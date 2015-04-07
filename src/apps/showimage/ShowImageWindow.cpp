@@ -230,35 +230,11 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 			| B_FRAME_EVENTS);
 	// wrap a scroll view around the view
 	fScrollView = new BScrollView("image_scroller", fImageView,
-		B_FOLLOW_ALL, 0, false, false, B_PLAIN_BORDER);
+		B_FOLLOW_ALL, 0, true, true, B_PLAIN_BORDER);
 	contentView->AddChild(fScrollView);
 
-	const int32 kstatusWidth = 190;
-	BRect rect;
-	rect = contentView->Bounds();
-	rect.top = viewFrame.bottom + 1;
-	rect.left = viewFrame.left + kstatusWidth;
-	rect.right = viewFrame.right + 1;
-	rect.bottom += 1;
-	BScrollBar* horizontalScrollBar = new BScrollBar(rect, "hscroll",
-		fImageView, 0, 150, B_HORIZONTAL);
-	contentView->AddChild(horizontalScrollBar);
-
-	rect.left = 0;
-	rect.right = kstatusWidth - 1;
-	rect.bottom -= 1;
-	fStatusView = new ShowImageStatusView(rect, "status_view", B_FOLLOW_BOTTOM,
-		B_WILL_DRAW);
-	contentView->AddChild(fStatusView);
-
-	rect = contentView->Bounds();
-	rect.top = viewFrame.top - 1;
-	rect.left = viewFrame.right + 1;
-	rect.bottom = viewFrame.bottom + 1;
-	rect.right += 1;
-	fVerticalScrollBar = new BScrollBar(rect, "vscroll", fImageView,
-		0, 150, B_VERTICAL);
-	contentView->AddChild(fVerticalScrollBar);
+	fStatusView = new ShowImageStatusView(fScrollView);
+	fScrollView->AddChild(fStatusView);
 
 	// Update minimum window size
 	float toolBarMinWidth = fToolBar->MinSize().width;
@@ -973,6 +949,10 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			fImageView->ZoomOut();
 			break;
 
+		case MSG_UPDATE_STATUS_ZOOM:
+			fStatusView->SetZoom(fImageView->Zoom());
+			break;
+
 		case kMsgOriginalSize:
 			if (message->FindInt32("behavior") == BButton::B_TOGGLE_BEHAVIOR) {
 				bool force = (message->FindInt32("be:value") == B_CONTROL_ON);
@@ -1040,8 +1020,6 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				fToolBar->MoveBy(0, offset);
 				fScrollView->ResizeBy(0, -offset);
 				fScrollView->MoveBy(0, offset);
-				fVerticalScrollBar->ResizeBy(0, -offset);
-				fVerticalScrollBar->MoveBy(0, offset);
 				UpdateIfNeeded();
 				snooze(15000);
 			}
@@ -1061,12 +1039,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				frame.top = fToolBar->Frame().bottom + 1;
 				fScrollView->MoveTo(fScrollView->Frame().left, frame.top);
 				fScrollView->ResizeTo(fScrollView->Bounds().Width(),
-					frame.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
-				fVerticalScrollBar->MoveTo(
-					frame.right - B_V_SCROLL_BAR_WIDTH + 1, frame.top);
-				fVerticalScrollBar->ResizeTo(
-					fVerticalScrollBar->Bounds().Width(),
-					frame.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
+					frame.Height() + 1);
 			}
 			break;
 		}
@@ -1085,16 +1058,11 @@ ShowImageWindow::_UpdateStatusText(const BMessage* message)
 	if (fImageView->Bitmap() != NULL) {
 		BRect bounds = fImageView->Bitmap()->Bounds();
 		status << bounds.IntegerWidth() + 1
-			<< "x" << bounds.IntegerHeight() + 1 << ", " << fImageType;
+			<< "x" << bounds.IntegerHeight() + 1;
 	}
 
-	BString text;
-	if (message != NULL && message->FindString("status", &text) == B_OK
-		&& text.Length() > 0) {
-		status << ", " << text;
-	}
-
-	fStatusView->Update(fNavigator.CurrentRef(), status);
+	fStatusView->Update(fNavigator.CurrentRef(), status, fImageType,
+		fImageView->Zoom());
 }
 
 
@@ -1546,8 +1514,6 @@ ShowImageWindow::_SetToolBarVisible(bool visible, bool animate)
 	} else {
 		fScrollView->ResizeBy(0, -diff);
 		fScrollView->MoveBy(0, diff);
-		fVerticalScrollBar->ResizeBy(0, -diff);
-		fVerticalScrollBar->MoveBy(0, diff);
 		fToolBar->MoveBy(0, diff);
 		if (!visible)
 			fToolBar->Hide();

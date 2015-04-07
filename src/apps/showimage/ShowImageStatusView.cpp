@@ -11,10 +11,12 @@
 
 #include "ShowImageStatusView.h"
 
+#include <ControlLook.h>
 #include <Entry.h>
 #include <MenuItem.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+#include <ScrollView.h>
 
 #include <tracker_private.h>
 #include "DirMenu.h"
@@ -22,60 +24,106 @@
 #include "ShowImageView.h"
 #include "ShowImageWindow.h"
 
+const float kHorzSpacing = 5.f;
 
-ShowImageStatusView::ShowImageStatusView(BRect rect, const char* name,
-	uint32 resizingMode, uint32 flags)
+
+ShowImageStatusView::ShowImageStatusView(BScrollView* scrollView)
 	:
-	BView(rect, name, resizingMode, flags)
+	BView(BRect(), "statusview", B_FOLLOW_BOTTOM | B_FOLLOW_LEFT, B_WILL_DRAW),
+	fScrollView(scrollView),
+	fPreferredSize(0.0, 0.0)
 {
-	SetViewColor(B_TRANSPARENT_32_BIT);
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetHighColor(0, 0, 0, 255);
+	memset(fCellWidth, 0, sizeof(fCellWidth));
+}
 
-	BFont font;
-	GetFont(&font);
-	font.SetSize(10.0);
-	SetFont(&font);
+
+void
+ShowImageStatusView::AttachedToWindow()
+{
+	SetFont(be_plain_font);
+	SetFontSize(10.0);
+
+	BScrollBar* scrollBar = fScrollView->ScrollBar(B_HORIZONTAL);
+	MoveTo(0.0, scrollBar->Frame().top);
+	rgb_color color = B_TRANSPARENT_COLOR;
+	BView* parent = Parent();
+	if (parent != NULL)
+		color = parent->ViewColor();
+
+	if (color == B_TRANSPARENT_COLOR)
+		color = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+	SetViewColor(color);
+
+	ResizeToPreferred();
+}
+
+
+void
+ShowImageStatusView::GetPreferredSize(float* _width, float* _height)
+{
+	_ValidatePreferredSize();
+
+	if (_width)
+		*_width = fPreferredSize.width;
+
+	if (_height)
+		*_height = fPreferredSize.height;
+}
+
+
+void
+ShowImageStatusView::ResizeToPreferred()
+{
+	float width, height;
+	GetPreferredSize(&width, &height);
+
+	if (Bounds().Width() > width)
+		width = Bounds().Width();
+
+	BView::ResizeTo(width, height);
 }
 
 
 void
 ShowImageStatusView::Draw(BRect updateRect)
 {
-	rgb_color darkShadow = tint_color(LowColor(), B_DARKEN_2_TINT);
-	rgb_color shadow = tint_color(LowColor(), B_DARKEN_1_TINT);
-	rgb_color light = tint_color(LowColor(), B_LIGHTEN_MAX_TINT);
+	if (fPreferredSize.width <= 0)
+		return;
 
-	BRect b(Bounds());
+	if (be_control_look != NULL) {
+		BRect bounds(Bounds());
+		be_control_look->DrawMenuBarBackground(this,
+			bounds, updateRect,	ViewColor());
+	}
 
-	BeginLineArray(5);
-		AddLine(BPoint(b.left, b.top),
-				BPoint(b.right, b.top), darkShadow);
-		b.top += 1.0;
-		AddLine(BPoint(b.left, b.top),
-				BPoint(b.right, b.top), light);
-		AddLine(BPoint(b.right, b.top + 1.0),
-				BPoint(b.right, b.bottom), shadow);
-		AddLine(BPoint(b.right - 1.0, b.bottom),
-				BPoint(b.left + 1.0, b.bottom), shadow);
-		AddLine(BPoint(b.left, b.bottom),
-				BPoint(b.left, b.top + 1.0), light);
-	EndLineArray();
+	BRect bounds(Bounds());
+	rgb_color highColor = HighColor();
+	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
+	StrokeLine(bounds.LeftTop(), bounds.RightTop());
 
-	b.InsetBy(1.0, 1.0);
+	float x = bounds.left;
+	for (size_t i = 0; i < kStatusCellCount - 1; i++) {
+		x += fCellWidth[i];
+		StrokeLine(BPoint(x, bounds.top + 3), BPoint(x, bounds.bottom - 3));
+	}
 
-	// Truncate and layout text
-	BString truncated(fText);
-	BFont font;
-	GetFont(&font);
-	font.TruncateString(&truncated, B_TRUNCATE_MIDDLE, b.Width() - 4.0);
-	font_height fh;
-	font.GetHeight(&fh);
+	SetLowColor(ViewColor());
+	SetHighColor(highColor);
 
-	FillRect(b, B_SOLID_LOW);
-	SetDrawingMode(B_OP_OVER);
-	DrawString(truncated.String(), BPoint(b.left + 2.0,
-		floorf(b.top + b.Height() / 2.0 + fh.ascent / 2.0)));
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+
+	x = bounds.left;
+	float y = (bounds.bottom + bounds.top
+		+ ceilf(fontHeight.ascent) - ceilf(fontHeight.descent)) / 2;
+
+	for (size_t i = 0; i < kStatusCellCount; i++) {
+		if (fCellText[i].Length() == 0)
+			continue;
+		DrawString(fCellText[i], BPoint(x + kHorzSpacing, y));
+		x += fCellWidth[i];
+	}
 }
 
 
@@ -101,11 +149,81 @@ ShowImageStatusView::MouseDown(BPoint where)
 
 
 void
-ShowImageStatusView::Update(const entry_ref& ref, const BString& text)
+ShowImageStatusView::Update(const entry_ref& ref, const BString& text,
+	const BString& imageType, float zoom)
 {
-	fText = text;
 	fRef = ref;
 
+	_SetFrameText(text);
+	_SetZoomText(zoom);
+	_SetImageTypeText(imageType);
+
+	_ValidatePreferredSize();
 	Invalidate();
 }
 
+
+void
+ShowImageStatusView::SetZoom(float zoom)
+{
+	_SetZoomText(zoom);
+	_ValidatePreferredSize();
+	Invalidate();
+}
+
+
+void
+ShowImageStatusView::_SetFrameText(const BString& text)
+{
+	fCellText[0] = text;
+}
+
+
+void
+ShowImageStatusView::_SetZoomText(float zoom)
+{
+	fCellText[1].SetToFormat("%.0f%%", zoom * 100);
+}
+
+
+void
+ShowImageStatusView::_SetImageTypeText(const BString& imageType)
+{
+	fCellText[2] = imageType;
+}
+
+
+void
+ShowImageStatusView::_ValidatePreferredSize()
+{
+	float orgWidth = fPreferredSize.width;
+	// width
+	fPreferredSize.width = 0.f;
+	for (size_t i = 0; i < kStatusCellCount; i++) {
+		if (fCellText[i].Length() == 0) {
+			fCellWidth[i] = 0;
+			continue;
+		}
+		float width = ceilf(StringWidth(fCellText[i]));
+		if (width > 0)
+			width += kHorzSpacing * 2;
+		fCellWidth[i] = width;
+		fPreferredSize.width += fCellWidth[i];
+	}
+
+	// height
+	font_height fontHeight;
+	GetFontHeight(&fontHeight);
+
+	fPreferredSize.height = ceilf(fontHeight.ascent + fontHeight.descent
+		+ fontHeight.leading);
+
+	if (fPreferredSize.height < B_H_SCROLL_BAR_HEIGHT)
+		fPreferredSize.height = B_H_SCROLL_BAR_HEIGHT;
+
+	float delta = fPreferredSize.width - orgWidth;
+	ResizeBy(delta, 0);
+	BScrollBar* scrollBar = fScrollView->ScrollBar(B_HORIZONTAL);
+	scrollBar->ResizeBy(-delta, 0);
+	scrollBar->MoveBy(delta, 0);
+}
