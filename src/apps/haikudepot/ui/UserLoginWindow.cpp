@@ -235,10 +235,9 @@ UserLoginWindow::MessageReceived(BMessage* message)
 
 		case MSG_CAPTCHA_OBTAINED:
 			if (fCaptchaImage.Get() != NULL) {
-				fCaptchaView->SetBitmap(
-					fCaptchaImage->Bitmap(SharedBitmap::SIZE_ANY));
+				fCaptchaView->SetBitmap(fCaptchaImage);
 			} else {
-				fCaptchaView->SetBitmap(NULL);
+				fCaptchaView->UnsetBitmap();
 			}
 			fCaptchaResultField->SetText("");
 			break;
@@ -442,7 +441,7 @@ UserLoginWindow::_RequestCaptcha()
 {
 	if (Lock()) {
 		fCaptchaToken = "";
-		fCaptchaView->SetBitmap(NULL);
+		fCaptchaView->UnsetBitmap();
 		fCaptchaImage.Unset();
 		Unlock();
 	}

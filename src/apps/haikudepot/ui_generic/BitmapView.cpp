@@ -131,19 +131,35 @@ BitmapView::MaxSize()
 
 
 void
-BitmapView::SetBitmap(const BBitmap* bitmap)
+BitmapView::SetBitmap(SharedBitmap* bitmap, SharedBitmap::Size bitmapSize)
 {
-	if (bitmap == fBitmap)
+	if (bitmap == fReference && bitmapSize == fBitmapSize)
 		return;
 
 	BSize size = MinSize();
 
-	fBitmap = bitmap;
+	fReference.SetTo(bitmap);
+	fBitmapSize = bitmapSize;
+	fBitmap = bitmap->Bitmap(bitmapSize);
 
 	BSize newSize = MinSize();
 	if (size != newSize)
 		InvalidateLayout();
 
+	Invalidate();
+}
+
+
+void
+BitmapView::UnsetBitmap()
+{
+	if (fReference.Get() == NULL)
+		return;
+
+	fBitmap = NULL;
+	fReference.Unset();
+
+	InvalidateLayout();
 	Invalidate();
 }
 

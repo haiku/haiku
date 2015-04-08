@@ -151,16 +151,15 @@ public:
 		fPackageListener->SetPackage(package);
 
 		if (package->Icon().Get() != NULL) {
-			fIconView->SetBitmap(
-				package->Icon()->Bitmap(SharedBitmap::SIZE_64));
+			fIconView->SetBitmap(package->Icon(), SharedBitmap::SIZE_64);
 		} else
-			fIconView->SetBitmap(NULL);
+			fIconView->UnsetBitmap();
 
 		if (package->State() == ACTIVATED) {
-			fInstalledIconView->SetBitmap(
-				sInstalledIcon->Bitmap(SharedBitmap::SIZE_16));
+			fInstalledIconView->SetBitmap(sInstalledIcon,
+				SharedBitmap::SIZE_16);
 		} else
-			fInstalledIconView->SetBitmap(NULL);
+			fInstalledIconView->UnsetBitmap();
 
 		fTitleView->SetText(package->Title());
 
@@ -199,8 +198,8 @@ public:
 	{
 		fPackageListener->SetPackage(PackageInfoRef(NULL));
 
-		fIconView->SetBitmap(NULL);
-		fInstalledIconView->SetBitmap(NULL);
+		fIconView->UnsetBitmap();
+		fInstalledIconView->UnsetBitmap();
 		fTitleView->SetText("");
 		fPublisherView->SetText("");
 		fSummaryView->SetText("");

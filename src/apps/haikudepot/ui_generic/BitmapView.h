@@ -6,6 +6,8 @@
 #define BITMAP_VIEW_H
 
 
+#include "SharedBitmap.h"
+
 #include <View.h>
 
 
@@ -22,7 +24,10 @@ public:
 	virtual	BSize				PreferredSize();
 	virtual	BSize				MaxSize();
 
-			void				SetBitmap(const BBitmap* bitmap);
+			void				SetBitmap(SharedBitmap* bitmap,
+									SharedBitmap::Size bitmapSize
+										= SharedBitmap::SIZE_ANY);
+			void				UnsetBitmap();
 			void				SetScaleBitmap(bool scaleBitmap);
 
 protected:
@@ -30,6 +35,8 @@ protected:
 									BRect updateRect);
 
 private:
+			BitmapRef			fReference;
+			SharedBitmap::Size	fBitmapSize;
 			const BBitmap*		fBitmap;
 			bool				fScaleBitmap;
 };

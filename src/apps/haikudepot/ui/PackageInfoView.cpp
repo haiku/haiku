@@ -391,9 +391,9 @@ public:
 	void SetPackage(const PackageInfo& package)
 	{
 		if (package.Icon().Get() != NULL)
-			fIconView->SetBitmap(package.Icon()->Bitmap(SharedBitmap::SIZE_32));
+			fIconView->SetBitmap(package.Icon(), SharedBitmap::SIZE_32);
 		else
-			fIconView->SetBitmap(NULL);
+			fIconView->UnsetBitmap();
 
 		fTitleView->SetText(package.Title());
 
@@ -431,7 +431,7 @@ public:
 
 	void Clear()
 	{
-		fIconView->SetBitmap(NULL);
+		fIconView->UnsetBitmap();
 		fTitleView->SetText("");
 		fPublisherView->SetText("");
 		fVersionInfo->SetText("");
@@ -797,31 +797,36 @@ public:
 		fDescriptionView->SetText(package.ShortDescription(),
 			package.FullDescription());
 
-		fEmailIconView->SetBitmap(fEmailIcon.Bitmap(SharedBitmap::SIZE_16));
+		fEmailIconView->SetBitmap(&fEmailIcon, SharedBitmap::SIZE_16);
 		_SetContactInfo(fEmailLinkView, package.Publisher().Email());
-		fWebsiteIconView->SetBitmap(fWebsiteIcon.Bitmap(SharedBitmap::SIZE_16));
+		fWebsiteIconView->SetBitmap(&fWebsiteIcon, SharedBitmap::SIZE_16);
 		_SetContactInfo(fWebsiteLinkView, package.Publisher().Website());
 
-		const BBitmap* screenshot = NULL;
+		bool hasScreenshot = false;
 		const BitmapList& screenShots = package.Screenshots();
 		if (screenShots.CountItems() > 0) {
 			const BitmapRef& bitmapRef = screenShots.ItemAtFast(0);
-			if (bitmapRef.Get() != NULL)
-				screenshot = bitmapRef->Bitmap(SharedBitmap::SIZE_ANY);
+			if (bitmapRef.Get() != NULL) {
+				hasScreenshot = true;
+				fScreenshotView->SetBitmap(bitmapRef);
+			}
 		}
-		fScreenshotView->SetBitmap(screenshot);
-		fScreenshotView->SetEnabled(screenshot != NULL);
+
+		if (!hasScreenshot)
+			fScreenshotView->UnsetBitmap();
+
+		fScreenshotView->SetEnabled(hasScreenshot);
 	}
 
 	void Clear()
 	{
 		fDescriptionView->SetText("");
-		fEmailIconView->SetBitmap(NULL);
+		fEmailIconView->UnsetBitmap();
 		fEmailLinkView->SetText("");
-		fWebsiteIconView->SetBitmap(NULL);
+		fWebsiteIconView->UnsetBitmap();
 		fWebsiteLinkView->SetText("");
 
-		fScreenshotView->SetBitmap(NULL);
+		fScreenshotView->UnsetBitmap();
 		fScreenshotView->SetEnabled(false);
 	}
 
@@ -867,8 +872,8 @@ public:
 
 		fAvatarView = new BitmapView("avatar view");
 		if (rating.User().Avatar().Get() != NULL) {
-			fAvatarView->SetBitmap(
-				rating.User().Avatar()->Bitmap(SharedBitmap::SIZE_16));
+			fAvatarView->SetBitmap(rating.User().Avatar(),
+				SharedBitmap::SIZE_16);
 		}
 		fAvatarView->SetExplicitMinSize(BSize(16.0f, 16.0f));
 
@@ -908,10 +913,8 @@ public:
 //		fVoteDownIconView = new BitmapButton("vote down icon", voteDownMessage);
 //		fDownVoteCountView = new BStringView("up vote count", "");
 //
-//		fVoteUpIconView->SetBitmap(
-//			voteUpIcon->Bitmap(SharedBitmap::SIZE_16));
-//		fVoteDownIconView->SetBitmap(
-//			voteDownIcon->Bitmap(SharedBitmap::SIZE_16));
+//		fVoteUpIconView->SetBitmap(voteUpIcon, SharedBitmap::SIZE_16);
+//		fVoteDownIconView->SetBitmap(voteDownIcon, SharedBitmap::SIZE_16);
 //
 //		fUpVoteCountView->SetFont(&versionFont);
 //		fUpVoteCountView->SetHighColor(kLightBlack);

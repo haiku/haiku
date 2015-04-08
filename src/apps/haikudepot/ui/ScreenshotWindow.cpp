@@ -175,8 +175,8 @@ ScreenshotWindow::_DownloadThread()
 		return;
 	}
 
-	fScreenshotView->SetBitmap(NULL);
-	
+	fScreenshotView->UnsetBitmap();
+
 	ScreenshotInfoList screenshotInfos;
 	if (fPackage.Get() != NULL)
 		screenshotInfos = fPackage->ScreenshotInfos();
@@ -202,7 +202,7 @@ ScreenshotWindow::_DownloadThread()
 	if (status == B_OK && Lock()) {
 		printf("got screenshot");
 		fScreenshot = BitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
-		fScreenshotView->SetBitmap(fScreenshot->Bitmap(SharedBitmap::SIZE_ANY));
+		fScreenshotView->SetBitmap(fScreenshot);
 		_ResizeToFitAndCenter();
 		Unlock();
 	} else {
