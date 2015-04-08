@@ -1142,7 +1142,7 @@ BSlider::DrawText()
 			view->SetHighColor(tint_color(LowColor(), B_DISABLED_LABEL_TINT));
 		}
 	} else
- 		flags = be_control_look->Flags(this);
+		flags = be_control_look->Flags(this);
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
