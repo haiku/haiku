@@ -63,8 +63,8 @@ RemotePackageRepository HaikuPorts
 	capitalbe-1.0-2
 	caya-2013.07.31-3
 	ccache-3.1.9-1
-	cdrtools-3.01~a18-1
-	cdrtools_devel-3.01~a18-1
+	cdrtools-3.01~a27-1
+	cdrtools_devel-3.01~a27-1
 	chat-20100903-2
 	clockwerk-git-3
 	ctags-5.8-3
@@ -457,6 +457,7 @@ RemotePackageRepository HaikuPorts
 	boost_x86_timer-1.55.0-5
 	boost_x86_unit_test_framework-1.55.0-5
 	boost_x86_wave-1.55.0-5
+	burnitnow_x86-0.1.0-1
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
 	cmake_x86-3.0.0-1
@@ -757,6 +758,7 @@ RemotePackageRepository HaikuPorts
 	bookmarkconverter
 	boost_x86
 	buildbot_slave
+	burnitnow
 	bzip2
 	bzr
 	canna
