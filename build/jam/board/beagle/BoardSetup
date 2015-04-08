@@ -53,6 +53,9 @@ mloFile = [ DownloadFile $(HAIKU_BOARD_MLO_IMAGE)
 ubootFile = [ DownloadFile $(HAIKU_BOARD_UBOOT_IMAGE)
         : $(HAIKU_BOARD_UBOOT_IMAGE_URL) ] ;
 
+local fdtBinary = [ FDirName $(HAIKU_OUTPUT_DIR) $(HAIKU_BOARD_FDT_NAME).dtb ] ;
+CompileDTS $(fdtBinary) : [ FDirName $(HAIKU_TOP) src data dts arch arm $(HAIKU_BOARD_FDT_NAME).dts ] ;
+
 # U-Boot environment
 # We load the uImage 2MB above its final destination, bootm will decode
 # it to the proper location. Our image is smaller than 2MB so this works.
@@ -67,7 +70,7 @@ HAIKU_BOARD_SDIMAGE_FILES =
 	haiku_loader_nbsd.ub
 	haiku_loader_linux.ub
 	haiku-floppyboot.tgz.ub
-	$(HAIKU_BOARD_FDT_NAME).dtb
+	$(fdtBinary)
 ;
 
 
