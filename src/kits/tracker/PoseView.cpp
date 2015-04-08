@@ -1489,16 +1489,8 @@ BPoseView::AddPosesTask(void* castToParams)
 	delete container;
 	// build attributes menu based on mime types we've added
 
- 	if (lock.Lock()) {
-#ifdef MSIPL_COMPILE_H
-	// workaround for broken PPC STL, not needed with the SGI headers for x86
- 		set<thread_id>::iterator i = view->fAddPosesThreads.find(threadID);
- 		if (i != view->fAddPosesThreads.end())
- 			view->fAddPosesThreads.erase(i);
-#else
+	if (lock.Lock())
 		view->fAddPosesThreads.erase(threadID);
-#endif
-	}
 
 	return B_OK;
 }
