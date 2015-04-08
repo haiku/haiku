@@ -59,19 +59,21 @@ package_state_to_string(PackageInfoRef ref)
 
 // A field type displaying both a bitmap and a string so that the
 // tree display looks nicer (both text and bitmap are indented)
-// TODO: Code-duplication with DriveSetup PartitionList.h
-class BBitmapStringField : public BStringField {
+class SharedBitmapStringField : public BStringField {
 	typedef BStringField Inherited;
 public:
-								BBitmapStringField(const BBitmap* bitmap,
+								SharedBitmapStringField(SharedBitmap* bitmap,
+									SharedBitmap::Size size,
 									const char* string);
-	virtual						~BBitmapStringField();
+	virtual						~SharedBitmapStringField();
 
-			void				SetBitmap(const BBitmap* bitmap);
+			void				SetBitmap(SharedBitmap* bitmap,
+									SharedBitmap::Size size);
 			const BBitmap*		Bitmap() const
 									{ return fBitmap; }
 
 private:
+			BitmapRef			fReference;
 			const BBitmap*		fBitmap;
 };
 
@@ -90,7 +92,7 @@ private:
 
 
 // BColumn for PackageListView which knows how to render
-// a BBitmapStringField
+// a SharedBitmapStringField
 // TODO: Code-duplication with DriveSetup PartitionList.h
 class PackageColumn : public BTitledColumn {
 	typedef BTitledColumn Inherited;
@@ -176,28 +178,30 @@ private:
 };
 
 
-// #pragma mark - BBitmapStringField
+// #pragma mark - SharedBitmapStringField
 
 
-// TODO: Code-duplication with DriveSetup PartitionList.cpp
-BBitmapStringField::BBitmapStringField(const BBitmap* bitmap,
-		const char* string)
+SharedBitmapStringField::SharedBitmapStringField(SharedBitmap* bitmap,
+		SharedBitmap::Size size, const char* string)
 	:
 	Inherited(string),
-	fBitmap(bitmap)
+	fBitmap(NULL)
 {
+	SetBitmap(bitmap, size);
 }
 
 
-BBitmapStringField::~BBitmapStringField()
+SharedBitmapStringField::~SharedBitmapStringField()
 {
 }
 
 
 void
-BBitmapStringField::SetBitmap(const BBitmap* bitmap)
+SharedBitmapStringField::SetBitmap(SharedBitmap* bitmap,
+	SharedBitmap::Size size)
 {
-	fBitmap = bitmap;
+	fReference = bitmap;
+	fBitmap = bitmap != NULL ? bitmap->Bitmap(size) : NULL;
 	// TODO: cause a redraw?
 }
 
@@ -255,8 +259,8 @@ PackageColumn::PackageColumn(const char* title, float width, float minWidth,
 void
 PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 {
-	BBitmapStringField* bitmapField
-		= dynamic_cast<BBitmapStringField*>(field);
+	SharedBitmapStringField* bitmapField
+		= dynamic_cast<SharedBitmapStringField*>(field);
 	BStringField* stringField = dynamic_cast<BStringField*>(field);
 	RatingField* ratingField = dynamic_cast<RatingField*>(field);
 
@@ -404,8 +408,8 @@ PackageColumn::CompareFields(BField* field1, BField* field2)
 float
 PackageColumn::GetPreferredWidth(BField *_field, BView* parent) const
 {
-	BBitmapStringField* bitmapField
-		= dynamic_cast<BBitmapStringField*>(_field);
+	SharedBitmapStringField* bitmapField
+		= dynamic_cast<SharedBitmapStringField*>(_field);
 	BStringField* stringField = dynamic_cast<BStringField*>(_field);
 
 	float parentWidth = Inherited::GetPreferredWidth(_field, parent);
@@ -503,10 +507,8 @@ PackageRow::UpdateTitle()
 	if (fPackage.Get() == NULL)
 		return;
 
-	const BBitmap* icon = NULL;
-	if (fPackage->Icon().Get() != NULL)
-		icon = fPackage->Icon()->Bitmap(SharedBitmap::SIZE_16);
-	SetField(new BBitmapStringField(icon, fPackage->Title()), kTitleColumn);
+	SetField(new SharedBitmapStringField(fPackage->Icon(),
+			SharedBitmap::SIZE_16, fPackage->Title()), kTitleColumn);
 }
 
 
