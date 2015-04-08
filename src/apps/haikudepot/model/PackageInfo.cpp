@@ -473,7 +473,8 @@ PackageInfo::PackageInfo()
 	fSystemDependency(false),
 	fArchitecture(),
 	fLocalFilePath(),
-	fFileName()
+	fFileName(),
+	fSize(0)
 {
 }
 
