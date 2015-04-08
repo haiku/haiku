@@ -44,7 +44,14 @@ static bool sParanoidValidation = false;
 static thread_id sWallCheckThread = -1;
 static bool sStopWallChecking = false;
 static bool sUseGuardPage = false;
-static bool sDefaultAlignment = 0;
+
+#if __cplusplus >= 201103L
+#include <cstddef>
+using namespace std;
+static size_t sDefaultAlignment = alignof(max_align_t);
+#else
+static size_t sDefaultAlignment = 0;
+#endif
 
 
 void
@@ -1852,7 +1859,7 @@ __init_heap_post_env(void)
 		const char *argument = strchr(mode, 'a');
 		if (argument != NULL
 			&& sscanf(argument, "a%" B_SCNuSIZE, &defaultAlignment) == 1
-			&& defaultAlignment > 0) {
+			&& defaultAlignment >= 0) {
 			heap_debug_set_default_alignment(defaultAlignment);
 		}
 	}

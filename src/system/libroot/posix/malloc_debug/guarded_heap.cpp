@@ -19,7 +19,14 @@
 
 
 static bool sDebuggerCalls = true;
+
+#if __cplusplus >= 201103L
+#include <cstddef>
+using namespace std;
+static size_t sDefaultAlignment = alignof(max_align_t);
+#else
 static size_t sDefaultAlignment = 0;
+#endif
 
 
 static void
@@ -950,7 +957,7 @@ __init_heap_post_env(void)
 		const char *argument = strchr(mode, 'a');
 		if (argument != NULL
 			&& sscanf(argument, "a%" B_SCNuSIZE, &defaultAlignment) == 1
-			&& defaultAlignment > 0) {
+			&& defaultAlignment >= 0) {
 			heap_debug_set_default_alignment(defaultAlignment);
 		}
 	}
