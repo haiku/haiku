@@ -261,7 +261,6 @@ private:
 	bool fHaveCommonPreferredApp;
 
 	SearchForSignatureEntryList* fIterator;
-		// private copy of the iterator pointer
 
 	typedef BPoseView _inherited;
 };

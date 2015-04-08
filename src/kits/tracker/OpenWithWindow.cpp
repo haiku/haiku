@@ -1400,7 +1400,7 @@ SearchForSignatureEntryList::Relation(const Model* nodeModel,
 {
 	int32 supportsMimeType = applicationModel->SupportsMimeType(
 		nodeModel->MimeType(), 0, true);
- 	switch (supportsMimeType) {
+	switch (supportsMimeType) {
 		case kDoesNotSupportType:
 			return kNoRelation;
 

@@ -1487,7 +1487,6 @@ BPoseView::AddPosesTask(void* castToParams)
 
 	delete posesResult;
 	delete container;
-	// build attributes menu based on mime types we've added
 
 	if (lock.Lock())
 		view->fAddPosesThreads.erase(threadID);
@@ -1911,7 +1910,7 @@ BPoseView::CreatePoses(Model** models, PoseInfo* poseInfoArray, int32 count,
 					viewBounds.InsetBy(-20, -20);
 				}
 
-	 			if (forceDraw && viewBounds.Intersects(poseBounds))
+				if (forceDraw && viewBounds.Intersects(poseBounds))
 					Invalidate(poseBounds);
 
 				// if this is the first item then we set extent here
