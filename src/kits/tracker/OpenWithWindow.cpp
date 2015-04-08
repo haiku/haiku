@@ -536,11 +536,19 @@ OpenWithPoseView::OpenWithPoseView()
 	:
 	BPoseView(new Model(), kListMode),
 	fHaveCommonPreferredApp(false),
-	fIterator(NULL)
+	fIterator(NULL),
+	fRefFilter(NULL)
 {
 	fSavePoseLocations = false;
 	fMultipleSelection = false;
 	fDragEnabled = false;
+}
+
+
+OpenWithPoseView::~OpenWithPoseView()
+{
+	delete fRefFilter;
+	delete fIterator;
 }
 
 
@@ -665,10 +673,19 @@ OpenWithPoseView::InitDirentIterator(const entry_ref*)
 		HideBarberPole();
 		return NULL;
 	}
-	SetRefFilter(new OpenWithRefFilter(fIterator, entryList,
-		(fHaveCommonPreferredApp ? &fPreferredRef : 0)));
+
+	fRefFilter = new OpenWithRefFilter(fIterator, entryList,
+		fHaveCommonPreferredApp ? &fPreferredRef : 0);
+	SetRefFilter(fRefFilter);
 
 	return fIterator;
+}
+
+
+void
+OpenWithPoseView::ReturnDirentIterator(EntryListBase* iterator)
+{
+	// Do nothing. We keep our fIterator around as it is used by fRefFilter.
 }
 
 

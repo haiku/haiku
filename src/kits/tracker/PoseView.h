@@ -436,6 +436,8 @@ protected:
 	virtual EntryListBase* InitDirentIterator(const entry_ref*);
 		// sets up an entry iterator for _add_poses_
 		// overriden by QueryPoseView, etc. to provide different iteration
+	virtual void ReturnDirentIterator(EntryListBase* iterator);
+		// returns the entry iterator after _add_poses_ is done
 
 	void Cleanup(bool doAll = false);
 		// clean up poses

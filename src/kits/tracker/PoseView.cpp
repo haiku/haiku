@@ -1148,6 +1148,13 @@ BPoseView::InitDirentIterator(const entry_ref* ref)
 }
 
 
+void
+BPoseView::ReturnDirentIterator(EntryListBase* iterator)
+{
+	delete iterator;
+}
+
+
 uint32
 BPoseView::WatchNewNodeMask()
 {
@@ -1478,7 +1485,8 @@ BPoseView::AddPosesTask(void* castToParams)
 		PRINT(("add_poses cleanup \n"));
 		// failed to lock window, bail
 		delete posesResult;
-		delete container;
+
+		view->ReturnDirentIterator(container);
 
 		return B_ERROR;
 	}
@@ -1486,7 +1494,8 @@ BPoseView::AddPosesTask(void* castToParams)
 	ASSERT(modelChunkIndex == -1);
 
 	delete posesResult;
-	delete container;
+
+	view->ReturnDirentIterator(container);
 
 	if (lock.Lock())
 		view->fAddPosesThreads.erase(threadID);
