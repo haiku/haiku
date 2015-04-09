@@ -46,9 +46,6 @@ enum  {
 	M_OPEN_PANEL_RESULT			= 'oprs',
 	M_SAVE_PANEL_RESULT			= 'sprs',
 
-	M_MEDIA_SERVER_STARTED		= 'msst',
-	M_MEDIA_SERVER_QUIT			= 'msqt',
-
 	M_OPEN_PREVIOUS_PLAYLIST	= 'oppp'
 };
 
@@ -107,9 +104,6 @@ private:
 			BFilePanel*			fOpenFilePanel;
 			BFilePanel*			fSaveFilePanel;
 			entry_ref			fLastFilePanelFolder;
-
-			bool				fMediaServerRunning;
-			bool				fMediaAddOnServerRunning;
 
 			bool				fAudioWindowFrameSaved;
 			bigtime_t			fLastSavedAudioWindowCreationTime;

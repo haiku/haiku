@@ -35,6 +35,7 @@
 #include <fs_attr.h>
 #include <Language.h>
 #include <Locale.h>
+#include <MediaRoster.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -315,12 +316,20 @@ MainWin::MainWin(bool isFirstWindow, BMessage* message)
 
 	if (message != NULL)
 		PostMessage(message);
+
+	BMediaRoster* roster = BMediaRoster::Roster();
+	roster->StartWatching(BMessenger(this, this), B_MEDIA_SERVER_STARTED);
+	roster->StartWatching(BMessenger(this, this),  B_MEDIA_SERVER_QUIT);
 }
 
 
 MainWin::~MainWin()
 {
 //	printf("MainWin::~MainWin\n");
+
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	roster->StopWatching(BMessenger(this, this), B_MEDIA_SERVER_STARTED);
+	roster->StopWatching(BMessenger(this, this), B_MEDIA_SERVER_QUIT);
 
 	Settings::Default()->RemoveListener(&fGlobalSettingsListener);
 	fPlaylist->RemoveListener(fPlaylistObserver);
@@ -623,9 +632,9 @@ MainWin::MessageReceived(BMessage* msg)
 			fPlaylistWindow->PostMessage(msg);
 			break;
 
-		case M_MEDIA_SERVER_STARTED:
+		case B_MEDIA_SERVER_STARTED:
 		{
-			printf("TODO: implement M_MEDIA_SERVER_STARTED\n");
+			printf("TODO: implement B_MEDIA_SERVER_STARTED\n");
 //
 //			BAutolock _(fPlaylist);
 //			BMessage fakePlaylistMessage(MSG_PLAYLIST_CURRENT_ITEM_CHANGED);
@@ -635,8 +644,8 @@ MainWin::MessageReceived(BMessage* msg)
 			break;
 		}
 
-		case M_MEDIA_SERVER_QUIT:
-			printf("TODO: implement M_MEDIA_SERVER_QUIT\n");
+		case B_MEDIA_SERVER_QUIT:
+			printf("TODO: implement B_MEDIA_SERVER_QUIT\n");
 //			if (fController->Lock()) {
 //				fController->CleanupNodes();
 //				fController->Unlock();

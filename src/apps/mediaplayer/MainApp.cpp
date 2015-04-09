@@ -33,7 +33,6 @@
 #include <MimeType.h>
 #include <Path.h>
 #include <Resources.h>
-#include <Roster.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -55,9 +54,6 @@ const char* kAppSig = "application/x-vnd.Haiku-MediaPlayer";
 
 MainApp* gMainApp;
 
-static const char* kMediaServerSig = B_MEDIA_SERVER_SIGNATURE;
-static const char* kMediaServerAddOnSig = "application/x-vnd.Be.addon-host";
-
 
 MainApp::MainApp()
 	:
@@ -69,41 +65,25 @@ MainApp::MainApp()
 	fSaveFilePanel(NULL),
 	fLastFilePanelFolder(),
 
-	fMediaServerRunning(false),
-	fMediaAddOnServerRunning(false),
-
 	fAudioWindowFrameSaved(false),
 	fLastSavedAudioWindowCreationTime(0)
 {
 	fLastFilePanelFolder = Settings::Default()->FilePanelFolder();
 
-	// Now tell the application roster, that we're interested
-	// in getting notifications of apps being launched or quit.
-	// In this way we are going to detect a media_server restart.
-	be_roster->StartWatching(BMessenger(this, this),
-		B_REQUEST_LAUNCHED | B_REQUEST_QUIT);
-	// we will keep track of the status of media_server
-	// and media_addon_server
-	fMediaServerRunning = be_roster->IsRunning(kMediaServerSig);
-	fMediaAddOnServerRunning = be_roster->IsRunning(kMediaServerAddOnSig);
-
-	if (!fMediaServerRunning || !fMediaAddOnServerRunning) {
+	if (!BMediaRoster::IsRunning()) {
 		BAlert* alert = new BAlert("start_media_server",
 			B_TRANSLATE("It appears the media server is not running.\n"
 			"Would you like to start it ?"), B_TRANSLATE("Quit"),
 			B_TRANSLATE("Start media server"), NULL,
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetShortcut(0, B_ESCAPE);
-		
+
 		if (alert->Go() == 0) {
 			PostMessage(B_QUIT_REQUESTED);
 			return;
 		}
 
 		launch_media_server();
-
-		fMediaServerRunning = be_roster->IsRunning(kMediaServerSig);
-		fMediaAddOnServerRunning = be_roster->IsRunning(kMediaServerAddOnSig);
 	}
 }
 
@@ -317,53 +297,6 @@ MainApp::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case B_SOME_APP_LAUNCHED:
-		case B_SOME_APP_QUIT:
-		{
-			const char* mimeSig;
-			if (message->FindString("be:signature", &mimeSig) < B_OK)
-				break;
-
-			bool isMediaServer = strcmp(mimeSig, kMediaServerSig) == 0;
-			bool isAddonServer = strcmp(mimeSig, kMediaServerAddOnSig) == 0;
-			if (!isMediaServer && !isAddonServer)
-				break;
-
-			bool running = (message->what == B_SOME_APP_LAUNCHED);
-			if (isMediaServer)
-				fMediaServerRunning = running;
-			if (isAddonServer)
-				fMediaAddOnServerRunning = running;
-
-			if (!fMediaServerRunning && !fMediaAddOnServerRunning) {
-				fprintf(stderr, "media server has quit.\n");
-				// trigger closing of media nodes
-				BMessage broadcast(M_MEDIA_SERVER_QUIT);
-				_BroadcastMessage(broadcast);
-			} else if (fMediaServerRunning && fMediaAddOnServerRunning) {
-				fprintf(stderr, "media server has launched.\n");
-				// HACK!
-				// quit our now invalid instance of the media roster
-				// so that before new nodes are created,
-				// we get a new roster (it is a normal looper)
-				// TODO: This functionality could become part of
-				// BMediaRoster. It could detect the start/quit of
-				// the servers like it is done here, and either quit
-				// itself, or re-establish the connection, and send some
-				// notification to the app... something along those lines.
-				BMediaRoster* roster = BMediaRoster::CurrentRoster();
-				if (roster) {
-					roster->Lock();
-					roster->Quit();
-				}
-				// give the servers some time to init...
-				snooze(3000000);
-				// trigger re-init of media nodes
-				BMessage broadcast(M_MEDIA_SERVER_STARTED);
-				_BroadcastMessage(broadcast);
-			}
-			break;
-		}
 		case M_SETTINGS:
 			_ShowSettingsWindow();
 			break;
