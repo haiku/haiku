@@ -90,6 +90,7 @@ enum {
 	NODE_TIME_WARP,
 	NODE_PREROLL,
 	NODE_ROLL,
+	NODE_SYNC_TO,
 	NODE_SET_TIMESOURCE,
 	NODE_GET_TIMESOURCE,
 	NODE_REQUEST_COMPLETED,
@@ -914,6 +915,14 @@ struct node_roll_command : command_data {
 	bigtime_t				start_performance_time;
 	bigtime_t				stop_performance_time;
 	bigtime_t				seek_media_time;
+};
+
+struct node_sync_to_request : request_data {
+	bigtime_t				performance_time;
+	port_id					port;
+};
+
+struct node_sync_to_reply : reply_data {
 };
 
 struct node_set_run_mode_command : command_data {

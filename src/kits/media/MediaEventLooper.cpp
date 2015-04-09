@@ -157,8 +157,12 @@ BMediaEventLooper::AddTimer(bigtime_t at_performance_time,
 							int32 cookie)
 {
 	CALLED();
-	// XXX what do we need to do here?
-	return BMediaNode::AddTimer(at_performance_time,cookie);
+
+	media_timed_event event(at_performance_time,
+		BTimedEventQueue::B_TIMER, NULL,
+		BTimedEventQueue::B_EXPIRE_TIMER);
+	event.data = cookie;
+	return EventQueue()->AddEvent(event);
 }
 
 
@@ -475,6 +479,10 @@ BMediaEventLooper::DispatchEvent(const media_timed_event *event,
 
 		case BTimedEventQueue::B_WARP:
 			/* nothing */
+			break;
+
+		case BTimedEventQueue::B_TIMER:
+			TimerExpired(event->event_time, event->data);
 			break;
 
 		default:

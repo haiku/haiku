@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2015, Dario Casalinuovo
  * Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -327,16 +328,21 @@ BMediaNode::NodeStopped(bigtime_t whenPerformance)
 }
 
 
+/*
+ * Used in couple with AddTimer, this will cause the BMediaRoster::SyncToNode()
+ * call that requested the timer to return to the caller with an appropriate
+ * value.
+ */
 void
 BMediaNode::TimerExpired(bigtime_t notifyPoint,
 						 int32 cookie,
 						 status_t error)
 {
-	UNIMPLEMENTED();
-	// Used with AddTimer
-	// This will, in turn, cause the BMediaRoster::SyncToNode() call
-	// that instigated the timer to return to the caller.
-	// Probably only important to classes derived from BTimeSource.
+	CALLED();
+	if (write_port((port_id)cookie, 0, &error, sizeof(error)) < 0) {
+		TRACE("BMediaNode::TimerExpired: error writing port" B_PRId32
+			", at notifyPoint" B_PRId64 "\n", cookie, notifyPoint);
+	}
 }
 
 
@@ -649,6 +655,26 @@ BMediaNode::HandleMessage(int32 message,
 			return B_OK;
 		}
 
+		case NODE_SYNC_TO:
+		{
+			const node_sync_to_request *request
+				= static_cast<const node_sync_to_request *>(data);
+			node_sync_to_reply reply;
+
+			TRACE("BMediaNode::HandleMessage NODE_SYNC_TO, node %ld\n",
+				fNodeID);
+
+			// If AddTimer return an error the caller will know that the node
+			// doesn't support this feature or there was a problem when adding
+			// it, this will result in SyncToNode returning immediately
+			// to the caller with an error.
+			status_t status = AddTimer(request->performance_time,
+				request->port);
+
+			request->SendReply(status, &reply, sizeof(reply));
+			return B_OK;
+		}
+
 		case NODE_SET_TIMESOURCE:
 		{
 			const node_set_timesource_command *command = static_cast<const node_set_timesource_command *>(data);
@@ -878,8 +904,7 @@ BMediaNode::GetNodeAttributes(media_node_attribute *outAttributes,
 BMediaNode::AddTimer(bigtime_t at_performance_time,
 					 int32 cookie)
 {
-	UNIMPLEMENTED();
-
+	CALLED();
 	return B_ERROR;
 }
 

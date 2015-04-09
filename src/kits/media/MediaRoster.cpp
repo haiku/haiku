@@ -1365,8 +1365,32 @@ status_t
 BMediaRoster::SyncToNode(const media_node& node, bigtime_t atTime,
 	bigtime_t timeout)
 {
-	UNIMPLEMENTED();
-	return B_OK;
+	TRACE("BMediaRoster::SyncToNode, node %" B_PRId32 ", at real %" B_PRId64
+		", at timeout %" B_PRId64 "\n", node.node, atTime, timeout);
+	if (IS_INVALID_NODE(node))
+		return B_MEDIA_BAD_NODE;
+
+	port_id waitPort = create_port(1, "SyncToNode wait port");
+	if (waitPort < B_OK)
+		return waitPort;
+
+	node_sync_to_request request;
+	node_sync_to_reply reply;
+	request.performance_time = atTime;
+	request.port = waitPort;
+
+	status_t status = QueryPort(node.port, NODE_SYNC_TO, &request,
+		sizeof(request), &reply, sizeof(reply));
+
+	if (status == B_OK) {
+		ssize_t readSize = read_port_etc(waitPort, NULL, &status,
+			sizeof(status), B_TIMEOUT, timeout);
+		if (readSize < 0)
+			status = readSize;
+	}
+	close_port(waitPort);
+	delete_port(waitPort);
+	return status;
 }
 
 
