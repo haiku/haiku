@@ -41,6 +41,9 @@ public:
 				// already. It is not thread safe if you call Roster() at the
 				// same time.
 
+	// Check if the media services are running.
+	static bool					IsRunning();
+
 	// Getting common instances of system nodes:
 			status_t			GetVideoInput(media_node* _node);
 			status_t			GetAudioInput(media_node* _node);

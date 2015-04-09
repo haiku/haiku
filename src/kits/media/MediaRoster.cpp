@@ -52,6 +52,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 #include <MimeType.h>
 #include <OS.h>
 #include <ParameterWeb.h>
+#include <Roster.h>
 #include <StopWatch.h>
 #include <String.h>
 #include <TimeSource.h>
@@ -3214,6 +3215,16 @@ BMediaRoster::GetInstancesFor(media_addon_id addon, int32 flavor,
 		memcpy(_id, reply.node_id, sizeof(media_node_id) * reply.count);
 
 	return B_OK;
+}
+
+
+bool
+BMediaRoster::IsRunning()
+{
+	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)
+		&& be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE))
+		return true;
+	return false;
 }
 
 
