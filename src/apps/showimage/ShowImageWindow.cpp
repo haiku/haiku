@@ -615,6 +615,15 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				break;
 			}
 
+			int32 page = message->FindInt32("page");
+			int32 pageCount = message->FindInt32("pageCount");
+			if (!first && page != fNavigator.CurrentPage()) {
+				// ignore older pages
+				if (bitmapOwner != NULL)
+					bitmapOwner->ReleaseReference();
+				break;
+			}
+
 			status_t status = fImageView->SetImage(message);
 			if (status != B_OK) {
 				if (bitmapOwner != NULL)
@@ -629,8 +638,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			}
 
 			fImageType = message->FindString("type");
-			fNavigator.SetTo(ref, message->FindInt32("page"),
-				message->FindInt32("pageCount"));
+			fNavigator.SetTo(ref, page, pageCount);
 
 			fImageView->FitToBounds();
 			if (first) {
@@ -680,12 +688,12 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			int32 pages = fNavigator.PageCount();
 			int32 currentPage = fNavigator.CurrentPage();
 
-			bool enable = pages > 1 ? true : false;
-			_EnableMenuItem(fBar, MSG_PAGE_FIRST, enable);
-			_EnableMenuItem(fBar, MSG_PAGE_LAST, enable);
-			_EnableMenuItem(fBar, MSG_PAGE_NEXT, enable);
-			_EnableMenuItem(fBar, MSG_PAGE_PREV, enable);
-			fGoToPageMenu->SetEnabled(enable);
+			_EnableMenuItem(fBar, MSG_PAGE_FIRST,
+				fNavigator.HasPreviousPage());
+			_EnableMenuItem(fBar, MSG_PAGE_LAST, fNavigator.HasNextPage());
+			_EnableMenuItem(fBar, MSG_PAGE_NEXT, fNavigator.HasNextPage());
+			_EnableMenuItem(fBar, MSG_PAGE_PREV, fNavigator.HasPreviousPage());
+			fGoToPageMenu->SetEnabled(pages > 1);
 
 			_EnableMenuItem(fBar, MSG_FILE_NEXT, fNavigator.HasNextFile());
 			_EnableMenuItem(fBar, MSG_FILE_PREV, fNavigator.HasPreviousFile());
@@ -1054,14 +1062,16 @@ ShowImageWindow::MessageReceived(BMessage* message)
 void
 ShowImageWindow::_UpdateStatusText(const BMessage* message)
 {
-	BString status;
+	BString frameText;
 	if (fImageView->Bitmap() != NULL) {
 		BRect bounds = fImageView->Bitmap()->Bounds();
-		status << bounds.IntegerWidth() + 1
+		frameText << bounds.IntegerWidth() + 1
 			<< "x" << bounds.IntegerHeight() + 1;
 	}
-
-	fStatusView->Update(fNavigator.CurrentRef(), status, fImageType,
+	BString pages;
+	if (fNavigator.PageCount() > 1)
+		pages << fNavigator.CurrentPage() << "/" << fNavigator.PageCount();
+	fStatusView->Update(fNavigator.CurrentRef(), frameText, pages, fImageType,
 		fImageView->Zoom());
 }
 

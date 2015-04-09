@@ -504,6 +504,20 @@ ImageFileNavigator::PreviousPage()
 
 
 bool
+ImageFileNavigator::HasNextPage()
+{
+	return fDocumentIndex < fDocumentCount;
+}
+
+
+bool
+ImageFileNavigator::HasPreviousPage()
+{
+	return fDocumentIndex > 1;
+}
+
+
+bool
 ImageFileNavigator::GoToPage(int32 page)
 {
 	if (page > 0 && page <= fDocumentCount && page != fDocumentIndex) {

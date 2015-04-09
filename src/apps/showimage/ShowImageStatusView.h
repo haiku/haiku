@@ -18,6 +18,7 @@
 enum {
 	kFrameSizeCell,
 	kZoomCell,
+	kPagesCell,
 	kImageTypeCell,
 	kStatusCellCount
 };
@@ -34,12 +35,13 @@ public:
 	virtual	void				MouseDown(BPoint where);
 
 			void				Update(const entry_ref& ref,
-									const BString& text, const BString& imageType,
-									float zoom);
+									const BString& text, const BString& pages,
+									const BString& imageType, float zoom);
 			void				SetZoom(float zoom);
  private:
 			void				_SetFrameText(const BString& text);
 			void				_SetZoomText(float zoom);
+			void				_SetPagesText(const BString& pages);
 			void				_SetImageTypeText(const BString& imageType);
 			void				_ValidatePreferredSize();
 			BScrollView*		fScrollView;

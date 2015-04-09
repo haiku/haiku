@@ -150,12 +150,13 @@ ShowImageStatusView::MouseDown(BPoint where)
 
 void
 ShowImageStatusView::Update(const entry_ref& ref, const BString& text,
-	const BString& imageType, float zoom)
+	const BString& pages, const BString& imageType, float zoom)
 {
 	fRef = ref;
 
 	_SetFrameText(text);
 	_SetZoomText(zoom);
+	_SetPagesText(pages);
 	_SetImageTypeText(imageType);
 
 	_ValidatePreferredSize();
@@ -175,21 +176,28 @@ ShowImageStatusView::SetZoom(float zoom)
 void
 ShowImageStatusView::_SetFrameText(const BString& text)
 {
-	fCellText[0] = text;
+	fCellText[kFrameSizeCell] = text;
 }
 
 
 void
 ShowImageStatusView::_SetZoomText(float zoom)
 {
-	fCellText[1].SetToFormat("%.0f%%", zoom * 100);
+	fCellText[kZoomCell].SetToFormat("%.0f%%", zoom * 100);
+}
+
+
+void
+ShowImageStatusView::_SetPagesText(const BString& pages)
+{
+	fCellText[kPagesCell] = pages;
 }
 
 
 void
 ShowImageStatusView::_SetImageTypeText(const BString& imageType)
 {
-	fCellText[2] = imageType;
+	fCellText[kImageTypeCell] = imageType;
 }
 
 
