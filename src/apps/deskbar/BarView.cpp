@@ -263,7 +263,8 @@ TBarView::MessageReceived(BMessage* message)
 			// so that I can follow the common pathway
 			// for adding icons to the tray
 			int32 id;
-			AddItem(new BMessage(*message), B_DESKBAR_TRAY, &id);
+			if (AddItem(message, B_DESKBAR_TRAY, &id) == B_OK)
+				Looper()->DetachCurrentMessage();
 			break;
 		}
 

@@ -39,6 +39,7 @@ All rights reserved.
 #include <stdio.h>
 
 #include <Application.h>
+#include <AutoDeleter.h>
 #include <Catalog.h>
 #include <Directory.h>
 #include <FindDirectory.h>
@@ -516,15 +517,18 @@ TBarWindow::AddItem(BMessage* message)
 	BMessage reply;
 	status_t err = B_ERROR;
 
-	BMessage archivedView;
-	if (message->FindMessage("view", &archivedView) == B_OK) {
+	BMessage* archivedView = new BMessage();
+	ObjectDeleter<BMessage> deleter(archivedView);
+	if (message->FindMessage("view", archivedView) == B_OK) {
 #if SHELF_AWARE
 		message->FindInt32("shelf", &shelf);
 #endif
-		BMessage* archive = new BMessage(archivedView);
-		err = fBarView->AddItem(archive, shelf, &id);
-		if (err < B_OK)
-			delete archive;
+		err = fBarView->AddItem(archivedView, shelf, &id);
+		if (err == B_OK) {
+			// Detach the deleter since AddReplicant is taking ownership
+			// on success. This should be changed on server side.
+			deleter.Detach();
+		}
 	} else if (message->FindRef("addon", &ref) == B_OK) {
 		BEntry entry(&ref);
 		err = entry.InitCheck();

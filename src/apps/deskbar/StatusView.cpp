@@ -337,12 +337,12 @@ TReplicantTray::MessageReceived(BMessage* message)
 			bool showDayOfWeek = fTime->ShowDayOfWeek();
 			bool showTimeZone = fTime->ShowTimeZone();
 
-			BMessage* reply = new BMessage(kGetClockSettings);
-			reply->AddBool("showClock", showClock);
-			reply->AddBool("showSeconds", showSeconds);
-			reply->AddBool("showDayOfWeek", showDayOfWeek);
-			reply->AddBool("showTimeZone", showTimeZone);
-			message->SendReply(reply);
+			BMessage reply(kGetClockSettings);
+			reply.AddBool("showClock", showClock);
+			reply.AddBool("showSeconds", showSeconds);
+			reply.AddBool("showDayOfWeek", showDayOfWeek);
+			reply.AddBool("showTimeZone", showTimeZone);
+			message->SendReply(&reply);
 			break;
 		}
 
@@ -451,9 +451,9 @@ TReplicantTray::ShowHideTime()
 
 	// Send a message to Time preferences telling it to update
 	BMessenger messenger("application/x-vnd.Haiku-Time");
-	BMessage* message = new BMessage(kShowHideTime);
-	message->AddBool("showClock", showClock);
-	messenger.SendMessage(message);
+	BMessage message(kShowHideTime);
+	message.AddBool("showClock", showClock);
+	messenger.SendMessage(&message);
 }
 
 
@@ -673,8 +673,9 @@ TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool addToSettings)
 	view->Archive(data);
 	delete view;
 
-	AddIcon(data, id, &ref);
-		// add the rep; adds info to list
+	// add the rep; adds info to list
+	if (AddIcon(data, id, &ref) != B_OK)
+		delete data;
 
 	if (addToSettings) {
 		fAddOnSettings.AddString(kReplicantPathField, path.Path());

@@ -16,6 +16,7 @@
 
 #include <pthread.h>
 
+#include <AutoDeleter.h>
 #include <AutoLock.h>
 #include <Beep.h>
 #include <Dragger.h>
@@ -1178,13 +1179,19 @@ BShelf::_InitData(BEntry *entry, BDataIO *stream, BView *view,
 				genCount = 1;
 
 			BMessage replicant;
-			BMessage *replmsg = NULL;
-			for (int32 i = 0; archive.FindMessage("replicant", i, &replicant) == B_OK; i++) {
+			for (int32 i = 0; archive.FindMessage("replicant", i, &replicant)
+				== B_OK; i++) {
 				BPoint point;
-				replmsg = new BMessage();
+				BMessage *replMsg = new BMessage();
+				ObjectDeleter<BMessage> deleter(replMsg);
 				replicant.FindPoint("position", &point);
-				replicant.FindMessage("message", replmsg);
-				AddReplicant(replmsg, point);
+				if (replicant.FindMessage("message", replMsg) == B_OK)
+					if (AddReplicant(replMsg, point) == B_OK) {
+						// Detach the deleter since AddReplicant is taking
+						// ownership on success. In R2 API this should be
+						// changed to take always ownership on the message.
+						deleter.Detach();
+					}
 			}
 		}
 	}
