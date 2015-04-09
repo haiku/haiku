@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.04.02
-#	Date:    2015-04-02 03:15:02
+#	Version: 2015.04.06
+#	Date:    2015-04-06 03:15:01
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10179,6 +10179,11 @@
 	17f0  GM200GL [Quadro M6000]
 10df  Emulex Corporation
 	0720  OneConnect NIC (Skyhawk)
+		103c 1934  HP FlexFabric 20Gb 2-port 650M Adapter
+		103c 1935  HP FlexFabric 20Gb 2-port 650FLB Adapter
+		103c 21d4  HP StoreFabric CN1200E 10Gb Converged Network Adapter
+		103c 220a  HP FlexFabric 10Gb 2-port 556FLR-SFP+ Adapter
+		103c 803f  HP Ethernet 10Gb 2-port 557SFP+ Adapter
 		17aa 1056  ThinkServer OCm14102-UX-L AnyFabric
 		17aa 1057  ThinkServer OCm14104-UX-L AnyFabric
 		17aa 1059  ThinkServer OCm14104-UT-L AnyFabric
@@ -12634,6 +12639,7 @@
 	2a43  88W8366 [TopDog] 802.11n Wireless
 	2a55  88W8864 [Avastar] 802.11ac Wireless
 	2b36  88W8764 [Avastar] 802.11n Wireless
+	2b38  88W8897 [AVASTAR] 802.11ac Wireless
 	4101  OLPC Cafe Controller Secure Digital Controller
 	4320  88E8001 Gigabit Ethernet Controller
 		1019 0f38  Marvell 88E8001 Gigabit Ethernet Controller (ECS)
@@ -18126,6 +18132,7 @@
 	5360  RT5360 Wireless 802.11n 1T/1R
 		1186 3c05  DWA-525 Wireless N 150 Desktop Adapter (rev.A2)
 		20f4 703a  TEW-703PI N150 Wireless PCI Adapter
+	5362  RT5362 PCI 802.11n Wireless Network Adapter
 	5390  RT5390 Wireless 802.11n 1T/1R PCIe
 		103c 1636  U98Z077.00 Half-size Mini PCIe Card
 	5392  RT5392 PCIe Wireless Network Adapter
@@ -21415,6 +21422,8 @@
 	1571  XL710/X710 Virtual Function
 	1572  Ethernet Controller X710 for 10GbE SFP+
 		1028 1f99  Ethernet 10G 4P X710/I350 rNDC
+		103c 22fc  HP Ethernet 10Gb 2-port 562FLR-SFP+ Adapter
+		103c 22fd  HP Ethernet 10Gb 2-port 562SFP+ Adapter
 		1137 0000  Ethernet Converged NIC X710-4
 		1137 013b  Ethernet Converged NIC X710-4
 		17aa 0000  ThinkServer XL710 AnyFabric
