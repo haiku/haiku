@@ -43,6 +43,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 #include <Roster.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
+#include <MediaRoster.h>
 #include <Messenger.h>
 
 #include <syscalls.h>
@@ -112,7 +113,14 @@ ServerApp::ServerApp()
 	fControlThread = spawn_thread(_ControlThread, "media_server control", 105,
 		this);
 	resume_thread(fControlThread);
+
+	BMediaRoster* roster = BMediaRoster::Roster();
+	if (roster->StartWatching(BMessenger(this, this),
+		B_MEDIA_SERVER_QUIT) != B_OK) {
+			TRACE("ServerApp: can't watch for B_MEDIA_SERVER_QUIT");
+	}
 }
+
 
 
 ServerApp::~ServerApp()
@@ -127,6 +135,12 @@ ServerApp::~ServerApp()
 	delete gAppManager;
 	delete gNodeManager;
 	delete gMediaFilesManager;
+
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	if (roster->StopWatching(BMessenger(this, this),
+		B_MEDIA_SERVER_QUIT) != B_OK) {
+			TRACE("ServerApp: can't unwatch for B_MEDIA_SERVER_QUIT");
+	}
 }
 
 
@@ -929,6 +943,11 @@ ServerApp::MessageReceived(BMessage* msg)
 		case MEDIA_SERVER_ADD_SYSTEM_BEEP_EVENT:
 			gMediaFilesManager->HandleAddSystemBeepEvent(msg);
 			break;
+
+		case B_MEDIA_SERVER_QUIT:
+			gNodeManager->CleanupDormantFlavorInfos();
+			break;
+
 		default:
 			BApplication::MessageReceived(msg);
 			printf("\nmedia_server: unknown message received:\n");
