@@ -60,8 +60,8 @@ private:
 
 AddOnManager::AddOnManager()
 	:
- 	fLock("add-on manager"),
- 	fNextWriterFormatFamilyID(0),
+	fLock("add-on manager"),
+	fNextWriterFormatFamilyID(0),
 	fNextEncoderCodecInfoID(0)
 {
 }
@@ -154,7 +154,7 @@ AddOnManager::GetReaders(entry_ref* outRefs, int32* outCount,
 		path.SetTo(directories[i]);
 		_GetReaders(path, outRefs, outCount, maxCount);
 	}
-	
+
 	return B_OK;
 }
 
