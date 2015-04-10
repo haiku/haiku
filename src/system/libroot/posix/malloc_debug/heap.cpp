@@ -1808,6 +1808,13 @@ heap_debug_get_allocation_info(void *address, size_t *size,
 
 
 extern "C" status_t
+heap_debug_dump_allocations_on_exit(bool enabled)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+extern "C" status_t
 heap_debug_set_stack_trace_depth(size_t stackTraceDepth)
 {
 	return B_NOT_SUPPORTED;
@@ -1870,6 +1877,13 @@ __init_heap_post_env(void)
 			heap_debug_set_default_alignment(defaultAlignment);
 		}
 	}
+}
+
+
+extern "C" void
+__heap_terminate_after()
+{
+	// nothing to do
 }
 
 

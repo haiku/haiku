@@ -20,6 +20,7 @@
 
 
 void initialize_before(image_id imageID);
+void terminate_after(image_id imageID);
 
 struct rld_export *__gRuntimeLoader = NULL;
 	// This little bugger is set to something meaningful by the runtime loader
@@ -94,3 +95,9 @@ _init_c_library_(void)
 	// do anything here.
 }
 
+
+void
+terminate_after(image_id id)
+{
+	__heap_terminate_after();
+}

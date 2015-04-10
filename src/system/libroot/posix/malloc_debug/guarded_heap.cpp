@@ -22,6 +22,7 @@ static const size_t kMaxStackTraceDepth = 50;
 
 
 static bool sDebuggerCalls = true;
+static bool sDumpAllocationsOnExit = false;
 static size_t sStackTraceDepth = 0;
 
 #if __cplusplus >= 201103L
@@ -47,6 +48,22 @@ panic(const char* format, ...)
 		debugger(buffer);
 	else
 		debug_printf(buffer);
+}
+
+
+static void
+print_stdout(const char* format, ...)
+{
+	// To avoid any allocations due to dynamic memory need by printf() we use a
+	// stack buffer and vsnprintf(). Otherwise this does the same as printf().
+	char buffer[1024];
+
+	va_list args;
+	va_start(args, format);
+	vsnprintf(buffer, sizeof(buffer), format, args);
+	va_end(args);
+
+	write(STDOUT_FILENO, buffer, strlen(buffer));
 }
 
 
@@ -218,12 +235,12 @@ guarded_heap_print_stack_trace(addr_t stackTrace[], size_t depth)
 		status_t status = _kern_lookup_symbol(address, &baseAddress, symbolName,
 			sizeof(symbolName), imageName, sizeof(imageName), &exactMatch);
 		if (status != B_OK) {
-			printf("\t%#" B_PRIxADDR " (lookup failed: %s)\n", address,
+			print_stdout("\t%#" B_PRIxADDR " (lookup failed: %s)\n", address,
 				strerror(status));
 			continue;
 		}
 
-		printf("\t<%s> %s + %#" B_PRIxADDR "%s\n", imageName, symbolName,
+		print_stdout("\t<%s> %s + %#" B_PRIxADDR "%s\n", imageName, symbolName,
 			address - baseAddress, (exactMatch ? "" : " (nearest)"));
 	}
 }
@@ -929,7 +946,7 @@ dump_allocations(guarded_heap& heap, bool statsOnly, thread_id thread)
 			if (statsOnly)
 				continue;
 
-			printf("allocation: base: %p; size: %" B_PRIuSIZE
+			print_stdout("allocation: base: %p; size: %" B_PRIuSIZE
 				"; thread: %" B_PRId32 "; alignment: %" B_PRIuSIZE "\n",
 				page.allocation_base, page.allocation_size, page.thread,
 				page.alignment);
@@ -939,8 +956,15 @@ dump_allocations(guarded_heap& heap, bool statsOnly, thread_id thread)
 		}
 	}
 
-	printf("total allocations: %" B_PRIuSIZE ", %" B_PRIuSIZE " bytes\n",
+	print_stdout("total allocations: %" B_PRIuSIZE ", %" B_PRIuSIZE " bytes\n",
 		allocationCount, allocationSize);
+}
+
+
+static void
+dump_allocations_full()
+{
+	dump_allocations(sGuardedHeap, false, -1);
 }
 
 
@@ -1048,6 +1072,14 @@ heap_debug_get_allocation_info(void *address, size_t *size,
 
 
 extern "C" status_t
+heap_debug_dump_allocations_on_exit(bool enabled)
+{
+	sDumpAllocationsOnExit = enabled;
+	return B_OK;
+}
+
+
+extern "C" status_t
 heap_debug_set_stack_trace_depth(size_t stackTraceDepth)
 {
 	sStackTraceDepth = min_c(stackTraceDepth, kMaxStackTraceDepth);
@@ -1104,6 +1136,8 @@ __init_heap_post_env(void)
 	if (mode != NULL) {
 		if (strchr(mode, 'r'))
 			heap_debug_set_memory_reuse(false);
+		if (strchr(mode, 'e'))
+			heap_debug_dump_allocations_on_exit(true);
 
 		size_t defaultAlignment = 0;
 		const char *argument = strchr(mode, 'a');
@@ -1120,6 +1154,14 @@ __init_heap_post_env(void)
 			heap_debug_set_stack_trace_depth(stackTraceDepth);
 		}
 	}
+}
+
+
+extern "C" void
+__heap_terminate_after()
+{
+	if (sDumpAllocationsOnExit)
+		dump_allocations_full();
 }
 
 

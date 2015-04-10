@@ -131,6 +131,13 @@ __init_heap_post_env(void)
 }
 
 
+extern "C" void
+__heap_terminate_after()
+{
+	// nothing to do
+}
+
+
 static void
 insert_chunk(free_chunk *newChunk)
 {
