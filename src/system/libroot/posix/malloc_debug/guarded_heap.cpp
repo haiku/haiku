@@ -1142,8 +1142,7 @@ __init_heap_post_env(void)
 		size_t defaultAlignment = 0;
 		const char *argument = strchr(mode, 'a');
 		if (argument != NULL
-			&& sscanf(argument, "a%" B_SCNuSIZE, &defaultAlignment) == 1
-			&& defaultAlignment >= 0) {
+			&& sscanf(argument, "a%" B_SCNuSIZE, &defaultAlignment) == 1) {
 			heap_debug_set_default_alignment(defaultAlignment);
 		}
 
