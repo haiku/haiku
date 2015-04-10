@@ -1023,8 +1023,11 @@ heap_debug_dump_heaps(bool dumpAreas, bool dumpBins)
 		if (!dumpBins)
 			continue;
 
-		for (size_t i = 0; i < area->page_count; i++)
+		for (size_t i = 0; i < area->page_count; i++) {
 			dump_guarded_heap_page(area->pages[i]);
+			if ((area->pages[i].flags & GUARDED_HEAP_PAGE_FLAG_FIRST) != 0)
+				guarded_heap_print_stack_traces(area->pages[i]);
+		}
 	}
 }
 
