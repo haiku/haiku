@@ -19,7 +19,7 @@ public:
 
 			orientation			Orientation() const;
 			void				SetOrientation(orientation orientation);
-	
+
 			float				ItemWeight(int32 index) const;
 			void				SetItemWeight(int32 index, float weight);
 
@@ -40,7 +40,7 @@ public:
 
 	virtual	status_t			Perform(perform_code d, void* arg);
 
-protected:	
+protected:
 	virtual status_t			AllArchived(BMessage* into) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
 	virtual status_t			ItemArchived(BMessage* into, BLayoutItem* item,
@@ -52,7 +52,7 @@ protected:
 	virtual	void				ItemRemoved(BLayoutItem* item, int32 fromIndex);
 
 	virtual	void				PrepareItems(orientation orientation);
-	
+
 	virtual	int32				InternalCountColumns();
 	virtual	int32				InternalCountRows();
 	virtual	void				GetColumnRowConstraints(

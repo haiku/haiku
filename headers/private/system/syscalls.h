@@ -448,7 +448,7 @@ extern status_t		_kern_close_port(port_id id);
 extern status_t		_kern_delete_port(port_id id);
 extern port_id		_kern_find_port(const char *port_name);
 extern status_t		_kern_get_port_info(port_id id, struct port_info *info);
-extern status_t	 	_kern_get_next_port_info(team_id team, int32 *cookie,
+extern status_t		_kern_get_next_port_info(team_id team, int32 *cookie,
 						struct port_info *info);
 extern ssize_t		_kern_port_buffer_size_etc(port_id port, uint32 flags,
 						bigtime_t timeout);

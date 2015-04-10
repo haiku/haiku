@@ -193,8 +193,8 @@ BCardLayout::DoLayout()
 		size.width = max_c(size.width, fMin.width);
 		size.height = max_c(size.height, fMin.height);
 	}
- 
- 	if (fVisibleItem != NULL)
+
+	if (fVisibleItem != NULL)
 		fVisibleItem->AlignInFrame(BRect(LayoutArea().LeftTop(), size));
 }
 
@@ -258,7 +258,7 @@ BCardLayout::Instantiate(BMessage* from)
 		return new BCardLayout(from);
 	return NULL;
 }
-	
+
 
 bool
 BCardLayout::ItemAdded(BLayoutItem* item, int32 atIndex)
