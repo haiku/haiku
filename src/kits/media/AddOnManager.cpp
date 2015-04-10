@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include <Architecture.h>
+#include <AutoDeleter.h>
 #include <Autolock.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -112,6 +113,8 @@ AddOnManager::GetDecoderForFormat(entry_ref* _decoderRef,
 		return B_ENTRY_NOT_FOUND;
 	}
 
+	MemoryDeleter directoriesDeleter(directories);
+
 	BPath path;
 	for (uint i = 0; i < directoryCount; i++) {
 		path.SetTo(directories[i]);
@@ -143,6 +146,8 @@ AddOnManager::GetReaders(entry_ref* outRefs, int32* outCount,
 		printf("AddOnManager::GetReaders: failed to locate plugins\n");
 		return B_ENTRY_NOT_FOUND;
 	}
+
+	MemoryDeleter directoriesDeleter(directories);
 
 	BPath path;
 	for (uint i = 0; i < directoryCount; i++) {
@@ -248,6 +253,8 @@ AddOnManager::RegisterAddOns()
 			&directoryCount) != B_OK) {
 		return;
 	}
+
+	MemoryDeleter directoriesDeleter(directories);
 
 	BPath path;
 	for (uint i = 0; i < directoryCount; i++) {
