@@ -902,6 +902,48 @@ dump_guarded_heap(guarded_heap& heap)
 }
 
 
+static void
+dump_allocations(guarded_heap& heap, bool statsOnly, thread_id thread)
+{
+	WriteLocker heapLocker(heap.lock);
+
+	size_t allocationCount = 0;
+	size_t allocationSize = 0;
+	for (guarded_heap_area* area = heap.areas; area != NULL;
+			area = area->next) {
+
+		MutexLocker areaLocker(area->lock);
+		for (size_t i = 0; i < area->page_count; i++) {
+			guarded_heap_page& page = area->pages[i];
+			if ((page.flags & GUARDED_HEAP_PAGE_FLAG_FIRST) == 0
+				|| (page.flags & GUARDED_HEAP_PAGE_FLAG_DEAD) != 0) {
+				continue;
+			}
+
+			if (thread >= 0 && thread != page.thread)
+				continue;
+
+			allocationCount++;
+			allocationSize += page.allocation_size;
+
+			if (statsOnly)
+				continue;
+
+			printf("allocation: base: %p; size: %" B_PRIuSIZE
+				"; thread: %" B_PRId32 "; alignment: %" B_PRIuSIZE "\n",
+				page.allocation_base, page.allocation_size, page.thread,
+				page.alignment);
+
+			guarded_heap_print_stack_trace(page.stack_trace,
+				page.alloc_stack_trace_depth);
+		}
+	}
+
+	printf("total allocations: %" B_PRIuSIZE ", %" B_PRIuSIZE " bytes\n",
+		allocationCount, allocationSize);
+}
+
+
 // #pragma mark - Heap Debug API
 
 
@@ -961,6 +1003,7 @@ heap_debug_validate_walls()
 extern "C" void
 heap_debug_dump_allocations(bool statsOnly, thread_id thread)
 {
+	dump_allocations(sGuardedHeap, statsOnly, thread);
 }
 
 
