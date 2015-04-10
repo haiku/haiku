@@ -13,12 +13,16 @@
 #include <sys/mman.h>
 
 #include <locks.h>
+#include <syscalls.h>
 
 
 // #pragma mark - Debug Helpers
 
+static const size_t kMaxStackTraceDepth = 50;
+
 
 static bool sDebuggerCalls = true;
+static size_t sStackTraceDepth = 0;
 
 #if __cplusplus >= 201103L
 #include <cstddef>
@@ -136,6 +140,9 @@ struct guarded_heap_page {
 	size_t				alignment;
 	thread_id			thread;
 	list_link			free_list_link;
+	size_t				alloc_stack_trace_depth;
+	size_t				free_stack_trace_depth;
+	addr_t				stack_trace[kMaxStackTraceDepth];
 };
 
 struct guarded_heap_area {
@@ -198,6 +205,70 @@ guarded_heap_page_protect(guarded_heap_area& area, size_t pageIndex,
 
 
 static void
+guarded_heap_print_stack_trace(addr_t stackTrace[], size_t depth)
+{
+	addr_t baseAddress;
+	char symbolName[1024];
+	char imageName[B_PATH_NAME_LENGTH];
+	bool exactMatch;
+
+	for (size_t i = 0; i < depth; i++) {
+		addr_t address = stackTrace[i];
+
+		status_t status = _kern_lookup_symbol(address, &baseAddress, symbolName,
+			sizeof(symbolName), imageName, sizeof(imageName), &exactMatch);
+		if (status != B_OK) {
+			printf("\t%#" B_PRIxADDR " (lookup failed: %s)\n", address,
+				strerror(status));
+			continue;
+		}
+
+		printf("\t<%s> %s + %#" B_PRIxADDR "%s\n", imageName, symbolName,
+			address - baseAddress, (exactMatch ? "" : " (nearest)"));
+	}
+}
+
+
+static void
+guarded_heap_print_stack_traces(guarded_heap_page& page)
+{
+	if (page.alloc_stack_trace_depth > 0) {
+		printf("alloc stack trace (%" B_PRIuSIZE "):\n",
+			page.alloc_stack_trace_depth);
+		guarded_heap_print_stack_trace(page.stack_trace,
+			page.alloc_stack_trace_depth);
+	}
+
+	if (page.free_stack_trace_depth > 0) {
+		printf("free stack trace (%" B_PRIuSIZE "):\n",
+			page.free_stack_trace_depth);
+		guarded_heap_print_stack_trace(
+			&page.stack_trace[page.alloc_stack_trace_depth],
+			page.free_stack_trace_depth);
+	}
+}
+
+
+static size_t
+guarded_heap_fill_stack_trace(addr_t stackTrace[], size_t maxDepth,
+	size_t skipFrames)
+{
+	if (maxDepth == 0)
+		return 0;
+
+	maxDepth += skipFrames;
+	addr_t buffer[maxDepth];
+	ssize_t traceDepth = _kern_get_stack_trace(maxDepth, buffer);
+	if (traceDepth <= (ssize_t)skipFrames)
+		return 0;
+
+	traceDepth -= skipFrames;
+	memcpy(stackTrace, &buffer[skipFrames], traceDepth * sizeof(addr_t));
+	return traceDepth;
+}
+
+
+static void
 guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 	size_t pagesNeeded, size_t allocationSize, size_t alignment,
 	void* allocationBase)
@@ -217,12 +288,17 @@ guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 			page.allocation_base = allocationBase;
 			page.alignment = alignment;
 			page.flags |= GUARDED_HEAP_PAGE_FLAG_FIRST;
+			page.alloc_stack_trace_depth = guarded_heap_fill_stack_trace(
+				page.stack_trace, sStackTraceDepth, 2);
+			page.free_stack_trace_depth = 0;
 			firstPage = &page;
 		} else {
 			page.thread = firstPage->thread;
 			page.allocation_size = allocationSize;
 			page.allocation_base = allocationBase;
 			page.alignment = alignment;
+			page.alloc_stack_trace_depth = 0;
+			page.free_stack_trace_depth = 0;
 		}
 
 		list_remove_item(&area.free_list, &page);
@@ -425,6 +501,9 @@ guarded_heap_allocate(guarded_heap& heap, size_t size, size_t alignment)
 			+ pagesNeeded * B_PAGE_SIZE - size) & ~(alignment - 1));
 		page->alignment = alignment;
 		page->thread = find_thread(NULL);
+		page->alloc_stack_trace_depth = guarded_heap_fill_stack_trace(
+			page->stack_trace, sStackTraceDepth, 2);
+		page->free_stack_trace_depth = 0;
 
 		mprotect((void*)((addr_t)address + pagesNeeded * B_PAGE_SIZE),
 			B_PAGE_SIZE, 0);
@@ -525,6 +604,14 @@ guarded_heap_area_free(guarded_heap_area& area, void* address)
 	while ((page->flags & GUARDED_HEAP_PAGE_FLAG_GUARD) == 0) {
 		// Mark the allocation page as free.
 		guarded_heap_free_page(area, pageIndex);
+		if (pagesFreed == 0 && sStackTraceDepth > 0) {
+			size_t freeEntries
+				= kMaxStackTraceDepth - page->alloc_stack_trace_depth;
+
+			page->free_stack_trace_depth = guarded_heap_fill_stack_trace(
+				&page->stack_trace[page->alloc_stack_trace_depth],
+				min_c(freeEntries, sStackTraceDepth), 2);
+		}
 
 		pagesFreed++;
 		pageIndex++;
@@ -693,6 +780,17 @@ dump_guarded_heap_page(void* address, bool doPanic)
 	size_t pageIndex = ((addr_t)address - area->base) / B_PAGE_SIZE;
 	guarded_heap_page& page = area->pages[pageIndex];
 	dump_guarded_heap_page(page);
+
+	// Find the first page and dump the stack traces.
+	for (ssize_t candidateIndex = (ssize_t)pageIndex;
+			sStackTraceDepth > 0 && candidateIndex >= 0; candidateIndex--) {
+		guarded_heap_page& candidate = area->pages[candidateIndex];
+		if ((candidate.flags & GUARDED_HEAP_PAGE_FLAG_FIRST) == 0)
+			continue;
+
+		guarded_heap_print_stack_traces(candidate);
+		break;
+	}
 
 	if (doPanic) {
 		// Note: we do this the complicated way because we absolutely don't
@@ -903,6 +1001,14 @@ heap_debug_get_allocation_info(void *address, size_t *size,
 }
 
 
+extern "C" status_t
+heap_debug_set_stack_trace_depth(size_t stackTraceDepth)
+{
+	sStackTraceDepth = min_c(stackTraceDepth, kMaxStackTraceDepth);
+	return B_OK;
+}
+
+
 // #pragma mark - Init
 
 
@@ -959,6 +1065,13 @@ __init_heap_post_env(void)
 			&& sscanf(argument, "a%" B_SCNuSIZE, &defaultAlignment) == 1
 			&& defaultAlignment >= 0) {
 			heap_debug_set_default_alignment(defaultAlignment);
+		}
+
+		size_t stackTraceDepth = 0;
+		argument = strchr(mode, 's');
+		if (argument != NULL
+			&& sscanf(argument, "s%" B_SCNuSIZE, &stackTraceDepth) == 1) {
+			heap_debug_set_stack_trace_depth(stackTraceDepth);
 		}
 	}
 }
