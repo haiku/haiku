@@ -492,6 +492,13 @@ extern status_t		_kern_system_profiler_stop();
 extern status_t		_kern_system_profiler_recorded(
 						struct system_profiler_parameters* parameters);
 
+extern ssize_t		_kern_get_stack_trace(size_t addressCount,
+						addr_t* adresses);
+extern status_t		_kern_lookup_symbol(addr_t address, addr_t* baseAddress,
+						char* symbolNameBuffer, size_t symbolNameBufferSize,
+						char* imageNameBuffer, size_t imageNameBufferSize,
+						bool* exactMatch);
+
 /* atomic_* ops (needed for CPUs that don't support them directly) */
 #ifdef ATOMIC_FUNCS_ARE_SYSCALLS
 extern void		_kern_atomic_set(int32 *value, int32 newValue);

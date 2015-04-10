@@ -54,6 +54,11 @@ status_t _user_read_kernel_image_symbols(image_id id, elf_sym* symbolTable,
 			int32* _symbolCount, char* stringTable, size_t* _stringTableSize,
 			addr_t* _imageDelta);
 
+status_t _user_lookup_symbol(addr_t address, addr_t* baseAddress,
+			char* symbolNameBuffer, size_t symbolNameBufferSize,
+			char* imageNameBuffer, size_t imageNameBufferSize,
+			bool* exactMatch);
+
 #ifdef __cplusplus
 }
 #endif
