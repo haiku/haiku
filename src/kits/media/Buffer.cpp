@@ -187,15 +187,15 @@ BBuffer::Size()
 
 BBuffer::BBuffer(const buffer_clone_info& info)
 	:
-	// must all be NULL/0 if not correctly initialized
 	fBufferList(NULL),
+	fArea(-1),
 	fData(NULL),
 	fSize(0)
 {
 	CALLED();
 
-	fMediaHeader.buffer = 0;
-		// must be 0 if not registered
+	// Must be -1 if not registered
+	fMediaHeader.buffer = -1;
 
 	// special case for BSmallBuffer
 	if (info.area == 0 && info.buffer == 0)
@@ -232,6 +232,18 @@ BBuffer::BBuffer(const buffer_clone_info& info)
 	ASSERT(reply.info.area > 0);
 	ASSERT(reply.info.size > 0);
 
+	fArea = clone_area("a cloned BBuffer", &fData, B_ANY_ADDRESS,
+		B_READ_AREA | B_WRITE_AREA, reply.info.area);
+	if (fArea < 0) {
+		ERROR("BBuffer::BBuffer: buffer cloning failed"
+			", unregistering buffer\n");
+		server_unregister_buffer_command cmd;
+		cmd.team = BPrivate::current_team();
+		cmd.buffer_id = fMediaHeader.buffer;
+		SendToServer(SERVER_UNREGISTER_BUFFER, &cmd, sizeof(cmd));
+		return;
+	}
+
 	// the response from media server contains enough information
 	// to clone the memory for this buffer
 	fSize = reply.info.size;
@@ -239,16 +251,6 @@ BBuffer::BBuffer(const buffer_clone_info& info)
 	fOffset = reply.info.offset;
 	fMediaHeader.size_used = 0;
 	fMediaHeader.buffer = reply.info.buffer;
-
-	fArea = clone_area("a cloned BBuffer", &fData, B_ANY_ADDRESS,
-		B_READ_AREA | B_WRITE_AREA, reply.info.area);
-	if (fArea < 0) {
-		// TODO: should unregister buffer here
-		ERROR("BBuffer::BBuffer: buffer cloning failed\n");
-		fData = 0;
-		return;
-	}
-
 	fData = (char*)fData + fOffset;
 }
 
