@@ -16,6 +16,7 @@
 #include <unistd.h>
 
 #include <Application.h>
+#include <AutoDeleter.h>
 #include <Autolock.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -419,18 +420,20 @@ KeyboardDevice::_ControlThread()
 		char* string = NULL;
 		char* rawString = NULL;
 		int32 numBytes = 0, rawNumBytes = 0;
+
+		ArrayDeleter<char> stringDeleter;
 		if (newDeadKey == 0) {
 			fKeymap.GetChars(keycode, fModifiers, activeDeadKey, &string,
 				&numBytes);
+			stringDeleter.SetTo(string);
 		}
+
 		fKeymap.GetChars(keycode, 0, 0, &rawString, &rawNumBytes);
+		ArrayDeleter<char> rawStringDeleter(rawString);
 
 		BMessage* msg = new BMessage;
-		if (msg == NULL) {
-			delete[] string;
-			delete[] rawString;
+		if (msg == NULL)
 			continue;
-		}
 
 		if (numBytes > 0)
 			msg->what = isKeyDown ? B_KEY_DOWN : B_KEY_UP;
@@ -448,23 +451,18 @@ KeyboardDevice::_ControlThread()
 
 			if (rawNumBytes <= 0) {
 				rawNumBytes = 1;
-				delete[] rawString;
 				rawString = string;
-			} else
-				delete[] string;
+			}
 
 			if (isKeyDown && lastKeyCode == keycode) {
 				repeatCount++;
 				msg->AddInt32("be:key_repeat", repeatCount);
 			} else
 				repeatCount = 1;
-		} else
-			delete[] string;
+		}
 
 		if (rawNumBytes > 0)
 			msg->AddInt32("raw_char", (uint32)((uint8)rawString[0] & 0x7f));
-
-		delete[] rawString;
 
 		if (newDeadKey == 0) {
 			if (isKeyDown && !modifiers && activeDeadKey != 0) {
