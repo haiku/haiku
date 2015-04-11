@@ -592,6 +592,12 @@ AboutView::AboutView()
 
 AboutView::~AboutView()
 {
+	for (PackageCreditMap::iterator it = fPackageCredits.begin();
+		it != fPackageCredits.end(); it++) {
+
+		delete it->second;
+	}
+
 	delete fScrollRunner;
 }
 
