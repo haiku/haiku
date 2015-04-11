@@ -44,6 +44,8 @@ bigtime_t __get_system_time_offset();
 void __init_pwd_backend(void);
 void __reinit_pwd_backend_after_fork(void);
 void* __arch_get_caller(void);
+int32 __arch_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
+	int32 skipFrames, addr_t stackBase, addr_t stackEnd);
 
 void __set_stack_protection(void);
 
