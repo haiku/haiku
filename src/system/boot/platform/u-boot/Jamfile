@@ -160,11 +160,12 @@ actions BuildUImageScript1
 rule BuildUBootSDImage image : files
 {
 	Depends $(image) : $(files) ;
-	SDIMAGE_BLOCK_SIZE on $(image) = 1048576 ; # 1M
-	SDIMAGE_SIZE on $(image) = $(HAIKU_BOARD_SDIMAGE_SIZE) ;
+	SDIMAGE_BLOCK_SIZE on $(image) = 1048576 ; # 1MiB
 	SDIMAGE_MTOOLS_H on $(image) = 255 ;
 	SDIMAGE_MTOOLS_S on $(image) = 63 ;
 	SDIMAGE_MTOOLS_C on $(image) = 8 ;
+	SDIMAGE_SIZE on $(image) = $(HAIKU_BOARD_SDIMAGE_SIZE) ;
+	SDIMAGE_BEGIN on $(image) = $(HAIKU_BOARD_SDIMAGE_BEGIN:E=63) ;
 	BuildUBootSDImage1 $(image) : $(files) ;
 }
 
@@ -183,7 +184,7 @@ actions BuildUBootSDImage1
 		heads=$(SDIMAGE_MTOOLS_H) sectors=$(SDIMAGE_MTOOLS_S)
 		mformat_only' > $(1).mtools
 	# partition it
-	MTOOLSRC=$(1).mtools mpartition -cI -T 0xc i:
+	MTOOLSRC=$(1).mtools mpartition -b$(SDIMAGE_BEGIN) -cI -T 0xc i:
 	# format the image
 	MTOOLSRC=$(1).mtools mformat -L 32 -v "Haiku" i:
 
@@ -200,6 +201,35 @@ actions BuildUBootSDImage1
 	# Add haiku bootstrap partition to MMC image
 	#cat $(2[0]) >> $(1)
 }
+
+
+rule BlessSDImage image
+{
+	# "Blesses" SD cards by writing out data to a fixed point outside of the
+	# filesystem. Handy if your board needs an SPL or boot0 at a fixed point.
+	if $(HAIKU_BOARD_SDIMAGE_BOOT0_FILE) {
+		Depends $(image) : $(HAIKU_BOARD_SDIMAGE_BOOT0_FILE) ;
+	}
+
+	if $(HAIKU_BOARD_SDIMAGE_BOOT1_FILE) {
+		Depends $(image) : $(HAIKU_BOARD_SDIMAGE_BOOT1_FILE) ;
+	}
+
+	BlessSDImage1 $(image) : $(HAIKU_BOARD_SDIMAGE_BOOT0_FILE) $(HAIKU_BOARD_SDIMAGE_BOOT1_FILE) ;
+}
+
+
+actions BlessSDImage1 bind HAIKU_BOARD_SDIMAGE_BOOT0_SEEK HAIKU_BOARD_SDIMAGE_BOOT1_SEEK
+{
+	if [ $(HAIKU_BOARD_SDIMAGE_BOOT0_SEEK:E=-1) -ge 0 ]; then
+		dd if=$(2[1]) of=$(1) bs=1 seek=$(HAIKU_BOARD_SDIMAGE_BOOT0_SEEK) conv=notrunc
+	fi
+
+	if [ $(HAIKU_BOARD_SDIMAGE_BOOT1_SEEK:E=-1) -ge 0 ]; then
+		dd if=$(2[2]) of=$(1) bs=1 seek=$(HAIKU_BOARD_SDIMAGE_BOOT1_SEEK) conv=notrunc
+	fi
+}
+
 
 # uimage targets
 BuildUImage haiku_loader.ub : haiku_loader :
@@ -250,6 +280,7 @@ Depends haiku-flash-uimage : haiku-$(HAIKU_BOOT_BOARD)_flash_image_uimage.img ;
 
 # SD/mmc image targets
 BuildUBootSDImage haiku-$(HAIKU_BOOT_BOARD).mmc : $(HAIKU_IMAGE) $(HAIKU_BOARD_SDIMAGE_FILES) ;
+BlessSDImage haiku-$(HAIKU_BOOT_BOARD).mmc ;
 NotFile haiku-mmc-image ;
 Depends haiku-mmc-image : haiku-$(HAIKU_BOOT_BOARD).mmc ;
 
