@@ -223,6 +223,7 @@ Style::SetGradient(const ::Gradient* gradient)
 #endif
 		delete[] fColors;
 		delete[] fGammaCorrectedColors;
+		delete fGradient;
 		fColors = NULL;
 		fGammaCorrectedColors = NULL;
 		fGradient = NULL;
