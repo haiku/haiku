@@ -14,8 +14,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		UsePrivateSystemHeaders ;
 
 		MergeObject <$(architecture)>posix_malloc_debug.o :
-			#guarded_heap.cpp
 			heap.cpp
+			;
+
+		MergeObject <$(architecture)>posix_malloc_guarded.o :
+			guarded_heap.cpp
 			;
 	}
 }
