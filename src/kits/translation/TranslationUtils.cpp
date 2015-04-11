@@ -68,7 +68,7 @@ BTranslationUtils::operator=(const BTranslationUtils &kUtils)
 //
 // Preconditions:
 //
-// Parameters: kName, the name of the bitmap file or resource to 
+// Parameters: kName, the name of the bitmap file or resource to
 //                    be returned
 //             roster, BTranslatorRoster used to do the translation
 //
@@ -84,11 +84,11 @@ BTranslationUtils::GetBitmap(const char *kName, BTranslatorRoster *roster)
 {
 	BBitmap *pBitmap = GetBitmapFile(kName, roster);
 		// Try loading a bitmap from the file named name
-	
+
 	// Try loading the bitmap as an application resource
 	if (pBitmap == NULL)
 		pBitmap = GetBitmap(B_TRANSLATOR_BITMAP, kName, roster);
-	
+
 	return pBitmap;
 }
 
@@ -96,7 +96,7 @@ BTranslationUtils::GetBitmap(const char *kName, BTranslatorRoster *roster)
 // GetBitmap
 //
 // Returns a BBitmap object for the bitmap resource identified by
-// the type type with the resource id, id. 
+// the type type with the resource id, id.
 // The user has to delete this object.
 //
 // Preconditions:
@@ -119,20 +119,20 @@ BTranslationUtils::GetBitmap(uint32 type, int32 id, BTranslatorRoster *roster)
 		// it belongs to the application
 	if (pResources == NULL || pResources->HasResource(type, id) == false)
 		return NULL;
-	
-	// Load the bitmap resource from the application file 
+
+	// Load the bitmap resource from the application file
 	// pRawData should be NULL if the resource is an
 	// unknown type or not available
 	size_t bitmapSize = 0;
 	const void *kpRawData = pResources->LoadResource(type, id, &bitmapSize);
 	if (kpRawData == NULL || bitmapSize == 0)
 		return NULL;
-	
+
 	BMemoryIO memio(kpRawData, bitmapSize);
 		// Put the pointer to the raw image data into a BMemoryIO object
 		// so that it can be used with BTranslatorRoster->Translate() in
 		// the GetBitmap(BPositionIO *, BTranslatorRoster *) function
-	
+
 	return GetBitmap(&memio, roster);
 		// Translate the data in memio using the BTranslatorRoster roster
 }
@@ -141,7 +141,7 @@ BTranslationUtils::GetBitmap(uint32 type, int32 id, BTranslatorRoster *roster)
 // GetBitmap
 //
 // Returns a BBitmap object for the bitmap resource identified by
-// the type type with the resource name, kName. 
+// the type type with the resource name, kName.
 // The user has to delete this object. Note that a resource type
 // and name does not uniquely identify a resource in a file.
 //
@@ -166,17 +166,17 @@ BTranslationUtils::GetBitmap(uint32 type, const char *kName,
 		// it belongs to the application
 	if (pResources == NULL || pResources->HasResource(type, kName) == false)
 		return NULL;
-	
-	// Load the bitmap resource from the application file 
+
+	// Load the bitmap resource from the application file
 	size_t bitmapSize = 0;
 	const void *kpRawData = pResources->LoadResource(type, kName, &bitmapSize);
 	if (kpRawData == NULL || bitmapSize == 0)
 		return NULL;
-	
+
 	BMemoryIO memio(kpRawData, bitmapSize);
 		// Put the pointer to the raw image data into a BMemoryIO object so
-		// that it can be used with BTranslatorRoster->Translate() 
-	
+		// that it can be used with BTranslatorRoster->Translate()
+
 	return GetBitmap(&memio, roster);
 		// Translate the data in memio using the BTranslatorRoster roster
 }
@@ -203,7 +203,7 @@ BTranslationUtils::GetBitmapFile(const char *kName, BTranslatorRoster *roster)
 {
 	if (!be_app || !kName || kName[0] == '\0')
 		return NULL;
-		
+
 	BPath path;
 	if (kName[0] != '/') {
 		// If kName is a relative path, use the path of the application's
@@ -221,7 +221,7 @@ BTranslationUtils::GetBitmapFile(const char *kName, BTranslatorRoster *roster)
 
 	} else if (path.SetTo(kName) != B_OK)
 		return NULL;
-		
+
 	BFile bitmapFile(path.Path(), B_READ_ONLY);
 	if (bitmapFile.InitCheck() != B_OK)
 		return NULL;
@@ -281,8 +281,8 @@ BTranslationUtils::GetBitmap(BPositionIO *stream, BTranslatorRoster *roster)
 {
 	if (stream == NULL)
 		return NULL;
-	
-	// Use default Translator if none is specified 
+
+	// Use default Translator if none is specified
 	if (roster == NULL) {
 		roster = BTranslatorRoster::Default();
 		if (roster == NULL)
@@ -295,7 +295,7 @@ BTranslationUtils::GetBitmap(BPositionIO *stream, BTranslatorRoster *roster)
 	if (roster->Translate(stream, NULL, NULL, &bitmapStream,
 		B_TRANSLATOR_BITMAP) < B_OK)
 		return NULL;
-	
+
 	// Detach the BBitmap from the BBitmapStream so the user
 	// of this function can do what they please with it.
 	BBitmap *pBitmap = NULL;
@@ -307,13 +307,13 @@ BTranslationUtils::GetBitmap(BPositionIO *stream, BTranslatorRoster *roster)
 
 
 /*!
-	This function translates the styled text in fromStream and 
+	This function translates the styled text in fromStream and
 	inserts it at the end of the text in intoView, using the
 	BTranslatorRoster *roster to do the translation. The structs
 	that make it possible to work with the translated data are
 	defined in
 	/boot/develop/headers/be/translation/TranslatorFormats.h
-	
+
 	\param source the stream with the styled text
 	\param intoView the view where the test will be inserted
 		roster, BTranslatorRoster used to do the translation
@@ -330,7 +330,7 @@ BTranslationUtils::GetStyledText(BPositionIO* source, BTextView* intoView,
 	if (source == NULL || intoView == NULL)
 		return B_BAD_VALUE;
 
-	// Use default Translator if none is specified 
+	// Use default Translator if none is specified
 	if (roster == NULL) {
 		roster = BTranslatorRoster::Default();
 		if (roster == NULL)
@@ -374,7 +374,7 @@ BTranslationUtils::GetStyledText(BPositionIO* source, BTextView* intoView,
 	if (mallocIO.BufferLength() < offset + kTextHeaderSize)
 		return B_BAD_DATA;
 
-	TranslatorStyledTextTextHeader textHeader = 
+	TranslatorStyledTextTextHeader textHeader =
 		*(const TranslatorStyledTextTextHeader *)(buffer + offset);
 
 	// convert the stm_header.header struct to the host format
@@ -402,7 +402,7 @@ BTranslationUtils::GetStyledText(BPositionIO* source, BTextView* intoView,
 		const size_t kStyleHeaderSize =
 			sizeof(TranslatorStyledTextStyleHeader);
 		if (mallocIO.BufferLength() >= offset + kStyleHeaderSize) {
-			TranslatorStyledTextStyleHeader styleHeader = 
+			TranslatorStyledTextStyleHeader styleHeader =
 				*(reinterpret_cast<const TranslatorStyledTextStyleHeader *>(buffer + offset));
 			swap_data(B_UINT32_TYPE, &styleHeader.header, kRecordHeaderSize, B_SWAP_BENDIAN_TO_HOST);
 			swap_data(B_UINT32_TYPE, &styleHeader.apply_offset, sizeof(uint32), B_SWAP_BENDIAN_TO_HOST);
@@ -452,11 +452,11 @@ BTranslationUtils::GetStyledText(BPositionIO* source, BTextView* intoView,
 	plain text data to the file, but puts the styled text data in
 	the "styles" attribute.  In other words, this function writes
 	styled text data to files in a manner that isn't human readable.
-	
+
 	So, if you want to write styled text
 	data to a file, and you want it to behave the way StyledEdit does,
 	you want to use the BTranslationUtils::WriteStyledEditFile() function.
-	
+
 	\param fromView, the view with the styled text in it
 	\param intoStream, the stream where the styled text is put
 		roster, not used
@@ -471,20 +471,20 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 {
 	if (fromView == NULL || intoStream == NULL)
 		return B_BAD_VALUE;
-	
+
 	int32 textLength = fromView->TextLength();
 	if (textLength < 0)
 		return B_ERROR;
-	
+
 	const char *pTextData = fromView->Text();
 		// its OK if the result of fromView->Text() is NULL
-	
+
 	int32 runArrayLength = 0;
 	text_run_array *runArray = fromView->RunArray(0, textLength,
 		&runArrayLength);
 	if (runArray == NULL)
 		return B_ERROR;
-	
+
 	int32 flatRunArrayLength = 0;
 	void *pflatRunArray =
 		BTextView::FlattenRunArray(runArray, &flatRunArrayLength);
@@ -496,13 +496,13 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 #endif
 		return B_ERROR;
 	}
-	
+
 	// Rather than use a goto, I put a whole bunch of code that
 	// could error out inside of a loop, and break out of the loop
-	// if there is an error. 
+	// if there is an error.
 
 	// This block of code is where I do all of the writing of the
-	// data to the stream.  I've gathered all of the data that I
+	// data to the stream. I've gathered all of the data that I
 	// need at this point.
 	bool ok = false;
 	while (!ok) {
@@ -513,7 +513,7 @@ BTranslationUtils::PutStyledText(BTextView *fromView, BPositionIO *intoStream,
 		stm_header.header.header_size = kStreamHeaderSize;
 		stm_header.header.data_size = 0;
 		stm_header.version = 100;
-		
+
 		// convert the stm_header.header struct to the host format
 		const size_t kRecordHeaderSize =
 			sizeof(TranslatorStyledTextRecordHeader);
@@ -631,7 +631,7 @@ BTranslationUtils::WriteStyledEditFile(BTextView* view, BFile* file, const char 
 	// move to the start of the file if not already there
 	status_t status = file->Seek(0, SEEK_SET);
 	if (status != B_OK)
-		return status;	
+		return status;
 
 	const BCharacterSet* characterSet = NULL;
 	if (encoding != NULL && strcmp(encoding, ""))
@@ -760,17 +760,17 @@ BMessage *
 BTranslationUtils::GetDefaultSettings(translator_id forTranslator,
 	BTranslatorRoster *roster)
 {
-	// Use default Translator if none is specified 
+	// Use default Translator if none is specified
 	if (roster == NULL) {
 		roster = BTranslatorRoster::Default();
 		if (roster == NULL)
 			return NULL;
 	}
-	
+
 	BMessage *message = new BMessage();
 	if (message == NULL)
 		return NULL;
-	
+
 	status_t result = roster->GetConfigurationMessage(forTranslator, message);
 	if (result != B_OK && result != B_NO_TRANSLATOR) {
 		// Be's version seems to just pass an empty BMessage
@@ -786,7 +786,7 @@ BTranslationUtils::GetDefaultSettings(translator_id forTranslator,
 // ---------------------------------------------------------------
 // GetDefaultSettings
 //
-// Attempts to find the translator settings for 
+// Attempts to find the translator settings for
 // the translator named kTranslatorName with a version of
 // translatorVersion.
 //
@@ -827,11 +827,11 @@ BTranslationUtils::GetDefaultSettings(const char *kTranslatorName,
 			if (currentTranVersion == translatorVersion
 				&& strcmp(currentTranName, kTranslatorName) == 0) {
 				pMessage = GetDefaultSettings(translators[i], roster);
-				break;				
+				break;
 			}
 		}
 	}
-	
+
 	delete[] translators;
 	return pMessage;
 }
@@ -864,7 +864,7 @@ BTranslationUtils::GetDefaultSettings(const char *kTranslatorName,
 //                                  output format id in the menuitem
 //             roster, BTranslatorRoster used to find translators
 //                     if NULL, the default translators are used
-//             
+//
 //
 // Postconditions:
 //
@@ -879,7 +879,7 @@ BTranslationUtils::AddTranslationItems(BMenu *intoMenu, uint32 fromType,
 {
 	if (!intoMenu)
 		return B_BAD_VALUE;
-		
+
 	if (!roster)
 		roster = BTranslatorRoster::Default();
 
@@ -914,7 +914,7 @@ BTranslationUtils::AddTranslationItems(BMenu *intoMenu, uint32 fromType,
 			continue;
 
 		// Get supported output formats
-		err = roster->GetOutputFormats(ids[tix], &formats, &numFormats); 
+		err = roster->GetOutputFormats(ids[tix], &formats, &numFormats);
 		if (err == B_OK) {
 			for (int oix = 0; oix < numFormats; oix++) {
 				if (formats[oix].type != fromType) {

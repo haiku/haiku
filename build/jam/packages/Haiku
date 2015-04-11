@@ -111,7 +111,7 @@ AddSymlinkToPackage lib : libbe.so : liblocale.so ;
 AddFilesToPackage servers : $(SYSTEM_SERVERS) ;
 
 # apps
-AddFilesToPackage  				: runtime_loader Deskbar Tracker ;
+AddFilesToPackage				: runtime_loader Deskbar Tracker ;
 AddFilesToPackage bin			: $(SYSTEM_BIN) consoled ;
 AddFilesToPackage apps			: $(SYSTEM_APPS) ;
 AddFilesToPackage preferences	: $(SYSTEM_PREFERENCES) ;
