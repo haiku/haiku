@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	2005945973
+1	hungarian	x-vnd.Haiku-MediaPlayer	2711018042
 raw audio	MediaPlayer-InfoWin		nyers audio
 Location	MediaPlayer-InfoWin		Útvonal
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikai)
@@ -91,6 +91,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Lejátszás indítása a
 Track	Video Track Menu		Sáv
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Belső hiba (nem sikerült zárolni). A lejátszási lista mentése sikertelen.
 View options	MediaPlayer-SettingsWindow		Megjelenítési beállítások
+none	MediaPlayer-Main		nincs 
 Play mode	MediaPlayer-SettingsWindow		Lejátszás módja
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Bejegyzések eltávolítása
 Video track	MediaPlayer-Main		Videósáv
@@ -119,6 +120,7 @@ raw video	MediaPlayer-InfoWin		nyers videó
 Volume of background clips	MediaPlayer-SettingsWindow		Háttérbeli klippek hangereje
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Belső hiba (nincs elég memória). A lejátszási lista mentése sikertelen.
 Hide interface	MediaPlayer-Main		Vezérlők elrejtése
+Open clips	MediaPlayer-Main		Klippek megnyitása
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Bejegyzés másolása
 none	Subtitles menu		nincs 
 Move file to Trash	MediaPlayer-PlaylistWindow		Fájl Szemetesbe helyezése

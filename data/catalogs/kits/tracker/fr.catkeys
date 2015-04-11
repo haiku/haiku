@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	1313160091
+1	french	x-vnd.Haiku-libtracker	4204393626
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Extensions
 Mount settings…	ContainerWindow		Réglages du montage…
@@ -179,6 +179,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		Erreur dans l’expressio
 Mount all	MountMenu		Monter tout
 calculating…	InfoWindow		calcul…
 Mount all disks now	AutoMounterSettings		Monter tous les disques maintenant
+Hide dotfiles	SettingsView		Masquer les fichiers cachés
 Untitled bitmap	PoseView		Image sans nom
 of %items	StatusWindow		de %items
 Description:	InfoWindow		Description :

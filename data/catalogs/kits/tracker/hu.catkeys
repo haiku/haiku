@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	1313160091
+1	hungarian	x-vnd.Haiku-libtracker	4204393626
 OK	WidgetAttributeText		Rendben
 Add-ons	FilePanelPriv		Kiegészítők
 Mount settings…	ContainerWindow		Csatolási beállítások…
@@ -179,6 +179,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		Hiba az általános kifej
 Mount all	MountMenu		Összes csatolása
 calculating…	InfoWindow		számolás…
 Mount all disks now	AutoMounterSettings		Összes lemez csatolása most
+Hide dotfiles	SettingsView		Ponttal kezdődő fájlnevek elrejtése
 Untitled bitmap	PoseView		Névtelen bittérkép
 of %items	StatusWindow		/ %items
 Description:	InfoWindow		Leírás:

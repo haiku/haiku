@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	1313160091
+1	swedish	x-vnd.Haiku-libtracker	4204393626
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Tillägg
 Mount settings…	ContainerWindow		Monteringsinställningar...
@@ -179,6 +179,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		Fel i reguljärt uttryck:
 Mount all	MountMenu		Montera alla
 calculating…	InfoWindow		beräknar...
 Mount all disks now	AutoMounterSettings		Montera alla diskar nu
+Hide dotfiles	SettingsView		Dölj . filer
 Untitled bitmap	PoseView		Odöpt bitmapp
 of %items	StatusWindow		av %items
 Description:	InfoWindow		Beskrivning:

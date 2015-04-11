@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1096206338
+1	german	x-vnd.Haiku-libtracker	3987439873
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-ons
 Mount settings…	ContainerWindow		Einhänge-Einstellungen…
@@ -174,6 +174,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		Fehler im regulären Ausd
 Mount all	MountMenu		Alle einhängen
 calculating…	InfoWindow		Berechnung läuft…
 Mount all disks now	AutoMounterSettings		Alle Datenträger einhängen
+Hide dotfiles	SettingsView		Mit \".\" beginnende Dateien ausblenden
 Untitled bitmap	PoseView		Unbenannte Bitmap
 of %items	StatusWindow		von %items
 Description:	InfoWindow		Beschreibung:
