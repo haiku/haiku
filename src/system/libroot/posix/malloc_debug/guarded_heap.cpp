@@ -13,9 +13,11 @@
 #include <sys/mman.h>
 
 #include <locks.h>
-#include <syscalls.h>
 
+#include <libroot_private.h>
 #include <runtime_loader.h>
+
+#include <TLS.h>
 
 
 // #pragma mark - Debug Helpers
@@ -26,6 +28,8 @@ static const size_t kMaxStackTraceDepth = 50;
 static bool sDebuggerCalls = true;
 static bool sDumpAllocationsOnExit = false;
 static size_t sStackTraceDepth = 0;
+static int32 sStackBaseTLSIndex = -1;
+static int32 sStackEndTLSIndex = -1;
 
 #if __cplusplus >= 201103L
 #include <cstddef>
@@ -276,15 +280,22 @@ guarded_heap_fill_stack_trace(addr_t stackTrace[], size_t maxDepth,
 	if (maxDepth == 0)
 		return 0;
 
-	maxDepth += skipFrames;
-	addr_t buffer[maxDepth];
-	ssize_t traceDepth = _kern_get_stack_trace(maxDepth, buffer);
-	if (traceDepth <= (ssize_t)skipFrames)
-		return 0;
+	void** stackBase = tls_address(sStackBaseTLSIndex);
+	void** stackEnd = tls_address(sStackEndTLSIndex);
+	if (*stackBase == NULL || *stackEnd == NULL) {
+		thread_info threadInfo;
+		status_t result = get_thread_info(find_thread(NULL), &threadInfo);
+		if (result != B_OK)
+			return 0;
 
-	traceDepth -= skipFrames;
-	memcpy(stackTrace, &buffer[skipFrames], traceDepth * sizeof(addr_t));
-	return traceDepth;
+		*stackBase = (void*)threadInfo.stack_base;
+		*stackEnd = (void*)threadInfo.stack_end;
+	}
+
+	int32 traceDepth = __arch_get_stack_trace(stackTrace, maxDepth, skipFrames,
+		(addr_t)*stackBase, (addr_t)*stackEnd);
+
+	return traceDepth < 0 ? 0 : traceDepth;
 }
 
 
@@ -1085,6 +1096,27 @@ heap_debug_dump_allocations_on_exit(bool enabled)
 extern "C" status_t
 heap_debug_set_stack_trace_depth(size_t stackTraceDepth)
 {
+	if (stackTraceDepth == 0) {
+		sStackTraceDepth = 0;
+		return B_OK;
+	}
+
+	// This is rather wasteful, but these are going to be filled lazily by each
+	// thread on alloc/free. Therefore we cannot use a dynamic allocation and
+	// just store a pointer to. Since we only need to store two addresses, we
+	// use two TLS slots and set them to point at the stack base/end.
+	if (sStackBaseTLSIndex < 0) {
+		sStackBaseTLSIndex = tls_allocate();
+		if (sStackBaseTLSIndex < 0)
+			return sStackBaseTLSIndex;
+	}
+
+	if (sStackEndTLSIndex < 0) {
+		sStackEndTLSIndex = tls_allocate();
+		if (sStackEndTLSIndex < 0)
+			return sStackEndTLSIndex;
+	}
+
 	sStackTraceDepth = min_c(stackTraceDepth, kMaxStackTraceDepth);
 	return B_OK;
 }
