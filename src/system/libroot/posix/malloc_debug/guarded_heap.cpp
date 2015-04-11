@@ -15,6 +15,8 @@
 #include <locks.h>
 #include <syscalls.h>
 
+#include <runtime_loader.h>
+
 
 // #pragma mark - Debug Helpers
 
@@ -224,16 +226,17 @@ guarded_heap_page_protect(guarded_heap_area& area, size_t pageIndex,
 static void
 guarded_heap_print_stack_trace(addr_t stackTrace[], size_t depth)
 {
-	addr_t baseAddress;
-	char symbolName[1024];
-	char imageName[B_PATH_NAME_LENGTH];
+	char* imageName;
+	char* symbolName;
+	void* location;
 	bool exactMatch;
 
 	for (size_t i = 0; i < depth; i++) {
 		addr_t address = stackTrace[i];
 
-		status_t status = _kern_lookup_symbol(address, &baseAddress, symbolName,
-			sizeof(symbolName), imageName, sizeof(imageName), &exactMatch);
+		status_t status = __gRuntimeLoader->get_nearest_symbol_at_address(
+			(void*)address, NULL, NULL, &imageName, &symbolName, NULL,
+			&location, &exactMatch);
 		if (status != B_OK) {
 			print_stdout("\t%#" B_PRIxADDR " (lookup failed: %s)\n", address,
 				strerror(status));
@@ -241,7 +244,7 @@ guarded_heap_print_stack_trace(addr_t stackTrace[], size_t depth)
 		}
 
 		print_stdout("\t<%s> %s + %#" B_PRIxADDR "%s\n", imageName, symbolName,
-			address - baseAddress, (exactMatch ? "" : " (nearest)"));
+			address - (addr_t)location, exactMatch ? "" : " (nearest)");
 	}
 }
 

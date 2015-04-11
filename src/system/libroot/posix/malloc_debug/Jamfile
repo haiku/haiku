@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src system libroot posix malloc_debug ;
 
-UsePrivateHeaders libroot shared ;
+UsePrivateHeaders libroot shared runtime_loader ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
