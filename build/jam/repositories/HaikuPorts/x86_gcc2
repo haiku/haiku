@@ -758,7 +758,7 @@ RemotePackageRepository HaikuPorts
 	bookmarkconverter
 	boost_x86
 	buildbot_slave
-	burnitnow
+	burnitnow_x86
 	bzip2
 	bzr
 	canna

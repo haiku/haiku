@@ -29,9 +29,11 @@ RemotePackageRepository HaikuPorts
 	binutils-2.25_2014_12_27-1
 	bison-2.4.3-6
 	buildbot_slave-0.8.8-2
+	burnitnow-0.1.0-1
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
-	cdrtools-3.01~a07-3
+	cdrtools-3.01~a27-1
+	cdrtools_devel-3.01~a27-1
 	clang-3.4-3
 	clang_analysis-3.4-3
 	cmake-3.0.0_rc3-1
@@ -308,6 +310,7 @@ RemotePackageRepository HaikuPorts
 	binutils_x86_gcc2
 	bison
 	buildbot_slave
+	burnitnow
 	bzip2
 	cdrtools
 	clang
