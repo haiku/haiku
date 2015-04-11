@@ -3000,21 +3000,3 @@ _user_clear_debugger_breakpoint(void *address, bool watchpoint)
 
 	return result;
 }
-
-
-ssize_t
-_user_get_stack_trace(size_t addressCount, addr_t* userReturnAddresses)
-{
-	addr_t returnAddresses[addressCount];
-	int32 readCount = arch_debug_get_stack_trace(returnAddresses, addressCount,
-		1, 0, STACK_TRACE_KERNEL | STACK_TRACE_USER);
-	if (readCount < 0)
-		return readCount;
-
-	status_t copyResult = user_memcpy(userReturnAddresses, returnAddresses,
-		readCount * sizeof(addr_t));
-	if (copyResult != B_OK)
-		return copyResult;
-
-	return readCount;
-}
