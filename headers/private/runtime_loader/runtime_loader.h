@@ -38,8 +38,8 @@ struct rld_export {
 		char *symbolName, int32 *nameLength, int32 *symbolType,
 		void **_location);
 	status_t (*get_nearest_symbol_at_address)(void* address,
-		image_id* _imageID,	char** _imagePath, char** _symbolName,
-		int32* _type, void** _location);
+		image_id* _imageID,	char** _imagePath, char** _imageName,
+		char** _symbolName, int32* _type, void** _location, bool* _exactMatch);
 	status_t (*test_executable)(const char *path, char *interpreter);
 	status_t (*get_executable_architecture)(const char *path,
 		const char** _architecture);
