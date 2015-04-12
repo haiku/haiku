@@ -668,7 +668,8 @@ mmu_init(void)
 			return /*B_ERROR*/;
 #endif
 		}
-		dprintf("total physical memory = %" B_PRId64 "MB\n", total / (1024 * 1024));
+		dprintf("total physical memory = %" B_PRId64 "MB\n",
+			total / (1024 * 1024));
 	}
 
 	// see if subpages are disabled
@@ -685,10 +686,17 @@ mmu_init(void)
 
 	// Mark start for dynamic allocation
 	sNextPhysicalAddress = sPageTableRegionEnd;
+	// We are going to allocate early kernel stuff there, so the virtual address
+	// has to be in kernel space. Either put it right after the identity mapped
+	// RAM (if it happens to be in the 0x80000000 range), or at the start of
+	// the kernel address space otherwise.
 	sNextVirtualAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
+	if (sPageTableRegionEnd > sNextVirtualAddress)
+		sNextVirtualAddress = sPageTableRegionEnd;
 
 	// mark allocated ranges, so they don't get overwritten
-	insert_physical_allocated_range((addr_t)&_start, (addr_t)&_end - (addr_t)&_start);
+	insert_physical_allocated_range((addr_t)&_start,
+		(addr_t)&_end - (addr_t)&_start);
 	insert_physical_allocated_range((addr_t)sPageDirectory, 0x200000);
 
 	init_page_directory();
