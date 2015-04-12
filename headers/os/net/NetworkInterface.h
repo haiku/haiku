@@ -14,6 +14,7 @@
 
 
 class BNetworkInterface;
+class BNetworkRoute;
 
 
 class BNetworkInterfaceAddress {
@@ -100,15 +101,17 @@ public:
 
 			status_t			GetHardwareAddress(BNetworkAddress& address);
 
-			status_t			AddRoute(const route_entry& route);
+			status_t			AddRoute(const BNetworkRoute& route);
 			status_t			AddDefaultRoute(const BNetworkAddress& gateway);
-			status_t			RemoveRoute(const route_entry& route);
+			status_t			RemoveRoute(const BNetworkRoute& route);
 			status_t			RemoveRoute(int family,
-									const route_entry& route);
+									const BNetworkRoute& route);
 			status_t			RemoveDefaultRoute(int family);
 			status_t			GetRoutes(int family,
-									BObjectList<route_entry>& routes) const;
+									BObjectList<BNetworkRoute>& routes) const;
 			status_t			GetDefaultRoute(int family,
+									BNetworkRoute& route) const;
+			status_t			GetDefaultGateway(int family,
 									BNetworkAddress& gateway) const;
 
 			status_t			AutoConfigure(int family);

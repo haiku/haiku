@@ -239,7 +239,7 @@ InterfaceAddressView::_UpdateFields()
 	fNetmaskField->SetText(address.Mask().ToString());
 
 	BNetworkAddress gateway;
-	if (fInterface.GetDefaultRoute(fFamily, gateway) == B_OK)
+	if (fInterface.GetDefaultGateway(fFamily, gateway) == B_OK)
 		fGatewayField->SetText(gateway.ToString());
 	else
 		fGatewayField->SetText(NULL);
