@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include <NetworkInterface.h>
 
 #include <errno.h>

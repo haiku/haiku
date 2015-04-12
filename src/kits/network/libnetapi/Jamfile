@@ -25,8 +25,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Includes [ FGristFiles $(sslSources) SecureSocket.cpp
 					HttpAuthentication.cpp Certificate.cpp ]
 				: [ BuildFeatureAttribute openssl : headers ] ;
-				# Dependency needed to trigger downloading/unzipping the package before
-				# compiling the files.
+				# Dependency needed to trigger downloading/unzipping the package
+				# before compiling the files.
 			SetupFeatureObjectsDir ssl ;
 		} else {
 			# As we don't have md5 from ssl, use our own

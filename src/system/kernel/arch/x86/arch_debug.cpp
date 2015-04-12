@@ -1152,7 +1152,7 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 		if (onKernelStack && is_iframe(thread, bp)) {
 			iframe* frame = (iframe*)bp;
 			ip = frame->ip;
- 			nextBp = frame->bp;
+			nextBp = frame->bp;
 
 			if (skipIframes > 0) {
 				if (--skipIframes == 0)
