@@ -35,6 +35,9 @@ BufferCache::~BufferCache()
 BBuffer*
 BufferCache::GetBuffer(media_buffer_id id)
 {
+	if (id <= 0)
+		return NULL;
+
 	BufferMap::iterator found = fMap.find(id);
 	if (found != fMap.end())
 		return found->second;
