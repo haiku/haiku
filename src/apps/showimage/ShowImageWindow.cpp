@@ -1116,6 +1116,14 @@ ShowImageWindow::_SaveAs(BMessage* message)
 	if (!fSavePanel)
 		return;
 
+	// Retrieve save directory from settings;
+	ShowImageSettings* settings = my_app->Settings();
+	if (settings->Lock()) {
+		fSavePanel->SetPanelDirectory(
+			settings->GetString("SaveDirectory", NULL));
+		settings->Unlock();
+	}
+
 	fSavePanel->Window()->SetWorkspaces(B_CURRENT_WORKSPACE);
 	fSavePanel->Show();
 }
@@ -1164,6 +1172,14 @@ ShowImageWindow::_SaveToFile(BMessage* message)
 	// Write out the image file
 	BDirectory dir(&dirRef);
 	fImageView->SaveToFile(&dir, filename, NULL, &outFormat[i]);
+
+	// Store Save directory in settings;
+	ShowImageSettings* settings = my_app->Settings();
+	if (settings->Lock()) {
+		BPath path(&dirRef);
+		settings->SetString("SaveDirectory", path.Path());
+		settings->Unlock();
+	}
 }
 
 
