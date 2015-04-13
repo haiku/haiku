@@ -21,8 +21,7 @@ HAIKU_BOARD_LOADER_ENTRY_LINUX = `printf \"obase=16;ibase=16;10 + %x\\n\" $(HAIK
 # mmc/SD image
 #
 
-# TODO: Update to https://github.com/cubieboard/CC-A80-binaries when accepted upstream
-HAIKU_BOARD_FIRMWARE_URL = "https://github.com/kallisti5/CC-A80-binaries/raw/master/bin" ;
+HAIKU_BOARD_FIRMWARE_URL = "https://github.com/cubieboard/CC-A80-binaries/raw/master/bin" ;
 
 # u-boot image
 # Dear Cubbieboard, add fdt_addr_r, ramdisk_addr_r, kernel_addr_r to u-boot
