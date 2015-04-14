@@ -270,6 +270,13 @@ BBufferProducer::HandleMessage(int32 message, const void* data, size_t size)
 			group = command->buffer_count != 0
 				? new BBufferGroup(command->buffer_count, command->buffers)
 				: NULL;
+
+			if (group == NULL || group->InitCheck() != B_OK) {
+				ERROR("BBufferProducer::HandleMessage PRODUCER_SET_BUFFER_GROUP"
+					" group InitCheck() failed.\n");
+				delete group;
+				return B_ERROR;
+			}
 			status_t status = SetBufferGroup(command->source, group);
 			if (command->destination == media_destination::null)
 				return B_OK;
