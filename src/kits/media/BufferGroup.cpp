@@ -41,7 +41,8 @@ BBufferGroup::BBufferGroup(size_t size, int32 count, uint32 placement,
 	uint32 lock)
 {
 	CALLED();
-	if (_Init() != B_OK)
+	fInitError = _Init();
+	if (fInitError != B_OK)
 		return;
 
 	// This one is easy. We need to create "count" BBuffers,
@@ -94,7 +95,8 @@ BBufferGroup::BBufferGroup(size_t size, int32 count, uint32 placement,
 BBufferGroup::BBufferGroup()
 {
 	CALLED();
-	if (_Init() != B_OK)
+	fInitError = _Init();
+	if (fInitError != B_OK)
 		return;
 
 	// this one simply creates an empty BBufferGroup
@@ -104,13 +106,11 @@ BBufferGroup::BBufferGroup()
 BBufferGroup::BBufferGroup(int32 count, const media_buffer_id* buffers)
 {
 	CALLED();
-	if (_Init() != B_OK)
+	fInitError = _Init();
+	if (fInitError != B_OK)
 		return;
 
-	// TODO: we need to make sure that a media_buffer_id is only added
-	// once to each group
-
-	// this one creates "BBuffer"s from "media_buffer_id"s passed
+	// This one creates "BBuffer"s from "media_buffer_id"s passed
 	// by the application.
 
 	buffer_clone_info info;
@@ -170,15 +170,11 @@ BBufferGroup::RequestBuffer(size_t size, bigtime_t timeout)
 	if (size <= 0)
 		return NULL;
 
-	BBuffer *buffer;
-	status_t status;
+	BBuffer *buffer = NULL;
+	fRequestError = fBufferList->RequestBuffer(fReclaimSem, fBufferCount,
+		size, 0, &buffer, timeout);
 
-	buffer = NULL;
-	status = fBufferList->RequestBuffer(fReclaimSem, fBufferCount, size, 0,
-		&buffer, timeout);
-	fRequestError = status;
-
-	return status == B_OK ? buffer : NULL;
+	return fRequestError == B_OK ? buffer : NULL;
 }
 
 
@@ -192,12 +188,10 @@ BBufferGroup::RequestBuffer(BBuffer* buffer, bigtime_t timeout)
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 
-	status_t status;
-	status = fBufferList->RequestBuffer(fReclaimSem, fBufferCount, 0, 0,
+	fRequestError = fBufferList->RequestBuffer(fReclaimSem, fBufferCount, 0, 0,
 		&buffer, timeout);
-	fRequestError = status;
 
-	return status;
+	return fRequestError;
 }
 
 
@@ -353,29 +347,25 @@ BBufferGroup::_Init()
 	CALLED();
 
 	// some defaults in case we drop out early
-	fBufferList = 0;
-	fInitError = B_ERROR;
+	fBufferList = NULL;
 	fRequestError = B_ERROR;
 	fBufferCount = 0;
 
 	// Create the reclaim semaphore
 	// This is also used as a system wide unique identifier for this group
 	fReclaimSem = create_sem(0, "buffer reclaim sem");
-	if (fReclaimSem < B_OK) {
+	if (fReclaimSem < 0) {
 		ERROR("BBufferGroup::InitBufferGroup: couldn't create fReclaimSem\n");
-		fInitError = (status_t)fReclaimSem;
-		return fInitError;
+		return (status_t)fReclaimSem;
 	}
 
 	fBufferList = BPrivate::SharedBufferList::Get();
 	if (fBufferList == NULL) {
 		ERROR("BBufferGroup::InitBufferGroup: SharedBufferList::Get() "
 			"failed\n");
-		fInitError = B_ERROR;
-		return fInitError;
+		return B_ERROR;
 	}
 
-	fInitError = B_OK;
-	return fInitError;
+	return B_OK;
 }
 
