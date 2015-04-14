@@ -35,8 +35,10 @@ BLayoutItem::BLayoutItem(BMessage* from)
 
 BLayoutItem::~BLayoutItem()
 {
-	if (fLayout)
-		fLayout->RemoveItem(this);
+	if (fLayout != NULL) {
+		debugger("Deleting a BLayoutItem that is still attached to a layout. "
+			"Call RemoveSelf first.");
+	}
 }
 
 

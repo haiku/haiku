@@ -704,9 +704,6 @@ BView::~BView()
 			"Call RemoveSelf first.");
 	}
 
-	_RemoveLayoutItemsFromLayout(true);
-	_RemoveSelf();
-
 	if (fToolTip != NULL)
 		fToolTip->ReleaseReference();
 
@@ -720,9 +717,12 @@ BView::~BView()
 		child = nextChild;
 	}
 
-	// delete the layout and the layout data
-	delete fLayoutData->fLayout;
+	SetLayout(NULL);
+	_RemoveLayoutItemsFromLayout(true);
+
 	delete fLayoutData;
+
+	_RemoveSelf();
 
 	if (fVerScroller)
 		fVerScroller->SetTarget((BView*)NULL);
@@ -4198,7 +4198,7 @@ BView::_RemoveLayoutItemsFromLayout(bool deleteItems)
 	int32 index = fLayoutData->fLayoutItems.CountItems();
 	while (index-- > 0) {
 		BLayoutItem* item = fLayoutData->fLayoutItems.ItemAt(index);
-		item->Layout()->RemoveItem(item);
+		item->RemoveSelf();
 			// Removes item from fLayoutItems list
 		if (deleteItems)
 			delete item;
@@ -4802,6 +4802,7 @@ BView::SetLayout(BLayout* layout)
 
 	// unset and delete the old layout
 	if (fLayoutData->fLayout) {
+		fLayoutData->fLayout->RemoveSelf();
 		fLayoutData->fLayout->SetOwner(NULL);
 		delete fLayoutData->fLayout;
 	}
