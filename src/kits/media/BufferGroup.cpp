@@ -150,32 +150,12 @@ BBufferGroup::AddBuffer(const buffer_clone_info& info, BBuffer** _buffer)
 	if (fInitError != B_OK)
 		return B_NO_INIT;
 
-	// TODO: we need to make sure that a media_buffer_id is only added
-	// once to each group
-
-	BBuffer* buffer = new(std::nothrow) BBuffer(info);
-	if (buffer == NULL)
-		return B_NO_MEMORY;
-
-	if (buffer->Data() == NULL) {
-		// BBuffer::Data() will return NULL if an error occured
-		ERROR("BBufferGroup: error while creating buffer\n");
-		delete buffer;
-		return B_ERROR;
-	}
-
-	status_t status = fBufferList->AddBuffer(fReclaimSem, buffer);
+	status_t status = fBufferList->AddBuffer(fReclaimSem, info, _buffer);
 	if (status != B_OK) {
 		ERROR("BBufferGroup: error when adding buffer\n");
-		delete buffer;
 		return status;
 	}
-
 	atomic_add(&fBufferCount, 1);
-
-	if (_buffer != NULL)
-		*_buffer = buffer;
-
 	return B_OK;
 }
 

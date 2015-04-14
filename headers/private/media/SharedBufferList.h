@@ -28,7 +28,14 @@ public:
 			status_t					Unlock();
 
 			status_t					AddBuffer(sem_id groupReclaimSem,
+											const buffer_clone_info& info,
+											BBuffer** buffer);
+
+			// Call AddBuffer and CheckID locked
+			status_t					AddBuffer(sem_id groupReclaimSem,
 											BBuffer* buffer);
+			status_t					CheckID(sem_id groupSem,
+											media_buffer_id id) const;
 
 			status_t					RequestBuffer(sem_id groupReclaimSem,
 											int32 buffersInGroup, size_t size,

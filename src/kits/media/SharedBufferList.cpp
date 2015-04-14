@@ -163,6 +163,46 @@ SharedBufferList::Unlock()
 
 
 status_t
+SharedBufferList::AddBuffer(sem_id groupReclaimSem,
+	const buffer_clone_info& info, BBuffer** _buffer)
+{
+	status_t status = Lock();
+	if (status != B_OK)
+		return status;
+
+	// Check if the id exists
+	status = CheckID(groupReclaimSem, info.buffer);
+	if (status != B_OK) {
+		Unlock();
+		return status;
+	}
+	BBuffer* buffer = new(std::nothrow) BBuffer(info);
+	if (buffer == NULL) {
+		Unlock();
+		return B_NO_MEMORY;
+	}
+
+	if (buffer->Data() == NULL) {
+		// BBuffer::Data() will return NULL if an error occured
+		ERROR("BBufferGroup: error while creating buffer\n");
+		delete buffer;
+		Unlock();
+		return B_ERROR;
+	}
+
+	status = AddBuffer(groupReclaimSem, buffer);
+	if (status != B_OK) {
+		delete buffer;
+		Unlock();
+		return status;
+	} else if (_buffer != NULL)
+		*_buffer = buffer;
+
+	return Unlock();
+}
+
+
+status_t
 SharedBufferList::AddBuffer(sem_id groupReclaimSem, BBuffer* buffer)
 {
 	CALLED();
@@ -170,12 +210,7 @@ SharedBufferList::AddBuffer(sem_id groupReclaimSem, BBuffer* buffer)
 	if (buffer == NULL)
 		return B_BAD_VALUE;
 
-	status_t status = Lock();
-	if (status != B_OK)
-		return status;
-
 	if (fCount == kMaxBuffers) {
-		Unlock();
 		return B_MEDIA_TOO_MANY_BUFFERS;
 	}
 
@@ -185,11 +220,27 @@ SharedBufferList::AddBuffer(sem_id groupReclaimSem, BBuffer* buffer)
 	fInfos[fCount].reclaimed = true;
 	fCount++;
 
-	status = release_sem_etc(groupReclaimSem, 1, B_DO_NOT_RESCHEDULE);
-	if (status != B_OK)
-		return status;
+	return release_sem_etc(groupReclaimSem, 1, B_DO_NOT_RESCHEDULE);
+}
 
-	return Unlock();
+
+status_t
+SharedBufferList::CheckID(sem_id groupSem, media_buffer_id id) const
+{
+	CALLED();
+
+	if (id == 0)
+		return B_OK;
+	if (id < 0)
+		return B_BAD_VALUE;
+
+	for (int32 i = 0; i < fCount; i++) {
+		if (fInfos[i].id == id
+			&& fInfos[i].reclaim_sem == groupSem) {
+			return B_ERROR;
+		}
+	}
+	return B_OK;
 }
 
 
