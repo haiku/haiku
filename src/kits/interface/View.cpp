@@ -710,9 +710,6 @@ BView::~BView()
 	if (fToolTip != NULL)
 		fToolTip->ReleaseReference();
 
-	// TODO: see about BShelf! must I delete it here? is it deleted by
-	// the window?
-
 	// we also delete all our children
 
 	BView* child = fFirstChild;
