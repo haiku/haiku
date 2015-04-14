@@ -24,7 +24,7 @@ RemotePackageRepository HaikuPorts
 	automake-1.13.1-4
 	bash-4.3.33-1
 	beam-1.2-1
-	bepdf-1.1.1~beta5_2013_04_28-2
+	bepdf-1.2.0-1
 	bescreencapture-1.9.4-1
 	binutils-2.25_2014_12_27-1
 	bison-2.4.3-6
@@ -124,6 +124,8 @@ RemotePackageRepository HaikuPorts
 	libpng_devel-1.5.22-1
 	libpng16-1.6.17-1
 	libpng16_devel-1.6.17-1
+	libsanta-3.0.1-1
+	libsanta_devel-3.0.1-1
 	libsdl-1.2.15-6
 	libsdl_devel-1.2.15-6
 	libssh2-1.5.0-1
@@ -178,7 +180,7 @@ RemotePackageRepository HaikuPorts
 	openssl_devel-1.0.0r-1
 	p7zip-9.20.1-4
 	patch-2.7.5-1
-	pe-2.4.4_2014_05_29-1
+	pe-2.4.5-1
 	perl-5.18.2-2
 	pixman-0.32.6-1
 	pkgconfig-0.27.1-2
@@ -211,7 +213,7 @@ RemotePackageRepository HaikuPorts
 	transmission-2.84-3
 	unrar-5.1.5-1
 	unzip-6.0-1
-	vision-0.9.7.r949-1
+	vision-0.9.7.r949-3
 	vim-7.4-1
 	wget-1.16.3-1
 	which-2.21-1
@@ -305,7 +307,7 @@ RemotePackageRepository HaikuPorts
 	automake
 	bash
 	beam
-#	bepdf
+	bepdf
 	binutils
 	binutils_x86_gcc2
 	bison
@@ -365,6 +367,7 @@ RemotePackageRepository HaikuPorts
 	libpcre
 	libpng
 	libpng16
+	libsanta
 	libsdl
 	libssh2
 	libsolv
