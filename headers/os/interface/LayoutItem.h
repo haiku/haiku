@@ -23,6 +23,7 @@ public:
 	virtual						~BLayoutItem();
 
 			BLayout*			Layout() const;
+			bool				RemoveSelf();
 
 	virtual	BSize				MinSize() = 0;
 	virtual	BSize				MaxSize() = 0;

@@ -47,6 +47,13 @@ BLayoutItem::Layout() const
 }
 
 
+bool
+BLayoutItem::RemoveSelf()
+{
+	return Layout() != NULL && Layout()->RemoveItem(this);
+}
+
+
 void
 BLayoutItem::SetExplicitSize(BSize size)
 {
