@@ -58,7 +58,7 @@ enum {
 	B_FONT_SIZE							= 0x00000002,
 	B_FONT_SHEAR						= 0x00000004,
 	B_FONT_ROTATION						= 0x00000008,
-	B_FONT_SPACING     					= 0x00000010,
+	B_FONT_SPACING						= 0x00000010,
 	B_FONT_ENCODING						= 0x00000020,
 	B_FONT_FACE							= 0x00000040,
 	B_FONT_FLAGS						= 0x00000080,
@@ -67,27 +67,27 @@ enum {
 };
 
 // view flags
-const uint32 B_FULL_UPDATE_ON_RESIZE 	= 0x80000000UL;	/* 31 */
-const uint32 _B_RESERVED1_ 				= 0x40000000UL;	/* 30 */
-const uint32 B_WILL_DRAW 				= 0x20000000UL;	/* 29 */
-const uint32 B_PULSE_NEEDED 			= 0x10000000UL;	/* 28 */
-const uint32 B_NAVIGABLE_JUMP 			= 0x08000000UL;	/* 27 */
+const uint32 B_FULL_UPDATE_ON_RESIZE	= 0x80000000UL;	/* 31 */
+const uint32 _B_RESERVED1_				= 0x40000000UL;	/* 30 */
+const uint32 B_WILL_DRAW				= 0x20000000UL;	/* 29 */
+const uint32 B_PULSE_NEEDED				= 0x10000000UL;	/* 28 */
+const uint32 B_NAVIGABLE_JUMP			= 0x08000000UL;	/* 27 */
 const uint32 B_FRAME_EVENTS				= 0x04000000UL;	/* 26 */
-const uint32 B_NAVIGABLE 				= 0x02000000UL;	/* 25 */
-const uint32 B_SUBPIXEL_PRECISE 		= 0x01000000UL;	/* 24 */
-const uint32 B_DRAW_ON_CHILDREN 		= 0x00800000UL;	/* 23 */
-const uint32 B_INPUT_METHOD_AWARE 		= 0x00400000UL;	/* 23 */
-const uint32 _B_RESERVED7_ 				= 0x00200000UL;	/* 22 */
+const uint32 B_NAVIGABLE				= 0x02000000UL;	/* 25 */
+const uint32 B_SUBPIXEL_PRECISE			= 0x01000000UL;	/* 24 */
+const uint32 B_DRAW_ON_CHILDREN			= 0x00800000UL;	/* 23 */
+const uint32 B_INPUT_METHOD_AWARE		= 0x00400000UL;	/* 23 */
+const uint32 _B_RESERVED7_				= 0x00200000UL;	/* 22 */
 const uint32 B_SUPPORTS_LAYOUT			= 0x00100000UL;	/* 21 */
 const uint32 B_INVALIDATE_AFTER_LAYOUT	= 0x00080000UL;	/* 20 */
 
 #define _RESIZE_MASK_ (0xffff)
 
-const uint32 _VIEW_TOP_				 	= 1UL;
-const uint32 _VIEW_LEFT_ 				= 2UL;
-const uint32 _VIEW_BOTTOM_			 	= 3UL;
-const uint32 _VIEW_RIGHT_ 				= 4UL;
-const uint32 _VIEW_CENTER_ 				= 5UL;
+const uint32 _VIEW_TOP_					= 1UL;
+const uint32 _VIEW_LEFT_				= 2UL;
+const uint32 _VIEW_BOTTOM_				= 3UL;
+const uint32 _VIEW_RIGHT_				= 4UL;
+const uint32 _VIEW_CENTER_				= 5UL;
 
 inline uint32 _rule_(uint32 r1, uint32 r2, uint32 r3, uint32 r4)
 	{ return ((r1 << 12) | (r2 << 8) | (r3 << 4) | r4); }
@@ -95,7 +95,7 @@ inline uint32 _rule_(uint32 r1, uint32 r2, uint32 r3, uint32 r4)
 #define B_FOLLOW_NONE 0
 #define B_FOLLOW_ALL_SIDES	_rule_(_VIEW_TOP_, _VIEW_LEFT_, _VIEW_BOTTOM_, \
 								_VIEW_RIGHT_)
-#define B_FOLLOW_ALL  		B_FOLLOW_ALL_SIDES
+#define B_FOLLOW_ALL		B_FOLLOW_ALL_SIDES
 
 #define B_FOLLOW_LEFT		_rule_(0, _VIEW_LEFT_, 0, _VIEW_LEFT_)
 #define B_FOLLOW_RIGHT		_rule_(0, _VIEW_RIGHT_, 0, _VIEW_RIGHT_)
@@ -224,11 +224,11 @@ public:
 									BPoint where = B_ORIGIN, bool sync = true);
 
 	virtual	void				SetDrawingMode(drawing_mode mode);
-			drawing_mode 		DrawingMode() const;
+			drawing_mode		DrawingMode() const;
 
 			void				SetBlendingMode(source_alpha srcAlpha,
 									alpha_function alphaFunc);
-			void	 			GetBlendingMode(source_alpha* srcAlpha,
+			void				GetBlendingMode(source_alpha* srcAlpha,
 									alpha_function* alphaFunc) const;
 
 	virtual	void				SetPenSize(float size);
@@ -364,7 +364,7 @@ public:
 			void				FillRegion(BRegion* rectegion,
 									::pattern pattern = B_SOLID_HIGH);
 			void				FillRegion(BRegion* rectegion,
-								   const BGradient& gradient);
+									const BGradient& gradient);
 			void				InvertRect(BRect rect);
 
 			void				StrokeRoundRect(BRect rect, float xRadius,
@@ -416,7 +416,7 @@ public:
 			void				FillBezier(BPoint* controlPoints,
 									::pattern pattern = B_SOLID_HIGH);
 			void				FillBezier(BPoint* controlPoints,
-								   const BGradient& gradient);
+									const BGradient& gradient);
 
 			void				StrokeShape(BShape* shape,
 									::pattern pattern = B_SOLID_HIGH);
@@ -468,10 +468,10 @@ public:
 									const BPoint* locations,
 									int32 locationCount);
 
-	virtual	void            	SetFont(const BFont* font,
+	virtual	void				SetFont(const BFont* font,
 									uint32 mask = B_FONT_ALL);
 
-			void            	GetFont(BFont* font) const;
+			void				GetFont(BFont* font) const;
 			void				TruncateString(BString* in_out, uint32 mode,
 									float width) const;
 			float				StringWidth(const char* string) const;
@@ -697,7 +697,7 @@ private:
 			void				_RemoveLayoutItemsFromLayout(bool deleteItems);
 
 	// Debugging methods
-			void 				_PrintToStream();
+			void				_PrintToStream();
 			void				_PrintTree();
 
 			int32				_unused_int1;
@@ -710,7 +710,7 @@ private:
 			BView*				fPreviousSibling;
 			BView*				fFirstChild;
 
-			int16 				fShowLevel;
+			int16				fShowLevel;
 			bool				fTopLevelView;
 			bool				fNoISInteraction;
 			BPicture*			fCurrentPicture;
