@@ -704,9 +704,6 @@ BView::~BView()
 			"Call RemoveSelf first.");
 	}
 
-	if (fToolTip != NULL)
-		fToolTip->ReleaseReference();
-
 	// we also delete all our children
 
 	BView* child = fFirstChild;
@@ -724,9 +721,12 @@ BView::~BView()
 
 	_RemoveSelf();
 
-	if (fVerScroller)
+	if (fToolTip != NULL)
+		fToolTip->ReleaseReference();
+
+	if (fVerScroller != NULL)
 		fVerScroller->SetTarget((BView*)NULL);
-	if (fHorScroller)
+	if (fHorScroller != NULL)
 		fHorScroller->SetTarget((BView*)NULL);
 
 	SetName(NULL);
