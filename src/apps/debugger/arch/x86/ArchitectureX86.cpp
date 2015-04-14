@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -27,6 +27,10 @@
 #include "X86AssemblyLanguage.h"
 
 #include "disasm/DisassemblerX86.h"
+
+
+#define IA32_FEATURE_MMX	(1 << 23)
+#define IA32_FEATURE_SSE	(1 << 25)
 
 
 static const int32 kFromDwarfRegisters[] = {
@@ -124,6 +128,7 @@ struct ArchitectureX86::FromDwarfRegisterMap : RegisterMap {
 ArchitectureX86::ArchitectureX86(TeamMemory* teamMemory)
 	:
 	Architecture(teamMemory, 4, false),
+	fFeatureFlags(0),
 	fAssemblyLanguage(NULL),
 	fToDwarfRegisterMap(NULL),
 	fFromDwarfRegisterMap(NULL)
@@ -148,6 +153,20 @@ ArchitectureX86::Init()
 	fAssemblyLanguage = new(std::nothrow) X86AssemblyLanguage;
 	if (fAssemblyLanguage == NULL)
 		return B_NO_MEMORY;
+
+#if defined(__INTEL__)
+	cpuid_info info;
+	status_t error = get_cpuid(&info, 1, 0);
+	if (error != B_OK)
+		return error;
+
+	if ((info.eax_1.features & IA32_FEATURE_MMX) != 0)
+		fFeatureFlags |= X86_CPU_FEATURE_FLAG_MMX;
+
+	if ((info.eax_1.features & IA32_FEATURE_SSE) != 0)
+		fFeatureFlags |= X86_CPU_FEATURE_FLAG_SSE;
+
+#endif
 
 	try {
 		_AddIntegerRegister(X86_REGISTER_EIP, "eip", B_UINT32_TYPE,
@@ -193,23 +212,35 @@ ArchitectureX86::Init()
 		_AddFPRegister(X86_REGISTER_ST6, "st6");
 		_AddFPRegister(X86_REGISTER_ST7, "st7");
 
-		_AddSIMDRegister(X86_REGISTER_MM0, "mm0", sizeof(uint64));
-		_AddSIMDRegister(X86_REGISTER_MM1, "mm1", sizeof(uint64));
-		_AddSIMDRegister(X86_REGISTER_MM2, "mm2", sizeof(uint64));
-		_AddSIMDRegister(X86_REGISTER_MM3, "mm3", sizeof(uint64));
-		_AddSIMDRegister(X86_REGISTER_MM4, "mm4", sizeof(uint64));
-		_AddSIMDRegister(X86_REGISTER_MM5, "mm5", sizeof(uint64));
-		_AddSIMDRegister(X86_REGISTER_MM6, "mm6", sizeof(uint64));
-		_AddSIMDRegister(X86_REGISTER_MM7, "mm7", sizeof(uint64));
+		if ((fFeatureFlags & X86_CPU_FEATURE_FLAG_MMX) != 0) {
+			_AddSIMDRegister(X86_REGISTER_MM0, "mm0", sizeof(uint64));
+			_AddSIMDRegister(X86_REGISTER_MM1, "mm1", sizeof(uint64));
+			_AddSIMDRegister(X86_REGISTER_MM2, "mm2", sizeof(uint64));
+			_AddSIMDRegister(X86_REGISTER_MM3, "mm3", sizeof(uint64));
+			_AddSIMDRegister(X86_REGISTER_MM4, "mm4", sizeof(uint64));
+			_AddSIMDRegister(X86_REGISTER_MM5, "mm5", sizeof(uint64));
+			_AddSIMDRegister(X86_REGISTER_MM6, "mm6", sizeof(uint64));
+			_AddSIMDRegister(X86_REGISTER_MM7, "mm7", sizeof(uint64));
+		}
 
-		_AddSIMDRegister(X86_REGISTER_XMM0, "xmm0", sizeof(x86_xmm_register));
-		_AddSIMDRegister(X86_REGISTER_XMM1, "xmm1", sizeof(x86_xmm_register));
-		_AddSIMDRegister(X86_REGISTER_XMM2, "xmm2", sizeof(x86_xmm_register));
-		_AddSIMDRegister(X86_REGISTER_XMM3, "xmm3", sizeof(x86_xmm_register));
-		_AddSIMDRegister(X86_REGISTER_XMM4, "xmm4", sizeof(x86_xmm_register));
-		_AddSIMDRegister(X86_REGISTER_XMM5, "xmm5", sizeof(x86_xmm_register));
-		_AddSIMDRegister(X86_REGISTER_XMM6, "xmm6", sizeof(x86_xmm_register));
-		_AddSIMDRegister(X86_REGISTER_XMM7, "xmm7", sizeof(x86_xmm_register));
+		if ((fFeatureFlags & X86_CPU_FEATURE_FLAG_SSE) != 0) {
+			_AddSIMDRegister(X86_REGISTER_XMM0, "xmm0",
+				sizeof(x86_xmm_register));
+			_AddSIMDRegister(X86_REGISTER_XMM1, "xmm1",
+				sizeof(x86_xmm_register));
+			_AddSIMDRegister(X86_REGISTER_XMM2, "xmm2",
+				sizeof(x86_xmm_register));
+			_AddSIMDRegister(X86_REGISTER_XMM3, "xmm3",
+				sizeof(x86_xmm_register));
+			_AddSIMDRegister(X86_REGISTER_XMM4, "xmm4",
+				sizeof(x86_xmm_register));
+			_AddSIMDRegister(X86_REGISTER_XMM5, "xmm5",
+				sizeof(x86_xmm_register));
+			_AddSIMDRegister(X86_REGISTER_XMM6, "xmm6",
+				sizeof(x86_xmm_register));
+			_AddSIMDRegister(X86_REGISTER_XMM7, "xmm7",
+				sizeof(x86_xmm_register));
+		}
 
 	} catch (std::bad_alloc) {
 		return B_NO_MEMORY;
@@ -246,6 +277,7 @@ ArchitectureX86::Registers() const
 }
 
 
+
 status_t
 ArchitectureX86::InitRegisterRules(CfaContext& context) const
 {
@@ -274,6 +306,15 @@ ArchitectureX86::GetDwarfRegisterMaps(RegisterMap** _toDwarf,
 		*_fromDwarf = fFromDwarfRegisterMap;
 		fFromDwarfRegisterMap->AcquireReference();
 	}
+
+	return B_OK;
+}
+
+
+status_t
+ArchitectureX86::GetCpuFeatures(uint32& flags)
+{
+	flags = fFeatureFlags;
 
 	return B_OK;
 }

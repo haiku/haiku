@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ARCHITECTURE_X86_H
@@ -11,6 +11,13 @@
 
 #include "Architecture.h"
 #include "Register.h"
+
+
+enum {
+	X86_CPU_FEATURE_FLAG_NONE = 0,
+	X86_CPU_FEATURE_FLAG_MMX = 1,
+	X86_CPU_FEATURE_FLAG_SSE = 2
+};
 
 
 class SourceLanguage;
@@ -31,6 +38,8 @@ public:
 
 	virtual	status_t			GetDwarfRegisterMaps(RegisterMap** _toDwarf,
 									RegisterMap** _fromDwarf) const;
+
+	virtual	status_t			GetCpuFeatures(uint32& flags);
 
 	virtual	status_t			CreateCpuState(CpuState*& _state);
 	virtual	status_t			CreateCpuState(const void* cpuStateData,
@@ -94,6 +103,7 @@ private:
 									FunctionDebugInfo* function) const;
 
 private:
+			uint32				fFeatureFlags;
 			Array<Register>		fRegisters;
 			SourceLanguage*		fAssemblyLanguage;
 			ToDwarfRegisterMap*	fToDwarfRegisterMap;

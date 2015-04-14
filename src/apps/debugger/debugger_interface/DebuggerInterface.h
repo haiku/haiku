@@ -80,6 +80,8 @@ public:
 	virtual	status_t			SetCpuState(thread_id thread,
 									const CpuState* state);
 
+	virtual	status_t			GetCpuFeatures(uint32& flags);
+
 	// TeamMemory
 	virtual	ssize_t				ReadMemory(target_addr_t address, void* buffer,
 									size_t size);

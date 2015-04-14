@@ -33,6 +33,8 @@ public:
 	virtual	status_t			GetDwarfRegisterMaps(RegisterMap** _toDwarf,
 									RegisterMap** _fromDwarf) const;
 
+	virtual	status_t			GetCpuFeatures(uint32& flags);
+
 	virtual	status_t			CreateCpuState(CpuState*& _state);
 	virtual	status_t			CreateCpuState(const void* cpuStateData,
 									size_t size, CpuState*& _state);

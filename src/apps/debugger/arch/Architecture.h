@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ARCHITECTURE_H
@@ -69,6 +69,8 @@ public:
 	virtual	status_t			GetDwarfRegisterMaps(RegisterMap** _toDwarf,
 									RegisterMap** _fromDwarf) const = 0;
 										// returns references
+
+	virtual	status_t			GetCpuFeatures(uint32& flags) = 0;
 
 	virtual	status_t			CreateCpuState(CpuState*& _state) = 0;
 	virtual	status_t			CreateCpuState(const void* cpuStateData,

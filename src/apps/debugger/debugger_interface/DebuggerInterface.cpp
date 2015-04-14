@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -698,6 +698,13 @@ DebuggerInterface::SetCpuState(thread_id thread, const CpuState* state)
 	return send_debug_message(contextGetter.Context(),
 		B_DEBUG_MESSAGE_SET_CPU_STATE, &message, sizeof(message), NULL,
 		0);
+}
+
+
+status_t
+DebuggerInterface::GetCpuFeatures(uint32& flags)
+{
+	return fArchitecture->GetCpuFeatures(flags);
 }
 
 

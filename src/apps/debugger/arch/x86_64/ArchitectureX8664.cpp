@@ -342,6 +342,15 @@ ArchitectureX8664::GetDwarfRegisterMaps(RegisterMap** _toDwarf,
 
 
 status_t
+ArchitectureX8664::GetCpuFeatures(uint32& flags)
+{
+	// TODO: implement if/when it winds up being needed.
+	flags = 0;
+	return B_OK;
+}
+
+
+status_t
 ArchitectureX8664::CreateCpuState(CpuState*& _state)
 {
 	CpuStateX8664* state = new(std::nothrow) CpuStateX8664;
