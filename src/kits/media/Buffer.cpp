@@ -239,7 +239,7 @@ BBuffer::BBuffer(const buffer_clone_info& info)
 			", unregistering buffer\n");
 		server_unregister_buffer_command cmd;
 		cmd.team = BPrivate::current_team();
-		cmd.buffer_id = fMediaHeader.buffer;
+		cmd.buffer_id = reply.info.buffer;
 		SendToServer(SERVER_UNREGISTER_BUFFER, &cmd, sizeof(cmd));
 		return;
 	}
