@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <AutoDeleter.h>
 #include <BufferProducer.h>
 #include <BufferGroup.h>
 #include <Buffer.h>
@@ -266,53 +267,47 @@ BBufferConsumer::SetOutputBuffersFor(const media_source &source,
 	if (IS_INVALID_DESTINATION(destination))
 		return B_MEDIA_BAD_DESTINATION;
 
-	producer_set_buffer_group_command *command;
-	BBuffer **buffers;
-	int32 buffer_count;
-	size_t size;
-	status_t rv;
+	int32 buffer_count = 0;
 
-	if (group == 0) {
-		buffer_count = 0;
-	} else {
-		if (B_OK != group->CountBuffers(&buffer_count))
+	if (group > 0) {
+		if (group->CountBuffers(&buffer_count) != B_OK)
 			return B_ERROR;
 	}
 
-	if (buffer_count != 0) {
-		buffers = new BBuffer * [buffer_count];
-		if (B_OK != group->GetBufferList(buffer_count, buffers)) {
-			delete [] buffers;
-			return B_ERROR;
-		}
-	} else {
-		buffers = NULL;
-	}
+	size_t size = sizeof(producer_set_buffer_group_command)
+		+ buffer_count * sizeof(media_buffer_id);
 
-	size = sizeof(producer_set_buffer_group_command) + buffer_count * sizeof(media_buffer_id);
-	command = static_cast<producer_set_buffer_group_command *>(malloc(size));
+	producer_set_buffer_group_command *command
+		= static_cast<producer_set_buffer_group_command *>(malloc(size));
+	MemoryDeleter deleter(command);
+
 	command->source = source;
 	command->destination = destination;
 	command->user_data = user_data;
 	command->change_tag = NewChangeTag();
-	command->buffer_count = buffer_count;
-	for (int32 i = 0; i < buffer_count; i++)
-		command->buffers[i] = buffers[i]->ID();
 
-	delete [] buffers;
+	BBuffer *buffers[buffer_count];
+	if (buffer_count != 0) {
+		if (group->GetBufferList(buffer_count, buffers) != B_OK)
+			return B_ERROR;
+		for (int32 i = 0; i < buffer_count; i++)
+			command->buffers[i] = buffers[i]->ID();
+	}
+
+	command->buffer_count = buffer_count;
 
 	if (change_tag != NULL)
 		*change_tag = command->change_tag;
 
-	rv = SendToPort(source.port, PRODUCER_SET_BUFFER_GROUP, command, size);
-	free(command);
+	status_t status = SendToPort(source.port, PRODUCER_SET_BUFFER_GROUP,
+		command, size);
 
-	if (rv == B_OK) {
+	if (status == B_OK) {
 		// XXX will leak memory if port write failed
 		delete fDeleteBufferGroup;
 		fDeleteBufferGroup = will_reclaim ? NULL : group;
 	}
-	return rv;
+	return status;
 }
 
 
