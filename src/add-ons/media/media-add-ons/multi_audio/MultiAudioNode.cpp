@@ -874,7 +874,14 @@ MultiAudioNode::SetBufferGroup(const media_source& for_source,
 		// our own buffer group to use from now on
 		size_t size = channel->fOutput.format.u.raw_audio.buffer_size;
 		int32 count = int32(fLatency / BufferDuration() + 1 + 1);
-		channel->fBufferGroup = new BBufferGroup(size, count);
+		BBufferGroup* group = new BBufferGroup(size, count);
+		if (group == NULL || group->InitCheck() != B_OK) {
+			delete group;
+			fprintf(stderr, "MultiAudioNode::SetBufferGroup failed to"
+				"instantiate a new group.\n");
+			return B_ERROR;
+		}
+		channel->fBufferGroup = group;
 	}
 
 	return B_OK;
