@@ -316,9 +316,9 @@ VideoConsumer::CreateBuffers(const media_format& withFormat)
 		}
 	}
 
-	BBuffer** buffList = new BBuffer * [3];
+	BBuffer* buffList[3];
 	for (int j = 0; j < 3; j++)
-		buffList[j] = 0;
+		buffList[j] = NULL;
 
 	if ((status = fBuffers->GetBufferList(3, buffList)) == B_OK)
 		for (int j = 0; j < 3; j++)

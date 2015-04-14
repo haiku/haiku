@@ -344,25 +344,18 @@ BBufferGroup::AddBuffersTo(BMessage* message, const char* name, bool needLock)
 	if (name == NULL || strlen(name) == 0)
 		return B_BAD_VALUE;
 
-	BBuffer** buffers;
-	int32 count;
-
-	count = fBufferCount;
-	buffers = new BBuffer * [count];
-
-	status_t status = GetBufferList(count, buffers);
+	BBuffer* buffers[fBufferCount];
+	status_t status = GetBufferList(fBufferCount, buffers);
 	if (status != B_OK)
-		goto end;
+		return status;
 
-	for (int32 i = 0; i < count; i++) {
+	for (int32 i = 0; i < fBufferCount; i++) {
 		status = message->AddInt32(name, int32(buffers[i]->ID()));
 		if (status != B_OK)
-			goto end;
+			return status;
 	}
 
-end:
-	delete [] buffers;
-	return status;
+	return B_OK;
 }
 
 
