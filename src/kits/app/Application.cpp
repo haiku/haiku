@@ -518,7 +518,7 @@ BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 
 	// Return the error or exit, if there was an error and no error variable
 	// has been supplied.
-	if (_error) {
+	if (_error != NULL) {
 		*_error = fInitError;
 	} else if (fInitError != B_OK) {
 		DBG(OUT("BApplication::InitData() failed: %s\n", strerror(fInitError)));
@@ -531,16 +531,7 @@ DBG(OUT("BApplication::InitData() done\n"));
 port_id
 BApplication::_GetPort(const char* signature)
 {
-	BLaunchRoster launchRoster;
-	BMessage data;
-	status_t status = launchRoster.GetData(signature, data);
-	if (status == B_OK) {
-		port_id port = data.GetInt32("port", B_NAME_NOT_FOUND);
-		if (port >= 0)
-			return port;
-	}
-
-	return -1;
+	return BLaunchRoster().GetPort(signature);
 }
 
 
@@ -1265,7 +1256,8 @@ BApplication::ScriptReceived(BMessage* message, int32 index,
 					case B_ID_SPECIFIER:
 					{
 						// TODO
-						debug_printf("Looper's ID specifier used but not implemented.\n");
+						debug_printf("Looper's ID specifier used but not "
+							"implemented.\n");
 						break;
 					}
 				}

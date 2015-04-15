@@ -9,6 +9,8 @@
 
 #include <LaunchRoster.h>
 
+#include <String.h>
+
 #include <LaunchDaemonDefs.h>
 #include <MessengerPrivate.h>
 
@@ -43,7 +45,7 @@ BLaunchRoster::GetData(const char* signature, BMessage& data)
 	if (signature == NULL || signature[0] == '\0')
 		return B_BAD_VALUE;
 
-	BMessage request(B_GET_LAUNCH_CONNECTIONS);
+	BMessage request(B_GET_LAUNCH_DATA);
 	status_t status = request.AddString("name", signature);
 	if (status != B_OK)
 		return status;
@@ -56,6 +58,29 @@ BLaunchRoster::GetData(const char* signature, BMessage& data)
 		status = data.GetInt32("error", B_OK);
 
 	return status;
+}
+
+
+port_id
+BLaunchRoster::GetPort(const char* signature, const char* name)
+{
+	BLaunchRoster launchRoster;
+	BMessage data;
+	status_t status = launchRoster.GetData(signature, data);
+	if (status == B_OK) {
+		BString fieldName;
+		if (name == NULL)
+			fieldName = "port";
+		else {
+			fieldName = name;
+			fieldName << "_port";
+		}
+		port_id port = data.GetInt32(fieldName.String(), B_NAME_NOT_FOUND);
+		if (port >= 0)
+			return port;
+	}
+
+	return -1;
 }
 
 

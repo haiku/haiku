@@ -24,7 +24,7 @@ namespace BPrivate {
 
 // message constants
 enum {
-	B_GET_LAUNCH_CONNECTIONS			= 'lncc',
+	B_GET_LAUNCH_DATA			= 'lncd',
 };
 
 

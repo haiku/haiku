@@ -17,6 +17,8 @@ public:
 			status_t			InitCheck() const;
 
 			status_t			GetData(const char* signature, BMessage& data);
+			port_id				GetPort(const char* signature,
+									const char* name = NULL);
 
 private:
 			void				_InitMessenger();

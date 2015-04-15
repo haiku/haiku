@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include <Directory.h>
 #include <driver_settings.h>
@@ -17,6 +18,7 @@
 #include <PathFinder.h>
 #include <Server.h>
 
+#include <AppMisc.h>
 #include <DriverSettingsMessageAdapter.h>
 #include <LaunchDaemonDefs.h>
 #include <syscalls.h>
@@ -70,6 +72,7 @@ public:
 			status_t			Init();
 			status_t			InitCheck() const;
 
+			team_id				Team() const;
 			port_id				Port() const;
 
 			status_t			Launch();
@@ -144,6 +147,7 @@ Job::Job(const char* name)
 	fInitStatus(B_NO_INIT),
 	fTeam(-1)
 {
+	fName.ToLower();
 }
 
 
@@ -248,8 +252,6 @@ Job::Init()
 		fPort = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, Name());
 		if (fPort < 0)
 			fInitStatus = fPort;
-
-		printf("PORT %s: %s\n", Name(), strerror(fPort));
 	}
 
 	return fInitStatus;
@@ -260,6 +262,13 @@ status_t
 Job::InitCheck() const
 {
 	return fInitStatus;
+}
+
+
+team_id
+Job::Team() const
+{
+	return fTeam;
 }
 
 
@@ -274,11 +283,37 @@ status_t
 Job::Launch()
 {
 	if (fArguments.IsEmpty()) {
-		// TODO: launch via signature
-	} else {
-		printf("LAUNCH %s\n", fArguments.StringAt(0).String());
+		// TODO: Launch via signature
+		// We cannot use the BRoster here as it tries to pre-register
+		// the application.
+		BString signature("application/");
+		signature << fName;
+		return B_NOT_SUPPORTED;
+		//return be_roster->Launch(signature.String(), (BMessage*)NULL, &fTeam);
 	}
+
+	entry_ref ref;
+	status_t status = get_ref_for_path(fArguments.StringAt(0).String(), &ref);
+	if (status != B_OK)
+		return status;
+
+	size_t count = fArguments.CountStrings();
+	const char* args[count + 1];
+	for (int32 i = 0; i < fArguments.CountStrings(); i++) {
+		args[i] = fArguments.StringAt(i);
+	}
+	args[count] = NULL;
+
+	thread_id thread = load_image(count, args,
+		const_cast<const char**>(environ));
+	if (thread >= 0)
+		resume_thread(thread);
+
+	thread_info info;
+	if (get_thread_info(thread, &info) == B_OK)
+		fTeam = info.team;
 	return B_OK;
+//	return be_roster->Launch(&ref, count, args, &fTeam);
 }
 
 
@@ -329,13 +364,18 @@ void
 LaunchDaemon::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case B_GET_LAUNCH_CONNECTIONS:
+		case B_GET_LAUNCH_DATA:
 		{
 			BMessage reply;
 			Job* job = _Job(get_leaf(message->GetString("name")));
 			if (job == NULL) {
 				reply.AddInt32("error", B_NAME_NOT_FOUND);
 			} else {
+				// If the job has not been launched yet, we'll pass on our
+				// team here. The rationale behind this is that this team
+				// will temporarily own the synchronous reply ports.
+				reply.AddInt32("team", job->Team() < 0
+					? current_team() : job->Team());
 				if (job->CreatePort())
 					reply.AddInt32("port", job->Port());
 
@@ -358,7 +398,6 @@ void
 LaunchDaemon::_ReadPaths(const BStringList& paths)
 {
 	for (int32 i = 0; i < paths.CountStrings(); i++) {
-		printf("----- %s -------\n", paths.StringAt(i).String());
 		BEntry entry(paths.StringAt(i));
 		if (entry.InitCheck() != B_OK || !entry.Exists())
 			continue;
@@ -377,11 +416,11 @@ LaunchDaemon::_ReadEntry(const char* context, BEntry& entry)
 		_ReadFile(context, entry);
 }
 
+
 void
 LaunchDaemon::_ReadDirectory(const char* context, BEntry& directoryEntry)
 {
 	BDirectory directory(&directoryEntry);
-	printf("DIR %s\n", directoryEntry.Name());
 
 	BEntry entry;
 	while (directory.GetNextEntry(&entry) == B_OK) {
@@ -393,7 +432,6 @@ LaunchDaemon::_ReadDirectory(const char* context, BEntry& directoryEntry)
 status_t
 LaunchDaemon::_ReadFile(const char* context, BEntry& entry)
 {
-	printf("FILE %s\n", entry.Name());
 	DriverSettingsMessageAdapter adapter;
 
 	BPath path;
@@ -426,7 +464,6 @@ void
 LaunchDaemon::_AddJob(bool service, BMessage& message)
 {
 	const char* name = message.GetString("name");
-printf("JOB %s\n", name);
 	if (name == NULL || name[0] == '\0') {
 		// Invalid job description
 		return;
@@ -458,7 +495,7 @@ LaunchDaemon::_Job(const char* name)
 	if (name == NULL)
 		return NULL;
 
-	JobMap::const_iterator found = fJobs.find(name);
+	JobMap::const_iterator found = fJobs.find(BString(name).ToLower());
 	if (found != fJobs.end())
 		return found->second;
 
@@ -472,7 +509,6 @@ LaunchDaemon::_InitJobs()
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
 			iterator++) {
 		Job* job = iterator->second;
-printf("  enabled? %s - %d\n", job->Name(), job->IsEnabled());
 		if (job->IsEnabled() && (!_IsSafeMode() || job->LaunchInSafeMode()))
 			job->Init();
 	}
@@ -524,6 +560,13 @@ LaunchDaemon::_IsSafeMode() const
 int
 main()
 {
+	// TODO: remove this again
+	close(STDOUT_FILENO);
+	int fd = open("/dev/dprintf", O_WRONLY);
+	if (fd != STDOUT_FILENO)
+		dup2(fd, STDOUT_FILENO);
+	puts("launch_daemon is alive and kicking.");
+
 	status_t status;
 	LaunchDaemon* daemon = new LaunchDaemon(status);
 	if (status == B_OK)
