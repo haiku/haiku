@@ -1,58 +1,52 @@
 /*
- * Copyright 2001-2011, Haiku, Inc.
+ * Copyright 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
+ *		Axel Dörfler, axeld@pinc-software.de
  */
 #ifndef	APP_SERVER_H
 #define	APP_SERVER_H
 
 
-#include <OS.h>
-#include <Locker.h>
-#include <List.h>
 #include <Application.h>
-#include <Window.h>
-#include <String.h>
+#include <List.h>
+#include <Locker.h>
 #include <ObjectList.h>
-#include <TokenSpace.h>
+#include <OS.h>
+#include <Server.h>
+#include <String.h>
+#include <Window.h>
 
-#include "ServerConfig.h"
 #include "MessageLooper.h"
+#include "ServerConfig.h"
+
 
 class ServerApp;
 class BitmapManager;
 class Desktop;
 
-using BPrivate::BTokenSpace;
 
-namespace BPrivate {
-	class PortLink;
-};
+class AppServer : public BServer  {
+public:
+								AppServer(status_t* status);
+	virtual						~AppServer();
 
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	bool				QuitRequested();
 
-class AppServer : public MessageLooper  {
-	public:
-		AppServer();
-		virtual ~AppServer();
+private:
+			Desktop*			_CreateDesktop(uid_t userID,
+									const char* targetScreen);
+			Desktop*			_FindDesktop(uid_t userID,
+									const char* targetScreen);
 
-		void			RunLooper();
-		virtual port_id	MessagePort() const { return fMessagePort; }
+			void				_LaunchInputServer();
 
-	private:
-		virtual void	_DispatchMessage(int32 code, BPrivate::LinkReceiver& link);
-
-		Desktop*		_CreateDesktop(uid_t userID, const char* targetScreen);
-		Desktop*		_FindDesktop(uid_t userID, const char* targetScreen);
-
-		void			_LaunchInputServer();
-
-	private:
-		port_id			fMessagePort;
-
-		BObjectList<Desktop> fDesktops;
-		BLocker			fDesktopLock;
+private:
+			BObjectList<Desktop> fDesktops;
+			BLocker				fDesktopLock;
 };
 
 

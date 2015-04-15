@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2011, Haiku, Inc.
+ * Copyright 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -35,7 +35,6 @@
 
 // Globals
 port_id gAppServerPort;
-static AppServer* sAppServer;
 BTokenSpace gTokenSpace;
 uint32 gAppServerSIMDFlags = 0;
 
@@ -46,22 +45,12 @@ uint32 gAppServerSIMDFlags = 0;
 	spawns the main housekeeping threads, loads user preferences for the UI
 	and decorator, and allocates various locks.
 */
-AppServer::AppServer()
+AppServer::AppServer(status_t* status)
 	:
-	MessageLooper("app_server"),
-	fMessagePort(-1),
-	fDesktops(),
+	BServer("application/x-vnd.Haiku-app_server", "picasso", -1, false, status),
 	fDesktopLock("AppServerDesktopLock")
 {
 	openlog("app_server", 0, LOG_DAEMON);
-
-	fMessagePort = create_port(DEFAULT_MONITOR_PORT_SIZE, SERVER_PORT_NAME);
-	if (fMessagePort < B_OK)
-		debugger("app_server could not create message port");
-
-	fLink.SetReceiverPort(fMessagePort);
-
-	sAppServer = this;
 
 	gInputManager = new InputManager();
 
@@ -98,10 +87,70 @@ AppServer::~AppServer()
 
 
 void
-AppServer::RunLooper()
+AppServer::MessageReceived(BMessage* message)
 {
-	rename_thread(find_thread(NULL), "picasso");
-	_message_thread((void*)this);
+	switch (message->what) {
+		case AS_GET_DESKTOP:
+		{
+			Desktop* desktop = NULL;
+
+			int32 userID = message->GetInt32("user", 0);
+			int32 version = message->GetInt32("version", 0);
+			const char* targetScreen = message->GetString("target");
+
+			if (version != AS_PROTOCOL_VERSION) {
+				syslog(LOG_ERR, "Application for user %" B_PRId32 " does not "
+					"support the current server protocol.\n", userID);
+			} else {
+				desktop = _FindDesktop(userID, targetScreen);
+				if (desktop == NULL) {
+					// we need to create a new desktop object for this user
+					// TODO: test if the user exists on the system
+					// TODO: maybe have a separate AS_START_DESKTOP_SESSION for
+					// authorizing the user
+					desktop = _CreateDesktop(userID, targetScreen);
+				}
+			}
+
+			BMessage reply;
+			if (desktop != NULL)
+				reply.AddInt32("port", desktop->MessagePort());
+			else
+				reply.what = (uint32)B_ERROR;
+
+			message->SendReply(&reply);
+			break;
+		}
+
+		default:
+			// We don't allow application scripting
+			STRACE(("AppServer received unexpected code %" B_PRId32 "\n",
+				message->what));
+			break;
+	}
+}
+
+
+bool
+AppServer::QuitRequested()
+{
+#if TEST_MODE
+	while (fDesktops.CountItems() > 0) {
+		Desktop *desktop = fDesktops.RemoveItemAt(0);
+
+		thread_id thread = desktop->Thread();
+		desktop->PostMessage(B_QUIT_REQUESTED);
+
+		// we just wait for the desktop to kill itself
+		status_t status;
+		wait_for_thread(thread, &status);
+	}
+
+	return BServer::QuitRequested();
+#else
+	return false;
+#endif
+
 }
 
 
@@ -160,112 +209,18 @@ AppServer::_FindDesktop(uid_t userID, const char* targetScreen)
 }
 
 
-/*!	\brief Message handling function for all messages sent to the app_server
-	\param code ID of the message sent
-	\param buffer Attachment buffer for the message.
-
-*/
-void
-AppServer::_DispatchMessage(int32 code, BPrivate::LinkReceiver& msg)
-{
-	switch (code) {
-		case AS_GET_DESKTOP:
-		{
-			Desktop* desktop = NULL;
-
-			port_id replyPort;
-			msg.Read<port_id>(&replyPort);
-
-			int32 userID;
-			msg.Read<int32>(&userID);
-
-			char* targetScreen = NULL;
-			msg.ReadString(&targetScreen);
-			if (targetScreen != NULL && strlen(targetScreen) == 0) {
-				free(targetScreen);
-				targetScreen = NULL;
-			}
-
-			int32 version;
-			if (msg.Read<int32>(&version) < B_OK
-				|| version != AS_PROTOCOL_VERSION) {
-				syslog(LOG_ERR, "Application for user %" B_PRId32 " with port "
-					"%" B_PRId32 " does not support the current server "
-					"protocol.\n", userID, replyPort);
-			} else {
-				desktop = _FindDesktop(userID, targetScreen);
-				if (desktop == NULL) {
-					// we need to create a new desktop object for this user
-					// TODO: test if the user exists on the system
-					// TODO: maybe have a separate AS_START_DESKTOP_SESSION for
-					// authorizing the user
-					desktop = _CreateDesktop(userID, targetScreen);
-				}
-			}
-
-			free(targetScreen);
-
-			BPrivate::LinkSender reply(replyPort);
-			if (desktop != NULL) {
-				reply.StartMessage(B_OK);
-				reply.Attach<port_id>(desktop->MessagePort());
-			} else
-				reply.StartMessage(B_ERROR);
-
-			reply.Flush();
-			break;
-		}
-
-#if TEST_MODE
-		case B_QUIT_REQUESTED:
-		{
-			// We've been asked to quit, so (for now) broadcast to all
-			// desktops to quit. This situation will occur only when the server
-			// is compiled as a regular Be application.
-
-			fQuitting = true;
-
-			while (fDesktops.CountItems() > 0) {
-				Desktop *desktop = fDesktops.RemoveItemAt(0);
-
-				thread_id thread = desktop->Thread();
-				desktop->PostMessage(B_QUIT_REQUESTED);
-
-				// we just wait for the desktop to kill itself
-				status_t status;
-				wait_for_thread(thread, &status);
-			}
-
-			delete this;
-
-			// we are now clear to exit
-			exit(0);
-			break;
-		}
-#endif
-
-		default:
-			STRACE(("Server::MainLoop received unexpected code %" B_PRId32 " "
-				"(offset %" B_PRId32 ")\n", code, code - SERVER_TRUE));
-			break;
-	}
-}
-
-
 //	#pragma mark -
 
 
 int
 main(int argc, char** argv)
 {
-	// There can be only one....
-	if (find_port(SERVER_PORT_NAME) >= B_OK)
-		return -1;
-
 	srand(real_time_clock_usecs());
 
-	AppServer* server = new AppServer;
-	server->RunLooper();
+	status_t status;
+	AppServer* server = new AppServer(&status);
+	if (status == B_OK)
+		server->Run();
 
-	return 0;
+	return status == B_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

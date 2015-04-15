@@ -1,8 +1,9 @@
 /*
- * Copyright 2001-2011, Haiku, Inc.
+ * Copyright 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
  *		Ingo Weinhold, bonefish@@users.sf.net
  */
 
@@ -16,6 +17,7 @@
 
 #include <Entry.h>
 #include <image.h>
+#include <Messenger.h>
 #include <OS.h>
 
 #include <ServerLink.h>
@@ -174,60 +176,34 @@ is_app_showing_modal_window(team_id team)
 }
 
 
-static port_id sServerPort = -1;
-
-
-void
-invalidate_server_port()
-{
-	sServerPort = -1;
-}
-
-
-port_id
-get_app_server_port()
-{
-	if (sServerPort < 0) {
-		// No need for synchronization - in the worst case, we'll call
-		// find_port() twice.
-		sServerPort = find_port(SERVER_PORT_NAME);
-	}
-
-	return sServerPort;
-}
-
-
 /*!	Creates a connection with the desktop.
 */
 status_t
 create_desktop_connection(ServerLink* link, const char* name, int32 capacity)
 {
-	port_id serverPort = get_app_server_port();
-	if (serverPort < 0)
-		return serverPort;
-
 	// Create the port so that the app_server knows where to send messages
 	port_id clientPort = create_port(capacity, name);
 	if (clientPort < 0)
 		return clientPort;
 
-	link->SetTo(serverPort, clientPort);
+	link->SetReceiverPort(clientPort);
 
-	link->StartMessage(AS_GET_DESKTOP);
-	link->Attach<port_id>(clientPort);
-	link->Attach<int32>(getuid());
-	link->AttachString(getenv("TARGET_SCREEN"));
-	link->Attach<int32>(AS_PROTOCOL_VERSION);
+	BMessage request(AS_GET_DESKTOP);
+	request.AddInt32("user", getuid());
+	request.AddInt32("version", AS_PROTOCOL_VERSION);
+	request.AddString("target", getenv("TARGET_SCREEN"));
 
-	int32 code;
-	if (link->FlushWithReply(code) != B_OK || code != B_OK) {
-		link->SetSenderPort(-1);
-		return B_ERROR;
-	}
+	BMessenger server("application/x-vnd.Haiku-app_server");
+	BMessage reply;
+	status_t status = server.SendMessage(&request, &reply);
+	if (status != B_OK)
+		return status;
 
-	link->Read<port_id>(&serverPort);
-	link->SetSenderPort(serverPort);
+	port_id desktopPort = reply.GetInt32("port", B_ERROR);
+	if (desktopPort < 0)
+		return desktopPort;
 
+	link->SetSenderPort(desktopPort);
 	return B_OK;
 }
 

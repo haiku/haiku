@@ -1410,7 +1410,6 @@ BApplication::_ReconnectToServer()
 {
 	delete_port(fServerLink->SenderPort());
 	delete_port(fServerLink->ReceiverPort());
-	invalidate_server_port();
 
 	if (_ConnectToServer() != B_OK)
 		debugger("Can't reconnect to app server!");
