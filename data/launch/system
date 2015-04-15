@@ -14,6 +14,7 @@ service x-vnd.Haiku-debug_server {
 
 service x-vnd.Haiku-package_daemon {
 	launch /system/servers/package_daemon
+	create_port
 }
 
 service x-vnd.Haiku-syslog_daemon {
@@ -57,4 +58,13 @@ service x-vnd.Haiku-notification_server {
 service x-vnd.Haiku-power_daemon {
 	launch /system/servers/power_daemon
 	no_safemode
+}
+
+# The following will be moved into the user launch data
+service x-vnd.Be-TRAK {
+	launch /system/Tracker
+}
+
+service x-vnd.Be-TSKB {
+	launch /system/Deskbar
 }

@@ -124,10 +124,13 @@ AddSymlinkToPackage bin : trash : untrash ;
 AddSymlinkToPackage bin : less : more ;
 
 # scripts and data files
-local bootScripts = Bootscript Bootscript.cd SetupEnvironment
-	InstallerInitScript InstallerFinishScript ;
+local bootScripts = SetupEnvironment InstallerInitScript InstallerFinishScript ;
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToPackage boot : $(bootScripts) ;
+
+local launchScripts = <data!launch>system ;
+SEARCH on $(launchScripts) = [ FDirName $(HAIKU_TOP) data launch ] ;
+AddFilesToPackage data launch : $(launchScripts) ;
 
 # post install scripts
 local postInstallFiles = add_catalog_entry_attributes.sh

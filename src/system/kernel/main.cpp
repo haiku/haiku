@@ -358,28 +358,31 @@ main2(void* /*unused*/)
 
 	// start the init process
 	{
-		KPath bootScriptPath;
-		status_t status = __find_directory(B_SYSTEM_BOOT_DIRECTORY, gBootDevice,
-			false, bootScriptPath.LockBuffer(), bootScriptPath.BufferSize());
+		KPath serverPath;
+		status_t status = __find_directory(B_SYSTEM_SERVERS_DIRECTORY,
+			gBootDevice, false, serverPath.LockBuffer(),
+			serverPath.BufferSize());
 		if (status != B_OK)
 			dprintf("main2: find_directory() failed: %s\n", strerror(status));
-		bootScriptPath.UnlockBuffer();
-		status = bootScriptPath.Append("/Bootscript");
+		serverPath.UnlockBuffer();
+		status = serverPath.Append("/launch_daemon");
 		if (status != B_OK) {
-			dprintf("main2: constructing path to Bootscript failed: "
-				"%s\n", strerror(status));
+			dprintf("main2: constructing path to launch_daemon failed: %s\n",
+			strerror(status));
 		}
 
-		const char *args[] = { "/bin/sh", bootScriptPath.Path(), NULL };
-		int32 argc = 2;
+		const char* args[] = { serverPath.Path(), NULL };
+		int32 argc = 1;
 		thread_id thread;
 
 		thread = load_image(argc, args, NULL);
 		if (thread >= B_OK) {
 			resume_thread(thread);
-			TRACE("Bootscript started\n");
-		} else
-			dprintf("error starting \"%s\" error = %" B_PRId32 " \n", args[0], thread);
+			TRACE("launch_daemon started\n");
+		} else {
+			dprintf("error starting \"%s\" error = %" B_PRId32 " \n",
+				args[0], thread);
+		}
 	}
 
 	return 0;

@@ -115,6 +115,7 @@ SYSTEM_SERVERS = [ FFilterByBuildFeatures
 	debug_server dns_resolver_server
 	input_server
 	keystore_server
+	launch_daemon
 	mount_server
 	net_server notification_server
 	package_daemon power_daemon
