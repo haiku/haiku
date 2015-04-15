@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2005-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,7 +58,7 @@
 #if BMESSAGE_TRACING
 #	define KTRACE(format...)	ktrace_printf(format)
 #else
-#	define KTRACE(format...)
+#	define KTRACE(format...)	;
 #endif
 
 
@@ -2276,6 +2276,8 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 		replyPort = sReplyPorts[cachedReplyPort];
 	}
 
+	bool recreateCachedPort = false;
+
 	team_id team = B_BAD_TEAM_ID;
 	if (be_app != NULL)
 		team = be_app->Team();
@@ -2345,15 +2347,18 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 	result = handle_reply(replyPort, &code, replyTimeout, reply);
 	if (result != B_OK && cachedReplyPort >= 0) {
 		delete_port(replyPort);
-		sReplyPorts[cachedReplyPort] = create_port(1, "tmp_rport");
+		recreateCachedPort = true;
 	}
 
 error:
 	if (cachedReplyPort >= 0) {
-		// Reclaim ownership of cached port
-		set_port_owner(replyPort, team);
-		// Flag as available
-		atomic_add(&sReplyPortInUse[cachedReplyPort], -1);
+		// Reclaim ownership of cached port, if possible
+		if (!recreateCachedPort && set_port_owner(replyPort, team) == B_OK) {
+			// Flag as available
+			atomic_add(&sReplyPortInUse[cachedReplyPort], -1);
+		} else
+			sReplyPorts[cachedReplyPort] = create_port(1, "tmp_rport");
+
 		return result;
 	}
 
