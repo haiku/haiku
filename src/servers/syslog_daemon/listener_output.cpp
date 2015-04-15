@@ -1,7 +1,7 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2015, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
 
 #include "listener_output.h"
@@ -14,7 +14,7 @@ static BList sListeners;
 
 
 static void
-listener_output(syslog_message &message)
+listener_output(syslog_message& message)
 {
 	// compose the message to be sent to all listeners; just convert
 	// the syslog_message into a BMessage
@@ -30,7 +30,7 @@ listener_output(syslog_message &message)
 	sLocker.Lock();
 
 	for (int32 i = sListeners.CountItems(); i-- > 0;) {
-		BMessenger *target = (BMessenger *)sListeners.ItemAt(i);
+		BMessenger* target = (BMessenger*)sListeners.ItemAt(i);
 
 		status_t status = target->SendMessage(&output);
 		if (status < B_OK) {
@@ -43,8 +43,8 @@ listener_output(syslog_message &message)
 }
 
 
-void 
-remove_listener(BMessenger *messenger)
+void
+remove_listener(BMessenger* messenger)
 {
 	if (sLocker.Lock()) {
 		sListeners.RemoveItem(messenger);
@@ -54,8 +54,8 @@ remove_listener(BMessenger *messenger)
 }
 
 
-void 
-add_listener(BMessenger *messenger)
+void
+add_listener(BMessenger* messenger)
 {
 	if (sLocker.Lock()) {
 		sListeners.AddItem(messenger);
@@ -66,7 +66,7 @@ add_listener(BMessenger *messenger)
 
 
 void
-init_listener_output(SyslogDaemon *daemon)
+init_listener_output(SyslogDaemon* daemon)
 {
 	daemon->AddHandler(listener_output);
 }

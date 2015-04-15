@@ -1,12 +1,13 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "SyslogDaemon.h"
-#include "listener_output.h"
-#include "syslog_output.h"
+
+#include <stdio.h>
+#include <string.h>
 
 #include <Alert.h>
 #include <Catalog.h>
@@ -15,17 +16,20 @@
 #include <Path.h>
 #include <TextView.h>
 
-#include <stdio.h>
-#include <string.h>
+#include "listener_output.h"
+#include "syslog_output.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "SyslogDaemon"
 
-const char *kSignature = "application/x-vnd.Haiku-SystemLogger";
+
+const char* kSignature = "application/x-vnd.Haiku-SystemLogger";
 
 
 SyslogDaemon::SyslogDaemon()
-	: BApplication(kSignature),
+	:
+	BApplication(kSignature),
 	fHandlerLock("handler lock")
 {
 }
@@ -62,15 +66,16 @@ SyslogDaemon::AboutRequested()
 			"at \"%s\".\n\n"), name.String(), path.Path());
 	message.UnlockBuffer();
 
-	BAlert *alert = new BAlert(name.String(), message.String(), B_TRANSLATE("OK"));
-	BTextView *view = alert->TextView();
+	BAlert* alert = new BAlert(name.String(), message.String(),
+		B_TRANSLATE("OK"));
+	BTextView* view = alert->TextView();
 	BFont font;
 
 	view->SetStylable(true);
 
 	view->GetFont(&font);
 	font.SetSize(21);
-	font.SetFace(B_BOLD_FACE); 			
+	font.SetFace(B_BOLD_FACE);
 	view->SetFontAndColor(0, name.Length(), &font);
 
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
@@ -91,26 +96,26 @@ SyslogDaemon::QuitRequested()
 
 
 void
-SyslogDaemon::MessageReceived(BMessage *msg)
+SyslogDaemon::MessageReceived(BMessage* message)
 {
-	switch (msg->what) {
+	switch (message->what) {
 		case SYSLOG_ADD_LISTENER:
 		{
 			BMessenger messenger;
-			if (msg->FindMessenger("target", &messenger) == B_OK)
+			if (message->FindMessenger("target", &messenger) == B_OK)
 				add_listener(&messenger);
 			break;
 		}
 		case SYSLOG_REMOVE_LISTENER:
 		{
 			BMessenger messenger;
-			if (msg->FindMessenger("target", &messenger) == B_OK)
+			if (message->FindMessenger("target", &messenger) == B_OK)
 				remove_listener(&messenger);
 			break;
 		}
 
 		default:
-			BApplication::MessageReceived(msg);
+			BApplication::MessageReceived(message);
 	}
 }
 
@@ -118,7 +123,7 @@ SyslogDaemon::MessageReceived(BMessage *msg)
 void
 SyslogDaemon::AddHandler(handler_func function)
 {
-	fHandlers.AddItem((void *)function);
+	fHandlers.AddItem((void*)function);
 }
 
 
@@ -126,7 +131,7 @@ void
 SyslogDaemon::Daemon()
 {
 	char buffer[SYSLOG_MESSAGE_BUFFER_SIZE + 1];
-	syslog_message &message = *(syslog_message *)buffer;
+	syslog_message& message = *(syslog_message*)buffer;
 	int32 code;
 
 	while (true) {
@@ -137,7 +142,8 @@ SyslogDaemon::Daemon()
 		}
 
 		// if we don't get what we want, ignore it
-		if (bytesRead < (ssize_t)sizeof(syslog_message) || code != SYSLOG_MESSAGE)
+		if (bytesRead < (ssize_t)sizeof(syslog_message)
+			|| code != SYSLOG_MESSAGE)
 			continue;
 
 		// add terminating null byte
@@ -162,15 +168,15 @@ SyslogDaemon::Daemon()
 
 
 int32
-SyslogDaemon::daemon_thread(void *data)
+SyslogDaemon::daemon_thread(void* data)
 {
-	((SyslogDaemon *)data)->Daemon();
+	((SyslogDaemon*)data)->Daemon();
 	return B_OK;
 }
 
 
 int
-main(int argc, char **argv)
+main(int argc, char** argv)
 {
 	SyslogDaemon daemon;
 	daemon.Run();
