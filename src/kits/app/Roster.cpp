@@ -42,6 +42,7 @@
 
 #include <AppMisc.h>
 #include <DesktopLink.h>
+#include <LaunchRoster.h>
 #include <MessengerPrivate.h>
 #include <PortLink.h>
 #include <RosterPrivate.h>
@@ -2585,13 +2586,17 @@ BRoster::_InitMessenger()
 	DBG(OUT("BRoster::InitMessengers()\n"));
 
 	// find the registrar port
-	port_id rosterPort = find_port(BPrivate::get_roster_port_name());
-	port_info info;
-	if (rosterPort >= 0 && get_port_info(rosterPort, &info) == B_OK) {
-		DBG(OUT("  found roster port\n"));
+	BMessage data;
+	if (BLaunchRoster().GetData("application/x-vnd.Haiku-registrar", data)
+			== B_OK) {
+		port_id port = data.GetInt32("port", -1);
+		team_id team = data.GetInt32("team", -1);
+		if (port >= 0) {
+			DBG(OUT("  found roster port\n"));
 
-		BMessenger::Private(fMessenger).SetTo(info.team, rosterPort,
-			B_PREFERRED_TOKEN);
+			BMessenger::Private(fMessenger).SetTo(team, port,
+				B_PREFERRED_TOKEN);
+		}
 	}
 
 	DBG(OUT("BRoster::InitMessengers() done\n"));
