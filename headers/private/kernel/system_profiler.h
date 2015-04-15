@@ -9,15 +9,19 @@
 
 #include <OS.h>
 
+#include "kernel_debug_config.h"
+
 
 struct system_profiler_parameters;
 
 
 __BEGIN_DECLS
 
+#if SYSTEM_PROFILER
 status_t start_system_profiler(size_t areaSize, uint32 stackDepth,
 			bigtime_t interval);
 void stop_system_profiler();
+#endif
 
 status_t _user_system_profiler_start(
 			struct system_profiler_parameters* parameters);

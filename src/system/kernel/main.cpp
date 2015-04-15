@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -47,6 +47,7 @@
 #include <real_time_clock.h>
 #include <sem.h>
 #include <smp.h>
+#include <system_profiler.h>
 #include <team.h>
 #include <timer.h>
 #include <user_debugger.h>
@@ -273,12 +274,14 @@ _start(kernel_args *bootKernelArgs, int currentCPU)
 
 
 static int32
-main2(void *unused)
+main2(void* /*unused*/)
 {
-	(void)(unused);
-
 	TRACE("start of main2: initializing devices\n");
 
+#if SYSTEM_PROFILER
+	start_system_profiler(SYSTEM_PROFILE_SIZE, SYSTEM_PROFILE_STACK_DEPTH,
+		SYSTEM_PROFILE_INTERVAL);
+#endif
 	boot_splash_init(sKernelArgs.boot_splash);
 
 	commpage_init_post_cpus();

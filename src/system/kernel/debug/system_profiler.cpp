@@ -1435,6 +1435,8 @@ SystemProfiler::_ProfilingEvent(struct timer* timer)
 // #pragma mark - private kernel API
 
 
+#if SYSTEM_PROFILER
+
 status_t
 start_system_profiler(size_t areaSize, uint32 stackDepth, bigtime_t interval)
 {
@@ -1529,6 +1531,8 @@ stop_system_profiler()
 
 	profiler->ReleaseReference();
 }
+
+#endif	// SYSTEM_PROFILER
 
 
 // #pragma mark - syscalls
@@ -1644,12 +1648,15 @@ _user_system_profiler_stop()
 
 
 status_t
-_user_system_profiler_recorded(struct system_profiler_parameters* userParameters)
+_user_system_profiler_recorded(system_profiler_parameters* userParameters)
 {
 	if (userParameters == NULL || !IS_USER_ADDRESS(userParameters))
 		return B_BAD_ADDRESS;
 	if (sRecordedParameters == NULL)
 		return B_ERROR;
+
+#if SYSTEM_PROFILER
+	stop_system_profiler();
 
 	// Transfer the area to the userland process
 
@@ -1673,4 +1680,7 @@ _user_system_profiler_recorded(struct system_profiler_parameters* userParameters
 	sRecordedParameters = NULL;
 
 	return status;
+#else
+	return B_NOT_SUPPORTED;
+#endif // SYSTEM_PROFILER
 }
