@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -67,6 +67,8 @@ BRoster::Private::SendTo(BMessage *message, BMessage *reply, bool mime)
 
 	const BMessenger& messenger = mime
 		? fRoster->_MimeMessenger() : fRoster->fMessenger;
+	if (messenger.IsTargetLocal())
+		return B_BAD_VALUE;
 
 	return reply != NULL
 		? messenger.SendMessage(message, reply)
