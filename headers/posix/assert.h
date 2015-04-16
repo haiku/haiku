@@ -1,10 +1,7 @@
 /*
- * Copyright 2004-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2015 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _ASSERT_H_
-#define _ASSERT_H_
-
 
 #undef assert
 
@@ -33,5 +30,3 @@ extern void __assert_perror_fail(int error, const char *file,
 #else	/* NDEBUG */
 #	define assert(condition) ((void)0)
 #endif
-
-#endif	/* _ASSERT_H_ */
