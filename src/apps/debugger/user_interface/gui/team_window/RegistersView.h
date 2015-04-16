@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef REGISTERS_VIEW_H
@@ -13,6 +13,7 @@
 
 
 class Architecture;
+class BMenu;
 
 
 class RegistersView : public BGroupView, private TableListener {
@@ -22,6 +23,8 @@ public:
 
 	static	RegistersView*		Create(Architecture* architecture);
 									// throws
+
+	virtual	void				MessageReceived(BMessage* message);
 
 			void				SetCpuState(CpuState* cpuState);
 
@@ -41,6 +44,7 @@ private:
 									uint32 buttons);
 
 			void				_Init();
+			status_t			_AddFormatItem(BMenu* menu, int32 format);
 
 private:
 			Architecture*		fArchitecture;

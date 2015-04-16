@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,6 +24,43 @@
 #include "MessageCodes.h"
 #include "Register.h"
 #include "UiUtils.h"
+
+
+enum {
+	MSG_SIMD_RENDER_FORMAT_CHANGED = 'srfc'
+};
+
+
+enum {
+	SIMD_RENDER_FORMAT_INT8 = 0,
+	SIMD_RENDER_FORMAT_INT16,
+	SIMD_RENDER_FORMAT_INT32,
+	SIMD_RENDER_FORMAT_INT64,
+	SIMD_RENDER_FORMAT_FLOAT,
+	SIMD_RENDER_FORMAT_DOUBLE
+};
+
+
+static const char*
+GetLabelForSIMDFormat(int format)
+{
+	switch (format) {
+			case SIMD_RENDER_FORMAT_INT8:
+				return "8-bit integer";
+			case SIMD_RENDER_FORMAT_INT16:
+				return "16-bit integer";
+			case SIMD_RENDER_FORMAT_INT32:
+				return "32-bit integer";
+			case SIMD_RENDER_FORMAT_INT64:
+				return "64-bit integer";
+			case SIMD_RENDER_FORMAT_FLOAT:
+				return "Float";
+			case SIMD_RENDER_FORMAT_DOUBLE:
+				return "Double";
+	}
+
+	return "Unknown";
+}
 
 
 // #pragma mark - RegisterValueColumn
@@ -92,7 +129,8 @@ public:
 	RegisterTableModel(Architecture* architecture)
 		:
 		fArchitecture(architecture),
-		fCpuState(NULL)
+		fCpuState(NULL),
+		fSIMDFormat(SIMD_RENDER_FORMAT_INT16)
 	{
 	}
 
@@ -115,6 +153,11 @@ public:
 	virtual int32 CountRows() const
 	{
 		return fArchitecture->CountRegisters();
+	}
+
+	inline int32 SIMDRenderFormat() const
+	{
+		return fSIMDFormat;
 	}
 
 	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, BVariant& value)
@@ -141,18 +184,49 @@ public:
 		}
 	}
 
+	void SetSIMDFormat(int32 format)
+	{
+		if (fSIMDFormat != format) {
+			fSIMDFormat = format;
+			NotifyRowsChanged(0, CountRows());
+		}
+	}
+
 private:
 	void _FormatSIMDValue(const Register* reg, BVariant& _value)
 	{
-		// for now, format SIMD registers as groups of 16-bit integer values.
-		// TODO: support multiple formats.
 		BString temp("{");
-		uint16* data = (uint16*)_value.ToPointer();
-		uint32 count = reg->BitSize() / (sizeof(uint16) * 8);
-		for (uint32 i = 0; i < count; i++) {
-			BString intFormat;
-			intFormat.SetToFormat("%#" B_PRIx16, data[i]);
-			temp += intFormat;
+		char* data = (char*)_value.ToPointer();
+		uint32 count = reg->BitSize() / (_GetSIMDFormatByteSize() * 8);
+		for (uint32 i = 0; i < count; i ++) {
+			BString format;
+			switch (fSIMDFormat) {
+				case SIMD_RENDER_FORMAT_INT8:
+					format.SetToFormat("%#" B_PRIx8,
+						_GetSIMDValueAtOffset<uint8>(data, i));
+					break;
+				case SIMD_RENDER_FORMAT_INT16:
+					format.SetToFormat("%#" B_PRIx16,
+						_GetSIMDValueAtOffset<uint16>(data, i));
+					break;
+				case SIMD_RENDER_FORMAT_INT32:
+					format.SetToFormat("%#" B_PRIx32,
+						_GetSIMDValueAtOffset<uint32>(data, i));
+					break;
+				case SIMD_RENDER_FORMAT_INT64:
+					format.SetToFormat("%#" B_PRIx64,
+						_GetSIMDValueAtOffset<uint64>(data, i));
+					break;
+				case SIMD_RENDER_FORMAT_FLOAT:
+					format.SetToFormat("%.3g",
+						(double)_GetSIMDValueAtOffset<float>(data, i));
+					break;
+				case SIMD_RENDER_FORMAT_DOUBLE:
+					format.SetToFormat("%.3g",
+						_GetSIMDValueAtOffset<double>(data, i));
+					break;
+			}
+			temp += format;
 			if (i < count - 1)
 				temp += ", ";
 		}
@@ -161,9 +235,36 @@ private:
 		_value.SetTo(temp);
 	}
 
+	template<typename T>
+	T _GetSIMDValueAtOffset(char* data, int32 index)
+	{
+		return ((T*)data)[index];
+	}
+
+	int32 _GetSIMDFormatByteSize() const
+	{
+		switch (fSIMDFormat) {
+			case SIMD_RENDER_FORMAT_INT8:
+				return sizeof(char);
+			case SIMD_RENDER_FORMAT_INT16:
+				return sizeof(int16);
+			case SIMD_RENDER_FORMAT_INT32:
+				return sizeof(int32);
+			case SIMD_RENDER_FORMAT_INT64:
+				return sizeof(int64);
+			case SIMD_RENDER_FORMAT_FLOAT:
+				return sizeof(float);
+			case SIMD_RENDER_FORMAT_DOUBLE:
+				return sizeof(double);
+		}
+
+		return 0;
+	}
+
 private:
 	Architecture*	fArchitecture;
 	CpuState*		fCpuState;
+	int32			fSIMDFormat;
 };
 
 
@@ -203,6 +304,27 @@ RegistersView::Create(Architecture* architecture)
 	}
 
 	return self;
+}
+
+
+void
+RegistersView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_SIMD_RENDER_FORMAT_CHANGED:
+			{
+				int32 format;
+				if (message->FindInt32("format", &format) != B_OK)
+					break;
+
+				fRegisterTableModel->SetSIMDFormat(format);
+			}
+			break;
+
+		default:
+			BGroupView::MessageReceived(message);
+			break;
+	}
 }
 
 
@@ -260,6 +382,9 @@ void
 RegistersView::TableCellMouseDown(Table* table, int32 rowIndex,
 	int32 columnIndex, BPoint screenWhere,	uint32 buttons)
 {
+	if (rowIndex < 0 || rowIndex >= fArchitecture->CountRegisters())
+		return;
+
 	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
 		return;
 
@@ -267,29 +392,65 @@ RegistersView::TableCellMouseDown(Table* table, int32 rowIndex,
 	if (!fRegisterTableModel->GetValueAt(rowIndex, 1, value))
 		return;
 
-	BPopUpMenu* menu = new(std::nothrow)BPopUpMenu("Options");
+	const Register* reg = fArchitecture->Registers() + rowIndex;
+	if (reg->Format() == REGISTER_FORMAT_FLOAT) {
+		// for floating point registers, we currently have no
+		// context menu options to display.
+		return;
+	}
+
+	BPopUpMenu* menu = new(std::nothrow) BPopUpMenu("Options");
 	if (menu == NULL)
 		return;
 
 	ObjectDeleter<BPopUpMenu> menuDeleter(menu);
-	BMessage* message = new(std::nothrow)BMessage(MSG_SHOW_INSPECTOR_WINDOW);
-	if (message == NULL)
-		return;
 
-	message->AddUInt64("address", value.ToUInt64());
+	if (reg->Format() == REGISTER_FORMAT_INTEGER) {
+		BMessage* message = new(std::nothrow) BMessage(MSG_SHOW_INSPECTOR_WINDOW);
+		if (message == NULL)
+			return;
 
-	ObjectDeleter<BMessage> messageDeleter(message);
-	BMenuItem* item = new(std::nothrow)BMenuItem("Inspect", message);
-	if (item == NULL)
-		return;
+		message->AddUInt64("address", value.ToUInt64());
 
-	messageDeleter.Detach();
-	ObjectDeleter<BMenuItem> itemDeleter(item);
-	if (!menu->AddItem(item))
-		return;
+		ObjectDeleter<BMessage> messageDeleter(message);
+		BMenuItem* item = new(std::nothrow) BMenuItem("Inspect", message);
+		if (item == NULL)
+			return;
 
-	itemDeleter.Detach();
-	menu->SetTargetForItems(Window());
+		messageDeleter.Detach();
+		ObjectDeleter<BMenuItem> itemDeleter(item);
+		if (!menu->AddItem(item))
+			return;
+
+		itemDeleter.Detach();
+
+		item->SetTarget(Window());
+	} else if (reg->Format() == REGISTER_FORMAT_SIMD) {
+		BMenu* formatMenu = new(std::nothrow) BMenu("Format");
+		if (formatMenu == NULL)
+			return;
+
+		ObjectDeleter<BMenu> formatMenuDeleter(formatMenu);
+		if (!menu->AddItem(formatMenu))
+			return;
+		formatMenuDeleter.Detach();
+
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_INT8) != B_OK)
+			return;
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_INT16) != B_OK)
+			return;
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_INT32) != B_OK)
+			return;
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_INT64) != B_OK)
+			return;
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_FLOAT) != B_OK)
+			return;
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_DOUBLE) != B_OK)
+			return;
+
+		formatMenu->SetTargetForItems(this);
+	}
+
 	menuDeleter.Detach();
 
 	BRect mouseRect(screenWhere, screenWhere);
@@ -319,3 +480,36 @@ RegistersView::_Init()
 
 	fRegisterTable->AddTableListener(this);
 }
+
+
+status_t
+RegistersView::_AddFormatItem(BMenu* menu, int32 format)
+{
+	BMessage* message = new(std::nothrow) BMessage(
+		MSG_SIMD_RENDER_FORMAT_CHANGED);
+	if (message == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<BMessage> messageDeleter(message);
+	if (message->AddInt32("format", format) != B_OK)
+		return B_NO_MEMORY;
+
+	BMenuItem* item = new(std::nothrow) BMenuItem(
+		GetLabelForSIMDFormat(format), message);
+	if (item == NULL)
+		return B_NO_MEMORY;
+
+	messageDeleter.Detach();
+	ObjectDeleter<BMenuItem> itemDeleter(item);
+	if (!menu->AddItem(item))
+		return B_NO_MEMORY;
+
+	itemDeleter.Detach();
+
+	if (format == fRegisterTableModel->SIMDRenderFormat())
+		item->SetMarked(true);
+
+	return B_OK;
+}
+
+
