@@ -135,7 +135,7 @@ AppGroupView::MouseDown(BPoint point)
 	if (BRect(fCloseRect).InsetBySelf(-5, -5).Contains(point)) {
 		int32 children = fInfo.size();
 		for (int32 i = 0; i < children; i++) {
-			GetLayout()->RemoveView(fInfo[i]);
+			fInfo[i]->RemoveSelf();
 			delete fInfo[i];
 		}
 
@@ -183,7 +183,7 @@ AppGroupView::MessageReceived(BMessage* msg)
 				break;
 
 			fInfo.erase(vIt);
-			GetLayout()->RemoveView(view);
+			view->RemoveSelf();
 			delete view;
 
 			fParent->PostMessage(msg);
@@ -216,7 +216,7 @@ AppGroupView::AddInfo(NotificationView* view)
 			if (id == fInfo[i]->MessageID()) {
 				NotificationView* oldView = fInfo[i];
 				fParent->NotificationViewSwapped(oldView, view);
-				GetLayout()->RemoveView(oldView);
+				oldView->RemoveSelf();
 				delete oldView;
 				
 				fInfo[i] = view;
