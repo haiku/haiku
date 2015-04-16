@@ -8,6 +8,10 @@
 
 #include_next <sys/wait.h>
 
+
+#ifdef _BSD_SOURCE
+
+
 #include <sys/resource.h>
 
 
@@ -22,5 +26,9 @@ pid_t wait4(pid_t pid, int *status, int options, struct rusage *rusage);
 #ifdef __cplusplus
 }
 #endif
+
+
+#endif
+
 
 #endif	/* _BSD_SYS_WAIT_H_ */

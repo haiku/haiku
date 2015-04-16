@@ -9,6 +9,9 @@
 #include_next <unistd.h>
 
 
+#ifdef _BSD_SOURCE
+
+
 #define L_SET	SEEK_SET
 #define	L_INCR	SEEK_CUR
 #define	L_XTND	SEEK_END
@@ -27,5 +30,9 @@ void	setusershell(void);
 #ifdef __cplusplus
 }
 #endif
+
+
+#endif
+
 
 #endif	/* _BSD_UNISTD_H_ */

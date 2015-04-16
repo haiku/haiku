@@ -37,6 +37,10 @@
 #ifndef _PATHS_H_
 #define	_PATHS_H_
 
+
+#ifdef _BSD_SOURCE
+
+
 #include <sys/cdefs.h>
 
 /* Default search path. */
@@ -135,5 +139,9 @@ __END_DECLS
 #undef	_PATH_WALL
 #define	_PATH_WALL	"/rescue/wall"
 #endif /* RESCUE */
+
+
+#endif
+
 
 #endif /* !_PATHS_H_ */

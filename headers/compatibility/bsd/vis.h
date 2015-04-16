@@ -38,6 +38,9 @@
 #define	_VIS_H_
 
 
+#ifdef _BSD_SOURCE
+
+
 #include <sys/types.h>
 
 
@@ -88,5 +91,9 @@ int	strunvis(char *, const char *);
 int	strunvisx(char *, const char *, int);
 int	unvis(char *, int, int *, int);
 __END_DECLS
+
+
+#endif
+
 
 #endif /* !_VIS_H_ */

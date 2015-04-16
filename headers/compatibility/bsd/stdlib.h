@@ -9,6 +9,9 @@
 #include_next <stdlib.h>
 
 
+#ifdef _BSD_SOURCE
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -20,5 +23,9 @@ void		setprogname(const char *programName);
 #ifdef __cplusplus
 }
 #endif
+
+
+#endif
+
 
 #endif	/* _BSD_STDLIB_H_ */

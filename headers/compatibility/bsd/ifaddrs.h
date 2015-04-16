@@ -6,6 +6,9 @@
 #define _IFADDRS_H
 
 
+#ifdef _BSD_SOURCE
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -29,6 +32,9 @@ void freeifaddrs(struct ifaddrs *ifa);
 
 #ifdef __cplusplus
 }
+#endif
+
+
 #endif
 
 

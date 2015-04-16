@@ -9,6 +9,8 @@ UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons network_settings ]
 	: true ;
 
+SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {

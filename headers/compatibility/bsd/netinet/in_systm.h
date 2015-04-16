@@ -6,12 +6,18 @@
 #define _NETINET_IN_SYSTM_H_
 
 
+#ifdef _BSD_SOURCE
+
+
 #include <stdint.h>
 
 
 typedef uint16_t n_short;
 typedef uint32_t n_long;
 typedef uint32_t n_time;
+
+
+#endif
 
 
 #endif	/* _NETINET_IN_SYSTM_H_ */

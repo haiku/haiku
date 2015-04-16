@@ -9,6 +9,9 @@
 #include_next <stdio.h>
 
 
+#ifdef _BSD_SOURCE
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,5 +21,9 @@ char *fgetln(FILE *stream, size_t *_length);
 #ifdef __cplusplus
 }
 #endif
+
+
+#endif
+
 
 #endif	/* _BSD_STDIO_H_ */

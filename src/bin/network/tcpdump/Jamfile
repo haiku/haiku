@@ -4,7 +4,8 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders [ FDirName $(SUBDIR) ] : true ;
 UseHeaders [ FDirName $(SUBDIR) libpcap ] : true ;
 
-local defines = [ FDefines HAVE_CONFIG_H=1 _U_=\"__attribute__((unused))\" INET6=1 HAVE_SOCKADDR_STORAGE=1 ] ;
+local defines = [ FDefines HAVE_CONFIG_H=1 _U_=\"__attribute__((unused))\"
+	INET6=1 HAVE_SOCKADDR_STORAGE=1 _BSD_SOURCE=1 ] ;
 
 SubDirCcFlags $(defines) ;
 SubDirC++Flags $(defines) ;

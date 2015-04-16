@@ -35,6 +35,11 @@
 
 #ifndef _STRINGLIST_H
 #define _STRINGLIST_H 
+
+
+#ifdef _BSD_SOURCE
+
+
 #include <sys/cdefs.h>
 #include <sys/types.h>
 
@@ -53,5 +58,9 @@ int	 sl_add(StringList *, char *);
 void	 sl_free(StringList *, int);
 char	*sl_find(StringList *, char *);
 __END_DECLS
+
+
+#endif
+
 
 #endif /* _STRINGLIST_H */
