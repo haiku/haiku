@@ -205,6 +205,8 @@ RemotePackageRepository HaikuPorts
 	libmikmod_devel-3.3.3-2
 	libmodplug-0.8.8.4-1
 	libmodplug_devel-0.8.8.4-1
+	libmpeg2-0.5.1-3
+	libmpeg2_devel-0.5.1-3
 	libogg-1.3.0-2
 	libogg_devel-1.3.0-2
 	libpaper-1.1.24-1
@@ -892,6 +894,7 @@ RemotePackageRepository HaikuPorts
 	libmng_x86
 	libmodplug
 	libmpdclient_x86
+	libmpeg2
 	libogg
 	libpaper
 	libpcre
