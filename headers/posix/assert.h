@@ -3,6 +3,22 @@
  * Distributed under the terms of the MIT License.
  */
 
+/* Include guards are omitted, as assert.h is required
+   to support being included multiple times.
+   
+   E.g. the following is required to be valid:
+   
+   #undef NDEBUG
+   #include <assert.h>
+   
+   assert(0); // this assertion will be triggered
+   
+   #define NDEBUG
+   #include <assert.h>
+   
+   assert(0); // this assertion will not be triggered
+*/
+
 #undef assert
 
 #ifndef NDEBUG
