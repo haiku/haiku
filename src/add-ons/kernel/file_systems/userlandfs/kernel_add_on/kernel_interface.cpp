@@ -72,8 +72,9 @@ static status_t
 userlandfs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 	const char* args, ino_t* rootVnodeID)
 {
-	PRINT(("userlandfs_mount(%p (%ld), %s, 0x%lx, %s, %p)\n", fsVolume,
-		fsVolume->id, device, flags, args, rootVnodeID));
+	PRINT(("userlandfs_mount(%p (%" B_PRId32 "), %s, 0x%" B_PRIx32
+		", %s, %p)\n", fsVolume, fsVolume->id, device, flags, args,
+		rootVnodeID));
 
 	status_t error = B_OK;
 
@@ -108,8 +109,8 @@ userlandfs_mount(fs_volume* fsVolume, const char* device, uint32 flags,
 	fsVolume->ops = volume->GetVolumeOps();
 	*rootVnodeID = volume->GetRootID();
 
-	PRINT(("userlandfs_mount() done: %p, %lld\n", fsVolume->private_volume,
-		*rootVnodeID));
+	PRINT(("userlandfs_mount() done: %p, %" B_PRIdINO "\n",
+		fsVolume->private_volume, *rootVnodeID));
 
 	return error;
 }
@@ -128,7 +129,7 @@ userlandfs_unmount(fs_volume* fsVolume)
 	volume->ReleaseReference();
 	UserlandFS::GetUserlandFS()->UnregisterFileSystem(fileSystem);
 
-	PRINT(("userlandfs_unmount() done: %lx\n", error));
+	PRINT(("userlandfs_unmount() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -139,7 +140,7 @@ userlandfs_sync(fs_volume* fsVolume)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_sync(%p)\n", volume));
 	status_t error = volume->Sync();
-	PRINT(("userlandfs_sync() done: %lx \n", error));
+	PRINT(("userlandfs_sync() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -150,7 +151,7 @@ userlandfs_read_fs_info(fs_volume* fsVolume, struct fs_info* info)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_read_fs_info(%p, %p)\n", volume, info));
 	status_t error = volume->ReadFSInfo(info);
-	PRINT(("userlandfs_read_fs_info() done: %lx \n", error));
+	PRINT(("userlandfs_read_fs_info() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -160,9 +161,10 @@ userlandfs_write_fs_info(fs_volume* fsVolume, const struct fs_info* info,
 	uint32 mask)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_write_fs_info(%p, %p, 0x%lx)\n", volume, info, mask));
+	PRINT(("userlandfs_write_fs_info(%p, %p, 0x%" B_PRIx32 ")\n", volume, info,
+		mask));
 	status_t error = volume->WriteFSInfo(info, mask);
-	PRINT(("userlandfs_write_fs_info() done: %lx \n", error));
+	PRINT(("userlandfs_write_fs_info() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -179,7 +181,8 @@ userlandfs_lookup(fs_volume* fsVolume, fs_vnode* fsDir, const char* entryName,
 	PRINT(("userlandfs_lookup(%p, %p, `%s', %p)\n", volume, fsDir->private_node,
 		entryName, vnid));
 	status_t error = volume->Lookup(fsDir->private_node, entryName, vnid);
-	PRINT(("userlandfs_lookup() done: (%lx, %lld)\n", error, *vnid));
+	PRINT(("userlandfs_lookup() done: (%" B_PRIx32 ", %" B_PRIdINO ")\n", error,
+		*vnid));
 	return error;
 }
 
@@ -189,12 +192,12 @@ userlandfs_get_vnode_name(fs_volume* fsVolume, fs_vnode* fsNode, char* buffer,
 	size_t bufferSize)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_get_vnode_name(%p, %p, %p, %lu)\n", volume,
+	PRINT(("userlandfs_get_vnode_name(%p, %p, %p, %" B_PRIuSIZE ")\n", volume,
 		fsNode->private_node, buffer, bufferSize));
 	status_t error = volume->GetVNodeName(fsNode->private_node, buffer,
 		bufferSize);
-	PRINT(("userlandfs_get_vnode_name() done: (%lx, \"%.*s\")\n", error,
-		(int)bufferSize, (error == B_OK ? buffer : NULL)));
+	PRINT(("userlandfs_get_vnode_name() done: (%" B_PRIx32 ", \"%.*s\")\n",
+		error, (int)bufferSize, (error == B_OK ? buffer : NULL)));
 	return error;
 }
 
@@ -204,7 +207,7 @@ userlandfs_get_vnode(fs_volume* fsVolume, ino_t vnid, fs_vnode* fsNode,
 	int* _type, uint32* _flags, bool reenter)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_get_vnode(%p, %lld, %p, %d)\n", volume, vnid,
+	PRINT(("userlandfs_get_vnode(%p, %" B_PRIdINO ", %p, %d)\n", volume, vnid,
 		fsNode->private_node, reenter));
 	void* node;
 	fs_vnode_ops* ops;
@@ -215,8 +218,8 @@ userlandfs_get_vnode(fs_volume* fsVolume, ino_t vnid, fs_vnode* fsNode,
 		fsNode->ops = ops;
 	}
 
-	PRINT(("userlandfs_get_vnode() done: (%lx, %p, %#x, %#lx)\n", error, node,
-		*_type, *_flags));
+	PRINT(("userlandfs_get_vnode() done: (%" B_PRIx32 ", %p, %#x, %#" B_PRIx32
+		")\n", error, node, *_type, *_flags));
 	return error;
 }
 
@@ -233,7 +236,7 @@ userlandfs_put_vnode(fs_volume* fsVolume, fs_vnode* fsNode, bool reenter)
 //	PRINT(("userlandfs_put_vnode(%p, %p, %d)\n", volume, fsNode->private_node,
 //		reenter));
 	status_t error = volume->WriteVNode(fsNode->private_node, reenter);
-//	PRINT(("userlandfs_put_vnode() done: %lx\n", error));
+//	PRINT(("userlandfs_put_vnode() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -246,7 +249,7 @@ userlandfs_remove_vnode(fs_volume* fsVolume, fs_vnode* fsNode, bool reenter)
 //	PRINT(("userlandfs_remove_vnode(%p, %p, %d)\n", volume,
 //		fsNode->private_node, reenter));
 	status_t error = volume->RemoveVNode(fsNode->private_node, reenter);
-//	PRINT(("userlandfs_remove_vnode() done: %lx\n", error));
+//	PRINT(("userlandfs_remove_vnode() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -263,7 +266,7 @@ userlandfs_io(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	PRINT(("userlandfs_io(%p, %p, %p, %p)\n", volume, fsNode->private_node,
 		cookie, request));
 	status_t error = volume->DoIO(fsNode->private_node, cookie, request);
-	PRINT(("userlandfs_io() done: (%lx)\n", error));
+	PRINT(("userlandfs_io() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -277,7 +280,7 @@ userlandfs_cancel_io(fs_volume* fsVolume, fs_vnode* fsNode, void *cookie,
 	PRINT(("userlandfs_cancel_io(%p, %p, %p, %p)\n", volume,
 		fsNode->private_node, cookie, request));
 	status_t error = volume->CancelIO(fsNode->private_node, cookie, request);
-	PRINT(("userlandfs_cancel_io() done: (%lx)\n", error));
+	PRINT(("userlandfs_cancel_io() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -291,11 +294,11 @@ userlandfs_ioctl(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie, uint32 op,
 	void* buffer, size_t length)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_ioctl(%p, %p, %p, %lu, %p, %lu)\n", volume,
-		fsNode->private_node, cookie, op, buffer, length));
+	PRINT(("userlandfs_ioctl(%p, %p, %p, %" B_PRIu32 ", %p, %" B_PRIuSIZE ")\n",
+		volume, fsNode->private_node, cookie, op, buffer, length));
 	status_t error = volume->IOCtl(fsNode->private_node, cookie, op, buffer,
 		length);
-	PRINT(("userlandfs_ioctl() done: (%lx)\n", error));
+	PRINT(("userlandfs_ioctl() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -308,7 +311,7 @@ userlandfs_set_flags(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	PRINT(("userlandfs_set_flags(%p, %p, %p, %d)\n", volume,
 		fsNode->private_node, cookie, flags));
 	status_t error = volume->SetFlags(fsNode->private_node, cookie, flags);
-	PRINT(("userlandfs_set_flags() done: (%lx)\n", error));
+	PRINT(("userlandfs_set_flags() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -321,7 +324,7 @@ userlandfs_select(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	PRINT(("userlandfs_select(%p, %p, %p, %hhd, %p)\n", volume,
 		fsNode->private_node, cookie, event, sync));
 	status_t error = volume->Select(fsNode->private_node, cookie, event, sync);
-	PRINT(("userlandfs_select() done: (%lx)\n", error));
+	PRINT(("userlandfs_select() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -335,7 +338,7 @@ userlandfs_deselect(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 		fsNode->private_node, cookie, event, sync));
 	status_t error = volume->Deselect(fsNode->private_node, cookie, event,
 		sync);
-	PRINT(("userlandfs_deselect() done: (%lx)\n", error));
+	PRINT(("userlandfs_deselect() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -346,7 +349,7 @@ userlandfs_fsync(fs_volume* fsVolume, fs_vnode* fsNode)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_fsync(%p, %p)\n", volume, fsNode->private_node));
 	status_t error = volume->FSync(fsNode->private_node);
-	PRINT(("userlandfs_fsync() done: %lx\n", error));
+	PRINT(("userlandfs_fsync() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -356,11 +359,12 @@ userlandfs_read_symlink(fs_volume* fsVolume, fs_vnode* fsLink, char* buffer,
 	size_t* bufferSize)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_read_symlink(%p, %p, %p, %lu)\n", volume,
+	PRINT(("userlandfs_read_symlink(%p, %p, %p, %" B_PRIuSIZE ")\n", volume,
 		fsLink->private_node, buffer, *bufferSize));
 	status_t error = volume->ReadSymlink(fsLink->private_node, buffer,
 		*bufferSize, bufferSize);
-	PRINT(("userlandfs_read_symlink() done: (%lx, %lu)\n", error, *bufferSize));
+	PRINT(("userlandfs_read_symlink() done: (%" B_PRIx32 ", %" B_PRIuSIZE ")\n",
+		error, *bufferSize));
 	return error;
 }
 
@@ -374,7 +378,7 @@ userlandfs_create_symlink(fs_volume* fsVolume, fs_vnode* fsDir,
 		fsDir->private_node, name, path, mode));
 	status_t error = volume->CreateSymlink(fsDir->private_node, name, path,
 		mode);
-	PRINT(("userlandfs_create_symlink() done: (%lx)\n", error));
+	PRINT(("userlandfs_create_symlink() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -388,7 +392,7 @@ userlandfs_link(fs_volume* fsVolume, fs_vnode* fsDir, const char* name,
 		fsDir->private_node, name, fsNode->private_node));
 	status_t error = volume->Link(fsDir->private_node, name,
 		fsNode->private_node);
-	PRINT(("userlandfs_link() done: (%lx)\n", error));
+	PRINT(("userlandfs_link() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -400,7 +404,7 @@ userlandfs_unlink(fs_volume* fsVolume, fs_vnode* fsDir, const char* name)
 	PRINT(("userlandfs_unlink(%p, %p, `%s')\n", volume, fsDir->private_node,
 		name));
 	status_t error = volume->Unlink(fsDir->private_node, name);
-	PRINT(("userlandfs_unlink() done: (%lx)\n", error));
+	PRINT(("userlandfs_unlink() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -414,7 +418,7 @@ userlandfs_rename(fs_volume* fsVolume, fs_vnode* fsFromDir,
 		fsFromDir->private_node, fromName, fsToDir->private_node, toName));
 	status_t error = volume->Rename(fsFromDir->private_node, fromName,
 		fsToDir->private_node, toName);
-	PRINT(("userlandfs_rename() done: (%lx)\n", error));
+	PRINT(("userlandfs_rename() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -426,7 +430,7 @@ userlandfs_access(fs_volume* fsVolume, fs_vnode* fsNode, int mode)
 	PRINT(("userlandfs_access(%p, %p, %d)\n", volume, fsNode->private_node,
 		mode));
 	status_t error = volume->Access(fsNode->private_node, mode);
-	PRINT(("userlandfs_access() done: %lx\n", error));
+	PRINT(("userlandfs_access() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -438,7 +442,7 @@ userlandfs_read_stat(fs_volume* fsVolume, fs_vnode* fsNode, struct stat* st)
 	PRINT(("userlandfs_read_stat(%p, %p, %p)\n", volume, fsNode->private_node,
 		st));
 	status_t error = volume->ReadStat(fsNode->private_node, st);
-	PRINT(("userlandfs_read_stat() done: %lx\n", error));
+	PRINT(("userlandfs_read_stat() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -448,10 +452,10 @@ userlandfs_write_stat(fs_volume* fsVolume, fs_vnode* fsNode,
 	const struct stat* st, uint32 mask)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_write_stat(%p, %p, %p, %ld)\n", volume,
+	PRINT(("userlandfs_write_stat(%p, %p, %p, %" B_PRIu32 ")\n", volume,
 		fsNode->private_node, st, mask));
 	status_t error = volume->WriteStat(fsNode->private_node, st, mask);
-	PRINT(("userlandfs_write_stat() done: %lx\n", error));
+	PRINT(("userlandfs_write_stat() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -469,8 +473,8 @@ userlandfs_create(fs_volume* fsVolume, fs_vnode* fsDir, const char* name,
 		fsDir->private_node, name, openMode, perms, cookie, vnid));
 	status_t error = volume->Create(fsDir->private_node, name, openMode, perms,
 		cookie, vnid);
-	PRINT(("userlandfs_create() done: (%lx, %lld, %p)\n", error, *vnid,
-		*cookie));
+	PRINT(("userlandfs_create() done: (%" B_PRIx32 ", %" B_PRIdINO ", %p)\n",
+		error, *vnid, *cookie));
 	return error;
 }
 
@@ -483,7 +487,7 @@ userlandfs_open(fs_volume* fsVolume, fs_vnode* fsNode, int openMode,
 	PRINT(("userlandfs_open(%p, %p, %d)\n", volume, fsNode->private_node,
 		openMode));
 	status_t error = volume->Open(fsNode->private_node, openMode, cookie);
-	PRINT(("userlandfs_open() done: (%lx, %p)\n", error, *cookie));
+	PRINT(("userlandfs_open() done: (%" B_PRIx32 ", %p)\n", error, *cookie));
 	return error;
 }
 
@@ -495,7 +499,7 @@ userlandfs_close(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	PRINT(("userlandfs_close(%p, %p, %p)\n", volume, fsNode->private_node,
 		cookie));
 	status_t error = volume->Close(fsNode->private_node, cookie);
-	PRINT(("userlandfs_close() done: %lx\n", error));
+	PRINT(("userlandfs_close() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -507,7 +511,7 @@ userlandfs_free_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	PRINT(("userlandfs_free_cookie(%p, %p, %p)\n", volume, fsNode->private_node,
 		cookie));
 	status_t error = volume->FreeCookie(fsNode->private_node, cookie);
-	PRINT(("userlandfs_free_cookie() done: %lx\n", error));
+	PRINT(("userlandfs_free_cookie() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -517,11 +521,12 @@ userlandfs_read(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie, off_t pos,
 	void* buffer, size_t* length)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_read(%p, %p, %p, %Ld, %p, %lu)\n", volume,
-		fsNode->private_node, cookie, pos, buffer, *length));
+	PRINT(("userlandfs_read(%p, %p, %p, %" B_PRIdOFF ", %p, %" B_PRIuSIZE ")\n",
+		volume, fsNode->private_node, cookie, pos, buffer, *length));
 	status_t error = volume->Read(fsNode->private_node, cookie, pos, buffer,
 		*length, length);
-	PRINT(("userlandfs_read() done: (%lx, %lu)\n", error, *length));
+	PRINT(("userlandfs_read() done: (%" B_PRIx32 ", %" B_PRIuSIZE ")\n", error,
+		*length));
 	return error;
 }
 
@@ -531,11 +536,12 @@ userlandfs_write(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie, off_t pos,
 	const void* buffer, size_t* length)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_write(%p, %p, %p, %Ld, %p, %lu)\n", volume,
-		fsNode->private_node, cookie, pos, buffer, *length));
+	PRINT(("userlandfs_write(%p, %p, %p, %" B_PRIdOFF ", %p, %" B_PRIuSIZE
+		")\n", volume, fsNode->private_node, cookie, pos, buffer, *length));
 	status_t error = volume->Write(fsNode->private_node, cookie, pos, buffer,
 		*length, length);
-	PRINT(("userlandfs_write() done: (%lx, %lu)\n", error, *length));
+	PRINT(("userlandfs_write() done: (%" B_PRIx32 ", %" B_PRIuSIZE ")\n", error,
+		*length));
 	return error;
 }
 
@@ -552,7 +558,7 @@ userlandfs_create_dir(fs_volume* fsVolume, fs_vnode* fsParent, const char* name,
 	PRINT(("userlandfs_create_dir(%p, %p, `%s', %#x)\n", volume,
 		fsParent->private_node, name, perms));
 	status_t error = volume->CreateDir(fsParent->private_node, name, perms);
-	PRINT(("userlandfs_create_dir() done: (%lx)\n", error));
+	PRINT(("userlandfs_create_dir() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -564,7 +570,7 @@ userlandfs_remove_dir(fs_volume* fsVolume, fs_vnode* fsParent, const char* name)
 	PRINT(("userlandfs_remove_dir(%p, %p, `%s')\n", volume,
 		fsParent->private_node, name));
 	status_t error = volume->RemoveDir(fsParent->private_node, name);
-	PRINT(("userlandfs_remove_dir() done: (%lx)\n", error));
+	PRINT(("userlandfs_remove_dir() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -575,7 +581,8 @@ userlandfs_open_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_open_dir(%p, %p)\n", volume, fsNode->private_node));
 	status_t error = volume->OpenDir(fsNode->private_node, cookie);
-	PRINT(("userlandfs_open_dir() done: (%lx, %p)\n", error, *cookie));
+	PRINT(("userlandfs_open_dir() done: (%" B_PRIx32 ", %p)\n", error,
+		*cookie));
 	return error;
 }
 
@@ -587,7 +594,7 @@ userlandfs_close_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	PRINT(("userlandfs_close_dir(%p, %p, %p)\n", volume, fsNode->private_node,
 		cookie));
 	status_t error = volume->CloseDir(fsNode->private_node, cookie);
-	PRINT(("userlandfs_close_dir() done: %lx\n", error));
+	PRINT(("userlandfs_close_dir() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -599,7 +606,7 @@ userlandfs_free_dir_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	PRINT(("userlandfs_free_dir_cookie(%p, %p, %p)\n", volume,
 		fsNode->private_node, cookie));
 	status_t error = volume->FreeDirCookie(fsNode->private_node, cookie);
-	PRINT(("userlandfs_free_dir_cookie() done: %lx \n", error));
+	PRINT(("userlandfs_free_dir_cookie() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -609,11 +616,13 @@ userlandfs_read_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	struct dirent* buffer, size_t bufferSize, uint32* count)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_read_dir(%p, %p, %p, %p, %lu, %lu)\n", volume,
-		fsNode->private_node, cookie, buffer, bufferSize, *count));
+	PRINT(("userlandfs_read_dir(%p, %p, %p, %p, %" B_PRIuSIZE ", %" B_PRIu32
+		")\n", volume, fsNode->private_node, cookie, buffer, bufferSize,
+		*count));
 	status_t error = volume->ReadDir(fsNode->private_node, cookie, buffer,
 		bufferSize, *count, count);
-	PRINT(("userlandfs_read_dir() done: (%lx, %lu)\n", error, *count));
+	PRINT(("userlandfs_read_dir() done: (%" B_PRIx32 ", %" B_PRIu32 ")\n",
+		error, *count));
 	#if DEBUG
 		dirent* entry = buffer;
 		for (uint32 i = 0; error == B_OK && i < *count; i++) {
@@ -623,8 +632,9 @@ userlandfs_read_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 			int nameLen = strnlen(entry->d_name, B_FILE_NAME_LENGTH - 1);
 			strncpy(name, entry->d_name, nameLen);
 			name[nameLen] = '\0';
-			PRINT(("  entry: d_dev: %ld, d_pdev: %ld, d_ino: %Ld, d_pino: %Ld, "
-				"d_reclen: %hu, d_name: `%s'\n",
+			PRINT(("  entry: d_dev: %" B_PRIdDEV ", d_pdev: %" B_PRIdDEV
+				", d_ino: %" B_PRIdINO ", d_pino: %" B_PRIdINO ", "
+				"d_reclen: %" B_PRIu16 ", d_name: `%s'\n",
 				entry->d_dev, entry->d_pdev, entry->d_ino, entry->d_pino,
 				entry->d_reclen, name));
 			entry = (dirent*)((char*)entry + entry->d_reclen);
@@ -641,7 +651,7 @@ userlandfs_rewind_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	PRINT(("userlandfs_rewind_dir(%p, %p, %p)\n", volume, fsNode->private_node,
 		cookie));
 	status_t error = volume->RewindDir(fsNode->private_node, cookie);
-	PRINT(("userlandfs_rewind_dir() done: %lx\n", error));
+	PRINT(("userlandfs_rewind_dir() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -656,7 +666,8 @@ userlandfs_open_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void** cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_open_attr_dir(%p, %p)\n", volume, fsNode->private_node));
 	status_t error = volume->OpenAttrDir(fsNode->private_node, cookie);
-	PRINT(("userlandfs_open_attr_dir() done: (%lx, %p)\n", error, *cookie));
+	PRINT(("userlandfs_open_attr_dir() done: (%" B_PRIx32 ", %p)\n", error,
+		*cookie));
 	return error;
 }
 
@@ -668,7 +679,7 @@ userlandfs_close_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	PRINT(("userlandfs_close_attr_dir(%p, %p, %p)\n", volume,
 		fsNode->private_node, cookie));
 	status_t error = volume->CloseAttrDir(fsNode->private_node, cookie);
-	PRINT(("userlandfs_close_attr_dir() done: (%lx)\n", error));
+	PRINT(("userlandfs_close_attr_dir() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -681,7 +692,7 @@ userlandfs_free_attr_dir_cookie(fs_volume* fsVolume, fs_vnode* fsNode,
 	PRINT(("userlandfs_free_attr_dir_cookie(%p, %p, %p)\n", volume,
 		fsNode->private_node, cookie));
 	status_t error = volume->FreeAttrDirCookie(fsNode->private_node, cookie);
-	PRINT(("userlandfs_free_attr_dir_cookie() done: (%lx)\n", error));
+	PRINT(("userlandfs_free_attr_dir_cookie() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -691,11 +702,13 @@ userlandfs_read_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	struct dirent* buffer, size_t bufferSize, uint32* count)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_read_attr_dir(%p, %p, %p, %p, %lu, %lu)\n", volume,
-		fsNode->private_node, cookie, buffer, bufferSize, *count));
+	PRINT(("userlandfs_read_attr_dir(%p, %p, %p, %p, %" B_PRIuSIZE ", %"
+		B_PRIu32 ")\n", volume, fsNode->private_node, cookie, buffer,
+		bufferSize, *count));
 	status_t error = volume->ReadAttrDir(fsNode->private_node, cookie, buffer,
 		bufferSize, *count, count);
-	PRINT(("userlandfs_read_attr_dir() done: (%lx, %lu)\n", error, *count));
+	PRINT(("userlandfs_read_attr_dir() done: (%" B_PRIx32 ", %" B_PRIu32 ")\n",
+		error, *count));
 	return error;
 }
 
@@ -707,7 +720,7 @@ userlandfs_rewind_attr_dir(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	PRINT(("userlandfs_rewind_attr_dir(%p, %p, %p)\n", volume,
 		fsNode->private_node, cookie));
 	status_t error = volume->RewindAttrDir(fsNode->private_node, cookie);
-	PRINT(("userlandfs_rewind_attr_dir() done: (%lx)\n", error));
+	PRINT(("userlandfs_rewind_attr_dir() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -721,11 +734,12 @@ userlandfs_create_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 	uint32 type, int openMode, void** cookie)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_create_attr(%p, %p, \"%s\", 0x%lx, %d, %p)\n", volume,
-		fsNode->private_node, name, type, openMode, cookie));
+	PRINT(("userlandfs_create_attr(%p, %p, \"%s\", 0x%" B_PRIx32 ", %d, %p)\n",
+		volume, fsNode->private_node, name, type, openMode, cookie));
 	status_t error = volume->CreateAttr(fsNode->private_node, name, type,
 		openMode, cookie);
-	PRINT(("userlandfs_create_attr() done: (%lx, %p)\n", error, *cookie));
+	PRINT(("userlandfs_create_attr() done: (%" B_PRIx32 ", %p)\n", error,
+		*cookie));
 	return error;
 }
 
@@ -739,7 +753,8 @@ userlandfs_open_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name,
 		fsNode->private_node, name, openMode, cookie));
 	status_t error = volume->OpenAttr(fsNode->private_node, name, openMode,
 		cookie);
-	PRINT(("userlandfs_open_attr() done: (%lx, %p)\n", error, *cookie));
+	PRINT(("userlandfs_open_attr() done: (%" B_PRIx32 ", %p)\n", error,
+		*cookie));
 	return error;
 }
 
@@ -751,7 +766,7 @@ userlandfs_close_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	PRINT(("userlandfs_close_attr(%p, %p, %p)\n", volume, fsNode->private_node,
 		cookie));
 	status_t error = volume->CloseAttr(fsNode->private_node, cookie);
-	PRINT(("userlandfs_close_attr() done: %lx\n", error));
+	PRINT(("userlandfs_close_attr() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -763,7 +778,7 @@ userlandfs_free_attr_cookie(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie)
 	PRINT(("userlandfs_free_attr_cookie(%p, %p, %p)\n", volume,
 		fsNode->private_node, cookie));
 	status_t error = volume->FreeAttrCookie(fsNode->private_node, cookie);
-	PRINT(("userlandfs_free_attr_cookie() done: %lx\n", error));
+	PRINT(("userlandfs_free_attr_cookie() done: %" B_PRIx32 "\n", error));
 	return error;
 }
 
@@ -773,11 +788,13 @@ userlandfs_read_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	off_t pos, void* buffer, size_t* length)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_read_attr(%p, %p, %p, %lld, %p, %lu)\n", volume,
-		fsNode->private_node, cookie, pos, buffer, *length));
+	PRINT(("userlandfs_read_attr(%p, %p, %p, %" B_PRIdOFF ", %p, %"
+		B_PRIuSIZE ")\n", volume, fsNode->private_node, cookie, pos, buffer,
+		*length));
 	status_t error = volume->ReadAttr(fsNode->private_node, cookie, pos, buffer,
 		*length, length);
-	PRINT(("userlandfs_read_attr() done: (%lx, %lu)\n", error, *length));
+	PRINT(("userlandfs_read_attr() done: (%" B_PRIx32 ", %" B_PRIuSIZE ")\n",
+		error, *length));
 	return error;
 }
 
@@ -787,11 +804,12 @@ userlandfs_write_attr(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	off_t pos, const void* buffer, size_t* length)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_write_attr(%p, %p, %p, %lld, %p, %lu)\n", volume,
-		fsNode->private_node, cookie, pos, buffer, *length));
+	PRINT(("userlandfs_write_attr(%p, %p, %p, %" B_PRIdOFF ", %p, %" B_PRIuSIZE
+		")\n", volume, fsNode->private_node, cookie, pos, buffer, *length));
 	status_t error = volume->WriteAttr(fsNode->private_node, cookie, pos,
 		buffer, *length, length);
-	PRINT(("userlandfs_write_attr() done: (%lx, %lu)\n", error, *length));
+	PRINT(("userlandfs_write_attr() done: (%" B_PRIx32 ", %" B_PRIuSIZE ")\n",
+		error, *length));
 	return error;
 }
 
@@ -804,7 +822,7 @@ userlandfs_read_attr_stat(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 	PRINT(("userlandfs_read_attr_stat(%p, %p, %p, %p)\n", volume,
 		fsNode->private_node, cookie, st));
 	status_t error = volume->ReadAttrStat(fsNode->private_node, cookie, st);
-	PRINT(("userlandfs_read_attr_stat() done: (%lx)\n", error));
+	PRINT(("userlandfs_read_attr_stat() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -818,7 +836,7 @@ userlandfs_write_attr_stat(fs_volume* fsVolume, fs_vnode* fsNode, void* cookie,
 		fsNode->private_node, cookie, st, statMask));
 	status_t error = volume->WriteAttrStat(fsNode->private_node, cookie, st,
 		statMask);
-	PRINT(("userlandfs_write_attr_stat() done: (%lx)\n", error));
+	PRINT(("userlandfs_write_attr_stat() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -832,7 +850,7 @@ userlandfs_rename_attr(fs_volume* fsVolume, fs_vnode* fsFromNode,
 		fsFromNode->private_node, fromName, fsToNode->private_node, toName));
 	status_t error = volume->RenameAttr(fsFromNode->private_node, fromName,
 		fsToNode->private_node, toName);
-	PRINT(("userlandfs_rename_attr() done: (%lx)\n", error));
+	PRINT(("userlandfs_rename_attr() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -844,7 +862,7 @@ userlandfs_remove_attr(fs_volume* fsVolume, fs_vnode* fsNode, const char* name)
 	PRINT(("userlandfs_remove_attr(%p, %p, `%s')\n", volume,
 		fsNode->private_node, name));
 	status_t error = volume->RemoveAttr(fsNode->private_node, name);
-	PRINT(("userlandfs_remove_attr() done: (%lx)\n", error));
+	PRINT(("userlandfs_remove_attr() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -859,7 +877,8 @@ userlandfs_open_index_dir(fs_volume* fsVolume, void** cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_open_index_dir(%p, %p)\n", volume, cookie));
 	status_t error = volume->OpenIndexDir(cookie);
-	PRINT(("userlandfs_open_index_dir() done: (%lx, %p)\n", error, *cookie));
+	PRINT(("userlandfs_open_index_dir() done: (%" B_PRIx32 ", %p)\n", error,
+		*cookie));
 	return error;
 }
 
@@ -870,7 +889,7 @@ userlandfs_close_index_dir(fs_volume* fsVolume, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_close_index_dir(%p, %p)\n", volume, cookie));
 	status_t error = volume->CloseIndexDir(cookie);
-	PRINT(("userlandfs_close_index_dir() done: (%lx)\n", error));
+	PRINT(("userlandfs_close_index_dir() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -881,7 +900,8 @@ userlandfs_free_index_dir_cookie(fs_volume* fsVolume, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_free_index_dir_cookie(%p, %p)\n", volume, cookie));
 	status_t error = volume->FreeIndexDirCookie(cookie);
-	PRINT(("userlandfs_free_index_dir_cookie() done: (%lx)\n", error));
+	PRINT(("userlandfs_free_index_dir_cookie() done: (%" B_PRIx32 ")\n",
+		error));
 	return error;
 }
 
@@ -891,11 +911,12 @@ userlandfs_read_index_dir(fs_volume* fsVolume, void* cookie,
 	struct dirent* buffer, size_t bufferSize, uint32* count)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_read_index_dir(%p, %p, %p, %lu, %lu)\n", volume, cookie,
-		buffer, bufferSize, *count));
+	PRINT(("userlandfs_read_index_dir(%p, %p, %p, %" B_PRIuSIZE ", %" B_PRIu32
+		")\n", volume, cookie, buffer, bufferSize, *count));
 	status_t error = volume->ReadIndexDir(cookie, buffer, bufferSize,
 		*count, count);
-	PRINT(("userlandfs_read_index_dir() done: (%lx, %lu)\n", error, *count));
+	PRINT(("userlandfs_read_index_dir() done: (%" B_PRIx32 ", %" B_PRIu32 ")\n",
+		error, *count));
 	return error;
 }
 
@@ -906,7 +927,7 @@ userlandfs_rewind_index_dir(fs_volume* fsVolume, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_rewind_index_dir(%p, %p)\n", volume, cookie));
 	status_t error = volume->RewindIndexDir(cookie);
-	PRINT(("userlandfs_rewind_index_dir() done: (%lx)\n", error));
+	PRINT(("userlandfs_rewind_index_dir() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -916,10 +937,10 @@ userlandfs_create_index(fs_volume* fsVolume, const char* name, uint32 type,
 	uint32 flags)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_create_index(%p, `%s', 0x%lx, 0x%lx)\n", volume, name,
-		type, flags));
+	PRINT(("userlandfs_create_index(%p, `%s', 0x%" B_PRIx32 ", 0x%" B_PRIx32
+		")\n", volume, name, type, flags));
 	status_t error = volume->CreateIndex(name, type, flags);
-	PRINT(("userlandfs_create_index() done: (%lx)\n", error));
+	PRINT(("userlandfs_create_index() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -930,7 +951,7 @@ userlandfs_remove_index(fs_volume* fsVolume, const char* name)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_remove_index(%p, `%s')\n", volume, name));
 	status_t error = volume->RemoveIndex(name);
-	PRINT(("userlandfs_remove_index() done: (%lx)\n", error));
+	PRINT(("userlandfs_remove_index() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -942,7 +963,7 @@ userlandfs_read_index_stat(fs_volume* fsVolume, const char* name,
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_read_index_stat(%p, `%s', %p)\n", volume, name, st));
 	status_t error = volume->ReadIndexStat(name, st);
-	PRINT(("userlandfs_read_index_stat() done: (%lx)\n", error));
+	PRINT(("userlandfs_read_index_stat() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -956,10 +977,11 @@ userlandfs_open_query(fs_volume* fsVolume, const char *queryString,
 	uint32 flags, port_id port, uint32 token, void** cookie)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_open_query(%p, `%s', %lu, %ld, %lu, %p)\n", volume,
-		queryString, flags, port, token, cookie));
+	PRINT(("userlandfs_open_query(%p, `%s', %" B_PRIu32 ", %" B_PRId32 ", %"
+		B_PRIu32 ", %p)\n", volume, queryString, flags, port, token, cookie));
 	status_t error = volume->OpenQuery(queryString, flags, port, token, cookie);
-	PRINT(("userlandfs_open_query() done: (%lx, %p)\n", error, *cookie));
+	PRINT(("userlandfs_open_query() done: (%" B_PRIx32 ", %p)\n", error,
+		*cookie));
 	return error;
 }
 
@@ -970,7 +992,7 @@ userlandfs_close_query(fs_volume* fsVolume, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_close_query(%p, %p)\n", volume, cookie));
 	status_t error = volume->CloseQuery(cookie);
-	PRINT(("userlandfs_close_query() done: (%lx)\n", error));
+	PRINT(("userlandfs_close_query() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -981,7 +1003,7 @@ userlandfs_free_query_cookie(fs_volume* fsVolume, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_free_query_cookie(%p, %p)\n", volume, cookie));
 	status_t error = volume->FreeQueryCookie(cookie);
-	PRINT(("userlandfs_free_query_cookie() done: (%lx)\n", error));
+	PRINT(("userlandfs_free_query_cookie() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 
@@ -991,11 +1013,12 @@ userlandfs_read_query(fs_volume* fsVolume, void* cookie,
 	struct dirent* buffer, size_t bufferSize, uint32* count)
 {
 	Volume* volume = (Volume*)fsVolume->private_volume;
-	PRINT(("userlandfs_read_query(%p, %p, %p, %lu, %lu)\n", volume, cookie,
-		buffer, bufferSize, *count));
+	PRINT(("userlandfs_read_query(%p, %p, %p, %" B_PRIuSIZE ", %" B_PRIu32
+		")\n", volume, cookie, buffer, bufferSize, *count));
 	status_t error = volume->ReadQuery(cookie, buffer, bufferSize, *count,
 		count);
-	PRINT(("userlandfs_read_query() done: (%lx, %ld)\n", error, *count));
+	PRINT(("userlandfs_read_query() done: (%" B_PRIx32 ", %" B_PRIu32 ")\n",
+		error, *count));
 	#if DEBUG
 		if (error == B_OK && *count > 0) {
 			// R5's kernel vsprintf() doesn't seem to know `%.<number>s', so
@@ -1004,10 +1027,10 @@ userlandfs_read_query(fs_volume* fsVolume, void* cookie,
 			int nameLen = strnlen(buffer->d_name, B_FILE_NAME_LENGTH - 1);
 			strncpy(name, buffer->d_name, nameLen);
 			name[nameLen] = '\0';
-			PRINT(("  entry: d_dev: %ld, d_pdev: %ld, d_ino: %Ld, d_pino: %Ld, "
-				"d_reclen: %hu, d_name: `%s'\n",
-				buffer->d_dev, buffer->d_pdev, buffer->d_ino, buffer->d_pino,
-				buffer->d_reclen, name));
+			PRINT(("  entry: d_dev: %" B_PRIdDEV ", d_pdev: %" B_PRIdDEV
+				", d_ino: %" B_PRIdINO ", d_pino: %" B_PRIdINO ", d_reclen: %"
+				B_PRIu16 ", d_name: `%s'\n", buffer->d_dev, buffer->d_pdev,
+				buffer->d_ino, buffer->d_pino, buffer->d_reclen, name));
 		}
 	#endif
 	return error;
@@ -1020,7 +1043,7 @@ userlandfs_rewind_query(fs_volume* fsVolume, void* cookie)
 	Volume* volume = (Volume*)fsVolume->private_volume;
 	PRINT(("userlandfs_rewind_query(%p, %p)\n", volume, cookie));
 	status_t error = volume->RewindQuery(cookie);
-	PRINT(("userlandfs_rewind_query() done: (%lx)\n", error));
+	PRINT(("userlandfs_rewind_query() done: (%" B_PRIx32 ")\n", error));
 	return error;
 }
 

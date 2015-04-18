@@ -118,8 +118,9 @@ KernelRequestHandler::HandleRequest(Request* request)
 		case REMOVE_NODE_LISTENER_REQUEST:
 			return _HandleRequest((RemoveNodeListenerRequest*)request);
 	}
-PRINT(("KernelRequestHandler::HandleRequest(): unexpected request: %lu\n",
-request->GetType()));
+
+	PRINT(("KernelRequestHandler::HandleRequest(): unexpected request: %"
+		B_PRIu32 "\n", request->GetType()));
 	return B_BAD_DATA;
 }
 

@@ -1263,8 +1263,8 @@ status_t
 FUSEVolume::WriteStat(void* _node, const struct stat* st, uint32 mask)
 {
 	FUSENode* node = (FUSENode*)_node;
-	PRINT(("FUSEVolume::WriteStat(%p (%" B_PRId64 "), %p, %#lx)\n", node,
-		node->id, st, mask));
+	PRINT(("FUSEVolume::WriteStat(%p (%" B_PRId64 "), %p, %#" B_PRIx32 ")\n",
+		node, node->id, st, mask));
 
 	// lock the directory
 	NodeReadLocker nodeLocker(this, node, true);
@@ -1827,7 +1827,7 @@ status_t
 FUSEVolume::ReadDir(void* _node, void* _cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* _countRead)
 {
-	PRINT(("FUSEVolume::ReadDir(%p, %p, %p, %" B_PRIu32 ", %" B_PRId32 ")\n",
+	PRINT(("FUSEVolume::ReadDir(%p, %p, %p, %" B_PRIuSIZE ", %" B_PRId32 ")\n",
 		_node, _cookie, buffer, bufferSize, count));
 	*_countRead = 0;
 
