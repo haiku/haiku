@@ -18,12 +18,19 @@ additionalMakeArgs=$*
 
 ccFlags="-O2"
 cxxFlags="-O2"
+binutilsTargets="$haikuMachine"
 case $haikuMachine in
+i586-*)
+	binutilsConfigureArgs="--disable-multilib"
+	gccConfigureArgs="--disable-multilib"
+	binutilsTargets="$binutilsTargets,i386-efi-pe,x86_64-efi-pe"
+	;;
 x86_64-*)
 	# GCC's default is to enable multilib, but there is a bug when
 	# explicitly using --enable-multilib that causes a build
 	# failure
 	binutilsConfigureArgs=""
+	binutilsTargets="$binutilsTargets,i386-efi-pe,x86_64-efi-pe"
 	;;
 m68k-*)
 	binutilsConfigureArgs="--enable-multilib"
@@ -40,6 +47,11 @@ arm-*)
 	# TODO: Disable building with TLS support for ARM until implemented.
 	binutilsConfigureArgs="$binutilsConfigureArgs --disable-tls"
 	gccConfigureArgs="$gccConfigureArgs --disable-tls"
+	;;
+powerpc-*)
+	binutilsConfigureArgs="--disable-multilib"
+	gccConfigureArgs="--disable-multilib"
+	binutilsTargets="$binutilsTargets,powerpc-apple-linux,powerpc-apple-freebsd,powerpc-apple-vxworks"
 	;;
 *)
 	binutilsConfigureArgs="--disable-multilib"
@@ -147,7 +159,7 @@ export LC_ALL=POSIX
 cd "$binutilsObjDir"
 CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$binutilsSourceDir/configure" \
 	--prefix="$installDir" $buildHostSpec --target=$haikuMachine \
-	--enable-targets=$haikuMachine,i386-efi-pe,x86_64-efi-pe \
+	--enable-targets=$binutilsTargets \
 	--disable-nls --disable-shared --disable-werror \
 	--with-sysroot="$sysrootDir" \
 	$binutilsConfigureArgs \
