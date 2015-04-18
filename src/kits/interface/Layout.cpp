@@ -209,7 +209,8 @@ BLayout::RemoveView(BView* child)
 			continue;
 
 		RemoveItem(i);
-		delete item;
+		if (item != child->GetLayout())
+			delete item;
 
 		remaining--;
 		removed = true;
