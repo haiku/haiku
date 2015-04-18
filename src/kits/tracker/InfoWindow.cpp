@@ -990,7 +990,7 @@ AttributeView::~AttributeView()
 	if (fDescWindow->Lock())
 		fDescWindow->Quit();
 
-	if (fModel->IsSymLink() && fIconModel != fModel)
+	if (fIconModel != fModel)
 		delete fIconModel;
 }
 
