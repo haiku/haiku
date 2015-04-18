@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3954814332
+1	russian	x-vnd.Haiku-HaikuDepot	3576934478
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -77,6 +77,7 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 It was not possible to contact the web service.	RatePackageWindow		Не удалось связаться с веб сервером.
 Only featured packages	MainWindow		Только популярные пакеты
 There are problems in the form:\n\n	UserLoginWindow		В этой форме присутствуют ощибки:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Пакет не был найден в веб сервисе. Скорее всего это охначает, что он был установлен из склада, который отслеживается в веб сервисе. Оценка таких пакетов, к сожалению, не поддерживается.
 Create account	UserLoginWindow		Создать учётную запись
 Productivity	Model		Офис
 No, quit HaikuDepot	App		Нет, выйти из HaikuDepot

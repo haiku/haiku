@@ -1,0 +1,32 @@
+1	italian	x-vnd.Haiku-InterfacesAddOn	3297241710
+Interface	InterfaceWindow		Interfaccia
+Network:	IntefaceHardwareView		Rete:
+Static	IntefaceAddressView		Statico
+None	InterfacesListView		Nessuno
+IP:	InterfacesListView	IPv4 address label	IP:
+Renegotiate address	InterfacesListView		Rinegoziare indirizzo
+Status:	IntefaceHardwareView		Stato:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Link speed:	IntefaceHardwareView		Velocità collegamento:
+The method for obtaining an IP address	IntefaceAddressView		Modalità di assegnazione indirizzo IP
+Your gateway	IntefaceAddressView		Il tuo gateway
+Enable	InterfacesListView		Abilita
+Received:	IntefaceHardwareView		Ricevuti:
+Choose automatically	IntefaceHardwareView		Scegli automaticamente
+connected	IntefaceHardwareView		connesso
+Automatic	IntefaceAddressView		Automatico
+Gateway:	IntefaceAddressView		Gateway:
+Disable	InterfacesListView		Disattiva
+Sent:	IntefaceHardwareView		Inviati:
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Modalità:
+<no wireless networks found>	IntefaceHardwareView		<nessuna rete wireless trovata>
+Your netmask	IntefaceAddressView		La tua netmask
+IP Address:	IntefaceAddressView		Indirizzo IP:
+Off	IntefaceAddressView		Off
+MAC address:	IntefaceHardwareView		Indirizzo MAC:
+Renegotiate	IntefaceHardwareView		Rinegoziare
+Netmask:	IntefaceAddressView		Netmask:
+Your IP address	IntefaceAddressView		Il tuo indirizzo IP
+disconnected	IntefaceHardwareView		disconnesso
+Disable	IntefaceHardwareView		Disabilita

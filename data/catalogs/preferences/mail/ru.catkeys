@@ -1,9 +1,10 @@
-1	russian	x-vnd.Haiku-Mail	1147431952
+1	russian	x-vnd.Haiku-Mail	3011978130
 Settings	Config Window		Настройки
 Never	Config Window	show status window	никогда
 While sending and receiving	Config Window		во время отправки и получения
 Incoming	Config Window		Входящие
 Server name:	E-Mail		Имя сервера:
+An error occurred while creating the config view: %error.	Config Views		При создании панели настройки произошла ошибка: %error.
 OK	Config Window		ОК
 E-mail address:	E-Mail		E-mail адрес:
 Account name:	E-Mail		Имя аккаунта:

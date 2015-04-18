@@ -1,7 +1,8 @@
-1	italian	x-vnd.Be-POST	2437005641
+1	italian	x-vnd.Be-POST	2949558073
 Fetching mail for %name	Notifier		Recupero della posta elettronica di %name in corso
 Check for mails only	DeskbarView		Controllare solo la posta in arrivo
 Send pending mails	DeskbarView		Inviare la posta in uscita
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{Un nuovo messaggio} other{# nuovi messaggi}}
 {0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# nuovo messaggio} other{# nuovi messaggi}}
 {0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# nuovo messaggio} other{# nuovi messaggi}} per %name\n
 New Messages	MailDaemon		Nuovi Messaggi

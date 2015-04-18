@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	2005945973
+1	japanese	x-vnd.Haiku-MediaPlayer	2711018042
 raw audio	MediaPlayer-InfoWin		raw オーディオ
 Location	MediaPlayer-InfoWin		場所
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
@@ -91,6 +91,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		自動的に再生を開
 Track	Video Track Menu		トラック
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (ロックに失敗)。プレイリストの保存に失敗しました。
 View options	MediaPlayer-SettingsWindow		表示オプション
+none	MediaPlayer-Main		無し
 Play mode	MediaPlayer-SettingsWindow		再生モード
 Remove Entries	MediaPlayer-RemovePLItemsCmd		項目の削除
 Video track	MediaPlayer-Main		映像トラック
@@ -119,6 +120,7 @@ raw video	MediaPlayer-InfoWin		raw ビデオ
 Volume of background clips	MediaPlayer-SettingsWindow		バックグラウンド再生時のボリューム
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		内部エラー (メモリ不足)。プレイリストの保存に失敗しました。
 Hide interface	MediaPlayer-Main		インターフェイスを隠す
+Open clips	MediaPlayer-Main		クリップを開く
 Copy Entry	MediaPlayer-CopyPLItemsCmd		項目をコピー
 none	Subtitles menu		無し
 Move file to Trash	MediaPlayer-PlaylistWindow		ファイルをごみ箱に移動

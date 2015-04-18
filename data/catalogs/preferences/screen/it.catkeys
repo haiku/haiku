@@ -1,17 +1,18 @@
-1	italian	x-vnd.Haiku-Screen	1388881963
+1	italian	x-vnd.Haiku-Screen	2339556848
 yes	Screen		sì
 Use laptop panel:	Screen		Usa pannello del portatile
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 colori
-/other…	Screen		/altro...
+/other…	Screen		/altro…
 16 bits/pixel, 65536 colors	Screen		16 bit/pixel, 65536 colori
-Revert	Screen		Reimposta
+Revert	Screen		Ripristina
 Swap displays:	Screen		Scambia schermi:
 Combine displays:	Screen		Combina schemi
 Done	Screen		Fatto
-Set background…	Screen		Imposta sfondo...
+Set background…	Screen		Imposta sfondo…
 Undo	Screen		Annulla
 if needed	Screen		se necessario
 Screen preferences by the Haiku team	Screen		Impostazioni schermo dal team di Haiku
+Settings will revert in %seconds.	Screen		Le impostazioni saranno ripristinate in %seconds secondi.
 Screen	System name		Screen
 OK	Screen		Ok
 Workspaces	Screen		Spazi di lavoro
@@ -28,11 +29,11 @@ Columns:	Screen		Colonne:
 All workspaces	Screen		Tutti gli spazi di lavoro
 always	Screen		sempre
 32 bits/pixel, 16 Million colors	Screen		32 bit/pixel, 16 Milioni di colori
-Current workspace	Screen		Spazio di lavoro corrente
+Current workspace	Screen		Spazio di lavoro attuale
 About	Screen		Informazioni
 24 bits/pixel, 16 Million colors	Screen		24 bit/pixel, 16 Milioni di colori
 horizontally	Screen		orizzontalmente
-Other…	Screen		Altro...
+Other…	Screen		Altro…
 Cancel	Screen		Cancella
 bits/pixel	Screen		bit/pixel
 Refresh rate:	Screen		Ritmo di aggiornamento

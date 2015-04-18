@@ -43,8 +43,8 @@ Quit	Keymap window		退出
 Dutch	Keyboard Layout View		荷兰文
 Switch shortcut keys to Haiku mode	Keymap window		切换快捷键为Haiku模式
 Circumflex trigger	Keymap window		触发音调符号
-Hebrew	Keyboard Layout View		希伯来文
 ISO-9995	Keyboard Layout View		ISO-9995
+Hebrew	Keyboard Layout View		希伯来文
 Diaeresis trigger	Keymap window		触发分音符号
 Disabled	Modifier keys window	Do nothing	禁用
 Belarusian (Latin)	Keyboard Layout View		白俄罗斯 (拉丁字母)

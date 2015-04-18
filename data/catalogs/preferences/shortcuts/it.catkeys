@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Shortcuts	1755582132
+1	italian	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts non è stato capace di salvare le tue impostazioni di tasti.
 Cancel	ShortcutsWindow		Annulla
@@ -6,6 +6,7 @@ Append KeySet…	ShortcutsWindow		Accoda Impostazione Tasti…
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		Tasto
 Open KeySet…	ShortcutsWindow		Apri Impostazione Tasti…
+Error, NULL state description?	ShortcutsSpec		Errore: probabile descrizione di stato NULL\n
 Revert to saved	ShortcutsWindow		Ripristina quanto salvato
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*InserisciStringa \"Qui il tuo testo\"
@@ -14,9 +15,11 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *LaunchHandler text/html	ShortcutsWindow		*AvviaGestore text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Shortcuts non è stato capace di aprire il vostro file di impostazione tasti!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multiplo \"*MuoviMouseVerso 100% 0\" \"*TastoMouse 1\"
+Option	ShortcutsSpec	Name for modifier on keyboard	Opzione
 Save	ShortcutsWindow		Salva
 *MouseButton 1	ShortcutsWindow		*TastoMouse 1
 *MoveMouse +20 +0	ShortcutsWindow		*MuoviMouse +20 +0
+Save changes before closing?	ShortcutsWindow		Salvare le modifiche prima di uscire?
 Remove selected shortcut	ShortcutsWindow		Rimuovi scorciatoia selezionata
 Add new shortcut	ShortcutsWindow		Aggiungi nuova scorciatoia
 Save & apply	ShortcutsWindow		Salva e applica

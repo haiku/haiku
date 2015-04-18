@@ -1,25 +1,42 @@
-1	italian	x-vnd.Haiku-Time	324409609
+1	italian	x-vnd.Haiku-Time	3180389660
+GMT (UNIX compatible)	Time		GMT (UNIX compatibile)
 OK	Time		OK
+Asia	Time		Asia
 \nNow: 	Time		\nOra:
+Africa	Time		Africa
+Reset to default server list	Time		Reimposta alla configurazione predefinita
 Stop	Time		Interrompi
 Could not contact server	Time		Non è stato possibile contattare il server
+Australia	Time		Australia
 Preview time:	Time		Durata dell'anteprima:
 Synchronize	Time		Sincronizza
 Revert	Time		Ripristina
+Pacific	Time		Pacifico
+Show day of week	Time		Mostra giorno della settimana
 Add	Time		Aggiungi
 Date and time	Time		Data e ora
 about	Time		informazioni
+Local time (Windows compatible)	Time		Ora Locale (Windows compatibile)
 Message receiving failed	Time		Ricezione del messaggio fallito
 Set time zone	Time		Imposta fuso orario
 Waiting for answer failed	Time		Attesa di una risposta fallita
 Hardware clock set to:	Time		Orologio hardware impostato su:
 The following error occured while synchronizing:r\n%s	Time		Si è verificato il seguente errore durante la sincronizzazione:r\n%s
+Europe	Time		Europa
 Remove	Time		Rimuovi
 Time	Time		Ora
+Indian	Time		Indiano
 Sending request failed	Time		Invio di una richiesta fallita
+Arctic	Time		Artide
+Display time with seconds	Time		Mostra i secondi
 Time	System name		Orario
+America	Time		America
 Synchronize at boot	Time		Sincronizza all'avvio
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Ora & Data, realizzato da:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		Orario ricevuto illegittimo
+Antarctica	Time		Antartide
+Show time zone	Time		Mostra fuso orario
+Show clock in Deskbar	Time		Mostra orologio in Deskbar
 The following error occured while synchronizing:r\n%s: %s	Time		Si è verificato il seguente errore durante la sincronizzazione:r\n%s: %s
 <Other>	Time		<Altro>
 Current time:	Time		Ora attuale:
@@ -27,4 +44,6 @@ Try all servers	Time		Prova con tutti i server
 Time zone	Time		Fuso orario
 Could not create socket	Time		Non è stato possibile creare un socket
 Synchronize again	Time		Sincronizza nuovamente
+Clock	Time		Orologio
 Network time	Time		Orario di Rete
+Atlantic	Time		Atlantico

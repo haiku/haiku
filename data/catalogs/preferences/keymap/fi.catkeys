@@ -43,8 +43,8 @@ Quit	Keymap window		Poistu
 Dutch	Keyboard Layout View		hollantilainen
 Switch shortcut keys to Haiku mode	Keymap window		Vaihda pikanäppäimet Haiku-tilaan
 Circumflex trigger	Keymap window		Sirkumfleksiliipaisin
-Hebrew	Keyboard Layout View		heprealainen
 ISO-9995	Keyboard Layout View		ISO-9995
+Hebrew	Keyboard Layout View		heprealainen
 Diaeresis trigger	Keymap window		Treemaliipaisin
 Disabled	Modifier keys window	Do nothing	Poissa käytöstä
 Belarusian (Latin)	Keyboard Layout View		valkovenäläinen (latinalainen)

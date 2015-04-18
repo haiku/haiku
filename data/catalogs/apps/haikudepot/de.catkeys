@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	4261904725
+1	german	x-vnd.Haiku-HaikuDepot	4273323974
 Name	PackageListView		Name
 Available packages	MainWindow		Verfügbare Pakete
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
@@ -85,6 +85,7 @@ No, quit HaikuDepot	App		Nein, HaikuDepot beenden
 Authentication failed	UserLoginWindow		Anmeldung fehlgeschlagen
 Logged in as %User%	MainWindow		Angemeldet als %User%
 Language	RatePackageWindow		Sprache
+Size	PackageListView		Größe
 Failed to create or update rating: %s\n	RatePackageWindow		Anlegen oder Aktualisieren der Bewertung fehlgeschlagen: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Nur angemeldete Benutzer können Pakete bewerten.
  It responded with: 	RatePackageWindow		 Es hat geantwortet: 
@@ -135,6 +136,7 @@ Cancel	RatePackageWindow		Abbrechen
 Package action failed	PackageInfoView		Paket-Aktion fehlgeschlagen
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Senden
+-	no package size		-
 Category:	FilterView		Kategorie:
 Failed to create account	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden
 There are problems with the data you entered:\n\n	UserLoginWindow		Mit den eingegebenen Daten gab es Probleme:\n\n

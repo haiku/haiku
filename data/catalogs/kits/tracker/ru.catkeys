@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	1313160091
+1	russian	x-vnd.Haiku-libtracker	4204393626
 OK	WidgetAttributeText		ОК
 Add-ons	FilePanelPriv		Дополнения
 Mount settings…	ContainerWindow		Настройка подключения дисков…
@@ -179,6 +179,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		Ошибка в регу�
 Mount all	MountMenu		Подключить все
 calculating…	InfoWindow		подсчёт…
 Mount all disks now	AutoMounterSettings		Подключить все диски сейчас
+Hide dotfiles	SettingsView		Скрывать файлы, начинающиеся с точки
 Untitled bitmap	PoseView		Безымянный рисунок
 of %items	StatusWindow		из %items
 Description:	InfoWindow		Описание:

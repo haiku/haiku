@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	4261904725
+1	french	x-vnd.Haiku-HaikuDepot	4273323974
 Name	PackageListView		Nom
 Available packages	MainWindow		Paquets disponibles
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
@@ -85,6 +85,7 @@ No, quit HaikuDepot	App		Non, quitter le Dépôt Haiku
 Authentication failed	UserLoginWindow		L’authentification a échoué
 Logged in as %User%	MainWindow		Connecté en tant que %User%
 Language	RatePackageWindow		Langue
+Size	PackageListView		Taille
 Failed to create or update rating: %s\n	RatePackageWindow		Votre évaluation n’a pas été prise en compte : %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Vous devez vous authentifier pour évaluer les paquets.
  It responded with: 	RatePackageWindow		 Il a répondu : 
@@ -135,6 +136,7 @@ Cancel	RatePackageWindow		Annuler
 Package action failed	PackageInfoView		L’action du paquet a échoué
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Envoyer
+-	no package size		-
 Category:	FilterView		Catégorie :
 Failed to create account	UserLoginWindow		La création du compte a échoué
 There are problems with the data you entered:\n\n	UserLoginWindow		Il y a des problèmes dans les données saisies :\n\n
