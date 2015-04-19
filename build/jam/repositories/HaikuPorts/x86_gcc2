@@ -188,8 +188,16 @@ RemotePackageRepository HaikuPorts
 	libart_lgpl_devel-2.3.21-1
 	libassuan-2.1.3-1
 	libassuan_devel-2.1.3-1
+	libcddb-1.3.2-1
+	libcddb_devel-1.3.2-1
+	libcdio-0.93-1
+	libcdio_devel-0.93-1
 	libcuefile-r475-1
 	libcuefile_devel-r475-1
+	libdvbpsi-1.2.0-1
+	libdvbpsi_devel-1.2.0-1
+	libdvdcss-1.3.0-1
+	libdvdcss_devel-1.3.0-1
 	libebml-1.3.1-1
 	libebml_devel-1.3.1-1
 	libedit-2012_06_01_3.0-1
@@ -418,6 +426,8 @@ RemotePackageRepository HaikuPorts
 	unrar-5.2.6-1
 	unzip-6.0-1
 	util_macros-1.19.0-2
+	vcdimager-0.7.24-2
+	vcdimager_devel-0.7.24-2
 	vim-7.4-3
 	virtualbox_guest_additions-4.3.53_svn-1
 	vmware_addons-1.1.1-2
@@ -893,8 +903,12 @@ RemotePackageRepository HaikuPorts
 	libassuan
 	libassuan_x86
 	libattica_x86
+	libcddb
+	libcdio
 	libcuefile
 	libdbusmenu_qt_x86
+	libdvbpsi
+	libdvdcss
 	libebml
 	libedit
 	libelf_x86
@@ -1099,6 +1113,7 @@ RemotePackageRepository HaikuPorts
 	unzip
 	util_macros
 	weather
+	vcdimager
 	vcmi_x86
 	vim
 	vision
