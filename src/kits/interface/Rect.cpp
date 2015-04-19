@@ -332,7 +332,7 @@ OffsetToCopy__5BRectff(BRect* self, float dx, float dy)
 }
 
 
-#elif __GNUC__ == 4
+#elif __GNUC__ >= 4
 // TODO: remove this when new GCC 4 packages have to be built anyway
 
 
@@ -390,4 +390,4 @@ _ZN5BRect12OffsetToCopyEff(BRect* self, float dx, float dy)
 }
 
 
-#endif	// __GNUC__ == 4
+#endif	// __GNUC__ >= 4

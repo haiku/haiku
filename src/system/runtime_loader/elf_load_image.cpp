@@ -552,7 +552,7 @@ load_image(char const* name, image_type type, const char* rpath,
 		#if __GNUC__ == 2
 			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_4)
 				sSearchPathSubDir = "x86";
-		#elif __GNUC__ == 4
+		#elif __GNUC__ >= 4
 			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_2)
 				sSearchPathSubDir = "x86_gcc2";
 		#endif

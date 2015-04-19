@@ -190,7 +190,7 @@ struct reply_data {
 struct command_data {
 	// yes, it's empty ;)
 
-#if __GNUC__ == 4
+#if __GNUC__ >= 4
 	int32 _padding;
 		// GCC 2 and GCC 4 treat empty structures differently
 #endif
