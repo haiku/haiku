@@ -29,6 +29,10 @@
 #include "MetaFormat.h"
 
 
+namespace BPrivate {
+namespace media {
+
+
 //	#pragma mark - ImageLoader
 
 /*!	The ImageLoader class is a convenience class to temporarily load
@@ -556,3 +560,7 @@ AddOnManager::_GetReaders(const BPath& path, entry_ref* outRefs,
 		(*outCount)++;
 	}
 }
+
+
+} // namespace media
+} // namespace BPrivate
