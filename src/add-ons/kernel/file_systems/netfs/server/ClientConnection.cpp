@@ -2506,7 +2506,7 @@ void
 ClientConnection::CloseNodeMonitoringEventQueue()
 {
 	typedef Vector<NodeMonitoringRequest*> RequestVector;
-	const RequestVector* requests;
+	const RequestVector* requests = NULL;
 	if (fNodeMonitoringEvents->Close(false, &requests) == B_OK) {
 		for (RequestVector::ConstIterator it = requests->Begin();
 			 it != requests->End();
