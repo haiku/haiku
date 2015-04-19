@@ -209,6 +209,44 @@ mmu_write_C1(uint32 value)
 }
 
 
+/*
+ * Dump current MMU Control Register state
+ * For debugging, can be added to loader temporarly post-serial-init
+ */
+void
+mmu_dump_C1()
+{
+	uint32 cpValue = mmu_read_C1();
+
+	dprintf("MMU CP15:c1 State:\n");
+
+	if ((cpValue & (1 << 0)) != 0)
+		dprintf(" - MMU Enabled\n");
+	else
+		dprintf(" - MMU Disabled\n");
+
+	if ((cpValue & (1 << 2)) != 0)
+		dprintf(" - Data Cache Enabled\n");
+	else
+		dprintf(" - Data Cache Disabled\n");
+
+	if ((cpValue & (1 << 3)) != 0)
+		dprintf(" - Write Buffer Enabled\n");
+	else
+		dprintf(" - Write Buffer Disabled\n");
+
+	if ((cpValue & (1 << 12)) != 0)
+		dprintf(" - Instruction Cache Enabled\n");
+	else
+		dprintf(" - Instruction Cache Disabled\n");
+
+	if ((cpValue & (1 << 13)) != 0)
+		dprintf(" - Vector Table @ 0xFFFF0000\n");
+	else
+		dprintf(" - Vector Table @ 0x00000000\n");
+}
+
+
 void
 mmu_write_DACR(uint32 value)
 {
