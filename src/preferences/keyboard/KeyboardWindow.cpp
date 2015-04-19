@@ -50,14 +50,15 @@ KeyboardWindow::KeyboardWindow()
 	// Build the layout
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.Add(fSettingsBox)
-		.AddGroup(B_HORIZONTAL, 7)
+		.AddGroup(B_HORIZONTAL)
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
 			.AddGlue()
 		.End()
-		.SetInsets(10, 10, 10, 10)
+		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
+			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	);
 
 	BSlider* slider = (BSlider* )FindView("key_repeat_rate");

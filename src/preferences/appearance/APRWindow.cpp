@@ -67,9 +67,8 @@ APRWindow::APRWindow(BRect frame)
 
 	_UpdateButtons();
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+	AddChild(BGroupLayoutBuilder(B_VERTICAL)
 		.Add(tabView)
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
