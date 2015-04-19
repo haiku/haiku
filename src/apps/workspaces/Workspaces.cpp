@@ -696,7 +696,7 @@ WorkspacesWindow::FrameMoved(BPoint origin)
 void
 WorkspacesWindow::FrameResized(float width, float height)
 {
-	if (!modifiers() & B_SHIFT_KEY) {
+	if (!(modifiers() & B_SHIFT_KEY)) {
 		BWindow::FrameResized(width, height);
 		return;
 	}
