@@ -14,19 +14,23 @@ BootstrapPackageRepository HaikuPortsCross
 	binutils_bootstrap-2.25_2014_12_27-1
 	bison_bootstrap-2.4.3-1
 	coreutils_bootstrap-8.22-1
+	curl_bootstrap-7.40.0-1
+	curl_bootstrap_devel-7.40.0-1
 	expat_bootstrap-2.1.0-1
 	expat_bootstrap_devel-2.1.0-1
+	findutils_bootstrap-4.4.2-1
 	flex_bootstrap-2.5.35-1
-	icu_bootstrap-54.1-1
-	icu_bootstrap_devel-54.1-1
-	grep_bootstrap-2.14-1
 	freetype_bootstrap-2.4.9-1
 	freetype_bootstrap_devel-2.4.9-1
+	mawk_bootstrap-1.3.4-1
+	grep_bootstrap-2.14-1
+	icu_bootstrap-54.1-1
+	icu_bootstrap_devel-54.1-1
 	m4_bootstrap-1.4.16-1
 	make_bootstrap-3.82-1
 	ncurses_bootstrap-5.9-1
 	ncurses_bootstrap_devel-5.9-1
-	python_bootstrap-2.6.8-1
+	python_bootstrap-2.7.6-1
 	sed_bootstrap-4.2.1-1
 	texinfo_bootstrap-4.13a-1
 	zlib_bootstrap-1.2.8-2
@@ -42,14 +46,17 @@ BootstrapPackageRepository HaikuPortsCross
 	binutils_bootstrap
 	bison_bootstrap
 	coreutils_bootstrap
+	curl_bootstrap
 	expat_bootstrap
+	findutils_bootstrap
 	flex_bootstrap
+	freetype_bootstrap
 	icu_bootstrap
 	gcc_bootstrap
 	grep_bootstrap
-	freetype_bootstrap
 	m4_bootstrap
 	make_bootstrap
+	mawk_bootstrap
 	ncurses_bootstrap
 	python_bootstrap
 	sed_bootstrap
