@@ -112,7 +112,7 @@ __sysconf(int name)
 		case _SC_NPROCESSORS_ONLN:
 		{
 			system_info info;
-			int i;
+			unsigned int i;
 			int count = 0;
 			err = get_system_info(&info);
 			if (err < B_OK) {
@@ -375,7 +375,7 @@ size_t
 confstr(int name, char *buffer, size_t length)
 {
 	size_t stringLength = 0;
-	char *string = "";
+	const char *string = "";
 
 	if (!length || !buffer) {
 		__set_errno(EINVAL);
