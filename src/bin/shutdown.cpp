@@ -63,14 +63,8 @@ parseTime(char *arg, char *argv, int32 *_i)
 
 
 void
-usage(const char *arg0)
+usage(const char *program)
 {
-	const char *program = strrchr(arg0, '/');
-	if (program == NULL)
-		program = arg0;
-	else
-		program++;
-
 	fprintf(stderr, "usage: %s [-rqca] [-d time]\n"
 		"\t-r reboot,\n"
 		"\t-q quick shutdown (don't broadcast apps),\n"
@@ -89,11 +83,23 @@ main(int argc, char **argv)
 	bool quick = false;
 	bool async = true;
 
+	const char *program = strrchr(argv[0], '/');
+	if (program == NULL)
+		program = argv[0];
+	else
+		program++;
+
+	// handle 'halt' and 'reboot' symlinks
+	if (!strcmp(program, "reboot"))
+		gReboot = true;
+	if (strcmp(program, "shutdown"))
+		askUser = true;
+
 	for (int32 i = 1; i < argc; i++) {
 		char *arg = argv[i];
 		if (arg[0] == '-') {
 			if (!isalpha(arg[1]))
-				usage(argv[0]);
+				usage(program);
 
 			while (arg && isalpha((++arg)[0])) {
 				switch (arg[0]) {
@@ -144,11 +150,11 @@ main(int argc, char **argv)
 						// supposed to fall through
 
 					default:
-						usage(argv[0]);
+						usage(program);
 				}
 			}
 		} else
-			usage(argv[0]);
+			usage(program);
 	}
 
 	if (gTimeToSleep > 0) {
