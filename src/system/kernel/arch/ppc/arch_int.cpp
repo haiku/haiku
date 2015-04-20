@@ -135,7 +135,8 @@ ppc_exception_entry(int vector, struct iframe *iframe)
 				}
 				Thread *thread = thread_get_current_thread();
 				if (thread && thread->fault_handler != 0) {
-					iframe->srr0 = thread->fault_handler;
+					iframe->srr0 =
+						reinterpret_cast<uintptr_t>(thread->fault_handler);
 					break;
 				}
 
