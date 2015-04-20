@@ -445,10 +445,11 @@ BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 			if (otherTeam >= 0) {
 				BMessenger otherApp(NULL, otherTeam);
 				app_info otherAppInfo;
-				if (__libc_argc > 1
-					&& be_roster->GetRunningAppInfo(otherTeam, &otherAppInfo)
-						== B_OK
-					&& (otherAppInfo.flags & B_ARGV_ONLY) != 0) {
+				bool argvOnly = be_roster->GetRunningAppInfo(otherTeam,
+						&otherAppInfo) == B_OK
+					&& (otherAppInfo.flags & B_ARGV_ONLY) != 0;
+
+				if (__libc_argc > 1 && !argvOnly) {
 					// create an B_ARGV_RECEIVED message
 					BMessage argvMessage(B_ARGV_RECEIVED);
 					fill_argv_message(argvMessage);
@@ -461,7 +462,7 @@ BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 
 					// send the message
 					otherApp.SendMessage(&argvMessage);
-				} else
+				} else if (!argvOnly)
 					otherApp.SendMessage(B_SILENT_RELAUNCH);
 			}
 		} else if (fInitError == B_OK) {
