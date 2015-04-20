@@ -38,6 +38,9 @@
 #define	_PATHS_H_
 
 
+#if defined(_BSD_SOURCE) || defined(_GNU_SOURCE)
+
+
 #include <sys/cdefs.h>
 
 /* Default search path. */
@@ -136,6 +139,9 @@ __END_DECLS
 #undef	_PATH_WALL
 #define	_PATH_WALL	"/rescue/wall"
 #endif /* RESCUE */
+
+
+#endif /* _BSD_SOURCE || _GNU_SOURCE */
 
 
 #endif /* !_PATHS_H_ */
