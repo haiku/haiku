@@ -26,11 +26,10 @@
 #include <string.h>
 
 #include "arch_mailbox.h"
+#include "arch_mmu.h"
 
 
 //XXX
-extern "C" addr_t
-mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags);
 extern "C" bool
 mmu_get_virtual_mapping(addr_t virtualAddress, phys_addr_t *_physicalAddress);
 
@@ -162,8 +161,7 @@ ArchFBArmBCM2835::SetVideoMode(int width, int height, int depth)
 		= BCM283X_BUS_TO_PHYSICAL(sFramebufferConfig.frame_buffer_address);
 	fSize = sFramebufferConfig.screen_size;
 
-	// kDefaultPageFlags?
-	fBase = (addr_t)mmu_map_physical_memory(fPhysicalBase, fSize, 0);
+	fBase = (addr_t)mmu_map_physical_memory(fPhysicalBase, fSize, kDefaultPageFlags);
 
 	dprintf("video framebuffer: va: %p pa: %p\n", (void *)fBase,
 		(void *)fPhysicalBase);
