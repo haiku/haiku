@@ -1523,9 +1523,8 @@ ShowImageWindow::_SaveWidthAndHeight()
 		return;
 
 	BRect bounds = fImageView->Bitmap()->Bounds();
-	int32 width, height;
-	width = bounds.IntegerWidth() + 1;
-	height = bounds.IntegerHeight() + 1;
+	int32 width = bounds.IntegerWidth() + 1;
+	int32 height = bounds.IntegerHeight() + 1;
 
 	BFile file(&fNavigator.CurrentRef(), B_WRITE_ONLY);
 	if (file.InitCheck() != B_OK)
