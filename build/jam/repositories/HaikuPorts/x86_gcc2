@@ -161,8 +161,8 @@ RemotePackageRepository HaikuPorts
 	html_parser-3.71-1
 	hubbub-0.3.0-1
 	hubbub_devel-0.3.0-1
-	icu-54.1-5
-	icu_devel-54.1-5
+	icu-55.1-1
+	icu_devel-55.1-1
 	imagemagick-6.8.9_8-1
 	imagemagick_devel-6.8.9_8-1
 	intltool-0.40.6-4
@@ -196,6 +196,8 @@ RemotePackageRepository HaikuPorts
 	libcdio_devel-0.93-1
 	libcuefile-r475-1
 	libcuefile_devel-r475-1
+	libdca-0.0.5-1
+	libdca_devel-0.0.5-1
 	libdvbpsi-1.2.0-1
 	libdvbpsi_devel-1.2.0-1
 	libdvdcss-1.3.0-1
@@ -561,8 +563,8 @@ RemotePackageRepository HaikuPorts
 	guilib_x86_devel-1.2.1-1
 	haikuwebkit_x86-1.4.10-1
 	haikuwebkit_x86_devel-1.4.10-1
-	icu_x86-54.1-5
-	icu_x86_devel-54.1-5
+	icu_x86-55.1-1
+	icu_x86_devel-55.1-1
 	ilmbase_x86-2.2.0-1
 	ilmbase_x86_devel-2.2.0-1
 	jasper_x86-1.900.1-4
@@ -920,6 +922,7 @@ RemotePackageRepository HaikuPorts
 	libcdio
 	libcuefile
 	libdbusmenu_qt_x86
+	libdca
 	libdvbpsi
 	libdvdcss
 	libdvdnav
