@@ -1526,12 +1526,22 @@ ShowImageWindow::_SaveWidthAndHeight()
 	int32 width = bounds.IntegerWidth() + 1;
 	int32 height = bounds.IntegerHeight() + 1;
 
-	BFile file(&fNavigator.CurrentRef(), B_WRITE_ONLY);
-	if (file.InitCheck() != B_OK)
+	BNode node(&fNavigator.CurrentRef());
+	if (node.InitCheck() != B_OK)
 		return;
 
-	file.WriteAttr("Media:Width", B_INT32_TYPE, 0, &width, sizeof(width));
-	file.WriteAttr("Media:Height", B_INT32_TYPE, 0, &height, sizeof(height));
+	const char* kWidthAttrName = "Media:Width";
+	const char* kHeightAttrName = "Media:Height";
+
+	int32 widthAttr;
+	ssize_t attrSize = node.ReadAttr(kWidthAttrName, B_INT32_TYPE, 0, &widthAttr, sizeof(widthAttr));
+	if (attrSize <= 0 || widthAttr != width)
+		node.WriteAttr(kWidthAttrName, B_INT32_TYPE, 0, &width, sizeof(width));
+
+	int32 heightAttr;
+	attrSize = node.ReadAttr(kHeightAttrName, B_INT32_TYPE, 0, &heightAttr, sizeof(heightAttr));
+	if (attrSize <= 0 || heightAttr != height)
+		node.WriteAttr(kHeightAttrName, B_INT32_TYPE, 0, &height, sizeof(height));
 }
 
 
