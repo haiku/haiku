@@ -108,6 +108,8 @@ private:
 									bool animate = false);
 			void				_SetToolBarBorder(bool visible);
 
+			void				_SaveWidthAndHeight();
+
 private:
 			ImageFileNavigator	fNavigator;
 			BFilePanel*			fSavePanel;

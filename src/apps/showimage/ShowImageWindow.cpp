@@ -647,6 +647,9 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				Show();
 			}
 			_UpdateRatingMenu();
+			// Set width and height attributes of the currently showed file.
+			// This should only be a temporary solution.
+			_SaveWidthAndHeight();
 			break;
 		}
 
@@ -1507,6 +1510,29 @@ ShowImageWindow::_UpdateRatingMenu()
 			break;
 		item->SetMarked(i == rating);
 	}
+}
+
+
+void
+ShowImageWindow::_SaveWidthAndHeight()
+{
+	if (fNavigator.CurrentPage() != 1)
+		return;
+
+	if (fImageView->Bitmap() == NULL)
+		return;
+
+	BRect bounds = fImageView->Bitmap()->Bounds();
+	int32 width, height;
+    width = bounds.IntegerWidth() + 1;
+	height = bounds.IntegerHeight() + 1;
+
+	BFile file(&fNavigator.CurrentRef(), B_WRITE_ONLY);
+	if (file.InitCheck() != B_OK)
+		return;
+
+	file.WriteAttr("Media:Width", B_INT32_TYPE, 0, &width, sizeof(width));
+	file.WriteAttr("Media:Height", B_INT32_TYPE, 0, &height, sizeof(height));
 }
 
 
