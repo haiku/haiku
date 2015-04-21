@@ -9,6 +9,7 @@
 
 #include <LaunchRoster.h>
 
+#include <Application.h>
 #include <String.h>
 
 #include <LaunchDaemonDefs.h>
@@ -40,6 +41,16 @@ BLaunchRoster::InitCheck() const
 
 
 status_t
+BLaunchRoster::GetData(BMessage& data)
+{
+	if (be_app == NULL)
+		return B_BAD_VALUE;
+
+	return GetData(be_app->Signature(), data);
+}
+
+
+status_t
 BLaunchRoster::GetData(const char* signature, BMessage& data)
 {
 	if (signature == NULL || signature[0] == '\0')
@@ -55,9 +66,19 @@ BLaunchRoster::GetData(const char* signature, BMessage& data)
 
 	// evaluate the reply
 	if (status == B_OK)
-		status = data.GetInt32("error", B_OK);
+		status = data.what;
 
 	return status;
+}
+
+
+port_id
+BLaunchRoster::GetPort(const char* name)
+{
+	if (be_app == NULL)
+		return B_BAD_VALUE;
+
+	return GetPort(be_app->Signature(), name);
 }
 
 
@@ -69,12 +90,10 @@ BLaunchRoster::GetPort(const char* signature, const char* name)
 	status_t status = launchRoster.GetData(signature, data);
 	if (status == B_OK) {
 		BString fieldName;
-		if (name == NULL)
-			fieldName = "port";
-		else {
-			fieldName = name;
-			fieldName << "_port";
-		}
+		if (name != NULL)
+			fieldName << name << "_";
+		fieldName << "port";
+
 		port_id port = data.GetInt32(fieldName.String(), B_NAME_NOT_FOUND);
 		if (port >= 0)
 			return port;

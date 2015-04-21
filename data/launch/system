@@ -1,11 +1,9 @@
 service x-vnd.Haiku-registrar {
 	launch /system/servers/registrar
-	create_port
 }
 
 service x-vnd.Haiku-app_server {
 	launch /system/servers/app_server
-	create_port
 }
 
 service x-vnd.Haiku-debug_server {
@@ -14,57 +12,69 @@ service x-vnd.Haiku-debug_server {
 
 service x-vnd.Haiku-package_daemon {
 	launch /system/servers/package_daemon
-	create_port
 }
 
-service x-vnd.Haiku-syslog_daemon {
+service x-vnd.Haiku-SystemLogger {
 	launch /system/servers/syslog_daemon
+	port logger {
+		capacity 256
+	}
 }
 
 service x-vnd.Haiku-mount_server {
 	launch /system/servers/mount_server
+	legacy
 }
 
 service x-vnd.Haiku-media_server {
 	launch /system/servers/media_server
 	no_safemode
+	legacy
 }
 
 service x-vnd.Haiku-midi_server {
 	launch /system/servers/midi_server
 	no_safemode
+	legacy
 }
 
 service x-vnd.Haiku-mail_daemon {
 	launch /system/servers/mail_daemon -E
 	no_safemode
+	legacy
 }
 
 service x-vnd.Haiku-cddb_daemon {
 	launch /system/servers/cddb_daemon
 	no_safemode
+	legacy
 }
 
 service x-vnd.Haiku-print_server {
 	launch /system/servers/print_server
 	no_safemode
+	legacy
 }
 
 service x-vnd.Haiku-notification_server {
 	launch /system/servers/notification_server
 	no_safemode
+	legacy
 }
 
 service x-vnd.Haiku-power_daemon {
 	launch /system/servers/power_daemon
 	no_safemode
+	legacy
 }
 
 # The following will be moved into the user launch data
 service x-vnd.Be-TRAK {
 	launch /system/Tracker
+	legacy
 }
 
 service x-vnd.Be-TSKB {
 	launch /system/Deskbar
+	legacy
 }

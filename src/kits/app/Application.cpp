@@ -531,7 +531,7 @@ DBG(OUT("BApplication::InitData() done\n"));
 port_id
 BApplication::_GetPort(const char* signature)
 {
-	return BLaunchRoster().GetPort(signature);
+	return BLaunchRoster().GetPort(signature, NULL);
 }
 
 

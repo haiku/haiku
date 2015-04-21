@@ -30,11 +30,17 @@ using namespace BPrivate;
 static const char* kLaunchDirectory = "launch";
 
 
+const static settings_template kPortTemplate[] = {
+	{B_STRING_TYPE, "name", NULL, true},
+	{B_INT32_TYPE, "capacity", NULL},
+};
+
 const static settings_template kJobTemplate[] = {
 	{B_STRING_TYPE, "name", NULL, true},
 	{B_BOOL_TYPE, "disabled", NULL},
 	{B_STRING_TYPE, "launch", NULL},
-	{B_BOOL_TYPE, "create_port", NULL},
+	{B_BOOL_TYPE, "legacy", NULL},
+	{B_MESSAGE_TYPE, "port", kPortTemplate},
 	{B_BOOL_TYPE, "no_safemode", NULL},
 	{0, NULL, NULL}
 };
@@ -44,6 +50,9 @@ const static settings_template kSettingsTemplate[] = {
 	{B_MESSAGE_TYPE, "service", kJobTemplate},
 	{0, NULL, NULL}
 };
+
+
+typedef std::map<BString, BMessage> PortMap;
 
 
 class Job {
@@ -59,8 +68,10 @@ public:
 			bool				IsService() const;
 			void				SetService(bool service);
 
-			bool				CreatePort() const;
-			void				SetCreatePort(bool createPort);
+			bool				CreateDefaultPort() const;
+			void				SetCreateDefaultPort(bool createPort);
+
+			void				AddPort(BMessage& data);
 
 			bool				LaunchInSafeMode() const;
 			void				SetLaunchInSafeMode(bool launch);
@@ -73,7 +84,9 @@ public:
 			status_t			InitCheck() const;
 
 			team_id				Team() const;
-			port_id				Port() const;
+
+			const PortMap&		Ports() const;
+			port_id				Port(const char* name = NULL) const;
 
 			status_t			Launch();
 			bool				IsLaunched() const;
@@ -83,9 +96,9 @@ private:
 			BStringList			fArguments;
 			bool				fEnabled;
 			bool				fService;
-			bool				fCreatePort;
+			bool				fCreateDefaultPort;
 			bool				fLaunchInSafeMode;
-			port_id				fPort;
+			PortMap				fPortMap;
 			status_t			fInitStatus;
 			team_id				fTeam;
 };
@@ -141,9 +154,8 @@ Job::Job(const char* name)
 	fName(name),
 	fEnabled(true),
 	fService(false),
-	fCreatePort(false),
+	fCreateDefaultPort(false),
 	fLaunchInSafeMode(true),
-	fPort(-1),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1)
 {
@@ -153,8 +165,12 @@ Job::Job(const char* name)
 
 Job::~Job()
 {
-	if (fPort >= 0)
-		delete_port(fPort);
+	PortMap::const_iterator iterator = Ports().begin();
+	for (; iterator != Ports().end(); iterator++) {
+		port_id port = iterator->second.GetInt32("port", -1);
+		if (port >= 0)
+			delete_port(port);
+	}
 }
 
 
@@ -194,16 +210,24 @@ Job::SetService(bool service)
 
 
 bool
-Job::CreatePort() const
+Job::CreateDefaultPort() const
 {
-	return fCreatePort;
+	return fCreateDefaultPort;
 }
 
 
 void
-Job::SetCreatePort(bool createPort)
+Job::SetCreateDefaultPort(bool createPort)
 {
-	fCreatePort = createPort;
+	fCreateDefaultPort = createPort;
+}
+
+
+void
+Job::AddPort(BMessage& data)
+{
+	const char* name = data.GetString("name");
+	fPortMap.insert(std::pair<BString, BMessage>(BString(name), data));
 }
 
 
@@ -247,11 +271,42 @@ Job::Init()
 {
 	fInitStatus = B_OK;
 
-	if (fCreatePort) {
-		// TODO: prefix system ports with "system:"
-		fPort = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, Name());
-		if (fPort < 0)
-			fInitStatus = fPort;
+	// Create ports
+	// TODO: prefix system ports with "system:"
+
+	bool defaultPort = false;
+
+	for (PortMap::iterator iterator = fPortMap.begin();
+			iterator != fPortMap.end(); iterator++) {
+		BString name(Name());
+		const char* suffix = iterator->second.GetString("name");
+		if (suffix != NULL)
+			name << ':' << suffix;
+		else
+			defaultPort = true;
+
+		const int32 capacity = iterator->second.GetInt32("capacity",
+			B_LOOPER_PORT_DEFAULT_CAPACITY);
+
+		port_id port = create_port(capacity, name.String());
+		if (port < 0) {
+			fInitStatus = port;
+			break;
+		}
+		iterator->second.SetInt32("port", port);
+	}
+
+	if (fInitStatus == B_OK && fCreateDefaultPort && !defaultPort) {
+		BMessage data;
+		data.AddInt32("capacity", B_LOOPER_PORT_DEFAULT_CAPACITY);
+
+		port_id port = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, Name());
+		if (port < 0)
+			fInitStatus = port;
+		else {
+			data.SetInt32("port", port);
+			AddPort(data);
+		}
 	}
 
 	return fInitStatus;
@@ -272,10 +327,21 @@ Job::Team() const
 }
 
 
-port_id
-Job::Port() const
+const PortMap&
+Job::Ports() const
 {
-	return fPort;
+	return fPortMap;
+}
+
+
+port_id
+Job::Port(const char* name) const
+{
+	PortMap::const_iterator found = fPortMap.find(name);
+	if (found != fPortMap.end())
+		return found->second.GetInt32("port", -1);
+
+	return B_NAME_NOT_FOUND;
 }
 
 
@@ -366,18 +432,27 @@ LaunchDaemon::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_GET_LAUNCH_DATA:
 		{
-			BMessage reply;
+			BMessage reply((uint32)B_OK);
 			Job* job = _Job(get_leaf(message->GetString("name")));
 			if (job == NULL) {
-				reply.AddInt32("error", B_NAME_NOT_FOUND);
+				reply.what = B_NAME_NOT_FOUND;
 			} else {
 				// If the job has not been launched yet, we'll pass on our
 				// team here. The rationale behind this is that this team
 				// will temporarily own the synchronous reply ports.
 				reply.AddInt32("team", job->Team() < 0
 					? current_team() : job->Team());
-				if (job->CreatePort())
-					reply.AddInt32("port", job->Port());
+
+				PortMap::const_iterator iterator = job->Ports().begin();
+				for (; iterator != job->Ports().end(); iterator++) {
+					BString name;
+					if (iterator->second.HasString("name"))
+						name << iterator->second.GetString("name") << "_";
+					name << "port";
+
+					reply.AddInt32(name.String(),
+						iterator->second.GetInt32("port", -1));
+				}
 
 				// Launch job now if it isn't running yet
 				if (!job->IsLaunched())
@@ -447,7 +522,7 @@ LaunchDaemon::_ReadFile(const char* context, BEntry& entry)
 		BMessage job;
 		for (int32 index = 0; message.FindMessage("service", index,
 				&job) == B_OK; index++) {
-			_AddJob(false, job);
+			_AddJob(true, job);
 		}
 
 		for (int32 index = 0; message.FindMessage("job", index, &job) == B_OK;
@@ -475,9 +550,15 @@ LaunchDaemon::_AddJob(bool service, BMessage& message)
 
 	job->SetEnabled(!message.GetBool("disabled", !job->IsEnabled()));
 	job->SetService(service);
-	job->SetCreatePort(message.GetBool("create_port", job->CreatePort()));
+	job->SetCreateDefaultPort(!message.GetBool("legacy", !service));
 	job->SetLaunchInSafeMode(
 		!message.GetBool("no_safemode", !job->LaunchInSafeMode()));
+
+	BMessage portMessage;
+	for (int32 index = 0;
+			message.FindMessage("port", index, &portMessage) == B_OK; index++) {
+		job->AddPort(portMessage);
+	}
 
 	const char* argument;
 	for (int32 index = 0;
