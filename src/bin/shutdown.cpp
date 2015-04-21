@@ -51,9 +51,9 @@ parseTime(char *arg, char *argv, int32 *_i)
 	} else
 		return false;
 
-	if (unit[0] == '\0' || !strcmp(unit, "s"))
+	if (unit[0] == '\0' || strcmp(unit, "s") == 0)
 		return true;
-	if (!strcmp(unit, "m")) {
+	if (strcmp(unit, "m") == 0) {
 		gTimeToSleep *= 60;
 		return true;
 	}
@@ -90,9 +90,9 @@ main(int argc, char **argv)
 		program++;
 
 	// handle 'halt' and 'reboot' symlinks
-	if (!strcmp(program, "reboot"))
+	if (strcmp(program, "reboot") == 0)
 		gReboot = true;
-	if (strcmp(program, "shutdown"))
+	if (strcmp(program, "shutdown") != 0)
 		askUser = true;
 
 	for (int32 i = 1; i < argc; i++) {
@@ -134,7 +134,7 @@ main(int argc, char **argv)
 								int32 thread_cookie = 0;
 								while (get_next_thread_info(teamInfo.team,
 										&thread_cookie, &threadInfo) == B_OK) {
-									if (!strcmp(threadInfo.name, "shutdown"))
+									if (strcmp(threadInfo.name, "shutdown") == 0)
 										kill(threadInfo.thread, SIGUSR1);
 								}
 							}
