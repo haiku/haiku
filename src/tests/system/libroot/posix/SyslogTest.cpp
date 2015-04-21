@@ -1,11 +1,8 @@
-/* 
-** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
-*/
+/*
+ * Copyright 2003-2015, Axel Dörfler, axeld@pinc-software.de.
+ * Distributed under the terms of the MIT License.
+ */
 
-
-#include <syslog_daemon.h>
-#include <OS.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -13,15 +10,11 @@
 #include <syslog.h>
 
 
-int 
+int
 main(int argc, char **argv)
 {
-	port_id port = find_port(SYSLOG_PORT_NAME);
-	if (port < B_OK)
-		fprintf(stderr, "The (new) syslog_daemon should be running!\n");
-
 	openlog_team("SyslogTest", LOG_PID, LOG_USER);
-	
+
 	log_team(LOG_ERR, "this is %.", "a test");
 
 	int mask = setlogmask_team(LOG_MASK(LOG_CRIT));

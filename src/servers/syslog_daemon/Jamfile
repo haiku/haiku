@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src servers syslog_daemon ;
 
-UsePrivateHeaders syslog_daemon ;
+UsePrivateHeaders app syslog_daemon ;
+UsePrivateSystemHeaders ;
 
 AddResources syslog_daemon : SyslogDaemon.rdef ;
 

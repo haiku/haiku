@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -98,6 +98,8 @@ static spinlock sSpinlock = B_SPINLOCK_INITIALIZER;
 static int32 sDebuggerOnCPU = -1;
 
 static sem_id sSyslogNotify = -1;
+static thread_id sSyslogWriter = -1;
+static port_id sSyslogPort = -1;
 static struct syslog_message* sSyslogMessage;
 static struct ring_buffer* sSyslogBuffer;
 static size_t sSyslogBufferOffset = 0;
@@ -1188,8 +1190,6 @@ cmd_switch_cpu(int argc, char** argv)
 static status_t
 syslog_sender(void* data)
 {
-	status_t error = B_BAD_PORT_ID;
-	port_id port = -1;
 	bool bufferPending = false;
 	int32 length = 0;
 
@@ -1208,69 +1208,56 @@ syslog_sender(void* data)
 
 		sSyslogMessage->when = real_time_clock();
 
-		if (error == B_BAD_PORT_ID) {
-			// last message couldn't be sent, try to locate the syslog_daemon
-			port = find_port(SYSLOG_PORT_NAME);
-			if (port < 0) {
-				// Don't recheck too quickly, since find_port) is rather
-				// expensive.
-				// TODO: Maybe using the port notification mechanism would be
-				// the better option here. Alternatively, and probably even
-				// better, the syslog daemon could register itself via a syscall
-				// (like the messaging service). We could even wait with
-				// starting this thread before that happened (end exit as soon
-				// as the port is gone).
-				snooze(1000000);
-				continue;
+		if (!bufferPending) {
+			// We need to have exclusive access to our syslog buffer
+			cpu_status state = disable_interrupts();
+			acquire_spinlock(&sSpinlock);
+
+			length = ring_buffer_readable(sSyslogBuffer)
+				- sSyslogBufferOffset;
+			if (length > (int32)SYSLOG_MAX_MESSAGE_LENGTH)
+				length = SYSLOG_MAX_MESSAGE_LENGTH;
+
+			length = ring_buffer_peek(sSyslogBuffer, sSyslogBufferOffset,
+				(uint8*)sSyslogMessage->message, length);
+			sSyslogBufferOffset += length;
+			if (sSyslogDropped) {
+				// Add drop marker - since parts had to be dropped, it's
+				// guaranteed that we have enough space in the buffer now.
+				ring_buffer_write(sSyslogBuffer, (uint8*)"<DROP>", 6);
+				sSyslogDropped = false;
 			}
+
+			release_spinlock(&sSpinlock);
+			restore_interrupts(state);
 		}
 
-		if (port >= B_OK) {
-			if (!bufferPending) {
-				// we need to have exclusive access to our syslog buffer
-				cpu_status state = disable_interrupts();
-				acquire_spinlock(&sSpinlock);
+		if (length == 0) {
+			// The buffer we came here for might have been sent already
+			bufferPending = false;
+			continue;
+		}
 
-				length = ring_buffer_readable(sSyslogBuffer)
-					- sSyslogBufferOffset;
-				if (length > (int32)SYSLOG_MAX_MESSAGE_LENGTH)
-					length = SYSLOG_MAX_MESSAGE_LENGTH;
+		status_t status = write_port_etc(sSyslogPort, SYSLOG_MESSAGE,
+			sSyslogMessage, sizeof(struct syslog_message) + length,
+			B_RELATIVE_TIMEOUT, 0);
+		if (status == B_BAD_PORT_ID) {
+			// The port is gone, there is no need to run anymore
+			sSyslogWriter = -1;
+			return status;
+		}
 
-				length = ring_buffer_peek(sSyslogBuffer, sSyslogBufferOffset,
-					(uint8*)sSyslogMessage->message, length);
-				sSyslogBufferOffset += length;
-				if (sSyslogDropped) {
-					// Add drop marker - since parts had to be dropped, it's
-					// guaranteed that we have enough space in the buffer now.
-					ring_buffer_write(sSyslogBuffer, (uint8*)"<DROP>", 6);
-					sSyslogDropped = false;
-				}
+		if (status != B_OK) {
+			// Sending has failed - just wait, maybe it'll work later.
+			bufferPending = true;
+			continue;
+		}
 
-				release_spinlock(&sSpinlock);
-				restore_interrupts(state);
-			}
-
-			if (length == 0) {
-				// the buffer we came here for might have been sent already
-				bufferPending = false;
-				continue;
-			}
-
-			error = write_port_etc(port, SYSLOG_MESSAGE, sSyslogMessage,
-				sizeof(struct syslog_message) + length, B_RELATIVE_TIMEOUT, 0);
-
-			if (error < B_OK) {
-				// sending has failed - just wait, maybe it'll work later.
-				bufferPending = true;
-				continue;
-			}
-
-			if (bufferPending) {
-				// we could write the last pending buffer, try to read more
-				// from the syslog ring buffer
-				release_sem_etc(sSyslogNotify, 1, B_DO_NOT_RESCHEDULE);
-				bufferPending = false;
-			}
+		if (bufferPending) {
+			// We could write the last pending buffer, try to read more
+			// from the syslog ring buffer
+			release_sem_etc(sSyslogNotify, 1, B_DO_NOT_RESCHEDULE);
+			bufferPending = false;
 		}
 	}
 
@@ -1318,12 +1305,8 @@ syslog_init_post_threads(void)
 		return B_OK;
 
 	sSyslogNotify = create_sem(0, "syslog data");
-	if (sSyslogNotify >= B_OK) {
-		thread_id thread = spawn_kernel_thread(syslog_sender, "syslog sender",
-			B_LOW_PRIORITY, NULL);
-		if (thread >= B_OK && resume_thread(thread) == B_OK)
-			return B_OK;
-	}
+	if (sSyslogNotify >= 0)
+		return B_OK;
 
 	// initializing kernel syslog service failed -- disable it
 
@@ -2275,23 +2258,39 @@ debug_is_debugged_team(team_id teamID)
 
 
 status_t
-_user_kernel_debugger(const char *userMessage)
+_user_kernel_debugger(const char* userMessage)
 {
 	if (geteuid() != 0)
 		return B_NOT_ALLOWED;
 
 	char message[512];
 	strcpy(message, "USER: ");
-	size_t len = strlen(message);
+	size_t length = strlen(message);
 
-	if (userMessage == NULL || !IS_USER_ADDRESS(userMessage)
-		|| 	user_strlcpy(message + len, userMessage, sizeof(message) - len)
-			< 0) {
+	if (userMessage == NULL || !IS_USER_ADDRESS(userMessage) || user_strlcpy(
+			message + length, userMessage, sizeof(message) - length) < 0) {
 		return B_BAD_ADDRESS;
 	}
 
 	kernel_debugger(message);
 	return B_OK;
+}
+
+
+void
+_user_register_syslog_daemon(port_id port)
+{
+	if (geteuid() != 0 || !sSyslogOutputEnabled || sSyslogNotify < 0)
+		return;
+
+	sSyslogPort = port;
+
+	if (sSyslogWriter < 0) {
+		sSyslogWriter = spawn_kernel_thread(syslog_sender, "syslog sender",
+			B_LOW_PRIORITY, NULL);
+		if (sSyslogWriter >= 0)
+			resume_thread(sSyslogWriter);
+	}
 }
 
 

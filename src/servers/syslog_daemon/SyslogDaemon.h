@@ -28,8 +28,9 @@ public:
 
 			void				AddHandler(handler_func function);
 
-			void				Daemon();
-	static	int32				daemon_thread(void* data);
+private:
+			void				_Daemon();
+	static	int32				_DaemonThread(void* data);
 
 private:
 			thread_id			fDaemon;

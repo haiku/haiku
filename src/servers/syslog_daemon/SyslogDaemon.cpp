@@ -16,6 +16,10 @@
 #include <Path.h>
 #include <TextView.h>
 
+#include <LaunchRoster.h>
+#include <syscalls.h>
+#include <syslog_daemon.h>
+
 #include "listener_output.h"
 #include "syslog_output.h"
 
@@ -24,12 +28,9 @@
 #define B_TRANSLATION_CONTEXT "SyslogDaemon"
 
 
-const char* kSignature = "application/x-vnd.Haiku-SystemLogger";
-
-
 SyslogDaemon::SyslogDaemon()
 	:
-	BApplication(kSignature),
+	BApplication(B_SYSTEM_LOGGER_SIGNATURE),
 	fHandlerLock("handler lock")
 {
 }
@@ -38,10 +39,12 @@ SyslogDaemon::SyslogDaemon()
 void
 SyslogDaemon::ReadyToRun()
 {
-	fPort = create_port(256, SYSLOG_PORT_NAME);
-	fDaemon = spawn_thread(daemon_thread, "daemon", B_NORMAL_PRIORITY, this);
+	fPort = BLaunchRoster().GetPort("logger");
+	fDaemon = spawn_thread(_DaemonThread, "daemon", B_NORMAL_PRIORITY, this);
 
-	if (fPort >= B_OK && fDaemon >= B_OK) {
+	if (fPort >= 0 && fDaemon >= 0) {
+		_kern_register_syslog_daemon(fPort);
+
 		init_syslog_output(this);
 		init_listener_output(this);
 
@@ -128,7 +131,7 @@ SyslogDaemon::AddHandler(handler_func function)
 
 
 void
-SyslogDaemon::Daemon()
+SyslogDaemon::_Daemon()
 {
 	char buffer[SYSLOG_MESSAGE_BUFFER_SIZE + 1];
 	syslog_message& message = *(syslog_message*)buffer;
@@ -168,11 +171,14 @@ SyslogDaemon::Daemon()
 
 
 int32
-SyslogDaemon::daemon_thread(void* data)
+SyslogDaemon::_DaemonThread(void* data)
 {
-	((SyslogDaemon*)data)->Daemon();
+	((SyslogDaemon*)data)->_Daemon();
 	return B_OK;
 }
+
+
+// #pragma mark -
 
 
 int

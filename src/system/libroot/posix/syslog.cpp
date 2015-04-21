@@ -1,17 +1,20 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2003-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
-#include <syslog_daemon.h>
-#include <TLS.h>
-
 #include <syslog.h>
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdarg.h>
+
+#include <launch.h>
+#include <syslog_daemon.h>
+#include <TLS.h>
+#include <util/KMessage.h>
 
 
 struct syslog_context {
@@ -28,6 +31,7 @@ static syslog_context sTeamContext = {
 	LOG_CONS
 };
 static int32 sThreadContextSlot = -1;
+static port_id sSystemLoggerPort = -1;
 
 
 static syslog_context *
@@ -102,6 +106,22 @@ message_to_console(syslog_context *context, const char *text, va_list args)
 }
 
 
+/*!	Retrieves the port of the system logger from the launch_daemon.
+*/
+static port_id
+get_system_logger_port()
+{
+	if (sSystemLoggerPort >= 0)
+		return sSystemLoggerPort;
+
+	BPrivate::KMessage data;
+	if (BPrivate::get_launch_data(B_SYSTEM_LOGGER_SIGNATURE, data) == B_OK)
+		sSystemLoggerPort = data.GetInt32("logger_port", -1);
+
+	return sSystemLoggerPort;
+}
+
+
 /*!	Creates the message from the given context and sends it to the syslog
 	daemon, if the priority mask matches.
 	If the message couldn't be delivered, and LOG_CONS was set, it will
@@ -117,7 +137,7 @@ send_syslog_message(syslog_context *context, int priority, const char *text,
 	if ((context->mask & LOG_MASK(SYSLOG_PRIORITY(priority))) == 0)
 		return;
 
-	port_id port = find_port(SYSLOG_PORT_NAME);
+	port_id port = get_system_logger_port();
 	if ((options & LOG_PERROR) != 0
 		|| ((options & LOG_CONS) != 0 && port < B_OK)) {
 		// if asked for, print out the (simplified) message on stderr

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2015, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef SYSLOG_DAEMON_H
@@ -9,7 +9,7 @@
 #include <OS.h>
 
 
-#define SYSLOG_PORT_NAME		"syslog_daemon"
+#define B_SYSTEM_LOGGER_SIGNATURE	"application/x-vnd.Haiku-SystemLogger"
 
 #define SYSLOG_MESSAGE			'_Syl'
 #define SYSLOG_ADD_LISTENER		'aSyl'

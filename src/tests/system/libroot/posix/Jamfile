@@ -1,15 +1,12 @@
 SubDir HAIKU_TOP src tests system libroot posix ;
 
-UsePrivateHeaders libroot syslog_daemon ;
-
-
 # filter warnings about strftime()-formats in locale_test
 TARGET_WARNING_C++FLAGS_$(TARGET_PACKAGING_ARCH)
 	on [ FGristFiles locale_test.o ] += -Wno-format ;
 
 # POSIX/libc tests
 SimpleTest abort_test : abort_test.cpp ;
-SimpleTest SyslogTest : SyslogTest.cpp syslog.cpp ;
+SimpleTest SyslogTest : SyslogTest.cpp ;
 SimpleTest clearenv : clearenv.cpp ;
 SimpleTest dirent_test : dirent_test.cpp ;
 SimpleTest flock_test : flock_test.cpp ;
@@ -71,11 +68,6 @@ SimpleTest test_wcfuncs : test_wcfuncs.c ;
 SimpleTest test_wctype : test_wctype.c ;
 SimpleTest wcs_test : wcs_test.cpp ;
 
-
-# Tell Jam where to find these sources
-SEARCH on [ FGristFiles
-		syslog.cpp
-	] = [ FDirName $(HAIKU_TOP) src system libroot posix ] ;
 
 SubInclude HAIKU_TOP src tests system libroot posix math ;
 SubInclude HAIKU_TOP src tests system libroot posix string ;

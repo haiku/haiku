@@ -6,16 +6,16 @@
 
 #include "syslog_output.h"
 
-#include <FindDirectory.h>
-#include <Path.h>
-#include <driver_settings.h>
-
-#include <syslog.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
 #include <sys/stat.h>
+#include <syslog.h>
+#include <unistd.h>
+
+#include <FindDirectory.h>
+#include <Path.h>
+#include <driver_settings.h>
 
 
 static const char *kFacilities[] = {
