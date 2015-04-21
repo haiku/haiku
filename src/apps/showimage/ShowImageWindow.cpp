@@ -1534,12 +1534,14 @@ ShowImageWindow::_SaveWidthAndHeight()
 	const char* kHeightAttrName = "Media:Height";
 
 	int32 widthAttr;
-	ssize_t attrSize = node.ReadAttr(kWidthAttrName, B_INT32_TYPE, 0, &widthAttr, sizeof(widthAttr));
+	ssize_t attrSize = node.ReadAttr(kWidthAttrName, B_INT32_TYPE, 0,
+		&widthAttr, sizeof(widthAttr));
 	if (attrSize <= 0 || widthAttr != width)
 		node.WriteAttr(kWidthAttrName, B_INT32_TYPE, 0, &width, sizeof(width));
 
 	int32 heightAttr;
-	attrSize = node.ReadAttr(kHeightAttrName, B_INT32_TYPE, 0, &heightAttr, sizeof(heightAttr));
+	attrSize = node.ReadAttr(kHeightAttrName, B_INT32_TYPE, 0,
+		&heightAttr, sizeof(heightAttr));
 	if (attrSize <= 0 || heightAttr != height)
 		node.WriteAttr(kHeightAttrName, B_INT32_TYPE, 0, &height, sizeof(height));
 }
