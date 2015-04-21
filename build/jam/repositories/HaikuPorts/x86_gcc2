@@ -318,8 +318,8 @@ RemotePackageRepository HaikuPorts
 	mpg123_devel-1.22.0-1
 	mtr-0.73-1
 	multitalk-1.4-1
-	mupdf-1.6-4
-	mupdf_devel-1.6-4
+	mupdf-1.7-1
+	mupdf_devel-1.7-1
 	musepack_tools-r475-1
 	musepack_tools_devel-r475-1
 	nano-2.4.0-1
@@ -347,7 +347,7 @@ RemotePackageRepository HaikuPorts
 	patch-2.7.5-1
 	pciutils-3.2.1-1
 	pciutils_devel-3.2.1-1
-	pdftranslator-1.0.1-3
+	pdftranslator-1.0.2-1
 	pe-2.4.5-1
 	pecorename-1.5-3
 	perl-5.18.2-2
@@ -513,7 +513,7 @@ RemotePackageRepository HaikuPorts
 	devil_x86_devel-1.7.8-2
 	djvulibre_x86-3.5.25-1
 	djvulibre_x86_devel-3.5.25-1
-	documentviewer_x86-0.3_git-6
+	documentviewer_x86-0.3_git-7
 	dtc_x86-1.4.1-1
 	expat_x86-2.0.1-7
 	expat_x86_devel-2.0.1-7
@@ -673,8 +673,8 @@ RemotePackageRepository HaikuPorts
 	mpfr_x86_devel-3.1.2-2
 	mpg123_x86-1.22.0-1
 	mpg123_x86_devel-1.22.0-1
-	mupdf_x86-1.6-4
-	mupdf_x86_devel-1.6-4
+	mupdf_x86-1.7-1
+	mupdf_x86_devel-1.7-1
 	muscle_x86-6.00-1
 	musicpc_x86-0.26-1
 	ncurses_x86-5.9-9
