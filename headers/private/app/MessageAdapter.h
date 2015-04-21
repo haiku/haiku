@@ -40,6 +40,9 @@ public:
 	static	status_t			Unflatten(uint32 format, BMessage* into,
 									BDataIO* stream);
 
+	static	status_t			ConvertToKMessage(const BMessage* from,
+									KMessage& to);
+
 private:
 	static	status_t			_ConvertFromKMessage(const KMessage* from,
 									BMessage* to);

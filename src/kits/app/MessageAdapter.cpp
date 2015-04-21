@@ -1,11 +1,13 @@
 /*
- * Copyright 2005-2007, Haiku Inc. All rights reserved.
+ * Copyright 2005-2015, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Lotz <mmlr@mlotz.ch>
  */
+
+
 #include <MessageAdapter.h>
 #include <MessagePrivate.h>
 #include <MessageUtils.h>
@@ -238,6 +240,44 @@ MessageAdapter::Unflatten(uint32 format, BMessage *into, BDataIO *stream)
 
 
 /*static*/ status_t
+MessageAdapter::ConvertToKMessage(const BMessage* from, KMessage& to)
+{
+	if (from == NULL)
+		return B_BAD_VALUE;
+
+	BMessage::Private fromPrivate(const_cast<BMessage*>(from));
+	BMessage::message_header* header = fromPrivate.GetMessageHeader();
+	uint8* data = fromPrivate.GetMessageData();
+
+	// Iterate through the fields and import them in the target message
+	BMessage::field_header* field = fromPrivate.GetMessageFields();
+	for (uint32 i = 0; i < header->field_count; i++, field++) {
+		const char* name = (const char*)data + field->offset;
+		const uint8* fieldData = data + field->offset + field->name_length;
+		bool fixedSize = (field->flags & FIELD_FLAG_FIXED_SIZE) != 0;
+
+		if (fixedSize) {
+			status_t status = to.AddArray(name, field->type, fieldData,
+				field->data_size / field->count, field->count);
+			if (status != B_OK)
+				return status;
+		} else {
+			for (uint32 i = 0; i < field->count; i++) {
+				uint32 itemSize = *(uint32*)fieldData;
+				fieldData += sizeof(uint32);
+				status_t status = to.AddData(name, field->type, fieldData,
+					itemSize, false);
+				if (status != B_OK)
+					return status;
+				fieldData += itemSize;
+			}
+		}
+	}
+	return B_OK;
+}
+
+
+/*static*/ status_t
 MessageAdapter::_ConvertFromKMessage(const KMessage *fromMessage,
 	BMessage *toMessage)
 {
@@ -252,6 +292,10 @@ MessageAdapter::_ConvertFromKMessage(const KMessage *fromMessage,
 	toPrivate.SetTarget(fromMessage->TargetToken());
 	toPrivate.SetReply(B_SYSTEM_TEAM, fromMessage->ReplyPort(),
 		fromMessage->ReplyToken());
+	if (fromMessage->ReplyPort() >= 0) {
+		toPrivate.GetMessageHeader()->flags |= MESSAGE_FLAG_REPLY_AS_KMESSAGE
+			| MESSAGE_FLAG_REPLY_REQUIRED;
+	}
 
 	// Iterate through the fields and import them in the target message
 	KMessageField field;
