@@ -23,7 +23,7 @@
 #include <ControlLook.h>
 #include <FindDirectory.h>
 #include <fs_attr.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MediaFiles.h>
 #include <MenuBar.h>
@@ -312,21 +312,16 @@ HWindow::_InitGUI()
 	playbutton->SetEnabled(false);
 	playbutton->SetExplicitSize(buttonsSize);
 
-	const float kInset = be_control_look->DefaultItemSpacing();
-
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
-		.SetInsets(kInset, kInset, kInset, kInset)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fEventList)
 		.AddGroup(B_HORIZONTAL)
-			.SetInsets(0, 0, 0, 0)
 			.Add(menuField)
 			.AddGroup(B_HORIZONTAL, 0)
 				.Add(playbutton)
 				.Add(stopbutton)
 			.End()
-		.End()
-	);
+		.End();
 
 	// setup file menu
 	_SetupMenuField();
