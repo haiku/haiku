@@ -51,7 +51,7 @@ RemotePackageRepository HaikuPorts
 	bepdf-1.2.0-1
 	bepodder-1.3.0-1
 	bescreencapture-1.9.4-1
-#	bezillabrowser-2.0.0.22pre_2010_05_02-1
+	bezilla-2.0.0.22-1
 	binutils-2.17_2013_04_21-2
 	bison-2.4.3-6
 	blogpositive-0.4.0-2
