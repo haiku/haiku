@@ -16,8 +16,7 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Message.h>
 #include <Screen.h>
@@ -48,18 +47,13 @@ KeyboardWindow::KeyboardWindow()
 	fRevertButton->SetEnabled(false);
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fSettingsBox)
 		.AddGroup(B_HORIZONTAL)
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
-			.AddGlue()
-		.End()
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-	);
+			.AddGlue();
 
 	BSlider* slider = (BSlider* )FindView("key_repeat_rate");
 	if (slider !=NULL)

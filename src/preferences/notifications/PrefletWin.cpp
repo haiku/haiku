@@ -14,8 +14,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <FindDirectory.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Path.h>
 
 #include <notification/Notifications.h>
@@ -48,19 +47,13 @@ PrefletWin::PrefletWin()
 	fApply->SetEnabled(false);
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
-	// Add childs
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fMainView)
 		.AddGroup(B_HORIZONTAL)
 			.Add(fRevert)
 			.AddGlue()
-			.Add(fApply)
-		.End()
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-	);
+			.Add(fApply);
 
 	ReloadSettings();
 

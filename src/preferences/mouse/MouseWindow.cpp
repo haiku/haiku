@@ -11,12 +11,11 @@
 
 #include <Alert.h>
 #include <Application.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <Debug.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Menu.h>
 #include <MenuField.h>
@@ -58,18 +57,13 @@ MouseWindow::MouseWindow(BRect _rect)
 		// buttons and draw the selected imagery
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fSettingsBox)
 		.AddGroup(B_HORIZONTAL)
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
-			.AddGlue()
-		.End()
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-	);
+			.AddGlue();
 
 	// check if the window is on screen
 	BRect rect = BScreen().Frame();
