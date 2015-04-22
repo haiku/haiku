@@ -264,8 +264,8 @@ RemotePackageRepository HaikuPorts
 	libssh2_devel-1.5.0-1
 	libtheora-1.1.1-2
 	libtheora_devel-1.1.1-2
-	libtool-2.4-8
-	libtool_libltdl-2.4-8
+	libtool-2.4.2-1
+	libtool_libltdl-2.4.2-1
 	libusb-1.0.19-2
 	libusb_devel-1.0.19-2
 	libusb_compat-0.1.5-2
@@ -643,6 +643,8 @@ RemotePackageRepository HaikuPorts
 	libsolv_x86_devel-0.3.0_haiku_2014_12_22-1
 	libtheora_x86-1.1.1-2
 	libtheora_x86_devel-1.1.1-2
+	libtool_x86-2.4.2-1
+	libtool_x86_libltdl-2.4.2-1
 	libusb_x86-1.0.18-1
 	libusb_x86_devel-1.0.18-1
 	libuuid_x86-1.0.3-2
@@ -973,6 +975,7 @@ RemotePackageRepository HaikuPorts
 	libssh2
 	libtheora
 	libtool
+	libtool_x86
 	libunistring
 	libusb
 	libusb_x86
