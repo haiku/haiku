@@ -48,16 +48,14 @@ ConfigView::ConfigView(uint32 flags)
 		B_UTF8_COPYRIGHT "1997-2007 Dave Coffin");
 
 	// Build the layout
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
-		.SetInsets(5)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fTitle)
-		.AddGlue()
 		.Add(fVersion)
 		.Add(fCopyright)
 		.AddGlue()
 		.Add(fCopyright2)
-		.Add(fCopyright3)
-		.AddGlue();
+		.Add(fCopyright3);
 
 	BFont font;
 	GetFont(&font);
