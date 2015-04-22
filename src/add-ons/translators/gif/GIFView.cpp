@@ -155,29 +155,21 @@ GIFView::GIFView(TranslatorSettings* settings)
 		}
 	}
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 10.0f)
-		.SetInsets(10.0f)
-		.AddGrid(10.0f, 5.0f)
-			.Add(fTitle, 0, 0)
-			.Add(fVersion, 1, 0)
-			.Add(fCopyright, 0, 1, 2, 1)
-			.End()
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(fTitle)
+		.Add(fVersion)
+		.Add(fCopyright)
 		.AddGlue()
-
 		.AddGrid(10.0f, 5.0f)
 			.Add(fPaletteMF->CreateLabelLayoutItem(), 0, 0)
 			.Add(fPaletteMF->CreateMenuBarLayoutItem(), 1, 0)
-
 			.Add(fColorCountMF->CreateLabelLayoutItem(), 0, 1)
 			.Add(fColorCountMF->CreateMenuBarLayoutItem(), 1, 1)
-
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(10.0f), 1, 2)
 		.End()
-
 		.Add(fDitheringBox)
 		.Add(fInterlacedBox)
 		.Add(fTransparentBox)
-
 		.AddGlue()
 		.End();
 

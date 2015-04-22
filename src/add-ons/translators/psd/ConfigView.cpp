@@ -6,10 +6,9 @@
 #include "ConfigView.h"
 
 #include <Catalog.h>
-#include <ControlLook.h>
+#include <LayoutBuilder.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
-#include <SpaceLayoutItem.h>
 #include <StringView.h>
 
 #include <stdio.h>
@@ -54,16 +53,9 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	fVersionField = new BMenuField("version",
 		B_TRANSLATE("Format: "), versionPopupMenu);
 
-	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
-
-	BStringView *stringView = new BStringView("title",
+	BStringView *titleView = new BStringView("title",
 		B_TRANSLATE("Photoshop image translator"));
-	stringView->SetFont(be_bold_font);
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
-
-	float spacing = be_control_look->DefaultItemSpacing();
-	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
+	titleView->SetFont(be_bold_font);
 
 	char version[256];
 	sprintf(version, B_TRANSLATE("Version %d.%d.%d, %s"),
@@ -71,29 +63,26 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		int(B_TRANSLATION_MINOR_VERSION(PSD_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(PSD_TRANSLATOR_VERSION)),
 		__DATE__);
-	stringView = new BStringView("version", version);
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 
-	stringView = new BStringView("copyright",
+	BStringView *versionView = new BStringView("version", version);
+	BStringView *copyrightView = new BStringView("copyright",
 		B_UTF8_COPYRIGHT "2005-2013 Haiku Inc.");
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
-
-	stringView = new BStringView("my_copyright",
+	BStringView *copyright2View = new BStringView("my_copyright",
 		B_UTF8_COPYRIGHT "2012-2013 Gerasim Troeglazov <3dEyes@gmail.com>");
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 	
-	AddChild(fVersionField);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(titleView)
+		.Add(versionView)
+		.Add(copyrightView)
+		.AddGlue()
+		.Add(fVersionField)
+		.Add(fCompressionField)
+		.AddGlue()
+		.Add(copyright2View);
 
-	AddChild(fCompressionField);
 
-	AddChild(BSpaceLayoutItem::CreateGlue());
-	GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
-
-	SetExplicitPreferredSize(GroupLayout()->MinSize());
+	//SetExplicitPreferredSize(GroupLayout()->MinSize());
 }
 
 

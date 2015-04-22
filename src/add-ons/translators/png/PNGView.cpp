@@ -13,6 +13,7 @@
 
 #include <Alert.h>
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -33,41 +34,20 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 	fSettings = settings;
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	font_height fontHeight;
-	be_bold_font->GetHeight(&fontHeight);
-	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
-
-	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", 
+	BStringView *titleView  = new BStringView("title",
 		B_TRANSLATE("PNG image translator"));
-	stringView->SetFont(be_bold_font);
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	titleView->SetFont(be_bold_font);
 
-	float maxWidth = stringView->Bounds().Width();
-
-	rect.OffsetBy(0, height + 10);
 	char version[256];
 	snprintf(version, sizeof(version), B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(PNG_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(PNG_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(PNG_TRANSLATOR_VERSION)),
 		__DATE__);
-	stringView = new BStringView(rect, "version", version);
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	BStringView *versionView =  new BStringView("version", version);
 
-	if (stringView->Bounds().Width() > maxWidth)
-		maxWidth = stringView->Bounds().Width();
-
-	GetFontHeight(&fontHeight);
-	height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
-
-	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, 
+	BStringView *copyrightView =  new BStringView(
 		"Copyright", B_UTF8_COPYRIGHT "2003-2006 Haiku Inc.");
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
 
 	// setup PNG interlace options
 
@@ -83,37 +63,47 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 		item->SetMarked(true);
 	fInterlaceMenu->AddItem(item);
 
-	rect.OffsetBy(0, stringView->Frame().Height() + 20.0f);
-	BMenuField* menuField = new BMenuField(rect, 
+
+	BMenuField* menuField = new BMenuField(
 		B_TRANSLATE("PNG Interlace Menu"),
 		B_TRANSLATE("Interlacing type:"), fInterlaceMenu);
 	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 7.0f);
 	menuField->ResizeToPreferred();
-	AddChild(menuField);
 
-	rect.OffsetBy(0, height + 15);
-	rect.right = Bounds().right;
-	rect.bottom = Bounds().bottom;
-	fCopyrightView = new BTextView(rect, "PNG copyright", 
-		rect.OffsetToCopy(B_ORIGIN),
-		B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS);
+
+
+	fCopyrightView = new BTextView("PNG copyright");
 	fCopyrightView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	fCopyrightView->SetLowColor(fCopyrightView->ViewColor());
 	fCopyrightView->MakeEditable(false);
+	fCopyrightView->SetWordWrap(false);
+	fCopyrightView->MakeResizable(true);
 	fCopyrightView->SetText(png_get_copyright(NULL));
 
 	BFont font;
-	font.SetSize(font.Size() * 0.8);
-	fCopyrightView->SetFontAndColor(&font, B_FONT_SIZE, NULL);
-	AddChild(fCopyrightView);
+	//font.SetSize(font.Size() * 0.8);
+	//fCopyrightView->SetFontAndColor(&font, B_FONT_SIZE, NULL);
 
-	if (maxWidth + 20 > Bounds().Width())
-		ResizeTo(maxWidth + 20, Bounds().Height());
-	if (Bounds().Height() < rect.top + stringView->Bounds().Height() 
-		* 3.0f + 8.0f)
-		ResizeTo(Bounds().Width(), rect.top + height * 3.0f + 8.0f);
 
-	fCopyrightView->SetTextRect(fCopyrightView->Bounds());
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(titleView)
+		.Add(versionView)
+		.Add(copyrightView)
+		.AddGlue()
+		.Add(menuField)
+		.AddGlue()
+		.Add(fCopyrightView);
+
+	GetFont(&font);
+	SetExplicitPreferredSize(BSize((font.Size() * 390) / 12,
+		(font.Size() * 180) / 12));
+
+	// TODO: remove this workaround for ticket #4217
+	fCopyrightView->SetExplicitPreferredSize(
+		BSize(fCopyrightView->LineWidth(4), fCopyrightView->TextHeight(0, 80)));
+	fCopyrightView->SetExplicitMaxSize(fCopyrightView->ExplicitPreferredSize());
+	fCopyrightView->SetExplicitMinSize(fCopyrightView->ExplicitPreferredSize());
 }
 
 

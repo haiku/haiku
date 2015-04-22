@@ -62,12 +62,12 @@ HVIFView::HVIFView(const char* name, uint32 flags, TranslatorSettings *settings)
 		new BMessage(HVIF_SETTING_RENDER_SIZE_CHANGED));
 	fRenderSize->SetExplicitAlignment(labelAlignment);
 
-	float padding = 5.0f;
-	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
-		.SetInsets(padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(title)
 		.Add(version)
 		.Add(copyright)
+		.AddGlue()
 		.Add(fRenderSize)
 		.AddGlue();
 

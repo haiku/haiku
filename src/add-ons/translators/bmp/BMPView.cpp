@@ -40,8 +40,8 @@ BMPView::BMPView(const BRect &frame, const char *name, uint32 resizeMode,
 		int(B_TRANSLATION_MINOR_VERSION(BMP_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(BMP_TRANSLATOR_VERSION)),
 		__DATE__);
-	BStringView *versionView  = new BStringView("version", version);
-	BStringView *copyrightView  = new BStringView("Copyright", B_UTF8_COPYRIGHT "2002-2010 Haiku Inc.");
+	BStringView *versionView = new BStringView("version", version);
+	BStringView *copyrightView = new BStringView("Copyright", B_UTF8_COPYRIGHT "2002-2010 Haiku Inc.");
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(B_USE_DEFAULT_SPACING)
