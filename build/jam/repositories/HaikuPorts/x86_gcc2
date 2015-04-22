@@ -301,6 +301,7 @@ RemotePackageRepository HaikuPorts
 	lzo-2.09-1
 	lzo_devel-2.09-1
 	m4-1.4.16-5
+	mailnews-2.0.0.25-1
 	make-3.82-5
 	man-1.6g-4
 	mc-4.8.13-1
