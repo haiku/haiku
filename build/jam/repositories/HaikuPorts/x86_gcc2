@@ -256,8 +256,8 @@ RemotePackageRepository HaikuPorts
 	libsdl2_devel-2.0.3-2
 	libsigc++-1.2.7-1
 	libsigc++_devel-1.2.7-1
-	libsndfile-1.0.25-2
-	libsndfile_devel-1.0.25-2
+	libsndfile-1.0.25-3
+	libsndfile_devel-1.0.25-3
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
 	libssh2-1.5.0-1
@@ -384,6 +384,8 @@ RemotePackageRepository HaikuPorts
 	rsync-3.1.0-1
 	ruby-1.9.1-2
 	ruby_devel-1.9.1-2
+	samba-3.6.25-1
+	samba_devel-3.6.25-1
 	scons-2.3.1-4
 	sdl_gfx-2.0.24-1
 	sdl_gfx_devel-2.0.24-1
@@ -436,6 +438,8 @@ RemotePackageRepository HaikuPorts
 	tiff_tools-3.9.6-2
 	tinyxml-2.6.2-1
 	tinyxml_devel-2.6.2-1
+	twolame-0.3.13-1
+	twolame_devel-0.3.13-1
 	ubertuber-0.9.10-3
 	unrar-5.2.6-1
 	unzip-6.0-1
@@ -1134,6 +1138,7 @@ RemotePackageRepository HaikuPorts
 	tig_x86
 	tinyxml
 	transmission_x86
+	twolame
 	ubertuber
 	unrar
 	unzip
