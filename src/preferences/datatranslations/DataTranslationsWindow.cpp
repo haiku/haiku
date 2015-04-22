@@ -103,6 +103,8 @@ DataTranslationsWindow::_PopulateListView()
 		maxWidth = std::max(maxWidth, fTranslatorListView->StringWidth(name));
 	}
 
+	fTranslatorListView->SortItems();
+
 	fTranslatorListView->SetExplicitSize(BSize(maxWidth + 20, B_SIZE_UNSET));
 
 	delete[] translators;
