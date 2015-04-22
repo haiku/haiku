@@ -21,7 +21,6 @@
 #include <PopUpMenu.h>
 #include <Slider.h>
 #include <StringView.h>
-#include <TextView.h>
 
 #include "webp/encode.h"
 
@@ -63,23 +62,22 @@ ConfigView::ConfigView(TranslatorSettings* settings)
 	title->SetFont(be_bold_font);
 
 	char versionString[256];
-	sprintf(versionString, "v%d.%d.%d",
+	sprintf(versionString, "v%d.%d.%d, %s",
 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(WEBP_TRANSLATOR_VERSION)),
 		static_cast<int>(B_TRANSLATION_MINOR_VERSION(WEBP_TRANSLATOR_VERSION)),
 		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
-			WEBP_TRANSLATOR_VERSION)));
+			WEBP_TRANSLATOR_VERSION)),
+		__DATE__);
 
 	BStringView* version = new BStringView("version", versionString);
 
 	BString copyrightsText;
-	copyrightsText << B_TRANSLATE(B_UTF8_COPYRIGHT "2010-2011 Haiku Inc.")
-		<< "\n" << B_TRANSLATE("Based on libwebp v0.1,"	)
-		<< "\n" << B_TRANSLATE(B_UTF8_COPYRIGHT "2010-2011 Google Inc.");
-
-	BTextView* copyrights = new BTextView("copyrights");
-	copyrights->SetText(copyrightsText);
-	copyrights->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	copyrights->MakeEditable(false);
+	BStringView *copyrightView = new BStringView("Copyright",
+		B_TRANSLATE(B_UTF8_COPYRIGHT "2010-2011 Haiku Inc."));
+	BStringView *copyright2View = new BStringView("Copyright2",
+		B_TRANSLATE("Based on libwebp v0.1,"));
+	BStringView *copyright3View = new BStringView("Copyright3",
+		B_TRANSLATE(B_UTF8_COPYRIGHT "2010-2011 Google Inc."));
 
 	// output parameters
 
@@ -120,21 +118,23 @@ ConfigView::ConfigView(TranslatorSettings* settings)
 		fPreprocessingCheckBox->SetValue(B_CONTROL_ON);
 
 	// Build the layout
-	BLayoutBuilder::Group<> builder(GroupLayout());
-	builder
-		.SetInsets(5)
-		.AddGroup(B_HORIZONTAL)
-			.Add(title)
-			.Add(version)
-			.AddGlue()
-		.End()
-		.Add(copyrights)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(title)
+		.Add(version)
+		.Add(copyrightView)
 		.AddGlue()
-
 		.Add(presetsField)
 		.Add(fQualitySlider)
 		.Add(fMethodSlider)
-		.Add(fPreprocessingCheckBox);
+		.Add(fPreprocessingCheckBox)
+		.AddGlue()
+		.Add(copyright2View)
+		.Add(copyright3View);
+
+	BFont font;
+	GetFont(&font);
+	SetExplicitPreferredSize(BSize((font.Size() * 1433)/12, (font.Size() * 200)/12));
 
 }
 

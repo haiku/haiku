@@ -12,10 +12,12 @@
 #include <string.h>
 
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <MenuBar.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
+#include <StringView.h>
 #include <Window.h>
 
 #include "WonderBrushImage.h"
@@ -27,7 +29,7 @@
 
 
 const char* kAuthor = "Stephan Aßmus, <superstippi@gmx.de>";
-const char* kWBICopyright = "Copyright " B_UTF8_COPYRIGHT " 2006 Haiku Inc.";
+const char* kWBICopyright = B_UTF8_COPYRIGHT " 2006 Haiku Inc.";
 
 
 void
@@ -50,9 +52,31 @@ WonderBrushView::WonderBrushView(const BRect &frame, const char *name,
 		fSettings(settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ViewColor());
 
-	ResizeToPreferred();
+	BStringView *titleView = new BStringView("title",
+		B_TRANSLATE("WonderBrush image translator"));
+	titleView->SetFont(be_bold_font);
+
+	char version[100];
+	sprintf(version, B_TRANSLATE("Version %d.%d.%d, %s"),
+		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(WBI_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_MINOR_VERSION(WBI_TRANSLATOR_VERSION)),
+		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
+			WBI_TRANSLATOR_VERSION)), __DATE__);
+
+	BStringView *versionView  = new BStringView("version", version);
+	BStringView *copyrightView  = new BStringView("copyright", kWBICopyright);
+	BStringView *copyright2View  = new BStringView("copyright2", B_TRANSLATE("written by:"));
+	BStringView *copyright3View  = new BStringView("copyright3", kAuthor);
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(titleView)
+		.Add(versionView)
+		.Add(copyrightView)
+		.AddGlue()
+		.Add(copyright2View)
+		.Add(copyright3View);
 }
 
 
@@ -110,49 +134,6 @@ WonderBrushView::AttachedToWindow()
 		}
 	}
 }
-
-
-void
-WonderBrushView::Draw(BRect area)
-{
-	SetFont(be_bold_font);
-	font_height fh;
-	GetFontHeight(&fh);
-	float xbold = fh.descent + 1;
-	float ybold = fh.ascent + fh.descent * 2 + fh.leading;
-
-	BPoint offset(xbold, ybold);
-
-	const char* text = B_TRANSLATE("WonderBrush image translator");
-	DrawString(text, offset);
-
-	SetFont(be_plain_font);
-	font_height plainh;
-	GetFontHeight(&plainh);
-	float yplain = plainh.ascent + plainh.descent * 2 + plainh.leading;
-
-	offset.y += yplain;
-
-	char detail[100];
-	sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"),
-		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(WBI_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_MINOR_VERSION(WBI_TRANSLATOR_VERSION)),
-		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
-			WBI_TRANSLATOR_VERSION)), __DATE__);
-	DrawString(detail, offset);
-
-	offset.y += 2 * ybold;
-
-	text = B_TRANSLATE("written by:");
-	DrawString(text, offset);
-	offset.y += ybold;
-
-	DrawString(kAuthor, offset);
-	offset.y += 2 * ybold;
-
-	DrawString(kWBICopyright, offset);
-}
-
 
 void
 WonderBrushView::GetPreferredSize(float* width, float* height)

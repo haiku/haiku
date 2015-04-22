@@ -83,7 +83,7 @@ TIFFView::TIFFView(const char* name, uint32 flags,
 	fTitle->SetFont(be_bold_font);
 
 	char detail[100];
-	sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"),
+	sprintf(detail, B_TRANSLATE("Version %d.%d.%d, %s"),
 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(TIFF_TRANSLATOR_VERSION)),
 		static_cast<int>(B_TRANSLATION_MINOR_VERSION(TIFF_TRANSLATOR_VERSION)),
 		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
@@ -123,8 +123,8 @@ TIFFView::TIFFView(const char* name, uint32 flags,
 	fCompressionMF = new BMenuField(B_TRANSLATE("Use compression:"), menu);
 
 	// Build the layout
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
-		.SetInsets(5)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fTitle)
 		.Add(fDetail)
 		.AddGlue()
@@ -136,11 +136,10 @@ TIFFView::TIFFView(const char* name, uint32 flags,
 		.Add(fLibTIFF[0])
 		.Add(fLibTIFF[1])
 		.Add(fLibTIFF[2])
-		.Add(fLibTIFF[3])
+		.Add(fLibTIFF[3]);
 			// Theses 4 adding above work because we know there are 4 strings
 			// but it's fragile: one string less in the library version and the
 			// application breaks
-		.AddGlue();
 
 	BFont font;
 	GetFont(&font);
