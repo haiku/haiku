@@ -305,6 +305,7 @@ RemotePackageRepository HaikuPorts
 	make-3.82-5
 	man-1.6g-4
 	mc-4.8.13-1
+	mda_vst-20100214-1
 	mercurial-2.9.2-1
 	mesa-7.9.2-10
 	mesa_devel-7.9.2-10
