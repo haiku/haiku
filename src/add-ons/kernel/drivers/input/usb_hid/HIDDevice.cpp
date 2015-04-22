@@ -247,6 +247,9 @@ status_t
 HIDDevice::Close(ProtocolHandler *handler)
 {
 	atomic_add(&fOpenCount, -1);
+	gUSBModule->cancel_queued_transfers(fInterruptPipe);
+		// This will wake up any listeners. Whether they should close or retry
+		// is handeled internally by the handlers.
 	return B_OK;
 }
 

@@ -337,6 +337,9 @@ JoystickProtocolHandler::_Update()
 			return B_DEV_NOT_READY;
 		}
 
+		if (result == B_CANCELED)
+			return B_CANCELED;
+
 		if (result != B_INTERRUPTED) {
 			// interrupts happen when other reports come in on the same
 			// input as ours

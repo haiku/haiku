@@ -39,7 +39,7 @@ public:
 private:
 			void				_WriteKey(uint32 key, bool down);
 			status_t			_SetLEDs(uint8 *data);
-			status_t			_ReadReport(bigtime_t timeout);
+			status_t			_ReadReport(bigtime_t timeout, uint32 *cookie);
 
 private:
 			mutex				fLock;

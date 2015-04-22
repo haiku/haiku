@@ -340,7 +340,7 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 
 				bigtime_t enterTime = system_time();
 				while (RingBufferReadable() == 0) {
-					status_t result = _ReadReport(fCurrentRepeatDelay);
+					status_t result = _ReadReport(fCurrentRepeatDelay, cookie);
 					if (result != B_OK && result != B_TIMED_OUT)
 						return result;
 
@@ -459,7 +459,7 @@ KeyboardProtocolHandler::_SetLEDs(uint8 *data)
 
 
 status_t
-KeyboardProtocolHandler::_ReadReport(bigtime_t timeout)
+KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 {
 	status_t result = fInputReport.WaitForReport(timeout);
 	if (result != B_OK) {
@@ -467,6 +467,9 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout)
 			TRACE("device has been removed\n");
 			return B_ERROR;
 		}
+
+		if ((*cookie & PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED) != 0)
+			return B_CANCELED;
 
 		if (result != B_TIMED_OUT && result != B_INTERRUPTED) {
 			// we expect timeouts as we do repeat key handling this way,

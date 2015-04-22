@@ -9,6 +9,9 @@
 #include <SupportDefs.h>
 
 
+#define PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED		0x80000000
+
+
 class HIDDevice;
 class HIDReport;
 
