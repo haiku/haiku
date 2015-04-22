@@ -27,6 +27,10 @@ extern "C" void _start(uint32 _unused1, uint32 _unused2,
 	void *openFirmwareEntry);
 extern "C" void start(void *openFirmwareEntry);
 
+// XCOFF "entry-point" is actually a pointer to the real code
+extern "C" void *_coff_start;
+void *_coff_start = (void *)&_start;
+
 // GCC defined globals
 extern void (*__ctor_list)(void);
 extern void (*__ctor_end)(void);
