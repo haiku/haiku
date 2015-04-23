@@ -28,8 +28,8 @@
 #define RIGHT_ALT_KEY	0x40
 #define ALT_KEYS		(LEFT_ALT_KEY | RIGHT_ALT_KEY)
 
-#define KEYBOARD_FLAG_READER	0x01
-#define KEYBOARD_FLAG_DEBUGGER	0x02
+#define KEYBOARD_HANDLER_COOKIE_FLAG_READER		0x01
+#define KEYBOARD_HANDLER_COOKIE_FLAG_DEBUGGER	0x02
 
 
 static bool sDebugKeyboardFound = false;
@@ -311,9 +311,9 @@ KeyboardProtocolHandler::Open(uint32 flags, uint32 *cookie)
 status_t
 KeyboardProtocolHandler::Close(uint32 *cookie)
 {
-	if ((*cookie & KEYBOARD_FLAG_DEBUGGER) != 0)
+	if ((*cookie & KEYBOARD_HANDLER_COOKIE_FLAG_DEBUGGER) != 0)
 		fHasDebugReader = false;
-	if ((*cookie & KEYBOARD_FLAG_READER) != 0)
+	if ((*cookie & KEYBOARD_HANDLER_COOKIE_FLAG_READER) != 0)
 		atomic_and(&fHasReader, 0);
 
 	return ProtocolHandler::Close(cookie);
@@ -332,7 +332,7 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 					return B_BUSY;
 
 				// We're the first, so we become the only reader
-				*cookie = KEYBOARD_FLAG_READER;
+				*cookie = KEYBOARD_HANDLER_COOKIE_FLAG_READER;
 			}
 
 			while (true) {
@@ -360,7 +360,8 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 					}
 				}
 
-				if (fHasDebugReader && (*cookie & KEYBOARD_FLAG_DEBUGGER)
+				if (fHasDebugReader
+					&& (*cookie & KEYBOARD_HANDLER_COOKIE_FLAG_DEBUGGER)
 						== 0) {
 					// Handover buffer to the debugger instead
 					locker.Unlock();
@@ -420,7 +421,7 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 			if (fHasDebugReader)
 				return B_BUSY;
 
-			*cookie |= KEYBOARD_FLAG_DEBUGGER;
+			*cookie |= KEYBOARD_HANDLER_COOKIE_FLAG_DEBUGGER;
 			fHasDebugReader = true;
 			return B_OK;
 	}
