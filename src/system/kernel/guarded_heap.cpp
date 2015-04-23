@@ -13,6 +13,7 @@
 #include <heap.h>
 #include <malloc.h>
 #include <slab/Slab.h>
+#include <team.h>
 #include <tracing.h>
 #include <util/list.h>
 #include <util/AutoLock.h>
@@ -37,6 +38,7 @@ struct guarded_heap_page {
 	size_t				allocation_size;
 	void*				allocation_base;
 	size_t				alignment;
+	team_id				team;
 	thread_id			thread;
 #if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
 	size_t				stack_trace_depth;
@@ -178,6 +180,7 @@ guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 		guarded_heap_page& page = area.pages[startPageIndex + i];
 		page.flags = GUARDED_HEAP_PAGE_FLAG_USED;
 		if (i == 0) {
+			page.team = (gKernelStartup ? 0 : team_get_current_team_id());
 			page.thread = find_thread(NULL);
 #if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
 			page.stack_trace_depth = arch_debug_get_stack_trace(
@@ -190,6 +193,7 @@ guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 			page.flags |= GUARDED_HEAP_PAGE_FLAG_FIRST;
 			firstPage = &page;
 		} else {
+			page.team = firstPage->team;
 			page.thread = firstPage->thread;
 #if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
 			page.stack_trace_depth = 0;
@@ -232,6 +236,7 @@ guarded_heap_free_page(guarded_heap_area& area, size_t pageIndex,
 #endif
 
 	page.allocation_size = 0;
+	page.team = (gKernelStartup ? 0 : team_get_current_team_id());
 	page.thread = find_thread(NULL);
 
 #if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
@@ -619,6 +624,7 @@ dump_guarded_heap_page(int argc, char** argv)
 	kprintf("allocation size: %" B_PRIuSIZE "\n", page.allocation_size);
 	kprintf("allocation base: %p\n", page.allocation_base);
 	kprintf("alignment: %" B_PRIuSIZE "\n", page.alignment);
+	kprintf("allocating team: %" B_PRId32 "\n", page.team);
 	kprintf("allocating thread: %" B_PRId32 "\n", page.thread);
 
 #if GUARDED_HEAP_STACK_TRACE_DEPTH > 0
