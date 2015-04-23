@@ -350,8 +350,8 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 					if (RingBufferReadable() == 0 && fCurrentRepeatKey != 0
 						&& system_time() - enterTime > fCurrentRepeatDelay) {
 						// this case is for handling key repeats, it means no
-						// interrupt transfer has happened or it didn't produce any
-						// new key events, but a repeated key down is due
+						// interrupt transfer has happened or it didn't produce
+						// any new key events, but a repeated key down is due
 						_WriteKey(fCurrentRepeatKey, true);
 
 						// the next timeout is reduced to the repeat_rate

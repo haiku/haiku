@@ -277,8 +277,8 @@ HIDDevice::MaybeScheduleTransfer()
 	status_t result = gUSBModule->queue_interrupt(fInterruptPipe,
 		fTransferBuffer, fTransferBufferSize, _TransferCallback, this);
 	if (result != B_OK) {
-		TRACE_ALWAYS("failed to schedule interrupt transfer 0x%08" B_PRIx32 "\n",
-			result);
+		TRACE_ALWAYS("failed to schedule interrupt transfer 0x%08" B_PRIx32
+			"\n", result);
 		return result;
 	}
 
@@ -335,10 +335,12 @@ HIDDevice::_TransferCallback(void *cookie, status_t status, void *data,
 	if (status == B_DEV_STALLED && !device->fRemoved) {
 		// try clearing stalls right away, the report listeners will resubmit
 		gUSBModule->queue_request(device->fDevice,
-			USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT, USB_REQUEST_CLEAR_FEATURE,
-			USB_FEATURE_ENDPOINT_HALT, device->fEndpointAddress, 0, NULL, _UnstallCallback, device);
+			USB_REQTYPE_STANDARD | USB_REQTYPE_ENDPOINT_OUT,
+			USB_REQUEST_CLEAR_FEATURE, USB_FEATURE_ENDPOINT_HALT,
+			device->fEndpointAddress, 0, NULL, _UnstallCallback, device);
 		return;
 	}
+
 	atomic_set(&device->fTransferScheduled, 0);
 	device->fParser.SetReport(status, device->fTransferBuffer, actualLength);
 }
