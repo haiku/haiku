@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.04.14
-#	Date:    2015-04-14 03:15:01
+#	Version: 2015.04.21
+#	Date:    2015-04-21 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -17394,6 +17394,13 @@
 	d200  PIXCI(R) D2X Digital Video Capture Board [custom QL5232]
 	d300  PIXCI(R) D3X Digital Video Capture Board [custom QL5232]
 	eb01  PIXCI(R) EB1 PCI Camera Link Video Capture Board
+# Gidel Reconfigurable Computing
+165c  Gidel Ltd.
+	5f01  ProceV_A3
+	5f11  ProceV_A7
+	5f21  ProceV_AB
+	5f31  ProceV_D5
+	5f41  ProceV_D8
 165d  Hsing Tech. Enterprise Co., Ltd.
 165f  Linux Media Labs, LLC
 	1020  LMLM4 MPEG-4 encoder
@@ -17917,7 +17924,9 @@
 	0011  SIS1100-e single link
 	0012  SIS1100-e quad link
 	0015  SIS8100 [Gigabit link, MicroTCA]
-1797  Techwell Inc.
+# nee Techwell, Inc.
+1797  Intersil Techwell
+	5864  TW5864 multimedia video controller
 	6801  TW6802 multimedia video card
 	6802  TW6802 multimedia other device
 	6810  TW6816 multimedia video controller
@@ -21450,6 +21459,8 @@
 		8086 0006  Ethernet 10G 2P X710 Adapter
 		8086 0007  Ethernet Converged Network Adapter X710-2
 		8086 0008  Ethernet Converged Network Adapter X710-2
+		8086 0009  Ethernet Controller X710 for 10GbE SFP+
+		8086 000a  Ethernet Controller X710 for 10GbE SFP+
 		8086 000d  Ethernet Controller X710 for 10GbE SFP+
 		8086 4005  Ethernet Controller XL710 for 10 Gigabit SFP+
 		8086 4006  Ethernet Controller X710 for 10GbE SFP+
@@ -23499,6 +23510,7 @@
 	2822  SATA Controller [RAID mode]
 		1028 020d  Inspiron 530
 		103c 2a6f  Asus IPIBL-LB Motherboard
+		1043 8277  P5K PRO Motherboard
 	2823  C610/X99 series chipset sSATA Controller [RAID mode]
 	2824  82801HB (ICH8) 4 port SATA Controller [AHCI mode]
 		1043 81ec  P5B
@@ -23728,6 +23740,7 @@
 		1028 0237  PowerEdge T610 SATA IDE Controller
 		1462 7360  G33/P35 Neo
 	2922  82801IR/IO/IH (ICH9R/DO/DH) 6 port SATA Controller [AHCI mode]
+		1043 8277  P5K PRO Motherboard
 		1af4 1100  QEMU Virtual Machine
 		8086 5044  Desktop Board DP35DP
 	2923  82801IB (ICH9) 4 port SATA Controller [AHCI mode]
@@ -26581,6 +26594,8 @@ bdbd  Blackmagic Design
 	a12f  DeckLink Mini Monitor
 	a130  DeckLink Mini Recorder
 	a132  UltraStudio 4K
+	a136  DeckLink 4K Extreme 12G
+	a137  DeckLink Studio 4K
 	a138  Decklink SDI 4K
 	a139  Intensity Pro 4K
 c001  TSI Telsys
