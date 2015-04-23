@@ -172,6 +172,7 @@ private:
 			BList*			fCommonFilters;
 			bool			fTerminating;
 			bool			fRunCalled;
+			bool			fOwnsPort;
 			uint32			_reserved[11];
 };
 

@@ -267,6 +267,8 @@ BApplication::BApplication(const char* signature, const char* looperName,
 		looperName != NULL ? looperName : kDefaultLooperName)
 {
 	_InitData(signature, initGUI, _error);
+	if (port < 0)
+		fOwnsPort = false;
 }
 
 

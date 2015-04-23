@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc. All rights reserved
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -130,7 +130,7 @@ BLooper::~BLooper()
 	}
 
 	// Close the message port and read and reply to the remaining messages.
-	if (fMsgPort >= 0)
+	if (fMsgPort >= 0 && fOwnsPort)
 		close_port(fMsgPort);
 
 	// Clear the queue so our call to IsMessageWaiting() below doesn't give
@@ -143,13 +143,15 @@ BLooper::~BLooper()
 			// msg will automagically post generic reply
 	}
 
-	do {
-		delete ReadMessageFromPort(0);
-			// msg will automagically post generic reply
-	} while (IsMessageWaiting());
+	if (!fOwnsPort) {
+		do {
+			delete ReadMessageFromPort(0);
+				// msg will automagically post generic reply
+		} while (IsMessageWaiting());
 
+		delete_port(fMsgPort);
+	}
 	fDirectTarget->Release();
-	delete_port(fMsgPort);
 
 	// Clean up our filters
 	SetCommonFilterList(NULL);
@@ -945,6 +947,7 @@ BLooper::_InitData(const char* name, int32 priority, port_id port,
 	fPreferred = NULL;
 	fThread = B_ERROR;
 	fTerminating = false;
+	fOwnsPort = true;
 	fMsgPort = -1;
 	fAtomicCount = 0;
 
