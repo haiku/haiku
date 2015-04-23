@@ -480,30 +480,30 @@ RemotePackageRepository HaikuPorts
 	beshare_x86-4-1
 	binutils_x86-2.25_2014_12_27-1
 	bison_x86-2.5-1
-	boost_x86-1.55.0-5
-	boost_x86_atomic-1.55.0-5
-	boost_x86_chrono-1.55.0-5
-	boost_x86_context-1.55.0-5
-	boost_x86_coroutine-1.55.0-5
-	boost_x86_date_time-1.55.0-5
-	boost_x86_devel-1.55.0-5
-	boost_x86_filesystem-1.55.0-5
-	boost_x86_graph-1.55.0-5
-	boost_x86_iostreams-1.55.0-5
-	boost_x86_locale-1.55.0-5
-	boost_x86_log-1.55.0-5
-	boost_x86_math-1.55.0-5
-	boost_x86_program_options-1.55.0-5
-	boost_x86_random-1.55.0-5
-	boost_x86_regex-1.55.0-5
-	boost_x86_serialization-1.55.0-5
-	boost_x86_signals-1.55.0-5
-	boost_x86_system-1.55.0-5
-	boost_x86_test-1.55.0-5
-	boost_x86_thread-1.55.0-5
-	boost_x86_timer-1.55.0-5
-	boost_x86_unit_test_framework-1.55.0-5
-	boost_x86_wave-1.55.0-5
+	boost_x86-1.55.0-6
+	boost_x86_atomic-1.55.0-6
+	boost_x86_chrono-1.55.0-6
+	boost_x86_context-1.55.0-6
+	boost_x86_coroutine-1.55.0-6
+	boost_x86_date_time-1.55.0-6
+	boost_x86_devel-1.55.0-6
+	boost_x86_filesystem-1.55.0-6
+	boost_x86_graph-1.55.0-6
+	boost_x86_iostreams-1.55.0-6
+	boost_x86_locale-1.55.0-6
+	boost_x86_log-1.55.0-6
+	boost_x86_math-1.55.0-6
+	boost_x86_program_options-1.55.0-6
+	boost_x86_random-1.55.0-6
+	boost_x86_regex-1.55.0-6
+	boost_x86_serialization-1.55.0-6
+	boost_x86_signals-1.55.0-6
+	boost_x86_system-1.55.0-6
+	boost_x86_test-1.55.0-6
+	boost_x86_thread-1.55.0-6
+	boost_x86_timer-1.55.0-6
+	boost_x86_unit_test_framework-1.55.0-6
+	boost_x86_wave-1.55.0-6
 	burnitnow_x86-0.1.0-1
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
