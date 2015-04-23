@@ -134,7 +134,7 @@ ConfigView::ConfigView(TranslatorSettings* settings)
 
 	BFont font;
 	GetFont(&font);
-	SetExplicitPreferredSize(BSize((font.Size() * 433)/12, (font.Size() * 200)/12));
+	SetExplicitPreferredSize(BSize((font.Size() * 250)/12, (font.Size() * 350)/12));
 
 }
 

@@ -7,8 +7,8 @@
 #include "ICNSTranslator.h"
 
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <StringView.h>
-#include <SpaceLayoutItem.h>
 #include <ControlLook.h>
 
 #include <stdio.h>
@@ -21,15 +21,9 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 	: BGroupView("ICNSTranslator Settings", B_VERTICAL, 0)
 {
 	fSettings = settings;
-	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
 
-	BStringView *stringView = new BStringView("title", B_TRANSLATE("Apple icon translator"));
-	stringView->SetFont(be_bold_font);
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
-
-	float spacing = be_control_look->DefaultItemSpacing();
-	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
+	BStringView *titleView = new BStringView("title", B_TRANSLATE("Apple icon translator"));
+	titleView->SetFont(be_bold_font);
 
 	char version[256];
 	sprintf(version, B_TRANSLATE("Version %d.%d.%d, %s"),
@@ -37,57 +31,40 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		int(B_TRANSLATION_MINOR_VERSION(ICNS_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(ICNS_TRANSLATOR_VERSION)),
 		__DATE__);
-	stringView = new BStringView("version", version);
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 
-	stringView = new BStringView("copyright",
+	BStringView *versionView = new BStringView("version", version);
+
+
+	BStringView *copyrightView = new BStringView("copyright",
 		B_UTF8_COPYRIGHT "2005-2006 Haiku Inc.");
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 
-	stringView = new BStringView("my_copyright",
+	BStringView *copyright2View = new BStringView("my_copyright",
 		B_UTF8_COPYRIGHT "2012 Gerasim Troeglazov <3dEyes@gmail.com>.");
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 
-	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
-
-	stringView = new BStringView("support_sizes",
+	BStringView *infoView = new BStringView("support_sizes",
 		"Valid sizes: 16, 32, 48, 128, 256, 512, 1024");
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 
-	stringView = new BStringView("support_colors",
+	BStringView *info2View  = new BStringView("support_colors",
 		"Valid colors: RGB32, RGBA32");
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);	
-
-	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
-
-	BString copyrightText;
-	copyrightText << "libicns v0.8.1\n"
-		<< B_UTF8_COPYRIGHT "2001-2012 Mathew Eis <mathew@eisbox.net>";
 	
-	fCopyrightView = new BTextView("CopyrightLibs");
-	fCopyrightView->SetExplicitAlignment(leftAlignment);
-	fCopyrightView->MakeEditable(false);
-	fCopyrightView->MakeResizable(true);
-	fCopyrightView->SetWordWrap(true);
-	fCopyrightView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fCopyrightView->SetText(copyrightText.String());
-	fCopyrightView->SetExplicitMinSize(BSize(300,200));
+	BStringView *copyright3View  = new BStringView("copyright3",
+		"libicns v0.8.1\n");
 
-	BFont font;
-	font.SetSize(font.Size() * 0.9);
-	fCopyrightView->SetFontAndColor(&font, B_FONT_SIZE, NULL);
-	AddChild(fCopyrightView);
+	BStringView *copyright4View  = new BStringView("copyright4",
+		"2001-2012 Mathew Eis <mathew@eisbox.net>");
 
-	fCopyrightView->SetExplicitAlignment(leftAlignment);
-	
-	AddChild(BSpaceLayoutItem::CreateGlue());
-	GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 
-		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(titleView)
+		.Add(versionView)
+		.Add(copyrightView)
+		.Add(copyright2View)
+		.AddGlue()
+		.Add(infoView)
+		.Add(info2View)
+		.AddGlue()
+		.Add(copyright3View)
+		.Add(copyright4View);
 
 	SetExplicitPreferredSize(GroupLayout()->MinSize());		
 }

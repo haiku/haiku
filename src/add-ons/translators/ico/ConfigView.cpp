@@ -10,7 +10,7 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
-#include <SpaceLayoutItem.h>
+#include <LayoutBuilder.h>
 #include <StringView.h>
 
 #include <stdio.h>
@@ -24,16 +24,9 @@ ConfigView::ConfigView()
 	:
 	BGroupView(B_TRANSLATE("ICOTranslator Settings"), B_VERTICAL, 0)
 {
-	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);	
-
-	BStringView* stringView = new BStringView("title", 
+	BStringView* titleView = new BStringView("title",
 		B_TRANSLATE("Windows icon translator"));
-	stringView->SetFont(be_bold_font);
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
-
-	float spacing = be_control_look->DefaultItemSpacing();
-	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
+	titleView->SetFont(be_bold_font);
 
 	char version[256];
 	sprintf(version, B_TRANSLATE("Version %d.%d.%d, %s"),
@@ -41,43 +34,37 @@ ConfigView::ConfigView()
 		int(B_TRANSLATION_MINOR_VERSION(ICO_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(ICO_TRANSLATOR_VERSION)),
 		__DATE__);
-	stringView = new BStringView("version", version);
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 
-	stringView = new BStringView("copyright",
+	BStringView* versionView = new BStringView("version", version);
+
+	BStringView *copyrightView = new BStringView("copyright",
 		B_UTF8_COPYRIGHT "2005-2006 Haiku Inc.");
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 
-	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
-
-	BCheckBox *checkBox = new BCheckBox("color", 
+	BCheckBox *colorCheckBox = new BCheckBox("color", 
 		B_TRANSLATE("Write 32 bit images on true color input"), NULL);
-	checkBox->SetExplicitAlignment(leftAlignment);
-	AddChild(checkBox);
 
-	checkBox = new BCheckBox("size", B_TRANSLATE("Enforce valid icon sizes"), 
-		NULL);
-	checkBox->SetValue(1);
-	checkBox->SetExplicitAlignment(leftAlignment);
-	AddChild(checkBox);
+	BCheckBox *sizeCheckBox = new BCheckBox("size",
+		B_TRANSLATE("Enforce valid icon sizes"), NULL);
+	sizeCheckBox->SetValue(1);
 
-	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
-
-	stringView = new BStringView("valid1", 
+	BStringView* infoView = new BStringView("valid1",
 		B_TRANSLATE("Valid icon sizes are 16, 32, or 48"));
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 
-	stringView = new BStringView("valid2", 
+	BStringView* info2View = new BStringView("valid2",
 		B_TRANSLATE("pixels in either direction."));
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 
-	AddChild(BSpaceLayoutItem::CreateGlue());
-	GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 
-		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(titleView)
+		.AddStrut(B_USE_SMALL_SPACING)
+		.Add(versionView)
+		.Add(copyrightView)
+		.AddGlue()
+		.Add(colorCheckBox)
+		.Add(sizeCheckBox)
+		.Add(infoView)
+		.Add(info2View)
+		.AddGlue();
 
 	SetExplicitPreferredSize(GroupLayout()->MinSize());
 }
