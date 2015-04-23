@@ -776,6 +776,64 @@ dump_guarded_heap(int argc, char** argv)
 }
 
 
+static int
+dump_guarded_heap_allocations(int argc, char** argv)
+{
+	team_id team = -1;
+	thread_id thread = -1;
+	addr_t address = 0;
+	bool statsOnly = false;
+
+	for (int32 i = 1; i < argc; i++) {
+		if (strcmp(argv[i], "team") == 0)
+			team = parse_expression(argv[++i]);
+		else if (strcmp(argv[i], "thread") == 0)
+			thread = parse_expression(argv[++i]);
+		else if (strcmp(argv[i], "address") == 0)
+			address = parse_expression(argv[++i]);
+		else if (strcmp(argv[i], "stats") == 0)
+			statsOnly = true;
+		else {
+			print_debugger_command_usage(argv[0]);
+			return 0;
+		}
+	}
+
+	size_t totalSize = 0;
+	uint32 totalCount = 0;
+
+	guarded_heap_area* area = sGuardedHeap.areas;
+	while (area != NULL) {
+		for (size_t i = 0; i < area->page_count; i++) {
+			guarded_heap_page& page = area->pages[i];
+			if ((page.flags & GUARDED_HEAP_PAGE_FLAG_FIRST) == 0)
+				continue;
+
+			if ((team < 0 || page.team == team)
+				&& (thread < 0 || page.thread == thread)
+				&& (address == 0 || (addr_t)page.allocation_base == address)) {
+
+				if (!statsOnly) {
+					kprintf("team: % 6" B_PRId32 "; thread: % 6" B_PRId32 "; "
+						"address: 0x%08" B_PRIxADDR "; size: %" B_PRIuSIZE
+						" bytes\n", page.team, page.thread,
+						(addr_t)page.allocation_base, page.allocation_size);
+				}
+
+				totalSize += page.allocation_size;
+				totalCount++;
+			}
+		}
+
+		area = area->next;
+	}
+
+	kprintf("total allocations: %" B_PRIu32 "; total bytes: %" B_PRIuSIZE
+		"\n", totalCount, totalSize);
+	return 0;
+}
+
+
 // #pragma mark - Malloc API
 
 
@@ -832,6 +890,16 @@ heap_init_post_sem()
 		"Dump info about a guarded heap page",
 		"<address>\nDump info about guarded heap page containing address.\n",
 		0);
+	add_debugger_command_etc("allocations", &dump_guarded_heap_allocations,
+		"Dump current heap allocations",
+		"[\"stats\"] [team] [thread] [address]\n"
+		"If no parameters are given, all current alloactions are dumped.\n"
+		"If the optional argument \"stats\" is specified, only the allocation\n"
+		"counts and no individual allocations are printed.\n"
+		"If a specific allocation address is given, only this allocation is\n"
+		"dumped.\n"
+		"If a team and/or thread is specified, only allocations of this\n"
+		"team/thread are dumped.\n", 0);
 
 	return B_OK;
 }
