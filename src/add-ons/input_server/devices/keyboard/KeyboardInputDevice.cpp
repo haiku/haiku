@@ -313,8 +313,8 @@ KeyboardDevice::_ControlThread()
 		uint32 keycode = keyInfo.keycode;
 		bool isKeyDown = keyInfo.is_keydown;
 
-		LOG_EVENT("KB_READ: %Ld, %02x, %02lx\n", keyInfo.timestamp, isKeyDown,
-			keycode);
+		LOG_EVENT("KB_READ: %" B_PRIdBIGTIME ", %02x, %02" B_PRIx32 "\n",
+			keyInfo.timestamp, isKeyDown, keycode);
 
 		if (keycode == 0)
 			continue;
@@ -681,7 +681,8 @@ KeyboardInputDevice::Control(const char* name, void* cookie,
 	uint32 command, BMessage* message)
 {
 	KID_CALLED();
-	TRACE("KeyboardInputDevice::Control(%s, code: %lu)\n", name, command);
+	TRACE("KeyboardInputDevice::Control(%s, code: %" B_PRIu32 ")\n", name,
+		command);
 
 	if (command == B_NODE_MONITOR)
 		_HandleMonitor(message);
