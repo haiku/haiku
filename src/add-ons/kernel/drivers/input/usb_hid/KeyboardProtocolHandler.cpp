@@ -771,6 +771,6 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 		keyDown = true;
 	}
 
-	memcpy(fLastKeys, fCurrentKeys, fKeyCount * sizeof(uint32));
+	memcpy(fLastKeys, fCurrentKeys, fKeyCount * sizeof(uint16));
 	return B_OK;
 }
