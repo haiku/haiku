@@ -49,6 +49,7 @@ private:
 		uint8					fShift;
 		uint32					fMask;
 		uint8					fBitCount;
+		uint8					fByteCount;
 		bool					fHasData;
 		bool					fArray;
 		bool					fRelative;

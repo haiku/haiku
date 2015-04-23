@@ -22,6 +22,7 @@ HIDReportItem::HIDReportItem(HIDReport *report, uint32 bitOffset,
 		fShift(bitOffset % 8),
 		fMask(~(0xffffffff << bitLength)),
 		fBitCount(bitLength),
+		fByteCount((fShift + fBitCount + 7) / 8),
 		fHasData(hasData),
 		fArray(isArray),
 		fRelative(isRelative),
@@ -63,7 +64,7 @@ HIDReportItem::Extract()
 	if (report == NULL)
 		return B_NO_INIT;
 
-	memcpy(&fData, report + fByteOffset, sizeof(uint32));
+	memcpy(&fData, report + fByteOffset, fByteCount);
 	fData >>= fShift;
 	fData &= fMask;
 
@@ -89,13 +90,13 @@ HIDReportItem::Insert()
 		return B_NO_INIT;
 
 	uint32 value;
-	memcpy(&value, report + fByteOffset, sizeof(uint32));
+	memcpy(&value, report + fByteOffset, fByteCount);
 	value &= ~(fMask << fShift);
 
 	if (fValid)
 		value |= (fData & fMask) << fShift;
 
-	memcpy(report + fByteOffset, &value, sizeof(uint32));
+	memcpy(report + fByteOffset, &value, fByteCount);
 	return B_OK;
 }
 
