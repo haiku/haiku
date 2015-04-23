@@ -49,6 +49,11 @@ BMPView::BMPView(const BRect &frame, const char *name, uint32 resizeMode,
 		.Add(versionView)
 		.Add(copyrightView)
 		.AddGlue();
+
+	BFont font;
+	GetFont(&font);
+	SetExplicitPreferredSize(BSize((font.Size() * 300)/12,
+		(font.Size() * 100)/12));
 }
 
 

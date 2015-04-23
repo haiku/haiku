@@ -82,7 +82,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		.Add(copyright2View);
 
 
-	//SetExplicitPreferredSize(GroupLayout()->MinSize());
+	SetExplicitPreferredSize(GroupLayout()->MinSize());
 }
 
 

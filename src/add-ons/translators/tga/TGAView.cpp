@@ -53,7 +53,7 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
  	fTitle->SetFont(be_bold_font);
 
  	char detail[100];
- 	sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"),
+ 	sprintf(detail, B_TRANSLATE("Version %d.%d.%d, %s"),
  		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(TGA_TRANSLATOR_VERSION)),
  		static_cast<int>(B_TRANSLATION_MINOR_VERSION(TGA_TRANSLATOR_VERSION)),
  		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
