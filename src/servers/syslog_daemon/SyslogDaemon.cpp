@@ -28,6 +28,9 @@
 #define B_TRANSLATION_CONTEXT "SyslogDaemon"
 
 
+static const int32 kQuitDaemon = 'quit';
+
+
 SyslogDaemon::SyslogDaemon()
 	:
 	BApplication(B_SYSTEM_LOGGER_SIGNATURE),
@@ -89,10 +92,8 @@ SyslogDaemon::AboutRequested()
 bool
 SyslogDaemon::QuitRequested()
 {
-	delete_port(fPort);
-
-	int32 returnCode;
-	wait_for_thread(fDaemon, &returnCode);
+	write_port(fPort, kQuitDaemon, NULL, 0);
+	wait_for_thread(fDaemon, NULL);
 
 	return true;
 }
@@ -143,6 +144,9 @@ SyslogDaemon::_Daemon()
 			// we've been quit
 			break;
 		}
+
+		if (code == kQuitDaemon)
+			return;
 
 		// if we don't get what we want, ignore it
 		if (bytesRead < (ssize_t)sizeof(syslog_message)
