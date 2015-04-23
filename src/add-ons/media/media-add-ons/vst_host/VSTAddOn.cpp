@@ -20,26 +20,24 @@ VSTAddOn::VSTAddOn(image_id image)
 	:
 	BMediaAddOn(image)
 {
-	const char vst_subdir[]={"media/vstplugins"};
-
-	BPath addons_dir;
 	fPluginsList.MakeEmpty();
 
-	find_directory(B_USER_NONPACKAGED_ADDONS_DIRECTORY, &addons_dir);
-	addons_dir.Append(vst_subdir);
-	ScanPluginsFolders(addons_dir.Path(), true);
+	directory_which dataDirectories[] = {
+		B_SYSTEM_ADDONS_DIRECTORY,
+		B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
+		B_USER_ADDONS_DIRECTORY,
+		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
+	};
 
-	find_directory(B_USER_ADDONS_DIRECTORY, &addons_dir);
-	addons_dir.Append(vst_subdir);
-	ScanPluginsFolders(addons_dir.Path() ,true);
+	for (uint i = 0; i < sizeof(dataDirectories)/sizeof(directory_which); i++) {
+		BPath path;
+		if (find_directory(dataDirectories[i], &path) != B_OK)
+			continue;
 
-	find_directory(B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY, &addons_dir);
-	addons_dir.Append(vst_subdir);	
-	ScanPluginsFolders(addons_dir.Path());
+		path.Append("media/vstplugins");
 
-	find_directory(B_SYSTEM_ADDONS_DIRECTORY, &addons_dir);
-	addons_dir.Append(vst_subdir);	
-	ScanPluginsFolders(addons_dir.Path());
+		ScanPluginsFolders(path.Path());
+	}
 }
 
 VSTAddOn::~VSTAddOn()
@@ -112,7 +110,8 @@ VSTAddOn::ScanPluginsFolders(const char* path, bool make_dir)
 
 	BDirectory dir(path);
 	if (dir.InitCheck() != B_OK) {
-		create_directory(path, 0755);
+		if (make_dir == true)
+			create_directory(path, 0755);
 		return 0;
 	}
 
