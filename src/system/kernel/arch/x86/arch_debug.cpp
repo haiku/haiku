@@ -63,11 +63,14 @@ already_visited(addr_t* visited, int32* _last, int32* _num, addr_t bp)
 /*!	Safe to be called only from outside the debugger.
 */
 static status_t
-get_next_frame_no_debugger(addr_t bp, addr_t* _next, addr_t* _ip)
+get_next_frame_no_debugger(addr_t bp, addr_t* _next, addr_t* _ip,
+	bool onKernelStack)
 {
 	// TODO: Do this more efficiently in assembly.
 	stack_frame frame;
-	if (user_memcpy(&frame, (void*)bp, sizeof(frame)) != B_OK)
+	if (onKernelStack)
+		memcpy(&frame, (void*)bp, sizeof(frame));
+	else if (user_memcpy(&frame, (void*)bp, sizeof(frame)) != B_OK)
 		return B_BAD_ADDRESS;
 
 	*_ip = frame.return_address;
@@ -1089,7 +1092,7 @@ arch_debug_contains_call(Thread* thread, const char* symbol, addr_t start,
 		} else {
 			addr_t ip, nextBp;
 
-			if (get_next_frame_no_debugger(bp, &nextBp, &ip) != B_OK
+			if (get_next_frame_no_debugger(bp, &nextBp, &ip, true) != B_OK
 				|| ip == 0 || bp == 0)
 				break;
 
@@ -1159,8 +1162,10 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 					skipFrames = 0;
 			}
 		} else {
-			if (get_next_frame_no_debugger(bp, &nextBp, &ip) != B_OK)
+			if (get_next_frame_no_debugger(bp, &nextBp, &ip,
+					onKernelStack) != B_OK) {
 				break;
+			}
 		}
 
 		if (skipFrames <= 0
