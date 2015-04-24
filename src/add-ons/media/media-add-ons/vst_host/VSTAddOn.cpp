@@ -7,6 +7,8 @@
 #include <Entry.h>
 #include <Directory.h>
 #include <FindDirectory.h>
+#include <PathFinder.h>
+#include <StringList.h>
 
 #include "VSTNode.h"
 #include "VSTAddOn.h"
@@ -22,22 +24,13 @@ VSTAddOn::VSTAddOn(image_id image)
 {
 	fPluginsList.MakeEmpty();
 
-	directory_which dataDirectories[] = {
-		B_SYSTEM_ADDONS_DIRECTORY,
-		B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-		B_USER_ADDONS_DIRECTORY,
-		B_USER_NONPACKAGED_ADDONS_DIRECTORY,
-	};
+	BStringList folders;
 
-	for (uint i = 0; i < sizeof(dataDirectories)/sizeof(directory_which); i++) {
-		BPath path;
-		if (find_directory(dataDirectories[i], &path) != B_OK)
-			continue;
+	BPathFinder::FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY,
+		"media/vstplugins/", B_FIND_PATH_EXISTING_ONLY, folders);
 
-		path.Append("media/vstplugins");
-
-		ScanPluginsFolders(path.Path());
-	}
+	for (int32 i = 0; i < folders.CountStrings(); i++)
+		ScanPluginsFolder(folders.StringAt(i).String());
 }
 
 VSTAddOn::~VSTAddOn()
@@ -104,7 +97,7 @@ VSTAddOn::InstantiateNodeFor(const flavor_info* info, BMessage* config,
 }
 
 int
-VSTAddOn::ScanPluginsFolders(const char* path, bool make_dir)
+VSTAddOn::ScanPluginsFolder(const char* path, bool make_dir)
 {
 	BEntry ent;
 
@@ -118,7 +111,7 @@ VSTAddOn::ScanPluginsFolders(const char* path, bool make_dir)
 	while(dir.GetNextEntry(&ent) == B_OK) {
 		BPath p(&ent);
 		if (ent.IsDirectory()) {
-			ScanPluginsFolders(p.Path());
+			ScanPluginsFolder(p.Path());
 		} else {
 			VSTPlugin* plugin = new VSTPlugin();
 			int ret = plugin->LoadModule(p.Path());
