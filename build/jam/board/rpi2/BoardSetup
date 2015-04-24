@@ -27,9 +27,6 @@ bootcodeFile = [ DownloadFile bootcode.bin : $(HAIKU_BOARD_FIRMWARE_URL)/bootcod
 startFile = [ DownloadFile start.elf : $(HAIKU_BOARD_FIRMWARE_URL)/start.elf ] ;
 licenseFile = [ DownloadFile LICENCE.broadcom : $(HAIKU_BOARD_FIRMWARE_URL)/LICENCE.broadcom ] ;
 
-local fdtBinary = [ FDirName $(HAIKU_OUTPUT_DIR) $(HAIKU_BOARD_FDT_NAME).dtb ] ;
-CompileDTS $(fdtBinary) : [ FDirName $(HAIKU_TOP) src data dts arch arm $(HAIKU_BOARD_FDT_NAME).dts ] ;
-
 HAIKU_BOARD_FIRMWARE_FILES =
 	$(bootcodeFile)
 	$(startFile)
@@ -48,7 +45,7 @@ HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
 HAIKU_BOARD_SDIMAGE_FILES = 
 	$(HAIKU_BOARD_FIRMWARE_FILES)
 	$(configFile)
-	$(fdtBinary)
+	$(HAIKU_BOARD_FDT_NAME).dtb
 	$(ubootFile)
 	haiku_loader_linux.ub
 	haiku-floppyboot.tgz.ub

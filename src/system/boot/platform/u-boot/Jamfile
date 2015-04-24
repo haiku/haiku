@@ -248,13 +248,15 @@ BuildUImage haiku_loader_linux.ub : haiku_loader :
 	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_LINUX)
 		-n 'haiku_loader $(TARGET_BOOT_BOARD)' ;
 
-local fdtBinary = [ FDirName $(HAIKU_OUTPUT_DIR) $(HAIKU_BOARD_FDT_NAME).dtb ] ;
-CompileDTS $(fdtBinary) : [ FDirName $(HAIKU_TOP) src data dts arch $(TARGET_ARCH) $(HAIKU_BOARD_FDT_NAME).dts ] ;
+if $(HAIKU_BOARD_FDT_NAME) {
+	local fdtBinary = $(HAIKU_BOARD_FDT_NAME).dtb ;
+	CompileDTS $(fdtBinary) : [ FDirName $(HAIKU_TOP) src data dts arch $(TARGET_ARCH) $(HAIKU_BOARD_FDT_NAME).dts ] ;
 
-BuildUImage haiku_loader_nbsd.ub : haiku_loader $(tgzArchive) $(fdtBinary) :
-	-A $(TARGET_ARCH) -O $(uImageFakeOS) -T multi -C none
-	-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_NBSD)
-		-n 'haiku_loader $(TARGET_BOOT_BOARD)' ;
+	BuildUImage haiku_loader_nbsd.ub : haiku_loader $(tgzArchive) $(fdtBinary) :
+		-A $(TARGET_ARCH) -O $(uImageFakeOS) -T multi -C none
+		-a $(HAIKU_BOARD_LOADER_BASE) -e $(HAIKU_BOARD_LOADER_ENTRY_NBSD)
+			-n 'haiku_loader $(TARGET_BOOT_BOARD)' ;
+}
 
 if $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) {
 	BuildUImageScript $(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME) :
