@@ -492,7 +492,7 @@ status_t
 LargeMemoryPhysicalPageMapper::GetPage(phys_addr_t physicalAddress,
 	addr_t* virtualAddress, void** handle)
 {
-	PhysicalPageSlot* slot;
+	PhysicalPageSlot* slot = NULL;
 	status_t error = GetSlot(true, slot);
 	if (error != B_OK)
 		return error;

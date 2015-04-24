@@ -2209,7 +2209,7 @@ init_node_tree(void)
 		{NULL}
 	};
 
-	device_node* node;
+	device_node* node = NULL;
 	if (register_node(NULL, DEVICE_MANAGER_ROOT_NAME, attrs, NULL, &node)
 			!= B_OK) {
 		dprintf("Cannot register Devices Root Node\n");

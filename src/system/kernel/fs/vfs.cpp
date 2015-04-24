@@ -4121,7 +4121,7 @@ vfs_get_vnode_from_path(const char* path, bool kernel, struct vnode** _vnode)
 extern "C" status_t
 vfs_get_vnode(dev_t mountID, ino_t vnodeID, bool canWait, struct vnode** _vnode)
 {
-	struct vnode* vnode;
+	struct vnode* vnode = NULL;
 
 	status_t status = get_vnode(mountID, vnodeID, &vnode, canWait, false);
 	if (status != B_OK)
