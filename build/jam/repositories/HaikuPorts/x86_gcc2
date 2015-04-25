@@ -525,6 +525,7 @@ RemotePackageRepository HaikuPorts
 	djvulibre_x86-3.5.25-1
 	djvulibre_x86_devel-3.5.25-1
 	documentviewer_x86-0.3_git-7
+	dosbox_x86-0.74-1
 	dtc_x86-1.4.1-1
 	expat_x86-2.0.1-7
 	expat_x86_devel-2.0.1-7
@@ -596,6 +597,8 @@ RemotePackageRepository HaikuPorts
 	libattica_x86_devel-0.4.2-1
 	libdbusmenu_qt_x86-0.9.2-1
 	libdbusmenu_qt_x86_devel-0.9.2-1
+	libedit_x86-2014_10_30_3.1-1
+	libedit_x86_devel-2014_10_30_3.1-1
 	libelf_x86-0.8.13-1
 	libelf_x86_devel-0.8.13-1
 	libevent_x86-2.0.21-7
@@ -846,6 +849,7 @@ RemotePackageRepository HaikuPorts
 	dmidecode
 	documentviewer_x86
 	dos2unix
+	dosbox_x86
 	doxygen
 	dtc_x86
 	ducksaver
@@ -941,6 +945,7 @@ RemotePackageRepository HaikuPorts
 	libdvdread
 	libebml
 	libedit
+	libedit_x86
 	libelf_x86
 	libevent_x86
 	libexecinfo_x86
