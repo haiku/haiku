@@ -3,7 +3,7 @@ Boot Manager, the application to configure the Haiku boot menu, could not be lau
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Oletko varma, että haluat keskeyttää asennuksen ja käynnistää järjestelmän uudelleen?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Asennusohjelma\n\ttekijät: Jérôme Duval ja Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
-Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Tässä sinun on muutettava rivi ”GRUB_HIDDEN_TIMEOUT=0” kommentiksi laittamalla merkin ”#” sen eteen, jotta alkukäynnistysvalikko todella näytettäisiin.\n\n
+Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Tässä sinun on muutettava rivi ”GRUB_HIDDEN_TIMEOUT=0” kommentiksi laittamalla merkin ”#” sen eteen, jotta käynnistysvalikko todella näytettäisiin.\n\n
 Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Käynnistyssektori kirjoitettiin levylle ’%s’. Jätä asennusohjelma painamalla Lopeta-painiketta tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
 Quit	InstallerApp		Lopeta
 Additional disk space required: 0.0 KiB	InstallerWindow		Vaadittu lisälevytilaa: 0.0 kibitavua
@@ -11,7 +11,7 @@ Additional disk space required: 0.0 KiB	InstallerWindow		Vaadittu lisälevytilaa
 Stop	InstallerWindow	In alert after pressing Stop	Pysäytä
 Install progress:  	InstallerWindow		Asennuksen eteneminen:  
 Starting Installation.	InstallProgress		Aloitetaan asennus.
-This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Tämä on alfa-laatuinen ohjelmisto! Se tarkoittaa, että on olemassa korkea riski menettää tärkeitä tietoja. Tee usein varmuuskopioita! Sinua on varoitettu.\n\n\n
+This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Tämä on alfa-laatuinen ohjelmisto! Se tarkoittaa, että on olemassa suuri riski menettää tärkeitä tietoja. Tee usein varmuuskopioita! Sinua on varoitettu.\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Oletko varma, että haluat keskeyttää asentamisen?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Oletko varma, että haluat asentaa nykyiselle käynnistyslevylle? Asennusohjelman on käynnistettävä tietokoneesi uudelleen, jos jatkat.
 Quit Boot Manager	InstallerWindow		Lopeta Käynnistyshallinta
@@ -43,7 +43,7 @@ Finishing Installation.	InstallProgress		Lopetetaan asennusta.
 \tsudo <your favorite text editor> /etc/default/grub\n\n	InstallerApp		\tsudo <suosikkieditorisi nimi> /etc/default/grub\n\n
 Restart	InstallerWindow		Käynnistä uudelleen
 README	InstallerApp		LUEMINUT
-The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Kohdelevyllä ei ehkä ole riittävästi tilaa. Yritä valita eri levy tai älä valitse valinnaisten kohteiden asentamista.
+The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Kohdelevyllä ei ehkä ole riittävästi tilaa. Kokeile eri levyn valitsemista tai jätä valitsematta valinnaisten kohteiden asentaminen.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Sulje ensin Käynnistyshallinta- ja Levyasema-asetusikkunat ennen asennusohjelman ikkunan sulkemista.
 Scanning for disks…	InstallerWindow		Etsitään levyjä…
 2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
@@ -61,7 +61,7 @@ Unknown Type	InstallProgress	Partition content type	Tuntematon tyyppi
 Installation completed. Boot sector has been written to '%s'. Press Restart to restart the computer or choose a new target volume to perform another installation.	InstallerWindow		Asennus valmis. Käynnistyssektori kirjoitettiin levylle ’%s’. Paina Käynnistä uudelleen -painiketta tietokoneen käynnistämiseksi uudelleen tai valitse uusi kohdetaltio toisen asennuksen suorittamiseksi.
 Installation canceled.	InstallProgress		Asennus peruttu.
 Installer	System name		Asennusohjelma
-You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Et voi asentaa levyn sisältö itseensä. Valitse eri levy.
+You can't install the contents of a disk onto itself. Please choose a different disk.	InstallProgress		Et voi asentaa levyn sisältöä itseensä. Valitse eri levy.
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		”n” on osionumero, joka GRUB 2 -ohjelmassa alkaa numerosta ”1”\n
 Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Alkaen os-prober-ohjelman versiosta v1.44 (esim.: Ubuntussa 11.04 tai myöhäisemmissä versioissa), Haiku-käyttöjärjestelmän tunnistaminen onnistuu ilman pulmia. Avaa Pääteikkuna Haikun lisäämiseksi GRUB-valikkoon ja kirjoita:\n\n

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	235954604
+1	finnish	x-vnd.Haiku-Terminal	2696855708
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -33,7 +33,9 @@ Increase	Terminal TermWindow		Kasvata
 Settings	Terminal TermWindow		Asetukset
 Window size	Terminal TermWindow		Ikkunakoko
 Selected text	Terminal AppearancePrefView		Valittu teksti
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tAktiivin prosessin nykyinen työhakemisto nykyisessä\n\t\t\tvälilehdessä. Valinnaisesti määriteltävien polkukomponenttien\n\t\t\tenimmäismäärä. Esim.: '%2d' enintään kahdelle komponentille.\n\t%T\t-\tPääteikkunasovelluksen nimi nykyisessä paikallisasetuksessa.\n\t%e\t-\tNykyisen välilehden koodaus. Ei näytetä UTF-8-koodaukselle.\n\t%i\t-\tIkkunahakemisto.\n\t%p\t-\tAktiivin prosessin nimi nykyisessä välilehdessä.\n\t%t\t-\tNykyisen välilehden otsikko.
 Find	Terminal FindWindow		Etsi
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Ikkunaotsikoiden määritysmalli. Seuraavia korvaajia\nvoidaan käyttää:
 Appearance	Terminal PrefWindow		Ulkoasu
 Tab title:	Terminal AppearancePrefView		Välilehtiotsikko:
 OK	Terminal SetTitleWindow		Valmis
@@ -76,6 +78,7 @@ Midnight	Terminal colors scheme		Keskiyö
 Decrease	Terminal TermWindow		Vähennä
 Default	Terminal colors scheme		Oletus
 Create link here	Terminal TermView		Luo linkki tänne
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Välilehtiotsikoiden määritysmalli. Seuraavia korvaajia\nvoidaan käyttää:
 Close	Terminal TermWindow		Sulje
 Text	Terminal AppearancePrefView		Teksti
 Clear all	Terminal TermWindow		Tyhjennä kaikki
@@ -104,6 +107,7 @@ Copy link location	Terminal TermView		Kopioi linkkisijainti
 Tab title:	Terminal TermWindow		Välilehtiotsikko:
 Find next	Terminal TermWindow		Löydä seuraava
 Close active tab	Terminal TermWindow		Sulje käytössä oleva välilehti
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tMerkki ’%’.\n\t%<\t-\tAloittaa kappaleen, joka näytetään vain jos korvaaja\n\t\t\ton jälkeenpäin tyhjä.\n\t%>\t-\tAloittaa kappaleen, joka näytetään vain jos korvaaja\n\t\t\tedellisen  %< kappaleen ja tämän kappaleen välillä ei ole tyhjä.\n\t%-\t-\tLopettaa %<- tai %>-kappaleen.\n\nMikä tahansa ei-aakkosnumeerinen merkki ’%’:n ja muotokirjaimen välissä lisää välilyönnin vain\njos korvaaja-arvo ei ole tyhjä. Se lisätään %<-kappaleeseen.
 Paste	Terminal TermWindow		Liitä
 Shell 	Terminal TermWindow		Komentoikkuna
 Cancel	Terminal TermView		Peru

@@ -11,7 +11,7 @@ Error	Login App		Virhe
 You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Voit räätälöidä työpöytää, joka näytetään Kirjautumissovelluksen takana pudottamalla kopiot siihen.\n\nKun olet valmis, lopeta vain sovellus (Alt-Q).
 Unimplemented	Login App		Toteuttamaton
 Welcome to Haiku	Login Window		Tervetuloa Haikuun
-Reboot	Login View		Alkulataa uudelleen
+Reboot	Login View		Käynnistä uudelleen
 Login application for Haiku\nUsage:\n	Login App		Kirjaa sovellus Haikulle\nKäyttö:\n
 Info	Login App		Tiedot
 Halt	Login View		Keskeytä

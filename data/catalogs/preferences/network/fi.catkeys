@@ -1,7 +1,33 @@
-1	finnish	x-vnd.Haiku-Network	3077078267
+1	finnish	x-vnd.Haiku-Network	950262959
+Static	IntefaceAddressView		Staattinen
 EAP	EAP protected network		EAP
+Services	NetworkWindow		Palvelut
 WPA2	WPA2 protected network		WPA2
+The netmask defines your local network	IntefaceAddressView		Verkkopeite määrittää paikallisen verkkosi
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+Network	NetworkWindow		Verkko
+Show network status in Deskbar	NetworkWindow		Näytä verkkotila Työkalupalkissa
+The method for obtaining an IP address	IntefaceAddressView		IP-osoitteen hakemismenettely
+Dial Up	NetworkWindow		Puhelinverkkoyhteys
+Apply	IntefaceAddressView		Käytä
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Verkkotilan asentaminen Työkalupalkkiin epäonnistui: %s
+Disabled	IntefaceAddressView		Poissa käytöstä
+Ok	NetworkWindow		Valmis
+launch error	NetworkWindow		käynnistysvirhe
+Other	NetworkWindow		Muu
+Automatic	IntefaceAddressView		Automaattinen
+Gateway:	IntefaceAddressView		Yhdyskäytävä:
+Revert	NetworkWindow		Palauta
+Enable	ServiceView		Ota käyttöön
+Your gateway to the internet	IntefaceAddressView		Yhdyskäytäväsi internettiin
+New…	NetworkWindow		Uusi...
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Tila:
 WPA	WPA protected network		WPA
 open	Open network		avaa
+IP Address:	IntefaceAddressView		IP-osoite:
+Netmask:	IntefaceAddressView		Verkkopeite:
+Disable	ServiceView		Poista käytöstä
+Your IP address	IntefaceAddressView		IP-osoitteesi
+Manage…	NetworkWindow		Hallitse...
 WEP	WEP protected network		WEP

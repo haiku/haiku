@@ -106,7 +106,7 @@ Find previous	Terminal TermWindow		前を検索
 Copy link location	Terminal TermView		リンクの場所をコピー
 Tab title:	Terminal TermWindow		タブタイトル:
 Find next	Terminal TermWindow		次を検索
-Close active tab	Terminal TermWindow		\t%%\t-\t文字 '%'.\n\t%<\t-\tプレースホルダーがあとで空にならない場合のみ表示される\n\t\t\tセクションを開始します。\n\t%>\t-\t前の %< セクションとこのセクション間のプレースホルダーが空でない場合にのみ\n\t\t\t表示されるセクションを開始します。\n\t%-\t-\t%< または %> セクションを終了します。\n\nプレースホルダー値が空でない場合、'%'とフォーマット文字間の英数字以外の文字は\nスペースを挿入するだけです。%< セクションに追加されるでしょう。
+Close active tab	Terminal TermWindow		タブを閉じる
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t文字 '%'.\n\t%<\t-\tあとでプレースホルダーが空にならない場合のみ表示される\n\t\t\tセクションを開始します。\n\t%>\t-\t前の %< セクションと、このセクションの間のプレースホルダーが\n\t\t\t空にならない場合のみ表示されるセクションを開始します。\n\t%-\t-\t%< または %> セクションを終了します。\n\n'%' とフォーマット文字間の英数字以外の文字は、プレースホルダーが\n空でない場合にスペースのみを挿入します。
 Paste	Terminal TermWindow		貼り付け
 Shell 	Terminal TermWindow		シェル

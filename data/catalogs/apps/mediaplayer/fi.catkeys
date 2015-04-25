@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-MediaPlayer	2005945973
+1	finnish	x-vnd.Haiku-MediaPlayer	2711018042
 raw audio	MediaPlayer-InfoWin		raakaääni
 Location	MediaPlayer-InfoWin		Sijainti
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikkalainen)
@@ -91,6 +91,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Aloita soittaminen autom
 Track	Video Track Menu		Kappale
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Sisäinen virhe (lukitus epäonnistui). Soittoluettelon tallentaminen epäonnistui.
 View options	MediaPlayer-SettingsWindow		Katso valitsimia
+none	MediaPlayer-Main		ei mitään
 Play mode	MediaPlayer-SettingsWindow		Soittotila
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Poista kappaleita
 Video track	MediaPlayer-Main		Videokappale
@@ -119,6 +120,7 @@ raw video	MediaPlayer-InfoWin		raakavideo
 Volume of background clips	MediaPlayer-SettingsWindow		Taustavideoleikkeen voimakkuus
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Sisäinen virhe (muisti loppui). Soittoluettelon tallentaminen epäonnistui.
 Hide interface	MediaPlayer-Main		Piilota käyttöliittymä
+Open clips	MediaPlayer-Main		Avaa videoleikkeet
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopioi kappale
 none	Subtitles menu		ei mitään
 Move file to Trash	MediaPlayer-PlaylistWindow		Siirrä tiedosto roskakoriin

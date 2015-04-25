@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	4261904725
+1	finnish	x-vnd.Haiku-HaikuDepot	4273323974
 Name	PackageListView		Nimi
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
@@ -85,6 +85,7 @@ No, quit HaikuDepot	App		Ei, poistu HaikuVarastosta
 Authentication failed	UserLoginWindow		Todennus epäonnistui
 Logged in as %User%	MainWindow		Kirjautuneena tunnuksella %User%
 Language	RatePackageWindow		Kieli
+Size	PackageListView		Koko
 Failed to create or update rating: %s\n	RatePackageWindow		Arvosanan luominen tai päivittäminen epäonnistui: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Sinun on kirjauduttava tilille ennen kuin voit antaa arvosanoja pakkauksille.
  It responded with: 	RatePackageWindow		 Se vastasi: 
@@ -114,7 +115,7 @@ Try again	App		Yritä uudelleen
 Login or Create account	MainWindow		Kirjaudu tai luo tili
 Pending…	PackageListView		Odottaa...
 Depot	FilterView		Varasto
-{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} muut{# kohdetta}}
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} other{# kohdetta}}
 OK	PackageInfoView		Valmis
 Uninstalled	PackageListView		Poistetut asennukset
 Show	MainWindow		Näytä
@@ -135,6 +136,7 @@ Cancel	RatePackageWindow		Peru
 Package action failed	PackageInfoView		Pakettitoiminta epäonnistui
 OK	UserLoginWindow		Valmis
 Send	RatePackageWindow		Lähetä
+-	no package size		-
 Category:	FilterView		Luokka:
 Failed to create account	UserLoginWindow		Tilin luominen epäonnistui
 There are problems with the data you entered:\n\n	UserLoginWindow		Syöttämissäsi tiedoissa oli pulmia:\n\n
