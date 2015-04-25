@@ -174,9 +174,6 @@ GIFView::GIFView(TranslatorSettings* settings)
 		.AddGlue()
 		.End();
 
-	BFont font;
-	GetFont(&font);
-
 	fSettings->Acquire();
 
 	RestorePrefs();

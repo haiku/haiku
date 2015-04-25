@@ -37,6 +37,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 
 	fCompressionField = new BMenuField("compression",
 		B_TRANSLATE("Compression: "), compressionPopupMenu);
+	fCompressionField->SetAlignment(B_ALIGN_RIGHT);
 
 	BPopUpMenu* versionPopupMenu = new BPopUpMenu("popup_version");
 
@@ -52,6 +53,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 
 	fVersionField = new BMenuField("version",
 		B_TRANSLATE("Format: "), versionPopupMenu);
+	fVersionField->SetAlignment(B_ALIGN_RIGHT);
 
 	BStringView *titleView = new BStringView("title",
 		B_TRANSLATE("Photoshop image translator"));
@@ -78,6 +80,12 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		.AddGlue()
 		.Add(fVersionField)
 		.Add(fCompressionField)
+		.AddGrid(10.0f, 5.0f)
+			.Add(fVersionField->CreateLabelLayoutItem(), 0, 0)
+			.Add(fVersionField->CreateMenuBarLayoutItem(), 1, 0)
+			.Add(fCompressionField->CreateLabelLayoutItem(), 0, 1)
+			.Add(fCompressionField->CreateMenuBarLayoutItem(), 1, 1)
+		.End()
 		.AddGlue()
 		.Add(copyright2View);
 

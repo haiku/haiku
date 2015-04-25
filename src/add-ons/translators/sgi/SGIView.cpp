@@ -117,7 +117,7 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 	BTextView* infoView = new BTextView("info");
 	infoView->SetText(BString(B_TRANSLATE("written by:\n"))
 			.Append(author)
-			.Append(B_TRANSLATE("\n\nbased on GIMP SGI plugin v1.5:\n"))
+			.Append(B_TRANSLATE("\nbased on GIMP SGI plugin v1.5:\n"))
 			.Append(kSGICopyright).String());
 	infoView->SetExplicitAlignment(labelAlignment);
 	infoView->SetWordWrap(false);
@@ -144,7 +144,7 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 
 	// TODO: remove this workaround for ticket #4217
 	infoView->SetExplicitPreferredSize(
-		BSize(infoView->LineWidth(4), infoView->TextHeight(0, 80)));
+		BSize(infoView->LineWidth(3), infoView->TextHeight(0, 80)));
 	infoView->SetExplicitMaxSize(infoView->ExplicitPreferredSize());
 	infoView->SetExplicitMinSize(infoView->ExplicitPreferredSize());
 }

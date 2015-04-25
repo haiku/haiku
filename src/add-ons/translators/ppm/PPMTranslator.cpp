@@ -507,7 +507,7 @@ public:
 					"bits big-endian"), CSMessage(B_RGBA15_BIG)));
 				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:6:5 16 bits "
 					"big-endian"), CSMessage(B_RGB16)));
-				fField = new BMenuField(B_TRANSLATE("Input Color Space"),
+				fField = new BMenuField(B_TRANSLATE("Input Color Space:"),
 					fMenu);
 				fField->SetViewColor(ViewColor());
  				SelectColorSpace(g_settings.out_space);
@@ -523,18 +523,19 @@ public:
 					.Add(fTitle)
 					.Add(fDetail)
 					.AddGlue()
-					.AddGrid(10, 10)
-						.Add(fField->CreateLabelLayoutItem(), 0, 0)
-						.Add(fField->CreateMenuBarLayoutItem(), 1, 0)
-						.Add(fAscii, 0, 1)
-					.End()
+					.AddGroup(B_HORIZONTAL)
+						.Add(fField)
+						.AddGlue()
+						.End()
+					.Add(fAscii)
 					.AddGlue()
 					.Add(fBasedOn)
 					.Add(fCopyright);
  
  				BFont font;
  				GetFont(&font);
- 				SetExplicitPreferredSize(BSize((font.Size() * 350)/12, (font.Size() * 200)/12));
+ 				SetExplicitPreferredSize(BSize((font.Size() * 350)/12,
+ 					(font.Size() * 200)/12));
 			}
 		~PPMView()
 			{

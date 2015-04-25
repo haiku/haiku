@@ -63,14 +63,11 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 		item->SetMarked(true);
 	fInterlaceMenu->AddItem(item);
 
-
 	BMenuField* menuField = new BMenuField(
 		B_TRANSLATE("PNG Interlace Menu"),
 		B_TRANSLATE("Interlacing type:"), fInterlaceMenu);
 	menuField->SetDivider(menuField->StringWidth(menuField->Label()) + 7.0f);
 	menuField->ResizeToPreferred();
-
-
 
 	fCopyrightView = new BTextView("PNG copyright");
 	fCopyrightView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -80,21 +77,20 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 	fCopyrightView->MakeResizable(true);
 	fCopyrightView->SetText(png_get_copyright(NULL));
 
-	BFont font;
-	//font.SetSize(font.Size() * 0.8);
-	//fCopyrightView->SetFontAndColor(&font, B_FONT_SIZE, NULL);
-
-
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(titleView)
 		.Add(versionView)
 		.Add(copyrightView)
 		.AddGlue()
-		.Add(menuField)
+		.AddGroup(B_HORIZONTAL)
+			.Add(menuField)
+			.AddGlue()
+			.End()
 		.AddGlue()
 		.Add(fCopyrightView);
 
+	BFont font;
 	GetFont(&font);
 	SetExplicitPreferredSize(BSize((font.Size() * 390) / 12,
 		(font.Size() * 180) / 12));
