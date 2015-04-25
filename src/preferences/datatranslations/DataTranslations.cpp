@@ -96,7 +96,8 @@ DataTranslationsApplication::RefsReceived(BMessage* message)
 	BTranslatorRoster* roster = BTranslatorRoster::Default();
 
 	BPath path;
-	status_t status = find_directory(B_USER_ADDONS_DIRECTORY, &path, true);
+	status_t status = find_directory(B_USER_NONPACKAGED_ADDONS_DIRECTORY,
+		&path, true);
 	if (status != B_OK) {
 		_InstallError("translator", status);
 		return;
