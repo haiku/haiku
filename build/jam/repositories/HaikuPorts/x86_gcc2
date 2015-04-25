@@ -69,6 +69,7 @@ RemotePackageRepository HaikuPorts
 	cdrtools_devel-3.01~a27-1
 	chat-20100903-2
 	clockwerk-git-3
+	criticalmass-2.2-1
 	ctags-5.8-3
 	colors-2.3-1
 	coreutils-8.23-1
@@ -509,7 +510,7 @@ RemotePackageRepository HaikuPorts
 	burnitnow_x86-0.1.0-1
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
-	cmake_x86-3.0.0-1
+	cmake_x86-3.2.2-1
 	confuse_x86-2.7-1
 	confuse_x86_devel-2.7-1
 	copynametoclipboard-1.0.1-2
@@ -827,6 +828,7 @@ RemotePackageRepository HaikuPorts
 	confuse_x86
 	copynametoclipboard
 	coreutils
+	criticalmass
 	ctags
 	curl
 	cvs
