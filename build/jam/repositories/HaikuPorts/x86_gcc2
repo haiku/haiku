@@ -637,8 +637,8 @@ RemotePackageRepository HaikuPorts
 	libpng_x86_devel-1.5.22-1
 	libpng16_x86-1.6.17-1
 	libpng16_x86_devel-1.6.17-1
-	libqt4_x86-4.8.6.4-1
-	libqt4_x86_devel-4.8.6.4-1
+	libqt4_x86-4.8.6.4-2
+	libqt4_x86_devel-4.8.6.4-2
 	libsamplerate_x86-0.1.8-1
 	libsamplerate_x86_devel-0.1.8-1
 	libsigc++_x86-2.4.1-1
