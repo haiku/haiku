@@ -98,8 +98,8 @@ RemotePackageRepository HaikuPorts
 	file_devel-5.15-1
 	filwip-1.0.0-5
 	findutils-4.4.2-1
-	ffmpeg-0.10.14-1
-	ffmpeg_devel-0.10.14-1
+	ffmpeg-0.10.14-2
+	ffmpeg_devel-0.10.14-2
 	flac-1.3.0-1
 	flac_devel-1.3.0-1
 	flex-2.5.39-1
@@ -206,8 +206,8 @@ RemotePackageRepository HaikuPorts
 	libdvdnav_devel-5.0.3-1
 	libdvdread-5.0.3-1
 	libdvdread_devel-5.0.3-1
-	libebml-1.3.1-1
-	libebml_devel-1.3.1-1
+	libebml-1.3.1-2
+	libebml_devel-1.3.1-2
 	libedit-2012_06_01_3.0-1
 	libffi-3.0.13-2
 	libffi_devel-3.0.13-2
@@ -446,6 +446,8 @@ RemotePackageRepository HaikuPorts
 	util_macros-1.19.0-2
 	vcdimager-0.7.24-2
 	vcdimager_devel-0.7.24-2
+	vlc-0.8.6i-1
+	vlc_devel-0.8.6i-1
 	vim-7.4-3
 	virtualbox_guest_additions-4.3.53_svn-1
 	vmware_addons-1.1.1-2
@@ -1148,6 +1150,7 @@ RemotePackageRepository HaikuPorts
 	vcmi_x86
 	vim
 	vision
+	vlc
 	vmware_addons
 	wget
 	which
