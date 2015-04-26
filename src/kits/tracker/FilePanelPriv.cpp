@@ -233,6 +233,7 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
 	AutoLock<BWindow> lock(this);
 	fBorderedView = new BorderedView;
 	CreatePoseView(model);
+	fBorderedView->GroupLayout()->SetInsets(1);
 	fPoseView->SetRefFilter(filter);
 	if (!fIsSavePanel)
 		fPoseView->SetMultipleSelection(multipleSelection);
