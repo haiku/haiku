@@ -220,6 +220,10 @@ ZipperThread::ThreadShutdown()
 void
 ZipperThread::ThreadStartupFailed(status_t status)
 {
+	fprintf(stderr, "ZipperThread::ThreadStartupFailed(): %s\n",
+		strerror(status));
+	_SendMessageToWindow(ZIPPO_THREAD_EXIT_ERROR);
+
 	Quit();
 }
 
@@ -228,9 +232,12 @@ void
 ZipperThread::ExecuteUnitFailed(status_t status)
 {
 	if (status == EOF) {
+		fprintf(stderr, "ZipperThread::ExecuteUnitFailed(): EOF\n");
 		// thread has finished, been quit or killed, we don't know
 		_SendMessageToWindow(ZIPPO_THREAD_EXIT);
 	} else {
+		fprintf(stderr, "ZipperThread::ExecuteUnitFailed(): %s\n",
+			strerror(status));
 		// explicit error - communicate error to Window
 		_SendMessageToWindow(ZIPPO_THREAD_EXIT_ERROR);
 	}
