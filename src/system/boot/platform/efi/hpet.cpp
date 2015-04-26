@@ -31,13 +31,6 @@
 #endif
 
 
-static addr_t
-mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
-{
-	return physicalAddress;
-}
-
-
 void
 hpet_init(void)
 {

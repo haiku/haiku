@@ -259,6 +259,63 @@ platform_allocate_region(void **_address, size_t size, uint8 /* protection */, b
 }
 
 
+/*!
+	Neither \a virtualAddress nor \a size need to be aligned, but the function
+	will map all pages the range intersects with.
+	If physicalAddress is not page-aligned, the returned virtual address will
+	have the same "misalignment".
+*/
+extern "C" addr_t
+mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
+{
+	addr_t pageOffset = physicalAddress & (B_PAGE_SIZE - 1);
+
+	physicalAddress -= pageOffset;
+	size += pageOffset;
+
+	size_t aligned_size = ROUNDUP(size, B_PAGE_SIZE);
+	allocated_memory_region *region = new(std::nothrow) allocated_memory_region;
+
+	if (!region)
+		return B_NO_MEMORY;
+
+	// Addresses above 512GB not supported.
+	// Memory map regions above 512GB can be ignored, but if EFI returns pages above
+	// that there's nothing that can be done to fix it.
+	if (physicalAddress + size > (512ull * 1024 * 1024 * 1024))
+		panic("Can't currently support more than 512GB of RAM!");
+
+	region->next = allocated_memory_regions;
+	allocated_memory_regions = region;
+	region->vaddr = 0;
+	region->paddr = physicalAddress;
+	region->size = aligned_size;
+	region->released = false;
+
+	return physicalAddress + pageOffset;
+}
+
+
+extern "C" void
+mmu_free(void *virtualAddress, size_t size)
+{
+	addr_t physicalAddress = (addr_t)virtualAddress;
+	addr_t pageOffset = physicalAddress & (B_PAGE_SIZE - 1);
+
+	physicalAddress -= pageOffset;
+	size += pageOffset;
+
+	size_t aligned_size = ROUNDUP(size, B_PAGE_SIZE);
+
+	for (allocated_memory_region *region = allocated_memory_regions; region; region = region->next) {
+		if (region->paddr == physicalAddress && region->size == aligned_size) {
+			region->released = true;
+			return;
+		}
+	}
+}
+
+
 static allocated_memory_region *
 get_region(void *address, size_t size)
 {

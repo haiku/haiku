@@ -39,19 +39,6 @@ static acpi_descriptor_header* sAcpiXsdt; // Extended System Description Table
 static int32 sNumEntries = -1;
 
 
-extern "C" addr_t
-mmu_map_physical_memory(addr_t physicalAddress, size_t size, uint32 flags)
-{
-	return physicalAddress;
-}
-
-extern "C" void
-mmu_free(void *virtualAddress, size_t size)
-{
-	return;
-}
-
-
 static status_t
 acpi_validate_rsdp(acpi_rsdp* rsdp)
 {
