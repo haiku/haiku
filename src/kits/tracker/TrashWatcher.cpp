@@ -173,7 +173,6 @@ BTrashWatcher::UpdateTrashIcons()
 				= GetTrackerResources()->LoadResource('MICN',
 					fTrashFull ? R_TrashFullIcon : R_TrashIcon,  &smallSize);
 
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			size_t vectorSize = 0;
 			const void* vectorData = GetTrackerResources()->LoadResource(
 				B_VECTOR_ICON_TYPE,
@@ -184,7 +183,6 @@ BTrashWatcher::UpdateTrashIcons()
 					vectorData, vectorSize);
 			} else
 				TRESPASS();
-#endif
 
 			if (largeData) {
 				trashDir.WriteAttr(kAttrLargeIcon, 'ICON', 0,
