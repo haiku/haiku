@@ -22,6 +22,7 @@
 #include "acpi.h"
 #include "console.h"
 #include "efi_platform.h"
+#include "hpet.h"
 #include "mmu.h"
 
 
@@ -274,6 +275,7 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systemTable)
 	gKernelArgs.platform_args.apm.version = 0;
 
 	acpi_init();
+	hpet_init();
 
 	gKernelArgs.num_cpus = 1;
 	gKernelArgs.arch_args.hpet_phys = 0;
