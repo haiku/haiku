@@ -99,8 +99,8 @@ RemotePackageRepository HaikuPorts
 	file_devel-5.15-1
 	filwip-1.0.0-5
 	findutils-4.4.2-1
-	ffmpeg-0.10.14-2
-	ffmpeg_devel-0.10.14-2
+	ffmpeg-0.10.14-3
+	ffmpeg_devel-0.10.14-3
 	flac-1.3.0-1
 	flac_devel-1.3.0-1
 	flex-2.5.39-1
