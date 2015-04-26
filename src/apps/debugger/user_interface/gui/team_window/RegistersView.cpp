@@ -31,16 +31,6 @@ enum {
 };
 
 
-enum {
-	SIMD_RENDER_FORMAT_INT8 = 0,
-	SIMD_RENDER_FORMAT_INT16,
-	SIMD_RENDER_FORMAT_INT32,
-	SIMD_RENDER_FORMAT_INT64,
-	SIMD_RENDER_FORMAT_FLOAT,
-	SIMD_RENDER_FORMAT_DOUBLE
-};
-
-
 static const char*
 GetLabelForSIMDFormat(int format)
 {
@@ -176,8 +166,11 @@ public:
 					return false;
 				if (!fCpuState->GetRegisterValue(reg, value))
 					value.SetTo("?", B_VARIANT_DONT_COPY_DATA);
-				else if (reg->Format() == REGISTER_FORMAT_SIMD)
-					_FormatSIMDValue(reg, value);
+				else if (reg->Format() == REGISTER_FORMAT_SIMD) {
+					BString output;
+					value.SetTo(UiUtils::FormatSIMDValue(value,
+						reg->BitSize(),fSIMDFormat, output));
+				}
 				return true;
 			default:
 				return false;
@@ -193,74 +186,6 @@ public:
 	}
 
 private:
-	void _FormatSIMDValue(const Register* reg, BVariant& _value)
-	{
-		BString temp("{");
-		char* data = (char*)_value.ToPointer();
-		uint32 count = reg->BitSize() / (_GetSIMDFormatByteSize() * 8);
-		for (uint32 i = 0; i < count; i ++) {
-			BString format;
-			switch (fSIMDFormat) {
-				case SIMD_RENDER_FORMAT_INT8:
-					format.SetToFormat("%#" B_PRIx8,
-						_GetSIMDValueAtOffset<uint8>(data, i));
-					break;
-				case SIMD_RENDER_FORMAT_INT16:
-					format.SetToFormat("%#" B_PRIx16,
-						_GetSIMDValueAtOffset<uint16>(data, i));
-					break;
-				case SIMD_RENDER_FORMAT_INT32:
-					format.SetToFormat("%#" B_PRIx32,
-						_GetSIMDValueAtOffset<uint32>(data, i));
-					break;
-				case SIMD_RENDER_FORMAT_INT64:
-					format.SetToFormat("%#" B_PRIx64,
-						_GetSIMDValueAtOffset<uint64>(data, i));
-					break;
-				case SIMD_RENDER_FORMAT_FLOAT:
-					format.SetToFormat("%.3g",
-						(double)_GetSIMDValueAtOffset<float>(data, i));
-					break;
-				case SIMD_RENDER_FORMAT_DOUBLE:
-					format.SetToFormat("%.3g",
-						_GetSIMDValueAtOffset<double>(data, i));
-					break;
-			}
-			temp += format;
-			if (i < count - 1)
-				temp += ", ";
-		}
-		temp += "}";
-
-		_value.SetTo(temp);
-	}
-
-	template<typename T>
-	T _GetSIMDValueAtOffset(char* data, int32 index)
-	{
-		return ((T*)data)[index];
-	}
-
-	int32 _GetSIMDFormatByteSize() const
-	{
-		switch (fSIMDFormat) {
-			case SIMD_RENDER_FORMAT_INT8:
-				return sizeof(char);
-			case SIMD_RENDER_FORMAT_INT16:
-				return sizeof(int16);
-			case SIMD_RENDER_FORMAT_INT32:
-				return sizeof(int32);
-			case SIMD_RENDER_FORMAT_INT64:
-				return sizeof(int64);
-			case SIMD_RENDER_FORMAT_FLOAT:
-				return sizeof(float);
-			case SIMD_RENDER_FORMAT_DOUBLE:
-				return sizeof(double);
-		}
-
-		return 0;
-	}
-
 private:
 	Architecture*	fArchitecture;
 	CpuState*		fCpuState;
