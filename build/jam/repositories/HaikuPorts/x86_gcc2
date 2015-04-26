@@ -387,6 +387,7 @@ RemotePackageRepository HaikuPorts
 	ruby_devel-1.9.1-2
 	samba-3.6.25-1
 	samba_devel-3.6.25-1
+	sawteeth-1.3-2
 	scons-2.3.1-4
 	sdl_gfx-2.0.24-1
 	sdl_gfx_devel-2.0.24-1
@@ -1104,6 +1105,7 @@ RemotePackageRepository HaikuPorts
 	roadfighter
 	rocksndiamonds_x86
 	ruby
+	sawteeth
 	scons
 	sdcc_x86
 	sdl_gfx
