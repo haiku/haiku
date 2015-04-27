@@ -96,6 +96,19 @@ void BFilePanel::_ReservedFilePanel8() {}
 #if __GNUC__ && __GNUC__ < 3
 extern "C" {
 
+_EXPORT void
+run_open_panel__Fv()
+{
+	(new TFilePanel())->Show();
+}
+
+
+_EXPORT void
+run_save_panel__Fv()
+{
+	(new TFilePanel(B_SAVE_PANEL))->Show();
+}
+
 _EXPORT BFilePanel*
 __10BFilePanel15file_panel_modeP10BMessengerP9entry_refUlbP8BMessageP10BRefFilterT5T5
 (void* self,

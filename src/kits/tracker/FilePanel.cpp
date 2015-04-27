@@ -53,27 +53,6 @@ All rights reserved.
 #ifndef _IMPEXP_ROOT
 #	define _IMPEXP_ROOT
 #endif
-#ifndef _IMPEXP_TRACKER
-#	define _IMPEXP_TRACKER
-#endif
-
-// these two calls are deprecated
-extern _IMPEXP_TRACKER void run_open_panel();
-extern _IMPEXP_TRACKER void run_save_panel();
-
-
-void
-run_open_panel()
-{
-	(new TFilePanel())->Show();
-}
-
-
-void
-run_save_panel()
-{
-	(new TFilePanel(B_SAVE_PANEL))->Show();
-}
 
 
 //	#pragma mark - BFilePanel
