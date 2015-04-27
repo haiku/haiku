@@ -226,7 +226,7 @@ UninstallView::MessageReceived(BMessage* msg)
 				break;
 
 			fButton->SetEnabled(true);
-			fDescription->SetText(fCurrentSelection.GetDescription());
+			fDescription->SetText(fCurrentSelection.Description());
 			break;
 		}
 		case P_MSG_REMOVE:
