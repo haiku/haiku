@@ -220,7 +220,7 @@ PackageInstall::_Install()
 		}
 
 		if (err != B_OK) {
-			fprintf(stderr, "Error while writing path\n");
+			fprintf(stderr, "Error '%s' while writing path\n", strerror(err));
 			return P_MSG_I_ERROR;
 		}
 
