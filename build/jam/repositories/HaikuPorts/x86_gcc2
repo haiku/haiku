@@ -14,6 +14,7 @@ RemotePackageRepository HaikuPorts
 	droid-113-1
 	flare_x86_data-0.19-3
 	freedroidrpg_x86_data-0.15.1-1
+	hub-1.12.4-1
 	openttd_gfx-0.4.7-1
 	openttd_msx-0.3.1-1
 	openttd_sfx-0.2.3-1
