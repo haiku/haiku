@@ -27,6 +27,7 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <ScrollView.h>
+#include <StringForSize.h>
 #include <TextView.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
@@ -45,24 +46,6 @@
 
 const float kMaxDescHeight = 125.0f;
 const uint32 kSeparatorIndex = 3;
-
-
-static void
-convert_size(uint64 size, char *buffer, uint32 n)
-{
-	if (size < 1024)
-		snprintf(buffer, n, B_TRANSLATE("%llu bytes"), size);
-	else if (size < 1024 * 1024)
-		snprintf(buffer, n, B_TRANSLATE("%.1f KiB"), size / 1024.0f);
-	else if (size < 1024 * 1024 * 1024)
-		snprintf(buffer, n, B_TRANSLATE("%.1f MiB"),
-			size / (1024.0f * 1024.0f));
-	else {
-		snprintf(buffer, n, B_TRANSLATE("%.1f GiB"),
-			size / (1024.0f * 1024.0f * 1024.0f));
-	}
-}
-
 
 
 // #pragma mark -
@@ -684,7 +667,7 @@ PackageView::_NamePlusSizeString(BString baseName, size_t size,
 	const char* format) const
 {
 	char sizeString[48];
-	convert_size(size, sizeString, sizeof(sizeString));
+	string_for_size(size, sizeString, sizeof(sizeString));
 
 	BString name(format);
 	name.ReplaceAll("%name%", baseName);
