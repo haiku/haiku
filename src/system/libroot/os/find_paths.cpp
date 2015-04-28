@@ -203,7 +203,7 @@ get_relative_directory_path(size_t installationLocationIndex,
 		case B_FIND_PATH_HEADERS_DIRECTORY:
 			return "/develop/headers%";
 		case B_FIND_PATH_LIB_DIRECTORY:
-			return "/lib";
+			return "/lib%";
 		case B_FIND_PATH_LOG_DIRECTORY:
 			return "/log";
 		case B_FIND_PATH_MEDIA_NODES_DIRECTORY:
