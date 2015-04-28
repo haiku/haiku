@@ -14,6 +14,8 @@
 #include <Locker.h>
 #include <SupportDefs.h>
 
+#include <stdio.h>
+
 #include "support_kit_config.h"
 
 
