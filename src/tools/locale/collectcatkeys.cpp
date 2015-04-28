@@ -57,7 +57,7 @@ usage()
 		"  -r <regex>\t\tchanges the regex used by the key-scanner to the one "
 		"given,\n"
 		"      \t\t\tthe default is:   ");
-		fprintf(stderr, rxString.String());
+		fprintf(stderr, "%s", rxString.String());
 		fprintf(stderr,"\n  -s <catalogSig>\tsignature of the target-catalog\n"
 		"  -v\t\t\tbe verbose, show summary\n"
 		"  -w\t\t\tshow warnings about catalog-accesses that couldn't be "
@@ -247,8 +247,7 @@ main(int argc, char **argv)
 				else if (c == 'o') {
 					outputFile = (++argv)[0];
 					break;
-				}
-				else if (c == 'r') {
+				} else if (c == 'r') {
 					rxString = (++argv)[0];
 					break;
 				}
