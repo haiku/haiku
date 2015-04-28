@@ -641,6 +641,7 @@ RemotePackageRepository HaikuPorts
 	libpng16_x86_devel-1.6.17-1
 	libqt4_x86-4.8.6.4-3
 	libqt4_x86_devel-4.8.6.4-3
+	librecad_x86-2.0.7-1
 	libsamplerate_x86-0.1.8-1
 	libsamplerate_x86_devel-0.1.8-1
 	libsigc++_x86-2.4.1-1
@@ -679,6 +680,7 @@ RemotePackageRepository HaikuPorts
 	lzip_x86-1.16-1
 	lzo_x86-2.09-1
 	lzo_x86_devel-2.09-1
+	marble_x86-1.9.2-1
 	mesa_x86-10.1.0-2
 	mesa_x86_devel-10.1.0-2
 	mesa_x86_swrast-10.1.0-2
@@ -976,6 +978,7 @@ RemotePackageRepository HaikuPorts
 	libpng16
 	libpthread_stubs
 	libqt4_x86
+	librecad_x86
 	libreplaygain
 	libsanta
 	libsamplerate_x86
@@ -1023,6 +1026,7 @@ RemotePackageRepository HaikuPorts
 	m4
 	make
 	man
+	marble_x86
 	mc
 	mercurial
 	mesa
