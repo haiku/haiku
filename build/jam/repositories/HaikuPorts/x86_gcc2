@@ -74,8 +74,8 @@ RemotePackageRepository HaikuPorts
 	ctags-5.8-3
 	colors-2.3-1
 	coreutils-8.23-1
-	curl-7.39.0-1
-	curl_devel-7.39.0-1
+	curl-7.42.0-1
+	curl_devel-7.42.0-1
 	cvs-1.12.13.1-6
 	desknotes-1.1-4
 	dfu_util-0.7-1
@@ -516,8 +516,8 @@ RemotePackageRepository HaikuPorts
 	confuse_x86-2.7-1
 	confuse_x86_devel-2.7-1
 	copynametoclipboard-1.0.1-2
-	curl_x86-7.39.0-1
-	curl_x86_devel-7.39.0-1
+	curl_x86-7.42.0-1
+	curl_x86_devel-7.42.0-1
 	cvsps_x86-2.2b1-1
 	dbus_x86-1.8.6-1
 	dbus_x86_devel-1.8.6-1

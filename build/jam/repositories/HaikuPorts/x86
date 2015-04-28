@@ -40,8 +40,8 @@ RemotePackageRepository HaikuPorts
 	coreutils-8.23-1
 	cpio-2.10-1
 	ctags-5.8-3
-	curl-7.39.0-1
-	curl_devel-7.39.0-1
+	curl-7.42.0-1
+	curl_devel-7.42.0-1
 	cvs-1.12.13.1-6
 	cvsps-2.2b1-1
 	doxygen-1.6.3-4
@@ -229,8 +229,8 @@ RemotePackageRepository HaikuPorts
 	binutils_x86_gcc2-2.17_2013_04_21-2
 	bzip2_x86_gcc2-1.0.6-5
 	bzip2_x86_gcc2_devel-1.0.6-5
-	curl_x86_gcc2-7.39.0-1
-	curl_x86_gcc2_devel-7.39.0-1
+	curl_x86_gcc2-7.42.0-1
+	curl_x86_gcc2_devel-7.42.0-1
 	expat_x86_gcc2-2.0.1-7
 	expat_x86_gcc2_devel-2.0.1-7
 	ffmpeg_x86_gcc2-0.10.2-4
