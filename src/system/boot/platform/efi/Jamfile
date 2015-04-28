@@ -31,6 +31,8 @@ local platform_src =
 	menu.cpp
 	devices.cpp
 	hpet.cpp
+	cpu.cpp
+	support.S
 	;
 
 Includes [ FGristFiles $(efi_glue_src) $(platform_src) ]

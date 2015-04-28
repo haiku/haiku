@@ -23,6 +23,7 @@
 #include "console.h"
 #include "efi_platform.h"
 #include "hpet.h"
+#include "cpu.h"
 #include "mmu.h"
 
 
@@ -274,6 +275,7 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systemTable)
 	// disable apm in case we ever load a 32-bit kernel...
 	gKernelArgs.platform_args.apm.version = 0;
 
+	cpu_init();
 	acpi_init();
 	hpet_init();
 
