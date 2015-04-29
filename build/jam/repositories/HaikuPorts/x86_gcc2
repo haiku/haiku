@@ -482,7 +482,7 @@ RemotePackageRepository HaikuPorts
 	avr_binutils_x86-2.24_2014_03_19-5
 	avr_gcc_x86-4.8.2_2014_03_20-1
 	avrdude_x86-6.0.1-1
-	beshare_x86-4-1
+	beshare_x86-2.31-1
 	binutils_x86-2.25_2014_12_27-1
 	bison_x86-2.5-1
 	boost_x86-1.55.0-6
@@ -644,6 +644,8 @@ RemotePackageRepository HaikuPorts
 	librecad_x86-2.0.7-1
 	libsamplerate_x86-0.1.8-1
 	libsamplerate_x86_devel-0.1.8-1
+	libsanta_x86-3.0.1-1
+	libsanta_x86_devel-3.0.1-1
 	libsigc++_x86-2.4.1-1
 	libsigc++_x86_devel-2.4.1-1
 	libsdl_x86-1.2.15-7
@@ -981,6 +983,7 @@ RemotePackageRepository HaikuPorts
 	librecad_x86
 	libreplaygain
 	libsanta
+	libsanta_x86
 	libsamplerate_x86
 	libsdl
 	libsdl2
