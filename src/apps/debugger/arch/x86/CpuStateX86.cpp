@@ -227,10 +227,31 @@ bool
 CpuStateX86::SetRegisterValue(const Register* reg, const BVariant& value)
 {
 	int32 index = reg->Index();
-	if (index >= X86_INT_REGISTER_END)
+	if (index >= X86_XMM_REGISTER_END)
 		return false;
 
-	fIntRegisters[index] = value.ToUInt32();
+	if (index < X86_INT_REGISTER_END)
+		fIntRegisters[index] = value.ToUInt32();
+	else if (index >= X86_REGISTER_ST0 && index < X86_FP_REGISTER_END)
+		fFloatRegisters[index - X86_REGISTER_ST0] = value.ToDouble();
+	else if (index >= X86_REGISTER_MM0 && index < X86_MMX_REGISTER_END) {
+		if (value.Size() > sizeof(int64))
+			return false;
+		memset(&fMMXRegisters[index - X86_REGISTER_MM0], 0,
+			sizeof(x86_fp_register));
+		memcpy(fMMXRegisters[index - X86_REGISTER_MM0].value,
+			value.ToPointer(), value.Size());
+	} else if (index >= X86_REGISTER_XMM0 && index < X86_XMM_REGISTER_END) {
+		if (value.Size() > sizeof(x86_xmm_register))
+			return false;
+
+		memset(&fXMMRegisters[index - X86_REGISTER_XMM0], 0,
+			sizeof(x86_xmm_register));
+		memcpy(fXMMRegisters[index - X86_REGISTER_XMM0].value,
+			value.ToPointer(), value.Size());
+	} else
+		return false;
+
 	fSetRegisters[index] = 1;
 	return true;
 }

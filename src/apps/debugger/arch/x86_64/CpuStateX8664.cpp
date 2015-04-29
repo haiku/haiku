@@ -256,7 +256,29 @@ CpuStateX8664::SetRegisterValue(const Register* reg, const BVariant& value)
 	if (index >= X86_64_XMM_REGISTER_END)
 		return false;
 
-	fIntRegisters[index] = value.ToUInt64();
+	if (index < X86_64_INT_REGISTER_END)
+		fIntRegisters[index] = value.ToUInt64();
+	else if (index >= X86_64_REGISTER_ST0 && index < X86_64_FP_REGISTER_END)
+		fFloatRegisters[index - X86_64_REGISTER_ST0] = value.ToDouble();
+	else if (index >= X86_64_REGISTER_MM0 && index < X86_64_MMX_REGISTER_END) {
+		if (value.Size() > sizeof(int64))
+			return false;
+		memset(&fMMXRegisters[index - X86_64_REGISTER_MM0], 0,
+			sizeof(x86_64_fp_register));
+		memcpy(fMMXRegisters[index - X86_64_REGISTER_MM0].value,
+			value.ToPointer(), value.Size());
+	} else if (index >= X86_64_REGISTER_XMM0
+			&& index < X86_64_XMM_REGISTER_END) {
+		if (value.Size() > sizeof(x86_64_xmm_register))
+			return false;
+
+		memset(&fXMMRegisters[index - X86_64_REGISTER_XMM0], 0,
+			sizeof(x86_64_xmm_register));
+		memcpy(fXMMRegisters[index - X86_64_REGISTER_XMM0].value,
+			value.ToPointer(), value.Size());
+	} else
+		return false;
+
 	fSetRegisters[index] = 1;
 	return true;
 }
