@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.04.21
-#	Date:    2015-04-21 03:15:02
+#	Version: 2015.04.28
+#	Date:    2015-04-28 03:15:01
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -342,6 +342,7 @@
 		8086 3513  RMS25CB080 RAID Controller
 	005c  SAS1064A PCI-X Fusion-MPT SAS
 	005d  MegaRAID SAS-3 3108 [Invader]
+		1000 9361  MegaRAID SAS 9361-8i
 		1028 1f41  PERC H830 Adapter
 		1028 1f42  PERC H730P Adapter
 		1028 1f43  PERC H730 Adapter
@@ -1444,6 +1445,7 @@
 	6602  Mars
 	6603  Mars
 	6604  Opal XT [Radeon R7 M265]
+		103c 8006  FirePro M4170
 		17aa 3643  Radeon R7 A360
 	6605  Opal PRO [Radeon R7 M260]
 	6606  Mars XTX [Radeon HD 8790M]
@@ -1995,6 +1997,7 @@
 		1002 0b0e  FirePro S10000 Passive
 		1002 0b2a  FirePro S10000
 		1028 030c  FirePro W8000
+		1028 0710  FirePro S9000
 	6790  Tahiti
 	6791  Tahiti
 	6792  Tahiti
@@ -2039,8 +2042,11 @@
 	679f  Tahiti
 	67a0  Hawaii XT GL [FirePro W9100]
 		1002 0335  FirePro S9150
+		1028 031f  FirePro W9100
+		1028 0335  FirePro S9150
 	67a1  Hawaii PRO GL [FirePro W8100]
 		1002 0335  FirePro S9100
+		1028 0335  FirePro S9100
 	67a2  Hawaii GL
 	67a8  Hawaii
 	67a9  Hawaii
@@ -4575,7 +4581,7 @@
 		1734 1099  D2030-A1 Motherboard
 	0900  SiS900 PCI Fast Ethernet
 		1019 0a14  K7S5A motherboard
-		1039 0900  SiS900 10/100 Ethernet Adapter onboard [Asus P4SC-EA]
+		1039 0900  SiS900 10/100 Ethernet Adapter onboard
 		1043 8035  CUSI-FX motherboard
 		1043 80a7  Motherboard P4S800D-X
 		1462 0900  MS-6701 motherboard
@@ -4657,7 +4663,7 @@
 		1019 0f05  A928 (i-Buddie)
 		1039 7012  SiS 7012 onboard [Asus P4SC-EA] AC'97 Sound Controller
 		1043 818f  A8S-X Motherboard
-		13f6 0300  CMI9739(A) on ECS K7SOM+ motherboard
+		13f6 0300  CMI9739(A) on ECS K7S series motherboard
 		1462 5850  MSI 648 Max (MS-6585)
 		1462 7010  MS-6701 motherboard
 		15bd 1001  DFI 661FX motherboard
@@ -10856,8 +10862,7 @@
 	287e  VT8237/8251 Ultra VLINK Controller
 	3022  CLE266
 	3038  VT82xxxxx UHCI USB 1.1 Controller
-# possibly Hewlett-Packard D9840-60001 [Brio BA410 Motherboard]
-		0925 1234  VA-502 Mainboard
+		0925 1234  onboard UHCI USB 1.1 Controller
 		1019 0985  P6VXA Motherboard
 		1019 0a81  L7VTA v1.0 Motherboard (KT400-8235)
 		1043 8080  A7V333 motherboard
@@ -10978,6 +10983,7 @@
 	3102  VT8662 Host Bridge
 	3103  VT8615 Host Bridge
 	3104  USB 2.0
+		0925 1234  onboard EHCI USB 2.0 Controller
 		1019 0a81  L7VTA v1.0 Motherboard (KT400-8235)
 		1043 808c  A7V8X motherboard
 		1043 80a1  A7V8X-X motherboard rev 1.01
@@ -11116,6 +11122,7 @@
 	3432  VL80x xHCI USB 3.0 Controller
 	3456  VX11 Standard Host Bridge
 	345b  VX11 Miscellaneous Bus
+	3483  VL805 USB 3.0 Host Controller
 	3a01  VX11 Graphics [Chrome 645/640]
 	4149  VIA VT6420 (ATA133) Controller
 	4204  K8M800 Host Bridge
@@ -17396,11 +17403,72 @@
 	eb01  PIXCI(R) EB1 PCI Camera Link Video Capture Board
 # Gidel Reconfigurable Computing
 165c  Gidel Ltd.
+	5361  PROCStarII60-1
+	5362  PROCStarII60-2
+	5364  PROCStarII60-4
+	5435  ProcSparkII
+	5661  ProcE60
+	56e1  ProcE180
+	5911  ProcStarIII110-1
+	5912  ProcStarIII110-2
+	5913  ProcStarIII110-3
+	5914  ProcStarIII110-4
+	5921  ProcStarIII150-1
+	5922  ProcStarIII150-2
+	5923  ProcStarIII150-3
+	5924  ProcStarIII150-4
+	5931  ProcStarIII260-1
+	5932  ProcStarIII260-2
+	5933  ProcStarIII260-3
+	5934  ProcStarIII260-4
+	5941  ProcStarIII340-1
+	5942  ProcStarIII340-2
+	5943  ProcStarIII340-3
+	5944  ProcStarIII340-4
+	5a01  ProceIII80
+	5a11  ProceIII110
+	5a21  ProceIII150
+	5a31  ProceIII260
+	5a41  ProceIII340
+	5b51  ProceIV360
+	5b61  ProceIV530
+	5b71  ProceIV820
+	5c01  ProcStarIV80-1
+	5c02  ProcStarIV80-2
+	5c03  ProcStarIV80-3
+	5c04  ProcStarIV80-4
+	5c11  ProcStarIV110-1
+	5c12  ProcStarIV110-2
+	5c13  ProcStarIV110-3
+	5c14  ProcStarIV110-4
+	5c51  ProcStarIV360-1
+	5c52  ProcStarIV360-2
+	5c53  ProcStarIV360-3
+	5c54  ProcStarIV360-4
+	5c61  ProcStarIV530-1
+	5c62  ProcStarIV530-2
+	5c63  ProcStarIV530-3
+	5c64  ProcStarIV530-4
+	5c71  ProcStarIV820-1
+	5c72  ProcStarIV820-2
+	5c73  ProcStarIV820-3
+	5c74  ProcStarIV820-4
+	5d01  Proc10480
+	5d11  Proc104110
 	5f01  ProceV_A3
 	5f11  ProceV_A7
 	5f21  ProceV_AB
 	5f31  ProceV_D5
 	5f41  ProceV_D8
+	6732  Proc6M
+	6832  Proc12M
+	7101  Proc10a_27
+	7111  Proc10a_48
+	7121  Proc10a_66
+	7141  Proc10a_115
+	7181  Proc10a_27S
+	7191  Proc10a_48S
+	71a1  Proc10a_66S
 165d  Hsing Tech. Enterprise Co., Ltd.
 165f  Linux Media Labs, LLC
 	1020  LMLM4 MPEG-4 encoder
@@ -18962,6 +19030,7 @@
 	1080  ASM1083/1085 PCIe to PCI Bridge
 		1849 1080  Motherboard
 	1142  ASM1042A USB 3.0 Host Controller
+	1242  ASM1142 USB 3.1 Host Controller
 1b2c  Opal-RT Technologies Inc.
 1b36  Red Hat, Inc.
 	0001  QEMU PCI-PCI bridge
@@ -19121,6 +19190,7 @@
 1d26  Kalray Inc.
 	0040  Turbocard2 Accelerator
 	e004  AB01/EMB01 Development Board
+1d40  Techman Electronics (Changshu) Co., Ltd.
 1d44  DPT
 	a400  PM2x24/PM3224
 1d5c  Fantasia Trading LLC
@@ -21528,6 +21598,7 @@
 	1612  Broadwell-U Integrated Graphics
 	1614  Broadwell-U Host Bridge - DMI
 	1616  Broadwell-U Integrated Graphics
+		103c 2216  ZBook 15u G2 Mobile Workstation
 	1618  Broadwell-U Host Bridge - DMI
 	161a  Broadwell-U Integrated Graphics
 	161b  Broadwell-U Integrated Graphics
