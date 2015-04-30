@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.04.21
-# Date:    2015-04-21 20:34:12
+# Version: 2015.04.27
+# Date:    2015-04-27 20:34:07
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -13251,6 +13251,7 @@
 	0169  Xperia S
 	0172  Xperia P
 	0177  Xperia Ion [Mass Storage]
+	01bb  D5803 [Xperia Z3 Compact] (MTP mode)
 	0dde  Xperia Mini Pro Bootloader
 	1010  WMC Modem
 	10af  V640i Phone [PictBridge]
@@ -14097,6 +14098,28 @@
 	1003  IBSecureCam-P
 	1004  IBSecureCam-O
 	1005  IBSecureCam-N
+	1006  Mini IO-Board
+	2000  Zygmunt Krynicki Lantern Brightness Sensor
+	2048  Housedillon.com MRF49XA Transciever
+	2222  LabConnect Signalgenerator
+	2300  Keyboardio Keyboardio Model 01 Bootloader
+	2301  Keyboardio Keyboardio Model 01
+	2337  /Dev or SlashDev /Net
+	3000  lloyd3000
+	3333  LabConnect Digitalnetzteil
+	5222  telavivmakers attami
+	5a22  ikari_01 sd2snes
+	7bd0  pokey9000 Tiny Bit Dingus
+	abd0  tibounise ADB converter
+	beef  Modal MC-USB
+	c0f5  unethi PERswitch
+	ca1c  KnightOS Hub
+	ca1d  KnightOS MTP Device
+	cafe  ii iigadget
+	dada  Rebel Technology OWL
+	dead  chaosfield.at AVR-Ruler
+	fa11  moonglow OpenXHC
+	feed  ProgramGyar AVR-IR Sender
 120e  Hudson Soft Co., Ltd
 120f  Magellan
 	524e  RoadMate 1475T
@@ -14107,6 +14130,8 @@
 	001c  RP255 Guitar Multi-Effects Processor
 121e  Jungsoft Co., Ltd
 	3403  Muzio JM250 Audio Player
+1221  Unknown manufacturer
+	3234  Disk (Thumb drive)
 1223  SKYCABLE ENTERPRISE. CO., LTD.
 1228  Datapaq Limited
 	0012  Q18 Data Logger
@@ -14294,8 +14319,8 @@
 	140b  EC1260 Wireless Data Modem HSD USB Card
 	140c  E180v
 	1412  EC168c
-	1436  E173 3G Modem (modem-mode)
-	1446  E1552/E1800/E173 (HSPA modem)
+	1436  Broadband stick
+	1446  Broadband stick (modem on)
 	1465  K3765 HSPA
 	14c3  K5005 Vodafone LTE/UMTS/GSM Modem/Networkcard
 	14c8  K5005 Vodafone LTE/UMTS/GSM MOdem/Networkcard
@@ -14315,7 +14340,7 @@
 	1575  K5150 LTE modem
 	15ca  E3131 3G/UMTS/HSPA+ Modem (Mass Storage Mode)
 	1805  AT&T Go Phone U2800A phone
-	1c05  E173s 3G broadband stick (modem on)
+	1c05  Broadband stick (modem on)
 	1c0b  E173s 3G broadband stick (modem off)
 	1c20  R205 Mobile WiFi (Charging)
 	1d50  ET302s TD-SCDMA/TD-HSDPA Mobile Broadband
@@ -15236,6 +15261,8 @@
 	0404  WMA9109 UMTS Phone
 	0600  Vodafone VDA GPS / Toschiba Protege G710
 	0804  WP-S1 Phone
+1617  Sony Corp.
+	2002  NVX-P1 Personal Navigation System
 1619  L & K Precision Technology Co., Ltd.
 1621  Wionics Research
 1628  Stonestreet One, Inc.
@@ -15429,6 +15456,8 @@
 	05e4  Free shared USB VID/PID pair for MIDI devices
 	06b4  USB2LPT with 2 interfaces
 	06b5  USB2LPT with 3 interfaces (native, HID, printer)
+	074e  DSP-Weuffen USB-HPI-Programmer
+	074f  DSP-Weuffen USB2-HPI-Programmer
 	0762  Osmocom SIMtrace
 	076b  OpenPCD 13.56MHz RFID Reader
 	076c  OpenPICC 13.56MHz RFID Simulator (native)
@@ -15502,6 +15531,7 @@
 	0011  MIDI-USB 1x1
 170d  Avnera
 1711  Leica Microsystems
+	0101  DFC-365FX camera
 	3020  IC80 HD Camera
 1724  Meyer Instruments (MIS)
 	0115  PAXcam5
@@ -15555,9 +15585,12 @@
 1748  MQP Electronics
 	0101  Packet-Master USB12
 174c  ASMedia Technology Inc.
-	5106  Transcend StoreJet 25M3
+	1153  ASM2115 SATA 6Gb/s bridge
+	2074  ASM1074 High-Speed hub
+	3074  ASM1074 SuperSpeed hub
+	5106  ASM1051 SATA 3Gb/s bridge
 	5136  ASM1053 SATA 6Gb/s bridge
-	55aa  ASM1051 SATA 3Gb/s bridge
+	55aa  ASM1051E SATA 6Gb/s bridge, ASM1053E SATA 6Gb/s bridge, ASM1153 SATA 3Gb/s bridge
 174f  Syntek
 	1105  SM-MS/Pro-MMC-XD Card Reader
 	110b  HP Webcam
@@ -16811,6 +16844,16 @@
 	648b  TEW-648UBM 802.11n 150Mbps Micro Wireless N Adapter [Realtek RTL8188CUS]
 2101  ActionStar
 	0201  SIIG 4-to-2 Printer Switch
+2109  VIA Labs, Inc.
+	0700  VL700 SATA 3Gb/s bridge
+	0701  VL701 SATA 3Gb/s bridge
+	0810  VL81x Hub
+	0811  Hub
+	0812  VL812 Hub
+	2811  Hub
+	2812  VL812 Hub
+	3431  Hub
+	8110  Hub
 2149  Advanced Silicon S.A.
 	211b  Touchscreen Controller
 	2703  TS58xxA/TC56xxA [CoolTouch]
@@ -17140,6 +17183,8 @@
 	803c  Arduino Explora (CDC ACM)
 	8041  Arduino Yun (CDC ACM)
 	804d  Arduino Zero Pro (CDC ACM)
+2a37  RTD Embedded Technologies, Inc.
+	5110  UPS35110/UPS25110
 2a45  Meizu Corp.
 	0001  MX Phone (BICR)
 	0c02  MX Phone (MTP & ADB)
