@@ -34,8 +34,8 @@ RemotePackageRepository HaikuPorts
 	cmake-3.0.0_rc6-1
 	coreutils-8.23-1
 	ctags-5.8-3
-	curl-7.42.0-1
-	curl_devel-7.42.0-1
+	curl-7.42.0-2
+	curl_devel-7.42.0-2
 	cvs-1.12.13.1-6
 	doxygen-1.6.3-4
 	dtc-1.4.1-1
