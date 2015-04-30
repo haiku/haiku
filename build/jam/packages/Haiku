@@ -232,6 +232,7 @@ AddFilesToPackage add-ons input_server devices
 	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
 AddFilesToPackage add-ons input_server filters
 	: screen_saver shortcut_catcher switch_workspace ;
+AddDirectoryToPackage add-ons input_server methods ;
 
 AddFilesToPackage add-ons kernel network : <net>notifications stack ;
 AddFilesToPackage add-ons kernel network : dns_resolver ;
