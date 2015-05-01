@@ -616,11 +616,15 @@ void
 AutoMounter::_UnmountAndEjectVolume(BPartition* partition, BPath& mountPoint,
 	const char* name)
 {
-	BDiskDevice device;
+	BDiskDevice deviceStorage;
+	BDiskDevice* device;
 	if (partition == NULL) {
 		// Try to retrieve partition
 		BDiskDeviceRoster().FindPartitionByMountPoint(mountPoint.Path(),
-			&device, &partition);
+			&deviceStorage, &partition);
+			device = &deviceStorage;
+	} else {
+		device = partition->Device();
 	}
 
 	status_t status;
@@ -678,10 +682,10 @@ AutoMounter::_UnmountAndEjectVolume(BPartition* partition, BPath& mountPoint,
 			bool	fHasMounted;
 		} visitor;
 
-		partition->Device()->VisitEachDescendant(&visitor);
+		device->VisitEachDescendant(&visitor);
 
 		if (!visitor.HasMountedPartitions())
-			partition->Device()->Eject();
+			device->Eject();
 	}
 
 	// remove the directory if it's a directory in rootfs

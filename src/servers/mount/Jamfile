@@ -3,8 +3,8 @@ SubDir HAIKU_TOP src servers mount ;
 UsePrivateHeaders mount shared storage ;
 
 Server mount_server
- 	:
- 	AutoMounter.cpp
+	:
+	AutoMounter.cpp
 # 	AutoMounterSettings.cpp
 	:
 	libbe.so localestub
