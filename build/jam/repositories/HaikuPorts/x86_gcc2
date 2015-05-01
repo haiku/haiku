@@ -74,8 +74,8 @@ RemotePackageRepository HaikuPorts
 	ctags-5.8-3
 	colors-2.3-1
 	coreutils-8.23-1
-	curl-7.42.0-1
-	curl_devel-7.42.0-1
+	curl-7.42.1-1
+	curl_devel-7.42.1-1
 	cvs-1.12.13.1-6
 	desknotes-1.1-4
 	dfu_util-0.7-1
@@ -241,6 +241,8 @@ RemotePackageRepository HaikuPorts
 	libogg_devel-1.3.0-2
 	libpaper-1.1.24-1
 	libpaper_devel-1.1.24-1
+	libpcap-1.7.3-1
+	libpcap_devel-1.7.3-1
 	libpcre-8.21-5
 	libpcre_devel-8.21-5
 	libpng-1.5.22-1
@@ -435,6 +437,7 @@ RemotePackageRepository HaikuPorts
 	taglib-1.7.2-1
 	taglib_devel-1.7.2-1
 	tar-1.26-6
+	tcpdump-4.7.4-1
 	texinfo-4.13a-7
 	tiff-3.9.6-2
 	tiff_devel-3.9.6-2
@@ -516,8 +519,8 @@ RemotePackageRepository HaikuPorts
 	confuse_x86-2.7-1
 	confuse_x86_devel-2.7-1
 	copynametoclipboard-1.0.1-2
-	curl_x86-7.42.0-1
-	curl_x86_devel-7.42.0-1
+	curl_x86-7.42.1-1
+	curl_x86_devel-7.42.1-1
 	cvsps_x86-2.2b1-1
 	dbus_x86-1.8.6-1
 	dbus_x86_devel-1.8.6-1
@@ -974,6 +977,7 @@ RemotePackageRepository HaikuPorts
 	libmpeg2
 	libogg
 	libpaper
+	libpcap
 	libpcre
 	libpcre_x86
 	libpng
@@ -1151,6 +1155,7 @@ RemotePackageRepository HaikuPorts
 	taglib
 	taglib_x86
 	tar
+	tcpdump
 	texi2html
 	texinfo
 	tiff
