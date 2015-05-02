@@ -1439,7 +1439,7 @@ dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 
 	while (true) {
 		struct file_io_vec fileVecs[8];
-		uint32 fileVecCount = 8;
+		size_t fileVecCount = 8;
 		bool bufferOverflow;
 		size_t bytes = bytesLeft;
 
@@ -1483,7 +1483,7 @@ dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 
 	while (true) {
 		struct file_io_vec fileVecs[8];
-		uint32 fileVecCount = 8;
+		size_t fileVecCount = 8;
 		bool bufferOverflow;
 		size_t bytes = bytesLeft;
 
