@@ -713,8 +713,9 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 
-	char versionString[16];
-	sprintf(versionString, "v%d.%d.%d", 
+	char versionString[100];
+	snprintf(versionString, sizeof(versionString),
+		B_TRANSLATE("Version %d.%d.%d"), 
 		static_cast<int>(sTranslatorVersion >> 8), 
 		static_cast<int>((sTranslatorVersion >> 4) & 0xf),
 		static_cast<int>(sTranslatorVersion & 0xf));

@@ -68,7 +68,7 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
  	fpchkIgnoreAlpha->SetValue(val);
  	fpchkIgnoreAlpha->SetViewColor(ViewColor());
 
- 	fpchkRLE = new BCheckBox(B_TRANSLATE("Save with RLE Compression"),
+ 	fpchkRLE = new BCheckBox(B_TRANSLATE("Save with RLE compression"),
 		new BMessage(CHANGE_RLE));
  	val = (fSettings->SetGetBool(TGA_SETTING_RLE)) ? 1 : 0;
  	fpchkRLE->SetValue(val);

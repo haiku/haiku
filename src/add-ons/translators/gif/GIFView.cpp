@@ -56,7 +56,7 @@ GIFView::GIFView(TranslatorSettings* settings)
 
 	char version_string[100];
 	snprintf(version_string, sizeof(version_string),
-		B_TRANSLATE("v%d.%d.%d, %s"),
+		B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(GIF_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(GIF_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(GIF_TRANSLATOR_VERSION)),
