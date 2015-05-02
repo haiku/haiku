@@ -671,9 +671,12 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 
-	char versionString[16];
-	sprintf(versionString, "v%d.%d.%d", (int)(sTranslatorVersion >> 8),
-		(int)((sTranslatorVersion >> 4) & 0xf), (int)(sTranslatorVersion & 0xf));
+	char versionString[100];
+	snprintf(versionString, sizeof(versionString),
+		B_TRANSLATE("Version %d.%d.%d"),
+		(int)(sTranslatorVersion >> 8),
+		(int)((sTranslatorVersion >> 4) & 0xf),
+		(int)(sTranslatorVersion & 0xf));
 
 	BStringView* version = new BStringView("Version", versionString);
 	version->SetExplicitAlignment(labelAlignment);

@@ -507,7 +507,7 @@ public:
 					"bits big-endian"), CSMessage(B_RGBA15_BIG)));
 				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:6:5 16 bits "
 					"big-endian"), CSMessage(B_RGB16)));
-				fField = new BMenuField(B_TRANSLATE("Input Color Space:"),
+				fField = new BMenuField(B_TRANSLATE("Input color space:"),
 					fMenu);
 				fField->SetViewColor(ViewColor());
  				SelectColorSpace(g_settings.out_space);

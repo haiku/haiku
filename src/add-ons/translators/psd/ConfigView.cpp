@@ -45,10 +45,10 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		fSettings->SetGetInt32(PSD_SETTING_VERSION);
 
 	_AddItemToMenu(versionPopupMenu,
-		B_TRANSLATE("Photoshop Document (PSD File)"), MSG_VERSION_CHANGED,
+		B_TRANSLATE("Photoshop Document (PSD file)"), MSG_VERSION_CHANGED,
 		PSD_FILE, currentVersion);
 	_AddItemToMenu(versionPopupMenu,
-		B_TRANSLATE("Photoshop Big Document (PSB File)"), MSG_VERSION_CHANGED,
+		B_TRANSLATE("Photoshop Big Document (PSB file)"), MSG_VERSION_CHANGED,
 		PSB_FILE, currentVersion);
 
 	fVersionField = new BMenuField("version",
