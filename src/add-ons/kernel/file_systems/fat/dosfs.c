@@ -59,29 +59,32 @@ debug_fat_nspace(int argc, char **argv)
 			continue;
 
 		kprintf("fat nspace @ %p\n", vol);
-		kprintf("id: %lx, fd: %x, device: %s, flags %lx\n",
-				vol->id, vol->fd, vol->device, vol->flags);
-		kprintf("bytes/sector = %lx, sectors/cluster = %lx, reserved sectors = %lx\n",
-				vol->bytes_per_sector, vol->sectors_per_cluster,
-				vol->reserved_sectors);
-		kprintf("%lx fats, %lx root entries, %lx total sectors, %lx sectors/fat\n",
-				vol->fat_count, vol->root_entries_count, vol->total_sectors,
-				vol->sectors_per_fat);
-		kprintf("media descriptor %x, fsinfo sector %x, %lx clusters, %lx free\n",
-				vol->media_descriptor, vol->fsinfo_sector, vol->total_clusters,
-				vol->free_clusters);
-		kprintf("%x-bit fat, mirrored %x, active %x\n",
-				vol->fat_bits, vol->fat_mirrored, vol->active_fat);
-		kprintf("root start %lx, %lx root sectors, root vnode @ %p\n",
-				vol->root_start, vol->root_sectors, &(vol->root_vnode));
-		kprintf("label entry %lx, label %s\n", vol->vol_entry, vol->vol_label);
-		kprintf("data start %lx, last allocated %lx\n",
-				vol->data_start, vol->last_allocated);
-		kprintf("last fake vnid %Lx, vnid cache %lx entries @ (%p %p)\n",
-				vol->vcache.cur_vnid, vol->vcache.cache_size,
-				vol->vcache.by_vnid, vol->vcache.by_loc);
-		kprintf("dlist entries: %lx/%lx @ %p\n",
-				vol->dlist.entries, vol->dlist.allocated, vol->dlist.vnid_list);
+		kprintf("id: %" B_PRIdDEV ", fd: %d, device: %s, flags %" B_PRIu32 "\n",
+			vol->id, vol->fd, vol->device, vol->flags);
+		kprintf("bytes/sector = %" B_PRIu32 ", sectors/cluster = %" B_PRIu32
+			", reserved sectors = %" B_PRIu32 "\n", vol->bytes_per_sector,
+			vol->sectors_per_cluster, vol->reserved_sectors);
+		kprintf("%" B_PRIu32 " fats, %" B_PRIu32 " root entries, %" B_PRIu32
+			" total sectors, %" B_PRIu32 " sectors/fat\n", vol->fat_count,
+			vol->root_entries_count, vol->total_sectors, vol->sectors_per_fat);
+		kprintf("media descriptor %" B_PRIu8 ", fsinfo sector %" B_PRIu16
+			", %" B_PRIu32 " clusters, %" B_PRIu32 " free\n",
+			vol->media_descriptor, vol->fsinfo_sector, vol->total_clusters,
+			vol->free_clusters);
+		kprintf("%" B_PRIu8 "-bit fat, mirrored %s, active %" B_PRIu8 "\n",
+			vol->fat_bits, vol->fat_mirrored ? "yes" : "no", vol->active_fat);
+		kprintf("root start %" B_PRIu8 ", %" B_PRIu8
+			" root sectors, root vnode @ %p\n", vol->root_start,
+			vol->root_sectors, &(vol->root_vnode));
+		kprintf("label entry %" B_PRIu32 ", label %s\n", vol->vol_entry,
+			vol->vol_label);
+		kprintf("data start %" B_PRIu32 ", last allocated %" B_PRIu32 "\n",
+			vol->data_start, vol->last_allocated);
+		kprintf("last fake vnid %" B_PRIdINO ", vnid cache %" B_PRIu32
+			" entries @ (%p %p)\n", vol->vcache.cur_vnid,
+			vol->vcache.cache_size, vol->vcache.by_vnid, vol->vcache.by_loc);
+		kprintf("dlist entries: %" B_PRIu32 "/%" B_PRIu32 " @ %p\n",
+			vol->dlist.entries, vol->dlist.allocated, vol->dlist.vnid_list);
 
 		dump_vcache(vol);
 		dlist_dump(vol);
@@ -108,12 +111,14 @@ debug_dvnode(int argc, char **argv)
 #if TRACK_FILENAME
 		kprintf(" (%s)", n->filename);
 #endif
-		kprintf("\nvnid %Lx, dir vnid %Lx\n", n->vnid, n->dir_vnid);
-		kprintf("iteration %lx, si=%lx, ei=%lx, cluster=%lx\n",
-			n->iteration, n->sindex, n->eindex, n->cluster);
-		kprintf("mode %lx, size %Lx, time %lx\n",
-			n->mode, n->st_size, n->st_time);
-		kprintf("end cluster = %lx\n", n->end_cluster);
+		kprintf("\nvnid %" B_PRIdINO ", dir vnid %" B_PRIdINO "\n", n->vnid,
+			n->dir_vnid);
+		kprintf("iteration %" B_PRIu32 ", si=%" B_PRIu32 ", ei=%" B_PRIu32
+			", cluster=%" B_PRIu32 "\n", n->iteration, n->sindex, n->eindex,
+			n->cluster);
+		kprintf("mode %#" B_PRIx32 ", size %" B_PRIdOFF ", time %" B_PRIuTIME
+			"\n", n->mode, n->st_size, n->st_time);
+		kprintf("end cluster = %" B_PRIu32 "\n", n->end_cluster);
 		if (n->mime) kprintf("mime type %s\n", n->mime);
 	}
 
@@ -138,8 +143,8 @@ debug_dc2s(int argc, char **argv)
 
 	for (i=2;i<argc;i++) {
 		uint32 cluster = strtoul(argv[i], NULL, 0);
-		kprintf("cluster %lx = block %Lx\n", cluster, vol->data_start +
-				(off_t)(cluster - 2) * vol->sectors_per_cluster);
+		kprintf("cluster %" B_PRIu32 " = block %" B_PRIdOFF "\n", cluster,
+			vol->data_start + (off_t)(cluster - 2) * vol->sectors_per_cluster);
 	}
 
 	return B_OK;
@@ -211,7 +216,7 @@ volume_init(int fd, uint8* buf,
 	vol->bytes_per_sector = read16(buf, 0xb);
 	if (vol->bytes_per_sector != 0x200 && vol->bytes_per_sector != 0x400
 		&& vol->bytes_per_sector != 0x800 && vol->bytes_per_sector != 0x1000) {
-		dprintf("dosfs error: unsupported bytes per sector (%lu)\n",
+		dprintf("dosfs error: unsupported bytes per sector (%" B_PRIu32 ")\n",
 			vol->bytes_per_sector);
 		goto error;
 	}
@@ -227,7 +232,8 @@ volume_init(int fd, uint8* buf,
 
 	vol->fat_count = buf[0x10];
 	if (vol->fat_count == 0 || vol->fat_count > 8) {
-		dprintf("dosfs error: unreasonable fat count (%lu)\n", vol->fat_count);
+		dprintf("dosfs error: unreasonable fat count (%" B_PRIu32 ")\n",
+			vol->fat_count);
 		goto error;
 	}
 
@@ -267,8 +273,8 @@ volume_init(int fd, uint8* buf,
 
 		vol->root_vnode.cluster = read32(buf, 0x2c);
 		if (vol->root_vnode.cluster >= vol->total_clusters) {
-			dprintf("dosfs error: root vnode cluster too large (0x%lx)\n",
-				vol->root_vnode.cluster);
+			dprintf("dosfs error: root vnode cluster too large (0x%" B_PRIu32
+				")\n", vol->root_vnode.cluster);
 			goto error;
 		}
 
@@ -277,7 +283,8 @@ volume_init(int fd, uint8* buf,
 	} else {
 		// fat12 & fat16
 		if (vol->fat_count != 2) {
-			dprintf("dosfs error: claims %ld fat tables\n", vol->fat_count);
+			dprintf("dosfs error: claims %" B_PRIu32 " fat tables\n",
+				vol->fat_count);
 			goto error;
 		}
 
@@ -359,18 +366,20 @@ volume_init(int fd, uint8* buf,
 		uint8 mirror_media_buf[512];
 		for (i = 0; i < vol->fat_count; i++) {
 			if (i != vol->active_fat) {
-				DPRINTF(1, ("checking fat #%ld\n", i));
+				DPRINTF(1, ("checking fat #%" B_PRIu32 "\n", i));
 				mirror_media_buf[0] = ~media_buf[0];
 				if ((err = read_pos(vol->fd, vol->bytes_per_sector
 						* (vol->reserved_sectors + vol->sectors_per_fat * i),
 						(void *)mirror_media_buf, 0x200)) != 0x200) {
-					dprintf("dosfs error: error reading FAT %ld\n", i);
+					dprintf("dosfs error: error reading FAT %" B_PRIu32 "\n",
+						i);
 					goto error;
 				}
 
 				if (mirror_media_buf[0] != vol->media_descriptor) {
 					dprintf("dosfs error: media descriptor mismatch in fat # "
-						"%ld (%x != %x)\n", i, mirror_media_buf[0], vol->media_descriptor);
+						"%" B_PRIu32 " (%" B_PRIu8 " != %" B_PRIu8 ")\n", i,
+						mirror_media_buf[0], vol->media_descriptor);
 					goto error;
 				}
 #if 0
@@ -420,8 +429,9 @@ volume_init(int fd, uint8* buf,
 		diri_free(&diri);
 	}
 
-	DPRINTF(0, ("root vnode id = %Lx\n", vol->root_vnode.vnid));
-	DPRINTF(0, ("volume label [%s] (%lx)\n", vol->vol_label, vol->vol_entry));
+	DPRINTF(0, ("root vnode id = %" B_PRIdINO "\n", vol->root_vnode.vnid));
+	DPRINTF(0, ("volume label [%s] (%" B_PRIu32 ")\n", vol->vol_label,
+		vol->vol_entry));
 
 	// steal a trick from bfs
 	if (!memcmp(vol->vol_label, "__RO__     ", 11))
@@ -458,7 +468,7 @@ volume_count_free_cluster(nspace *vol)
 				vol->free_clusters = free_count;
 			else {
 				dprintf("dosfs error: free cluster count from fsinfo block "
-					"invalid %lx\n", free_count);
+					"invalid %" B_PRIu32 "\n", free_count);
 				err = -1;
 			}
 
@@ -523,7 +533,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 
 	if (geo.bytes_per_sector != 0x200 && geo.bytes_per_sector != 0x400
 		&& geo.bytes_per_sector != 0x800 && geo.bytes_per_sector != 0x1000) {
-		dprintf("dosfs error: unsupported device block size (%lu)\n",
+		dprintf("dosfs error: unsupported device block size (%" B_PRIu32 ")\n",
 			geo.bytes_per_sector);
 		goto error1;
 	}
@@ -618,22 +628,24 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	volume_count_free_cluster(vol);
 
 	DPRINTF(0, ("built at %s on %s\n", build_time, build_date));
-	DPRINTF(0, ("mounting %s (id %lx, device %x, media descriptor %x)\n",
-				vol->device, vol->id, vol->fd, vol->media_descriptor));
-	DPRINTF(0, ("%lx bytes/sector, %lx sectors/cluster\n",
-				vol->bytes_per_sector, vol->sectors_per_cluster));
-	DPRINTF(0, ("%lx reserved sectors, %lx total sectors\n",
-				vol->reserved_sectors, vol->total_sectors));
-	DPRINTF(0, ("%lx %d-bit fats, %lx sectors/fat, %lx root entries\n",
-				vol->fat_count, vol->fat_bits, vol->sectors_per_fat,
-				vol->root_entries_count));
-	DPRINTF(0, ("root directory starts at sector %lx (cluster %lx), data at sector %lx\n",
-				vol->root_start, vol->root_vnode.cluster, vol->data_start));
-	DPRINTF(0, ("%lx total clusters, %lx free\n",
-				vol->total_clusters, vol->free_clusters));
-	DPRINTF(0, ("fat mirroring is %s, fs info sector at sector %x\n",
-				(vol->fat_mirrored) ? "on" : "off", vol->fsinfo_sector));
-	DPRINTF(0, ("last allocated cluster = %lx\n", vol->last_allocated));
+	DPRINTF(0, ("mounting %s (id %" B_PRIdDEV ", device %u, media descriptor %"
+		B_PRIu8 ")\n", vol->device, vol->id, vol->fd, vol->media_descriptor));
+	DPRINTF(0, ("%" B_PRIu32 " bytes/sector, %" B_PRIu32 " sectors/cluster\n",
+		vol->bytes_per_sector, vol->sectors_per_cluster));
+	DPRINTF(0, ("%" B_PRIu32 " reserved sectors, %" B_PRIu32 " total sectors\n",
+		vol->reserved_sectors, vol->total_sectors));
+	DPRINTF(0, ("%" B_PRIu32 " %" B_PRIu8 "-bit fats, %" B_PRIu32
+		" sectors/fat, %" B_PRIu32 " root entries\n", vol->fat_count,
+		vol->fat_bits, vol->sectors_per_fat, vol->root_entries_count));
+	DPRINTF(0, ("root directory starts at sector %" B_PRIu32 " (cluster %"
+		B_PRIu32 "), data at sector %" B_PRIu32 "\n", vol->root_start,
+		vol->root_vnode.cluster, vol->data_start));
+	DPRINTF(0, ("%" B_PRIu32 " total clusters, %" B_PRIu32 " free\n",
+		vol->total_clusters, vol->free_clusters));
+	DPRINTF(0, ("fat mirroring is %s, fs info sector at sector %" B_PRIu16 "\n",
+		vol->fat_mirrored ? "on" : "off", vol->fsinfo_sector));
+	DPRINTF(0, ("last allocated cluster = %" B_PRIu32 "\n",
+		vol->last_allocated));
 
 	if (vol->fat_bits == 32) {
 		// now that the block cache has been initialised, we can figure
@@ -656,8 +668,9 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	dlist_add(vol, vol->root_vnode.vnid);
 
 
-	DPRINTF(0, ("root vnode id = %Lx\n", vol->root_vnode.vnid));
-	DPRINTF(0, ("volume label [%s] (%lx)\n", vol->vol_label, vol->vol_entry));
+	DPRINTF(0, ("root vnode id = %" B_PRIdINO "\n", vol->root_vnode.vnid));
+	DPRINTF(0, ("volume label [%s] (%" B_PRIu32 ")\n", vol->vol_label,
+		vol->vol_entry));
 
 	// steal a trick from bfs
 	if (!memcmp(vol->vol_label, "__RO__     ", 11))
@@ -866,7 +879,7 @@ dosfs_mount(fs_volume *_vol, const char *device, uint32 flags,
 			dprintf("error creating new vnode (%s)\n", strerror(result));
 			goto error;
 		}
-		sprintf(name, "fat lock %lx", vol->id);
+		sprintf(name, "fat lock %" B_PRIdDEV, vol->id);
 		recursive_lock_init_etc(&(vol->vlock), name, MUTEX_FLAG_CLONE_NAME);
 
 #if DEBUG
@@ -961,7 +974,7 @@ dosfs_unmount(fs_volume *_vol)
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_unmount volume %lx\n", vol->id));
+	DPRINTF(0, ("dosfs_unmount volume %" B_PRIdDEV "\n", vol->id));
 
 	update_fsinfo(vol);
 
@@ -1218,8 +1231,8 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, uint32 code,
 #endif
 
 		default :
-			DPRINTF(0, ("dosfs_ioctl: vol %lx, vnode %Lx code = %ld\n",
-				vol->id, node->vnid, code));
+			DPRINTF(0, ("dosfs_ioctl: vol %" B_PRIdDEV ", vnode %" B_PRIdINO
+				" code = %" B_PRIu32 "\n", vol->id, node->vnid, code));
 			result = B_DEV_INVALID_IOCTL;
 			break;
 	}
@@ -1246,7 +1259,7 @@ dosfs_sync(fs_volume *_vol)
 	nspace *vol = (nspace *)_vol->private_volume;
 	status_t err;
 
-	DPRINTF(0, ("dosfs_sync called on volume %lx\n", vol->id));
+	DPRINTF(0, ("dosfs_sync called on volume %" B_PRIdDEV "\n", vol->id));
 
 	LOCK_VOL(vol);
 	err = _dosfs_sync(vol);

@@ -134,14 +134,14 @@ typedef struct _nspace {
 	bool	fat_mirrored;			// true if fat mirroring on
 	uint8	active_fat;
 
-	uint32  root_start;				// for fat12 + fat16 only
+	uint32	root_start;				// for fat12 + fat16 only
 	uint32	root_sectors;			// for fat12 + fat16 only
 	vnode	root_vnode;				// root directory
 	int32	vol_entry;				// index in root directory
 	char	vol_label[12];			// lfn's need not apply
 
 	uint32	data_start;
-	uint32  last_allocated;			// last allocated cluster
+	uint32	last_allocated;			// last allocated cluster
 
 	ino_t	beos_vnid;				// vnid of \BEOS directory
 	bool	respect_disk_image;
@@ -165,8 +165,8 @@ typedef struct _nspace {
 	} dlist;
 } nspace;
 
-#define FS_FLAGS_OP_SYNC       0x1
-#define FS_FLAGS_LOCK_DOOR     0x2
+#define FS_FLAGS_OP_SYNC		0x1
+#define FS_FLAGS_LOCK_DOOR		0x2
 
 #define LOCK_VOL(vol) \
 	if (vol == NULL) { dprintf("null vol\n"); return EINVAL; } else LOCK((vol)->vlock)

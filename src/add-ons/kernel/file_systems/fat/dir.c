@@ -79,8 +79,8 @@ _next_dirent_(struct diri *iter, struct _dirent_info_ *oinfo, char *filename,
 		% (iter->csi.vol->bytes_per_sector / 0x20)) * 0x20;
 
 	for (; buffer != NULL; buffer = diri_next_entry(iter)) {
-		DPRINTF(2, ("_next_dirent_: %lx/%lx/%lx\n", iter->csi.cluster,
-			iter->csi.sector, iter->current_index));
+		DPRINTF(2, ("_next_dirent_: %" B_PRIu32 "/%" B_PRIu32 "/%" B_PRIu32
+			"\n", iter->csi.cluster, iter->csi.sector, iter->current_index));
 		if (buffer[0] == 0) { // quit if at end of table
 			if (start_index != 0xffff)
 				dprintf("lfn entry (%" B_PRIu32 ") with no alias\n", lfn_count);
@@ -264,7 +264,7 @@ get_next_dirent(nspace *vol, vnode *dir, struct diri *iter, ino_t *vnid,
 		}
 	}
 
-	DPRINTF(2, ("get_next_dirent: found %s (vnid %Lx)\n", filename,
+	DPRINTF(2, ("get_next_dirent: found %s (vnid %" B_PRIdINO ")\n", filename,
 		vnid != NULL ? *vnid : (ino_t)0));
 
 	return B_NO_ERROR;
@@ -364,7 +364,7 @@ findfile(nspace *vol, vnode *dir, const char *file, ino_t *vnid,
 
 //	dprintf("findfile: %s in %Lx, case %d dups %d\n", file, dir->vnid, check_case, check_dups);
 
-	DPRINTF(1, ("findfile: %s in %Lx\n", file, dir->vnid));
+	DPRINTF(1, ("findfile: %s in %" B_PRIdINO "\n", file, dir->vnid));
 
 	if (dups_exist != NULL)
 		*dups_exist = false;
@@ -446,8 +446,8 @@ erase_dir_entry(nspace *vol, vnode *node)
 	struct _dirent_info_ info;
 	struct diri diri;
 
-	DPRINTF(0, ("erasing directory entries %lx through %lx\n",
-		node->sindex, node->eindex));
+	DPRINTF(0, ("erasing directory entries %" B_PRIu32 " through %" B_PRIu32
+		"\n", node->sindex, node->eindex));
 	buffer = diri_init(vol,VNODE_PARENT_DIR_CLUSTER(node), node->sindex, &diri);
 
 	// first pass: check if the entry is still valid
@@ -493,15 +493,16 @@ compact_directory(nspace *vol, vnode *dir)
 	struct diri diri;
 	status_t error = B_ERROR; /* quiet warning */
 
-	DPRINTF(0, ("compacting directory with vnode id %Lx\n", dir->vnid));
+	DPRINTF(0, ("compacting directory with vnode id %" B_PRIdINO "\n",
+		dir->vnid));
 
 	// root directory can't shrink in fat12 and fat16
 	if (IS_FIXED_ROOT(dir->cluster))
 		return 0;
 
 	if (diri_init(vol, dir->cluster, 0, &diri) == NULL) {
-		dprintf("compact_directory: cannot open dir at cluster (%lx)\n",
-			dir->cluster);
+		dprintf("compact_directory: cannot open dir at cluster (%" B_PRIu32
+			")\n", dir->cluster);
 		return EIO;
 	}
 	while (diri.current_block) {
@@ -525,10 +526,13 @@ compact_directory(nspace *vol, vnode *dir)
 			if (clusters == 0)
 				clusters = 1;
 
-			if (clusters * vol->bytes_per_sector * vol->sectors_per_cluster < dir->st_size) {
-				DPRINTF(0, ("shrinking directory to %lx clusters\n", clusters));
+			if (clusters * vol->bytes_per_sector * vol->sectors_per_cluster
+					< dir->st_size) {
+				DPRINTF(0, ("shrinking directory to %" B_PRIu32 " clusters\n",
+					clusters));
 				error = set_fat_chain_length(vol, dir, clusters);
-				dir->st_size = clusters*vol->bytes_per_sector*vol->sectors_per_cluster;
+				dir->st_size = clusters * vol->bytes_per_sector
+					* vol->sectors_per_cluster;
 				dir->iteration++;
 			}
 			break;
@@ -618,7 +622,8 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 	}
 
 	if (info->cluster != 0 && !IS_DATA_CLUSTER(info->cluster)) {
-		dprintf("_create_dir_entry_ for bad cluster (%lx)\n", info->cluster);
+		dprintf("_create_dir_entry_ for bad cluster (%" B_PRIu32 ")\n",
+			info->cluster);
 		return EINVAL;
 	}
 
@@ -629,7 +634,8 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 	*ns = 0;
 	last_entry = true;
 	if (diri_init(vol, dir->cluster, 0, &diri) == NULL) {
-		dprintf("_create_dir_entry_: cannot open dir at cluster (%lx)\n", dir->cluster);
+		dprintf("_create_dir_entry_: cannot open dir at cluster (%" B_PRIu32
+			")\n", dir->cluster);
 		return EIO;
 	}
 
@@ -667,7 +673,9 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 			GENERATE_DIR_INDEX_VNID(dir->cluster, i)) == ENOENT);
 	}
 
-	DPRINTF(0, ("directory entry runs from %lx to %lx (dirsize = %Lx) (is%s last entry)\n", *ns, *ne, dir->st_size, last_entry ? "" : "n't"));
+	DPRINTF(0, ("directory entry runs from %" B_PRIu32 " to %" B_PRIu32
+		" (dirsize = %" B_PRIdOFF ") (is%s last entry)\n", *ns, *ne,
+		dir->st_size, last_entry ? "" : "n't"));
 
 	// check if the directory needs to be expanded
 	if (*ne * 0x20 >= dir->st_size) {
@@ -684,8 +692,9 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 			vol->bytes_per_sector*vol->sectors_per_cluster - 1) /
 			vol->bytes_per_sector / vol->sectors_per_cluster;
 
-		DPRINTF(0, ("expanding directory from %Lx to %lx clusters\n",
-			dir->st_size/vol->bytes_per_sector/vol->sectors_per_cluster, clusters_needed));
+		DPRINTF(0, ("expanding directory from %" B_PRIdOFF " to %" B_PRIu32
+			" clusters\n", dir->st_size / vol->bytes_per_sector
+				/ vol->sectors_per_cluster, clusters_needed));
 		if ((error = set_fat_chain_length(vol, dir, clusters_needed)) < 0)
 			return error;
 		dir->st_size = vol->bytes_per_sector*vol->sectors_per_cluster*clusters_needed;
@@ -695,8 +704,8 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 	// starting blitting entries
 	buffer = diri_init(vol,dir->cluster, *ns, &diri);
 	if (buffer == NULL) {
-		dprintf("_create_dir_entry_: cannot open dir at (%lx, %lu)\n",
-			dir->cluster, *ns);
+		dprintf("_create_dir_entry_: cannot open dir at (%" B_PRIu32 ", %"
+			B_PRIu32 ")\n", dir->cluster, *ns);
 		return EIO;
 	}
 	hash = hash_msdos_name(nshort);
@@ -832,7 +841,8 @@ create_dir_entry(nspace *vol, vnode *dir, vnode *node, const char *name,
 	// check if name already exists
 	error = findfile_nocase(vol, dir, name, NULL, NULL);
 	if (error == B_OK) {
-		DPRINTF(0, ("%s already found in directory %Lx\n", name, dir->vnid));
+		DPRINTF(0, ("%s already found in directory %" B_PRIdINO "\n", name,
+			dir->vnid));
 		return EEXIST;
 	}
 	if (error != ENOENT)
@@ -929,7 +939,7 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 	_node->ops = &gFATVnodeOps;
 	*_flags = 0;
 
-	DPRINTF(0, ("dosfs_read_vnode (vnode id %Lx)\n", vnid));
+	DPRINTF(0, ("dosfs_read_vnode (vnode id %" B_PRIdINO ")\n", vnid));
 
 	if (vnid == vol->root_vnode.vnid) {
 		dprintf("??? dosfs_read_vnode called on root node ???\n");
@@ -942,14 +952,15 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 		loc = vnid;
 
 	if (IS_ARTIFICIAL_VNID(loc) || IS_INVALID_VNID(loc)) {
-		DPRINTF(0, ("dosfs_read_vnode: unknown vnid %Lx (loc %Lx)\n", vnid, loc));
+		DPRINTF(0, ("dosfs_read_vnode: unknown vnid %" B_PRIdINO " (loc %"
+			B_PRIdINO ")\n", vnid, loc));
 		result = ENOENT;
 		goto bi;
 	}
 
 	if ((dir_vnid = dlist_find(vol, DIR_OF_VNID(loc))) == -1LL) {
-		DPRINTF(0, ("dosfs_read_vnode: unknown directory at cluster %lx\n",
-			DIR_OF_VNID(loc)));
+		DPRINTF(0, ("dosfs_read_vnode: unknown directory at cluster %" B_PRIu32
+			"\n", DIR_OF_VNID(loc)));
 		result = ENOENT;
 		goto bi;
 	}
@@ -957,8 +968,8 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 	if (diri_init(vol, DIR_OF_VNID(loc),
 			IS_DIR_CLUSTER_VNID(loc) ? 0 : INDEX_OF_DIR_INDEX_VNID(loc),
 			&iter) == NULL) {
-		dprintf("dosfs_read_vnode: error initializing directory for vnid %Lx (loc %Lx)\n",
-			vnid, loc);
+		dprintf("dosfs_read_vnode: error initializing directory for vnid %"
+			B_PRIdINO " (loc %" B_PRIdINO ")\n", vnid, loc);
 		result = ENOENT;
 		goto bi;
 	}
@@ -966,8 +977,8 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 	while (1) {
 		result = _next_dirent_(&iter, &info, filename, 512);
 		if (result < 0) {
-			dprintf("dosfs_read_vnode: error finding vnid %Lx (loc %Lx) (%s)\n",
-				vnid, loc, strerror(result));
+			dprintf("dosfs_read_vnode: error finding vnid %" B_PRIdINO
+				" (loc %" B_PRIdINO ") (%s)\n", vnid, loc, strerror(result));
 			goto bi2;
 		}
 
@@ -977,8 +988,8 @@ dosfs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 		} else {
 			if (info.sindex == INDEX_OF_DIR_INDEX_VNID(loc))
 				break;
-			dprintf("dosfs_read_vnode: error finding vnid %Lx (loc %Lx) (%s)\n",
-				vnid, loc, strerror(result));
+			dprintf("dosfs_read_vnode: error finding vnid %" B_PRIdINO
+				" (loc %" B_PRIdINO ") (%s)\n", vnid, loc, strerror(result));
 			result = ENOENT;
 			goto bi2;
 		}
@@ -1056,13 +1067,13 @@ dosfs_walk(fs_volume *_vol, fs_vnode *_dir, const char *file, ino_t *_vnid)
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_walk: find %Lx/%s\n", dir->vnid, file));
+	DPRINTF(0, ("dosfs_walk: find %" B_PRIdINO "/%s\n", dir->vnid, file));
 
 	result = findfile_case(vol, dir, file, _vnid, &vnode);
 	if (result != B_OK) {
 		DPRINTF(0, ("dosfs_walk (%s)\n", strerror(result)));
 	} else {
-		DPRINTF(0, ("dosfs_walk: found vnid %Lx\n", *_vnid));
+		DPRINTF(0, ("dosfs_walk: found vnid %" B_PRIdINO "\n", *_vnid));
 	}
 
 	UNLOCK_VOL(vol);
@@ -1080,7 +1091,8 @@ dosfs_access(fs_volume *_vol, fs_vnode *_node, int mode)
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_access (vnode id %Lx, mode %x)\n", node->vnid, mode));
+	DPRINTF(0, ("dosfs_access (vnode id %" B_PRIdINO ", mode %o)\n", node->vnid,
+		mode));
 
 	if (mode & W_OK) {
 		if (vol->flags & B_FS_IS_READONLY) {
@@ -1123,7 +1135,7 @@ dosfs_opendir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_opendir (vnode id %Lx)\n", node->vnid));
+	DPRINTF(0, ("dosfs_opendir (vnode id %" B_PRIdINO ")\n", node->vnid));
 
 	*_cookie = NULL;
 
@@ -1171,7 +1183,7 @@ dosfs_readdir(fs_volume *_vol, fs_vnode *_dir, void *_cookie,
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_readdir: vnode id %Lx, index %lx\n",
+	DPRINTF(0, ("dosfs_readdir: vnode id %" B_PRIdINO ", index %" B_PRIu32 "\n",
 		dir->vnid, cookie->current_index));
 
 	// simulate '.' and '..' entries for root directory
@@ -1244,7 +1256,7 @@ dosfs_rewinddir(fs_volume *_vol, fs_vnode *_node, void* _cookie)
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_rewinddir (vnode id %Lx)\n", node->vnid));
+	DPRINTF(0, ("dosfs_rewinddir (vnode id %" B_PRIdINO ")\n", node->vnid));
 
 	cookie->current_index = 0;
 
@@ -1274,7 +1286,8 @@ dosfs_free_dircookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_free_dircookie (vnode id %Lx)\n", node->vnid));
+	DPRINTF(0, ("dosfs_free_dircookie (vnode id %" B_PRIdINO ")\n",
+		node->vnid));
 
 	free(cookie);
 

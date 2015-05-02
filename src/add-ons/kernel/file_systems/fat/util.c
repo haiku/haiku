@@ -42,17 +42,18 @@ void
 dump_bytes(uint8 *buffer, uint32 count)
 {
 	uint32 i, j, k;
-	for (i=0;i<0x10;i++)
-		dprintf(" %lX ", i);
+	for (i = 0; i < 0x10; i++)
+		dprintf(" %" B_PRIu32 " ", i);
+
 	dprintf("\n");
-	for (i=0;i<count;i+=0x10) {
+	for (i = 0; i < count; i += 0x10) {
 		j = (i + 0x10 > count) ? count - i : 0x10;
-		for (k=i;k<i+j;k++)
+		for (k = i; k < i + j; k++)
 			dprintf("%2.2X ", buffer[k]);
-		for (;k<i+0x10;k++)
+		for (; k < i + 0x10; k++)
 			dprintf("   ");
 		dprintf(" ");
-		for (k=i;k<i+j;k++)
+		for (k = i; k < i + j; k++)
 			print_byte(buffer[k]);
 		dprintf("\n");
 	}

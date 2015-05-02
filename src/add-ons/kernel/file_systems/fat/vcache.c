@@ -79,12 +79,11 @@ dump_vcache(nspace *vol)
 {
 	uint32 i;
 	struct vcache_entry *c;
-	kprintf("vnid cache size %lx, cur vnid = %Lx\n"
-		"vnid             loc\n",
-		vol->vcache.cache_size, vol->vcache.cur_vnid);
+	kprintf("vnid cache size %" B_PRIu32 ", cur vnid = %" B_PRIdINO "\n"
+		"vnid             loc\n", vol->vcache.cache_size, vol->vcache.cur_vnid);
 	for (i = 0; i < vol->vcache.cache_size; i++) {
 		for (c = vol->vcache.by_vnid[i]; c ; c = c->next_vnid)
-			kprintf("%16Lx %16Lx\n", c->vnid, c->loc);
+			kprintf("%16" B_PRIdINO " %16" B_PRIdINO "\n", c->vnid, c->loc);
 	}
 }
 
@@ -118,11 +117,11 @@ init_vcache(nspace *vol)
 		return ENOMEM;
 	}
 
-	sprintf(name, "fat cache %lx", vol->id);
+	sprintf(name, "fat cache %" B_PRIdDEV, vol->id);
 	rw_lock_init(&vol->vcache.lock, "fat cache");
 
-	DPRINTF(0, ("init_vcache: initialized vnid cache with %lx entries\n",
-		vol->vcache.cache_size));
+	DPRINTF(0, ("init_vcache: initialized vnid cache with %" B_PRIu32
+		" entries\n", vol->vcache.cache_size));
 
 	return 0;
 }
@@ -148,7 +147,7 @@ uninit_vcache(nspace *vol)
 		}
 	}
 
-	DPRINTF(0, ("%lx vcache entries removed\n", count));
+	DPRINTF(0, ("%" B_PRIu32 " vcache entries removed\n", count));
 
 	free(vol->vcache.by_vnid); vol->vcache.by_vnid = NULL;
 	free(vol->vcache.by_loc); vol->vcache.by_loc = NULL;
@@ -174,7 +173,7 @@ _add_to_vcache_(nspace *vol, ino_t vnid, ino_t loc)
 	int hash1 = hash(vnid), hash2 = hash(loc);
 	struct vcache_entry *e, *c, *p;
 
-	DPRINTF(0, ("add_to_vcache %Lx/%Lx\n", vnid, loc));
+	DPRINTF(0, ("add_to_vcache %" B_PRIdINO "/%" B_PRIdINO "\n", vnid, loc));
 
 	ASSERT(vnid != loc);
 
@@ -226,7 +225,7 @@ _remove_from_vcache_(nspace *vol, ino_t vnid)
 	int hash1 = hash(vnid), hash2;
 	struct vcache_entry *c, *p, *e;
 
-	DPRINTF(0, ("remove_from_vcache %Lx\n", vnid));
+	DPRINTF(0, ("remove_from_vcache %" B_PRIdINO "\n", vnid));
 
 	c = p = vol->vcache.by_vnid[hash1];
 	while (c) {
@@ -352,7 +351,8 @@ vcache_vnid_to_loc(nspace *vol, ino_t vnid, ino_t *loc)
 {
 	struct vcache_entry *e;
 
-	DPRINTF(1, ("vcache_vnid_to_loc %Lx %lx\n", vnid, (uint32)loc));
+	DPRINTF(1, ("vcache_vnid_to_loc %" B_PRIdINO " %p\n", vnid,
+		loc));
 
 	LOCK_CACHE_R;
 	e = _find_vnid_in_vcache_(vol, vnid);
@@ -369,7 +369,8 @@ vcache_loc_to_vnid(nspace *vol, ino_t loc, ino_t *vnid)
 {
 	struct vcache_entry *e;
 
-	DPRINTF(1, ("vcache_loc_to_vnid %Lx %lx\n", loc, (uint32)vnid));
+	DPRINTF(1, ("vcache_loc_to_vnid %" B_PRIdINO " %p\n", loc,
+		vnid));
 
 	LOCK_CACHE_R;
 	e = _find_loc_in_vcache_(vol, loc);
@@ -387,7 +388,8 @@ vcache_set_entry(nspace *vol, ino_t vnid, ino_t loc)
 	struct vcache_entry *e;
 	status_t result = B_OK;
 
-	DPRINTF(0, ("vcache_set_entry: %Lx -> %Lx\n", vnid, loc));
+	DPRINTF(0, ("vcache_set_entry: %" B_PRIdINO " -> %" B_PRIdINO "\n", vnid,
+		loc));
 
 	/*if (is_vnode_removed(vol->id, vnid) > 0) {
 		if (!IS_ARTIFICIAL_VNID(loc))
@@ -436,9 +438,10 @@ debug_dfvnid(int argc, char **argv)
 		ino_t vnid = strtoull(argv[i], NULL, 0);
 		struct vcache_entry *e;
 		if ((e = _find_vnid_in_vcache_(vol, vnid)) != NULL) {
-			kprintf("vnid %Lx -> loc %Lx @ %p\n", vnid, e->loc, e);
+			kprintf("vnid %" B_PRIdINO " -> loc %" B_PRIdINO " @ %p\n", vnid,
+				e->loc, e);
 		} else {
-			kprintf("vnid %Lx not found in vnid cache\n", vnid);
+			kprintf("vnid %" B_PRIdINO " not found in vnid cache\n", vnid);
 		}
 	}
 
@@ -465,9 +468,10 @@ debug_dfloc(int argc, char **argv)
 		ino_t loc = strtoull(argv[i], NULL, 0);
 		struct vcache_entry *e;
 		if ((e = _find_loc_in_vcache_(vol, loc)) != NULL) {
-			kprintf("loc %Lx -> vnid %Lx @ %p\n", loc, e->vnid, e);
+			kprintf("loc %" B_PRIdINO " -> vnid %" B_PRIdINO " @ %p\n", loc,
+				e->vnid, e);
 		} else {
-			kprintf("loc %Lx not found in vnid cache\n", loc);
+			kprintf("loc %" B_PRIdINO " not found in vnid cache\n", loc);
 		}
 	}
 
