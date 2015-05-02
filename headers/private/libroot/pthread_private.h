@@ -29,6 +29,7 @@ struct thread_creation_attributes;
 
 typedef struct _pthread_condattr {
 	bool		process_shared;
+	clockid_t	clock_id;
 } pthread_condattr;
 
 typedef struct _pthread_mutexattr {

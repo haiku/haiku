@@ -131,6 +131,10 @@ extern int pthread_condattr_getpshared(const pthread_condattr_t *condAttr,
 	int *processShared);
 extern int pthread_condattr_setpshared(pthread_condattr_t *condAttr,
 	int processShared);
+extern int pthread_condattr_getclock(const pthread_condattr_t *condAttr,
+	clockid_t *clockID);
+extern int pthread_condattr_setclock(pthread_condattr_t *condAttr,
+	clockid_t clockID);
 
 /* rwlock functions */
 extern int pthread_rwlock_init(pthread_rwlock_t *lock,

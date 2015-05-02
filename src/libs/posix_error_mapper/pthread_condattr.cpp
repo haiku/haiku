@@ -32,3 +32,17 @@ WRAPPER_FUNCTION(int, pthread_condattr_setpshared,
 	return B_TO_POSITIVE_ERROR(sReal_pthread_condattr_setpshared(condAttr,
 		processShared));
 )
+
+
+WRAPPER_FUNCTION(int, pthread_condattr_getclock,
+		(const pthread_condattr_t *condAttr, clockid_t *clockID),
+	return B_TO_POSITIVE_ERROR(sReal_pthread_condattr_getclock(condAttr,
+		clockID));
+)
+
+
+WRAPPER_FUNCTION(int, pthread_condattr_setclock,
+		(pthread_condattr_t *condAttr, clockid_t clockID),
+	return B_TO_POSITIVE_ERROR(sReal_pthread_condattr_setclock(condAttr,
+		clockID));
+)
