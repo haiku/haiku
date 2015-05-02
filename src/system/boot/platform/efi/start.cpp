@@ -25,6 +25,7 @@
 #include "hpet.h"
 #include "cpu.h"
 #include "mmu.h"
+#include "smp.h"
 
 
 extern void (*__ctor_list)(void);
@@ -40,6 +41,7 @@ EFI_HANDLE kImage;
 static uint32 sBootOptions;
 static uint64 gLongKernelEntry;
 extern uint64 gLongGDT;
+extern uint64 gLongGDTR;
 segment_descriptor gBootGDT[BOOT_GDT_SEGMENT_COUNT];
 
 
@@ -147,6 +149,8 @@ platform_start_kernel(void)
 	cpu_init();
 	acpi_init();
 	hpet_init();
+	smp_init();
+	smp_init_other_cpus();
 
 	preloaded_elf64_image *image = static_cast<preloaded_elf64_image *>(
 		gKernelArgs.kernel_image.Pointer());
@@ -234,6 +238,8 @@ platform_start_kernel(void)
 
 	// Update EFI, generate final kernel physical memory map, etc.
 	mmu_post_efi_setup(memory_map_size, memory_map, descriptor_size, descriptor_version);
+
+	smp_boot_other_cpus(final_pml4, (uint32_t)(uint64_t)&gLongGDTR, gLongKernelEntry);
 
 	// Enter the kernel!
 	efi_enter_kernel(final_pml4,
