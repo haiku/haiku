@@ -711,9 +711,7 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	uint8 buf[512];
 	int i;
 	uint32 bytes_per_sector;
-	uint32 sectors_per_cluster;
 	uint32 fatCount;
-	uint32 reserved_sectors;
 	uint32 total_sectors;
 	uint32 sectors_per_fat;
 	char name[12];
@@ -738,12 +736,10 @@ dosfs_identify_partition(int fd, partition_data *partition, void **_cookie)
 	}
 
 	// must be a power of two
-	sectors_per_cluster = i = buf[0xd];
+	i = buf[0xd];
 	if (i != 1 && i != 2 && i != 4 && i != 8 && i != 0x10 && i != 0x20
 		&& i != 0x40 && i != 0x80)
 		return -1;
-
-	reserved_sectors = read16(buf, 0xe);
 
 	fatCount = buf[0x10];
 	if (fatCount == 0 || fatCount > 8)
@@ -1101,9 +1097,11 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 				goto bi;
 			}
 			if ((vol->sectors_per_fat == 0 && (buffer[0x42] != 0x29
-				|| strncmp(buffer + 0x47, vol->vol_label, 11) != 0))
+					|| strncmp((const char *)buffer + 0x47, vol->vol_label, 11)
+						!= 0))
 				|| (vol->sectors_per_fat != 0 && (buffer[0x26] != 0x29
-				|| strncmp(buffer + 0x2b, vol->vol_label, 11) == 0))) {
+					|| strncmp((const char *)buffer + 0x2b, vol->vol_label, 11)
+						== 0))) {
 				dprintf("dosfs_wfsstat: label mismatch\n");
 				block_cache_set_dirty(vol->fBlockCache, 0, false, -1);
 				result = B_ERROR;
@@ -1118,7 +1116,8 @@ dosfs_write_fs_stat(fs_volume *_vol, const struct fs_info * fss, uint32 mask)
 			buffer = diri_init(vol, vol->root_vnode.cluster, vol->vol_entry, &diri);
 
 			// check if it is the same as the old volume label
-			if ((buffer == NULL) || (strncmp(buffer, vol->vol_label, 11) == 0)) {
+			if (buffer == NULL || strncmp((const char *)buffer, vol->vol_label,
+					11) == 0) {
 				dprintf("dosfs_wfsstat: label mismatch\n");
 				diri_free(&diri);
 				result = B_ERROR;

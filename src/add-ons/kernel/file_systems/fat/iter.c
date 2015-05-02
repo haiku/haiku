@@ -150,7 +150,7 @@ csi_read_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	uint32 sectors;
 	off_t block;
 	status_t err;
-	char *buf = buffer;
+	uint8 *buf = buffer;
 	int32 i;
 
 	ASSERT(len >= csi->vol->bytes_per_sector);
@@ -191,7 +191,7 @@ csi_write_blocks(struct csi *csi, uint8 *buffer, ssize_t len)
 	uint32 sectors;
 	off_t block;
 	status_t err;
-	char *buf = buffer;
+	uint8 *buf = buffer;
 	int32 i;
 
 	ASSERT(len >= csi->vol->bytes_per_sector);
