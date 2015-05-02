@@ -1,6 +1,5 @@
-1	lithuanian	x-vnd.Haiku-TGATranslator	3289993499
+1	lithuanian	x-vnd.Haiku-TGATranslator	335173288
 Targa image (%d bits truecolor)	TGATranslator		TGA paveikslas (%d bitų tikrosios spalvos)
-Version %d.%d.%d %s	TGAView		Versija %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Nepaisyti TGA alfa kanalo
 Targa image (%d bits colormap)	TGATranslator		TGA paveikslas (%d bitų spalvų atvaizdis)
 TGA image translator	TGAView		TGA paveikslų keitiklis

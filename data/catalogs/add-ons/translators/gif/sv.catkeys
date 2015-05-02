@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-GIFTranslator	1515001985
+1	swedish	x-vnd.Haiku-GIFTranslator	2626723192
 Websafe	GIFView		Webbsäker
 Write interlaced images	GIFView		Skriv sammanflätade bilder
 Optimal	GIFView		Optimal
@@ -15,5 +15,4 @@ Use RGB color	GIFView		Använd RGB-färger
 Use dithering	GIFView		Använd färgsimulering
 GIF Settings	GIFTranslator		GIF inställningar
 BeOS system	GIFView		BeOS system
-v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		Automatisk (från alfakanal)

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PPMTranslator	276252412
+1	japanese	x-vnd.Haiku-PPMTranslator	797856484
 PPM Settings	PPMMain		PPM 設定
 Based on PPMTranslator sample code	PPMTranslator		PPM トランスレーターのサンプルコードに基づく
 OK	PPMMain		OK
@@ -13,7 +13,6 @@ PPM image translator	PPMTranslator		PPM イメージトランスレーター
 bits/space	PPMTranslator		bits/space
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 ビット ビッグエンディアン
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 ビット ビッグエンディアン
-Version %d.%d.%d %s	PPMTranslator		バージョン %d.%d.%d %s
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 ビット ビッグエンディアン
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 ビット
 Write ASCII	PPMTranslator		ASCII形式で書きだす
@@ -23,7 +22,6 @@ RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 ビット ビッ�
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 ビット
 Bitmap 1 bit	PPMTranslator		ビットマップ 1 ビット
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 ビット ビッグエンディアン
-Input Color Space	PPMTranslator		入力カラースペース
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 ビット
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Sample code copyright 1999, Be Incorporated
 PPMTranslator Settings	PPMTranslator		PPM トランスレーター設定

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	1313160091
+1	polish	x-vnd.Haiku-libtracker	4204393626
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Wtyczki
 Mount settings…	ContainerWindow		Ustawienia montowania…
@@ -179,6 +179,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		Błąd w wyrażeniu: \n\n
 Mount all	MountMenu		Zamontuj wszystko
 calculating…	InfoWindow		obliczanie…
 Mount all disks now	AutoMounterSettings		Zamontuj wszystkie dyski
+Hide dotfiles	SettingsView		Ukryj pliki zaczynające się od kropki
 Untitled bitmap	PoseView		Bez nazwy - mapa bitowa
 of %items	StatusWindow		z %items
 Description:	InfoWindow		Opis:

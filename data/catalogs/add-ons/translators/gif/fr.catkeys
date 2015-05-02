@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-GIFTranslator	1515001985
+1	french	x-vnd.Haiku-GIFTranslator	2626723192
 Websafe	GIFView		Garantie pour le web
 Write interlaced images	GIFView		Enregistrer les images entrelacées
 Optimal	GIFView		Optimale
@@ -15,5 +15,4 @@ Use RGB color	GIFView		Utilisez la couleur RVB
 Use dithering	GIFView		Utilisez le tramage
 GIF Settings	GIFTranslator		Réglages GIF
 BeOS system	GIFView		Système BeOS
-v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		Automatique (à partir du canal alpha)

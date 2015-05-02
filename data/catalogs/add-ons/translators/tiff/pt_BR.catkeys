@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-TIFFTranslator	1930083198
+1	portuguese (brazil)	x-vnd.Haiku-TIFFTranslator	40018330
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: não foi possível definir diretório\n
 TIFF image	TIFFTranslator		imagem TIFF
@@ -13,4 +13,3 @@ TIFF Settings	TIFFMain		Definições de TIFF
 Use compression:	TIFFView		Usar compressão:
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: indexação de documento inválida\n
 ZIP (Deflate)	TIFFView		ZIP (Extrair)
-Version %d.%d.%d %s	TIFFView		Versão %d.%d.%d %s

@@ -1,6 +1,5 @@
-1	portuguese (brazil)	x-vnd.Haiku-TGATranslator	3289993499
+1	portuguese (brazil)	x-vnd.Haiku-TGATranslator	335173288
 Targa image (%d bits truecolor)	TGATranslator		imagem Targa (%d bits truecolor)
-Version %d.%d.%d %s	TGAView		Versão %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Ignorar canal alfa de TGA
 Targa image (%d bits colormap)	TGATranslator		imagem Targa (%d bits mapa de cor)
 TGA image translator	TGAView		tradutor de imagem TGA

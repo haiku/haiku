@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PackageInstaller	3253212490
+1	dutch; flemish	x-vnd.Haiku-PackageInstaller	172019075
 Install to:	PackageView		Installeren naar:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akkoord
@@ -11,7 +11,6 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Er lijkt een bestandsgrootte in het pakket niet overeen te komen. Mogelijks is het pakket beschadigd of werd het gewijzigd na het aanmaken. Wil je nog steeds verdergaan?
 Error while installing the package\n	PackageView		Fout tijdens het installeren van het pakket\n
 Disclaimer	PackageTextViewer		Afwijzing van verantwoordelijkheid
-%.1f GiB	PackageView		%.1f GiB
 The installation of the package has been aborted.	PackageView		De installatie van het pakket is afgebroken.
 Done	PackageInstall		Gereed
 All existing files will be replaced?	PackageView		Alle bestaande bestanden zullen vervangen worden?
@@ -27,9 +26,7 @@ Skip all	PackageView		Alles overslaan
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Het item met de naam '%s' bestaat reeds op de gegeven locatie.\nWilt u dat item vervangen met het item van dit pakket of het overslaan?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Het script met de naam '%s' bestaat reeds op de gegeven locatie.\nWilt u dat script vervangen met het script van dit pakket of het overslaan?
 Running post-installation scripts	PackageInstall		Post-installatiescripts worden uitgevoerd
-%llu bytes	PackageView		%llu bytes
 Skip	PackageView		Overslaan
-%.1f MiB	PackageView		%.1f MiB
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		De map met de naam '%s' bestaat reeds op de gegeven locatie.\nWilt u die map vervangen door de map van dit pakket of deze overslaan?
 The package you requested has been successfully installed on your system.	PackageView		Het pakket dat u opvroeg werd succesvol op uw systeem geïnstalleerd.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Fout! \"%s\" is geen geldige bestandslocatie.\n
@@ -44,7 +41,6 @@ Decline	PackageTextViewer		Afwijzen
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Het bestand met de naam '%s' bestaat al op de gegeven locatie.\nWilt u dat bestand vervangen door het bestand van dit pakket of het overslaan?
 All existing files will be skipped?	PackageView		Alle bestaande bestanden zullen overgeslaan worden?
 Continue	PackageInfo		Doorgaan
-%.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		Afbreken
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Afbreken

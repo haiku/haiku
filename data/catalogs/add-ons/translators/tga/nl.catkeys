@@ -1,6 +1,5 @@
-1	dutch; flemish	x-vnd.Haiku-TGATranslator	3289993499
+1	dutch; flemish	x-vnd.Haiku-TGATranslator	335173288
 Targa image (%d bits truecolor)	TGATranslator		Targa afbeelding (%d bits truecolor)
-Version %d.%d.%d %s	TGAView		Versie %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Negeer TGA alpha kanaal
 Targa image (%d bits colormap)	TGATranslator		Targa afbeelding (%d bits kleurmap)
 TGA image translator	TGAView		TGA afbeelding vertaler

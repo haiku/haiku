@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-PPMTranslator	276252412
+1	slovak	x-vnd.Haiku-PPMTranslator	797856484
 PPM Settings	PPMMain		Nastavenia PPM
 Based on PPMTranslator sample code	PPMTranslator		Založené na vzorovom kóde PPMTranslator
 OK	PPMMain		OK
@@ -13,7 +13,6 @@ PPM image translator	PPMTranslator		Prekladač obrázkov PPM
 bits/space	PPMTranslator		bitov/priestor
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bitov big-endian
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bitov big-endian
-Version %d.%d.%d %s	PPMTranslator		Verzia %d.%d.%d %s
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bitov big-endian
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bitov
 Write ASCII	PPMTranslator		Zapísať ASCII
@@ -23,7 +22,6 @@ RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bitov big-endian
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bitov
 Bitmap 1 bit	PPMTranslator		Bitmapa 1 bit
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bitov big-endian
-Input Color Space	PPMTranslator		Vstupný farebný priestor
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bitov
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Vzorový kód Copyright 1999, Be Incorporated
 PPMTranslator Settings	PPMTranslator		Nastavenia PPMTranslator

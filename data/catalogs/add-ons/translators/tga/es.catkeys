@@ -1,6 +1,5 @@
-1	spanish; castilian	x-vnd.Haiku-TGATranslator	3289993499
+1	spanish; castilian	x-vnd.Haiku-TGATranslator	335173288
 Targa image (%d bits truecolor)	TGATranslator		Imagen Targa (%d bits de color verdadero)
-Version %d.%d.%d %s	TGAView		Versión %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Ignorar el canal alfa TGA
 Targa image (%d bits colormap)	TGATranslator		Imagen Targa (%d bits de mapa de color)
 TGA image translator	TGAView		Conversor de imagen TGA

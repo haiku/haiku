@@ -1,6 +1,5 @@
-1	hungarian	x-vnd.Haiku-TGATranslator	3289993499
+1	hungarian	x-vnd.Haiku-TGATranslator	335173288
 Targa image (%d bits truecolor)	TGATranslator		Targa kép (%d bites trucolor)
-Version %d.%d.%d %s	TGAView		%d.%d.%d %s verzió
 Ignore TGA alpha channel	TGAView		TGA alfa csatorna figyelmen kívül hagyása
 Targa image (%d bits colormap)	TGATranslator		Targa kép (%d bites színtérkép)
 TGA image translator	TGAView		TGA kép értelmező

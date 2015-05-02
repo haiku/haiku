@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-TIFFTranslator	1624888114
+1	slovak	x-vnd.Haiku-TIFFTranslator	4029790542
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nepodarilo sa nastaviť adresár\n
 TIFF image	TIFFTranslator		Obrázok TIFF
@@ -12,4 +12,3 @@ RLE (Packbits)	TIFFView		RLE (Packbits)
 TIFF Settings	TIFFMain		Nastavenia TIFF
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: neplatný index dokumentu\n
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
-Version %d.%d.%d %s	TIFFView		Verzia %d.%d.%d %s

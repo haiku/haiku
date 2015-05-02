@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PackageInstaller	1453600182
+1	romanian	x-vnd.Haiku-PackageInstaller	2667374063
 Install to:	PackageView		Instalează la:
 OK	PackageView		OK
 Accept	PackageTextViewer		Acceptare
@@ -7,7 +7,6 @@ Image not loaded correctly	PackageImageViewer		Imaginea nu s-a încărcat corect
 No package selected.	PackageInfo		Niciun pachet selectat.
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Doriți să țineți minte această decizie pentru restul acestei instalări?\n
 Error while installing the package\n	PackageView		Eroare în timpul instalării pachetului\n
-%.1f GiB	PackageView		%.1f GiO
 %name% (%size% free)	PackageView		%name% (%size% liber)
 Done	PackageInstall		Terminat
 All existing files will be replaced?	PackageView		Toate fișierele existente vor fi înlocuite?
@@ -21,8 +20,6 @@ No installation type selected	PackageView		Niciun tip de instalare selectat
 Installing files and folders	PackageInstall		Se instalează fișiere și dosare
 Package installer	PackageView		Instalator de pachete
 Running post-installation scripts	PackageInstall		Se rulează scripturi post-instalare
-%llu bytes	PackageView		%llu octeți
-%.1f MiB	PackageView		%.1f MiO
 The package you requested has been successfully installed on your system.	PackageView		Pachetul pe care l-ați solicitat a fost instalat cu succes în sistem.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Eroare! \"%s\" nu este o cale validă.\n
 Installation type:	PackageView		Tip instalare:
@@ -32,7 +29,6 @@ Installing package	PackageStatus		Se instalează pachetul
 Decline	PackageTextViewer		Refuzare
 Continue	PackageInfo		Continuare
 %index% of %total%	PackageInstall		%index% din %total%
-%.1f KiB	PackageView		%.1f KiO
 PackageInstaller	System name		PackageInstaller
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Continuare

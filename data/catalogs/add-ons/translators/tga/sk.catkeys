@@ -1,6 +1,5 @@
-1	slovak	x-vnd.Haiku-TGATranslator	3289993499
+1	slovak	x-vnd.Haiku-TGATranslator	335173288
 Targa image (%d bits truecolor)	TGATranslator		Obrázok Targa (%d-bitový truecolor)
-Version %d.%d.%d %s	TGAView		Verzia %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Ignorovať alfa kanál TGA
 Targa image (%d bits colormap)	TGATranslator		Obrázok Targa (%d-bitová farebná mapa)
 TGA image translator	TGAView		Prekladač obrázkov TGA

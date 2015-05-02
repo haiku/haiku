@@ -1,6 +1,5 @@
-1	french	x-vnd.Haiku-TGATranslator	3289993499
+1	french	x-vnd.Haiku-TGATranslator	335173288
 Targa image (%d bits truecolor)	TGATranslator		Image Targa (Vraie couleur %d bits)
-Version %d.%d.%d %s	TGAView		Version %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Ignorer le canal alpha TGA
 Targa image (%d bits colormap)	TGATranslator		Image Targa (Palette %d bits)
 TGA image translator	TGAView		Traducteur d’images TGA

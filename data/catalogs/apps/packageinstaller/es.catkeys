@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-PackageInstaller	199496416
+1	spanish; castilian	x-vnd.Haiku-PackageInstaller	1413270297
 Install to:	PackageView		Instalar a:
 OK	PackageView		OK
 Accept	PackageTextViewer		Aceptar
@@ -11,7 +11,6 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Parece haber una diferencia de tamaño en el paquete de archivo. El paquete puede estar corrupto o puede haber sido modificado desde su creación. ¿Deseas continuar de todos modos?
 Error while installing the package\n	PackageView		Error al instalar el paquete\n
 Disclaimer	PackageTextViewer		Descargo de responsabilidad
-%.1f GiB	PackageView		%.1f GiB
 %name% (%size% free)	PackageView		%name% (%size% libre)
 The installation of the package has been aborted.	PackageView		La instalación del paquete ha sido abortada.
 Done	PackageInstall		Hecho
@@ -29,9 +28,7 @@ Skip all	PackageView		Omitir todo
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Ya existe en la ruta provista el ítem llamado '%s'.\n¿Reemplazar el ítem con el que viene en el paquete u omitir?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Ya existe en la ruta provista el script llamado '%s'.\n¿Reemplazar el script por el que viene en el paquete u omitir?
 Running post-installation scripts	PackageInstall		Ejecutando Scripts post-instalación
-%llu bytes	PackageView		%llu bytes
 Skip	PackageView		Omitir
-%.1f MiB	PackageView		%.1f MiB
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Ya existe en la ruta provista el directorio llamado '%s'.\n¿Reemplazar el directorio por el que viene en el paquete u omitir?
 The package you requested has been successfully installed on your system.	PackageView		El paquete solicitado ha sido exitosamente instalado en el sistema.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Error! \"%s\" no es una ruta valida.\n
@@ -47,7 +44,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		¿Todos los archivos existentes serán omitidos?
 Continue	PackageInfo		Continuar
 %index% of %total%	PackageInstall		%index% de %total%
-%.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		Cancelar
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Cancelar

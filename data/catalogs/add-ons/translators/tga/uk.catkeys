@@ -1,6 +1,5 @@
-1	ukrainian	x-vnd.Haiku-TGATranslator	3289993499
+1	ukrainian	x-vnd.Haiku-TGATranslator	335173288
 Targa image (%d bits truecolor)	TGATranslator		Зображення Targa (%d біт повнокольорове)
-Version %d.%d.%d %s	TGAView		Версія %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Ігнорувати альфа канал TGA
 Targa image (%d bits colormap)	TGATranslator		Зображення Targa (%d бітs палітра)
 TGA image translator	TGAView		Перетворювач зображеньTGA

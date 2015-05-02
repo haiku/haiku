@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-PackageInstaller	3672759664
+1	english	x-vnd.Haiku-PackageInstaller	591566249
 Install to:	PackageView		安装到：
 OK	PackageView		确认
 Accept	PackageTextViewer		接受
@@ -11,7 +11,6 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		包文件大小不匹配。该包在创建之后可能已经损坏或被修改。是否继续？
 Error while installing the package\n	PackageView		安装软件包时出错\n
 Disclaimer	PackageTextViewer		责任声明
-%.1f GiB	PackageView		%.1f GiB
 %name% (%size% free)	PackageView		%name% (自由空间 %size%)
 The installation of the package has been aborted.	PackageView		该包的安装已经取消。
 Done	PackageInstall		完成
@@ -29,9 +28,7 @@ Skip all	PackageView		跳过所有
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		'%s' 项目已经存在于给定路径。\n是替换为包中的项目，还是跳过？
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		'%s' 脚本已经存在于给定路径。\n是替换为包中的脚本，还是跳过？
 Running post-installation scripts	PackageInstall		运行预安装脚本
-%llu bytes	PackageView		%lly 字节
 Skip	PackageView		跳过
-%.1f MiB	PackageView		%1f MiB
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		'%s' 项目已经存在于给定路径。\n是替换为包中的目录，还是跳过？
 The package you requested has been successfully installed on your system.	PackageView		您所需要的包已经成功的安装到系统。
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		错误！\"%s\" 不是有效路径。\n
@@ -47,7 +44,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		所有已存在的文件将被跳过？
 Continue	PackageInfo		继续
 %index% of %total%	PackageInstall		%index% / %total%
-%.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		终止
 PackageInstaller	System name		包安装器
 Abort	PackageInstall		终止

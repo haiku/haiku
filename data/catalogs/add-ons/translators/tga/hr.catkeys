@@ -1,6 +1,5 @@
-1	croatian	x-vnd.Haiku-TGATranslator	1069017608
+1	croatian	x-vnd.Haiku-TGATranslator	2409164693
 Targa image (%d bits truecolor)	TGATranslator		Targa slika (%d bita prava boja)
-Version %d.%d.%d %s	TGAView		Verzija %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		Ignoriraj TGA alfa kanal
 TGA image translator	TGAView		TGA prevoditelj slika
 Targa image (%d bits gray)	TGATranslator		Targa slika (%d sivi bitovi)

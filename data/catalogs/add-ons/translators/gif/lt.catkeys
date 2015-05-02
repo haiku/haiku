@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-GIFTranslator	1515001985
+1	lithuanian	x-vnd.Haiku-GIFTranslator	2626723192
 Websafe	GIFView		saityno spalvos
 Write interlaced images	GIFView		Naudoti progresinį paveikslų kodavimą
 Optimal	GIFView		optimali
@@ -15,5 +15,4 @@ Use RGB color	GIFView		Naudoti RŽM spalvą
 Use dithering	GIFView		Naudoti elementų smulkinimą
 GIF Settings	GIFTranslator		GIF nuostatos
 BeOS system	GIFView		„BeOS“ sisteminė
-v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		Automatinė spalva (iš alfa kanalo)

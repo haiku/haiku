@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	2918699501
+1	polish	x-vnd.Haiku-Terminal	2090807552
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz terminal
 Change directory	Terminal TermView		Zmień folder
@@ -33,6 +33,7 @@ Increase	Terminal TermWindow		Powiększ
 Settings	Terminal TermWindow		Ustawienia
 Window size	Terminal TermWindow		Rozmiar okna
 Selected text	Terminal AppearancePrefView		Zaznaczony tekst
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t–\tAktualny katalog roboczy bieżącego procesu na aktywnej\n\t\t\tkarcie. Opcjonalnie może zostać podana maksymalna liczba\n\t\t\telementów ścieżki. Np. „%2d” dla najwyżej dwóch elementów.\n\t%T\t–\tZlokalizowana nazwa aplikacji Terminal.\n\t%e\t–\tKodowanie aktywnej karty. Niewidoczne dla UTF-8.\n\t%i\t–\tIndeks okna.\n\t%t\t–\tTytuł aktywnej karty.
 Find	Terminal FindWindow		Znajdź
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Szablon określający tytuły okien. Znaczenie poszczególnych symboli jest następujące:
 Appearance	Terminal PrefWindow		Wygląd

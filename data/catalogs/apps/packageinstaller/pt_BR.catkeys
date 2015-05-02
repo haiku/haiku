@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PackageInstaller	3672759664
+1	portuguese (brazil)	x-vnd.Haiku-PackageInstaller	591566249
 Install to:	PackageView		Instalar em:
 OK	PackageView		OK
 Accept	PackageTextViewer		Aceitar
@@ -11,7 +11,6 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Parece haver um erro no tamanho do arquivo do pacote. O pacote pode estar quebrado ou ter sido modificado após sua criação. Quer continuar?
 Error while installing the package\n	PackageView		Erro instalando o pacote\n
 Disclaimer	PackageTextViewer		Aviso
-%.1f GiB	PackageView		%.1f GB
 %name% (%size% free)	PackageView		%name% (%size% livre)
 The installation of the package has been aborted.	PackageView		A instalação do pacote foi cancelada.
 Done	PackageInstall		Feito
@@ -29,9 +28,7 @@ Skip all	PackageView		Ignorar tudo
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		O item de nome '%s' já existe no caminho especificado.\nSubstituir pelo item deste pacote ou pular esta etapa?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		O script de nome '%s' já existe no caminho especificado.\nSubstituir pelo script deste pacote ou pular esta etapa?
 Running post-installation scripts	PackageInstall		Executando scripts pós-instalação
-%llu bytes	PackageView		%llu bytes
 Skip	PackageView		Pular
-%.1f MiB	PackageView		%.1f MB
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		A pasta de nome '%s' já existe no caminho especificado.\nSubstituir pela pasta deste pacote ou pular esta etapa?
 The package you requested has been successfully installed on your system.	PackageView		O pacote requisitado foi instalado com sucesso.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Opa! Erro! \"%s\" não é um caminho válido.\n
@@ -47,7 +44,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Todos os arquivos existentes serão pulados?
 Continue	PackageInfo		Continuar
 %index% of %total%	PackageInstall		%index% de %total%
-%.1f KiB	PackageView		%.1f kB
 Abort	PackageInfo		Cancelar
 PackageInstaller	System name		Instalador de pacotes
 Abort	PackageInstall		Cancelar

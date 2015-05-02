@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-MediaPlayer	2005945973
+1	polish	x-vnd.Haiku-MediaPlayer	2711018042
 raw audio	MediaPlayer-InfoWin		czysty dźwięk
 Location	MediaPlayer-InfoWin		Położenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerykańskie)
@@ -91,6 +91,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Automatycznie rozpocznij
 Track	Video Track Menu		Ścieżka
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Błąd wewnętrzny (nie udało się zablokować). Zapisywanie listy odtwarzania nie powiodło się.
 View options	MediaPlayer-SettingsWindow		Opcje widoku
+none	MediaPlayer-Main		brak
 Play mode	MediaPlayer-SettingsWindow		Odtwarzanie
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Usunięcie wpisów
 Video track	MediaPlayer-Main		Ścieżka wideo
@@ -119,6 +120,7 @@ raw video	MediaPlayer-InfoWin		czyste wideo
 Volume of background clips	MediaPlayer-SettingsWindow		Głośność klipów działających w tle
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Błąd wewnętrzny (brak pamięci). Zapisywanie listy odtwarzania nie powiodło się.
 Hide interface	MediaPlayer-Main		Ukryj interfejs
+Open clips	MediaPlayer-Main		Otwórz pliki
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiowanie wpisu
 none	Subtitles menu		brak
 Move file to Trash	MediaPlayer-PlaylistWindow		Przenieś plik do Kosza

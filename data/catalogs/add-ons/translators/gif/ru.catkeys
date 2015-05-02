@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-GIFTranslator	1515001985
+1	russian	x-vnd.Haiku-GIFTranslator	2626723192
 Websafe	GIFView		Безопасная
 Write interlaced images	GIFView		Записывать чересстрочные изображения
 Optimal	GIFView		Оптимальная
@@ -15,5 +15,4 @@ Use RGB color	GIFView		Использовать RGB цвета
 Use dithering	GIFView		Использовать сглаживание
 GIF Settings	GIFTranslator		Настройки GIF транслятора
 BeOS system	GIFView		Система BeOS
-v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		Автоматически (из альфа канала)

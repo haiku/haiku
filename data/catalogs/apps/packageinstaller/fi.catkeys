@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PackageInstaller	3672759664
+1	finnish	x-vnd.Haiku-PackageInstaller	591566249
 Install to:	PackageView		Asenna kohteeseen:
 OK	PackageView		Valmis
 Accept	PackageTextViewer		Hyväksy
@@ -11,7 +11,6 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Pakettitiedoston tiedostokoossa näyttää olevan täsmäämättömyys. Paketti voi olla rikkinäinen tai sitä on muokattu luomisen jälkeen. Haluatko yhä jatkaa?
 Error while installing the package\n	PackageView		Virhe asennettaessa pakettia\n
 Disclaimer	PackageTextViewer		Vastuuvapauslauseke
-%.1f GiB	PackageView		%.1f gibitavua
 %name% (%size% free)	PackageView		%name% (%size% vapaana)
 The installation of the package has been aborted.	PackageView		Paketin asennus on keskeytetty.
 Done	PackageInstall		Valmis
@@ -29,9 +28,7 @@ Skip all	PackageView		Ohita kaikki
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Kohde nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko kohde vastaavalla tästä paketista vai ohitetaanko se?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripti nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko se vastaavalla tästä paketista vai ohitetaanko se?
 Running post-installation scripts	PackageInstall		Suoritetaan jälkiasennusskriptit
-%llu bytes	PackageView		%llu tavua
 Skip	PackageView		Ohita
-%.1f MiB	PackageView		%.1f mebitavua
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Hakemisto nimeltään ’%s’ on jo olemassa annetussa polussa.\nKorvataanko hakemisto vastaavalla tästä paketista vai ohitetaanko se?
 The package you requested has been successfully installed on your system.	PackageView		Pyytämäsi paketti on asennettu järjestelmääsi onnistuneesti.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Virhe! ”%s” ei ole kelvollinen polku.\n
@@ -47,7 +44,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Kaikki olemassaolevat tiedostot ohitetaan?
 Continue	PackageInfo		Jatka
 %index% of %total%	PackageInstall		%index% / %total%
-%.1f KiB	PackageView		%.1f kibitavua
 Abort	PackageInfo		Keskeytä
 PackageInstaller	System name		Pakettiasennus
 Abort	PackageInstall		Keskeytä

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-TIFFTranslator	1930083198
+1	ukrainian	x-vnd.Haiku-TIFFTranslator	40018330
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		iВизначення заголовка tiff: неможливо встановити каталог\n
 TIFF image	TIFFTranslator		Зображення TIFF
@@ -13,4 +13,3 @@ TIFF Settings	TIFFMain		Настройки TIFF
 Use compression:	TIFFView		Використати зтиск:
 identify_tiff_header: invalid document index\n	TIFFTranslator		визначення заголовка tiff: неправильний показник документу\n
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
-Version %d.%d.%d %s	TIFFView		Версія %d.%d.%d %s

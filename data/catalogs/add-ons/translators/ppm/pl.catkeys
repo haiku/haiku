@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-PPMTranslator	276252412
+1	polish	x-vnd.Haiku-PPMTranslator	797856484
 PPM Settings	PPMMain		Ustawienia PPM
 Based on PPMTranslator sample code	PPMTranslator		Oparte na przykładowym kodzie źródłowym translatora PPM
 OK	PPMMain		OK
@@ -13,7 +13,6 @@ PPM image translator	PPMTranslator		Translator obrazów PPM
 bits/space	PPMTranslator		bity/przestrzeń
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8, 32 bity, Big Endian
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5, 16 bitów, Big Endian
-Version %d.%d.%d %s	PPMTranslator		Wersja %d.%d.%d %s
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5, 16 bitów, Big Endian
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5, 16 bitów
 Write ASCII	PPMTranslator		Zapisz ASCII
@@ -23,7 +22,6 @@ RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1, 16 bitów, Big Endi
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5, 16 bitów
 Bitmap 1 bit	PPMTranslator		Jednobitowa bitmapa
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8, 32 bity, Big Endian
-Input Color Space	PPMTranslator		Wejściowa przestrzeń barw
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8, 32 bity
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Przykładowy kod źródłowy, copyright 1999, Be Incorporated
 PPMTranslator Settings	PPMTranslator		Ustawienia translatora PPM

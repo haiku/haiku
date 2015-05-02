@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-TIFFTranslator	1930083198
+1	french	x-vnd.Haiku-TIFFTranslator	40018330
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		entête d’identification TIFF : impossible de déterminer l’annuaire\n
 TIFF image	TIFFTranslator		Image TIFF
@@ -13,4 +13,3 @@ TIFF Settings	TIFFMain		Réglages TIFF
 Use compression:	TIFFView		Méthode de compression :
 identify_tiff_header: invalid document index\n	TIFFTranslator		entête d’identification TIFF : index de document invalide\n
 ZIP (Deflate)	TIFFView		ZIP (Compression)
-Version %d.%d.%d %s	TIFFView		Version %d.%d.%d %s
