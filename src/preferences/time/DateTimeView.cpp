@@ -175,7 +175,7 @@ DateTimeView::_InitView()
 	fCalendarView->SetInvocationMessage(new BMessage(kDayChanged));
 
 	fDateEdit = new TDateEdit("dateEdit", 3);
-	fTimeEdit = new TTimeEdit("timeEdit", 4);
+	fTimeEdit = new TTimeEdit("timeEdit", 5);
 	fClock = new TAnalogClock("analogClock");
 
 	BTime time(BTime::CurrentTime(B_LOCAL_TIME));
