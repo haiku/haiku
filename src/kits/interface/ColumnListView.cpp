@@ -133,23 +133,6 @@ static const float kTitleSpacing = 1.4;
 static const float kRowSpacing = 1.4;
 static const float kLatchWidth = 15.0;
 
-
-static const rgb_color kColor[B_COLOR_TOTAL] =
-{
-    {255, 255, 255, 255},           // B_COLOR_BACKGROUND
-    {  0,   0,   0, 255},           // B_COLOR_TEXT
-    {148, 148, 148, 255},           // B_COLOR_ROW_DIVIDER
-    {190, 190, 190, 255},           // B_COLOR_SELECTION
-    {  0,   0,   0, 255},           // B_COLOR_SELECTION_TEXT
-    {200, 200, 200, 255},           // B_COLOR_NON_FOCUS_SELECTION
-    {180, 180, 180, 180},           // B_COLOR_EDIT_BACKGROUND
-    {  0,   0,   0, 255},           // B_COLOR_EDIT_TEXT
-    {215, 215, 215, 255},           // B_COLOR_HEADER_BACKGROUND
-    {  0,   0,   0, 255},           // B_COLOR_HEADER_TEXT
-    {  0,   0,   0, 255},           // B_COLOR_SEPARATOR_LINE
-    {  0,   0,   0, 255},           // B_COLOR_SEPARATOR_BORDER
-};
-
 static const int32 kMaxDepth = 1024;
 static const float kLeftMargin = kLatchWidth;
 static const float kRightMargin = 8;
@@ -2053,8 +2036,32 @@ BColumnListView::_Init()
 	if (bounds.Height() <= 0)
 		bounds.bottom = 100;
 
-	for (int i = 0; i < (int)B_COLOR_TOTAL; i++)
-		fColorList[i] = kColor[i];
+	fColorList[B_COLOR_BACKGROUND] = ui_color(B_LIST_BACKGROUND_COLOR);
+	fColorList[B_COLOR_TEXT] = ui_color(B_LIST_ITEM_TEXT_COLOR);
+	fColorList[B_COLOR_ROW_DIVIDER] = tint_color(
+		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR), B_DARKEN_2_TINT);
+	fColorList[B_COLOR_SELECTION] = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+	fColorList[B_COLOR_SELECTION_TEXT] =
+		ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+
+	// For non focus selection uses the selection color as BListView
+	fColorList[B_COLOR_NON_FOCUS_SELECTION] =
+		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+
+	// edit mode doesn't work very well
+	fColorList[B_COLOR_EDIT_BACKGROUND] = tint_color(
+		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR), B_DARKEN_1_TINT);
+	fColorList[B_COLOR_EDIT_BACKGROUND].alpha = 180;
+
+	// Unused color
+	fColorList[B_COLOR_EDIT_TEXT] = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+
+	fColorList[B_COLOR_HEADER_BACKGROUND] = ui_color(B_PANEL_BACKGROUND_COLOR);
+	fColorList[B_COLOR_HEADER_TEXT] = ui_color(B_PANEL_TEXT_COLOR);
+
+	// Unused colors
+	fColorList[B_COLOR_SEPARATOR_LINE] = ui_color(B_LIST_ITEM_TEXT_COLOR);
+	fColorList[B_COLOR_SEPARATOR_BORDER] = ui_color(B_LIST_ITEM_TEXT_COLOR);
 
 	BRect titleRect;
 	BRect outlineRect;
