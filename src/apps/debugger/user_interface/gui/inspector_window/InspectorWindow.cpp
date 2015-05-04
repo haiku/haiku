@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -409,7 +409,7 @@ InspectorWindow::LoadSettings(const GuiTeamUiSettings& settings)
 		return B_ERROR;
 
 	BMessage inspectorSettings;
-	if (settings.Settings("inspectorWindow", inspectorSettings) == B_OK)
+	if (settings.Settings("inspectorWindow", inspectorSettings) != B_OK)
 		return B_OK;
 
 	BRect frameRect;
