@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef INSPECTOR_WINDOW_H
@@ -18,6 +18,7 @@
 class BButton;
 class BMenuField;
 class BMessenger;
+class BStringView;
 class BTextControl;
 class GuiTeamUiSettings;
 class SourceLanguage;
@@ -75,12 +76,16 @@ private:
 	void						_SetToAddress(target_addr_t address);
 	void						_SetCurrentBlock(TeamMemoryBlock* block);
 
+	void						_UpdateWritableIndicator();
+	const char*					_GetCurrentWritableIndicator() const;
+
 private:
 	UserInterfaceListener*		fListener;
 	BTextControl*				fAddressInput;
 	BMenuField*					fHexMode;
 	BMenuField*					fEndianMode;
 	BMenuField*					fTextMode;
+	BStringView*				fWritableBlockIndicator;
 	MemoryView*					fMemoryView;
 	BButton*					fPreviousBlockButton;
 	BButton*					fNextBlockButton;

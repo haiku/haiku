@@ -14,6 +14,7 @@
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
 #include <ScrollView.h>
+#include <StringView.h>
 #include <TextControl.h>
 
 #include "Architecture.h"
@@ -37,11 +38,12 @@ InspectorWindow::InspectorWindow(::Team* team, UserInterfaceListener* listener,
 	BHandler* target)
 	:
 	BWindow(BRect(100, 100, 700, 500), "Inspector", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS),
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fListener(listener),
 	fAddressInput(NULL),
 	fHexMode(NULL),
 	fTextMode(NULL),
+	fWritableBlockIndicator(NULL),
 	fMemoryView(NULL),
 	fCurrentBlock(NULL),
 	fCurrentAddress(0LL),
@@ -163,6 +165,11 @@ InspectorWindow::_Init()
 		.End()
 		.Add(scrollView = new BScrollView("memory scroll",
 			NULL, 0, false, true), 3.0f)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fWritableBlockIndicator = new BStringView("writableIndicator",
+				_GetCurrentWritableIndicator()))
+			.AddGlue()
+		.End()
 	.End();
 
 	fHexMode->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -514,4 +521,23 @@ InspectorWindow::_SetCurrentBlock(TeamMemoryBlock* block)
 
 	fCurrentBlock = block;
 	fMemoryView->SetTargetAddress(fCurrentBlock, fCurrentAddress);
+	_UpdateWritableIndicator();
+}
+
+
+void
+InspectorWindow::_UpdateWritableIndicator()
+{
+	fWritableBlockIndicator->SetText(_GetCurrentWritableIndicator());
+}
+
+
+const char*
+InspectorWindow::_GetCurrentWritableIndicator() const
+{
+	static char buffer[32];
+	snprintf(buffer, sizeof(buffer), "Writable: %s", fCurrentBlock == NULL
+			? "N/A" : fCurrentBlock->IsWritable() ? "Yes" : "No");
+
+	return buffer;
 }
