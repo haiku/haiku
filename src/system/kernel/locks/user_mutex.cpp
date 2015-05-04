@@ -131,8 +131,8 @@ user_mutex_lock_locked(int32* mutex, addr_t physicalAddress, const char* name,
 	status_t error = waitEntry.Wait(flags, timeout);
 	locker.Lock();
 
-	// dequeue
-	if (!remove_user_mutex_entry(&entry)) {
+	// dequeue if we weren't woken up
+	if (!entry.locked && !remove_user_mutex_entry(&entry)) {
 		// no one is waiting anymore -- clear the waiting flag
 		atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
 	}
@@ -150,29 +150,37 @@ user_mutex_lock_locked(int32* mutex, addr_t physicalAddress, const char* name,
 static void
 user_mutex_unlock_locked(int32* mutex, addr_t physicalAddress, uint32 flags)
 {
-	if (UserMutexEntry* entry = sUserMutexTable.Lookup(physicalAddress)) {
-		// Someone is waiting -- set the locked flag. It might still be set,
-		// but when using userland atomic operations, the caller will usually
-		// have cleared it already.
-		int32 oldValue = atomic_or(mutex, B_USER_MUTEX_LOCKED);
-
-		// unblock the first thread
-		entry->locked = true;
-		entry->condition.NotifyOne();
-
-		if ((flags & B_USER_MUTEX_UNBLOCK_ALL) != 0
-				|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
-			// unblock all the other waiting threads as well
-			for (UserMutexEntryList::Iterator it
-					= entry->otherEntries.GetIterator();
-				UserMutexEntry* otherEntry = it.Next();) {
-				otherEntry->locked = true;
-				otherEntry->condition.NotifyOne();
-			}
-		}
-	} else {
+	UserMutexEntry* entry = sUserMutexTable.Lookup(physicalAddress);
+	if (entry == NULL) {
 		// no one is waiting -- clear locked flag
 		atomic_and(mutex, ~(int32)B_USER_MUTEX_LOCKED);
+		return;
+	}
+
+	// Someone is waiting -- set the locked flag. It might still be set,
+	// but when using userland atomic operations, the caller will usually
+	// have cleared it already.
+	int32 oldValue = atomic_or(mutex, B_USER_MUTEX_LOCKED);
+
+	// unblock the first thread
+	entry->locked = true;
+	entry->condition.NotifyOne();
+
+	if ((flags & B_USER_MUTEX_UNBLOCK_ALL) != 0
+			|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
+		// unblock and dequeue all the other waiting threads as well
+		while (UserMutexEntry* otherEntry = entry->otherEntries.RemoveHead()) {
+			otherEntry->locked = true;
+			otherEntry->condition.NotifyOne();
+		}
+
+		// dequeue the first thread and mark the mutex uncontended
+		sUserMutexTable.Remove(entry);
+		atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
+	} else {
+		bool otherWaiters = remove_user_mutex_entry(entry);
+		if (!otherWaiters)
+			atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
 	}
 }
 
