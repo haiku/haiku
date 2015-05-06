@@ -58,7 +58,10 @@ SimpleItem::Draw(BView *owner, BRect frame, uint32 flags)
 {
 	DrawBackground(owner, frame, flags);
 	// label
-	owner->SetHighColor( 0, 0, 0, 255 );
+	if (IsSelected())
+		owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+	else
+		owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	font_height fh;
 	owner->GetFontHeight( &fh );
 	const char* text = Text();
@@ -86,14 +89,16 @@ SimpleItem::DrawBackground(BView *owner, BRect frame, uint32 flags)
 		frame.InsetBy(1.0, 1.0);
 	}
 	// figure out bg-color
-	rgb_color color = (rgb_color){ 255, 255, 255, 255 };
+	rgb_color color = ui_color(B_LIST_BACKGROUND_COLOR);
+
+	if (IsSelected())
+		color = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+
 	if ( flags & FLAGS_TINTED_LINE )
-		color = tint_color( color, 1.06 );
+		color = tint_color(color, 1.06);
 	// background
-	if ( IsSelected() )
-		color = tint_color( color, B_DARKEN_2_TINT );
-	owner->SetLowColor( color );
-	owner->FillRect( frame, B_SOLID_LOW );
+	owner->SetLowColor(color);
+	owner->FillRect(frame, B_SOLID_LOW);
 }
 
 // DragSortableListView class
@@ -170,11 +175,11 @@ DragSortableListView::Draw( BRect updateRect )
 		}
 		updateRect.top = r.bottom + 1.0;
 		if (updateRect.IsValid()) {
-			SetLowColor(255, 255, 255, 255);
+			SetLowColor(ui_color(B_LIST_BACKGROUND_COLOR));
 			FillRect(updateRect, B_SOLID_LOW);
 		}
 	} else {
-		SetLowColor(255, 255, 255, 255);
+		SetLowColor(ui_color(B_LIST_BACKGROUND_COLOR));
 		FillRect(updateRect, B_SOLID_LOW);
 	}
 	// drop anticipation indication
