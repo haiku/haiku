@@ -220,7 +220,7 @@ RemotePackageRepository HaikuPorts
 	tinyxml_devel-2.6.2-1
 	transmission-2.84-3
 	unrar-5.1.5-1
-	unzip-6.0-1
+	unzip-6.0-2
 	vim-7.4-2
 	vision-0.9.7.r949-2
 	wget-1.16.3-1
