@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.04.28
-#	Date:    2015-04-28 03:15:01
+#	Version: 2015.05.07
+#	Date:    2015-05-07 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -1506,7 +1506,6 @@
 		17aa 368f  Radeon R5 A230
 	6667  Jet ULT [Radeon R5 M230]
 	666f  Sun LE [Radeon HD 8550M / R5 M230]
-	6670  Hainan
 	6704  Cayman PRO GL [FirePro V7900]
 	6707  Cayman LE GL [FirePro V5900]
 	6718  Cayman XT [Radeon HD 6970]
@@ -1986,8 +1985,8 @@
 		1b0a 90bb  Radeon HD 7450A
 	677b  Caicos PRO [Radeon HD 7450]
 	6780  Tahiti XT GL [FirePro W9000]
-	6784  Tahiti [ATI FirePro V (FireGL V) Graphics Adapter]
-	6788  Tahiti [ATI FirePro V (FireGL V) Graphics Adapter]
+	6784  Tahiti [FirePro Series Graphics Adapter]
+	6788  Tahiti [FirePro Series Graphics Adapter]
 	678a  Tahiti PRO GL [FirePro Series]
 		1002 030c  FirePro W8000
 		1002 0310  FirePro S9000
@@ -1998,9 +1997,6 @@
 		1002 0b2a  FirePro S10000
 		1028 030c  FirePro W8000
 		1028 0710  FirePro S9000
-	6790  Tahiti
-	6791  Tahiti
-	6792  Tahiti
 	6798  Tahiti XT [Radeon HD 7970/8970 OEM / R9 280X]
 		1002 3000  Tahiti XT2 [Radeon HD 7970 GHz Edition]
 		1002 3001  Tahiti XTL [Radeon R9 280X]
@@ -2133,9 +2129,6 @@
 		1462 8092  Radeon HD 8730
 		148c 8730  Radeon HD 8730
 		1787 3000  Radeon HD 6570
-	6838  Cape Verde
-	6839  Cape Verde
-	683b  Cape Verde [Radeon HD 7700 Series]
 	683d  Cape Verde XT [Radeon HD 7770/8760 / R7 250X]
 		1002 0030  Radeon HD 8760 OEM
 		1019 0030  Radeon HD 8760 OEM
@@ -2725,8 +2718,8 @@
 		1179 f903  Radeon R7 M260
 		1179 f934  Radeon R7 M260
 	6901  Topaz PRO [Radeon R5 M255]
-	6920  Tonga
 	6921  Amethyst XT [Radeon R9 M295X]
+	6929  Tonga PRO GL [FirePro Series]
 	692b  Tonga PRO GL [FirePro W7100]
 	692f  Tonga XT GL [FirePro W8100]
 	6938  Amethyst XT [Radeon R9 M295X Mac Edition]
@@ -3097,12 +3090,7 @@
 	9837  Kabini [Radeon HD 8280E]
 	9838  Kabini [Radeon HD 8240 / R3 Series]
 	9839  Kabini [Radeon HD 8180]
-	983a  Kabini
-	983b  Kabini
-	983c  Kabini
 	983d  Temash [Radeon HD 8250/8280G]
-	983e  Kabini
-	983f  Kabini
 	9840  Kabini HDMI/DP Audio
 	9850  Mullins [Radeon R3 Graphics]
 	9851  Mullins [Radeon R4/R5 Graphics]
@@ -18559,9 +18547,11 @@
 		1924 8009  SFN7x22F-R2 Flareon Ultra 7000 Series 10G Adapter
 		1924 800a  SFN7x02F-R2 Flareon 7000 Series 10G Adapter
 		1924 800b  SFN7x22F-R3 Flareon Ultra 7000 Series 10G Adapter
-		1924 800c  SFN7x02F-R3 Flareon 7000 Series 10G Adapter
+		1924 800c  SFN7x22F-R3 Flareon Ultra 7000 Series 10G Adapter
+		1924 800d  SFN7x02F-R3 Flareon 7000 Series 10G Adapter
 	0923  SFC9140
 		1924 800b  SFN7x42Q-R1 Flareon Ultra 7000 Series 10/40G Adapter
+		1924 800e  SFN7x42Q-R2 Flareon Ultra 7000 Series 10/40G Adapter
 	1803  SFC9020 Virtual Function [Solarstorm]
 	1813  SFL9021 Virtual Function [Solarstorm]
 	1903  SFC9120 Virtual Function
@@ -19231,6 +19221,9 @@
 		0000 3011  10-Giga TOE Dual Port SFP+/CX4 Low Profile SmartNIC
 		0000 3012  10-Giga TOE Dual Port CX4/SFP+ Low Profile SmartNIC
 		0000 3014  10-Giga TOE Dual Port CX4 Low Profile SmartNIC
+1fcc  StreamLabs
+	f416  MS416
+	fb01  MH4LM
 1fce  Cognio Inc.
 	0001  Spectrum Analyzer PC Card (SAgE)
 1fd4  SUNIX Co., Ltd.
@@ -21567,6 +21560,10 @@
 	1588  Ethernet Controller XL710 for 20GbE backplane
 		103c 0000  HP Flex-20 20Gb 2-port 660M Adapter
 		103c 22ff  HP Flex-20 20Gb 2-port 660M Adapter
+	1589  Ethernet Controller X710/X557-AT 10GBASE-T
+		8086 0000  Ethernet Converged Network Adapter X710-T
+		8086 0001  Ethernet Converged Network Adapter X710-T4
+		8086 0002  Ethernet Converged Network Adapter X710-T4
 	15a0  Ethernet Connection (2) I218-LM
 	15a1  Ethernet Connection (2) I218-V
 	15a2  Ethernet Connection (3) I218-LM
