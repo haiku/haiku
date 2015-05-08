@@ -70,6 +70,9 @@ extern FILE		*fopen(const char *name, const char *mode);
 extern FILE		*freopen(const char *name, const char *mode, FILE *stream);
 extern FILE		*fdopen(int fd, const char *mode);
 extern int		fclose(FILE *stream);
+#ifdef _GNU_SOURCE
+extern int		fcloseall(void);
+#endif
 
 extern int		fileno(FILE *stream);
 extern int		fileno_unlocked(FILE *stream);
