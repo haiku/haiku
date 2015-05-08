@@ -677,7 +677,7 @@ RemotePackageRepository HaikuPorts
 	libxml2_x86_devel-2.9.1-1
 	libxslt_x86-1.1.28-2
 	libxslt_x86_devel-1.1.28-2
-	llvm_x86-3.4-1
+	llvm_x86-3.5.2-1
 	lmms_x86-1.2.0_git-1
 	luajit_x86-2.0.2-2
 	luajit_x86_devel-2.0.2-2
