@@ -47,7 +47,7 @@ one of our OpenGrok servers:
 
 ### Contributing documentation
 The main piece of documentation that still needs work are the API docs (found
-in the tree at `src/docs/user`). Just find an undocumented class, write
+in the tree at `docs/user`). Just find an undocumented class, write
 documentation for it, and [submit a patch](https://dev.haiku-os.org/wiki/CodingGuidelines/SubmittingPatches).
 
 ### Contributing translations
