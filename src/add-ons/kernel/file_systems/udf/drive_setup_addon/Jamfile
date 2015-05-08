@@ -1,8 +1,5 @@
 SubDir HAIKU_TOP src add-ons kernel file_systems udf drive_setup_addon ;
 
-# save original optimization level
-oldOPTIM = $(OPTIM) ;
-
 # set some additional defines
 {
 	local defines =
@@ -15,9 +12,6 @@ oldOPTIM = $(OPTIM) ;
 
 	if $(DEBUG) {
 		#defines += DEBUG ;
-	} else {
-		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
-		OPTIM = -O1 ;
 	}
 
 	defines = [ FDefines $(defines) ] ;
@@ -55,7 +49,3 @@ actions ignore InstallUDFDS
 }
 
 InstallUDFDS install : i-udf-ds ;
-
-# restore original optimization level
-OPTIM = $(oldOPTIM) ;
-

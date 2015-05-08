@@ -12,11 +12,6 @@ DEFINES += HAIKU_BUILD_COMPATIBILITY_H ;
 		FS_SHELL
 		;
 
-	if $(DEBUG) = 0 {
-		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
-		OPTIM = -O1 ;
-	}
-
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) -Wno-multichar ;
 	SubDirC++Flags $(defines) -Wno-multichar -fno-rtti ;
