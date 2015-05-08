@@ -80,7 +80,10 @@ RemotePackageRepository HaikuPorts
 	glu_devel-9.0.0-3
 	gmp-6.0.0-1
 	gmp_devel-6.0.0-1
+	gnupg-1.4.16-1
 	gperf-3.0.4-1
+	gpgme-1.5.4-1
+	gpgme_devel-1.5.4-1
 	graphite2-1.2.4-1
 	graphite2_devel-1.2.4-1
 	grep-2.20-1
@@ -106,6 +109,8 @@ RemotePackageRepository HaikuPorts
 	jpeg_tools-9-3
 	keymapswitcher-1.2.7.10-1
 	less-451-4
+	libassuan-2.2.0-1
+	libassuan_devel-2.2.0-1
 	libedit-2012_06_01_3.0-1
 	libedit_devel-2012_06_01_3.0-1
 	libevent-2.0.21-7
@@ -114,6 +119,8 @@ RemotePackageRepository HaikuPorts
 	libexecinfo_devel-1.1-2
 	libffi-3.2.1-2
 	libffi_devel-3.2.1-2
+	libgpg_error-1.19-1
+	libgpg_error_devel-1.19-1
 	libicns-0.8.1-1
 	libicns_devel-0.8.1-1
 	libiconv-1.13.1-6
@@ -144,6 +151,10 @@ RemotePackageRepository HaikuPorts
 	libtool_libltdl-2.4.2-1
 	libunistring-0.9.5-1
 	libunistring_devel-0.9.5-1
+	libusb-1.0.19-2
+	libusb_devel-1.0.19-2
+	libusb_compat-0.1.5-2
+	libusb_compat_devel-0.1.5-2
 	libvorbis-1.3.5-1
 	libvorbis_devel-1.3.5-1
 	libvpx-1.0.0-2
@@ -206,8 +217,8 @@ RemotePackageRepository HaikuPorts
 	sharutils-4.14-1
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.8.8.3-1
-	sqlite_devel-3.8.8.3-1
+	sqlite-3.8.10.0-1
+	sqlite_devel-3.8.10.0-1
 	subversion-1.8.11-1
 	subversion_devel-1.8.11-1
 	tar-1.27.1-2
@@ -273,7 +284,9 @@ RemotePackageRepository HaikuPorts
 	glib2
 	glu
 	gmp
+	gnupg
 	gperf
+	gpgme
 	graphite2
 	grep
 	groff
@@ -289,10 +302,12 @@ RemotePackageRepository HaikuPorts
 	help2man
 	keymapswitcher
 	less
+	libassuan
 	libedit
 	libevent
 	libexecinfo
 	libffi
+	libgpg_error
 	libicns
 	libiconv
 	libogg
@@ -309,6 +324,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis
 	libvpx
 	libunistring
+	libusb
+	libusb_compat
 	libwebp
 	libxml2
 	libxslt
