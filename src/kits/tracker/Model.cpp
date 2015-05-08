@@ -1310,10 +1310,8 @@ Model::GetVersionString(BString &result, version_kind kind)
 	if (error != B_OK)
 		return error;
 
-	char vstr[32];
-	sprintf(vstr, "%" B_PRId32 ".%" B_PRId32 ".%" B_PRId32, version.major,
+	result.SetToFormat("%" B_PRId32 ".%" B_PRId32 ".%" B_PRId32, version.major,
 		version.middle, version.minor);
-	result = vstr;
 
 	return B_OK;
 }
