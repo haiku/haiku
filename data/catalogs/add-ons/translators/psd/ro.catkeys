@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-PSDTranslator	3865598981
+1	romanian	x-vnd.Haiku-PSDTranslator	1948761734
 Lab	PSDLoader		Laborator
 Uncompressed	PSDConfig		Necomprimat
 Indexed	PSDLoader		Indexat
@@ -6,7 +6,6 @@ Grayscale	PSDLoader		Scală de gri
 Version %d.%d.%d, %s	PSDConfig		Versiunea %d.%d.%d, %s
 Photoshop image	PSDTranslator		Imagine Photoshop
 RLE	PSDConfig		RLE
-Photoshop Document (PSD File)	PSDConfig		Document Photoshop (Fișier PSD)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Imagine Photoshop (%s)
 RGB	PSDLoader		RGB

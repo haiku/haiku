@@ -1,5 +1,6 @@
-1	french	x-vnd.Haiku-TIFFTranslator	40018330
+1	french	x-vnd.Haiku-TIFFTranslator	2234713102
 LZW	TIFFView		LZW
+Version %d.%d.%d, %s	TIFFView		Version %d.%d.%d, %s
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		entête d’identification TIFF : impossible de déterminer l’annuaire\n
 TIFF image	TIFFTranslator		Image TIFF
 TIFF Library:	TIFFView		Bibliothèque TIFF :

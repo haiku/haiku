@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	1708199414
+1	japanese	x-vnd.Haiku-HaikuDepot	4273323974
 Name	PackageListView		名前
 Available packages	MainWindow		使用可能なパッケージ
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
@@ -136,6 +136,7 @@ Cancel	RatePackageWindow		キャンセル
 Package action failed	PackageInfoView		パッケージアクションに失敗しました
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		送信する
+-	no package size		-
 Category:	FilterView		分類:
 Failed to create account	UserLoginWindow		アカウントの作成に失敗しました
 There are problems with the data you entered:\n\n	UserLoginWindow		入力したデーターに問題があります:\n\n

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-TGATranslator	335173288
+1	russian	x-vnd.Haiku-TGATranslator	3952259621
 Targa image (%d bits truecolor)	TGATranslator		Targa изображение (%d битный истинный цвет)
 Ignore TGA alpha channel	TGAView		Игнорировать альфа канал TGA
 Targa image (%d bits colormap)	TGATranslator		Targa изображение (%d битная цветовая карта)
@@ -8,8 +8,8 @@ Targa image (%d bits gray)	TGATranslator		Targa изображение (%d би�
 Written by the Haiku Translation Kit Team	TGAView		Разработан командой Haiku Translation Kit
 Targa image (%d bits RLE truecolor)	TGATranslator		Targa изображение (%d битное полноцветное RLE)
 TGA images	TGATranslator		TGA изображения
+Version %d.%d.%d, %s	TGAView		Версия %d.%d.%d, %s
 TGATranslator Settings	TGATranslator		Настройки TGA транслятора
-Save with RLE Compression	TGAView		Сохранить с RLE сжатием
 TGA image translator	TGATranslator		Транслятор TGA изображений
 Targa image (%d bits RLE gray)	TGATranslator		Targa изображение (%d битное серое RLE)
 TGA Settings	TGAMain		Настройки TGA транслятора

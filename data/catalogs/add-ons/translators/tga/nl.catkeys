@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-TGATranslator	335173288
+1	dutch; flemish	x-vnd.Haiku-TGATranslator	77519970
 Targa image (%d bits truecolor)	TGATranslator		Targa afbeelding (%d bits truecolor)
 Ignore TGA alpha channel	TGAView		Negeer TGA alpha kanaal
 Targa image (%d bits colormap)	TGATranslator		Targa afbeelding (%d bits kleurmap)
@@ -9,7 +9,6 @@ Written by the Haiku Translation Kit Team	TGAView		Geschreven door het Haiku Tra
 Targa image (%d bits RLE truecolor)	TGATranslator		Targa afbeelding (%d bits RLE truecolor)
 TGA images	TGATranslator		TGA afbeeldingen
 TGATranslator Settings	TGATranslator		TGAVertaler Instellingen
-Save with RLE Compression	TGAView		Met RLE-compressie opslaan
 TGA image translator	TGATranslator		TGA afbeelding vertaler
 Targa image (%d bits RLE gray)	TGATranslator		Targa afbeelding (%d bits RLE grijs)
 TGA Settings	TGAMain		TGA Instellingen

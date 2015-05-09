@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PSDTranslator	489719358
+1	hungarian	x-vnd.Haiku-PSDTranslator	1706619436
 Lab	PSDLoader		Lab
 Uncompressed	PSDConfig		Tömörítetlen
 Indexed	PSDLoader		Indexelt
@@ -8,10 +8,8 @@ Photoshop image translator	PSDTranslator		Photoshop-kép értelmező
 Version %d.%d.%d, %s	PSDConfig		Verzió: %d.%d.%d, %s
 Photoshop image	PSDTranslator		Photoshop-kép
 RLE	PSDConfig		RLE
-Photoshop Document (PSD File)	PSDConfig		Photoshop dokumentum (PSD fájl)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Photoshop-kép (%s)
-Photoshop Big Document (PSB File)	PSDConfig		Photoshop (Big) dokumentum (PSB fájl)
 PSDTranslator Settings	PSDConfig		PSDTranslator Settings
 RGB	PSDLoader		RGB
 Bitmap	PSDLoader		Bittérkép

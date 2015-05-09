@@ -1,9 +1,11 @@
-1	polish	x-vnd.Haiku-SGITranslator	4153400005
+1	polish	x-vnd.Haiku-SGITranslator	129108011
 Use compression:	SGIView		Kompresja:
 SGITranslator Settings	SGITranslator		Ustawienia translatora SGI
 None	SGIView		Brak
 SGI images	SGITranslator		Obrazy SGI
 SGI image translator	SGITranslator		Translator obrazów SGI
+\nbased on GIMP SGI plugin v1.5:\n	SGIView		\noparte na wtyczce SGI w wersji 1.5 dla programu GIMP:\n
+Version %d.%d.%d, %s	SGIView		Wersja %d.%d.%d, %s
 SGI image	SGITranslator		Obraz SGI
 RLE	SGIView		RLE
 SGI Settings	SGIMain		Ustawienia SGI

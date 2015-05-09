@@ -4,7 +4,7 @@ Unlock	KeyRequestWindow		Entsperren
 This application has been updated since it was last granted access.	AppAccessRequestWindow		Diese Anwendung wurde seit dem letzten erlaubten Zugriff aktualisiert.
 Allow always	AppAccessRequestWindow		Immer erlauben
 Application keyring access	AppAccessRequestWindow		Anwendungszugriff auf Schlüsselbund
-to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		folgendes zu tun:\n%accessString%\n\n
+to perform the following action:\n%accessString%\n\n	AppAccessRequestWindow		um folgendes zu tun:\n%accessString%\n\n
 The application:\n%signature% (%path%)\n\n	AppAccessRequestWindow		Die Anwendung:\n%signature% (%path%)\n\n
 This application doesn't yet have the required privileges.	AppAccessRequestWindow		Diese Anwendung verfügt noch nicht über die erforderlichen Rechte.
 Password:	KeyRequestWindow		Kennwort:

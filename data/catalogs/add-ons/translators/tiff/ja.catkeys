@@ -1,5 +1,6 @@
-1	japanese	x-vnd.Haiku-TIFFTranslator	40018330
+1	japanese	x-vnd.Haiku-TIFFTranslator	2234713102
 LZW	TIFFView		LZW
+Version %d.%d.%d, %s	TIFFView		バージョン %d.%d.%d, %s
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: couldn't set directory\n
 TIFF image	TIFFTranslator		TIFF イメージ
 TIFF Library:	TIFFView		TIFF ライブラリ:

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-TGATranslator	335173288
+1	french	x-vnd.Haiku-TGATranslator	3952259621
 Targa image (%d bits truecolor)	TGATranslator		Image Targa (Vraie couleur %d bits)
 Ignore TGA alpha channel	TGAView		Ignorer le canal alpha TGA
 Targa image (%d bits colormap)	TGATranslator		Image Targa (Palette %d bits)
@@ -8,8 +8,8 @@ Targa image (%d bits gray)	TGATranslator		Image Targa (Gris %d bits)
 Written by the Haiku Translation Kit Team	TGAView		Écrit par l’équipe du Kit de TraductionDeDonnées d’Haiku
 Targa image (%d bits RLE truecolor)	TGATranslator		Image Targa (Vraie couleur %d bits RLE)
 TGA images	TGATranslator		Images TGA
+Version %d.%d.%d, %s	TGAView		Version %d.%d.%d, %s
 TGATranslator Settings	TGATranslator		Réglages du traducteur TGA
-Save with RLE Compression	TGAView		Enregistrer avec une compression RLE
 TGA image translator	TGATranslator		Traducteur d’images TGA
 Targa image (%d bits RLE gray)	TGATranslator		Image Targa (Gris %d bits RLE)
 TGA Settings	TGAMain		Réglages TGA
