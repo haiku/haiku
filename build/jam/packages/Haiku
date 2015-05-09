@@ -68,7 +68,7 @@ AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 #AddNewDriversToPackage display		: display_adapter@x86 ;
 
 # legacy drivers
-AddDriversToPackage					: console dprintf null <driver>tty zero ;
+AddDriversToPackage					: console dprintf null <driver>tty usb_modeswitch zero ;
 AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
