@@ -46,7 +46,7 @@ Document::~Document()
 {
 	delete fCommandStack;
 	delete fSelection;
-	fIcon->Release();
+	fIcon->ReleaseReference();
 	delete fNativeSaver;
 	delete fExportSaver;
 }
@@ -92,7 +92,7 @@ Document::SetIcon(_ICON_NAMESPACE Icon* icon)
 	if (fIcon == icon)
 		return;
 
-	fIcon->Release();
+	fIcon->ReleaseReference();
 
 	fIcon = icon;
 

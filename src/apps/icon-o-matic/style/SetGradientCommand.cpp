@@ -36,7 +36,8 @@ SetGradientCommand::SetGradientCommand(Style* style,
 // destructor
 SetGradientCommand::~SetGradientCommand()
 {
-	delete fGradient;
+	if (fGradient != NULL)
+		fGradient->ReleaseReference();
 }
 
 // InitCheck
@@ -77,9 +78,9 @@ SetGradientCommand::Perform()
 				return B_NO_MEMORY;
 			}
 		}
-	} else {
+	} else if (fGradient != NULL) {
 		// the style didn't have a gradient set
-		delete fGradient;
+		fGradient->ReleaseReference();
 		fGradient = NULL;
 	}
 

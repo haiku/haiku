@@ -58,7 +58,7 @@ RemovePathsCommand::~RemovePathsCommand()
 	if (fPathsRemoved && fInfos) {
 		for (int32 i = 0; i < fCount; i++) {
 			if (fInfos[i].path)
-				fInfos[i].path->Release();
+				fInfos[i].path->ReleaseReference();
 		}
 	}
 	delete[] fInfos;

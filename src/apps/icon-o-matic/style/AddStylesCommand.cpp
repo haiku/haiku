@@ -48,7 +48,7 @@ AddStylesCommand::~AddStylesCommand()
 {
 	if (!fStylesAdded && fStyles) {
 		for (int32 i = 0; i < fCount; i++)
-			fStyles[i]->Release();
+			fStyles[i]->ReleaseReference();
 	}
 	delete[] fStyles;
 }

@@ -28,18 +28,18 @@ AssignStyleCommand::AssignStyleCommand(Shape* shape,
 	  fNewStyle(style)
 {
 	if (fOldStyle)
-		fOldStyle->Acquire();
+		fOldStyle->AcquireReference();
 	if (fNewStyle)
-		fNewStyle->Acquire();
+		fNewStyle->AcquireReference();
 }
 
 // destructor
 AssignStyleCommand::~AssignStyleCommand()
 {
 	if (fOldStyle)
-		fOldStyle->Release();
+		fOldStyle->ReleaseReference();
 	if (fNewStyle)
-		fNewStyle->Release();
+		fNewStyle->ReleaseReference();
 }
 
 // InitCheck

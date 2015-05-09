@@ -52,7 +52,7 @@ AddShapesCommand::~AddShapesCommand()
 {
 	if (!fShapesAdded && fShapes) {
 		for (int32 i = 0; i < fCount; i++)
-			fShapes[i]->Release();
+			fShapes[i]->ReleaseReference();
 	}
 	delete[] fShapes;
 }

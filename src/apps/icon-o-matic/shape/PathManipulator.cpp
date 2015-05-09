@@ -235,7 +235,7 @@ PathManipulator::PathManipulator(VectorPath* path)
 	  fLastNudgeTime(system_time()),
 	  fNudgeCommand(NULL)
 {
-	fPath->Acquire();
+	fPath->AcquireReference();
 	fPath->AddListener(this);
 	fPath->AddObserver(this);
 }
@@ -255,7 +255,7 @@ PathManipulator::~PathManipulator()
 
 	fPath->RemoveObserver(this);
 	fPath->RemoveListener(this);
-	fPath->Release();
+	fPath->ReleaseReference();
 }
 
 

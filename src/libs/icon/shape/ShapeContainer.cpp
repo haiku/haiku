@@ -187,7 +187,7 @@ ShapeContainer::_MakeEmpty()
 		Shape* shape = ShapeAtFast(i);
 #ifdef ICON_O_MATIC
 		_NotifyShapeRemoved(shape);
-		shape->Release();
+		shape->ReleaseReference();
 #else
 		delete shape;
 #endif

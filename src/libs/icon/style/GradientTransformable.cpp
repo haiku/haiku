@@ -22,6 +22,7 @@ Gradient::Gradient(bool empty)
 #ifdef ICON_O_MATIC
 	: BArchivable(),
 	  Observable(),
+	  BReferenceable(),
 	  Transformable(),
 #else
 	: Transformable(),
@@ -43,6 +44,7 @@ Gradient::Gradient(BMessage* archive)
 #ifdef ICON_O_MATIC
 	: BArchivable(archive),
 	  Observable(),
+	  BReferenceable(),
 	  Transformable(),
 #else
 	: Transformable(),
@@ -89,6 +91,7 @@ Gradient::Gradient(const Gradient& other)
 #ifdef ICON_O_MATIC
 	: BArchivable(other),
 	  Observable(),
+	  BReferenceable(),
 	  Transformable(other),
 #else
 	: Transformable(other),

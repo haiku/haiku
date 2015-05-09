@@ -9,17 +9,17 @@
 #ifndef ICON_OBJECT_H
 #define ICON_OBJECT_H
 
+#include <Referenceable.h>
 #include <String.h>
 
 #include "Observable.h"
-#include "Referenceable.h"
 #include "Selectable.h"
 
 class BMessage;
 class PropertyObject;
 
 class IconObject : public Observable,
-				   public Referenceable,
+				   public BReferenceable,
 				   public Selectable {
  public:
 								IconObject(const char* name);

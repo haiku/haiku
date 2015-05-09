@@ -253,14 +253,14 @@ StyleView::SetStyle(Style* style)
 
 	if (fStyle) {
 		fStyle->RemoveObserver(this);
-		fStyle->Release();
+		fStyle->ReleaseReference();
 	}
 
 	fStyle = style;
 
 	Gradient* gradient = NULL;
 	if (fStyle) {
-		fStyle->Acquire();
+		fStyle->AcquireReference();
 		fStyle->AddObserver(this);
 		gradient = fStyle->Gradient();
 
@@ -308,13 +308,16 @@ StyleView::_SetGradient(Gradient* gradient, bool forceControlUpdate,
 	if (!forceControlUpdate && fGradient == gradient)
 		return;
 
-	if (fGradient)
-		fGradient->RemoveObserver(this);
+	Gradient* oldGradient = fGradient;
+	if (oldGradient != NULL)
+		oldGradient->RemoveObserver(this);
 
 	fGradient = gradient;
 
-	if (fGradient)
+	if (fGradient) {
+		fGradient->AcquireReference();
 		fGradient->AddObserver(this);
+	}
 
 	if (fGradient) {
 		fGradientControl->SetEnabled(true);
@@ -328,6 +331,9 @@ StyleView::_SetGradient(Gradient* gradient, bool forceControlUpdate,
 		_MarkType(fStyleType->Menu(), STYLE_TYPE_COLOR);
 		_MarkType(fGradientType->Menu(), -1);
 	}
+
+	if (oldGradient != NULL)
+		oldGradient->ReleaseReference();
 
 	if (sendMessage) {
 		BMessage message(MSG_STYLE_TYPE_CHANGED);

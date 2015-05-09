@@ -839,7 +839,7 @@ MainWindow::SetIcon(Icon* icon)
 	fIcon = icon;
 
 	if (fIcon != NULL)
-		fIcon->Acquire();
+		fIcon->AcquireReference();
 	else
 		MakeEmpty();
 
@@ -865,7 +865,7 @@ MainWindow::SetIcon(Icon* icon)
 
 	// keep this last
 	if (oldIcon != NULL)
-		oldIcon->Release();
+		oldIcon->ReleaseReference();
 }
 
 

@@ -204,14 +204,14 @@ IconObjectListView::_SetObject(IconObject* object)
 
 	if (fObject) {
 		fObject->RemoveObserver(this);
-		fObject->Release();
+		fObject->ReleaseReference();
 	}
 
 	fObject = object;
 	PropertyObject* propertyObject = NULL;
 
 	if (fObject) {
-		fObject->Acquire();
+		fObject->AcquireReference();
 		fObject->AddObserver(this);
 		propertyObject = fObject->MakePropertyObject();
 	}
