@@ -1,40 +1,36 @@
 /*
- * Copyright 2006, Haiku.
+ * Copyright 2006-2012 Stephan Aßmus <superstippi@gmx.de>
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Stephan Aßmus <superstippi@gmx.de>
  */
 
 #include "AlphaSlider.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include <AppDefs.h>
 #include <Bitmap.h>
+#include <ControlLook.h>
+#include <LayoutUtils.h>
 #include <Message.h>
 #include <Window.h>
 
 #include "ui_defines.h"
-#include "support_ui.h"
 
 // constructor
-AlphaSlider::AlphaSlider(orientation dir, BMessage* message)
-	: BControl(dir == B_HORIZONTAL ? BRect(0, 0, 255 + 4, 7 + 4)
-								   : BRect(0, 0, 7 + 4, 255 + 4),
-			   "alpha slider", NULL, message,
-								   
-			   B_FOLLOW_NONE,
-			   B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE),
-
-	  fBitmap(NULL),
-	  fColor(kBlack),
-	  fDragging(false),
-	  fOrientation(dir)
+AlphaSlider::AlphaSlider(orientation dir, BMessage* message,
+	border_style border)
+	: BControl("alpha slider", NULL, message,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE)
+	, fBitmap(NULL)
+	, fColor(kBlack)
+	, fDragging(false)
+	, fOrientation(dir)
+	, fBorderStyle(border)
 {
 	FrameResized(Bounds().Width(), Bounds().Height());
 
-	SetViewColor(B_TRANSPARENT_32_BIT);
+	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	SetValue(255);
@@ -45,31 +41,6 @@ AlphaSlider::~AlphaSlider()
 {
 	delete fBitmap;
 }
-
-#if LIB_LAYOUT
-// layoutprefs
-minimax
-AlphaSlider::layoutprefs()
-{
-	mpm.mini.x = 256 + 4;
-	mpm.maxi.x = mpm.mini.x + 10000;
-	mpm.mini.y = 8 + 4;
-	mpm.maxi.y = mpm.mini.y + 10;
-
-	mpm.weight = 1.0;
-
-	return mpm;
-}
-
-// layout
-BRect
-AlphaSlider::layout(BRect frame)
-{
-	MoveTo(frame.LeftTop());
-	ResizeTo(frame.Width(), frame.Height());
-	return Frame();
-}
-#endif // LIB_LAYOUT
 
 // WindowActivated
 void
@@ -87,6 +58,37 @@ AlphaSlider::MakeFocus(bool focus)
 		BControl::MakeFocus(focus);
 		Invalidate();
 	}
+}
+
+// MinSize
+BSize
+AlphaSlider::MinSize()
+{
+	BSize minSize;
+	if (fOrientation == B_HORIZONTAL)
+		minSize = BSize(255 + 4, 7 + 4);
+	else
+		minSize = BSize(7 + 4, 255 + 4);
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), minSize);
+}
+
+// PreferredSize
+BSize
+AlphaSlider::PreferredSize()
+{
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), MinSize());
+}
+
+// MaxSize
+BSize
+AlphaSlider::MaxSize()
+{
+	BSize minSize;
+	if (fOrientation == B_HORIZONTAL)
+		minSize = BSize(B_SIZE_UNLIMITED, 16 + 4);
+	else
+		minSize = BSize(16 + 4, B_SIZE_UNLIMITED);
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), minSize);
 }
 
 // MouseDown
@@ -114,7 +116,8 @@ AlphaSlider::MouseUp(BPoint where)
 
 // MouseMoved
 void
-AlphaSlider::MouseMoved(BPoint where, uint32 transit, const BMessage* dragMessage)
+AlphaSlider::MouseMoved(BPoint where, uint32 transit,
+	const BMessage* dragMessage)
 {
 	if (!IsEnabled() || !fDragging)
 		return;
@@ -158,46 +161,27 @@ AlphaSlider::KeyDown(const char* bytes, int32 numBytes)
 void
 AlphaSlider::Draw(BRect updateRect)
 {
-	BRect b = _BitmapRect();
-	b.InsetBy(-2.0, -2.0);
-
+	BRect b = Bounds();
 	bool isFocus = IsFocus() && Window()->IsActive();
 
-	rgb_color bg = LowColor();
-	rgb_color shadow;
-	rgb_color darkShadow;
-	rgb_color light;
-	rgb_color black;
+	if (fBorderStyle == B_FANCY_BORDER) {
+		rgb_color bg = LowColor();
+		uint32 flags = 0;
 
-	if (IsEnabled()) {
-		shadow = tint_color(bg, B_DARKEN_1_TINT);
-		darkShadow = tint_color(bg, B_DARKEN_3_TINT);
-		light = tint_color(bg, B_LIGHTEN_MAX_TINT);
-		black = tint_color(bg, B_DARKEN_MAX_TINT);
-	} else {
-		shadow = bg;
-		darkShadow = tint_color(bg, B_DARKEN_1_TINT);
-		light = tint_color(bg, B_LIGHTEN_2_TINT);
-		black = tint_color(bg, B_DARKEN_2_TINT);
+		if (!IsEnabled())
+			flags |= BControlLook::B_DISABLED;
+		if (isFocus)
+			flags |= BControlLook::B_FOCUSED;
+
+		be_control_look->DrawTextControlBorder(this, b, updateRect, bg, flags);
 	}
-
-	rgb_color focus = isFocus ? ui_color(B_KEYBOARD_NAVIGATION_COLOR)
-							  : black;
-
-	stroke_frame(this, b, shadow, shadow, light, light);
-	b.InsetBy(1.0, 1.0);
-	if (isFocus)
-		stroke_frame(this, b, focus, focus, focus, focus);
-	else
-		stroke_frame(this, b, darkShadow, darkShadow, bg, bg);
-	b.InsetBy(1.0, 1.0);
 
 	DrawBitmap(fBitmap, b.LeftTop());
 
 	// value marker
 	if (fOrientation == B_HORIZONTAL) {
 		float pos = floorf(b.left + Value() * b.Width() / 255.0 + 0.5);
-	
+
 		if (pos - 2 >= b.left) {
 			SetHighColor(kWhite);
 			StrokeLine(BPoint(pos - 2, b.top), BPoint(pos - 2, b.bottom));
@@ -216,7 +200,7 @@ AlphaSlider::Draw(BRect updateRect)
 		}
 	} else {
 		float pos = floorf(b.top + Value() * b.Height() / 255.0 + 0.5);
-	
+
 		if (pos - 2 >= b.top) {
 			SetHighColor(kWhite);
 			StrokeLine(BPoint(b.left, pos - 2), BPoint(b.right, pos - 2));
@@ -244,7 +228,7 @@ AlphaSlider::FrameResized(float width, float height)
 	_AllocBitmap(r.IntegerWidth() + 1, r.IntegerHeight() + 1);
 	_UpdateColors();
 	Invalidate();
-	
+
 }
 
 // SetValue
@@ -309,7 +293,7 @@ blend_colors(uint8* d, uint8 alpha, uint8 c1, uint8 c2, uint8 c3)
 void
 AlphaSlider::_UpdateColors()
 {
-	if (!fBitmap || !fBitmap->IsValid())
+	if (fBitmap == NULL || !fBitmap->IsValid())
 		return;
 
 	// fill in top row with alpha gradient
@@ -397,7 +381,8 @@ BRect
 AlphaSlider::_BitmapRect() const
 {
 	BRect r = Bounds();
-	r.InsetBy(2, 2);
+	if (fBorderStyle == B_FANCY_BORDER)
+		r.InsetBy(2, 2);
 	return r;
 }
 
