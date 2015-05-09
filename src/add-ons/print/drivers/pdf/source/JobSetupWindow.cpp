@@ -31,9 +31,9 @@ THE SOFTWARE.
 */
 
 #include <GridView.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
 #include <InterfaceKit.h>
+#include <LayoutBuilder.h>
+#include <SeparatorView.h>
 #include <SupportKit.h>
 #include <stdlib.h>
 
@@ -122,41 +122,34 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 		fFrom->TextView()->DisallowChar(i);
 	}
 
-	BBox *separator = new BBox("separator");
-	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
-
-	BButton *documentInfo = new BButton("documentInfo",
+	BButton* documentInfo = new BButton("documentInfo",
 		"Document"  B_UTF8_ELLIPSIS,
 		new BMessage(DOC_INFO_MSG));
 
-	BButton *cancel = new BButton("cancel", "Cancel", new BMessage(CANCEL_MSG));
+	BButton* cancel = new BButton("cancel", "Cancel", new BMessage(CANCEL_MSG));
 
-	BButton *ok = new BButton("ok", "OK", new BMessage(OK_MSG));
+	BButton* ok = new BButton("ok", "OK", new BMessage(OK_MSG));
 	ok->MakeDefault(true);
 
-	BGridView* settings = new BGridView();
-	BGridLayout* settingsLayout = settings->GridLayout();
-	settingsLayout->AddItem(fFrom->CreateLabelLayoutItem(), 0, 0);
-	settingsLayout->AddItem(fFrom->CreateTextViewLayoutItem(), 1, 0);
-	settingsLayout->AddItem(fTo->CreateLabelLayoutItem(), 0, 1);
-	settingsLayout->AddItem(fTo->CreateTextViewLayoutItem(), 1, 1);
-	settingsLayout->SetSpacing(0, 0);
-
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_SMALL_SPACING)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fAll)
 		.Add(fRange)
-		.Add(settings)
+		.AddGrid(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
+			.SetInsets(B_USE_SMALL_SPACING, 0, B_USE_SMALL_SPACING, 0)
+			.Add(fFrom->CreateLabelLayoutItem(), 0, 0)
+			.Add(fFrom->CreateTextViewLayoutItem(), 1, 0)
+			.Add(fTo->CreateLabelLayoutItem(), 0, 1)
+			.Add(fTo->CreateTextViewLayoutItem(), 1, 1)
+		.End()
 		.AddGlue()
-		.Add(separator)
-		.AddGroup(B_HORIZONTAL, 10, 1.0f)
+		.Add(new BSeparatorView(B_HORIZONTAL, B_FANCY_BORDER))
+		.AddGroup(B_HORIZONTAL)
 			.Add(documentInfo)
 			.AddGlue()
 			.Add(cancel)
 			.Add(ok)
-		.End()
-		.SetInsets(10, 10, 10, 10)
-	);
+		.End();
 }
 
 
