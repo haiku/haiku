@@ -14,7 +14,10 @@
 #include <Locker.h>
 
 
-namespace icu {
+#ifndef U_ICU_NAMESPACE
+  #define U_ICU_NAMESPACE icu
+#endif
+namespace U_ICU_NAMESPACE {
 	class DateFormat;
 }
 
@@ -76,7 +79,7 @@ public:
 									BDate& output);
 
 private:
-			icu::DateFormat*	_CreateDateFormatter(
+			U_ICU_NAMESPACE::DateFormat*	_CreateDateFormatter(
 									const BDateFormatStyle style) const;
 
 };

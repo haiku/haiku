@@ -15,7 +15,10 @@ class BBitmap;
 
 // We must not include the icu headers in there as it could mess up binary
 // compatibility.
-namespace icu {
+#ifndef U_ICU_NAMESPACE
+  #define U_ICU_NAMESPACE icu
+#endif
+namespace U_ICU_NAMESPACE {
 	class Locale;
 }
 
@@ -64,7 +67,7 @@ private:
 	friend	class Private;
 
 			uint8				fDirection;
-			icu::Locale*		fICULocale;
+			U_ICU_NAMESPACE::Locale*		fICULocale;
 };
 
 

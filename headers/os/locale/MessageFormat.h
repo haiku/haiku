@@ -13,7 +13,10 @@
 #include <Format.h>
 
 
-namespace icu {
+#ifndef U_ICU_NAMESPACE
+  #define U_ICU_NAMESPACE icu
+#endif
+namespace U_ICU_NAMESPACE {
 	class MessageFormat;
 	class UnicodeString;
 }
@@ -31,10 +34,10 @@ public:
 			status_t			Format(BString& buffer, const int64 arg) const;
 
 private:
-			status_t			_Initialize(const icu::UnicodeString&);
+			status_t			_Initialize(const U_ICU_NAMESPACE::UnicodeString&);
 
 private:
-			icu::MessageFormat*	fFormatter;
+			U_ICU_NAMESPACE::MessageFormat*	fFormatter;
 };
 
 

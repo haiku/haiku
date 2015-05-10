@@ -12,7 +12,10 @@
 
 class BString;
 
-namespace icu {
+#ifndef U_ICU_NAMESPACE
+  #define U_ICU_NAMESPACE icu
+#endif
+namespace U_ICU_NAMESPACE {
 	class TimeUnitFormat;
 }
 
@@ -53,7 +56,7 @@ public:
 									) const;
 
 private:
-			icu::TimeUnitFormat*	fFormatter;
+			U_ICU_NAMESPACE::TimeUnitFormat*	fFormatter;
 };
 
 

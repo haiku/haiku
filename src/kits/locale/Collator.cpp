@@ -5,13 +5,15 @@
 */
 
 
+#include <unicode/uversion.h>
+#include <Collator.h>
+
 #include <ctype.h>
 #include <stdlib.h>
 
 #include <new>
 #include <typeinfo>
 
-#include <Collator.h>
 #include <UnicodeChar.h>
 #include <String.h>
 #include <Message.h>

@@ -16,7 +16,10 @@ class BBitmap;
 class BLanguage;
 class BMessage;
 
-namespace icu {
+#ifndef U_ICU_NAMESPACE
+  #define U_ICU_NAMESPACE icu
+#endif
+namespace U_ICU_NAMESPACE {
 	class DateFormat;
 	class Locale;
 }
@@ -45,7 +48,7 @@ public:
 private:
 	friend	class Private;
 
-			icu::Locale*		fICULocale;
+			U_ICU_NAMESPACE::Locale*		fICULocale;
 };
 
 

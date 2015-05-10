@@ -6,6 +6,7 @@
  *		Oliver Tappe <zooey@hirschkaefer.de>
  */
 
+#include <unicode/uversion.h>
 #include <TimeFormat.h>
 
 #include <AutoDeleter.h>

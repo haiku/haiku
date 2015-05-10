@@ -14,7 +14,10 @@
 
 class BTimeZone;
 
-namespace icu {
+#ifndef U_ICU_NAMESPACE
+  #define U_ICU_NAMESPACE icu
+#endif
+namespace U_ICU_NAMESPACE {
 	class GregorianCalendar;
 }
 
@@ -43,7 +46,7 @@ public:
 private:
 			BString				fSeparator;
 			BTimeUnitFormat		fTimeUnitFormat;
-			icu::GregorianCalendar*	fCalendar;
+			U_ICU_NAMESPACE::GregorianCalendar*	fCalendar;
 };
 
 

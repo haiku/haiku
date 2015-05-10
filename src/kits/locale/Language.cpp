@@ -4,6 +4,7 @@
  */
 
 
+#include <unicode/uversion.h>
 #include <Language.h>
 
 #include <stdlib.h>

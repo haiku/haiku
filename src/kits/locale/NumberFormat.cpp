@@ -6,6 +6,7 @@
  */
 
 
+#include <unicode/uversion.h>
 #include <NumberFormat.h>
 
 #include <AutoDeleter.h>

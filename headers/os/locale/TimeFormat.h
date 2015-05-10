@@ -48,7 +48,7 @@ public:
 									BPrivate::BTime& output);
 
 private:
-			icu::DateFormat*	_CreateTimeFormatter(
+			U_ICU_NAMESPACE::DateFormat*	_CreateTimeFormatter(
 									const BTimeFormatStyle style) const;
 };
 

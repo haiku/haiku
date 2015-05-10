@@ -6,6 +6,8 @@
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
  *		John Scipione, jscipione@gmail.com
  */
+
+#include <unicode/uversion.h>
 #include <MessageFormat.h>
 
 #include <Autolock.h>

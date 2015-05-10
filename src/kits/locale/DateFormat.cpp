@@ -7,6 +7,7 @@
  *		Adrien Desutugues <pulkomandy@pulkomandy.tk>
  */
 
+#include <unicode/uversion.h>
 #include <DateFormat.h>
 
 #include <AutoDeleter.h>
