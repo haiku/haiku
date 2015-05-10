@@ -116,7 +116,7 @@ debug_dvnode(int argc, char **argv)
 		kprintf("iteration %" B_PRIu32 ", si=%" B_PRIu32 ", ei=%" B_PRIu32
 			", cluster=%" B_PRIu32 "\n", n->iteration, n->sindex, n->eindex,
 			n->cluster);
-		kprintf("mode %#" B_PRIx32 ", size %" B_PRIdOFF ", time %" B_PRIuTIME
+		kprintf("mode %#" B_PRIx32 ", size %" B_PRIdOFF ", time %" B_PRIdTIME
 			"\n", n->mode, n->st_size, n->st_time);
 		kprintf("end cluster = %" B_PRIu32 "\n", n->end_cluster);
 		if (n->mime) kprintf("mime type %s\n", n->mime);
