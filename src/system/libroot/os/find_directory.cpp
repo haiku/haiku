@@ -231,11 +231,18 @@ get_user_home_path(char* buffer, size_t bufferSize)
 	const char* home = NULL;
 #ifndef _KERNEL_MODE
 #ifdef USE_PWENTS
+	uid_t user = geteuid();
+	if (user == 0) {
+		// TODO: this is a work-around as the launch_daemon, and the registrar
+		// must not call getpwuid_r().
+		return strlcpy(buffer, kUserDirectory, bufferSize);
+	}
+
 	struct passwd pwBuffer;
 	char pwStringBuffer[MAX_PASSWD_BUFFER_SIZE];
 	struct passwd* pw;
 
-	if (getpwuid_r(geteuid(), &pwBuffer, pwStringBuffer,
+	if (getpwuid_r(user, &pwBuffer, pwStringBuffer,
 			sizeof(pwStringBuffer), &pw) == 0
 		&& pw != NULL) {
 		home = pw->pw_dir;
