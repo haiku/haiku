@@ -1,16 +1,13 @@
 /*
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "DiskProbe.h"
-#include "DataEditor.h"
-#include "DataView.h"
-#include "FileWindow.h"
-#include "AttributeWindow.h"
-#include "OpenWindow.h"
-#include "FindWindow.h"
+
+#include <stdio.h>
+#include <string.h>
 
 #include <AboutWindow.h>
 #include <Alert.h>
@@ -21,16 +18,23 @@
 #include <Entry.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
+#include <LayoutUtils.h>
 #include <Locale.h>
 #include <Path.h>
 #include <Screen.h>
 #include <TextView.h>
 
-#include <stdio.h>
-#include <string.h>
+#include "DataEditor.h"
+#include "DataView.h"
+#include "FileWindow.h"
+#include "AttributeWindow.h"
+#include "OpenWindow.h"
+#include "FindWindow.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DiskProbe"
+
 
 const char *kSignature = "application/x-vnd.Haiku-DiskProbe";
 
@@ -45,10 +49,12 @@ struct disk_probe_settings {
 	int32	flags;
 };
 
+
 enum disk_probe_flags {
 	kCaseSensitive	= 0x01,	// this flag alone is R5 DiskProbe settings compatible
 	kHexFindMode	= 0x02,
 };
+
 
 class Settings {
 	public:
@@ -100,11 +106,16 @@ Settings::Settings()
 	fMessage(kMsgDiskProbeSettings),
 	fUpdated(false)
 {
+	float fontSize = be_plain_font->Size();
+	int32 windowWidth = DataView::WidthForFontSize(fontSize) + 20;
+		// TODO: make scrollbar width variable
+
 	BScreen screen;
-	fMessage.AddRect("window_frame", BRect(50, 50, screen.Frame().Width() - 50,
-		screen.Frame().Height() - 50));
+	fMessage.AddRect("window_frame", BLayoutUtils::AlignInFrame(screen.Frame(),
+		BSize(windowWidth, windowWidth),
+		BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER)));
 	fMessage.AddInt32("base_type", kHexBase);
-	fMessage.AddFloat("font_size", 12.0f);
+	fMessage.AddFloat("font_size", fontSize);
 	fMessage.AddBool("case_sensitive", true);
 	fMessage.AddInt8("find_mode", kAsciiMode);
 
@@ -135,17 +146,17 @@ Settings::Settings()
 			&& settings.window_frame.Height() < screen.Frame().Height())
 			fMessage.ReplaceRect("window_frame", settings.window_frame);
 
-		if (settings.base_type == kHexBase 
+		if (settings.base_type == kHexBase
 			|| settings.base_type == kDecimalBase)
-			fMessage.ReplaceInt32("base_type", 
+			fMessage.ReplaceInt32("base_type",
 				B_LENDIAN_TO_HOST_INT32(settings.base_type));
 		if (settings.font_size >= 0 && settings.font_size <= 72)
-			fMessage.ReplaceFloat("font_size", 
+			fMessage.ReplaceFloat("font_size",
 				float(B_LENDIAN_TO_HOST_INT32(settings.font_size)));
 
-		fMessage.ReplaceBool("case_sensitive", 
+		fMessage.ReplaceBool("case_sensitive",
 			settings.flags & kCaseSensitive);
-		fMessage.ReplaceInt8("find_mode", 
+		fMessage.ReplaceInt8("find_mode",
 			settings.flags & kHexFindMode ? kHexMode : kAsciiMode);
 	}
 }
@@ -188,7 +199,7 @@ Settings::~Settings()
 }
 
 
-status_t 
+status_t
 Settings::Open(BFile *file, int32 mode)
 {
 	BPath path;
@@ -201,7 +212,7 @@ Settings::Open(BFile *file, int32 mode)
 }
 
 
-void 
+void
 Settings::UpdateFrom(BMessage *message)
 {
 	BRect frame;
@@ -396,12 +407,12 @@ DiskProbe::ArgvReceived(int32 argc, char **argv)
 			path.SetTo(&currentDirectory, argv[i]);
 
 		status_t status;
-		entry_ref ref;		
+		entry_ref ref;
 		BEntry entry;
 
 		if ((status = entry.SetTo(path.Path(), false)) != B_OK
 			|| (status = entry.GetRef(&ref)) != B_OK) {
-			fprintf(stderr, B_TRANSLATE("Could not open file \"%s\": %s\n"), 
+			fprintf(stderr, B_TRANSLATE("Could not open file \"%s\": %s\n"),
 				path.Path(), strerror(status));
 			continue;
 		}

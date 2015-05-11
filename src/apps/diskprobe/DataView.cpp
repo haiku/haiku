@@ -1,30 +1,29 @@
 /*
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
 
 #include "DataView.h"
-#include "DataEditor.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <Window.h>
-#include <ScrollBar.h>
 #include <Autolock.h>
+#include <Beep.h>
 #include <Clipboard.h>
 #include <Mime.h>
-#include <Beep.h>
+#include <ScrollBar.h>
+#include <Window.h>
 
+#include "DataEditor.h"
 
-#ifndef __HAIKU__
-typedef uint32 addr_t;
-#endif
 
 static const uint32 kBlockSize = 16;
+// TODO: use variable spacing
 static const uint32 kHorizontalSpace = 8;
 static const uint32 kVerticalSpace = 4;
+static const uint32 kPositionLength = 4;
 
 static const uint32 kBlockSpace = 3;
 static const uint32 kHexByteWidth = 3;
@@ -106,7 +105,6 @@ DataView::DataView(DataEditor &editor)
 	fFitFontSize(false),
 	fDragMessageSize(-1)
 {
-	fPositionLength = 4;
 	fStart = fEnd = 0;
 
 	if (fEditor.Lock()) {
@@ -357,7 +355,7 @@ DataView::ConvertLine(char *line, off_t offset, const uint8 *buffer, size_t size
 	}
 
 	line += sprintf(line, fBase == kHexBase ? "%0*" B_PRIxOFF":  " : "%0*"
-		B_PRIdOFF":  ", (int)fPositionLength, offset);
+		B_PRIdOFF":  ", (int)kPositionLength, offset);
 
 	for (uint32 i = 0; i < kBlockSize; i++) {
 		if (i >= size) {
@@ -412,7 +410,7 @@ BRect
 DataView::DataBounds(bool inView) const
 {
 	return BRect(0, 0,
-		fCharWidth * (kBlockSize * 4 + fPositionLength + 6) + 2 * kHorizontalSpace,
+		fCharWidth * (kBlockSize * 4 + kPositionLength + 6) + 2 * kHorizontalSpace,
 		fFontHeight * (((inView ? fSizeInView : fDataSize) + kBlockSize - 1) / kBlockSize)
 			+ 2 * kVerticalSpace);
 }
@@ -434,7 +432,7 @@ DataView::PositionAt(view_focus focus, BPoint point, view_focus *_newFocus)
 	else if (point.y >= bounds.bottom - kVerticalSpace)
 		point.y = bounds.bottom - kVerticalSpace - 1;
 
-	float left = fCharWidth * (fPositionLength + kBlockSpace) + kHorizontalSpace;
+	float left = fCharWidth * (kPositionLength + kBlockSpace) + kHorizontalSpace;
 	float hexWidth = fCharWidth * kBlockSize * kHexByteWidth;
 	float width = fCharWidth;
 
@@ -478,11 +476,11 @@ DataView::SelectionFrame(view_focus which, int32 start, int32 end)
 
 	if (which == kHexFocus) {
 		spacing = fCharWidth / 2;
-		left = width * (fPositionLength + kBlockSpace);
+		left = width * (kPositionLength + kBlockSpace);
 		width *= kHexByteWidth;
 		byteWidth *= 2;
 	} else
-		left = width * (fPositionLength + 2 * kBlockSpace + kHexByteWidth * kBlockSize);
+		left = width * (kPositionLength + 2 * kBlockSpace + kHexByteWidth * kBlockSize);
 
 	left += kHorizontalSpace;
 	float startInLine = (start % kBlockSize) * width;
@@ -837,6 +835,18 @@ DataView::DataAt(int32 start)
 }
 
 
+/*static*/ int32
+DataView::WidthForFontSize(float size)
+{
+	BFont font = be_fixed_font;
+	font.SetSize(size);
+
+	float charWidth = font.StringWidth("w");
+	return (int32)ceilf(charWidth * (kBlockSize * 4 + kPositionLength + 6)
+		+ 2 * kHorizontalSpace);
+}
+
+
 void
 DataView::SetBase(base_type type)
 {
@@ -942,24 +952,24 @@ DataView::FrameResized(float width, float height)
 	if (fFitFontSize) {
 		// adapt the font size to fit in the view's bounds
 		float oldSize = FontSize();
-		BFont font = be_fixed_font;
 		float steps = 0.5f;
 
 		float size;
 		for (size = 1.f; size < 100; size += steps) {
-			font.SetSize(size);
-			float charWidth = font.StringWidth("w");
-			if (charWidth * (kBlockSize * 4 + fPositionLength + 6) + 2 * kHorizontalSpace > width)
+			int32 preferredWidth = WidthForFontSize(size);
+			if (preferredWidth > width)
 				break;
 
 			if (size > 6)
 				steps = 1.0f;
 		}
 		size -= steps;
-		font.SetSize(size);
 
 		if (oldSize != size) {
+			BFont font = be_fixed_font;
+			font.SetSize(size);
 			SetFont(&font);
+
 			Invalidate();
 		}
 	}
