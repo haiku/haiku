@@ -388,7 +388,7 @@ PackageColumn::CompareFields(BField* field1, BField* field2)
 	if (stringField1 != NULL && stringField2 != NULL) {
 		// TODO: Locale aware string compare... not too important if
 		// package names are not translated.
-		return strcmp(stringField1->String(), stringField2->String());
+		return strcasecmp(stringField1->String(), stringField2->String());
 	}
 
 	RatingField* ratingField1 = dynamic_cast<RatingField*>(field1);
