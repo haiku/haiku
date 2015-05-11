@@ -37,6 +37,7 @@ RemotePackageRepository HaikuPorts
 	apr_devel-1.5.0-1
 	apr_util-1.5.3-1
 	apr_util_devel-1.5.3-1
+	armyknife-4.3.0-2
 	asciidoc-8.6.8-2
 	autoconf-2.69-5
 	automake-1.13.1-4
@@ -795,6 +796,7 @@ RemotePackageRepository HaikuPorts
 	arm_none_eabi_gcc_x86
 	arm_none_eabi_gdb_x86
 	arm_none_eabi_newlib_x86
+	armyknife
 	asciidoc
 	autoconf
 	automake
