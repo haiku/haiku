@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "AuthenticationManager.h"
 
 #include <errno.h>
@@ -19,6 +20,7 @@
 #include <StringList.h>
 
 #include <AutoDeleter.h>
+#include <LaunchRoster.h>
 #include <RegistrarDefs.h>
 
 #include <libroot_private.h>
@@ -723,12 +725,9 @@ AuthenticationManager::AuthenticationManager()
 
 AuthenticationManager::~AuthenticationManager()
 {
-	// delete port and wait for the request thread to finish
-	if (fRequestPort >= 0)
-		delete_port(fRequestPort);
-
-	status_t dummy;
-	wait_for_thread(fRequestThread, &dummy);
+	// Quit the request thread and wait for it to finish
+	write_port(fRequestPort, 'quit', NULL, 0);
+	wait_for_thread(fRequestThread, NULL);
 
 	delete fUserDB;
 	delete fGroupDB;
@@ -752,7 +751,8 @@ AuthenticationManager::Init()
 		return B_NO_MEMORY;
 	}
 
-	fRequestPort = create_port(100, REGISTRAR_AUTHENTICATION_PORT_NAME);
+	fRequestPort = BLaunchRoster().GetPort(
+		B_REGISTRAR_AUTHENTICATION_PORT_NAME);
 	if (fRequestPort < 0)
 		return fRequestPort;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -18,15 +18,13 @@
 
 namespace BPrivate {
 
+
 // names
-extern const char* kRegistrarSignature;
-extern const char* kRosterThreadName;
 extern const char* kRAppLooperPortName;
 
-extern const char* get_roster_port_name();
 
-
-#define REGISTRAR_AUTHENTICATION_PORT_NAME	"system:registrar:auth manager"
+#define B_REGISTRAR_SIGNATURE "application/x-vnd.haiku-registrar"
+#define B_REGISTRAR_AUTHENTICATION_PORT_NAME	"auth"
 
 
 // message constants
@@ -179,7 +177,9 @@ struct flat_app_info {
 	char		ref_name[B_FILE_NAME_LENGTH + 1];
 };
 
+
 }	// namespace BPrivate
+
 
 #endif	// REGISTRAR_DEFS_H
 

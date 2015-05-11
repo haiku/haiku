@@ -362,7 +362,7 @@ BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 
 #ifndef RUN_WITHOUT_REGISTRAR
 	bool registerApp = signature == NULL
-		|| (strcasecmp(signature, kRegistrarSignature) != 0
+		|| (strcasecmp(signature, B_REGISTRAR_SIGNATURE) != 0
 			&& strcasecmp(signature, kLaunchDaemonSignature) != 0);
 	// get team and thread
 	team_id team = Team();

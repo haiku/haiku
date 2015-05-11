@@ -1247,7 +1247,7 @@ TRoster::Init()
 	if (error == B_OK) {
 		info->Init(be_app->Thread(), be_app->Team(),
 			BMessenger::Private(be_app_messenger).Port(),
-			B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP, &ref, kRegistrarSignature);
+			B_EXCLUSIVE_LAUNCH | B_BACKGROUND_APP, &ref, B_REGISTRAR_SIGNATURE);
 		info->state = APP_STATE_REGISTERED;
 		info->registration_time = system_time();
 		error = AddApp(info);
