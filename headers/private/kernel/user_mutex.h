@@ -20,6 +20,9 @@ status_t	_user_mutex_lock(int32* mutex, const char* name, uint32 flags,
 status_t	_user_mutex_unlock(int32* mutex, uint32 flags);
 status_t	_user_mutex_switch_lock(int32* fromMutex, int32* toMutex,
 				const char* name, uint32 flags, bigtime_t timeout);
+status_t	_user_mutex_sem_acquire(int32* sem, const char* name, uint32 flags,
+				bigtime_t timeout);
+status_t	_user_mutex_sem_release(int32* sem);
 
 #ifdef __cplusplus
 }

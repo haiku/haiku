@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Hamish Morrison, hamishm53@gmail.com.
  * Copyright 2010, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -99,23 +100,9 @@ remove_user_mutex_entry(UserMutexEntry* entry)
 
 
 static status_t
-user_mutex_lock_locked(int32* mutex, addr_t physicalAddress, const char* name,
-	uint32 flags, bigtime_t timeout, MutexLocker& locker)
+user_mutex_wait_locked(int32* mutex, addr_t physicalAddress, const char* name,
+	uint32 flags, bigtime_t timeout, MutexLocker& locker, bool& lastWaiter)
 {
-	// mark the mutex locked + waiting
-	int32 oldValue = atomic_or(mutex,
-		B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING);
-
-	// The mutex might have been unlocked (or disabled) in the meantime.
-	if ((oldValue & (B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING)) == 0
-			|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
-		// clear the waiting flag and be done
-		atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
-		return B_OK;
-	}
-
-	// we have to wait
-
 	// add the entry to the table
 	UserMutexEntry entry;
 	entry.address = physicalAddress;
@@ -131,17 +118,43 @@ user_mutex_lock_locked(int32* mutex, addr_t physicalAddress, const char* name,
 	status_t error = waitEntry.Wait(flags, timeout);
 	locker.Lock();
 
-	// dequeue if we weren't woken up
-	if (!entry.locked && !remove_user_mutex_entry(&entry)) {
-		// no one is waiting anymore -- clear the waiting flag
-		atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
+	if (error != B_OK && entry.locked)
+		error = B_OK;
+
+	if (!entry.locked) {
+		// if nobody woke us up, we have to dequeue ourselves
+		lastWaiter = !remove_user_mutex_entry(&entry);
+	} else {
+		// otherwise the waker has done the work of marking the
+		// mutex or semaphore uncontended
+		lastWaiter = false;
 	}
 
-	if (error != B_OK
-			&& (entry.locked || (*mutex & B_USER_MUTEX_DISABLED) != 0)) {
-		// timeout or interrupt, but the mutex was unlocked or disabled in time
-		error = B_OK;
+	return error;
+}
+
+
+static status_t
+user_mutex_lock_locked(int32* mutex, addr_t physicalAddress,
+	const char* name, uint32 flags, bigtime_t timeout, MutexLocker& locker)
+{
+	// mark the mutex locked + waiting
+	int32 oldValue = atomic_or(mutex,
+		B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING);
+
+	if ((oldValue & (B_USER_MUTEX_LOCKED | B_USER_MUTEX_WAITING)) == 0
+			|| (oldValue & B_USER_MUTEX_DISABLED) != 0) {
+		// clear the waiting flag and be done
+		atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
+		return B_OK;
 	}
+
+	bool lastWaiter;
+	status_t error = user_mutex_wait_locked(mutex, physicalAddress, name,
+		flags, timeout, locker, lastWaiter);
+
+	if (lastWaiter)
+		atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
 
 	return error;
 }
@@ -181,6 +194,59 @@ user_mutex_unlock_locked(int32* mutex, addr_t physicalAddress, uint32 flags)
 		bool otherWaiters = remove_user_mutex_entry(entry);
 		if (!otherWaiters)
 			atomic_and(mutex, ~(int32)B_USER_MUTEX_WAITING);
+	}
+}
+
+
+static status_t
+user_mutex_sem_acquire_locked(int32* sem, addr_t physicalAddress,
+	const char* name, uint32 flags, bigtime_t timeout, MutexLocker& locker)
+{
+	// The semaphore may have been released in the meantime, and we also
+	// need to mark it as contended if it isn't already.
+	int32 oldValue = atomic_get(sem);
+	while (oldValue > -1) {
+		int32 value = atomic_test_and_set(sem, oldValue - 1, oldValue);
+		if (value == oldValue && value > 0)
+			return B_OK;
+		oldValue = value;
+	}
+
+	bool lastWaiter;
+	status_t error = user_mutex_wait_locked(sem, physicalAddress, name, flags,
+		timeout, locker, lastWaiter);
+
+	if (lastWaiter)
+		atomic_test_and_set(sem, 0, -1);
+
+	return error;
+}
+
+
+static void
+user_mutex_sem_release_locked(int32* sem, addr_t physicalAddress)
+{
+	UserMutexEntry* entry = sUserMutexTable.Lookup(physicalAddress);
+	if (!entry) {
+		// no waiters - mark as uncontended and release
+		int32 oldValue = atomic_get(sem);
+		while (true) {
+			int32 inc = oldValue < 0 ? 2 : 1;
+			int32 value = atomic_test_and_set(sem, oldValue + inc, oldValue);
+			if (value == oldValue)
+				return;
+			oldValue = value;
+		}
+	}
+
+	bool otherWaiters = remove_user_mutex_entry(entry);
+
+	entry->locked = true;
+	entry->condition.NotifyOne();
+
+	if (!otherWaiters) {
+		// mark the semaphore uncontended
+		atomic_test_and_set(sem, 0, -1);
 	}
 }
 
@@ -311,4 +377,54 @@ _user_mutex_switch_lock(int32* fromMutex, int32* toMutex, const char* name,
 
 	return user_mutex_switch_lock(fromMutex, toMutex, name,
 		flags | B_CAN_INTERRUPT, timeout);
+}
+
+
+status_t
+_user_mutex_sem_acquire(int32* sem, const char* name, uint32 flags,
+	bigtime_t timeout)
+{
+	if (sem == NULL || !IS_USER_ADDRESS(sem) || (addr_t)sem % 4 != 0)
+		return B_BAD_ADDRESS;
+
+	syscall_restart_handle_timeout_pre(flags, timeout);
+
+	// wire the page and get the physical address
+	VMPageWiringInfo wiringInfo;
+	status_t error = vm_wire_page(B_CURRENT_TEAM, (addr_t)sem, true,
+		&wiringInfo);
+	if (error != B_OK)
+		return error;
+
+	{
+		MutexLocker locker(sUserMutexTableLock);
+		error = user_mutex_sem_acquire_locked(sem, wiringInfo.physicalAddress,
+			name, flags | B_CAN_INTERRUPT, timeout, locker);
+	}
+
+	vm_unwire_page(&wiringInfo);
+	return syscall_restart_handle_timeout_post(error, timeout);
+}
+
+
+status_t
+_user_mutex_sem_release(int32* sem)
+{
+	if (sem == NULL || !IS_USER_ADDRESS(sem) || (addr_t)sem % 4 != 0)
+		return B_BAD_ADDRESS;
+
+	// wire the page and get the physical address
+	VMPageWiringInfo wiringInfo;
+	status_t error = vm_wire_page(B_CURRENT_TEAM, (addr_t)sem, true,
+		&wiringInfo);
+	if (error != B_OK)
+		return error;
+
+	{
+		MutexLocker locker(sUserMutexTableLock);
+		user_mutex_sem_release_locked(sem, wiringInfo.physicalAddress);
+	}
+
+	vm_unwire_page(&wiringInfo);
+	return B_OK;
 }

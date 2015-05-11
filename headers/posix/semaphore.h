@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 Haiku, Inc.
+ * Copyright 2008-2015 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SEMAPHORE_H_
@@ -13,8 +13,12 @@
 
 
 typedef struct _sem_t {
-	int32_t	id;
-	int32_t	_padding[3];
+	int32_t type;
+	union {
+		int32_t named_sem_id;
+		int32_t unnamed_sem;
+	} u;
+	int32_t padding[2];
 } sem_t;
 
 #define SEM_FAILED	((sem_t*)(long)-1)
