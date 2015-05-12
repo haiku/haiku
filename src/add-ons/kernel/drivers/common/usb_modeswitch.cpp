@@ -25,11 +25,11 @@
 
 #define TRACE_USB_MODESWITCH 1
 #ifdef TRACE_USB_MODESWITCH
-#define TRACE(x...)			dprintf(DRIVER_NAME": "x)
+#define TRACE(x...)			dprintf(DRIVER_NAME ": " x)
 #else
 #define TRACE(x...)			/* nothing */
 #endif
-#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME": "x)
+#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME ": " x)
 #define ENTER()	TRACE("%s", __FUNCTION__)
 
 
@@ -438,7 +438,7 @@ my_modeswitch(my_device* device)
 		char data[36];
 		err = my_transfer_data(device, true, data, sizeof(data));
 		if (err != B_OK) {
-			TRACE_ALWAYS("receive response %d failed 0x%lx\n",
+			TRACE_ALWAYS("receive response %d failed 0x%" B_PRIx32 "\n",
 				i + 1, device->status);
 			return err;
 		}
@@ -459,7 +459,7 @@ my_modeswitch(my_device* device)
 static status_t
 my_device_added(usb_device newDevice, void **cookie)
 {
-	TRACE("device_added(0x%08lx)\n", newDevice);
+	TRACE("device_added(0x%08" B_PRIx32 ")\n", newDevice);
 	my_device *device = (my_device *)malloc(sizeof(my_device));
 	device->device = newDevice;
 	device->removed = false;
@@ -552,7 +552,7 @@ my_device_added(usb_device newDevice, void **cookie)
 static status_t
 my_device_removed(void *cookie)
 {
-	TRACE("device_removed(0x%08lx)\n", (uint32)cookie);
+	TRACE("device_removed(%p)\n", cookie);
 	my_device *device = (my_device *)cookie;
 
 	mutex_lock(&gDeviceListLock);
@@ -611,7 +611,7 @@ init_driver()
 	status_t result = get_module(B_USB_MODULE_NAME,
 		(module_info **)&gUSBModule);
 	if (result < B_OK) {
-		TRACE_ALWAYS("getting module failed 0x%08lx\n", result);
+		TRACE_ALWAYS("getting module failed 0x%08" B_PRIx32 "\n", result);
 		mutex_destroy(&gDeviceListLock);
 		return result;
 	}
