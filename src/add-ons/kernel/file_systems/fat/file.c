@@ -32,13 +32,6 @@
 
 typedef struct filecookie {
 	uint32		mode;		// open mode
-
-	/* simple cluster cache */
-	struct {
-		uint32		iteration;
-		uint32		index;		/* index in the fat chain */
-		uint32		cluster;
-	} ccache;
 } filecookie;
 
 
@@ -343,9 +336,6 @@ dosfs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **_cookie)
 	}
 
 	cookie->mode = omode;
-	cookie->ccache.iteration = node->iteration;
-	cookie->ccache.index = 0;
-	cookie->ccache.cluster = node->cluster;
 	*_cookie = cookie;
 	result = B_OK;
 
@@ -647,9 +637,6 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 	}
 
 	cookie->mode = omode;
-	cookie->ccache.iteration = file->iteration;
-	cookie->ccache.index = 0;
-	cookie->ccache.cluster = file->cluster;
 	*_cookie = cookie;
 
 	notify_entry_created(vol->id, dir->vnid, name, *vnid);
