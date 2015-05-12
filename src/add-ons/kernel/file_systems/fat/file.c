@@ -364,12 +364,7 @@ dosfs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	nspace	*vol = (nspace *)_vol->private_volume;
 	vnode	*node = (vnode *)_node->private_node;
 	filecookie *cookie = (filecookie *)_cookie;
-	//uint8 *buffer;
-	//struct csi iter;
 	int result = B_OK;
-	//size_t bytes_read = 0;
-	//uint32 cluster1;
-	//off_t diff;
 
 	LOCK_VOL(vol);
 
@@ -387,7 +382,6 @@ dosfs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	if (pos < 0) pos = 0;
 
 	if ((node->st_size == 0) || (*len == 0) || (pos >= node->st_size)) {
-		//bytes_read = 0;
 		*len = 0;
 		goto bi;
 	}
@@ -397,102 +391,6 @@ dosfs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		*len = node->st_size - pos;
 
 	result = file_cache_read(node->cache, cookie, pos, buf, len);
-
-#if 0
-
-	if ((cookie->ccache.iteration == node->iteration) &&
-		(pos >= cookie->ccache.index * vol->bytes_per_sector * vol->sectors_per_cluster)) {
-		/* the cached fat value is both valid and helpful */
-		ASSERT(IS_DATA_CLUSTER(cookie->ccache.cluster));
-		ASSERT(cookie->ccache.cluster == get_nth_fat_entry(vol, node->cluster, cookie->ccache.index));
-		cluster1 = cookie->ccache.cluster;
-		diff = pos - cookie->ccache.index * vol->bytes_per_sector * vol->sectors_per_cluster;
-	} else {
-		/* the fat chain changed, so we have to start from the beginning */
-		cluster1 = node->cluster;
-		diff = pos;
-	}
-	diff /= vol->bytes_per_sector; /* convert to sectors */
-
-	if ((result = init_csi(vol, cluster1, 0, &iter)) != B_OK) {
-		dprintf("dosfs_read: invalid starting cluster (%lx)\n", cluster1);
-		goto bi;
-	}
-
-	if (diff && ((result = iter_csi(&iter, diff)) != B_OK)) {
-		dprintf("dosfs_read: end of file reached (init)\n");
-		result = EIO;
-		goto bi;
-	}
-
-	ASSERT(iter.cluster == get_nth_fat_entry(vol, node->cluster, pos / vol->bytes_per_sector / vol->sectors_per_cluster));
-
-	if ((pos % vol->bytes_per_sector) != 0) {
-		// read in partial first sector if necessary
-		size_t amt;
-		buffer = csi_get_block(&iter);
-		if (buffer == NULL) {
-			dprintf("dosfs_read: error reading cluster %lx, sector %lx\n", iter.cluster, iter.sector);
-			result = EIO;
-			goto bi;
-		}
-		amt = vol->bytes_per_sector - (pos % vol->bytes_per_sector);
-		if (amt > *len) amt = *len;
-		memcpy(buf, buffer + (pos % vol->bytes_per_sector), amt);
-		csi_release_block(&iter);
-		bytes_read += amt;
-
-		if (bytes_read < *len)
-			if ((result = iter_csi(&iter, 1)) != B_OK) {
-				dprintf("dosfs_read: end of file reached\n");
-				result = EIO;
-				goto bi;
-			}
-	}
-
-	// read middle sectors
-	while (bytes_read + vol->bytes_per_sector <= *len) {
-		result = csi_read_blocks(&iter, (uint8*)buf + bytes_read, *len - bytes_read);
-		if (result < B_OK) {
-			dprintf("dosfs_read: end of file reached\n");
-			goto bi;
-		}
-		bytes_read += result;
-
-		if (bytes_read < *len)
-			if ((result = iter_csi(&iter, 1)) != B_OK) {
-				dprintf("dosfs_read: end of file reached\n");
-				result = EIO;
-				goto bi;
-			}
-	}
-
-	// read part of remaining sector if needed
-	if (bytes_read < *len) {
-		size_t amt;
-
-		buffer = csi_get_block(&iter);
-		if (buffer == NULL) {
-			dprintf("dosfs_read: error reading cluster %lx, sector %lx\n", iter.cluster, iter.sector);
-			result = EIO;
-			goto bi;
-		}
-		amt = *len - bytes_read;
-		memcpy((uint8*)buf + bytes_read, buffer, amt);
-		csi_release_block(&iter);
-		bytes_read += amt;
-	}
-
-	if (*len) {
-		cookie->ccache.iteration = node->iteration;
-		cookie->ccache.index = (pos + *len - 1) / vol->bytes_per_sector / vol->sectors_per_cluster;
-		cookie->ccache.cluster = iter.cluster;
-
-		ASSERT(cookie->ccache.cluster == get_nth_fat_entry(vol, node->cluster, cookie->ccache.index));
-	}
-
-	result = B_OK;
-#endif
 
 bi:
 	if (result != B_OK) {
@@ -513,13 +411,7 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	nspace	*vol = (nspace *)_vol->private_volume;
 	vnode	*node = (vnode *)_node->private_node;
 	filecookie *cookie = (filecookie *)_cookie;
-	//uint8 *buffer;
-	//struct csi iter;
 	int result = B_OK;
-	//size_t bytes_written = 0;
-	//uint32 cluster1;
-	//off_t diff;
-
 
 	LOCK_VOL(vol);
 
@@ -560,21 +452,6 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		*len = (size_t)(MAX_FILE_SIZE - pos);
 	}
 
-#if 0
-
-	if (node->st_size &&
-		(cookie->ccache.iteration == node->iteration) &&
-		(pos >= cookie->ccache.index * vol->bytes_per_sector * vol->sectors_per_cluster)) {
-		ASSERT(IS_DATA_CLUSTER(cookie->ccache.cluster));
-		ASSERT(cookie->ccache.cluster == get_nth_fat_entry(vol, node->cluster, cookie->ccache.index));
-		cluster1 = cookie->ccache.cluster;
-		diff = pos - cookie->ccache.index * vol->bytes_per_sector * vol->sectors_per_cluster;
-	} else {
-		cluster1 = 0xffffffff;
-		diff = 0;
-	}
-#endif
-
 	// extend file size if needed
 	if (pos + *len > node->st_size) {
 		uint32 clusters = (pos + *len + vol->bytes_per_sector*vol->sectors_per_cluster - 1) / vol->bytes_per_sector / vol->sectors_per_cluster;
@@ -598,98 +475,6 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	}
 
 	result = file_cache_write(node->cache, cookie, pos, buf, len);
-
-#if 0
-	if (cluster1 == 0xffffffff) {
-		cluster1 = node->cluster;
-		diff = pos;
-	}
-	diff /= vol->bytes_per_sector; /* convert to sectors */
-
-	if ((result = init_csi(vol, cluster1, 0, &iter)) != B_OK) {
-		dprintf("dosfs_write: invalid starting cluster (%lx)\n", cluster1);
-		goto bi;
-	}
-
-	if (diff && ((result = iter_csi(&iter, diff)) != B_OK)) {
-		dprintf("dosfs_write: end of file reached (init)\n");
-		result = EIO;
-		goto bi;
-	}
-
-	ASSERT(iter.cluster == get_nth_fat_entry(vol, node->cluster, pos / vol->bytes_per_sector / vol->sectors_per_cluster));
-
-	if(*len > 0)
-		node->dirty = true;
-
-	// write partial first sector if necessary
-	if ((pos % vol->bytes_per_sector) != 0) {
-		size_t amt;
-		buffer = csi_get_block(&iter);
-		if (buffer == NULL) {
-			dprintf("dosfs_write: error writing cluster %lx, sector %lx\n", iter.cluster, iter.sector);
-			result = EIO;
-			goto bi;
-		}
-		amt = vol->bytes_per_sector - (pos % vol->bytes_per_sector);
-		if (amt > *len) amt = *len;
-		memcpy(buffer + (pos % vol->bytes_per_sector), buf, amt);
-		csi_mark_block_dirty(&iter);
-		csi_release_block(&iter);
-		bytes_written += amt;
-
-		if (bytes_written < *len)
-			if ((result = iter_csi(&iter, 1)) != B_OK) {
-				dprintf("dosfs_write: end of file reached\n");
-				result = EIO;
-				goto bi;
-			}
-	}
-
-	// write middle sectors
-	while (bytes_written + vol->bytes_per_sector <= *len) {
-		result = csi_write_blocks(&iter, (uint8*)buf + bytes_written, *len - bytes_written);
-		if (result < B_OK) {
-			dprintf("dosfs_write: end of file reached\n");
-			goto bi;
-		}
-		bytes_written += result;
-
-		if (bytes_written < *len)
-			if ((result = iter_csi(&iter, 1)) != B_OK) {
-				dprintf("dosfs_write: end of file reached\n");
-				result = EIO;
-				goto bi;
-			}
-	}
-
-	// write part of remaining sector if needed
-	if (bytes_written < *len) {
-		size_t amt;
-
-		buffer = csi_get_block(&iter);
-		if (buffer == NULL) {
-			dprintf("error writing cluster %lx, sector %lx\n", iter.cluster, iter.sector);
-			result = EIO;
-			goto bi;
-		}
-		amt = *len - bytes_written;
-		memcpy(buffer, (uint8*)buf + bytes_written, amt);
-		csi_mark_block_dirty(&iter);
-		csi_release_block(&iter);
-		bytes_written += amt;
-	}
-
-	if (*len) {
-		cookie->ccache.iteration = node->iteration;
-		cookie->ccache.index = (pos + *len - 1) / vol->bytes_per_sector / vol->sectors_per_cluster;
-		cookie->ccache.cluster = iter.cluster;
-
-		ASSERT(cookie->ccache.cluster == get_nth_fat_entry(vol, node->cluster, cookie->ccache.index));
-	}
-
-	result = B_OK;
-#endif
 
 bi:
 	if (result != B_OK) {
