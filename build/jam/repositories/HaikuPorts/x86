@@ -224,7 +224,7 @@ RemotePackageRepository HaikuPorts
 	which-2.21-1
 	wpa_supplicant-2.0-3
 	xml_parser-2.36-1
-	xz_utils-5.0.4-1
+	xz_utils-5.0.8-1
 	yasm-1.2.0-3
 	zip-3.0-2
 	zlib-1.2.8-4
