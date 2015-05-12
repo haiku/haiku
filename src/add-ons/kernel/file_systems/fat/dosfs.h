@@ -40,9 +40,9 @@
 
 #define IS_INVALID_VNID(vnid) \
 	((!IS_DIR_CLUSTER_VNID((vnid)) && \
-	  !IS_DIR_INDEX_VNID((vnid)) && \
-	  !IS_ARTIFICIAL_VNID((vnid))) || \
-	 ((vnid) & INVALID_VNID_BITS_MASK))
+			!IS_DIR_INDEX_VNID((vnid)) && \
+			!IS_ARTIFICIAL_VNID((vnid))) || \
+		((vnid) & INVALID_VNID_BITS_MASK))
 
 #define GENERATE_DIR_INDEX_VNID(dircluster, index) \
 	(DIR_INDEX_VNID_BITS | ((ino_t)(dircluster) << 32) | (index))
@@ -64,8 +64,8 @@
 
 
 typedef struct vnode {
-	ino_t		vnid; 			// self id
-	ino_t	 	dir_vnid;		// parent vnode id (directory containing entry)
+	ino_t		vnid;			// self id
+	ino_t		dir_vnid;		// parent vnode id (directory containing entry)
 	void		*cache;
 	void		*file_map;
 

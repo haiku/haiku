@@ -1312,9 +1312,9 @@ fs_volume_ops gFATVolumeOps = {
 	/* query operations */
 	NULL,	//&fs_open_query,
 	NULL,	//&fs_close_query,
-	NULL, 	//&fs_free_query_cookie,
-	NULL, 	//&fs_read_query,
-	NULL, 	//&fs_rewind_query,
+	NULL,	//&fs_free_query_cookie,
+	NULL,	//&fs_read_query,
+	NULL,	//&fs_rewind_query,
 };
 
 
