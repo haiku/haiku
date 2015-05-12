@@ -1535,22 +1535,22 @@ dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 
 
 status_t
-dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t pos, size_t len,
-	struct file_io_vec *vecs, size_t *_count)
+dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t position,
+	size_t length, struct file_io_vec *vecs, size_t *_count)
 {
-	nspace	*vol = (nspace *)_vol->private_volume;
-	vnode	*node = (vnode *)_node->private_node;
+	nspace *vol = (nspace *)_vol->private_volume;
+	vnode *node = (vnode *)_node->private_node;
 	struct csi iter;
-	int result = B_OK;
-	size_t bytes_read = 0;
-	uint32 cluster1;
-	off_t diff;
-	size_t index = 0, max = *_count;
+	status_t result;
+	uint32 skipSectors;
+	off_t offset;
+	size_t index = 0;
+	size_t max = *_count;
 
 	LOCK_VOL(vol);
 	*_count = 0;
 
-	if (node->mode & FAT_SUBDIR) {
+	if ((node->mode & FAT_SUBDIR) != 0) {
 		DPRINTF(0, ("dosfs_get_file_map called on subdirectory %" B_PRIdINO
 			"\n", node->vnid));
 		UNLOCK_VOL(vol);
@@ -1558,84 +1558,71 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t pos, size_t len,
 	}
 
 	DPRINTF(0, ("dosfs_get_file_map called %" B_PRIuSIZE " bytes at %" B_PRIdOFF
-		" (vnode id %" B_PRIdINO ")\n", len, pos, node->vnid));
+		" (vnode id %" B_PRIdINO ")\n", length, position, node->vnid));
 
-	if (pos < 0) pos = 0;
+	if (position < 0)
+		position = 0;
 
-	if ((node->st_size == 0) || (len == 0) || (pos >= node->st_size)) {
-		bytes_read = 0;
+	if (node->st_size == 0 || length == 0 || position >= node->st_size) {
+		result = B_OK;
 		goto bi;
 	}
 
-	// truncate bytes to read to file size
-	if (pos + len >= node->st_size)
-		len = node->st_size - pos;
+	// Truncate to file size, taking overflow into account.
+	if (position + length >= node->st_size || position + length < position)
+		length = node->st_size - position;
 
-	/* the fat chain changed, so we have to start from the beginning */
-	cluster1 = node->cluster;
-	diff = pos;
-	diff /= vol->bytes_per_sector; /* convert to sectors */
-
-	if ((result = init_csi(vol, cluster1, 0, &iter)) != B_OK) {
+	result = init_csi(vol, node->cluster, 0, &iter);
+	if (result != B_OK) {
 		dprintf("dosfs_get_file_map: invalid starting cluster (%" B_PRIu32
-			")\n", cluster1);
-		goto bi;
-	}
-
-	if (diff && ((result = iter_csi(&iter, diff)) != B_OK)) {
-		dprintf("dosfs_get_file_map: end of file reached (init)\n");
+			")\n", node->cluster);
 		result = EIO;
 		goto bi;
 	}
 
-	ASSERT(iter.cluster == get_nth_fat_entry(vol, node->cluster, pos / vol->bytes_per_sector / vol->sectors_per_cluster));
-
-	if ((pos % vol->bytes_per_sector) != 0) {
-		// read in partial first sector if necessary
-		size_t amt = vol->bytes_per_sector - (pos % vol->bytes_per_sector);
-		if (amt > len)
-			amt = len;
-		vecs[index].offset = csi_to_block(&iter) * vol->bytes_per_sector + (pos % vol->bytes_per_sector);
-		vecs[index].length = amt;
-		index++;
-		if (index >= max) {
-			// we're out of file_io_vecs; let's bail out
-			result = B_BUFFER_OVERFLOW;
+	skipSectors = position / vol->bytes_per_sector;
+	if (skipSectors > 0) {
+		result = iter_csi(&iter, skipSectors);
+		if (result != B_OK) {
+			dprintf("dosfs_get_file_map: end of file reached (init)\n");
+			result = EIO;
 			goto bi;
 		}
+	}
 
-		bytes_read += amt;
+	ASSERT(iter.cluster == get_nth_fat_entry(vol, node->cluster,
+			position / vol->bytes_per_sector / vol->sectors_per_cluster));
 
-		if (bytes_read < len)
-			if ((result = iter_csi(&iter, 1)) != B_OK) {
+	offset = position % vol->bytes_per_sector;
+	while (length > 0) {
+		off_t block = csi_to_block(&iter);
+		uint32 sectors = 1;
+
+		length -= min(length, vol->bytes_per_sector - offset);
+
+		while (length > 0) {
+			result = iter_csi(&iter, 1);
+			if (result != B_OK) {
 				dprintf("dosfs_get_file_map: end of file reached\n");
 				result = EIO;
 				goto bi;
 			}
-	}
 
-	// read middle sectors
-	while (bytes_read + vol->bytes_per_sector <= len) {
-		struct csi old_csi;
-		uint32 sectors = 1;
-		off_t block = csi_to_block(&iter);
-		status_t err;
+			if (block + sectors != csi_to_block(&iter)) {
+				// Disjoint sectors, need to flush and begin a new vector.
+				break;
+			}
 
-		while (1) {
-			old_csi = iter;
-			err = iter_csi(&iter, 1);
-			if ((len - bytes_read) < (sectors + 1) * iter.vol->bytes_per_sector)
-				break;
-			if ((err < B_OK) || (block + sectors != csi_to_block(&iter)))
-				break;
+			length -= min(length, vol->bytes_per_sector);
 			sectors++;
 		}
 
-		vecs[index].offset = block * vol->bytes_per_sector;
-		vecs[index].length = sectors * vol->bytes_per_sector;
-		bytes_read += sectors * vol->bytes_per_sector;
+		vecs[index].offset = block * vol->bytes_per_sector + offset;
+		vecs[index].length = sectors * vol->bytes_per_sector - offset;
 		index++;
-		iter = old_csi;
+
+		if (length == 0)
+			break;
 
 		if (index >= max) {
 			// we're out of file_io_vecs; let's bail out
@@ -1643,27 +1630,7 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t pos, size_t len,
 			goto bi;
 		}
 
-		if (bytes_read < len)
-			if ((result = iter_csi(&iter, 1)) != B_OK) {
-				dprintf("dosfs_get_file_map: end of file reached\n");
-				result = EIO;
-				goto bi;
-			}
-	}
-
-	// read part of remaining sector if needed
-	if (bytes_read < len) {
-		size_t amt = len - bytes_read;
-		vecs[index].offset = csi_to_block(&iter) * vol->bytes_per_sector;
-		vecs[index].length = amt;
-		index++;
-		bytes_read += amt;
-
-		if (index >= max) {
-			// we're out of file_io_vecs; let's bail out
-			result = B_BUFFER_OVERFLOW;
-			goto bi;
-		}
+		offset = 0;
 	}
 
 	result = B_OK;
