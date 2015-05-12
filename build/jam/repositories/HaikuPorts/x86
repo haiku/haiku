@@ -90,8 +90,10 @@ RemotePackageRepository HaikuPorts
 	haikuwebkit_devel-1.4.10-1
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
-	icu-54.1-5
-	icu_devel-54.1-5
+	icu-55.1-4
+	icu_devel-55.1-4
+	icu54-54.1-1
+	icu54_devel-54.1-1
 	intltool-0.40.6-4
 	jam-2.5_2012_10_12-2
 	jasper-1.900.1-4
@@ -253,8 +255,10 @@ RemotePackageRepository HaikuPorts
 	glib2_x86_gcc2_devel-2.38.1-4
 	glu_x86_gcc2-9.0.0-2
 	glu_x86_gcc2_devel-9.0.0-2
-	icu_x86_gcc2-54.1-5
-	icu_x86_gcc2_devel-54.1-5
+	icu_x86_gcc2-55.1-4
+	icu_x86_gcc2_devel-55.1-4
+	icu54_x86_gcc2-54.1-1
+	icu54_x86_gcc2_devel-54.1-1
 	jasper_x86_gcc2-1.900.1-4
 	jasper_x86_gcc2_devel-1.900.1-4
 	jpeg_x86_gcc2-9-3
@@ -352,6 +356,7 @@ RemotePackageRepository HaikuPorts
 	gutenprint
 	htmldoc
 	icu
+	icu54
 	intltool
 	jam
 	jasper
