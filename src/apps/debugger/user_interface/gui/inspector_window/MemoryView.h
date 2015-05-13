@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -71,6 +71,11 @@ public:
 	virtual void				MouseUp(BPoint point);
 			void				ScrollToSelection();
 	virtual void				TargetedByScrollView(BScrollView* scrollView);
+
+
+	virtual	BSize				MinSize();
+	virtual	BSize				PreferredSize();
+	virtual	BSize				MaxSize();
 
 private:
 	void						_Init();

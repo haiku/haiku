@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -518,6 +518,27 @@ MemoryView::TargetedByScrollView(BScrollView* scrollView)
 {
 	BView::TargetedByScrollView(scrollView);
 	scrollView->ScrollBar(B_VERTICAL)->SetRange(0.0, 0.0);
+}
+
+
+BSize
+MemoryView::MinSize()
+{
+	return BSize(0.0, 0.0);
+}
+
+
+BSize
+MemoryView::PreferredSize()
+{
+	return MinSize();
+}
+
+
+BSize
+MemoryView::MaxSize()
+{
+	return BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
 }
 
 
