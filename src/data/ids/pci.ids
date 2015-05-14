@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.05.07
-#	Date:    2015-05-07 03:15:02
+#	Version: 2015.05.13
+#	Date:    2015-05-13 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -5763,6 +5763,7 @@
 		1077 020c  3200 Series Quad Port 1Gb Intelligent Ethernet Adapter
 		1077 020f  3200 Series Single Port 10Gb Intelligent Ethernet Adapter
 		1077 0210  QME8242-k 10GbE Dual Port Mezzanine Card
+		1077 0233  QME8262-k 10GbE Dual Port Mezzanine Card
 	8021  8200 Series 10GbE Converged Network Adapter (FCoE)
 		103c 3348  CN1000Q Dual Port Converged Network Adapter
 		1077 0211  QME8242-k 10GbE Dual Port Mezzanine Card, FCoE
@@ -17142,6 +17143,10 @@
 	1007  MT27520 Family [ConnectX-3 Pro]
 		103c 22f3  InfiniBand FDR/Ethernet 10Gb/40Gb 2-port 544+QSFP Adapter
 		103c 22f4  InfiniBand FDR/Ethernet 10Gb/40Gb 2-port 544+FLR-QSFP Adapter
+		117c 0090  FastFrame NQ41
+		117c 0091  FastFrame NQ42
+		117c 0092  FastFrame NQ11
+		117c 0093  FastFrame NQ12
 	1009  MT27530 Family
 	100a  MT27531 Family
 	100b  MT27540 Family
@@ -19160,6 +19165,9 @@
 	0300  Telas 2.V
 1c44  Enmotus Inc
 	8000  8000 Storage IO Controller
+# A Western Digital Subsidiary
+1c58  HGST, Inc.
+	0003  Ultrastar SN100 Series NVMe SSD
 1c7e  TTTech Computertechnik AG
 	0200  zFAS Debug Port
 1c7f  Elektrobit Austria GmbH
