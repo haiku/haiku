@@ -331,12 +331,12 @@ bi:
 			DPRINTF(0, ("pooh. there is a problem. clearing chain (%" B_PRIu32
 				")\n", first));
 			if (first != 0)
-				clear_fat_chain(vol, first);
+				clear_fat_chain(vol, first, false);
 		} else if (n != N) {
 			DPRINTF(0, ("not enough free entries (%" B_PRId32 "/%" B_PRId32
 				" found)\n", n, N));
 			if (first != 0)
-				clear_fat_chain(vol, first);
+				clear_fat_chain(vol, first, false);
 			result = B_DEVICE_FULL;
 		} else if (result == 0) {
 			vol->last_allocated = cluster;
@@ -447,7 +447,7 @@ count_clusters(nspace *vol, int32 cluster)
 
 
 status_t
-clear_fat_chain(nspace *vol, uint32 cluster)
+clear_fat_chain(nspace *vol, uint32 cluster, bool discardBlockCache)
 {
 	int32 c;
 	status_t result;
@@ -472,6 +472,12 @@ clear_fat_chain(nspace *vol, uint32 cluster)
 			DPRINTF(0, ("clear_fat_chain: error clearing fat entry for cluster "
 				"%" B_PRIu32 " (%s)\n", cluster, strerror(result)));
 			return result;
+		}
+
+		if (discardBlockCache) {
+			block_cache_discard(vol->fBlockCache,
+				vol->data_start + (cluster - 2) * vol->sectors_per_cluster,
+				vol->sectors_per_cluster);
 		}
 
 		vol->free_clusters++;
@@ -514,7 +520,8 @@ allocate_n_fat_entries(nspace *vol, int32 n, int32 *start)
 
 
 status_t
-set_fat_chain_length(nspace *vol, vnode *node, uint32 clusters)
+set_fat_chain_length(nspace *vol, vnode *node, uint32 clusters,
+	bool discardBlockCache)
 {
 	status_t result;
 	int32 i, c, n;
@@ -535,7 +542,7 @@ set_fat_chain_length(nspace *vol, vnode *node, uint32 clusters)
 			return B_OK;
 
 		c = node->cluster;
-		if ((result = clear_fat_chain(vol, c)) != B_OK)
+		if ((result = clear_fat_chain(vol, c, discardBlockCache)) != B_OK)
 			return result;
 
 		node->cluster = 0;
@@ -594,7 +601,7 @@ set_fat_chain_length(nspace *vol, vnode *node, uint32 clusters)
 
 		result = set_fat_entry(vol, node->end_cluster, n);
 		if (result < B_OK) {
-			clear_fat_chain(vol, n);
+			clear_fat_chain(vol, n, false);
 			return result;
 		}
 
@@ -631,7 +638,7 @@ set_fat_chain_length(nspace *vol, vnode *node, uint32 clusters)
 		return result;
 
 	node->end_cluster = c;
-	return clear_fat_chain(vol, n);
+	return clear_fat_chain(vol, n, discardBlockCache);
 }
 
 

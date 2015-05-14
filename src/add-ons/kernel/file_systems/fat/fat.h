@@ -20,13 +20,15 @@ int32		get_nth_fat_entry(nspace *vol, int32 cluster, uint32 n);
 uint32		count_clusters(nspace *vol, int32 cluster);
 
 /* remember to update vnode iteration after calling this function */
-status_t	clear_fat_chain(nspace *vol, uint32 cluster);
+status_t	clear_fat_chain(nspace *vol, uint32 cluster,
+				bool discardBlockCache);
 
 /* remember to set end of chain field when merging into a vnode */
 status_t	allocate_n_fat_entries(nspace *vol, int32 n, int32 *start);
 
 /* remember to update vnode iteration after calling this function */
-status_t	set_fat_chain_length(nspace *vol, vnode *node, uint32 clusters);
+status_t	set_fat_chain_length(nspace *vol, vnode *node, uint32 clusters,
+				bool discardBlockCache);
 
 void		dump_fat_chain(nspace *vol, uint32 cluster);
 

@@ -532,7 +532,7 @@ compact_directory(nspace *vol, vnode *dir)
 					< dir->st_size) {
 				DPRINTF(0, ("shrinking directory to %" B_PRIu32 " clusters\n",
 					clusters));
-				error = set_fat_chain_length(vol, dir, clusters);
+				error = set_fat_chain_length(vol, dir, clusters, true);
 				dir->st_size = clusters * vol->bytes_per_sector
 					* vol->sectors_per_cluster;
 				dir->iteration++;
@@ -698,8 +698,11 @@ _create_dir_entry_(nspace *vol, vnode *dir, struct _entry_info_ *info,
 		DPRINTF(0, ("expanding directory from %" B_PRIdOFF " to %" B_PRIu32
 			" clusters\n", dir->st_size / vol->bytes_per_sector
 				/ vol->sectors_per_cluster, clusters_needed));
-		if ((error = set_fat_chain_length(vol, dir, clusters_needed)) < 0)
+		if ((error = set_fat_chain_length(vol, dir, clusters_needed, false))
+				< 0) {
 			return error;
+		}
+
 		dir->st_size = vol->bytes_per_sector*vol->sectors_per_cluster*clusters_needed;
 		dir->iteration++;
 	}

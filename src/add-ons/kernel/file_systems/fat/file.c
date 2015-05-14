@@ -239,7 +239,8 @@ dosfs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st,
 				/ vol->sectors_per_cluster;
 			DPRINTF(0, ("setting fat chain length to %" B_PRIu32 " clusters\n",
 				clusters));
-			if ((err = set_fat_chain_length(vol, node, clusters)) == B_OK) {
+			if ((err = set_fat_chain_length(vol, node, clusters, false))
+					== B_OK) {
 				node->st_size = st->st_size;
 				node->iteration++;
 				dirty = true;
@@ -321,7 +322,7 @@ dosfs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **_cookie)
 
 	if (omode & O_TRUNC) {
 		DPRINTF(0, ("dosfs_open called with O_TRUNC set\n"));
-		if ((result = set_fat_chain_length(vol, node, 0)) != B_OK) {
+		if ((result = set_fat_chain_length(vol, node, 0, false)) != B_OK) {
 			dprintf("dosfs_open: error truncating file\n");
 			goto error;
 		}
@@ -446,7 +447,8 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	if (pos + *len > node->st_size) {
 		uint32 clusters = (pos + *len + vol->bytes_per_sector*vol->sectors_per_cluster - 1) / vol->bytes_per_sector / vol->sectors_per_cluster;
 		if (node->st_size <= (clusters - 1) * vol->sectors_per_cluster * vol->bytes_per_sector) {
-			if ((result = set_fat_chain_length(vol, node, clusters)) != B_OK) {
+			if ((result = set_fat_chain_length(vol, node, clusters, false))
+					!= B_OK) {
 				goto bi;
 			}
 			node->iteration++;
@@ -588,7 +590,7 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 		}
 
 		if (omode & O_TRUNC) {
-			set_fat_chain_length(vol, file, 0);
+			set_fat_chain_length(vol, file, 0, false);
 			file->st_size = 0;
 			file->iteration++;
 		}
@@ -807,7 +809,7 @@ bi3:
 	if (IS_ARTIFICIAL_VNID(dummy.vnid))
 		remove_from_vcache(vol, dummy.vnid);
 bi2:
-	clear_fat_chain(vol, dummy.cluster);
+	clear_fat_chain(vol, dummy.cluster, false);
 	if (vol->fs_flags & FS_FLAGS_OP_SYNC)
 		_dosfs_sync(vol);
 bi:
@@ -1064,7 +1066,7 @@ dosfs_remove_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 	/* XXX: the following assertion was tripped */
 	ASSERT((node->cluster != 0) || (node->st_size == 0));
 	if (node->cluster != 0)
-		clear_fat_chain(vol, node->cluster);
+		clear_fat_chain(vol, node->cluster, (node->mode & FAT_SUBDIR) != 0);
 
 	/* remove vnode id from the cache */
 	if (find_vnid_in_vcache(vol, node->vnid) == B_OK)
