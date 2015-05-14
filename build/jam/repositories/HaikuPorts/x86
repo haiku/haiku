@@ -189,6 +189,8 @@ RemotePackageRepository HaikuPorts
 	pixman-0.32.6-1
 	pkgconfig-0.27.1-2
 	python-2.7.9-1
+	python_mako-1.0.1-1
+	python_setuptools-5.3-2
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
 	qemu-2.1.2-1
@@ -414,6 +416,8 @@ RemotePackageRepository HaikuPorts
 	pkgconfig
 	pkgconfig_x86_gcc2
 	python
+	python_mako
+	python_setuptools
 	python_twisted
 	python_zope.interface
 	qemu
