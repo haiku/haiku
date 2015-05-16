@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-JPEGTranslator	965709535
+1	russian	x-vnd.Haiku-JPEGTranslator	3788699631
 Output quality	JPEGTranslator		Качество вывода
 JPEG images	JPEGTranslator		JPEG изображения
 Prevent colors 'washing out'	JPEGTranslator		Предотвращать 'размывание' цветов
@@ -15,6 +15,7 @@ Output smoothing strength	JPEGTranslator		Сглаживание вывода
 High	JPEGTranslator		Высокое
 Write	JPEGTranslator		Запись
 Write black-and-white images as RGB24	JPEGTranslator		Сохранять черно-белые рисунки как RGB24
+Version %d.%d.%d	JPEGTranslator		Версия %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		Открывать рисунки серого цвета как RGB32
 Read	JPEGTranslator		Чтение
 JPEG Library Warning: %s\n	be_jerror		Предупреждение библиотеки JPEG: %s\n

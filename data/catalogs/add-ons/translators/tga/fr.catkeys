@@ -1,4 +1,5 @@
-1	french	x-vnd.Haiku-TGATranslator	3952259621
+1	french	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		Enregistrer avec une compression RLE
 Targa image (%d bits truecolor)	TGATranslator		Image Targa (Vraie couleur %d bits)
 Ignore TGA alpha channel	TGAView		Ignorer le canal alpha TGA
 Targa image (%d bits colormap)	TGATranslator		Image Targa (Palette %d bits)

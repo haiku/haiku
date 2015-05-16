@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-PPMTranslator	4122630687
+1	hungarian	x-vnd.Haiku-PPMTranslator	2233502290
 Version %d.%d.%d, %s	PPMTranslator		Verzió: %d.%d.%d %s
 PPM Settings	PPMMain		PPM beállítások
 Based on PPMTranslator sample code	PPMTranslator		A PPM értelemző mintakódja alapján
@@ -9,6 +9,7 @@ PPM image	PPMTranslator		PPM kép
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16-bites
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Bittépkép Formátum (PPMÉrtelmező)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32-bites
+Input color space:	PPMTranslator		Bemeneti színskála:
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32-bites
 PPM image translator	PPMTranslator		PPM kép értelmező
 bits/space	PPMTranslator		bit/hely

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-PRNT	2674539197
+1	dutch; flemish	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Printer: %printer_name%\nDriver:   %driver%\n
 Waiting	JobListView		Bezig met wachten
 Print test page	PrintersWindow		Druk een testpagina af
@@ -30,7 +30,6 @@ Blue	TestPageView		Blauw
 1 pending job.	PrinterListView		1 taak in de wachtrij
 Remove	PrintersWindow		Verwijderen
 <pick one>	AddPrinterDialog		<kies één>
-Add …	PrintersWindow		Toevoegen...
 Print jobs for 	PrintersWindow		Afdruktaken voor
 Failed	JobListView		Mislukt
 %.2f KB	JobListView		%.2f KB

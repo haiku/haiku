@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Be-PRNT	3832936789
+1	croatian	x-vnd.Be-PRNT	1358844686
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Pisač: %ime_pisača%\nUpravljački program:   %upravljački program%\n
 Waiting	JobListView		Čekanje
 Print test page	PrintersWindow		Ispiši test stranicu
@@ -27,7 +27,6 @@ Blue	TestPageView		Plava
 1 pending job.	PrinterListView		1 zadatak na čekanju.
 Remove	PrintersWindow		Ukloni
 <pick one>	AddPrinterDialog		<odaberi jedan>
-Add …	PrintersWindow		Dodaj ...
 Print jobs for 	PrintersWindow		Ispiši zadatke za 
 Failed	JobListView		Neuspjelo
 %.2f KB	JobListView		%.2f KB

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-InterfacesAddOn	606366088
+1	russian	x-vnd.Haiku-InterfacesAddOn	3297241710
 Interface	InterfaceWindow		Интерфейс
 Network:	IntefaceHardwareView		Сеть:
 Static	IntefaceAddressView		Статический
@@ -14,6 +14,7 @@ Enable	InterfacesListView		Включить
 Received:	IntefaceHardwareView		Получено:
 Choose automatically	IntefaceHardwareView		Выбирать автоматически
 connected	IntefaceHardwareView		подключено
+Automatic	IntefaceAddressView		Автоматический
 Gateway:	IntefaceAddressView		Шлюз:
 Disable	InterfacesListView		Отключить
 Sent:	IntefaceHardwareView		Отправлено:

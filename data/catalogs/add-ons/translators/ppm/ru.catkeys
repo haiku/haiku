@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PPMTranslator	4122630687
+1	russian	x-vnd.Haiku-PPMTranslator	2233502290
 Version %d.%d.%d, %s	PPMTranslator		Версия %d.%d.%d, %s
 PPM Settings	PPMMain		Настройки PPM транслятора
 Based on PPMTranslator sample code	PPMTranslator		Основано на исходном коде PPM транслятора
@@ -9,6 +9,7 @@ PPM image	PPMTranslator		PPM изображение
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 бит
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Битмапный формат BeOS (PPM транслятор)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 бита
+Input color space:	PPMTranslator		Входная палитра цветов:
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 бита
 PPM image translator	PPMTranslator		Транслятор PPM изображений
 bits/space	PPMTranslator		бит/пространство

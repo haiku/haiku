@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PRNT	2674539197
+1	japanese	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		プリンター: %printer_name%\nドライバー: %driver%\n
 Waiting	JobListView		待機中
 Print test page	PrintersWindow		テストページを印刷
@@ -30,7 +30,6 @@ Blue	TestPageView		青
 1 pending job.	PrinterListView		1 個のジョブが印刷待ちです。
 Remove	PrintersWindow		削除
 <pick one>	AddPrinterDialog		<１つ選択>
-Add …	PrintersWindow		追加…
 Print jobs for 	PrintersWindow		このプリンターのジョブ:
 Failed	JobListView		エラー
 %.2f KB	JobListView		%.2f KB

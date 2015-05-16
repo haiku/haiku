@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-PRNT	2674539197
+1	russian	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Waiting	JobListView		Ожидание
 Print test page	PrintersWindow		Пробная страница
@@ -30,7 +30,6 @@ Blue	TestPageView		Синий
 1 pending job.	PrinterListView		1 задание в очереди.
 Remove	PrintersWindow		Удалить
 <pick one>	AddPrinterDialog		<выбрать>
-Add …	PrintersWindow		Добавить…
 Print jobs for 	PrintersWindow		Задания печати для 
 Failed	JobListView		Неудача
 %.2f KB	JobListView		%.2f КБ

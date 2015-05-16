@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-GIFTranslator	2626723192
+1	french	x-vnd.Haiku-GIFTranslator	2201651797
 Websafe	GIFView		Garantie pour le web
 Write interlaced images	GIFView		Enregistrer les images entrelacées
 Optimal	GIFView		Optimale
@@ -11,6 +11,7 @@ Palette:	GIFView		Palette :
 GIF image	GIFTranslator		Image GIF
 Write transparent images	GIFView		Enregistrer la transparence des images
 GIF images	GIFTranslator		Images GIF
+Version %d.%d.%d, %s	GIFView		Version %d.%d.%d, %s
 Use RGB color	GIFView		Utilisez la couleur RVB
 Use dithering	GIFView		Utilisez le tramage
 GIF Settings	GIFTranslator		Réglages GIF

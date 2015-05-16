@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-PRNT	2674539197
+1	french	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimante : %printer_name%\n    Pilote : %driver%\n
 Waiting	JobListView		Attente
 Print test page	PrintersWindow		Imprimer une page de test
@@ -30,7 +30,6 @@ Blue	TestPageView		Bleu
 1 pending job.	PrinterListView		1 travail en attente.
 Remove	PrintersWindow		Retirer
 <pick one>	AddPrinterDialog		<choisir>
-Add …	PrintersWindow		Ajouter…
 Print jobs for 	PrintersWindow		Travaux d’impression pour 
 Failed	JobListView		Échoué
 %.2f KB	JobListView		%.2f Ko

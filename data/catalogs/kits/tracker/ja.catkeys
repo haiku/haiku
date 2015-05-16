@@ -276,7 +276,7 @@ Copy more	ContainerWindow		さらにコピー
 OK	PoseView		OK
 Read	FilePermissionsView		読み取り
 Clean up all	ContainerWindow		すべてを整列
-New folder	TemplatesMenu		新規フォルダー
+New folder	TemplatesMenu		フォルダー
 Move here	ContainerWindow		ここに移動
 File	FilePanelPriv		ファイル
 Real name	ContainerWindow		実名

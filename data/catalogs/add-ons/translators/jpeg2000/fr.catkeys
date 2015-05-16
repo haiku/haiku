@@ -1,6 +1,7 @@
-1	french	x-vnd.Haiku-JPEG2000Translator	547915409
+1	french	x-vnd.Haiku-JPEG2000Translator	3265915643
 Write	JPEG2000Translator		Écriture
 JPEG2000 images	JPEG2000Translator		Images JPEG2000
+Version %d.%d.%d	JPEG2000Translator		Version %d.%d.%d
 Output only codestream (.jpc)	JPEG2000Translator		Flux de sortie code seul (.jpc)
 Write black-and-white images as RGB24	JPEG2000Translator		Écrire les images noir&blanc en RVB24
 Output quality	JPEG2000Translator		Qualité de sortie

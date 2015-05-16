@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Be-PRNT	3570863804
+1	slovenian	x-vnd.Be-PRNT	1096771701
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tiskalnik: %printer_name%\nGonilnik:  %driver%\n
 Waiting	JobListView		Čakam
 Print test page	PrintersWindow		Natisni preizkusno stran
@@ -21,7 +21,6 @@ Blue	TestPageView		Modra
 1 pending job.	PrinterListView		1 čakajoč dokument.
 Remove	PrintersWindow		Odstrani
 <pick one>	AddPrinterDialog		(izberite enega)
-Add …	PrintersWindow		Dodaj…
 Print jobs for 	PrintersWindow		Dokumenti za tiskanje na 
 Failed	JobListView		Ni uspelo
 %.2f KB	JobListView		%.2f KB

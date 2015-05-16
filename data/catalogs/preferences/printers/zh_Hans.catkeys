@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-PRNT	2674539197
+1	english	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		打印机：%printer_name%\n驱动：%driver%\n
 Waiting	JobListView		等待
 Print test page	PrintersWindow		打印测试页面
@@ -30,7 +30,6 @@ Blue	TestPageView		蓝
 1 pending job.	PrinterListView		1个挂起任务
 Remove	PrintersWindow		删除
 <pick one>	AddPrinterDialog		<选择一个>
-Add …	PrintersWindow		添加...
 Print jobs for 	PrintersWindow		打印任务
 Failed	JobListView		失败
 %.2f KB	JobListView		%.2f KB

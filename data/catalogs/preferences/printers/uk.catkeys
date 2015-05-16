@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-PRNT	2674539197
+1	ukrainian	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Waiting	JobListView		Очікування
 Print test page	PrintersWindow		Друк пробної сторінки
@@ -30,7 +30,6 @@ Blue	TestPageView		Синій
 1 pending job.	PrinterListView		1 завдання в черзі.
 Remove	PrintersWindow		Видалити
 <pick one>	AddPrinterDialog		<виберіть>
-Add …	PrintersWindow		Додати …
 Print jobs for 	PrintersWindow		Завдання на друк для
 Failed	JobListView		Призупинено
 %.2f KB	JobListView		%.2f KB

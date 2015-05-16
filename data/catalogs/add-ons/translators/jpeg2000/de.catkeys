@@ -1,6 +1,7 @@
-1	german	x-vnd.Haiku-JPEG2000Translator	547915409
+1	german	x-vnd.Haiku-JPEG2000Translator	3265915643
 Write	JPEG2000Translator		Schreiben
 JPEG2000 images	JPEG2000Translator		JPEG2000-Bilder
+Version %d.%d.%d	JPEG2000Translator		Version %d.%d.%d
 Output only codestream (.jpc)	JPEG2000Translator		Nur als Codestream ausgeben (.jpc)
 Write black-and-white images as RGB24	JPEG2000Translator		Schwarz-Weiß-Bilder als RGB24 ausgeben
 Output quality	JPEG2000Translator		Ausgabequalität

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3576934478
+1	russian	x-vnd.Haiku-HaikuDepot	1023229167
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -84,6 +84,7 @@ No, quit HaikuDepot	App		Нет, выйти из HaikuDepot
 Authentication failed	UserLoginWindow		Авторизация завершилась неудачно
 Logged in as %User%	MainWindow		Выполнен вход под пользователем %User%
 Language	RatePackageWindow		Язык
+Size	PackageListView		Размер
 Failed to create or update rating: %s\n	RatePackageWindow		Не удалось создать или изменить рейтинг: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Вы должны войти в свою учётную запись перед тем как оценить пакет.
  It responded with: 	RatePackageWindow		 Он ответил так: 

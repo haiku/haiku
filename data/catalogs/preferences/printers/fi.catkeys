@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PRNT	2674539197
+1	finnish	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tulostin: %printer_name%\nAjuri:   %driver%\n
 Waiting	JobListView		Odotetaan
 Print test page	PrintersWindow		Tulosta testisivu
@@ -30,7 +30,6 @@ Blue	TestPageView		Sininen
 1 pending job.	PrinterListView		1 odottava työ.
 Remove	PrintersWindow		Poista
 <pick one>	AddPrinterDialog		<poimi yksi>
-Add …	PrintersWindow		Lisää ...
 Print jobs for 	PrintersWindow		Tulosta työt tulostimelle 
 Failed	JobListView		Epäonnistui
 %.2f KB	JobListView		%.2f kilotavua

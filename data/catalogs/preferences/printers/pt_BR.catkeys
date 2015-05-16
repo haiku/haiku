@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-PRNT	2674539197
+1	portuguese (brazil)	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impressora: %printer_name%\nDriver: %driver%\n
 Waiting	JobListView		Aguardando
 Print test page	PrintersWindow		Imprimir página de teste
@@ -30,7 +30,6 @@ Blue	TestPageView		Azul
 1 pending job.	PrinterListView		1 tarefa pendente.
 Remove	PrintersWindow		Remover
 <pick one>	AddPrinterDialog		<escolha uma>
-Add …	PrintersWindow		Adicionar ...
 Print jobs for 	PrintersWindow		Tarefas de impressão para
 Failed	JobListView		Falhou
 %.2f KB	JobListView		%.2fb KB

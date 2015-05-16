@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-PRNT	2674539197
+1	spanish; castilian	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impresora: %printer_name%\nControlador: %driver%\n
 Waiting	JobListView		Espera
 Print test page	PrintersWindow		Página de impresión de prueba
@@ -30,7 +30,6 @@ Blue	TestPageView		Azul
 1 pending job.	PrinterListView		1 Trabajo pendiente
 Remove	PrintersWindow		Eliminar
 <pick one>	AddPrinterDialog		<elegir uno >
-Add …	PrintersWindow		Añadir ...
 Print jobs for 	PrintersWindow		Trabajos de impresión para
 Failed	JobListView		Fallado
 %.2f KB	JobListView		%.2f KB

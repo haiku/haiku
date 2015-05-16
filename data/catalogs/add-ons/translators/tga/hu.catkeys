@@ -1,4 +1,5 @@
-1	hungarian	x-vnd.Haiku-TGATranslator	3952259621
+1	hungarian	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		RLE tömörítéssel való mentés
 Targa image (%d bits truecolor)	TGATranslator		Targa kép (%d bites trucolor)
 Ignore TGA alpha channel	TGAView		TGA alfa csatorna figyelmen kívül hagyása
 Targa image (%d bits colormap)	TGATranslator		Targa kép (%d bites színtérkép)

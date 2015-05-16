@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-JPEGTranslator	965709535
+1	hungarian	x-vnd.Haiku-JPEGTranslator	3788699631
 Output quality	JPEGTranslator		Kimeneti minőség
 JPEG images	JPEGTranslator		JPEG kép
 Prevent colors 'washing out'	JPEGTranslator		Elmosódott színek megelőzése
@@ -15,6 +15,7 @@ Output smoothing strength	JPEGTranslator		Kimeneti simítás erőssége
 High	JPEGTranslator		Magas
 Write	JPEGTranslator		Írás
 Write black-and-white images as RGB24	JPEGTranslator		Fekete-fehér képek írása RGB24-ként
+Version %d.%d.%d	JPEGTranslator		Verzió: %d.%d.%d, %s
 Read greyscale images as RGB32	JPEGTranslator		Szürkeárnyalatos képek olvasása RGB32-ként
 Read	JPEGTranslator		Olvasás
 JPEG Library Warning: %s\n	be_jerror		JPEG funkciótár figyelmeztetés: %s\n
