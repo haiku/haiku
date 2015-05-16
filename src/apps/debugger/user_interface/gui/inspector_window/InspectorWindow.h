@@ -46,6 +46,9 @@ public:
 	virtual	void				ThreadStateChanged(
 									const Team::ThreadEvent& event);
 
+	virtual	void				MemoryChanged(
+									const Team::MemoryChangedEvent& event);
+
 	// TeamMemoryBlock::Listener
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);
 	virtual void				MemoryBlockRetrievalFailed(
@@ -79,6 +82,12 @@ private:
 	void						_SetToAddress(target_addr_t address);
 	void						_SetCurrentBlock(TeamMemoryBlock* block);
 
+	void						_SetEditMode(bool enabled);
+
+	bool						_GetWritableState() const;
+
+	void						_UpdateWritableOptions();
+
 	void						_UpdateWritableIndicator();
 	const char*					_GetCurrentWritableIndicator() const;
 
@@ -92,6 +101,9 @@ private:
 	MemoryView*					fMemoryView;
 	BButton*					fPreviousBlockButton;
 	BButton*					fNextBlockButton;
+	BButton*					fEditBlockButton;
+	BButton*					fCommitBlockButton;
+	BButton*					fRevertBlockButton;
 	TeamMemoryBlock*			fCurrentBlock;
 	target_addr_t				fCurrentAddress;
 	::Team*						fTeam;

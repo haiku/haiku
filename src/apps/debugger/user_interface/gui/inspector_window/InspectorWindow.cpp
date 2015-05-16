@@ -30,7 +30,10 @@
 enum {
 	MSG_NAVIGATE_PREVIOUS_BLOCK 		= 'npbl',
 	MSG_NAVIGATE_NEXT_BLOCK				= 'npnl',
-	MSG_MEMORY_BLOCK_RETRIEVED			= 'mbre'
+	MSG_MEMORY_BLOCK_RETRIEVED			= 'mbre',
+	MSG_EDIT_CURRENT_BLOCK				= 'mecb',
+	MSG_COMMIT_MODIFIED_BLOCK			= 'mcmb',
+	MSG_REVERT_MODIFIED_BLOCK			= 'mrmb'
 };
 
 
@@ -169,6 +172,12 @@ InspectorWindow::_Init()
 			.Add(fWritableBlockIndicator = new BStringView("writableIndicator",
 				_GetCurrentWritableIndicator()))
 			.AddGlue()
+			.Add(fEditBlockButton = new BButton("editBlock", "Edit",
+				new BMessage(MSG_EDIT_CURRENT_BLOCK)))
+			.Add(fCommitBlockButton = new BButton("commitBlock", "Commit",
+				new BMessage(MSG_COMMIT_MODIFIED_BLOCK)))
+			.Add(fRevertBlockButton = new BButton("revertBlock", "Revert",
+				new BMessage(MSG_REVERT_MODIFIED_BLOCK)))
 		.End()
 	.End();
 
@@ -186,6 +195,14 @@ InspectorWindow::_Init()
 	fNextBlockButton->SetTarget(this);
 	fPreviousBlockButton->SetEnabled(false);
 	fNextBlockButton->SetEnabled(false);
+
+	fEditBlockButton->SetTarget(this);
+	fCommitBlockButton->SetTarget(this);
+	fRevertBlockButton->SetTarget(this);
+
+	fEditBlockButton->SetEnabled(false);
+	fCommitBlockButton->Hide();
+	fRevertBlockButton->Hide();
 
 	hexMenu->SetLabelFromMarked(true);
 	hexMenu->SetTargetForItems(fMemoryView);
@@ -325,6 +342,43 @@ InspectorWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case MSG_EDIT_CURRENT_BLOCK:
+		{
+			_SetEditMode(true);
+			break;
+		}
+		case MSG_MEMORY_DATA_CHANGED:
+		{
+			if (fCurrentBlock == NULL)
+				break;
+
+			target_addr_t address;
+			if (message->FindUInt64("address", &address) == B_OK
+				&& address >= fCurrentBlock->BaseAddress()
+				&& address < fCurrentBlock->BaseAddress()
+					+ fCurrentBlock->Size()) {
+				fCurrentBlock->Invalidate();
+				_SetEditMode(false);
+				fListener->InspectRequested(address, this);
+			}
+			break;
+		}
+		case MSG_COMMIT_MODIFIED_BLOCK:
+		{
+			// TODO: this could conceivably be extended to detect the
+			// individual modified regions and only write those back.
+			// That would require potentially submitting multiple separate
+			// write requests, and thus require tracking all the writes being
+			// waited upon for completion.
+			fListener->MemoryWriteRequested(fCurrentBlock->BaseAddress(),
+				fMemoryView->GetEditedData(), fCurrentBlock->Size());
+			break;
+		}
+		case MSG_REVERT_MODIFIED_BLOCK:
+		{
+			_SetEditMode(false);
+			break;
+		}
 		default:
 		{
 			BWindow::MessageReceived(message);
@@ -354,6 +408,17 @@ InspectorWindow::ThreadStateChanged(const Team::ThreadEvent& event)
 
 	if (PostMessage(&message) == B_OK)
 		threadReference.Detach();
+}
+
+
+void
+InspectorWindow::MemoryChanged(const Team::MemoryChangedEvent& event)
+{
+	BMessage message(MSG_MEMORY_DATA_CHANGED);
+	message.AddUInt64("address", event.GetTargetAddress());
+	message.AddUInt64("size", event.GetSize());
+
+	PostMessage(&message);
 }
 
 
@@ -563,6 +628,53 @@ InspectorWindow::_SetCurrentBlock(TeamMemoryBlock* block)
 
 	fCurrentBlock = block;
 	fMemoryView->SetTargetAddress(fCurrentBlock, fCurrentAddress);
+	_UpdateWritableOptions();
+}
+
+
+bool
+InspectorWindow::_GetWritableState() const
+{
+	return fCurrentBlock != NULL ? fCurrentBlock->IsWritable() : false;
+}
+
+
+void
+InspectorWindow::_SetEditMode(bool enabled)
+{
+	if (enabled == fMemoryView->GetEditMode())
+		return;
+
+	status_t error = fMemoryView->SetEditMode(enabled);
+	if (error != B_OK)
+		return;
+
+	if (enabled) {
+		fEditBlockButton->Hide();
+		fCommitBlockButton->Show();
+		fRevertBlockButton->Show();
+	} else {
+		fEditBlockButton->Show();
+		fCommitBlockButton->Hide();
+		fRevertBlockButton->Hide();
+	}
+
+	fHexMode->SetEnabled(!enabled);
+	fEndianMode->SetEnabled(!enabled);
+
+	// while the block is being edited, disable block navigation controls.
+	fAddressInput->SetEnabled(!enabled);
+	fPreviousBlockButton->SetEnabled(!enabled);
+	fNextBlockButton->SetEnabled(!enabled);
+
+	InvalidateLayout();
+}
+
+
+void
+InspectorWindow::_UpdateWritableOptions()
+{
+	fEditBlockButton->SetEnabled(_GetWritableState());
 	_UpdateWritableIndicator();
 }
 
