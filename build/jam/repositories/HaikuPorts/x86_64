@@ -159,8 +159,8 @@ RemotePackageRepository HaikuPorts
 	libusb_devel-1.0.19-2
 	libusb_compat-0.1.5-2
 	libusb_compat_devel-0.1.5-2
-	libvorbis-1.3.5-1
-	libvorbis_devel-1.3.5-1
+	libvorbis-1.3.5-2
+	libvorbis_devel-1.3.5-2
 	libvpx-1.0.0-2
 	libvpx_devel-1.0.0-2
 	libwebp-0.4.1-1
@@ -171,6 +171,8 @@ RemotePackageRepository HaikuPorts
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
 	llvm-3.5.2-1
+	lua-5.2.3-2
+	lua_devel-5.2.3-2
 	lz4-r117-1
 	lz4_devel-r117-1
 	lzo-2.09-1
@@ -215,10 +217,16 @@ RemotePackageRepository HaikuPorts
 	ruby-1.9.1-2
 	ruby_devel-1.9.1-2
 	scons-2.3.1-4
+	sdl_gfx-2.0.25-2
+	sdl_gfx_devel-2.0.25-2
+	sdl_image-1.2.12-5
+	sdl_image_devel-1.2.12-5
 	sed-4.2.1-6
 	serf-1.3.7-1
 	serf_devel-1.3.7-1
 	sharutils-4.14-1
+	smpeg-0.4.5-4
+	smpeg_devel-0.4.5-4
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
 	sqlite-3.8.10.0-1
@@ -336,6 +344,7 @@ RemotePackageRepository HaikuPorts
 	libxml2
 	libxslt
 	llvm
+	lua
 	lz4
 	lzo
 	m4
@@ -367,9 +376,12 @@ RemotePackageRepository HaikuPorts
 	readline
 	ruby
 	scons
+	sdl_gfx
+	sdl_image
 	sed
 	serf
 	sharutils
+	smpeg
 	speex
 	sqlite
 	subversion
