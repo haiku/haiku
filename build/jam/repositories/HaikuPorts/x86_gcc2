@@ -557,7 +557,7 @@ RemotePackageRepository HaikuPorts
 	gcc_x86-4.8.4_2014_12_21-1
 	gcc_x86_syslibs-4.8.4_2014_12_21-1
 	gcc_x86_syslibs_devel-4.8.4_2014_12_21-1
-	gcc6809_x86-4.6.1-1
+	gcc6809_x86-4.6.1-2
 	gettext_x86-0.18.1.1-6
 	gettext_x86_libintl-0.18.1.1-6
 	giflib_x86-5.1.0-1
@@ -682,7 +682,7 @@ RemotePackageRepository HaikuPorts
 	lmms_x86-1.2.0_git-1
 	luajit_x86-2.0.2-2
 	luajit_x86_devel-2.0.2-2
-	lwtools_x86-4.10-1
+	lwtools_x86-4.10-2
 	lzip_x86-1.16-1
 	lzo_x86-2.09-1
 	lzo_x86_devel-2.09-1
