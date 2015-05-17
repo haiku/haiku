@@ -8,6 +8,7 @@
 
 #include <algorithm>
 
+#include <ctype.h>
 #include <stdio.h>
 
 #include <ByteOrder.h>
@@ -29,7 +30,7 @@
 
 
 enum {
-	MSG_TARGET_ADDRESS_CHANGED = 'mtac',
+	MSG_TARGET_ADDRESS_CHANGED	= 'mtac',
 	MSG_VIEW_AUTOSCROLL			= 'mvas'
 };
 
@@ -42,7 +43,11 @@ MemoryView::MemoryView(::Team* team, Listener* listener)
 		| B_SUBPIXEL_PRECISE),
 	fTeam(team),
 	fTargetBlock(NULL),
+	fEditableData(NULL),
+	fEditedOffsets(),
 	fTargetAddress(0LL),
+	fEditMode(false),
+	fEditLowNybble(false),
 	fCharWidth(0.0),
 	fLineHeight(0.0),
 	fTextCharsPerLine(0),
@@ -67,6 +72,8 @@ MemoryView::~MemoryView()
 {
 	if (fTargetBlock != NULL)
 		fTargetBlock->ReleaseReference();
+
+	delete[] fEditableData;
 }
 
 
@@ -111,6 +118,32 @@ MemoryView::UnsetListener()
 }
 
 
+status_t
+MemoryView::SetEditMode(bool enabled)
+{
+	if (fTargetBlock == NULL)
+		return B_BAD_VALUE;
+	else if (fEditMode == enabled)
+		return B_OK;
+
+	if (enabled) {
+		status_t error = _SetupEditableData();
+		if (error != B_OK)
+			return error;
+	} else {
+		delete[] fEditableData;
+		fEditableData = NULL;
+		fEditedOffsets.clear();
+		fEditLowNybble = false;
+	}
+
+	fEditMode = enabled;
+	Invalidate();
+
+	return B_OK;
+}
+
+
 void
 MemoryView::AttachedToWindow()
 {
@@ -148,13 +181,15 @@ MemoryView::Draw(BRect rect)
 	char buffer[32];
 	char textbuffer[512];
 
+	const char* dataSource = (const char*)(fEditMode ? fEditableData
+			: fTargetBlock->Data());
+
 	int32 startLine = int32(rect.top / fLineHeight);
-	const char* currentAddress = (const char*)(fTargetBlock->Data()
-		+ fHexBlocksPerLine * blockByteSize * startLine);
-	const char* maxAddress = (const char*)(fTargetBlock->Data()
-		+ fTargetBlock->Size());
-	const char* targetAddress = (const char *)fTargetBlock->Data()
-		+ fTargetAddress - fTargetBlock->BaseAddress();
+	const char* currentAddress = dataSource + fHexBlocksPerLine
+		* blockByteSize * startLine;
+	const char* maxAddress = dataSource + fTargetBlock->Size();
+	const char* targetAddress = dataSource + fTargetAddress
+		- fTargetBlock->BaseAddress();
 	BPoint drawPoint(1.0, (startLine + 1) * fLineHeight);
 	int32 currentBlocksPerLine = fHexBlocksPerLine;
 	int32 currentCharsPerLine = fTextCharsPerLine;
@@ -164,6 +199,8 @@ MemoryView::Draw(BRect rect)
 	GetFontHeight(&fh);
 	target_addr_t lineAddress = fTargetBlock->BaseAddress() + startLine
 		* currentCharsPerLine;
+	bool highlightBlock = false;
+	rgb_color highlightColor;
 	for (; currentAddress < maxAddress && drawPoint.y < rect.bottom
 		+ fLineHeight; drawPoint.y += fLineHeight) {
 		drawPoint.x = 1.0;
@@ -186,14 +223,34 @@ MemoryView::Draw(BRect rect)
 				const char* blockAddress = currentAddress + (j
 					* blockByteSize);
 				_GetNextHexBlock(buffer, sizeof(buffer), blockAddress);
-				if (targetAddress >= blockAddress && targetAddress <
+
+				highlightBlock = false;
+				if (fEditMode)
+				{
+					int32 offset = blockAddress - dataSource;
+					for (uint32 i = 0; i < blockByteSize; i++) {
+						if (fEditedOffsets.count(offset + i) != 0) {
+							highlightBlock = true;
+							highlightColor.set_to(0, 216, 0);
+							break;
+						}
+					}
+
+				} else if (targetAddress >= blockAddress && targetAddress <
 						blockAddress + blockByteSize) {
+						highlightBlock = true;
+						highlightColor.set_to(216, 0, 0);
+				}
+
+				if (highlightBlock) {
 					PushState();
-					SetHighColor(make_color(216,0,0));
-					DrawString(buffer, drawPoint);
+					SetHighColor(highlightColor);
+				}
+
+				DrawString(buffer, drawPoint);
+
+				if (highlightBlock)
 					PopState();
-				} else
-					DrawString(buffer, drawPoint);
 
 				drawPoint.x += fCharWidth * hexBlockSize;
 			}
@@ -248,6 +305,16 @@ MemoryView::Draw(BRect rect)
 		FillRegion(&selectionRegion, B_SOLID_HIGH);
 		PopState();
 	}
+
+	if (fEditMode) {
+		PushState();
+		BRect caretRect;
+		_GetEditCaretRect(caretRect);
+		SetDrawingMode(B_OP_INVERT);
+		FillRect(caretRect, B_SOLID_HIGH);
+		PopState();
+
+	}
 }
 
 
@@ -286,12 +353,22 @@ MemoryView::KeyDown(const char* bytes, int32 numBytes)
 			}
 			case B_LEFT_ARROW:
 			{
-				newAddress -= blockSize;
+				if (fEditMode) {
+					if (!fEditLowNybble)
+						newAddress--;
+					fEditLowNybble = !fEditLowNybble;
+				} else
+					newAddress -= blockSize;
 				break;
 			}
 			case B_RIGHT_ARROW:
 			{
-				newAddress += blockSize;
+				if (fEditMode) {
+					if (fEditLowNybble)
+						newAddress++;
+					fEditLowNybble = !fEditLowNybble;
+				} else
+					newAddress += blockSize;
 				break;
 			}
 			case B_PAGE_UP:
@@ -307,19 +384,59 @@ MemoryView::KeyDown(const char* bytes, int32 numBytes)
 			case B_HOME:
 			{
 				newAddress = fTargetBlock->BaseAddress();
+				fEditLowNybble = false;
 				break;
 			}
 			case B_END:
 			{
 				newAddress = maxAddress;
+				fEditLowNybble = true;
 				break;
 			}
 			default:
 			{
-				handled = false;
+				if (fEditMode && isxdigit(bytes[0]))
+				{
+					int value = 0;
+					if (isdigit(bytes[0]))
+						value = bytes[0] - '0';
+					else
+						value = (int)strtol(bytes, NULL, 16);
+
+					int32 byteOffset = fTargetAddress
+						- fTargetBlock->BaseAddress();
+
+					if (fEditLowNybble)
+						value = (fEditableData[byteOffset] & 0xf0) | value;
+					else {
+						value = (fEditableData[byteOffset] & 0x0f)
+							| (value << 4);
+					}
+
+					fEditableData[byteOffset] = value;
+
+					if (fEditableData[byteOffset]
+						!= fTargetBlock->Data()[byteOffset]) {
+						fEditedOffsets.insert(byteOffset);
+					} else
+						fEditedOffsets.erase(byteOffset);
+
+					if (fEditLowNybble) {
+						if (newAddress < maxAddress) {
+							newAddress++;
+							fEditLowNybble = false;
+						}
+					} else
+						fEditLowNybble = true;
+
+					Invalidate();
+				} else
+					handled = false;
+
 				break;
 			}
 		}
+
 		if (handled) {
 			if (newAddress < fTargetBlock->BaseAddress())
 				newAddress = fTargetAddress;
@@ -370,11 +487,21 @@ MemoryView::MessageReceived(BMessage* message)
 		}
 		case MSG_SET_HEX_MODE:
 		{
+			// while editing, hex view changes are disallowed.
+			if (fEditMode)
+				break;
+
 			int32 mode;
 			if (message->FindInt32("mode", &mode) == B_OK) {
+				if (fHexMode == mode)
+					break;
+
 				fHexMode = mode;
 				_RecalcScrollBars();
 				Invalidate();
+
+				if (fListener != NULL)
+					fListener->HexModeChanged(mode);
 			}
 			break;
 		}
@@ -382,8 +509,14 @@ MemoryView::MessageReceived(BMessage* message)
 		{
 			int32 mode;
 			if (message->FindInt32("mode", &mode) == B_OK) {
+				if (fCurrentEndianMode == mode)
+					break;
+
 				fCurrentEndianMode = mode;
 				Invalidate();
+
+				if (fListener != NULL)
+					fListener->EndianModeChanged(mode);
 			}
 			break;
 		}
@@ -391,9 +524,15 @@ MemoryView::MessageReceived(BMessage* message)
 		{
 			int32 mode;
 			if (message->FindInt32("mode", &mode) == B_OK) {
+				if (fTextMode == mode)
+					break;
+
 				fTextMode = mode;
 				_RecalcScrollBars();
 				Invalidate();
+
+				if (fListener != NULL)
+					fListener->TextModeChanged(mode);
 			}
 			break;
 		}
@@ -593,7 +732,7 @@ MemoryView::_RecalcScrollBars()
 
 void
 MemoryView::_GetNextHexBlock(char* buffer, int32 bufferSize,
-	const char* address)
+	const char* address) const
 {
 	switch(fHexMode) {
 		case HexMode8BitInt:
@@ -765,7 +904,25 @@ MemoryView::_GetAddressDisplayWidth() const
 
 
 void
-MemoryView::_GetSelectionRegion(BRegion& region)
+MemoryView::_GetEditCaretRect(BRect& rect) const
+{
+	if (!fEditMode)
+		return;
+
+	int32 byteOffset = fTargetAddress - fTargetBlock->BaseAddress();
+	BPoint point = _GetPointForOffset(byteOffset);
+	if (fEditLowNybble)
+		point.x += fCharWidth;
+
+	rect.left = point.x;
+	rect.right = point.x + fCharWidth;
+	rect.top = point.y;
+	rect.bottom = point.y + fLineHeight;
+}
+
+
+void
+MemoryView::_GetSelectionRegion(BRegion& region) const
 {
 	if (fHexMode == HexModeNone || fTargetBlock == NULL)
 		return;
@@ -812,14 +969,15 @@ MemoryView::_GetSelectionRegion(BRegion& region)
 
 
 void
-MemoryView::_GetSelectedText(BString& text)
+MemoryView::_GetSelectedText(BString& text) const
 {
 	if (fSelectionStart == fSelectionEnd)
 		return;
 
 	text.Truncate(0);
+	const uint8* dataSource = fEditMode ? fEditableData : fTargetBlock->Data();
 
-	char* data = (char *)fTargetBlock->Data() + fSelectionStart;
+	const char* data = (const char *)dataSource + fSelectionStart;
 	int16 blockSize = _GetHexDigitsPerBlock() / 2;
 	int32 count = (fSelectionEnd - fSelectionStart)
 		/ blockSize;
@@ -956,6 +1114,27 @@ MemoryView::_HandleContextMenu(BPoint point)
 	BRect mouseRect(screenWhere, screenWhere);
 	mouseRect.InsetBy(-4.0, -4.0);
 	menu->Go(screenWhere, true, false, mouseRect, true);
+}
+
+
+status_t
+MemoryView::_SetupEditableData()
+{
+	fEditableData = new(std::nothrow) uint8[fTargetBlock->Size()];
+	if (fEditableData == NULL)
+		return B_NO_MEMORY;
+
+	memcpy(fEditableData, fTargetBlock->Data(), fTargetBlock->Size());
+
+	if (fHexMode != HexMode8BitInt) {
+		fHexMode = HexMode8BitInt;
+		if (fListener != NULL)
+			fListener->HexModeChanged(fHexMode);
+
+		_RecalcScrollBars();
+	}
+
+	return B_OK;
 }
 
 
