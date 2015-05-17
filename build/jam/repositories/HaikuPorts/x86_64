@@ -110,6 +110,8 @@ RemotePackageRepository HaikuPorts
 	jpeg_devel-9-3
 	jpeg_tools-9-3
 	keymapswitcher-1.2.7.10-1
+	lcms-2.7-1
+	lcms_devel-2.7-1
 	less-451-4
 	libassuan-2.2.0-1
 	libassuan_devel-2.2.0-1
@@ -304,6 +306,7 @@ RemotePackageRepository HaikuPorts
 	jpeg
 	help2man
 	keymapswitcher
+	lcms
 	less
 	libassuan
 	libedit
