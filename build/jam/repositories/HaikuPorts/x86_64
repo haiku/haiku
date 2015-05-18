@@ -39,6 +39,8 @@ RemotePackageRepository HaikuPorts
 	cvs-1.12.13.1-6
 	doxygen-1.6.3-4
 	dtc-1.4.1-1
+	enca-1.15-1
+	enca_devel-1.15-1
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
 	file-5.15-1
@@ -113,6 +115,8 @@ RemotePackageRepository HaikuPorts
 	lcms-2.7-1
 	lcms_devel-2.7-1
 	less-451-4
+	libass-0.12.2-1
+	libass_devel-0.12.2-1
 	libassuan-2.2.0-1
 	libassuan_devel-2.2.0-1
 	libedit-2012_06_01_3.0-1
@@ -277,6 +281,7 @@ RemotePackageRepository HaikuPorts
 	cvs
 	doxygen
 	dtc
+	enca
 	expat
 	file
 	findutils
@@ -316,6 +321,7 @@ RemotePackageRepository HaikuPorts
 	keymapswitcher
 	lcms
 	less
+	libass
 	libassuan
 	libedit
 	libevent
