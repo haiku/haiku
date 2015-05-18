@@ -1072,9 +1072,10 @@ dosfs_remove_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 	if (find_vnid_in_vcache(vol, node->vnid) == B_OK)
 		remove_from_vcache(vol, node->vnid);
 
-	/* and from the dlist as well */
-	if (node->mode & FAT_SUBDIR)
-		dlist_remove(vol, node->vnid);
+	/* at this point, the node shouldn't be in the dlist anymore */
+	if ((node->mode & FAT_SUBDIR) != 0) {
+		ASSERT(dlist_find(vol, CLUSTER_OF_DIR_CLUSTER_VNID(node->vnid)) == -1);
+	}
 
 	free(node);
 
@@ -1173,6 +1174,9 @@ do_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name, bool is_file)
 	 * here on.
 	 */
 	vcache_set_entry(vol, file->vnid, generate_unique_vnid(vol));
+
+	if (!is_file)
+		dlist_remove(vol, file->vnid);
 
 	// fsil doesn't call dosfs_write_vnode for us, so we have to free the
 	// vnode manually here.
