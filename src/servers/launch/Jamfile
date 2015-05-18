@@ -1,11 +1,17 @@
 SubDir HAIKU_TOP src servers launch ;
 
-UsePrivateHeaders app shared ;
+UsePrivateHeaders app package shared storage support ;
 UsePrivateSystemHeaders ;
 
 Server launch_daemon
 	:
 	LaunchDaemon.cpp
+
+	# init jobs
+	AbstractEmptyDirectoryJob.cpp
+	InitRealTimeClockJob.cpp
+	InitSharedMemoryDirectoryJob.cpp
+	InitTemporaryDirectoryJob.cpp
 	:
 	be libshared.a [ TargetLibstdc++ ]
 	:

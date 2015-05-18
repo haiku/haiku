@@ -13,6 +13,7 @@
 #include <Directory.h>
 #include <driver_settings.h>
 #include <Entry.h>
+#include <File.h>
 #include <ObjectList.h>
 #include <Path.h>
 #include <PathFinder.h>
@@ -20,11 +21,18 @@
 
 #include <AppMisc.h>
 #include <DriverSettingsMessageAdapter.h>
+#include <JobQueue.h>
 #include <LaunchDaemonDefs.h>
 #include <syscalls.h>
 
+#include "InitRealTimeClockJob.h"
+#include "InitSharedMemoryDirectoryJob.h"
+#include "InitTemporaryDirectoryJob.h"
+
 
 using namespace BPrivate;
+using namespace BSupportKit;
+using BSupportKit::BPrivate::JobQueue;
 
 
 static const char* kLaunchDirectory = "launch";
@@ -127,11 +135,16 @@ private:
 			void				_InitJobs();
 			void				_LaunchJobs();
 
+			void				_RetrieveKernelOptions();
 			void				_SetupEnvironment();
+			void				_InitSystem();
+
 			bool				_IsSafeMode() const;
 
 private:
 			JobMap				fJobs;
+			JobQueue			fJobQueue;
+			bool				fSafeMode;
 };
 
 
@@ -410,7 +423,9 @@ LaunchDaemon::~LaunchDaemon()
 void
 LaunchDaemon::ReadyToRun()
 {
+	_RetrieveKernelOptions();
 	_SetupEnvironment();
+	_InitSystem();
 
 	BStringList paths;
 	BPathFinder::FindPaths(B_FIND_PATH_DATA_DIRECTORY, kLaunchDirectory,
@@ -609,29 +624,52 @@ LaunchDaemon::_LaunchJobs()
 
 
 void
-LaunchDaemon::_SetupEnvironment()
-{
-	// Determine safemode kernel option
-	BString safemode = "SAFEMODE=";
-	safemode << _IsSafeMode() ? "yes" : "no";
-}
-
-
-bool
-LaunchDaemon::_IsSafeMode() const
+LaunchDaemon::_RetrieveKernelOptions()
 {
 	char buffer[32];
 	size_t size = sizeof(buffer);
 	status_t status = _kern_get_safemode_option(B_SAFEMODE_SAFE_MODE, buffer,
 		&size);
 	if (status == B_OK) {
-		return !strncasecmp(buffer, "true", size)
+		fSafeMode = !strncasecmp(buffer, "true", size)
 			|| !strncasecmp(buffer, "yes", size)
 			|| !strncasecmp(buffer, "on", size)
 			|| !strncasecmp(buffer, "enabled", size);
-	}
+	} else
+		fSafeMode = false;
+}
 
-	return false;
+
+void
+LaunchDaemon::_SetupEnvironment()
+{
+	// Determine safemode kernel option
+	BString safemode = "SAFEMODE=";
+	safemode << _IsSafeMode() ? "yes" : "no";
+
+	putenv(safemode.String());
+}
+
+
+/*!	Basic system initialization that must happen before any jobs are launched.
+*/
+void
+LaunchDaemon::_InitSystem()
+{
+	fJobQueue.AddJob(new InitRealTimeClockJob());
+	fJobQueue.AddJob(new InitSharedMemoryDirectoryJob());
+	fJobQueue.AddJob(new InitTemporaryDirectoryJob());
+
+	// TODO: these should be done in parallel
+	while (BJob* job = fJobQueue.Pop())
+		job->Run();
+}
+
+
+bool
+LaunchDaemon::_IsSafeMode() const
+{
+	return fSafeMode;
 }
 
 
@@ -647,6 +685,7 @@ main()
 	if (fd != STDOUT_FILENO)
 		dup2(fd, STDOUT_FILENO);
 	puts("launch_daemon is alive and kicking.");
+	fflush(stdout);
 
 	status_t status;
 	LaunchDaemon* daemon = new LaunchDaemon(status);
