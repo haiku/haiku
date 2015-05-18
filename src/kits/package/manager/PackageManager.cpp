@@ -364,7 +364,7 @@ BPackageManager::InstallationRepository()
 
 
 void
-BPackageManager::JobStarted(BJob* job)
+BPackageManager::JobStarted(BSupportKit::BJob* job)
 {
 	if (dynamic_cast<FetchFileJob*>(job) != NULL) {
 		FetchFileJob* fetchJob = (FetchFileJob*)job;
@@ -378,7 +378,7 @@ BPackageManager::JobStarted(BJob* job)
 
 
 void
-BPackageManager::JobProgress(BJob* job)
+BPackageManager::JobProgress(BSupportKit::BJob* job)
 {
 	if (dynamic_cast<FetchFileJob*>(job) != NULL) {
 		FetchFileJob* fetchJob = (FetchFileJob*)job;
@@ -390,7 +390,7 @@ BPackageManager::JobProgress(BJob* job)
 
 
 void
-BPackageManager::JobSucceeded(BJob* job)
+BPackageManager::JobSucceeded(BSupportKit::BJob* job)
 {
 	if (dynamic_cast<FetchFileJob*>(job) != NULL) {
 		FetchFileJob* fetchJob = (FetchFileJob*)job;

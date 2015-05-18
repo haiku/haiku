@@ -7,17 +7,17 @@
 #define JOB_STATE_LISTENER_H
 
 
-#include <package/Job.h>
+#include <Job.h>
 
 
-class JobStateListener : public BPackageKit::BJobStateListener {
+class JobStateListener : public BSupportKit::BJobStateListener {
 public:
 								JobStateListener();
 
-	virtual	void				JobStarted(BPackageKit::BJob* job);
-	virtual	void				JobSucceeded(BPackageKit::BJob* job);
-	virtual	void				JobFailed(BPackageKit::BJob* job);
-	virtual	void				JobAborted(BPackageKit::BJob* job);
+	virtual	void				JobStarted(BSupportKit::BJob* job);
+	virtual	void				JobSucceeded(BSupportKit::BJob* job);
+	virtual	void				JobFailed(BSupportKit::BJob* job);
+	virtual	void				JobAborted(BSupportKit::BJob* job);
 };
 
 

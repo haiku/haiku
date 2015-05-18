@@ -53,7 +53,7 @@ PackageManager::SetInteractive(bool interactive)
 
 
 void
-PackageManager::JobFailed(BJob* job)
+PackageManager::JobFailed(BSupportKit::BJob* job)
 {
 	BString error = job->ErrorString();
 	if (error.Length() > 0) {
@@ -64,7 +64,7 @@ PackageManager::JobFailed(BJob* job)
 
 
 void
-PackageManager::JobAborted(BJob* job)
+PackageManager::JobAborted(BSupportKit::BJob* job)
 {
 	DIE(job->Result(), "aborted");
 }

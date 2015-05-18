@@ -29,6 +29,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DataPositionIOWrapper.cpp
 			DateTime.cpp
 			Flattenable.cpp
+			Job.cpp
+			JobQueue.cpp
 			List.cpp
 			Locker.cpp
 			PointerList.cpp

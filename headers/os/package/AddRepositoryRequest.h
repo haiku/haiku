@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__ADD_REPOSITORY_REQUEST_H_
@@ -36,7 +36,7 @@ public:
 
 protected:
 								// BJobStateListener
-	virtual	void				JobSucceeded(BJob* job);
+	virtual	void				JobSucceeded(BSupportKit::BJob* job);
 
 private:
 			BString				fRepositoryBaseURL;

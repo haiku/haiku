@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__CONTEXT_H_
@@ -10,10 +10,14 @@
 #include <String.h>
 
 
+namespace BSupportKit {
+	class BJobStateListener;
+}
+
+
 namespace BPackageKit {
 
 
-class BJobStateListener;
 namespace BPrivate {
 	class TempfileManager;
 }
@@ -37,7 +41,8 @@ struct BDecisionProvider {
 class BContext {
 public:
 								BContext(BDecisionProvider& decisionProvider,
-									BJobStateListener& jobStateListener);
+									BSupportKit::BJobStateListener&
+										jobStateListener);
 								~BContext();
 
 			status_t			InitCheck() const;
@@ -46,13 +51,13 @@ public:
 									BEntry* entry) const;
 
 			BDecisionProvider&	DecisionProvider() const;
-			BJobStateListener&	JobStateListener() const;
+			BSupportKit::BJobStateListener&	JobStateListener() const;
 
 private:
 			status_t			_Initialize();
 
 			BDecisionProvider&	fDecisionProvider;
-			BJobStateListener&	fJobStateListener;
+			BSupportKit::BJobStateListener&	fJobStateListener;
 			status_t			fInitStatus;
 
 	mutable	BPrivate::TempfileManager*	fTempfileManager;

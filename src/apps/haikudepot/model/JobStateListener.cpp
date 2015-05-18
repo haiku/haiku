@@ -8,7 +8,7 @@
 #include "JobStateListener.h"
 
 
-using BPackageKit::BJob;
+using BSupportKit::BJob;
 
 
 JobStateListener::JobStateListener()

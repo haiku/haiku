@@ -363,14 +363,14 @@ PackageManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 
 
 void
-PackageManager::JobFailed(BJob* job)
+PackageManager::JobFailed(BSupportKit::BJob* job)
 {
 // TODO:...
 }
 
 
 void
-PackageManager::JobAborted(BJob* job)
+PackageManager::JobAborted(BSupportKit::BJob* job)
 {
 // TODO:...
 }

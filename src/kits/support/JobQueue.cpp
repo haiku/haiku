@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,16 +7,17 @@
  */
 
 
-#include <package/JobQueue.h>
+#include <JobQueue.h>
 
 #include <set>
 
 #include <Autolock.h>
+#include <Job.h>
 
-#include <package/Job.h>
+#include <JobPrivate.h>
 
 
-namespace BPackageKit {
+namespace BSupportKit {
 
 namespace BPrivate {
 
@@ -26,11 +27,11 @@ struct JobQueue::JobPriorityLess {
 };
 
 
-// sort jobs by:
-//     1. descending count of dependencies (only jobs without dependencies are
-//        runnable)
-//     2. job ticket number (order in which jobs were added to the queue)
-//
+/*!	Sort jobs by:
+		1. descending count of dependencies (only jobs without dependencies are
+		   runnable)
+		2. job ticket number (order in which jobs were added to the queue)
+*/
 bool
 JobQueue::JobPriorityLess::operator()(const BJob* left, const BJob* right) const
 {
@@ -86,7 +87,7 @@ JobQueue::AddJob(BJob* job)
 		} catch (...) {
 			return B_ERROR;
 		}
-		job->_SetTicketNumber(fNextTicketNumber++);
+		BJob::Private(*job).SetTicketNumber(fNextTicketNumber++);
 		job->AddStateListener(this);
 	}
 
@@ -108,7 +109,7 @@ JobQueue::RemoveJob(BJob* job)
 		} catch (...) {
 			return B_ERROR;
 		}
-		job->_ClearTicketNumber();
+		BJob::Private(*job).ClearTicketNumber();
 		job->RemoveStateListener(this);
 	}
 

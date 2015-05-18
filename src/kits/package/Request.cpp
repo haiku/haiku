@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,14 +11,15 @@
 
 #include <new>
 
+#include <JobQueue.h>
+
 #include <package/Context.h>
-#include <package/JobQueue.h>
 
 
 namespace BPackageKit {
 
 
-using BPrivate::JobQueue;
+using BSupportKit::BPrivate::JobQueue;
 
 
 BRequest::BRequest(const BContext& context)
@@ -42,7 +43,7 @@ BRequest::InitCheck() const
 }
 
 
-BJob*
+BSupportKit::BJob*
 BRequest::PopRunnableJob()
 {
 	if (fJobQueue == NULL)
@@ -63,7 +64,7 @@ BRequest::Process(bool failIfCanceledOnly)
 	if (error != B_OK)
 		return error;
 
-	while (BJob* job = PopRunnableJob()) {
+	while (BSupportKit::BJob* job = PopRunnableJob()) {
 		error = job->Run();
 		delete job;
 		if (error != B_OK) {
@@ -77,7 +78,7 @@ BRequest::Process(bool failIfCanceledOnly)
 
 
 status_t
-BRequest::QueueJob(BJob* job)
+BRequest::QueueJob(BSupportKit::BJob* job)
 {
 	if (fJobQueue == NULL)
 		return B_NO_INIT;

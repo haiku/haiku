@@ -1,18 +1,18 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _PACKAGE__PRIVATE__JOB_QUEUE_H_
-#define _PACKAGE__PRIVATE__JOB_QUEUE_H_
+#ifndef _SUPPORT_PRIVATE_JOB_QUEUE_H_
+#define _SUPPORT_PRIVATE_JOB_QUEUE_H_
 
 
 #include <Locker.h>
 #include <SupportDefs.h>
 
-#include <package/Job.h>
+#include <Job.h>
 
 
-namespace BPackageKit {
+namespace BSupportKit {
 
 namespace BPrivate {
 
@@ -60,7 +60,7 @@ private:
 
 }	// namespace BPrivate
 
-}	// namespace BPackageKit
+}	// namespace BSupportKit
 
 
-#endif // _PACKAGE__PRIVATE__JOB_QUEUE_H_
+#endif // _SUPPORT_PRIVATE_JOB_QUEUE_H_

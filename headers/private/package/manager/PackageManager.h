@@ -29,7 +29,7 @@
 
 namespace BPackageKit {
 
-	
+
 class BCommitTransactionResult;
 
 
@@ -42,7 +42,7 @@ using BPackageKit::BPrivate::BActivationTransaction;
 using BPackageKit::BPrivate::BDaemonClient;
 
 
-class BPackageManager : protected BJobStateListener {
+class BPackageManager : protected BSupportKit::BJobStateListener {
 public:
 			class RemoteRepository;
 			class LocalRepository;
@@ -118,9 +118,9 @@ protected:
 
 protected:
 			// BJobStateListener
-	virtual	void				JobStarted(BJob* job);
-	virtual	void				JobProgress(BJob* job);
-	virtual	void				JobSucceeded(BJob* job);
+	virtual	void				JobStarted(BSupportKit::BJob* job);
+	virtual	void				JobProgress(BSupportKit::BJob* job);
+	virtual	void				JobSucceeded(BSupportKit::BJob* job);
 
 private:
 			void				_HandleProblems();
