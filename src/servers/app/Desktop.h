@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -283,6 +283,8 @@ private:
 			void				_BringWindowsToFront(WindowList& windows,
 									int32 list, bool wereVisible);
 			Window*				_LastFocusSubsetWindow(Window* window);
+			bool				_CheckSendFakeMouseMoved(
+									const Window* lastWindowUnderMouse);
 			void				_SendFakeMouseMoved(Window* window = NULL);
 
 			Screen*				_DetermineScreenFor(BRect frame);
