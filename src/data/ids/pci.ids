@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.05.13
-#	Date:    2015-05-13 03:15:02
+#	Version: 2015.05.20
+#	Date:    2015-05-20 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -8801,11 +8801,14 @@
 		1849 0569  K10N78FullHD-hSLI R3.0 PCI Express Bridge
 	056a  MCP73 [nForce 630i] USB 2.0 Controller (EHCI)
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 	056c  MCP73 IDE
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	056d  MCP73 PCI Express bridge
 		1019 297a  MCP73PVT-SM
+		10de cb73  MCP73 PCIe x16 port
 	056e  MCP73 PCI Express bridge
 		1019 297a  MCP73PVT-SM
 	056f  MCP73 PCI Express bridge
@@ -9082,49 +9085,65 @@
 	07c1  MCP73 Host Bridge
 		1019 297a  MCP73PVT-SM
 	07c2  MCP73 Host Bridge
+	07c3  MCP73 Host Bridge
+		147b 1c3e  I-N73V motherboard
 	07c5  MCP73 Host Bridge
 	07c8  MCP73 Memory Controller
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07cb  nForce 630i memory controller
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07cd  nForce 630i memory controller
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07ce  nForce 630i memory controller
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07cf  nForce 630i memory controller
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07d0  nForce 630i memory controller
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07d1  nForce 630i memory controller
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07d2  nForce 630i memory controller
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07d3  nForce 630i memory controller
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07d6  nForce 630i memory controller
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07d7  MCP73 LPC Bridge
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07d8  MCP73 SMBus
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07d9  MCP73 Memory Controller
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	07da  MCP73 Co-processor
 		1afa 7150  JW-IN7150-HD
 	07dc  MCP73 Ethernet
+		147b 1c3e  I-N73V motherboard
 	07dd  MCP73 Ethernet
 	07de  MCP73 Ethernet
 	07df  MCP73 Ethernet
@@ -9134,16 +9153,20 @@
 		1019 297a  MCP73PVT-SM
 	07e2  C73 [GeForce 7050 / nForce 630i]
 	07e3  C73 [GeForce 7050 / nForce 610i]
+		147b 1c3e  I-N73V motherboard
 	07e5  C73 [GeForce 7100 / nForce 620i]
 	07f0  MCP73 IDE
+		147b 1c3e  I-N73V motherboard
 	07f4  GeForce 7100/nForce 630i SATA
 		1019 297a  MCP73PVT-SM
 	07f8  MCP73 SATA RAID Controller
 	07fc  MCP73 High Definition Audio
 		1019 297a  MCP73PVT-SM
 		10de 07fc  MCP73 High Definition Audio
+		147b 1c3e  I-N73V motherboard
 	07fe  GeForce 7100/nForce 630i USB
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	0840  C77 [GeForce 8200M]
 	0844  C77 [GeForce 9100M G]
