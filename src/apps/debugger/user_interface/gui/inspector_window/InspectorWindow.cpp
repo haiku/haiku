@@ -392,6 +392,48 @@ InspectorWindow::TargetAddressChanged(target_addr_t address)
 
 
 void
+InspectorWindow::HexModeChanged(int32 newMode)
+{
+	AutoLocker<BLooper> lock(this);
+	if (lock.IsLocked()) {
+		BMenu* menu = fHexMode->Menu();
+		if (newMode < 0 || newMode > menu->CountItems())
+			return;
+		BMenuItem* item = menu->ItemAt(newMode);
+		item->SetMarked(true);
+	}
+}
+
+
+void
+InspectorWindow::EndianModeChanged(int32 newMode)
+{
+	AutoLocker<BLooper> lock(this);
+	if (lock.IsLocked()) {
+		BMenu* menu = fEndianMode->Menu();
+		if (newMode < 0 || newMode > menu->CountItems())
+			return;
+		BMenuItem* item = menu->ItemAt(newMode);
+		item->SetMarked(true);
+	}
+}
+
+
+void
+InspectorWindow::TextModeChanged(int32 newMode)
+{
+	AutoLocker<BLooper> lock(this);
+	if (lock.IsLocked()) {
+		BMenu* menu = fTextMode->Menu();
+		if (newMode < 0 || newMode > menu->CountItems())
+			return;
+		BMenuItem* item = menu->ItemAt(newMode);
+		item->SetMarked(true);
+	}
+}
+
+
+void
 InspectorWindow::ExpressionEvaluated(ExpressionInfo* info, status_t result,
 	ExpressionResult* value)
 {

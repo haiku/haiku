@@ -132,6 +132,10 @@ public:
 
 	virtual	void				TargetAddressChanged(target_addr_t address)
 									= 0;
+
+	virtual	void				HexModeChanged(int32 newMode) = 0;
+	virtual	void				TextModeChanged(int32 newMode) = 0;
+	virtual	void				EndianModeChanged(int32 newMode) = 0;
 };
 
 

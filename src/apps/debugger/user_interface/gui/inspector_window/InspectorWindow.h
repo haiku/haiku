@@ -53,6 +53,9 @@ public:
 
 	// MemoryView::Listener
 	virtual	void				TargetAddressChanged(target_addr_t address);
+	virtual	void				HexModeChanged(int32 newMode);
+	virtual	void				EndianModeChanged(int32 newMode);
+	virtual	void				TextModeChanged(int32 newMode);
 
 	// ExpressionInfo::Listener
 	virtual	void				ExpressionEvaluated(ExpressionInfo* info,
