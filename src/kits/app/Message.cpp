@@ -1456,7 +1456,7 @@ BMessage::SetCurrentSpecifier(int32 index)
 	if (result != B_OK)
 		return result;
 
-	if (index > count)
+	if (index >= count)
 		return B_BAD_INDEX;
 
 	fHeader->current_specifier = index;
