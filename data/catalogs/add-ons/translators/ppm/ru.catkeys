@@ -9,7 +9,7 @@ PPM image	PPMTranslator		PPM изображение
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 бит
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Битмапный формат BeOS (PPM транслятор)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 бита
-Input color space:	PPMTranslator		Входная палитра цветов:
+Input color space:	PPMTranslator		Входное цветовое пространство:
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 бита
 PPM image translator	PPMTranslator		Транслятор PPM изображений
 bits/space	PPMTranslator		бит/пространство

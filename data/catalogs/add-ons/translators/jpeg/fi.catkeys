@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-JPEGTranslator	965709535
+1	finnish	x-vnd.Haiku-JPEGTranslator	3788699631
 Output quality	JPEGTranslator		Tulostuslaatu
 JPEG images	JPEGTranslator		JPEG-kuvat
 Prevent colors 'washing out'	JPEGTranslator		Estää värejä ’huuhtoutumasta pois’
@@ -15,6 +15,7 @@ Output smoothing strength	JPEGTranslator		Tulostuskiillotusvoimakkuus
 High	JPEGTranslator		Korkea
 Write	JPEGTranslator		Kirjoita
 Write black-and-white images as RGB24	JPEGTranslator		Kirjoita mustavalkoisia kuvia RGB24-väreinä
+Version %d.%d.%d	JPEGTranslator		Versio %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		Lue harmaaskaalavärejä RGB32-väreinä
 Read	JPEGTranslator		Lue
 JPEG Library Warning: %s\n	be_jerror		JPEG-kirjastovaroitus: %s\n

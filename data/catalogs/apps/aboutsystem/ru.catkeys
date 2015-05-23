@@ -1,5 +1,5 @@
-1	russian	x-vnd.Haiku-About	3786131863
-Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 Авторы Gutenprint.
+1	russian	x-vnd.Haiku-About	1488037792
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 авторы Gutenprint.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Все права защищены © 1996-2002, 2006 David Turner, Robert Wilhelm и Werner Lemberg.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 Ralink (firmware)	AboutWindow		Ralink (прошивка)
@@ -57,12 +57,14 @@ Google and their Google Summer of Code and Google Code In programs\n	AboutView		
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Все права защищены © 1995, 1998-2001 Jef Poskanzer.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Все права защищены © 2010-2011 Google Inc.
+Website & marketing:\n	AboutView		Вебсайт и маркетинг:\n
 About this system	AboutWindow		Об этой системе
 Version:	AboutView		Версия:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Все права защищены © 1994-2008 Xiph.Org.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Все права защищены © 1998-2000 Thai Open Source Software Center Ltd и Clark Cooper.
 Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Все права защищены © 2004-2005 Intel Corporation.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Все права защищены © 2002-2006 Максим Шеманарев (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Все права защищены © 2000-2014 Fabrice Bellard и другие.
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Все права защищены © 1999-2007 Michael C. Ring.
 The BeGeistert team\n	AboutView		Команде BeGeistert\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Университету Окленда и Christof Lutteroth\n\n

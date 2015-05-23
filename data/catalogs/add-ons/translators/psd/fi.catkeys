@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-PSDTranslator	1706619436
+1	finnish	x-vnd.Haiku-PSDTranslator	3654055550
 Lab	PSDLoader		Labra
 Uncompressed	PSDConfig		Pakkaamaton
 Indexed	PSDLoader		Indeksoitu
@@ -6,8 +6,10 @@ Grayscale	PSDLoader		Harmaasävy
 Photoshop image translator	PSDConfig		Photoshop-kuvamuunnin
 Photoshop image translator	PSDTranslator		Photoshop-kuvamuunnin
 Version %d.%d.%d, %s	PSDConfig		Versio %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Photoshop-asiakirja (PSD-tiedosto)
 Photoshop image	PSDTranslator		Photoshop-kuva
 RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Photoshop-suurasiakirja (PSB-tiedosto)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Photoshop-kuva (%s)
 PSDTranslator Settings	PSDConfig		PSDTranslator-asetukset

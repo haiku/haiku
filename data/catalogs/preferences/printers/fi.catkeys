@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PRNT	200447094
+1	finnish	x-vnd.Be-PRNT	2163275033
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tulostin: %printer_name%\nAjuri:   %driver%\n
 Waiting	JobListView		Odotetaan
 Print test page	PrintersWindow		Tulosta testisivu
@@ -9,6 +9,7 @@ Cancel	AddPrinterDialog		Peru
 Add printer	AddPrinterDialog		Lisää tulostin
 Green	TestPageView		Vihreä
 Printers	PrintersWindow		Tulostimet
+Add…	PrintersWindow		Lisää...
 Default Printer	PrinterListView		Oletustulostin
 Transport: %transport% %transport_address%	PrinterListView		Siirto: %transport% %transport_address%
 No pending jobs.	PrinterListView		Töitä ei ole odottamassa.
