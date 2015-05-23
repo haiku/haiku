@@ -162,6 +162,7 @@ Application Debugger :
 	LoadSourceCodeJob.cpp
 	ResolveValueNodeJob.cpp
 	RetrieveMemoryBlockJob.cpp
+	WriteMemoryJob.cpp
 
 	# model
 	AreaInfo.cpp

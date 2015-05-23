@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef JOBS_H
@@ -52,6 +52,7 @@ enum {
 	JOB_TYPE_GET_STACK_FRAME_VALUE,
 	JOB_TYPE_RESOLVE_VALUE_NODE_VALUE,
 	JOB_TYPE_GET_MEMORY_BLOCK,
+	JOB_TYPE_WRITE_MEMORY,
 	JOB_TYPE_EVALUATE_EXPRESSION
 };
 
@@ -230,6 +231,27 @@ private:
 			Team*				fTeam;
 			TeamMemory*			fTeamMemory;
 			TeamMemoryBlock*	fMemoryBlock;
+};
+
+
+class WriteMemoryJob : public Job {
+public:
+								WriteMemoryJob(Team* team,
+									TeamMemory* teamMemory,
+									target_addr_t address, void* data,
+									target_size_t size);
+	virtual						~WriteMemoryJob();
+
+	virtual const JobKey&		Key() const;
+	virtual status_t			Do();
+
+private:
+			SimpleJobKey		fKey;
+			Team*				fTeam;
+			TeamMemory*			fTeamMemory;
+			target_addr_t		fTargetAddress;
+			void*				fData;
+			target_size_t		fSize;
 };
 
 

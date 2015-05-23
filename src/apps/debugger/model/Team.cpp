@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -733,6 +733,17 @@ Team::NotifyDebugReportChanged(const char* reportPath)
 
 
 void
+Team::NotifyMemoryChanged(target_addr_t address, target_size_t size)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->MemoryChanged(MemoryChangedEvent(
+			TEAM_EVENT_MEMORY_CHANGED, this, address, size));
+	}
+}
+
+
+void
 Team::_NotifyThreadAdded(Thread* thread)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -863,6 +874,19 @@ Team::DebugReportEvent::DebugReportEvent(uint32 type, Team* team,
 	:
 	Event(type, team),
 	fReportPath(reportPath)
+{
+}
+
+
+// #pragma mark - MemoryChangedEvent
+
+
+Team::MemoryChangedEvent::MemoryChangedEvent(uint32 type, Team* team,
+	target_addr_t address, target_size_t size)
+	:
+	Event(type, team),
+	fTargetAddress(address),
+	fSize(size)
 {
 }
 
@@ -1011,5 +1035,11 @@ Team::Listener::WatchpointChanged(const Team::WatchpointEvent& event)
 
 void
 Team::Listener::DebugReportChanged(const Team::DebugReportEvent& event)
+{
+}
+
+
+void
+Team::Listener::MemoryChanged(const Team::MemoryChangedEvent& event)
 {
 }

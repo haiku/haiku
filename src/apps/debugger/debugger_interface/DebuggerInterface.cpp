@@ -725,7 +725,7 @@ DebuggerInterface::WriteMemory(target_addr_t address, void* buffer,
 	DebugContextGetter contextGetter(fDebugContextPool);
 
 	return debug_write_memory(contextGetter.Context(),
-		(const void*)(addr_t)address, buffer, size);
+		(const void*)address, buffer, size);
 }
 
 

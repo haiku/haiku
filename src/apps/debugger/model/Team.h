@@ -48,7 +48,9 @@ enum {
 	TEAM_EVENT_WATCHPOINT_REMOVED,
 	TEAM_EVENT_WATCHPOINT_CHANGED,
 
-	TEAM_EVENT_DEBUG_REPORT_CHANGED
+	TEAM_EVENT_DEBUG_REPORT_CHANGED,
+
+	TEAM_EVENT_MEMORY_CHANGED
 };
 
 
@@ -75,6 +77,7 @@ public:
 			class BreakpointEvent;
 			class ConsoleOutputEvent;
 			class DebugReportEvent;
+			class MemoryChangedEvent;
 			class ImageEvent;
 			class ImageLoadEvent;
 			class ImageLoadNameEvent;
@@ -225,6 +228,10 @@ public:
 			void				NotifyDebugReportChanged(
 									const char* reportPath);
 
+			// memory write related service methods
+			void				NotifyMemoryChanged(target_addr_t address,
+									target_size_t size);
+
 private:
 			struct BreakpointByAddressPredicate;
 			struct WatchpointByAddressPredicate;
@@ -360,6 +367,21 @@ protected:
 };
 
 
+class Team::MemoryChangedEvent : public Event {
+public:
+								MemoryChangedEvent(uint32 type, Team* team,
+									target_addr_t address, target_size_t size);
+
+			target_addr_t		GetTargetAddress() const
+									{ return fTargetAddress; }
+
+			target_size_t		GetSize() const	{ return fSize; }
+protected:
+			target_addr_t		fTargetAddress;
+			target_size_t		fSize;
+};
+
+
 class Team::WatchpointEvent : public Event {
 public:
 								WatchpointEvent(uint32 type, Team* team,
@@ -430,6 +452,9 @@ public:
 
 	virtual void				DebugReportChanged(
 									const Team::DebugReportEvent& event);
+
+	virtual	void				MemoryChanged(
+									const Team::MemoryChangedEvent& event);
 };
 
 
