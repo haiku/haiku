@@ -99,6 +99,7 @@ RemotePackageRepository HaikuPorts
 	gutenprint_devel-5.2.10-1
 	haikuwebkit-1.4.10-1
 	haikuwebkit_devel-1.4.10-1
+	handbrake-0.10.1-1
 	harfbuzz-0.9.39-1
 	harfbuzz_devel-0.9.39-1
 	help2man-1.44.1-1
@@ -333,6 +334,7 @@ RemotePackageRepository HaikuPorts
 	groff
 	gutenprint
 	haikuwebkit
+	handbrake
 	harfbuzz
 	htmldoc
 	icu
