@@ -127,6 +127,10 @@ RemotePackageRepository HaikuPorts
 	libassuan_devel-2.2.0-1
 	libbluray-0.8.1-1
 	libbluray_devel-0.8.1-1
+	libdvdread-5.0.3-2
+	libdvdread_devel-5.0.3-2
+	libdvdnav-5.0.3-2
+	libdvdnav_devel-5.0.3-2
 	libedit-2012_06_01_3.0-1
 	libedit_devel-2012_06_01_3.0-1
 	libevent-2.0.21-7
@@ -345,6 +349,8 @@ RemotePackageRepository HaikuPorts
 	libass
 	libassuan
 	libbluray
+	libdvdread
+	libdvdnav
 	libedit
 	libevent
 	libexecinfo
