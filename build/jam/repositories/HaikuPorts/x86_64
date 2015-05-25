@@ -15,6 +15,8 @@ RemotePackageRepository HaikuPorts
 	:
 	# repository architecture packages
 	# primary architecture (x86_64)
+	a52dec-0.7.4-2
+	a52dec_devel-0.7.4-2
 	apr-1.5.0-1
 	apr_devel-1.5.0-1
 	apr_util-1.5.4-1
@@ -48,6 +50,8 @@ RemotePackageRepository HaikuPorts
 	findutils-4.4.2-1
 	ffmpeg-0.11.5-2
 	ffmpeg_devel-0.11.5-2
+	ffmpeg26-2.6.3-1
+	ffmpeg26_devel-2.6.3-1
 	flac-1.3.0-3
 	flac_devel-1.3.0-3
 	flex-2.5.39-1
@@ -112,6 +116,8 @@ RemotePackageRepository HaikuPorts
 	jpeg_devel-9-3
 	jpeg_tools-9-3
 	keymapswitcher-1.2.7.10-1
+	lame-3.99.5-5
+	lame_devel-3.99.5-5
 	lcms-2.7-1
 	lcms_devel-2.7-1
 	less-451-4
@@ -133,6 +139,12 @@ RemotePackageRepository HaikuPorts
 	libicns_devel-0.8.1-1
 	libiconv-1.13.1-6
 	libiconv_devel-1.13.1-6
+	libmkv-0.6.5.1-3
+	libmkv_devel-0.6.5.1-3
+	libmp4v2-2.0.0-2
+	libmp4v2_devel-2.0.0-2
+	libmpeg2-0.5.1-3
+	libmpeg2_devel-0.5.1-3
 	libogg-1.3.0-2
 	libogg_devel-1.3.0-2
 	libpcap-1.7.3-1
@@ -143,6 +155,8 @@ RemotePackageRepository HaikuPorts
 	libpng_devel-1.5.22-1
 	libpng16-1.6.17-1
 	libpng16_devel-1.6.17-1
+	libsamplerate-0.1.8-2
+	libsamplerate_devel-0.1.8-2
 	libsndfile-1.0.25-3
 	libsndfile_devel-1.0.25-3
 	libsdl-1.2.15-6
@@ -254,6 +268,8 @@ RemotePackageRepository HaikuPorts
 	which-2.21-1
 	wpa_supplicant-2.0-3
 	xml_parser-2.36-1
+	x264-20140308-1
+	x264_devel-20140308-1
 	xz_utils-5.0.6-1
 	xz_utils_devel-5.0.6-1
 	yasm-1.2.0-3
@@ -264,6 +280,7 @@ RemotePackageRepository HaikuPorts
 	:
 
 	# source packages
+	a52dec
 	apr
 	autoconf
 	automake
@@ -286,6 +303,7 @@ RemotePackageRepository HaikuPorts
 	file
 	findutils
 	ffmpeg
+	ffmpeg26
 	flac
 	flex
 	fontconfig
@@ -319,6 +337,7 @@ RemotePackageRepository HaikuPorts
 	jpeg
 	help2man
 	keymapswitcher
+	lame
 	lcms
 	less
 	libass
@@ -330,10 +349,14 @@ RemotePackageRepository HaikuPorts
 	libgpg_error
 	libicns
 	libiconv
+	libmkv
+	libmp4v2
+	libmpeg2
 	libogg
 	libpcre
 	libpng
 	libpng16
+	libsamplerate
 	libsdl
 	libsdl2
 	libsndfile
@@ -407,6 +430,7 @@ RemotePackageRepository HaikuPorts
 	wpa_supplicant
 	yasm
 	xml_parser
+	x264
 	xz_utils
 	zip
 	zlib
