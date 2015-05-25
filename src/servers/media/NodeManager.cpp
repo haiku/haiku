@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2015 Dario Casalinuovo
  * Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -30,6 +31,7 @@
 
 #include "NodeManager.h"
 
+#include <Application.h>
 #include <Autolock.h>
 #include <Entry.h>
 #include <MediaAddOn.h>
@@ -144,12 +146,13 @@ NodeManager::RescanDefaultNodes()
 status_t
 NodeManager::RegisterNode(media_addon_id addOnID, int32 flavorID,
 	const char* name, uint64 kinds, port_id port, team_id team,
-	media_node_id* _nodeID)
+	media_node_id timesource, media_node_id* _nodeID)
 {
 	BAutolock _(this);
 
 	registered_node node;
 	node.node_id = fNextNodeID;
+	node.timesource_id = timesource;
 	node.add_on_id = addOnID;
 	node.flavor_id = flavorID;
 	strlcpy(node.name, name, sizeof(node.name));
@@ -1092,6 +1095,24 @@ NodeManager::GetDormantFlavorInfoFor(media_addon_id addOnID, int32 flavorID,
 // #pragma mark - Misc.
 
 
+status_t
+NodeManager::SetNodeTimeSource(media_node_id node,
+	media_node_id timesource)
+{
+	BAutolock _(this);
+
+	NodeMap::iterator found = fNodeMap.find(node);
+	if (found == fNodeMap.end()) {
+		ERROR("NodeManager::SetNodeTimeSource: node %"
+			B_PRId32 " not found\n", node);
+		return B_ERROR;
+	}
+	registered_node& registeredNode = found->second;
+	registeredNode.timesource_id = timesource;
+	return B_OK;
+}
+
+
 void
 NodeManager::CleanupTeam(team_id team)
 {
@@ -1120,6 +1141,8 @@ NodeManager::CleanupTeam(team_id team)
 		if (node.containing_team == team) {
 			PRINT(1, "NodeManager::CleanupTeam: removing node id %" B_PRId32
 				", team %" B_PRId32 "\n", node.node_id, team);
+			// Ensure the slave node is removed from it's timesource
+			_NotifyTimeSource(node);
 			fNodeMap.erase(remove);
 			BPrivate::media::notifications::NodesDeleted(&node.node_id, 1);
 			continue;
@@ -1137,6 +1160,8 @@ NodeManager::CleanupTeam(team_id team)
 				PRINT(1, "NodeManager::CleanupTeam: removing node id %"
 					B_PRId32 " that has no teams\n", node.node_id);
 
+				// Ensure the slave node is removed from it's timesource
+				_NotifyTimeSource(node);
 				fNodeMap.erase(remove);
 				BPrivate::media::notifications::NodesDeleted(&node.node_id, 1);
 			} else
@@ -1339,4 +1364,27 @@ NodeManager::_AcquireNodeReference(media_node_id id, team_id team)
 		"%" B_PRId32 ", ref %" B_PRId32 ", team ref %" B_PRId32 "\n", id, team,
 		node.ref_count, node.team_ref_count.find(team)->second);
 	return B_OK;
+}
+
+
+void
+NodeManager::_NotifyTimeSource(registered_node& node)
+{
+	team_id team = be_app->Team();
+	media_node timeSource;
+	// Ensure the timesource ensure still exists
+	if (GetCloneForID(node.timesource_id, team, &timeSource) != B_OK)
+		return;
+
+	media_node currentNode;
+	if (GetCloneForID(node.node_id, team,
+		&currentNode) == B_OK) {
+		timesource_remove_slave_node_command cmd;
+		cmd.node = currentNode;
+		// Notify slave node removal to owner timesource
+		SendToPort(timeSource.port, TIMESOURCE_REMOVE_SLAVE_NODE,
+			&cmd, sizeof(cmd));
+		ReleaseNode(timeSource, team);
+	}
+	ReleaseNode(currentNode, team);
 }

@@ -545,9 +545,6 @@ BTimeSource::AddMe(BMediaNode* node)
 void
 BTimeSource::DirectAddMe(const media_node& node)
 {
-	// XXX this code has race conditions and is pretty dumb, and it
-	// XXX won't detect nodes that crash and don't remove themself.
-
 	CALLED();
 	ASSERT(fSlaveNodes != NULL);
 	BAutolock lock(fSlaveNodes);
@@ -582,9 +579,6 @@ BTimeSource::DirectAddMe(const media_node& node)
 void
 BTimeSource::DirectRemoveMe(const media_node& node)
 {
-	// XXX this code has race conditions and is pretty dumb, and it
-	// XXX won't detect nodes that crash and don't remove themself.
-
 	CALLED();
 	ASSERT(fSlaveNodes != NULL);
 	BAutolock lock(fSlaveNodes);

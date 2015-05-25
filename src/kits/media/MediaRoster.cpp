@@ -1,6 +1,7 @@
 /*
- * Copyright 2008 Maurice Kalinowski, haiku@kaldience.com
+ * Copyright 2015 Dario Casalinuovo
  * Copyright 2009-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008 Maurice Kalinowski, haiku@kaldience.com
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -1972,6 +1973,7 @@ BMediaRosterEx::RegisterNode(BMediaNode* node, media_addon_id addOnID,
 	request.kinds = node->Kinds();
 	request.port = node->ControlPort();
 	request.team = BPrivate::current_team();
+	request.timesource_id = node->fTimeSourceID;
 
 	TRACE("BMediaRoster::RegisterNode: sending SERVER_REGISTER_NODE: port "
 		"%" B_PRId32 ", kinds 0x%" B_PRIx64 ", team %" B_PRId32 ", name '%s'\n",
@@ -2176,44 +2178,51 @@ BMediaRoster::SetTimeSourceFor(media_node_id node, media_node_id time_source)
 		return B_BAD_VALUE;
 
 	media_node clone;
-	status_t rv, result;
-
-	TRACE("BMediaRoster::SetTimeSourceFor: node %" B_PRId32 " will be assigned "
-		"time source %" B_PRId32 "\n", node, time_source);
-	TRACE("BMediaRoster::SetTimeSourceFor: node %" B_PRId32 " time source %"
-		B_PRId32 " enter\n", node, time_source);
-
-	// we need to get a clone of the node to have a port id
-	rv = GetNodeFor(node, &clone);
-	if (rv != B_OK) {
-		ERROR("BMediaRoster::SetTimeSourceFor, GetNodeFor failed, node id %"
-			B_PRId32 "\n", node);
-		return B_ERROR;
+	// We need to get a clone of the node to have a port id
+	status_t result = GetNodeFor(node, &clone);
+	if (result == B_OK) {
+		// We just send the request to set time_source-id as
+		// timesource to the node, the NODE_SET_TIMESOURCE handler
+		// code will do the real assignment.
+		result = B_OK;
+		node_set_timesource_command cmd;
+		cmd.timesource_id = time_source;
+		result = SendToPort(clone.port, NODE_SET_TIMESOURCE,
+			&cmd, sizeof(cmd));
+		if (result != B_OK) {
+			ERROR("BMediaRoster::SetTimeSourceFor"
+				"sending NODE_SET_TIMESOURCE failed, node id %"
+				B_PRId32 "\n", clone.node);
+		}
+		// We release the clone
+		result = ReleaseNode(clone);
+		if (result != B_OK) {
+			ERROR("BMediaRoster::SetTimeSourceFor, ReleaseNode failed,"
+				" node id %" B_PRId32 "\n", clone.node);
+		}
+	} else {
+		ERROR("BMediaRoster::SetTimeSourceFor GetCloneForID failed, "
+			"node id %" B_PRId32 "\n", node);
 	}
 
-	// we just send the request to set time_source-id as timesource to the node,
-	// the NODE_SET_TIMESOURCE handler code will do the real assignment
-	result = B_OK;
-	node_set_timesource_command cmd;
-	cmd.timesource_id = time_source;
-	rv = SendToPort(clone.port, NODE_SET_TIMESOURCE, &cmd, sizeof(cmd));
-	if (rv != B_OK) {
-		ERROR("BMediaRoster::SetTimeSourceFor, sending NODE_SET_TIMESOURCE "
-			"failed, node id %" B_PRId32 "\n", node);
-		result = B_ERROR;
+	if (result == B_OK) {
+		// Notify the server
+		server_set_node_timesource_request request;
+		server_set_node_timesource_reply reply;
+
+		request.node_id = node;
+		request.timesource_id = time_source;
+
+		result = QueryServer(SERVER_SET_NODE_TIMESOURCE, &request,
+			sizeof(request), &reply, sizeof(reply));
+		if (result != B_OK) {
+			ERROR("BMediaRoster::SetTimeSourceFor, sending NODE_SET_TIMESOURCE "
+				"failed, node id %" B_PRId32 "\n", node);
+		} else {
+			TRACE("BMediaRoster::SetTimeSourceFor: node %" B_PRId32 " time source %"
+				B_PRId32 " OK\n", node, time_source);
+		}
 	}
-
-	// we release the clone
-	rv = ReleaseNode(clone);
-	if (rv != B_OK) {
-		ERROR("BMediaRoster::SetTimeSourceFor, ReleaseNode failed, node id %"
-			B_PRId32 "\n", node);
-		result = B_ERROR;
-	}
-
-	TRACE("BMediaRoster::SetTimeSourceFor: node %" B_PRId32 " time source %"
-		B_PRId32 " leave\n", node, time_source);
-
 	return result;
 }
 

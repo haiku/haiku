@@ -27,6 +27,7 @@ typedef std::vector<live_node_info> LiveNodeList;
 
 struct registered_node {
 	media_node_id			node_id;
+	media_node_id			timesource_id;
 	media_addon_id			add_on_id;
 	int32					flavor_id;
 	char					name[B_MEDIA_NAME_LENGTH];
@@ -73,6 +74,7 @@ public:
 			status_t			RegisterNode(media_addon_id addOnID,
 									int32 flavorID, const char* name,
 									uint64 kinds, port_id port, team_id team,
+									media_node_id timesource,
 									media_node_id* _nodeID);
 			status_t			UnregisterNode(media_node_id nodeID,
 									team_id team, media_addon_id* addOnID,
@@ -141,6 +143,9 @@ public:
 									 int32 flavorID,
 									 dormant_flavor_info* flavorInfo);
 
+			status_t			SetNodeTimeSource(media_node_id node,
+									media_node_id timesource);
+
 			void				CleanupTeam(team_id team);
 
 			status_t			LoadState();
@@ -151,6 +156,7 @@ public:
 private:
 			status_t			_AcquireNodeReference(media_node_id id,
 									team_id team);
+			void				_NotifyTimeSource(registered_node& node);
 
 private:
 			typedef std::map<media_addon_id, registered_node> NodeMap;

@@ -447,7 +447,7 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 
 			status_t status = gNodeManager->RegisterNode(request.add_on_id,
 				request.flavor_id, request.name, request.kinds, request.port,
-				request.team, &reply.node_id);
+				request.team, request.timesource_id, &reply.node_id);
 			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
@@ -577,6 +577,17 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 					"possibly truncated list of node id's\n");
 			}
 			request.SendReply(status, &reply, sizeof(reply));
+			break;
+		}
+
+		case SERVER_SET_NODE_TIMESOURCE:
+		{
+			const server_set_node_timesource_request& request
+				= *static_cast<const server_set_node_timesource_request*>(data);
+			server_set_node_timesource_reply reply;
+			status_t result = gNodeManager->SetNodeTimeSource(request.node_id,
+				request.timesource_id);
+			request.SendReply(result, &reply, sizeof(reply));
 			break;
 		}
 
