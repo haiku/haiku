@@ -231,7 +231,7 @@ RemotePackageRepository HaikuPorts
 	pixman-0.32.6-1
 	pixman_devel-0.32.6-1
 	pkgconfig-0.27.1-2
-	python-2.7.9-1
+	python-2.7.10-1
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
 	qemu-2.1.2-2
