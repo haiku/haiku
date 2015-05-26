@@ -13,6 +13,7 @@
 #include <Locker.h>
 
 #include <AutoLocker.h>
+#include <memory_private.h>
 #include <OS.h>
 #include <system_info.h>
 #include <util/DoublyLinkedList.h>
@@ -705,6 +706,15 @@ status_t
 DebuggerInterface::GetCpuFeatures(uint32& flags)
 {
 	return fArchitecture->GetCpuFeatures(flags);
+}
+
+
+status_t
+DebuggerInterface::GetMemoryProperties(target_addr_t address,
+	uint32& protection, uint32& locking)
+{
+	return get_memory_properties(fTeamID, (const void *)address,
+		&protection, &locking);
 }
 
 

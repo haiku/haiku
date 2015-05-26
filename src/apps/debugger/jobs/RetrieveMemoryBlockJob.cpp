@@ -7,7 +7,6 @@
 #include "Jobs.h"
 
 #include <AutoLocker.h>
-#include <memory_private.h>
 
 #include "Team.h"
 #include "TeamMemory.h"
@@ -53,8 +52,8 @@ RetrieveMemoryBlockJob::Do()
 
 	uint32 protection = 0;
 	uint32 locking = 0;
-	status_t error = get_memory_properties(fTeam->ID(),
-		(const void *)fMemoryBlock->BaseAddress(), &protection, &locking);
+	status_t error = fTeamMemory->GetMemoryProperties(
+		fMemoryBlock->BaseAddress(), protection, locking);
 	if (error != B_OK) {
 		fMemoryBlock->NotifyDataRetrieved(error);
 		return error;
