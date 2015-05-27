@@ -58,6 +58,7 @@ MemoryView::MemoryView(::Team* team, Listener* listener)
 	fSelectionStart(0),
 	fSelectionEnd(0),
 	fScrollRunner(NULL),
+	fTrackingMouse(false),
 	fListener(listener)
 {
 	Architecture* architecture = team->GetArchitecture();
