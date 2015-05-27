@@ -711,6 +711,7 @@ RemotePackageRepository HaikuPorts
 	mpfr_x86_devel-3.1.2-2
 	mpg123_x86-1.22.0-1
 	mpg123_x86_devel-1.22.0-1
+	mplayer_x86-1.1.1-2
 	mupdf_x86-1.7-1
 	mupdf_x86_devel-1.7-1
 	muscle_x86-6.00-1
@@ -1071,6 +1072,7 @@ RemotePackageRepository HaikuPorts
 	moe
 	mog
 	mpc_x86
+	mplayer_x86
 	mosh_x86
 	most
 	mpd_x86
