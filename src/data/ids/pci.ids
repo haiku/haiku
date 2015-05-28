@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.05.20
-#	Date:    2015-05-20 03:15:02
+#	Version: 2015.05.26
+#	Date:    2015-05-26 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -361,6 +361,7 @@
 		1028 1f4b  PERC H330 Mini
 		1028 1f4c  PERC H330 Mini (for blades)
 		1028 1f4d  PERC H330 Embedded (for monolithic)
+		1054 306a  SAS 3004 iMR ROMB
 	0060  MegaRAID SAS 1078
 		1000 1006  MegaRAID SAS 8888ELP
 		1000 100a  MegaRAID SAS 8708ELP
@@ -2095,11 +2096,11 @@
 		174b 8b04  Radeon HD 8860
 	6819  Pitcairn PRO [Radeon HD 7850]
 		174b e221  Radeon HD 7850 2GB GDDR5 DVI-I/DVI-D/HDMI/DP
-	6820  Venus XTX [Radeon HD 8890M / R9 M275X]
+	6820  Venus XTX [Radeon HD 8890M / R9 M275X/M375X]
 		103c 1851  Radeon HD 7750M
 		17aa 3643  Radeon R9 A375
 		17aa 3801  Radeon R9 M275
-	6821  Venus XT [Radeon HD 8870M / R9 M270X]
+	6821  Venus XT [Radeon HD 8870M / R9 M270X/M370X]
 		1002 031e  FirePro SX4000
 		1028 05cc  FirePro M5100
 		1028 15cc  FirePro M5100
@@ -8802,15 +8803,16 @@
 	056a  MCP73 [nForce 630i] USB 2.0 Controller (EHCI)
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
-	056c  MCP73 IDE
+	056c  MCP73 IDE Controller
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
 	056d  MCP73 PCI Express bridge
 		1019 297a  MCP73PVT-SM
-		10de cb73  MCP73 PCIe x16 port
+		10de cb73  MCP73 PCIe x1 port
 	056e  MCP73 PCI Express bridge
 		1019 297a  MCP73PVT-SM
+		10de 0000  MCP73 PCIe x16 port
 	056f  MCP73 PCI Express bridge
 		1019 297a  MCP73PVT-SM
 	05b1  NF200 PCIe 2.0 switch
@@ -9092,39 +9094,39 @@
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
-	07cb  nForce 630i memory controller
+	07cb  nForce 610i/630i memory controller
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
-	07cd  nForce 630i memory controller
+	07cd  nForce 610i/630i memory controller
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
-	07ce  nForce 630i memory controller
+	07ce  nForce 610i/630i memory controller
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
-	07cf  nForce 630i memory controller
+	07cf  nForce 610i/630i memory controller
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
-	07d0  nForce 630i memory controller
+	07d0  nForce 610i/630i memory controller
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
-	07d1  nForce 630i memory controller
+	07d1  nForce 610i/630i memory controller
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
-	07d2  nForce 630i memory controller
+	07d2  nForce 610i/630i memory controller
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
-	07d3  nForce 630i memory controller
+	07d3  nForce 610i/630i memory controller
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
-	07d6  nForce 630i memory controller
+	07d6  nForce 610i/630i memory controller
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
@@ -9155,16 +9157,18 @@
 	07e3  C73 [GeForce 7050 / nForce 610i]
 		147b 1c3e  I-N73V motherboard
 	07e5  C73 [GeForce 7100 / nForce 620i]
-	07f0  MCP73 IDE
+	07f0  MCP73 SATA Controller (IDE mode)
 		147b 1c3e  I-N73V motherboard
 	07f4  GeForce 7100/nForce 630i SATA
 		1019 297a  MCP73PVT-SM
+		147b 1c3e  I-N73V motherboard
 	07f8  MCP73 SATA RAID Controller
+		147b 1c3e  I-N73V motherboard
 	07fc  MCP73 High Definition Audio
 		1019 297a  MCP73PVT-SM
 		10de 07fc  MCP73 High Definition Audio
 		147b 1c3e  I-N73V motherboard
-	07fe  GeForce 7100/nForce 630i USB
+	07fe  MCP73 OHCI USB 1.1 Controller
 		1019 297a  MCP73PVT-SM
 		147b 1c3e  I-N73V motherboard
 		1afa 7150  JW-IN7150-HD
@@ -10202,8 +10206,10 @@
 	13d7  GM204M [GeForce GTX 980M]
 	13d8  GM204M [GeForce GTX 970M]
 	13d9  GM204M [GeForce GTX 965M]
+	13f2  GM204GL [Tesla M60]
 	1401  GM206 [GeForce GTX 960]
 	17c2  GM200 [GeForce GTX TITAN X]
+	17c8  GM200 [GeForce GTX 980 Ti]
 	17f0  GM200GL [Quadro M6000]
 10df  Emulex Corporation
 	0720  OneConnect NIC (Skyhawk)
@@ -26805,7 +26811,8 @@ deaf  Middle Digital Inc.
 	9050  PC Weasel Virtual VGA
 	9051  PC Weasel Serial Port
 	9052  PC Weasel Watchdog Timer
-deda  SoftHard Technology Ltd.
+# formerly SoftHard Technology Ltd.
+deda  XIMEA
 e000  Winbond
 	e000  W89C940
 e159  Tiger Jet Network Inc.
