@@ -65,6 +65,7 @@ RemotePackageRepository HaikuPorts
 	bzr-2.6.0-2
 	canna-1.0.1-1
 	capitalbe-1.0-2
+	catkeyseditor-0.1.1-1
 	caya-2013.10.12-2
 	ccache-3.1.9-1
 	cdrtools-3.01~a27-1
@@ -850,6 +851,7 @@ RemotePackageRepository HaikuPorts
 	bzr
 	canna
 	capitalbe
+	catkeyseditor
 	caya
 	ccache
 	cdrtools
