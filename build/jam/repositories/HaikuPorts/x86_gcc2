@@ -3,7 +3,7 @@ RemotePackageRepository HaikuPorts
 	: http://packages.haiku-os.org/haikuports/master/repo/x86_gcc2
 	:
 	# architecture "any" packages
-	avr_libc_x86-1.8.0-1
+	avr_libc_x86-1.8.0-2
 	be_book-2008_10_26-1
 	ca_root_certificates-2014_08_13-1
 	caladea-20130214-3
@@ -487,7 +487,7 @@ RemotePackageRepository HaikuPorts
 	automoc_x86-0.9.88-2
 	avr_binutils_x86-2.24_2014_03_19-5
 	avr_gcc_x86-4.8.2_2014_03_20-1
-	avrdude_x86-6.0.1-1
+	avrdude_x86-6.0.1-2
 	beshare_x86-2.31-1
 	binutils_x86-2.25_2014_12_27-1
 	bison_x86-2.5-1
@@ -519,8 +519,8 @@ RemotePackageRepository HaikuPorts
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
 	cmake_x86-3.2.2-1
-	confuse_x86-2.7-1
-	confuse_x86_devel-2.7-1
+	confuse_x86-2.7-2
+	confuse_x86_devel-2.7-2
 	copynametoclipboard-1.0.1-2
 	curl_x86-7.42.1-1
 	curl_x86_devel-7.42.1-1
@@ -625,8 +625,8 @@ RemotePackageRepository HaikuPorts
 	libexecinfo_x86_devel-1.1-1
 	libffi_x86-3.0.13-1
 	libffi_x86_devel-3.0.13-1
-	libftdi_x86-1.0-1
-	libftdi_x86_devel-1.0-1
+	libftdi_x86-1.0-2
+	libftdi_x86_devel-1.0-2
 	libgpg_error_x86-1.15-1
 	libgpg_error_x86_devel-1.15-1
 	libicns_x86-0.8.1-1
