@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-PRNT	200447094
+1	french	x-vnd.Be-PRNT	2163275033
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimante : %printer_name%\n    Pilote : %driver%\n
 Waiting	JobListView		Attente
 Print test page	PrintersWindow		Imprimer une page de test
@@ -9,6 +9,7 @@ Cancel	AddPrinterDialog		Annuler
 Add printer	AddPrinterDialog		Ajouter une imprimante
 Green	TestPageView		Vert
 Printers	PrintersWindow		Imprimantes
+Add…	PrintersWindow		Ajouter…
 Default Printer	PrinterListView		Imprimante par défaut
 Transport: %transport% %transport_address%	PrinterListView		Liaison : %transport% %transport_address%
 No pending jobs.	PrinterListView		Pas de travaux en attente.

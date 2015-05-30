@@ -1,5 +1,6 @@
-1	swedish	x-vnd.Haiku-TIFFTranslator	40018330
+1	swedish	x-vnd.Haiku-TIFFTranslator	2234713102
 LZW	TIFFView		LZW
+Version %d.%d.%d, %s	TIFFView		Version %d.%d.%d, %s
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: kunde inte ange mapp\n
 TIFF image	TIFFTranslator		TIFF-bild
 TIFF Library:	TIFFView		TIFF-bibliotek:

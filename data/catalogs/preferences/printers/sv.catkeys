@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-PRNT	200447094
+1	swedish	x-vnd.Be-PRNT	2163275033
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Skrivare: %printer_name%\nDrivrutin: %driver%\n
 Waiting	JobListView		Väntar
 Print test page	PrintersWindow		Skriv ut testsida
@@ -9,6 +9,7 @@ Cancel	AddPrinterDialog		Avbryt
 Add printer	AddPrinterDialog		Lägg till skrivare
 Green	TestPageView		Grön
 Printers	PrintersWindow		Skrivare
+Add…	PrintersWindow		Lägg till...
 Default Printer	PrinterListView		Standardskrivare
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
 No pending jobs.	PrinterListView		Inga utskrifter i kön.

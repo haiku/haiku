@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	4261904725
+1	swedish	x-vnd.Haiku-HaikuDepot	4273323974
 Name	PackageListView		Namn
 Available packages	MainWindow		Tillgängliga paket
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
@@ -85,6 +85,7 @@ No, quit HaikuDepot	App		Nej, avsluta HaikuDepot
 Authentication failed	UserLoginWindow		Autentisering misslyckades
 Logged in as %User%	MainWindow		Inloggad som %User%
 Language	RatePackageWindow		Språk
+Size	PackageListView		Storlek
 Failed to create or update rating: %s\n	RatePackageWindow		Gick inte att skapa eller uppdatera betyg: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Du måste logga in för att kunna betygsätta paket.
  It responded with: 	RatePackageWindow		 Den svarade med: 
@@ -135,6 +136,7 @@ Cancel	RatePackageWindow		Avbryt
 Package action failed	PackageInfoView		Paketåtgärden misslyckades
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Skicka
+-	no package size		-
 Category:	FilterView		Kategori:
 Failed to create account	UserLoginWindow		Misslyckades skapa konto
 There are problems with the data you entered:\n\n	UserLoginWindow		Det är något problem med data du skrev:\n\n
