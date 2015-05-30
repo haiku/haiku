@@ -9,12 +9,15 @@
 
 #include "PrinterListView.h"
 
+#include <Application.h>
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <Directory.h>
+#include <IconUtils.h>
 #include <Locale.h>
 #include <Mime.h>
 #include <NodeInfo.h>
+#include <Resources.h>
 #include <String.h>
 
 #include "pr_server.h"
@@ -23,7 +26,7 @@
 #include "PrintersWindow.h"
 #include "SpoolFolder.h"
 
-
+#include <stdio.h>
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PrinterListView"
 
@@ -275,7 +278,9 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node,
 	}
 
 	if (sIcon && sIcon->IsValid() && sSelectedIcon == NULL) {
-		BBitmap *checkMark = LoadBitmap("check_mark_icon", 'BBMP');
+		const float checkMarkIconSize = 20.0;
+		BBitmap *checkMark = _LoadVectorIcon("check_mark_icon",
+			checkMarkIconSize);
 		if (checkMark && checkMark->IsValid()) {
 			sSelectedIcon = new BBitmap(rect, B_RGBA32, true);
 			if (sSelectedIcon && sSelectedIcon->IsValid()) {
@@ -525,3 +530,24 @@ PrinterItem::_GetStringProperty(const char* propName, BString& outString)
 	fNode.ReadAttrString(propName, &outString);
 }
 
+
+BBitmap*
+PrinterItem::_LoadVectorIcon(const char* resourceName, float iconSize)
+{
+	size_t dataSize;
+	BResources* resources = BApplication::AppResources();
+	const void* data = resources->LoadResource(B_VECTOR_ICON_TYPE,
+		resourceName, &dataSize);
+
+	if (data != NULL){
+		BBitmap *iconBitmap = new BBitmap(BRect(0, 0, iconSize - 1,
+			iconSize - 1), 0, B_RGBA32);
+		if (BIconUtils::GetVectorIcon(
+				reinterpret_cast<const uint8*>(data),
+				dataSize, iconBitmap) == B_OK)
+			return iconBitmap;
+		else
+			delete iconBitmap;
+	};
+	return NULL;
+}
