@@ -26,7 +26,7 @@
 #include "PrintersWindow.h"
 #include "SpoolFolder.h"
 
-#include <stdio.h>
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "PrinterListView"
 
