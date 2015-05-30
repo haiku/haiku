@@ -558,6 +558,27 @@ StyledEditWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case UPDATE_STATUS_REF:
+		{
+			entry_ref ref;
+			const char* name;
+
+			if (fSaveMessage != NULL
+				&& fSaveMessage->FindRef("directory", &ref) == B_OK
+				&& fSaveMessage->FindString("name", &name) == B_OK) {
+
+				BDirectory dir(&ref);
+				status_t status = dir.InitCheck();
+				BEntry entry;
+				if (status == B_OK)
+					status = entry.SetTo(&dir, name);
+				if (status == B_OK)
+					status = entry.GetRef(&ref);
+			}
+			fStatusView->SetRef(ref);
+			break;
+		}
+
 		case UNLOCK_FILE:
 		{
 			status_t status = _UnlockFile();
@@ -801,6 +822,8 @@ StyledEditWindow::Save(BMessage* message)
 	fNagOnNodeChange = true;
 
 	PostMessage(UPDATE_STATUS);
+	PostMessage(UPDATE_STATUS_REF);
+
 	return status;
 }
 
@@ -887,6 +910,8 @@ StyledEditWindow::OpenFile(entry_ref* ref)
 	}
 
 	_SwitchNodeMonitor(true, ref);
+
+	PostMessage(UPDATE_STATUS_REF);
 
 	fReloadItem->SetEnabled(fSaveMessage != NULL);
 	fEncodingItem->SetEnabled(fSaveMessage != NULL);
@@ -2053,6 +2078,7 @@ StyledEditWindow::_HandleNodeMonitorEvent(BMessage *message)
 					_SwitchNodeMonitor(false);
 					_SwitchNodeMonitor(true);
 				}
+				PostMessage(UPDATE_STATUS_REF);
 			}
 			break;
 
@@ -2099,6 +2125,7 @@ StyledEditWindow::_HandleNodeMonitorEvent(BMessage *message)
 					name = "Unknown";
 
 				_ShowNodeChangeAlert(name, true);
+				PostMessage(UPDATE_STATUS_REF);
 			}
 			break;
 

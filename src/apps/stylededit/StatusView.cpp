@@ -25,6 +25,9 @@
 #include <StringView.h>
 #include <Window.h>
 
+#include <tracker_private.h>
+#include "DirMenu.h"
+
 #include "Constants.h"
 
 
@@ -156,6 +159,11 @@ StatusView::Draw(BRect updateRect)
 void
 StatusView::MouseDown(BPoint where)
 {
+	if (where.x < fCellWidth[kPositionCell]) {
+		_ShowDirMenu();
+		return;
+	}
+
 	if (!fReadOnly || !fCanUnlock)
 		return;
 
@@ -229,6 +237,13 @@ StatusView::SetStatus(BMessage* message)
 
 
 void
+StatusView::SetRef(const entry_ref& ref)
+{
+	fRef = ref;
+}
+
+
+void
 StatusView::_ValidatePreferredSize()
 {
 	float orgWidth = fPreferredSize.width;
@@ -262,5 +277,29 @@ StatusView::_ValidatePreferredSize()
 	BScrollBar* scrollBar = fScrollView->ScrollBar(B_HORIZONTAL);
 	scrollBar->ResizeBy(-delta, 0);
 	scrollBar->MoveBy(delta, 0);
+}
+
+
+void
+StatusView::_ShowDirMenu()
+{
+	BEntry entry;
+	status_t status = entry.SetTo(&fRef);
+
+	if (status != B_OK || !entry.Exists())
+		return;
+
+	BPrivate::BDirMenu* menu = new BDirMenu(NULL,
+		BMessenger(kTrackerSignature), B_REFS_RECEIVED);
+
+	menu->Populate(&entry, Window(), false, false, true, false, true);
+
+	BPoint point = Bounds().LeftBottom();
+	point.y += 3;
+	ConvertToScreen(&point);
+	BRect clickToOpenRect(Bounds());
+	ConvertToScreen(&clickToOpenRect);
+	menu->Go(point, true, true, clickToOpenRect);
+	delete menu;
 }
 
