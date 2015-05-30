@@ -233,6 +233,7 @@ TFilePanel::TFilePanel(file_panel_mode mode, BMessenger* target,
 	AutoLock<BWindow> lock(this);
 	fBorderedView = new BorderedView;
 	CreatePoseView(model);
+	fBorderedView->GroupLayout()->SetInsets(1);
 	fPoseView->SetRefFilter(filter);
 	if (!fIsSavePanel)
 		fPoseView->SetMultipleSelection(multipleSelection);
@@ -751,9 +752,6 @@ TFilePanel::Init(const BMessage*)
 	PoseView()->VScrollBar()->SetResizingMode(B_FOLLOW_TOP_BOTTOM | B_FOLLOW_RIGHT);
 	fBackView->AddChild(PoseView()->VScrollBar());
 
-	// re-parent the poseview to our bordered view
-	PoseView()->RemoveSelf();
-	fBorderedView->AddChild(PoseView());
 	if (fIsSavePanel)
 		fBackView->AddChild(fBorderedView, fTextControl);
 	else
