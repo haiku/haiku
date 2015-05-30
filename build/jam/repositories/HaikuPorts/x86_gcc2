@@ -687,8 +687,8 @@ RemotePackageRepository HaikuPorts
 	libvpx_x86_devel-1.0.0-2
 	libwebp_x86-0.4.1-1
 	libwebp_x86_devel-0.4.1-1
-	libxml2_x86-2.9.1-1
-	libxml2_x86_devel-2.9.1-1
+	libxml2_x86-2.9.2-1
+	libxml2_x86_devel-2.9.2-1
 	libxslt_x86-1.1.28-2
 	libxslt_x86_devel-1.1.28-2
 	llvm_x86-3.5.2-1
