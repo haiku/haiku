@@ -112,6 +112,59 @@ private:
 };
 
 
+class LaunchJob : public BJob {
+public:
+								LaunchJob(Job* job);
+
+protected:
+	virtual	status_t			Execute();
+
+private:
+			Job*				fJob;
+};
+
+
+class Target : public BJob {
+public:
+								Target(const char* name);
+
+protected:
+	virtual	status_t			Execute();
+};
+
+
+class Worker {
+public:
+								Worker(JobQueue& queue);
+	virtual						~Worker();
+
+protected:
+	virtual	status_t			Process();
+	virtual	bigtime_t			Timeout() const;
+	virtual	status_t			Run(BJob* job);
+
+private:
+	static	status_t			_Process(void* self);
+
+protected:
+			thread_id			fThread;
+			JobQueue&			fJobQueue;
+};
+
+
+class MainWorker : public Worker {
+public:
+								MainWorker(JobQueue& queue);
+
+protected:
+	virtual	bigtime_t			Timeout() const;
+	virtual	status_t			Run(BJob* job);
+
+private:
+			int32				fCPUCount;
+};
+
+
 typedef std::map<BString, Job*> JobMap;
 
 
@@ -134,18 +187,28 @@ private:
 			Job*				_Job(const char* name);
 			void				_InitJobs();
 			void				_LaunchJobs();
+			void				_AddLaunchJob(Job* job);
 
 			void				_RetrieveKernelOptions();
 			void				_SetupEnvironment();
 			void				_InitSystem();
+			void				_AddInitJob(BJob* job);
 
 			bool				_IsSafeMode() const;
 
 private:
 			JobMap				fJobs;
 			JobQueue			fJobQueue;
+			MainWorker*			fMainWorker;
+			Target*				fInitTarget;
 			bool				fSafeMode;
 };
+
+
+static const bigtime_t kWorkerTimeout = 1000000;
+	// One second until a worker thread quits without a job
+
+static int32 sWorkerCount;
 
 
 static const char*
@@ -406,12 +469,148 @@ Job::IsLaunched() const
 // #pragma mark -
 
 
+LaunchJob::LaunchJob(Job* job)
+	:
+	BJob(job->Name()),
+	fJob(job)
+{
+}
+
+
+status_t
+LaunchJob::Execute()
+{
+	if (!fJob->IsLaunched())
+		return fJob->Launch();
+
+	return B_OK;
+}
+
+
+// #pragma mark -
+
+
+Target::Target(const char* name)
+	:
+	BJob(name)
+{
+}
+
+
+status_t
+Target::Execute()
+{
+	return B_OK;
+}
+
+
+// #pragma mark -
+
+
+Worker::Worker(JobQueue& queue)
+	:
+	fJobQueue(queue)
+{
+	fThread = spawn_thread(&Worker::_Process, "worker", B_NORMAL_PRIORITY,
+		this);
+	if (fThread >= 0 && resume_thread(fThread) == B_OK)
+		atomic_add(&sWorkerCount, 1);
+}
+
+
+Worker::~Worker()
+{
+}
+
+
+status_t
+Worker::Process()
+{
+	while (true) {
+		BJob* job;
+		status_t status = fJobQueue.Pop(Timeout(), false, &job);
+		if (status != B_OK)
+			return status;
+
+		Run(job);
+			// TODO: proper error reporting on failed job!
+	}
+}
+
+
+bigtime_t
+Worker::Timeout() const
+{
+	return kWorkerTimeout;
+}
+
+
+status_t
+Worker::Run(BJob* job)
+{
+	return job->Run();
+}
+
+
+/*static*/ status_t
+Worker::_Process(void* _self)
+{
+	Worker* self = (Worker*)_self;
+	status_t status = self->Process();
+	delete self;
+
+	return status;
+}
+
+
+// #pragma mark -
+
+
+MainWorker::MainWorker(JobQueue& queue)
+	:
+	Worker(queue)
+{
+	// TODO: keep track of workers, and quit them on destruction
+	system_info info;
+	if (get_system_info(&info) == B_OK)
+		fCPUCount = info.cpu_count;
+}
+
+
+bigtime_t
+MainWorker::Timeout() const
+{
+	return B_INFINITE_TIMEOUT;
+}
+
+
+status_t
+MainWorker::Run(BJob* job)
+{
+	int32 count = atomic_get(&sWorkerCount);
+
+	size_t jobCount = fJobQueue.CountJobs();
+	if (jobCount > INT_MAX)
+		jobCount = INT_MAX;
+
+	if ((int32)jobCount > count && count < fCPUCount)
+		new Worker(fJobQueue);
+
+	return Worker::Run(job);
+}
+
+
+// #pragma mark -
+
+
 LaunchDaemon::LaunchDaemon(status_t& error)
 	:
 	BServer(kLaunchDaemonSignature, NULL,
 		create_port(B_LOOPER_PORT_DEFAULT_CAPACITY,
-			B_LAUNCH_DAEMON_PORT_NAME), false, &error)
+			B_LAUNCH_DAEMON_PORT_NAME), false, &error),
+	fInitTarget(new Target("init"))
 {
+	fMainWorker = new MainWorker(fJobQueue);
 }
 
 
@@ -469,9 +668,7 @@ LaunchDaemon::MessageReceived(BMessage* message)
 						iterator->second.GetInt32("port", -1));
 				}
 
-				// Launch job now if it isn't running yet
-				if (!job->IsLaunched())
-					job->Launch();
+				_AddLaunchJob(job);
 			}
 			message->SendReply(&reply);
 			break;
@@ -618,8 +815,24 @@ LaunchDaemon::_LaunchJobs()
 			iterator++) {
 		Job* job = iterator->second;
 		if (job->IsEnabled() && job->InitCheck() == B_OK)
-			job->Launch();
+			_AddLaunchJob(job);
 	}
+}
+
+
+void
+LaunchDaemon::_AddLaunchJob(Job* job)
+{
+	if (job->IsLaunched())
+		return;
+
+	LaunchJob* launchJob = new LaunchJob(job);
+
+	// All jobs depend on the init target
+	if (fInitTarget->State() < B_JOB_STATE_SUCCEEDED)
+		launchJob->AddDependency(fInitTarget);
+
+	fJobQueue.AddJob(launchJob);
 }
 
 
@@ -656,13 +869,19 @@ LaunchDaemon::_SetupEnvironment()
 void
 LaunchDaemon::_InitSystem()
 {
-	fJobQueue.AddJob(new InitRealTimeClockJob());
-	fJobQueue.AddJob(new InitSharedMemoryDirectoryJob());
-	fJobQueue.AddJob(new InitTemporaryDirectoryJob());
+	_AddInitJob(new InitRealTimeClockJob());
+	_AddInitJob(new InitSharedMemoryDirectoryJob());
+	_AddInitJob(new InitTemporaryDirectoryJob());
 
-	// TODO: these should be done in parallel
-	while (BJob* job = fJobQueue.Pop())
-		job->Run();
+	fJobQueue.AddJob(fInitTarget);
+}
+
+
+void
+LaunchDaemon::_AddInitJob(BJob* job)
+{
+	fInitTarget->AddDependency(job);
+	fJobQueue.AddJob(job);
 }
 
 
