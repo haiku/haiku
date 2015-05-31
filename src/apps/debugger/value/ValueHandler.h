@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VALUE_HANDLER_H
@@ -11,6 +12,7 @@
 
 class Settings;
 class SettingsMenu;
+class TableCellValueEditor;
 class TableCellValueRenderer;
 class Value;
 class ValueFormatter;
@@ -27,6 +29,12 @@ public:
 	virtual	status_t			GetTableCellValueRenderer(Value* value,
 									TableCellValueRenderer*& _renderer) = 0;
 									// returns a reference
+	virtual	status_t			GetTableCellValueEditor(Value* value,
+									Settings* settings,
+										// may be NULL if preconfiguration with
+										// particular settings isn't desired.
+									TableCellValueEditor*& _editor);
+									// may return NULL, otherwise a reference
 	virtual	status_t			CreateTableCellValueSettingsMenu(Value* value,
 									Settings* settings, SettingsMenu*& _menu);
 									// may return NULL, otherwise a reference

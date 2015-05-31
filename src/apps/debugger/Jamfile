@@ -304,6 +304,7 @@ Application Debugger :
 	TableCellFloatRenderer.cpp
 	TableCellIntegerRenderer.cpp
 	TableCellStringRenderer.cpp
+	TableCellValueEditor.cpp
 	TableCellValueRenderer.cpp
 	TableCellValueRendererUtils.cpp
 
