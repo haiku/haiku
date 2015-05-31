@@ -311,8 +311,12 @@ JobItem::DrawItem(BView *owner, BRect, bool complete)
 			owner->DrawBitmap(fIcon, iconPt);
 
 		// left of item
-		owner->DrawString(fName.String(), fName.Length(), namePt);
-		owner->DrawString(fStatus.String(), fStatus.Length(), statusPt);
+		BString name = fName;
+		owner->TruncateString(&name, B_TRUNCATE_MIDDLE, pagePt.x - namePt.x);
+		owner->DrawString(name.String(), name.Length(), namePt);
+		BString status = fStatus;
+		owner->TruncateString(&status, B_TRUNCATE_MIDDLE, sizePt.x - statusPt.x);
+		owner->DrawString(status.String(), status.Length(), statusPt);
 
 		// right of item
 		owner->DrawString(fPages.String(), fPages.Length(), pagePt);

@@ -446,15 +446,14 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 
 	// left of item
 	BString s = fName;
-	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, pendingPt.x - namePt.x);
-
 	owner->SetFont(be_bold_font);
+	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, pendingPt.x - namePt.x);
 	owner->DrawString(s.String(), s.Length(), namePt);
 	owner->SetFont(&font);
 
 	s = B_TRANSLATE("Driver: %driver%");
 	s.ReplaceFirst("%driver%", fDriverName);
-	owner->TruncateString(&s, B_TRUNCATE_END, bounds.Width() - commentPt.x);
+	owner->TruncateString(&s, B_TRUNCATE_END, commentPt.x - driverPt.x);
 	owner->DrawString(s.String(), s.Length(), driverPt);
 
 
@@ -516,6 +515,7 @@ PrinterItem::UpdatePendingJobs()
 			fPendingJobs = B_TRANSLATE("1 pending job.");
 			return;
 		} else if (pendingJobs > 1) {
+			fPendingJobs = "";
 			fPendingJobs << pendingJobs << B_TRANSLATE(" pending jobs.");
 			return;
 		}
