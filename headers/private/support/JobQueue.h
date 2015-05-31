@@ -30,7 +30,11 @@ public:
 									// gives up ownership
 
 			BJob*				Pop();
+			status_t			Pop(bigtime_t timeout, bool returnWhenEmpty,
+									BJob** _job);
 									// caller owns job
+
+			size_t				CountJobs() const;
 
 			void				Close();
 
@@ -49,7 +53,7 @@ private:
 			void				_RequeueDependantJobsOf(BJob* job);
 			void				_RemoveDependantJobsOf(BJob* job);
 
-			BLocker				fLock;
+	mutable	BLocker				fLock;
 			uint32				fNextTicketNumber;
 			JobPriorityQueue*	fQueuedJobs;
 			sem_id				fHaveRunnableJobSem;
