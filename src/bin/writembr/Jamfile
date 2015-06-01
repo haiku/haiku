@@ -9,10 +9,7 @@ Application writembr :
 ;
 
 # Assemble the MBR code, and convert it into a header file
-
-NASMFLAGS on [ FGristFiles mbr.bin ] = -f bin -O5 ;
-
-Object [ FGristFiles mbr.bin ] : mbr.nasm ;
+BuildMBR [ FGristFiles mbr.bin ] : mbr.S ;
 
 DataFileToSourceFile [ FGristFiles MBR.h ] : [ FGristFiles mbr.bin ]
 	: kMBR : kMBRSize ;

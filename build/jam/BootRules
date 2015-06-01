@@ -134,3 +134,16 @@ actions BootStaticLibraryObjects
 	$(RM) "$(1)"
 	$(HAIKU_AR_$(TARGET_PACKAGING_ARCH)) -r "$(1)" "$(2)" ;
 }
+
+rule BuildMBR binary : source
+{
+	SEARCH on $(source) = $(SUBDIR) ;
+	MakeLocateDebug $(binary) ;
+	Depends $(binary) : $(source) ;
+}
+
+actions BuildMBR
+{
+	$(RM) $(1)
+	$(HAIKU_CC_$(HAIKU_PACKAGING_ARCH)) $(2) -o $(1) $(MBRFLAGS) -nostdlib -Xlinker --oformat=binary -Xlinker -S -Xlinker -N -Xlinker "-e start" -Xlinker "-Ttext=0x600"
+}

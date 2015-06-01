@@ -4,19 +4,6 @@ HAIKU_ANYBOOT_DIR ?= $(HAIKU_DEFAULT_ANYBOOT_DIR) ;
 HAIKU_ANYBOOT = $(HAIKU_ANYBOOT_NAME) ;
 HAIKU_ANYBOOT_LABEL ?= $(HAIKU_DEFAULT_ANYBOOT_LABEL) ;
 
-rule BuildAnybootMBR binary : source {
-	Depends $(binary) : $(source) ;
-
-	MBR_SOURCE on $(binary) = $(source) ;
-
-	BuildAnybootMBR1 $(binary) ;
-}
-
-actions BuildAnybootMBR1 {
-	$(RM) $(1)
-	$(HAIKU_NASM) -f bin $(MBR_SOURCE) -O5 -o $(1)
-}
-
 rule BuildAnybootImage anybootImage : mbrPart : isoPart : imageFile {
 	local anyboot = <build>anyboot ;
 
@@ -33,8 +20,8 @@ actions BuildAnybootImage1 {
 }
 
 local baseMBR = base_mbr.bin ;
-local mbrSource = [ FDirName $(HAIKU_TOP) src bin writembr mbr.nasm ] ;
-BuildAnybootMBR $(baseMBR) : $(mbrSource) ;
+local mbrSource = [ FDirName $(HAIKU_TOP) src bin writembr mbr.S ] ;
+BuildMBR $(baseMBR) : $(mbrSource) ;
 MakeLocate $(baseMBR) : $(HAIKU_OUTPUT_DIR) ;
 MakeLocate $(HAIKU_ANYBOOT) : $(HAIKU_ANYBOOT_DIR) ;
 BuildAnybootImage $(HAIKU_ANYBOOT) : $(baseMBR) : $(HAIKU_CD_BOOT_IMAGE)
