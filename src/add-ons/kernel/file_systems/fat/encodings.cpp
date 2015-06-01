@@ -1139,7 +1139,8 @@ status_t unicode_to_utf8(const uchar *uni, uint32 unilen, uint8 *utf8,
 			(int32 *)&unilen, (char *)utf8, (int32 *)&utf8len);
 
 	if (unilen < origlen) {
-		dprintf("Name is too long (%lx < %lx)\n", unilen, origlen);
+		dprintf("Name is too long (%" B_PRIu32 " < %" B_PRIu32 ")\n", unilen,
+			origlen);
 		return B_ERROR;
 	}
 
@@ -1209,7 +1210,8 @@ status_t utf8_to_unicode(const char *utf8, uchar *uni, uint32 unilen)
 			(int32 *)&utf8len, (char *)uni, (int32 *)&unilen);
 
 	if (origlen < utf8len) {
-		dprintf("Name is too long (%lx < %lx)\n", unilen, origlen);
+		dprintf("Name is too long (%" B_PRIu32 " < %" B_PRIu32 ")\n", unilen,
+			origlen);
 		return B_ERROR;
 	}
 
@@ -1226,7 +1228,7 @@ status_t munge_short_name_english(uchar nshort[11], uint64 value)
 
 	// short names must have only numbers following
 	// the tilde and cannot begin with 0
-	sprintf(buffer, "~%Ld", value);
+	sprintf(buffer, "~%" B_PRIu64, value);
 	len = strlen(buffer);
 	i = 7 - len;
 
@@ -1250,7 +1252,7 @@ status_t munge_short_name_sjis(uchar nshort[11], uint64 value)
 
 	// short names must have only numbers following
 	// the tilde and cannot begin with 0
-	sprintf(buffer, "~%Ld", value);
+	sprintf(buffer, "~%" B_PRIu64, value);
 	len = strlen(buffer);
 
 	last = 0;
@@ -1456,7 +1458,8 @@ generate_short_name_sjis(const uchar *utf8, const uint16 *uni,
 
 bi:
 	if (result < 0) {
-		dprintf("generate_short_name_sjis error: %lx (%s)\n", result, strerror(result));
+		dprintf("generate_short_name_sjis error: %" B_PRId32 " (%s)\n", result,
+			strerror(result));
 	}
 
 	free(sjis);

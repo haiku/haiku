@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUGGER_INTERFACE_H
@@ -80,7 +80,12 @@ public:
 	virtual	status_t			SetCpuState(thread_id thread,
 									const CpuState* state);
 
+	virtual	status_t			GetCpuFeatures(uint32& flags);
+
 	// TeamMemory
+	virtual	status_t			GetMemoryProperties(target_addr_t address,
+									uint32& protection, uint32& locking);
+
 	virtual	ssize_t				ReadMemory(target_addr_t address, void* buffer,
 									size_t size);
 	virtual	ssize_t				WriteMemory(target_addr_t address,

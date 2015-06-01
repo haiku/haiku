@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-PRNT	2674539197
+1	romanian	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimantă: %printer_name%\nDriver:  %driver%\n
 Waiting	JobListView		Se așteaptă
 Print test page	PrintersWindow		Tipărește o pagină de test
@@ -30,7 +30,6 @@ Blue	TestPageView		Albastru
 1 pending job.	PrinterListView		1 sarcină în așteptare.
 Remove	PrintersWindow		Elimină
 <pick one>	AddPrinterDialog		<pick one>
-Add …	PrintersWindow		Adaugă ...
 Print jobs for 	PrintersWindow		Sarcini de tipărire pentru
 Failed	JobListView		Eșuat
 %.2f KB	JobListView		%.2f KB

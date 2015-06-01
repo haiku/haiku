@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	4261904725
+1	hungarian	x-vnd.Haiku-HaikuDepot	4273323974
 Name	PackageListView		Név
 Available packages	MainWindow		Elérhető csomagok
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
@@ -85,6 +85,7 @@ No, quit HaikuDepot	App		Nem, a Raktár bezárása.
 Authentication failed	UserLoginWindow		A hitelesítés sikertelen
 Logged in as %User%	MainWindow		Bejelentkezett mint %User%
 Language	RatePackageWindow		Nyelv
+Size	PackageListView		Méret
 Failed to create or update rating: %s\n	RatePackageWindow		Az értékelés létrehozása vagy frissítése nem sikerült: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Csomag értékelése előtt be kell jelentkezni egy felhasználói fiókba.
  It responded with: 	RatePackageWindow		Ezt válaszolta:
@@ -135,6 +136,7 @@ Cancel	RatePackageWindow		Mégse
 Package action failed	PackageInfoView		A csomag telepítése sikertelen
 OK	UserLoginWindow		Rendben
 Send	RatePackageWindow		Küldés
+-	no package size		-
 Category:	FilterView		Kategória:
 Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
 There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n

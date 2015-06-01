@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	235954604
+1	swedish	x-vnd.Haiku-Terminal	2918699501
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -34,6 +34,7 @@ Settings	Terminal TermWindow		Inställningar
 Window size	Terminal TermWindow		Fönsterstorlek
 Selected text	Terminal AppearancePrefView		Markerad text
 Find	Terminal FindWindow		Sök
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Mönster som specificerar fönster titel. Följande platshållare\nkan användas:
 Appearance	Terminal PrefWindow		Utseende
 Tab title:	Terminal AppearancePrefView		Fliktitel:
 OK	Terminal SetTitleWindow		OK
@@ -76,6 +77,7 @@ Midnight	Terminal colors scheme		Midnatt
 Decrease	Terminal TermWindow		Minska
 Default	Terminal colors scheme		Standard
 Create link here	Terminal TermView		Skapa länk här
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Mönster som specificerar tab titel. Följande platshållare\nkan användas:
 Close	Terminal TermWindow		Stäng
 Text	Terminal AppearancePrefView		Text
 Clear all	Terminal TermWindow		Rensa allt

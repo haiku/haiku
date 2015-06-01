@@ -120,6 +120,9 @@ ScreenSaverFilter::~ScreenSaverFilter()
 {
 	be_roster->StopWatching(fController);
 
+	if (fWatchingFile || fWatchingDirectory)
+		watch_node(&fNodeRef, B_STOP_WATCHING, fController);
+
 	// We must quit our controller without being locked, or else we might
 	// deadlock; when the controller is gone, there is no reason to lock
 	// anymore, anyway.
@@ -128,9 +131,6 @@ ScreenSaverFilter::~ScreenSaverFilter()
 
 	delete fCornerRunner;
 	delete fRunner;
-
-	if (fWatchingFile || fWatchingDirectory)
-		watch_node(&fNodeRef, B_STOP_WATCHING, fController);
 }
 
 

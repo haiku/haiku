@@ -42,7 +42,6 @@ All rights reserved.
 #include <string.h>
 
 #include "EntryIterator.h"
-#include "NodeWalker.h"
 
 
 //	#pragma mark - TWalkerWrapper

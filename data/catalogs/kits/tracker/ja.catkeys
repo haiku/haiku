@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	1313160091
+1	japanese	x-vnd.Haiku-libtracker	4204393626
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		アドオン
 Mount settings…	ContainerWindow		マウント設定…
@@ -179,6 +179,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		正規表現にエラー�
 Mount all	MountMenu		すべてマウント
 calculating…	InfoWindow		計算中…
 Mount all disks now	AutoMounterSettings		すべてのディスクをただちにマウント
+Hide dotfiles	SettingsView		ドットファイルを隠す
 Untitled bitmap	PoseView		無名ビットマップ
 of %items	StatusWindow		/ %items
 Description:	InfoWindow		説明:
@@ -275,7 +276,7 @@ Copy more	ContainerWindow		さらにコピー
 OK	PoseView		OK
 Read	FilePermissionsView		読み取り
 Clean up all	ContainerWindow		すべてを整列
-New folder	TemplatesMenu		新規フォルダー
+New folder	TemplatesMenu		フォルダー
 Move here	ContainerWindow		ここに移動
 File	FilePanelPriv		ファイル
 Real name	ContainerWindow		実名

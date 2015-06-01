@@ -88,7 +88,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			InitTerminateLibPackage.cpp
 			InstallationLocationInfo.cpp
 			Job.cpp
-			JobQueue.cpp
 			PackageInfo.cpp
 			PackageInfoContentHandler.cpp
 			PackageInfoParser.cpp

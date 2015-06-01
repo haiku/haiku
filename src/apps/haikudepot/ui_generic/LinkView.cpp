@@ -65,7 +65,7 @@ LinkView::Draw(BRect updateRect)
 	float y = (bounds.top + bounds.bottom - ceilf(fontHeight.ascent)
 		- ceilf(fontHeight.descent)) / 2.0 + ceilf(fontHeight.ascent);
 	float x = 0.0f;
-	
+
 	BString text(Text());
 	TruncateString(&text, B_TRUNCATE_END, bounds.Width());
 	DrawString(text, BPoint(x, y));

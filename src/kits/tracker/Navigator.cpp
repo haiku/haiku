@@ -41,7 +41,6 @@ All rights reserved.
 #include "Bitmaps.h"
 #include "Commands.h"
 #include "FSUtils.h"
-#include "Model.h"
 #include "Tracker.h"
 
 
@@ -190,8 +189,7 @@ BNavigator::GoUp(bool option)
 	BEntry entry;
 	if (entry.SetTo(fPath.Path()) == B_OK) {
 		BEntry parentEntry;
-		if (entry.GetParent(&parentEntry) == B_OK
-			&& !FSIsDeskDir(&parentEntry)) {
+		if (entry.GetParent(&parentEntry) == B_OK) {
 			SendNavigationMessage(kActionUp, &parentEntry, option);
 		}
 	}
@@ -267,7 +265,6 @@ BNavigator::GoTo()
 	entry_ref ref;
 
 	if (entry.SetTo(pathname.String()) == B_OK
-		&& !FSIsDeskDir(&entry)
 		&& entry.GetRef(&ref) == B_OK) {
 		BMessage message(kSwitchDirectory);
 		message.AddRef("refs", &ref);
@@ -318,8 +315,7 @@ BNavigator::UpdateLocation(const Model* newmodel, int32 action)
 	BEntry entry;
 	if (entry.SetTo(fPath.Path()) == B_OK) {
 		BEntry parentEntry;
-		bool enable = entry.GetParent(&parentEntry) == B_OK
-			&& !FSIsDeskDir(&parentEntry);
+		bool enable = entry.GetParent(&parentEntry) == B_OK;
 		SetActionEnabled(kNavigatorCommandUp, enable);
 	}
 

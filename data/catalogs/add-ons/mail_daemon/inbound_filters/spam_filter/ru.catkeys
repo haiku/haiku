@@ -1,6 +1,7 @@
-1	russian	x-vnd.Haiku-SpamFilter	160316705
+1	russian	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		или пустое письмо
 Genuine below and uncertain above:	SpamFilterConfig		Достоверно ниже и неточно выше:
 Spam above:	SpamFilterConfig		Спам выше:
 Add spam rating to start of subject	SpamFilterConfig		Добавить спам-рейтинг к начало темы
+Bayesian Spam Filter	SpamFilter		Байесовский спам-фильтр
 Learn from all incoming e-mail	SpamFilterConfig		Обучаться на всех входящих письмах

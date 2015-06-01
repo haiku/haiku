@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	235954604
+1	japanese	x-vnd.Haiku-Terminal	2696855708
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -33,7 +33,9 @@ Increase	Terminal TermWindow		大きく
 Settings	Terminal TermWindow		設定
 Window size	Terminal TermWindow		ウィンドウサイズ
 Selected text	Terminal AppearancePrefView		選択されたテキスト
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tタブで動作中のプロセスの作業中フォルダー\n\t\t\tオプションでパスの最大要素数を指定できます。\n\t\t\t例. '%2d' は最大 2 つの要素を示します。\n\t%T\t-\t現在のロケールでの Terminal アプリケーション名\n\t%e\t-\tタブのエンコーディング。UTF-8 の場合は非表示です。\n\t%i\t-\tウィンドウのインデックス\n\t%p\t-\tタブ内で実行中のプロセス名\n\t%t\t-\tタブのタイトル
 Find	Terminal FindWindow		検索
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		パターンはウィンドウタイトルを定めます。以下のプレースホルダーが\n使えます:
 Appearance	Terminal PrefWindow		外観
 Tab title:	Terminal AppearancePrefView		タブタイトル:
 OK	Terminal SetTitleWindow		OK
@@ -76,6 +78,7 @@ Midnight	Terminal colors scheme		ミッドナイト
 Decrease	Terminal TermWindow		小さく
 Default	Terminal colors scheme		デフォルト
 Create link here	Terminal TermView		カレントディレクトリにリンク作成
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		パターンはタブタイトルを定めます。以下のプレースホルダーが\n使えます:
 Close	Terminal TermWindow		閉じる
 Text	Terminal AppearancePrefView		テキスト
 Clear all	Terminal TermWindow		すべて消去
@@ -103,7 +106,8 @@ Find previous	Terminal TermWindow		前を検索
 Copy link location	Terminal TermView		リンクの場所をコピー
 Tab title:	Terminal TermWindow		タブタイトル:
 Find next	Terminal TermWindow		次を検索
-Close active tab	Terminal TermWindow		アクティブタブを閉じる
+Close active tab	Terminal TermWindow		タブを閉じる
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t文字 '%'.\n\t%<\t-\tあとでプレースホルダーが空にならない場合のみ表示される\n\t\t\tセクションを開始します。\n\t%>\t-\t前の %< セクションと、このセクションの間のプレースホルダーが\n\t\t\t空にならない場合のみ表示されるセクションを開始します。\n\t%-\t-\t%< または %> セクションを終了します。\n\n'%' とフォーマット文字間の英数字以外の文字は、プレースホルダーが\n空でない場合にスペースのみを挿入します。
 Paste	Terminal TermWindow		貼り付け
 Shell 	Terminal TermWindow		シェル
 Cancel	Terminal TermView		中止

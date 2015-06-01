@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef MESSAGE_CODES_H
@@ -41,6 +41,7 @@ enum {
 	MSG_FUNCTION_SOURCE_CODE_CHANGED			= 'fnsc',
 	MSG_USER_BREAKPOINT_CHANGED					= 'ubrc',
 	MSG_WATCHPOINT_CHANGED						= 'wapc',
+	MSG_MEMORY_DATA_CHANGED						= 'mdac',
 	MSG_DEBUGGER_EVENT							= 'dbge',
 	MSG_LOAD_SETTINGS							= 'ldst',
 
@@ -77,6 +78,7 @@ enum {
 	MSG_ADD_NEW_EXPRESSION						= 'anex',
 	MSG_EXPRESSION_PROMPT_WINDOW_CLOSED			= 'epwc',
 	MSG_INSPECT_ADDRESS							= 'isad',
+	MSG_WRITE_TARGET_MEMORY						= 'wtam',
 	MSG_EVALUATE_EXPRESSION						= 'evex',
 	MSG_EXPRESSION_EVALUATED					= 'exev',
 	MSG_SHOW_TYPECAST_NODE_PROMPT				= 'stnp',

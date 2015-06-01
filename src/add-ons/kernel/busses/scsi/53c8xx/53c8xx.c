@@ -23,6 +23,7 @@
 #define d_printf(x...)
 #endif
 
+#include <module.h>
 #include <OS.h>
 #include <KernelExport.h>
 #include <PCI.h>
@@ -1025,7 +1026,7 @@ static void reloc_script(Symbios *s)
 	inb(sym_sist1);
 	inb(sym_dstat);
 
-	outb(sym_dmode, ( sym_dmode_diom | sym_dmode_siom, 0 ));	/* FIXME: ??? */
+	outb(sym_dmode, /*( sym_dmode_diom | sym_dmode_siom, 0 )*/ 0);	/* FIXME: ??? */
 }
 
 static uint32 sym_readclock(Symbios *s)
@@ -1079,7 +1080,7 @@ static Symbios *create_cardinfo(int num, pci_info *pi, int flags)
 	s->num = num;
 	s->iobase = pi->u.h0.base_registers[0];
 	s->irq = pi->u.h0.interrupt_line;
-	s->hwlock = 0;
+	B_INITIALIZE_SPINLOCK(&s->hwlock);
 	s->startqueue = NULL;
 	s->startqueuetail = NULL;
 	s->active = NULL;
@@ -1407,8 +1408,6 @@ static status_t std_ops(int32 op, ...)
 #if DEBUG_SAFETY
 		set_dprintf_enabled(true);
 #endif
-		load_driver_symbols("53c8xx");
-
 		if (get_module(pci_name, (module_info **) &pci) != B_OK)
 			return B_ERROR;
 

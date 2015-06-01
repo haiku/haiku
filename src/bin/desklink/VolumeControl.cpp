@@ -79,7 +79,8 @@ VolumeControl::VolumeControl(BMessage* archive)
 
 	fMixerControl = new MixerControl(volumeWhich);
 
-	archive->SendReply(new BMessage(B_QUIT_REQUESTED));
+	BMessage msg(B_QUIT_REQUESTED);
+	archive->SendReply(&msg);
 }
 
 
@@ -300,33 +301,34 @@ VolumeControl::MessageReceived(BMessage* msg)
 			if (msg->FindString("be:signature", &signature) != B_OK)
 				break;
 
-            bool isMediaServer = !strcmp(signature, kMediaServerSignature);
-            bool isAddOnServer = !strcmp(signature, kAddOnServerSignature);
-            if (isMediaServer)
-                fMediaServerRunning = msg->what == B_SOME_APP_LAUNCHED;
-            if (isAddOnServer)
-                fAddOnServerRunning = msg->what == B_SOME_APP_LAUNCHED;
+			bool isMediaServer = !strcmp(signature, kMediaServerSignature);
+			bool isAddOnServer = !strcmp(signature, kAddOnServerSignature);
+			if (!isMediaServer && !isAddOnServer)
+				break;
 
-           if (isMediaServer || isAddOnServer) {
-                if (!fMediaServerRunning && !fAddOnServerRunning) {
-					// No media server around
-					SetLabel(B_TRANSLATE("No media server running"));
-					SetEnabled(false);
-                } else if (fMediaServerRunning && fAddOnServerRunning) {
-                    // HACK!
-                    // quit our now invalid instance of the media roster
-                    // so that before new nodes are created,
-                    // we get a new roster
-                    BMediaRoster* roster = BMediaRoster::CurrentRoster();
-                    if (roster != NULL) {
-                        roster->Lock();
-                        roster->Quit();
-                    }
+			if (isMediaServer)
+				fMediaServerRunning = msg->what == B_SOME_APP_LAUNCHED;
+			if (isAddOnServer)
+				fAddOnServerRunning = msg->what == B_SOME_APP_LAUNCHED;
 
-					BMessage reconnect(kMsgReconnectVolume);
-					BMessageRunner::StartSending(this, &reconnect, 1000000LL, 1);
-					fConnectRetries = 3;
-                }
+			if (!fMediaServerRunning && !fAddOnServerRunning) {
+				// No media server around
+				SetLabel(B_TRANSLATE("No media server running"));
+				SetEnabled(false);
+			} else if (fMediaServerRunning && fAddOnServerRunning) {
+				// HACK!
+				// quit our now invalid instance of the media roster
+				// so that before new nodes are created,
+				// we get a new roster
+				BMediaRoster* roster = BMediaRoster::CurrentRoster();
+				if (roster != NULL) {
+					roster->Lock();
+					roster->Quit();
+				}
+
+				BMessage reconnect(kMsgReconnectVolume);
+				BMessageRunner::StartSending(this, &reconnect, 1000000LL, 1);
+				fConnectRetries = 3;
 			}
 			break;
 		}

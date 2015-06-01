@@ -2,14 +2,23 @@
  * Copyright 2004-2008, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
- * Copyright 2012, Alexander von Gluck, kallisti5@unixzen.com
+ * Copyright 2012-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
 
 #include "serial.h"
 
-#include <debug_uart_8250.h>
+#include <arch/generic/debug_uart_8250.h>
+
+#if defined(__ARM__)
+#include <arch/arm/arch_uart_pl011.h>
+#endif
+
 #include <board_config.h>
 #include <boot/platform.h>
 #include <arch/cpu.h>
@@ -23,8 +32,8 @@ extern "C" {
 #include <libfdt_env.h>
 };
 
+#include "fdt_serial.h"
 
-extern "C" DebugUART *debug_uart_from_fdt(const void *fdt);
 
 DebugUART* gUART;
 
@@ -36,6 +45,9 @@ static uint32 sBufferPosition;
 static void
 serial_putc(char c)
 {
+	if (gUART == NULL || sSerialEnabled <= 0)
+		return;
+
 	gUART->PutChar(c);
 }
 
@@ -43,6 +55,9 @@ serial_putc(char c)
 extern "C" int
 serial_getc(bool wait)
 {
+	if (gUART == NULL || sSerialEnabled <= 0)
+		return 0;
+
 	return gUART->GetChar(wait);
 }
 
@@ -83,10 +98,8 @@ extern "C" void
 serial_enable(void)
 {
 	/* should already be initialized by U-Boot */
-	/*
 	gUART->InitEarly();
-	gUART->InitPort(9600);
-	*/
+	gUART->InitPort(115200);
 	sSerialEnabled++;
 }
 
@@ -111,11 +124,16 @@ serial_init(const void *fdt)
 	// first try with hints from the FDT
 	gUART = debug_uart_from_fdt(fdt);
 
-#ifdef BOARD_UART_DEBUG
-	// fallback to hardcoded board UART
-	if (gUART == NULL)
+	// fallback to known board UARTs
+	#if defined(BOARD_UART_DEBUG) && defined(BOARD_UART_CLOCK)
+	if (gUART == NULL) {
+		#ifdef BOARD_UART_PL011
+		gUART = arch_get_uart_pl011(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
+		#else
 		gUART = arch_get_uart_8250(BOARD_UART_DEBUG, BOARD_UART_CLOCK);
-#endif
+		#endif
+	}
+	#endif
 
 	if (gUART == NULL)
 		return;

@@ -23,7 +23,7 @@ public:
 	virtual		bool 		WantsAutoStart();
 	virtual		status_t 	AutoStart(int count, BMediaNode** node,	int32* id, bool* more);
 private:	
-				int 		ScanPluginsFolders(const char* path, bool make_dir = false);
+				int 		ScanPluginsFolder(const char* path, bool make_dir = false);
 				BList		fPluginsList;
 };
 

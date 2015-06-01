@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-PackageInstaller	3253212490
+1	slovak	x-vnd.Haiku-PackageInstaller	172019075
 Install to:	PackageView		Inštalovať do:
 OK	PackageView		OK
 Accept	PackageTextViewer		Prijať
@@ -11,7 +11,6 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Zdá sa, že sa vyskytla nezhoda vo veľkosti súboru balíka. Balík môže byť poškodený alebo bol po vytvorení zmenený. Želáte si napriek tomu pokračovať?
 Error while installing the package\n	PackageView		Chyba počas inštalácie balíka\n
 Disclaimer	PackageTextViewer		Zrieknutie sa zodpovednosti
-%.1f GiB	PackageView		%.1f GiB
 The installation of the package has been aborted.	PackageView		Inštalácia balíka bola zrušená.
 Done	PackageInstall		Hotovo
 All existing files will be replaced?	PackageView		Všetky existujúce súbory budú nahradené?
@@ -27,9 +26,7 @@ Skip all	PackageView		Preskočiť všetky
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Položka s názvom „%s“ už v danej ceste existuje.\nNahradiť položku položkou z tohto balíka alebo ho preskočiť?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skript s názvom „%s“ už v danej ceste existuje.\nNahradiť skript skriptom z tohto balíka alebo ho preskočiť?
 Running post-installation scripts	PackageInstall		Spúšťajú sa poinštalačné skripty
-%llu bytes	PackageView		%llu bajtov
 Skip	PackageView		Preskočiť
-%.1f MiB	PackageView		%.1f MiB
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Adresár s názvom „%s“ už v danej ceste existuje.\nNahradiť adresár adresárom z tohto balíka alebo ho preskočiť?
 The package you requested has been successfully installed on your system.	PackageView		Balík, ktorý ste požadovali bol úspešne nainštalovaný na váš systém.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Chyba! „%s“ nie je platná cesta.\n
@@ -44,7 +41,6 @@ Decline	PackageTextViewer		Zamietnuť
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Súbor s názvom „%s“ už v danej ceste existuje.\nNahradiť súbor súborom z tohto balíka alebo ho preskočiť?
 All existing files will be skipped?	PackageView		Všetky existujúce súbory sa preskočia?
 Continue	PackageInfo		Pokračovať
-%.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		Zrušiť
 PackageInstaller	System name		Inštalátor balíkov
 Abort	PackageInstall		Zrušiť

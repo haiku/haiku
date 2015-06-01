@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,7 +39,7 @@ BDecisionProvider::YesNoDecisionNeeded(const BString& description,
 
 
 BContext::BContext(BDecisionProvider& decisionProvider,
-	BJobStateListener& jobStateListener)
+	BSupportKit::BJobStateListener& jobStateListener)
 	:
 	fDecisionProvider(decisionProvider),
 	fJobStateListener(jobStateListener),
@@ -74,7 +74,7 @@ BContext::GetNewTempfile(const BString& baseName, BEntry* entry) const
 }
 
 
-BJobStateListener&
+BSupportKit::BJobStateListener&
 BContext::JobStateListener() const
 {
 	return fJobStateListener;

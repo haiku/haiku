@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,47 +8,54 @@
 
 
 #include "Services.h"
-#include "NetServer.h"
-#include "Settings.h"
 
-#include <Autolock.h>
-#include <NetworkAddress.h>
+#include <new>
 
 #include <errno.h>
-#include <netdb.h>
 #include <netinet/in.h>
-#include <new>
 #include <stdlib.h>
 #include <strings.h>
 #include <sys/ioctl.h>
 #include <sys/socket.h>
-#include <vector>
+
+#include <Autolock.h>
+#include <NetworkAddress.h>
+#include <NetworkSettings.h>
+
+#include <NetServer.h>
+
 
 using namespace std;
+using namespace BNetworkKit;
 
-struct service_address {
+
+struct service_connection {
 	struct service* owner;
 	int		socket;
-	int		family;
-	int		type;
-	int		protocol;
-	BNetworkAddress address;
+	BNetworkServiceAddressSettings address;
 
-	bool operator==(const struct service_address& other) const;
+	//service_connection() : owner(NULL), socket(-1) {}
+
+	int Family() const { return address.Family(); }
+	int Protocol() const { return address.Protocol(); }
+	int Type() const { return address.Type(); }
+	const BNetworkAddress& Address() const { return address.Address(); }
+
+	bool operator==(const struct service_connection& other) const;
 };
 
-typedef std::vector<service_address> AddressList;
+typedef std::vector<service_connection> ConnectionList;
 typedef std::vector<std::string> StringList;
 
 struct service {
-	std::string	name;
-	StringList	arguments;
-	uid_t		user;
-	gid_t		group;
-	AddressList	addresses;
-	uint32		update;
-	bool		stand_alone;
-	pid_t		process;
+	std::string		name;
+	StringList		arguments;
+	uid_t			user;
+	gid_t			group;
+	ConnectionList	connections;
+	uint32			update;
+	bool			stand_alone;
+	pid_t			process;
 
 	~service();
 	bool operator!=(const struct service& other) const;
@@ -56,52 +63,13 @@ struct service {
 };
 
 
-int
-parse_type(const char* string)
-{
-	if (!strcasecmp(string, "stream"))
-		return SOCK_STREAM;
-
-	return SOCK_DGRAM;
-}
-
-
-int
-parse_protocol(const char* string)
-{
-	struct protoent* proto = getprotobyname(string);
-	if (proto == NULL)
-		return IPPROTO_TCP;
-
-	return proto->p_proto;
-}
-
-
-int
-type_for_protocol(int protocol)
-{
-	// default determined by protocol
-	switch (protocol) {
-		case IPPROTO_TCP:
-			return SOCK_STREAM;
-
-		case IPPROTO_UDP:
-		default:
-			return SOCK_DGRAM;
-	}
-}
-
-
 //	#pragma mark -
 
 
 bool
-service_address::operator==(const struct service_address& other) const
+service_connection::operator==(const struct service_connection& other) const
 {
-	return family == other.family
-		&& type == other.type
-		&& protocol == other.protocol
-		&& address == other.address;
+	return address == other.address;
 }
 
 
@@ -111,11 +79,11 @@ service_address::operator==(const struct service_address& other) const
 service::~service()
 {
 	// close all open sockets
-	AddressList::const_iterator iterator = addresses.begin();
-	for (; iterator != addresses.end(); iterator++) {
-		const service_address& address = *iterator;
+	ConnectionList::const_iterator iterator = connections.begin();
+	for (; iterator != connections.end(); iterator++) {
+		const service_connection& connection = *iterator;
 
-		close(address.socket);
+		close(connection.socket);
 	}
 }
 
@@ -132,32 +100,33 @@ service::operator==(const struct service& other) const
 {
 	if (name != other.name
 		|| arguments.size() != other.arguments.size()
-		|| addresses.size() != other.addresses.size()
+		|| connections.size() != other.connections.size()
 		|| stand_alone != other.stand_alone)
 		return false;
 
-	// compare arguments
+	// Compare arguments
 
 	for(size_t i = 0; i < arguments.size(); i++) {
 		if (arguments[i] != other.arguments[i])
 			return false;
 	}
 
-	// compare addresses
+	// Compare connections
 
-	AddressList::const_iterator iterator = addresses.begin();
-	for (; iterator != addresses.end(); iterator++) {
-		const service_address& address = *iterator;
+	ConnectionList::const_iterator iterator = connections.begin();
+	for (; iterator != connections.end(); iterator++) {
+		const service_connection& connection = *iterator;
 
-		// find address in other addresses
+		// Find address in other addresses
 
-		AddressList::const_iterator otherIterator = other.addresses.begin();
-		for (; otherIterator != other.addresses.end(); otherIterator++) {
-			if (address == *otherIterator)
+		ConnectionList::const_iterator otherIterator
+			= other.connections.begin();
+		for (; otherIterator != other.connections.end(); otherIterator++) {
+			if (connection == *otherIterator)
 				break;
 		}
 
-		if (otherIterator == other.addresses.end())
+		if (otherIterator == other.connections.end())
 			return false;
 	}
 
@@ -229,6 +198,19 @@ Services::MessageReceived(BMessage* message)
 			_Update(*message);
 			break;
 
+		case kMsgIsServiceRunning:
+		{
+			const char* name = message->GetString("name");
+			if (name == NULL)
+				break;
+
+			BMessage reply(B_REPLY);
+			reply.AddString("name", name);
+			reply.AddBool("running", fNameMap.find(name) != fNameMap.end());
+			message->SendReply(&reply);
+			break;
+		}
+
 		default:
 			BHandler::MessageReceived(message);
 	}
@@ -268,20 +250,22 @@ Services::_StartService(struct service& service)
 	// create socket
 
 	bool failed = false;
-	AddressList::iterator iterator = service.addresses.begin();
-	for (; iterator != service.addresses.end(); iterator++) {
-		service_address& address = *iterator;
+	ConnectionList::iterator iterator = service.connections.begin();
+	for (; iterator != service.connections.end(); iterator++) {
+		service_connection& connection = *iterator;
 
-		address.socket = socket(address.family, address.type, address.protocol);
-		if (address.socket < 0
-			|| bind(address.socket, address.address, address.address.Length())
-					< 0
-			|| fcntl(address.socket, F_SETFD, FD_CLOEXEC) < 0) {
+		connection.socket = socket(connection.Family(),
+			connection.Type(), connection.Protocol());
+		if (connection.socket < 0
+			|| bind(connection.socket, connection.Address(),
+				connection.Address().Length()) < 0
+			|| fcntl(connection.socket, F_SETFD, FD_CLOEXEC) < 0) {
 			failed = true;
 			break;
 		}
 
-		if (address.type == SOCK_STREAM && listen(address.socket, 50) < 0) {
+		if (connection.Type() == SOCK_STREAM
+			&& listen(connection.socket, 50) < 0) {
 			failed = true;
 			break;
 		}
@@ -297,13 +281,13 @@ Services::_StartService(struct service& service)
 	fNameMap[service.name] = &service;
 	service.update = fUpdate;
 
-	iterator = service.addresses.begin();
-	for (; iterator != service.addresses.end(); iterator++) {
-		service_address& address = *iterator;
+	iterator = service.connections.begin();
+	for (; iterator != service.connections.end(); iterator++) {
+		service_connection& connection = *iterator;
 
-		fSocketMap[address.socket] = &address;
-		_UpdateMinMaxSocket(address.socket);
-		FD_SET(address.socket, &fSet);
+		fSocketMap[connection.socket] = &connection;
+		_UpdateMinMaxSocket(connection.socket);
+		FD_SET(connection.socket, &fSet);
 	}
 
 	_NotifyListener();
@@ -325,17 +309,17 @@ Services::_StopService(struct service& service)
 	}
 
 	if (!service.stand_alone) {
-		AddressList::const_iterator iterator = service.addresses.begin();
-		for (; iterator != service.addresses.end(); iterator++) {
-			const service_address& address = *iterator;
+		ConnectionList::const_iterator iterator = service.connections.begin();
+		for (; iterator != service.connections.end(); iterator++) {
+			const service_connection& connection = *iterator;
 
 			ServiceSocketMap::iterator socketIterator
-				= fSocketMap.find(address.socket);
+				= fSocketMap.find(connection.socket);
 			if (socketIterator != fSocketMap.end())
 				fSocketMap.erase(socketIterator);
 
-			close(address.socket);
-			FD_CLR(address.socket, &fSet);
+			close(connection.socket);
+			FD_CLR(connection.socket, &fSet);
 		}
 	}
 
@@ -353,129 +337,34 @@ Services::_StopService(struct service& service)
 status_t
 Services::_ToService(const BMessage& message, struct service*& service)
 {
-	// get mandatory fields
-	const char* name;
-	if (message.FindString("name", &name) != B_OK
-		|| !message.HasString("launch"))
-		return B_BAD_VALUE;
+	BNetworkServiceSettings settings(message);
+	status_t status = settings.InitCheck();
+	if (status != B_OK)
+		return status;
+	if (!settings.IsEnabled())
+		return B_NAME_NOT_FOUND;
 
 	service = new (std::nothrow) ::service;
 	if (service == NULL)
 		return B_NO_MEMORY;
 
-	service->name = name;
-
-	const char* argument;
-	for (int i = 0; message.FindString("launch", i, &argument) == B_OK; i++) {
-		service->arguments.push_back(argument);
-	}
-
-	service->stand_alone = false;
+	service->name = settings.Name();
+	service->stand_alone = settings.IsStandAlone();
 	service->process = -1;
 
-	// TODO: user/group is currently ignored!
+	// Copy launch arguments
+	for (int32 i = 0; i < settings.CountArguments(); i++)
+		service->arguments.push_back(settings.ArgumentAt(i));
 
-	// Default family/port/protocol/type for all addresses
+	// Copy addresses to listen to
+	for (int32 i = 0; i < settings.CountAddresses(); i++) {
+		const BNetworkServiceAddressSettings& address = settings.AddressAt(i);
+		service_connection connection;
+		connection.owner = service;
+		connection.socket = -1;
+		connection.address = address;
 
-	// we default to inet/tcp/port-from-service-name if nothing is specified
-	const char* string;
-	if (message.FindString("family", &string) != B_OK)
-		string = "inet";
-
-	int32 serviceFamily = get_address_family(string);
-	if (serviceFamily == AF_UNSPEC)
-		serviceFamily = AF_INET;
-
-	int32 serviceProtocol;
-	if (message.FindString("protocol", &string) == B_OK)
-		serviceProtocol = parse_protocol(string);
-	else {
-		string = "tcp";
-			// we set 'string' here for an eventual call to getservbyname()
-			// below
-		serviceProtocol = IPPROTO_TCP;
-	}
-
-	int32 servicePort;
-	if (message.FindInt32("port", &servicePort) != B_OK) {
-		struct servent* servent = getservbyname(name, string);
-		if (servent != NULL)
-			servicePort = ntohs(servent->s_port);
-		else
-			servicePort = -1;
-	}
-
-	int32 serviceType = -1;
-	if (message.FindString("type", &string) == B_OK) {
-		serviceType = parse_type(string);
-	} else {
-		serviceType = type_for_protocol(serviceProtocol);
-	}
-
-	bool standAlone = false;
-	if (message.FindBool("stand_alone", &standAlone) == B_OK)
-		service->stand_alone = standAlone;
-
-	BMessage address;
-	int32 i = 0;
-	for (; message.FindMessage("address", i, &address) == B_OK; i++) {
-		// TODO: dump problems in the settings to syslog
-		service_address serviceAddress;
-		if (address.FindString("family", &string) != B_OK)
-			continue;
-
-		serviceAddress.family = get_address_family(string);
-		if (serviceAddress.family == AF_UNSPEC)
-			continue;
-
-		if (address.FindString("protocol", &string) == B_OK)
-			serviceAddress.protocol = parse_protocol(string);
-		else
-			serviceAddress.protocol = serviceProtocol;
-
-		if (message.FindString("type", &string) == B_OK)
-			serviceAddress.type = parse_type(string);
-		else if (serviceAddress.protocol != serviceProtocol)
-			serviceAddress.type = type_for_protocol(serviceAddress.protocol);
-		else
-			serviceAddress.type = serviceType;
-
-		if (address.FindString("address", &string) == B_OK) {
-			if (!parse_address(serviceFamily, string, serviceAddress.address))
-				continue;
-		} else
-			serviceAddress.address.SetToWildcard(serviceFamily);
-
-		int32 port;
-		if (address.FindInt32("port", &port) != B_OK)
-			port = servicePort;
-
-		serviceAddress.address.SetPort(port);
-		serviceAddress.socket = -1;
-
-		serviceAddress.owner = service;
-		service->addresses.push_back(serviceAddress);
-	}
-
-	if (i == 0 && (serviceFamily < 0 || servicePort < 0)) {
-		// no address specified
-		printf("service %s has no address specified\n", name);
-		delete service;
-		return B_BAD_VALUE;
-	}
-
-	if (i == 0) {
-		// no address specified, but family/port were given; add empty address
-		service_address serviceAddress;
-		serviceAddress.family = serviceFamily;
-		serviceAddress.type = serviceType;
-		serviceAddress.protocol = serviceProtocol;
-		serviceAddress.address.SetToWildcard(serviceFamily, servicePort);
-
-		serviceAddress.socket = -1;
-
-		serviceAddress.owner = service;
-		service->addresses.push_back(serviceAddress);
+		service->connections.push_back(connection);
 	}
 
 	return B_OK;
@@ -491,15 +380,11 @@ Services::_Update(const BMessage& services)
 	BMessage message;
 	for (int32 index = 0; services.FindMessage("service", index,
 			&message) == B_OK; index++) {
-		const char* name;
-		if (message.FindString("name", &name) != B_OK)
-			continue;
-
 		struct service* service;
 		if (_ToService(message, service) != B_OK)
 			continue;
 
-		ServiceNameMap::iterator iterator = fNameMap.find(name);
+		ServiceNameMap::iterator iterator = fNameMap.find(service->name);
 		if (iterator == fNameMap.end()) {
 			// this service does not exist yet, start it
 			printf("New service %s\n", service->name.c_str());
@@ -576,7 +461,10 @@ Services::_LaunchService(struct service& service, int socket)
 		if (socket != -1)
 			close(socket);
 
-		if (service.stand_alone)
+		if (child < 0) {
+			fprintf(stderr, "Could not start service %s\n",
+				service.name.c_str());
+		} else if (service.stand_alone)
 			service.process = child;
 	}
 
@@ -614,16 +502,16 @@ Services::_Listener()
 			if (iterator == fSocketMap.end())
 				continue;
 
-			struct service_address& address = *iterator->second;
+			struct service_connection& connection = *iterator->second;
 			int socket;
 
-			if (address.type == SOCK_STREAM) {
+			if (connection.Type() == SOCK_STREAM) {
 				// accept incoming connection
 				int value = 1;
 				ioctl(i, FIONBIO, &value);
 					// make sure we don't wait for the connection
 
-				socket = accept(address.socket, NULL, NULL);
+				socket = accept(connection.socket, NULL, NULL);
 
 				value = 0;
 				ioctl(i, FIONBIO, &value);
@@ -631,11 +519,11 @@ Services::_Listener()
 				if (socket < 0)
 					continue;
 			} else
-				socket = address.socket;
+				socket = connection.socket;
 
 			// launch this service's handler
 
-			_LaunchService(*address.owner, socket);
+			_LaunchService(*connection.owner, socket);
 		}
 	}
 	return B_OK;

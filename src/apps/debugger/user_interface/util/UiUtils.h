@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2015, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -20,6 +20,16 @@ class StackFrame;
 class Team;
 class TeamMemoryBlock;
 class ValueNodeChild;
+
+
+enum {
+	SIMD_RENDER_FORMAT_INT8 = 0,
+	SIMD_RENDER_FORMAT_INT16,
+	SIMD_RENDER_FORMAT_INT32,
+	SIMD_RENDER_FORMAT_INT64,
+	SIMD_RENDER_FORMAT_FLOAT,
+	SIMD_RENDER_FORMAT_DOUBLE
+};
 
 
 class UiUtils {
@@ -60,6 +70,10 @@ public:
 									RangeList& _output);
 
 	static	const char*			TypeCodeToString(type_code type);
+
+	static	const BString&		FormatSIMDValue(const BVariant& value,
+									uint32 bitSize, uint32 format,
+									BString& _output);
 };
 
 

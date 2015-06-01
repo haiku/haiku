@@ -955,7 +955,7 @@ rootfs_rename(fs_volume* _volume, fs_vnode* _fromDir, const char* fromName,
 	}
 
 	// we try to reuse the existing name buffer if possible
-	if (strlen(fromName) >= strlen(toName)) {
+	if (strlen(fromName) < strlen(toName)) {
 		char* nameBuffer = strdup(toName);
 		if (nameBuffer == NULL)
 			return B_NO_MEMORY;

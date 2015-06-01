@@ -1,4 +1,5 @@
-1	finnish	x-vnd.Haiku-PPMTranslator	276252412
+1	finnish	x-vnd.Haiku-PPMTranslator	2233502290
+Version %d.%d.%d, %s	PPMTranslator		Versio %d.%d.%d, %s
 PPM Settings	PPMMain		PPM-asetukset
 Based on PPMTranslator sample code	PPMTranslator		Perustuu PPM-muunninnäytekoodiin
 OK	PPMMain		Valmis
@@ -8,12 +9,12 @@ PPM image	PPMTranslator		PPM-kuva
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bittiä
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Be-bittikarttamuoto (PPM-muunnin)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bittiä
+Input color space:	PPMTranslator		Syöteväritila:
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bittiä
 PPM image translator	PPMTranslator		PPM-kuvamuunnin
 bits/space	PPMTranslator		bittiä/tila
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bittiä big-endian -tavujärjestys
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bittiä big-endian -tavujärjestys
-Version %d.%d.%d %s	PPMTranslator		Versio %d.%d.%d %s
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bittiä big-endian -tavujärjestys
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bittiä
 Write ASCII	PPMTranslator		Kirjoita ASCII-tekstinä
@@ -23,7 +24,6 @@ RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bittiä big-endia
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bittiä
 Bitmap 1 bit	PPMTranslator		Bittikartta 1 bittiä
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bittiä big-endian -tavujärjestys
-Input Color Space	PPMTranslator		Syöteväritila
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bittiä
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Näytekoodi copyright 1999, Be Incorporated
 PPMTranslator Settings	PPMTranslator		PPM-muunninasetukset

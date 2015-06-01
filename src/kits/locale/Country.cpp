@@ -5,6 +5,7 @@
  */
 
 
+#include <unicode/uversion.h>
 #include <Country.h>
 
 #include <AutoDeleter.h>

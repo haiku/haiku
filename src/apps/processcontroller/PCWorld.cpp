@@ -118,10 +118,9 @@ PCApplication::ReadyToRun()
 	int32 count = list.CountItems();
 	if (count > 1) {
 		for (int32 i = 0; i < count - 1; i++) {
-			BMessenger* otherme = new BMessenger(NULL, (addr_t)list.ItemAt(i));
-			BMessage* message = new BMessage(B_QUIT_REQUESTED);
-			otherme->SendMessage(message);
-			delete otherme;
+			BMessenger otherme(NULL, (addr_t)list.ItemAt(i));
+			BMessage message(B_QUIT_REQUESTED);
+			otherme.SendMessage(&message);
 		}
 	}
 }

@@ -36,6 +36,10 @@
 #ifndef _ARPA_FTP_H_
 #define	_ARPA_FTP_H_
 
+
+#ifdef _BSD_SOURCE
+
+
 /* Definitions for FTP; see RFC-765. */
 
 /*
@@ -105,5 +109,9 @@ char *modenames[] =  {"0", "Stream", "Block", "Compressed" };
 #define	BLK_RESTART	0x10	/* Block is Restart Marker */
 
 #define	BLK_BYTECOUNT	2	/* Bytes in this block */
+
+
+#endif
+
 
 #endif /* !_FTP_H_ */

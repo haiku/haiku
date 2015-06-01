@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc.
+ * Copyright 2011-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PACKAGE__REQUEST_H_
@@ -11,16 +11,20 @@
 #include <package/Job.h>
 
 
+namespace BSupportKit {
+	namespace BPrivate {
+		class JobQueue;
+	}
+}
+
+
 namespace BPackageKit {
 
 
 class BContext;
-namespace BPrivate {
-	class JobQueue;
-}
 
 
-class BRequest : protected BJobStateListener {
+class BRequest : protected BSupportKit::BJobStateListener {
 public:
 								BRequest(const BContext& context);
 	virtual						~BRequest();
@@ -29,18 +33,19 @@ public:
 
 	virtual	status_t			CreateInitialJobs() = 0;
 
-			BJob*				PopRunnableJob();
+			BSupportKit::BJob*	PopRunnableJob();
 
 			status_t			Process(bool failIfCanceledOnly = false);
 
 protected:
-			status_t			QueueJob(BJob* job);
+			status_t			QueueJob(BSupportKit::BJob* job);
 
 			const BContext&		fContext;
 
 protected:
 			status_t			fInitStatus;
-			BPrivate::JobQueue*	fJobQueue;
+			BSupportKit::BPrivate::JobQueue*
+								fJobQueue;
 };
 
 

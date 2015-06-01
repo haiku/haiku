@@ -9,6 +9,9 @@
 #include_next <sys/param.h>
 
 
+#ifdef _BSD_SOURCE
+
+
 #ifndef _ALIGNBYTES
 #	define _ALIGNBYTES 7
 #endif
@@ -30,5 +33,9 @@
 #ifndef MAXLOGNAME
 #	define MAXLOGNAME 32
 #endif
+
+
+#endif
+
 
 #endif	/* _BSD_SYS_PARAM_H_ */

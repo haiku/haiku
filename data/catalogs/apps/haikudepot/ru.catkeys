@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3626723700
+1	russian	x-vnd.Haiku-HaikuDepot	1023229167
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -45,6 +45,7 @@ Status	PackageListView		Статус
 Switch account…	MainWindow		Сменить аккаунт…
 Ignore	UserLoginWindow		Игнорировать
 Language	UserLoginWindow		Язык
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Слишком слабый или неподходящий пароль. Пожалуйста, используйте в пароле минимум 8 символов, 2 цифры и 2 заглавных буквы.
 Rate package	RatePackageWindow		Оценить пакет
 Development	Model		Разработка
 Fatal error	PackageManager		Неисправимая ошибка
@@ -55,10 +56,13 @@ Ratings	PackageInfoView		Оценки
 System & Utilities	Model		Система и утилиты
 Inactive	PackageListView		Неактивный
 Refresh depots	MainWindow		Обновить склады
+The package action could not be scheduled: %Error%	PackageInfoView		Действие для пакета не может быть запланировано: %Error%
 Science & Mathematics	Model		Наука и математика
 Main Menu	MainWindow		Главное меню
 (%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Вы указали неверную капчу.
 Success	UserLoginWindow		Выполнено успешно
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot требует для своей работы демон пакетов, который не запущен.\nВы хотите запустить его сейчас?
 Downloading:	PackageInfoView		Загружается:
 Mostly stable	RatePackageWindow		В основном стабилен
 There was a puzzling response from the web service.	RatePackageWindow		Был получен странный ответ от веб сервера.
@@ -71,13 +75,18 @@ Failed to update rating	RatePackageWindow		Не удалось обновить 
 Does not start	RatePackageWindow		Не запускается
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Возникла ошибка при обновлении репозитория: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		Не удалось связаться с веб сервером.
+Only featured packages	MainWindow		Только популярные пакеты
 There are problems in the form:\n\n	UserLoginWindow		В этой форме присутствуют ощибки:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Пакет не был найден в веб сервисе. Скорее всего это охначает, что он был установлен из склада, который отслеживается в веб сервисе. Оценка таких пакетов, к сожалению, не поддерживается.
 Create account	UserLoginWindow		Создать учётную запись
 Productivity	Model		Офис
+No, quit HaikuDepot	App		Нет, выйти из HaikuDepot
 Authentication failed	UserLoginWindow		Авторизация завершилась неудачно
 Logged in as %User%	MainWindow		Выполнен вход под пользователем %User%
 Language	RatePackageWindow		Язык
+Size	PackageListView		Размер
 Failed to create or update rating: %s\n	RatePackageWindow		Не удалось создать или изменить рейтинг: %s\n
+You need to be logged into an account before you can rate packages.	MainWindow		Вы должны войти в свою учётную запись перед тем как оценить пакет.
  It responded with: 	RatePackageWindow		 Он ответил так: 
 User name:	UserLoginWindow		Имя пользователя:
 Unstable but usable	RatePackageWindow		Нестабилен, но пригодный для использования
@@ -118,12 +127,15 @@ Not specified	RatePackageWindow		Не указана
 Available	PackageListView		Доступен
 Develop packages	MainWindow		Пакеты для разработчиков
 n/a	PackageInfoView		н/д
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Если вы не укажите адрес электронной почты, вы не сможете восстановить пароль в случае его утери.
  It responded with: 	UserLoginWindow		 Он ответил так: 
+Authentication failed. Connection to the service failed.	UserLoginWindow		Неверный логин/пароль. Соединение с сервисом прервано.
 Cancel	RatePackageWindow		Отмена
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Отправить
 Category:	FilterView		Категория:
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
+There are problems with the data you entered:\n\n	UserLoginWindow		Проблемы с данными, которые вы ввели:\n\n
 Featured packages	MainWindow		Популярные пакеты
 Start package daemon	App		Запустить пакетный демон
 Success	RatePackageWindow		Выполнено успешно

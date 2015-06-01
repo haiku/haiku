@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-TIFFTranslator	2965400835
+1	croatian	x-vnd.Haiku-TIFFTranslator	1075335967
 LZW	TIFFView		LZW
 TIFF image	TIFFTranslator		TIFF slika
 TIFF Library:	TIFFView		TIFF biblioteka:
@@ -11,4 +11,3 @@ RLE (Packbits)	TIFFView		RLE(Packbits)
 TIFF Settings	TIFFMain		TIFF postavke
 Use compression:	TIFFView		Koristi kompresiju:
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
-Version %d.%d.%d %s	TIFFView		Verzija %d.%d.%d %s

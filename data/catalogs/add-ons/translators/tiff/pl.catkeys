@@ -1,5 +1,6 @@
-1	polish	x-vnd.Haiku-TIFFTranslator	1930083198
+1	polish	x-vnd.Haiku-TIFFTranslator	2234713102
 LZW	TIFFView		LZW
+Version %d.%d.%d, %s	TIFFView		Wersja %d.%d.%d, %s
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nie można ustawić katalogu\n
 TIFF image	TIFFTranslator		Obraz TIFF
 TIFF Library:	TIFFView		Biblioteka TIFF:
@@ -13,4 +14,3 @@ TIFF Settings	TIFFMain		Ustawienia TIFF
 Use compression:	TIFFView		Kompresja:
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: błędny indeks dokumentu\n
 ZIP (Deflate)	TIFFView		ZIP (deflate)
-Version %d.%d.%d %s	TIFFView		Wersja %d.%d.%d %s

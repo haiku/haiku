@@ -8,6 +8,7 @@
  */
 
 
+#include <unicode/uversion.h>
 #include <LocaleRoster.h>
 
 #include <assert.h>

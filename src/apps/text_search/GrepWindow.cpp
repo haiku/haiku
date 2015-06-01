@@ -1,23 +1,6 @@
 /*
  * Copyright (c) 1998-2007 Matthijs Hollemans
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
 #include "GrepWindow.h"
 
@@ -33,10 +16,12 @@
 #include <AppFileInfo.h>
 #include <Alert.h>
 #include <Clipboard.h>
+#include <LayoutBuilder.h>
 #include <MessageRunner.h>
 #include <Path.h>
 #include <PathMonitor.h>
 #include <Roster.h>
+#include <SpaceLayoutItem.h>
 #include <String.h>
 #include <UTF8.h>
 
@@ -44,7 +29,6 @@
 #include "GlobalDefs.h"
 #include "Grepper.h"
 #include "InitialIterator.h"
-#include "Translation.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "GrepWindow"
@@ -84,7 +68,8 @@ static const bigtime_t kChangesPulseInterval = 150000;
 
 
 GrepWindow::GrepWindow(BMessage* message)
-	: BWindow(BRect(0, 0, 1, 1), NULL, B_DOCUMENT_WINDOW, 0),
+	: BWindow(BRect(0, 0, 525, 430), NULL, B_DOCUMENT_WINDOW,
+		B_AUTO_UPDATE_SIZE_LIMITS),
 	fSearchText(NULL),
 	fSearchResults(NULL),
 	fMenuBar(NULL),
@@ -108,7 +93,6 @@ GrepWindow::GrepWindow(BMessage* message)
 	fEscapeText(NULL),
 	fTextOnly(NULL),
 	fInvokePe(NULL),
-	fShowLinesMenuitem(NULL),
 	fHistoryMenu(NULL),
 	fEncodingMenu(NULL),
 	fUTF8(NULL),
@@ -158,7 +142,6 @@ GrepWindow::~GrepWindow()
 
 void GrepWindow::FrameResized(float width, float height)
 {
-	fSearchBoxWidth = fSearchText->Bounds().Width();
 	BWindow::FrameResized(width, height);
 	fModel->fFrame = Frame();
 	_SavePrefs();
@@ -296,10 +279,6 @@ void GrepWindow::MessageReceived(BMessage* message)
 			_OnSelectInTracker();
 			break;
 
-		case MSG_MENU_SHOW_LINES:
-			_OnMenuShowLines();
-			break;
-
 		case MSG_CHECKBOX_SHOW_LINES:
 			_OnCheckboxShowLines();
 			break;
@@ -402,7 +381,7 @@ GrepWindow::_SetWindowTitle()
 		if (entry.GetPath(&path) == B_OK) {
 			if (fOldPattern.Length()) {
 				title = B_TRANSLATE("%appname% : %path% : %searchtext%");
-				title.ReplaceAll("%searchtext%", fOldPattern.String()); 
+				title.ReplaceAll("%searchtext%", fOldPattern.String());
 			} else
 				title = B_TRANSLATE("%appname% : %path%");
 
@@ -421,7 +400,7 @@ GrepWindow::_SetWindowTitle()
 void
 GrepWindow::_CreateMenus()
 {
-	fMenuBar = new BMenuBar(BRect(0, 0, 1, 1), "menubar");
+	fMenuBar = new BMenuBar("menubar");
 
 	fFileMenu = new BMenu(B_TRANSLATE("File"));
 	fActionMenu = new BMenu(B_TRANSLATE("Actions"));
@@ -482,10 +461,6 @@ GrepWindow::_CreateMenus()
 	fInvokePe = new BMenuItem(
 		B_TRANSLATE("Open files in Pe"), new BMessage(MSG_INVOKE_PE));
 
-	fShowLinesMenuitem = new BMenuItem(
-		B_TRANSLATE("Show lines"), new BMessage(MSG_MENU_SHOW_LINES), 'L');
-	fShowLinesMenuitem->SetMarked(true);
-
 	fUTF8 = new BMenuItem("UTF8", new BMessage('utf8'));
 	fShiftJIS = new BMenuItem("ShiftJIS", new BMessage(B_SJIS_CONVERSION));
 	fEUC = new BMenuItem("EUC", new BMessage(B_EUC_CONVERSION));
@@ -514,8 +489,6 @@ GrepWindow::_CreateMenus()
 	fPreferencesMenu->AddItem(fEscapeText);
 	fPreferencesMenu->AddItem(fTextOnly);
 	fPreferencesMenu->AddItem(fInvokePe);
-	fPreferencesMenu->AddSeparatorItem();
-	fPreferencesMenu->AddItem(fShowLinesMenuitem);
 
 	fEncodingMenu->AddItem(fUTF8);
 	fEncodingMenu->AddItem(fShiftJIS);
@@ -533,9 +506,6 @@ GrepWindow::_CreateMenus()
 	fMenuBar->AddItem(fHistoryMenu);
 	fMenuBar->AddItem(fEncodingMenu);
 
-	AddChild(fMenuBar);
-	SetKeyMenuBar(fMenuBar);
-
 	fSearch->SetEnabled(false);
 }
 
@@ -548,96 +518,55 @@ GrepWindow::_CreateViews()
 	// does this and we don't want to send the same message twice.
 
 	fSearchText = new BTextControl(
-		BRect(0, 0, 0, 1), "SearchText", NULL, NULL, NULL,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
+		"SearchText", NULL, NULL, NULL,
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_NAVIGABLE);
 
 	fSearchText->TextView()->SetMaxBytes(1000);
-	fSearchText->ResizeToPreferred();
-		// because it doesn't have a label
-
 	fSearchText->SetModificationMessage(new BMessage(MSG_SEARCH_TEXT));
 
 	fButton = new BButton(
-		BRect(0, 1, 80, 1), "Button", B_TRANSLATE("Search"),
-		new BMessage(MSG_START_CANCEL), B_FOLLOW_RIGHT);
-
+		"Button", B_TRANSLATE("Search"),
+		new BMessage(MSG_START_CANCEL));
 	fButton->MakeDefault(true);
-	fButton->ResizeToPreferred();
 	fButton->SetEnabled(false);
 
 	fShowLinesCheckbox = new BCheckBox(
-		BRect(0, 0, 1, 1), "ShowLines", B_TRANSLATE("Show lines"),
-		new BMessage(MSG_CHECKBOX_SHOW_LINES), B_FOLLOW_LEFT);
-
+		"ShowLines", B_TRANSLATE("Show lines"),
+		new BMessage(MSG_CHECKBOX_SHOW_LINES));
 	fShowLinesCheckbox->SetValue(B_CONTROL_ON);
-	fShowLinesCheckbox->ResizeToPreferred();
 
 	fSearchResults = new GrepListView();
-
 	fSearchResults->SetInvocationMessage(new BMessage(MSG_INVOKE_ITEM));
-	fSearchResults->ResizeToPreferred();
 }
 
 
 void
 GrepWindow::_LayoutViews()
 {
-	float menubarWidth, menubarHeight = 20;
-	fMenuBar->GetPreferredSize(&menubarWidth, &menubarHeight);
-
-	BBox* background = new BBox(
-		BRect(0, menubarHeight + 1, 2, menubarHeight + 2), B_EMPTY_STRING,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-		B_PLAIN_BORDER);
-
 	BScrollView* scroller = new BScrollView(
-		"ScrollSearchResults", fSearchResults, B_FOLLOW_ALL_SIDES,
-		B_FULL_UPDATE_ON_RESIZE, true, true, B_NO_BORDER);
+		"ScrollSearchResults", fSearchResults,
+		B_FULL_UPDATE_ON_RESIZE, true, true);
 
-	scroller->ResizeToPreferred();
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_HALF_ITEM_SPACING)
+		.SetInsets(0, 0, -1, -1)
+		.Add(fMenuBar)
+		.AddGrid(B_USE_HALF_ITEM_SPACING)
+			.SetInsets(B_USE_ITEM_INSETS, B_USE_HALF_ITEM_INSETS,
+				B_USE_ITEM_INSETS, 0)
+			.Add(fSearchText, 0, 0, 3)
+			.Add(fShowLinesCheckbox, 0, 1)
+			.Add(BSpaceLayoutItem::CreateGlue(), 1, 1)
+			.Add(fButton, 2, 1)
+		.End()
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(-1, 0, -1, -1)
+			.Add(scroller)
+		.End()
+	.End();
 
-	float width = 8 + fShowLinesCheckbox->Frame().Width()
-		+ 8 + fButton->Frame().Width() + 8;
-
-	float height = 8 + fSearchText->Frame().Height() + 8
-		+ fButton->Frame().Height() + 8 + scroller->Frame().Height();
-
-	float backgroundHeight = 8 + fSearchText->Frame().Height()
-		+ 8 + fButton->Frame().Height() + 8;
-
-	ResizeTo(width, height);
-
-	AddChild(background);
-	background->ResizeTo(width,	backgroundHeight);
-	background->AddChild(fSearchText);
-	background->AddChild(fShowLinesCheckbox);
-	background->AddChild(fButton);
-
-	fSearchText->MoveTo(8, 8);
-	fSearchText->ResizeTo(width - 16, fSearchText->Frame().Height());
 	fSearchText->MakeFocus(true);
 
-	fShowLinesCheckbox->MoveTo(
-		8, 8 + fSearchText->Frame().Height() + 8
-			+ (fButton->Frame().Height() - fShowLinesCheckbox->Frame().Height())/2);
-
-	fButton->MoveTo(
-		width - fButton->Frame().Width() - 8,
-		8 + fSearchText->Frame().Height() + 8);
-
-	AddChild(scroller);
-	scroller->MoveTo(0, menubarHeight + 1 + backgroundHeight + 1);
-	scroller->ResizeTo(width + 1, height - backgroundHeight - menubarHeight - 1);
-
-	BRect screenRect = BScreen(this).Frame();
-
-	MoveTo(
-		(screenRect.Width() - width) / 2,
-		(screenRect.Height() - height) / 2);
-
-	SetSizeLimits(width, 10000, height, 10000);
+	SetKeyMenuBar(fMenuBar);
 }
 
 
@@ -681,11 +610,6 @@ GrepWindow::_LoadPrefs()
 	fEscapeText->SetMarked(fModel->fEscapeText);
 	fTextOnly->SetMarked(fModel->fTextOnly);
 	fInvokePe->SetMarked(fModel->fInvokePe);
-
-	fShowLinesCheckbox->SetValue(
-		fModel->fShowContents ? B_CONTROL_ON : B_CONTROL_OFF);
-	fShowLinesMenuitem->SetMarked(
-		fModel->fShowContents ? true : false);
 
 	switch (fModel->fEncoding) {
 		case 0:
@@ -799,11 +723,7 @@ GrepWindow::_OnStartCancel()
 
 		fButton->MakeFocus(true);
 		fButton->SetLabel(B_TRANSLATE("Cancel"));
-		fButton->ResizeToPreferred();
-		fButton->MoveTo(
-			fMenuBar->Frame().Width() - fButton->Frame().Width() - 8,
-			8 + fSearchText->Frame().Height() + 8);
-		
+
 		fSearch->SetEnabled(false);
 
 		// We need to remember the search pattern, because during
@@ -856,11 +776,7 @@ GrepWindow::_OnSearchFinished()
 	fEncodingMenu->SetEnabled(true);
 
 	fButton->SetLabel(B_TRANSLATE("Search"));
-	fButton->ResizeToPreferred();
-	fButton->MoveTo(
-		fMenuBar->Frame().Width() - fButton->Frame().Width() - 8,
-		8 + fSearchText->Frame().Height() + 8);
-		
+
 	fButton->SetEnabled(true);
 	fSearch->SetEnabled(true);
 
@@ -1044,7 +960,7 @@ GrepWindow::_OnReportFileName(BMessage* message)
 		fSearchText->TruncateString(&name, B_TRUNCATE_MIDDLE,
 			fSearchBoxWidth - 10);
 
-		fSearchText->SetText(name);		
+		fSearchText->SetText(name);
 	}
 }
 
@@ -1075,7 +991,7 @@ GrepWindow::_OnReportResult(BMessage* message)
 	if (item == NULL) {
 		item = new ResultItem(ref);
 		fSearchResults->AddItem(item);
-		item->SetExpanded(fModel->fShowContents);
+		item->SetExpanded(fShowLinesCheckbox->Value() == 1);
 	}
 
 	const char* buf;
@@ -1178,10 +1094,6 @@ GrepWindow::_OnInvokePe()
 void
 GrepWindow::_OnCheckboxShowLines()
 {
-	// toggle checkbox and menuitem
-	fModel->fShowContents = !fModel->fShowContents;
-	fShowLinesMenuitem->SetMarked(!fShowLinesMenuitem->IsMarked());
-
 	// Selection in BOutlineListView in multiple selection mode
 	// gets weird when collapsing. I've tried all sorts of things.
 	// It seems impossible to make it behave just right.
@@ -1212,7 +1124,7 @@ GrepWindow::_OnCheckboxShowLines()
 	for (int32 x = 0; x < numItems; ++x) {
 		BListItem* listItem = fSearchResults->FullListItemAt(x);
 		if (listItem->OutlineLevel() == 0) {
-			if (fModel->fShowContents) {
+			if (fShowLinesCheckbox->Value() == 1) {
 				if (!fSearchResults->IsExpanded(x))
 					fSearchResults->Expand(listItem);
 			} else {
@@ -1225,15 +1137,6 @@ GrepWindow::_OnCheckboxShowLines()
 	fSearchResults->Invalidate();
 
 	_SavePrefs();
-}
-
-
-void
-GrepWindow::_OnMenuShowLines()
-{
-	// toggle companion checkbox
-	fShowLinesCheckbox->SetValue(!fShowLinesCheckbox->Value());
-	_OnCheckboxShowLines();
 }
 
 
@@ -1469,7 +1372,7 @@ GrepWindow::_OnSelectInTracker()
 		BString str1;
 		str1 << B_TRANSLATE("%APP_NAME couldn't open one or more folders.");
 		str1.ReplaceFirst("%APP_NAME",APP_NAME);
-		BAlert* alert = new BAlert(NULL, str1.String(), B_TRANSLATE("OK"), 
+		BAlert* alert = new BAlert(NULL, str1.String(), B_TRANSLATE("OK"),
 			NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);

@@ -303,6 +303,44 @@ struct HashKey64 {
 };
 
 
+// HashKeyPointer
+template<typename Value>
+struct HashKeyPointer {
+	HashKeyPointer() {}
+	HashKeyPointer(const Value& value) : value(value) {}
+
+	uint32 GetHashCode() const
+	{
+#if __HAIKU_ARCH_BITS == 32
+		return (uint32)(addr_t)value;
+#elif __HAIKU_ARCH_BITS == 64
+		uint64 v = (uint64)(addr_t)value;
+		return (uint32)(v >> 32) ^ (uint32)v;
+#else
+		#error unknown bitness
+#endif
+	}
+
+	HashKeyPointer<Value> operator=(const HashKeyPointer<Value>& other)
+	{
+		value = other.value;
+		return *this;
+	}
+
+	bool operator==(const HashKeyPointer<Value>& other) const
+	{
+		return (value == other.value);
+	}
+
+	bool operator!=(const HashKeyPointer<Value>& other) const
+	{
+		return (value != other.value);
+	}
+
+	Value	value;
+};
+
+
 // HashMap
 
 // constructor

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-PSDTranslator	489719358
+1	dutch; flemish	x-vnd.Haiku-PSDTranslator	1706619436
 Lab	PSDLoader		Lab
 Uncompressed	PSDConfig		Ongecomprimeerd
 Indexed	PSDLoader		Geïndexeerd
@@ -8,10 +8,8 @@ Photoshop image translator	PSDTranslator		Photoshop-afbeelding translator
 Version %d.%d.%d, %s	PSDConfig		Versie %d.%d.%d, %s
 Photoshop image	PSDTranslator		Photoshop-afbeelding
 RLE	PSDConfig		RLE
-Photoshop Document (PSD File)	PSDConfig		Photoshop-document (PSD-bestand)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Photoshop-afbeelding (%s)
-Photoshop Big Document (PSB File)	PSDConfig		Photoshop Big-document (PSB-bestand)
 PSDTranslator Settings	PSDConfig		PSDTranslator-instellingen
 RGB	PSDLoader		RGB
 Bitmap	PSDLoader		Rasterafbeelding

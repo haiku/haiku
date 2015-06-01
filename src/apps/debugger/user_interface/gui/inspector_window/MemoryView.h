@@ -1,11 +1,13 @@
 /*
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
 #ifndef MEMORY_VIEW_H
 #define MEMORY_VIEW_H
 
+
+#include <set>
 
 #include <View.h>
 
@@ -24,7 +26,6 @@ enum {
 	HexMode16BitInt,
 	HexMode32BitInt,
 	HexMode64BitInt
-	// TODO: floating point representation?
 };
 
 enum {
@@ -56,8 +57,17 @@ public:
 
 			void				SetTargetAddress(TeamMemoryBlock* block,
 									target_addr_t address);
-
 			void				UnsetListener();
+
+	inline	bool				GetEditMode() const
+									{ return fEditMode; }
+			status_t			SetEditMode(bool enabled);
+
+	inline	void*				GetEditedData() const
+									{ return fEditableData; }
+
+			void				CommitChanges();
+			void				RevertChanges();
 
 	virtual	void				AttachedToWindow();
 	virtual void				Draw(BRect rect);
@@ -72,11 +82,17 @@ public:
 			void				ScrollToSelection();
 	virtual void				TargetedByScrollView(BScrollView* scrollView);
 
+
+	virtual	BSize				MinSize();
+	virtual	BSize				PreferredSize();
+	virtual	BSize				MaxSize();
+
 private:
 	void						_Init();
 	void						_RecalcScrollBars();
 	void						_GetNextHexBlock(char* buffer,
-									int32 bufferSize, const char* address);
+									int32 bufferSize,
+									const char* address) const;
 
 	int32						_GetOffsetAt(BPoint point) const;
 	BPoint						_GetPointForOffset(int32 offset) const;
@@ -86,18 +102,28 @@ private:
 	inline int32				_GetHexDigitsPerBlock() const
 									{ return 1 << fHexMode; };
 
-	void						_GetSelectionRegion(BRegion& region);
-	void						_GetSelectedText(BString& text);
+	void						_GetEditCaretRect(BRect& rect) const;
+	void						_GetSelectionRegion(BRegion& region) const;
+	void						_GetSelectedText(BString& text) const;
 	void						_CopySelectionToClipboard();
 
 	void						_HandleAutoScroll();
 	void						_ScrollByLines(int32 lineCount);
 	void						_HandleContextMenu(BPoint point);
 
+	status_t					_SetupEditableData();
+
+private:
+	typedef std::set<int32>		ModifiedIndexSet;
+
 private:
 	::Team*						fTeam;
 	TeamMemoryBlock*			fTargetBlock;
+	uint8*						fEditableData;
+	ModifiedIndexSet			fEditedOffsets;
 	target_addr_t				fTargetAddress;
+	bool						fEditMode;
+	bool						fEditLowNybble;
 	float						fCharWidth;
 	float						fLineHeight;
 	int32						fTargetAddressSize;
@@ -127,6 +153,10 @@ public:
 
 	virtual	void				TargetAddressChanged(target_addr_t address)
 									= 0;
+
+	virtual	void				HexModeChanged(int32 newMode) = 0;
+	virtual	void				TextModeChanged(int32 newMode) = 0;
+	virtual	void				EndianModeChanged(int32 newMode) = 0;
 };
 
 

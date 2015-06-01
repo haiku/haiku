@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libbe	310820204
+1	romanian	x-vnd.Haiku-libbe	2112793636
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -27,7 +27,6 @@ Special Thanks:	AboutWindow		Mulţumiri speciale:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nu se poate găsi aplicația pentru copie. Nu a fost furnizată nicio semnătură de aplicație.\n%error
 Redo	TextView		Repetă
 <empty>	Menu		<liber>
-Select All	TextView		Selectează tot
 Warning	Dragger		Avertisment
 Undo	TextView		Refă
 Red:	ColorControl		Roșu:

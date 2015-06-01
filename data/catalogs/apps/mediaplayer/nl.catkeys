@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MediaPlayer	1339757957
+1	dutch; flemish	x-vnd.Haiku-MediaPlayer	2390862402
 raw audio	MediaPlayer-InfoWin		ruwe audio
 Location	MediaPlayer-InfoWin		Locatie
 1.85 : 1 (American)	MediaPlayer-Main		1,85 : 1 (Amerikaans)
@@ -133,7 +133,6 @@ Start media server	MediaPlayer-Main		Start mediaserver
 Toggle fullscreen.	MediaPlayer-Main		Volledig scherm in-/uitschakelen.
 ToggleFullscreen	MediaPlayer-Main		Volledig scherm in-/uitschakelen
 <unnamed>	PlaylistItem-name		<naamloos>
-Open Clips	MediaPlayer-Main		Clips openen
 OK	MediaPlayer-PlaylistWindow		Oké
 none	Audio track menu		geen
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Volume (0.0-2.0) ophalen/instellen

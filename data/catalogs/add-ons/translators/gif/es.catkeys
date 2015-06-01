@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-GIFTranslator	1515001985
+1	spanish; castilian	x-vnd.Haiku-GIFTranslator	2626723192
 Websafe	GIFView		Seguro para la web
 Write interlaced images	GIFView		Guardar imágenes entrelazadas
 Optimal	GIFView		Óptimo
@@ -15,5 +15,4 @@ Use RGB color	GIFView		Usar color RGB
 Use dithering	GIFView		Usar dithering
 GIF Settings	GIFTranslator		Configuración de GIF
 BeOS system	GIFView		Sistema BeOS
-v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		Automático (desde el canal alfa)

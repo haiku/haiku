@@ -58,7 +58,7 @@ RemoveStylesCommand::~RemoveStylesCommand()
 	if (fStylesRemoved && fInfos) {
 		for (int32 i = 0; i < fCount; i++) {
 			if (fInfos[i].style)
-				fInfos[i].style->Release();
+				fInfos[i].style->ReleaseReference();
 		}
 	}
 	delete[] fInfos;

@@ -1,12 +1,14 @@
-1	english	x-vnd.Haiku-NewMailNotification	583443025
-Keyboard LEDs	ConfigView		键盘LED
-Log window	ConfigView		日志窗口
-Central beep	ConfigView		中部蜂鸣
-Beep	ConfigView		蜂鸣
-Method:	ConfigView		方法：
-Central alert	ConfigView		中部警告
-Alert	ConfigView		警告
-none	ConfigView		无
-New messages	filter		新消息
-New mails notification	ConfigView		新邮件通知
-OK	filter		确定
+1	english	x-vnd.Haiku-NewMailNotification	73789504
+You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		您的 %account 账户具有 {0, plural, one{One new message} 以及 {# new messages}} 。
+none	NotifierConfigView		无
+Method:	NotifierConfigView		方法：
+Beep	NotifierConfigView		蜂鸣
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{一条新消息} other{# 更多新消息}}
+New mails notification	NotifierFilter		新邮件通知
+Central alert	NotifierConfigView		中部警告
+OK	NotifierFilter		确定
+New messages	NotifierFilter		新消息
+Log window	NotifierConfigView		日志窗口
+Keyboard LEDs	NotifierConfigView		键盘LED
+Central beep	NotifierConfigView		中部蜂鸣
+Alert	NotifierConfigView		警告

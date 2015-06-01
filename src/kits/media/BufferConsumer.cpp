@@ -385,14 +385,19 @@ BBufferConsumer::HandleMessage(int32 message, const void* data, size_t size)
 				= static_cast<const consumer_buffer_received_command*>(data);
 
 			BBuffer* buffer = fBufferCache->GetBuffer(command->buffer);
-			buffer->SetHeader(&command->header);
+			if (buffer == NULL) {
+				ERROR("BBufferConsumer::CONSUMER_BUFFER_RECEIVED can't"
+					"find the buffer\n");
+			} else {
+				buffer->SetHeader(&command->header);
 
-			PRINT(4, "calling BBufferConsumer::BufferReceived buffer %ld at "
-				"perf %Ld and TimeSource()->Now() is %Ld\n",
-				buffer->Header()->buffer, buffer->Header()->start_time,
-				TimeSource()->Now());
+				PRINT(4, "calling BBufferConsumer::BufferReceived buffer %ld "
+					"at perf %Ld and TimeSource()->Now() is %Ld\n",
+					buffer->Header()->buffer, buffer->Header()->start_time,
+					TimeSource()->Now());
 
-			BufferReceived(buffer);
+				BufferReceived(buffer);
+			}
 			return B_OK;
 		}
 

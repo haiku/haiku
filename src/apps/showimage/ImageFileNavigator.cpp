@@ -115,13 +115,6 @@ private:
 };
 
 
-// TODO: Remove this and use Tracker's Command.h once it is moved into the
-// private headers!
-namespace BPrivate {
-	const uint32 kMoveToTrash = 'Ttrs';
-}
-
-
 static bool
 entry_ref_is_file(const entry_ref& ref)
 {
@@ -507,6 +500,20 @@ ImageFileNavigator::PreviousPage()
 		return true;
 	}
 	return false;
+}
+
+
+bool
+ImageFileNavigator::HasNextPage()
+{
+	return fDocumentIndex < fDocumentCount;
+}
+
+
+bool
+ImageFileNavigator::HasPreviousPage()
+{
+	return fDocumentIndex > 1;
 }
 
 

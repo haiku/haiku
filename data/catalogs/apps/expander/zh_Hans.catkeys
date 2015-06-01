@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Expander	3431738656
+1	english	x-vnd.Haiku-Expander	2177073262
 Expand	ExpanderMenu		解压缩
 Close window when done expanding	ExpanderPreferences		完成解压后，关闭窗口。
 Set destination…	ExpanderMenu		目标文件…
@@ -34,6 +34,7 @@ Automatically show contents listing	ExpanderPreferences		自动显示内容列�
 OK	ExpanderPreferences		确定
 Leave destination folder path empty	ExpanderPreferences		保持目标目录为空
 Failed to create the destination folder.	ExpanderWindow		目标目录创建失败。
+Select '%s'…	DirectoryFilePanel		选择 '%s'…
 Create	ExpanderWindow		创建
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		文件夹已被删除，重命名或者不被\n支持.
 The file doesn't exist	ExpanderWindow		文件不存在

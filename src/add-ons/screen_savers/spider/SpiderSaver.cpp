@@ -213,13 +213,11 @@ SpiderSaver::_Init(BRect bounds)
 		maxQueueDepth /= 4;
 	}
 	for (uint32 i = 0; i < fQueueNumber; i++)
-		fQueues[i] = new PolygonQueue(new Polygon(bounds, minPoints
-															+ lrand48()
-															% (maxPoints
-															- minPoints)),
-									  minQueueDepth + lrand48() % (maxQueueDepth
-									  - minQueueDepth));
+		fQueues[i] = new PolygonQueue(new Polygon(bounds,
+			minPoints + lrand48() % (maxPoints - minPoints)),
+			minQueueDepth + lrand48() % (maxQueueDepth - minQueueDepth));
 }
+
 
 // _Cleanup
 void
@@ -232,6 +230,7 @@ SpiderSaver::_Cleanup()
 	}
 }
 
+
 // _AllocBackBitmap
 void
 SpiderSaver::_AllocBackBitmap(float width, float height)
@@ -241,11 +240,18 @@ SpiderSaver::_AllocBackBitmap(float width, float height)
 		return;
 
 	BRect b(0.0, 0.0, width, height);
-	fBackBitmap = new BBitmap(b, B_RGB32, true);
+	fBackBitmap = new(std::nothrow) BBitmap(b, B_RGB32, true);
 	if (!fBackBitmap)
 		return;
+
 	if (fBackBitmap->IsValid()) {
-		fBackView = new BView(b, 0, B_FOLLOW_NONE, B_WILL_DRAW);
+		fBackView = new(std::nothrow) BView(b, 0, B_FOLLOW_NONE, B_WILL_DRAW);
+		if (fBackView == NULL) {
+			_FreeBackBitmap();
+			fprintf(stderr,
+				"SpiderSaver::_AllocBackBitmap(): view allocation failed\n");
+			return;
+		}
 		fBackBitmap->AddChild(fBackView);
 		memset(fBackBitmap->Bits(), 0, fBackBitmap->BitsLength());
 	} else {
@@ -253,6 +259,7 @@ SpiderSaver::_AllocBackBitmap(float width, float height)
 		fprintf(stderr, "SpiderSaver::_AllocBackBitmap(): bitmap invalid\n");
 	}
 }
+
 
 // _FreeBackBitmap
 void
@@ -264,6 +271,7 @@ SpiderSaver::_FreeBackBitmap()
 		fBackView = NULL;
 	}
 }
+
 
 // _DrawInto
 void

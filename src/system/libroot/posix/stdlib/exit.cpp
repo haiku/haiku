@@ -123,7 +123,7 @@ private:
 };
 
 
-static AtExitInfoBlock sInitialAtExistInfoBlock;
+static AtExitInfoBlock sInitialAtExitInfoBlock;
 static AtExitInfoBlockList sAtExitInfoBlocks;
 static AtExitInfoList sAtExitInfoStack;
 static recursive_lock sAtExitLock = RECURSIVE_LOCK_INITIALIZER("at exit lock");
@@ -200,8 +200,8 @@ __cxa_atexit(void (*hook)(void*), void* data, void* dsoHandle)
 	AtExitInfoBlock* block = sAtExitInfoBlocks.Head();
 	if (block == NULL) {
 		// might be the first call -- check the initial block
-		if (!sInitialAtExistInfoBlock.IsEmpty()) {
-			block = &sInitialAtExistInfoBlock;
+		if (!sInitialAtExitInfoBlock.IsEmpty()) {
+			block = &sInitialAtExitInfoBlock;
 		} else {
 			// no empty block -- let's hope libroot is initialized sufficiently
 			// for the heap to work

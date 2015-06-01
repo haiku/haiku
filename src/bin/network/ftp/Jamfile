@@ -9,6 +9,7 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 }
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
+SubDirCcFlags [ FDefines _BSD_SOURCE=1 ] ;
 
 BinCommand ftp :
 	cmds.c

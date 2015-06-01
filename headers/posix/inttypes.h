@@ -112,33 +112,33 @@ typedef struct {
 #	define PRIXPTR			__HAIKU_PRI_PREFIX_ADDR "X"
 
 /* fscanf() macros for signed integers */
-#	define SCNd8 			"hhd"
-#	define SCNdLEAST8 		"hhd"
-#	define SCNdFAST8 		"d"
-#	define SCNi8 			"hhi"
-#	define SCNiLEAST8 		"hhi"
-#	define SCNiFAST8 		"i"
+#	define SCNd8			"hhd"
+#	define SCNdLEAST8		"hhd"
+#	define SCNdFAST8		"d"
+#	define SCNi8			"hhi"
+#	define SCNiLEAST8		"hhi"
+#	define SCNiFAST8		"i"
 
 #	define SCNd16			"hd"
 #	define SCNdLEAST16		"hd"
 #	define SCNdFAST16		"d"
-#	define SCNi16 			"hi"
+#	define SCNi16			"hi"
 #	define SCNiLEAST16		"hi"
 #	define SCNiFAST16		"i"
 
-#	define SCNd32 			__HAIKU_STD_PRI_PREFIX_32 "d"
+#	define SCNd32			__HAIKU_STD_PRI_PREFIX_32 "d"
 #	define SCNdLEAST32		SCNd32
 #	define SCNdFAST32		SCNd32
-#	define SCNi32 			__HAIKU_STD_PRI_PREFIX_32 "i"
+#	define SCNi32			__HAIKU_STD_PRI_PREFIX_32 "i"
 #	define SCNiLEAST32		SCNi32
 #	define SCNiFAST32		SCNi32
 
 #	define SCNd64			__HAIKU_STD_PRI_PREFIX_64 "d"
 #	define SCNdLEAST64		SCNd64
 #	define SCNdFAST64		SCNd64
-#	define SCNi64 			__HAIKU_STD_PRI_PREFIX_64 "i"
+#	define SCNi64			__HAIKU_STD_PRI_PREFIX_64 "i"
 #	define SCNiLEAST64		SCNi64
-#	define SCNiFAST64 		SCNi64
+#	define SCNiFAST64		SCNi64
 
 #	define SCNdMAX			SCNd64
 #	define SCNdPTR			__HAIKU_PRI_PREFIX_ADDR "d"
@@ -146,15 +146,15 @@ typedef struct {
 #	define SCNiPTR			__HAIKU_PRI_PREFIX_ADDR "i"
 
 /* fscanf() macros for unsigned integers */
-#	define SCNu8 			"hhu"
-#	define SCNuLEAST8 		"hhu"
-#	define SCNuFAST8 		"u"
-#	define SCNo8 			"hho"
-#	define SCNoLEAST8 		"hho"
-#	define SCNoFAST8 		"o"
-#	define SCNx8 			"hhx"
-#	define SCNxLEAST8 		"hhx"
-#	define SCNxFAST8 		"x"
+#	define SCNu8			"hhu"
+#	define SCNuLEAST8		"hhu"
+#	define SCNuFAST8		"u"
+#	define SCNo8			"hho"
+#	define SCNoLEAST8		"hho"
+#	define SCNoFAST8		"o"
+#	define SCNx8			"hhx"
+#	define SCNxLEAST8		"hhx"
+#	define SCNxFAST8		"x"
 
 #	define SCNu16			"hu"
 #	define SCNuLEAST16		"hu"
@@ -166,13 +166,13 @@ typedef struct {
 #	define SCNxLEAST16		"hx"
 #	define SCNxFAST16		"x"
 
-#	define SCNu32 			__HAIKU_STD_PRI_PREFIX_32 "u"
+#	define SCNu32			__HAIKU_STD_PRI_PREFIX_32 "u"
 #	define SCNuLEAST32		SCNu32
 #	define SCNuFAST32		SCNu32
-#	define SCNo32 			__HAIKU_STD_PRI_PREFIX_32 "o"
+#	define SCNo32			__HAIKU_STD_PRI_PREFIX_32 "o"
 #	define SCNoLEAST32		SCNo32
 #	define SCNoFAST32		SCNo32
-#	define SCNx32 			__HAIKU_STD_PRI_PREFIX_32 "x"
+#	define SCNx32			__HAIKU_STD_PRI_PREFIX_32 "x"
 #	define SCNxLEAST32		SCNx32
 #	define SCNxFAST32		SCNx32
 

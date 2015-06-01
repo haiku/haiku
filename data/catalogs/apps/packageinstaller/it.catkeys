@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-PackageInstaller	3523139039
+1	italian	x-vnd.Haiku-PackageInstaller	441945624
 Install to:	PackageView		Installare su:
 OK	PackageView		Ok
 Accept	PackageTextViewer		Accetta
@@ -11,7 +11,6 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Il pacchetto sembra possedere una dimensione del file inaspettata. Questo potrebbe essere corrotto o aver subito una modifica successiva alla sua creazione. Volete proseguire?
 Error while installing the package\n	PackageView		È occorso un errore durante l'installazione del pacchetto\n
 Disclaimer	PackageTextViewer		Esclusione di responsabilità
-%.1f GiB	PackageView		%.1f GiB
 The installation of the package has been aborted.	PackageView		L'installazione del pacchetto è stata annullata.
 Done	PackageInstall		Fatto
 All existing files will be replaced?	PackageView		Volete sostituire tutti i file già presenti?
@@ -25,9 +24,7 @@ Package installer	PackageView		Installatore pacchetti
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		L'oggetto con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirlo con quanto presente in questo pacchetto oppure lo ignorate?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Lo script con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirlo con quanto presente in questo pacchetto oppure lo ignorate?
 Running post-installation scripts	PackageInstall		Avvio script per il dopo-installazione
-%llu bytes	PackageView		%llu byte
 Skip	PackageView		Ignora
-%.1f MiB	PackageView		%.1f MiB
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		La cartella con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirla con quanto presente in questo pacchetto oppure la ignorate?
 The package you requested has been successfully installed on your system.	PackageView		Il pacchetto richiesto è stato installato con successo nel vostro sistema.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Errore! \"%s\" non è un percorso valido.\n
@@ -41,7 +38,6 @@ Decline	PackageTextViewer		Rifiuto
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Il file con nome \"%s\" è già presente nel percorso dato.\nVolete sostituirlo con quanto presente in questo pacchetto oppure lo ignorate?
 All existing files will be skipped?	PackageView		Volete ignorare tutti i file già presenti?
 Continue	PackageInfo		Prosegui
-%.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		Annulla
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Annulla

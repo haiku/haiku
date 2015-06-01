@@ -1,14 +1,32 @@
-1	russian	x-vnd.Haiku-Network	3414163106
-Revert	NetworkSetupWindow		Вернуть
+1	russian	x-vnd.Haiku-Network	2520478876
+Static	IntefaceAddressView		Статический
 EAP	EAP protected network		EAP
+Services	NetworkWindow		Службы
 WPA2	WPA2 protected network		WPA2
+The netmask defines your local network	IntefaceAddressView		Маска подсети определяет вашу локальную сеть 
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-Installing NetworkStatus in Deskbar failed: %s	NetworkSetupWindow		Не удалось установить NetworkStatus в Deskbar: %s
-Apply	NetworkSetupWindow		Применить
-Ok	NetworkSetupWindow		OK
-launch error	NetworkSetupWindow		Ошибка запуска
-Manage…	NetworkSetupWindow		Настроить…
+Network	NetworkWindow		Сеть
+Show network status in Deskbar	NetworkWindow		Отображать статус интерфейсов в Deskbar
+The method for obtaining an IP address	IntefaceAddressView		Метод получения IP-адреса
+Dial Up	NetworkWindow		Модемное
+Apply	IntefaceAddressView		Применить
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Не удалось установить NetworkStatus в Deskbar: %s
+Disabled	IntefaceAddressView		Отключен
+Ok	NetworkWindow		OK
+launch error	NetworkWindow		Ошибка запуска
+Automatic	IntefaceAddressView		Автоматический
+Gateway:	IntefaceAddressView		Шлюз:
+Revert	NetworkWindow		Вернуть
+Enable	ServiceView		Включить
+Your gateway to the internet	IntefaceAddressView		Ваш шлюз в интернет
+New…	NetworkWindow		Создать…
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Режим:
 WPA	WPA protected network		WPA
 open	Open network		открытая
-New…	NetworkSetupWindow		Создать…
+IP Address:	IntefaceAddressView		IP-адрес:
+Netmask:	IntefaceAddressView		Маска подсети:
+Disable	ServiceView		Отключить
+Your IP address	IntefaceAddressView		Ваш IP-адрес
+Manage…	NetworkWindow		Настроить…
 WEP	WEP protected network		WEP

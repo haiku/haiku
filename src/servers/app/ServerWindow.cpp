@@ -602,7 +602,7 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			int32 showLevel;
 			if (link.Read<int32>(&showLevel) == B_OK) {
 				DTRACE(("ServerWindow %s: Message AS_SHOW_OR_HIDE_WINDOW, "
-					"show level: %ld\n", Title(), showLevel));
+					"show level: %" B_PRId32 "\n", Title(), showLevel));
 
 				fWindow->SetShowLevel(showLevel);
 				if (showLevel <= 0)
@@ -1265,8 +1265,10 @@ fDesktop->UnlockSingleWindow();
 							EventTarget(), token);
 fDesktop->LockSingleWindow();
 					}
-					if (fCurrentView == view)
+
+					if (fCurrentView == view || fCurrentView->HasParent(view))
 						_SetCurrentView(parent);
+
 					delete view;
 				} // else we don't delete the root view
 			}

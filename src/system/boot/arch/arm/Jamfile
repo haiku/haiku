@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot arch arm ;
 
+UsePrivateHeaders [ FDirName kernel platform $(TARGET_BOOT_PLATFORM) ] ;
+
 #XXX: should not be needed here
 UsePrivateHeaders [ FDirName kernel arch $(TARGET_KERNEL_ARCH) board $(TARGET_BOOT_BOARD) ] ;
 UseLibraryHeaders [ FDirName libfdt ] ;
@@ -9,7 +11,7 @@ UseLibraryHeaders [ FDirName libfdt ] ;
 
 	defines = [ FDefines $(defines) ] ;
 	SubDirCcFlags $(defines) ;
-	SubDirC++Flags $(defines) -fno-rtti ;
+	SubDirC++Flags $(defines) -fno-rtti -std=c++1y ;
 }
 
 # TODO: Is there any reason to recompile arch_string.S here?
@@ -34,8 +36,10 @@ BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 	arch_uart_pl011.cpp
 	arch_elf.cpp
 	arch_framebuffer_920.cpp
+	arch_framebuffer_bcm2835.cpp
 	arch_framebuffer_pxa.cpp
 	arch_framebuffer_omap3.cpp
+	arch_mailbox_bcm2835.cpp
 	arch_cpu.cpp
 	arch_mmu.cpp
 	arch_start_kernel.S

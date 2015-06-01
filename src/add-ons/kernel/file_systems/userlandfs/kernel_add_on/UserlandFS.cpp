@@ -164,7 +164,7 @@ UserlandFS::_UnregisterFileSystem(const char* name)
 		if (!fileSystemInitializer)
 			return B_BAD_VALUE;
 
-		deleteFS = fileSystemInitializer->ReleaseReference();
+		deleteFS = fileSystemInitializer->ReleaseReference() == 1;
 		if (deleteFS)
 			fFileSystems->Remove(name);
 	}

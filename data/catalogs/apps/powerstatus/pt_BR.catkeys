@@ -1,8 +1,10 @@
-1	portuguese (brazil)	x-vnd.Haiku-PowerStatus	3224068645
+1	portuguese (brazil)	x-vnd.Haiku-PowerStatus	968371302
 Design capacity low warning: 	PowerStatus		Aviso de design de baixa capacidade 
 Show percent	PowerStatus		Mostrar porcentagem
 Design capacity: 	PowerStatus		Capacidade de design:
  mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		O nível da bateria estáficando baixo, por favor ligue o dispositivo.
+Battery low	PowerStatus		Bateria fraca
 Type: 	PowerStatus		Tipo:
 non-rechargeable	PowerStatus		não-recarregável
 Empty battery slot	PowerStatus		Slot de bateria vazio

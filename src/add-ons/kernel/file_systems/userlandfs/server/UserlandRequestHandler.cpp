@@ -637,7 +637,7 @@ UserlandRequestHandler::_HandleRequest(IterativeIOGetVecsRequest* request)
 			request->offset, request->size, vecs, &vecCount);
 		if (result == B_OK) {
 			vecCount = std::min(vecCount,
-				(uint32)IterativeIOGetVecsReply::MAX_VECS);
+				(size_t)IterativeIOGetVecsReply::MAX_VECS);
 		}
 	}
 

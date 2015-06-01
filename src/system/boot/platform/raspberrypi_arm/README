@@ -1,0 +1,3 @@
+THIS PLATFORM CODE SHOULD DIE SOON IN FAVOR OF U-BOOT
+Any early ARM drivers should move over to src/system/boot/arch/arm
+ -- Alex v. 2015

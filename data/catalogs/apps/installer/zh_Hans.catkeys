@@ -1,4 +1,5 @@
-1	english	x-vnd.Haiku-Installer	528139900
+1	english	x-vnd.Haiku-Installer	3421507633
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		引导管理器，用于配置 Haiku 引导菜单，该程序无法启动。
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		您是否确定终止安装，重新启动系统？
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		系统安装器\n\t编写者：Jérôme Duval 和 Stephan Aßmus \n\t版权所有 2005-2001 Haiku, Inc.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -16,12 +17,15 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		退出引导管理器
 Stop	InstallerWindow		停止
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		如果操作系统探测无法正常运行，GRUB 2 使用额外的配置文件为引导菜单添加自定义项。为了在头部添加，您需要在终端中使用偏好的编辑器创建或编辑一个文件：\n\n
 OK	InstallerApp		确定
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		从弹出菜单中选择源磁盘和目标磁盘。然后点击\"开始\"。
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
+Failed to launch Boot Manager	InstallerWindow		启动引导管理器失败
 Install from:	InstallerWindow		安装源：
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld来源于%2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		安装必读\n\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		GRUB 的分区命名策略为: (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	继续
 Write boot sector to '%s'	InstallerWindow		引导扇区写入到 '%s'
 Collecting copy information.	InstallProgress		收集复制信息。
@@ -42,6 +46,7 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		目标磁盘可能没有足够的空间。尝试选择其他的磁盘或者选择不安装附加项目。
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		请在关闭系统安装器之前关闭引导管理器和磁盘管理器。
 Scanning for disks…	InstallerWindow		扫描磁盘...
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		磁盘无法挂载。请选择其他磁盘。
 ?? of ??	InstallerWindow	Unknown progress	??来源于??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -86,6 +91,7 @@ With GRUB 2 the first logical partition always has the number \"5\", regardless 
 Write boot sector	InstallerWindow		写入引导扇区
 Cancel	InstallerWindow		取消
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		磁盘管理器可用于配置磁盘分区，当前其无法启动。
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		目标卷为非空，是否确定继续安装？\n\n注意： 'system' 目录将完全从源卷进行拷贝，但配置目录将会保留，所有其他的目录都将会进行合并，同时存在于源卷和目标卷的文件和链接都将会被源卷的版本所覆盖。
 No optional packages available.	PackagesView		无可用附加软件包。
 All hard disks start with \"hd\".\n	InstallerApp		所有硬盘的起始字符为：\"hd\"。\n
 Continue	InstallerApp		继续

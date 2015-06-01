@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PSDTranslator	489719358
+1	japanese	x-vnd.Haiku-PSDTranslator	3654055550
 Lab	PSDLoader		ラボ
 Uncompressed	PSDConfig		未圧縮
 Indexed	PSDLoader		インデックスカラー
@@ -6,12 +6,12 @@ Grayscale	PSDLoader		グレースケール
 Photoshop image translator	PSDConfig		Photoshop イメージトランスレーター
 Photoshop image translator	PSDTranslator		Photoshop イメージトランスレーター
 Version %d.%d.%d, %s	PSDConfig		バージョン %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Photoshop ドキュメント (PSD ファイル)
 Photoshop image	PSDTranslator		Photoshop イメージ
 RLE	PSDConfig		RLE
-Photoshop Document (PSD File)	PSDConfig		Photoshop ドキュメント (PSD ファイル)
+Photoshop Big Document (PSB file)	PSDConfig		Photoshop ビックドキュメント (PSB ファイル)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Photoshop イメージ (%s)
-Photoshop Big Document (PSB File)	PSDConfig		Photoshop ビックドキュメント (PSB ファイル)
 PSDTranslator Settings	PSDConfig		PSDTranslator 設定
 RGB	PSDLoader		RGB
 Bitmap	PSDLoader		ビットマップ

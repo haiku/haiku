@@ -6,10 +6,9 @@
 #include "ConfigView.h"
 
 #include <Catalog.h>
-#include <ControlLook.h>
+#include <LayoutBuilder.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
-#include <SpaceLayoutItem.h>
 #include <StringView.h>
 
 #include <stdio.h>
@@ -38,6 +37,7 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 
 	fCompressionField = new BMenuField("compression",
 		B_TRANSLATE("Compression: "), compressionPopupMenu);
+	fCompressionField->SetAlignment(B_ALIGN_RIGHT);
 
 	BPopUpMenu* versionPopupMenu = new BPopUpMenu("popup_version");
 
@@ -45,25 +45,19 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		fSettings->SetGetInt32(PSD_SETTING_VERSION);
 
 	_AddItemToMenu(versionPopupMenu,
-		B_TRANSLATE("Photoshop Document (PSD File)"), MSG_VERSION_CHANGED,
+		B_TRANSLATE("Photoshop Document (PSD file)"), MSG_VERSION_CHANGED,
 		PSD_FILE, currentVersion);
 	_AddItemToMenu(versionPopupMenu,
-		B_TRANSLATE("Photoshop Big Document (PSB File)"), MSG_VERSION_CHANGED,
+		B_TRANSLATE("Photoshop Big Document (PSB file)"), MSG_VERSION_CHANGED,
 		PSB_FILE, currentVersion);
 
 	fVersionField = new BMenuField("version",
 		B_TRANSLATE("Format: "), versionPopupMenu);
+	fVersionField->SetAlignment(B_ALIGN_RIGHT);
 
-	BAlignment leftAlignment(B_ALIGN_LEFT, B_ALIGN_VERTICAL_UNSET);
-
-	BStringView *stringView = new BStringView("title",
+	BStringView *titleView = new BStringView("title",
 		B_TRANSLATE("Photoshop image translator"));
-	stringView->SetFont(be_bold_font);
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
-
-	float spacing = be_control_look->DefaultItemSpacing();
-	AddChild(BSpaceLayoutItem::CreateVerticalStrut(spacing));
+	titleView->SetFont(be_bold_font);
 
 	char version[256];
 	sprintf(version, B_TRANSLATE("Version %d.%d.%d, %s"),
@@ -71,27 +65,28 @@ ConfigView::ConfigView(TranslatorSettings *settings)
 		int(B_TRANSLATION_MINOR_VERSION(PSD_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(PSD_TRANSLATOR_VERSION)),
 		__DATE__);
-	stringView = new BStringView("version", version);
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 
-	stringView = new BStringView("copyright",
+	BStringView *versionView = new BStringView("version", version);
+	BStringView *copyrightView = new BStringView("copyright",
 		B_UTF8_COPYRIGHT "2005-2013 Haiku Inc.");
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
-
-	stringView = new BStringView("my_copyright",
+	BStringView *copyright2View = new BStringView("my_copyright",
 		B_UTF8_COPYRIGHT "2012-2013 Gerasim Troeglazov <3dEyes@gmail.com>");
-	stringView->SetExplicitAlignment(leftAlignment);
-	AddChild(stringView);
 	
-	AddChild(fVersionField);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(titleView)
+		.Add(versionView)
+		.Add(copyrightView)
+		.AddGlue()
+		.AddGrid(10.0f, 5.0f)
+			.Add(fVersionField->CreateLabelLayoutItem(), 0, 0)
+			.Add(fVersionField->CreateMenuBarLayoutItem(), 1, 0)
+			.Add(fCompressionField->CreateLabelLayoutItem(), 0, 1)
+			.Add(fCompressionField->CreateMenuBarLayoutItem(), 1, 1)
+		.End()
+		.AddGlue()
+		.Add(copyright2View);
 
-	AddChild(fCompressionField);
-
-	AddChild(BSpaceLayoutItem::CreateGlue());
-	GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
 
 	SetExplicitPreferredSize(GroupLayout()->MinSize());
 }

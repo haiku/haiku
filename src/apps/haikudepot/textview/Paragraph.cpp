@@ -286,12 +286,12 @@ Paragraph::SubParagraph(int32 start, int32 length) const
 {
 	if (start < 0)
 		start = 0;
-	
+
 	if (start == 0 && length == Length())
 		return *this;
-	
+
 	Paragraph result(fStyle);
-	
+
 	int32 count = fTextSpans.CountItems();
 	for (int32 i = 0; i < count; i++) {
 		const TextSpan& span = fTextSpans.ItemAtFast(i);
@@ -312,7 +312,7 @@ Paragraph::SubParagraph(int32 start, int32 length) const
 			result.Append(span);
 		else
 			result.Append(span.SubSpan(start, copyLength));
-		
+
 		length -= copyLength;
 		if (length == 0)
 			break;

@@ -196,13 +196,13 @@ SettingsWindow::SettingsWindow()
 	BBox* box = new BBox("box");
 	box->SetLabel(fSwapEnabledCheckBox);
 
-	box->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_DEFAULT_SPACING)
+	box->AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fSwapUsageBar)
 		.Add(fSwapAutomaticCheckBox)
 		.Add(fVolumeMenuField)
 		.Add(fSizeSlider)
 		.Add(fWarningStringView)
-		.SetInsets(10)
 		.View());
 
 	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),
@@ -212,14 +212,14 @@ SettingsWindow::SettingsWindow()
 		new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(box)
-		.AddGroup(B_HORIZONTAL, 10)
+		.AddGroup(B_HORIZONTAL)
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
 			.AddGlue()
-		.End()
-		.SetInsets(10);
+		.End();
 
 	BScreen screen;
 	BRect screenFrame = screen.Frame();

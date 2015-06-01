@@ -241,7 +241,7 @@ public:
 								PackageInfo();
 								PackageInfo(const BPackageInfo& info);
 								PackageInfo(
-									const BString& title,
+									const BString& name,
 									const BPackageVersion& version,
 									const PublisherInfo& publisher,
 									const BString& shortDescription,
@@ -254,8 +254,10 @@ public:
 			bool				operator==(const PackageInfo& other) const;
 			bool				operator!=(const PackageInfo& other) const;
 
-			const BString&		Title() const
-									{ return fTitle; }
+			const BString&		Name() const
+									{ return fName; }
+			void				SetTitle(const BString& title);
+			const BString&		Title() const;
 			const BPackageVersion& Version() const
 									{ return fVersion; }
 			void				SetShortDescription(const BString& description);
@@ -304,7 +306,7 @@ public:
 			bool				IsLocalFile() const;
 			const BString&		FileName() const
 									{ return fFileName; }
-			
+
 			void				ClearCategories();
 			bool				AddCategory(const CategoryRef& category);
 			const CategoryList&	Categories() const
@@ -334,6 +336,10 @@ public:
 			const BitmapList&	Screenshots() const
 									{ return fScreenshots; }
 
+			void				SetSize(int64 size);
+			int64				Size() const
+									{ return fSize; }
+
 			bool				AddListener(
 									const PackageInfoListenerRef& listener);
 			void				RemoveListener(
@@ -346,6 +352,7 @@ private:
 
 private:
 			BitmapRef			fIcon;
+			BString				fName;
 			BString				fTitle;
 			BPackageVersion		fVersion;
 			PublisherInfo		fPublisher;
@@ -368,6 +375,7 @@ private:
 			BString				fArchitecture;
 			BString				fLocalFilePath;
 			BString				fFileName;
+			int64				fSize;
 
 	static	BitmapRef			sDefaultIcon;
 };

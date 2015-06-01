@@ -9,6 +9,9 @@
 #include_next <signal.h>
 
 
+#ifdef _BSD_SOURCE
+
+
 #define	sigmask(sig) (1 << ((sig) - 1))
 
 
@@ -22,5 +25,9 @@ int sigblock(int mask);
 #ifdef __cplusplus
 }
 #endif
+
+
+#endif
+
 
 #endif	/* _BSD_SIGNAL_H_ */

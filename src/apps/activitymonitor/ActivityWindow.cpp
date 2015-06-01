@@ -335,14 +335,12 @@ ActivityWindow::_SaveSettings()
 		if (view == NULL)
 			continue;
 
-		BMessage* viewState = new BMessage;
-		status = view->SaveState(*viewState);
+		BMessage viewState;
+		status = view->SaveState(viewState);
 		if (status == B_OK)
-			status = settings.AddMessage("activity view", viewState);
-		if (status != B_OK) {
-			delete viewState;
+			status = settings.AddMessage("activity view", &viewState);
+		if (status != B_OK)
 			break;
-		}
 	}
 
 	if (status == B_OK)

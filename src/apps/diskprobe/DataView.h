@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DATA_VIEW_H
@@ -13,16 +13,19 @@
 
 class DataEditor;
 
+
 enum base_type {
 	kHexBase = 16,
 	kDecimalBase = 10
 };
+
 
 enum view_focus {
 	kNoFocus,
 	kHexFocus,
 	kAsciiFocus
 };
+
 
 class DataView : public BView {
 public:
@@ -65,6 +68,8 @@ public:
 
 			const uint8*	DataAt(int32 start);
 
+	static	int32			WidthForFontSize(float size);
+
 private:
 			BRect			DataBounds(bool inView = false) const;
 			BRect			SelectionFrame(view_focus which, int32 start,
@@ -90,7 +95,6 @@ private:
 			void			Paste();
 
 			DataEditor&		fEditor;
-			int32			fPositionLength;
 			uint8*			fData;
 			size_t			fDataSize;
 			off_t			fFileSize;

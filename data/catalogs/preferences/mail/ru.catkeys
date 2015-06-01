@@ -1,9 +1,10 @@
-1	russian	x-vnd.Haiku-Mail	1147431952
+1	russian	x-vnd.Haiku-Mail	2750130554
 Settings	Config Window		Настройки
 Never	Config Window	show status window	никогда
 While sending and receiving	Config Window		во время отправки и получения
 Incoming	Config Window		Входящие
 Server name:	E-Mail		Имя сервера:
+An error occurred while creating the config view: %error.	Config Views		При создании панели настройки произошла ошибка: %error.
 OK	Config Window		ОК
 E-mail address:	E-Mail		E-mail адрес:
 Account name:	E-Mail		Имя аккаунта:
@@ -18,6 +19,7 @@ Password:	E-Mail		Пароль:
 Accounts	Config Window		Аккаунты
 Finish	AutoConfigWindow		Завершить
 Remove	Config Window		Удалить
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Создайте новую учётную запись, нажав Добавить.\n\nУдалите выбранную учётную запись, нажав Удалить.\n\nВыберите имеющуюся в списке запись для её настройки.
 Error!	Config Views		Ошибка!
 Server Name:	E-Mail		Адрес сервера:
 While sending	Config Window		во время отправки

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -134,7 +134,7 @@ public:
 		if (ref->IsLocalFile())
 			packageName = ref->LocalFilePath();
 		else
-			packageName = ref->Title();
+			packageName = ref->Name();
 
 		const char* packageNameString = packageName.String();
 		try {
@@ -242,7 +242,7 @@ public:
 		PackageInfoRef ref(Package());
 		fPackageManager->SetCurrentActionPackage(ref, false);
 		fPackageManager->AddProgressListener(this);
-		const char* packageName = ref->Title().String();
+		const char* packageName = ref->Name().String();
 		try {
 			fPackageManager->Uninstall(&packageName, 1);
 		} catch (BFatalErrorException ex) {
@@ -313,14 +313,14 @@ struct DeskbarLink {
 		link(link)
 	{
 	}
-	
+
 	DeskbarLink(const DeskbarLink& other)
 		:
 		path(other.path),
 		link(other.link)
 	{
 	}
-	
+
 	DeskbarLink& operator=(const DeskbarLink& other)
 	{
 		if (this == &other)
@@ -329,17 +329,17 @@ struct DeskbarLink {
 		link = other.link;
 		return *this;
 	}
-	
+
 	bool operator==(const DeskbarLink& other)
 	{
 		return path == other.path && link == other.link;
 	}
-	
+
 	bool operator!=(const DeskbarLink& other)
 	{
 		return !(*this == other);
 	}
-	
+
 	BString	path;
 	BString	link;
 };
@@ -367,24 +367,24 @@ public:
 		}
 		return B_OK;
 	}
-	
+
 	virtual status_t HandleEntryAttribute(BPackageEntry* entry,
 		BPackageEntryAttribute* attribute)
 	{
 		return B_OK;
 	}
-	
+
 	virtual status_t HandleEntryDone(BPackageEntry* entry)
 	{
 		return B_OK;
 	}
-	
+
 	virtual status_t HandlePackageAttribute(
 		const BPackageInfoAttributeValue& value)
 	{
 		return B_OK;
 	}
-	
+
 	virtual void HandleErrorOccurred()
 	{
 	}
@@ -419,7 +419,7 @@ public:
 		int32 lastPathSeparator = target.FindLast('/');
 		if (lastPathSeparator > 0 && lastPathSeparator + 1 < target.Length())
 			target.Remove(0, lastPathSeparator + 1);
-		
+
 		fLabel.ReplaceAll("%DeskbarLink%", target);
 	}
 
@@ -448,7 +448,7 @@ public:
 			} else {
 				return B_ERROR;
 			}
-			
+
 			status = path.Append(fDeskbarLink.path);
 			if (status == B_OK)
 				status = path.GetParent(&path);
@@ -457,14 +457,14 @@ public:
 				printf("trying to launch: %s\n", path.Path());
 			}
 		}
-		
+
 		entry_ref ref;
 		if (status == B_OK)
 			status = get_ref_for_path(path.Path(), &ref);
-		
+
 		if (status == B_OK)
 			status = be_roster->Launch(&ref);
-		
+
 		return status;
 	}
 
@@ -494,7 +494,7 @@ public:
 		}
 
 		packagePath.Append(package->FileName());
-		
+
 		BNoErrorOutput errorOutput;
 		BPackageReader reader(&errorOutput);
 
@@ -505,7 +505,7 @@ public:
 				packagePath.Path(), strerror(status));
 			return false;
 		}
-		
+
 		// Scan package contents for Deskbar links
 		DeskbarLinkFinder contentHandler(foundLinks);
 		status = reader.ParseContent(&contentHandler);
@@ -515,7 +515,7 @@ public:
 				packagePath.Path(), strerror(status));
 			return false;
 		}
-		
+
 		return foundLinks.CountItems() > 0;
 	}
 
@@ -567,7 +567,7 @@ PackageManager::GetPackageActions(PackageInfoRef package, Model* model)
 	if (state == ACTIVATED || state == INSTALLED) {
 		actionList.Add(PackageActionRef(new UninstallPackageAction(
 			package, model), true));
-		
+
 		// Add OpenPackageActions for each deskbar link found in the
 		// package
 		DeskbarLinkList foundLinks;
@@ -721,13 +721,13 @@ PackageManager::Warn(status_t error, const char* format, ...)
 void
 PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 {
-	ProgressPackageDownloadActive(packageName, 0.0f);
+	ProgressPackageDownloadActive(packageName, 0.0f, 0, 0);
 }
 
 
 void
 PackageManager::ProgressPackageDownloadActive(const char* packageName,
-	float completionPercentage)
+	float completionPercentage, off_t bytes, off_t totalBytes)
 {
 	for (int32 i = 0; i < fPackageProgressListeners.CountItems(); i++) {
 		fPackageProgressListeners.ItemAt(i)->DownloadProgressChanged(
@@ -813,12 +813,11 @@ PackageManager::_GetSolverPackage(PackageInfoRef package)
 		flags |= BSolver::B_FIND_INSTALLED_ONLY;
 
 	BObjectList<BSolverPackage> packages;
-	status_t result = Solver()->FindPackages(package->Title(),
-		flags, packages);
+	status_t result = Solver()->FindPackages(package->Name(), flags, packages);
 	if (result == B_OK) {
 		for (int32 i = 0; i < packages.CountItems(); i++) {
 			BSolverPackage* solverPackage = packages.ItemAt(i);
-			if (solverPackage->Name() != package->Title())
+			if (solverPackage->Name() != package->Name())
 				continue;
 			else if (package->State() == NONE
 				&& dynamic_cast<BPackageManager::RemoteRepository*>(

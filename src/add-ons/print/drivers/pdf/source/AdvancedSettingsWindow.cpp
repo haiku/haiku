@@ -34,12 +34,14 @@ THE SOFTWARE.
 #include <Box.h>
 #include <Button.h>
 #include <FindDirectory.h>
+#include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <Message.h>
 #include <Messenger.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Screen.h>
+#include <SeparatorView.h>
 #include <TextControl.h>
 
 
@@ -54,7 +56,7 @@ static BMessage* BorderWidthMessage(uint32 what, float width)
 AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	: HWindow(BRect(0, 0, 450, 180), "Advanced Settings", B_TITLED_WINDOW_LOOK,
 		B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
-		B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE),
+		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	 fSettings(settings)
 {
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
@@ -84,19 +86,9 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	if (settings->FindInt32("close_option", (int32*)&fCloseOption) != B_OK)
 		fCloseOption = kNever;
 
-	BRect bounds(Bounds());
-	BBox *panel = new BBox(bounds, "background", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP, B_PLAIN_BORDER);
-	AddChild(panel);
-
-	bounds.InsetBy(10.0, 10.0);
-	float divider = be_plain_font->StringWidth("Close status window when done: ");
-	fLicenseKey = new BTextControl(bounds, "pdflib_license_key",
+	fLicenseKey = new BTextControl("pdflib_license_key",
 		"PDFlib License Key: ", "", NULL);
-	panel->AddChild(fLicenseKey);
 	fLicenseKey->SetEnabled(false);
-	fLicenseKey->ResizeToPreferred();
-	fLicenseKey->SetDivider(divider);
 	fLicenseKey->TextView()->HideTyping(true);
 	fLicenseKey->TextView()->SetText(licenseKey.String());
 
@@ -106,49 +98,52 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	// border link
 
 	// bounds.OffsetBy(0.0, fLicenseKey->Bounds().Height() + 10.0);
-	BPopUpMenu* m = new BPopUpMenu("Link Border");
-	m->SetRadioMode(true);
+	BPopUpMenu* menuLinkBorder = new BPopUpMenu("Link Border");
+	menuLinkBorder->SetRadioMode(true);
 
-	BMenuField *mf = new BMenuField(bounds, "link_border_width_menu",
-		"Link Border: ", m);
-	panel->AddChild(mf);
-	mf->ResizeToPreferred();
-	mf->SetDivider(divider);
-	mf->Menu()->SetLabelFromMarked(true);
+	BMenuField* menuFieldLinkBorder = new BMenuField("link_border_width_menu",
+		"Link Border: ", menuLinkBorder);
+	menuFieldLinkBorder->Menu()->SetLabelFromMarked(true);
 
 	BMenuItem* item;
-	m->AddItem(item = new BMenuItem("None", new BMessage(CREATE_LINKS_MSG)));
-	item->SetMarked(!fCreateLinks);
-	m->AddSeparatorItem();
+	menuLinkBorder->AddItem(item = new BMenuItem("None",
+		new BMessage(CREATE_LINKS_MSG)));
 
-	m->AddItem(item = new BMenuItem("No Border", BorderWidthMessage(LINK_BORDER_MSG, 0.0)));
+	item->SetMarked(!fCreateLinks);
+	menuLinkBorder->AddSeparatorItem();
+
+	menuLinkBorder->AddItem(item = new BMenuItem("No Border",
+		BorderWidthMessage(LINK_BORDER_MSG, 0.0)));
+
 	if (fCreateLinks && fLinkBorderWidth == 0)
 		item->SetMarked(true);
 
-	m->AddItem(item = new BMenuItem("Normal Border", BorderWidthMessage(LINK_BORDER_MSG, 1.0)));
+	menuLinkBorder->AddItem(item = new BMenuItem("Normal Border",
+		BorderWidthMessage(LINK_BORDER_MSG, 1.0)));
+
 	if (fCreateLinks && fLinkBorderWidth == 1)
 		item->SetMarked(true);
 
-	m->AddItem(item = new BMenuItem("Bold Border", BorderWidthMessage(LINK_BORDER_MSG, 2.0)));
+	menuLinkBorder->AddItem(item = new BMenuItem("Bold Border",
+		BorderWidthMessage(LINK_BORDER_MSG, 2.0)));
+
 	if (fCreateLinks && fLinkBorderWidth == 2)
 		item->SetMarked(true);
 
 
 	// bookmarks
 
-	m = new BPopUpMenu("Bookmark Definition File");
-	m->SetRadioMode(true);
+	BPopUpMenu* menuBookmark = new BPopUpMenu("Bookmark Definition File");
+	menuBookmark->SetRadioMode(true);
 
-	bounds.OffsetBy(0.0, mf->Bounds().Height() + 10.0);
-	mf = new BMenuField(bounds, "definition_menu", "Bookmark Definition File: ", m);
-	panel->AddChild(mf);
-	mf->ResizeToPreferred();
-	mf->SetDivider(divider);
-	mf->Menu()->SetLabelFromMarked(true);
+	BMenuField* menuFieldBookmark = new BMenuField("definition_menu",
+		"Bookmark Definition File: ", menuBookmark);
+	menuFieldBookmark->Menu()->SetLabelFromMarked(true);
 
-	m->AddItem(item = new BMenuItem("None", new BMessage(CREATE_BOOKMARKS_MSG)));
+	menuBookmark->AddItem(item = new BMenuItem("None",
+		new BMessage(CREATE_BOOKMARKS_MSG)));
 	item->SetMarked(!fCreateBookmarks);
-	m->AddSeparatorItem();
+	menuBookmark->AddSeparatorItem();
 
 	BDirectory bookmarks(_SetupDirectory("bookmarks"));
 	if (bookmarks.InitCheck() == B_OK) {
@@ -156,7 +151,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 		while (bookmarks.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
 			char name[B_FILE_NAME_LENGTH];
 			if (entry.GetName(name) == B_OK) {
-				m->AddItem(item = new BMenuItem(name, new BMessage(DEFINITION_MSG)));
+				menuBookmark->AddItem(item = new BMenuItem(name, new BMessage(DEFINITION_MSG)));
 				if (fCreateBookmarks && strcmp(name, fBookmarkDefinition.String()) == 0)
 					item->SetMarked(true);
 			}
@@ -165,19 +160,17 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 
 	// cross references
 
-	m = new BPopUpMenu("Cross References File");
-	m->SetRadioMode(true);
+	BPopUpMenu* menuCrossReferences = new BPopUpMenu("Cross References File");
+	menuCrossReferences->SetRadioMode(true);
 
-	bounds.OffsetBy(0.0, mf->Bounds().Height() + 10.0);
-	mf = new BMenuField(bounds, "xrefs_menu", "Cross References File: ", m);
-	panel->AddChild(mf);
-	mf->ResizeToPreferred();
-	mf->SetDivider(divider);
-	mf->Menu()->SetLabelFromMarked(true);
+	BMenuField* menuFieldCrossReferences = new BMenuField("xrefs_menu",
+		"Cross References File: ", menuCrossReferences);
+	menuFieldCrossReferences->Menu()->SetLabelFromMarked(true);
 
-	m->AddItem(item = new BMenuItem("None", new BMessage(CREATE_XREFS_MSG)));
+	menuCrossReferences->AddItem(item = new BMenuItem("None",
+		new BMessage(CREATE_XREFS_MSG)));
 	item->SetMarked(!fCreateXRefs);
-	m->AddSeparatorItem();
+	menuCrossReferences->AddSeparatorItem();
 
 	BDirectory xrefs(_SetupDirectory("xrefs"));
 	if (xrefs.InitCheck() == B_OK) {
@@ -185,62 +178,62 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 		while (xrefs.GetNextEntry(&entry) != B_ENTRY_NOT_FOUND) {
 			char name[B_FILE_NAME_LENGTH];
 			if (entry.GetName(name) == B_OK) {
-				m->AddItem (item = new BMenuItem(name, new BMessage(XREFS_MSG)));
+				menuCrossReferences->AddItem(item = new BMenuItem(name,
+					 new BMessage(XREFS_MSG)));
 				if (fCreateXRefs && strcmp(name, fXRefs.String()) == 0)
 					item->SetMarked(true);
 			}
 		}
 	}
 
-	m = new BPopUpMenu("Close status window when done");
-	m->SetRadioMode(true);
+	BPopUpMenu* menuStatusWindow =
+		new BPopUpMenu("Close status window when done");
+	menuStatusWindow->SetRadioMode(true);
 
-	bounds.OffsetBy(0.0, mf->Bounds().Height() + 10.0);
-	mf = new BMenuField(bounds, "close_option_menu", "Close status window when done: ", m);
-	panel->AddChild(mf);
-	mf->ResizeToPreferred();
-	mf->SetDivider(divider);
-	mf->Menu()->SetLabelFromMarked(true);
+	BMenuField* menuFieldStatusWindow = new BMenuField("close_option_menu",
+		"Close status window when done: ", menuStatusWindow);
+	menuFieldStatusWindow->Menu()->SetLabelFromMarked(true);
 
-	_AddMenuItem(m, "Never", kNever);
-	_AddMenuItem(m, "No Errors", kNoErrors);
-	_AddMenuItem(m, "No Errors or Warnings", kNoErrorsOrWarnings);
-	_AddMenuItem(m, "No Errors, Warnings or Info", kNoErrorsWarningsOrInfo);
-	_AddMenuItem(m, "Always", kAlways);
+	_AddMenuItem(menuStatusWindow, "Never", kNever);
+	_AddMenuItem(menuStatusWindow, "No Errors", kNoErrors);
+	_AddMenuItem(menuStatusWindow, "No Errors or Warnings",
+		kNoErrorsOrWarnings);
+	_AddMenuItem(menuStatusWindow, "No Errors, Warnings or Info",
+		kNoErrorsWarningsOrInfo);
+	_AddMenuItem(menuStatusWindow, "Always", kAlways);
 
-	bounds = Bounds();
-	bounds.InsetBy(5.0, 0.0);
-	bounds.top = mf->Frame().bottom + 10.0;
-	BBox *line = new BBox(BRect(bounds.left, bounds.top, bounds.right,
-		bounds.top + 1.0), NULL, B_FOLLOW_LEFT_RIGHT);
-	panel->AddChild(line);
+	BButton *cancelButton = new BButton("cancel", "Cancel",
+		new BMessage(CANCEL_MSG));
 
-	bounds.InsetBy(5.0, 0.0);
-	bounds.OffsetBy(0.0, 11.0);
-	BButton *cancel = new BButton(bounds, NULL, "Cancel", new BMessage(CANCEL_MSG));
-	panel->AddChild(cancel);
-	cancel->ResizeToPreferred();
+	BButton *okButton = new BButton("ok", "Ok", new BMessage(OK_MSG));
+	okButton->MakeDefault(true);
 
-	BButton *ok = new BButton(bounds, NULL, "OK", new BMessage(OK_MSG));
-	panel->AddChild(ok, cancel);
-	ok->ResizeToPreferred();
-
-	ResizeTo(divider * 1.3 + 10.0 + ok->Bounds().Width() + cancel->Bounds().Width(),
-		ok->Frame().bottom + 10.0);
-
-	bounds.right = Bounds().right - 10.0;
-	ok->MoveTo(bounds.right - ok->Bounds().Width(), ok->Frame().top);
-
-	bounds = ok->Frame();
-	cancel->MoveTo(bounds.left - cancel->Bounds().Width() - 10.0, bounds.top);
-
-	ok->MakeDefault(true);
-
-	BButton *button = new BButton(bounds, NULL, "Open Settings Folder" B_UTF8_ELLIPSIS,
+	BButton *openButton = new BButton("openSettingsFolder",
+		"Open Settings Folder" B_UTF8_ELLIPSIS,
 		new BMessage(OPEN_SETTINGS_FOLDER_MSG));
-	panel->AddChild(button);
-	button->ResizeToPreferred();
-	button->MoveTo(fLicenseKey->Frame().left, bounds.top);
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
+			.Add(fLicenseKey->CreateLabelLayoutItem(), 0, 0)
+			.Add(fLicenseKey->CreateTextViewLayoutItem(), 1, 0)
+			.Add(menuFieldLinkBorder->CreateLabelLayoutItem(), 0, 1)
+			.Add(menuFieldLinkBorder->CreateMenuBarLayoutItem(), 1, 1)
+			.Add(menuFieldBookmark->CreateLabelLayoutItem(), 0, 2)
+			.Add(menuFieldBookmark->CreateMenuBarLayoutItem(), 1, 2)
+			.Add(menuFieldCrossReferences->CreateLabelLayoutItem(), 0, 3)
+			.Add(menuFieldCrossReferences->CreateMenuBarLayoutItem(), 1, 3)
+			.Add(menuFieldStatusWindow->CreateLabelLayoutItem(), 0, 4)
+			.Add(menuFieldStatusWindow->CreateMenuBarLayoutItem(), 1, 4)
+		.End()
+		.Add(new BSeparatorView(B_HORIZONTAL, B_FANCY_BORDER))
+		.AddGroup(B_HORIZONTAL)
+			.Add(openButton)
+			.AddGlue()
+			.Add(cancelButton)
+			.Add(okButton)
+		.End();
+
 
 	BRect winFrame(Frame());
 	BRect screenFrame(BScreen().Frame());

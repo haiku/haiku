@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_TEXT_CONTROL_H
@@ -40,6 +40,7 @@ public:
 
 	virtual	void				SetText(const char* text);
 			const char*			Text() const;
+			int32				TextLength() const;
 			void				MarkAsInvalid(bool invalid);
 
 	virtual	void				SetValue(int32 value);
@@ -144,5 +145,6 @@ private:
 
 			uint32				_reserved[8];
 };
+
 
 #endif	// _TEXT_CONTROL_H

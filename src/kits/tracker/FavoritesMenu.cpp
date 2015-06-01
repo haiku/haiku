@@ -51,7 +51,6 @@ All rights reserved.
 #include <algorithm>
 
 #include "IconMenuItem.h"
-#include "NavMenu.h"
 #include "PoseView.h"
 #include "QueryPoseView.h"
 #include "Tracker.h"

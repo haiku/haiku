@@ -35,6 +35,7 @@ enum {
 	MSG_MODIFIED				= 'mMOD',
 	MSG_UPDATE_STATUS			= 'mUPS',
 	MSG_UPDATE_STATUS_TEXT		= 'mUPT',
+	MSG_UPDATE_STATUS_ZOOM		= 'mUPZ',
 	MSG_SELECTION				= 'mSEL',
 	MSG_FILE_NEXT				= 'mFLN',
 	MSG_FILE_PREV				= 'mFLP',
@@ -105,6 +106,9 @@ private:
 
 			void				_SetToolBarVisible(bool visible,
 									bool animate = false);
+			void				_SetToolBarBorder(bool visible);
+
+			void				_SaveWidthAndHeight();
 
 private:
 			ImageFileNavigator	fNavigator;
@@ -117,7 +121,6 @@ private:
 			BToolBar*			fToolBar;
 			bool				fToolBarVisible;
 			BScrollView*		fScrollView;
-			BScrollBar*			fVerticalScrollBar;
 			ShowImageView*		fImageView;
 			ShowImageStatusView* fStatusView;
 			ProgressWindow*		fProgressWindow;

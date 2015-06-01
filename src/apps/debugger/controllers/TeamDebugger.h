@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_DEBUGGER_H
@@ -107,6 +107,8 @@ private:
 
 	virtual void				InspectRequested(target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
+	virtual	void				MemoryWriteRequested(target_addr_t address,
+									const void* data, target_size_t size);
 
 	virtual	void				ExpressionEvaluationRequested(
 									SourceLanguage* language,
@@ -194,6 +196,9 @@ private:
 			void				_HandleInspectAddress(
 									target_addr_t address,
 									TeamMemoryBlock::Listener* listener);
+			void				_HandleWriteMemory(
+									target_addr_t address, void* data,
+									target_size_t size);
 
 			void				_HandleEvaluateExpression(
 									SourceLanguage* language,

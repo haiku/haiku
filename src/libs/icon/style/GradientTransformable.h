@@ -11,6 +11,7 @@
 
 #ifdef ICON_O_MATIC
 # include <Archivable.h>
+# include <Referenceable.h>
 
 # include "Observable.h"
 #endif // ICON_O_MATIC
@@ -45,6 +46,7 @@ _BEGIN_ICON_NAMESPACE
 #ifdef ICON_O_MATIC
 class Gradient : public BArchivable,
 				 public Observable,
+				 public BReferenceable,
 				 public Transformable {
 #else
 class Gradient : public Transformable {

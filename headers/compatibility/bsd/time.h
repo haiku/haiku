@@ -9,6 +9,9 @@
 #include_next <time.h>
 
 
+#ifdef _BSD_SOURCE
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -19,5 +22,9 @@ time_t	timegm(struct tm *tm);
 #ifdef __cplusplus
 }
 #endif
+
+
+#endif
+
 
 #endif	/* _BSD_TIME_H_ */

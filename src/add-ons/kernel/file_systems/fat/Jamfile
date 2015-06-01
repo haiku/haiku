@@ -16,5 +16,5 @@ KernelAddon fat :
 	mime_table.c
 	util.c
 	vcache.c
-	version.c 
+	version.c
 ;

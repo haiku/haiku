@@ -1,14 +1,18 @@
 /*
- * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Axel Dörfler <axeld@pinc-software.de>
  *		Rene Gollent <rene@gollent.com>
+ *		Ingo Weinhold <ingo_weinhold@gmx.de>
  */
 
 
 #include "PackageManager.h"
+
+#include <sys/ioctl.h>
+#include <unistd.h>
 
 #include <package/CommitTransactionResult.h>
 #include <package/DownloadFileRequest.h>
@@ -49,7 +53,7 @@ PackageManager::SetInteractive(bool interactive)
 
 
 void
-PackageManager::JobFailed(BJob* job)
+PackageManager::JobFailed(BSupportKit::BJob* job)
 {
 	BString error = job->ErrorString();
 	if (error.Length() > 0) {
@@ -60,7 +64,7 @@ PackageManager::JobFailed(BJob* job)
 
 
 void
-PackageManager::JobAborted(BJob* job)
+PackageManager::JobAborted(BSupportKit::BJob* job)
 {
 	DIE(job->Result(), "aborted");
 }
@@ -176,8 +180,11 @@ PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 
 void
 PackageManager::ProgressPackageDownloadActive(const char* packageName,
-	float completionPercentage)
+	float completionPercentage, off_t bytes, off_t totalBytes)
 {
+	if (!fInteractive)
+		return;
+
 	static const char* progressChars[] = {
 		"\xE2\x96\x8F",
 		"\xE2\x96\x8E",
@@ -189,13 +196,20 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 		"\xE2\x96\x88",
 	};
 
-	const int width = 70;
+	int width = 70;
+
+	struct winsize winSize;
+	if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &winSize) == 0
+		&& winSize.ws_col < 77) {
+		// We need 7 characters for the percent display
+		width = winSize.ws_col - 7;
+	}
 
 	int position;
 	int ipart = (int)(completionPercentage * width);
 	int fpart = (int)(((completionPercentage * width) - ipart) * 8);
 
-	printf("\r"); // erase the line
+	printf("\r"); // return to the beginning of the line
 
 	for (position = 0; position < width; position++) {
 		if (position < ipart) {
@@ -220,21 +234,31 @@ PackageManager::ProgressPackageDownloadActive(const char* packageName,
 void
 PackageManager::ProgressPackageDownloadComplete(const char* packageName)
 {
-	printf("\nFinished downloading %s.\n", packageName);
+	if (fInteractive) {
+		// Overwrite the progress bar with whitespace
+		printf("\r");
+		struct winsize w;
+		ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+		for (int i = 0; i < (w.ws_col); i++)
+			printf(" ");
+		printf("\r\x1b[1A"); // Go to previous line.
+	}
+
+	printf("Downloading %s...done.\n", packageName);
 }
 
 
 void
 PackageManager::ProgressPackageChecksumStarted(const char* title)
 {
-	printf("%s...\n", title);
+	printf("%s...", title);
 }
 
 
 void
 PackageManager::ProgressPackageChecksumComplete(const char* title)
 {
-	printf("%s complete.\n", title);
+	printf("done.\n");
 }
 
 
@@ -289,20 +313,45 @@ PackageManager::_PrintResult(InstalledRepository& installationRepository)
 	PackageList& packagesToDeactivate
 		= installationRepository.PackagesToDeactivate();
 
+	BStringList upgradedPackages;
+	for (int32 i = 0;
+		BSolverPackage* installPackage = packagesToActivate.ItemAt(i);
+		i++) {
+		for (int32 j = 0;
+			BSolverPackage* uninstallPackage = packagesToDeactivate.ItemAt(j);
+			j++) {
+			if (installPackage->Info().Name() == uninstallPackage->Info().Name()) {
+				upgradedPackages.Add(installPackage->Info().Name());
+				break;
+			}
+		}
+	}
+
 	for (int32 i = 0; BSolverPackage* package = packagesToActivate.ItemAt(i);
 		i++) {
-		if (dynamic_cast<MiscLocalRepository*>(package->Repository()) == NULL) {
-			printf("    install package %s from repository %s\n",
-				package->Info().FileName().String(),
-				package->Repository()->Name().String());
+		BString repository;
+		if (dynamic_cast<MiscLocalRepository*>(package->Repository()) != NULL)
+			repository = "local file";
+		else
+			repository.SetToFormat("repository %s", package->Repository()->Name().String());
+
+		if (upgradedPackages.HasString(package->Info().Name())) {
+			printf("    upgrade package %s to %s from %s\n",
+				package->Info().Name().String(),
+				package->Info().Version().ToString().String(),
+				repository.String());
 		} else {
-			printf("    install package %s from local file\n",
-				package->Info().FileName().String());
+			printf("    install package %s-%s from %s\n",
+				package->Info().Name().String(),
+				package->Info().Version().ToString().String(),
+				repository.String());
 		}
 	}
 
 	for (int32 i = 0; BSolverPackage* package = packagesToDeactivate.ItemAt(i);
 		i++) {
+		if (upgradedPackages.HasString(package->Info().Name()))
+			continue;
 		printf("    uninstall package %s\n", package->VersionedName().String());
 	}
 // TODO: Print file/download sizes. Unfortunately our package infos don't

@@ -19,10 +19,12 @@
 
 
 #define COND_FLAG_SHARED	0x01
+#define COND_FLAG_MONOTONIC	0x02
 
 
 static const pthread_condattr pthread_condattr_default = {
-	false
+	false,
+	CLOCK_REALTIME
 };
 
 
@@ -35,6 +37,9 @@ pthread_cond_init(pthread_cond_t* cond, const pthread_condattr_t* _attr)
 	cond->flags = 0;
 	if (attr->process_shared)
 		cond->flags |= COND_FLAG_SHARED;
+
+	if (attr->clock_id == CLOCK_MONOTONIC)
+		cond->flags |= COND_FLAG_MONOTONIC;
 
 	cond->mutex = NULL;
 	cond->waiter_count = 0;
@@ -74,10 +79,12 @@ cond_wait(pthread_cond_t* cond, pthread_mutex_t* mutex, bigtime_t timeout)
 	mutex->owner = -1;
 	mutex->owner_count = 0;
 
+	int32 flags = (cond->flags & COND_FLAG_MONOTONIC) != 0 ? B_ABSOLUTE_TIMEOUT
+		: B_ABSOLUTE_REAL_TIME_TIMEOUT;
+
 	status_t status = _kern_mutex_switch_lock((int32*)&mutex->lock,
 		(int32*)&cond->lock, "pthread condition",
-		timeout == B_INFINITE_TIMEOUT ? 0 : B_ABSOLUTE_REAL_TIME_TIMEOUT,
-		timeout);
+		timeout == B_INFINITE_TIMEOUT ? 0 : flags, timeout);
 
 	if (status == B_INTERRUPTED) {
 		// EINTR is not an allowed return value. We either have to restart

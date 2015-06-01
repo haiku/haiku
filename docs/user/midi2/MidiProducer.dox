@@ -1,7 +1,6 @@
 /*!
 	\file MidiProducer.h
 	\ingroup midi2
-	\ingroup libbe
 	\brief Defines producer classes for the MIDI Kit.
 */
 
@@ -9,8 +8,6 @@
 /*!
 	\class BMidiProducer MidiProducer.h
 	\ingroup midi2
-	\ingroup libmidi2
-	\ingroup libbe
 	\brief Streams MIDI events to connected consumers.
 
 	A producer is an object that generate a stream of MIDI events. Each
@@ -28,7 +25,7 @@
 	\brief Connects a consumer to this producer.
 
 	Establishes a connection between this producer and the specified consumer
-	endpoint. From now on, any events that this producer sprays will be sent 
+	endpoint. From now on, any events that this producer sprays will be sent
 	to that consumer. You may connect multiple consumers to a producer.
 
 	\return B_OK on success, or an error code when the connection could not be
@@ -91,8 +88,6 @@ delete list;
 /*!
 	\class BMidiLocalProducer MidiProducer.h
 	\ingroup midi2
-	\ingroup libmidi2
-	\ingroup libbe
 	\brief A producer endpoint that is created by your own application.
 
 	You create a BMidiLocalProducer if you want your application to send MIDI

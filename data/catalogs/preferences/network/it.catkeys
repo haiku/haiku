@@ -1,20 +1,33 @@
-1	italian	x-vnd.Haiku-Network	3810742593
-<no wireless networks found>	EthernetSettingsView		<nessuna rete wireless trovata>
-Adapter:	EthernetSettingsView		Adattatore:
-Apply	EthernetSettingsView		Applica
-Auto-configuring failed: 	EthernetSettingsView		Auto-configurazione fallita: 
-Choose automatically	EthernetSettingsView		Scegli automaticamente
-DHCP	EthernetSettingsView		DHCP
-DNS #1:	EthernetSettingsView		DNS primario:
-DNS #2:	EthernetSettingsView		DNS secondario:
-Disabled	EthernetSettingsView		Disabilitato
-Domain:	EthernetSettingsView		Dominio:
-Gateway:	EthernetSettingsView		Gateway:
-IP address:	EthernetSettingsView		Indirizzo IP:
-Mode:	EthernetSettingsView		Modalità:
-Netmask:	EthernetSettingsView		Netmask:
-Network:	EthernetSettingsView		Rete:
-OK	EthernetSettingsView		Ok
-Revert	EthernetSettingsView		Ripristina
-Static	EthernetSettingsView		Statico
-The net_server needs to run for the auto configuration!	EthernetSettingsView		E' necessario che il net_server sia avviato per l'auto-configurazione!
+1	italian	x-vnd.Haiku-Network	950262959
+Static	IntefaceAddressView		Statico
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Servizi
+WPA2	WPA2 protected network		WPA2
+The netmask defines your local network	IntefaceAddressView		La netmask definisce la tua rete locale
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+Network	NetworkWindow		Rete
+Show network status in Deskbar	NetworkWindow		Mostra lo stato della rete in Deskbar
+The method for obtaining an IP address	IntefaceAddressView		Modalità di assegnazione indirizzo IP
+Dial Up	NetworkWindow		Dial Up
+Apply	IntefaceAddressView		Applica
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installazione di NetworkStatus in Deskbar fallita: %s
+Disabled	IntefaceAddressView		Disabilitata
+Ok	NetworkWindow		Ok
+launch error	NetworkWindow		Errore di avvio
+Other	NetworkWindow		Altro
+Automatic	IntefaceAddressView		Automatico
+Gateway:	IntefaceAddressView		Gateway:
+Revert	NetworkWindow		Ripristina
+Enable	ServiceView		Abilita
+Your gateway to the internet	IntefaceAddressView		Il tuo gateway su internet
+New…	NetworkWindow		Nuovo...
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Modalità:
+WPA	WPA protected network		WPA
+open	Open network		apri
+IP Address:	IntefaceAddressView		Indirizzo IP:
+Netmask:	IntefaceAddressView		Netmask:
+Disable	ServiceView		Disabilita
+Your IP address	IntefaceAddressView		Il tuo indirizzo IP
+Manage…	NetworkWindow		Gestisci…
+WEP	WEP protected network		WEP

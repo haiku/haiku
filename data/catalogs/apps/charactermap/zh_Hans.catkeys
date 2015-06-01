@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-CharacterMap	56063163
+1	english	x-vnd.Haiku-CharacterMap	1534181938
 Enclosed alphanumerics	UnicodeBlocks		封装字母数字
 Basic Latin	UnicodeBlocks		基本拉丁语
 View	CharacterWindow		视图
@@ -123,6 +123,7 @@ Vai	UnicodeBlocks		瓦伊语
 Yi Radicals	UnicodeBlocks		彝文字根
 Cyrillic extended B	UnicodeBlocks		斯拉夫文扩展 B
 Quit	CharacterWindow		退出
+Ancient symbols	UnicodeBlocks		古代符号
 Braille patterns	UnicodeBlocks		盲文图案
 New Tai Lue	UnicodeBlocks		新傣仂语
 Runic	UnicodeBlocks		如尼文

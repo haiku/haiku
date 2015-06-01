@@ -1,8 +1,10 @@
-1	english	x-vnd.Haiku-PowerStatus	3224068645
+1	english	x-vnd.Haiku-PowerStatus	3969330583
 Design capacity low warning: 	PowerStatus		设计低容量警告：
 Show percent	PowerStatus		显示百分比
 Design capacity: 	PowerStatus		设计容量：
  mW	PowerStatus		毫瓦
+The battery level is getting low, please plug in the device.	PowerStatus		电池剩余电量不足，请连接充电电源。
+Battery low	PowerStatus		电池电量低
 Type: 	PowerStatus		输入：
 non-rechargeable	PowerStatus		不可再充电
 Empty battery slot	PowerStatus		清理电池接口槽
@@ -27,10 +29,12 @@ Install in Deskbar	PowerStatus		安装到桌面栏
 Capacity: 	PowerStatus		容量：
 Battery discharging	PowerStatus		电池供电
 Serial number: 	PowerStatus		编号：
+Battery critical	PowerStatus		电池电量严重不足
 Capacity granularity 1: 	PowerStatus		容量粒度1：
 OEM info: 	PowerStatus		OEM 信息：
 Design voltage: 	PowerStatus		设计电压：
 Battery charging	PowerStatus		电池充电
+The battery level is critical, please plug in the device immediately.	PowerStatus		电池电量严重不足，请及时连接充电电源。
 Design capacity warning: 	PowerStatus		设计低容量警告：
 Battery info	PowerStatus		电池信息
 Quit	PowerStatus		退出

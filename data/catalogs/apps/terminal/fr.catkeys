@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	235954604
+1	french	x-vnd.Haiku-Terminal	2696855708
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -33,7 +33,9 @@ Increase	Terminal TermWindow		Augmenter
 Settings	Terminal TermWindow		Réglages
 Window size	Terminal TermWindow		Taille de la fenêtre
 Selected text	Terminal AppearancePrefView		Texte sélectionné
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail courant du processus actif dans\n\t\t\tl’onglet courant. En option, le nombre maximum d’éléments\n\t\t\tdu chemin peut être spécifié. Par exemple « %2d » pour au plus\n\t\t\tdeux éléments.\n\t%T\t-\tLe nom de l’application Terminal pour la langue active.\n\t%e\t-\tLe codage de l’onglet courant. Non affiché pour UTF-8.\n\t%i\t-\tL’index de la fenêtre.\n\t%p\t-\tLe nom du processus actif dans l’onglet courant.\n\t%t\t-\tLe titre de l’onglet courant.
 Find	Terminal FindWindow		Rechercher
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Le motif servant à composer le titre de la fenêtre. Vous pouvez\nutiliser les variables suivantes :
 Appearance	Terminal PrefWindow		Apparence
 Tab title:	Terminal AppearancePrefView		Titre de l’onglet :
 OK	Terminal SetTitleWindow		OK
@@ -76,6 +78,7 @@ Midnight	Terminal colors scheme		Minuit
 Decrease	Terminal TermWindow		Réduire
 Default	Terminal colors scheme		Par défaut
 Create link here	Terminal TermView		Créer un raccourci ici
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Le motif servant à composer le titre des onglets. Vous\npouvez utiliser les variables suivantes :
 Close	Terminal TermWindow		Fermer
 Text	Terminal AppearancePrefView		Texte
 Clear all	Terminal TermWindow		Effacer tout
@@ -98,12 +101,13 @@ Find failed	Terminal TermWindow		Échec de la recherche
 Search forward	Terminal FindWindow		Rechercher en avant
 Edit tab title…	Terminal TermWindow		Éditer le titre de l’onglet…
 Open path	Terminal TermView		Ouvrir l’emplacement
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail du processus actif.\n\t\t\tVous pouvez éventuellement spécifier le nombre d’éléments maximum\n\t\t\tdans le chemin. Par exemple, '%2d' pour au plus deux éléments.\n\t%i\t-\tL’indice de l’onglet.\n\t%e\t-\tLe jeu de caractère utilisé par l’onglet courant. Masqué pour UTF-8.\n\t%p\t-\tLe nom du processus actif.\n\t%%\t-\tLe caractère '%'.
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tLe répertoire de travail du processus actif.\n\t\t\tVous pouvez éventuellement spécifier le nombre d’éléments maximum\n\t\t\tdans le chemin. Par exemple, « %2d » pour au plus deux éléments.\n\t%i\t-\tL’indice de l’onglet.\n\t%e\t-\tLe jeu de caractère utilisé par l’onglet courant. Masqué pour UTF-8.\n\t%p\t-\tLe nom du processus actif.\n\t%%\t-\tLe caractère « % ».
 Find previous	Terminal TermWindow		Rechercher le précédent
 Copy link location	Terminal TermView		Copier l’emplacement du lien
 Tab title:	Terminal TermWindow		Titre de l’onglet :
 Find next	Terminal TermWindow		Rechercher le suivant
 Close active tab	Terminal TermWindow		Fermer l’onglet actif
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tLe caractère « % ».\n\t%<\t-\tDémarre une section qui ne sera affiché que si un\n\t\t\tparamètre qui suit n'est pas vide.\n\t%>\t-\tDémarre une section qui ne sera affiché que si un paramètre\n\t\t\tentre la précédente section %< et celui-ci n’est pas vide.\n\t%-\t-\tTermine une section. %< ou %>.\n\nTout caractère non alpha-numérique entre « % » et la lettre de format insérera un espace\nque si la valeur du paramètre n’est pas vide. Il s’ajoutera à la section %<.
 Paste	Terminal TermWindow		Coller
 Shell 	Terminal TermWindow		Interpréteur de commande
 Cancel	Terminal TermView		Annuler

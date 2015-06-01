@@ -1,9 +1,12 @@
-1	english	x-vnd.Haiku-MediaConverter	217152063
+1	english	x-vnd.Haiku-MediaConverter	341686525
 Video using parameters form settings	MediaConverter		视频参数表使用设置
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{该文件未被识别为支持的媒体文件:} other{# 文件未被识别为支持的媒体文件:}}
 Video encoding:	MediaConverter		视频编码：
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error read audio frame %lld	MediaConverter		读取音频帧 %lld 出错
 No audio	Audio codecs list		无音频
 Error	MediaConverter		错误
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# 位} other{# 位}}
 Error loading a file	MediaConverter		载入文件错误
 Error read video frame %lld	MediaConverter		读取视频帧 %lld 出错
 File Error	MediaConverter-FileInfo		文件错误
@@ -16,6 +19,7 @@ MediaConverter	System name		媒体转换器
 No video	Video codecs list		无视频
 Duration:	MediaConverter-FileInfo		持续时间：
 OK	MediaConverter		确定
+%.1f kHz mono	MediaFileInfo		%.1f kHz 单声道
 Error converting '%filename'	MediaConverter		转换 '%filename' 错误
 Low	MediaConverter		低
 Conversion completed	MediaConverter		转换结束
@@ -24,8 +28,10 @@ OK	MediaConverter-FileInfo		确定
  seconds	MediaFileInfo		秒
 Source files	MediaConverter		源文件
 Error writing video frame %lld	MediaConverter		写入视频帧 %lld 出错
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# 帧} other{# 帧}}
 Error writing audio frame %lld	MediaConverter		写入音频帧 %lld 出错
 Cancelling	MediaConverter		取消
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# 字节} other{# 字节}}
 Error loading files	MediaConverter		载入文件错误
 Cancel	MediaConverter		取消
 None available	Video codecs		无可用
@@ -53,9 +59,11 @@ Drop media files onto this window	MediaConverter		拖放媒体文件到窗口
 Audio encoding:	MediaConverter		音频编码：
 Audio quality not supported	MediaConverter		音频质量不支持
 File	Menu		文件
+%.1f kHz stereo	MediaFileInfo		%.1f kHz 立体声
 Convert	MediaConverter		转换
 Writing audio track: %ld%% complete	MediaConverter		写入音频轨道：%ld%% 完成
 Video quality: %3d%%	MediaConverter		视频质量：%3d%%
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld 通道
 Output folder	MediaConverter		输出目录
 Audio quality: %3d%%	MediaConverter		音频质量：%3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		读取文件信息错误。\n\n错误：

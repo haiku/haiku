@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,7 +29,7 @@
 
 namespace BPackageKit {
 
-	
+
 class BCommitTransactionResult;
 
 
@@ -42,7 +42,7 @@ using BPackageKit::BPrivate::BActivationTransaction;
 using BPackageKit::BPrivate::BDaemonClient;
 
 
-class BPackageManager : protected BJobStateListener {
+class BPackageManager : protected BSupportKit::BJobStateListener {
 public:
 			class RemoteRepository;
 			class LocalRepository;
@@ -118,9 +118,9 @@ protected:
 
 protected:
 			// BJobStateListener
-	virtual	void				JobStarted(BJob* job);
-	virtual	void				JobProgress(BJob* job);
-	virtual	void				JobSucceeded(BJob* job);
+	virtual	void				JobStarted(BSupportKit::BJob* job);
+	virtual	void				JobProgress(BSupportKit::BJob* job);
+	virtual	void				JobSucceeded(BSupportKit::BJob* job);
 
 private:
 			void				_HandleProblems();
@@ -319,7 +319,8 @@ public:
 									const char* packageName);
 	virtual	void				ProgressPackageDownloadActive(
 									const char* packageName,
-									float completionPercentage);
+									float completionPercentage,
+									off_t bytes, off_t totalBytes);
 	virtual	void				ProgressPackageDownloadComplete(
 									const char* packageName);
 	virtual	void				ProgressPackageChecksumStarted(

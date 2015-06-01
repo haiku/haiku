@@ -1,14 +1,14 @@
-1	polish	x-vnd.Haiku-About	3415235510
+1	polish	x-vnd.Haiku-About	3251436090
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 przez autorów Gutenprint. Wszelkie prawa zastrzeżone.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
+Past website & marketing:\n	AboutView		Strona internetowa i marketing (dawniej):\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travisa Geiselbrechta (i jego jądra NewOS)\n
 Ralink (firmware)	AboutWindow		Ralink (firmware)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Wszelkie prawa zastrzeżone.
 %d MiB total	AboutView		%d MiB ogółem
 Michael Phipps (project founder)\n\n	AboutView		Michaela Phippsa (założyciela projektu)\n\n
-Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Copyright © 1998-2003 Daniel Veillard. Wszelkie prawa zastrzeżone.
 %d MiB used (%d%%)	AboutView		%d MiB użyte (%d%%)
-Website, marketing & documentation:\n	AboutView		Strona WWW, marketing i dokumentacja:\n
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Zawiera oprogramowanie z Projektu GNU wydane na licencjach GPL i LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, bash\nCopyright © The Free Software Foundation.
 AboutSystem	System name		OSystemie
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe i inni.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Wszelkie prawa zastrzeżone.
@@ -19,9 +19,7 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 19
 Source Code: 	AboutView		Kod źródłowy: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{# procesor:} few{# procesory:} many{# procesorów:} other{# procesora:}}
 Kernel:	AboutView		Jądro:
-Copyright © 2000 Jean-Pierre Lefebvre and Remi Lefebvre.	AboutView		Copyright © 2000 Jean-Pierre Lefebvre oraz Remi Lefebvre.
 BSD (4-clause)	AboutWindow		BSD (4-klauzulowa)
-Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman oraz Daniel Veillard. Wszelkie prawa zastrzeżone.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Prawa autorskie do kodu Haiku są własnością Haiku Inc. lub autorów, gdzie jest to wyraźnie zaznaczone w źródłach. Haiku® i logo HAIKU® są zarejestrowanymi znakami towarowymi Haiku Inc.\n\n
 Marvell (firmware)	AboutWindow		Marvell (firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nWszelkie prawa zastrzeżone.
@@ -29,7 +27,6 @@ GNU LGPL v2	AboutWindow		GNU LGPL v2
 The HaikuPorts team\n	AboutView		Zespołu HaikuPorts\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB ogółem, %inaccessible MiB nieosiągalne
 Intel (2xxx firmware)	AboutWindow		Intel (firmware 2xxx)
-Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2007 Fabrice Bellard, et al.
 Contributors:\n	AboutView		Współpracownicy:\n
 Unknown	AboutView		Nieznany
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 współtwórcy Expat.
@@ -63,12 +60,14 @@ Google and their Google Summer of Code and Google Code In programs\n	AboutView		
 The Haikuware team and their bounty program\n	AboutView		Zespołu Haikuware i ich programu nagród\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Wszelkie prawa zastrzeżone.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Wszelkie prawa zastrzeżone.
+Website & marketing:\n	AboutView		Strona internetowa i marketing:\n
 About this system	AboutWindow		O systemie
 Version:	AboutView		Wersja:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Wszelkie prawa zastrzeżone.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd oraz Clark Cooper.
 Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyright © 2004-2005 Intel Corporation. Wszelkie prawa zastrzeżone.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2014 Fabrice Bellard, et al.
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Wszelkie prawa zastrzeżone.
 The BeGeistert team\n	AboutView		Grupy BeGeistert\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Uniwersytetu w Auckland oraz Christofa Lutterotha\n\n
@@ -79,12 +78,10 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyri
 %ld MHz	AboutView		%ld MHz
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH i Thomas Merz. Wszelkie prawa zastrzeżone.\nPDFlib i PDFlib logo są zastrzeżonymi znakami towarowymi PDFlib GmbH.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Copyright © 1991-2000 Silicon Graphics, Inc. Wszelkie prawa zastrzeżone.
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Zawiera oprogramowanie z GNU Project, wydanego na licencjach GPL i LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
 …and the many people making donations!\n\n	AboutView		...oraz wielu ludzi, którzy wysyłają dotacje!\n\n
 MIT license. All rights reserved.	AboutView		Licencja MIT. Wszelkie prawa zastrzeżone.
 [Click a license name to read the respective license.]\n\n	AboutView		[Kliknij na nazwę licencji, aby wyświetlić jej treść.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Wszelkie prawa zastrzeżone.
-MIT (no promotion)	AboutWindow		MIT (bez klauzuli ogłoszeniowej)
 BSD (3-clause)	AboutWindow		BSD (3-klauzulowa)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Wszelkie prawa zastrzeżone.
 License: 	AboutView		Licencja: 

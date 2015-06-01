@@ -26,6 +26,11 @@
 
 #ifndef _MD4_H_
 #define _MD4_H_
+
+
+#ifdef _BSD_SOURCE
+
+
 /* MD4 context. */
 typedef struct MD4Context {
   u_int32_t state[4];	/* state (ABCD) */
@@ -44,5 +49,9 @@ char * MD4End(MD4_CTX *, char *);
 char * MD4File(const char *, char *);
 char * MD4Data(const unsigned char *, unsigned int, char *);
 __END_DECLS
+
+
+#endif
+
 
 #endif /* _MD4_H_ */

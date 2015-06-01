@@ -350,7 +350,7 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 #endif
 
 		// bump up to microseconds
-		delta *=  1000000;
+		delta *= 1000000;
 
 		TTracker* tracker = dynamic_cast<TTracker*>(be_app);
 		ThrowOnAssert(tracker != NULL);

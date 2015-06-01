@@ -1,8 +1,8 @@
-1	italian	x-vnd.Haiku-ScreenSaver	904083067
+1	italian	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Non è stato possibile caricare il salvaschermo
 30 seconds	ScreenSaver		30 secondi
 Start screensaver	ScreenSaver		Avvia salvaschermo
-Password…	ScreenSaver		Password...
+Password…	ScreenSaver		Password…
 Password:	ScreenSaver		Password:
 Password lock	ScreenSaver		Password blocco
 Screensavers	ScreenSaver		Salvaschermi
@@ -10,7 +10,9 @@ Display Power Management Signaling not available	ScreenSaver		Display Power Mana
 ScreenSaver	System name		ScreenSaver
 Test	ScreenSaver		Test
 General	ScreenSaver		Generale
+Fade now when mouse is here	ScreenSaver		Dissolvi quando il puntatore del mouse è in posizione
 Enable screensaver	ScreenSaver		Attiva salvaschermo
+Don't fade when mouse is here	ScreenSaver		Non dissolvere quando il puntatore del mouse è in posizione
 Cancel	ScreenSaver		Cancella
 Turn off screen	ScreenSaver		Spegni schermo
 No options available	ScreenSaver		Nessuna opzione disponibile
@@ -22,4 +24,5 @@ Blackness	ScreenSaver		Oscurità
 Use custom password	ScreenSaver		Usa una password personalizzata
 Done	ScreenSaver		Fatto
 Confirm password:	ScreenSaver		Conferma password:
+No preview available	PreviewView		Nessuna anteprima disponibile
 Use network password	ScreenSaver		Usa password di rete

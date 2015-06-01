@@ -48,7 +48,7 @@ AddPathsCommand::AddPathsCommand(PathContainer* container,
 		// Add references to paths
 		for (int32 i = 0; i < fCount; i++) {
 			if (fPaths[i] != NULL)
-				fPaths[i]->Acquire();
+				fPaths[i]->AcquireReference();
 		}
 	}
 }
@@ -59,7 +59,7 @@ AddPathsCommand::~AddPathsCommand()
 	if (!fPathsAdded && fPaths) {
 		for (int32 i = 0; i < fCount; i++) {
 			if (fPaths[i] != NULL)
-				fPaths[i]->Release();
+				fPaths[i]->ReleaseReference();
 		}
 	}
 	delete[] fPaths;

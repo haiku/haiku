@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-GIFTranslator	1515001985
+1	ukrainian	x-vnd.Haiku-GIFTranslator	2626723192
 Websafe	GIFView		Придатний для Web
 Write interlaced images	GIFView		Записати зображення, що переплітаються
 Optimal	GIFView		Оптимальний
@@ -15,5 +15,4 @@ Use RGB color	GIFView		Використовувати кольори RGB
 Use dithering	GIFView		Використовувати згладжування
 GIF Settings	GIFTranslator		Настройки GIF
 BeOS system	GIFView		Система BeOS
-v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		Автоматично (з альфа каналу)

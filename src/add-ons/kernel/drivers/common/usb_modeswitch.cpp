@@ -8,6 +8,7 @@
 
 /*
 	Devices and messages reference: usb-modeswitch-data-20100826
+	Huawei devices updated to usb-modeswitch-data-20150115
 */
 
 #include <ByteOrder.h>
@@ -24,11 +25,11 @@
 
 #define TRACE_USB_MODESWITCH 1
 #ifdef TRACE_USB_MODESWITCH
-#define TRACE(x...)			dprintf(DRIVER_NAME": "x)
+#define TRACE(x...)			dprintf(DRIVER_NAME ": " x)
 #else
 #define TRACE(x...)			/* nothing */
 #endif
-#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME": "x)
+#define TRACE_ALWAYS(x...)	dprintf(DRIVER_NAME ": " x)
 #define ENTER()	TRACE("%s", __FUNCTION__)
 
 
@@ -64,7 +65,7 @@ unsigned char kDevicesMsg[][31] = {
 	{ 	/* MSG_HUAWEI_3 */
 		0x55, 0x53, 0x42, 0x43, 0x12, 0x34, 0x56, 0x78,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x11,
-		0x06, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01,
+		0x06, 0x20, 0x00, 0x00, 0x01, 0x01, 0x00, 0x01,
 		0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 	},
 	{	/* MSG_NOKIA_1 */
@@ -122,7 +123,7 @@ unsigned char kDevicesMsg[][31] = {
 #define NOKIA_VENDOR	0x0421
 #define NOVATEL_VENDOR	0x1410
 #define ZYDAS_VENDOR	0x0ace
-#define ZTE_VENDOR	0x19d2
+#define ZTE_VENDOR		0x19d2
 #define OLIVETTI_VENDOR	0x0b3c
 #define OPTION_VENDOR	0x0af0
 #define ATHEROS_VENDOR	0x0cf3
@@ -133,33 +134,52 @@ static const struct {
 	msgType type, type2, type3;
 } kDevices[] = {
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x101e}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1446}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1449}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14ad}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14b5}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14b7}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14ba}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c1}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c3}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c4}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c5}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14d1}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14fe}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1505}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x151a}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1520}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1521}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1523}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1526}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1553}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1557}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x155b}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1c0b}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1c24}, MSG_HUAWEI_1},
-	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f11}, MSG_HUAWEI_1},
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1030}, MSG_HUAWEI_2},
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1031}, MSG_HUAWEI_2},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1446}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1449}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14ad}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14b5}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14b7}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14ba}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c1}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c3}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c4}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14c5}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14d1}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x14fe}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1505}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x151a}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1520}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1521}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1523}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1526}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1553}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1557}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x155b}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x156a}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1576}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x157d}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1583}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x15ca}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x15e7}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1c0b}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1c1b}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1c24}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1da1}, MSG_HUAWEI_3},
 	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f01}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f02}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f03}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f11}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f15}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f16}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f17}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f18}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f19}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f1b}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f1c}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f1d}, MSG_HUAWEI_3},
+	{{ 0, 0, 0, HUAWEI_VENDOR, 0x1f1e}, MSG_HUAWEI_3},
 	{{ 0, 0, 0, NOKIA_VENDOR, 0x060c}, MSG_NOKIA_1},
 	{{ 0, 0, 0, NOKIA_VENDOR, 0x0610}, MSG_NOKIA_1},
 	{{ 0, 0, 0, NOKIA_VENDOR, 0x061d}, MSG_NOKIA_1},
@@ -388,7 +408,7 @@ my_get_msg_type(const usb_device_descriptor *desc, int index)
 			case 2:
 				return kDevices[i].type3;
 		}
-			
+
 	}
 
 	return MSG_NONE;
@@ -412,19 +432,19 @@ my_modeswitch(my_device* device)
 			TRACE_ALWAYS("send message %d failed\n", i + 1);
 			return err;
 		}
-	
+
 		TRACE("device switched: %p\n", device);
 
 		char data[36];
 		err = my_transfer_data(device, true, data, sizeof(data));
 		if (err != B_OK) {
-			TRACE_ALWAYS("receive response %d failed 0x%lx\n",
+			TRACE_ALWAYS("receive response %d failed 0x%" B_PRIx32 "\n",
 				i + 1, device->status);
 			return err;
 		}
-		TRACE("device switched (response length %ld)\n", device->actual_length);	
+		TRACE("device switched (response length %ld)\n", device->actual_length);
 	}
-	
+
 	TRACE("device switched: %p\n", device);
 
 	return B_OK;
@@ -439,7 +459,7 @@ my_modeswitch(my_device* device)
 static status_t
 my_device_added(usb_device newDevice, void **cookie)
 {
-	TRACE("device_added(0x%08lx)\n", newDevice);
+	TRACE("device_added(0x%08" B_PRIx32 ")\n", newDevice);
 	my_device *device = (my_device *)malloc(sizeof(my_device));
 	device->device = newDevice;
 	device->removed = false;
@@ -532,7 +552,7 @@ my_device_added(usb_device newDevice, void **cookie)
 static status_t
 my_device_removed(void *cookie)
 {
-	TRACE("device_removed(0x%08lx)\n", (uint32)cookie);
+	TRACE("device_removed(%p)\n", cookie);
 	my_device *device = (my_device *)cookie;
 
 	mutex_lock(&gDeviceListLock);
@@ -591,7 +611,7 @@ init_driver()
 	status_t result = get_module(B_USB_MODULE_NAME,
 		(module_info **)&gUSBModule);
 	if (result < B_OK) {
-		TRACE_ALWAYS("getting module failed 0x%08lx\n", result);
+		TRACE_ALWAYS("getting module failed 0x%08" B_PRIx32 "\n", result);
 		mutex_destroy(&gDeviceListLock);
 		return result;
 	}

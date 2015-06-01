@@ -50,8 +50,8 @@ platform_switch_to_text_mode(void)
 extern "C" status_t
 platform_init_video(void)
 {
-	extern ArchFramebuffer* arch_get_framebuffer_arm_bcm2708();
-	gFramebuffer = arch_get_framebuffer_arm_bcm2708();
+	extern ArchFramebuffer* arch_get_framebuffer_arm_bcm2835();
+	gFramebuffer = arch_get_framebuffer_arm_bcm2825();
 
 	if (gFramebuffer == NULL)
 		return B_ERROR;

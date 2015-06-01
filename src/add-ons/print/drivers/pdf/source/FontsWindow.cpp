@@ -30,6 +30,7 @@ THE SOFTWARE.
 */
 
 #include <InterfaceKit.h>
+#include <LayoutBuilder.h>
 #include <SupportKit.h>
 #include "BlockingWindow.h"
 #include "FontsWindow.h"
@@ -108,93 +109,70 @@ DragListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
 FontsWindow::FontsWindow(Fonts *fonts)
 	:	HWindow(BRect(0,0,400,220), "Fonts", B_TITLED_WINDOW_LOOK,
  			B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
- 			B_NOT_ZOOMABLE | B_CLOSE_ON_ESCAPE)
+			B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
 {
 	// ---- Ok, build a default page setup user interface
-	BRect		r, r1;
-	BView		*panel;
-	BButton		*button;
-	float		x, y, w, h;
-	BString 	setting_value;
-	BTabView    *tabView;
-	BTab        *tab;
 
 	AddShortcut('W',B_COMMAND_KEY,new BMessage(B_QUIT_REQUESTED));
 	
 	fFonts = fonts;
 	
-	r = Bounds();
-	tabView = new BTabView(r, "tab_view");
+	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
 
 	// --- Embedding tab ---
-	tab = new BTab();
 	
 	// add a *dialog* background
+	BView* embeddingPanel = new BView("Embedding", B_WILL_DRAW
+		| B_FRAME_EVENTS | B_NAVIGABLE_JUMP);
+	embeddingPanel->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	r.bottom -= tabView->TabHeight();
-	panel = new BView(r, "embedding_panel", B_FOLLOW_ALL, 
-					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP);
-	panel->	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	r1 = r; r1.OffsetTo(0, 0);
 	// add font list
 #if USE_CLV
-	fList = new BColumnListView(BRect(r.left+5, r.top+5, r.right-5-B_V_SCROLL_BAR_WIDTH, r.bottom-5-B_H_SCROLL_BAR_HEIGHT-30),
+	fList = new BColumnListView(BRect(),
 		"fonts_list", B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE_JUMP);
-	panel->AddChild(fList);
+	embeddingPanel->AddChild(fList);
 #else
-	fList = new BListView(BRect(r1.left+5, r1.top+5, r1.right-5-B_V_SCROLL_BAR_WIDTH, r1.bottom-5-B_H_SCROLL_BAR_HEIGHT-30),
-		"fonts_list", B_MULTIPLE_SELECTION_LIST);
-	panel->AddChild(new BScrollView("scroll_list", fList, 
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true));
+	fList = new BListView("fonts_list", B_MULTIPLE_SELECTION_LIST);
+	BScrollView* embeddingScrollView = new BScrollView("scroll_list",
+		fList, 0, false, true);
 	fList->SetSelectionMessage(new BMessage(SELECTION_MSG));
 #endif
 	FillFontList();
 
 	// add a "Embed" button, and make it default
-	button 	= new BButton(r1, NULL, "Embed", new BMessage(EMBED_MSG), 
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->GetPreferredSize(&w, &h);
-	x = r1.right - w - 8;
-	y = r1.bottom - h - 8;
-	button->MoveTo(x, y);
-	button->SetEnabled(false);
-	panel->AddChild(button);
-	button->MakeDefault(true);
-	fEmbedButton = button;
+	fEmbedButton = new BButton("embed", "Embed", new BMessage(EMBED_MSG));
+	fEmbedButton->SetEnabled(false);
+	fEmbedButton->MakeDefault(true);
+
 
 	// add a "Substitute" button	
-	button 	= new BButton(r, NULL, "Substitute", new BMessage(SUBST_MSG), 
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	button->MoveTo(x - w - 8, y);
-	button->SetEnabled(false);
-	panel->AddChild(button);
-	fSubstButton = button;
+	fSubstButton = new BButton("substitute", "Substitute",
+		new BMessage(SUBST_MSG));
+	fSubstButton->SetEnabled(false);
+	embeddingScrollView->SetExplicitMinSize(BSize(200, 200));
 
-	// add a separator line...
-	BBox * line = new BBox(BRect(r1.left, y - 9, r1.right, y - 8), NULL,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM );
-	panel->AddChild(line);
+	BLayoutBuilder::Group<>(embeddingPanel, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(embeddingScrollView)
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fEmbedButton)
+			.Add(fSubstButton);
 
-	tabView->AddTab(panel, tab);
-	tab->SetLabel("Embedding");
+	tabView->AddTab(embeddingPanel);
 
 	// --- CJK tab ---
-	tab = new BTab();
 
 	// add a *dialog* background
-	panel = new BView(r, "cjk_panel", B_FOLLOW_ALL, 
-					B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP);
-	panel->	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	BView* cjkPanel = new BView("CJK", B_WILL_DRAW | B_FRAME_EVENTS
+		| B_NAVIGABLE_JUMP);
+	cjkPanel->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BListView* list = 
-		new DragListView(BRect(r1.left+5, r1.top+5, r1.right-5-B_V_SCROLL_BAR_WIDTH, r1.bottom-5-B_H_SCROLL_BAR_HEIGHT-30),
+		new DragListView(BRect(),
 		"cjk", B_MULTIPLE_SELECTION_LIST);
-	panel->AddChild(new BScrollView("cjk_scroll_list", list, 
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, 0, false, true));
+	BScrollView* cjkScrollView = new BScrollView("cjk_scroll_list",
+		list, 0, false, true);
 
 	font_encoding enc; bool active;
 	for (int i = 0; fFonts->GetCJKOrder(i, enc, active); i++) {
@@ -204,63 +182,40 @@ FontsWindow::FontsWindow(Fonts *fonts)
 	fCJKList = list;
 
 	// add a "Embed" button
-	button 	= new BButton(r, NULL, "Enable", new BMessage(ENABLE_MSG), 
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->ResizeToPreferred();
-	button->GetPreferredSize(&w, &h);
-	x = r1.right - w - 8;
-	y = r1.bottom - h - 8;
-	button->MoveTo(x, y);
-	button->SetEnabled(false);
-	panel->AddChild(button);
-	fEnableButton = button;
+	fEnableButton = new BButton("enable", "Enable", new BMessage(ENABLE_MSG));
+	fEnableButton->SetEnabled(false);
 
 	// add a "Disable" button	
-	button 	= new BButton(r, NULL, "Disable", new BMessage(DISABLE_MSG), 
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	x -= w + 8;
-	button->MoveTo(x, y);
-	button->SetEnabled(false);
-	panel->AddChild(button);
-	fDisableButton = button;
+	fDisableButton = new BButton("disable", "Disable",
+		new BMessage(DISABLE_MSG));
+	fDisableButton->SetEnabled(false);
 
 	// add a "Down" button	
-	button 	= new BButton(r, NULL, "Down", new BMessage(DOWN_MSG), 
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	x -= w + 8;
-	button->MoveTo(x, y);
-	button->SetEnabled(false);
-	panel->AddChild(button);
-	fDownButton = button;
+	fDownButton = new BButton("down", "Down", new BMessage(DOWN_MSG));
+	fDownButton->SetEnabled(false);
 
 	// add a "Up" button	
-	button 	= new BButton(r, NULL, "Up", new BMessage(UP_MSG), 
-		B_FOLLOW_RIGHT | B_FOLLOW_BOTTOM);
-	button->GetPreferredSize(&w, &h);
-	button->ResizeToPreferred();
-	x -= w + 8;
-	button->MoveTo(x, y);
-	button->SetEnabled(false);
-	panel->AddChild(button);
-	fUpButton = button;
+	fUpButton = new BButton("up", "Up", new BMessage(UP_MSG));
+	fUpButton->SetEnabled(false);
 
-	// add a separator line...
-	line = new BBox(BRect(r1.left, y - 9, r1.right, y - 8), NULL,
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM );
-	panel->AddChild(line);
+	BLayoutBuilder::Group<>(cjkPanel, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(cjkScrollView)
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fEnableButton)
+			.Add(fDisableButton)
+			.Add(fDownButton)
+			.Add(fUpButton);
 
-
-	tabView->AddTab(panel, tab);
-	tab->SetLabel("CJK");
+	tabView->AddTab(cjkPanel);
 
 	// add the tabView to the window	
-	AddChild(tabView);
-	
-	MoveTo(320, 320);
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(tabView);
+
+	MoveTo(320,320);
 }
 
 

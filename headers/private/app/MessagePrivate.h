@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2010, Haiku Inc. All rights reserved.
+ * Copyright 2005-2015, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  */
 #ifndef _MESSAGE_PRIVATE_H_
 #define _MESSAGE_PRIVATE_H_
+
 
 #include <Message.h>
 #include <Messenger.h>
@@ -30,7 +31,8 @@ enum {
 	MESSAGE_FLAG_WAS_DELIVERED = 0x0010,
 	MESSAGE_FLAG_HAS_SPECIFIERS = 0x0020,
 	MESSAGE_FLAG_WAS_DROPPED = 0x0040,
-	MESSAGE_FLAG_PASS_BY_AREA = 0x0080
+	MESSAGE_FLAG_PASS_BY_AREA = 0x0080,
+	MESSAGE_FLAG_REPLY_AS_KMESSAGE = 0x0100
 };
 
 

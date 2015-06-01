@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-NewMailNotification	2111731137
+1	russian	x-vnd.Haiku-NewMailNotification	73789504
+You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		У вас {0, plural, one{одно сообщение} few{# новых сообщения} other{# новых сообщений}} для %account.
 none	NotifierConfigView		нет
 Method:	NotifierConfigView		Метод:
 Beep	NotifierConfigView		Звуковой сигнал

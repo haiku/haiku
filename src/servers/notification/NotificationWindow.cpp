@@ -242,8 +242,8 @@ NotificationWindow::MessageReceived(BMessage* message)
 			if (fAppViews.erase(view->Group()) < 1)
 				break;
 
-			if (GetLayout()->RemoveView(view))
-				delete view;
+			view->RemoveSelf();
+			delete view;
 
 			_ShowHide();
 			break;

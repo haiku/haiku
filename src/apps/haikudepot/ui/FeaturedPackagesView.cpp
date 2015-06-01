@@ -46,7 +46,7 @@ public:
 	{
 		SetViewColor(255, 255, 255);
 		SetEventMask(B_POINTER_EVENTS);
-		
+
 		fIconView = new BitmapView("package icon view");
 		fInstalledIconView = new BitmapView("installed icon view");
 		fTitleView = new BStringView("package title view", "");
@@ -131,17 +131,17 @@ public:
 				break;
 		}
 	}
-	
+
 	virtual void MouseDown(BPoint where)
 	{
 		BRect bounds = Bounds();
 		BRect parentBounds = Parent()->Bounds();
 		ConvertFromParent(&parentBounds);
 		bounds = bounds & parentBounds;
-		
+
 		if (bounds.Contains(where) && Window()->IsActive()) {
 			BMessage message(MSG_PACKAGE_SELECTED);
-			message.AddString("title", PackageTitle());
+			message.AddString("name", PackageName());
 			Window()->PostMessage(&message);
 		}
 	}
@@ -151,16 +151,15 @@ public:
 		fPackageListener->SetPackage(package);
 
 		if (package->Icon().Get() != NULL) {
-			fIconView->SetBitmap(
-				package->Icon()->Bitmap(SharedBitmap::SIZE_64));
+			fIconView->SetBitmap(package->Icon(), SharedBitmap::SIZE_64);
 		} else
-			fIconView->SetBitmap(NULL);
+			fIconView->UnsetBitmap();
 
 		if (package->State() == ACTIVATED) {
-			fInstalledIconView->SetBitmap(
-				sInstalledIcon->Bitmap(SharedBitmap::SIZE_16));
+			fInstalledIconView->SetBitmap(sInstalledIcon,
+				SharedBitmap::SIZE_16);
 		} else
-			fInstalledIconView->SetBitmap(NULL);
+			fInstalledIconView->UnsetBitmap();
 
 		fTitleView->SetText(package->Title());
 
@@ -199,8 +198,8 @@ public:
 	{
 		fPackageListener->SetPackage(PackageInfoRef(NULL));
 
-		fIconView->SetBitmap(NULL);
-		fInstalledIconView->SetBitmap(NULL);
+		fIconView->UnsetBitmap();
+		fInstalledIconView->UnsetBitmap();
 		fTitleView->SetText("");
 		fPublisherView->SetText("");
 		fSummaryView->SetText("");
@@ -214,18 +213,26 @@ public:
 		return fTitleView->Text();
 	}
 
+	const char* PackageName() const
+	{
+		if (fPackageListener->Package().Get() != NULL)
+			return fPackageListener->Package()->Name();
+		else
+			return "";
+	}
+
 	void SetSelected(bool selected)
 	{
 		if (fSelected == selected)
 			return;
 		fSelected = selected;
-		
+
 		rgb_color bgColor;
 		if (fSelected)
 			bgColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 		else
 			bgColor = (rgb_color){ 255, 255, 255, 255 };
-		
+
 		List<BView*, true> views;
 
 		views.Add(this);
@@ -237,10 +244,10 @@ public:
 		views.Add(fRatingView);
 		views.Add(fAvgRating);
 		views.Add(fVoteInfo);
-		
+
 		for (int32 i = 0; i < views.CountItems(); i++) {
 			BView* view = views.ItemAtFast(i);
-		
+
 			view->SetViewColor(bgColor);
 			view->SetLowColor(bgColor);
 			view->Invalidate();
@@ -264,6 +271,7 @@ private:
 
 	bool							fSelected;
 
+	BString							fPackageName;
 };
 
 
@@ -310,12 +318,13 @@ FeaturedPackagesView::AddPackage(const PackageInfoRef& package)
 		if (view == NULL)
 			break;
 
-		BString title = view->PackageTitle();
-		if (title == package->Title()) {
+		BString name = view->PackageName();
+		if (name == package->Name()) {
 			// Don't add packages more than once
 			return;
 		}
 
+		BString title = view->PackageTitle();
 		if (title.Compare(package->Title()) < 0)
 			index++;
 	}
@@ -336,8 +345,8 @@ FeaturedPackagesView::RemovePackage(const PackageInfoRef& package)
 		if (view == NULL)
 			break;
 
-		BString title = view->PackageTitle();
-		if (title == package->Title()) {
+		BString name = view->PackageName();
+		if (name == package->Name()) {
 			view->RemoveSelf();
 			delete view;
 			break;
@@ -363,17 +372,17 @@ FeaturedPackagesView::Clear()
 void
 FeaturedPackagesView::SelectPackage(const PackageInfoRef& package)
 {
-	BString selectedTitle;
+	BString selectedName;
 	if (package.Get() != NULL)
-		selectedTitle = package->Title();
-	
+		selectedName = package->Name();
+
 	for (int32 i = 0; BLayoutItem* item = fPackageListLayout->ItemAt(i); i++) {
 		PackageView* view = dynamic_cast<PackageView*>(item->View());
 		if (view == NULL)
 			break;
 
-		BString title = view->PackageTitle();
-		view->SetSelected(title == selectedTitle);
+		BString name = view->PackageName();
+		view->SetSelected(name == selectedName);
 	}
 }
 

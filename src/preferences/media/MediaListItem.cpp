@@ -76,44 +76,43 @@ struct MediaListItem::Renderer {
 	{
 		const rgb_color lowColor = onto->LowColor();
 		const rgb_color highColor = onto->HighColor();
-		const rgb_color kBlack = {0, 0, 0, 255};
 
 		if (fSelected || complete) {
 			if (fSelected)
-				onto->SetLowColor(tint_color(lowColor, B_DARKEN_2_TINT));
+				onto->SetLowColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 			onto->FillRect(frame, B_SOLID_LOW);
 		}
 
-		frame.left += 4;
-		frame.top += kITEM_MARGIN;
-		BRect iconFrame(MediaIcons::IconRectAt(frame.LeftTop() + BPoint(1, 0)));
+		BPoint point(frame.left + 4.0f,
+			frame.top + (frame.Height() - MediaIcons::sBounds.Height()) / 2.0f);
+
+		BRect iconFrame(MediaIcons::IconRectAt(point + BPoint(1, 0)));
 
 		onto->SetDrawingMode(B_OP_OVER);
 		if (fPrimaryIcon && !fDoubleInsets) {
 			onto->DrawBitmap(fPrimaryIcon, iconFrame);
-			frame.left = iconFrame.right + 1;
+			point.x = iconFrame.right + 1;
 		} else if (fSecondaryIcon) {
 			onto->DrawBitmap(fSecondaryIcon, iconFrame);
 		}
+
 		iconFrame = MediaIcons::IconRectAt(iconFrame.RightTop() + BPoint(1, 0));
 
 		if (fDoubleInsets && fPrimaryIcon) {
 			onto->DrawBitmap(fPrimaryIcon, iconFrame);
-			frame.left = iconFrame.right + 1;
+			point.x = iconFrame.right + 1;
 		}
 
 		onto->SetDrawingMode(B_OP_COPY);
-		onto->SetHighColor(kBlack);
 
 		BFont font = be_plain_font;
 		font_height	fontInfo;
 		font.GetHeight(&fontInfo);
-		float lineHeight = fontInfo.ascent + fontInfo.descent
-			+ fontInfo.leading;
+
 		onto->SetFont(&font);
-		onto->MovePenTo(frame.left + 8, frame.top
-			+ ((frame.Height() - (lineHeight)) / 2)
-			+ (fontInfo.ascent + fontInfo.descent) - 1);
+		onto->MovePenTo(point.x + 8, frame.top
+			+ fontInfo.ascent + (frame.Height()
+			- ceilf(fontInfo.ascent + fontInfo.descent)) / 2.0f);
 		onto->DrawString(fTitle);
 
 		onto->SetHighColor(highColor);

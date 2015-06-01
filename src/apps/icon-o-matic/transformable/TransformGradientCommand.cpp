@@ -27,7 +27,7 @@ TransformGradientCommand::TransformGradientCommand(TransformBox* box,
 	if (fGradient == NULL)
 		return;
 
-//	fGradient->Acquire();
+	fGradient->AcquireReference();
 
 	if (fTransformBox != NULL)
 		fTransformBox->AddListener(this);
@@ -36,8 +36,8 @@ TransformGradientCommand::TransformGradientCommand(TransformBox* box,
 
 TransformGradientCommand::~TransformGradientCommand()
 {
-//	if (fGradient != NULL)
-//		fGradient->Release();
+	if (fGradient != NULL)
+		fGradient->ReleaseReference();
 
 	if (fTransformBox != NULL)
 		fTransformBox->RemoveListener(this);

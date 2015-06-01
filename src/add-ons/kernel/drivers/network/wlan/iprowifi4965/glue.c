@@ -24,8 +24,9 @@ NO_HAIKU_FBSD_MII_DRIVER();
 NO_HAIKU_REENABLE_INTERRUPTS();
 HAIKU_DRIVER_REQUIREMENTS(FBSD_TASKQUEUES | FBSD_WLAN);
 HAIKU_FIRMWARE_VERSION(44417);
-HAIKU_FIRMWARE_NAME_MAP(8) = {
+HAIKU_FIRMWARE_NAME_MAP(9) = {
 	{"iwn1000fw", "iwlwifi-1000-5.ucode"},
+	{"iwn2030fw", "iwlwifi-2030-6.ucode"},
 	{"iwn4965fw", "iwlwifi-4965-2.ucode"},
 	{"iwn5000fw", "iwlwifi-5000-5.ucode"},
 	{"iwn5150fw", "iwlwifi-5150-2.ucode"},

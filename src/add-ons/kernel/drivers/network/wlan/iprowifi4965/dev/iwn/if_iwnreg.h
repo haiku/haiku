@@ -206,6 +206,7 @@
 #define IWN_HW_REV_TYPE_6000	7
 #define IWN_HW_REV_TYPE_6050	8
 #define IWN_HW_REV_TYPE_6005	11
+#define IWN_HW_REV_TYPE_2030	12
 
 /* Possible flags for register IWN_GIO_CHICKEN. */
 #define IWN_GIO_CHICKEN_L1A_NO_L0S_RX	(1 << 23)
@@ -220,6 +221,7 @@
 #define IWN_GP_DRIVER_RADIO_2X2_IPA	(2 << 0)
 #define IWN_GP_DRIVER_CALIB_VER6	(1 << 2)
 #define IWN_GP_DRIVER_6050_1X2		(1 << 3)
+#define IWN_GP_DRIVER_RADIO_IQ_INVERT	(1 << 7)
 
 /* Possible flags for register IWN_UCODE_GP1_CLR. */
 #define IWN_UCODE_GP1_RFKILL		(1 << 1)
@@ -878,6 +880,25 @@ struct iwn6000_btcoex_config {
 	uint16_t	rx_prio_boost;
 } __packed;
 
+struct iwn2000_btcoex_config {
+	uint8_t		flags;		/* same as in iwn6000_btcoex_config */
+	uint8_t		lead_time;
+	uint8_t		max_kill;
+	uint8_t		bt3_t7_timer;
+	uint32_t	kill_ack;
+	uint32_t	kill_cts;
+	uint8_t		sample_time;
+	uint8_t		bt3_t2_timer;
+	uint16_t	bt4_reaction;
+	uint32_t	lookup_table[12];
+	uint16_t	bt4_decision;
+	uint16_t	valid;
+    	uint32_t	prio_boost;
+	uint8_t		reserved;
+	uint8_t		tx_prio_boost;
+	uint16_t	rx_prio_boost;
+} __packed;
+
 struct iwn_btcoex_priotable {
 	uint8_t		calib_init1;
 	uint8_t		calib_init2;
@@ -965,10 +986,11 @@ struct iwn_phy_calib {
 #define IWN5000_PHY_CALIB_CRYSTAL		15
 #define IWN5000_PHY_CALIB_BASE_BAND		16
 #define IWN5000_PHY_CALIB_TX_IQ_PERIODIC	17
-#define IWN5000_PHY_CALIB_TEMP_OFFSET		18
-
 #define IWN5000_PHY_CALIB_RESET_NOISE_GAIN	18
 #define IWN5000_PHY_CALIB_NOISE_GAIN		19
+
+#define IWN6000_PHY_CALIB_TEMP_OFFSET		18
+#define IWN2000_PHY_CALIB_TEMP_OFFSET		18
 
 	uint8_t	group;
 	uint8_t	ngroups;
@@ -985,7 +1007,7 @@ struct iwn5000_phy_calib_crystal {
 	uint8_t	reserved[2];
 } __packed;
 
-struct iwn5000_phy_calib_temp_offset {
+struct iwn6000_phy_calib_temp_offset {
 	uint8_t		code;
 	uint8_t		group;
 	uint8_t		ngroups;
@@ -994,6 +1016,17 @@ struct iwn5000_phy_calib_temp_offset {
 #define IWN_DEFAULT_TEMP_OFFSET	2700
 
 	uint16_t	reserved;
+} __packed;
+
+struct iwn2000_phy_calib_temp_offset {
+	uint8_t		code;
+	uint8_t		group;
+	uint8_t		ngroups;
+	uint8_t		isvalid;
+	int16_t		offset_high;
+	int16_t		offset_low;
+	int16_t		burnt_voltage_ref;
+	int16_t		reserved;
 } __packed;
 
 struct iwn_phy_calib_gain {
@@ -1414,6 +1447,7 @@ struct iwn_fw_tlv {
 #define IWN5000_EEPROM_CRYSTAL	0x128
 #define IWN5000_EEPROM_TEMP	0x12a
 #define IWN5000_EEPROM_VOLT	0x12b
+#define IWN2000_EEPROM_RAWTEMP	0x12b
 
 /* Possible flags for IWN_EEPROM_SKU_CAP. */
 #define IWN_EEPROM_SKU_CAP_11N	(1 << 6)
@@ -1711,6 +1745,18 @@ static const struct iwn_sensitivity_limits iwn1000_sensitivity_limits = {
 };
 
 static const struct iwn_sensitivity_limits iwn6000_sensitivity_limits = {
+	105, 110,
+	192, 232,
+	 80, 145,
+	128, 232,
+	125, 175,
+	160, 310,
+	 97,
+	 97,
+	100
+};
+
+static const struct iwn_sensitivity_limits iwn2000_sensitivity_limits = {
 	105, 110,
 	192, 232,
 	 80, 145,

@@ -194,7 +194,6 @@ BDeskWindow::BDeskWindow(LockingList<BWindow>* windowList)
 			| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES,
 			false, true),
 	fDeskShelf(NULL),
-	fTrashContextMenu(NULL),
 	fNodeRef(NULL),
 	fShortcutsSettings(NULL)
 {
@@ -394,9 +393,6 @@ BDeskWindow::Quit()
 
 	fAddonsList->MakeEmpty(true);
 	delete fAddonsList;
-
-	delete fTrashContextMenu;
-	fTrashContextMenu = NULL;
 
 	delete fDeskShelf;
 	_inherited::Quit();

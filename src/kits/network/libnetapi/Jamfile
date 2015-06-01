@@ -1,11 +1,15 @@
 SubDir HAIKU_TOP src kits network libnetapi ;
 
-UsePrivateHeaders app net shared support ;
+UsePrivateHeaders app net shared storage support ;
 UsePrivateHeaders locale shared ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 	: true ;
 UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_wlan ] : true ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers os add-ons network_settings ]
+	: true ;
+
+SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
@@ -23,8 +27,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Includes [ FGristFiles $(sslSources) SecureSocket.cpp
 					HttpAuthentication.cpp Certificate.cpp ]
 				: [ BuildFeatureAttribute openssl : headers ] ;
-				# Dependency needed to trigger downloading/unzipping the package before
-				# compiling the files.
+				# Dependency needed to trigger downloading/unzipping the package
+				# before compiling the files.
 			SetupFeatureObjectsDir ssl ;
 		} else {
 			# As we don't have md5 from ssl, use our own
@@ -55,7 +59,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			NetworkDevice.cpp
 			NetworkInterface.cpp
 			NetworkRoster.cpp
-			RouteSupport.cpp
+			NetworkRoute.cpp
+			NetworkSettings.cpp
 
 			AbstractSocket.cpp
 			DatagramSocket.cpp

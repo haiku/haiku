@@ -1587,6 +1587,10 @@ ShowImageView::SetZoom(float zoom, BPoint where)
 		offset.y = (int)(where.y * fZoom / oldZoom + 0.5) - offset.y;
 		ScrollTo(offset);
 	}
+
+	BMessage message(MSG_UPDATE_STATUS_ZOOM);
+	message.AddFloat("zoom", fZoom);
+	_SendMessageToWindow(&message);
 }
 
 

@@ -817,7 +817,7 @@ MainWin::MessageReceived(BMessage* msg)
 			BMessage appMessage(M_SHOW_OPEN_PANEL);
 			appMessage.AddMessenger("target", target);
 			appMessage.AddMessage("message", &result);
-			appMessage.AddString("title", B_TRANSLATE("Open Clips"));
+			appMessage.AddString("title", B_TRANSLATE("Open clips"));
 			appMessage.AddString("label", B_TRANSLATE("Open"));
 			be_app->PostMessage(&appMessage);
 			break;

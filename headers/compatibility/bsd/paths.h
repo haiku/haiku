@@ -37,6 +37,10 @@
 #ifndef _PATHS_H_
 #define	_PATHS_H_
 
+
+#if defined(_BSD_SOURCE) || defined(_GNU_SOURCE)
+
+
 #include <sys/cdefs.h>
 
 /* Default search path. */
@@ -61,8 +65,8 @@
 #define	_PATH_DRUM	"/dev/drum"
 #define	_PATH_ETC	"/etc"
 #define	_PATH_FTPUSERS	"/etc/ftpusers"
-#define	_PATH_HALT	"/sbin/halt"
-#define	_PATH_IFCONFIG	"/sbin/ifconfig"
+#define	_PATH_HALT	"/bin/halt"
+#define	_PATH_IFCONFIG	"/bin/ifconfig"
 #define	_PATH_KMEM	"/dev/kmem"
 #define	_PATH_LIBMAP_CONF	"/etc/libmap.conf"
 #define	_PATH_LOCALE	"/usr/share/locale"
@@ -72,11 +76,11 @@
 #define	_PATH_MDCONFIG	"/sbin/mdconfig"
 #define	_PATH_MEM	"/dev/mem"
 #define	_PATH_MKSNAP_FFS	"/sbin/mksnap_ffs"
-#define	_PATH_MOUNT	"/sbin/mount"
+#define	_PATH_MOUNT	"/bin/mount"
 #define	_PATH_NEWFS	"/sbin/newfs"
 #define	_PATH_NOLOGIN	"/var/run/nologin"
 #define	_PATH_RCP	"/bin/rcp"
-#define	_PATH_REBOOT	"/sbin/reboot"
+#define	_PATH_REBOOT	"/bin/reboot"
 #define	_PATH_RLOGIN	"/bin/rlogin"
 #define	_PATH_RM	"/bin/rm"
 #define	_PATH_RSH	"/usr/bin/rsh"
@@ -135,5 +139,9 @@ __END_DECLS
 #undef	_PATH_WALL
 #define	_PATH_WALL	"/rescue/wall"
 #endif /* RESCUE */
+
+
+#endif /* _BSD_SOURCE || _GNU_SOURCE */
+
 
 #endif /* !_PATHS_H_ */

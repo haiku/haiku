@@ -13,10 +13,9 @@
 
 #include <Button.h>
 #include <Catalog.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Messenger.h>
-#include <SpaceLayoutItem.h>
 #include <TabView.h>
 
 #include "AntialiasingSettingsView.h"
@@ -40,8 +39,6 @@ APRWindow::APRWindow(BRect frame)
 		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS
 			| B_QUIT_ON_WINDOW_CLOSE, B_ALL_WORKSPACES)
 {
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
 	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),
 		new BMessage(kMsgSetDefaults), B_WILL_DRAW);
 
@@ -67,17 +64,13 @@ APRWindow::APRWindow(BRect frame)
 
 	_UpdateButtons();
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(tabView)
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+		.AddGroup(B_HORIZONTAL)
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
-			.AddGlue()
-		)
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-	);
+			.AddGlue();
 }
 
 

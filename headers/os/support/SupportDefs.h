@@ -27,7 +27,7 @@ typedef	__haiku_int64			int64;
 typedef __haiku_uint64			uint64;
 
 /* shorthand types */
-typedef volatile int8   		vint8;
+typedef volatile int8			vint8;
 typedef volatile uint8			vuint8;
 typedef volatile int16			vint16;
 typedef volatile uint16			vuint16;
@@ -47,7 +47,7 @@ typedef volatile unsigned short	vushort;
 typedef volatile unsigned char	vuchar;
 
 typedef unsigned char			uchar;
-typedef unsigned short          unichar;
+typedef unsigned short			unichar;
 
 /* descriptive types */
 typedef int32					status_t;
@@ -89,64 +89,96 @@ typedef	generic_addr_t			generic_size_t;
 #define B_PRIx64		__HAIKU_PRI_PREFIX_64 "x"
 #define B_PRIX64		__HAIKU_PRI_PREFIX_64 "X"
 
-#define B_SCNd8 		"hhd"
-#define B_SCNi8 		"hhi"
+#define B_SCNd8			"hhd"
+#define B_SCNi8			"hhi"
 #define B_SCNd16		"hd"
-#define B_SCNi16	 	"hi"
-#define B_SCNd32 		__HAIKU_PRI_PREFIX_32 "d"
-#define B_SCNi32	 	__HAIKU_PRI_PREFIX_32 "i"
+#define B_SCNi16		"hi"
+#define B_SCNd32		__HAIKU_PRI_PREFIX_32 "d"
+#define B_SCNi32		__HAIKU_PRI_PREFIX_32 "i"
 #define B_SCNd64		__HAIKU_PRI_PREFIX_64 "d"
-#define B_SCNi64 		__HAIKU_PRI_PREFIX_64 "i"
-#define B_SCNu8 		"hhu"
-#define B_SCNo8 		"hho"
-#define B_SCNx8 		"hhx"
+#define B_SCNi64		__HAIKU_PRI_PREFIX_64 "i"
+#define B_SCNu8			"hhu"
+#define B_SCNo8			"hho"
+#define B_SCNx8			"hhx"
 #define B_SCNu16		"hu"
 #define B_SCNo16		"ho"
 #define B_SCNx16		"hx"
-#define B_SCNu32 		__HAIKU_PRI_PREFIX_32 "u"
-#define B_SCNo32 		__HAIKU_PRI_PREFIX_32 "o"
-#define B_SCNx32 		__HAIKU_PRI_PREFIX_32 "x"
+#define B_SCNu32		__HAIKU_PRI_PREFIX_32 "u"
+#define B_SCNo32		__HAIKU_PRI_PREFIX_32 "o"
+#define B_SCNx32		__HAIKU_PRI_PREFIX_32 "x"
 #define B_SCNu64		__HAIKU_PRI_PREFIX_64 "u"
 #define B_SCNo64		__HAIKU_PRI_PREFIX_64 "o"
 #define B_SCNx64		__HAIKU_PRI_PREFIX_64 "x"
 
-/* printf() format strings for some standard types */
+/* printf()/scanf() format strings for some standard types */
 /* size_t */
 #define B_PRIuSIZE		__HAIKU_PRI_PREFIX_ADDR "u"
 #define B_PRIoSIZE		__HAIKU_PRI_PREFIX_ADDR "o"
 #define B_PRIxSIZE		__HAIKU_PRI_PREFIX_ADDR "x"
 #define B_PRIXSIZE		__HAIKU_PRI_PREFIX_ADDR "X"
+
+#define B_SCNuSIZE		__HAIKU_PRI_PREFIX_ADDR "u"
+#define B_SCNoSIZE		__HAIKU_PRI_PREFIX_ADDR "o"
+#define B_SCNxSIZE		__HAIKU_PRI_PREFIX_ADDR "x"
+
 /* ssize_t */
 #define B_PRIdSSIZE		__HAIKU_PRI_PREFIX_ADDR "d"
 #define B_PRIiSSIZE		__HAIKU_PRI_PREFIX_ADDR "i"
+
+#define B_SCNdSSIZE		__HAIKU_PRI_PREFIX_ADDR "d"
+#define B_SCNiSSIZE		__HAIKU_PRI_PREFIX_ADDR "i"
+
 /* addr_t */
 #define B_PRIuADDR		__HAIKU_PRI_PREFIX_ADDR "u"
 #define B_PRIoADDR		__HAIKU_PRI_PREFIX_ADDR "o"
 #define B_PRIxADDR		__HAIKU_PRI_PREFIX_ADDR "x"
 #define B_PRIXADDR		__HAIKU_PRI_PREFIX_ADDR "X"
+
+#define B_SCNuADDR		__HAIKU_PRI_PREFIX_ADDR "u"
+#define B_SCNoADDR		__HAIKU_PRI_PREFIX_ADDR "o"
+#define B_SCNxADDR		__HAIKU_PRI_PREFIX_ADDR "x"
+
 /* phys_addr_t */
 #define B_PRIuPHYSADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR "u"
 #define B_PRIoPHYSADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR "o"
 #define B_PRIxPHYSADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR "x"
 #define B_PRIXPHYSADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR "X"
+
+#define B_SCNuPHYSADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR "u"
+#define B_SCNoPHYSADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR "o"
+#define B_SCNxPHYSADDR	__HAIKU_PRI_PREFIX_PHYS_ADDR "x"
+
 /* generic_addr_t */
 #define B_PRIuGENADDR	__HAIKU_PRI_PREFIX_GENERIC_ADDR "u"
 #define B_PRIoGENADDR	__HAIKU_PRI_PREFIX_GENERIC_ADDR "o"
 #define B_PRIxGENADDR	__HAIKU_PRI_PREFIX_GENERIC_ADDR "x"
 #define B_PRIXGENADDR	__HAIKU_PRI_PREFIX_GENERIC_ADDR "X"
+
+#define B_SCNuGENADDR	__HAIKU_PRI_PREFIX_GENERIC_ADDR "u"
+#define B_SCNoGENADDR	__HAIKU_PRI_PREFIX_GENERIC_ADDR "o"
+#define B_SCNxGENADDR	__HAIKU_PRI_PREFIX_GENERIC_ADDR "x"
+
 /* off_t */
 #define B_PRIdOFF		B_PRId64
 #define B_PRIiOFF		B_PRIi64
 #define B_PRIxOFF		B_PRIx64
+
+#define B_SCNdOFF		B_SCNd64
+#define B_SCNiOFF		B_SCNi64
+#define B_SCNxOFF		B_SCNx64
+
 /* dev_t */
 #define B_PRIdDEV		B_PRId32
 #define B_PRIiDEV		B_PRIi32
+
 /* ino_t */
 #define B_PRIdINO		B_PRId64
 #define B_PRIiINO		B_PRIi64
+
 /* time_t */
 #define B_PRIdTIME		B_PRId32
 #define B_PRIiTIME		B_PRIi32
+
 /* bigtime_t */
 #define B_PRIdBIGTIME	B_PRId64
 #define B_PRIiBIGTIME	B_PRIi64

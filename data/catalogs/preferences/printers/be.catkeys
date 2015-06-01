@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-PRNT	2674539197
+1	belarusian	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Прынтэр: %printer_name%\nДрайвер:  %driver%\n
 Waiting	JobListView		Чаканне
 Print test page	PrintersWindow		Надрукаваць тэставую старонку
@@ -30,7 +30,6 @@ Blue	TestPageView		Сіні
 1 pending job.	PrinterListView		1 заданне ў чарзе.
 Remove	PrintersWindow		Выдаліць
 <pick one>	AddPrinterDialog		<выберыце адно>
-Add …	PrintersWindow		Дадаць …
 Print jobs for 	PrintersWindow		Заданні друку для 
 Failed	JobListView		Не ўдалося
 %.2f KB	JobListView		%.2f КБ

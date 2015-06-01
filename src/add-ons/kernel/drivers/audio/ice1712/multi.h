@@ -1,13 +1,13 @@
 /*
- * ice1712 BeOS/Haiku Driver for VIA - VT1712 Multi Channel Audio Controller
+ * Copyright 2004-2015 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Copyright (c) 2002, Jerome Duval		(jerome.duval@free.fr)
- * Copyright (c) 2003, Marcus Overhagen	(marcus@overhagen.de)
- * Copyright (c) 2007, Jerome Leveque	(leveque.jerome@neuf.fr)
- *
- * All rights reserved
- * Distributed under the terms of the MIT license.
+ * Authors:
+ *		Jérôme Duval, jerome.duval@free.fr
+ *		Marcus Overhagen, marcus@overhagen.de
+ *		Jérôme Lévêque, leveque.jerome@gmail.com
  */
+
 
 #ifndef _ICE1712_MULTI_H_
 #define _ICE1712_MULTI_H_
@@ -30,14 +30,14 @@
 #define ICE1712_MULTI_CONTROL_CHANNEL_MASK	(0x0FF00000)
 #define ICE1712_MULTI_CONTROL_INDEX_MASK	(0x00000FFF)
 
-#define ICE1712_MULTI_SET_CHANNEL(_c_) 		((_c_ << 20) & \
+#define ICE1712_MULTI_SET_CHANNEL(_c_)		((_c_ << 20) & \
 	ICE1712_MULTI_CONTROL_CHANNEL_MASK)
-#define ICE1712_MULTI_GET_CHANNEL(_c_) 		((_c_ & \
+#define ICE1712_MULTI_GET_CHANNEL(_c_)		((_c_ & \
 	ICE1712_MULTI_CONTROL_CHANNEL_MASK) >> 20)
 
-#define ICE1712_MULTI_SET_INDEX(_i_) 		(_i_ & \
+#define ICE1712_MULTI_SET_INDEX(_i_)		(_i_ & \
 	ICE1712_MULTI_CONTROL_INDEX_MASK)
-#define ICE1712_MULTI_GET_INDEX(_i_) 		(_i_ & \
+#define ICE1712_MULTI_GET_INDEX(_i_)		(_i_ & \
 	ICE1712_MULTI_CONTROL_INDEX_MASK)
 
 /*
@@ -51,25 +51,22 @@
 
 #define CONTROL_IS_MASTER (0)
 
-status_t ice1712_get_description(ice1712 *card, multi_description *data);
-status_t ice1712_get_enabled_channels(ice1712 *card,
-			multi_channel_enable *data);
-status_t ice1712_set_enabled_channels(ice1712 *card,
-			multi_channel_enable *data);
-status_t ice1712_get_global_format(ice1712 *card, multi_format_info *data);
-status_t ice1712_set_global_format(ice1712 *card, multi_format_info *data);
-status_t ice1712_get_mix(ice1712 *card, multi_mix_value_info *data);
-status_t ice1712_set_mix(ice1712 *card, multi_mix_value_info *data);
-status_t ice1712_list_mix_channels(ice1712 *card,
-			multi_mix_channel_info *data);
-status_t ice1712_list_mix_controls(ice1712 *card,
-			multi_mix_control_info *data);
-status_t ice1712_list_mix_connections(ice1712 *card,
-			multi_mix_connection_info *data);
-status_t ice1712_get_buffers(ice1712 *card, multi_buffer_list *data);
-status_t ice1712_buffer_exchange(ice1712 *card, multi_buffer_info *data);
-status_t ice1712_buffer_force_stop(ice1712 *card);
-
+status_t ice1712Get_Description(ice1712 *card, multi_description *data);
+status_t ice1712Get_Channel(ice1712 *card, multi_channel_enable *data);
+status_t ice1712Set_Channel(ice1712 *card, multi_channel_enable *data);
+status_t ice1712Get_Format(ice1712 *card, multi_format_info *data);
+status_t ice1712Set_Format(ice1712 *card, multi_format_info *data);
+status_t ice1712Get_MixValue(ice1712 *card, multi_mix_value_info *data);
+status_t ice1712Set_MixValue(ice1712 *card, multi_mix_value_info *data);
+status_t ice1712Get_MixValueChannel(ice1712 *card,
+	multi_mix_channel_info *data);
+status_t ice1712Get_MixValueControls(ice1712 *card,
+	multi_mix_control_info *data);
+status_t ice1712Get_MixValueConnections(ice1712 *card,
+	multi_mix_connection_info *data);
+status_t ice1712Buffer_Get(ice1712 *card, multi_buffer_list *data);
+status_t ice1712Buffer_Exchange(ice1712 *card, multi_buffer_info *data);
+status_t ice1712Buffer_Stop(ice1712 *card);
 
 #endif //_ICE1712_MULTI_H_
 

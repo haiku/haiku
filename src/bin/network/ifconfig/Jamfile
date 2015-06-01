@@ -4,5 +4,6 @@ UsePrivateHeaders net ;
 
 BinCommand ifconfig :
 	ifconfig.cpp
+	MediaTypes.cpp
 	: be network bnetapi
 ;

@@ -31,7 +31,7 @@ public:
 	virtual	BAlignment			BaseAlignment();
 
 	virtual BRect				Frame();
-	virtual	void				SetFrame(BRect frame);	
+	virtual	void				SetFrame(BRect frame);
 
 	virtual	bool				IsVisible();
 	virtual	void				SetVisible(bool visible);
@@ -42,7 +42,7 @@ public:
 
 protected:
 	// Archiving hook methods
-	virtual	status_t 			AllArchived(BMessage* archive) const;
+	virtual	status_t			AllArchived(BMessage* archive) const;
 	virtual	status_t			AllUnarchived(const BMessage* from);
 
 	virtual status_t			ItemArchived(BMessage* into, BLayoutItem* item,

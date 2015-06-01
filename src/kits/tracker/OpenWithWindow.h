@@ -200,6 +200,7 @@ private:
 class OpenWithPoseView : public BPoseView {
 public:
 	OpenWithPoseView();
+	virtual ~OpenWithPoseView();
 
 	virtual void OpenSelection(BPose*, int32*);
 		// open entries with the selected app
@@ -222,7 +223,8 @@ protected:
 	virtual void FinalStopWatching() {}
 
 	virtual void AttachedToWindow();
-	EntryListBase* InitDirentIterator(const entry_ref* ref);
+	virtual EntryListBase* InitDirentIterator(const entry_ref* ref);
+	virtual void ReturnDirentIterator(EntryListBase* iterator);
 
 	virtual void SetUpDefaultColumnsIfNeeded();
 		// show launch window specific columns
@@ -261,7 +263,7 @@ private:
 	bool fHaveCommonPreferredApp;
 
 	SearchForSignatureEntryList* fIterator;
-		// private copy of the iterator pointer
+	BRefFilter* fRefFilter;
 
 	typedef BPoseView _inherited;
 };

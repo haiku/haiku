@@ -376,7 +376,7 @@ BButton::WindowActivated(bool active)
 void
 BButton::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
-	bool inside = Bounds().Contains(where);
+	bool inside = (code != B_EXITED_VIEW) && Bounds().Contains(where);
 	if (_SetFlag(FLAG_INSIDE, inside))
 		Invalidate();
 

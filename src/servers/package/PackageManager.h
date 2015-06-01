@@ -18,11 +18,11 @@
 
 using BPackageKit::BCommitTransactionResult;
 using BPackageKit::BContext;
-using BPackageKit::BJob;
-using BPackageKit::BJobStateListener;
 using BPackageKit::BPackageInstallationLocation;
 using BPackageKit::BRepositoryConfig;
 using BPackageKit::BSolverPackage;
+using BSupportKit::BJob;
+using BSupportKit::BJobStateListener;
 
 using BPackageKit::BPrivate::BDaemonClient;
 using BPackageKit::BManager::BPrivate::BPackageManager;
@@ -65,7 +65,8 @@ private:
 									const char* packageName);
 	virtual	void				ProgressPackageDownloadActive(
 									const char* packageName,
-									float completionPercentage);
+									float completionPercentage,
+									off_t bytes, off_t totalBytes);
 	virtual	void				ProgressPackageDownloadComplete(
 									const char* packageName);
 	virtual	void				ProgressPackageChecksumStarted(
@@ -83,8 +84,8 @@ private:
 
 private:
 	// BJobStateListener
-	virtual	void				JobFailed(BJob* job);
-	virtual	void				JobAborted(BJob* job);
+	virtual	void				JobFailed(BSupportKit::BJob* job);
+	virtual	void				JobAborted(BSupportKit::BJob* job);
 
 private:
 			typedef std::set<BSolverPackage*> SolverPackageSet;

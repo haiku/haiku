@@ -25,6 +25,9 @@
 #include "WriterPlugin.h"
 
 
+namespace BPrivate {
+namespace media {
+
 class AddOnManager {
 public:
 								AddOnManager();
@@ -108,5 +111,8 @@ private:
 
 			static AddOnManager	sInstance;
 };
+
+} // namespace media
+} // namespace BPrivate
 
 #endif // _ADD_ON_MANAGER_H

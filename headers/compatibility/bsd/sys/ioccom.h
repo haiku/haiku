@@ -6,6 +6,10 @@
 #ifndef _SYS_IOCCOM_H
 #define _SYS_IOCCOM_H
 
+
+#ifdef _BSD_SOURCE
+
+
 /**
  * @defgroup IOCTL_common sys/ioccom.h
  * @brief Definitions & maros common to ioctl()
@@ -76,5 +80,9 @@
 /** @} */
 
 /** @} */
+
+
+#endif
+
 
 #endif /* _SYS_IOCCOM_H */

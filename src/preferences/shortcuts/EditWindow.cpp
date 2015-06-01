@@ -68,7 +68,9 @@ EditWindow::Go()
 	CenterOnScreen();
 
 	acquire_sem(fSem);
+	BString result = fTextControl->Text();
 	if (Lock())
 		Quit();
-	return fTextControl->Text();
+
+	return result;
 }

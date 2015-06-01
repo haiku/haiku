@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2005-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -403,7 +403,7 @@ public:
 
 	// Convenience methods
 			bool				GetBool(const char* name,
-									bool defaultValue) const;
+									bool defaultValue = false) const;
 			bool				GetBool(const char* name, int32 index,
 									bool defaultValue) const;
 			int8				GetInt8(const char* name,
@@ -447,7 +447,7 @@ public:
 			double				GetDouble(const char* name, int32 index,
 									double defaultValue) const;
 			const char*			GetString(const char* name,
-									const char* defaultValue) const;
+									const char* defaultValue = NULL) const;
 			const char*			GetString(const char* name, int32 index,
 									const char* defaultValue) const;
 			BAlignment			GetAlignment(const char* name, int32 index,

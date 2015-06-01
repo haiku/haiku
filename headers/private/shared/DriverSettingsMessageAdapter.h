@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,11 +14,27 @@
 #include <Message.h>
 
 
+class DriverSettingsConverter {
+public:
+								DriverSettingsConverter();
+	virtual						~DriverSettingsConverter();
+
+	virtual	status_t			ConvertFromDriverSettings(
+									const driver_parameter& parameter,
+									const char* name, int32 index, uint32 type,
+									BMessage& target) = 0;
+	virtual	status_t			ConvertToDriverSettings(const BMessage& source,
+									const char* name, int32 index,
+									uint32 type, BString& value) = 0;
+};
+
+
 struct settings_template {
 	uint32		type;
 	const char*	name;
 	const settings_template* sub_template;
 	bool		parent_value;
+	DriverSettingsConverter* converter;
 };
 
 
@@ -49,7 +65,7 @@ private:
 			const settings_template* _FindParentValueTemplate(
 									const settings_template* settingsTemplate);
 			status_t			_AddParameter(const driver_parameter& parameter,
-									const char* name, uint32 type,
+									const settings_template& settingsTemplate,
 									BMessage& message);
 
 			status_t			_ConvertFromDriverParameter(

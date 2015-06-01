@@ -82,7 +82,6 @@ All rights reserved.
 #include "IconMenuItem.h"
 #include "OpenWithWindow.h"
 #include "MimeTypes.h"
-#include "Model.h"
 #include "MountMenu.h"
 #include "Navigator.h"
 #include "NavMenu.h"
@@ -204,7 +203,7 @@ AddOneAddon(const Model* model, const char* name, uint32 shortcut,
 
 
 static int32
-AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref dirRef)
+AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref directoryRef)
 {
 	std::auto_ptr<BMessage> refsMessagePtr(refsMessage);
 
@@ -223,7 +222,7 @@ AddOnThread(BMessage* refsMessage, entry_ref addonRef, entry_ref dirRef)
 
 			if (result >= 0) {
 				// call add-on code
-				(*processRefs)(dirRef, refsMessagePtr.get(), 0);
+				(*processRefs)(directoryRef, refsMessagePtr.get(), NULL);
 
 				unload_add_on(addonImage);
 				return B_OK;
@@ -462,6 +461,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	:
 	BWindow(InitialWindowRect(feel), "TrackerWindow", look, feel, flags,
 		workspace),
+	fUseLayouts(useLayouts),
 	fMenuContainer(NULL),
 	fPoseContainer(NULL),
 	fBorderedView(NULL),
@@ -500,7 +500,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 	fDragMessage(NULL),
 	fCachedTypesList(NULL),
 	fStateNeedsSaving(false),
-	fSaveStateIsEnabled(!fIsDesktop),
+	fSaveStateIsEnabled(true),
 	fIsWatchingPath(false)
 {
 	InitIconPreloader();
@@ -722,6 +722,7 @@ BContainerWindow::CreatePoseView(Model* model)
 
 	fPoseView = NewPoseView(model, kListMode);
 	fBorderedView->GroupLayout()->AddView(fPoseView);
+	fBorderedView->GroupLayout()->SetInsets(1, 0, 1, 1);
 	fBorderedView->EnableBorderHighlight(false);
 
 	TrackerSettings settings;
@@ -729,10 +730,10 @@ BContainerWindow::CreatePoseView(Model* model)
 		&& !fPoseView->IsFilePanel()) {
 		fNavigator = new BNavigator(model);
 		fPoseContainer->GridLayout()->AddView(fNavigator, 0, 0, 2);
-		if (!settings.ShowNavigator()) {
+		if (settings.ShowNavigator())
+			fBorderedView->GroupLayout()->SetInsets(1);
+		else
 			fNavigator->Hide();
-			fBorderedView->GroupLayout()->SetInsets(1, 0, 1, 1);
-		}
 	}
 
 	SetPathWatchingEnabled(settings.ShowNavigator()
@@ -962,7 +963,7 @@ BContainerWindow::InitLayout()
 	item = fCountContainer->GroupLayout()->AddView(fPoseView->CountView());
 	minSize = item->MinSize();
 	maxSize = item->MaxSize();
-	item->SetExplicitMinSize(BSize(kCountViewWidth, minSize.Height()));
+	item->SetExplicitMinSize(BSize(kCountViewWidth, B_H_SCROLL_BAR_HEIGHT));
 	item->SetExplicitMaxSize(BSize(kCountViewWidth, maxSize.Height()));
 
 	// Eliminate the extra borders
@@ -973,13 +974,13 @@ BContainerWindow::InitLayout()
 	if (fPoseView->VScrollBar() != NULL) {
 		fVScrollBarContainer = new BGroupView(B_VERTICAL, 0);
 		fVScrollBarContainer->GroupLayout()->AddView(fPoseView->VScrollBar());
-		fVScrollBarContainer->GroupLayout()->SetInsets(-1, 0, 0, 1);
+		fVScrollBarContainer->GroupLayout()->SetInsets(-1, 0, 0, 0);
 		fPoseContainer->GridLayout()->AddView(fVScrollBarContainer, 1, 1);
 	}
 	if (fPoseView->HScrollBar() != NULL) {
 		BGroupView* hScrollBarContainer = new BGroupView(B_VERTICAL, 0);
 		hScrollBarContainer->GroupLayout()->AddView(fPoseView->HScrollBar());
-		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, 0, 0);
+		hScrollBarContainer->GroupLayout()->SetInsets(0, -1, 0, -1);
 		fCountContainer->GroupLayout()->AddView(hScrollBarContainer);
 	}
 }
@@ -1012,7 +1013,7 @@ BContainerWindow::RestoreState(const BMessage &message)
 void
 BContainerWindow::RestoreStateCommon()
 {
-	if (!fIsDesktop)
+	if (!fIsDesktop && fUseLayouts)
 		InitLayout();
 
 	if (BootedInSafeMode())
@@ -1090,7 +1091,7 @@ BContainerWindow::UpdateBackgroundImage()
 void
 BContainerWindow::FrameResized(float, float)
 {
-	if (PoseView() != NULL && dynamic_cast<BDeskWindow*>(this) == NULL) {
+	if (PoseView() != NULL && !fIsDesktop) {
 		BRect extent = PoseView()->Extent();
 		float offsetX = extent.left - PoseView()->Bounds().left;
 		float offsetY = extent.top - PoseView()->Bounds().top;
@@ -1664,7 +1665,7 @@ BContainerWindow::MessageReceived(BMessage* message)
 						// there is fMenuBar
 						if (fMenuBar && fFileMenu) {
 							item = fFileMenu->FindItem(kMoveToTrash);
-							if (item) {
+							if (item != NULL) {
 								item->SetLabel(dontMoveToTrash
 									? B_TRANSLATE("Delete")
 									: B_TRANSLATE("Move to Trash"));
@@ -3213,18 +3214,22 @@ BContainerWindow::LoadAddOn(BMessage* message)
 
 	// add selected refs to message
 	BMessage* refs = new BMessage(B_REFS_RECEIVED);
-
-	BObjectList<BPose>* list = PoseView()->SelectionList();
+	BObjectList<BPose>* selectionList = PoseView()->SelectionList();
 
 	int32 index = 0;
 	BPose* pose;
-	while ((pose = list->ItemAt(index++)) != NULL)
+	while ((pose = selectionList->ItemAt(index++)) != NULL)
 		refs->AddRef("refs", pose->TargetModel()->EntryRef());
 
 	refs->AddMessenger("TrackerViewToken", BMessenger(PoseView()));
 
+	const entry_ref* modelRef = TargetModel()->IsContainer()
+			&& selectionList->ItemAt(0) != NULL
+		? selectionList->ItemAt(0)->TargetModel()->EntryRef()
+		: TargetModel()->EntryRef();
+
 	LaunchInNewThread("Add-on", B_NORMAL_PRIORITY, &AddOnThread, refs,
-		addonRef, *TargetModel()->EntryRef());
+		addonRef, *modelRef);
 }
 
 
@@ -3793,7 +3798,7 @@ BContainerWindow::SetUpDefaultState()
 		return;
 	}
 
-	if (dynamic_cast<BDeskWindow*>(this) != NULL) {
+	if (fIsDesktop) {
 		// don't copy over the attributes if we are the Desktop
 		return;
 	}
@@ -3834,7 +3839,7 @@ BContainerWindow::SetUpDefaultState()
 void
 BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 {
-	if (node == NULL || dynamic_cast<BDeskWindow*>(this) != NULL) {
+	if (node == NULL || fIsDesktop) {
 		// don't restore any window state if we are the Desktop
 		return;
 	}
@@ -3886,7 +3891,7 @@ BContainerWindow::RestoreWindowState(AttributeStreamNode* node)
 void
 BContainerWindow::RestoreWindowState(const BMessage& message)
 {
-	if (dynamic_cast<BDeskWindow*>(this) != NULL) {
+	if (fIsDesktop) {
 		// don't restore any window state if we are the Desktop
 		return;
 	}
@@ -3930,7 +3935,7 @@ BContainerWindow::RestoreWindowState(const BMessage& message)
 void
 BContainerWindow::SaveWindowState(AttributeStreamNode* node)
 {
-	if (dynamic_cast<BDeskWindow*>(this) != NULL) {
+	if (fIsDesktop) {
 		// don't save window state if we are the Desktop
 		return;
 	}

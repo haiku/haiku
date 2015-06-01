@@ -157,8 +157,8 @@ HIDReport::SetReport(status_t status, uint8 *report, size_t length)
 	fReportStatus = status;
 	fCurrentReport = report;
 	if (status == B_OK && length * 8 < fReportSize) {
-		TRACE_ALWAYS("report of %lu bits too small, expected %" B_PRIu32 " bits\n",
-			length * 8, fReportSize);
+		TRACE_ALWAYS("report of %lu bits too small, expected %" B_PRIu32
+			" bits\n", length * 8, fReportSize);
 		fReportStatus = B_ERROR;
 	}
 

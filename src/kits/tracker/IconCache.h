@@ -262,8 +262,8 @@ public:
 	void RemoveAliasesTo(int32 index);
 
 private:
-	OpenHashTable<SharedCacheEntry, SharedCacheEntryArray> fHashTable;
 	SharedCacheEntryArray fElementArray;
+	OpenHashTable<SharedCacheEntry, SharedCacheEntryArray> fHashTable;
 	BObjectList<BBitmap> fRetiredBitmaps;
 		// icons are drawn asynchronously, can't just delete them right away,
 		// instead have to place them onto the retired bitmap list and wait
@@ -336,8 +336,8 @@ public:
 	void RemoveAliasesTo(int32 index);
 
 private:
-	OpenHashTable<NodeCacheEntry, NodeCacheEntryArray> fHashTable;
 	NodeCacheEntryArray fElementArray;
+	OpenHashTable<NodeCacheEntry, NodeCacheEntryArray> fHashTable;
 };
 
 

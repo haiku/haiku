@@ -40,7 +40,6 @@ All rights reserved.
 #include <Locale.h>
 #include <ScrollView.h>
 
-#include "SettingsViews.h"
 #include "TrackerSettings.h"
 #include "TrackerSettingsWindow.h"
 

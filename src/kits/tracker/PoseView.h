@@ -436,6 +436,8 @@ protected:
 	virtual EntryListBase* InitDirentIterator(const entry_ref*);
 		// sets up an entry iterator for _add_poses_
 		// overriden by QueryPoseView, etc. to provide different iteration
+	virtual void ReturnDirentIterator(EntryListBase* iterator);
+		// returns the entry iterator after _add_poses_ is done
 
 	void Cleanup(bool doAll = false);
 		// clean up poses
@@ -1245,7 +1247,7 @@ EachTextWidget(BPose* pose, BPoseView* poseView,
 			break;
 
 		BTextWidget* widget = pose->WidgetFor(column->AttrHash());
-		if (widget)
+		if (widget != NULL)
 			(func)(widget, pose, poseView, column, p1);
 	}
 }
@@ -1263,7 +1265,7 @@ EachTextWidget(BPose* pose, BPoseView* poseView,
 			break;
 
 		BTextWidget* widget = pose->WidgetFor(column->AttrHash());
-		if (widget)
+		if (widget != NULL)
 			(func)(widget, pose, poseView, column, p1, p2);
 	}
 }
@@ -1281,12 +1283,13 @@ WhileEachTextWidget(BPose* pose, BPoseView* poseView,
 			break;
 
 		BTextWidget* widget = pose->WidgetFor(column->AttrHash());
-		if (widget) {
+		if (widget != NULL) {
 			Result result = (func)(widget, pose, poseView, column, p1, p2);
-			if (result)
+			if (result != 0)
 				return result;
 		}
 	}
+
 	return 0;
 }
 

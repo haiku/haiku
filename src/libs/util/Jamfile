@@ -4,7 +4,7 @@ SetSubDirSupportedPlatforms $(HAIKU_BONE_COMPATIBLE_PLATFORMS) ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
-local defines = [ FDefines SCCSID=0 ] ;
+local defines = [ FDefines SCCSID=0 _BSD_SOURCE=1 ] ;
 SubDirCcFlags $(defines) ;
 
 StaticLibrary libutil.a :

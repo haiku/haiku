@@ -68,13 +68,13 @@ class TransformerItem : public SimpleItem,
 
 						if (transformer) {
 							transformer->RemoveObserver(this);
-							transformer->Release();
+							transformer->ReleaseReference();
 						}
 
 						transformer = t;
 
 						if (transformer) {
-							transformer->Acquire();
+							transformer->AcquireReference();
 							transformer->AddObserver(this);
 							UpdateText();
 						}

@@ -53,7 +53,7 @@ ScreenshotWindow::ScreenshotWindow(BWindow* parent, BRect frame)
 ScreenshotWindow::~ScreenshotWindow()
 {
 	BAutolock locker(&fLock);
-	
+
 	if (fWorkerThread >= 0)
 		wait_for_thread(fWorkerThread, NULL);
 }
@@ -114,7 +114,7 @@ void
 ScreenshotWindow::_DownloadScreenshot()
 {
 	BAutolock locker(&fLock);
-	
+
 	if (fWorkerThread >= 0) {
 		fDownloadPending = true;
 		return;
@@ -132,13 +132,13 @@ ScreenshotWindow::_SetWorkerThread(thread_id thread)
 {
 	if (!Lock())
 		return;
-	
+
 //	bool enabled = thread < 0;
 //
 //	fPreviewsButton->SetEnabled(enabled);
 //	fNextButton->SetEnabled(enabled);
 //	fCloseButton->SetEnabled(enabled);
-	
+
 	if (thread >= 0) {
 		fWorkerThread = thread;
 		resume_thread(fWorkerThread);
@@ -175,8 +175,8 @@ ScreenshotWindow::_DownloadThread()
 		return;
 	}
 
-	fScreenshotView->SetBitmap(NULL);
-	
+	fScreenshotView->UnsetBitmap();
+
 	ScreenshotInfoList screenshotInfos;
 	if (fPackage.Get() != NULL)
 		screenshotInfos = fPackage->ScreenshotInfos();
@@ -202,7 +202,7 @@ ScreenshotWindow::_DownloadThread()
 	if (status == B_OK && Lock()) {
 		printf("got screenshot");
 		fScreenshot = BitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
-		fScreenshotView->SetBitmap(fScreenshot->Bitmap(SharedBitmap::SIZE_ANY));
+		fScreenshotView->SetBitmap(fScreenshot);
 		_ResizeToFitAndCenter();
 		Unlock();
 	} else {

@@ -76,7 +76,7 @@ SharedBitmap::SharedBitmap(BPositionIO& data)
 		fBuffer = new(std::nothrow) uint8[fSize];
 		if (fBuffer != NULL) {
 			data.Seek(0, SEEK_SET);
-			
+
 			off_t bytesRead = 0;
 			size_t chunkSize = std::min((off_t)4096, fSize);
 			while (bytesRead < fSize) {
@@ -86,7 +86,7 @@ SharedBitmap::SharedBitmap(BPositionIO& data)
 				else
 					break;
 			}
-	
+
 			if (bytesRead != fSize) {
 				delete[] fBuffer;
 				fBuffer = NULL;
@@ -177,7 +177,7 @@ BBitmap*
 SharedBitmap::_CreateBitmapFromBuffer(int32 size) const
 {
 	BBitmap* bitmap = _LoadIconFromBuffer(fBuffer, fSize, size);
-	
+
 	if (bitmap == NULL)
 		bitmap = _LoadBitmapFromBuffer(fBuffer, fSize);
 
@@ -214,7 +214,7 @@ SharedBitmap::_LoadBitmapFromBuffer(const void* buffer, size_t size) const
 
 	// Try to read as an archived bitmap.
 	BBitmap* bitmap = _LoadArchivedBitmapFromStream(stream);
-	
+
 	if (bitmap == NULL) {
 		// Try to read as a translator bitmap
 		stream.Seek(0, SEEK_SET);

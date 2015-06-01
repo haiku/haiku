@@ -81,12 +81,11 @@ MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 	}
 
 	if (fShowIcon) {
-		rgb_color highColor = owner->HighColor();
 		rgb_color lowColor = owner->LowColor();
 
 		if (IsSelected() || complete) {
 			if (IsSelected())
-				owner->SetLowColor(tint_color(lowColor, B_DARKEN_2_TINT));
+				owner->SetLowColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 
 			owner->FillRect(rect, B_SOLID_LOW);
 		}
@@ -112,10 +111,8 @@ MimeTypeItem::DrawItem(BView* owner, BRect frame, bool complete)
 		owner->SetDrawingMode(B_OP_COPY);
 
 		owner->MovePenTo(rect.left + B_MINI_ICON + 8.0f, frame.top + fBaselineOffset);
-		owner->SetHighColor(0, 0, 0);
 		owner->DrawString(Text());
 
-		owner->SetHighColor(highColor);
 		owner->SetLowColor(lowColor);
 	} else
 		BStringItem::DrawItem(owner, rect, complete);

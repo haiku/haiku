@@ -9,6 +9,13 @@
 #include_next <errno.h>
 
 
+#ifdef _BSD_SOURCE
+
+
 #define EDOOFUS	EINVAL
+
+
+#endif
+
 
 #endif	/* _BSD_ERRNO_H_ */

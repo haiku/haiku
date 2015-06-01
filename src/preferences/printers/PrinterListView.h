@@ -97,6 +97,8 @@ public:
 private:
 			void				_GetStringProperty(const char* propName,
 									BString& outString);
+			BBitmap*			_LoadVectorIcon(const char* resourceName,
+									float iconSize);
 
 			SpoolFolder*		fFolder;
 			BDirectory			fNode;

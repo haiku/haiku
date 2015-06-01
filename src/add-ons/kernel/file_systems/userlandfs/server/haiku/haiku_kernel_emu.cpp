@@ -320,7 +320,7 @@ do_iterative_fd_io(int fd, io_request *_request, iterative_io_get_vecs getVecs,
 	// get the first vecs already -- this saves a guaranteed trip back from
 	// kernel to userland
 	file_io_vec fileVecs[DoIterativeFDIORequest::MAX_VECS];
-	uint32 fileVecCount = DoIterativeFDIORequest::MAX_VECS;
+	size_t fileVecCount = DoIterativeFDIORequest::MAX_VECS;
 	status_t error = getVecs(_cookie, _request, request->offset,
 		request->length, fileVecs, &fileVecCount);
 	if (error != B_OK && error != B_BUFFER_OVERFLOW)

@@ -1,12 +1,10 @@
-1	ukrainian	x-vnd.Haiku-About	2438918874
+1	ukrainian	x-vnd.Haiku-About	2724473542
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 авторів програми Gutenprint. Всі права застережені.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (і ядро його NewOS)\n
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Всі права застережені © 1996-2005 Julian R Seward.
 %d MiB total	AboutView		%d MiB загалом 
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (засновнику проекту)\n\n
-Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Всі права застережені © 1998-2003 Daniel Veillard.
 %d MiB used (%d%%)	AboutView		%d MiB викор. (%d%%)
-Website, marketing & documentation:\n	AboutView		Сайт, маркетинг і документація:\n
 AboutSystem	System name		Про систему
 Copyright © 2003 Peter Hanappe and others.	AboutView		Всі права застережені © 2003 Peter Hanappe і інші.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Всі права застережені © 1994-1997 Mark Kilgard.
@@ -16,11 +14,9 @@ Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Корп
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Всі права застережені © 1999-2000 Y.Takagi.
 Source Code: 	AboutView		Вихідний код:
 Kernel:	AboutView		Ядро:
-Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Всі права застережені © 2001-2002 Thomas Broyer, Charlie Bozeman і Daniel Veillard. 
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Авторські права коду Haiku є власністю Haiku, Inc. або конкретним авторам, про що згадується в коді. Haiku® і лого HAIKU ® є зареєстрованою торговою маркою Haiku, Inc.\n\n
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Всі права застережені © 1987-1988 Корпорацією Digital Equipment, Mейнард, Mассачусетс.\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB заг., %inaccessible MiB недоступно
-Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Всі права застережені © 2000-2007 Fabrice Bellard,  та інші.
 Contributors:\n	AboutView		Внесли вклад у розвиток :\n
 Unknown	AboutView		Невідомий
 Copyright © 2001-2003 Expat maintainers.	AboutView		Всі права застережені © 2001-2003 Розробники Expat.
@@ -63,7 +59,6 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Всі
 %ld MHz	AboutView		%ld Мгц
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Всі права застережені © 1997-2006 PDFlib GmbH і Thomas Merz.\nPDFlib і логотип PDFlib є зареєстрованими торговими марками PDFlib GmbH.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Всі права застережені © 1991-2000 Silicon Graphics, Inc.
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Містить програмне забезпечення проекту GNU , реалізоване під ліцензіями GPL і LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nВсі права застережені © The Free Software Foundation.
 …and the many people making donations!\n\n	AboutView		…і багатьом тим, що зробили пожертви !\n\n
 MIT license. All rights reserved.	AboutView		Ліцензія MIT. Всі права застережені.
 [Click a license name to read the respective license.]\n\n	AboutView		[Клікніть ім'я ліцензії для прочитання її.]\n\n

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	954841528
+1	swedish	x-vnd.Haiku-MediaPlayer	2711018042
 raw audio	MediaPlayer-InfoWin		raw-ljud
 Location	MediaPlayer-InfoWin		Plats
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
@@ -91,6 +91,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Starta uppspelning autom
 Track	Video Track Menu		Spår
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internt fel (låsning misslyckades). Kunde inte spara spellistan.
 View options	MediaPlayer-SettingsWindow		Visningsalternativ
+none	MediaPlayer-Main		ingen
 Play mode	MediaPlayer-SettingsWindow		Uppspelningsläge
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Ta bort poster
 Video track	MediaPlayer-Main		Videospår
@@ -119,6 +120,7 @@ raw video	MediaPlayer-InfoWin		raw video
 Volume of background clips	MediaPlayer-SettingsWindow		Volym för bakgrundsklipp
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Internt fel (slut på minne). Misslyckades att spara filen.
 Hide interface	MediaPlayer-Main		Göm gränssnitt
+Open clips	MediaPlayer-Main		Öppna klipp
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiera post
 none	Subtitles menu		ingen
 Move file to Trash	MediaPlayer-PlaylistWindow		Flytta filen till Papperskorgen
@@ -139,7 +141,6 @@ Gets the duration of the currently playing item in microseconds.	MediaPlayer-Mai
 ToggleFullscreen	MediaPlayer-Main		Växla helskärmsläge
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Kanaler}}
 <unnamed>	PlaylistItem-name		<odöpt>
-Open Clips	MediaPlayer-Main		Öppna klipp
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		ingen
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Hämta/sätt volymen (0.0-2.0)

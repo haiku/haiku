@@ -138,7 +138,7 @@ FilterView::AdoptModel(const Model& model)
 		message->AddString("name", depot.Name());
 		BMenuItem* item = new BMenuItem(depot.Name(), message);
 		repositoryMenu->AddItem(item);
-		
+
 		if (depot.Name() == model.Depot()) {
 			item->SetMarked(true);
 			foundSelectedDepot = true;
@@ -146,7 +146,7 @@ FilterView::AdoptModel(const Model& model)
 	}
 
 	if (!foundSelectedDepot)
-		repositoryMenu->ItemAt(0)->SetMarked(true);	
+		repositoryMenu->ItemAt(0)->SetMarked(true);
 
 	// Adopt categories
 	BMenu* showMenu = fShowField->Menu();
@@ -174,6 +174,6 @@ FilterView::AdoptModel(const Model& model)
 		}
 	}
 	if (!foundSelectedCategory)
-		showMenu->ItemAt(0)->SetMarked(true);	
+		showMenu->ItemAt(0)->SetMarked(true);
 }
 

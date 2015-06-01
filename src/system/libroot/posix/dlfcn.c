@@ -81,7 +81,7 @@ dladdr(void *address, Dl_info *info)
 	image_info imageInfo;
 
 	sStatus = __gRuntimeLoader->get_nearest_symbol_at_address(address, &image,
-		&imagePath, &symbolName, NULL, &location);
+		&imagePath, NULL, &symbolName, NULL, &location, NULL);
 	if (sStatus != B_OK)
 		return 0;
 

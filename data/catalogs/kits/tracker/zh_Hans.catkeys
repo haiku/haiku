@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	1844319736
+1	english	x-vnd.Haiku-libtracker	1313160091
 OK	WidgetAttributeText		确定
 Add-ons	FilePanelPriv		附加组件
 Mount settings…	ContainerWindow		挂载设置...
@@ -200,8 +200,10 @@ Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	移动
 Get info	ContainerWindow		获取信息
 Error creating link to \"%name\".	FSUtils		创建至 \"%name\" 的链接出错。
 Select	SelectionWindow		选择
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# 字节} other{# 字节}}
 Or	FindPanel		或者
 The Tracker must be running to see set the default printer.	PoseView		Tracker 必须运行以查看/设置默认打印机。
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# 字节} other{# 字节}}
 by formula	FindPanel		公式
 40 x 40	DeskWindow		40 x 40
 Name	PoseView		名称
@@ -212,6 +214,7 @@ Created:	InfoWindow		创建：
 Copying: 	StatusWindow		复制：
 Capacity:	InfoWindow		容量：
 Delete	FilePanelPriv		删除
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# 字节)} other{(# 字节)}}
 Save	FindPanel		保存
 copy	FSUtils	filename copy	复制
 Temporary	FindPanel		临时文件
@@ -247,6 +250,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		对不起，您无�
 Name	ContainerWindow		名称
 Reverse order	ContainerWindow		倒序排列
 48 x 48	DeskWindow		48 x 48
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# 项} other{# 项}}
 OK	OpenWithWindow		确定
 Add current folder	FilePanelPriv		添加当前目录
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		无法使用 \"%app\" 程序打开 \"%document\"（缺失符号： %symbol）。\n
@@ -290,6 +294,7 @@ Cancel	PoseView		取消
 You can't move or copy items to read-only volumes.	FSUtils		您无法移动或复制项目到只读卷。
 Unknown	FilePermissionsView		未知
 All files and folders	FindPanel		所有文件及目录
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{对于 # 文件} other{对于 # 文件}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		无法打开 \"%document\"（缺失库：%library）。\n
 The Tracker must be running to see Info windows.	PoseView		文件浏览器必须运行以查看信息窗口
 Other	FilePermissionsView		其它
@@ -328,6 +333,7 @@ New folder %ld	FSUtils		新建目录 %d
 All BeOS disks	AutoMounterSettings		所有 BeOS 磁盘
 Used space color	SettingsView		已用空间颜色
 Sorry, could not create a new folder.	FSUtils		对不起，无法新建目录。
+Disk mount	TrackerSettingsWindow		磁盘挂载
 multiple disks	FindPanel		多轴磁盘
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		您必须放置项目到 \"Disks\" 窗口中的磁盘图标。
 Untitled clipping	PoseView		未命名片段

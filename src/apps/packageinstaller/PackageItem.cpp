@@ -121,7 +121,8 @@ inflate_file_to_file(BFile *in, uint64 in_size, BFile *out, uint64 out_size)
 
 			ret = inflate(&stream, Z_NO_FLUSH);
 			if (ret != Z_OK && ret != Z_STREAM_END && ret != Z_BUF_ERROR) {
-				parser_debug("inflate_file_to_file: inflate failed\n");
+				parser_debug("inflate_file_to_file: inflate failed with '%s'\n",
+					stream.msg);
 				(void)inflateEnd(&stream);
 				return B_ERROR;
 			}

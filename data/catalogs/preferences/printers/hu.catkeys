@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-PRNT	2674539197
+1	hungarian	x-vnd.Be-PRNT	2163275033
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Nyomtató: %printer_name%\nVezérlő: %driver%\n
 Waiting	JobListView		Várakozás
 Print test page	PrintersWindow		Tesztoldal nyomtatása
@@ -9,6 +9,7 @@ Cancel	AddPrinterDialog		Mégse
 Add printer	AddPrinterDialog		Nyomtató hozzáadása
 Green	TestPageView		Zöld
 Printers	PrintersWindow		Nyomtatók
+Add…	PrintersWindow		Hozzáadás…
 Default Printer	PrinterListView		Alapértelmezett nyomtató
 Transport: %transport% %transport_address%	PrinterListView		Csatlakozás: %transport% %transport_address%
 No pending jobs.	PrinterListView		Nincs függő feladat.
@@ -30,7 +31,6 @@ Blue	TestPageView		Kék
 1 pending job.	PrinterListView		1 függő feladat.
 Remove	PrintersWindow		Eltávolítás
 <pick one>	AddPrinterDialog		<válasszon egyet>
-Add …	PrintersWindow		Hozzáadás…
 Print jobs for 	PrintersWindow		Feladat lista: 
 Failed	JobListView		Sikertelen
 %.2f KB	JobListView		%.2f KiB

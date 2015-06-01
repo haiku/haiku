@@ -9,7 +9,10 @@
 #include <String.h>
 
 
-namespace icu {
+#ifndef U_ICU_NAMESPACE
+  #define U_ICU_NAMESPACE icu
+#endif
+namespace U_ICU_NAMESPACE {
 	class Locale;
 	class TimeZone;
 }
@@ -46,8 +49,8 @@ public:
 private:
 	friend	class Private;
 
-			icu::TimeZone*		fICUTimeZone;
-			icu::Locale*		fICULocale;
+			U_ICU_NAMESPACE::TimeZone*		fICUTimeZone;
+			U_ICU_NAMESPACE::Locale*		fICULocale;
 			status_t			fInitStatus;
 
 	mutable uint32				fInitializedFields;

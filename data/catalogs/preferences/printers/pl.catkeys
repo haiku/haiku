@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-PRNT	2674539197
+1	polish	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Drukarka: %printer_name%\nSterownik:  %driver%\n
 Waiting	JobListView		Oczekuję
 Print test page	PrintersWindow		Wydrukuj stronę testową
@@ -30,7 +30,6 @@ Blue	TestPageView		Niebieski
 1 pending job.	PrinterListView		1 zadanie w toku.
 Remove	PrintersWindow		Usuń
 <pick one>	AddPrinterDialog		<wybierz>
-Add …	PrintersWindow		Dodaj …
 Print jobs for 	PrintersWindow		Drukowanie dla 
 Failed	JobListView		Nie wykonano
 %.2f KB	JobListView		%.2f KB

@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Be-PRNT	3883920649
+1	esperanto	x-vnd.Be-PRNT	1409828546
 Print test page	PrintersWindow		Presi testan paĝon
 page	JobListView		paĝo
 Cancel	AddPrinterDialog		Rezigni
@@ -10,4 +10,3 @@ Printers	System name		Presiloj
 Printer name:	AddPrinterDialog		Presila nomo:
 Add	AddPrinterDialog		Aldoni
 Remove	PrintersWindow		Forigi
-Add …	PrintersWindow		Aldoni…

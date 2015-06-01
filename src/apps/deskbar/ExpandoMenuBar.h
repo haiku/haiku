@@ -61,8 +61,7 @@ class TTeamMenuItem;
 
 class TExpandoMenuBar : public BMenuBar {
 public:
-							TExpandoMenuBar(const char* name,
-								TBarView* barView, bool vertical);
+							TExpandoMenuBar(TBarView* barView, bool vertical);
 
 	virtual	void			AttachedToWindow();
 	virtual	void			DetachedFromWindow();
@@ -115,9 +114,6 @@ private:
 			TBarView*		fBarView;
 			bool			fVertical : 1;
 			bool			fOverflow : 1;
-			bool			fDrawLabel : 1;
-			bool			fShowTeamExpander : 1;
-			bool			fExpandNewTeams : 1;
 
 			float			fDeskbarMenuWidth;
 			TTeamMenuItem*	fPreviousDragTargetItem;

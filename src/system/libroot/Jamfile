@@ -62,6 +62,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			;
 		librootDebugObjects = $(librootDebugObjects:G=$(architecture)) ;
 
+		local librootGuardedObjects =
+			posix_malloc_guarded.o
+			;
+		librootGuardedObjects = $(librootGuardedObjects:G=$(architecture)) ;
+
 		local librootNoDebugObjects =
 			posix_malloc.o
 			;
@@ -69,12 +74,15 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		local libroot = [ MultiArchDefaultGristFiles libroot.so ] ;
 		local librootDebug = $(libroot:B=libroot_debug) ;
+		local librootGuarded = $(libroot:B=libroot_guarded) ;
 
 		DONT_LINK_AGAINST_LIBROOT on $(libroot) = true ;
 		DONT_LINK_AGAINST_LIBROOT on $(librootDebug) = true ;
+		DONT_LINK_AGAINST_LIBROOT on $(librootGuarded) = true ;
 
 		SetVersionScript $(libroot) : libroot_versions ;
 		SetVersionScript $(librootDebug) : libroot_versions ;
+		SetVersionScript $(librootGuarded) : libroot_versions ;
 
 		SharedLibrary $(libroot)
 			:
@@ -100,6 +108,17 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ TargetLibgcc ]
 			;
 
+		HAIKU_SONAME on $(librootGuarded) = libroot.so ;
+
+		SharedLibrary $(librootGuarded)
+			:
+			libroot_init.c
+			:
+			$(librootObjects)
+			$(librootGuardedObjects)
+			[ TargetStaticLibsupc++ ]
+			[ TargetLibgcc ]
+			;
 
 		# Copy libroot.so and update the copy's revision section. We link
 		# everything against the original, but the copy will end up on the disk
@@ -112,12 +131,18 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 				libroot.so : revisioned ] ;
 			local revisionedLibrootDebug
 				= $(librootDebug:G=$(revisionedLibroot:G)) ;
+			local revisionedLibrootGuarded
+				= $(librootGuarded:G=$(revisionedLibroot:G)) ;
 
 			MakeLocate $(revisionedLibroot) : $(targetDir) ;
 			CopySetHaikuRevision $(revisionedLibroot) : $(libroot) ;
 
 			MakeLocate $(revisionedLibrootDebug) : $(targetDir) ;
 			CopySetHaikuRevision $(revisionedLibrootDebug) : $(librootDebug) ;
+
+			MakeLocate $(revisionedLibrootGuarded) : $(targetDir) ;
+			CopySetHaikuRevision $(revisionedLibrootGuarded)
+				: $(librootGuarded) ;
 		}
 	}
 }

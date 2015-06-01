@@ -61,7 +61,7 @@ const float kMinimumTrayWidth = kIconGap
 		+ (kMinimumReplicantCount * kMaxReplicantWidth) + kGutter;
 const float kMinimumTrayHeight = kGutter + kMaxReplicantHeight + kGutter;
 
-extern float sMinimumWindowWidth;
+extern float gMinimumWindowWidth;
 
 #ifdef DB_ADDONS
 struct DeskbarItemInfo {
@@ -211,7 +211,7 @@ public:
 
 	int32 DragRegionLocation() const;
 	void SetDragRegionLocation(int32);
-	
+
 	bool IsDragging() {return IsTracking();}
 
 private:

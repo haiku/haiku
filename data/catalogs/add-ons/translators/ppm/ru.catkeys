@@ -1,4 +1,5 @@
-1	russian	x-vnd.Haiku-PPMTranslator	276252412
+1	russian	x-vnd.Haiku-PPMTranslator	2233502290
+Version %d.%d.%d, %s	PPMTranslator		Версия %d.%d.%d, %s
 PPM Settings	PPMMain		Настройки PPM транслятора
 Based on PPMTranslator sample code	PPMTranslator		Основано на исходном коде PPM транслятора
 OK	PPMMain		ОК
@@ -8,12 +9,12 @@ PPM image	PPMTranslator		PPM изображение
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 бит
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Битмапный формат BeOS (PPM транслятор)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 бита
+Input color space:	PPMTranslator		Входное цветовое пространство:
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 бита
 PPM image translator	PPMTranslator		Транслятор PPM изображений
 bits/space	PPMTranslator		бит/пространство
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 бита (big-endian)
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 бит (big-endian)
-Version %d.%d.%d %s	PPMTranslator		Версия %d.%d.%d %s
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 бит (big-endian)
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 бит
 Write ASCII	PPMTranslator		Записывать в ASCII
@@ -23,7 +24,6 @@ RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 бит (big-endia
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 бит
 Bitmap 1 bit	PPMTranslator		Битмап 1 бит
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 бита (big-endian)
-Input Color Space	PPMTranslator		Исходная палитра цветов
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 бита
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Лицензия 1999, Be Incorporated на использование примеров исходного кода
 PPMTranslator Settings	PPMTranslator		Настройки PPM транслятора

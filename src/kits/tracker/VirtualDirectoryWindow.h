@@ -1,8 +1,9 @@
 /*
- * Copyright 2013 Haiku, Inc. All rights reserved.
+ * Copyright 2013-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  */
 #ifndef VIRTUAL_DIRECTORY_WINDOW_H
@@ -14,6 +15,7 @@
 
 namespace BPrivate {
 
+class VirtualDirectoryPoseView;
 
 class VirtualDirectoryWindow : public BContainerWindow {
 public:
@@ -26,6 +28,8 @@ public:
 										| B_NO_WORKSPACE_ACTIVATION,
 									uint32 workspace = B_CURRENT_WORKSPACE);
 
+	VirtualDirectoryPoseView*	PoseView() const;
+
 protected:
 	virtual	void				CreatePoseView(Model* model);
 	virtual	BPoseView*			NewPoseView(Model* model, uint32 viewMode);
@@ -35,7 +39,6 @@ protected:
 private:
 			typedef BContainerWindow _inherited;
 };
-
 
 } // namespace BPrivate
 

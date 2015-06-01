@@ -8,6 +8,7 @@
  */
 
 
+#include <unicode/uversion.h>
 #include <TimeZone.h>
 
 #include <new>

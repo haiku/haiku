@@ -63,7 +63,7 @@ FileSystemInitializer::FirstTimeInit()
 
 	// prepare the command line arguments
 	char portID[16];
-	snprintf(portID, sizeof(portID), "%ld", port);
+	snprintf(portID, sizeof(portID), "%" B_PRId32, port);
 
 	const char* args[4] = {
 		"/system/servers/userlandfs_server",

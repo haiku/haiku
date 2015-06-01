@@ -1,7 +1,8 @@
-1	russian	x-vnd.Haiku-IMAP	1939688018
+1	russian	x-vnd.Haiku-IMAP	354143849
 Destination:	imap_config		Папка:
 Ok	IMAPFolderConfig		OK
 status	IMAPFolderConfig		статус
+Configure IMAP Folders	imap_config		Настроить папки IMAP
 Cancel	IMAPFolderConfig		Отмена
 Apply	IMAPFolderConfig		Применить
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Запрашиваются IMAP папки, имейте терпение...

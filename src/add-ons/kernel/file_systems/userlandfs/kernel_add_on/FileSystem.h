@@ -81,9 +81,9 @@ public:
 			RequestPortPool*	GetPortPool();
 
 			status_t			Mount(fs_volume* fsVolume, const char* device,
-									ulong flags, const char* parameters,
+									uint32 flags, const char* parameters,
 									Volume** volume);
-//			status_t		 	Initialize(const char* deviceName,
+//			status_t			Initialize(const char* deviceName,
 //									const char* parameters, size_t len);
 			void				VolumeUnmounted(Volume* volume);
 

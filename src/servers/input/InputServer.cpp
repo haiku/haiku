@@ -199,15 +199,10 @@ void
 InputServer::ArgvReceived(int32 argc, char** argv)
 {
 	CALLED();
-	if (2 == argc && (0 == strcmp("-q", argv[1]))) {
+
+	if (argc == 2 && strcmp(argv[1], "-q") == 0) {
 		PRINT(("InputServer::ArgvReceived - Restarting ...\n"));
-		status_t quit_status = B_OK;
-		BMessenger msgr = BMessenger(INPUTSERVER_SIGNATURE, -1, &quit_status);
-		if (B_OK == quit_status) {
-			msgr.SendMessage(B_QUIT_REQUESTED);
-		} else {
-			PRINTERR(("Unable to send Quit message to running InputServer.\n"));
-		}
+		PostMessage(B_QUIT_REQUESTED);
 	}
 }
 

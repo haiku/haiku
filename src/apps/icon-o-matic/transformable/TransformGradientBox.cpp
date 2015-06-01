@@ -33,7 +33,7 @@ TransformGradientBox::TransformGradientBox(CanvasView* view, Gradient* gradient,
 	fGradient(gradient)
 {
 	if (fShape) {
-		fShape->Acquire();
+		fShape->AcquireReference();
 		fShape->AddObserver(this);
 	}
 	if (fGradient) {
@@ -50,7 +50,7 @@ TransformGradientBox::~TransformGradientBox()
 {
 	if (fShape) {
 		fShape->RemoveObserver(this);
-		fShape->Release();
+		fShape->ReleaseReference();
 	}
 	if (fGradient)
 		fGradient->RemoveObserver(this);

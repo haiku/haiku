@@ -101,7 +101,7 @@ public:
 		fMessenger(messenger)
 	{
 	}
-	
+
 	virtual void AuthorizationChanged()
 	{
 		if (fMessenger.IsValid())
@@ -315,7 +315,7 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case B_PACKAGE_UPDATE:
 			// TODO: We should do a more selective update depending on the
-			// "event", "location", and "change count" fields! 
+			// "event", "location", and "change count" fields!
 			_StartRefreshWorker(false);
 			break;
 
@@ -380,14 +380,14 @@ MainWindow::MessageReceived(BMessage* message)
 
 		case MSG_PACKAGE_SELECTED:
 		{
-			BString title;
-			if (message->FindString("title", &title) == B_OK) {
+			BString name;
+			if (message->FindString("name", &name) == B_OK) {
 				BAutolock locker(fModel.Lock());
 				int count = fVisiblePackages.CountItems();
 				for (int i = 0; i < count; i++) {
 					const PackageInfoRef& package
 						= fVisiblePackages.ItemAtFast(i);
-					if (package.Get() != NULL && package->Title() == title) {
+					if (package.Get() != NULL && package->Name() == name) {
 						locker.Unlock();
 						_AdoptPackage(package);
 						break;
@@ -514,9 +514,9 @@ MainWindow::StoreSettings(BMessage& settings) const
 
 		BMessage columnSettings;
 		fPackageListView->SaveState(&columnSettings);
-	
+
 		settings.AddMessage("column settings", &columnSettings);
-	
+
 		settings.AddBool("show featured packages",
 			fModel.ShowFeaturedPackages());
 		settings.AddBool("show available packages",
@@ -660,7 +660,7 @@ MainWindow::_AdoptModel()
 	fPackageListView->Clear();
 	for (int32 i = 0; i < fVisiblePackages.CountItems(); i++) {
 		BAutolock locker(fModel.Lock());
-		
+
 		const PackageInfoRef& package = fVisiblePackages.ItemAtFast(i);
 		fPackageListView->AddPackage(package);
 
@@ -697,7 +697,7 @@ MainWindow::_AdoptPackage(const PackageInfoRef& package)
 	{
 		BAutolock locker(fModel.Lock());
 		fPackageInfoView->SetPackage(package);
-	
+
 		if (fFeaturedPackagesView != NULL)
 			fFeaturedPackagesView->SelectPackage(package);
 		if (fPackageListView != NULL)
@@ -864,7 +864,7 @@ MainWindow::_RefreshPackageList(bool force)
 		if (dynamic_cast<BPackageManager::RemoteRepository*>(repository)
 				!= NULL) {
 			depots[repository->Name()].AddPackage(modelInfo);
-			remotePackages[modelInfo->Title()] = modelInfo;
+			remotePackages[modelInfo->Name()] = modelInfo;
 		} else {
 			if (repository == static_cast<const BSolverRepository*>(
 					manager.SystemRepository())) {
@@ -890,7 +890,7 @@ MainWindow::_RefreshPackageList(bool force)
 		fModel.StopPopulatingAllPackages();
 
 	BAutolock lock(fModel.Lock());
-	
+
 	if (force)
 		fModel.Clear();
 
@@ -1160,13 +1160,13 @@ MainWindow::_RatePackage()
 
 		if (alert == NULL)
 			return;
-		
+
 		int32 choice = alert->Go();
 		if (choice == 1)
 			_OpenLoginWindow(BMessage(MSG_RATE_PACKAGE));
 		return;
 	}
-	
+
 	// TODO: Allow only one RatePackageWindow
 	// TODO: Mechanism for remembering the window frame
 	RatePackageWindow* window = new RatePackageWindow(this,

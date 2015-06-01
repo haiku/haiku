@@ -1,7 +1,9 @@
-1	portuguese (brazil)	x-vnd.Haiku-Pairs	2193803529
+1	portuguese (brazil)	x-vnd.Haiku-Pairs	818003250
 Pairs did not find enough vector icons to start; it needs at least %zu, found %zu.\n	Pairs	Don't translate \"%zu\", but make sure to keep them.	Pares não encontrou ícones vetoriais suficientes para iniciar; necessita ao menos de %zu, encontrou %zu.\n
+%app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tescrito por Ralf Schülke\n\tDireitos autorais 2008-2010, Haiku Inc.\n\n
 Expert (8x8)	PairsWindow		Expert (8x8)
 Beginner (4x4)	PairsWindow		Iniciante (4x4)
+You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Você completou o jogo em {0, plural, um{# clique} outro{# cliques}}.\n
 Quit game	PairsWindow		Sair do jogo
 Large	PairsWindow		Grande
 Small	PairsWindow		Pequeno

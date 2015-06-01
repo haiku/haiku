@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Haiku Inc.
+ * Copyright 2001-2015, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -564,6 +564,13 @@ const char*
 BTextControl::Text() const
 {
 	return fText->Text();
+}
+
+
+int32
+BTextControl::TextLength() const
+{
+	return fText->TextLength();
 }
 
 

@@ -108,6 +108,10 @@ platform_init_video(void)
 	#if defined(BOARD_CPU_ARM920T)
 		extern ArchFramebuffer *arch_get_fb_arm_920(addr_t base);
 		gFramebuffer = arch_get_fb_arm_920(0x88000000);
+	#elif defined(BOARD_CPU_BCM2835) || defined(BOARD_CPU_BCM2836)
+		extern ArchFramebuffer *arch_get_fb_arm_bcm2835(addr_t base);
+		// BCM2835/BCM2836 gets their framebuffer base from a Mailbox
+		gFramebuffer = arch_get_fb_arm_bcm2835(0x0);
 	#elif defined(BOARD_CPU_OMAP3)
 		extern ArchFramebuffer *arch_get_fb_arm_omap3(addr_t base);
 		gFramebuffer = arch_get_fb_arm_omap3(FB_BASE);
@@ -117,10 +121,18 @@ platform_init_video(void)
 	#endif
 #endif
 
-	if (gFramebuffer != NULL) {
-		gFramebuffer->Probe();
-		gFramebuffer->Init();
+	if (gFramebuffer == NULL) {
+		ERROR("No framebuffer device found!\n");
+		return B_ERROR;
 	}
+
+	status_t result = gFramebuffer->Probe();
+	if (result != B_OK)
+		return result;
+
+	gFramebuffer->Init();
+	if (result != B_OK)
+		return result;
 
 	return B_OK;
 }

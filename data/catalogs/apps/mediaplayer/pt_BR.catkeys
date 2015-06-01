@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	98667844
+1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	3890917719
 raw audio	MediaPlayer-InfoWin		áudio não processado
 Location	MediaPlayer-InfoWin		Local
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -91,6 +91,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Iniciar a reprodução a
 Track	Video Track Menu		Faixa
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erro interno (falha ao bloquear). Falha ao salvar a lista de reprodução.
 View options	MediaPlayer-SettingsWindow		Opções de visualização
+none	MediaPlayer-Main		nenhum
 Play mode	MediaPlayer-SettingsWindow		Modo de reprodução
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Remover Entradas
 Video track	MediaPlayer-Main		Faixa de vídeo
@@ -137,8 +138,8 @@ Start media server	MediaPlayer-Main		Iniciar o servidor de mídia
 Toggle fullscreen.	MediaPlayer-Main		Alternar para tela cheia.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Obter a duração do item atualmente em execução em microssegundos.
 ToggleFullscreen	MediaPlayer-Main		Alternar para Tela Cheia
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Estéreo} outros{# Canais}}
 <unnamed>	PlaylistItem-name		<sem nome>
-Open Clips	MediaPlayer-Main		Clipes Abertos
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		nenhum
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obtém/define o volume (0.0-2.0).

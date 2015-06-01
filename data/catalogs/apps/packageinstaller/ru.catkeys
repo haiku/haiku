@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PackageInstaller	199496416
+1	russian	x-vnd.Haiku-PackageInstaller	1413270297
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
@@ -11,7 +11,6 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Обнаружилась несоответствие размера файла в пакете. Этот пакет мог бы быть испорчен или быть измененным после его создания. Вы все еще хотите продолжить?
 Error while installing the package\n	PackageView		Ошибка во время установки пакета\n
 Disclaimer	PackageTextViewer		Заявление об отказе от ответственности
-%.1f GiB	PackageView		%.1f ГБ
 %name% (%size% free)	PackageView		%name% (%size% свободно)
 The installation of the package has been aborted.	PackageView		Установка пакета была прервана.
 Done	PackageInstall		Готово
@@ -29,9 +28,7 @@ Skip all	PackageView		Пропустить все
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Элемент с именем '%s' уже существует по этому пути.\nЗаменить этот файл тем, что находится внутри пакета или пропустить го?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт с именем '%s' уже существует по этому пути.\nЗаменить этот скрипт тем, что находится внутри пакета или пропустить его?
 Running post-installation scripts	PackageInstall		Выполнение постинсталляционных скриптов
-%llu bytes	PackageView		%llu байт
 Skip	PackageView		Пропустить
-%.1f MiB	PackageView		%.1f МБ
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Папка с именем '%s' уже существует по этому пути.\nЗаменить эту папку той, что находится внутри пакета или пропустить ее?
 The package you requested has been successfully installed on your system.	PackageView		Пакет, который вы просили, был успешно установлен на вашей системе.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Ошибка! \"%s\" не является правильным путем.\n
@@ -47,7 +44,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Все существующие файлы будут заменены?
 Continue	PackageInfo		Продолжить
 %index% of %total%	PackageInstall		%index% из %total%
-%.1f KiB	PackageView		%.1f КБ
 Abort	PackageInfo		Прервать
 PackageInstaller	System name		Установщик пакетов
 Abort	PackageInstall		Прервать

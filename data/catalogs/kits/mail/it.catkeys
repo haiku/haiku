@@ -1,10 +1,11 @@
-1	italian	x-vnd.Haiku-libmail	161731481
+1	italian	x-vnd.Haiku-libmail	3450478295
 Partially download messages larger than	ProtocolConfigView		Scaricare parzialmente messaggi di dimensione superiore a
 Password:	ProtocolConfigView		Password:
 Remove mail from server when deleted	ProtocolConfigView		Eliminare i messaggi anche sul server
 Mail server:	ProtocolConfigView		Server di posta:
 Select…	MailKit		Seleziona…
 Connection type:	ProtocolConfigView		Tipo di connessione:
+KB	ProtocolConfigView	kilo byte	KB
 Leave mail on server	ProtocolConfigView		Lasciare i messaggi sul server
 Username:	ProtocolConfigView		Nome utente:
 Login type:	ProtocolConfigView		Tipo Login:

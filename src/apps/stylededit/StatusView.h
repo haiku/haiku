@@ -10,6 +10,7 @@
 #define STATUS_VIEW_H
 
 
+#include <Entry.h>
 #include <String.h>
 #include <View.h>
 
@@ -30,6 +31,7 @@ public:
 							~StatusView();
 
 			void			SetStatus(BMessage* mesage);
+			void			SetRef(const entry_ref& ref);
 	virtual	void			AttachedToWindow();
 	virtual void			GetPreferredSize(float* _width, float* _height);
 	virtual	void			ResizeToPreferred();
@@ -38,6 +40,7 @@ public:
 
 private:
 			void			_ValidatePreferredSize();
+			void			_ShowDirMenu();
 
 private:
 			BScrollView*	fScrollView;
@@ -47,6 +50,7 @@ private:
 			bool			fReadOnly;
 			bool			fCanUnlock;
 			BString			fEncoding;
+			entry_ref		fRef;
 };
 
 #endif  // STATUS_VIEW_H

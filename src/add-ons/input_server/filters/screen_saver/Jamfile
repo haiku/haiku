@@ -4,6 +4,6 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders screen_saver ;
 
-Addon screen_saver : 
-	ScreenSaverFilter.cpp 
+Addon screen_saver :
+	ScreenSaverFilter.cpp
 	: be libscreensaver.so input_server [ TargetLibsupc++ ] ;

@@ -1,6 +1,6 @@
 /*
  * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Mark-Jan Bastian. All rights reserved.
@@ -13,6 +13,7 @@
 
 #include <port.h>
 
+#include <algorithm>
 #include <ctype.h>
 #include <iovec.h>
 #include <stdlib.h>
@@ -71,7 +72,7 @@
 //   always only accessed atomically and updates are done using
 //   atomic_test_and_set(). A port is only seen as existent when its state is
 //   Port::kActive.
-// * Deletion of ports is done in two steps: logical and physical deletion. 
+// * Deletion of ports is done in two steps: logical and physical deletion.
 //   First, logical deletion happens and sets Port::state to Port::kDeleted.
 //   This is an atomic operation and from then on, functions like
 //   get_locked_port() consider this port as deleted and ignore it. Secondly,
@@ -288,6 +289,17 @@ private:
 
 class Read : public AbstractTraceEntry {
 public:
+	Read(const BReference<Port>& portRef, int32 code, ssize_t result)
+		:
+		fID(portRef->id),
+		fReadCount(portRef->read_count),
+		fWriteCount(portRef->write_count),
+		fCode(code),
+		fResult(result)
+	{
+		Initialized();
+	}
+
 	Read(port_id id, int32 readCount, int32 writeCount, int32 code,
 		ssize_t result)
 		:
@@ -348,6 +360,17 @@ private:
 
 class Info : public AbstractTraceEntry {
 public:
+	Info(const BReference<Port>& portRef, int32 code, ssize_t result)
+		:
+		fID(portRef->id),
+		fReadCount(portRef->read_count),
+		fWriteCount(portRef->write_count),
+		fCode(code),
+		fResult(result)
+	{
+		Initialized();
+	}
+
 	Info(port_id id, int32 readCount, int32 writeCount, int32 code,
 		ssize_t result)
 		:
@@ -623,7 +646,7 @@ get_port(port_id id) GCC_2_NRV(portRef)
 #endif
 	ReadLocker portsLocker(sPortsLock);
 	portRef.SetTo(sPorts.Lookup(id));
-	
+
 	return portRef;
 }
 
@@ -743,7 +766,7 @@ copy_port_message(port_message* message, int32* _code, void* buffer,
 	size_t bufferSize, bool userCopy)
 {
 	// check output buffer size
-	size_t size = min_c(bufferSize, message->size);
+	size_t size = std::min(bufferSize, message->size);
 
 	// copy message
 	if (_code != NULL)
@@ -795,7 +818,7 @@ delete_port_logical(Port* port)
 			case Port::kActive:
 				// Logical deletion succesful
 				return B_OK;
-		
+
 			case Port::kDeleted:
 				// Someone else already deleted it in the meantime
 				TRACE(("delete_port_logical: already deleted port_id %ld\n",
@@ -838,12 +861,12 @@ delete_owned_ports(Team* team)
 			// Contains linearization point
 
 		Port* nextPort = (Port*)list_get_next_item(&team->port_list, port);
-		
+
 		if (status == B_OK) {
 			list_remove_link(&port->team_link);
 			list_add_item(&deletionList, port);
 		}
-		
+
 		port = nextPort;
 	}
 
@@ -1076,7 +1099,7 @@ delete_port(port_id id)
 		TRACE(("delete_port: invalid port_id %ld\n", id));
 		return B_BAD_PORT_ID;
 	}
-	
+
 	status_t status = delete_port_logical(portRef);
 		// Contains linearization point
 	if (status != B_OK)
@@ -1201,7 +1224,7 @@ find_port(const char* name)
 	Port* port = sPortsByName.Lookup(name);
 		// Since we have sPortsLock and don't return the port itself,
 		// no BReference necessary
-	
+
 	if (port != NULL && port->state == Port::kActive)
 		return port->id;
 
@@ -1339,7 +1362,7 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 		status_t status = entry.Wait(flags, timeout);
 
 		if (status != B_OK) {
-			T(Info(port, 0, status));
+			T(Info(portRef, 0, status));
 			return status;
 		}
 
@@ -1371,7 +1394,7 @@ _get_port_message_info_etc(port_id id, port_message_info* info,
 	info->sender_group = message->sender_group;
 	info->sender_team = message->sender_team;
 
-	T(Info(id, id->read_count, id->write_count, message->code, B_OK));
+	T(Info(portRef, message->code, B_OK));
 
 	// notify next one, as we haven't read from the port
 	portRef->read_condition.NotifyOne();
@@ -1495,8 +1518,7 @@ read_port_etc(port_id id, int32* _code, void* buffer, size_t bufferSize,
 	portRef->write_condition.NotifyOne();
 		// make one spot in queue available again for write
 
-	T(Read(id, portRef->read_count, portRef->write_count, message->code,
-		min_c(bufferSize, message->size)));
+	T(Read(portRef, message->code, std::min(bufferSize, message->size)));
 
 	locker.Unlock();
 

@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-GIFTranslator	1515001985
+1	english	x-vnd.Haiku-GIFTranslator	2626723192
 Websafe	GIFView		网络安全色
 Write interlaced images	GIFView		写入隔行图像
 Optimal	GIFView		最佳效果
@@ -15,5 +15,4 @@ Use RGB color	GIFView		启用 RGB 颜色
 Use dithering	GIFView		启用抖动
 GIF Settings	GIFTranslator		GIF 设置
 BeOS system	GIFView		BeOS 系统
-v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		自动（从测试频道）

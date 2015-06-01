@@ -8,6 +8,7 @@
  */
 
 
+#include <unicode/uversion.h>
 #include <LocaleRosterData.h>
 
 #include <Autolock.h>

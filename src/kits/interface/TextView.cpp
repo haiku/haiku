@@ -5638,7 +5638,7 @@ BTextView::_ShowContextMenu(BPoint where)
 		.AddItem(TRANSLATE("Paste"), B_PASTE, 'V')
 			.SetEnabled(canEdit && be_clipboard->SystemCount() > 0)
 		.AddSeparator()
-		.AddItem(TRANSLATE("Select All"), B_SELECT_ALL, 'A')
+		.AddItem(TRANSLATE("Select all"), B_SELECT_ALL, 'A')
 			.SetEnabled(!(start == 0 && finish == length))
 	;
 

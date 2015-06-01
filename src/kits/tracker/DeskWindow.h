@@ -83,7 +83,6 @@ private:
 
 	BShelf* fDeskShelf;
 		// shelf for replicant support
-	BPopUpMenu* fTrashContextMenu;
 
 	BRect fOldFrame;
 

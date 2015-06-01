@@ -130,13 +130,13 @@ public:
 
 		if (style) {
 			style->RemoveObserver(this);
-			style->Release();
+			style->ReleaseReference();
 		}
 
 		style = s;
 
 		if (style) {
-			style->Acquire();
+			style->AcquireReference();
 			style->AddObserver(this);
 			UpdateText();
 		}

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libbe	2929679013
+1	finnish	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		gamma
 beta	AboutWindow		beeta
 %3.2f GiB	StringForSize		%3.2f gibitavua
@@ -6,7 +6,7 @@ Written by:	AboutWindow		Tekijä:
 About %app%	AboutMenuItem		Ohjelmasta %app%
 Cut	TextView		Leikkaa
 Version	AboutWindow		Versio
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Ei voida luoda replikanttia kohteelle ”%description”.\n%error
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Ei voida luoda kopiota kohteelle ”%description”.\n%error
 Copy	TextView		Kopioi
 %3.2f KiB	StringForSize		%3.2f kibitavua
 alpha	AboutWindow		alfa
@@ -19,17 +19,17 @@ OK	Dragger		Valmis
 OK	PrintJob		Valmis
 Green:	ColorControl		Vihreä:
 Version history:	AboutWindow		Versiohistoria:
-Remove replicant	Dragger		Poista replikantti
+Remove replicant	Dragger		Poista kopio
+Select all	TextView		Valitse kaikki
 OK	AboutWindow		Valmis
 OK	ZombieReplicantView		Valmis
 Print Server is not responding.	PrintJob		Tulostuspalvelin ei vastaa.
 Paste	TextView		Liitä
 Special Thanks:	AboutWindow		Erityiskiitokset:
 %.2f TiB	StringForSize		%.2f tebitavua
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Ei voi paikallistaa sovellusta replikantille. Sovellusallekirjoitusta ei ole tarjottu.\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Ei voi kotoistaa sovellusta kopiolle. Sovellusallekirjoitusta ei ole tarjottu.\n%error
 Redo	TextView		Tee uudelleen
 <empty>	Menu		<tyhjä>
-Select All	TextView		Valitse kaikki
 Warning	Dragger		Varoitus
 Undo	TextView		Peru
 Red:	ColorControl		Punainen:
@@ -39,4 +39,4 @@ development	AboutWindow		ohjelmakehitys
 Error	ZombieReplicantView		Virhe
 Blue:	ColorControl		Sininen:
 gold master	AboutWindow		gold master
-Can't delete this replicant from its original application. Life goes on.	Dragger		Ei voida poistaa tätä replikanttia sen alkuperäisestä sovelluksesta. Elämä jatkuu.
+Can't delete this replicant from its original application. Life goes on.	Dragger		Ei voida poistaa tätä kopiota sen alkuperäisestä sovelluksesta. Elämä jatkuu.

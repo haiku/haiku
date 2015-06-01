@@ -43,14 +43,12 @@ THE SOFTWARE.
 #include "PrintUtils.h"
 
 
-#include <Box.h>
 #include <Button.h>
-#include <GridView.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <Message.h>
 #include <PopUpMenu.h>
+#include <SeparatorView.h>
 #include <Screen.h>
 #include <TextControl.h>
 
@@ -212,9 +210,6 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	fPDFCompressionSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fPDFCompressionSlider->SetValue(compression);
 
-	BBox *separator = new BBox("separator");
-	separator->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
-
 	BButton *cancel = new BButton("cancel", "Cancel", new BMessage(CANCEL_MSG));
 
 	BButton *ok = new BButton("ok", "OK", new BMessage(OK_MSG));
@@ -227,39 +222,33 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 		"Advanced" B_UTF8_ELLIPSIS,
 		new BMessage(ADVANCED_MSG));
 
-	BGridView* settings = new BGridView();
-	BGridLayout* settingsLayout = settings->GridLayout();
-	settingsLayout->AddItem(fPageSizeMenu->CreateLabelLayoutItem(), 0, 0);
-	settingsLayout->AddItem(fPageSizeMenu->CreateMenuBarLayoutItem(), 1, 0);
-	settingsLayout->AddItem(fOrientationMenu->CreateLabelLayoutItem(), 0, 1);
-	settingsLayout->AddItem(fOrientationMenu->CreateMenuBarLayoutItem(), 1, 1);
-	settingsLayout->AddItem(fPDFCompatibilityMenu->CreateLabelLayoutItem(), 0, 2);
-	settingsLayout->AddItem(fPDFCompatibilityMenu->CreateMenuBarLayoutItem(), 1, 2);
-	settingsLayout->AddView(fPDFCompressionSlider, 0, 3, 2);
-	settingsLayout->SetSpacing(0, 0);
+	float padding = 10;
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.AddGroup(B_HORIZONTAL, 5, 1)
 			.AddGroup(B_VERTICAL, 0, 1.0f)
 				.Add(fMarginView)
-				.AddGlue()
 			.End()
-			.AddGroup(B_VERTICAL, 0, 1.0f)
-				.Add(settings)
-				.AddGlue()
+			.AddGrid(padding, padding / 2)
+				.SetInsets(padding, padding * 2, padding, padding)
+				.Add(fPageSizeMenu->CreateLabelLayoutItem(), 0, 0)
+				.Add(fPageSizeMenu->CreateMenuBarLayoutItem(), 1, 0)
+				.Add(fOrientationMenu->CreateLabelLayoutItem(), 0, 1)
+				.Add(fOrientationMenu->CreateMenuBarLayoutItem(), 1, 1)
+				.Add(fPDFCompatibilityMenu->CreateLabelLayoutItem(), 0, 2)
+				.Add(fPDFCompatibilityMenu->CreateMenuBarLayoutItem(), 1, 2)
+				.Add(fPDFCompressionSlider, 0, 3, 2)
 			.End()
 		.End()
-		.Add(separator)
+		.Add(new BSeparatorView(B_HORIZONTAL, B_FANCY_BORDER))
 		.AddGroup(B_HORIZONTAL, 10, 1.0f)
 			.Add(fontsButton)
 			.Add(advancedButton)
 			.AddGlue()
 			.Add(cancel)
 			.Add(ok)
-		.End()
-		.SetInsets(10, 10, 10, 10)
-	);
+		.End();
 
 	BRect winFrame(Frame());
 	BRect screenFrame(BScreen().Frame());

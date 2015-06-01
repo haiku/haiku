@@ -40,6 +40,8 @@
 #	define TRACE(x) ;
 #endif
 
+#define TRACE_ALWAYS(x) dprintf x
+
 // This macro is used for fatal situations that are acceptable in a running
 // system, like out of memory situations - should only panic for debugging.
 #define FATAL(x) panic x
@@ -1239,7 +1241,7 @@ BlockWriter::_WriteBlock(cached_block* block)
 
 	if (written != (ssize_t)blockSize) {
 		TB(Error(fCache, block->block_number, "write failed", written));
-		FATAL(("could not write back block %" B_PRIdOFF " (%s)\n", block->block_number,
+		TRACE_ALWAYS(("could not write back block %" B_PRIdOFF " (%s)\n", block->block_number,
 			strerror(errno)));
 		if (written < 0)
 			return errno;
@@ -1902,7 +1904,7 @@ retry:
 			cache->RemoveBlock(block);
 			TB(Error(cache, blockNumber, "read failed", bytesRead));
 
-			FATAL(("could not read block %" B_PRIdOFF ": bytesRead: %zd, error: %s\n",
+			TRACE_ALWAYS(("could not read block %" B_PRIdOFF ": bytesRead: %zd, error: %s\n",
 				blockNumber, bytesRead, strerror(errno)));
 			return NULL;
 		}

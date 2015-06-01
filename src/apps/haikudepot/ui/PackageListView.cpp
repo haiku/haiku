@@ -13,6 +13,7 @@
 #include <Catalog.h>
 #include <MessageFormat.h>
 #include <ScrollBar.h>
+#include <StringForSize.h>
 #include <Window.h>
 
 #include "MainWindow.h"
@@ -58,19 +59,21 @@ package_state_to_string(PackageInfoRef ref)
 
 // A field type displaying both a bitmap and a string so that the
 // tree display looks nicer (both text and bitmap are indented)
-// TODO: Code-duplication with DriveSetup PartitionList.h
-class BBitmapStringField : public BStringField {
+class SharedBitmapStringField : public BStringField {
 	typedef BStringField Inherited;
 public:
-								BBitmapStringField(const BBitmap* bitmap,
+								SharedBitmapStringField(SharedBitmap* bitmap,
+									SharedBitmap::Size size,
 									const char* string);
-	virtual						~BBitmapStringField();
+	virtual						~SharedBitmapStringField();
 
-			void				SetBitmap(const BBitmap* bitmap);
+			void				SetBitmap(SharedBitmap* bitmap,
+									SharedBitmap::Size size);
 			const BBitmap*		Bitmap() const
 									{ return fBitmap; }
 
 private:
+			BitmapRef			fReference;
 			const BBitmap*		fBitmap;
 };
 
@@ -89,7 +92,7 @@ private:
 
 
 // BColumn for PackageListView which knows how to render
-// a BBitmapStringField
+// a SharedBitmapStringField
 // TODO: Code-duplication with DriveSetup PartitionList.h
 class PackageColumn : public BTitledColumn {
 	typedef BTitledColumn Inherited;
@@ -130,6 +133,7 @@ public:
 			void				UpdateSummary();
 			void				UpdateState();
 			void				UpdateRating();
+			void				UpdateSize();
 
 private:
 			PackageInfoRef		fPackage;
@@ -163,7 +167,7 @@ public:
 		const PackageInfo& package = *event.Package().Get();
 
 		BMessage message(MSG_UPDATE_PACKAGE);
-		message.AddString("title", package.Title());
+		message.AddString("name", package.Name());
 		message.AddUInt32("changes", event.Changes());
 
 		messenger.SendMessage(&message);
@@ -174,28 +178,30 @@ private:
 };
 
 
-// #pragma mark - BBitmapStringField
+// #pragma mark - SharedBitmapStringField
 
 
-// TODO: Code-duplication with DriveSetup PartitionList.cpp
-BBitmapStringField::BBitmapStringField(const BBitmap* bitmap,
-		const char* string)
+SharedBitmapStringField::SharedBitmapStringField(SharedBitmap* bitmap,
+		SharedBitmap::Size size, const char* string)
 	:
 	Inherited(string),
-	fBitmap(bitmap)
+	fBitmap(NULL)
 {
+	SetBitmap(bitmap, size);
 }
 
 
-BBitmapStringField::~BBitmapStringField()
+SharedBitmapStringField::~SharedBitmapStringField()
 {
 }
 
 
 void
-BBitmapStringField::SetBitmap(const BBitmap* bitmap)
+SharedBitmapStringField::SetBitmap(SharedBitmap* bitmap,
+	SharedBitmap::Size size)
 {
-	fBitmap = bitmap;
+	fReference = bitmap;
+	fBitmap = bitmap != NULL ? bitmap->Bitmap(size) : NULL;
 	// TODO: cause a redraw?
 }
 
@@ -253,8 +259,8 @@ PackageColumn::PackageColumn(const char* title, float width, float minWidth,
 void
 PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 {
-	BBitmapStringField* bitmapField
-		= dynamic_cast<BBitmapStringField*>(field);
+	SharedBitmapStringField* bitmapField
+		= dynamic_cast<SharedBitmapStringField*>(field);
 	BStringField* stringField = dynamic_cast<BStringField*>(field);
 	RatingField* ratingField = dynamic_cast<RatingField*>(field);
 
@@ -382,7 +388,7 @@ PackageColumn::CompareFields(BField* field1, BField* field2)
 	if (stringField1 != NULL && stringField2 != NULL) {
 		// TODO: Locale aware string compare... not too important if
 		// package names are not translated.
-		return strcmp(stringField1->String(), stringField2->String());
+		return strcasecmp(stringField1->String(), stringField2->String());
 	}
 
 	RatingField* ratingField1 = dynamic_cast<RatingField*>(field1);
@@ -402,8 +408,8 @@ PackageColumn::CompareFields(BField* field1, BField* field2)
 float
 PackageColumn::GetPreferredWidth(BField *_field, BView* parent) const
 {
-	BBitmapStringField* bitmapField
-		= dynamic_cast<BBitmapStringField*>(_field);
+	SharedBitmapStringField* bitmapField
+		= dynamic_cast<SharedBitmapStringField*>(_field);
 	BStringField* stringField = dynamic_cast<BStringField*>(_field);
 
 	float parentWidth = Inherited::GetPreferredWidth(_field, parent);
@@ -451,7 +457,7 @@ enum {
 	kTitleColumn,
 	kRatingColumn,
 	kDescriptionColumn,
-//	kSizeColumn,
+	kSizeColumn,
 	kStatusColumn,
 };
 
@@ -479,12 +485,10 @@ PackageRow::PackageRow(const PackageInfoRef& packageRef,
 	UpdateSummary();
 
 	// Size
-	// TODO: Store package size
-//	SetField(new BStringField("0 KiB"), kSizeColumn);
+	UpdateSize();
 
 	// Status
-	SetField(new BStringField(package_state_to_string(fPackage)),
-		kStatusColumn);
+	UpdateState();
 
 	package.AddListener(fPackageListener);
 }
@@ -503,10 +507,8 @@ PackageRow::UpdateTitle()
 	if (fPackage.Get() == NULL)
 		return;
 
-	const BBitmap* icon = NULL;
-	if (fPackage->Icon().Get() != NULL)
-		icon = fPackage->Icon()->Bitmap(SharedBitmap::SIZE_16);
-	SetField(new BBitmapStringField(icon, fPackage->Title()), kTitleColumn);
+	SetField(new SharedBitmapStringField(fPackage->Icon(),
+			SharedBitmap::SIZE_16, fPackage->Title()), kTitleColumn);
 }
 
 
@@ -539,6 +541,22 @@ PackageRow::UpdateRating()
 		return;
 	RatingSummary summary = fPackage->CalculateRatingSummary();
 	SetField(new RatingField(summary.averageRating), kRatingColumn);
+}
+
+
+void
+PackageRow::UpdateSize()
+{
+	if (fPackage.Get() == NULL)
+		return;
+	BString size;
+	if (fPackage->Size() == 0) {
+		size = B_TRANSLATE_CONTEXT("-", "no package size");
+	} else {
+		char buffer[256];
+		size = string_for_size(fPackage->Size(), buffer, sizeof(buffer));
+	}
+	SetField(new BStringField(size), kSizeColumn);
 }
 
 
@@ -640,8 +658,10 @@ PackageListView::PackageListView(BLocker* modelLock)
 		B_TRUNCATE_MIDDLE), kRatingColumn);
 	AddColumn(new PackageColumn(B_TRANSLATE("Description"), 300, 80, 1000,
 		B_TRUNCATE_MIDDLE), kDescriptionColumn);
-//	AddColumn(new PackageColumn(B_TRANSLATE("Size"), 60, 50, 100,
-//		B_TRUNCATE_END), kSizeColumn);
+	PackageColumn* sizeColumn = new PackageColumn(B_TRANSLATE("Size"),
+		60, 50, 100, B_TRUNCATE_END);
+	sizeColumn->SetAlignment(B_ALIGN_RIGHT);
+	AddColumn(sizeColumn, kSizeColumn);
 	AddColumn(new PackageColumn(B_TRANSLATE("Status"), 60, 60, 100,
 		B_TRUNCATE_END), kStatusColumn);
 
@@ -682,22 +702,26 @@ PackageListView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_UPDATE_PACKAGE:
 		{
-			BString title;
+			BString name;
 			uint32 changes;
-			if (message->FindString("title", &title) != B_OK
+			if (message->FindString("name", &name) != B_OK
 				|| message->FindUInt32("changes", &changes) != B_OK) {
 				break;
 			}
 
 			BAutolock _(fModelLock);
-			PackageRow* row = _FindRow(title);
+			PackageRow* row = _FindRow(name);
 			if (row != NULL) {
+				if ((changes & PKG_CHANGED_TITLE) != 0)
+					row->UpdateTitle();
 				if ((changes & PKG_CHANGED_SUMMARY) != 0)
 					row->UpdateSummary();
 				if ((changes & PKG_CHANGED_RATINGS) != 0)
 					row->UpdateRating();
 				if ((changes & PKG_CHANGED_STATE) != 0)
 					row->UpdateState();
+				if ((changes & PKG_CHANGED_SIZE) != 0)
+					row->UpdateSize();
 				if ((changes & PKG_CHANGED_ICON) != 0)
 					row->UpdateTitle();
 			}
@@ -720,7 +744,7 @@ PackageListView::SelectionChanged()
 
 	PackageRow* selected = dynamic_cast<PackageRow*>(CurrentSelection());
 	if (selected != NULL)
-		message.AddString("title", selected->Package()->Title());
+		message.AddString("name", selected->Package()->Name());
 
 	Window()->PostMessage(&message);
 }
@@ -807,17 +831,17 @@ PackageListView::_FindRow(const PackageInfoRef& package, PackageRow* parent)
 
 
 PackageRow*
-PackageListView::_FindRow(const BString& packageTitle, PackageRow* parent)
+PackageListView::_FindRow(const BString& packageName, PackageRow* parent)
 {
 	for (int32 i = CountRows(parent) - 1; i >= 0; i--) {
 		PackageRow* row = dynamic_cast<PackageRow*>(RowAt(i, parent));
 		if (row != NULL && row->Package().Get() != NULL
-			&& row->Package()->Title() == packageTitle) {
+			&& row->Package()->Name() == packageName) {
 			return row;
 		}
 		if (CountRows(row) > 0) {
 			// recurse into child rows
-			row = _FindRow(packageTitle, row);
+			row = _FindRow(packageName, row);
 			if (row != NULL)
 				return row;
 		}

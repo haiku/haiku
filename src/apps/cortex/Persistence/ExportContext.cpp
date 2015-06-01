@@ -179,7 +179,6 @@ void ExportContext::beginContent() {
 \
 	writeString(out);
 
-#if B_BEOS_VERSION > B_BEOS_VERSION_4_5
 void ExportContext::writeAttr(
 	const char*									key,
 	int8												value) {_WRITE_ATTR_BODY(value)}
@@ -195,7 +194,6 @@ void ExportContext::writeAttr(
 void ExportContext::writeAttr(
 	const char*									key,
 	uint16											value) {_WRITE_ATTR_BODY(uint32(value))}
-#endif
 
 void ExportContext::writeAttr(
 	const char*									key,

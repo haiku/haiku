@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-PackageInstaller	199496416
+1	lithuanian	x-vnd.Haiku-PackageInstaller	1413270297
 Install to:	PackageView		Diegti į:
 OK	PackageView		Gerai
 Accept	PackageTextViewer		Priimti
@@ -11,7 +11,6 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Panašu, kad failų dydžiai pakete nesutampa. Paketas gali būti sugadintas arba pakeistas po to, kai buvo sukurtas. Ar vis dar norite tęsti?
 Error while installing the package\n	PackageView		Klaida diegiant paketą\n
 Disclaimer	PackageTextViewer		Atsakomybės išsižadėjimas
-%.1f GiB	PackageView		%.1f GiB
 %name% (%size% free)	PackageView		%name% (laisva %size%)
 The installation of the package has been aborted.	PackageView		Paketo diegimas nutrauktas.
 Done	PackageInstall		Atlikta
@@ -29,9 +28,7 @@ Skip all	PackageView		Praleisti visus
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Objektas vardu „%s“ duotąjame kelyje jau yra.\nPakeisti objektą esančiu šiame pakete, ar palikti esamą?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Scenarijus vardu „%s“ duotąjame kelyje jau yra.\nPakeisti scenarijų esančiu šiame pakete, ar palikti esamą?
 Running post-installation scripts	PackageInstall		Vykdomi podiegiminiai scenarijai.
-%llu bytes	PackageView		%llu B
 Skip	PackageView		Praleisti
-%.1f MiB	PackageView		%.1f MiB
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Aplankas vardu „%s“ duotąjame kelyje jau yra.\nPakeisti aplanką esančiu šiame pakete, ar palikti esamą?
 The package you requested has been successfully installed on your system.	PackageView		Nurodytas paketas sėkmingai įdiegtas šiame kompiuteryje.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Klaida! „%s“ nėra galimas kelias.\n
@@ -47,7 +44,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Ar tikrai norite praleisti visus jau egzistuojančius failus?
 Continue	PackageInfo		Tęsti
 %index% of %total%	PackageInstall		%index% iš %total%
-%.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		Nutraukti
 PackageInstaller	System name		Paketų diegyklė
 Abort	PackageInstall		Nutraukti

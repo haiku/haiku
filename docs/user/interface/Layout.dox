@@ -80,7 +80,7 @@ topLayout->AddItem(nestedLayoutWithView);
 	BLayoutItem's and does not have a target BView.
 
 	\warning Because a new BLayout does not have a target BView, calls to the
-		AddItem() and AddView() will fail methods will fail.
+		AddItem() and AddView() methods will fail.
 
 	\since Haiku R1
 */
@@ -166,10 +166,10 @@ topLayout->AddItem(nestedLayoutWithView);
 
 	\a child is added to this BLayout's target view.
 
-	\returns The BLayoutItem created to represent \a child is, or \c NULL if
-		there was an error.
+	\returns The BLayoutItem created to represent \a child, or \c NULL if there
+		was an error.
 
-	\param child The BView to be added to this BLayout. 
+	\param child The BView to be added to this BLayout.
 
 	\since Haiku R1
 */

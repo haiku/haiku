@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-GIFTranslator	2972541280
+1	romanian	x-vnd.Haiku-GIFTranslator	4084262487
 Websafe	GIFView		Web în siguranță
 Write interlaced images	GIFView		Scrie imagini îmbinate
 Optimal	GIFView		Optim
@@ -13,5 +13,4 @@ Use RGB color	GIFView		Utilizează culoare RGB
 Use dithering	GIFView		Utilizează vibrație
 GIF Settings	GIFTranslator		Configurări GIF
 BeOS system	GIFView		Sistem BeOS
-v%d.%d.%d %s	GIFView		v%d.%d.%d %s
 Automatic (from alpha channel)	GIFView		Automat (de la canalul alfa)

@@ -87,7 +87,7 @@ public:
 			fPath.Append("/");
 		fPath.Append(entry->Name());
 	}
-	
+
 	inline const BString& EntryPath() const
 	{
 		return fPath;
@@ -213,11 +213,11 @@ public:
 	{
 		return B_OK;
 	}
-	
+
 	virtual void HandleErrorOccurred()
 	{
 	}
-	
+
 private:
 	BOutlineListView*		fListView;
 
@@ -241,12 +241,12 @@ PackageContentsView::PackageContentsView(const char* name)
 	BView("package_contents_view", B_WILL_DRAW),
 	fPackageLock("package contents populator lock")
 {
-	fContentListView = new BOutlineListView("content list view", 
+	fContentListView = new BOutlineListView("content list view",
 		B_SINGLE_SELECTION_LIST);
-	
-	BScrollView* scrollView = new CustomScrollView("contents scroll view", 
+
+	BScrollView* scrollView = new CustomScrollView("contents scroll view",
 		fContentListView);
-															
+
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollView, 1.0f)
 		.SetInsets(0.0f, -1.0f, -1.0f, -1.0f)
@@ -287,7 +287,7 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 		return;
 
 //	printf("PackageContentsView::SetPackage(%s)\n",
-//		package.Get() != NULL ? package->Title().String() : "NULL");
+//		package.Get() != NULL ? package->Name().String() : "NULL");
 
 	Clear();
 
@@ -299,7 +299,7 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 }
 
 
-void 
+void
 PackageContentsView::Clear()
 {
 	{

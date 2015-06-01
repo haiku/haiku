@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-PSDTranslator	489719358
+1	polish	x-vnd.Haiku-PSDTranslator	1706619436
 Lab	PSDLoader		Lab
 Uncompressed	PSDConfig		brak
 Indexed	PSDLoader		Indeksowany
@@ -8,10 +8,8 @@ Photoshop image translator	PSDTranslator		Translator obrazów Photoshopa
 Version %d.%d.%d, %s	PSDConfig		Wersja %d.%d.%d, %s
 Photoshop image	PSDTranslator		Obrazy Photoshop
 RLE	PSDConfig		RLE
-Photoshop Document (PSD File)	PSDConfig		Obraz programu Photoshop (plik PSD)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Obraz programu Photoshop (%s)
-Photoshop Big Document (PSB File)	PSDConfig		Duży obraz programu Photoshop (plik PSB)
 PSDTranslator Settings	PSDConfig		Ustawienia PSDTranslatora
 RGB	PSDLoader		RGB
 Bitmap	PSDLoader		Mapa bitowa

@@ -85,17 +85,13 @@ typedef std::map<BString, TTeamMenuItem*> TeamMenuItemMap;
 //	#pragma mark - TExpandoMenuBar
 
 
-TExpandoMenuBar::TExpandoMenuBar(const char* name, TBarView* barView,
-	bool vertical)
+TExpandoMenuBar::TExpandoMenuBar(TBarView* barView, bool vertical)
 	:
-	BMenuBar(BRect(0, 0, 0, 0), name, B_FOLLOW_NONE,
+	BMenuBar(BRect(0, 0, 0, 0), "ExpandoMenuBar", B_FOLLOW_NONE,
 		vertical ? B_ITEMS_IN_COLUMN : B_ITEMS_IN_ROW),
 	fBarView(barView),
 	fVertical(vertical),
 	fOverflow(false),
-	fDrawLabel(!static_cast<TBarApp*>(be_app)->Settings()->hideLabels),
-	fShowTeamExpander(static_cast<TBarApp*>(be_app)->Settings()->superExpando),
-	fExpandNewTeams(static_cast<TBarApp*>(be_app)->Settings()->expandNewTeams),
 	fDeskbarMenuWidth(kMinMenuItemWidth),
 	fPreviousDragTargetItem(NULL),
 	fLastMousedOverItem(NULL),
@@ -304,7 +300,7 @@ TExpandoMenuBar::MouseDown(BPoint where)
 	}
 
 	// check if within expander bounds to expand window items
-	if (fVertical && fShowTeamExpander
+	if (fVertical && static_cast<TBarApp*>(be_app)->Settings()->superExpando
 		&& item->ExpanderBounds().Contains(where)) {
 		// start the animation here, finish on mouse up
 		fLastClickedItem = item;
@@ -369,7 +365,7 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 					// expando mode window menu item
 					fLastMousedOverItem = menuItem;
 					if (strcasecmp(windowMenuItem->TruncatedLabel(),
-						windowMenuItem->Label()) > 0) {
+							windowMenuItem->Label()) > 0) {
 						// label is truncated, set tooltip
 						SetToolTip(windowMenuItem->Label());
 					} else
@@ -467,13 +463,17 @@ TExpandoMenuBar::BuildItems()
 
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
-	fDrawLabel = !settings->hideLabels;
-	fShowTeamExpander = settings->superExpando;
-	fExpandNewTeams = settings->expandNewTeams;
 
-	float itemWidth = fVertical ? Frame().Width()
-		: iconSize + (fDrawLabel ? sMinimumWindowWidth - kMinimumIconSize
-			: kIconPadding * 2);
+	float itemWidth = -1.0f;
+	if (fVertical)
+		itemWidth = Frame().Width();
+	else {
+		itemWidth = iconSize;
+		if (!settings->hideLabels)
+			itemWidth += gMinimumWindowWidth - kMinimumIconSize;
+		else
+			itemWidth += kIconPadding * 2;
+	}
 	float itemHeight = -1.0f;
 
 	TeamMenuItemMap items;
@@ -535,7 +535,7 @@ TExpandoMenuBar::BuildItems()
 			}
 
 			// unexpand if turn off show team expander
-			if (fVertical && !fShowTeamExpander && item->IsExpanded())
+			if (fVertical && !settings->superExpando && item->IsExpanded())
 				item->ToggleExpandState(false);
 
 			if (hasWindowItems) {
@@ -611,12 +611,19 @@ void
 TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	char* signature)
 {
-	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
+	desk_settings* settings = static_cast<TBarApp*>(be_app)->Settings();
 
-	float itemWidth = fVertical ? Frame().Width()
-		: iconSize + (fDrawLabel ? sMinimumWindowWidth - kMinimumIconSize
-			: kIconPadding * 2);
+	float itemWidth = -1.0f;
+	if (fVertical)
+		itemWidth = fBarView->Bounds().Width();
+	else {
+		itemWidth = iconSize;
+		if (!settings->hideLabels)
+			itemWidth += gMinimumWindowWidth - kMinimumIconSize;
+		else
+			itemWidth += kIconPadding * 2;
+	}
 	float itemHeight = -1.0f;
 
 	TTeamMenuItem* item = new TTeamMenuItem(team, icon, name, signature,
@@ -652,7 +659,7 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 	} else
 		AddItem(item);
 
-	if (fShowTeamExpander && fExpandNewTeams)
+	if (fVertical && settings->superExpando && settings->expandNewTeams)
 		item->ToggleExpandState(false);
 
 	SizeWindow(1);
@@ -727,15 +734,17 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 	if (fBarView->Vertical())
 		return;
 
+	bool drawLabels = !static_cast<TBarApp*>(be_app)->Settings()->hideLabels;
+
 	float maxWidth = fBarView->DragRegion()->Frame().left
 		- fDeskbarMenuWidth - kSepItemWidth;
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 	float iconOnlyWidth = kIconPadding + iconSize + kIconPadding;
-	float minItemWidth = fDrawLabel
+	float minItemWidth = drawLabels
 		? iconOnlyWidth + kMinMenuItemWidth
 		: iconOnlyWidth - kIconPadding;
-	float maxItemWidth = fDrawLabel
-		? sMinimumWindowWidth + iconSize - kMinimumIconSize
+	float maxItemWidth = drawLabels
+		? gMinimumWindowWidth + iconSize - kMinimumIconSize
 		: iconOnlyWidth;
 	float menuWidth = maxItemWidth * CountItems() + fDeskbarMenuWidth
 		+ kSepItemWidth;
@@ -864,7 +873,7 @@ TExpandoMenuBar::CheckForSizeOverrun()
 
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 	float iconOnlyWidth = kIconPadding + iconSize + kIconPadding;
-	float minItemWidth = fDrawLabel
+	float minItemWidth = !static_cast<TBarApp*>(be_app)->Settings()->hideLabels
 		? iconOnlyWidth + kMinMenuItemWidth
 		: iconOnlyWidth - kIconPadding;
 	float menuWidth = minItemWidth * CountItems() + fDeskbarMenuWidth
@@ -880,11 +889,11 @@ void
 TExpandoMenuBar::SetMaxItemWidth()
 {
 	if (fVertical)
-		SetMaxContentWidth(sMinimumWindowWidth);
+		SetMaxContentWidth(gMinimumWindowWidth);
 	else {
 		// Make more room for the icon in horizontal mode
 		int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
-		SetMaxContentWidth(sMinimumWindowWidth + iconSize
+		SetMaxContentWidth(gMinimumWindowWidth + iconSize
 			- kMinimumIconSize);
 	}
 }

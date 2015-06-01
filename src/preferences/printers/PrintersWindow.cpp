@@ -15,9 +15,11 @@
 #include <Application.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <FindDirectory.h>
 #include <GroupLayout.h>
 #include <Layout.h>
+#include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
 #include <PrintJob.h>
@@ -94,7 +96,7 @@ TestPageWindow::MessageReceived(BMessage* message)
 PrintersWindow::PrintersWindow(BRect frame)
 	:
 	BWindow(BRect(78, 71, 761, 509), B_TRANSLATE_SYSTEM_NAME("Printers"),
-		B_TITLED_WINDOW, 0),
+		B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
 	fSelectedPrinter(NULL),
 	fAddingPrinter(false)
 {
@@ -281,83 +283,34 @@ PrintersWindow::UpdateJob(SpoolFolder* folder, Job* job)
 void
 PrintersWindow::_BuildGUI()
 {
-	const float boxInset = 10.0;
-	BRect r(Bounds());
-
-// ------------------------ First of all, create a nice grey backdrop
-	BBox * backdrop = new BBox(Bounds(), "backdrop", B_FOLLOW_ALL_SIDES,
-						B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP,
-						B_PLAIN_BORDER);
-	AddChild(backdrop);
-
 // ------------------------ Next, build the printers overview box
-	BBox* printersBox = new BBox(BRect(boxInset, boxInset,
-		r.Width() - boxInset, (r.Height()/2) - (boxInset/2)),
-		"printersBox", B_FOLLOW_ALL);
+	BBox* printersBox = new BBox("printersBox");
 	printersBox->SetFont(be_bold_font);
 	printersBox->SetLabel(B_TRANSLATE("Printers"));
-	backdrop->AddChild(printersBox);
-
-		// Width of largest button
-	float maxWidth = 0;
 
 		// Add Button
-	BButton* addButton = new BButton(BRect(5,5,5,5), "add",
-		B_TRANSLATE("Add …"), new BMessage(kMsgAddPrinter), B_FOLLOW_RIGHT);
-	printersBox->AddChild(addButton);
-	addButton->ResizeToPreferred();
-
-	maxWidth = addButton->Bounds().Width();
+	BButton* addButton = new BButton("add",
+		B_TRANSLATE("Add" B_UTF8_ELLIPSIS), new BMessage(kMsgAddPrinter));
+	addButton->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 		// Remove button
-	fRemove = new BButton(BRect(5,30,5,30), "remove",
-		B_TRANSLATE("Remove"), new BMessage(kMsgRemovePrinter),
-		B_FOLLOW_RIGHT);
-	printersBox->AddChild(fRemove);
-	fRemove->ResizeToPreferred();
-
-	if (fRemove->Bounds().Width() > maxWidth)
-		maxWidth = fRemove->Bounds().Width();
+	fRemove = new BButton("remove",
+		B_TRANSLATE("Remove"), new BMessage(kMsgRemovePrinter));
+	fRemove->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 		// Make Default button
-	fMakeDefault = new BButton(BRect(5,60,5,60), "default",
-		B_TRANSLATE("Make default"), new BMessage(kMsgMakeDefaultPrinter),
-		B_FOLLOW_RIGHT);
-	printersBox->AddChild(fMakeDefault);
-	fMakeDefault->ResizeToPreferred();
-
-	if (fMakeDefault->Bounds().Width() > maxWidth)
-		maxWidth = fMakeDefault->Bounds().Width();
+	fMakeDefault = new BButton("default",
+		B_TRANSLATE("Make default"), new BMessage(kMsgMakeDefaultPrinter));
+	fMakeDefault->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 		// Print Test Page button
-	fPrintTestPage = new BButton(BRect(5,60,5,60), "print_test_page",
-		B_TRANSLATE("Print test page"), new BMessage(kMsgPrintTestPage),
-		B_FOLLOW_RIGHT);
-	printersBox->AddChild(fPrintTestPage);
-	fPrintTestPage->ResizeToPreferred();
-
-	if (fPrintTestPage->Bounds().Width() > maxWidth)
-		maxWidth = fPrintTestPage->Bounds().Width();
-
-
-		// Resize all buttons to maximum width and align them to the right
-	float xPos = printersBox->Bounds().Width() - boxInset - maxWidth;
-	addButton->MoveTo(xPos, boxInset + 8);
-	addButton->ResizeTo(maxWidth, addButton->Bounds().Height());
-
-	fRemove->MoveTo(xPos,
-		boxInset + addButton->Bounds().Height() + boxInset + 8);
-	fRemove->ResizeTo(maxWidth, fRemove->Bounds().Height());
-
-	fMakeDefault->MoveTo(xPos, boxInset + addButton->Bounds().Height() +
-		boxInset + fRemove->Bounds().Height() + boxInset + 8);
-	fMakeDefault->ResizeTo(maxWidth, fMakeDefault->Bounds().Height());
-
-	fPrintTestPage->MoveTo(xPos, boxInset + addButton->Bounds().Height() +
-		boxInset + fRemove->Bounds().Height() +
-		boxInset + fMakeDefault->Bounds().Height() + boxInset + 8);
-	fPrintTestPage->ResizeTo(maxWidth, fPrintTestPage->Bounds().Height());
-
+	fPrintTestPage = new BButton("print_test_page",
+		B_TRANSLATE("Print test page"), new BMessage(kMsgPrintTestPage));
+	fPrintTestPage->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 		// Disable all selection-based buttons
 	fRemove->SetEnabled(false);
@@ -365,72 +318,72 @@ PrintersWindow::_BuildGUI()
 	fPrintTestPage->SetEnabled(false);
 
 		// Create listview with scroller
-	BRect listBounds(boxInset, boxInset + 8,
-		fMakeDefault->Frame().left - boxInset - B_V_SCROLL_BAR_WIDTH,
-		printersBox->Bounds().Height()- boxInset - 3);
-	fPrinterListView = new PrinterListView(listBounds);
+	fPrinterListView = new PrinterListView(BRect());
 	BScrollView* pscroller = new BScrollView("printer_scroller", fPrinterListView,
 		B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_FANCY_BORDER);
-	printersBox->AddChild(pscroller);
+
+	float padding = be_control_look->DefaultItemSpacing();
+
+	BLayoutBuilder::Group<>(printersBox, B_HORIZONTAL, padding)
+		.SetInsets(padding, padding * 2, padding, padding)
+		.Add(pscroller)
+		.AddGroup(B_VERTICAL, padding / 2, 0.0f)
+			.SetInsets(0)
+			.Add(addButton)
+			.Add(fRemove)
+			.Add(fMakeDefault)
+			.Add(fPrintTestPage)
+			.AddGlue();
 
 // ------------------------ Lastly, build the jobs overview box
-	fJobsBox = new BBox(BRect(boxInset, r.Height() / 2 + boxInset / 2,
-		Bounds().Width() - 10, Bounds().Height() - boxInset), "jobsBox",
-		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
+	fJobsBox = new BBox("jobsBox");
 	fJobsBox->SetFont(be_bold_font);
 	fJobsBox->SetLabel(B_TRANSLATE("Print jobs: No printer selected"));
-	backdrop->AddChild(fJobsBox);
 
 		// Cancel Job Button
-	BButton* cancelButton = new BButton(BRect(5, 5, 5, 5), "cancel",
-		B_TRANSLATE("Cancel job"), new BMessage(kMsgCancelJob),
-		B_FOLLOW_RIGHT+B_FOLLOW_TOP);
-	fJobsBox->AddChild(cancelButton);
-	cancelButton->ResizeToPreferred();
-	fCancel = cancelButton;
-
-	maxWidth = cancelButton->Bounds().Width();
+	fCancel = new BButton("cancel",
+		B_TRANSLATE("Cancel job"), new BMessage(kMsgCancelJob));
+	fCancel->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 		// Restart Job button
-	BButton* restartButton = new BButton(BRect(5, 30, 5, 30), "restart",
-		B_TRANSLATE("Restart job"), new BMessage(kMsgRestartJob),
-		B_FOLLOW_RIGHT | B_FOLLOW_TOP);
-	fJobsBox->AddChild(restartButton);
-	restartButton->ResizeToPreferred();
-	fRestart = restartButton;
-
-	if (restartButton->Bounds().Width() > maxWidth)
-		maxWidth = restartButton->Bounds().Width();
-
-		// Resize all buttons to maximum width and align them to the right
-	xPos = fJobsBox->Bounds().Width() - boxInset - maxWidth;
-	cancelButton->MoveTo(xPos, boxInset + 8);
-	cancelButton->ResizeTo(maxWidth, cancelButton->Bounds().Height());
-
-	restartButton->MoveTo(xPos, boxInset + cancelButton->Bounds().Height()
-		+ boxInset + 8);
-	restartButton->ResizeTo(maxWidth, restartButton->Bounds().Height());
+	fRestart = new BButton("restart",
+		B_TRANSLATE("Restart job"), new BMessage(kMsgRestartJob));
+	fRestart->SetExplicitMaxSize(
+		BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 		// Disable all selection-based buttons
-	cancelButton->SetEnabled(false);
-	restartButton->SetEnabled(false);
+	fCancel->SetEnabled(false);
+	fRestart->SetEnabled(false);
 
 		// Create listview with scroller
-	listBounds = BRect(boxInset, boxInset + 8,
-		cancelButton->Frame().left - boxInset - B_V_SCROLL_BAR_WIDTH,
-		fJobsBox->Bounds().Height() - boxInset - 3);
-	fJobListView = new JobListView(listBounds);
+	fJobListView = new JobListView(BRect());
 	BScrollView* jscroller = new BScrollView("jobs_scroller", fJobListView,
 		B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_FANCY_BORDER);
-	fJobsBox->AddChild(jscroller);
 
-		// Determine min width
-	float width = (jscroller->Bounds().Width() < pscroller->Bounds().Width())
-		? jscroller->Bounds().Width() : pscroller->Bounds().Width();
+	BLayoutBuilder::Group<>(fJobsBox, B_HORIZONTAL, padding)
+		.SetInsets(padding, padding * 2, padding, padding)
+		.Add(jscroller)
+		.AddGroup(B_VERTICAL, padding / 2, 0.0f)
+			.SetInsets(0)
+			.Add(fCancel)
+			.Add(fRestart)
+			.AddGlue();
 
-		// Resize boxes to the same size
-	jscroller->ResizeTo(width, jscroller->Bounds().Height());
-	pscroller->ResizeTo(width, pscroller->Bounds().Height());
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(printersBox)
+		.AddStrut(B_USE_DEFAULT_SPACING)
+		.Add(fJobsBox);
+
+		// There is a better solution?
+	Layout(true);
+	if (fPrintTestPage->Bounds().Width() > fRestart->Bounds().Width())
+		fRestart->SetExplicitMinSize(
+			BSize(fPrintTestPage->Bounds().Width(), B_SIZE_UNSET));
+	else
+		fPrintTestPage->SetExplicitMinSize(
+			BSize(fRestart->Bounds().Width(), B_SIZE_UNSET));
 }
 
 

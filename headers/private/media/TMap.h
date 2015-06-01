@@ -57,7 +57,7 @@ public:
 		return true;
 	}
 	
-	bool Get(const key &k, value **v)
+	bool Get(const key &k, value **v) const
 	{
 	 	for (int i = 0; i < item_count; i++) {
 	 		if (items[i]->k == k) {
@@ -75,7 +75,7 @@ public:
 		return false;
 	}
 	
-	int Find(const value &v) 
+	int Find(const value &v) const
 	{
 		for (int i = 0; i < item_count; i++)
 			if (items[i]->v == v)
@@ -83,7 +83,7 @@ public:
 		return -1;
 	}
 
-	bool Has(const key &k) 
+	bool Has(const key &k) const
 	{
 		for (int i = 0; i < item_count; i++)
 			if (items[i]->k == k)
@@ -91,12 +91,12 @@ public:
 		return false;
 	}
 	
-	int CountItems()
+	int CountItems() const
 	{
 		return item_count;
 	}
 	
-	bool IsEmpty()
+	bool IsEmpty() const
 	{
 		return item_count == 0;
 	}
@@ -136,7 +136,7 @@ public:
 	}
 
 private:	
-	bool _Get(int32 index, value **v)
+	bool _Get(int32 index, value **v) const
 	{
 		if (index < 0 || index >= item_count)
 			return false;

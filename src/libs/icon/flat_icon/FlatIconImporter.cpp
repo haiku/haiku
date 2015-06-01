@@ -238,7 +238,7 @@ _ReadGradientStyle(LittleEndianBuffer& buffer)
 
 		if (!buffer.Read(stopOffset))
 			return NULL;
-		
+
 		if (alpha) {
 			if (gray) {
 				if (!buffer.Read(color.red)

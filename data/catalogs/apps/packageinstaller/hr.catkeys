@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-PackageInstaller	3253212490
+1	croatian	x-vnd.Haiku-PackageInstaller	172019075
 Install to:	PackageView		Instaliraj u:
 OK	PackageView		U redu
 Accept	PackageTextViewer		Prihvati
@@ -11,7 +11,6 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Izgleda da se veličina paketa ne podudara u datoteci paketa. Paket je moža oštećen ili je možda bio pomijenjen nakon što je kreiran. Želite li ipak nastaviti?
 Error while installing the package\n	PackageView		Greška tijekom instalacije paketa\n
 Disclaimer	PackageTextViewer		Izjava o odricanju
-%.1f GiB	PackageView		%.1f GiB
 The installation of the package has been aborted.	PackageView		Instalacija paketa je prekinuta.
 Done	PackageInstall		Izvršeno
 All existing files will be replaced?	PackageView		Sve postojeće datoteke će biti zamijenjene?
@@ -27,9 +26,7 @@ Skip all	PackageView		Preskoči sve
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Stavka po imenu '%s' već postoji u zadanoj putanji.\nZamijeni stavku sa onom iz paketa ili preskoči?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skripta  po imenu '%s' već postoji u zadanoj putanji.\nZamijeni skriptu sa onom iz paketa ili preskoči?
 Running post-installation scripts	PackageInstall		Pokretanje post-instalacijskih skripti
-%llu bytes	PackageView		%llu byte-a
 Skip	PackageView		Preskoči
-%.1f MiB	PackageView		%.1f MiB
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Direktorij po imenu '%s' već postoji u zadanoj putanji.\nZamijeni direktorij sa onim iz paketa ili preskoči?
 The package you requested has been successfully installed on your system.	PackageView		Traženi paket je uspješno instaliran u vaš sustav.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Greška! \"%s\" nije ispravna putanja.\n
@@ -44,7 +41,6 @@ Decline	PackageTextViewer		Odbij
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Paket po imenu '%s' već postoji u zadanoj putanji.\nZamijeni paket sa onim iz paketa ili preskoči?
 All existing files will be skipped?	PackageView		Sve postojeće datoteke će biti preskočene?
 Continue	PackageInfo		Nastavi
-%.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		Prekini
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Prekini

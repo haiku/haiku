@@ -223,6 +223,12 @@ Style::SetGradient(const ::Gradient* gradient)
 #endif
 		delete[] fColors;
 		delete[] fGammaCorrectedColors;
+#ifdef ICON_O_MATIC
+		if (fGradient != NULL)
+			fGradient->ReleaseReference();
+#else
+		delete fGradient;
+#endif
 		fColors = NULL;
 		fGammaCorrectedColors = NULL;
 		fGradient = NULL;

@@ -35,6 +35,7 @@ void _call_atexit_hooks_for_range(addr_t start, addr_t size);
 void __init_env(const struct user_space_program_args *args);
 status_t __init_heap(void);
 void __init_heap_post_env(void);
+void __heap_terminate_after(void);
 
 void __init_time(addr_t commPageTable);
 void __arch_init_time(struct real_time_data *data, bool setDefaults);
@@ -43,6 +44,8 @@ bigtime_t __get_system_time_offset();
 void __init_pwd_backend(void);
 void __reinit_pwd_backend_after_fork(void);
 void* __arch_get_caller(void);
+int32 __arch_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
+	int32 skipFrames, addr_t stackBase, addr_t stackEnd);
 
 void __set_stack_protection(void);
 

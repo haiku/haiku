@@ -1,36 +1,37 @@
 /*
- * ice1712 BeOS/Haiku Driver for VIA - VT1712 Multi Channel Audio Controller
+ * Copyright 2004-2015 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
- * Copyright (c) 2002, Jerome Duval		(jerome.duval@free.fr)
- * Copyright (c) 2003, Marcus Overhagen	(marcus@overhagen.de)
- * Copyright (c) 2007, Jerome Leveque	(leveque.jerome@neuf.fr)
- *
- * All rights reserved
- * Distributed under the terms of the MIT license.
+ * Authors:
+ *		Jérôme Duval, jerome.duval@free.fr
+ *		Marcus Overhagen, marcus@overhagen.de
+ *		Jérôme Lévêque, leveque.jerome@gmail.com
  */
+
+
 #ifndef _DEBUG_ICE1712_H_
 #define _DEBUG_ICE1712_H_
 
-#ifdef TRACE
-#	undef TRACE
-#endif
-
 //#define ICE1712_VERBOSE
 #ifdef ICE1712_VERBOSE
-#	define TRACE(a...) dprintf("\33[34mice1712:\33[0m " a)
+#	define ITRACE(a...) dprintf("ice1712: " a)
 #else
-#	define TRACE(a...) ;
+#	define ITRACE(a...) (void)0
 #endif
 
 //#define ICE1712_VERY_VERBOSE
 #ifdef ICE1712_VERY_VERBOSE
-#	define TRACE_VV(a...) dprintf("\33[34mice1712:\33[0m " a)
+#	define ITRACE_VV(a...) ITRACE(a)
 #else
-#	define TRACE_VV(a...) ;
+#	define ITRACE_VV(a...) (void)0
 #endif
 
-#define ASSERT(a) if (a) {} else TRACE("ASSERT failed! file = %s, line = %d\n",\
-	__FILE__,__LINE__)
-	
+#undef ASSERT
+#if DEBUG > 0
+	#define ASSERT(a)		if (a) {} else \
+		dprintf("ASSERT failed! file = %s, line = %d\n",__FILE__,__LINE__)
+#else
+	#define ASSERT(a)	((void)(0))
+#endif
 
 #endif // _DEBUG_ICE1712_H_

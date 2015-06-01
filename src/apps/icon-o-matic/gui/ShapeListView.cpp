@@ -76,13 +76,13 @@ public:
 
 		if (shape) {
 			shape->RemoveObserver(this);
-			shape->Release();
+			shape->ReleaseReference();
 		}
 
 		shape = s;
 
 		if (shape) {
-			shape->Acquire();
+			shape->AcquireReference();
 			shape->AddObserver(this);
 			UpdateText();
 		}

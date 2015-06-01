@@ -73,7 +73,8 @@ dlist_realloc(nspace *vol, uint32 allocate)
 {
 	ino_t *vnid_list;
 
-	DPRINTF(0, ("dlist_realloc %lx -> %lx\n", vol->dlist.allocated, allocate));
+	DPRINTF(0, ("dlist_realloc %" B_PRIu32 " -> %" B_PRIu32 "\n",
+		vol->dlist.allocated, allocate));
 
 	ASSERT(allocate != vol->dlist.allocated);
 	ASSERT(allocate > vol->dlist.entries);
@@ -96,7 +97,7 @@ dlist_realloc(nspace *vol, uint32 allocate)
 status_t
 dlist_add(nspace *vol, ino_t vnid)
 {
-	DPRINTF(0, ("dlist_add vnid %Lx\n", vnid));
+	DPRINTF(0, ("dlist_add vnid %" B_PRIdINO "\n", vnid));
 
 	ASSERT(IS_DIR_CLUSTER_VNID(vnid) || IS_ARTIFICIAL_VNID(vnid));
 	ASSERT(vnid != 0);
@@ -117,7 +118,7 @@ dlist_remove(nspace *vol, ino_t vnid)
 {
 	uint32 i;
 
-	DPRINTF(0, ("dlist_remove vnid %Lx\n", vnid));
+	DPRINTF(0, ("dlist_remove vnid %" B_PRIdINO "\n", vnid));
 
 	for (i=0;i<vol->dlist.entries;i++)
 		if (vol->dlist.vnid_list[i] == vnid)
@@ -141,7 +142,7 @@ dlist_find(nspace *vol, uint32 cluster)
 {
 	uint32 i;
 
-	DPRINTF(1, ("dlist_find cluster %lx\n", cluster));
+	DPRINTF(1, ("dlist_find cluster %" B_PRIu32 "\n", cluster));
 
 	ASSERT(((cluster >= 2) && (cluster < vol->total_clusters + 2)) || (cluster == 1));
 
@@ -155,7 +156,7 @@ dlist_find(nspace *vol, uint32 cluster)
 			return vol->dlist.vnid_list[i];
 	}
 
-	DPRINTF(1, ("dlist_find cluster %lx not found\n", cluster));
+	DPRINTF(1, ("dlist_find cluster %" B_PRIu32 " not found\n", cluster));
 
 	return -1LL;
 }
@@ -166,11 +167,13 @@ dlist_dump(nspace *vol)
 {
 	uint32 i;
 
-	dprintf("%lx/%lx dlist entries filled, QUANTUM = %x\n",
+	dprintf("%" B_PRIu32 "/%" B_PRIu32 " dlist entries filled, QUANTUM = %u\n",
 		vol->dlist.entries, vol->dlist.allocated, DLIST_ENTRY_QUANTUM);
 
-	for (i = 0; i < vol->dlist.entries; i++)
-		dprintf("%s %Lx", ((i == 0) ? "entries:" : ","), vol->dlist.vnid_list[i]);
+	for (i = 0; i < vol->dlist.entries; i++) {
+		dprintf("%s %" B_PRIdINO, i == 0 ? "entries:" : ",",
+			vol->dlist.vnid_list[i]);
+	}
 
 	dprintf("\n");
 }

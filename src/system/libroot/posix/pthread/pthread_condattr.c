@@ -23,6 +23,7 @@ pthread_condattr_init(pthread_condattr_t *_condAttr)
 		return B_NO_MEMORY;
 
 	attr->process_shared = false;
+	attr->clock_id = CLOCK_REALTIME;
 
 	*_condAttr = attr;
 	return B_OK;
@@ -71,3 +72,29 @@ pthread_condattr_setpshared(pthread_condattr_t *_condAttr, int processShared)
 	return B_OK;
 }
 
+
+int
+pthread_condattr_getclock(const pthread_condattr_t *_condAttr, clockid_t *_clockID)
+{
+	pthread_condattr *attr;
+
+	if (_condAttr == NULL || (attr = *_condAttr) == NULL || _clockID == NULL)
+		return B_BAD_VALUE;
+
+	*_clockID = attr->clock_id;
+	return B_OK;
+}
+
+
+int
+pthread_condattr_setclock(pthread_condattr_t *_condAttr, clockid_t clockID)
+{
+	pthread_condattr *attr;
+
+	if (_condAttr == NULL || (attr = *_condAttr) == NULL
+		|| (clockID != CLOCK_REALTIME && clockID != CLOCK_MONOTONIC))
+		return B_BAD_VALUE;
+
+	attr->clock_id = clockID;
+	return B_OK;
+}

@@ -93,8 +93,14 @@ rule BuildCoffLoader {
 
 actions BuildCoffLoader bind HACK_COFF {
 	rm -f $(1)
-	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O $(COFF_FORMAT) $(2) $(1)
+	# get the address of the COFF entry
+	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O symbolsrec $(2) $(2).syms
+	EP=`grep _coff_start $(2).syms | tr -d '\r' | cut -d'$' -f2`
+	rm -f $(2).syms
+	# copy to XCOFF format and patch the entry point
+	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -O $(COFF_FORMAT) --set-start="0x${EP}" $(2) $(1)
 	#$(CP) $(2) $(1)
+	# fill-in some fields objcopy missed
 	$(HACK_COFF) $(1)
 }
 

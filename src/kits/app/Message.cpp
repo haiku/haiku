@@ -913,6 +913,8 @@ BMessage::SendReply(BMessage* reply, BMessenger replyTo, bigtime_t timeout)
 	BMessenger::Private messengerPrivate(messenger);
 	messengerPrivate.SetTo(fHeader->reply_team, fHeader->reply_port,
 		fHeader->reply_target);
+	if ((fHeader->flags & MESSAGE_FLAG_REPLY_AS_KMESSAGE) != 0)
+		reply->fHeader->flags |= MESSAGE_FLAG_REPLY_AS_KMESSAGE;
 
 	if ((fHeader->flags & MESSAGE_FLAG_REPLY_REQUIRED) != 0) {
 		if ((fHeader->flags & MESSAGE_FLAG_REPLY_DONE) != 0)
@@ -923,11 +925,9 @@ BMessage::SendReply(BMessage* reply, BMessenger replyTo, bigtime_t timeout)
 		status_t result = messenger.SendMessage(reply, replyTo, timeout);
 		reply->fHeader->flags &= ~MESSAGE_FLAG_IS_REPLY;
 
-		if (result != B_OK) {
-			if (set_port_owner(messengerPrivate.Port(),
+		if (result != B_OK && set_port_owner(messengerPrivate.Port(),
 				messengerPrivate.Team()) == B_BAD_TEAM_ID) {
-				delete_port(messengerPrivate.Port());
-			}
+			delete_port(messengerPrivate.Port());
 		}
 
 		return result;
@@ -993,7 +993,8 @@ BMessage::SendReply(BMessage* reply, BMessage* replyToReply,
 		return B_BAD_REPLY;
 
 	reply->AddMessage("_previous_", this);
-	reply->fHeader->flags |= MESSAGE_FLAG_IS_REPLY;
+	reply->fHeader->flags |= MESSAGE_FLAG_IS_REPLY
+		| (fHeader->flags & MESSAGE_FLAG_REPLY_AS_KMESSAGE);
 	status_t result = messenger.SendMessage(reply, replyToReply, sendTimeout,
 		replyTimeout);
 	reply->fHeader->flags &= ~MESSAGE_FLAG_IS_REPLY;
@@ -2164,6 +2165,13 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 			header->message_area = transfered;
 		}
 #endif
+	} else if ((fHeader->flags & MESSAGE_FLAG_REPLY_AS_KMESSAGE) != 0) {
+		KMessage toMessage;
+		result = BPrivate::MessageAdapter::ConvertToKMessage(this, toMessage);
+		if (result != B_OK)
+			return result;
+
+		return toMessage.SendTo(port, token);
 	} else {
 		size = FlattenedSize();
 		buffer = (char*)malloc(size);

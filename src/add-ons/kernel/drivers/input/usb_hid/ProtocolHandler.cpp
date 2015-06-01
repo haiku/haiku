@@ -124,6 +124,9 @@ ProtocolHandler::Open(uint32 flags, uint32 *cookie)
 status_t
 ProtocolHandler::Close(uint32 *cookie)
 {
+	*cookie |= PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED;
+		// This lets the handlers know that this user is gone.
+
 	return fDevice->Close(this);
 }
 

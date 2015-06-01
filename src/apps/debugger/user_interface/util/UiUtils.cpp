@@ -1,6 +1,6 @@
 /*
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -70,7 +70,7 @@ UiUtils::VariantToString(const BVariant& value, char* buffer,
 	switch (value.Type()) {
 		case B_FLOAT_TYPE:
 		case B_DOUBLE_TYPE:
-			snprintf(buffer, bufferSize, "%g", value.ToDouble());
+			snprintf(buffer, bufferSize, "%.3g", value.ToDouble());
 			break;
 		case B_INT8_TYPE:
 		case B_UINT8_TYPE:
@@ -484,4 +484,78 @@ UiUtils::TypeCodeToString(type_code type)
 		default:
 			return "unknown";
 	}
+}
+
+
+template<typename T>
+T GetSIMDValueAtOffset(char* data, int32 index)
+{
+	return ((T*)data)[index];
+}
+
+
+static int32 GetSIMDFormatByteSize(uint32 format)
+{
+	switch (format) {
+		case SIMD_RENDER_FORMAT_INT8:
+			return sizeof(char);
+		case SIMD_RENDER_FORMAT_INT16:
+			return sizeof(int16);
+		case SIMD_RENDER_FORMAT_INT32:
+			return sizeof(int32);
+		case SIMD_RENDER_FORMAT_INT64:
+			return sizeof(int64);
+		case SIMD_RENDER_FORMAT_FLOAT:
+			return sizeof(float);
+		case SIMD_RENDER_FORMAT_DOUBLE:
+			return sizeof(double);
+	}
+
+	return 0;
+}
+
+
+/*static*/
+const BString&
+UiUtils::FormatSIMDValue(const BVariant& value, uint32 bitSize,
+	uint32 format, BString& _output)
+{
+	_output.SetTo("{");
+	char* data = (char*)value.ToPointer();
+	uint32 count = bitSize / (GetSIMDFormatByteSize(format) * 8);
+	for (uint32 i = 0; i < count; i ++) {
+		BString temp;
+		switch (format) {
+			case SIMD_RENDER_FORMAT_INT8:
+				temp.SetToFormat("%#" B_PRIx8,
+					GetSIMDValueAtOffset<uint8>(data, i));
+				break;
+			case SIMD_RENDER_FORMAT_INT16:
+				temp.SetToFormat("%#" B_PRIx16,
+					GetSIMDValueAtOffset<uint16>(data, i));
+				break;
+			case SIMD_RENDER_FORMAT_INT32:
+				temp.SetToFormat("%#" B_PRIx32,
+					GetSIMDValueAtOffset<uint32>(data, i));
+				break;
+			case SIMD_RENDER_FORMAT_INT64:
+				temp.SetToFormat("%#" B_PRIx64,
+					GetSIMDValueAtOffset<uint64>(data, i));
+				break;
+			case SIMD_RENDER_FORMAT_FLOAT:
+				temp.SetToFormat("%.3g",
+					(double)GetSIMDValueAtOffset<float>(data, i));
+				break;
+			case SIMD_RENDER_FORMAT_DOUBLE:
+				temp.SetToFormat("%.3g",
+					GetSIMDValueAtOffset<double>(data, i));
+				break;
+		}
+		_output += temp;
+		if (i < count - 1)
+			_output += ", ";
+	}
+	_output += "}";
+
+	return _output;
 }

@@ -198,7 +198,6 @@ Application Icon-O-Matic :
 	Selection.cpp
 
 	# generic/support
-	Referenceable.cpp
 	RWLocker.cpp
 	support.cpp
 	support_ui.cpp

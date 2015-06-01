@@ -617,6 +617,8 @@ BTwoDimensionalLayout::CompoundLayouter::CompoundLayouter(
 
 BTwoDimensionalLayout::CompoundLayouter::~CompoundLayouter()
 {
+	delete fLayouter;
+	delete fLayoutInfo;
 }
 
 

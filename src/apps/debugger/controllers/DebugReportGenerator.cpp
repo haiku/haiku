@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -589,9 +589,16 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BFile& _output,
 		reg = fArchitecture->Registers() + i;
 		state->GetRegisterValue(reg, value);
 
-		char buffer[64];
-		data.SetToFormat("\t\t\t%5s:\t%s\n", reg->Name(),
-			UiUtils::VariantToString(value, buffer, sizeof(buffer)));
+		if (reg->Format() == REGISTER_FORMAT_SIMD) {
+			data.SetToFormat("\t\t\t%5s:\t%s\n", reg->Name(),
+				UiUtils::FormatSIMDValue(value, reg->BitSize(),
+					SIMD_RENDER_FORMAT_INT16, data).String());
+		} else {
+			char buffer[64];
+			data.SetToFormat("\t\t\t%5s:\t%s\n", reg->Name(),
+				UiUtils::VariantToString(value, buffer, sizeof(buffer)));
+		}
+
 		WRITE_AND_CHECK(_output, data);
 	}
 

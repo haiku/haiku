@@ -180,7 +180,7 @@ StyleContainer::_MakeEmpty()
 		Style* style = StyleAtFast(i);
 #ifdef ICON_O_MATIC
 		_NotifyStyleRemoved(style);
-		style->Release();
+		style->ReleaseReference();
 #else
 		delete style;
 #endif

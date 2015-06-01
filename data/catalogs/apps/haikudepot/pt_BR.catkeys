@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	1567356868
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	3134988464
 Name	PackageListView		Nome
 Available packages	MainWindow		Pacotes disponíveis
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
@@ -19,6 +19,7 @@ Depot:	FilterView		Depósito:
 Description	PackageListView		Descrição
 Install	PackageManager		Instalar
 Source packages	MainWindow		Pacotes fonte
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Autenticação falhou. O usuário não existe ou uma senha errada foi fornecida.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Conta criada com sucesso. Você pode agora classificar pacotes e fazer outras coisas úteis.
 Tools	MainWindow		Ferramentas
 HaikuDepot	System name		Depósito Haiku
@@ -34,11 +35,21 @@ An error occurred while initializing the package manager: %message%	MainWindow		
 Email address:	UserLoginWindow		Endereço de e-mail:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Sua classificação foi enviada com sucesso. Você pode atualizá-la ou removê-la a qualquer tempo para classificar o pacote novamente.
 Very unstable	RatePackageWindow		Muito instável
+<Package contents not available for remote packages>	PackageContentsView		<Conteúdos de pacote não disponíveis para pacotes remotos>
 The username is already taken. Please choose another.	UserLoginWindow		Este nome de usuário já pertence a alguém. Escolha outro, por favor.
 Close	PackageManager		Fechar
+Not logged in	MainWindow		Não autenticado
+The authentication was successful.	UserLoginWindow		A autenticação foi bem sucedida.
+Installed packages	MainWindow		Pacotes instalados
 Status	PackageListView		Estado
+Switch account…	MainWindow		Alternar conta…
+Ignore	UserLoginWindow		Ignorar
+Language	UserLoginWindow		Idioma
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		A senha é muito fraca ou inválida. Por favor, utilize ao menos 8 caracteres com pelo menos 2 números e 2 letras maiúsculas.
+Rate package	RatePackageWindow		Avaliar pacote…
 Development	Model		Desenvolvimento
 Fatal error	PackageManager		Erro fatal
+The user name needs to be at least 3 letters long.	UserLoginWindow		O nome de usuário precisa ter pelo menos 3 letras.
 Log in	UserLoginWindow		Entrar
 Repeat pass phrase:	UserLoginWindow		Repita a frase secreta:
 Ratings	PackageInfoView		Classificações
@@ -67,7 +78,16 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 It was not possible to contact the web service.	RatePackageWindow		Não é possível contatar o serviço web.
 Only featured packages	MainWindow		Apenas pacotes em destaque
 There are problems in the form:\n\n	UserLoginWindow		Existem problemas no formulário:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		O pacote não foi encontrado pelo serviço web. Isto provavelmente significa que veio de um depósito que não foi rastreado lá. Avaliar tais pacotes infelizmente não é suportado.
+Create account	UserLoginWindow		Criar conta
 Productivity	Model		Produtividade
+No, quit HaikuDepot	App		Não, fechar Depósito Haiku
+Authentication failed	UserLoginWindow		A autenticação falhou
+Logged in as %User%	MainWindow		Autenticado como %User%
+Language	RatePackageWindow		Idioma
+Failed to create or update rating: %s\n	RatePackageWindow		Falha ao criar ou atualizar classificação: %s\n
+You need to be logged into an account before you can rate packages.	MainWindow		Você precisa estar autenticado em uma conta antes de poder classificar pacotes.
+ It responded with: 	RatePackageWindow		 Ele respondeu com: 
 User name:	UserLoginWindow		Nome do usuário:
 User Menu	MainWindow		Menu do Usuário
 Unstable but usable	RatePackageWindow		Instável mas utilizável
@@ -83,11 +103,21 @@ Preferred language:	UserLoginWindow		Idioma preferido:
 Failed to rate package	RatePackageWindow		Falhou ao avaliar pacote
 Internet & Network	Model		Internet & Rede
 Cancel	MainWindow		Cancelar
+Quit HaikuDepot	App		Fechar o Depósito Haiku
+Input validation	UserLoginWindow		Validação de entrada
+Update	RatePackageWindow		Atualizar
 Video	Model		Vídeo
+All categories	FilterView		Todas as categorias
+Contents	PackageInfoView		Conteúdo
 An error occurred while refreshing the repository: %error%	MainWindow		Ocorreu um erro ao atualizar o repositório: %error%
+Try again	App		Tente novamente
+Login or Create account	MainWindow		Autenticar-se ou Criar conta
 Pending…	PackageListView		Pendente…
 Depot	FilterView		Depósito
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, um{# item} outro{# itens}}
+OK	PackageInfoView		OK
 Uninstalled	PackageListView		Não instalado
+Show	MainWindow		Exibir
 Stable	RatePackageWindow		Estável
 Unknown	PackageListView		Desconhecido
 All depots	FilterView		Todos os depósitos
@@ -101,7 +131,14 @@ n/a	PackageInfoView		n/a
 If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Se não fornecer um endereço de e-mail, você não será capaz de redefinir sua senha se esquecê-la.
  It responded with: 	UserLoginWindow		 Ele respondeu com: 
 Authentication failed. Connection to the service failed.	UserLoginWindow		Autenticação falhou. Conexão ao serviço falhou.
+Cancel	RatePackageWindow		Cancelar
+Package action failed	PackageInfoView		Ação do pacote falhou
 Send	RatePackageWindow		Enviar
+Failed to create account	UserLoginWindow		Falhou ao criar conta
+There are problems with the data you entered:\n\n	UserLoginWindow		Existem problemas com os dados que você inseriu:\n\n
+Featured packages	MainWindow		Pacotes em destaque
+Start package daemon	App		Iniciar daemon de pacote
+Success	RatePackageWindow		Sucesso
 Business	Model		Negócios
 Audio	Model		Áudio
 About	PackageInfoView		Sobre

@@ -1,17 +1,24 @@
 SubDir HAIKU_TOP src system libroot posix malloc_debug ;
 
-UsePrivateHeaders libroot shared ;
+UsePrivateHeaders libroot shared runtime_loader ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
+		if $(architecture) != x86_gcc2 {
+			SubDirC++Flags -std=gnu++11 ;
+		}
+
 		UsePrivateSystemHeaders ;
 
 		MergeObject <$(architecture)>posix_malloc_debug.o :
-			#guarded_heap.cpp
 			heap.cpp
+			;
+
+		MergeObject <$(architecture)>posix_malloc_guarded.o :
+			guarded_heap.cpp
 			;
 	}
 }

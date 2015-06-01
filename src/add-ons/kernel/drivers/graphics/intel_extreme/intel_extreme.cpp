@@ -93,23 +93,63 @@ intel_interrupt_handler(void* data)
 
 		// TODO: verify that these aren't actually the same
 		bool hasPCH = info.device_type.HasPlatformControlHub();
-		uint16 mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA
-			: INTERRUPT_VBLANK_PIPEA;
-		if ((identity & mask) != 0) {
-			handled = release_vblank_sem(info);
+		uint16 mask;
 
-			// make sure we'll get another one of those
-			write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
-				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-		}
+		// Intel changed the PCH register mapping between Sandy Bridge and the
+		// later generations (Ivy Bridge and up).
+		if (info.device_type.InFamily(INTEL_TYPE_SNB)) {
+			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA_SNB
+				: INTERRUPT_VBLANK_PIPEA;
+			if ((identity & mask) != 0) {
+				handled = release_vblank_sem(info);
 
-		mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEB : INTERRUPT_VBLANK_PIPEB;
-		if ((identity & mask) != 0) {
-			handled = release_vblank_sem(info);
+				// make sure we'll get another one of those
+				write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
+					DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+			}
 
-			// make sure we'll get another one of those
-			write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
-				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEB_SNB
+				: INTERRUPT_VBLANK_PIPEB;
+			if ((identity & mask) != 0) {
+				handled = release_vblank_sem(info);
+
+				// make sure we'll get another one of those
+				write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
+					DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+			}
+		} else {
+			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA
+				: INTERRUPT_VBLANK_PIPEA;
+			if ((identity & mask) != 0) {
+				handled = release_vblank_sem(info);
+
+				// make sure we'll get another one of those
+				write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
+					DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+			}
+
+			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEB
+				: INTERRUPT_VBLANK_PIPEB;
+			if ((identity & mask) != 0) {
+				handled = release_vblank_sem(info);
+
+				// make sure we'll get another one of those
+				write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
+					DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+			}
+
+#if 0
+			// FIXME we don't have supprot for the 3rd pipe yet
+			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEC
+				: 0;
+			if ((identity & mask) != 0) {
+				handled = release_vblank_sem(info);
+
+				// make sure we'll get another one of those
+				write32(info, INTEL_DISPLAY_C_PIPE_STATUS,
+					DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+			}
+#endif
 		}
 
 		// setting the bit clears it!

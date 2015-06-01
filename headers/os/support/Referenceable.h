@@ -60,7 +60,6 @@ public:
 		SetTo(other.Get());
 	}
 
-	
 	template<typename OtherType>
 	BReference(const BReference<OtherType>& other)
 		:

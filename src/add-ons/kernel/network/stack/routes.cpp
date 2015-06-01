@@ -323,6 +323,7 @@ list_routes(net_domain_private* domain, void* buffer, size_t size)
 	RecursiveLocker _(domain->lock);
 
 	RouteList::Iterator iterator = domain->routes.GetIterator();
+	const size_t kBaseSize = IF_NAMESIZE + sizeof(route_entry);
 	size_t spaceLeft = size;
 
 	sockaddr zeros;
@@ -333,7 +334,7 @@ list_routes(net_domain_private* domain, void* buffer, size_t size)
 	while (iterator.HasNext()) {
 		net_route* route = iterator.Next();
 
-		size = IF_NAMESIZE + sizeof(route_entry);
+		size = kBaseSize;
 
 		sockaddr* destination = NULL;
 		sockaddr* mask = NULL;
@@ -360,6 +361,8 @@ list_routes(net_domain_private* domain, void* buffer, size_t size)
 			return ENOBUFS;
 
 		ifreq request;
+		memset(&request, 0, sizeof(request));
+
 		strlcpy(request.ifr_name, route->interface_address->interface->name,
 			IF_NAMESIZE);
 		request.ifr_route.destination = destination;
@@ -369,7 +372,7 @@ list_routes(net_domain_private* domain, void* buffer, size_t size)
 		request.ifr_route.flags = route->flags;
 
 		// copy data into userland buffer
-		if (user_memcpy(buffer, &request, size) < B_OK
+		if (user_memcpy(buffer, &request, kBaseSize) < B_OK
 			|| (route->destination != NULL
 				&& user_memcpy(request.ifr_route.destination,
 					route->destination, route->destination->sa_len) < B_OK)

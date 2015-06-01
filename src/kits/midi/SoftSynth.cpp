@@ -116,14 +116,6 @@ BSoftSynth::SetDefaultInstrumentsFile()
 		}
 	}
 
-	// fall back to the old default
-	// softsynth (big_synth.sy)
-	// TODO: Remove this
-	if (find_directory(B_SYNTH_DIRECTORY, &path, false, NULL) == B_OK) {
-		path.Append(B_BIG_SYNTH_FILE);
-		return SetInstrumentsFile(path.Path());
-	}
-
 	// TODO: Use the first soundfont found in the synth directory
 	// instead of hardcoding
 	if (find_directory(B_SYNTH_DIRECTORY, &path, false, NULL) == B_OK) {

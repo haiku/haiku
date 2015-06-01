@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-JPEGTranslator	965709535
+1	japanese	x-vnd.Haiku-JPEGTranslator	3788699631
 Output quality	JPEGTranslator		出力品質
 JPEG images	JPEGTranslator		JPEG イメージ
 Prevent colors 'washing out'	JPEGTranslator		色が 'washing out' されないようにする
@@ -15,6 +15,7 @@ Output smoothing strength	JPEGTranslator		スムージング強度
 High	JPEGTranslator		高い
 Write	JPEGTranslator		書き出し
 Write black-and-white images as RGB24	JPEGTranslator		モノクロイメージをRGB24として書き出す
+Version %d.%d.%d	JPEGTranslator		バージョン %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		グレースケールイメージをRGB32として読み込む
 Read	JPEGTranslator		読み取り
 JPEG Library Warning: %s\n	be_jerror		JPEG ライブラリの警告: %s\n

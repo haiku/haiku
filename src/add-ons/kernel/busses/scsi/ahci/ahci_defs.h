@@ -94,8 +94,9 @@ typedef struct {
 	uint32		sact;			// Serial ATA Active (SCR3: SActive) **RW1**
 	uint32		ci;				// Command Issue **RW1**
 	uint32		sntf;			// SNotification
-	uint32		res2;			// Reserved for FIS-based Switching Definition
-	uint32		res[11];		// Reserved
+	uint32		fbs;			// FIS-based Switching Control
+	uint32		devslp;			// Device Sleep
+	uint32		res[10];		// Reserved
 	uint32		vendor[4];		// Vendor Specific
 } _PACKED ahci_port;
 
@@ -151,6 +152,43 @@ enum {
 };
 
 
+enum {
+	PORT_FBS_DWE_SHIFT		= 16,	// Device With Error
+	PORT_FBS_DWE_MASK 		= 0xf,
+	PORT_FBS_ADO_SHIFT		= 12,	// Active Device Optimization
+	PORT_FBS_ADO_MASK 		= 0xf,
+	PORT_FBS_DEV_SHIFT		= 8,	// Device To Issue
+	PORT_FBS_DEV_MASK 		= 0xf,
+	PORT_FBS_SDE			= 0x04,	// Single Device Error
+	PORT_FBS_DEC			= 0x02,	// Device Error Clear
+	PORT_FBS_EN				= 0x01,	// Enable
+};
+
+
+enum {
+	PORT_DEVSLP_DM_SHIFT	= 25,	// DITO Multiplier
+	PORT_DEVSLP_DM_MASK 	= 0xf,
+	PORT_DEVSLP_DITO_SHIFT	= 15,	// Device Sleep Idle Timeout
+	PORT_DEVSLP_DITO_MASK	= 0x3ff,
+	PORT_DEVSLP_MDAT_SHIFT	= 10,	// Minimum Device Sleep Assertion Time
+	PORT_DEVSLP_MDAT_MASK	= 0x1f,
+	PORT_DEVSLP_DETO_SHIFT	= 2,	// Device Sleep Exit Timeout
+	PORT_DEVSLP_DETO_MASK	= 0xff,
+	PORT_DEVSLP_DSP			= 0x02,	// Device Sleep Present
+	PORT_DEVSLP_ADSE		= 0x01,	// Aggressive Device Sleep Enable
+};
+
+
+enum {
+	CAP2_DESO 		= (1 << 5),		// DevSleep Entrance from Slumber Only
+	CAP2_SADM 		= (1 << 4),		// Supports Aggressive Device Sleep Management
+	CAP2_SDS 		= (1 << 3), 	// Supports Device Sleep
+	CAP2_APST 		= (1 << 2),		// Automatic Partial to Slumber Transitions
+	CAP2_NVMP 		= (1 << 1),		// NVMHCI Present
+	CAP2_BOH 		= (1 << 0), 	// BIOS/OS Handoff
+};
+
+
 typedef struct {
 	uint32		cap;			// Host Capabilities
 	uint32		ghc;			// Global Host Control
@@ -161,7 +199,9 @@ typedef struct {
 	uint32		ccc_ports;		// Command Completion Coalsecing Ports
 	uint32		em_loc;			// Enclosure Management Location
 	uint32		em_ctl;			// Enclosure Management Control
-	uint32		res[31];		// Reserved
+	uint32		cap2;			// Host Capabilities Extended
+	uint32		bohc;			// BIOS/OS Handoff Control and Status
+	uint32		res[29];		// Reserved
 	uint32		vendor[24];		// Vendor Specific registers
 	ahci_port	port[32];
 } _PACKED ahci_hba;

@@ -1,6 +1,7 @@
-1	russian	x-vnd.Haiku-JPEG2000Translator	547915409
+1	russian	x-vnd.Haiku-JPEG2000Translator	3265915643
 Write	JPEG2000Translator		Запись
 JPEG2000 images	JPEG2000Translator		JPEG2000 изображения
+Version %d.%d.%d	JPEG2000Translator		Версия %d.%d.%d
 Output only codestream (.jpc)	JPEG2000Translator		Выводить только поток кодов (.jpc)
 Write black-and-white images as RGB24	JPEG2000Translator		Записывать черно-белые изображения как RGB24
 Output quality	JPEG2000Translator		Качество вывода

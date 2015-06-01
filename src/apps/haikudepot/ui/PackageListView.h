@@ -38,7 +38,7 @@ public:
 private:
 			PackageRow*			_FindRow(const PackageInfoRef& package,
 									PackageRow* parent = NULL);
-			PackageRow*			_FindRow(const BString& packageTitle,
+			PackageRow*			_FindRow(const BString& packageName,
 									PackageRow* parent = NULL);
 
 private:

@@ -98,7 +98,6 @@ static const char* kGPLv2 = B_TRANSLATE_MARK("GNU GPL v2");
 static const char* kGPLv3 = B_TRANSLATE_MARK("GNU GPL v3");
 static const char* kLGPLv2 = B_TRANSLATE_MARK("GNU LGPL v2");
 static const char* kLGPLv21 = B_TRANSLATE_MARK("GNU LGPL v2.1");
-static const char* kMITNoPromotion = B_TRANSLATE_MARK("MIT (no promotion)");
 static const char* kPublicDomain = B_TRANSLATE_MARK("Public Domain");
 #ifdef __INTEL__
 static const char* kIntel2xxxFirmware = B_TRANSLATE_MARK("Intel (2xxx firmware)");
@@ -593,6 +592,12 @@ AboutView::AboutView()
 
 AboutView::~AboutView()
 {
+	for (PackageCreditMap::iterator it = fPackageCredits.begin();
+		it != fPackageCredits.end(); it++) {
+
+		delete it->second;
+	}
+
 	delete fScrollRunner;
 }
 
@@ -866,8 +871,8 @@ AboutView::_CreateCreditsView()
 		"\n\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kLinkBlue);
-	fCreditsView->InsertHyperText("http://www.haiku-os.org",
-		new URLAction("http://www.haiku-os.org"));
+	fCreditsView->InsertHyperText("https://www.haiku-os.org",
+		new URLAction("https://www.haiku-os.org"));
 	fCreditsView->Insert("\n\n");
 
 	font.SetSize(be_bold_font->Size());
@@ -886,10 +891,16 @@ AboutView::_CreateCreditsView()
 	fCreditsView->Insert(kPastMaintainers);
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
-	fCreditsView->Insert(B_TRANSLATE("Website, marketing & documentation:\n"));
+	fCreditsView->Insert(B_TRANSLATE("Website & marketing:\n"));
 
 	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
 	fCreditsView->Insert(kWebsiteTeam);
+
+	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
+	fCreditsView->Insert(B_TRANSLATE("Past website & marketing:\n"));
+
+	fCreditsView->SetFontAndColor(be_plain_font, B_FONT_ALL, &kDarkGrey);
+	fCreditsView->Insert(kPastWebsiteTeam);
 
 	fCreditsView->SetFontAndColor(&font, B_FONT_ALL, &kHaikuOrange);
 	fCreditsView->Insert(B_TRANSLATE("Contributors:\n"));
@@ -1033,12 +1044,12 @@ AboutView::_CreateCreditsView()
 		"GNU C Library, "
 		"GNU coretools, diffutils, findutils, "
 		"sharutils, gawk, bison, m4, make, "
-		"gdb, wget, ncurses, termcap, "
+		"wget, ncurses, termcap, "
 		"Bourne Again Shell.\n"
 		COPYRIGHT_STRING "The Free Software Foundation."),
 		StringVector(kLGPLv21, kGPLv2, kGPLv3, NULL),
 		StringVector(),
-		"http://www.gnu.org");
+		"https://www.gnu.org");
 
 	// FreeBSD copyrights
 	AddCopyrightEntry("The FreeBSD Project",
@@ -1050,7 +1061,7 @@ AboutView::_CreateCreditsView()
 		StringVector(kBSDTwoClause, kBSDThreeClause, kBSDFourClause,
 			NULL),
 		StringVector(),
-		"http://www.freebsd.org");
+		"https://www.freebsd.org");
 
 	// NetBSD copyrights
 	AddCopyrightEntry("The NetBSD Project",
@@ -1059,15 +1070,15 @@ AboutView::_CreateCreditsView()
 		"ftp, tput\n"
 		COPYRIGHT_STRING "1996-2008 The NetBSD Foundation, Inc. "
 		"All rights reserved."),
-		"http://www.netbsd.org");
+		"https://www.netbsd.org");
 			// TODO: License!
 
-	// FFMpeg copyrights
-	_AddPackageCredit(PackageCredit("FFMpeg libavcodec")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2000-2007 Fabrice "
+	// FFmpeg copyrights
+	_AddPackageCredit(PackageCredit("FFmpeg")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2000-2014 Fabrice "
 			"Bellard, et al."))
 		.SetLicenses(kLGPLv21, kLGPLv2, NULL)
-		.SetURL("http://www.ffmpeg.org"));
+		.SetURL("https://www.ffmpeg.org"));
 
 	// AGG copyrights
 	_AddPackageCredit(PackageCredit("AntiGrain Geometry")
@@ -1184,13 +1195,6 @@ AboutView::_CreateCreditsView()
 		.SetLicense("Bullet")
 		.SetURL("http://www.bulletphysics.com"));
 
-	// atftp copyrights
-	_AddPackageCredit(PackageCredit("atftp")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2000 Jean-Pierre "
-			"Lefebvre and Remi Lefebvre."))
-		.SetLicense(kGPLv2)
-		.SetURL("http://freecode.com/projects/atftp"));
-
 	// Netcat copyrights
 	_AddPackageCredit(PackageCredit("Netcat")
 		.SetCopyright(COPYRIGHT_STRING "1996 Hobbit.")
@@ -1199,9 +1203,9 @@ AboutView::_CreateCreditsView()
 
 	// acpica copyrights
 	_AddPackageCredit(PackageCredit("acpica")
-		.SetCopyright(COPYRIGHT_STRING "1999-2006 Intel Corp.")
+		.SetCopyright(COPYRIGHT_STRING "1999-2014 Intel Corp.")
 		.SetLicense("Intel (ACPICA)")
-		.SetURL("http://www.acpica.org"));
+		.SetURL("https://www.acpica.org"));
 
 	// libpng copyrights
 	_AddPackageCredit(PackageCredit("libpng")
@@ -1236,24 +1240,6 @@ AboutView::_CreateCreditsView()
 			"and others."))
 		.SetLicense(kLGPLv2)
 		.SetURL("http://www.fluidsynth.org"));
-
-	// CannaIM copyrights
-	_AddPackageCredit(PackageCredit("CannaIM")
-		.SetCopyright(COPYRIGHT_STRING "1999 Masao Kawamura.")
-		.SetLicense("MIT"));
-
-	// libxml2, libxslt, libexslt copyrights
-	_AddPackageCredit(PackageCredit("libxml2, libxslt")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1998-2003 Daniel Veillard. "
-			"All rights reserved."))
-		.SetLicense(kMITNoPromotion)
-		.SetURL("http://xmlsoft.org"));
-
-	_AddPackageCredit(PackageCredit("libexslt")
-		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2001-2002 Thomas Broyer, "
-			"Charlie Bozeman and Daniel Veillard. All rights reserved."))
-		.SetLicense(kMITNoPromotion)
-		.SetURL("http://xmlsoft.org"));
 
 	// Xiph.org Foundation copyrights
 	_AddPackageCredit(PackageCredit("Xiph.org Foundation")
@@ -1311,27 +1297,21 @@ AboutView::_CreateCreditsView()
 			"Vivek Mohan. All rights reserved."))
 		.SetLicense(kBSDTwoClause)
 		.SetURL("http://udis86.sourceforge.net"));
-#endif
 
-#ifdef __INTEL__
 	// Intel PRO/Wireless 2100 Firmware
 	_AddPackageCredit(PackageCredit("Intel PRO/Wireless 2100 Firmware")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2003-2006 "
 			"Intel Corporation. All rights reserved."))
 		.SetLicense(kIntel2xxxFirmware)
 		.SetURL("http://ipw2100.sourceforge.net/"));
-#endif
 
-#ifdef __INTEL__
 	// Intel PRO/Wireless 2200BG Firmware
 	_AddPackageCredit(PackageCredit("Intel PRO/Wireless 2200BG Firmware")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2004-2005 "
 			"Intel Corporation. All rights reserved."))
 		.SetLicense(kIntel2xxxFirmware)
 		.SetURL("http://ipw2200.sourceforge.net/"));
-#endif
 
-#ifdef __INTEL__
 	// Intel PRO/Wireless 3945ABG/BG Network Connection Adapter Firmware
 	_AddPackageCredit(
 		PackageCredit(
@@ -1340,8 +1320,7 @@ AboutView::_CreateCreditsView()
 			"Intel Corporation. All rights reserved."))
 		.SetLicense(kIntelFirmware)
 		.SetURL("http://www.intellinuxwireless.org/"));
-#endif
-#ifdef __INTEL__
+
 	// Intel Wireless WiFi Link 4965AGN Adapter Firmware
 	_AddPackageCredit(
 		PackageCredit("Intel Wireless WiFi Link 4965AGN Adapter Firmware")
@@ -1349,18 +1328,14 @@ AboutView::_CreateCreditsView()
 			"Intel Corporation. All rights reserved."))
 		.SetLicense(kIntelFirmware)
 		.SetURL("http://www.intellinuxwireless.org/"));
-#endif
 
-#ifdef __INTEL__
 	// Marvell 88w8363
 	_AddPackageCredit(PackageCredit("Marvell 88w8363")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2007-2009 "
 			"Marvell Semiconductor, Inc. All rights reserved."))
 		.SetLicense(kMarvellFirmware)
 		.SetURL("http://www.marvell.com/"));
-#endif
 
-#ifdef __INTEL__
 	// Ralink Firmware RT2501/RT2561/RT2661
 	_AddPackageCredit(PackageCredit("Ralink Firmware RT2501/RT2561/RT2661")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2007 "

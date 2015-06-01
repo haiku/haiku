@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libbe	2929679013
+1	polish	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		gamma
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -20,6 +20,7 @@ OK	PrintJob		OK
 Green:	ColorControl		Zielony:
 Version history:	AboutWindow		Historia zmian:
 Remove replicant	Dragger		Usuń replikant
+Select all	TextView		Zaznacz wszystko
 OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Serwer wydruku nie odpowiada.
@@ -29,7 +30,6 @@ Special Thanks:	AboutWindow		Specjalne podziękowania dla:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Nie można zlokalizować aplikacji dla replikanta. Nie dostarczono podpisu aplikacji.\n%error
 Redo	TextView		Ponów
 <empty>	Menu		<puste>
-Select All	TextView		Zaznacz wszystko
 Warning	Dragger		Ostrzeżenie
 Undo	TextView		Cofnij
 Red:	ColorControl		Czerwony:

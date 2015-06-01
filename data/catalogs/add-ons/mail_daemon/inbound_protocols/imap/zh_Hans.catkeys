@@ -1,7 +1,12 @@
-1	english	x-vnd.Haiku-IMAP	3950045582
+1	english	x-vnd.Haiku-IMAP	354143849
 Destination:	imap_config		目标位置：
+Ok	IMAPFolderConfig		确定
 status	IMAPFolderConfig		状态
+Configure IMAP Folders	imap_config		配置 IMAP 目录
+Cancel	IMAPFolderConfig		取消
 Apply	IMAPFolderConfig		应用
 Fetching IMAP folders, have patience...	IMAPFolderConfig		获取 IMAP 目录，请耐心等待...
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		无法连接服务器 \"%server%\":\n%error%
 IMAP Folders	IMAPFolderConfig		IMAP 目录
+Update subcription of IMAP folders, have patience...	IMAPFolderConfig		更新 IMAP 目录订阅，请耐心等待...
 Failed to fetch available storage.	IMAPFolderConfig		获取可用存储失败

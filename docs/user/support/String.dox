@@ -2707,7 +2707,7 @@
 
 
 /*!
-	\name <tt>sprintf()</tt> Replacement Methods
+	\name sprintf() Replacement Methods
 
 	These methods may be slower than <tt>sprintf()</tt>, but they are overflow safe.
 */

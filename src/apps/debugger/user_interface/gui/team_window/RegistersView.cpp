@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,6 +24,33 @@
 #include "MessageCodes.h"
 #include "Register.h"
 #include "UiUtils.h"
+
+
+enum {
+	MSG_SIMD_RENDER_FORMAT_CHANGED = 'srfc'
+};
+
+
+static const char*
+GetLabelForSIMDFormat(int format)
+{
+	switch (format) {
+			case SIMD_RENDER_FORMAT_INT8:
+				return "8-bit integer";
+			case SIMD_RENDER_FORMAT_INT16:
+				return "16-bit integer";
+			case SIMD_RENDER_FORMAT_INT32:
+				return "32-bit integer";
+			case SIMD_RENDER_FORMAT_INT64:
+				return "64-bit integer";
+			case SIMD_RENDER_FORMAT_FLOAT:
+				return "Float";
+			case SIMD_RENDER_FORMAT_DOUBLE:
+				return "Double";
+	}
+
+	return "Unknown";
+}
 
 
 // #pragma mark - RegisterValueColumn
@@ -92,7 +119,8 @@ public:
 	RegisterTableModel(Architecture* architecture)
 		:
 		fArchitecture(architecture),
-		fCpuState(NULL)
+		fCpuState(NULL),
+		fSIMDFormat(SIMD_RENDER_FORMAT_INT16)
 	{
 	}
 
@@ -117,6 +145,11 @@ public:
 		return fArchitecture->CountRegisters();
 	}
 
+	inline int32 SIMDRenderFormat() const
+	{
+		return fSIMDFormat;
+	}
+
 	virtual bool GetValueAt(int32 rowIndex, int32 columnIndex, BVariant& value)
 	{
 		if (rowIndex < 0 || rowIndex >= fArchitecture->CountRegisters())
@@ -133,15 +166,30 @@ public:
 					return false;
 				if (!fCpuState->GetRegisterValue(reg, value))
 					value.SetTo("?", B_VARIANT_DONT_COPY_DATA);
+				else if (reg->Format() == REGISTER_FORMAT_SIMD) {
+					BString output;
+					value.SetTo(UiUtils::FormatSIMDValue(value,
+						reg->BitSize(),fSIMDFormat, output));
+				}
 				return true;
 			default:
 				return false;
 		}
 	}
 
+	void SetSIMDFormat(int32 format)
+	{
+		if (fSIMDFormat != format) {
+			fSIMDFormat = format;
+			NotifyRowsChanged(0, CountRows());
+		}
+	}
+
+private:
 private:
 	Architecture*	fArchitecture;
 	CpuState*		fCpuState;
+	int32			fSIMDFormat;
 };
 
 
@@ -181,6 +229,27 @@ RegistersView::Create(Architecture* architecture)
 	}
 
 	return self;
+}
+
+
+void
+RegistersView::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_SIMD_RENDER_FORMAT_CHANGED:
+			{
+				int32 format;
+				if (message->FindInt32("format", &format) != B_OK)
+					break;
+
+				fRegisterTableModel->SetSIMDFormat(format);
+			}
+			break;
+
+		default:
+			BGroupView::MessageReceived(message);
+			break;
+	}
 }
 
 
@@ -238,6 +307,9 @@ void
 RegistersView::TableCellMouseDown(Table* table, int32 rowIndex,
 	int32 columnIndex, BPoint screenWhere,	uint32 buttons)
 {
+	if (rowIndex < 0 || rowIndex >= fArchitecture->CountRegisters())
+		return;
+
 	if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0)
 		return;
 
@@ -245,29 +317,65 @@ RegistersView::TableCellMouseDown(Table* table, int32 rowIndex,
 	if (!fRegisterTableModel->GetValueAt(rowIndex, 1, value))
 		return;
 
-	BPopUpMenu* menu = new(std::nothrow)BPopUpMenu("Options");
+	const Register* reg = fArchitecture->Registers() + rowIndex;
+	if (reg->Format() == REGISTER_FORMAT_FLOAT) {
+		// for floating point registers, we currently have no
+		// context menu options to display.
+		return;
+	}
+
+	BPopUpMenu* menu = new(std::nothrow) BPopUpMenu("Options");
 	if (menu == NULL)
 		return;
 
 	ObjectDeleter<BPopUpMenu> menuDeleter(menu);
-	BMessage* message = new(std::nothrow)BMessage(MSG_SHOW_INSPECTOR_WINDOW);
-	if (message == NULL)
-		return;
 
-	message->AddUInt64("address", value.ToUInt64());
+	if (reg->Format() == REGISTER_FORMAT_INTEGER) {
+		BMessage* message = new(std::nothrow) BMessage(MSG_SHOW_INSPECTOR_WINDOW);
+		if (message == NULL)
+			return;
 
-	ObjectDeleter<BMessage> messageDeleter(message);
-	BMenuItem* item = new(std::nothrow)BMenuItem("Inspect", message);
-	if (item == NULL)
-		return;
+		message->AddUInt64("address", value.ToUInt64());
 
-	messageDeleter.Detach();
-	ObjectDeleter<BMenuItem> itemDeleter(item);
-	if (!menu->AddItem(item))
-		return;
+		ObjectDeleter<BMessage> messageDeleter(message);
+		BMenuItem* item = new(std::nothrow) BMenuItem("Inspect", message);
+		if (item == NULL)
+			return;
 
-	itemDeleter.Detach();
-	menu->SetTargetForItems(Window());
+		messageDeleter.Detach();
+		ObjectDeleter<BMenuItem> itemDeleter(item);
+		if (!menu->AddItem(item))
+			return;
+
+		itemDeleter.Detach();
+
+		item->SetTarget(Window());
+	} else if (reg->Format() == REGISTER_FORMAT_SIMD) {
+		BMenu* formatMenu = new(std::nothrow) BMenu("Format");
+		if (formatMenu == NULL)
+			return;
+
+		ObjectDeleter<BMenu> formatMenuDeleter(formatMenu);
+		if (!menu->AddItem(formatMenu))
+			return;
+		formatMenuDeleter.Detach();
+
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_INT8) != B_OK)
+			return;
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_INT16) != B_OK)
+			return;
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_INT32) != B_OK)
+			return;
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_INT64) != B_OK)
+			return;
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_FLOAT) != B_OK)
+			return;
+		if (_AddFormatItem(formatMenu, SIMD_RENDER_FORMAT_DOUBLE) != B_OK)
+			return;
+
+		formatMenu->SetTargetForItems(this);
+	}
+
 	menuDeleter.Detach();
 
 	BRect mouseRect(screenWhere, screenWhere);
@@ -297,3 +405,36 @@ RegistersView::_Init()
 
 	fRegisterTable->AddTableListener(this);
 }
+
+
+status_t
+RegistersView::_AddFormatItem(BMenu* menu, int32 format)
+{
+	BMessage* message = new(std::nothrow) BMessage(
+		MSG_SIMD_RENDER_FORMAT_CHANGED);
+	if (message == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<BMessage> messageDeleter(message);
+	if (message->AddInt32("format", format) != B_OK)
+		return B_NO_MEMORY;
+
+	BMenuItem* item = new(std::nothrow) BMenuItem(
+		GetLabelForSIMDFormat(format), message);
+	if (item == NULL)
+		return B_NO_MEMORY;
+
+	messageDeleter.Detach();
+	ObjectDeleter<BMenuItem> itemDeleter(item);
+	if (!menu->AddItem(item))
+		return B_NO_MEMORY;
+
+	itemDeleter.Detach();
+
+	if (format == fRegisterTableModel->SIMDRenderFormat())
+		item->SetMarked(true);
+
+	return B_OK;
+}
+
+

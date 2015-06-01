@@ -174,6 +174,7 @@ ShowImageApp::QuitRequested()
 		be_clipboard->StopWatching(be_app_messenger);
 			// tell clipboard we don't want anymore notification
 	}
+	DefaultCache().Stop();
 
 	return result;
 }

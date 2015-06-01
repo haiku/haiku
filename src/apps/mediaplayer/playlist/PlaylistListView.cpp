@@ -103,17 +103,20 @@ void
 PlaylistListView::Item::Draw(BView* owner, BRect frame, const font_height& fh,
 	bool tintedLine, uint32 mode, bool active, uint32 playbackState)
 {
-	rgb_color color = (rgb_color){ 255, 255, 255, 255 };
+	rgb_color color = ui_color(B_LIST_BACKGROUND_COLOR);
+
+	if (IsSelected())
+		color = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 	if (tintedLine)
 		color = tint_color(color, 1.04);
 	// background
-	if (IsSelected())
-		color = tint_color(color, B_DARKEN_2_TINT);
 	owner->SetLowColor(color);
 	owner->FillRect(frame, B_SOLID_LOW);
 	// label
-	rgb_color black = (rgb_color){ 0, 0, 0, 255 };
-	owner->SetHighColor(black);
+	if (IsSelected())
+		owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+	else
+		owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	const char* text = Text();
 	switch (mode) {
 		case DISPLAY_NAME:

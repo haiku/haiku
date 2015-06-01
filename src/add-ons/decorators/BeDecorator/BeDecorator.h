@@ -13,7 +13,7 @@
 
 
 #include "DecorManager.h"
-#include "TabDecorator.h"
+#include "SATDecorator.h"
 
 
 class Desktop;
@@ -30,7 +30,7 @@ protected:
 };
 
 
-class BeDecorator: public TabDecorator {
+class BeDecorator: public SATDecorator {
 public:
 								BeDecorator(DesktopSettings& settings, BRect frame);
 	virtual						~BeDecorator();

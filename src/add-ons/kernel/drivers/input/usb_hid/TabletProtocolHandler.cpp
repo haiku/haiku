@@ -189,7 +189,7 @@ TabletProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 				return B_BUFFER_OVERFLOW;
 
 			while (true) {
-				status_t result = _ReadReport(buffer);
+				status_t result = _ReadReport(buffer, cookie);
 				if (result != B_INTERRUPTED)
 					return result;
 			}
@@ -218,7 +218,7 @@ TabletProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 
 
 status_t
-TabletProtocolHandler::_ReadReport(void *buffer)
+TabletProtocolHandler::_ReadReport(void *buffer, uint32 *cookie)
 {
 	status_t result = fReport.WaitForReport(B_INFINITE_TIMEOUT);
 	if (result != B_OK) {
@@ -226,6 +226,9 @@ TabletProtocolHandler::_ReadReport(void *buffer)
 			TRACE("device has been removed\n");
 			return B_DEV_NOT_READY;
 		}
+
+		if ((*cookie & PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED) != 0)
+			return B_CANCELED;
 
 		if (result != B_INTERRUPTED) {
 			// interrupts happen when other reports come in on the same

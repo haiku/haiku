@@ -12,7 +12,10 @@ for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 			# TODO in time.c!
 		UsePrivateSystemHeaders ;
 
-		SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) generic ] ;
+		SEARCH_SOURCE +=
+			[ FDirName $(SUBDIR) $(DOTDOT) generic ]
+			[ FDirName $(SUBDIR) $(DOTDOT) x86_common ]
+			;
 
 		MergeObject <$(architecture)>os_arch_$(TARGET_ARCH).o :
 			byteorder.S
@@ -23,6 +26,10 @@ for architectureObject in [ MultiArchSubDirSetup x86_64 ] {
 			time.cpp
 			tls.cpp
 
+			# sources from x86_common
+			stack_trace.cpp
+
+			# sources from generic
 			generic_atomic.cpp
 			;
 	}

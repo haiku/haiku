@@ -183,7 +183,7 @@ printf_size (FILE *fp, const struct printf_info *info, const void *const *args)
 
   if (special)
     {
-      int width = info->prec > width ? info->prec : width;
+      int width = info->prec > width ? info->prec : info->width;
 
       if (negative || info->showsign || info->space)
 	--width;

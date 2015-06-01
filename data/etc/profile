@@ -13,7 +13,7 @@ if [ -z $BE_HOST_CPU ]; then
 fi
 
 export PS1="\w> "
-export HISTFILESIZE=50
+export HISTFILESIZE=500
 export HISTCONTROL=ignoredups
 
 # Locale

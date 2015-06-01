@@ -201,6 +201,7 @@ private:
 	void CloseAllInWorkspace();
 	void OpenInfoWindows(BMessage*);
 	void MoveRefsToTrash(const BMessage*);
+	void SelectRefs(const BMessage*);
 	void OpenContainerWindow(Model*, BMessage* refsList = NULL,
 		OpenSelector openSelector = kOpen, uint32 openFlags = 0,
 		bool checkAlreadyOpen = true,

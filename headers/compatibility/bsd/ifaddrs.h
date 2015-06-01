@@ -6,6 +6,14 @@
 #define _IFADDRS_H
 
 
+#ifdef _BSD_SOURCE
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 struct ifaddrs {
 	struct ifaddrs  *ifa_next;    /* Next item in list */
 	const char      *ifa_name;    /* Name of interface */
@@ -20,6 +28,14 @@ struct ifaddrs {
 
 int getifaddrs(struct ifaddrs **ifap);
 void freeifaddrs(struct ifaddrs *ifa);
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#endif
 
 
 #endif

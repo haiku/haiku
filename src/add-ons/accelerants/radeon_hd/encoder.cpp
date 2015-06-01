@@ -626,7 +626,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 		tableMajor, tableMinor);
 
 	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
-	uint8 dpClock = 0;
+	uint32 dpClock = 0;
 	if (dpInfo->valid == true)
 		dpClock = dpInfo->linkRate;
 
@@ -1231,7 +1231,7 @@ transmitter_dig_setup(uint32 connectorIndex, uint32 pixelClock,
 
 	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
 
-	uint8 dpClock = 0;
+	uint32 dpClock = 0;
 	int dpLaneCount = 0;
 	if (dpInfo->valid == true) {
 		dpClock = dpInfo->linkRate;

@@ -215,7 +215,7 @@ public:
 		const BMessage* dragMessage)
 	{
 		BButton::MouseMoved(point, transit, dragMessage);
-		
+
 		if (fTransitMessage != NULL && transit == B_EXITED_VIEW)
 			Invoke(fTransitMessage);
 	}
@@ -251,7 +251,7 @@ public:
 		const BMessage* dragMessage)
 	{
 		RatingView::MouseMoved(point, transit, dragMessage);
-		
+
 		if (fTransitMessage != NULL && transit == B_ENTERED_VIEW)
 			Invoke(fTransitMessage);
 	}
@@ -391,9 +391,9 @@ public:
 	void SetPackage(const PackageInfo& package)
 	{
 		if (package.Icon().Get() != NULL)
-			fIconView->SetBitmap(package.Icon()->Bitmap(SharedBitmap::SIZE_32));
+			fIconView->SetBitmap(package.Icon(), SharedBitmap::SIZE_32);
 		else
-			fIconView->SetBitmap(NULL);
+			fIconView->UnsetBitmap();
 
 		fTitleView->SetText(package.Title());
 
@@ -431,7 +431,7 @@ public:
 
 	void Clear()
 	{
-		fIconView->SetBitmap(NULL);
+		fIconView->UnsetBitmap();
 		fTitleView->SetText("");
 		fPublisherView->SetText("");
 		fVersionInfo->SetText("");
@@ -564,12 +564,12 @@ public:
 	{
 		if (fButtons.CountItems() > 0)
 			Clear();
-		
+
 		if (fStatusBar == NULL) {
 			fStatusLabel = new BStringView("progress label",
 				B_TRANSLATE("Downloading:"));
 			fLayout->AddView(fStatusLabel);
-			
+
 			fStatusBar = new BStatusBar("progress");
 			fStatusBar->SetMaxValue(100.0);
 			fStatusBar->SetExplicitMinSize(
@@ -577,7 +577,7 @@ public:
 
 			fLayout->AddView(fStatusBar);
 		}
-		
+
 		fStatusBar->SetTo(package.DownloadProgress() * 100.0);
 	}
 
@@ -621,7 +621,7 @@ private:
 		if (result != B_OK) {
 			fprintf(stderr, "Failed to schedule action: "
 				"%s '%s': %s\n", action->Label(),
-				action->Package()->Title().String(),
+				action->Package()->Name().String(),
 				strerror(result));
 			BString message(B_TRANSLATE("The package action "
 				"could not be scheduled: %Error%"));
@@ -769,7 +769,7 @@ public:
 				Window()->PostMessage(message, Window());
 				break;
 			}
-			
+
 			case MSG_EMAIL_PUBLISHER:
 			{
 				// TODO: Implement. If memory serves, there is a
@@ -797,31 +797,36 @@ public:
 		fDescriptionView->SetText(package.ShortDescription(),
 			package.FullDescription());
 
-		fEmailIconView->SetBitmap(fEmailIcon.Bitmap(SharedBitmap::SIZE_16));
+		fEmailIconView->SetBitmap(&fEmailIcon, SharedBitmap::SIZE_16);
 		_SetContactInfo(fEmailLinkView, package.Publisher().Email());
-		fWebsiteIconView->SetBitmap(fWebsiteIcon.Bitmap(SharedBitmap::SIZE_16));
+		fWebsiteIconView->SetBitmap(&fWebsiteIcon, SharedBitmap::SIZE_16);
 		_SetContactInfo(fWebsiteLinkView, package.Publisher().Website());
 
-		const BBitmap* screenshot = NULL;
+		bool hasScreenshot = false;
 		const BitmapList& screenShots = package.Screenshots();
 		if (screenShots.CountItems() > 0) {
 			const BitmapRef& bitmapRef = screenShots.ItemAtFast(0);
-			if (bitmapRef.Get() != NULL)
-				screenshot = bitmapRef->Bitmap(SharedBitmap::SIZE_ANY);
+			if (bitmapRef.Get() != NULL) {
+				hasScreenshot = true;
+				fScreenshotView->SetBitmap(bitmapRef);
+			}
 		}
-		fScreenshotView->SetBitmap(screenshot);
-		fScreenshotView->SetEnabled(screenshot != NULL);
+
+		if (!hasScreenshot)
+			fScreenshotView->UnsetBitmap();
+
+		fScreenshotView->SetEnabled(hasScreenshot);
 	}
 
 	void Clear()
 	{
 		fDescriptionView->SetText("");
-		fEmailIconView->SetBitmap(NULL);
+		fEmailIconView->UnsetBitmap();
 		fEmailLinkView->SetText("");
-		fWebsiteIconView->SetBitmap(NULL);
+		fWebsiteIconView->UnsetBitmap();
 		fWebsiteLinkView->SetText("");
 
-		fScreenshotView->SetBitmap(NULL);
+		fScreenshotView->UnsetBitmap();
 		fScreenshotView->SetEnabled(false);
 	}
 
@@ -867,8 +872,8 @@ public:
 
 		fAvatarView = new BitmapView("avatar view");
 		if (rating.User().Avatar().Get() != NULL) {
-			fAvatarView->SetBitmap(
-				rating.User().Avatar()->Bitmap(SharedBitmap::SIZE_16));
+			fAvatarView->SetBitmap(rating.User().Avatar(),
+				SharedBitmap::SIZE_16);
 		}
 		fAvatarView->SetExplicitMinSize(BSize(16.0f, 16.0f));
 
@@ -908,10 +913,8 @@ public:
 //		fVoteDownIconView = new BitmapButton("vote down icon", voteDownMessage);
 //		fDownVoteCountView = new BStringView("up vote count", "");
 //
-//		fVoteUpIconView->SetBitmap(
-//			voteUpIcon->Bitmap(SharedBitmap::SIZE_16));
-//		fVoteDownIconView->SetBitmap(
-//			voteDownIcon->Bitmap(SharedBitmap::SIZE_16));
+//		fVoteUpIconView->SetBitmap(voteUpIcon, SharedBitmap::SIZE_16);
+//		fVoteDownIconView->SetBitmap(voteDownIcon, SharedBitmap::SIZE_16);
 //
 //		fUpVoteCountView->SetFont(&versionFont);
 //		fUpVoteCountView->SetHighColor(kLightBlack);
@@ -1068,7 +1071,7 @@ public:
 			.Add(scrollView, 1.0f)
 			.SetInsets(B_USE_DEFAULT_SPACING, -1.0f, -1.0f, -1.0f)
 		;
-	
+
 		_InitPreferredLanguages();
 	}
 
@@ -1144,7 +1147,7 @@ private:
 			return;
 
 		BMessage preferredLanguages;
-		if (localeRoster->GetPreferredLanguages(&preferredLanguages) != B_OK) 
+		if (localeRoster->GetPreferredLanguages(&preferredLanguages) != B_OK)
 			return;
 
 		BString language;
@@ -1280,7 +1283,7 @@ public:
 		AddTab(fUserRatingsView);
 		AddTab(fChangelogView);
 		AddTab(fContentsView);
-		
+
 		TabAt(0)->SetLabel(B_TRANSLATE("About"));
 		TabAt(1)->SetLabel(B_TRANSLATE("Ratings"));
 		TabAt(2)->SetLabel(B_TRANSLATE("Changelog"));
@@ -1334,7 +1337,7 @@ PackageInfoView::PackageInfoView(BLocker* modelLock,
 {
 	fCardLayout = new BCardLayout();
 	SetLayout(fCardLayout);
-	
+
 	BGroupView* noPackageCard = new BGroupView("no package card", B_VERTICAL);
 	AddChild(noPackageCard);
 
@@ -1397,25 +1400,27 @@ PackageInfoView::MessageReceived(BMessage* message)
 			if (fPackageListener->Package().Get() == NULL)
 				break;
 
-			BString title;
+			BString name;
 			uint32 changes;
-			if (message->FindString("title", &title) != B_OK
+			if (message->FindString("name", &name) != B_OK
 				|| message->FindUInt32("changes", &changes) != B_OK) {
 				break;
 			}
 
 			const PackageInfoRef& package = fPackageListener->Package();
-			if (package->Title() != title)
+			if (package->Name() != name)
 				break;
 
 			BAutolock _(fModelLock);
 
-			if ((changes & PKG_CHANGED_DESCRIPTION) != 0
+			if ((changes & PKG_CHANGED_SUMMARY) != 0
+				|| (changes & PKG_CHANGED_DESCRIPTION) != 0
 				|| (changes & PKG_CHANGED_SCREENSHOTS) != 0) {
 				fPagesView->SetPackage(package, false);
 			}
 
-			if ((changes & PKG_CHANGED_RATINGS) != 0) {
+			if ((changes & PKG_CHANGED_TITLE) != 0
+				|| (changes & PKG_CHANGED_RATINGS) != 0) {
 				fPagesView->SetPackage(package, false);
 				fTitleView->SetPackage(*package.Get());
 			}
@@ -1449,7 +1454,7 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 		// don't switch to the default tab.
 		switchToDefaultTab = false;
 	} else if (fPackage.Get() != NULL && packageRef.Get() != NULL
-		&& fPackage->Title() == packageRef->Title()) {
+		&& fPackage->Name() == packageRef->Name()) {
 		// When asked to display a different PackageInfo instance,
 		// but it has the same package title as the already showing
 		// instance, this probably means there was a repository
@@ -1457,7 +1462,7 @@ PackageInfoView::SetPackage(const PackageInfoRef& packageRef)
 		// same package as before the refresh.
 		switchToDefaultTab = false;
 	}
-	
+
 	const PackageInfo& package = *packageRef.Get();
 
 	fTitleView->SetPackage(package);

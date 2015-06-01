@@ -3,7 +3,6 @@
  * Distributed under the terms of the MIT License.
  */
 
-
 #include <NetworkInterface.h>
 
 #include <errno.h>
@@ -13,7 +12,8 @@
 #include <AutoDeleter.h>
 #include <Messenger.h>
 #include <NetServer.h>
-#include <RouteSupport.h>
+#include <NetworkRoute.h>
+
 
 static int
 family_from_interface_address(const BNetworkInterfaceAddress& address)
@@ -26,22 +26,6 @@ family_from_interface_address(const BNetworkInterfaceAddress& address)
 		return address.Destination().Family();
 
 	return AF_INET;
-}
-
-
-static int
-family_from_route(const route_entry& route)
-{
-	if (route.destination != NULL && route.destination->sa_family != AF_UNSPEC)
-		return route.destination->sa_family;
-	if (route.mask != NULL && route.mask->sa_family != AF_UNSPEC)
-		return route.mask->sa_family;
-	if (route.gateway != NULL && route.gateway->sa_family != AF_UNSPEC)
-		return route.gateway->sa_family;
-	if (route.source != NULL && route.source->sa_family != AF_UNSPEC)
-		return route.source->sa_family;
-
-	return AF_UNSPEC;
 }
 
 
@@ -513,14 +497,14 @@ BNetworkInterface::GetHardwareAddress(BNetworkAddress& address)
 
 
 status_t
-BNetworkInterface::AddRoute(const route_entry& route)
+BNetworkInterface::AddRoute(const BNetworkRoute& route)
 {
-	int family = family_from_route(route);
+	int family = route.AddressFamily();
 	if (family == AF_UNSPEC)
 		return B_BAD_VALUE;
 
 	ifreq request;
-	request.ifr_route = route;
+	request.ifr_route = route.RouteEntry();
 	return do_request(family, request, Name(), SIOCADDRT);
 }
 
@@ -528,19 +512,20 @@ BNetworkInterface::AddRoute(const route_entry& route)
 status_t
 BNetworkInterface::AddDefaultRoute(const BNetworkAddress& gateway)
 {
-	route_entry route;
-	memset(&route, 0, sizeof(route_entry));
-	route.flags = RTF_STATIC | RTF_DEFAULT | RTF_GATEWAY;
-	route.gateway = const_cast<sockaddr*>(&gateway.SockAddr());
+	BNetworkRoute route;
+	status_t result = route.SetGateway(gateway);
+	if (result != B_OK)
+		return result;
 
+	route.SetFlags(RTF_STATIC | RTF_DEFAULT | RTF_GATEWAY);
 	return AddRoute(route);
 }
 
 
 status_t
-BNetworkInterface::RemoveRoute(const route_entry& route)
+BNetworkInterface::RemoveRoute(const BNetworkRoute& route)
 {
-	int family = family_from_route(route);
+	int family = route.AddressFamily();
 	if (family == AF_UNSPEC)
 		return B_BAD_VALUE;
 
@@ -549,10 +534,10 @@ BNetworkInterface::RemoveRoute(const route_entry& route)
 
 
 status_t
-BNetworkInterface::RemoveRoute(int family, const route_entry& route)
+BNetworkInterface::RemoveRoute(int family, const BNetworkRoute& route)
 {
 	ifreq request;
-	request.ifr_route = route;
+	request.ifr_route = route.RouteEntry();
 	return do_request(family, request, Name(), SIOCDELRT);
 }
 
@@ -560,38 +545,31 @@ BNetworkInterface::RemoveRoute(int family, const route_entry& route)
 status_t
 BNetworkInterface::RemoveDefaultRoute(int family)
 {
-	route_entry route;
-	memset(&route, 0, sizeof(route_entry));
-	route.flags = RTF_STATIC | RTF_DEFAULT;
-
+	BNetworkRoute route;
+	route.SetFlags(RTF_STATIC | RTF_DEFAULT);
 	return RemoveRoute(family, route);
 }
 
 
 status_t
-BNetworkInterface::GetRoutes(int family, BObjectList<route_entry>& routes) const
+BNetworkInterface::GetRoutes(int family,
+	BObjectList<BNetworkRoute>& routes) const
 {
-	return BPrivate::get_routes(Name(), family, routes);
+	return BNetworkRoute::GetRoutes(family, Name(), routes);
 }
 
 
 status_t
-BNetworkInterface::GetDefaultRoute(int family, BNetworkAddress& gateway) const
+BNetworkInterface::GetDefaultRoute(int family, BNetworkRoute& route) const
 {
-	BObjectList<route_entry> routes(1, true);
-	status_t status = GetRoutes(family, routes);
-	if (status != B_OK)
-		return status;
+	return BNetworkRoute::GetDefaultRoute(family, Name(), route);
+}
 
-	for (int32 i = routes.CountItems() - 1; i >= 0; i--) {
-		route_entry* entry = routes.ItemAt(i);
-		if (entry->flags & RTF_DEFAULT) {
-			gateway.SetTo(*entry->gateway);
-			break;
-		}
-	}
 
-	return B_OK;
+status_t
+BNetworkInterface::GetDefaultGateway(int family, BNetworkAddress& gateway) const
+{
+	return BNetworkRoute::GetDefaultGateway(family, Name(), gateway);
 }
 
 

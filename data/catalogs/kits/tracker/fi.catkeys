@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	1313160091
+1	finnish	x-vnd.Haiku-libtracker	4204393626
 OK	WidgetAttributeText		Valmis
 Add-ons	FilePanelPriv		Lisäosat
 Mount settings…	ContainerWindow		Liittämisasetukset...
@@ -38,7 +38,7 @@ Create link here	ContainerWindow		Luo linkki tähän
 Moving: 	StatusWindow		Siirretään: 
 before	FindPanel		ennen
 Error emptying Trash	FSUtils		Virhe tyhjennettäessä roskakoria
-On	FindPanel		Kohteessa
+On	FindPanel		kohteessa
 MiB	WidgetAttributeText		mebitavua
 greater than	FindPanel		suurempi kuin
 Delete	PoseView		Poista
@@ -179,6 +179,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		Virhe säännöllisessä 
 Mount all	MountMenu		Liitä kaikki
 calculating…	InfoWindow		lasketaan...
 Mount all disks now	AutoMounterSettings		Liitä kaikki levyt nyt
+Hide dotfiles	SettingsView		Piilota pistetiedostot
 Untitled bitmap	PoseView		Otsikoton bittikarttatiedosto
 of %items	StatusWindow		/ %items
 Description:	InfoWindow		Kuvaus:
@@ -201,7 +202,7 @@ Get info	ContainerWindow		Hae tiedot
 Error creating link to \"%name\".	FSUtils		Virhe luotaessa linkkiä kohteeseen ”%name”.
 Select	SelectionWindow		Valitse
 {0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, one{# tavu} other{# tavua}}
-Or	FindPanel		Tai
+Or	FindPanel		tai
 The Tracker must be running to see set the default printer.	PoseView		Seuraajan on oltava käynnissä oletustulostimen näkymiseksi.
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# tavu} other{# tavua}}
 by formula	FindPanel		kaavoittain
@@ -339,7 +340,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Untitled clipping	PoseView		Otsikoton leikkaus
 Don't automount	AutoMounterSettings		Älä liitä automaattisesti
 Save	FilePanelPriv		Tallenna
-To: %dir	StatusWindow		Kohteeseen: %dir
+To: %dir	StatusWindow		Vastaanottaja: %dir
 Window	FilePanelPriv		Ikkuna
 Edit name	FilePanelPriv		Muokkaa nimeä
 Size:	InfoWindow		Koko:
@@ -365,7 +366,7 @@ Are you sure you want to delete the selected item(s)? This operation cannot be r
 If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Jos kohdistat toiminnon ”%ifYouDoAction” kotihakemistoon, ”%osName” ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?\n\nToiminnon ”%toDoAction” kohdistamiseksi kotihakemistoon pidä alhaalla Vaihto-painike ja napsauta \"%toConfirmAction\".
 Add-ons	DeskWindow		Lisäosat
 Name	FindPanel		Nimi
-And	FindPanel		Ja
+And	FindPanel		ja
 Select…	DeskWindow		Valitse...
 Copy	FilePanelPriv		Kopioi
 Icon view	DeskWindow		Kuvakenäkymä

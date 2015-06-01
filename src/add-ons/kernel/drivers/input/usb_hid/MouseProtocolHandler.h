@@ -34,7 +34,7 @@ public:
 									size_t length);
 
 private:
-			status_t			_ReadReport(void *buffer);
+			status_t			_ReadReport(void *buffer, uint32 *cookie);
 
 			HIDReport &			fReport;
 

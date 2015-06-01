@@ -1,7 +1,13 @@
 /*
  * Copyright 2012, François Revol, revol@free.fr.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		François Revol, revol@free.fr
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
+
+#include "fdt_serial.h"
 
 #include <KernelExport.h>
 #include <ByteOrder.h>
@@ -9,8 +15,11 @@
 #include <stdio.h>
 #include <sys/cdefs.h>
 
-#include <arch/generic/debug_uart.h>
 #include <arch/generic/debug_uart_8250.h>
+
+#ifdef __ARM__
+#include <arch/arm/arch_uart_pl011.h>
+#endif
 
 extern "C" {
 #include <fdt.h>
@@ -18,15 +27,16 @@ extern "C" {
 #include <libfdt_env.h>
 };
 
+#include "fdt_support.h"
 
-extern "C" DebugUART *debug_uart_from_fdt(const void *fdt);
+
+// If we dprintf before the UART is initalized there will be no output
 
 
-DebugUART *
+DebugUART*
 debug_uart_from_fdt(const void *fdt)
 {
 	const char *name;
-	const char *type;
 	int node;
 	int len;
 	phys_addr_t regs;
@@ -43,63 +53,56 @@ debug_uart_from_fdt(const void *fdt)
 		name = fdt_get_alias(fdt, "serial0");
 	if (name == NULL)
 		name = fdt_get_alias(fdt, "serial1");
+	if (name == NULL)
+		name = fdt_get_alias(fdt, "uart0");
 	// TODO: else use /chosen linux,stdout-path
 	if (name == NULL)
 		return NULL;
 
 	node = fdt_path_offset(fdt, name);
-	//dprintf("serial: using '%s', node %d\n", name, node);
+
 	if (node < 0)
 		return NULL;
 
-	type = (const char *)fdt_getprop(fdt, node, "device_type", &len);
-	//dprintf("serial: type: '%s'\n", type);
-	if (type == NULL || strcmp(type, "serial"))
+	// determine the MMIO address
+	regs = fdt_get_device_reg(fdt, node);
+
+	if (regs == 0)
 		return NULL;
 
-	// determine the MMIO address
-	// TODO: ppc460 use 64bit addressing, but U-Boot seems to map it below 4G,
-	// and the FDT is not very clear. libfdt is also getting 64bit addr support.
-	// so FIXME someday.
-	prop = fdt_getprop(fdt, node, "virtual-reg", &len);
-	if (prop && len == 4) {
-		regs = fdt32_to_cpu(*(uint32_t *)prop);
-		//dprintf("serial: virtual-reg 0x%08llx\n", (int64)regs);
-	} else {
-		prop = fdt_getprop(fdt, node, "reg", &len);
-		if (prop && len >= 4) {
-			regs = fdt32_to_cpu(*(uint32_t *)prop);
-			//dprintf("serial: reg 0x%08llx\n", (int64)regs);
-		} else
-			return NULL;
-	}
+	dprintf("serial: using '%s', node %d @ %" B_PRIxPHYSADDR "\n",
+		name, node, regs);
 
 	// get the UART clock rate
 	prop = fdt_getprop(fdt, node, "clock-frequency", &len);
 	if (prop && len == 4) {
 		clock = fdt32_to_cpu(*(uint32_t *)prop);
-		//dprintf("serial: clock %ld\n", clock);
+		dprintf("serial: clock %ld\n", clock);
 	}
 
 	// get current speed (XXX: not yet passed over)
 	prop = fdt_getprop(fdt, node, "current-speed", &len);
 	if (prop && len == 4) {
 		speed = fdt32_to_cpu(*(uint32_t *)prop);
-		//dprintf("serial: speed %ld\n", speed);
+		dprintf("serial: speed %ld\n", speed);
 	}
 
-	if (fdt_node_check_compatible(fdt, node, "ns16550a") == 1
-		|| fdt_node_check_compatible(fdt, node, "ns16550") == 1) {
+	// fdt_node_check_compatible returns 0 on match.
+
+	if (fdt_node_check_compatible(fdt, node, "ns16550a") == 0
+		|| fdt_node_check_compatible(fdt, node, "ns16550") == 0) {
+		dprintf("serial: Found 8250 serial UART!\n");
 		uart = arch_get_uart_8250(regs, clock);
-		//dprintf("serial: using 8250\n");
-		// XXX:assume speed is already set
-		(void)speed;
+	#ifdef __ARM__
+	} else if (fdt_node_check_compatible(fdt, node, "arm,pl011") == 0
+		|| fdt_node_check_compatible(fdt, node, "arm,primecell") == 0) {
+		dprintf("serial: Found pl011 serial UART!\n");
+		uart = arch_get_uart_pl011(regs, clock);
+	#endif
 	} else {
 		// TODO: handle more UART types
-		// for when we can use U-Boot's console
-		panic("Unknown UART type %s", type);
+		return NULL;
 	}
 
 	return uart;
 }
-

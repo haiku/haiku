@@ -29,5 +29,10 @@
 #define __dead
 #define __dead2
 
+#ifndef __weak_reference
+#define	__weak_reference(sym,alias)	\
+	__asm__(".weak " #alias);	\
+	__asm__(".equ "  #alias ", " #sym)
+#endif
 
 #endif

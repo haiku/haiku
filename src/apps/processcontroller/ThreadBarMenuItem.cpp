@@ -56,6 +56,7 @@ ThreadBarMenuItem::DrawBar(bool force)
 	bool selected = IsSelected();
 	BRect frame = Frame();
 	BMenu* menu = Menu();
+	rgb_color highColor = menu->HighColor();
 	frame.right -= 24;
 	frame.left = frame.right - kBarWidth;
 	frame.top += 3;
@@ -127,7 +128,7 @@ ThreadBarMenuItem::DrawBar(bool force)
 			menu->SetHighColor(kWhite);
 		menu->FillRect(r);
 	}
-	menu->SetHighColor(kBlack);
+	menu->SetHighColor(highColor);
 	fGrenze1 = grenze1;
 	fGrenze2 = grenze2;
 }

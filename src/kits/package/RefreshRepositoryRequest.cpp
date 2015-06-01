@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,11 +12,12 @@
 #include <Directory.h>
 #include <Path.h>
 
+#include <JobQueue.h>
+
 #include <package/ActivateRepositoryCacheJob.h>
 #include <package/ChecksumAccessors.h>
 #include <package/ValidateChecksumJob.h>
 #include <package/FetchFileJob.h>
-#include <package/JobQueue.h>
 #include <package/RepositoryCache.h>
 #include <package/RepositoryConfig.h>
 #include <package/PackageRoster.h>
@@ -96,7 +97,7 @@ BRefreshRepositoryRequest::CreateInitialJobs()
 
 
 void
-BRefreshRepositoryRequest::JobSucceeded(BJob* job)
+BRefreshRepositoryRequest::JobSucceeded(BSupportKit::BJob* job)
 {
 	if (job == fValidateChecksumJob
 		&& !fValidateChecksumJob->ChecksumsMatch()) {

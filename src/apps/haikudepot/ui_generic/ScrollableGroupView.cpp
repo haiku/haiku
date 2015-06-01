@@ -30,9 +30,9 @@ void
 ScrollableGroupView::DoLayout()
 {
 	BGroupView::DoLayout();
-	
+
 	BScrollBar* scrollBar = ScrollBar(B_VERTICAL);
-	
+
 	if (scrollBar == NULL)
 		return;
 

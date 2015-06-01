@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Hamish Morrison, hamishm53@gmail.com.
  * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -17,6 +18,25 @@
 #include <posix/realtime_sem_defs.h>
 #include <syscall_utils.h>
 #include <syscalls.h>
+#include <user_mutex_defs.h>
+
+
+#define SEM_TYPE_NAMED		1
+#define SEM_TYPE_UNNAMED	2
+
+
+static int32
+atomic_add_if_greater(int32* value, int32 amount, int32 testValue)
+{
+	int32 current = atomic_get(value);
+	while (current > testValue) {
+		int32 old = atomic_test_and_set(value, current + amount, current);
+		if (old == current)
+			return old;
+		current = old;
+	}
+	return current;
+}
 
 
 sem_t*
@@ -50,6 +70,8 @@ sem_open(const char* name, int openFlags,...)
 		__set_errno(B_NO_MEMORY);
 		return SEM_FAILED;
 	}
+
+	sem->type = SEM_TYPE_NAMED;
 	MemoryDeleter semDeleter(sem);
 
 	// ask the kernel to open the semaphore
@@ -72,7 +94,8 @@ int
 sem_close(sem_t* semaphore)
 {
 	sem_t* deleteSem = NULL;
-	status_t error = _kern_realtime_sem_close(semaphore->id, &deleteSem);
+	status_t error = _kern_realtime_sem_close(semaphore->u.named_sem_id,
+		&deleteSem);
 	if (error == B_OK)
 		free(deleteSem);
 
@@ -90,35 +113,87 @@ sem_unlink(const char* name)
 int
 sem_init(sem_t* semaphore, int shared, unsigned value)
 {
-	RETURN_AND_SET_ERRNO(_kern_realtime_sem_open(NULL, shared, 0, value,
-		semaphore, NULL));
+	semaphore->type = SEM_TYPE_UNNAMED;
+	semaphore->u.unnamed_sem = value;
+	return 0;
 }
 
 
 int
 sem_destroy(sem_t* semaphore)
 {
-	RETURN_AND_SET_ERRNO(_kern_realtime_sem_close(semaphore->id, NULL));
+	if (semaphore->type != SEM_TYPE_UNNAMED)
+		RETURN_AND_SET_ERRNO(EINVAL);
+
+	return 0;
+}
+
+
+static int
+unnamed_sem_post(sem_t* semaphore) {
+	int32* sem = (int32*)&semaphore->u.unnamed_sem;
+	int32 oldValue = atomic_add_if_greater(sem, 1, -1);
+	if (oldValue > -1)
+		return 0;
+
+	return _kern_mutex_sem_release(sem);
+}
+
+
+static int
+unnamed_sem_trywait(sem_t* semaphore) {
+	int32* sem = (int32*)&semaphore->u.unnamed_sem;
+	int32 oldValue = atomic_add_if_greater(sem, -1, 0);
+	if (oldValue > 0)
+		return 0;
+
+	return EAGAIN;
+}
+
+
+static int
+unnamed_sem_timedwait(sem_t* semaphore, const struct timespec* timeout) {
+	int32* sem = (int32*)&semaphore->u.unnamed_sem;
+
+	bigtime_t timeoutMicros = B_INFINITE_TIMEOUT;
+	if (timeout != NULL) {
+		timeoutMicros = ((bigtime_t)timeout->tv_sec) * 1000000
+			+ timeout->tv_nsec / 1000;
+	}
+
+	int result = unnamed_sem_trywait(semaphore);
+	if (result == 0)
+		return 0;
+
+	return _kern_mutex_sem_acquire(sem,	NULL,
+		timeoutMicros == B_INFINITE_TIMEOUT ? 0 : B_ABSOLUTE_REAL_TIME_TIMEOUT,
+		timeoutMicros);
 }
 
 
 int
 sem_post(sem_t* semaphore)
 {
-	RETURN_AND_SET_ERRNO(_kern_realtime_sem_post(semaphore->id));
+	status_t error;
+	if (semaphore->type == SEM_TYPE_NAMED)
+		error = _kern_realtime_sem_post(semaphore->u.named_sem_id);
+	else
+		error = unnamed_sem_post(semaphore);
+
+	RETURN_AND_SET_ERRNO(error);
 }
 
 
-int
-sem_timedwait(sem_t* semaphore, const struct timespec* timeout)
+static int
+named_sem_timedwait(sem_t* semaphore, const struct timespec* timeout)
 {
 	if (timeout != NULL
 		&& (timeout->tv_nsec < 0 || timeout->tv_nsec >= 1000000000)) {
-		status_t err = _kern_realtime_sem_wait(semaphore->id, 0);
+		status_t err = _kern_realtime_sem_wait(semaphore->u.named_sem_id, 0);
 		if (err == B_WOULD_BLOCK)
 			err = EINVAL;
 		// do nothing, return err as it is.
-		RETURN_AND_SET_ERRNO_TEST_CANCEL(err);
+		return err;
 	}
 
 	bigtime_t timeoutMicros = B_INFINITE_TIMEOUT;
@@ -126,31 +201,62 @@ sem_timedwait(sem_t* semaphore, const struct timespec* timeout)
 		timeoutMicros = ((bigtime_t)timeout->tv_sec) * 1000000
 			+ timeout->tv_nsec / 1000;
 	}
-	status_t err = _kern_realtime_sem_wait(semaphore->id, timeoutMicros);
+	status_t err = _kern_realtime_sem_wait(semaphore->u.named_sem_id,
+		timeoutMicros);
 	if (err == B_WOULD_BLOCK)
 		err = ETIMEDOUT;
-	
-	RETURN_AND_SET_ERRNO_TEST_CANCEL(err);
+
+	return err;
 }
 
 
 int
 sem_trywait(sem_t* semaphore)
 {
-	RETURN_AND_SET_ERRNO(_kern_realtime_sem_wait(semaphore->id, 0));
+	status_t error;
+	if (semaphore->type == SEM_TYPE_NAMED)
+		error = _kern_realtime_sem_wait(semaphore->u.named_sem_id, 0);
+	else
+		error = unnamed_sem_trywait(semaphore);
+
+	RETURN_AND_SET_ERRNO(error);
 }
 
 
 int
 sem_wait(sem_t* semaphore)
 {
-	RETURN_AND_SET_ERRNO_TEST_CANCEL(
-		_kern_realtime_sem_wait(semaphore->id, B_INFINITE_TIMEOUT));
+	status_t error;
+	if (semaphore->type == SEM_TYPE_NAMED)
+		error = named_sem_timedwait(semaphore, NULL);
+	else
+		error = unnamed_sem_timedwait(semaphore, NULL);
+
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(error);
+}
+
+
+int
+sem_timedwait(sem_t* semaphore, const struct timespec* timeout)
+{
+	status_t error;
+	if (semaphore->type == SEM_TYPE_NAMED)
+		error = named_sem_timedwait(semaphore, timeout);
+	else
+		error = unnamed_sem_timedwait(semaphore, timeout);
+
+	RETURN_AND_SET_ERRNO_TEST_CANCEL(error);
 }
 
 
 int
 sem_getvalue(sem_t* semaphore, int* value)
 {
-	RETURN_AND_SET_ERRNO(_kern_realtime_sem_get_value(semaphore->id, value));
+	if (semaphore->type == SEM_TYPE_NAMED) {
+		RETURN_AND_SET_ERRNO(_kern_realtime_sem_get_value(
+			semaphore->u.named_sem_id, value));
+	} else {
+		*value = semaphore->u.unnamed_sem < 0 ? 0 : semaphore->u.unnamed_sem;
+		return 0;
+	}
 }

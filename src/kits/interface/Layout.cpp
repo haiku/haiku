@@ -94,9 +94,10 @@ BLayout::~BLayout()
 	if (fOwner && this == fOwner->GetLayout())
 		fOwner->_LayoutLeft(this);
 
-	// removes and deletes all items
-	if (fTarget)
-		SetTarget(NULL);
+	if (CountItems() > 0) {
+		debugger("Deleting a BLayout that still has items. Subclass hooks "
+			"will not be called");
+	}
 }
 
 
@@ -208,7 +209,8 @@ BLayout::RemoveView(BView* child)
 			continue;
 
 		RemoveItem(i);
-		delete item;
+		if (item != child->GetLayout())
+			delete item;
 
 		remaining--;
 		removed = true;

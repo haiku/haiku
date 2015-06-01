@@ -583,8 +583,6 @@ void export_raw_audio_attr(
 	}
 }
 
-#if B_BEOS_VERSION > B_BEOS_VERSION_4_5
-
 void export_multi_audio_info_attr(
 	const media_multi_audio_info& f,
 	ExportContext& context) {
@@ -600,7 +598,6 @@ void export_multi_audio_info_attr(
 	if(f.matrix_mask != w.matrix_mask)
 		context.writeAttr(gKey_matrix_mask, f.matrix_mask);
 }
-#endif
 
 void export_video_display_info_attr(
 	const media_video_display_info& d,
@@ -842,9 +839,7 @@ void export_encoded_audio_content(
 	context.beginElement(MediaFormatIO::s_raw_audio_tag);
 	export_raw_audio_attr(f.output, context);
 
-#if B_BEOS_VERSION > B_BEOS_VERSION_4_5
 	export_multi_audio_info_attr(f.multi_info, context);
-#endif
 
 	context.endElement();
 }
@@ -925,9 +920,7 @@ void MediaFormatIO::xmlExportAttributes(
 	switch(m_format.type) {
 		case B_MEDIA_RAW_AUDIO:
 			export_raw_audio_attr(m_format.u.raw_audio, context);
-#if B_BEOS_VERSION > B_BEOS_VERSION_4_5
 			export_multi_audio_info_attr(m_format.u.raw_audio, context);
-#endif
 			break;
 
 		case B_MEDIA_RAW_VIDEO:
@@ -1016,8 +1009,6 @@ void import_raw_audio_attribute(
 	}
 }
 
-#if B_BEOS_VERSION > B_BEOS_VERSION_4_5
-
 void import_multi_audio_info_attribute(
 	media_multi_audio_info& f,
 	const char* key,
@@ -1031,8 +1022,6 @@ void import_multi_audio_info_attribute(
 	else if(!strcmp(key, gKey_matrix_mask))
 		f.matrix_mask = atoi(value);
 }
-
-#endif
 
 void import_raw_video_attribute(
 	media_raw_video_format& f,
@@ -1257,10 +1246,8 @@ void MediaFormatIO::xmlImportAttribute(
 			import_raw_audio_attribute(
 				m_format.u.raw_audio, key, value, context);
 
-#if B_BEOS_VERSION > B_BEOS_VERSION_4_5
 			import_multi_audio_info_attribute(
 				m_format.u.raw_audio, key, value, context);
-#endif
 			break;
 
 		case B_MEDIA_RAW_VIDEO:

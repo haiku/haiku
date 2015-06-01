@@ -68,7 +68,7 @@ Device	Device		Urządzenie
 Signal processing controller	Device		Kontroler przetwarzania sygnałów
 Serial bus controller	Device		Kontroler magistrali szeregowej
 Wireless controller	Device		Kontroler łączy bezprzewodowych
-ACPI node '%1'	DeviceACPI		ACPI węzeł '%1'
+ACPI node '%1'	DeviceACPI		ACPI węzeł „%1”
 Device name	Device		Nazwa urządzenia
 Manufacturer	Device		Producent
 Name	PropertyList		Nazwa

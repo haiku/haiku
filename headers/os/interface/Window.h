@@ -26,8 +26,8 @@ namespace BPrivate {
 
 enum window_type {
 	B_UNTYPED_WINDOW					= 0,
-	B_TITLED_WINDOW 					= 1,
-	B_MODAL_WINDOW 						= 3,
+	B_TITLED_WINDOW						= 1,
+	B_MODAL_WINDOW						= 3,
 	B_DOCUMENT_WINDOW					= 11,
 	B_BORDERED_WINDOW					= 20,
 	B_FLOATING_WINDOW					= 21

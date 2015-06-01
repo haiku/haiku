@@ -129,13 +129,13 @@ public:
 
 		if (path) {
 			path->RemoveObserver(this);
-			path->Release();
+			path->ReleaseReference();
 		}
 
 		path = p;
 
 		if (path) {
-			path->Acquire();
+			path->AcquireReference();
 			path->AddObserver(this);
 			UpdateText();
 		}

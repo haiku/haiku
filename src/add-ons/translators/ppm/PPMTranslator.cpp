@@ -452,91 +452,90 @@ public:
 			BView(name, flags)
 			{
 				SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-				SetLowColor(ViewColor());
 
-				mTitle = new BStringView("title",
+				fTitle = new BStringView("title",
 					B_TRANSLATE("PPM image translator"));
-				mTitle->SetFont(be_bold_font);
+				fTitle->SetFont(be_bold_font);
 
 				char detail[100];
 				int ver = static_cast<int>(translatorVersion);
-				sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"), ver >> 8,
+				sprintf(detail, B_TRANSLATE("Version %d.%d.%d, %s"), ver >> 8,
 					((ver >> 4) & 0xf),
 					(ver & 0xf), __DATE__);
-				mDetail = new BStringView("detail", detail);
+				fDetail = new BStringView("detail", detail);
 
-				mBasedOn = new BStringView("basedOn",
+				fBasedOn = new BStringView("basedOn",
 					B_TRANSLATE("Based on PPMTranslator sample code"));
 
-				mCopyright = new BStringView("copyright",
+				fCopyright = new BStringView("copyright",
 					B_TRANSLATE("Sample code copyright 1999, Be Incorporated"));
 
-				mMenu = new BPopUpMenu("Color Space");
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("None"),
+				fMenu = new BPopUpMenu("Color Space");
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("None"),
 					CSMessage(B_NO_COLOR_SPACE)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 8:8:8 32 bits"),
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 8:8:8 32 bits"),
 					CSMessage(B_RGB32)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 8:8:8:8 32 "
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 8:8:8:8 32 "
 					"bits"), CSMessage(B_RGBA32)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:5:5 16 bits"),
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:5:5 16 bits"),
 					CSMessage(B_RGB15)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 5:5:5:1 16 "
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 5:5:5:1 16 "
 					"bits"), CSMessage(B_RGBA15)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:6:5 16 bits"),
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:6:5 16 bits"),
 					CSMessage(B_RGB16)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("System palette 8 "
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("System palette 8 "
 					"bits"), CSMessage(B_CMAP8)));
-				mMenu->AddSeparatorItem();
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("Grayscale 8 bits"),
+				fMenu->AddSeparatorItem();
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("Grayscale 8 bits"),
 					CSMessage(B_GRAY8)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("Bitmap 1 bit"),
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("Bitmap 1 bit"),
 					CSMessage(B_GRAY1)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("CMY 8:8:8 32 bits"),
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("CMY 8:8:8 32 bits"),
 					CSMessage(B_CMY32)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("CMYA 8:8:8:8 32 "
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("CMYA 8:8:8:8 32 "
 					"bits"), CSMessage(B_CMYA32)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("CMYK 8:8:8:8 32 "
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("CMYK 8:8:8:8 32 "
 					"bits"), CSMessage(B_CMYK32)));
-				mMenu->AddSeparatorItem();
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 8:8:8 32 bits "
+				fMenu->AddSeparatorItem();
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 8:8:8 32 bits "
 					"big-endian"), CSMessage(B_RGB32_BIG)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 8:8:8:8 32 "
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 8:8:8:8 32 "
 					"bits big-endian"), CSMessage(B_RGBA32_BIG)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:5:5 16 bits "
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:5:5 16 bits "
 					"big-endian"), CSMessage(B_RGB15_BIG)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 5:5:5:1 16 "
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGBA 5:5:5:1 16 "
 					"bits big-endian"), CSMessage(B_RGBA15_BIG)));
-				mMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:6:5 16 bits "
+				fMenu->AddItem(new BMenuItem(B_TRANSLATE("RGB 5:6:5 16 bits "
 					"big-endian"), CSMessage(B_RGB16)));
- 				mField = new BMenuField(B_TRANSLATE("Input Color Space"),
-					mMenu);
- 				mField->SetViewColor(ViewColor());
+				fField = new BMenuField(B_TRANSLATE("Input color space:"),
+					fMenu);
+				fField->SetViewColor(ViewColor());
  				SelectColorSpace(g_settings.out_space);
  				BMessage * msg = new BMessage(CHANGE_ASCII);
- 				mAscii = new BCheckBox(B_TRANSLATE("Write ASCII"), msg);
+ 				fAscii = new BCheckBox(B_TRANSLATE("Write ASCII"), msg);
  				if (g_settings.write_ascii)
- 					mAscii->SetValue(1);
- 				mAscii->SetViewColor(ViewColor());
+ 					fAscii->SetValue(1);
+				fAscii->SetViewColor(ViewColor());
 
- 				// Build the layout
-				BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
-					.SetInsets(5)
-					.Add(mTitle)
- 					.Add(mDetail)
- 					.AddGlue()
- 					.Add(mBasedOn)
- 					.Add(mCopyright)
- 					.AddGlue()
-					.AddGrid(10, 10)
-						.Add(mField->CreateLabelLayoutItem(), 0, 0)
- 						.Add(mField->CreateMenuBarLayoutItem(), 1, 0)
- 						.Add(mAscii, 0, 1)
-					.End()
-					.AddGlue();
-
+				// Build the layout
+				BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+					.SetInsets(B_USE_DEFAULT_SPACING)
+					.Add(fTitle)
+					.Add(fDetail)
+					.AddGlue()
+					.AddGroup(B_HORIZONTAL)
+						.Add(fField)
+						.AddGlue()
+						.End()
+					.Add(fAscii)
+					.AddGlue()
+					.Add(fBasedOn)
+					.Add(fCopyright);
+ 
  				BFont font;
  				GetFont(&font);
- 				SetExplicitPreferredSize(BSize((font.Size() * 350)/12, (font.Size() * 200)/12));
+ 				SetExplicitPreferredSize(BSize((font.Size() * 350)/12,
+ 					(font.Size() * 200)/12));
 			}
 		~PPMView()
 			{
@@ -556,7 +555,7 @@ virtual	void MessageReceived(
 				}
 				else if (message->what == CHANGE_ASCII) {
 					BMessage msg;
-					msg.AddBool("ppm /ascii", mAscii->Value());
+					msg.AddBool("ppm /ascii", fAscii->Value());
 					SetSettings(&msg);
 				}
 				else {
@@ -568,13 +567,13 @@ virtual	void AllAttached()
 				BView::AllAttached();
 				BMessenger msgr(this);
 				/*	Tell all menu items we're the man.	*/
-				for (int ix=0; ix<mMenu->CountItems(); ix++) {
-					BMenuItem * i = mMenu->ItemAt(ix);
+				for (int ix=0; ix<fMenu->CountItems(); ix++) {
+					BMenuItem * i = fMenu->ItemAt(ix);
 					if (i) {
 						i->SetTarget(msgr);
 					}
 				}
-				mAscii->SetTarget(msgr);
+				fAscii->SetTarget(msgr);
 			}
 
 		void SetSettings(
@@ -596,13 +595,13 @@ virtual	void AllAttached()
 			}
 
 private:
-		BStringView * mTitle;
-		BStringView * mDetail;
-		BStringView * mBasedOn;
-		BStringView * mCopyright;
-		BPopUpMenu * mMenu;
-		BMenuField * mField;
-		BCheckBox * mAscii;
+		BStringView * fTitle;
+		BStringView * fDetail;
+		BStringView * fBasedOn;
+		BStringView * fCopyright;
+		BPopUpMenu * fMenu;
+		BMenuField * fField;
+		BCheckBox * fAscii;
 
 		BMessage * CSMessage(
 				color_space space)
@@ -615,13 +614,13 @@ private:
 		void SelectColorSpace(
 				color_space space)
 			{
-				for (int ix=0; ix<mMenu->CountItems(); ix++) {
+				for (int ix=0; ix<fMenu->CountItems(); ix++) {
 					int32 s;
-					BMenuItem * i = mMenu->ItemAt(ix);
+					BMenuItem * i = fMenu->ItemAt(ix);
 					if (i) {
 						BMessage * m = i->Message();
 						if (m && !m->FindInt32("space", &s) && (s == space)) {
-							mMenu->Superitem()->SetLabel(i->Label());
+							fMenu->Superitem()->SetLabel(i->Label());
 							break;
 						}
 					}

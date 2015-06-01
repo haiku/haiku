@@ -1,7 +1,12 @@
-1	portuguese (brazil)	x-vnd.Haiku-IMAP	3950045582
+1	portuguese (brazil)	x-vnd.Haiku-IMAP	354143849
 Destination:	imap_config		Destino:
+Ok	IMAPFolderConfig		Ok
 status	IMAPFolderConfig		status
+Configure IMAP Folders	imap_config		Configurar Pastas IMAP
+Cancel	IMAPFolderConfig		Cancelar
 Apply	IMAPFolderConfig		Aplicar
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Buscando pastas IMAP, tenha paciência...
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Não é possível conectar ao servidor \"%server%\":\n%error%
 IMAP Folders	IMAPFolderConfig		Pastas IMAP
+Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Atualizar subscrição de pastas IMAP, tenha paciência…
 Failed to fetch available storage.	IMAPFolderConfig		Falhou ao buscar armazenamento disponível.

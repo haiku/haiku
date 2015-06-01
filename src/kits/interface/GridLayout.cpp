@@ -220,6 +220,10 @@ BGridLayout::~BGridLayout()
 {
 	delete fRowInfos;
 	delete fColumnInfos;
+
+	for (int32 i = 0; i < fColumnCount; i++)
+		delete[] fGrid[i];
+	delete[] fGrid;
 }
 
 

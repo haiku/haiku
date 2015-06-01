@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Bluetooth	3495483302
+1	italian	x-vnd.Haiku-Bluetooth	3550394259
 Display	DeviceClass		Schermo
 Capturing	DeviceClass		Registrazione in corso
 Printer	DeviceClass		Stampante
@@ -15,6 +15,7 @@ No service available	DeviceClass		Nessun servizio disponibile
 Wearable	DeviceClass	A wearable computer	Indossabile
 Handheld	DeviceClass		Palmare
 Invalid device class!\n	DeviceClass		La classe dispositivo non è valida.\n
+Sensing device	DeviceClass		Rilevazione del dispositivo
 Computer	DeviceClass		Computer
 Cellular	DeviceClass		Cellulare
 Microphone	DeviceClass		Microfono
@@ -44,6 +45,7 @@ Information	DeviceClass		Informazione
 Remote control	DeviceClass		Telecomando
 Service classes: 	DeviceClass		Classi servizio: 
 Pager	DeviceClass	A small radio device to receive short text messages	Cercapersone
+Object transfer	DeviceClass		Trasferimento dell'oggetto
 Gaming/Toy	DeviceClass		Gadget
 Audio	DeviceClass		Audio
 Robot	DeviceClass		Robot

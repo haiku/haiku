@@ -179,7 +179,7 @@ PathContainer::_MakeEmpty()
 #ifdef ICON_O_MATIC
 		_NotifyPathRemoved(path);
 		if (fOwnsPaths)
-			path->Release();
+			path->ReleaseReference();
 #else
 		if (fOwnsPaths)
 			delete path;

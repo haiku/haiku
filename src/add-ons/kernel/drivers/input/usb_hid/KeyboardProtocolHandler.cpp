@@ -28,8 +28,8 @@
 #define RIGHT_ALT_KEY	0x40
 #define ALT_KEYS		(LEFT_ALT_KEY | RIGHT_ALT_KEY)
 
-#define KEYBOARD_FLAG_READER	0x01
-#define KEYBOARD_FLAG_DEBUGGER	0x02
+#define KEYBOARD_HANDLER_COOKIE_FLAG_READER		0x01
+#define KEYBOARD_HANDLER_COOKIE_FLAG_DEBUGGER	0x02
 
 
 static bool sDebugKeyboardFound = false;
@@ -311,9 +311,9 @@ KeyboardProtocolHandler::Open(uint32 flags, uint32 *cookie)
 status_t
 KeyboardProtocolHandler::Close(uint32 *cookie)
 {
-	if ((*cookie & KEYBOARD_FLAG_DEBUGGER) != 0)
+	if ((*cookie & KEYBOARD_HANDLER_COOKIE_FLAG_DEBUGGER) != 0)
 		fHasDebugReader = false;
-	if ((*cookie & KEYBOARD_FLAG_READER) != 0)
+	if ((*cookie & KEYBOARD_HANDLER_COOKIE_FLAG_READER) != 0)
 		atomic_and(&fHasReader, 0);
 
 	return ProtocolHandler::Close(cookie);
@@ -332,7 +332,7 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 					return B_BUSY;
 
 				// We're the first, so we become the only reader
-				*cookie = KEYBOARD_FLAG_READER;
+				*cookie = KEYBOARD_HANDLER_COOKIE_FLAG_READER;
 			}
 
 			while (true) {
@@ -340,7 +340,7 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 
 				bigtime_t enterTime = system_time();
 				while (RingBufferReadable() == 0) {
-					status_t result = _ReadReport(fCurrentRepeatDelay);
+					status_t result = _ReadReport(fCurrentRepeatDelay, cookie);
 					if (result != B_OK && result != B_TIMED_OUT)
 						return result;
 
@@ -350,8 +350,8 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 					if (RingBufferReadable() == 0 && fCurrentRepeatKey != 0
 						&& system_time() - enterTime > fCurrentRepeatDelay) {
 						// this case is for handling key repeats, it means no
-						// interrupt transfer has happened or it didn't produce any
-						// new key events, but a repeated key down is due
+						// interrupt transfer has happened or it didn't produce
+						// any new key events, but a repeated key down is due
 						_WriteKey(fCurrentRepeatKey, true);
 
 						// the next timeout is reduced to the repeat_rate
@@ -360,7 +360,8 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 					}
 				}
 
-				if (fHasDebugReader && (*cookie & KEYBOARD_FLAG_DEBUGGER)
+				if (fHasDebugReader
+					&& (*cookie & KEYBOARD_HANDLER_COOKIE_FLAG_DEBUGGER)
 						== 0) {
 					// Handover buffer to the debugger instead
 					locker.Unlock();
@@ -420,7 +421,7 @@ KeyboardProtocolHandler::Control(uint32 *cookie, uint32 op, void *buffer,
 			if (fHasDebugReader)
 				return B_BUSY;
 
-			*cookie |= KEYBOARD_FLAG_DEBUGGER;
+			*cookie |= KEYBOARD_HANDLER_COOKIE_FLAG_DEBUGGER;
 			fHasDebugReader = true;
 			return B_OK;
 	}
@@ -459,7 +460,7 @@ KeyboardProtocolHandler::_SetLEDs(uint8 *data)
 
 
 status_t
-KeyboardProtocolHandler::_ReadReport(bigtime_t timeout)
+KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 {
 	status_t result = fInputReport.WaitForReport(timeout);
 	if (result != B_OK) {
@@ -467,6 +468,9 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout)
 			TRACE("device has been removed\n");
 			return B_ERROR;
 		}
+
+		if ((*cookie & PROTOCOL_HANDLER_COOKIE_FLAG_CLOSED) != 0)
+			return B_CANCELED;
 
 		if (result != B_TIMED_OUT && result != B_INTERRUPTED) {
 			// we expect timeouts as we do repeat key handling this way,
@@ -767,6 +771,6 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout)
 		keyDown = true;
 	}
 
-	memcpy(fLastKeys, fCurrentKeys, fKeyCount * sizeof(uint32));
+	memcpy(fLastKeys, fCurrentKeys, fKeyCount * sizeof(uint16));
 	return B_OK;
 }

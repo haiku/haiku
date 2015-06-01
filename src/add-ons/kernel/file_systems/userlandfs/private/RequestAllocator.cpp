@@ -92,8 +92,9 @@ RequestAllocator::FinishDeferredInit()
 				memcpy((uint8*)fRequest + info.offset, info.data, info.size);
 			free(info.data);
 		}
-		PRINT(("RequestAllocator::FinishDeferredInit(): area: %ld, "
-			"offset: %ld, size: %ld\n", info.area, info.offset, info.size));
+		PRINT(("RequestAllocator::FinishDeferredInit(): area: %" B_PRId32 ", "
+			"offset: %" B_PRId32 ", size: %" B_PRId32 "\n", info.area,
+			info.offset, info.size));
 		info.target->SetTo(info.area, info.offset, info.size);
 	}
 	fDeferredInitInfoCount = 0;
@@ -251,8 +252,9 @@ RequestAllocator::AllocateAddress(Address& address, int32 size, int32 align,
 			info.inPortBuffer = false;
 			info.target = &address;
 			fDeferredInitInfoCount++;
-PRINT(("  RequestAllocator::AllocateAddress(): deferred allocated area: "
-"%ld, size: %ld (%ld), data: %p\n", area, size, areaSize, *data));
+			PRINT(("  RequestAllocator::AllocateAddress(): deferred allocated "
+				"area: %" B_PRId32 ", size: %" B_PRId32 " (%" B_PRId32
+				"), data: %p\n", area, size, areaSize, *data));
 		} else
 			address.SetTo(area, 0, size);
 	}

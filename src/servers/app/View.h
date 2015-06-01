@@ -83,6 +83,13 @@ public:
 			void			AddChild(View* view);
 			bool			RemoveChild(View* view);
 
+	inline	bool			HasParent(View* candidate) const
+							{
+								return fParent == candidate
+									|| (fParent != NULL
+										&& fParent->HasParent(candidate));
+							}
+
 	inline	View*			Parent() const
 								{ return fParent; }
 

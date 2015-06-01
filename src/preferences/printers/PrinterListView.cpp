@@ -9,12 +9,15 @@
 
 #include "PrinterListView.h"
 
+#include <Application.h>
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <Directory.h>
+#include <IconUtils.h>
 #include <Locale.h>
 #include <Mime.h>
 #include <NodeInfo.h>
+#include <Resources.h>
 #include <String.h>
 
 #include "pr_server.h"
@@ -275,7 +278,9 @@ PrinterItem::PrinterItem(PrintersWindow* window, const BDirectory& node,
 	}
 
 	if (sIcon && sIcon->IsValid() && sSelectedIcon == NULL) {
-		BBitmap *checkMark = LoadBitmap("check_mark_icon", 'BBMP');
+		const float checkMarkIconSize = 20.0;
+		BBitmap *checkMark = _LoadVectorIcon("check_mark_icon",
+			checkMarkIconSize);
 		if (checkMark && checkMark->IsValid()) {
 			sSelectedIcon = new BBitmap(rect, B_RGBA32, true);
 			if (sSelectedIcon && sSelectedIcon->IsValid()) {
@@ -384,14 +389,12 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	BRect bounds = list->ItemFrame(list->IndexOf(this));
 
 	rgb_color color = owner->ViewColor();
-	rgb_color oldViewColor = color;
 	rgb_color oldLowColor = owner->LowColor();
 	rgb_color oldHighColor = owner->HighColor();
 
 	if (IsSelected())
-		color = tint_color(color, B_HIGHLIGHT_BACKGROUND_TINT);
+		color = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 
-	owner->SetViewColor(color);
 	owner->SetLowColor(color);
 	owner->SetHighColor(color);
 
@@ -443,15 +446,14 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 
 	// left of item
 	BString s = fName;
-	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, pendingPt.x - namePt.x);
-
 	owner->SetFont(be_bold_font);
+	owner->TruncateString(&s, B_TRUNCATE_MIDDLE, pendingPt.x - namePt.x);
 	owner->DrawString(s.String(), s.Length(), namePt);
 	owner->SetFont(&font);
 
 	s = B_TRANSLATE("Driver: %driver%");
 	s.ReplaceFirst("%driver%", fDriverName);
-	owner->TruncateString(&s, B_TRUNCATE_END, bounds.Width() - commentPt.x);
+	owner->TruncateString(&s, B_TRUNCATE_END, commentPt.x - driverPt.x);
 	owner->DrawString(s.String(), s.Length(), driverPt);
 
 
@@ -473,7 +475,6 @@ PrinterItem::DrawItem(BView *owner, BRect /*bounds*/, bool complete)
 	owner->DrawString(s.String(), s.Length(), commentPt);
 
 	owner->SetDrawingMode(mode);
-	owner->SetViewColor(oldViewColor);
 }
 
 
@@ -514,6 +515,7 @@ PrinterItem::UpdatePendingJobs()
 			fPendingJobs = B_TRANSLATE("1 pending job.");
 			return;
 		} else if (pendingJobs > 1) {
+			fPendingJobs = "";
 			fPendingJobs << pendingJobs << B_TRANSLATE(" pending jobs.");
 			return;
 		}
@@ -528,3 +530,24 @@ PrinterItem::_GetStringProperty(const char* propName, BString& outString)
 	fNode.ReadAttrString(propName, &outString);
 }
 
+
+BBitmap*
+PrinterItem::_LoadVectorIcon(const char* resourceName, float iconSize)
+{
+	size_t dataSize;
+	BResources* resources = BApplication::AppResources();
+	const void* data = resources->LoadResource(B_VECTOR_ICON_TYPE,
+		resourceName, &dataSize);
+
+	if (data != NULL){
+		BBitmap *iconBitmap = new BBitmap(BRect(0, 0, iconSize - 1,
+			iconSize - 1), 0, B_RGBA32);
+		if (BIconUtils::GetVectorIcon(
+				reinterpret_cast<const uint8*>(data),
+				dataSize, iconBitmap) == B_OK)
+			return iconBitmap;
+		else
+			delete iconBitmap;
+	};
+	return NULL;
+}

@@ -34,7 +34,7 @@ UnassignPathCommand::UnassignPathCommand(Shape* shape,
 UnassignPathCommand::~UnassignPathCommand()
 {
 	if (fPathRemoved && fPath)
-		fPath->Release();
+		fPath->ReleaseReference();
 }
 
 // InitCheck

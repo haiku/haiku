@@ -38,9 +38,6 @@ struct QueueEntry {
 };
 
 
-/*static*/ ImageCache ImageCache::sCache;
-
-
 // #pragma mark -
 
 
@@ -82,7 +79,7 @@ ImageCache::ImageCache()
 
 ImageCache::~ImageCache()
 {
-	// TODO: delete CacheEntries, and QueueEntries
+	Stop();
 }
 
 
@@ -157,6 +154,29 @@ ImageCache::RetrieveImage(const entry_ref& ref, int32 page,
 	}
 
 	return B_OK;
+}
+
+
+void
+ImageCache::Stop()
+{
+	// empty the working queue
+	fLocker.Lock();
+	while (!fQueue.empty()) {
+		QueueEntry* entry = *fQueue.begin();
+		fQueue.pop_front();
+		delete entry;
+	}
+	fLocker.Unlock();
+
+	// wait for running thread
+	thread_id thread;
+	while (true) {
+		thread = find_thread("image loader");
+		if (thread < 0)
+			break;
+		wait_for_thread(thread, NULL);
+	}
 }
 
 

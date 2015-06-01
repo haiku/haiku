@@ -128,7 +128,6 @@ public:													// *** XML formatting helpers
 	// [e.moon 22dec99]
 	// non-template forms of writeAttr()
 
-#if B_BEOS_VERSION > B_BEOS_VERSION_4_5
 	void writeAttr(
 		const char*									key,
 		int8												value);
@@ -144,7 +143,6 @@ public:													// *** XML formatting helpers
 	void writeAttr(
 		const char*									key,
 		uint16											value);
-#endif
 
 	void writeAttr(
 		const char*									key,

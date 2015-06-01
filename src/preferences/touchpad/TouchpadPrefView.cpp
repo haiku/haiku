@@ -451,27 +451,23 @@ TouchpadPrefView::SetupView()
 
 	tapPrefLayout->AddView(fTapSlider);
 
-	BGroupView* buttonView = new BGroupView(B_HORIZONTAL, B_USE_SMALL_SPACING);
 	fDefaultButton = new BButton(B_TRANSLATE("Defaults"),
 		new BMessage(DEFAULT_SETTINGS));
 
-	buttonView->AddChild(fDefaultButton);
 	fRevertButton = new BButton(B_TRANSLATE("Revert"),
 		new BMessage(REVERT_SETTINGS));
 	fRevertButton->SetEnabled(false);
-	buttonView->AddChild(fRevertButton);
-	buttonView->GetLayout()->AddItem(BSpaceLayoutItem::CreateGlue());
 
-	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
-	layout->SetInsets(spacing, spacing, spacing, spacing);
-	layout->SetSpacing(spacing);
-	BView* rootView = new BView("root view", 0, layout);
-	AddChild(rootView);
-	rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	layout->AddView(scrollBox);
-	layout->AddView(tapBox);
-	layout->AddView(buttonView);
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(scrollBox)
+		.Add(tapBox)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fDefaultButton)
+			.Add(fRevertButton)
+			.AddGlue()
+			.End()
+		.End();
 }
 
 

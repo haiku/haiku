@@ -46,7 +46,7 @@
 
 PoorManWindow::PoorManWindow(BRect frame)
 	:
-	BWindow(frame, STR_APP_NAME, B_TITLED_WINDOW, 0),
+	BWindow(frame, STR_APP_NAME, B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
 	fStatus(false),
 	fHits(0),
 	fPrefWindow(NULL),

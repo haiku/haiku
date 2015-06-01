@@ -14,8 +14,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <FindDirectory.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Path.h>
 
 #include <notification/Notifications.h>
@@ -47,24 +46,14 @@ PrefletWin::PrefletWin()
 	fApply = new BButton("apply", B_TRANSLATE("Apply"), new BMessage(kApply));
 	fApply->SetEnabled(false);
 
-	// Calculate inset
-	float inset = ceilf(be_plain_font->Size() * 0.7f);
-
 	// Build the layout
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
-	// Add childs
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, inset)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fMainView)
-
-		.AddGroup(B_HORIZONTAL, inset)
+		.AddGroup(B_HORIZONTAL)
 			.Add(fRevert)
 			.AddGlue()
-			.Add(fApply)
-		.End()
-
-		.SetInsets(inset, inset, inset, inset)
-	);
+			.Add(fApply);
 
 	ReloadSettings();
 

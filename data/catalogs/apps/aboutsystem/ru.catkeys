@@ -1,13 +1,12 @@
-1	russian	x-vnd.Haiku-About	2555042707
-Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 Авторы Gutenprint.
+1	russian	x-vnd.Haiku-About	1488037792
+Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 авторы Gutenprint.
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Все права защищены © 1996-2002, 2006 David Turner, Robert Wilhelm и Werner Lemberg.
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (за его ядро NewOS)\n
 Ralink (firmware)	AboutWindow		Ralink (прошивка)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Все права защищены © 1996-2005 Julian R Seward.
 %d MiB total	AboutView		Всего %d МБ
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (основателю проекта)\n\n
-Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Все права защищены © 1998-2003 Daniel Veillard.
 %d MiB used (%d%%)	AboutView		%d МБ использовано (%d%%)
-Website, marketing & documentation:\n	AboutView		Веб-сайт, маркетинг и документация:\n
 AboutSystem	System name		О системе
 Copyright © 2003 Peter Hanappe and others.	AboutView		Все права защищены © 2003 Peter Hanappe и другие.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Все права защищены © 1994-1997 Mark Kilgard.
@@ -18,9 +17,7 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Все прав
 Source Code: 	AboutView		Исходный код: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Процессор:} few{# процессора:} other{# процессоров:}}
 Kernel:	AboutView		Ядро:
-Copyright © 2000 Jean-Pierre Lefebvre and Remi Lefebvre.	AboutView		Все права защищены © 2000 Jean-Pierre Lefebvre и Remi Lefebvre.
 BSD (4-clause)	AboutWindow		BSD (4-х пунктная)
-Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Все права защищены © 2001-2002 Thomas Broyer, Charlie Bozeman и Daniel Veillard.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Права на код Haiku принадлежат Haiku, Inc. или конкретным авторам, указанным в исходном коде. Haiku® и логотип HAIKU® являются зарегистрированными торговыми марками Haiku, Inc.\n\n
 Marvell (firmware)	AboutWindow		Marvell (прошивка)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Все права защищены © 1987-1988 Digital Equipment Corporation, Мейнард, Массачусетс.
@@ -28,7 +25,6 @@ GNU LGPL v2	AboutWindow		GNU LGPL v2
 The HaikuPorts team\n	AboutView		Команде HaikuPorts\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total МБ всего, %inaccessible МБ недоступно
 Intel (2xxx firmware)	AboutWindow		Intel (2xxx прошивка)
-Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Все права защищены © 2000-2007 Fabrice Bellard и другие.
 Contributors:\n	AboutView		Внесли вклад в развитие:\n
 Unknown	AboutView		Неизвестен
 Copyright © 2001-2003 Expat maintainers.	AboutView		Все права защищены © 2001-2003 Разработчики Expat.
@@ -61,12 +57,14 @@ Google and their Google Summer of Code and Google Code In programs\n	AboutView		
 The Haikuware team and their bounty program\n	AboutView		Команде Haikuware и их программе пожертвований\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Все права защищены © 1995, 1998-2001 Jef Poskanzer.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Все права защищены © 2010-2011 Google Inc.
+Website & marketing:\n	AboutView		Вебсайт и маркетинг:\n
 About this system	AboutWindow		Об этой системе
 Version:	AboutView		Версия:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Все права защищены © 1994-2008 Xiph.Org.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Все права защищены © 1998-2000 Thai Open Source Software Center Ltd и Clark Cooper.
 Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Все права защищены © 2004-2005 Intel Corporation.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Все права защищены © 2002-2006 Максим Шеманарев (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Все права защищены © 2000-2014 Fabrice Bellard и другие.
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Все права защищены © 1999-2007 Michael C. Ring.
 The BeGeistert team\n	AboutView		Команде BeGeistert\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Университету Окленда и Christof Lutteroth\n\n
@@ -77,7 +75,6 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Все
 %ld MHz	AboutView		%ld МГц
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Все права защищены © 1997-2006 PDFlib GmbH и Thomas Merz.\nPDFlib и логотип PDFlib зарегистрированные торговые марки PDFlib GmbH.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Все права защищены © 1991-2000 Silicon Graphics, Inc.
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Содержит программное обеспечение из Проекта GNU, выпущенное под лицензиями GPL и LGPL:\nБиблиотека GNU C, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nВсе права защищены © Фонд свободного программного обеспечения.
 …and the many people making donations!\n\n	AboutView		…и многим другим людям, делающим пожертвования!\n\n
 MIT license. All rights reserved.	AboutView		Лицензия MIT. Все права защищены.
 [Click a license name to read the respective license.]\n\n	AboutView		[Щелкните левой кнопкой мыши на название лицензии для её прочтения.]\n\n

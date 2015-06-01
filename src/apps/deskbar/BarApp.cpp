@@ -56,18 +56,18 @@ All rights reserved.
 #include <Roster.h>
 #include <RosterPrivate.h>
 
-#include "icons.h"
-#include "tracker_private.h"
 #include "BarView.h"
 #include "BarWindow.h"
 #include "DeskbarUtils.h"
 #include "FSUtils.h"
 #include "PreferencesWindow.h"
-#include "PublicCommands.h"
 #include "ResourceSet.h"
 #include "StatusView.h"
 #include "Switcher.h"
 #include "Utilities.h"
+
+#include "icons.h"
+#include "tracker_private.h"
 
 
 BLocker TBarApp::sSubscriberLock;

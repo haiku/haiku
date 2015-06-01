@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  */
 
 
@@ -225,7 +225,7 @@ TextGapBuffer::Text()
 			memcpy(scratchPtr, B_UTF8_BULLET, bulletCharLen);
 			scratchPtr += bulletCharLen;
 		}
-		scratchPtr = '\0';
+		*scratchPtr = '\0';
 
 		return fScratchBuffer;
 	}

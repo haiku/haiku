@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-PRNT	2674539197
+1	slovak	x-vnd.Be-PRNT	200447094
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tlačiareň: %printer_name%\nOvládač:  %driver%\n
 Waiting	JobListView		Čaká sa
 Print test page	PrintersWindow		Vytlačiť testovaciu stránku
@@ -30,7 +30,6 @@ Blue	TestPageView		Modrá
 1 pending job.	PrinterListView		1 úloha vo fronte.
 Remove	PrintersWindow		Odstrániť
 <pick one>	AddPrinterDialog		<vyberte jednu>
-Add …	PrintersWindow		Pridať …
 Print jobs for 	PrintersWindow		Tlačové úlohy pre 
 Failed	JobListView		Zlyhalo
 %.2f KB	JobListView		%.2f KB

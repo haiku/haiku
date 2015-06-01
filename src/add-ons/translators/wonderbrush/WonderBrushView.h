@@ -26,8 +26,6 @@ public:
 	virtual void AttachedToWindow();
 	virtual void MessageReceived(BMessage *message);
 
-	virtual	void Draw(BRect area);
-		// draws information about the WonderBrushTranslator 
 	virtual	void GetPreferredSize(float* width, float* height);
 
 	enum {

@@ -196,7 +196,7 @@ RatingSummary::operator==(const RatingSummary& other) const
 		if (ratingCountByStar[i] != other.ratingCountByStar[i])
 			return false;
 	}
-	
+
 	return true;
 }
 
@@ -455,6 +455,7 @@ PackageInfo::sDefaultIcon(new(std::nothrow) SharedBitmap(
 PackageInfo::PackageInfo()
 	:
 	fIcon(sDefaultIcon),
+	fName(),
 	fTitle(),
 	fVersion(),
 	fPublisher(),
@@ -472,7 +473,8 @@ PackageInfo::PackageInfo()
 	fSystemDependency(false),
 	fArchitecture(),
 	fLocalFilePath(),
-	fFileName()
+	fFileName(),
+	fSize(0)
 {
 }
 
@@ -480,7 +482,8 @@ PackageInfo::PackageInfo()
 PackageInfo::PackageInfo(const BPackageInfo& info)
 	:
 	fIcon(sDefaultIcon),
-	fTitle(info.Name()),
+	fName(info.Name()),
+	fTitle(),
 	fVersion(info.Version()),
 	fPublisher(),
 	fShortDescription(info.Summary()),
@@ -497,7 +500,8 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	fSystemDependency(false),
 	fArchitecture(info.ArchitectureName()),
 	fLocalFilePath(),
-	fFileName(info.FileName())
+	fFileName(info.FileName()),
+	fSize(0) // TODO: Retrieve local file size
 {
 	BString publisherURL;
 	if (info.URLList().CountStrings() > 0)
@@ -507,18 +511,21 @@ PackageInfo::PackageInfo(const BPackageInfo& info)
 	const BStringList& rightsList = info.CopyrightList();
 	if (rightsList.CountStrings() > 0)
 		publisherName = rightsList.StringAt(0);
+	if (!publisherName.IsEmpty())
+		publisherName.Prepend("© ");
 
 	fPublisher = PublisherInfo(BitmapRef(), publisherName, "", publisherURL);
 }
 
 
-PackageInfo::PackageInfo(const BString& title,
+PackageInfo::PackageInfo(const BString& name,
 		const BPackageVersion& version, const PublisherInfo& publisher,
 		const BString& shortDescription, const BString& fullDescription,
 		int32 flags, const char* architecture)
 	:
 	fIcon(sDefaultIcon),
-	fTitle(title),
+	fName(name),
+	fTitle(),
 	fVersion(version),
 	fPublisher(publisher),
 	fShortDescription(shortDescription),
@@ -536,7 +543,8 @@ PackageInfo::PackageInfo(const BString& title,
 	fSystemDependency(false),
 	fArchitecture(architecture),
 	fLocalFilePath(),
-	fFileName()
+	fFileName(),
+	fSize(0)
 {
 }
 
@@ -544,6 +552,7 @@ PackageInfo::PackageInfo(const BString& title,
 PackageInfo::PackageInfo(const PackageInfo& other)
 	:
 	fIcon(other.fIcon),
+	fName(other.fName),
 	fTitle(other.fTitle),
 	fVersion(other.fVersion),
 	fPublisher(other.fPublisher),
@@ -563,7 +572,8 @@ PackageInfo::PackageInfo(const PackageInfo& other)
 	fSystemDependency(other.fSystemDependency),
 	fArchitecture(other.fArchitecture),
 	fLocalFilePath(other.fLocalFilePath),
-	fFileName(other.fFileName)
+	fFileName(other.fFileName),
+	fSize(other.fSize)
 {
 }
 
@@ -572,6 +582,7 @@ PackageInfo&
 PackageInfo::operator=(const PackageInfo& other)
 {
 	fIcon = other.fIcon;
+	fName = other.fName;
 	fTitle = other.fTitle;
 	fVersion = other.fVersion;
 	fPublisher = other.fPublisher;
@@ -592,6 +603,7 @@ PackageInfo::operator=(const PackageInfo& other)
 	fArchitecture = other.fArchitecture;
 	fLocalFilePath = other.fLocalFilePath;
 	fFileName = other.fFileName;
+	fSize = other.fSize;
 
 	return *this;
 }
@@ -601,6 +613,7 @@ bool
 PackageInfo::operator==(const PackageInfo& other) const
 {
 	return fIcon == other.fIcon
+		&& fName == other.fName
 		&& fTitle == other.fTitle
 		&& fVersion == other.fVersion
 		&& fPublisher == other.fPublisher
@@ -619,7 +632,8 @@ PackageInfo::operator==(const PackageInfo& other) const
 		&& fSystemDependency == other.fSystemDependency
 		&& fArchitecture == other.fArchitecture
 		&& fLocalFilePath == other.fLocalFilePath
-		&& fFileName == other.fFileName;
+		&& fFileName == other.fFileName
+		&& fSize == other.fSize;
 }
 
 
@@ -627,6 +641,23 @@ bool
 PackageInfo::operator!=(const PackageInfo& other) const
 {
 	return !(*this == other);
+}
+
+
+void
+PackageInfo::SetTitle(const BString& title)
+{
+	if (fTitle != title) {
+		fTitle = title;
+		_NotifyListeners(PKG_CHANGED_TITLE);
+	}
+}
+
+
+const BString&
+PackageInfo::Title() const
+{
+	return fTitle.Length() > 0 ? fTitle : fName;
 }
 
 
@@ -788,7 +819,7 @@ PackageInfo::CalculateRatingSummary() const
 {
 	if (fUserRatings.CountItems() == 0)
 		return fCachedRatingSummary;
-	
+
 	RatingSummary summary;
 	summary.ratingCount = fUserRatings.CountItems();
 	summary.averageRating = 0.0f;
@@ -887,6 +918,16 @@ PackageInfo::AddScreenshot(const BitmapRef& screenshot)
 	_NotifyListeners(PKG_CHANGED_SCREENSHOTS);
 
 	return true;
+}
+
+
+void
+PackageInfo::SetSize(int64 size)
+{
+	if (fSize != size) {
+		fSize = size;
+		_NotifyListeners(PKG_CHANGED_SIZE);
+	}
 }
 
 
@@ -997,15 +1038,15 @@ void
 DepotInfo::SyncPackages(const PackageList& otherPackages)
 {
 	PackageList packages(fPackages);
-	
+
 	for (int32 i = otherPackages.CountItems() - 1; i >= 0; i--) {
 		const PackageInfoRef& otherPackage = otherPackages.ItemAtFast(i);
 		bool found = false;
 		for (int32 j = packages.CountItems() - 1; j >= 0; j--) {
 			const PackageInfoRef& package = packages.ItemAtFast(j);
-			if (package->Title() == otherPackage->Title()) {
+			if (package->Name() == otherPackage->Name()) {
 //				printf("%s: found package: '%s'\n", fName.String(),
-//					package->Title().String());
+//					package->Name().String());
 				package->SetState(otherPackage->State());
 				package->SetLocalFilePath(otherPackage->LocalFilePath());
 				package->SetSystemDependency(
@@ -1017,7 +1058,7 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 		}
 		if (!found) {
 			printf("%s: new package: '%s'\n", fName.String(),
-				otherPackage->Title().String());
+				otherPackage->Name().String());
 			fPackages.Add(otherPackage);
 		}
 	}
@@ -1025,7 +1066,7 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 	for (int32 i = packages.CountItems() - 1; i >= 0; i--) {
 		const PackageInfoRef& package = packages.ItemAtFast(i);
 		printf("%s: removing package: '%s'\n", fName.String(),
-			package->Title().String());
+			package->Name().String());
 		fPackages.Remove(package);
 	}
 }

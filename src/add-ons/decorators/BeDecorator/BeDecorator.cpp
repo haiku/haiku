@@ -75,7 +75,7 @@ BeDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect)
 //	methods to the Decorator base class
 BeDecorator::BeDecorator(DesktopSettings& settings, BRect rect)
 	:
-	TabDecorator(settings, rect)
+	SATDecorator(settings, rect)
 {
 	STRACE(("BeDecorator:\n"));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
@@ -109,7 +109,17 @@ BeDecorator::GetComponentColors(Component component, uint8 highlight,
 	Decorator::Tab* tab = static_cast<Decorator::Tab*>(_tab);
 	switch (component) {
 		case COMPONENT_TAB:
-			if (tab && tab->buttonFocus) {
+			if (highlight == HIGHLIGHT_STACK_AND_TILE) {
+				_colors[COLOR_TAB_FRAME_LIGHT]
+					= tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
+				_colors[COLOR_TAB_FRAME_DARK]
+					= tint_color(kFocusFrameColor, B_DARKEN_4_TINT);
+				_colors[COLOR_TAB] = tint_color(kFocusTabColor, B_DARKEN_1_TINT);
+				_colors[COLOR_TAB_LIGHT] = tint_color(kFocusTabColorLight, B_DARKEN_1_TINT);
+				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = kFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
+			} else if (tab && tab->buttonFocus) {
 				_colors[COLOR_TAB_FRAME_LIGHT]
 					= tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
 				_colors[COLOR_TAB_FRAME_DARK]
@@ -134,7 +144,10 @@ BeDecorator::GetComponentColors(Component component, uint8 highlight,
 
 		case COMPONENT_CLOSE_BUTTON:
 		case COMPONENT_ZOOM_BUTTON:
-			if (tab && tab->buttonFocus) {
+			if (highlight == HIGHLIGHT_STACK_AND_TILE) {
+				_colors[COLOR_BUTTON] = tint_color(kFocusTabColor, B_DARKEN_1_TINT);
+				_colors[COLOR_BUTTON_LIGHT] = tint_color(kFocusTabColorLight, B_DARKEN_1_TINT);
+			} else if (tab && tab->buttonFocus) {
 				_colors[COLOR_BUTTON] = kFocusTabColor;
 				_colors[COLOR_BUTTON_LIGHT] = kFocusTabColorLight;
 			} else {
@@ -151,7 +164,9 @@ BeDecorator::GetComponentColors(Component component, uint8 highlight,
 		default:
 		{
 			rgb_color base;
-			if (tab && tab->buttonFocus)
+			if (highlight == HIGHLIGHT_STACK_AND_TILE)
+				base = tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
+			else if (tab && tab->buttonFocus)
 				base = kFocusFrameColor;
 			else
 				base = kNonFocusFrameColor;

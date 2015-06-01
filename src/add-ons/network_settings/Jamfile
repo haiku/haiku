@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src add-ons network_settings ;
+
+# Interface add-ons
+SubInclude HAIKU_TOP src add-ons network_settings ipv4 ;
+SubInclude HAIKU_TOP src add-ons network_settings ipv6 ;
+
+# Service add-ons
+SubInclude HAIKU_TOP src add-ons network_settings dnsclient ;
+SubInclude HAIKU_TOP src add-ons network_settings ftpd ;
+SubInclude HAIKU_TOP src add-ons network_settings sshd ;
+SubInclude HAIKU_TOP src add-ons network_settings telnetd ;

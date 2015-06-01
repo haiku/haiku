@@ -168,7 +168,7 @@ TBarView::TBarView(BRect frame, bool vertical, bool left, bool top,
 		AddChild(fDragRegion);
 
 	// create and add the application menubar
-	fExpandoMenuBar = new TExpandoMenuBar("ExpandoMenuBar", this, fVertical);
+	fExpandoMenuBar = new TExpandoMenuBar(this, fVertical);
 	fInlineScrollView = new TInlineScrollView(fExpandoMenuBar,
 		fVertical ? B_VERTICAL : B_HORIZONTAL);
 	AddChild(fInlineScrollView);
@@ -263,7 +263,8 @@ TBarView::MessageReceived(BMessage* message)
 			// so that I can follow the common pathway
 			// for adding icons to the tray
 			int32 id;
-			AddItem(new BMessage(*message), B_DESKBAR_TRAY, &id);
+			if (AddItem(message, B_DESKBAR_TRAY, &id) == B_OK)
+				Looper()->DetachCurrentMessage();
 			break;
 		}
 
@@ -379,7 +380,7 @@ TBarView::PlaceDeskbarMenu()
 	height = fVertical ? kMenuBarHeight : fBarApp->IconSize() + 4;
 
 	BPoint loc(B_ORIGIN);
-	float width = sMinimumWindowWidth;
+	float width = gMinimumWindowWidth;
 
 	if (fState == kFullState) {
 		fBarMenuBar->RemoveTeamMenu();
@@ -473,7 +474,7 @@ TBarView::PlaceApplicationBar()
 		expandoFrame.top = fTrayLocation != 0 ? fDragRegion->Frame().bottom + 1
 			: fBarMenuBar->Frame().bottom + 1;
 		expandoFrame.left = fDragRegion->Frame().left;
-		expandoFrame.right = expandoFrame.left + sMinimumWindowWidth;
+		expandoFrame.right = expandoFrame.left + gMinimumWindowWidth;
 		expandoFrame.bottom = fState == kFullState ? screenFrame.bottom
 			: expandoFrame.top + 1;
 	} else {
@@ -521,7 +522,7 @@ void
 TBarView::GetPreferredWindowSize(BRect screenFrame, float* width, float* height)
 {
 	float windowHeight = 0;
-	float windowWidth = sMinimumWindowWidth;
+	float windowWidth = gMinimumWindowWidth;
 	bool setToHiddenSize = fBarApp->Settings()->autoHide && IsHidden()
 		&& !fDragRegion->IsDragging();
 

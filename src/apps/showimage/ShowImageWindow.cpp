@@ -28,6 +28,7 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <Clipboard.h>
+#include <ControlLook.h>
 #include <DurationFormat.h>
 #include <Entry.h>
 #include <File.h>
@@ -198,6 +199,11 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 		B_TRANSLATE("Zoom in"), false);
 	fToolBar->AddAction(MSG_ZOOM_OUT, this, tool_bar_icon(kIconZoomOut),
 		B_TRANSLATE("Zoom out"), false);
+	fToolBar->AddSeparator();
+	fToolBar->AddAction(MSG_PAGE_PREV, this, tool_bar_icon(kIconPagePrevious),
+		B_TRANSLATE("Previous page"), false);
+	fToolBar->AddAction(MSG_PAGE_NEXT, this, tool_bar_icon(kIconPageNext),
+		B_TRANSLATE("Next page"), false);
 	fToolBar->AddGlue();
 	fToolBar->AddAction(MSG_FULL_SCREEN, this,
 		tool_bar_icon(kIconViewWindowed), B_TRANSLATE("Leave full screen"),
@@ -224,35 +230,11 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 			| B_FRAME_EVENTS);
 	// wrap a scroll view around the view
 	fScrollView = new BScrollView("image_scroller", fImageView,
-		B_FOLLOW_ALL, 0, false, false, B_PLAIN_BORDER);
+		B_FOLLOW_ALL, 0, true, true, B_PLAIN_BORDER);
 	contentView->AddChild(fScrollView);
 
-	const int32 kstatusWidth = 190;
-	BRect rect;
-	rect = contentView->Bounds();
-	rect.top = viewFrame.bottom + 1;
-	rect.left = viewFrame.left + kstatusWidth;
-	rect.right = viewFrame.right + 1;
-	rect.bottom += 1;
-	BScrollBar* horizontalScrollBar = new BScrollBar(rect, "hscroll",
-		fImageView, 0, 150, B_HORIZONTAL);
-	contentView->AddChild(horizontalScrollBar);
-
-	rect.left = 0;
-	rect.right = kstatusWidth - 1;
-	rect.bottom -= 1;
-	fStatusView = new ShowImageStatusView(rect, "status_view", B_FOLLOW_BOTTOM,
-		B_WILL_DRAW);
-	contentView->AddChild(fStatusView);
-
-	rect = contentView->Bounds();
-	rect.top = viewFrame.top - 1;
-	rect.left = viewFrame.right + 1;
-	rect.bottom = viewFrame.bottom + 1;
-	rect.right += 1;
-	fVerticalScrollBar = new BScrollBar(rect, "vscroll", fImageView,
-		0, 150, B_VERTICAL);
-	contentView->AddChild(fVerticalScrollBar);
+	fStatusView = new ShowImageStatusView(fScrollView);
+	fScrollView->AddChild(fStatusView);
 
 	// Update minimum window size
 	float toolBarMinWidth = fToolBar->MinSize().width;
@@ -633,6 +615,15 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				break;
 			}
 
+			int32 page = message->FindInt32("page");
+			int32 pageCount = message->FindInt32("pageCount");
+			if (!first && page != fNavigator.CurrentPage()) {
+				// ignore older pages
+				if (bitmapOwner != NULL)
+					bitmapOwner->ReleaseReference();
+				break;
+			}
+
 			status_t status = fImageView->SetImage(message);
 			if (status != B_OK) {
 				if (bitmapOwner != NULL)
@@ -647,8 +638,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			}
 
 			fImageType = message->FindString("type");
-			fNavigator.SetTo(ref, message->FindInt32("page"),
-				message->FindInt32("pageCount"));
+			fNavigator.SetTo(ref, page, pageCount);
 
 			fImageView->FitToBounds();
 			if (first) {
@@ -657,6 +647,9 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				Show();
 			}
 			_UpdateRatingMenu();
+			// Set width and height attributes of the currently showed file.
+			// This should only be a temporary solution.
+			_SaveWidthAndHeight();
 			break;
 		}
 
@@ -698,12 +691,12 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			int32 pages = fNavigator.PageCount();
 			int32 currentPage = fNavigator.CurrentPage();
 
-			bool enable = pages > 1 ? true : false;
-			_EnableMenuItem(fBar, MSG_PAGE_FIRST, enable);
-			_EnableMenuItem(fBar, MSG_PAGE_LAST, enable);
-			_EnableMenuItem(fBar, MSG_PAGE_NEXT, enable);
-			_EnableMenuItem(fBar, MSG_PAGE_PREV, enable);
-			fGoToPageMenu->SetEnabled(enable);
+			_EnableMenuItem(fBar, MSG_PAGE_FIRST,
+				fNavigator.HasPreviousPage());
+			_EnableMenuItem(fBar, MSG_PAGE_LAST, fNavigator.HasNextPage());
+			_EnableMenuItem(fBar, MSG_PAGE_NEXT, fNavigator.HasNextPage());
+			_EnableMenuItem(fBar, MSG_PAGE_PREV, fNavigator.HasPreviousPage());
+			fGoToPageMenu->SetEnabled(pages > 1);
 
 			_EnableMenuItem(fBar, MSG_FILE_NEXT, fNavigator.HasNextFile());
 			_EnableMenuItem(fBar, MSG_FILE_PREV, fNavigator.HasPreviousFile());
@@ -967,6 +960,10 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			fImageView->ZoomOut();
 			break;
 
+		case MSG_UPDATE_STATUS_ZOOM:
+			fStatusView->SetZoom(fImageView->Zoom());
+			break;
+
 		case kMsgOriginalSize:
 			if (message->FindInt32("behavior") == BButton::B_TOGGLE_BEHAVIOR) {
 				bool force = (message->FindInt32("be:value") == B_CONTROL_ON);
@@ -1034,8 +1031,6 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				fToolBar->MoveBy(0, offset);
 				fScrollView->ResizeBy(0, -offset);
 				fScrollView->MoveBy(0, offset);
-				fVerticalScrollBar->ResizeBy(0, -offset);
-				fVerticalScrollBar->MoveBy(0, offset);
 				UpdateIfNeeded();
 				snooze(15000);
 			}
@@ -1055,12 +1050,7 @@ ShowImageWindow::MessageReceived(BMessage* message)
 				frame.top = fToolBar->Frame().bottom + 1;
 				fScrollView->MoveTo(fScrollView->Frame().left, frame.top);
 				fScrollView->ResizeTo(fScrollView->Bounds().Width(),
-					frame.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
-				fVerticalScrollBar->MoveTo(
-					frame.right - B_V_SCROLL_BAR_WIDTH + 1, frame.top);
-				fVerticalScrollBar->ResizeTo(
-					fVerticalScrollBar->Bounds().Width(),
-					frame.Height() - B_H_SCROLL_BAR_HEIGHT + 1);
+					frame.Height() + 1);
 			}
 			break;
 		}
@@ -1075,20 +1065,17 @@ ShowImageWindow::MessageReceived(BMessage* message)
 void
 ShowImageWindow::_UpdateStatusText(const BMessage* message)
 {
-	BString status;
+	BString frameText;
 	if (fImageView->Bitmap() != NULL) {
 		BRect bounds = fImageView->Bitmap()->Bounds();
-		status << bounds.IntegerWidth() + 1
-			<< "x" << bounds.IntegerHeight() + 1 << ", " << fImageType;
+		frameText << bounds.IntegerWidth() + 1
+			<< "x" << bounds.IntegerHeight() + 1;
 	}
-
-	BString text;
-	if (message != NULL && message->FindString("status", &text) == B_OK
-		&& text.Length() > 0) {
-		status << ", " << text;
-	}
-
-	fStatusView->Update(fNavigator.CurrentRef(), status);
+	BString pages;
+	if (fNavigator.PageCount() > 1)
+		pages << fNavigator.CurrentPage() << "/" << fNavigator.PageCount();
+	fStatusView->Update(fNavigator.CurrentRef(), frameText, pages, fImageType,
+		fImageView->Zoom());
 }
 
 
@@ -1131,6 +1118,14 @@ ShowImageWindow::_SaveAs(BMessage* message)
 		&target, NULL, 0, false, &panelMsg);
 	if (!fSavePanel)
 		return;
+
+	// Retrieve save directory from settings;
+	ShowImageSettings* settings = my_app->Settings();
+	if (settings->Lock()) {
+		fSavePanel->SetPanelDirectory(
+			settings->GetString("SaveDirectory", NULL));
+		settings->Unlock();
+	}
 
 	fSavePanel->Window()->SetWorkspaces(B_CURRENT_WORKSPACE);
 	fSavePanel->Show();
@@ -1180,6 +1175,14 @@ ShowImageWindow::_SaveToFile(BMessage* message)
 	// Write out the image file
 	BDirectory dir(&dirRef);
 	fImageView->SaveToFile(&dir, filename, NULL, &outFormat[i]);
+
+	// Store Save directory in settings;
+	ShowImageSettings* settings = my_app->Settings();
+	if (settings->Lock()) {
+		BPath path(&dirRef);
+		settings->SetString("SaveDirectory", path.Path());
+		settings->Unlock();
+	}
 }
 
 
@@ -1228,7 +1231,7 @@ status_t
 ShowImageWindow::_LoadImage(bool forward)
 {
 	BMessenger us(this);
-	status_t status = ImageCache::Default().RetrieveImage(
+	status_t status = my_app->DefaultCache().RetrieveImage(
 		fNavigator.CurrentRef(), fNavigator.CurrentPage(), &us);
 	if (status != B_OK)
 		return status;
@@ -1257,7 +1260,7 @@ ShowImageWindow::_PreloadImage(bool forward, entry_ref& ref)
 		|| (!forward && !fNavigator.GetPreviousFile(currentRef, ref)))
 		return false;
 
-	return ImageCache::Default().RetrieveImage(ref) == B_OK;
+	return my_app->DefaultCache().RetrieveImage(ref) == B_OK;
 }
 
 
@@ -1273,7 +1276,6 @@ ShowImageWindow::_ToggleFullScreen()
 		frame.top -= fBar->Bounds().Height() + 1;
 		frame.right += B_V_SCROLL_BAR_WIDTH;
 		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
-		frame.InsetBy(-1, -1); // PEN_SIZE in ShowImageView
 
 		SetFlags(Flags() | B_NOT_RESIZABLE | B_NOT_MOVABLE);
 
@@ -1287,6 +1289,7 @@ ShowImageWindow::_ToggleFullScreen()
 
 	fToolBar->SetActionVisible(MSG_FULL_SCREEN, fFullScreen);
 	_SetToolBarVisible(!fFullScreen && fShowToolBar);
+	_SetToolBarBorder(!fFullScreen);
 
 	MoveTo(frame.left, frame.top);
 	ResizeTo(frame.Width(), frame.Height());
@@ -1511,6 +1514,40 @@ ShowImageWindow::_UpdateRatingMenu()
 
 
 void
+ShowImageWindow::_SaveWidthAndHeight()
+{
+	if (fNavigator.CurrentPage() != 1)
+		return;
+
+	if (fImageView->Bitmap() == NULL)
+		return;
+
+	BRect bounds = fImageView->Bitmap()->Bounds();
+	int32 width = bounds.IntegerWidth() + 1;
+	int32 height = bounds.IntegerHeight() + 1;
+
+	BNode node(&fNavigator.CurrentRef());
+	if (node.InitCheck() != B_OK)
+		return;
+
+	const char* kWidthAttrName = "Media:Width";
+	const char* kHeightAttrName = "Media:Height";
+
+	int32 widthAttr;
+	ssize_t attrSize = node.ReadAttr(kWidthAttrName, B_INT32_TYPE, 0,
+		&widthAttr, sizeof(widthAttr));
+	if (attrSize <= 0 || widthAttr != width)
+		node.WriteAttr(kWidthAttrName, B_INT32_TYPE, 0, &width, sizeof(width));
+
+	int32 heightAttr;
+	attrSize = node.ReadAttr(kHeightAttrName, B_INT32_TYPE, 0,
+		&heightAttr, sizeof(heightAttr));
+	if (attrSize <= 0 || heightAttr != height)
+		node.WriteAttr(kHeightAttrName, B_INT32_TYPE, 0, &height, sizeof(height));
+}
+
+
+void
 ShowImageWindow::_SetToolBarVisible(bool visible, bool animate)
 {
 	if (visible == fToolBarVisible)
@@ -1540,12 +1577,20 @@ ShowImageWindow::_SetToolBarVisible(bool visible, bool animate)
 	} else {
 		fScrollView->ResizeBy(0, -diff);
 		fScrollView->MoveBy(0, diff);
-		fVerticalScrollBar->ResizeBy(0, -diff);
-		fVerticalScrollBar->MoveBy(0, diff);
 		fToolBar->MoveBy(0, diff);
 		if (!visible)
 			fToolBar->Hide();
 	}
+}
+
+
+void
+ShowImageWindow::_SetToolBarBorder(bool visible)
+{
+	float inset = visible
+		? ceilf(be_control_look->DefaultItemSpacing() / 2) : 0;
+
+	fToolBar->GroupLayout()->SetInsets(inset, 0, inset, 0);
 }
 
 

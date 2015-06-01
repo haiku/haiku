@@ -1,14 +1,14 @@
-1	swedish	x-vnd.Haiku-About	3415235510
+1	swedish	x-vnd.Haiku-About	3251436090
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Upphovsrätt © 1999-2010 skaparna av Gutenprint. Med ensamrätt.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Upphovsrätt © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
+Past website & marketing:\n	AboutView		Före detta webbsida och marknadsföring:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (och hans NewOS-kärna)\n
 Ralink (firmware)	AboutWindow		Ralink (firmware)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Upphovsrätt © 1996-2005 Julian R Seward. Med ensamrätt.
 %d MiB total	AboutView		%d MiB totalt
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (projektgrundare)\n\n
-Copyright © 1998-2003 Daniel Veillard. All rights reserved.	AboutView		Upphovsrätt © 1998-2003 Daniel Veillard. Med ensamrätt.
 %d MiB used (%d%%)	AboutView		%d MiB använt (%d%%)
-Website, marketing & documentation:\n	AboutView		Webbplats, marknadsföring och dokumentation:\n
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Innehåller program från GNU Project, släpt under GPL och LGPL licenser:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
 AboutSystem	System name		OmHaiku
 Copyright © 2003 Peter Hanappe and others.	AboutView		Upphovsrätt © 2003 Peter Hanappe och andra.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Upphovsrätt © 1994-1997 Mark Kilard. Med ensamrätt.
@@ -19,9 +19,7 @@ Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Upphovsrätt ©
 Source Code: 	AboutView		Källkod: 
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Processor:} other{# Processors:}}
 Kernel:	AboutView		Kärna:
-Copyright © 2000 Jean-Pierre Lefebvre and Remi Lefebvre.	AboutView		Upphovsrätt © 2000 Jean-Pierre erbefeL och Remi Lefebvre.
 BSD (4-clause)	AboutWindow		BSD (4-clause)
-Copyright © 2001-2002 Thomas Broyer, Charlie Bozeman and Daniel Veillard. All rights reserved.	AboutView		Upphovsrätt © 2001-2002 Thomas Broyer, Charlie Bozeman och Daniel Veillard. Med ensamrätt.
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Upphovsrätten till Haiku's källkod en egendom tillhörande Haiku, Inc. eller respektive upphovsman, där det uttryckligen är angivet i källkoden. Haiku® och Haiku's logo® är registrerade varumärken tillhörande Haiku, Inc.\n\n
 Marvell (firmware)	AboutWindow		Marvell (firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Upphovsrätt © 1987-1988 Digital Equipment Corporation, Manyard, Massachusetts\n Med ensamrätt.
@@ -29,7 +27,6 @@ GNU LGPL v2	AboutWindow		GNU LGPL v2
 The HaikuPorts team\n	AboutView		Haiku Ports-teamet\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB totalt, %inaccessible MiB otillgängligt
 Intel (2xxx firmware)	AboutWindow		Intel (2xxx firmware)
-Copyright © 2000-2007 Fabrice Bellard, et al.	AboutView		Upphovsrätt © 2000-2007 Fabrice Bellard, et al.
 Contributors:\n	AboutView		Medarbetare:\n
 Unknown	AboutView		Okänd
 Copyright © 2001-2003 Expat maintainers.	AboutView		Upphovsrätt © 2001-2003 Expat underhållarna.
@@ -63,12 +60,14 @@ Google and their Google Summer of Code and Google Code In programs\n	AboutView		
 The Haikuware team and their bounty program\n	AboutView		Haikuware-teamet och deras belöningsprogram\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Upphovsrätt © 1995, 1998-2001 Jef Poskanzer. Med ensamrätt.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Upphovsrätt © 2010-2011 Google Inc. Med ensamrätt.
+Website & marketing:\n	AboutView		Webbsida & marknadsföring:\n
 About this system	AboutWindow		Om Haiku
 Version:	AboutView		Version:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Upphovsrätt © 1994-2008 Xiph.Org. Med ensamrätt.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Upphovsrätt © 1998-2000 Thai Open Source Software Center Ltd och Clark Cooper.
 Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Upphovsrätt © 2004-2005 Intel Corporation. Med ensamrätt.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Upphovsrätt © 2002-2006Maxim Shemanarev (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Upphovsrätt © 2000-2007 Fabrice Bellard, et al.
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Upphovsrätt © 1999-2007 Michael C. Ring. Med ensamrätt.
 The BeGeistert team\n	AboutView		BeGeistert-teamet\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		The University of Auckland och Christof Lutteroth\n\n
@@ -79,12 +78,10 @@ Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Upphov
 %ld MHz	AboutView		%ld MHz
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Upphovsrätt © 1997-2006 PDFlib GmbH och Thomas Merz. Med ensamrätt.\nPDFlib och PDFlib logotypen är registrerade varumärken av PDFlib GmbH.
 Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Upphovsrätt © 1991-2000 Silicon Graphics, Inc. Med ensamrätt.
-Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Innehåller programvara från GNU Projektet, utgivet under GPL och LGPL licenserna:\nGNU C Bibilioteket, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, gdb, wget, ncurses, termcap, Bourne Again Shell.\nUpphovsrätt © The Free Software Foundation.
 …and the many people making donations!\n\n	AboutView		…och alla de som har skänkt pengar!\n\n
 MIT license. All rights reserved.	AboutView		MIT licens. Med ensamrätt.
 [Click a license name to read the respective license.]\n\n	AboutView		[Klicka på ett licensnamn för att läsa respektive licens.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Upphovsrätt © 2007 Ralink Technology Corporation. Med ensamrätt.
-MIT (no promotion)	AboutWindow		MIT (ingen reklam)
 BSD (3-clause)	AboutWindow		BSD (3-clause)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Upphovsrätt © 1990-2002 Info-ZIP. Med ensamrätt.
 License: 	AboutView		Licens: 

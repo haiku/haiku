@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Sudoku	2463385585
+1	english	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		恢复快照
 Could not set Sudoku:\n%s\n	SudokuWindow		无法设置数独：\n%s\n 
 Export as…	SudokuWindow		导出为...
@@ -25,7 +25,8 @@ Snapshot current	SudokuWindow		当前快照
 Text	SudokuWindow		文本
 Creating solvable field	SudokuGenerator		创建已完成区域
 View	SudokuWindow		视图
-Progress monitor	ProgressWindow		进度管理
+Progress monitor	ProgressWindow		设置所有提示
+Set all hints	SudokuWindow		设置所有提示
 Mark invalid values	SudokuWindow		标记无效线索
 Blank	SudokuWindow		空白
 Help	SudokuWindow		帮助

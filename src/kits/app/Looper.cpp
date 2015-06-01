@@ -13,24 +13,25 @@
 // BLooper class spawns a thread that runs a message loop.
 
 
-#include <AppMisc.h>
-#include <AutoLocker.h>
-#include <DirectMessageTarget.h>
-#include <LooperList.h>
-#include <MessagePrivate.h>
-#include <TokenSpace.h>
+#include <Looper.h>
+
+#include <new>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <Autolock.h>
-#include <Looper.h>
 #include <Message.h>
 #include <MessageFilter.h>
 #include <MessageQueue.h>
 #include <Messenger.h>
 #include <PropertyInfo.h>
 
-#include <new>
-#include <stdio.h>
-#include <stdlib.h>
+#include <AppMisc.h>
+#include <AutoLocker.h>
+#include <DirectMessageTarget.h>
+#include <LooperList.h>
+#include <MessagePrivate.h>
+#include <TokenSpace.h>
 
 
 // debugging

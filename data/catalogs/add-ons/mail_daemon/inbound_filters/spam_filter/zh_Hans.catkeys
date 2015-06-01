@@ -1,6 +1,7 @@
-1	english	x-vnd.Haiku-SpamFilter	160316705
+1	english	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		或者清空邮箱
 Genuine below and uncertain above:	SpamFilterConfig		根据确定性排序：
 Spam above:	SpamFilterConfig		垃圾邮件：
 Add spam rating to start of subject	SpamFilterConfig		在条目前添加垃圾邮件排名
+Bayesian Spam Filter	SpamFilter		贝叶斯垃圾邮件过滤器
 Learn from all incoming e-mail	SpamFilterConfig		从所有收件箱中学习

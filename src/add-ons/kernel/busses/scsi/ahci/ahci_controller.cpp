@@ -165,29 +165,57 @@ AHCIController::Init()
 		fPortCount = highestPort;
 	}
 
-	TRACE("cap: Interface Speed Support: generation %" B_PRIu32 "\n",	(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
-	TRACE("cap: Number of Command Slots: %d (raw %#" B_PRIx32 ")\n",	fCommandSlotCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
-	TRACE("cap: Number of Ports: %d (raw %#" B_PRIx32 ")\n",			fPortCount, (fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
-	TRACE("cap: Supports Port Multiplier: %s\n",		(fRegs->cap & CAP_SPM) ? "yes" : "no");
-	TRACE("cap: Supports External SATA: %s\n",			(fRegs->cap & CAP_SXS) ? "yes" : "no");
-	TRACE("cap: Enclosure Management Supported: %s\n",	(fRegs->cap & CAP_EMS) ? "yes" : "no");
+	TRACE("cap: Interface Speed Support: generation %" B_PRIu32 "\n",
+		(fRegs->cap >> CAP_ISS_SHIFT) & CAP_ISS_MASK);
+	TRACE("cap: Number of Command Slots: %d (raw %#" B_PRIx32 ")\n",
+		fCommandSlotCount, (fRegs->cap >> CAP_NCS_SHIFT) & CAP_NCS_MASK);
+	TRACE("cap: Number of Ports: %d (raw %#" B_PRIx32 ")\n", fPortCount,
+		(fRegs->cap >> CAP_NP_SHIFT) & CAP_NP_MASK);
+	TRACE("cap: Supports Port Multiplier: %s\n",
+		(fRegs->cap & CAP_SPM) ? "yes" : "no");
+	TRACE("cap: Supports External SATA: %s\n",
+		(fRegs->cap & CAP_SXS) ? "yes" : "no");
+	TRACE("cap: Enclosure Management Supported: %s\n",
+		(fRegs->cap & CAP_EMS) ? "yes" : "no");
 
-	TRACE("cap: Supports Command List Override: %s\n",	(fRegs->cap & CAP_SCLO) ? "yes" : "no");
-	TRACE("cap: Supports Staggered Spin-up: %s\n",	(fRegs->cap & CAP_SSS) ? "yes" : "no");
-	TRACE("cap: Supports Mechanical Presence Switch: %s\n",	(fRegs->cap & CAP_SMPS) ? "yes" : "no");
+	TRACE("cap: Supports Command List Override: %s\n",
+		(fRegs->cap & CAP_SCLO) ? "yes" : "no");
+	TRACE("cap: Supports Staggered Spin-up: %s\n",
+		(fRegs->cap & CAP_SSS) ? "yes" : "no");
+	TRACE("cap: Supports Mechanical Presence Switch: %s\n",
+		(fRegs->cap & CAP_SMPS) ? "yes" : "no");
 
-	TRACE("cap: Supports 64-bit Addressing: %s\n",		(fRegs->cap & CAP_S64A) ? "yes" : "no");
-	TRACE("cap: Supports Native Command Queuing: %s\n",	(fRegs->cap & CAP_SNCQ) ? "yes" : "no");
-	TRACE("cap: Supports SNotification Register: %s\n",	(fRegs->cap & CAP_SSNTF) ? "yes" : "no");
-	TRACE("cap: Supports Command List Override: %s\n",	(fRegs->cap & CAP_SCLO) ? "yes" : "no");
-
+	TRACE("cap: Supports 64-bit Addressing: %s\n",
+		(fRegs->cap & CAP_S64A) ? "yes" : "no");
+	TRACE("cap: Supports Native Command Queuing: %s\n",
+		(fRegs->cap & CAP_SNCQ) ? "yes" : "no");
+	TRACE("cap: Supports SNotification Register: %s\n",
+		(fRegs->cap & CAP_SSNTF) ? "yes" : "no");
+	TRACE("cap: Supports Command List Override: %s\n",
+		(fRegs->cap & CAP_SCLO) ? "yes" : "no");
 
 	TRACE("cap: Supports AHCI mode only: %s\n",			(fRegs->cap & CAP_SAM) ? "yes" : "no");
-	TRACE("ghc: AHCI Enable: %s\n",						(fRegs->ghc & GHC_AE) ? "yes" : "no");
-	TRACE("Ports Implemented Mask: %#08" B_PRIx32 "\n",	fPortImplementedMask);
-	TRACE("Number of Available Ports: %d\n",			count_bits_set(fPortImplementedMask));
-	TRACE("AHCI Version %" B_PRIu32 ".%" B_PRIu32 "\n",	fRegs->vs >> 16, fRegs->vs & 0xff);
-	TRACE("Interrupt %u\n",								fIRQ);
+
+	if (fRegs->vs >= 0x00010200) {
+		TRACE("cap2: DevSleep Entrance from Slumber Only: %s\n",
+			(fRegs->cap2 & CAP2_DESO) ? "yes" : "no");
+		TRACE("cap2: Supports Aggressive Device Sleep Management: %s\n",
+			(fRegs->cap2 & CAP2_SADM) ? "yes" : "no");
+		TRACE("cap2: Supports Device Sleep: %s\n",
+			(fRegs->cap2 & CAP2_SDS) ? "yes" : "no");
+		TRACE("cap2: Automatic Partial to Slumber Transitions: %s\n",
+			(fRegs->cap2 & CAP2_APST) ? "yes" : "no");
+		TRACE("cap2: NVMHCI Present: %s\n",
+			(fRegs->cap2 & CAP2_NVMP) ? "yes" : "no");
+		TRACE("cap2: BIOS/OS Handoff: %s\n",
+			(fRegs->cap2 & CAP2_BOH) ? "yes" : "no");
+	}
+	TRACE("ghc: AHCI Enable: %s\n",	(fRegs->ghc & GHC_AE) ? "yes" : "no");
+	TRACE("Ports Implemented Mask: %#08" B_PRIx32 " Number of Available Ports:"
+		" %d\n", fPortImplementedMask, count_bits_set(fPortImplementedMask));
+	TRACE("AHCI Version %02" B_PRIx32 "%02" B_PRIx32 ".%02" B_PRIx32 ".%02"
+		B_PRIx32 " Interrupt %u\n", fRegs->vs >> 24, (fRegs->vs >> 16) & 0xff,
+		(fRegs->vs >> 8) & 0xff, fRegs->vs & 0xff, fIRQ);
 
 	// setup interrupt handler
 	if (install_io_interrupt_handler(fIRQ, Interrupt, this, 0) < B_OK) {

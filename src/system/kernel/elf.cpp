@@ -2409,19 +2409,19 @@ elf_get_image_info_for_address(addr_t address, image_info* info)
 		return B_ENTRY_NOT_FOUND;
 
 	info->id = elfInfo->id;
-    info->type = B_SYSTEM_IMAGE;
-    info->sequence = 0;
-    info->init_order = 0;
-    info->init_routine = NULL;
-    info->term_routine = NULL;
-    info->device = -1;
-    info->node = -1;
+	info->type = B_SYSTEM_IMAGE;
+	info->sequence = 0;
+	info->init_order = 0;
+	info->init_routine = NULL;
+	info->term_routine = NULL;
+	info->device = -1;
+	info->node = -1;
 		// TODO: We could actually fill device/node in.
 	strlcpy(info->name, elfInfo->name, sizeof(info->name));
-    info->text = (void*)elfInfo->text_region.start;
-    info->data = (void*)elfInfo->data_region.start;
-    info->text_size = elfInfo->text_region.size;
-    info->data_size = elfInfo->data_region.size;
+	info->text = (void*)elfInfo->text_region.start;
+	info->data = (void*)elfInfo->data_region.start;
+	info->text_size = elfInfo->text_region.size;
+	info->data_size = elfInfo->data_region.size;
 
 	return B_OK;
 }

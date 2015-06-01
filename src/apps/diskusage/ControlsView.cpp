@@ -10,6 +10,8 @@
 
 #include "ControlsView.h"
 
+#include <string.h>
+
 #include <Bitmap.h>
 #include <Box.h>
 #include <TabView.h>
@@ -138,6 +140,7 @@ ControlsView::VolumeTabView::VolumeTabView()
 	:
 	BTabView("volume_tabs", B_WIDTH_FROM_LABEL)
 {
+	SetBorder(B_NO_BORDER);
 }
 
 
@@ -155,21 +158,20 @@ ControlsView::VolumeTabView::TabFrame(int32 index) const
 	float x = 0.0f;
 	float width = 0.0f;
 	float minStringWidth = StringWidth("Haiku");
-
-	int	countTabs = CountTabs();
+	int32 countTabs = CountTabs();
 
 	// calculate the total width if no truncation is made at all
 	float averageWidth = Frame().Width() / countTabs;
-	
-	// margins are the deltas with the average widths	
+
+	// margins are the deltas with the average widths
 	float* margins = new float[countTabs];
 	for (int32 i = 0; i < countTabs; i++) {
 		float tabLabelWidth = StringWidth(TabAt(i)->Label());
 		if (tabLabelWidth < minStringWidth)
 			tabLabelWidth = minStringWidth;
+
 		float tabWidth = tabLabelWidth + 3.0f * kSmallHMargin
-				+ ((VolumeTab*)TabAt(i))->IconWidth();
-	
+			+ ((VolumeTab*)TabAt(i))->IconWidth();
 		margins[i] = tabWidth - averageWidth;
 		width += tabWidth;
 	}
@@ -184,7 +186,7 @@ ControlsView::VolumeTabView::TabFrame(int32 index) const
 
 		float averageToShave;
 		float oldToShave;
-		/* 
+		/*
 			we might have to do multiple passes because of the minimum
 			tab width we are imposing.
 			we could also fail to totally fit all tabs.
@@ -198,7 +200,7 @@ ControlsView::VolumeTabView::TabFrame(int32 index) const
 				float iconWidth = ((VolumeTab*)TabAt(i))->IconWidth();
 				float newMargin = max_c(margins[i] - averageToShave,
 					minimumMargin + iconWidth);
-				toShave -= margins[i] - newMargin;			
+				toShave -= margins[i] - newMargin;
 				margins[i] = newMargin;
 			}
 		} while (toShave > 0 && oldToShave != toShave);
@@ -222,13 +224,23 @@ ControlsView::VolumeTabView::AttachedToWindow()
 
 	BVolume tempVolume;
 	while (fVolumeRoster->GetNextVolume(&tempVolume) == B_OK) {
-		if (tempVolume.IsPersistent()) {
-			BVolume* volume = new BVolume(tempVolume);
-			VolumeTab *item = new VolumeTab(volume);
-			char name[B_PATH_NAME_LENGTH];
-			volume->GetName(name);			
-			AddTab(new VolumeView(name, volume), item);
+		if (!tempVolume.IsPersistent())
+			continue;
+
+		char name[B_PATH_NAME_LENGTH];
+		if (tempVolume.GetName(name) != B_OK)
+			continue;
+
+		if (strcmp(name, "system") == 0
+			|| strcmp(name, "config") == 0) {
+			// Don't include virtual volumes.
+			continue;
 		}
+
+		BVolume* volume = new BVolume(tempVolume);
+		VolumeView* volumeView = new VolumeView(name, volume);
+		VolumeTab* volumeTab = new VolumeTab(volume);
+		AddTab(volumeView, volumeTab);
 	}
 
 	// Begin watching mount and unmount events.

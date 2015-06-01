@@ -195,8 +195,8 @@ TTimeView::MessageReceived(BMessage* message)
 			be_roster->Launch("application/x-vnd.Haiku-Time");
 			// tell Time preflet to switch to the clock tab
 			BMessenger messenger("application/x-vnd.Haiku-Time");
-			BMessage* switchToClock = new BMessage('SlCk');
-			messenger.SendMessage(switchToClock);
+			BMessage switchToClock('SlCk');
+			messenger.SendMessage(&switchToClock);
 			break;
 		}
 

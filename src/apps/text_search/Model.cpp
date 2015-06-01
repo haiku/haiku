@@ -38,7 +38,6 @@ Model::Model()
 	fEscapeText(true),
 	fTextOnly(true),
 	fInvokePe(false),
-	fShowContents(false),
 
 	fFrame(100, 100, 500, 400),
 
@@ -101,10 +100,6 @@ Model::LoadPrefs()
 	if (file.ReadAttr("InvokePe", B_INT32_TYPE, 0, &value, sizeof(int32)) > 0)
 		fInvokePe = (value != 0);
 
-	if (file.ReadAttr("ShowContents", B_INT32_TYPE, 0, &value,
-			sizeof(int32)) > 0)
-		fShowContents = (value != 0);
-
 	char buffer [B_PATH_NAME_LENGTH+1];
 	int32 length = file.ReadAttr("FilePanelPath", B_STRING_TYPE, 0, &buffer,
 		sizeof(buffer));
@@ -160,9 +155,6 @@ Model::SavePrefs()
 
 	value = fInvokePe ? 1 : 0;
 	file.WriteAttr("InvokePe", B_INT32_TYPE, 0, &value, sizeof(int32));
-
-	value = fShowContents ? 1 : 0;
-	file.WriteAttr("ShowContents", B_INT32_TYPE, 0, &value, sizeof(int32));
 
 	file.WriteAttr("WindowFrame", B_RECT_TYPE, 0, &fFrame, sizeof(BRect));
 

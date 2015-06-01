@@ -108,13 +108,13 @@ public:
 	{
 		if (dragMessage != NULL)
 			return;
-	
+
 		if ((transit != B_INSIDE_VIEW && transit != B_ENTERED_VIEW)
 			|| where.x > MinSize().width) {
 			SetRating(fPermanentRating);
 			return;
 		}
-	
+
 		float hoverRating = _RatingForMousePos(where);
 		SetRating(hoverRating);
 	}
@@ -126,7 +126,7 @@ public:
 		message.AddFloat("rating", fPermanentRating);
 		Window()->PostMessage(&message, Window());
 	}
-	
+
 	void SetPermanentRating(float rating)
 	{
 		fPermanentRating = rating;
@@ -187,7 +187,7 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	BStringView* ratingLabel = new BStringView("rating label",
 		B_TRANSLATE("Your rating:"));
 
-	fSetRatingView = new SetRatingView();	
+	fSetRatingView = new SetRatingView();
 
 	fTextView = new TextDocumentView();
 	ScrollView* textScrollView = new ScrollView(
@@ -218,10 +218,10 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 		B_TRANSLATE("Very unstable"), "veryunstable"));
 	fStabilityCodes.Add(StabilityRating(
 		B_TRANSLATE("Does not start"), "nostart"));
-	
+
 	add_stabilities_to_menu(fStabilityCodes, stabilityMenu);
 	stabilityMenu->SetTargetForItems(this);
-	
+
 	fStability = fStabilityCodes.ItemAt(0).Name();
 	stabilityMenu->ItemAt(0)->SetMarked(true);
 
@@ -237,14 +237,14 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 		fModel.SupportedLanguages().IndexOf(fCommentLanguage));
 	if (defaultItem != NULL)
 		defaultItem->SetMarked(true);
-	
+
 	fRatingActiveCheckBox = new BCheckBox("rating active",
 		B_TRANSLATE("Other users can see this rating"),
 		new BMessage(MSG_RATING_ACTIVE_CHANGED));
 	// Hide the check mark by default, it will be made visible when
 	// the user already made a rating and it is loaded
 	fRatingActiveCheckBox->Hide();
-	
+
 	// Construct buttons
 	fCancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
@@ -297,7 +297,7 @@ RatePackageWindow::MessageReceived(BMessage* message)
 		case MSG_LANGUAGE_SELECTED:
 			message->FindString("code", &fCommentLanguage);
 			break;
-			
+
 		case MSG_RATING_ACTIVE_CHANGED:
 		{
 			int32 value;
@@ -355,7 +355,7 @@ RatePackageWindow::_SetWorkerThread(thread_id thread)
 {
 	if (!Lock())
 		return;
-	
+
 	bool enabled = thread < 0;
 
 //	fTextEditor->SetEnabled(enabled);
@@ -363,7 +363,7 @@ RatePackageWindow::_SetWorkerThread(thread_id thread)
 	fStabilityField->SetEnabled(enabled);
 	fCommentLanguageField->SetEnabled(enabled);
 	fSendButton->SetEnabled(enabled);
-	
+
 	if (thread >= 0) {
 		fWorkerThread = thread;
 		resume_thread(fWorkerThread);
@@ -410,7 +410,7 @@ RatePackageWindow::_QueryRatingThread()
 	BMessage info;
 
 	status_t status = interface.RetrieveUserRating(
-		package->Title(), package->Version(), package->Architecture(),
+		package->Name(), package->Version(), package->Architecture(),
 		username, info);
 
 //	info.PrintToStream();
@@ -418,7 +418,7 @@ RatePackageWindow::_QueryRatingThread()
 	BMessage result;
 	if (status == B_OK && info.FindMessage("result", &result) == B_OK
 		&& Lock()) {
-		
+
 		result.FindString("code", &fRatingID);
 		result.FindBool("active", &fRatingActive);
 		BString comment;
@@ -454,7 +454,7 @@ RatePackageWindow::_QueryRatingThread()
 			fRating = (float)rating;
 			fSetRatingView->SetPermanentRating(fRating);
 		}
-		
+
 		fRatingActiveCheckBox->SetValue(fRatingActive);
 		fRatingActiveCheckBox->Show();
 
@@ -489,7 +489,7 @@ RatePackageWindow::_SendRatingThread()
 		return;
 	}
 
-	BString package = fPackage->Title();
+	BString package = fPackage->Name();
 	BString architecture = fPackage->Architecture();
 	int rating = (int)fRating;
 	BString stability = fStability;
@@ -541,7 +541,7 @@ RatePackageWindow::_SendRatingThread()
 		error = B_TRANSLATE(
 			"It was not possible to contact the web service.");
 	}
-	
+
 	if (!error.IsEmpty()) {
 		BString failedTitle;
 		if (ratingID.Length() > 0)

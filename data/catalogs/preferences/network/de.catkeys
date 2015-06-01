@@ -1,16 +1,33 @@
-1	german	x-vnd.Haiku-Network	1423171766
-Revert	NetworkSetupWindow		Anfangswerte
+1	german	x-vnd.Haiku-Network	950262959
+Static	IntefaceAddressView		Statisch
 EAP	EAP protected network		EAP
+Services	NetworkWindow		Dienste
 WPA2	WPA2 protected network		WPA2
+The netmask defines your local network	IntefaceAddressView		Die Netzmaske definiert das lokale Netzwerk
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
-Installing NetworkStatus in Deskbar failed: %s	NetworkSetupWindow		Installation von NetworkStatus in der Deskbar fehlgeschlagen: %s
-Apply	NetworkSetupWindow		Anwenden
-Ok	NetworkSetupWindow		OK
-launch error	NetworkSetupWindow		Fehler beim Ausführen
-Manage…	NetworkSetupWindow		Verwalten…
-Show network status in Deskbar	NetworkSetupWindow		NetworkStatus in der Deskbar zeigen
+Network	NetworkWindow		Netzwerk
+Show network status in Deskbar	NetworkWindow		NetworkStatus in der Deskbar zeigen
+The method for obtaining an IP address	IntefaceAddressView		Die Art wie IP Adressen bezogen werden
+Dial Up	NetworkWindow		Einwahl
+Apply	IntefaceAddressView		Anwenden
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installation von NetworkStatus in der Deskbar fehlgeschlagen: %s
+Disabled	IntefaceAddressView		Deaktiviert
+Ok	NetworkWindow		OK
+launch error	NetworkWindow		Fehler beim Ausführen
+Other	NetworkWindow		Anderes
+Automatic	IntefaceAddressView		Automatisch
+Gateway:	IntefaceAddressView		Gateway:
+Revert	NetworkWindow		Anfangswerte
+Enable	ServiceView		Aktivieren
+Your gateway to the internet	IntefaceAddressView		Die Zugangsadresse zu Internet
+New…	NetworkWindow		Neu…
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Modus:
 WPA	WPA protected network		WPA
 open	Open network		frei
-Network	NetworkSetupWindow		Netzwerk
-New…	NetworkSetupWindow		Neu…
+IP Address:	IntefaceAddressView		IP-Adresse:
+Netmask:	IntefaceAddressView		Netzmaske:
+Disable	ServiceView		Deaktivieren
+Your IP address	IntefaceAddressView		IP-Adresse
+Manage…	NetworkWindow		Verwalten…
 WEP	WEP protected network		WEP

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -617,7 +617,27 @@ BNetworkAddress::SockAddr()
 bool
 BNetworkAddress::IsEmpty() const
 {
-	return fAddress.ss_len == 0 || fAddress.ss_family == AF_UNSPEC;
+	if (fAddress.ss_len == 0)
+		return true;
+
+	switch (fAddress.ss_family) {
+		case AF_UNSPEC:
+			return true;
+		case AF_INET:
+		{
+			sockaddr_in& sin = (sockaddr_in&)fAddress;
+			return sin.sin_addr.s_addr == INADDR_ANY && sin.sin_port == 0;
+		}
+		case AF_INET6:
+		{
+			sockaddr_in6& sin6 = (sockaddr_in6&)fAddress;
+			return IN6_IS_ADDR_UNSPECIFIED(&sin6.sin6_addr)
+				&& sin6.sin6_port == 0;
+		}
+
+		default:
+			return false;
+	}
 }
 
 

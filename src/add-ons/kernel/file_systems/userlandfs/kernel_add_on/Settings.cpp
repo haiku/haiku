@@ -248,8 +248,9 @@ Settings::Dump() const
 				 it.HasNext();) {
 				IOCtlInfoMap::Entry entry = it.Next();
 				IOCtlInfo* info = entry.value;
-				PRINT(("  ioctl %d: buffer size: %ld, write buffer size: %ld\n",
-					info->command, info->bufferSize, info->writeBufferSize));
+				PRINT(("  ioctl %d: buffer size: %" B_PRId32
+					", write buffer size: %" B_PRId32 "\n", info->command,
+					info->bufferSize, info->writeBufferSize));
 			}
 		}
 	)

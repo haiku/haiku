@@ -84,6 +84,7 @@ const struct supported_device {
 	{0x94c7, 2, 0, RADEON_RV610, CHIP_STD, "Radeon HD 2350"},
 	{0x94c1, 2, 0, RADEON_RV610, CHIP_IGP, "Radeon HD 2400"},
 	{0x94c3, 2, 0, RADEON_RV610, CHIP_STD, "Radeon HD 2400"},
+	{0x94c9, 2, 0, RADEON_RV610, CHIP_IGP, "Mobility Radeon HD 2400"},
 	{0x94cc, 2, 0, RADEON_RV610, CHIP_STD, "Radeon HD 2400"},
 	{0x9519, 2, 0, RADEON_RV630, CHIP_STD, "AMD FireStream 9170"},
 	{0x9586, 2, 0, RADEON_RV630, CHIP_STD, "Radeon HD 2600"},

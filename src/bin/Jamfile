@@ -297,8 +297,6 @@ SubInclude HAIKU_TOP src bin debug ;
 SubInclude HAIKU_TOP src bin network ;
 
 # Compression command line tools
-SubInclude HAIKU_TOP src bin unzip ;
-SubInclude HAIKU_TOP src bin zip ;
 SubInclude HAIKU_TOP src bin gzip ;
 
 # Other stuff

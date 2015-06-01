@@ -28,6 +28,10 @@ documentation and/or software.
 #ifndef _SYS_MD5_H_
 #define _SYS_MD5_H_
 
+
+#ifdef _BSD_SOURCE
+
+
 #include <stdint.h>
 
 #define MD5_BLOCK_LENGTH		64
@@ -52,4 +56,9 @@ char * MD5File(const char *, char *);
 char * MD5FileChunk(const char *, char *, off_t, off_t);
 char * MD5Data(const unsigned char *, unsigned int, char *);
 __END_DECLS
+
+
+#endif
+
+
 #endif /* _SYS_MD5_H_ */

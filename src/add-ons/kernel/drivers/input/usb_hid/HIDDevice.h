@@ -48,12 +48,16 @@ private:
 	static	void				_TransferCallback(void *cookie,
 									status_t status, void *data,
 									size_t actualLength);
+	static	void				_UnstallCallback(void *cookie,
+									status_t status, void *data,
+									size_t actualLength);
 
 private:
 			status_t			fStatus;
 			usb_device			fDevice;
 			usb_pipe			fInterruptPipe;
 			size_t				fInterfaceIndex;
+			uint8				fEndpointAddress;
 
 			int32				fTransferScheduled;
 			size_t				fTransferBufferSize;

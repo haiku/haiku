@@ -36,10 +36,6 @@ All rights reserved.
 
 #include "ShowHideMenuItem.h"
 
-#include <malloc.h>
-#include <stdio.h>
-#include <strings.h>
-
 #include <Debug.h>
 #include <Roster.h>
 #include <WindowInfo.h>

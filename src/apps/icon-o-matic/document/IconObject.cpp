@@ -17,7 +17,7 @@
 // constructor
 IconObject::IconObject(const char* name)
 	: Observable(),
-	  Referenceable(),
+	  BReferenceable(),
 	  Selectable(),
 
 	  fName(name)
@@ -27,7 +27,7 @@ IconObject::IconObject(const char* name)
 // copy constructor
 IconObject::IconObject(const IconObject& other)
 	: Observable(),
-	  Referenceable(),
+	  BReferenceable(),
 	  Selectable(),
 
 	  fName(other.fName)
@@ -37,7 +37,7 @@ IconObject::IconObject(const IconObject& other)
 // archive constructor
 IconObject::IconObject(BMessage* archive)
 	: Observable(),
-	  Referenceable(),
+	  BReferenceable(),
 	  Selectable(),
 
 	  fName()

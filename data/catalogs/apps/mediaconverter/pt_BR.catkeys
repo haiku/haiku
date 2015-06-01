@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	217152063
+1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	1661579051
 Video using parameters form settings	MediaConverter		Vídeo utilizando definições de forma de parâmetros
 Video encoding:	MediaConverter		Codificação de vídeo:
 Error read audio frame %lld	MediaConverter		Erro ao ler quadro de áudio %lld
@@ -56,6 +56,7 @@ File	Menu		Arquivo
 Convert	MediaConverter		Converter
 Writing audio track: %ld%% complete	MediaConverter		Gravando trilha de áudio: %ld%% concluído
 Video quality: %3d%%	MediaConverter		Qualidade de vídeo: %3d%%
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld canal
 Output folder	MediaConverter		Pasta de saída
 Audio quality: %3d%%	MediaConverter		Qualidade de áudio: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Um erro ocorreu lendo as informações do arquivo.\n\nErro :

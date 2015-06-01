@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Screen	1388881963
+1	english	x-vnd.Haiku-Screen	2339556848
 yes	Screen		是
 Use laptop panel:	Screen		使用笔记本面板：
 15 bits/pixel, 32768 colors	Screen		15 位/像素l，32768 色
@@ -12,6 +12,7 @@ Set background…	Screen		设置背景...
 Undo	Screen		撤销
 if needed	Screen		如果需要
 Screen preferences by the Haiku team	Screen		Screen 首选项编写者 Haiku项目组
+Settings will revert in %seconds.	Screen		设置将会在 %seconds 秒后恢复。
 Screen	System name		屏幕
 OK	Screen		确定
 Workspaces	Screen		工作区

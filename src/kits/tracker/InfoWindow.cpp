@@ -673,7 +673,7 @@ BInfoWindow::MessageReceived(BMessage* message)
 
 
 void
-BInfoWindow::GetSizeString(BString &result, off_t size, int32 fileCount)
+BInfoWindow::GetSizeString(BString& result, off_t size, int32 fileCount)
 {
 	static BMessageFormat sizeFormat(B_TRANSLATE(
 		"{0, plural, one{(# byte)} other{(# bytes)}}"));
@@ -685,7 +685,7 @@ BInfoWindow::GetSizeString(BString &result, off_t size, int32 fileCount)
 
 	if (size >= kKBSize) {
 		result << " ";
-				
+
 		sizeFormat.Format(result, size);
 			// "bytes" translation could come from string_for_size
 			// which could be part of the localekit itself
@@ -990,7 +990,7 @@ AttributeView::~AttributeView()
 	if (fDescWindow->Lock())
 		fDescWindow->Quit();
 
-	if (fModel->IsSymLink() && fIconModel != fModel)
+	if (fIconModel != fModel)
 		delete fIconModel;
 }
 

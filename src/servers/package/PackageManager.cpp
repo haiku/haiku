@@ -320,7 +320,7 @@ PackageManager::ProgressPackageDownloadStarted(const char* packageName)
 
 void
 PackageManager::ProgressPackageDownloadActive(const char* packageName,
-	float completionPercentage)
+	float completionPercentage, off_t bytes, off_t totalBytes)
 {
 }
 
@@ -363,14 +363,14 @@ PackageManager::ProgressApplyingChangesDone(InstalledRepository& repository)
 
 
 void
-PackageManager::JobFailed(BJob* job)
+PackageManager::JobFailed(BSupportKit::BJob* job)
 {
 // TODO:...
 }
 
 
 void
-PackageManager::JobAborted(BJob* job)
+PackageManager::JobAborted(BSupportKit::BJob* job)
 {
 // TODO:...
 }

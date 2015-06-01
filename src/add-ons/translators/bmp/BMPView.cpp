@@ -14,6 +14,7 @@
 #include "BMPTranslator.h"
 
 #include <Catalog.h>
+#include <LayoutBuilder.h>
 #include <StringView.h>
 
 #include <stdio.h>
@@ -29,43 +30,30 @@ BMPView::BMPView(const BRect &frame, const char *name, uint32 resizeMode,
 	fSettings = settings;
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	font_height fontHeight;
-	be_bold_font->GetHeight(&fontHeight);
-	float height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
-
-	BRect rect(10, 10, 200, 10 + height);
-	BStringView *stringView = new BStringView(rect, "title", 
+	BStringView *titleView = new BStringView("title",
 		B_TRANSLATE("BMP image translator"));
-	stringView->SetFont(be_bold_font);
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	titleView->SetFont(be_bold_font);
 
-	float maxWidth = stringView->Bounds().Width();
-
-	rect.OffsetBy(0, height + 10);
 	char version[256];
 	snprintf(version, sizeof(version), B_TRANSLATE("Version %d.%d.%d, %s"),
 		int(B_TRANSLATION_MAJOR_VERSION(BMP_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_MINOR_VERSION(BMP_TRANSLATOR_VERSION)),
 		int(B_TRANSLATION_REVISION_VERSION(BMP_TRANSLATOR_VERSION)),
 		__DATE__);
-	stringView = new BStringView(rect, "version", version);
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
+	BStringView *versionView = new BStringView("version", version);
+	BStringView *copyrightView = new BStringView("Copyright", B_UTF8_COPYRIGHT "2002-2010 Haiku Inc.");
 
-	if (stringView->Bounds().Width() > maxWidth)
-		maxWidth = stringView->Bounds().Width();
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(titleView)
+		.Add(versionView)
+		.Add(copyrightView)
+		.AddGlue();
 
-	GetFontHeight(&fontHeight);
-	height = fontHeight.descent + fontHeight.ascent + fontHeight.leading;
-
-	rect.OffsetBy(0, height + 5);
-	stringView = new BStringView(rect, "Copyright", B_UTF8_COPYRIGHT "2002-2010 Haiku Inc.");
-	stringView->ResizeToPreferred();
-	AddChild(stringView);
-
-	if (maxWidth + 20 > Bounds().Width())
-		ResizeTo(maxWidth + 20, Bounds().Height());
+	BFont font;
+	GetFont(&font);
+	SetExplicitPreferredSize(BSize((font.Size() * 300)/12,
+		(font.Size() * 100)/12));
 }
 
 

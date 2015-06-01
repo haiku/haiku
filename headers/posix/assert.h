@@ -1,10 +1,23 @@
 /*
- * Copyright 2004-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2015 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
-#ifndef _ASSERT_H_
-#define _ASSERT_H_
 
+/* Include guards are omitted, as assert.h is required
+   to support being included multiple times.
+   
+   E.g. the following is required to be valid:
+   
+   #undef NDEBUG
+   #include <assert.h>
+   
+   assert(0); // this assertion will be triggered
+   
+   #define NDEBUG
+   #include <assert.h>
+   
+   assert(0); // this assertion will not be triggered
+*/
 
 #undef assert
 
@@ -33,5 +46,3 @@ extern void __assert_perror_fail(int error, const char *file,
 #else	/* NDEBUG */
 #	define assert(condition) ((void)0)
 #endif
-
-#endif	/* _ASSERT_H_ */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef INSPECTOR_WINDOW_H
@@ -18,6 +18,7 @@
 class BButton;
 class BMenuField;
 class BMessenger;
+class BStringView;
 class BTextControl;
 class GuiTeamUiSettings;
 class SourceLanguage;
@@ -45,6 +46,9 @@ public:
 	virtual	void				ThreadStateChanged(
 									const Team::ThreadEvent& event);
 
+	virtual	void				MemoryChanged(
+									const Team::MemoryChangedEvent& event);
+
 	// TeamMemoryBlock::Listener
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);
 	virtual void				MemoryBlockRetrievalFailed(
@@ -52,6 +56,9 @@ public:
 
 	// MemoryView::Listener
 	virtual	void				TargetAddressChanged(target_addr_t address);
+	virtual	void				HexModeChanged(int32 newMode);
+	virtual	void				EndianModeChanged(int32 newMode);
+	virtual	void				TextModeChanged(int32 newMode);
 
 	// ExpressionInfo::Listener
 	virtual	void				ExpressionEvaluated(ExpressionInfo* info,
@@ -75,15 +82,28 @@ private:
 	void						_SetToAddress(target_addr_t address);
 	void						_SetCurrentBlock(TeamMemoryBlock* block);
 
+	void						_SetEditMode(bool enabled);
+
+	bool						_GetWritableState() const;
+
+	void						_UpdateWritableOptions();
+
+	void						_UpdateWritableIndicator();
+	const char*					_GetCurrentWritableIndicator() const;
+
 private:
 	UserInterfaceListener*		fListener;
 	BTextControl*				fAddressInput;
 	BMenuField*					fHexMode;
 	BMenuField*					fEndianMode;
 	BMenuField*					fTextMode;
+	BStringView*				fWritableBlockIndicator;
 	MemoryView*					fMemoryView;
 	BButton*					fPreviousBlockButton;
 	BButton*					fNextBlockButton;
+	BButton*					fEditBlockButton;
+	BButton*					fCommitBlockButton;
+	BButton*					fRevertBlockButton;
 	TeamMemoryBlock*			fCurrentBlock;
 	target_addr_t				fCurrentAddress;
 	::Team*						fTeam;

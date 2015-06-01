@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -743,6 +743,24 @@ TeamDebugger::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_WRITE_TARGET_MEMORY:
+		{
+			target_addr_t address;
+			if (message->FindUInt64("address", &address) != B_OK)
+				break;
+
+			void* data;
+			if (message->FindPointer("data", &data) != B_OK)
+				break;
+
+			target_size_t size;
+			if (message->FindUInt64("size", &size) != B_OK)
+				break;
+
+			_HandleWriteMemory(address, data, size);
+			break;
+		}
+
 		case MSG_EVALUATE_EXPRESSION:
 		{
 			SourceLanguage* language;
@@ -1154,6 +1172,18 @@ TeamDebugger::InspectRequested(target_addr_t address,
 	BMessage message(MSG_INSPECT_ADDRESS);
 	message.AddUInt64("address", address);
 	message.AddPointer("listener", listener);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::MemoryWriteRequested(target_addr_t address, const void* data,
+	target_size_t size)
+{
+	BMessage message(MSG_WRITE_TARGET_MEMORY);
+	message.AddUInt64("address", address);
+	message.AddPointer("data", data);
+	message.AddUInt64("size", size);
 	PostMessage(&message);
 }
 
@@ -2054,6 +2084,26 @@ TeamDebugger::_HandleInspectAddress(target_addr_t address,
 	} else
 		memoryBlock->NotifyDataRetrieved();
 
+}
+
+
+void
+TeamDebugger::_HandleWriteMemory(target_addr_t address, void* data,
+	target_size_t size)
+{
+	TRACE_CONTROL("TeamDebugger::_HandleWriteTargetMemory(%" B_PRIx64 ", %p, "
+		"%" B_PRIu64 ")\n", address, data, size);
+
+	AutoLocker< ::Team> teamLocker(fTeam);
+	TeamMemory* memory = fTeam->GetTeamMemory();
+	// schedule the job
+	status_t result;
+	if ((result = fWorker->ScheduleJob(
+		new(std::nothrow) WriteMemoryJob(fTeam, memory, address, data, size),
+		this)) != B_OK) {
+		_NotifyUser("Write Memory", "Failed to write memory data: %s",
+			strerror(result));
+	}
 }
 
 

@@ -121,9 +121,9 @@ extern bool is_type_swapped(type_code type);
 extern double __swap_double(double arg);
 extern float  __swap_float(float arg);
 #if __GNUC__ >= 4
-#define __swap_int64(arg)	__builtin_bswap64(arg)
-#define __swap_int32(arg)	__builtin_bswap32(arg)
-#define __swap_int16(arg)	__builtin_bswap16(arg)
+#define __swap_int64(arg)	(uint64)__builtin_bswap64(arg)
+#define __swap_int32(arg)	(uint32)__builtin_bswap32(arg)
+#define __swap_int16(arg)	(uint16)__builtin_bswap16(arg)
 #else
 extern uint64 __swap_int64(uint64 arg);
 extern uint32 __swap_int32(uint32 arg);

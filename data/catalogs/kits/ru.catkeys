@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libbe	2929679013
+1	russian	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		гамма
 beta	AboutWindow		бета
 %3.2f GiB	StringForSize		%3.2f ГБ
@@ -20,6 +20,7 @@ OK	PrintJob		ОК
 Green:	ColorControl		Зеленый:
 Version history:	AboutWindow		История версий:
 Remove replicant	Dragger		Удалить репликант
+Select all	TextView		Выделить все
 OK	AboutWindow		ОК
 OK	ZombieReplicantView		ОК
 Print Server is not responding.	PrintJob		Сервер печати не отвечает.
@@ -29,7 +30,6 @@ Special Thanks:	AboutWindow		Особые благодарности:
 Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Не удалось найти приложение этого репликанта. Не указана сигнатура приложения.\n%error
 Redo	TextView		Повторить
 <empty>	Menu		<пусто>
-Select All	TextView		Выделить все
 Warning	Dragger		Внимание
 Undo	TextView		Отменить
 Red:	ColorControl		Красный:

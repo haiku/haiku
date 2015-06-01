@@ -49,7 +49,7 @@ PackageAction::FindPackageByName(const BString& name)
 		const PackageList& packages = depot.Packages();
 		for (int32 j = 0; j < packages.CountItems(); j++) {
 			PackageInfoRef info = packages.ItemAtFast(j);
-			if (info->Title() == name)
+			if (info->Name() == name)
 				return info;
 		}
 	}

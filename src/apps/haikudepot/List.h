@@ -99,7 +99,7 @@ public:
 	{
 		_Resize(0);
 	}
-	
+
 	inline bool IsEmpty() const
 	{
 		return fCount == 0;

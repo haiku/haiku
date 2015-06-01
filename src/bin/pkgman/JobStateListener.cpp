@@ -10,7 +10,7 @@
 #include "pkgman.h"
 
 
-using BPackageKit::BJob;
+using BSupportKit::BJob;
 
 
 JobStateListener::JobStateListener(uint32 flags)

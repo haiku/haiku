@@ -76,30 +76,6 @@ public:
 	bool StartsWith(const char*, bool caseSensitivity = false) const;
 	bool Contains(const char*, bool caseSensitivity = false) const;
 
-	int32 FindFirst(const BString&) const;
-	int32 FindFirst(const char*) const;
-	int32 FindFirst(const BString&, int32 fromOffset) const;
-	int32 FindFirst(const char*, int32 fromOffset) const;
-	int32 FindFirst(char) const;
-	int32 FindFirst(char, int32 fromOffset) const;
-
-	int32 FindLast(const BString&) const;
-	int32 FindLast(const char*) const;
-	int32 FindLast(const BString&, int32 beforeOffset) const;
-	int32 FindLast(const char*, int32 beforeOffset) const;
-	int32 FindLast(char) const;
-	int32 FindLast(char, int32 beforeOffset) const;
-
-	int32 IFindFirst(const BString&) const;
-	int32 IFindFirst(const char*) const;
-	int32 IFindFirst(const BString&, int32 fromOffset) const;
-	int32 IFindFirst(const char*, int32 fromOffset) const;
-
-	int32 IFindLast(const BString&) const;
-	int32 IFindLast(const char*) const;
-	int32 IFindLast(const BString&, int32 beforeOffset) const;
-	int32 IFindLast(const char*, int32 beforeOffset) const;
-
 private:
 	bool IsGlyph(char) const;
 	bool IsInsideGlyph(char) const;

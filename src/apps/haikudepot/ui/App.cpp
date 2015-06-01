@@ -69,10 +69,10 @@ App::ReadyToRun()
 {
 	if (fWindowCount > 0)
 		return;
-	
+
 	BMessage settings;
 	_LoadSettings(settings);
-	
+
 	fMainWindow = new MainWindow(_GetNextWindowFrame(false), settings);
 	_ShowWindow(fMainWindow);
 }
@@ -152,7 +152,7 @@ App::_Open(const BEntry& entry)
 		fprintf(stderr, "Could not allocate PackageInfo\n");
 		return;
 	}
-	
+
 	package->SetLocalFilePath(path.Path());
 
 	BMessage settings;
@@ -258,7 +258,7 @@ App::_CheckPackageDaemonRuns()
 
 		if (!_LaunchPackageDaemon())
 			break;
-	}		
+	}
 }
 
 
@@ -270,7 +270,7 @@ App::_LaunchPackageDaemon()
 		BString errorMessage
 			= B_TRANSLATE("Starting the package daemon failed:\n\n%Error%");
 		errorMessage.ReplaceAll("%Error%", strerror(ret));
-		
+
 		BAlert* alert = new BAlert("package_daemon_problem",
 			errorMessage,
 			B_TRANSLATE("Quit HaikuDepot"),

@@ -187,6 +187,7 @@ actions AssembleNasm
 
 rule CompileDTS
 {
+	MakeLocate $(<) : $(HAIKU_OUTPUT_DIR) ;
 	Depends $(<) : $(>) ;
 }
 

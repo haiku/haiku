@@ -418,12 +418,14 @@ WindowsSettingsView::WindowsSettingsView()
 	fShowNavigatorCheckBox(NULL),
 	fOutlineSelectionCheckBox(NULL),
 	fSortFolderNamesFirstCheckBox(NULL),
+	fHideDotFilesCheckBox(NULL),
 	fTypeAheadFilteringCheckBox(NULL),
 	fShowFullPathInTitleBar(false),
 	fSingleWindowBrowse(false),
 	fShowNavigator(false),
 	fTransparentSelection(false),
 	fSortFolderNamesFirst(false),
+	fHideDotFiles(false),
 	fTypeAheadFiltering(false)
 {
 	fShowFullPathInTitleBarCheckBox = new BCheckBox("",
@@ -446,6 +448,10 @@ WindowsSettingsView::WindowsSettingsView()
 		B_TRANSLATE("List folders first"),
 		new BMessage(kSortFolderNamesFirstChanged));
 
+	fHideDotFilesCheckBox = new BCheckBox("",
+		B_TRANSLATE("Hide dotfiles"),
+		new BMessage(kHideDotFilesChanged));
+
 	fTypeAheadFilteringCheckBox = new BCheckBox("",
 		B_TRANSLATE("Enable type-ahead filtering"),
 		new BMessage(kTypeAheadFilteringChanged));
@@ -464,6 +470,7 @@ WindowsSettingsView::WindowsSettingsView()
 		.AddGroup(B_VERTICAL, 0)
 			.Add(fOutlineSelectionCheckBox)
 			.Add(fSortFolderNamesFirstCheckBox)
+			.Add(fHideDotFilesCheckBox)
 			.Add(fTypeAheadFilteringCheckBox)
 			.End()
 		.AddGlue()
@@ -479,6 +486,7 @@ WindowsSettingsView::AttachedToWindow()
 	fShowFullPathInTitleBarCheckBox->SetTarget(this);
 	fOutlineSelectionCheckBox->SetTarget(this);
 	fSortFolderNamesFirstCheckBox->SetTarget(this);
+	fHideDotFilesCheckBox->SetTarget(this);
 	fTypeAheadFilteringCheckBox->SetTarget(this);
 }
 
@@ -549,6 +557,20 @@ WindowsSettingsView::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case kHideDotFilesChanged:
+		{
+			settings.SetHideDotFiles(
+				fHideDotFilesCheckBox->Value() == 1);
+
+			// Make the notification message and send it to the tracker:
+			send_bool_notices(kHideDotFilesChanged,
+				"HideDotFiles",
+				fHideDotFilesCheckBox->Value() == 1);
+
+			Window()->PostMessage(kSettingsContentsModified);
+			break;
+		}
+
 		case kTypeAheadFilteringChanged:
 		{
 			settings.SetTypeAheadFiltering(
@@ -601,6 +623,12 @@ WindowsSettingsView::SetDefaults()
 		settings.SetSortFolderNamesFirst(true);
 		send_bool_notices(kSortFolderNamesFirstChanged,
 			"SortFolderNamesFirst", true);
+	}
+
+	if (!settings.HideDotFiles()) {
+		settings.SetHideDotFiles(true);
+		send_bool_notices(kHideDotFilesChanged,
+			"HideDotFiles", true);
 	}
 
 	if (settings.TypeAheadFiltering()) {
@@ -663,6 +691,12 @@ WindowsSettingsView::Revert()
 			"SortFolderNamesFirst", fSortFolderNamesFirst);
 	}
 
+	if (settings.HideDotFiles() != fHideDotFiles) {
+		settings.SetSortFolderNamesFirst(fHideDotFiles);
+		send_bool_notices(kHideDotFilesChanged,
+			"HideDotFiles", fHideDotFiles);
+	}
+
 	if (settings.TypeAheadFiltering() != fTypeAheadFiltering) {
 		settings.SetTypeAheadFiltering(fTypeAheadFiltering);
 		send_bool_notices(kTypeAheadFilteringChanged,
@@ -686,6 +720,7 @@ WindowsSettingsView::ShowCurrentSettings()
 	fOutlineSelectionCheckBox->SetValue(settings.TransparentSelection()
 		? B_CONTROL_OFF : B_CONTROL_ON);
 	fSortFolderNamesFirstCheckBox->SetValue(settings.SortFolderNamesFirst());
+	fHideDotFilesCheckBox->SetValue(settings.HideDotFiles());
 	fTypeAheadFilteringCheckBox->SetValue(settings.TypeAheadFiltering());
 }
 
@@ -700,6 +735,7 @@ WindowsSettingsView::RecordRevertSettings()
 	fShowNavigator = settings.ShowNavigator();
 	fTransparentSelection = settings.TransparentSelection();
 	fSortFolderNamesFirst = settings.SortFolderNamesFirst();
+	fHideDotFiles = settings.HideDotFiles();
 	fTypeAheadFiltering = settings.TypeAheadFiltering();
 }
 
@@ -714,6 +750,7 @@ WindowsSettingsView::IsRevertable() const
 		|| fShowNavigator != settings.ShowNavigator()
 		|| fTransparentSelection != settings.TransparentSelection()
 		|| fSortFolderNamesFirst != settings.SortFolderNamesFirst()
+		|| fHideDotFiles != settings.HideDotFiles()
 		|| fTypeAheadFiltering != settings.TypeAheadFiltering();
 }
 

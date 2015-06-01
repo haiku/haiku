@@ -33,13 +33,13 @@ MessagePackageListener::PackageChanged(const PackageInfoEvent& event)
 {
 	if ((event.Changes() & fChangesMask) == 0)
 		return;
-	
+
 	BMessenger messenger(fTarget);
 	if (!messenger.IsValid())
 		return;
 
 	BMessage message(MSG_UPDATE_PACKAGE);
-	message.AddString("title", event.Package()->Title());
+	message.AddString("name", event.Package()->Name());
 	message.AddUInt32("changes", event.Changes());
 
 	messenger.SendMessage(&message);

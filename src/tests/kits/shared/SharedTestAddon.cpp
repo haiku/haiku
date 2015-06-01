@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +8,7 @@
 #include <TestSuiteAddon.h>
 
 #include "CalendarViewTest.h"
+#include "DriverSettingsMessageAdapterTest.h"
 #include "GeolocationTest.h"
 #include "NaturalCompareTest.h"
 
@@ -18,6 +19,7 @@ getTestSuite()
 	BTestSuite* suite = new BTestSuite("Shared");
 
 	CalendarViewTest::AddTests(*suite);
+	DriverSettingsMessageAdapterTest::AddTests(*suite);
 	GeolocationTest::AddTests(*suite);
 	NaturalCompareTest::AddTests(*suite);
 

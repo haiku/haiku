@@ -79,6 +79,9 @@ extern status_t		_kern_mutex_lock(int32* mutex, const char* name,
 extern status_t		_kern_mutex_unlock(int32* mutex, uint32 flags);
 extern status_t		_kern_mutex_switch_lock(int32* fromMutex, int32* toMutex,
 						const char* name, uint32 flags, bigtime_t timeout);
+extern status_t		_kern_mutex_sem_acquire(int32* sem, const char* name,
+						uint32 flags, bigtime_t timeout);
+extern status_t		_kern_mutex_sem_release(int32* sem);
 
 /* sem functions */
 extern sem_id		_kern_create_sem(int count, const char *name);
@@ -448,7 +451,7 @@ extern status_t		_kern_close_port(port_id id);
 extern status_t		_kern_delete_port(port_id id);
 extern port_id		_kern_find_port(const char *port_name);
 extern status_t		_kern_get_port_info(port_id id, struct port_info *info);
-extern status_t	 	_kern_get_next_port_info(team_id team, int32 *cookie,
+extern status_t		_kern_get_next_port_info(team_id team, int32 *cookie,
 						struct port_info *info);
 extern ssize_t		_kern_port_buffer_size_etc(port_id port, uint32 flags,
 						bigtime_t timeout);

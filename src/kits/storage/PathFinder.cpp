@@ -6,6 +6,7 @@
 
 #include <PathFinder.h>
 
+#include <AutoDeleter.h>
 #include <FindDirectory.h>
 #include <Path.h>
 #include <StringList.h>
@@ -128,6 +129,8 @@ BPathFinder::FindPaths(const char* architecture,
 	if (error != B_OK)
 		return error;
 
+	MemoryDeleter pathArrayDeleter(pathArray);
+
 	// add them to BStringList
 	for (size_t i = 0; i < pathCount; i++) {
 		BString path(pathArray[i]);
@@ -145,7 +148,7 @@ BPathFinder::FindPaths(const char* architecture,
 BPathFinder::FindPaths(path_base_directory baseDirectory, const char* subPath,
 	uint32 flags, BStringList& _paths)
 {
-	return FindPaths(NULL, baseDirectory, subPath, 0, _paths);
+	return FindPaths(NULL, baseDirectory, subPath, flags, _paths);
 }
 
 

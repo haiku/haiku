@@ -1,6 +1,6 @@
 /*
  * Copyright 2010, Jérôme Duval.
- * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Sebastian Nozzi.
  *
  * Distributed under the terms of the MIT license.
@@ -64,8 +64,9 @@ const struct {
 
 	{B_BOOL_TYPE, "bool"},
 
-	{B_VECTOR_ICON_TYPE, "icon"},
+	{B_TIME_TYPE, "time"},
 
+	{B_VECTOR_ICON_TYPE, "icon"},
 	{B_RAW_TYPE, "raw"},
 };
 const uint32 kNumSupportedTypes = sizeof(kSupportedTypes)
@@ -80,7 +81,7 @@ const uint32 kNumSupportedTypes = sizeof(kSupportedTypes)
 	On failure, B_BAD_VALUE is returned and "result" is not modified
 */
 static status_t
-typeForString(const char *string, type_code *_result)
+typeForString(const char* string, type_code* _result)
 {
 	for (uint32 i = 0; i < kNumSupportedTypes; i++) {
 		if (!strcmp(string, kSupportedTypes[i].name)) {
@@ -112,7 +113,7 @@ usage(int returnValue)
 		"   or: %s [-f value-from-file] [-t type] [ -P ] attr file1 [file2...]\n\n"
 		"\t-P : Don't resolve links\n"
 		"\tType is one of:\n"
-		"\t\tstring, mime, int, llong, float, double, bool, icon, raw\n"
+		"\t\tstring, mime, int, llong, float, double, bool, time, icon, raw\n"
 		"\t\tor a numeric value (ie. 0x1234, 42, 'ABCD', ...)\n"
 		"\tThe default is \"string\"\n", kProgramName, kProgramName);
 
@@ -121,12 +122,12 @@ usage(int returnValue)
 
 
 void
-invalidAttrType(const char *attrTypeName)
+invalidAttrType(const char* attrTypeName)
 {
 	fprintf(stderr, "%s: attribute type \"%s\" is not valid\n", kProgramName,
 		attrTypeName);
 	fprintf(stderr, "\tTry one of: string, mime, int, llong, float, double,\n");
-	fprintf(stderr, "\t\tbool, icon, raw, or a numeric value (ie. 0x1234, 42, 'ABCD'"
+	fprintf(stderr, "\t\tbool, time, icon, raw, or a numeric value (ie. 0x1234, 42, 'ABCD'"
 		", ...)\n");
 
 	exit(1);
@@ -134,7 +135,7 @@ invalidAttrType(const char *attrTypeName)
 
 
 void
-invalidBoolValue(const char *value)
+invalidBoolValue(const char* value)
 {
 	fprintf(stderr, "%s: attribute value \"%s\" is not valid\n", kProgramName,
 		value);
@@ -146,10 +147,10 @@ invalidBoolValue(const char *value)
 
 
 int
-main(int argc, char *argv[])
+main(int argc, char* argv[])
 {
 	type_code attrType = B_STRING_TYPE;
-	char *attrValue = NULL;
+	char* attrValue = NULL;
 	size_t valueFileLength = 0;
 	bool resolveLinks = true;
 
@@ -181,7 +182,7 @@ main(int argc, char *argv[])
 							" bytes\n", size);
 						return 1;
 					}
-					attrValue = (char *)malloc(size);
+					attrValue = (char*)malloc(size);
 					if (attrValue != NULL)
 						status = file.Read(attrValue, size);
 					else
@@ -215,7 +216,7 @@ main(int argc, char *argv[])
 	
 	if (argc - optind < 1)
 		usage(1);
-	const char *attrName = argv[optind++];
+	const char* attrName = argv[optind++];
 
 	if (argc - optind < 1)
 		usage(1);

@@ -49,7 +49,7 @@ public:
 									{ return fFont; }
 
 			CharacterStyleDataRef SetAscent(float ascent);
-			
+
 			// Returns the ascent of the configured font, unless the ascent
 			// has been overridden by a fixed value with SetAscent().
 			float				Ascent() const;

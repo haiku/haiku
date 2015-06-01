@@ -320,8 +320,14 @@ segment_in_sequence(const tcp_segment_header& segment, int size,
 static inline bool
 is_writable(tcp_state state)
 {
-	return state == SYNCHRONIZE_SENT || state == SYNCHRONIZE_RECEIVED
-		|| state == ESTABLISHED || state == FINISH_RECEIVED;
+	return state == ESTABLISHED || state == FINISH_RECEIVED;
+}
+
+
+static inline bool
+is_establishing(tcp_state state)
+{
+	return state == SYNCHRONIZE_SENT || state == SYNCHRONIZE_RECEIVED;
 }
 
 
@@ -786,7 +792,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		return ENOTCONN;
 	if (fState == LISTEN)
 		return EDESTADDRREQ;
-	if (!is_writable(fState)) {
+	if (!is_writable(fState) && !is_establishing(fState)) {
 		// we only send signals when called from userland
 		if (gStackModule->is_syscall())
 			send_signal(find_thread(NULL), SIGPIPE);
@@ -812,7 +818,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 				return posix_error(status);
 			}
 
-			if (!is_writable(fState)) {
+			if (!is_writable(fState) && !is_establishing(fState)) {
 				// we only send signals when called from userland
 				if (gStackModule->is_syscall())
 					send_signal(find_thread(NULL), SIGPIPE);
@@ -873,6 +879,8 @@ TCPEndpoint::SendAvailable()
 
 	if (is_writable(fState))
 		available = fSendQueue.Free();
+	else if (is_establishing(fState))
+		available = 0;
 	else
 		available = EPIPE;
 
@@ -1182,6 +1190,7 @@ TCPEndpoint::_MarkEstablished()
 	}
 
 	fSendList.Signal();
+	gSocketModule->notify(socket, B_SELECT_WRITE, fSendQueue.Free());
 }
 
 
@@ -2185,7 +2194,7 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 		if (is_writable(fState)) {
 			// notify threads waiting on the socket to become writable again
 			fSendList.Signal();
-			gSocketModule->notify(socket, B_SELECT_WRITE, fSendQueue.Used());
+			gSocketModule->notify(socket, B_SELECT_WRITE, fSendQueue.Free());
 		}
 
 		if (fCongestionWindow < fSlowStartThreshold)

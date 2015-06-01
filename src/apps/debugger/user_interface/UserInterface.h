@@ -142,6 +142,10 @@ public:
 	virtual void				InspectRequested(
 									target_addr_t address,
 									TeamMemoryBlock::Listener* listener) = 0;
+	virtual	void				MemoryWriteRequested(
+									target_addr_t address,
+									const void* data,
+									target_size_t length) = 0;
 
 	virtual	void				ExpressionEvaluationRequested(
 									SourceLanguage* language,

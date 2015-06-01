@@ -187,24 +187,24 @@ public:
 	{
 //		printf("ConnectionOpened(%p)\n", caller);
 	}
-	
+
 	virtual void HostnameResolved(BUrlRequest* caller, const char* ip)
 	{
 //		printf("HostnameResolved(%p): %s\n", caller, ip);
 	}
-									
+
 	virtual void ResponseStarted(BUrlRequest* caller)
 	{
 		if (fDebug)
 			printf("ResponseStarted(%p)\n", caller);
 	}
-	
+
 	virtual void HeadersReceived(BUrlRequest* caller)
 	{
 		if (fDebug)
 			printf("HeadersReceived(%p)\n", caller);
 	}
-	
+
 	virtual void DataReceived(BUrlRequest* caller, const char* data,
 		off_t position, ssize_t size)
 	{
@@ -216,27 +216,27 @@ public:
 		if (fDownloadIO != NULL)
 			fDownloadIO->Write(data, size);
 	}
-									
+
 	virtual	void DownloadProgress(BUrlRequest* caller, ssize_t bytesReceived,
 		ssize_t bytesTotal)
 	{
 //		printf("DownloadProgress(%p): %ld/%ld\n", caller, bytesReceived,
 //			bytesTotal);
 	}
-									
+
 	virtual void UploadProgress(BUrlRequest* caller, ssize_t bytesSent,
 		ssize_t bytesTotal)
 	{
 		if (fDebug)
 			printf("UploadProgress(%p): %ld/%ld\n", caller, bytesSent, bytesTotal);
 	}
-																	
+
 	virtual void RequestCompleted(BUrlRequest* caller, bool success)
 	{
 		if (fDebug)
 			printf("RequestCompleted(%p): %d\n", caller, success);
 	}
-									
+
 	virtual void DebugMessage(BUrlRequest* caller,
 		BUrlProtocolDebugMessage type, const char* text)
 	{
@@ -295,11 +295,11 @@ WebAppInterface::operator=(const WebAppInterface& other)
 {
 	if (this == &other)
 		return *this;
-	
+
 	fUsername = other.fUsername;
 	fPassword = other.fPassword;
 	fLanguage = other.fLanguage;
-	
+
 	return *this;
 }
 
@@ -380,12 +380,12 @@ WebAppInterface::RetrievePackageIcon(const BString& packageName,
 {
 	BString urlString = "https://depot.haiku-os.org/pkgicon/";
 	urlString << packageName << ".hvif";
-	
+
 	BUrl url(urlString);
-	
+
 	ProtocolListener listener;
 	listener.SetDownloadIO(stream);
-	
+
 	BHttpRequest request(url, true, "HTTP", &listener);
 	request.SetMethod(B_HTTP_GET);
 
@@ -396,7 +396,7 @@ WebAppInterface::RetrievePackageIcon(const BString& packageName,
 		request.Result());
 
 	int32 statusCode = result.StatusCode();
-	
+
 	if (statusCode == 200)
 		return B_OK;
 
@@ -523,15 +523,15 @@ WebAppInterface::RetrieveScreenshot(const BString& code,
 	BString urlString = "https://depot.haiku-os.org/pkgscreenshot/";
 	urlString << code << ".png"
 		<< "?tw=" << width << "&th=" << height;
-	
+
 	BUrl url(urlString);
-	
+
 	ProtocolListener listener;
 	listener.SetDownloadIO(stream);
 
-	BHttpHeaders headers;	
+	BHttpHeaders headers;
 	headers.AddHeader("User-Agent", "X-HDS-Client");
-	
+
 	BHttpRequest request(url, true, "HTTP", &listener);
 	request.SetMethod(B_HTTP_GET);
 	request.SetHeaders(headers);
@@ -543,7 +543,7 @@ WebAppInterface::RetrieveScreenshot(const BString& code,
 		request.Result());
 
 	int32 statusCode = result.StatusCode();
-	
+
 	if (statusCode == 200)
 		return B_OK;
 
@@ -588,7 +588,7 @@ WebAppInterface::CreateUser(const BString& nickName,
 
 				if (!email.IsEmpty())
 					builder.AddValue("email", email);
-	
+
 				builder.AddValue("captchaToken", captchaToken)
 				.AddValue("captchaResponse", captchaResponse)
 				.AddValue("naturalLanguageCode", languageCode)

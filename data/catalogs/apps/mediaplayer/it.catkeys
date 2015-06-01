@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-MediaPlayer	3355553830
+1	italian	x-vnd.Haiku-MediaPlayer	111690979
 raw audio	MediaPlayer-InfoWin		audio grezzo
 Location	MediaPlayer-InfoWin		Luogo
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -131,7 +131,6 @@ Edit	MediaPlayer-PlaylistWindow		Modifica
 Start media server	MediaPlayer-Main		Avvia il media server
 Toggle fullscreen.	MediaPlayer-Main		Modalità a schermo intero.
 <unnamed>	PlaylistItem-name		<senza nome>
-Open Clips	MediaPlayer-Main		Apri Appunti
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		nessuno
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Rileva/Imposta il volume (0.0-2.0).

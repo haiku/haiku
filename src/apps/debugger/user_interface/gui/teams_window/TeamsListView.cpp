@@ -4,7 +4,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-
+#include <algorithm>
 #include <new>
 
 #include <stdio.h>
@@ -192,14 +192,14 @@ enum {
 
 
 TeamRow::TeamRow(team_info& info)
-	: BRow(20.0)
+	: BRow(std::max(20.0f, ceilf(be_plain_font->Size() * 1.4)))
 {
 	_SetTo(info);
 }
 
 
 TeamRow::TeamRow(team_id team)
-	: BRow(20.0)
+	: BRow(std::max(20.0f, ceilf(be_plain_font->Size() * 1.4)))
 {
 	team_info info;
 	get_team_info(team, &info);

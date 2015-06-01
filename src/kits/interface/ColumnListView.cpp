@@ -47,6 +47,7 @@ All rights reserved.
 
 #include <typeinfo>
 
+#include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -126,25 +127,11 @@ static const unsigned char kUpSortArrow8x8Invert[] = {
 
 static const float kTintedLineTint = 1.04;
 
-static const float kTitleHeight = 16.0;
+static const float kMinTitleHeight = 16.0;
+static const float kMinRowHeight = 16.0;
+static const float kTitleSpacing = 1.4;
+static const float kRowSpacing = 1.4;
 static const float kLatchWidth = 15.0;
-
-
-static const rgb_color kColor[B_COLOR_TOTAL] =
-{
-    {255, 255, 255, 255},           // B_COLOR_BACKGROUND
-    {  0,   0,   0, 255},           // B_COLOR_TEXT
-    {148, 148, 148, 255},           // B_COLOR_ROW_DIVIDER
-    {190, 190, 190, 255},           // B_COLOR_SELECTION
-    {  0,   0,   0, 255},           // B_COLOR_SELECTION_TEXT
-    {200, 200, 200, 255},           // B_COLOR_NON_FOCUS_SELECTION
-    {180, 180, 180, 180},           // B_COLOR_EDIT_BACKGROUND
-    {  0,   0,   0, 255},           // B_COLOR_EDIT_TEXT
-    {215, 215, 215, 255},           // B_COLOR_HEADER_BACKGROUND
-    {  0,   0,   0, 255},           // B_COLOR_HEADER_TEXT
-    {  0,   0,   0, 255},           // B_COLOR_SEPARATOR_LINE
-    {  0,   0,   0, 255},           // B_COLOR_SEPARATOR_BORDER
-};
 
 static const int32 kMaxDepth = 1024;
 static const float kLeftMargin = kLatchWidth;
@@ -441,6 +428,20 @@ BColumn::MouseUp(BColumnListView* /*parent*/, BRow* /*row*/, BField* /*field*/)
 
 
 // #pragma mark -
+
+
+BRow::BRow()
+	:
+	fChildList(NULL),
+	fIsExpanded(false),
+	fHeight(std::max(kMinRowHeight,
+		ceilf(be_plain_font->Size() * kRowSpacing))),
+	fNextSelected(NULL),
+	fPrevSelected(NULL),
+	fParent(NULL),
+	fList(NULL)
+{
+}
 
 
 BRow::BRow(float height)
@@ -1913,7 +1914,9 @@ BColumnListView::MinSize()
 {
 	BSize size;
 	size.width = 100;
-	size.height = kTitleHeight + 4 * B_H_SCROLL_BAR_HEIGHT;
+	size.height = std::max(kMinTitleHeight,
+		ceilf(be_plain_font->Size() * kTitleSpacing))
+		+ 4 * B_H_SCROLL_BAR_HEIGHT;
 	if (!fHorizontalScrollBar->IsHidden())
 		size.height += fHorizontalScrollBar->Frame().Height() + 1;
 	// TODO: Take border size into account
@@ -2033,8 +2036,32 @@ BColumnListView::_Init()
 	if (bounds.Height() <= 0)
 		bounds.bottom = 100;
 
-	for (int i = 0; i < (int)B_COLOR_TOTAL; i++)
-		fColorList[i] = kColor[i];
+	fColorList[B_COLOR_BACKGROUND] = ui_color(B_LIST_BACKGROUND_COLOR);
+	fColorList[B_COLOR_TEXT] = ui_color(B_LIST_ITEM_TEXT_COLOR);
+	fColorList[B_COLOR_ROW_DIVIDER] = tint_color(
+		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR), B_DARKEN_2_TINT);
+	fColorList[B_COLOR_SELECTION] = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+	fColorList[B_COLOR_SELECTION_TEXT] =
+		ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+
+	// For non focus selection uses the selection color as BListView
+	fColorList[B_COLOR_NON_FOCUS_SELECTION] =
+		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+
+	// edit mode doesn't work very well
+	fColorList[B_COLOR_EDIT_BACKGROUND] = tint_color(
+		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR), B_DARKEN_1_TINT);
+	fColorList[B_COLOR_EDIT_BACKGROUND].alpha = 180;
+
+	// Unused color
+	fColorList[B_COLOR_EDIT_TEXT] = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+
+	fColorList[B_COLOR_HEADER_BACKGROUND] = ui_color(B_PANEL_BACKGROUND_COLOR);
+	fColorList[B_COLOR_HEADER_TEXT] = ui_color(B_PANEL_TEXT_COLOR);
+
+	// Unused colors
+	fColorList[B_COLOR_SEPARATOR_LINE] = ui_color(B_LIST_ITEM_TEXT_COLOR);
+	fColorList[B_COLOR_SEPARATOR_BORDER] = ui_color(B_LIST_ITEM_TEXT_COLOR);
 
 	BRect titleRect;
 	BRect outlineRect;
@@ -2071,7 +2098,8 @@ BColumnListView::_GetChildViewRects(const BRect& bounds, BRect& titleRect,
 	BRect& outlineRect, BRect& vScrollBarRect, BRect& hScrollBarRect)
 {
 	titleRect = bounds;
-	titleRect.bottom = titleRect.top + kTitleHeight;
+	titleRect.bottom = titleRect.top + std::max(kMinTitleHeight,
+		ceilf(be_plain_font->Size() * kTitleSpacing));
 #if !LOWER_SCROLLBAR
 	titleRect.right -= B_V_SCROLL_BAR_WIDTH;
 #endif
@@ -2084,7 +2112,8 @@ BColumnListView::_GetChildViewRects(const BRect& bounds, BRect& titleRect,
 
 	vScrollBarRect = bounds;
 #if LOWER_SCROLLBAR
-	vScrollBarRect.top += kTitleHeight;
+	vScrollBarRect.top += std::max(kMinTitleHeight,
+		ceilf(be_plain_font->Size() * kTitleSpacing));
 #endif
 
 	vScrollBarRect.left = vScrollBarRect.right - B_V_SCROLL_BAR_WIDTH;
@@ -2739,6 +2768,9 @@ TitleView::MouseDown(BPoint position)
 				&& (fColumnFlags & B_ALLOW_COLUMN_RESIZE) != 0) {
 
 				int32 clicks = 0;
+				fSelectedColumn = column;
+				fSelectedColumnRect.Set(leftEdge, 0, rightEdge,
+					fVisibleRect.Height());
 				Window()->CurrentMessage()->FindInt32("clicks", &clicks);
 				if (clicks == 2 || buttons == B_TERTIARY_MOUSE_BUTTON) {
 					ResizeSelectedColumn(position, true);
@@ -2746,9 +2778,6 @@ TitleView::MouseDown(BPoint position)
 					break;
 				}
 				fCurrentState = RESIZING_COLUMN;
-				fSelectedColumn = column;
-				fSelectedColumnRect.Set(leftEdge, 0, rightEdge,
-					fVisibleRect.Height());
 				fClickPoint = BPoint(position.x - rightEdge - 1,
 					position.y - fSelectedColumnRect.top);
 				SetMouseEventMask(B_POINTER_EVENTS,

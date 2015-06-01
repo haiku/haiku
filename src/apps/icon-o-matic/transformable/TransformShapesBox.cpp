@@ -40,7 +40,7 @@ TransformShapesBox::TransformShapesBox(CanvasView* view,
 
 		for (int32 i = 0; i < fCount; i++) {
 			if (fShapes[i]) {
-				fShapes[i]->Acquire();
+				fShapes[i]->AcquireReference();
 				fShapes[i]->AddObserver(this);
 			}
 		}
@@ -59,7 +59,7 @@ TransformShapesBox::~TransformShapesBox()
 		for (int32 i = 0; i < fCount; i++) {
 			if (fShapes[i]) {
 				fShapes[i]->RemoveObserver(this);
-				fShapes[i]->Release();
+				fShapes[i]->ReleaseReference();
 			}
 		}
 		delete[] fShapes;

@@ -103,6 +103,8 @@ DataTranslationsWindow::_PopulateListView()
 		maxWidth = std::max(maxWidth, fTranslatorListView->StringWidth(name));
 	}
 
+	fTranslatorListView->SortItems();
+
 	fTranslatorListView->SetExplicitSize(BSize(maxWidth + 20, B_SIZE_UNSET));
 
 	delete[] translators;
@@ -228,11 +230,10 @@ DataTranslationsWindow::_SetupViews()
 	_PopulateListView();
 
 	// Build the layout
-	float padding = be_control_look->DefaultItemSpacing();
-	BLayoutBuilder::Group<>(this, B_HORIZONTAL, padding)
-		.SetInsets(padding, padding, padding, padding)
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(scrollView, 3)
-		.AddGrid(padding, padding, 6)
+		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 6)
 			.SetInsets(0, 0, 0, 0)
 			.Add(fRightBox, 0, 0, 3, 1)
 			.Add(fIconView, 0, 1)

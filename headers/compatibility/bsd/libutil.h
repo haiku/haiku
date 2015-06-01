@@ -39,6 +39,10 @@
 #ifndef _LIBUTIL_H_
 #define	_LIBUTIL_H_
 
+
+#ifdef _BSD_SOURCE
+
+
 #include <stdint.h>
 #include <sys/cdefs.h>
 #include <sys/types.h>
@@ -161,5 +165,9 @@ __END_DECLS
 
 #define HN_GETSCALE		0x10
 #define HN_AUTOSCALE		0x20
+
+
+#endif
+
 
 #endif /* !_LIBUTIL_H_ */

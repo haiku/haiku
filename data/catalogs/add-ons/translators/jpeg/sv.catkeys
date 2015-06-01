@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-JPEGTranslator	965709535
+1	swedish	x-vnd.Haiku-JPEGTranslator	3788699631
 Output quality	JPEGTranslator		Bildkvalitet
 JPEG images	JPEGTranslator		JPEG-bilder
 Prevent colors 'washing out'	JPEGTranslator		Förhindra att färger mattas
@@ -15,6 +15,7 @@ Output smoothing strength	JPEGTranslator		Bildutjämningsstyrka
 High	JPEGTranslator		Hög
 Write	JPEGTranslator		Skriv
 Write black-and-white images as RGB24	JPEGTranslator		Skriv svart/vita bilder som RGB24
+Version %d.%d.%d	JPEGTranslator		Version %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		Läs in gråskalebilder som RGB32
 Read	JPEGTranslator		Läs
 JPEG Library Warning: %s\n	be_jerror		JPEG bibliotekvarning: %s\n

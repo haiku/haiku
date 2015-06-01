@@ -438,10 +438,8 @@ TranslatorReadView::TranslatorReadView(const char* name,
 	if (fSettings->SetGetBool(JPEG_SET_SHOWREADWARNING, NULL))
 		fShowErrorBox->SetValue(B_CONTROL_ON);
 
-	float padding = 5.0f;
-
-	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
-		.SetInsets(padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fAlwaysRGB32)
 		.Add(fPhotoshopCMYK)
 		.Add(fShowErrorBox)
@@ -559,9 +557,8 @@ TranslatorWriteView::TranslatorWriteView(const char* name,
 	if (fSettings->SetGetBool(JPEG_SET_GRAY1_AS_RGB24))
 		fGrayAsRGB24->SetValue(B_CONTROL_ON);
 
-	float padding = 5.0f;
-	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
-		.SetInsets(padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fQualitySlider)
 		.Add(fSmoothingSlider)
 		.Add(fProgress)
@@ -674,9 +671,12 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 
-	char versionString[16];
-	sprintf(versionString, "v%d.%d.%d", (int)(sTranslatorVersion >> 8),
-		(int)((sTranslatorVersion >> 4) & 0xf), (int)(sTranslatorVersion & 0xf));
+	char versionString[100];
+	snprintf(versionString, sizeof(versionString),
+		B_TRANSLATE("Version %d.%d.%d"),
+		(int)(sTranslatorVersion >> 8),
+		(int)((sTranslatorVersion >> 4) & 0xf),
+		(int)(sTranslatorVersion & 0xf));
 
 	BStringView* version = new BStringView("Version", versionString);
 	version->SetExplicitAlignment(labelAlignment);
@@ -686,22 +686,20 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	infoView->MakeEditable(false);
 
-	float padding = 5.0f;
-	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
-		.SetInsets(padding)
-		.AddGroup(B_HORIZONTAL, padding)
-			.Add(title)
-			.Add(version)
-			.AddGlue()
-		.End()
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(title)
+		.Add(version)
 		.Add(infoView);
 }
 
 
 TranslatorView::TranslatorView(const char* name, TranslatorSettings* settings)
 	:
-	BTabView(name)
+	BTabView(name, B_WIDTH_FROM_LABEL)
 {
+	SetBorder(B_NO_BORDER);
+
 	AddTab(new TranslatorWriteView(B_TRANSLATE("Write"), settings->Acquire()));
 	AddTab(new TranslatorReadView(B_TRANSLATE("Read"), settings->Acquire()));
 	AddTab(new TranslatorAboutView(B_TRANSLATE("About")));

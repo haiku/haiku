@@ -14,6 +14,8 @@ BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	DataIO.cpp
 	DataPositionIOWrapper.cpp
 	Flattenable.cpp
+	Job.cpp
+	JobQueue.cpp
 	List.cpp
 	Locker.cpp
 	PointerList.cpp

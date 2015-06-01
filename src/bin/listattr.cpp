@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Ryan Fleet.
  *
  * Distributed under the terms of the MIT license.
@@ -111,6 +111,15 @@ show_attr_contents(BNode& node, const char* attribute, const attr_info& info)
 		case B_BOOL_TYPE:
 			printf("%d\n", *((unsigned char *)buffer));
 			break;
+		case B_TIME_TYPE:
+		{
+			char stringBuffer[256];
+			struct tm timeInfo;
+			localtime_r((time_t *)buffer, &timeInfo);
+			strftime(stringBuffer, sizeof(stringBuffer), "%c", &timeInfo);
+			printf("%s\n", stringBuffer);
+			break;
+		}
 		case B_STRING_TYPE:
 		case B_MIME_STRING_TYPE:
 		case 'MSIG':

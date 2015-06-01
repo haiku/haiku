@@ -51,7 +51,7 @@ struct BAbstractLayout::Proxy {
 
 	virtual bool		IsVisible(bool ancestorHidden) const = 0;
 	virtual	void		SetVisible(bool visible) = 0;
-	
+
 	virtual	status_t	AddDataToArchive(BMessage* archive,
 							bool ancestorHidden) = 0;
 	virtual	status_t	RestoreDataFromArchive(const BMessage* archive) = 0;

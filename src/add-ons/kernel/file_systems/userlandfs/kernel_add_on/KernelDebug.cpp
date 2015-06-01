@@ -23,7 +23,7 @@ KernelDebug::DebugUFS(int argc, char** argv)
 	KDebugFSMap& fileSystems = userlandFS->fFileSystems->GetUnsynchronizedMap();
 
 	for (KDebugFSMap::Iterator it = fileSystems.GetIterator();
-		 it.HasNext();) {
+			it.HasNext();) {
 		KDebugFSMap::Entry entry = it.Next();
 		FileSystemInitializer* fsInitializer = entry.value;
 		FileSystem* fs = fsInitializer->GetFileSystem();
@@ -33,7 +33,8 @@ KernelDebug::DebugUFS(int argc, char** argv)
 			int32 volumeCount = fs->fVolumes.Count();
 			for (int32 i = 0; i < volumeCount; i++) {
 				Volume* volume = fs->fVolumes.ElementAt(i);
-				kprintf("  volume %p: %ld\n", volume, volume->GetID());
+				kprintf("  volume %p: %" B_PRId32 "\n", volume,
+					volume->GetID());
 			}
 		}
 	}
@@ -55,8 +56,9 @@ KernelDebug::DebugPortPool(int argc, char** argv)
 	}
 	kprintf("used ports:\n");
 	for (int32 i = portPool->fFreePorts; i < portPool->fPortCount; i++) {
-		kprintf("  port %p, owner: %ld, count: %ld\n", portPool->fPorts[i].port,
-			portPool->fPorts[i].owner, portPool->fPorts[i].count);
+		kprintf("  port %p, owner: %" B_PRId32 ", count: %" B_PRId32 "\n",
+			portPool->fPorts[i].port, portPool->fPorts[i].owner,
+			portPool->fPorts[i].count);
 	}
 	return 0;
 }
@@ -71,12 +73,12 @@ KernelDebug::DebugPort(int argc, char** argv)
 	}
 	RequestPort *port = (RequestPort*)parse_expression(argv[1]);
 	kprintf("port %p:\n", port);
-	kprintf("  status      : %lx\n", port->fPort.fInitStatus);
+	kprintf("  status      : %" B_PRIx32 "\n", port->fPort.fInitStatus);
 	kprintf("  is owner    : %d\n", port->fPort.fOwner);
-	kprintf("  owner port:   %ld\n", port->fPort.fInfo.owner_port);
-	kprintf("  client port:  %ld\n", port->fPort.fInfo.client_port);
-	kprintf("  size:         %ld\n", port->fPort.fInfo.size);
-	kprintf("  capacity:     %ld\n", port->fPort.fCapacity);
+	kprintf("  owner port:   %" B_PRId32 "\n", port->fPort.fInfo.owner_port);
+	kprintf("  client port:  %" B_PRId32 "\n", port->fPort.fInfo.client_port);
+	kprintf("  size:         %" B_PRId32 "\n", port->fPort.fInfo.size);
+	kprintf("  capacity:     %" B_PRId32 "\n", port->fPort.fCapacity);
 	kprintf("  buffer:       %p\n", port->fPort.fBuffer);
 	return 0;
 }

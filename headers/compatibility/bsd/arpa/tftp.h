@@ -37,6 +37,10 @@
 #ifndef _ARPA_TFTP_H_
 #define	_ARPA_TFTP_H_
 
+
+#ifdef _BSD_SOURCE
+
+
 /*
  * Trivial File Transfer Protocol (IEN-133)
  */
@@ -79,5 +83,9 @@ struct tftphdr {
 #define	EEXISTS		6		/* file already exists */
 #define	ENOUSER		7		/* no such user */
 #define	EOPTNEG		8		/* option negotiation failed */
+
+
+#endif
+
 
 #endif /* !_TFTP_H_ */

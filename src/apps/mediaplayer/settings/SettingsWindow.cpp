@@ -43,7 +43,7 @@ enum {
 SettingsWindow::SettingsWindow(BRect frame)
  	:
  	BWindow(frame, B_TRANSLATE("MediaPlayer settings"), B_FLOATING_WINDOW_LOOK,
- 		B_FLOATING_APP_WINDOW_FEEL,
+ 		B_FLOATING_ALL_WINDOW_FEEL,
  		B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_NOT_RESIZABLE
  			| B_AUTO_UPDATE_SIZE_LIMITS)
 {

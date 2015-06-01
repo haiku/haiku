@@ -102,7 +102,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	fRepeatPasswordField = new BTextControl(B_TRANSLATE("Repeat pass phrase:"),
 		"", new BMessage(MSG_VALIDATE_FIELDS));
 	fRepeatPasswordField->TextView()->HideTyping(true);
-	
+
 	// Construct languages popup
 	BPopUpMenu* languagesMenu = new BPopUpMenu(B_TRANSLATE("Language"));
 	fLanguageCodeField = new BMenuField("language",
@@ -115,8 +115,8 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 		fModel.SupportedLanguages().IndexOf(fPreferredLanguage));
 	if (defaultItem != NULL)
 		defaultItem->SetMarked(true);
-	
-	
+
+
 	fEmailField = new BTextControl(B_TRANSLATE("Email address:"), "", NULL);
 	fCaptchaView = new BitmapView("captcha view");
 	fCaptchaResultField = new BTextControl("", "", NULL);
@@ -133,7 +133,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 		new BMessage(MSG_VALIDATE_FIELDS));
 	fCaptchaResultField->SetModificationMessage(
 		new BMessage(MSG_VALIDATE_FIELDS));
-	
+
 	fTabView = new TabView(BMessenger(this),
 		BMessage(MSG_TAB_SELECTED));
 
@@ -178,7 +178,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 	;
 
 	SetDefaultButton(fSendButton);
-	
+
 	_SetMode(LOGIN);
 
 	CenterIn(parent->Frame());
@@ -188,7 +188,7 @@ UserLoginWindow::UserLoginWindow(BWindow* parent, BRect frame, Model& model)
 UserLoginWindow::~UserLoginWindow()
 {
 	BAutolock locker(&fLock);
-	
+
 	if (fWorkerThread >= 0)
 		wait_for_thread(fWorkerThread, NULL);
 }
@@ -235,10 +235,9 @@ UserLoginWindow::MessageReceived(BMessage* message)
 
 		case MSG_CAPTCHA_OBTAINED:
 			if (fCaptchaImage.Get() != NULL) {
-				fCaptchaView->SetBitmap(
-					fCaptchaImage->Bitmap(SharedBitmap::SIZE_ANY));
+				fCaptchaView->SetBitmap(fCaptchaImage);
 			} else {
-				fCaptchaView->SetBitmap(NULL);
+				fCaptchaView->UnsetBitmap();
 			}
 			fCaptchaResultField->SetText("");
 			break;
@@ -331,13 +330,13 @@ UserLoginWindow::_ValidateCreateAccountFields(bool alertProblems)
 	// TODO: Use the same validation as the web-serivce
 	bool validUserName = nickName.Length() >= 3;
 	fNewUsernameField->MarkAsInvalid(!validUserName);
-	
+
 	bool validPassword = password1.Length() >= 8
 		&& count_digits(password1) >= 2
 		&& count_upper_case_letters(password1) >= 2;
 	fNewPasswordField->MarkAsInvalid(!validPassword);
 	fRepeatPasswordField->MarkAsInvalid(password1 != password2);
-	
+
 	bool validCaptcha = captcha.Length() > 0;
 	fCaptchaResultField->MarkAsInvalid(!validCaptcha);
 
@@ -399,7 +398,7 @@ UserLoginWindow::_ValidateCreateAccountFields(bool alertProblems)
 				return false;
 		}
 	}
-	
+
 	return valid;
 }
 
@@ -408,7 +407,7 @@ void
 UserLoginWindow::_Login()
 {
 	BAutolock locker(&fLock);
-	
+
 	if (fWorkerThread >= 0)
 		return;
 
@@ -424,9 +423,9 @@ UserLoginWindow::_CreateAccount()
 {
 	if (!_ValidateCreateAccountFields(true))
 		return;
-	
+
 	BAutolock locker(&fLock);
-	
+
 	if (fWorkerThread >= 0)
 		return;
 
@@ -442,13 +441,13 @@ UserLoginWindow::_RequestCaptcha()
 {
 	if (Lock()) {
 		fCaptchaToken = "";
-		fCaptchaView->SetBitmap(NULL);
+		fCaptchaView->UnsetBitmap();
 		fCaptchaImage.Unset();
 		Unlock();
 	}
 
 	BAutolock locker(&fLock);
-	
+
 	if (fWorkerThread >= 0)
 		return;
 
@@ -466,7 +465,7 @@ UserLoginWindow::_LoginSuccessful(const BString& message)
 	// (This method is executd from another thread.)
 	BMessenger onSuccessTarget(fOnSuccessTarget);
 	BMessage onSuccessMessage(fOnSuccessMessage);
-	
+
 	BMessenger(this).SendMessage(B_QUIT_REQUESTED);
 
 	BAlert* alert = new(std::nothrow) BAlert(
@@ -489,7 +488,7 @@ UserLoginWindow::_SetWorkerThread(thread_id thread)
 {
 	if (!Lock())
 		return;
-	
+
 	bool enabled = thread < 0;
 
 	fUsernameField->SetEnabled(enabled);
@@ -501,7 +500,7 @@ UserLoginWindow::_SetWorkerThread(thread_id thread)
 	fLanguageCodeField->SetEnabled(enabled);
 	fCaptchaResultField->SetEnabled(enabled);
 	fSendButton->SetEnabled(enabled);
-	
+
 	if (thread >= 0) {
 		fWorkerThread = thread;
 		resume_thread(fWorkerThread);
@@ -620,7 +619,7 @@ UserLoginWindow::_RequestCaptchaThread()
 				}
 				delete[] buffer;
 			}
-		}			
+		}
 	} else {
 		fprintf(stderr, "Failed to obtain captcha: %s\n", strerror(status));
 	}
@@ -738,7 +737,7 @@ UserLoginWindow::_CollectValidationFailures(const BMessage& result,
 			BMessage failure;
 			if (failures.FindMessage(name, &failure) != B_OK)
 				break;
-	
+
 			BString property;
 			BString message;
 			if (failure.FindString("property", &property) == B_OK
@@ -764,7 +763,7 @@ UserLoginWindow::_CollectValidationFailures(const BMessage& result,
 			}
 		}
 	}
-	
+
 	if (!found) {
 		error << B_TRANSLATE("But none could be listed here, sorry.");
 	}

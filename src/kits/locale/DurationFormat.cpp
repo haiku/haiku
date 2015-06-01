@@ -7,6 +7,7 @@
  */
 
 
+#include <unicode/uversion.h>
 #include <DurationFormat.h>
 
 #include <new>

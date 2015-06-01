@@ -68,7 +68,7 @@ AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 #AddNewDriversToPackage display		: display_adapter@x86 ;
 
 # legacy drivers
-AddDriversToPackage					: console dprintf null <driver>tty zero ;
+AddDriversToPackage					: console dprintf null <driver>tty usb_modeswitch zero ;
 AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
 AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
@@ -111,7 +111,7 @@ AddSymlinkToPackage lib : libbe.so : liblocale.so ;
 AddFilesToPackage servers : $(SYSTEM_SERVERS) ;
 
 # apps
-AddFilesToPackage  				: runtime_loader Deskbar Tracker ;
+AddFilesToPackage				: runtime_loader Deskbar Tracker ;
 AddFilesToPackage bin			: $(SYSTEM_BIN) consoled ;
 AddFilesToPackage apps			: $(SYSTEM_APPS) ;
 AddFilesToPackage preferences	: $(SYSTEM_PREFERENCES) ;
@@ -125,10 +125,9 @@ AddSymlinkToPackage bin : less : more ;
 AddSymlinkToPackage bin : gzip : gunzip ;
 AddSymlinkToPackage bin : gzip : zcat ;
 AddSymlinkToPackage bin : zdiff : zcmp ;
-AddSymlinkToPackage bin : unzip : zipinfo ;
 
 # scripts and data files
-local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript
+local bootScripts = Bootscript Bootscript.cd SetupEnvironment
 	InstallerInitScript InstallerFinishScript ;
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToPackage boot : $(bootScripts) ;
@@ -215,7 +214,9 @@ AddFilesToPackage add-ons mail_daemon outbound_filters		: Fortune ;
 AddFilesToPackage add-ons media : $(SYSTEM_ADD_ONS_MEDIA) ;
 AddFilesToPackage add-ons media plugins : $(SYSTEM_ADD_ONS_MEDIA_PLUGINS) ;
 
-AddFilesToPackage add-ons Network\ Setup : Interfaces Services ;
+AddFilesToPackage add-ons Network\ Settings
+	: IPv4Interface IPv6Interface DNSClientService FTPService SSHService
+		TelnetService ;
 
 AddFilesToPackage add-ons Tracker
 	: FileType Mark\ as… Mark\ as\ Read Open\ Target\ Folder
@@ -231,6 +232,7 @@ AddFilesToPackage add-ons input_server devices
 	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
 AddFilesToPackage add-ons input_server filters
 	: screen_saver shortcut_catcher switch_workspace ;
+AddDirectoryToPackage add-ons input_server methods ;
 
 AddFilesToPackage add-ons kernel network : <net>notifications stack ;
 AddFilesToPackage add-ons kernel network : dns_resolver ;

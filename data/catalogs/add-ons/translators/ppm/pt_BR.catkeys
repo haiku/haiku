@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PPMTranslator	276252412
+1	portuguese (brazil)	x-vnd.Haiku-PPMTranslator	797856484
 PPM Settings	PPMMain		Definições de PPM
 Based on PPMTranslator sample code	PPMTranslator		Baseado no código de exemplo do tradutor PPM
 OK	PPMMain		OK
@@ -13,7 +13,6 @@ PPM image translator	PPMTranslator		tradutor de imagem PPM
 bits/space	PPMTranslator		bits/espaço
 RGB 8:8:8 32 bits big-endian	PPMTranslator		RGB 8:8:8 32 bits big-endian
 RGB 5:6:5 16 bits big-endian	PPMTranslator		RGB 5:6:5 16 bits big-endian
-Version %d.%d.%d %s	PPMTranslator		Versão %d.%d.%d %s
 RGB 5:5:5 16 bits big-endian	PPMTranslator		RGB 5:5:5 16 bits big-endian
 RGB 5:6:5 16 bits	PPMTranslator		RGB 5:6:5 16 bits
 Write ASCII	PPMTranslator		Gravar ASCII
@@ -23,7 +22,6 @@ RGBA 5:5:5:1 16 bits big-endian	PPMTranslator		RGBA 5:5:5:1 16 bits big-endian
 RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 bits
 Bitmap 1 bit	PPMTranslator		Mapa de bits de 1 bit
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 bits big-endian
-Input Color Space	PPMTranslator		Espaço de Cor de Entrada
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 bits
 Sample code copyright 1999, Be Incorporated	PPMTranslator		Código de exemplo direitos reservados 1999, Be Incorporated
 PPMTranslator Settings	PPMTranslator		Definições do Tradutor PPM

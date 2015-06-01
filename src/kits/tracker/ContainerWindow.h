@@ -280,6 +280,7 @@ protected:
 		BObjectList<Model>*, void*, BStringList&);
 	void LoadAddOn(BMessage*);
 
+	bool fUseLayouts;
 	BGroupLayout* fRootLayout;
 	BGroupView* fMenuContainer;
 	BGridView* fPoseContainer;

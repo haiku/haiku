@@ -53,15 +53,14 @@ struct CacheEntry : DoublyLinkedListLinkImpl<CacheEntry> {
 
 class ImageCache {
 public:
-	static	ImageCache&			Default() { return sCache; }
-
+								ImageCache();
+	virtual						~ImageCache();
 			status_t			RetrieveImage(const entry_ref& ref,
 									int32 page = 1,
 									const BMessenger* target = NULL);
+			void				Stop();
 
 private:
-								ImageCache();
-	virtual						~ImageCache();
 
 	static	status_t			_QueueWorkerThread(void* self);
 
@@ -91,8 +90,6 @@ private:
 			uint64				fBytes;
 			uint64				fMaxBytes;
 			size_t				fMaxEntries;
-
-	static	ImageCache			sCache;
 };
 
 

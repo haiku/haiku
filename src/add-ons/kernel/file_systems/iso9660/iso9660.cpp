@@ -307,6 +307,7 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 	// Now we're at the start of the rock ridge stuff
 	char* altName = NULL;
 	char* slName = NULL;
+	char* newSlName = NULL;
 	uint16 altNameSize = 0;
 	uint16 slNameSize = 0;
 	uint8 length = 0;
@@ -410,10 +411,13 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 							slNameSize += compLen;
 							if (useSeparator)
 								slNameSize++;
-							slName = (char*)realloc(slName,
+							newSlName = (char*)realloc(slName,
 								slNameSize + 1);
-							if (slName == NULL)
+							if (newSlName == NULL) {
+								free(slName);
 								return B_NO_MEMORY;
+							}
+							slName = newSlName;
 
 							if (useSeparator) {
 								TRACE(("Adding separator\n"));
@@ -431,10 +435,13 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 						case SLCP_CURRENT:
 							TRACE(("InitNode - found link to current directory\n"));
 							slNameSize += 2;
-							slName = (char*)realloc(slName,
+							newSlName = (char*)realloc(slName,
 								slNameSize + 1);
-							if (slName == NULL)
+							if (newSlName == NULL) {
+								free(slName);
 								return B_NO_MEMORY;
+							}
+							slName = newSlName;
 
 							memcpy(slName + addPos, "./", 2);
 							useSeparator = false;
@@ -442,10 +449,13 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 
 						case SLCP_PARENT:
 							slNameSize += 3;
-							slName = (char*)realloc(slName,
+							newSlName = (char*)realloc(slName,
 								slNameSize + 1);
-							if (slName == NULL)
+							if (newSlName == NULL) {
+								free(slName);
 								return B_NO_MEMORY;
+							}
+							slName = newSlName;
 
 							memcpy(slName + addPos, "../", 3);
 							useSeparator = false;
@@ -454,10 +464,13 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 						case SLCP_ROOT:
 							TRACE(("InitNode - found link to root directory\n"));
 							slNameSize += 1;
-							slName = (char*)realloc(slName,
+							newSlName = (char*)realloc(slName,
 								slNameSize + 1);
-							if (slName == NULL)
+							if (newSlName == NULL) {
+								free(slName);
 								return B_NO_MEMORY;
+							}
+							slName = newSlName;
 							memcpy(slName + addPos, "/", 1);
 							useSeparator = false;
 							break;
@@ -488,16 +501,20 @@ parse_rock_ridge(iso9660_volume* volume, iso9660_inode* node, char* buffer,
 				uint16 oldEnd = altNameSize;
 
 				altNameSize += length - 5;
-				altName = (char*)realloc(altName, altNameSize + 1);
-				if (altName == NULL)
+				char* newAltName = (char*)realloc(altName, altNameSize + 1);
+				if (newAltName == NULL) {
+					free(altName);
 					return B_NO_MEMORY;
+				}
+				altName = newAltName;
 
 				TRACE(("RR: found NM, length %u\n", length));
 				// Read flag and version.
 				node->attr.nmVer = *(uint8 *)(buffer + bytePos++);
 				flags = *(uint8 *)(buffer + bytePos++);
 
-				TRACE(("RR: nm buffer is %s, start at %p\n", (buffer + bytePos), buffer + bytePos));
+				TRACE(("RR: nm buffer is %s, start at %p\n", (buffer + bytePos),
+					buffer + bytePos));
 
 				// Build the file name.
 				memcpy(altName + oldEnd, buffer + bytePos, length - 5);
@@ -973,7 +990,8 @@ status_t
 ConvertRecDate(ISORecDate* inDate, time_t* outDate)
 {
 	time_t	time;
-	int		days, i, year, tz;
+	int		days, i, year;
+	int8_t tz;
 
 	year = inDate->year - 70;
 	tz = inDate->offsetGMT;
@@ -998,8 +1016,6 @@ ConvertRecDate(ISORecDate* inDate, time_t* outDate)
 		days += inDate->date - 1;
 		time = ((((days*24) + inDate->hour) * 60 + inDate->minute) * 60)
 					+ inDate->second;
-		if (tz & 0x80)
-			tz |= (-1 << 8);
 
 		if (-48 <= tz && tz <= 52)
 			time -= tz * 15 * 60;

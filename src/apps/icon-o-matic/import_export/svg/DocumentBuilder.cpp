@@ -534,7 +534,7 @@ printf("scale: %f\n", scale);
 			if (*style == *earlierStyle) {
 				shape->SetStyle(earlierStyle);
 				icon->Styles()->RemoveStyle(style);
-				style->Release();
+				style->ReleaseReference();
 				break;
 			}
 		}
@@ -649,7 +649,7 @@ AddPathsFromVertexSource(Icon* icon, Shape* shape,
 //printf("  path with no points!\n");
 						icon->Paths()->RemovePath(path);
 						shape->Paths()->RemovePath(path);
-						path->Release();
+						path->ReleaseReference();
 					}
 					path = new (nothrow) VectorPath();
 					if (!path || !icon->Paths()->AddPath(path)) {
@@ -745,7 +745,7 @@ AddPathsFromVertexSource(Icon* icon, Shape* shape,
 //printf("path with no points!\n");
 		icon->Paths()->RemovePath(path);
 		shape->Paths()->RemovePath(path);
-		path->Release();
+		path->ReleaseReference();
 	}
 
 	return B_OK;

@@ -31,7 +31,6 @@
 
 #include <Catalog.h>
 #include <LayoutBuilder.h>
-#include <SpaceLayoutItem.h>
 
 #include <stdio.h>
 #include <string.h>
@@ -49,13 +48,12 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
 	fSettings(settings)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ViewColor());
 
  	fTitle = new BStringView("title", B_TRANSLATE("TGA image translator"));
  	fTitle->SetFont(be_bold_font);
 
  	char detail[100];
- 	sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"),
+ 	sprintf(detail, B_TRANSLATE("Version %d.%d.%d, %s"),
  		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(TGA_TRANSLATOR_VERSION)),
  		static_cast<int>(B_TRANSLATION_MINOR_VERSION(TGA_TRANSLATOR_VERSION)),
  		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
@@ -70,23 +68,22 @@ TGAView::TGAView(const char *name, uint32 flags, TranslatorSettings *settings)
  	fpchkIgnoreAlpha->SetValue(val);
  	fpchkIgnoreAlpha->SetViewColor(ViewColor());
 
- 	fpchkRLE = new BCheckBox(B_TRANSLATE("Save with RLE Compression"),
+ 	fpchkRLE = new BCheckBox(B_TRANSLATE("Save with RLE compression"),
 		new BMessage(CHANGE_RLE));
  	val = (fSettings->SetGetBool(TGA_SETTING_RLE)) ? 1 : 0;
  	fpchkRLE->SetValue(val);
  	fpchkRLE->SetViewColor(ViewColor());
 
  	// Build the layout
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 7)
-		.SetInsets(5)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
  		.Add(fTitle)
  		.Add(fDetail)
  		.AddGlue()
  		.Add(fpchkIgnoreAlpha)
  		.Add(fpchkRLE)
  		.AddGlue()
- 		.Add(fWrittenBy)
-		.AddGlue();
+		.Add(fWrittenBy);
 
  	BFont font;
  	GetFont(&font);

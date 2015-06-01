@@ -477,20 +477,31 @@ BControlLook::DrawCheckBox(BView* view, BRect& rect, const BRect& updateRect,
 		dark1BorderColor, dark1BorderColor,
 		dark2BorderColor, dark2BorderColor);
 
-	if ((flags & B_DISABLED) != 0) {
+	if ((flags & B_DISABLED) != 0)
 		_FillGradient(view, rect, base, 0.4, 0.2);
-	} else {
+	else
 		_FillGradient(view, rect, base, 0.15, 0.0);
-	}
 
 	rgb_color markColor;
 	if (_RadioButtonAndCheckBoxMarkColor(base, markColor, flags)) {
 		view->SetHighColor(markColor);
 
-		rect.InsetBy(2, 2);
-		view->SetPenSize(max_c(1.0, ceilf(rect.Width() / 3.5)));
-		view->SetDrawingMode(B_OP_OVER);
+		BFont font;
+		view->GetFont(&font);
+		float inset = std::max(2.0f, roundf(font.Size() / 6));
+		rect.InsetBy(inset, inset);
 
+		float penSize = std::max(1.0f, ceilf(rect.Width() / 3.5f));
+		if (penSize > 1.0f && fmodf(penSize, 2.0f) == 0.0f) {
+			// Tweak ends to "include" the pixel at the index,
+			// we need to do this in order to produce results like R5,
+			// where coordinates were inclusive
+			rect.right++;
+			rect.bottom++;
+		}
+
+		view->SetPenSize(penSize);
+		view->SetDrawingMode(B_OP_OVER);
 		view->StrokeLine(rect.LeftTop(), rect.RightBottom());
 		view->StrokeLine(rect.LeftBottom(), rect.RightTop());
 	}
@@ -559,7 +570,10 @@ BControlLook::DrawRadioButton(BView* view, BRect& rect, const BRect& updateRect,
 	rgb_color markColor;
 	if (_RadioButtonAndCheckBoxMarkColor(base, markColor, flags)) {
 		view->SetHighColor(markColor);
-		rect.InsetBy(3, 3);
+		BFont font;
+		view->GetFont(&font);
+		float inset = roundf(font.Size() / 4);
+		rect.InsetBy(inset, inset);
 		view->FillEllipse(rect);
 	}
 }
@@ -1265,7 +1279,7 @@ BControlLook::DrawSliderHashMarks(BView* view, BRect& rect,
 		darkColor = tint_color(base, 1.14);
 	}
 
-	int32 hashMarkCount = max_c(count, 2);
+	int32 hashMarkCount = std::max(count, (int32)2);
 		// draw at least two hashmarks at min/max if
 		// fHashMarks != B_HASH_MARKS_NONE
 	float factor;
@@ -1306,8 +1320,7 @@ BControlLook::DrawSliderHashMarks(BView* view, BRect& rect,
 		view->EndLineArray();
 	}
 
-	if (location & B_HASH_MARKS_BOTTOM) {
-
+	if ((location & B_HASH_MARKS_BOTTOM) != 0) {
 		view->BeginLineArray(hashMarkCount * 2);
 
 		if (orientation == B_HORIZONTAL) {
@@ -3095,8 +3108,6 @@ BControlLook::_DrawRoundCornerBackgroundLeftBottom(BView* view, BRect& cornerRec
 	// gradient
 	ellipseRect.InsetBy(1, 1);
 	view->FillEllipse(ellipseRect, fillGradient);
-
-	view->PopState();
 }
 
 

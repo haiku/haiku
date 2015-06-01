@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-PSDTranslator	489719358
+1	swedish	x-vnd.Haiku-PSDTranslator	3654055550
 Lab	PSDLoader		Lab
 Uncompressed	PSDConfig		Okomprimerad
 Indexed	PSDLoader		Indexerad
@@ -6,12 +6,12 @@ Grayscale	PSDLoader		Gråskala
 Photoshop image translator	PSDConfig		Photoshop bildöversättare
 Photoshop image translator	PSDTranslator		Photoshop bildöversättare
 Version %d.%d.%d, %s	PSDConfig		Version %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Photoshop Dokument (PSD Fil)
 Photoshop image	PSDTranslator		Photoshop-bild
 RLE	PSDConfig		RLE
-Photoshop Document (PSD File)	PSDConfig		Photoshop Dokument (PSD Fil)
+Photoshop Big Document (PSB file)	PSDConfig		Photoshop Stort Dokument (PSB Fil)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Photoshop-bild (%s)
-Photoshop Big Document (PSB File)	PSDConfig		Photoshop Stort Dokument (PSB Fil)
 PSDTranslator Settings	PSDConfig		PSDTranslator Inställningar
 RGB	PSDLoader		RGB
 Bitmap	PSDLoader		Bitmapp

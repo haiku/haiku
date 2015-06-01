@@ -27,9 +27,9 @@ public:
 			ssize_t				ReadLink(char* buf, size_t size);
 
 			ssize_t				MakeLinkedPath(const char* dirPath,
-								               BPath* path);
+									BPath* path);
 			ssize_t				MakeLinkedPath(const BDirectory* dir,
-								               BPath* path);
+									BPath* path);
 
 			bool				IsAbsolute();
 

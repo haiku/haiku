@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-WebPositive	3378116449
+1	portuguese (brazil)	x-vnd.Haiku-WebPositive	3678460971
 Show home button	Settings Window		Exibir botão home
 Username:	Authentication Panel		Nome de Usuário:
 Copy URL to clipboard	Download Window		Copiar URL para a área de transferência
@@ -18,6 +18,8 @@ Error opening downloads folder	Download Window		Erro ao abrir pasta de itens bai
 Paste	WebPositive Window		Colar
 Double-click or middle-click to open new tab.	Tab Manager		Clique duas vezes ou com o botão do meio do mouse para abrir uma nova guia.
 Proxy username:	Settings Window		Nome de usuário do proxy:
+Save page as…	WebPositive Window		Salvar página como…
+Over %days left	Download Window		Mais de %dias restante
 Settings	Settings Window		Definições
 Confirmation	WebPositive Window		Confirmação
 Window	WebPositive Window		Janela
@@ -46,6 +48,7 @@ Restart	Download Window		Reiniciar
 Proxy server	Settings Window		Servidor proxy
 Open containing folder	Download Window		Abrir pasta de contenção
 New window	WebPositive Window		Nova janela
+WebPositive	Download Window		WebPositive
 Open	Download Window		Abrir
 Reload	WebPositive Window		Recarregar
 Downloads	Download Window		Itens baixados
@@ -108,6 +111,7 @@ Password:	Authentication Panel		Senha:
 Back	WebPositive Window		Voltar
 New browser window	Download Window		Nova janela do navegador
 Today	WebPositive Window		Hoje
+Over %hours left	Download Window		Mais de %horas restante
 Remember username and password for this site	Authentication Panel		Lembrar nome de usuário e senha para este site
 Earlier	WebPositive Window		Mais cedo
 Authentication required	Authentication Panel		Autenticação requerida
@@ -115,6 +119,7 @@ Use proxy server to connect to the internet	Settings Window		Utilize o servidor 
 There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Ainda existem downloads em progresso, deseja realmente sair do WebPositive agora?
 Auto-hide interface in full screen mode	Settings Window		Auto-ocultar interface no modo tela cheia
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url falhou
+%seconds left	Download Window		%segundos restante
 New tab	WebPositive Window		Nova guia
 Downloads in progress	WebPositive		Downloads em progresso
 Style:	Font Selection view		Estilo:

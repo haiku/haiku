@@ -23,6 +23,8 @@
 
 #include <string.h>
 
+#include "fdt_support.h"
+
 extern "C" {
 #include <fdt.h>
 #include <libfdt.h>
@@ -204,6 +206,44 @@ void
 mmu_write_C1(uint32 value)
 {
 	asm volatile("MCR p15, 0, %[c1in], c1, c0, 0"::[c1in] "r" (value));
+}
+
+
+/*
+ * Dump current MMU Control Register state
+ * For debugging, can be added to loader temporarly post-serial-init
+ */
+void
+mmu_dump_C1()
+{
+	uint32 cpValue = mmu_read_C1();
+
+	dprintf("MMU CP15:c1 State:\n");
+
+	if ((cpValue & (1 << 0)) != 0)
+		dprintf(" - MMU Enabled\n");
+	else
+		dprintf(" - MMU Disabled\n");
+
+	if ((cpValue & (1 << 2)) != 0)
+		dprintf(" - Data Cache Enabled\n");
+	else
+		dprintf(" - Data Cache Disabled\n");
+
+	if ((cpValue & (1 << 3)) != 0)
+		dprintf(" - Write Buffer Enabled\n");
+	else
+		dprintf(" - Write Buffer Disabled\n");
+
+	if ((cpValue & (1 << 12)) != 0)
+		dprintf(" - Instruction Cache Enabled\n");
+	else
+		dprintf(" - Instruction Cache Disabled\n");
+
+	if ((cpValue & (1 << 13)) != 0)
+		dprintf(" - Vector Table @ 0xFFFF0000\n");
+	else
+		dprintf(" - Vector Table @ 0x00000000\n");
 }
 
 
@@ -596,27 +636,9 @@ find_physical_memory_ranges(uint64 &total)
 
 	total = 0;
 
-	// Memory base addresses are provided in 32 or 64 bit flavors
-	// #address-cells and #size-cells matches the number of 32-bit 'cells'
-	// representing the length of the base address and size fields
-	int root = fdt_path_offset(gFDT, "/");
 	int32 regAddressCells = 1;
 	int32 regSizeCells = 1;
-	prop = fdt_getprop(gFDT, root, "#address-cells", &len);
-	if (prop && len == sizeof(uint32))
-		regAddressCells = fdt32_to_cpu(*(uint32_t *)prop);
-	prop = fdt_getprop(gFDT, root, "#size-cells", &len);
-	if (prop && len == sizeof(uint32))
-		regSizeCells = fdt32_to_cpu(*(uint32_t *)prop);
-
-
-	// NOTE : Size Cells of 2 is possible in theory... but I haven't seen it yet.
-	if (regAddressCells > 2 || regSizeCells > 1) {
-		panic("%s: Unsupported FDT cell count detected.\n"
-		"Address Cells: %" B_PRId32 "; Size Cells: %" B_PRId32
-		" (CPU > 64bit?).\n", __func__, regAddressCells, regSizeCells);
-		return B_ERROR;
-	}
+	fdt_get_cell_count(gFDT, node, regAddressCells, regSizeCells);
 
 	prop = fdt_getprop(gFDT, node, "reg", &len);
 	if (prop == NULL) {
@@ -637,7 +659,7 @@ find_physical_memory_ranges(uint64 &total)
 			size = fdt64_to_cpu(*(uint64_t *)p);
 		else
 			size = fdt32_to_cpu(*(uint32_t *)p);
-		p += regAddressCells;
+		p += regSizeCells;
 		len -= sizeof(uint32) * (regAddressCells + regSizeCells);
 
 		if (size <= 0) {
@@ -684,7 +706,8 @@ mmu_init(void)
 			return /*B_ERROR*/;
 #endif
 		}
-		dprintf("total physical memory = %" B_PRId64 "MB\n", total / (1024 * 1024));
+		dprintf("total physical memory = %" B_PRId64 "MB\n",
+			total / (1024 * 1024));
 	}
 
 	// see if subpages are disabled
@@ -700,11 +723,18 @@ mmu_init(void)
 	sPageTableRegionEnd = (addr_t)sPageDirectory + 0x200000;
 
 	// Mark start for dynamic allocation
-	sNextPhysicalAddress =
-	sNextVirtualAddress = sPageTableRegionEnd;
+	sNextPhysicalAddress = sPageTableRegionEnd;
+	// We are going to allocate early kernel stuff there, so the virtual address
+	// has to be in kernel space. Either put it right after the identity mapped
+	// RAM (if it happens to be in the 0x80000000 range), or at the start of
+	// the kernel address space otherwise.
+	sNextVirtualAddress = KERNEL_LOAD_BASE + kMaxKernelSize;
+	if (sPageTableRegionEnd > sNextVirtualAddress)
+		sNextVirtualAddress = sPageTableRegionEnd;
 
 	// mark allocated ranges, so they don't get overwritten
-	insert_physical_allocated_range((addr_t)&_start, (addr_t)&_end - (addr_t)&_start);
+	insert_physical_allocated_range((addr_t)&_start,
+		(addr_t)&_end - (addr_t)&_start);
 	insert_physical_allocated_range((addr_t)sPageDirectory, 0x200000);
 
 	init_page_directory();

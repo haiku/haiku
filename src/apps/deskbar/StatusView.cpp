@@ -89,7 +89,7 @@ const char* const kInstantiateEntryCFunctionName = "instantiate_deskbar_entry";
 const char* const kReplicantSettingsFile = "replicants";
 const char* const kReplicantPathField = "replicant_path";
 
-float sMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
+float gMinimumWindowWidth = kGutter + kMinimumTrayWidth + kDragRegionWidth;
 
 
 static void
@@ -142,9 +142,9 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 	const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
 		R_LeafLogoBitmap);
 	if (logoBitmap != NULL) {
-		sMinimumWindowWidth = std::max(sMinimumWindowWidth,
+		gMinimumWindowWidth = std::max(gMinimumWindowWidth,
 			2 * (logoBitmap->Bounds().Width() + 8));
-		fMinimumTrayWidth = sMinimumWindowWidth - kGutter - kDragRegionWidth;
+		fMinimumTrayWidth = gMinimumWindowWidth - kGutter - kDragRegionWidth;
 	}
 
 	// Create the time view
@@ -337,12 +337,12 @@ TReplicantTray::MessageReceived(BMessage* message)
 			bool showDayOfWeek = fTime->ShowDayOfWeek();
 			bool showTimeZone = fTime->ShowTimeZone();
 
-			BMessage* reply = new BMessage(kGetClockSettings);
-			reply->AddBool("showClock", showClock);
-			reply->AddBool("showSeconds", showSeconds);
-			reply->AddBool("showDayOfWeek", showDayOfWeek);
-			reply->AddBool("showTimeZone", showTimeZone);
-			message->SendReply(reply);
+			BMessage reply(kGetClockSettings);
+			reply.AddBool("showClock", showClock);
+			reply.AddBool("showSeconds", showSeconds);
+			reply.AddBool("showDayOfWeek", showDayOfWeek);
+			reply.AddBool("showTimeZone", showTimeZone);
+			message->SendReply(&reply);
 			break;
 		}
 
@@ -451,9 +451,9 @@ TReplicantTray::ShowHideTime()
 
 	// Send a message to Time preferences telling it to update
 	BMessenger messenger("application/x-vnd.Haiku-Time");
-	BMessage* message = new BMessage(kShowHideTime);
-	message->AddBool("showClock", showClock);
-	messenger.SendMessage(message);
+	BMessage message(kShowHideTime);
+	message.AddBool("showClock", showClock);
+	messenger.SendMessage(&message);
 }
 
 
@@ -673,8 +673,9 @@ TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool addToSettings)
 	view->Archive(data);
 	delete view;
 
-	AddIcon(data, id, &ref);
-		// add the rep; adds info to list
+	// add the rep; adds info to list
+	if (AddIcon(data, id, &ref) != B_OK)
+		delete data;
 
 	if (addToSettings) {
 		fAddOnSettings.AddString(kReplicantPathField, path.Path());
@@ -1540,8 +1541,8 @@ TDragRegion::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 		BRect frame = screen.Frame();
 
 		float hDivider = frame.Width() / 6;
-		hDivider = (hDivider < sMinimumWindowWidth + 10.0f)
-			? sMinimumWindowWidth + 10.0f : hDivider;
+		hDivider = (hDivider < gMinimumWindowWidth + 10.0f)
+			? gMinimumWindowWidth + 10.0f : hDivider;
 		float miniDivider = frame.top + kMiniHeight + 10.0f;
 		float vDivider = frame.Height() / 2;
 #ifdef FULL_MODE

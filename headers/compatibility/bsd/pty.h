@@ -6,6 +6,9 @@
 #define _BSD_PTY_H_
 
 
+#ifdef _BSD_SOURCE
+
+
 #include <sys/cdefs.h>
 #include <termios.h>
 
@@ -19,5 +22,9 @@ extern pid_t	forkpty(int* master, char* name,
 					struct termios* termAttrs, struct winsize* windowSize);
 
 __END_DECLS
+
+
+#endif
+
 
 #endif	// _BSD_PTY_H_

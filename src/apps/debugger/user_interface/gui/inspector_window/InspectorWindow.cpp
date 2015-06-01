@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com. All rights reserved.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,6 +14,7 @@
 #include <ControlLook.h>
 #include <LayoutBuilder.h>
 #include <ScrollView.h>
+#include <StringView.h>
 #include <TextControl.h>
 
 #include "Architecture.h"
@@ -29,7 +30,10 @@
 enum {
 	MSG_NAVIGATE_PREVIOUS_BLOCK 		= 'npbl',
 	MSG_NAVIGATE_NEXT_BLOCK				= 'npnl',
-	MSG_MEMORY_BLOCK_RETRIEVED			= 'mbre'
+	MSG_MEMORY_BLOCK_RETRIEVED			= 'mbre',
+	MSG_EDIT_CURRENT_BLOCK				= 'mecb',
+	MSG_COMMIT_MODIFIED_BLOCK			= 'mcmb',
+	MSG_REVERT_MODIFIED_BLOCK			= 'mrmb'
 };
 
 
@@ -37,11 +41,12 @@ InspectorWindow::InspectorWindow(::Team* team, UserInterfaceListener* listener,
 	BHandler* target)
 	:
 	BWindow(BRect(100, 100, 700, 500), "Inspector", B_TITLED_WINDOW,
-		B_ASYNCHRONOUS_CONTROLS),
+		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fListener(listener),
 	fAddressInput(NULL),
 	fHexMode(NULL),
 	fTextMode(NULL),
+	fWritableBlockIndicator(NULL),
 	fMemoryView(NULL),
 	fCurrentBlock(NULL),
 	fCurrentAddress(0LL),
@@ -163,6 +168,17 @@ InspectorWindow::_Init()
 		.End()
 		.Add(scrollView = new BScrollView("memory scroll",
 			NULL, 0, false, true), 3.0f)
+		.AddGroup(B_HORIZONTAL)
+			.Add(fWritableBlockIndicator = new BStringView("writableIndicator",
+				_GetCurrentWritableIndicator()))
+			.AddGlue()
+			.Add(fEditBlockButton = new BButton("editBlock", "Edit",
+				new BMessage(MSG_EDIT_CURRENT_BLOCK)))
+			.Add(fCommitBlockButton = new BButton("commitBlock", "Commit",
+				new BMessage(MSG_COMMIT_MODIFIED_BLOCK)))
+			.Add(fRevertBlockButton = new BButton("revertBlock", "Revert",
+				new BMessage(MSG_REVERT_MODIFIED_BLOCK)))
+		.End()
 	.End();
 
 	fHexMode->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -179,6 +195,14 @@ InspectorWindow::_Init()
 	fNextBlockButton->SetTarget(this);
 	fPreviousBlockButton->SetEnabled(false);
 	fNextBlockButton->SetEnabled(false);
+
+	fEditBlockButton->SetTarget(this);
+	fCommitBlockButton->SetTarget(this);
+	fRevertBlockButton->SetTarget(this);
+
+	fEditBlockButton->SetEnabled(false);
+	fCommitBlockButton->Hide();
+	fRevertBlockButton->Hide();
 
 	hexMenu->SetLabelFromMarked(true);
 	hexMenu->SetTargetForItems(fMemoryView);
@@ -318,6 +342,43 @@ InspectorWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case MSG_EDIT_CURRENT_BLOCK:
+		{
+			_SetEditMode(true);
+			break;
+		}
+		case MSG_MEMORY_DATA_CHANGED:
+		{
+			if (fCurrentBlock == NULL)
+				break;
+
+			target_addr_t address;
+			if (message->FindUInt64("address", &address) == B_OK
+				&& address >= fCurrentBlock->BaseAddress()
+				&& address < fCurrentBlock->BaseAddress()
+					+ fCurrentBlock->Size()) {
+				fCurrentBlock->Invalidate();
+				_SetEditMode(false);
+				fListener->InspectRequested(address, this);
+			}
+			break;
+		}
+		case MSG_COMMIT_MODIFIED_BLOCK:
+		{
+			// TODO: this could conceivably be extended to detect the
+			// individual modified regions and only write those back.
+			// That would require potentially submitting multiple separate
+			// write requests, and thus require tracking all the writes being
+			// waited upon for completion.
+			fListener->MemoryWriteRequested(fCurrentBlock->BaseAddress(),
+				fMemoryView->GetEditedData(), fCurrentBlock->Size());
+			break;
+		}
+		case MSG_REVERT_MODIFIED_BLOCK:
+		{
+			_SetEditMode(false);
+			break;
+		}
 		default:
 		{
 			BWindow::MessageReceived(message);
@@ -347,6 +408,17 @@ InspectorWindow::ThreadStateChanged(const Team::ThreadEvent& event)
 
 	if (PostMessage(&message) == B_OK)
 		threadReference.Detach();
+}
+
+
+void
+InspectorWindow::MemoryChanged(const Team::MemoryChangedEvent& event)
+{
+	BMessage message(MSG_MEMORY_DATA_CHANGED);
+	message.AddUInt64("address", event.GetTargetAddress());
+	message.AddUInt64("size", event.GetSize());
+
+	PostMessage(&message);
 }
 
 
@@ -385,6 +457,48 @@ InspectorWindow::TargetAddressChanged(target_addr_t address)
 
 
 void
+InspectorWindow::HexModeChanged(int32 newMode)
+{
+	AutoLocker<BLooper> lock(this);
+	if (lock.IsLocked()) {
+		BMenu* menu = fHexMode->Menu();
+		if (newMode < 0 || newMode > menu->CountItems())
+			return;
+		BMenuItem* item = menu->ItemAt(newMode);
+		item->SetMarked(true);
+	}
+}
+
+
+void
+InspectorWindow::EndianModeChanged(int32 newMode)
+{
+	AutoLocker<BLooper> lock(this);
+	if (lock.IsLocked()) {
+		BMenu* menu = fEndianMode->Menu();
+		if (newMode < 0 || newMode > menu->CountItems())
+			return;
+		BMenuItem* item = menu->ItemAt(newMode);
+		item->SetMarked(true);
+	}
+}
+
+
+void
+InspectorWindow::TextModeChanged(int32 newMode)
+{
+	AutoLocker<BLooper> lock(this);
+	if (lock.IsLocked()) {
+		BMenu* menu = fTextMode->Menu();
+		if (newMode < 0 || newMode > menu->CountItems())
+			return;
+		BMenuItem* item = menu->ItemAt(newMode);
+		item->SetMarked(true);
+	}
+}
+
+
+void
 InspectorWindow::ExpressionEvaluated(ExpressionInfo* info, status_t result,
 	ExpressionResult* value)
 {
@@ -409,7 +523,7 @@ InspectorWindow::LoadSettings(const GuiTeamUiSettings& settings)
 		return B_ERROR;
 
 	BMessage inspectorSettings;
-	if (settings.Settings("inspectorWindow", inspectorSettings) == B_OK)
+	if (settings.Settings("inspectorWindow", inspectorSettings) != B_OK)
 		return B_OK;
 
 	BRect frameRect;
@@ -514,4 +628,70 @@ InspectorWindow::_SetCurrentBlock(TeamMemoryBlock* block)
 
 	fCurrentBlock = block;
 	fMemoryView->SetTargetAddress(fCurrentBlock, fCurrentAddress);
+	_UpdateWritableOptions();
+}
+
+
+bool
+InspectorWindow::_GetWritableState() const
+{
+	return fCurrentBlock != NULL ? fCurrentBlock->IsWritable() : false;
+}
+
+
+void
+InspectorWindow::_SetEditMode(bool enabled)
+{
+	if (enabled == fMemoryView->GetEditMode())
+		return;
+
+	status_t error = fMemoryView->SetEditMode(enabled);
+	if (error != B_OK)
+		return;
+
+	if (enabled) {
+		fEditBlockButton->Hide();
+		fCommitBlockButton->Show();
+		fRevertBlockButton->Show();
+	} else {
+		fEditBlockButton->Show();
+		fCommitBlockButton->Hide();
+		fRevertBlockButton->Hide();
+	}
+
+	fHexMode->SetEnabled(!enabled);
+	fEndianMode->SetEnabled(!enabled);
+
+	// while the block is being edited, disable block navigation controls.
+	fAddressInput->SetEnabled(!enabled);
+	fPreviousBlockButton->SetEnabled(!enabled);
+	fNextBlockButton->SetEnabled(!enabled);
+
+	InvalidateLayout();
+}
+
+
+void
+InspectorWindow::_UpdateWritableOptions()
+{
+	fEditBlockButton->SetEnabled(_GetWritableState());
+	_UpdateWritableIndicator();
+}
+
+
+void
+InspectorWindow::_UpdateWritableIndicator()
+{
+	fWritableBlockIndicator->SetText(_GetCurrentWritableIndicator());
+}
+
+
+const char*
+InspectorWindow::_GetCurrentWritableIndicator() const
+{
+	static char buffer[32];
+	snprintf(buffer, sizeof(buffer), "Writable: %s", fCurrentBlock == NULL
+			? "N/A" : fCurrentBlock->IsWritable() ? "Yes" : "No");
+
+	return buffer;
 }

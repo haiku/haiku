@@ -106,7 +106,7 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 	titleView->SetExplicitAlignment(labelAlignment);
 
 	char detail[100];
-	sprintf(detail, B_TRANSLATE("Version %d.%d.%d %s"),
+	sprintf(detail, B_TRANSLATE("Version %d.%d.%d, %s"),
 		static_cast<int>(B_TRANSLATION_MAJOR_VERSION(SGI_TRANSLATOR_VERSION)),
 		static_cast<int>(B_TRANSLATION_MINOR_VERSION(SGI_TRANSLATOR_VERSION)),
 		static_cast<int>(B_TRANSLATION_REVISION_VERSION(
@@ -117,7 +117,7 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 	BTextView* infoView = new BTextView("info");
 	infoView->SetText(BString(B_TRANSLATE("written by:\n"))
 			.Append(author)
-			.Append(B_TRANSLATE("\n\nbased on GIMP SGI plugin v1.5:\n"))
+			.Append(B_TRANSLATE("\nbased on GIMP SGI plugin v1.5:\n"))
 			.Append(kSGICopyright).String());
 	infoView->SetExplicitAlignment(labelAlignment);
 	infoView->SetWordWrap(false);
@@ -125,17 +125,17 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 	infoView->MakeResizable(true);
 	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	float padding = 5.0f;
-	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
-		.SetInsets(padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(titleView)
 		.Add(detailView)
+		.AddGlue()
 		.AddGroup(B_HORIZONTAL)
 			.Add(fCompressionMF)
 			.AddGlue()
 			.End()
-		.Add(infoView)
-		.AddGlue();
+		.AddGlue()
+		.Add(infoView);
 
 	BFont font;
 	GetFont(&font);
@@ -144,7 +144,7 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 
 	// TODO: remove this workaround for ticket #4217
 	infoView->SetExplicitPreferredSize(
-		BSize(infoView->LineWidth(4), infoView->TextHeight(0, 80)));
+		BSize(infoView->LineWidth(3), infoView->TextHeight(0, 80)));
 	infoView->SetExplicitMaxSize(infoView->ExplicitPreferredSize());
 	infoView->SetExplicitMinSize(infoView->ExplicitPreferredSize());
 }

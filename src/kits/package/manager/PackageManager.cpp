@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -364,7 +364,7 @@ BPackageManager::InstallationRepository()
 
 
 void
-BPackageManager::JobStarted(BJob* job)
+BPackageManager::JobStarted(BSupportKit::BJob* job)
 {
 	if (dynamic_cast<FetchFileJob*>(job) != NULL) {
 		FetchFileJob* fetchJob = (FetchFileJob*)job;
@@ -378,18 +378,19 @@ BPackageManager::JobStarted(BJob* job)
 
 
 void
-BPackageManager::JobProgress(BJob* job)
+BPackageManager::JobProgress(BSupportKit::BJob* job)
 {
 	if (dynamic_cast<FetchFileJob*>(job) != NULL) {
 		FetchFileJob* fetchJob = (FetchFileJob*)job;
 		fUserInteractionHandler->ProgressPackageDownloadActive(
-			fetchJob->DownloadFileName(), fetchJob->DownloadProgress());
+			fetchJob->DownloadFileName(), fetchJob->DownloadProgress(),
+			fetchJob->DownloadBytes(), fetchJob->DownloadTotalBytes());
 	}
 }
 
 
 void
-BPackageManager::JobSucceeded(BJob* job)
+BPackageManager::JobSucceeded(BSupportKit::BJob* job)
 {
 	if (dynamic_cast<FetchFileJob*>(job) != NULL) {
 		FetchFileJob* fetchJob = (FetchFileJob*)job;
@@ -1105,7 +1106,8 @@ BPackageManager::UserInteractionHandler::ProgressPackageDownloadStarted(
 
 void
 BPackageManager::UserInteractionHandler::ProgressPackageDownloadActive(
-	const char* packageName, float completionPercentage)
+	const char* packageName, float completionPercentage, off_t bytes,
+	off_t totalBytes)
 {
 }
 

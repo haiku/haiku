@@ -48,6 +48,30 @@ _IMPEXP_TRACKER
 #endif
 void InitIconPreloader();
 
-}
+// commands that may be issued to the tracker by other apps using messengers
+
+const uint32 kFindButton = 'Tfnd';
+const uint32 kSaveButton = 'Tsav';
+const uint32 kShowSplash = 'Spls';
+
+const uint32 kStartWatchClipboardRefs = 'TCbw';
+	// StartWatching() clipboard changes. Changes will be sent to given
+	// BMessenger "target"
+const uint32 kStopWatchClipboardRefs = 'TCfw';
+	// StopWatching() given BMessenger "target"
+const uint32 kFSClipboardChanges = 'TCch';
+	// Used by FSClipboard functions which change refs in clipboard and are
+	// used outside Tracker (like BFilePanel called in another app)
+	// Contains movemodes named as in FSClipboard operations and in Clipboard
+	// (look into FSClipboard files)
+
+const uint32 kMoveToTrash = 'Ttrs';
+	// Used by ShowImage to delete images
+
+const uint32 kSelect = 'Tsel';
+	// Used by Open Target Folder tracker add-on to select files
+
+} // namespace BPrivate
+
 
 #endif	/* _TRACKER_PRIVATE_H */

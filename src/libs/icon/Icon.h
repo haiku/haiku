@@ -14,9 +14,9 @@
 
 #ifdef ICON_O_MATIC
 #	include <List.h>
+#	include <Referenceable.h>
 
 #	include "Observer.h"
-#	include "Referenceable.h"
 #else
 #	include <SupportDefs.h>
 #endif
@@ -43,7 +43,7 @@ class IconListener {
 #ifdef ICON_O_MATIC
 class Icon : public ShapeContainerListener,
 			 public Observer,
-			 public Referenceable {
+			 public BReferenceable {
 #else
 class Icon {
 #endif

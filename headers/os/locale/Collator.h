@@ -10,7 +10,10 @@
 #include <SupportDefs.h>
 
 
-namespace icu {
+#ifndef U_ICU_NAMESPACE
+  #define U_ICU_NAMESPACE icu
+#endif
+namespace U_ICU_NAMESPACE {
 	class Collator;
 };
 
@@ -73,7 +76,7 @@ public:
 private:
 			status_t			_SetStrength(int8 strength) const;
 
-			mutable icu::Collator*	fICUCollator;
+			mutable U_ICU_NAMESPACE::Collator*	fICUCollator;
 			int8				fDefaultStrength;
 			bool				fIgnorePunctuation;
 };

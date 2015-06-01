@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-PRNT	2674539197
+1	german	x-vnd.Be-PRNT	2163275033
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Drucker: %printer_name%\nTreiber: %driver%\n
 Waiting	JobListView		Warten
 Print test page	PrintersWindow		Testseite drucken
@@ -9,6 +9,7 @@ Cancel	AddPrinterDialog		Abbrechen
 Add printer	AddPrinterDialog		Drucker hinzufügen
 Green	TestPageView		Grün
 Printers	PrintersWindow		Printers - Drucker
+Add…	PrintersWindow		Hinzu…
 Default Printer	PrinterListView		Standarddrucker
 Transport: %transport% %transport_address%	PrinterListView		Transport:%transport% %transport_address%
 No pending jobs.	PrinterListView		Keine offenen Druckaufträge.
@@ -30,7 +31,6 @@ Blue	TestPageView		Blau
 1 pending job.	PrinterListView		1 offener Druckauftrag.
 Remove	PrintersWindow		Entfernen
 <pick one>	AddPrinterDialog		<auswählen>
-Add …	PrintersWindow		Hinzu…
 Print jobs for 	PrintersWindow		Druckaufträge für
 Failed	JobListView		Fehler
 %.2f KB	JobListView		%.2F KiB

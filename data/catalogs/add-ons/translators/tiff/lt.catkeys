@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-TIFFTranslator	1930083198
+1	lithuanian	x-vnd.Haiku-TIFFTranslator	40018330
 LZW	TIFFView		LZW
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: nepavyko nustatyti katalogo\n
 TIFF image	TIFFTranslator		TIFF paveikslas
@@ -13,4 +13,3 @@ TIFF Settings	TIFFMain		TIFF nuostatos
 Use compression:	TIFFView		Naudoti glaudinimą:
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: negalimas dokumento indeksas\n
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
-Version %d.%d.%d %s	TIFFView		Versija %d.%d.%d %s

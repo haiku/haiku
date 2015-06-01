@@ -27,10 +27,12 @@ status_t
 SingleReplyRequestHandler::HandleRequest(Request* request)
 {
 	if (!fAcceptAnyRequest && request->GetType() != fExpectedReply) {
-PRINT(("SingleReplyRequestHandler::HandleRequest(): unexpected request: %lu "
-"expected was: %lu\n", request->GetType(), fExpectedReply));
+		PRINT(("SingleReplyRequestHandler::HandleRequest(): unexpected "
+			"request: %" B_PRIu32 " expected was: %" B_PRIu32 "\n",
+			request->GetType(), fExpectedReply));
 #if USER
-debugger("SingleReplyRequestHandler::HandleRequest(): unexpected request!");
+		debugger("SingleReplyRequestHandler::HandleRequest(): unexpected "
+			"request!");
 #endif
 		return B_BAD_DATA;
 	}

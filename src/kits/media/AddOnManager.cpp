@@ -15,6 +15,7 @@
 #include <string.h>
 
 #include <Architecture.h>
+#include <AutoDeleter.h>
 #include <Autolock.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -26,6 +27,10 @@
 
 #include "FormatManager.h"
 #include "MetaFormat.h"
+
+
+namespace BPrivate {
+namespace media {
 
 
 //	#pragma mark - ImageLoader
@@ -59,8 +64,8 @@ private:
 
 AddOnManager::AddOnManager()
 	:
- 	fLock("add-on manager"),
- 	fNextWriterFormatFamilyID(0),
+	fLock("add-on manager"),
+	fNextWriterFormatFamilyID(0),
 	fNextEncoderCodecInfoID(0)
 {
 }
@@ -112,6 +117,8 @@ AddOnManager::GetDecoderForFormat(entry_ref* _decoderRef,
 		return B_ENTRY_NOT_FOUND;
 	}
 
+	MemoryDeleter directoriesDeleter(directories);
+
 	BPath path;
 	for (uint i = 0; i < directoryCount; i++) {
 		path.SetTo(directories[i]);
@@ -144,12 +151,14 @@ AddOnManager::GetReaders(entry_ref* outRefs, int32* outCount,
 		return B_ENTRY_NOT_FOUND;
 	}
 
+	MemoryDeleter directoriesDeleter(directories);
+
 	BPath path;
 	for (uint i = 0; i < directoryCount; i++) {
 		path.SetTo(directories[i]);
 		_GetReaders(path, outRefs, outCount, maxCount);
 	}
-	
+
 	return B_OK;
 }
 
@@ -248,6 +257,8 @@ AddOnManager::RegisterAddOns()
 			&directoryCount) != B_OK) {
 		return;
 	}
+
+	MemoryDeleter directoriesDeleter(directories);
 
 	BPath path;
 	for (uint i = 0; i < directoryCount; i++) {
@@ -549,3 +560,7 @@ AddOnManager::_GetReaders(const BPath& path, entry_ref* outRefs,
 		(*outCount)++;
 	}
 }
+
+
+} // namespace media
+} // namespace BPrivate

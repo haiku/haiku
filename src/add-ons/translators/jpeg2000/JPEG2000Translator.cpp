@@ -637,9 +637,8 @@ TranslatorWriteView::TranslatorWriteView(const char* name,
 	if (fSettings->SetGetBool(JP2_SET_JPC))
 		fCodeStreamOnly->SetValue(B_CONTROL_ON);
 
-	float padding = 10.0f;
-	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
-		.SetInsets(padding)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(fQualitySlider)
 		.Add(fGrayAsRGB24)
 		.Add(fCodeStreamOnly)
@@ -714,8 +713,9 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	title->SetFont(be_bold_font);
 	title->SetExplicitAlignment(labelAlignment);
 
-	char versionString[16];
-	sprintf(versionString, "v%d.%d.%d", 
+	char versionString[100];
+	snprintf(versionString, sizeof(versionString),
+		B_TRANSLATE("Version %d.%d.%d"), 
 		static_cast<int>(sTranslatorVersion >> 8), 
 		static_cast<int>((sTranslatorVersion >> 4) & 0xf),
 		static_cast<int>(sTranslatorVersion & 0xf));
@@ -728,14 +728,10 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	infoView->MakeEditable(false);
 
-	float padding = 10.0f;
-	BLayoutBuilder::Group<>(this, B_VERTICAL, padding)
-		.SetInsets(padding)
-		.AddGroup(B_HORIZONTAL, padding)
-			.Add(title)
-			.Add(version)
-			.AddGlue()
-		.End()
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(title)
+		.Add(version)
 		.Add(infoView);
 }
 
@@ -745,8 +741,10 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 
 TranslatorView::TranslatorView(const char* name, TranslatorSettings* settings)
 	:
-	BTabView(name)
+	BTabView(name, B_WIDTH_FROM_LABEL)
 {
+	SetBorder(B_NO_BORDER);
+
 	AddTab(new TranslatorWriteView(B_TRANSLATE("Write"), 
 		settings->Acquire()));
 	AddTab(new TranslatorReadView(B_TRANSLATE("Read"), 

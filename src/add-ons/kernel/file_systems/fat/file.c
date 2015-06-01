@@ -82,7 +82,8 @@ status_t write_vnode_entry(nspace *vol, vnode *node)
 	// though we do the is_vnode_removed check above
 
 	if ((node->cluster != 0) && !IS_DATA_CLUSTER(node->cluster)) {
-		dprintf("write_vnode_entry called on invalid cluster (%lx)\n", node->cluster);
+		dprintf("write_vnode_entry called on invalid cluster (%" B_PRIu32 ")\n",
+			node->cluster);
 		return EINVAL;
 	}
 
@@ -136,7 +137,7 @@ dosfs_release_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 
 	TOUCH(reenter);
 
-	DPRINTF(0, ("dosfs_write_vnode (ino_t %Lx)\n", node->vnid));
+	DPRINTF(0, ("dosfs_write_vnode (ino_t %" B_PRIdINO ")\n", node->vnid));
 
 	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
 		LOCK_VOL(vol);
@@ -168,7 +169,7 @@ dosfs_rstat(fs_volume *_vol, fs_vnode *_node, struct stat *st)
 
 	LOCK_VOL(vol);
 
-	DPRINTF(1, ("dosfs_rstat (vnode id %Lx)\n", node->vnid));
+	DPRINTF(1, ("dosfs_rstat (vnode id %" B_PRIdINO ")\n", node->vnid));
 
 	st->st_dev = vol->id;
 	st->st_ino = node->vnid;
@@ -202,7 +203,7 @@ dosfs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st,
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_wstat (vnode id %Lx)\n", node->vnid));
+	DPRINTF(0, ("dosfs_wstat (vnode id %" B_PRIdINO ")\n", node->vnid));
 
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("can't wstat on read-only volume\n");
@@ -226,7 +227,7 @@ dosfs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st,
 	}
 
 	if (mask & B_STAT_SIZE) {
-		DPRINTF(0, ("setting file size to %Lx\n", st->st_size));
+		DPRINTF(0, ("setting file size to %" B_PRIdOFF "\n", st->st_size));
 		if (node->mode & FAT_SUBDIR) {
 			dprintf("dosfs_wstat: can't set file size of directory!\n");
 			err = EISDIR;
@@ -234,8 +235,11 @@ dosfs_wstat(fs_volume *_vol, fs_vnode *_node, const struct stat *st,
 			dprintf("dosfs_wstat: desired file size exceeds fat limit\n");
 			err = E2BIG;
 		} else {
-			uint32 clusters = (st->st_size + vol->bytes_per_sector*vol->sectors_per_cluster - 1) / vol->bytes_per_sector / vol->sectors_per_cluster;
-			DPRINTF(0, ("setting fat chain length to %lx clusters\n", clusters));
+			uint32 clusters = (st->st_size + vol->bytes_per_sector
+					* vol->sectors_per_cluster - 1) / vol->bytes_per_sector
+				/ vol->sectors_per_cluster;
+			DPRINTF(0, ("setting fat chain length to %" B_PRIu32 " clusters\n",
+				clusters));
 			if ((err = set_fat_chain_length(vol, node, clusters)) == B_OK) {
 				node->st_size = st->st_size;
 				node->iteration++;
@@ -284,7 +288,8 @@ dosfs_open(fs_volume *_vol, fs_vnode *_node, int omode, void **_cookie)
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_open: vnode id %Lx, omode %x\n", node->vnid, omode));
+	DPRINTF(0, ("dosfs_open: vnode id %" B_PRIdINO ", omode %o\n", node->vnid,
+		omode));
 
 	if (omode & O_CREAT) {
 		dprintf("dosfs_open called with O_CREAT. call dosfs_create instead!\n");
@@ -355,13 +360,15 @@ dosfs_read(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	LOCK_VOL(vol);
 
 	if (node->mode & FAT_SUBDIR) {
-		DPRINTF(0, ("dosfs_read called on subdirectory %Lx\n", node->vnid));
+		DPRINTF(0, ("dosfs_read called on subdirectory %" B_PRIdINO "\n",
+			node->vnid));
 		*len = 0;
 		UNLOCK_VOL(vol);
 		return EISDIR;
 	}
 
-	DPRINTF(0, ("dosfs_read called %lx bytes at %Lx (vnode id %Lx)\n", *len, pos, node->vnid));
+	DPRINTF(0, ("dosfs_read called %" B_PRIuSIZE " bytes at %" B_PRIdOFF
+		" (vnode id %" B_PRIdINO ")\n", *len, pos, node->vnid));
 
 	if (pos < 0) pos = 0;
 
@@ -477,7 +484,7 @@ bi:
 	if (result != B_OK) {
 		DPRINTF(0, ("dosfs_read (%s)\n", strerror(result)));
 	} else {
-		DPRINTF(0, ("dosfs_read: read %lx bytes\n", *len));
+		DPRINTF(0, ("dosfs_read: read %" B_PRIuSIZE " bytes\n", *len));
 	}
 	UNLOCK_VOL(vol);
 
@@ -503,14 +510,17 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	LOCK_VOL(vol);
 
 	if (node->mode & FAT_SUBDIR) {
-		DPRINTF(0, ("dosfs_write called on subdirectory %Lx\n", node->vnid));
+		DPRINTF(0, ("dosfs_write called on subdirectory %" B_PRIdINO "\n",
+			node->vnid));
 		*len = 0;
 		UNLOCK_VOL(vol);
 		return EISDIR;
 
 	}
 
-	DPRINTF(0, ("dosfs_write called %lx bytes at %Lx from buffer at %lx (vnode id %Lx)\n", *len, pos, (uint32)buf, node->vnid));
+	DPRINTF(0, ("dosfs_write called %" B_PRIuSIZE " bytes at %" B_PRIdOFF
+		" from buffer at %p (vnode id %" B_PRIdINO ")\n", *len, pos, buf,
+		node->vnid));
 
 	if ((cookie->mode & O_RWMASK) == O_RDONLY) {
 		dprintf("dosfs_write: called on file opened as read-only\n");
@@ -566,7 +576,8 @@ dosfs_write(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		 */
 		write_vnode_entry(vol, node);
 
-		DPRINTF(0, ("setting file size to %Lx (%lx clusters)\n", node->st_size, clusters));
+		DPRINTF(0, ("setting file size to %" B_PRIdOFF " (%" B_PRIu32
+			" clusters)\n", node->st_size, clusters));
 		node->dirty = true;
 		file_cache_set_size(node->cache, node->st_size);
 		file_map_set_size(node->file_map, node->st_size);
@@ -670,7 +681,7 @@ bi:
 	if (result != B_OK) {
 		DPRINTF(0, ("dosfs_write (%s)\n", strerror(result)));
 	} else {
-		DPRINTF(0, ("dosfs_write: wrote %lx bytes\n", *len));
+		DPRINTF(0, ("dosfs_write: wrote %" B_PRIuSIZE " bytes\n", *len));
 	}
 	UNLOCK_VOL(vol);
 
@@ -686,7 +697,7 @@ dosfs_close(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_close (vnode id %Lx)\n", node->vnid));
+	DPRINTF(0, ("dosfs_close (vnode id %" B_PRIdINO ")\n", node->vnid));
 
 	if ((vol->fs_flags & FS_FLAGS_OP_SYNC) && node->dirty) {
 		_dosfs_sync(vol);
@@ -707,7 +718,7 @@ dosfs_free_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	filecookie *cookie = _cookie;
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_free_cookie (vnode id %Lx)\n", node->vnid));
+	DPRINTF(0, ("dosfs_free_cookie (vnode id %" B_PRIdINO ")\n", node->vnid));
 
 	free(cookie);
 
@@ -736,7 +747,8 @@ dosfs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 		return EINVAL;
 	}
 
-	DPRINTF(0, ("dosfs_create called: %Lx/%s perms=%o omode=%o\n", dir->vnid, name, perms, omode));
+	DPRINTF(0, ("dosfs_create called: %" B_PRIdINO "/%s perms=%o omode=%o\n",
+		dir->vnid, name, perms, omode));
 
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("dosfs_create called on read-only volume\n");
@@ -876,10 +888,12 @@ dosfs_mkdir(fs_volume *_vol, fs_vnode *_dir, const char *name, int perms)
 		return EPERM;
 	}*/
 
-	DPRINTF(0, ("dosfs_mkdir called: %Lx/%s (perm %o)\n", dir->vnid, name, perms));
+	DPRINTF(0, ("dosfs_mkdir called: %" B_PRIdINO "/%s (perm %o)\n", dir->vnid,
+		name, perms));
 
 	if ((dir->mode & FAT_SUBDIR) == 0) {
-		dprintf("dosfs_mkdir: vnode id %Lx is not a directory\n", dir->vnid);
+		dprintf("dosfs_mkdir: vnode id %" B_PRIdINO " is not a directory\n",
+			dir->vnid);
 		UNLOCK_VOL(vol);
 		return EINVAL;
 	}
@@ -1021,7 +1035,8 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_rename called: %Lx/%s->%Lx/%s\n", odir->vnid, oldname, ndir->vnid, newname));
+	DPRINTF(0, ("dosfs_rename called: %" B_PRIdINO "/%s->%" B_PRIdINO "/%s\n",
+		odir->vnid, oldname, ndir->vnid, newname));
 
 	if (!oldname || !(*oldname) || !newname || !(*newname)) {
 		result = EINVAL;
@@ -1047,7 +1062,8 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 
 	// locate the file
 	if ((result = findfile_case(vol,odir,oldname,NULL,&file)) != B_OK) {
-		DPRINTF(0, ("dosfs_rename: can't find file %s in directory %Lx\n", oldname, odir->vnid));
+		DPRINTF(0, ("dosfs_rename: can't find file %s in directory %" B_PRIdINO
+			"\n", oldname, odir->vnid));
 		goto bi;
 	}
 
@@ -1238,7 +1254,7 @@ dosfs_remove_vnode(fs_volume *_vol, fs_vnode *_node, bool reenter)
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("dosfs_remove_vnode (%Lx)\n", node->vnid));
+	DPRINTF(0, ("dosfs_remove_vnode (%" B_PRIdINO ")\n", node->vnid));
 
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("dosfs_remove_vnode: read-only volume\n");
@@ -1293,7 +1309,7 @@ do_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name, bool is_file)
 
 	LOCK_VOL(vol);
 
-	DPRINTF(0, ("do_unlink %Lx/%s\n", dir->vnid, name));
+	DPRINTF(0, ("do_unlink %" B_PRIdINO "/%s\n", dir->vnid, name));
 
 	if (vol->flags & B_FS_IS_READONLY) {
 		dprintf("do_unlink: read-only volume\n");
@@ -1303,7 +1319,8 @@ do_unlink(fs_volume *_vol, fs_vnode *_dir, const char *name, bool is_file)
 
 	// locate the file
 	if ((result = findfile_case(vol,dir,name,&vnid,&file)) != B_OK) {
-		DPRINTF(0, ("do_unlink: can't find file %s in directory %Lx\n", name, dir->vnid));
+		DPRINTF(0, ("do_unlink: can't find file %s in directory %" B_PRIdINO
+			"\n", name, dir->vnid));
 		result = ENOENT;
 		goto bi;
 	}
@@ -1422,7 +1439,7 @@ dosfs_read_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 
 	while (true) {
 		struct file_io_vec fileVecs[8];
-		uint32 fileVecCount = 8;
+		size_t fileVecCount = 8;
 		bool bufferOverflow;
 		size_t bytes = bytesLeft;
 
@@ -1466,7 +1483,7 @@ dosfs_write_pages(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 
 	while (true) {
 		struct file_io_vec fileVecs[8];
-		uint32 fileVecCount = 8;
+		size_t fileVecCount = 8;
 		bool bufferOverflow;
 		size_t bytes = bytesLeft;
 
@@ -1509,12 +1526,14 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t pos, size_t len,
 	*_count = 0;
 
 	if (node->mode & FAT_SUBDIR) {
-		DPRINTF(0, ("dosfs_get_file_map called on subdirectory %Lx\n", node->vnid));
+		DPRINTF(0, ("dosfs_get_file_map called on subdirectory %" B_PRIdINO
+			"\n", node->vnid));
 		UNLOCK_VOL(vol);
 		return EISDIR;
 	}
 
-	DPRINTF(0, ("dosfs_get_file_map called %lx bytes at %Lx (vnode id %Lx)\n", len, pos, node->vnid));
+	DPRINTF(0, ("dosfs_get_file_map called %" B_PRIuSIZE " bytes at %" B_PRIdOFF
+		" (vnode id %" B_PRIdINO ")\n", len, pos, node->vnid));
 
 	if (pos < 0) pos = 0;
 
@@ -1533,7 +1552,8 @@ dosfs_get_file_map(fs_volume *_vol, fs_vnode *_node, off_t pos, size_t len,
 	diff /= vol->bytes_per_sector; /* convert to sectors */
 
 	if ((result = init_csi(vol, cluster1, 0, &iter)) != B_OK) {
-		dprintf("dosfs_get_file_map: invalid starting cluster (%lx)\n", cluster1);
+		dprintf("dosfs_get_file_map: invalid starting cluster (%" B_PRIu32
+			")\n", cluster1);
 		goto bi;
 	}
 

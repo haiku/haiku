@@ -1,5 +1,7 @@
-1	english	x-vnd.Haiku-DiskUsage	4268917316
+1	english	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% in {0, plural, one{# 文件} other{# 文件}}
 Scanning %refName%	Scanner		扫描 %refName% 
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d 文件
 Size	Info Window		大小
 Rescan	Pie View		重新扫描
 Kind	Info Window		种类
@@ -16,5 +18,6 @@ Modified	Info Window		已修改
 Abort	Status View		退出
 Open with	Pie View		打开方式
 Open	Pie View		打开
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# 文件} other{# 文件}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		空闲存在 %refName%

@@ -999,8 +999,8 @@ FUSEVolume::CreateSymlink(void* _dir, const char* name, const char* target,
 	int mode)
 {
 	FUSENode* dir = (FUSENode*)_dir;
-PRINT(("FUSEVolume::CreateSymlink(%p (%lld), \"%s\" -> \"%s\", %#x)\n", dir,
-dir->id, name, target, mode));
+	PRINT(("FUSEVolume::CreateSymlink(%p (%" B_PRId64 "), \"%s\" -> \"%s\", "
+		"%#x)\n", dir, dir->id, name, target, mode));
 
 	// lock the directory
 	NodeWriteLocker nodeLocker(this, dir, false);
@@ -1046,8 +1046,8 @@ FUSEVolume::Link(void* _dir, const char* name, void* _node)
 {
 	FUSENode* dir = (FUSENode*)_dir;
 	FUSENode* node = (FUSENode*)_node;
-PRINT(("FUSEVolume::Link(%p (%lld), \"%s\" -> %p (%lld))\n", dir, dir->id, name,
-node, node->id));
+	PRINT(("FUSEVolume::Link(%p (%" B_PRId64 "), \"%s\" -> %p (%" B_PRId64
+		"))\n", dir, dir->id, name, node, node->id));
 
 	// lock the directories -- the target directory for writing, the node's
 	// parent for reading
@@ -1095,7 +1095,8 @@ status_t
 FUSEVolume::Unlink(void* _dir, const char* name)
 {
 	FUSENode* dir = (FUSENode*)_dir;
-PRINT(("FUSEVolume::Unlink(%p (%lld), \"%s\")\n", dir, dir->id, name));
+	PRINT(("FUSEVolume::Unlink(%p (%" B_PRId64 "), \"%s\")\n", dir, dir->id,
+		name));
 
 	// lock the directory
 	NodeWriteLocker nodeLocker(this, dir, false);
@@ -1146,8 +1147,9 @@ FUSEVolume::Rename(void* _oldDir, const char* oldName, void* _newDir,
 {
 	FUSENode* oldDir = (FUSENode*)_oldDir;
 	FUSENode* newDir = (FUSENode*)_newDir;
-PRINT(("FUSEVolume::Rename(%p (%lld), \"%s\", %p (%lld), \"%s\")\n", oldDir,
-oldDir->id, oldName, newDir, newDir->id, newName));
+	PRINT(("FUSEVolume::Rename(%p (%" B_PRId64 "), \"%s\", %p (%" B_PRId64
+		"), \"%s\")\n", oldDir, oldDir->id, oldName, newDir, newDir->id,
+		newName));
 
 	// lock the directories
 	MultiNodeLocker nodeLocker(this, oldDir, false, true, newDir, false, true);
@@ -1229,7 +1231,8 @@ status_t
 FUSEVolume::ReadStat(void* _node, struct stat* st)
 {
 	FUSENode* node = (FUSENode*)_node;
-PRINT(("FUSEVolume::ReadStat(%p (%lld), %p)\n", node, node->id, st));
+	PRINT(("FUSEVolume::ReadStat(%p (%" B_PRId64 "), %p)\n", node, node->id,
+		st));
 
 	// lock the directory
 	NodeReadLocker nodeLocker(this, node, true);
@@ -1260,8 +1263,8 @@ status_t
 FUSEVolume::WriteStat(void* _node, const struct stat* st, uint32 mask)
 {
 	FUSENode* node = (FUSENode*)_node;
-PRINT(("FUSEVolume::WriteStat(%p (%lld), %p, %#lx)\n", node, node->id, st,
-mask));
+	PRINT(("FUSEVolume::WriteStat(%p (%" B_PRId64 "), %p, %#" B_PRIx32 ")\n",
+		node, node->id, st, mask));
 
 	// lock the directory
 	NodeReadLocker nodeLocker(this, node, true);
@@ -1356,8 +1359,8 @@ FUSEVolume::Create(void* _dir, const char* name, int openMode, int mode,
 	void** _cookie, ino_t* _vnid)
 {
 	FUSENode* dir = (FUSENode*)_dir;
-PRINT(("FUSEVolume::Create(%p (%lld), \"%s\", %#x, %#x)\n", dir, dir->id, name,
-openMode, mode));
+	PRINT(("FUSEVolume::Create(%p (%" B_PRId64 "), \"%s\", %#x, %#x)\n", dir,
+		dir->id, name, openMode, mode));
 
 	// lock the directory
 	NodeWriteLocker nodeLocker(this, dir, false);
@@ -1420,7 +1423,8 @@ status_t
 FUSEVolume::Open(void* _node, int openMode, void** _cookie)
 {
 	FUSENode* node = (FUSENode*)_node;
-PRINT(("FUSEVolume::Open(%p (%lld), %#x)\n", node, node->id, openMode));
+	PRINT(("FUSEVolume::Open(%p (%" B_PRId64 "), %#x)\n", node, node->id,
+		openMode));
 
 	// lock the directory
 	NodeReadLocker nodeLocker(this, node, true);
@@ -1641,8 +1645,8 @@ status_t
 FUSEVolume::CreateDir(void* _dir, const char* name, int mode)
 {
 	FUSENode* dir = (FUSENode*)_dir;
-PRINT(("FUSEVolume::CreateDir(%p (%lld), \"%s\", %#x)\n", dir, dir->id, name,
-mode));
+	PRINT(("FUSEVolume::CreateDir(%p (%" B_PRId64 "), \"%s\", %#x)\n", dir,
+		dir->id, name, mode));
 
 	// lock the directory
 	NodeWriteLocker nodeLocker(this, dir, false);
@@ -1684,7 +1688,8 @@ status_t
 FUSEVolume::RemoveDir(void* _dir, const char* name)
 {
 	FUSENode* dir = (FUSENode*)_dir;
-PRINT(("FUSEVolume::RemoveDir(%p (%lld), \"%s\")\n", dir, dir->id, name));
+	PRINT(("FUSEVolume::RemoveDir(%p (%" B_PRId64 "), \"%s\")\n", dir, dir->id,
+		name));
 
 	// lock the directory
 	NodeWriteLocker nodeLocker(this, dir, false);
@@ -1732,7 +1737,8 @@ status_t
 FUSEVolume::OpenDir(void* _node, void** _cookie)
 {
 	FUSENode* node = (FUSENode*)_node;
-PRINT(("FUSEVolume::OpenDir(%p (%lld), %p)\n", node, node->id, _cookie));
+	PRINT(("FUSEVolume::OpenDir(%p (%" B_PRId64 "), %p)\n", node, node->id,
+		_cookie));
 
 	// lock the parent directory
 	NodeReadLocker nodeLocker(this, node, true);
@@ -1821,8 +1827,8 @@ status_t
 FUSEVolume::ReadDir(void* _node, void* _cookie, void* buffer, size_t bufferSize,
 	uint32 count, uint32* _countRead)
 {
-PRINT(("FUSEVolume::ReadDir(%p, %p, %p, %lu, %ld)\n", _node, _cookie, buffer,
-bufferSize, count));
+	PRINT(("FUSEVolume::ReadDir(%p, %p, %p, %" B_PRIuSIZE ", %" B_PRId32 ")\n",
+		_node, _cookie, buffer, bufferSize, count));
 	*_countRead = 0;
 
 	FUSENode* node = (FUSENode*)_node;
@@ -2115,8 +2121,9 @@ FUSEVolume::_GetNode(FUSENode* dir, const char* entryName, FUSENode** _node)
 
 		if (privateNode != node) {
 			// weird, the node changed!
-			ERROR(("FUSEVolume::_GetNode(): cookie for node %lld changed: "
-				"expected: %p, got: %p\n", nodeID, node, privateNode));
+			ERROR(("FUSEVolume::_GetNode(): cookie for node %" B_PRId64
+				" changed: expected: %p, got: %p\n", nodeID, node,
+				privateNode));
 			UserlandFS::KernelEmu::put_vnode(fID, nodeID);
 			_PutNode(node);
 			continue;
@@ -2753,8 +2760,8 @@ int
 FUSEVolume::_AddReadDirEntry(ReadDirBuffer* buffer, const char* name, int type,
 	ino_t nodeID, off_t offset)
 {
-PRINT(("FUSEVolume::_AddReadDirEntry(%p, \"%s\", %#x, %lld, %lld\n", buffer,
-name, type, nodeID, offset));
+	PRINT(("FUSEVolume::_AddReadDirEntry(%p, \"%s\", %#x, %" B_PRId64 ", %"
+		B_PRId64 "\n", buffer, name, type, nodeID, offset));
 
 	AutoLocker<Locker> locker(fLock);
 
@@ -2781,8 +2788,8 @@ name, type, nodeID, offset));
 		// parent dir entry
 		FUSEEntry* parentEntry = buffer->directory->entries.Head();
 		if (parentEntry == NULL) {
-			ERROR(("FUSEVolume::_AddReadDirEntry(): dir %lld has no entry!\n",
-				dirID));
+			ERROR(("FUSEVolume::_AddReadDirEntry(): dir %" B_PRId64
+				" has no entry!\n", dirID));
 			return 0;
 		}
 		nodeID = parentEntry->parent->id;
@@ -2830,7 +2837,7 @@ name, type, nodeID, offset));
 				buffer->error = B_NO_MEMORY;
 				return 1;
 			}
-PRINT(("  -> create node: %p, id: %lld\n", node, nodeID));
+			PRINT(("  -> create node: %p, id: %" B_PRId64 "\n", node, nodeID));
 
 			fNodes.Insert(node);
 		} else {

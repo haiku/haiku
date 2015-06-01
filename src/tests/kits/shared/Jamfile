@@ -9,6 +9,7 @@ UnitTestLib libsharedtest.so :
 	SharedTestAddon.cpp
 
 	CalendarViewTest.cpp
+	DriverSettingsMessageAdapterTest.cpp
 	GeolocationTest.cpp
 	NaturalCompareTest.cpp
 

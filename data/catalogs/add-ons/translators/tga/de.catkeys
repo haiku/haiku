@@ -1,6 +1,6 @@
-1	german	x-vnd.Haiku-TGATranslator	3289993499
+1	german	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		Speichern mit RLE-Komprimierung
 Targa image (%d bits truecolor)	TGATranslator		Targa-Bild (%d Bits Truecolor)
-Version %d.%d.%d %s	TGAView		Version %d.%d.%d %s
 Ignore TGA alpha channel	TGAView		TGA-Alphakanal ignorieren
 Targa image (%d bits colormap)	TGATranslator		Targa-Bild (%d Bits Colormap)
 TGA image translator	TGAView		TGA-Bild-Translator
@@ -9,8 +9,8 @@ Targa image (%d bits gray)	TGATranslator		Targa-Bild (%d Bits Graustufen)
 Written by the Haiku Translation Kit Team	TGAView		vom Haiku Translation Kit Team
 Targa image (%d bits RLE truecolor)	TGATranslator		Targa-Bild (%d Bits RLE Truecolor)
 TGA images	TGATranslator		TGA-Bilder
+Version %d.%d.%d, %s	TGAView		Version %d.%d.%d, %s
 TGATranslator Settings	TGATranslator		TGATranslator-Einstellungen
-Save with RLE Compression	TGAView		Speichern mit RLE-Komprimierung
 TGA image translator	TGATranslator		TGA-Bild-Translator
 Targa image (%d bits RLE gray)	TGATranslator		Targa-Bild (%d Bits RLE-Graustufen)
 TGA Settings	TGAMain		TGA-Einstellungen

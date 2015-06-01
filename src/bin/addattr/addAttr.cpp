@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2006, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Sebastian Nozzi.
  *
  * Distributed under the terms of the MIT license.
@@ -12,6 +12,9 @@
 #include <Mime.h>
 
 #include <fs_attr.h>
+#ifdef __HAIKU__
+#	include <parsedate.h>
+#endif
 
 #include <ctype.h>
 #include <errno.h>
@@ -23,7 +26,7 @@
 
 template<class Type>
 ssize_t
-writeAttrValue(int fd, const char *name, type_code type, Type value)
+writeAttrValue(int fd, const char* name, type_code type, Type value)
 {
 	ssize_t bytes = fs_write_attr(fd, name, type, 0, &value, sizeof(Type));
 	if (bytes < 0)
@@ -33,15 +36,14 @@ writeAttrValue(int fd, const char *name, type_code type, Type value)
 }
 
 
-/**	Writes an attribute to a node, taking the type into account and
- *	converting the value accordingly
- *
- *	On success it will return the amount of bytes written
- *	On failure it returns an error code (negative number)
- */
+/*!	Writes an attribute to a node, taking the type into account and
+	converting the value accordingly
 
+	On success it will return the amount of bytes written
+	On failure it returns an error code (negative number)
+*/
 static ssize_t
-writeAttr(int fd, type_code type, const char *name, const char *value, size_t length)
+writeAttr(int fd, type_code type, const char* name, const char* value, size_t length)
 {
 	uint64 uint64value = 0;
 	int64 int64value = 0;
@@ -113,6 +115,17 @@ writeAttr(int fd, type_code type, const char *name, const char *value, size_t le
 			return writeAttrValue<uint8>(fd, name, B_BOOL_TYPE, boolValue);
 		}
 
+#ifdef __HAIKU__
+		case B_TIME_TYPE:
+		{
+			time_t timeValue = parsedate(value, time(NULL));
+			if (timeValue < 0)
+				return B_BAD_VALUE;
+
+			return writeAttrValue<time_t>(fd, name, B_TIME_TYPE, timeValue);
+		}
+#endif
+
 		case B_STRING_TYPE:
 		case B_MIME_STRING_TYPE:
 		default:
@@ -129,15 +142,14 @@ writeAttr(int fd, type_code type, const char *name, const char *value, size_t le
 }
 
 
-/**	Adds an attribute to a file for the given type, name and value
- *	Converts the value accordingly in case of numeric or boolean types
- *
- *	On success, it returns B_OK, or else an appropriate error code.
- */
+/*!	Adds an attribute to a file for the given type, name and value
+	Converts the value accordingly in case of numeric or boolean types
 
+	On success, it returns B_OK, or else an appropriate error code.
+*/
 status_t
-addAttr(const char *file, type_code type, const char *name,
-	const char *value, size_t length, bool resolveLinks)
+addAttr(const char* file, type_code type, const char* name,
+	const char* value, size_t length, bool resolveLinks)
 {
 	int fd = open(file, O_RDONLY | (resolveLinks ? 0 : O_NOTRAVERSE));
 	if (fd < 0)

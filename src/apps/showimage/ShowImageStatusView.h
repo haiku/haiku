@@ -15,20 +15,39 @@
 #include <View.h>
 
 
+enum {
+	kFrameSizeCell,
+	kZoomCell,
+	kPagesCell,
+	kImageTypeCell,
+	kStatusCellCount
+};
+
+
 class ShowImageStatusView : public BView {
 public:
-								ShowImageStatusView(BRect rect,
-									const char* name, uint32 resizingMode,
-									uint32 flags);
+								ShowImageStatusView(BScrollView* scrollView);
 
+	virtual	void				AttachedToWindow();
+	virtual void				GetPreferredSize(float* _width, float* _height);
+	virtual	void				ResizeToPreferred();
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				MouseDown(BPoint where);
 
 			void				Update(const entry_ref& ref,
-									const BString& text);
-
-private:
-			BString				fText;
+									const BString& text, const BString& pages,
+									const BString& imageType, float zoom);
+			void				SetZoom(float zoom);
+ private:
+			void				_SetFrameText(const BString& text);
+			void				_SetZoomText(float zoom);
+			void				_SetPagesText(const BString& pages);
+			void				_SetImageTypeText(const BString& imageType);
+			void				_ValidatePreferredSize();
+			BScrollView*		fScrollView;
+			BSize				fPreferredSize;
+			BString				fCellText[kStatusCellCount];
+			float				fCellWidth[kStatusCellCount];
 			entry_ref			fRef;
 };
 

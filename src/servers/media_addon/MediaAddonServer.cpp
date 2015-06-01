@@ -67,14 +67,14 @@ typedef std::vector<media_node> NodeVector;
 
 
 struct AddOnInfo {
-	media_addon_id		id;
-	bool				wants_autostart;
-	int32				flavor_count;
+			media_addon_id		id;
+			bool				wants_autostart;
+			int32				flavor_count;
 
-	NodeVector			active_flavors;
+			NodeVector			active_flavors;
 
-	BMediaAddOn*		addon;
-		// if != NULL, need to call gDormantNodeManager->PutAddOn(id)
+			// if != NULL, need to call gDormantNodeManager->PutAddOn(id)
+			BMediaAddOn*		addon;
 };
 
 
@@ -121,18 +121,19 @@ private:
 			thread_id			fControlThread;
 			bool				fStartup;
 			bool				fStartupSound;
+			SystemTimeSource*	fSystemTimeSource;
 };
 
 
 class MediaAddonServer::MonitorHandler : public AddOnMonitorHandler {
 public:
-							MonitorHandler(MediaAddonServer* server);
+								MonitorHandler(MediaAddonServer* server);
 
-	virtual void			AddOnEnabled(const add_on_entry_info* info);
-	virtual void			AddOnDisabled(const add_on_entry_info* info);
+	virtual void				AddOnEnabled(const add_on_entry_info* info);
+	virtual void				AddOnDisabled(const add_on_entry_info* info);
 
 private:
-	MediaAddonServer* fServer;
+			MediaAddonServer*	fServer;
 };
 
 
@@ -203,8 +204,11 @@ MediaAddonServer::MonitorHandler::AddOnDisabled(const add_on_entry_info* info)
 MediaAddonServer::MediaAddonServer(const char* signature)
 	:
 	BApplication(signature),
+	fMonitorHandler(NULL),
+	fPulseRunner(NULL),
 	fStartup(true),
-	fStartupSound(true)
+	fStartupSound(true),
+	fSystemTimeSource(NULL)
 {
 	CALLED();
 	fMediaRoster = BMediaRoster::Roster();
@@ -227,14 +231,15 @@ MediaAddonServer::~MediaAddonServer()
 	for (; iterator != fFileMap.end(); iterator++)
 		gDormantNodeManager->UnregisterAddOn(iterator->second);
 
-	// TODO: unregister system time source
+	delete fMonitorHandler;
+	delete fPulseRunner;
 }
 
 
 void
 MediaAddonServer::ReadyToRun()
 {
-	if (!be_roster->IsRunning("application/x-vnd.Be.media-server")) {
+	if (!be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
 		// the media server is not running, let's quit
 		fprintf(stderr, "The media_server is not running!\n");
 		Quit();
@@ -249,20 +254,20 @@ MediaAddonServer::ReadyToRun()
 
 	// The very first thing to do is to create the system time source,
 	// register it with the server, and make it the default SYSTEM_TIME_SOURCE
-	BMediaNode *timeSource = new SystemTimeSource;
-	status_t result = fMediaRoster->RegisterNode(timeSource);
+	fSystemTimeSource = new SystemTimeSource();
+	status_t result = fMediaRoster->RegisterNode(fSystemTimeSource);
 	if (result != B_OK) {
 		fprintf(stderr, "Can't register system time source : %s\n",
 			strerror(result));
-		debugger("Can't register system time source");
+		ERROR("Can't register system time source");
 	}
 
-	if (timeSource->ID() != NODE_SYSTEM_TIMESOURCE_ID)
-		debugger("System time source got wrong node ID");
-	media_node node = timeSource->Node();
+	if (fSystemTimeSource->ID() != NODE_SYSTEM_TIMESOURCE_ID)
+		ERROR("System time source got wrong node ID");
+	media_node node = fSystemTimeSource->Node();
 	result = MediaRosterEx(fMediaRoster)->SetNode(SYSTEM_TIME_SOURCE, &node);
 	if (result != B_OK)
-		debugger("Can't setup system time source as default");
+		ERROR("Can't setup system time source as default");
 
 	// During startup, first all add-ons are loaded, then all
 	// nodes (flavors) representing physical inputs and outputs
@@ -274,8 +279,12 @@ MediaAddonServer::ReadyToRun()
 	AddHandler(fMonitorHandler);
 
 	BMessage pulse(B_PULSE);
+	// the monitor handler needs a pulse to check if add-ons are ready
 	fPulseRunner = new BMessageRunner(fMonitorHandler, &pulse, 1000000LL);
-		// the monitor handler needs a pulse to check if add-ons are ready
+
+	result = fPulseRunner->InitCheck();
+	if (result != B_OK)
+		ERROR("Can't create the pulse runner");
 
 	fMonitorHandler->AddAddOnDirectories("media");
 
@@ -313,11 +322,24 @@ MediaAddonServer::QuitRequested()
 	for (iterator = fInfoMap.begin(); iterator != fInfoMap.end(); iterator++)
 		_DestroyInstantiatedFlavors(iterator->second);
 
-	BMediaRoster::CurrentRoster()->Lock();
-	BMediaRoster::CurrentRoster()->Quit();
+	// the System timesource should be removed before we quit the roster
+	if (fSystemTimeSource != NULL &&
+		be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
+		status_t result = fMediaRoster->UnregisterNode(fSystemTimeSource);
+		if (result != B_OK) {
+			fprintf(stderr, "Error removing the system time source : %s\n",
+				strerror(result));
+			ERROR("Can't remove the system time source");
+		}
+		fSystemTimeSource->Release();
+		fSystemTimeSource = NULL;
+	}
 
 	for (iterator = fInfoMap.begin(); iterator != fInfoMap.end(); iterator++)
 		_PutAddonIfPossible(iterator->second);
+
+	BMediaRoster::CurrentRoster()->Lock();
+	BMediaRoster::CurrentRoster()->Quit();
 
 	return true;
 }
@@ -339,7 +361,7 @@ MediaAddonServer::MessageReceived(BMessage* message)
 
 			PlayMediaFile(type, name);
 			message->SendReply((uint32)B_OK);
-				// TODO: don't know which reply is expected
+			// TODO: don't know which reply is expected
 			return;
 		}
 
@@ -533,7 +555,8 @@ MediaAddonServer::_AddOnAdded(const char* path, ino_t fileNode)
 	AddOnInfo& info = found->second;
 
 	info.id = id;
-	info.wants_autostart = false; // temporary default
+	// temporary default
+	info.wants_autostart = false;
 	info.flavor_count = 0;
 	info.addon = addon;
 

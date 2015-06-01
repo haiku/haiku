@@ -9,6 +9,9 @@
 #include_next <string.h>
 
 
+#ifdef _BSD_SOURCE
+
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,5 +21,9 @@ char* strsep(char** string, const char* delimiters);
 #ifdef __cplusplus
 }
 #endif
+
+
+#endif
+
 
 #endif	/* _BSD_STRING_H_ */

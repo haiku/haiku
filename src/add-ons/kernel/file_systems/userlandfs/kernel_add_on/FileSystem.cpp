@@ -35,7 +35,7 @@ static const bigtime_t kNotificationRequestTimeout = 50000;	// 50 ms
 
 
 struct FileSystem::SelectSyncMap
-	: public SynchronizedHashMap<HashKey32<selectsync*>, int32*> {
+	: public SynchronizedHashMap<HashKeyPointer<selectsync*>, int32*> {
 };
 
 
@@ -202,7 +202,7 @@ FileSystem::~FileSystem()
 
 	if (fSelectSyncs) {
 		for (SelectSyncMap::Iterator it = fSelectSyncs->GetIterator();
-			 it.HasNext();) {
+				it.HasNext();) {
 			SelectSyncMap::Entry entry = it.Next();
 			delete entry.value;
 		}
@@ -221,7 +221,7 @@ FileSystem::~FileSystem()
 		ops = next;
 	}
 	if (count > 0)
-		WARN(("Deleted %ld vnode ops vectors!\n", count));
+		WARN(("Deleted %" B_PRId32 " vnode ops vectors!\n", count));
 
 
 	mutex_destroy(&fVolumeLock);
@@ -234,7 +234,8 @@ status_t
 FileSystem::Init(const char* name, team_id team, Port::Info* infos, int32 count,
 	const FSCapabilities& capabilities)
 {
-	PRINT(("FileSystem::Init(\"%s\", %p, %ld)\n", name, infos, count));
+	PRINT(("FileSystem::Init(\"%s\", %p, %" B_PRId32 ")\n", name, infos,
+		count));
 	capabilities.Dump();
 
 	// check parameters
@@ -295,13 +296,13 @@ FileSystem::Init(const char* name, team_id team, Port::Info* infos, int32 count,
 
 	// print some info about the userland team
 	D(
-		PRINT(("  userland team is: %ld\n", fUserlandServerTeam));
+		PRINT(("  userland team is: %" B_PRId32 "\n", fUserlandServerTeam));
 		int32 cookie = 0;
 		thread_info threadInfo;
 		while (get_next_thread_info(fUserlandServerTeam, &cookie, &threadInfo)
 			   == B_OK) {
-			PRINT(("    userland thread: %ld: `%s'\n", threadInfo.thread,
-				threadInfo.name));
+			PRINT(("    userland thread: %" B_PRId32 ": `%s'\n",
+				threadInfo.thread, threadInfo.name));
 		}
 	);
 

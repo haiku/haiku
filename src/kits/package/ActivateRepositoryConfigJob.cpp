@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -77,7 +77,7 @@ ActivateRepositoryConfigJob::Execute()
 void
 ActivateRepositoryConfigJob::Cleanup(status_t jobResult)
 {
-	if (jobResult != B_OK && State() != JOB_STATE_ABORTED
+	if (jobResult != B_OK && State() != BSupportKit::B_JOB_STATE_ABORTED
 		&& fTargetEntry.InitCheck() == B_OK)
 		fTargetEntry.Remove();
 }

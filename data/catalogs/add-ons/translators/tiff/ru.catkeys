@@ -1,5 +1,6 @@
-1	russian	x-vnd.Haiku-TIFFTranslator	1930083198
+1	russian	x-vnd.Haiku-TIFFTranslator	2234713102
 LZW	TIFFView		LZW
+Version %d.%d.%d, %s	TIFFView		Версия %d.%d.%d, %s
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: не удалось установить каталог\n
 TIFF image	TIFFTranslator		TIFF изображение
 TIFF Library:	TIFFView		Библиотека TIFF:
@@ -13,4 +14,3 @@ TIFF Settings	TIFFMain		Настройки TIFF транслятора
 Use compression:	TIFFView		Использовать сжатие:
 identify_tiff_header: invalid document index\n	TIFFTranslator		identify_tiff_header: неверный индекс документа\n
 ZIP (Deflate)	TIFFView		ZIP (Deflate)
-Version %d.%d.%d %s	TIFFView		Версия %d.%d.%d %s

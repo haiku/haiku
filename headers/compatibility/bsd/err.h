@@ -37,6 +37,10 @@
 #ifndef _ERR_H_
 #define	_ERR_H_
 
+
+#ifdef _BSD_SOURCE
+
+
 /*
  * Don't use va_list in the err/warn prototypes.   Va_list is typedef'd in two
  * places (<machine/varargs.h> and <machine/stdarg.h>), so if we include one
@@ -68,5 +72,9 @@ void	vwarnx(const char *, __va_list) __printflike(1, 0);
 void	err_set_file(void *);
 void	err_set_exit(void (*)(int));
 __END_DECLS
+
+
+#endif
+
 
 #endif /* !_ERR_H_ */

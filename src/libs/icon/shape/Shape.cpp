@@ -335,7 +335,7 @@ Shape::ObjectChanged(const Observable* object)
 void
 Shape::PathAdded(VectorPath* path, int32 index)
 {
-	path->Acquire();
+	path->AcquireReference();
 	path->AddListener(this);
 	_NotifyRerender();
 }
@@ -346,7 +346,7 @@ Shape::PathRemoved(VectorPath* path)
 {
 	path->RemoveListener(this);
 	_NotifyRerender();
-	path->Release();
+	path->ReleaseReference();
 }
 
 // #pragma mark -
@@ -417,7 +417,7 @@ Shape::SetStyle(::Style* style)
 #ifdef ICON_O_MATIC
 	if (fStyle) {
 		fStyle->RemoveObserver(this);
-		fStyle->Release();
+		fStyle->ReleaseReference();
 	}
 	::Style* oldStyle = fStyle;
 #endif
@@ -426,7 +426,7 @@ Shape::SetStyle(::Style* style)
 
 #ifdef ICON_O_MATIC
 	if (fStyle) {
-		fStyle->Acquire();
+		fStyle->AcquireReference();
 		fStyle->AddObserver(this);
 	}
 

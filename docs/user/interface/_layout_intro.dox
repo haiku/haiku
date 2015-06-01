@@ -1,9 +1,10 @@
 /*
- * Copyright 2010 Haiku, Inc. All rights reserved.
+ * Copyright 2010-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Alex Wilson, yourpalal2@gmail.com
+ *		Augustin Cavalier <waddlesplash>
  */
 
 
@@ -37,7 +38,7 @@
 	above would work, but we'll use a BGroupLayout, because it suits this
 	purpose the best.
 
-	So, let's review the BGroupLayout constructor:
+	The BGroupLayout constructor is:
 
 \code
 BGroupLayout(orientation orientation, float spacing = B_USE_DEFAULT_SPACING)
@@ -56,16 +57,16 @@ window->SetLayout(group);
 	Before we can add anything to our layout, we must attach it to something,
 	and here we've used the BWindow::SetLayout() method to accomplish that.
 	By doing this, \c window takes ownership of \c group, so there is no need
-	to manually  <tt> delete group </tt> when we're done with it.
+	to manually <tt>delete group</tt> when we're done with it.
 
 	Now that we've got our BGroupLayout in place, we can start adding things
-	to it, let's add a BStringView.
+	to it, so let's add a BStringView.
 
 \code
 group->AddView(MakeStringView("Haiku rocks!"));
 \endcode
 
-	That does it! Now we've got a BWindow with a horizontal BGroupLayout holding
+	Now we've got a BWindow with a horizontal BGroupLayout holding
 	a single BView. However, if we want to ensure that our BStringView is always
 	centered in the window, we should give it an explicit BAlignment. So the
 	last line becomes:
@@ -79,7 +80,7 @@ stringView->SetExplicitAlignment(BAlignment(B_ALIGN_HORIZONTAL_CENTER,
 	Now our BStringView will always be right in the middle of the space
 	allotted to it, which at the moment is the whole of \c window.
 
-	Now let's take things one step further, and add a BMenuBar into the mix.
+	Now let's add a BMenuBar:
 
 \code
 group->AddView(0, MakeMenuBar());
@@ -93,23 +94,22 @@ group->SetInsets(0, 0, 0, 0);
 	space between our BMenuBar and our BStringView, but \c group's spacing has
 	already been set by the BGroupLayout constructor, so we don't need to do
 	that.
- 
+
 	Now that we've put our BGroupLayout to good use, we can rest easy, assured
 	that GUI will always look nice, no matter what font is used, or how big or
 	little \c window is stretched. Of course, very few interfaces are as simple
 	as this one.
 
-	Luckily, the layout classes can deal with complex layouts. Suppose, for
+	The layout classes can deal with complex layouts. Suppose, for
 	example, that we wanted to add a grid of BButtons under our BStringView.
-	We could use a BGridLayout for this. Let's review the BGridLayout
-	constructor:
+	We could use a BGridLayout for this. The BGridLayout constructor is:
 
 \code
 BGridLayout(float horizontal = B_USE_DEFAULT_SPACING,
 	float vertical = B_USE_DEFAULT_SPACING);
 \endcode
 
-	Because we want a bit of breathing room between our buttons, we'll leave 
+	Because we want a bit of breathing room between our buttons, we'll leave
 	vertical and horizontal spacing as is.
 
 \code
@@ -134,8 +134,6 @@ grid->AddView(MakeSmallButton(), 1, 2);
 		\li The cells (0, 1) and (1, 1) hold a single button that spans both
 			cells.
 		\li The cell (0, 2) is empty.
-
-	How easy was that? Very easy!
 
 	One of the features you'll find incredibly handy in the layout API is the
 	builders in LayoutBuilder.h. Here's how our whole layout would look if it

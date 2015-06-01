@@ -5,7 +5,6 @@
 #include <MediaFormats.h>
 #include "MediaPlugin.h"
 
-class AddOnManager;
 
 namespace BPrivate { namespace media {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,11 +10,11 @@
 #include <package/AddRepositoryRequest.h>
 
 #include <Directory.h>
+#include <JobQueue.h>
 #include <Path.h>
 
 #include <package/ActivateRepositoryConfigJob.h>
 #include <package/FetchFileJob.h>
-#include <package/JobQueue.h>
 #include <package/PackageRoster.h>
 
 
@@ -88,7 +88,7 @@ AddRepositoryRequest::CreateInitialJobs()
 
 
 void
-AddRepositoryRequest::JobSucceeded(BJob* job)
+AddRepositoryRequest::JobSucceeded(BSupportKit::BJob* job)
 {
 	if (job == fActivateJob)
 		fRepositoryName = fActivateJob->RepositoryName();

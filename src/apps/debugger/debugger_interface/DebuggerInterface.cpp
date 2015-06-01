@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,6 +13,7 @@
 #include <Locker.h>
 
 #include <AutoLocker.h>
+#include <memory_private.h>
 #include <OS.h>
 #include <system_info.h>
 #include <util/DoublyLinkedList.h>
@@ -701,6 +702,22 @@ DebuggerInterface::SetCpuState(thread_id thread, const CpuState* state)
 }
 
 
+status_t
+DebuggerInterface::GetCpuFeatures(uint32& flags)
+{
+	return fArchitecture->GetCpuFeatures(flags);
+}
+
+
+status_t
+DebuggerInterface::GetMemoryProperties(target_addr_t address,
+	uint32& protection, uint32& locking)
+{
+	return get_memory_properties(fTeamID, (const void *)address,
+		&protection, &locking);
+}
+
+
 ssize_t
 DebuggerInterface::ReadMemory(target_addr_t address, void* buffer, size_t size)
 {
@@ -718,7 +735,7 @@ DebuggerInterface::WriteMemory(target_addr_t address, void* buffer,
 	DebugContextGetter contextGetter(fDebugContextPool);
 
 	return debug_write_memory(contextGetter.Context(),
-		(const void*)(addr_t)address, buffer, size);
+		(const void*)address, buffer, size);
 }
 
 

@@ -1,0 +1,72 @@
+# Cubieboard 4 board-specific definitions
+# This likely could be easily used for other Allwinner chipsets
+
+HAIKU_BOARD_DESCRIPTION = "Cubieboard 4 (CC-A80)" ;
+HAIKU_BOARD_FDT_NAME = "cubieboard4" ;
+
+#
+# Various hardcoded addresses
+#
+
+# 0x20000000 = SDRAM start
+# 0x20007800 = haiku_loader_linux.ub
+# 0x20087800 = BASE
+
+HAIKU_BOARD_LOADER_BASE = 0x20087800 ;
+HAIKU_BOARD_LOADER_ENTRY_RAW = $(HAIKU_BOARD_LOADER_BASE) ;
+HAIKU_BOARD_LOADER_ENTRY_NBSD = `printf \"obase=16;ibase=16;8 + %x\\n\" $(HAIKU_BOARD_LOADER_BASE)|bc` ;
+HAIKU_BOARD_LOADER_ENTRY_LINUX = `printf \"obase=16;ibase=16;10 + %x\\n\" $(HAIKU_BOARD_LOADER_BASE)|bc` ;
+
+#
+# mmc/SD image
+#
+
+HAIKU_BOARD_FIRMWARE_URL = "https://github.com/cubieboard/CC-A80-binaries/raw/master/bin" ;
+
+# u-boot image
+# Dear Cubbieboard, add fdt_addr_r, ramdisk_addr_r, kernel_addr_r to u-boot
+HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME = boot.scr ;
+HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT = "\
+    fatload mmc 0 0x20800000 haiku-floppyboot.tgz.ub \
+    fatload mmc 0 0x20007800 haiku_loader_linux.ub \
+    bootm 0x20007800 0x20800000" ;
+
+HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
+HAIKU_BOARD_SDIMAGE_FILES = 
+	haiku_loader_linux.ub
+	haiku-floppyboot.tgz.ub
+	$(HAIKU_BOARD_SDIMAGE_UBOOT_SCRIPT_NAME)
+;
+
+HAIKU_BOARD_SDIMAGE_BEGIN = 40950 ; # 512-byte sectors (divisible by 63)
+HAIKU_BOARD_SDIMAGE_SIZE = 128 ; # MiB
+
+boot0File = [ DownloadFile sdcard-boot0 : $(HAIKU_BOARD_FIRMWARE_URL)/sdcard-boot0 ] ;
+boot1File = [ DownloadFile sdcard-boot1 : $(HAIKU_BOARD_FIRMWARE_URL)/sdcard-boot1 ] ;
+
+# The Allwinner chips require an SD card "blessed" with
+# the boot0 SPL and boot1 (u-boot) at a fixed location on
+# the SD card. (Dear AW, please support loading from FAT)
+HAIKU_BOARD_SDIMAGE_BOOT0_FILE = $(boot0File) ;
+HAIKU_BOARD_SDIMAGE_BOOT0_SEEK = 8192 ;
+HAIKU_BOARD_SDIMAGE_BOOT1_FILE = $(boot1File) ;
+HAIKU_BOARD_SDIMAGE_BOOT1_SEEK = 19554304 ;
+
+#
+# gcc flags for the specific cpu
+#
+
+local flags = -march=armv7-a -mfpu=vfpv3-d16 -mfloat-abi=hard ;
+
+HAIKU_ASFLAGS_$(HAIKU_PACKAGING_ARCH) += $(flags) ;
+HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH) += $(flags) ;
+HAIKU_C++FLAGS_$(HAIKU_PACKAGING_ARCH) += $(flags) ;
+
+# Workaround for ld using 32k for alignment despite forcing it in the config...
+# should definitely not be needed!
+HAIKU_KERNEL_LINKFLAGS +=
+    -Wl,-z -Wl,max-page-size=0x1000
+    -Wl,-z -Wl,common-page-size=0x1000 ;
+HAIKU_LINKFLAGS_$(HAIKU_PACKAGING_ARCH) +=
+    -Wl,-z -Wl,max-page-size=0x1000
+    -Wl,-z -Wl,common-page-size=0x1000 ;

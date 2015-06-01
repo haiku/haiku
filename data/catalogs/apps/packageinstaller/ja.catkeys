@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-PackageInstaller	3672759664
+1	japanese	x-vnd.Haiku-PackageInstaller	591566249
 Install to:	PackageView		インストール先:
 OK	PackageView		OK
 Accept	PackageTextViewer		承認
@@ -11,7 +11,6 @@ Do you want to remember this decision for the rest of this installation?\n	Packa
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		パッケージファイル中にファイルサイズの不一致があるようです。パッケージが壊れているか、作成後変更されたおそれがあります。インストールを本当に続けますか?
 Error while installing the package\n	PackageView		パッケージをインストール中にエラーが発生しました\n
 Disclaimer	PackageTextViewer		免責条項
-%.1f GiB	PackageView		%.1f GiB
 %name% (%size% free)	PackageView		%name% (%size% 空き)
 The installation of the package has been aborted.	PackageView		パッケージのインストールは中止されました。
 Done	PackageInstall		完了
@@ -29,9 +28,7 @@ Skip all	PackageView		すべてスキップ
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		項目 '%s' がすでにパスに存在します。\n項目をパッケージの物と置き換えますか、またはスキップしますか?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		スクリプト '%s' がすでにパスに存在します。\nスクリプトをパッケージの物と置き換えますか、またはスキップしますか?
 Running post-installation scripts	PackageInstall		インストールの後始末をしています
-%llu bytes	PackageView		%llu bytes
 Skip	PackageView		スキップ
-%.1f MiB	PackageView		%.1f MiB
 The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		ディレクトリ '%s' がすでにパスに存在します。\nディレクトリをパッケージの物と置き換えますか、またはスキップしますか?
 The package you requested has been successfully installed on your system.	PackageView		要求されたパッケージはシステムに正しくインストールされました。
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		エラー! \"%s\" は正しいパスではありません。\n
@@ -47,7 +44,6 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		既存のファイルをすべてスキップしますか?
 Continue	PackageInfo		続ける
 %index% of %total%	PackageInstall		%index% / %total%
-%.1f KiB	PackageView		%.1f KiB
 Abort	PackageInfo		中断
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		中断

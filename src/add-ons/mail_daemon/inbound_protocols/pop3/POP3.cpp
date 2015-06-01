@@ -39,6 +39,8 @@
 #include <VolumeRoster.h>
 #include <Query.h>
 
+#include <mail_util.h>
+
 #include "crypt.h"
 #include "MailSettings.h"
 #include "MessageIO.h"
@@ -82,7 +84,7 @@ POP3Protocol::POP3Protocol(const BMailAccountSettings& settings)
 
 	create_directory(fDestinationDir, 0777);
 
-	fFetchBodyLimit = 0;
+	fFetchBodyLimit = -1;
 	if (fSettings.HasInt32("partial_download_limit"))
 		fFetchBodyLimit = fSettings.FindInt32("partial_download_limit");
 }
@@ -235,6 +237,7 @@ POP3Protocol::SyncMessages()
 			error = B_ERROR;
 
 		file.WriteAttr("MAIL:size", B_INT32_TYPE, 0, &size, sizeof(int32));
+		write_read_attr(file, B_UNREAD);
 
 		// save manifest in case we get disturbed
 		fManifest.Add(uid);

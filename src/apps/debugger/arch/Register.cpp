@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2014, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -33,6 +34,9 @@ Register::Register(int32 index, const char* name, uint32 bitSize,
 		case B_FLOAT_TYPE:
 		case B_DOUBLE_TYPE:
 			fFormat = REGISTER_FORMAT_FLOAT;
+			break;
+		case B_RAW_TYPE:
+			fFormat = REGISTER_FORMAT_SIMD;
 			break;
 		default:
 			fFormat = REGISTER_FORMAT_INTEGER;

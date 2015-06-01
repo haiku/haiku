@@ -272,14 +272,12 @@ JobItem::DrawItem(BView *owner, BRect, bool complete)
 		BRect bounds = list->ItemFrame(list->IndexOf(this));
 
 		rgb_color color = owner->ViewColor();
-		rgb_color oldViewColor = color;
 		rgb_color oldLowColor = owner->LowColor();
 		rgb_color oldHighColor = owner->HighColor();
 
 		if (IsSelected())
-			color = tint_color(color, B_HIGHLIGHT_BACKGROUND_TINT);
+			color = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
 
-		owner->SetViewColor(color);
 		owner->SetHighColor(color);
 		owner->SetLowColor(color);
 
@@ -313,14 +311,17 @@ JobItem::DrawItem(BView *owner, BRect, bool complete)
 			owner->DrawBitmap(fIcon, iconPt);
 
 		// left of item
-		owner->DrawString(fName.String(), fName.Length(), namePt);
-		owner->DrawString(fStatus.String(), fStatus.Length(), statusPt);
+		BString name = fName;
+		owner->TruncateString(&name, B_TRUNCATE_MIDDLE, pagePt.x - namePt.x);
+		owner->DrawString(name.String(), name.Length(), namePt);
+		BString status = fStatus;
+		owner->TruncateString(&status, B_TRUNCATE_MIDDLE, sizePt.x - statusPt.x);
+		owner->DrawString(status.String(), status.Length(), statusPt);
 
 		// right of item
 		owner->DrawString(fPages.String(), fPages.Length(), pagePt);
 		owner->DrawString(fSize.String(), fSize.Length(), sizePt);
 
 		owner->SetDrawingMode(mode);
-		owner->SetViewColor(oldViewColor);
 	}
 }

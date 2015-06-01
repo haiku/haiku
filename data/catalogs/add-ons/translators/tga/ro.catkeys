@@ -1,6 +1,4 @@
-1	romanian	x-vnd.Haiku-TGATranslator	1941245506
-Version %d.%d.%d %s	TGAView		Versiunea %d.%d.%d %s
+1	romanian	x-vnd.Haiku-TGATranslator	3023739273
 Ignore TGA alpha channel	TGAView		Ignoră canalul alfa TGA
 TGA images	TGATranslator		Imagini TGA
-Save with RLE Compression	TGAView		Salvează cu Compresie RLE
 TGA Settings	TGAMain		Configurări TGA

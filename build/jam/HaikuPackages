@@ -7,7 +7,7 @@ local packages = [ FFilterByBuildFeatures
 	HaikuWelcome
 	MakefileEngine
 	NetFS@!x86_64
-	UserlandFS@!x86_64
+	UserlandFS
 	]
 	;
 

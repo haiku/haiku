@@ -156,7 +156,7 @@ Volume::Volume(boot::Partition *partition)
 	return;
 
 err1:
-	TRACE("fatfs: cannot mount (bad superblock ?)\n");
+	TRACE(("fatfs: cannot mount (bad superblock ?)\n"));
 	// XXX !? this triple-faults in QEMU ..
 	//delete fCachedBlock;
 }

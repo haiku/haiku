@@ -31,7 +31,6 @@ provides {
 	cmd:diff3
 	cmd:ftp
 	cmd:ftpd
-	cmd:funzip
 	cmd:gunzip
 	cmd:gzexe
 	cmd:gzip
@@ -39,13 +38,13 @@ provides {
 	cmd:hey
 	cmd:login
 	cmd:more
-	cmd:netcat
 	cmd:passwd
 	cmd:ping
 	cmd:ping6
 	cmd:prio
 	cmd:ps
 	cmd:renice
+	cmd:resattr
 	cmd:sdiff
 	cmd:su
 	cmd:tcpdump
@@ -56,8 +55,6 @@ provides {
 	cmd:traceroute
 	cmd:trash
 	cmd:unchop
-	cmd:unzip = 5.50
-	cmd:unzipsfx
 	cmd:useradd
 	cmd:watch
 	cmd:xres
@@ -66,12 +63,6 @@ provides {
 	cmd:zdiff
 	cmd:zforce
 	cmd:zgrep
-	cmd:zip = 2.32
-	cmd:zipcloak
-	cmd:zipgrep
-	cmd:zipinfo
-	cmd:zipnote
-	cmd:zipsplit
 	cmd:zmore
 	cmd:znew
 }
@@ -79,6 +70,11 @@ provides {
 requires {
 	coreutils
 	cmd:sh
+#ifdef HAIKU_REGULAR_BUILD
+	cmd:bunzip2
+	cmd:tar
+	cmd:unzip
+#endif
 	lib:libcurl
 	lib:libfreetype
 	lib:libgcc_s

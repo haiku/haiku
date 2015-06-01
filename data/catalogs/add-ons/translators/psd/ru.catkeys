@@ -1,13 +1,20 @@
-1	russian	x-vnd.Haiku-PSDTranslator	3139009143
+1	russian	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Lab
 Uncompressed	PSDConfig		Без сжатия
 Indexed	PSDLoader		Индексированное
 Grayscale	PSDLoader		Оттенки серого
 Photoshop image translator	PSDConfig		Транслятор Photoshop изображений
 Photoshop image translator	PSDTranslator		Транслятор Photoshop изображений
 Version %d.%d.%d, %s	PSDConfig		Версия %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Документ Photoshop (PSD-файл)
 Photoshop image	PSDTranslator		Изображение Photoshop
 RLE	PSDConfig		кодирования повторов (RLE)
+Photoshop Big Document (PSB file)	PSDConfig		Документ Photoshop Big (PSB-файл)
+RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Изображение Photoshop (%s)
+PSDTranslator Settings	PSDConfig		Настройки PSD транслятора
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Растровый
 CMYK	PSDLoader		CMYK
 Compression: 	PSDConfig		Сжатие: 
 Format: 	PSDConfig		Формат: 

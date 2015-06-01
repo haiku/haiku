@@ -317,8 +317,8 @@ ConfigWindow::ConfigWindow()
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(tabView)
 		.AddGroup(B_HORIZONTAL)
-			.AddGlue()
 			.Add(revertButton)
+			.AddGlue()
 			.Add(applyButton);
 
 	_LoadSettings();

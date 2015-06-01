@@ -53,7 +53,7 @@ public:
 									const BTimeZone* timeZone = NULL) const;
 
 private:
-			icu::DateFormat*	_CreateDateTimeFormatter(
+			U_ICU_NAMESPACE::DateFormat*	_CreateDateTimeFormatter(
 									const BString& format) const;
 };
 

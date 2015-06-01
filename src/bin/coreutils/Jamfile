@@ -1,5 +1,4 @@
 SubDir HAIKU_TOP src bin coreutils ;
 
 SubInclude HAIKU_TOP src bin coreutils lib ;
-SubInclude HAIKU_TOP src bin coreutils man ;
 SubInclude HAIKU_TOP src bin coreutils src ; 

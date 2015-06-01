@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-libbe	2190613540
+1	slovenian	x-vnd.Haiku-libbe	3992586972
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -17,7 +17,6 @@ Special Thanks:	AboutWindow		Posebna zahvala:
 %.2f TiB	StringForSize		%.2f TiB
 Redo	TextView		Ponovno uveljavi
 <empty>	Menu		(prazno)
-Select All	TextView		Izberi vse
 Warning	Dragger		Opozorilo
 Undo	TextView		Razveljavi
 Red:	ColorControl		Rdeča:

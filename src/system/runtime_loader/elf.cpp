@@ -713,7 +713,8 @@ out:
 
 status_t
 get_nearest_symbol_at_address(void* address, image_id* _imageID,
-	char** _imagePath, char** _symbolName, int32* _type, void** _location)
+	char** _imagePath, char** _imageName, char** _symbolName, int32* _type,
+	void** _location, bool* _exactMatch)
 {
 	rld_lock();
 
@@ -723,11 +724,11 @@ get_nearest_symbol_at_address(void* address, image_id* _imageID,
 		return B_BAD_VALUE;
 	}
 
+	bool exactMatch = false;
 	elf_sym* foundSymbol = NULL;
 	addr_t foundLocation = (addr_t)NULL;
 
-	bool found = false;
-	for (uint32 i = 0; i < HASHTABSIZE(image) && !found; i++) {
+	for (uint32 i = 0; i < HASHTABSIZE(image) && !exactMatch; i++) {
 		for (int32 j = HASHBUCKETS(image)[i]; j != STN_UNDEF;
 				j = HASHCHAINS(image)[j]) {
 			elf_sym *symbol = &image->syms[j];
@@ -738,8 +739,8 @@ get_nearest_symbol_at_address(void* address, image_id* _imageID,
 				foundLocation = location;
 
 				// jump out if we have an exact match
-				if (foundLocation == (addr_t)address) {
-					found = true;
+				if (location + symbol->st_size > (addr_t)address) {
+					exactMatch = true;
 					break;
 				}
 			}
@@ -750,6 +751,10 @@ get_nearest_symbol_at_address(void* address, image_id* _imageID,
 		*_imageID = image->id;
 	if (_imagePath != NULL)
 		*_imagePath = image->path;
+	if (_imageName != NULL)
+		*_imageName = image->name;
+	if (_exactMatch != NULL)
+		*_exactMatch = exactMatch;
 
 	if (foundSymbol != NULL) {
 		*_symbolName = SYMNAME(image, foundSymbol);

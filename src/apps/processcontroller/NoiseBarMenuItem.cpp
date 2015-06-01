@@ -51,6 +51,7 @@ NoiseBarMenuItem::DrawBar(bool force)
 	bool selected = IsSelected();
 	BRect frame = Frame();
 	BMenu* menu = Menu();
+	rgb_color highColor = menu->HighColor();
 	frame.right -= 24;
 	frame.left = frame.right - kBarWidth;
 	frame.top += 5;
@@ -97,7 +98,7 @@ NoiseBarMenuItem::DrawBar(bool force)
 			r.right = fGrenze1;
 	}
 	if (r.left < r.right) {
-		menu->SetHighColor(kBlack);
+		menu->SetHighColor(highColor);
 //		menu->SetHighColor(gUserColor);
 		menu->FillRect(r);
 	}
@@ -112,7 +113,7 @@ NoiseBarMenuItem::DrawBar(bool force)
 			menu->SetHighColor(kWhite);
 		menu->FillRect(r);
 	}
-	menu->SetHighColor(kBlack);
+	menu->SetHighColor(highColor);
 	fGrenze1 = grenze1;
 	fGrenze2 = grenze2;
 }

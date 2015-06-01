@@ -905,7 +905,8 @@ socket_request_notification(net_socket* _socket, uint8 event, selectsync* sync)
 			break;
 		}
 		case B_SELECT_ERROR:
-			// TODO: B_SELECT_ERROR condition!
+			if (socket->error != B_OK)
+				notify_select_event(sync, event);
 			break;
 	}
 

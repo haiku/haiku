@@ -184,7 +184,7 @@ const ACPI_PREDEFINED_NAMES     AcpiGbl_PreDefinedNames[] =
     {"_SB_",    ACPI_TYPE_DEVICE,           NULL},
     {"_SI_",    ACPI_TYPE_LOCAL_SCOPE,      NULL},
     {"_TZ_",    ACPI_TYPE_DEVICE,           NULL},
-    {"_REV",    ACPI_TYPE_INTEGER,          (char *) ACPI_CA_SUPPORT_LEVEL},
+    {"_REV",    ACPI_TYPE_INTEGER,          (char *) 2},
     {"_OS_",    ACPI_TYPE_STRING,           ACPI_OS_NAME},
     {"_GL_",    ACPI_TYPE_MUTEX,            (char *) 1},
 

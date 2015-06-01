@@ -174,7 +174,7 @@ public:
 		if (package.Get()==NULL)
 			return false;
 
-		printf("TEST %s\n", package->Title().String());
+		printf("TEST %s\n", package->Name().String());
 
 		for (int32 i = 0; i < fPackageLists.CountItems(); i++) {
 			if (fPackageLists.ItemAtFast(i)->Contains(package)) {
@@ -235,7 +235,8 @@ public:
 		// Every search term must be found in one of the package texts
 		for (int32 i = fSearchTerms.CountItems() - 1; i >= 0; i--) {
 			const BString& term = fSearchTerms.ItemAtFast(i);
-			if (!_TextContains(package->Title(), term)
+			if (!_TextContains(package->Name(), term)
+				&& !_TextContains(package->Title(), term)
 				&& !_TextContains(package->Publisher().Name(), term)
 				&& !_TextContains(package->ShortDescription(), term)
 				&& !_TextContains(package->FullDescription(), term)) {
@@ -288,7 +289,7 @@ public:
 static inline bool
 is_source_package(const PackageInfoRef& package)
 {
-	const BString& packageName = package->Title();
+	const BString& packageName = package->Name();
 	return packageName.EndsWith("_source");
 }
 
@@ -296,7 +297,7 @@ is_source_package(const PackageInfoRef& package)
 static inline bool
 is_develop_package(const PackageInfoRef& package)
 {
-	const BString& packageName = package->Title();
+	const BString& packageName = package->Name();
 	return packageName.EndsWith("_devel");
 }
 
@@ -659,13 +660,13 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 		BMessage info;
 
 		BString packageName;
-		BString architecture;	
+		BString architecture;
 		{
 			BAutolock locker(&fLock);
-			packageName = package->Title();
+			packageName = package->Name();
 			architecture = package->Architecture();
 		}
-	
+
 		status_t status = fWebAppInterface.RetrieveUserRatings(packageName,
 			architecture, 0, 50, info);
 		if (status == B_OK) {
@@ -682,7 +683,7 @@ Model::PopulatePackage(const PackageInfoRef& package, uint32 flags)
 				while (true) {
 					BString name;
 					name << index++;
-					
+
 					BMessage item;
 					if (items.FindMessage(name, &item) != B_OK)
 						break;
@@ -830,7 +831,7 @@ Model::_UpdateIsFeaturedFilter()
 {
 	if (fShowFeaturedPackages && SearchTerms().IsEmpty())
 		fIsFeaturedFilter = PackageFilterRef(new IsFeaturedFilter(), true);
-	else 
+	else
 		fIsFeaturedFilter = PackageFilterRef(new AnyFilter(), true);
 }
 
@@ -859,7 +860,7 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 		PackageInfoRef package;
 		{
 			BAutolock locker(&fLock);
-			
+
 			if (depotIndex >= fDepots.CountItems())
 				break;
 			const DepotInfo& depot = fDepots.ItemAt(depotIndex);
@@ -871,14 +872,14 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 				depotIndex++;
 				continue;
 			}
-			
+
 			package = packages.ItemAt(packageIndex);
 			packageIndex++;
 		}
-		
+
 		if (package.Get() == NULL)
 			continue;
-	
+
 		//_PopulatePackageInfo(package, fromCacheOnly);
 		bulkPackageList.Add(package);
 		if (bulkPackageList.CountItems() == 50) {
@@ -903,7 +904,7 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 				break;
 			const PackageInfoRef& package = packagesWithIconsList.ItemAtFast(i);
 			printf("Getting/Updating native icon for %s\n",
-				package->Title().String());
+				package->Name().String());
 			_PopulatePackageIcon(package, fromCacheOnly);
 		}
 	}
@@ -953,7 +954,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 {
 	if (fStopPopulatingAllPackages)
 		return;
-	
+
 	// See if there are cached info files
 	for (int i = packages.CountItems() - 1; i >= 0; i--) {
 		if (fStopPopulatingAllPackages)
@@ -963,7 +964,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 
 		BFile file;
 		BPath path;
-		BString name(package->Title());
+		BString name(package->Name());
 		name << ".info";
 		if (_GetCacheFile(path, file, B_USER_CACHE_DIRECTORY,
 			"HaikuDepot", name, fromCacheOnly, 60 * 60)) {
@@ -977,10 +978,10 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 			}
 		}
 	}
-	
+
 	if (fromCacheOnly || packages.IsEmpty())
 		return;
-	
+
 	// Retrieve info from web-app
 	BMessage info;
 
@@ -988,7 +989,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 	StringList packageArchitectures;
 	for (int i = 0; i < packages.CountItems(); i++) {
 		const PackageInfoRef& package = packages.ItemAtFast(i);
-		packageNames.Add(package->Title());
+		packageNames.Add(package->Name());
 		packageArchitectures.Add(package->Architecture());
 	}
 
@@ -1010,16 +1011,16 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 				BMessage pkgInfo;
 				if (pkgs.FindMessage(name, &pkgInfo) != B_OK)
 					break;
-			
+
 				BString pkgName;
 				if (pkgInfo.FindString("name", &pkgName) != B_OK)
 					continue;
-			
+
 				// Find the PackageInfoRef
 				bool found = false;
 				for (int i = 0; i < packages.CountItems(); i++) {
 					const PackageInfoRef& package = packages.ItemAtFast(i);
-					if (pkgName == package->Title()) {
+					if (pkgName == package->Name()) {
 						_PopulatePackageInfo(package, pkgInfo);
 						if (_HasNativeIcon(pkgInfo))
 							packagesWithIcons.Add(package);
@@ -1027,7 +1028,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 						// Store in cache
 						BFile file;
 						BPath path;
-						BString fileName(package->Title());
+						BString fileName(package->Name());
 						fileName << ".info";
 						if (_GetCacheFile(path, file, B_USER_CACHE_DIRECTORY,
 								"HaikuDepot", fileName,
@@ -1070,7 +1071,7 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 	if (packages.CountItems() > 0) {
 		for (int i = 0; i < packages.CountItems(); i++) {
 			const PackageInfoRef& package = packages.ItemAtFast(i);
-			printf("No package info for %s\n", package->Title().String());
+			printf("No package info for %s\n", package->Name().String());
 		}
 	}
 }
@@ -1081,11 +1082,11 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
 {
 	if (fromCacheOnly)
 		return;
-	
+
 	// Retrieve info from web-app
 	BMessage info;
 
-	status_t status = fWebAppInterface.RetrievePackageInfo(package->Title(),
+	status_t status = fWebAppInterface.RetrievePackageInfo(package->Name(),
 		package->Architecture(), info);
 	if (status == B_OK) {
 		// Parse message
@@ -1103,7 +1104,7 @@ append_word_list(BString& words, const char* word)
 	if (words.Length() > 0)
 		words << ", ";
 	words << word;
-} 
+}
 
 
 void
@@ -1123,13 +1124,12 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 			BMessage version;
 			if (versions.FindMessage(name, &version) != B_OK)
 				break;
-			BString languageCode;
-			if (version.FindString("naturalLanguageCode",
-					&languageCode) != B_OK 
-				|| languageCode != fPreferredLanguage) {
-				continue;
-			}
 
+			BString title;
+			if (version.FindString("title", &title) == B_OK) {
+				package->SetTitle(title);
+				append_word_list(foundInfo, "title");
+			}
 			BString summary;
 			if (version.FindString("summary", &summary) == B_OK) {
 				package->SetShortDescription(summary);
@@ -1139,6 +1139,11 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 			if (version.FindString("description", &description) == B_OK) {
 				package->SetFullDescription(description);
 				append_word_list(foundInfo, "description");
+			}
+			double payloadLength;
+			if (version.FindDouble("payloadLength", &payloadLength) == B_OK) {
+				package->SetSize((int64)payloadLength);
+				append_word_list(foundInfo, "size");
 			}
 			break;
 		}
@@ -1168,7 +1173,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 		if (foundCategory)
 			append_word_list(foundInfo, "categories");
 	}
-	
+
 	double derivedRating;
 	if (data.FindDouble("derivedRating", &derivedRating) == B_OK) {
 		RatingSummary summary;
@@ -1177,14 +1182,14 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 
 		append_word_list(foundInfo, "rating");
 	}
-	
+
 	double prominenceOrdering;
 	if (data.FindDouble("prominenceOrdering", &prominenceOrdering) == B_OK) {
 		package->SetProminence(prominenceOrdering);
 
 		append_word_list(foundInfo, "prominence");
 	}
-	
+
 	BMessage screenshots;
 	if (data.FindMessage("pkgScreenshots", &screenshots) == B_OK) {
 		package->ClearScreenshotInfos();
@@ -1193,7 +1198,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 		while (true) {
 			BString name;
 			name << index++;
-			
+
 			BMessage screenshot;
 			if (screenshots.FindMessage(name, &screenshot) != B_OK)
 				break;
@@ -1214,10 +1219,10 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 		if (foundScreenshot)
 			append_word_list(foundInfo, "screenshots");
 	}
-	
+
 	if (foundInfo.Length() > 0) {
 		printf("Populated package info for %s: %s\n",
-			package->Title().String(), foundInfo.String());
+			package->Name().String(), foundInfo.String());
 	}
 
 	// If the user already clicked this package, remove it from the
@@ -1234,7 +1239,7 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
 	// See if there is a cached icon file
 	BFile iconFile;
 	BPath iconCachePath;
-	BString iconName(package->Title());
+	BString iconName(package->Name());
 	iconName << ".hvif";
 	if (_GetCacheFile(iconCachePath, iconFile, B_USER_CACHE_DIRECTORY,
 		"HaikuDepot", iconName, fromCacheOnly, 60 * 60)) {
@@ -1251,7 +1256,7 @@ Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
 	// Retrieve icon from web-app
 	BMallocIO buffer;
 
-	status_t status = fWebAppInterface.RetrievePackageIcon(package->Title(),
+	status_t status = fWebAppInterface.RetrievePackageIcon(package->Name(),
 		&buffer);
 	if (status == B_OK) {
 		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
@@ -1341,11 +1346,11 @@ Model::_HasNativeIcon(const BMessage& message) const
 	while (true) {
 		BString name;
 		name << index++;
-		
+
 		BMessage typeCodeInfo;
 		if (pkgIcons.FindMessage(name, &typeCodeInfo) != B_OK)
 			break;
-	
+
 		BString mediaTypeCode;
 		if (typeCodeInfo.FindString("mediaTypeCode", &mediaTypeCode) == B_OK
 			&& mediaTypeCode == "application/x-vnd.haiku-icon") {

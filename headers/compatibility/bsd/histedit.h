@@ -40,6 +40,10 @@
 #ifndef _HISTEDIT_H_
 #define	_HISTEDIT_H_
 
+
+#ifdef _BSD_SOURCE
+
+
 #include <sys/cdefs.h>
 #include <sys/types.h>
 #include <stdio.h>
@@ -224,5 +228,9 @@ int		 tok_str(Tokenizer *, const char *,
 		    int *, const char ***);
 
 __END_DECLS
+
+
+#endif
+
 
 #endif /* _HISTEDIT_H_ */

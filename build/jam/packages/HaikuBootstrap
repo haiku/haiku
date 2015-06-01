@@ -122,10 +122,9 @@ AddSymlinkToPackage bin : less : more ;
 AddSymlinkToPackage bin : gzip : gunzip ;
 AddSymlinkToPackage bin : gzip : zcat ;
 AddSymlinkToPackage bin : zdiff : zcmp ;
-AddSymlinkToPackage bin : unzip : zipinfo ;
 
 # scripts and data files
-local bootScripts = Bootscript Bootscript.cd SetupEnvironment Netscript
+local bootScripts = Bootscript Bootscript.cd SetupEnvironment
 	InstallerInitScript InstallerFinishScript ;
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToPackage boot : $(bootScripts) ;
