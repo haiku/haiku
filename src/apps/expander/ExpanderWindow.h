@@ -20,6 +20,7 @@
 class BCheckBox;
 class BMenu;
 class BLayout;
+class BScrollView;
 class BStringView;
 class BTextControl;
 class BTextView;
@@ -80,6 +81,7 @@ private:
 			BTextControl*		fDestText;
 			BStringView*		fStatusView;
 			BTextView*			fListingText;
+			BScrollView*		fScrollView;
 
 			ExpanderThread*		fListingThread;
 			bool				fListingStarted;

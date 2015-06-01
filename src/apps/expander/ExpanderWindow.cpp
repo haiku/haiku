@@ -91,8 +91,8 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	fListingText->SetWordWrap(false);
 	BFont font = be_fixed_font;
 	fListingText->SetFontAndColor(&font);
-	BScrollView* scrollView = new BScrollView("", fListingText,
-		B_INVALIDATE_AFTER_LAYOUT, true, true);
+	fScrollView = new BScrollView("", fListingText,	B_INVALIDATE_AFTER_LAYOUT,
+		true, true);
 
 	// workaround to let the layout manager estimate
 	// the width of status view and fix the #5289
@@ -127,14 +127,14 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 					.End()
 				.End()
 			.End()
-			.Add(scrollView)
+			.Add(fScrollView)
 			.SetInsets(spacing, spacing, spacing, spacing)
 		.End()
 	.End();
 
 	pathLayout->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	size = GetLayout()->View()->PreferredSize();
-	fSizeLimit = size.Height() - scrollView->PreferredSize().height - spacing;
+	fSizeLimit = size.Height() - fScrollView->PreferredSize().height - spacing;
 
 	ResizeTo(Bounds().Width(), fSizeLimit);
 	SetSizeLimits(size.Width(), 32767.0f, fSizeLimit, fSizeLimit);
@@ -369,6 +369,12 @@ ExpanderWindow::MessageReceived(BMessage* message)
 
 		case 'outp':
 			if (!fExpandingStarted && fListingStarted) {
+				// Check if the vertical scroll bar is at the end
+				float max, pos;
+				fScrollView->ScrollBar(B_VERTICAL)->GetRange(NULL, &max);
+				pos = fScrollView->ScrollBar(B_VERTICAL)->Value();
+				bool atEnd = (pos == max);
+
 				BString string;
 				int32 i = 0;
 				while (message->FindString("output", i++, &string) == B_OK) {
@@ -379,7 +385,11 @@ ExpanderWindow::MessageReceived(BMessage* message)
 
 					fListingText->Insert(string.String());
 				}
-				fListingText->ScrollToSelection();
+
+				if (atEnd && fScrollView->ScrollBar(B_VERTICAL)->Value() == pos) {
+					fScrollView->ScrollBar(B_VERTICAL)->GetRange(NULL, &max);
+					fScrollView->ScrollBar(B_VERTICAL)->SetValue(max);
+				}
 			} else if (fExpandingStarted) {
 				BString string;
 				int32 i = 0;
