@@ -123,9 +123,10 @@ DriveItem::DrawItem(BView* owner, BRect frame, bool complete)
 {
 	owner->PushState();
 	owner->SetDrawingMode(B_OP_ALPHA);
+
 	if (IsSelected() || complete) {
 		if (IsSelected()) {
-			owner->SetHighColor(tint_color(owner->LowColor(), B_DARKEN_2_TINT));
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
 			owner->SetLowColor(owner->HighColor());
 		} else
 			owner->SetHighColor(owner->LowColor());
@@ -133,36 +134,56 @@ DriveItem::DrawItem(BView* owner, BRect frame, bool complete)
 		owner->FillRect(frame);
 	}
 
-	rgb_color black = {0, 0, 0, 255};
+	if (!IsEnabled()) {
+		rgb_color textColor;
+		if (IsSelected())
+			textColor = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+		else
+			textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
 
-	if (!IsEnabled())
-		owner->SetHighColor(tint_color(black, B_LIGHTEN_2_TINT));
-	else
-		owner->SetHighColor(black);
+		if (textColor.red + textColor.green + textColor.blue > 128 * 3)
+			owner->SetHighColor(tint_color(textColor, B_DARKEN_1_TINT));
+		else
+			owner->SetHighColor(tint_color(textColor, B_LIGHTEN_1_TINT));
+	} else {
+		if (IsSelected())
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+		else
+			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
+	}
+
 
 	// icon
 	owner->MovePenTo(frame.left + 4, frame.top + 1);
 	owner->DrawBitmap(fIcon);
 
 	// device
-	owner->MovePenTo(frame.left + 8 + fIcon->Bounds().Width(), frame.top + fSecondBaselineOffset);
+	owner->MovePenTo(frame.left + 8 + fIcon->Bounds().Width(),
+		frame.top + fSecondBaselineOffset);
 	owner->DrawString(fPath.Path());
-
-	// size
-	owner->MovePenTo(frame.right - 4 - fSizeWidth, frame.top + fBaselineOffset);
-	owner->DrawString(fSize.String());
 
 	// name
 	BFont boldFont;
+	BFont ownerFont;
+	owner->GetFont(&ownerFont);
 	owner->GetFont(&boldFont);
 	boldFont.SetFace(B_BOLD_FACE);
 	owner->SetFont(&boldFont);
 
-	owner->MovePenTo(frame.left + 8 + fIcon->Bounds().Width(), frame.top + fBaselineOffset);
+	BPoint namePosition(frame.left + 8 + fIcon->Bounds().Width(),
+		frame.top + fBaselineOffset);
+
+	owner->MovePenTo(namePosition);
 	owner->DrawString(fName.String());
 
+	float nameWidth = owner->StringWidth(fName.String());
+	float messageWidth = frame.right - 4 - fSizeWidth
+		- (frame.left + 8 + fIcon->Bounds().Width()) - nameWidth
+		- fBaselineOffset * 2;
+
 	if (fCanBeInstalled != B_OK) {
-		owner->SetHighColor(140, 0, 0);
+		rgb_color highColor = owner->HighColor();
+		owner->SetHighColor(ui_color(B_FAILURE_COLOR));
 		owner->MovePenBy(fBaselineOffset, 0);
 		const char* message;
 		switch (fCanBeInstalled) {
@@ -179,7 +200,18 @@ DriveItem::DrawItem(BView* owner, BRect frame, bool complete)
 					"Cannot install");
 				break;
 		}
-		owner->DrawString(message);
+		BString truncatedMessage = message;
+		owner->TruncateString(&truncatedMessage, B_TRUNCATE_END, messageWidth);
+		owner->DrawString(truncatedMessage);
+		owner->SetHighColor(highColor);
+	}
+	owner->SetFont(&ownerFont);
+		// size
+	BPoint sizePosition(frame.right - 4 - fSizeWidth,
+		frame.top + fBaselineOffset);
+	if (sizePosition.x > namePosition.x + nameWidth) {
+		owner->MovePenTo(sizePosition);
+		owner->DrawString(fSize.String());
 	}
 
 	owner->PopState();
@@ -231,7 +263,8 @@ DrivesPage::DrivesPage(WizardView* wizardView, const BootMenuList& menus,
 	BTextView* description = CreateDescription("description", text);
 	MakeHeading(description);
 
-	fDrivesView = new BListView("drives");
+	fDrivesView = new BListView("drives", B_SINGLE_SELECTION_LIST,
+		B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE | B_FULL_UPDATE_ON_RESIZE);
 	fDrivesView->SetSelectionMessage(new BMessage(kMsgSelectionChanged));
 
 	BScrollView* scrollView = new BScrollView("scrollView", fDrivesView, 0,
