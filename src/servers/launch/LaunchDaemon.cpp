@@ -47,6 +47,7 @@ const static settings_template kJobTemplate[] = {
 	{B_STRING_TYPE, "name", NULL, true},
 	{B_BOOL_TYPE, "disabled", NULL},
 	{B_STRING_TYPE, "launch", NULL},
+	{B_STRING_TYPE, "requires", NULL},
 	{B_BOOL_TYPE, "legacy", NULL},
 	{B_MESSAGE_TYPE, "port", kPortTemplate},
 	{B_BOOL_TYPE, "no_safemode", NULL},
@@ -88,6 +89,10 @@ public:
 			BStringList&		Arguments();
 			void				AddArgument(const char* argument);
 
+			const BStringList&	Requirements() const;
+			BStringList&		Requirements();
+			void				AddRequirement(const char* requirement);
+
 			status_t			Init();
 			status_t			InitCheck() const;
 
@@ -102,6 +107,7 @@ public:
 private:
 			BString				fName;
 			BStringList			fArguments;
+			BStringList			fRequirements;
 			bool				fEnabled;
 			bool				fService;
 			bool				fCreateDefaultPort;
@@ -187,7 +193,7 @@ private:
 			Job*				_Job(const char* name);
 			void				_InitJobs();
 			void				_LaunchJobs();
-			void				_AddLaunchJob(Job* job);
+			LaunchJob*			_AddLaunchJob(Job* job);
 
 			void				_RetrieveKernelOptions();
 			void				_SetupEnvironment();
@@ -339,6 +345,27 @@ void
 Job::AddArgument(const char* argument)
 {
 	fArguments.Add(argument);
+}
+
+
+const BStringList&
+Job::Requirements() const
+{
+	return fRequirements;
+}
+
+
+BStringList&
+Job::Requirements()
+{
+	return fRequirements;
+}
+
+
+void
+Job::AddRequirement(const char* requirement)
+{
+	fRequirements.Add(requirement);
 }
 
 
@@ -778,6 +805,13 @@ LaunchDaemon::_AddJob(bool service, BMessage& message)
 		job->AddArgument(argument);
 	}
 
+	const char* requirement;
+	for (int32 index = 0;
+			message.FindString("requires", index, &requirement) == B_OK;
+			index++) {
+		job->AddRequirement(requirement);
+	}
+
 	fJobs.insert(std::pair<BString, Job*>(job->Name(), job));
 }
 
@@ -820,11 +854,11 @@ LaunchDaemon::_LaunchJobs()
 }
 
 
-void
+LaunchJob*
 LaunchDaemon::_AddLaunchJob(Job* job)
 {
 	if (job->IsLaunched())
-		return;
+		return NULL;
 
 	LaunchJob* launchJob = new LaunchJob(job);
 
@@ -832,7 +866,19 @@ LaunchDaemon::_AddLaunchJob(Job* job)
 	if (fInitTarget->State() < B_JOB_STATE_SUCCEEDED)
 		launchJob->AddDependency(fInitTarget);
 
+	for (int32 index = 0; index < job->Requirements().CountStrings(); index++) {
+		Job* dependency = _Job(job->Requirements().StringAt(index));
+		if (dependency != NULL) {
+			// Create launch job
+			// TODO: detect circular dependencies!
+			LaunchJob* dependentLaunchJob = _AddLaunchJob(dependency);
+			if (dependentLaunchJob != NULL)
+				launchJob->AddDependency(dependentLaunchJob);
+		}
+	}
+
 	fJobQueue.AddJob(launchJob);
+	return launchJob;
 }
 
 
