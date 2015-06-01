@@ -6,6 +6,7 @@ UsePrivateSystemHeaders ;
 Server launch_daemon
 	:
 	LaunchDaemon.cpp
+	Worker.cpp
 
 	# init jobs
 	AbstractEmptyDirectoryJob.cpp
