@@ -59,6 +59,8 @@ RemotePackageRepository HaikuPorts
 	clang_analysis-3.5.1-1
 	cmake-3.0.0_rc6-1
 	coreutils-8.23-1
+	cppunit-1.12.1-2
+	cppunit_devel-1.12.1-2
 	ctags-5.8-3
 	curl-7.42.1-1
 	curl_devel-7.42.1-1
@@ -186,6 +188,8 @@ RemotePackageRepository HaikuPorts
 	libpng_devel-1.5.22-1
 	libpng16-1.6.17-1
 	libpng16_devel-1.6.17-1
+	librevenge-0.0.1-1
+	librevenge_devel-0.0.1-1
 	libsamplerate-0.1.8-2
 	libsamplerate_devel-0.1.8-2
 	libsndfile-1.0.25-3
@@ -326,6 +330,7 @@ RemotePackageRepository HaikuPorts
 	clang
 	cmake
 	coreutils
+	cppunit
 	ctags
 	curl
 	cvs
@@ -393,6 +398,7 @@ RemotePackageRepository HaikuPorts
 	libpcre
 	libpng
 	libpng16
+	librevenge
 	libsamplerate
 	libsdl
 	libsdl2
