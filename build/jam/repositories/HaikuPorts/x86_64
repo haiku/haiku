@@ -124,8 +124,8 @@ RemotePackageRepository HaikuPorts
 	haikuwebkit-1.4.10-1
 	haikuwebkit_devel-1.4.10-1
 	handbrake-0.10.1-1
-	harfbuzz-0.9.39-1
-	harfbuzz_devel-0.9.39-1
+	harfbuzz-0.9.40-1
+	harfbuzz_devel-0.9.40-1
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
 	icu-55.1-3
@@ -222,8 +222,8 @@ RemotePackageRepository HaikuPorts
 	llvm-3.5.2-1
 	lua-5.2.3-2
 	lua_devel-5.2.3-2
-	lz4-r117-1
-	lz4_devel-r117-1
+	lz4-r130-1
+	lz4_devel-r130-1
 	lzo-2.09-1
 	lzo_devel-2.09-1
 	m4-1.4.16-5
@@ -275,7 +275,7 @@ RemotePackageRepository HaikuPorts
 	sed-4.2.1-6
 	serf-1.3.7-1
 	serf_devel-1.3.7-1
-	sharutils-4.14-1
+	sharutils-4.15.2-1
 	smpeg-0.4.5-4
 	smpeg_devel-0.4.5-4
 	speex-1.2~rc1-2
