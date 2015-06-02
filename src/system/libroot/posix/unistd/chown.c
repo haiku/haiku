@@ -14,61 +14,54 @@
 #include <syscall_utils.h>
 
 
-int
-chown(const char *path, uid_t owner, gid_t group)
+static int
+common_chown(int fd, const char* path, bool followLinks, uid_t owner,
+	gid_t group)
 {
 	struct stat stat;
 	status_t status;
 
-	stat.st_uid = owner;
-	stat.st_gid = group;
-	status = _kern_write_stat(-1, path, true, &stat, sizeof(struct stat),
-		B_STAT_UID | B_STAT_GID);
+	int mask = 0;
+	if (owner != (uid_t)-1) {
+		stat.st_uid = owner;
+		mask |= B_STAT_UID;
+	}
+	if (group != (gid_t)-1) {
+		stat.st_gid = group;
+		mask |= B_STAT_GID;
+	}
+
+	status = _kern_write_stat(fd, path, followLinks, &stat,
+		sizeof(struct stat), mask);
 
 	RETURN_AND_SET_ERRNO(status);
+}
+
+
+int
+chown(const char *path, uid_t owner, gid_t group)
+{
+	return common_chown(-1, path, true, owner, group);
 }
 
 
 int
 lchown(const char *path, uid_t owner, gid_t group)
 {
-	struct stat stat;
-	status_t status;
-
-	stat.st_uid = owner;
-	stat.st_gid = group;
-	status = _kern_write_stat(-1, path, false, &stat, sizeof(struct stat),
-		B_STAT_UID | B_STAT_GID);
-
-	RETURN_AND_SET_ERRNO(status);
+	return common_chown(-1, path, false, owner, group);
 }
 
 
 int
 fchown(int fd, uid_t owner, gid_t group)
 {
-	struct stat stat;
-	status_t status;
-
-	stat.st_uid = owner;
-	stat.st_gid = group;
-	status = _kern_write_stat(fd, NULL, false, &stat, sizeof(struct stat),
-		B_STAT_UID | B_STAT_GID);
-
-	RETURN_AND_SET_ERRNO(status);
+	return common_chown(fd, NULL, false, owner, group);
 }
 
 
 int
 fchownat(int fd, const char* path, uid_t owner, gid_t group, int flag)
 {
-	struct stat stat;
-	status_t status;
-
-	stat.st_uid = owner;
-	stat.st_gid = group;
-	status = _kern_write_stat(fd, path, (flag & AT_SYMLINK_NOFOLLOW) == 0, &stat,
-		sizeof(struct stat), B_STAT_UID | B_STAT_GID);
-
-	RETURN_AND_SET_ERRNO(status);
+	return common_chown(fd, path, (flag & AT_SYMLINK_NOFOLLOW) == 0, owner,
+		group);
 }
