@@ -754,6 +754,7 @@ RemotePackageRepository HaikuPorts
 	qca2_x86_devel-2.0.3-1
 	qjson_x86-0.8.1-1
 	qjson_x86_devel-0.8.1-1
+	qmplay2_x86-15.05.30-1
 	quassel_x86-0.10.0-2
 	quicklaunch-0.9.9-1
 	qupzilla_x86-1.8.6-1
@@ -1147,6 +1148,7 @@ RemotePackageRepository HaikuPorts
 	qemu_x86
 	qca2_x86
 	qjson_x86
+	qmplay2_x86
 	qrencode
 	quassel_x86
 	quicklaunch
