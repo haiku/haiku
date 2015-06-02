@@ -27,6 +27,30 @@ RemotePackageRepository HaikuPorts
 #	bepdf-1.1.1~beta5_2013_04_28-1
 	binutils-2.25_2014_12_27-1
 	bison-2.6.5-1
+	boost-1.55.0-6
+	boost_atomic-1.55.0-6
+	boost_chrono-1.55.0-6
+	boost_context-1.55.0-6
+	boost_coroutine-1.55.0-6
+	boost_date_time-1.55.0-6
+	boost_devel-1.55.0-6
+	boost_filesystem-1.55.0-6
+	boost_graph-1.55.0-6
+	boost_iostreams-1.55.0-6
+	boost_locale-1.55.0-6
+	boost_log-1.55.0-6
+	boost_math-1.55.0-6
+	boost_program_options-1.55.0-6
+	boost_random-1.55.0-6
+	boost_regex-1.55.0-6
+	boost_serialization-1.55.0-6
+	boost_signals-1.55.0-6
+	boost_system-1.55.0-6
+	boost_test-1.55.0-6
+	boost_thread-1.55.0-6
+	boost_timer-1.55.0-6
+	boost_unit_test_framework-1.55.0-6
+	boost_wave-1.55.0-6
 	buildbot_slave-0.8.8-2
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
@@ -221,6 +245,8 @@ RemotePackageRepository HaikuPorts
 	neon_devel-0.29.6-7
 	netcat-1.10-1
 	ninja-1.5.1-2
+	nspr-4.10.8-1
+	nspr_devel-4.10.8-1
 	openssh-6.6p1-1
 	openssl-1.0.0r-1
 	openssl_devel-1.0.0r-1
@@ -400,6 +426,7 @@ RemotePackageRepository HaikuPorts
 	neon
 	netcat
 	ninja
+	nspr
 	openssh
 	openssl
 	p7zip
