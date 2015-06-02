@@ -95,7 +95,12 @@ ZipperThread::ThreadStartup()
 
 	BString archiveName;
 
-	if (gotDirRef || sameFolder) {
+	if (gotDirRef) {
+		BEntry entry(&dirRef);
+		BPath path;
+		entry.GetPath(&path);
+		archiveName = path.Path();
+	} else if (sameFolder) {
 		BEntry entry(&lastRef);
 		BPath path;
 		entry.GetParent(&entry);
