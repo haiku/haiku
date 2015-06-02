@@ -91,6 +91,8 @@ RemotePackageRepository HaikuPorts
 	doxygen-1.7.6.1-1
 	ducksaver-1.1.0-2
 	ed-1.7-1
+	enca-1.15-1
+	enca_devel-1.15-1
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
 	faac-1.28-2
@@ -536,6 +538,8 @@ RemotePackageRepository HaikuPorts
 	documentviewer_x86-0.3_git-7
 	dosbox_x86-0.74-1
 	dtc_x86-1.4.1-1
+	enca_x86-1.15-1
+	enca_x86_devel-1.15-1
 	expat_x86-2.0.1-7
 	expat_x86_devel-2.0.1-7
 	faad2_x86-2.7-1
@@ -892,6 +896,8 @@ RemotePackageRepository HaikuPorts
 	dtc_x86
 	ducksaver
 	ed
+	enca
+	enca_x86
 	expat
 	faac
 	faad2
