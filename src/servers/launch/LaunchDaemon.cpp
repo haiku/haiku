@@ -5,6 +5,7 @@
 
 
 #include <map>
+#include <set>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -64,7 +65,19 @@ const static settings_template kSettingsTemplate[] = {
 typedef std::map<BString, BMessage> PortMap;
 
 
-class Job {
+class Target : public BJob {
+public:
+								Target(const char* name);
+
+protected:
+	virtual	status_t			Execute();
+};
+
+
+class JobFinder;
+
+
+class Job : public BJob {
 public:
 								Job(const char* name);
 	virtual						~Job();
@@ -93,7 +106,8 @@ public:
 			BStringList&		Requirements();
 			void				AddRequirement(const char* requirement);
 
-			status_t			Init();
+			status_t			Init(Target* target, const JobFinder& jobs,
+									std::set<BString>& dependencies);
 			status_t			InitCheck() const;
 
 			team_id				Team() const;
@@ -103,6 +117,9 @@ public:
 
 			status_t			Launch();
 			bool				IsLaunched() const;
+
+protected:
+	virtual	status_t			Execute();
 
 private:
 			BString				fName;
@@ -118,34 +135,21 @@ private:
 };
 
 
-class LaunchJob : public BJob {
-public:
-								LaunchJob(Job* job);
-
-protected:
-	virtual	status_t			Execute();
-
-private:
-			Job*				fJob;
-};
-
-
-class Target : public BJob {
-public:
-								Target(const char* name);
-
-protected:
-	virtual	status_t			Execute();
-};
-
-
 typedef std::map<BString, Job*> JobMap;
 
 
-class LaunchDaemon : public BServer {
+class JobFinder {
+public:
+	virtual	Job*				FindJob(const char* name) const = 0;
+};
+
+
+class LaunchDaemon : public BServer, public JobFinder {
 public:
 								LaunchDaemon(status_t& error);
 	virtual						~LaunchDaemon();
+
+	virtual	Job*				FindJob(const char* name) const;
 
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
@@ -158,10 +162,9 @@ private:
 			status_t			_ReadFile(const char* context, BEntry& entry);
 
 			void				_AddJob(bool service, BMessage& message);
-			Job*				_Job(const char* name);
-			void				_InitJobs();
+			void				_InitJobs(Target* target);
 			void				_LaunchJobs();
-			LaunchJob*			_AddLaunchJob(Job* job);
+			void				_AddLaunchJob(Job* job);
 
 			void				_RetrieveKernelOptions();
 			void				_SetupEnvironment();
@@ -195,7 +198,7 @@ get_leaf(const char* signature)
 
 Job::Job(const char* name)
 	:
-	fName(name),
+	BJob(name),
 	fEnabled(true),
 	fService(false),
 	fCreateDefaultPort(false),
@@ -203,7 +206,6 @@ Job::Job(const char* name)
 	fInitStatus(B_NO_INIT),
 	fTeam(-1)
 {
-	fName.ToLower();
 }
 
 
@@ -221,7 +223,7 @@ Job::~Job()
 const char*
 Job::Name() const
 {
-	return fName.String();
+	return Title().String();
 }
 
 
@@ -332,9 +334,46 @@ Job::AddRequirement(const char* requirement)
 
 
 status_t
-Job::Init()
+Job::Init(Target* target, const JobFinder& jobs,
+	std::set<BString>& dependencies)
 {
+	// Only initialize the jobs once
+	if (fInitStatus != B_NO_INIT)
+		return fInitStatus;
+
 	fInitStatus = B_OK;
+
+	if (target != NULL && target->State() < B_JOB_STATE_SUCCEEDED)
+		AddDependency(target);
+
+	// Check dependencies
+
+	for (int32 index = 0; index < Requirements().CountStrings(); index++) {
+		const BString& requires = Requirements().StringAt(index);
+		if (dependencies.find(requires) != dependencies.end()) {
+			// Found a cyclic dependency
+			// TODO: log error
+			return fInitStatus = B_ERROR;
+		}
+		dependencies.insert(requires);
+
+		Job* dependency = jobs.FindJob(requires);
+		if (dependency != NULL) {
+			std::set<BString> subDependencies = dependencies;
+
+			fInitStatus = dependency->Init(target, jobs, subDependencies);
+			if (fInitStatus != B_OK) {
+				// TODO: log error
+				return fInitStatus;
+			}
+
+			AddDependency(dependency);
+		} else {
+			// Could not find dependency
+			// TODO: log error
+			return fInitStatus = B_NAME_NOT_FOUND;
+		}
+	}
 
 	// Create ports
 	// TODO: prefix system ports with "system:"
@@ -366,9 +405,10 @@ Job::Init()
 		data.AddInt32("capacity", B_LOOPER_PORT_DEFAULT_CAPACITY);
 
 		port_id port = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, Name());
-		if (port < 0)
+		if (port < 0) {
+			// TODO: log error
 			fInitStatus = port;
-		else {
+		} else {
 			data.SetInt32("port", port);
 			AddPort(data);
 		}
@@ -455,22 +495,11 @@ Job::IsLaunched() const
 }
 
 
-// #pragma mark -
-
-
-LaunchJob::LaunchJob(Job* job)
-	:
-	BJob(job->Name()),
-	fJob(job)
-{
-}
-
-
 status_t
-LaunchJob::Execute()
+Job::Execute()
 {
-	if (!fJob->IsLaunched())
-		return fJob->Launch();
+	if (!IsLaunched())
+		return Launch();
 
 	return B_OK;
 }
@@ -512,6 +541,20 @@ LaunchDaemon::~LaunchDaemon()
 }
 
 
+Job*
+LaunchDaemon::FindJob(const char* name) const
+{
+	if (name == NULL)
+		return NULL;
+
+	JobMap::const_iterator found = fJobs.find(BString(name).ToLower());
+	if (found != fJobs.end())
+		return found->second;
+
+	return NULL;
+}
+
+
 void
 LaunchDaemon::ReadyToRun()
 {
@@ -528,7 +571,7 @@ LaunchDaemon::ReadyToRun()
 		B_FIND_PATHS_SYSTEM_ONLY, paths);
 	_ReadPaths(paths);
 
-	_InitJobs();
+	_InitJobs(fInitTarget);
 	_LaunchJobs();
 }
 
@@ -540,7 +583,7 @@ LaunchDaemon::MessageReceived(BMessage* message)
 		case B_GET_LAUNCH_DATA:
 		{
 			BMessage reply((uint32)B_OK);
-			Job* job = _Job(get_leaf(message->GetString("name")));
+			Job* job = FindJob(get_leaf(message->GetString("name")));
 			if (job == NULL) {
 				reply.what = B_NAME_NOT_FOUND;
 			} else {
@@ -643,13 +686,14 @@ LaunchDaemon::_ReadFile(const char* context, BEntry& entry)
 void
 LaunchDaemon::_AddJob(bool service, BMessage& message)
 {
-	const char* name = message.GetString("name");
-	if (name == NULL || name[0] == '\0') {
+	BString name = message.GetString("name");
+	if (name.IsEmpty()) {
 		// Invalid job description
 		return;
 	}
+	name.ToLower();
 
-	Job* job = _Job(name);
+	Job* job = FindJob(name);
 	if (job == NULL)
 		job = new Job(name);
 
@@ -682,28 +726,29 @@ LaunchDaemon::_AddJob(bool service, BMessage& message)
 }
 
 
-Job*
-LaunchDaemon::_Job(const char* name)
-{
-	if (name == NULL)
-		return NULL;
-
-	JobMap::const_iterator found = fJobs.find(BString(name).ToLower());
-	if (found != fJobs.end())
-		return found->second;
-
-	return NULL;
-}
-
-
 void
-LaunchDaemon::_InitJobs()
+LaunchDaemon::_InitJobs(Target* target)
 {
-	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
-			iterator++) {
+	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();) {
 		Job* job = iterator->second;
-		if (job->IsEnabled() && (!_IsSafeMode() || job->LaunchInSafeMode()))
-			job->Init();
+		JobMap::iterator remove = iterator++;
+
+		status_t status = B_NO_INIT;
+		if (job->IsEnabled() && (!_IsSafeMode() || job->LaunchInSafeMode())) {
+			std::set<BString> dependencies;
+			status = job->Init(target, *this, dependencies);
+		}
+
+		if (status != B_OK) {
+			if (status != B_NO_INIT) {
+				// TODO: log error
+				debug_printf("Init \"%s\" failed: %s\n", job->Name(),
+					strerror(status));
+			}
+
+			// Remove jobs that aren't user later on
+			fJobs.erase(remove);
+		}
 	}
 }
 
@@ -714,37 +759,16 @@ LaunchDaemon::_LaunchJobs()
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
 			iterator++) {
 		Job* job = iterator->second;
-		if (job->IsEnabled() && job->InitCheck() == B_OK)
-			_AddLaunchJob(job);
+		_AddLaunchJob(job);
 	}
 }
 
 
-LaunchJob*
+void
 LaunchDaemon::_AddLaunchJob(Job* job)
 {
-	if (job->IsLaunched())
-		return NULL;
-
-	LaunchJob* launchJob = new LaunchJob(job);
-
-	// All jobs depend on the init target
-	if (fInitTarget->State() < B_JOB_STATE_SUCCEEDED)
-		launchJob->AddDependency(fInitTarget);
-
-	for (int32 index = 0; index < job->Requirements().CountStrings(); index++) {
-		Job* dependency = _Job(job->Requirements().StringAt(index));
-		if (dependency != NULL) {
-			// Create launch job
-			// TODO: detect circular dependencies!
-			LaunchJob* dependentLaunchJob = _AddLaunchJob(dependency);
-			if (dependentLaunchJob != NULL)
-				launchJob->AddDependency(dependentLaunchJob);
-		}
-	}
-
-	fJobQueue.AddJob(launchJob);
-	return launchJob;
+	if (!job->IsLaunched())
+		fJobQueue.AddJob(job);
 }
 
 
