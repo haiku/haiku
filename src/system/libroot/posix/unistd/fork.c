@@ -13,6 +13,7 @@
 #include <errno_private.h>
 #include <locks.h>
 #include <libroot_private.h>
+#include <pthread_private.h>
 #include <runtime_loader.h>
 #include <syscalls.h>
 
@@ -147,6 +148,8 @@ fork(void)
 		// we are the child
 		// ToDo: initialize child
 		__main_thread_id = find_thread(NULL);
+		pthread_self()->id = __main_thread_id;
+
 		mutex_init(&sForkLock, FORK_LOCK_NAME);
 			// TODO: The lock is already initialized and we in the fork()ing
 			// process we should make sure that it is in a consistent state when
