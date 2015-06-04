@@ -12,10 +12,15 @@ USES_BE_API on <build>makebootable = true ;
 
 local hostPlatformSources ;
 if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd || $(HOST_PLATFORM) = darwin {
-	hostPlatformSources = PartitionMap.cpp PartitionMapParser.cpp ;
+	UsePrivateHeaders interface ;
+
+	hostPlatformSources = PartitionMap.cpp PartitionMapParser.cpp
+		crc32.cpp Header.cpp utility.cpp ;
 
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel
 		partitioning_systems intel ] ;
+	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel
+		partitioning_systems gpt ] ;
 
 	DEFINES += _USER_MODE ;
 }

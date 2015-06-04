@@ -55,6 +55,9 @@
 #endif
 
 #if USE_PARTITION_MAP
+#	include "guid.h"
+#	include "gpt_known_guids.h"
+#	include "Header.h"
 #	include "PartitionMap.h"
 #	include "PartitionMapParser.h"
 #endif
@@ -238,6 +241,59 @@ dump_partition_map(const PartitionMap& map)
 	}
 }
 
+
+static void
+get_partition_offset(int deviceFD, off_t deviceStart, off_t deviceSize,
+		int blockSize, int partitionIndex, char *deviceName,
+		int64 &_partitionOffset)
+{
+	PartitionMapParser parser(deviceFD, deviceStart, deviceSize, blockSize);
+	PartitionMap map;
+	status_t error = parser.Parse(NULL, &map);
+	if (error == B_OK) {
+		Partition *partition = map.PartitionAt(partitionIndex - 1);
+		if (!partition || partition->IsEmpty()) {
+			fprintf(stderr, "Error: Invalid partition index %d.\n",
+				partitionIndex);
+			dump_partition_map(map);
+			exit(1);
+		}
+
+		if (partition->IsExtended()) {
+			fprintf(stderr, "Error: Partition %d is an extended "
+				"partition.\n", partitionIndex);
+			dump_partition_map(map);
+			exit(1);
+		}
+
+		_partitionOffset = partition->Offset();
+	} else {
+		// try again using GPT instead
+		EFI::Header gptHeader(deviceFD, deviceSize, blockSize);
+		error = gptHeader.InitCheck();
+		if (error == B_OK && partitionIndex < gptHeader.EntryCount()) {
+			efi_partition_entry partition = gptHeader.EntryAt(partitionIndex - 1);
+
+			static_guid bfs_uuid = {0x42465331, 0x3BA3, 0x10F1,
+				0x802A4861696B7521LL};
+
+			if (!(bfs_uuid == partition.partition_type)) {
+				fprintf(stderr, "Error: Partition %d does not have the "
+					"BFS UUID.\n", partitionIndex);
+				exit(1);
+			}
+
+			_partitionOffset = partition.StartBlock() * blockSize;
+		} else {
+			fprintf(stderr, "Error: Parsing partition table on device "
+				"\"%s\" failed: %s\n", deviceName, strerror(error));
+			exit(1);
+		}
+	}
+
+	close(deviceFD);
+}
+
 #endif
 
 
@@ -407,36 +463,8 @@ main(int argc, const char *const *argv)
 
 					// parse the partition map
 					// TODO: block size!
-					PartitionMapParser parser(baseFD, 0, deviceSize, 512);
-					PartitionMap map;
-					error = parser.Parse(NULL, &map);
-					if (error != B_OK) {
-						fprintf(stderr, "Error: Parsing partition table on "
-							"device \"%s\" failed: %s\n", baseDeviceName,
-							strerror(error));
-						exit(1);
-					}
-
-					close(baseFD);
-
-					// check the partition we are supposed to write at
-					Partition *partition = map.PartitionAt(partitionIndex - 1);
-					if (!partition || partition->IsEmpty()) {
-						fprintf(stderr, "Error: Invalid partition index %d.\n",
-							partitionIndex);
-						dump_partition_map(map);
-						exit(1);
-					}
-
-					if (partition->IsExtended()) {
-						fprintf(stderr, "Error: Partition %d is an extended "
-							"partition.\n", partitionIndex);
-						dump_partition_map(map);
-						exit(1);
-					}
-
-					partitionOffset = partition->Offset();
-
+					get_partition_offset(baseFD, 0, deviceSize, 512,
+						partitionIndex, baseDeviceName, partitionOffset);
 				} else {
 					// The given device is the base device. We'll write at
 					// offset 0.
@@ -498,35 +526,8 @@ main(int argc, const char *const *argv)
 
 					// parse the partition map
 					// TODO: block size!
-					PartitionMapParser parser(baseFD, 0, deviceSize, 512);
-					PartitionMap map;
-					error = parser.Parse(NULL, &map);
-					if (error != B_OK) {
-						fprintf(stderr, "Error: Parsing partition table on "
-							"device \"%s\" failed: %s\n", baseDeviceName,
-							strerror(error));
-						exit(1);
-					}
-
-					close(baseFD);
-
-					// check the partition we are supposed to write at
-					Partition *partition = map.PartitionAt(partitionIndex - 1);
-					if (!partition || partition->IsEmpty()) {
-						fprintf(stderr, "Error: Invalid partition index %d.\n",
-							partitionIndex);
-						dump_partition_map(map);
-						exit(1);
-					}
-
-					if (partition->IsExtended()) {
-						fprintf(stderr, "Error: Partition %d is an extended "
-							"partition.\n", partitionIndex);
-						dump_partition_map(map);
-						exit(1);
-					}
-
-					partitionOffset = partition->Offset();
+					get_partition_offset(baseFD, 0, deviceSize, 512,
+						partitionIndex, baseDeviceName, partitionOffset);
 				} else {
 					// The given device is the base device. We'll write at
 					// offset 0.
@@ -571,34 +572,8 @@ main(int argc, const char *const *argv)
 				deviceSize = blockSize * blockCount;
 
 				// parse the partition map
-				PartitionMapParser parser(baseFD, 0, deviceSize, blockSize);
-				PartitionMap map;
-				error = parser.Parse(NULL, &map);
-				if (error != B_OK) {
-					fprintf(stderr, "Error: Parsing partition table on "
-							"device \"%s\" failed: %s\n", baseDeviceName,
-							strerror(error));
-					exit(1);
-				}
-
-				close(baseFD);
-
-				// check the partition we are supposed to write at
-				Partition *partition = map.PartitionAt(partitionIndex - 1);
-				if (!partition || partition->IsEmpty()) {
-					fprintf(stderr, "Error: Invalid partition index %d.\n",
-						partitionIndex);
-					dump_partition_map(map);
-					exit(1);
-				}
-
-				if (partition->IsExtended()) {
-					fprintf(stderr, "Error: Partition %d is an extended "
-						"partition.\n", partitionIndex);
-					dump_partition_map(map);
-					exit(1);
-				}
-				partitionOffset = partition->Offset();
+				get_partition_offset(baseFD, 0, deviceSize, 512,
+						partitionIndex, baseDeviceName, partitionOffset);
 			#else
 			// partitions are block devices under Haiku, but not under BeOS
 			#ifdef HAIKU_TARGET_PLATFORM_HAIKU
