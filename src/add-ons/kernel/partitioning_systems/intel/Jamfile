@@ -10,6 +10,10 @@ BuildMBR [ FGristFiles mbr.bin ] : mbr.S ;
 DataFileToSourceFile [ FGristFiles MBR.h ] : [ FGristFiles mbr.bin ]
 	: kMBR : kMBRSize ;
 
+if $(HAIKU_ARCH) = "x86" || $(HAIKU_ARCH) = "x86"64 {
+	Depends [ FGristFiles PartitionMapWriter.cpp ] : [ FGristFiles MBR.h ] ;
+}
+
 KernelAddon intel :
 	intel.cpp
 	PartitionLocker.cpp

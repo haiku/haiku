@@ -37,7 +37,10 @@ using std::nothrow;
 #endif
 
 
-#include "MBR.h"
+#if defined(__INTEL__) || defined(__x86_64__)
+#define MBR_HEADER "MBR.h"
+#include MBR_HEADER
+#endif
 
 
 bool
@@ -103,12 +106,14 @@ PartitionMapWriter::WriteMBR(const PartitionMap* map, bool writeBootCode)
 	status_t error = _ReadBlock(0, partitionTable);
 	if (error != B_OK)
 		return error;
+#ifdef MBR_HEADER
 	if (writeBootCode) {
 		// the boot code must be small enough to fit in the code area
 		STATIC_ASSERT(kMBRSize <= sizeof(partitionTable.code_area));
 		partitionTable.clear_code_area();
 		partitionTable.fill_code_area(kMBR, kMBRSize);
 	}
+#endif
 
 	partitionTable.signature = kPartitionTableSectorSignature;
 
