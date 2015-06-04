@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.05.26
-#	Date:    2015-05-26 03:15:02
+#	Version: 2015.06.04
+#	Date:    2015-06-04 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -4096,6 +4096,7 @@
 		102b 2100  MGA-2164W Millennium II
 	051e  MGA 1064SG [Mystique] AGP
 	051f  MGA 2164W [Millennium II] AGP
+		102b 2100  MGA-2164WA [Millennium II A]
 	0520  MGA G200
 		102b dbc2  G200 Multi-Monitor
 		102b dbc8  G200 Multi-Monitor
@@ -4136,7 +4137,7 @@
 		102b f806  Mystique G200 Video AGP
 		102b ff00  MGA-G200 AGP
 		102b ff02  Mystique G200 AGP
-		102b ff03  Millennium G200 AGP
+		102b ff03  Millennium G200A AGP
 		102b ff04  Marvel G200 AGP
 		110a 0032  MGA-G200 AGP
 	0522  MGA G200e [Pilot] ServerEngines (SEP1)
@@ -10680,8 +10681,11 @@
 	0620  RocketRAID 620 2 Port SATA-III Controller
 	0622  RocketRAID 622 2 Port SATA-III Controller
 	0640  RocketRAID 640 4 Port SATA-III Controller
+	0641  RocketRAID 640L 4 Port SATA-III Controller
+	0642  RocketRAID 642L SATA-III Controller (2 eSATA ports + 2 internal SATA ports)
 	0644  RocketRAID 644 4 Port SATA-III Controller (eSATA)
 	0645  RocketRAID 644L 4 Port SATA-III Controller (eSATA)
+	0646  RocketRAID 644LS SATA-III Controller (4 eSATA devices connected by 1 SAS cable)
 	1720  RocketRAID 1720 (2x SATA II RAID Controller)
 	1740  RocketRAID 1740
 	1742  RocketRAID 1742
@@ -10943,6 +10947,7 @@
 		1462 3091  MS-6309 Onboard Audio
 		1462 3092  MS-6309 v2.x Mainboard (VIA VT1611A codec)
 		1462 3300  MS-6330 Onboard Audio
+		1462 3400  MS-6340 (VT8363) motherboard
 		15dd 7609  Onboard Audio
 	3059  VT8233/A/8235/8237 AC97 Audio Controller
 		1019 0a81  L7VTA v1.0 Motherboard (KT400-8235)
@@ -15699,7 +15704,6 @@
 	1003  HCF 56k Data/Fax Modem
 148e  OSI Plus Corporation
 148f  Plant Equipment, Inc.
-	5370  Dexlink AUWL15I1
 1490  Stone Microsystems PTY Ltd.
 1491  ZEAL Corporation
 1492  Time Logic Corporation
@@ -19221,6 +19225,7 @@
 1d44  DPT
 	a400  PM2x24/PM3224
 1d5c  Fantasia Trading LLC
+1d6c  Atomic Rules LLC
 1de1  Tekram Technology Co.,Ltd.
 	0391  TRM-S1040
 	2020  DC-390
@@ -21701,6 +21706,7 @@
 	1a24  82840 840 [Carmel] Chipset PCI Bridge (Hub B)
 	1a30  82845 845 [Brookdale] Chipset Host Bridge
 		1028 010e  Optiplex GX240
+		147b 0505  BL7 motherboard
 		15d9 3280  Supermicro P4SBE Mainboard
 	1a31  82845 845 [Brookdale] Chipset AGP Bridge
 	1a38  5000 Series Chipset DMA Engine
@@ -22176,7 +22182,7 @@
 	2428  82801AB PCI Bridge
 	2440  82801BA ISA Bridge (LPC)
 		8086 5744  S845WD1-E
-	2442  82801BA/BAM USB Controller #1
+	2442  82801BA/BAM UHCI USB 1.1 Controller #1
 		1014 01c6  Netvista A40/A40p
 		1025 1016  Travelmate 612 TX
 		1028 00c7  Dimension 8100
@@ -22185,6 +22191,7 @@
 		103c 126f  e-pc 40
 		1043 8027  TUSL2-C Mainboard
 		104d 80df  Vaio PCG-FX403
+		147b 0505  BL7 motherboard
 		147b 0507  TH7II-RAID
 		8086 4532  D815EEA2 mainboard
 		8086 4557  D815EGEW Mainboard
@@ -22198,12 +22205,13 @@
 		103c 126f  e-pc 40
 		1043 8027  TUSL2-C Mainboard
 		104d 80df  Vaio PCG-FX403
+		147b 0505  BL7 motherboard
 		147b 0507  TH7II-RAID
 		15d9 3280  Supermicro P4SBE Mainboard
 		8086 4532  D815EEA2 mainboard
 		8086 4557  D815EGEW Mainboard
 		8086 5744  S845WD1-E mainboard
-	2444  82801BA/BAM USB Controller #1
+	2444  82801BA/BAM UHCI USB 1.1 Controller #2
 		1025 1016  Travelmate 612 TX
 		1028 00c7  Dimension 8100
 		1028 00d8  Precision 530
@@ -22211,6 +22219,7 @@
 		103c 126f  e-pc 40
 		1043 8027  TUSL2-C Mainboard
 		104d 80df  Vaio PCG-FX403
+		147b 0505  BL7 motherboard
 		147b 0507  TH7II-RAID
 		8086 4532  D815EEA2 mainboard
 		8086 5744  S845WD1-E mainboard
@@ -22223,6 +22232,7 @@
 		103c 126f  e-pc 40
 		104d 80df  Vaio PCG-FX403
 		1462 3370  STAC9721 AC
+		147b 0505  BL7 motherboard
 		147b 0507  TH7II-RAID
 		8086 4557  D815EGEW Mainboard
 	2446  82801BA/BAM AC'97 Modem Controller
@@ -22290,6 +22300,7 @@
 		1028 010e  Optiplex GX240
 		103c 126f  e-pc 40
 		1043 8027  TUSL2-C Mainboard
+		147b 0505  BL7 motherboard
 		147b 0507  TH7II-RAID
 		15d9 3280  Supermicro P4SBE Mainboard
 		8086 4532  D815EEA2 mainboard
