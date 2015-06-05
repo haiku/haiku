@@ -19,11 +19,13 @@
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <File.h>
 #include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Path.h>
+#include <SeparatorView.h>
 #include <ScrollView.h>
 #include <StringView.h>
 
@@ -46,10 +48,16 @@ DNSSettingsView::DNSSettingsView(BNetworkSettingsItem* item)
 	BView("dns", 0),
 	fItem(item)
 {
+	BStringView* titleView = new BStringView("title",
+		B_TRANSLATE("DNS settings"));
+	titleView->SetFont(be_bold_font);
+	titleView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+
 	fServerListView = new BListView("nameservers");
-	fTextControl = new IPAddressControl(AF_UNSPEC, B_TRANSLATE("Server"),
+	fTextControl = new IPAddressControl(AF_UNSPEC, B_TRANSLATE("Server:"),
 		"server");
-	fTextControl->SetExplicitMinSize(BSize(fTextControl->StringWidth("5") * 18,
+	fTextControl->SetExplicitMinSize(BSize(fTextControl->StringWidth("5") * 16
+		+ fTextControl->StringWidth(B_TRANSLATE("Server:")),
 		B_SIZE_UNSET));
 
 	fAddButton = new BButton(B_TRANSLATE("Add"), new BMessage(kMsgAddServer));
@@ -59,15 +67,16 @@ DNSSettingsView::DNSSettingsView(BNetworkSettingsItem* item)
 	fDownButton = new BButton(B_TRANSLATE("Move down"),
 		new BMessage(kMsgMoveDown));
 	fDownButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	fRemoveButton = new BButton(B_TRANSLATE("Remove"), new BMessage(kMsgDeleteServer));
+	fRemoveButton = new BButton(B_TRANSLATE("Remove"),
+		new BMessage(kMsgDeleteServer));
 	fRemoveButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-
+	fDomain = new BTextControl(B_TRANSLATE("Domain:"), "", NULL);
 	fApplyButton = new BButton(B_TRANSLATE("Apply"), new BMessage(kMsgApply));
 
-	BBox* box = new BBox("dns");
-	box->SetLabel(B_TRANSLATE("DNS servers"));
-	box->AddChild(BLayoutBuilder::Grid<>()
-		.SetInsets(B_USE_DEFAULT_SPACING)
+	float spacing = be_control_look->DefaultItemSpacing();
+
+	BGridView* serviceGridView = new BGridView();
+	BLayoutBuilder::Grid<>(serviceGridView)
 		.Add(fTextControl, 0, 0)
 		.Add(fAddButton, 1, 0)
 		.Add(new BScrollView("scroll", fServerListView, 0, false, true),
@@ -75,11 +84,14 @@ DNSSettingsView::DNSSettingsView(BNetworkSettingsItem* item)
 		.Add(fUpButton, 1, 1)
 		.Add(fDownButton, 1, 2)
 		.Add(fRemoveButton, 1, 3)
-		.View());
+		.SetColumnWeight(0, 10.f);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.Add(box)
-		.Add(fDomain = new BTextControl(B_TRANSLATE("Domain"), "", NULL))
+		.Add(titleView)
+		.Add(serviceGridView)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.Add(fDomain)
+		.AddStrut(spacing)
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
 			.Add(fApplyButton);
