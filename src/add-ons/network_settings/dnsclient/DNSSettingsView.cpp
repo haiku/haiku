@@ -54,11 +54,10 @@ DNSSettingsView::DNSSettingsView(BNetworkSettingsItem* item)
 	titleView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fServerListView = new BListView("nameservers");
-	fTextControl = new IPAddressControl(AF_UNSPEC, B_TRANSLATE("Server:"),
-		"server");
+	const char* serverLabel = B_TRANSLATE("Server:");
+	fTextControl = new IPAddressControl(AF_UNSPEC, serverLabel, "server");
 	fTextControl->SetExplicitMinSize(BSize(fTextControl->StringWidth("5") * 16
-		+ fTextControl->StringWidth(B_TRANSLATE("Server:")),
-		B_SIZE_UNSET));
+		+ fTextControl->StringWidth(serverLabel), B_SIZE_UNSET));
 
 	fAddButton = new BButton(B_TRANSLATE("Add"), new BMessage(kMsgAddServer));
 	fAddButton->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
