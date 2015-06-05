@@ -710,6 +710,7 @@ RemotePackageRepository HaikuPorts
 	luajit_x86-2.0.2-2
 	luajit_x86_devel-2.0.2-2
 	lwtools_x86-4.10-2
+	lyx_x86-2.1.3-1
 	lzip_x86-1.16-1
 	lzo_x86-2.09-1
 	lzo_x86_devel-2.09-1
@@ -803,6 +804,8 @@ RemotePackageRepository HaikuPorts
 	strigi_x86_devel-0.7.5-2
 	taglib_x86-1.9.1-1
 	taglib_x86_devel-1.9.1-1
+	texlive_x86-2014-1
+	texlive_x86_devel-2014-1
 	tiff_x86-3.9.6-2
 	tiff_x86_devel-3.9.6-2
 	tinyxml_x86-2.6.2-1
@@ -1080,6 +1083,7 @@ RemotePackageRepository HaikuPorts
 	lua
 	lwtools_x86
 	lynx
+	lyx_x86
 	lz4
 	lzip_x86
 	lzo
