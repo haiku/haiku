@@ -242,8 +242,9 @@ BackgroundsView::BackgroundsView()
 
 BackgroundsView::~BackgroundsView()
 {
-	delete fPanel;
+	// The order matter. The last panel saves the state
 	delete fFolderPanel;
+	delete fPanel;
 }
 
 
