@@ -18,11 +18,11 @@
 
 //#define TRACE_MULTI_AUDIO
 #ifdef TRACE_MULTI_AUDIO
-#	define TRACE(a...) dprintf("\33[34mhda:\33[0m " a)
+#	define TRACE(a...) dprintf("hda: " a)
 #else
 #	define TRACE(a...) ;
 #endif
-#define ERROR(a...)	dprintf("\33[34mhda:\33[0m " a)
+#define ERROR(a...)	dprintf("hda: " a)
 
 typedef enum {
 	B_MIX_GAIN = 1 << 0,
@@ -92,7 +92,7 @@ get_description(hda_audio_group* audioGroup, multi_description* data)
 	data->input_bus_channel_count = inChannels;
 	data->aux_bus_channel_count = 0;
 
-	dprintf("%s: request_channel_count: %ld\n", __func__,
+	TRACE("%s: request_channel_count: %ld\n", __func__,
 		data->request_channel_count);
 
 	if (data->request_channel_count >= (int)(sizeof(sChannels)
@@ -1008,7 +1008,7 @@ buffer_exchange(hda_audio_group* audioGroup, multi_buffer_info* data)
 	err = acquire_sem_etc(audioGroup->codec->controller->buffer_ready_sem,
 		1, B_CAN_INTERRUPT, 0);
 	if (err != B_OK) {
-		dprintf("%s: Error waiting for playback buffer to finish (%s)!\n", __func__,
+		ERROR("%s: Error waiting for playback buffer to finish (%s)!\n", __func__,
 			strerror(err));
 		return err;
 	}

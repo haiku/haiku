@@ -16,11 +16,11 @@
 #undef TRACE
 #define TRACE_CODEC
 #ifdef TRACE_CODEC
-#	define TRACE(a...) dprintf(a)
+#	define TRACE(a...) dprintf("hda: " a)
 #else
 #	define TRACE(a...)
 #endif
-#define ERROR(a...) dprintf(a)
+#define ERROR(a...) dprintf("hda: " a)
 
 
 #define HDA_ALL 0xffffffff
@@ -593,7 +593,7 @@ hda_widget_get_connections(hda_audio_group* audioGroup, hda_widget* widget)
 				VID_GET_CONNECTION_LIST_ENTRY, i);
 			if (hda_send_verbs(audioGroup->codec, &verb, &response, 1)
 					!= B_OK) {
-				ERROR("hda: Error parsing inputs for widget %ld!\n",
+				ERROR("Error parsing inputs for widget %ld!\n",
 					widget->node_id);
 				break;
 			}
@@ -607,7 +607,7 @@ hda_widget_get_connections(hda_audio_group* audioGroup, hda_widget* widget)
 			input &= ~rangeMask;
 
 			if (input < previousInput || previousInput == -1) {
-				ERROR("hda: invalid range from %ld to %ld\n", previousInput,
+				ERROR("invalid range from %ld to %ld\n", previousInput,
 					input);
 				continue;
 			}
@@ -726,12 +726,12 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	if (hda_send_verbs(audioGroup->codec, verbs, resp, 3) != B_OK)
 		return B_ERROR;
 
-	TRACE("hda: Audio Group: Output delay: %ld samples, Input delay: %ld "
+	TRACE("Audio Group: Output delay: %ld samples, Input delay: %ld "
 		"samples, Beep Generator: %s\n", AUDIO_GROUP_CAP_OUTPUT_DELAY(resp[0]),
 		AUDIO_GROUP_CAP_INPUT_DELAY(resp[0]),
 		AUDIO_GROUP_CAP_BEEPGEN(resp[0]) ? "yes" : "no");
 
-	TRACE("hda:   #GPIO: %ld, #GPO: %ld, #GPI: %ld, unsol: %s, wake: %s\n",
+	TRACE("  #GPIO: %ld, #GPO: %ld, #GPI: %ld, unsol: %s, wake: %s\n",
 		GPIO_COUNT_NUM_GPIO(resp[1]), GPIO_COUNT_NUM_GPO(resp[1]),
 		GPIO_COUNT_NUM_GPI(resp[1]), GPIO_COUNT_GPIUNSOL(resp[1]) ? "yes" : "no",
 		GPIO_COUNT_GPIWAKE(resp[1]) ? "yes" : "no");
@@ -741,7 +741,7 @@ hda_codec_parse_audio_group(hda_audio_group* audioGroup)
 	audioGroup->widget_start = SUB_NODE_COUNT_START(resp[2]);
 	audioGroup->widget_count = SUB_NODE_COUNT_TOTAL(resp[2]);
 
-	TRACE("hda:   widget start %lu, count %lu\n", audioGroup->widget_start,
+	TRACE("  widget start %lu, count %lu\n", audioGroup->widget_start,
 		audioGroup->widget_count);
 
 	audioGroup->widgets = (hda_widget*)calloc(audioGroup->widget_count,
@@ -1101,7 +1101,7 @@ TRACE("try without mixer!\n");
 	}
 
 	if (!hda_audio_group_build_input_tree(audioGroup)) {
-		ERROR("hda: build input tree failed\n");
+		ERROR("build input tree failed\n");
 	}
 
 TRACE("build tree!\n");
@@ -1124,7 +1124,7 @@ TRACE("build tree!\n");
 		corb_t verb = MAKE_VERB(audioGroup->codec->addr,
 			widget.node_id, VID_SET_CONNECTION_SELECT, widget.active_input);
 		if (hda_send_verbs(audioGroup->codec, &verb, NULL, 1) != B_OK)
-			ERROR("hda: Setting output selector %ld failed on widget %ld!\n",
+			ERROR("Setting output selector %ld failed on widget %ld!\n",
 				widget.active_input, widget.node_id);
 	}
 
@@ -1146,9 +1146,9 @@ TRACE("build tree!\n");
 			MAKE_VERB(audioGroup->codec->addr,
 				audioGroup->widget.node_id, VID_SET_GPIO_DIR, gpio)
 		};
-		TRACE("hda: Setting gpio 0x%lx\n", gpio);
+		TRACE("Setting gpio 0x%lx\n", gpio);
 		if (hda_send_verbs(audioGroup->codec, verb, NULL, 3) != B_OK)
-			ERROR("hda: Setting gpio failed!\n");
+			ERROR("Setting gpio failed!\n");
 	}
 
 	dump_audiogroup_widgets(audioGroup);
@@ -1171,7 +1171,7 @@ hda_audio_group_switch_init(hda_audio_group* audioGroup)
 			corb_t verb = MAKE_VERB(audioGroup->codec->addr, widget.node_id,
 				VID_SET_UNSOLRESP, UNSOLRESP_ENABLE);
 			hda_send_verbs(audioGroup->codec, &verb, NULL, 1);
-			TRACE("hda: Enabled unsolicited responses on widget %ld\n",
+			TRACE("Enabled unsolicited responses on widget %ld\n",
 				widget.node_id);
 		}
 	}
@@ -1195,7 +1195,7 @@ hda_audio_group_check_sense(hda_audio_group* audioGroup, bool disable)
 		uint32 response;
 		hda_send_verbs(audioGroup->codec, &verb, &response, 1);
 		disable = response & PIN_SENSE_PRESENCE_DETECT;
-		TRACE("hda: sensed pin widget %ld, %d\n", widget.node_id, disable);
+		TRACE("sensed pin widget %ld, %d\n", widget.node_id, disable);
 
 		uint32 ctrl = hda_widget_prepare_pin_ctrl(audioGroup, &widget,
 				true);
@@ -1292,7 +1292,7 @@ hda_codec_new_audio_group(hda_codec* codec, uint32 audioGroupNodeID)
 
 	audioGroup->playback_stream = hda_stream_new(audioGroup, STREAM_PLAYBACK);
 	audioGroup->record_stream = hda_stream_new(audioGroup, STREAM_RECORD);
-	TRACE("hda: streams playback %p, record %p\n", audioGroup->playback_stream,
+	TRACE("streams playback %p, record %p\n", audioGroup->playback_stream,
 		audioGroup->record_stream);
 
 	if (audioGroup->playback_stream != NULL
@@ -1446,7 +1446,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 
 	hda_codec* codec = (hda_codec*)calloc(1, sizeof(hda_codec));
 	if (codec == NULL) {
-		ERROR("hda: Failed to alloc a codec\n");
+		ERROR("Failed to alloc a codec\n");
 		return NULL;
 	}
 
@@ -1456,14 +1456,14 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 	codec->addr = codecAddress;
 	codec->response_sem = create_sem(0, "hda_codec_response_sem");
 	if (codec->response_sem < B_OK) {
-		ERROR("hda: Failed to create semaphore\n");
+		ERROR("Failed to create semaphore\n");
 		goto err;
 	}
 	controller->codecs[codecAddress] = codec;
 
 	codec->unsol_response_sem = create_sem(0, "hda_codec_unsol_response_sem");
 	if (codec->unsol_response_sem < B_OK) {
-		ERROR("hda: Failed to create semaphore\n");
+		ERROR("Failed to create semaphore\n");
 		goto err;
 	}
 	codec->unsol_response_read = 0;
@@ -1491,7 +1491,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 
 	status = hda_send_verbs(codec, verbs, (uint32*)&response, 3);
 	if (status != B_OK) {
-		ERROR("hda: Failed to get vendor and revision parameters: %s\n",
+		ERROR("Failed to get vendor and revision parameters: %s\n",
 			strerror(status));
 		goto err;
 	}
@@ -1516,7 +1516,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 			PID_FUNCTION_GROUP_TYPE);
 
 		if (hda_send_verbs(codec, verbs, &groupType, 1) != B_OK) {
-			ERROR("hda: Failed to get function group type\n");
+			ERROR("Failed to get function group type\n");
 			goto err;
 		}
 
@@ -1525,7 +1525,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 			// Found an Audio Function Group!
 			status_t status = hda_codec_new_audio_group(codec, nodeID);
 			if (status != B_OK) {
-				ERROR("hda: Failed to setup new audio function group (%s)!\n",
+				ERROR("Failed to setup new audio function group (%s)!\n",
 					strerror(status));
 				goto err;
 			}
@@ -1536,7 +1536,7 @@ hda_codec_new(hda_controller* controller, uint32 codecAddress)
 		(status_t(*)(void*))hda_codec_switch_handler,
 		"hda_codec_unsol_thread", B_LOW_PRIORITY, codec);
 	if (codec->unsol_response_thread < B_OK) {
-		ERROR("hda: Failed to spawn thread\n");
+		ERROR("Failed to spawn thread\n");
 		goto err;
 	}
 	resume_thread(codec->unsol_response_thread);

@@ -740,9 +740,9 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 	stream->buffer_size = ALIGN(stream->buffer_length * stream->num_channels
 		* stream->sample_size, 128);
 
-	dprintf("HDA: sample size %ld, num channels %ld, buffer length %ld\n",
+	dprintf("hda: sample size %ld, num channels %ld, buffer length %ld\n",
 		stream->sample_size, stream->num_channels, stream->buffer_length);
-	dprintf("IRA: %s: setup stream %ld: SR=%ld, SF=%ld F=0x%x (0x%lx)\n",
+	dprintf("hda: %s: setup stream %ld: SR=%ld, SF=%ld F=0x%x (0x%lx)\n",
 		__func__, stream->id, stream->rate, stream->bps, format,
 		stream->sample_format);
 
@@ -772,7 +772,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 			bufferPhysicalAddress, B_MTR_UC);
 	}
 
-	dprintf("%s(%s): Allocated %lu bytes for %ld buffers\n", __func__, desc,
+	dprintf("hda: %s(%s): Allocated %lu bytes for %ld buffers\n", __func__, desc,
 		alloc, stream->num_buffers);
 
 	// Store pointers (both virtual/physical)
@@ -811,7 +811,7 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 			stream->physical_buffer_descriptors, B_MTR_UC);
 	}
 
-	dprintf("%s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
+	dprintf("hda: %s(%s): Allocated %ld bytes for %ld BDLEs\n", __func__, desc,
 		alloc, bdlCount);
 
 	// Setup buffer descriptor list (BDL) entries
@@ -869,9 +869,9 @@ hda_stream_setup_buffers(hda_audio_group* audioGroup, hda_stream* stream,
 		hda_widget* widget = hda_audio_group_get_widget(audioGroup,
 			stream->io_widgets[i]);
 		if ((widget->capabilities.audio & AUDIO_CAP_DIGITAL) != 0) {
-    		verb[0] = MAKE_VERB(codec->addr, stream->io_widgets[i],
+			verb[0] = MAKE_VERB(codec->addr, stream->io_widgets[i],
 				VID_SET_DIGITAL_CONVERTER_CONTROL1, format);
-   			hda_send_verbs(codec, verb, response, 1);
+			hda_send_verbs(codec, verb, response, 1);
 		}
 	}
 	dprintf("\n");

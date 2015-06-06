@@ -57,8 +57,8 @@ init_driver(void)
 		if (info.class_base == PCI_multimedia
 			&& info.class_sub == PCI_hd_audio) {
 #ifdef __HAIKU__
-			if ((*gPci->reserve_device)(info.bus, info.device, info.function, "hda",
-				&gCards[gNumCards]) < B_OK) {
+			if ((*gPci->reserve_device)(info.bus, info.device, info.function,
+				"hda", &gCards[gNumCards]) < B_OK) {
 				dprintf("HDA: Failed to reserve PCI:%d:%d:%d\n",
 					info.bus, info.device, info.function);
 				continue;
@@ -70,10 +70,10 @@ init_driver(void)
 			sprintf(path, DEVFS_PATH_FORMAT, gNumCards);
 			gCards[gNumCards++].devfs_path = strdup(path);
 
-			dprintf("HDA: Detected controller @ PCI:%d:%d:%d, IRQ:%d, type %04x/%04x (%04x/%04x)\n",
+			dprintf("HDA: Detected controller @ PCI:%d:%d:%d, IRQ:%d, "
+				"type %04x/%04x (%04x/%04x)\n",
 				info.bus, info.device, info.function,
-				info.u.h0.interrupt_line,
-				info.vendor_id, info.device_id,
+				info.u.h0.interrupt_line, info.vendor_id, info.device_id,
 				info.u.h0.subsystem_vendor_id, info.u.h0.subsystem_id);
 		}
 	}
@@ -94,12 +94,11 @@ init_driver(void)
 extern "C" void
 uninit_driver(void)
 {
-	dprintf("IRA: %s\n", __func__);
-
 	for (uint32 i = 0; i < gNumCards; i++) {
 #ifdef __HAIKU__
-		(*gPci->unreserve_device)(gCards[i].pci_info.bus, gCards[i].pci_info.device,
-			gCards[i].pci_info.function, "hda", &gCards[i]);
+		(*gPci->unreserve_device)(gCards[i].pci_info.bus,
+			gCards[i].pci_info.device, gCards[i].pci_info.function, "hda",
+			&gCards[i]);
 #endif
 		free((void*)gCards[i].devfs_path);
 		gCards[i].devfs_path = NULL;
@@ -119,7 +118,6 @@ publish_devices(void)
 	static const char* devs[MAX_CARDS + 1];
 	uint32 i;
 
-	dprintf("IRA: %s\n", __func__);
 	for (i = 0; i < gNumCards; i++) {
 		devs[i] = gCards[i].devfs_path;
 	}
@@ -133,6 +131,5 @@ publish_devices(void)
 extern "C" device_hooks*
 find_device(const char* name)
 {
-	dprintf("IRA: %s\n", __func__);
 	return &gDriverHooks;
 }
