@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -9,7 +10,8 @@
 #include <new>
 
 #include "BoolValue.h"
-#include "TableCellBoolRenderer.h"
+#include "BoolValueFormatter.h"
+#include "TableCellFormattedValueRenderer.h"
 
 
 BoolValueHandler::BoolValueHandler()
@@ -40,8 +42,15 @@ status_t
 BoolValueHandler::GetValueFormatter(Value* value,
 	ValueFormatter*& _formatter)
 {
-	// TODO:...
-	return B_UNSUPPORTED;
+	if (dynamic_cast<BoolValue*>(value) == NULL)
+		return B_BAD_VALUE;
+
+	BoolValueFormatter* formatter = new(std::nothrow) BoolValueFormatter;
+	if (formatter == NULL)
+		return B_NO_MEMORY;
+
+	_formatter = formatter;
+	return B_OK;
 }
 
 
@@ -52,8 +61,14 @@ BoolValueHandler::GetTableCellValueRenderer(Value* value,
 	if (dynamic_cast<BoolValue*>(value) == NULL)
 		return B_BAD_VALUE;
 
+	ValueFormatter* formatter = NULL;
+	if (GetValueFormatter(value, formatter))
+		return B_NO_MEMORY;
+	BReference<ValueFormatter> formatterReference(formatter, true);
+
 	// create the renderer
-	TableCellValueRenderer* renderer = new(std::nothrow) TableCellBoolRenderer;
+	TableCellValueRenderer* renderer
+		= new(std::nothrow) TableCellFormattedValueRenderer(formatter);
 	if (renderer == NULL)
 		return B_NO_MEMORY;
 

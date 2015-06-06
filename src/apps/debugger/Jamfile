@@ -47,6 +47,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value type_handlers ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_formatters ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_handlers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_nodes ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value values ] ;
@@ -299,12 +300,7 @@ Application Debugger :
 	WatchPromptWindow.cpp
 
 	# user_interface/gui/value
-	TableCellBoolRenderer.cpp
-	TableCellEnumerationRenderer.cpp
-	TableCellFloatRenderer.cpp
-	TableCellIntegerRenderer.cpp
-	TableCellStringRenderer.cpp
-	TableCellValueEditor.cpp
+	TableCellFormattedValueRenderer.cpp
 	TableCellValueRenderer.cpp
 	TableCellValueRendererUtils.cpp
 
@@ -323,6 +319,7 @@ Application Debugger :
 	TypeHandler.cpp
 	TypeHandlerRoster.cpp
 	Value.cpp
+	ValueFormatter.cpp
 	ValueHandler.cpp
 	ValueHandlerRoster.cpp
 	ValueLoader.cpp
@@ -334,6 +331,13 @@ Application Debugger :
 	BListTypeHandler.cpp
 	BMessageTypeHandler.cpp
 	CStringTypeHandler.cpp
+
+	# value/value_formatters
+	BoolValueFormatter.cpp
+	EnumerationValueFormatter.cpp
+	IntegerValueFormatter.cpp
+	FloatValueFormatter.cpp
+	StringValueFormatter.cpp
 
 	# value/value_handlers
 	AddressValueHandler.cpp

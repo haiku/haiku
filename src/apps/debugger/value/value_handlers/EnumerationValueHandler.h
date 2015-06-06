@@ -17,15 +17,20 @@ public:
 			status_t			Init();
 
 	virtual	float				SupportsValue(Value* value);
+	virtual	status_t			GetValueFormatter(Value* value,
+									ValueFormatter*& _formatter);
 
 protected:
 	virtual	integer_format		DefaultIntegerFormat(IntegerValue* value);
+	virtual	status_t			CreateValueFormatter(
+									IntegerValueFormatter::Config* config,
+									ValueFormatter*& _formatter);
 	virtual	status_t			AddIntegerFormatSettingOptions(
 									IntegerValue* value,
 									OptionsSettingImpl* setting);
 	virtual	status_t			CreateTableCellValueRenderer(
 									IntegerValue* value,
-									TableCellIntegerRenderer::Config* config,
+									IntegerValueFormatter::Config* config,
 									TableCellValueRenderer*& _renderer);
 };
 

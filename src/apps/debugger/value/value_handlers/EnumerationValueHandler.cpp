@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -9,7 +10,8 @@
 #include <new>
 
 #include "EnumerationValue.h"
-#include "TableCellEnumerationRenderer.h"
+#include "EnumerationValueFormatter.h"
+#include "TableCellFormattedValueRenderer.h"
 #include "Type.h"
 
 
@@ -37,6 +39,30 @@ EnumerationValueHandler::SupportsValue(Value* value)
 }
 
 
+status_t
+EnumerationValueHandler::GetValueFormatter(Value* _value,
+	ValueFormatter*& _formatter)
+{
+	EnumerationValue* value = dynamic_cast<EnumerationValue*>(_value);
+	if (value == NULL)
+		return B_BAD_VALUE;
+
+	IntegerValueFormatter::Config* config = NULL;
+	status_t error = CreateIntegerFormatterConfig(value, config);
+	if (error != B_OK)
+		return error;
+	BReference<IntegerValueFormatter::Config> configReference(config, true);
+
+	ValueFormatter* formatter = NULL;
+	error = CreateValueFormatter(config, formatter);
+	if (error != B_OK)
+		return error;
+
+	_formatter = formatter;
+
+	return B_OK;
+}
+
 
 integer_format
 EnumerationValueHandler::DefaultIntegerFormat(IntegerValue* _value)
@@ -46,6 +72,20 @@ EnumerationValueHandler::DefaultIntegerFormat(IntegerValue* _value)
 		return INTEGER_FORMAT_DEFAULT;
 
 	return IntegerValueHandler::DefaultIntegerFormat(_value);
+}
+
+
+status_t
+EnumerationValueHandler::CreateValueFormatter(
+	IntegerValueFormatter::Config* config, ValueFormatter*& _formatter)
+{
+	ValueFormatter* formatter = new(std::nothrow) EnumerationValueFormatter(
+		config);
+	if (formatter == NULL)
+		return B_NO_MEMORY;
+
+	_formatter = formatter;
+	return B_OK;
 }
 
 
@@ -68,14 +108,21 @@ EnumerationValueHandler::AddIntegerFormatSettingOptions(IntegerValue* _value,
 
 status_t
 EnumerationValueHandler::CreateTableCellValueRenderer(IntegerValue* _value,
-	TableCellIntegerRenderer::Config* config,
+	IntegerValueFormatter::Config* config,
 	TableCellValueRenderer*& _renderer)
 {
 	EnumerationValue* value = dynamic_cast<EnumerationValue*>(_value);
 	if (value != NULL
 		&& value->GetType()->ValueFor(value->GetValue()) != NULL) {
+		ValueFormatter* formatter = NULL;
+		status_t error = GetValueFormatter(value, formatter);
+		if (error != B_OK)
+			return error;
+		BReference<ValueFormatter> formatterReference(formatter,
+			true);
+
 		TableCellValueRenderer* renderer
-			= new(std::nothrow) TableCellEnumerationRenderer(config);
+			= new(std::nothrow) TableCellFormattedValueRenderer(formatter);
 		if (renderer == NULL)
 			return B_NO_MEMORY;
 

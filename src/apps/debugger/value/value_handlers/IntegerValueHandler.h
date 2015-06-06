@@ -6,12 +6,12 @@
 #define INTEGER_VALUE_HANDLER_H
 
 
-#include "IntegerFormatter.h"
-#include "TableCellIntegerRenderer.h"
+#include "IntegerValueFormatter.h"
 #include "ValueHandler.h"
 
 
 class IntegerValue;
+class IntegerValueFormatter;
 class OptionsSettingImpl;
 class SettingsDescription;
 
@@ -36,10 +36,16 @@ protected:
 	virtual	status_t			AddIntegerFormatSettingOptions(
 									IntegerValue* value,
 									OptionsSettingImpl* setting);
+	virtual	status_t			CreateValueFormatter(
+									IntegerValueFormatter::Config* config,
+									ValueFormatter*& _formatter);
 	virtual	status_t			CreateTableCellValueRenderer(
 									IntegerValue* value,
-									TableCellIntegerRenderer::Config* config,
+									IntegerValueFormatter::Config* config,
 									TableCellValueRenderer*& _renderer);
+	virtual	status_t			CreateIntegerFormatterConfig(
+									IntegerValue* value,
+									IntegerValueFormatter::Config*& _config);
 
 			status_t			AddIntegerFormatOption(
 									OptionsSettingImpl* setting, const char* id,
@@ -47,7 +53,7 @@ protected:
 
 private:
 			class FormatOption;
-			class TableCellRendererConfig;
+			class IntegerFormatterConfig;
 
 private:
 			SettingsDescription* _CreateTableCellSettingsDescription(

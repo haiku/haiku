@@ -9,7 +9,8 @@
 #include <new>
 
 #include "FloatValue.h"
-#include "TableCellFloatRenderer.h"
+#include "FloatValueFormatter.h"
+#include "TableCellFormattedValueRenderer.h"
 
 
 FloatValueHandler::FloatValueHandler()
@@ -40,8 +41,15 @@ status_t
 FloatValueHandler::GetValueFormatter(Value* value,
 	ValueFormatter*& _formatter)
 {
-	// TODO:...
-	return B_UNSUPPORTED;
+	if (dynamic_cast<FloatValue*>(value) == NULL)
+		return B_BAD_VALUE;
+
+	FloatValueFormatter* formatter = new(std::nothrow) FloatValueFormatter;
+	if (formatter == NULL)
+		return B_NO_MEMORY;
+
+	_formatter = formatter;
+	return B_OK;
 }
 
 
@@ -52,8 +60,15 @@ FloatValueHandler::GetTableCellValueRenderer(Value* value,
 	if (dynamic_cast<FloatValue*>(value) == NULL)
 		return B_BAD_VALUE;
 
+	ValueFormatter* formatter = NULL;
+	status_t error = GetValueFormatter(value, formatter);
+	if (error != B_OK)
+		return error;
+	BReference<ValueFormatter> formatterReference(formatter, true);
+
 	// create the renderer
-	TableCellValueRenderer* renderer = new(std::nothrow) TableCellFloatRenderer;
+	TableCellValueRenderer* renderer
+		= new(std::nothrow) TableCellFormattedValueRenderer(formatter);
 	if (renderer == NULL)
 		return B_NO_MEMORY;
 

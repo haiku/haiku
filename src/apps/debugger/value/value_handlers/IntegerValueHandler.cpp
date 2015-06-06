@@ -11,11 +11,12 @@
 #include <AutoDeleter.h>
 
 #include "IntegerValue.h"
+#include "IntegerValueFormatter.h"
 #include "Setting.h"
 #include "Settings.h"
 #include "SettingsDescription.h"
 #include "SettingsMenu.h"
-#include "TableCellIntegerRenderer.h"
+#include "TableCellFormattedValueRenderer.h"
 
 
 static const char* const kFormatSettingID = "format";
@@ -56,20 +57,20 @@ private:
 };
 
 
-// #pragma mark - TableCellRendererConfig
+// #pragma mark - IntegerFormatterConfig
 
 
-class IntegerValueHandler::TableCellRendererConfig
-	: public TableCellIntegerRenderer::Config {
+class IntegerValueHandler::IntegerFormatterConfig
+	: public IntegerValueFormatter::Config {
 public:
-	TableCellRendererConfig()
+	IntegerFormatterConfig()
 		:
 		fSettings(NULL),
 		fFormatSetting(NULL)
 	{
 	}
 
-	~TableCellRendererConfig()
+	~IntegerFormatterConfig()
 	{
 		if (fSettings != NULL)
 			fSettings->ReleaseReference();
@@ -139,11 +140,25 @@ IntegerValueHandler::SupportsValue(Value* value)
 
 
 status_t
-IntegerValueHandler::GetValueFormatter(Value* value,
+IntegerValueHandler::GetValueFormatter(Value* _value,
 	ValueFormatter*& _formatter)
 {
-	// TODO:...
-	return B_UNSUPPORTED;
+	IntegerValue* value = dynamic_cast<IntegerValue*>(_value);
+	if (value == NULL)
+		return B_BAD_VALUE;
+
+	IntegerValueFormatter::Config* config = NULL;
+	status_t error = CreateIntegerFormatterConfig(value, config);
+	if (error != B_OK)
+		return error;
+
+	BReference<IntegerValueFormatter::Config> configReference(config, true);
+	ValueFormatter* formatter = new(std::nothrow) IntegerValueFormatter(config);
+	if (formatter == NULL)
+		return B_NO_MEMORY;
+
+	_formatter = formatter;
+	return B_OK;
 }
 
 
@@ -155,23 +170,11 @@ IntegerValueHandler::GetTableCellValueRenderer(Value* _value,
 	if (value == NULL)
 		return B_BAD_VALUE;
 
-	// create a settings description
-	SettingsDescription* settingsDescription
-		= _CreateTableCellSettingsDescription(value);
-	if (settingsDescription == NULL)
-		return B_NO_MEMORY;
-	BReference<SettingsDescription> settingsDescriptionReference(
-		settingsDescription, true);
-
-	// create config
-	TableCellRendererConfig* config = new(std::nothrow) TableCellRendererConfig;
-	if (config == NULL)
-		return B_NO_MEMORY;
-	BReference<TableCellRendererConfig> configReference(config, true);
-
-	status_t error = config->Init(settingsDescription);
+	IntegerValueFormatter::Config* config = NULL;
+	status_t error = CreateIntegerFormatterConfig(value, config);
 	if (error != B_OK)
 		return error;
+	BReference<IntegerValueFormatter::Config> configReference(config, true);
 
 	// create the renderer
 	return CreateTableCellValueRenderer(value, config, _renderer);
@@ -234,16 +237,66 @@ IntegerValueHandler::AddIntegerFormatSettingOptions(IntegerValue* value,
 
 
 status_t
+IntegerValueHandler::CreateValueFormatter(
+	IntegerValueFormatter::Config* config,
+	ValueFormatter*& _formatter)
+{
+	ValueFormatter* formatter = new(std::nothrow) IntegerValueFormatter(
+		config);
+	if (formatter == NULL)
+		return B_NO_MEMORY;
+
+	_formatter = formatter;
+	return B_OK;
+}
+
+
+status_t
 IntegerValueHandler::CreateTableCellValueRenderer(IntegerValue* value,
-	TableCellIntegerRenderer::Config* config,
+	IntegerValueFormatter::Config* config,
 	TableCellValueRenderer*& _renderer)
 {
+	ValueFormatter* formatter;
+	status_t error = CreateValueFormatter(config, formatter);
+	if (error != B_OK)
+		return error;
+	BReference<ValueFormatter> formatterReference(formatter, true);
+
 	TableCellValueRenderer* renderer
-		= new(std::nothrow) TableCellIntegerRenderer(config);
+		= new(std::nothrow) TableCellFormattedValueRenderer(formatter);
 	if (renderer == NULL)
 		return B_NO_MEMORY;
 
 	_renderer = renderer;
+	return B_OK;
+}
+
+
+status_t
+IntegerValueHandler::CreateIntegerFormatterConfig(IntegerValue* value,
+	IntegerValueFormatter::Config*& _config)
+{
+	// create a settings description
+	SettingsDescription* settingsDescription
+		= _CreateTableCellSettingsDescription(value);
+	if (settingsDescription == NULL)
+		return B_NO_MEMORY;
+	BReference<SettingsDescription> settingsDescriptionReference(
+		settingsDescription, true);
+
+	// create config
+	IntegerFormatterConfig* config = new(std::nothrow) IntegerFormatterConfig;
+	if (config == NULL)
+		return B_NO_MEMORY;
+	BReference<IntegerFormatterConfig> configReference(config, true);
+
+	status_t error = config->Init(settingsDescription);
+	if (error != B_OK)
+		return error;
+
+	_config = config;
+	configReference.Detach();
+
 	return B_OK;
 }
 
