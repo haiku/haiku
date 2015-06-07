@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -9,6 +9,7 @@
 #include "AutoLocker.h"
 
 #include "StackFrame.h"
+#include "Team.h"
 #include "Thread.h"
 #include "TypeHandlerRoster.h"
 #include "ValueNode.h"
@@ -107,7 +108,7 @@ ValueNodeManager::ValueNodeChanged(ValueNodeChild* nodeChild,
 		fListeners.ItemAt(i)->ValueNodeChanged(nodeChild, oldNode, newNode);
 
 	if (oldNode != NULL)
-		newNode->CreateChildren();
+		newNode->CreateChildren(fThread->GetTeam()->GetTeamTypeInformation());
 
 }
 
@@ -149,7 +150,8 @@ ValueNodeManager::ValueNodeValueChanged(ValueNode* valueNode)
 
 	if (valueNode->ChildCreationNeedsValue()
 		&& !valueNode->ChildrenCreated()) {
-		status_t error = valueNode->CreateChildren();
+		status_t error = valueNode->CreateChildren(
+			fThread->GetTeam()->GetTeamTypeInformation());
 		if (error == B_OK) {
 			for (int32 i = 0; i < valueNode->CountChildren(); i++) {
 				ValueNodeChild* child = valueNode->ChildAt(i);
@@ -230,5 +232,6 @@ ValueNodeManager::AddChildNodes(ValueNodeChild* nodeChild)
 	if (valueNode->ChildrenCreated())
 		return B_OK;
 
-	return valueNode->CreateChildren();
+	return valueNode->CreateChildren(
+		fThread->GetTeam()->GetTeamTypeInformation());
 }

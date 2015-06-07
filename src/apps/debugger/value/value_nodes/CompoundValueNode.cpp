@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -191,7 +192,7 @@ CompoundValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 
 
 status_t
-CompoundValueNode::CreateChildren()
+CompoundValueNode::CreateChildren(TeamTypeInformation* info)
 {
 	if (!fChildren.IsEmpty())
 		return B_OK;

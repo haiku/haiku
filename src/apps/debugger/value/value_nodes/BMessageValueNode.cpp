@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com
  * Distributed under the terms of the MIT License.
  */
 
@@ -14,6 +14,7 @@
 
 #include "Architecture.h"
 #include "StringValue.h"
+#include "TeamTypeInformation.h"
 #include "Tracing.h"
 #include "Type.h"
 #include "TypeLookupConstraints.h"
@@ -109,7 +110,6 @@ BMessageValueNode::BMessageValueNode(ValueNodeChild* nodeChild,
 	:
 	ValueNode(nodeChild),
 	fType(type),
-	fLoader(NULL),
 	fHeader(NULL),
 	fFields(NULL),
 	fData(NULL),
@@ -125,7 +125,6 @@ BMessageValueNode::~BMessageValueNode()
 	for (int32 i = 0; i < fChildren.CountItems(); i++)
 		fChildren.ItemAt(i)->ReleaseReference();
 
-	delete fLoader;
 	delete fHeader;
 	delete[] fFields;
 	delete[] fData;
@@ -319,18 +318,12 @@ BMessageValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	if (error != B_OK)
 		return error;
 
-	if (fLoader == NULL) {
-		fLoader = new(std::nothrow)ValueLoader(*valueLoader);
-		if (fLoader == NULL)
-			return B_NO_MEMORY;
-	}
-
 	return B_OK;
 }
 
 
 status_t
-BMessageValueNode::CreateChildren()
+BMessageValueNode::CreateChildren(TeamTypeInformation* info)
 {
 	DataMember* member = NULL;
 	CompoundType* messageType = dynamic_cast<CompoundType*>(fType);
@@ -358,7 +351,7 @@ BMessageValueNode::CreateChildren()
 		&count) == B_OK; i++) {
 		fieldType = NULL;
 
-		_GetTypeForTypeCode(type, fieldType);
+		_GetTypeForTypeCode(info, type, fieldType);
 		if (fieldType != NULL)
 			typeRef.SetTo(fieldType, true);
 
@@ -397,8 +390,8 @@ BMessageValueNode::ChildAt(int32 index) const
 
 
 status_t
-BMessageValueNode::_GetTypeForTypeCode(type_code type,
-	Type*& _type)
+BMessageValueNode::_GetTypeForTypeCode(TeamTypeInformation* info,
+	type_code type, Type*& _type)
 {
 	BString typeName;
 	TypeLookupConstraints constraints;
@@ -494,7 +487,7 @@ BMessageValueNode::_GetTypeForTypeCode(type_code type,
 			typeName = "char";
 			constraints.SetTypeKind(TYPE_PRIMITIVE);
 			Type* baseType = NULL;
-			status_t result = fLoader->LookupTypeByName(typeName, constraints,
+			status_t result = info->LookupTypeByName(typeName, constraints,
 				baseType);
 			if (result != B_OK)
 				return result;
@@ -517,7 +510,7 @@ BMessageValueNode::_GetTypeForTypeCode(type_code type,
 			break;
 	}
 
-	return fLoader->LookupTypeByName(typeName, constraints, _type);
+	return info->LookupTypeByName(typeName, constraints, _type);
 }
 
 
@@ -647,17 +640,18 @@ BMessageValueNode::BMessageFieldNode::GetType() const
 
 
 status_t
-BMessageValueNode::BMessageFieldNode::CreateChildren()
+BMessageValueNode::BMessageFieldNode::CreateChildren(TeamTypeInformation* info)
 {
 	Type* type = NULL;
-	status_t error = fParent->_GetTypeForTypeCode(fFieldType, type);
+	status_t error = fParent->_GetTypeForTypeCode(info, fFieldType, type);
 	if (error != B_OK)
 		return error;
 
 	BReference<Type> typeRef(type, true);
 	for (int32 i = 0; i < fFieldCount; i++) {
 		BMessageFieldNodeChild* child = new(std::nothrow)
-			BMessageFieldNodeChild(fParent, type, fName, fFieldType, fFieldCount, i);
+			BMessageFieldNodeChild(fParent, type, fName, fFieldType,
+				fFieldCount, i);
 
 		if (child == NULL)
 			return B_NO_MEMORY;

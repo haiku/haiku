@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -75,12 +75,12 @@ AbstractArrayValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 
 
 status_t
-AbstractArrayValueNode::CreateChildren()
+AbstractArrayValueNode::CreateChildren(TeamTypeInformation* info)
 {
 	if (!fChildren.IsEmpty())
 		return B_OK;
 
-	return CreateChildrenInRange(0, kMaxArrayElementCount - 1);
+	return CreateChildrenInRange(info, 0, kMaxArrayElementCount - 1);
 }
 
 
@@ -117,8 +117,8 @@ AbstractArrayValueNode::ClearChildren()
 
 
 status_t
-AbstractArrayValueNode::CreateChildrenInRange(int32 lowIndex,
-	int32 highIndex)
+AbstractArrayValueNode::CreateChildrenInRange(TeamTypeInformation* info,
+	int32 lowIndex, int32 highIndex)
 {
 	// TODO: ensure that we don't already have children in the specified
 	// index range. These need to be skipped if so.

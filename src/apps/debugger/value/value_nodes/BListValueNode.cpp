@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013, Rene Gollent, rene@gollent.com
+ * Copyright 2012-2015, Rene Gollent, rene@gollent.com
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,6 +13,7 @@
 #include "AddressValueNode.h"
 #include "Architecture.h"
 #include "StringValue.h"
+#include "TeamTypeInformation.h"
 #include "Tracing.h"
 #include "Type.h"
 #include "TypeLookupConstraints.h"
@@ -163,7 +164,6 @@ BListValueNode::BListValueNode(ValueNodeChild* nodeChild,
 	:
 	ValueNode(nodeChild),
 	fType(type),
-	fLoader(NULL),
 	fItemCountType(NULL),
 	fItemCount(0),
 	fCountChildCreated(false)
@@ -180,8 +180,6 @@ BListValueNode::~BListValueNode()
 
 	if (fItemCountType != NULL)
 		fItemCountType->ReleaseReference();
-
-	delete fLoader;
 }
 
 
@@ -292,20 +290,14 @@ BListValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 		memberLocation = NULL;
 	}
 
-	if (fLoader == NULL) {
-		fLoader = new(std::nothrow)ValueLoader(*valueLoader);
-		if (fLoader == NULL)
-			return B_NO_MEMORY;
-	}
-
 	return B_OK;
 }
 
 
 status_t
-BListValueNode::CreateChildren()
+BListValueNode::CreateChildren(TeamTypeInformation* info)
 {
-	return CreateChildrenInRange(0, kMaxArrayElementCount);
+	return CreateChildrenInRange(info, 0, kMaxArrayElementCount);
 }
 
 
@@ -348,7 +340,8 @@ BListValueNode::ClearChildren()
 
 
 status_t
-BListValueNode::CreateChildrenInRange(int32 lowIndex, int32 highIndex)
+BListValueNode::CreateChildrenInRange(TeamTypeInformation* info,
+	int32 lowIndex, int32 highIndex)
 {
 	if (fLocationResolutionState != B_OK)
 		return fLocationResolutionState;
@@ -387,7 +380,8 @@ BListValueNode::CreateChildrenInRange(int32 lowIndex, int32 highIndex)
 		TypeLookupConstraints constraints;
 		constraints.SetTypeKind(TYPE_ADDRESS);
 		constraints.SetBaseTypeName("void");
-		status_t result = fLoader->LookupTypeByName(typeName, constraints, type);
+		status_t result = info->LookupTypeByName(typeName, constraints,
+			type);
 		if (result != B_OK)
 			return result;
 	}

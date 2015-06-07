@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef BMESSAGE_VALUE_NODE_H
@@ -19,8 +19,8 @@ class CompoundType;
 
 class BMessageValueNode : public ValueNode {
 public:
-									BMessageValueNode(ValueNodeChild* nodeChild,
-										Type* type);
+									BMessageValueNode(
+										ValueNodeChild* nodeChild, Type* type);
 	virtual							~BMessageValueNode();
 
 	virtual	Type*					GetType() const;
@@ -31,13 +31,15 @@ public:
 
 	virtual bool					ChildCreationNeedsValue() const
 										{ return true; }
-	virtual status_t				CreateChildren();
+	virtual status_t				CreateChildren(TeamTypeInformation* info);
 	virtual int32					CountChildren() const;
 	virtual ValueNodeChild*			ChildAt(int32 index) const;
 
 private:
 
-			status_t				_GetTypeForTypeCode(type_code type,
+			status_t				_GetTypeForTypeCode(
+										TeamTypeInformation* info,
+										type_code type,
 										Type*& _type);
 			status_t				_FindField(const char* name,
 										type_code type,
@@ -61,7 +63,6 @@ private:
 private:
 			Type*					fType;
 			ChildNodeList			fChildren;
-			ValueLoader*			fLoader;
 			BVariant				fDataLocation;
 			BMessage::message_header*
 									fHeader;
@@ -89,7 +90,7 @@ public:
 										ValueLocation *& _location,
 										Value*& _value);
 
-	virtual	status_t 				CreateChildren();
+	virtual	status_t 				CreateChildren(TeamTypeInformation* info);
 	virtual	int32 					CountChildren() const;
 	virtual	ValueNodeChild* 		ChildAt(int32 index) const;
 

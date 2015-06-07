@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -37,14 +37,15 @@ public:
 
 			// locking required
 
-	virtual	status_t			CreateChildren();
+	virtual	status_t			CreateChildren(TeamTypeInformation* info);
 	virtual	int32				CountChildren() const;
 	virtual	ValueNodeChild*		ChildAt(int32 index) const;
 
 	virtual	bool				IsRangedContainer() const;
 	virtual	void				ClearChildren();
-	virtual	status_t			CreateChildrenInRange(int32 lowIndex,
-									int32 highIndex);
+	virtual	status_t			CreateChildrenInRange(
+									TeamTypeInformation* info,
+									int32 lowIndex, int32 highIndex);
 	virtual	status_t			SupportedChildRange(int32& lowIndex,
 									int32& highIndex) const;
 protected:

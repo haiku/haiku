@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -85,7 +86,8 @@ ValueNode::ClearChildren()
 
 
 status_t
-ValueNode::CreateChildrenInRange(int32 lowIndex, int32 highIndex)
+ValueNode::CreateChildrenInRange(TeamTypeInformation* info, int32 lowIndex,
+	int32 highIndex)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -245,7 +247,7 @@ ChildlessValueNode::ChildlessValueNode(ValueNodeChild* nodeChild)
 
 
 status_t
-ChildlessValueNode::CreateChildren()
+ChildlessValueNode::CreateChildren(TeamTypeInformation* info)
 {
 	return B_OK;
 }

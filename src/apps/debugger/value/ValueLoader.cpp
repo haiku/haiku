@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,38 +12,19 @@
 #include "CpuState.h"
 #include "Register.h"
 #include "TeamMemory.h"
-#include "TeamTypeInformation.h"
 #include "Tracing.h"
-#include "TypeLookupConstraints.h"
 #include "ValueLocation.h"
 
 
 ValueLoader::ValueLoader(Architecture* architecture, TeamMemory* teamMemory,
-	TeamTypeInformation* typeInformation, CpuState* cpuState)
+	CpuState* cpuState)
 	:
 	fArchitecture(architecture),
 	fTeamMemory(teamMemory),
-	fTypeInformation(typeInformation),
 	fCpuState(cpuState)
 {
 	fArchitecture->AcquireReference();
 	fTeamMemory->AcquireReference();
-	fTypeInformation->AcquireReference();
-	if (fCpuState != NULL)
-		fCpuState->AcquireReference();
-}
-
-
-ValueLoader::ValueLoader(const ValueLoader& other)
-	:
-	fArchitecture(other.fArchitecture),
-	fTeamMemory(other.fTeamMemory),
-	fTypeInformation(other.fTypeInformation),
-	fCpuState(other.fCpuState)
-{
-	fArchitecture->AcquireReference();
-	fTeamMemory->AcquireReference();
-	fTypeInformation->AcquireReference();
 	if (fCpuState != NULL)
 		fCpuState->AcquireReference();
 }
@@ -53,7 +34,6 @@ ValueLoader::~ValueLoader()
 {
 	fArchitecture->ReleaseReference();
 	fTeamMemory->ReleaseReference();
-	fTypeInformation->ReleaseReference();
 	if (fCpuState != NULL)
 		fCpuState->ReleaseReference();
 }
@@ -251,12 +231,4 @@ ValueLoader::LoadStringValue(BVariant& location, size_t maxSize, BString& _value
 
 	return fTeamMemory->ReadMemoryString(location.ToUInt64(),
 		std::min(maxSize, kMaxStringSize), _value);
-}
-
-
-status_t
-ValueLoader::LookupTypeByName(const BString& name,
-	const TypeLookupConstraints& constraints, Type*& _type)
-{
-	return fTypeInformation->LookupTypeByName(name, constraints, _type);
 }

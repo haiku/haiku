@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -29,7 +30,7 @@ public:
 
 			// locking required
 
-	virtual	status_t			CreateChildren();
+	virtual	status_t			CreateChildren(TeamTypeInformation* info);
 	virtual	int32				CountChildren() const;
 	virtual	ValueNodeChild*		ChildAt(int32 index) const;
 

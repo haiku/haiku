@@ -2027,6 +2027,7 @@ VariablesView::MessageReceived(BMessage* message)
 			for (int32 i = 0; i < ranges.CountRanges(); i++) {
 				const Range* range = ranges.RangeAt(i);
 				result = valueNode->CreateChildrenInRange(
+					fThread->GetTeam()->GetTeamTypeInformation(),
 					range->lowerBound, range->upperBound);
 				if (result != B_OK)
 					break;

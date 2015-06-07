@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -87,7 +88,7 @@ AddressValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 
 
 status_t
-AddressValueNode::CreateChildren()
+AddressValueNode::CreateChildren(TeamTypeInformation* info)
 {
 	if (fChild != NULL)
 		return B_OK;

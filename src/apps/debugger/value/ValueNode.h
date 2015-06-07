@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -11,6 +12,7 @@
 #include <Referenceable.h>
 
 
+class TeamTypeInformation;
 class Type;
 class Value;
 class ValueLoader;
@@ -52,7 +54,7 @@ public:
 			bool				ChildrenCreated() const
 									{ return fChildrenCreated; }
 
-	virtual	status_t			CreateChildren() = 0;
+	virtual	status_t			CreateChildren(TeamTypeInformation* info) = 0;
 	virtual	int32				CountChildren() const = 0;
 	virtual	ValueNodeChild*		ChildAt(int32 index) const = 0;
 
@@ -67,8 +69,9 @@ public:
 									// arbitrarily go outside of the
 									// specified/supported range.
 	virtual	void				ClearChildren();
-	virtual	status_t			CreateChildrenInRange(int32 lowIndex,
-									int32 highIndex);
+	virtual	status_t			CreateChildrenInRange(
+									TeamTypeInformation* info,
+									int32 lowIndex, int32 highIndex);
 	virtual	status_t			SupportedChildRange(int32& lowIndex,
 									int32& highIndex) const;
 
@@ -134,7 +137,7 @@ class ChildlessValueNode : public ValueNode {
 public:
 								ChildlessValueNode(ValueNodeChild* nodeChild);
 
-	virtual	status_t			CreateChildren();
+	virtual	status_t			CreateChildren(TeamTypeInformation* info);
 	virtual	int32				CountChildren() const;
 	virtual	ValueNodeChild*		ChildAt(int32 index) const;
 };

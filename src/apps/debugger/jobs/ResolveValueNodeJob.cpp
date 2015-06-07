@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -154,8 +154,7 @@ ResolveValueNodeValueJob::_ResolveNodeValue()
 
 	// resolve the node location and value
 	ValueLoader valueLoader(fArchitecture, fDebuggerInterface,
-		fTypeInformation, variableCpuState != NULL ? variableCpuState
-				: fCpuState);
+		variableCpuState != NULL ? variableCpuState : fCpuState);
 	ValueLocation* location;
 	Value* value;
 	status_t error = fValueNode->ResolvedLocationAndValue(&valueLoader,
@@ -186,8 +185,7 @@ status_t
 ResolveValueNodeValueJob::_ResolveNodeChildLocation(ValueNodeChild* nodeChild)
 {
 	// resolve the location
-	ValueLoader valueLoader(fArchitecture, fDebuggerInterface,
-		fTypeInformation, fCpuState);
+	ValueLoader valueLoader(fArchitecture, fDebuggerInterface, fCpuState);
 	ValueLocation* location = NULL;
 	status_t error = nodeChild->ResolveLocation(&valueLoader, location);
 	BReference<ValueLocation> locationReference(location, true);
