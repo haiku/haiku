@@ -319,14 +319,18 @@ PrintersWindow::_BuildGUI()
 
 		// Create listview with scroller
 	fPrinterListView = new PrinterListView(BRect());
-	BScrollView* pscroller = new BScrollView("printer_scroller", fPrinterListView,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_FANCY_BORDER);
+	BScrollView* printerScrollView = new BScrollView("printer_scroller",
+		fPrinterListView, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS,
+		false, true, B_FANCY_BORDER);
+
+	printerScrollView->SetExplicitMinSize(
+		BSize(be_plain_font->Size() * 30, B_SIZE_UNSET));
 
 	float padding = be_control_look->DefaultItemSpacing();
 
 	BLayoutBuilder::Group<>(printersBox, B_HORIZONTAL, padding)
 		.SetInsets(padding, padding * 2, padding, padding)
-		.Add(pscroller)
+		.Add(printerScrollView)
 		.AddGroup(B_VERTICAL, padding / 2, 0.0f)
 			.SetInsets(0)
 			.Add(addButton)
@@ -358,12 +362,13 @@ PrintersWindow::_BuildGUI()
 
 		// Create listview with scroller
 	fJobListView = new JobListView(BRect());
-	BScrollView* jscroller = new BScrollView("jobs_scroller", fJobListView,
-		B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS, false, true, B_FANCY_BORDER);
+	BScrollView* jobScrollView = new BScrollView("jobs_scroller",
+		fJobListView, B_FOLLOW_ALL, B_WILL_DRAW | B_FRAME_EVENTS,
+		false, true, B_FANCY_BORDER);
 
 	BLayoutBuilder::Group<>(fJobsBox, B_HORIZONTAL, padding)
 		.SetInsets(padding, padding * 2, padding, padding)
-		.Add(jscroller)
+		.Add(jobScrollView)
 		.AddGroup(B_VERTICAL, padding / 2, 0.0f)
 			.SetInsets(0)
 			.Add(fCancel)
