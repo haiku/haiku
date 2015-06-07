@@ -441,6 +441,8 @@ RemotePackageRepository HaikuPorts
 	taglib-1.7.2-1
 	taglib_devel-1.7.2-1
 	tar-1.26-6
+	tcl-8.5.18-1
+	tcl_devel-8.5.18-1
 	tcpdump-4.7.4-1
 	texinfo-4.13a-7
 	tiff-3.9.6-2
@@ -707,6 +709,8 @@ RemotePackageRepository HaikuPorts
 	libxslt_x86_devel-1.1.28-2
 	llvm_x86-3.5.2-1
 	lmms_x86-1.2.0_git-1
+	lua_x86-5.2.3-2
+	lua_x86_devel-5.2.3-2
 	luajit_x86-2.0.2-2
 	luajit_x86_devel-2.0.2-2
 	lwtools_x86-4.10-2
@@ -802,6 +806,7 @@ RemotePackageRepository HaikuPorts
 	stm32flash_x86-0.3-1
 	strigi_x86-0.7.5-2
 	strigi_x86_devel-0.7.5-2
+	swig_x86-2.0.11-1
 	taglib_x86-1.9.1-1
 	taglib_x86_devel-1.9.1-1
 	texlive_x86-2014-1
@@ -1081,6 +1086,7 @@ RemotePackageRepository HaikuPorts
 	ltris
 	luajit_x86
 	lua
+	lua_x86
 	lwtools_x86
 	lynx
 	lyx_x86
@@ -1212,9 +1218,11 @@ RemotePackageRepository HaikuPorts
 	subversion
 	sum_it
 	super_transball
+	swig_x86
 	taglib
 	taglib_x86
 	tar
+	tcl
 	tcpdump
 	texi2html
 	texinfo
