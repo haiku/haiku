@@ -300,8 +300,11 @@ Application Debugger :
 	WatchPromptWindow.cpp
 
 	# user_interface/gui/value
+	TableCellBoolEditor.cpp
+	TableCellEnumerationEditor.cpp
 	TableCellFormattedValueEditor.cpp
 	TableCellFormattedValueRenderer.cpp
+	TableCellIntegerEditor.cpp
 	TableCellOptionPopUpEditor.cpp
 	TableCellTextControlEditor.cpp
 	TableCellValueEditor.cpp
