@@ -182,6 +182,7 @@ private:
 									const entry_ref* ref,
 									const BList* messageList, int argc,
 									const char* const* args,
+									const char** environment,
 									team_id* appTeam) const;
 
 			status_t			_UpdateActiveApp(team_id team) const;

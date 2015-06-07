@@ -28,6 +28,12 @@ class BRoster::Private {
 		status_t SendTo(BMessage *message, BMessage *reply, bool mime);
 		bool IsMessengerValid(bool mime) const;
 
+		status_t Launch(const char* mimeType, const entry_ref* ref,
+					const BList* messageList, int argc, const char* const* args,
+					const char** environment, team_id* appTeam)
+			{ return fRoster->_LaunchApp(mimeType, ref, messageList, argc,
+					args, environment, appTeam); }
+
 		status_t ShutDown(bool reboot, bool confirm, bool synchronous)
 			{ return fRoster->_ShutDown(reboot, confirm, synchronous); }
 

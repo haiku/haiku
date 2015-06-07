@@ -922,7 +922,8 @@ BRoster::Launch(const char* mimeType, BMessage* initialMessage,
 	if (initialMessage != NULL)
 		messageList.AddItem(initialMessage);
 
-	return _LaunchApp(mimeType, NULL, &messageList, 0, NULL, _appTeam);
+	return _LaunchApp(mimeType, NULL, &messageList, 0, NULL,
+		(const char**)environ, _appTeam);
 }
 
 
@@ -933,7 +934,8 @@ BRoster::Launch(const char* mimeType, BList* messageList,
 	if (mimeType == NULL)
 		return B_BAD_VALUE;
 
-	return _LaunchApp(mimeType, NULL, messageList, 0, NULL, _appTeam);
+	return _LaunchApp(mimeType, NULL, messageList, 0, NULL,
+		(const char**)environ, _appTeam);
 }
 
 
@@ -944,7 +946,8 @@ BRoster::Launch(const char* mimeType, int argc, const char* const* args,
 	if (mimeType == NULL)
 		return B_BAD_VALUE;
 
-	return _LaunchApp(mimeType, NULL, NULL, argc, args, _appTeam);
+	return _LaunchApp(mimeType, NULL, NULL, argc, args, (const char**)environ,
+		_appTeam);
 }
 
 
@@ -959,7 +962,8 @@ BRoster::Launch(const entry_ref* ref, const BMessage* initialMessage,
 	if (initialMessage != NULL)
 		messageList.AddItem(const_cast<BMessage*>(initialMessage));
 
-	return _LaunchApp(NULL, ref, &messageList, 0, NULL, _appTeam);
+	return _LaunchApp(NULL, ref, &messageList, 0, NULL, (const char**)environ,
+		_appTeam);
 }
 
 
@@ -970,7 +974,8 @@ BRoster::Launch(const entry_ref* ref, const BList* messageList,
 	if (ref == NULL)
 		return B_BAD_VALUE;
 
-	return _LaunchApp(NULL, ref, messageList, 0, NULL, appTeam);
+	return _LaunchApp(NULL, ref, messageList, 0, NULL, (const char**)environ,
+		appTeam);
 }
 
 
@@ -981,7 +986,8 @@ BRoster::Launch(const entry_ref* ref, int argc, const char* const* args,
 	if (ref == NULL)
 		return B_BAD_VALUE;
 
-	return _LaunchApp(NULL, ref, NULL, argc, args, appTeam);
+	return _LaunchApp(NULL, ref, NULL, argc, args, (const char**)environ,
+		appTeam);
 }
 
 
@@ -1821,8 +1827,8 @@ BRoster::_UpdateActiveApp(team_id team) const
 */
 status_t
 BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
-	const BList* messageList, int argc,
-	const char* const* args, team_id* _appTeam) const
+	const BList* messageList, int argc, const char* const* args,
+	const char** environment, team_id* _appTeam) const
 {
 	DBG(OUT("BRoster::_LaunchApp()"));
 
@@ -1895,8 +1901,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 			DBG(OUT("  token: %lu\n", appToken));
 			// load the app image
 			thread_id appThread = load_image(argVector.Count(),
-				const_cast<const char**>(argVector.Args()),
-				const_cast<const char**>(environ));
+				const_cast<const char**>(argVector.Args()), environment);
 
 			// get the app team
 			if (appThread >= 0) {
