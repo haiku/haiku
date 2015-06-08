@@ -115,6 +115,11 @@ efi_gpt_scan_partition(int fd, partition_data* partition, void* _cookie)
 			continue;
 		}
 
+		if (entry.StartBlock() * partition->block_size == 0) {
+			TRACE(("efi_gpt: child partition starts at 0 (recursive entry)\n"));
+			continue;
+		}
+
 		partition_data* child = create_child_partition(partition->id, index++,
 			partition->offset + entry.StartBlock() * partition->block_size,
 			entry.BlockCount() * partition->block_size, -1);
