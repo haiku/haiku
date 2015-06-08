@@ -358,6 +358,8 @@ MemoryView::KeyDown(const char* bytes, int32 numBytes)
 					if (!fEditLowNybble)
 						newAddress--;
 					fEditLowNybble = !fEditLowNybble;
+					if (newAddress == fTargetAddress)
+						Invalidate();
 				} else
 					newAddress -= blockSize;
 				break;
@@ -368,6 +370,8 @@ MemoryView::KeyDown(const char* bytes, int32 numBytes)
 					if (fEditLowNybble)
 						newAddress++;
 					fEditLowNybble = !fEditLowNybble;
+					if (newAddress == fTargetAddress)
+						Invalidate();
 				} else
 					newAddress += blockSize;
 				break;
