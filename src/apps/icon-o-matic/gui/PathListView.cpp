@@ -96,29 +96,29 @@ public:
 
 		// mark
 		BRect markRect = itemFrame;
-		float MarkRectBorderTint = B_DARKEN_1_TINT;
-		float MarkRectFillTint = 1.04;
-		float MarkTint = B_DARKEN_4_TINT;
+		float markRectBorderTint = B_DARKEN_1_TINT;
+		float markRectFillTint = 1.04;
+		float markTint = B_DARKEN_4_TINT;
 					// Dark Themes
 		rgb_color lowColor = owner->LowColor();
 		if (lowColor.red + lowColor.green + lowColor.blue < 128 * 3) {
-			MarkRectBorderTint = B_LIGHTEN_2_TINT;
-			MarkRectFillTint = 0.85;
-			MarkTint = 0.1;
+			markRectBorderTint = B_LIGHTEN_2_TINT;
+			markRectFillTint = 0.85;
+			markTint = 0.1;
 		}
 		markRect.left += kBorderOffset;
 		markRect.right = markRect.left + kMarkWidth;
 		markRect.top = (markRect.top + markRect.bottom - kMarkWidth) / 2.0;
 		markRect.bottom = markRect.top + kMarkWidth;
-		owner->SetHighColor(tint_color(owner->LowColor(), MarkRectBorderTint));
+		owner->SetHighColor(tint_color(owner->LowColor(), markRectBorderTint));
 		owner->StrokeRect(markRect);
 		markRect.InsetBy(1, 1);
-		owner->SetHighColor(tint_color(owner->LowColor(), MarkRectFillTint));
+		owner->SetHighColor(tint_color(owner->LowColor(), markRectFillTint));
 		owner->FillRect(markRect);
 		if (fMarked) {
 			markRect.InsetBy(2, 2);
 			owner->SetHighColor(tint_color(owner->LowColor(),
-				MarkTint));
+				markTint));
 			owner->SetPenSize(2);
 			owner->StrokeLine(markRect.LeftTop(), markRect.RightBottom());
 			owner->StrokeLine(markRect.LeftBottom(), markRect.RightTop());
