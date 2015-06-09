@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <AppMisc.h>
 #include <LooperList.h>
 #include <MessagePrivate.h>
 #include <RosterPrivate.h>
@@ -35,6 +36,7 @@ initialize_forked_child()
 	BMessage::Private::StaticReInitForkedChild();
 	BPrivate::gLooperList.InitAfterFork();
 	BPrivate::gDefaultTokens.InitAfterFork();
+	BPrivate::init_team_after_fork();
 
 	DBG(OUT("initialize_forked_child() done\n"));
 }

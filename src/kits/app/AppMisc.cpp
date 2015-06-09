@@ -25,6 +25,9 @@
 namespace BPrivate {
 
 
+static team_id sCurrentTeam = -1;
+
+
 /*!	\brief Returns the path to an application's executable.
 	\param team The application's team ID.
 	\param buffer A pointer to a pre-allocated character array of at least
@@ -123,13 +126,19 @@ get_app_ref(entry_ref *ref, bool traverse)
 team_id
 current_team()
 {
-	static team_id team = -1;
-	if (team < 0) {
+	if (sCurrentTeam < 0) {
 		thread_info info;
 		if (get_thread_info(find_thread(NULL), &info) == B_OK)
-			team = info.team;
+			sCurrentTeam = info.team;
 	}
-	return team;
+	return sCurrentTeam;
+}
+
+
+void
+init_team_after_fork()
+{
+	sCurrentTeam = -1;
 }
 
 
@@ -147,7 +156,7 @@ main_thread_for(team_id team)
 	// a team info to verify the existence of the team.
 	team_info info;
 	status_t error = get_team_info(team, &info);
-	return (error == B_OK ? team : error);
+	return error == B_OK ? team : error;
 }
 
 

@@ -25,6 +25,7 @@ status_t get_app_ref(team_id team, entry_ref *ref, bool traverse = true);
 status_t get_app_ref(entry_ref *ref, bool traverse = true);
 
 team_id current_team();
+void init_team_after_fork();
 thread_id main_thread_for(team_id team);
 
 bool is_app_showing_modal_window(team_id team);
