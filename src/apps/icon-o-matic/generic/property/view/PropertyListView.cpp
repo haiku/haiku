@@ -102,8 +102,8 @@ PropertyListView::PropertyListView()
 	  fMouseWheelFilter(new MouseWheelFilter(this)),
 	  fTabFilter(new TabFilter(this))
 {
-	SetLowColor(255, 255, 255, 255);
-	SetHighColor(0, 0, 0, 255);
+	SetLowColor(ui_color(B_LIST_BACKGROUND_COLOR));
+	SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 	SetViewColor(B_TRANSPARENT_32_BIT);
 }
 

@@ -54,11 +54,15 @@ PropertyItemView::Draw(BRect updateRect)
 		BRect b(Bounds());
 
 		// just draw background and label
-		rgb_color labelColor = LowColor();
-		if (fEnabled)
-			labelColor = tint_color(labelColor, B_DARKEN_MAX_TINT);
-		else
-			labelColor = tint_color(labelColor, B_DISABLED_LABEL_TINT);
+		rgb_color highColor = HighColor();
+		rgb_color labelColor = highColor;
+
+		if (!fEnabled) {
+			if (highColor.red + highColor.green + highColor.blue < 128 * 3)
+				labelColor = tint_color(HighColor(), B_LIGHTEN_2_TINT);
+			else
+				labelColor = tint_color(HighColor(), B_DARKEN_2_TINT);
+		}
 
 		SetHighColor(labelColor);
 		BFont font;
@@ -76,9 +80,17 @@ PropertyItemView::Draw(BRect updateRect)
 												  		   + fh.ascent / 2.0)));
 
 		// draw a "separator" line behind the label
-		SetHighColor(tint_color(LowColor(), B_DARKEN_1_TINT));
+
+		rgb_color lowColor = LowColor();
+			// Dark Themes
+		if (lowColor.red + lowColor.green + lowColor.blue > 128 * 3)
+			SetHighColor(tint_color(LowColor(), B_DARKEN_1_TINT));
+		else
+			SetHighColor(tint_color(LowColor(), B_LIGHTEN_1_TINT));
+
 		StrokeLine(BPoint(b.left + fLabelWidth - 1.0, b.top),
 				   BPoint(b.left + fLabelWidth - 1.0, b.bottom), B_SOLID_HIGH);
+		SetHighColor(highColor);
 	}
 }
 
@@ -245,10 +257,14 @@ PropertyItemView::UpdateObject()
 void
 PropertyItemView::_UpdateLowColor()
 {
-	rgb_color lowColor = fParent ? fParent->LowColor() : kWhite;
-	if (fSelected)
-		lowColor = tint_color(lowColor, B_DARKEN_2_TINT);
-
+	rgb_color lowColor = fParent ? fParent->LowColor()
+		: ui_color(B_LIST_BACKGROUND_COLOR);
+	if (fSelected) {
+		lowColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+		SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+	} else {
+		SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
+	}
 	if (lowColor != LowColor()) {
 		SetLowColor(lowColor);
 		Invalidate();

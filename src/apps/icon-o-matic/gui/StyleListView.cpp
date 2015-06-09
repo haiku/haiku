@@ -77,7 +77,10 @@ public:
 		SimpleItem::DrawBackground(owner, itemFrame, flags);
 
 		// text
-		owner->SetHighColor(0, 0, 0, 255);
+		if (IsSelected())
+			owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+		else
+			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
 		font_height fh;
 		owner->GetFontHeight(&fh);
 		BString truncatedString(Text());
@@ -96,19 +99,29 @@ public:
 
 		// mark
 		BRect markRect = itemFrame;
+		float MarkRectFillTint = B_DARKEN_1_TINT;
+		float MarkRectBorderTint = 1.04;
+		float MarkTint = B_DARKEN_4_TINT;
+					// Dark Themes
+		rgb_color lowColor = owner->LowColor();
+		if (lowColor.red + lowColor.green + lowColor.blue < 128 * 3) {
+			MarkRectFillTint = B_LIGHTEN_2_TINT;
+			MarkRectBorderTint = 0.85;
+			MarkTint = 0.1;
+		}
 		markRect.left += kBorderOffset;
 		markRect.right = markRect.left + kMarkWidth;
 		markRect.top = (markRect.top + markRect.bottom - kMarkWidth) / 2.0;
 		markRect.bottom = markRect.top + kMarkWidth;
-		owner->SetHighColor(tint_color(owner->LowColor(), B_DARKEN_1_TINT));
+		owner->SetHighColor(tint_color(owner->LowColor(), MarkRectFillTint));
 		owner->StrokeRect(markRect);
 		markRect.InsetBy(1, 1);
-		owner->SetHighColor(tint_color(owner->LowColor(), 1.04));
+		owner->SetHighColor(tint_color(owner->LowColor(), MarkRectBorderTint));
 		owner->FillRect(markRect);
 		if (fMarked) {
 			markRect.InsetBy(2, 2);
 			owner->SetHighColor(tint_color(owner->LowColor(),
-				B_DARKEN_4_TINT));
+				MarkTint));
 			owner->SetPenSize(2);
 			owner->StrokeLine(markRect.LeftTop(), markRect.RightBottom());
 			owner->StrokeLine(markRect.LeftBottom(), markRect.RightTop());

@@ -140,7 +140,13 @@ TransformerListView::Draw(BRect updateRect)
 	const char* message2 = B_TRANSLATE_CONTEXT("to attach transformers.",
 		"Empty transformers list - 2nd line");
 
-	SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
+	// Dark Themes
+	rgb_color lowColor = LowColor();
+	if (lowColor.red + lowColor.green + lowColor.blue > 128 * 3)
+		SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
+	else
+		SetHighColor(tint_color(LowColor(), B_LIGHTEN_2_TINT));
+
 	font_height fh;
 	GetFontHeight(&fh);
 	BRect b(Bounds());

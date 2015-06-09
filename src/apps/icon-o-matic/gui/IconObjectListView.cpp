@@ -66,7 +66,13 @@ IconObjectListView::Draw(BRect updateRect)
 	const char* message3 = B_TRANSLATE_CONTEXT(
 		"edit it's properties here.", "Empty property list - 3rd line");
 
-	SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
+	// Dark Themes
+	rgb_color lowColor = LowColor();
+	if (lowColor.red + lowColor.green + lowColor.blue > 128 * 3)
+		SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
+	else
+		SetHighColor(tint_color(LowColor(), B_LIGHTEN_2_TINT));
+
 	font_height fh;
 	GetFontHeight(&fh);
 	BRect b(Bounds());
