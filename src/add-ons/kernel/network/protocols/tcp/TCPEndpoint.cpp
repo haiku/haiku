@@ -741,7 +741,7 @@ TCPEndpoint::Listen(int count)
 		fAcceptSemaphore = create_sem(0, "tcp accept");
 		if (fAcceptSemaphore < B_OK)
 			return ENOBUFS;
-	
+
 		status_t status = fManager->SetPassive(this);
 		if (status != B_OK) {
 			delete_sem(fAcceptSemaphore);
@@ -796,7 +796,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		return EDESTADDRREQ;
 	if (!is_writable(fState) && !is_establishing(fState)) {
 		// we only send signals when called from userland
-		if (gStackModule->is_syscall() && (flags & MSG_NOSIGNAL != 0))
+		if (gStackModule->is_syscall() && ((flags & MSG_NOSIGNAL) != 0))
 			send_signal(find_thread(NULL), SIGPIPE);
 		return EPIPE;
 	}
@@ -1589,7 +1589,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 	// buffer?
 	fReceiveWindow = max_c(fReceiveQueue.Free(), fReceiveWindow);
 		// the window must not shrink
-	
+
 	// trim buffer to be within the receive window
 	int32 drop = (int32)(fReceiveNext - segment.sequence).Number();
 	if (drop > 0) {
