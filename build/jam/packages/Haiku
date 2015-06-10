@@ -122,9 +122,6 @@ AddFilesToPackage bin : install-wifi-firmwares.sh ;
 
 AddSymlinkToPackage bin : trash : untrash ;
 AddSymlinkToPackage bin : less : more ;
-AddSymlinkToPackage bin : gzip : gunzip ;
-AddSymlinkToPackage bin : gzip : zcat ;
-AddSymlinkToPackage bin : zdiff : zcmp ;
 
 # scripts and data files
 local bootScripts = Bootscript Bootscript.cd SetupEnvironment

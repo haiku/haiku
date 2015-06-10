@@ -10,7 +10,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	eject error
 	fdinfo ffm filepanel finddir findpaths fortune fstrim
 	ftp ftpd
-	getarch groupadd groupdel groupmod gzip gzexe
+	getarch groupadd groupdel groupmod
 	hd hey
 	ideinfo@ide idestatus@ide ifconfig iroster isvolume
 	kernel_debugger keymap keystore
@@ -34,7 +34,6 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	uptime urlwrapper useradd userdel
 	version vmstat
 	waitfor watch writembr@x86,x86_64 xres
-	zdiff zforce zgrep zmore znew
 ] ;
 
 SYSTEM_APPS = [ FFilterByBuildFeatures
