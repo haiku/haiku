@@ -109,7 +109,7 @@ compute_new_paths(const char* architecture, BStringList& _paths)
 			int32 index = primaryBinDirectories.IndexOf(path);
 			if (index >= 0) {
 				if (insertionIndex < 0)
-					insertionIndex = i;
+					insertionIndex = _paths.CountStrings();
 			} else if (!is_primary_architecture(
 					guess_architecture_for_path(path))) {
 				// a non-primary architecture path -- skip
