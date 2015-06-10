@@ -46,8 +46,8 @@ RemotePackageRepository HaikuPorts
 	cvsps-2.2b1-1
 	doxygen-1.6.3-4
 	dtc-1.4.1-1
-	expat-2.0.1-7
-	expat_devel-2.0.1-7
+	expat-2.1.0-1
+	expat_devel-2.1.0-1
 	file-5.15-1
 	file_devel-5.15-1
 	findutils-4.4.2-1
