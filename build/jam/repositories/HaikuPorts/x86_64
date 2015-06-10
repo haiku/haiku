@@ -65,6 +65,7 @@ RemotePackageRepository HaikuPorts
 	curl-7.42.1-1
 	curl_devel-7.42.1-1
 	cvs-1.12.13.1-6
+	dos2unix-7.2.2-1
 	doxygen-1.6.3-4
 	dtc-1.4.1-1
 	enca-1.15-1
@@ -335,6 +336,7 @@ RemotePackageRepository HaikuPorts
 	ctags
 	curl
 	cvs
+	dos2unix
 	doxygen
 	dtc
 	enca

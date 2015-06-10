@@ -44,6 +44,7 @@ RemotePackageRepository HaikuPorts
 	curl_devel-7.42.1-1
 	cvs-1.12.13.1-6
 	cvsps-2.2b1-1
+	dos2unix-7.2.2-1
 	doxygen-1.6.3-4
 	dtc-1.4.1-1
 	expat-2.1.0-1
@@ -334,6 +335,7 @@ RemotePackageRepository HaikuPorts
 	curl
 	cvs
 	cvsps
+	dos2unix
 	doxygen
 	dtc
 	expat
