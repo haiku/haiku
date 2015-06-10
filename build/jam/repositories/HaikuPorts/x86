@@ -241,8 +241,8 @@ RemotePackageRepository HaikuPorts
 	bzip2_x86_gcc2_devel-1.0.6-5
 	curl_x86_gcc2-7.42.1-1
 	curl_x86_gcc2_devel-7.42.1-1
-	expat_x86_gcc2-2.0.1-7
-	expat_x86_gcc2_devel-2.0.1-7
+	expat_x86_gcc2-2.1.0-1
+	expat_x86_gcc2_devel-2.1.0-1
 	ffmpeg_x86_gcc2-0.10.2-4
 	ffmpeg_x86_gcc2_devel-0.10.2-4
 	freetype_x86_gcc2-2.6-1

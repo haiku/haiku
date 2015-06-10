@@ -543,8 +543,8 @@ RemotePackageRepository HaikuPorts
 	dtc_x86-1.4.1-1
 	enca_x86-1.15-1
 	enca_x86_devel-1.15-1
-	expat_x86-2.0.1-7
-	expat_x86_devel-2.0.1-7
+	expat_x86-2.1.0-1
+	expat_x86_devel-2.1.0-1
 	faad2_x86-2.7-1
 	faad2_x86_devel-2.7-1
 	fish_x86-1.23.1_git-1
