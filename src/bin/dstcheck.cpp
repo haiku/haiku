@@ -139,9 +139,9 @@ main(int argc, char **argv)
 		TimedAlert::GetLabel(string);
 
 		int32 index = (new TimedAlert("timedAlert", string.String(),
-			B_TRANSLATE("Ask me later"), B_TRANSLATE("Use this time"),
+			B_TRANSLATE("Keep this time"), B_TRANSLATE("Ask me later"),
 			B_TRANSLATE("Manually adjust time" B_UTF8_ELLIPSIS)))->Go();
-		if (index == 0)
+		if (index == 1)
 			exit(0);
 
 		if (index == 2)
