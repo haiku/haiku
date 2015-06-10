@@ -237,13 +237,14 @@ main(int argc, const char* const* argv)
 	}
 
 	// if no command is given, get the user's shell
-	const char* shellCommand[2];
+	const char* shellCommand[3];
 	if (commandArgs == NULL) {
 		struct passwd* pwd = getpwuid(geteuid());
 		shellCommand[0] = pwd != NULL ? pwd->pw_shell : "/bin/sh";
-		shellCommand[1] = NULL;
+		shellCommand[1] = "-l";
+		shellCommand[2] = NULL;
 		commandArgs = shellCommand;
-		commandArgCount = 1;
+		commandArgCount = 2;
 	}
 
 	// exec the command
