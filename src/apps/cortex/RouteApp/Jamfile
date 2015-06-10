@@ -40,7 +40,7 @@ Application Cortex :
 	cortex_diagram_view.a
 	cortex_support.a
 	be media tracker translation
-	libexpat.a
+	[ BuildFeatureAttribute expat : library ]
 	[ TargetLibstdc++ ]
 	: ../Resource.rdef
 ;

@@ -343,7 +343,7 @@ Parser::parse(const char* pathToFile)
 		size_t len = fread(fBuffer, 1, buf_size, fd);
 		done = len < buf_size;
 		if (!XML_Parse(p, fBuffer, len, done)) {
-			sprintf(msg, "%s at line %d\n",
+			sprintf(msg, "%s at line %ld\n",
 					XML_ErrorString(XML_GetErrorCode(p)),
 					XML_GetCurrentLineNumber(p));
 			throw exception(msg);

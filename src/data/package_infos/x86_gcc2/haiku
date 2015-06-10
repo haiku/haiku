@@ -78,6 +78,7 @@ requires {
 	lib:libicutu
 	lib:libicuuc
 #ifdef HAIKU_REGULAR_BUILD
+	lib:libexpat
 	lib:libgutenprint
 	lib:libicns
 	lib:libjasper

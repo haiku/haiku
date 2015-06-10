@@ -62,7 +62,8 @@ for sourceDir in $(sourceDirs) {
 }
 
 # system headers
-UseLibraryHeaders agg expat icon ;
+UseBuildFeatureHeaders expat ;
+UseLibraryHeaders agg icon ;
 UsePrivateHeaders shared ;
 
 
@@ -298,11 +299,15 @@ Application Icon-O-Matic :
 	MainWindow.cpp
 	Util.cpp
 
-	: be tracker translation libshared.a libagg.a libexpat.a 
+	: be tracker translation libshared.a libagg.a
+		[ BuildFeatureAttribute expat : library ]
 		[ TargetLibstdc++ ] localestub
 
 	: Icon-O-Matic.rdef
 ;
+
+Includes [ FGristFiles SVGParser.cpp ]
+	: [ BuildFeatureAttribute expat : headers ] ;
 
 DoCatalogs Icon-O-Matic : 
 	x-vnd.haiku-icon_o_matic

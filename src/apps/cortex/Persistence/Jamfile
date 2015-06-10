@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src apps cortex Persistence ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
 SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) support ] ;
 
-UseLibraryHeaders expat ;
+UseBuildFeatureHeaders expat ;
 
 SubDirCcFlags -DCORTEX_NAMESPACE=cortex ;
 
@@ -16,5 +16,8 @@ StaticLibrary cortex_persistence.a :
 	StringContent.cpp
 	XML.cpp
 ;
+
+Includes [ FGristFiles ImportContext.cpp Importer.cpp XML.cpp ]
+	: [ BuildFeatureAttribute expat : headers ] ;
 
 SubInclude HAIKU_TOP src apps cortex Persistence Wrappers ;

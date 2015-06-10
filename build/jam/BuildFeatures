@@ -537,6 +537,23 @@ if [ IsPackageAvailable ncurses_devel ] {
 }
 
 
+# expat
+if [ IsPackageAvailable expat_devel ] {
+	ExtractBuildFeatureArchives expat :
+		file: base expat
+			runtime: lib
+		file: devel expat_devel
+			depends: base
+			library: $(developLibDir)/libexpat.so.1
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures expat ;
+} else {
+	Echo "expat support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # GPL add-ons
 if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
 	EnableBuildFeatures gpl ;

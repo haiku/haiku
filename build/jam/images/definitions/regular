@@ -17,7 +17,7 @@ SYSTEM_APPS += [ FFilterByBuildFeatures
 	CodyCam
 	GLInfo@mesa
 	HaikuDepot
-	Icon-O-Matic Installer LaunchBox
+	Icon-O-Matic@expat Installer LaunchBox
 	Magnify Mail MediaConverter MediaPlayer MidiPlayer
 	PackageInstaller People PoorMan PowerStatus
 	RemoteDesktop
@@ -50,7 +50,7 @@ SYSTEM_PREFERENCES += [ FFilterByBuildFeatures
 ] ;
 
 SYSTEM_DEMOS += [ FFilterByBuildFeatures
-	Chart Clock Cortex FontDemo GLTeapot@mesa
+	Chart Clock Cortex@expat FontDemo GLTeapot@mesa
 	$(HAIKU_INCLUDE_TRADEMARKS)Haiku3d@mesa Mandelbrot OverlayImage Pairs
 	PatchBay Playground Pulse Sudoku
 ] ;
