@@ -162,6 +162,7 @@ RemotePackageRepository HaikuPorts
 	gutenprint-5.2.10-1
 	gutenprint_devel-5.2.10-1
 	gyp-r1948-2
+	gzip-1.6-2
 	help2man-1.44.1-1
 	htmldoc-1.8.27-3
 	html_parser-3.71-1
@@ -967,6 +968,7 @@ RemotePackageRepository HaikuPorts
 	guilib
 	gutenprint
 	gyp
+	gzip
 	haikuwebkit_x86
 	harfbuzz_x86
 	help2man

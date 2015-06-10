@@ -86,6 +86,7 @@ RemotePackageRepository HaikuPorts
 	groff-1.20.1-3
 	gutenprint-5.2.10-1
 	gutenprint_devel-5.2.10-1
+	gzip-1.6-2
 	haikuwebkit-1.4.10-1
 	haikuwebkit_devel-1.4.10-1
 	help2man-1.44.1-1
@@ -357,6 +358,7 @@ RemotePackageRepository HaikuPorts
 	grep
 	groff
 	gutenprint
+	gzip
 	htmldoc
 	icu
 	icu54
