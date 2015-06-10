@@ -121,6 +121,7 @@ struct msghdr {
 #define MSG_BCAST		0x0100	/* this message rec'd as broadcast */
 #define MSG_MCAST		0x0200	/* this message rec'd as multicast */
 #define	MSG_EOF			0x0400	/* data completes connection */
+#define MSG_NOSIGNAL	0x0800	/* don't raise SIGPIPE if socket is closed */
 
 struct cmsghdr {
 	socklen_t	cmsg_len;

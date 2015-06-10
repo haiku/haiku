@@ -785,8 +785,10 @@ TCPEndpoint::SendData(net_buffer *buffer)
 	MutexLocker lock(fLock);
 
 	TRACE("SendData(buffer %p, size %lu, flags %lx) [total %lu bytes, has %lu]",
-		  buffer, buffer->size, buffer->flags, fSendQueue.Size(),
-		  fSendQueue.Free());
+		buffer, buffer->size, buffer->flags, fSendQueue.Size(),
+		fSendQueue.Free());
+
+	uint32 flags = buffer->flags;
 
 	if (fState == CLOSED)
 		return ENOTCONN;
@@ -794,12 +796,11 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		return EDESTADDRREQ;
 	if (!is_writable(fState) && !is_establishing(fState)) {
 		// we only send signals when called from userland
-		if (gStackModule->is_syscall())
+		if (gStackModule->is_syscall() && (flags & MSG_NOSIGNAL != 0))
 			send_signal(find_thread(NULL), SIGPIPE);
 		return EPIPE;
 	}
 
-	uint32 flags = buffer->flags;
 	size_t left = buffer->size;
 
 	bigtime_t timeout = absolute_timeout(socket->send.timeout);
