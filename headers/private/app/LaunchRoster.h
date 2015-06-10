@@ -22,7 +22,14 @@ public:
 			port_id				GetPort(const char* signature,
 									const char* name);
 
+			status_t			StartSession(const char* login,
+									const char* password);
+
+	class Private;
+
 private:
+	friend class Private;
+
 			void				_InitMessenger();
 
 private:

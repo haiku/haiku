@@ -1,0 +1,9 @@
+service x-vnd.Be-TRAK {
+	launch /system/Tracker
+	legacy
+}
+
+service x-vnd.Be-TSKB {
+	launch /system/Deskbar
+	legacy
+}

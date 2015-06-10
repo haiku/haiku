@@ -14,6 +14,7 @@
 
 #include <launch.h>
 #include <LaunchDaemonDefs.h>
+#include <LaunchRosterPrivate.h>
 #include <MessengerPrivate.h>
 
 
@@ -21,6 +22,45 @@ using namespace BPrivate;
 
 
 const BLaunchRoster* be_launch_roster;
+
+
+BLaunchRoster::Private::Private(BLaunchRoster* roster)
+	:
+	fRoster(roster)
+{
+}
+
+
+BLaunchRoster::Private::Private(BLaunchRoster& roster)
+	:
+	fRoster(&roster)
+{
+}
+
+
+status_t
+BLaunchRoster::Private::RegisterSession(const BMessenger& target)
+{
+	BMessage request(B_REGISTER_LAUNCH_SESSION);
+	status_t status = request.AddInt32("user", getuid());
+	if (status == B_OK)
+		status = request.AddMessenger("target", target);
+	if (status != B_OK)
+		return status;
+
+	// send the request
+	BMessage result;
+	status = fRoster->fMessenger.SendMessage(&request, &result);
+
+	// evaluate the reply
+	if (status == B_OK)
+		status = result.what;
+
+	return status;
+}
+
+
+// #pragma mark -
 
 
 BLaunchRoster::BLaunchRoster()
@@ -59,6 +99,8 @@ BLaunchRoster::GetData(const char* signature, BMessage& data)
 
 	BMessage request(B_GET_LAUNCH_DATA);
 	status_t status = request.AddString("name", signature);
+	if (status == B_OK)
+		status = request.AddInt32("user", getuid());
 	if (status != B_OK)
 		return status;
 
@@ -86,9 +128,8 @@ BLaunchRoster::GetPort(const char* name)
 port_id
 BLaunchRoster::GetPort(const char* signature, const char* name)
 {
-	BLaunchRoster launchRoster;
 	BMessage data;
-	status_t status = launchRoster.GetData(signature, data);
+	status_t status = GetData(signature, data);
 	if (status == B_OK) {
 		BString fieldName;
 		if (name != NULL)
@@ -101,6 +142,33 @@ BLaunchRoster::GetPort(const char* signature, const char* name)
 	}
 
 	return -1;
+}
+
+
+status_t
+BLaunchRoster::StartSession(const char* login, const char* password)
+{
+	if (login == NULL || password == NULL)
+		return B_BAD_VALUE;
+
+	BMessage request(B_LAUNCH_SESSION);
+	status_t status = request.AddInt32("user", getuid());
+	if (status == B_OK)
+		status = request.AddString("login", login);
+	if (status == B_OK)
+		status = request.AddString("password", password);
+	if (status != B_OK)
+		return status;
+
+	// send the request
+	BMessage result;
+	status = fMessenger.SendMessage(&request, &result);
+
+	// evaluate the reply
+	if (status == B_OK)
+		status = result.what;
+
+	return status;
 }
 
 

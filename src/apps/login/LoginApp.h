@@ -29,7 +29,7 @@ public:
 private:
 	void			TryLogin(BMessage *message);
 	status_t		ValidateLogin(const char *login, const char *password);
-	status_t		StartUserSession(const char *login);
+	status_t		StartUserSession(const char *login, const char *password);
 	int				getpty(char *pty, char *tty);
 	
 	DesktopWindow*	fDesktopWindow;

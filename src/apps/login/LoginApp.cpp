@@ -16,15 +16,16 @@
 #include <unistd.h>
 #include <pwd.h>
 
+#include <LaunchRoster.h>
+#include <RosterPrivate.h>
+#include <shadow.h>
+
+#include "multiuser_utils.h"
+
 #include "LoginApp.h"
 #include "LoginWindow.h"
 #include "DesktopWindow.h"
 
-#ifdef __HAIKU__
-#include <RosterPrivate.h>
-#include <shadow.h>
-#include "multiuser_utils.h"
-#endif
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Login App"
@@ -80,11 +81,9 @@ LoginApp::MessageReceived(BMessage *message)
 
 	switch (message->what) {
 		case kAttemptLogin:
-			message->PrintToStream();
 			TryLogin(message);
 			// TODO
 			break;
-#ifdef __HAIKU__
 		case kHaltAction:
 			reboot = false;
 			// FALLTHROUGH
@@ -111,9 +110,9 @@ LoginApp::MessageReceived(BMessage *message)
 			alert->Go();
 			break;
 		}
-#endif
-	default:
-		BApplication::MessageReceived(message);
+
+		default:
+			BApplication::MessageReceived(message);
 	}
 }
 
@@ -145,37 +144,31 @@ LoginApp::ArgvReceived(int32 argc, char **argv)
 void
 LoginApp::TryLogin(BMessage *message)
 {
-	status_t err;
+	status_t status = B_BAD_VALUE;
+
 	const char *login;
 	const char *password;
 	BMessage reply(kLoginBad);
 	if (message->FindString("login", &login) == B_OK) {
 		if (message->FindString("password", &password) < B_OK)
 			password = NULL;
-		err = ValidateLogin(login, password);
-		printf(B_TRANSLATE_COMMENT("ValidateLogin: %s\n",
-			"A message returned from the ValidateLogin function. "
-			"It can be \"B_OK\"."), strerror(err));
-		if (err == B_OK) {
-			reply.what = kLoginOk;
-			message->SendReply(&reply);
 
-			if (password == NULL)
-				return;
+		if (password != NULL) {
+			status = StartUserSession(login, password);
+			if (status == B_OK)
+				Quit();
+		} else
+			status = ValidateLogin(login, password);
 
-			// start a session
-			//kSetProgress
-			StartUserSession(login);
-		} else {
-			reply.AddInt32("error", err);
-			message->SendReply(&reply);
-			return;
-		}
+		fprintf(stderr, "ValidateLogin: %s\n", strerror(status));
+	}
 
-	} else {
-		reply.AddInt32("error", EINVAL);
+	if (status == B_OK) {
+		reply.what = kLoginOk;
 		message->SendReply(&reply);
-		return;
+	} else {
+		reply.AddInt32("error", status);
+		message->SendReply(&reply);
 	}
 }
 
@@ -210,9 +203,12 @@ LoginApp::ValidateLogin(const char *login, const char *password)
 
 
 status_t
-LoginApp::StartUserSession(const char *login)
+LoginApp::StartUserSession(const char* login, const char* password)
 {
-	return B_ERROR;
+	if (login == NULL || password == NULL)
+		return B_BAD_VALUE;
+
+	return BLaunchRoster().StartSession(login, password);
 }
 
 

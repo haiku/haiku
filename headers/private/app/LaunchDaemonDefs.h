@@ -24,7 +24,9 @@ namespace BPrivate {
 
 // message constants
 enum {
-	B_GET_LAUNCH_DATA			= 'lncd',
+	B_GET_LAUNCH_DATA			= 'lnda',
+	B_LAUNCH_SESSION			= 'lnse',
+	B_REGISTER_LAUNCH_SESSION	= 'lnrs',
 };
 
 

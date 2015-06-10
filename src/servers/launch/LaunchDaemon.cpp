@@ -7,6 +7,8 @@
 #include <map>
 #include <set>
 
+#include <errno.h>
+#include <grp.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -23,7 +25,10 @@
 #include <AppMisc.h>
 #include <DriverSettingsMessageAdapter.h>
 #include <LaunchDaemonDefs.h>
+#include <LaunchRosterPrivate.h>
 #include <syscalls.h>
+
+#include "multiuser_utils.h"
 
 #include "InitRealTimeClockJob.h"
 #include "InitSharedMemoryDirectoryJob.h"
@@ -63,6 +68,21 @@ const static settings_template kSettingsTemplate[] = {
 
 
 typedef std::map<BString, BMessage> PortMap;
+
+
+class Session {
+public:
+								Session(uid_t user, const BMessenger& target);
+
+			uid_t				User() const
+									{ return fUser; }
+			const BMessenger&	Target() const
+									{ return fTarget; }
+
+private:
+			uid_t				fUser;
+			BMessenger			fTarget;
+};
 
 
 class Target : public BJob {
@@ -135,26 +155,30 @@ private:
 };
 
 
-typedef std::map<BString, Job*> JobMap;
-
-
 class JobFinder {
 public:
 	virtual	Job*				FindJob(const char* name) const = 0;
 };
 
 
+typedef std::map<BString, Job*> JobMap;
+typedef std::map<uid_t, Session*> SessionMap;
+
+
 class LaunchDaemon : public BServer, public JobFinder {
 public:
-								LaunchDaemon(status_t& error);
+								LaunchDaemon(bool userMode, status_t& error);
 	virtual						~LaunchDaemon();
 
 	virtual	Job*				FindJob(const char* name) const;
+			Session*			FindSession(uid_t user) const;
 
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
+			uid_t				_GetUserID(BMessage* message);
+
 			void				_ReadPaths(const BStringList& paths);
 			void				_ReadEntry(const char* context, BEntry& entry);
 			void				_ReadDirectory(const char* context,
@@ -166,6 +190,9 @@ private:
 			void				_LaunchJobs();
 			void				_AddLaunchJob(Job* job);
 
+			status_t			_StartSession(const char* login,
+									const char* password);
+
 			void				_RetrieveKernelOptions();
 			void				_SetupEnvironment();
 			void				_InitSystem();
@@ -176,9 +203,11 @@ private:
 private:
 			JobMap				fJobs;
 			JobQueue			fJobQueue;
+			SessionMap			fSessions;
 			MainWorker*			fMainWorker;
 			Target*				fInitTarget;
 			bool				fSafeMode;
+			bool				fUserMode;
 };
 
 
@@ -508,6 +537,17 @@ Job::Execute()
 // #pragma mark -
 
 
+Session::Session(uid_t user, const BMessenger& target)
+	:
+	fUser(user),
+	fTarget(target)
+{
+}
+
+
+// #pragma mark -
+
+
 Target::Target(const char* name)
 	:
 	BJob(name)
@@ -525,12 +565,13 @@ Target::Execute()
 // #pragma mark -
 
 
-LaunchDaemon::LaunchDaemon(status_t& error)
+LaunchDaemon::LaunchDaemon(bool userMode, status_t& error)
 	:
 	BServer(kLaunchDaemonSignature, NULL,
 		create_port(B_LOOPER_PORT_DEFAULT_CAPACITY,
-			B_LAUNCH_DAEMON_PORT_NAME), false, &error),
-	fInitTarget(new Target("init"))
+			userMode ? "AppPort" : B_LAUNCH_DAEMON_PORT_NAME), false, &error),
+	fInitTarget(userMode ? NULL : new Target("init")),
+	fUserMode(userMode)
 {
 	fMainWorker = new MainWorker(fJobQueue);
 }
@@ -555,23 +596,38 @@ LaunchDaemon::FindJob(const char* name) const
 }
 
 
+Session*
+LaunchDaemon::FindSession(uid_t user) const
+{
+	SessionMap::const_iterator found = fSessions.find(user);
+	if (found != fSessions.end())
+		return found->second;
+
+	return NULL;
+}
+
+
 void
 LaunchDaemon::ReadyToRun()
 {
 	_RetrieveKernelOptions();
 	_SetupEnvironment();
-	_InitSystem();
+	if (fUserMode) {
+		BLaunchRoster roster;
+		BLaunchRoster::Private(roster).RegisterSession(this);
+	} else
+		_InitSystem();
 
 	BStringList paths;
 	BPathFinder::FindPaths(B_FIND_PATH_DATA_DIRECTORY, kLaunchDirectory,
-		B_FIND_PATHS_SYSTEM_ONLY, paths);
+		fUserMode ? B_FIND_PATHS_USER_ONLY : B_FIND_PATHS_SYSTEM_ONLY, paths);
 	_ReadPaths(paths);
 
 	BPathFinder::FindPaths(B_FIND_PATH_SETTINGS_DIRECTORY, kLaunchDirectory,
-		B_FIND_PATHS_SYSTEM_ONLY, paths);
+		fUserMode ? B_FIND_PATHS_USER_ONLY : B_FIND_PATHS_SYSTEM_ONLY, paths);
 	_ReadPaths(paths);
 
-	_InitJobs(fInitTarget);
+	_InitJobs(fUserMode ? NULL : fInitTarget);
 	_LaunchJobs();
 }
 
@@ -582,9 +638,19 @@ LaunchDaemon::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case B_GET_LAUNCH_DATA:
 		{
+			uid_t user = _GetUserID(message);
+			if (user < 0)
+				return;
+
 			BMessage reply((uint32)B_OK);
 			Job* job = FindJob(get_leaf(message->GetString("name")));
 			if (job == NULL) {
+				Session* session = FindSession(user);
+				if (session != NULL) {
+					// Forward request to user launch_daemon
+					if (session->Target().SendMessage(message) == B_OK)
+						break;
+				}
 				reply.what = B_NAME_NOT_FOUND;
 			} else {
 				// If the job has not been launched yet, we'll pass on our
@@ -610,10 +676,70 @@ LaunchDaemon::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case B_LAUNCH_SESSION:
+		{
+			uid_t user = _GetUserID(message);
+			if (user < 0)
+				break;
+
+			status_t status = B_OK;
+			const char* login = message->GetString("login");
+			const char* password = message->GetString("password");
+			if (login == NULL || password == NULL)
+				status = B_BAD_VALUE;
+			if (status == B_OK && user != 0) {
+				// Only the root user can start sessions
+				status = B_PERMISSION_DENIED;
+			}
+			if (status == B_OK)
+				status = _StartSession(login, password);
+
+			BMessage reply((uint32)status);
+			message->SendReply(&reply);
+			break;
+		}
+
+		case B_REGISTER_LAUNCH_SESSION:
+		{
+			uid_t user = _GetUserID(message);
+			if (user < 0)
+				break;
+
+			status_t status = B_OK;
+
+			BMessenger target;
+			if (message->FindMessenger("target", &target) != B_OK)
+				status = B_BAD_VALUE;
+
+			if (status == B_OK) {
+				Session* session = new (std::nothrow) Session(user, target);
+				if (session != NULL)
+					fSessions.insert(std::pair<uid_t, Session*>(user, session));
+				else
+					status = B_NO_MEMORY;
+			}
+
+			BMessage reply((uint32)status);
+			message->SendReply(&reply);
+			break;
+		}
+
 		default:
 			BServer::MessageReceived(message);
 			break;
 	}
+}
+
+
+uid_t
+LaunchDaemon::_GetUserID(BMessage* message)
+{
+	uid_t user = (uid_t)message->GetInt32("user", -1);
+	if (user < 0) {
+		BMessage reply((uint32)B_BAD_VALUE);
+		message->SendReply(&reply);
+	}
+	return user;
 }
 
 
@@ -746,7 +872,7 @@ LaunchDaemon::_InitJobs(Target* target)
 					strerror(status));
 			}
 
-			// Remove jobs that aren't user later on
+			// Remove jobs that won't be used later on
 			fJobs.erase(remove);
 		}
 	}
@@ -769,6 +895,67 @@ LaunchDaemon::_AddLaunchJob(Job* job)
 {
 	if (!job->IsLaunched())
 		fJobQueue.AddJob(job);
+}
+
+
+status_t
+LaunchDaemon::_StartSession(const char* login, const char* password)
+{
+	Unlock();
+
+	// TODO: enable user/group code and password authentication
+	// The launch_daemon currently cannot talk to the registrar, though
+/*
+	struct passwd* passwd = getpwnam(login);
+	if (passwd == NULL)
+		return B_NAME_NOT_FOUND;
+	if (strcmp(passwd->pw_name, login) != 0)
+		return B_NAME_NOT_FOUND;
+
+	// TODO: check for auto-login, and ignore password then
+	if (!verify_password(passwd, getspnam(login), password))
+		return B_PERMISSION_DENIED;
+
+	// Check if there is a user session running already
+	uid_t user = passwd->pw_uid;
+	gid_t group = passwd->pw_gid;
+*/
+
+	if (fork() == 0) {
+		if (setsid() < 0)
+			exit(EXIT_FAILURE);
+
+/*
+debug_printf("session leader...\n");
+		if (initgroups(login, group) == -1) {
+debug_printf("1.ouch: %s\n", strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+		//endgrent();
+		if (setgid(group) != 0) {
+debug_printf("2.ouch: %s\n", strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+		if (setuid(user) != 0) {
+debug_printf("3.ouch: %s\n", strerror(errno));
+			exit(EXIT_FAILURE);
+		}
+*/
+
+		// TODO: This leaks the parent application
+		be_app = NULL;
+
+		// TODO: take over system jobs, and reserve their names
+		status_t status;
+		LaunchDaemon* daemon = new LaunchDaemon(true, status);
+		if (status == B_OK)
+			daemon->Run();
+
+		delete daemon;
+		exit(EXIT_SUCCESS);
+	}
+	Lock();
+	return B_OK;
 }
 
 
@@ -834,16 +1021,8 @@ LaunchDaemon::_IsSafeMode() const
 int
 main()
 {
-	// TODO: remove this again
-	close(STDOUT_FILENO);
-	int fd = open("/dev/dprintf", O_WRONLY);
-	if (fd != STDOUT_FILENO)
-		dup2(fd, STDOUT_FILENO);
-	puts("launch_daemon is alive and kicking.");
-	fflush(stdout);
-
 	status_t status;
-	LaunchDaemon* daemon = new LaunchDaemon(status);
+	LaunchDaemon* daemon = new LaunchDaemon(false, status);
 	if (status == B_OK)
 		daemon->Run();
 

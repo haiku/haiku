@@ -41,6 +41,7 @@ SYSTEM_APPS = [ FFilterByBuildFeatures
 	CharacterMap
 	Debugger DeskCalc Devices DiskProbe DiskUsage DriveSetup
 	Expander
+	Login
 	NetworkStatus
 	ProcessController
 	ShowImage StyledEdit
@@ -276,6 +277,10 @@ local networkSettingsFiles = <network-settings>services ;
 SEARCH on $(networkSettingsFiles)
 	= [ FDirName $(HAIKU_TOP) data settings network ] ;
 AddFilesToHaikuImage system settings network : $(networkSettingsFiles) ;
+
+local userLaunchScripts = <data!launch>user ;
+SEARCH on $(userLaunchScripts) = [ FDirName $(HAIKU_TOP) data launch ] ;
+AddFilesToHaikuImage home config non-packaged data launch : $(userLaunchScripts) ;
 
 # fresh install indicator file for the post install scripts
 SEARCH on <post-install>fresh_install

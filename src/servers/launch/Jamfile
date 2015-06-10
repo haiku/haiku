@@ -3,6 +3,8 @@ SubDir HAIKU_TOP src servers launch ;
 UsePrivateHeaders app package shared storage support ;
 UsePrivateSystemHeaders ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) src bin multiuser ] ;
+
 Server launch_daemon
 	:
 	LaunchDaemon.cpp
@@ -14,7 +16,7 @@ Server launch_daemon
 	InitSharedMemoryDirectoryJob.cpp
 	InitTemporaryDirectoryJob.cpp
 	:
-	be libshared.a [ TargetLibstdc++ ]
+	be libshared.a libmultiuser_utils.a [ TargetLibstdc++ ]
 	:
 	LaunchDaemon.rdef
 ;
