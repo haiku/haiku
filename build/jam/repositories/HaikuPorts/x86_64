@@ -23,7 +23,7 @@ RemotePackageRepository HaikuPorts
 	apr_util_devel-1.5.4-1
 	autoconf-2.69-6
 	automake-1.13.1-4
-	bash-4.3.33-1
+	bash-4.3.39-1
 #	bepdf-1.1.1~beta5_2013_04_28-1
 	binutils-2.25_2014_12_27-1
 	bison-2.6.5-1
