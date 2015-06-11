@@ -796,7 +796,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		return EDESTADDRREQ;
 	if (!is_writable(fState) && !is_establishing(fState)) {
 		// we only send signals when called from userland
-		if (gStackModule->is_syscall() && ((flags & MSG_NOSIGNAL) == 0))
+		if (gStackModule->is_syscall() && (flags & MSG_NOSIGNAL) == 0)
 			send_signal(find_thread(NULL), SIGPIPE);
 		return EPIPE;
 	}
