@@ -38,7 +38,7 @@ public:
 			void				HandleInputBuffer(BBuffer* buffer,
 									bigtime_t lateness);
 
-			BBufferGroup*		CreateBufferGroup();
+			status_t			CreateBufferGroup(BBufferGroup** buffer) const;
 
 			status_t			SendBuffer(BBuffer* buffer,
 									MixerOutput* output);

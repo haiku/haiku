@@ -108,8 +108,8 @@ AudioMixer::AudioMixer(BMediaAddOn *addOn, bool isSystemMixer)
 	BMediaEventLooper(),
 	fAddOn(addOn),
 	fCore(new MixerCore(this)),
-	fWeb(0),
-	fBufferGroup(0),
+	fWeb(NULL),
+	fBufferGroup(NULL),
 	fDownstreamLatency(1),
 	fInternalLatency(1),
 	fDisableStop(false),
@@ -573,6 +573,8 @@ AudioMixer::FormatChangeRequested(const media_source &source,
 
 	fCore->Lock();
 
+	status_t status = B_OK;
+	BBufferGroup *group = NULL;
 	MixerOutput *output = fCore->Output();
 	if (!output) {
 		ERROR("AudioMixer::FormatChangeRequested: no output\n");
@@ -638,16 +640,21 @@ AudioMixer::FormatChangeRequested(const media_source &source,
 	// apply format change
 	fCore->OutputFormatChanged(io_format->u.raw_audio);
 
-	delete fBufferGroup;
-	fBufferGroup = CreateBufferGroup();
-	fCore->SetOutputBufferGroup(fBufferGroup);
+	status = CreateBufferGroup(&group);
+	if (status != B_OK)
+		return status;
+	else {
+		delete fBufferGroup;
+		fBufferGroup = group;
+		fCore->SetOutputBufferGroup(fBufferGroup);
+	}
 
 	fCore->Unlock();
-	return B_OK;
+	return status;
 
 err:
 	fCore->Unlock();
-	return B_ERROR;
+	return status;
 }
 
 
@@ -703,8 +710,11 @@ AudioMixer::SetBufferGroup(const media_source &for_source,
 	}
 
 	fCore->Lock();
-	if (!newGroup)
-		newGroup = CreateBufferGroup();
+	if (!newGroup) {
+		status_t status = CreateBufferGroup(&newGroup);
+		if (status != B_OK)
+			return status;
+	}
 	fCore->SetOutputBufferGroup(newGroup);
 	delete fBufferGroup;
 	fBufferGroup = newGroup;
@@ -931,14 +941,18 @@ AudioMixer::Connect(status_t error, const media_source &source,
 	// we need to inform all connected *inputs* about *our* change in latency
 	PublishEventLatencyChange();
 
+	fCore->Lock();
+
 	// Set up the buffer group for our connection, as long as nobody handed
 	// us a buffer group (via SetBufferGroup()) prior to this.  That can
 	// happen, for example, if the consumer calls SetOutputBuffersFor() on
 	// us from within its Connected() method.
-	if (!fBufferGroup)
-		fBufferGroup = CreateBufferGroup();
-
-	fCore->Lock();
+	if (!fBufferGroup) {
+		BBufferGroup *group = NULL;
+		if (CreateBufferGroup(&group) != B_OK)
+			return;
+		fBufferGroup = group;
+	}
 
 	ASSERT(fCore->Output() != 0);
 
@@ -991,7 +1005,7 @@ AudioMixer::Disconnect(const media_source& what, const media_destination& where)
 
 	// destroy buffer group
 	delete fBufferGroup;
-	fBufferGroup = 0;
+	fBufferGroup = NULL;
 	fCore->SetOutputBufferGroup(0);
 
 	fCore->Unlock();
@@ -1148,8 +1162,8 @@ AudioMixer::PublishEventLatencyChange()
 }
 
 
-BBufferGroup*
-AudioMixer::CreateBufferGroup()
+status_t
+AudioMixer::CreateBufferGroup(BBufferGroup** buffer) const
 {
 	// allocate enough buffers to span our downstream latency
 	// (plus one for rounding up), plus one extra
@@ -1168,7 +1182,18 @@ AudioMixer::CreateBufferGroup()
 
 	TRACE("AudioMixer: allocating %ld buffers of %ld bytes each\n",
 		count, size);
-	return new BBufferGroup(size, count);
+
+	BBufferGroup* buf = new BBufferGroup(size, count);
+	if (buf == NULL)
+		return B_NO_MEMORY;
+
+	status_t status = buf->InitCheck();
+	if (status != B_OK)
+		delete buf;
+	else
+		*buffer = buf;
+
+	return status;
 }
 
 
