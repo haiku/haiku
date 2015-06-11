@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.06.04
-#	Date:    2015-06-04 03:15:02
+#	Version: 2015.06.08
+#	Date:    2015-06-08 03:15:01
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10883,7 +10883,7 @@
 	287d  VT8251 PCIE Root Port
 	287e  VT8237/8251 Ultra VLINK Controller
 	3022  CLE266
-	3038  VT82xxxxx UHCI USB 1.1 Controller
+	3038  VT82xx/62xx UHCI USB 1.1 Controller
 		0925 1234  onboard UHCI USB 1.1 Controller
 		1019 0985  P6VXA Motherboard
 		1019 0a81  L7VTA v1.0 Motherboard (KT400-8235)
@@ -10951,6 +10951,7 @@
 		15dd 7609  Onboard Audio
 	3059  VT8233/A/8235/8237 AC97 Audio Controller
 		1019 0a81  L7VTA v1.0 Motherboard (KT400-8235)
+		1019 1841  M811 (VT8367/VT8235/VT6103) [KT333] motherboard
 		1019 1877  K8M800-M2 (V2.0) onboard audio
 		1043 8095  A7V8X Motherboard (Realtek ALC650 codec)
 		1043 80a1  A7V8X-X Motherboard
@@ -10970,7 +10971,7 @@
 		1462 5901  KT6 Delta-FIS2R (MS-6590)
 		1462 7181  K8MM3-V mainboard
 		147b 1407  KV8-MAX3 motherboard
-		1695 300c  EP-8KRA2+ Mainboard
+		1695 300c  Realtek ALC655 audio on EP-8KRA series mainboard
 		1849 0850  ASRock 775Dual-880 Pro onboard audio (Realtek ALC850)
 		1849 9739  P4VT8 Mainboard (C-Media CMI9739A codec)
 # probably all K7VT2/4*/6
@@ -10978,10 +10979,10 @@
 		4005 4710  MSI K7T266 Pro2-RU (MSI-6380 v2) onboard audio (Realtek/ALC 200/200P)
 		a0a0 01b6  AK77-8XN onboard audio
 		a0a0 0342  AK86-L motherboard
-	3065  VT6102 [Rhine-II]
+	3065  VT6102/VT6103 [Rhine-II]
 		1043 80a1  A7V8X-X Motherboard
 		1043 80ed  A7V600-X Motherboard
-		1106 0102  VT6102 [Rhine II] Embeded Ethernet Controller on VT8235
+		1106 0102  VT6102/6103 [Rhine II] Ethernet Controller
 		1186 1400  DFE-530TX rev A
 		1186 1401  DFE-530TX rev B
 		13b9 1421  LD-10/100AL PCI Fast Ethernet Adapter (rev.B)
@@ -10989,7 +10990,6 @@
 		1462 7181  K8MM3-V mainboard
 		147b 1c09  NV7 Motherboard
 		1695 3005  VT6103
-		1695 300c  Realtek ALC655 sound chip
 # probably all K7VT2/4*/6
 		1849 3065  K7VT series Motherboards
 # This hosts more than just the Intel 537 codec, it also hosts PCtel (SIL33) and SmartLink (SIL34) codecs
@@ -10999,6 +10999,7 @@
 		1043 8052  VT8233A
 	3091  VT8633 [Apollo Pro266]
 	3099  VT8366/A/7 [Apollo KT266/A/333]
+		1019 1841  M811 (VT8367/VT8235/VT6103) [KT333] motherboard
 		1043 8064  A7V266-E Mainboard
 		1043 807f  A7V333 Mainboard
 		1849 3099  K7VT2 motherboard
@@ -11066,6 +11067,7 @@
 		1849 3168  P4VT8 Mainboard
 	3177  VT8235 ISA Bridge
 		1019 0a81  L7VTA v1.0 Motherboard (KT400-8235)
+		1019 1841  M811 (VT8367/VT8235/VT6103) [KT333] motherboard
 		1043 808c  A7V8X motherboard
 		1043 80a1  A7V8X-X motherboard
 		1106 0000  KT4AV motherboard
@@ -19073,7 +19075,20 @@
 	0100  QXL paravirtual graphic card
 		1af4 1100  QEMU Virtual Machine
 1b37  Signal Processing Devices Sweden AB
+	0001  ADQ214
+	0003  ADQ114
+	0005  ADQ112
+	000e  ADQ108
+	000f  ADQDSP
 	0014  ADQ412
+	0015  ADQ212
+	001b  SDR14
+	001c  ADQ1600
+	001e  ADQ208
+	001f  DSU
+	0020  ADQ14
+	2014  TX320
+	2019  S6000
 # now owned by HGST (a Western Digital subsidiary)
 1b39  sTec, Inc.
 	0001  S1120 PCIe Accelerator SSD
@@ -19226,8 +19241,16 @@
 	a400  PM2x24/PM3224
 1d5c  Fantasia Trading LLC
 1d6c  Atomic Rules LLC
+	1001  A5PL-E1
+	1002  A5PL-E7
+	1003  S5PEDS-AB
+	1004  KC705-K325
+	1005  ZC706-Z045
+	1006  KCU105-KU040
+	1007  XUSP3S-VU095 [Jasper]
+	4200  A5PL-E1-10GETI [10 GbE Ethernet Traffic Instrument]
 1de1  Tekram Technology Co.,Ltd.
-	0391  TRM-S1040
+	0391  TRM-S1040 [DC-315 / DC-395 series]
 	2020  DC-390
 	690c  690c
 	dc29  DC290
@@ -21554,8 +21577,9 @@
 		103c 22fd  HP Ethernet 10Gb 2-port 562SFP+ Adapter
 		1137 0000  Ethernet Converged NIC X710-4
 		1137 013b  Ethernet Converged NIC X710-4
-		17aa 0000  ThinkServer XL710 AnyFabric
-		17aa 4001  ThinkServer XL710-4 AnyFabric
+		17aa 0000  ThinkServer X710 AnyFabric for 10GbE SFP+
+		17aa 4001  ThinkServer X710-4 AnyFabric for 10GbE SFP+
+		17aa 4002  ThinkServer X710-2 AnyFabric for 10GbE SFP+
 		8086 0000  Ethernet Converged Network Adapter X710
 		8086 0001  Ethernet Converged Network Adapter X710-4
 		8086 0002  Ethernet Converged Network Adapter X710-4
@@ -26229,8 +26253,8 @@
 	3860  AHA-2930CU
 	3b78  AHA-4844W/4844UW
 	5075  AIC-755x
-	5078  AIC-7850
-		9004 7850  AHA-2904/Integrated AIC-7850
+	5078  AIC-7850T/7856T [AVA-2902/4/6 / AHA-2910]
+		9004 7850  AIC-7850T/7856T [AVA-290x / AHA-2910]
 	5175  AIC-755x
 	5178  AIC-7851
 	5275  AIC-755x
@@ -26279,7 +26303,7 @@
 		9004 8020  ANA62022 2-port 64 bit 10/100
 		9004 8028  ANA69011A/TX 64 bit 10/100
 	7078  AHA-294x / AIC-7870
-	7178  AHA-2940/2940W / AIC-7871
+	7178  AIC-7870P/7871 [AHA-2940/W/S76]
 	7278  AHA-3940/3940W / AIC-7872
 	7378  AHA-3985 / AIC-7873
 	7478  AHA-2944/2944W / AIC-7874
@@ -26318,7 +26342,7 @@
 	7897  AIC-789x
 	8078  AIC-7880U
 		9004 7880  AIC-7880P Ultra/Ultra Wide SCSI Chipset
-	8178  AHA-2940U/UW/D / AIC-7881U
+	8178  AIC-7870P/7881U [AHA-2940U/UW/D/S76]
 		9004 7881  AHA-2940UW SCSI Host Adapter
 	8278  AHA-3940U/UW/UWD / AIC-7882U
 	8378  AHA-3940U/UW / AIC-7883U
@@ -26337,7 +26361,7 @@
 		9005 2180  AHA-2940U2 SCSI Controller
 		9005 8100  AHA-2940U2B SCSI Controller
 		9005 a100  AHA-2940U2B SCSI Controller
-		9005 a180  AHA-2940U2W SCSI Controller
+		9005 a180  AIC-3860Q [AHA-2940U2W/GE] SCSI Controller
 		9005 e100  AHA-2950U2B SCSI Controller
 	0011  AHA-2930U2
 	0013  78902
