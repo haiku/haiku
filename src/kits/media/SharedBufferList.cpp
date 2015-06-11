@@ -25,9 +25,9 @@
 #include <DataExchange.h>
 
 
-static BPrivate::SharedBufferList* sList;
-static area_id sArea;
-static int32 sRefCount;
+static BPrivate::SharedBufferList* sList = NULL;
+static area_id sArea = -1;
+static int32 sRefCount = 0;
 static BLocker sLocker("shared buffer list");
 
 
@@ -419,6 +419,7 @@ SharedBufferList::_Init()
 	for (int32 i = 0; i < kMaxBuffers; i++) {
 		fInfos[i].id = -1;
 	}
+	fCount = 0;
 
 	return B_OK;
 }

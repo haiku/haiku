@@ -190,16 +190,20 @@ BBuffer::BBuffer(const buffer_clone_info& info)
 	fBufferList(NULL),
 	fArea(-1),
 	fData(NULL),
-	fSize(0)
+	fOffset(0),
+	fSize(0),
+	fFlags(0)
 {
 	CALLED();
 
-	// Must be -1 if not registered
-	fMediaHeader.buffer = -1;
-
+	// Ensure that the media_header is clean
+	memset(&fMediaHeader, 0, sizeof(fMediaHeader));
 	// special case for BSmallBuffer
 	if (info.area == 0 && info.buffer == 0)
 		return;
+
+	// Must be -1 if registration fail
+	fMediaHeader.buffer = -1;
 
 	fBufferList = BPrivate::SharedBufferList::Get();
 	if (fBufferList == NULL) {
