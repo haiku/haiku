@@ -486,6 +486,7 @@ RemotePackageRepository HaikuPorts
 	# secondary architecture (x86)
 	a52dec_x86-0.7.4-2
 	a52dec_x86_devel-0.7.4-2
+	arduino_x86-1.7.4-1
 	arm_none_eabi_binutils_x86-2.24_2014_03_19-6
 	arm_none_eabi_gcc_x86-4.8.4-1
 	arm_none_eabi_gdb_x86-7.7-1
