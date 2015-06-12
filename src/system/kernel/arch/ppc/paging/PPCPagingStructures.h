@@ -14,12 +14,14 @@
 
 #include <heap.h>
 
+#include <smp.h>
+
 
 struct PPCPagingStructures : DeferredDeletable {
 	// X86 stuff, probably useless
 	phys_addr_t					pgdir_phys;
 	int32						ref_count;
-	int32						active_on_cpus;
+	CPUSet						active_on_cpus;
 		// mask indicating on which CPUs the map is currently used
 
 								PPCPagingStructures();
