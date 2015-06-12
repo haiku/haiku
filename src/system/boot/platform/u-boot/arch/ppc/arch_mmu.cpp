@@ -116,6 +116,7 @@ get_next_virtual_address(size_t size)
 }
 
 
+#if 0
 static addr_t
 get_next_physical_address(size_t size)
 {
@@ -125,6 +126,7 @@ get_next_physical_address(size_t size)
 
 	return address;
 }
+#endif
 
 
 //	#pragma mark -
@@ -367,9 +369,10 @@ platform_allocate_region(void **_address, size_t size, uint8 protection,
 		// is the address within the valid range?
 		if (address < KERNEL_BASE
 			|| address + size >= KERNEL_BASE + kMaxKernelSize) {
-			TRACE(("mmu_allocate in illegal range\n address: %lx"
-				"  KERNELBASE: %lx KERNEL_BASE + kMaxKernelSize: %lx"
-				"  address + size : %lx \n", (uint32)address, KERNEL_BASE,
+			TRACE(("mmu_allocate in illegal range\n address: %" B_PRIx32
+				"  KERNELBASE: %" B_PRIx32 " KERNEL_BASE + kMaxKernelSize:"
+				" %" B_PRIx32 "  address + size : %" B_PRIx32 " \n",
+				(uint32)address, (uint32)KERNEL_BASE,
 				KERNEL_BASE + kMaxKernelSize, (uint32)(address + size)));
 			return B_ERROR;
 		}
