@@ -216,17 +216,20 @@ BRect
 App::_GetNextWindowFrame(bool singlePackageMode)
 {
 	BRect frame;
-	if (singlePackageMode)
+	const char* frameName;
+	if (singlePackageMode) {
 		frame = BRect(50.0, 50.0, 649.0, 349.0);
-	else
+		frameName = "small window frame";
+	}
+	else {
 		frame = BRect(50.0, 50.0, 749.0, 549.0);
-
+		frameName = "window frame";
+	}
 	BMessage settings;
 	if (_LoadSettings(settings)) {
-		if (singlePackageMode)
-			settings.FindRect("small window frame", &frame);
-		else
-			settings.FindRect("window frame", &frame);
+		BRect windowFrame;
+		if (settings.FindRect(frameName, &windowFrame) == B_OK)
+			frame = windowFrame;
 	}
 
 	make_sure_frame_is_on_screen(frame);
