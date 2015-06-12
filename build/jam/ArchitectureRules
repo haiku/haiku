@@ -447,6 +447,9 @@ rule ArchitectureSetupWarnings architecture
 		case m68k :
 			return ;
 				# we use #warning as placeholders for things to write...
+		case ppc :
+			return ;
+				# we use #warning as placeholders for things to write...
 	}
 
 	# enable -Werror for certain parts of the source tree
