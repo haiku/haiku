@@ -410,9 +410,14 @@ InterfaceAddress::Prepare(sockaddr** _address, size_t size)
 	sockaddr* address = *_address;
 
 	if (address == NULL || size > address->sa_len) {
-		address = (sockaddr*)realloc(address, size);
-		if (address == NULL)
+		sockaddr* resized = (sockaddr*)realloc(address, size);
+
+		if (resized == NULL) {
+			free(address);
 			return NULL;
+		}
+
+		address = resized;
 	}
 
 	address->sa_len = size;
