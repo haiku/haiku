@@ -20,6 +20,10 @@ extern void free(void *pointer);
 extern void *memalign(size_t alignment, size_t numBytes);
 extern void *valloc(size_t numBytes);
 
+#ifdef _GNU_SOURCE
+size_t malloc_usable_size(void *ptr);
+#endif
+
 #ifdef __cplusplus
 }
 #endif

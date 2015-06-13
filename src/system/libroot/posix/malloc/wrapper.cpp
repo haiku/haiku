@@ -490,6 +490,15 @@ realloc(void *ptr, size_t size)
 }
 
 
+extern "C" size_t
+malloc_usable_size(void *ptr)
+{
+	if (ptr == NULL)
+		return 0;
+	return threadHeap::objectSize(ptr);
+}
+
+
 //	#pragma mark - BeOS specific extensions
 
 
