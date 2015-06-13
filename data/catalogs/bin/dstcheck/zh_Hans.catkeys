@@ -1,5 +1,4 @@
-1	english	x-vnd.Haiku-cmd-dstconfig	1861992467
-Use this time	dstcheck		使用当前时间
+1	english	x-vnd.Haiku-cmd-dstconfig	2690010039
 Ask me later	dstcheck		稍后询问
 Manually adjust time…	dstcheck		手动调整时间...
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		注意！\n\n由于夏令时切换，您的计算机时钟会有一个小时的偏移。\n您的计算机当前时间是 %current time% 。\n\n当前时间是否正确？

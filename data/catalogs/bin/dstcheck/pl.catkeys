@@ -1,5 +1,4 @@
-1	polish	x-vnd.Haiku-cmd-dstconfig	1861992467
-Use this time	dstcheck		Użyj tym razem
+1	polish	x-vnd.Haiku-cmd-dstconfig	2690010039
 Ask me later	dstcheck		Zapytaj mnie później
 Manually adjust time…	dstcheck		Ręcznie dostosuj czas…
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Uwaga!\n\nZ powodu zmiany na czas zimowy, zegar w twoim komputerze może się spieszyć.\nKomputer sądzi, że jest godzina %current time%.\n\nCzy ten czas jest poprawny?

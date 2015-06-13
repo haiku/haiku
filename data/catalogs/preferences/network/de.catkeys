@@ -6,7 +6,7 @@ WPA2	WPA2 protected network		WPA2
 The netmask defines your local network	IntefaceAddressView		Die Netzmaske definiert das lokale Netzwerk
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Netzwerk
-Show network status in Deskbar	NetworkWindow		NetworkStatus in der Deskbar zeigen
+Show network status in Deskbar	NetworkWindow		NetworkStatus in der Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Die Art wie IP Adressen bezogen werden
 Dial Up	NetworkWindow		Einwahl
 Apply	IntefaceAddressView		Anwenden

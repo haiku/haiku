@@ -1,5 +1,4 @@
-1	russian	x-vnd.Haiku-cmd-dstconfig	1861992467
-Use this time	dstcheck		Использовать это время
+1	russian	x-vnd.Haiku-cmd-dstconfig	2690010039
 Ask me later	dstcheck		Спросить позже
 Manually adjust time…	dstcheck		Настроить вручную…
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Внимание!\n\nИз-за сезонного перевода времени часы вашего компьютера могут быть смещены на час.\nВаш компьютер думает, что сейчас %current time%.\n\nЭто верное время?

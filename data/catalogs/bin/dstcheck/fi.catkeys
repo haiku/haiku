@@ -1,5 +1,4 @@
-1	finnish	x-vnd.Haiku-cmd-dstconfig	1861992467
-Use this time	dstcheck		Käytä tätä aikaa
+1	finnish	x-vnd.Haiku-cmd-dstconfig	2690010039
 Ask me later	dstcheck		Kysy minulta myöhemmin
 Manually adjust time…	dstcheck		Säädä aikaa käsin...
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Huomio!\n\nKesäaikaan vaihtamisen vuoksi tietokoneesi ajattelee, että kello on ehkä tunnin väärässä.\nTietokoneesi mielestä kello on nyt %current time%.\n\nOnko tämä oikea aika?

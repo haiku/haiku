@@ -1,5 +1,4 @@
-1	german	x-vnd.Haiku-cmd-dstconfig	1861992467
-Use this time	dstcheck		Uhrzeit übernehmen
+1	german	x-vnd.Haiku-cmd-dstconfig	2690010039
 Ask me later	dstcheck		Später nachfragen
 Manually adjust time…	dstcheck		Uhrzeit einstellen…
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Achtung!\n\nWegen der automatisch erfolgten Zeitumstellung könnte die Uhr des Rechners um eine Stunde falsch gehen.\nFür den Rechner ist es jetzt %current time%.\n\nIst das die richtige Uhrzeit?

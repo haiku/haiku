@@ -1,5 +1,4 @@
-1	hungarian	x-vnd.Haiku-cmd-dstconfig	1861992467
-Use this time	dstcheck		Ez a pontos idő
+1	hungarian	x-vnd.Haiku-cmd-dstconfig	2690010039
 Ask me later	dstcheck		Kérdezze később
 Manually adjust time…	dstcheck		Kézi beállítás…
 Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Figyelem!\n\nA téli-nyári óraátállítás miatt a számítógép órája lehetséges, hogy pontatlan.\nA számítógép szerint ennyi az idő: %current time%.\n\nEz a pontos idő?
