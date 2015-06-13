@@ -65,7 +65,7 @@ debug_uart_from_fdt(const void *fdt)
 		return NULL;
 
 	// determine the MMIO address
-	regs = fdt_get_device_reg(fdt, node);
+	regs = fdt_get_device_reg(fdt, node, false);
 
 	if (regs == 0)
 		return NULL;
