@@ -91,6 +91,19 @@ private:
 };
 
 
+class SizeField : public BStringField {
+public:
+								SizeField(double size);
+	virtual						~SizeField();
+
+			void				SetSize(double size);
+			double				Size() const
+									{ return fSize; }
+private:
+			float				fSize;
+};
+
+
 // BColumn for PackageListView which knows how to render
 // a SharedBitmapStringField
 // TODO: Code-duplication with DriveSetup PartitionList.h
@@ -234,6 +247,45 @@ RatingField::SetRating(float rating)
 		return;
 
 	fRating = rating;
+}
+
+
+// #pragma mark - SizeField
+
+
+SizeField::SizeField(double size)
+	:
+	BStringField(""),
+	fSize(-1.0)
+{
+	SetSize(size);
+}
+
+
+SizeField::~SizeField()
+{
+}
+
+
+void
+SizeField::SetSize(double size)
+{
+	if (size < 0.0)
+		size = 0.0;
+
+	if (size == fSize)
+		return;
+
+	BString sizeString;
+	if (size == 0) {
+		sizeString = B_TRANSLATE_CONTEXT("-", "no package size");
+	} else {
+		char buffer[256];
+		sizeString = string_for_size(size, buffer, sizeof(buffer));
+	}
+
+	fSize = size;
+	SetString(sizeString.String());
 }
 
 
@@ -383,6 +435,16 @@ PackageColumn::DrawField(BField* field, BRect rect, BView* parent)
 int
 PackageColumn::CompareFields(BField* field1, BField* field2)
 {
+	SizeField* sizeField1 = dynamic_cast<SizeField*>(field1);
+	SizeField* sizeField2 = dynamic_cast<SizeField*>(field2);
+	if (sizeField1 != NULL && sizeField2 != NULL) {
+		if (sizeField1->Size() > sizeField2->Size())
+			return -1;
+		else if (sizeField1->Size() < sizeField2->Size())
+			return 1;
+		return 0;
+	}
+
 	BStringField* stringField1 = dynamic_cast<BStringField*>(field1);
 	BStringField* stringField2 = dynamic_cast<BStringField*>(field2);
 	if (stringField1 != NULL && stringField2 != NULL) {
@@ -549,14 +611,8 @@ PackageRow::UpdateSize()
 {
 	if (fPackage.Get() == NULL)
 		return;
-	BString size;
-	if (fPackage->Size() == 0) {
-		size = B_TRANSLATE_CONTEXT("-", "no package size");
-	} else {
-		char buffer[256];
-		size = string_for_size(fPackage->Size(), buffer, sizeof(buffer));
-	}
-	SetField(new BStringField(size), kSizeColumn);
+
+	SetField(new SizeField(fPackage->Size()), kSizeColumn);
 }
 
 
