@@ -120,7 +120,7 @@ write_command_block_regs(void *channel_cookie, ata_task_file *tf,
 		return B_ERROR;
 
 	for (i = 0; i < 7; i++) {
-		if (((1 << (i-7)) & mask) != 0) {
+		if (((1 << (i + 7)) & mask) != 0) {
 			TRACE("write_command_block_regs(): %x->HI(%x)\n",
 				tf->raw.r[i + 7], i);
 			channel->isa->write_io_8(ioaddr + 1 + i, tf->raw.r[i + 7]);
