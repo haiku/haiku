@@ -68,11 +68,11 @@ StdBinCommands
 }
 
 # standard commands that need libncurses.a
-Includes [ FGristFiles top.c watch.c ]
+Includes [ FGristFiles top.cpp watch.c ]
 	: [ BuildFeatureAttribute ncurses : headers ] ;
 
 StdBinCommands
-	top.c
+	top.cpp
 	watch.c
 	: [ BuildFeatureAttribute ncurses : library ] : $(haiku-utils_rsrc) ;
 
