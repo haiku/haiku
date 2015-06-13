@@ -100,7 +100,7 @@ public:
 			double				Size() const
 									{ return fSize; }
 private:
-			float				fSize;
+			double				fSize;
 };
 
 
