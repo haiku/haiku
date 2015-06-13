@@ -72,7 +72,6 @@ Includes [ FGristFiles top.cpp watch.c ]
 	: [ BuildFeatureAttribute ncurses : headers ] ;
 
 StdBinCommands
-	top.cpp
 	watch.c
 	: [ BuildFeatureAttribute ncurses : library ] : $(haiku-utils_rsrc) ;
 
@@ -177,6 +176,12 @@ StdBinCommands
 	diff_zip.cpp
 	sysinfo.cpp
 	: [ TargetLibstdc++ ] : $(haiku-utils_rsrc) ;
+
+# commands that need libstdc++ and lubncurses
+StdBinCommands
+	top.cpp
+	: [ BuildFeatureAttribute ncurses : library ] [ TargetLibstdc++ ] : $(haiku-utils_rsrc) ;
+
 
 # standard commands that need libbe.so, libtranslation.so, libsupc++.so
 StdBinCommands
