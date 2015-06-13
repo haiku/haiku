@@ -34,7 +34,7 @@ SYMBOL(_start_common):
 	lis		%r12, gUBootGlobalData@ha
 	ori		%r12, %r12, gUBootGlobalData@l
 	stw		%r2, 0(%r12)
-	stw		%r11, 8(%r12)	// gUBootOS
+	stw		%r11, gUBootOS-gUBootGlobalData(%r12)	// gUBootOS
 
 	b		start_linux_ppc_fdt
 
