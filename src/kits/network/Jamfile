@@ -23,7 +23,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			socket.cpp
 			r5_compatibility.cpp
 			:
-			<netresolv!$(architecture)>netresolv.o libutil.a bsd
+			<netresolv!$(architecture)>netresolv.o libutil.a libbsd.so
 			[ TargetLibsupc++ ]
 			;
 
