@@ -39,6 +39,7 @@ strip_port(BString& host, BString& port)
 
 BNetworkAddressResolver::BNetworkAddressResolver()
 	:
+	BReferenceable(),
 	fInfo(NULL),
 	fStatus(B_NO_INIT)
 {
@@ -48,6 +49,7 @@ BNetworkAddressResolver::BNetworkAddressResolver()
 BNetworkAddressResolver::BNetworkAddressResolver(const char* address,
 	uint16 port, uint32 flags)
 	:
+	BReferenceable(),
 	fInfo(NULL),
 	fStatus(B_NO_INIT)
 {
@@ -57,6 +59,7 @@ BNetworkAddressResolver::BNetworkAddressResolver(const char* address,
 BNetworkAddressResolver::BNetworkAddressResolver(const char* address,
 	const char* service, uint32 flags)
 	:
+	BReferenceable(),
 	fInfo(NULL),
 	fStatus(B_NO_INIT)
 {
@@ -67,6 +70,7 @@ BNetworkAddressResolver::BNetworkAddressResolver(const char* address,
 BNetworkAddressResolver::BNetworkAddressResolver(int family,
 	const char* address, uint16 port, uint32 flags)
 	:
+	BReferenceable(),
 	fInfo(NULL),
 	fStatus(B_NO_INIT)
 {
@@ -77,6 +81,7 @@ BNetworkAddressResolver::BNetworkAddressResolver(int family,
 BNetworkAddressResolver::BNetworkAddressResolver(int family,
 	const char* address, const char* service, uint32 flags)
 	:
+	BReferenceable(),
 	fInfo(NULL),
 	fStatus(B_NO_INIT)
 {
@@ -258,3 +263,72 @@ BNetworkAddressResolver::GetNextAddress(int family, uint32* cookie,
 
 	return B_OK;
 }
+
+
+/*static*/ BReference<const BNetworkAddressResolver>
+BNetworkAddressResolver::Resolve(const char* address, const char* service,
+	uint32 flags)
+{
+	return Resolve(AF_UNSPEC, address, service, flags);
+}
+
+
+/*static*/ BReference<const BNetworkAddressResolver>
+BNetworkAddressResolver::Resolve(const char* address, uint16 port, uint32 flags)
+{
+	return Resolve(AF_UNSPEC, address, port, flags);
+}
+
+
+/*static*/ BReference<const BNetworkAddressResolver>
+BNetworkAddressResolver::Resolve(int family, const char* address,
+	uint16 port, uint32 flags)
+{
+	BString service;
+	service << port;
+
+	return Resolve(family, address, port == 0 ? NULL : service.String(), flags);
+}
+
+
+/*static*/ BReference<const BNetworkAddressResolver>
+BNetworkAddressResolver::Resolve(int family, const char* address,
+	const char* service, uint32 flags)
+{
+	// TODO it may be faster to use an hash map to have faster lookup of the
+	// cache. However, we also need to access the cache by LRU, and for that
+	// a doubly-linked list is better. We should have these two share the same
+	// items, so it's easy to remove the LRU from the map, or insert a new
+	// item in both structures.
+	for (int i = 0; i < sCacheMap.CountItems(); i++) {
+		CacheEntry* entry = sCacheMap.ItemAt(i);
+		if (entry->Matches(family, address, service, flags)) {
+			// This entry is now the MRU, move to end of list.
+			// TODO if the item is old (more than 1 minute), it should be
+			// dropped and a new request made.
+			sCacheMap.MoveItem(i, sCacheMap.CountItems());
+			return entry->fResolver;
+		}
+	}
+
+	BNetworkAddressResolver* resolver = new(std::nothrow)
+		BNetworkAddressResolver(family, address, service, flags);
+
+	if (resolver != NULL && resolver->InitCheck() == B_OK) {
+		// TODO adjust capacity. Chrome uses 256 entries with a timeout of
+		// 1 minute, IE uses 1000 entries with a timeout of 30 seconds.
+		if (sCacheMap.CountItems() > 255)
+			delete sCacheMap.RemoveItemAt(0);
+
+		CacheEntry* entry = new(std::nothrow) CacheEntry(family, address,
+			service, flags, resolver);
+		if (entry)
+			sCacheMap.AddItem(entry, sCacheMap.CountItems());
+	}
+
+	return BReference<const BNetworkAddressResolver>(resolver, true);
+}
+
+
+BObjectList<BNetworkAddressResolver::CacheEntry>
+	BNetworkAddressResolver::sCacheMap;

@@ -158,40 +158,46 @@ BNetworkAddress::Unset()
 status_t
 BNetworkAddress::SetTo(const char* host, uint16 port, uint32 flags)
 {
-	BNetworkAddressResolver resolver;
-	status_t status = resolver.SetTo(host, port, flags);
+	BReference<const BNetworkAddressResolver> resolver
+		= BNetworkAddressResolver::Resolve(host, port, flags);
+	if (resolver.Get() == NULL)
+		return B_NO_MEMORY;
+	status_t status = resolver->InitCheck();
 	if (status != B_OK)
 		return status;
 
 	// Prefer IPv6 addresses
 
 	uint32 cookie = 0;
-	status = resolver.GetNextAddress(AF_INET6, &cookie, *this);
+	status = resolver->GetNextAddress(AF_INET6, &cookie, *this);
 	if (status == B_OK)
 		return B_OK;
 
 	cookie = 0;
-	return resolver.GetNextAddress(&cookie, *this);
+	return resolver->GetNextAddress(&cookie, *this);
 }
 
 
 status_t
 BNetworkAddress::SetTo(const char* host, const char* service, uint32 flags)
 {
-	BNetworkAddressResolver resolver;
-	status_t status = resolver.SetTo(host, service, flags);
+	BReference<const BNetworkAddressResolver> resolver
+		= BNetworkAddressResolver::Resolve(host, service, flags);
+	if (resolver.Get() == NULL)
+		return B_NO_MEMORY;
+	status_t status = resolver->InitCheck();
 	if (status != B_OK)
 		return status;
 
 	// Prefer IPv6 addresses
 
 	uint32 cookie = 0;
-	status = resolver.GetNextAddress(AF_INET6, &cookie, *this);
+	status = resolver->GetNextAddress(AF_INET6, &cookie, *this);
 	if (status == B_OK)
 		return B_OK;
 
 	cookie = 0;
-	return resolver.GetNextAddress(&cookie, *this);
+	return resolver->GetNextAddress(&cookie, *this);
 }
 
 
@@ -204,13 +210,16 @@ BNetworkAddress::SetTo(int family, const char* host, uint16 port, uint32 flags)
 		return _ParseLinkAddress(host);
 	}
 
-	BNetworkAddressResolver resolver;
-	status_t status = resolver.SetTo(family, host, port, flags);
+	BReference<const BNetworkAddressResolver> resolver
+		= BNetworkAddressResolver::Resolve(family, host, port, flags);
+	if (resolver.Get() == NULL)
+		return B_NO_MEMORY;
+	status_t status = resolver->InitCheck();
 	if (status != B_OK)
 		return status;
 
 	uint32 cookie = 0;
-	return resolver.GetNextAddress(&cookie, *this);
+	return resolver->GetNextAddress(&cookie, *this);
 }
 
 
@@ -224,13 +233,16 @@ BNetworkAddress::SetTo(int family, const char* host, const char* service,
 		return _ParseLinkAddress(host);
 	}
 
-	BNetworkAddressResolver resolver;
-	status_t status = resolver.SetTo(family, host, service, flags);
+	BReference<const BNetworkAddressResolver> resolver
+		= BNetworkAddressResolver::Resolve(family, host, service, flags);
+	if (resolver.Get() == NULL)
+		return B_NO_MEMORY;
+	status_t status = resolver->InitCheck();
 	if (status != B_OK)
 		return status;
 
 	uint32 cookie = 0;
-	return resolver.GetNextAddress(&cookie, *this);
+	return resolver->GetNextAddress(&cookie, *this);
 }
 
 
