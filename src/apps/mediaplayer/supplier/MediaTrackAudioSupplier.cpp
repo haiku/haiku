@@ -612,6 +612,7 @@ MediaTrackAudioSupplier::_ReadUncachedFrames(void* buffer, int64 position,
 	return error;
 }
 
+
 // _FindKeyFrameForward
 status_t
 MediaTrackAudioSupplier::_FindKeyFrameForward(int64& position)
@@ -628,6 +629,7 @@ MediaTrackAudioSupplier::_FindKeyFrameForward(int64& position)
 	return error;
 }
 
+
 // _FindKeyFrameBackward
 status_t
 MediaTrackAudioSupplier::_FindKeyFrameBackward(int64& position)
@@ -640,6 +642,7 @@ MediaTrackAudioSupplier::_FindKeyFrameBackward(int64& position)
 		position -= position % _FramesPerBuffer();
 	return error;
 }
+
 
 #if 0
 // _SeekToKeyFrameForward
@@ -666,6 +669,7 @@ MediaTrackAudioSupplier::_SeekToKeyFrameForward(int64& position)
 	return error;
 }
 #endif
+
 
 // _SeekToKeyFrameBackward
 status_t

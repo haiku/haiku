@@ -165,7 +165,7 @@ VideoProducer::HandleEvent(const media_timed_event* event,
 {
 	TOUCH(lateness); TOUCH(realTimeEvent);
 
-	switch(event->type) {
+	switch (event->type) {
 		case BTimedEventQueue::B_START:
 			_HandleStart(event->event_time);
 			break;
@@ -699,7 +699,7 @@ VideoProducer::_FrameGeneratorThread()
 					// Drop frame if it's at least a frame late.
 					if (playingDirection > 0) {
 						printf("VideoProducer: dropped frame (%" B_PRId64
-							")\n", fFrame);
+							") (perf. time %Ld)\n", fFrame, performanceTime);
 					}
 					// next frame
 					droppedFrames++;
