@@ -1509,51 +1509,65 @@ VariablesView::VariableTableModel::GetToolTipForTablePath(
 	if (node == NULL)
 		return false;
 
-	if (node->NodeChild()->LocationResolutionState() != B_OK)
-		return false;
-
 	BString tipData;
-	switch (columnIndex) {
-		case 0:
-		{
-			ValueLocation* location = node->NodeChild()->Location();
-			for (int32 i = 0; i < location->CountPieces(); i++) {
-				ValuePieceLocation piece = location->PieceAt(i);
-				BString pieceData;
-				switch (piece.type) {
-					case VALUE_PIECE_LOCATION_MEMORY:
-						pieceData.SetToFormat("(%" B_PRId32 "): Address: %#"
-							B_PRIx64 ", Size: %" B_PRId64 " bytes", i,
-							piece.address, piece.size);
-						break;
-					case VALUE_PIECE_LOCATION_REGISTER:
-					{
-						Architecture* architecture = fThread->GetTeam()
-							->GetArchitecture();
-						pieceData.SetToFormat("(%" B_PRId32 "): Register (%s)",
-							i, architecture->Registers()[piece.reg].Name());
-						break;
+	ValueNodeChild* child = node->NodeChild();
+	status_t error = child->LocationResolutionState();
+	if (error != B_OK)
+		tipData.SetToFormat("Unable to resolve location: %s", strerror(error));
+	else {
+		ValueNode* valueNode = child->Node();
+		if (valueNode == NULL)
+			return false;
+		error = valueNode->LocationAndValueResolutionState();
+		if (error != B_OK) {
+			tipData.SetToFormat("Unable to resolve value: %s\n\n",
+				strerror(error));
+		}
+
+		switch (columnIndex) {
+			case 0:
+			{
+				ValueLocation* location = child->Location();
+				for (int32 i = 0; i < location->CountPieces(); i++) {
+					ValuePieceLocation piece = location->PieceAt(i);
+					BString pieceData;
+					switch (piece.type) {
+						case VALUE_PIECE_LOCATION_MEMORY:
+							pieceData.SetToFormat("(%" B_PRId32 "): Address: "
+								"%#" B_PRIx64 ", Size: %" B_PRId64 " bytes\n",
+								i, piece.address, piece.size);
+							break;
+						case VALUE_PIECE_LOCATION_REGISTER:
+						{
+							Architecture* architecture = fThread->GetTeam()
+								->GetArchitecture();
+							pieceData.SetToFormat("(%" B_PRId32 "): Register "
+								"(%s)\n", i,
+								architecture->Registers()[piece.reg].Name());
+							break;
+						}
+						default:
+							break;
 					}
-					default:
-						break;
+
+					tipData	+= pieceData;
 				}
-
-				tipData	+= pieceData;
-				if (i < location->CountPieces() - 1)
-					tipData += "\n";
+				tipData += "Editable: ";
+				tipData += error == B_OK && location->IsEditable()
+					? "Yes" : "No";
+				break;
 			}
-			break;
-		}
-		case 1:
-		{
-			Value* value = node->GetValue();
-			if (value != NULL)
-				value->ToString(tipData);
+			case 1:
+			{
+				Value* value = node->GetValue();
+				if (value != NULL)
+					value->ToString(tipData);
 
-			break;
+				break;
+			}
+			default:
+				break;
 		}
-		default:
-			break;
 	}
 
 	if (tipData.IsEmpty())
