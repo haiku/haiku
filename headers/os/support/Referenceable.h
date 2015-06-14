@@ -176,7 +176,7 @@ public:
 
 	BReference(const BReference<const Type>& other)
 		:
-		fReference(other)
+		fReference(const_cast<Type*>(other.Get()))
 	{
 	}
 
