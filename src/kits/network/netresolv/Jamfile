@@ -1,4 +1,4 @@
-SubDir HAIKU_TOP src kits network libbind ;
+SubDir HAIKU_TOP src kits network netresolv ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
@@ -31,7 +31,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			SubDirC++Flags $(defines) ;
 		}
 
-		MergeObject <libbind!$(architecture)>libbind.o :
+		MergeObject <netresolv!$(architecture)>netresolv.o :
 			# dst
 			dst_api.c
 			hmac_link.c

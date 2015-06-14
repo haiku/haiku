@@ -4,7 +4,7 @@ UsePrivateHeaders libroot net shared ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
 local services = [ FGristFiles services ] ;
-SEARCH on $(services) = [ FDirName $(SUBDIR) libbind defaults ] ;
+SEARCH on $(services) = [ FDirName $(SUBDIR) netresolv defaults ] ;
 
 SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
 
@@ -23,7 +23,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			socket.cpp
 			r5_compatibility.cpp
 			:
-			<libbind!$(architecture)>libbind.o libutil.a bsd
+			<netresolv!$(architecture)>netresolv.o libutil.a bsd
 			[ TargetLibsupc++ ]
 			;
 
@@ -31,5 +31,5 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	}
 }
 
-SubInclude HAIKU_TOP src kits network libbind ;
+SubInclude HAIKU_TOP src kits network netresolv ;
 SubInclude HAIKU_TOP src kits network libnetapi ;
