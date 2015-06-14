@@ -350,7 +350,7 @@ decompose_ft_bitmap_gray8(const FT_Bitmap& bitmap, int x, int y,
 					sl.add_cell(x + j, *p);
 				++p;
 			}
- 		}
+		}
 
 		buf += pitch;
 		if (sl.num_spans()) {
@@ -400,7 +400,7 @@ decompose_ft_bitmap_subpix(const FT_Bitmap& bitmap, int x, int y,
 					sl.add_cell(x + j, p[0], p[1], p[2]);
 				p += 3;
 			}
- 		}
+		}
 
 		buf += pitch;
 		if (sl.num_spans()) {
@@ -541,7 +541,7 @@ decompose_ft_bitmap_subpix(const FT_Bitmap& bitmap, int x, int y,
 				if (coverR || coverG || coverB)
 					sl.add_cell(x + w, coverR, coverG, coverB);
 			}
- 		}
+		}
 
 		buf += pitch;
 		if (sl.num_spans()) {
