@@ -303,4 +303,8 @@
 #define	__DECONST(type, var)	((type)(uintptr_t)(const void *)(var))
 #endif
 
+#ifndef	__UNCONST
+#define	__UNCONST(var)	((void*)(uintptr_t)(const void *)(var))
+#endif
+
 #endif
