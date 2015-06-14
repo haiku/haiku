@@ -32,6 +32,7 @@ BNotification::BNotification(notification_type type)
 {
 }
 
+
 BNotification::BNotification(BMessage* archive)
 	:
 	BArchivable(archive),

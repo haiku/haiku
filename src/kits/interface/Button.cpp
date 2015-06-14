@@ -188,9 +188,9 @@ BButton::MouseDown(BPoint where)
 		SetValue(B_CONTROL_ON);
 
 	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
- 		SetTracking(true);
- 		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
- 	} else {
+		SetTracking(true);
+		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS);
+	} else {
 		BRect bounds = Bounds();
 		uint32 buttons;
 		bool inside = false;
@@ -200,7 +200,7 @@ BButton::MouseDown(BPoint where)
 			snooze(40000);
 
 			GetMouse(&where, &buttons, true);
- 			inside = bounds.Contains(where);
+			inside = bounds.Contains(where);
 
 			if (toggleBehavior) {
 				bool pressed = inside ^ _Flag(FLAG_WAS_PRESSED);
@@ -442,7 +442,7 @@ BButton::GetPreferredSize(float* _width, float* _height)
 void
 BButton::ResizeToPreferred()
 {
-	 BControl::ResizeToPreferred();
+	BControl::ResizeToPreferred();
 }
 
 
