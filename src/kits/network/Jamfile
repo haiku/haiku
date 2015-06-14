@@ -1,9 +1,12 @@
 SubDir HAIKU_TOP src kits network ;
 
 UsePrivateHeaders libroot net shared ;
+UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
 local services = [ FGristFiles services ] ;
 SEARCH on $(services) = [ FDirName $(SUBDIR) libbind defaults ] ;
+
+SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
@@ -16,10 +19,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SharedLibrary $(libnetwork) :
 			init.cpp
 			interfaces.cpp
+			getifaddrs.cpp
 			socket.cpp
 			r5_compatibility.cpp
 			:
-			<libbind!$(architecture)>libbind.o
+			<libbind!$(architecture)>libbind.o libutil.a bsd
 			[ TargetLibsupc++ ]
 			;
 

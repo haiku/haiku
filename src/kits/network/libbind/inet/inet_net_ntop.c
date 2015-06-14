@@ -1,22 +1,27 @@
 /*
- * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996,1999 by Internet Software Consortium.
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * THE SOFTWARE IS PROVIDED "AS IS" AND INTERNET SOFTWARE CONSORTIUM DISCLAIMS
+ * ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL INTERNET SOFTWARE
+ * CONSORTIUM BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL
+ * DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR
+ * PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+ * ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
+ * SOFTWARE.
  */
 
+#include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-static const char rcsid[] = "$Id: inet_net_ntop.c,v 1.5 2006/06/20 02:50:14 marka Exp $";
+#ifdef notdef
+static const char rcsid[] = "Id: inet_net_ntop.c,v 1.1.2.1 2002/08/02 02:17:21 marka Exp ";
+#else
+__RCSID("$NetBSD: inet_net_ntop.c,v 1.3 2012/03/20 17:08:13 matt Exp $");
+#endif
 #endif
 
 #include "port_before.h"
@@ -33,18 +38,22 @@ static const char rcsid[] = "$Id: inet_net_ntop.c,v 1.5 2006/06/20 02:50:14 mark
 
 #include "port_after.h"
 
+#ifdef __weak_alias
+__weak_alias(inet_net_ntop,_inet_net_ntop)
+#endif
+
 #ifdef SPRINTF_CHAR
 # define SPRINTF(x) strlen(sprintf/**/x)
 #else
-# define SPRINTF(x) ((size_t)sprintf x)
+# define SPRINTF(x) sprintf x
 #endif
 
-static char *	inet_net_ntop_ipv4 __P((const u_char *src, int bits,
-					char *dst, size_t size));
-static char *	inet_net_ntop_ipv6 __P((const u_char *src, int bits,
-					char *dst, size_t size));
+static char *	inet_net_ntop_ipv4(const u_char *src, int bits,
+					char *dst, size_t size);
+static char *	inet_net_ntop_ipv6(const u_char *src, int bits,
+					char *dst, size_t size);
 
-/*%
+/*
  * char *
  * inet_net_ntop(af, src, bits, dst, size)
  *	convert network number from network to presentation format.
@@ -55,12 +64,7 @@ static char *	inet_net_ntop_ipv6 __P((const u_char *src, int bits,
  *	Paul Vixie (ISC), July 1996
  */
 char *
-inet_net_ntop(af, src, bits, dst, size)
-	int af;
-	const void *src;
-	int bits;
-	char *dst;
-	size_t size;
+inet_net_ntop(int af, const void *src, int bits, char *dst, size_t size)
 {
 	switch (af) {
 	case AF_INET:
@@ -73,7 +77,7 @@ inet_net_ntop(af, src, bits, dst, size)
 	}
 }
 
-/*%
+/*
  * static char *
  * inet_net_ntop_ipv4(src, bits, dst, size)
  *	convert IPv4 network number from network to presentation format.
@@ -87,11 +91,7 @@ inet_net_ntop(af, src, bits, dst, size)
  *	Paul Vixie (ISC), July 1996
  */
 static char *
-inet_net_ntop_ipv4(src, bits, dst, size)
-	const u_char *src;
-	int bits;
-	char *dst;
-	size_t size;
+inet_net_ntop_ipv4(const u_char *src, int bits, char *dst, size_t size)
 {
 	char *odst = dst;
 	char *t;
@@ -148,7 +148,7 @@ inet_net_ntop_ipv4(src, bits, dst, size)
 	return (NULL);
 }
 
-/*%
+/*
  * static char *
  * inet_net_ntop_ipv6(src, bits, fakebits, dst, size)
  *	convert IPv6 network number from network to presentation format.
@@ -166,17 +166,18 @@ inet_net_ntop_ipv4(src, bits, dst, size)
  */
 
 static char *
-inet_net_ntop_ipv6(const u_char *src, int bits, char *dst, size_t size) {
+inet_net_ntop_ipv6(const u_char *src, int bits, char *dst, size_t size)
+{
 	u_int	m;
 	int	b;
-	int	p;
-	int	zero_s, zero_l, tmp_zero_s, tmp_zero_l;
-	int	i;
+	size_t	p;
+	size_t	zero_s, zero_l, tmp_zero_s, tmp_zero_l;
+	size_t	i;
 	int	is_ipv4 = 0;
 	unsigned char inbuf[16];
 	char outbuf[sizeof("xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:255.255.255.255/128")];
 	char	*cp;
-	int	words;
+	size_t	words;
 	u_char	*s;
 
 	if (bits < 0 || bits > 128) {
@@ -264,7 +265,7 @@ inet_net_ntop_ipv6(const u_char *src, int bits, char *dst, size_t size) {
 		}
 	}
 	/* Format CIDR /width. */
-	sprintf(cp, "/%u", bits);
+	(void)SPRINTF((cp, "/%u", bits));
 	if (strlen(outbuf) + 1 > size)
 		goto emsgsize;
 	strcpy(dst, outbuf);

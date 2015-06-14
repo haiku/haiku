@@ -68,9 +68,14 @@
  * SOFTWARE.
  */
 
+#include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
+#ifdef notdef
 static const char sccsid[] = "@(#)res_send.c	8.1 (Berkeley) 6/4/93";
 static const char rcsid[] = "$Id: res_send.c,v 1.22 2009/01/22 23:49:23 tbox Exp $";
+#else
+__RCSID("$NetBSD: res_send.c,v 1.29 2013/02/16 13:45:45 para Exp $");
+#endif
 #endif /* LIBC_SCCS and not lint */
 
 /*! \file
@@ -79,23 +84,30 @@ static const char rcsid[] = "$Id: res_send.c,v 1.22 2009/01/22 23:49:23 tbox Exp
  */
 
 #include "port_before.h"
+#ifndef USE_KQUEUE
 #include "fd_setsize.h"
+#endif /* USE_KQUEUE */
 
 #include <sys/types.h>
 #include <sys/param.h>
 #include <sys/time.h>
 #include <sys/socket.h>
 #include <sys/uio.h>
+#ifdef USE_KQUEUE
+#include <sys/event.h>
+#endif /* USE_KQUEUE */
 
 #include <netinet/in.h>
 #include <arpa/nameser.h>
 #include <arpa/inet.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <netdb.h>
 #include <resolv.h>
 #include <signal.h>
 #include <stdio.h>
+#include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -103,6 +115,22 @@ static const char rcsid[] = "$Id: res_send.c,v 1.22 2009/01/22 23:49:23 tbox Exp
 #include <isc/eventlib.h>
 
 #include "port_after.h"
+
+#if 0
+#ifdef __weak_alias
+__weak_alias(res_ourserver_p,__res_ourserver_p)
+__weak_alias(res_nameinquery,__res_nameinquery)
+__weak_alias(res_queriesmatch,__res_queriesmatch)
+__weak_alias(res_nsend,__res_nsend)
+#endif
+#endif
+
+#ifndef SOCK_NOSIGPIPE
+#define SOCK_NOSIGPIPE 0
+#endif
+#ifndef SOCK_NOCLOEXEC
+#define SOCK_NOCLOEXEC 0
+#endif
 
 #ifdef USE_POLL
 #ifdef HAVE_STROPTS_H
@@ -112,34 +140,38 @@ static const char rcsid[] = "$Id: res_send.c,v 1.22 2009/01/22 23:49:23 tbox Exp
 #endif /* USE_POLL */
 
 /* Options.  Leave them on. */
+#ifndef DEBUG
 //#define DEBUG
+#endif
 #include "res_debug.h"
 #include "res_private.h"
 
 #define EXT(res) ((res)->_u._ext)
 
-#ifndef USE_POLL
+#if !defined(USE_POLL) && !defined(USE_KQUEUE)
 static const int highestFD = FD_SETSIZE - 1;
-#else
-static int highestFD = 0;
 #endif
 
 /* Forward. */
 
-static int		get_salen __P((const struct sockaddr *));
-static struct sockaddr * get_nsaddr __P((res_state, size_t));
-static int		send_vc(res_state, const u_char *, int,
+static socklen_t	get_salen(const struct sockaddr *);
+static struct sockaddr * get_nsaddr(res_state, size_t);
+static int		send_vc(res_state, const void *, size_t,
 				u_char *, int, int *, int);
-static int		send_dg(res_state, const u_char *, int,
+static int		send_dg(res_state, 
+#ifdef USE_KQUEUE
+				int kq,
+#endif
+				const void *, size_t,
 				u_char *, int, int *, int, int,
 				int *, int *);
 #ifdef DEBUG
 static void		Aerror(const res_state, FILE *, const char *, int,
-			       const struct sockaddr *, int);
+			       const struct sockaddr *, socklen_t);
 static void		Perror(const res_state, FILE *, const char *, int);
 #endif // DEBUG
 static int		sock_eq(struct sockaddr *, struct sockaddr *);
-#if defined(NEED_PSELECT) && !defined(USE_POLL)
+#if defined(NEED_PSELECT) && !defined(USE_POLL) && !defined(USE_KQUEUE)
 static int		pselect(int, void *, void *, void *,
 				struct timespec *,
 				const sigset_t *);
@@ -168,9 +200,9 @@ res_ourserver_p(const res_state statp, const struct sockaddr *sa) {
 
 	switch (sa->sa_family) {
 	case AF_INET:
-		inp = (const struct sockaddr_in *)sa;
+		inp = (const struct sockaddr_in *)(const void *)sa;
 		for (ns = 0;  ns < statp->nscount;  ns++) {
-			srv = (struct sockaddr_in *)get_nsaddr(statp, ns);
+			srv = (struct sockaddr_in *)(void *)get_nsaddr(statp, (size_t)ns);
 			if (srv->sin_family == inp->sin_family &&
 			    srv->sin_port == inp->sin_port &&
 			    (srv->sin_addr.s_addr == INADDR_ANY ||
@@ -181,9 +213,9 @@ res_ourserver_p(const res_state statp, const struct sockaddr *sa) {
 	case AF_INET6:
 		if (EXT(statp).ext == NULL)
 			break;
-		in6p = (const struct sockaddr_in6 *)sa;
+		in6p = (const struct sockaddr_in6 *)(const void *)sa;
 		for (ns = 0;  ns < statp->nscount;  ns++) {
-			srv6 = (struct sockaddr_in6 *)get_nsaddr(statp, ns);
+			srv6 = (struct sockaddr_in6 *)(void *)get_nsaddr(statp, (size_t)ns);
 			if (srv6->sin6_family == in6p->sin6_family &&
 			    srv6->sin6_port == in6p->sin6_port &&
 #ifdef HAVE_SIN6_SCOPE_ID
@@ -220,13 +252,13 @@ res_nameinquery(const char *name, int type, int class,
 		const u_char *buf, const u_char *eom)
 {
 	const u_char *cp = buf + HFIXEDSZ;
-	int qdcount = ntohs(((const HEADER*)buf)->qdcount);
+	int qdcount = ntohs(((const HEADER*)(const void *)buf)->qdcount);
 
 	while (qdcount-- > 0) {
 		char tname[MAXDNAME+1];
 		int n, ttype, tclass;
 
-		n = dn_expand(buf, eom, cp, tname, sizeof tname);
+		n = dn_expand(buf, eom, cp, tname, (int)sizeof tname);
 		if (n < 0)
 			return (-1);
 		cp += n;
@@ -258,7 +290,7 @@ res_queriesmatch(const u_char *buf1, const u_char *eom1,
 		 const u_char *buf2, const u_char *eom2)
 {
 	const u_char *cp = buf1 + HFIXEDSZ;
-	int qdcount = ntohs(((const HEADER*)buf1)->qdcount);
+	int qdcount = ntohs(((const HEADER*)(const void *)buf1)->qdcount);
 
 	if (buf1 + HFIXEDSZ > eom1 || buf2 + HFIXEDSZ > eom2)
 		return (-1);
@@ -267,17 +299,17 @@ res_queriesmatch(const u_char *buf1, const u_char *eom1,
 	 * Only header section present in replies to
 	 * dynamic update packets.
 	 */
-	if ((((const HEADER *)buf1)->opcode == ns_o_update) &&
-	    (((const HEADER *)buf2)->opcode == ns_o_update))
+	if ((((const HEADER *)(const void *)buf1)->opcode == ns_o_update) &&
+	    (((const HEADER *)(const void *)buf2)->opcode == ns_o_update))
 		return (1);
 
-	if (qdcount != ntohs(((const HEADER*)buf2)->qdcount))
+	if (qdcount != ntohs(((const HEADER*)(const void *)buf2)->qdcount))
 		return (0);
 	while (qdcount-- > 0) {
 		char tname[MAXDNAME+1];
 		int n, ttype, tclass;
 
-		n = dn_expand(buf1, eom1, cp, tname, sizeof tname);
+		n = dn_expand(buf1, eom1, cp, tname, (int)sizeof tname);
 		if (n < 0)
 			return (-1);
 		cp += n;
@@ -296,12 +328,11 @@ res_nsend(res_state statp,
 	  const u_char *buf, int buflen, u_char *ans, int anssiz)
 {
 	int gotsomewhere, terrno, tries, v_circuit, resplen, ns, n;
+#ifdef USE_KQUEUE
+	int kq;
+#endif
 #ifdef DEBUG
 	char abuf[NI_MAXHOST];
-#endif
-
-#ifdef USE_POLL
-	highestFD = sysconf(_SC_OPEN_MAX) - 1;
 #endif
 
 	/* No name servers or res_init() failure */
@@ -319,6 +350,12 @@ res_nsend(res_state statp,
 	gotsomewhere = 0;
 	terrno = ETIMEDOUT;
 
+#ifdef USE_KQUEUE
+	if ((kq = kqueue1(O_CLOEXEC)) == -1) {
+		return (-1);
+	}
+#endif
+
 	/*
 	 * If the ns_addr_list in the resolver context has changed, then
 	 * invalidate our cached copy and the associated timing data.
@@ -333,8 +370,8 @@ res_nsend(res_state statp,
 		else
 			for (ns = 0; ns < statp->nscount; ns++) {
 				if (statp->nsaddr_list[ns].sin_family &&
-				    !sock_eq((struct sockaddr *)&statp->nsaddr_list[ns],
-					     (struct sockaddr *)&EXT(statp).ext->nsaddrs[ns])) {
+				    !sock_eq((struct sockaddr *)(void *)&statp->nsaddr_list[ns],
+					     (struct sockaddr *)(void *)&EXT(statp).ext->nsaddrs[ns])) {
 					needclose++;
 					break;
 				}
@@ -343,12 +380,12 @@ res_nsend(res_state statp,
 					continue;
 				peerlen = sizeof(peer);
 				if (getpeername(EXT(statp).nssocks[ns],
-				    (struct sockaddr *)&peer, &peerlen) < 0) {
+				    (struct sockaddr *)(void *)&peer, &peerlen) < 0) {
 					needclose++;
 					break;
 				}
-				if (!sock_eq((struct sockaddr *)&peer,
-				    get_nsaddr(statp, ns))) {
+				if (!sock_eq((struct sockaddr *)(void *)&peer,
+				    get_nsaddr(statp, (size_t)ns))) {
 					needclose++;
 					break;
 				}
@@ -412,8 +449,8 @@ res_nsend(res_state statp,
 	for (tries = 0; tries < statp->retry; tries++) {
 	    for (ns = 0; ns < statp->nscount; ns++) {
 		struct sockaddr *nsap;
-		int nsaplen;
-		nsap = get_nsaddr(statp, ns);
+		socklen_t nsaplen;
+		nsap = get_nsaddr(statp, (size_t)ns);
 		nsaplen = get_salen(nsap);
 		statp->_flags &= ~RES_F_LASTMASK;
 		statp->_flags |= (ns << RES_F_LASTSHIFT);
@@ -434,6 +471,9 @@ res_nsend(res_state statp,
 					res_nclose(statp);
 					goto next_ns;
 				case res_done:
+#ifdef USE_KQUEUE
+					close(kq);
+#endif
 					return (resplen);
 				case res_modified:
 					/* give the hook another try */
@@ -449,8 +489,8 @@ res_nsend(res_state statp,
 		}
 
 		Dprint(((statp->options & RES_DEBUG) &&
-			getnameinfo(nsap, nsaplen, abuf, sizeof(abuf),
-				    NULL, 0, niflags) == 0),
+			getnameinfo(nsap, nsaplen, abuf,
+			    (socklen_t)sizeof(abuf), NULL, 0, niflags) == 0),
 		       (stdout, ";; Querying server (# %d) address = %s\n",
 			ns + 1, abuf));
 
@@ -458,7 +498,7 @@ res_nsend(res_state statp,
 		if (v_circuit) {
 			/* Use VC; at most one attempt per server. */
 			tries = statp->retry;
-			n = send_vc(statp, buf, buflen, ans, anssiz, &terrno,
+			n = send_vc(statp, buf, (size_t)buflen, ans, anssiz, &terrno,
 				    ns);
 			if (n < 0)
 				goto fail;
@@ -467,8 +507,12 @@ res_nsend(res_state statp,
 			resplen = n;
 		} else {
 			/* Use datagrams. */
-			n = send_dg(statp, buf, buflen, ans, anssiz, &terrno,
-				    ns, tries, &v_circuit, &gotsomewhere);
+			n = send_dg(statp,
+#ifdef USE_KQUEUE
+			    kq,
+#endif
+			    buf, (size_t)buflen, ans, anssiz, &terrno,
+			    ns, tries, &v_circuit, &gotsomewhere);
 			if (n < 0)
 				goto fail;
 			if (n == 0)
@@ -526,11 +570,17 @@ res_nsend(res_state statp,
 			} while (!done);
 
 		}
+#ifdef USE_KQUEUE
+		close(kq);
+#endif
 		return (resplen);
  next_ns: ;
 	   } /*foreach ns*/
 	} /*foreach retry*/
 	res_nclose(statp);
+#ifdef USE_KQUEUE
+	close(kq);
+#endif
 	if (!v_circuit) {
 		if (!gotsomewhere)
 			errno = ECONNREFUSED;	/*%< no nameservers found */
@@ -541,37 +591,37 @@ res_nsend(res_state statp,
 	return (-1);
  fail:
 	res_nclose(statp);
+#ifdef USE_KQUEUE
+	close(kq);
+#endif
 	return (-1);
 }
 
 /* Private */
 
-static int
-get_salen(sa)
-	const struct sockaddr *sa;
+static socklen_t
+get_salen(const struct sockaddr *sa)
 {
 
 #ifdef HAVE_SA_LEN
 	/* There are people do not set sa_len.  Be forgiving to them. */
 	if (sa->sa_len)
-		return (sa->sa_len);
+		return (socklen_t)sa->sa_len;
 #endif
 
 	if (sa->sa_family == AF_INET)
-		return (sizeof(struct sockaddr_in));
+		return (socklen_t)sizeof(struct sockaddr_in);
 	else if (sa->sa_family == AF_INET6)
-		return (sizeof(struct sockaddr_in6));
+		return (socklen_t)sizeof(struct sockaddr_in6);
 	else
-		return (0);	/*%< unknown, die on connect */
+		return 0;	/*%< unknown, die on connect */
 }
 
 /*%
  * pick appropriate nsaddr_list for use.  see res_init() for initialization.
  */
 static struct sockaddr *
-get_nsaddr(statp, n)
-	res_state statp;
-	size_t n;
+get_nsaddr(res_state statp, size_t n)
 {
 
 	if (!statp->nsaddr_list[n].sin_family && EXT(statp).ext) {
@@ -593,23 +643,24 @@ get_nsaddr(statp, n)
 
 static int
 send_vc(res_state statp,
-	const u_char *buf, int buflen, u_char *ans, int anssiz,
+	const void *buf, size_t buflen, u_char *ans, int anssiz,
 	int *terrno, int ns)
 {
-	const HEADER *hp = (const HEADER *) buf;
-	HEADER *anhp = (HEADER *) ans;
+	const HEADER *hp = (const HEADER *)(const void *)buf;
+	HEADER *anhp = (HEADER *)(void *)ans;
 	struct sockaddr *nsap;
-	int nsaplen;
-	int truncating, connreset, resplen, n;
+	socklen_t nsaplen;
+	int truncating, connreset, resplen;
+	ssize_t n;
 	struct iovec iov[2];
 	u_short len;
 	u_char *cp;
 	void *tmp;
-#ifdef SO_NOSIGPIPE
+#if defined(SO_NOSIGPIPE) && SOCK_NOSIGPIPE == 0
 	int on = 1;
 #endif
 
-	nsap = get_nsaddr(statp, ns);
+	nsap = get_nsaddr(statp, (size_t)ns);
 	nsaplen = get_salen(nsap);
 
 	connreset = 0;
@@ -622,8 +673,8 @@ send_vc(res_state statp,
 		ISC_SOCKLEN_T size = sizeof peer;
 
 		if (getpeername(statp->_vcsock,
-				(struct sockaddr *)&peer, &size) < 0 ||
-		    !sock_eq((struct sockaddr *)&peer, nsap)) {
+				(struct sockaddr *)(void *)&peer, &size) < 0 ||
+		    !sock_eq((struct sockaddr *)(void *)&peer, nsap)) {
 			res_nclose(statp);
 			statp->_flags &= ~RES_F_VC;
 		}
@@ -633,11 +684,21 @@ send_vc(res_state statp,
 		if (statp->_vcsock >= 0)
 			res_nclose(statp);
 
-		statp->_vcsock = socket(nsap->sa_family, SOCK_STREAM, 0);
+#ifndef SOCK_CLOEXEC
+#define SOCK_CLOEXEC 0
+#endif
+
+		statp->_vcsock = socket(nsap->sa_family, SOCK_STREAM
+			| SOCK_NOSIGPIPE | SOCK_CLOEXEC, 0);
+#if SOCK_CLOEXEC == 0
+		fcntl(statp->_vcsock, F_SETFD, FD_CLOEXEC);
+#endif
+#if !defined(USE_POLL) && !defined(USE_KQUEUE)
 		if (statp->_vcsock > highestFD) {
 			res_nclose(statp);
 			errno = ENOTSOCK;
 		}
+#endif
 		if (statp->_vcsock < 0) {
 			switch (errno) {
 			case EPROTONOSUPPORT:
@@ -653,7 +714,7 @@ send_vc(res_state statp,
 				return (-1);
 			}
 		}
-#ifdef SO_NOSIGPIPE
+#if defined(SO_NOSIGPIPE) && SOCK_NOSIGPIPE == 0
 		/*
 		 * Disable generation of SIGPIPE when writing to a closed
 		 * socket.  Write should return -1 and set errno to EPIPE
@@ -662,7 +723,7 @@ send_vc(res_state statp,
 		 * Push on even if setsockopt(SO_NOSIGPIPE) fails.
 		 */
 		(void)setsockopt(statp->_vcsock, SOL_SOCKET, SO_NOSIGPIPE, &on,
-				 sizeof(on));
+				 (socklen_t)sizeof(on));
 #endif
 		errno = 0;
 		if (connect(statp->_vcsock, nsap, nsaplen) < 0) {
@@ -678,11 +739,11 @@ send_vc(res_state statp,
 	/*
 	 * Send length & message
 	 */
-	ns_put16((u_short)buflen, (u_char*)&len);
+	ns_put16((u_short)buflen, (u_char*)(void *)&len);
 	iov[0] = evConsIovec(&len, INT16SZ);
 	DE_CONST(buf, tmp);
-	iov[1] = evConsIovec(tmp, buflen);
-	if (writev(statp->_vcsock, iov, 2) != (INT16SZ + buflen)) {
+	iov[1] = evConsIovec(tmp, (size_t)buflen);
+	if (writev(statp->_vcsock, iov, 2) != (ssize_t)(INT16SZ + buflen)) {
 		*terrno = errno;
 		Perror(statp, stderr, "write failed", errno);
 		res_nclose(statp);
@@ -694,9 +755,9 @@ send_vc(res_state statp,
  read_len:
 	cp = ans;
 	len = INT16SZ;
-	while ((n = read(statp->_vcsock, (char *)cp, (int)len)) > 0) {
+	while ((n = read(statp->_vcsock, (char *)cp, (size_t)len)) > 0) {
 		cp += n;
-		if ((len -= n) == 0)
+		if ((len -= (u_short)n) == 0)
 			break;
 	}
 	if (n <= 0) {
@@ -740,9 +801,9 @@ send_vc(res_state statp,
 		return (0);
 	}
 	cp = ans;
-	while (len != 0 && (n = read(statp->_vcsock, (char *)cp, (int)len)) > 0){
+	while (len != 0 && (n = read(statp->_vcsock, (char *)cp, (size_t)len)) > 0){
 		cp += n;
-		len -= n;
+		len -= (u_short)n;
 	}
 	if (n <= 0) {
 		*terrno = errno;
@@ -762,7 +823,7 @@ send_vc(res_state statp,
 			n = read(statp->_vcsock, junk,
 				 (len > sizeof junk) ? sizeof junk : len);
 			if (n > 0)
-				len -= n;
+				len -= (u_short)n;
 			else
 				break;
 		}
@@ -790,33 +851,48 @@ send_vc(res_state statp,
 }
 
 static int
-send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
+send_dg(res_state statp,
+#ifdef USE_KQUEUE
+	int kq,
+#endif
+	const void *buf, size_t buflen, u_char *ans,
 	int anssiz, int *terrno, int ns, int tries, int *v_circuit,
 	int *gotsomewhere)
 {
-	const HEADER *hp = (const HEADER *) buf;
-	HEADER *anhp = (HEADER *) ans;
+	const HEADER *hp = (const HEADER *)(const void *)buf;
+	HEADER *anhp = (HEADER *)(void *)ans;
 	const struct sockaddr *nsap;
-	int nsaplen;
+	socklen_t nsaplen;
 	struct timespec now, timeout, finish;
 	struct sockaddr_storage from;
 	ISC_SOCKLEN_T fromlen;
-	int resplen, seconds, n, s;
+	ssize_t resplen;
+	int seconds, n, s;
+#ifdef USE_KQUEUE
+	struct kevent kv;
+#else
 #ifdef USE_POLL
 	int     polltimeout;
 	struct pollfd   pollfd;
 #else
 	fd_set dsmask;
 #endif
+#endif
 
-	nsap = get_nsaddr(statp, ns);
+	nsap = get_nsaddr(statp, (size_t)ns);
 	nsaplen = get_salen(nsap);
 	if (EXT(statp).nssocks[ns] == -1) {
-		EXT(statp).nssocks[ns] = socket(nsap->sa_family, SOCK_DGRAM, 0);
+		EXT(statp).nssocks[ns] = socket(nsap->sa_family, SOCK_DGRAM
+			| SOCK_CLOEXEC, 0);
+#if SOCK_CLOEXEC == 0
+		fcntl(EXT(statp).nssocks[ns], F_SETFD, FD_CLOEXEC);
+#endif
+#if !defined(USE_POLL) && !defined(USE_KQUEUE)
 		if (EXT(statp).nssocks[ns] > highestFD) {
 			res_nclose(statp);
 			errno = ENOTSOCK;
 		}
+#endif
 		if (EXT(statp).nssocks[ns] < 0) {
 			switch (errno) {
 			case EPROTONOSUPPORT:
@@ -843,8 +919,16 @@ send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
 		 * socket operation, and select returns if the
 		 * error message is received.  We can thus detect
 		 * the absence of a nameserver without timing out.
-		 */
-		if (connect(EXT(statp).nssocks[ns], nsap, nsaplen) < 0) {
+		 *
+		 * When the option "insecure1" is specified, we'd
+		 * rather expect to see responses from an "unknown"
+		 * address.  In order to let the kernel accept such
+		 * responses, do not connect the socket here.
+		 * XXX: or do we need an explicit option to disable
+		 * connecting?
+ 		 */
+		if (!(statp->options & RES_INSECURE1) &&
+		    connect(EXT(statp).nssocks[ns], nsap, nsaplen) < 0) {
 			Aerror(statp, stderr, "connect(dg)", errno, nsap,
 			    nsaplen);
 			res_nclose(statp);
@@ -856,13 +940,20 @@ send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
 	}
 	s = EXT(statp).nssocks[ns];
 #ifndef CANNOT_CONNECT_DGRAM
-	if (send(s, (const char*)buf, buflen, 0) != buflen) {
+	if (statp->options & RES_INSECURE1) {
+		if (sendto(s, buf, buflen, 0, nsap, nsaplen) !=
+		    (ssize_t)buflen) {
+			Aerror(statp, stderr, "sendto", errno, nsap, nsaplen);
+			res_nclose(statp);
+			return (0);
+		}
+	} else if (send(s, buf, buflen, 0) != (ssize_t)buflen) {
 		Perror(statp, stderr, "send", errno);
 		res_nclose(statp);
 		return (0);
 	}
 #else /* !CANNOT_CONNECT_DGRAM */
-	if (sendto(s, (const char*)buf, buflen, 0, nsap, nsaplen) != buflen)
+	if (sendto(s, buf, buflen, 0, nsap, nsaplen) != (ssize_t)buflen)
 	{
 		Aerror(statp, stderr, "sendto", errno, nsap, nsaplen);
 		res_nclose(statp);
@@ -879,26 +970,31 @@ send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
 	if (seconds <= 0)
 		seconds = 1;
 	now = evNowTime();
-	timeout = evConsTime(seconds, 0);
+	timeout = evConsTime((time_t)seconds, 0L);
 	finish = evAddTime(now, timeout);
 	goto nonow;
  wait:
 	now = evNowTime();
  nonow:
 #ifndef USE_POLL
-	FD_ZERO(&dsmask);
-	FD_SET(s, &dsmask);
 	if (evCmpTime(finish, now) > 0)
 		timeout = evSubTime(finish, now);
 	else
-		timeout = evConsTime(0, 0);
+		timeout = evConsTime(0L, 0L);
+#ifdef USE_KQUEUE
+	EV_SET(&kv, s, EVFILT_READ, EV_ADD | EV_ONESHOT, 0, 0, 0);
+	n = kevent(kq, &kv, 1, &kv, 1, &timeout);
+#else
+	FD_ZERO(&dsmask);
+	FD_SET(s, &dsmask);
 	n = pselect(s + 1, &dsmask, NULL, NULL, &timeout, NULL);
+#endif
 #else
 	timeout = evSubTime(finish, now);
 	if (timeout.tv_sec < 0)
-		timeout = evConsTime(0, 0);
-	polltimeout = 1000*timeout.tv_sec +
-		timeout.tv_nsec/1000000;
+		timeout = evConsTime((time_t)0, 0L);
+	polltimeout = 1000*(int)timeout.tv_sec +
+		(int)timeout.tv_nsec/1000000;
 	pollfd.fd = s;
 	pollfd.events = POLLRDNORM;
 	n = poll(&pollfd, 1, polltimeout);
@@ -910,20 +1006,29 @@ send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
 		return (0);
 	}
 	if (n < 0) {
+#if DEBUG
+#if defined(USE_POLL)
+		static const char *fun = "poll";
+#elif defined(USE_KQUEUE)
+		static const char *fun = "kevent";
+#else
+		static const char *fun = "select";
+#endif
+#endif
 		if (errno == EINTR)
 			goto wait;
-#ifndef USE_POLL
-		Perror(statp, stderr, "select", errno);
-#else
-		Perror(statp, stderr, "poll", errno);
-#endif /* USE_POLL */
+		Perror(statp, stderr, fun, errno);
 		res_nclose(statp);
 		return (0);
 	}
+#ifdef USE_KQUEUE
+	if ((int)kv.ident != s)
+		goto wait;
+#endif
 	errno = 0;
 	fromlen = sizeof(from);
-	resplen = recvfrom(s, (char*)ans, anssiz,0,
-			   (struct sockaddr *)&from, &fromlen);
+	resplen = recvfrom(s, (char*)ans, (size_t)anssiz,0,
+			   (struct sockaddr *)(void *)&from, &fromlen);
 	if (resplen <= 0) {
 		Perror(statp, stderr, "recvfrom", errno);
 		res_nclose(statp);
@@ -935,7 +1040,7 @@ send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
 		 * Undersized message.
 		 */
 		Dprint(statp->options & RES_DEBUG,
-		       (stdout, ";; undersized: %d\n",
+		       (stdout, ";; undersized: %zd\n",
 			resplen));
 		*terrno = EMSGSIZE;
 		res_nclose(statp);
@@ -954,7 +1059,7 @@ send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
 		goto wait;
 	}
 	if (!(statp->options & RES_INSECURE1) &&
-	    !res_ourserver_p(statp, (struct sockaddr *)&from)) {
+	    !res_ourserver_p(statp, (struct sockaddr *)(void *)&from)) {
 		/*
 		 * response from wrong server? ignore it.
 		 * XXX - potential security hazard could
@@ -983,7 +1088,7 @@ send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
 	}
 #endif
 	if (!(statp->options & RES_INSECURE2) &&
-	    !res_queriesmatch(buf, buf + buflen,
+	    !res_queriesmatch(buf, (const u_char *)buf + buflen,
 			      ans, ans + anssiz)) {
 		/*
 		 * response contains wrong query? ignore it.
@@ -993,7 +1098,7 @@ send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
 		DprintQ((statp->options & RES_DEBUG) ||
 			(statp->pfcode & RES_PRF_REPLY),
 			(stdout, ";; wrong query name:\n"),
-			ans, (resplen > anssiz) ? anssiz : resplen);
+			ans, (int)(resplen > anssiz) ? anssiz : resplen);
 		goto wait;
 	}
 	if (anhp->rcode == SERVFAIL ||
@@ -1001,7 +1106,7 @@ send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
 	    anhp->rcode == REFUSED) {
 		DprintQ(statp->options & RES_DEBUG,
 			(stdout, "server rejected query:\n"),
-			ans, (resplen > anssiz) ? anssiz : resplen);
+			ans, (int)(resplen > anssiz) ? anssiz : resplen);
 		res_nclose(statp);
 		/* don't retry if called from dig */
 		if (!statp->pfcode)
@@ -1022,14 +1127,15 @@ send_dg(res_state statp, const u_char *buf, int buflen, u_char *ans,
 	 * All is well, or the error is fatal.  Signal that the
 	 * next nameserver ought not be tried.
 	 */
-	return (resplen);
+	assert(INT_MIN <= resplen && resplen <= INT_MAX);
+	return (int)resplen;
 }
 
 #ifdef DEBUG
 
 static void
 Aerror(const res_state statp, FILE *file, const char *string, int error,
-       const struct sockaddr *address, int alen)
+       const struct sockaddr *address, socklen_t alen)
 {
 	int save = errno;
 	char hbuf[NI_MAXHOST];
@@ -1038,8 +1144,9 @@ Aerror(const res_state statp, FILE *file, const char *string, int error,
 	alen = alen;
 
 	if ((statp->options & RES_DEBUG) != 0U) {
-		if (getnameinfo(address, alen, hbuf, sizeof(hbuf),
-		    sbuf, sizeof(sbuf), niflags)) {
+		if (getnameinfo(address, alen, hbuf,
+				(socklen_t)sizeof(hbuf), sbuf, (socklen_t)sizeof(sbuf),
+				niflags)) {
 			strncpy(hbuf, "?", sizeof(hbuf) - 1);
 			hbuf[sizeof(hbuf) - 1] = '\0';
 			strncpy(sbuf, "?", sizeof(sbuf) - 1);
@@ -1072,13 +1179,13 @@ sock_eq(struct sockaddr *a, struct sockaddr *b) {
 		return 0;
 	switch (a->sa_family) {
 	case AF_INET:
-		a4 = (struct sockaddr_in *)a;
-		b4 = (struct sockaddr_in *)b;
+		a4 = (struct sockaddr_in *)(void *)a;
+		b4 = (struct sockaddr_in *)(void *)b;
 		return a4->sin_port == b4->sin_port &&
 		    a4->sin_addr.s_addr == b4->sin_addr.s_addr;
 	case AF_INET6:
-		a6 = (struct sockaddr_in6 *)a;
-		b6 = (struct sockaddr_in6 *)b;
+		a6 = (struct sockaddr_in6 *)(void *)a;
+		b6 = (struct sockaddr_in6 *)(void *)b;
 		return a6->sin6_port == b6->sin6_port &&
 #ifdef HAVE_SIN6_SCOPE_ID
 		    a6->sin6_scope_id == b6->sin6_scope_id &&
@@ -1089,7 +1196,7 @@ sock_eq(struct sockaddr *a, struct sockaddr *b) {
 	}
 }
 
-#if defined(NEED_PSELECT) && !defined(USE_POLL)
+#if defined(NEED_PSELECT) && !defined(USE_POLL) && !defined(USE_KQUEUE)
 /* XXX needs to move to the porting library. */
 static int
 pselect(int nfds, void *rfds, void *wfds, void *efds,

@@ -1,242 +1,336 @@
+/*	$NetBSD: getservent_r.c,v 1.11 2011/10/15 23:00:02 christos Exp $	*/
+
 /*
- * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
- * Copyright (c) 1998-1999 by Internet Software Consortium.
+ * Copyright (c) 1983, 1993
+ *	The Regents of the University of California.  All rights reserved.
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
  */
 
+#include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-static const char rcsid[] = "$Id: getservent_r.c,v 1.6 2006/08/01 01:14:16 marka Exp $";
+#if 0
+static char sccsid[] = "@(#)getservent.c	8.1 (Berkeley) 6/4/93";
+#else
+__RCSID("$NetBSD: getservent_r.c,v 1.11 2011/10/15 23:00:02 christos Exp $");
+#endif
 #endif /* LIBC_SCCS and not lint */
 
-#include <port_before.h>
-#if !defined(_REENTRANT) || !defined(DO_PTHREADS)
-	static int getservent_r_not_required = 0;
-#else
 #include <errno.h>
-#include <string.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <netinet/in.h>
+#include <fcntl.h>
 #include <netdb.h>
-#include <sys/param.h>
-#include <port_after.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#ifdef SERV_R_RETURN
+#include <FindDirectory.h>
 
-static SERV_R_RETURN 
-copy_servent(struct servent *, struct servent *, SERV_R_COPY_ARGS);
+#include <libutil.h>
+#include "servent.h"
 
-SERV_R_RETURN
-getservbyname_r(const char *name, const char *proto,
-		struct servent *sptr, SERV_R_ARGS) {
-	struct servent *se = getservbyname(name, proto);
-#ifdef SERV_R_SETANSWER
-	int n = 0;
-	
-	if (se == NULL || (n = copy_servent(se, sptr, SERV_R_COPY)) != 0)
-		*answerp = NULL;
-	else
-		*answerp = sptr;
-
-	return (n);
-#else
-	if (se == NULL)
-		return (SERV_R_BAD);
-
-	return (copy_servent(se, sptr, SERV_R_COPY));
+#ifdef __weak_alias
+__weak_alias(endservent_r,_endservent_r)
+__weak_alias(getservent_r,_getservent_r)
+__weak_alias(setservent_r,_setservent_r)
 #endif
-}
 
-SERV_R_RETURN
-getservbyport_r(int port, const char *proto,
-		struct servent *sptr, SERV_R_ARGS) {
-	struct servent *se = getservbyport(port, proto);
-#ifdef SERV_R_SETANSWER
-	int n = 0;
-	
-	if (se == NULL || (n = copy_servent(se, sptr, SERV_R_COPY)) != 0)
-		*answerp = NULL;
-	else
-		*answerp = sptr;
-
-	return (n);
-#else
-	if (se == NULL)
-		return (SERV_R_BAD);
-
-	return (copy_servent(se, sptr, SERV_R_COPY));
-#endif
-}
-
-/*%
- *	These assume a single context is in operation per thread.
- *	If this is not the case we will need to call irs directly
- *	rather than through the base functions.
- */
-
-SERV_R_RETURN
-getservent_r(struct servent *sptr, SERV_R_ARGS) {
-	struct servent *se = getservent();
-#ifdef SERV_R_SETANSWER
-	int n = 0;
-	
-	if (se == NULL || (n = copy_servent(se, sptr, SERV_R_COPY)) != 0)
-		*answerp = NULL;
-	else
-		*answerp = sptr;
-
-	return (n);
-#else
-	if (se == NULL)
-		return (SERV_R_BAD);
-
-	return (copy_servent(se, sptr, SERV_R_COPY));
-#endif
-}
-
-SERV_R_SET_RETURN
-#ifdef SERV_R_ENT_ARGS
-setservent_r(int stay_open, SERV_R_ENT_ARGS)
-#else
-setservent_r(int stay_open)
-#endif
+int
+_servent_open(struct servent_data *sd)
 {
-#ifdef SERV_R_ENT_UNUSED
-	SERV_R_ENT_UNUSED;
+	char buffer[256];
+
+	if (sd->flags & (_SV_CDB | _SV_PLAINFILE)) {
+		sd->flags |= _SV_FIRST;
+		return 0;
+	}
+
+	free(sd->line);
+	sd->line = NULL;
+	free(sd->cdb_buf);
+	sd->cdb_buf = NULL;
+	sd->cdb_buf_len = 0;
+	free(sd->aliases);
+	sd->aliases = NULL;
+	sd->maxaliases = 0;
+	sd->flags |= _SV_FIRST;
+
+#if 0
+	sd->cdb = cdbr_open(_PATH_SERVICES_CDB, CDBR_DEFAULT);
+	if (sd->cdb != NULL) {
+		sd->flags |= _SV_CDB;
+		return 0;
+	}
 #endif
-	setservent(stay_open);
-#ifdef SERV_R_SET_RESULT
-	return (SERV_R_SET_RESULT);
-#endif
+
+	find_directory(B_SYSTEM_SETTINGS_DIRECTORY, 0, false, buffer, sizeof(buffer));
+	strlcat(buffer, "/network/ports", sizeof(buffer));
+
+	sd->plainfile = fopen(buffer, "re");
+	if (sd->plainfile != NULL) {
+		sd->flags |= _SV_PLAINFILE;
+		return 0;
+	}
+	return -1;
 }
 
-SERV_R_END_RETURN
-#ifdef SERV_R_ENT_ARGS
-endservent_r(SERV_R_ENT_ARGS)
-#else
-endservent_r()
-#endif
+void
+_servent_close(struct servent_data *sd)
 {
-#ifdef SERV_R_ENT_UNUSED
-	SERV_R_ENT_UNUSED;
+#if 0
+	if (sd->flags & _SV_CDB) {
+		cdbr_close(sd->cdb);
+		sd->cdb = NULL;
+		sd->flags &= ~_SV_CDB;
+	}
 #endif
-	endservent();
-	SERV_R_END_RESULT(SERV_R_OK);
+
+	if (sd->flags & _SV_PLAINFILE) {
+		(void)fclose(sd->plainfile);
+		sd->plainfile = NULL;
+		sd->flags &= ~_SV_PLAINFILE;
+	}
+	sd->flags &= ~_SV_STAYOPEN;
 }
 
-/* Private */
 
-#ifndef SERVENT_DATA
-static SERV_R_RETURN
-copy_servent(struct servent *se, struct servent *sptr, SERV_R_COPY_ARGS) {
-	char *cp;
-	int i, n;
-	int numptr, len;
+int
+_servent_getline(struct servent_data *sd)
+{
+#if 0
+	if (sd->flags & _SV_CDB)
+		return -1;
+#endif
 
-	/* Find out the amount of space required to store the answer. */
-	numptr = 1; /*%< NULL ptr */
-	len = (char *)ALIGN(buf) - buf;
-	for (i = 0; se->s_aliases[i]; i++, numptr++) {
-		len += strlen(se->s_aliases[i]) + 1;
+	if ((sd->flags & _SV_PLAINFILE) == 0)
+		return -1;
+
+	free(sd->line);
+	sd->line = NULL;
+
+	if (sd->flags & _SV_FIRST) {
+		(void)rewind((FILE *)sd->plainfile);
+		sd->flags &= ~_SV_FIRST;
 	}
-	len += strlen(se->s_name) + 1;
-	len += strlen(se->s_proto) + 1;
-	len += numptr * sizeof(char*);
-	
-	if (len > (int)buflen) {
-		errno = ERANGE;
-		return (SERV_R_BAD);
-	}
-
-	/* copy port value */
-	sptr->s_port = se->s_port;
-
-	cp = (char *)ALIGN(buf) + numptr * sizeof(char *);
-
-	/* copy official name */
-	n = strlen(se->s_name) + 1;
-	strcpy(cp, se->s_name);
-	sptr->s_name = cp;
-	cp += n;
-
-	/* copy aliases */
-	sptr->s_aliases = (char **)ALIGN(buf);
-	for (i = 0 ; se->s_aliases[i]; i++) {
-		n = strlen(se->s_aliases[i]) + 1;
-		strcpy(cp, se->s_aliases[i]);
-		sptr->s_aliases[i] = cp;
-		cp += n;
-	}
-	sptr->s_aliases[i] = NULL;
-
-	/* copy proto */
-	n = strlen(se->s_proto) + 1;
-	strcpy(cp, se->s_proto);
-	sptr->s_proto = cp;
-	cp += n;
-
-	return (SERV_R_OK);
+	sd->line = fparseln(sd->plainfile, NULL, NULL, NULL,
+	    FPARSELN_UNESCALL);
+	return sd->line == NULL ? -1 : 0;
 }
-#else /* !SERVENT_DATA */
-static int
-copy_servent(struct servent *se, struct servent *sptr, SERV_R_COPY_ARGS) {
-	char *cp, *eob;
-	int i, n;
 
-	/* copy port value */
-	sptr->s_port = se->s_port;
+struct servent *
+_servent_parseline(struct servent_data *sd, struct servent *sp)
+{
+	size_t i = 0;
+	int oerrno;
+	char *p, *cp, **q;
 
-	/* copy official name */
-	cp = sdptr->line;
-	eob = sdptr->line + sizeof(sdptr->line);
-	if ((n = strlen(se->s_name) + 1) < (eob - cp)) {
-		strcpy(cp, se->s_name);
-		sptr->s_name = cp;
-		cp += n;
-	} else {
-		return (-1);
-	}
+	if (sd->line == NULL)
+		return NULL;
 
-	/* copy aliases */
-	i = 0;
-	sptr->s_aliases = sdptr->serv_aliases;
-	while (se->s_aliases[i] && i < (_MAXALIASES-1)) {
-		if ((n = strlen(se->s_aliases[i]) + 1) < (eob - cp)) {
-			strcpy(cp, se->s_aliases[i]);
-			sptr->s_aliases[i] = cp;
-			cp += n;
-		} else {
-			break;
+	sp->s_name = p = sd->line;
+	p = strpbrk(p, " \t");
+	if (p == NULL)
+		return NULL;
+	*p++ = '\0';
+	while (*p == ' ' || *p == '\t')
+		p++;
+	cp = strpbrk(p, ",/");
+	if (cp == NULL)
+		return NULL;
+	*cp++ = '\0';
+	sp->s_port = htons((u_short)atoi(p));
+	sp->s_proto = cp;
+	if (sd->aliases == NULL) {
+		sd->maxaliases = 10;
+		sd->aliases = calloc(sd->maxaliases, sizeof(*sd->aliases));
+		if (sd->aliases == NULL) {
+			oerrno = errno;
+			endservent_r(sd);
+			errno = oerrno;
+			return NULL;
 		}
-		i++;
 	}
-	sptr->s_aliases[i] = NULL;
-
-	/* copy proto */
-	if ((n = strlen(se->s_proto) + 1) < (eob - cp)) {
-		strcpy(cp, se->s_proto);
-		sptr->s_proto = cp;
-		cp += n;
-	} else {
-		return (-1);
+	sp->s_aliases = sd->aliases;
+	cp = strpbrk(cp, " \t");
+	if (cp != NULL)
+		*cp++ = '\0';
+	while (cp && *cp) {
+		if (*cp == ' ' || *cp == '\t') {
+			cp++;
+			continue;
+		}
+		if (i == sd->maxaliases - 2) {
+			sd->maxaliases *= 2;
+			q = realloc(sd->aliases, sd->maxaliases * sizeof(*q));
+			if (q == NULL) {
+				oerrno = errno;
+				endservent_r(sd);
+				errno = oerrno;
+				return NULL;
+			}
+			sp->s_aliases = sd->aliases = q;
+		}
+		sp->s_aliases[i++] = cp;
+		cp = strpbrk(cp, " \t");
+		if (cp != NULL)
+			*cp++ = '\0';
 	}
-
-	return (SERV_R_OK);
+	sp->s_aliases[i] = NULL;
+	return sp;
 }
-#endif /* !SERVENT_DATA */
-#else /*SERV_R_RETURN */
-	static int getservent_r_unknown_system = 0;
-#endif /*SERV_R_RETURN */
-#endif /* !defined(_REENTRANT) || !defined(DO_PTHREADS) */
-/*! \file */
+
+void
+setservent_r(int f, struct servent_data *sd)
+{
+	(void)_servent_open(sd);
+	sd->flags |= f ? _SV_STAYOPEN : 0;
+}
+
+void
+endservent_r(struct servent_data *sd)
+{
+	_servent_close(sd);
+	free(sd->aliases);
+	sd->aliases = NULL;
+	sd->maxaliases = 0;
+	free(sd->line);
+	sd->line = NULL;
+	free(sd->cdb_buf);
+	sd->cdb_buf = NULL;
+	sd->cdb_buf_len = 0;
+}
+
+struct servent *
+getservent_r(struct servent *sp, struct servent_data *sd)
+{
+
+	if ((sd->flags & (_SV_CDB | _SV_PLAINFILE)) == 0 &&
+	    _servent_open(sd) == -1)
+		return NULL;
+
+#if 0
+	if (sd->flags & _SV_CDB) {
+		const void *data;
+		size_t len;
+
+		if (sd->flags & _SV_FIRST) {
+			sd->cdb_index = 0;
+			sd->flags &= ~_SV_FIRST;
+		}
+
+		if (cdbr_get(sd->cdb, sd->cdb_index, &data, &len))
+			return NULL;
+		++sd->cdb_index;
+		return _servent_parsedb(sd, sp, data, len);
+	}
+#endif
+	if (sd->flags & _SV_PLAINFILE) {
+		for (;;) {
+			if (_servent_getline(sd) == -1)
+				return NULL;
+			if (_servent_parseline(sd, sp) == NULL)
+				continue;
+			return sp;
+		}
+	}
+	return NULL;
+}
+
+struct servent *
+_servent_parsedb(struct servent_data *sd, struct servent *sp,
+    const uint8_t *data, size_t len)
+{
+	char **q;
+	size_t i;
+	int oerrno;
+
+	if ((sd->flags & _SV_STAYOPEN) == 0) {
+		if (len > sd->cdb_buf_len) {
+			void *tmp = realloc(sd->cdb_buf, len);
+			if (tmp == NULL)
+				goto fail;
+			sd->cdb_buf = tmp;
+			sd->cdb_buf_len = len;
+		}
+		memcpy(sd->cdb_buf, data, len);
+		data = sd->cdb_buf;
+	}
+
+	if (len < 2)
+		goto fail;
+	sp->s_port = *(uint16_t*)data;
+	data += 2;
+	len -= 2;
+
+	if (len == 0 || len < (size_t)data[0] + 2)
+		goto fail;
+	sp->s_proto = __UNCONST(data + 1);
+
+	if (sp->s_proto[data[0]] != '\0')
+		goto fail;
+
+	len -= 2 + data[0];
+	data += 2 + data[0];
+
+	if (len == 0)
+		goto fail;
+	if (len < (size_t)data[0] + 2)
+		goto fail;
+
+	sp->s_name = __UNCONST(data + 1);
+	len -= 2 + data[0];
+	data += 2 + data[0];
+
+	if (sd->aliases == NULL) {
+		sd->maxaliases = 10;
+		sd->aliases = malloc(sd->maxaliases * sizeof(char *));
+		if (sd->aliases == NULL)
+			goto fail;
+	}
+	sp->s_aliases = sd->aliases;
+	i = 0;
+	while (len) {
+		if (len < (size_t)data[0] + 2)
+			goto fail;
+		if (i == sd->maxaliases - 2) {
+			sd->maxaliases *= 2;
+			q = realloc(sd->aliases, sd->maxaliases * sizeof(*q));
+			if (q == NULL)
+				goto fail;
+			sp->s_aliases = sd->aliases = q;
+		}
+		sp->s_aliases[i++] = __UNCONST(data + 1);
+		len -= 2 + data[0];
+		data += 2 + data[0];
+	}
+	sp->s_aliases[i] = NULL;
+	return sp;
+
+fail:
+	oerrno = errno;
+	endservent_r(sd);
+	errno = oerrno;
+	return NULL;
+}
+

@@ -741,7 +741,7 @@ pselect(int nfds, void *rfds, void *wfds, void *efds,
 	sigset_t sigs;
 	int n;
 #ifdef USE_POLL
-	int	polltimeout = INFTIM;
+	int	polltimeout = INT_MAX;
 	evContext_p	*ctx;
 	struct pollfd	*fds;
 	nfds_t		pnfds;

@@ -1,3 +1,5 @@
+/*	$NetBSD: ns_parse.c,v 1.9 2012/03/13 21:13:39 christos Exp $	*/
+
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996,1999 by Internet Software Consortium.
@@ -15,8 +17,13 @@
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <sys/cdefs.h>
 #ifndef lint
-static const char rcsid[] = "$Id: ns_parse.c,v 1.10 2009/01/23 19:59:16 each Exp $";
+#ifdef notdef
+static const char rcsid[] = "Id: ns_parse.c,v 1.10 2009/01/23 19:59:16 each Exp";
+#else
+//__RCSID("$NetBSD: ns_parse.c,v 1.9 2012/03/13 21:13:39 christos Exp $");
+#endif
 #endif
 
 /* Import. */
@@ -28,6 +35,7 @@ static const char rcsid[] = "$Id: ns_parse.c,v 1.10 2009/01/23 19:59:16 each Exp
 #include <netinet/in.h>
 #include <arpa/nameser.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <resolv.h>
 #include <string.h>
@@ -41,7 +49,7 @@ static void	setsection(ns_msg *msg, ns_sect sect);
 /* Macros. */
 
 #if !defined(SOLARIS2) || defined(__COVERITY__)
-#define RETERR(err) do { errno = (err); return (-1); } while (0)
+#define RETERR(err) do { errno = (err); return (-1); } while (/*NOTREACHED*//*CONSTCOND*/0)
 #else
 #define RETERR(err) \
 	do { errno = (err); if (errno == errno) return (-1); } while (0)
@@ -73,14 +81,14 @@ struct _ns_flagdata _ns_flagdata[16] = {
 };
 
 int ns_msg_getflag(ns_msg handle, int flag) {
-	return(((handle)._flags & _ns_flagdata[flag].mask) >> _ns_flagdata[flag].shift);
+	return((u_int32_t)((handle)._flags & _ns_flagdata[flag].mask) >> _ns_flagdata[flag].shift);
 }
 
 int
 ns_skiprr(const u_char *ptr, const u_char *eom, ns_sect section, int count) {
 	const u_char *optr = ptr;
 
-	for ((void)NULL; count > 0; count--) {
+	for (; count > 0; count--) {
 		int b, rdlength;
 
 		b = dn_skipname(ptr, eom);
@@ -97,7 +105,8 @@ ns_skiprr(const u_char *ptr, const u_char *eom, ns_sect section, int count) {
 	}
 	if (ptr > eom)
 		RETERR(EMSGSIZE);
-	return (ptr - optr);
+	assert(INT_MIN <= (ptr - optr) && (ptr - optr) <= INT_MAX);
+	return (int)(ptr - optr);
 }
 
 int
@@ -205,7 +214,8 @@ ns_parserr2(ns_msg *handle, ns_sect section, int rrnum, ns_rr2 *rr) {
 	int tmp;
 
 	/* Make section right. */
-	if ((tmp = section) < 0 || section >= ns_s_max)
+	tmp = section;
+	if (tmp < 0 || section >= ns_s_max)
 		RETERR(ENODEV);
 	if (section != handle->_sect)
 		setsection(handle, section);

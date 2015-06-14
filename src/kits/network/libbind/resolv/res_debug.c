@@ -1,3 +1,5 @@
+/*	$NetBSD: res_debug.c,v 1.13 2012/06/25 22:32:45 abs Exp $	*/
+
 /*
  * Portions Copyright (C) 2004, 2005, 2008, 2009  Internet Systems Consortium, Inc. ("ISC")
  * Portions Copyright (C) 1996-2003  Internet Software Consortium.
@@ -108,6 +110,7 @@ static const char rcsid[] = "$Id: res_debug.c,v 1.19 2009/02/26 11:20:20 tbox Ex
 #include <arpa/inet.h>
 #include <arpa/nameser.h>
 
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <math.h>
@@ -130,6 +133,15 @@ static const char rcsid[] = "$Id: res_debug.c,v 1.19 2009/02/26 11:20:20 tbox Ex
 extern const char *_res_opcodes[];
 extern const char *_res_sectioncodes[];
 
+#if 0
+#ifdef __weak_alias
+__weak_alias(res_pquery,__res_pquery)
+__weak_alias(res_nametoclass,__res_nametoclass)
+__weak_alias(res_nametotype,__res_nametotype)
+#endif
+#endif
+
+#ifndef _LIBC
 /*%
  * Print the current options.
  */
@@ -143,6 +155,7 @@ fp_resstat(const res_state statp, FILE *file) {
 			fprintf(file, " %s", p_option(mask));
 	putc('\n', file);
 }
+#endif
 
 static void
 do_section(const res_state statp,
@@ -158,11 +171,11 @@ do_section(const res_state statp,
 	/*
 	 * Print answer records.
 	 */
-	sflag = (statp->pfcode & pflag);
+	sflag = (int)(statp->pfcode & pflag);
 	if (statp->pfcode && !sflag)
 		return;
 
-	buf = malloc(buflen);
+	buf = malloc((size_t)buflen);
 	if (buf == NULL) {
 		fprintf(file, ";; memory allocation failure\n");
 		return;
@@ -189,11 +202,14 @@ do_section(const res_state statp,
 				p_type(ns_rr_type(rr)),
 				p_class(ns_rr_class(rr)));
 		else if (section == ns_s_ar && ns_rr_type(rr) == ns_t_opt) {
-			u_int16_t optcode, optlen, rdatalen = ns_rr_rdlen(rr);
-			u_int32_t ttl = ns_rr_ttl(rr);
+			size_t rdatalen, ttl;
+			uint16_t optcode, optlen;
+
+			rdatalen = ns_rr_rdlen(rr);
+			ttl = ns_rr_ttl(rr);
 
 			fprintf(file,
-				"; EDNS: version: %u, udp=%u, flags=%04x\n",
+				"; EDNS: version: %zu, udp=%u, flags=%04zx\n",
 				(ttl>>16)&0xff, ns_rr_class(rr), ttl&0xffff);
 
 			while (rdatalen >= 4) {
@@ -241,13 +257,13 @@ do_section(const res_state statp,
 			}
 		} else {
 			n = ns_sprintrr(handle, &rr, NULL, NULL,
-					buf, buflen);
+					buf, (u_int)buflen);
 			if (n < 0) {
 				if (errno == ENOSPC) {
 					free(buf);
 					buf = NULL;
 					if (buflen < 131072)
-						buf = malloc(buflen += 1024);
+						buf = malloc((size_t)(buflen += 1024));
 					if (buf == NULL) {
 						fprintf(file,
 					      ";; memory allocation failure\n");
@@ -297,7 +313,7 @@ res_pquery(const res_state statp, const u_char *msg, int len, FILE *file) {
 	if ((!statp->pfcode) || (statp->pfcode & RES_PRF_HEADX) || rcode)
 		fprintf(file,
 			";; ->>HEADER<<- opcode: %s, status: %s, id: %d\n",
-			_res_opcodes[opcode], p_rcode(rcode), id);
+			_res_opcodes[opcode], p_rcode((int)rcode), id);
 	if ((!statp->pfcode) || (statp->pfcode & RES_PRF_HEADX))
 		putc(';', file);
 	if ((!statp->pfcode) || (statp->pfcode & RES_PRF_HEAD2)) {
@@ -321,13 +337,13 @@ res_pquery(const res_state statp, const u_char *msg, int len, FILE *file) {
 	}
 	if ((!statp->pfcode) || (statp->pfcode & RES_PRF_HEAD1)) {
 		fprintf(file, "; %s: %d",
-			p_section(ns_s_qd, opcode), qdcount);
+			p_section(ns_s_qd, (int)opcode), qdcount);
 		fprintf(file, ", %s: %d",
-			p_section(ns_s_an, opcode), ancount);
+			p_section(ns_s_an, (int)opcode), ancount);
 		fprintf(file, ", %s: %d",
-			p_section(ns_s_ns, opcode), nscount);
+			p_section(ns_s_ns, (int)opcode), nscount);
 		fprintf(file, ", %s: %d",
-			p_section(ns_s_ar, opcode), arcount);
+			p_section(ns_s_ar, (int)opcode), arcount);
 	}
 	if ((!statp->pfcode) || (statp->pfcode &
 		(RES_PRF_HEADX | RES_PRF_HEAD2 | RES_PRF_HEAD1))) {
@@ -350,7 +366,7 @@ p_cdnname(const u_char *cp, const u_char *msg, int len, FILE *file) {
 	char name[MAXDNAME];
 	int n;
 
-	if ((n = dn_expand(msg, msg + len, cp, name, sizeof name)) < 0)
+	if ((n = dn_expand(msg, msg + len, cp, name, (int)sizeof name)) < 0)
 		return (NULL);
 	if (name[0] == '\0')
 		putc('.', file);
@@ -369,19 +385,17 @@ p_cdname(const u_char *cp, const u_char *msg, FILE *file) {
    length supplied).  */
 
 const u_char *
-p_fqnname(cp, msg, msglen, name, namelen)
-	const u_char *cp, *msg;
-	int msglen;
-	char *name;
-	int namelen;
+p_fqnname(const u_char *cp, const u_char *msg, int msglen, char *name,
+    int namelen)
 {
-	int n, newlen;
+	int n;
+	size_t newlen;
 
 	if ((n = dn_expand(msg, cp + msglen, cp, name, namelen)) < 0)
 		return (NULL);
 	newlen = strlen(name);
 	if (newlen == 0 || name[newlen - 1] != '.') {
-		if (newlen + 1 >= namelen)	/*%< Lack space for final dot */
+		if ((int)newlen + 1 >= namelen)	/*%< Lack space for final dot */
 			return (NULL);
 		else
 			strcpy(name + newlen, ".");
@@ -396,7 +410,7 @@ p_fqname(const u_char *cp, const u_char *msg, FILE *file) {
 	char name[MAXDNAME];
 	const u_char *n;
 
-	n = p_fqnname(cp, msg, MAXCDNAME, name, sizeof name);
+	n = p_fqnname(cp, msg, MAXCDNAME, name, (int)sizeof name);
 	if (n == NULL)
 		return (NULL);
 	fputs(name, file);
@@ -557,7 +571,7 @@ const struct res_sym __p_rcode_syms[] = {
 
 int
 sym_ston(const struct res_sym *syms, const char *name, int *success) {
-	for ((void)NULL; syms->name != 0; syms++) {
+	for (; syms->name != 0; syms++) {
 		if (strcasecmp (name, syms->name) == 0) {
 			if (success)
 				*success = 1;
@@ -573,7 +587,7 @@ const char *
 sym_ntos(const struct res_sym *syms, int number, int *success) {
 	char *unname = sym_ntos_unname;
 
-	for ((void)NULL; syms->name != 0; syms++) {
+	for (; syms->name != 0; syms++) {
 		if (number == syms->number) {
 			if (success)
 				*success = 1;
@@ -591,7 +605,7 @@ const char *
 sym_ntop(const struct res_sym *syms, int number, int *success) {
 	char *unname = sym_ntop_unname;
 
-	for ((void)NULL; syms->name != 0; syms++) {
+	for (; syms->name != 0; syms++) {
 		if (number == syms->number) {
 			if (success)
 				*success = 1;
@@ -710,7 +724,7 @@ const char *
 p_time(u_int32_t value) {
 	char *nbuf = p_time_nbuf;
 
-	if (ns_format_ttl(value, nbuf, sizeof nbuf) < 0)
+	if (ns_format_ttl((u_long)value, nbuf, sizeof nbuf) < 0)
 		sprintf(nbuf, "%u", value);
 	return (nbuf);
 }
@@ -732,7 +746,7 @@ p_sockun(union res_sockaddr_union u, char *buf, size_t size) {
 
 	switch (u.sin.sin_family) {
 	case AF_INET:
-		inet_ntop(AF_INET, &u.sin.sin_addr, ret, sizeof ret);
+		inet_ntop(AF_INET, &u.sin.sin_addr, ret, (socklen_t)sizeof ret);
 		break;
 #ifdef HAS_INET6_STRUCTS
 	case AF_INET6:
@@ -761,8 +775,7 @@ static unsigned int poweroften[10] = {1, 10, 100, 1000, 10000, 100000,
 
 /*% takes an XeY precision/size value, returns a string representation. */
 static const char *
-precsize_ntoa(prec)
-	u_int8_t prec;
+precsize_ntoa(u_int32_t prec)
 {
 	char *retbuf = precsize_ntoa_retbuf;
 	unsigned long val;
@@ -915,9 +928,7 @@ latlon2ul(const char **latlonstrptr, int *which) {
  * converts a zone file representation in a string to an RDATA on-the-wire
  * representation. */
 int
-loc_aton(ascii, binary)
-	const char *ascii;
-	u_char *binary;
+loc_aton(const char *ascii, u_char *binary)
 {
 	const char *cp, *maxcp;
 	u_char *bcp;
@@ -1026,9 +1037,7 @@ loc_aton(ascii, binary)
 
 /*% takes an on-the-wire LOC RR and formats it in a human readable format. */
 const char *
-loc_ntoa(binary, ascii)
-	const u_char *binary;
-	char *ascii;
+loc_ntoa(const u_char *binary, char *ascii)
 {
 	static const char *error = "?";
 	static char tmpbuf[sizeof
@@ -1110,9 +1119,9 @@ loc_ntoa(binary, ascii)
 	altfrac = altval % 100;
 	altmeters = (altval / 100);
 
-	sizestr = strdup(precsize_ntoa(sizeval));
-	hpstr = strdup(precsize_ntoa(hpval));
-	vpstr = strdup(precsize_ntoa(vpval));
+	sizestr = strdup(precsize_ntoa((u_int32_t)sizeval));
+	hpstr = strdup(precsize_ntoa((u_int32_t)hpval));
+	vpstr = strdup(precsize_ntoa((u_int32_t)vpval));
 
 	sprintf(ascii,
 	    "%d %.2d %.2d.%.3d %c %d %.2d %.2d.%.3d %c %s%d.%.2dm %sm %sm %sm",
@@ -1137,7 +1146,7 @@ loc_ntoa(binary, ascii)
 /*% Return the number of DNS hierarchy levels in the name. */
 int
 dn_count_labels(const char *name) {
-	int i, len, count;
+	size_t len, i, count;
 
 	len = strlen(name);
 	for (i = 0, count = 0; i < len; i++) {
@@ -1156,7 +1165,8 @@ dn_count_labels(const char *name) {
 	/* count to include last label */
 	if (len > 0 && name[len-1] != '.')
 		count++;
-	return (count);
+	assert(count <= (size_t)INT_MAX);
+	return (int)count;
 }
 
 /*%
@@ -1165,21 +1175,22 @@ dn_count_labels(const char *name) {
  */
 char *
 p_secstodate (u_long secs) {
+	/* XXX nonreentrant */
 	char *output = p_secstodate_output;
-	time_t clock = secs;
-	struct tm *time;
+	time_t myclock = secs;
+	struct tm *mytime;
 #ifdef HAVE_TIME_R
 	struct tm res;
-
-	time = gmtime_r(&clock, &res);
+	
+	mytime = gmtime_r(&myclock, &res);
 #else
-	time = gmtime(&clock);
+	mytime = gmtime(&myclock);
 #endif
-	time->tm_year += 1900;
-	time->tm_mon += 1;
+	mytime->tm_year += 1900;
+	mytime->tm_mon += 1;
 	sprintf(output, "%04d%02d%02d%02d%02d%02d",
-		time->tm_year, time->tm_mon, time->tm_mday,
-		time->tm_hour, time->tm_min, time->tm_sec);
+		mytime->tm_year, mytime->tm_mon, mytime->tm_mday,
+		mytime->tm_hour, mytime->tm_min, mytime->tm_sec);
 	return (output);
 }
 
@@ -1203,7 +1214,7 @@ res_nametoclass(const char *buf, int *successp) {
  done:
 	if (successp)
 		*successp = success;
-	return (result);
+	return (u_int16_t)(result);
 }
 
 u_int16_t
@@ -1226,7 +1237,7 @@ res_nametotype(const char *buf, int *successp) {
  done:
 	if (successp)
 		*successp = success;
-	return (result);
+	return (u_int16_t)(result);
 }
 
 /*! \file */

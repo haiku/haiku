@@ -1,179 +1,78 @@
-/*
- * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
- * Copyright (c) 1996,1999 by Internet Software Consortium.
+/*	$NetBSD: getservent.c,v 1.12 2008/04/28 20:23:00 martin Exp $	*/
+
+/*-
+ * Copyright (c) 2004 The NetBSD Foundation, Inc.
+ * All rights reserved.
  *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
+ * This code is derived from software contributed to The NetBSD Foundation
+ * by Christos Zoulas.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if !defined(LINT) && !defined(CODECENTER)
-static const char rcsid[] = "$Id: getservent.c,v 1.4 2005/04/27 04:56:26 sra Exp $";
+#include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$NetBSD: getservent.c,v 1.12 2008/04/28 20:23:00 martin Exp $");
+#endif /* LIBC_SCCS and not lint */
+
+#include <netdb.h>
+#include <pthread.h>
+
+#include "servent.h"
+
+#ifdef __weak_alias
+__weak_alias(endservent,_endservent)
+__weak_alias(getservent,_getservent)
+__weak_alias(setservent,_setservent)
 #endif
 
-/* Imports */
+#ifdef _REENTRANT
+pthread_mutex_t _servent_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
+struct servent_data _servent_data;
 
-#include "port_before.h"
-
-#if !defined(__BIND_NOSTATIC)
-
-#include <sys/types.h>
-
-#include <netinet/in.h>
-#include <arpa/nameser.h>
-
-#include <errno.h>
-#include <resolv.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <irs.h>
-
-#include "port_after.h"
-
-#include "irs_data.h"
-
-/* Forward */
-
-static struct net_data *init(void);
-
-/* Public */
-
-struct servent *
-getservent(void) {
-	struct net_data *net_data = init();
-
-	return (getservent_p(net_data));
-}
-
-struct servent *
-getservbyname(const char *name, const char *proto) {
-	struct net_data *net_data = init();
-
-	return (getservbyname_p(name, proto, net_data));
-}
-
-struct servent *
-getservbyport(int port, const char *proto) {
-	struct net_data *net_data = init();
-
-	return (getservbyport_p(port, proto, net_data));
+void
+setservent(int f)
+{
+	pthread_mutex_lock(&_servent_mutex);
+	setservent_r(f, &_servent_data);
+	pthread_mutex_unlock(&_servent_mutex);
 }
 
 void
-setservent(int stayopen) {
-	struct net_data *net_data = init();
-
-	setservent_p(stayopen, net_data);
-}
-
-void
-endservent() {
-	struct net_data *net_data = init();
-
-	endservent_p(net_data);
-}
-
-/* Shared private. */
-
-struct servent *
-getservent_p(struct net_data *net_data) {
-	struct irs_sv *sv;
-
-	if (!net_data || !(sv = net_data->sv))
-		return (NULL);
-	net_data->sv_last = (*sv->next)(sv);
-	return (net_data->sv_last);
+endservent(void)
+{
+	pthread_mutex_lock(&_servent_mutex);
+	endservent_r(&_servent_data);
+	pthread_mutex_unlock(&_servent_mutex);
 }
 
 struct servent *
-getservbyname_p(const char *name, const char *proto,
-		struct net_data *net_data) {
-	struct irs_sv *sv;
-	char **sap;
+getservent(void)
+{
+	struct servent *s;
 
-	if (!net_data || !(sv = net_data->sv))
-		return (NULL);
-	if (net_data->sv_stayopen && net_data->sv_last)
-		if (!proto || !strcmp(net_data->sv_last->s_proto, proto)) {
-			if (!strcmp(net_data->sv_last->s_name, name))
-				return (net_data->sv_last);
-			for (sap = net_data->sv_last->s_aliases;
-			     sap && *sap; sap++)
-				if (!strcmp(name, *sap))
-					return (net_data->sv_last);
-		}
-	net_data->sv_last = (*sv->byname)(sv, name, proto);
-	if (!net_data->sv_stayopen)
-		endservent();
-	return (net_data->sv_last);
+	pthread_mutex_lock(&_servent_mutex);
+	s = getservent_r(&_servent_data.serv, &_servent_data);
+	pthread_mutex_unlock(&_servent_mutex);
+	return (s);
 }
-
-struct servent *
-getservbyport_p(int port, const char *proto, struct net_data *net_data) {
-	struct irs_sv *sv;
-
-	if (!net_data || !(sv = net_data->sv))
-		return (NULL);
-	if (net_data->sv_stayopen && net_data->sv_last)
-		if (port == net_data->sv_last->s_port &&
-		    ( !proto ||
-		     !strcmp(net_data->sv_last->s_proto, proto)))
-			return (net_data->sv_last);
-	net_data->sv_last = (*sv->byport)(sv, port, proto);
-	return (net_data->sv_last);
-}
-
-void
-setservent_p(int stayopen, struct net_data *net_data) {
-	struct irs_sv *sv;
-
-	if (!net_data || !(sv = net_data->sv))
-		return;
-	(*sv->rewind)(sv);
-	net_data->sv_stayopen = (stayopen != 0);
-	if (stayopen == 0)
-		net_data_minimize(net_data);
-}
-
-void
-endservent_p(struct net_data *net_data) {
-	struct irs_sv *sv;
-
-	if ((net_data != NULL) && ((sv = net_data->sv) != NULL))
-		(*sv->minimize)(sv);
-}
-
-/* Private */
-
-static struct net_data *
-init() {
-	struct net_data *net_data;
-
-	if (!(net_data = net_data_init(NULL)))
-		goto error;
-	if (!net_data->sv) {
-		net_data->sv = (*net_data->irs->sv_map)(net_data->irs);
-
-		if (!net_data->sv || !net_data->res) {
- error:		
-			errno = EIO;
-			return (NULL);
-		}
-		(*net_data->sv->res_set)(net_data->sv, net_data->res, NULL);
-	}
-	
-	return (net_data);
-}
-
-#endif /*__BIND_NOSTATIC*/
-
-/*! \file */

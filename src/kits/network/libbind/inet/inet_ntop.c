@@ -1,3 +1,5 @@
+/*	$NetBSD: inet_ntop.c,v 1.9 2012/03/20 17:08:13 matt Exp $	*/
+
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996-1999 by Internet Software Consortium.
@@ -15,8 +17,13 @@
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-static const char rcsid[] = "$Id: inet_ntop.c,v 1.5 2005/11/03 22:59:52 marka Exp $";
+#if 0
+static const char rcsid[] = "Id: inet_ntop.c,v 1.5 2005/11/03 22:59:52 marka Exp";
+#else
+__RCSID("$NetBSD: inet_ntop.c,v 1.9 2012/03/20 17:08:13 matt Exp $");
+#endif
 #endif /* LIBC_SCCS and not lint */
 
 #include "port_before.h"
@@ -29,25 +36,21 @@ static const char rcsid[] = "$Id: inet_ntop.c,v 1.5 2005/11/03 22:59:52 marka Ex
 #include <arpa/inet.h>
 #include <arpa/nameser.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "port_after.h"
-
-#ifdef SPRINTF_CHAR
-# define SPRINTF(x) strlen(sprintf/**/x)
-#else
-# define SPRINTF(x) ((size_t)sprintf x)
-#endif
 
 /*%
  * WARNING: Don't even consider trying to compile this on a system where
  * sizeof(int) < 4.  sizeof(int) > 4 is fine; all the world's not a VAX.
  */
 
-static const char *inet_ntop4 __P((const u_char *src, char *dst, size_t size));
-static const char *inet_ntop6 __P((const u_char *src, char *dst, size_t size));
+static const char *inet_ntop4(const u_char *src, char *dst, socklen_t size);
+static const char *inet_ntop6(const u_char *src, char *dst, socklen_t size);
 
 /* char *
  * inet_ntop(af, src, dst, size)
@@ -58,12 +61,12 @@ static const char *inet_ntop6 __P((const u_char *src, char *dst, size_t size));
  *	Paul Vixie, 1996.
  */
 const char *
-inet_ntop(af, src, dst, size)
-	int af;
-	const void *src;
-	char *dst;
-	socklen_t size;
+inet_ntop(int af, const void *src, char *dst, socklen_t size)
 {
+
+	assert(src != NULL);
+	assert(dst != NULL);
+
 	switch (af) {
 	case AF_INET:
 		return (inet_ntop4(src, dst, size));
@@ -78,7 +81,7 @@ inet_ntop(af, src, dst, size)
 
 /* const char *
  * inet_ntop4(src, dst, size)
- *	format an IPv4 address
+ *	format an IPv4 address, more or less like inet_ntoa()
  * return:
  *	`dst' (as a const)
  * notes:
@@ -88,19 +91,21 @@ inet_ntop(af, src, dst, size)
  *	Paul Vixie, 1996.
  */
 static const char *
-inet_ntop4(src, dst, size)
-	const u_char *src;
-	char *dst;
-	size_t size;
+inet_ntop4(const u_char *src, char *dst, socklen_t size)
 {
-	static const char fmt[] = "%u.%u.%u.%u";
 	char tmp[sizeof "255.255.255.255"];
+	int l;
 
-	if (SPRINTF((tmp, fmt, src[0], src[1], src[2], src[3])) >= size) {
+	assert(src != NULL);
+	assert(dst != NULL);
+
+	l = snprintf(tmp, sizeof(tmp), "%u.%u.%u.%u",
+	    src[0], src[1], src[2], src[3]);
+	if (l <= 0 || (socklen_t) l >= size) {
 		errno = ENOSPC;
 		return (NULL);
 	}
-	strcpy(dst, tmp);
+	strlcpy(dst, tmp, size);
 	return (dst);
 }
 
@@ -111,10 +116,7 @@ inet_ntop4(src, dst, size)
  *	Paul Vixie, 1996.
  */
 static const char *
-inet_ntop6(src, dst, size)
-	const u_char *src;
-	char *dst;
-	size_t size;
+inet_ntop6(const u_char *src, char *dst, socklen_t size)
 {
 	/*
 	 * Note that int32_t and int16_t need only be "at least" large enough
@@ -123,10 +125,15 @@ inet_ntop6(src, dst, size)
 	 * Keep this in mind if you think this function should have been coded
 	 * to use pointer overlays.  All the world's not a VAX.
 	 */
-	char tmp[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"], *tp;
+	char tmp[sizeof "ffff:ffff:ffff:ffff:ffff:ffff:255.255.255.255"];
+	char *tp, *ep;
 	struct { int base, len; } best, cur;
 	u_int words[NS_IN6ADDRSZ / NS_INT16SZ];
 	int i;
+	int advance;
+
+	assert(src != NULL);
+	assert(dst != NULL);
 
 	/*
 	 * Preprocess:
@@ -165,6 +172,7 @@ inet_ntop6(src, dst, size)
 	 * Format the result.
 	 */
 	tp = tmp;
+	ep = tmp + sizeof(tmp);
 	for (i = 0; i < (NS_IN6ADDRSZ / NS_INT16SZ); i++) {
 		/* Are we inside the best run of 0x00's? */
 		if (best.base != -1 && i >= best.base &&
@@ -174,23 +182,35 @@ inet_ntop6(src, dst, size)
 			continue;
 		}
 		/* Are we following an initial run of 0x00s or any real hex? */
-		if (i != 0)
+		if (i != 0) {
+			if (tp + 1 >= ep)
+				return (NULL);
 			*tp++ = ':';
+		}
 		/* Is this address an encapsulated IPv4? */
-		if (i == 6 && best.base == 0 && (best.len == 6 ||
+		if (i == 6 && best.base == 0 &&
+			(best.len == 6 ||
 		    (best.len == 7 && words[7] != 0x0001) ||
 		    (best.len == 5 && words[5] == 0xffff))) {
-			if (!inet_ntop4(src+12, tp, sizeof tmp - (tp - tmp)))
+			if (!inet_ntop4(src+12, tp, (socklen_t)(ep - tp)))
 				return (NULL);
 			tp += strlen(tp);
 			break;
 		}
-		tp += SPRINTF((tp, "%x", words[i]));
+		advance = snprintf(tp, (size_t)(ep - tp), "%x", words[i]);
+		if (advance <= 0 || advance >= ep - tp)
+			return (NULL);
+		tp += advance;
 	}
 	/* Was it a trailing run of 0x00's? */
 	if (best.base != -1 && (best.base + best.len) ==
-	    (NS_IN6ADDRSZ / NS_INT16SZ))
+	    (NS_IN6ADDRSZ / NS_INT16SZ)) {
+		if (tp + 1 >= ep)
+			return (NULL);
 		*tp++ = ':';
+	}
+	if (tp + 1 >= ep)
+		return (NULL);
 	*tp++ = '\0';
 
 	/*
@@ -200,7 +220,7 @@ inet_ntop6(src, dst, size)
 		errno = ENOSPC;
 		return (NULL);
 	}
-	strcpy(dst, tmp);
+	strlcpy(dst, tmp, size);
 	return (dst);
 }
 

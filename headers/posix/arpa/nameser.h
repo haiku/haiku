@@ -586,10 +586,10 @@ extern "C" {
 #endif
 
 int		ns_msg_getflag(ns_msg, int);
-u_int	ns_get16(const u_char *);
-u_long	ns_get32(const u_char *);
-void	ns_put16(u_int, u_char *);
-void	ns_put32(u_long, u_char *);
+uint16_t ns_get16(const u_char *);
+uint32_t ns_get32(const u_char *);
+void	ns_put16(uint16_t, u_char *);
+void	ns_put32(uint32_t, u_char *);
 int		ns_initparse(const u_char *, int, ns_msg *);
 int		ns_skiprr(const u_char *, const u_char *, ns_sect, int);
 int		ns_parserr(ns_msg *, ns_sect, int, ns_rr *);

@@ -1,3 +1,5 @@
+/*	$NetBSD: res_debug.h,v 1.2 2012/03/13 21:13:43 christos Exp $	*/
+
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1999 by Internet Software Consortium.
@@ -27,7 +29,7 @@
 #   define Dprint(cond, args) if (cond) {fprintf args;} else {}
 #   define DprintQ(cond, args, query, size) if (cond) {\
 			fprintf args;\
-			res_pquery(statp, query, size, stdout);\
+			res_pquery(statp, (query), (int)(size), stdout);\
 		} else {}
 #endif
 

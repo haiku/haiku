@@ -1,3 +1,5 @@
+/*	$NetBSD: inet_makeaddr.c,v 1.1 2004/05/20 23:13:02 christos Exp $	*/
+
 /*
  * Copyright (c) 1983, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -43,26 +45,26 @@ static const char sccsid[] = "@(#)inet_makeaddr.c	8.1 (Berkeley) 6/4/93";
 
 #include "port_after.h"
 
-/*%
+/*
  * Formulate an Internet address from network + host.  Used in
  * building addresses stored in the ifnet structure.
  */
 struct in_addr
-inet_makeaddr(net, host)
-	u_long net, host;
+inet_makeaddr(in_addr_t net, in_addr_t host)
 {
-	struct in_addr a;
+	in_addr_t addr;
+	struct in_addr ret;
 
-	if (net < 128U)
-		a.s_addr = (net << IN_CLASSA_NSHIFT) | (host & IN_CLASSA_HOST);
-	else if (net < 65536U)
-		a.s_addr = (net << IN_CLASSB_NSHIFT) | (host & IN_CLASSB_HOST);
+	if (net < 128)
+		addr = (net << IN_CLASSA_NSHIFT) | (host & IN_CLASSA_HOST);
+	else if (net < 65536)
+		addr = (net << IN_CLASSB_NSHIFT) | (host & IN_CLASSB_HOST);
 	else if (net < 16777216L)
-		a.s_addr = (net << IN_CLASSC_NSHIFT) | (host & IN_CLASSC_HOST);
+		addr = (net << IN_CLASSC_NSHIFT) | (host & IN_CLASSC_HOST);
 	else
-		a.s_addr = net | host;
-	a.s_addr = htonl(a.s_addr);
-	return (a);
+		addr = net | host;
+	ret.s_addr = htonl(addr);
+	return ret;
 }
 
 #undef inet_makeaddr

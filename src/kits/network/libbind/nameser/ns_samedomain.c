@@ -1,3 +1,5 @@
+/*	$NetBSD: ns_samedomain.c,v 1.8 2012/11/22 20:22:31 christos Exp $	*/
+
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1995,1999 by Internet Software Consortium.
@@ -15,8 +17,13 @@
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <sys/cdefs.h>
 #ifndef lint
-static const char rcsid[] = "$Id: ns_samedomain.c,v 1.6 2005/04/27 04:56:40 sra Exp $";
+#ifdef notdef
+static const char rcsid[] = "Id: ns_samedomain.c,v 1.6 2005/04/27 04:56:40 sra Exp";
+#else
+//__RCSID("$NetBSD: ns_samedomain.c,v 1.8 2012/11/22 20:22:31 christos Exp $");
+#endif
 #endif
 
 #include "port_before.h"
@@ -28,6 +35,7 @@ static const char rcsid[] = "$Id: ns_samedomain.c,v 1.6 2005/04/27 04:56:40 sra 
 
 #include "port_after.h"
 
+#ifdef _LIBRESOLV
 /*%
  *	Check whether a name belongs to a domain.
  *
@@ -49,8 +57,8 @@ static const char rcsid[] = "$Id: ns_samedomain.c,v 1.6 2005/04/27 04:56:40 sra 
 
 int
 ns_samedomain(const char *a, const char *b) {
-	size_t la, lb;
-	int diff, i, escaped;
+	size_t la, lb, i;
+	int diff, escaped;
 	const char *cp;
 
 	la = strlen(a);
@@ -60,8 +68,8 @@ ns_samedomain(const char *a, const char *b) {
 	if (la != 0U && a[la - 1] == '.') {
 		escaped = 0;
 		/* Note this loop doesn't get executed if la==1. */
-		for (i = la - 2; i >= 0; i--)
-			if (a[i] == '\\') {
+		for (i = la - 1; i > 0; i--)
+			if (a[i - 1] == '\\') {
 				if (escaped)
 					escaped = 0;
 				else
@@ -76,8 +84,8 @@ ns_samedomain(const char *a, const char *b) {
 	if (lb != 0U && b[lb - 1] == '.') {
 		escaped = 0;
 		/* note this loop doesn't get executed if lb==1 */
-		for (i = lb - 2; i >= 0; i--)
-			if (b[i] == '\\') {
+		for (i = lb - 1; i > 0; i--)
+			if (b[i - 1] == '\\') {
 				if (escaped)
 					escaped = 0;
 				else
@@ -102,7 +110,7 @@ ns_samedomain(const char *a, const char *b) {
 
 	/* Ok, we know la > lb. */
 
-	diff = la - lb;
+	diff = (int)(la - lb);
 
 	/*
 	 * If 'a' is only 1 character longer than 'b', then it can't be
@@ -125,8 +133,8 @@ ns_samedomain(const char *a, const char *b) {
          * and thus not a really a label separator.
 	 */
 	escaped = 0;
-	for (i = diff - 2; i >= 0; i--)
-		if (a[i] == '\\') {
+	for (i = diff - 1; i > 0; i--)
+		if (a[i - 1] == '\\') {
 			if (escaped)
 				escaped = 0;
 			else
@@ -148,7 +156,9 @@ int
 ns_subdomain(const char *a, const char *b) {
 	return (ns_samename(a, b) != 1 && ns_samedomain(a, b));
 }
-
+#endif
+#define _LIBC
+#ifdef _LIBC
 /*%
  *	make a canonical copy of domain name "src"
  *
@@ -203,5 +213,5 @@ ns_samename(const char *a, const char *b) {
 	else
 		return (0);
 }
-
+#endif
 /*! \file */

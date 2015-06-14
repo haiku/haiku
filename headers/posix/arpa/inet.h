@@ -22,15 +22,15 @@ char*			inet_cidr_ntop(int family, const void* source, int bits,
 					char* dest, size_t destSize);
 int				inet_cidr_pton(int family, const char* sourceString, void* dest,
 					int* _bits);
-u_long			inet_lnaof(struct in_addr address);
-struct in_addr	inet_makeaddr(u_long net, u_long host);
+in_addr_t		inet_lnaof(struct in_addr address);
+struct in_addr	inet_makeaddr(in_addr_t net, in_addr_t host);
 char*			inet_net_ntop(int family, const void* source, int bits,
 					char* dest, size_t destSize);
 int				inet_net_pton(int family, const char* sourceString, void* dest,
 					size_t destSize);
 char*			inet_neta(u_long source, char* dest, size_t destSize);
-u_long			inet_netof(struct in_addr address);
-u_long			inet_network(const char* addressString);
+in_addr_t		inet_netof(struct in_addr address);
+in_addr_t		inet_network(const char* addressString);
 char*			inet_ntoa(struct in_addr address);
 const char*		inet_ntop(int family, const void* source, char* dest,
 					socklen_t destSize);

@@ -1,345 +1,167 @@
+/*	$NetBSD: getnetent.c,v 1.21 2012/03/20 17:44:18 matt Exp $	*/
+
 /*
- * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
- * Copyright (c) 1996,1999 by Internet Software Consortium.
+ * Copyright (c) 1983, 1993
+ *	The Regents of the University of California.  All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of the University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software
+ *    without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * Portions Copyright (c) 1993 Carlos Leandro and Rui Salgueiro
+ *    Dep. Matematica Universidade de Coimbra, Portugal, Europe
  *
  * Permission to use, copy, modify, and distribute this software for any
  * purpose with or without fee is hereby granted, provided that the above
  * copyright notice and this permission notice appear in all copies.
  *
- * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ * from getnetent.c   1.1 (Coimbra) 93/06/02
  */
 
-#if !defined(LINT) && !defined(CODECENTER)
-static const char rcsid[] = "$Id: getnetent.c,v 1.7 2005/04/27 04:56:25 sra Exp $";
+#include <sys/cdefs.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+#if 0
+static char sccsid[] = "@(#)getnetent.c	8.1 (Berkeley) 6/4/93";
+static char rcsid[] = "Id: getnetent.c,v 8.4 1997/06/01 20:34:37 vixie Exp ";
+#else
+__RCSID("$NetBSD: getnetent.c,v 1.21 2012/03/20 17:44:18 matt Exp $");
 #endif
-
-/* Imports */
-
-#include "port_before.h"
-
-#if !defined(__BIND_NOSTATIC)
+#endif /* LIBC_SCCS and not lint */
 
 #include <sys/types.h>
 #include <sys/socket.h>
-
 #include <netinet/in.h>
-#include <arpa/nameser.h>
 #include <arpa/inet.h>
-
-#include <ctype.h>
-#include <errno.h>
 #include <netdb.h>
-#include <resolv.h>
-#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
-#include <irs.h>
-
-#include "port_after.h"
-
-#include "irs_p.h"
-#include "irs_data.h"
-
-/* Definitions */
-
-struct pvt {
-	struct netent	netent;
-	char *		aliases[1];
-	char		name[MAXDNAME + 1];
-};
-
-/* Forward */
-
-static struct net_data *init(void);
-static struct netent   *nw_to_net(struct nwent *, struct net_data *);
-static void		freepvt(struct net_data *);
-static struct netent   *fakeaddr(const char *, int af, struct net_data *);
-
-/* Portability */
-
-#ifndef INADDR_NONE
-# define INADDR_NONE 0xffffffff
+#ifdef __weak_alias
+__weak_alias(endnetent,_endnetent)
+__weak_alias(getnetent,_getnetent)
+__weak_alias(setnetent,_setnetent)
 #endif
 
-/* Public */
+#define	MAXALIASES	35
 
-struct netent *
-getnetent() {
-	struct net_data *net_data = init();
+static FILE *netf;
+static char line[BUFSIZ+1];
+static struct netent net;
+static char *net_aliases[MAXALIASES];
+int _net_stayopen;
 
-	return (getnetent_p(net_data));
-}
+static void __setnetent(int);
+static void __endnetent(void);
 
-struct netent *
-getnetbyname(const char *name) {
-	struct net_data *net_data = init();
+void
+setnetent(int stayopen)
+{
 
-	return (getnetbyname_p(name, net_data));
-}
-
-struct netent *
-getnetbyaddr(unsigned long net, int type) {
-	struct net_data *net_data = init();
-
-	return (getnetbyaddr_p(net, type, net_data));
+	sethostent(stayopen);
+	__setnetent(stayopen);
 }
 
 void
-setnetent(int stayopen) {
-	struct net_data *net_data = init();
+endnetent(void)
+{
 
-	setnetent_p(stayopen, net_data);
-}
-
-
-void
-endnetent() {
-	struct net_data *net_data = init();
-
-	endnetent_p(net_data);
-}
-
-/* Shared private. */
-
-struct netent *
-getnetent_p(struct net_data *net_data) {
-	struct irs_nw *nw;
-
-	if (!net_data || !(nw = net_data->nw))
-		return (NULL);
-	net_data->nww_last = (*nw->next)(nw);
-	net_data->nw_last = nw_to_net(net_data->nww_last, net_data);
-	return (net_data->nw_last);
-}
-
-struct netent *
-getnetbyname_p(const char *name, struct net_data *net_data) {
-	struct irs_nw *nw;
-	struct netent *np;
-	char **nap;
-
-	if (!net_data || !(nw = net_data->nw))
-		return (NULL);
-	if (net_data->nw_stayopen && net_data->nw_last) {
-		if (!strcmp(net_data->nw_last->n_name, name))
-			return (net_data->nw_last);
-		for (nap = net_data->nw_last->n_aliases; nap && *nap; nap++)
-			if (!strcmp(name, *nap))
-				return (net_data->nw_last);
-	}
-	if ((np = fakeaddr(name, AF_INET, net_data)) != NULL)
-		return (np);
-	net_data->nww_last = (*nw->byname)(nw, name, AF_INET);
-	net_data->nw_last = nw_to_net(net_data->nww_last, net_data);
-	if (!net_data->nw_stayopen)
-		endnetent();
-	return (net_data->nw_last);
-}
-
-struct netent *
-getnetbyaddr_p(unsigned long net, int type, struct net_data *net_data) {
-	struct irs_nw *nw;
-	u_char addr[4];
-	int bits;
-
-	if (!net_data || !(nw = net_data->nw))
-		return (NULL);
-	if (net_data->nw_stayopen && net_data->nw_last)
-		if (type == net_data->nw_last->n_addrtype &&
-		    net == net_data->nw_last->n_net)
-			return (net_data->nw_last);
-
-	/* cannonize net(host order) */
-	if (net < 256UL) {
-		net <<= 24;
-		bits = 8;
-	} else if (net < 65536UL) {
-		net <<= 16;
-		bits = 16;
-	} else if (net < 16777216UL) {
-		net <<= 8;
-		bits = 24;
-	} else
-		bits = 32;
-
-	/* convert to net order */
-	addr[0] = (0xFF000000 & net) >> 24;
-	addr[1] = (0x00FF0000 & net) >> 16;
-	addr[2] = (0x0000FF00 & net) >> 8;
-	addr[3] = (0x000000FF & net);
-
-	/* reduce bits to as close to natural number as possible */
-	if ((bits == 32) && (addr[0] < 224) && (addr[3] == 0)) {
-		if ((addr[0] < 192) && (addr[2] == 0)) {
-			if ((addr[0] < 128) && (addr[1] == 0))
-				bits = 8;
-			else
-				bits = 16;
-		} else {
-			bits = 24;
-		}
-	}
-
-	net_data->nww_last = (*nw->byaddr)(nw, addr, bits, AF_INET);
-	net_data->nw_last = nw_to_net(net_data->nww_last, net_data);
-	if (!net_data->nw_stayopen)
-		endnetent();
-	return (net_data->nw_last);
-}
-
-
-
-
-void
-setnetent_p(int stayopen, struct net_data *net_data) {
-	struct irs_nw *nw;
-
-	if (!net_data || !(nw = net_data->nw))
-		return;
-	freepvt(net_data);
-	(*nw->rewind)(nw);
-	net_data->nw_stayopen = (stayopen != 0);
-	if (stayopen == 0)
-		net_data_minimize(net_data);
-}
-
-void
-endnetent_p(struct net_data *net_data) {
-	struct irs_nw *nw;
-
-	if ((net_data != NULL) && ((nw	= net_data->nw) != NULL))
-		(*nw->minimize)(nw);
-}
-
-/* Private */
-
-static struct net_data *
-init() {
-	struct net_data *net_data;
-
-	if (!(net_data = net_data_init(NULL)))
-		goto error;
-	if (!net_data->nw) {
-		net_data->nw = (*net_data->irs->nw_map)(net_data->irs);
-
-		if (!net_data->nw || !net_data->res) {
- error:		
-			errno = EIO;
-			return (NULL);
-		}
-		(*net_data->nw->res_set)(net_data->nw, net_data->res, NULL);
-	}
-	
-	return (net_data);
+	endhostent();
+	__endnetent();
 }
 
 static void
-freepvt(struct net_data *net_data) {
-	if (net_data->nw_data) {
-		free(net_data->nw_data);
-		net_data->nw_data = NULL;
-	}
+__setnetent(int f)
+{
+
+	if (netf == NULL)
+		netf = fopen(_PATH_NETWORKS, "re");
+	else
+		rewind(netf);
+	_net_stayopen |= f;
 }
 
-static struct netent *
-fakeaddr(const char *name, int af, struct net_data *net_data) {
-	struct pvt *pvt;
-	const char *cp;
-	u_long tmp;
+static void
+__endnetent(void)
+{
 
-	if (af != AF_INET) {
-		/* XXX should support IPv6 some day */
-		errno = EAFNOSUPPORT;
-		RES_SET_H_ERRNO(net_data->res, NETDB_INTERNAL);
-		return (NULL);
+	if (netf) {
+		fclose(netf);
+		netf = NULL;
 	}
-	if (!isascii((unsigned char)(name[0])) ||
-	    !isdigit((unsigned char)(name[0])))
-		return (NULL);
-	for (cp = name; *cp; ++cp)
-		if (!isascii(*cp) || (!isdigit((unsigned char)*cp) && *cp != '.'))
-			return (NULL);
-	if (*--cp == '.')
-		return (NULL);
-
-	/* All-numeric, no dot at the end. */
-
-	tmp = inet_network(name);
-	if (tmp == INADDR_NONE) {
-		RES_SET_H_ERRNO(net_data->res, HOST_NOT_FOUND);
-		return (NULL);
-	}
-
-	/* Valid network number specified.
-	 * Fake up a netent as if we'd actually
-	 * done a lookup.
-	 */
-	freepvt(net_data);
-	net_data->nw_data = malloc(sizeof (struct pvt));
-	if (!net_data->nw_data) {
-		errno = ENOMEM;
-		RES_SET_H_ERRNO(net_data->res, NETDB_INTERNAL);
-		return (NULL);
-	}
-	pvt = net_data->nw_data;
-
-	strncpy(pvt->name, name, MAXDNAME);
-	pvt->name[MAXDNAME] = '\0';
-	pvt->netent.n_name = pvt->name;
-	pvt->netent.n_addrtype = AF_INET;
-	pvt->netent.n_aliases = pvt->aliases;
-	pvt->aliases[0] = NULL;
-	pvt->netent.n_net = tmp;
-
-	return (&pvt->netent);
+	_net_stayopen = 0;
 }
 
-static struct netent *
-nw_to_net(struct nwent *nwent, struct net_data *net_data) {
-	struct pvt *pvt;
-	u_long addr = 0;
-	int i;
-	int msbyte;
+struct netent *
+getnetent(void)
+{
+	char *p;
+	register char *cp, **q;
 
-	if (!nwent || nwent->n_addrtype != AF_INET)
+	if (netf == NULL && (netf = fopen(_PATH_NETWORKS, "re")) == NULL)
 		return (NULL);
-	freepvt(net_data);
-	net_data->nw_data = malloc(sizeof (struct pvt));
-	if (!net_data->nw_data) {
-		errno = ENOMEM;
-		RES_SET_H_ERRNO(net_data->res, NETDB_INTERNAL);
+#if (defined(__sparc__) && defined(_LP64)) ||		\
+    defined(__alpha__) ||				\
+    (defined(__i386__) && defined(_LP64)) ||		\
+    (defined(__sh__) && defined(_LP64))
+	net.__n_pad0 = 0;
+#endif
+again:
+	p = fgets(line, (int)sizeof line, netf);
+	if (p == NULL)
 		return (NULL);
+	if (*p == '#')
+		goto again;
+	cp = strpbrk(p, "#\n");
+	if (cp == NULL)
+		goto again;
+	*cp = '\0';
+	net.n_name = p;
+	cp = strpbrk(p, " \t");
+	if (cp == NULL)
+		goto again;
+	*cp++ = '\0';
+	while (*cp == ' ' || *cp == '\t')
+		cp++;
+	p = strpbrk(cp, " \t");
+	if (p != NULL)
+		*p++ = '\0';
+	net.n_net = inet_network(cp);
+	net.n_addrtype = AF_INET;
+	q = net.n_aliases = net_aliases;
+	if (p != NULL) {
+		cp = p;
+		while (cp && *cp) {
+			if (*cp == ' ' || *cp == '\t') {
+				cp++;
+				continue;
+			}
+			if (q < &net_aliases[MAXALIASES - 1])
+				*q++ = cp;
+			cp = strpbrk(cp, " \t");
+			if (cp != NULL)
+				*cp++ = '\0';
+		}
 	}
-	pvt = net_data->nw_data;
-	pvt->netent.n_name = nwent->n_name;
-	pvt->netent.n_aliases = nwent->n_aliases;
-	pvt->netent.n_addrtype = nwent->n_addrtype;
-
-/*%
- * What this code does: Converts net addresses from network to host form.
- *
- * msbyte: the index of the most significant byte in the n_addr array.
- *
- * Shift bytes in significant order into addr. When all signicant
- * bytes are in, zero out bits in the LSB that are not part of the network.
- */
-	msbyte = nwent->n_length / 8 +
-		((nwent->n_length % 8) != 0 ? 1 : 0) - 1;
-	for (i = 0; i <= msbyte; i++)
-		addr = (addr << 8) | ((unsigned char *)nwent->n_addr)[i];
-	i = (32 - nwent->n_length) % 8;
-	if (i != 0)
-		addr &= ~((1 << (i + 1)) - 1);
-	pvt->netent.n_net = addr;
-	return (&pvt->netent);
+	*q = NULL;
+	return (&net);
 }
-
-#endif /*__BIND_NOSTATIC*/
-
-/*! \file */

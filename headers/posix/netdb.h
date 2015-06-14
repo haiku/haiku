@@ -95,6 +95,7 @@
 #include <netinet/in.h>
 #include <stdio.h>
 
+#include <pthread.h>
 
 #ifndef _PATH_NETWORKS
 #define	_PATH_NETWORKS	"/etc/networks"
@@ -128,7 +129,7 @@ struct netent {
 	char		*n_name;			/* official name of net */
 	char		**n_aliases;		/* alias list */
 	int			n_addrtype;			/* net address type */
-	unsigned long n_net;			/* network # */
+	in_addr_t	n_net;				/* network # */
 };
 
 struct servent {
@@ -238,13 +239,13 @@ void			endnetent(void);
 void			endprotoent(void);
 void			endservent(void);
 void			freehostent(struct hostent *host);
-struct hostent	*gethostbyaddr(const char *address, int length, int type);
+struct hostent	*gethostbyaddr(const char *address, socklen_t length, int type);
 struct hostent	*gethostbyname(const char *name);
 struct hostent	*gethostbyname2(const char *name, int type);
 struct hostent	*gethostent(void);
 struct hostent	*getipnodebyaddr(const void *, size_t, int, int *);
 struct hostent	*getipnodebyname(const char *, int, int, int *);
-struct netent	*getnetbyaddr(unsigned long, int);
+struct netent	*getnetbyaddr(uint32_t, int);
 struct netent	*getnetbyname(const char *);
 struct netent	*getnetent(void);
 struct protoent	*getprotobyname(const char *);
@@ -264,6 +265,7 @@ int				getaddrinfo(const char *, const char *,
 					const struct addrinfo *, struct addrinfo **);
 int				getnameinfo(const struct sockaddr *, socklen_t, char *,
 					socklen_t, char *, socklen_t, int);
+struct addrinfo	*allocaddrinfo(socklen_t);
 void			freeaddrinfo(struct addrinfo *);
 const char		*gai_strerror(int);
 
@@ -283,21 +285,23 @@ struct netent	*getnetent_r(struct netent *, char *, int);
 void			setnetent_r(int);
 void			endnetent_r(void);
 
+struct protoent_data;
 struct protoent	*getprotobyname_r(const char *,
-				struct protoent *, char *, int);
+				struct protoent *, struct protoent_data *);
 struct protoent	*getprotobynumber_r(int,
-				struct protoent *, char *, int);
-struct protoent	*getprotoent_r(struct protoent *, char *, int);
-void			setprotoent_r(int);
-void			endprotoent_r(void);
+				struct protoent *, struct protoent_data *);
+struct protoent	*getprotoent_r(struct protoent *, struct protoent_data *);
+void			setprotoent_r(int, struct protoent_data *);
+void			endprotoent_r(struct protoent_data *);
 
+struct servent_data;
 struct servent	*getservbyname_r(const char *name, const char *,
-					struct servent *, char *, int);
+					struct servent *, struct servent_data *);
 struct servent	*getservbyport_r(int port, const char *,
-					struct servent *, char *, int);
-struct servent	*getservent_r(struct servent *, char *, int);
-void			setservent_r(int);
-void			endservent_r(void);
+					struct servent *, struct servent_data *);
+struct servent	*getservent_r(struct servent *, struct servent_data *);
+void			setservent_r(int, struct servent_data *);
+void			endservent_r(struct servent_data *);
 __END_DECLS
 
 #endif /* _NETDB_H_ */

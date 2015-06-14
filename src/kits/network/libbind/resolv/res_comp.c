@@ -1,3 +1,5 @@
+/*	$NetBSD: res_comp.c,v 1.12 2012/03/13 21:13:43 christos Exp $	*/
+
 /*
  * Copyright (c) 1985, 1993
  *    The Regents of the University of California.  All rights reserved.
@@ -78,12 +80,25 @@ static const char rcsid[] = "$Id: res_comp.c,v 1.5 2005/07/28 06:51:50 marka Exp
 #include <sys/param.h>
 #include <netinet/in.h>
 #include <arpa/nameser.h>
+#include <assert.h>
 #include <ctype.h>
 #include <resolv.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include "port_after.h"
+
+#ifdef __weak_alias
+__weak_alias(dn_expand,_dn_expand)
+__weak_alias(dn_comp,__dn_comp)
+#if 0
+__weak_alias(dn_skipname,__dn_skipname)
+__weak_alias(res_hnok,__res_hnok)
+__weak_alias(res_ownok,__res_ownok)
+__weak_alias(res_mailok,__res_mailok)
+__weak_alias(res_dnok,__res_dnok)
+#endif
+#endif
 
 /*%
  * Expand compressed domain name 'src' to full domain name.
@@ -115,8 +130,8 @@ dn_comp(const char *src, u_char *dst, int dstsiz,
 	u_char **dnptrs, u_char **lastdnptr)
 {
 	return (ns_name_compress(src, dst, (size_t)dstsiz,
-				 (const u_char **)dnptrs,
-				 (const u_char **)lastdnptr));
+				 (void *)dnptrs,
+				 (void *)lastdnptr));
 }
 
 /*%
@@ -128,7 +143,8 @@ dn_skipname(const u_char *ptr, const u_char *eom) {
 
 	if (ns_name_skip(&ptr, eom) == -1)
 		return (-1);
-	return (ptr - saveptr);
+	assert(INT_MIN <= (ptr - saveptr) && (ptr - saveptr) <= INT_MAX);
+	return (int)(ptr - saveptr);
 }
 
 /*%
@@ -160,7 +176,7 @@ res_hnok(const char *dn) {
 		int nch = *dn++;
 
 		if (periodchar(ch)) {
-			(void)NULL;
+			;
 		} else if (periodchar(pch)) {
 			if (!borderchar(ch))
 				return (0);
@@ -256,10 +272,11 @@ res_dnok(const char *dn) {
 
 void __putlong(u_int32_t src, u_char *dst) { ns_put32(src, dst); }
 void __putshort(u_int16_t src, u_char *dst) { ns_put16(src, dst); }
+#endif /*BIND_4_COMPAT*/
+
 #ifndef __ultrix__
 u_int32_t _getlong(const u_char *src) { return (ns_get32(src)); }
 u_int16_t _getshort(const u_char *src) { return (ns_get16(src)); }
 #endif /*__ultrix__*/
-#endif /*BIND_4_COMPAT*/
 
 /*! \file */

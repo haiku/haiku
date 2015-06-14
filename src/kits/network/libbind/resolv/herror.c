@@ -1,3 +1,5 @@
+/*	$NetBSD: herror.c,v 1.9 2012/03/13 21:13:43 christos Exp $	*/
+
 /*
  * Copyright (c) 1987, 1993
  *    The Regents of the University of California.  All rights reserved.
@@ -66,7 +68,6 @@ static const char rcsid[] = "$Id: herror.c,v 1.4 2005/04/27 04:56:41 sra Exp $";
 #include <resolv.h>
 #include <string.h>
 #include <unistd.h>
-#include <irs.h>
 
 #include "port_after.h"
 
@@ -82,6 +83,10 @@ int	h_nerr = { sizeof h_errlist / sizeof h_errlist[0] };
 #if !(__GLIBC__ > 2 || __GLIBC__ == 2 &&  __GLIBC_MINOR__ >= 3)
 #undef	h_errno
 int	h_errno;
+#endif
+
+#ifdef __weak_alias
+__weak_alias(herror,_herror)
 #endif
 
 /*%
@@ -110,7 +115,7 @@ herror(const char *s) {
 	DE_CONST("\n", t);
 	v->iov_base = t;
 	v->iov_len = 1;
-	writev(STDERR_FILENO, iov, (v - iov) + 1);
+	(void)writev(STDERR_FILENO, iov, (int)((v - iov) + 1));
 }
 
 /*%

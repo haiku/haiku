@@ -272,9 +272,16 @@ union res_sockaddr_union {
 
 /* Things involving an internal (static) resolver context. */
 __BEGIN_DECLS
+extern struct __res_state *__res_get_state(void);
+extern void __res_put_state(struct __res_state *);
+
+/*
+ * Source and Binary compatibility; _res will not work properly
+ * with multi-threaded programs.
+ */
 extern struct __res_state *__res_state(void);
-__END_DECLS
 #define _res (*__res_state())
+__END_DECLS
 
 #ifndef __BIND_NOSTATIC
 #define fp_nquery		__fp_nquery
@@ -409,7 +416,7 @@ const char *	loc_ntoa(const u_char *, char *);
 int				dn_skipname(const u_char *, const u_char *);
 void			putlong(u_int32_t, u_char *);
 void			putshort(u_int16_t, u_char *);
-#if !defined(__ultrix__) && !defined(__HAIKU__)
+#if !defined(__ultrix__)
 u_int16_t		_getshort(const u_char *);
 u_int32_t		_getlong(const u_char *);
 #endif

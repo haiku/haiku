@@ -1,3 +1,5 @@
+/*	$NetBSD: ns_name.c,v 1.9 2012/03/13 21:13:39 christos Exp $	*/
+
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996,1999 by Internet Software Consortium.
@@ -26,6 +28,7 @@ static const char rcsid[] = "$Id: ns_name.c,v 1.11 2009/01/23 19:59:16 each Exp 
 #include <netinet/in.h>
 #include <arpa/nameser.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <resolv.h>
 #include <string.h>
@@ -36,9 +39,9 @@ static const char rcsid[] = "$Id: ns_name.c,v 1.11 2009/01/23 19:59:16 each Exp 
 #include "port_after.h"
 
 #ifdef SPRINTF_CHAR
-# define SPRINTF(x) strlen(sprintf/**/x)
+# define SPRINTF(x) ((int)strlen(sprintf/**/x))
 #else
-# define SPRINTF(x) ((size_t)sprintf x)
+# define SPRINTF(x) (sprintf x)
 #endif
 
 #define NS_TYPE_ELT			0x40 /*%< EDNS0 extended label type */
@@ -143,7 +146,7 @@ ns_name_ntop(const u_char *src, char *dst, size_t dstsiz)
 			dn += m; 
 			continue;
 		}
-		for ((void)NULL; l > 0; l--) {
+		for (; l > 0; l--) {
 			c = *cp++;
 			if (special(c)) {
 				if (dn + 1 >= eom) {
@@ -182,7 +185,8 @@ ns_name_ntop(const u_char *src, char *dst, size_t dstsiz)
 		return (-1);
 	}
 	*dn++ = '\0';
-	return (dn - dst);
+	assert(INT_MIN <= (dn - dst) && (dn - dst) <= INT_MAX);
+	return (int)(dn - dst);
 }
 
 /*%
@@ -249,19 +253,19 @@ ns_name_pton2(const char *src, u_char *dst, size_t dstsiz, size_t *dstlen) {
 				continue;
 			}
 			else if ((cp = strchr(digits, c)) != NULL) {
-				n = (cp - digits) * 100;
+				n = (int)(cp - digits) * 100;
 				if ((c = *src++) == 0 ||
 				    (cp = strchr(digits, c)) == NULL) {
 					errno = EMSGSIZE;
 					return (-1);
 				}
-				n += (cp - digits) * 10;
+				n += (int)(cp - digits) * 10;
 				if ((c = *src++) == 0 ||
 				    (cp = strchr(digits, c)) == NULL) {
 					errno = EMSGSIZE;
 					return (-1);
 				}
-				n += (cp - digits);
+				n += (int)(cp - digits);
 				if (n > 255) {
 					errno = EMSGSIZE;
 					return (-1);
@@ -273,7 +277,7 @@ ns_name_pton2(const char *src, u_char *dst, size_t dstsiz, size_t *dstlen) {
 			escaped = 1;
 			continue;
 		} else if (c == '.') {
-			c = (bp - label - 1);
+			c = (int)(bp - label - 1);
 			if ((c & NS_CMPRSFLGS) != 0) {	/*%< Label too big. */
 				errno = EMSGSIZE;
 				return (-1);
@@ -313,7 +317,7 @@ ns_name_pton2(const char *src, u_char *dst, size_t dstsiz, size_t *dstlen) {
 		}
 		*bp++ = (u_char)c;
 	}
-	c = (bp - label - 1);
+	c = (int)(bp - label - 1);
 	if ((c & NS_CMPRSFLGS) != 0) {		/*%< Label too big. */
 		errno = EMSGSIZE;
 		return (-1);
@@ -382,7 +386,7 @@ ns_name_ntol(const u_char *src, u_char *dst, size_t dstsiz)
 			errno = EMSGSIZE;
 			return (-1);
 		}
-		for ((void)NULL; l > 0; l--) {
+		for (; l > 0; l--) {
 			c = *cp++;
 			if (isascii(c) && isupper(c))
 				*dn++ = tolower(c);
@@ -391,7 +395,8 @@ ns_name_ntol(const u_char *src, u_char *dst, size_t dstsiz)
 		}
 	}
 	*dn++ = '\0';
-	return (dn - dst);
+	assert(INT_MIN <= (dn - dst) && (dn - dst) <= INT_MAX);
+	return (int)(dn - dst);
 }
 
 /*%
@@ -449,7 +454,7 @@ ns_name_unpack2(const u_char *msg, const u_char *eom, const u_char *src,
 			}
 			checked += l + 1;
 			*dstp++ = n;
-			memcpy(dstp, srcp, l);
+			memcpy(dstp, srcp, (size_t)l);
 			dstp += l;
 			srcp += l;
 			break;
@@ -459,8 +464,10 @@ ns_name_unpack2(const u_char *msg, const u_char *eom, const u_char *src,
 				errno = EMSGSIZE;
 				return (-1);
 			}
-			if (len < 0)
-				len = srcp - src + 1;
+			if (len < 0) {
+				assert(INT_MIN <= (srcp - src + 1) && (srcp - src + 1) <= INT_MAX);
+				len = (int)(srcp - src + 1);
+			}
 			srcp = msg + (((n & 0x3f) << 8) | (*srcp & 0xff));
 			if (srcp < msg || srcp >= eom) {  /*%< Out of range. */
 				errno = EMSGSIZE;
@@ -486,9 +493,11 @@ ns_name_unpack2(const u_char *msg, const u_char *eom, const u_char *src,
 	*dstp++ = 0;
 	if (dstlen != NULL)
 		*dstlen = dstp - dst;
-	if (len < 0)
-		len = srcp - src;
-	return (len);
+	if (len < 0) {
+		assert(INT_MIN <= (srcp - src) && (srcp - src) <= INT_MAX);
+		len = (int)(srcp - src);
+	}
+	return len;
 }
 
 /*%
@@ -526,7 +535,7 @@ ns_name_pack(const u_char *src, u_char *dst, int dstsiz,
 	if (dnptrs != NULL) {
 		if ((msg = *dnptrs++) != NULL) {
 			for (cpp = dnptrs; *cpp != NULL; cpp++)
-				(void)NULL;
+				continue;
 			lpp = cpp;	/*%< end of list to search */
 		}
 	} else
@@ -566,9 +575,10 @@ ns_name_pack(const u_char *src, u_char *dst, int dstsiz,
 				if (dstp + 1 >= eob) {
 					goto cleanup;
 				}
-				*dstp++ = (l >> 8) | NS_CMPRSFLGS;
+				*dstp++ = ((u_int32_t)l >> 8) | NS_CMPRSFLGS;
 				*dstp++ = l % 256;
-				return (dstp - dst);
+				assert(INT_MIN <= (dstp - dst) && (dstp - dst) <= INT_MAX);
+				return (int)(dstp - dst);
 			}
 			/* Not found, save it. */
 			if (lastdnptr != NULL && cpp < lastdnptr - 1 &&
@@ -587,7 +597,7 @@ ns_name_pack(const u_char *src, u_char *dst, int dstsiz,
 		if (dstp + 1 + n >= eob) {
 			goto cleanup;
 		}
-		memcpy(dstp, srcp, n + 1);
+		memcpy(dstp, srcp, (size_t)(n + 1));
 		srcp += n + 1;
 		dstp += n + 1;
 	} while (n != 0);
@@ -599,7 +609,8 @@ cleanup:
 		errno = EMSGSIZE;
 		return (-1);
 	} 
-	return (dstp - dst);
+	assert(INT_MIN <= (dstp - dst) && (dstp - dst) <= INT_MAX);
+	return (int)(dstp - dst);
 }
 
 /*%
@@ -648,7 +659,7 @@ ns_name_compress(const char *src, u_char *dst, size_t dstsiz,
 
 	if (ns_name_pton(src, tmp, sizeof tmp) == -1)
 		return (-1);
-	return (ns_name_pack(tmp, dst, dstsiz, dnptrs, lastdnptr));
+	return (ns_name_pack(tmp, dst, (int)dstsiz, dnptrs, lastdnptr));
 }
 
 /*%
@@ -753,7 +764,8 @@ ns_name_eq(ns_nname_ct a, size_t as, ns_nname_ct b, size_t bs) {
 			return (-1);
 		}
 		if (ac != bc || strncasecmp((const char *) ++a,
-					    (const char *) ++b, ac) != 0)
+					    (const char *) ++b,
+					    (size_t)ac) != 0)
 			return (0);
 		a += ac, b += bc;
 	}
@@ -772,7 +784,7 @@ ns_name_owned(ns_namemap_ct a, int an, ns_namemap_ct b, int bn) {
 	while (bn > 0) {
 		if (a->len != b->len ||
 		    strncasecmp((const char *) a->base,
-				(const char *) b->base, a->len) != 0)
+				(const char *) b->base, (size_t)a->len) != 0)
 			return (0);
 		a++, an--;
 		b++, bn--;
@@ -947,13 +959,15 @@ dn_find(const u_char *domain, const u_char *msg,
 					if (n != *dn++)
 						goto next;
 
-					for ((void)NULL; n > 0; n--)
+					for (; n > 0; n--)
 						if (mklower(*dn++) !=
 						    mklower(*cp++))
 							goto next;
 					/* Is next root for both ? */
-					if (*dn == '\0' && *cp == '\0')
-						return (sp - msg);
+					if (*dn == '\0' && *cp == '\0') {
+						assert(INT_MIN <= (sp - msg) && (sp - msg) <= INT_MAX);
+						return (int)(sp - msg);
+					}
 					if (*dn)
 						continue;
 					goto next;
@@ -984,7 +998,7 @@ decode_bitstring(const unsigned char **cpp, char *dn, const char *eom)
 	if ((blen = (*cp & 0xff)) == 0)
 		blen = 256;
 	plen = (blen + 3) / 4;
-	plen += sizeof("\\[x/]") + (blen > 99 ? 3 : (blen > 9) ? 2 : 1);
+	plen += (int)sizeof("\\[x/]") + (blen > 99 ? 3 : (blen > 9) ? 2 : 1);
 	if (dn + plen >= eom)
 		return (-1);
 
@@ -1008,7 +1022,7 @@ decode_bitstring(const unsigned char **cpp, char *dn, const char *eom)
 	} else if (b > 0) {
 		tc = *cp++;
 		i = SPRINTF((dn, "%1x",
-			       ((tc >> 4) & 0x0f) & (0x0f << (4 - b)))); 
+			       (((u_int32_t)tc >> 4) & 0x0f) & (0x0f << (4 - b)))); 
 		if (i < 0)
 			return (-1);
 		dn += i;
@@ -1019,7 +1033,8 @@ decode_bitstring(const unsigned char **cpp, char *dn, const char *eom)
 	dn += i;
 
 	*cpp = cp;
-	return (dn - beg);
+	assert(INT_MIN <= (dn - beg) && (dn - beg) <= INT_MAX);
+	return (int)(dn - beg);
 }
 
 static int

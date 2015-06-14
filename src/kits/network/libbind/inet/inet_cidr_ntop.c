@@ -1,3 +1,5 @@
+/*	$NetBSD: inet_cidr_ntop.c,v 1.8 2012/03/13 21:13:38 christos Exp $	*/
+
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1998,1999 by Internet Software Consortium.
@@ -15,8 +17,13 @@
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-static const char rcsid[] = "$Id: inet_cidr_ntop.c,v 1.7 2006/10/11 02:18:18 marka Exp $";
+#if 0
+static const char rcsid[] = "Id: inet_cidr_ntop.c,v 1.7 2006/10/11 02:18:18 marka Exp";
+#else
+__RCSID("$NetBSD: inet_cidr_ntop.c,v 1.8 2012/03/13 21:13:38 christos Exp $");
+#endif
 #endif
 
 #include "port_before.h"
@@ -27,12 +34,17 @@ static const char rcsid[] = "$Id: inet_cidr_ntop.c,v 1.7 2006/10/11 02:18:18 mar
 #include <arpa/nameser.h>
 #include <arpa/inet.h>
 
+#include <assert.h>
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
 #include "port_after.h"
+
+#ifdef __weak_alias
+__weak_alias(inet_cidr_ntop,_inet_cidr_ntop)
+#endif
 
 #ifdef SPRINTF_CHAR
 # define SPRINTF(x) strlen(sprintf/**/x)
@@ -73,10 +85,10 @@ inet_cidr_ntop(int af, const void *src, int bits, char *dst, size_t size) {
 }
 
 static int
-decoct(const u_char *src, int bytes, char *dst, size_t size) {
+decoct(const u_char *src, size_t bytes, char *dst, size_t size) {
 	char *odst = dst;
 	char *t;
-	int b;
+	size_t b;
 
 	for (b = 1; b <= bytes; b++) {
 		if (size < sizeof "255.")
@@ -89,7 +101,8 @@ decoct(const u_char *src, int bytes, char *dst, size_t size) {
 		}
 		size -= (size_t)(dst - t);
 	}
-	return (dst - odst);
+	assert(INT_MIN <= (dst - odst) && (dst - odst) <= INT_MAX);
+	return (int)(dst - odst);
 }
 
 /*%
@@ -221,7 +234,7 @@ inet_cidr_ntop_ipv6(const u_char *src, int bits, char *dst, size_t size) {
 		if (i == 6 && best.base == 0 && (best.len == 6 ||
 		    (best.len == 7 && words[7] != 0x0001) ||
 		    (best.len == 5 && words[5] == 0xffff))) {
-			int n;
+			size_t n;
 
 			if (src[15] || bits == -1 || bits > 120)
 				n = 4;

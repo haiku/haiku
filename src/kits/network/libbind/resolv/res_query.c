@@ -1,3 +1,5 @@
+/*	$NetBSD: res_query.c,v 1.14 2012/03/13 21:13:44 christos Exp $	*/
+
 /*
  * Portions Copyright (C) 2004, 2005, 2008  Internet Systems Consortium, Inc. ("ISC")
  * Portions Copyright (C) 1996-2001, 2003  Internet Software Consortium.
@@ -115,7 +117,7 @@ res_nquery(res_state statp,
 	   int anslen)		/*%< size of answer buffer */
 {
 	u_char buf[MAXPACKET];
-	HEADER *hp = (HEADER *) answer;
+	HEADER *hp = (HEADER *)(void *)answer;
 	u_int oflags;
 	u_char *rdata;
 	int n;
@@ -216,7 +218,7 @@ res_nsearch(res_state statp,
 	    int anslen)		/*%< size of answer */
 {
 	const char *cp, * const *domain;
-	HEADER *hp = (HEADER *) answer;
+	HEADER *hp = (HEADER *)(void *)answer;
 	char tmp[NS_MAXDNAME];
 	u_int dots;
 	int trailing_dot, ret, saved_herrno;
@@ -364,7 +366,7 @@ res_nquerydomain(res_state statp,
 {
 	char nbuf[MAXDNAME];
 	const char *longname = nbuf;
-	int n, d;
+	size_t n, d;
 
 #ifdef DEBUG
 	if (statp->options & RES_DEBUG)
@@ -381,8 +383,7 @@ res_nquerydomain(res_state statp,
 			RES_SET_H_ERRNO(statp, NO_RECOVERY);
 			return (-1);
 		}
-		n--;
-		if (n >= 0 && name[n] == '.') {
+		if (n && name[--n] == '.') {
 			strncpy(nbuf, name, n);
 			nbuf[n] = '\0';
 		} else
@@ -407,12 +408,12 @@ res_hostalias(const res_state statp, const char *name, char *dst, size_t siz) {
 
 	if (statp->options & RES_NOALIASES)
 		return (NULL);
+
 	file = getenv("HOSTALIASES");
 	if (file == NULL || (fp = fopen(file, "r")) == NULL)
 		return (NULL);
-	setbuf(fp, NULL);
 	buf[sizeof(buf) - 1] = '\0';
-	while (fgets(buf, sizeof(buf), fp)) {
+	while (fgets(buf, (int)sizeof(buf), fp)) {
 		for (cp1 = buf; *cp1 && !isspace((unsigned char)*cp1); ++cp1)
 			;
 		if (!*cp1)

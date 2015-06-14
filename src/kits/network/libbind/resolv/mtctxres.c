@@ -1,3 +1,5 @@
+/*	$NetBSD: mtctxres.c,v 1.4 2007/03/30 20:40:52 ghen Exp $	*/
+
 #include <port_before.h>
 #ifdef DO_PTHREADS
 #include <pthread.h>
@@ -7,7 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <resolv_mt.h>
-#include <irs.h>
 #include <port_after.h>
 
 #ifdef DO_PTHREADS

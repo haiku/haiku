@@ -84,7 +84,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			HttpResult.cpp
 			HttpTime.cpp
 
-			getifaddrs.cpp
 			notifications.cpp
 
 			$(md5Sources)

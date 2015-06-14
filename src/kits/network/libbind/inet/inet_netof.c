@@ -1,3 +1,5 @@
+/*	$NetBSD: inet_netof.c,v 1.1 2004/05/20 23:13:02 christos Exp $	*/
+
 /*
  * Copyright (c) 1983, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -31,8 +33,13 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-static const char sccsid[] = "@(#)inet_netof.c	8.1 (Berkeley) 6/4/93";
+#if 0
+static char sccsid[] = "@(#)inet_netof.c	8.1 (Berkeley) 6/4/93";
+#else
+__RCSID("$NetBSD: inet_netof.c,v 1.1 2004/05/20 23:13:02 christos Exp $");
+#endif
 #endif /* LIBC_SCCS and not lint */
 
 #include "port_before.h"
@@ -43,15 +50,14 @@ static const char sccsid[] = "@(#)inet_netof.c	8.1 (Berkeley) 6/4/93";
 
 #include "port_after.h"
 
-/*%
+/*
  * Return the network number from an internet
  * address; handles class a/b/c network #'s.
  */
-u_long
-inet_netof(in)
-	struct in_addr in;
+in_addr_t
+inet_netof(struct in_addr in)
 {
-	register u_long i = ntohl(in.s_addr);
+	in_addr_t i = ntohl(in.s_addr);
 
 	if (IN_CLASSA(i))
 		return (((i)&IN_CLASSA_NET) >> IN_CLASSA_NSHIFT);

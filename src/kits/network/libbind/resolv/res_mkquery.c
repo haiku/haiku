@@ -1,3 +1,5 @@
+/*	$NetBSD: res_mkquery.c,v 1.13 2012/03/13 21:13:43 christos Exp $	*/
+
 /*
  * Portions Copyright (C) 2004, 2005, 2008  Internet Systems Consortium, Inc. ("ISC")
  * Portions Copyright (C) 1996, 1997, 1988, 1999, 2001, 2003  Internet Software Consortium.
@@ -78,6 +80,7 @@ static const char rcsid[] = "$Id: res_mkquery.c,v 1.10 2008/12/11 09:59:00 marka
 #include <sys/param.h>
 #include <netinet/in.h>
 #include <arpa/nameser.h>
+#include <assert.h>
 #include <netdb.h>
 #include <resolv.h>
 #include <stdio.h>
@@ -122,7 +125,7 @@ res_nmkquery(res_state statp,
 	if ((buf == NULL) || (buflen < HFIXEDSZ))
 		return (-1);
 	memset(buf, 0, HFIXEDSZ);
-	hp = (HEADER *) buf;
+	hp = (HEADER *)(void *)buf;
 	statp->id = res_nrandomid(statp);
 	hp->id = htons(statp->id);
 	hp->opcode = op;
@@ -142,7 +145,7 @@ res_nmkquery(res_state statp,
 	case NS_NOTIFY_OP:
 		if (ep - cp < QFIXEDSZ)
 			return (-1);
-		if ((n = dn_comp(dname, cp, ep - cp - QFIXEDSZ, dnptrs,
+		if ((n = dn_comp(dname, cp, (int)(ep - cp - QFIXEDSZ), dnptrs,
 		    lastdnptr)) < 0)
 			return (-1);
 		cp += n;
@@ -158,7 +161,7 @@ res_nmkquery(res_state statp,
 		 */
 		if ((ep - cp) < RRFIXEDSZ)
 			return (-1);
-		n = dn_comp((const char *)data, cp, ep - cp - RRFIXEDSZ,
+		n = dn_comp((const char *)data, cp, (int)(ep - cp - RRFIXEDSZ),
 			    dnptrs, lastdnptr);
 		if (n < 0)
 			return (-1);
@@ -190,7 +193,7 @@ res_nmkquery(res_state statp,
 		ns_put16(datalen, cp);
 		cp += INT16SZ;
 		if (datalen) {
-			memcpy(cp, data, datalen);
+			memcpy(cp, data, (size_t)datalen);
 			cp += datalen;
 		}
 		hp->ancount = htons(1);
@@ -199,7 +202,8 @@ res_nmkquery(res_state statp,
 	default:
 		return (-1);
 	}
-	return (cp - buf);
+	assert(INT_MIN <= (cp - buf) && (cp - buf) <= INT_MAX);
+	return (int)(cp - buf);
 }
 
 #ifdef RES_USE_EDNS0
@@ -221,7 +225,7 @@ res_nopt(res_state statp,
 		printf(";; res_nopt()\n");
 #endif
 
-	hp = (HEADER *) buf;
+	hp = (HEADER *)(void *)buf;
 	cp = buf + n0;
 	ep = buf + buflen;
 
@@ -251,7 +255,8 @@ res_nopt(res_state statp,
 
 	hp->arcount = htons(ntohs(hp->arcount) + 1);
 
-	return (cp - buf);
+	assert(INT_MIN <= (cp - buf) && (cp - buf) <= INT_MAX);
+	return (int)(cp - buf);
 }
 
 /*
@@ -291,13 +296,15 @@ res_nopt_rdata(res_state statp,
 	ns_put16(len, cp);
 	cp += INT16SZ;
 
-	memcpy(cp, data, len);
+	memcpy(cp, data, (size_t)len);
 	cp += len;
 
-	len = cp - rdata;
+	assert(0 <= (cp - rdata) && (cp - rdata) <= USHRT_MAX);
+	len = (u_short)(cp - rdata);
 	ns_put16(len, rdata - 2);	/* Update RDLEN field */
 
-	return (cp - buf);
+	assert(INT_MIN <= (cp - buf) && (cp - buf) <= INT_MAX);
+	return (int)(cp - buf);
 }
 #endif
 

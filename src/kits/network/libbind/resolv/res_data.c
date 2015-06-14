@@ -1,3 +1,5 @@
+/*	$NetBSD: res_data.c,v 1.14 2009/10/24 05:35:37 christos Exp $	*/
+
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1995-1999 by Internet Software Consortium.
@@ -15,8 +17,13 @@
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-static const char rcsid[] = "$Id: res_data.c,v 1.7 2008/12/11 09:59:00 marka Exp $";
+#ifdef notdef
+static const char rcsid[] = "Id: res_data.c,v 1.7 2008/12/11 09:59:00 marka Exp";
+#else
+__RCSID("$NetBSD: res_data.c,v 1.14 2009/10/24 05:35:37 christos Exp $");
+#endif
 #endif /* LIBC_SCCS and not lint */
 
 #include "port_before.h"
@@ -40,6 +47,28 @@ static const char rcsid[] = "$Id: res_data.c,v 1.7 2008/12/11 09:59:00 marka Exp
 #include <unistd.h>
 
 #include "port_after.h"
+
+#include "res_private.h"
+
+#ifdef __weak_alias
+__weak_alias(res_init,_res_init)
+__weak_alias(res_mkquery,_res_mkquery)
+__weak_alias(res_query,_res_query)
+__weak_alias(res_search,_res_search)
+__weak_alias(res_send,__res_send)
+__weak_alias(res_close,__res_close)
+/* XXX: these leaked in the old bind8 libc */
+__weak_alias(res_querydomain,__res_querydomain)
+__weak_alias(res_send_setqhook,__res_send_setqhook)
+__weak_alias(res_send_setrhook,__res_send_setrhook)
+#if 0
+__weak_alias(p_query,__p_query)
+__weak_alias(fp_query,__fp_query)
+__weak_alias(fp_nquery,__fp_nquery)
+__weak_alias(res_isourserver,__res_isourserver)
+__weak_alias(hostalias,__hostalias)
+#endif
+#endif
 
 const char *_res_opcodes[] = {
 	"QUERY",
@@ -69,25 +98,34 @@ const char *_res_sectioncodes[] = {
 };
 #endif
 
-#undef _res
-#ifndef __BIND_NOSTATIC
-struct __res_state _res
-# if defined(__BIND_RES_TEXT)
-	= { RES_TIMEOUT, }	/*%< Motorola, et al. */
-# endif
-        ;
-
-#if defined(DO_PTHREADS) || defined(__linux)
-#define _res (*__res_state())
-#endif
+#ifndef __BIND_NOSTATIC 
+extern struct __res_state _nres;
 
 /* Proto. */
 
-int  res_ourserver_p(const res_state, const struct sockaddr_in *);
+int  res_ourserver_p(const res_state, const struct sockaddr *);
 
 int
 res_init(void) {
-	extern int __res_vinit(res_state, int);
+	int rv;
+#ifdef COMPAT__RES
+	/*
+	 * Compatibility with program that were accessing _res directly
+	 * to set options. We keep another struct res that is the same
+	 * size as the original res structure, and then copy fields to
+	 * it so that we achieve the same initialization
+	 */
+	extern void *__res_get_old_state(void);
+	extern void __res_put_old_state(void *);
+	res_state ores = __res_get_old_state();
+
+	if (ores->options != 0)
+		_nres.options = ores->options;
+	if (ores->retrans != 0)
+		_nres.retrans = ores->retrans;
+	if (ores->retry != 0)
+		_nres.retry = ores->retry;
+#endif
 
 	/*
 	 * These three fields used to be statically initialized.  This made
@@ -102,27 +140,31 @@ res_init(void) {
 	 * so one can safely assume that the applications were already getting
 	 * unexpected results.
 	 *
-	 * _res.options is tricky since some apps were known to diddle the bits
+	 * _nres.options is tricky since some apps were known to diddle the bits
 	 * before res_init() was first called. We can't replicate that semantic
 	 * with dynamic initialization (they may have turned bits off that are
 	 * set in RES_DEFAULT).  Our solution is to declare such applications
 	 * "broken".  They could fool us by setting RES_INIT but none do (yet).
 	 */
-	if (!_res.retrans)
-		_res.retrans = RES_TIMEOUT;
-	if (!_res.retry)
-		_res.retry = 4;
-	if (!(_res.options & RES_INIT))
-		_res.options = RES_DEFAULT;
+	if (!_nres.retrans)
+		_nres.retrans = RES_TIMEOUT;
+	if (!_nres.retry)
+		_nres.retry = 4;
+	if (!(_nres.options & RES_INIT))
+		_nres.options = RES_DEFAULT;
 
 	/*
 	 * This one used to initialize implicitly to zero, so unless the app
 	 * has set it to something in particular, we can randomize it now.
 	 */
-	if (!_res.id)
-		_res.id = res_nrandomid(&_res);
+	if (!_nres.id)
+		_nres.id = res_nrandomid(&_nres);
 
-	return (__res_vinit(&_res, 1));
+	rv = __res_vinit(&_nres, 1);
+#ifdef COMPAT__RES
+	__res_put_old_state(&_nres);
+#endif
+	return rv;
 }
 
 void
@@ -137,10 +179,10 @@ fp_query(const u_char *msg, FILE *file) {
 
 void
 fp_nquery(const u_char *msg, int len, FILE *file) {
-	if ((_res.options & RES_INIT) == 0U && res_init() == -1)
+	if ((_nres.options & RES_INIT) == 0U && res_init() == -1)
 		return;
 
-	res_pquery(&_res, msg, len, file);
+	res_pquery(&_nres, msg, len, file);
 }
 
 int
@@ -153,24 +195,26 @@ res_mkquery(int op,			/*!< opcode of query  */
 	    u_char *buf,		/*!< buffer to put query  */
 	    int buflen)			/*!< size of buffer  */
 {
-	if ((_res.options & RES_INIT) == 0U && res_init() == -1) {
-		RES_SET_H_ERRNO(&_res, NETDB_INTERNAL);
+	if ((_nres.options & RES_INIT) == 0U && res_init() == -1) {
+		RES_SET_H_ERRNO(&_nres, NETDB_INTERNAL);
 		return (-1);
 	}
-	return (res_nmkquery(&_res, op, dname, class, type,
+	return (res_nmkquery(&_nres, op, dname, class, type,
 			     data, datalen,
 			     newrr_in, buf, buflen));
 }
 
+#ifdef _LIBRESOLV
 int
 res_mkupdate(ns_updrec *rrecp_in, u_char *buf, int buflen) {
-	if ((_res.options & RES_INIT) == 0U && res_init() == -1) {
-		RES_SET_H_ERRNO(&_res, NETDB_INTERNAL);
+	if ((_nres.options & RES_INIT) == 0U && res_init() == -1) {
+		RES_SET_H_ERRNO(&_nres, NETDB_INTERNAL);
 		return (-1);
 	}
 
-	return (res_nmkupdate(&_res, rrecp_in, buf, buflen));
+	return (res_nmkupdate(&_nres, rrecp_in, buf, buflen));
 }
+#endif
 
 int
 res_query(const char *name,	/*!< domain name  */
@@ -178,64 +222,68 @@ res_query(const char *name,	/*!< domain name  */
 	  u_char *answer,	/*!< buffer to put answer  */
 	  int anslen)		/*!< size of answer buffer  */
 {
-	if ((_res.options & RES_INIT) == 0U && res_init() == -1) {
-		RES_SET_H_ERRNO(&_res, NETDB_INTERNAL);
+	if ((_nres.options & RES_INIT) == 0U && res_init() == -1) {
+		RES_SET_H_ERRNO(&_nres, NETDB_INTERNAL);
 		return (-1);
 	}
-	return (res_nquery(&_res, name, class, type, answer, anslen));
+	return (res_nquery(&_nres, name, class, type, answer, anslen));
 }
 
 void
 res_send_setqhook(res_send_qhook hook) {
-	_res.qhook = hook;
+	_nres.qhook = hook;
 }
 
 void
 res_send_setrhook(res_send_rhook hook) {
-	_res.rhook = hook;
+	_nres.rhook = hook;
 }
 
 int
 res_isourserver(const struct sockaddr_in *inp) {
-	return (res_ourserver_p(&_res, inp));
+	return (res_ourserver_p(&_nres, (const struct sockaddr *)(const void *)inp));
 }
 
 int
 res_send(const u_char *buf, int buflen, u_char *ans, int anssiz) {
-	if ((_res.options & RES_INIT) == 0U && res_init() == -1) {
+	if ((_nres.options & RES_INIT) == 0U && res_init() == -1) {
 		/* errno should have been set by res_init() in this case. */
 		return (-1);
 	}
 
-	return (res_nsend(&_res, buf, buflen, ans, anssiz));
+	return (res_nsend(&_nres, buf, buflen, ans, anssiz));
 }
 
+#ifdef _LIBRESOLV
 int
 res_sendsigned(const u_char *buf, int buflen, ns_tsig_key *key,
 	       u_char *ans, int anssiz)
 {
-	if ((_res.options & RES_INIT) == 0U && res_init() == -1) {
+	if ((_nres.options & RES_INIT) == 0U && res_init() == -1) {
 		/* errno should have been set by res_init() in this case. */
 		return (-1);
 	}
 
-	return (res_nsendsigned(&_res, buf, buflen, key, ans, anssiz));
+	return (res_nsendsigned(&_nres, buf, buflen, key, ans, anssiz));
 }
+#endif
 
 void
 res_close(void) {
-	res_nclose(&_res);
+	res_nclose(&_nres);
 }
 
+#ifdef _LIBRESOLV
 int
 res_update(ns_updrec *rrecp_in) {
-	if ((_res.options & RES_INIT) == 0U && res_init() == -1) {
-		RES_SET_H_ERRNO(&_res, NETDB_INTERNAL);
+	if ((_nres.options & RES_INIT) == 0U && res_init() == -1) {
+		RES_SET_H_ERRNO(&_nres, NETDB_INTERNAL);
 		return (-1);
 	}
 
-	return (res_nupdate(&_res, rrecp_in, NULL));
+	return (res_nupdate(&_nres, rrecp_in, NULL));
 }
+#endif
 
 int
 res_search(const char *name,	/*!< domain name  */
@@ -243,12 +291,12 @@ res_search(const char *name,	/*!< domain name  */
 	   u_char *answer,	/*!< buffer to put answer  */
 	   int anslen)		/*!< size of answer  */
 {
-	if ((_res.options & RES_INIT) == 0U && res_init() == -1) {
-		RES_SET_H_ERRNO(&_res, NETDB_INTERNAL);
+	if ((_nres.options & RES_INIT) == 0U && res_init() == -1) {
+		RES_SET_H_ERRNO(&_nres, NETDB_INTERNAL);
 		return (-1);
 	}
 
-	return (res_nsearch(&_res, name, class, type, answer, anslen));
+	return (res_nsearch(&_nres, name, class, type, answer, anslen));
 }
 
 int
@@ -258,31 +306,31 @@ res_querydomain(const char *name,
 		u_char *answer,		/*!< buffer to put answer  */
 		int anslen)		/*!< size of answer  */
 {
-	if ((_res.options & RES_INIT) == 0U && res_init() == -1) {
-		RES_SET_H_ERRNO(&_res, NETDB_INTERNAL);
+	if ((_nres.options & RES_INIT) == 0U && res_init() == -1) {
+		RES_SET_H_ERRNO(&_nres, NETDB_INTERNAL);
 		return (-1);
 	}
 
-	return (res_nquerydomain(&_res, name, domain,
+	return (res_nquerydomain(&_nres, name, domain,
 				 class, type,
 				 answer, anslen));
 }
 
 u_int
 res_randomid(void) {
-	if ((_res.options & RES_INIT) == 0U && res_init() == -1) {
+	if ((_nres.options & RES_INIT) == 0U && res_init() == -1) {
 		RES_SET_H_ERRNO(&_res, NETDB_INTERNAL);
-		return (-1);
+		return (u_int)-1;
 	}
 
-	return (res_nrandomid(&_res));
+	return (res_nrandomid(&_nres));
 }
 
 const char *
 hostalias(const char *name) {
 	static char abuf[MAXDNAME];
 
-	return (res_hostalias(&_res, name, abuf, sizeof abuf));
+	return (res_hostalias(&_nres, name, abuf, sizeof abuf));
 }
 
 #ifdef ultrix
@@ -290,12 +338,12 @@ int
 local_hostname_length(const char *hostname) {
 	int len_host, len_domain;
 
-	if (!*_res.defdname)
+	if (!*_nres.defdname)
 		res_init();
 	len_host = strlen(hostname);
-	len_domain = strlen(_res.defdname);
+	len_domain = strlen(_nres.defdname);
 	if (len_host > len_domain &&
-	    !strcasecmp(hostname + len_host - len_domain, _res.defdname) &&
+	    !strcasecmp(hostname + len_host - len_domain, _nres.defdname) &&
 	    hostname[len_host - len_domain - 1] == '.')
 		return (len_host - len_domain - 1);
 	return (0);

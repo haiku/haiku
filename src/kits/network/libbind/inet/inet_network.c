@@ -1,3 +1,5 @@
+/*	$NetBSD: inet_network.c,v 1.4 2008/01/20 04:56:08 christos Exp $	*/
+
 /*
  * Copyright (c) 1983, 1993
  *	The Regents of the University of California.  All rights reserved.
@@ -31,8 +33,13 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-static const char sccsid[] = "@(#)inet_network.c	8.1 (Berkeley) 6/4/93";
+#if 0
+static char sccsid[] = "@(#)inet_network.c	8.1 (Berkeley) 6/4/93";
+#else
+__RCSID("$NetBSD: inet_network.c,v 1.4 2008/01/20 04:56:08 christos Exp $");
+#endif
 #endif /* LIBC_SCCS and not lint */
 
 #include "port_before.h"
@@ -40,42 +47,48 @@ static const char sccsid[] = "@(#)inet_network.c	8.1 (Berkeley) 6/4/93";
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+
+#include <assert.h>
 #include <ctype.h>
+#ifdef _DIAGNOSTIC
+#include <stddef.h>	/* for NULL */
+#endif
 
 #include "port_after.h"
 
-/*%
+/*
  * Internet network address interpretation routine.
  * The library routines call this routine to interpret
  * network numbers.
  */
-u_long
-inet_network(cp)
-	register const char *cp;
+in_addr_t
+inet_network(const char *cp)
 {
-	register u_long val, base, n, i;
-	register char c;
-	u_long parts[4], *pp = parts;
-	int digit;
+	in_addr_t val;
+	size_t i, n;
+	u_char c;
+	in_addr_t parts[4], *pp = parts;
+	int digit, base;
+
+	assert(cp != NULL);
 
 again:
 	val = 0; base = 10; digit = 0;
 	if (*cp == '0')
 		digit = 1, base = 8, cp++;
 	if (*cp == 'x' || *cp == 'X')
-		base = 16, cp++;
+		digit = 0, base = 16, cp++;
 	while ((c = *cp) != 0) {
-		if (isdigit((unsigned char)c)) {
-			if (base == 8U && (c == '8' || c == '9'))
+		if (isdigit(c)) {
+			if (base == 8 && (c == '8' || c == '9'))
 				return (INADDR_NONE);
 			val = (val * base) + (c - '0');
 			cp++;
 			digit = 1;
 			continue;
 		}
-		if (base == 16U && isxdigit((unsigned char)c)) {
-			val = (val << 4) +
-			      (c + 10 - (islower((unsigned char)c) ? 'a' : 'A'));
+		if (base == 16 && isxdigit(c)) {
+			val = (val << 4) + (c + 10 - (islower(c) ? 'a' : 'A'));
 			cp++;
 			digit = 1;
 			continue;
@@ -84,17 +97,17 @@ again:
 	}
 	if (!digit)
 		return (INADDR_NONE);
-	if (pp >= parts + 4 || val > 0xffU)
+	if (pp >= parts + 4 || val > 0xff)
 		return (INADDR_NONE);
 	if (*cp == '.') {
 		*pp++ = val, cp++;
 		goto again;
 	}
-	if (*cp && !isspace(*cp&0xff))
+	if (*cp && !isspace((u_char) *cp))
 		return (INADDR_NONE);
 	*pp++ = val;
 	n = pp - parts;
-	if (n > 4U)
+	if (n > 4)
 		return (INADDR_NONE);
 	for (val = 0, i = 0; i < n; i++) {
 		val <<= 8;

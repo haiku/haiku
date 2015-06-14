@@ -1,3 +1,5 @@
+/*	$NetBSD: ns_ttl.c,v 1.8 2012/03/13 21:13:39 christos Exp $	*/
+
 /*
  * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
  * Copyright (c) 1996,1999 by Internet Software Consortium.
@@ -15,8 +17,13 @@
  * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include <sys/cdefs.h>
 #ifndef lint
-static const char rcsid[] = "$Id: ns_ttl.c,v 1.4 2005/07/28 06:51:49 marka Exp $";
+#ifdef notdef
+static const char rcsid[] = "Id: ns_ttl.c,v 1.4 2005/07/28 06:51:49 marka Exp";
+#else
+//__RCSID("$NetBSD: ns_ttl.c,v 1.8 2012/03/13 21:13:39 christos Exp $");
+#endif
 #endif
 
 /* Import. */
@@ -25,6 +32,7 @@ static const char rcsid[] = "$Id: ns_ttl.c,v 1.4 2005/07/28 06:51:49 marka Exp $
 
 #include <arpa/nameser.h>
 
+#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
@@ -44,7 +52,7 @@ static int	fmt1(int t, char s, char **buf, size_t *buflen);
 
 /* Macros. */
 
-#define T(x) if ((x) < 0) return (-1); else (void)NULL
+#define T(x) if ((x) < 0) return (-1)
 
 /* Public. */
 
@@ -54,11 +62,11 @@ ns_format_ttl(u_long src, char *dst, size_t dstlen) {
 	int secs, mins, hours, days, weeks, x;
 	char *p;
 
-	secs = src % 60;   src /= 60;
-	mins = src % 60;   src /= 60;
-	hours = src % 24;  src /= 24;
-	days = src % 7;    src /= 7;
-	weeks = src;       src = 0;
+	secs = (int)(src % 60);   src /= 60;
+	mins = (int)(src % 60);   src /= 60;
+	hours = (int)(src % 24);  src /= 24;
+	days = (int)(src % 7);    src /= 7;
+	weeks = (int)src;       src = 0;
 
 	x = 0;
 	if (weeks) {
@@ -90,9 +98,11 @@ ns_format_ttl(u_long src, char *dst, size_t dstlen) {
 				*p = tolower(ch);
 	}
 
-	return (dst - odst);
+	assert(INT_MIN <= (dst - odst) && (dst - odst) <= INT_MAX);
+	return (int)(dst - odst);
 }
 
+#ifndef _LIBC
 int
 ns_parse_ttl(const char *src, u_long *dst) {
 	u_long ttl, tmp;
@@ -116,10 +126,10 @@ ns_parse_ttl(const char *src, u_long *dst) {
 		if (islower(ch))
 			ch = toupper(ch);
 		switch (ch) {
-		case 'W':  tmp *= 7;
-		case 'D':  tmp *= 24;
-		case 'H':  tmp *= 60;
-		case 'M':  tmp *= 60;
+		case 'W':  tmp *= 7;	/*FALLTHROUGH*/
+		case 'D':  tmp *= 24;	/*FALLTHROUGH*/
+		case 'H':  tmp *= 60;	/*FALLTHROUGH*/
+		case 'M':  tmp *= 60;	/*FALLTHROUGH*/
 		case 'S':  break;
 		default:   goto einval;
 		}
@@ -142,6 +152,7 @@ ns_parse_ttl(const char *src, u_long *dst) {
 	errno = EINVAL;
 	return (-1);
 }
+#endif
 
 /* Private. */
 

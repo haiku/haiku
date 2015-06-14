@@ -1,176 +1,77 @@
-/*
- * Copyright (c) 2004 by Internet Systems Consortium, Inc. ("ISC")
- * Copyright (c) 1996,1999 by Internet Software Consortium.
- *
- * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
- * copyright notice and this permission notice appear in all copies.
- *
- * THE SOFTWARE IS PROVIDED "AS IS" AND ISC DISCLAIMS ALL WARRANTIES
- * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- * MERCHANTABILITY AND FITNESS.  IN NO EVENT SHALL ISC BE LIABLE FOR
- * ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- * WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- * ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
- * OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
- */
+/*	$NetBSD: getprotoent.c,v 1.12 2008/04/28 20:23:00 martin Exp $	*/
 
-#if !defined(LINT) && !defined(CODECENTER)
-static const char rcsid[] = "$Id: getprotoent.c,v 1.4 2005/04/27 04:56:26 sra Exp $";
+/*-
+ * Copyright (c) 2004 The NetBSD Foundation, Inc.
+ * All rights reserved.
+ *
+ * This code is derived from software contributed to The NetBSD Foundation
+ * by Christos Zoulas.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE NETBSD FOUNDATION, INC. AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE FOUNDATION OR CONTRIBUTORS
+ * BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+#include <sys/cdefs.h>
+
+#if defined(LIBC_SCCS) && !defined(lint)
+__RCSID("$NetBSD: getprotoent.c,v 1.12 2008/04/28 20:23:00 martin Exp $");
+#endif /* LIBC_SCCS and not lint */
+
+#include <netdb.h>
+
+#include "protoent.h"
+
+#ifdef __weak_alias
+__weak_alias(endprotoent,_endprotoent)
+__weak_alias(getprotoent,_getprotoent)
+__weak_alias(setprotoent,_setprotoent)
 #endif
 
-/* Imports */
+#ifdef _REENTRANT
+pthread_mutex_t _protoent_mutex = PTHREAD_MUTEX_INITIALIZER;
+#endif
+struct protoent_data _protoent_data;
 
-#include "port_before.h"
-
-#if !defined(__BIND_NOSTATIC)
-
-#include <sys/types.h>
-
-#include <netinet/in.h>
-#include <arpa/nameser.h>
-
-#include <errno.h>
-#include <resolv.h>
-#include <stdio.h>
-#include <string.h>
-
-#include <irs.h>
-
-#include "port_after.h"
-
-#include "irs_data.h"
-
-/* Forward */
-
-static struct net_data *init(void);
-
-/* Public */
-
-struct protoent *
-getprotoent() {
-	struct net_data *net_data = init();
-
-	return (getprotoent_p(net_data));
-}
-
-struct protoent *
-getprotobyname(const char *name) {
-	struct net_data *net_data = init();
-
-	return (getprotobyname_p(name, net_data));
-}
-
-struct protoent *
-getprotobynumber(int proto) {
-	struct net_data *net_data = init();
-
-	return (getprotobynumber_p(proto, net_data));
+void
+setprotoent(int f)
+{
+	pthread_mutex_lock(&_protoent_mutex);
+	setprotoent_r(f, &_protoent_data);
+	pthread_mutex_unlock(&_protoent_mutex);
 }
 
 void
-setprotoent(int stayopen) {
-	struct net_data *net_data = init();
-
-	setprotoent_p(stayopen, net_data);
-}
-
-void
-endprotoent() {
-	struct net_data *net_data = init();
-
-	endprotoent_p(net_data);
-}
-
-/* Shared private. */
-
-struct protoent *
-getprotoent_p(struct net_data *net_data) {
-	struct irs_pr *pr;
-
-	if (!net_data || !(pr = net_data->pr))
-		return (NULL);
-	net_data->pr_last = (*pr->next)(pr);
-	return (net_data->pr_last);
+endprotoent(void)
+{
+	pthread_mutex_lock(&_protoent_mutex);
+	endprotoent_r(&_protoent_data);
+	pthread_mutex_unlock(&_protoent_mutex);
 }
 
 struct protoent *
-getprotobyname_p(const char *name, struct net_data *net_data) {
-	struct irs_pr *pr;
-	char **pap;
+getprotoent(void)
+{
+	struct protoent *p;
 
-	if (!net_data || !(pr = net_data->pr))
-		return (NULL);
-	if (net_data->pr_stayopen && net_data->pr_last) {
-		if (!strcmp(net_data->pr_last->p_name, name))
-			return (net_data->pr_last);
-		for (pap = net_data->pr_last->p_aliases; pap && *pap; pap++)
-			if (!strcmp(name, *pap))
-				return (net_data->pr_last);
-	}
-	net_data->pr_last = (*pr->byname)(pr, name);
-	if (!net_data->pr_stayopen)
-		endprotoent();
-	return (net_data->pr_last);
+	pthread_mutex_lock(&_protoent_mutex);
+	p = getprotoent_r(&_protoent_data.proto, &_protoent_data);
+	pthread_mutex_unlock(&_protoent_mutex);
+	return (p);
 }
-
-struct protoent *
-getprotobynumber_p(int proto, struct net_data *net_data) {
-	struct irs_pr *pr;
-
-	if (!net_data || !(pr = net_data->pr))
-		return (NULL);
-	if (net_data->pr_stayopen && net_data->pr_last)
-		if (net_data->pr_last->p_proto == proto)
-			return (net_data->pr_last);
-	net_data->pr_last = (*pr->bynumber)(pr, proto);
-	if (!net_data->pr_stayopen)
-		endprotoent();
-	return (net_data->pr_last);
-}
-
-void
-setprotoent_p(int stayopen, struct net_data *net_data) {
-	struct irs_pr *pr;
-
-	if (!net_data || !(pr = net_data->pr))
-		return;
-	(*pr->rewind)(pr);
-	net_data->pr_stayopen = (stayopen != 0);
-	if (stayopen == 0)
-		net_data_minimize(net_data);
-}
-
-void
-endprotoent_p(struct net_data *net_data) {
-	struct irs_pr *pr;
-
-	if ((net_data != NULL) && ((pr = net_data->pr) != NULL))
-		(*pr->minimize)(pr);
-}
-
-/* Private */
-
-static struct net_data *
-init() {
-	struct net_data *net_data;
-
-	if (!(net_data = net_data_init(NULL)))
-		goto error;
-	if (!net_data->pr) {
-		net_data->pr = (*net_data->irs->pr_map)(net_data->irs);
-
-		if (!net_data->pr || !net_data->res) {
- error:		
-			errno = EIO;
-			return (NULL);
-		}
-		(*net_data->pr->res_set)(net_data->pr, net_data->res, NULL);
-	}
-	
-	return (net_data);
-}
-
-#endif /*__BIND_NOSTATIC*/
-
-/*! \file */
