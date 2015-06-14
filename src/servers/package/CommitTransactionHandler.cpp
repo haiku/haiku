@@ -15,6 +15,7 @@
 
 #include <File.h>
 #include <Path.h>
+#include <SymLink.h>
 
 #include <AutoDeleter.h>
 #include <CopyEngine.h>
@@ -397,7 +398,7 @@ CommitTransactionHandler::_ApplyChanges()
 		// run post-installation scripts
 		_RunPostInstallScripts();
 	} else {
-		// TODO: Make sure the post-install scripts are run on next boot!
+		_QueuePostInstallScripts();
 	}
 
 	// removed packages have been deleted, new packages shall not be deleted
@@ -1346,6 +1347,52 @@ CommitTransactionHandler::_RunPostInstallScript(Package* package,
 					BTransactionIssue::B_STARTING_POST_INSTALL_SCRIPT_FAILED)
 				.SetPath1(BString(scriptPath.Path()))
 				.SetExitCode(result));
+		}
+	}
+}
+
+
+void
+CommitTransactionHandler::_QueuePostInstallScripts()
+{
+	BDirectory adminDirectory;
+	status_t error = _OpenPackagesSubDirectory(
+		RelativePath(kAdminDirectoryName), true, adminDirectory);
+	if (error != B_OK) {
+		ERROR("Failed to open administrative directory: %s\n", strerror(error));
+		return;
+	}
+
+	BDirectory scriptsDirectory;
+	error = scriptsDirectory.SetTo(&adminDirectory, kQueuedScriptsDirectoryName);
+	if (error == B_ENTRY_NOT_FOUND)
+		error = adminDirectory.CreateDirectory(kQueuedScriptsDirectoryName, &scriptsDirectory);
+	if (error != B_OK) {
+		ERROR("Failed to open queued scripts directory: %s\n", strerror(error));
+		return;
+	}
+
+	BDirectory rootDir(&fVolume->RootDirectoryRef());
+	for (PackageSet::iterator it = fAddedPackages.begin();
+		it != fAddedPackages.end(); ++it) {
+		Package* package = *it;
+		const BStringList& scripts = package->Info().PostInstallScripts();
+		for (int32 i = 0; i < scripts.CountStrings(); ++i) {
+			BPath scriptPath(&rootDir, scripts.StringAt(i));
+			status_t error = scriptPath.InitCheck();
+			if (error != B_OK) {
+				ERROR("Can't find script: %s\n", scripts.StringAt(i).String());
+				continue;
+			}
+
+			// symlink to the script
+			BSymLink scriptLink;
+			scriptsDirectory.CreateSymLink(scriptPath.Leaf(),
+				scriptPath.Path(), &scriptLink);
+			if (scriptLink.InitCheck() != B_OK) {
+				ERROR("Creating symlink failed: %s\n", strerror(scriptLink.InitCheck()));
+				continue;
+			}
 		}
 	}
 }

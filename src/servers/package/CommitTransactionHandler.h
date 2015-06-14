@@ -100,6 +100,8 @@ private:
 			void				_RunPostInstallScript(Package* package,
 									const BString& script);
 
+			void				_QueuePostInstallScripts();
+
 			void				_ExtractPackageContent(Package* package,
 									const BStringList& contentPaths,
 									BDirectory& targetDirectory,

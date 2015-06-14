@@ -15,6 +15,7 @@ extern const char* const kActivationFileName;
 extern const char* const kTemporaryActivationFileName;
 extern const char* const kWritableFilesDirectoryName;
 extern const char* const kPackageFileAttribute;
+extern const char* const kQueuedScriptsDirectoryName;
 
 static const bigtime_t kHandleNodeMonitorEvents = 'nmon';
 

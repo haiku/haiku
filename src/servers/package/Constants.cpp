@@ -16,3 +16,4 @@ const char* const kTemporaryActivationFileName
 	= PACKAGES_DIRECTORY_ACTIVATION_FILE ".tmp";
 const char* const kWritableFilesDirectoryName = "writable-files";
 const char* const kPackageFileAttribute = "SYS:PACKAGE";
+const char* const kQueuedScriptsDirectoryName = "queued-scripts";

@@ -23,6 +23,7 @@
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <Roster.h>
+#include <SymLink.h>
 
 #include <package/CommitTransactionResult.h>
 #include <package/PackageRoster.h>
@@ -1127,6 +1128,49 @@ Volume::_GetActivePackages(int fd)
 
 	fActiveState = stateDeleter.Detach();
 	return B_OK;
+}
+
+
+void
+Volume::_RunQueuedScripts()
+{
+	BDirectory adminDirectory;
+	status_t error = _OpenPackagesSubDirectory(
+		RelativePath(kAdminDirectoryName), false, adminDirectory);
+	if (error != B_OK)
+		return;
+
+	BDirectory scriptsDirectory;
+	error = scriptsDirectory.SetTo(&adminDirectory, kQueuedScriptsDirectoryName);
+	if (error != B_OK)
+		return;
+
+	// enumerate all the symlinks in the queued scripts directory
+	BEntry scriptEntry;
+	while (scriptsDirectory.GetNextEntry(&scriptEntry, false) == B_OK) {
+		BPath scriptPath;
+		scriptEntry.GetPath(&scriptPath);
+		error = scriptPath.InitCheck();
+		if (error != B_OK) {
+			INFORM("failed to get path of post-installation script \"%s\"\n",
+				strerror(error));
+			continue;
+		}
+
+		errno = 0;
+		int result = system(scriptPath.Path());
+		if (result != 0) {
+			INFORM("running post-installation script \"%s\" "
+				"failed: %d (errno: %s)\n", scriptPath.Leaf(), errno, strerror(errno));
+		}
+
+		// remove the symlink, now that we've run the post-installation script
+		error = scriptEntry.Remove();
+		if (error != B_OK) {
+			INFORM("removing queued post-install script failed \"%s\"\n",
+				strerror(error));
+		}
+	}
 }
 
 
