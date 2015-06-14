@@ -1,3 +1,0 @@
-Example usage for OpenBeOS project:
-
-stubgen -s -g -a *.h
