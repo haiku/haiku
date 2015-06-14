@@ -37,12 +37,16 @@ struct ValuePieceLocation {
 											// significant bit)
 	value_piece_location_type	type;
 	void*						value;		// used for storing implicit values
+	bool						writable;	// indicates if the piece is in a
+											// location in the target team
+											// where it can be modified
 
 
 	ValuePieceLocation()
 		:
 		type(VALUE_PIECE_LOCATION_INVALID),
-		value(NULL)
+		value(NULL),
+		writable(false)
 	{
 	}
 
@@ -97,12 +101,14 @@ struct ValuePieceLocation {
 	{
 		type = VALUE_PIECE_LOCATION_MEMORY;
 		this->address = address;
+		this->writable = true;
 	}
 
 	void SetToRegister(uint32 reg)
 	{
 		type = VALUE_PIECE_LOCATION_REGISTER;
 		this->reg = reg;
+		this->writable = true;
 	}
 
 	void SetSize(target_size_t size)
@@ -128,6 +134,7 @@ struct ValuePieceLocation {
 		SetSize(size);
 		type = VALUE_PIECE_LOCATION_IMPLICIT;
 		value = valueData;
+		writable = false;
 		return true;
 	}
 
@@ -153,6 +160,7 @@ public:
 			void				Clear();
 
 			bool				IsBigEndian() const	{ return fBigEndian; }
+			bool				IsWritable() const { return fWritable; }
 
 			bool				AddPiece(const ValuePieceLocation& piece);
 
@@ -170,6 +178,7 @@ private:
 private:
 			PieceVector			fPieces;
 			bool				fBigEndian;
+			bool				fWritable;
 };
 
 

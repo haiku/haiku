@@ -47,14 +47,16 @@ ValuePieceLocation::Normalize(bool bigEndian)
 
 ValueLocation::ValueLocation()
 	:
-	fBigEndian(false)
+	fBigEndian(false),
+	fWritable(false)
 {
 }
 
 
 ValueLocation::ValueLocation(bool bigEndian)
 	:
-	fBigEndian(bigEndian)
+	fBigEndian(bigEndian),
+	fWritable(false)
 {
 }
 
@@ -212,6 +214,7 @@ ValueLocation::SetTo(const ValueLocation& other, uint64 bitOffset,
 void
 ValueLocation::Clear()
 {
+	fWritable = false;
 	fPieces.clear();
 }
 
@@ -226,6 +229,11 @@ ValueLocation::AddPiece(const ValuePieceLocation& piece)
 	} catch (...) {
 		return false;
 	}
+
+	if (fPieces.size() == 1)
+		fWritable = piece.writable;
+	else
+		fWritable = fWritable && piece.writable;
 
 	return true;
 }
