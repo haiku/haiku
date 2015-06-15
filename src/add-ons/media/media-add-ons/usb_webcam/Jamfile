@@ -80,17 +80,16 @@ actions USBWebcamHeaderGen1
 }
 
 
-USBWebcamHeaderGen CamInternalAddons.h : B_WEBCAM_MKINTFUNC
-	: $(addonSources) ;
-USBWebcamHeaderGen CamInternalSensors.h : B_WEBCAM_DECLARE_SENSOR
-	: $(sensorsSources) ;
-USBWebcamHeaderGen CamInternalColorSpaceTransforms.h
-	: B_WEBCAM_DECLARE_CSTRANSFORM : $(csTransformsSources) ;
-
-
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+
+		USBWebcamHeaderGen CamInternalAddons.h : B_WEBCAM_MKINTFUNC
+			: $(addonSources) ;
+		USBWebcamHeaderGen CamInternalSensors.h : B_WEBCAM_DECLARE_SENSOR
+			: $(sensorsSources) ;
+		USBWebcamHeaderGen CamInternalColorSpaceTransforms.h
+			: B_WEBCAM_DECLARE_CSTRANSFORM : $(csTransformsSources) ;
 
 		for sourceDir in $(sourceDirs) {
 			SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons media
