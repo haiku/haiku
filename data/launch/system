@@ -71,7 +71,9 @@ service x-vnd.Haiku-power_daemon {
 	legacy
 }
 
-job x-vnd.Haiku-Login {
-	launch /system/apps/Login
-	legacy
+target login {
+	job x-vnd.Haiku-Login {
+		launch /system/apps/Login
+		legacy
+	}
 }

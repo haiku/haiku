@@ -12,16 +12,17 @@
 
 #include "AppServer.h"
 
+#include <syslog.h>
+
+#include <LaunchRoster.h>
+#include <PortLink.h>
+
 #include "BitmapManager.h"
 #include "Desktop.h"
 #include "FontManager.h"
 #include "InputManager.h"
 #include "ScreenManager.h"
 #include "ServerProtocol.h"
-
-#include <PortLink.h>
-
-#include <syslog.h>
 
 
 //#define DEBUG_SERVER
@@ -66,6 +67,12 @@ AppServer::AppServer(status_t* status)
 
 	// Create the bitmap allocator. Object declared in BitmapManager.cpp
 	gBitmapManager = new BitmapManager();
+
+	// TODO: check the attached displays, and launch login session for them
+	BMessage data;
+	data.AddString("name", "app_server");
+	data.AddInt32("session", 0);
+	BLaunchRoster().Target("login", data);
 }
 
 

@@ -60,7 +60,16 @@ const static settings_template kJobTemplate[] = {
 	{0, NULL, NULL}
 };
 
+const static settings_template kTargetTemplate[] = {
+	{B_STRING_TYPE, "name", NULL, true},
+	{B_BOOL_TYPE, "reset", NULL},
+	{B_MESSAGE_TYPE, "job", kJobTemplate},
+	{B_MESSAGE_TYPE, "service", kJobTemplate},
+	{0, NULL, NULL}
+};
+
 const static settings_template kSettingsTemplate[] = {
+	{B_MESSAGE_TYPE, "target", kTargetTemplate},
 	{B_MESSAGE_TYPE, "job", kJobTemplate},
 	{B_MESSAGE_TYPE, "service", kJobTemplate},
 	{0, NULL, NULL}
@@ -76,12 +85,12 @@ public:
 
 			uid_t				User() const
 									{ return fUser; }
-			const BMessenger&	Target() const
-									{ return fTarget; }
+			const BMessenger&	Daemon() const
+									{ return fDaemon; }
 
 private:
 			uid_t				fUser;
-			BMessenger			fTarget;
+			BMessenger			fDaemon;
 };
 
 
@@ -89,17 +98,27 @@ class Target : public BJob {
 public:
 								Target(const char* name);
 
+			const char*			Name() const;
+
+			status_t			AddData(const char* name, BMessage& data);
+			const BMessage&		Data() const
+									{ return fData; }
+
 protected:
 	virtual	status_t			Execute();
+
+private:
+			BMessage			fData;
 };
 
 
-class JobFinder;
+class Finder;
 
 
 class Job : public BJob {
 public:
 								Job(const char* name);
+								Job(const Job& other);
 	virtual						~Job();
 
 			const char*			Name() const;
@@ -122,11 +141,14 @@ public:
 			BStringList&		Arguments();
 			void				AddArgument(const char* argument);
 
+			::Target*			Target() const;
+			void				SetTarget(::Target* target);
+
 			const BStringList&	Requirements() const;
 			BStringList&		Requirements();
 			void				AddRequirement(const char* requirement);
 
-			status_t			Init(Target* target, const JobFinder& jobs,
+			status_t			Init(const Finder& jobs,
 									std::set<BString>& dependencies);
 			status_t			InitCheck() const;
 
@@ -142,7 +164,11 @@ protected:
 	virtual	status_t			Execute();
 
 private:
-			BString				fName;
+			Job&				operator=(const Job& other);
+			void				_DeletePorts();
+			status_t			_AddRequirement(BJob* dependency);
+
+private:
 			BStringList			fArguments;
 			BStringList			fRequirements;
 			bool				fEnabled;
@@ -152,25 +178,29 @@ private:
 			PortMap				fPortMap;
 			status_t			fInitStatus;
 			team_id				fTeam;
+			::Target*			fTarget;
 };
 
 
-class JobFinder {
+class Finder {
 public:
 	virtual	Job*				FindJob(const char* name) const = 0;
+	virtual	Target*				FindTarget(const char* name) const = 0;
 };
 
 
 typedef std::map<BString, Job*> JobMap;
 typedef std::map<uid_t, Session*> SessionMap;
+typedef std::map<BString, Target*> TargetMap;
 
 
-class LaunchDaemon : public BServer, public JobFinder {
+class LaunchDaemon : public BServer, public Finder {
 public:
 								LaunchDaemon(bool userMode, status_t& error);
 	virtual						~LaunchDaemon();
 
 	virtual	Job*				FindJob(const char* name) const;
+	virtual	Target*				FindTarget(const char* name) const;
 			Session*			FindSession(uid_t user) const;
 
 	virtual	void				ReadyToRun();
@@ -185,10 +215,13 @@ private:
 									BEntry& directory);
 			status_t			_ReadFile(const char* context, BEntry& entry);
 
-			void				_AddJob(bool service, BMessage& message);
-			void				_InitJobs(Target* target);
-			void				_LaunchJobs();
+			void				_AddJobs(Target* target, BMessage& message);
+			void				_AddJob(Target* target, bool service,
+									BMessage& message);
+			void				_InitJobs();
+			void				_LaunchJobs(Target* target);
 			void				_AddLaunchJob(Job* job);
+			void				_AddTarget(Target* target);
 
 			status_t			_StartSession(const char* login,
 									const char* password);
@@ -202,6 +235,7 @@ private:
 
 private:
 			JobMap				fJobs;
+			TargetMap			fTargets;
 			JobQueue			fJobQueue;
 			SessionMap			fSessions;
 			MainWorker*			fMainWorker;
@@ -233,19 +267,44 @@ Job::Job(const char* name)
 	fCreateDefaultPort(false),
 	fLaunchInSafeMode(true),
 	fInitStatus(B_NO_INIT),
-	fTeam(-1)
+	fTeam(-1),
+	fTarget(NULL)
 {
+}
+
+
+Job::Job(const Job& other)
+	:
+	BJob(other.Name()),
+	fEnabled(other.IsEnabled()),
+	fService(other.IsService()),
+	fCreateDefaultPort(other.CreateDefaultPort()),
+	fLaunchInSafeMode(other.LaunchInSafeMode()),
+	fInitStatus(B_NO_INIT),
+	fTeam(-1),
+	fTarget(other.Target())
+{
+	for (int32 i = 0; i < other.Arguments().CountStrings(); i++)
+		AddArgument(other.Arguments().StringAt(i));
+
+	for (int32 i = 0; i < other.Requirements().CountStrings(); i++)
+		AddRequirement(other.Requirements().StringAt(i));
+
+	PortMap::const_iterator constIterator = other.Ports().begin();
+	for (; constIterator != other.Ports().end(); constIterator++) {
+		fPortMap.insert(
+			std::make_pair(constIterator->first, constIterator->second));
+	}
+
+	PortMap::iterator iterator = fPortMap.begin();
+	for (; iterator != fPortMap.end(); iterator++)
+		iterator->second.RemoveData("port");
 }
 
 
 Job::~Job()
 {
-	PortMap::const_iterator iterator = Ports().begin();
-	for (; iterator != Ports().end(); iterator++) {
-		port_id port = iterator->second.GetInt32("port", -1);
-		if (port >= 0)
-			delete_port(port);
-	}
+	_DeletePorts();
 }
 
 
@@ -341,6 +400,20 @@ Job::AddArgument(const char* argument)
 }
 
 
+::Target*
+Job::Target() const
+{
+	return fTarget;
+}
+
+
+void
+Job::SetTarget(::Target* target)
+{
+	fTarget = target;
+}
+
+
 const BStringList&
 Job::Requirements() const
 {
@@ -363,8 +436,7 @@ Job::AddRequirement(const char* requirement)
 
 
 status_t
-Job::Init(Target* target, const JobFinder& jobs,
-	std::set<BString>& dependencies)
+Job::Init(const Finder& finder, std::set<BString>& dependencies)
 {
 	// Only initialize the jobs once
 	if (fInitStatus != B_NO_INIT)
@@ -372,8 +444,8 @@ Job::Init(Target* target, const JobFinder& jobs,
 
 	fInitStatus = B_OK;
 
-	if (target != NULL && target->State() < B_JOB_STATE_SUCCEEDED)
-		AddDependency(target);
+	if (fTarget != NULL)
+		fTarget->AddDependency(this);
 
 	// Check dependencies
 
@@ -386,21 +458,29 @@ Job::Init(Target* target, const JobFinder& jobs,
 		}
 		dependencies.insert(requires);
 
-		Job* dependency = jobs.FindJob(requires);
+		Job* dependency = finder.FindJob(requires);
 		if (dependency != NULL) {
 			std::set<BString> subDependencies = dependencies;
 
-			fInitStatus = dependency->Init(target, jobs, subDependencies);
+			fInitStatus = dependency->Init(finder, subDependencies);
 			if (fInitStatus != B_OK) {
 				// TODO: log error
 				return fInitStatus;
 			}
 
-			AddDependency(dependency);
+			fInitStatus = _AddRequirement(dependency);
 		} else {
-			// Could not find dependency
+			::Target* target = finder.FindTarget(requires);
+			if (target != NULL)
+				fInitStatus = _AddRequirement(dependency);
+			else {
+				// Could not find dependency
+				fInitStatus = B_NAME_NOT_FOUND;
+			}
+		}
+		if (fInitStatus != B_OK) {
 			// TODO: log error
-			return fInitStatus = B_NAME_NOT_FOUND;
+			return fInitStatus;
 		}
 	}
 
@@ -487,7 +567,7 @@ Job::Launch()
 		// We cannot use the BRoster here as it tries to pre-register
 		// the application.
 		BString signature("application/");
-		signature << fName;
+		signature << Name();
 		return B_NOT_SUPPORTED;
 		//return be_roster->Launch(signature.String(), (BMessage*)NULL, &fTeam);
 	}
@@ -534,13 +614,52 @@ Job::Execute()
 }
 
 
+void
+Job::_DeletePorts()
+{
+	PortMap::const_iterator iterator = Ports().begin();
+	for (; iterator != Ports().end(); iterator++) {
+		port_id port = iterator->second.GetInt32("port", -1);
+		if (port >= 0)
+			delete_port(port);
+	}
+}
+
+
+status_t
+Job::_AddRequirement(BJob* dependency)
+{
+	if (dependency == NULL)
+		return B_OK;
+
+	switch (dependency->State()) {
+		case B_JOB_STATE_WAITING_TO_RUN:
+		case B_JOB_STATE_STARTED:
+		case B_JOB_STATE_IN_PROGRESS:
+			AddDependency(dependency);
+			break;
+
+		case B_JOB_STATE_SUCCEEDED:
+			// Just queue it without any dependencies
+			break;
+
+		case B_JOB_STATE_FAILED:
+		case B_JOB_STATE_ABORTED:
+			// TODO: return appropriate error
+			return B_BAD_VALUE;
+	}
+
+	return B_OK;
+}
+
+
 // #pragma mark -
 
 
-Session::Session(uid_t user, const BMessenger& target)
+Session::Session(uid_t user, const BMessenger& daemon)
 	:
 	fUser(user),
-	fTarget(target)
+	fDaemon(daemon)
 {
 }
 
@@ -552,6 +671,20 @@ Target::Target(const char* name)
 	:
 	BJob(name)
 {
+}
+
+
+const char*
+Target::Name() const
+{
+	return Title().String();
+}
+
+
+status_t
+Target::AddData(const char* name, BMessage& data)
+{
+	return fData.AddMessage(name, &data);
 }
 
 
@@ -574,6 +707,8 @@ LaunchDaemon::LaunchDaemon(bool userMode, status_t& error)
 	fUserMode(userMode)
 {
 	fMainWorker = new MainWorker(fJobQueue);
+	if (fInitTarget != NULL)
+		_AddTarget(fInitTarget);
 }
 
 
@@ -590,6 +725,20 @@ LaunchDaemon::FindJob(const char* name) const
 
 	JobMap::const_iterator found = fJobs.find(BString(name).ToLower());
 	if (found != fJobs.end())
+		return found->second;
+
+	return NULL;
+}
+
+
+Target*
+LaunchDaemon::FindTarget(const char* name) const
+{
+	if (name == NULL)
+		return NULL;
+
+	TargetMap::const_iterator found = fTargets.find(BString(name).ToLower());
+	if (found != fTargets.end())
 		return found->second;
 
 	return NULL;
@@ -614,7 +763,7 @@ LaunchDaemon::ReadyToRun()
 	_SetupEnvironment();
 	if (fUserMode) {
 		BLaunchRoster roster;
-		BLaunchRoster::Private(roster).RegisterSession(this);
+		BLaunchRoster::Private(roster).RegisterSessionDaemon(this);
 	} else
 		_InitSystem();
 
@@ -627,8 +776,8 @@ LaunchDaemon::ReadyToRun()
 		fUserMode ? B_FIND_PATHS_USER_ONLY : B_FIND_PATHS_SYSTEM_ONLY, paths);
 	_ReadPaths(paths);
 
-	_InitJobs(fUserMode ? NULL : fInitTarget);
-	_LaunchJobs();
+	_InitJobs();
+	_LaunchJobs(NULL);
 }
 
 
@@ -648,7 +797,7 @@ LaunchDaemon::MessageReceived(BMessage* message)
 				Session* session = FindSession(user);
 				if (session != NULL) {
 					// Forward request to user launch_daemon
-					if (session->Target().SendMessage(message) == B_OK)
+					if (session->Daemon().SendMessage(message) == B_OK)
 						break;
 				}
 				reply.what = B_NAME_NOT_FOUND;
@@ -676,6 +825,57 @@ LaunchDaemon::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case B_LAUNCH_TARGET:
+		{
+			uid_t user = _GetUserID(message);
+			if (user < 0)
+				break;
+
+			const char* name = message->GetString("target");
+			const char* baseName = message->GetString("base target");
+
+			Target* target = FindTarget(name);
+			if (target == NULL) {
+				Target* baseTarget = FindTarget(baseName);
+				if (baseTarget != NULL) {
+					target = new Target(name);
+
+					// Copy all jobs with the base target into the new target
+					for (JobMap::iterator iterator = fJobs.begin();
+							iterator != fJobs.end();) {
+						Job* job = iterator->second;
+						iterator++;
+
+						if (job->Target() == baseTarget) {
+							Job* copy = new Job(*job);
+							copy->SetTarget(target);
+
+							fJobs.insert(std::make_pair(copy->Name(), copy));
+						}
+					}
+				}
+			}
+			if (target == NULL) {
+				Session* session = FindSession(user);
+				if (session != NULL) {
+					// Forward request to user launch_daemon
+					if (session->Daemon().SendMessage(message) == B_OK)
+						break;
+				}
+
+				BMessage reply(B_NAME_NOT_FOUND);
+				message->SendReply(&reply);
+				break;
+			}
+
+			BMessage data;
+			if (message->FindMessage("data", &data) == B_OK)
+				target->AddData(data.GetString("name"), data);
+
+			_LaunchJobs(target);
+			break;
+		}
+
 		case B_LAUNCH_SESSION:
 		{
 			uid_t user = _GetUserID(message);
@@ -699,7 +899,7 @@ LaunchDaemon::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case B_REGISTER_LAUNCH_SESSION:
+		case B_REGISTER_SESSION_DAEMON:
 		{
 			uid_t user = _GetUserID(message);
 			if (user < 0)
@@ -792,16 +992,37 @@ LaunchDaemon::_ReadFile(const char* context, BEntry& entry)
 	status = adapter.ConvertFromDriverSettings(path.Path(), kSettingsTemplate,
 			message);
 	if (status == B_OK) {
-		message.PrintToStream();
-		BMessage job;
-		for (int32 index = 0; message.FindMessage("service", index,
-				&job) == B_OK; index++) {
-			_AddJob(true, job);
-		}
+		_AddJobs(NULL, message);
 
-		for (int32 index = 0; message.FindMessage("job", index, &job) == B_OK;
-				index++) {
-			_AddJob(false, job);
+		BMessage targetMessage;
+		for (int32 index = 0; message.FindMessage("target", index,
+				&targetMessage) == B_OK; index++) {
+			const char* name = targetMessage.GetString("name");
+			if (name == NULL) {
+				// TODO: log error
+				debug_printf("Target has no name, ignoring it!\n");
+				continue;
+			}
+
+			Target* target = FindTarget(name);
+			if (target == NULL) {
+				target = new Target(name);
+				_AddTarget(target);
+			} else if (targetMessage.GetBool("reset")) {
+				// Remove all jobs from this target
+				for (JobMap::iterator iterator = fJobs.begin();
+						iterator != fJobs.end();) {
+					Job* job = iterator->second;
+					JobMap::iterator remove = iterator++;
+
+					if (job->Target() == target) {
+						fJobs.erase(remove);
+						delete job;
+					}
+				}
+			}
+
+			_AddJobs(target, targetMessage);
 		}
 	}
 
@@ -810,7 +1031,23 @@ LaunchDaemon::_ReadFile(const char* context, BEntry& entry)
 
 
 void
-LaunchDaemon::_AddJob(bool service, BMessage& message)
+LaunchDaemon::_AddJobs(Target* target, BMessage& message)
+{
+	BMessage job;
+	for (int32 index = 0; message.FindMessage("service", index,
+			&job) == B_OK; index++) {
+		_AddJob(target, true, job);
+	}
+
+	for (int32 index = 0; message.FindMessage("job", index, &job) == B_OK;
+			index++) {
+		_AddJob(target, false, job);
+	}
+}
+
+
+void
+LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 {
 	BString name = message.GetString("name");
 	if (name.IsEmpty()) {
@@ -828,6 +1065,7 @@ LaunchDaemon::_AddJob(bool service, BMessage& message)
 	job->SetCreateDefaultPort(!message.GetBool("legacy", !service));
 	job->SetLaunchInSafeMode(
 		!message.GetBool("no_safemode", !job->LaunchInSafeMode()));
+	job->SetTarget(target);
 
 	BMessage portMessage;
 	for (int32 index = 0;
@@ -847,13 +1085,15 @@ LaunchDaemon::_AddJob(bool service, BMessage& message)
 			index++) {
 		job->AddRequirement(requirement);
 	}
+	if (fInitTarget != NULL)
+		job->AddRequirement(fInitTarget->Name());
 
 	fJobs.insert(std::pair<BString, Job*>(job->Name(), job));
 }
 
 
 void
-LaunchDaemon::_InitJobs(Target* target)
+LaunchDaemon::_InitJobs()
 {
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();) {
 		Job* job = iterator->second;
@@ -862,7 +1102,7 @@ LaunchDaemon::_InitJobs(Target* target)
 		status_t status = B_NO_INIT;
 		if (job->IsEnabled() && (!_IsSafeMode() || job->LaunchInSafeMode())) {
 			std::set<BString> dependencies;
-			status = job->Init(target, *this, dependencies);
+			status = job->Init(*this, dependencies);
 		}
 
 		if (status != B_OK) {
@@ -874,18 +1114,20 @@ LaunchDaemon::_InitJobs(Target* target)
 
 			// Remove jobs that won't be used later on
 			fJobs.erase(remove);
+			delete job;
 		}
 	}
 }
 
 
 void
-LaunchDaemon::_LaunchJobs()
+LaunchDaemon::_LaunchJobs(Target* target)
 {
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
 			iterator++) {
 		Job* job = iterator->second;
-		_AddLaunchJob(job);
+		if (job->Target() == target)
+			_AddLaunchJob(job);
 	}
 }
 
@@ -895,6 +1137,13 @@ LaunchDaemon::_AddLaunchJob(Job* job)
 {
 	if (!job->IsLaunched())
 		fJobQueue.AddJob(job);
+}
+
+
+void
+LaunchDaemon::_AddTarget(Target* target)
+{
+	fTargets.insert(std::make_pair(target->Title(), target));
 }
 
 

@@ -14,7 +14,7 @@ public:
 								Private(BLaunchRoster* roster);
 								Private(BLaunchRoster& roster);
 
-			status_t			RegisterSession(const BMessenger& target);
+			status_t			RegisterSessionDaemon(const BMessenger& daemon);
 
 private:
 			BLaunchRoster*		fRoster;

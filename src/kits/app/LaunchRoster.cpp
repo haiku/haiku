@@ -39,12 +39,12 @@ BLaunchRoster::Private::Private(BLaunchRoster& roster)
 
 
 status_t
-BLaunchRoster::Private::RegisterSession(const BMessenger& target)
+BLaunchRoster::Private::RegisterSessionDaemon(const BMessenger& daemon)
 {
-	BMessage request(B_REGISTER_LAUNCH_SESSION);
+	BMessage request(B_REGISTER_SESSION_DAEMON);
 	status_t status = request.AddInt32("user", getuid());
 	if (status == B_OK)
-		status = request.AddMessenger("target", target);
+		status = request.AddMessenger("daemon", daemon);
 	if (status != B_OK)
 		return status;
 
@@ -142,6 +142,35 @@ BLaunchRoster::GetPort(const char* signature, const char* name)
 	}
 
 	return -1;
+}
+
+
+status_t
+BLaunchRoster::Target(const char* name, BMessage& data, const char* baseName)
+{
+	if (name == NULL)
+		return B_BAD_VALUE;
+
+	BMessage request(B_LAUNCH_TARGET);
+	status_t status = request.AddInt32("user", getuid());
+	if (status == B_OK)
+		status = request.AddString("target", name);
+	if (status == B_OK && !data.IsEmpty())
+		status = request.AddMessage("data", &data);
+	if (status == B_OK && baseName != NULL)
+		status = request.AddString("base target", baseName);
+	if (status != B_OK)
+		return status;
+
+	// send the request
+	BMessage result;
+	status = fMessenger.SendMessage(&request, &result);
+
+	// evaluate the reply
+	if (status == B_OK)
+		status = result.what;
+
+	return status;
 }
 
 

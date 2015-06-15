@@ -19,14 +19,15 @@
 namespace BPrivate {
 
 #define kLaunchDaemonSignature "application/x-vnd.Haiku-launch_daemon"
-#define B_LAUNCH_DAEMON_PORT_NAME	"system:launch_daemon"
+#define B_LAUNCH_DAEMON_PORT_NAME "system:launch_daemon"
 
 
 // message constants
 enum {
 	B_GET_LAUNCH_DATA			= 'lnda',
+	B_LAUNCH_TARGET				= 'lntg',
 	B_LAUNCH_SESSION			= 'lnse',
-	B_REGISTER_LAUNCH_SESSION	= 'lnrs',
+	B_REGISTER_SESSION_DAEMON	= 'lnrs',
 };
 
 
