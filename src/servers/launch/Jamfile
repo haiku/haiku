@@ -8,6 +8,8 @@ UseHeaders [ FDirName $(HAIKU_TOP) src bin multiuser ] ;
 Server launch_daemon
 	:
 	LaunchDaemon.cpp
+	Job.cpp
+	Target.cpp
 	Worker.cpp
 
 	# init jobs
