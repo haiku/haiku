@@ -31,6 +31,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			SubDirC++Flags $(defines) ;
 		}
 
+		# the header doesn't appear to get the architecture gristed, so
+		# make the dependency explicit
+		Includes <src!kits!network!netresolv!$(architecture)>nslexer.l
+			: <src!kits!network!netresolv!$(architecture)>nsparser.h ;
+
 		MergeObject <netresolv!$(architecture)>netresolv.o :
 			# dst
 			dst_api.c
