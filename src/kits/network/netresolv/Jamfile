@@ -5,15 +5,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		local architecture = $(TARGET_PACKAGING_ARCH) ;
 
-#HDRGRIST = [ FGrist $(SUBDIR_TOKENS) $(architecture) ] ;
-
 		UseHeaders [ FDirName $(SUBDIR) include ] : true ;
 		UseHeaders [ FDirName $(HAIKU_TOP) src libs compat freebsd_network compat ]
 			: true ;
 		UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
-		UseHeaders [ FDirName
-			$(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCHS[1]))
-			kits network netresolv ] ;
 		SubDirSysHdrs $(SUBDIR) ;
 
 		# private sources for this port
@@ -31,7 +26,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		{
 			# we want to have the xxx_r functions, IPv6, and md5 implementation
 			# we also need to use our BSD compatibility functions
-			local defines = _REENTRANT=1 USE_MD5=1 _BSD_SOURCE ;
+			local defines = _REENTRANT=1 USE_MD5=1 _BSD_SOURCE IPV6 ;
 			defines = [ FDefines $(defines) ] ;
 			SubDirCcFlags $(defines) ;
 			SubDirC++Flags $(defines) ;
