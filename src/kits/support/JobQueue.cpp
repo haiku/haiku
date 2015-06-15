@@ -84,20 +84,21 @@ JobQueue::AddJob(BJob* job)
 		return B_NO_INIT;
 
 	BAutolock lock(&fLock);
-	if (lock.IsLocked()) {
-		try {
-			if (!fQueuedJobs->insert(job).second)
-				return B_NAME_IN_USE;
-		} catch (const std::bad_alloc& e) {
-			return B_NO_MEMORY;
-		} catch (...) {
-			return B_ERROR;
-		}
-		BJob::Private(*job).SetTicketNumber(fNextTicketNumber++);
-		job->AddStateListener(this);
-		if (job->IsRunnable())
-			release_sem(fHaveRunnableJobSem);
+	if (!lock.IsLocked())
+		return B_ERROR;
+
+	try {
+		if (!fQueuedJobs->insert(job).second)
+			return B_NAME_IN_USE;
+	} catch (const std::bad_alloc& e) {
+		return B_NO_MEMORY;
+	} catch (...) {
+		return B_ERROR;
 	}
+	BJob::Private(*job).SetTicketNumber(fNextTicketNumber++);
+	job->AddStateListener(this);
+	if (job->IsRunnable())
+		release_sem(fHaveRunnableJobSem);
 
 	return B_OK;
 }
