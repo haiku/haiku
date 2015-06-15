@@ -699,7 +699,8 @@ VideoProducer::_FrameGeneratorThread()
 					// Drop frame if it's at least a frame late.
 					if (playingDirection > 0) {
 						printf("VideoProducer: dropped frame (%" B_PRId64
-							") (perf. time %Ld)\n", fFrame, performanceTime);
+							") (perf. time " B_PRIdBIGTIME ")\n", fFrame,
+							performanceTime);
 					}
 					// next frame
 					droppedFrames++;
