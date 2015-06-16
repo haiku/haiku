@@ -22,7 +22,7 @@ RemotePackageRepository HaikuPorts
 	timgmsoundfont-fixed-5
 	vl_gothic-20141206-1
 	wqy_microhei-0.2.0~beta-3
-	youtube_dl-2015.01.10-1
+	youtube_dl-2015.06.15-1
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
@@ -453,7 +453,7 @@ RemotePackageRepository HaikuPorts
 	tinyxml_devel-2.6.2-1
 	twolame-0.3.13-1
 	twolame_devel-0.3.13-1
-	ubertuber-0.9.10-3
+	ubertuber-0.9.11-1
 	unrar-5.2.6-1
 	unzip-6.0-2
 	util_macros-1.19.0-2
@@ -771,7 +771,7 @@ RemotePackageRepository HaikuPorts
 	qjson_x86_devel-0.8.1-1
 	qmplay2_x86-15.05.30-2
 	quassel_x86-0.10.0-2
-	quicklaunch-0.9.9-1
+	quicklaunch-0.9.10-1
 	qupzilla_x86-1.8.6-1
 	rcs_x86-5.9.3-2
 	readline_x86-6.3-2
