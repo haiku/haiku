@@ -1370,8 +1370,6 @@ update_interface_address(InterfaceAddress* interfaceAddress, int32 option,
 			sockaddr* defaultNetmask = NULL;
 			const sockaddr* netmask = NULL;
 			if (option == SIOCSIFADDR) {
-				if (address == NULL)
-					return B_BAD_VALUE;
 				defaultNetmask = InterfaceAddress::Prepare(
 					&interfaceAddress->mask, address->sa_len);
 			} else
@@ -1382,8 +1380,6 @@ update_interface_address(InterfaceAddress* interfaceAddress, int32 option,
 			sockaddr* defaultBroadcast = NULL;
 			if ((domain->address_module->flags
 					& NET_ADDRESS_MODULE_FLAG_BROADCAST_ADDRESS) != 0) {
-				if (address == NULL)
-					return B_BAD_VALUE;
 				defaultBroadcast = InterfaceAddress::Prepare(
 					&interfaceAddress->destination, address->sa_len);
 			} else
