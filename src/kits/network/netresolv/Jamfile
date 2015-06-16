@@ -26,7 +26,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		{
 			# we want to have the xxx_r functions, IPv6, and md5 implementation
 			# we also need to use our BSD compatibility functions
-			local defines = _REENTRANT=1 USE_MD5=1 _BSD_SOURCE IPV6 ;
+			local defines = _REENTRANT=1 USE_MD5=1 _BSD_SOURCE INET6 ;
 			defines = [ FDefines $(defines) ] ;
 			SubDirCcFlags $(defines) ;
 			SubDirC++Flags $(defines) ;

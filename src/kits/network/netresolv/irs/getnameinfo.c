@@ -81,6 +81,7 @@ static const struct afd {
 } afdl [] = {
 #ifdef INET6
 	{PF_INET6, sizeof(struct in6_addr), sizeof(struct sockaddr_in6),
+		offsetof(struct sockaddr_in6, sin6_addr)},
 #endif
 	{PF_INET, sizeof(struct in_addr), sizeof(struct sockaddr_in),
 		offsetof(struct sockaddr_in, sin_addr)},
@@ -429,9 +430,9 @@ ip6_parsenumeric(const struct sockaddr *sa, const char *addr, char *host,
 	size_t numaddrlen;
 	char numaddr[512];
 
-	_DIAGASSERT(sa != NULL);
-	_DIAGASSERT(addr != NULL);
-	_DIAGASSERT(host != NULL);
+	assert(sa != NULL);
+	assert(addr != NULL);
+	assert(host != NULL);
 
 	if (inet_ntop(AF_INET6, addr, numaddr, (socklen_t)sizeof(numaddr))
 	    == NULL)
@@ -471,8 +472,8 @@ ip6_sa2str(const struct sockaddr_in6 *sa6, char *buf, size_t bufsiz, int flags)
 	const struct in6_addr *a6;
 	int n;
 
-	_DIAGASSERT(sa6 != NULL);
-	_DIAGASSERT(buf != NULL);
+	assert(sa6 != NULL);
+	assert(buf != NULL);
 
 	ifindex = (unsigned int)sa6->sin6_scope_id;
 	a6 = &sa6->sin6_addr;
