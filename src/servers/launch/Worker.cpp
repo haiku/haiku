@@ -38,8 +38,12 @@ Worker::Process()
 		if (status != B_OK)
 			return status;
 
-		Run(job);
+		status = Run(job);
+		if (status != B_OK) {
 			// TODO: proper error reporting on failed job!
+			debug_printf("Launching %s failed: %s\n", job->Title().String(),
+				strerror(status));
+		}
 	}
 }
 
