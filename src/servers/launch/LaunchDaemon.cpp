@@ -711,7 +711,7 @@ LaunchDaemon::_SetupEnvironment()
 {
 	// Determine safemode kernel option
 	BString safemode = "SAFEMODE=";
-	safemode << _IsSafeMode() ? "yes" : "no";
+	safemode << (_IsSafeMode() ? "yes" : "no");
 
 	putenv(safemode.String());
 }
