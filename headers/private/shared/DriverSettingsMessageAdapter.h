@@ -22,10 +22,15 @@ public:
 	virtual	status_t			ConvertFromDriverSettings(
 									const driver_parameter& parameter,
 									const char* name, int32 index, uint32 type,
-									BMessage& target) = 0;
+									BMessage& target);
+	virtual	status_t			ConvertEmptyFromDriverSettings(
+									const driver_parameter& parameter,
+									const char* name, uint32 type,
+									BMessage& target);
+
 	virtual	status_t			ConvertToDriverSettings(const BMessage& source,
 									const char* name, int32 index,
-									uint32 type, BString& value) = 0;
+									uint32 type, BString& value);
 };
 
 

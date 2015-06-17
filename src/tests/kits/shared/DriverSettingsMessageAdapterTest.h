@@ -19,6 +19,7 @@ public:
 			void				TestMessage();
 			void				TestParent();
 			void				TestConverter();
+			void				TestWildcard();
 
 	static	void				AddTests(BTestSuite& suite);
 };

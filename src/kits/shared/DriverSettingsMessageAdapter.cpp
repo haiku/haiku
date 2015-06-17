@@ -28,6 +28,32 @@ DriverSettingsConverter::~DriverSettingsConverter()
 }
 
 
+status_t
+DriverSettingsConverter::ConvertFromDriverSettings(
+	const driver_parameter& parameter, const char* name, int32 index,
+	uint32 type, BMessage& target)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+DriverSettingsConverter::ConvertEmptyFromDriverSettings(
+	const driver_parameter& parameter, const char* name, uint32 type,
+	BMessage& target)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+DriverSettingsConverter::ConvertToDriverSettings(const BMessage& source,
+	const char* name, int32 index, uint32 type, BString& value)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
 // #pragma mark -
 
 
@@ -133,14 +159,19 @@ const settings_template*
 DriverSettingsMessageAdapter::_FindSettingsTemplate(
 	const settings_template* settingsTemplate, const char* name)
 {
-	while (settingsTemplate->name != NULL) {
-		if (!strcmp(name, settingsTemplate->name))
+	const settings_template* wildcardTemplate = NULL;
+
+	while (settingsTemplate->type != 0) {
+		if (settingsTemplate->name != NULL
+			&& !strcmp(name, settingsTemplate->name))
 			return settingsTemplate;
 
+		if (settingsTemplate->name == NULL)
+			wildcardTemplate = settingsTemplate;
 		settingsTemplate++;
 	}
 
-	return NULL;
+	return wildcardTemplate;
 }
 
 
@@ -152,7 +183,7 @@ DriverSettingsMessageAdapter::_FindParentValueTemplate(
 	if (settingsTemplate == NULL)
 		return NULL;
 
-	while (settingsTemplate->name != NULL) {
+	while (settingsTemplate->type != 0) {
 		if (settingsTemplate->parent_value)
 			return settingsTemplate;
 
@@ -167,12 +198,15 @@ status_t
 DriverSettingsMessageAdapter::_AddParameter(const driver_parameter& parameter,
 	const settings_template& settingsTemplate, BMessage& message)
 {
+	const char* name = settingsTemplate.name;
+	if (name == NULL)
+		name = parameter.name;
+
 	for (int32 i = 0; i < parameter.value_count; i++) {
 		if (settingsTemplate.converter != NULL) {
 			status_t status
 				= settingsTemplate.converter->ConvertFromDriverSettings(
-					parameter, settingsTemplate.name, i, settingsTemplate.type,
-					message);
+					parameter, name, i, settingsTemplate.type, message);
 			if (status == B_OK)
 				continue;
 			if (status != B_NOT_SUPPORTED)
@@ -183,12 +217,10 @@ DriverSettingsMessageAdapter::_AddParameter(const driver_parameter& parameter,
 
 		switch (settingsTemplate.type) {
 			case B_STRING_TYPE:
-				status = message.AddString(settingsTemplate.name,
-					parameter.values[i]);
+				status = message.AddString(name, parameter.values[i]);
 				break;
 			case B_INT32_TYPE:
-				status = message.AddInt32(settingsTemplate.name,
-					atoi(parameter.values[i]));
+				status = message.AddInt32(name, atoi(parameter.values[i]));
 				break;
 			case B_BOOL_TYPE:
 			{
@@ -197,7 +229,7 @@ DriverSettingsMessageAdapter::_AddParameter(const driver_parameter& parameter,
 					|| !strcasecmp(parameter.values[i], "yes")
 					|| !strcasecmp(parameter.values[i], "enabled")
 					|| !strcasecmp(parameter.values[i], "1");
-				status = message.AddBool(settingsTemplate.name, value);
+				status = message.AddBool(name, value);
 				break;
 			}
 			case B_MESSAGE_TYPE:
@@ -210,9 +242,18 @@ DriverSettingsMessageAdapter::_AddParameter(const driver_parameter& parameter,
 		if (status != B_OK)
 			return status;
 	}
-	if (settingsTemplate.type == B_BOOL_TYPE && parameter.value_count == 0) {
-		// Empty boolean parameters are always true
-		return message.AddBool(settingsTemplate.name, true);
+
+	if (parameter.value_count == 0) {
+		if (settingsTemplate.converter != NULL) {
+			status_t status
+				= settingsTemplate.converter->ConvertEmptyFromDriverSettings(
+					parameter, name, settingsTemplate.type, message);
+			if (status == B_NOT_SUPPORTED)
+				return B_OK;
+		} else if (settingsTemplate.type == B_BOOL_TYPE) {
+			// Empty boolean parameters are always true
+			return message.AddBool(name, true);
+		}
 	}
 
 	return B_OK;
