@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2007, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -51,6 +51,9 @@ class BRoster::Private {
 					uint32 token, bool *preRegistered, app_info *info) const
 			{ return fRoster->_IsAppRegistered(ref, team, token, preRegistered,
 					info); }
+
+		void SetWithoutRegistrar(bool noRegistrar) const
+			{ fRoster->_SetWithoutRegistrar(noRegistrar); }
 
 		status_t RemoveApp(team_id team) const
 			{ return fRoster->_RemoveApp(team); }

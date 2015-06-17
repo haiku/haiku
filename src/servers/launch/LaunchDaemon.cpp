@@ -26,6 +26,7 @@
 #include <DriverSettingsMessageAdapter.h>
 #include <LaunchDaemonDefs.h>
 #include <LaunchRosterPrivate.h>
+#include <RosterPrivate.h>
 #include <syscalls.h>
 
 #include "multiuser_utils.h"
@@ -185,6 +186,10 @@ LaunchDaemon::LaunchDaemon(bool userMode, status_t& error)
 	fMainWorker = new MainWorker(fJobQueue);
 	if (fInitTarget != NULL)
 		_AddTarget(fInitTarget);
+
+	// We may not be able to talk to the registrar
+	if (!fUserMode)
+		BRoster::Private().SetWithoutRegistrar(true);
 }
 
 

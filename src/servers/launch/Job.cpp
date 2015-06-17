@@ -9,6 +9,7 @@
 #include <Entry.h>
 #include <Looper.h>
 #include <Message.h>
+#include <Roster.h>
 
 #include "Target.h"
 
@@ -317,13 +318,10 @@ status_t
 Job::Launch()
 {
 	if (fArguments.IsEmpty()) {
-		// TODO: Launch via signature
-		// We cannot use the BRoster here as it tries to pre-register
-		// the application.
+		// Launch by signature
 		BString signature("application/");
 		signature << Name();
-		return B_NOT_SUPPORTED;
-		//return be_roster->Launch(signature.String(), (BMessage*)NULL, &fTeam);
+		return be_roster->Launch(signature.String(), (BMessage*)NULL, &fTeam);
 	}
 
 	entry_ref ref;
@@ -331,23 +329,14 @@ Job::Launch()
 	if (status != B_OK)
 		return status;
 
-	size_t count = fArguments.CountStrings();
+	size_t count = fArguments.CountStrings() - 1;
 	const char* args[count + 1];
-	for (int32 i = 0; i < fArguments.CountStrings(); i++) {
-		args[i] = fArguments.StringAt(i);
+	for (int32 i = 1; i < fArguments.CountStrings(); i++) {
+		args[i - 1] = fArguments.StringAt(i);
 	}
 	args[count] = NULL;
 
-	thread_id thread = load_image(count, args,
-		const_cast<const char**>(environ));
-	if (thread >= 0)
-		resume_thread(thread);
-
-	thread_info info;
-	if (get_thread_info(thread, &info) == B_OK)
-		fTeam = info.team;
-	return B_OK;
-//	return be_roster->Launch(&ref, count, args, &fTeam);
+	return be_roster->Launch(&ref, count, args, &fTeam);
 }
 
 

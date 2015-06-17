@@ -212,6 +212,8 @@ private:
 									const entry_ref* ref,
 									bool readyToRun) const;
 
+			void				_SetWithoutRegistrar(bool noRegistrar);
+
 			void				_InitMessenger();
 
 	static	status_t			_InitMimeMessenger(void* data);
@@ -229,7 +231,8 @@ private:
 			BMessenger			fMessenger;
 			BMessenger			fMimeMessenger;
 			int32				fMimeMessengerInitOnce;
-			uint32				_reserved[2];
+			bool				fNoRegistrar;
+			uint32				_reserved[1];
 };
 
 // global BRoster instance

@@ -554,7 +554,8 @@ BRoster::BRoster()
 	:
 	fMessenger(),
 	fMimeMessenger(),
-	fMimeMessengerInitOnce(INIT_ONCE_UNINITIALIZED)
+	fMimeMessengerInitOnce(INIT_ONCE_UNINITIALIZED),
+	fNoRegistrar(false)
 {
 	_InitMessenger();
 }
@@ -1871,7 +1872,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 		uint32 appToken = 0;
 		app_info appInfo;
 		bool isScript = wasDocument && docRef != NULL && *docRef == appRef;
-		if (!isScript) {
+		if (!isScript && !fNoRegistrar) {
 			error = _AddApplication(signature, &appRef, appFlags, -1, -1, -1,
 				false, &appToken, &team);
 			if (error == B_ALREADY_RUNNING) {
@@ -1910,7 +1911,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 
 			DBG(OUT("  load image: %s (%lx)\n", strerror(error), error));
 			// finish the registration
-			if (error == B_OK && !isScript)
+			if (error == B_OK && !isScript && !fNoRegistrar)
 				error = _SetThreadAndTeam(appToken, appThread, team);
 
 			DBG(OUT("  set thread and team: %s (%lx)\n", strerror(error),
@@ -1926,7 +1927,8 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 					kill_thread(appThread);
 
 				if (!isScript) {
-					_RemovePreRegApp(appToken);
+					if (!fNoRegistrar)
+						_RemovePreRegApp(appToken);
 
 					if (!wasDocument) {
 						// Remove app hint if it's this one
@@ -1953,7 +1955,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 	}
 
 	// send "on launch" messages
-	if (error == B_OK) {
+	if (error == B_OK && !fNoRegistrar) {
 		// If the target app is B_ARGV_ONLY, only if it is newly launched
 		// messages are sent to it (namely B_ARGV_RECEIVED and B_READY_TO_RUN).
 		// An already running B_ARGV_ONLY app won't get any messages.
@@ -2578,6 +2580,16 @@ BRoster::_SendToRunning(team_id team, int argc, const char* const* args,
 	}
 
 	return error;
+}
+
+
+/*!	Allows to use certain functionality of the BRoster class without
+	accessing the registrar.
+*/
+void
+BRoster::_SetWithoutRegistrar(bool noRegistrar)
+{
+	fNoRegistrar = noRegistrar;
 }
 
 
