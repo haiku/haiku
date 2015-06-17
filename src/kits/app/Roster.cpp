@@ -499,7 +499,7 @@ BRoster::ArgVector::Init(int argc, const char* const* args,
 {
 	// unset old values
 	Unset();
-	status_t error = (appRef ? B_OK : B_BAD_VALUE);
+	status_t error = appRef ? B_OK : B_BAD_VALUE;
 	// get app path
 	if (error == B_OK)
 		error = fAppPath.SetTo(appRef);
@@ -509,19 +509,20 @@ BRoster::ArgVector::Init(int argc, const char* const* args,
 		fArgc = 1;
 		if (argc > 0 && args) {
 			fArgc += argc;
-			if (docRef && fDocPath.SetTo(docRef) == B_OK) {
+			if (docRef != NULL && fDocPath.SetTo(docRef) == B_OK) {
 				fArgc++;
 				hasDocArg = true;
 			}
 		}
-		fArgs = new(nothrow) const char*[fArgc + 1];	// + 1 for term. NULL
+		fArgs = new(nothrow) const char*[fArgc + 1];
+			// + 1 for the terminating NULL
 		if (!fArgs)
 			error = B_NO_MEMORY;
 	}
 	// init vector
 	if (error == B_OK) {
 		fArgs[0] = fAppPath.Path();
-		if (argc > 0 && args) {
+		if (argc > 0 && args != NULL) {
 			for (int i = 0; i < argc; i++)
 				fArgs[i + 1] = args[i];
 			if (hasDocArg)
@@ -2176,7 +2177,7 @@ BRoster::_TranslateRef(entry_ref* ref, BMimeType* appMeta,
 	if (error != B_OK)
 		return error;
 
-	if ((permissions & S_IXUSR) && node.IsFile()) {
+	if ((permissions & S_IXUSR) != 0 && node.IsFile()) {
 		// node is executable and a file
 		error = appFile->SetTo(ref, B_READ_ONLY);
 		if (error != B_OK)
