@@ -269,10 +269,6 @@ struct addrinfo	*allocaddrinfo(socklen_t);
 void			freeaddrinfo(struct addrinfo *);
 const char		*gai_strerror(int);
 
-struct hostent	*gethostbyaddr_r(const char *, int, int, struct hostent *,
-					char *, int, int *);
-struct hostent	*gethostbyname_r(const char *, struct hostent *,
-					char *, int, int *);
 struct hostent	*gethostent_r(struct hostent *, char *, int, int *);
 void			sethostent_r(int);
 void			endhostent_r(void);
