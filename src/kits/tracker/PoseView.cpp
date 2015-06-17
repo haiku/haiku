@@ -346,7 +346,7 @@ BPoseView::InitCommon()
 	PinPointToValidRange(origin);
 
 	// init things related to laying out items
-	fListElemHeight = ceilf(ceilf(sFontHeight) < 20 ? 20 : sFontHeight + 4);
+	fListElemHeight = ceilf(ceilf(sFontHeight) < 20 ? 20 : sFontHeight + 2);
 	SetIconPoseHeight();
 	GetLayoutInfo(ViewMode(), &fGrid, &fOffset);
 	ResetPosePlacementHint();
