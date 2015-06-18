@@ -137,7 +137,7 @@ Header::Header(uint64 lastBlock, uint32 blockSize)
 	fHeader.SetHeaderSize(sizeof(fHeader));
 	fHeader.SetHeaderCRC(0);
 	fHeader.SetAbsoluteBlock(EFI_HEADER_LOCATION);
-	fHeader.SetAlternateBlock(0); // TODO
+	fHeader.SetAlternateBlock(lastBlock);
 	// TODO: set disk guid
 	fHeader.SetEntriesBlock(EFI_PARTITION_ENTRIES_BLOCK);
 	fHeader.SetEntryCount(EFI_PARTITION_ENTRY_COUNT);
