@@ -23,7 +23,6 @@
 #include <Server.h>
 
 #include <AppMisc.h>
-#include <DriverSettingsMessageAdapter.h>
 #include <LaunchDaemonDefs.h>
 #include <LaunchRosterPrivate.h>
 #include <RosterPrivate.h>
@@ -35,6 +34,7 @@
 #include "InitSharedMemoryDirectoryJob.h"
 #include "InitTemporaryDirectoryJob.h"
 #include "Job.h"
+#include "SettingsParser.h"
 #include "Target.h"
 #include "Worker.h"
 
@@ -45,38 +45,6 @@ using BSupportKit::BPrivate::JobQueue;
 
 
 static const char* kLaunchDirectory = "launch";
-
-
-const static settings_template kPortTemplate[] = {
-	{B_STRING_TYPE, "name", NULL, true},
-	{B_INT32_TYPE, "capacity", NULL},
-};
-
-const static settings_template kJobTemplate[] = {
-	{B_STRING_TYPE, "name", NULL, true},
-	{B_BOOL_TYPE, "disabled", NULL},
-	{B_STRING_TYPE, "launch", NULL},
-	{B_STRING_TYPE, "requires", NULL},
-	{B_BOOL_TYPE, "legacy", NULL},
-	{B_MESSAGE_TYPE, "port", kPortTemplate},
-	{B_BOOL_TYPE, "no_safemode", NULL},
-	{0, NULL, NULL}
-};
-
-const static settings_template kTargetTemplate[] = {
-	{B_STRING_TYPE, "name", NULL, true},
-	{B_BOOL_TYPE, "reset", NULL},
-	{B_MESSAGE_TYPE, "job", kJobTemplate},
-	{B_MESSAGE_TYPE, "service", kJobTemplate},
-	{0, NULL, NULL}
-};
-
-const static settings_template kSettingsTemplate[] = {
-	{B_MESSAGE_TYPE, "target", kTargetTemplate},
-	{B_MESSAGE_TYPE, "job", kJobTemplate},
-	{B_MESSAGE_TYPE, "service", kJobTemplate},
-	{0, NULL, NULL}
-};
 
 
 class Session {
@@ -462,16 +430,14 @@ LaunchDaemon::_ReadDirectory(const char* context, BEntry& directoryEntry)
 status_t
 LaunchDaemon::_ReadFile(const char* context, BEntry& entry)
 {
-	DriverSettingsMessageAdapter adapter;
-
 	BPath path;
 	status_t status = path.SetTo(&entry);
 	if (status != B_OK)
 		return status;
 
+	SettingsParser parser;
 	BMessage message;
-	status = adapter.ConvertFromDriverSettings(path.Path(), kSettingsTemplate,
-			message);
+	status = parser.ParseFile(path.Path(), message);
 	if (status == B_OK) {
 		_AddJobs(NULL, message);
 

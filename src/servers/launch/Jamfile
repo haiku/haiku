@@ -9,6 +9,7 @@ Server launch_daemon
 	:
 	LaunchDaemon.cpp
 	Job.cpp
+	SettingsParser.cpp
 	Target.cpp
 	Worker.cpp
 
