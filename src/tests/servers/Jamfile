@@ -3,4 +3,5 @@ SubDir HAIKU_TOP src tests servers ;
 SubInclude HAIKU_TOP src tests servers app ;
 SubInclude HAIKU_TOP src tests servers debug ;
 SubInclude HAIKU_TOP src tests servers input ;
+SubInclude HAIKU_TOP src tests servers launch ;
 SubInclude HAIKU_TOP src tests servers registrar ;

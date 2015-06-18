@@ -9,6 +9,65 @@
 #include <DriverSettingsMessageAdapter.h>
 
 
+class ConditionConverter : public DriverSettingsConverter {
+public:
+	status_t ConvertFromDriverSettings(const driver_parameter& parameter,
+		const char* name, int32 index, uint32 type, BMessage& target)
+	{
+		BMessage message;
+		if (strcmp(parameter.name, "if") == 0) {
+			// Parse values directly following "if", with special
+			// handling for the "not" operator.
+			if (index != 0)
+				return B_OK;
+
+			BMessage* add = &target;
+			bool not = parameter.value_count > 1
+				&& strcmp(parameter.values[0], "not") == 0;
+			if (not) {
+				add = &message;
+				index++;
+			}
+			const char* condition = parameter.values[index];
+			BMessage args;
+			for (index++; index < parameter.value_count; index++) {
+				status_t status = args.AddString("args",
+					parameter.values[index]);
+				if (status != B_OK)
+					return status;
+			}
+			status_t status = add->AddMessage(condition, &args);
+			if (status == B_OK && not)
+				status = target.AddMessage("not", &message);
+
+			return status;
+		}
+
+		message.AddString("args", parameter.values[index]);
+		return target.AddMessage(parameter.name, &message);
+	}
+
+	status_t ConvertEmptyFromDriverSettings(
+		const driver_parameter& parameter, const char* name, uint32 type,
+		BMessage& target)
+	{
+		if (parameter.parameter_count != 0)
+			return B_OK;
+
+		BMessage message;
+		return target.AddMessage(name, &message);
+	}
+};
+
+
+const static settings_template kConditionTemplate[] = {
+	{B_STRING_TYPE, NULL, NULL, true, new ConditionConverter()},
+	{B_MESSAGE_TYPE, "not", kConditionTemplate},
+	{B_MESSAGE_TYPE, "and", kConditionTemplate},
+	{B_MESSAGE_TYPE, "or", kConditionTemplate},
+	{0, NULL, NULL}
+};
+
 const static settings_template kPortTemplate[] = {
 	{B_STRING_TYPE, "name", NULL, true},
 	{B_INT32_TYPE, "capacity", NULL},
@@ -21,15 +80,8 @@ const static settings_template kJobTemplate[] = {
 	{B_STRING_TYPE, "requires", NULL},
 	{B_BOOL_TYPE, "legacy", NULL},
 	{B_MESSAGE_TYPE, "port", kPortTemplate},
+	{B_MESSAGE_TYPE, "if", kConditionTemplate},
 	{B_BOOL_TYPE, "no_safemode", NULL},
-	{0, NULL, NULL}
-};
-
-const static settings_template kConditionTemplate[] = {
-	{B_STRING_TYPE, NULL, NULL, true},
-	{B_MESSAGE_TYPE, "not", kConditionTemplate},
-	{B_MESSAGE_TYPE, "and", kConditionTemplate},
-	{B_MESSAGE_TYPE, "or", kConditionTemplate},
 	{0, NULL, NULL}
 };
 
@@ -61,3 +113,25 @@ SettingsParser::ParseFile(const char* path, BMessage& settings)
 	DriverSettingsMessageAdapter adapter;
 	return adapter.ConvertFromDriverSettings(path, kSettingsTemplate, settings);
 }
+
+
+#ifdef TEST_HAIKU
+
+
+status_t
+SettingsParser::Parse(const char* text, BMessage& settings)
+{
+	void* driverSettings = parse_driver_settings_string(text);
+	if (driverSettings == NULL)
+		return B_BAD_VALUE;
+
+	DriverSettingsMessageAdapter adapter;
+	status_t status = adapter.ConvertFromDriverSettings(
+		*get_driver_settings(driverSettings), kSettingsTemplate, settings);
+
+	delete_driver_settings(driverSettings);
+	return status;
+}
+
+
+#endif	// TEST_HAIKU

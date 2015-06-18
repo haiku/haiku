@@ -325,55 +325,6 @@ DriverSettingsMessageAdapterTest::TestWildcard()
 	CPPUNIT_ASSERT_EQUAL(BString("works"),
 		BString(subMessage.GetString("still", "-")));
 	CPPUNIT_ASSERT_EQUAL(1, subMessage.CountNames(B_ANY_TYPE));
-
-	class WildcardConverter : public DriverSettingsConverter {
-	public:
-		status_t ConvertFromDriverSettings(const driver_parameter& parameter,
-			const char* name, int32 index, uint32 type, BMessage& target)
-		{
-			BMessage message;
-			message.AddString("args", parameter.values[index]);
-			return target.AddMessage(parameter.name, &message);
-		}
-
-		status_t ConvertEmptyFromDriverSettings(
-			const driver_parameter& parameter, const char* name, uint32 type,
-			BMessage& target)
-		{
-			if (parameter.parameter_count != 0)
-				return B_OK;
-
-			BMessage message;
-			return target.AddMessage(name, &message);
-		}
-	} converter;
-
-	const settings_template kSubTemplateC[] = {
-		{B_STRING_TYPE, NULL, NULL, true, &converter},
-		{}
-	};
-	const settings_template kTemplateC[] = {
-		{B_MESSAGE_TYPE, "if", kSubTemplateC},
-		{}
-	};
-
-	Settings settingsD("if {\n"
-		"\tsafemode\n"
-		"\tfile_exists one\n"
-		"}\n");
-	CPPUNIT_ASSERT_EQUAL(B_OK, settingsD.ToMessage(kTemplateC, message));
-	CPPUNIT_ASSERT_EQUAL(1, message.CountNames(B_ANY_TYPE));
-	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("if", &subMessage));
-	CPPUNIT_ASSERT_EQUAL(2, subMessage.CountNames(B_ANY_TYPE));
-	BMessage subSubMessage;
-	CPPUNIT_ASSERT_EQUAL(B_OK, subMessage.FindMessage("safemode",
-		&subSubMessage));
-	CPPUNIT_ASSERT(subSubMessage.IsEmpty());
-	CPPUNIT_ASSERT_EQUAL(B_OK, subMessage.FindMessage("file_exists",
-		&subSubMessage));
-	CPPUNIT_ASSERT_EQUAL(BString("one"),
-		BString(subSubMessage.GetString("args", 0, "-")));
-	CPPUNIT_ASSERT_EQUAL(1, subSubMessage.CountNames(B_ANY_TYPE));
 }
 
 

@@ -14,6 +14,10 @@ public:
 								SettingsParser();
 
 			status_t			ParseFile(const char* path, BMessage& settings);
+
+#ifdef TEST_HAIKU
+			status_t			Parse(const char* text, BMessage& settings);
+#endif
 };
 
 
