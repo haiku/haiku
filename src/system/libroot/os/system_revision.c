@@ -7,7 +7,7 @@
 #include <system_revision.h>
 
 
-// Haiku SVN revision. Will be set when copying libroot.so to the image.
+// Haiku revision (hrev). Will be set when copying libroot.so to the image.
 // Lives in a separate section so that it can easily be found.
 static char sHaikuRevision[SYSTEM_REVISION_LENGTH]
 	__attribute__((section("_haiku_revision")));

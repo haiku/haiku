@@ -2,7 +2,7 @@
 # ----------------------
 
 # UserBuildConfig can be used to customize the build according to your needs.
-# If existent it is included by the build system, but it is ignored by svn.
+# If existent it is included by the build system, but it is ignored by Git.
 # This file documents a few examples, what can be done. Don't just rename it
 # to UserBuildConfig -- you don't want all the things to happen, that are
 # specified here. Rather create an empty UserBuildConfig and copy the lines
@@ -125,7 +125,7 @@ AddSourceDirectoryToHaikuImage src/tests/servers/debug : alwaysUpdate ;
 
 # Copy the jam sources (assuming they are located ../buildtools/jam relatively
 # to your Haiku sources) to the image as /boot/home/Desktop/jam-src, excluding
-# any file or directory named ".svn" and any source path that matches the
+# any file or directory named ".git" and any source path that matches the
 # pattern "*/jam/./bin.*". Note that the "*" character needs to be escaped with
 # two backslashes (one because it goes through a shell and one to quote the
 # first one in jam), and that the build system always appends "/." to the source
@@ -134,7 +134,7 @@ AddSourceDirectoryToHaikuImage src/tests/servers/debug : alwaysUpdate ;
 # also be copied in update mode.
 CopyDirectoryToHaikuImage home Desktop
 	: $(HAIKU_TOP)/../buildtools/jam
-	: "jam-src" : -x .svn -X \\*/jam/./bin.\\* ;
+	: "jam-src" : -x .git -X \\*/jam/./bin.\\* ;
 
 # Extracts the given archive onto the image under /boot/develop/tools.
 ExtractArchiveToHaikuImage develop tools
