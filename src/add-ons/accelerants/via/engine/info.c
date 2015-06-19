@@ -19,7 +19,7 @@ static void pinsnv30_arch_fake(void);
 static void getRAMsize(void);
 static void getstrap_arch_nv4(void);
 static void getstrap_arch_nv10_20_30_40(void);
-static status_t	eng_crtc_setup_fifo(void);
+static status_t eng_crtc_setup_fifo(void);
 
 /* Parse the BIOS PINS structure if there */
 status_t parse_pins ()
@@ -249,7 +249,7 @@ static void detect_panels()
 	 * -> On all cards a CRTC is used in slaved mode when a panel is connected,
 	 *    except on NV11: here master mode is (might be?) detected. */
 	/* note also:
-	 * external TMDS encoders are only used for logic-level translation: it's 
+	 * external TMDS encoders are only used for logic-level translation: it's
 	 * modeline registers are not used. Instead the GPU's internal modeline registers
 	 * are used. The external encoder is not connected to a I2C bus (confirmed NV34). */
 	if (slaved_for_dev1 && !tvout1)
@@ -947,7 +947,7 @@ static void getRAMsize(void)
 			LOG(8,("INFO: unable to detect RAMsize (read $%02x), assuming 16Mb\n"));
 			si->ps.memory_size = 16 * 1024 * 1024;
 		}
-	}	
+	}
 }
 
 static void getstrap_arch_nv4(void)

@@ -5,6 +5,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 UsePrivateHeaders graphics ;
 UsePrivateHeaders [ FDirName graphics via ] ;
 
+SubDirCcFlags -Wno-unused ;
+
 StaticLibrary libvia_engine.a :
 	acc.c
 	bes.c
