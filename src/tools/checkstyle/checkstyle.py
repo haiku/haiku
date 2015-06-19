@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 #
 # Copyright 2009, Alexandre Deckner, alex@zappotek.com
 # Distributed under the terms of the MIT License.
