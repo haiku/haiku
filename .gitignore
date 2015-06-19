@@ -2,9 +2,13 @@ generated*
 build/jam/UserBuildConfig
 build/user_config_headers
 
-# ignore KDE backup files ending with a ~ 
+# ignore KDE backup files ending with a ~
 *~
 # Vim swp files
 .*.swp
 
 conf.sh
+
+# compiled/optimized Python
+*.pyc
+*.pyo
