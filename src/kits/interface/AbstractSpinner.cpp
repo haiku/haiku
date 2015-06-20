@@ -349,13 +349,15 @@ SpinnerButton::Draw(BRect updateRect)
 
 	BView::Draw(updateRect);
 
+	float frameTint = B_DARKEN_1_TINT;
+
 	float fgTint;
 	if (!fIsEnabled)
 		fgTint = B_DARKEN_1_TINT;
 	else if (fIsMouseDown)
 		fgTint = B_DARKEN_MAX_TINT;
 	else
-		fgTint = B_DARKEN_3_TINT;
+		fgTint = 1.777f;	// 216 --> 48.2 (48)
 
 	float bgTint;
 	if (fIsEnabled && fIsMouseOver)
@@ -366,6 +368,7 @@ SpinnerButton::Draw(BRect updateRect)
 	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 	if (bgColor.red + bgColor.green + bgColor.blue <= 128 * 3) {
 		// if dark background make the tint lighter
+		frameTint = 2.0f - frameTint;
 		fgTint = 2.0f - fgTint;
 		bgTint = 2.0f - bgTint;
 	}
@@ -380,7 +383,7 @@ SpinnerButton::Draw(BRect updateRect)
 
 	// draw the button
 	be_control_look->DrawButtonFrame(this, rect, updateRect,
-		tint_color(bgColor, fgTint), bgColor, 0, borders);
+		tint_color(bgColor, frameTint), bgColor, 0, borders);
 	be_control_look->DrawButtonBackground(this, rect, updateRect,
 		tint_color(bgColor, bgTint), 0, borders);
 
