@@ -60,7 +60,7 @@ setprotoent_r(int f, struct protoent_data *pd)
 {
 	if (pd->fp == NULL) {
 		char buffer[256];
-		find_directory(B_SYSTEM_SETTINGS_DIRECTORY, 0, false, buffer, sizeof(buffer));
+		find_directory(B_SYSTEM_DATA_DIRECTORY, 0, false, buffer, sizeof(buffer));
 		strlcat(buffer, "/network/protocols", sizeof(buffer));
 
 		pd->fp = fopen(buffer, "re");

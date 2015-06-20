@@ -253,6 +253,11 @@ CopyDirectoryToPackage data
 	: [ FDirName $(HAIKU_TOP) data system data licenses ]
 	: licenses ;
 
+# netresolv support files
+CopyDirectoryToPackage data
+	: [ FDirName $(HAIKU_TOP) data system data network ]
+	: network ;
+
 # Copy documentation as per DiskUsage's license requirement.
 CopyDirectoryToPackage documentation
 	: [ FDirName $(HAIKU_TOP) docs apps diskusage ]

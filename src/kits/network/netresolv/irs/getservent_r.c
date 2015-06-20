@@ -84,7 +84,7 @@ _servent_open(struct servent_data *sd)
 	}
 #endif
 
-	find_directory(B_SYSTEM_SETTINGS_DIRECTORY, 0, false, buffer, sizeof(buffer));
+	find_directory(B_SYSTEM_DATA_DIRECTORY, 0, false, buffer, sizeof(buffer));
 	strlcat(buffer, "/network/ports", sizeof(buffer));
 
 	sd->plainfile = fopen(buffer, "re");
