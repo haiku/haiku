@@ -25,7 +25,7 @@ Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Uruchom ponownie
 Large	PreferencesWindow		Duże
 Auto-raise	PreferencesWindow		Autoaktywacja
-Recent folders:	PreferencesWindow		Ostatnio przeglądane foldery:
+Recent folders:	PreferencesWindow		Ostatnio przeglądane katalogi:
 Show application expander	PreferencesWindow		Aplikacje jako lista rozwijalna
 Restart Tracker	DeskbarMenu		Uruchom ponownie Trackera
 Close all	WindowMenu		Zamknij wszystkie
@@ -37,7 +37,7 @@ Recent applications:	PreferencesWindow		Ostatnio uruchamiane aplikacje:
 Shutdown…	DeskbarMenu		Wyłącz komputer…
 Tracker always first	PreferencesWindow		Tracker zawsze na początku
 Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Ustawienia
-Recent folders	DeskbarMenu		Ostatnio przeglądane foldery
+Recent folders	DeskbarMenu		Ostatnio przeglądane katalogi
 About this system	DeskbarMenu		Informacje o systemie
 Show calendar…	TimeView		Pokaż kalendarz…
 Deskbar preferences…	DeskbarMenu		Ustawienia Deskbara…

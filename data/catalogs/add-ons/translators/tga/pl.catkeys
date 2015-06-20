@@ -1,4 +1,5 @@
-1	polish	x-vnd.Haiku-TGATranslator	3952259621
+1	polish	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		Zapisz używając kompresji RLE
 Targa image (%d bits truecolor)	TGATranslator		Obraz Targa (%d-bitowy True Color)
 Ignore TGA alpha channel	TGAView		Ignoruj kanał alpha TGA
 Targa image (%d bits colormap)	TGATranslator		Obraz Targa (%d-bitowa mapa kolorów)

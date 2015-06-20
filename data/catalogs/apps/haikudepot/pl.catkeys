@@ -78,7 +78,7 @@ An error occurred while refreshing the repository: %error% (%details%)	MainWindo
 It was not possible to contact the web service.	RatePackageWindow		Nie udało się połączyć z usługą sieciową.
 Only featured packages	MainWindow		Tylko pakiety polecane
 There are problems in the form:\n\n	UserLoginWindow		W formularzu występują problemy:\n\n
-The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Usługa sieciowa nie odnalazła pakietu. To prawdopodobnie oznacza, że pochodzi z repozytorium, które nie jest tutaj obsługiwane. Ocenianie takich pakietów jest niestety niewspierane.
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Usługa sieciowa nie odnalazła pakietu. To prawdopodobnie oznacza, że pochodzi z repozytorium, które nie jest tutaj obsługiwane. Ocenianie takich pakietów jest niestety nieobsługiwane.
 Create account	UserLoginWindow		Utwórz konto
 Productivity	Model		Programy użytkowe
 No, quit HaikuDepot	App		Nie, zakończ HaikuDepot

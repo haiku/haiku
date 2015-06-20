@@ -1,6 +1,6 @@
 1	polish	x-vnd.Haiku-MediaConverter	341686525
 Video using parameters form settings	MediaConverter		Wideo używa parametrów z ustawień
-{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Plik nie został rozpoznany jako wspierany plik mediów:} few{# pliki nie zostały rozpoznane jako wspierane pliki mediów:} many{# plików nie zostało rozpoznanych jako wspierane pliki mediów:} other{# pliku nie zostało rozpoznane jako wspierany plik mediów:}}
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Plik nie został rozpoznany jako obsługiwany plik mediów:} few{# pliki nie zostały rozpoznane jako obsługiwane pliki mediów:} many{# plików nie zostało rozpoznanych jako obsługiwane pliki mediów:} other{# pliku nie zostało rozpoznane jako obsługiwany plik mediów:}}
 Video encoding:	MediaConverter		Kodowanie wideo:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error read audio frame %lld	MediaConverter		Błąd odczytu ramki audio %lld

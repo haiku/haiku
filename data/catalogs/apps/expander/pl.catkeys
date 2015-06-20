@@ -36,7 +36,7 @@ Leave destination folder path empty	ExpanderPreferences		Pozostaw katalog docelo
 Failed to create the destination folder.	ExpanderWindow		Nie udało się utworzyć katalogu docelowego.
 Select '%s'…	DirectoryFilePanel		Wybierz „%s”…
 Create	ExpanderWindow		Utwórz
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Katalog został przeniesiony, przemianowany\nalbo nie jest wspierany.
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Katalog został przeniesiony, przemianowany\nalbo nie jest obsługiwany.
 The file doesn't exist	ExpanderWindow		Plik nie istnieje
 Stop	ExpanderMenu		Zatrzymaj
 File	ExpanderMenu		Plik

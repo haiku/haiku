@@ -22,14 +22,14 @@ Install %name%	PackageView		Instaluj %name%
 Stop	PackageStatus		Zatrzymaj
 Other…	PackageView		Inne…
 No installation type selected	PackageView		Sposób instalacji nie został wybrany
-Installing files and folders	PackageInstall		Instalowanie plików i folderów
+Installing files and folders	PackageInstall		Instalowanie plików i katalogów
 Package installer	PackageView		Instalator pakietów
 Skip all	PackageView		Pomiń wszystkie
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Element o nazwie „%s” już istnieje w podanej ścieżce.\nZastąpić element tym z pakietu czy pominąć?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Skrypt o nazwie „%s” już istnieje w podanej ścieżce.\nZastąpić skrypt tym z pakietu czy pominąć?
 Running post-installation scripts	PackageInstall		Uruchamianie poinstalacyjnych skryptów
 Skip	PackageView		Pomiń
-The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Katalog o nazwie „%s” już istnieje w podanej ścieżce.\nZastąpić katalog tym z pakietu czy pominąć?
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Katalog o nazwie „%s” już istnieje pod danym adresem.\nZastąpić katalog tym z pakietu czy pominąć?
 The package you requested has been successfully installed on your system.	PackageView		Żądany pakiet został poprawnie zainstalowany w systemie.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Błąd! „%s” niepoprawna ścieżka.\n
 Installation type:	PackageView		Typ instalacji:

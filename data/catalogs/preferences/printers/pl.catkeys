@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-PRNT	200447094
+1	polish	x-vnd.Be-PRNT	2163275033
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Drukarka: %printer_name%\nSterownik:  %driver%\n
 Waiting	JobListView		Oczekuję
 Print test page	PrintersWindow		Wydrukuj stronę testową
@@ -9,6 +9,7 @@ Cancel	AddPrinterDialog		Anuluj
 Add printer	AddPrinterDialog		Dodaj drukarkę
 Green	TestPageView		Zielony
 Printers	PrintersWindow		Drukarki
+Add…	PrintersWindow		Dodaj…
 Default Printer	PrinterListView		Domyślna drukarka
 Transport: %transport% %transport_address%	PrinterListView		Podsystem transportu: %transport%, adres: %transport_address%
 No pending jobs.	PrinterListView		Brak oczekujących zadań.

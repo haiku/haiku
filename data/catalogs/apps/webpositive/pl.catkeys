@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	98059607
+1	polish	x-vnd.Haiku-WebPositive	3678460971
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -48,6 +48,7 @@ Restart	Download Window		Uruchom ponownie
 Proxy server	Settings Window		Serwer proxy
 Open containing folder	Download Window		Otwórz katalog zawierający
 New window	WebPositive Window		Nowe okno
+WebPositive	Download Window		WebPositive
 Open	Download Window		Otwórz
 Reload	WebPositive Window		Odśwież
 Downloads	Download Window		Pobierane
@@ -59,7 +60,7 @@ Fixed font:	Settings Window		Font o stałej szerokości:
 Cut	WebPositive Window		Wytnij
 Bookmark this page	WebPositive Window		Dodaj zakładkę
 There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	Wystąpił błąd podczas próby pokazania katalogu zakładek.\n\nBłąd: %error
-Open downloads folder	Download Window		Otwórz folder pobierania
+Open downloads folder	Download Window		Otwórz katalog pobierania
 Proxy password:	Settings Window		Hasło serwera proxy:
 Number of days to keep links in History menu:	Settings Window		Liczba dni przechowywania odnośników w historii:
 Hide	Download Window		Ukryj
@@ -80,7 +81,7 @@ Fonts	Settings Window		Fonty
 OK	Download Window		OK
 Page source error	WebPositive Window		Błąd strony źródłowej
 Open blank page	Settings Window		Otwórz pustą stronę
-New tabs:	Settings Window		Nowa karta:
+New tabs:	Settings Window		Nowe karty:
 Cancel	WebPositive Window		Anuluj
 Open all	WebPositive Window		Otwórz wszystko
 Proxy server requires authentication	Settings Window		Serwer proxy wymaga uwierzytelnienia

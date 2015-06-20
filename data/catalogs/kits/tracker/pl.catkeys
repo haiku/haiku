@@ -190,7 +190,7 @@ Replace all	FSUtils		Zastąp wszystko
 Preparing to restore items…	StatusWindow		Przygotowanie do odzyskania elementów…
 Replace other file	WidgetAttributeText		Zastąp pozostałe pliki
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Część zaznaczonych plików nie może zostać przeniesiona do kosza. Czy chcesz je usunąć zamiast tego? (Ta operacja nie może zostać cofnięta)
-You cannot create a link to the root directory.	FSUtils		Nie możesz utworzyć skrótu go głównego folderu.
+You cannot create a link to the root directory.	FSUtils		Nie możesz utworzyć skrótu do katalogu głównego.
 48 x 48	ContainerWindow		48 x 48
 Could not find application \"%appname\"	OpenWithWindow		Nie można odnaleźć aplikacji „%appname”
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Zaznaczony plik nie może zostać przeniesiony do kosza. Czy chcesz go usunąć zamiast tego? (Ta operacja nie może zostać cofnięta)
@@ -255,7 +255,7 @@ Reverse order	ContainerWindow		Odwrócony porządek
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		Dodaj obecny folder
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nie można otworzyć „%document” przy użyciu aplikacji „%app” (Brakujący symbol: %symbol). \n
-The target disk does not support creating links.	FSUtils		Dysk docelowy nie obługuje fukcji tworzenia skrótów.
+The target disk does not support creating links.	FSUtils		Dysk docelowy nie obsługuje fukcji tworzenia skrótów.
 starts with	SelectionWindow		Zaczyna się od
 Preparing to delete items…	StatusWindow		Przygotowywanie do usunięcia…
 Enable type-ahead filtering	SettingsView		Włącz przedwczesne filtrowanie
@@ -328,7 +328,7 @@ Handles any file	OpenWithWindow		Wspiera każdy plik
 Get info	FilePanelPriv		Pokaż informacje
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		Anuluj
-The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Typ dokumentu, którego zamierzasz otworzyć programem „%appname”, nie jest przez niego obsługiwany.\nCzy jesteś pewien, że chcesz to zrobić?\n\nJeśli jesteś pewien, że program wspiera taki typ dokumentu, powinieneś skontaktować się z wydawcą programu i poprosić, żeby zaktualizowano listę wspieranych typów dokumentów.
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Typ dokumentu, którego zamierzasz otworzyć programem „%appname”, nie jest przez niego obsługiwany.\nCzy jesteś pewien, że chcesz to zrobić?\n\nJeśli jesteś pewien, że program obsługuje taki typ dokumentu, powinieneś skontaktować się z wydawcą programu i poprosić go, aby zaktualizował listę obsługiwanych typów dokumentów.
 Disks	DirMenu		Dyski
 New folder %ld	FSUtils		Nowy folder %ld
 All BeOS disks	AutoMounterSettings		Wszystkie dyski BeOS

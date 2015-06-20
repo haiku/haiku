@@ -1,7 +1,7 @@
-1	polish	x-vnd.Haiku-Terminal	2090807552
+1	polish	x-vnd.Haiku-Terminal	2696855708
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz terminal
-Change directory	Terminal TermView		Zmień folder
+Change directory	Terminal TermView		Zmień katalog
 Cursor	Terminal AppearancePrefView		Kursor
 Professional	Terminal colors scheme		Profesjonalny
 OK	Terminal TermWindow		OK
@@ -33,7 +33,7 @@ Increase	Terminal TermWindow		Powiększ
 Settings	Terminal TermWindow		Ustawienia
 Window size	Terminal TermWindow		Rozmiar okna
 Selected text	Terminal AppearancePrefView		Zaznaczony tekst
-\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t–\tAktualny katalog roboczy bieżącego procesu na aktywnej\n\t\t\tkarcie. Opcjonalnie może zostać podana maksymalna liczba\n\t\t\telementów ścieżki. Np. „%2d” dla najwyżej dwóch elementów.\n\t%T\t–\tZlokalizowana nazwa aplikacji Terminal.\n\t%e\t–\tKodowanie aktywnej karty. Niewidoczne dla UTF-8.\n\t%i\t–\tIndeks okna.\n\t%t\t–\tTytuł aktywnej karty.
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t–\tAktualny katalog roboczy bieżącego procesu na aktywnej\n\t\t\tkarcie. Opcjonalnie może zostać podana maksymalna liczba\n\t\t\telementów ścieżki. Np. „%2d” dla maksymalnie dwóch elementów.\n\t%T\t–\tZlokalizowana nazwa aplikacji Terminal.\n\t%e\t–\tKodowanie aktywnej karty. Niewidoczne dla UTF-8.\n\t%i\t–\tIndeks okna.\n\t%t\t–\tTytuł aktywnej karty.
 Find	Terminal FindWindow		Znajdź
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Szablon określający tytuły okien. Znaczenie poszczególnych symboli jest następujące:
 Appearance	Terminal PrefWindow		Wygląd
@@ -41,7 +41,7 @@ Tab title:	Terminal AppearancePrefView		Tytuł karty:
 OK	Terminal SetTitleWindow		OK
 Background	Terminal AppearancePrefView		Tło
 Use selection	Terminal FindWindow		Użyj zaznaczenia
-The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces „%1” jest wciąż w użyciu.\nJeśli zamkniesz kartę, proces zostanie zatrzymany.
+The process \"%1\" is still running.\nIf you close the tab, the process will be killed.	Terminal TermWindow		Proces „%1” jest wciąż w użyciu.\nJeśli zamkniesz tę kartę, proces zostanie zatrzymany.
 Cannot execute \"%command\":\n\t%error	Terminal Shell		Nie można wykonać „%command”:\n\t%error
   -h,     --help               print this help\n  -t,     --title              set window title\n  -f,     --fullscreen         start fullscreen\n	Terminal TermApp		  -h,     --help               wyświetlenie tego tekstu pomocy\n  -t,     --title              zmiana tytułu okna\n  -f,     --fullscreen         tryb pełnoekranowy\n
 Window title…	Terminal TermWindow		Tytuł okna…
@@ -78,7 +78,7 @@ Midnight	Terminal colors scheme		O północy
 Decrease	Terminal TermWindow		Zmniejsz
 Default	Terminal colors scheme		Domyślny
 Create link here	Terminal TermView		Utwórz link tutaj
-The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Szablon określający tytuły zakładek. Następujące symbole mogą\nzostać użyte:
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Szablon określający tytuły kart. Następujące symbole mogą\nzostać użyte:
 Close	Terminal TermWindow		Zamknij
 Text	Terminal AppearancePrefView		Tekst
 Clear all	Terminal TermWindow		Wyczyść wszystko
@@ -99,15 +99,16 @@ Cancel	Terminal TermWindow		Anuluj
 OK	Terminal TermApp		OK
 Find failed	Terminal TermWindow		Nie znaleziono
 Search forward	Terminal FindWindow		Szukaj dalej
-Edit tab title…	Terminal TermWindow		Edytuj nazwę karty…
+Edit tab title…	Terminal TermWindow		Edytuj tytuł karty…
 Open path	Terminal TermView		Otwórz ścieżkę
-\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktualny katalog roboczy aktywnego procesu.\n\t\t\tOpcjonalnie może być ustalona określona liczba elementów\n\t\t\tścieżki. Np. „%2d” dla maksymalnie dwóch elementów.\n\t%i\t-\tIndeks karty.\n\t%e\t-\tKodowanie karty. W przypadku UTF-8 niewyświetlane.\n\t%p\t-\tNazwa aktywnego procesu.\n\t%%\t-\t„%”.
+\t%d\t-\tThe current working directory of the active process.\n\t\t\tOptionally the maximum number of path components can be\n\t\t\tspecified. E.g. '%2d' for at most two components.\n\t%i\t-\tThe index of the tab.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%p\t-\tThe name of the active process.\n\t%%\t-\tThe character '%'.	Terminal ToolTips		\t%d\t-\tAktualny katalog roboczy aktywnego procesu.\n\t\t\tOpcjonalnie może może zostać podana maksymalna liczba\n\t\t\telementów ścieżki. Np. „%2d” dla maksymalnie dwóch elementów.\n\t%i\t-\tIndeks karty.\n\t%e\t-\tKodowanie karty. W przypadku UTF-8 niewyświetlane.\n\t%p\t-\tNazwa aktywnego procesu.\n\t%%\t-\t„%”.
 Find previous	Terminal TermWindow		Znajdź poprzedni
 Copy link location	Terminal TermView		Kopiuj adres odnośnika
 Tab title:	Terminal TermWindow		Tytuł karty:
 Find next	Terminal TermWindow		Znajdź następny
 Close active tab	Terminal TermWindow		Zamknij aktywną kartę
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t–\tZnak „%”.\n\t%<\t–\tRozpoczyna sekcję, która będzie pokazana tylko jeśli znacznik\n\t\t\tnastępujący nie będzie pusty.\n\t%>\t–\tRozpoczyna sekcję, która będzie pokazana tylko jeśli znacznik\n\t\t\tpomiędzy poprzednią sekcją %< a obecną nie będzie pusty.\n\t%-\t–\tKończy powyższe sekcje.\n\nKażdy znak niebędący alfanumerycznym, znajdujący się pomiędzy „%” a literą\nformatującą wstawi spację, tylko jeśli znacznik nie jest pusty. Zostanie\nona dodana do sekcji %<.
 Paste	Terminal TermWindow		Wklej
-Shell 	Terminal TermWindow		Shell 
+Shell 	Terminal TermWindow		Powłoka
 Cancel	Terminal TermView		Anuluj
 Use default	Terminal SetTitleWindow		Użyj domyślnych

@@ -13,8 +13,8 @@ Copy text to clipboard	GrepWindow		Kopiuj tekst do schowka
 Settings	GrepWindow		Ustawienia
 Select all	GrepWindow		Zaznacz wszystko
 OK	GrepWindow		OK
-Skip folders starting with a dot	GrepWindow		Pomiń foldery zaczynające się od kropki
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME nie mógł otworzyć jednego lub więcej folderów.
+Skip folders starting with a dot	GrepWindow		Pomiń katalogi zaczynające się od kropki
+%APP_NAME couldn't open one or more folders.	GrepWindow		Aplikcaja %APP_NAME nie mogła otworzyć jednego lub więcej katalogów.
 Escape search text	GrepWindow		Wyszukiwanie znaków wyjścia
 Search	GrepWindow		Szukaj
 Open selection	GrepWindow		Otwarte zaznaczenie

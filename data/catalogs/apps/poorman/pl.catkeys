@@ -5,7 +5,7 @@ Settings…	PoorMan		Ustawienia…
 Create PoorMan log	PoorMan		Utwórz log programu PoorMan
 Shutting down.\n	PoorMan		Wyłączanie.\n
 Hits: %lu	PoorMan		Odsłon: %lu
-Web folder:	PoorMan		Folder WWW:
+Web folder:	PoorMan		Katalog WWW:
 Save log console selection	PoorMan		Zapisz wybrany fragment logu konsoli
 Run server	PoorMan		Uruchom serwer
 PoorMan settings	PoorMan		Ustawienia programu PoorMan
@@ -31,7 +31,7 @@ Save log console	PoorMan		Zapisz log konsoli
 Edit	PoorMan		Edycja
 Create Log File	PoorMan		Utwórz plik log
 Log to console	PoorMan		Loguj do konsoli
-Directory: (none)	PoorMan		Folder: (brak)
+Directory: (none)	PoorMan		Katalog: (brak)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Proszę wybrać katalog do opublikowania w sieci.\n\nMożesz pozwolić programowi PoorMan utworzyć katalog „public_html”\nw katalogu domowym lub wybrać swój własny.
 Log To Console	PoorMan		Loguj do konsoli
 {0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# połączenie} few{# połączenia} many{# połączeń} other{# połączenia}}
@@ -45,10 +45,10 @@ File	PoorMan		Plik
 File Logging	PoorMan		Logowanie do pliku
 Save console selections as…	PoorMan		Zapisz wybrany fragment logu konsoli jako…
 File logging	PoorMan		Logowanie do pliku
-Select web folder	PoorMan		Wybierz folder WWW
+Select web folder	PoorMan		Wybierz katalog WWW
 Logging view	PoorMan		Widok logowania
 Logging	PoorMan		Logowanie
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Domyślny folder WWW („/boot/home/public_html”) został utworzony.\nUpewnij się, że jest w nim plik HTML o nazwie „index.html”.
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Domyślny katalog WWW („/boot/home/public_html”) został utworzony.\nUpewnij się, że jest w nim plik HTML o nazwie „index.html”.
 Clear log file	PoorMan		Wyczyść plik log
 Log file name:	PoorMan		Nazwa pliku log:
 Directory: 	PoorMan		Katalog: 

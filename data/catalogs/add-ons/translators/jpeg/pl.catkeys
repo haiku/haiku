@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-JPEGTranslator	965709535
+1	polish	x-vnd.Haiku-JPEGTranslator	3788699631
 Output quality	JPEGTranslator		Jakość wyjściowa
 JPEG images	JPEGTranslator		Obrazy JPEG
 Prevent colors 'washing out'	JPEGTranslator		Zapobiegaj „zmyciu się” kolorów
@@ -15,6 +15,7 @@ Output smoothing strength	JPEGTranslator		Wyjściowa moc wygładzenia
 High	JPEGTranslator		Wysoka
 Write	JPEGTranslator		Zapis
 Write black-and-white images as RGB24	JPEGTranslator		Zapisz czarno-białe obrazy jako RGB24
+Version %d.%d.%d	JPEGTranslator		Wersja %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		Odczytaj obrazy w skali szarości jako RGB32
 Read	JPEGTranslator		Odczyt
 JPEG Library Warning: %s\n	be_jerror		Ostrzeżenie biblioteki JPEG: %s\n
