@@ -93,25 +93,29 @@ ZipperThread::ThreadStartup()
 			gotDirRef = true;
 	}
 
-	BString archiveName;
-
-	if (gotDirRef || sameFolder) {
+	if (gotDirRef) {
+		BEntry entry(&dirRef);
+		BPath path;
+		entry.GetPath(&path);
+		chdir(path.Path());
+	} else if (sameFolder) {
 		BEntry entry(&lastRef);
 		BPath path;
 		entry.GetParent(&entry);
 		entry.GetPath(&path);
-		archiveName = path.Path();
+		chdir(path.Path());
 	} else {
 		BPath path;
 		if (find_directory(B_DESKTOP_DIRECTORY, &path) == B_OK)
-			archiveName = path.Path();
+			chdir(path.Path());
 	}
-	archiveName.Append("/");
+
+	BString archiveName;
 
 	if (refCount > 1)
-		archiveName.Append(B_TRANSLATE("Archive"));
+		archiveName = B_TRANSLATE("Archive");
 	else
-		archiveName.Append(lastRef.name);
+		archiveName = lastRef.name;
 
 	int index = 1;
 	for (;; index++) {
@@ -140,9 +144,13 @@ ZipperThread::ThreadStartup()
 	for (int index = 0; index < refCount; index++) {
 		fThreadDataStore->FindRef("refs", index, &ref);
 
-		BPath path(&ref);
-		BString file = path.Path();
-		argv[3 + index]	= strdup(path.Path());
+		if (gotDirRef || sameFolder) {
+			argv[3 + index]	= strdup(ref.name);
+		} else {
+			BPath path(&ref);
+			BString file = path.Path();
+			argv[3 + index]	= strdup(path.Path());
+		}
 	}
 
 	argv[argc] = NULL;
