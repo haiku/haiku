@@ -50,7 +50,7 @@ process_refs(entry_ref directoryRef, BMessage* message, void*)
 			break;
 		}
 
-		BEntry targetEntry(&directoryRef, true);
+		BEntry targetEntry(&ref, true);
 		if (targetEntry.InitCheck() != B_OK) {
 			BAlert* alert = new BAlert("Open Target Folder",
 				"Cannot open target entry. Maybe this link is broken?",
