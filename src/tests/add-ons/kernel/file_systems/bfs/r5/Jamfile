@@ -2,6 +2,9 @@ SubDir HAIKU_TOP src tests add-ons kernel file_systems bfs r5 ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
+# save original optimization level
+oldOPTIM = $(OPTIM) ;
+
 # set some additional defines
 {
 	local defines =
@@ -22,6 +25,11 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 		bfsAddOnName = bfs ;
 	} else {
 		bfsAddOnName = obfs ;
+	}
+
+	if $(DEBUG) = 0 {
+		# the gcc on BeOS doesn't compile BFS correctly with -O2 or more
+		OPTIM = -O1 ;
 	}
 
 	defines = [ FDefines $(defines) ] ;
@@ -67,3 +75,6 @@ actions ignore InstallBFS
 }
 
 InstallBFS install : obfs ;
+
+# restore original optimization level
+OPTIM = $(oldOPTIM) ;
