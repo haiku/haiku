@@ -122,7 +122,16 @@ SettingsParserTest::TestConditionsMultiLineFlatNot()
 	CPPUNIT_ASSERT_EQUAL(B_OK, _ParseCondition("if {\n"
 		"\tnot safemode\n"
 		"}\n", message));
-	message.PrintToStream();
+
+	BMessage subMessage;
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("not",
+		&subMessage));
+	CPPUNIT_ASSERT_EQUAL(1, message.CountNames(B_ANY_TYPE));
+
+	BMessage args;
+	CPPUNIT_ASSERT_EQUAL(B_OK, subMessage.FindMessage("safemode", &args));
+	CPPUNIT_ASSERT_EQUAL(1, subMessage.CountNames(B_ANY_TYPE));
+	CPPUNIT_ASSERT(args.IsEmpty());
 }
 
 
@@ -133,7 +142,16 @@ SettingsParserTest::TestConditionsMultiLineFlatNotWithArgs()
 	CPPUNIT_ASSERT_EQUAL(B_OK, _ParseCondition("if {\n"
 		"\tnot file_exists one\n"
 		"}\n", message));
-	message.PrintToStream();
+
+	BMessage subMessage;
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("not",
+		&subMessage));
+
+	BMessage args;
+	CPPUNIT_ASSERT_EQUAL(B_OK, subMessage.FindMessage("file_exists", &args));
+	CPPUNIT_ASSERT_EQUAL(BString("one"),
+		BString(args.GetString("args", 0, "-")));
+	CPPUNIT_ASSERT_EQUAL(1, args.CountNames(B_ANY_TYPE));
 }
 
 

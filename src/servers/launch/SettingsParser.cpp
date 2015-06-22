@@ -28,19 +28,18 @@ public:
 				add = &message;
 				index++;
 			}
-			const char* condition = parameter.values[index];
-			BMessage args;
-			for (index++; index < parameter.value_count; index++) {
-				status_t status = args.AddString("args",
-					parameter.values[index]);
-				if (status != B_OK)
-					return status;
-			}
-			status_t status = add->AddMessage(condition, &args);
+
+			status_t status = _AddSubMessage(parameter, index, *add);
 			if (status == B_OK && not)
 				status = target.AddMessage("not", &message);
 
 			return status;
+		}
+		if (strcmp(parameter.name, "not") == 0) {
+			if (index != 0)
+				return B_OK;
+
+			return _AddSubMessage(parameter, index, target);
 		}
 
 		message.AddString("args", parameter.values[index]);
@@ -56,6 +55,21 @@ public:
 
 		BMessage message;
 		return target.AddMessage(name, &message);
+	}
+
+private:
+	status_t _AddSubMessage(const driver_parameter& parameter, int32 index,
+		BMessage& target)
+	{
+		const char* condition = parameter.values[index];
+		BMessage args;
+		for (index++; index < parameter.value_count; index++) {
+			status_t status = args.AddString("args",
+				parameter.values[index]);
+			if (status != B_OK)
+				return status;
+		}
+		return target.AddMessage(condition, &args);
 	}
 };
 
