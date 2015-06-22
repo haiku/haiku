@@ -45,25 +45,3 @@ Known Bugs/Limitations
 Note
 - BePDF until version 0.9.4 does not take the alpha channel of transparent bitmaps or patterns into account;
   Acrobat Reader shows them properly!
-
-
-Contact
-
-Either one of the developers or post to the print_kit mailing list
-open-beos-printing@freelists.org (preferred)
-Before any post, you'll need to subscribe it:
-http://www.freelists.org/cgi-bin/list?list_id=open-beos-printing
-
-
-Links
-
-Latest PDF Writer release
-http://www.bebits.com/app/2494
-
-CVS 
-https://sourceforge.net/cvs/?group_id=33869
-
-CVS Browser
-http://cvs.sourceforge.net/cgi-bin/viewcvs.cgi/open-beos/current/src/add-ons/print/drivers/pdf
-
- 
