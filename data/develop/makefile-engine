@@ -260,7 +260,7 @@ $(CATALOGS_DIR):: $(OBJ_DIR)
 	@[ -d $(CATALOGS_DIR) ] || mkdir $(CATALOGS_DIR) >/dev/null 2>&1
 
 # Rules to create the dependency files.
-$(OBJ_DIR)/%.d : %.c
+$(OBJ_DIR)/%.d : %.c %.cpp %.cp %.cc %.C %.CC $.CPP
 	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .c:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.cpp
@@ -331,11 +331,9 @@ $(OBJ_DIR)/%.o: %.y
 	bison -d -y $<
 	$(CC) -c $(INCLUDES) $(CFLAGS) y.tab.c -o "$@"
 
-# Empty rule. (Things that depend on this rule will always get triggered.)
-FORCE:
-
 # The generic "clean" command. (Deletes everything in the object folder.)
-clean :: FORCE
+.PHONY: clean
+clean:
 	-rm -rf "$(OBJ_DIR)"
 
 # Remove just the application from the object folder.
