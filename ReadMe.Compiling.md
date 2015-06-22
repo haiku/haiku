@@ -27,7 +27,7 @@ nightly builds.
  * `ssh` (for developers with commit access)
  * `gcc`/`g++` and binutils (`as`, `ld`, etc., required by GCC)
  * (GNU) `make`
- * `bison`
+ * `bison` (2.4 or better)
  * `flex` and `lex` (usually a mini shell script invoking `flex`)
  * `makeinfo` (part of `texinfo`, only needed for building GCC 4)
  * `autoheader` (part of `autoconf`, needed for building GCC)
