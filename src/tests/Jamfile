@@ -13,7 +13,7 @@ UnitTestLib libexampletest.so
 UnitTest UnitTester
 	: UnitTester.cpp
 	: be [ TargetLibstdc++ ]
-	: UnitTester.rsrc
+	: UnitTester.rdef
 ;
 
 # Install libbe and other libraries for target platform libbe_test.

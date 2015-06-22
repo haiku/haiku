@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src tests kits app bapplication testapps ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) src tests kits app common ] ;
@@ -57,12 +56,12 @@ SimpleBAppTestApp BApplicationTestApp2b.cpp ;
 SimpleBAppTestApp BApplicationTestApp3.cpp ;
 SimpleBAppTestApp BApplicationTestApp3a.cpp ;
 SimpleBAppTestApp BApplicationTestApp3b.cpp ;
-SimpleBAppTestApp BApplicationTestApp4.cpp : BApplicationTestApp4.rsrc ;
-SimpleBAppTestApp BApplicationTestApp4a.cpp : BApplicationTestApp4.rsrc ;
-SimpleBAppTestApp BApplicationTestApp4b.cpp : BApplicationTestApp4.rsrc ;
-SimpleBAppTestApp BApplicationTestApp5.cpp : BApplicationTestApp5.rsrc ;
-SimpleBAppTestApp BApplicationTestApp5a.cpp : BApplicationTestApp5.rsrc ;
-SimpleBAppTestApp BApplicationTestApp5b.cpp : BApplicationTestApp5.rsrc ;
+SimpleBAppTestApp BApplicationTestApp4.cpp : BApplicationTestApp4.rdef ;
+SimpleBAppTestApp BApplicationTestApp4a.cpp : BApplicationTestApp4.rdef ;
+SimpleBAppTestApp BApplicationTestApp4b.cpp : BApplicationTestApp4.rdef ;
+SimpleBAppTestApp BApplicationTestApp5.cpp : BApplicationTestApp5.rdef ;
+SimpleBAppTestApp BApplicationTestApp5a.cpp : BApplicationTestApp5.rdef ;
+SimpleBAppTestApp BApplicationTestApp5b.cpp : BApplicationTestApp5.rdef ;
 
 
 # BApplication::Run() test apps
@@ -70,17 +69,17 @@ SimpleBAppTestApp BApplicationTestApp5b.cpp : BApplicationTestApp5.rsrc ;
 
 local runTestApp1 = [ FGristFiles AppRunTestApp1$(SUFOBJ) ] ;
 
-SimpleBAppTestApp AppRunTestApp1.cpp : AppRunTestApp1.rsrc
+SimpleBAppTestApp AppRunTestApp1.cpp : AppRunTestApp1.rdef
 				   : $(commonObjects) ;
-SimpleBAppTestApp2 AppRunTestApp2 : $(runTestApp1) : AppRunTestApp2.rsrc
+SimpleBAppTestApp2 AppRunTestApp2 : $(runTestApp1) : AppRunTestApp2.rdef
 				   : $(commonObjects) ;
-SimpleBAppTestApp2 AppRunTestApp3 : $(runTestApp1) : AppRunTestApp3.rsrc
+SimpleBAppTestApp2 AppRunTestApp3 : $(runTestApp1) : AppRunTestApp3.rdef
 				   : $(commonObjects) ;
-SimpleBAppTestApp2 AppRunTestApp4 : $(runTestApp1) : AppRunTestApp4.rsrc
+SimpleBAppTestApp2 AppRunTestApp4 : $(runTestApp1) : AppRunTestApp4.rdef
 				   : $(commonObjects) ;
-SimpleBAppTestApp2 AppRunTestApp5 : $(runTestApp1) : AppRunTestApp5.rsrc
+SimpleBAppTestApp2 AppRunTestApp5 : $(runTestApp1) : AppRunTestApp5.rdef
 				   : $(commonObjects) ;
-SimpleBAppTestApp2 AppRunTestApp6 : $(runTestApp1) : AppRunTestApp6.rsrc
+SimpleBAppTestApp2 AppRunTestApp6 : $(runTestApp1) : AppRunTestApp6.rdef
 				   : $(commonObjects) ;
 
 CopyBAppTestApp AppRunTestApp3a : AppRunTestApp3 ;

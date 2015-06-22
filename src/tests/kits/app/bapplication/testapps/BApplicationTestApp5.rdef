@@ -1,0 +1,3 @@
+resource app_signature "application/x-vnd.obos-bapplication-testapp5";
+
+resource(2, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-elfexecutable";

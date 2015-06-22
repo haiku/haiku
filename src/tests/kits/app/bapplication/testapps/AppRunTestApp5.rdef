@@ -1,0 +1,17 @@
+resource app_flags B_EXCLUSIVE_LAUNCH | B_ARGV_ONLY;
+
+resource app_signature "application/x-vnd.obos-app-run-testapp1";
+
+resource app_version {
+	major  = 0,
+	middle = 0,
+	minor  = 0,
+
+	variety = B_APPV_DEVELOPMENT,
+	internal = 0,
+
+	short_info = "TestApp1",
+	long_info = "TestApp1"
+};
+
+resource(2, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-elfexecutable";
