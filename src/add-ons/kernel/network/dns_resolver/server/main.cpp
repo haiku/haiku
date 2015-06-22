@@ -146,6 +146,8 @@ MainLoop()
 		switch (code) {
 			case MsgGetAddrInfo:
 				result = GetAddrInfo(reinterpret_cast<char*>(buffer));
+				break;
+
 			default:
 				result = B_BAD_VALUE;
 				write_port(gReplyPort, MsgError, &result, sizeof(result));
