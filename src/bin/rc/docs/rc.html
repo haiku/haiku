@@ -32,7 +32,7 @@
 
 <P>Because .rsrc files have a binary file format, you need to use special tools to edit them, such as FileTypes, QuickRes, or Resourcer. Alternatively, you can use a "resource compiler". This is a command line tool that takes a text-based resource script and turns it into a .rsrc file.</P>
 
-<P>With a resource compiler, you express your resources as ASCII text using a special definition language, which makes the resource files much easier to edit and maintain. You no longer need separate GUI tools to build your .rsrc files, and you can even automate the whole process by calling the compiler from your Makefile or Jamfile. Resource scripts will also make your life easier if you use CVS, because CVS doesn't handle .rsrc files very well.</P>
+<P>With a resource compiler, you express your resources as ASCII text using a special definition language, which makes the resource files much easier to edit and maintain. You no longer need separate GUI tools to build your .rsrc files, and you can even automate the whole process by calling the compiler from your Makefile or Jamfile. Resource scripts will also make your life easier if you use version control, because version control doesn't handle .rsrc files very well.</P>
 
 <P>BeOS R5 comes with an (experimental) resource compiler called "beres", and a corresponding decompiler called "deres". rc is an open source replacement (and enhancement) of these tools. It is (mostly) backwards compatible, so you should be able to compile your old .rdef files without any problems.</P>
 
@@ -280,13 +280,13 @@ resource myint { 123 };</PRE></BLOCKQUOTE>
 <BLOCKQUOTE><TABLE BORDER=1 SUMMARY="">
 <TR><TH>type</TH><TH>corresponds to</TH><TH>fields</TH></TR>
 
-<TR><TD>app_signature</TD><TD>the app's MIME signature</TD><TD>string 
+<TR><TD>app_signature</TD><TD>the app's MIME signature</TD><TD>string
 signature</TD></TR>
 
-<TR><TD>app_flags</TD><TD>application launch flags</TD><TD>uint32 
+<TR><TD>app_flags</TD><TD>application launch flags</TD><TD>uint32
 flags</TD></TR>
 
-<TR><TD>app_version</TD><TD>version information</TD><TD>uint32 major, middle, 
+<TR><TD>app_version</TD><TD>version information</TD><TD>uint32 major, middle,
 minor, variety, internal<BR>string short_info, long_info</TD></TR>
 
 <TR><TD>large_icon</TD><TD>32x32 icon</TD><TD>array of 1024 bytes</TD></TR>
