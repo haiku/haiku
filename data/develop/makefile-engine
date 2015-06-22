@@ -261,25 +261,25 @@ $(CATALOGS_DIR):: $(OBJ_DIR)
 
 # Rules to create the dependency files.
 $(OBJ_DIR)/%.d : %.c
-	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) >/dev/null 2>&1; \
+	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .c:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.cpp
-	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) >/dev/null 2>&1; \
+	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .cpp:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.cp
-	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) >/dev/null 2>&1; \
+	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .cp:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.cc
-	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) >/dev/null 2>&1; \
+	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .cc:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.C
-	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) >/dev/null 2>&1; \
+	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .C:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.CC
-	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) >/dev/null 2>&1; \
+	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .CC:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.CPP
-	[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) >/dev/null 2>&1; \
+	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .CPP:$(OBJ_DIR)/%n.o -m -f "$@" $<
 
 -include $(DEPENDS)
