@@ -1,8 +1,7 @@
 /*
- * Copyright 2006, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2009, François Revol, <revol@free.fr>.
  * Distributed under the terms of the MIT License.
  */
-
 
 #include <Alert.h>
 #include <Messenger.h>
@@ -10,6 +9,7 @@
 #include <View.h>
 
 #include "PoseView.h"
+
 
 static void Error(BView *view, status_t status, bool unlock=false)
 {
@@ -22,9 +22,6 @@ static void Error(BView *view, status_t status, bool unlock=false)
 	alert->Go();
 }
 
-/*!
-	\brief Tracker add-on entry
-*/
 extern "C" void
 process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 {
@@ -38,7 +35,7 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 	BString windowTitleBackup;
 
 	refs->PrintToStream();
-	
+
 	status = refs->FindMessenger("TrackerViewToken", &msgr);
 	if (status < B_OK) {
 		Error(view, status);
@@ -70,22 +67,16 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 	view->SetSelectionRectEnabled(false);
 	view->SetPoseEditing(false);
 	poseViewModeBackup = view->ViewMode();
-	
 
 	view->SetViewMode(kIconMode);
-
 	view->ShowBarberPole();
 
-
 	view->UnlockLooper();
-
-
 
 	alert = new BAlert("Error", "IconVader:\nClick on the icons to get points."
 		"\nAvoid symlinks!", "OK");
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
-
 
 	int32 score = 0;
 	int32 count = 300;
@@ -107,18 +98,10 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 					score-=10;
 				pose->Select(false);
 			}
-#ifdef __HAIKU__
 			BPoint location = pose->Location(view);
-#else
-			BPoint location = pose->Location();
-#endif
 			location.x += ((rand() % 20) - 10);
 			location.y += ((rand() % 20) - 10);
-#ifdef __HAIKU__
 			pose->SetLocation(location, view);
-#else
-			pose->SetLocation(location);
-#endif
 		}
 
 		view->CheckPoseVisibility();
@@ -128,7 +111,7 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 		BString str("Score: ");
 		str << score;
 		view->Window()->SetTitle(str.String());
-		
+
 		view->UnlockLooper();
 		snooze(100000);
 	}
@@ -138,7 +121,6 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 	alert = new BAlert("Error", scoreStr.String(), "Cool!");
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
-
 
 	status = B_ERROR;
 	if (!msgr.LockTarget()) {
@@ -159,15 +141,13 @@ process_refs(entry_ref dir, BMessage* refs, void* /*reserved*/)
 	view->RestoreColumnState(poseViewColumnBackup);
 
 	view->Window()->SetTitle(windowTitleBackup.String());
-	
+
 /*
 	BMessage('_RRC') {
         TrackerViewToken = BMessenger(port=32004, team=591, target=direct:0x131)
 } */
 
 
-	//be_roster->Launch("application/x-vnd.haiku-filetypes", refs);
-	
 	view->UnlockLooper();
 	return;
 
