@@ -30,6 +30,7 @@
 
 #include "multiuser_utils.h"
 
+#include "Conditions.h"
 #include "InitRealTimeClockJob.h"
 #include "InitSharedMemoryDirectoryJob.h"
 #include "InitTemporaryDirectoryJob.h"
@@ -67,7 +68,7 @@ typedef std::map<uid_t, Session*> SessionMap;
 typedef std::map<BString, Target*> TargetMap;
 
 
-class LaunchDaemon : public BServer, public Finder {
+class LaunchDaemon : public BServer, public Finder, public ConditionContext {
 public:
 								LaunchDaemon(bool userMode, status_t& error);
 	virtual						~LaunchDaemon();
@@ -75,6 +76,8 @@ public:
 	virtual	Job*				FindJob(const char* name) const;
 	virtual	Target*				FindTarget(const char* name) const;
 			Session*			FindSession(uid_t user) const;
+
+	virtual	bool				IsSafeMode() const;
 
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
@@ -103,8 +106,6 @@ private:
 			void				_SetupEnvironment();
 			void				_InitSystem();
 			void				_AddInitJob(BJob* job);
-
-			bool				_IsSafeMode() const;
 
 private:
 			JobMap				fJobs;
@@ -205,6 +206,13 @@ LaunchDaemon::FindSession(uid_t user) const
 }
 
 
+bool
+LaunchDaemon::IsSafeMode() const
+{
+	return fSafeMode;
+}
+
+
 void
 LaunchDaemon::ReadyToRun()
 {
@@ -250,6 +258,12 @@ LaunchDaemon::MessageReceived(BMessage* message)
 						break;
 				}
 				reply.what = B_NAME_NOT_FOUND;
+			} else if (!job->IsLaunched() && !job->CheckCondition(*this)) {
+				// The job exists, but cannot be started yet, as its
+				// conditions are not met; don't make it available yet
+				// TODO: we may not want to initialize jobs with conditions
+				// that aren't met yet
+				reply.what = B_NO_INIT;
 			} else {
 				// If the job has not been launched yet, we'll pass on our
 				// team here. The rationale behind this is that this team
@@ -547,7 +561,7 @@ LaunchDaemon::_InitJobs()
 		JobMap::iterator remove = iterator++;
 
 		status_t status = B_NO_INIT;
-		if (job->IsEnabled() && (!_IsSafeMode() || job->LaunchInSafeMode())) {
+		if (job->IsEnabled() && (!IsSafeMode() || job->LaunchInSafeMode())) {
 			std::set<BString> dependencies;
 			status = job->Init(*this, dependencies);
 		}
@@ -570,6 +584,9 @@ LaunchDaemon::_InitJobs()
 void
 LaunchDaemon::_LaunchJobs(Target* target)
 {
+	if (target != NULL && !target->CheckCondition(*this))
+		return;
+
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
 			iterator++) {
 		Job* job = iterator->second;
@@ -582,7 +599,7 @@ LaunchDaemon::_LaunchJobs(Target* target)
 void
 LaunchDaemon::_AddLaunchJob(Job* job)
 {
-	if (!job->IsLaunched())
+	if (!job->IsLaunched() && job->CheckCondition(*this))
 		fJobQueue.AddJob(job);
 }
 
@@ -677,7 +694,7 @@ LaunchDaemon::_SetupEnvironment()
 {
 	// Determine safemode kernel option
 	BString safemode = "SAFEMODE=";
-	safemode << (_IsSafeMode() ? "yes" : "no");
+	safemode << (IsSafeMode() ? "yes" : "no");
 
 	putenv(safemode.String());
 }
@@ -701,13 +718,6 @@ LaunchDaemon::_AddInitJob(BJob* job)
 {
 	fInitTarget->AddDependency(job);
 	fJobQueue.AddJob(job);
-}
-
-
-bool
-LaunchDaemon::_IsSafeMode() const
-{
-	return fSafeMode;
 }
 
 

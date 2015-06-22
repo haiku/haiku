@@ -9,15 +9,8 @@
 
 Target::Target(const char* name)
 	:
-	BJob(name)
+	BaseJob(name)
 {
-}
-
-
-const char*
-Target::Name() const
-{
-	return Title().String();
 }
 
 

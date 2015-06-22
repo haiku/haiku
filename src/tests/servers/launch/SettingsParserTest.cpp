@@ -140,7 +140,7 @@ SettingsParserTest::TestConditionsMultiLineFlatNotWithArgs()
 {
 	BMessage message;
 	CPPUNIT_ASSERT_EQUAL(B_OK, _ParseCondition("if {\n"
-		"\tnot file_exists one\n"
+		"\tnot file_exists one two\n"
 		"}\n", message));
 
 	BMessage subMessage;
@@ -151,7 +151,9 @@ SettingsParserTest::TestConditionsMultiLineFlatNotWithArgs()
 	CPPUNIT_ASSERT_EQUAL(B_OK, subMessage.FindMessage("file_exists", &args));
 	CPPUNIT_ASSERT_EQUAL(BString("one"),
 		BString(args.GetString("args", 0, "-")));
-	CPPUNIT_ASSERT_EQUAL(1, args.CountNames(B_ANY_TYPE));
+	CPPUNIT_ASSERT_EQUAL(BString("two"),
+		BString(args.GetString("args", 1, "-")));
+	CPPUNIT_ASSERT_EQUAL(2, args.CountNames(B_ANY_TYPE));
 }
 
 

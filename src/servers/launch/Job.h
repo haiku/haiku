@@ -6,7 +6,7 @@
 #define JOB_H
 
 
-#include <Job.h>
+#include "BaseJob.h"
 
 #include <map>
 #include <set>
@@ -25,13 +25,11 @@ class Target;
 typedef std::map<BString, BMessage> PortMap;
 
 
-class Job : public BJob {
+class Job : public BaseJob {
 public:
 								Job(const char* name);
 								Job(const Job& other);
 	virtual						~Job();
-
-			const char*			Name() const;
 
 			bool				IsEnabled() const;
 			void				SetEnabled(bool enable);
@@ -89,6 +87,7 @@ private:
 			status_t			fInitStatus;
 			team_id				fTeam;
 			::Target*			fTarget;
+			::Condition*		fCondition;
 };
 
 

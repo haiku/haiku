@@ -6,18 +6,17 @@
 #define TARGET_H
 
 
-#include <Job.h>
+#include "BaseJob.h"
+
 #include <Message.h>
 
 
 using namespace BSupportKit;
 
 
-class Target : public BJob {
+class Target : public BaseJob {
 public:
 								Target(const char* name);
-
-			const char*			Name() const;
 
 			status_t			AddData(const char* name, BMessage& data);
 			const BMessage&		Data() const

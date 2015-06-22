@@ -16,7 +16,7 @@
 
 Job::Job(const char* name)
 	:
-	BJob(name),
+	BaseJob(name),
 	fEnabled(true),
 	fService(false),
 	fCreateDefaultPort(false),
@@ -30,7 +30,7 @@ Job::Job(const char* name)
 
 Job::Job(const Job& other)
 	:
-	BJob(other.Name()),
+	BaseJob(other.Name()),
 	fEnabled(other.IsEnabled()),
 	fService(other.IsService()),
 	fCreateDefaultPort(other.CreateDefaultPort()),
@@ -39,6 +39,8 @@ Job::Job(const Job& other)
 	fTeam(-1),
 	fTarget(other.Target())
 {
+	fCondition = other.fCondition;
+
 	for (int32 i = 0; i < other.Arguments().CountStrings(); i++)
 		AddArgument(other.Arguments().StringAt(i));
 
@@ -60,13 +62,6 @@ Job::Job(const Job& other)
 Job::~Job()
 {
 	_DeletePorts();
-}
-
-
-const char*
-Job::Name() const
-{
-	return Title().String();
 }
 
 
