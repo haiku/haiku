@@ -260,7 +260,7 @@ $(CATALOGS_DIR):: $(OBJ_DIR)
 	@[ -d $(CATALOGS_DIR) ] || mkdir $(CATALOGS_DIR) >/dev/null 2>&1
 
 # Rules to create the dependency files.
-$(OBJ_DIR)/%.d : %.c %.cpp %.cp %.cc %.C %.CC $.CPP
+$(OBJ_DIR)/%.d : %.c
 	mkdir -p $(OBJ_DIR); \
 	mkdepend $(LOC_INCLUDES) -p .c:$(OBJ_DIR)/%n.o -m -f "$@" $<
 $(OBJ_DIR)/%.d : %.cpp
