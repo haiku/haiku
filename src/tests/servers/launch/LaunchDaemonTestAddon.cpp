@@ -7,6 +7,7 @@
 #include <TestSuite.h>
 #include <TestSuiteAddon.h>
 
+#include "ConditionsTest.h"
 #include "SettingsParserTest.h"
 
 
@@ -16,6 +17,7 @@ getTestSuite()
 	BTestSuite* suite = new BTestSuite("LaunchDaemon");
 
 	SettingsParserTest::AddTests(*suite);
+	ConditionsTest::AddTests(*suite);
 
 	return suite;
 }

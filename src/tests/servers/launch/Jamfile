@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src tests servers launch ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
-UsePrivateHeaders app shared support ;
+UsePrivateHeaders app shared storage support ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers launch ] ;
 
@@ -11,6 +11,9 @@ UnitTestLib liblaunch_daemontest.so :
 
 	SettingsParserTest.cpp
 	SettingsParser.cpp
+
+	ConditionsTest.cpp
+	Conditions.cpp
 
 	: be libshared.a [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
