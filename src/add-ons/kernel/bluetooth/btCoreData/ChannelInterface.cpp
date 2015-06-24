@@ -35,12 +35,12 @@ ChannelBySourceID(HciConnection *conn, uint16 scid)
 uint16
 ChannelAllocateCid(HciConnection* conn)
 {
-	uint16 cid = conn->lastCid ;
+	uint16 cid = conn->lastCid;
 	debugf("Starting search cid %d\n",cid);
 	do {
-		cid = (cid == L2CAP_LAST_CID)?L2CAP_FIRST_CID : cid + 1;
+		cid = (cid == L2CAP_LAST_CID) ? L2CAP_FIRST_CID : cid + 1;
 
-		if(ChannelBySourceID(conn, cid) == NULL) {
+		if (ChannelBySourceID(conn, cid) == NULL) {
 			conn->lastCid = cid;
 			return cid;
 		}
@@ -54,7 +54,7 @@ ChannelAllocateCid(HciConnection* conn)
 uint16
 ChannelAllocateIdent(HciConnection* conn)
 {
-	uint8	ident = conn->lastIdent + 1;
+	uint8 ident = conn->lastIdent + 1;
 
 	if (ident < L2CAP_FIRST_IDENT)
 		ident = L2CAP_FIRST_IDENT;
@@ -66,7 +66,7 @@ ChannelAllocateIdent(HciConnection* conn)
 			return ident;
 		}
 
-		ident ++;
+		ident++;
 		if (ident < L2CAP_FIRST_IDENT)
 			ident = L2CAP_FIRST_IDENT;
 	}
@@ -82,7 +82,7 @@ AddChannel(HciConnection* conn, uint16 psm)
 
 	if (channel == NULL) {
 		flowf ("no mem for channel");
-		return (NULL);
+		return NULL;
 	}
 
 	/* Get a new Source CID */
@@ -110,7 +110,7 @@ AddChannel(HciConnection* conn, uint16 psm)
 		channel = NULL;
 	}
 
-	return (channel);
+	return channel;
 }
 
 

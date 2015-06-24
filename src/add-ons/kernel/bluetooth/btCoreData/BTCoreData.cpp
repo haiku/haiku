@@ -21,14 +21,14 @@ net_buffer_module_info* gBufferModule = NULL;
 inline bool
 ExistConnectionByDestination(const bdaddr_t& destination, hci_id hid = -1)
 {
-	return (ConnectionByDestination(destination, hid) != NULL);
+	return ConnectionByDestination(destination, hid) != NULL;
 }
 
 
 inline bool
 ExistConnectionByHandle(uint16 handle, hci_id hid)
 {
-	return (ConnectionByHandle(handle, hid));
+	return ConnectionByHandle(handle, hid);
 }
 
 

@@ -259,9 +259,10 @@ RegisterDriver(bt_hci_transport_hooks* hooks, bluetooth_device** _device)
 
 	if (sDeviceList.IsEmpty())
 		device->index = HCI_DEVICE_INDEX_OFFSET; // REVIEW: dev index
-	else
+	else {
 		device->index = (sDeviceList.Tail())->index + 1; // REVIEW!
 		flowf("List not empty\n");
+	}
 
 	sDeviceList.Add(device);
 
