@@ -92,12 +92,14 @@ private:
 			status_t			_ReadFile(const char* context, BEntry& entry);
 
 			void				_AddJobs(Target* target, BMessage& message);
+			void				_AddTargets(BMessage& message);
 			void				_AddJob(Target* target, bool service,
 									BMessage& message);
 			void				_InitJobs();
 			void				_LaunchJobs(Target* target);
 			void				_AddLaunchJob(Job* job);
 			void				_AddTarget(Target* target);
+			void				_SetCondition(BaseJob* job, BMessage& message);
 
 			status_t			_StartSession(const char* login,
 									const char* password);
@@ -454,37 +456,7 @@ LaunchDaemon::_ReadFile(const char* context, BEntry& entry)
 	status = parser.ParseFile(path.Path(), message);
 	if (status == B_OK) {
 		_AddJobs(NULL, message);
-
-		BMessage targetMessage;
-		for (int32 index = 0; message.FindMessage("target", index,
-				&targetMessage) == B_OK; index++) {
-			const char* name = targetMessage.GetString("name");
-			if (name == NULL) {
-				// TODO: log error
-				debug_printf("Target has no name, ignoring it!\n");
-				continue;
-			}
-
-			Target* target = FindTarget(name);
-			if (target == NULL) {
-				target = new Target(name);
-				_AddTarget(target);
-			} else if (targetMessage.GetBool("reset")) {
-				// Remove all jobs from this target
-				for (JobMap::iterator iterator = fJobs.begin();
-						iterator != fJobs.end();) {
-					Job* job = iterator->second;
-					JobMap::iterator remove = iterator++;
-
-					if (job->Target() == target) {
-						fJobs.erase(remove);
-						delete job;
-					}
-				}
-			}
-
-			_AddJobs(target, targetMessage);
-		}
+		_AddTargets(message);
 	}
 
 	return status;
@@ -503,6 +475,43 @@ LaunchDaemon::_AddJobs(Target* target, BMessage& message)
 	for (int32 index = 0; message.FindMessage("job", index, &job) == B_OK;
 			index++) {
 		_AddJob(target, false, job);
+	}
+}
+
+
+void
+LaunchDaemon::_AddTargets(BMessage& message)
+{
+	BMessage targetMessage;
+	for (int32 index = 0; message.FindMessage("target", index,
+			&targetMessage) == B_OK; index++) {
+		const char* name = targetMessage.GetString("name");
+		if (name == NULL) {
+			// TODO: log error
+			debug_printf("Target has no name, ignoring it!\n");
+			continue;
+		}
+
+		Target* target = FindTarget(name);
+		if (target == NULL) {
+			target = new Target(name);
+			_AddTarget(target);
+		} else if (targetMessage.GetBool("reset")) {
+			// Remove all jobs from this target
+			for (JobMap::iterator iterator = fJobs.begin();
+					iterator != fJobs.end();) {
+				Job* job = iterator->second;
+				JobMap::iterator remove = iterator++;
+
+				if (job->Target() == target) {
+					fJobs.erase(remove);
+					delete job;
+				}
+			}
+		}
+
+		_SetCondition(target, targetMessage);
+		_AddJobs(target, targetMessage);
 	}
 }
 
@@ -527,6 +536,8 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 	job->SetLaunchInSafeMode(
 		!message.GetBool("no_safemode", !job->LaunchInSafeMode()));
 	job->SetTarget(target);
+
+	_SetCondition(job, message);
 
 	BMessage portMessage;
 	for (int32 index = 0;
@@ -608,6 +619,18 @@ void
 LaunchDaemon::_AddTarget(Target* target)
 {
 	fTargets.insert(std::make_pair(target->Title(), target));
+}
+
+
+void
+LaunchDaemon::_SetCondition(BaseJob* job, BMessage& message)
+{
+	BMessage conditions;
+	if (message.FindMessage("if", &conditions) == B_OK) {
+		Condition* condition = Conditions::FromMessage(conditions);
+		if (condition != NULL)
+			job->SetCondition(condition);
+	}
 }
 
 
