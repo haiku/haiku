@@ -350,6 +350,7 @@ PackageInfo::Parse()
 					BPath *path = new BPath();
 					status_t ret = find_directory(dir, path);
 					if (ret != B_OK) {
+						delete path;
 						RETURN_AND_SET_STATUS(B_ERROR);
 					}
 
