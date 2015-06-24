@@ -17,6 +17,12 @@ BaseJob::BaseJob(const char* name)
 }
 
 
+BaseJob::~BaseJob()
+{
+	delete fCondition;
+}
+
+
 const char*
 BaseJob::Name() const
 {

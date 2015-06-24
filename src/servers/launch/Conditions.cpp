@@ -119,6 +119,8 @@ Condition::~Condition()
 
 
 ConditionContainer::ConditionContainer(const BMessage& args)
+	:
+	fConditions(10, true)
 {
 	char* name;
 	type_code type;

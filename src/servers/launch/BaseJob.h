@@ -18,6 +18,7 @@ class ConditionContext;
 class BaseJob : public BJob {
 public:
 								BaseJob(const char* name);
+								~BaseJob();
 
 			const char*			Name() const;
 
