@@ -599,8 +599,7 @@ SudokuView::MouseDown(BPoint where)
 	if (buttons == B_PRIMARY_MOUSE_BUTTON && clicks == 1) {
 		uint32 value = fField->ValueAt(x, y);
 		if (value != 0) {
-			// Toggle value hint
-			_SetValueHintValue(fValueHintValue == value ? ~0UL : value);
+			_SetValueHintValue(value);
 			return;
 		}
 	}
@@ -612,6 +611,7 @@ SudokuView::MouseDown(BPoint where)
 	uint32 value = hintX + hintY * fBlockSize;
 	uint32 field = x + y * fField->Size();
 	_PushUndo();
+	_SetValueHintValue(value + 1);
 
 	if ((clicks == 2 && fLastHintValue == value && fLastField == field)
 		|| (buttons & (B_SECONDARY_MOUSE_BUTTON
