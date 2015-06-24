@@ -74,6 +74,29 @@ private:
 };
 
 
+class RunConverter : public DriverSettingsConverter {
+public:
+	status_t ConvertFromDriverSettings(const driver_parameter& parameter,
+		const char* name, int32 index, uint32 type, BMessage& target)
+	{
+		if (parameter.parameter_count == 0)
+			return target.AddString("target", parameter.values[index]);
+
+		return B_NOT_SUPPORTED;
+	}
+
+	status_t ConvertEmptyFromDriverSettings(
+		const driver_parameter& parameter, const char* name, uint32 type,
+		BMessage& target)
+	{
+		if (parameter.parameter_count != 0)
+			return B_OK;
+
+		return target.AddString("target", name);
+	}
+};
+
+
 const static settings_template kConditionTemplate[] = {
 	{B_STRING_TYPE, NULL, NULL, true, new ConditionConverter()},
 	{B_MESSAGE_TYPE, "not", kConditionTemplate},
@@ -108,10 +131,24 @@ const static settings_template kTargetTemplate[] = {
 	{0, NULL, NULL}
 };
 
+const static settings_template kRunConditionalTemplate[] = {
+	{B_STRING_TYPE, NULL, NULL, true, new RunConverter()},
+	{0, NULL, NULL}
+};
+
+const static settings_template kRunTemplate[] = {
+	{B_STRING_TYPE, NULL, NULL, true, new RunConverter()},
+	{B_MESSAGE_TYPE, "if", kConditionTemplate},
+	{B_MESSAGE_TYPE, "then", kRunConditionalTemplate},
+	{B_MESSAGE_TYPE, "else", kRunConditionalTemplate},
+	{0, NULL, NULL}
+};
+
 const static settings_template kSettingsTemplate[] = {
 	{B_MESSAGE_TYPE, "target", kTargetTemplate},
 	{B_MESSAGE_TYPE, "job", kJobTemplate},
 	{B_MESSAGE_TYPE, "service", kJobTemplate},
+	{B_MESSAGE_TYPE, "run", kRunTemplate},
 	{0, NULL, NULL}
 };
 

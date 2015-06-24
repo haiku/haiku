@@ -1,9 +1,33 @@
-service x-vnd.Be-TRAK {
-	launch /system/Tracker
-	legacy
+target desktop {
+	service x-vnd.Be-TRAK {
+		launch /system/Tracker
+		legacy
+	}
+
+	service x-vnd.Be-TSKB {
+		launch /system/Deskbar
+		legacy
+	}
 }
 
-service x-vnd.Be-TSKB {
-	launch /system/Deskbar
-	legacy
+target first_boot {
+	job x-vnd.Haiku-FirstBootPrompt {
+		launch /system/apps/FirstBootPrompt
+		legacy
+	}
+}
+
+run {
+	if {
+		or {
+			not file_exists /boot/home/config/settings/Locale\ settings
+			read_only
+		}
+	}
+	then {
+		first_boot
+	}
+	else {
+		desktop
+	}
 }

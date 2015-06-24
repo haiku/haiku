@@ -26,11 +26,18 @@ public:
 			void				TestConditionsMultiLineFlatNotWithArgs();
 			void				TestConditionsMultiLineNot();
 
+			void				TestRunFlat();
+			void				TestRunMultiLine();
+			void				TestRunIfThenElseFlat();
+			void				TestRunIfThenElseMultiLine();
+
 	static	void				AddTests(BTestSuite& suite);
 
 private:
 			status_t			_ParseCondition(const char* text,
 									BMessage& message);
+			int32				_ArrayCount(BMessage& message,
+									const char* name);
 };
 
 

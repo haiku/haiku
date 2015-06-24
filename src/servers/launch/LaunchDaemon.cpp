@@ -93,6 +93,9 @@ private:
 
 			void				_AddJobs(Target* target, BMessage& message);
 			void				_AddTargets(BMessage& message);
+			void				_AddRunTargets(BMessage& message);
+			void				_AddRunTargets(BMessage& message,
+									const char* name);
 			void				_AddJob(Target* target, bool service,
 									BMessage& message);
 			void				_InitJobs();
@@ -112,6 +115,7 @@ private:
 private:
 			JobMap				fJobs;
 			TargetMap			fTargets;
+			BStringList			fRunTargets;
 			JobQueue			fJobQueue;
 			SessionMap			fSessions;
 			MainWorker*			fMainWorker;
@@ -237,6 +241,13 @@ LaunchDaemon::ReadyToRun()
 
 	_InitJobs();
 	_LaunchJobs(NULL);
+
+	// Launch run targets
+	for (int32 index = 0; index < fRunTargets.CountStrings(); index++) {
+		Target* target = FindTarget(fRunTargets.StringAt(index));
+		if (target != NULL)
+			_LaunchJobs(target);
+	}
 }
 
 
@@ -457,6 +468,7 @@ LaunchDaemon::_ReadFile(const char* context, BEntry& entry)
 	if (status == B_OK) {
 		_AddJobs(NULL, message);
 		_AddTargets(message);
+		_AddRunTargets(message);
 	}
 
 	return status;
@@ -512,6 +524,50 @@ LaunchDaemon::_AddTargets(BMessage& message)
 
 		_SetCondition(target, targetMessage);
 		_AddJobs(target, targetMessage);
+	}
+}
+
+
+void
+LaunchDaemon::_AddRunTargets(BMessage& message)
+{
+	BMessage runMessage;
+	for (int32 index = 0; message.FindMessage("run", index,
+			&runMessage) == B_OK; index++) {
+		BMessage conditions;
+		bool pass = true;
+		if (runMessage.FindMessage("if", &conditions) == B_OK) {
+			Condition* condition = Conditions::FromMessage(conditions);
+			if (condition != NULL) {
+				pass = condition->Test(*this);
+				debug_printf("Test: %s -> %d\n", condition->ToString().String(),
+					pass);
+				delete condition;
+			} else
+				debug_printf("Could not parse condition!\n");
+		}
+
+		if (pass) {
+			_AddRunTargets(runMessage, NULL);
+			_AddRunTargets(runMessage, "then");
+		} else {
+			_AddRunTargets(runMessage, "else");
+		}
+	}
+}
+
+
+void
+LaunchDaemon::_AddRunTargets(BMessage& message, const char* name)
+{
+	BMessage targets;
+	if (name != NULL && message.FindMessage(name, &targets) != B_OK)
+		return;
+
+	const char* target;
+	for (int32 index = 0; targets.FindString("target", index, &target) == B_OK;
+			index++) {
+		fRunTargets.Add(target);
 	}
 }
 

@@ -153,7 +153,8 @@ SettingsParserTest::TestConditionsMultiLineFlatNotWithArgs()
 		BString(args.GetString("args", 0, "-")));
 	CPPUNIT_ASSERT_EQUAL(BString("two"),
 		BString(args.GetString("args", 1, "-")));
-	CPPUNIT_ASSERT_EQUAL(2, args.CountNames(B_ANY_TYPE));
+	CPPUNIT_ASSERT_EQUAL(1, args.CountNames(B_ANY_TYPE));
+	CPPUNIT_ASSERT_EQUAL(2, _ArrayCount(args, "args"));
 }
 
 
@@ -177,11 +178,122 @@ SettingsParserTest::TestConditionsMultiLineNot()
 }
 
 
+void
+SettingsParserTest::TestRunFlat()
+{
+	SettingsParser parser;
+	BMessage jobs;
+	CPPUNIT_ASSERT_EQUAL(B_OK, parser.Parse("run me", jobs));
+	CPPUNIT_ASSERT_EQUAL(1, jobs.CountNames(B_ANY_TYPE));
+
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, jobs.FindMessage("run", &message));
+	CPPUNIT_ASSERT_EQUAL(BString("me"),
+		BString(message.GetString("target", "-")));
+	CPPUNIT_ASSERT_EQUAL(1, _ArrayCount(message, "target"));
+	CPPUNIT_ASSERT_EQUAL(1, message.CountNames(B_ANY_TYPE));
+}
+
+
+void
+SettingsParserTest::TestRunMultiLine()
+{
+	SettingsParser parser;
+	BMessage jobs;
+	status_t status = parser.Parse("run {\n"
+		"\tme\n"
+		"\tyou\n"
+		"}\n", jobs);
+	CPPUNIT_ASSERT_EQUAL(B_OK, status);
+	CPPUNIT_ASSERT_EQUAL(1, jobs.CountNames(B_ANY_TYPE));
+
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, jobs.FindMessage("run", &message));
+	CPPUNIT_ASSERT_EQUAL(BString("me"),
+		BString(message.GetString("target", 0, "-")));
+	CPPUNIT_ASSERT_EQUAL(BString("you"),
+		BString(message.GetString("target", 1, "-")));
+	CPPUNIT_ASSERT_EQUAL(2, _ArrayCount(message, "target"));
+	CPPUNIT_ASSERT_EQUAL(1, message.CountNames(B_ANY_TYPE));
+}
+
+
+void
+SettingsParserTest::TestRunIfThenElseFlat()
+{
+	SettingsParser parser;
+	BMessage jobs;
+	status_t status = parser.Parse("run {\n"
+		"\tif safemode\n"
+		"\tthen this\n"
+		"\telse that\n"
+		"}\n", jobs);
+	CPPUNIT_ASSERT_EQUAL(B_OK, status);
+
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, jobs.FindMessage("run", &message));
+	CPPUNIT_ASSERT_EQUAL(3, message.CountNames(B_ANY_TYPE));
+
+	BMessage then;
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("then", &then));
+	CPPUNIT_ASSERT_EQUAL(BString("this"),
+		BString(then.GetString("target", "-")));
+	CPPUNIT_ASSERT_EQUAL(1, _ArrayCount(then, "target"));
+	CPPUNIT_ASSERT_EQUAL(1, then.CountNames(B_ANY_TYPE));
+
+	BMessage otherwise;
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("else", &otherwise));
+	CPPUNIT_ASSERT_EQUAL(BString("that"),
+		BString(otherwise.GetString("target", "-")));
+	CPPUNIT_ASSERT_EQUAL(1, _ArrayCount(otherwise, "target"));
+	CPPUNIT_ASSERT_EQUAL(1, otherwise.CountNames(B_ANY_TYPE));
+}
+
+
+void
+SettingsParserTest::TestRunIfThenElseMultiLine()
+{
+	SettingsParser parser;
+	BMessage jobs;
+	status_t status = parser.Parse("run {\n"
+		"\tif {\n"
+		"\t\tread_only\n"
+		"\t}\n"
+		"\tthen {\n"
+		"\t\tthis\n"
+		"\t}\n"
+		"\telse {\n"
+		"\t\tthat\n"
+		"\t}\n"
+		"}\n", jobs);
+	CPPUNIT_ASSERT_EQUAL(B_OK, status);
+
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, jobs.FindMessage("run", &message));
+	CPPUNIT_ASSERT_EQUAL(3, message.CountNames(B_ANY_TYPE));
+
+	BMessage then;
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("then", &then));
+	CPPUNIT_ASSERT_EQUAL(BString("this"),
+		BString(then.GetString("target", "-")));
+	CPPUNIT_ASSERT_EQUAL(1, _ArrayCount(then, "target"));
+	CPPUNIT_ASSERT_EQUAL(1, then.CountNames(B_ANY_TYPE));
+
+	BMessage otherwise;
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("else", &otherwise));
+	CPPUNIT_ASSERT_EQUAL(BString("that"),
+		BString(otherwise.GetString("target", "-")));
+	CPPUNIT_ASSERT_EQUAL(1, _ArrayCount(otherwise, "target"));
+	CPPUNIT_ASSERT_EQUAL(1, otherwise.CountNames(B_ANY_TYPE));
+}
+
+
 /*static*/ void
 SettingsParserTest::AddTests(BTestSuite& parent)
 {
 	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("SettingsParserTest");
 
+	// Conditions
 	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
 		"SettingsParserTest::TestConditionsMultiLine",
 		&SettingsParserTest::TestConditionsMultiLine));
@@ -206,6 +318,20 @@ SettingsParserTest::AddTests(BTestSuite& parent)
 	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
 		"SettingsParserTest::TestConditionsMultiLineNot",
 		&SettingsParserTest::TestConditionsMultiLineNot));
+
+	// Run
+	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
+		"SettingsParserTest::TestRunFlat",
+		&SettingsParserTest::TestRunFlat));
+	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
+		"SettingsParserTest::TestRunMultiLine",
+		&SettingsParserTest::TestRunMultiLine));
+	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
+		"SettingsParserTest::TestRunIfThenElseFlat",
+		&SettingsParserTest::TestRunIfThenElseFlat));
+	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
+		"SettingsParserTest::TestRunIfThenElseMultiLine",
+		&SettingsParserTest::TestRunIfThenElseMultiLine));
 
 	parent.addTest("SettingsParserTest", &suite);
 }
@@ -232,4 +358,15 @@ SettingsParserTest::_ParseCondition(const char* text, BMessage& message)
 	CPPUNIT_ASSERT_EQUAL(BString("A"), BString(job.GetString("name")));
 
 	return job.FindMessage("if", &message);
+}
+
+
+int32
+SettingsParserTest::_ArrayCount(BMessage& message, const char* name)
+{
+	int32 found;
+	if (message.GetInfo(name, NULL, &found, NULL) != B_OK)
+		return 0;
+
+	return found;
 }
