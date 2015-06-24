@@ -340,6 +340,7 @@ local sources =
 	ValueNode.cpp
 	ValueNodeContainer.cpp
 	ValueNodeManager.cpp
+	ValueWriter.cpp
 
 	# value/type_handlers
 	BListTypeHandler.cpp
