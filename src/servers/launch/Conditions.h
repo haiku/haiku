@@ -6,6 +6,9 @@
 #define CONDITIONS_H
 
 
+#include <String.h>
+
+
 class BMessage;
 
 
@@ -21,6 +24,7 @@ public:
 	virtual						~Condition();
 
 	virtual	bool				Test(ConditionContext& context) const = 0;
+	virtual	BString				ToString() const = 0;
 };
 
 

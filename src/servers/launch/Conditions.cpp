@@ -25,6 +25,9 @@ protected:
 			void				AddCondition(Condition* condition);
 
 protected:
+			void				ToString(BString& string) const;
+
+protected:
 			BObjectList<Condition> fConditions;
 };
 
@@ -34,6 +37,7 @@ public:
 								AndCondition(const BMessage& args);
 
 	virtual	bool				Test(ConditionContext& context) const;
+	virtual	BString				ToString() const;
 };
 
 
@@ -42,6 +46,7 @@ public:
 								OrCondition(const BMessage& args);
 
 	virtual	bool				Test(ConditionContext& context) const;
+	virtual	BString				ToString() const;
 };
 
 
@@ -50,12 +55,14 @@ public:
 								NotCondition(const BMessage& args);
 
 	virtual	bool				Test(ConditionContext& context) const;
+	virtual	BString				ToString() const;
 };
 
 
 class SafeModeCondition : public Condition {
 public:
 	virtual	bool				Test(ConditionContext& context) const;
+	virtual	BString				ToString() const;
 };
 
 
@@ -64,6 +71,7 @@ public:
 								ReadOnlyCondition(const BMessage& args);
 
 	virtual	bool				Test(ConditionContext& context) const;
+	virtual	BString				ToString() const;
 
 private:
 			dev_t				fDevice;
@@ -75,6 +83,7 @@ public:
 								FileExistsCondition(const BMessage& args);
 
 	virtual	bool				Test(ConditionContext& context) const;
+	virtual	BString				ToString() const;
 
 private:
 			BStringList			fPaths;
@@ -144,6 +153,20 @@ ConditionContainer::AddCondition(Condition* condition)
 }
 
 
+void
+ConditionContainer::ToString(BString& string) const
+{
+	string += "[";
+
+	for (int32 index = 0; index < fConditions.CountItems(); index++) {
+		if (index != 0)
+			string += ", ";
+		string += fConditions.ItemAt(index)->ToString();
+	}
+	string += "]";
+}
+
+
 // #pragma mark - and
 
 
@@ -163,6 +186,15 @@ AndCondition::Test(ConditionContext& context) const
 			return false;
 	}
 	return true;
+}
+
+
+BString
+AndCondition::ToString() const
+{
+	BString string = "and ";
+	ConditionContainer::ToString(string);
+	return string;
 }
 
 
@@ -191,6 +223,15 @@ OrCondition::Test(ConditionContext& context) const
 }
 
 
+BString
+OrCondition::ToString() const
+{
+	BString string = "or ";
+	ConditionContainer::ToString(string);
+	return string;
+}
+
+
 // #pragma mark - or
 
 
@@ -213,6 +254,15 @@ NotCondition::Test(ConditionContext& context) const
 }
 
 
+BString
+NotCondition::ToString() const
+{
+	BString string = "not ";
+	ConditionContainer::ToString(string);
+	return string;
+}
+
+
 // #pragma mark - safemode
 
 
@@ -220,6 +270,13 @@ bool
 SafeModeCondition::Test(ConditionContext& context) const
 {
 	return context.IsSafeMode();
+}
+
+
+BString
+SafeModeCondition::ToString() const
+{
+	return "safemode";
 }
 
 
@@ -257,6 +314,15 @@ ReadOnlyCondition::Test(ConditionContext& context) const
 }
 
 
+BString
+ReadOnlyCondition::ToString() const
+{
+	BString string = "readonly ";
+	string << fDevice;
+	return string;
+}
+
+
 // #pragma mark - file_exists
 
 
@@ -279,6 +345,20 @@ FileExistsCondition::Test(ConditionContext& context) const
 			return false;
 	}
 	return true;
+}
+
+
+BString
+FileExistsCondition::ToString() const
+{
+	BString string = "file_exists [";
+	for (int32 index = 0; index < fPaths.CountStrings(); index++) {
+		if (index != 0)
+			string << ", ";
+		string << fPaths.StringAt(index);
+	}
+	string += "]";
+	return string;
 }
 
 
