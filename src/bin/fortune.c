@@ -37,9 +37,10 @@ choose_file(const char *path)
 		count++;
 	}
 
-	if (count == 0)
+	if (count == 0) {
+		closedir(dir);
 		return -1;
-
+	}
 	// choose and open entry
 
 	chosen = rand() % count;
