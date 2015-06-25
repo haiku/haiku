@@ -130,19 +130,19 @@ MidiSettingsView::_LoadSettings()
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		path.Append(SETTINGS_FILE);
 		BFile file(path.Path(), B_READ_ONLY);
-		if (file.InitCheck() == B_OK)
+		if (file.InitCheck() == B_OK) {
 			file.Read(buffer, sizeof(buffer));
-	}
+			char soundFont[512];
+			sscanf(buffer, "# Midi Settings\n soundfont = %s\n",
+				soundFont);
 
-	char soundFont[512];
-	sscanf(buffer, "# Midi Settings\n soundfont = %s\n",
-		soundFont);
-
-	for (int32 i = 0; i < fListView->CountItems(); i++) {
-		BStringItem* item = (BStringItem*)fListView->ItemAt(i);
-		if (!strcmp(item->Text(), soundFont)) {
-			fListView->Select(i);
-			break;
+			for (int32 i = 0; i < fListView->CountItems(); i++) {
+				BStringItem* item = (BStringItem*)fListView->ItemAt(i);
+				if (!strcmp(item->Text(), soundFont)) {
+					fListView->Select(i);
+					break;
+				}
+			}
 		}
 	}
 }
