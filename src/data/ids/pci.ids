@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.06.18
-#	Date:    2015-06-18 03:15:02
+#	Version: 2015.06.21
+#	Date:    2015-06-21 03:15:01
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10227,7 +10227,7 @@
 	139c  GM107M [GeForce 940M]
 	13b0  GM107GLM [Quadro M2000M]
 	13b1  GM107GLM [Quadro M1000M]
-	13b2  GM107GLM [Quadro M600M]GM107GLM {Quadro M600M]
+	13b2  GM107GLM [Quadro M600M]
 	13b3  GM107GLM [Quadro K2200M]
 	13ba  GM107GL [Quadro K2200]
 	13bb  GM107GL [Quadro K620]
@@ -10442,6 +10442,7 @@
 		10ec 8139  RTL-8100/8101L/8139 PCI Fast Ethernet Adapter
 		10f7 8338  Panasonic CF-Y5 laptop
 		1113 ec01  LevelOne FNC-0107TX/FNC-0109TX
+		1186 1104  DFE-520TX Fast Ethernet PCI Adapter (rev. D1)
 		1186 1300  DFE-538TX
 		1186 1320  SN5200
 		1186 8139  DRN-32TX
@@ -10942,7 +10943,7 @@
 	3043  VT86C100A [Rhine]
 		10bd 0000  VT86C100A Fast Ethernet Adapter
 		1106 0100  VT86C100A Fast Ethernet Adapter
-		1186 1400  DFE-530TX rev A
+		1186 1400  DFE-530TX PCI Fast Ethernet Adapter (rev. A)
 	3044  VT6306/7/8 [Fire II(M)] IEEE 1394 OHCI Controller
 		0010 0001  IEEE 1394 4port DCST 1394-3+1B
 		1025 005a  TravelMate 290
@@ -10959,6 +10960,7 @@
 	3050  VT82C596 Power Management
 	3051  VT82C596 Power Management
 	3053  VT6105M [Rhine-III]
+		1186 1404  DFE-530TX PCI Fast Ethernet Adapter (rev. D)
 	3057  VT82C686 [Apollo Super ACPI]
 		1019 0985  P6VXA Motherboard
 		1019 0987  K7VZA Motherboard
@@ -11017,8 +11019,9 @@
 		1043 80a1  A7V8X-X Motherboard
 		1043 80ed  A7V600-X Motherboard
 		1106 0102  VT6102/6103 [Rhine II] Ethernet Controller
-		1186 1400  DFE-530TX rev A
-		1186 1401  DFE-530TX rev B
+		1186 1400  DFE-530TX PCI Fast Ethernet Adapter (rev. A)
+		1186 1401  DFE-530TX PCI Fast Ethernet Adapter (rev. B)
+		1186 1402  DFE-530TX PCI Fast Ethernet Adapter (rev. B)
 		13b9 1421  LD-10/100AL PCI Fast Ethernet Adapter (rev.B)
 		1462 7061  MS-7061
 		1462 7181  K8MM3-V mainboard
@@ -11061,7 +11064,7 @@
 		19da a179  ZBOX nano VD01
 	3106  VT6105/VT6106S [Rhine-III]
 		1106 0105  VT6106S [Rhine-III]
-		1186 1403  DFE-530TX rev C
+		1186 1403  DFE-530TX PCI Fast Ethernet Adapter (rev. C)
 		1186 1405  DFE-520TX Fast Ethernet PCI Adapter
 		1186 1406  DFE-530TX+ rev F2
 		1186 1407  DFE-538TX
@@ -12588,6 +12591,7 @@
 	4200  DFE-520TX Fast Ethernet PCI Adapter
 		1186 1103  DFE-520TX Fast Ethernet PCI Adapter (rev. C1)
 	4300  DGE-528T Gigabit Ethernet Adapter
+		1186 4300  DGE-528T PCI Gigabit Ethernet Adapter
 # rev. B1; RealTek RTL8168E.
 		1186 4b10  DGE-560T PCI Express (x1) Gigabit Ethernet Adapter
 	4302  DGE-530T Gigabit Ethernet Adapter (rev.C1) [Realtek RTL8169]
@@ -20580,10 +20584,10 @@
 	0c48  Atom Processor S1200 PCI Express Root Port 3
 	0c49  Atom Processor S1200 PCI Express Root Port 4
 	0c4e  Atom Processor S1200 NTB Primary
-	0c50  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QuickData Technology Device
-	0c51  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QuickData Technology Device
-	0c52  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QuickData Technology Device
-	0c53  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QuickData Technology Device
+	0c50  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QuickData Technology Device
+	0c51  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QuickData Technology Device
+	0c52  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QuickData Technology Device
+	0c53  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QuickData Technology Device
 	0c54  Atom Processor S1200 Internal
 	0c55  Atom Processor S1200 DFX 1
 	0c56  Atom Processor S1200 DFX 2
@@ -25499,167 +25503,167 @@
 	65f9  5100 Chipset PCI Express x8 Port 6-7
 	65fa  5100 Chipset PCI Express x16 Port 4-7
 	65ff  5100 Chipset DMA Engine
-	6f00  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DMI2
-	6f01  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon PCI Express Root Port 0
-	6f02  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon PCI Express Root Port 1
-	6f03  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon PCI Express Root Port 1
-	6f04  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon PCI Express Root Port 2
-	6f05  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon PCI Express Root Port 2
-	6f06  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon PCI Express Root Port 2
-	6f07  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon PCI Express Root Port 2
-	6f08  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon PCI Express Root Port 3
-	6f09  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon PCI Express Root Port 3
-	6f0a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon PCI Express Root Port 3
-	6f0b  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon PCI Express Root Port 3
-	6f10  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f11  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f12  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f13  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f14  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f15  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f16  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f17  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f18  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f19  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f1a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f1b  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f1c  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Debug
-	6f1d  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon R2PCIe Agent
-	6f1e  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Ubox
-	6f1f  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Ubox
-	6f20  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Crystal Beach DMA Channel 0
-	6f21  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Crystal Beach DMA Channel 1
-	6f22  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Crystal Beach DMA Channel 2
-	6f23  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Crystal Beach DMA Channel 3
-	6f24  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Crystal Beach DMA Channel 4
-	6f25  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Crystal Beach DMA Channel 5
-	6f26  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Crystal Beach DMA Channel 6
-	6f27  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Crystal Beach DMA Channel 7
-	6f28  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Map/VTd_Misc/System Management
-	6f29  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO Hot Plug
-	6f2a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IIO RAS/Control Status/Global Errors
-	6f2c  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon I/O APIC
-	6f30  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Home Agent 0
-	6f32  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 0
-	6f33  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 1
-	6f34  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon R2PCIe Agent
-	6f36  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon R3 QPI Link 0/1
-	6f37  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon R3 QPI Link 0/1
-	6f38  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Home Agent 1
-	6f39  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon IO Performance Monitoring
-	6f3a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 2
-	6f3e  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon R3 QPI Link 2
-	6f3f  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon R3 QPI Link 2
-	6f40  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 2
-	6f41  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon R3 QPI Link 2
-	6f43  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 2
-	6f45  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 2 Debug
-	6f46  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 2 Debug
-	6f47  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 2 Debug
-	6f60  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Home Agent 1
-	6f68  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Target Address/Thermal/RAS
-	6f6a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Channel Target Address Decoder
-	6f6b  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Channel Target Address Decoder
-	6f6c  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Channel Target Address Decoder
-	6f6d  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Channel Target Address Decoder
-	6f6e  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Channel 2/3 Broadcast
-	6f6f  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Global Broadcast
-	6f70  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Home Agent 0 Debug
-	6f71  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Target Address/Thermal/RAS
-	6f76  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon R3 QPI Link Debug
-	6f78  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Home Agent 1 Debug
-	6f79  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Target Address/Thermal/RAS
-	6f7d  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Ubox
-	6f7e  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon R3 QPI Link Debug
-	6f80  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 0
-	6f81  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon R3 QPI Link 0/1
-	6f83  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 0
-	6f85  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 0 Debug
-	6f86  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 0 Debug
-	6f87  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 0 Debug
-	6f88  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6f8a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6f90  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 1
-	6f93  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 1
-	6f95  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 1 Debug
-	6f96  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon QPI Link 1 Debug
-	6f98  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6f99  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6f9a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6f9c  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fa0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Home Agent 0
-	6fa8  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Target Address/Thermal/RAS
-	6faa  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel Target Address Decoder
-	6fab  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel Target Address Decoder
-	6fac  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel Target Address Decoder
-	6fad  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel Target Address Decoder
-	6fae  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Channel 0/1 Broadcast
-	6faf  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Global Broadcast
-	6fb0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel 0 Thermal Control
-	6fb1  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel 1 Thermal Control
-	6fb2  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel 0 Error
-	6fb3  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel 1 Error
-	6fb4  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel 2 Thermal Control
-	6fb5  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel 3 Thermal Control
-	6fb6  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel 2 Error
-	6fb7  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 0 - Channel 3 Error
-	6fb8  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Channel 2/3 Interface
-	6fb9  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Channel 2/3 Interface
-	6fba  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Channel 2/3 Interface
-	6fbb  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Channel 2/3 Interface
-	6fbc  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Channel 0/1 Interface
-	6fbd  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Channel 0/1 Interface
-	6fbe  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Channel 0/1 Interface
-	6fbf  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon DDRIO Channel 0/1 Interface
-	6fc0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fc1  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fc2  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fc3  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fc4  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fc5  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fc6  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fc7  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fc8  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fc9  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fca  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fcb  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fcc  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fcd  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fce  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fcf  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Power Control Unit
-	6fd0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 1 - Channel 0 Thermal Control
-	6fd1  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 1 - Channel 1 Thermal Control
-	6fd2  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 1 - Channel 0 Error
-	6fd3  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 1 - Channel 1 Error
-	6fd4  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 1 - Channel 2 Thermal Control
-	6fd5  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 1 - Channel 3 Thermal Control
-	6fd6  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 1 - Channel 2 Error
-	6fd7  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Memory Controller 1 - Channel 3 Error
-	6fe0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fe1  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fe2  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fe3  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fe4  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fe5  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fe6  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fe7  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fe8  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fe9  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fea  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6feb  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fec  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fed  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fee  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6fef  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6ff0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6ff1  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6ff8  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6ff9  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6ffa  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6ffb  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6ffc  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6ffd  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
-	6ffe  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon Caching Agent
+	6f00  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DMI2
+	6f01  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 0
+	6f02  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 1
+	6f03  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 1
+	6f04  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 2
+	6f05  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 2
+	6f06  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 2
+	6f07  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 2
+	6f08  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 3
+	6f09  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 3
+	6f0a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 3
+	6f0b  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D PCI Express Root Port 3
+	6f10  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f11  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f12  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f13  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f14  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f15  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f16  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f17  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f18  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f19  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f1a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f1b  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f1c  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Debug
+	6f1d  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R2PCIe Agent
+	6f1e  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox
+	6f1f  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox
+	6f20  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 0
+	6f21  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 1
+	6f22  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 2
+	6f23  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 3
+	6f24  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 4
+	6f25  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 5
+	6f26  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 6
+	6f27  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Crystal Beach DMA Channel 7
+	6f28  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Map/VTd_Misc/System Management
+	6f29  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO Hot Plug
+	6f2a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IIO RAS/Control Status/Global Errors
+	6f2c  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D I/O APIC
+	6f30  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 0
+	6f32  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0
+	6f33  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1
+	6f34  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R2PCIe Agent
+	6f36  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1
+	6f37  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1
+	6f38  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 1
+	6f39  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D IO Performance Monitoring
+	6f3a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 2
+	6f3e  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 2
+	6f3f  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 2
+	6f40  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 2
+	6f41  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 2
+	6f43  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 2
+	6f45  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 2 Debug
+	6f46  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 2 Debug
+	6f47  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 2 Debug
+	6f60  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 1
+	6f68  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Target Address/Thermal/RAS
+	6f6a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Channel Target Address Decoder
+	6f6b  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Channel Target Address Decoder
+	6f6c  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Channel Target Address Decoder
+	6f6d  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Channel Target Address Decoder
+	6f6e  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Broadcast
+	6f6f  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Global Broadcast
+	6f70  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 0 Debug
+	6f71  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Target Address/Thermal/RAS
+	6f76  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link Debug
+	6f78  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 1 Debug
+	6f79  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Target Address/Thermal/RAS
+	6f7d  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Ubox
+	6f7e  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link Debug
+	6f80  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0
+	6f81  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D R3 QPI Link 0/1
+	6f83  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0
+	6f85  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 Debug
+	6f86  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 Debug
+	6f87  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 0 Debug
+	6f88  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6f8a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6f90  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1
+	6f93  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1
+	6f95  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 Debug
+	6f96  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D QPI Link 1 Debug
+	6f98  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6f99  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6f9a  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6f9c  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fa0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Home Agent 0
+	6fa8  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Target Address/Thermal/RAS
+	6faa  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder
+	6fab  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder
+	6fac  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder
+	6fad  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel Target Address Decoder
+	6fae  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Broadcast
+	6faf  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Global Broadcast
+	6fb0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 0 Thermal Control
+	6fb1  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 1 Thermal Control
+	6fb2  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 0 Error
+	6fb3  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 1 Error
+	6fb4  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 2 Thermal Control
+	6fb5  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 3 Thermal Control
+	6fb6  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 2 Error
+	6fb7  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 0 - Channel 3 Error
+	6fb8  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface
+	6fb9  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface
+	6fba  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface
+	6fbb  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 2/3 Interface
+	6fbc  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface
+	6fbd  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface
+	6fbe  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface
+	6fbf  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D DDRIO Channel 0/1 Interface
+	6fc0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fc1  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fc2  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fc3  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fc4  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fc5  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fc6  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fc7  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fc8  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fc9  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fca  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fcb  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fcc  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fcd  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fce  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fcf  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Power Control Unit
+	6fd0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 1 - Channel 0 Thermal Control
+	6fd1  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 1 - Channel 1 Thermal Control
+	6fd2  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 1 - Channel 0 Error
+	6fd3  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 1 - Channel 1 Error
+	6fd4  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 1 - Channel 2 Thermal Control
+	6fd5  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 1 - Channel 3 Thermal Control
+	6fd6  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 1 - Channel 2 Error
+	6fd7  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Memory Controller 1 - Channel 3 Error
+	6fe0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fe1  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fe2  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fe3  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fe4  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fe5  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fe6  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fe7  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fe8  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fe9  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fea  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6feb  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fec  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fed  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fee  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6fef  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6ff0  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6ff1  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6ff8  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6ff9  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6ffa  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6ffb  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6ffc  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6ffd  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
+	6ffe  Xeon E7 v4/Xeon E5 v4/Xeon E3 v4/Xeon D Caching Agent
 	7000  82371SB PIIX3 ISA [Natoma/Triton II]
 		1af4 1100  Qemu virtual machine
 	7010  82371SB PIIX3 IDE [Natoma/Triton II]
