@@ -285,7 +285,7 @@ DrawSmoke_Scalar(flurry_info_t* info, SmokeV* s, float brightness)
 			sy = s->p[i].position[1].f[k] * info->sys_glWidth / z + hslash2;
 			oldz = s->p[i].oldposition[2].f[k];
 			if (sx > info->sys_glWidth + 50.0f || sx < -50.0f
-				|| sy > info->sys_glHeight+50.0f || sy < -50.0f || z < 25.0f
+				|| sy > info->sys_glHeight + 50.0f || sy < -50.0f || z < 25.0f
 				|| oldz < 25.0f) {
 				continue;
 			}
@@ -296,8 +296,8 @@ DrawSmoke_Scalar(flurry_info_t* info, SmokeV* s, float brightness)
 				float oldy = s->p[i].oldposition[1].f[k];
 				float oldscreenx = (oldx * info->sys_glWidth / oldz) + wslash2;
 				float oldscreeny = (oldy * info->sys_glWidth / oldz) + hslash2;
-				float dx = (sx-oldscreenx);
-				float dy = (sy-oldscreeny);
+				float dx = (sx - oldscreenx);
+				float dy = (sy - oldscreeny);
 
 				float d = FastDistance2D(dx, dy);
 
@@ -307,7 +307,7 @@ DrawSmoke_Scalar(flurry_info_t* info, SmokeV* s, float brightness)
 				else
 					sm = 0.0f;
 
-				ow = MAX_(1.0f,thisWidth/oldz);
+				ow = MAX_(1.0f, thisWidth / oldz);
 				if (d)
 					os = ow / d;
 				else
@@ -329,23 +329,23 @@ DrawSmoke_Scalar(flurry_info_t* info, SmokeV* s, float brightness)
 					if (s->p[i].animFrame.i[k] >= 64)
 						s->p[i].animFrame.i[k] = 0;
 
-					u0 = (s->p[i].animFrame.i[k]&&7) * 0.125f;
-					v0 = (s->p[i].animFrame.i[k]>>3) * 0.125f;
+					u0 = (s->p[i].animFrame.i[k] & 7) * 0.125f;
+					v0 = (s->p[i].animFrame.i[k] >> 3) * 0.125f;
 					u1 = u0 + 0.125f;
 					v1 = v0 + 0.125f;
 					u1 = u0 + 0.125f;
 					v1 = v0 + 0.125f;
-					cm = (1.375f - thisWidth/width);
+					cm = (1.375f - thisWidth / width);
 					if (s->p[i].dead.i[k] == 3) {
 						cm *= 0.125f;
 						s->p[i].dead.i[k] = 1;
 					}
 					si++;
 					cm *= brightness;
-					cmv.f[0] = s->p[i].color[0].f[k]*cm;
-					cmv.f[1] = s->p[i].color[1].f[k]*cm;
-					cmv.f[2] = s->p[i].color[2].f[k]*cm;
-					cmv.f[3] = s->p[i].color[3].f[k]*cm;
+					cmv.f[0] = s->p[i].color[0].f[k] * cm;
+					cmv.f[1] = s->p[i].color[1].f[k] * cm;
+					cmv.f[2] = s->p[i].color[2].f[k] * cm;
+					cmv.f[3] = s->p[i].color[3].f[k] * cm;
 
 #if 0
 					// MDT we can't use vectors in the Scalar routine
