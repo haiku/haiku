@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.06.09
-# Date:    2015-06-09 20:34:09
+# Version: 2015.06.22
+# Date:    2015-06-22 20:34:08
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -15001,7 +15001,7 @@
 	0015  spirodoc
 152d  JMicron Technology Corp. / JMicron USA Technology Corp.
 	0539  JMS539/567 SuperSpeed SATA II/III 3.0G/6.0G Bridge
-	0567  JMS567 SATA 6.0Gb/s bridge
+	0567  JMS567 SATA 6Gb/s bridge
 	0770  Alienware Integrated Webcam
 	2329  JM20329 SATA Bridge
 	2335  ATA/ATAPI Bridge
@@ -15013,7 +15013,8 @@
 	2509  JMS539 SuperSpeed SATA II 3.0G Bridge
 	2551  JMS551 SATA 3Gb/s bridge
 	2566  JMS566 SATA 3Gb/s bridge
-	3562  JMS567 SATA 6.0Gb/s bridge
+	2590  Seatay ATA/ATAPI Bridge
+	3562  JMS567 SATA 6Gb/s bridge
 	3569  JMS566 SATA 3Gb/s bridge
 152e  LG (HLDS)
 	2507  PL-2507 IDE Controller
