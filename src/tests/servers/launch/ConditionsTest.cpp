@@ -43,6 +43,7 @@ ConditionsTest::TestSafemode()
 {
 	Condition* condition = _Condition("safemode");
 	CPPUNIT_ASSERT(!condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(condition->IsConstant(sConditionContext));
 
 	class SafemodeConditionContext : public ConditionContext {
 	public:
@@ -52,6 +53,7 @@ ConditionsTest::TestSafemode()
 		}
 	} safemodeContext;
 	CPPUNIT_ASSERT(condition->Test(safemodeContext));
+	CPPUNIT_ASSERT(condition->IsConstant(safemodeContext));
 }
 
 
@@ -60,6 +62,7 @@ ConditionsTest::TestFileExists()
 {
 	Condition* condition = _Condition("file_exists /boot");
 	CPPUNIT_ASSERT(condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(!condition->IsConstant(sConditionContext));
 
 	condition = _Condition("file_exists /boot/don't fool me!");
 	CPPUNIT_ASSERT(!condition->Test(sConditionContext));
@@ -73,17 +76,34 @@ ConditionsTest::TestOr()
 		"file_exists /boot\n"
 		"}\n");
 	CPPUNIT_ASSERT(condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(!condition->IsConstant(sConditionContext));
 
 	condition = _Condition("or {\n"
 		"file_exists /nowhere\n"
 		"}\n");
 	CPPUNIT_ASSERT(!condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(!condition->IsConstant(sConditionContext));
 
 	condition = _Condition("or {\n"
 		"file_exists /boot\n"
 		"file_exists /nowhere\n"
 		"}\n");
 	CPPUNIT_ASSERT(condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(!condition->IsConstant(sConditionContext));
+
+	condition = _Condition("or {\n"
+		"not safemode\n"
+		"file_exists /boot\n"
+		"}\n");
+	CPPUNIT_ASSERT(condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(condition->IsConstant(sConditionContext));
+
+	condition = _Condition("or {\n"
+		"safemode\n"
+		"file_exists /boot\n"
+		"}\n");
+	CPPUNIT_ASSERT(condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(!condition->IsConstant(sConditionContext));
 }
 
 
@@ -94,17 +114,40 @@ ConditionsTest::TestAnd()
 		"file_exists /boot\n"
 		"}\n");
 	CPPUNIT_ASSERT(condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(!condition->IsConstant(sConditionContext));
 
 	condition = _Condition("and {\n"
 		"file_exists /nowhere\n"
 		"}\n");
 	CPPUNIT_ASSERT(!condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(!condition->IsConstant(sConditionContext));
 
 	condition = _Condition("and {\n"
 		"file_exists /boot\n"
 		"file_exists /nowhere\n"
 		"}\n");
 	CPPUNIT_ASSERT(!condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(!condition->IsConstant(sConditionContext));
+
+	condition = _Condition("and {\n"
+		"safemode\n"
+		"file_exists /nowhere\n"
+		"}\n");
+	CPPUNIT_ASSERT(!condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(condition->IsConstant(sConditionContext));
+
+	condition = _Condition("and {\n"
+		"not safemode\n"
+		"file_exists /nowhere\n"
+		"}\n");
+	CPPUNIT_ASSERT(!condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(!condition->IsConstant(sConditionContext));
+
+	condition = _Condition("and {\n"
+		"safemode\n"
+		"}\n");
+	CPPUNIT_ASSERT(!condition->Test(sConditionContext));
+	CPPUNIT_ASSERT(condition->IsConstant(sConditionContext));
 }
 
 

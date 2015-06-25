@@ -126,6 +126,7 @@ const static settings_template kTargetTemplate[] = {
 	{B_STRING_TYPE, "name", NULL, true},
 	{B_BOOL_TYPE, "reset", NULL},
 	{B_MESSAGE_TYPE, "if", kConditionTemplate},
+	{B_BOOL_TYPE, "no_safemode", NULL},
 	{B_MESSAGE_TYPE, "job", kJobTemplate},
 	{B_MESSAGE_TYPE, "service", kJobTemplate},
 	{0, NULL, NULL}

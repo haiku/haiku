@@ -21,8 +21,12 @@
 class ConditionContainer : public Condition {
 protected:
 								ConditionContainer(const BMessage& args);
+								ConditionContainer();
 
+public:
 			void				AddCondition(Condition* condition);
+
+	virtual	bool				IsConstant(ConditionContext& context) const;
 
 protected:
 			void				ToString(BString& string) const;
@@ -35,6 +39,7 @@ protected:
 class AndCondition : public ConditionContainer {
 public:
 								AndCondition(const BMessage& args);
+								AndCondition();
 
 	virtual	bool				Test(ConditionContext& context) const;
 	virtual	BString				ToString() const;
@@ -46,6 +51,8 @@ public:
 								OrCondition(const BMessage& args);
 
 	virtual	bool				Test(ConditionContext& context) const;
+	virtual	bool				IsConstant(ConditionContext& context) const;
+
 	virtual	BString				ToString() const;
 };
 
@@ -53,6 +60,7 @@ public:
 class NotCondition : public ConditionContainer {
 public:
 								NotCondition(const BMessage& args);
+								NotCondition();
 
 	virtual	bool				Test(ConditionContext& context) const;
 	virtual	BString				ToString() const;
@@ -62,6 +70,8 @@ public:
 class SafeModeCondition : public Condition {
 public:
 	virtual	bool				Test(ConditionContext& context) const;
+	virtual	bool				IsConstant(ConditionContext& context) const;
+
 	virtual	BString				ToString() const;
 };
 
@@ -71,6 +81,8 @@ public:
 								ReadOnlyCondition(const BMessage& args);
 
 	virtual	bool				Test(ConditionContext& context) const;
+	virtual	bool				IsConstant(ConditionContext& context) const;
+
 	virtual	BString				ToString() const;
 
 private:
@@ -124,6 +136,13 @@ Condition::~Condition()
 }
 
 
+bool
+Condition::IsConstant(ConditionContext& context) const
+{
+	return false;
+}
+
+
 // #pragma mark -
 
 
@@ -145,11 +164,37 @@ ConditionContainer::ConditionContainer(const BMessage& args)
 }
 
 
+ConditionContainer::ConditionContainer()
+	:
+	fConditions(10, true)
+{
+}
+
+
 void
 ConditionContainer::AddCondition(Condition* condition)
 {
 	if (condition != NULL)
 		fConditions.AddItem(condition);
+}
+
+
+/*!	A single constant failing condition makes this constant, too, otherwise,
+	a single non-constant condition makes this non-constant as well.
+*/
+bool
+ConditionContainer::IsConstant(ConditionContext& context) const
+{
+	bool fixed = true;
+	for (int32 index = 0; index < fConditions.CountItems(); index++) {
+		const Condition* condition = fConditions.ItemAt(index);
+		if (condition->IsConstant(context)) {
+			if (!condition->Test(context))
+				return true;
+		} else
+			fixed = false;
+	}
+	return fixed;
 }
 
 
@@ -173,6 +218,11 @@ ConditionContainer::ToString(BString& string) const
 AndCondition::AndCondition(const BMessage& args)
 	:
 	ConditionContainer(args)
+{
+}
+
+
+AndCondition::AndCondition()
 {
 }
 
@@ -223,6 +273,25 @@ OrCondition::Test(ConditionContext& context) const
 }
 
 
+/*!	If there is a single succeeding constant condition, this is constant, too.
+	Otherwise, it is non-constant if there is a single non-constant condition.
+*/
+bool
+OrCondition::IsConstant(ConditionContext& context) const
+{
+	bool fixed = true;
+	for (int32 index = 0; index < fConditions.CountItems(); index++) {
+		const Condition* condition = fConditions.ItemAt(index);
+		if (condition->IsConstant(context)) {
+			if (condition->Test(context))
+				return true;
+		} else
+			fixed = false;
+	}
+	return fixed;
+}
+
+
 BString
 OrCondition::ToString() const
 {
@@ -238,6 +307,11 @@ OrCondition::ToString() const
 NotCondition::NotCondition(const BMessage& args)
 	:
 	ConditionContainer(args)
+{
+}
+
+
+NotCondition::NotCondition()
 {
 }
 
@@ -270,6 +344,13 @@ bool
 SafeModeCondition::Test(ConditionContext& context) const
 {
 	return context.IsSafeMode();
+}
+
+
+bool
+SafeModeCondition::IsConstant(ConditionContext& context) const
+{
+	return true;
 }
 
 
@@ -311,6 +392,13 @@ ReadOnlyCondition::Test(ConditionContext& context) const
 	}
 
 	return partition->IsReadOnly();
+}
+
+
+bool
+ReadOnlyCondition::IsConstant(ConditionContext& context) const
+{
+	return true;
 }
 
 
@@ -369,4 +457,21 @@ FileExistsCondition::ToString() const
 Conditions::FromMessage(const BMessage& message)
 {
 	return create_condition("and", message);
+}
+
+
+/*static*/ Condition*
+Conditions::AddNotSafeMode(Condition* condition)
+{
+	AndCondition* and = dynamic_cast<AndCondition*>(condition);
+	if (and == NULL)
+		and = new AndCondition();
+	if (and != condition && condition != NULL)
+		and->AddCondition(condition);
+
+	NotCondition* not = new NotCondition();
+	not->AddCondition(new SafeModeCondition());
+
+	and->AddCondition(not);
+	return and;
 }

@@ -24,6 +24,12 @@ public:
 	virtual						~Condition();
 
 	virtual	bool				Test(ConditionContext& context) const = 0;
+
+	/*!	Determines whether or not the result of this condition is fixed,
+		and will not change anymore.
+	*/
+	virtual	bool				IsConstant(ConditionContext& context) const;
+
 	virtual	BString				ToString() const = 0;
 };
 
@@ -31,6 +37,7 @@ public:
 class Conditions {
 public:
 	static	Condition*			FromMessage(const BMessage& message);
+	static	Condition*			AddNotSafeMode(Condition* condition);
 };
 
 

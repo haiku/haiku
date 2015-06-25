@@ -102,7 +102,8 @@ private:
 			void				_LaunchJobs(Target* target);
 			void				_AddLaunchJob(Job* job);
 			void				_AddTarget(Target* target);
-			void				_SetCondition(BaseJob* job, BMessage& message);
+			void				_SetCondition(BaseJob* job,
+									const BMessage& message);
 
 			status_t			_StartSession(const char* login,
 									const char* password);
@@ -589,8 +590,6 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 	job->SetEnabled(!message.GetBool("disabled", !job->IsEnabled()));
 	job->SetService(service);
 	job->SetCreateDefaultPort(!message.GetBool("legacy", !service));
-	job->SetLaunchInSafeMode(
-		!message.GetBool("no_safemode", !job->LaunchInSafeMode()));
 	job->SetTarget(target);
 
 	_SetCondition(job, message);
@@ -628,9 +627,13 @@ LaunchDaemon::_InitJobs()
 		JobMap::iterator remove = iterator++;
 
 		status_t status = B_NO_INIT;
-		if (job->IsEnabled() && (!IsSafeMode() || job->LaunchInSafeMode())) {
-			std::set<BString> dependencies;
-			status = job->Init(*this, dependencies);
+		if (job->IsEnabled()) {
+			// Filter out jobs that have a constant and failing condition
+			if (job->Condition() == NULL || !job->Condition()->IsConstant(*this)
+				|| job->Condition()->Test(*this)) {
+				std::set<BString> dependencies;
+				status = job->Init(*this, dependencies);
+			}
 		}
 
 		if (status != B_OK) {
@@ -679,14 +682,19 @@ LaunchDaemon::_AddTarget(Target* target)
 
 
 void
-LaunchDaemon::_SetCondition(BaseJob* job, BMessage& message)
+LaunchDaemon::_SetCondition(BaseJob* job, const BMessage& message)
 {
+	Condition* condition = NULL;
+
 	BMessage conditions;
-	if (message.FindMessage("if", &conditions) == B_OK) {
-		Condition* condition = Conditions::FromMessage(conditions);
-		if (condition != NULL)
-			job->SetCondition(condition);
-	}
+	if (message.FindMessage("if", &conditions) == B_OK)
+		condition = Conditions::FromMessage(conditions);
+
+	if (message.GetBool("no_safemode"))
+		condition = Conditions::AddNotSafeMode(condition);
+
+	if (condition != NULL)
+		job->SetCondition(condition);
 }
 
 

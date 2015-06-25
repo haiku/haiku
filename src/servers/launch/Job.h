@@ -42,9 +42,6 @@ public:
 
 			void				AddPort(BMessage& data);
 
-			bool				LaunchInSafeMode() const;
-			void				SetLaunchInSafeMode(bool launch);
-
 			const BStringList&	Arguments() const;
 			BStringList&		Arguments();
 			void				AddArgument(const char* argument);
@@ -82,7 +79,6 @@ private:
 			bool				fEnabled;
 			bool				fService;
 			bool				fCreateDefaultPort;
-			bool				fLaunchInSafeMode;
 			PortMap				fPortMap;
 			status_t			fInitStatus;
 			team_id				fTeam;

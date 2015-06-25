@@ -20,7 +20,6 @@ Job::Job(const char* name)
 	fEnabled(true),
 	fService(false),
 	fCreateDefaultPort(false),
-	fLaunchInSafeMode(true),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
 	fTarget(NULL)
@@ -34,7 +33,6 @@ Job::Job(const Job& other)
 	fEnabled(other.IsEnabled()),
 	fService(other.IsService()),
 	fCreateDefaultPort(other.CreateDefaultPort()),
-	fLaunchInSafeMode(other.LaunchInSafeMode()),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
 	fTarget(other.Target())
@@ -112,20 +110,6 @@ Job::AddPort(BMessage& data)
 {
 	const char* name = data.GetString("name");
 	fPortMap.insert(std::pair<BString, BMessage>(BString(name), data));
-}
-
-
-bool
-Job::LaunchInSafeMode() const
-{
-	return fLaunchInSafeMode;
-}
-
-
-void
-Job::SetLaunchInSafeMode(bool launch)
-{
-	fLaunchInSafeMode = launch;
 }
 
 
