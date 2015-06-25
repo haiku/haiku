@@ -105,8 +105,7 @@ private:
 			void				_SetCondition(BaseJob* job,
 									const BMessage& message);
 
-			status_t			_StartSession(const char* login,
-									const char* password);
+			status_t			_StartSession(const char* login);
 
 			void				_RetrieveKernelOptions();
 			void				_SetupEnvironment();
@@ -361,15 +360,15 @@ LaunchDaemon::MessageReceived(BMessage* message)
 
 			status_t status = B_OK;
 			const char* login = message->GetString("login");
-			const char* password = message->GetString("password");
-			if (login == NULL || password == NULL)
+			if (login == NULL)
 				status = B_BAD_VALUE;
 			if (status == B_OK && user != 0) {
 				// Only the root user can start sessions
+				// TODO: we'd actually need to know the uid of the sender
 				status = B_PERMISSION_DENIED;
 			}
 			if (status == B_OK)
-				status = _StartSession(login, password);
+				status = _StartSession(login);
 
 			BMessage reply((uint32)status);
 			message->SendReply(&reply);
@@ -699,11 +698,9 @@ LaunchDaemon::_SetCondition(BaseJob* job, const BMessage& message)
 
 
 status_t
-LaunchDaemon::_StartSession(const char* login, const char* password)
+LaunchDaemon::_StartSession(const char* login)
 {
-	Unlock();
-
-	// TODO: enable user/group code and password authentication
+	// TODO: enable user/group code
 	// The launch_daemon currently cannot talk to the registrar, though
 /*
 	struct passwd* passwd = getpwnam(login);
@@ -712,14 +709,12 @@ LaunchDaemon::_StartSession(const char* login, const char* password)
 	if (strcmp(passwd->pw_name, login) != 0)
 		return B_NAME_NOT_FOUND;
 
-	// TODO: check for auto-login, and ignore password then
-	if (!verify_password(passwd, getspnam(login), password))
-		return B_PERMISSION_DENIED;
-
 	// Check if there is a user session running already
 	uid_t user = passwd->pw_uid;
 	gid_t group = passwd->pw_gid;
 */
+
+	Unlock();
 
 	if (fork() == 0) {
 		if (setsid() < 0)

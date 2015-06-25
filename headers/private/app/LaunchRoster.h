@@ -25,8 +25,7 @@ public:
 			status_t			Target(const char* name, BMessage& data,
 									const char* baseName = NULL);
 
-			status_t			StartSession(const char* login,
-									const char* password);
+			status_t			StartSession(const char* login);
 
 	class Private;
 

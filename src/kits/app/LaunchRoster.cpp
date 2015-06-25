@@ -175,17 +175,15 @@ BLaunchRoster::Target(const char* name, BMessage& data, const char* baseName)
 
 
 status_t
-BLaunchRoster::StartSession(const char* login, const char* password)
+BLaunchRoster::StartSession(const char* login)
 {
-	if (login == NULL || password == NULL)
+	if (login == NULL)
 		return B_BAD_VALUE;
 
 	BMessage request(B_LAUNCH_SESSION);
 	status_t status = request.AddInt32("user", getuid());
 	if (status == B_OK)
 		status = request.AddString("login", login);
-	if (status == B_OK)
-		status = request.AddString("password", password);
 	if (status != B_OK)
 		return status;
 

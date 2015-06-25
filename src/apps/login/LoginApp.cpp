@@ -144,21 +144,19 @@ LoginApp::ArgvReceived(int32 argc, char **argv)
 void
 LoginApp::TryLogin(BMessage *message)
 {
+	BMessage reply(kLoginBad);
 	status_t status = B_BAD_VALUE;
 
-	const char *login;
-	const char *password;
-	BMessage reply(kLoginBad);
+	const char* login;
 	if (message->FindString("login", &login) == B_OK) {
-		if (message->FindString("password", &password) < B_OK)
-			password = NULL;
+		const char* password = message->GetString("password");
 
-		if (password != NULL) {
-			status = StartUserSession(login, password);
+		status = ValidateLogin(login, password);
+		if (status == B_OK) {
+			status = BLaunchRoster().StartSession(login);
 			if (status == B_OK)
 				Quit();
-		} else
-			status = ValidateLogin(login, password);
+		}
 
 		fprintf(stderr, "ValidateLogin: %s\n", strerror(status));
 	}
@@ -179,36 +177,15 @@ LoginApp::ValidateLogin(const char *login, const char *password)
 	struct passwd *pwd;
 
 	pwd = getpwnam(login);
-	if (!pwd)
+	if (pwd == NULL)
 		return ENOENT;
-	if (strcmp(pwd->pw_name, login))
+	if (strcmp(pwd->pw_name, login) != 0)
 		return ENOENT;
 
-	if (password == NULL) {
-		// we only want to check is login exists.
-		return B_OK;
-	}
-
-#ifdef __HAIKU__
 	if (verify_password(pwd, getspnam(login), password))
 		return B_OK;
-#else
-	// for testing
-	if (strcmp(crypt(password, pwd->pw_passwd), pwd->pw_passwd) == 0)
-		return B_OK;
-#endif
 
 	return B_PERMISSION_DENIED;
-}
-
-
-status_t
-LoginApp::StartUserSession(const char* login, const char* password)
-{
-	if (login == NULL || password == NULL)
-		return B_BAD_VALUE;
-
-	return BLaunchRoster().StartSession(login, password);
 }
 
 
