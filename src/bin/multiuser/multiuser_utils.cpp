@@ -103,8 +103,12 @@ verify_password(passwd* passwd, spwd* spwd, const char* plainPassword)
 	}
 
 	// If no password is required, we're done.
-	if (requiredPassword == NULL || strlen(requiredPassword) == 0)
-		return true;
+	if (requiredPassword == NULL || requiredPassword[0] == '\0') {
+		if (plainPassword == NULL || plainPassword[0] == '\0')
+			return true;
+
+		return false;
+	}
 
 	// crypt and check it
 	char* encryptedPassword = crypt(plainPassword, requiredPassword);
