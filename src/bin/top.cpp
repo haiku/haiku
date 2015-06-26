@@ -216,7 +216,7 @@ compare(
 
 		if (columns <= 80)
 			t.name[16] = 0;
-		else
+		else if (columns - 64 < sizeof(t.name))
 			t.name[columns - 64] = 0;
 
 		total = it->total_time();
