@@ -11,6 +11,8 @@
 #include <Message.h>
 #include <Roster.h>
 
+#include <user_group.h>
+
 #include "Target.h"
 
 
@@ -241,6 +243,11 @@ Job::Init(const Finder& finder, std::set<BString>& dependencies)
 			break;
 		}
 		iterator->second.SetInt32("port", port);
+
+		if (name == "x-vnd.haiku-registrar:auth") {
+			// Allow the launch_daemon to access the registrar authentication
+			BPrivate::set_registrar_authentication_port(port);
+		}
 	}
 
 	if (fInitStatus == B_OK && fCreateDefaultPort && !defaultPort) {

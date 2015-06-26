@@ -702,7 +702,7 @@ LaunchDaemon::_StartSession(const char* login)
 {
 	// TODO: enable user/group code
 	// The launch_daemon currently cannot talk to the registrar, though
-/*
+
 	struct passwd* passwd = getpwnam(login);
 	if (passwd == NULL)
 		return B_NAME_NOT_FOUND;
@@ -712,7 +712,6 @@ LaunchDaemon::_StartSession(const char* login)
 	// Check if there is a user session running already
 	uid_t user = passwd->pw_uid;
 	gid_t group = passwd->pw_gid;
-*/
 
 	Unlock();
 
@@ -720,22 +719,12 @@ LaunchDaemon::_StartSession(const char* login)
 		if (setsid() < 0)
 			exit(EXIT_FAILURE);
 
-/*
-debug_printf("session leader...\n");
-		if (initgroups(login, group) == -1) {
-debug_printf("1.ouch: %s\n", strerror(errno));
+		if (initgroups(login, group) == -1)
 			exit(EXIT_FAILURE);
-		}
-		//endgrent();
-		if (setgid(group) != 0) {
-debug_printf("2.ouch: %s\n", strerror(errno));
+		if (setgid(group) != 0)
 			exit(EXIT_FAILURE);
-		}
-		if (setuid(user) != 0) {
-debug_printf("3.ouch: %s\n", strerror(errno));
+		if (setuid(user) != 0)
 			exit(EXIT_FAILURE);
-		}
-*/
 
 		// TODO: This leaks the parent application
 		be_app = NULL;

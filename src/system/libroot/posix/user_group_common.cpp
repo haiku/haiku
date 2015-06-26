@@ -67,6 +67,13 @@ BPrivate::get_registrar_authentication_port()
 }
 
 
+void
+BPrivate::set_registrar_authentication_port(port_id port)
+{
+	sRegistrarPort = port;
+}
+
+
 status_t
 BPrivate::send_authentication_request_to_registrar(KMessage& request,
 	KMessage& reply)

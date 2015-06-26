@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src servers launch ;
 
-UsePrivateHeaders app package shared storage support ;
+UsePrivateHeaders app libroot shared storage support ;
 UsePrivateSystemHeaders ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) src bin multiuser ] ;
