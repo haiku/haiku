@@ -177,6 +177,7 @@ Application Debugger :
 	LineDataSource.cpp
 	ReturnValueInfo.cpp
 	SemaphoreInfo.cpp
+	SignalInfo.cpp
 	SourceCode.cpp
 	StackFrame.cpp
 	StackFrameValues.cpp
