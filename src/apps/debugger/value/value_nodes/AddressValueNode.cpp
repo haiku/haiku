@@ -93,13 +93,24 @@ AddressValueNode::CreateChildren(TeamTypeInformation* info)
 	if (fChild != NULL)
 		return B_OK;
 
+	// For function pointers, don't bother creating a child, as there
+	// currently isn't any useful information that can be presented there,
+	// and the address node's value already indicates the instruction pointer
+	// of the target function.
+	// TODO: an eventual future possibility might be for a child node to
+	// indicate the name of the function being pointed to, if target address
+	// is valid.
+	Type* baseType = fType->BaseType();
+	if (baseType != NULL && baseType->Kind() == TYPE_FUNCTION)
+		return B_OK;
+
 	// construct name
 	BString name = "*";
 	name << Name();
 
 	// create the child
 	fChild = new(std::nothrow) AddressValueNodeChild(this, name,
-		fType->BaseType());
+		baseType);
 	if (fChild == NULL)
 		return B_NO_MEMORY;
 
