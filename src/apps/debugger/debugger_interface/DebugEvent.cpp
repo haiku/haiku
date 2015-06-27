@@ -237,3 +237,15 @@ HandedOverEvent::HandedOverEvent(team_id team, thread_id thread,
 	fCausingThread(causingThread)
 {
 }
+
+
+// #pragma mark - SignalReceivedEvent
+
+
+SignalReceivedEvent::SignalReceivedEvent(team_id team, thread_id thread,
+	const SignalInfo& info)
+	:
+	DebugEvent(B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED, team, thread),
+	fInfo(info)
+{
+}

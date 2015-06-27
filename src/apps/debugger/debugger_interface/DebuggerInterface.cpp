@@ -857,13 +857,21 @@ DebuggerInterface::_CreateDebugEvent(int32 messageCode,
 					message.post_syscall.syscall, message.post_syscall.args));
 			break;
 		}
+		case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
+		{
+			event = new(std::nothrow) SignalReceivedEvent(message.origin.team,
+				message.origin.thread,
+				SignalInfo(message.signal_received.signal,
+					message.signal_received.handler,
+					message.signal_received.deadly));
+			break;
+		}
 		default:
 			printf("DebuggerInterface for team %" B_PRId32 ": unknown message "
 				"from kernel: %" B_PRId32 "\n", fTeamID, messageCode);
 			// fall through...
 		case B_DEBUGGER_MESSAGE_TEAM_CREATED:
 		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
-		case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
 		case B_DEBUGGER_MESSAGE_PROFILER_UPDATE:
 		case B_DEBUGGER_MESSAGE_HANDED_OVER:
 			_ignore = true;

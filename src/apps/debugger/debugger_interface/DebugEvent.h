@@ -9,6 +9,7 @@
 #include <debugger.h>
 
 #include "ImageInfo.h"
+#include "SignalInfo.h"
 #include "SyscallInfo.h"
 #include "Types.h"
 
@@ -220,6 +221,19 @@ public:
 
 private:
 			thread_id			fCausingThread;
+};
+
+
+class SignalReceivedEvent : public DebugEvent {
+public:
+								SignalReceivedEvent(team_id team,
+									thread_id thread,
+									const SignalInfo& info);
+
+			const SignalInfo&	GetSignalInfo() const	{ return fInfo; }
+
+private:
+			SignalInfo			fInfo;
 };
 
 
