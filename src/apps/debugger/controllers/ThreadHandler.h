@@ -57,6 +57,8 @@ public:
 									SingleStepEvent* event);
 			bool				HandleExceptionOccurred(
 									ExceptionOccurredEvent* event);
+			bool				HandleSignalReceived(
+									SignalReceivedEvent* event);
 
 			void				HandleThreadAction(uint32 action,
 									target_addr_t address);

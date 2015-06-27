@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -26,6 +26,7 @@
 #include "Jobs.h"
 #include "MessageCodes.h"
 #include "Register.h"
+#include "SignalDispositionTypes.h"
 #include "SourceCode.h"
 #include "SourceLanguage.h"
 #include "SpecificImageDebugInfo.h"
@@ -243,6 +244,59 @@ ThreadHandler::HandleExceptionOccurred(ExceptionOccurredEvent* event)
 	char buffer[256];
 	get_debug_exception_string(event->Exception(), buffer, sizeof(buffer));
 	return _HandleThreadStopped(NULL, THREAD_STOPPED_EXCEPTION, buffer);
+}
+
+
+bool
+ThreadHandler::HandleSignalReceived(SignalReceivedEvent* event)
+{
+	::Team* team = fThread->GetTeam();
+	AutoLocker<Team> locker(team);
+
+	const SignalInfo& info = event->GetSignalInfo();
+	int32 signal = info.Signal();
+	int32 disposition = team->SignalDispositionFor(signal);
+
+	switch (disposition) {
+		case SIGNAL_DISPOSITION_IGNORE:
+			return false;
+		case SIGNAL_DISPOSITION_STOP_AT_SIGNAL_HANDLER:
+		{
+			const struct sigaction& handlerInfo = info.Handler();
+			target_addr_t address = 0;
+			if ((handlerInfo.sa_flags & SA_SIGINFO) != 0)
+				address = (target_addr_t)handlerInfo.sa_sigaction;
+			else
+				address = (target_addr_t)handlerInfo.sa_handler;
+
+			if (address == (target_addr_t)SIG_DFL
+				|| address == (target_addr_t)SIG_IGN
+				|| address == (target_addr_t)SIG_HOLD) {
+				address = 0;
+			}
+
+			if (address != 0 && _InstallTemporaryBreakpoint(address) == B_OK
+				&& fDebuggerInterface->ContinueThread(ThreadID()) == B_OK) {
+				fStepMode = STEP_UNTIL;
+				return true;
+			}
+
+			// fall through if no handler or if we failed to
+			// set a breakpoint at the handler
+		}
+		case SIGNAL_DISPOSITION_STOP_AT_RECEIPT:
+		{
+			BString stopReason;
+			stopReason.SetToFormat("Received signal %" B_PRId32 " (%s)",
+				signal, strsignal(signal));
+			return _HandleThreadStopped(NULL, THREAD_STOPPED_DEBUGGED,
+				stopReason);
+		}
+		default:
+			break;
+	}
+
+	return false;
 }
 
 

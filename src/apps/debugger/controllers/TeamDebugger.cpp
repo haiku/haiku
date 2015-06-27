@@ -454,7 +454,7 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, int argc,
 	// set team debugging flags
 	fDebuggerInterface->SetTeamDebuggingFlags(
 		B_TEAM_DEBUG_THREADS | B_TEAM_DEBUG_IMAGES
-			| B_TEAM_DEBUG_POST_SYSCALL);
+			| B_TEAM_DEBUG_POST_SYSCALL | B_TEAM_DEBUG_SIGNALS);
 
 	// get the initial state of the team
 	AutoLocker< ::Team> teamLocker(fTeam);
@@ -1617,8 +1617,18 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			}
 			break;
 		}
-		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 		case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
+		{
+			TRACE_EVENTS("B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED: thread: %"
+				B_PRId32 "\n", event->Thread());
+
+			if (handler != NULL) {
+				handled = handler->HandleSignalReceived(
+					dynamic_cast<SignalReceivedEvent*>(event));
+			}
+			break;
+		}
+		case B_DEBUGGER_MESSAGE_PRE_SYSCALL:
 		case B_DEBUGGER_MESSAGE_PROFILER_UPDATE:
 		case B_DEBUGGER_MESSAGE_HANDED_OVER:
 			// not interested
