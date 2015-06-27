@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1414,8 +1414,12 @@ VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
 				if (location == NULL)
 					return false;
 
-				Type* nodeChildRawType = node->NodeChild()->Node()->GetType()
-					->ResolveRawType(false);
+				ValueNode* childNode = node->NodeChild()->Node();
+				if (childNode == NULL)
+					return false;
+
+				Type* nodeChildRawType = childNode->GetType()->ResolveRawType(
+					false);
 				if (nodeChildRawType->Kind() == TYPE_COMPOUND)
 				{
 					if (location->CountPieces() > 1)
@@ -1440,7 +1444,11 @@ VariablesView::VariableTableModel::GetValueAt(void* object, int32 columnIndex,
 			// use the type of the underlying value node, as it may
 			// be different from the initially assigned top level type
 			// due to casting
-			Type* type = node->NodeChild()->Node()->GetType();
+			ValueNode* childNode = node->NodeChild()->Node();
+			if (childNode == NULL)
+				return false;
+
+			Type* type = childNode->GetType();
 			if (type == NULL)
 				return false;
 
