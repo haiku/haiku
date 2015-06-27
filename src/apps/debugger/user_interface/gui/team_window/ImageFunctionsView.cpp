@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -11,6 +11,7 @@
 #include <new>
 #include <set>
 
+#include <ControlLook.h>
 #include <LayoutBuilder.h>
 #include <MessageRunner.h>
 #include <StringList.h>
@@ -26,6 +27,7 @@
 #include "Image.h"
 #include "ImageDebugInfo.h"
 #include "LocatableFile.h"
+#include "TargetAddressTableColumn.h"
 #include "Tracing.h"
 
 
@@ -247,7 +249,6 @@ public:
 
 		BVariant tempValue(node->ComponentName(), B_VARIANT_DONT_COPY_DATA);
 		return StringTableColumn::PrepareField(tempValue);
-
 	}
 
 
@@ -371,7 +372,7 @@ public:
 
 	virtual int32 CountColumns() const
 	{
-		return 1;
+		return 2;
 	}
 
 	virtual void* Root() const
@@ -397,15 +398,27 @@ public:
 
 	virtual bool GetValueAt(void* object, int32 columnIndex, BVariant& value)
 	{
-		if (columnIndex != 0)
-			return false;
-
 		if (object == this)
 			return false;
 
 		SourcePathComponentNode* node = (SourcePathComponentNode*)object;
-
-		value.SetTo(node);
+		switch (columnIndex) {
+			case 0:
+			{
+				value.SetTo(node);
+				break;
+			}
+			case 1:
+			{
+				FunctionInstance* function = node->Function();
+				if (function == NULL)
+					return false;
+				value.SetTo(function->Address());
+				break;
+			}
+			default:
+				return false;
+		}
 
 		return true;
 	}
@@ -812,10 +825,15 @@ ImageFunctionsView::_Init()
 			MSG_FUNCTION_FILTER_CHANGED));
 	fFunctionsTable->SetSortingEnabled(false);
 
+	float addressWidth = be_plain_font->StringWidth("0x00000000")
+		+ be_control_look->DefaultLabelSpacing() * 2 + 5;
+
 	// columns
 	fFunctionsTable->AddColumn(fHighlightingColumn
 		= new HighlightingTableColumn(0, "File/Function", 300, 100, 1000,
 			B_TRUNCATE_BEGINNING, B_ALIGN_LEFT));
+	fFunctionsTable->AddColumn(new TargetAddressTableColumn(1, "Address",
+		addressWidth, 40, 1000, B_TRUNCATE_END, B_ALIGN_RIGHT));
 
 	fFunctionsTableModel = new FunctionsTableModel();
 	fFunctionsTable->SetTreeTableModel(fFunctionsTableModel);
