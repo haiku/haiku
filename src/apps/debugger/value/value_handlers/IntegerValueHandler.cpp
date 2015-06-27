@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -17,6 +18,7 @@
 #include "SettingsDescription.h"
 #include "SettingsMenu.h"
 #include "TableCellFormattedValueRenderer.h"
+#include "TableCellIntegerEditor.h"
 
 
 static const char* const kFormatSettingID = "format";
@@ -178,6 +180,42 @@ IntegerValueHandler::GetTableCellValueRenderer(Value* _value,
 
 	// create the renderer
 	return CreateTableCellValueRenderer(value, config, _renderer);
+}
+
+
+status_t
+IntegerValueHandler::GetTableCellValueEditor(Value* _value,
+	Settings* settings, TableCellValueEditor*& _editor)
+{
+	IntegerValue* value = dynamic_cast<IntegerValue*>(_value);
+	if (value == NULL)
+		return B_BAD_VALUE;
+
+	IntegerValueFormatter::Config* config = NULL;
+	status_t error = CreateIntegerFormatterConfig(value, config);
+	if (error != B_OK)
+		return error;
+	BReference<IntegerValueFormatter::Config> configReference(config, true);
+
+	ValueFormatter* formatter;
+	error = CreateValueFormatter(config, formatter);
+	if (error != B_OK)
+		return error;
+	BReference<ValueFormatter> formatterReference(formatter, true);
+
+	TableCellIntegerEditor* editor = new(std::nothrow) TableCellIntegerEditor(
+		value, formatter);
+	if (editor == NULL)
+		return B_NO_MEMORY;
+
+	BReference<TableCellIntegerEditor> editorReference(editor, true);
+	error = editor->Init();
+	if (error != B_OK)
+		return error;
+
+	editorReference.Detach();
+	_editor = editor;
+	return B_OK;
 }
 
 

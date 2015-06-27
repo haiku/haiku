@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -28,6 +29,9 @@ public:
 									ValueFormatter*& _formatter);
 	virtual	status_t			GetTableCellValueRenderer(Value* value,
 									TableCellValueRenderer*& _renderer);
+	virtual	status_t			GetTableCellValueEditor(Value* value,
+									Settings* settings,
+									TableCellValueEditor*& _editor);
 	virtual	status_t			CreateTableCellValueSettingsMenu(Value* value,
 									Settings* settings, SettingsMenu*& _menu);
 
