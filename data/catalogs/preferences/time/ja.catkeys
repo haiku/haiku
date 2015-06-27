@@ -14,7 +14,7 @@ Revert	Time		元に戻す
 Pacific	Time		太平洋
 Show day of week	Time		曜日を表示
 Add	Time		追加
-Date and time	Time		日付と時間
+Date and time	Time		日付と時刻
 about	Time		このソフトウェアについて
 Local time (Windows compatible)	Time		現地時刻 (Windows 互換)
 Message receiving failed	Time		メッセージの取得に失敗しました
@@ -24,15 +24,15 @@ Hardware clock set to:	Time		ハードウェアクロックを設定:
 The following error occured while synchronizing:r\n%s	Time		同期中に次のエラーが発生しました:\n%s
 Europe	Time		ヨーロッパ
 Remove	Time		削除
-Time	Time		日付と時間
+Time	Time		日付と時刻
 Indian	Time		インド
 Sending request failed	Time		リクエストの送信に失敗しました
 Arctic	Time		北極
 Display time with seconds	Time		秒を表示
-Time	System name		日付と時間
+Time	System name		日付と時刻
 America	Time		アメリカ
-Synchronize at boot	Time		システム起動時に同期する
-Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		Time & Date 作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
+Synchronize at boot	Time		起動時に同期
+Time & Date, written by:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.	Time		日付と時刻 作者:\n\n\tAndrew Edward McCall\n\tMike Berg\n\tJulun\n\tPhilippe Saint-Pierre\n\nCopyright 2004-2012, Haiku.
 Received invalid time	Time		不正な時間を受け取りました
 Antarctica	Time		南極
 Show time zone	Time		タイムゾーンを表示
