@@ -21,6 +21,7 @@
 #include "FunctionInstance.h"
 #include "Image.h"
 #include "RangeList.h"
+#include "SignalDispositionTypes.h"
 #include "StackFrame.h"
 #include "Team.h"
 #include "TeamMemoryBlock.h"
@@ -558,4 +559,22 @@ UiUtils::FormatSIMDValue(const BVariant& value, uint32 bitSize,
 	_output += "}";
 
 	return _output;
+}
+
+
+const char*
+UiUtils::SignalDispositionToString(int disposition)
+{
+	switch (disposition) {
+		case SIGNAL_DISPOSITION_IGNORE:
+			return "Ignore";
+		case SIGNAL_DISPOSITION_STOP_AT_RECEIPT:
+			return "Stop at receipt";
+		case SIGNAL_DISPOSITION_STOP_AT_SIGNAL_HANDLER:
+			return "Stop at signal handler";
+		default:
+			break;
+	}
+
+	return "Unknown";
 }
