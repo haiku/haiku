@@ -1,9 +1,9 @@
 /*
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
-#ifndef BREAK_CONDITION_CONFIG_WINDOW_H
-#define BREAK_CONDITION_CONFIG_WINDOW_H
+#ifndef TEAM_SETTINGS_WINDOW_H
+#define TEAM_SETTINGS_WINDOW_H
 
 
 #include <Window.h>
@@ -23,15 +23,15 @@ class ImageDebugInfo;
 class UserInterfaceListener;
 
 
-class BreakConditionConfigWindow : public BWindow, private Team::Listener {
+class TeamSettingsWindow : public BWindow, private Team::Listener {
 public:
-								BreakConditionConfigWindow(::Team* team,
+								TeamSettingsWindow(::Team* team,
 									UserInterfaceListener* listener,
 									BHandler* target);
 
-								~BreakConditionConfigWindow();
+								~TeamSettingsWindow();
 
-	static	BreakConditionConfigWindow* Create(::Team* team,
+	static	TeamSettingsWindow* Create(::Team* team,
 									UserInterfaceListener* listener,
 									BHandler* target);
 									// throws
@@ -84,4 +84,4 @@ private:
 };
 
 
-#endif // BREAK_CONDITION_CONFIG_WINDOW_H
+#endif // TEAM_SETTINGS_WINDOW_H

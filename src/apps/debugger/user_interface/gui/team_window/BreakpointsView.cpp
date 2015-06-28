@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -29,7 +29,6 @@ BreakpointsView::BreakpointsView(Team* team, Listener* listener)
 	BGroupView(B_HORIZONTAL, 4.0f),
 	fTeam(team),
 	fListView(NULL),
-	fConfigureExceptionsButton(NULL),
 	fToggleBreakpointButton(NULL),
 	fEditBreakpointButton(NULL),
 	fRemoveBreakpointButton(NULL),
@@ -113,7 +112,6 @@ BreakpointsView::MessageReceived(BMessage* message)
 void
 BreakpointsView::AttachedToWindow()
 {
-	fConfigureExceptionsButton->SetTarget(Window());
 	fEditBreakpointButton->SetTarget(this);
 	fToggleBreakpointButton->SetTarget(this);
 	fRemoveBreakpointButton->SetTarget(this);
@@ -162,15 +160,11 @@ BreakpointsView::_Init()
 		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
 			.SetInsets(B_USE_SMALL_SPACING)
 			.AddGlue()
-			.Add(fConfigureExceptionsButton = new BButton(
-				"Configure break conditions" B_UTF8_ELLIPSIS))
 			.Add(fRemoveBreakpointButton = new BButton("Remove"))
 			.Add(fEditBreakpointButton = new BButton("Edit" B_UTF8_ELLIPSIS))
 			.Add(fToggleBreakpointButton = new BButton("Toggle"))
 		.End();
 
-	fConfigureExceptionsButton->SetMessage(
-		new BMessage(MSG_SHOW_BREAK_CONDITION_CONFIG_WINDOW));
 	fToggleBreakpointButton->SetMessage(new BMessage(MSG_ENABLE_BREAKPOINT));
 	fRemoveBreakpointButton->SetMessage(new BMessage(MSG_CLEAR_BREAKPOINT));
 	fEditBreakpointButton->SetMessage(

@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_WINDOW_H
@@ -32,7 +32,6 @@ class BStringList;
 class BStringView;
 class BTabView;
 class ConsoleOutputView;
-class BreakConditionConfigWindow;
 class BreakpointEditWindow;
 class ExpressionPromptWindow;
 class Image;
@@ -41,6 +40,7 @@ class RegistersView;
 class SourceCode;
 class SourceLanguage;
 class StackFrame;
+class TeamSettingsWindow;
 class Type;
 class UserBreakpoint;
 class UserInterfaceListener;
@@ -227,7 +227,7 @@ private:
 			BSplitView*			fImageSplitView;
 			BSplitView*			fThreadSplitView;
 			BSplitView*			fConsoleSplitView;
-			BreakConditionConfigWindow* fBreakConditionConfigWindow;
+			TeamSettingsWindow*	fTeamSettingsWindow;
 			BreakpointEditWindow* fBreakpointEditWindow;
 			InspectorWindow*	fInspectorWindow;
 			ExpressionPromptWindow* fExpressionPromptWindow;

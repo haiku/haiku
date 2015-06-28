@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -33,7 +33,6 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
-#include "BreakConditionConfigWindow.h"
 #include "Breakpoint.h"
 #include "BreakpointEditWindow.h"
 #include "ConsoleOutputView.h"
@@ -53,6 +52,7 @@
 #include "RegistersView.h"
 #include "StackTrace.h"
 #include "StackTraceView.h"
+#include "TeamSettingsWindow.h"
 #include "Tracing.h"
 #include "TypeComponentPath.h"
 #include "UiUtils.h"
@@ -138,7 +138,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fImageSplitView(NULL),
 	fThreadSplitView(NULL),
 	fConsoleSplitView(NULL),
-	fBreakConditionConfigWindow(NULL),
+	fTeamSettingsWindow(NULL),
 	fBreakpointEditWindow(NULL),
 	fInspectorWindow(NULL),
 	fExpressionPromptWindow(NULL),
@@ -397,28 +397,28 @@ TeamWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-		case MSG_SHOW_BREAK_CONDITION_CONFIG_WINDOW:
+		case MSG_SHOW_TEAM_SETTINGS_WINDOW:
 		{
-			if (fBreakConditionConfigWindow != NULL) {
-				AutoLocker<BWindow> lock(fBreakConditionConfigWindow);
+			if (fTeamSettingsWindow != NULL) {
+				AutoLocker<BWindow> lock(fTeamSettingsWindow);
 				if (lock.IsLocked())
-					fBreakConditionConfigWindow->Activate(true);
+					fTeamSettingsWindow->Activate(true);
 			} else {
 				try {
-					fBreakConditionConfigWindow
-						= BreakConditionConfigWindow::Create(
+					fTeamSettingsWindow
+						= TeamSettingsWindow::Create(
 						fTeam, fListener, this);
-					if (fBreakConditionConfigWindow != NULL)
-						fBreakConditionConfigWindow->Show();
+					if (fTeamSettingsWindow != NULL)
+						fTeamSettingsWindow->Show();
 	           	} catch (...) {
 	           		// TODO: notify user
 	           	}
 			}
 			break;
 		}
-		case MSG_BREAK_CONDITION_CONFIG_WINDOW_CLOSED:
+		case MSG_TEAM_SETTINGS_WINDOW_CLOSED:
 		{
-			fBreakConditionConfigWindow = NULL;
+			fTeamSettingsWindow = NULL;
 			break;
 		}
 		case MSG_SHOW_BREAKPOINT_EDIT_WINDOW:
@@ -1098,6 +1098,11 @@ TeamWindow::_Init()
 	item->SetTarget(this);
 	item = new BMenuItem("Close", new BMessage(B_QUIT_REQUESTED),
 		'W');
+	menu->AddItem(item);
+	item->SetTarget(this);
+	menu->AddSeparatorItem();
+	item = new BMenuItem("Settings" B_UTF8_ELLIPSIS, new BMessage(
+		MSG_SHOW_TEAM_SETTINGS_WINDOW));
 	menu->AddItem(item);
 	item->SetTarget(this);
 	menu = new BMenu("Edit");

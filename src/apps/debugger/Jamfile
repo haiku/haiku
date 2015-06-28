@@ -39,6 +39,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui inspector_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_window ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_settings_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui teams_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui utility_windows ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
@@ -288,6 +289,9 @@ Application Debugger :
 	ThreadListView.cpp
 	VariablesView.cpp
 
+	# user_interface/gui/team_settings_window
+	TeamSettingsWindow.cpp
+
 	# user_interface/gui/util
 	ActionMenuItem.cpp
 	GuiSettingsUtils.cpp
@@ -295,7 +299,6 @@ Application Debugger :
 	TargetAddressTableColumn.cpp
 
 	# user_interface/gui/utility_windows
-	BreakConditionConfigWindow.cpp
 	BreakpointEditWindow.cpp
 	ExpressionPromptWindow.cpp
 	StartTeamWindow.cpp

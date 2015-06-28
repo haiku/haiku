@@ -1,8 +1,8 @@
 /*
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
-#include "BreakConditionConfigWindow.h"
+#include "TeamSettingsWindow.h"
 
 #include <Box.h>
 #include <Button.h>
@@ -44,10 +44,10 @@ static int SortStringItems(const void* a, const void* b)
 }
 
 
-BreakConditionConfigWindow::BreakConditionConfigWindow(::Team* team,
+TeamSettingsWindow::TeamSettingsWindow(::Team* team,
 	UserInterfaceListener* listener, BHandler* target)
 	:
-	BWindow(BRect(), "Configure break conditions", B_FLOATING_WINDOW,
+	BWindow(BRect(), "Team settings", B_FLOATING_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fTeam(team),
 	fListener(listener),
@@ -71,18 +71,18 @@ BreakConditionConfigWindow::BreakConditionConfigWindow(::Team* team,
 }
 
 
-BreakConditionConfigWindow::~BreakConditionConfigWindow()
+TeamSettingsWindow::~TeamSettingsWindow()
 {
 	fTeam->RemoveListener(this);
-	BMessenger(fTarget).SendMessage(MSG_BREAK_CONDITION_CONFIG_WINDOW_CLOSED);
+	BMessenger(fTarget).SendMessage(MSG_TEAM_SETTINGS_WINDOW_CLOSED);
 }
 
 
-BreakConditionConfigWindow*
-BreakConditionConfigWindow::Create(::Team* team,
+TeamSettingsWindow*
+TeamSettingsWindow::Create(::Team* team,
 	UserInterfaceListener* listener, BHandler* target)
 {
-	BreakConditionConfigWindow* self = new BreakConditionConfigWindow(
+	TeamSettingsWindow* self = new TeamSettingsWindow(
 		team, listener, target);
 
 	try {
@@ -97,7 +97,7 @@ BreakConditionConfigWindow::Create(::Team* team,
 }
 
 void
-BreakConditionConfigWindow::MessageReceived(BMessage* message)
+TeamSettingsWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_STOP_ON_THROWN_EXCEPTION_CHANGED:
@@ -232,7 +232,7 @@ BreakConditionConfigWindow::MessageReceived(BMessage* message)
 
 
 void
-BreakConditionConfigWindow::Show()
+TeamSettingsWindow::Show()
 {
 	CenterOnScreen();
 	BWindow::Show();
@@ -240,7 +240,7 @@ BreakConditionConfigWindow::Show()
 
 
 void
-BreakConditionConfigWindow::StopOnImageLoadSettingsChanged(
+TeamSettingsWindow::StopOnImageLoadSettingsChanged(
 	const Team::ImageLoadEvent& event)
 {
 	BMessage message(MSG_STOP_IMAGE_SETTINGS_CHANGED);
@@ -251,7 +251,7 @@ BreakConditionConfigWindow::StopOnImageLoadSettingsChanged(
 
 
 void
-BreakConditionConfigWindow::StopOnImageLoadNameAdded(
+TeamSettingsWindow::StopOnImageLoadNameAdded(
 	const Team::ImageLoadNameEvent& event)
 {
 	BMessage message(MSG_STOP_IMAGE_NAME_ADDED);
@@ -261,7 +261,7 @@ BreakConditionConfigWindow::StopOnImageLoadNameAdded(
 
 
 void
-BreakConditionConfigWindow::StopOnImageLoadNameRemoved(
+TeamSettingsWindow::StopOnImageLoadNameRemoved(
 	const Team::ImageLoadNameEvent& event)
 {
 	BMessage message(MSG_STOP_IMAGE_NAME_REMOVED);
@@ -271,7 +271,7 @@ BreakConditionConfigWindow::StopOnImageLoadNameRemoved(
 
 
 void
-BreakConditionConfigWindow::_Init()
+TeamSettingsWindow::_Init()
 {
 	fExceptionSettingsBox = new BBox("exceptionBox");
 	fExceptionSettingsBox->SetLabel("Exceptions");
@@ -365,7 +365,7 @@ BreakConditionConfigWindow::_Init()
 
 
 void
-BreakConditionConfigWindow::_UpdateThrownBreakpoints(bool enable)
+TeamSettingsWindow::_UpdateThrownBreakpoints(bool enable)
 {
 	AutoLocker< ::Team> teamLocker(fTeam);
 	for (ImageList::ConstIterator it = fTeam->Images().GetIterator();
@@ -386,7 +386,7 @@ BreakConditionConfigWindow::_UpdateThrownBreakpoints(bool enable)
 
 
 status_t
-BreakConditionConfigWindow::_FindExceptionFunction(ImageDebugInfo* info,
+TeamSettingsWindow::_FindExceptionFunction(ImageDebugInfo* info,
 	target_addr_t& _foundAddress) const
 {
 	if (info != NULL) {
@@ -406,7 +406,7 @@ BreakConditionConfigWindow::_FindExceptionFunction(ImageDebugInfo* info,
 
 
 void
-BreakConditionConfigWindow::_UpdateExceptionState()
+TeamSettingsWindow::_UpdateExceptionState()
 {
 	// check if the exception breakpoints are already installed
 	for (ImageList::ConstIterator it = fTeam->Images().GetIterator();
@@ -427,7 +427,7 @@ BreakConditionConfigWindow::_UpdateExceptionState()
 
 
 void
-BreakConditionConfigWindow::_UpdateStopImageState()
+TeamSettingsWindow::_UpdateStopImageState()
 {
 	bool previousStop = fStopOnLoadEnabled;
 	bool previousCustomImages = fUseCustomImages && fStopOnLoadEnabled;
@@ -458,7 +458,7 @@ BreakConditionConfigWindow::_UpdateStopImageState()
 
 
 void
-BreakConditionConfigWindow::_UpdateStopImageButtons(bool previousStop,
+TeamSettingsWindow::_UpdateStopImageButtons(bool previousStop,
 	bool previousCustomImages)
 {
 	fStopImageConstraints->SetEnabled(fStopOnLoadEnabled);
