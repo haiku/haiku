@@ -6,13 +6,10 @@
 #if !defined(_CM_PRIVATE_H)
 #define _CM_PRIVATE_H
 
-#if !defined(_CMEDIA_PCI_H)
 #include "cmedia_pci.h"
-#endif
 
-#if !defined(_PCI_H)
+#include <KernelExport.h>
 #include <PCI.h>
-#endif
 
 #if !defined(DEBUG)
 #define DEBUG 0
@@ -54,7 +51,7 @@
 
 /* there are five logical devices: midi, joystick, pcm, mux and mixer */
 
-typedef struct _midi_dev 
+typedef struct _midi_dev
 {
 	struct _cmedia_pci_dev *card;
 	void *		driver;
@@ -63,7 +60,7 @@ typedef struct _midi_dev
 	char		name[64];
 } midi_dev;
 
-typedef struct _joy_dev 
+typedef struct _joy_dev
 {
 	void *		driver;
 	char		name1[64];
@@ -72,13 +69,13 @@ typedef struct _joy_dev
 typedef cmedia_pci_audio_format pcm_cfg;
 typedef cmedia_pci_audio_buf_header pcm_buf_hdr;
 
-enum 
+enum
 {	/* these map to the mode enable bits in the CMX13 register */
 	kPlayback = 1,
 	kRecord = 2
 };
 
-typedef struct 
+typedef struct
 {
 	struct _cmedia_pci_dev * card;
 	char		name[DEVNAME];
@@ -89,7 +86,7 @@ typedef struct
 
 /* playback from a cyclic, small-ish buffer */
 
-	int32		wr_lock;
+	spinlock	wr_lock;
 	int			dma_a;
 	vuchar *	wr_1;
 	vuchar *	wr_2;
@@ -108,7 +105,7 @@ typedef struct
 
 /* recording into a cyclic, somewhat larger buffer */
 
-	int32		rd_lock;
+	spinlock	rd_lock;
 	int			dma_c;
 	vuchar *	rd_1;
 	vuchar *	rd_2;
@@ -133,24 +130,24 @@ typedef struct
 	sem_id		old_play_sem;
 } pcm_dev;
 
-typedef struct 
+typedef struct
 {
 	struct _cmedia_pci_dev * card;
 	char		name[DEVNAME];
 	int32		open_count;
 } mux_dev;
 
-typedef struct 
+typedef struct
 {
 	struct _cmedia_pci_dev * card;
 	char		name[DEVNAME];
 	int32		open_count;
 } mixer_dev;
 
-typedef struct _cmedia_pci_dev 
+typedef struct _cmedia_pci_dev
 {
 	char		name[DEVNAME];	/* used for resources */
-	int32		hardware;		/* spinlock */
+	spinlock	hardware;
 	int			enhanced;		/* offset to port */
 	int32		inth_count;
 	int			dma_base;

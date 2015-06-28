@@ -10,9 +10,7 @@
 #include "cm_private.h"
 #include "sound.h"
 
-#if !defined(_KERNEL_EXPORT_H)
 #include <KernelExport.h>
-#endif /* _KERNEL_EXPORT_H */
 
 extern int sprintf(char *, const char *, ...);
 
@@ -88,7 +86,7 @@ device_hooks pcm_hooks = {
 static pcm_cfg default_pcm = {
 	44100.0,	/* sample rate */
 	2,			/* channels */
-	0x2,		/* format */		
+	0x2,		/* format */
 #if B_HOST_IS_BENDIAN
 	1,			/* endian (big) */
 #else
@@ -176,11 +174,11 @@ start_dma(
 	KTRACE();
 	ddprintf(("cmedia_pci: start_dma()\n"));
 	if (port->config.format == 0x11) {
-		memset((void*)port->card->low_mem, 0x80, port->config.play_buf_size + 
+		memset((void*)port->card->low_mem, 0x80, port->config.play_buf_size +
 			port->config.rec_buf_size);
 	}
 	else {
-		memset((void *)port->card->low_mem, 0, port->config.play_buf_size + 
+		memset((void *)port->card->low_mem, 0, port->config.play_buf_size +
 			port->config.rec_buf_size);
 	}
 
@@ -201,8 +199,8 @@ start_dma(
 	/* will get 187 interrupts a second from playback, and 94 interrupts */
 	/* a second from recording, at 48 kHz sampling rate, when buffers */
 	/* are 2048 for playback and 4096 for record. */
-	
-	ddprintf(("play_buf_size %lx   rec_buf_size %lx\n", 
+
+	ddprintf(("play_buf_size %lx   rec_buf_size %lx\n",
 		port->config.play_buf_size/2, port->config.rec_buf_size/2));
 
 	PCI_IO_WR(port->dma_c, ((uint32)port->card->low_phys+
@@ -246,7 +244,7 @@ start_dma(
 }
 
 
-static status_t 
+static status_t
 configure_pcm(
 	pcm_dev * port,
 	pcm_cfg * config,
@@ -274,7 +272,7 @@ configure_pcm(
 	}
 	/* secret format of format: upper nybble = signed, unsigned, float */
 	/* lower nybble = bytes per sample */
-	if ((config->format != 0x11) && (config->format != 0x2) && 
+	if ((config->format != 0x11) && (config->format != 0x2) &&
 		(config->format != 0x24) && (config->format != 0x4)) {
 		config->format = default_pcm.format;
 	}
@@ -427,7 +425,7 @@ configure_pcm(
 
 /* here is where we should care about record and playback buffer sizes */
 
-	ddprintf(("cmedia_pci: play %04lx rec %04lx\n", port->config.play_buf_size/2, 
+	ddprintf(("cmedia_pci: play %04lx rec %04lx\n", port->config.play_buf_size/2,
 		port->config.rec_buf_size/2));
 
 	port->wr_1 = port->card->low_mem;
@@ -499,8 +497,7 @@ gotit:
 		port->config.rec_buf_size *= 2;
 
 		/* playback */
-
-		port->wr_lock = 0;
+		B_INITIALIZE_SPINLOCK(&port->wr_lock);
 		port->dma_a = cards[ix].dma_base;
 		port->wr_1 = cards[ix].low_mem;
 		port->wr_2 = cards[ix].low_mem+port->config.play_buf_size/2;
@@ -532,10 +529,10 @@ gotit:
 			return port->wr_time_sem;
 		}
 		set_sem_owner(port->wr_time_sem, B_SYSTEM_TEAM);
-		
+
 		/* recording */
 
-		port->rd_lock = 0;
+		B_INITIALIZE_SPINLOCK(&port->rd_lock);
 		port->dma_c = cards[ix].dma_base+0x08;
 		port->rd_1 = cards[ix].low_mem+port->config.play_buf_size;
 		port->rd_2 = cards[ix].low_mem+port->config.play_buf_size+port->config.rec_buf_size/2;
@@ -595,7 +592,7 @@ gotit:
 
 		set_direct(port->card, 0x0e, 0x03, 0x03);	/* */
 		start_dma(port);
-		
+
 		/* initialization is done, let other clients of the driver go */
 	} else {
 		if (prev_mode != port->open_mode) {
@@ -690,9 +687,9 @@ pcm_free(
 		KTRACE();
 		cp = disable_interrupts();
 		acquire_spinlock(&port->card->hardware);
-	
+
 		decrement_interrupt_handler(port->card);
-	
+
 		release_spinlock(&port->card->hardware);
 		restore_interrupts(cp);
 	}
@@ -815,73 +812,73 @@ pcm_control(
 		u = get_indirect(port->card, 0x30)>>2;
 		sound->mono_gain = u&63;
 		sound->mono_mute = 0;
-		
+
 		/* left channel */
 		u = get_indirect(port->card, 0x3d); // Legacy SB compatible Mixer
-		switch (u) 
+		switch (u)
 		{
 		case 0x10:
 			sound->left.adc_source = line;		//	record line left
 			break;
-	
+
 		case 4:
 			sound->left.adc_source = aux1;		// record CD left ??
 			break;
-		
+
 		case 1:
 			sound->left.adc_source = mic;		// record mic left
 			break;
-		
+
 		default:
 			sound->left.adc_source = loopback;
 			break;
 		}
 		u = get_indirect(port->card, 0x3f)>>4;
 		sound->left.adc_gain = u&15;
-	
+
 		u = get_direct(port->card, 0x25)<<4;
 		sound->left.mic_gain_enable = u&16;
-		
+
 		u = get_indirect(port->card, 0x36)>>3;
 		sound->left.aux1_mix_gain = 31-(u&31);
-		
+
 		u = get_indirect(port->card, 0x3c)<<5;
 		sound->left.aux1_mix_mute = ~u&128;
-		
+
 		u = get_indirect(port->card, 0x34)>>3;
 		sound->left.aux2_mix_gain = 31-(u&31);
-		
+
 		u = get_direct(port->card, 0x24);
 		sound->left.aux2_mix_mute = u&128;
-		
+
 		u = get_indirect(port->card, 0x38)>>3;
 		sound->left.line_mix_gain = 31-(u&31);
-		
+
 		u = get_indirect(port->card, 0x3c)<<3;
 		sound->left.line_mix_mute = ~u&128;
-		
+
 		u = get_indirect(port->card, 0x32)>>2;
 		sound->left.dac_attn = 63-(u&63);
-		
+
 		u = get_direct(port->card, 0x24)<<1;
 		sound->left.dac_mute = u&128;
-		
+
 		/* right channel */
 		u = get_indirect(port->card, 0x3e);
-		switch (u) 
+		switch (u)
 		{
 		case 8:
 			sound->right.adc_source = line;		//record line right
 			break;
-		
+
 		case 2:
 			sound->right.adc_source = aux1;		// record CD right?
 			break;
-		
+
 		case 1:
 			sound->right.adc_source = mic;		// record mic right
 			break;
-		
+
 		default:
 			sound->right.adc_source = loopback;
 			break;
@@ -961,7 +958,7 @@ pcm_control(
 		set_indirect(port->card, 0x30, u<<3, 0xff);
 		set_indirect(port->card, 0x31, u<<3, 0xff);
 		/* left channel */
-		switch (sound->left.adc_source) 
+		switch (sound->left.adc_source)
 		{
 		case line:
 			u = 1<<4;
@@ -1096,8 +1093,8 @@ pcm_control(
 		*(int32*)data = config.rec_buf_size;
 		err = B_OK;
 		break;
-		
-		
+
+
 // control ports for SPDIF settings
 	case SOUND_GET_SPDIF_IN_OUT_LOOPBACK:
 		*(int8 *)data = 0;
@@ -1105,7 +1102,7 @@ pcm_control(
 		if( reg_value && 0x80 ) *(int8 *)data = 1;
 		err = B_OK;
 		break;
-	
+
 	case SOUND_SET_SPDIF_IN_OUT_LOOPBACK:
 		if( *(int8 *)data == 0 ) // disable SPDIF-IN loopback to SPDIF (bypass)
 			set_direct( port->card, 0x04, 0x00, 0x80 );
@@ -1123,7 +1120,7 @@ pcm_control(
 		if( reg_value && 0x80 ) *(int8 *)data = 1;
 		err = B_OK;
 		break;
-	
+
 	case SOUND_SET_SPDIF_OUT:
 		if( *(int8 *)data == 0 ) // disable SPDIF-OUT
 			set_direct( port->card, 0x16, 0x00, 0x80);
@@ -1132,16 +1129,16 @@ pcm_control(
 		err = B_OK;
 		break;
 
-	
-	
+
+
 	case SOUND_GET_SPDIF_MONITOR:
 		*(int8 *)data = 0;
 		reg_value = get_direct( port->card, 0x24 );
 		if( reg_value && 0x01 ) *(int8 *)data = 1;
 		err = B_OK;
 		break;
-	
-	
+
+
 	case SOUND_SET_SPDIF_MONITOR:
 		if( *(int8 *)data == 0 ) // disable SPDIF_IN PCM to DAC (CDPlay)
 			set_direct( port->card, 0x24, 0x00, 0x01 );
@@ -1149,21 +1146,21 @@ pcm_control(
 			set_direct( port->card, 0x24, 0x01, 0x01 );
 		err = B_OK;
 		break;
-	
+
 	case SOUND_GET_SPDIF_OUT_LEVEL:
 		*(int8 *)data = 0;
 		reg_value = get_direct( port->card, 0x1b );
 		if( reg_value && 0x02 ) *(int8 *)data = 1;
 		err = B_OK;
 		break;
-	
+
 	case SOUND_SET_SPDIF_OUT_LEVEL:
-		if( *(int8 *)data == 0 ) // enable SPDIF-OUT optical 
+		if( *(int8 *)data == 0 ) // enable SPDIF-OUT optical
 			set_direct( port->card, 0x1b, 0x00, 0x02 );
 		else // enable SPDIF-OUT coaxial
 			set_direct( port->card, 0x1b, 0x02, 0x02 );
 		break;
-	
+
 	case SOUND_GET_SPDIF_IN_FORMAT:
 		*(int8 *)data = 0;
 		reg_value = get_direct( port->card, 0x08 );		// Adresse 0x08
@@ -1171,7 +1168,7 @@ pcm_control(
 		err = B_OK;
 		break;
 
-	
+
 	case SOUND_SET_SPDIF_IN_FORMAT:
 		if( *(int8 *)data == 0 ) // disable SPDIF inverse (SPDIF normal)
 			set_direct( port->card, 0x08, 0x00, 0x80 );
@@ -1180,14 +1177,14 @@ pcm_control(
 		err = B_OK;
 		break;
 
-	
+
 	case SOUND_GET_SPDIF_IN_OUT_COPYRIGHT:
 		*(int8 *)data = 0;
 		reg_value = get_direct( port->card, 0x16 );
 		if( reg_value && 0x40 ) *(int8 *)data = 1;
 		err = B_OK;
 		break;
-	
+
 	case SOUND_SET_SPDIF_IN_OUT_COPYRIGHT:
 		if( *(int8 *)data == 0 ) // disable SPDIF-IN/OUT copyright protection
 			set_direct( port->card, 0x16, 0x00, 0x40 );
@@ -1195,14 +1192,14 @@ pcm_control(
 			set_direct( port->card, 0x16, 0x40, 0x40 );
 		err = B_OK;
 		break;
-	
+
 	case SOUND_GET_SPDIF_IN_VALIDITY:
 		*(int8 *)data = 0;
 		reg_value = get_direct( port->card, 0x27 );
 		if( reg_value && 0x02 ) *(int8 *)data = 1;
 		err = B_OK;
 		break;
-	
+
 	case SOUND_SET_SPDIF_IN_VALIDITY:
 		if( *(int8 *)data == 0 ) // disable SPDIF-IN validity detection
 			set_direct( port->card, 0x27, 0x00, 0x02 );
@@ -1211,18 +1208,18 @@ pcm_control(
 		err = B_OK;
 		break;
 // control ports for analog settings
-	
+
 	case SOUND_GET_4_CHANNEL_DUPLICATE:
 		*(int8 *)data = 0;
 		reg_value = get_direct( port->card, 0x1b );
 		if( reg_value && 0x04 ) *(int8 *)data = 1;
-		
+
 //		0x1b, 0x04, 0x04,	/* dual channel mode enable */
 //		0x1a, 0x00, 0x80,	/* Double DAC structure disable */
 
 		err = B_OK;
 		break;
-	
+
 	case SOUND_SET_4_CHANNEL_DUPLICATE:
 		if( *(int8 *)data == 0 ) // disable 4 channel analog duplicate mode
 			set_direct( port->card, 0x1b, 0x00, 0x04 );
@@ -1235,22 +1232,22 @@ pcm_control(
 	case SOUND_GET_DEVICE_ID:
 //		*(int32*)data.vendor_id = cards[0].info.vendor_id;
 //		*(int32*)data.device_id = cards[0].info.device_id;
-		
+
 //		chipinfo[0] = cards[0].info.vendor_id;
 		*(int32 *)data = cards[0].info.device_id;
-		
+
 //		memcpy(data, &chipinfo, sizeof(chipinfo));
 		err = B_OK;
 		break;
-	
+
 	case SOUND_GET_INTERNAL_CHIP_ID:
 		// XXX
 		break;
-	
+
 	case SOUND_GET_DRIVER_VERSION:
 		memcpy(data, &DriverVersion, sizeof(DriverVersion));
 		break;
-		
+
 	default:
 		OLDAPI(("cmedia_pci: unknown code %ld\n", iop));
 		err = B_BAD_VALUE;
@@ -1391,7 +1388,7 @@ first_time:	/* we need to check whether anything's available first */
 		}
 		switch (port->config.format) {
 		case 0x24:	/*	floats	*/
-			copy_short_to_float((float *)data, (const short *)(port->rd_cur+port->was_read), 
+			copy_short_to_float((float *)data, (const short *)(port->rd_cur+port->was_read),
 				block, !B_HOST_IS_LENDIAN == !port->config.big_endian);
 			bytes_xferred = block * 2;
 			break;
@@ -1514,7 +1511,7 @@ pcm_write(
 		}
 		switch (port->config.format) {
 		case 0x24:	/*	floats	*/
-			copy_float_to_short((short *)(port->wr_cur+port->was_written), (const float *)data, 
+			copy_float_to_short((short *)(port->wr_cur+port->was_written), (const float *)data,
 				block, !B_HOST_IS_LENDIAN == !port->config.big_endian);
 			bytes_xferred = block * 2;
 			break;

@@ -9,9 +9,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#if !defined(_KERNEL_EXPORT_H)
 #include <KernelExport.h>
-#endif
 
 
 #if DEBUG
