@@ -248,10 +248,11 @@ BNetworkAddressResolver::GetNextAddress(int family, uint32* cookie,
 
 	addrinfo* info = fInfo;
 	int32 first = *cookie;
-	for (int32 index = 0; index < first && info != NULL; index++) {
-		while (info != NULL && info->ai_family != family)
-			info = info->ai_next;
-	}
+	for (int32 index = 0; index < first && info != NULL; index++)
+		info = info->ai_next;
+
+	while (info != NULL && info->ai_family != family)
+		info = info->ai_next;
 
 	if (info == NULL)
 		return B_BAD_VALUE;
