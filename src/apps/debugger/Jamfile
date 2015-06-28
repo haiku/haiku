@@ -290,6 +290,8 @@ Application Debugger :
 	VariablesView.cpp
 
 	# user_interface/gui/team_settings_window
+	ExceptionStopConfigView.cpp
+	ImageStopConfigView.cpp
 	TeamSettingsWindow.cpp
 
 	# user_interface/gui/util

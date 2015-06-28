@@ -8,22 +8,15 @@
 
 #include <Window.h>
 
-#include "Team.h"
 
-#include "types/Types.h"
-
-
-class BBox;
 class BButton;
-class BCheckBox;
-class BListView;
-class BMenuField;
-class BTextControl;
-class ImageDebugInfo;
+class ExceptionStopConfigView;
+class ImageStopConfigView;
+class Team;
 class UserInterfaceListener;
 
 
-class TeamSettingsWindow : public BWindow, private Team::Listener {
+class TeamSettingsWindow : public BWindow {
 public:
 								TeamSettingsWindow(::Team* team,
 									UserInterfaceListener* listener,
@@ -36,49 +29,14 @@ public:
 									BHandler* target);
 									// throws
 
-	virtual	void				MessageReceived(BMessage* message);
-
 	virtual	void				Show();
-
-	// Team::Listener
-	virtual	void				StopOnImageLoadSettingsChanged(
-									const Team::ImageLoadEvent& event);
-	virtual	void				StopOnImageLoadNameAdded(
-									const Team::ImageLoadNameEvent& event);
-	virtual	void				StopOnImageLoadNameRemoved(
-									const Team::ImageLoadNameEvent& event);
-
 
 private:
 			void	 			_Init();
-			void				_UpdateThrownBreakpoints(bool enable);
-			status_t			_FindExceptionFunction(ImageDebugInfo* info,
-									target_addr_t& _foundAddress) const;
-
-			void				_UpdateExceptionState();
-			void				_UpdateStopImageState();
-			void				_UpdateStopImageButtons(bool previousStop,
-									bool previousCustomImages);
-									// must be called with team lock held
-
-
 
 private:
 			::Team*				fTeam;
 			UserInterfaceListener* fListener;
-			BBox*				fExceptionSettingsBox;
-			BBox*				fImageSettingsBox;
-			BCheckBox*			fExceptionThrown;
-			BCheckBox*			fExceptionCaught;
-			BCheckBox*			fStopOnImageLoad;
-			BMenuField*			fStopImageConstraints;
-			BListView*			fStopImageNames;
-			BTextControl*		fStopImageNameInput;
-			BButton*			fAddImageNameButton;
-			BButton*			fRemoveImageNameButton;
-			BView*				fCustomImageGroup;
-			bool				fStopOnLoadEnabled;
-			bool				fUseCustomImages;
 			BButton*			fCloseButton;
 			BHandler*			fTarget;
 };
