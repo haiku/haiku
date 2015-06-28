@@ -1333,8 +1333,14 @@ BContainerWindow::ResizeToFit()
 	BRect screenFrame(screen.Frame());
 
 	screenFrame.InsetBy(5, 5);
-	screenFrame.top += 15;
-		// keeps title bar of window visible
+	BMessage decoratorSettings;
+	GetDecoratorSettings(&decoratorSettings);
+
+	float tabHeight = 15;
+	BRect tabRect;
+	if (decoratorSettings.FindRect("tab frame", &tabRect) == B_OK)
+		tabHeight = tabRect.Height();
+	screenFrame.top += tabHeight;
 
 	BRect frame(Frame());
 
