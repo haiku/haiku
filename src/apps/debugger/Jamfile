@@ -292,6 +292,7 @@ Application Debugger :
 	# user_interface/gui/team_settings_window
 	ExceptionStopConfigView.cpp
 	ImageStopConfigView.cpp
+	SignalsConfigView.cpp
 	TeamSettingsWindow.cpp
 
 	# user_interface/gui/util

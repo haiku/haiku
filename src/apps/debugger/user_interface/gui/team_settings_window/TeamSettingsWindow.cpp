@@ -11,6 +11,7 @@
 #include "ExceptionStopConfigView.h"
 #include "ImageStopConfigView.h"
 #include "MessageCodes.h"
+#include "SignalsConfigView.h"
 
 
 TeamSettingsWindow::TeamSettingsWindow(::Team* team,
@@ -71,6 +72,9 @@ TeamSettingsWindow::_Init()
 					B_QUIT_REQUESTED)))
 		.End();
 
+	SignalsConfigView* signalsView = SignalsConfigView::Create(fTeam,
+		fListener);
+	tabView->AddTab(signalsView);
 	ImageStopConfigView* imageView = ImageStopConfigView::Create(fTeam,
 		fListener);
 	tabView->AddTab(imageView);
