@@ -158,7 +158,8 @@ static	pthread_once_t			_nslockinit = PTHREAD_ONCE_INIT;
 
 static void lockinit()
 {
-	pthread_rwlock_init(&_nslock, NULL);
+	int result = pthread_rwlock_init(&_nslock, NULL);
+	assert(result == 0);
 }
 
 /*
@@ -509,8 +510,6 @@ _nsconfigure(void)
 		return (0);
 	}
 
-	pthread_once(&_nslockinit, lockinit);
-
 	/*
 	 * Ok, we've decided we need to update the nsswitch configuration
 	 * structures.  Acquire a write-lock on _nslock while continuing
@@ -613,6 +612,8 @@ nsdispatch(void *retval, const ns_dtab disp_tab[], const char *database,
 	assert(defaults != NULL);
 	if (database == NULL || method == NULL || defaults == NULL)
 		return (NS_UNAVAIL);
+
+	pthread_once(&_nslockinit, lockinit);
 
 	/*
 	 * In both the threaded and non-threaded cases, avoid reloading
