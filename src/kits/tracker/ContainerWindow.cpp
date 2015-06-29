@@ -3051,11 +3051,14 @@ BContainerWindow::BuildAddOnMenu(BMenu* menu)
 	if (item == NULL)
 		return;
 
+	BFont font;
+	menu->GetFont(&font);
+
 	menu = item->Submenu();
 	if (menu == NULL)
 		return;
 
-	menu->SetFont(be_plain_font);
+	menu->SetFont(&font);
 
 	// found the addons menu, empty it first
 	for (;;) {
