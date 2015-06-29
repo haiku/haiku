@@ -52,6 +52,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			nsap_addr.c
 
 			# irs
+			base64.c
 			getaddrinfo.c
 			gethnamaddr.c
 			getnameinfo.c
@@ -78,7 +79,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 			# isc
 			assertions.c
-			base64.c
 			bitncmp.c
 			ctl_clnt.c
 			ctl_p.c
