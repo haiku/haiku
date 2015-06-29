@@ -11,9 +11,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 		SubDirSysHdrs $(SUBDIR) ;
 
-		# private sources for this port
-		SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
-
 		# NetResolv sources
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) dst ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) inet ] ;
