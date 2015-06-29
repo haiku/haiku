@@ -14,8 +14,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		# private sources for this port
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) src ] ;
 
-		# BIND sources
-		SEARCH_SOURCE += [ FDirName $(SUBDIR) bsd ] ;
+		# NetResolv sources
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) dst ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) inet ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) irs ] ;
@@ -120,9 +119,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			res_query.c
 			res_send.c
 			res_state.c
-
-			# private functions
-			strsep.c
 			;
 	}
 }
