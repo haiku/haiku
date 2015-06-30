@@ -82,8 +82,10 @@ bs_printf(BString* string, const char* format, ...)
 
 
 StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
-	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
-	fFindWindow(NULL), fReplaceWindow(NULL)
+	:
+	BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+	fFindWindow(NULL),
+	fReplaceWindow(NULL)
 {
 	_InitWindow(encoding);
 	BString unTitled(B_TRANSLATE("Untitled "));
@@ -96,8 +98,10 @@ StyledEditWindow::StyledEditWindow(BRect frame, int32 id, uint32 encoding)
 
 
 StyledEditWindow::StyledEditWindow(BRect frame, entry_ref* ref, uint32 encoding)
-	: BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
-	fFindWindow(NULL), fReplaceWindow(NULL)
+	:
+	BWindow(frame, "untitled", B_DOCUMENT_WINDOW, B_ASYNCHRONOUS_CONTROLS),
+	fFindWindow(NULL),
+	fReplaceWindow(NULL)
 {
 	_InitWindow(encoding);
 	OpenFile(ref);
@@ -424,22 +428,18 @@ StyledEditWindow::MessageReceived(BMessage* message)
 		}
 		case FONT_COLOR:
 		{
-			void* ptr;
-			if (message->FindPointer("source", &ptr) == B_OK) {
-				if (ptr == fBlackItem)
-					_SetFontColor(&BLACK);
-				else if (ptr == fRedItem)
-					_SetFontColor(&RED);
-				else if (ptr == fGreenItem)
-					_SetFontColor(&GREEN);
-				else if (ptr == fBlueItem)
-					_SetFontColor(&BLUE);
-				else if (ptr == fCyanItem)
-					_SetFontColor(&CYAN);
-				else if (ptr == fMagentaItem)
-					_SetFontColor(&MAGENTA);
-				else if (ptr == fYellowItem)
-					_SetFontColor(&YELLOW);
+			ssize_t colorLength;
+			rgb_color* color;
+			if (message->FindData("color", B_RGB_COLOR_TYPE,
+					(const void**)&color, &colorLength) == B_OK
+				&& colorLength == sizeof(rgb_color)) {
+				/*
+				 * TODO: Ideally, when selecting the default color,
+				 * you wouldn't naively apply it; it shouldn't lose its nature.
+				 * When reloaded with a different default color, it should
+				 * reflect that different choice.
+				 */
+				_SetFontColor(color);
 			}
 			break;
 		}
@@ -648,37 +648,21 @@ StyledEditWindow::MenusBeginning()
 	// find the current font, color, size
 	BFont font;
 	uint32 sameProperties;
-	rgb_color color = BLACK;
+	rgb_color color = ui_color(B_DOCUMENT_TEXT_COLOR);
 	bool sameColor;
 	fTextView->GetFontAndColor(&font, &sameProperties, &color, &sameColor);
 	color.alpha = 255;
 
 	if (sameColor) {
-		// mark the menu according to the current color
-		if (color.red == 0) {
-			if (color.green == 0) {
-				if (color.blue == 0) {
-					fBlackItem->SetMarked(true);
-				} else if (color.blue == 255) {
-					fBlueItem->SetMarked(true);
-				}
-			} else if (color.green == 255) {
-				if (color.blue == 0) {
-					fGreenItem->SetMarked(true);
-				} else if (color.blue == 255) {
-					fCyanItem->SetMarked(true);
-				}
-			}
-		} else if (color.red == 255) {
-			if (color.green == 0) {
-				if (color.blue == 0) {
-					fRedItem->SetMarked(true);
-				} else if (color.blue == 255) {
-					fMagentaItem->SetMarked(true);
-				}
-			} else if (color.green == 255) {
-				if (color.blue == 0) {
-					fYellowItem->SetMarked(true);
+		if (fDefaultFontColorItem->Color() == color)
+			fDefaultFontColorItem->SetMarked(true);
+		else {
+			for (int i = 0; i < fFontColorMenu->CountItems(); i++) {
+				ColorMenuItem* item = dynamic_cast<ColorMenuItem*>
+					(fFontColorMenu->ItemAt(i));
+				if (item != NULL && item->Color() == color) {
+					item->SetMarked(true);
+					break;
 				}
 			}
 		}
@@ -1237,27 +1221,12 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	}
 
 	// "Color"-subMenu
-	fFontColorMenu = new BMenu(B_TRANSLATE("Color"));
+	fFontColorMenu = new BMenu(B_TRANSLATE("Color"), 0, 0);
 	fFontColorMenu->SetRadioMode(true);
 	fFontMenu->AddItem(fFontColorMenu);
 
-	fFontColorMenu->AddItem(fBlackItem = new ColorMenuItem(B_TRANSLATE("Black"),
-		BLACK, new BMessage(FONT_COLOR)));
-	fBlackItem->SetMarked(true);
-	fFontColorMenu->AddItem(fRedItem = new ColorMenuItem(B_TRANSLATE("Red"),
-		RED, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fGreenItem = new ColorMenuItem(B_TRANSLATE("Green"),
-		GREEN, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fBlueItem = new ColorMenuItem(B_TRANSLATE("Blue"),
-		BLUE, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fCyanItem = new ColorMenuItem(B_TRANSLATE("Cyan"),
-		CYAN, new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fMagentaItem
-		= new ColorMenuItem(B_TRANSLATE("Magenta"), MAGENTA,
-			new BMessage(FONT_COLOR)));
-	fFontColorMenu->AddItem(fYellowItem
-		= new ColorMenuItem(B_TRANSLATE("Yellow"), YELLOW,
-			new BMessage(FONT_COLOR)));
+	_BuildFontColorMenu(fFontColorMenu);
+
 	fFontMenu->AddSeparatorItem();
 
 	// "Bold" & "Italic" menu items
@@ -1337,6 +1306,57 @@ StyledEditWindow::_InitWindow(uint32 encoding)
 	fSavePanel = NULL;
 	fSavePanelEncodingMenu = NULL;
 		// build lazily
+}
+
+
+void
+StyledEditWindow::_BuildFontColorMenu(BMenu* menu)
+{
+	if (menu == NULL)
+		return;
+
+	BFont font;
+	menu->GetFont(&font);
+	font_height fh;
+	font.GetHeight(&fh);
+
+	const float itemHeight = ceilf(fh.ascent + fh.descent + 2 * fh.leading);
+	const float margin = 8.0;
+	const int nbColumns = 5;
+
+	BMessage msgTemplate(FONT_COLOR);
+	BRect matrixArea(0, 0, 0, 0);
+
+	// we place the color palette, reserving room at the top
+	for (uint i = 0; i < sizeof(palette) / sizeof(rgb_color); i++) {
+		BPoint topLeft((i % nbColumns) * (itemHeight + margin),
+			(i / nbColumns) * (itemHeight + margin));
+		BRect buttonArea(topLeft.x, topLeft.y, topLeft.x + itemHeight,
+			topLeft.y + itemHeight);
+		buttonArea.OffsetBy(margin, itemHeight + margin + margin);
+		menu->AddItem(
+			new ColorMenuItem("", palette[i], new BMessage(msgTemplate)),
+			buttonArea);
+		buttonArea.OffsetBy(margin, margin);
+		matrixArea = matrixArea | buttonArea;
+	}
+
+	// separator at the bottom to add spacing in the matrix menu
+	matrixArea.top = matrixArea.bottom;
+	menu->AddItem(new BSeparatorItem(), matrixArea);
+
+	matrixArea.top = 0;
+	matrixArea.bottom = itemHeight + 4;
+
+	BMessage* msg = new BMessage(msgTemplate);
+	msg->AddBool("default", true);
+	fDefaultFontColorItem = new ColorMenuItem(B_TRANSLATE("Default"),
+		ui_color(B_DOCUMENT_TEXT_COLOR), msg);
+	menu->AddItem(fDefaultFontColorItem, matrixArea);
+
+	matrixArea.top = matrixArea.bottom;
+	matrixArea.bottom = matrixArea.top + margin;
+	menu->AddItem(new BSeparatorItem(), matrixArea);
 }
 
 

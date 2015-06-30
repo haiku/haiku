@@ -33,8 +33,9 @@ using namespace BPrivate;
 StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds,
 	BHandler* handler)
 	:
-	BTextView(viewFrame, "textview", textBounds,  B_FOLLOW_ALL,
-		B_FRAME_EVENTS | B_WILL_DRAW)
+	BTextView(viewFrame, "textview", textBounds, NULL,
+		&(fInitialColor = ui_color(B_DOCUMENT_TEXT_COLOR)),
+		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW)
 {
 	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	SetLowColor(ViewColor());

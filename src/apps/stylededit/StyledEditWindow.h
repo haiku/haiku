@@ -25,6 +25,7 @@ class BMessage;
 class BScrollView;
 class StatusView;
 class StyledEditView;
+class ColorMenuItem;
 
 
 class StyledEditWindow : public BWindow {
@@ -51,6 +52,7 @@ public:
 
 private:
 			void				_InitWindow(uint32 encoding = 0);
+			void				_BuildFontColorMenu(BMenu* menu);
 			void				_LoadAttrs();
 			void				_SaveAttrs();
 			status_t			_LoadFile(entry_ref* ref,
@@ -123,14 +125,6 @@ private:
 			BMenuItem*			fReplaceItem;
 			BMenuItem*			fReplaceSameItem;
 
-			BMenuItem*			fBlackItem;
-			BMenuItem*			fRedItem;
-			BMenuItem*			fGreenItem;
-			BMenuItem*			fBlueItem;
-			BMenuItem*			fCyanItem;
-			BMenuItem*			fMagentaItem;
-			BMenuItem*			fYellowItem;
-
 			BMenuItem*			fBoldItem;
 			BMenuItem*			fItalicItem;
 
@@ -143,6 +137,8 @@ private:
 
 			BString				fStringToFind;
 			BString				fReplaceString;
+
+			ColorMenuItem*		fDefaultFontColorItem;
 
 			// undo modes
 			bool				fUndoFlag;	// we just did an undo action

@@ -48,6 +48,7 @@ private:
 			BMessenger*	fMessenger;
 			bool		fSuppressChanges;
 			BString		fEncoding;
+			rgb_color	fInitialColor;
 };
 
 

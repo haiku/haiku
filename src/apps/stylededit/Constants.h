@@ -53,14 +53,20 @@ const uint32 FONT_COLOR					= 'Fcol';
 const uint32 kMsgSetItalic				= 'Fita';
 const uint32 kMsgSetBold				= 'Fbld';
 
-// fontcolors
-const rgb_color	BLACK 					= {0, 0, 0, 255};
-const rgb_color	RED 					= {255, 0, 0, 255};
-const rgb_color	GREEN					= {0, 255, 0, 255};
-const rgb_color	BLUE					= {0, 0, 255, 255};
-const rgb_color	CYAN					= {0, 255, 255, 255};
-const rgb_color	MAGENTA					= {255, 0, 255, 255};
-const rgb_color	YELLOW 					= {255, 255, 0, 255};
+const rgb_color palette[] = {
+	{ 220, 0, 0, 255 },		// red
+	{ 220, 73, 0, 255 },	// orange
+	{ 220, 220, 0, 255 },	// yellow
+	{ 59, 177, 0, 255 },	// green
+	{ 60, 22, 0, 255 },		// brown
+	{ 36, 71, 106, 255 },	// blue
+	{ 0, 123, 186, 255 },	// cyan
+	{ 0, 106, 115, 255 },	// teal
+	{ 53, 53, 53, 255 },	// charcoal
+	{ 137, 0, 72, 255 },	// magenta
+	{ 0, 0, 0, 255 },		//black
+	{ 255, 255, 255, 255 }	// white
+};
 
 // "Document"-menu
 const uint32 ALIGN_LEFT					= 'ALle';

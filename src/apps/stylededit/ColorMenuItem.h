@@ -17,15 +17,16 @@ class BMessage;
 
 
 class ColorMenuItem: public BMenuItem {
-	public:
-						ColorMenuItem(const char* label, rgb_color color, 
-							BMessage* message);
+public:
+								ColorMenuItem(const char* label, rgb_color color,
+									BMessage* message);
+			rgb_color			Color() { return fItemColor; };
 
-	protected:
-		virtual void	DrawContent();
+protected:
+	virtual void				DrawContent();
 
-	private:
-		rgb_color		fItemColor;
+private:
+			rgb_color			fItemColor;
 };
 
 #endif	// COLOR_MENU_ITEM_H
