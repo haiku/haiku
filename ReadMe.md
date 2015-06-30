@@ -54,4 +54,4 @@ documentation for it, and [submit a patch](https://dev.haiku-os.org/wiki/CodingG
 See [wiki:i18n](https://dev.haiku-os.org/wiki/i18n).
 
 ### Contributing software ports
-See [HaikuPorts](https://bitbucket.org/haikuports/haikuports/).
+See [HaikuPorts](https://github.com/haikuports/haikuports/).
