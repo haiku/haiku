@@ -161,8 +161,8 @@ RemotePackageRepository HaikuPorts
 	libdvdread_devel-5.0.3-2
 	libdvdnav-5.0.3-3
 	libdvdnav_devel-5.0.3-3
-	libedit-2012_06_01_3.0-1
-	libedit_devel-2012_06_01_3.0-1
+	libedit-2015_03_21_3.1-1
+	libedit_devel-2015_03_21_3.1-1
 	libevent-2.0.21-7
 	libevent_devel-2.0.21-7
 	libexecinfo-1.1-2
