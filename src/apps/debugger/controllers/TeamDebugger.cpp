@@ -53,6 +53,7 @@
 #include "TeamMemoryBlock.h"
 #include "TeamMemoryBlockManager.h"
 #include "TeamSettings.h"
+#include "TeamSignalSettings.h"
 #include "TeamUiSettings.h"
 #include "Tracing.h"
 #include "ValueNode.h"
@@ -2315,6 +2316,22 @@ TeamDebugger::_LoadSettings()
 		fUserInterface->ID());
 	if (uiSettings != NULL)
 			fUserInterface->LoadSettings(uiSettings);
+
+	const TeamSignalSettings* signalSettings = fTeamSettings.SignalSettings();
+	if (signalSettings != NULL) {
+		fTeam->SetDefaultSignalDisposition(
+			signalSettings->DefaultSignalDisposition());
+
+		int32 signal;
+		int32 disposition;
+		for (int32 i = 0; i < signalSettings->CountCustomSignalDispositions();
+			i++) {
+			if (signalSettings->GetCustomSignalDispositionAt(i, signal,
+				disposition) == B_OK) {
+				fTeam->SetCustomSignalDisposition(signal, disposition);
+			}
+		}
+	}
 }
 
 

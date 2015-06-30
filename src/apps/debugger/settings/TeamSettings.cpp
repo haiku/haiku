@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,6 +17,7 @@
 #include "BreakpointSetting.h"
 #include "Team.h"
 #include "TeamFileManagerSettings.h"
+#include "TeamSignalSettings.h"
 #include "TeamUiSettings.h"
 #include "TeamUiSettingsFactory.h"
 #include "UserBreakpoint.h"
@@ -25,6 +26,7 @@
 TeamSettings::TeamSettings()
 {
 	fFileManagerSettings = new TeamFileManagerSettings();
+	fSignalSettings = new TeamSignalSettings();
 }
 
 
@@ -72,6 +74,22 @@ TeamSettings::SetTo(Team* team)
 			delete breakpointSetting;
 			return error;
 		}
+	}
+
+	// add signal configuration
+
+	fSignalSettings->SetDefaultSignalDisposition(
+		team->DefaultSignalDisposition());
+
+	const SignalDispositionMappings& mappings
+		= team->GetSignalDispositionMappings();
+
+	for (SignalDispositionMappings::const_iterator it = mappings.begin();
+		it != mappings.end(); ++it) {
+		status_t error = fSignalSettings->AddCustomSignalDisposition(
+			it->first, it->second);
+		if (error != B_OK)
+			return error;
 	}
 
 	return B_OK;
@@ -124,6 +142,12 @@ TeamSettings::SetTo(const BMessage& archive)
 			return error;
 	}
 
+	if (archive.FindMessage("signalsettings", &childArchive) == B_OK) {
+		error = fSignalSettings->SetTo(childArchive);
+		if (error != B_OK)
+			return error;
+	}
+
 	return B_OK;
 }
 
@@ -163,6 +187,14 @@ TeamSettings::WriteTo(BMessage& archive) const
 		return error;
 
 	error = archive.AddMessage("filemanagersettings", &childArchive);
+	if (error != B_OK)
+		return error;
+
+	error = fSignalSettings->WriteTo(childArchive);
+	if (error != B_OK)
+		return error;
+
+	error = archive.AddMessage("signalsettings", &childArchive);
 	if (error != B_OK)
 		return error;
 
@@ -253,6 +285,8 @@ TeamSettings::operator=(const TeamSettings& other)
 
 	*fFileManagerSettings = *other.fFileManagerSettings;
 
+	*fSignalSettings = *other.fSignalSettings;
+
 	return *this;
 }
 
@@ -277,6 +311,26 @@ TeamSettings::SetFileManagerSettings(TeamFileManagerSettings* settings)
 }
 
 
+TeamSignalSettings*
+TeamSettings::SignalSettings() const
+{
+	return fSignalSettings;
+}
+
+
+status_t
+TeamSettings::SetSignalSettings(TeamSignalSettings* settings)
+{
+	try {
+		*fSignalSettings = *settings;
+	} catch (...) {
+		return B_NO_MEMORY;
+	}
+
+	return B_OK;
+}
+
+
 void
 TeamSettings::_Unset()
 {
@@ -290,6 +344,7 @@ TeamSettings::_Unset()
 
 	fBreakpoints.MakeEmpty();
 	fUiSettings.MakeEmpty();
+	fSignalSettings->Unset();
 
 	fTeamName.Truncate(0);
 }

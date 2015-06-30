@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_SETTINGS_H
@@ -13,10 +13,11 @@
 
 
 class BMessage;
-class Team;
 class BreakpointSetting;
-class TeamUiSettings;
+class Team;
 class TeamFileManagerSettings;
+class TeamSignalSettings;
+class TeamUiSettings;
 
 
 class TeamSettings {
@@ -48,6 +49,10 @@ public:
 			status_t			SetFileManagerSettings(
 									TeamFileManagerSettings* settings);
 
+			TeamSignalSettings* SignalSettings() const;
+			status_t			SetSignalSettings(
+									TeamSignalSettings* settings);
+
 private:
 			typedef BObjectList<BreakpointSetting> BreakpointList;
 			typedef BObjectList<TeamUiSettings> UiSettingsList;
@@ -60,6 +65,7 @@ private:
 			UiSettingsList		fUiSettings;
 			TeamFileManagerSettings*
 								fFileManagerSettings;
+			TeamSignalSettings*	fSignalSettings;
 			BString				fTeamName;
 };
 

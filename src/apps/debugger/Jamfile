@@ -208,6 +208,7 @@ Application Debugger :
 	SettingsManager.cpp
 	TeamFileManagerSettings.cpp
 	TeamSettings.cpp
+	TeamSignalSettings.cpp
 	TeamUiSettings.cpp
 	TeamUiSettingsFactory.cpp
 
