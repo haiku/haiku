@@ -1,11 +1,12 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_H
 #define TEAM_H
 
+#include <map>
 
 #include <Locker.h>
 #include <StringList.h>
@@ -37,6 +38,10 @@ enum {
 	TEAM_EVENT_IMAGE_LOAD_SETTINGS_CHANGED,
 	TEAM_EVENT_IMAGE_LOAD_NAME_ADDED,
 	TEAM_EVENT_IMAGE_LOAD_NAME_REMOVED,
+
+	TEAM_EVENT_DEFAULT_SIGNAL_DISPOSITION_CHANGED,
+	TEAM_EVENT_CUSTOM_SIGNAL_DISPOSITION_CHANGED,
+	TEAM_EVENT_CUSTOM_SIGNAL_DISPOSITION_REMOVED,
 
 	TEAM_EVENT_CONSOLE_OUTPUT_RECEIVED,
 
@@ -71,6 +76,9 @@ class UserBreakpoint;
 class Value;
 
 
+typedef std::map<int32, int32> SignalDispositionMappings;
+
+
 class Team {
 public:
 			class Event;
@@ -81,6 +89,8 @@ public:
 			class ImageEvent;
 			class ImageLoadEvent;
 			class ImageLoadNameEvent;
+			class DefaultSignalDispositionEvent;
+			class CustomSignalDispositionEvent;
 			class ThreadEvent;
 			class UserBreakpointEvent;
 			class WatchpointEvent;
@@ -138,6 +148,18 @@ public:
 									{ return fStopOnImageLoad; }
 			bool				StopImageNameListEnabled() const
 									{ return fStopImageNameListEnabled; }
+
+			void				SetDefaultSignalDisposition(int32 disposition);
+			int32				DefaultSignalDisposition() const
+									{ return fDefaultSignalDisposition; }
+			bool				SetCustomSignalDisposition(int32 signal,
+									int32 disposition);
+			void				RemoveCustomSignalDisposition(int32 signal);
+			int32				SignalDispositionFor(int32 signal) const;
+									// if no custom disposition is found,
+									// returns default
+			const SignalDispositionMappings&
+								GetSignalDispositionMappings() const;
 
 			bool				AddBreakpoint(Breakpoint* breakpoint);
 									// takes over reference (also on error)
@@ -212,6 +234,14 @@ public:
 			void				NotifyStopImageNameRemoved(
 									const BString& name);
 
+			// service methods for Signal Disposition settings
+			void				NotifyDefaultSignalDispositionChanged(
+									int32 newDisposition);
+			void				NotifyCustomSignalDispositionChanged(
+									int32 signal, int32 disposition);
+			void				NotifyCustomSignalDispositionRemoved(
+									int32 signal);
+
 			// service methods for console output
 			void				NotifyConsoleOutputReceived(
 									int32 fd, const BString& output);
@@ -259,6 +289,9 @@ private:
 			bool				fStopOnImageLoad;
 			bool				fStopImageNameListEnabled;
 			BStringList			fStopImageNames;
+			int32				fDefaultSignalDisposition;
+			SignalDispositionMappings
+								fCustomSignalDispositions;
 			BreakpointList		fBreakpoints;
 			WatchpointList		fWatchpoints;
 			UserBreakpointList	fUserBreakpoints;
@@ -327,6 +360,34 @@ public:
 
 private:
 			BString				fImageName;
+};
+
+
+class Team::DefaultSignalDispositionEvent : public Event {
+public:
+								DefaultSignalDispositionEvent(uint32 type,
+									Team* team, int32 disposition);
+
+			int32				DefaultDisposition() const
+									{ return fDefaultDisposition; }
+
+private:
+			int32				fDefaultDisposition;
+};
+
+
+class Team::CustomSignalDispositionEvent : public Event {
+public:
+								CustomSignalDispositionEvent(uint32 type,
+									Team* team, int32 signal,
+									int32 disposition);
+
+			int32				Signal() const { return fSignal; }
+			int32				Disposition() const { return fDisposition; }
+
+private:
+			int32				fSignal;
+			int32				fDisposition;
 };
 
 
@@ -432,6 +493,16 @@ public:
 									const Team::ImageLoadNameEvent& event);
 	virtual	void				StopOnImageLoadNameRemoved(
 									const Team::ImageLoadNameEvent& event);
+
+	virtual	void				DefaultSignalDispositionChanged(
+									const Team::DefaultSignalDispositionEvent&
+										event);
+	virtual	void				CustomSignalDispositionChanged(
+									const Team::CustomSignalDispositionEvent&
+										event);
+	virtual	void				CustomSignalDispositionRemoved(
+									const Team::CustomSignalDispositionEvent&
+										event);
 
 	virtual	void				ConsoleOutputReceived(
 									const Team::ConsoleOutputEvent& event);

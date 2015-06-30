@@ -97,6 +97,13 @@ private:
 	virtual	void				RemoveStopImageNameRequested(
 									const char* name);
 
+	virtual	void				SetDefaultSignalDispositionRequested(
+									int32 disposition);
+	virtual	void				SetCustomSignalDispositionRequested(
+									int32 signal, int32 disposition);
+	virtual	void				RemoveCustomSignalDispositionRequested(
+									int32 signal);
+
 	virtual	void				SetWatchpointRequested(target_addr_t address,
 									uint32 type, int32 length, bool enabled);
 	virtual	void				SetWatchpointEnabledRequested(

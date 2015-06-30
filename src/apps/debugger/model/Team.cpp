@@ -16,6 +16,7 @@
 #include "FileSourceCode.h"
 #include "Function.h"
 #include "ImageDebugInfo.h"
+#include "SignalDispositionTypes.h"
 #include "SourceCode.h"
 #include "SpecificImageDebugInfo.h"
 #include "Statement.h"
@@ -80,7 +81,8 @@ Team::Team(team_id teamID, TeamMemory* teamMemory, Architecture* architecture,
 	fArchitecture(architecture),
 	fDebugInfo(debugInfo),
 	fStopOnImageLoad(false),
-	fStopImageNameListEnabled(false)
+	fStopImageNameListEnabled(false),
+	fDefaultSignalDisposition(SIGNAL_DISPOSITION_IGNORE)
 {
 	fDebugInfo->AcquireReference();
 }
@@ -309,6 +311,69 @@ const BStringList&
 Team::StopImageNames() const
 {
 	return fStopImageNames;
+}
+
+
+void
+Team::SetDefaultSignalDisposition(int32 disposition)
+{
+	if (disposition != fDefaultSignalDisposition) {
+		fDefaultSignalDisposition = disposition;
+		NotifyDefaultSignalDispositionChanged(disposition);
+	}
+}
+
+
+bool
+Team::SetCustomSignalDisposition(int32 signal, int32 disposition)
+{
+	SignalDispositionMappings::iterator it = fCustomSignalDispositions.find(
+		signal);
+	if (it != fCustomSignalDispositions.end() && it->second == disposition)
+		return true;
+
+	try {
+		fCustomSignalDispositions[signal] = disposition;
+	} catch (...) {
+		return false;
+	}
+
+	NotifyCustomSignalDispositionChanged(signal, disposition);
+
+	return true;
+}
+
+
+void
+Team::RemoveCustomSignalDisposition(int32 signal)
+{
+	SignalDispositionMappings::iterator it = fCustomSignalDispositions.find(
+		signal);
+	if (it == fCustomSignalDispositions.end())
+		return;
+
+	fCustomSignalDispositions.erase(it);
+
+	NotifyCustomSignalDispositionRemoved(signal);
+}
+
+
+int32
+Team::SignalDispositionFor(int32 signal) const
+{
+	SignalDispositionMappings::const_iterator it
+		= fCustomSignalDispositions.find(signal);
+	if (it != fCustomSignalDispositions.end())
+		return it->second;
+
+	return fDefaultSignalDisposition;
+}
+
+
+const SignalDispositionMappings&
+Team::GetSignalDispositionMappings() const
+{
+	return fCustomSignalDispositions;
 }
 
 
@@ -688,6 +753,45 @@ Team::NotifyStopImageNameRemoved(const BString& name)
 
 
 void
+Team::NotifyDefaultSignalDispositionChanged(int32 disposition)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->DefaultSignalDispositionChanged(
+			DefaultSignalDispositionEvent(
+				TEAM_EVENT_DEFAULT_SIGNAL_DISPOSITION_CHANGED, this,
+				disposition));
+	}
+}
+
+
+void
+Team::NotifyCustomSignalDispositionChanged(int32 signal, int32 disposition)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->CustomSignalDispositionChanged(
+			CustomSignalDispositionEvent(
+				TEAM_EVENT_CUSTOM_SIGNAL_DISPOSITION_CHANGED, this,
+				signal, disposition));
+	}
+}
+
+
+void
+Team::NotifyCustomSignalDispositionRemoved(int32 signal)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->CustomSignalDispositionRemoved(
+			CustomSignalDispositionEvent(
+				TEAM_EVENT_CUSTOM_SIGNAL_DISPOSITION_REMOVED, this,
+				signal, SIGNAL_DISPOSITION_IGNORE));
+	}
+}
+
+
+void
 Team::NotifyConsoleOutputReceived(int32 fd, const BString& output)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -841,6 +945,31 @@ Team::ImageLoadNameEvent::ImageLoadNameEvent(uint32 type, Team* team,
 }
 
 
+// #pragma mark - DefaultSignalDispositionEvent
+
+
+Team::DefaultSignalDispositionEvent::DefaultSignalDispositionEvent(uint32 type,
+	Team* team, int32 disposition)
+	:
+	Event(type, team),
+	fDefaultDisposition(disposition)
+{
+}
+
+
+// #pragma mark - CustomSignalDispositionEvent
+
+
+Team::CustomSignalDispositionEvent::CustomSignalDispositionEvent(uint32 type,
+	Team* team, int32 signal, int32 disposition)
+	:
+	Event(type, team),
+	fSignal(signal),
+	fDisposition(disposition)
+{
+}
+
+
 // #pragma mark - BreakpointEvent
 
 
@@ -987,6 +1116,27 @@ Team::Listener::StopOnImageLoadNameAdded(const Team::ImageLoadNameEvent& event)
 void
 Team::Listener::StopOnImageLoadNameRemoved(
 	const Team::ImageLoadNameEvent& event)
+{
+}
+
+
+void
+Team::Listener::DefaultSignalDispositionChanged(
+	const Team::DefaultSignalDispositionEvent& event)
+{
+}
+
+
+void
+Team::Listener::CustomSignalDispositionChanged(
+	const Team::CustomSignalDispositionEvent& event)
+{
+}
+
+
+void
+Team::Listener::CustomSignalDispositionRemoved(
+	const Team::CustomSignalDispositionEvent& event)
 {
 }
 

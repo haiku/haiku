@@ -685,6 +685,43 @@ TeamDebugger::MessageReceived(BMessage* message)
 
 			AutoLocker< ::Team> teamLocker(fTeam);
 			fTeam->RemoveStopImageName(imageName);
+			break;
+		}
+
+		case MSG_SET_DEFAULT_SIGNAL_DISPOSITION:
+		{
+			int32 disposition;
+			if (message->FindInt32("disposition", &disposition) != B_OK)
+				break;
+
+			AutoLocker< ::Team> teamLocker(fTeam);
+			fTeam->SetDefaultSignalDisposition(disposition);
+			break;
+		}
+
+		case MSG_SET_CUSTOM_SIGNAL_DISPOSITION:
+		{
+			int32 signal;
+			int32 disposition;
+			if (message->FindInt32("signal", &signal) != B_OK
+				|| message->FindInt32("disposition", &disposition) != B_OK) {
+				break;
+			}
+
+			AutoLocker< ::Team> teamLocker(fTeam);
+			fTeam->SetCustomSignalDisposition(signal, disposition);
+			break;
+		}
+
+		case MSG_REMOVE_CUSTOM_SIGNAL_DISPOSITION:
+		{
+			int32 signal;
+			if (message->FindInt32("signal", &signal) != B_OK)
+				break;
+
+			AutoLocker< ::Team> teamLocker(fTeam);
+			fTeam->RemoveCustomSignalDisposition(signal);
+			break;
 		}
 
 		case MSG_SET_WATCHPOINT:
@@ -1101,6 +1138,35 @@ TeamDebugger::RemoveStopImageNameRequested(const char* name)
 {
 	BMessage message(MSG_REMOVE_STOP_IMAGE_NAME);
 	message.AddString("name", name);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::SetDefaultSignalDispositionRequested(int32 disposition)
+{
+	BMessage message(MSG_SET_DEFAULT_SIGNAL_DISPOSITION);
+	message.AddInt32("disposition", disposition);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::SetCustomSignalDispositionRequested(int32 signal,
+	int32 disposition)
+{
+	BMessage message(MSG_SET_CUSTOM_SIGNAL_DISPOSITION);
+	message.AddInt32("signal", signal);
+	message.AddInt32("disposition", disposition);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::RemoveCustomSignalDispositionRequested(int32 signal)
+{
+	BMessage message(MSG_REMOVE_CUSTOM_SIGNAL_DISPOSITION);
+	message.AddInt32("signal", signal);
 	PostMessage(&message);
 }
 
