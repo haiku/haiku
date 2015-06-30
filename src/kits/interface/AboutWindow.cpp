@@ -170,13 +170,13 @@ AboutView::AboutView(const char* appName, const char* signature)
 	fVersionView = new BStringView("version",
 		_GetVersionFromSignature(signature));
 
-	fInfoView = new BTextView("info", B_WILL_DRAW);
+	rgb_color documentColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+	fInfoView = new BTextView("info", NULL, &documentColor, B_WILL_DRAW);
 	fInfoView->SetExplicitMinSize(BSize(210.0, 160.0));
 	fInfoView->MakeEditable(false);
 	fInfoView->SetWordWrap(true);
 	fInfoView->SetInsets(5.0, 5.0, 5.0, 5.0);
 	fInfoView->SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
-	fInfoView->SetHighColor(ui_color(B_DOCUMENT_TEXT_COLOR));
 	fInfoView->SetStylable(true);
 
 	BScrollView* infoViewScroller = new BScrollView(
