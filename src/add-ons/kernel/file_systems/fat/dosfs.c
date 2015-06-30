@@ -664,7 +664,7 @@ mount_fat_disk(const char *path, fs_volume *_vol, const int flags,
 	vol->root_vnode.sindex = vol->root_vnode.eindex = 0xffffffff;
 	vol->root_vnode.mode = FAT_SUBDIR;
 	time(&(vol->root_vnode.st_time));
-	vol->root_vnode.st_ctim = vol->root_vnode.st_time;
+	vol->root_vnode.st_crtim = vol->root_vnode.st_time;
 	vol->root_vnode.mime = NULL;
 	vol->root_vnode.dirty = false;
 	dlist_add(vol, vol->root_vnode.vnid);
@@ -1151,6 +1151,7 @@ bi:	UNLOCK_VOL(vol);
 }
 
 
+#if 0
 static status_t
 dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, uint32 code,
 	void *buf, size_t len)
@@ -1159,24 +1160,11 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, uint32 code,
 	nspace *vol = (nspace *)_vol->private_volume;
 	vnode *node = (vnode *)_node->private_node;
 
-	TOUCH(cookie); TOUCH(buf); TOUCH(len);
+	TOUCH(cookie); TOUCH(len);
 
 	LOCK_VOL(vol);
 
 	switch (code) {
-		case 10002 : /* return real creation time */
-				if (buf) *(bigtime_t *)buf = node->st_ctim;
-				break;
-		case 10003 : /* return real last modification time */
-				if (buf) *(bigtime_t *)buf = node->st_time;
-				break;
-
-#if 0
-		/*case 69666 :
-				result = fragment(vol, buf);
-				break;
-		*/
-
 		case 100000 :
 			dprintf("built at %s on %s\n", build_time, build_date);
 			dprintf("vol info: %s (device %x, media descriptor %x)\n", vol->device, vol->fd, vol->media_descriptor);
@@ -1213,11 +1201,9 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, uint32 code,
 
 		case 100003 :
 			dprintf("vcache validation not yet implemented\n");
-#if 0
 			dprintf("validating vcache for %lx\n", vol->id);
 			validate_vcache(vol);
 			dprintf("validation complete for %lx\n", vol->id);
-#endif
 			break;
 
 		case 100004 :
@@ -1229,7 +1215,6 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, uint32 code,
 			dprintf("dumping dlist for %lx\n", vol->id);
 			dlist_dump(vol);
 			break;
-#endif
 
 		default :
 			DPRINTF(0, ("dosfs_ioctl: vol %" B_PRIdDEV ", vnode %" B_PRIdINO
@@ -1242,6 +1227,7 @@ dosfs_ioctl(fs_volume *_vol, fs_vnode *_node, void *cookie, uint32 code,
 
 	return result;
 }
+#endif
 
 
 status_t
@@ -1349,23 +1335,23 @@ fs_vnode_ops gFATVnodeOps = {
 
 	&dosfs_get_file_map,
 
-	&dosfs_ioctl,
-	NULL,	//&fs_set_flags,
-	NULL,	//&fs_select
-	NULL,	//&fs_deselect
+	NULL,	// fs_ioctl()
+	NULL,	// fs_set_flags,
+	NULL,	// fs_select
+	NULL,	// fs_deselect
 	&dosfs_fsync,
 
 	&dosfs_readlink,
-	NULL,	//&fs_create_symlink,
+	NULL,	// fs_create_symlink,
 
-	NULL,	//&fs_link,
+	NULL,	// fs_link,
 	&dosfs_unlink,
 	&dosfs_rename,
 
 	&dosfs_access,
 	&dosfs_rstat,
 	&dosfs_wstat,
-	NULL,	// &fs_preallocate,
+	NULL,	// fs_preallocate,
 
 	/* file operations */
 	&dosfs_create,
@@ -1392,7 +1378,7 @@ fs_vnode_ops gFATVnodeOps = {
 	&dosfs_rewind_attrdir,
 
 	/* attribute operations */
-	NULL,	//&fs_create_attr,
+	NULL,	// fs_create_attr,
 	&dosfs_open_attr,
 	&dosfs_close_attr,
 	&dosfs_free_attr_cookie,
@@ -1400,9 +1386,9 @@ fs_vnode_ops gFATVnodeOps = {
 	&dosfs_write_attr,
 
 	&dosfs_read_attr_stat,
-	NULL,	//&fs_write_attr_stat,
-	NULL,	//&fs_rename_attr,
-	NULL,	//&fs_remove_attr,
+	NULL,	// fs_write_attr_stat,
+	NULL,	// fs_rename_attr,
+	NULL,	// fs_remove_attr,
 };
 
 
