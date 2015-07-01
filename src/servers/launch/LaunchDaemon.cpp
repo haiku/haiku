@@ -726,6 +726,10 @@ LaunchDaemon::_StartSession(const char* login)
 		if (setuid(user) != 0)
 			exit(EXIT_FAILURE);
 
+		BString home="HOME=\"";
+		home << passwd->pw_dir << "\"";
+		putenv(home.String());
+
 		// TODO: This leaks the parent application
 		be_app = NULL;
 
@@ -768,6 +772,9 @@ LaunchDaemon::_SetupEnvironment()
 	safemode << (IsSafeMode() ? "yes" : "no");
 
 	putenv(safemode.String());
+
+	// Default locale settings
+	putenv("LC_TYPE=en_US.UTF-8");
 }
 
 
