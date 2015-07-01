@@ -12,7 +12,6 @@ target desktop {
 
 target first_boot {
 	job x-vnd.Haiku-FirstBootPrompt {
-		launch /system/apps/FirstBootPrompt
 		legacy
 	}
 }
