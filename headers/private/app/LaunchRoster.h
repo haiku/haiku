@@ -22,7 +22,10 @@ public:
 			port_id				GetPort(const char* signature,
 									const char* name);
 
-			status_t			Target(const char* name, BMessage& data,
+			status_t			Target(const char* name, const BMessage& data,
+									const char* baseName = NULL);
+			status_t			Target(const char* name,
+									const BMessage* data = NULL,
 									const char* baseName = NULL);
 
 			status_t			StartSession(const char* login);

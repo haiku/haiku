@@ -3,11 +3,13 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "BootPrompt.h"
 
 #include <stdlib.h>
 
 #include <Catalog.h>
+#include <LaunchRoster.h>
 #include <Locale.h>
 
 #include "BootPromptWindow.h"
@@ -43,10 +45,12 @@ BootPromptApp::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case MSG_BOOT_DESKTOP:
+			BLaunchRoster().Target("desktop");
 			sExitValue = 1;
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 		case MSG_RUN_INSTALLER:
+			BLaunchRoster().Target("installer");
 			sExitValue = 0;
 			PostMessage(B_QUIT_REQUESTED);
 			break;

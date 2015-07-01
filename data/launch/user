@@ -11,9 +11,11 @@ target desktop {
 }
 
 target first_boot {
-	job x-vnd.Haiku-FirstBootPrompt {
-		legacy
-	}
+	job x-vnd.Haiku-FirstBootPrompt
+}
+
+target installer {
+	job x-vnd.Haiku-Installer
 }
 
 run {

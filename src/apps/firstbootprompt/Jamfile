@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src apps firstbootprompt ;
 
-UsePrivateHeaders interface locale shared ;
+UsePrivateHeaders app interface locale shared ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src preferences keymap ] ;
 

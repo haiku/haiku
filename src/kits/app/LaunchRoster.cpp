@@ -146,7 +146,16 @@ BLaunchRoster::GetPort(const char* signature, const char* name)
 
 
 status_t
-BLaunchRoster::Target(const char* name, BMessage& data, const char* baseName)
+BLaunchRoster::Target(const char* name, const BMessage& data,
+	const char* baseName)
+{
+	return Target(name, &data, baseName);
+}
+
+
+status_t
+BLaunchRoster::Target(const char* name, const BMessage* data,
+	const char* baseName)
 {
 	if (name == NULL)
 		return B_BAD_VALUE;
@@ -155,8 +164,8 @@ BLaunchRoster::Target(const char* name, BMessage& data, const char* baseName)
 	status_t status = request.AddInt32("user", getuid());
 	if (status == B_OK)
 		status = request.AddString("target", name);
-	if (status == B_OK && !data.IsEmpty())
-		status = request.AddMessage("data", &data);
+	if (status == B_OK && data != NULL && !data->IsEmpty())
+		status = request.AddMessage("data", data);
 	if (status == B_OK && baseName != NULL)
 		status = request.AddString("base target", baseName);
 	if (status != B_OK)
