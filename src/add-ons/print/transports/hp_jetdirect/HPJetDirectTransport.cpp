@@ -52,11 +52,13 @@ HPJetDirectPort::HPJetDirectPort(BDirectory* printer, BMessage *msg)
 	printf("fPort = %d\n", fPort);
 
 
-	fEndpoint = new BNetEndpoint(SOCK_STREAM);
-	if ((fReady = fEndpoint->InitCheck()) != B_OK) {
+	fEndpoint = new(std::nothrow) BNetEndpoint(SOCK_STREAM);
+	if (fEndpoint == NULL || (fReady = fEndpoint->InitCheck()) != B_OK) {
 		BAlert *alert = new BAlert("", "Fail to create the NetEndpoint!", "OK");
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
+		delete fEndpoint;
+		fEndpoint = NULL;
 		return;
 	}
 
