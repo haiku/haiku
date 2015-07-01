@@ -181,7 +181,7 @@ PeriodicDelayedTask::~PeriodicDelayedTask()
 bool
 PeriodicDelayedTask::RunIfNeeded(bigtime_t currentTime)
 {
-	if (!currentTime < fRunAfter)
+	if (currentTime < fRunAfter)
 		return false;
 
 	fRunAfter = currentTime + fPeriod;
