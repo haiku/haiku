@@ -464,7 +464,7 @@ get_iovec_array(void)
 
     LOCK(iovec_lock);
 
-    for(i=0; i < MAX_IOVECS; i++) {
+    for(i = 0; i < MAX_IOVECS; i++) {
         if (iovec_used[i] == 0)
             break;
     }
@@ -475,7 +475,7 @@ get_iovec_array(void)
 
     if (iovec_pool[i] == NULL) {
         iovec_pool[i] = (struct iovec *)malloc(sizeof(struct iovec)*NUM_FLUSH_BLOCKS);
-        if (iovec_pool == NULL)
+        if (iovec_pool[i] == NULL)
             beos_panic("can't allocate an iovec!\n");
     }
 
