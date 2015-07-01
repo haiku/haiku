@@ -996,13 +996,15 @@ status_t NodeRef::getFreeInputs(
 	int32 inputBufferSize = 16;
 	media_input* inputBuffer = new media_input[inputBufferSize];
 
-	while(true) {
+	while (true) {
 		err = r->GetFreeInputsFor(
 			m_info.node, inputBuffer, inputBufferSize, &count, filterType);
-		if(err < B_OK)
+		if (err < B_OK) {
+			delete [] inputBuffer;
 			return err;
+		}
 			
-		if(count == inputBufferSize) {
+		if (count == inputBufferSize) {
 			// buffer too small; increase & try again
 			inputBufferSize += bufferInc;
 			delete [] inputBuffer;
@@ -1010,7 +1012,7 @@ status_t NodeRef::getFreeInputs(
 			continue;
 		}
 		
-		if(count)
+		if (count)
 			// copy found inputs into vector
 			copy(inputBuffer, inputBuffer + count,
 				back_inserter(ioInputs));
@@ -1038,13 +1040,15 @@ status_t NodeRef::getConnectedInputs(
 	int32 inputBufferSize = 16;
 	media_input* inputBuffer = new media_input[inputBufferSize];
 
-	while(true) {
+	while (true) {
 		err = r->GetConnectedInputsFor(
 			m_info.node, inputBuffer, inputBufferSize, &count);
-		if(err < B_OK)
+		if (err < B_OK) {
+			delete [] inputBuffer;
 			return err;
+		}
 			
-		if(count == inputBufferSize) {
+		if (count == inputBufferSize) {
 			// buffer too small; increase & try again
 			inputBufferSize += bufferInc;
 			delete [] inputBuffer;
@@ -1052,7 +1056,7 @@ status_t NodeRef::getConnectedInputs(
 			continue;
 		}
 		
-		if(count)
+		if (count)
 			// copy found inputs matching the given type into vector
 			remove_copy_if(inputBuffer, inputBuffer + count,
 				back_inserter(ioInputs),
@@ -1080,13 +1084,15 @@ status_t NodeRef::getFreeOutputs(
 	int32 outputBufferSize = 16;
 	media_output* outputBuffer = new media_output[outputBufferSize];
 
-	while(true) {
+	while (true) {
 		err = r->GetFreeOutputsFor(
 			m_info.node, outputBuffer, outputBufferSize, &count, filterType);
-		if(err < B_OK)
+		if (err < B_OK) {
+			delete [] outputBuffer;
 			return err;
+		}
 			
-		if(count == outputBufferSize) {
+		if (count == outputBufferSize) {
 			// buffer too small; increase & try again
 			outputBufferSize += bufferInc;
 			delete [] outputBuffer;
@@ -1094,7 +1100,7 @@ status_t NodeRef::getFreeOutputs(
 			continue;
 		}
 		
-		if(count)
+		if (count)
 			// copy found outputs into vector
 			copy(outputBuffer, outputBuffer + count,
 				back_inserter(ioOutputs));
@@ -1121,13 +1127,15 @@ status_t NodeRef::getConnectedOutputs(
 	int32 outputBufferSize = 16;
 	media_output* outputBuffer = new media_output[outputBufferSize];
 
-	while(true) {
+	while (true) {
 		err = r->GetConnectedOutputsFor(
 			m_info.node, outputBuffer, outputBufferSize, &count);
-		if(err < B_OK)
+		if (err < B_OK) {
+			delete [] outputBuffer;
 			return err;
+		}
 			
-		if(count == outputBufferSize) {
+		if (count == outputBufferSize) {
 			// buffer too small; increase & try again
 			outputBufferSize += bufferInc;
 			delete [] outputBuffer;
@@ -1135,7 +1143,7 @@ status_t NodeRef::getConnectedOutputs(
 			continue;
 		}
 		
-		if(count)
+		if (count)
 			// copy found outputs matching the given type into vector
 			remove_copy_if(outputBuffer, outputBuffer + count,
 				back_inserter(ioOutputs),
