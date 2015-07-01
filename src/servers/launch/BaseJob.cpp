@@ -37,8 +37,15 @@ BaseJob::Condition() const
 }
 
 
+::Condition*
+BaseJob::Condition()
+{
+	return fCondition;
+}
+
+
 void
-BaseJob::SetCondition(const ::Condition* condition)
+BaseJob::SetCondition(::Condition* condition)
 {
 	fCondition = condition;
 }

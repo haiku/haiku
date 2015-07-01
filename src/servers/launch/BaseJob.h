@@ -23,11 +23,12 @@ public:
 			const char*			Name() const;
 
 			const ::Condition*	Condition() const;
-			void				SetCondition(const ::Condition* condition);
+			::Condition*		Condition();
+			void				SetCondition(::Condition* condition);
 			bool				CheckCondition(ConditionContext& context) const;
 
 protected:
-			const ::Condition*	fCondition;
+			::Condition*		fCondition;
 };
 
 
