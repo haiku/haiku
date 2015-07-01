@@ -218,7 +218,7 @@ BMessage::operator=(const BMessage& other)
 		if (fFields == NULL) {
 			fHeader->field_count = 0;
 			fHeader->data_size = 0;
-		} else
+		} else if (other.fFields != NULL)
 			memcpy(fFields, other.fFields, fieldsSize);
 	}
 
@@ -230,7 +230,7 @@ BMessage::operator=(const BMessage& other)
 			fHeader->field_count = 0;
 			free(fFields);
 			fFields = NULL;
-		} else
+		} else if (other.fData != NULL)
 			memcpy(fData, other.fData, fHeader->data_size);
 	}
 
@@ -1965,19 +1965,20 @@ BMessage::ReplaceData(const char* name, type_code type, int32 index,
 	if (numBytes <= 0 || data == NULL)
 		return B_BAD_VALUE;
 
-	field_header* field = NULL;
-	status_t result = _FindField(name, type, &field);
-	if (result != B_OK)
-		return result;
-
-	if (index < 0 || (uint32)index >= field->count)
-		return B_BAD_INDEX;
-
+	status_t result;
 	if (fHeader->message_area >= 0) {
 		result = _CopyForWrite();
 		if (result != B_OK)
 			return result;
 	}
+
+	field_header* field = NULL;
+	result = _FindField(name, type, &field);
+	if (result != B_OK)
+		return result;
+
+	if (index < 0 || (uint32)index >= field->count)
+		return B_BAD_INDEX;
 
 	if ((field->flags & FIELD_FLAG_FIXED_SIZE) != 0) {
 		ssize_t size = field->data_size / field->count;
