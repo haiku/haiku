@@ -311,7 +311,7 @@ LaunchDaemon::MessageReceived(BMessage* message)
 			const char* baseName = message->GetString("base target");
 
 			Target* target = FindTarget(name);
-			if (target == NULL) {
+			if (target == NULL && baseName != NULL) {
 				Target* baseTarget = FindTarget(baseName);
 				if (baseTarget != NULL) {
 					target = new Target(name);
@@ -384,13 +384,13 @@ LaunchDaemon::MessageReceived(BMessage* message)
 			status_t status = B_OK;
 
 			BMessenger target;
-			if (message->FindMessenger("target", &target) != B_OK)
+			if (message->FindMessenger("daemon", &target) != B_OK)
 				status = B_BAD_VALUE;
 
 			if (status == B_OK) {
 				Session* session = new (std::nothrow) Session(user, target);
 				if (session != NULL)
-					fSessions.insert(std::pair<uid_t, Session*>(user, session));
+					fSessions.insert(std::make_pair(user, session));
 				else
 					status = B_NO_MEMORY;
 			}
@@ -614,7 +614,7 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 	if (fInitTarget != NULL)
 		job->AddRequirement(fInitTarget->Name());
 
-	fJobs.insert(std::pair<BString, Job*>(job->Name(), job));
+	fJobs.insert(std::make_pair(job->Title(), job));
 }
 
 
