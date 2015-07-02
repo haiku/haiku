@@ -2278,7 +2278,7 @@ ChartWindow::Animation2(void *data)
 		RefreshStarPacket(w->fSecondThreadBuffer, &w->fSpecials2, &w->fGeometry);
 		bigtime_t after = system_time();
 
-		w->fSecondThreadDelay = after-before;
+		w->fSecondThreadDelay = max_c(after-before, 1);
 
 		release_sem(w->fSecondThreadRelease);
 	}
@@ -2763,6 +2763,7 @@ ChartWindow::RefreshStars(buffer *buf, float time_step)
 	   dynamic load split between the two threads, when
 	   needed. */
 	if (fCurrentSettings.second_thread) {
+
 		int32 star_threshold = (int32)((float)fStars.count * fSecondThreadThreshold + 0.5);
 		int32 special_threshold = (int32)((float)fSpecials.count * fSecondThreadThreshold + 0.5);
 
@@ -2814,9 +2815,10 @@ ChartWindow::RefreshStars(buffer *buf, float time_step)
 		/* calculate the new optimal split ratio depending
 		   of the previous one and the time used by both
 		   threads to do their work. */
-		float ratio = ((float)fSecondThreadDelay/(float)(after-before)) *
-				(fSecondThreadThreshold/(1.0-fSecondThreadThreshold));
-		fSecondThreadThreshold = ratio / (1.0+ratio);
+		float ratio = ((float)fSecondThreadDelay /
+				(float)max_c(after - before, 1))
+			* (fSecondThreadThreshold / (1.0 - fSecondThreadThreshold));
+		fSecondThreadThreshold = ratio / (1.0 + ratio);
 
 	} else {
 		 /* In single-threaded mode, nothing fancy to be done. */
