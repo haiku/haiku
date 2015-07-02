@@ -1166,7 +1166,7 @@ fssh_cache_detach_sub_transaction(void* _cache, int32_t id,
 
 	// create a new transaction for the sub transaction
 	cache_transaction* newTransaction = new(nothrow) cache_transaction;
-	if (transaction == NULL)
+	if (newTransaction == NULL)
 		return FSSH_B_NO_MEMORY;
 
 	newTransaction->id = fssh_atomic_add(&cache->next_transaction_id, 1);
