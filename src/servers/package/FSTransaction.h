@@ -55,7 +55,8 @@ public:
 	Operation(FSTransaction* transaction, int32 operation)
 		:
 		fTransaction(transaction),
-		fOperation(operation)
+		fOperation(operation),
+		fIsFinished(false)
 	{
 	}
 
