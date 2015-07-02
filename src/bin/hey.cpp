@@ -1168,7 +1168,7 @@ format_data(int32 type, char *ptr, long size)
 	char *tempstr;
 
 	if (size <= 0L) {
-		str = new char;
+		str = new char[1];
 		*str = 0;
 		return str;
 	}
