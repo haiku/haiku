@@ -1112,7 +1112,7 @@ Radeon_DetectDisplays(accelerator_info *ai)
 		displays |= dd_tv_crt;
 
 	// check TV-out connector
-	if ((controlled_displays && (dd_ctv | dd_stv)) != 0)
+	if ((controlled_displays & (dd_ctv | dd_stv)) != 0)
 		displays |= Radeon_DetectTV(ai, (displays & dd_tv_crt) != 0);
 
 	SHOW_INFO(0, "Detected monitors: 0x%x", displays);
