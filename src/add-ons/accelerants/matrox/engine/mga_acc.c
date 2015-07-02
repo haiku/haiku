@@ -44,7 +44,7 @@ status_t gx00_acc_init()
 	/* used for convenience: MACCESS is a write only register! */
 	uint32 maccess = 0x00000000;
 	/* if we were unable to read PINS, we have to assume something (keeping bit6 zero) */
-	if ((si->ps.card_type >= G450) && (si->ps.pins_status = B_OK))
+	if ((si->ps.card_type >= G450) && (si->ps.pins_status == B_OK))
 	{
 		/* b7 v5_mem_type = done by Mark Watson. fixme: still confirm! (unknown bits) */
 		maccess |= ((((uint32)si->ps.v5_mem_type) & 0x80) >> 1);
