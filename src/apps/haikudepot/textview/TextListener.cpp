@@ -37,14 +37,16 @@ TextChangeEvent::~TextChangeEvent()
 TextChangingEvent::TextChangingEvent(int32 firstChangedParagraph,
 		int32 changedParagraphCount)
 	:
-	TextChangeEvent(firstChangedParagraph, changedParagraphCount)
+	TextChangeEvent(firstChangedParagraph, changedParagraphCount),
+	fIsCanceled(false)
 {
 }
 
 
 TextChangingEvent::TextChangingEvent()
 	:
-	TextChangeEvent()
+	TextChangeEvent(),
+	fIsCanceled(false)
 {
 }
 
