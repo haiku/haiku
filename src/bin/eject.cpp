@@ -151,73 +151,82 @@ static int do_eject(char operation, char *device)
 		return 1;
 	}
 	switch (operation) {
-	case 'h':
-		return usage("eject");
-	case 'e':
-		if (ioctl(fd, B_EJECT_DEVICE, NULL, 0) < 0) {
-			perror(device);
-			return 1;
-		}
-		break;
-	case 'l':
-		if (ioctl(fd, B_LOAD_MEDIA, NULL, 0) < 0) {
-			perror(device);
-			return 1;
-		}
-		break;
-	case 'b':
-		bval = true;
-		if (ioctl(fd, B_SCSI_PREVENT_ALLOW, &bval, sizeof(bval)) < 0) {
-			perror(device);
-			return 1;
-		}
-		break;
-	case 'u':
-		bval = false;
-		if (ioctl(fd, B_SCSI_PREVENT_ALLOW, &bval, sizeof(bval)) < 0) {
-			perror(device);
-			return 1;
-		}
-		break;
-	case 'q':
-		if (ioctl(fd, B_GET_MEDIA_STATUS, &devstatus, sizeof(devstatus)) < 0) {
-			perror(device);
-			return 1;
-		}
-		switch (devstatus) {
-		case B_NO_ERROR:
-			puts("Media present");
-			break;
-		default:
-			puts(strerror(devstatus));
-		}
-		break;
-	case 's':
-		if (ioctl(fd, B_GET_MEDIA_STATUS, &devstatus, sizeof(devstatus)) < 0) {
-			perror(device);
-			return 1;
-		}
-		switch (devstatus) {
-		case B_NO_ERROR:
-		case B_DEV_NO_MEDIA:
+		case 'e':
 			if (ioctl(fd, B_EJECT_DEVICE, NULL, 0) < 0) {
 				perror(device);
+				close(fd);
 				return 1;
 			}
 			break;
-		case B_DEV_DOOR_OPEN:
+		case 'l':
 			if (ioctl(fd, B_LOAD_MEDIA, NULL, 0) < 0) {
 				perror(device);
+				close(fd);
 				return 1;
 			}
 			break;
+		case 'b':
+			bval = true;
+			if (ioctl(fd, B_SCSI_PREVENT_ALLOW, &bval, sizeof(bval)) < 0) {
+				perror(device);
+				close(fd);
+				return 1;
+			}
+			break;
+		case 'u':
+			bval = false;
+			if (ioctl(fd, B_SCSI_PREVENT_ALLOW, &bval, sizeof(bval)) < 0) {
+				perror(device);
+				close(fd);
+				return 1;
+			}
+			break;
+		case 'q':
+			if (ioctl(fd, B_GET_MEDIA_STATUS, &devstatus, sizeof(devstatus))
+				< 0) {
+				perror(device);
+				close(fd);
+				return 1;
+			}
+			switch (devstatus) {
+				case B_NO_ERROR:
+					puts("Media present");
+					break;
+				default:
+					puts(strerror(devstatus));
+			}
+			break;
+		case 's':
+			if (ioctl(fd, B_GET_MEDIA_STATUS, &devstatus, sizeof(devstatus))
+				< 0) {
+				perror(device);
+				close(fd);
+				return 1;
+			}
+			switch (devstatus) {
+				case B_NO_ERROR:
+				case B_DEV_NO_MEDIA:
+					if (ioctl(fd, B_EJECT_DEVICE, NULL, 0) < 0) {
+						perror(device);
+						close(fd);
+						return 1;
+					}
+					break;
+				case B_DEV_DOOR_OPEN:
+					if (ioctl(fd, B_LOAD_MEDIA, NULL, 0) < 0) {
+						perror(device);
+						close(fd);
+						return 1;
+					}
+				break;
+				default:
+					perror(device);
+			}
+			break;
+		case 'h':
 		default:
-			perror(device);
-		}
-		break;
-	default:
-		usage("eject");
-		return 1;
+			close(fd);
+			return usage("eject");
 	}
 	close(fd);
 	return 0;
