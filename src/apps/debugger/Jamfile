@@ -299,11 +299,13 @@ Application Debugger :
 	ActionMenuItem.cpp
 	GuiSettingsUtils.cpp
 	SettingsMenu.cpp
+	SignalDispositionMenu.cpp
 	TargetAddressTableColumn.cpp
 
 	# user_interface/gui/utility_windows
 	BreakpointEditWindow.cpp
 	ExpressionPromptWindow.cpp
+	SignalDispositionEditWindow.cpp
 	StartTeamWindow.cpp
 	WatchPromptWindow.cpp
 

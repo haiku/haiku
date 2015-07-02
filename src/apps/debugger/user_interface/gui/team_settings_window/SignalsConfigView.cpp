@@ -15,6 +15,8 @@
 #include "table/TableColumns.h"
 
 #include "MessageCodes.h"
+#include "SignalDispositionEditWindow.h"
+#include "SignalDispositionMenu.h"
 #include "SignalDispositionTypes.h"
 #include "UiUtils.h"
 #include "UserInterface.h"
@@ -73,16 +75,32 @@ public:
 
 		switch (columnIndex) {
 			case 0:
-				value = info->signal;
+			{
+				BString tempValue;
+				value.SetTo(UiUtils::SignalNameToString(info->signal,
+					tempValue));
 				return true;
+			}
 			case 1:
-				value = info->disposition;
+			{
+				value.SetTo(UiUtils::SignalDispositionToString(
+						info->disposition), B_VARIANT_DONT_COPY_DATA);
 				return true;
+			}
 			default:
 				break;
 		}
 
 		return false;
+	}
+
+	bool SignalDispositionInfoAt(int32 rowIndex, SignalDispositionInfo*& _info)
+	{
+		_info = fDispositions.ItemAt(rowIndex);
+		if (_info == NULL)
+			return false;
+
+		return true;
 	}
 
 	void Update(int32 signal, int32 disposition)
@@ -168,7 +186,8 @@ SignalsConfigView::SignalsConfigView(::Team* team,
 	fAddDispositionButton(NULL),
 	fEditDispositionButton(NULL),
 	fRemoveDispositionButton(NULL),
-	fDispositionModel(NULL)
+	fDispositionModel(NULL),
+	fEditWindow(NULL)
 {
 	SetName("Signals");
 	fTeam->AddListener(this);
@@ -178,6 +197,7 @@ SignalsConfigView::SignalsConfigView(::Team* team,
 SignalsConfigView::~SignalsConfigView()
 {
 	fTeam->RemoveListener(this);
+	BMessenger(fEditWindow).SendMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -219,6 +239,10 @@ void
 SignalsConfigView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_SIGNAL_DISPOSITION_EDIT_WINDOW_CLOSED:
+		{
+			fEditWindow = NULL;
+		}
 		case MSG_SET_DEFAULT_SIGNAL_DISPOSITION:
 		{
 			int32 disposition;
@@ -229,15 +253,64 @@ SignalsConfigView::MessageReceived(BMessage* message)
 			break;
 		}
 		case MSG_ADD_DISPOSITION_EXCEPTION:
-		{
-			break;
-		}
 		case MSG_EDIT_DISPOSITION_EXCEPTION:
 		{
+			if (fEditWindow != NULL) {
+				AutoLocker<BWindow> lock(fEditWindow);
+				if (lock.IsLocked())
+					fEditWindow->Activate(true);
+			} else {
+				int32 signal = 0;
+				if (message->what == MSG_EDIT_DISPOSITION_EXCEPTION) {
+					TableSelectionModel* model
+						= fDispositionExceptions->SelectionModel();
+					SignalDispositionInfo* info;
+					if (fDispositionModel->SignalDispositionInfoAt(
+							model->RowAt(0), info)) {
+						signal = info->signal;
+					}
+				}
+
+				try {
+					fEditWindow = SignalDispositionEditWindow::Create(fTeam,
+						signal, fListener, this);
+					if (fEditWindow != NULL)
+						fEditWindow->Show();
+	           	} catch (...) {
+	           		// TODO: notify user
+	           	}
+			}
 			break;
 		}
 		case MSG_REMOVE_DISPOSITION_EXCEPTION:
 		{
+			TableSelectionModel* model
+				= fDispositionExceptions->SelectionModel();
+			for (int32 i = 0; i < model->CountRows(); i++) {
+				SignalDispositionInfo* info;
+				if (fDispositionModel->SignalDispositionInfoAt(model->RowAt(i),
+						info)) {
+					fListener->RemoveCustomSignalDispositionRequested(
+						info->signal);
+				}
+			}
+			break;
+		}
+		case MSG_SET_CUSTOM_SIGNAL_DISPOSITION:
+		{
+			int32 signal;
+			int32 disposition;
+			if (message->FindInt32("signal", &signal) == B_OK
+				&& message->FindInt32("disposition", &disposition) == B_OK) {
+				fDispositionModel->Update(signal, disposition);
+			}
+			break;
+		}
+		case MSG_REMOVE_CUSTOM_SIGNAL_DISPOSITION:
+		{
+			int32 signal;
+			if (message->FindInt32("signal", &signal) == B_OK)
+				fDispositionModel->Remove(signal);
 			break;
 		}
 		default:
@@ -248,23 +321,44 @@ SignalsConfigView::MessageReceived(BMessage* message)
 
 
 void
+SignalsConfigView::CustomSignalDispositionChanged(
+	const Team::CustomSignalDispositionEvent& event)
+{
+	BMessage message(MSG_SET_CUSTOM_SIGNAL_DISPOSITION);
+	message.AddInt32("signal", event.Signal());
+	message.AddInt32("disposition", event.Disposition());
+
+	BMessenger(this).SendMessage(&message);
+}
+
+
+void
+SignalsConfigView::CustomSignalDispositionRemoved(
+	const Team::CustomSignalDispositionEvent& event)
+{
+	BMessage message(MSG_REMOVE_CUSTOM_SIGNAL_DISPOSITION);
+	message.AddInt32("signal", event.Signal());
+
+	BMessenger(this).SendMessage(&message);
+}
+
+
+void
 SignalsConfigView::TableSelectionChanged(Table* table)
 {
+	TableSelectionModel* model = fDispositionExceptions->SelectionModel();
+	int32 rowCount = model->CountRows();
+	fEditDispositionButton->SetEnabled(rowCount == 1);
+	fRemoveDispositionButton->SetEnabled(rowCount > 0);
 }
 
 
 void
 SignalsConfigView::_Init()
 {
-	BMenu* dispositionMenu = new BMenu("signalDispositionsMenu");
-
-	for (int i = 0; i < SIGNAL_DISPOSITION_MAX; i++) {
-		BMessage* message = new BMessage(
-			MSG_SET_DEFAULT_SIGNAL_DISPOSITION);
-		message->AddInt32("disposition", i);
-		dispositionMenu->AddItem(new BMenuItem(
-			UiUtils::SignalDispositionToString(i), message));
-	}
+	SignalDispositionMenu* dispositionMenu = new SignalDispositionMenu(
+		"signalDispositionsMenu",
+		new BMessage(MSG_SET_DEFAULT_SIGNAL_DISPOSITION));
 
 	BGroupView* customDispositionsGroup = new BGroupView();
 	BLayoutBuilder::Group<>(customDispositionsGroup, B_VERTICAL, 0.0)

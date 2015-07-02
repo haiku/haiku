@@ -17,6 +17,7 @@
 
 class BButton;
 class BMenuField;
+class SignalDispositionEditWindow;
 class UserInterfaceListener;
 
 
@@ -35,15 +36,21 @@ public:
 	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
 
-	// Team::Listener
-
-	// TableListener
-	virtual	void				TableSelectionChanged(Table* table);
-
 private:
 			class SignalDispositionModel;
 
 private:
+	// Team::Listener
+	virtual	void				CustomSignalDispositionChanged(
+									const Team::CustomSignalDispositionEvent&
+										event);
+	virtual	void				CustomSignalDispositionRemoved(
+									const Team::CustomSignalDispositionEvent&
+										event);
+
+	// TableListener
+	virtual	void				TableSelectionChanged(Table* table);
+
 			void	 			_Init();
 
 			void				_UpdateSignalConfigState();
@@ -58,6 +65,7 @@ private:
 			BButton*			fEditDispositionButton;
 			BButton*			fRemoveDispositionButton;
 			SignalDispositionModel* fDispositionModel;
+			SignalDispositionEditWindow* fEditWindow;
 };
 
 
