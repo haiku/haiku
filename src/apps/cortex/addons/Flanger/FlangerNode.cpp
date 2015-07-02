@@ -1210,20 +1210,20 @@ void FlangerNode::specializeOutputFormat(
 	media_raw_audio_format& f = ioFormat.u.raw_audio;
 	media_raw_audio_format& w = media_raw_audio_format::wildcard;
 
-	if(f.frame_rate == w.frame_rate)
+	if (f.frame_rate == w.frame_rate)
 		f.frame_rate = 44100.0;
-	if(f.channel_count == w.channel_count) {
+	if (f.channel_count == w.channel_count) {
 		//+++++ tweaked 15sep99
-		if(m_input.source != media_source::null)
+		if (m_input.source != media_source::null)
 			f.channel_count = m_input.format.u.raw_audio.channel_count;
 		else
 			f.channel_count = 1;
 	}
-	if(f.format == w.format)
+	if (f.format == w.format)
 		f.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	if(f.byte_order == w.format)
+	if (f.byte_order == w.byte_order)
 		f.byte_order = (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
-	if(f.buffer_size == w.buffer_size)
+	if (f.buffer_size == w.buffer_size)
 		f.buffer_size = 2048;
 
 	string_for_format(ioFormat, formatStr, 255);
