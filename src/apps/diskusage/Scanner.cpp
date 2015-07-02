@@ -230,8 +230,10 @@ Scanner::_GetFileInfo(BDirectory* dir, FileInfo* parent)
 	thisDir->count = 0;
 
 	while (true) {
-		if (fQuitRequested)
+		if (fQuitRequested) {
+			delete thisDir;
 			return NULL;
+		}
 
 		if (dir->GetNextEntry(&entry) == B_ENTRY_NOT_FOUND)
 			break;
