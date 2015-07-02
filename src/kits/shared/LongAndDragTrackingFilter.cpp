@@ -43,7 +43,8 @@ LongAndDragTrackingFilter::LongAndDragTrackingFilter(uint32 longMessageWhat,
 	fDragMessageWhat(dragMessageWhat),
 	fMessageRunner(NULL),
 	fClickButtons(0),
-	fSquaredRadiusThreshold(radiusThreshold * radiusThreshold)
+	fSquaredRadiusThreshold(radiusThreshold * radiusThreshold),
+	fDurationThreshold(durationThreshold)
 {
 	if (durationThreshold == 0) {
 		get_click_speed(&fDurationThreshold);
