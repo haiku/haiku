@@ -494,7 +494,10 @@ BackgroundImage::SetBackgroundImage(BNode* node)
 
 	PRINT_OBJECT(container);
 
-	size_t flattenedSize = container.FlattenedSize();
+	ssize_t flattenedSize = container.FlattenedSize();
+	if (flattenedSize < B_OK)
+		return flattenedSize;
+
 	char* buffer = new(std::nothrow) char[flattenedSize];
 	if (buffer == NULL)
 		return B_NO_MEMORY;
@@ -511,7 +514,7 @@ BackgroundImage::SetBackgroundImage(BNode* node)
 
 	if (size < B_OK)
 		return size;
-	if ((size_t)size != flattenedSize)
+	if (size != flattenedSize)
 		return B_ERROR;
 
 	return B_OK;
