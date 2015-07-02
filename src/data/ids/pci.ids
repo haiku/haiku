@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.06.21
-#	Date:    2015-06-21 03:15:01
+#	Version: 2015.07.02
+#	Date:    2015-07-02 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -9656,6 +9656,7 @@
 	1021  GK110GL [Tesla K20Xm]
 	1022  GK110GL [Tesla K20c]
 	1023  GK110BGL [Tesla K40m]
+		10de 097e  12GB Computational Accelerator
 	1024  GK110BGL [Tesla K40c]
 	1026  GK110GL [Tesla K20s]
 	1027  GK110BGL [Tesla K40st]
@@ -10241,6 +10242,8 @@
 	13d7  GM204M [GeForce GTX 980M]
 	13d8  GM204M [GeForce GTX 970M]
 	13d9  GM204M [GeForce GTX 965M]
+	13f0  GM204GL [Quadro M5000]
+	13f1  GM204GL [Quadro M4000]
 	13f2  GM204GL [Tesla M60]
 	1401  GM206 [GeForce GTX 960]
 	17c2  GM200 [GeForce GTX TITAN X]
@@ -18916,6 +18919,8 @@
 19ae  Progeny Systems Corporation
 	0520  4135 HFT Interface Controller
 	0521  Decimator
+19ba  ZyXEL Communications Corp.
+	2330  ZyWALL Turbo Card
 19c1  Exegy Inc.
 # nee NextNet Wireless
 19d1  Motorola Expedience
@@ -19066,6 +19071,8 @@
 	0301  Wil6200 802.11ad Wireless Network Adapter
 	0302  Wil6200 802.11ad Wireless Network Adapter
 	0310  Wil6200 802.11ad Wireless Network Adapter
+1aea  Alcor Micro
+	6601  AU6601 PCI-E Flash card reader controller
 1aec  Wolfson Microelectronics
 # nee Fusion-io
 1aed  SanDisk
@@ -22870,6 +22877,8 @@
 		8086 524c  D865PERL mainboard
 	24df  82801ER (ICH5R) SATA Controller
 		1028 0168  Precision Workstation 670 Mainboard
+	24f0  Omni-Path HFI Silicon 100 Series [discrete]
+	24f1  Omni-Path HFI Silicon 100 Series [integrated]
 	24f3  Wireless 8260
 # Snow Field Peak AC
 		8086 0010  Dual Band Wireless-AC 8260
@@ -26261,6 +26270,7 @@
 	a1fb  Lewisburg IE: KT Controller
 	a1fc  Lewisburg IE: HECI #3
 	a620  6400/6402 Advanced Memory Buffer (AMB)
+	abc0  Omni-Path Fabric Switch Silicon 100 Series
 	b152  21152 PCI-to-PCI Bridge
 		8086 b152  21152 PCI-to-PCI Bridge
 # observed, and documented in Intel revision note; new mask of 1011:0026
