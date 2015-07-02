@@ -144,7 +144,7 @@ BitmapHWInterface::ProposeMode(display_mode* candidate, const display_mode* low,
 sem_id
 BitmapHWInterface::RetraceSemaphore()
 {
-	return B_ERROR;
+	return -1;
 }
 
 
