@@ -142,8 +142,10 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw,
 		return errno;
 
 	attr_info info;
-	if (fs_stat_attr(fd, attribute, &info) < 0)
+	if (fs_stat_attr(fd, attribute, &info) < 0) {
+		close(fd);
 		return errno;
+	}
 
 	// limit size of the attribute, only the first 64k will make it on screen
 	off_t size = info.size;
@@ -156,12 +158,14 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw,
 	char* buffer = (char*)malloc(size);
 	if (!buffer) {
 		fprintf(stderr, "Could not allocate read buffer!\n");
+		close(fd);
 		return B_NO_MEMORY;
 	}
 
 	ssize_t bytesRead = fs_read_attr(fd, attribute, info.type, 0, buffer, size);
 	if (bytesRead < 0) {
 		free(buffer);
+		close(fd);
 		return errno;
 	}
 
@@ -169,6 +173,7 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw,
 		fprintf(stderr, "Could only read %ld bytes from attribute!\n",
 			bytesRead);
 		free(buffer);
+		close(fd);
 		return B_ERROR;
 	}
 
@@ -210,6 +215,7 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw,
 		free(buffer);
 		if (written > 0)
 			written = B_OK;
+		close(fd);
 		return written;
 	}
 
@@ -275,6 +281,7 @@ catAttr(const char *attribute, const char *fileName, bool keepRaw,
 	}
 
 	free(buffer);
+	close(fd);
 	return B_OK;
 }
 
