@@ -104,6 +104,7 @@ BTitleView::BTitleView(BPoseView* view)
 	fTitleList(10, true),
 	fHorizontalResizeCursor(B_CURSOR_ID_RESIZE_EAST_WEST),
 	fPreviouslyClickedColumnTitle(0),
+	fPreviousLeftClickTime(0),
 	fTrackingState(NULL)
 {
 	sTitleBackground = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 0.88f);
