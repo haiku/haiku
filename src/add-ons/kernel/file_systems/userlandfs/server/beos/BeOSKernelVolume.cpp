@@ -604,7 +604,7 @@ BeOSKernelVolume::ReadAttr(void* node, void* _cookie, off_t pos,
 	AttributeCookie* cookie = (AttributeCookie*)_cookie;
 
 	// check, if open mode allows reading
-	if ((open_mode_to_access(cookie->fOpenMode) | R_OK) == 0)
+	if ((open_mode_to_access(cookie->fOpenMode) & R_OK) == 0)
 		return B_FILE_ERROR;
 
 	// read
@@ -624,7 +624,7 @@ BeOSKernelVolume::WriteAttr(void* node, void* _cookie, off_t pos,
 	AttributeCookie* cookie = (AttributeCookie*)_cookie;
 
 	// check, if open mode allows writing
-	if ((open_mode_to_access(cookie->fOpenMode) | W_OK) == 0)
+	if ((open_mode_to_access(cookie->fOpenMode) & W_OK) == 0)
 		return B_FILE_ERROR;
 
 	// write
