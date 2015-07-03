@@ -138,6 +138,7 @@ add_to_message(TReadHelper& source, BMessage& target, tiff_tag& tag,
 			defaultType = B_DOUBLE_TYPE;
 			double value = source.Next<int32>();
 			doubleValue = value / source.Next<int32>();
+			break;
 		}
 
 		// floating point
