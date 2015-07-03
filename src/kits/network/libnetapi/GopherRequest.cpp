@@ -354,8 +354,10 @@ BGopherRequest::_ProtocolLoop()
 			_ParseInput(receiveEnd);
 		else if (fInputBuffer.Size()) {
 			// send input directly
-			fListener->DataReceived(this, (const char *)fInputBuffer.Data(),
-								fPosition, fInputBuffer.Size());
+			if (fListener != NULL) {
+				fListener->DataReceived(this, (const char *)fInputBuffer.Data(),
+					fPosition, fInputBuffer.Size());
+			}
 
 			fPosition += fInputBuffer.Size();
 
@@ -373,7 +375,8 @@ BGopherRequest::_ProtocolLoop()
 
 	if (fPosition > 0) {
 		fResult.SetLength(fPosition);
-		fListener->DownloadProgress(this, fPosition, fPosition);
+		if (fListener != NULL)
+			fListener->DownloadProgress(this, fPosition, fPosition);
 	}
 
 	fSocket->Disconnect();
