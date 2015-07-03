@@ -428,12 +428,14 @@ TTracker::QuitRequested()
 	if (!BootedInSafeMode() && FSGetDeskDir(&deskDir) == B_OK) {
 		// if message is empty, delete the corresponding attribute
 		if (message.CountNames(B_ANY_TYPE)) {
-			size_t size = (size_t)message.FlattenedSize();
-			char* buffer = new char[size];
-			message.Flatten(buffer, (ssize_t)size);
-			deskDir.WriteAttr(kAttrOpenWindows, B_MESSAGE_TYPE, 0, buffer,
-				size);
-			delete[] buffer;
+			ssize_t size = message.FlattenedSize();
+			if (size > B_OK) {
+				char* buffer = new char[size];
+				message.Flatten(buffer, size);
+				deskDir.WriteAttr(kAttrOpenWindows, B_MESSAGE_TYPE, 0, buffer,
+					size);
+				delete[] buffer;
+			}
 		} else
 			deskDir.RemoveAttr(kAttrOpenWindows);
 	}
