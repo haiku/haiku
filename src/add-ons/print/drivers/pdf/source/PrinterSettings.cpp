@@ -115,11 +115,13 @@ PrinterSettings::ReadSettings(BMessage *msg)
 status_t 
 PrinterSettings::WriteSettings(BMessage* msg)
 {
-	size_t length;	
+	ssize_t length;
  	char *data = NULL;
 	status_t err = B_ERROR;
 	
 	length = msg->FlattenedSize();
+	if (length < B_OK)
+		return length;
 	data = (char *) malloc(length);
 	if (data != NULL) {
 		msg->Flatten(data, length);
