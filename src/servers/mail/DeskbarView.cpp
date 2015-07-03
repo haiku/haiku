@@ -95,7 +95,8 @@ BView* instantiate_deskbar_item(void)
 DeskbarView::DeskbarView(BRect frame)
 	:
 	BView(frame, "mail_daemon", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED),
-	fStatus(kStatusNoMail)
+	fStatus(kStatusNoMail),
+	fLastButtons(0)
 {
 	_InitBitmaps();
 }
@@ -104,7 +105,8 @@ DeskbarView::DeskbarView(BRect frame)
 DeskbarView::DeskbarView(BMessage *message)
 	:
 	BView(message),
-	fStatus(kStatusNoMail)
+	fStatus(kStatusNoMail),
+	fLastButtons(0)
 {
 	_InitBitmaps();
 }
