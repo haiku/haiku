@@ -1079,6 +1079,8 @@ void
 TExpandoMenuBar::_DoneTracking(BPoint point)
 {
 	TTeamMenuItem* lastItem = dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
+	if (lastItem == NULL)
+		return;
 
 	if (!lastItem->ExpanderBounds().Contains(point))
 		return;
@@ -1096,6 +1098,8 @@ void
 TExpandoMenuBar::_Track(BPoint point, uint32)
 {
 	TTeamMenuItem* lastItem = dynamic_cast<TTeamMenuItem*>(fLastClickedItem);
+	if (lastItem == NULL)
+		return;
 
 	if (lastItem->ExpanderBounds().Contains(point))
 		lastItem->SetArrowDirection(BControlLook::B_RIGHT_DOWN_ARROW);
