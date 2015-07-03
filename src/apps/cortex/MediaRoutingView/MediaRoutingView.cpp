@@ -168,7 +168,11 @@ DiagramWire *MediaRoutingView::createWire(
 
 	MediaJack *outputJack, *inputJack;
 	MediaJack *jack = dynamic_cast<MediaJack *>(fromWhich);
-	if (jack && jack->isOutput())
+
+	if (jack == NULL)
+		return 0;
+
+	if (jack->isOutput())
 	{
 		outputJack = jack;
 		inputJack = dynamic_cast<MediaJack *>(toWhich);
