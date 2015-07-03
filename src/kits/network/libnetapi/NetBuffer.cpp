@@ -202,7 +202,11 @@ BNetBuffer::AppendMessage(const BMessage& data)
 {
 	char stackFlattenedData[STACK_BUFFER_SIZE];
 
-	size_t dataSize = data.FlattenedSize();
+	ssize_t dataSize = data.FlattenedSize();
+
+	if (dataSize < B_OK)
+		return dataSize;
+
 	if (dataSize == 0)
 		return B_ERROR;
 
