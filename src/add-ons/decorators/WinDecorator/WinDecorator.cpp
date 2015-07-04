@@ -116,10 +116,19 @@ WinDecorator::Draw()
 
 
 Decorator::Region
-WinDecorator::RegionAt(BPoint where, int32& tab) const
+WinDecorator::RegionAt(BPoint where, int32& tabIndex) const
 {
+	tabIndex = -1;
+
+	for (int32 i = 0; i < fTabList.CountItems(); i++) {
+		Decorator::Tab* tab = fTabList.ItemAt(i);
+		if (tab->minimizeRect.Contains(where)) {
+			tabIndex = i;
+			return REGION_MINIMIZE_BUTTON;
+		}
+	}
 	// Let the base class version identify hits of the buttons and the tab.
-	Region region = Decorator::RegionAt(where, tab);
+	Region region = Decorator::RegionAt(where, tabIndex);
 	if (region != REGION_NONE)
 		return region;
 
@@ -185,40 +194,58 @@ WinDecorator::_DoLayout()
 	fBorderRect = fFrame;
 	switch ((int)fTopTab->look) {
 		case B_MODAL_WINDOW_LOOK:
-			fBorderRect.InsetBy(-4, -4);
+			fBorderWidth = 4;
 			break;
 
 		case B_TITLED_WINDOW_LOOK:
 		case B_DOCUMENT_WINDOW_LOOK:
 			hasTab = true;
-			fBorderRect.InsetBy(-4, -4);
+			fBorderWidth = 4;
 			break;
 		case B_FLOATING_WINDOW_LOOK:
+			fBorderWidth = 0;
 			hasTab = true;
 			break;
 
 		case B_BORDERED_WINDOW_LOOK:
-			fBorderRect.InsetBy(-1, -1);
+			fBorderWidth = 1;
 			break;
 
 		default:
+			fBorderWidth = 0;
 			break;
 	}
 
+	fBorderRect.InsetBy(-fBorderWidth, -fBorderWidth);
+
 	if (hasTab) {
-		fBorderRect.top -= 19;
+		font_height fontHeight;
+		fDrawState.Font().GetHeight(fontHeight);
+
+		float tabSize = ceilf(fontHeight.ascent + fontHeight.descent + 4.0);
+
+		if (tabSize < 20)
+			tabSize = 20;
+		fBorderRect.top -= tabSize;
+
+		fTitleBarRect.Set(fFrame.left - 1,
+			fFrame.top - tabSize,
+			((fFrame.right - fFrame.left) < 32.0 ?
+				fFrame.left + 32.0 : fFrame.right) + 1,
+			fFrame.top - 1);
 
 		for (int32 i = 0; i < fTabList.CountItems(); i++) {
 			Decorator::Tab* tab = fTabList.ItemAt(i);
 
-			tab->tabRect.top -= 19;
-			tab->tabRect.bottom = tab->tabRect.top + 19;
+			tab->tabRect = fTitleBarRect;
+
+			const float buttonsInset = 3;
 
 			tab->zoomRect = tab->tabRect;
-			tab->zoomRect.top += 3;
-			tab->zoomRect.right -= 3;
-			tab->zoomRect.bottom -= 3;
-			tab->zoomRect.left = tab->zoomRect.right - 15;
+			tab->zoomRect.top += buttonsInset;
+			tab->zoomRect.right -= buttonsInset;
+			tab->zoomRect.bottom -= buttonsInset;
+			tab->zoomRect.left = tab->zoomRect.right - tabSize + buttonsInset;
 
 			tab->closeRect = tab->zoomRect;
 			tab->zoomRect.OffsetBy(0 - tab->zoomRect.Width() - 3, 0);
@@ -305,7 +332,7 @@ WinDecorator::_DrawTab(Decorator::Tab* tab, BRect rect)
 		return;
 	}
 
-	fDrawingEngine->FillRect(tabRect, fTabColor);
+	fDrawingEngine->FillRect(tabRect & rect, fTabColor);
 
 	_DrawTitle(tab, tabRect);
 
@@ -346,8 +373,17 @@ WinDecorator::_DrawTitle(Decorator::Tab* tab, BRect rect)
 	tab->truncatedTitleLength = tab->truncatedTitle.Length();
 	fDrawingEngine->SetFont(fDrawState.Font());
 
+	font_height fontHeight;
+	fDrawState.Font().GetHeight(fontHeight);
+
+	BPoint titlePos;
+	titlePos.x = tabRect.left + 5;
+	titlePos.y = floorf(((tabRect.top + 2.0) + tabRect.bottom
+			+ fontHeight.ascent + fontHeight.descent) / 2.0
+			- fontHeight.descent + 0.5);
+
 	fDrawingEngine->DrawString(tab->truncatedTitle, tab->truncatedTitleLength,
-		BPoint(tabRect.left + 5, closeRect.bottom - 1));
+		titlePos);
 }
 
 
@@ -383,7 +419,7 @@ void
 WinDecorator::_DrawMinimize(Decorator::Tab* tab, bool direct, BRect rect)
 {
 	// Just like DrawZoom, but for a Minimize button
-	_DrawBeveledRect(rect, true);
+	_DrawBeveledRect(rect, tab->minimizePressed);
 
 	fDrawingEngine->SetHighColor(fTextColor);
 	BRect minimizeBox(rect.left + 5, rect.bottom - 4, rect.right - 5,
@@ -408,7 +444,7 @@ WinDecorator::_DrawMinimize(Decorator::Tab* tab, bool direct, BRect rect)
 void
 WinDecorator::_DrawZoom(Decorator::Tab* tab, bool direct, BRect rect)
 {
-	_DrawBeveledRect(rect, true);
+	_DrawBeveledRect(rect, tab->zoomPressed);
 
 	// Draw the Zoom box
 
@@ -444,7 +480,7 @@ WinDecorator::_DrawClose(Decorator::Tab* tab, bool direct, BRect rect)
 		rect.bottom));
 
 	// Just like DrawZoom, but for a close button
-	_DrawBeveledRect(rect, true);
+	_DrawBeveledRect(rect, tab->closePressed);
 
 	// Draw the X
 
@@ -533,8 +569,7 @@ WinDecorator::_ResizeBy(BPoint offset, BRegion* dirty)
 	fFrame.bottom += offset.y;
 	fTitleBarRect.right += offset.x;
 	fTitleBarRect.bottom += offset.y;
-	fResizeRect.right += offset.x;
-	fResizeRect.bottom += offset.y;
+	fResizeRect.OffsetBy(offset);
 	fBorderRect.right += offset.x;
 	fBorderRect.bottom += offset.y;
 
@@ -691,7 +726,7 @@ WinDecorator::_DrawBeveledRect(BRect r, bool down)
 	fDrawingEngine->StrokeLine(point, rect.RightBottom(), lower);
 
 	rect.InsetBy(1,1);
-
+	fDrawingEngine->SetHighColor(high);
 	// Top inside highlight
 	fDrawingEngine->StrokeLine(rect.LeftTop(), rect.RightTop());
 
@@ -701,12 +736,12 @@ WinDecorator::_DrawBeveledRect(BRect r, bool down)
 	// Right inside shading
 	point = rect.RightTop();
 	point.y++;
-	fDrawingEngine->StrokeLine(point, rect.RightBottom(), lower);
+	fDrawingEngine->StrokeLine(point, rect.RightBottom(), low);
 
 	// Bottom inside shading
 	point = rect.LeftBottom();
 	point.x++;
-	fDrawingEngine->StrokeLine(point, rect.RightBottom(), lower);
+	fDrawingEngine->StrokeLine(point, rect.RightBottom(), low);
 
 	rect.InsetBy(1,1);
 
