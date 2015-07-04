@@ -564,7 +564,7 @@ BeDecorator::_DrawTitle(Decorator::Tab* _tab, BRect r)
 	_GetComponentColors(COMPONENT_TAB, colors, tab);
 
 	fDrawingEngine->SetDrawingMode(B_OP_OVER);
-	fDrawingEngine->SetHighColor(ui_color(B_WINDOW_TEXT_COLOR));
+	fDrawingEngine->SetHighColor(colors[COLOR_TAB_TEXT]);
 	fDrawingEngine->SetLowColor(colors[COLOR_TAB]);
 	fDrawingEngine->SetFont(fDrawState.Font());
 
