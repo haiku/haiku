@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-StyledEdit	3208803155
+1	finnish	x-vnd.Haiku-StyledEdit	2588854353
 StyledEdit	System name		Tyylitetty editori
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tämä tiedosto on merkitty kirjoitussuojatuksi. Tallennetaanko muutokset asiakirjaan \”%s\”? 
 Paste	Menus		Liitä
@@ -21,9 +21,7 @@ Replace with:	FindandReplaceWindow		Korvaa sisällöllä:
 Cancel	SaveAlert		Peru
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Ei voi palauttaa, tiedostoa ei löytynyt: ”%s”.
 Case-sensitive	FindandReplaceWindow		Kirjainkoosta riippuva
-Green	Menus		Vihreä
 Reload	NodeMonitorAlerts		Lataa uudelleen
-Yellow	Menus		Keltainen
 Replace in all windows	FindandReplaceWindow		Korvaa kaikissa ikkunoissa
 Wrap lines	Menus		Rivitä
 Quit	Menus		Lopeta
@@ -51,16 +49,12 @@ OK	RevertToSavedAlert		Valmis
 Don't save	QuitAlert		Älä tallenna
 Align	Menus		Tasaa
 Color	Menus		Väri
-Red	Menus		Punainen
 OK	QuitAlert		Valmis
 Open…	Menus		Avaa…
 Center	Menus		Keskitä
-Blue	Menus		Sininen
 Unable to unlock file\n\t%s	QuitAlert		Tiedoston lukituksen poisto epäonnistui\n\t%s
-Cyan	Menus		Turkoosi
 line %d, column %d	StatusView		rivi %d, sarake %d
 OK	Statistics		Valmis
-Magenta	Menus		Punasininen
 New	Menus		Uusi
 Wrap-around search	FindandReplaceWindow		Kierrätä haku alkuun
 Bold	Menus		Lihavointi
@@ -81,7 +75,6 @@ Error loading \"%s\":\n\t%s	LoadAlert		Virhe ladattaessa ”%s”:\n\t%s
 Ignore	NodeMonitorAlerts		Ohita
 Read-only	StatusView		Kirjoitussuojattu
 Undo typing	QuitAlert		Peru kirjoitus
-Black	Menus		Musta
 Untitled 	StyledEditWindow		Otsikoton 
 OK	SaveAlert		Valmis
 Find	FindandReplaceWindow		Haku

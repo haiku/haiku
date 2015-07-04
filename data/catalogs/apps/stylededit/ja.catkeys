@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-StyledEdit	3208803155
+1	japanese	x-vnd.Haiku-StyledEdit	2588854353
 StyledEdit	System name		StyledEdit
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		このファイルは読み取り専用です。変更を\"%s\"ドキュメントに保存しますか?
 Paste	Menus		貼り付け
@@ -21,9 +21,7 @@ Replace with:	FindandReplaceWindow		置換:
 Cancel	SaveAlert		中止
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		\"%s\" ファイルが存在しないため、読み込めませんでした。
 Case-sensitive	FindandReplaceWindow		大文字と小文字を区別する
-Green	Menus		緑
 Reload	NodeMonitorAlerts		再読み込み
-Yellow	Menus		黄
 Replace in all windows	FindandReplaceWindow		すべてのウィンドウで置換
 Wrap lines	Menus		ワードラップ
 Quit	Menus		終了
@@ -51,16 +49,12 @@ OK	RevertToSavedAlert		Ok
 Don't save	QuitAlert		保存しない
 Align	Menus		配置
 Color	Menus		色
-Red	Menus		赤
 OK	QuitAlert		OK
 Open…	Menus		開く…
 Center	Menus		中央揃え
-Blue	Menus		青
 Unable to unlock file\n\t%s	QuitAlert		以下のファイルのロック解除が出来ません\n\t%s
-Cyan	Menus		水色
 line %d, column %d	StatusView		%d 行, %d 列
 OK	Statistics		OK
-Magenta	Menus		紫
 New	Menus		新規作成
 Wrap-around search	FindandReplaceWindow		ラップアラウンド検索
 Bold	Menus		太字
@@ -81,7 +75,6 @@ Error loading \"%s\":\n\t%s	LoadAlert		\"%s\" を読み込み中にエラーが�
 Ignore	NodeMonitorAlerts		無視
 Read-only	StatusView		読み込み専用
 Undo typing	QuitAlert		元に戻す
-Black	Menus		黒
 Untitled 	StyledEditWindow		無題
 OK	SaveAlert		Ok
 Find	FindandReplaceWindow		検索

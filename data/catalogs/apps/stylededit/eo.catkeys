@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-StyledEdit	3511634065
+1	esperanto	x-vnd.Haiku-StyledEdit	2891685263
 OK	LoadAlert		Bone
 ???	LoadAlert		???
 Left	Menus		Maldekstren
@@ -10,8 +10,6 @@ Save	Menus		Konservi
 Replace with:	FindandReplaceWindow		Anstataŭigi kun:
 Cancel	SaveAlert		Nuligi
 Case-sensitive	FindandReplaceWindow		Usklecodistinga
-Green	Menus		Verda
-Yellow	Menus		Flava
 Replace in all windows	FindandReplaceWindow		Anstataŭigi en ĉiu fenestro
 Wrap lines	Menus		Faldi linojn
 Cancel	RevertToSavedAlert		Nuligi
@@ -25,14 +23,10 @@ OK	RevertToSavedAlert		Bone
 Don't save	QuitAlert		Ne konservi
 Align	Menus		Ĝisrandigo
 Color	Menus		Koloro
-Red	Menus		Ruĝa
 OK	QuitAlert		Bone
 Open…	Menus		Malfermi…
 Center	Menus		Centra
-Blue	Menus		Blua
-Cyan	Menus		Cejana
 OK	Statistics		Bone
-Magenta	Menus		Fuksino
 New	Menus		Nova
 Wrap-around search	FindandReplaceWindow		Ŝerĉi ek la komenco
 Find selection	Menus		Trovi elektitan
@@ -42,7 +36,6 @@ Find again	Menus		Retrovi
 Cancel	QuitAlert		Nuligi
 Find…	Menus		Trovi…
 Don't save	SaveAlert		Ne konservi
-Black	Menus		Nigra
 Untitled 	StyledEditWindow		Sentitolo 
 OK	SaveAlert		Bone
 Find	FindandReplaceWindow		Trovi

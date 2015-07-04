@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-StyledEdit	3208803155
+1	lithuanian	x-vnd.Haiku-StyledEdit	2588854353
 StyledEdit	System name		Rašyklė
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Šis failas pažymėtas kaip skirtas tik skaitymui. Ar įrašyti dokumento „%s“ pakeitimus? 
 Paste	Menus		Įdėti
@@ -21,9 +21,7 @@ Replace with:	FindandReplaceWindow		Keisti į:
 Cancel	SaveAlert		Atsisakyti
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Negrįžtama, failas nerastas: „%s“.
 Case-sensitive	FindandReplaceWindow		Paisyti raidžių registro
-Green	Menus		Žalia
 Reload	NodeMonitorAlerts		Įkelti iš naujo
-Yellow	Menus		Geltona
 Replace in all windows	FindandReplaceWindow		Keisti visuose languose
 Wrap lines	Menus		Laužyti eilutes
 Quit	Menus		Baigti darbą
@@ -51,16 +49,12 @@ OK	RevertToSavedAlert		Gerai
 Don't save	QuitAlert		Neįrašyti
 Align	Menus		Lygiuotė
 Color	Menus		Spalva
-Red	Menus		Raudona
 OK	QuitAlert		Gerai
 Open…	Menus		Atverti…
 Center	Menus		Centrinė
-Blue	Menus		Mėlyna
 Unable to unlock file\n\t%s	QuitAlert		Failo atrakinti nepavyko\n\t %s
-Cyan	Menus		Žydra
 line %d, column %d	StatusView		%d eilutė, %d stulpelis
 OK	Statistics		Gerai
-Magenta	Menus		Purpurinė
 New	Menus		Naujas
 Wrap-around search	FindandReplaceWindow		Tęsti paiešką nuo dokumento pradžios
 Bold	Menus		Pastorintas
@@ -81,7 +75,6 @@ Error loading \"%s\":\n\t%s	LoadAlert		Klaida įkeliant „%s“:\n\t%s
 Ignore	NodeMonitorAlerts		Nepaisyti
 Read-only	StatusView		Tik skaitymui
 Undo typing	QuitAlert		Atšaukti
-Black	Menus		Juoda
 Untitled 	StyledEditWindow		Bevardis 
 OK	SaveAlert		Gerai
 Find	FindandReplaceWindow		Ieškoti

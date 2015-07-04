@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-StyledEdit	3217484262
+1	italian	x-vnd.Haiku-StyledEdit	2597535460
 StyledEdit	System name		StyledEdit
 Paste	Menus		Incolla
 OK	LoadAlert		OK
@@ -18,8 +18,6 @@ Replace with:	FindandReplaceWindow		Sostituisci con:
 Cancel	SaveAlert		Annulla
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossibile ripristinare, file non trovato: \"%s\".
 Case-sensitive	FindandReplaceWindow		Sensibile alle maiuscole-minuscole
-Green	Menus		Verde
-Yellow	Menus		Giallo
 Replace in all windows	FindandReplaceWindow		Sostituisci in tutte le finestre
 Wrap lines	Menus		A capo automatico
 Quit	Menus		Esci
@@ -44,14 +42,10 @@ OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Non salvare
 Align	Menus		Allinea
 Color	Menus		Colore
-Red	Menus		Rosso
 OK	QuitAlert		OK
 Open…	Menus		Apri…
 Center	Menus		Centra
-Blue	Menus		Blu
-Cyan	Menus		Ciano
 OK	Statistics		OK
-Magenta	Menus		Magenta
 New	Menus		Nuovo
 Wrap-around search	FindandReplaceWindow		Ricerca ovunque
 Bold	Menus		Grassetto
@@ -68,7 +62,6 @@ Select all	Menus		Seleziona tutto
 Don't save	SaveAlert		Non salvare
 Error loading \"%s\":\n\t%s	LoadAlert		Errore caricando \"%s\":\n\t%s
 Undo typing	QuitAlert		Annulla digitazione
-Black	Menus		Nero
 Untitled 	StyledEditWindow		Senza titolo
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Trova

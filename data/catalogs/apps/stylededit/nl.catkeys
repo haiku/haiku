@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-StyledEdit	3019034824
+1	dutch; flemish	x-vnd.Haiku-StyledEdit	2399086022
 StyledEdit	System name		StyledEdit
 Paste	Menus		Plakken
 OK	LoadAlert		Oké
@@ -18,8 +18,6 @@ Replace with:	FindandReplaceWindow		Vervangen door:
 Cancel	SaveAlert		Annuleren
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan niet herstellen, het bestand \"%s\" werd niet gevonden.
 Case-sensitive	FindandReplaceWindow		Hoofdlettergevoelig
-Green	Menus		Groen
-Yellow	Menus		Geel
 Replace in all windows	FindandReplaceWindow		Vervang in alle vensters
 Wrap lines	Menus		Regels afbreken
 Quit	Menus		Sluiten
@@ -42,14 +40,10 @@ OK	RevertToSavedAlert		Oké
 Don't save	QuitAlert		Niet opslaan
 Align	Menus		Uitlijnen
 Color	Menus		Kleur
-Red	Menus		Rood
 OK	QuitAlert		Oké
 Open…	Menus		Openen…
 Center	Menus		Centreren
-Blue	Menus		Blauw
-Cyan	Menus		Cyaan
 OK	Statistics		Oké
-Magenta	Menus		Magenta
 New	Menus		Nieuw
 Wrap-around search	FindandReplaceWindow		Rondgaand zoeken
 Bold	Menus		Vet
@@ -66,7 +60,6 @@ Select all	Menus		Alles selecteren
 Don't save	SaveAlert		Niet opslaan
 Error loading \"%s\":\n\t%s	LoadAlert		Fout bij het laden van \"%s\":\n\t%s
 Undo typing	QuitAlert		Typen ongedaan maken
-Black	Menus		Zwart
 Untitled 	StyledEditWindow		Naamloos
 OK	SaveAlert		Oké
 Find	FindandReplaceWindow		Zoeken

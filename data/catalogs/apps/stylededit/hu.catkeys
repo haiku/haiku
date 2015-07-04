@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-StyledEdit	3208803155
+1	hungarian	x-vnd.Haiku-StyledEdit	2588854353
 StyledEdit	System name		StyledEdit
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ez a fájl írásvédett. Menti dokumentum (%s) változtatásait? 
 Paste	Menus		Beillesztés
@@ -21,9 +21,7 @@ Replace with:	FindandReplaceWindow		Csere erre:
 Cancel	SaveAlert		Mégse
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nem vonható vissza, a fájl (%s) nem található.
 Case-sensitive	FindandReplaceWindow		Betűérzékeny
-Green	Menus		Zöld
 Reload	NodeMonitorAlerts		Újratöltés
-Yellow	Menus		Sárga
 Replace in all windows	FindandReplaceWindow		Cserélje minden ablakban
 Wrap lines	Menus		Sortörés
 Quit	Menus		Kilépés
@@ -51,16 +49,12 @@ OK	RevertToSavedAlert		Rendben
 Don't save	QuitAlert		Ne mentse
 Align	Menus		Igazítás
 Color	Menus		Szín
-Red	Menus		Vörös
 OK	QuitAlert		Rendben
 Open…	Menus		Megnyitás…
 Center	Menus		Középre
-Blue	Menus		Kék
 Unable to unlock file\n\t%s	QuitAlert		Nem tudom feloldani a fájlt:\n\t %s
-Cyan	Menus		Cián
 line %d, column %d	StatusView		%d. sor, %d. oszlop
 OK	Statistics		Rendben
-Magenta	Menus		Bíbor
 New	Menus		Új
 Wrap-around search	FindandReplaceWindow		Folyamatos keresés
 Bold	Menus		Félkövér
@@ -81,7 +75,6 @@ Error loading \"%s\":\n\t%s	LoadAlert		Hiba történt a betöltés (%s) közben:
 Ignore	NodeMonitorAlerts		Mellőzés
 Read-only	StatusView		Csak olvasható
 Undo typing	QuitAlert		Gépelés visszavonása
-Black	Menus		Fekete
 Untitled 	StyledEditWindow		Névtelen
 OK	SaveAlert		Rendben
 Find	FindandReplaceWindow		Keresés

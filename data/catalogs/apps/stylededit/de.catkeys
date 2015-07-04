@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-StyledEdit	3208803155
+1	german	x-vnd.Haiku-StyledEdit	2588854353
 StyledEdit	System name		Texteditor
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Diese Datei ist als schreibgeschützt gekennzeichnet. Änderungen am Dokument \"%s\" speichern?
 Paste	Menus		Einfügen
@@ -21,9 +21,7 @@ Replace with:	FindandReplaceWindow		Ersetzen durch:
 Cancel	SaveAlert		Abbrechen
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rückgängig machen unmöglich, die Datei wurde nicht gefunden: \"%s\".
 Case-sensitive	FindandReplaceWindow		Groß-/Kleinschreibung beachten
-Green	Menus		Grün
 Reload	NodeMonitorAlerts		Neu laden
-Yellow	Menus		Gelb
 Replace in all windows	FindandReplaceWindow		In allen Fenstern ersetzen
 Wrap lines	Menus		Zeilenumbruch
 Quit	Menus		Beenden
@@ -51,16 +49,12 @@ OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Verwerfen
 Align	Menus		Ausrichtung
 Color	Menus		Farbe
-Red	Menus		Rot
 OK	QuitAlert		OK
 Open…	Menus		Öffnen…
 Center	Menus		Zentriert
-Blue	Menus		Blau
 Unable to unlock file\n\t%s	QuitAlert		Die Datei '%s' konnte nicht entsperrt werden.
-Cyan	Menus		Türkis
 line %d, column %d	StatusView		Zeile %d, Spalte %d
 OK	Statistics		OK
-Magenta	Menus		Magenta
 New	Menus		Neu
 Wrap-around search	FindandReplaceWindow		Gesamtes Dokument durchsuchen
 Bold	Menus		Fett
@@ -81,7 +75,6 @@ Error loading \"%s\":\n\t%s	LoadAlert		Fehler beim Laden von "%s":\n\t%s
 Ignore	NodeMonitorAlerts		Ignorieren
 Read-only	StatusView		Schreibgeschützt
 Undo typing	QuitAlert		Rückgängig: Eingabe
-Black	Menus		Schwarz
 Untitled 	StyledEditWindow		Unbenannt
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Suchen

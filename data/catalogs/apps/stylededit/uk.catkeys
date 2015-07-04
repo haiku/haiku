@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-StyledEdit	3208803155
+1	ukrainian	x-vnd.Haiku-StyledEdit	2588854353
 StyledEdit	System name		Редактор тексту StyledEdit
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Цей файл помічений тільки для читання. Зберегти зміни в документі \"%s\"? 
 Paste	Menus		Вставити
@@ -21,9 +21,7 @@ Replace with:	FindandReplaceWindow		Перемістити з:
 Cancel	SaveAlert		Відмінити
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Неможливо повернути, файл не знайдено: \"%s\".
 Case-sensitive	FindandReplaceWindow		Чутливий до регістра
-Green	Menus		Зелений
 Reload	NodeMonitorAlerts		Перезавантажити
-Yellow	Menus		Жовтий
 Replace in all windows	FindandReplaceWindow		Замінити  у всіх вікнах
 Wrap lines	Menus		Перенос по словах
 Quit	Menus		Вийти
@@ -51,16 +49,12 @@ OK	RevertToSavedAlert		Гаразд
 Don't save	QuitAlert		Не зберігати
 Align	Menus		Вирівняти
 Color	Menus		Колір
-Red	Menus		Червоний
 OK	QuitAlert		Гаразд
 Open…	Menus		Відкрити…
 Center	Menus		Центр
-Blue	Menus		Синій
 Unable to unlock file\n\t%s	QuitAlert		Неможливо розблокувати файл\n\t%s
-Cyan	Menus		Голубий
 line %d, column %d	StatusView		лінія %d, позиція %d
 OK	Statistics		Гаразд
-Magenta	Menus		Фіолетовий
 New	Menus		Новий
 Wrap-around search	FindandReplaceWindow		Шукати по всьому документу
 Bold	Menus		Bold
@@ -81,7 +75,6 @@ Error loading \"%s\":\n\t%s	LoadAlert		Помилка загрузки \"%s\":\n
 Ignore	NodeMonitorAlerts		Ігнорувати
 Read-only	StatusView		Тільки читання
 Undo typing	QuitAlert		Відміна друку
-Black	Menus		Чорний
 Untitled 	StyledEditWindow		Неназваний 
 OK	SaveAlert		Гаразд
 Find	FindandReplaceWindow		Знайти

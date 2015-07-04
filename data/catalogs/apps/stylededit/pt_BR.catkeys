@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-StyledEdit	3208803155
+1	portuguese (brazil)	x-vnd.Haiku-StyledEdit	2588854353
 StyledEdit	System name		Estilo de Edição
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Este arquivo está marcado como somente leitura. Salvar alterações para o documento \"%s\"?
 Paste	Menus		Colar
@@ -21,9 +21,7 @@ Replace with:	FindandReplaceWindow		Substituir com:
 Cancel	SaveAlert		Cancelar
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Impossível reverter, arquivo não encontrado: \"%s\".
 Case-sensitive	FindandReplaceWindow		Diferenciar maiúsculas/minúsculas
-Green	Menus		Verde
 Reload	NodeMonitorAlerts		Atualizar
-Yellow	Menus		Amarelo
 Replace in all windows	FindandReplaceWindow		Substituir em todas as janelas
 Wrap lines	Menus		Quebrar linhas
 Quit	Menus		Sair
@@ -51,16 +49,12 @@ OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Não salvar
 Align	Menus		Alinhar
 Color	Menus		Cor
-Red	Menus		Vermelho
 OK	QuitAlert		OK
 Open…	Menus		Abrir...
 Center	Menus		Centralizado
-Blue	Menus		Azul
 Unable to unlock file\n\t%s	QuitAlert		Não foi possível desbloquear o arquivo\n\t %s
-Cyan	Menus		Ciano
 line %d, column %d	StatusView		linha %d, coluna %d
 OK	Statistics		OK
-Magenta	Menus		Magenta
 New	Menus		Novo
 Wrap-around search	FindandReplaceWindow		Localizar em torno de
 Bold	Menus		Negrito
@@ -81,7 +75,6 @@ Error loading \"%s\":\n\t%s	LoadAlert		Erro ao salvar \"%s\":\n%s
 Ignore	NodeMonitorAlerts		Ignorar
 Read-only	StatusView		Somente leitura
 Undo typing	QuitAlert		Desfazer digitação
-Black	Menus		Preto
 Untitled 	StyledEditWindow		Sem título
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Localizar

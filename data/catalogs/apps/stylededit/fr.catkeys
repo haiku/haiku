@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-StyledEdit	3208803155
+1	french	x-vnd.Haiku-StyledEdit	2588854353
 StyledEdit	System name		Éditeur stylé
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ce fichier est en lecture seule. Voulez-vous sauvegarder les modifications dans le document « %s » ? 
 Paste	Menus		Coller
@@ -21,9 +21,7 @@ Replace with:	FindandReplaceWindow		Remplacer par :
 Cancel	SaveAlert		Annuler
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Rétablissement impossible, fichier non trouvé : « %s ».
 Case-sensitive	FindandReplaceWindow		Sensible à la casse
-Green	Menus		Vert
 Reload	NodeMonitorAlerts		Recharger
-Yellow	Menus		Jaune
 Replace in all windows	FindandReplaceWindow		Remplacer dans toutes les fenêtres
 Wrap lines	Menus		Retour à la ligne
 Quit	Menus		Quitter
@@ -51,16 +49,12 @@ OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Ne pas enregistrer
 Align	Menus		Aligner
 Color	Menus		Couleur
-Red	Menus		Rouge
 OK	QuitAlert		OK
 Open…	Menus		Ouvrir…
 Center	Menus		Centré
-Blue	Menus		Bleu
 Unable to unlock file\n\t%s	QuitAlert		Impossible de déverrouiller le fichier\n\t%s
-Cyan	Menus		Cyan
 line %d, column %d	StatusView		ligne %d, colonne %d
 OK	Statistics		OK
-Magenta	Menus		Magenta
 New	Menus		Nouveau
 Wrap-around search	FindandReplaceWindow		Recherche en boucle
 Bold	Menus		Gras
@@ -81,7 +75,6 @@ Error loading \"%s\":\n\t%s	LoadAlert		Erreur au de chargement de « %s » :\n\t
 Ignore	NodeMonitorAlerts		Ignorer
 Read-only	StatusView		Lecture seule
 Undo typing	QuitAlert		Annuler la saisie
-Black	Menus		Noir
 Untitled 	StyledEditWindow		Sans titre
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Trouver

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-StyledEdit	3208803155
+1	polish	x-vnd.Haiku-StyledEdit	2588854353
 StyledEdit	System name		StyledEdit
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ten plik jest oznaczony jako tylko do odczytu. Czy zapisać zmiany w dokumencie „%s”? 
 Paste	Menus		Wklej
@@ -21,9 +21,7 @@ Replace with:	FindandReplaceWindow		Zamień na:
 Cancel	SaveAlert		Anuluj
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie można przywrócić, nie znaleziono pliku: „%s”.
 Case-sensitive	FindandReplaceWindow		Uwzględnij wielkość liter
-Green	Menus		Zielony
 Reload	NodeMonitorAlerts		Wczytaj ponownie
-Yellow	Menus		Żółty
 Replace in all windows	FindandReplaceWindow		Zamień we wszystkich oknach
 Wrap lines	Menus		Zawijaj wiersze
 Quit	Menus		Zakończ
@@ -51,16 +49,12 @@ OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Nie zapisuj
 Align	Menus		Wyrównaj
 Color	Menus		Kolor
-Red	Menus		Czerwony
 OK	QuitAlert		OK
 Open…	Menus		Otwórz…
 Center	Menus		Wyśrodkuj
-Blue	Menus		Niebieski
 Unable to unlock file\n\t%s	QuitAlert		Nie można odblokować pliku\n\t %s
-Cyan	Menus		Cyjan
 line %d, column %d	StatusView		wiersz %d, kolumna %d
 OK	Statistics		OK
-Magenta	Menus		Magenta
 New	Menus		Nowy
 Wrap-around search	FindandReplaceWindow		Szukanie owijające
 Bold	Menus		Pogrubienie
@@ -81,7 +75,6 @@ Error loading \"%s\":\n\t%s	LoadAlert		Błąd podczas ładowania „%s”:\n\t%s
 Ignore	NodeMonitorAlerts		Ignoruj
 Read-only	StatusView		Tylko do odczytu
 Undo typing	QuitAlert		Cofnij pisanie
-Black	Menus		Czarny
 Untitled 	StyledEditWindow		Bez tytułu 
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Znajdź

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-StyledEdit	2574742746
+1	slovak	x-vnd.Haiku-StyledEdit	1954793944
 StyledEdit	System name		StyledEdit
 Paste	Menus		Vložiť
 OK	LoadAlert		OK
@@ -20,9 +20,7 @@ Replace with:	FindandReplaceWindow		Nahradiť čím:
 Cancel	SaveAlert		Zrušiť
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie je možné vrátiť späť, súbor nebol nájdený: „%s“.
 Case-sensitive	FindandReplaceWindow		Rozlišovať veľkosť písmen
-Green	Menus		Zelená
 Reload	NodeMonitorAlerts		Obnoviť
-Yellow	Menus		Žltá
 Replace in all windows	FindandReplaceWindow		Nahradiť vo všetkých oknách
 Wrap lines	Menus		Zalamovať riadky
 Quit	Menus		Ukončiť
@@ -50,16 +48,12 @@ OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Neukladať
 Align	Menus		Zarovnať
 Color	Menus		Farba
-Red	Menus		Červená
 OK	QuitAlert		OK
 Open…	Menus		Otvoriť…
 Center	Menus		Stred
-Blue	Menus		Modrá
 Unable to unlock file\n\t%s	QuitAlert		Nebolo možné odomknúť súbor\n\t%s
-Cyan	Menus		Azúrová
 line %d, column %d	StatusView		riadok %d, stĺpec %d
 OK	Statistics		OK
-Magenta	Menus		Purpurová
 New	Menus		Nový
 Wrap-around search	FindandReplaceWindow		Pokračovať v hľadaní od začiatku
 Bold	Menus		Hrubé
@@ -80,7 +74,6 @@ Error loading \"%s\":\n\t%s	LoadAlert		Chyba pri načítaní „%s“:\n\t%s
 Ignore	NodeMonitorAlerts		Ignorovať
 Read-only	StatusView		Iba na čítanie
 Undo typing	QuitAlert		Vrátiť späť písanie
-Black	Menus		Čierna
 Untitled 	StyledEditWindow		Bez názvu 
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Nájsť

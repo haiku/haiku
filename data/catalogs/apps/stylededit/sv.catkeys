@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-StyledEdit	3208803155
+1	swedish	x-vnd.Haiku-StyledEdit	2588854353
 StyledEdit	System name		SkrivStiligt
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Denna fil är markerad som endast läsbar. Vill du spara ändringarna till dokumentet \"%s\"?  
 Paste	Menus		Klistra in
@@ -21,9 +21,7 @@ Replace with:	FindandReplaceWindow		Ersätt med:
 Cancel	SaveAlert		Avbryt
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Kan inte återgå, filen hittades inte: "%s".
 Case-sensitive	FindandReplaceWindow		Skiftlägeskänslig
-Green	Menus		Grön
 Reload	NodeMonitorAlerts		Uppdatera
-Yellow	Menus		Gul
 Replace in all windows	FindandReplaceWindow		Ersätt i alla fönster
 Wrap lines	Menus		Bryt rader
 Quit	Menus		Avsluta
@@ -51,16 +49,12 @@ OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Spara inte
 Align	Menus		Justera
 Color	Menus		Färg
-Red	Menus		Röd
 OK	QuitAlert		OK
 Open…	Menus		Öppna…
 Center	Menus		Mitten
-Blue	Menus		Blå
 Unable to unlock file\n\t%s	QuitAlert		Kan inte låsaupp fil\n\t %s
-Cyan	Menus		Cyan
 line %d, column %d	StatusView		rad %d, kolumn %d
 OK	Statistics		OK
-Magenta	Menus		Magenta
 New	Menus		Ny
 Wrap-around search	FindandReplaceWindow		Fortsätt sökning vid andra änden
 Bold	Menus		Fet
@@ -81,7 +75,6 @@ Error loading \"%s\":\n\t%s	LoadAlert		Fel vid inläsning "%s":\n\t%s
 Ignore	NodeMonitorAlerts		Ignorera
 Read-only	StatusView		Skrivskyddad
 Undo typing	QuitAlert		Ångra inmatning
-Black	Menus		Svart
 Untitled 	StyledEditWindow		Namnlös 
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Sök

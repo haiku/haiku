@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-StyledEdit	3506241477
+1	slovenian	x-vnd.Haiku-StyledEdit	1371461695
 StyledEdit	System name		StyledEdit
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Ta datoteka je samo za branje. Shranim spremembe v dokument \"%s\"?
 Paste	Menus		Prilepi
@@ -32,7 +32,6 @@ OK	RevertToSavedAlert		V redu
 Don't save	QuitAlert		Ne shrani
 Align	Menus		Poravnava
 Color	Menus		Barva
-Red	Menus		Rdeča
 OK	QuitAlert		V redu
 Open…	Menus		Odpri…
 Bold	Menus		Krepko
@@ -44,7 +43,6 @@ Cut	Menus		Izreži
 File \"%file%\" was modified by another application, reload it?	NodeMonitorAlerts		Datoteko \"%file%\" je spremenila druga aplikacija. Jo ponovno naložim?
 Replace	FindandReplaceWindow		Zamenjaj
 Find again	Menus		Poišči znova
-Black	Menus		Črna
 Untitled 	StyledEditWindow		Neimenovano
 OK	SaveAlert		V redu
 Find	FindandReplaceWindow		Poišči

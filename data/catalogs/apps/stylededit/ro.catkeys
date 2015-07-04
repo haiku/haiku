@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-StyledEdit	1157359136
+1	romanian	x-vnd.Haiku-StyledEdit	537410334
 StyledEdit	System name		EditorText
 Paste	Menus		Lipește
 OK	LoadAlert		OK
@@ -19,9 +19,7 @@ Replace with:	FindandReplaceWindow		Înlocuiește cu:
 Cancel	SaveAlert		Anulează
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nu se poate reveni, nu s-a găsit fișierul: \"%s\".
 Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
-Green	Menus		Verde
 Reload	NodeMonitorAlerts		Reîncărcare
-Yellow	Menus		Galben
 Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
 Wrap lines	Menus		Încadrează linii
 Quit	Menus		Părăsește
@@ -46,16 +44,12 @@ OK	RevertToSavedAlert		OK
 Don't save	QuitAlert		Nu salva
 Align	Menus		Aliniază
 Color	Menus		Culoare
-Red	Menus		Roșu
 OK	QuitAlert		OK
 Open…	Menus		Deschide...
 Center	Menus		Centru
-Blue	Menus		Albastru
 Unable to unlock file\n\t%s	QuitAlert		Nu s-a putut debloca fișierul\n\t%s
-Cyan	Menus		Cyan
 line %d, column %d	StatusView		linia %d, coloana %d
 OK	Statistics		OK
-Magenta	Menus		Magenta
 New	Menus		Nou
 Wrap-around search	FindandReplaceWindow		Căutare încadrează împrejur
 Bold	Menus		Aldin
@@ -75,7 +69,6 @@ Recover	NodeMonitorAlerts		Recuperează
 Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea lui \"%s\":\n\t%s
 Ignore	NodeMonitorAlerts		Ignoră
 Undo typing	QuitAlert		Refă tastarea
-Black	Menus		Negru
 Untitled 	StyledEditWindow		Fără titlu
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Găsește
