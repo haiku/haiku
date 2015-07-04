@@ -204,7 +204,7 @@ BNetBuffer::AppendMessage(const BMessage& data)
 
 	ssize_t dataSize = data.FlattenedSize();
 
-	if (dataSize < B_OK)
+	if (dataSize < 0)
 		return dataSize;
 
 	if (dataSize == 0)

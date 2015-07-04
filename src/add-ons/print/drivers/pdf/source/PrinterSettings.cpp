@@ -120,7 +120,7 @@ PrinterSettings::WriteSettings(BMessage* msg)
 	status_t err = B_ERROR;
 	
 	length = msg->FlattenedSize();
-	if (length < B_OK)
+	if (length < 0)
 		return length;
 	data = (char *) malloc(length);
 	if (data != NULL) {

@@ -429,7 +429,7 @@ TTracker::QuitRequested()
 		// if message is empty, delete the corresponding attribute
 		if (message.CountNames(B_ANY_TYPE)) {
 			ssize_t size = message.FlattenedSize();
-			if (size > B_OK) {
+			if (size > 0) {
 				char* buffer = new char[size];
 				message.Flatten(buffer, size);
 				deskDir.WriteAttr(kAttrOpenWindows, B_MESSAGE_TYPE, 0, buffer,
