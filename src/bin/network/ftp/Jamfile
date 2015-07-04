@@ -11,6 +11,8 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 SubDirCcFlags [ FDefines _BSD_SOURCE=1 ] ;
 
+UseBuildFeatureHeaders libedit ;
+
 BinCommand ftp :
 	cmds.c
 	cmdtab.c
@@ -22,7 +24,10 @@ BinCommand ftp :
 	progressbar.c
 	ruserpass.c
 	util.c
-	: libedit.a [ BuildFeatureAttribute ncurses : library ] libutil.a libbsd.so
+	:
+	[ BuildFeatureAttribute libedit : library ]
+	[ BuildFeatureAttribute ncurses : library ]
+	libutil.a libbsd.so
 	$(TARGET_NETWORK_LIBS)
 ;
 

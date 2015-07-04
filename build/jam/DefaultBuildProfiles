@@ -168,6 +168,8 @@ rule DefineDefaultBuildProfiles
 				grep
 				haikuporter
 				less
+				libedit
+				libedit_devel
 				m4
 				make
 				ncurses
@@ -193,6 +195,8 @@ rule DefineDefaultBuildProfiles
 						gcc
 						icu
 						libsolv
+						libedit
+						libedit_devel
 						ncurses
 						ncurses_devel
 						zlib

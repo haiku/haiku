@@ -9,6 +9,8 @@ UseHeaders [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
 UsePrivateHeaders app debug interface kernel package shared libroot ;
 UsePrivateSystemHeaders ;
 
+UseBuildFeatureHeaders libedit ;
+
 LINKFLAGS += -Wl,--exclude-libs,ALL ;
 
 SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
@@ -71,12 +73,7 @@ SourceHdrs
 	: [ FDirName $(SUBDIR) dwarf ]
 ;
 
-# since syscall_numbers.h is generated on the fly, we need to explicitly
-# let Jam know about the dependency.
-Includes [ FGristFiles TeamDebugger.cpp ]
-	: <syscalls!$(TARGET_PACKAGING_ARCH)>syscall_numbers.h ;
-
-Application Debugger :
+local sources =
 	Debugger.cpp
 
 	# arch
@@ -384,7 +381,18 @@ Application Debugger :
 	FloatValue.cpp
 	IntegerValue.cpp
 	StringValue.cpp
+;
 
+# since syscall_numbers.h is generated on the fly, we need to explicitly
+# let Jam know about the dependency.
+Includes [ FGristFiles $(sources) ] :
+	<syscalls!$(TARGET_PACKAGING_ARCH)>syscall_numbers.h
+	[ BuildFeatureAttribute ncurses : headers ]
+	[ BuildFeatureAttribute libedit : headers ]
+;
+
+Application Debugger :
+	$(sources)
 	:
 	<nogrist>Debugger_demangler.o
 	<nogrist>Debugger_disasm_x86.o
@@ -392,16 +400,16 @@ Application Debugger :
 	<nogrist>Debugger_dwarf.o
 	<nogrist>DebugAnalyzer_gui_table.o
 
-	[ BuildFeatureAttribute ncurses : library ]
-
 	libudis86.a
 	<bin>debug_utils.a
 	libcolumnlistview.a
 	libshared.a
-	libedit.a
 
 	[ TargetLibstdc++ ]
 	be package tracker libbsd.so libdebug.so
+
+	[ BuildFeatureAttribute ncurses : library ]
+	[ BuildFeatureAttribute libedit : library ]
 
 	: Debugger.rdef
 ;

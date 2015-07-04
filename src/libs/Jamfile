@@ -5,7 +5,6 @@ SubInclude HAIKU_TOP src libs alm ;
 SubInclude HAIKU_TOP src libs bsd ;
 SubInclude HAIKU_TOP src libs compat ;
 SubInclude HAIKU_TOP src libs crypt ;
-SubInclude HAIKU_TOP src libs edit ;
 SubInclude HAIKU_TOP src libs fluidsynth ;
 SubInclude HAIKU_TOP src libs glut ;
 SubInclude HAIKU_TOP src libs gnu ;

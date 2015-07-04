@@ -448,6 +448,23 @@ if [ IsPackageAvailable zlib_devel ] {
 }
 
 
+# libedit
+if [ IsPackageAvailable libedit_devel ] {
+	ExtractBuildFeatureArchives libedit :
+		file: base libedit
+			runtime: lib
+		file: devel libedit_devel
+			depends: base
+			library: $(developLibDir)/libedit.so
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures libedit ;
+} else {
+	Echo "libedit support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # libsolv
 if [ IsPackageAvailable libsolv_devel ] {
 	ExtractBuildFeatureArchives libsolv :
