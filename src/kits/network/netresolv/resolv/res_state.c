@@ -1,4 +1,4 @@
-/*	$NetBSD: res_state.c,v 1.8 2009/01/11 02:46:29 christos Exp $	*/
+/*	$NetBSD: res_state.c,v 1.6 2008/04/28 20:23:02 martin Exp $	*/
 
 /*-
  * Copyright (c) 2004 The NetBSD Foundation, Inc.
@@ -28,17 +28,29 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+ 
+/* Note to Haiku Developers:
+   -------------------------
+   This file contains the thread-safe versions of res functions, taken from
+   NetBSD's libpthread directory. Do *not* replace it with the legacy
+   single-threaded version from NetBSD's netresolv directory.
+*/
 
 #include <sys/cdefs.h>
 #if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$NetBSD: res_state.c,v 1.8 2009/01/11 02:46:29 christos Exp $");
+__RCSID("$NetBSD: res_state.c,v 1.6 2008/04/28 20:23:02 martin Exp $");
 #endif
 
 #include <sys/types.h>
+#include <sys/queue.h>
 #include <arpa/inet.h>
 #include <arpa/nameser.h>
-#include <netdb.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include <resolv.h>
+#include <netdb.h>
+
+#include <pthread.h>
 
 struct __res_state _nres
 # if defined(__BIND_RES_TEXT)
@@ -46,30 +58,91 @@ struct __res_state _nres
 # endif
 	;
 
-res_state __res_get_state_nothread(void);
-void __res_put_state_nothread(res_state);
+static SLIST_HEAD(, _res_st) res_list = LIST_HEAD_INITIALIZER(&res_list);
 
-#define __weak_alias(from, to) B_DEFINE_WEAK_ALIAS(to, from);
+struct _res_st {
+	/* __res_put_state() assumes st_res is the first member. */
+	struct __res_state	st_res;
 
-#ifdef __weak_alias
-__weak_alias(__res_get_state, __res_get_state_nothread)
-__weak_alias(__res_put_state, __res_put_state_nothread)
-/* Source compatibility; only for single threaded programs */
-__weak_alias(__res_state, __res_get_state_nothread)
+	SLIST_ENTRY(_res_st)	st_list;
+};
+
+static pthread_mutex_t res_mtx = PTHREAD_MUTEX_INITIALIZER;
+
+res_state __res_state(void);
+res_state __res_get_state(void);
+void __res_put_state(res_state);
+
+#ifdef RES_STATE_DEBUG
+static void
+res_state_debug(const char *msg, void *p)
+{
+	char buf[512];
+	pthread_t self = pthread__self();
+	int len = snprintf(buf, sizeof(buf), "%p: %s %p\n", self, msg, p);
+
+	(void)write(STDOUT_FILENO, buf, (size_t)len);
+}
+#else
+#define res_state_debug(a, b)
 #endif
 
+
 res_state
-__res_get_state_nothread(void)
+__res_get_state(void)
 {
-	if ((_nres.options & RES_INIT) == 0 && res_ninit(&_nres) == -1) {
-		h_errno = NETDB_INTERNAL;
-		return NULL;
+	res_state res;
+	struct _res_st *st;
+	pthread_mutex_lock(&res_mtx);
+	st = SLIST_FIRST(&res_list);
+	if (st != NULL) {
+		SLIST_REMOVE_HEAD(&res_list, st_list);
+		pthread_mutex_unlock(&res_mtx);
+		res = &st->st_res;
+		res_state_debug("checkout from list", st);
+	} else {
+		pthread_mutex_unlock(&res_mtx);
+		st = malloc(sizeof(*st));
+		if (st == NULL) {
+			h_errno = NETDB_INTERNAL;
+			return NULL;
+		}
+		res = &st->st_res;
+		res->options = 0;
+		res_state_debug("alloc new", res);
 	}
-	return &_nres;
+	if ((res->options & RES_INIT) == 0) {
+		if (res_ninit(res) == -1) {
+			h_errno = NETDB_INTERNAL;
+			free(st);
+			return NULL;
+		}
+	}
+	return res;
 }
 
 void
 /*ARGSUSED*/
-__res_put_state_nothread(res_state res)
+__res_put_state(res_state res)
 {
+	struct _res_st *st = (struct _res_st *)(void *)res;
+
+	res_state_debug("free", res);
+	pthread_mutex_lock(&res_mtx);
+	SLIST_INSERT_HEAD(&res_list, st, st_list);
+	pthread_mutex_unlock(&res_mtx);
+}
+
+/*
+ * This is aliased via a macro to _res; don't allow multi-threaded programs
+ * to use it.
+ */
+res_state
+__res_state(void)
+{
+	static const char res[] = "_res is not supported for multi-threaded"
+	    " programs.\n";
+	(void)write(STDERR_FILENO, res, sizeof(res) - 1);
+	abort();
+	return NULL;
 }
