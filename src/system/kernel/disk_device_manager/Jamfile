@@ -33,7 +33,3 @@ KernelMergeObject kernel_disk_device_manager.o :
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;
 
-# KFileDiskDevice.cpp needs the virtualdrive.h Header. Add it here to not
-# contaminate the include paths for the other files.
-ObjectHdrs [ FGristFiles KFileDiskDevice$(SUFOBJ) ]
-	: [ FDirName $(HAIKU_TOP) src tests kits storage virtualdrive ] ;
