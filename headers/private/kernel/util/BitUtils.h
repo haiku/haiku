@@ -56,5 +56,5 @@ log2(uint32 v)
 }
 
 
-#endif	// KERNEL_UTIL_RANDOM_H
+#endif	// KERNEL_UTIL_BITUTIL_H
 

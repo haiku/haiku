@@ -20,7 +20,7 @@
 #define CACHE_MODULES_NAME	"file_cache"
 
 #define FILE_CACHE_SEQUENTIAL_ACCESS	0x01
-#define FILE_CACHE_LOADED_COMPLETELY 	0x02
+#define FILE_CACHE_LOADED_COMPLETELY	0x02
 #define FILE_CACHE_NO_IO				0x04
 
 struct cache_module_info {

@@ -46,12 +46,12 @@ SEARCH_SOURCE += [ FDirName $(posixSources) unistd ] ;
 
 KernelMergeObject kernel_lib_posix.o :
 	# main
- 	kernel_errno.cpp
- 	dirent.c
+	kernel_errno.cpp
+	dirent.c
 	fcntl.cpp
- 	poll.c
- 	utime.c
- 	# locale
+	poll.c
+	utime.c
+	# locale
 	ctype.cpp
 	localeconv.cpp
 	LocaleData.cpp
@@ -76,7 +76,7 @@ KernelMergeObject kernel_lib_posix.o :
 	mkdir.c
 	select.c
 	gettimeofday.c
- 	uio.c
+	uio.c
 	# time
 	time.c
 	# unistd

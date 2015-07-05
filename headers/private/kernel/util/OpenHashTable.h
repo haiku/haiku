@@ -74,7 +74,7 @@ struct MallocAllocator {
  * stored in a linked list. The table may be made to adjust its number of slots
  * depending on the load factor (this should be enabled unless the object is to
  * be used at times where memory allocations aren't possible, such as code
- * called byt he memory allocator).
+ * called by the memory allocator).
  *
  * The link between entries is part of the ValueType stored items, which makes
  * sure the table can always accept new items and will never fail because it is

@@ -12,14 +12,14 @@ public:
 	typedef const DataType* ConstPointer;
 	typedef DataType& Reference;
 	typedef const DataType& ConstReference;
-	
+
 	/*! malloc()'s an object of type \c DataType and returns a
 		pointer to it.
 	*/
 	Pointer Allocate() {
 		return reinterpret_cast<Pointer>(malloc(sizeof(DataType)));
 	}
-	
+
 	/*! free()'s the given object.
 	*/
 	void Deallocate(Pointer object) {
