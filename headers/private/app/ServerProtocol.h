@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,15 +14,6 @@
 
 #include <SupportDefs.h>
 
-
-// Server port names. The input port is the port which is used to receive
-// input messages from the Input Server. The other is the "main" port for
-// the server and is utilized mostly by BApplication objects.
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
-#	define SERVER_PORT_NAME "system:app_server"
-#else
-#	define SERVER_PORT_NAME "haiku-test:app_server"
-#endif
 
 #if TEST_MODE
 #	define SERVER_INPUT_PORT "haiku-test:input port"

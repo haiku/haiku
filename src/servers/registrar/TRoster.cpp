@@ -1430,23 +1430,19 @@ TRoster::GetShutdownApps(AppInfoList& userApps, AppInfoList& systemApps,
 		vitalSystemApps.insert(teamInfo.team);
 
 	// app server
-	port_id appServerPort = find_port(SERVER_PORT_NAME);
-	port_info portInfo;
-	if (appServerPort >= 0
-		&& get_port_info(appServerPort, &portInfo) == B_OK) {
-		vitalSystemApps.insert(portInfo.team);
-	}
+	RosterAppInfo* info
+		= fRegisteredApps.InfoFor("application/x-vnd.haiku-app_server");
+	if (info != NULL)
+		vitalSystemApps.insert(info->team);
 
 	// debug server
-	RosterAppInfo* info =
-		fRegisteredApps.InfoFor("application/x-vnd.haiku-debug_server");
-	if (info)
+	info = fRegisteredApps.InfoFor("application/x-vnd.haiku-debug_server");
+	if (info != NULL)
 		vitalSystemApps.insert(info->team);
 
 	// populate the other groups
 	for (AppInfoList::Iterator it(fRegisteredApps.It());
-		 RosterAppInfo* info = *it;
-		 ++it) {
+			RosterAppInfo* info = *it; ++it) {
 		if (vitalSystemApps.find(info->team) == vitalSystemApps.end()) {
 			RosterAppInfo* clonedInfo = info->Clone();
 			if (clonedInfo) {
@@ -1474,8 +1470,8 @@ TRoster::GetShutdownApps(AppInfoList& userApps, AppInfoList& systemApps,
 	// Special case, we add the input server to vital apps here so it is
 	// not excluded in the lists above
 	info = fRegisteredApps.InfoFor("application/x-vnd.Be-input_server");
- 	if (info)
- 		vitalSystemApps.insert(info->team);
+	if (info != NULL)
+		vitalSystemApps.insert(info->team);
 
 	// clean up on error
 	if (error != B_OK) {
