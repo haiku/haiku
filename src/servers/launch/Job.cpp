@@ -11,6 +11,7 @@
 #include <Message.h>
 #include <Roster.h>
 
+#include <RosterPrivate.h>
 #include <user_group.h>
 
 #include "Target.h"
@@ -303,26 +304,49 @@ Job::Port(const char* name) const
 status_t
 Job::Launch()
 {
+	// Build environment
+
+	// TODO: resolve environment source files
+	std::vector<const char*> environment;
+	for (const char** variable = (const char**)environ; variable[0] != NULL;
+			variable++) {
+		environment.push_back(variable[0]);
+	}
+
+	if (Target() != NULL)
+		_AddStringList(environment, Target()->Environment());
+	_AddStringList(environment, Environment());
+
+	environment.push_back(NULL);
+
 	if (fArguments.IsEmpty()) {
 		// Launch by signature
 		BString signature("application/");
 		signature << Name();
-		return be_roster->Launch(signature.String(), (BMessage*)NULL, &fTeam);
+		return BRoster::Private().Launch(signature.String(), NULL, NULL,
+			0, NULL, environment.begin(), &fTeam);
 	}
+
+	// Build argument vector
 
 	entry_ref ref;
 	status_t status = get_ref_for_path(fArguments.StringAt(0).String(), &ref);
 	if (status != B_OK)
 		return status;
 
-	size_t count = fArguments.CountStrings() - 1;
-	const char* args[count + 1];
-	for (int32 i = 1; i < fArguments.CountStrings(); i++) {
-		args[i - 1] = fArguments.StringAt(i);
-	}
-	args[count] = NULL;
+	std::vector<const char*> args;
 
-	return be_roster->Launch(&ref, count, args, &fTeam);
+	size_t count = fArguments.CountStrings() - 1;
+	if (count > 0) {
+		for (int32 i = 1; i < fArguments.CountStrings(); i++) {
+			args.push_back(fArguments.StringAt(i));
+		}
+		args.push_back(NULL);
+	}
+
+	// Launch via entry_ref
+	return BRoster::Private().Launch(NULL, &ref, NULL, count, args.begin(),
+		environment.begin(), &fTeam);
 }
 
 
@@ -379,4 +403,14 @@ Job::_AddRequirement(BJob* dependency)
 	}
 
 	return B_OK;
+}
+
+
+void
+Job::_AddStringList(std::vector<const char*>& array, const BStringList& list)
+{
+	int32 count = list.CountStrings();
+	for (int32 index = 0; index < count; index++) {
+		array.push_back(list.StringAt(index).String());
+	}
 }

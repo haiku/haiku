@@ -10,6 +10,7 @@
 
 #include <map>
 #include <set>
+#include <vector>
 
 #include <OS.h>
 #include <StringList.h>
@@ -72,6 +73,8 @@ private:
 			Job&				operator=(const Job& other);
 			void				_DeletePorts();
 			status_t			_AddRequirement(BJob* dependency);
+			void				_AddStringList(std::vector<const char*>& array,
+									const BStringList& list);
 
 private:
 			BStringList			fArguments;

@@ -110,6 +110,11 @@ const static settings_template kPortTemplate[] = {
 	{B_INT32_TYPE, "capacity", NULL},
 };
 
+const static settings_template kEnvTemplate[] = {
+	{B_STRING_TYPE, "from_file", NULL, true},
+	{B_STRING_TYPE, NULL, NULL},
+};
+
 const static settings_template kJobTemplate[] = {
 	{B_STRING_TYPE, "name", NULL, true},
 	{B_BOOL_TYPE, "disabled", NULL},
@@ -119,6 +124,7 @@ const static settings_template kJobTemplate[] = {
 	{B_MESSAGE_TYPE, "port", kPortTemplate},
 	{B_MESSAGE_TYPE, "if", kConditionTemplate},
 	{B_BOOL_TYPE, "no_safemode", NULL},
+	{B_MESSAGE_TYPE, "env", kEnvTemplate},
 	{0, NULL, NULL}
 };
 
@@ -127,6 +133,7 @@ const static settings_template kTargetTemplate[] = {
 	{B_BOOL_TYPE, "reset", NULL},
 	{B_MESSAGE_TYPE, "if", kConditionTemplate},
 	{B_BOOL_TYPE, "no_safemode", NULL},
+	{B_MESSAGE_TYPE, "env", kEnvTemplate},
 	{B_MESSAGE_TYPE, "job", kJobTemplate},
 	{B_MESSAGE_TYPE, "service", kJobTemplate},
 	{0, NULL, NULL}

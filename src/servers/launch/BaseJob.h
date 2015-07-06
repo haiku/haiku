@@ -7,10 +7,12 @@
 
 
 #include <Job.h>
+#include <StringList.h>
 
 
 using namespace BSupportKit;
 
+class BMessage;
 class Condition;
 class ConditionContext;
 
@@ -27,8 +29,14 @@ public:
 			void				SetCondition(::Condition* condition);
 			bool				CheckCondition(ConditionContext& context) const;
 
+			const BStringList&	Environment() const;
+			const BStringList&	EnvironmentSourceFiles() const;
+			void				SetEnvironment(const BMessage& message);
+
 protected:
 			::Condition*		fCondition;
+			BStringList			fEnvironment;
+			BStringList			fSourceFiles;
 };
 
 

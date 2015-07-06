@@ -104,6 +104,8 @@ private:
 			void				_AddTarget(Target* target);
 			void				_SetCondition(BaseJob* job,
 									const BMessage& message);
+			void				_SetEnvironment(BaseJob* job,
+									const BMessage& message);
 
 			status_t			_StartSession(const char* login);
 
@@ -523,6 +525,7 @@ LaunchDaemon::_AddTargets(BMessage& message)
 		}
 
 		_SetCondition(target, targetMessage);
+		_SetEnvironment(target, targetMessage);
 		_AddJobs(target, targetMessage);
 	}
 }
@@ -600,7 +603,7 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 		job->SetCreateDefaultPort(!message.GetBool("legacy", !service));
 
 	_SetCondition(job, message);
-
+	_SetEnvironment(job, message);
 
 	BMessage portMessage;
 	for (int32 index = 0;
@@ -712,6 +715,15 @@ LaunchDaemon::_SetCondition(BaseJob* job, const BMessage& message)
 
 	if (updated)
 		job->SetCondition(condition);
+}
+
+
+void
+LaunchDaemon::_SetEnvironment(BaseJob* job, const BMessage& message)
+{
+	BMessage environmentMessage;
+	if (message.FindMessage("env", &environmentMessage) == B_OK)
+		job->SetEnvironment(environmentMessage);
 }
 
 
