@@ -1,7 +1,7 @@
 # This file defines the content of the minimum Haiku image.
 
 SYSTEM_BIN = [ FFilterByBuildFeatures
-	addattr alert arp
+	addattr alert arp autologin
 	bc beep bfsinfo
 	catattr checkfs checkitout chop clear cmp collectcatkeys compress copyattr
 	dc desklink df diff diff3 diskimage draggers
@@ -41,7 +41,6 @@ SYSTEM_APPS = [ FFilterByBuildFeatures
 	CharacterMap
 	Debugger DeskCalc Devices DiskProbe DiskUsage DriveSetup
 	Expander
-	Login
 	NetworkStatus
 	ProcessController
 	ShowImage StyledEdit
