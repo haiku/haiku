@@ -33,8 +33,7 @@ float presin[512];
 typedef unsigned short word;
 
 extern "C" {
-	void memshset(char *dst, int center_shade,int fixed_shade, int length_2);
-	void mblur(char *src, int nbpixels);
+	#include "Draw.c"
 
 	void draw_stars320(char *, char);
 	void draw_stars512(char *, char);
@@ -173,19 +172,19 @@ drawshdisk(int x0, int y0, int r)
 		//gBuffer8[x0+W*y0] = 10+r*5;
 		return;
 	}
-	
+
 	if (r < SLIMIT+SRANGE)
 		r = ((r-SLIMIT)*SLIMIT)/SRANGE+1;
 
 	y = ly = r;     /* AAaargh */
 	delta = 3-2*r;
 
-	do {	
+	do {
 		if (y != ly) {
 			/* dont overlap these lines */
 			c = ((r-y+1)<<13)/r;
 			d = -c/(x+1);
-			
+
 			if (y == x+1)		/* this would overlap with the next x lines */
 				goto TOTO;		/* WHY NOT */
 
@@ -193,11 +192,11 @@ drawshdisk(int x0, int y0, int r)
 				(unsigned int)(x) < M   <=>  0<=x<H
 				(because if x<0, then (unsigned)(x) = 2**32-|x| which is
 				BIG and thus >H )
-			
+
 				This is clearly a stupid, unmaintanable, unreadable "optimization".
 				But i like it :)
 			*/
-			if ((uint32)(y0-y-1) < gHeight-3)   
+			if ((uint32)(y0-y-1) < gHeight-3)
 				memshset(&gBuffer8[x0 + gWidth*(y0-y+1)] ,c,d, x);
 			if ((uint32)(y0+y-1) < gHeight-3)
 				memshset(&gBuffer8[x0 + gWidth*(y0+y)] ,c,d, x);
@@ -219,7 +218,7 @@ drawshdisk(int x0, int y0, int r)
 			y--;
 		}
 		x++;
-	} while (x < y);	
+	} while (x < y);
 }
 
 
@@ -240,8 +239,8 @@ drawGalaxy()
 	(independant of processor speed)
 	*/
 	static bigtime_t firstTime = system_time();
-	t = ((double)gSpeed * system_time()-firstTime)/1000000.0; //opti_scale_time(0.418, &demo_elapsed_time);  
-	
+	t = ((double)gSpeed * system_time()-firstTime)/1000000.0; //opti_scale_time(0.418, &demo_elapsed_time);
+
 	a = 0.9*t;
 	b = t;
 	c = 1.1*t;
@@ -255,12 +254,12 @@ drawGalaxy()
 	oa = 140 * osin(a);
 	ob = 140 * ocos(b);
 	oc = 240 * osin(c);
-	
+
 	if (gMotionBlur) {
 		/* mblur does something like that:
 		 * (or did, perhaps it's another version!..)
-	
-		for (i=0; i<W*H; i++)   
+
+		for (i=0; i<W*H; i++)
 			gBuffer8[i]= (gBuffer8[i]>>3) + (gBuffer8[i]>>1);
 		*/
 		mblur (gBuffer8, gWidth*gHeight);
@@ -314,24 +313,24 @@ setPalette()
 		case 1:		// blue
 			for (i = 0; i < 30; i++)
 				gPalette[i] = (uint8)(i*8/10); // << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
-			
+
 			for (i = 30; i < 256; i++) {
 				uint8 b = (i);
 				uint8 g = (i*i >> 8); //(i*8/10);
 				uint8 r = i >= 240 ? (i-240) << 3 : 0; //(i*2/10);
-		
+
 				gPalette[i] = ((r << 16) | (g << 8) | (b));
 			}
 			break;
 		case 2:		// red
 			for (i = 0;i < 128;i++)
 				gPalette[i] = (uint8)i << 16; // << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
-			
+
 			for (i = 128;i < 256;i++)
-			{	
+			{
 				uint8 r = i;
 				uint8 c = (uint8)((cos((i-256) / 42.0)*0.5 + 0.5)*225);
-		
+
 				gPalette[i] = ((r << 16) | (c << 8) | c);
 			}
 /*			for (i = 192;i < 224;i++)
@@ -413,12 +412,12 @@ class SimpleSlider : public BSlider {
 		};
 
 		char *UpdateText() const
-		{ 
+		{
 			sprintf(fText, "%s: %d", fLabel, Value());
 
 			return fText;
 		};
-	
+
 	private:
 		mutable char fText[32];
 		const char *fLabel;
@@ -432,10 +431,10 @@ class SimpleSlider : public BSlider {
 class SettingsView : public BView {
 	public:
 		SettingsView(BRect frame);
-		
+
 		virtual void AttachedToWindow();
 		virtual void MessageReceived(BMessage *msg);
-	
+
 	private:
 		BMenuField *fWidthMenu,*fColorMenu,*fBorderMenu;
 		BCheckBox *fMotionCheck;
@@ -463,7 +462,7 @@ SettingsView::AttachedToWindow()
 
 	BRect rect(10,0,0,25);
 	rect.right = Bounds().right;
-	
+
 	BStringView *string = new BStringView(rect,B_EMPTY_STRING,"Nebula");
 	string->SetFontSize(18.0);
 	AddChild(string);
@@ -472,7 +471,7 @@ SettingsView::AttachedToWindow()
 	string = new BStringView(rect,B_EMPTY_STRING,VERSION_STRING);
 	AddChild(string);
 
-//	rect.OffsetBy(0,height+5);	
+//	rect.OffsetBy(0,height+5);
 	rect.left = 10;  rect.top = 27;  rect.bottom = 17+height;
 	string = new BStringView(rect,B_EMPTY_STRING,"© 2001-2004 pinc Software, Axel Dörfler.");
 	string->SetAlignment(B_ALIGN_CENTER);
@@ -629,7 +628,7 @@ Nebula::Nebula(BMessage *message, image_id id)
 		gSettingsWidth = 320;
 	if (gMaxFramesPerSecond < 1.f)
 		gMaxFramesPerSecond = 40.0f;
-	
+
 	gScreenSaver = this;
 }
 
