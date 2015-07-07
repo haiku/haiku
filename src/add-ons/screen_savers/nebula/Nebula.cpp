@@ -7,6 +7,7 @@
 
 #include <AppKit.h>
 #include <InterfaceKit.h>
+#include <LayoutBuilder.h>
 #include <Window.h>
 #include <ScreenSaver.h>
 #include <SupportDefs.h>
@@ -387,8 +388,8 @@ setPalette()
 
 class SimpleSlider : public BSlider {
 	public:
-		SimpleSlider(BRect frame, const char *label, BMessage *msg)
-			: BSlider(frame, B_EMPTY_STRING, B_EMPTY_STRING, msg, 1, 100)
+		SimpleSlider(const char *label, BMessage *msg)
+			: BSlider(B_EMPTY_STRING, B_EMPTY_STRING, msg, 1, 100, B_HORIZONTAL)
 		{
 			SetLimitLabels("1", "100");
 			SetHashMarks(B_HASH_MARKS_BOTTOM);
@@ -428,40 +429,28 @@ class SettingsView : public BView {
 
 
 SettingsView::SettingsView(BRect frame)
-	: BView(frame,"",B_FOLLOW_NONE,B_WILL_DRAW)
+	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW)
 {
-	MoveBy(0, -25);	// the view is not where it should
+	MoveBy(0, -25); // The view is not where it should be.
 }
 
 
 void
 SettingsView::AttachedToWindow()
 {
-	int32 height,y;
-	{
-		font_height fontHeight;
-		GetFontHeight(&fontHeight);
-		height = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading)+10;
-	}
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
-	BRect rect(10,0,0,25);
-	rect.right = Bounds().right;
+	BStringView* titleString = new BStringView(B_EMPTY_STRING, "Nebula");
+	titleString->SetFontSize(18.0);
 
-	BStringView *string = new BStringView(rect,B_EMPTY_STRING,"Nebula");
-	string->SetFontSize(18.0);
-	AddChild(string);
-
-//	rect.OffsetBy(0,height+5);
-	rect.left = 10;  rect.top = 27;  rect.bottom = 17+height;
-	string = new BStringView(rect,B_EMPTY_STRING,"© 2001-2004 Axel Dörfler.");
-	string->SetAlignment(B_ALIGN_CENTER);
-	AddChild(string);
+	BStringView* copyrightString = new BStringView(B_EMPTY_STRING,
+		"© 2001-2004 Axel Dörfler.");
+	copyrightString->SetAlignment(B_ALIGN_CENTER);
 
 	BPopUpMenu* popMenu = new BPopUpMenu("");
 	BMenuItem* item;
 
-	const char *colorSchemes[] = {"yellow","blue/cyan","red","green","grey","cold","orange (original)"};
+	const char *colorSchemes[] = {"yellow","cyan","red","green","grey","cold","orange (original)"};
 	for (int i = 0; i < 7; i++) {
 		BMessage *msg = new BMessage(kMsgColorScheme);
 		msg->AddInt8("scheme",(int8)i);
@@ -471,16 +460,12 @@ SettingsView::AttachedToWindow()
 	}
 
 	popMenu->SetTargetForItems(this);
-	rect.OffsetBy(0,height);
-	fColorMenu = new BMenuField(rect,"col","Color Scheme:",popMenu);
-	fColorMenu->SetDivider(110);
-	AddChild(fColorMenu);
+	fColorMenu = new BMenuField("col", "Color: ", popMenu);
 
 	popMenu = new BPopUpMenu("");
 
 	const char *blankBorderFormats[] = {"fullscreen, no borders","16:9, wide-screen","2:3.5, cinemascope","only a slit"};
-	for (int8 i = 0;i < 4;i++)
-	{
+	for (int8 i = 0;i < 4;i++) {
 		BMessage *msg = new BMessage(kMsgBlankBorders);
 		msg->AddInt8("border",i);
 		popMenu->AddItem(item = new BMenuItem(blankBorderFormats[i],msg));
@@ -489,31 +474,32 @@ SettingsView::AttachedToWindow()
 	}
 
 	popMenu->SetTargetForItems(this);
-	rect.OffsetBy(0,height);
-	fBorderMenu = new BMenuField(rect,"cinema","Blank Border Format:",popMenu);
-	fBorderMenu->SetDivider(110);
-	AddChild(fBorderMenu);
+	fBorderMenu = new BMenuField("cinema", "Format: ", popMenu);
 
-	rect.OffsetBy(0,height+3);
-	fMotionCheck = new BCheckBox(rect,B_EMPTY_STRING,"Enable Motion Blur",new BMessage(kMsgMotionBlur));
+	fMotionCheck = new BCheckBox(B_EMPTY_STRING, "Enable motion blur", new BMessage(kMsgMotionBlur));
 	fMotionCheck->SetTarget(this);
 	fMotionCheck->SetValue((int)gMotionBlur);
-	AddChild(fMotionCheck);
-	fMotionCheck->ResizeToPreferred();
 
-	rect.OffsetBy(0, height - 3);	 rect.bottom += 2*height;  rect.right -= 10;
-	fSpeedSlider = new SimpleSlider(rect,"Speed",new BMessage(kMsgSpeed));
+	fSpeedSlider = new SimpleSlider("Speed", new BMessage(kMsgSpeed));
 	fSpeedSlider->SetValue((gSpeed - 0.002)/0.05);
 	fSpeedSlider->SetTarget(this);
-	AddChild(fSpeedSlider);
-	fSpeedSlider->ResizeToPreferred();
 
-	rect.OffsetBy(0, 2 * height + 15);
-	fFramesSlider = new SimpleSlider(rect,"Maximum Frames Per Second",new BMessage(kMsgFrames));
+	fFramesSlider = new SimpleSlider("Maximum Frames Per Second", new BMessage(kMsgFrames));
 	fFramesSlider->SetValue(gMaxFramesPerSecond);
 	fFramesSlider->SetTarget(this);
-	AddChild(fFramesSlider);
-	fFramesSlider->ResizeToPreferred();
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_HALF_ITEM_SPACING)
+		.SetInsets(B_USE_HALF_ITEM_INSETS, B_USE_HALF_ITEM_INSETS,
+			B_USE_BIG_INSETS, B_USE_HALF_ITEM_INSETS)
+		.Add(titleString)
+		.Add(copyrightString)
+		.Add(fColorMenu)
+		.Add(fBorderMenu)
+		.Add(fMotionCheck)
+		.Add(fSpeedSlider)
+		.Add(fFramesSlider)
+		.AddGlue()
+	.End();
 }
 
 
