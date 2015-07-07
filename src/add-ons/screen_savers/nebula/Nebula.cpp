@@ -1,0 +1,793 @@
+/* Nebula - a screen saver for the BeOS
+**
+** Copyright (c) 2001-2004 pinc Software.  All Rights Reserved.
+** Effect from corTeX / Optimum
+*/
+
+
+#include <AppKit.h>
+#include <InterfaceKit.h>
+#include <Window.h>
+#include <ScreenSaver.h>
+#include <SupportDefs.h>
+
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define VERSION_STRING "1.2.0 (August 21st 2004)"
+
+typedef struct
+{
+	int x,y,z,r;
+} p3;
+
+typedef float matrix[3][3];
+
+#define GMAX 5000
+p3 gal[GMAX];
+float precos[512];
+float presin[512];
+
+typedef unsigned short word;
+
+extern "C" {
+	void memshset(char *dst, int center_shade,int fixed_shade, int length_2);
+	void mblur(char *src, int nbpixels);
+
+	void draw_stars320(char *, char);
+	void draw_stars512(char *, char);
+	void draw_stars576(char *, char);
+	void draw_stars640(char *, char);
+	void draw_stars800(char *, char);
+	void draw_stars1024(char *, char);
+	void draw_stars1152(char *, char);
+	void draw_stars1280(char *, char);
+	void draw_stars1400(char *, char);
+	void draw_stars1600(char *, char);
+}
+
+const uint32 kMsgWidth  = 'widt';
+const uint32 kMsgColorScheme = 'cols';
+const uint32 kMsgBlankBorders = 'blbr';
+const uint32 kMsgMotionBlur = 'blur';
+const uint32 kMsgSpeed = 'sped';
+const uint32 kMsgFrames = 'mfps';
+
+void	(*gDrawStarFunc)(char *,char);
+float	gSpeed;
+bool	gMotionBlur;
+int32	gSettingsWidth;
+int32	gWidth;
+int32	gHeight;
+float	gMaxFramesPerSecond;
+BBitmap	*gBitmap;
+BScreenSaver *gScreenSaver;
+uint32	gPalette[256];
+int8	gPaletteScheme,gBlankBorders;
+char 	*gBuffer8;   /* working 8bit buffer */
+
+
+inline float
+ocos(float a)
+{
+	return (precos[(int)(a*256/M_PI) & 511]);
+}
+
+inline float
+osin(float a)
+{
+	return (presin[(int)(a*256/M_PI) & 511]);
+}
+
+
+void
+mulmat(matrix *a, matrix *b, matrix *c)
+{
+	int i,j;
+
+	for (i = 0;i < 3;i++) {
+		for (j = 0;j < 3;j++) {
+			(*c)[i][j] = (*a)[i][0] * (*b)[0][j] +
+						 (*a)[i][1] * (*b)[1][j] +
+						 (*a)[i][2] * (*b)[2][j];
+		}
+	}
+}
+
+
+inline void
+mulvec(matrix *a, float *x, float *y, float *z)
+{
+	float nx = *x,ny = *y,nz = *z;
+
+	*x = nx*(*a)[0][0] + ny*(*a)[0][1] + nz*(*a)[0][2];
+	*y = nx*(*a)[1][0] + ny*(*a)[1][1] + nz*(*a)[1][2];
+	*z = nx*(*a)[2][0] + ny*(*a)[2][1] + nz*(*a)[2][2];
+}
+
+
+void
+setrmat(float a, float b, float c, matrix *m)
+{
+	int i,j;
+	for (i = 0;i < 3;i++)
+		for (j = 0;j < 3;j++)
+			(*m)[i][j] = (float)(i == j);
+
+	if (a != 0) {
+		(*m)[0][0] = cos(a);	(*m)[0][1] = sin(a);
+		(*m)[1][0] = sin(a);	(*m)[1][1] = -cos(a);
+		return;
+	}
+	if (b != 0) {
+		(*m)[0][0] = cos(b);	(*m)[0][2] = sin(b);
+		(*m)[2][0] = sin(b);	(*m)[2][2] = -cos(b);
+		return;
+	}
+	(*m)[1][1] = cos(c);	(*m)[1][2] = sin(c);
+	(*m)[2][1] = sin(c);	(*m)[2][2] = -cos(c);
+}
+
+
+void
+rotate3d(float *xr, float *yr, float *zr,  /* point to rotate */
+	float ax, float ay, float az)     /* the 3 angles (order ?..) */
+{
+	float xr2, yr2, zr2;
+
+	xr2 = (*xr*ocos(az) + *yr*osin(az));
+	yr2 = (*xr*osin(az) - *yr*ocos(az));
+	*xr = xr2;
+	*yr = yr2;
+
+	xr2 = (*xr*ocos(ay) + *zr*osin(ay));
+	zr2 = (*xr*osin(ay) - *zr*ocos(ay));
+	*xr = xr2;
+	*zr = zr2;
+
+	zr2 = (*zr*ocos(ax) + *yr*osin(ax));
+	yr2 = (*zr*osin(ax) - *yr*ocos(ax));
+	*zr = zr2;
+	*yr = yr2;
+}
+
+
+void
+drawshdisk(int x0, int y0, int r)
+{
+	int x = 0;
+	int y;
+	int ly;		/* last y */
+	int delta;
+	int c;		/* color at center */
+	int d;		/* delta */
+
+#define SLIMIT 17
+#define SRANGE 15
+
+	if (r <= SLIMIT) {
+		/* range checking is already (more or less) done... */
+		(*gDrawStarFunc)(&gBuffer8[x0 + gWidth*y0], 10+r*5);
+		//gBuffer8[x0+W*y0] = 10+r*5;
+		return;
+	}
+	
+	if (r < SLIMIT+SRANGE)
+		r = ((r-SLIMIT)*SLIMIT)/SRANGE+1;
+
+	y = ly = r;     /* AAaargh */
+	delta = 3-2*r;
+
+	do {	
+		if (y != ly) {
+			/* dont overlap these lines */
+			c = ((r-y+1)<<13)/r;
+			d = -c/(x+1);
+			
+			if (y == x+1)		/* this would overlap with the next x lines */
+				goto TOTO;		/* WHY NOT */
+
+			/*  note : for "normal" numbers (not too big) :
+				(unsigned int)(x) < M   <=>  0<=x<H
+				(because if x<0, then (unsigned)(x) = 2**32-|x| which is
+				BIG and thus >H )
+			
+				This is clearly a stupid, unmaintanable, unreadable "optimization".
+				But i like it :)
+			*/
+			if ((uint32)(y0-y-1) < gHeight-3)   
+				memshset(&gBuffer8[x0 + gWidth*(y0-y+1)] ,c,d, x);
+			if ((uint32)(y0+y-1) < gHeight-3)
+				memshset(&gBuffer8[x0 + gWidth*(y0+y)] ,c,d, x);
+		}
+		TOTO:
+		c = ((r-x+1)<<13)/r;
+		d = -c/(y);
+
+		if ((uint32)(y0-x-1) < gHeight-3)
+			memshset(&gBuffer8[x0 + gWidth*(y0-x)] ,c,d, y);
+		if ((uint32)(y0+x-1) < gHeight-3)
+			memshset(&gBuffer8[x0 + gWidth*(y0+x+1)] ,c,d, y);
+
+		ly = y;
+		if (delta < 0)
+			delta += 4*x+6;
+		else {
+			delta += 4*(x-y)+10;
+			y--;
+		}
+		x++;
+	} while (x < y);	
+}
+
+
+void
+drawGalaxy()
+{
+	int r;
+	int x,y;
+	float rx,ry,rz;
+	int i;
+	float oa,ob,oc;
+	float t;
+	float a, b, c;
+	matrix ma,mb,mc,mr;
+
+	/* t is the parametric coordinate for the animation;
+	change the scale value to change the speed of anim
+	(independant of processor speed)
+	*/
+	static bigtime_t firstTime = system_time();
+	t = ((double)gSpeed * system_time()-firstTime)/1000000.0; //opti_scale_time(0.418, &demo_elapsed_time);  
+	
+	a = 0.9*t;
+	b = t;
+	c = 1.1*t;
+
+	setrmat(a,0,0,&ma);
+	setrmat(0,b,0,&mb);
+	mulmat(&ma,&mb,&mc);
+	setrmat(0,0,c,&ma);
+	mulmat(&ma,&mc,&mr);
+
+	oa = 140 * osin(a);
+	ob = 140 * ocos(b);
+	oc = 240 * osin(c);
+	
+	if (gMotionBlur) {
+		/* mblur does something like that:
+		 * (or did, perhaps it's another version!..)
+	
+		for (i=0; i<W*H; i++)   
+			gBuffer8[i]= (gBuffer8[i]>>3) + (gBuffer8[i]>>1);
+		*/
+		mblur (gBuffer8, gWidth*gHeight);
+	} else
+		memset(gBuffer8,0,gWidth*gHeight);
+
+	for (i = 0; i < GMAX; i++) {
+		rx = gal[i].x;
+		ry = gal[i].y;
+		rz = gal[i].z;
+
+		mulvec(&mr, &rx, &ry, &rz);
+
+		rx += oa;
+		ry += ob;
+		rz += oc;
+		rz += 300;
+
+		if (rz > 5) {
+			x = (int)(15*rx/(rz/5+1)) + gWidth/2;  /* tain jcomprend plus rien  */
+			y = (int)(15*ry/(rz/5+1)) + gHeight/2;  /* a ces formules de daube !! */
+			r = (int)(3*gal[i].r / (rz/4+3))+2;
+
+			if (x > 5 && x < gWidth-6 && y > 5 && y < gHeight-6)
+//			if ((uint32)x < gWidth-1 && (uint32)y < gHeight-1)
+				drawshdisk(x,y,r);
+		}
+	}
+}
+
+
+void
+setPalette()
+{
+	int i;
+
+	switch (gPaletteScheme) {
+		case 0:		// yellow
+		default:
+			for (i = 0; i < 30; i++)
+				gPalette[i] = (uint8)(i*8/10) << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
+
+			for (i = 30; i < 256; i++) {
+				uint8 r = (i);
+				uint8 g = (i*i >> 8); //(i*8/10);
+				uint8 b = i >= 240 ? (i-240) << 3 : 0; //(i*2/10);
+
+				gPalette[i] = ((r << 16) | (g << 8) | (b));
+			}
+			break;
+		case 1:		// blue
+			for (i = 0; i < 30; i++)
+				gPalette[i] = (uint8)(i*8/10); // << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
+			
+			for (i = 30; i < 256; i++) {
+				uint8 b = (i);
+				uint8 g = (i*i >> 8); //(i*8/10);
+				uint8 r = i >= 240 ? (i-240) << 3 : 0; //(i*2/10);
+		
+				gPalette[i] = ((r << 16) | (g << 8) | (b));
+			}
+			break;
+		case 2:		// red
+			for (i = 0;i < 128;i++)
+				gPalette[i] = (uint8)i << 16; // << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
+			
+			for (i = 128;i < 256;i++)
+			{	
+				uint8 r = i;
+				uint8 c = (uint8)((cos((i-256) / 42.0)*0.5 + 0.5)*225);
+		
+				gPalette[i] = ((r << 16) | (c << 8) | c);
+			}
+/*			for (i = 192;i < 224;i++)
+			{
+				uint8 c = (i-192);
+				gPalette[i] = gPalette[i] & 0xff0000 | c << 8 | c;
+			}
+			for (i = 224;i < 256;i++)
+			{
+				uint8 c = (i-224)/2;
+				c = 32 + c*c*6/10;
+				gPalette[i] = gPalette[i] & 0xff0000 | c << 8 | c;
+			}
+*/			break;
+		case 3:		// green
+			for (i = 0; i < 30; i++)
+				gPalette[i] = (uint8)(i*8/10) << 8; // << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
+
+			for (i = 30; i < 256; i++) {
+				uint8 g = (i);
+				uint8 r = (i*i >> 8); //(i*8/10);
+				uint8 b = i >= 240 ? (i-240) << 3 : 0; //(i*2/10);
+
+				gPalette[i] = ((r << 16) | (g << 8) | (b));
+			}
+			break;
+		case 4:		// grey
+			for (i = 0; i < 256; i++) {
+				uint8 c = i*15/16 + 10;
+				gPalette[i] = c << 16 | c << 8 | c;
+			}
+			break;
+		case 5:		// cold
+			for (i = 0; i < 30; i++)
+				gPalette[i] = (uint8)(i*8/10) << 16; // << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
+
+			for (i = 30; i < 256; i++) {
+				uint8 r = i;
+				uint8 c = (uint8)((cos((i-255) / 82.0)*0.5 + 0.5)*255);
+
+				gPalette[i] = ((r << 16) | (c << 8) | c);
+			}
+			break;
+		case 6:		// original
+			for (i = 0; i < 256; i++) {
+				uint32 c = *(char *)&i;
+				gPalette[i] = c << 16 | c << 8;
+			}
+			break;
+	}
+/*	for (i = 0;i < 256;i++)
+	{
+		uint8 r = (i);
+		uint8 g = (i*i >> 8); //(i*8/10);
+		uint8 b = 0; //(i*2/10);
+
+		gPalette[i] = ((r << 16) | (g << 8) | (b));
+	}
+*/
+/*	for (i = 240;i < 256;i++)
+		gPalette[i] = (uint8)i << 16 | (uint8)i << 8 | (uint8)(i*6/10);
+*/
+}
+
+
+/***********************************************************************************/
+// #pragma mark -
+// #pragma mark SimpleSlider
+
+class SimpleSlider : public BSlider {
+	public:
+		SimpleSlider(BRect frame, const char *label, BMessage *msg)
+			: BSlider(frame, B_EMPTY_STRING, B_EMPTY_STRING, msg, 1, 100)
+		{
+			SetLimitLabels("1", "100");
+			SetHashMarks(B_HASH_MARKS_BOTTOM);
+			SetHashMarkCount(11);
+			fLabel = label;
+		};
+
+		char *UpdateText() const
+		{ 
+			sprintf(fText, "%s: %d", fLabel, Value());
+
+			return fText;
+		};
+	
+	private:
+		mutable char fText[32];
+		const char *fLabel;
+};
+
+
+/***********************************************************************************/
+// #pragma mark -
+
+
+class SettingsView : public BView {
+	public:
+		SettingsView(BRect frame);
+		
+		virtual void AttachedToWindow();
+		virtual void MessageReceived(BMessage *msg);
+	
+	private:
+		BMenuField *fWidthMenu,*fColorMenu,*fBorderMenu;
+		BCheckBox *fMotionCheck;
+		BSlider *fSpeedSlider,*fFramesSlider;
+};
+
+
+SettingsView::SettingsView(BRect frame)
+	: BView(frame,"",B_FOLLOW_NONE,B_WILL_DRAW)
+{
+	MoveBy(0, -25);	// the view is not where it should
+}
+
+
+void
+SettingsView::AttachedToWindow()
+{
+	int32 height,y;
+	{
+		font_height fontHeight;
+		GetFontHeight(&fontHeight);
+		height = (int32)(fontHeight.ascent + fontHeight.descent + fontHeight.leading)+10;
+	}
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	BRect rect(10,0,0,25);
+	rect.right = Bounds().right;
+	
+	BStringView *string = new BStringView(rect,B_EMPTY_STRING,"Nebula");
+	string->SetFontSize(18.0);
+	AddChild(string);
+
+	rect.left += 60;	rect.bottom -= 2;
+	string = new BStringView(rect,B_EMPTY_STRING,VERSION_STRING);
+	AddChild(string);
+
+//	rect.OffsetBy(0,height+5);	
+	rect.left = 10;  rect.top = 27;  rect.bottom = 17+height;
+	string = new BStringView(rect,B_EMPTY_STRING,"© 2001-2004 pinc Software, Axel Dörfler.");
+	string->SetAlignment(B_ALIGN_CENTER);
+	AddChild(string);
+
+	BPopUpMenu *popMenu = new BPopUpMenu("");
+	BMenuItem *item;
+
+	int32 widths[] = { 320, 512, 576, 640, 800, 1024, 1152, 1280, 1400, 1600 };
+	for (int32 i = 0; i < sizeof(widths) / sizeof(widths[0]); i++) {
+		BMessage *msg = new BMessage(kMsgWidth);
+		char label[64];
+		sprintf(label, "%ld pixel", widths[i]);
+		msg->AddInt32("width", widths[i]);
+		popMenu->AddItem(item = new BMenuItem(label, msg));
+
+		if (gSettingsWidth == widths[i])
+			item->SetMarked(true);
+	}
+
+	popMenu->SetTargetForItems(this);
+	rect.left = 10;  rect.OffsetBy(0,height);
+	fWidthMenu = new BMenuField(rect, "res", "Internal Horizontal Resolution:", popMenu);
+	fWidthMenu->SetDivider(155);
+	AddChild(fWidthMenu);
+
+	popMenu = new BPopUpMenu("");
+
+	const char *colorSchemes[] = {"yellow","blue/cyan","red","green","grey","cold","orange (original)"};
+	for (int i = 0; i < 7; i++) {
+		BMessage *msg = new BMessage(kMsgColorScheme);
+		msg->AddInt8("scheme",(int8)i);
+		popMenu->AddItem(item = new BMenuItem(colorSchemes[i],msg));
+		if (gPaletteScheme == i)
+			item->SetMarked(true);
+	}
+
+	popMenu->SetTargetForItems(this);
+	rect.OffsetBy(0,height);
+	fColorMenu = new BMenuField(rect,"col","Color Scheme:",popMenu);
+	fColorMenu->SetDivider(110);
+	AddChild(fColorMenu);
+
+	popMenu = new BPopUpMenu("");
+
+	const char *blankBorderFormats[] = {"fullscreen, no borders","16:9, wide-screen","2:3.5, cinemascope","only a slit"};
+	for (int8 i = 0;i < 4;i++)
+	{
+		BMessage *msg = new BMessage(kMsgBlankBorders);
+		msg->AddInt8("border",i);
+		popMenu->AddItem(item = new BMenuItem(blankBorderFormats[i],msg));
+		if (gBlankBorders == i)
+			item->SetMarked(true);
+	}
+
+	popMenu->SetTargetForItems(this);
+	rect.OffsetBy(0,height);
+	fBorderMenu = new BMenuField(rect,"cinema","Blank Border Format:",popMenu);
+	fBorderMenu->SetDivider(110);
+	AddChild(fBorderMenu);
+
+	rect.OffsetBy(0,height+3);
+	fMotionCheck = new BCheckBox(rect,B_EMPTY_STRING,"Enable Motion Blur",new BMessage(kMsgMotionBlur));
+	fMotionCheck->SetTarget(this);
+	fMotionCheck->SetValue((int)gMotionBlur);
+	AddChild(fMotionCheck);
+	fMotionCheck->ResizeToPreferred();
+
+	rect.OffsetBy(0, height - 3);	 rect.bottom += 2*height;  rect.right -= 10;
+	fSpeedSlider = new SimpleSlider(rect,"Speed",new BMessage(kMsgSpeed));
+	fSpeedSlider->SetValue((gSpeed - 0.002)/0.05);
+	fSpeedSlider->SetTarget(this);
+	AddChild(fSpeedSlider);
+	fSpeedSlider->ResizeToPreferred();
+
+	rect.OffsetBy(0, 2 * height + 15);
+	fFramesSlider = new SimpleSlider(rect,"Maximum Frames Per Second",new BMessage(kMsgFrames));
+	fFramesSlider->SetValue(gMaxFramesPerSecond);
+	fFramesSlider->SetTarget(this);
+	AddChild(fFramesSlider);
+	fFramesSlider->ResizeToPreferred();
+}
+
+
+void
+SettingsView::MessageReceived(BMessage *msg)
+{
+	switch(msg->what) {
+		case kMsgWidth:
+			if (msg->FindInt32("width",&gSettingsWidth) == B_OK) {
+				if (gSettingsWidth > 1600)
+					gSettingsWidth = 1600;
+				else if (gSettingsWidth < 320)
+					gSettingsWidth = 320;
+			}
+			break;
+		case kMsgColorScheme:
+			if (msg->FindInt8("scheme",&gPaletteScheme) == B_OK)
+				setPalette();
+			break;
+		case kMsgBlankBorders:
+			msg->FindInt8("border",&gBlankBorders);
+			break;
+		case kMsgMotionBlur:
+			gMotionBlur = fMotionCheck->Value() > 0;
+			break;
+		case kMsgSpeed:
+			gSpeed = 0.002 + 0.05 * fSpeedSlider->Value();
+			//printf("value = %d, gSpeed = %f\n",fSpeedSlider->Value(),gSpeed);
+			break;
+		case kMsgFrames:
+			gMaxFramesPerSecond = fFramesSlider->Value();
+			gScreenSaver->SetTickSize((bigtime_t)(1000000LL / gMaxFramesPerSecond));
+			break;
+	}
+}
+
+
+
+/***********************************************************************************/
+// #pragma mark -
+
+
+class Nebula : public BScreenSaver {
+	public:
+		Nebula(BMessage *message, image_id id);
+
+		virtual void StartConfig(BView *view);
+		virtual status_t SaveState(BMessage *state) const;
+
+		virtual status_t StartSaver(BView *view, bool preview);
+		virtual void StopSaver();
+		virtual void Draw(BView *view, int32 frame);
+
+	private:
+		float	fFactor;
+		bool	fStarted;
+};
+
+
+Nebula::Nebula(BMessage *message, image_id id)
+	: BScreenSaver(message, id)
+{
+	message->FindFloat("speed", 0, &gSpeed);
+	message->FindInt32("width", 0, &gSettingsWidth);
+	message->FindBool("motionblur", 0, &gMotionBlur);
+	message->FindFloat("max_fps", 0, &gMaxFramesPerSecond);
+	message->FindInt8("scheme", 0, &gPaletteScheme);
+	message->FindInt8("border", 0, &gBlankBorders);
+
+	if (gSpeed < 0.01f)
+		gSpeed = 0.4f;
+	if (gSettingsWidth < 320)
+		gSettingsWidth = 320;
+	if (gMaxFramesPerSecond < 1.f)
+		gMaxFramesPerSecond = 40.0f;
+	
+	gScreenSaver = this;
+}
+
+
+void
+Nebula::StartConfig(BView *view)
+{
+	view->AddChild(new SettingsView(view->Frame()));
+}
+
+
+status_t
+Nebula::SaveState(BMessage *state) const
+{
+	state->AddFloat("speed", gSpeed);
+	state->AddInt32("width", gSettingsWidth);
+	state->AddBool("motionblur", gMotionBlur);
+	state->AddFloat("max_fps", gMaxFramesPerSecond);
+	state->AddInt8("scheme", gPaletteScheme);
+	state->AddInt8("border", gBlankBorders);
+
+	return B_OK;
+}
+
+
+status_t
+Nebula::StartSaver(BView *view, bool preview)
+{
+	// initialize palette
+	setPalette();
+
+	int i;
+	for (i = 0; i < 512; i++) {
+		precos[i]=cos(i*M_PI/256);
+		presin[i]=sin(i*M_PI/256);
+	}
+
+	// uniforme cubique
+/*	for (i = 0;i < GMAX;i++)
+	{
+		gal[i].x = 1*((rand()&1023) - 512);
+		gal[i].y = 1*((rand()&1023) - 512);
+		gal[i].z = 1*((rand()&1023) - 512);
+		gal[i].r = rand()&63;
+	}
+*/
+
+	for (i = 0; i < GMAX; i++) {
+		float r, th, h, dth;
+
+		r = rand()*1.0 / RAND_MAX;
+		r = (1-r)*(1-r)+0.05;
+
+		if (r < 0.12)
+			th = rand()*M_PI*2/RAND_MAX;
+		else {
+			th = (rand()&3)*M_PI_2 + r*r*2;
+			dth = rand()*1.0/RAND_MAX;
+			dth = dth*dth*2;
+			th+=dth;
+		}
+		gal[i].x = (int)(512*r*cos(th));
+		gal[i].z = (int)(512*r*sin(th));
+		h = (1+cos(r*M_PI))*150;
+		dth = rand()*1.0/RAND_MAX;
+		gal[i].y = (int)(h*(dth-0.5));
+		gal[i].r = (int)((2-r)*60 + 31);
+	}
+	gal[0].x = gal[0].y = gal[0].z = 0;
+	gal[0].r = 320;
+
+	if (preview)
+		gWidth = 320;
+	else
+		gWidth = gSettingsWidth;
+
+	fFactor = (view->Bounds().Width()+1) / gWidth;
+	if ((int)fFactor != fFactor)
+		fFactor += 0.01;
+
+	// 4:3
+	gHeight = (int32)((view->Bounds().Height()+1)/fFactor + 0.5f);
+	// calculate blank border format (if not in preview)
+	if (!preview) switch (gBlankBorders) {
+		case 1:		// 16:9
+			gHeight = (int32)(gHeight * 0.703125 + 0.5);
+			break;
+		case 2:		// 2:3.5
+			gHeight = (int32)(gHeight * 0.534 + 0.5);
+			break;
+		case 3:
+			gHeight /= 5;
+			break;
+	}
+	view->SetScale(fFactor);
+
+	switch (gWidth) {
+		default:
+		case 320:  gDrawStarFunc = draw_stars320; break;
+		case 512:  gDrawStarFunc = draw_stars512; break;
+		case 576:  gDrawStarFunc = draw_stars576; break;
+		case 640:  gDrawStarFunc = draw_stars640; break;
+		case 800:  gDrawStarFunc = draw_stars800; break;
+		case 1024: gDrawStarFunc = draw_stars1024; break;
+		case 1152: gDrawStarFunc = draw_stars1152; break;
+		case 1280: gDrawStarFunc = draw_stars1280; break;
+		case 1400: gDrawStarFunc = draw_stars1400; break;
+		case 1600: gDrawStarFunc = draw_stars1600; break;
+	}
+
+	gBitmap = new BBitmap(BRect(0, 0, gWidth - 1, gHeight - 1), B_RGB32);
+	gBuffer8 = (char *)malloc(gWidth * gHeight);
+
+	SetTickSize((bigtime_t)(1000000LL / gMaxFramesPerSecond));
+	fStarted = true;
+
+	return B_OK;
+}
+
+
+void
+Nebula::StopSaver()
+{
+	free(gBuffer8);
+	gBuffer8 = NULL;
+
+	delete gBitmap;
+	gBitmap = NULL;
+}
+
+
+void
+Nebula::Draw(BView *view, int32)
+{
+	if (fStarted) {
+		view->SetHighColor(0, 0, 0, 0);
+		view->FillRect(view->Frame());
+		view->MovePenTo(0, (view->Bounds().Height() / fFactor - 1 - gHeight) / 2);
+
+		fStarted = false;
+	}
+	uint32 *buffer32 = (uint32 *)gBitmap->Bits();
+
+	drawGalaxy();
+
+	for (int x = 0, end = gWidth * gHeight; x < end; x++)
+		buffer32[x] = gPalette[(uint8)gBuffer8[x]];
+
+	view->DrawBitmap(gBitmap);
+}
+
+
+/***********************************************************************************/
+// #pragma mark -
+
+
+extern "C" _EXPORT BScreenSaver *
+instantiate_screen_saver(BMessage *message, image_id image)
+{
+	return new Nebula(message, image);
+}
