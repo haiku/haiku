@@ -55,8 +55,8 @@ class InodeHashtable {
 
 			status_t status = inode->AcquireBuffer();
 			if (status != B_OK) {
-				fprintf(stderr, "Could not retrieve buffer for inode %Ld: %s\n",
-					inode->Offset(), strerror(status));
+				fprintf(stderr, "Could not retrieve buffer for inode %"
+					B_PRIdOFF ": %s\n", inode->Offset(), strerror(status));
 				return NULL;
 			}
 			return inode;
@@ -243,7 +243,8 @@ collectInodes(Disk& disk, RunSet* set, InodeHashtable* hashTable, off_t start,
 				Inode *node = Inode::Factory(&disk, &inode);
 				if (node != NULL) {
 					if (gVerbose)
-						printf("  node: %Ld \"%s\"\n", position, node->Name());
+						printf("  node: %" B_PRIdOFF " \"%s\"\n", position,
+							node->Name());
 
 					if (set != NULL)
 						set->insert(node->BlockRun());
@@ -268,19 +269,20 @@ collectInodes(Disk& disk, RunSet* set, InodeHashtable* hashTable, off_t start,
 			position += disk.BlockSize();
 		}
 		if (system_time() - lastUpdate > 500000) {
-			printf("  block %Ld (%Ld%%), %Ld inodes\33[1A\n", offset,
+			printf("  block %" B_PRIdOFF " (%" B_PRIdOFF "%%), %" B_PRIdOFF
+				" inodes\33[1A\n", offset,
 				100 * (offset - start) / (end - start), count);
 			lastUpdate = system_time();
 		}
 	}
-	printf("\n%Ld inodes found.\n", count);
+	printf("\n%" B_PRIdOFF " inodes found.\n", count);
 
-	printf("\n%20Ld directories found (total of %Ld bytes)\n"
-	   "%20Ld files found (total of %Ld bytes)\n"
-	   "%20Ld symlinks found\n"
-	   "--------------------\n"
-	   "%20Ld inodes total found.\n",
-	   directories, directorySize, files, fileSize, symlinks, count);
+	printf("\n%20" B_PRIdOFF " directories found (total of %" B_PRIdOFF
+		" bytes)\n%20" B_PRIdOFF " files found (total of %" B_PRIdOFF
+		" bytes)\n%20" B_PRIdOFF " symlinks found\n"
+		"--------------------\n"
+		"%20" B_PRIdOFF " inodes total found.\n",
+		directories, directorySize, files, fileSize, symlinks, count);
 }
 
 
@@ -291,7 +293,8 @@ collectLogInodes(Disk &disk)
 	off_t offset = disk.ToOffset(disk.Log());
 	off_t end = offset + (disk.Log().length << disk.BlockShift());
 
-	printf("\nsearching from %Ld to %Ld (log area)\n",offset,end);
+	printf("\nsearching from %" B_PRIdOFF " to %" B_PRIdOFF " (log area)\n",
+		offset, end);
 
 	collectInodes(disk, NULL, &gLogged, offset, end);
 }
@@ -305,7 +308,8 @@ collectRealInodes(Disk &disk)
 		<< disk.BlockShift());
 	off_t end = (off_t)disk.NumBlocks() << disk.BlockShift();
 
-	printf("\nsearching from %Ld to %Ld (main area)\n", offset, end);
+	printf("\nsearching from %" B_PRIdOFF " to %" B_PRIdOFF " (main area)\n",
+		offset, end);
 
 	collectInodes(disk, &gMainInodes, NULL, offset, end);
 }
@@ -362,7 +366,8 @@ checkDirectoryContents(Disk& disk, Directory *dir)
 					"\"%s\" failed!", name);
 			}
 			if (gVerbose) {
-				printf("Set name of missing node (%ld, %d) to \"%s\" (%s)\n",
+				printf("Set name of missing node (%" B_PRId32
+					", %d) to \"%s\" (%s)\n",
 					run.allocation_group, run.start, missing->Name(), name);
 			}
 
@@ -378,8 +383,8 @@ checkDirectoryContents(Disk& disk, Directory *dir)
 		else {
 			// missing inode has not been found
 			if (gVerbose) {
-				printf("directory \"%s\" (%ld, %d): node \"%s\" is "
-					"missing (%ld, %d, %d)\n", dir->Name(),
+				printf("directory \"%s\" (%" B_PRId32 ", %d): node \"%s\" is "
+					"missing (%" B_PRId32 ", %d, %d)\n", dir->Name(),
 					dir->BlockRun().allocation_group,
 					dir->BlockRun().start, name,
 					run.allocation_group, run.start, run.length);
@@ -391,7 +396,8 @@ checkDirectoryContents(Disk& disk, Directory *dir)
 					printf("found missing entry in log!\n");
 				if (missing->InodeBuffer()->parent != dir->BlockRun()) {
 					if (gVerbose)
-						puts("\tparent directories differ (may be an old version of it), reseting parent.");
+						puts("\tparent directories differ (may be an old "
+							"version of it), reseting parent.");
 					missing->SetParent(dir->BlockRun());
 				}
 				if (!gMissing.Insert(missing))
@@ -417,18 +423,17 @@ checkDirectoryContents(Disk& disk, Directory *dir)
 void
 checkStructure(Disk &disk)
 {
-	Inode *node;
-
 	off_t count = 0;
+	Inode* node;
 
 	RunSet::iterator iterator = gMainInodes.begin();
 	for (; iterator != gMainInodes.end(); iterator++) {
 		InodeGetter getter(disk, *iterator);
-		Inode* node = getter.Node();
+		node = getter.Node();
 
 		count++;
 		if ((count % 50) == 0)
-			fprintf(stderr, "%Ld inodes processed...\33[1A\n", count);
+			fprintf(stderr, "%" B_PRIdOFF " inodes processed...\33[1A\n", count);
 
 		if (node->IsDirectory() && !node->IsIndex()) {
 			// check if all entries are in the hashtable
@@ -442,12 +447,12 @@ checkStructure(Disk &disk)
 		Inode *parentNode = parentGetter.Node();
 
 		Directory *dir = dynamic_cast<Directory *>(parentNode);
-		if (dir || parentNode && (node->Mode() & S_ATTR_DIR)) {
+		if (dir || (parentNode && (node->Mode() & S_ATTR_DIR))) {
 			// entry has a valid parent directory, so it's assumed to be a valid entry
 			disk.BlockBitmap()->BackupSet(node, true);
 		} else if (node->Mode() & S_ATTR) {
 			if (gVerbose) {
-				printf("attribute \"%s\" at %ld,%d misses its parent.\n",
+				printf("attribute \"%s\" at %" B_PRId32 ",%d misses its parent.\n",
 					node->Name(), node->BlockRun().allocation_group,
 					node->BlockRun().start);
 				puts("\thandling not yet implemented...");
@@ -458,11 +463,14 @@ checkStructure(Disk &disk)
 
 			if (missing == NULL) {
 				if (gVerbose) {
-					printf("%s \"%s\" (%ld, %d, mode = %10lo): parent directory is "
-						"missing (%ld, %d, %d), may be deleted!\n",
+					printf("%s \"%s\" (%" B_PRId32 ", %d, mode = %10" B_PRIo32
+						"): parent directory is missing (%" B_PRId32
+						", %d, %d), may be deleted!\n",
 						node->IsFile() ? "file" : "node", node->Name(),
-						node->BlockRun().allocation_group, node->BlockRun().start,
-						node->Mode(),run.allocation_group, run.start, run.length);
+						node->BlockRun().allocation_group,
+						node->BlockRun().start,
+						node->Mode(), run.allocation_group, run.start,
+						run.length);
 				}
 
 				if ((dir = dynamic_cast<Directory *>((Inode *)gLogged.Remove(
@@ -514,17 +522,19 @@ checkStructure(Disk &disk)
 					}
 				}
 			} else if (missing != NULL && dir == NULL && gVerbose) {
-				printf("%s \"%s\" (%ld, %d, mode = %10lo): parent directory "
-					"found in missing list (%ld, %d, %d), but it's not a dir!\n",
+				printf("%s \"%s\" (%" B_PRId32 ", %d, mode = %10" B_PRIo32
+					"): parent directory found in missing list (%" B_PRId32
+					", %d, %d), but it's not a dir!\n",
 					node->IsFile() ? "file" : "node", node->Name(),
 					node->BlockRun().allocation_group, node->BlockRun().start,
-					node->Mode(),run.allocation_group, run.start, run.length);
+					node->Mode(), run.allocation_group, run.start, run.length);
 			} else if (gVerbose) {
-				printf("%s \"%s\" (%ld, %d, mode = %10lo): parent directory "
-					"found in missing list (%ld, %d, %d)!\n",
+				printf("%s \"%s\" (%" B_PRId32 ", %d, mode = %10" B_PRIo32
+					"): parent directory found in missing list (%" B_PRId32
+					", %d, %d)!\n",
 					node->IsFile() ? "file" : "node", node->Name(),
 					node->BlockRun().allocation_group, node->BlockRun().start,
-					node->Mode(),run.allocation_group, run.start, run.length);
+					node->Mode(), run.allocation_group, run.start, run.length);
 			}
 
 			if (dir) {
@@ -534,7 +544,7 @@ checkStructure(Disk &disk)
 		}
 //			else
 //			{
-//				printf("node %s\n",node->Name());
+//				printf("node %s\n", node->Name());
 //				status_t status = dir->Contains(node);
 //				if (status == B_ENTRY_NOT_FOUND)
 //					printf("node \"%s\": parent directory \"%s\" contains no link to this node!\n",node->Name(),dir->Name());
@@ -550,8 +560,9 @@ checkStructure(Disk &disk)
 
 			if (gMainInodes.find(run) == gMainInodes.end()) {
 				if (gVerbose) {
-					printf("node \"%s\": attributes are missing (%ld, %d, %d)\n",
-						node->Name(), run.allocation_group, run.start, run.length);
+					printf("node \"%s\": attributes are missing (%" B_PRId32
+						", %d, %d)\n", node->Name(), run.allocation_group,
+						run.start, run.length);
 				}
 
 				if ((dir = (Directory *)gMissing.Get(run)) != NULL) {
@@ -584,7 +595,7 @@ checkStructure(Disk &disk)
 			}
 		}
 	}
-	printf("%Ld inodes processed.\n", count);
+	printf("%" B_PRIdOFF " inodes processed.\n", count);
 
 	Directory *directory = getNameIndex(disk);
 	if (directory != NULL) {
@@ -600,8 +611,8 @@ checkStructure(Disk &disk)
 					continue;
 
 				if (gVerbose) {
-					printf("  Node found: %ld:%d\n", run.allocation_group,
-						run.start);
+					printf("  Node found: %" B_PRId32 ":%d\n",
+						run.allocation_group, run.start);
 				}
 				if (node->Name() == NULL || strcmp(node->Name(), name)) {
 					if (gVerbose) {
@@ -631,7 +642,7 @@ checkStructure(Disk &disk)
 
 		Directory *dir = dynamic_cast<Directory *>(node);
 		if (dir) {
-			printf("\ndirectory \"%s\" (%ld, %d) contents:\n",
+			printf("\ndirectory \"%s\" (%" B_PRId32 ", %d) contents:\n",
 				node->Name(), node->BlockRun().allocation_group,
 				node->BlockRun().start);
 
@@ -640,7 +651,7 @@ checkStructure(Disk &disk)
 			char name[B_FILE_NAME_LENGTH];
 			block_run run;
 			while (dir->GetNextEntry(name, &run) == B_OK) {
-				printf("\t\"%s\" (%ld, %d, %d)\n", name,
+				printf("\t\"%s\" (%" B_PRId32 ", %d, %d)\n", name,
 					run.allocation_group, run.start, run.length);
 			}
 
@@ -656,8 +667,9 @@ checkStructure(Disk &disk)
 				name[length] = 0;
 
 				run = disk.ToBlockRun(offset);
-				printf("%s: block_run == (%5ld,%5d,%5d), \"%s\"\n", dir->Name(),
-					run.allocation_group, run.start, run.length, name);
+				printf("%s: block_run == (%5" B_PRId32 ",%5d,%5d), \"%s\"\n",
+					dir->Name(), run.allocation_group, run.start, run.length,
+					name);
 			}
 
 			//tree->WriteTo(dir);
@@ -686,16 +698,16 @@ copyInodes(Disk& disk, const char* copyTo)
 		Inode* node = getter.Node();
 
 		if (!node->IsIndex() && !node->IsAttributeDirectory())
-			node->CopyTo(copyTo, &source);
+			node->CopyTo(copyTo, true, &source);
 
 		if ((++count % 500) == 0)
-			fprintf(stderr, "copied %ld files...\n", count);
+			fprintf(stderr, "copied %" B_PRId32 " files...\n", count);
 	}
 
 	gMissing.Rewind();
 	while (gMissing.GetNextEntry(&node) == B_OK) {
 		if (!node->IsIndex() && !node->IsAttributeDirectory())
-			node->CopyTo(copyTo, &source);
+			node->CopyTo(copyTo, true, &source);
 
 		gMissing.Release(node);
 	}
