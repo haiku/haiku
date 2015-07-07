@@ -823,6 +823,7 @@ RemotePackageRepository HaikuPorts
 	transmission_x86-2.84-4
 	twolame_x86-0.3.13-2
 	twolame_x86_devel-0.3.13-2
+	vacuum_x86-1.2.5-1
 	vcmi_x86-0.94-1
 	wizznic_x86-0.9.9-2
 	xz_utils_x86-5.0.5-3
@@ -1243,6 +1244,7 @@ RemotePackageRepository HaikuPorts
 	unzip
 	util_macros
 	weather
+	vacuum_x86
 	vcdimager
 	vcmi_x86
 	vim
