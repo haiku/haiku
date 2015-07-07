@@ -33,18 +33,38 @@ float presin[512];
 typedef unsigned short word;
 
 extern "C" {
-	#include "Draw.c"
+#include "Draw.c"
 
-	void draw_stars320(char *, char);
-	void draw_stars512(char *, char);
-	void draw_stars576(char *, char);
-	void draw_stars640(char *, char);
-	void draw_stars800(char *, char);
-	void draw_stars1024(char *, char);
-	void draw_stars1152(char *, char);
-	void draw_stars1280(char *, char);
-	void draw_stars1400(char *, char);
-	void draw_stars1600(char *, char);
+#define STAR_WIDTH 320
+#define STAR_FUNCTION draw_stars320
+#include "DrawStars.c"
+#define STAR_WIDTH 512
+#define STAR_FUNCTION draw_stars512
+#include "DrawStars.c"
+#define STAR_WIDTH 576
+#define STAR_FUNCTION draw_stars576
+#include "DrawStars.c"
+#define STAR_WIDTH 640
+#define STAR_FUNCTION draw_stars640
+#include "DrawStars.c"
+#define STAR_WIDTH 800
+#define STAR_FUNCTION draw_stars800
+#include "DrawStars.c"
+#define STAR_WIDTH 1024
+#define STAR_FUNCTION draw_stars1024
+#include "DrawStars.c"
+#define STAR_WIDTH 1152
+#define STAR_FUNCTION draw_stars1152
+#include "DrawStars.c"
+#define STAR_WIDTH 1280
+#define STAR_FUNCTION draw_stars1280
+#include "DrawStars.c"
+#define STAR_WIDTH 1400
+#define STAR_FUNCTION draw_stars1400
+#include "DrawStars.c"
+#define STAR_WIDTH 1600
+#define STAR_FUNCTION draw_stars1600
+#include "DrawStars.c"
 }
 
 const uint32 kMsgWidth  = 'widt';
