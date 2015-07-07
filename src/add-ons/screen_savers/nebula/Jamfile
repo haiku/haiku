@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons screen_savers nebula ;
 
-SubDirC++Flags -funroll-loops -fomit-frame-pointer -fexpensive-optimizations -Wno-error ;
+SubDirC++Flags -Wno-error ;
 
 AddResources Nebula : Nebula.rdef ;
 
