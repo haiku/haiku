@@ -320,7 +320,10 @@
 	\fn BScrollBar* BScrollView::ScrollBar(orientation direction) const
 	\brief Returns the BScrollBar object at the given \a direction.
 
-	\param direction The \a direction of the scroll bar to get.
+	\param direction The \a direction of the desired scroll bar, one of the
+	       following:
+	       - \c B_HORIZONTAL to get the horizontal scroll bar
+	       - \c B_VERTICAL to get the vertical scroll bar
 
 	\returns A pointer to the desired BScrollBar object or \c NULL
 	         if there is no scroll bar at that location.
