@@ -16,8 +16,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define VERSION_STRING "1.2.0 (August 21st 2004)"
-
 typedef struct
 {
 	int x,y,z,r;
@@ -452,10 +450,6 @@ SettingsView::AttachedToWindow()
 
 	BStringView *string = new BStringView(rect,B_EMPTY_STRING,"Nebula");
 	string->SetFontSize(18.0);
-	AddChild(string);
-
-	rect.left += 60;	rect.bottom -= 2;
-	string = new BStringView(rect,B_EMPTY_STRING,VERSION_STRING);
 	AddChild(string);
 
 //	rect.OffsetBy(0,height+5);
