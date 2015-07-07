@@ -326,7 +326,7 @@
 	       - \c B_VERTICAL to get the vertical scroll bar
 
 	\returns A pointer to the desired BScrollBar object or \c NULL
-	         if there is no scroll bar at that location.
+	         if there was no scroll bar at that location.
 
 	\since BeOS R3
 */
