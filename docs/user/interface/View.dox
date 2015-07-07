@@ -1240,6 +1240,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param flags The view flags to set as a uint32 mask.
 
+	\sa Flags()
+
 	\since BeOS R3
 */
 
@@ -1365,7 +1367,7 @@ SetViewColor(Parent()->ViewColor());
 
 	The resizing mode is first set in the BView constructor.
 
-	\sa SetFlags()
+	\sa ResizingMode()
 
 	\since BeOS R3
 */
@@ -1691,6 +1693,8 @@ SetViewColor(Parent()->ViewColor());
 	\return \c B_OK if everything went fine or an error code, usually
 	        \c B_ERROR if something went wrong.
 
+	\sa EventMask()
+
 	\since BeOS R5
 */
 
@@ -1700,6 +1704,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the current event mask.
 
 	\return The current event mask as a uint32.
+
+	\sa SetEventMask()
 
 	\since BeOS R5
 */
@@ -1783,6 +1789,8 @@ SetViewColor(Parent()->ViewColor());
 
 	\param where The point to set the origin to.
 
+	\sa Origin()
+
 	\since BeOS R3
 */
 
@@ -1794,6 +1802,8 @@ SetViewColor(Parent()->ViewColor());
 	\param x The x-coordinate to set the origin to.
 	\param y The y-coordinate to set the origin to.
 
+	\sa Origin()
+
 	\since BeOS R3
 */
 
@@ -1803,6 +1813,8 @@ SetViewColor(Parent()->ViewColor());
 	\brief Returns the origin point in the view's coordinate system.
 
 	\return The local origin point in the view's coordinate system.
+
+	\sa SetOrigin()
 
 	\since BeOS R3
 */
