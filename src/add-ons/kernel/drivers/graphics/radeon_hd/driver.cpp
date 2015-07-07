@@ -306,8 +306,8 @@ const struct supported_device {
 	{0x6806, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
 	{0x6808, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
 	{0x6809, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
-	{0x6810, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
-	{0x6811, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
+	{0x6810, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD R9 270X"},
+	{0x6811, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD R9 270"},
 	{0x6816, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
 	{0x6817, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD Pitcairn"},
 	{0x6818, 6, 0, RADEON_PITCAIRN, CHIP_STD, "Radeon HD 7870"},
@@ -371,10 +371,10 @@ const struct supported_device {
 	{0x6603, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD Oland"},
 	{0x6606, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD Oland"},
 	{0x6607, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD Oland"},
-	{0x6610, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD Oland"},
+	{0x6610, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD R7 250"},
 	{0x6611, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD Oland"},
-	{0x6613, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD Oland"},
-	{0x6620, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD Oland"},
+	{0x6613, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD R7 240"},
+	{0x6620, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD R7 240"},
 	{0x6621, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD Oland"},
 	{0x6623, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD Oland"},
 	{0x6631, 6, 4, RADEON_OLAND, CHIP_STD, "Radeon HD Oland"},
@@ -408,14 +408,17 @@ const struct supported_device {
 	{0x131c, 8, 1, RADEON_KAVERI, CHIP_STD, "Radeon HD Kaveri"},
 	{0x131d, 8, 1, RADEON_KAVERI, CHIP_STD, "Radeon HD Kaveri"},
 	//  Bonaire DCE 8.2
-	{0x6640, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"},
-	{0x6641, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"},
+	{0x6640, 8, 2, RADEON_BONAIRE, CHIP_MOBILE, "Radeon HD Bonaire"},
+	{0x6641, 8, 2, RADEON_BONAIRE, CHIP_MOBILE, "Radeon HD Bonaire"},
+	{0x6646, 8, 2, RADEON_BONAIRE, CHIP_MOBILE, "Radeon HD Bonaire"},
+	{0x6647, 8, 2, RADEON_BONAIRE, CHIP_MOBILE, "Radeon HD Bonaire"},
 	{0x6649, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"},
 	{0x6650, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"}, 
 	{0x6651, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"}, 
 	{0x6658, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"}, 
 	{0x665c, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD 7790"},
 	{0x665d, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"},
+	{0x665f, 8, 2, RADEON_BONAIRE, CHIP_STD, "Radeon HD Bonaire"},
 	//  Kabini DCE 8.3
 	{0x9830, 8, 3, RADEON_KABINI, CHIP_STD, "Radeon HD 8400"},
 	{0x9831, 8, 3, RADEON_KABINI, CHIP_STD, "Radeon HD 8400"},
@@ -450,14 +453,45 @@ const struct supported_device {
 	{0x985d, 8, 3, RADEON_MULLINS, CHIP_STD, "Radeon HD Mullins"},
 	{0x985e, 8, 3, RADEON_MULLINS, CHIP_STD, "Radeon HD Mullins"},
 	{0x985f, 8, 3, RADEON_MULLINS, CHIP_STD, "Radeon HD Mullins"},
+	//  Hawaii DCE 8.5
+	{0x67a0, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67a1, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67a2, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67a8, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67a9, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67aa, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67b0, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67b1, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67b8, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67b9, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67ba, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
+	{0x67be, 8, 5, RADEON_HAWAII, CHIP_STD, "Radeon HD Hawaii"},
 
-	// Introduced: 2014?
+	// Introduced: 2014
 	// Codename: Volcanic Islands
-	// Process: 20 nm
-
-	// Introduced: 2015?
-	// Codename: Pirate Islands
-	// Process: ?? nm
+	// Process: 28 nm
+	// Iceland (aka topaz) NO DCE
+	//{0x6900, 99, 0, RADEON_TOPAZ, CHIP_STD, "Radeon HD Topaz"},
+	//{0x6901, 99, 0, RADEON_TOPAZ, CHIP_STD, "Radeon HD Topaz"},
+	//{0x6902, 99, 0, RADEON_TOPAZ, CHIP_STD, "Radeon HD Topaz"},
+	//{0x6903, 99, 0, RADEON_TOPAZ, CHIP_STD, "Radeon HD Topaz"},
+	//{0x6907, 99, 0, RADEON_TOPAZ, CHIP_STD, "Radeon HD Topaz"},
+	// Tonga DCE 10.0
+	{0x6920, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
+	{0x6921, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
+	{0x6928, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
+	{0x6929, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
+	{0x692b, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
+	{0x692f, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
+	{0x6930, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
+	{0x6938, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
+	{0x6939, 10, 0, RADEON_TONGA, CHIP_STD, "Radeon HD Tonga"},
+	// Carrizo DCE 11.0
+	{0x9870, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
+	{0x9874, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
+	{0x9875, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
+	{0x9876, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
+	{0x9877, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"}
 };
 
 
