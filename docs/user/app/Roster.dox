@@ -683,8 +683,8 @@
 
 
 /*!
-	\fn status_t BRoster::Launch(const char* mimeType, int argc, char** args,
-		team_id* appTeam) const
+	\fn status_t BRoster::Launch(const char* mimeType, int argc,
+		const char* const* args, team_id* appTeam) const
 	\brief Launches the application associated with the supplied MIME type.
 
 	The application to be started is searched the same way FindApp() does it.
