@@ -1,9 +1,9 @@
-/* Nebula - a screen saver for the BeOS
-**
-** Copyright (c) 2001-2004 pinc Software.  All Rights Reserved.
-** Effect from corTeX / Optimum
-*/
-
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Effect from corTeX / Optimum.
+ */
 
 #include <AppKit.h>
 #include <InterfaceKit.h>
@@ -454,7 +454,7 @@ SettingsView::AttachedToWindow()
 
 //	rect.OffsetBy(0,height+5);
 	rect.left = 10;  rect.top = 27;  rect.bottom = 17+height;
-	string = new BStringView(rect,B_EMPTY_STRING,"© 2001-2004 pinc Software, Axel Dörfler.");
+	string = new BStringView(rect,B_EMPTY_STRING,"© 2001-2004 Axel Dörfler.");
 	string->SetAlignment(B_ALIGN_CENTER);
 	AddChild(string);
 
