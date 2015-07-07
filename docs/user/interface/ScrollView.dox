@@ -336,7 +336,7 @@
 	\fn void BScrollView::SetBorder(border_style border)
 	\brief Set the border style of the scroll view.
 
-	\param border The border style constant to use, on of the following:
+	\param border The border style constant to use, one of the following:
 		- \c B_PLAIN_BORDER
 		- \c B_FANCY_BORDER
 		- \c B_NO_BORDER
