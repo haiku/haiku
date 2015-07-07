@@ -317,7 +317,7 @@
 
 
 /*!
-	\fn BScrollBar* BScrollView::ScrollBar(orientation posture) const
+	\fn BScrollBar* BScrollView::ScrollBar(orientation direction) const
 	\brief Returns the BScrollBar object at the given \a direction.
 
 	\param direction The \a direction of the scroll bar to get.

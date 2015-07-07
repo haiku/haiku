@@ -67,7 +67,7 @@ public:
 	virtual	BSize				PreferredSize();
 
 	// BScrollBar
-			BScrollBar*			ScrollBar(orientation posture) const;
+			BScrollBar*			ScrollBar(orientation direction) const;
 
 	virtual	void				SetBorder(border_style border);
 			border_style		Border() const;
