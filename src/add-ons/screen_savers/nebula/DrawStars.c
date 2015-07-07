@@ -6,7 +6,7 @@
 // #define STAR_FUNCTION draw_stars320
 
 /* draw a star (5 pixels) */
-void STAR_FUNCTION(char* dstParam, char incParam)
+void draw_stars(int STAR_WIDTH, char* dstParam, char incParam)
 {
 	unsigned char* dst;
 	unsigned char inc;

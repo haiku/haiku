@@ -34,36 +34,6 @@ typedef unsigned short word;
 
 extern "C" {
 #include "Draw.c"
-
-#define STAR_WIDTH 320
-#define STAR_FUNCTION draw_stars320
-#include "DrawStars.c"
-#define STAR_WIDTH 512
-#define STAR_FUNCTION draw_stars512
-#include "DrawStars.c"
-#define STAR_WIDTH 576
-#define STAR_FUNCTION draw_stars576
-#include "DrawStars.c"
-#define STAR_WIDTH 640
-#define STAR_FUNCTION draw_stars640
-#include "DrawStars.c"
-#define STAR_WIDTH 800
-#define STAR_FUNCTION draw_stars800
-#include "DrawStars.c"
-#define STAR_WIDTH 1024
-#define STAR_FUNCTION draw_stars1024
-#include "DrawStars.c"
-#define STAR_WIDTH 1152
-#define STAR_FUNCTION draw_stars1152
-#include "DrawStars.c"
-#define STAR_WIDTH 1280
-#define STAR_FUNCTION draw_stars1280
-#include "DrawStars.c"
-#define STAR_WIDTH 1400
-#define STAR_FUNCTION draw_stars1400
-#include "DrawStars.c"
-#define STAR_WIDTH 1600
-#define STAR_FUNCTION draw_stars1600
 #include "DrawStars.c"
 }
 
@@ -74,7 +44,6 @@ const uint32 kMsgMotionBlur = 'blur';
 const uint32 kMsgSpeed = 'sped';
 const uint32 kMsgFrames = 'mfps';
 
-void	(*gDrawStarFunc)(char *,char);
 float	gSpeed;
 bool	gMotionBlur;
 int32	gSettingsWidth;
@@ -188,7 +157,7 @@ drawshdisk(int x0, int y0, int r)
 
 	if (r <= SLIMIT) {
 		/* range checking is already (more or less) done... */
-		(*gDrawStarFunc)(&gBuffer8[x0 + gWidth*y0], 10+r*5);
+		draw_stars(gWidth, &gBuffer8[x0 + gWidth*y0], 10+r*5);
 		//gBuffer8[x0+W*y0] = 10+r*5;
 		return;
 	}
@@ -744,20 +713,6 @@ Nebula::StartSaver(BView *view, bool preview)
 			break;
 	}
 	view->SetScale(fFactor);
-
-	switch (gWidth) {
-		default:
-		case 320:  gDrawStarFunc = draw_stars320; break;
-		case 512:  gDrawStarFunc = draw_stars512; break;
-		case 576:  gDrawStarFunc = draw_stars576; break;
-		case 640:  gDrawStarFunc = draw_stars640; break;
-		case 800:  gDrawStarFunc = draw_stars800; break;
-		case 1024: gDrawStarFunc = draw_stars1024; break;
-		case 1152: gDrawStarFunc = draw_stars1152; break;
-		case 1280: gDrawStarFunc = draw_stars1280; break;
-		case 1400: gDrawStarFunc = draw_stars1400; break;
-		case 1600: gDrawStarFunc = draw_stars1600; break;
-	}
 
 	gBitmap = new BBitmap(BRect(0, 0, gWidth - 1, gHeight - 1), B_RGB32);
 	gBuffer8 = (char *)malloc(gWidth * gHeight);
