@@ -60,7 +60,7 @@ extern "C" void _sPrintf(const char* format, ...);
  *   Allowed ranges are given in the pll_info min/max values.
  *
  *   The resulting output pixel clock frequency is then:
- * 
+ *
  *                            feedbackDiv + (feedbackDivFrac/10)
  *   f_out = referenceFreq * ------------------------------------
  *                                  referenceDiv * postDiv
@@ -424,7 +424,7 @@ pll_compute(pll_info* pll)
 		// Put first 2 digits after the decimal point into feedbackDivFrac
 		pll->feedbackDivFrac
 			= (100 * pll->feedbackDivFrac) / pll->referenceFreq;
-		
+
 		// Now round it to one digit
 		if (pll->feedbackDivFrac >= 5) {
 			pll->feedbackDivFrac -= 5;
@@ -1002,6 +1002,12 @@ pll_external_set(uint32 clock)
 }
 
 
+/**
+ * pll_external_init - Sets external default pll to sane value
+ *
+ * Takes the AtomBIOS ulDefaultDispEngineClkFreq and applies it
+ * back to the card's external PLL clock via SetPixelClock
+ */
 void
 pll_external_init()
 {
@@ -1012,14 +1018,17 @@ pll_external_init()
 	} else if (info.dceMajor >= 4) {
 		// Create our own pseudo pll
 		pll_info pll;
+		pll.pixelClock = gInfo->displayClockFrequency;
+
 		pll_asic_ss_probe(&pll, ASIC_INTERNAL_SS_ON_DCPLL);
 		if (pll.ssEnabled)
 			display_crtc_ss(&pll, ATOM_DISABLE);
-		pll_external_set(gInfo->displayClockFrequency);
+		pll_external_set(pll.pixelClock);
 		if (pll.ssEnabled)
 			display_crtc_ss(&pll, ATOM_ENABLE);
 	}
 }
+
 
 /**
  * pll_usage_mask - Calculate which PLL's are in use
