@@ -18,7 +18,7 @@
 	\ingroup app
 	\ingroup libbe
 	\brief Provides the app_info struct, the BRoster class and the
-	       \c be_roster global.
+	       #be_roster global.
 */
 
 
@@ -186,7 +186,7 @@
 	\brief The BRoster class lets you launch apps and keeps track of apps
 	       that are running.
 
-	Global be_roster represents the default BRoster.
+	The global #be_roster object represents the default BRoster, while the
 	app_info structure provides info for a running app.
 
 	\since BeOS R3
@@ -198,7 +198,7 @@
 	\brief Creates a new BRoster and sets up the connection to the roster
 	       service.
 
-	You should not need to call this, use the be_roster global instead.
+	You should not need to call this, use the #be_roster global instead.
 
 	\since BeOS R3
 */
