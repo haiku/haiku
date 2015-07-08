@@ -15,6 +15,7 @@ class BMessage;
 class ConditionContext {
 public:
 	virtual	bool				IsSafeMode() const = 0;
+	virtual	bool				BootVolumeIsReadOnly() const = 0;
 };
 
 

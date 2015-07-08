@@ -37,6 +37,7 @@
 #include "Job.h"
 #include "SettingsParser.h"
 #include "Target.h"
+#include "Utility.h"
 #include "Worker.h"
 
 
@@ -78,6 +79,7 @@ public:
 			Session*			FindSession(uid_t user) const;
 
 	virtual	bool				IsSafeMode() const;
+	virtual	bool				BootVolumeIsReadOnly() const;
 
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
@@ -123,6 +125,7 @@ private:
 			MainWorker*			fMainWorker;
 			Target*				fInitTarget;
 			bool				fSafeMode;
+			bool				fReadOnlyBootVolume;
 			bool				fUserMode;
 };
 
@@ -221,11 +224,23 @@ LaunchDaemon::IsSafeMode() const
 }
 
 
+bool
+LaunchDaemon::BootVolumeIsReadOnly() const
+{
+	return fReadOnlyBootVolume;
+}
+
+
 void
 LaunchDaemon::ReadyToRun()
 {
 	_RetrieveKernelOptions();
 	_SetupEnvironment();
+
+	fReadOnlyBootVolume = Utility::IsReadOnlyVolume("/boot");
+	if (fReadOnlyBootVolume)
+		Utility::BlockMedia("/boot", true);
+
 	if (fUserMode) {
 		BLaunchRoster roster;
 		BLaunchRoster::Private(roster).RegisterSessionDaemon(this);

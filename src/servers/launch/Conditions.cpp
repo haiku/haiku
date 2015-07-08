@@ -13,9 +13,7 @@
 #include <Message.h>
 #include <StringList.h>
 
-#include <DiskDevice.h>
-#include <DiskDeviceRoster.h>
-#include <Volume.h>
+#include "Utility.h"
 
 
 class ConditionContainer : public Condition {
@@ -86,7 +84,9 @@ public:
 	virtual	BString				ToString() const;
 
 private:
-			dev_t				fDevice;
+			BString				fPath;
+	mutable	bool				fIsReadOnly;
+	mutable	bool				fTestPerformed;
 };
 
 
@@ -365,33 +365,28 @@ SafeModeCondition::ToString() const
 
 
 ReadOnlyCondition::ReadOnlyCondition(const BMessage& args)
+	:
+	fPath(args.GetString("args")),
+	fIsReadOnly(false),
+	fTestPerformed(false)
 {
-	fDevice = dev_for_path(args.GetString("args", "/boot"));
 }
 
 
 bool
 ReadOnlyCondition::Test(ConditionContext& context) const
 {
-	BVolume volume;
-	status_t status = volume.SetTo(fDevice);
-	if (status != B_OK) {
-		fprintf(stderr, "Failed to get BVolume for device %" B_PRIdDEV
-			": %s\n", fDevice, strerror(status));
-		return false;
-	}
+	if (fTestPerformed)
+		return fIsReadOnly;
 
-	BDiskDeviceRoster roster;
-	BDiskDevice diskDevice;
-	BPartition* partition;
-	status = roster.FindPartitionByVolume(volume, &diskDevice, &partition);
-	if (status != B_OK) {
-		fprintf(stderr, "Failed to get partition for device %" B_PRIdDEV
-			": %s\n", fDevice, strerror(status));
-		return false;
-	}
+	if (fPath.IsEmpty() || fPath == "/boot")
+		fIsReadOnly = context.BootVolumeIsReadOnly();
+	else
+		fIsReadOnly = Utility::IsReadOnlyVolume(fPath);
 
-	return partition->IsReadOnly();
+	fTestPerformed = true;
+
+	return fIsReadOnly;
 }
 
 
@@ -406,7 +401,7 @@ BString
 ReadOnlyCondition::ToString() const
 {
 	BString string = "readonly ";
-	string << fDevice;
+	string << fPath;
 	return string;
 }
 
