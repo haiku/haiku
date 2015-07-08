@@ -22,7 +22,7 @@
 
 typedef struct
 {
-	int x,y,z,r;
+	int x, y, z, r;
 } p3;
 
 typedef float matrix[3][3];
@@ -52,33 +52,34 @@ int32	gSettingsWidth;
 int32	gWidth;
 int32	gHeight;
 float	gMaxFramesPerSecond;
-BBitmap	*gBitmap;
-BScreenSaver *gScreenSaver;
+BBitmap* gBitmap;
+BScreenSaver* gScreenSaver;
 uint32	gPalette[256];
-int8	gPaletteScheme,gBlankBorders;
-char 	*gBuffer8;   /* working 8bit buffer */
+int8	gPaletteScheme;
+int8	gBlankBorders;
+char*	gBuffer8;   /* working 8bit buffer */
 
 
 inline float
 ocos(float a)
 {
-	return (precos[(int)(a*256/M_PI) & 511]);
+	return (precos[(int)(a * 256 / M_PI) & 511]);
 }
 
 inline float
 osin(float a)
 {
-	return (presin[(int)(a*256/M_PI) & 511]);
+	return (presin[(int)(a * 256 / M_PI) & 511]);
 }
 
 
 void
-mulmat(matrix *a, matrix *b, matrix *c)
+mulmat(matrix* a, matrix* b, matrix* c)
 {
-	int i,j;
+	int i, j;
 
-	for (i = 0;i < 3;i++) {
-		for (j = 0;j < 3;j++) {
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 3; j++) {
 			(*c)[i][j] = (*a)[i][0] * (*b)[0][j] +
 						 (*a)[i][1] * (*b)[1][j] +
 						 (*a)[i][2] * (*b)[2][j];
@@ -88,22 +89,22 @@ mulmat(matrix *a, matrix *b, matrix *c)
 
 
 inline void
-mulvec(matrix *a, float *x, float *y, float *z)
+mulvec(matrix* a, float* x, float* y, float* z)
 {
-	float nx = *x,ny = *y,nz = *z;
+	float nx = *x, ny = *y, nz = *z;
 
-	*x = nx*(*a)[0][0] + ny*(*a)[0][1] + nz*(*a)[0][2];
-	*y = nx*(*a)[1][0] + ny*(*a)[1][1] + nz*(*a)[1][2];
-	*z = nx*(*a)[2][0] + ny*(*a)[2][1] + nz*(*a)[2][2];
+	*x = nx * (*a)[0][0] + ny * (*a)[0][1] + nz * (*a)[0][2];
+	*y = nx * (*a)[1][0] + ny * (*a)[1][1] + nz * (*a)[1][2];
+	*z = nx * (*a)[2][0] + ny * (*a)[2][1] + nz * (*a)[2][2];
 }
 
 
 void
-setrmat(float a, float b, float c, matrix *m)
+setrmat(float a, float b, float c, matrix* m)
 {
-	int i,j;
-	for (i = 0;i < 3;i++)
-		for (j = 0;j < 3;j++)
+	int i, j;
+	for (i = 0; i < 3; i++)
+		for (j = 0; j < 3; j++)
 			(*m)[i][j] = (float)(i == j);
 
 	if (a != 0) {
@@ -122,23 +123,23 @@ setrmat(float a, float b, float c, matrix *m)
 
 
 void
-rotate3d(float *xr, float *yr, float *zr,  /* point to rotate */
+rotate3d(float* xr, float* yr, float* zr,  /* point to rotate */
 	float ax, float ay, float az)     /* the 3 angles (order ?..) */
 {
 	float xr2, yr2, zr2;
 
-	xr2 = (*xr*ocos(az) + *yr*osin(az));
-	yr2 = (*xr*osin(az) - *yr*ocos(az));
+	xr2 = (*xr * ocos(az) + *yr * osin(az));
+	yr2 = (*xr * osin(az) - *yr * ocos(az));
 	*xr = xr2;
 	*yr = yr2;
 
-	xr2 = (*xr*ocos(ay) + *zr*osin(ay));
-	zr2 = (*xr*osin(ay) - *zr*ocos(ay));
+	xr2 = (*xr * ocos(ay) + *zr * osin(ay));
+	zr2 = (*xr * osin(ay) - *zr * ocos(ay));
 	*xr = xr2;
 	*zr = zr2;
 
-	zr2 = (*zr*ocos(ax) + *yr*osin(ax));
-	yr2 = (*zr*osin(ax) - *yr*ocos(ax));
+	zr2 = (*zr * ocos(ax) + *yr * osin(ax));
+	yr2 = (*zr * osin(ax) - *yr * ocos(ax));
 	*zr = zr2;
 	*yr = yr2;
 }
@@ -159,24 +160,24 @@ drawshdisk(int x0, int y0, int r)
 
 	if (r <= SLIMIT) {
 		/* range checking is already (more or less) done... */
-		draw_stars(gWidth, &gBuffer8[x0 + gWidth*y0], 10+r*5);
-		//gBuffer8[x0+W*y0] = 10+r*5;
+		draw_stars(gWidth, &gBuffer8[x0 + gWidth * y0], 10 + r * 5);
+		//gBuffer8[x0 + W * y0] = 10 + r * 5;
 		return;
 	}
 
-	if (r < SLIMIT+SRANGE)
-		r = ((r-SLIMIT)*SLIMIT)/SRANGE+1;
+	if (r < SLIMIT + SRANGE)
+		r = ((r - SLIMIT) * SLIMIT) / SRANGE + 1;
 
 	y = ly = r;     /* AAaargh */
-	delta = 3-2*r;
+	delta = 3 - 2 * r;
 
 	do {
 		if (y != ly) {
 			/* dont overlap these lines */
-			c = ((r-y+1)<<13)/r;
-			d = -c/(x+1);
+			c = ((r - y + 1) << 13) / r;
+			d = -c / (x + 1);
 
-			if (y == x+1)		/* this would overlap with the next x lines */
+			if (y == x + 1)		/* this would overlap with the next x lines */
 				goto TOTO;		/* WHY NOT */
 
 			/*  note : for "normal" numbers (not too big) :
@@ -187,25 +188,26 @@ drawshdisk(int x0, int y0, int r)
 				This is clearly a stupid, unmaintanable, unreadable "optimization".
 				But i like it :)
 			*/
-			if ((uint32)(y0-y-1) < gHeight-3)
-				memshset(&gBuffer8[x0 + gWidth*(y0-y+1)] ,c,d, x);
-			if ((uint32)(y0+y-1) < gHeight-3)
-				memshset(&gBuffer8[x0 + gWidth*(y0+y)] ,c,d, x);
+			if ((uint32)(y0 - y - 1) < gHeight - 3)
+				memshset(&gBuffer8[x0 + gWidth * (y0 - y + 1)], c, d, x);
+
+			if ((uint32)(y0 + y - 1) < gHeight - 3)
+				memshset(&gBuffer8[x0 + gWidth*(y0 + y)], c, d, x);
 		}
 		TOTO:
-		c = ((r-x+1)<<13)/r;
-		d = -c/(y);
+		c = ((r - x + 1) << 13) / r;
+		d = -c / (y);
 
-		if ((uint32)(y0-x-1) < gHeight-3)
-			memshset(&gBuffer8[x0 + gWidth*(y0-x)] ,c,d, y);
-		if ((uint32)(y0+x-1) < gHeight-3)
-			memshset(&gBuffer8[x0 + gWidth*(y0+x+1)] ,c,d, y);
+		if ((uint32)(y0 - x - 1) < gHeight - 3)
+			memshset(&gBuffer8[x0 + gWidth*(y0 - x)], c, d, y);
+		if ((uint32)(y0 + x - 1) < gHeight - 3)
+			memshset(&gBuffer8[x0 + gWidth * (y0 + x + 1)], c, d, y);
 
 		ly = y;
 		if (delta < 0)
-			delta += 4*x+6;
+			delta += 4 * x + 6;
 		else {
-			delta += 4*(x-y)+10;
+			delta += 4 * (x - y) + 10;
 			y--;
 		}
 		x++;
@@ -217,30 +219,31 @@ void
 drawGalaxy()
 {
 	int r;
-	int x,y;
-	float rx,ry,rz;
+	int x, y;
+	float rx, ry, rz;
 	int i;
-	float oa,ob,oc;
+	float oa, ob, oc;
 	float t;
 	float a, b, c;
-	matrix ma,mb,mc,mr;
+	matrix ma, mb, mc, mr;
 
 	/* t is the parametric coordinate for the animation;
 	change the scale value to change the speed of anim
 	(independant of processor speed)
 	*/
 	static bigtime_t firstTime = system_time();
-	t = ((double)gSpeed * system_time()-firstTime)/1000000.0; //opti_scale_time(0.418, &demo_elapsed_time);
+	t = ((double)gSpeed * system_time() - firstTime) / 1000000.0;
+		//opti_scale_time(0.418, &demo_elapsed_time);
 
-	a = 0.9*t;
+	a = 0.9 * t;
 	b = t;
-	c = 1.1*t;
+	c = 1.1 * t;
 
-	setrmat(a,0,0,&ma);
-	setrmat(0,b,0,&mb);
-	mulmat(&ma,&mb,&mc);
-	setrmat(0,0,c,&ma);
-	mulmat(&ma,&mc,&mr);
+	setrmat(a, 0, 0, &ma);
+	setrmat(0, b, 0, &mb);
+	mulmat(&ma, &mb, &mc);
+	setrmat(0, 0, c, &ma);
+	mulmat(&ma, &mc, &mr);
 
 	oa = 140 * osin(a);
 	ob = 140 * ocos(b);
@@ -250,12 +253,12 @@ drawGalaxy()
 		/* mblur does something like that:
 		 * (or did, perhaps it's another version!..)
 
-		for (i=0; i<W*H; i++)
-			gBuffer8[i]= (gBuffer8[i]>>3) + (gBuffer8[i]>>1);
+		for (i = 0; i < W * H; i++)
+			gBuffer8[i]= (gBuffer8[i] >> 3) + (gBuffer8[i] >> 1);
 		*/
-		mblur (gBuffer8, gWidth*gHeight);
+		mblur (gBuffer8, gWidth * gHeight);
 	} else
-		memset(gBuffer8,0,gWidth*gHeight);
+		memset(gBuffer8, 0, gWidth * gHeight);
 
 	for (i = 0; i < GMAX; i++) {
 		rx = gal[i].x;
@@ -270,13 +273,15 @@ drawGalaxy()
 		rz += 300;
 
 		if (rz > 5) {
-			x = (int)(15*rx/(rz/5+1)) + gWidth/2;  /* tain jcomprend plus rien  */
-			y = (int)(15*ry/(rz/5+1)) + gHeight/2;  /* a ces formules de daube !! */
-			r = (int)(3*gal[i].r / (rz/4+3))+2;
+			x = (int)(15 * rx / (rz / 5 + 1)) + gWidth / 2;
+				/* tain jcomprend plus rien  */
+			y = (int)(15 * ry/ (rz / 5 + 1)) + gHeight / 2;
+				/* a ces formules de daube !! */
+			r = (int)(3 * gal[i].r / (rz / 4 + 3)) + 2;
 
-			if (x > 5 && x < gWidth-6 && y > 5 && y < gHeight-6)
-//			if ((uint32)x < gWidth-1 && (uint32)y < gHeight-1)
-				drawshdisk(x,y,r);
+			if (x > 5 && x < gWidth - 6 && y > 5 && y < gHeight - 6)
+//			if ((uint32)x < gWidth - 1 && (uint32)y < gHeight - 1)
+				drawshdisk(x, y, r);
 		}
 	}
 }
@@ -291,80 +296,94 @@ setPalette()
 		case 0:		// yellow
 		default:
 			for (i = 0; i < 30; i++)
-				gPalette[i] = (uint8)(i*8/10) << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
+				gPalette[i] = (uint8)(i * 8 / 10) << 16 | (uint8)(i * 6 / 10) << 8;
+					// | (uint8)(i*3/10);
 
 			for (i = 30; i < 256; i++) {
 				uint8 r = (i);
-				uint8 g = (i*i >> 8); //(i*8/10);
-				uint8 b = i >= 240 ? (i-240) << 3 : 0; //(i*2/10);
+				uint8 g = (i * i >> 8); //(i*8/10);
+				uint8 b = i >= 240 ? (i - 240) << 3 : 0; //(i * 2 / 10);
 
 				gPalette[i] = ((r << 16) | (g << 8) | (b));
 			}
 			break;
+
 		case 1:		// blue
 			for (i = 0; i < 30; i++)
-				gPalette[i] = (uint8)(i*8/10); // << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
+				gPalette[i] = (uint8)(i * 8 / 10);
+					// << 16 | (uint8)(i * 6 / 10) << 8;
+					// | (uint8)(i * 3 / 10);
 
 			for (i = 30; i < 256; i++) {
 				uint8 b = (i);
-				uint8 g = (i*i >> 8); //(i*8/10);
-				uint8 r = i >= 240 ? (i-240) << 3 : 0; //(i*2/10);
+				uint8 g = (i * i >> 8); //(i * 8 / 10);
+				uint8 r = i >= 240 ? (i - 240) << 3 : 0; //(i * 2 / 10);
 
 				gPalette[i] = ((r << 16) | (g << 8) | (b));
 			}
 			break;
+
 		case 2:		// red
-			for (i = 0;i < 128;i++)
-				gPalette[i] = (uint8)i << 16; // << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
+			for (i = 0; i < 128; i++)
+				gPalette[i] = (uint8)i << 16;
+					// << 16 | (uint8)(i * 6/10) << 8;
+					// | (uint8)(i * 3 / 10);
 
 			for (i = 128;i < 256;i++)
 			{
 				uint8 r = i;
-				uint8 c = (uint8)((cos((i-256) / 42.0)*0.5 + 0.5)*225);
+				uint8 c = (uint8)((cos((i - 256) / 42.0) * 0.5 + 0.5) * 225);
 
 				gPalette[i] = ((r << 16) | (c << 8) | c);
 			}
-/*			for (i = 192;i < 224;i++)
+/*			for (i = 192; i < 224; i++)
 			{
-				uint8 c = (i-192);
+				uint8 c = (i - 192);
 				gPalette[i] = gPalette[i] & 0xff0000 | c << 8 | c;
 			}
-			for (i = 224;i < 256;i++)
+			for (i = 224; i < 256; i++)
 			{
-				uint8 c = (i-224)/2;
-				c = 32 + c*c*6/10;
+				uint8 c = (i-224) / 2;
+				c = 32 + c * c * 6 / 10;
 				gPalette[i] = gPalette[i] & 0xff0000 | c << 8 | c;
 			}
 */			break;
+
 		case 3:		// green
 			for (i = 0; i < 30; i++)
-				gPalette[i] = (uint8)(i*8/10) << 8; // << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
+				gPalette[i] = (uint8)(i * 8 / 10) << 8;
+					// << 16 | (uint8)(i * 6 / 10) << 8;
+					// | (uint8)(i * 3 / 10);
 
 			for (i = 30; i < 256; i++) {
 				uint8 g = (i);
-				uint8 r = (i*i >> 8); //(i*8/10);
-				uint8 b = i >= 240 ? (i-240) << 3 : 0; //(i*2/10);
+				uint8 r = (i * i >> 8); //(i * 8 / 10);
+				uint8 b = i >= 240 ? (i-240) << 3 : 0; //(i * 2 / 10);
 
 				gPalette[i] = ((r << 16) | (g << 8) | (b));
 			}
 			break;
+
 		case 4:		// grey
 			for (i = 0; i < 256; i++) {
-				uint8 c = i*15/16 + 10;
+				uint8 c = i * 15 / 16 + 10;
 				gPalette[i] = c << 16 | c << 8 | c;
 			}
 			break;
 		case 5:		// cold
 			for (i = 0; i < 30; i++)
-				gPalette[i] = (uint8)(i*8/10) << 16; // << 16 | (uint8)(i*6/10) << 8; // | (uint8)(i*3/10);
+				gPalette[i] = (uint8)(i * 8 / 10) << 16;
+					// << 16 | (uint8)(i * 6 / 10) << 8;
+					// | (uint8)(i * 3 / 10);
 
 			for (i = 30; i < 256; i++) {
 				uint8 r = i;
-				uint8 c = (uint8)((cos((i-255) / 82.0)*0.5 + 0.5)*255);
+				uint8 c = (uint8)((cos((i - 255) / 82.0) * 0.5 + 0.5) * 255);
 
 				gPalette[i] = ((r << 16) | (c << 8) | c);
 			}
 			break;
+
 		case 6:		// original
 			for (i = 0; i < 256; i++) {
 				uint32 c = *(char *)&i;
@@ -375,14 +394,14 @@ setPalette()
 /*	for (i = 0;i < 256;i++)
 	{
 		uint8 r = (i);
-		uint8 g = (i*i >> 8); //(i*8/10);
-		uint8 b = 0; //(i*2/10);
+		uint8 g = (i * i >> 8); //(i * 8 / 10);
+		uint8 b = 0; //(i * 2 / 10);
 
 		gPalette[i] = ((r << 16) | (g << 8) | (b));
 	}
 */
-/*	for (i = 240;i < 256;i++)
-		gPalette[i] = (uint8)i << 16 | (uint8)i << 8 | (uint8)(i*6/10);
+/*	for (i = 240; i < 256; i++)
+		gPalette[i] = (uint8)i << 16 | (uint8)i << 8 | (uint8)(i * 6 / 10);
 */
 }
 
@@ -392,25 +411,26 @@ setPalette()
 // #pragma mark SimpleSlider
 
 class SimpleSlider : public BSlider {
-	public:
-		SimpleSlider(const char *label, BMessage *message)
-			: BSlider(B_EMPTY_STRING, B_EMPTY_STRING, message, 1, 100, B_HORIZONTAL)
-		{
-			SetLimitLabels("1", "100");
-			SetHashMarks(B_HASH_MARKS_BOTTOM);
-			SetHashMarkCount(11);
-			fLabel = label;
-		};
+public:
+	SimpleSlider(const char* label, BMessage* message)
+		:
+		BSlider(B_EMPTY_STRING, B_EMPTY_STRING, message, 1, 100, B_HORIZONTAL)
+	{
+		SetLimitLabels("1", "100");
+		SetHashMarks(B_HASH_MARKS_BOTTOM);
+		SetHashMarkCount(11);
+		fLabel = label;
+	};
 
-		const char* UpdateText() const
-		{
-			sprintf(fText, "%s: %d", fLabel, Value());
-			return fText;
-		};
+	const char* UpdateText() const
+	{
+		sprintf(fText, "%s: %d", fLabel, Value());
+		return fText;
+	};
 
-	private:
-		mutable char fText[32];
-		const char *fLabel;
+private:
+	mutable char fText[32];
+	const char* fLabel;
 };
 
 
@@ -496,7 +516,7 @@ SettingsView::SettingsView(BRect frame)
 	popMenu = new BPopUpMenu("");
 	for (int i = 0; i < 7; i++) {
 		BMessage* message = new BMessage(kMsgColorScheme);
-		message->AddInt8("scheme",(int8)i);
+		message->AddInt8("scheme", (int8)i);
 		popMenu->AddItem(item = new BMenuItem(colorSchemes[i], message));
 		if (gPaletteScheme == i)
 			item->SetMarked(true);
@@ -512,7 +532,7 @@ SettingsView::SettingsView(BRect frame)
 	};
 
 	popMenu = new BPopUpMenu("");
-	for (int8 i = 0;i < 4;i++) {
+	for (int8 i = 0; i < 4; i++) {
 		BMessage* message = new BMessage(kMsgBlankBorders);
 		message->AddInt8("border", i);
 		popMenu->AddItem(item = new BMenuItem(blankBorderFormats[i], message));
@@ -589,16 +609,16 @@ SettingsView::MessageReceived(BMessage* message)
 {
 	switch(message->what) {
 		case kMsgWidth:
-			message->FindInt32("width",&gSettingsWidth);
+			message->FindInt32("width", &gSettingsWidth);
 			break;
 
 		case kMsgColorScheme:
-			if (message->FindInt8("scheme",&gPaletteScheme) == B_OK)
+			if (message->FindInt8("scheme", &gPaletteScheme) == B_OK)
 				setPalette();
 			break;
 
 		case kMsgBlankBorders:
-			message->FindInt8("border",&gBlankBorders);
+			message->FindInt8("border", &gBlankBorders);
 			break;
 
 		case kMsgMotionBlur:
@@ -607,7 +627,6 @@ SettingsView::MessageReceived(BMessage* message)
 
 		case kMsgSpeed:
 			gSpeed = 0.002 + 0.05 * fSpeedSlider->Value();
-			//printf("value = %d, gSpeed = %f\n",fSpeedSlider->Value(),gSpeed);
 			break;
 
 		case kMsgFrames:
@@ -670,7 +689,7 @@ Nebula::StartConfig(BView* view)
 
 
 status_t
-Nebula::SaveState(BMessage *state) const
+Nebula::SaveState(BMessage* state) const
 {
 	state->AddFloat("speed", gSpeed);
 	state->AddInt32("width", gSettingsWidth);
@@ -684,47 +703,47 @@ Nebula::SaveState(BMessage *state) const
 
 
 status_t
-Nebula::StartSaver(BView *view, bool preview)
+Nebula::StartSaver(BView* view, bool preview)
 {
 	// initialize palette
 	setPalette();
 
 	int i;
 	for (i = 0; i < 512; i++) {
-		precos[i]=cos(i*M_PI/256);
-		presin[i]=sin(i*M_PI/256);
+		precos[i]=cos(i * M_PI / 256);
+		presin[i]=sin(i * M_PI / 256);
 	}
 
 	// uniforme cubique
 /*	for (i = 0;i < GMAX;i++)
 	{
-		gal[i].x = 1*((rand()&1023) - 512);
-		gal[i].y = 1*((rand()&1023) - 512);
-		gal[i].z = 1*((rand()&1023) - 512);
-		gal[i].r = rand()&63;
+		gal[i].x = 1 * ((rand()&1023) - 512);
+		gal[i].y = 1 * ((rand()&1023) - 512);
+		gal[i].z = 1 * ((rand()&1023) - 512);
+		gal[i].r = rand() & 63;
 	}
 */
 
 	for (i = 0; i < GMAX; i++) {
 		float r, th, h, dth;
 
-		r = rand()*1.0 / RAND_MAX;
-		r = (1-r)*(1-r)+0.05;
+		r = rand() * 1.0 / RAND_MAX;
+		r = (1 - r) * (1 - r) + 0.05;
 
 		if (r < 0.12)
-			th = rand()*M_PI*2/RAND_MAX;
+			th = rand() * M_PI * 2 / RAND_MAX;
 		else {
-			th = (rand()&3)*M_PI_2 + r*r*2;
-			dth = rand()*1.0/RAND_MAX;
-			dth = dth*dth*2;
-			th+=dth;
+			th = (rand() & 3) * M_PI_2 + r * r * 2;
+			dth = rand() * 1.0 / RAND_MAX;
+			dth = dth * dth * 2;
+			th += dth;
 		}
-		gal[i].x = (int)(512*r*cos(th));
-		gal[i].z = (int)(512*r*sin(th));
-		h = (1+cos(r*M_PI))*150;
-		dth = rand()*1.0/RAND_MAX;
-		gal[i].y = (int)(h*(dth-0.5));
-		gal[i].r = (int)((2-r)*60 + 31);
+		gal[i].x = (int)(512 * r * cos(th));
+		gal[i].z = (int)(512 * r * sin(th));
+		h = (1 + cos(r * M_PI)) * 150;
+		dth = rand() * 1.0 / RAND_MAX;
+		gal[i].y = (int)(h * (dth - 0.5));
+		gal[i].r = (int)((2 - r) * 60 + 31);
 	}
 	gal[0].x = gal[0].y = gal[0].z = 0;
 	gal[0].r = 320;
@@ -755,7 +774,7 @@ Nebula::StartSaver(BView *view, bool preview)
 	view->SetScale(fFactor);
 
 	gBitmap = new BBitmap(BRect(0, 0, gWidth - 1, gHeight - 1), B_RGB32);
-	gBuffer8 = (char *)malloc(gWidth * gHeight);
+	gBuffer8 = (char*)malloc(gWidth * gHeight);
 
 	SetTickSize((bigtime_t)(1000000LL / gMaxFramesPerSecond));
 	fStarted = true;
@@ -776,7 +795,7 @@ Nebula::StopSaver()
 
 
 void
-Nebula::Draw(BView *view, int32)
+Nebula::Draw(BView* view, int32)
 {
 	if (fStarted) {
 		view->SetHighColor(0, 0, 0, 0);
@@ -785,7 +804,7 @@ Nebula::Draw(BView *view, int32)
 
 		fStarted = false;
 	}
-	uint32 *buffer32 = (uint32 *)gBitmap->Bits();
+	uint32* buffer32 = (uint32*)gBitmap->Bits();
 
 	drawGalaxy();
 
@@ -800,8 +819,8 @@ Nebula::Draw(BView *view, int32)
 // #pragma mark -
 
 
-extern "C" _EXPORT BScreenSaver *
-instantiate_screen_saver(BMessage *message, image_id image)
+extern "C" _EXPORT BScreenSaver*
+instantiate_screen_saver(BMessage* message, image_id image)
 {
 	return new Nebula(message, image);
 }
