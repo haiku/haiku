@@ -189,6 +189,17 @@ Canvas::PenToScreenTransform() const GCC_2_NRV(transform)
 
 
 SimpleTransform
+Canvas::PenToLocalTransform() const GCC_2_NRV(transform)
+{
+#if __GNUC__ >= 3
+	SimpleTransform transform;
+#endif
+	fDrawState->Transform(transform);
+	return transform;
+}
+
+
+SimpleTransform
 Canvas::ScreenToPenTransform() const GCC_2_NRV(transform)
 {
 #if __GNUC__ >= 3
@@ -218,4 +229,3 @@ OffscreenCanvas::ResyncDrawState()
 {
 	fDrawingEngine->SetDrawState(fDrawState);
 }
-

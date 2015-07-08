@@ -57,6 +57,7 @@ public:
 			SimpleTransform LocalToScreenTransform() const;
 			SimpleTransform ScreenToLocalTransform() const;
 			SimpleTransform PenToScreenTransform() const;
+			SimpleTransform PenToLocalTransform() const;
 			SimpleTransform ScreenToPenTransform() const;
 
 	virtual	DrawingEngine*	GetDrawingEngine() const = 0;
