@@ -370,6 +370,19 @@ DrawState::SetTransform(BAffineTransform transform)
 }
 
 
+DrawState*
+DrawState::Squash()
+{
+	DrawState* const squashedState = new DrawState(*this);
+
+	squashedState->fOrigin = fCombinedOrigin;
+	squashedState->fScale = fCombinedScale;
+	squashedState->fTransform = fCombinedTransform;
+
+	return squashedState;
+}
+
+
 void
 DrawState::SetClippingRegion(const BRegion* region)
 {

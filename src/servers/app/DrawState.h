@@ -69,6 +69,8 @@ public:
 		BAffineTransform	CombinedTransform() const
 								{ return fCombinedTransform; }
 
+		DrawState*			Squash();
+
 							// additional clipping as requested by client
 		void				SetClippingRegion(const BRegion* region);
 
