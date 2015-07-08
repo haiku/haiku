@@ -392,8 +392,8 @@ setPalette()
 
 class SimpleSlider : public BSlider {
 	public:
-		SimpleSlider(const char *label, BMessage *msg)
-			: BSlider(B_EMPTY_STRING, B_EMPTY_STRING, msg, 1, 100, B_HORIZONTAL)
+		SimpleSlider(const char *label, BMessage *message)
+			: BSlider(B_EMPTY_STRING, B_EMPTY_STRING, message, 1, 100, B_HORIZONTAL)
 		{
 			SetLimitLabels("1", "100");
 			SetHashMarks(B_HASH_MARKS_BOTTOM);
@@ -418,97 +418,116 @@ class SimpleSlider : public BSlider {
 
 
 class SettingsView : public BView {
-	public:
-		SettingsView(BRect frame);
+public:
+								SettingsView(BRect frame);
 
-		virtual void AttachedToWindow();
-		virtual void MessageReceived(BMessage *msg);
+	virtual	void				AttachedToWindow();
+	virtual	void				MessageReceived(BMessage* message);
 
 	private:
-		BMenuField *fWidthMenu,*fColorMenu,*fBorderMenu;
-		BCheckBox *fMotionCheck;
-		BSlider *fSpeedSlider,*fFramesSlider;
+			BMenuField*			fWidthMenu;
+			BMenuField*			fColorMenu;
+			BMenuField*			fBorderMenu;
+			BCheckBox*			fMotionCheck;
+			BSlider*			fSpeedSlider;
+			BSlider*			fFramesSlider;
 };
 
 
 SettingsView::SettingsView(BRect frame)
-	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW)
+	:
+	BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW)
 {
-	MoveBy(0, -25); // The view is not where it should be.
-}
-
-
-void
-SettingsView::AttachedToWindow()
-{
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
 	BStringView* titleString = new BStringView(B_EMPTY_STRING, "Nebula");
 	titleString->SetFont(be_bold_font);
 
 	BStringView* copyrightString = new BStringView(B_EMPTY_STRING,
 		"© 2001-2004 Axel Dörfler.");
 
-	BPopUpMenu *popMenu = new BPopUpMenu("");
-	BMenuItem *item;
+	BPopUpMenu* popMenu;
+	BMenuItem* item;
 
-	int32 widths[] = { 0, 320, 512, 576, 640, 800, 1024, 1152, 1280, 1400, 1600 };
-	for (int32 i = 0; i < sizeof(widths) / sizeof(widths[0]); i++) {
-		BMessage *msg = new BMessage(kMsgWidth);
+	int32 widths[] = {
+		0,
+		320,
+		512,
+		576,
+		640,
+		800,
+		1024,
+		1152,
+		1280,
+		1400,
+		1600
+	};
+
+	size_t widthsLength = sizeof(widths) / sizeof(widths[0]);
+
+	popMenu = new BPopUpMenu("");
+	for (int32 i = 0; i < widthsLength; i++) {
+		BMessage* message = new BMessage(kMsgWidth);
 		char label[64];
 		if (widths[i] == 0)
 			sprintf(label, "screen resolution");
 		else
 			sprintf(label, "%ld pixels", widths[i]);
-		msg->AddInt32("width", widths[i]);
-		popMenu->AddItem(item = new BMenuItem(label, msg));
+
+		message->AddInt32("width", widths[i]);
+		popMenu->AddItem(item = new BMenuItem(label, message));
 
 		if (gSettingsWidth == widths[i])
 			item->SetMarked(true);
 	}
 
-	popMenu->SetTargetForItems(this);
 	fWidthMenu = new BMenuField("res", "Internal width:", popMenu);
 
-	popMenu = new BPopUpMenu("");
+	const char* colorSchemes[] = {
+		"yellow",
+		"cyan",
+		"red",
+		"green",
+		"grey",
+		"cold",
+		"orange (original)"
+	};
 
-	const char *colorSchemes[] = {"yellow","cyan","red","green","grey","cold","orange (original)"};
+	popMenu = new BPopUpMenu("");
 	for (int i = 0; i < 7; i++) {
-		BMessage *msg = new BMessage(kMsgColorScheme);
-		msg->AddInt8("scheme",(int8)i);
-		popMenu->AddItem(item = new BMenuItem(colorSchemes[i],msg));
+		BMessage* message = new BMessage(kMsgColorScheme);
+		message->AddInt8("scheme",(int8)i);
+		popMenu->AddItem(item = new BMenuItem(colorSchemes[i], message));
 		if (gPaletteScheme == i)
 			item->SetMarked(true);
 	}
 
-	popMenu->SetTargetForItems(this);
 	fColorMenu = new BMenuField("col", "Color: ", popMenu);
 
-	popMenu = new BPopUpMenu("");
+	const char* blankBorderFormats[] = {
+		"fullscreen, no borders",
+		"16:9, wide-screen",
+		"2:3.5, cinemascope",
+		"only a slit"
+	};
 
-	const char *blankBorderFormats[] = {"fullscreen, no borders","16:9, wide-screen","2:3.5, cinemascope","only a slit"};
+	popMenu = new BPopUpMenu("");
 	for (int8 i = 0;i < 4;i++) {
-		BMessage *msg = new BMessage(kMsgBlankBorders);
-		msg->AddInt8("border",i);
-		popMenu->AddItem(item = new BMenuItem(blankBorderFormats[i],msg));
+		BMessage* message = new BMessage(kMsgBlankBorders);
+		message->AddInt8("border", i);
+		popMenu->AddItem(item = new BMenuItem(blankBorderFormats[i], message));
 		if (gBlankBorders == i)
 			item->SetMarked(true);
 	}
 
-	popMenu->SetTargetForItems(this);
 	fBorderMenu = new BMenuField("cinema", "Format: ", popMenu);
 
 	fMotionCheck = new BCheckBox(B_EMPTY_STRING, "Enable motion blur", new BMessage(kMsgMotionBlur));
-	fMotionCheck->SetTarget(this);
 	fMotionCheck->SetValue((int)gMotionBlur);
 
 	fSpeedSlider = new SimpleSlider("Speed", new BMessage(kMsgSpeed));
-	fSpeedSlider->SetValue((gSpeed - 0.002)/0.05);
-	fSpeedSlider->SetTarget(this);
+	fSpeedSlider->SetValue((gSpeed - 0.002) / 0.05);
 
 	fFramesSlider = new SimpleSlider("Maximum Frames Per Second", new BMessage(kMsgFrames));
 	fFramesSlider->SetValue(gMaxFramesPerSecond);
-	fFramesSlider->SetTarget(this);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_HALF_ITEM_SPACING)
 		.SetInsets(B_USE_HALF_ITEM_INSETS, B_USE_HALF_ITEM_INSETS,
@@ -544,30 +563,51 @@ SettingsView::AttachedToWindow()
 		.Add(fFramesSlider)
 		.AddGlue()
 	.End();
+
+	MoveBy(0, -25); // The view is not where it should be.
 }
 
 
 void
-SettingsView::MessageReceived(BMessage *msg)
+SettingsView::AttachedToWindow()
 {
-	switch(msg->what) {
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+
+	fWidthMenu->Menu()->SetTargetForItems(this);
+	fColorMenu->Menu()->SetTargetForItems(this);
+	fBorderMenu->Menu()->SetTargetForItems(this);
+	fMotionCheck->SetTarget(this);
+	fSpeedSlider->SetTarget(this);
+	fFramesSlider->SetTarget(this);
+}
+
+
+void
+SettingsView::MessageReceived(BMessage* message)
+{
+	switch(message->what) {
 		case kMsgWidth:
-			msg->FindInt32("width",&gSettingsWidth);
+			message->FindInt32("width",&gSettingsWidth);
 			break;
+
 		case kMsgColorScheme:
-			if (msg->FindInt8("scheme",&gPaletteScheme) == B_OK)
+			if (message->FindInt8("scheme",&gPaletteScheme) == B_OK)
 				setPalette();
 			break;
+
 		case kMsgBlankBorders:
-			msg->FindInt8("border",&gBlankBorders);
+			message->FindInt8("border",&gBlankBorders);
 			break;
+
 		case kMsgMotionBlur:
 			gMotionBlur = fMotionCheck->Value() > 0;
 			break;
+
 		case kMsgSpeed:
 			gSpeed = 0.002 + 0.05 * fSpeedSlider->Value();
 			//printf("value = %d, gSpeed = %f\n",fSpeedSlider->Value(),gSpeed);
 			break;
+
 		case kMsgFrames:
 			gMaxFramesPerSecond = fFramesSlider->Value();
 			gScreenSaver->SetTickSize((bigtime_t)(1000000LL / gMaxFramesPerSecond));
@@ -582,23 +622,23 @@ SettingsView::MessageReceived(BMessage *msg)
 
 
 class Nebula : public BScreenSaver {
-	public:
-		Nebula(BMessage *message, image_id id);
+public:
+								Nebula(BMessage* message, image_id id);
 
-		virtual void StartConfig(BView *view);
-		virtual status_t SaveState(BMessage *state) const;
+	virtual	void				StartConfig(BView* view);
+	virtual	status_t			SaveState(BMessage* state) const;
 
-		virtual status_t StartSaver(BView *view, bool preview);
-		virtual void StopSaver();
-		virtual void Draw(BView *view, int32 frame);
+	virtual	status_t			StartSaver(BView* view, bool preview);
+	virtual	void				StopSaver();
+	virtual	void				Draw(BView* view, int32 frame);
 
-	private:
-		float	fFactor;
-		bool	fStarted;
+private:
+			float				fFactor;
+			bool				fStarted;
 };
 
 
-Nebula::Nebula(BMessage *message, image_id id)
+Nebula::Nebula(BMessage* message, image_id id)
 	:
 	BScreenSaver(message, id),
 	fStarted(false)
@@ -612,6 +652,7 @@ Nebula::Nebula(BMessage *message, image_id id)
 
 	if (gSpeed < 0.01f)
 		gSpeed = 0.4f;
+
 	if (gMaxFramesPerSecond < 1.f)
 		gMaxFramesPerSecond = 40.0f;
 
@@ -620,7 +661,7 @@ Nebula::Nebula(BMessage *message, image_id id)
 
 
 void
-Nebula::StartConfig(BView *view)
+Nebula::StartConfig(BView* view)
 {
 	view->AddChild(new SettingsView(view->Frame()));
 }
