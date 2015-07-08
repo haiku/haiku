@@ -159,7 +159,8 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
 		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
 		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
-		(void *)nop, (void *)nop, (void *)nop, (void *)nop
+		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
+		(void *)nop
 	};
 
 	if ((uint32)tableEntries < kOpsTableSize) {
