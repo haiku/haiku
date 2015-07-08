@@ -336,7 +336,7 @@ getNameIndex(Disk &disk)
 		InodeGetter getter(disk, *iterator);
 		Inode* node = getter.Node();
 
-		if (!node->IsIndex() || node->Name() == NULL)
+		if (!node || !node->IsIndex() || node->Name() == NULL)
 			continue;
 		if (!strcmp(node->Name(), "name") && node->Mode() & S_STR_INDEX)
 			return dynamic_cast<Directory *>(node);
@@ -434,6 +434,9 @@ checkStructure(Disk &disk)
 		count++;
 		if ((count % 50) == 0)
 			fprintf(stderr, "%" B_PRIdOFF " inodes processed...\33[1A\n", count);
+
+		if (node == NULL)
+			continue;
 
 		if (node->IsDirectory() && !node->IsIndex()) {
 			// check if all entries are in the hashtable
@@ -697,7 +700,7 @@ copyInodes(Disk& disk, const char* copyTo)
 		InodeGetter getter(disk, *iterator);
 		Inode* node = getter.Node();
 
-		if (!node->IsIndex() && !node->IsAttributeDirectory())
+		if (node && !node->IsIndex() && !node->IsAttributeDirectory())
 			node->CopyTo(copyTo, true, &source);
 
 		if ((++count % 500) == 0)

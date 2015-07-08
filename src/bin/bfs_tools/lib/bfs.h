@@ -17,7 +17,7 @@
 #endif
 
 
-struct block_run {
+struct __attribute__((packed)) block_run {
 	int32		allocation_group;
 	uint16		start;
 	uint16		length;
@@ -37,15 +37,15 @@ typedef block_run inode_addr;
 
 #define BFS_DISK_NAME_LENGTH	32
 
-struct disk_super_block
+struct __attribute__((packed)) disk_super_block
 {
 	char		name[BFS_DISK_NAME_LENGTH];
 	int32		magic1;
 	int32		fs_byte_order;
 	uint32		block_size;
 	uint32		block_shift;
-	off_t		num_blocks;
-	off_t		used_blocks;
+	int64		num_blocks;
+	int64		used_blocks;
 	int32		inode_size;
 	int32		magic2;
 	int32		blocks_per_ag;
@@ -53,8 +53,8 @@ struct disk_super_block
 	int32		num_ags;
 	int32		flags;
 	block_run	log_blocks;
-	off_t		log_start;
-	off_t		log_end;
+	int64		log_start;
+	int64		log_end;
 	int32		magic3;
 	inode_addr	root_dir;
 	inode_addr	indices;
@@ -74,22 +74,22 @@ struct disk_super_block
 
 #define NUM_DIRECT_BLOCKS			12
 
-struct data_stream
+struct __attribute__((packed)) data_stream
 {
 	block_run	direct[NUM_DIRECT_BLOCKS];
-	off_t		max_direct_range;
+	int64		max_direct_range;
 	block_run	indirect;
-	off_t		max_indirect_range;
+	int64		max_indirect_range;
 	block_run	double_indirect;
-	off_t		max_double_indirect_range;
-	off_t		size;
+	int64		max_double_indirect_range;
+	int64		size;
 };
 
 //**************************************
 
 struct bfs_inode;
 
-struct small_data
+struct __attribute__((packed)) small_data
 {
 	uint32		type;
 	uint16		name_size;
@@ -111,7 +111,7 @@ struct small_data
 
 #define SHORT_SYMLINK_NAME_LENGTH	144 // length incl. terminating '\0'
 
-struct bfs_inode
+struct __attribute__((packed)) bfs_inode
 {
 	int32		magic1;
 	inode_addr	inode_num;
@@ -119,8 +119,8 @@ struct bfs_inode
 	int32		gid;
 	int32		mode;				// see sys/stat.h
 	int32		flags;
-	bigtime_t	create_time;
-	bigtime_t	last_modified_time;
+	int64		create_time;
+	int64		last_modified_time;
 	inode_addr	parent;
 	inode_addr	attributes;
 	uint32		type;				// attribute type
