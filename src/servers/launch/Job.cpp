@@ -306,7 +306,6 @@ Job::Launch()
 {
 	// Build environment
 
-	// TODO: resolve environment source files
 	std::vector<const char*> environment;
 	for (const char** variable = (const char**)environ; variable[0] != NULL;
 			variable++) {
@@ -316,6 +315,11 @@ Job::Launch()
 	if (Target() != NULL)
 		_AddStringList(environment, Target()->Environment());
 	_AddStringList(environment, Environment());
+
+	// Resolve source files
+	BStringList sourceFilesEnvironment;
+	GetSourceFilesEnvironment(sourceFilesEnvironment);
+	_AddStringList(environment, sourceFilesEnvironment);
 
 	environment.push_back(NULL);
 

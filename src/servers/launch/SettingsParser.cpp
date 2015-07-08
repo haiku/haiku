@@ -111,7 +111,7 @@ const static settings_template kPortTemplate[] = {
 };
 
 const static settings_template kEnvTemplate[] = {
-	{B_STRING_TYPE, "from_file", NULL, true},
+	{B_STRING_TYPE, "from_script", NULL, true},
 	{B_STRING_TYPE, NULL, NULL},
 };
 

@@ -1,4 +1,6 @@
 target desktop {
+	env /system/boot/SetupEnvironment
+
 	service x-vnd.Be-TRAK {
 		launch /system/Tracker
 		legacy

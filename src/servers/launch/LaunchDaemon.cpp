@@ -684,6 +684,9 @@ LaunchDaemon::_LaunchJobs(Target* target)
 void
 LaunchDaemon::_AddLaunchJob(Job* job)
 {
+	if (job->Target() != NULL)
+		job->Target()->ResolveSourceFiles();
+
 	if (!job->IsLaunched() && job->CheckCondition(*this))
 		fJobQueue.AddJob(job);
 }

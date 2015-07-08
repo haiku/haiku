@@ -30,8 +30,20 @@ public:
 			bool				CheckCondition(ConditionContext& context) const;
 
 			const BStringList&	Environment() const;
+			BStringList&		Environment();
 			const BStringList&	EnvironmentSourceFiles() const;
+			BStringList&		EnvironmentSourceFiles();
 			void				SetEnvironment(const BMessage& message);
+
+			void				GetSourceFilesEnvironment(
+									BStringList& environment);
+			void				ResolveSourceFiles();
+
+private:
+			void				_GetSourceFileEnvironment(const char* script,
+									BStringList& environment);
+			void				_ParseExportVariable(BStringList& environment,
+									const BString& line);
 
 protected:
 			::Condition*		fCondition;
