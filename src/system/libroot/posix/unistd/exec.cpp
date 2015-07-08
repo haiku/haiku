@@ -56,21 +56,24 @@ static int
 do_exec(const char *path, char * const args[], char * const environment[],
 	bool useDefaultInterpreter)
 {
-	int32 argCount = 0, envCount = 0;
-	char invoker[B_FILE_NAME_LENGTH];
-	char **newArgs = NULL;
-
-	if (path == NULL) {
+	if (path == NULL || args == NULL) {
 		__set_errno(B_BAD_VALUE);
 		return -1;
 	}
 
-	// count argument/environment list entries here, we don't want
+	// Count argument/environment list entries here, we don't want
 	// to do this in the kernel
-	while (args[argCount] != NULL)
+	int32 argCount = 0;
+	while (args[argCount] != NULL) {
 		argCount++;
-	while (environment[envCount] != NULL)
-		envCount++;
+	}
+
+	int32 envCount = 0;
+	if (environment != NULL) {
+		while (environment[envCount] != NULL) {
+			envCount++;
+		}
+	}
 
 	if (argCount == 0) {
 		// we need some more info on what to do...
@@ -78,7 +81,8 @@ do_exec(const char *path, char * const args[], char * const environment[],
 		return -1;
 	}
 
-	// test validity of executable + support for scripts
+	// Test validity of executable + support for scripts
+	char invoker[B_FILE_NAME_LENGTH];
 	status_t status = __test_executable(path, invoker);
 	if (status < B_OK) {
 		if (status == B_NOT_AN_EXECUTABLE && useDefaultInterpreter) {
@@ -90,6 +94,7 @@ do_exec(const char *path, char * const args[], char * const environment[],
 		}
 	}
 
+	char **newArgs = NULL;
 	if (invoker[0] != '\0') {
 		status = __parse_invoke_line(invoker, &newArgs, &args, &argCount, path);
 		if (status < B_OK) {

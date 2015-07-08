@@ -412,6 +412,7 @@ __test_executable(const char *path, char *invoker)
 	into it. The buffer starts with a char* array which contains pointers to
 	the strings of the arguments and environment, followed by the strings. Both
 	arguments and environment arrays are NULL-terminated.
+
 	If executablePath is non-NULL, it should refer to the executable to be
 	executed. If the executable file specifies changes to environment variable
 	values, those will be performed.
@@ -421,7 +422,7 @@ __flatten_process_args(const char* const* args, int32 argCount,
 	const char* const* env, int32* _envCount, const char* executablePath,
 	char*** _flatArgs, size_t* _flatSize)
 {
-	if (args == NULL || env == NULL || _envCount == NULL)
+	if (args == NULL || _envCount == NULL || (env == NULL && *_envCount != 0))
 		return B_BAD_VALUE;
 
 	int32 envCount = *_envCount;
