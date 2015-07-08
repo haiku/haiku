@@ -586,6 +586,11 @@ pll_setup_flags(pll_info* pll, uint8 crtcID)
 }
 
 
+/**
+ * pll_adjust - Ask AtomBIOS if it wants to make adjustments to our pll
+ *
+ * Returns B_OK on successful execution.
+ */
 status_t
 pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 {
@@ -732,6 +737,11 @@ pll_adjust(pll_info* pll, display_mode* mode, uint8 crtcID)
 }
 
 
+/*
+ * pll_set - Calculate and set a pll on the crtc provided based on the mode.
+ *
+ * Returns B_OK on successful execution
+ */
 status_t
 pll_set(display_mode* mode, uint8 crtcID)
 {

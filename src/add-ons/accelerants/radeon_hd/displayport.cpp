@@ -133,28 +133,63 @@ dp_aux_speak(uint32 connectorIndex, uint8* send, int sendBytes,
 
 
 status_t
-dp_aux_write(uint32 connectorIndex, uint16 address,
-	uint8* send, uint8 sendBytes, uint8 delay)
+dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 {
+	uint8 delay = 0;
+	if (message == NULL) {
+		ERROR("%s: DP message is invalid!\n", __func__);
+		return B_ERROR;
+	}
+
+	if (message->buffer == NULL) {
+		ERROR("%s: DP message uninitalized buffer!\n", __func__);
+		return B_ERROR;
+	}
+
+	uint8 transactionSize = 4;
+
+	switch(message->request) {
+		case AUX_NATIVE_WRITE:
+		case AUX_I2C_WRITE:
+			transactionSize += message->size;
+			break;
+	}
+
+	if (transactionSize > 20) {
+		ERROR("%s: Too many bytes! (%" B_PRIu8 ")\n", __func__,
+			transactionSize);
+		return B_ERROR;
+	}
+
 	uint8 auxMessage[20];
-	int auxMessageBytes = sendBytes + 4;
+	auxMessage[0] = message->address & 0xff;
+	auxMessage[1] = message->address >> 8;
+	auxMessage[2] = message->request << 4;
+	auxMessage[3] = message->size ? (message->size - 1) : 0;
 
-	if (sendBytes > 16) {
-		ERROR("%s: Too many bytes! (%" B_PRIu8 ")\n", __func__, sendBytes);
-		return -1;
-	}
-
-	auxMessage[0] = address;
-	auxMessage[1] = address >> 8;
-	auxMessage[2] = AUX_NATIVE_WRITE << 4;
-	auxMessage[3] = (auxMessageBytes << 4) | (sendBytes - 1);
-	memcpy(&auxMessage[4], send, sendBytes);
+	if (message->size == 0)
+		auxMessage[3] |= 3 << 4;
+	else
+		auxMessage[3] |= transactionSize << 4;
 
 	uint8 retry;
 	for (retry = 0; retry < 7; retry++) {
 		uint8 ack;
-		status_t result = dp_aux_speak(connectorIndex, auxMessage,
-			auxMessageBytes, NULL, 0, delay, &ack);
+		status_t result = B_ERROR;
+		switch(message->request) {
+			case AUX_NATIVE_WRITE:
+			case AUX_I2C_WRITE:
+				memcpy(&auxMessage[4], message->buffer, message->size);
+				result = dp_aux_speak(connectorIndex, auxMessage,
+					transactionSize, NULL, 0, delay, &ack);
+				break;
+			case AUX_NATIVE_READ:
+			case AUX_I2C_READ:
+				result = dp_aux_speak(connectorIndex, auxMessage,
+					transactionSize, (uint8*)message->buffer, message->size,
+					delay, &ack);
+				break;
+		}
 
 		if (result == B_BUSY)
 			continue;
@@ -162,43 +197,7 @@ dp_aux_write(uint32 connectorIndex, uint16 address,
 			return result;
 
 		ack >>= 4;
-		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
-			return B_OK;
-		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
-			snooze(400);
-		else
-			return B_IO_ERROR;
-	}
-
-	ERROR("%s: IO Error. %" B_PRIu8 " attempts\n", __func__, retry);
-	return B_IO_ERROR;
-}
-
-
-status_t
-dp_aux_read(uint32 connectorIndex, uint16 address,
-	uint8* recv, int recvBytes, uint8 delay)
-{
-	uint8 auxMessage[4];
-	int auxMessageBytes = 4;
-
-	auxMessage[0] = address;
-	auxMessage[1] = address >> 8;
-	auxMessage[2] = AUX_NATIVE_READ << 4;
-	auxMessage[3] = (auxMessageBytes << 4) | (recvBytes - 1);
-
-	uint8 retry;
-	for (retry = 0; retry < 7; retry++) {
-		uint8 ack;
-		status_t result = dp_aux_speak(connectorIndex, auxMessage,
-			auxMessageBytes, recv, recvBytes, delay, &ack);
-
-		if (result == B_BUSY)
-			continue;
-		else if (result != B_OK)
-			return result;
-
-		ack >>= 4;
+		message->reply = ack;
 		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
 			return B_OK;
 		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
@@ -215,7 +214,13 @@ dp_aux_read(uint32 connectorIndex, uint16 address,
 void
 dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 {
-	status_t result = dp_aux_write(connectorIndex, address, &value, 1, 0);
+	dp_aux_msg message;
+	message.address = address;
+	message.buffer = &value;
+	message.request = AUX_NATIVE_WRITE;
+	message.size = 1;
+
+	status_t result = dp_aux_transaction(connectorIndex, &message);
 	if (result != B_OK) {
 		ERROR("%s: error on DisplayPort aux write (0x%" B_PRIx32 ")\n",
 			__func__, result);
@@ -226,14 +231,21 @@ dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 uint8
 dpcd_reg_read(uint32 connectorIndex, uint16 address)
 {
-	uint8 value = 0;
-	status_t result = dp_aux_read(connectorIndex, address, &value, 1, 0);
+	// TODO: Review dpcd response size response[3]?
+	uint8 response;
+
+	dp_aux_msg message;
+	message.address = address;
+	message.request = AUX_NATIVE_READ;
+	message.buffer = &response;
+
+	status_t result = dp_aux_transaction(connectorIndex, &message);
 	if (result != B_OK) {
 		ERROR("%s: error on DisplayPort aux read (0x%" B_PRIx32 ")\n",
 			__func__, result);
 	}
 
-	return value;
+	return response;
 }
 
 
@@ -241,6 +253,7 @@ status_t
 dp_aux_get_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 	bool start, bool stop)
 {
+	// TODO: Leverage dp_aux_transaction
 	uint8 auxMessage[5];
 	int auxMessageBytes = 4; // 4 for read
 
@@ -319,6 +332,7 @@ status_t
 dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 	bool start, bool stop)
 {
+	// TODO: Leverage dp_aux_transaction
 	uint8 auxMessage[5];
 	int auxMessageBytes = 5; // 5 for write
 
@@ -495,25 +509,30 @@ dp_setup_connectors()
 		uint32 auxPin = gGPIOInfo[i2cPinIndex]->hwPin;
 		dpInfo->auxPin = auxPin;
 
-		uint8 auxMessage[DP_DPCD_SIZE];
+		dp_aux_msg message;
+		message.address = DP_DPCD_REV;
+		message.request = AUX_NATIVE_READ;
+			// TODO: validate
+		message.size = DP_DPCD_SIZE;
+		message.buffer = dpInfo->config;
 
-		status_t result = dp_aux_read(index, DP_DPCD_REV, auxMessage,
-			DP_DPCD_SIZE, 0);
+		status_t result = dp_aux_transaction(index, &message);
 
 		if (result == B_OK) {
 			dpInfo->valid = true;
-			memcpy(dpInfo->config, auxMessage, DP_DPCD_SIZE);
 			TRACE("%s: connector(%" B_PRIu32 "): successful read of DPCD\n",
 				__func__, index);
 		} else {
 			TRACE("%s: connector(%" B_PRIu32 "): failed read of DPCD\n",
 				__func__, index);
 		}
+		/*
 		TRACE("%s: DPCD is ", __func__);
-		uint32 position; 
-		for (position = 0; position < DP_DPCD_SIZE; position++)
-			_sPrintf("%02x ", auxMessage[position]);
+		uint32 position;
+		for (position = 0; position < message.size; position++)
+			_sPrintf("%02x ", message.buffer + position);
 		_sPrintf("\n");
+		*/
 	}
 }
 
@@ -522,8 +541,13 @@ bool
 dp_get_link_status(uint32 connectorIndex)
 {
 	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
-	status_t result = dp_aux_read(connectorIndex, DP_LANE_STATUS_0_1,
-		dp->linkStatus, DP_LINK_STATUS_SIZE, 100);
+	dp_aux_msg message;
+	message.address = DP_LANE_STATUS_0_1;
+	message.size = DP_LINK_STATUS_SIZE;
+	message.buffer = dp->linkStatus;
+
+	// TODO: Delay 100? Newer AMD code doesn't care about link status
+	status_t result = dp_aux_transaction(connectorIndex, &message);
 
 	if (result != B_OK) {
 		ERROR("%s: DisplayPort link status failed\n", __func__);
@@ -589,9 +613,13 @@ dp_update_vs_emph(uint32 connectorIndex)
 	transmitter_dig_setup(connectorIndex, dp->linkRate, 0,
 		dp->trainingSet[0], ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH);
 
-	// Set vs and emph on the sink
-	dp_aux_write(connectorIndex, DP_TRAIN_LANE0,
-		dp->trainingSet, dp->laneCount, 0);
+	dp_aux_msg message;
+	message.request = AUX_NATIVE_WRITE;
+	message.address = DP_TRAIN_LANE0;
+	message.buffer = dp->trainingSet;
+	message.size = dp->laneCount;
+		// TODO: Review laneCount as it sounds strange.
+	dp_aux_transaction(connectorIndex, &message);
 }
 
 

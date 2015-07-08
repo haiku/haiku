@@ -27,10 +27,7 @@ uint8 dpcd_reg_read(uint32 connectorIndex, uint16 address);
 void dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value);
 
 // Communication over DisplayPort AUX channel
-status_t dp_aux_write(uint32 connectorIndex, uint16 address, uint8* send,
-	uint8 sendBytes, uint8 delay);
-status_t dp_aux_read(uint32 connectorIndex, uint16 address, uint8* recv,
-	int recvBytes, uint8 delay);
+status_t dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message);
 
 status_t dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address,
 	uint8* data, bool start, bool stop);
