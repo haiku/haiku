@@ -41,6 +41,7 @@ public:
 	virtual	void			PushState();
 	virtual	void			PopState();
 			DrawState*		CurrentState() const { return fDrawState; }
+			void			SetDrawState(DrawState* newState);
 
 			void			SetDrawingOrigin(BPoint origin);
 			BPoint			DrawingOrigin() const;

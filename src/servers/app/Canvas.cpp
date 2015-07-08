@@ -89,6 +89,13 @@ Canvas::PopState()
 
 
 void
+Canvas::SetDrawState(DrawState* newState)
+{
+	fDrawState = newState;
+}
+
+
+void
 Canvas::SetDrawingOrigin(BPoint origin)
 {
 	fDrawState->SetOrigin(origin);
