@@ -36,6 +36,7 @@ extern "C" {
 #include "DrawStars.c"
 }
 
+const uint32 kMsgWidth  = 'widt';
 const uint32 kMsgColorScheme = 'cols';
 const uint32 kMsgBlankBorders = 'blbr';
 const uint32 kMsgMotionBlur = 'blur';
@@ -44,6 +45,7 @@ const uint32 kMsgFrames = 'mfps';
 
 float	gSpeed;
 bool	gMotionBlur;
+int32	gSettingsWidth;
 int32	gWidth;
 int32	gHeight;
 float	gMaxFramesPerSecond;
@@ -446,8 +448,28 @@ SettingsView::AttachedToWindow()
 		"© 2001-2004 Axel Dörfler.");
 	copyrightString->SetAlignment(B_ALIGN_CENTER);
 
-	BPopUpMenu* popMenu = new BPopUpMenu("");
-	BMenuItem* item;
+	BPopUpMenu *popMenu = new BPopUpMenu("");
+	BMenuItem *item;
+
+	int32 widths[] = { 0, 320, 512, 576, 640, 800, 1024, 1152, 1280, 1400, 1600 };
+	for (int32 i = 0; i < sizeof(widths) / sizeof(widths[0]); i++) {
+		BMessage *msg = new BMessage(kMsgWidth);
+		char label[64];
+		if (widths[i] == 0)
+			sprintf(label, "screen resolution");
+		else
+			sprintf(label, "%ld pixels", widths[i]);
+		msg->AddInt32("width", widths[i]);
+		popMenu->AddItem(item = new BMenuItem(label, msg));
+
+		if (gSettingsWidth == widths[i])
+			item->SetMarked(true);
+	}
+
+	popMenu->SetTargetForItems(this);
+	fWidthMenu = new BMenuField("res", "Internal width:", popMenu);
+
+	popMenu = new BPopUpMenu("");
 
 	const char *colorSchemes[] = {"yellow","cyan","red","green","grey","cold","orange (original)"};
 	for (int i = 0; i < 7; i++) {
@@ -493,6 +515,7 @@ SettingsView::AttachedToWindow()
 		.Add(titleString)
 		.Add(copyrightString)
 		.Add(fColorMenu)
+		.Add(fWidthMenu)
 		.Add(fBorderMenu)
 		.Add(fMotionCheck)
 		.Add(fSpeedSlider)
@@ -506,6 +529,9 @@ void
 SettingsView::MessageReceived(BMessage *msg)
 {
 	switch(msg->what) {
+		case kMsgWidth:
+			msg->FindInt32("width",&gSettingsWidth);
+			break;
 		case kMsgColorScheme:
 			if (msg->FindInt8("scheme",&gPaletteScheme) == B_OK)
 				setPalette();
@@ -545,6 +571,7 @@ class Nebula : public BScreenSaver {
 		virtual void Draw(BView *view, int32 frame);
 
 	private:
+		float	fFactor;
 		bool	fStarted;
 };
 
@@ -553,6 +580,7 @@ Nebula::Nebula(BMessage *message, image_id id)
 	: BScreenSaver(message, id)
 {
 	message->FindFloat("speed", 0, &gSpeed);
+	message->FindInt32("width", 0, &gSettingsWidth);
 	message->FindBool("motionblur", 0, &gMotionBlur);
 	message->FindFloat("max_fps", 0, &gMaxFramesPerSecond);
 	message->FindInt8("scheme", 0, &gPaletteScheme);
@@ -578,6 +606,7 @@ status_t
 Nebula::SaveState(BMessage *state) const
 {
 	state->AddFloat("speed", gSpeed);
+	state->AddInt32("width", gSettingsWidth);
 	state->AddBool("motionblur", gMotionBlur);
 	state->AddFloat("max_fps", gMaxFramesPerSecond);
 	state->AddInt8("scheme", gPaletteScheme);
@@ -633,11 +662,17 @@ Nebula::StartSaver(BView *view, bool preview)
 	gal[0].x = gal[0].y = gal[0].z = 0;
 	gal[0].r = 320;
 
-	//gWidth = view->Bounds().Width() + 1;
-	gWidth = view->Bounds().Width();
+	if (gSettingsWidth == 0)
+		gWidth = view->Bounds().Width();
+	else
+		gWidth = gSettingsWidth;
+
+	fFactor = (view->Bounds().Width()+1) / gWidth;
+	if ((int)fFactor != fFactor)
+		fFactor += 0.01;
 
 	// 4:3
-	gHeight = (int32)((view->Bounds().Height() + 1) + 0.5f);
+	gHeight = (int32)((view->Bounds().Height()+1)/fFactor + 0.5f);
 	// calculate blank border format (if not in preview)
 	if (!preview) switch (gBlankBorders) {
 		case 1:		// 16:9
@@ -650,6 +685,7 @@ Nebula::StartSaver(BView *view, bool preview)
 			gHeight /= 5;
 			break;
 	}
+	view->SetScale(fFactor);
 
 	gBitmap = new BBitmap(BRect(0, 0, gWidth - 1, gHeight - 1), B_RGB32);
 	gBuffer8 = (char *)malloc(gWidth * gHeight);
@@ -678,7 +714,7 @@ Nebula::Draw(BView *view, int32)
 	if (fStarted) {
 		view->SetHighColor(0, 0, 0, 0);
 		view->FillRect(view->Frame());
-		view->MovePenTo(0, (view->Bounds().Height() - 1 - gHeight) / 2);
+		view->MovePenTo(0, (view->Bounds().Height() / fFactor - 1 - gHeight) / 2);
 
 		fStarted = false;
 	}
