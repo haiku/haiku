@@ -33,8 +33,8 @@ float presin[512];
 typedef unsigned short word;
 
 extern "C" {
-#include "Draw.c"
-#include "DrawStars.c"
+#include "Draw.h"
+#include "DrawStars.h"
 }
 
 const uint32 kMsgWidth  = 'widt';

@@ -5,6 +5,8 @@ SubDirC++Flags -Wno-error ;
 AddResources Nebula : Nebula.rdef ;
 
 ScreenSaver Nebula :
+	Draw.c
+	DrawStars.c
 	Nebula.cpp :
 	be libscreensaver.so [ TargetLibsupc++ ]
 ;

@@ -6,8 +6,12 @@
  * Effect from corTeX / Optimum.
  */
 
-// Hand-translated from x86 assembly.
+#include <SupportDefs.h>
 
+#include "Draw.h"
+
+
+// Hand-translated from x86 assembly.
 /* memshset (char *dst, int center_shade,int fixed_shade, int length_2) */
 /* dst is the *center* of the dst segment */
 /* center shade is the initial color (at center) (!! 8:8 also) */
@@ -15,7 +19,6 @@
 /* length_2 is the 1/2 length to set (to the left, and to the right) */
 
 /* a memaddshadedset function (or something like that ) */
-
 void memshset(char* dstParam, int center_shade, int fixed_shade, int half_length)
 {
 	unsigned char* dst;

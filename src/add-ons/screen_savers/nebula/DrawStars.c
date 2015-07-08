@@ -6,13 +6,17 @@
  * Effect from corTeX / Optimum.
  */
 
-// Hand-translated from x86 assembly.
+#include <SupportDefs.h>
 
+#include "DrawStars.h"
+
+
+// Hand-translated from x86 assembly.
 /* draw a star (5 pixels) */
 void draw_stars(int star_width, char* dstParam, char incParam)
 {
 	unsigned char* dst;
-	unsigned char inc;
+	unsigned char inc, al, cl;
 	dst = (unsigned char*)dstParam;
 	inc = (unsigned char)incParam;
 
@@ -23,9 +27,7 @@ void draw_stars(int star_width, char* dstParam, char incParam)
 	}
 
 	inc >>= 1;
-	unsigned char al;
 	al = *dst;
-	unsigned char cl;
 	cl = dst[star_width - 1];
 	al += inc;
 	if (al >= inc) {
