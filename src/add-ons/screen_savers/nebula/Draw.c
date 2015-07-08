@@ -1,3 +1,11 @@
+/*
+ * Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2015, Augustin Cavalier <waddlesplash>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Effect from corTeX / Optimum.
+ */
+
 // Hand-translated from x86 assembly.
 
 /* memshset (char *dst, int center_shade,int fixed_shade, int length_2) */
