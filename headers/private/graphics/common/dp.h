@@ -36,6 +36,13 @@ typedef struct {
 
 } dp_info;
 
+typedef struct {
+	uint16	address;
+	uint8	request;
+	uint8	reply;
+	void*	buffer;
+	size_t	size;
+} dp_aux_msg;
 
 uint32 dp_encode_link_rate(uint32 linkRate);
 uint32 dp_decode_link_rate(uint32 rawLinkRate);
