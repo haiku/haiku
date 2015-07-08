@@ -465,7 +465,7 @@ SettingsView::SettingsView(BRect frame)
 	size_t widthsLength = sizeof(widths) / sizeof(widths[0]);
 
 	popMenu = new BPopUpMenu("");
-	for (int32 i = 0; i < widthsLength; i++) {
+	for (size_t i = 0; i < widthsLength; i++) {
 		BString label;
 		if (widths[i] == 0)
 			label.SetTo("screen resolution");
