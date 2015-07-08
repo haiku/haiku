@@ -63,6 +63,8 @@ public:
 			status_t			ExportData(BPrivate::PortLink& link);
 
 private:
+	friend class PictureBoundingBoxPlayer;
+
 			typedef BObjectList<ServerPicture> PictureList;
 
 			int32				fToken;

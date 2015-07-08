@@ -978,7 +978,7 @@ ServerPicture::SyncState(View* view)
 
 	WriteSetOrigin(view->CurrentState()->Origin());
 	WriteSetPenLocation(view->CurrentState()->PenLocation());
-	WriteSetPenSize(view->CurrentState()->PenSize());
+	WriteSetPenSize(view->CurrentState()->UnscaledPenSize());
 	WriteSetScale(view->CurrentState()->Scale());
 	WriteSetLineMode(view->CurrentState()->LineCapMode(),
 		view->CurrentState()->LineJoinMode(),

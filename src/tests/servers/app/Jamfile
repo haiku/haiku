@@ -156,6 +156,7 @@ SharedLibrary libtestappserver.so :
 	DesktopSettings.cpp
 	OffscreenServerWindow.cpp
 	OffscreenWindow.cpp
+	PictureBoundingBoxPlayer.cpp
 	RegionPool.cpp
 	Screen.cpp
 	ScreenConfigurations.cpp
