@@ -7,6 +7,7 @@
  */
 
 #include <AppKit.h>
+#include <ControlLook.h>
 #include <InterfaceKit.h>
 #include <LayoutBuilder.h>
 #include <Window.h>
@@ -443,11 +444,10 @@ SettingsView::AttachedToWindow()
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BStringView* titleString = new BStringView(B_EMPTY_STRING, "Nebula");
-	titleString->SetFontSize(18.0);
+	titleString->SetFont(be_bold_font);
 
 	BStringView* copyrightString = new BStringView(B_EMPTY_STRING,
 		"© 2001-2004 Axel Dörfler.");
-	copyrightString->SetAlignment(B_ALIGN_CENTER);
 
 	BPopUpMenu *popMenu = new BPopUpMenu("");
 	BMenuItem *item;
@@ -515,11 +515,32 @@ SettingsView::AttachedToWindow()
 			B_USE_BIG_INSETS, B_USE_HALF_ITEM_INSETS)
 		.Add(titleString)
 		.Add(copyrightString)
-		.Add(fColorMenu)
-		.Add(fWidthMenu)
-		.Add(fBorderMenu)
-		.Add(fMotionCheck)
+		.AddStrut(roundf(be_control_look->DefaultItemSpacing() / 2))
+		.AddGlue()
+		.AddGroup(B_HORIZONTAL, 0.0f)
+			.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
+				.Add(fColorMenu->CreateLabelLayoutItem(), 0, 0)
+				.AddGroup(B_HORIZONTAL, 0.0f, 1, 0)
+					.Add(fColorMenu->CreateMenuBarLayoutItem(), 0.0f)
+					.AddGlue()
+					.End()
+				.Add(fWidthMenu->CreateLabelLayoutItem(), 0, 1)
+				.AddGroup(B_HORIZONTAL, 0.0f, 1, 1)
+					.Add(fWidthMenu->CreateMenuBarLayoutItem(), 0.0f)
+					.AddGlue()
+					.End()
+				.Add(fBorderMenu->CreateLabelLayoutItem(), 0, 2)
+				.AddGroup(B_HORIZONTAL, 0.0f, 1, 2)
+					.Add(fBorderMenu->CreateMenuBarLayoutItem(), 0.0f)
+					.AddGlue()
+					.End()
+				.Add(fMotionCheck, 1, 3)
+				.End()
+			.AddGlue()
+			.End()
+		.AddGlue()
 		.Add(fSpeedSlider)
+		.AddGlue()
 		.Add(fFramesSlider)
 		.AddGlue()
 	.End();
