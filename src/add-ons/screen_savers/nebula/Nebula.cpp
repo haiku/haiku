@@ -430,12 +430,12 @@ public:
 
 	const char* UpdateText() const
 	{
-		sprintf(fText, "%s: %d", fLabel, Value());
-		return fText;
+		fText.SetToFormat("%s: %d", fLabel, Value());
+		return fText.String();
 	};
 
 private:
-	mutable char fText[32];
+	mutable BString fText;
 	const char* fLabel;
 };
 
