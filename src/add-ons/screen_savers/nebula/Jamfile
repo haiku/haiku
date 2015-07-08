@@ -8,5 +8,11 @@ ScreenSaver Nebula :
 	Draw.c
 	DrawStars.c
 	Nebula.cpp :
-	be libscreensaver.so [ TargetLibsupc++ ]
+	be libscreensaver.so localestub [ TargetLibsupc++ ]
+;
+
+DoCatalogs Message :
+	x-vnd.Haiku-NebulaScreensaver
+	:
+	Nebula.cpp
 ;

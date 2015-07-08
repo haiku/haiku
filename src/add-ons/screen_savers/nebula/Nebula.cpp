@@ -7,6 +7,7 @@
  */
 
 #include <AppKit.h>
+#include <Catalog.h>
 #include <ControlLook.h>
 #include <InterfaceKit.h>
 #include <LayoutBuilder.h>
@@ -19,6 +20,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Nebula Screen Saver"
+
 
 typedef struct
 {
@@ -459,11 +465,12 @@ SettingsView::SettingsView(BRect frame)
 	:
 	BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW)
 {
-	BStringView* titleString = new BStringView(B_EMPTY_STRING, "Nebula");
+	BStringView* titleString = new BStringView(B_EMPTY_STRING,
+		B_TRANSLATE("Nebula"));
 	titleString->SetFont(be_bold_font);
 
 	BStringView* copyrightString = new BStringView(B_EMPTY_STRING,
-		"© 2001-2004 Axel Dörfler.");
+		B_TRANSLATE("© 2001-2004 Axel Dörfler."));
 
 	BPopUpMenu* popMenu;
 	BMenuItem* item;
@@ -495,22 +502,24 @@ SettingsView::SettingsView(BRect frame)
 		BMessage* message = new BMessage(kMsgWidth);
 		message->AddInt32("width", widths[i]);
 
-		popMenu->AddItem(item = new BMenuItem(label.String(), message));
+		const char* l = label.String();
+		popMenu->AddItem(item = new BMenuItem(B_TRANSLATE(l), message));
 
 		if (gSettingsWidth == widths[i])
 			item->SetMarked(true);
 	}
 
-	fWidthMenu = new BMenuField("res", "Internal width:", popMenu);
+	fWidthMenu = new BMenuField("res", B_TRANSLATE("Internal width:"),
+		popMenu);
 
 	const char* colorSchemes[] = {
-		"yellow",
-		"cyan",
-		"red",
-		"green",
-		"grey",
-		"cold",
-		"orange (original)"
+		B_TRANSLATE("yellow"),
+		B_TRANSLATE("cyan"),
+		B_TRANSLATE("red"),
+		B_TRANSLATE("green"),
+		B_TRANSLATE("grey"),
+		B_TRANSLATE("cold"),
+		B_TRANSLATE("orange (original)")
 	};
 
 	popMenu = new BPopUpMenu("");
@@ -522,13 +531,13 @@ SettingsView::SettingsView(BRect frame)
 			item->SetMarked(true);
 	}
 
-	fColorMenu = new BMenuField("col", "Color: ", popMenu);
+	fColorMenu = new BMenuField("col", B_TRANSLATE("Color:"), popMenu);
 
 	const char* blankBorderFormats[] = {
-		"fullscreen, no borders",
-		"16:9, wide-screen",
-		"2:3.5, cinemascope",
-		"only a slit"
+		B_TRANSLATE("fullscreen, no borders"),
+		B_TRANSLATE("16:9, wide-screen"),
+		B_TRANSLATE("2:3.5, cinemascope"),
+		B_TRANSLATE("only a slit")
 	};
 
 	popMenu = new BPopUpMenu("");
@@ -540,15 +549,17 @@ SettingsView::SettingsView(BRect frame)
 			item->SetMarked(true);
 	}
 
-	fBorderMenu = new BMenuField("cinema", "Format: ", popMenu);
+	fBorderMenu = new BMenuField("cinema", B_TRANSLATE("Format:"), popMenu);
 
-	fMotionCheck = new BCheckBox(B_EMPTY_STRING, "Enable motion blur", new BMessage(kMsgMotionBlur));
+	fMotionCheck = new BCheckBox(B_EMPTY_STRING,
+		B_TRANSLATE("Enable motion blur"), new BMessage(kMsgMotionBlur));
 	fMotionCheck->SetValue((int)gMotionBlur);
 
-	fSpeedSlider = new SimpleSlider("Speed", new BMessage(kMsgSpeed));
+	fSpeedSlider = new SimpleSlider(B_TRANSLATE("Speed"), new BMessage(kMsgSpeed));
 	fSpeedSlider->SetValue((gSpeed - 0.002) / 0.05);
 
-	fFramesSlider = new SimpleSlider("Maximum Frames Per Second", new BMessage(kMsgFrames));
+	fFramesSlider = new SimpleSlider(B_TRANSLATE("Maximum Frames Per Second"),
+		new BMessage(kMsgFrames));
 	fFramesSlider->SetValue(gMaxFramesPerSecond);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_HALF_ITEM_SPACING)
