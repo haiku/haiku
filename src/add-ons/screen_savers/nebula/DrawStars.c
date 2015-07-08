@@ -27,40 +27,32 @@ void draw_stars(int star_width, char* dstParam, char incParam)
 	}
 
 	inc >>= 1;
-	al = *dst;
 	cl = dst[star_width - 1];
-	al += inc;
-	if (al >= inc) {
-		cl += inc;
-		if (cl < inc) {
-			*dst = 255;
-			dst[star_width - 1] = 255;
-		} else {
-			*dst = al;
-			dst[star_width - 1] = cl;
-		}
+	cl += inc;
+	if (cl < inc) {
+		*dst = 255;
+		dst[star_width - 1] = 255;
 	} else {
-		cl += inc;
-		if (cl < inc) {
+		al = *dst;
+		al += inc;
+		if (al >= inc)
+			*dst = al;
+		else
 			*dst = 255;
-			dst[star_width - 1] = 255;
-		} else {
-			*dst = 255;
-			dst[star_width - 1] = cl;
-		}
+		dst[star_width - 1] = cl;
 	}
+
 	al = dst[star_width * 2];
 	cl = dst[star_width + 1];
 	al += inc;
+	cl += inc;
 	if (al < inc) {
-		cl += inc;
 		if (cl >= inc) {
 			dst[star_width * 2] = 255;
 			dst[star_width + 1] = cl;
 			return;
 		}
 	} else {
-		cl += inc;
 		if (cl >= inc) {
 			dst[star_width * 2] = al;
 			dst[star_width + 1] = cl;
