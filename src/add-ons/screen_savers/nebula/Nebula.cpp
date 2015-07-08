@@ -397,10 +397,9 @@ class SimpleSlider : public BSlider {
 			fLabel = label;
 		};
 
-		char *UpdateText() const
+		const char* UpdateText() const
 		{
 			sprintf(fText, "%s: %d", fLabel, Value());
-
 			return fText;
 		};
 
