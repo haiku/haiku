@@ -578,7 +578,9 @@ class Nebula : public BScreenSaver {
 
 
 Nebula::Nebula(BMessage *message, image_id id)
-	: BScreenSaver(message, id)
+	:
+	BScreenSaver(message, id),
+	fStarted(false)
 {
 	message->FindFloat("speed", 0, &gSpeed);
 	message->FindInt32("width", 0, &gSettingsWidth);
