@@ -470,7 +470,7 @@ SettingsView::SettingsView(BRect frame)
 		if (widths[i] == 0)
 			label.SetTo("screen resolution");
 		else
-			label.SetToFormat("%ld pixels", widths[i]);
+			label.SetToFormat("%" B_PRId32 " pixels", widths[i]);
 
 		BMessage* message = new BMessage(kMsgWidth);
 		message->AddInt32("width", widths[i]);
