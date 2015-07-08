@@ -12,6 +12,7 @@
 #include <LayoutBuilder.h>
 #include <Window.h>
 #include <ScreenSaver.h>
+#include <String.h>
 #include <SupportDefs.h>
 
 #include <math.h>
@@ -465,15 +466,16 @@ SettingsView::SettingsView(BRect frame)
 
 	popMenu = new BPopUpMenu("");
 	for (int32 i = 0; i < widthsLength; i++) {
-		BMessage* message = new BMessage(kMsgWidth);
-		char label[64];
+		BString label;
 		if (widths[i] == 0)
-			sprintf(label, "screen resolution");
+			label.SetTo("screen resolution");
 		else
-			sprintf(label, "%ld pixels", widths[i]);
+			label.SetToFormat("%ld pixels", widths[i]);
 
+		BMessage* message = new BMessage(kMsgWidth);
 		message->AddInt32("width", widths[i]);
-		popMenu->AddItem(item = new BMenuItem(label, message));
+
+		popMenu->AddItem(item = new BMenuItem(label.String(), message));
 
 		if (gSettingsWidth == widths[i])
 			item->SetMarked(true);
