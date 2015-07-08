@@ -71,6 +71,7 @@ Server app_server :
 	MultiLocker.cpp
 	OffscreenServerWindow.cpp
 	OffscreenWindow.cpp
+	PictureBoundingBoxPlayer.cpp
 	ProfileMessageSupport.cpp
 	RGBColor.cpp
 	RegionPool.cpp
