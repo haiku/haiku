@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.07.02
-#	Date:    2015-07-02 03:15:02
+#	Version: 2015.07.09
+#	Date:    2015-07-09 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -5754,6 +5754,7 @@
 	1280  ISP1280 SCSI Host Adapter
 	2020  ISP2020A Fast!SCSI Basic Adapter
 	2031  ISP8324-based 16Gb Fibre Channel to PCI Express Adapter
+		103c 8002  3830C 16G Fibre Channel Host Bus Adapter
 	2100  QLA2100 64-bit Fibre Channel Adapter
 		1077 0001  QLA2100 64-bit Fibre Channel Adapter
 	2200  QLA2200 64-bit Fibre Channel Adapter
@@ -10208,6 +10209,7 @@
 		17aa 3697  GeForce 840A
 		17aa 3699  GeForce 840A
 		17aa 369c  GeForce 840A
+	1344  GM108M [GeForce 845M]
 	1346  GM108M [GeForce 930M]
 	1347  GM108M [GeForce 940M]
 	137a  GM108GLM [Quadro K620M]
@@ -15426,6 +15428,8 @@
 	5013  T580-CHR Unified Wire Ethernet Controller
 	5014  T580-LP-SO-CR Unified Wire Ethernet Controller
 	5015  T502-BT Unified Wire Ethernet Controller
+	5016  T580-OCP-SO Unified Wire Ethernet Controller
+	5017  T520-OCP-SO Unified Wire Ethernet Controller
 	5080  T540-5080 Unified Wire Ethernet Controller
 	5081  T540-5081 Unified Wire Ethernet Controller
 	5082  T504-5082 Unified Wire Ethernet Controller
@@ -15460,6 +15464,8 @@
 	5413  T580-CHR Unified Wire Ethernet Controller
 	5414  T580-LP-SO-CR Unified Wire Ethernet Controller
 	5415  T502-BT Unified Wire Ethernet Controller
+	5416  T580-OCP-SO Unified Wire Ethernet Controller
+	5417  T520-OCP-SO Unified Wire Ethernet Controller
 	5480  T540-5080 Unified Wire Ethernet Controller
 	5481  T540-5081 Unified Wire Ethernet Controller
 	5482  T504-5082 Unified Wire Ethernet Controller
@@ -15494,6 +15500,8 @@
 	5513  T580-CHR Unified Wire Storage Controller
 	5514  T580-LP-SO-CR Unified Wire Storage Controller
 	5515  T502-BT Unified Wire Storage Controller
+	5516  T580-OCP-SO Unified Wire Storage Controller
+	5517  T520-OCP-SO Unified Wire Storage Controller
 	5580  T540-5080 Unified Wire Storage Controller
 	5581  T540-5081 Unified Wire Storage Controller
 	5582  T504-5082 Unified Wire Storage Controller
@@ -15528,6 +15536,8 @@
 	5613  T580-CHR Unified Wire Storage Controller
 	5614  T580-LP-SO-CR Unified Wire Storage Controller
 	5615  T502-BT Unified Wire Storage Controller
+	5616  T580-OCP-SO Unified Wire Storage Controller
+	5617  T520-OCP-SO Unified Wire Storage Controller
 	5680  T540-5080 Unified Wire Storage Controller
 	5681  T540-5081 Unified Wire Storage Controller
 	5682  T504-5082 Unified Wire Storage Controller
@@ -15596,6 +15606,8 @@
 	5813  T580-CHR Unified Wire Ethernet Controller [VF]
 	5814  T580-LP-SO-CR Unified Wire Ethernet Controller [VF]
 	5815  T502-BT Unified Wire Ethernet Controller [VF]
+	5816  T580-OCP-SO Unified Wire Ethernet Controller [VF]
+	5817  T520-OCP-SO Unified Wire Ethernet Controller [VF]
 	5880  T540-5080 Unified Wire Ethernet Controller [VF]
 	5881  T540-5081 Unified Wire Ethernet Controller [VF]
 	5882  T504-5082 Unified Wire Ethernet Controller [VF]
@@ -16218,10 +16230,14 @@
 	16a2  BCM57840 NetXtreme II 10/20-Gigabit Ethernet
 		103c 1916  HP FlexFabric 20Gb 2-port 630FLB Adapter
 		103c 1917  HP FlexFabric 20Gb 2-port 630M Adapter
+		103c 2231  3820C 10/20Gb Converged Network Adapter
+		103c 22fa  FlexFabric 10Gb 2-port 536FLB Adapter
 	16a3  NetXtreme BCM57786 Gigabit Ethernet PCIe
 	16a4  BCM57840 NetXtreme II Ethernet Multi Function
 		103c 1916  HP NPAR 20Gb 2-port 630FLB Adapter
 		103c 1917  HP NPAR 20Gb 2-port 630M Adapter
+		103c 2231  3820C 10/20Gb Converged Network Adapter (NPAR 1.5)
+		103c 22fa  FlexFabric 10Gb 2-port 536FLB Adapter (NPAR 1.5)
 # The Broadcom 57800 device has two 1Gig ports and two 10Gig ports. The subsystem information can be used to differentiate.
 	16a5  NetXtreme II BCM57800 1/10 Gigabit Ethernet Multi Function
 		1028 1f5c  NetXtreme II BCM57800 10-Gigabit Ethernet Multi Function
@@ -16267,6 +16283,8 @@
 	16ad  NetXtreme II BCM57840 10/20 Gigabit Ethernet Virtual Function
 		103c 1916  HP FlexFabric 20Gb 2-port 630FLB Adapter
 		103c 1917  HP FlexFabric 20Gb 2-port 630M Adapter
+		103c 2231  3820C 10/20Gb Converged Network Adapter (SR-IOV VF)
+		103c 22fa  FlexFabric 10Gb 2-port 536FLB Adapter (SR-IOV VF)
 	16ae  NetXtreme II BCM57810 10 Gigabit Ethernet Multi Function
 		103c 1798  HP NPAR 10Gb 2-port 530FLB Adapter
 		103c 17a5  HP NPAR 10Gb 2-port 530M Adapter
@@ -16522,6 +16540,7 @@
 	43d3  BCM43567 802.11ac Wireless Network Adapter
 	43d9  BCM43570 802.11ac Wireless Network Adapter
 	43df  BCM4354 802.11ac Wireless LAN SoC
+	43e9  BCM4358 802.11ac Wireless LAN SoC
 	43ec  BCM4356 802.11ac Wireless Network Adapter
 	4401  BCM4401 100Base-T
 		1025 0035  TravelMate 660
@@ -16582,6 +16601,7 @@
 	5850  BCM5850 Crypto Accelerator
 	8602  BCM7400/BCM7405 Serial ATA Controller
 	a8d8  BCM43224/5 Wireless Network Adapter
+	aa52  BCM43602 802.11ac Wireless LAN SoC
 	b302  BCM56302 StrataXGS 24x1GE 2x10GE Switch Controller
 	b334  BCM56334 StrataXGS 24x1GE 4x10GE Switch Controller
 	b800  BCM56800 StrataXGS 10GE Switch Controller
@@ -17925,6 +17945,8 @@
 	7003  XMC-7K410AX: User-Configurable Kintex-7 FPGA, 410k logic cells with AXM Plug-In I/O
 	7004  XMC-7K325CC: User-Configurable Kintex-7 FPGA, 325k logic cells, conduction-cooled
 	7005  XMC-7K410CC: User-Configurable Kintex-7 FPGA, 410k logic cells, conduction-cooled
+	7006  XMC-7A200: User-Configurable Artix-7 FPGA, 200k logic cells with Plug-In I/O
+	7007  XMC-7A200CC: User-Configurable Conduction-Cooled Artix-7 FPGA, with 200k logic cells
 16da  Advantech Co., Ltd.
 	0011  INES GPIB-PCI
 16df  PIKA Technologies Inc.
@@ -18017,6 +18039,8 @@
 	0094  Octeon Fusion CNF71XX Cell processor
 	0095  Octeon III CN78XX Network Processor
 	0096  Octeon III CN70XX Network Processor
+	9700  Octeon III CN73XX Network Processor
+	9800  Octeon Fusion CNF75XX Processor
 	a001  THUNDERX MRML Bridge
 	a002  THUNDERX PCC Bridge
 		177d a102  CN88XX PCC Bridge
@@ -18653,6 +18677,7 @@
 	0923  SFC9140
 		1924 800b  SFN7x42Q-R1 Flareon Ultra 7000 Series 10/40G Adapter
 		1924 800e  SFN7x42Q-R2 Flareon Ultra 7000 Series 10/40G Adapter
+		1924 800f  SFN7xx4F-R1 Flareon Ultra 7000 Series 10G Adapter
 	1803  SFC9020 Virtual Function [Solarstorm]
 	1813  SFL9021 Virtual Function [Solarstorm]
 	1903  SFC9120 Virtual Function
