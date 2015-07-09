@@ -200,9 +200,10 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 		message->reply = ack;
 		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
 			return B_OK;
-		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER)
+		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER) {
+			TRACE("%s: aux reply defer received. Snoozing.\n", __func__);
 			snooze(400);
-		else
+		} else
 			return B_IO_ERROR;
 	}
 
@@ -225,6 +226,7 @@ dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 		ERROR("%s: error on DisplayPort aux write (0x%" B_PRIx32 ")\n",
 			__func__, result);
 	}
+	TRACE("%s: aux message reply: 0x%" B_PRIx8 "\n", __func__, message.reply);
 }
 
 
@@ -244,6 +246,8 @@ dpcd_reg_read(uint32 connectorIndex, uint16 address)
 		ERROR("%s: error on DisplayPort aux read (0x%" B_PRIx32 ")\n",
 			__func__, result);
 	}
+
+	TRACE("%s: aux message reply: 0x%" B_PRIx8 "\n", __func__, message.reply);
 
 	return response;
 }
@@ -739,7 +743,7 @@ dp_set_tp(uint32 connectorIndex, int trainingPattern)
 
 	/* set training pattern on the source */
 	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {
-		TRACE("%s: Training with encoder...", __func__);
+		TRACE("%s: Training with encoder...\n", __func__);
 		switch (trainingPattern) {
 			case DP_TRAIN_PATTERN_1:
 				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN1;
@@ -753,7 +757,7 @@ dp_set_tp(uint32 connectorIndex, int trainingPattern)
 		}
 		encoder_dig_setup(connectorIndex, pll->pixelClock, rawTrainingPattern);
 	} else {
-		TRACE("%s: Training with encoder service...", __func__);
+		TRACE("%s: Training with encoder service...\n", __func__);
 		switch (trainingPattern) {
 			case DP_TRAIN_PATTERN_1:
 				rawTrainingPattern = 0;
