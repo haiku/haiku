@@ -283,7 +283,7 @@ detect_displays()
 
 			if (gDisplay[displayIndex]->attached) {
 				TRACE("%s: connector(%" B_PRIu32 "): Found DisplayPort EDID!\n",
-					__func__);
+					__func__, id);
 			}
 		}
 
