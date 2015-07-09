@@ -41,6 +41,7 @@
 
 #include <debug.h>
 #include <MediaMisc.h>
+#include <Notifications.h>
 
 #include "AppManager.h"
 #include "DefaultManager.h"
@@ -980,8 +981,17 @@ NodeManager::CleanupDormantFlavorInfos()
 	PRINT(1, "NodeManager::CleanupDormantFlavorInfos\n");
 
 	BAutolock _(this);
+
+	for (DormantFlavorList::iterator iterator = fDormantFlavors.begin();
+			iterator != fDormantFlavors.end(); iterator++) {
+		dormant_add_on_flavor_info& info = *iterator;
+
+		// Current instance count is zero since the media_addon_server crashed.
+		BPrivate::media::notifications::FlavorsChanged(info.add_on_id,
+			0, info.instances_count);
+	}
+
 	fDormantFlavors.clear();
-	// TODO: FlavorsChanged() notification
 
 	PRINT(1, "NodeManager::CleanupDormantFlavorInfos done\n");
 }
@@ -1091,8 +1101,6 @@ NodeManager::CleanupTeam(team_id team)
 
 	PRINT(1, "NodeManager::CleanupTeam: team %" B_PRId32 "\n", team);
 
-	// TODO: send notifications after removing nodes
-
 	// Cleanup node references
 
 	for (NodeMap::iterator iterator = fNodeMap.begin();
@@ -1113,6 +1121,7 @@ NodeManager::CleanupTeam(team_id team)
 			PRINT(1, "NodeManager::CleanupTeam: removing node id %" B_PRId32
 				", team %" B_PRId32 "\n", node.node_id, team);
 			fNodeMap.erase(remove);
+			BPrivate::media::notifications::NodesDeleted(&node.node_id, 1);
 			continue;
 		}
 
@@ -1129,6 +1138,7 @@ NodeManager::CleanupTeam(team_id team)
 					B_PRId32 " that has no teams\n", node.node_id);
 
 				fNodeMap.erase(remove);
+				BPrivate::media::notifications::NodesDeleted(&node.node_id, 1);
 			} else
 				node.team_ref_count.erase(teamRef);
 		}
@@ -1147,10 +1157,13 @@ NodeManager::CleanupTeam(team_id team)
 				instanceCount->second, flavorInfo.add_on_id,
 				flavorInfo.flavor_id);
 
+			int32 count = flavorInfo.instances_count;
 			flavorInfo.instances_count -= instanceCount->second;
-			if (flavorInfo.instances_count <= 0)
+			if (flavorInfo.instances_count <= 0) {
 				fDormantFlavors.erase(fDormantFlavors.begin() + index--);
-			else
+				BPrivate::media::notifications::FlavorsChanged(
+					flavorInfo.add_on_id, 0, count);
+			} else
 				flavorInfo.team_instances_count.erase(team);
 		}
 	}
