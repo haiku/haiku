@@ -10,6 +10,15 @@ target desktop {
 		launch /system/Deskbar
 		legacy
 	}
+
+	job create-installer-link {
+		# When run from a read-only medium a.k.a. live desktop
+		if {
+			read_only
+			file_exists /boot/system/apps/Installer
+		}
+		launch /bin/ln -sf /boot/system/apps/Installer /boot/home/Desktop/Installer
+	}
 }
 
 target first_boot {
@@ -22,6 +31,7 @@ target installer {
 
 run {
 	if {
+		file_exists /system/bin/FirstBootPrompt
 		or {
 			not file_exists /boot/home/config/settings/Locale\ settings
 			read_only
