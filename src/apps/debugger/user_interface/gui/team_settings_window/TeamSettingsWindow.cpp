@@ -17,7 +17,7 @@
 TeamSettingsWindow::TeamSettingsWindow(::Team* team,
 	UserInterfaceListener* listener, BHandler* target)
 	:
-	BWindow(BRect(), "Team settings", B_FLOATING_WINDOW,
+	BWindow(BRect(), "Team settings", B_TITLED_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fTeam(team),
 	fListener(listener),

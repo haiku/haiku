@@ -31,7 +31,7 @@ enum {
 SignalDispositionEditWindow::SignalDispositionEditWindow(::Team* team,
 	int32 signal, UserInterfaceListener* listener, BHandler* target)
 	:
-	BWindow(BRect(), "Edit breakpoint", B_FLOATING_WINDOW,
+	BWindow(BRect(), "Edit signal disposition", B_FLOATING_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fTeam(team),
 	fListener(listener),
