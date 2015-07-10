@@ -22,6 +22,8 @@ class TestConditionContext : public ConditionContext {
 public:
 			bool				IsSafeMode() const
 									{ return false; }
+			bool				BootVolumeIsReadOnly() const
+									{ return false; }
 };
 
 
@@ -45,7 +47,7 @@ ConditionsTest::TestSafemode()
 	CPPUNIT_ASSERT(!condition->Test(sConditionContext));
 	CPPUNIT_ASSERT(condition->IsConstant(sConditionContext));
 
-	class SafemodeConditionContext : public ConditionContext {
+	class SafemodeConditionContext : public TestConditionContext {
 	public:
 		bool IsSafeMode() const
 		{
@@ -157,7 +159,7 @@ ConditionsTest::TestNot()
 	Condition* condition = _Condition("not safemode");
 	CPPUNIT_ASSERT(condition->Test(sConditionContext));
 
-	class SafemodeConditionContext : public ConditionContext {
+	class SafemodeConditionContext : public TestConditionContext {
 	public:
 		bool IsSafeMode() const
 		{
