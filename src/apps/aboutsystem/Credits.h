@@ -317,7 +317,6 @@ static const Translation kTranslations[] = {
 	"Dario Casalinuovo\n" \
 	"Augustin Cavalier\n" \
 	"Stefano Ceccherini\n" \
-	"Alexandre Deckner\n" \
 	"Adrien Destugues\n" \
 	"Axel Dörfler\n" \
 	"Jérôme Duval\n" \
@@ -346,7 +345,6 @@ static const Translation kTranslations[] = {
 	"Alexander von Gluck IV\n" \
 	"Ingo Weinhold\n" \
 	"Clemens Zeidler\n" \
-	"Siarzhuk Zharski\n" \
 	"\n"
 
 #define kPastMaintainers \
@@ -355,6 +353,7 @@ static const Translation kTranslations[] = {
 	"Salvatore Benedetto\n" \
 	"Rudolf Cornelissen\n" \
 	"Tyler Dauwalder\n" \
+	"Alexandre Deckner\n" \
 	"Oliver Ruiz Dorantes\n" \
 	"Daniel Furrer\n" \
 	"Andre Alves Garzia\n" \
@@ -387,6 +386,7 @@ static const Translation kTranslations[] = {
 	"Alex Wilson\n" \
 	"Artur Wyszyński\n" \
 	"Jonathan Yoder\n" \
+	"Siarzhuk Zharski\n" \
 	"\n"
 
 #define kContributors \
