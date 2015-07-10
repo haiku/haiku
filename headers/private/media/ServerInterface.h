@@ -135,6 +135,7 @@ enum {
 	FILEINTERFACE_SET_REF,
 	FILEINTERFACE_GET_REF,
 	FILEINTERFACE_SNIFF_REF,
+	FILEINTERFACE_GET_FORMATS,
 	FILEINTERFACE_MESSAGE_END,
 
 	CONTROLLABLE_MESSAGE_START = 0x600,
@@ -1004,6 +1005,14 @@ struct fileinterface_sniff_ref_reply : reply_data {
 	float					capability;
 };
 
+struct fileinterface_get_formats_request : request_data {
+	int32					num_formats;
+	area_id					data_area;
+};
+
+struct fileinterface_get_formats_reply : reply_data {
+	int32					filled_slots;
+};
 
 // #pragma mark - controllable commands
 

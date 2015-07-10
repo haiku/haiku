@@ -2819,8 +2819,42 @@ status_t
 BMediaRoster::GetFileFormatsFor(const media_node& fileInterface,
 	media_file_format* _formats, int32* _numFormats)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+
+	if (IS_INVALID_NODE(fileInterface)
+		|| (fileInterface.kind & B_FILE_INTERFACE) == 0)
+		return B_MEDIA_BAD_NODE;
+
+	if (_numFormats == NULL || *_numFormats < 1)
+		return B_BAD_VALUE;
+
+	fileinterface_get_formats_request request;
+	fileinterface_get_formats_reply reply;
+
+	media_file_format* formats;
+	size_t needSize = sizeof(media_file_format) * *_numFormats;
+	size_t size = (needSize + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
+
+	area_id area = create_area("formats area", (void**)&formats,
+		B_ANY_ADDRESS, size, B_NO_LOCK,
+		B_READ_AREA | B_WRITE_AREA);
+
+	if (area < 0)
+		return B_NO_MEMORY;
+
+	request.num_formats = *_numFormats;
+	request.data_area = area;
+
+	status_t status = QueryPort(fileInterface.port,
+		FILEINTERFACE_GET_FORMATS, &request,
+		sizeof(request), &reply, sizeof(reply));
+
+	if (status == B_OK) {
+		memcpy(_formats, formats, sizeof(media_file_format)*reply.filled_slots);
+		*_numFormats = reply.filled_slots;
+	}
+	delete_area(area);
+	return status;
 }
 
 

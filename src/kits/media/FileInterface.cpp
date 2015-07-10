@@ -97,6 +97,35 @@ BFileInterface::HandleMessage(int32 message,
 
 			return B_OK;
 		}
+		case FILEINTERFACE_GET_FORMATS:
+		{
+			const fileinterface_get_formats_request *request =
+					(const fileinterface_get_formats_request*) data;
+			fileinterface_get_formats_reply reply;
+
+			media_file_format* formats;
+			area_id area = clone_area("client formats area",
+				(void**)&formats, B_ANY_ADDRESS, B_WRITE_AREA,
+				request->data_area);
+
+			if (area < 0) {
+				ERROR("BBufferConsumer::FILEINTERFACE_GET_FORMATS:"
+					" can't clone area\n");
+				break;
+			}
+
+			int32 cookie = 0;
+			while (GetNextFileFormat(&cookie, formats) == B_OK) {
+				if (cookie >= request->num_formats)
+					break;
+				formats += sizeof(media_format);
+			}
+			reply.filled_slots = cookie;
+			request->SendReply(B_OK, &reply, sizeof(reply));
+
+			delete_area(area);
+			return B_OK;
+		}
 		default:
 			return B_ERROR;
 	}
