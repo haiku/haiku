@@ -10,10 +10,12 @@ UnitTestLib liblaunch_daemontest.so :
 	LaunchDaemonTestAddon.cpp
 
 	SettingsParserTest.cpp
-	SettingsParser.cpp
-
 	ConditionsTest.cpp
+
+	# from the launch_daemon
+	SettingsParser.cpp
 	Conditions.cpp
+	Utility.cpp
 
 	: be libshared.a [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;

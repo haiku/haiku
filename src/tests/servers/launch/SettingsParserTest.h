@@ -26,6 +26,13 @@ public:
 			void				TestConditionsMultiLineFlatNotWithArgs();
 			void				TestConditionsMultiLineNot();
 
+			void				TestEventsMultiLine();
+			void				TestEventsFlat();
+			void				TestEventsFlatWithArgs();
+
+			void				TestEnvironmentMultiLine();
+			void				TestEnvironmentFlat();
+
 			void				TestRunFlat();
 			void				TestRunMultiLine();
 			void				TestRunIfThenElseFlat();
@@ -35,6 +42,10 @@ public:
 
 private:
 			status_t			_ParseCondition(const char* text,
+									BMessage& message);
+			status_t			_ParseEvent(const char* text,
+									BMessage& message);
+			status_t			_ParseName(const char* name, const char* text,
 									BMessage& message);
 			int32				_ArrayCount(BMessage& message,
 									const char* name);

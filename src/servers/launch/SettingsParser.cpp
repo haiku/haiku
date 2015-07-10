@@ -9,7 +9,37 @@
 #include <DriverSettingsMessageAdapter.h>
 
 
-class ConditionConverter : public DriverSettingsConverter {
+class AbstractArgsConverter : public DriverSettingsConverter {
+public:
+	status_t ConvertEmptyFromDriverSettings(
+		const driver_parameter& parameter, const char* name, uint32 type,
+		BMessage& target)
+	{
+		if (parameter.parameter_count != 0)
+			return B_OK;
+
+		BMessage message;
+		return target.AddMessage(name, &message);
+	}
+
+protected:
+	status_t AddSubMessage(const driver_parameter& parameter, int32 index,
+		BMessage& target)
+	{
+		const char* condition = parameter.values[index];
+		BMessage args;
+		for (index++; index < parameter.value_count; index++) {
+			status_t status = args.AddString("args",
+				parameter.values[index]);
+			if (status != B_OK)
+				return status;
+		}
+		return target.AddMessage(condition, &args);
+	}
+};
+
+
+class ConditionConverter : public AbstractArgsConverter {
 public:
 	status_t ConvertFromDriverSettings(const driver_parameter& parameter,
 		const char* name, int32 index, uint32 type, BMessage& target)
@@ -29,7 +59,7 @@ public:
 				index++;
 			}
 
-			status_t status = _AddSubMessage(parameter, index, *add);
+			status_t status = AddSubMessage(parameter, index, *add);
 			if (status == B_OK && not)
 				status = target.AddMessage("not", &message);
 
@@ -39,37 +69,31 @@ public:
 			if (index != 0)
 				return B_OK;
 
-			return _AddSubMessage(parameter, index, target);
+			return AddSubMessage(parameter, index, target);
 		}
 
 		message.AddString("args", parameter.values[index]);
 		return target.AddMessage(parameter.name, &message);
 	}
+};
 
-	status_t ConvertEmptyFromDriverSettings(
-		const driver_parameter& parameter, const char* name, uint32 type,
-		BMessage& target)
+
+class EventConverter : public AbstractArgsConverter {
+public:
+	status_t ConvertFromDriverSettings(const driver_parameter& parameter,
+		const char* name, int32 index, uint32 type, BMessage& target)
 	{
-		if (parameter.parameter_count != 0)
-			return B_OK;
-
 		BMessage message;
-		return target.AddMessage(name, &message);
-	}
+		if (strcmp(parameter.name, "on") == 0) {
+			// Parse values directly following "on"
+			if (index != 0)
+				return B_OK;
 
-private:
-	status_t _AddSubMessage(const driver_parameter& parameter, int32 index,
-		BMessage& target)
-	{
-		const char* condition = parameter.values[index];
-		BMessage args;
-		for (index++; index < parameter.value_count; index++) {
-			status_t status = args.AddString("args",
-				parameter.values[index]);
-			if (status != B_OK)
-				return status;
+			return AddSubMessage(parameter, index, target);
 		}
-		return target.AddMessage(condition, &args);
+
+		message.AddString("args", parameter.values[index]);
+		return target.AddMessage(parameter.name, &message);
 	}
 };
 
@@ -105,6 +129,13 @@ const static settings_template kConditionTemplate[] = {
 	{0, NULL, NULL}
 };
 
+const static settings_template kEventTemplate[] = {
+	{B_STRING_TYPE, NULL, NULL, true, new EventConverter()},
+	{B_MESSAGE_TYPE, "and", kEventTemplate},
+	{B_MESSAGE_TYPE, "or", kEventTemplate},
+	{0, NULL, NULL}
+};
+
 const static settings_template kPortTemplate[] = {
 	{B_STRING_TYPE, "name", NULL, true},
 	{B_INT32_TYPE, "capacity", NULL},
@@ -122,6 +153,7 @@ const static settings_template kJobTemplate[] = {
 	{B_STRING_TYPE, "requires", NULL},
 	{B_BOOL_TYPE, "legacy", NULL},
 	{B_MESSAGE_TYPE, "port", kPortTemplate},
+	{B_MESSAGE_TYPE, "on", kEventTemplate},
 	{B_MESSAGE_TYPE, "if", kConditionTemplate},
 	{B_BOOL_TYPE, "no_safemode", NULL},
 	{B_MESSAGE_TYPE, "env", kEnvTemplate},
@@ -131,6 +163,7 @@ const static settings_template kJobTemplate[] = {
 const static settings_template kTargetTemplate[] = {
 	{B_STRING_TYPE, "name", NULL, true},
 	{B_BOOL_TYPE, "reset", NULL},
+	{B_MESSAGE_TYPE, "on", kEventTemplate},
 	{B_MESSAGE_TYPE, "if", kConditionTemplate},
 	{B_BOOL_TYPE, "no_safemode", NULL},
 	{B_MESSAGE_TYPE, "env", kEnvTemplate},

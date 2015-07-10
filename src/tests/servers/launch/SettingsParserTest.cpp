@@ -27,6 +27,9 @@ SettingsParserTest::~SettingsParserTest()
 }
 
 
+// #pragma mark - conditions
+
+
 void
 SettingsParserTest::TestConditionsMultiLine()
 {
@@ -178,6 +181,101 @@ SettingsParserTest::TestConditionsMultiLineNot()
 }
 
 
+// #pragma mark - events
+
+
+void
+SettingsParserTest::TestEventsMultiLine()
+{
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, _ParseEvent("on {\n"
+		"\tfile_created one\n"
+		"\tdemand\n"
+		"}\n", message));
+	CPPUNIT_ASSERT_EQUAL(2, message.CountNames(B_ANY_TYPE));
+
+	BMessage subMessage;
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("demand", &subMessage));
+	CPPUNIT_ASSERT(subMessage.IsEmpty());
+
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("file_created",
+		&subMessage));
+	CPPUNIT_ASSERT_EQUAL(BString("one"),
+		BString(subMessage.GetString("args", 0, "-")));
+	CPPUNIT_ASSERT_EQUAL(1, subMessage.CountNames(B_ANY_TYPE));
+}
+
+
+void
+SettingsParserTest::TestEventsFlat()
+{
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, _ParseEvent("on demand\n", message));
+	CPPUNIT_ASSERT_EQUAL(1, message.CountNames(B_ANY_TYPE));
+
+	BMessage args;
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("demand", &args));
+	CPPUNIT_ASSERT(args.IsEmpty());
+}
+
+
+void
+SettingsParserTest::TestEventsFlatWithArgs()
+{
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, _ParseEvent("on file_created one\n", message));
+	CPPUNIT_ASSERT_EQUAL(1, message.CountNames(B_ANY_TYPE));
+
+	BMessage args;
+	CPPUNIT_ASSERT_EQUAL(B_OK, message.FindMessage("file_created", &args));
+	CPPUNIT_ASSERT_EQUAL(BString("one"),
+		BString(args.GetString("args", 0, "-")));
+	CPPUNIT_ASSERT_EQUAL(1, args.CountNames(B_ANY_TYPE));
+}
+
+
+// #pragma mark - environment
+
+
+void
+SettingsParserTest::TestEnvironmentMultiLine()
+{
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, _ParseName("env", "env {\n"
+		"from_script SetupEnvironment\n"
+		"TEST well, yes\n"
+		"}\n", message));
+	CPPUNIT_ASSERT_EQUAL(2, message.CountNames(B_ANY_TYPE));
+
+	CPPUNIT_ASSERT_EQUAL(BString("SetupEnvironment"),
+		BString(message.GetString("from_script", "-")));
+	CPPUNIT_ASSERT_EQUAL(1, _ArrayCount(message, "from_script"));
+
+	CPPUNIT_ASSERT_EQUAL(BString("well,"),
+		BString(message.GetString("TEST", 0, "-")));
+	CPPUNIT_ASSERT_EQUAL(BString("yes"),
+		BString(message.GetString("TEST", 1, "-")));
+	CPPUNIT_ASSERT_EQUAL(2, _ArrayCount(message, "TEST"));
+}
+
+
+void
+SettingsParserTest::TestEnvironmentFlat()
+{
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, _ParseName("env", "env SetupEnvironment\n",
+		message));
+	CPPUNIT_ASSERT_EQUAL(1, message.CountNames(B_ANY_TYPE));
+
+	CPPUNIT_ASSERT_EQUAL(BString("SetupEnvironment"),
+		BString(message.GetString("from_script", "-")));
+	CPPUNIT_ASSERT_EQUAL(1, _ArrayCount(message, "from_script"));
+}
+
+
+// #pragma mark - run
+
+
 void
 SettingsParserTest::TestRunFlat()
 {
@@ -288,6 +386,9 @@ SettingsParserTest::TestRunIfThenElseMultiLine()
 }
 
 
+// #pragma mark -
+
+
 /*static*/ void
 SettingsParserTest::AddTests(BTestSuite& parent)
 {
@@ -319,6 +420,25 @@ SettingsParserTest::AddTests(BTestSuite& parent)
 		"SettingsParserTest::TestConditionsMultiLineNot",
 		&SettingsParserTest::TestConditionsMultiLineNot));
 
+	// Events
+	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
+		"SettingsParserTest::TestEventsMultiLine",
+		&SettingsParserTest::TestEventsMultiLine));
+	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
+		"SettingsParserTest::TestEventsFlat",
+		&SettingsParserTest::TestEventsFlat));
+	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
+		"SettingsParserTest::TestEventsFlatWithArgs",
+		&SettingsParserTest::TestEventsFlatWithArgs));
+
+	// Environment
+	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
+		"SettingsParserTest::TestEnvironmentMultiLine",
+		&SettingsParserTest::TestEnvironmentMultiLine));
+	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
+		"SettingsParserTest::TestEnvironmentFlat",
+		&SettingsParserTest::TestEnvironmentFlat));
+
 	// Run
 	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
 		"SettingsParserTest::TestRunFlat",
@@ -340,6 +460,21 @@ SettingsParserTest::AddTests(BTestSuite& parent)
 status_t
 SettingsParserTest::_ParseCondition(const char* text, BMessage& message)
 {
+	return _ParseName("if", text, message);
+}
+
+
+status_t
+SettingsParserTest::_ParseEvent(const char* text, BMessage& message)
+{
+	return _ParseName("on", text, message);
+}
+
+
+status_t
+SettingsParserTest::_ParseName(const char* name, const char* text,
+	BMessage& message)
+{
 	SettingsParser parser;
 	BString input("job A {\n");
 	input << text << "\n}\n";
@@ -357,7 +492,7 @@ SettingsParserTest::_ParseCondition(const char* text, BMessage& message)
 	CPPUNIT_ASSERT_EQUAL(2, job.CountNames(B_ANY_TYPE));
 	CPPUNIT_ASSERT_EQUAL(BString("A"), BString(job.GetString("name")));
 
-	return job.FindMessage("if", &message);
+	return job.FindMessage(name, &message);
 }
 
 
