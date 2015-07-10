@@ -6,7 +6,9 @@
 
 #include "BaseJob.h"
 
+#include <errno.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <Message.h>
@@ -103,10 +105,10 @@ BaseJob::SetEnvironment(const BMessage& message)
 	for (int32 index = 0; message.GetInfo(B_STRING_TYPE, index, &name, &type,
 			&count) == B_OK; index++) {
 		if (strcmp(name, "from_script") == 0) {
-			const char* fromFile;
-			for (int32 fileIndex = 0; message.FindString(name, fileIndex,
-					&fromFile) == B_OK; fileIndex++) {
-				fSourceFiles.Add(fromFile);
+			const char* fromScript;
+			for (int32 scriptIndex = 0; message.FindString(name, scriptIndex,
+					&fromScript) == B_OK; scriptIndex++) {
+				fSourceFiles.Add(fromScript);
 			}
 			continue;
 		}
@@ -166,6 +168,7 @@ BaseJob::_GetSourceFileEnvironment(const char* script, BStringList& environment)
 	pid_t child = fork();
 	if (child < 0) {
 		// TODO: log error
+		debug_printf("could not fork: %s\n", strerror(errno));
 	} else if (child == 0) {
 		// We're the child, redirect stdout
 		close(STDOUT_FILENO);
