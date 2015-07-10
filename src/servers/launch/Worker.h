@@ -19,6 +19,8 @@ public:
 								Worker(JobQueue& queue);
 	virtual						~Worker();
 
+			status_t			Init();
+
 protected:
 	virtual	status_t			Process();
 	virtual	bigtime_t			Timeout() const;

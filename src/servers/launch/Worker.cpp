@@ -15,17 +15,30 @@ static int32 sWorkerCount;
 
 Worker::Worker(JobQueue& queue)
 	:
+	fThread(-1),
 	fJobQueue(queue)
 {
-	fThread = spawn_thread(&Worker::_Process, "worker", B_NORMAL_PRIORITY,
-		this);
-	if (fThread >= 0 && resume_thread(fThread) == B_OK)
-		atomic_add(&sWorkerCount, 1);
 }
 
 
 Worker::~Worker()
 {
+}
+
+
+status_t
+Worker::Init()
+{
+	fThread = spawn_thread(&Worker::_Process, "worker", B_NORMAL_PRIORITY,
+		this);
+	if (fThread < 0)
+		return fThread;
+
+	status_t status = resume_thread(fThread);
+	if (status == B_OK)
+		atomic_add(&sWorkerCount, 1);
+
+	return status;
 }
 
 
@@ -103,8 +116,10 @@ MainWorker::Run(BJob* job)
 	if (jobCount > INT_MAX)
 		jobCount = INT_MAX;
 
-	if ((int32)jobCount > count && count < fCPUCount)
-		new Worker(fJobQueue);
+	if ((int32)jobCount > count && count < fCPUCount) {
+		Worker* worker = new Worker(fJobQueue);
+		worker->Init();
+	}
 
 	return Worker::Run(job);
 }

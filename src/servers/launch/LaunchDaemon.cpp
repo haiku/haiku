@@ -164,6 +164,8 @@ LaunchDaemon::LaunchDaemon(bool userMode, status_t& error)
 	fUserMode(userMode)
 {
 	fMainWorker = new MainWorker(fJobQueue);
+	fMainWorker->Init();
+
 	if (fInitTarget != NULL)
 		_AddTarget(fInitTarget);
 
