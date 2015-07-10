@@ -18,8 +18,10 @@ public:
 								InstallerApp();
 
 	virtual	void				MessageReceived(BMessage* message);
+
 	virtual	void				AboutRequested();
 	virtual	void				ReadyToRun();
+	virtual	void				Quit();
 
 private:
 			EULAWindow*			fEULAWindow;

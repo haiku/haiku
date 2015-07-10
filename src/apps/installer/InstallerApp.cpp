@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Axel Dörfler <axeld@pinc-software.de>
  * Copyright 2009, Stephan Aßmus <superstippi@gmx.de>
  * Copyright 2005, Jérôme DUVAL.
  * All rights reserved. Distributed under the terms of the MIT License.
@@ -6,10 +7,16 @@
 
 #include "InstallerApp.h"
 
+#include <unistd.h>
+
 #include <Alert.h>
+#include <Roster.h>
 #include <TextView.h>
 
+#include <syscalls.h>
+
 #include "tracker_private.h"
+#include "Utility.h"
 
 
 static const uint32 kMsgAgree = 'agre';
@@ -107,4 +114,26 @@ InstallerApp::ReadyToRun()
 	// Show the installer window without EULA.
 	new InstallerWindow();
 #endif
+}
+
+
+void
+InstallerApp::Quit()
+{
+	BApplication::Quit();
+
+	if (!be_roster->IsRunning(kDeskbarSignature)) {
+		// Synchronize disks, and reboot the system
+		sync();
+
+		if (Utility::IsReadOnlyVolume("/boot")) {
+			// Unblock CD tray, and eject the CD
+			Utility::BlockMedia("/boot", false);
+			Utility::EjectMedia("/boot");
+		}
+
+		// Quickly shutdown without possibly touching anything on disk
+		// (which we might just have ejected)
+		_kern_shutdown(false);
+	}
 }

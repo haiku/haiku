@@ -14,6 +14,7 @@ namespace Utility {
 	bool IsReadOnlyVolume(const char* path);
 
 	status_t BlockMedia(const char* path, bool block);
+	status_t EjectMedia(const char* path);
 }
 
 
