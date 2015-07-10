@@ -1,0 +1,30 @@
+SubDir HAIKU_TOP src system libroot posix glibc math ;
+
+SubDirCcFlags -D_GNU_SOURCE -DUSE_IN_LIBIO ;
+
+local architectureObject ;
+for architectureObject in [ MultiArchSubDirSetup ] {
+	on $(architectureObject) {
+		local architecture = $(TARGET_PACKAGING_ARCH) ;
+
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+			$(TARGET_ARCH) ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include arch
+			generic ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc include ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc math ;
+		SubDirSysHdrs $(HAIKU_TOP) src system libroot posix glibc ;
+
+		UsePrivateHeaders libroot ;
+
+		MergeObject <$(architecture)>posix_gnu_math.o :
+			cabs.c cabsf.c cabsl.c
+			carg.c cargf.c cargl.c
+			cimag.c cimagf.c cimagl.c
+			conj.c conjf.c conjl.c
+			creal.c crealf.c creall.c
+
+			k_casinh.c k_casinhf.c k_casinhl.c
+			;
+	}
+}
