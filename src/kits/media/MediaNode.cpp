@@ -139,8 +139,10 @@ BMediaNode::~BMediaNode()
 	if ((fKinds & NODE_KIND_SHADOW_TIMESOURCE) == 0) {
 		if (fControlPort > 0)
 			delete_port(fControlPort);
-	} else
-		TRACE("BMediaNode::~BMediaNode: shadow timesource, not unregistering\n");
+	} else {
+		TRACE("BMediaNode::~BMediaNode: shadow timesource,"
+			" not unregistering\n");
+	}
 }
 
 
@@ -787,7 +789,8 @@ status_t
 BMediaNode::RequestCompleted(const media_request_info& info)
 {
 	CALLED();
-	// This function is called whenever a request issued by the node is completed.
+	// This function is called whenever
+	// a request issued by the node is completed.
 	// May be overriden by derived classes.
 	// info.change_tag can be used to match up requests against
 	// the accompaning calles from
@@ -816,7 +819,8 @@ void
 BMediaNode::NodeRegistered()
 {
 	CALLED();
-	// The Media Server calls this hook function after the node has been registered.
+	// The Media Server calls this hook function
+	// after the node has been registered.
 	// May be overriden by derived classes.
 }
 
@@ -825,8 +829,9 @@ status_t
 BMediaNode::GetNodeAttributes(media_node_attribute* outAttributes,
 	size_t inMaxCount)
 {
-	UNIMPLEMENTED();
-
+	CALLED();
+	// This is implemented by derived classes that fills
+	// it's own attributes to a max of inMaxCount size.
 	return B_ERROR;
 }
 
@@ -926,7 +931,8 @@ BMediaNode::IncrementChangeTag()
 	CALLED();
 	// Only present in BeOS R4
 	// Obsoleted in BeOS R4.5 and later
-	// "updates the change tag, so that downstream consumers know that the node is in a new state."
+	// "updates the change tag, so that downstream consumers
+	// know that the node is in a new state."
 	// not supported, only for binary compatibility
 	return 0;
 }
