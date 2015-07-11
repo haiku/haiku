@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Network	2520478876
+1	japanese	x-vnd.Haiku-Network	950262959
 Static	IntefaceAddressView		固定 IP
 EAP	EAP protected network		EAP
 Services	NetworkWindow		サービス
@@ -13,7 +13,8 @@ Apply	IntefaceAddressView		適用
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		ネットワーク状況の Deskbar へのインストールに失敗しました: %s
 Disabled	IntefaceAddressView		無効
 Ok	NetworkWindow		Ok
-launch error	NetworkWindow		実行エラー
+launch error	NetworkWindow		その他
+Other	NetworkWindow		その他
 Automatic	IntefaceAddressView		自動
 Gateway:	IntefaceAddressView		ゲートウェイ:
 Revert	NetworkWindow		元に戻す

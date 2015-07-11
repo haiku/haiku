@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PRNT	200447094
+1	japanese	x-vnd.Be-PRNT	2163275033
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		プリンター: %printer_name%\nドライバー: %driver%\n
 Waiting	JobListView		待機中
 Print test page	PrintersWindow		テストページを印刷
@@ -9,6 +9,7 @@ Cancel	AddPrinterDialog		中止
 Add printer	AddPrinterDialog		プリンターを追加
 Green	TestPageView		緑
 Printers	PrintersWindow		プリンター
+Add…	PrintersWindow		追加…
 Default Printer	PrinterListView		通常使うプリンター
 Transport: %transport% %transport_address%	PrinterListView		転送先: %transport% %transport_address%
 No pending jobs.	PrinterListView		印刷待ち中のジョブはありません。

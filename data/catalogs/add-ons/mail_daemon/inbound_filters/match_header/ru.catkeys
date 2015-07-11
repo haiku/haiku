@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MatchHeader	491991630
+1	russian	x-vnd.Haiku-MatchHeader	1196375185
 <Choose action>	ConfigView		<Выберите действие>
 has	ConfigView		содержит
 Move to	ConfigView		Переместить в
@@ -9,6 +9,7 @@ value (use REGEX: in front of regular expressions like *spam*)	ConfigView		зн�
 <Choose account>	ConfigView		значение (используйте регулярные выражения, например *спам*)
 Set flags to	ConfigView		Установить флаги в
 Set as read	ConfigView		Отметить как прочитанное
+Match header	RuleFilter		Совпадающий заголовок
 Reply with	ConfigView		Ответить с
 If	ConfigView		Если
 header (e.g. Subject)	ConfigView		заголовок (Subject)
