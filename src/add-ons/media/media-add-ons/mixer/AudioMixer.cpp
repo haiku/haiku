@@ -649,9 +649,6 @@ AudioMixer::FormatChangeRequested(const media_source &source,
 		fCore->SetOutputBufferGroup(fBufferGroup);
 	}
 
-	fCore->Unlock();
-	return status;
-
 err:
 	fCore->Unlock();
 	return status;
