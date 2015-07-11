@@ -16,6 +16,9 @@ if $(CHECK_MALLOC) {
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) legacy ] ;
+
 		SharedLibrary [ MultiArchDefaultGristFiles libmedia.so ] :
 			# Private Media Kit
 			!missing_symbols.cpp
