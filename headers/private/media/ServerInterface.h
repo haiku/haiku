@@ -93,6 +93,7 @@ enum {
 	NODE_SYNC_TO,
 	NODE_SET_TIMESOURCE,
 	NODE_GET_TIMESOURCE,
+	NODE_GET_ATTRIBUTES_FOR,
 	NODE_REQUEST_COMPLETED,
 	NODE_FINAL_RELEASE,
 	NODE_MESSAGE_END,
@@ -944,6 +945,15 @@ struct node_get_timesource_request : request_data {
 
 struct node_get_timesource_reply : reply_data {
 	media_node_id			timesource_id;
+};
+
+struct node_get_attributes_for_request : request_data {
+	size_t					count;
+	area_id					area;
+};
+
+struct node_get_attributes_for_reply : reply_data {
+	size_t					filled_count;
 };
 
 struct node_final_release_command : command_data {

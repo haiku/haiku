@@ -35,6 +35,7 @@
 #include <FileInterface.h>
 #include <MediaRoster.h>
 #include <MediaNode.h>
+#include <SupportDefs.h>
 #include <TimeSource.h>
 
 #include <string.h>
@@ -707,6 +708,42 @@ BMediaNode::HandleMessage(int32 message, const void* data, size_t size)
 			return B_OK;
 		}
 
+		case NODE_GET_ATTRIBUTES_FOR:
+		{
+			const node_get_attributes_for_request *request =
+				(const node_get_attributes_for_request*) data;
+
+			TRACE("BMediaNode::HandleMessage NODE_GET_ATTRIBUTES_FOR,"
+				"node %ld\n", fNodeID);
+
+			node_get_attributes_for_reply reply;
+
+			media_node_attribute* addr;
+			area_id dataArea = clone_area("client attributes area",
+				(void**)&addr, B_ANY_ADDRESS, B_WRITE_AREA,
+				request->area);
+
+			if (dataArea < 0) {
+				ERROR("NODE_GET_ATTRIBUTES_FOR can't clone area\n");
+				return B_NO_MEMORY;
+			}
+
+			status_t status = GetNodeAttributes(addr, request->count);
+			if (status == B_OK) {
+				// NOTE: we do it because there's not an easy way
+				// to guess the number of attributes filled.
+				size_t i;
+				for (i = 0; i < request->count; i++) {
+					if (addr[i].what <= 0)
+						break;
+				}
+				reply.filled_count = i;
+			}
+			request->SendReply(status, &reply, sizeof(reply));
+			delete_area(dataArea);
+			return B_OK;
+		}
+
 		case NODE_REQUEST_COMPLETED:
 		{
 			const node_request_completed_command* command
@@ -831,7 +868,7 @@ BMediaNode::GetNodeAttributes(media_node_attribute* outAttributes,
 {
 	CALLED();
 	// This is implemented by derived classes that fills
-	// it's own attributes to a max of inMaxCount size.
+	// it's own attributes to a max of inMaxCount elements.
 	return B_ERROR;
 }
 

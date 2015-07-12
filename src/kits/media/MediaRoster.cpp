@@ -3123,8 +3123,41 @@ ssize_t
 BMediaRoster::GetNodeAttributesFor(const media_node& node,
 	media_node_attribute* _array, size_t maxCount)
 {
-	UNIMPLEMENTED();
-	return B_ERROR;
+	CALLED();
+
+	if (IS_INVALID_NODE(node))
+		return B_MEDIA_BAD_NODE;
+
+	node_get_attributes_for_request request;
+	node_get_attributes_for_reply reply;
+	status_t status;
+
+	media_node_attribute* addr = NULL;
+	size_t totalSize = maxCount*sizeof(media_node_attribute);
+	size_t size = (totalSize + (B_PAGE_SIZE - 1)) & ~(B_PAGE_SIZE - 1);
+
+	area_id dataArea = create_area("attributes area", (void**)&addr,
+		B_ANY_ADDRESS, size, B_NO_LOCK,
+		B_READ_AREA | B_WRITE_AREA);
+	// No need to memset the padding
+	memset(addr, 0, totalSize);
+
+	if (dataArea < 0)
+		return B_NO_MEMORY;
+
+	request.count = maxCount;
+	request.area = dataArea;
+
+	status = QueryPort(node.port, NODE_GET_ATTRIBUTES_FOR, &request,
+		sizeof(request), &reply, sizeof(reply));
+	if (status != B_OK)
+		return status;
+
+	memcpy(_array, addr, reply.filled_count
+		* sizeof(media_node_attribute));
+
+	delete_area(dataArea);
+	return reply.filled_count;
 }
 
 
