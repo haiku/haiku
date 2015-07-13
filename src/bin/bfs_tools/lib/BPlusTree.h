@@ -16,12 +16,12 @@
 class BPositionIO;
 
 
-//****************** on-disk structures ********************
+// ****************** on-disk structures ********************
 
 #define BPLUSTREE_NULL			-1LL
 #define BPLUSTREE_FREE			-2LL
 
-struct bplustree_header 
+struct __attribute__((packed)) bplustree_header
 {
 	uint32		magic;
 	uint32		node_size;
@@ -30,7 +30,7 @@ struct bplustree_header
 	off_t		root_node_pointer;
 	off_t		free_node_pointer;
 	off_t		maximum_size;
-	
+
 	inline bool IsValidLink(off_t link);
 };
 
@@ -49,21 +49,21 @@ enum bplustree_types {
 	BPLUSTREE_DOUBLE_TYPE	= 6
 };
 
-struct bplustree_node {
+struct __attribute((packed)) bplustree_node {
 	off_t	left_link;
 	off_t	right_link;
 	off_t	overflow_link;
 	uint16	all_key_count;
 	uint16	all_key_length;
-	
+
 	inline uint16 *KeyLengths() const;
 	inline off_t *Values() const;
 	inline uint8 *Keys() const;
 	inline int32 Used() const;
-	uint8 *KeyAt(int32 index,uint16 *keyLength) const;
-	
-	uint8 CountDuplicates(off_t offset,bool isFragment) const;
-	off_t DuplicateAt(off_t offset,bool isFragment,int8 index) const;
+	uint8 *KeyAt(int32 index, uint16 *keyLength) const;
+
+	uint8 CountDuplicates(off_t offset, bool isFragment) const;
+	off_t DuplicateAt(off_t offset, bool isFragment, int8 index) const;
 
 	static inline uint8 LinkType(off_t link);
 	static inline off_t FragmentOffset(off_t link);
@@ -73,12 +73,12 @@ struct bplustree_node {
 #define BPLUSTREE_DUPLICATE_NODE 2
 #define BPLUSTREE_DUPLICATE_FRAGMENT 3
 
-//**************************************
+// **************************************
 
 enum bplustree_traversing {
 	BPLUSTREE_FORWARD = 1,
 	BPLUSTREE_BACKWARD = -1,
-	
+
 	BPLUSTREE_BEGIN = 0,
 	BPLUSTREE_END = 1
 };
@@ -89,10 +89,10 @@ class BPlusTree;
 class NodeCache : public Cache<off_t> {
 	public:
 		NodeCache(BPlusTree *);
-		
+
 		virtual Cacheable *NewCacheable(off_t offset);
 		bplustree_node *Get(off_t offset);
-//		void SetOffset(bplustree_node *,off_t offset);
+//		void SetOffset(bplustree_node *, off_t offset);
 
 	protected:
 		BPlusTree	*fTree;

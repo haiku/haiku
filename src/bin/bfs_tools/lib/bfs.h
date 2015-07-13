@@ -85,7 +85,7 @@ struct __attribute__((packed)) data_stream
 	int64		size;
 };
 
-//**************************************
+// **************************************
 
 struct bfs_inode;
 
@@ -95,7 +95,7 @@ struct __attribute__((packed)) small_data
 	uint16		name_size;
 	uint16		data_size;
 	char		name[0];	// name_size long, followed by data
-	
+
 	inline char		*Name();
 	inline uint8	*Data();
 	inline small_data *Next();
@@ -104,10 +104,10 @@ struct __attribute__((packed)) small_data
 
 // the file name is part of the small_data structure
 #define FILE_NAME_TYPE			'CSTR'
-#define FILE_NAME_NAME			0x13 
-#define FILE_NAME_NAME_LENGTH	1 
+#define FILE_NAME_NAME			0x13
+#define FILE_NAME_NAME_LENGTH	1
 
-//**************************************
+// **************************************
 
 #define SHORT_SYMLINK_NAME_LENGTH	144 // length incl. terminating '\0'
 
@@ -124,17 +124,17 @@ struct __attribute__((packed)) bfs_inode
 	inode_addr	parent;
 	inode_addr	attributes;
 	uint32		type;				// attribute type
-	
+
 	int32		inode_size;
 	uint32		etc;				// for in-memory structures (unused in OpenBeOS' fs)
 
-	union {
+	union __attribute__((packed)) {
 		data_stream		data;
 		char 			short_symlink[SHORT_SYMLINK_NAME_LENGTH];
 	};
 	int32		pad[4];
 	small_data	small_data_start[0];
-};	
+};
 
 #define INODE_MAGIC1			0x3bbe0ad9
 #define INODE_TIME_SHIFT		16
