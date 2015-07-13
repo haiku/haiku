@@ -1,10 +1,14 @@
-#include <string.h>
 #include <Application.h>
+#include <MediaDefs.h>
 #include <MediaRoster.h>
 #include <TimeSource.h>
+
+#include <string.h>
+
 #include "ConsumerNode.h"
-#include "ProducerNode.h"
 #include "misc.h"
+#include "ProducerNode.h"
+
 
 BMediaRoster *roster;
 ProducerNode *producer;
@@ -171,6 +175,12 @@ int main()
 	rv = roster->GetFreeInputsFor(sourceNode,inputs,2,&count,B_MEDIA_RAW_AUDIO);
 	val(rv);
 	out("Found %ld\n",count);
+
+	out("Calling GetAttNodeAttributesFor(source)\n");
+	media_node_attribute attr[10];
+	ssize_t size = roster->GetNodeAttributesFor(sourceNode, attr, 10);
+	val_size(size);
+	out("Found %" B_PRIdSSIZE "\n", size);
 
 	media_format format;
 	format.type = B_MEDIA_RAW_AUDIO; 

@@ -13,8 +13,16 @@ void val(status_t status)
 {
 	if (status == B_OK)
 		out("OK\n");
-	else 
+	else
 		out("failed, 0x%08x, %s\n",status,strerror(status));
+}
+
+void val_size(ssize_t size)
+{
+	if (size >= 0)
+		out("OK\n");
+	else
+		out("failed, size %" B_PRIdSSIZE ", error %s\n", size, strerror(size));
 }
 
 void wait()

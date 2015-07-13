@@ -4,6 +4,7 @@
 
 #include <Buffer.h>
 #include <BufferGroup.h>
+#include <MediaNode.h>
 #include <TimeSource.h>
 
 #include "misc.h"
@@ -42,6 +43,19 @@ ProducerNode::NodeRegistered()
 	InitializeOutput();
 	SetPriority(108);
 	Run();
+}
+
+
+status_t
+ProducerNode::GetNodeAttributes(
+	media_node_attribute* attributes, size_t count)
+{
+	uint32 what = media_node_attribute::B_FIRST_USER_ATTRIBUTE;
+	for (size_t i = 0; i < count; i++) {
+		attributes[i].what = what;
+		what++;
+	}
+	return B_OK;
 }
 
 

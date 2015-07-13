@@ -15,6 +15,10 @@ virtual	BMediaAddOn* AddOn(
 
 virtual		void NodeRegistered();
 
+virtual status_t GetNodeAttributes(
+				media_node_attribute* attributes,
+				size_t count);
+
 	/* functionality of BBufferProducer */
 virtual	status_t FormatSuggestionRequested(
 				media_type type,
@@ -84,9 +88,10 @@ virtual	void LatencyChanged(
 				uint32 flags);
 				
 	/* functionality of BMediaEventLooper */
-virtual void HandleEvent(const media_timed_event *event,
-						 bigtime_t lateness,
-						 bool realTimeEvent = false);
+virtual void HandleEvent(
+				const media_timed_event *event,
+				bigtime_t lateness,
+				bool realTimeEvent = false);
 
 	/* our own functionality */
 void InitializeOutput();
