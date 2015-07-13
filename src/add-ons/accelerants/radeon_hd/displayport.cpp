@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -31,7 +31,7 @@
 #define ERROR(x...) _sPrintf("radeon_hd: " x)
 
 
-static status_t
+static ssize_t
 dp_aux_speak(uint32 connectorIndex, uint8* send, int sendBytes,
 	uint8* recv, int recvBytes, uint8 delay, uint8* ack)
 {
@@ -53,11 +53,11 @@ dp_aux_speak(uint32 connectorIndex, uint8* send, int sendBytes,
 	union auxChannelTransaction args;
 	memset(&args, 0, sizeof(args));
 
-	args.v1.lpAuxRequest = B_HOST_TO_LENDIAN_INT16(0 + 4);
-	args.v1.lpDataOut = B_HOST_TO_LENDIAN_INT16(16 + 4);
-	args.v1.ucDataOutLen = 0;
-	args.v1.ucChannelID = dpInfo->auxPin;
-	args.v1.ucDelay = delay / 10;
+	args.v2.lpAuxRequest = B_HOST_TO_LENDIAN_INT16(0 + 4);
+	args.v2.lpDataOut = B_HOST_TO_LENDIAN_INT16(16 + 4);
+	args.v2.ucDataOutLen = 0;
+	args.v2.ucChannelID = dpInfo->auxPin;
+	args.v2.ucDelay = delay / 10;
 
 	uint16 hpdPinIndex = gConnector[connectorIndex]->hpdPinIndex;
 	if (info.dceMajor >= 4
@@ -105,17 +105,17 @@ dp_aux_speak(uint32 connectorIndex, uint8* send, int sendBytes,
 
 	atom_execute_table(gAtomContext, index, (uint32*)&args);
 
-	*ack = args.v1.ucReplyStatus;
+	*ack = args.v2.ucReplyStatus;
 
-	switch (args.v1.ucReplyStatus) {
+	switch (args.v2.ucReplyStatus) {
 		case 1:
-			ERROR("%s: dp_aux_ch timeout!\n", __func__);
+			ERROR("%s: dp_aux channel timeout!\n", __func__);
 			return B_TIMED_OUT;
 		case 2:
-			ERROR("%s: dp_aux_ch flags not zero!\n", __func__);
+			ERROR("%s: dp_aux channel flags not zero!\n", __func__);
 			return B_BUSY;
 		case 3:
-			ERROR("%s: dp_aux_ch error!\n", __func__);
+			ERROR("%s: dp_aux channel error!\n", __func__);
 			return B_IO_ERROR;
 	}
 
@@ -128,7 +128,7 @@ dp_aux_speak(uint32 connectorIndex, uint8* send, int sendBytes,
 	if (recv && recvBytes)
 		memcpy(recv, base + 16, recvLength);
 
-	return B_OK;
+	return recvLength;
 }
 
 
@@ -141,8 +141,9 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 		return B_ERROR;
 	}
 
-	if (message->buffer == NULL) {
-		ERROR("%s: DP message uninitalized buffer!\n", __func__);
+	if (message->size > 16) {
+		ERROR("%s: Too many bytes! (%" B_PRIuSIZE ")\n", __func__,
+			message->size);
 		return B_ERROR;
 	}
 
@@ -151,14 +152,12 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 	switch(message->request) {
 		case AUX_NATIVE_WRITE:
 		case AUX_I2C_WRITE:
+			if (message->buffer == NULL) {
+				ERROR("%s: DP message uninitalized buffer!\n", __func__);
+				return B_ERROR;
+			}
 			transactionSize += message->size;
 			break;
-	}
-
-	if (transactionSize > 20) {
-		ERROR("%s: Too many bytes! (%" B_PRIu8 ")\n", __func__,
-			transactionSize);
-		return B_ERROR;
 	}
 
 	uint8 auxMessage[20];
@@ -175,11 +174,11 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 	uint8 retry;
 	for (retry = 0; retry < 7; retry++) {
 		uint8 ack;
-		status_t result = B_ERROR;
-		switch(message->request) {
+		ssize_t result = B_ERROR;
+		switch(message->request & ~AUX_I2C_MOT) {
 			case AUX_NATIVE_WRITE:
 			case AUX_I2C_WRITE:
-				memcpy(&auxMessage[4], message->buffer, message->size);
+				memcpy(auxMessage + 4, message->buffer, message->size);
 				result = dp_aux_speak(connectorIndex, auxMessage,
 					transactionSize, NULL, 0, delay, &ack);
 				break;
@@ -189,22 +188,32 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 					transactionSize, (uint8*)message->buffer, message->size,
 					delay, &ack);
 				break;
+			default:
+				ERROR("%s: Unknown dp_aux_msg request!\n", __func__);
+				return B_ERROR;
 		}
+
+		TRACE("%s: dp_aux_speak result: %" B_PRIdSSIZE "\n", __func__, result);
 
 		if (result == B_BUSY)
 			continue;
-		else if (result != B_OK)
+		else if (result < B_OK)
 			return result;
 
 		ack >>= 4;
 		message->reply = ack;
-		if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_ACK)
-			return B_OK;
-		else if ((ack & AUX_NATIVE_REPLY_MASK) == AUX_NATIVE_REPLY_DEFER) {
-			TRACE("%s: aux reply defer received. Snoozing.\n", __func__);
-			snooze(400);
-		} else
-			return B_IO_ERROR;
+		switch(message->reply & AUX_NATIVE_REPLY_MASK) {
+			case AUX_NATIVE_REPLY_ACK:
+				return B_OK;
+			case AUX_NATIVE_REPLY_DEFER:
+				TRACE("%s: aux reply defer received. Snoozing.\n", __func__);
+				snooze(400);
+				break;
+			default:
+				TRACE("%s: aux invalid native reply: 0x%02x\n", __func__,
+					message->reply);
+				return B_IO_ERROR;
+		}
 	}
 
 	ERROR("%s: IO Error. %" B_PRIu8 " attempts\n", __func__, retry);
@@ -215,6 +224,9 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 void
 dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 {
+	TRACE("%s: connector(%" B_PRId32 "): 0x%" B_PRIx16 " -> 0x%" B_PRIx8 "\n",
+		__func__, connectorIndex, address, value);
+
 	dp_aux_msg message;
 	message.address = address;
 	message.buffer = &value;
@@ -233,13 +245,16 @@ dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 uint8
 dpcd_reg_read(uint32 connectorIndex, uint16 address)
 {
-	// TODO: Review dpcd response size response[3]?
-	uint8 response;
+	TRACE("%s: connector(%" B_PRId32 "): read 0x%" B_PRIx16 ".\n",
+		__func__, connectorIndex, address);
+
+	uint8 response[3];
 
 	dp_aux_msg message;
 	message.address = address;
-	message.request = AUX_NATIVE_READ;
 	message.buffer = &response;
+	message.request = AUX_NATIVE_READ;
+	message.size = 1;
 
 	status_t result = dp_aux_transaction(connectorIndex, &message);
 	if (result != B_OK) {
@@ -249,7 +264,7 @@ dpcd_reg_read(uint32 connectorIndex, uint16 address)
 
 	TRACE("%s: aux message reply: 0x%" B_PRIx8 "\n", __func__, message.reply);
 
-	return response;
+	return response[0];
 }
 
 
@@ -257,77 +272,46 @@ status_t
 dp_aux_get_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 	bool start, bool stop)
 {
-	// TODO: Leverage dp_aux_transaction
-	uint8 auxMessage[5];
-	int auxMessageBytes = 4; // 4 for read
-
-	/* Set up the command byte */
-	auxMessage[2] = AUX_I2C_READ << 4;
-	if (stop == false)
-		auxMessage[2] |= AUX_I2C_MOT << 4;
-
-	auxMessage[0] = address;
-	auxMessage[1] = address >> 8;
-
-	auxMessage[3] = auxMessageBytes << 4;
-
-	/* special case for sending the START or STOP */
-	if (start || stop) {
-		auxMessage[3] = 3 << 4;
-		auxMessageBytes = 4;
+	uint8 reply[3];
+	dp_aux_msg message;
+	message.address = address;
+	message.buffer = reply;
+	message.request = AUX_I2C_READ;
+	message.size = 1;
+	if (stop == false) {
+		// Remove Middle-Of-Transmission on final transaction
+		message.request |= AUX_I2C_MOT;
+	}
+	if  (stop || start) {
+		// Bare address packet
+		message.buffer = NULL;
+		message.size = 0;
 	}
 
-	int retry;
-	for (retry = 0; retry < 4; retry++) {
-		uint8 ack;
-		uint8 reply[2];
-		int replyBytes = 1;
-
-		status_t result = dp_aux_speak(connectorIndex, auxMessage,
-			auxMessageBytes, reply, replyBytes, 0, &ack);
-		if (result == B_BUSY)
-			continue;
-		else if (result != B_OK) {
-			ERROR("%s: aux_ch speak failed 0x%" B_PRIx32 "\n", __func__, result);
-			return B_ERROR;
+	for (int attempt = 0; attempt < 7; attempt++) {
+		status_t result = dp_aux_transaction(connectorIndex, &message);
+		if (result != B_OK) {
+			ERROR("%s: aux_ch transaction failed!\n", __func__); 
+			return result;
 		}
 
-		switch (ack & AUX_NATIVE_REPLY_MASK) {
-			case AUX_NATIVE_REPLY_ACK:
-				// I2C-over-AUX Reply field is only valid for AUX_ACK
-				break;
-			case AUX_NATIVE_REPLY_NACK:
-				TRACE("%s: aux_ch native nack\n", __func__);
-				return B_IO_ERROR;
-			case AUX_NATIVE_REPLY_DEFER:
-				TRACE("%s: aux_ch native defer\n", __func__);
-				snooze(400);
-				continue;
-			default:
-				TRACE("%s: aux_ch invalid native reply: 0x%02x\n",
-					__func__, ack);
-				return B_ERROR;
-		}
-
-		switch (ack & AUX_I2C_REPLY_MASK) {
+		switch (message.reply & AUX_I2C_REPLY_MASK) {
 			case AUX_I2C_REPLY_ACK:
 				*data = reply[0];
 				return B_OK;
 			case AUX_I2C_REPLY_NACK:
-				TRACE("%s: aux_i2c nack\n", __func__);
+				TRACE("%s: aux i2c nack\n", __func__);
 				return B_IO_ERROR;
 			case AUX_I2C_REPLY_DEFER:
-				TRACE("%s: aux_i2c defer\n", __func__);
+				TRACE("%s: aux i2c defer\n", __func__);
 				snooze(400);
 				break;
 			default:
-				TRACE("%s: aux_i2c invalid native reply: 0x%02x\n",
-					__func__, ack);
+				TRACE("%s: aux invalid I2C reply: 0x%02x\n",
+					__func__, message.reply);
 				return B_ERROR;
 		}
 	}
-
-	TRACE("%s: aux i2c too many retries, giving up.\n", __func__);
 	return B_ERROR;
 }
 
@@ -336,79 +320,40 @@ status_t
 dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 	bool start, bool stop)
 {
-	// TODO: Leverage dp_aux_transaction
-	uint8 auxMessage[5];
-	int auxMessageBytes = 5; // 5 for write
-
-	/* Set up the command byte */
-	auxMessage[2] = AUX_I2C_WRITE << 4;
+	dp_aux_msg message;
+	message.address = address;
+	message.buffer = data;
+	message.request = AUX_I2C_WRITE;
 	if (stop == false)
-		auxMessage[2] |= AUX_I2C_MOT << 4;
+		message.request |= AUX_I2C_MOT;
+	message.size = 1;
+	if (stop || start)
+		message.size = 0;
 
-	auxMessage[0] = address;
-	auxMessage[1] = address >> 8;
-
-	auxMessage[3] = auxMessageBytes << 4;
-	auxMessage[4] = *data;
-
-	/* special case for sending the START or STOP */
-	if (start || stop) {
-		auxMessage[3] = 3 << 4;
-		auxMessageBytes = 4;
-	}
-
-	int retry;
-	for (retry = 0; retry < 4; retry++) {
-		uint8 ack;
-		uint8 reply[2];
-		int replyBytes = 1;
-
-		status_t result = dp_aux_speak(connectorIndex, auxMessage,
-			auxMessageBytes, reply, replyBytes, 0, &ack);
-		if (result == B_BUSY)
-			continue;
-		else if (result != B_OK) {
-			ERROR("%s: aux_ch speak failed 0x%" B_PRIx32 "\n", __func__, result);
-			return B_ERROR;
+	for (int attempt = 0; attempt < 7; attempt++) {
+		status_t result = dp_aux_transaction(connectorIndex, &message);
+		if (result != B_OK) {
+			ERROR("%s: aux_ch transaction failed!\n", __func__); 
+			return result;
 		}
-
-		switch (ack & AUX_NATIVE_REPLY_MASK) {
-			case AUX_NATIVE_REPLY_ACK:
-				// I2C-over-AUX Reply field is only valid for AUX_ACK
-				break;
-			case AUX_NATIVE_REPLY_NACK:
-				TRACE("%s: aux_ch native nack\n", __func__);
-				return B_IO_ERROR;
-			case AUX_NATIVE_REPLY_DEFER:
-				TRACE("%s: aux_ch native defer\n", __func__);
-				snooze(400);
-				continue;
-			default:
-				TRACE("%s: aux_ch invalid native reply: 0x%02x\n",
-					__func__, ack);
-				return B_ERROR;
-		}
-
-		switch (ack & AUX_I2C_REPLY_MASK) {
+		switch (message.reply & AUX_I2C_REPLY_MASK) {
 			case AUX_I2C_REPLY_ACK:
-				// Success!
 				return B_OK;
 			case AUX_I2C_REPLY_NACK:
-				TRACE("%s: aux_i2c nack\n", __func__);
+				ERROR("%s: aux i2c nack\n", __func__);
 				return B_IO_ERROR;
 			case AUX_I2C_REPLY_DEFER:
-				TRACE("%s: aux_i2c defer\n", __func__);
+				TRACE("%s: aux i2c defer\n", __func__);
 				snooze(400);
 				break;
 			default:
-				TRACE("%s: aux_i2c invalid native reply: 0x%02x\n",
-					__func__, ack);
-				return B_ERROR;
+				ERROR("%s: aux invalid I2C reply: 0x%02x\n", __func__,
+					message.reply);
+				return B_IO_ERROR;
 		}
 	}
 
-	TRACE("%s: aux i2c too many retries, giving up.\n", __func__);
-	return B_OK;
+	return B_ERROR;
 }
 
 
@@ -1046,10 +991,10 @@ ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 	dp_aux_get_i2c_byte(connectorIndex, 0x50, rdata, true, false);
 	dp_aux_get_i2c_byte(connectorIndex, 0x50, rdata, false, false);
 	dp_aux_get_i2c_byte(connectorIndex, 0x50, rdata, false, true);
+
 	dp_aux_set_i2c_byte(connectorIndex, 0x50, &sdata, true, false);
 	dp_aux_set_i2c_byte(connectorIndex, 0x50, &sdata, false, false);
 	dp_aux_get_i2c_byte(connectorIndex, 0x50, rdata, true, false);
-
 	for (uint32 i = 0; i < sizeof(raw); i++) {
 		status_t result = dp_aux_get_i2c_byte(connectorIndex, 0x50,
 			rdata++, false, false);
@@ -1061,6 +1006,9 @@ ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 		}
 	}
 	dp_aux_get_i2c_byte(connectorIndex, 0x50, &sdata, false, true);
+
+	TRACE("%s: EDID version %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
+		raw.version.version, raw.version.revision);
 
 	if (raw.version.version != 1 || raw.version.revision > 4) {
 		ERROR("%s: EDID version or revision out of range\n", __func__);
