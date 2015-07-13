@@ -440,7 +440,15 @@ checkStructure(Disk &disk)
 
 		if (node->IsDirectory() && !node->IsIndex()) {
 			// check if all entries are in the hashtable
-			checkDirectoryContents(disk, (Directory*)node);
+			Directory* directory = dynamic_cast<Directory*>(node);
+			if (directory != NULL)
+				checkDirectoryContents(disk, directory);
+			else {
+				printf("Node \"%s\" at %" B_PRId32
+					",%d looks like a directory, but isn't.\n",
+					node->Name(), node->BlockRun().allocation_group,
+					node->BlockRun().start);
+			}
 		}
 
 		// check for the parent directory

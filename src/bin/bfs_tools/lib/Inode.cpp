@@ -108,7 +108,7 @@ Inode::SetTo(bfs_inode *inode)
 
 
 status_t
-Inode::InitCheck()
+Inode::InitCheck() const
 {
 	if (!fInode)
 		return B_ERROR;
@@ -304,6 +304,10 @@ Inode::SetName(const char *name)
 const char *
 Inode::Name() const
 {
+	if (InitCheck() != B_OK) {
+		puts("Not getting name because node is invalid");
+		return NULL;
+	}
 	small_data *data = fInode->small_data_start;
 	while (!data->IsLast(fInode)) {
 		if (data->type == FILE_NAME_TYPE
@@ -929,7 +933,7 @@ File::~File()
 
 
 status_t
-File::InitCheck()
+File::InitCheck() const
 {
 	status_t status = DataStream::InitCheck();
 	if (status == B_OK)
@@ -1006,7 +1010,7 @@ Attribute::~Attribute()
 
 
 status_t
-Attribute::InitCheck()
+Attribute::InitCheck() const
 {
 	status_t status = DataStream::InitCheck();
 	if (status == B_OK)
@@ -1053,7 +1057,7 @@ Directory::~Directory()
 
 
 status_t
-Directory::InitCheck()
+Directory::InitCheck() const
 {
 	status_t status = DataStream::InitCheck();
 	if (status == B_OK)
@@ -1322,7 +1326,7 @@ Symlink::~Symlink()
 
 
 status_t
-Symlink::InitCheck()
+Symlink::InitCheck() const
 {
 	status_t status = Inode::InitCheck();
 	if (status == B_OK)

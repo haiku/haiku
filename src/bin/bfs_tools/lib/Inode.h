@@ -20,7 +20,7 @@ class Inode {
 		virtual ~Inode();
 
 		status_t SetTo(bfs_inode *inode);
-		virtual status_t InitCheck();
+		virtual status_t InitCheck() const;
 
 		bool			IsFile() const { return S_ISREG(fInode->mode); }
 		bool			IsDirectory() const { return S_ISDIR(fInode->mode); }
@@ -131,7 +131,7 @@ class File : public DataStream {
 		File(const Inode &inode);
 		~File();
 
-		virtual status_t	InitCheck();
+		virtual status_t	InitCheck() const;
 		virtual status_t	CopyTo(const char *path, bool fullPath = true,
 								Inode::Source *source = NULL);
 };
@@ -143,7 +143,7 @@ class Attribute : public File {
 		Attribute(const Inode &inode);
 		~Attribute();
 
-		virtual status_t	InitCheck();
+		virtual status_t	InitCheck() const;
 		virtual status_t	CopyTo(const char *path, bool fullPath = true,
 								Inode::Source *source = NULL);
 
@@ -157,7 +157,7 @@ class Directory : public DataStream {
 		Directory(const Inode &inode);
 		~Directory();
 
-		virtual status_t	InitCheck();
+		virtual status_t	InitCheck() const;
 		virtual status_t	CopyTo(const char *path, bool fullPath = true,
 								Inode::Source *source = NULL);
 
@@ -186,7 +186,7 @@ class Symlink : public Inode {
 		Symlink(const Inode &inode);
 		~Symlink();
 
-		virtual status_t	InitCheck();
+		virtual status_t	InitCheck() const;
 		virtual status_t	CopyTo(const char *path, bool fullPath = true,
 								Inode::Source *source = NULL);
 
