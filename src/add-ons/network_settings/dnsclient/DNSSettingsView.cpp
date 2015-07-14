@@ -196,7 +196,7 @@ DNSSettingsView::_LoadDNSConfiguration()
 	if (res_init() != 0)
 		return B_ERROR;
 
-	res_state state = __res_state();
+	res_state state = __res_get_state();
 
 	if (state != NULL) {
 		for (int i = 0; i < state->nscount; i++) {
@@ -206,6 +206,8 @@ DNSSettingsView::_LoadDNSConfiguration()
 		}
 
 		fDomain->SetText(state->dnsrch[0]);
+
+		__res_put_state(state);
 		return B_OK;
 	}
 
