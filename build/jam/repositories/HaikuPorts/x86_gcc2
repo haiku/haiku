@@ -230,6 +230,8 @@ RemotePackageRepository HaikuPorts
 	libiconv_devel-1.13.1-6
 	libid3tag-0.15.1b-1
 	libid3tag_devel-0.15.1b-1
+	libiodbc-3.52.9-1
+	libiodbc_devel-3.52.9-1
 	libiptcdata-1.0.4-1
 	libiptcdata_devel-1.0.4-1
 	liblayout-1.4.1-1
@@ -374,8 +376,12 @@ RemotePackageRepository HaikuPorts
 	pkgconfig-0.27.1-1
 	popt-1.16-1
 	popt_devel-1.16-1
+	postgresql-9.3.5-2
+	postgresql_devel-9.3.5-2
 	psiconv-0.9.8-1
 	psiconv_devel-0.9.8-1
+	psqlodbc-09.03.0400-1
+	psqlodbc_devel-09.03.0400-1
 	python-2.7.9-1
 	python_dateutil-1.5-2
 	python_lxml-3.3.5-2
@@ -1034,6 +1040,7 @@ RemotePackageRepository HaikuPorts
 	libicns
 	libiconv
 	libid3tag
+	libiodbc
 	libiptcdata
 	libmad
 	libmatroska
@@ -1164,9 +1171,11 @@ RemotePackageRepository HaikuPorts
 	pkgconfig
 	popt
 	popt_x86
+	postgresql
 	protobuf_x86
 	protrekkr_x86
 	psiconv
+	psqlodbc
 	python
 	python_dateutil
 	python_lxml
