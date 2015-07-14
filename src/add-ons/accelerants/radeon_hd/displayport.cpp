@@ -195,8 +195,6 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 				return B_ERROR;
 		}
 
-		TRACE("%s: dp_aux_speak result: %" B_PRIdSSIZE "\n", __func__, result);
-
 		if (result == B_BUSY)
 			continue;
 		else if (result < B_OK)
@@ -226,9 +224,8 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 void
 dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 {
-	TRACE("%s: connector(%" B_PRId32 "): 0x%" B_PRIx16 " -> 0x%" B_PRIx8 "\n",
-		__func__, connectorIndex, address, value);
-
+	//TRACE("%s: connector(%" B_PRId32 "): 0x%" B_PRIx16 " -> 0x%" B_PRIx8 "\n",
+	//	__func__, connectorIndex, address, value);
 	dp_aux_msg message;
 	memset(&message, 0, sizeof(message));
 
@@ -242,16 +239,14 @@ dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 		ERROR("%s: error on DisplayPort aux write (0x%" B_PRIx32 ")\n",
 			__func__, result);
 	}
-	TRACE("%s: aux message reply: 0x%" B_PRIx8 "\n", __func__, message.reply);
 }
 
 
 uint8
 dpcd_reg_read(uint32 connectorIndex, uint16 address)
 {
-	TRACE("%s: connector(%" B_PRId32 "): read 0x%" B_PRIx16 ".\n",
-		__func__, connectorIndex, address);
-
+	//TRACE("%s: connector(%" B_PRId32 "): read 0x%" B_PRIx16 ".\n",
+	//	__func__, connectorIndex, address);
 	uint8 response[3];
 
 	dp_aux_msg message;
@@ -267,8 +262,6 @@ dpcd_reg_read(uint32 connectorIndex, uint16 address)
 		ERROR("%s: error on DisplayPort aux read (0x%" B_PRIx32 ")\n",
 			__func__, result);
 	}
-
-	TRACE("%s: aux message reply: 0x%" B_PRIx8 "\n", __func__, message.reply);
 
 	return response[0];
 }
@@ -1027,9 +1020,6 @@ ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 		}
 	}
 	dp_aux_get_i2c_byte(connectorIndex, 0x50, &sdata, false, true);
-
-	TRACE("%s: EDID version %" B_PRIu8 ".%" B_PRIu8 "\n", __func__,
-		raw.version.version, raw.version.revision);
 
 	if (raw.version.version != 1 || raw.version.revision > 4) {
 		ERROR("%s: EDID version or revision out of range\n", __func__);
