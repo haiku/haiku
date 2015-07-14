@@ -21,7 +21,7 @@ enum tab_position {
 
 class BTab : public BArchivable {
 public:
-								BTab(BView* tabView = NULL);
+								BTab(BView* contentsView = NULL);
 	virtual						~BTab();
 
 								BTab(BMessage* archive);

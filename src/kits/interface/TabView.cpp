@@ -48,12 +48,12 @@ static property_info sPropertyList[] = {
 
 
 
-BTab::BTab(BView* tabView)
+BTab::BTab(BView* contentsView)
 	:
 	fEnabled(true),
 	fSelected(false),
 	fFocus(false),
-	fView(tabView),
+	fView(contentsView),
 	fTabView(NULL)
 {
 }
@@ -78,7 +78,7 @@ BTab::BTab(BMessage* archive)
 
 BTab::~BTab()
 {
-	if (!fView)
+	if (fView == NULL)
 		return;
 
 	if (fSelected)
@@ -122,7 +122,7 @@ BTab::Perform(uint32 d, void* arg)
 const char*
 BTab::Label() const
 {
-	if (fView)
+	if (fView != NULL)
 		return fView->Name();
 	else
 		return NULL;
@@ -132,7 +132,7 @@ BTab::Label() const
 void
 BTab::SetLabel(const char* label)
 {
-	if (!label || !fView)
+	if (label == NULL || fView == NULL)
 		return;
 
 	fView->SetName(label);
@@ -154,12 +154,12 @@ BTab::Select(BView* owner)
 {
 	fSelected = true;
 
-	if (!owner || !View())
+	if (owner == NULL || fView == NULL)
 		return;
 
 	// NOTE: Views are not added/removed, if there is layout,
 	// they are made visible/invisible in that case.
-	if (!owner->GetLayout() && View()->Parent() == NULL)
+	if (owner->GetLayout() == NULL && fView->Parent() == NULL)
 		owner->AddChild(fView);
 }
 
@@ -167,16 +167,16 @@ BTab::Select(BView* owner)
 void
 BTab::Deselect()
 {
-	if (View()) {
+	if (fView != NULL) {
 		// NOTE: Views are not added/removed, if there is layout,
 		// they are made visible/invisible in that case.
 		bool removeView = false;
-		BView* container = View()->Parent();
-		if (container)
+		BView* container = fView->Parent();
+		if (container != NULL)
 			removeView =
 				dynamic_cast<BCardLayout*>(container->GetLayout()) == NULL;
 		if (removeView)
-			View()->RemoveSelf();
+			fView->RemoveSelf();
 	}
 
 	fSelected = false;
@@ -214,7 +214,7 @@ BTab::IsFocus() const
 void
 BTab::SetView(BView* view)
 {
-	if (!view || fView == view)
+	if (view == NULL || fView == view)
 		return;
 
 	if (fView != NULL) {
@@ -692,16 +692,16 @@ BTabView::Select(int32 index)
 		tab->Deselect();
 
 	tab = TabAt(index);
-	if (tab && ContainerView()) {
+	if (tab != NULL && fContainerView != NULL) {
 		if (index == 0)
 			fTabOffset = 0.0f;
-		tab->Select(ContainerView());
+		tab->Select(fContainerView);
 		fSelection = index;
 
 		// make the view visible through the layout if there is one
 		BCardLayout* layout
 			= dynamic_cast<BCardLayout*>(fContainerView->GetLayout());
-		if (layout)
+		if (layout != NULL)
 			layout->SetVisibleItem(index);
 	}
 
@@ -1080,7 +1080,7 @@ BSize
 BTabView::PreferredSize()
 {
 	BSize size;
-	if (GetLayout())
+	if (GetLayout() != NULL)
 		size = GetLayout()->PreferredSize();
 	else {
 		size = _TabsMinSize();
@@ -1271,7 +1271,7 @@ BView*
 BTabView::ViewForTab(int32 tabIndex) const
 {
 	BTab* tab = TabAt(tabIndex);
-	if (tab)
+	if (tab != NULL)
 		return tab->View();
 
 	return NULL;
@@ -1281,7 +1281,7 @@ BTabView::ViewForTab(int32 tabIndex) const
 void
 BTabView::_InitObject(bool layouted, button_width width)
 {
-	if (!be_control_look)
+	if (be_control_look == NULL)
 		SetFont(be_bold_font);
 
 	fTabList = new BList;
@@ -1312,17 +1312,17 @@ BTabView::_InitContainerView(bool layouted)
 	bool needsLayout = false;
 	bool createdContainer = false;
 	if (layouted) {
-		if (!GetLayout()) {
+		if (GetLayout() == NULL) {
 			SetLayout(new(nothrow) BGroupLayout(B_HORIZONTAL));
 			needsLayout = true;
 		}
 
-		if (!fContainerView) {
+		if (fContainerView == NULL) {
 			fContainerView = new BView("view container", B_WILL_DRAW);
 			fContainerView->SetLayout(new(std::nothrow) BCardLayout());
 			createdContainer = true;
 		}
-	} else if (!fContainerView) {
+	} else if (fContainerView == NULL) {
 		fContainerView = new BView(Bounds(), "view container", B_FOLLOW_ALL,
 			B_WILL_DRAW);
 		createdContainer = true;
@@ -1392,7 +1392,7 @@ BTabView::_LayoutContainerView(bool layouted)
 				break;
 		}
 		BGroupLayout* layout = dynamic_cast<BGroupLayout*>(GetLayout());
-		if (layout) {
+		if (layout != NULL) {
 			layout->SetInsets(borderWidth, borderWidth + TabHeight()
 				- topBorderOffset, borderWidth, borderWidth);
 		}
