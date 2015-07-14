@@ -353,7 +353,7 @@ RemotePackageRepository HaikuPorts
 	openjpeg-2.1.0-2
 	openjpeg_devel-2.1.0-2
 	opensound-4.2_git-2
-	openssh-6.6p1-1
+	openssh-6.8p1-2
 	# sync openssl with secondary architecture (x86)
 	openssl-1.0.0s-1
 	openssl_devel-1.0.0s-1
