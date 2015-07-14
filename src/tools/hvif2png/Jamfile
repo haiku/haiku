@@ -1,0 +1,11 @@
+SubDir HAIKU_TOP src tools hvif2png ;
+
+UsePrivateBuildHeaders shared ;
+
+USES_BE_API on <build>hvif2png = true ;
+
+BuildPlatformMain <build>hvif2png :
+	hvif2png.cpp
+	:
+	$(HOST_LIBBE) $(HOST_LIBROOT) png 
+;
