@@ -11,6 +11,7 @@ Server launch_daemon
 
 	BaseJob.cpp
 	Conditions.cpp
+	Events.cpp
 	Job.cpp
 	SettingsParser.cpp
 	Target.cpp

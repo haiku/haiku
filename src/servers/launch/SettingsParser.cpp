@@ -156,6 +156,7 @@ const static settings_template kJobTemplate[] = {
 	{B_MESSAGE_TYPE, "on", kEventTemplate},
 	{B_MESSAGE_TYPE, "if", kConditionTemplate},
 	{B_BOOL_TYPE, "no_safemode", NULL},
+	{B_BOOL_TYPE, "on_demand", NULL},
 	{B_MESSAGE_TYPE, "env", kEnvTemplate},
 	{0, NULL, NULL}
 };

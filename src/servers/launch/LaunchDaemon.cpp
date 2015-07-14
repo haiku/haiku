@@ -4,6 +4,8 @@
  */
 
 
+#include "LaunchDaemon.h"
+
 #include <map>
 #include <set>
 
@@ -31,6 +33,7 @@
 #include "multiuser_utils.h"
 
 #include "Conditions.h"
+#include "Events.h"
 #include "InitRealTimeClockJob.h"
 #include "InitSharedMemoryDirectoryJob.h"
 #include "InitTemporaryDirectoryJob.h"
@@ -102,9 +105,12 @@ private:
 									BMessage& message);
 			void				_InitJobs();
 			void				_LaunchJobs(Target* target);
+			void				_TriggerJob(Job* job);
 			void				_AddLaunchJob(Job* job);
 			void				_AddTarget(Target* target);
 			void				_SetCondition(BaseJob* job,
+									const BMessage& message);
+			void				_SetEvent(BaseJob* job,
 									const BMessage& message);
 			void				_SetEnvironment(BaseJob* job,
 									const BMessage& message);
@@ -261,7 +267,7 @@ LaunchDaemon::ReadyToRun()
 	_InitJobs();
 	_LaunchJobs(NULL);
 
-	// Launch run targets
+	// Launch run targets (ignores events)
 	for (int32 index = 0; index < fRunTargets.CountStrings(); index++) {
 		Target* target = FindTarget(fRunTargets.StringAt(index));
 		if (target != NULL)
@@ -314,7 +320,7 @@ LaunchDaemon::MessageReceived(BMessage* message)
 						iterator->second.GetInt32("port", -1));
 				}
 
-				_AddLaunchJob(job);
+				_TriggerJob(job);
 			}
 			message->SendReply(&reply);
 			break;
@@ -416,6 +422,28 @@ LaunchDaemon::MessageReceived(BMessage* message)
 
 			BMessage reply((uint32)status);
 			message->SendReply(&reply);
+			break;
+		}
+
+		case kMsgEventTriggered:
+		{
+			// An internal event has been triggered.
+			// Check if its job can be launched now.
+			const char* name = message->GetString("owner");
+			if (name == NULL)
+				break;
+
+			Job* job = FindJob(name);
+			if (job != NULL && job->EventHasTriggered()) {
+				_AddLaunchJob(job);
+				break;
+			}
+
+			Target* target = FindTarget(name);
+			if (target != NULL && target->EventHasTriggered()) {
+				_LaunchJobs(target);
+				break;
+			}
 			break;
 		}
 
@@ -542,6 +570,7 @@ LaunchDaemon::_AddTargets(BMessage& message)
 		}
 
 		_SetCondition(target, targetMessage);
+		_SetEvent(target, targetMessage);
 		_SetEnvironment(target, targetMessage);
 		_AddJobs(target, targetMessage);
 	}
@@ -620,6 +649,7 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 		job->SetCreateDefaultPort(!message.GetBool("legacy", !service));
 
 	_SetCondition(job, message);
+	_SetEvent(job, message);
 	_SetEnvironment(job, message);
 
 	BMessage portMessage;
@@ -683,6 +713,9 @@ LaunchDaemon::_InitJobs()
 }
 
 
+/*!	Adds all jobs for the specified target (may be \c NULL) to the launch
+	queue, except those that are triggered by events.
+*/
 void
 LaunchDaemon::_LaunchJobs(Target* target)
 {
@@ -692,9 +725,27 @@ LaunchDaemon::_LaunchJobs(Target* target)
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
 			iterator++) {
 		Job* job = iterator->second;
-		if (job->Target() == target)
-			_AddLaunchJob(job);
+		if (job->Target() == target && job->Event() == NULL)
+			_TriggerJob(job);
 	}
+}
+
+
+void
+LaunchDaemon::_TriggerJob(Job* job)
+{
+	if (job == NULL)
+		return;
+
+	int32 count = job->Requirements().CountStrings();
+	for (int32 index = 0; index < count; index++) {
+		Job* requirement = FindJob(job->Requirements().StringAt(index));
+		if (requirement != NULL)
+			_TriggerJob(requirement);
+	}
+
+	if (!Events::TriggerDemand(job->Event()))
+		_AddLaunchJob(job);
 }
 
 
@@ -735,6 +786,28 @@ LaunchDaemon::_SetCondition(BaseJob* job, const BMessage& message)
 
 	if (updated)
 		job->SetCondition(condition);
+}
+
+
+void
+LaunchDaemon::_SetEvent(BaseJob* job, const BMessage& message)
+{
+	Event* event = job->Event();
+	bool updated = false;
+
+	BMessage events;
+	if (message.FindMessage("on", &events) == B_OK) {
+		event = Events::FromMessage(this, events);
+		updated = true;
+	}
+
+	if (message.GetBool("on_demand")) {
+		event = Events::AddOnDemand(event);
+		updated = true;
+	}
+
+	if (updated)
+		job->SetEvent(event);
 }
 
 

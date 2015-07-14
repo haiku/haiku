@@ -15,6 +15,7 @@ using namespace BSupportKit;
 class BMessage;
 class Condition;
 class ConditionContext;
+class Event;
 
 
 class BaseJob : public BJob {
@@ -28,6 +29,11 @@ public:
 			::Condition*		Condition();
 			void				SetCondition(::Condition* condition);
 			bool				CheckCondition(ConditionContext& context) const;
+
+			const ::Event*		Event() const;
+			::Event*			Event();
+			void				SetEvent(::Event* event);
+			bool				EventHasTriggered() const;
 
 			const BStringList&	Environment() const;
 			BStringList&		Environment();
@@ -47,6 +53,7 @@ private:
 
 protected:
 			::Condition*		fCondition;
+			::Event*			fEvent;
 			BStringList			fEnvironment;
 			BStringList			fSourceFiles;
 };

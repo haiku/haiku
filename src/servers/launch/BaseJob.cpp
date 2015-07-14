@@ -14,6 +14,7 @@
 #include <Message.h>
 
 #include "Conditions.h"
+#include "Events.h"
 
 
 BaseJob::BaseJob(const char* name)
@@ -65,6 +66,35 @@ BaseJob::CheckCondition(ConditionContext& context) const
 		return fCondition->Test(context);
 
 	return true;
+}
+
+
+const ::Event*
+BaseJob::Event() const
+{
+	return fEvent;
+}
+
+
+::Event*
+BaseJob::Event()
+{
+	return fEvent;
+}
+
+
+void
+BaseJob::SetEvent(::Event* event)
+{
+	fEvent = event;
+	event->SetOwner(this);
+}
+
+
+bool
+BaseJob::EventHasTriggered() const
+{
+	return Event() != NULL && Event()->Triggered();
 }
 
 
