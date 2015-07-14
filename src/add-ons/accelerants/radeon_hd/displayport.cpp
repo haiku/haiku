@@ -508,6 +508,7 @@ dp_get_link_status(uint32 connectorIndex)
 	dp_aux_msg message;
 	memset(&message, 0, sizeof(message));
 
+	message.request = DP_AUX_NATIVE_READ;
 	message.address = DP_LANE_STATUS_0_1;
 	message.size = DP_LINK_STATUS_SIZE;
 	message.buffer = dp->linkStatus;
