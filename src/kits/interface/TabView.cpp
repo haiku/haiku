@@ -12,6 +12,7 @@
 
 
 #include <TabView.h>
+#include <TabViewPrivate.h>
 
 #include <new>
 #include <string.h>
@@ -153,12 +154,12 @@ BTab::Select(BView* owner)
 {
 	fSelected = true;
 
-	if (!owner || !View() || !owner->Window())
+	if (!owner || !View())
 		return;
 
 	// NOTE: Views are not added/removed, if there is layout,
 	// they are made visible/invisible in that case.
-	if (!owner->GetLayout()	&& View()->Parent() == NULL)
+	if (!owner->GetLayout() && View()->Parent() == NULL)
 		owner->AddChild(fView);
 }
 
@@ -223,7 +224,7 @@ BTab::SetView(BView* view)
 	fView = view;
 
 	if (fTabView != NULL && fSelected) {
-		Select(NULL);
+		Select(fTabView->ContainerView());
 		fTabView->Invalidate();
 	}
 }
@@ -1151,7 +1152,7 @@ BTabView::AddTab(BView* target, BTab* tab)
 		fContainerView->GetLayout()->AddView(CountTabs(), target);
 
 	fTabList->AddItem(tab);
-	tab->fTabView = this;
+	BTab::Private(tab).SetTabView(this);
 
 	// When we haven't had a any tabs before, but are already attached to the
 	// window, select this one.
@@ -1171,7 +1172,7 @@ BTabView::RemoveTab(int32 index)
 		return NULL;
 
 	tab->Deselect();
-	tab->fTabView = NULL;
+	BTab::Private(tab).SetTabView(NULL);
 
 	if (fContainerView->GetLayout())
 		fContainerView->GetLayout()->RemoveItem(index);

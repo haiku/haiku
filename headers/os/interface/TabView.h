@@ -52,7 +52,11 @@ public:
 	virtual	void				DrawTab(BView* owner, BRect frame,
 									tab_position position, bool full = true);
 
+	class Private;
+
 private:
+	friend class Private;
+
 	// FBC padding and forbidden methods
 	virtual	void				_ReservedTab1();
 	virtual	void				_ReservedTab2();
@@ -70,8 +74,6 @@ private:
 			BTab&				operator=(const BTab&);
 
 private:
-			friend class BTabView;
-
 			bool 				fEnabled;
 			bool				fSelected;
 			bool				fFocus;
