@@ -149,15 +149,17 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 
 	uint8 transactionSize = 4;
 
-	switch(message->request) {
+	switch(message->request & ~DP_AUX_I2C_MOT) {
 		case DP_AUX_NATIVE_WRITE:
 		case DP_AUX_I2C_WRITE:
-			if (message->buffer == NULL) {
-				ERROR("%s: DP message uninitalized buffer!\n", __func__);
-				return B_ERROR;
-			}
 			transactionSize += message->size;
 			break;
+	}
+
+	// If not bare address, check for buffer
+	if (message->size > 0 && message->buffer == NULL) {
+		ERROR("%s: DP message uninitalized buffer!\n", __func__);
+		return B_ERROR;
 	}
 
 	uint8 auxMessage[20];
@@ -332,11 +334,13 @@ dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 	message.address = address;
 	message.buffer = data;
 	message.request = DP_AUX_I2C_WRITE;
+	message.size = 1;
 	if (stop == false)
 		message.request |= DP_AUX_I2C_MOT;
-	message.size = 1;
-	if (stop || start)
+	if (stop || start) {
+		message.buffer = NULL;
 		message.size = 0;
+	}
 
 	for (int attempt = 0; attempt < 7; attempt++) {
 		status_t result = dp_aux_transaction(connectorIndex, &message);
@@ -1010,6 +1014,7 @@ ddc2_dp_read_edid1(uint32 connectorIndex, edid1_info* edid)
 	dp_aux_set_i2c_byte(connectorIndex, 0x50, &sdata, true, false);
 	dp_aux_set_i2c_byte(connectorIndex, 0x50, &sdata, false, false);
 	dp_aux_get_i2c_byte(connectorIndex, 0x50, rdata, true, false);
+
 	for (uint32 i = 0; i < sizeof(raw); i++) {
 		status_t result = dp_aux_get_i2c_byte(connectorIndex, 0x50,
 			rdata++, false, false);
