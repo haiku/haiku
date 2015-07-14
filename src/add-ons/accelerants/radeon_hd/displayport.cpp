@@ -150,8 +150,8 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 	uint8 transactionSize = 4;
 
 	switch(message->request) {
-		case AUX_NATIVE_WRITE:
-		case AUX_I2C_WRITE:
+		case DP_AUX_NATIVE_WRITE:
+		case DP_AUX_I2C_WRITE:
 			if (message->buffer == NULL) {
 				ERROR("%s: DP message uninitalized buffer!\n", __func__);
 				return B_ERROR;
@@ -175,15 +175,15 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 	for (retry = 0; retry < 7; retry++) {
 		uint8 ack;
 		ssize_t result = B_ERROR;
-		switch(message->request & ~AUX_I2C_MOT) {
-			case AUX_NATIVE_WRITE:
-			case AUX_I2C_WRITE:
+		switch(message->request & ~DP_AUX_I2C_MOT) {
+			case DP_AUX_NATIVE_WRITE:
+			case DP_AUX_I2C_WRITE:
 				memcpy(auxMessage + 4, message->buffer, message->size);
 				result = dp_aux_speak(connectorIndex, auxMessage,
 					transactionSize, NULL, 0, delay, &ack);
 				break;
-			case AUX_NATIVE_READ:
-			case AUX_I2C_READ:
+			case DP_AUX_NATIVE_READ:
+			case DP_AUX_I2C_READ:
 				result = dp_aux_speak(connectorIndex, auxMessage,
 					transactionSize, (uint8*)message->buffer, message->size,
 					delay, &ack);
@@ -202,10 +202,10 @@ dp_aux_transaction(uint32 connectorIndex, dp_aux_msg* message)
 
 		ack >>= 4;
 		message->reply = ack;
-		switch(message->reply & AUX_NATIVE_REPLY_MASK) {
-			case AUX_NATIVE_REPLY_ACK:
+		switch(message->reply & DP_AUX_NATIVE_REPLY_MASK) {
+			case DP_AUX_NATIVE_REPLY_ACK:
 				return B_OK;
-			case AUX_NATIVE_REPLY_DEFER:
+			case DP_AUX_NATIVE_REPLY_DEFER:
 				TRACE("%s: aux reply defer received. Snoozing.\n", __func__);
 				snooze(400);
 				break;
@@ -230,7 +230,7 @@ dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 	dp_aux_msg message;
 	message.address = address;
 	message.buffer = &value;
-	message.request = AUX_NATIVE_WRITE;
+	message.request = DP_AUX_NATIVE_WRITE;
 	message.size = 1;
 
 	status_t result = dp_aux_transaction(connectorIndex, &message);
@@ -253,7 +253,7 @@ dpcd_reg_read(uint32 connectorIndex, uint16 address)
 	dp_aux_msg message;
 	message.address = address;
 	message.buffer = &response;
-	message.request = AUX_NATIVE_READ;
+	message.request = DP_AUX_NATIVE_READ;
 	message.size = 1;
 
 	status_t result = dp_aux_transaction(connectorIndex, &message);
@@ -276,11 +276,11 @@ dp_aux_get_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 	dp_aux_msg message;
 	message.address = address;
 	message.buffer = reply;
-	message.request = AUX_I2C_READ;
+	message.request = DP_AUX_I2C_READ;
 	message.size = 1;
 	if (stop == false) {
 		// Remove Middle-Of-Transmission on final transaction
-		message.request |= AUX_I2C_MOT;
+		message.request |= DP_AUX_I2C_MOT;
 	}
 	if  (stop || start) {
 		// Bare address packet
@@ -295,14 +295,14 @@ dp_aux_get_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 			return result;
 		}
 
-		switch (message.reply & AUX_I2C_REPLY_MASK) {
-			case AUX_I2C_REPLY_ACK:
+		switch (message.reply & DP_AUX_I2C_REPLY_MASK) {
+			case DP_AUX_I2C_REPLY_ACK:
 				*data = reply[0];
 				return B_OK;
-			case AUX_I2C_REPLY_NACK:
+			case DP_AUX_I2C_REPLY_NACK:
 				TRACE("%s: aux i2c nack\n", __func__);
 				return B_IO_ERROR;
-			case AUX_I2C_REPLY_DEFER:
+			case DP_AUX_I2C_REPLY_DEFER:
 				TRACE("%s: aux i2c defer\n", __func__);
 				snooze(400);
 				break;
@@ -323,9 +323,9 @@ dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 	dp_aux_msg message;
 	message.address = address;
 	message.buffer = data;
-	message.request = AUX_I2C_WRITE;
+	message.request = DP_AUX_I2C_WRITE;
 	if (stop == false)
-		message.request |= AUX_I2C_MOT;
+		message.request |= DP_AUX_I2C_MOT;
 	message.size = 1;
 	if (stop || start)
 		message.size = 0;
@@ -336,13 +336,13 @@ dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 			ERROR("%s: aux_ch transaction failed!\n", __func__); 
 			return result;
 		}
-		switch (message.reply & AUX_I2C_REPLY_MASK) {
-			case AUX_I2C_REPLY_ACK:
+		switch (message.reply & DP_AUX_I2C_REPLY_MASK) {
+			case DP_AUX_I2C_REPLY_ACK:
 				return B_OK;
-			case AUX_I2C_REPLY_NACK:
+			case DP_AUX_I2C_REPLY_NACK:
 				ERROR("%s: aux i2c nack\n", __func__);
 				return B_IO_ERROR;
-			case AUX_I2C_REPLY_DEFER:
+			case DP_AUX_I2C_REPLY_DEFER:
 				TRACE("%s: aux i2c defer\n", __func__);
 				snooze(400);
 				break;
@@ -460,7 +460,7 @@ dp_setup_connectors()
 
 		dp_aux_msg message;
 		message.address = DP_DPCD_REV;
-		message.request = AUX_NATIVE_READ;
+		message.request = DP_AUX_NATIVE_READ;
 			// TODO: validate
 		message.size = DP_DPCD_SIZE;
 		message.buffer = dpInfo->config;
@@ -563,7 +563,7 @@ dp_update_vs_emph(uint32 connectorIndex)
 		dp->trainingSet[0], ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH);
 
 	dp_aux_msg message;
-	message.request = AUX_NATIVE_WRITE;
+	message.request = DP_AUX_NATIVE_WRITE;
 	message.address = DP_TRAIN_LANE0;
 	message.buffer = dp->trainingSet;
 	message.size = dp->laneCount;
