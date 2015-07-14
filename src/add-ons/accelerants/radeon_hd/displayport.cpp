@@ -228,6 +228,8 @@ dpcd_reg_write(uint32 connectorIndex, uint16 address, uint8 value)
 		__func__, connectorIndex, address, value);
 
 	dp_aux_msg message;
+	memset(&message, 0, sizeof(message));
+
 	message.address = address;
 	message.buffer = &value;
 	message.request = DP_AUX_NATIVE_WRITE;
@@ -251,6 +253,8 @@ dpcd_reg_read(uint32 connectorIndex, uint16 address)
 	uint8 response[3];
 
 	dp_aux_msg message;
+	memset(&message, 0, sizeof(message));
+
 	message.address = address;
 	message.buffer = &response;
 	message.request = DP_AUX_NATIVE_READ;
@@ -274,6 +278,8 @@ dp_aux_get_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 {
 	uint8 reply[3];
 	dp_aux_msg message;
+	memset(&message, 0, sizeof(message));
+
 	message.address = address;
 	message.buffer = reply;
 	message.request = DP_AUX_I2C_READ;
@@ -321,6 +327,8 @@ dp_aux_set_i2c_byte(uint32 connectorIndex, uint16 address, uint8* data,
 	bool start, bool stop)
 {
 	dp_aux_msg message;
+	memset(&message, 0, sizeof(message));
+
 	message.address = address;
 	message.buffer = data;
 	message.request = DP_AUX_I2C_WRITE;
@@ -459,6 +467,8 @@ dp_setup_connectors()
 		dpInfo->auxPin = auxPin;
 
 		dp_aux_msg message;
+		memset(&message, 0, sizeof(message));
+
 		message.address = DP_DPCD_REV;
 		message.request = DP_AUX_NATIVE_READ;
 			// TODO: validate
@@ -490,7 +500,10 @@ bool
 dp_get_link_status(uint32 connectorIndex)
 {
 	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
+
 	dp_aux_msg message;
+	memset(&message, 0, sizeof(message));
+
 	message.address = DP_LANE_STATUS_0_1;
 	message.size = DP_LINK_STATUS_SIZE;
 	message.buffer = dp->linkStatus;
@@ -563,6 +576,8 @@ dp_update_vs_emph(uint32 connectorIndex)
 		dp->trainingSet[0], ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH);
 
 	dp_aux_msg message;
+	memset(&message, 0, sizeof(message));
+
 	message.request = DP_AUX_NATIVE_WRITE;
 	message.address = DP_TRAIN_LANE0;
 	message.buffer = dp->trainingSet;
