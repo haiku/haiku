@@ -149,28 +149,28 @@ BTab::IsSelected() const
 
 
 void
-BTab::Select(BView*)
+BTab::Select(BView* owner)
 {
 	fSelected = true;
 
-	if (!fTabView || !View())
+	if (!owner || !View() || !owner->Window())
 		return;
 
 	// NOTE: Views are not added/removed, if there is layout,
 	// they are made visible/invisible in that case.
-	if (!fTabView->ContainerView()->GetLayout()	&& View()->Parent() == NULL)
-		fTabView->AddChild(fView);
+	if (!owner->GetLayout()	&& View()->Parent() == NULL)
+		owner->AddChild(fView);
 }
 
 
 void
 BTab::Deselect()
 {
-	if (View() && fTabView) {
+	if (View()) {
 		// NOTE: Views are not added/removed, if there is layout,
 		// they are made visible/invisible in that case.
 		bool removeView = false;
-		BView* container = fTabView->ContainerView();
+		BView* container = View()->Parent();
 		if (container)
 			removeView =
 				dynamic_cast<BCardLayout*>(container->GetLayout()) == NULL;
@@ -691,10 +691,10 @@ BTabView::Select(int32 index)
 		tab->Deselect();
 
 	tab = TabAt(index);
-	tab->Select(NULL);
 	if (tab && ContainerView()) {
 		if (index == 0)
 			fTabOffset = 0.0f;
+		tab->Select(ContainerView());
 		fSelection = index;
 
 		// make the view visible through the layout if there is one
