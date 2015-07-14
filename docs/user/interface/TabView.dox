@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
+ *		Augustin Cavalier <waddlesplash>
  *		John Scipione, jscipione@gmail.com
  *
  * Corresponds to:
@@ -67,10 +68,10 @@
 
 
 /*!
-	\fn BTab::BTab(BView* tabView)
+	\fn BTab::BTab(BView* contentsView)
 	\brief Initializes a new BTab object as part of a \a tabView.
 
-	The BTab is enabled, but not selected nor the current focus. \a tabView
+	The BTab is enabled, but not selected nor the current focus. \a contentsView
 	is set as the tab's target view -- when the tab is selected, its target
 	view is activated.
 
@@ -160,9 +161,9 @@
 
 /*!
 	\fn void BTab::Select(BView* owner)
-	\brief Selects the tab.
+	\brief Called by the BTabView when the tab is selected.
 
-	This also adds the tab's target view to the \a owner view.
+	\param owner The view that the tab's view should be owned by.
 
 	\since BeOS R3
 */
@@ -170,7 +171,7 @@
 
 /*!
 	\fn void BTab::Deselect()
-	\brief Delects the tab.
+	\brief Called by the BTabView when the tab is de-selected.
 
 	\since BeOS R3
 */
