@@ -52,7 +52,7 @@ main(int argc, const char* const* argv)
 		if (c == -1)
 			break;
 
-	
+
 		switch (c) {
 			case 'h':
 				print_usage_and_exit(false);
@@ -75,7 +75,7 @@ main(int argc, const char* const* argv)
 	}
 
 	if (getpwnam(user) == NULL) {
-		fprintf(stderr, "Error: User \"%s\" doesn't exists.\n", user);
+		fprintf(stderr, "Error: User \"%s\" doesn't exist.\n", user);
 		exit(1);
 	}
 
