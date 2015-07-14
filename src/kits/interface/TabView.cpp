@@ -52,7 +52,8 @@ BTab::BTab(BView* tabView)
 	fEnabled(true),
 	fSelected(false),
 	fFocus(false),
-	fView(tabView)
+	fView(tabView),
+	fTabView(NULL)
 {
 }
 
@@ -62,7 +63,8 @@ BTab::BTab(BMessage* archive)
 	BArchivable(archive),
 	fSelected(false),
 	fFocus(false),
-	fView(NULL)
+	fView(NULL),
+	fTabView(NULL)
 {
 	bool disable;
 
@@ -133,6 +135,9 @@ BTab::SetLabel(const char* label)
 		return;
 
 	fView->SetName(label);
+
+	if (fTabView != NULL)
+		fTabView->Invalidate();
 }
 
 
@@ -144,29 +149,28 @@ BTab::IsSelected() const
 
 
 void
-BTab::Select(BView* owner)
+BTab::Select(BView*)
 {
-	// TODO: Shouldn't we still maintain fSelected like in Deselect()?
-	if (!owner || !View() || !owner->Window())
+	fSelected = true;
+
+	if (!fTabView || !View())
 		return;
 
 	// NOTE: Views are not added/removed, if there is layout,
 	// they are made visible/invisible in that case.
-	if (!owner->GetLayout() && View()->Parent() == NULL)
-		owner->AddChild(fView);
-
-	fSelected = true;
+	if (!fTabView->ContainerView()->GetLayout()	&& View()->Parent() == NULL)
+		fTabView->AddChild(fView);
 }
 
 
 void
 BTab::Deselect()
 {
-	if (View()) {
+	if (View() && fTabView) {
 		// NOTE: Views are not added/removed, if there is layout,
 		// they are made visible/invisible in that case.
 		bool removeView = false;
-		BView* container = View()->Parent();
+		BView* container = fTabView->ContainerView();
 		if (container)
 			removeView =
 				dynamic_cast<BCardLayout*>(container->GetLayout()) == NULL;
@@ -217,6 +221,11 @@ BTab::SetView(BView* view)
 		delete fView;
 	}
 	fView = view;
+
+	if (fTabView != NULL && fSelected) {
+		Select(NULL);
+		fTabView->Invalidate();
+	}
 }
 
 
@@ -491,7 +500,7 @@ BTabView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	if (fSelection < 0)
+	if (fSelection < 0 && CountTabs() > 0)
 		Select(0);
 }
 
@@ -682,10 +691,10 @@ BTabView::Select(int32 index)
 		tab->Deselect();
 
 	tab = TabAt(index);
+	tab->Select(NULL);
 	if (tab && ContainerView()) {
 		if (index == 0)
 			fTabOffset = 0.0f;
-		tab->Select(ContainerView());
 		fSelection = index;
 
 		// make the view visible through the layout if there is one
@@ -1142,6 +1151,7 @@ BTabView::AddTab(BView* target, BTab* tab)
 		fContainerView->GetLayout()->AddView(CountTabs(), target);
 
 	fTabList->AddItem(tab);
+	tab->fTabView = this;
 
 	// When we haven't had a any tabs before, but are already attached to the
 	// window, select this one.
@@ -1161,6 +1171,7 @@ BTabView::RemoveTab(int32 index)
 		return NULL;
 
 	tab->Deselect();
+	tab->fTabView = NULL;
 
 	if (fContainerView->GetLayout())
 		fContainerView->GetLayout()->RemoveItem(index);

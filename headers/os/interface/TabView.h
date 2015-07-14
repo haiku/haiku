@@ -9,6 +9,9 @@
 #include <View.h>
 
 
+class BTabView;
+
+
 enum tab_position {
 	B_TAB_FIRST = 999,
 	B_TAB_FRONT,
@@ -67,12 +70,15 @@ private:
 			BTab&				operator=(const BTab&);
 
 private:
+			friend class BTabView;
+
 			bool 				fEnabled;
 			bool				fSelected;
 			bool				fFocus;
 			BView*				fView;
+			BTabView*			fTabView;
 
-			uint32				_reserved[12];
+			uint32				_reserved[11];
 };
 
 
