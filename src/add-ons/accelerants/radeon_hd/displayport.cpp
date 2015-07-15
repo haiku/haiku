@@ -35,8 +35,6 @@ static ssize_t
 dp_aux_speak(uint32 connectorIndex, uint8* send, int sendBytes,
 	uint8* recv, int recvBytes, uint8 delay, uint8* ack)
 {
-	radeon_shared_info &info = *gInfo->shared_info;
-
 	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
 	if (dpInfo->auxPin == 0) {
 		ERROR("%s: cannot speak on invalid GPIO pin!\n", __func__);
@@ -59,43 +57,8 @@ dp_aux_speak(uint32 connectorIndex, uint8* send, int sendBytes,
 	args.v2.ucChannelID = dpInfo->auxPin;
 	args.v2.ucDelay = delay / 10;
 
-	uint16 hpdPinIndex = gConnector[connectorIndex]->hpdPinIndex;
-	if (info.dceMajor >= 4
-		&& gGPIOInfo[hpdPinIndex]->valid) {
-
-		uint32 targetReg = EVERGREEN_DC_GPIO_HPD_A;
-		if (info.dceMajor >= 6)
-			targetReg = SI_DC_GPIO_HPD_A;
-
-		// You're drunk AMD, go home. (this makes no sense)
-		if (gGPIOInfo[hpdPinIndex]->hwReg == targetReg) {
-			switch(gGPIOInfo[hpdPinIndex]->hwMask) {
-				case (1 << 0):
-					args.v2.ucHPD_ID = 0;
-					break;
-				case (1 << 8):
-					args.v2.ucHPD_ID = 1;
-					break;
-				case (1 << 16):
-					args.v2.ucHPD_ID = 2;
-					break;
-				case (1 << 24):
-					args.v2.ucHPD_ID = 3;
-					break;
-				case (1 << 26):
-					args.v2.ucHPD_ID = 4;
-					break;
-				case (1 << 28):
-					args.v2.ucHPD_ID = 5;
-					break;
-				default:
-					args.v2.ucHPD_ID = 0xff;
-					break;
-			}
-		} else {
-			args.v2.ucHPD_ID = 0xff;
-		}
-	}
+	// Careful! This value differs in different atombios calls :-|
+	args.v2.ucHPD_ID = connector_pick_atom_hpdid(connectorIndex);
 
 	unsigned char* base = (unsigned char*)(gAtomContext->scratch + 1);
 

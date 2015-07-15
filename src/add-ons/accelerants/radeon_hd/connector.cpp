@@ -117,6 +117,60 @@ gpio_set_i2c_bit(void* cookie, int clock, int data)
 }
 
 
+uint16
+connector_pick_atom_hpdid(uint32 connectorIndex)
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	uint16 atomHPDID = 0xff;
+	uint16 hpdPinIndex = gConnector[connectorIndex]->hpdPinIndex;
+	if (info.dceMajor >= 4
+		&& gGPIOInfo[hpdPinIndex]->valid) {
+
+		// See mmDC_GPIO_HPD_A in drm for register value
+		uint32 targetReg = AVIVO_DC_GPIO_HPD_A;
+		if (info.dceMajor >= 12) {
+			ERROR("WARNING: CHECK NEW DCE mmDC_GPIO_HPD_A value!\n");
+			targetReg = CAR_mmDC_GPIO_HPD_A;
+		} else if (info.dceMajor >= 11)
+			targetReg = CAR_mmDC_GPIO_HPD_A;
+		else if (info.dceMajor >= 10)
+			targetReg = VOL_mmDC_GPIO_HPD_A;
+		else if (info.dceMajor >= 8)
+			targetReg = SEA_mmDC_GPIO_HPD_A;
+		else if (info.dceMajor >= 6)
+			targetReg = SI_DC_GPIO_HPD_A;
+		else if (info.dceMajor >= 4)
+			targetReg = EVERGREEN_DC_GPIO_HPD_A;
+
+		// You're drunk AMD, go home. (this makes no sense)
+		if (gGPIOInfo[hpdPinIndex]->hwReg == targetReg) {
+			switch(gGPIOInfo[hpdPinIndex]->hwMask) {
+				case (1 << 0):
+					atomHPDID = 0;
+					break;
+				case (1 << 8):
+					atomHPDID = 1;
+					break;
+				case (1 << 16):
+					atomHPDID = 2;
+					break;
+				case (1 << 24):
+					atomHPDID = 3;
+					break;
+				case (1 << 26):
+					atomHPDID = 4;
+					break;
+				case (1 << 28):
+					atomHPDID = 5;
+					break;
+			}
+		}
+	}
+	return atomHPDID;
+}
+
+
 bool
 connector_read_edid(uint32 connectorIndex, edid1_info* edid)
 {

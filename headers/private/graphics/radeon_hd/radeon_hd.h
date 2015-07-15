@@ -14,13 +14,16 @@
 
 #include "radeon_reg.h"
 
-//#include "r500_reg.h"  // Not used atm
-#include "avivo_reg.h"
-#include "r600_reg.h"
-#include "r700_reg.h"
-#include "evergreen_reg.h"
-#include "si_reg.h"
-#include "ni_reg.h"
+//#include "r500_reg.h"  // Not used atm. DCE 0
+#include "avivo_reg.h"		// DCE 1
+#include "r600_reg.h"		// DCE 2
+#include "r700_reg.h"		// DCE 3
+#include "evergreen_reg.h"	// DCE 4
+#include "ni_reg.h"			// DCE 5
+#include "si_reg.h"			// DCE 6
+#include "sea_reg.h"		// DCE 8
+#include "vol_reg.h"		// DCE 10
+#include "car_reg.h"		// DCE 11
 
 #include <Accelerant.h>
 #include <Drivers.h>

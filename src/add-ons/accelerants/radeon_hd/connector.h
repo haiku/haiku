@@ -69,5 +69,7 @@ status_t connector_probe_legacy();
 bool connector_is_dp(uint32 connectorIndex);
 void debug_connectors();
 
+uint16 connector_pick_atom_hpdid(uint32 connectorIndex);
+
 
 #endif /* RADEON_HD_CONNECTOR_H */

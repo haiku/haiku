@@ -637,6 +637,9 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 		dualLink = true;
 	}
 
+	// Careful! The mapping of ucHPD_ID differs between atombios calls
+	uint16 hpdID = connector_pick_atom_hpdid(connectorIndex);
+
 	switch (tableMinor) {
 		case 1:
 			args.v1.ucAction = command;
@@ -784,8 +787,11 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 					args.v4.ucBitPerColor = PANEL_16BIT_PER_COLOR;
 					break;
 			}
-			// TODO: VVV RADEON_HPD_NONE?
-			args.v4.ucHPD_ID = 0;
+
+			if (hpdID == 0xff)
+				args.v4.ucHPD_ID = 0;
+			else
+				args.v4.ucHPD_ID = hpdID + 1;
 			break;
 		default:
 			ERROR("%s: unknown tableMinor!\n", __func__);
