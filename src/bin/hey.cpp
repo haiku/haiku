@@ -175,9 +175,9 @@ parse(BMessenger& the_application, int argc, char *argv[], int32 argapp)
 				}
 			} else {
 				if (!silent) {
-					printf("error 0x%8" B_PRIx32 "\n", 
+					printf("error 0x%8" B_PRIx32 "\n",
 						the_reply.FindInt32("error"));
-				}			
+				}
 			}
 			return 1;
 		} else {
@@ -239,43 +239,49 @@ parse(BMessenger& the_application, int argc, char *argv[], int32 argapp)
 	return B_OK;
 }
 
+
+void
+usage(int exitCode)
+{
+	fprintf(exitCode == EXIT_SUCCESS ? stdout : stderr,
+		"hey %s, written by Attila Mezei (attila.mezei@mail.datanet.hu)\n"
+		"usage: hey [-s][-o] <app|signature|teamid> [let <specifier> do] <verb> <specifier_1> <of\n"
+		"           <specifier_n>>* [to <value>] [with name=<value> [and name=<value>]*]\n"
+		"where  <verb> : DO|GET|SET|COUNT|CREATE|DELETE|GETSUITES|QUIT|SAVE|LOAD|'what'\n"
+		"  <specifier> : [the] <property_name> [ <index> | name | \"name\" | '\"name\"' ]\n"
+		"      <index> : int | -int | '['int']' | '['-int']' | '['startint to end']'\n"
+		"      <value> : \"string\" | <integer> | <float> | bool(value) | int8(value)\n"
+		"                | int16(value) | int32(value) | float(value) | double(value)\n"
+		"                | BPoint(x,y) | BRect(l,t,r,b) | rgb_color(r,g,b,a) | file(path)\n"
+		"options: -s: silent\n"
+		"         -o: output result to stdout for easy parsing\n\n", VERSION);
+	exit(exitCode);
+}
+
+
 int
 main(int argc, char *argv[])
 {
 	BApplication app("application/x-amezei-hey");
 
-	if (argc < 2) {
-		fprintf(stderr, "hey %s, written by Attila Mezei (attila.mezei@mail.datanet.hu)\n" \
-		"usage: hey [-s][-o] <app|signature|teamid> [let <specifier> do] <verb> <specifier_1> <of\n" \
-		"           <specifier_n>>* [to <value>] [with name=<value> [and name=<value>]*]\n" \
-		"where  <verb> : DO|GET|SET|COUNT|CREATE|DELETE|GETSUITES|QUIT|SAVE|LOAD|'what'\n" \
-		"  <specifier> : [the] <property_name> [ <index> | name | \"name\" | '\"name\"' ]\n" \
-		"      <index> : int | -int | '['int']' | '['-int']' | '['startint to end']'\n" \
-		"      <value> : \"string\" | <integer> | <float> | bool(value) | int8(value)\n" \
-		"                | int16(value) | int32(value) | float(value) | double(value)\n" \
-		"                | BPoint(x,y) | BRect(l,t,r,b) | rgb_color(r,g,b,a) | file(path)\n" \
-		"options: -s: silent\n" \
-		"         -o: output result to stdout for easy parsing\n\n", VERSION);
-		// Updated Usage string to reflect "do", "the", bare -index, and '"name"' changes below
-		//   -- pfolk@uni.uiuc.edu 1999-11-03
-
-		return 1;
-	}
+	if (argc < 2)
+		usage(1);
 
 	int32 argapp = 1;
 	silent = false;
 	output = false;
 
-	// Updated option mechanism --SS
+	// Updated option mechanism
 	for (int i = 0; i < argc; i++) {
 		if (strcmp(argv[i], "-s") == 0 || strcmp(argv[i], "-S") == 0) {
 			silent = true;
 			argapp++;
-		}
-		if (strcmp(argv[i], "-o") == 0 || strcmp(argv[i], "-O") == 0) {
+		} else if (strcmp(argv[i], "-o") == 0 || strcmp(argv[i], "-O") == 0) {
 			output = true;
 			argapp++;
-		}
+		} else  if (strcmp(argv[1], "-h") == 0
+			|| strcmp(argv[1], "--help") == 0)
+			usage(0);
 	}
 
 	// find the application
@@ -352,8 +358,9 @@ HeyInterpreterThreadHook(void* arg)
 status_t
 Hey(BMessenger* target, const char* arg, BMessage* reply)
 {
-	BList argv; // number of tokens is now limited only by memory  -- pfolk@uni.uiuc.edu 1999-11-03
-	char* tokens = new char[strlen(arg)*2];
+	BList argv;
+	char* tokens = new char[strlen(arg) * 2];
+		// number of tokens is limited only by memory
 	char* currentToken = tokens;
 	int32 tokenNdex = 0;
 	int32 argNdex = 0;
@@ -387,7 +394,7 @@ Hey(BMessenger* target, const char* arg, BMessage* reply)
 
 	int32 argx = 0;
 	status_t ret = Hey(target, (char **)argv.Items(), &argx, argv.CountItems() - 1, reply);
-	  // This used to be "return Hey(...);"---so tokens wasn't delete'd.  -- pfolk@uni.uiuc.edu 1999-11-03
+	  // This used to be "return Hey(...);"---so tokens wasn't delete'd.
 	delete[] tokens;
 	return ret;
 }
@@ -413,7 +420,6 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 	bool direct_what = false;
 	BMessage the_message;
 	if (strcasecmp(argv[*argx], "let") == 0) {
-			// added "let" -- sander@adamation.com 31may2000
 		BMessage get_target (B_GET_PROPERTY);
 		get_target.AddSpecifier ("Messenger");
 			// parse the specifiers
@@ -445,10 +451,9 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 			return B_ERROR;
 		}
 	}
-	if (strcasecmp(argv[*argx], "do") == 0) {
-			// added "do"  -- pfolk@uni.uiuc.edu  1999-11-03
+	if (strcasecmp(argv[*argx], "do") == 0)
 		the_message.what = B_EXECUTE_PROPERTY;
-	} else if (strcasecmp(argv[*argx], "get") == 0)
+	else if (strcasecmp(argv[*argx], "get") == 0)
 		the_message.what = B_GET_PROPERTY;
 	else if (strcasecmp(argv[*argx], "set") == 0)
 		the_message.what = B_SET_PROPERTY;
@@ -533,7 +538,7 @@ Hey(BMessenger* target, char* argv[], int32* argx, int32 argc, BMessage* reply)
 									if (strcmp(vinfo[vinfo_index].name,
 											argv[*argx]) == 0) {
 										found = true;
-										the_message.what = 
+										the_message.what =
 											vinfo[vinfo_index].value;
 #if TEST_VALUEINFO>0
 										printf("FOUND COMMAND \"%s\" = %lX\n",
@@ -687,7 +692,7 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 	}
 
 	if (strcasecmp(property, "the") == 0) {
-			// skip "the", read real property  -- pfolk@uni.uiuc.edu 1999-11-03
+			// skip "the", read real property
 		property = argv[*argx];
 		if (property == NULL)
 			return B_BAD_SCRIPT_SYNTAX;
@@ -770,7 +775,7 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 		// if it contains only digits, it will be an index...
 		bool index_spec = true;
 		bool reverse = specifier[0] == '-';
-		//  accept bare reverse-index-specs  -- pfolk@uni.uiuc.edu 1999-11-03
+		// accept bare reverse-index-specs
 		size_t speclen = strlen(specifier);
 		for (int32 i = (reverse ? 1 : 0); i < (int32)speclen; ++i) {
 			if (specifier[i] < '0' || specifier[i] > '9') {
@@ -781,7 +786,7 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 
 		if (index_spec) {
 			if (reverse) {
-				// Copied from above  -- pfolk@uni.uiuc.edu 1999-11-03
+				// Copied from above
 				BMessage revspec(B_REVERSE_INDEX_SPECIFIER);
 				revspec.AddString("property", property);
 				revspec.AddInt32("index", atol(specifier + 1));
@@ -789,8 +794,8 @@ add_specifier(BMessage *to_message, char *argv[], int32 *argx, int32 argc)
 			} else
 				to_message->AddSpecifier(property, atol(specifier));
 		} else {
-			// Allow any name by counting an initial " as a literal-string indicator
-			//  -- pfolk@uni.uiuc.edu 1999-11-03
+			// Allow any name by counting an initial " as a literal-string
+			// indicator
 			if (specifier[0] == '\"') {
 				if (specifier[speclen - 1] == '\"')
 					specifier[speclen - 1] = '\0';
