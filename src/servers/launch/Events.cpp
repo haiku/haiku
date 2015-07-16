@@ -139,6 +139,13 @@ Event::Trigger()
 }
 
 
+void
+Event::ResetTrigger()
+{
+	fTriggered = false;
+}
+
+
 BaseJob*
 Event::Owner() const
 {
@@ -418,16 +425,17 @@ Events::TriggerDemand(Event* event)
 	if (EventContainer* container = dynamic_cast<EventContainer*>(event)) {
 		for (int32 index = 0; index < container->Events().CountItems();
 				index++) {
-			Event* event = container->Events().ItemAt(index);
-			if (dynamic_cast<DemandEvent*>(event) != NULL) {
-				event->Trigger();
+			Event* childEvent = container->Events().ItemAt(index);
+			if (dynamic_cast<DemandEvent*>(childEvent) != NULL) {
+				childEvent->Trigger();
 				return true;
 			}
-			if (dynamic_cast<EventContainer*>(event) != NULL) {
-				if (TriggerDemand(event))
-					return true;
+			if (dynamic_cast<EventContainer*>(childEvent) != NULL) {
+				if (TriggerDemand(childEvent))
+					break;
 			}
 		}
 	}
-	return false;
+
+	return event->Triggered();
 }

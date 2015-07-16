@@ -311,7 +311,7 @@ LaunchDaemon::MessageReceived(BMessage* message)
 
 			Job* job = FindJob(name);
 			if (job != NULL && job->EventHasTriggered()) {
-				_AddLaunchJob(job);
+				_TriggerJob(job);
 				break;
 			}
 
@@ -766,7 +766,8 @@ LaunchDaemon::_LaunchJobs(Target* target)
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
 			iterator++) {
 		Job* job = iterator->second;
-		if (job->Target() == target && job->Event() == NULL)
+		if (job->Target() == target
+			&& (job->Event() == NULL || job->Event()->Triggered()))
 			_TriggerJob(job);
 	}
 }
@@ -785,7 +786,7 @@ LaunchDaemon::_TriggerJob(Job* job)
 			_TriggerJob(requirement);
 	}
 
-	if (!Events::TriggerDemand(job->Event()))
+	if (job->EventHasTriggered() || !Events::TriggerDemand(job->Event()))
 		_AddLaunchJob(job);
 }
 
@@ -795,6 +796,8 @@ LaunchDaemon::_AddLaunchJob(Job* job)
 {
 	if (job->Target() != NULL)
 		job->Target()->ResolveSourceFiles();
+	if (job->Event() != NULL)
+		job->Event()->ResetTrigger();
 
 	if (!job->IsLaunched() && job->CheckCondition(*this))
 		fJobQueue.AddJob(job);

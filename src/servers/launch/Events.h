@@ -33,6 +33,7 @@ public:
 
 			bool				Triggered() const;
 	virtual	void				Trigger();
+			void				ResetTrigger();
 
 	virtual	BaseJob*			Owner() const;
 	virtual	void				SetOwner(BaseJob* owner);
