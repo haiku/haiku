@@ -843,6 +843,24 @@ TreeTable::RemoveTreeTableListener(TreeTableListener* listener)
 }
 
 
+status_t
+TreeTable::GetCellRectAt(const TreeTablePath& path, int32 colIndex,
+	BRect& _output) const
+{
+	TreeTableNode* node = _NodeForPath(path);
+	if (node == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	AbstractColumn* column = fColumns.ItemAt(colIndex);
+	if (column == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	_output = GetFieldRect(node->Row(), column);
+
+	return B_OK;
+}
+
+
 bool
 TreeTable::GetToolTipAt(BPoint point, BToolTip** _tip)
 {

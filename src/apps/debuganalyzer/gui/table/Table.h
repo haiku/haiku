@@ -135,6 +135,9 @@ public:
 			bool				AddTableListener(TableListener* listener);
 			void				RemoveTableListener(TableListener* listener);
 
+	virtual	status_t			GetCellRectAt(int32 rowIndex, int32 colIndex,
+									BRect& _output) const;
+
 protected:
 	virtual bool				GetToolTipAt(BPoint point, BToolTip** _tip);
 

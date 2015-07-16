@@ -499,6 +499,23 @@ Table::RemoveTableListener(TableListener* listener)
 }
 
 
+status_t
+Table::GetCellRectAt(int32 rowIndex, int32 colIndex, BRect& _output) const
+{
+	BRow* row = fRows.ItemAt(rowIndex);
+	if (row == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	AbstractColumn* column = fColumns.ItemAt(colIndex);
+	if (column == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	_output = GetFieldRect(row, column);
+
+	return B_OK;
+}
+
+
 bool
 Table::GetToolTipAt(BPoint point, BToolTip** _tip)
 {

@@ -1502,9 +1502,22 @@ BPoint
 BColumnListView::SuggestTextPosition(const BRow* row,
 	const BColumn* inColumn) const
 {
+	BRect rect(GetFieldRect(row, inColumn));
+
+	font_height fh;
+	fOutlineView->GetFontHeight(&fh);
+	float baseline = floor(rect.top + fh.ascent
+		+ (rect.Height() + 1 - (fh.ascent + fh.descent)) / 2);
+	return BPoint(rect.left + 8, baseline);
+}
+
+
+BRect
+BColumnListView::GetFieldRect(const BRow* row, const BColumn* inColumn) const
+{
 	BRect rect;
 	GetRowRect(row, &rect);
-	if (inColumn) {
+	if (inColumn != NULL) {
 		float leftEdge = MAX(kLeftMargin, LatchWidth());
 		for (int index = 0; index < fColumns.CountItems(); index++) {
 			BColumn* column = (BColumn*) fColumns.ItemAt(index);
@@ -1521,11 +1534,7 @@ BColumnListView::SuggestTextPosition(const BRow* row,
 		}
 	}
 
-	font_height fh;
-	fOutlineView->GetFontHeight(&fh);
-	float baseline = floor(rect.top + fh.ascent
-		+ (rect.Height() + 1 - (fh.ascent + fh.descent)) / 2);
-	return BPoint(rect.left + 8, baseline);
+	return rect;
 }
 
 

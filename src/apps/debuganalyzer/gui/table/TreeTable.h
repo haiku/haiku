@@ -195,6 +195,9 @@ public:
 			void				RemoveTreeTableListener(
 									TreeTableListener* listener);
 
+	virtual	status_t			GetCellRectAt(const TreeTablePath& path,
+									int32 colIndex, BRect& _output) const;
+
 protected:
 	virtual bool				GetToolTipAt(BPoint point, BToolTip** _tip);
 

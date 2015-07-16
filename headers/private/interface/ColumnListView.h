@@ -363,6 +363,9 @@ public:
 			BPoint				SuggestTextPosition(const BRow* row,
 									const BColumn* column = NULL) const;
 
+			BRect				GetFieldRect(const BRow* row,
+									const BColumn* column) const;
+
 			void				SetLatchWidth(float width);
 			float				LatchWidth() const;
 	virtual	void				DrawLatch(BView* view, BRect frame,
