@@ -88,6 +88,11 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
+			void				_HandleGetLaunchData(BMessage* message);
+			void				_HandleLaunchTarget(BMessage* message);
+			void				_HandleLaunchSession(BMessage* message);
+			void				_HandleRegisterSessionDaemon(BMessage* message);
+
 			uid_t				_GetUserID(BMessage* message);
 
 			void				_ReadPaths(const BStringList& paths);
@@ -281,149 +286,20 @@ LaunchDaemon::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
 		case B_GET_LAUNCH_DATA:
-		{
-			uid_t user = _GetUserID(message);
-			if (user < 0)
-				return;
-
-			BMessage reply((uint32)B_OK);
-			Job* job = FindJob(get_leaf(message->GetString("name")));
-			if (job == NULL) {
-				Session* session = FindSession(user);
-				if (session != NULL) {
-					// Forward request to user launch_daemon
-					if (session->Daemon().SendMessage(message) == B_OK)
-						break;
-				}
-				reply.what = B_NAME_NOT_FOUND;
-			} else if (!job->IsLaunched() && !job->CheckCondition(*this)) {
-				// The job exists, but cannot be started yet, as its
-				// conditions are not met; don't make it available yet
-				// TODO: we may not want to initialize jobs with conditions
-				// that aren't met yet
-				reply.what = B_NO_INIT;
-			} else {
-				// If the job has not been launched yet, we'll pass on our
-				// team here. The rationale behind this is that this team
-				// will temporarily own the synchronous reply ports.
-				reply.AddInt32("team", job->Team() < 0
-					? current_team() : job->Team());
-
-				PortMap::const_iterator iterator = job->Ports().begin();
-				for (; iterator != job->Ports().end(); iterator++) {
-					BString name;
-					if (iterator->second.HasString("name"))
-						name << iterator->second.GetString("name") << "_";
-					name << "port";
-
-					reply.AddInt32(name.String(),
-						iterator->second.GetInt32("port", -1));
-				}
-
-				_TriggerJob(job);
-			}
-			message->SendReply(&reply);
+			_HandleGetLaunchData(message);
 			break;
-		}
 
 		case B_LAUNCH_TARGET:
-		{
-			uid_t user = _GetUserID(message);
-			if (user < 0)
-				break;
-
-			const char* name = message->GetString("target");
-			const char* baseName = message->GetString("base target");
-
-			Target* target = FindTarget(name);
-			if (target == NULL && baseName != NULL) {
-				Target* baseTarget = FindTarget(baseName);
-				if (baseTarget != NULL) {
-					target = new Target(name);
-
-					// Copy all jobs with the base target into the new target
-					for (JobMap::iterator iterator = fJobs.begin();
-							iterator != fJobs.end();) {
-						Job* job = iterator->second;
-						iterator++;
-
-						if (job->Target() == baseTarget) {
-							Job* copy = new Job(*job);
-							copy->SetTarget(target);
-
-							fJobs.insert(std::make_pair(copy->Name(), copy));
-						}
-					}
-				}
-			}
-			if (target == NULL) {
-				Session* session = FindSession(user);
-				if (session != NULL) {
-					// Forward request to user launch_daemon
-					if (session->Daemon().SendMessage(message) == B_OK)
-						break;
-				}
-
-				BMessage reply(B_NAME_NOT_FOUND);
-				message->SendReply(&reply);
-				break;
-			}
-
-			BMessage data;
-			if (message->FindMessage("data", &data) == B_OK)
-				target->AddData(data.GetString("name"), data);
-
-			_LaunchJobs(target);
+			_HandleLaunchTarget(message);
 			break;
-		}
 
 		case B_LAUNCH_SESSION:
-		{
-			uid_t user = _GetUserID(message);
-			if (user < 0)
-				break;
-
-			status_t status = B_OK;
-			const char* login = message->GetString("login");
-			if (login == NULL)
-				status = B_BAD_VALUE;
-			if (status == B_OK && user != 0) {
-				// Only the root user can start sessions
-				// TODO: we'd actually need to know the uid of the sender
-				status = B_PERMISSION_DENIED;
-			}
-			if (status == B_OK)
-				status = _StartSession(login);
-
-			BMessage reply((uint32)status);
-			message->SendReply(&reply);
+			_HandleLaunchSession(message);
 			break;
-		}
 
 		case B_REGISTER_SESSION_DAEMON:
-		{
-			uid_t user = _GetUserID(message);
-			if (user < 0)
-				break;
-
-			status_t status = B_OK;
-
-			BMessenger target;
-			if (message->FindMessenger("daemon", &target) != B_OK)
-				status = B_BAD_VALUE;
-
-			if (status == B_OK) {
-				Session* session = new (std::nothrow) Session(user, target);
-				if (session != NULL)
-					fSessions.insert(std::make_pair(user, session));
-				else
-					status = B_NO_MEMORY;
-			}
-
-			BMessage reply((uint32)status);
-			message->SendReply(&reply);
+			_HandleRegisterSessionDaemon(message);
 			break;
-		}
 
 		case kMsgEventTriggered:
 		{
@@ -451,6 +327,171 @@ LaunchDaemon::MessageReceived(BMessage* message)
 			BServer::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+LaunchDaemon::_HandleGetLaunchData(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	BMessage reply((uint32)B_OK);
+	bool triggerJob = true;
+
+	Job* job = FindJob(get_leaf(message->GetString("name")));
+	if (job == NULL) {
+		Session* session = FindSession(user);
+		if (session != NULL) {
+			// Forward request to user launch_daemon
+			if (session->Daemon().SendMessage(message) == B_OK)
+				return;
+		}
+		reply.what = B_NAME_NOT_FOUND;
+	} else if (!job->IsLaunched()) {
+		if (!job->CheckCondition(*this)) {
+			// The job exists, but cannot be started yet, as its
+			// conditions are not met; don't make it available yet
+			// TODO: we may not want to initialize jobs with conditions
+			// that aren't met yet
+			reply.what = B_NO_INIT;
+		} else if (job->Event() != NULL) {
+			if (!Events::TriggerDemand(job->Event())) {
+				// The job is not triggered by demand; we cannot start it now
+				reply.what = B_NO_INIT;
+			} else {
+				// The job has already been triggered, don't trigger it
+				// again
+				triggerJob = false;
+			}
+		}
+	}
+
+	if (reply.what == B_OK) {
+		// If the job has not been launched yet, we'll pass on our
+		// team here. The rationale behind this is that this team
+		// will temporarily own the synchronous reply ports.
+		reply.AddInt32("team", job->Team() < 0
+			? current_team() : job->Team());
+
+		PortMap::const_iterator iterator = job->Ports().begin();
+		for (; iterator != job->Ports().end(); iterator++) {
+			BString name;
+			if (iterator->second.HasString("name"))
+				name << iterator->second.GetString("name") << "_";
+			name << "port";
+
+			reply.AddInt32(name.String(),
+				iterator->second.GetInt32("port", -1));
+		}
+
+		if (triggerJob)
+			_TriggerJob(job);
+	}
+	message->SendReply(&reply);
+}
+
+
+void
+LaunchDaemon::_HandleLaunchTarget(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	const char* name = message->GetString("target");
+	const char* baseName = message->GetString("base target");
+
+	Target* target = FindTarget(name);
+	if (target == NULL && baseName != NULL) {
+		Target* baseTarget = FindTarget(baseName);
+		if (baseTarget != NULL) {
+			target = new Target(name);
+
+			// Copy all jobs with the base target into the new target
+			for (JobMap::iterator iterator = fJobs.begin();
+					iterator != fJobs.end();) {
+				Job* job = iterator->second;
+				iterator++;
+
+				if (job->Target() == baseTarget) {
+					Job* copy = new Job(*job);
+					copy->SetTarget(target);
+
+					fJobs.insert(std::make_pair(copy->Name(), copy));
+				}
+			}
+		}
+	}
+	if (target == NULL) {
+		Session* session = FindSession(user);
+		if (session != NULL) {
+			// Forward request to user launch_daemon
+			if (session->Daemon().SendMessage(message) == B_OK)
+				return;
+		}
+
+		BMessage reply(B_NAME_NOT_FOUND);
+		message->SendReply(&reply);
+		return;
+	}
+
+	BMessage data;
+	if (message->FindMessage("data", &data) == B_OK)
+		target->AddData(data.GetString("name"), data);
+
+	_LaunchJobs(target);
+}
+
+
+void
+LaunchDaemon::_HandleLaunchSession(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	status_t status = B_OK;
+	const char* login = message->GetString("login");
+	if (login == NULL)
+		status = B_BAD_VALUE;
+	if (status == B_OK && user != 0) {
+		// Only the root user can start sessions
+		// TODO: we'd actually need to know the uid of the sender
+		status = B_PERMISSION_DENIED;
+	}
+	if (status == B_OK)
+		status = _StartSession(login);
+
+	BMessage reply((uint32)status);
+	message->SendReply(&reply);
+}
+
+
+void
+LaunchDaemon::_HandleRegisterSessionDaemon(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	status_t status = B_OK;
+
+	BMessenger target;
+	if (message->FindMessenger("daemon", &target) != B_OK)
+		status = B_BAD_VALUE;
+
+	if (status == B_OK) {
+		Session* session = new (std::nothrow) Session(user, target);
+		if (session != NULL)
+			fSessions.insert(std::make_pair(user, session));
+		else
+			status = B_NO_MEMORY;
+	}
+
+	BMessage reply((uint32)status);
+	message->SendReply(&reply);
 }
 
 
