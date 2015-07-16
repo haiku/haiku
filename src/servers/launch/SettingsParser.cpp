@@ -15,7 +15,7 @@ public:
 		const driver_parameter& parameter, const char* name, uint32 type,
 		BMessage& target)
 	{
-		if (parameter.parameter_count != 0)
+		if (parameter.parameter_count != 0 || strcmp(name, Name()) == 0)
 			return B_OK;
 
 		BMessage message;
@@ -36,6 +36,8 @@ protected:
 		}
 		return target.AddMessage(condition, &args);
 	}
+
+	virtual const char* Name() = 0;
 };
 
 
@@ -75,6 +77,11 @@ public:
 		message.AddString("args", parameter.values[index]);
 		return target.AddMessage(parameter.name, &message);
 	}
+
+	const char* Name()
+	{
+		return "if";
+	}
 };
 
 
@@ -94,6 +101,11 @@ public:
 
 		message.AddString("args", parameter.values[index]);
 		return target.AddMessage(parameter.name, &message);
+	}
+
+	const char* Name()
+	{
+		return "on";
 	}
 };
 

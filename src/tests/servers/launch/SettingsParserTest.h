@@ -17,6 +17,7 @@ public:
 								SettingsParserTest();
 	virtual						~SettingsParserTest();
 
+			void				TestConditionsEmpty();
 			void				TestConditionsMultiLine();
 			void				TestConditionsFlat();
 			void				TestConditionsFlatWithNot();
@@ -26,6 +27,7 @@ public:
 			void				TestConditionsMultiLineFlatNotWithArgs();
 			void				TestConditionsMultiLineNot();
 
+			void				TestEventsEmpty();
 			void				TestEventsMultiLine();
 			void				TestEventsFlat();
 			void				TestEventsFlatWithArgs();

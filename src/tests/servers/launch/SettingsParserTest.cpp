@@ -31,6 +31,16 @@ SettingsParserTest::~SettingsParserTest()
 
 
 void
+SettingsParserTest::TestConditionsEmpty()
+{
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, _ParseCondition("if {\n"
+		"}\n", message));
+	CPPUNIT_ASSERT(message.IsEmpty());
+}
+
+
+void
 SettingsParserTest::TestConditionsMultiLine()
 {
 	BMessage message;
@@ -177,11 +187,20 @@ SettingsParserTest::TestConditionsMultiLineNot()
 	BMessage args;
 	CPPUNIT_ASSERT_EQUAL(B_OK, subMessage.FindMessage("safemode", &args));
 	CPPUNIT_ASSERT(args.IsEmpty());
-
 }
 
 
 // #pragma mark - events
+
+
+void
+SettingsParserTest::TestEventsEmpty()
+{
+	BMessage message;
+	CPPUNIT_ASSERT_EQUAL(B_OK, _ParseEvent("on {\n"
+		"}\n", message));
+	CPPUNIT_ASSERT(message.IsEmpty());
+}
 
 
 void
@@ -396,6 +415,9 @@ SettingsParserTest::AddTests(BTestSuite& parent)
 
 	// Conditions
 	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
+		"SettingsParserTest::TestConditionsEmpty",
+		&SettingsParserTest::TestConditionsEmpty));
+	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
 		"SettingsParserTest::TestConditionsMultiLine",
 		&SettingsParserTest::TestConditionsMultiLine));
 	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
@@ -421,6 +443,9 @@ SettingsParserTest::AddTests(BTestSuite& parent)
 		&SettingsParserTest::TestConditionsMultiLineNot));
 
 	// Events
+	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
+		"SettingsParserTest::TestEventsEmpty",
+		&SettingsParserTest::TestEventsEmpty));
 	suite.addTest(new CppUnit::TestCaller<SettingsParserTest>(
 		"SettingsParserTest::TestEventsMultiLine",
 		&SettingsParserTest::TestEventsMultiLine));
