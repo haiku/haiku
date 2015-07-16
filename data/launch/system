@@ -26,7 +26,6 @@ service x-vnd.Haiku-SystemLogger {
 
 service x-vnd.Haiku-mount_server {
 	launch /system/servers/mount_server
-	legacy
 }
 
 service x-vnd.Haiku-media_server {

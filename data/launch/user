@@ -4,11 +4,17 @@ target desktop {
 	service x-vnd.Be-TRAK {
 		launch /system/Tracker
 		legacy
+		on {
+			initial_volumes_mounted
+		}
 	}
 
 	service x-vnd.Be-TSKB {
 		launch /system/Deskbar
 		legacy
+		on {
+			initial_volumes_mounted
+		}
 	}
 
 	job create-installer-link {

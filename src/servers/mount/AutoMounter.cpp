@@ -28,6 +28,7 @@
 #include <FindDirectory.h>
 #include <fs_info.h>
 #include <fs_volume.h>
+#include <LaunchRoster.h>
 #include <Locale.h>
 #include <Message.h>
 #include <Node.h>
@@ -37,7 +38,6 @@
 #include <String.h>
 #include <VolumeRoster.h>
 
-//#include "AutoMounterSettings.h"
 #include "MountServer.h"
 
 
@@ -46,11 +46,12 @@
 
 
 static const char* kMountServerSettings = "mount_server";
-static const uint32 kMsgInitialScan = 'insc';
 static const char* kMountFlagsKeyExtension = " mount flags";
 
+static const char* kInitialMountEvent = "initial_volumes_mounted";
 
-bool
+
+static bool
 BootedInSafeMode()
 {
 	const char *safeMode = getenv("SAFEMODE");
@@ -63,7 +64,7 @@ BootedInSafeMode()
 
 AutoMounter::AutoMounter()
 	:
-	BApplication(kMountServerSignature),
+	BServer(kMountServerSignature, true, NULL),
 	fNormalMode(kRestorePreviousVolumes),
 	fRemovableMode(kAllVolumes),
 	fEjectWhenUnmounting(true)
@@ -80,12 +81,23 @@ AutoMounter::AutoMounter()
 
 	BDiskDeviceRoster().StartWatching(this,
 		B_DEVICE_REQUEST_DEVICE | B_DEVICE_REQUEST_DEVICE_LIST);
+	BLaunchRoster().RegisterEvent(this, kInitialMountEvent);
 }
 
 
 AutoMounter::~AutoMounter()
 {
+	BLaunchRoster().UnregisterEvent(this, kInitialMountEvent);
 	BDiskDeviceRoster().StopWatching(this);
+}
+
+
+void
+AutoMounter::ReadyToRun()
+{
+	// Do initial scan
+	_MountVolumes(fNormalMode, fRemovableMode, true);
+	BLaunchRoster().NotifyEvent(this, kInitialMountEvent);
 }
 
 
@@ -93,25 +105,6 @@ void
 AutoMounter::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case B_EXECUTE_PROPERTY:
-		{
-			int32 index;
-			BMessage specifier;
-			int32 what;
-			const char* property = NULL;
-			if (message->GetCurrentSpecifier(&index, &specifier, &what,
-					&property) < B_OK
-				|| !_ScriptReceived(message, index, &specifier, what,
-					property)) {
-				BApplication::MessageReceived(message);
-			}
-			break;
-		}
-
-		case kMsgInitialScan:
-			_MountVolumes(fNormalMode, fRemovableMode, true);
-			break;
-
 		case kMountVolume:
 			_MountVolume(message);
 			break;
@@ -270,169 +263,7 @@ AutoMounter::QuitRequested()
 }
 
 
-// #pragma mark - scripting
-
-
-const uint32 kApplication = 0;
-
-static property_info sPropertyInfo[] = {
-	{
-		"InitialScan",
-		{B_EXECUTE_PROPERTY},
-		{B_DIRECT_SPECIFIER},
-		NULL, kApplication,
-		{B_STRING_TYPE},
-		{},
-		{}
-	},
-	{}
-};
-
-
-BHandler*
-AutoMounter::ResolveSpecifier(BMessage* message, int32 index,
-	BMessage* specifier, int32 what, const char* property)
-{
-	BPropertyInfo propInfo(sPropertyInfo);
-
-	uint32 data;
-	if (propInfo.FindMatch(message, 0, specifier, what, property, &data) >= 0) {
-		if (data == kApplication)
-			return this;
-
-		BMessage reply(B_MESSAGE_NOT_UNDERSTOOD);
-		reply.AddInt32("error", B_ERROR);
-		reply.AddString("message", "Unkown specifier.");
-		message->SendReply(&reply);
-		return NULL;
-	}
-
-	return BApplication::ResolveSpecifier(message, index, specifier, what,
-		property);
-}
-
-
-status_t
-AutoMounter::GetSupportedSuites(BMessage* data)
-{
-	if (data == NULL)
-		return B_BAD_VALUE;
-
-	status_t status = data->AddString("suites",
-		"suite/vnd.Haiku-mount_server");
-	if (status != B_OK)
-		return status;
-
-	BPropertyInfo propertyInfo(sPropertyInfo);
-	status = data->AddFlat("messages", &propertyInfo);
-	if (status != B_OK)
-		return status;
-
-	return BApplication::GetSupportedSuites(data);
-}
-
-
-bool
-AutoMounter::_ScriptReceived(BMessage *message, int32 index,
-	BMessage *specifier, int32 what, const char *property)
-{
-	BMessage reply(B_REPLY);
-	status_t err = B_BAD_SCRIPT_SYNTAX;
-
-	switch (message->what) {
-		case B_EXECUTE_PROPERTY:
-			if (strcmp("InitialScan", property) == 0) {
-				_MountVolumes(fNormalMode, fRemovableMode, true);
-				err = reply.AddString("result",
-					B_TRANSLATE("Previous volumes mounted."));
-			}
-			break;
-	}
-
-	if (err == B_BAD_SCRIPT_SYNTAX)
-		return false;
-
-	if (err != B_OK) {
-		reply.what = B_MESSAGE_NOT_UNDERSTOOD;
-		reply.AddString("message", strerror(err));
-	}
-	reply.AddInt32("error", err);
-	message->SendReply(&reply);
-	return true;
-}
-
-
-// #pragma mark -
-
-
-static bool
-suggest_mount_flags(const BPartition* partition, uint32* _flags)
-{
-	uint32 mountFlags = 0;
-
-	bool askReadOnly = true;
-	bool isBFS = false;
-
-	if (partition->ContentType() != NULL
-		&& strcmp(partition->ContentType(), kPartitionTypeBFS) == 0) {
-#if 0
-		askReadOnly = false;
-#endif
-		isBFS = true;
-	}
-
-	BDiskSystem diskSystem;
-	status_t status = partition->GetDiskSystem(&diskSystem);
-	if (status == B_OK && !diskSystem.SupportsWriting())
-		askReadOnly = false;
-
-	if (partition->IsReadOnly())
-		askReadOnly = false;
-
-	if (askReadOnly) {
-		// Suggest to the user to mount read-only until Haiku is more mature.
-		BString string;
-		if (partition->ContentName() != NULL) {
-			char buffer[512];
-			snprintf(buffer, sizeof(buffer),
-				B_TRANSLATE("Mounting volume '%s'\n\n"),
-				partition->ContentName());
-			string << buffer;
-		} else
-			string << B_TRANSLATE("Mounting volume <unnamed volume>\n\n");
-
-		// TODO: Use distro name instead of "Haiku"...
-		if (!isBFS) {
-			string << B_TRANSLATE("The file system on this volume is not the "
-				"Haiku file system. It is strongly suggested to mount it in "
-				"read-only mode. This will prevent unintentional data loss "
-				"because of errors in Haiku.");
-		} else {
-			string << B_TRANSLATE("It is suggested to mount all additional "
-				"Haiku volumes in read-only mode. This will prevent "
-				"unintentional data loss because of errors in Haiku.");
-		}
-
-		BAlert* alert = new BAlert(B_TRANSLATE("Mount warning"),
-			string.String(), B_TRANSLATE("Mount read/write"),
-			B_TRANSLATE("Cancel"), B_TRANSLATE("Mount read-only"),
-			B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
-		alert->SetShortcut(1, B_ESCAPE);
-		int32 choice = alert->Go();
-		switch (choice) {
-			case 0:
-				break;
-			case 1:
-				return false;
-			case 2:
-				mountFlags |= B_MOUNT_READ_ONLY;
-				break;
-		}
-	}
-
-	*_flags = mountFlags;
-	return true;
-}
+// #pragma mark - private methods
 
 
 void
@@ -515,7 +346,7 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 				if (!fInitialRescan) {
 					// Ask the user about mount flags if this is not the
 					// initial scan.
-					if (!suggest_mount_flags(partition, &mountFlags))
+					if (!_SuggestMountFlags(partition, &mountFlags))
 						return false;
 				} else {
 					BString mountFlagsKey(path.Path());
@@ -561,7 +392,7 @@ AutoMounter::_MountVolume(const BMessage* message)
 		return;
 
 	uint32 mountFlags;
-	if (!suggest_mount_flags(partition, &mountFlags))
+	if (!_SuggestMountFlags(partition, &mountFlags))
 		return;
 
 	status_t status = partition->Mount(NULL, mountFlags);
@@ -926,6 +757,76 @@ AutoMounter::_GetSettings(BMessage *message)
 			message->AddInt32(mountFlagsKey.String(), mountFlags);
 		}
 	}
+}
+
+
+/*static*/ bool
+AutoMounter::_SuggestMountFlags(const BPartition* partition, uint32* _flags)
+{
+	uint32 mountFlags = 0;
+
+	bool askReadOnly = true;
+	bool isBFS = false;
+
+	if (partition->ContentType() != NULL
+		&& strcmp(partition->ContentType(), kPartitionTypeBFS) == 0) {
+#if 0
+		askReadOnly = false;
+#endif
+		isBFS = true;
+	}
+
+	BDiskSystem diskSystem;
+	status_t status = partition->GetDiskSystem(&diskSystem);
+	if (status == B_OK && !diskSystem.SupportsWriting())
+		askReadOnly = false;
+
+	if (partition->IsReadOnly())
+		askReadOnly = false;
+
+	if (askReadOnly) {
+		// Suggest to the user to mount read-only until Haiku is more mature.
+		BString string;
+		if (partition->ContentName() != NULL) {
+			char buffer[512];
+			snprintf(buffer, sizeof(buffer),
+				B_TRANSLATE("Mounting volume '%s'\n\n"),
+				partition->ContentName());
+			string << buffer;
+		} else
+			string << B_TRANSLATE("Mounting volume <unnamed volume>\n\n");
+
+		// TODO: Use distro name instead of "Haiku"...
+		if (!isBFS) {
+			string << B_TRANSLATE("The file system on this volume is not the "
+				"Haiku file system. It is strongly suggested to mount it in "
+				"read-only mode. This will prevent unintentional data loss "
+				"because of errors in Haiku.");
+		} else {
+			string << B_TRANSLATE("It is suggested to mount all additional "
+				"Haiku volumes in read-only mode. This will prevent "
+				"unintentional data loss because of errors in Haiku.");
+		}
+
+		BAlert* alert = new BAlert(B_TRANSLATE("Mount warning"),
+			string.String(), B_TRANSLATE("Mount read/write"),
+			B_TRANSLATE("Cancel"), B_TRANSLATE("Mount read-only"),
+			B_WIDTH_FROM_WIDEST, B_WARNING_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
+		int32 choice = alert->Go();
+		switch (choice) {
+			case 0:
+				break;
+			case 1:
+				return false;
+			case 2:
+				mountFlags |= B_MOUNT_READ_ONLY;
+				break;
+		}
+	}
+
+	*_flags = mountFlags;
+	return true;
 }
 
 

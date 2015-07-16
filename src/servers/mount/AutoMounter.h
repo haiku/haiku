@@ -1,31 +1,29 @@
 /*
- * Copyright 2007-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	AUTO_MOUNTER_H
 #define AUTO_MOUNTER_H
 
-#include <Application.h>
+
 #include <DiskDeviceDefs.h>
 #include <File.h>
 #include <Message.h>
+#include <Server.h>
+
 
 class BPartition;
 class BPath;
 
 
-class AutoMounter : public BApplication {
+class AutoMounter : public BServer {
 public:
 								AutoMounter();
 	virtual						~AutoMounter();
 
+	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
 	virtual	bool				QuitRequested();
-
-	virtual	BHandler*			ResolveSpecifier(BMessage* message,
-									int32 index, BMessage* specifier,
-									int32 what, const char* property);
-	virtual	status_t			GetSupportedSuites(BMessage* data);
 
 private:
 			enum mount_mode {
@@ -36,9 +34,6 @@ private:
 			};
 
 			void				_GetSettings(BMessage* message);
-			bool				_ScriptReceived(BMessage* msg, int32 index,
-									BMessage* specifier, int32 form,
-									const char* property);
 
 			void				_MountVolumes(mount_mode normal,
 									mount_mode removable,
@@ -62,6 +57,9 @@ private:
 			void				_ReadSettings();
 			void				_WriteSettings();
 
+	static	bool				_SuggestMountFlags(const BPartition* partition,
+									uint32* _flags);
+
 private:
 			mount_mode			fNormalMode;
 			mount_mode			fRemovableMode;
@@ -70,5 +68,6 @@ private:
 			BFile				fPrefsFile;
 			BMessage			fSettings;
 };
+
 
 #endif // AUTO_MOUNTER_H
