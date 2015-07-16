@@ -18,6 +18,7 @@ public:
 								ConditionsTest();
 	virtual						~ConditionsTest();
 
+			void				TestEmpty();
 			void				TestSafemode();
 			void				TestFileExists();
 			void				TestOr();

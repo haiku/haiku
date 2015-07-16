@@ -41,6 +41,14 @@ ConditionsTest::~ConditionsTest()
 
 
 void
+ConditionsTest::TestEmpty()
+{
+	Condition* condition = _Condition("");
+	CPPUNIT_ASSERT(condition == NULL);
+}
+
+
+void
 ConditionsTest::TestSafemode()
 {
 	Condition* condition = _Condition("safemode");
@@ -177,6 +185,8 @@ ConditionsTest::AddTests(BTestSuite& parent)
 	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("ConditionsTest");
 
 	suite.addTest(new CppUnit::TestCaller<ConditionsTest>(
+		"ConditionsTest::TestEmpty", &ConditionsTest::TestEmpty));
+	suite.addTest(new CppUnit::TestCaller<ConditionsTest>(
 		"ConditionsTest::TestSafemode", &ConditionsTest::TestSafemode));
 	suite.addTest(new CppUnit::TestCaller<ConditionsTest>(
 		"ConditionsTest::TestFileExists", &ConditionsTest::TestFileExists));
@@ -210,6 +220,7 @@ ConditionsTest::_Condition(const char* string)
 	CPPUNIT_ASSERT_EQUAL(B_OK, job.FindMessage("if", &message));
 
 	Condition* condition = Conditions::FromMessage(message);
-	CPPUNIT_ASSERT(condition != NULL);
+	if (string[0] != '\0')
+		CPPUNIT_ASSERT(condition != NULL);
 	return condition;
 }

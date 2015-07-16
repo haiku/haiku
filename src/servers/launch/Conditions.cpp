@@ -105,11 +105,11 @@ private:
 static Condition*
 create_condition(const char* name, const BMessage& args)
 {
-	if (strcmp(name, "and") == 0)
+	if (strcmp(name, "and") == 0 && !args.IsEmpty())
 		return new AndCondition(args);
-	if (strcmp(name, "or") == 0)
+	if (strcmp(name, "or") == 0 && !args.IsEmpty())
 		return new OrCondition(args);
-	if (strcmp(name, "not") == 0)
+	if (strcmp(name, "not") == 0 && !args.IsEmpty())
 		return new NotCondition(args);
 
 	if (strcmp(name, "safemode") == 0)
