@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.07.09
-#	Date:    2015-07-09 03:15:02
+#	Version: 2015.07.10
+#	Date:    2015-07-10 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -27126,6 +27126,7 @@ C 02  Network controller
 	05  WorldFip controller
 	06  PICMG controller
 	07  Infiniband controller
+	08  Fabric controller
 	80  Network controller
 C 03  Display controller
 	00  VGA compatible controller
@@ -27279,4 +27280,5 @@ C 11  Signal processing controller
 C 12  Processing accelerators
 	00  Processing accelerators
 C 13  Non-Essential Instrumentation
+C 40  Coprocessor
 C ff  Unassigned class
