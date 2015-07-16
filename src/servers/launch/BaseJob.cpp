@@ -20,7 +20,8 @@
 BaseJob::BaseJob(const char* name)
 	:
 	BJob(name),
-	fCondition(NULL)
+	fCondition(NULL),
+	fEvent(NULL)
 {
 }
 
@@ -87,7 +88,8 @@ void
 BaseJob::SetEvent(::Event* event)
 {
 	fEvent = event;
-	event->SetOwner(this);
+	if (event != NULL)
+		event->SetOwner(this);
 }
 
 

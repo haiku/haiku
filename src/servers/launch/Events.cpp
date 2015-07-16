@@ -92,8 +92,12 @@ static Event*
 create_event(Event* parent, const char* name, const BMessenger* target,
 	const BMessage& args)
 {
-	if (strcmp(name, "or") == 0)
+	if (strcmp(name, "or") == 0) {
+		if (args.IsEmpty())
+			return NULL;
+
 		return new OrEvent(parent, target, args);
+	}
 
 	if (strcmp(name, "demand") == 0)
 		return new DemandEvent(parent);
@@ -356,6 +360,7 @@ FileCreatedEvent::FileCreatedEvent(Event* parent, const BMessage& args)
 status_t
 FileCreatedEvent::Register(EventRegistrator& registrator) const
 {
+	// TODO: implement!
 	return B_ERROR;
 }
 
