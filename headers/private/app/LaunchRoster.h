@@ -30,12 +30,21 @@ public:
 
 			status_t			StartSession(const char* login);
 
+			status_t			RegisterEvent(const BMessenger& source,
+									const char* name);
+			status_t			UnregisterEvent(const BMessenger& source,
+									const char* name);
+			status_t			NotifyEvent(const BMessenger& source,
+									const char* name);
+
 	class Private;
 
 private:
 	friend class Private;
 
 			void				_InitMessenger();
+			status_t			_UpdateEvent(uint32 what,
+									const BMessenger& source, const char* name);
 
 private:
 			BMessenger			fMessenger;

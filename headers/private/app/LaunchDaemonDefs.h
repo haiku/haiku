@@ -22,12 +22,15 @@ namespace BPrivate {
 #define B_LAUNCH_DAEMON_PORT_NAME "system:launch_daemon"
 
 
-// message constants
+// Message constants
 enum {
 	B_GET_LAUNCH_DATA			= 'lnda',
 	B_LAUNCH_TARGET				= 'lntg',
 	B_LAUNCH_SESSION			= 'lnse',
 	B_REGISTER_SESSION_DAEMON	= 'lnrs',
+	B_REGISTER_LAUNCH_EVENT		= 'lnre',
+	B_UNREGISTER_LAUNCH_EVENT	= 'lnue',
+	B_NOTIFY_LAUNCH_EVENT		= 'lnne',
 };
 
 

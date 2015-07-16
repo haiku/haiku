@@ -208,6 +208,27 @@ BLaunchRoster::StartSession(const char* login)
 }
 
 
+status_t
+BLaunchRoster::RegisterEvent(const BMessenger& source, const char* name)
+{
+	return _UpdateEvent(B_REGISTER_LAUNCH_EVENT, source, name);
+}
+
+
+status_t
+BLaunchRoster::UnregisterEvent(const BMessenger& source, const char* name)
+{
+	return _UpdateEvent(B_UNREGISTER_LAUNCH_EVENT, source, name);
+}
+
+
+status_t
+BLaunchRoster::NotifyEvent(const BMessenger& source, const char* name)
+{
+	return _UpdateEvent(B_NOTIFY_LAUNCH_EVENT, source, name);
+}
+
+
 void
 BLaunchRoster::_InitMessenger()
 {
@@ -218,4 +239,34 @@ BLaunchRoster::_InitMessenger()
 		BMessenger::Private(fMessenger).SetTo(info.team, daemonPort,
 			B_PREFERRED_TOKEN);
 	}
+}
+
+
+status_t
+BLaunchRoster::_UpdateEvent(uint32 what, const BMessenger& source,
+	const char* name)
+{
+	if (be_app == NULL || name == NULL || name[0] == '\0')
+		return B_BAD_VALUE;
+
+	BMessage request(what);
+	status_t status = request.AddInt32("user", getuid());
+	if (status == B_OK)
+		status = request.AddMessenger("source", source);
+	if (status == B_OK)
+		status = request.AddString("owner", be_app->Signature());
+	if (status == B_OK)
+		status = request.AddString("name", name);
+	if (status != B_OK)
+		return status;
+
+	// send the request
+	BMessage result;
+	status = fMessenger.SendMessage(&request, &result);
+
+	// evaluate the reply
+	if (status == B_OK)
+		status = result.what;
+
+	return status;
 }

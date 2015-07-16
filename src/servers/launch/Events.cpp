@@ -73,6 +73,26 @@ public:
 };
 
 
+class ExternalEvent : public Event {
+public:
+								ExternalEvent(Event* parent, const char* name,
+									const BMessage& args);
+
+			const BString&		Name() const;
+			bool				Resolve();
+
+	virtual	status_t			Register(EventRegistrator& registrator) const;
+	virtual	void				Unregister(EventRegistrator& registrator) const;
+
+	virtual	BString				ToString() const;
+
+private:
+			BString				fName;
+			BStringList			fArguments;
+			bool				fResolved;
+};
+
+
 class FileCreatedEvent : public Event {
 public:
 								FileCreatedEvent(Event* parent,
@@ -104,7 +124,7 @@ create_event(Event* parent, const char* name, const BMessenger* target,
 	if (strcmp(name, "file_created") == 0)
 		return new FileCreatedEvent(parent, args);
 
-	return NULL;
+	return new ExternalEvent(parent, name, args);
 }
 
 
@@ -353,6 +373,62 @@ DemandEvent::ToString() const
 }
 
 
+// #pragma mark - External event
+
+
+ExternalEvent::ExternalEvent(Event* parent, const char* name,
+	const BMessage& args)
+	:
+	Event(parent),
+	fName(name),
+	fResolved(false)
+{
+	const char* argument;
+	for (int32 index = 0; args.FindString("args", index, &argument) == B_OK;
+			index++) {
+		fArguments.Add(argument);
+	}
+}
+
+
+const BString&
+ExternalEvent::Name() const
+{
+	return fName;
+}
+
+
+bool
+ExternalEvent::Resolve()
+{
+	if (fResolved)
+		return false;
+
+	fResolved = true;
+	return true;
+}
+
+
+status_t
+ExternalEvent::Register(EventRegistrator& registrator) const
+{
+	return B_OK;
+}
+
+
+void
+ExternalEvent::Unregister(EventRegistrator& registrator) const
+{
+}
+
+
+BString
+ExternalEvent::ToString() const
+{
+	return fName;
+}
+
+
 // #pragma mark - file_created
 
 
@@ -413,6 +489,53 @@ Events::AddOnDemand(Event* event)
 
 	or->AddEvent(new DemandEvent(or));
 	return or;
+}
+
+
+/*static*/ bool
+Events::ResolveRegisteredEvent(Event* event, const char* name)
+{
+	if (event == NULL)
+		return false;
+
+	if (EventContainer* container = dynamic_cast<EventContainer*>(event)) {
+		for (int32 index = 0; index < container->Events().CountItems();
+				index++) {
+			Event* event = container->Events().ItemAt(index);
+			if (ExternalEvent* external = dynamic_cast<ExternalEvent*>(event)) {
+				if (external->Name() == name && external->Resolve())
+					return true;
+			} else if (dynamic_cast<EventContainer*>(event) != NULL) {
+				if (ResolveRegisteredEvent(event, name))
+					return true;
+			}
+		}
+	}
+	return false;
+}
+
+
+/*static*/ void
+Events::TriggerRegisteredEvent(Event* event, const char* name)
+{
+	if (event == NULL)
+		return;
+
+	if (EventContainer* container = dynamic_cast<EventContainer*>(event)) {
+		for (int32 index = 0; index < container->Events().CountItems();
+				index++) {
+			Event* event = container->Events().ItemAt(index);
+			if (ExternalEvent* external = dynamic_cast<ExternalEvent*>(event)) {
+				if (external->Name() == name) {
+					external->Trigger();
+					return;
+				}
+			} else if (dynamic_cast<EventContainer*>(event) != NULL) {
+				TriggerRegisteredEvent(event, name);
+			}
+		}
+	}
+	return;
 }
 
 

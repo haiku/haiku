@@ -53,6 +53,10 @@ public:
 	static	Event*			FromMessage(const BMessenger& target,
 								const BMessage& message);
 	static	Event*			AddOnDemand(Event* event);
+	static	bool			ResolveRegisteredEvent(Event* event,
+								const char* name);
+	static	void			TriggerRegisteredEvent(Event* event,
+								const char* name);
 	static	bool			TriggerDemand(Event* event);
 };
 

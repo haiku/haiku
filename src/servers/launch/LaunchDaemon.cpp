@@ -67,14 +67,37 @@ private:
 };
 
 
+class RegisteredEvent {
+public:
+								RegisteredEvent(BMessenger& source,
+									const char* ownerName,
+									const char* name);
+								~RegisteredEvent();
+
+			const char*			Name() const;
+
+			int32				CountListeners() const;
+			BaseJob*			ListenerAt(int32 index) const;
+
+			status_t			AddListener(BaseJob* job);
+			void				RemoveListener(BaseJob* job);
+
+private:
+			BString				fName;
+			BObjectList<BaseJob> fListeners;
+};
+
+
 typedef std::map<BString, Job*> JobMap;
 typedef std::map<uid_t, Session*> SessionMap;
 typedef std::map<BString, Target*> TargetMap;
+typedef std::map<BString, RegisteredEvent*> EventMap;
 
 
 class LaunchDaemon : public BServer, public Finder, public ConditionContext {
 public:
-								LaunchDaemon(bool userMode, status_t& error);
+								LaunchDaemon(bool userMode,
+									const EventMap& events, status_t& error);
 	virtual						~LaunchDaemon();
 
 	virtual	Job*				FindJob(const char* name) const;
@@ -92,6 +115,9 @@ private:
 			void				_HandleLaunchTarget(BMessage* message);
 			void				_HandleLaunchSession(BMessage* message);
 			void				_HandleRegisterSessionDaemon(BMessage* message);
+			void				_HandleRegisterLaunchEvent(BMessage* message);
+			void				_HandleUnregisterLaunchEvent(BMessage* message);
+			void				_HandleNotifyLaunchEvent(BMessage* message);
 
 			uid_t				_GetUserID(BMessage* message);
 
@@ -120,6 +146,14 @@ private:
 			void				_SetEnvironment(BaseJob* job,
 									const BMessage& message);
 
+			RegisteredEvent*	_FindEvent(const char* owner,
+									const char* name) const;
+			void				_ResolveRegisteredEvents(RegisteredEvent* event,
+									const BString& name);
+			void				_ResolveRegisteredEvents(BaseJob* job);
+			void				_ForwardEventMessage(uid_t user,
+									BMessage* message);
+
 			status_t			_StartSession(const char* login);
 
 			void				_RetrieveKernelOptions();
@@ -131,6 +165,7 @@ private:
 			JobMap				fJobs;
 			TargetMap			fTargets;
 			BStringList			fRunTargets;
+			EventMap			fEvents;
 			JobQueue			fJobQueue;
 			SessionMap			fSessions;
 			MainWorker*			fMainWorker;
@@ -166,11 +201,68 @@ Session::Session(uid_t user, const BMessenger& daemon)
 // #pragma mark -
 
 
-LaunchDaemon::LaunchDaemon(bool userMode, status_t& error)
+RegisteredEvent::RegisteredEvent(BMessenger& source, const char* ownerName,
+	const char* name)
+	:
+	fName(name),
+	fListeners(5, true)
+{
+}
+
+
+RegisteredEvent::~RegisteredEvent()
+{
+}
+
+
+const char*
+RegisteredEvent::Name() const
+{
+	return fName.String();
+}
+
+
+int32
+RegisteredEvent::CountListeners() const
+{
+	return fListeners.CountItems();
+}
+
+
+BaseJob*
+RegisteredEvent::ListenerAt(int32 index) const
+{
+	return fListeners.ItemAt(index);
+}
+
+
+status_t
+RegisteredEvent::AddListener(BaseJob* job)
+{
+	if (fListeners.AddItem(job))
+		return B_OK;
+
+	return B_NO_MEMORY;
+}
+
+
+void
+RegisteredEvent::RemoveListener(BaseJob* job)
+{
+	fListeners.RemoveItem(job);
+}
+
+
+// #pragma mark -
+
+
+LaunchDaemon::LaunchDaemon(bool userMode, const EventMap& events,
+	status_t& error)
 	:
 	BServer(kLaunchDaemonSignature, NULL,
 		create_port(B_LOOPER_PORT_DEFAULT_CAPACITY,
 			userMode ? "AppPort" : B_LAUNCH_DAEMON_PORT_NAME), false, &error),
+	fEvents(events),
 	fInitTarget(userMode ? NULL : new Target("init")),
 	fUserMode(userMode)
 {
@@ -299,6 +391,18 @@ LaunchDaemon::MessageReceived(BMessage* message)
 
 		case B_REGISTER_SESSION_DAEMON:
 			_HandleRegisterSessionDaemon(message);
+			break;
+
+		case B_REGISTER_LAUNCH_EVENT:
+			_HandleRegisterLaunchEvent(message);
+			break;
+
+		case B_UNREGISTER_LAUNCH_EVENT:
+			_HandleUnregisterLaunchEvent(message);
+			break;
+
+		case B_NOTIFY_LAUNCH_EVENT:
+			_HandleNotifyLaunchEvent(message);
 			break;
 
 		case kMsgEventTriggered:
@@ -492,6 +596,112 @@ LaunchDaemon::_HandleRegisterSessionDaemon(BMessage* message)
 
 	BMessage reply((uint32)status);
 	message->SendReply(&reply);
+}
+
+
+void
+LaunchDaemon::_HandleRegisterLaunchEvent(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	if (user == 0 || fUserMode) {
+		status_t status = B_OK;
+
+		const char* name = message->GetString("name");
+		const char* ownerName = message->GetString("owner");
+		BMessenger source;
+		if (name != NULL && ownerName != NULL
+			&& message->FindMessenger("source", &source) == B_OK) {
+			// Register event
+			ownerName = get_leaf(ownerName);
+
+			RegisteredEvent* event = new (std::nothrow) RegisteredEvent(
+				source, ownerName, name);
+			if (event != NULL) {
+				// Use short name, and fully qualified name
+				BString eventName = name;
+				fEvents.insert(std::make_pair(eventName, event));
+				_ResolveRegisteredEvents(event, eventName);
+
+				eventName.Prepend("/");
+				eventName.Prepend(ownerName);
+				fEvents.insert(std::make_pair(eventName, event));
+				_ResolveRegisteredEvents(event, eventName);
+			} else
+				status = B_NO_MEMORY;
+		} else
+			status = B_BAD_VALUE;
+
+		BMessage reply((uint32)status);
+		message->SendReply(&reply);
+	}
+
+	_ForwardEventMessage(user, message);
+}
+
+
+void
+LaunchDaemon::_HandleUnregisterLaunchEvent(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	if (user == 0 || fUserMode) {
+		status_t status = B_OK;
+
+		const char* name = message->GetString("name");
+		const char* ownerName = message->GetString("owner");
+		BMessenger source;
+		if (name != NULL && ownerName != NULL
+			&& message->FindMessenger("source", &source) == B_OK) {
+			// Unregister short and fully qualified event name
+			ownerName = get_leaf(ownerName);
+
+			BString eventName = name;
+			fEvents.erase(eventName);
+
+			eventName.Prepend("/");
+			eventName.Prepend(ownerName);
+			fEvents.erase(eventName);
+		} else
+			status = B_BAD_VALUE;
+
+		BMessage reply((uint32)status);
+		message->SendReply(&reply);
+	}
+
+	_ForwardEventMessage(user, message);
+}
+
+
+void
+LaunchDaemon::_HandleNotifyLaunchEvent(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	if (user == 0 || fUserMode) {
+		// Trigger events
+		const char* name = message->GetString("name");
+		const char* ownerName = message->GetString("owner");
+		// TODO: support arguments (as selectors)
+
+		RegisteredEvent* event = _FindEvent(ownerName, name);
+		if (event != NULL) {
+			// Evaluate all of its jobs
+			int32 count = event->CountListeners();
+			for (int32 index = 0; index < count; index++) {
+				BaseJob* listener = event->ListenerAt(index);
+				Events::TriggerRegisteredEvent(listener->Event(), name);
+			}
+		}
+	}
+
+	_ForwardEventMessage(user, message);
 }
 
 
@@ -850,8 +1060,10 @@ LaunchDaemon::_SetEvent(BaseJob* job, const BMessage& message)
 		updated = true;
 	}
 
-	if (updated)
+	if (updated) {
 		job->SetEvent(event);
+		_ResolveRegisteredEvents(job);
+	}
 }
 
 
@@ -861,6 +1073,83 @@ LaunchDaemon::_SetEnvironment(BaseJob* job, const BMessage& message)
 	BMessage environmentMessage;
 	if (message.FindMessage("env", &environmentMessage) == B_OK)
 		job->SetEnvironment(environmentMessage);
+}
+
+
+RegisteredEvent*
+LaunchDaemon::_FindEvent(const char* owner, const char* name) const
+{
+	if (name == NULL)
+		return NULL;
+
+	BString eventName = name;
+	eventName.ToLower();
+
+	EventMap::const_iterator found = fEvents.find(eventName);
+	if (found != fEvents.end())
+		return found->second;
+
+	if (owner == NULL)
+		return NULL;
+
+	eventName.Prepend("/");
+	eventName.Prepend(get_leaf(owner));
+
+	found = fEvents.find(eventName);
+	if (found != fEvents.end())
+		return found->second;
+
+	return NULL;
+}
+
+
+void
+LaunchDaemon::_ResolveRegisteredEvents(RegisteredEvent* event,
+	const BString& name)
+{
+	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
+			iterator++) {
+		Job* job = iterator->second;
+		if (Events::ResolveRegisteredEvent(job->Event(), name))
+			event->AddListener(job);
+	}
+}
+
+
+void
+LaunchDaemon::_ResolveRegisteredEvents(BaseJob* job)
+{
+	if (job->Event() == NULL)
+		return;
+
+	for (EventMap::iterator iterator = fEvents.begin();
+			iterator != fEvents.end(); iterator++) {
+		RegisteredEvent* event = iterator->second;
+		if (Events::ResolveRegisteredEvent(job->Event(), event->Name()))
+			event->AddListener(job);
+	}
+}
+
+
+void
+LaunchDaemon::_ForwardEventMessage(uid_t user, BMessage* message)
+{
+	if (fUserMode)
+		return;
+
+	// Forward event to user launch_daemon(s)
+	if (user == 0) {
+		for (SessionMap::iterator iterator = fSessions.begin();
+				iterator != fSessions.end(); iterator++) {
+			Session* session = iterator->second;
+			session->Daemon().SendMessage(message);
+				// ignore reply
+		}
+	} else {
+		Session* session = FindSession(user);
+		if (session != NULL)
+			session->Daemon().SendMessage(message);
+	}
 }
 
 
@@ -902,7 +1191,7 @@ LaunchDaemon::_StartSession(const char* login)
 
 		// TODO: take over system jobs, and reserve their names
 		status_t status;
-		LaunchDaemon* daemon = new LaunchDaemon(true, status);
+		LaunchDaemon* daemon = new LaunchDaemon(true, fEvents, status);
 		if (status == B_OK)
 			daemon->Run();
 
@@ -972,8 +1261,9 @@ LaunchDaemon::_AddInitJob(BJob* job)
 int
 main()
 {
+	EventMap events;
 	status_t status;
-	LaunchDaemon* daemon = new LaunchDaemon(false, status);
+	LaunchDaemon* daemon = new LaunchDaemon(false, events, status);
 	if (status == B_OK)
 		daemon->Run();
 
