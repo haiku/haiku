@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Check for fresh install and run post install scripts.
+
+freshInstallIndicator=/boot/system/settings/fresh_install
+postInstallDir=boot/post-install
+if [ -e $freshInstallIndicator ]; then
+	# wait a moment for things to calm down a bit
+	sleep 3
+
+	# execute scripts
+	for f in /boot/system/$postInstallDir/*.sh
+	do
+		if [ -f $f ]; then
+			echo "Running post install script $f ..." > /dev/dprintf
+			$f
+		fi
+	done
+
+	sync
+	rm $freshInstallIndicator
+fi

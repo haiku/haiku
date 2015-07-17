@@ -70,6 +70,11 @@ service x-vnd.Haiku-power_daemon {
 	legacy
 }
 
+job post-install {
+	launch /bin/sh /system/boot/PostInstallScript
+	if file_exists /boot/system/settings/fresh_install
+}
+
 target login {
 	job x-vnd.Haiku-autologin {
 		launch /system/bin/autologin

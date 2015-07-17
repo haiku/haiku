@@ -17,6 +17,10 @@ target desktop {
 		}
 	}
 
+	job user-bootscript {
+		launch /bin/sh /boot/home/config/settings/boot/UserBootscript
+	}
+
 	job create-installer-link {
 		# When run from a read-only medium a.k.a. live desktop
 		if {
