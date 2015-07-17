@@ -51,8 +51,5 @@ private:
 			uint32				_reserved[5];
 };
 
-// global BLaunchRoster instance
-extern const BLaunchRoster* be_launch_roster;
-
 
 #endif	// _LAUNCH_ROSTER_H

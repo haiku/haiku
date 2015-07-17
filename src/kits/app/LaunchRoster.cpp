@@ -21,9 +21,6 @@
 using namespace BPrivate;
 
 
-const BLaunchRoster* be_launch_roster;
-
-
 BLaunchRoster::Private::Private(BLaunchRoster* roster)
 	:
 	fRoster(roster)
