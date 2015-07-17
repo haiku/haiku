@@ -41,6 +41,10 @@ Job::Job(const Job& other)
 	fTarget(other.Target())
 {
 	fCondition = other.fCondition;
+	// TODO: copy events
+	//fEvent = other.fEvent;
+	fEnvironment = other.fEnvironment;
+	fSourceFiles = other.fSourceFiles;
 
 	for (int32 i = 0; i < other.Arguments().CountStrings(); i++)
 		AddArgument(other.Arguments().StringAt(i));
@@ -169,6 +173,16 @@ void
 Job::AddRequirement(const char* requirement)
 {
 	fRequirements.Add(requirement);
+}
+
+
+bool
+Job::CheckCondition(ConditionContext& context) const
+{
+	if (Target() != NULL && !Target()->HasLaunched())
+		return false;
+
+	return BaseJob::CheckCondition(context);
 }
 
 

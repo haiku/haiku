@@ -9,7 +9,8 @@
 
 Target::Target(const char* name)
 	:
-	BaseJob(name)
+	BaseJob(name),
+	fLaunched(false)
 {
 }
 
@@ -18,6 +19,13 @@ status_t
 Target::AddData(const char* name, BMessage& data)
 {
 	return fData.AddMessage(name, &data);
+}
+
+
+void
+Target::SetLaunched(bool launched)
+{
+	fLaunched = launched;
 }
 
 

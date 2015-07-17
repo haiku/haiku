@@ -54,6 +54,8 @@ public:
 			BStringList&		Requirements();
 			void				AddRequirement(const char* requirement);
 
+	virtual	bool				CheckCondition(ConditionContext& context) const;
+
 			status_t			Init(const Finder& jobs,
 									std::set<BString>& dependencies);
 			status_t			InitCheck() const;

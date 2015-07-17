@@ -93,10 +93,15 @@ BaseJob::SetEvent(::Event* event)
 }
 
 
+/*!	Determines whether the events of this job has been triggered
+	already or not.
+	Note, if this job does not have any events, this method returns
+	\c true.
+*/
 bool
 BaseJob::EventHasTriggered() const
 {
-	return Event() != NULL && Event()->Triggered();
+	return Event() == NULL || Event()->Triggered();
 }
 
 

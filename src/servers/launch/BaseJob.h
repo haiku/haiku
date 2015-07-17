@@ -28,7 +28,7 @@ public:
 			const ::Condition*	Condition() const;
 			::Condition*		Condition();
 			void				SetCondition(::Condition* condition);
-			bool				CheckCondition(ConditionContext& context) const;
+	virtual	bool				CheckCondition(ConditionContext& context) const;
 
 			const ::Event*		Event() const;
 			::Event*			Event();

@@ -539,10 +539,15 @@ Events::TriggerRegisteredEvent(Event* event, const char* name)
 }
 
 
+/*!	This will trigger a demand event, if it exists.
+
+	\return \c true, if there is a demand event, and it has been
+			triggered by this call. \c false if not.
+*/
 /*static*/ bool
 Events::TriggerDemand(Event* event)
 {
-	if (event == NULL)
+	if (event == NULL || event->Triggered())
 		return false;
 
 	if (EventContainer* container = dynamic_cast<EventContainer*>(event)) {
@@ -551,7 +556,7 @@ Events::TriggerDemand(Event* event)
 			Event* childEvent = container->Events().ItemAt(index);
 			if (dynamic_cast<DemandEvent*>(childEvent) != NULL) {
 				childEvent->Trigger();
-				return true;
+				break;
 			}
 			if (dynamic_cast<EventContainer*>(childEvent) != NULL) {
 				if (TriggerDemand(childEvent))

@@ -134,10 +134,10 @@ private:
 									const char* name);
 			void				_AddJob(Target* target, bool service,
 									BMessage& message);
-			void				_InitJobs();
-			void				_LaunchJobs(Target* target);
-			void				_TriggerJob(Job* job);
-			void				_AddLaunchJob(Job* job);
+			void				_InitJobs(Target* target);
+			void				_LaunchJobs(Target* target,
+									bool forceNow = false);
+			void				_LaunchJob(Job* job, bool forceNow = false);
 			void				_AddTarget(Target* target);
 			void				_SetCondition(BaseJob* job,
 									const BMessage& message);
@@ -361,7 +361,7 @@ LaunchDaemon::ReadyToRun()
 		fUserMode ? B_FIND_PATHS_USER_ONLY : B_FIND_PATHS_SYSTEM_ONLY, paths);
 	_ReadPaths(paths);
 
-	_InitJobs();
+	_InitJobs(NULL);
 	_LaunchJobs(NULL);
 
 	// Launch run targets (ignores events)
@@ -414,13 +414,13 @@ LaunchDaemon::MessageReceived(BMessage* message)
 				break;
 
 			Job* job = FindJob(name);
-			if (job != NULL && job->EventHasTriggered()) {
-				_TriggerJob(job);
+			if (job != NULL) {
+				_LaunchJob(job);
 				break;
 			}
 
 			Target* target = FindTarget(name);
-			if (target != NULL && target->EventHasTriggered()) {
+			if (target != NULL) {
 				_LaunchJobs(target);
 				break;
 			}
@@ -442,7 +442,7 @@ LaunchDaemon::_HandleGetLaunchData(BMessage* message)
 		return;
 
 	BMessage reply((uint32)B_OK);
-	bool triggerJob = true;
+	bool launchJob = true;
 
 	Job* job = FindJob(get_leaf(message->GetString("name")));
 	if (job == NULL) {
@@ -454,7 +454,7 @@ LaunchDaemon::_HandleGetLaunchData(BMessage* message)
 		}
 		reply.what = B_NAME_NOT_FOUND;
 	} else if (!job->IsLaunched()) {
-		if (!job->CheckCondition(*this)) {
+		if (job->InitCheck() == B_NO_INIT || !job->CheckCondition(*this)) {
 			// The job exists, but cannot be started yet, as its
 			// conditions are not met; don't make it available yet
 			// TODO: we may not want to initialize jobs with conditions
@@ -465,9 +465,8 @@ LaunchDaemon::_HandleGetLaunchData(BMessage* message)
 				// The job is not triggered by demand; we cannot start it now
 				reply.what = B_NO_INIT;
 			} else {
-				// The job has already been triggered, don't trigger it
-				// again
-				triggerJob = false;
+				// The job has already been triggered, don't launch it again
+				launchJob = false;
 			}
 		}
 	}
@@ -490,8 +489,9 @@ LaunchDaemon::_HandleGetLaunchData(BMessage* message)
 				iterator->second.GetInt32("port", -1));
 		}
 
-		if (triggerJob)
-			_TriggerJob(job);
+		// Launch the job if it hasn't been launched already
+		if (launchJob)
+			_LaunchJob(job);
 	}
 	message->SendReply(&reply);
 }
@@ -932,12 +932,19 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 }
 
 
+/*!	Initializes all jobs for the specified target (may be \c NULL).
+	Jobs that cannot be initialized, and those that never will be due to
+	conditions, will be removed from the list.
+*/
 void
-LaunchDaemon::_InitJobs()
+LaunchDaemon::_InitJobs(Target* target)
 {
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();) {
 		Job* job = iterator->second;
 		JobMap::iterator remove = iterator++;
+
+		if (job->Target() != target)
+			continue;
 
 		status_t status = B_NO_INIT;
 		if (job->IsEnabled()) {
@@ -965,52 +972,64 @@ LaunchDaemon::_InitJobs()
 
 
 /*!	Adds all jobs for the specified target (may be \c NULL) to the launch
-	queue, except those that are triggered by events.
+	queue, except those that are triggered by events that haven't been
+	triggered yet.
+
+	Unless \a forceNow is true, the target is only launched if its events,
+	if any, have been triggered already, and its conditions are met.
 */
 void
-LaunchDaemon::_LaunchJobs(Target* target)
+LaunchDaemon::_LaunchJobs(Target* target, bool forceNow)
 {
-	if (target != NULL && !target->CheckCondition(*this))
+	if (!forceNow && target != NULL && (!target->EventHasTriggered()
+		|| !target->CheckCondition(*this))) {
 		return;
+	}
+
+	if (target != NULL && !target->HasLaunched()) {
+		target->SetLaunched(true);
+		_InitJobs(target);
+	}
 
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
 			iterator++) {
 		Job* job = iterator->second;
-		if (job->Target() == target
-			&& (job->Event() == NULL || job->Event()->Triggered()))
-			_TriggerJob(job);
+		if (job->Target() == target)
+			_LaunchJob(job);
 	}
 }
 
 
+/*!	Adds the specified \a job to the launch queue
+	queue, except those that are triggered by events.
+
+	Unless \a forceNow is true, the target is only launched if its events,
+	if any, have been triggered already.
+
+	Calling this method will trigger a demand event.
+*/
 void
-LaunchDaemon::_TriggerJob(Job* job)
+LaunchDaemon::_LaunchJob(Job* job, bool forceNow)
 {
-	if (job == NULL)
+	if (job == NULL || job->IsLaunched() || !forceNow
+		&& (!job->EventHasTriggered() || !job->CheckCondition(*this)
+			|| Events::TriggerDemand(job->Event()))) {
 		return;
+	}
 
 	int32 count = job->Requirements().CountStrings();
 	for (int32 index = 0; index < count; index++) {
 		Job* requirement = FindJob(job->Requirements().StringAt(index));
 		if (requirement != NULL)
-			_TriggerJob(requirement);
+			_LaunchJob(requirement);
 	}
 
-	if (job->EventHasTriggered() || !Events::TriggerDemand(job->Event()))
-		_AddLaunchJob(job);
-}
-
-
-void
-LaunchDaemon::_AddLaunchJob(Job* job)
-{
 	if (job->Target() != NULL)
 		job->Target()->ResolveSourceFiles();
 	if (job->Event() != NULL)
 		job->Event()->ResetTrigger();
 
-	if (!job->IsLaunched() && job->CheckCondition(*this))
-		fJobQueue.AddJob(job);
+	fJobQueue.AddJob(job);
 }
 
 
