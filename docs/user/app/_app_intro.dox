@@ -1,5 +1,5 @@
 /*
- * Copyright 2007 Haiku, Inc. All rights reserved.
+ * Copyright 2007-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -14,7 +14,7 @@
 	native Haiku applications with a GUI. The application kit does
 	exactly as its name suggests; it is the basis for Haiku	applications.  You
 	should read through this document and the documents referenced here before
-	moving on to any other part of the API. 
+	moving on to any other part of the API.
 
 	The Application Kit classes can be divided into two groups: the "messaging"
 	classes and the "system interaction" classes.  The larger group contains
@@ -37,6 +37,7 @@
 	- BApplication
 	- BClipboard
 	- BCursor
+	- BLaunchRoster
 	- BPropertyInfo
 	- BRoster
 */

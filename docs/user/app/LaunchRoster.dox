@@ -1,0 +1,255 @@
+/*
+ * Copyright 2015 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *
+ * Corresponds to:
+ *		headers/private/app/LaunchRoster.h
+ *		src/kits/app/LaunchRoster.cpp
+ */
+
+
+/*!
+	\file LaunchRoster.h
+	\ingroup app
+	\ingroup libbe
+	\brief Provides BLaunchRoster class.
+*/
+
+
+/*!
+	\class BLaunchRoster
+	\ingroup app
+	\ingroup libbe
+	\brief The BLaunchRoster class lets you communicate with the launch_daemon.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLaunchRoster::BLaunchRoster()
+	\brief Creates a new BLaunchRoster and sets up the connection to the
+			launch_daemon.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn BLaunchRoster::~BLaunchRoster()
+	\brief Does nothing.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\name Querying
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BLaunchRoster::GetData(BMessage& data)
+	\brief Returns the launch data for your own application.
+
+	If your application has any data stored by the launch_daemon, you can
+	retrieve this data with this method. Typically, this will contain the
+	communication channels the launch_daemon created for your application,
+	if any.
+
+	\return \c B_OK if the launch data has been received successfully.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::GetData(const char* signature, BMessage& data)
+	\brief Returns the launch data for the specified application.
+
+	If the application has any data stored by the launch_daemon, you can
+	retrieve this data with this method. Typically, this will contain the
+	communication channels the launch_daemon created for this application,
+	if any.
+
+	\param signature The app \a signature.
+	\return \c B_OK if the launch data has been received successfully.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::GetPort(const char* name)
+	\brief Returns the named or default port for your application.
+
+	If the launch_daemon created a port for your application with the given
+	name, you can retrieve it with this method. Note that this is not the
+	actual port name, but the name the port has been registered with with
+	the launch_daemon.
+
+	\param name The name of the port, if \c NULL, the default port is returned.
+	\return The port ID, if successful, or an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::GetPort(const char* signature, const char* name)
+	\brief Returns the named or default port for the specified application.
+
+	If the launch_daemon created a port for the application with the given name,
+	you can retrieve it with this method. Note that this is not the actual port
+	name, but the name the port has been registered with with the launch_daemon.
+
+	\param signature The app \a signature.
+	\param name The name of the port, if \c NULL, the default port is returned.
+	\return The port ID, if successful, or an error code.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Controlling
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BLaunchRoster::Target(const char* name, const BMessage& data,
+			const char* baseName)
+	\brief Launches the specified target (or a clone of it), and attaches
+			the specified data to it.
+
+	The \a baseName will, if non \c NULL, cause the target by this name to
+	be cloned, and named \a name. This allows you to create new targets with
+	different \a data.
+	For example. the app_server is using this to create different login
+	targets for different displays.
+
+	\param name The target name, as specified in the configuration files
+	\param data Additional data you can pass to the target. This argument
+			is currently ignored.
+	\param baseName The name of the target to be cloned. Use \c NULL if you
+			do not want to clone the target.
+	\return B_OK if the target could be launched, otherwise an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::Target(const char* name, const BMessage* data,
+			const char* baseName)
+	\brief Launches the specified target (or a clone of it), and attaches
+			the specified data to it.
+
+	\see status_t BLaunchRoster::Target(const char* name, const BMessage& data,
+			const char* baseName)
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::StartSession(const char* login)
+	\brief Starts a new launch session for the specified login.
+
+	This causes the launch_daemon to start itself under the specified
+	user, and to evaluate and process the user's launch configuration.
+
+	\param login The name of the user.
+	\return B_OK if the session could be created, otherwise an error code.
+
+	\since Haiku R1
+*/
+
+
+//! @}
+
+
+/*!
+	\name Events
+*/
+
+
+//! @{
+
+
+/*!
+	\fn status_t BLaunchRoster::RegisterEvent(const BMessenger& source,
+			const char* name)
+	\brief Registers an event with the launch_daemon.
+
+	Registering an event allows other applications to be triggered by this
+	event. If you register an event named "event", applications can listen
+	to it like this:
+\code
+on {
+	event
+}
+\endcode
+	Or
+\code
+on {
+	last-part-of-signature/event
+}
+\endcode
+
+	The latter form can be used to solve ambiguous event definitions.
+
+	\param source The messenger the event is coming from.
+	\param name The name of the event.
+	\return B_OK if the event could be registered, otherwise an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::UnregisterEvent(const BMessenger& source,
+			const char* name)
+	\brief Unregisters an event previously registered with the launch_daemon.
+
+	\param source The messenger the event is coming from.
+	\param name The name of the event.
+	\return B_OK if the event could be unregistered, otherwise an error code.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BLaunchRoster::NotifyEvent(const BMessenger& source,
+			const char* name)
+	\brief Notifies the launch_daemon that an event has been triggered.
+
+	This causes the launch_daemon to notify all jobs, or targets listening
+	to this event, eventually leading them to be started.
+
+	You must have previously registered the event, in order to make the
+	launch_daemon do anything on a notification. Unknown event notifications
+	will be ignored.
+
+	\param source The messenger the event is coming from.
+	\param name The name of the event.
+	\return B_OK if the event could be notified, otherwise an error code.
+
+	\since Haiku R1
+*/
+
+
+//! @}
