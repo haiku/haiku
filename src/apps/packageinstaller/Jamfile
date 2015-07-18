@@ -8,7 +8,7 @@ UseBuildFeatureHeaders zlib ;
 Includes [ FGristFiles PackageItem.cpp ]
 	: [ BuildFeatureAttribute zlib : headers ] ;
 
-Application PackageInstaller :
+Application LegacyPackageInstaller :
 	main.cpp
 	BlockingWindow.cpp
 	PackageWindow.cpp
@@ -26,7 +26,7 @@ Application PackageInstaller :
 	: PackageInstaller.rdef
 ;
 
-DoCatalogs PackageInstaller :
+DoCatalogs LegacyPackageInstaller :
 	x-vnd.Haiku-PackageInstaller
 	:
 	main.cpp

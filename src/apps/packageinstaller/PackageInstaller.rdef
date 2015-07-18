@@ -15,8 +15,8 @@ resource app_version {
 
 	internal = 0,
 
-	short_info = "Package Installer",
-	long_info = "Package Installer ©2007-2009 Haiku, Inc."
+	short_info = "Legacy Package Installer",
+	long_info = "Legacy Package Installer ©2007-2009 Haiku, Inc."
 };
 
 resource app_flags B_SINGLE_LAUNCH;
