@@ -12,7 +12,7 @@
 
 // common base class for editors that input a value via a text field
 class TableCellTextControlEditor : public TableCellFormattedValueEditor,
-	protected BTextControl {
+	public BTextControl {
 public:
 								TableCellTextControlEditor(
 									::Value* initialValue,
