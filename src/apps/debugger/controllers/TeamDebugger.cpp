@@ -1657,11 +1657,21 @@ TeamDebugger::_HandleTeamDeleted(TeamDeletedEvent* event)
 		message, "Do nothing", "Quit", fCommandLineArgc != 0
 			? "Restart team" : NULL);
 
-	if (result == 1)
-		PostMessage(B_QUIT_REQUESTED);
-	else if (result == 2) {
-		_SaveSettings();
-		fListener->TeamDebuggerRestartRequested(this);
+	switch (result) {
+		case 1:
+		case -1:
+		{
+			PostMessage(B_QUIT_REQUESTED);
+			break;
+		}
+		case 2:
+		{
+			_SaveSettings();
+			fListener->TeamDebuggerRestartRequested(this);
+			break;
+		}
+		default:
+			break;
 	}
 
 	return true;
