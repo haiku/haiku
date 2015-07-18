@@ -68,17 +68,17 @@ h2p_close_state(h2p_state* state)
 	if (state->hvif_buffer.buffer != NULL)
 		free(state->hvif_buffer.buffer);
 
-	if (state->in != NULL)
-		fclose(state->in);
+	if (state->in != NULL) {
+		if (state->in != stdin)
+			fclose(state->in);
+		state->in = NULL;
+	}
 
-	if (state->out != NULL)
-		fclose(state->out);
-}
-
-
-static void fclose_quietly(FILE** f)
-{
-	fclose(*f);
+	if (state->out != NULL) {
+		if (state->out != stdout)
+			fclose(state->out);
+		state->out = NULL;
+	}
 }
 
 
@@ -89,6 +89,8 @@ static void fclose_quietly(FILE** f)
 static bool
 h2p_open_streams(h2p_state* state)
 {
+	CObjectDeleter<h2p_state> stateCloser(state, &h2p_close_state);
+
 	if (state->params.in_filename != NULL)
 		state->in = fopen(state->params.in_filename, "rb");
 	else
@@ -99,8 +101,6 @@ h2p_open_streams(h2p_state* state)
 			state->params.in_filename);
 		return false;
 	}
-
-	CObjectDeleter<FILE*> inDeleter(&state->in, fclose_quietly);
 
 	if (state->params.out_filename != NULL)
 		state->out = fopen(state->params.out_filename, "wb");
@@ -113,7 +113,7 @@ h2p_open_streams(h2p_state* state)
 		return false;
 	}
 
-	inDeleter.Detach();
+	stateCloser.Detach();
 
 	return true;
 }
