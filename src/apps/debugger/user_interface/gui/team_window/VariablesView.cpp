@@ -1553,7 +1553,7 @@ VariablesView::VariableTableModel::GetToolTipForTablePath(
 					tipData	+= pieceData;
 				}
 				tipData += "Editable: ";
-				tipData += error == B_OK && location->IsEditable()
+				tipData += error == B_OK && location->IsWritable()
 					? "Yes" : "No";
 				break;
 			}
