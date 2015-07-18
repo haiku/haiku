@@ -33,6 +33,7 @@ public:
 			const BString&		Username() const
 									{ return fUsername; }
 
+	static	status_t			SetBaseUrl(const BString& url);
 			void				SetPreferredLanguage(const BString& language);
 			void				SetArchitecture(const BString& architecture);
 
@@ -100,11 +101,13 @@ public:
 									BMessage& message);
 
 private:
+			BString				_FormFullUrl(const BString& suffix) const;
 			status_t			_SendJsonRequest(const char* domain,
 									BString jsonString, uint32 flags,
 									BMessage& reply) const;
 
 private:
+	static	BString				fBaseUrl;
 			BString				fUsername;
 			BString				fPassword;
 			BString				fLanguage;

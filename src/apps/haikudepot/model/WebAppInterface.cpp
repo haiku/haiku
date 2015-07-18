@@ -21,6 +21,10 @@
 #include "PackageInfo.h"
 
 
+#define CODE_REPOSITORY_DEFAULT "haikuports"
+#define BASEURL_DEFAULT "https://depot.haiku-os.org"
+
+
 class JsonBuilder {
 public:
 	JsonBuilder()
@@ -269,6 +273,9 @@ enum {
 };
 
 
+BString WebAppInterface::fBaseUrl = BString(BASEURL_DEFAULT);
+
+
 WebAppInterface::WebAppInterface()
 	:
 	fLanguage("en")
@@ -313,6 +320,54 @@ WebAppInterface::SetAuthorization(const BString& username,
 }
 
 
+static bool
+arguments_is_url_valid(const BString& value)
+{
+	if (value.Length() < 8) {
+		fprintf(stderr,"the url is less than 8 characters in length\n");
+		return false;
+	}
+
+	int32 schemeEnd = value.FindFirst("://");
+
+	if (schemeEnd == B_ERROR) {
+		fprintf(stderr,"the url does not contain the '://' string\n");
+		return false;
+	}
+
+	BString scheme;
+	value.CopyInto(scheme, 0, schemeEnd);
+ 
+	if (scheme != "http" && scheme != "https") {
+		fprintf(stderr,"the url scheme should be 'http' or 'https'\n");
+		return false;
+	}
+
+	if (value.Length()-1 == value.FindLast("/")) {
+		fprintf(stderr,"the url should be be terminated with a '/'\n");
+		return false;
+	}
+
+	return true;
+}
+
+
+/*! This method will set the web app base URL, returning a status to
+    indicate if the URL was acceptable.
+    \return B_OK if the base URL was valid and B_BAD_VALUE if not.
+ */
+
+status_t 
+WebAppInterface::SetBaseUrl(const BString& url) {
+	if (!arguments_is_url_valid(url))
+		return B_BAD_VALUE;
+
+	fBaseUrl.SetTo(url);
+
+	return B_OK;
+}
+
+
 void
 WebAppInterface::SetPreferredLanguage(const BString& language)
 {
@@ -333,6 +388,7 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 				.AddValue("name", packageName)
 				.AddValue("architectureCode", architecture)
 				.AddValue("naturalLanguageCode", fLanguage)
+				.AddValue("repositoryCode", CODE_REPOSITORY_DEFAULT)
 				.AddValue("versionType", "NONE")
 			.EndObject()
 		.EndArray()
@@ -358,6 +414,9 @@ WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
 				.AddArray("architectureCodes")
 					.AddStrings(packageArchitectures)
 				.EndArray()
+				.AddArray("repositoryCodes")
+					.AddItem(CODE_REPOSITORY_DEFAULT)
+				.EndArray()
 				.AddValue("naturalLanguageCode", fLanguage)
 				.AddValue("versionType", "LATEST")
 				.AddArray("filter")
@@ -378,15 +437,16 @@ status_t
 WebAppInterface::RetrievePackageIcon(const BString& packageName,
 	BDataIO* stream)
 {
-	BString urlString = "https://depot.haiku-os.org/pkgicon/";
-	urlString << packageName << ".hvif";
+	BString urlString = _FormFullUrl(BString("/pkgicon/") << packageName
+		<< ".hvif");
+	bool isSecure = 0 == urlString.FindFirst("https://");
 
 	BUrl url(urlString);
 
 	ProtocolListener listener;
 	listener.SetDownloadIO(stream);
 
-	BHttpRequest request(url, true, "HTTP", &listener);
+	BHttpRequest request(url, isSecure, "HTTP", &listener);
 	request.SetMethod(B_HTTP_GET);
 
 	thread_id thread = request.Run();
@@ -446,6 +506,7 @@ WebAppInterface::RetrieveUserRating(const BString& packageName,
 				.AddValue("pkgVersionMicro", version.Micro(), true)
 				.AddValue("pkgVersionPreRelease", version.PreRelease(), true)
 				.AddValue("pkgVersionRevision", (int)version.Revision())
+				.AddValue("repositoryCode", CODE_REPOSITORY_DEFAULT)
 			.EndObject()
 		.EndArray()
 	.End();
@@ -473,6 +534,7 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 				.AddValue("rating", rating)
 				.AddValue("userRatingStabilityCode", stability, true)
 				.AddValue("comment", comment)
+				.AddValue("repositoryCode", CODE_REPOSITORY_DEFAULT)
 				.AddValue("naturalLanguageCode", languageCode)
 			.EndObject()
 		.EndArray()
@@ -520,9 +582,9 @@ status_t
 WebAppInterface::RetrieveScreenshot(const BString& code,
 	int32 width, int32 height, BDataIO* stream)
 {
-	BString urlString = "https://depot.haiku-os.org/pkgscreenshot/";
-	urlString << code << ".png"
-		<< "?tw=" << width << "&th=" << height;
+	BString urlString = _FormFullUrl(BString("/pkgscreenshot/") << code
+		<< ".png" << "?tw=" << width << "&th=" << height);
+	bool isSecure = 0 == urlString.FindFirst("https://");
 
 	BUrl url(urlString);
 
@@ -532,7 +594,7 @@ WebAppInterface::RetrieveScreenshot(const BString& code,
 	BHttpHeaders headers;
 	headers.AddHeader("User-Agent", "X-HDS-Client");
 
-	BHttpRequest request(url, true, "HTTP", &listener);
+	BHttpRequest request(url, isSecure, "HTTP", &listener);
 	request.SetMethod(B_HTTP_GET);
 	request.SetHeaders(headers);
 
@@ -625,6 +687,18 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 // #pragma mark - private
 
 
+BString
+WebAppInterface::_FormFullUrl(const BString& suffix) const
+{
+	if (fBaseUrl.IsEmpty()) {
+		fprintf(stderr,"illegal state - missing web app base url\n");
+		exit(EXIT_FAILURE);
+	}
+
+	return BString(fBaseUrl) << suffix;
+}
+
+
 status_t
 WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	uint32 flags, BMessage& reply) const
@@ -632,8 +706,8 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	if ((flags & ENABLE_DEBUG) != 0)
 		printf("_SendJsonRequest(%s)\n", jsonString.String());
 
-	BString urlString("https://depot.haiku-os.org/api/v1/");
-	urlString << domain;
+	BString urlString = _FormFullUrl(BString("/api/v1/") << domain);
+	bool isSecure = 0 == urlString.FindFirst("https://");
 	BUrl url(urlString);
 
 	ProtocolListener listener;
@@ -643,7 +717,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	headers.AddHeader("Content-Type", "application/json");
 	headers.AddHeader("User-Agent", "X-HDS-Client");
 
-	BHttpRequest request(url, true, "HTTP", &listener, &context);
+	BHttpRequest request(url, isSecure, "HTTP", &listener, &context);
 	request.SetMethod(B_HTTP_POST);
 	request.SetHeaders(headers);
 

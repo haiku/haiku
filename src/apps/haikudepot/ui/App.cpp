@@ -118,9 +118,26 @@ App::RefsReceived(BMessage* message)
 void
 App::ArgvReceived(int32 argc, char* argv[])
 {
-	for (int i = 1; i < argc; i++) {
-		BEntry entry(argv[i], true);
-		_Open(entry);
+	for (int i = 1; i < argc;) {
+		if (0 == strcmp("--webappbaseurl", argv[i])) {
+			if (i == argc-1) {
+				fprintf(stderr,"unexpected end of arguments; missing web app base url\n");
+				Quit();
+			}
+
+			if (B_OK != WebAppInterface::SetBaseUrl(argv[i+1])) {
+				fprintf(stderr,"malformed web app base url; %s\n", argv[i+1]);
+				Quit();
+			}
+			else
+				fprintf(stderr,"did configure the web base url; %s\n",argv[i+1]);
+
+			i += 2;
+		} else {
+			BEntry entry(argv[i], true);
+			_Open(entry);
+			i ++;
+		}
 	}
 }
 
