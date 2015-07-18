@@ -31,6 +31,9 @@
 #define SIZE_HVIF_BUFFER_STEP 1024
 
 
+static const uint8 kHvifMagic[] = { 'n', 'c', 'i', 'f' };
+
+
 typedef struct h2p_hvif_buffer {
 	uint8*	buffer;
 	size_t	used;
@@ -195,6 +198,8 @@ h2p_read_hvif_input(h2p_hvif_buffer* result, FILE* in)
 				fprintf(stderr,"out of memory\n");
 				return 0;
 			}
+
+			result->allocated += SIZE_HVIF_BUFFER_STEP;
 		}
 
 		result->used += fread(&result->buffer[result->used], sizeof(uint8),
@@ -206,6 +211,22 @@ h2p_read_hvif_input(h2p_hvif_buffer* result, FILE* in)
 			fprintf(stderr, "error reading input; %s\n", strerror(err));
 			return 0;
 		}
+	}
+
+	if (result->used < 4) {
+		fprintf(stderr, "the hvif data is too small to visably be valid\n");
+		return 0;
+	}
+
+	// hvif files have a magic string of "ncif" so we should check for that as
+	// well.
+
+	if (memcmp(result->buffer, kHvifMagic, 4) != 0) {
+		fprintf(stderr, "the input data does not look like hvif because the"
+			" magic string is not 'ncif'; %d, %d, %d, %d\n",
+			result->buffer[0], result->buffer[1], result->buffer[2],
+			result->buffer[3]);
+		return 0;
 	}
 
 	return result->used;
