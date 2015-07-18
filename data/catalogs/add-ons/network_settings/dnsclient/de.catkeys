@@ -1,0 +1,10 @@
+1	german	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		DNS-Einstellungen
+Move down	DNSSettingsView		Runter
+DNS settings	DNSSettingsView		DNS-Einstellungen
+Remove	DNSSettingsView		Entfernen
+Domain:	DNSSettingsView		Domäne:
+Add	DNSSettingsView		Hinzufügen
+Server:	DNSSettingsView		Server:
+Move up	DNSSettingsView		Hoch
+Apply	DNSSettingsView		Anwenden
