@@ -143,7 +143,7 @@ IntegerValueFormatter::_ValidateSigned(const BString& input, type_code type,
 		}
 		case B_INT32_TYPE:
 		{
-			if (parsedValue < INT32_MAX || parsedValue > INT32_MAX)
+			if (parsedValue < INT32_MIN || parsedValue > INT32_MAX)
 				return B_BAD_VALUE;
 
 			newValue.SetTo((int32)parsedValue);
