@@ -324,14 +324,14 @@ static bool
 arguments_is_url_valid(const BString& value)
 {
 	if (value.Length() < 8) {
-		fprintf(stderr,"the url is less than 8 characters in length\n");
+		fprintf(stderr, "the url is less than 8 characters in length\n");
 		return false;
 	}
 
 	int32 schemeEnd = value.FindFirst("://");
 
-	if (schemeEnd == B_ERROR) {
-		fprintf(stderr,"the url does not contain the '://' string\n");
+	if (schemeEnd < B_OK) {
+		fprintf(stderr, "the url does not contain the '://' string\n");
 		return false;
 	}
 
@@ -339,12 +339,12 @@ arguments_is_url_valid(const BString& value)
 	value.CopyInto(scheme, 0, schemeEnd);
  
 	if (scheme != "http" && scheme != "https") {
-		fprintf(stderr,"the url scheme should be 'http' or 'https'\n");
+		fprintf(stderr, "the url scheme should be 'http' or 'https'\n");
 		return false;
 	}
 
-	if (value.Length()-1 == value.FindLast("/")) {
-		fprintf(stderr,"the url should be be terminated with a '/'\n");
+	if (value.Length() - 1 == value.FindLast("/")) {
+		fprintf(stderr, "the url should be be terminated with a '/'\n");
 		return false;
 	}
 
@@ -356,9 +356,9 @@ arguments_is_url_valid(const BString& value)
     indicate if the URL was acceptable.
     \return B_OK if the base URL was valid and B_BAD_VALUE if not.
  */
-
 status_t 
-WebAppInterface::SetBaseUrl(const BString& url) {
+WebAppInterface::SetBaseUrl(const BString& url)
+{
 	if (!arguments_is_url_valid(url))
 		return B_BAD_VALUE;
 
@@ -691,7 +691,7 @@ BString
 WebAppInterface::_FormFullUrl(const BString& suffix) const
 {
 	if (fBaseUrl.IsEmpty()) {
-		fprintf(stderr,"illegal state - missing web app base url\n");
+		fprintf(stderr, "illegal state - missing web app base url\n");
 		exit(EXIT_FAILURE);
 	}
 
