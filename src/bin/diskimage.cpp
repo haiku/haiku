@@ -57,7 +57,7 @@ list_file_disk_devices()
 			continue;
 
 		// ID
-		printf("%6ld  ", device.ID());
+		printf("%6" B_PRId32 "  ", device.ID());
 
 		// file path
 		BPath path;
@@ -104,11 +104,11 @@ register_file_disk_device(const char* fileName)
 	BPath path;
 	if (roster.GetDeviceWithID(id, &device) == B_OK
 		&& device.GetPath(&path) == B_OK) {
-		printf("Registered file as disk device \"%s\" with ID %ld.\n",
+		printf("Registered file as disk device \"%s\" with ID %" B_PRId32 ".\n",
 			path.Path(), id);
 	} else {
-		printf("Registered file as disk device with ID %ld, but failed to "
-			"get the device path.\n", id);
+		printf("Registered file as disk device with ID %" B_PRId32 ", "
+			"but failed to get the device path.\n", id);
 	}
 
 	return B_OK;
@@ -128,15 +128,16 @@ unregister_file_disk_device(const char* fileNameOrID)
 			status_t error = roster.UnregisterFileDevice(id);
 			if (error != B_OK) {
 				fprintf(stderr, "Error: Failed to unregister file disk device "
-					"with ID %ld: %s\n", id, strerror(error));
+					"with ID %" B_PRId32 ": %s\n", id, strerror(error));
 				return error;
 			}
 
-			printf("Unregistered file disk device with ID %ld.\n", id);
+			printf("Unregistered file disk device with ID %" B_PRId32 ".\n",
+				id);
 			return B_OK;
 		} else {
-			fprintf(stderr, "No file disk device with ID %ld, trying file "
-				"\"%s\"\n", id, fileNameOrID);
+			fprintf(stderr, "No file disk device with ID %" B_PRId32 ","
+				"trying file \"%s\"\n", id, fileNameOrID);
 		}
 	}
 
@@ -172,13 +173,15 @@ unregister_file_disk_device(const char* fileNameOrID)
 			status_t error = roster.UnregisterFileDevice(device.ID());
 			if (error != B_OK) {
 				fprintf(stderr, "Error: Failed to unregister file disk device"
-					"%s \"%s\" (ID: %ld): %s\n", isFilePath ? " for file" : "",
-					fileNameOrID, device.ID(), strerror(error));
+					"%s \"%s\" (ID: %" B_PRId32 "): %s\n",
+					isFilePath ? " for file" : "", fileNameOrID, device.ID(),
+					strerror(error));
 				return error;
 			}
 
-			printf("Unregistered file disk device%s \"%s\" (ID: %ld)\n",
-				isFilePath ? " for file" : "", fileNameOrID, device.ID());
+			printf("Unregistered file disk device%s \"%s\" "
+				"(ID: %" B_PRId32 ")\n", isFilePath ? " for file" : "",
+				fileNameOrID, device.ID());
 
 			return B_OK;
 		}
