@@ -1,5 +1,5 @@
 /*
- * Copyright 2006, Haiku, Inc.
+ * Copyright 2006-2015, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Author:
@@ -46,14 +46,14 @@ open_mode_to_string(int openMode)
 void
 print_fds(team_info &teamInfo)
 {
-	printf("Team: (%ld) %s\n", teamInfo.team, teamInfo.args);
+	printf("Team: (%" B_PRId32 ") %s\n", teamInfo.team, teamInfo.args);
 
 	uint32 cookie = 0;
 	fd_info info;
 
 	while (_kern_get_next_fd_info(teamInfo.team, &cookie, &info, sizeof(fd_info)) == B_OK) {
-		printf("%5d  %s %ld:%Ld\n", info.number, open_mode_to_string(info.open_mode),
-			info.device, info.node);
+		printf("%5d  %s %" B_PRIdDEV ":%" B_PRIdINO "\n", info.number,
+			open_mode_to_string(info.open_mode), info.device, info.node);
 	}
 }
 
@@ -69,13 +69,13 @@ filter_device(team_info &teamInfo, dev_t device, bool brief)
 			continue;
 
 		if (brief) {
-			printf("%5ld %s\n", teamInfo.team, teamInfo.args);
+			printf("%5" B_PRId32 " %s\n", teamInfo.team, teamInfo.args);
 			break;
 		}
 
-		printf("%5ld %3d  %3s  %ld:%Ld %s\n", teamInfo.team, info.number,
-			open_mode_to_string(info.open_mode), info.device, info.node,
-			teamInfo.args);
+		printf("%5" B_PRId32 " %3d  %3s  %" B_PRIdDEV ":%" B_PRIdINO " %s\n",
+			teamInfo.team, info.number, open_mode_to_string(info.open_mode),
+				info.device, info.node, teamInfo.args);
 	}
 }
 
@@ -91,11 +91,11 @@ filter_file(team_info &teamInfo, dev_t device, ino_t node, bool brief)
 			continue;
 
 		if (brief) {
-			printf("%5ld %s\n", teamInfo.team, teamInfo.args);
+			printf("%5" B_PRId32 " %s\n", teamInfo.team, teamInfo.args);
 			break;
 		}
 
-		printf("%5ld %3d  %3s  %s\n", teamInfo.team, info.number,
+		printf("%5" B_PRId32 " %3d  %3s  %s\n", teamInfo.team, info.number,
 			open_mode_to_string(info.open_mode), teamInfo.args);
 	}
 }
