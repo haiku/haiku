@@ -138,7 +138,7 @@ dump_file(FILE *fp)
 void
 display(uint32 offset, uint8 *data)
 {
-	printf("%08lx ", offset);
+	printf("%08" B_PRIx32 " ", offset);
 	printf("  %s ", hexbytes(data));
 	printf("%16s ", printable(data));
 	
