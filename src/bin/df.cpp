@@ -69,7 +69,7 @@ ByteString(int64 numBlocks, int64 blockSize)
 	static char string[64];
 
 	if (blocks < 1024)
-		sprintf(string, "%Ld", numBlocks * blockSize);
+		sprintf(string, "%" B_PRId64, numBlocks * blockSize);
 	else {
 		const char *units[] = {"K", "M", "G", NULL};
 		int32 i = -1;
@@ -92,7 +92,7 @@ PrintBlocks(int64 blocks, int64 blockSize, bool showBlocks)
 	char temp[1024];
 
 	if (showBlocks)
-		sprintf(temp, "%Ld", blocks * (blockSize / 1024));
+		sprintf(temp, "%" B_PRId64, blocks * (blockSize / 1024));
 	else
 		strcpy(temp, ByteString(blocks, blockSize));
 
@@ -109,7 +109,7 @@ PrintVerbose(dev_t device)
 		return;
 	}
 
-	printf("   Device No.: %ld\n", info.dev);
+	printf("   Device No.: %" B_PRIdDEV "\n", info.dev);
 	PrintMountPoint(info.dev, true);
 	printf("  Volume Name: \"%s\"\n", info.volume_name);
 	printf("  File System: %s\n", info.fsh_name);
@@ -124,13 +124,17 @@ PrintVerbose(dev_t device)
 	PrintFlag(info.flags, B_FS_IS_REMOVABLE, "R", "-");
 	PrintFlag(info.flags, B_FS_IS_READONLY, "-", "W");
 
-	printf("\n     I/O Size: %10s (%Ld byte)\n", ByteString(info.io_size, 1), info.io_size);
-	printf("   Block Size: %10s (%Ld byte)\n", ByteString(info.block_size, 1), info.block_size);
-	printf(" Total Blocks: %10s (%Ld blocks)\n", ByteString(info.total_blocks, info.block_size), info.total_blocks);
-	printf("  Free Blocks: %10s (%Ld blocks)\n", ByteString(info.free_blocks, info.block_size), info.free_blocks);
-	printf("  Total Nodes: %Ld\n", info.total_nodes);
-	printf("   Free Nodes: %Ld\n", info.free_nodes);
-	printf("   Root Inode: %Ld\n", info.root);	
+	printf("\n     I/O Size: %10s (%" B_PRIdOFF " byte)\n",
+		ByteString(info.io_size, 1), info.io_size);
+	printf("   Block Size: %10s (%" B_PRIdOFF " byte)\n",
+		ByteString(info.block_size, 1), info.block_size);
+	printf(" Total Blocks: %10s (%" B_PRIdOFF " blocks)\n",
+		ByteString(info.total_blocks, info.block_size), info.total_blocks);
+	printf("  Free Blocks: %10s (%" B_PRIdOFF " blocks)\n",
+		ByteString(info.free_blocks, info.block_size), info.free_blocks);
+	printf("  Total Nodes: %" B_PRIdOFF "\n", info.total_nodes);
+	printf("   Free Nodes: %" B_PRIdOFF "\n", info.free_nodes);
+	printf("   Root Inode: %" B_PRIdINO "\n", info.root);
 }
 
 
