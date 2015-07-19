@@ -198,7 +198,7 @@ color.alpha = fAlphaSlider->Value();
 			// then it comes from the color picker panel.
 			// it also means the panel has died.
 			BRect frame;
-			selected_color_mode mode;
+			SelectedColorMode mode;
 			if (message->FindRect("panel frame", &frame) == B_OK
 				&& message->FindInt32("panel mode", (int32*)&mode) == B_OK) {
 				// message came from the color picker panel

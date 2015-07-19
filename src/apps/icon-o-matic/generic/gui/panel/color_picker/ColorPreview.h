@@ -17,12 +17,16 @@
 class BMessageRunner;
 
 class ColorPreview : public BControl {
- public:
+public:
 
-								ColorPreview(BRect frame,
-											 rgb_color color);
+								ColorPreview(BRect frame, rgb_color color);
+								ColorPreview(rgb_color color);
 
 	// BControl interface
+	virtual	BSize				MinSize();
+	virtual	BSize				PreferredSize();
+	virtual	BSize				MaxSize();
+
 	virtual	void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
 
@@ -41,16 +45,17 @@ class ColorPreview : public BControl {
 			void				SetNewColor(rgb_color color);
 									// changes also the old color
 
- private:
-
+private:
 			void				_DragColor(BPoint where);
 
+private:
 			rgb_color			fColor;
 			rgb_color			fOldColor;
-
 			bool				fMouseDown;
 
 			BMessageRunner*		fMessageRunner;
+
+			border_style		fBorderStyle;
 };
 
 #endif // _COLOR_PREVIEW_H

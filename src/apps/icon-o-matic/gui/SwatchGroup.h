@@ -11,7 +11,7 @@
 
 #include <View.h>
 
-#include "selected_color_mode.h"
+#include "SelectedColorMode.h"
 
 #include "Observer.h"
 
@@ -57,7 +57,7 @@ class SwatchGroup : public BView,
 			bool				fIgnoreNotifications;
 
 			ColorPickerPanel*	fColorPickerPanel;
-			selected_color_mode fColorPickerMode;
+			SelectedColorMode	fColorPickerMode;
 			BRect				fColorPickerFrame;
 };
 

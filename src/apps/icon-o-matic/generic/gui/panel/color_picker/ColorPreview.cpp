@@ -1,7 +1,7 @@
 /* 
  * Copyright 2001 Werner Freytag - please read to the LICENSE file
  *
- * Copyright 2002-2006, Stephan Aßmus <superstippi@gmx.de>
+ * Copyright 2002-2015, Stephan Aßmus <superstippi@gmx.de>
  * All rights reserved.
  *		
  */
@@ -11,7 +11,9 @@
 #include <stdio.h>
 
 #include <Bitmap.h>
+#include <ControlLook.h>
 #include <Cursor.h>
+#include <LayoutUtils.h>
 #include <MessageRunner.h>
 #include <String.h>
 #include <Window.h>
@@ -19,20 +21,60 @@
 #include "cursors.h"
 #include "support_ui.h"
 
-// constructor
+
 ColorPreview::ColorPreview(BRect frame, rgb_color color)
-	: BControl(frame, "colorpreview", "", new BMessage(MSG_COLOR_PREVIEW),
-			   B_FOLLOW_TOP|B_FOLLOW_LEFT, B_WILL_DRAW),
-	  fColor(color),
-	  fOldColor(color),
+	:
+	BControl(frame, "colorpreview", "", new BMessage(MSG_COLOR_PREVIEW),
+		B_FOLLOW_TOP | B_FOLLOW_LEFT, B_WILL_DRAW),
+	fColor(color),
+	fOldColor(color),
 
-	  fMouseDown(false),
+	fMouseDown(false),
 
-	  fMessageRunner(0)
+	fMessageRunner(0),
+	fBorderStyle(B_FANCY_BORDER)
 {
 }
 
-// AttachedToWindow
+
+ColorPreview::ColorPreview(rgb_color color)
+	:
+	BControl("colorpreview", "", new BMessage(MSG_COLOR_PREVIEW), B_WILL_DRAW),
+	fColor(color),
+	fOldColor(color),
+
+	fMouseDown(false),
+
+	fMessageRunner(0),
+	fBorderStyle(B_FANCY_BORDER)
+{
+}
+
+
+BSize
+ColorPreview::MinSize()
+{
+	BSize minSize(32, 36);
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), minSize);
+}
+
+
+BSize
+ColorPreview::PreferredSize()
+{
+	BSize preferredSize(66, 70);
+	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), preferredSize);
+}
+
+
+BSize
+ColorPreview::MaxSize()
+{
+	BSize maxSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED);
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), maxSize);
+}
+
+
 void
 ColorPreview::AttachedToWindow()
 {
@@ -40,32 +82,30 @@ ColorPreview::AttachedToWindow()
 	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
-// Draw
+
 void
 ColorPreview::Draw(BRect updateRect)
 {
-	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color shadow = tint_color(background, B_DARKEN_1_TINT);
-	rgb_color darkShadow = tint_color(background, B_DARKEN_3_TINT);
-	rgb_color light = tint_color(background, B_LIGHTEN_MAX_TINT);
+	BRect bounds(Bounds());
 
-	BRect r(Bounds());
-	stroke_frame(this, r, shadow, shadow, light, light);
-	r.InsetBy(1.0, 1.0);
-	stroke_frame(this, r, darkShadow, darkShadow, background, background);
-	r.InsetBy(1.0, 1.0);
-
-	r.bottom = r.top + r.Height() / 2.0;
+	// Frame
+	if (fBorderStyle == B_FANCY_BORDER) {
+		rgb_color color = LowColor();
+		be_control_look->DrawTextControlBorder(this, bounds, updateRect, color);
+	}
+	
+	BRect r(bounds.left, bounds.top, bounds.right,
+		bounds.top + bounds.Height() / 2);
 	SetHighColor(fColor);
 	FillRect(r);
 
 	r.top = r.bottom + 1;
-	r.bottom = Bounds().bottom - 2.0;
+	r.bottom = bounds.bottom;
 	SetHighColor(fOldColor);
 	FillRect(r);
 }
 
-// MessageReceived
+
 void
 ColorPreview::MessageReceived(BMessage* message)
 {
@@ -112,7 +152,7 @@ ColorPreview::MessageReceived(BMessage* message)
 	}
 }
 
-// MouseDown
+
 void
 ColorPreview::MouseDown(BPoint where)
 {
@@ -137,7 +177,7 @@ ColorPreview::MouseDown(BPoint where)
 	
 }
 
-// MouseUp			
+
 void
 ColorPreview::MouseUp(BPoint where)
 {
@@ -148,7 +188,7 @@ ColorPreview::MouseUp(BPoint where)
 	BControl::MouseUp(where);
 }
 
-// MouseMoved
+
 void 
 ColorPreview::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 {
@@ -160,11 +200,11 @@ ColorPreview::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 		_DragColor(where);
 }
 
-// Invoke
+
 status_t
 ColorPreview::Invoke(BMessage* message)
 {
-	if (!message)
+	if (message == NULL)
 		message = Message();
 
 	if (message) {
@@ -175,7 +215,7 @@ ColorPreview::Invoke(BMessage* message)
 	return BControl::Invoke(message);
 }
 
-// SetColor
+
 void
 ColorPreview::SetColor(rgb_color color)
 {
@@ -185,7 +225,7 @@ ColorPreview::SetColor(rgb_color color)
 	Invalidate();
 }
 
-// SetNewColor
+
 void
 ColorPreview::SetNewColor(rgb_color color)
 {
@@ -195,9 +235,10 @@ ColorPreview::SetNewColor(rgb_color color)
 	Invalidate();
 }
 
+
 // #pragma mark -
 
-// _DragColor
+
 void
 ColorPreview::_DragColor(BPoint where)
 {

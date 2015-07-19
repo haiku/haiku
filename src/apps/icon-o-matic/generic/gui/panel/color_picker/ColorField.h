@@ -84,7 +84,6 @@ private:
 
 	BPoint						fMarkerPosition;
 	BPoint						fLastMarkerPosition;
-
 	bool						fMouseDown;
 
 	BBitmap*					fBitmap;

@@ -1,12 +1,12 @@
-/* 
+/*
  * Copyright 2001 Werner Freytag - please read to the LICENSE file
- *		
+ *
  */
 
 #ifndef	_SELECTED_COLOR_MODE_H
 #define _SELECTED_COLOR_MODE_H
 
-enum selected_color_mode {
+enum SelectedColorMode {
 	R_SELECTED = 0x01,
 	G_SELECTED = 0x02,
 	B_SELECTED = 0x04,
