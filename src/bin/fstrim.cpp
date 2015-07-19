@@ -77,6 +77,6 @@ main(int argc, char** argv)
 		return EXIT_FAILURE;
 	}
 
-	printf("Trimmed %lld bytes from device.\n", trimData.trimmed_size);
+	printf("Trimmed %" B_PRIu64 " bytes from device.\n", trimData.trimmed_size);
 	return EXIT_SUCCESS;
 }
