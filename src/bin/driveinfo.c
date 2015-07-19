@@ -12,7 +12,7 @@ static void dump_dev_size(int dev)
 		perror("ioctl(B_GET_DEVICE_SIZE)");
 		return;
 	}
-	printf("size: %ld bytes\n", sz);
+	printf("size: %" B_PRIuSIZE " bytes\n", sz);
 }
 
 static void dump_bios_id(int dev)
@@ -59,10 +59,10 @@ static void dump_geom(int dev, bool bios)
 		return;
 	}
 	printf("%sgeometry:\n", bios?"bios ":"");
-	printf("bytes_per_sector:\t%ld\n", geom.bytes_per_sector);
-	printf("sectors_per_track:\t%ld\n", geom.sectors_per_track);
-	printf("cylinder_count:\t%ld\n", geom.cylinder_count);
-	printf("head_count:\t%ld\n", geom.head_count);
+	printf("bytes_per_sector:\t%" B_PRIu32 "\n", geom.bytes_per_sector);
+	printf("sectors_per_track:\t%" B_PRIu32 "\n", geom.sectors_per_track);
+	printf("cylinder_count:\t%" B_PRIu32 "\n", geom.cylinder_count);
+	printf("head_count:\t%" B_PRIu32 "\n", geom.head_count);
 	printf("device_type:\t%d, %s\n", geom.device_type, device_type(geom.device_type));
 	printf("%sremovable.\n", geom.removable?"":"not ");
 	printf("%sread_only.\n", geom.read_only?"":"not ");
@@ -78,11 +78,11 @@ static void dump_partition(int dev)
 		return;
 	}
 	printf("partition:\n");
-	printf("offset:\t%lld\n", partition.offset);
-	printf("size:\t%lld\n", partition.size);
-	printf("logical_block_size:\t%ld\n", partition.logical_block_size);
-	printf("session:\t%ld\n", partition.session);
-	printf("partition:\t%ld\n", partition.partition);
+	printf("offset:\t%" B_PRIdOFF "\n", partition.offset);
+	printf("size:\t%" B_PRIdOFF "\n", partition.size);
+	printf("logical_block_size:\t%" B_PRId32 "\n", partition.logical_block_size);
+	printf("session:\t%" B_PRId32 "\n", partition.session);
+	printf("partition:\t%" B_PRId32 "\n", partition.partition);
 	printf("device:\t%s\n", partition.device);
 }
 
