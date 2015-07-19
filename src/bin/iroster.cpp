@@ -52,7 +52,7 @@ static void start_device(const char *name)
 		printf("Error finding device \"%s\"\n", name);
 	}
 	else if ((status = device->Start()) != B_OK) {
-		printf("Error starting device \"%s\" (%ld)\n", name, status);
+		printf("Error starting device \"%s\" (%" B_PRId32 ")\n", name, status);
 	}
 	else {
 		printf("Started device \"%s\"\n", name);
@@ -71,7 +71,7 @@ static void stop_device(const char *name)
 		printf("Error finding device \"%s\"\n", name);
 	}
 	else if ((status = device->Stop()) != B_OK) {
-		printf("Error stopping device \"%s\" (%ld)\n", name, status);
+		printf("Error stopping device \"%s\" (%" B_PRId32 ")\n", name, status);
 	}
 	else {
 		printf("Stopped device \"%s\"\n", name);
