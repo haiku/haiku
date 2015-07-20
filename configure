@@ -823,7 +823,7 @@ else
 			get_build_tool_path STRIP_$targetArch ${crossToolsPrefix}strip
 
 			case `get_variable HAIKU_GCC_RAW_VERSION_$targetArch` in
-				4.*)
+				4.*|5.*|6.*)
 					get_build_tool_path ELFEDIT_$targetArch \
 						${crossToolsPrefix}elfedit
 				;;

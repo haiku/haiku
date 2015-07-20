@@ -45,7 +45,7 @@
 
 #if __GNUC__ == 2
 #	define B_HAIKU_ABI					B_HAIKU_ABI_GCC_2_HAIKU
-#elif __GNUC__ == 4
+#elif __GNUC__ == 4 || __GNUC__ == 5 || __GNUC__ == 6
 #	define B_HAIKU_ABI					B_HAIKU_ABI_GCC_4
 #else
 #	error Unsupported gcc version!
