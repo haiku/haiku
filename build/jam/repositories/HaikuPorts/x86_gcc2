@@ -533,7 +533,7 @@ RemotePackageRepository HaikuPorts
 	burnitnow_x86-0.1.0-1
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
-	cmake_x86-3.2.2-1
+	cmake_x86-3.2.3-1
 	confuse_x86-2.7-2
 	confuse_x86_devel-2.7-2
 	copynametoclipboard-1.0.1-2
