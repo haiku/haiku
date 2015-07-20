@@ -323,7 +323,8 @@ ColorSlider::SetModeAndValues(SelectedColorMode mode,
 		B *= 255.0;
 	}
 
-	rgb_color color = { round(R), round(G), round(B), 255 };
+	rgb_color color = { (uint8)round(R), (uint8)round(G), (uint8)round(B), 
+		255 };
 
 	fMode = mode;
 	SetOtherValues(value1, value2);

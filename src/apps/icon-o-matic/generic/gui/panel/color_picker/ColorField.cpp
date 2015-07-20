@@ -276,7 +276,8 @@ ColorField::SetModeAndValue(SelectedColorMode mode, float fixedValue)
 		R *= 255.0; G *= 255.0; B *= 255.0;
 	}
 
-	rgb_color color = { round(R), round(G), round(B), 255 };
+	rgb_color color = { (uint8)round(R), (uint8)round(G), (uint8)round(B), 
+		255 };
 
 	if (fFixedValue != fixedValue || fMode != mode) {
 		fFixedValue = fixedValue;
