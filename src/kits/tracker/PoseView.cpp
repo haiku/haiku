@@ -1042,6 +1042,32 @@ BPoseView::GetLayoutInfo(uint32 mode, BPoint* grid, BPoint* offset) const
 
 
 void
+BPoseView::ScrollView(int32 type)
+{
+	if (fVScrollBar == NULL)
+		return;
+
+	float max, min;
+	fVScrollBar->GetSteps(&min, &max);
+
+	switch (type) {
+		case B_HOME:
+			fVScrollBar->SetValue(0);
+			break;
+		case B_END:
+			fVScrollBar->SetValue(max);
+			break;
+		case B_PAGE_UP:
+			fVScrollBar->SetValue(fVScrollBar->Value() - max);
+			break;
+		case B_PAGE_DOWN:
+			fVScrollBar->SetValue(fVScrollBar->Value() + max);
+			break;
+	}
+}
+
+
+void
 BPoseView::MakeFocus(bool focused)
 {
 	bool invalidate = false;
@@ -3942,6 +3968,40 @@ BPoseView::SelectPoses(int32 start, int32 end)
 
 
 void
+BPoseView::MoveOrChangePoseSelection(int32 to)
+{
+	PoseList* poseList = CurrentPoseList();
+	BPose* first = fSelectionList->FirstItem();
+
+	if (first != NULL && fMultipleSelection
+		&& (modifiers() & B_SHIFT_KEY) != 0) {
+		// Extend selection
+		BPose* target = poseList->ItemAt(to);
+		BPose* last = fSelectionList->LastItem();
+		int32 firstIndex = poseList->IndexOf(first);
+		int32 lastIndex = poseList->IndexOf(last);
+
+		int32 from = to < firstIndex ? firstIndex : lastIndex;
+		int32 step = from < to ? 1 : -1;
+
+		// TODO: shrink selection depending on anchor
+		bool select = true;
+
+		for (int32 index = from; step > 0 ? index <= to : index >= to;
+				index += step) {
+			BPose* pose = poseList->ItemAt(index);
+			if (pose != NULL && pose->IsSelected() != select)
+				AddRemovePoseFromSelection(pose, index, select);
+		}
+		if (target != NULL)
+			ScrollIntoView(target, to);
+	} else {
+		SelectPose(poseList->ItemAt(to), to);
+	}
+}
+
+
+void
 BPoseView::ScrollIntoView(BPose* pose, int32 index)
 {
 	ScrollIntoView(CalcPoseRect(pose, index, true));
@@ -6524,77 +6584,55 @@ BPoseView::KeyDown(const char* bytes, int32 count)
 		case B_HOME:
 			// select the first entry (if in listview mode), and
 			// scroll to the top of the view
-			if (ViewMode() == kListMode) {
-				PoseList* poseList = CurrentPoseList();
-				BPose* pose = fSelectionList->LastItem();
-
-				if (pose != NULL && fMultipleSelection
-					&& (modifiers() & B_SHIFT_KEY) != 0) {
-					int32 index = poseList->IndexOf(pose);
-
-					// select all items from the current one till the top
-					for (int32 i = index; i-- > 0; ) {
-						pose = poseList->ItemAt(i);
-						if (pose == NULL)
-							continue;
-
-						if (!pose->IsSelected())
-							AddPoseToSelection(pose, i, i == 0);
-					}
-				} else
-					SelectPose(poseList->FirstItem(), 0);
-
-			} else if (fVScrollBar)
-				fVScrollBar->SetValue(0);
-
+			if (ViewMode() == kListMode)
+				MoveOrChangePoseSelection(0);
+			else
+				ScrollView(B_HOME);
 			break;
 
 		case B_END:
 			// select the last entry (if in listview mode), and
 			// scroll to the bottom of the view
-			if (ViewMode() == kListMode) {
-				PoseList* poseList = CurrentPoseList();
-				BPose* pose = fSelectionList->FirstItem();
-
-				if (pose != NULL && fMultipleSelection
-					&& (modifiers() & B_SHIFT_KEY) != 0) {
-					int32 index = poseList->IndexOf(pose);
-					int32 count = poseList->CountItems() - 1;
-
-					// select all items from the current one to the bottom
-					for (int32 i = index; i <= count; i++) {
-						pose = poseList->ItemAt(i);
-						if (pose == NULL)
-							continue;
-
-						if (!pose->IsSelected())
-							AddPoseToSelection(pose, i, i == count);
-					}
-				} else {
-					SelectPose(poseList->LastItem(),
-						poseList->CountItems() - 1);
-				}
-			} else if (fVScrollBar) {
-				float max, min;
-				fVScrollBar->GetRange(&min, &max);
-				fVScrollBar->SetValue(max);
-			}
+			if (ViewMode() == kListMode)
+				MoveOrChangePoseSelection(CurrentPoseList()->CountItems() - 1);
+			else
+				ScrollView(B_END);
 			break;
 
 		case B_PAGE_UP:
-			if (fVScrollBar) {
-				float max, min;
-				fVScrollBar->GetSteps(&min, &max);
-				fVScrollBar->SetValue(fVScrollBar->Value() - max);
-			}
+			if (ViewMode() == kListMode) {
+				// Select first visible pose
+				int32 firstIndex = CurrentPoseList()->IndexOf(
+					fSelectionList->FirstItem());
+				int32 index;
+				BPose* first = FirstVisiblePose(&index);
+				if (first != NULL) {
+					if (index == firstIndex) {
+						ScrollView(B_PAGE_UP);
+						first = FirstVisiblePose(&index);
+					}
+					MoveOrChangePoseSelection(index);
+				}
+			} else
+				ScrollView(B_PAGE_UP);
 			break;
 
 		case B_PAGE_DOWN:
-			if (fVScrollBar) {
-				float max, min;
-				fVScrollBar->GetSteps(&min, &max);
-				fVScrollBar->SetValue(fVScrollBar->Value() + max);
-			}
+			if (ViewMode() == kListMode) {
+				// Select last visible pose
+				int32 lastIndex = CurrentPoseList()->IndexOf(
+					fSelectionList->LastItem());
+				int32 index;
+				BPose* last = LastVisiblePose(&index);
+				if (last != NULL) {
+					if (index == lastIndex) {
+						ScrollView(B_PAGE_DOWN);
+						last = LastVisiblePose(&index);
+					}
+					MoveOrChangePoseSelection(index);
+				}
+			} else
+				ScrollView(B_PAGE_DOWN);
 			break;
 
 		case B_TAB:
@@ -8109,6 +8147,31 @@ BPoseView::FindPose(BPoint point, int32* poseIndex) const
 	}
 
 	return NULL;
+}
+
+
+BPose*
+BPoseView::FirstVisiblePose(int32* _index) const
+{
+	ASSERT(ViewMode() == kListMode);
+	return FindPose(BPoint(kListOffset,
+		Bounds().top + fListElemHeight - 1), _index);
+}
+
+
+BPose*
+BPoseView::LastVisiblePose(int32* _index) const
+{
+	ASSERT(ViewMode() == kListMode);
+	BPose* pose = FindPose(BPoint(kListOffset, Bounds().top + Frame().Height()
+		- fListElemHeight + 2), _index);
+	if (pose == NULL) {
+		// Just get the last one
+		pose = CurrentPoseList()->LastItem();
+		if (_index != NULL)
+			*_index = CurrentPoseList()->CountItems() - 1;
+	}
+	return pose;
 }
 
 

@@ -245,6 +245,8 @@ public:
 		// used to not erase when we have a background image and
 		// invalidate instead
 
+	void ScrollView(int32 type);
+
 	// column handling
 	void ColumnRedraw(BRect updateRect);
 	bool AddColumn(BColumn*, const BColumn* after = NULL);
@@ -282,6 +284,8 @@ public:
 	BPose* DeepFindPose(const node_ref* node, int32* index = NULL) const;
 		// same as FindPose, node can be a target of the actual
 		// pose if the pose is a symlink
+	BPose* FirstVisiblePose(int32* _index = NULL) const;
+	BPose* LastVisiblePose(int32* _index = NULL) const;
 
 	void OpenInfoWindows();
 	void SetDefaultPrinter();
@@ -332,6 +336,7 @@ public:
 	void RemovePoseFromSelection(BPose*);
 	void SelectPoseAtLocation(BPoint);
 	void SelectPoses(int32 start, int32 end);
+	void MoveOrChangePoseSelection(int32 to);
 
 	// pose handling
 	void ScrollIntoView(BPose* pose, int32 index);
