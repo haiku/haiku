@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Marcus Overhagen <marcus@overhagen.de>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 
 #include "ServerPicture.h"
@@ -372,6 +373,7 @@ fill_ellipse(Canvas* canvas, BPoint center, BPoint radii)
 {
 	BRect rect(center.x - radii.x, center.y - radii.y,
 		center.x + radii.x - 1, center.y + radii.y - 1);
+
 	canvas->PenToScreenTransform().Apply(&rect);
 	canvas->GetDrawingEngine()->DrawEllipse(rect, true);
 }
@@ -776,6 +778,13 @@ set_blending_mode(Canvas* canvas, int16 alphaSrcMode, int16 alphaFncMode)
 
 
 static void
+set_transform(Canvas* canvas, BAffineTransform transform)
+{
+	canvas->CurrentState()->SetTransform(transform);
+}
+
+
+static void
 reserved()
 {
 }
@@ -787,7 +796,7 @@ const static void* kTableEntries[] = {
 	(const void*)stroke_line,
 	(const void*)stroke_rect,
 	(const void*)fill_rect,
-	(const void*)stroke_round_rect,	//	5
+	(const void*)stroke_round_rect,		//	5
 	(const void*)fill_round_rect,
 	(const void*)stroke_bezier,
 	(const void*)fill_bezier,
@@ -807,7 +816,7 @@ const static void* kTableEntries[] = {
 	(const void*)push_state,
 	(const void*)pop_state,
 	(const void*)enter_state_change,
-	(const void*)exit_state_change,	//	25
+	(const void*)exit_state_change,		//	25
 	(const void*)enter_font_state,
 	(const void*)exit_font_state,
 	(const void*)set_origin,
@@ -822,14 +831,15 @@ const static void* kTableEntries[] = {
 	(const void*)set_font_family,
 	(const void*)set_font_style,
 	(const void*)set_font_spacing,
-	(const void*)set_font_size,		//	40
+	(const void*)set_font_size,			//	40
 	(const void*)set_font_rotate,
 	(const void*)set_font_encoding,
 	(const void*)set_font_flags,
 	(const void*)set_font_shear,
 	(const void*)reserved,				//	45
 	(const void*)set_font_face,
-	(const void*)set_blending_mode		//	47
+	(const void*)set_blending_mode,
+	(const void*)set_transform			//  48
 };
 
 
