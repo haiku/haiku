@@ -5,9 +5,9 @@
 	Interface (API) of the Haiku operating system. This API describes
 	the internals of the operating system allowing developers to write
 	native C++ applications and device drivers. See the
-	<a href="http://api.haiku-os.org">online version</a> for the most
+	<a href="https://api.haiku-os.org">online version</a> for the most
 	updated version of this document. If you would like to help contribute
-	contact the <a href="http://www.freelists.org/list/haiku-doc">documentation
+	contact the <a href="https://www.freelists.org/list/haiku-doc">documentation
 	mailing list</a>. For guidelines on how to help document the API see
 	the \link apidoc Documenting the API\endlink page. A list of
 	contributors can be found \ref credits page. Documenting the API is
@@ -20,9 +20,9 @@
 	appropriate sections.
 
 	A complete reference to the BeOS R5 API is available on the web in
-	<a href="http://haiku-os.org/legacy-docs/bebook/">The Be Book</a>.
+	<a href="https://haiku-os.org/legacy-docs/bebook/">The Be Book</a>.
 	The Be Book is used with permission from
-	<a href="http://www.access-company.com/">Access Co.</a>, the current
+	<a href="https://www.access-company.com/">Access Co.</a>, the current
 	owners of Be's intellectual property.
 
 	\section kits Kits and Servers
@@ -167,7 +167,7 @@
 	\brief The Midi Kit is the API that implements support for generating,
 		processing, and playing music in MIDI format.
 
-	<A HREF="http://www.midi.org/">MIDI</A>, which  stands for 'Musical
+	<A HREF="https://www.midi.org/">MIDI</A>, which  stands for 'Musical
 	Instrument Digital Interface', is a well-established  standard for
 	representing and communicating musical data. This document serves as
 	an overview. If you would like to see all the components, please look
@@ -413,7 +413,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 	of events from more than one producer to one consumer at the same time.
 
 	The article Introduction to MIDI, Part 2 in <A
-	HREF="http://open-beos.sourceforge.net/nsl.php?mode=display&id=36">OpenBeOS
+	HREF="https://open-beos.sourceforge.net/nsl.php?mode=display&id=36">OpenBeOS
 	Newsletter 36</A> describes this problem in more detail, and provides a
 	solution. Go read it now!
 
@@ -454,19 +454,19 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 		- \ref Midi2Defs.h
 		- Be Newsletter Volume 3, Issue 47 - Motor Mix sample code
 		- Be Newsletter Volume 4, Issue 3 - Overview of the new kit
-		- <A HREF="http://haiku-os.org/documents/dev/introduction_to_midi_part_1">Newsletter
+		- <A HREF="https://haiku-os.org/documents/dev/introduction_to_midi_part_1">Newsletter
 		  33</A>, Introduction to MIDI, Part 1
-		- <A HREF="http://haiku-os.org/documents/dev/introduction_to_midi_part_2">Newsletter
+		- <A HREF="https://haiku-os.org/documents/dev/introduction_to_midi_part_2">Newsletter
 		  36</A>, Introduction to MIDI, Part 2
 		- Sample code and other goodies at the
-		  <A HREF="http://haiku-os.org/about/teams/midi_kit">Haiku Midi Kit team page</A>
+		  <A HREF="https://haiku-os.org/about/teams/midi_kit">Haiku Midi Kit team page</A>
 
 	Information about MIDI in general:
-		- <A HREF="http://www.midi.org">MIDI Manufacturers Association</A>
-		- <A HREF="http://www.borg.com/~jglatt/tutr/miditutr.htm">MIDI Tutorials</A>
-		- <A HREF="http://www.borg.com/~jglatt/tech/midispec.htm">MIDI Specification</A>
-		- <A HREF="http://www.borg.com/~jglatt/tech/midifile.htm">Standard MIDI File Format</A>
-		- <A HREF="http://www.io.com/~jimm/midi_ref.html">Jim Menard's MIDI Reference</A>
+		- <A HREF="https://www.midi.org">MIDI Manufacturers Association</A>
+		- <A HREF="https://www.borg.com/~jglatt/tutr/miditutr.htm">MIDI Tutorials</A>
+		- <A HREF="https://www.borg.com/~jglatt/tech/midispec.htm">MIDI Specification</A>
+		- <A HREF="https://www.borg.com/~jglatt/tech/midifile.htm">Standard MIDI File Format</A>
+		- <A HREF="https://www.io.com/~jimm/midi_ref.html">Jim Menard's MIDI Reference</A>
 
 
 	\defgroup network Network Kit
@@ -502,7 +502,7 @@ snooze_until(time - Latency(), B_SYSTEM_TIMEBASE);
 	including ping, ifconfig, route, traceroute, and arp.
 
 	See the User Guide for more information about the
-	<a href="http://haiku-os.org/docs/userguide/en/preferences/network.html">Network preferences app</a>
+	<a href="https://haiku-os.org/docs/userguide/en/preferences/network.html">Network preferences app</a>
 	included as part of the Network Kit.
 
 

@@ -10,7 +10,7 @@
  *		John Scipione, jscipione@gmail.com
  */
 
-/* color names provided by: http://chir.ag/projects/name-that-color */
+/* color names provided by: https://chir.ag/projects/name-that-color */
 
 html {
 	overflow-x: hidden;
@@ -146,7 +146,7 @@ h4 a:hover, a:active, h5 a:hover, a:active, h6 a:hover, a:active {
 }
 
 #banner div.logo {
-	background: url('http://api.haiku-os.org/logo.png') no-repeat scroll 0 0 transparent;
+	background: url('https://api.haiku-os.org/logo.png') no-repeat scroll 0 0 transparent;
 	width: 59em;
 	height: 100%;
 	margin: 0 auto;
@@ -377,24 +377,24 @@ dl.note dd, dl.remark dd, dl.warning dd, dl.attention dd {
 
 dl.note {
 	/* rice flower */
-	background:#e4ffde url('http://haiku-os.org/sites/haiku-os.org/themes/shijin/haiku-icons/alert_info_32.png') 15px 15px no-repeat;
+	background:#e4ffde url('https://haiku-os.org/sites/haiku-os.org/themes/shijin/haiku-icons/alert_info_32.png') 15px 15px no-repeat;
 	border-color: #94ce18; /* lima */
 }
 
 dl.remark {
-	background: #f3f3f3 url('http://api.haiku-os.org/images/alert_idea_32.png') 15px 15px no-repeat;
+	background: #f3f3f3 url('https://api.haiku-os.org/images/alert_idea_32.png') 15px 15px no-repeat;
 	border-color: #c0c0c0; /* silver */
 }
 
 dl.warning {
 	/* lemon chiffon */
-	background: #fffbc6 url('http://api.haiku-os.org/images/alert_warning_32.png') 15px 15px no-repeat;
+	background: #fffbc6 url('https://api.haiku-os.org/images/alert_warning_32.png') 15px 15px no-repeat;
 	border-color: #eed300; /* gold */
 }
 
 dl.attention {
 	/* fair pink */
-	background: #ffeae6 url('http://api.haiku-os.org/images/alert_stop_32.png') 15px 15px no-repeat;
+	background: #ffeae6 url('https://api.haiku-os.org/images/alert_stop_32.png') 15px 15px no-repeat;
 	border-color: red;
 }
 
