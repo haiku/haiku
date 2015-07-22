@@ -46,3 +46,23 @@ TableCellEnumerationEditor::ConfigureOptions()
 
 	return SelectOptionFor(integerValue.ToInt32());
 }
+
+
+status_t
+TableCellEnumerationEditor::GetSelectedValue(::Value*& _value) const
+{
+	EnumerationValue* initialValue = dynamic_cast<EnumerationValue*>(
+		InitialValue());
+	EnumerationType* type = initialValue->GetType();
+	const char* name = NULL;
+	int32 selectedValue = 0;
+	SelectedOption(&name, &selectedValue);
+
+	EnumerationValue* value = new(std::nothrow) EnumerationValue(type,
+		BVariant(selectedValue));
+	if (value == NULL)
+		return B_NO_MEMORY;
+
+	_value = value;
+	return B_OK;
+}

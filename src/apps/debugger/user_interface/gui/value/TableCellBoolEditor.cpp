@@ -38,3 +38,18 @@ TableCellBoolEditor::ConfigureOptions()
 
 	return SelectOptionFor(initialValue->GetValue());
 }
+
+
+status_t
+TableCellBoolEditor::GetSelectedValue(::Value*& _value) const
+{
+	const char* name = NULL;
+	int32 selectedValue = 0;
+	SelectedOption(&name, &selectedValue);
+	BoolValue* value = new(std::nothrow) BoolValue((bool)selectedValue);
+	if (value == NULL)
+		return B_NO_MEMORY;
+
+	_value = value;
+	return B_OK;
+}

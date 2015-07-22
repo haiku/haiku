@@ -65,7 +65,13 @@ TableCellOptionPopUpEditor::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_SELECTED_OPTION_CHANGED:
 		{
-			// TODO: implement
+			::Value* value = NULL;
+			if (GetSelectedValue(value) == B_OK) {
+				BReference< ::Value> valueReference(value, true);
+				NotifyEditCompleted(value);
+			} else
+				NotifyEditCancelled();
+
 			break;
 		}
 		default:

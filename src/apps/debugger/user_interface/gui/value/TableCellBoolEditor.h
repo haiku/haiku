@@ -18,6 +18,8 @@ public:
 
 	virtual	status_t			ConfigureOptions();
 
+protected:
+	virtual	status_t			GetSelectedValue(::Value*& _value) const;
 };
 
 #endif	// TABLE_CELL_BOOL_EDITOR_H

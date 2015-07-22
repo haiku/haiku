@@ -27,6 +27,8 @@ public:
 	virtual	status_t			ConfigureOptions() = 0;
 
 protected:
+	virtual	status_t			GetSelectedValue(::Value*& _value) const = 0;
+
 	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
 };
