@@ -178,36 +178,35 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 //	fToolBar->AddAction(MSG_FILE_OPEN, be_app,
 //		tool_bar_icon(kIconDocumentOpen), B_TRANSLATE("Open" B_UTF8_ELLIPSIS));
 	fToolBar->AddAction(MSG_FILE_PREV, this,
-		tool_bar_icon(kIconGoPrevious), B_TRANSLATE("Previous file"), false);
+		tool_bar_icon(kIconGoPrevious), B_TRANSLATE("Previous file"));
 	fToolBar->AddAction(MSG_FILE_NEXT, this, tool_bar_icon(kIconGoNext),
-		B_TRANSLATE("Next file"), false);
+		B_TRANSLATE("Next file"));
 	BMessage* fullScreenSlideShow = new BMessage(MSG_SLIDE_SHOW);
 	fullScreenSlideShow->AddBool("full screen", true);
 	fToolBar->AddAction(fullScreenSlideShow, this,
-		tool_bar_icon(kIconMediaMovieLibrary), B_TRANSLATE("Slide show"),
-		false);
+		tool_bar_icon(kIconMediaMovieLibrary), B_TRANSLATE("Slide show"));
 	fToolBar->AddSeparator();
 	fToolBar->AddAction(MSG_SELECTION_MODE, this,
 		tool_bar_icon(kIconDrawRectangularSelection),
-		B_TRANSLATE("Selection mode"), false);
+		B_TRANSLATE("Selection mode"));
 	fToolBar->AddSeparator();
 	fToolBar->AddAction(kMsgOriginalSize, this,
-		tool_bar_icon(kIconZoomOriginal), B_TRANSLATE("Original size"), true);
+		tool_bar_icon(kIconZoomOriginal), B_TRANSLATE("Original size"), NULL,
+		true);
 	fToolBar->AddAction(kMsgFitToWindow, this,
-		tool_bar_icon(kIconZoomFitBest), B_TRANSLATE("Fit to window"), false);
+		tool_bar_icon(kIconZoomFitBest), B_TRANSLATE("Fit to window"));
 	fToolBar->AddAction(MSG_ZOOM_IN, this, tool_bar_icon(kIconZoomIn),
-		B_TRANSLATE("Zoom in"), false);
+		B_TRANSLATE("Zoom in"));
 	fToolBar->AddAction(MSG_ZOOM_OUT, this, tool_bar_icon(kIconZoomOut),
-		B_TRANSLATE("Zoom out"), false);
+		B_TRANSLATE("Zoom out"));
 	fToolBar->AddSeparator();
 	fToolBar->AddAction(MSG_PAGE_PREV, this, tool_bar_icon(kIconPagePrevious),
-		B_TRANSLATE("Previous page"), false);
+		B_TRANSLATE("Previous page"));
 	fToolBar->AddAction(MSG_PAGE_NEXT, this, tool_bar_icon(kIconPageNext),
-		B_TRANSLATE("Next page"), false);
+		B_TRANSLATE("Next page"));
 	fToolBar->AddGlue();
 	fToolBar->AddAction(MSG_FULL_SCREEN, this,
-		tool_bar_icon(kIconViewWindowed), B_TRANSLATE("Leave full screen"),
-		false);
+		tool_bar_icon(kIconViewWindowed), B_TRANSLATE("Leave full screen"));
 	fToolBar->SetActionVisible(MSG_FULL_SCREEN, false);
 
 	fToolBar->ResizeTo(viewFrame.Width(), fToolBar->MinSize().height);

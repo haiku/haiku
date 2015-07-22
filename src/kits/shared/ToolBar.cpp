@@ -83,17 +83,17 @@ BToolBar::Hide()
 
 void
 BToolBar::AddAction(uint32 command, BHandler* target, const BBitmap* icon,
-	const char* toolTipText, bool lockable)
+	const char* toolTipText, const char* text, bool lockable)
 {
-	AddAction(new BMessage(command), target, icon, toolTipText, lockable);
+	AddAction(new BMessage(command), target, icon, toolTipText, text, lockable);
 }
 
 
 void
 BToolBar::AddAction(BMessage* message, BHandler* target,
-	const BBitmap* icon, const char* toolTipText, bool lockable)
+	const BBitmap* icon, const char* toolTipText, const char* text,
+	bool lockable)
 {
-
 	BButton* button;
 	if (lockable)
 		button = new LockableButton(NULL, NULL, message);
@@ -103,6 +103,8 @@ BToolBar::AddAction(BMessage* message, BHandler* target,
 	button->SetFlat(true);
 	if (toolTipText != NULL)
 		button->SetToolTip(toolTipText);
+	if (text != NULL)
+		button->SetLabel(text);
 	AddView(button);
 	button->SetTarget(target);
 }
