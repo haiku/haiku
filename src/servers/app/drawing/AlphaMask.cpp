@@ -1,10 +1,11 @@
 /*
- * Copyright 2014, Haiku, Inc.
+ * Copyright 2014-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Adrien Destugues <pulkomandy@pulkomandy.tk>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 
 
@@ -26,6 +27,7 @@ AlphaMask::AlphaMask(ServerPicture* picture, bool inverse, BPoint origin,
 	fPicture(picture),
 	fInverse(inverse),
 	fOrigin(origin),
+	fBackgroundOpacity(0),
 	fDrawState(drawState),
 
 	fViewBounds(),
@@ -43,9 +45,34 @@ AlphaMask::AlphaMask(ServerPicture* picture, bool inverse, BPoint origin,
 }
 
 
+AlphaMask::AlphaMask(uint8 backgroundOpacity)
+	:
+	fPreviousMask(NULL),
+
+	fPicture(NULL),
+	fInverse(false),
+	fOrigin(0, 0),
+	fBackgroundOpacity(backgroundOpacity),
+	fDrawState(),
+
+	fViewBounds(),
+	fViewOffset(),
+
+	fCachedBitmap(NULL),
+	fCachedBounds(),
+	fCachedOffset(),
+
+	fBuffer(),
+	fCachedMask(),
+	fScanline(fCachedMask)
+{
+}
+
+
 AlphaMask::~AlphaMask()
 {
-	fPicture->ReleaseReference();
+	if (fPicture != NULL)
+		fPicture->ReleaseReference();
 	delete[] fCachedBitmap;
 	SetPrevious(NULL);
 }
@@ -81,7 +108,13 @@ AlphaMask::SetPrevious(AlphaMask* mask)
 scanline_unpacked_masked_type*
 AlphaMask::Generate()
 {
-	if (fPicture == NULL || !fViewBounds.IsValid())
+	if (fPicture == NULL) {
+		fBuffer.attach(NULL, 0, 0, 0);
+		_AttachMaskToBuffer();
+		return &fScanline;
+	}
+
+	if (!fViewBounds.IsValid())
 		return NULL;
 
 	// See if a cached bitmap can be used. Don't use it when the view offset
@@ -162,9 +195,7 @@ AlphaMask::Generate()
 	fCachedOffset = fViewOffset;
 
 	fBuffer.attach(fCachedBitmap, width, height, width);
-
-	fCachedMask.attach(fBuffer, fViewOffset.x + fOrigin.x,
-		fViewOffset.y + fOrigin.y, fInverse ? 255 : 0);
+	_AttachMaskToBuffer();
 
 	return &fScanline;
 }
@@ -184,7 +215,7 @@ AlphaMask::_RenderPicture() const
 	}
 
 	// Clear the bitmap with the transparent color
-	memset(bitmap->Bits(), 0, bitmap->BitsLength());
+	memset(bitmap->Bits(), fBackgroundOpacity, bitmap->BitsLength());
 
 	// Render the picture to the bitmap
 	BitmapHWInterface interface(bitmap);
@@ -213,3 +244,13 @@ AlphaMask::_RenderPicture() const
 	return bitmap;
 }
 
+
+void
+AlphaMask::_AttachMaskToBuffer()
+{
+	uint8 outsideOpacity = fInverse ? 255 - fBackgroundOpacity
+		: fBackgroundOpacity;
+
+	fCachedMask.attach(fBuffer, fViewOffset.x + fOrigin.x,
+		fViewOffset.y + fOrigin.y, outsideOpacity);
+}

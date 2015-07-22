@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Haiku, Inc.
+ * Copyright 2014-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,6 +23,7 @@ class AlphaMask : public BReferenceable {
 public:
 								AlphaMask(ServerPicture* mask, bool inverse,
 									BPoint origin, const DrawState& drawState);
+								AlphaMask(uint8 backgroundOpacity);
 								~AlphaMask();
 
 			void				Update(BRect bounds, BPoint offset);
@@ -33,6 +34,7 @@ public:
 
 private:
 			ServerBitmap*		_RenderPicture() const;
+			void				_AttachMaskToBuffer();
 
 
 private:
@@ -41,10 +43,18 @@ private:
 			ServerPicture*		fPicture;
 			const bool			fInverse;
 			BPoint				fOrigin;
+									// position of this mask, relative to
+									// either its parent mask, or (if there
+									// is none) the canvas
+			uint8				fBackgroundOpacity;
 			DrawState			fDrawState;
+									// draw state used for drawing fPicture
 
 			BRect				fViewBounds;
+									// determines alpha mask size
 			BPoint				fViewOffset;
+									// position of alpha mask in screen
+									// coordinates
 
 			uint8*				fCachedBitmap;
 			BRect				fCachedBounds;
