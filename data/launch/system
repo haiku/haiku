@@ -46,6 +46,12 @@ service x-vnd.Haiku-mail_daemon {
 	legacy
 }
 
+service x-vnd.Haiku-net_server {
+	launch /system/servers/net_server
+	no_safemode
+	legacy
+}
+
 service x-vnd.Haiku-cddb_daemon {
 	launch /system/servers/cddb_daemon
 	no_safemode
