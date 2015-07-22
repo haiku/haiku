@@ -13,8 +13,6 @@ UsePrivateHeaders storage ;
 AddResources Mail : pictures.rdef  ;
 
 Application Mail :
-	BmapButton.cpp
-	ButtonBar.cpp
 	ComboBox.cpp
 	Content.cpp
 	Enclosures.cpp
@@ -33,8 +31,8 @@ Application Mail :
 	WIndex.cpp
 	Words.cpp
 	KUndoBuffer.cpp
-	: be tracker [ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
-		libmail.so libtextencoding.so
+	: libshared.a be tracker [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+		localestub libmail.so libtextencoding.so
 	: Mail.rdef
 ;
 
@@ -52,4 +50,3 @@ DoCatalogs Mail :
 	Prefs.cpp
 	Signature.cpp
 ;
-

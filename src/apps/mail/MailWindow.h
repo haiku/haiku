@@ -37,10 +37,12 @@ All rights reserved.
 
 #include <Entry.h>
 #include <Font.h>
-#include <List.h>
 #include <Locker.h>
 #include <Messenger.h>
+#include <ObjectList.h>
 #include <Window.h>
+
+#include <ToolBar.h>
 
 #include <E-mail.h>
 #include <mail_encoding.h>
@@ -61,8 +63,6 @@ class BMailMessage;
 class BMenu;
 class BMenuBar;
 class BMenuItem;
-class BmapButton;
-class ButtonBar;
 class Words;
 
 class TMailWindow : public BWindow {
@@ -119,7 +119,7 @@ class TMailWindow : public BWindow {
 	protected:
 				void			SetTitleForMessage();
 				void			AddEnclosure(BMessage* msg);
-				void			BuildButtonBar();
+				void			BuildToolBar();
 				status_t		TrainMessageAs(const char* commandWord);
 
 	private:
@@ -128,7 +128,7 @@ class TMailWindow : public BWindow {
 				status_t		_GetQueryPath(BPath* path) const;
 				void			_RebuildQueryMenu(bool firstTime = false);
 				char*			_BuildQueryString(BEntry* entry) const;
- 
+
  				void			_AddReadButton();
 				void			_UpdateReadButton();
 
@@ -165,13 +165,17 @@ class TMailWindow : public BWindow {
 
 				BMenu*			fQueryMenu;
 				BMenu*			fLeaveStatusMenu;
-		
-				ButtonBar*		fButtonBar;
-				BmapButton*		fSendButton;
-				BmapButton*		fSaveButton;
-				BmapButton*		fPrintButton;
-				BmapButton*		fSigButton;
-		
+
+				static BBitmap*					_RetrieveVectorIcon(int32 id);
+				struct BitmapItem {
+					BBitmap* bm;
+					int32 id;
+				};
+				static BObjectList<BitmapItem>	fBitmapCache;
+				static BLocker					fBitmapCacheLock;
+
+				BToolBar*		fToolBar;
+
 				BRect			fZoom;
 				TContentView*	fContentView;
 				THeaderView*	fHeaderView;
@@ -181,7 +185,7 @@ class TMailWindow : public BWindow {
 				BMessenger		fTrackerMessenger;
 					// Talks to tracker window that this was launched from.
 				BMessenger		fMessengerToSpamServer;
-		
+
 				entry_ref		fPrevRef;
 				entry_ref		fNextRef;
 				bool			fPrevTrackerPositionSaved : 1;
@@ -196,17 +200,14 @@ class TMailWindow : public BWindow {
 				bool			fSent : 1;
 				bool			fDraft : 1;
 				bool			fChanged : 1;
-			
+
 				static BList	sWindowList;
 				static BLocker	sWindowListLock;
-		
+
 				entry_ref		fRepliedMail;
 				BMessenger*		fOriginatingWindow;
-				
-				bool			fAutoMarkRead : 1;
-				BmapButton*		fReadButton;
-				BmapButton*		fNextButton;
 
+				bool			fAutoMarkRead : 1;
 				bool			fKeepStatusOnQuit;
 
 				bool			fDownloading;

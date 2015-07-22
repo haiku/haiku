@@ -48,6 +48,7 @@ of their respective holders. All rights reserved.
 #include <Debug.h>
 #include <E-mail.h>
 #include <File.h>
+#include <IconUtils.h>
 #include <InterfaceKit.h>
 #include <Locale.h>
 #include <Node.h>
@@ -69,7 +70,6 @@ of their respective holders. All rights reserved.
 
 #include <CharacterSetRoster.h>
 
-#include "ButtonBar.h"
 #include "Content.h"
 #include "Enclosures.h"
 #include "FieldMsg.h"
@@ -158,10 +158,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fFieldState(0),
 	fPanel(NULL),
 	fLeaveStatusMenu(NULL),
-	fSendButton(NULL),
-	fSaveButton(NULL),
-	fPrintButton(NULL),
-	fSigButton(NULL),
 	fZoom(rect),
 	fEnclosuresView(NULL),
 	fPrevTrackerPositionSaved(false),
@@ -173,8 +169,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fDraft(false),
 	fChanged(false),
 	fOriginatingWindow(NULL),
-	fReadButton(NULL),
-	fNextButton(NULL),
 
 	fDownloading(false)
 {
@@ -473,19 +467,17 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	// Button Bar
 
-	BuildButtonBar();
+	BuildToolBar();
 
-	float bbwidth = 0, bbheight = 0;
+	float bbheight = 0;
 
-	bool showButtonBar = fApp->ShowButtonBar();
+	bool showToolBar = fApp->ShowToolBar();
 
-	if (showButtonBar) {
-		fButtonBar->ShowLabels(showButtonBar);
-		fButtonBar->Arrange(true);
-		fButtonBar->GetPreferredSize(&bbwidth, &bbheight);
-		fButtonBar->ResizeTo(Bounds().right, bbheight);
-		fButtonBar->MoveTo(0, height);
-		fButtonBar->Show();
+	if (showToolBar) {
+		bbheight = fToolBar->MinSize().height;
+		fToolBar->ResizeTo(Bounds().right, bbheight);
+		fToolBar->MoveTo(0, height);
+		fToolBar->Show();
 	}
 
 	r.top = r.bottom = height + bbheight + 1;
@@ -562,91 +554,131 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 }
 
 
-void
-TMailWindow::BuildButtonBar()
-{
-	ButtonBar *bbar;
+BObjectList<TMailWindow::BitmapItem> TMailWindow::fBitmapCache;
+BLocker TMailWindow::fBitmapCacheLock;
 
-	bbar = new ButtonBar(BRect(0, 0, 100, 100), "ButtonBar", 2, 3, 0, 1, 10,
-		2);
-	bbar->AddButton(B_TRANSLATE("New"), 28, new BMessage(M_NEW));
-	bbar->AddDivider(5);
-	fButtonBar = bbar;
+BBitmap*
+TMailWindow::_RetrieveVectorIcon(int32 id)
+{
+	// Lock access to the list
+	BAutolock lock(fBitmapCacheLock);
+	if (!lock.IsLocked())
+		return NULL;
+
+	// Check for the bitmap in the cache first
+	BitmapItem* item;
+	for (int32 i = 0; (item = fBitmapCache.ItemAt(i)) != NULL; i++) {
+		if (item->id == id)
+			return item->bm;
+	}
+
+	// If it's not in the cache, try to load it
+	BResources* res = BApplication::AppResources();
+	if (res == NULL)
+		return NULL;
+	size_t size;
+	const void* data = res->LoadResource(B_VECTOR_ICON_TYPE, id, &size);
+
+	if (!data)
+		return NULL;
+
+	BBitmap* bitmap = new BBitmap(BRect(0, 0, 21, 21), B_RGBA32);
+	status_t status = BIconUtils::GetVectorIcon((uint8*)data, size, bitmap);
+	if (status == B_OK) {
+		item = (BitmapItem*)malloc(sizeof(BitmapItem));
+		item->bm = bitmap;
+		item->id = id;
+		fBitmapCache.AddItem(item);
+		return bitmap;
+	}
+
+	return NULL;
+}
+
+
+void
+TMailWindow::BuildToolBar()
+{
+	fToolBar = new BToolBar(BRect(0, 0, 100, 50));
+	fToolBar->AddAction(M_NEW, this, _RetrieveVectorIcon(11), NULL,
+		B_TRANSLATE("New"));
+	fToolBar->AddSeparator();
 
 	if (fResending) {
-		fSendButton = bbar->AddButton(B_TRANSLATE("Send"), 8,
-			new BMessage(M_SEND_NOW));
-		bbar->AddDivider(5);
+		fToolBar->AddAction(M_SEND_NOW, this, _RetrieveVectorIcon(1), NULL,
+			B_TRANSLATE("Send"));
 	} else if (!fIncoming) {
-		fSendButton = bbar->AddButton(B_TRANSLATE("Send"), 8,
-			new BMessage(M_SEND_NOW));
-		fSendButton->SetEnabled(false);
-		fSigButton = bbar->AddButton(B_TRANSLATE("Signature"), 4,
-			new BMessage(M_SIG_MENU));
-		fSigButton->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
-		fSaveButton = bbar->AddButton(B_TRANSLATE("Save"), 44,
-			new BMessage(M_SAVE_AS_DRAFT));
-		fSaveButton->SetEnabled(false);
-		fPrintButton = bbar->AddButton(B_TRANSLATE("Print"), 16,
-			new BMessage(M_PRINT));
-		fPrintButton->SetEnabled(false);
-		bbar->AddButton(B_TRANSLATE("Trash"), 0, new BMessage(M_DELETE));
-		bbar->AddDivider(5);
+		fToolBar->AddAction(M_SEND_NOW, this, _RetrieveVectorIcon(1), NULL,
+			B_TRANSLATE("Send"));
+		fToolBar->SetActionEnabled(M_SEND_NOW, false);
+		fToolBar->AddAction(M_SIG_MENU, this, _RetrieveVectorIcon(2), NULL,
+			B_TRANSLATE("Signature"));
+		fToolBar->AddAction(M_SAVE_AS_DRAFT, this, _RetrieveVectorIcon(3), NULL,
+			B_TRANSLATE("Save"));
+		fToolBar->SetActionEnabled(M_SAVE_AS_DRAFT, false);
+		fToolBar->AddAction(M_PRINT, this, _RetrieveVectorIcon(5), NULL,
+			B_TRANSLATE("Print"));
+		fToolBar->SetActionEnabled(M_PRINT, false);
+		fToolBar->AddAction(M_DELETE, this, _RetrieveVectorIcon(4), NULL,
+			B_TRANSLATE("Trash"));
 	} else {
-		BmapButton *button = bbar->AddButton(B_TRANSLATE("Reply"), 12,
-			new BMessage(M_REPLY));
-		button->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
-		button = bbar->AddButton(B_TRANSLATE("Forward"), 40,
-			new BMessage(M_FORWARD));
-		button->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
-		fPrintButton = bbar->AddButton(B_TRANSLATE("Print"), 16,
-			new BMessage(M_PRINT));
-		bbar->AddButton(B_TRANSLATE("Trash"), 0, new BMessage(M_DELETE_NEXT));
-		if (fApp->ShowSpamGUI()) {
-			button = bbar->AddButton("Spam", 48, new BMessage(M_SPAM_BUTTON));
-			button->InvokeOnButton(B_SECONDARY_MOUSE_BUTTON);
-		}
-		bbar->AddDivider(5);
-		fNextButton = bbar->AddButton(B_TRANSLATE("Next"), 24,
-			new BMessage(M_NEXTMSG));
-		bbar->AddButton(B_TRANSLATE("Previous"), 20, new BMessage(M_PREVMSG));
+		fToolBar->AddAction(M_REPLY, this, _RetrieveVectorIcon(8), NULL,
+			B_TRANSLATE("Reply"));
+		fToolBar->AddAction(M_FORWARD, this, _RetrieveVectorIcon(9), NULL,
+			B_TRANSLATE("Forward"));
+		fToolBar->AddAction(M_PRINT, this, _RetrieveVectorIcon(5), NULL,
+			B_TRANSLATE("Print"));
+		fToolBar->AddAction(M_DELETE_NEXT, this, _RetrieveVectorIcon(4), NULL,
+			B_TRANSLATE("Trash"));
+		if (fApp->ShowSpamGUI())
+			fToolBar->AddAction(M_SPAM_BUTTON, this, _RetrieveVectorIcon(10), NULL,
+				B_TRANSLATE("Spam"));
+		fToolBar->AddSeparator();
+		fToolBar->AddAction(M_NEXTMSG, this, _RetrieveVectorIcon(6), NULL,
+			B_TRANSLATE("Next"));
+		fToolBar->AddAction(M_UNREAD, this, _RetrieveVectorIcon(12), NULL,
+			B_TRANSLATE("Unread"));
+		fToolBar->SetActionVisible(M_UNREAD, false);
+		fToolBar->AddAction(M_READ, this, _RetrieveVectorIcon(13), NULL,
+			B_TRANSLATE(" Read "));
+		fToolBar->SetActionVisible(M_READ, false);
+		fToolBar->AddAction(M_PREVMSG, this, _RetrieveVectorIcon(7), NULL,
+			B_TRANSLATE("Previous"));
+
 		if (!fAutoMarkRead)
 			_AddReadButton();
 	}
+	fToolBar->AddGlue();
 
-	bbar->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	bbar->Hide();
-	AddChild(bbar);
+	fToolBar->Hide();
+	AddChild(fToolBar);
 }
 
 
 void
 TMailWindow::UpdateViews()
 {
-	float bbwidth = 0, bbheight = 0;
+	float bbheight = 0;
 	float nextY = fMenuBar->Frame().bottom + 1;
 
-	uint8 showButtonBar = fApp->ShowButtonBar();
+	uint8 showToolBar = fApp->ShowToolBar();
 
 	// Show/Hide Button Bar
-	if (showButtonBar) {
+	if (showToolBar) {
 		// Create the Button Bar if needed
-		if (!fButtonBar)
-			BuildButtonBar();
+		if (!fToolBar)
+			BuildToolBar();
 
-		fButtonBar->ShowLabels(showButtonBar == 1);
-		fButtonBar->Arrange(true);
-			// True for all buttons same size, false to just fit
-		fButtonBar->GetPreferredSize(&bbwidth, &bbheight);
-		fButtonBar->ResizeTo(Bounds().right, bbheight);
-		fButtonBar->MoveTo(0, nextY);
+		bbheight = fToolBar->MinSize().height;
+		fToolBar->ResizeTo(Bounds().right, bbheight);
+		fToolBar->MoveTo(0, nextY);
 		nextY += bbheight + 1;
-		if (fButtonBar->IsHidden())
-			fButtonBar->Show();
+		if (fToolBar->IsHidden())
+			fToolBar->Show();
 		else
-			fButtonBar->Invalidate();
-	} else if (fButtonBar && !fButtonBar->IsHidden())
-		fButtonBar->Hide();
+			fToolBar->Invalidate();
+	} else if (fToolBar && !fToolBar->IsHidden())
+		fToolBar->Hide();
 
 	// Arange other views to match
 	fHeaderView->MoveTo(0, nextY);
@@ -999,13 +1031,10 @@ TMailWindow::MessageReceived(BMessage *msg)
 			// Has anything changed?
 			if (prevState != fFieldState || !fChanged) {
 				// Change Buttons to reflect this
-				if (fSaveButton)
-					fSaveButton->SetEnabled(fFieldState);
-				if (fPrintButton)
-					fPrintButton->SetEnabled(fFieldState);
-				if (fSendButton)
-					fSendButton->SetEnabled((fFieldState & FIELD_TO)
-						|| (fFieldState & FIELD_BCC));
+				fToolBar->SetActionEnabled(M_SAVE_AS_DRAFT, fFieldState);
+				fToolBar->SetActionEnabled(M_PRINT, fFieldState);
+				fToolBar->SetActionEnabled(M_SEND_NOW, (fFieldState & FIELD_TO)
+					|| (fFieldState & FIELD_BCC));
 			}
 			fChanged = true;
 
@@ -1442,20 +1471,15 @@ TMailWindow::MessageReceived(BMessage *msg)
 			menu = new TMenu("Add Signature", INDEX_SIGNATURE, M_SIGNATURE,
 				true);
 
-			BPoint	where;
-			bool open_anyway = true;
-
+			BPoint where;
 			if (msg->FindPoint("where", &where) != B_OK) {
-				BRect	bounds;
-				bounds = fSigButton->Bounds();
-				where = fSigButton->ConvertToScreen(BPoint(
+				BRect bounds = fToolBar->Bounds();
+				where = fToolBar->ConvertToScreen(BPoint(
 					(bounds.right - bounds.left) / 2,
 					(bounds.bottom - bounds.top) / 2));
-			} else if (msg->FindInt32("buttons") == B_SECONDARY_MOUSE_BUTTON) {
-				open_anyway = false;
 			}
 
-			if ((item = menu->Go(where, false, open_anyway)) != NULL) {
+			if ((item = menu->Go(where, false, true)) != NULL) {
 				item->SetTarget(this);
 				(dynamic_cast<BInvoker *>(item))->Invoke();
 			}
@@ -1571,13 +1595,10 @@ TMailWindow::MessageReceived(BMessage *msg)
 			if (fContentView->fTextView->TextLength())
 				fFieldState |= FIELD_BODY;
 
-			if (fSaveButton)
-				fSaveButton->SetEnabled(false);
-			if (fPrintButton)
-				fPrintButton->SetEnabled(fFieldState);
-			if (fSendButton)
-				fSendButton->SetEnabled((fFieldState & FIELD_TO)
-					|| (fFieldState & FIELD_BCC));
+			fToolBar->SetActionEnabled(M_SAVE_AS_DRAFT, false);
+			fToolBar->SetActionEnabled(M_PRINT, fFieldState);
+			fToolBar->SetActionEnabled(M_SEND_NOW, (fFieldState & FIELD_TO)
+				|| (fFieldState & FIELD_BCC));
 			break;
 
 		case M_CHECK_SPELLING:
@@ -2660,7 +2681,7 @@ TMailWindow::SaveAsDraft()
 	fDraft = true;
 	fChanged = false;
 
-	fSaveButton->SetEnabled(false);
+	fToolBar->SetActionEnabled(M_SAVE_AS_DRAFT, false);
 
 	return B_OK;
 }
@@ -2970,7 +2991,7 @@ TMailWindow::OpenMessage(const entry_ref *ref, uint32 characterSetForDecoding)
 
 		fContentView->fTextView->LoadMessage(fMail, false, NULL);
 
-		if (fApp->ShowButtonBar())
+		if (fApp->ShowToolBar())
 			_UpdateReadButton();
 	}
 
@@ -3036,8 +3057,9 @@ TMailWindow::_UpdateSizeLimits()
 
 	minHeight = height;
 
-	if (fButtonBar) {
-		fButtonBar->GetPreferredSize(&minWidth, &height);
+	if (fToolBar != NULL) {
+		minWidth = fToolBar->MinSize().width;
+		height = fToolBar->MinSize().height;
 		minHeight += height;
 	} else {
 		minWidth = WIND_WIDTH;
@@ -3227,13 +3249,12 @@ TMailWindow::_AddReadButton()
 	read_flags flag = B_UNREAD;
 	read_read_attr(node, flag);
 
-	int32 buttonIndex = fButtonBar->IndexOf(fNextButton);
 	if (flag == B_READ) {
-		fReadButton = fButtonBar->AddButton(B_TRANSLATE("Unread"), 28,
-			new BMessage(M_UNREAD), buttonIndex);
+		fToolBar->SetActionVisible(M_UNREAD, true);
+		fToolBar->SetActionVisible(M_READ, false);
 	} else {
-		fReadButton = fButtonBar->AddButton(B_TRANSLATE(" Read "), 24,
-			new BMessage(M_READ), buttonIndex);
+		fToolBar->SetActionVisible(M_UNREAD, false);
+		fToolBar->SetActionVisible(M_READ, true);
 	}
 }
 
@@ -3241,9 +3262,7 @@ TMailWindow::_AddReadButton()
 void
 TMailWindow::_UpdateReadButton()
 {
-	if (fApp->ShowButtonBar()) {
-		fButtonBar->RemoveButton(fReadButton);
-		fReadButton = NULL;
+	if (fApp->ShowToolBar()) {
 		if (!fAutoMarkRead && fIncoming)
 			_AddReadButton();
 	}

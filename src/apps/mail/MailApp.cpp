@@ -71,7 +71,6 @@ of their respective holders. All rights reserved.
 
 using namespace BPrivate ;
 
-#include "ButtonBar.h"
 #include "Content.h"
 #include "Enclosures.h"
 #include "FieldMsg.h"
@@ -112,7 +111,7 @@ TMailApp::TMailApp()
 	fWrapMode(true),
 	fAttachAttributes(true),
 	fColoredQuotes(true),
-	fShowButtonBar(true),
+	fShowToolBar(true),
 	fWarnAboutUnencodableCharacters(true),
 	fStartWithSpellCheckOn(false),
 	fShowSpamGUI(true),
@@ -331,7 +330,7 @@ TMailApp::MessageReceived(BMessage *msg)
 						&fReplyPreamble, &fSignature, &fMailCharacterSet,
 						&fWarnAboutUnencodableCharacters,
 						&fStartWithSpellCheckOn, &fAutoMarkRead,
-						&fShowButtonBar);
+						&fShowToolBar);
 				fPrefsWindow->Show();
 			}
 			break;
@@ -537,7 +536,7 @@ TMailApp::ReadyToRun()
 			indexPath.Append(leafName.String());
 			gExactWords[gDictCount] = new Words(dataPath.Path(), indexPath.Path(), false);
 			gDictCount++;
-		}		
+		}
 
 		// Create user dictionary if it does not exist
 		dataPath = userDictionaryDir;
@@ -860,8 +859,8 @@ TMailApp::LoadOldSettings()
 		FindWindow::SetFindString(findString);
 		free(findString);
 	}
-	if (file.Read(&fShowButtonBar, sizeof(uint8)) < (ssize_t)sizeof(uint8))
-		fShowButtonBar = true;
+	if (file.Read(&fShowToolBar, sizeof(uint8)) < (ssize_t)sizeof(uint8))
+		fShowToolBar = true;
 	if (file.Read(&fUseAccountFrom, sizeof(int32)) < (ssize_t)sizeof(int32)
 		|| fUseAccountFrom < ACCOUNT_USE_DEFAULT
 		|| fUseAccountFrom > ACCOUNT_FROM_MAIL)
@@ -927,7 +926,7 @@ TMailApp::SaveSettings()
 	settings.AddString("SignatureText", fSignature);
 	settings.AddInt32("CharacterSet", fMailCharacterSet);
 	settings.AddString("FindString", FindWindow::GetFindString());
-	settings.AddInt8("ShowButtonBar", fShowButtonBar);
+	settings.AddInt8("ShowButtonBar", fShowToolBar);
 	settings.AddInt32("UseAccountFrom", fUseAccountFrom);
 	settings.AddBool("ColoredQuotes", fColoredQuotes);
 	settings.AddString("ReplyPreamble", fReplyPreamble);
@@ -1033,7 +1032,7 @@ TMailApp::LoadSettings()
 
 	int8 int8Value;
 	if (settings.FindInt8("ShowButtonBar", &int8Value) == B_OK)
-		fShowButtonBar = int8Value;
+		fShowToolBar = int8Value;
 
 	if (settings.FindInt32("UseAccountFrom", &int32Value) == B_OK)
 		fUseAccountFrom = int32Value;
@@ -1199,10 +1198,10 @@ TMailApp::ColoredQuotes()
 
 
 uint8
-TMailApp::ShowButtonBar()
+TMailApp::ShowToolBar()
 {
 	BAutolock _(this);
-	return fShowButtonBar;
+	return fShowToolBar;
 }
 
 

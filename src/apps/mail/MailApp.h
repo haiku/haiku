@@ -79,7 +79,7 @@ class TMailApp : public BApplication {
 				bool			WrapMode();
 				bool			AttachAttributes();
 				bool			ColoredQuotes();
-				uint8			ShowButtonBar();
+				uint8			ShowToolBar();
 				bool			WarnAboutUnencodableCharacters();
 				bool			StartWithSpellCheckOn();
 				void			SetDefaultAccount(int32 account);
@@ -103,7 +103,7 @@ class TMailApp : public BApplication {
 				int32			fWindowCount;
 				TPrefsWindow*	fPrefsWindow;
 				TSignatureWindow* fSigWindow;
-		
+
 				BRect			fMailWindowFrame;
 				BRect			fLastMailWindowFrame;
 				BRect			fSignatureWindowFrame;
@@ -120,7 +120,7 @@ class TMailApp : public BApplication {
 				bool			fWrapMode;
 				bool			fAttachAttributes;
 				bool			fColoredQuotes;
-				uint8			fShowButtonBar;
+				uint8			fShowToolBar;
 				bool			fWarnAboutUnencodableCharacters;
 				bool			fStartWithSpellCheckOn;
 				bool			fShowSpamGUI;
