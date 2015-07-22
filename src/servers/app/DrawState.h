@@ -68,6 +68,7 @@ public:
 								{ return fTransform; }
 		BAffineTransform	CombinedTransform() const
 								{ return fCombinedTransform; }
+		void				SetTransformEnabled(bool enabled);
 
 		DrawState*			Squash();
 
