@@ -89,6 +89,25 @@ AlphaMask::Update(BRect bounds, BPoint offset)
 }
 
 
+BPoint
+AlphaMask::Update(BPoint offset)
+{
+	BPoint oldOffset = fViewOffset;
+	fViewOffset = offset;
+
+	if (oldOffset == fCachedOffset && fCachedBitmap != NULL) {
+		// No need to redraw the picture when only the offset is shifted
+		fCachedOffset = offset;
+		_AttachMaskToBuffer();
+	}
+
+	if (fPreviousMask != NULL)
+		fPreviousMask->Update(offset);
+
+	return oldOffset;
+}
+
+
 void
 AlphaMask::SetPrevious(AlphaMask* mask)
 {

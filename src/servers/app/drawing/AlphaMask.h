@@ -27,6 +27,7 @@ public:
 								~AlphaMask();
 
 			void				Update(BRect bounds, BPoint offset);
+			BPoint				Update(BPoint offset);
 
 			void				SetPrevious(AlphaMask* mask);
 
