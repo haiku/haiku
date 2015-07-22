@@ -1,9 +1,10 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 
 
@@ -1070,7 +1071,7 @@ DrawingEngine::FillRegion(BRegion& r)
 				doInSoftware = false;
 			}
 		}
-	
+
 		if (doInSoftware
 			&& (fAvailableHWAccleration & HW_ACC_INVERT_REGION) != 0
 			&& fPainter->Pattern() == B_SOLID_HIGH
@@ -1552,6 +1553,13 @@ DrawingEngine::CopyRect(BRect src, int32 xOffset, int32 yOffset) const
 		}
 	}
 	return dst;
+}
+
+
+void
+DrawingEngine::SetRendererOffset(int32 offsetX, int32 offsetY)
+{
+	fPainter->SetRendererOffset(offsetX, offsetY);
 }
 
 

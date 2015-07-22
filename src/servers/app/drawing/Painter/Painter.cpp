@@ -2,6 +2,7 @@
  * Copyright 2009, Christian Packmann.
  * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
  * Copyright 2005-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2015, Julian Harnath <julian.harnath@rwth-aachen.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -667,7 +668,7 @@ Painter::DrawPolygon(BPoint* p, int32 numPts, bool filled, bool closed) const
 
 	bool centerOffset = !filled && fIdentityTransform
 		&& fmodf(fPenSize, 2.0) != 0.0;
-	
+
 	fPath.remove_all();
 
 	_Align(p, centerOffset);
@@ -1505,6 +1506,13 @@ Painter::InvertRect(const BRect& r) const
 		_InvertRect32(region.RectAt(i));
 
 	return _Clipped(r);
+}
+
+
+void
+Painter::SetRendererOffset(int32 offsetX, int32 offsetY)
+{
+	fBaseRenderer.set_offset(offsetX, offsetY);
 }
 
 
@@ -2939,7 +2947,7 @@ Painter::_RasterizePath(VertexSource& path, const BGradient& gradient) const
 			_RasterizePath(path, gradient, gradientFunction, gradientTransform);
 			break;
 		}
-		
+
 		default:
 		case BGradient::TYPE_NONE:
 			GTRACE(("Painter::_FillPathGradient> type == TYPE_NONE/unkown\n"));

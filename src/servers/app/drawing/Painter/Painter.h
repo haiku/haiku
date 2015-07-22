@@ -1,6 +1,7 @@
 /*
  * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
+ * Copyright 2015, Julian Harnath <julian.harnath@rwth-aachen.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  * API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
@@ -243,6 +244,8 @@ public:
 	inline	BRect				AlignAndClipRect(BRect rect) const;
 	inline	BRect				AlignRect(BRect rect) const;
 
+			void				SetRendererOffset(int32 offsetX,
+									int32 offsetY);
 
 private:
 			float				_Align(float coord, bool round,
