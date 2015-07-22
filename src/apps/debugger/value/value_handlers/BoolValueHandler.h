@@ -21,6 +21,9 @@ public:
 									ValueFormatter*& _formatter);
 	virtual	status_t			GetTableCellValueRenderer(Value* value,
 									TableCellValueRenderer*& _renderer);
+	virtual	status_t			GetTableCellValueEditor(Value* _value,
+									Settings* settings,
+									TableCellValueEditor*& _editor);
 };
 
 

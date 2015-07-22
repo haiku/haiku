@@ -19,6 +19,9 @@ public:
 	virtual	float				SupportsValue(Value* value);
 	virtual	status_t			GetValueFormatter(Value* value,
 									ValueFormatter*& _formatter);
+	virtual	status_t			GetTableCellValueEditor(Value* value,
+									Settings* settings,
+									TableCellValueEditor*& _editor);
 
 protected:
 	virtual	integer_format		DefaultIntegerFormat(IntegerValue* value);

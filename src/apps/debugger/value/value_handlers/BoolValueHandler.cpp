@@ -11,6 +11,7 @@
 
 #include "BoolValue.h"
 #include "BoolValueFormatter.h"
+#include "TableCellBoolEditor.h"
 #include "TableCellFormattedValueRenderer.h"
 
 
@@ -62,7 +63,7 @@ BoolValueHandler::GetTableCellValueRenderer(Value* value,
 		return B_BAD_VALUE;
 
 	ValueFormatter* formatter = NULL;
-	if (GetValueFormatter(value, formatter))
+	if (GetValueFormatter(value, formatter) != B_OK)
 		return B_NO_MEMORY;
 	BReference<ValueFormatter> formatterReference(formatter, true);
 
@@ -73,5 +74,35 @@ BoolValueHandler::GetTableCellValueRenderer(Value* value,
 		return B_NO_MEMORY;
 
 	_renderer = renderer;
+	return B_OK;
+}
+
+
+status_t
+BoolValueHandler::GetTableCellValueEditor(Value* _value, Settings* settings,
+	TableCellValueEditor*& _editor)
+{
+	BoolValue* value = dynamic_cast<BoolValue*>(_value);
+	if (value == NULL)
+		return B_BAD_VALUE;
+
+	ValueFormatter* formatter;
+	status_t error = GetValueFormatter(value, formatter);
+	if (error != B_OK)
+		return error;
+	BReference<ValueFormatter> formatterReference(formatter, true);
+
+	TableCellBoolEditor* editor = new(std::nothrow)
+		TableCellBoolEditor(value, formatter);
+	if (editor == NULL)
+		return B_NO_MEMORY;
+
+	BReference<TableCellBoolEditor> editorReference(editor, true);
+	error = editor->Init();
+	if (error != B_OK)
+		return error;
+
+	editorReference.Detach();
+	_editor = editor;
 	return B_OK;
 }

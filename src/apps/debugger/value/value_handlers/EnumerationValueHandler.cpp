@@ -11,6 +11,7 @@
 
 #include "EnumerationValue.h"
 #include "EnumerationValueFormatter.h"
+#include "TableCellEnumerationEditor.h"
 #include "TableCellFormattedValueRenderer.h"
 #include "Type.h"
 
@@ -60,6 +61,42 @@ EnumerationValueHandler::GetValueFormatter(Value* _value,
 
 	_formatter = formatter;
 
+	return B_OK;
+}
+
+
+status_t
+EnumerationValueHandler::GetTableCellValueEditor(Value* _value,
+	Settings* settings, TableCellValueEditor*& _editor)
+{
+	EnumerationValue* value = dynamic_cast<EnumerationValue*>(_value);
+	if (value == NULL)
+		return B_BAD_VALUE;
+
+	IntegerValueFormatter::Config* config = NULL;
+	status_t error = CreateIntegerFormatterConfig(value, config);
+	if (error != B_OK)
+		return error;
+	BReference<IntegerValueFormatter::Config> configReference(config, true);
+
+	ValueFormatter* formatter;
+	error = CreateValueFormatter(config, formatter);
+	if (error != B_OK)
+		return error;
+	BReference<ValueFormatter> formatterReference(formatter, true);
+
+	TableCellEnumerationEditor* editor = new(std::nothrow)
+		TableCellEnumerationEditor(value, formatter);
+	if (editor == NULL)
+		return B_NO_MEMORY;
+
+	BReference<TableCellEnumerationEditor> editorReference(editor, true);
+	error = editor->Init();
+	if (error != B_OK)
+		return error;
+
+	editorReference.Detach();
+	_editor = editor;
 	return B_OK;
 }
 
