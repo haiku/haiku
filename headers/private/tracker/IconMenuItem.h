@@ -122,6 +122,8 @@ class SpecialModelMenuItem : public ModelMenuItem {
 
 } // namespace BPrivate
 
-using namespace BPrivate;
+using BPrivate::IconMenuItem;
+using BPrivate::ModelMenuItem;
+using BPrivate::SpecialModelMenuItem;
 
 #endif	// ICON_MENU_ITEM_H
