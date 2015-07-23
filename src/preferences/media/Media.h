@@ -23,9 +23,7 @@ static const char* kApplicationSignature = "application/x-vnd.Haiku-Media";
 class Media : public BApplication {
 public:
 								Media();
-	virtual						~Media();
 
-	virtual	void				MessageReceived(BMessage* message);
 			status_t			InitCheck();
 
 private:

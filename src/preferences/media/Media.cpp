@@ -14,7 +14,6 @@
 
 #include <Catalog.h>
 #include <Locale.h>
-#include <Roster.h>
 #include <StorageKit.h>
 #include <String.h>
 
@@ -59,14 +58,6 @@ Media::Media()
 
 	MediaListItem::SetIcons(&fIcons);
 	fWindow = new MediaWindow(rect);
-
-	be_roster->StartWatching(BMessenger(this));
-}
-
-
-Media::~Media()
-{
-	be_roster->StopWatching(BMessenger(this));
 }
 
 
@@ -76,22 +67,6 @@ Media::InitCheck()
 	if (fWindow)
 		return fWindow->InitCheck();
 	return B_OK;
-}
-
-
-void
-Media::MessageReceived(BMessage* message)
-{
-	switch (message->what) {
-		case B_SOME_APP_LAUNCHED:
-		case B_SOME_APP_QUIT:
-			fWindow->PostMessage(message);
-			break;
-
-		default:
-			BApplication::MessageReceived(message);
-			break;
-	}
 }
 
 

@@ -167,6 +167,10 @@ MediaWindow::MediaWindow(BRect frame)
 	fInitCheck(B_OK)
 {
 	_InitWindow();
+
+	BMediaRoster* roster = BMediaRoster::Roster();
+	roster->StartWatching(BMessenger(this, this),
+		B_MEDIA_SERVER_STARTED);
 }
 
 
@@ -188,6 +192,10 @@ MediaWindow::~MediaWindow()
 		if (file.InitCheck() == B_OK)
 			file.Write(buffer, strlen(buffer));
 	}
+
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	roster->StopWatching(BMessenger(this, this),
+		B_MEDIA_SERVER_STARTED);
 }
 
 
@@ -313,31 +321,12 @@ MediaWindow::MessageReceived(BMessage* message)
 			item->AlterWindow(this);
 			break;
 		}
-		case B_SOME_APP_LAUNCHED:
+		case B_MEDIA_SERVER_STARTED:
 		{
 			PRINT_OBJECT(*message);
 
-			BString mimeSig;
-			if (message->FindString("be:signature", &mimeSig) == B_OK
-				&& (mimeSig == "application/x-vnd.Be.addon-host"
-					|| mimeSig == "application/x-vnd.Be.media-server")) {
-				_Notify(0.75, B_TRANSLATE("Starting media server"
-					B_UTF8_ELLIPSIS));
-			}
-			break;
-		}
-		case B_SOME_APP_QUIT:
-		{
-			PRINT_OBJECT(*message);
-			BString mimeSig;
-			if (message->FindString("be:signature", &mimeSig) == B_OK) {
-				if (mimeSig == "application/x-vnd.Be.addon-host"
-					|| mimeSig == "application/x-vnd.Be.media-server") {
-					BMediaRoster* roster = BMediaRoster::CurrentRoster();
-					if (roster != NULL && roster->Lock())
-						roster->Quit();
-				}
-			}
+			_Notify(0.75, B_TRANSLATE("Starting media server"
+				B_UTF8_ELLIPSIS));
 			break;
 		}
 		default:
