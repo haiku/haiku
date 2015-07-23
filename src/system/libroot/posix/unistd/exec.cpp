@@ -1,6 +1,6 @@
 /*
  * Copyright 2008, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2004-2005, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -21,30 +21,30 @@
 
 
 static int
-count_arguments(va_list list, const char *arg, char ***_env)
+count_arguments(va_list list, const char* arg, char*** _env)
 {
 	int count = 0;
 
 	while (arg != NULL) {
 		count++;
-		arg = va_arg(list, const char *);
+		arg = va_arg(list, const char*);
 	}
 
 	if (_env)
-		*_env = va_arg(list, char **);
+		*_env = va_arg(list, char**);
 
 	return count;
 }
 
 
 static void
-copy_arguments(va_list list, const char **args, const char *arg)
+copy_arguments(va_list list, const char** args, const char* arg)
 {
 	int count = 0;
 
 	while (arg != NULL) {
 		args[count++] = arg;
-		arg = va_arg(list, const char *);
+		arg = va_arg(list, const char*);
 	}
 
 	args[count] = NULL;
@@ -53,7 +53,7 @@ copy_arguments(va_list list, const char **args, const char *arg)
 
 
 static int
-do_exec(const char *path, char * const args[], char * const environment[],
+do_exec(const char* path, char* const args[], char* const environment[],
 	bool useDefaultInterpreter)
 {
 	if (path == NULL || args == NULL) {
@@ -94,7 +94,7 @@ do_exec(const char *path, char * const args[], char * const environment[],
 		}
 	}
 
-	char **newArgs = NULL;
+	char** newArgs = NULL;
 	if (invoker[0] != '\0') {
 		status = __parse_invoke_line(invoker, &newArgs, &args, &argCount, path);
 		if (status < B_OK) {
@@ -128,25 +128,32 @@ do_exec(const char *path, char * const args[], char * const environment[],
 
 
 int
-execve(const char *path, char* const args[], char* const environment[])
+execve(const char* path, char* const args[], char* const environment[])
 {
 	return do_exec(path, args, environment, false);
 }
 
 
 int
-execv(const char *path, char * const *argv)
+execv(const char* path, char* const argv[])
 {
 	return do_exec(path, argv, environ, false);
 }
 
 
 int
-execvp(const char *file, char* const* argv)
+execvp(const char* file, char* const argv[])
+{
+	return execvpe(file, argv, environ);
+}
+
+
+int
+execvpe(const char* file, char* const argv[], char* const environment[])
 {
 	// let do_exec() handle cases where file is a path (or invalid)
 	if (file == NULL || strchr(file, '/') != NULL)
-		return do_exec(file, argv, environ, true);
+		return do_exec(file, argv, environment, true);
 
 	// file is just a leaf name, so we have to look it up in the path
 
@@ -189,7 +196,7 @@ execvp(const char *file, char* const* argv)
 
 		// if executable, execute it
 		if (access(path, X_OK) == 0)
-			return do_exec(path, argv, environ, true);
+			return do_exec(path, argv, environment, true);
 	}
 
 	__set_errno(B_ENTRY_NOT_FOUND);
@@ -198,9 +205,9 @@ execvp(const char *file, char* const* argv)
 
 
 int
-execl(const char *path, const char *arg, ...)
+execl(const char* path, const char* arg, ...)
 {
-	const char **args;
+	const char** args;
 	va_list list;
 	int count;
 
@@ -212,19 +219,19 @@ execl(const char *path, const char *arg, ...)
 
 	// copy arguments
 
-	args = (const char**)alloca((count + 1) * sizeof(char *));
+	args = (const char**)alloca((count + 1) * sizeof(char*));
 	va_start(list, arg);
 	copy_arguments(list, args, arg);
 	va_end(list);
 
-	return do_exec(path, (char * const *)args, environ, false);
+	return do_exec(path, (char* const*)args, environ, false);
 }
 
 
 int
-execlp(const char *file, const char *arg, ...)
+execlp(const char* file, const char* arg, ...)
 {
-	const char **args;
+	const char** args;
 	va_list list;
 	int count;
 
@@ -236,20 +243,20 @@ execlp(const char *file, const char *arg, ...)
 
 	// copy arguments
 
-	args = (const char**)alloca((count + 1) * sizeof(char *));
+	args = (const char**)alloca((count + 1) * sizeof(char*));
 	va_start(list, arg);
 	copy_arguments(list, args, arg);
 	va_end(list);
 
-	return execvp(file, (char * const *)args);
+	return execvp(file, (char* const*)args);
 }
 
 
 int
-execle(const char *path, const char *arg, ... /*, char **env */)
+execle(const char* path, const char* arg, ... /*, char** env */)
 {
-	const char **args;
-	char **env;
+	const char** args;
+	char** env;
 	va_list list;
 	int count;
 
@@ -261,19 +268,19 @@ execle(const char *path, const char *arg, ... /*, char **env */)
 
 	// copy arguments
 
-	args = (const char**)alloca((count + 1) * sizeof(char *));
+	args = (const char**)alloca((count + 1) * sizeof(char*));
 	va_start(list, arg);
 	copy_arguments(list, args, arg);
 	va_end(list);
 
-	return do_exec(path, (char * const *)args, env, false);
+	return do_exec(path, (char* const*)args, env, false);
 }
 
+// TODO: remove this again if possible
+extern int exect(const char *path, char *const *argv);
 
 int
-exect(const char *path, char * const *argv)
+exect(const char* path, char* const* argv)
 {
-	// ToDo: is this any different?
 	return execv(path, argv);
 }
-

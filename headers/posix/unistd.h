@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2011 Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2015 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _UNISTD_H_
@@ -207,13 +207,15 @@ extern int		lockf(int fd, int function, off_t size);
 /* process functions */
 extern pid_t	fork(void);
 extern pid_t	vfork(void);
-extern int		execve(const char *path, char * const argv[], char * const envp[]);
+extern int		execve(const char *path, char * const argv[],
+					char *const environment[]);
 extern int		execl(const char *path, const char *arg, ...);
-extern int		execv(const char *path, char *const *argv);
+extern int		execv(const char *path, char *const argv[]);
 extern int		execlp(const char *file, const char *arg, ...);
 extern int		execle(const char *path, const char *arg , ... /*, char **envp */);
-extern int		exect(const char *path, char *const *argv);
-extern int		execvp(const char *file, char *const *argv);
+extern int		execvp(const char *file, char *const argv[]);
+extern int		execvpe(const char *file, char *const argv[],
+					char *const environment[]);
 
 extern void		_exit(int status) __attribute__ ((noreturn));
 
