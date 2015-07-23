@@ -7,6 +7,8 @@
 
 #include "SettingsParser.h"
 
+#include <string.h>
+
 #include <DriverSettingsMessageAdapter.h>
 
 
@@ -55,15 +57,15 @@ public:
 				return B_OK;
 
 			BMessage* add = &target;
-			bool notExpr = parameter.value_count > 1
+			bool notOperator = parameter.value_count > 1
 				&& strcmp(parameter.values[0], "not") == 0;
-			if (notExpr) {
+			if (notOperator) {
 				add = &message;
 				index++;
 			}
 
 			status_t status = AddSubMessage(parameter, index, *add);
-			if (status == B_OK && notExpr)
+			if (status == B_OK && notOperator)
 				status = target.AddMessage("not", &message);
 
 			return status;

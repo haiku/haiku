@@ -6,6 +6,8 @@
 
 #include "Job.h"
 
+#include <stdlib.h>
+
 #include <Entry.h>
 #include <Looper.h>
 #include <Message.h>
@@ -342,7 +344,7 @@ Job::Launch()
 		BString signature("application/");
 		signature << Name();
 		return BRoster::Private().Launch(signature.String(), NULL, NULL,
-			0, NULL, environment.begin(), &fTeam);
+			0, NULL, &environment[0], &fTeam);
 	}
 
 	// Build argument vector
@@ -363,8 +365,8 @@ Job::Launch()
 	}
 
 	// Launch via entry_ref
-	return BRoster::Private().Launch(NULL, &ref, NULL, count, args.begin(),
-		environment.begin(), &fTeam);
+	return BRoster::Private().Launch(NULL, &ref, NULL, count, &args[0],
+		&environment[0], &fTeam);
 }
 
 

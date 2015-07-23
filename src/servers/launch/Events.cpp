@@ -42,7 +42,7 @@ public:
 	virtual	void				SetOwner(BaseJob* owner);
 
 protected:
-			void				ToString(BString& string) const;
+			void				AddEventsToString(BString& string) const;
 
 protected:
 			BaseJob*			fOwner;
@@ -304,7 +304,7 @@ EventContainer::SetOwner(BaseJob* owner)
 
 
 void
-EventContainer::ToString(BString& string) const
+EventContainer::AddEventsToString(BString& string) const
 {
 	string += "[";
 
@@ -338,7 +338,7 @@ BString
 OrEvent::ToString() const
 {
 	BString string = "or ";
-	EventContainer::ToString(string);
+	EventContainer::AddEventsToString(string);
 	return string;
 }
 

@@ -27,7 +27,7 @@ public:
 	virtual	bool				IsConstant(ConditionContext& context) const;
 
 protected:
-			void				ToString(BString& string) const;
+			void				AddConditionsToString(BString& string) const;
 
 protected:
 			BObjectList<Condition> fConditions;
@@ -199,7 +199,7 @@ ConditionContainer::IsConstant(ConditionContext& context) const
 
 
 void
-ConditionContainer::ToString(BString& string) const
+ConditionContainer::AddConditionsToString(BString& string) const
 {
 	string += "[";
 
@@ -243,7 +243,7 @@ BString
 AndCondition::ToString() const
 {
 	BString string = "and ";
-	ConditionContainer::ToString(string);
+	ConditionContainer::AddConditionsToString(string);
 	return string;
 }
 
@@ -296,7 +296,7 @@ BString
 OrCondition::ToString() const
 {
 	BString string = "or ";
-	ConditionContainer::ToString(string);
+	ConditionContainer::AddConditionsToString(string);
 	return string;
 }
 
@@ -332,7 +332,7 @@ BString
 NotCondition::ToString() const
 {
 	BString string = "not ";
-	ConditionContainer::ToString(string);
+	ConditionContainer::AddConditionsToString(string);
 	return string;
 }
 
