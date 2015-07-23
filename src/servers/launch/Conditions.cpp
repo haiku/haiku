@@ -458,15 +458,15 @@ Conditions::FromMessage(const BMessage& message)
 /*static*/ Condition*
 Conditions::AddNotSafeMode(Condition* condition)
 {
-	AndCondition* and = dynamic_cast<AndCondition*>(condition);
-	if (and == NULL)
-		and = new AndCondition();
-	if (and != condition && condition != NULL)
-		and->AddCondition(condition);
+	AndCondition* andCondition = dynamic_cast<AndCondition*>(condition);
+	if (andCondition == NULL)
+		andCondition = new AndCondition();
+	if (andCondition != condition && condition != NULL)
+		andCondition->AddCondition(condition);
 
-	NotCondition* not = new NotCondition();
-	not->AddCondition(new SafeModeCondition());
+	NotCondition* notCondition = new NotCondition();
+	notCondition->AddCondition(new SafeModeCondition());
 
-	and->AddCondition(not);
-	return and;
+	andCondition->AddCondition(notCondtion);
+	return andCondition;
 }
