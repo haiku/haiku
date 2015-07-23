@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include <string.h>
 
 #include "SettingsParser.h"
 
@@ -54,15 +55,15 @@ public:
 				return B_OK;
 
 			BMessage* add = &target;
-			bool not = parameter.value_count > 1
+			bool notExpr = parameter.value_count > 1
 				&& strcmp(parameter.values[0], "not") == 0;
-			if (not) {
+			if (notExpr) {
 				add = &message;
 				index++;
 			}
 
 			status_t status = AddSubMessage(parameter, index, *add);
-			if (status == B_OK && not)
+			if (status == B_OK && notExpr)
 				status = target.AddMessage("not", &message);
 
 			return status;
