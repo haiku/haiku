@@ -192,8 +192,6 @@ void
 AppManager::_BigBrother()
 {
 	status_t status = B_TIMED_OUT;
-	BMessage ping('PING');
-	BMessage reply;
 
 	do {
 		if (!Lock())
@@ -202,21 +200,29 @@ AppManager::_BigBrother()
 		bool startOver = false;
 		AppMap::iterator iterator = fMap.begin();
 		for (; iterator != fMap.end(); iterator++) {
-			reply.what = 0;
-			status = iterator->second.SendMessage(&ping, &reply, 5000000,
-				2000000);
-			if (status != B_OK || reply.what != 'PONG') {
-				team_id team = iterator->first;
-				Unlock();
-
-				_TeamDied(team);
+			// No need to send the alive message
+			// if the team died.
+			if (iterator->second.IsValid() == true) {
+				BMessage ping('PING');
+				BMessage reply;
+				reply.what = 0;
+				status = iterator->second.SendMessage(&ping, &reply, 5000000,
+					2000000);
+				if (status != B_OK || reply.what != 'PONG') {
+					startOver = true;
+					break;
+				}
+			} else {
 				startOver = true;
 				break;
 			}
 		}
 
-		if (startOver)
+		if (startOver == true) {
+			Unlock();
+			_TeamDied(iterator->first);
 			continue;
+		}
 
 		Unlock();
 		status = acquire_sem_etc(fQuit, 1, B_RELATIVE_TIMEOUT, 2000000);
