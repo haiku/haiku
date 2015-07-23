@@ -32,6 +32,12 @@ enum {
 	MEDIA_ADD_ON_SERVER_PLAY_MEDIA = '_TRU'
 };
 
+enum {
+	// local media services status notification service
+	MEDIA_ROSTER_REQUEST_NOTIFICATIONS = 2000,
+	MEDIA_ROSTER_CANCEL_NOTIFICATIONS
+};
+
 // Raw port based communication
 enum {
 	GENERAL_PURPOSE_WAKEUP = 0,	// when no action but wait termination needed

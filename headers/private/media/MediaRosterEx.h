@@ -88,6 +88,8 @@ public:
 
 		BTimeSource*		MakeTimeSourceObject(media_node_id timesource_id);
 
+		status_t			BuildConnections();
+
 private:
 	friend class BMediaRoster;
 };

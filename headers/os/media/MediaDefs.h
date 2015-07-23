@@ -47,8 +47,10 @@ enum {
 	B_MEDIA_NEW_PARAMETER_VALUE,	/* N "node", "parameter", "when", */
 									/* "value" */
 	B_MEDIA_NODE_STOPPED,			/* N "node", "when" */
-	B_MEDIA_FLAVORS_CHANGED			/* "be:addon_id", "be:new_count", */
+	B_MEDIA_FLAVORS_CHANGED,		/* "be:addon_id", "be:new_count", */
 									/* "be:gone_count" */
+	B_MEDIA_SERVER_STARTED,
+	B_MEDIA_SERVER_QUIT
 };
 
 

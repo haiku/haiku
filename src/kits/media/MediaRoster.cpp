@@ -59,14 +59,15 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 
 #include <AppMisc.h>
 
-#include <debug.h>
 #include <DataExchange.h>
+#include <debug.h>
 #include <DormantNodeManager.h>
-#include <MediaRosterEx.h>
 #include <MediaMisc.h>
+#include <MediaRosterEx.h>
 #include <Notifications.h>
 #include <ServerInterface.h>
 #include <SharedBufferList.h>
+#include <TList.h>
 
 #include "TimeSourceObjectManager.h"
 
@@ -74,6 +75,14 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 namespace BPrivate {
 namespace media {
 
+
+struct RosterNotification {
+	BMessenger	messenger;
+	int32		what;
+};
+
+static bool sServerIsUp = false;
+static List<RosterNotification> sNotificationList;
 
 // This class is provided to ensure the BMediaRoster is quit.
 class MediaRosterUndertaker {
@@ -101,11 +110,25 @@ BMediaRosterEx::BMediaRosterEx(status_t* _error)
 	:
 	BMediaRoster()
 {
-	InitDataExchange();
-
 	gDormantNodeManager = new DormantNodeManager;
 	gTimeSourceObjectManager = new TimeSourceObjectManager;
 
+	*_error = BuildConnections();
+
+	InitRosterDataExchange(BMessenger(this, this));
+
+	if (be_roster->StartWatching(BMessenger(this, this),
+		B_REQUEST_LAUNCHED | B_REQUEST_QUIT) != B_OK)
+			*_error = B_ERROR;
+
+	sServerIsUp = BMediaRoster::IsRunning();
+}
+
+
+status_t
+BMediaRosterEx::BuildConnections()
+{
+	InitServerDataExchange();
 	// register this application with the media server
 	server_register_app_request request;
 	server_register_app_reply reply;
@@ -115,9 +138,9 @@ BMediaRosterEx::BMediaRosterEx(status_t* _error)
 	status_t status = QueryServer(SERVER_REGISTER_APP, &request,
 		sizeof(request), &reply, sizeof(reply));
 	if (status != B_OK)
-		*_error = B_MEDIA_SYSTEM_FAILURE;
-	else
-		*_error = B_OK;
+		return B_MEDIA_SYSTEM_FAILURE;
+
+	return B_OK;
 }
 
 
@@ -1902,6 +1925,10 @@ BMediaRoster::StartWatching(const BMessenger & where, int32 notificationType)
 		ERROR("BMediaRoster::StartWatching: notificationType invalid!\n");
 		return B_BAD_VALUE;
 	}
+
+	// NOTE: we support only explicitly B_MEDIA_SERVER_STARTED/QUIT
+	// notifications. This should be cleared in documentation.
+
 	return BPrivate::media::notifications::Register(where, media_node::null,
 		notificationType);
 }
@@ -3308,6 +3335,119 @@ BMediaRoster::MessageReceived(BMessage* message)
 			return;
 		}
 
+		case MEDIA_ROSTER_REQUEST_NOTIFICATIONS:
+		{
+			RosterNotification notification;
+			if (message->FindInt32(NOTIFICATION_PARAM_WHAT, &notification.what)
+				!= B_OK) {
+				TRACE("BMediaRoster MEDIA_ROSTER_REQUEST_NOTIFICATIONS can't"
+					"find what parameter");
+				return;
+			}
+			if (message->FindMessenger(NOTIFICATION_PARAM_MESSENGER,
+				&notification.messenger) != B_OK) {
+				TRACE("BMediaRoster MEDIA_ROSTER_REQUEST_NOTIFICATIONS can't"
+					"find messenger");
+				return;
+			}
+			sNotificationList.Insert(notification);
+			return;
+		}
+
+		case MEDIA_ROSTER_CANCEL_NOTIFICATIONS:
+		{
+			RosterNotification notification;
+			if (message->FindInt32(NOTIFICATION_PARAM_WHAT, &notification.what)
+				!= B_OK) {
+				TRACE("BMediaRoster MEDIA_ROSTER_CANCEL_NOTIFICATIONS can't"
+					"find what parameter");
+				return;
+			}
+			if (message->FindMessenger(NOTIFICATION_PARAM_MESSENGER,
+				&notification.messenger) != B_OK) {
+				TRACE("BMediaRoster MEDIA_ROSTER_CANCEL_NOTIFICATIONS can't"
+					"find messenger");
+				return;
+			}
+			for (int32 i = 0; i < sNotificationList.CountItems(); i++) {
+				RosterNotification* current;
+				if (sNotificationList.Get(i, &current) != true)
+					return;
+				if (current->what == notification.what
+					&& current->messenger == notification.messenger) {
+					sNotificationList.Remove(i);
+					return;
+				}
+			}
+			return;
+		}
+
+		case B_SOME_APP_LAUNCHED:
+		{
+			BString mimeSig;
+			if (message->FindString("be:signature", &mimeSig) != B_OK)
+				return;
+			if (mimeSig != B_MEDIA_ADDON_SERVER_SIGNATURE
+					&& mimeSig != B_MEDIA_SERVER_SIGNATURE)
+				return;
+
+			TRACE("BMediaRoster::MessageReceived media services are going up.");
+
+			// Send the notification to our subscribers
+			if (BMediaRoster::IsRunning()) {
+				sServerIsUp = true;
+				// Restore our friendship with the media servers
+				if (MediaRosterEx(this)->BuildConnections() != B_OK) {
+					TRACE("BMediaRoster::MessageReceived can't reconnect"
+						"to media_server.");
+				}
+
+				for (int32 i = 0; i < sNotificationList.CountItems(); i++) {
+					RosterNotification* current;
+					if (sNotificationList.Get(i, &current) != true)
+						return;
+					if (current->what == B_MEDIA_SERVER_STARTED) {
+						if (current->messenger.SendMessage(
+							B_MEDIA_SERVER_STARTED) != B_OK) {
+							if(!current->messenger.IsValid())
+								sNotificationList.Remove(i);
+						}
+					}
+				}
+			}
+			return;
+		}
+
+		case B_SOME_APP_QUIT:
+		{
+			BString mimeSig;
+			if (message->FindString("be:signature", &mimeSig) != B_OK)
+				return;
+			if (mimeSig != B_MEDIA_ADDON_SERVER_SIGNATURE
+					&& mimeSig != B_MEDIA_SERVER_SIGNATURE)
+				return;
+
+			TRACE("BMediaRoster::MessageReceived media services are down.");
+
+			// Send the notification to our subscribers
+			if (!BMediaRoster::IsRunning() && sServerIsUp == true) {
+				sServerIsUp = false;
+				for (int32 i = 0; i < sNotificationList.CountItems(); i++) {
+					RosterNotification* current;
+					if (sNotificationList.Get(i, &current) != true)
+						return;
+					if (current->what == B_MEDIA_SERVER_QUIT) {
+						if (current->messenger.SendMessage(
+							B_MEDIA_SERVER_QUIT) != B_OK) {
+							if(!current->messenger.IsValid())
+								sNotificationList.Remove(i);
+						}
+					}
+				}
+			}
+			return;
+		}
+
 		case NODE_FINAL_RELEASE:
 		{
 			// this function is called by a BMediaNode to delete
@@ -3338,7 +3478,14 @@ BMediaRoster::MessageReceived(BMessage* message)
 bool
 BMediaRoster::QuitRequested()
 {
-	UNIMPLEMENTED();
+	CALLED();
+
+	if (be_roster->StopWatching(BMessenger(this, this)) != B_OK)
+			TRACE("Can't unregister roster notifications");
+
+	if (sNotificationList.CountItems() != 0)
+		sNotificationList.MakeEmpty();
+
 	return true;
 }
 

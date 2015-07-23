@@ -25,6 +25,7 @@ namespace dataexchange {
 
 
 static BMessenger sMediaServerMessenger;
+static BMessenger sMediaRosterMessenger;
 static port_id sMediaServerPort;
 static port_id sMediaAddonServerPort;
 
@@ -58,11 +59,32 @@ find_media_addon_server_port()
 
 
 void
-InitDataExchange()
+InitServerDataExchange()
 {
 	sMediaServerMessenger = BMessenger(B_MEDIA_SERVER_SIGNATURE);
 	find_media_server_port();
 	find_media_addon_server_port();
+}
+
+
+void
+InitRosterDataExchange(const BMessenger& rosterMessenger)
+{
+	sMediaRosterMessenger = rosterMessenger;
+}
+
+
+//! BMessage based data exchange with the local BMediaRoster
+status_t
+SendToRoster(BMessage* msg)
+{
+	status_t status = sMediaRosterMessenger.SendMessage(msg,
+		static_cast<BHandler*>(NULL), TIMEOUT);
+	if (status != B_OK) {
+		ERROR("SendToRoster: SendMessage failed: %s\n", strerror(status));
+		DEBUG_ONLY(msg->PrintToStream());
+	}
+	return status;
 }
 
 

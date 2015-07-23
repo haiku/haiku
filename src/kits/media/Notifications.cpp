@@ -58,6 +58,15 @@ Register(const BMessenger& notifyHandler, const media_node& node,
 	int32 notification)
 {
 	CALLED();
+
+	if (notification == B_MEDIA_SERVER_STARTED
+		|| notification == B_MEDIA_SERVER_QUIT) {
+		BMessage msg(MEDIA_ROSTER_REQUEST_NOTIFICATIONS);
+		msg.AddInt32(NOTIFICATION_PARAM_WHAT, notification);
+		msg.AddMessenger(NOTIFICATION_PARAM_MESSENGER, notifyHandler);
+		return BPrivate::media::dataexchange::SendToRoster(&msg);
+	}
+
 	BMessage msg(MEDIA_SERVER_REQUEST_NOTIFICATIONS);
 	msg.AddInt32(NOTIFICATION_PARAM_WHAT, notification);
 	msg.AddInt32(NOTIFICATION_PARAM_TEAM, BPrivate::current_team());
@@ -73,6 +82,15 @@ Unregister(const BMessenger& notifyHandler, const media_node& node,
 	int32 notification)
 {
 	CALLED();
+
+	if (notification == B_MEDIA_SERVER_STARTED
+		|| notification == B_MEDIA_SERVER_QUIT) {
+		BMessage msg(MEDIA_ROSTER_CANCEL_NOTIFICATIONS);
+		msg.AddInt32(NOTIFICATION_PARAM_WHAT, notification);
+		msg.AddMessenger(NOTIFICATION_PARAM_MESSENGER, notifyHandler);
+		return BPrivate::media::dataexchange::SendToRoster(&msg);
+	}
+
 	BMessage msg(MEDIA_SERVER_CANCEL_NOTIFICATIONS);
 	msg.AddInt32(NOTIFICATION_PARAM_WHAT, notification);
 	msg.AddInt32(NOTIFICATION_PARAM_TEAM, BPrivate::current_team());
@@ -294,6 +312,11 @@ IsValidNotificationRequest(bool node_specific, int32 notification)
 		case B_MEDIA_DEFAULT_CHANGED:
 		case B_MEDIA_FLAVORS_CHANGED:
 			return true;
+
+		// invalid if we watch for a specific node
+		case B_MEDIA_SERVER_STARTED:
+		case B_MEDIA_SERVER_QUIT:
+			return !node_specific;
 
 		// only valid for node specific watching
 		case B_MEDIA_PARAMETER_CHANGED:

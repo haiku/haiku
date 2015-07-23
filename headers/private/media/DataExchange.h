@@ -16,7 +16,11 @@ namespace media {
 namespace dataexchange {
 
 
-void InitDataExchange();
+void InitServerDataExchange();
+void InitRosterDataExchange(const BMessenger& rosterMessenger);
+
+// BMessage based data exchange with the current BMediaRoster
+status_t SendToRoster(BMessage* msg);
 
 // BMessage based data exchange with the media_server
 status_t SendToServer(BMessage* msg);
