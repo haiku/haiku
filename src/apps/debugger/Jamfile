@@ -304,6 +304,7 @@ local sources =
 	ExpressionPromptWindow.cpp
 	SignalDispositionEditWindow.cpp
 	StartTeamWindow.cpp
+	VariableEditWindow.cpp
 	WatchPromptWindow.cpp
 
 	# user_interface/gui/value
