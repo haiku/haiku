@@ -413,6 +413,10 @@ ApplicationTypesWindow::_SetType(BMimeType* type, int32 forceUpdate)
 				fTrackerButton->SetMessage(NULL);
 				appFound = false;
 			}
+		} else if ((forceUpdate & B_APP_HINT_CHANGED) != 0) {
+			fLaunchButton->SetMessage(NULL);
+			fPathView->SetText(NULL);
+			fTrackerButton->SetMessage(NULL);
 		}
 
 		if (forceUpdate == B_EVERYTHING_CHANGED) {
