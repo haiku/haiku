@@ -1,20 +1,20 @@
 /*
 	ProcessController © 2000, Georges-Edouard Berenger, All Rights Reserved.
-	Copyright (C) 2004 beunited.org 
+	Copyright (C) 2004 beunited.org
 
-	This library is free software; you can redistribute it and/or 
-	modify it under the terms of the GNU Lesser General Public 
-	License as published by the Free Software Foundation; either 
-	version 2.1 of the License, or (at your option) any later version. 
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-	This library is distributed in the hope that it will be useful, 
-	but WITHOUT ANY WARRANTY; without even the implied warranty of 
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-	Lesser General Public License for more details. 
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public 
-	License along with this library; if not, write to the Free Software 
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 
 
@@ -23,9 +23,7 @@
 #include "ProcessController.h"
 #include "icons.h"
 
-#ifdef __HAIKU__
-	#include <AppMisc.h>
-#endif
+#include <AppMisc.h>
 #include <Alert.h>
 #include <Bitmap.h>
 #include <Deskbar.h>
@@ -67,18 +65,8 @@ get_team_name_and_icon(info_pack& infoPack, bool icon)
 			get_ref_for_path(kernelPath.Path(), &info.ref);
 			nameFromArgs = true;
 		} else {
-#ifdef __HAIKU__
 			status = BPrivate::get_app_ref(infoPack.team_info.team, &info.ref);
 			nameFromArgs = true;
-#else
-
-			BEntry entry(infoPack.team_info.args, true);
-			status = entry.GetRef(&info.ref);
-			if (status != B_OK
-				|| strncmp(infoPack.team_info.args, systemPath.Path(),
-					strlen(systemPath.Path())) != 0)
-				nameFromArgs = true;
-#endif
 			tryTrackerIcon = (status == B_OK);
 		}
 	}
@@ -87,11 +75,7 @@ get_team_name_and_icon(info_pack& infoPack, bool icon)
 		B_PATH_NAME_LENGTH - 1);
 
 	if (icon) {
-#ifdef __HAIKU__
 		infoPack.team_icon = new BBitmap(BRect(0, 0, 15, 15), B_RGBA32);
-#else
-		infoPack.team_icon = new BBitmap(BRect(0, 0, 15, 15), B_CMAP8);
-#endif
 		if (!tryTrackerIcon
 			|| BNodeInfo::GetTrackerIcon(&info.ref, infoPack.team_icon,
 				B_MINI_ICON) != B_OK) {

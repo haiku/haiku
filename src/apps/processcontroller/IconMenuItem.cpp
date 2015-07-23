@@ -4,21 +4,21 @@
 
 	ProcessController
 	(c) 2000, Georges-Edouard Berenger, All Rights Reserved.
-	Copyright (C) 2004 beunited.org 
+	Copyright (C) 2004 beunited.org
 
-	This library is free software; you can redistribute it and/or 
-	modify it under the terms of the GNU Lesser General Public 
-	License as published by the Free Software Foundation; either 
-	version 2.1 of the License, or (at your option) any later version. 
+	This library is free software; you can redistribute it and/or
+	modify it under the terms of the GNU Lesser General Public
+	License as published by the Free Software Foundation; either
+	version 2.1 of the License, or (at your option) any later version.
 
-	This library is distributed in the hope that it will be useful, 
-	but WITHOUT ANY WARRANTY; without even the implied warranty of 
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU 
-	Lesser General Public License for more details. 
+	This library is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+	Lesser General Public License for more details.
 
-	You should have received a copy of the GNU Lesser General Public 
-	License along with this library; if not, write to the Free Software 
-	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA	
+	You should have received a copy of the GNU Lesser General Public
+	License along with this library; if not, write to the Free Software
+	Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 */
 
@@ -27,7 +27,6 @@
 #include <NodeInfo.h>
 #include <Bitmap.h>
 #include <Roster.h>
-#include <parsedate.h>
 
 
 IconMenuItem::IconMenuItem(BBitmap* icon, const char* title,
@@ -155,22 +154,6 @@ int IconMenuItem::MinHeight()
 {
 	static int	minheight = -1;
 	if (minheight < 0)
-		minheight = before_dano() ? 16 : 17;
+		minheight = 17;
 	return minheight;
-}
-
-
-bool
-before_dano()
-{
-	static int old_version = -1;
-	if (old_version < 0) {
-		system_info sys_info;
-		get_system_info(&sys_info);
-		time_t kernelTime = parsedate(sys_info.kernel_build_date, time(NULL));
-		struct tm* date = gmtime(&kernelTime);
-		old_version = (date->tm_year < 101 || (date->tm_year == 101 && date->tm_mon < 10));
-	}
-
-	return old_version;
 }

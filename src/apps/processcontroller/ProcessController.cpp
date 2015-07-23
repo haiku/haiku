@@ -921,69 +921,7 @@ status_t
 thread_debug_thread(void *arg)
 {
 	Tdebug_thead_param*	param = (Tdebug_thead_param*) arg;
-#ifdef __HAIKU__
 	debug_thread(param->thread);
-#else	// !__HAIKU__
-	thread_info	thinfo;
-	get_thread_info(param->thread, &thinfo);
-	char text[4096];
-	sprintf(text, "db %d", int(param->thread));
-	system(text);
-	if (param->sem >= 0 && thinfo.state == B_THREAD_WAITING && param->sem
-			== thinfo.sem) {
-		snooze(1000000);
-		get_thread_info(param->thread, &thinfo);
-		if (thinfo.state == B_THREAD_WAITING
-			&& param->sem == thinfo.sem
-			&& param->totalTime == thinfo.user_time + thinfo.kernel_time) {
-			// the thread has been waiting for this semaphore since the before
-			// the alert, not doing anything... Let's push it out of there!
-			sem_info sinfo;
-			thread_info thinfo;
-			info_pack infos;
-
-			if (get_sem_info(param->sem, &sinfo) == B_OK
-				&& get_thread_info(param->thread, &thinfo) == B_OK
-				&& get_team_info(thinfo.team, &infos.team_info) == B_OK) {
-				sprintf (text, "This thread is waiting for the "
-					"semaphore called \"%s\". As long as it waits for this "
-					"semaphore, you won't be able to debug that thread.\n",
-						sinfo.name);
-				if (sinfo.team == thinfo.team)
-					strcat(text, "This semaphore belongs to the "
-						"thread's team.\n\nShould I release this semaphore?\n");
-				else {
-					get_team_name_and_icon(infos);
-					char moreText[1024];
-					sprintf(moreText, "\nWARNING! This semaphore "
-						"belongs to the team \"%s\"!\n\nShould I release this "
-						"semaphore anyway?\n",
-						infos.team_name);
-					strcat(text, moreText);
-				}
-
-				BAlert* alert = new BAlert("", text, "Cancel", "Release",
-						NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
-				alert->SetShortcut(0, B_ESCAPE);
-				if (alert->Go()) {
-					get_thread_info (param->thread, &thinfo);
-					if (thinfo.state == B_THREAD_WAITING && param->sem
-							== thinfo.sem
-						&& param->totalTime == thinfo.user_time
-							+ thinfo.kernel_time)
-						release_sem(param->sem);
-					else {
-						alert = new BAlert("", "The semaphore wasn't released, "
-							"because it wasn't necessary anymore!",
-							"OK", NULL, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-						alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-						alert->Go();
-					}
-				}
-			}
-		}
-	}
-#endif	// !__HAIKU__
 	delete param;
 	return B_OK;
 }
