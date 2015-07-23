@@ -19,8 +19,8 @@
 #include <Catalog.h>
 #include <ControlLook.h>
 #include <Dragger.h>
+#include <MediaRoster.h>
 #include <MessageRunner.h>
-#include <Roster.h>
 
 #include <AppMisc.h>
 
@@ -29,14 +29,9 @@
 #include "VolumeWindow.h"
 
 
-
-
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "VolumeControl"
 
-
-static const char* kMediaServerSignature = "application/x-vnd.Be.media-server";
-static const char* kAddOnServerSignature = "application/x-vnd.Be.addon-host";
 
 static const uint32 kMsgReconnectVolume = 'rcms';
 
@@ -131,7 +126,9 @@ VolumeControl::AttachedToWindow()
 	else
 		SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
 
-	be_roster->StartWatching(this, B_REQUEST_LAUNCHED | B_REQUEST_QUIT);
+	BMediaRoster* roster = BMediaRoster::Roster();
+	roster->StartWatching(BMessenger(this), B_MEDIA_SERVER_STARTED);
+	roster->StartWatching(BMessenger(this), B_MEDIA_SERVER_QUIT);
 
 	_ConnectVolume();
 
@@ -150,7 +147,9 @@ VolumeControl::DetachedFromWindow()
 {
 	_DisconnectVolume();
 
-	be_roster->StopWatching(this);
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	roster->StopWatching(BMessenger(this), B_MEDIA_SERVER_STARTED);
+	roster->StopWatching(BMessenger(this), B_MEDIA_SERVER_QUIT);
 }
 
 
@@ -294,42 +293,19 @@ VolumeControl::MessageReceived(BMessage* msg)
 			SetValue((int32)fMixerControl->Volume());
 			break;
 
-		case B_SOME_APP_LAUNCHED:
-		case B_SOME_APP_QUIT:
+		case B_MEDIA_SERVER_STARTED:
 		{
-			const char* signature;
-			if (msg->FindString("be:signature", &signature) != B_OK)
-				break;
+			BMessage reconnect(kMsgReconnectVolume);
+			BMessageRunner::StartSending(this, &reconnect, 1000000LL, 1);
+			fConnectRetries = 3;
+			break;
+		}
 
-			bool isMediaServer = !strcmp(signature, kMediaServerSignature);
-			bool isAddOnServer = !strcmp(signature, kAddOnServerSignature);
-			if (!isMediaServer && !isAddOnServer)
-				break;
-
-			if (isMediaServer)
-				fMediaServerRunning = msg->what == B_SOME_APP_LAUNCHED;
-			if (isAddOnServer)
-				fAddOnServerRunning = msg->what == B_SOME_APP_LAUNCHED;
-
-			if (!fMediaServerRunning && !fAddOnServerRunning) {
-				// No media server around
-				SetLabel(B_TRANSLATE("No media server running"));
-				SetEnabled(false);
-			} else if (fMediaServerRunning && fAddOnServerRunning) {
-				// HACK!
-				// quit our now invalid instance of the media roster
-				// so that before new nodes are created,
-				// we get a new roster
-				BMediaRoster* roster = BMediaRoster::CurrentRoster();
-				if (roster != NULL) {
-					roster->Lock();
-					roster->Quit();
-				}
-
-				BMessage reconnect(kMsgReconnectVolume);
-				BMessageRunner::StartSending(this, &reconnect, 1000000LL, 1);
-				fConnectRetries = 3;
-			}
+		case B_MEDIA_SERVER_QUIT:
+		{
+			// No media server around
+			SetLabel(B_TRANSLATE("No media server running"));
+			SetEnabled(false);
 			break;
 		}
 
