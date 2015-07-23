@@ -132,8 +132,8 @@ InstallerApp::Quit()
 			Utility::EjectMedia("/boot");
 		}
 
-		// Quickly shutdown without possibly touching anything on disk
+		// Quickly reboot without possibly touching anything on disk
 		// (which we might just have ejected)
-		_kern_shutdown(false);
+		_kern_shutdown(true);
 	}
 }
