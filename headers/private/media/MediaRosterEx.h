@@ -35,6 +35,7 @@ class BMediaRosterEx : public BMediaRoster
 {
 public:
 							BMediaRosterEx(status_t* out_error);
+		virtual				~BMediaRosterEx();
 
 		status_t			SaveNodeConfiguration(BMediaNode* node);
 		status_t 			LoadNodeConfiguration(media_addon_id addonid,

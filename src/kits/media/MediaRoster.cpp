@@ -75,14 +75,10 @@ namespace BPrivate {
 namespace media {
 
 
-class MediaInitializer {
+// This class is provided to ensure the BMediaRoster is quit.
+class MediaRosterUndertaker {
 public:
-	MediaInitializer()
-	{
-		InitDataExchange();
-	}
-
-	~MediaInitializer()
+	~MediaRosterUndertaker()
 	{
 		if (BMediaRoster::CurrentRoster() != NULL) {
 			BMediaRoster::CurrentRoster()->Lock();
@@ -98,7 +94,7 @@ public:
 using namespace BPrivate::media;
 
 
-static MediaInitializer sInitializer;
+static MediaRosterUndertaker sUndertaker;
 
 
 BMediaRosterEx::BMediaRosterEx(status_t* _error)
@@ -122,6 +118,24 @@ BMediaRosterEx::BMediaRosterEx(status_t* _error)
 		*_error = B_MEDIA_SYSTEM_FAILURE;
 	else
 		*_error = B_OK;
+}
+
+
+BMediaRosterEx::~BMediaRosterEx()
+{
+	CALLED();
+
+	delete gTimeSourceObjectManager;
+	delete gDormantNodeManager;
+
+	// unregister this application with the media server
+	server_unregister_app_request request;
+	server_unregister_app_reply reply;
+	request.team = BPrivate::current_team();
+	QueryServer(SERVER_UNREGISTER_APP, &request, sizeof(request), &reply,
+		sizeof(reply));
+
+	BPrivate::SharedBufferList::Invalidate();
 }
 
 
@@ -3347,18 +3361,6 @@ BMediaRoster::GetSupportedSuites(BMessage* data)
 BMediaRoster::~BMediaRoster()
 {
 	CALLED();
-
-	delete gTimeSourceObjectManager;
-	delete gDormantNodeManager;
-
-	// unregister this application with the media server
-	server_unregister_app_request request;
-	server_unregister_app_reply reply;
-	request.team = BPrivate::current_team();
-	QueryServer(SERVER_UNREGISTER_APP, &request, sizeof(request), &reply,
-		sizeof(reply));
-
-	BPrivate::SharedBufferList::Invalidate();
 
 	// Unset the global instance pointer, the destructor is also called
 	// if a client app calls Lock(); and Quit(); directly.
