@@ -476,19 +476,19 @@ Events::FromMessage(const BMessenger& target, const BMessage& message)
 /*static*/ Event*
 Events::AddOnDemand(Event* event)
 {
-	OrEvent* or = dynamic_cast<OrEvent*>(event);
-	if (or == NULL) {
+	OrEvent* orEvent = dynamic_cast<OrEvent*>(event);
+	if (orEvent == NULL) {
 		EventContainer* container = dynamic_cast<EventContainer*>(event);
 		if (container == NULL)
 			return NULL;
 
-		or = new OrEvent(container->Owner(), container->Target());
+		orEvent = new OrEvent(container->Owner(), container->Target());
 	}
-	if (or != event && event != NULL)
-		or->AddEvent(event);
+	if (orEvent != event && event != NULL)
+		orEvent->AddEvent(event);
 
-	or->AddEvent(new DemandEvent(or));
-	return or;
+	orEvent->AddEvent(new DemandEvent(orEvent));
+	return orEvent;
 }
 
 
