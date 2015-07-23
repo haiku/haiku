@@ -467,6 +467,6 @@ Conditions::AddNotSafeMode(Condition* condition)
 	NotCondition* notCondition = new NotCondition();
 	notCondition->AddCondition(new SafeModeCondition());
 
-	andCondition->AddCondition(notCondtion);
+	andCondition->AddCondition(notCondition);
 	return andCondition;
 }
