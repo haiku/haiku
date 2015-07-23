@@ -1011,9 +1011,9 @@ LaunchDaemon::_LaunchJobs(Target* target, bool forceNow)
 void
 LaunchDaemon::_LaunchJob(Job* job, bool forceNow)
 {
-	if ((job == NULL || job->IsLaunched() || !forceNow)
+	if (job == NULL || job->IsLaunched() || (!forceNow
 		&& (!job->EventHasTriggered() || !job->CheckCondition(*this)
-			|| Events::TriggerDemand(job->Event()))) {
+			|| Events::TriggerDemand(job->Event())))) {
 		return;
 	}
 
