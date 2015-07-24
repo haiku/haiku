@@ -566,13 +566,14 @@ _event_queue_imp::CleanupEvent(media_timed_event *event)
 
 	if (event->cleanup == BTimedEventQueue::B_NO_CLEANUP) {
 		// do nothing
-	} else if (event->type == BTimedEventQueue::B_HANDLE_BUFFER && event->cleanup == BTimedEventQueue::B_RECYCLE_BUFFER) {
+	} else if (event->type == BTimedEventQueue::B_HANDLE_BUFFER
+			&& event->cleanup == BTimedEventQueue::B_RECYCLE_BUFFER) {
 		((BBuffer *)event->pointer)->Recycle();
 		DEBUG_ONLY(*const_cast<void **>(&event->pointer) = NULL);
 	} else if (event->cleanup == BTimedEventQueue::B_EXPIRE_TIMER) {
-		// call TimerExpired() on the event->data
-		debugger("BTimedEventQueue cleanup: calling TimerExpired() should be implemented here\n");
-	} else if (event->cleanup == B_DELETE || event->cleanup >= BTimedEventQueue::B_USER_CLEANUP) {
+		// do nothing, called in BMediaEventLooper::DispatchEvent
+	} else if (event->cleanup == B_DELETE
+			|| event->cleanup >= BTimedEventQueue::B_USER_CLEANUP) {
 		if (fCleanupHook)
 			(*fCleanupHook)(event,fCleanupHookContext);
 	} else {
