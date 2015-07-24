@@ -130,6 +130,8 @@ private:
 									ExpressionInfo* info,
 									StackFrame* frame,
 									::Thread* thread);
+	virtual	void				ValueNodeWriteRequested(ValueNode* node,
+									CpuState* state, Value* value);
 
 	// Team::Listener
 	virtual	void				ThreadStateChanged(

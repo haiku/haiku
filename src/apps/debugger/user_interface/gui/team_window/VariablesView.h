@@ -159,6 +159,12 @@ public:
 									ExpressionInfo* info,
 									StackFrame* frame,
 									Thread* thread) = 0;
+
+	virtual	void				ValueNodeWriteRequested(
+									ValueNode* node,
+									CpuState* state,
+									Value* newValue) = 0;
+
 };
 
 

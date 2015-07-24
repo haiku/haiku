@@ -898,6 +898,14 @@ TeamWindow::ExpressionEvaluationRequested(ExpressionInfo* info,
 
 
 void
+TeamWindow::ValueNodeWriteRequested(ValueNode* node, CpuState* state,
+	Value* newValue)
+{
+	fListener->ValueNodeWriteRequested(node, state, newValue);
+}
+
+
+void
 TeamWindow::ThreadStateChanged(const Team::ThreadEvent& event)
 {
 	BMessage message(MSG_THREAD_STATE_CHANGED);
