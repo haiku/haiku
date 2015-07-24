@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef VARIABLES_VIEW_H
@@ -22,11 +22,13 @@ class StackFrame;
 class Thread;
 class Type;
 class TypeComponentPath;
+class ValueLocation;
 class ValueNode;
 class ValueNodeChild;
 class ValueNodeContainer;
 class Value;
 class Variable;
+class VariableEditWindow;
 class VariablesViewState;
 class VariablesViewStateHistory;
 
@@ -59,7 +61,8 @@ private:
 	// TreeTableListener
 	virtual	void				TreeTableNodeExpandedChanged(TreeTable* table,
 									const TreeTablePath& path, bool expanded);
-
+	virtual	void				TreeTableNodeInvoked(TreeTable* table,
+									const TreeTablePath& path);
 	virtual	void				TreeTableCellMouseDown(TreeTable* table,
 									const TreeTablePath& path,
 									int32 columnIndex, BPoint screenWhere,
@@ -143,6 +146,7 @@ private:
 			VariablesExpressionInfo* fPendingTypecastInfo;
 			ExpressionInfo*		fTemporaryExpression;
 			bool				fFrameClearPending;
+			VariableEditWindow*	fEditWindow;
 			Listener*			fListener;
 };
 

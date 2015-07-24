@@ -43,6 +43,7 @@
 #include "StringUtils.h"
 #include "StringValue.h"
 #include "SyntheticPrimitiveType.h"
+#include "TableCellValueEditor.h"
 #include "TableCellValueRenderer.h"
 #include "Team.h"
 #include "TeamDebugInfo.h"
@@ -59,6 +60,7 @@
 #include "ValueNode.h"
 #include "ValueNodeManager.h"
 #include "Variable.h"
+#include "VariableEditWindow.h"
 #include "VariableValueNodeChild.h"
 #include "VariablesViewState.h"
 #include "VariablesViewStateHistory.h"
@@ -1773,6 +1775,7 @@ VariablesView::VariablesView(Listener* listener)
 	fPendingTypecastInfo(NULL),
 	fTemporaryExpression(NULL),
 	fFrameClearPending(false),
+	fEditWindow(NULL),
 	fListener(listener)
 {
 	SetName("Variables");
@@ -1781,6 +1784,9 @@ VariablesView::VariablesView(Listener* listener)
 
 VariablesView::~VariablesView()
 {
+	if (fEditWindow != NULL)
+		BMessenger(fEditWindow).SendMessage(B_QUIT_REQUESTED);
+
 	SetStackFrame(NULL, NULL);
 	fVariableTable->SetTreeTableModel(NULL);
 
@@ -1885,6 +1891,66 @@ VariablesView::MessageReceived(BMessage* message)
 			// target for each action rather than them all defaulting
 			// to targetting here.
 			Looper()->PostMessage(message);
+			break;
+		}
+		case MSG_SHOW_VARIABLE_EDIT_WINDOW:
+		{
+			TableCellValueEditor* editor = NULL;
+			if (message->FindPointer("editor", reinterpret_cast<void**>(
+					&editor)) != B_OK) {
+				break;
+			}
+			BReference<TableCellValueEditor> editorReference(editor, true);
+			if (fEditWindow != NULL)
+				fEditWindow->Activate();
+			else {
+				ValueNode* node = NULL;
+				if (message->FindPointer("node", reinterpret_cast<void**>(
+						&node)) != B_OK) {
+					break;
+				}
+
+				Value* value = NULL;
+				if (message->FindPointer("value", reinterpret_cast<void**>(
+						&value)) != B_OK) {
+					break;
+				}
+
+				try {
+					fEditWindow = VariableEditWindow::Create(value, node,
+						editor, this);
+				} catch (...) {
+					fEditWindow = NULL;
+					break;
+				}
+
+				fEditWindow->Show();
+			}
+			break;
+		}
+		case MSG_VARIABLE_EDIT_WINDOW_CLOSED:
+		{
+			fEditWindow = NULL;
+			break;
+		}
+		case MSG_WRITE_VARIABLE_VALUE:
+		{
+			Value* value = NULL;
+			if (message->FindPointer("value", reinterpret_cast<void**>(
+					&value)) != B_OK) {
+				break;
+			}
+
+			BReference<Value> valueReference(value, true);
+
+			ValueNode* node = NULL;
+			if (message->FindPointer("node", reinterpret_cast<void**>(
+					&node)) != B_OK) {
+				break;
+			}
+
+			fListener->ValueNodeWriteRequested(node,
+				fStackFrame->GetCpuState(), value);
 			break;
 		}
 		case MSG_SHOW_TYPECAST_NODE_PROMPT:
@@ -2325,6 +2391,54 @@ VariablesView::TreeTableNodeExpandedChanged(TreeTable* table,
 			_RequestNodeValue(child);
 		}
 	}
+}
+
+
+void
+VariablesView::TreeTableNodeInvoked(TreeTable* table,
+	const TreeTablePath& path)
+{
+	ModelNode* node = (ModelNode*)fVariableTableModel->NodeForPath(path);
+	if (node == NULL)
+		return;
+
+	ValueNodeChild* child = node->NodeChild();
+
+	if (child->LocationResolutionState() != B_OK)
+		return;
+
+	ValueLocation* location = child->Location();
+	if (!location->IsWritable())
+		return;
+
+	Value* value = node->GetValue();
+	if (value == NULL)
+		return;
+
+	// get a value handler
+	ValueHandler* valueHandler;
+	status_t error = ValueHandlerRoster::Default()->FindValueHandler(value,
+		valueHandler);
+	if (error != B_OK)
+		return;
+
+	BReference<ValueHandler> handlerReference(valueHandler, true);
+	TableCellValueRenderer* renderer = node->TableCellRenderer();
+	TableCellValueEditor* editor = NULL;
+	error = valueHandler->GetTableCellValueEditor(value,
+		renderer != NULL ? renderer->GetSettings() : NULL, editor);
+	if (error != B_OK || editor == NULL)
+		return;
+
+	BReference<TableCellValueEditor> editorReference(editor, true);
+
+	BMessage message(MSG_SHOW_VARIABLE_EDIT_WINDOW);
+	message.AddPointer("editor", editor);
+	message.AddPointer("node", node->NodeChild()->Node());
+	message.AddPointer("value", value);
+
+	if (BMessenger(this).SendMessage(&message) == B_OK)
+		editorReference.Detach();
 }
 
 
