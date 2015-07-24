@@ -195,10 +195,6 @@ void ESDSinkNode::NodeRegistered(void)
 		return;
 	}
 	
-	SetPriority(B_REAL_TIME_PRIORITY);
-	
-	Run();
-	
 //	media_input *input = new media_input;
 
 	fInput.format = fPreferredFormat;
@@ -236,6 +232,9 @@ void ESDSinkNode::NodeRegistered(void)
 #ifdef PRINTING
 	PRINT(("apply configuration in : %lld\n", system_time() - start));
 #endif
+
+	SetPriority(B_REAL_TIME_PRIORITY);
+	Run();
 }
 
 status_t ESDSinkNode::RequestCompleted(const media_request_info &info)

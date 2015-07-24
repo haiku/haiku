@@ -587,15 +587,15 @@ AudioProducer::NodeRegistered()
 {
 	TRACE("%p->AudioProducer::NodeRegistered()\n", this);
 
-	// Start the BMediaEventLooper thread
-	SetPriority(B_REAL_TIME_PRIORITY);
-	Run();
-
 	// set up as much information about our output as we can
 	fOutput.source.port = ControlPort();
 	fOutput.source.id = 0;
 	fOutput.node = Node();
 	::strcpy(fOutput.name, Name());
+
+	// Start the BMediaEventLooper thread
+	SetPriority(B_REAL_TIME_PRIORITY);
+	Run();
 }
 
 

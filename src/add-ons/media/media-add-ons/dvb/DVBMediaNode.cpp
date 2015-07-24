@@ -181,9 +181,6 @@ DVBMediaNode::DVBMediaNode(
 	fRequiredFormatEncAudio = fDefaultFormatEncAudio;
 	fRequiredFormatTS = fDefaultFormatTS;
 
-	// start the BMediaEventLooper control loop running
-	Run();
-
 	TRACE("current RunMode = %d\n", RunMode());
 
 #ifdef DUMP_VIDEO
@@ -350,6 +347,8 @@ DVBMediaNode::NodeRegistered()
 
 	//printf("RunMode = %d\n", RunMode());
 	//printf("_m_recordDelay = %Ld\n", _m_recordDelay);
+
+	Run();
 }
 
 

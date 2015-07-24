@@ -227,10 +227,6 @@ void FlangerNode::NodeRegistered() {
 
 	PRINT(("FlangerNode::NodeRegistered()\n"));
 
-	// Start the BMediaEventLooper thread
-	SetPriority(B_REAL_TIME_PRIORITY);
-	Run();
-
 	// figure preferred ('template') format
 	m_preferredFormat.type = B_MEDIA_RAW_AUDIO;
 	getPreferredFormat(m_preferredFormat);
@@ -258,6 +254,10 @@ void FlangerNode::NodeRegistered() {
 	// init parameters
 	initParameterValues();
 	initParameterWeb();
+
+	// Start the BMediaEventLooper thread
+	SetPriority(B_REAL_TIME_PRIORITY);
+	Run();
 }
 
 // "Augment OfflineTime() to compute the node's current time; it's called

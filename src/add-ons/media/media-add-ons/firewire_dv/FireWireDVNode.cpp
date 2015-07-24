@@ -138,9 +138,6 @@ FireWireDVNode::NodeRegistered()
 {
 	CALLED();
 
-	SetPriority(B_REAL_TIME_PRIORITY);
-	Run();
-
 	fOutputEncVideo.node = Node();
 	fOutputEncVideo.source.port = ControlPort();
 	fOutputEncVideo.source.id = 0;
@@ -149,6 +146,9 @@ FireWireDVNode::NodeRegistered()
 	strcpy(fOutputEncVideo.name, "encoded video");	
 	
 	RefreshParameterWeb();
+
+	SetPriority(B_REAL_TIME_PRIORITY);
+	Run();
 }
 
 

@@ -629,16 +629,16 @@ ToneProducer::NodeRegistered()
 {
 	FPRINTF(stderr, "ToneProducer::NodeRegistered\n");
 
-	// Start the BMediaEventLooper thread
-	SetPriority(B_REAL_TIME_PRIORITY);
-	Run();
-
 	// output init moved to ctor
 	// e.moon [4jun99]
 
 	// Set up our parameter web
 	mWeb = make_parameter_web();
 	SetParameterWeb(mWeb);
+
+	// Start the BMediaEventLooper thread
+	SetPriority(B_REAL_TIME_PRIORITY);
+	Run();
 }
 
 void

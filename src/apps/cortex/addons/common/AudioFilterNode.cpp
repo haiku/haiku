@@ -383,10 +383,6 @@ void AudioFilterNode::NodeRegistered() {
 
 	PRINT(("AudioFilterNode::NodeRegistered()\n"));
 	status_t err;
-		
-	// Start the BMediaEventLooper thread
-	SetPriority(B_REAL_TIME_PRIORITY);
-	Run();
 
 	// init input
 	m_input.destination.port = ControlPort();
@@ -414,6 +410,10 @@ void AudioFilterNode::NodeRegistered() {
 
 	// init parameters
 	initParameterWeb();
+
+	// Start the BMediaEventLooper thread
+	SetPriority(B_REAL_TIME_PRIORITY);
+	Run();
 }
 	
 // "Augment OfflineTime() to compute the node's current time; it's called

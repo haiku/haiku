@@ -448,10 +448,6 @@ OpenSoundNode::NodeRegistered()
 		return;
 	}
 
-	SetPriority(B_REAL_TIME_PRIORITY);
-
-	Run();
-
 	TRACE("NodeRegistered: %d engines\n", fDevice->CountEngines());
 	for (int32 i = 0; i < fDevice->CountEngines(); i++) {
 		OpenSoundDeviceEngine* engine = fDevice->EngineAt(i);
@@ -576,6 +572,9 @@ OpenSoundNode::NodeRegistered()
 	}
 
 	TRACE("apply configuration in : %lldµs\n", system_time() - start);
+
+	SetPriority(B_REAL_TIME_PRIORITY);
+	Run();
 }
 
 

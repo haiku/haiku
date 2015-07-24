@@ -422,15 +422,15 @@ GameProducer::AdditionalBufferRequested(const media_source& source,
 void
 GameProducer::NodeRegistered()
 {
-	// Start the BMediaEventLooper thread
-	SetPriority(B_REAL_TIME_PRIORITY);
-	Run();
-
 	// set up as much information about our output as we can
 	fOutput.source.port = ControlPort();
 	fOutput.source.id = 0;
 	fOutput.node = Node();
 	strlcpy(fOutput.name, "GameProducer Output", B_MEDIA_NAME_LENGTH);
+
+	// Start the BMediaEventLooper thread
+	SetPriority(B_REAL_TIME_PRIORITY);
+	Run();
 }
 
 

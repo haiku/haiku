@@ -168,8 +168,11 @@ node_output::~node_output()
 
 MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 		MultiAudioDevice* device, int32 internalID, BMessage* config)
-	: BMediaNode(name), BBufferConsumer(B_MEDIA_RAW_AUDIO),
+	:
+	BMediaNode(name),
+	BBufferConsumer(B_MEDIA_RAW_AUDIO),
 	BBufferProducer(B_MEDIA_RAW_AUDIO),
+	BMediaEventLooper(),
 	fBufferLock("multi audio buffers"),
 	fThread(-1),
 	fDevice(device),
@@ -335,9 +338,6 @@ MultiAudioNode::NodeRegistered()
 		return;
 	}
 
-	SetPriority(B_REAL_TIME_PRIORITY);
-	Run();
-
 	node_input *currentInput = NULL;
 	int32 currentId = 0;
 
@@ -461,6 +461,9 @@ MultiAudioNode::NodeRegistered()
 
 	PRINT(("apply configuration in : %" B_PRIdBIGTIME "\n",
 		system_time() - start));
+
+	SetPriority(B_REAL_TIME_PRIORITY);
+	Run();
 }
 
 

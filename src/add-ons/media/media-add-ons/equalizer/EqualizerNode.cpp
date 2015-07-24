@@ -66,9 +66,6 @@ EqualizerNode::HandleMessage(int32 message, const void *data, size_t size)
 void
 EqualizerNode::NodeRegistered()
 {
-	SetPriority(B_REAL_TIME_PRIORITY);
-	Run();
-
 	fPreferredFormat.type = B_MEDIA_RAW_AUDIO;
 	fPreferredFormat.u.raw_audio.buffer_size = BUFF_SIZE;
 	fPreferredFormat.u.raw_audio = media_raw_audio_format::wildcard;
@@ -95,6 +92,9 @@ EqualizerNode::NodeRegistered()
 
 	InitParameterValues();
 	InitParameterWeb();
+
+	SetPriority(B_REAL_TIME_PRIORITY);
+	Run();
 }
 
 

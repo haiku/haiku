@@ -17,6 +17,7 @@
 #include <Buffer.h>
 #include <Catalog.h>
 #include <FindDirectory.h>
+#include <MediaDefs.h>
 #include <MediaRoster.h>
 #include <ParameterWeb.h>
 #include <Path.h>
@@ -1066,9 +1067,9 @@ AudioMixer::EnableOutput(const media_source& what, bool enabled,
 void
 AudioMixer::NodeRegistered()
 {
-	Run();
-	SetPriority(120);
 	UpdateParameterWeb();
+	SetPriority(B_REAL_TIME_PRIORITY);
+	Run();
 }
 
 
