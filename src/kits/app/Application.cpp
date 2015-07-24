@@ -343,11 +343,12 @@ BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 {
 	DBG(OUT("BApplication::InitData(`%s', %p)\n", signature, _error));
 	// check whether there exists already an application
-	if (be_app)
+	if (be_app != NULL)
 		debugger("2 BApplication objects were created. Only one is allowed.");
 
 	fServerLink = new BPrivate::PortLink(-1, -1);
 	fServerAllocator = NULL;
+	fServerReadOnlyMemory = NULL;
 	fInitialWorkspace = 0;
 	//fDraggedMessage = NULL;
 	fReadyToRunCalled = false;

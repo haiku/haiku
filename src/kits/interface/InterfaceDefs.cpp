@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc.
+ * Copyright 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -947,7 +947,7 @@ get_mouse(BPoint* screenWhere, uint32* buttons)
 
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_CURSOR_POSITION);
-	
+
 	int32 code;
 	status_t ret = link.FlushWithReply(code);
 	if (ret != B_OK)
@@ -980,21 +980,21 @@ get_mouse_bitmap(BBitmap** bitmap, BPoint* hotspot)
 {
 	if (bitmap == NULL && hotspot == NULL)
 		return B_BAD_VALUE;
-	
+
 	BPrivate::AppServerLink link;
 	link.StartMessage(AS_GET_CURSOR_BITMAP);
-	
+
 	int32 code;
 	status_t status = link.FlushWithReply(code);
 	if (status != B_OK)
 		return status;
 	if (code != B_OK)
 		return code;
-	
+
 	uint32 size = 0;
 	uint32 cursorWidth = 0;
 	uint32 cursorHeight = 0;
-	
+
 	// if link.Read() returns an error, the same error will be returned on
 	// subsequent calls, so we'll check only the return value of the last call
 	link.Read<uint32>(&size);
@@ -1011,16 +1011,16 @@ get_mouse_bitmap(BBitmap** bitmap, BPoint* hotspot)
 		data = malloc(size);
 	if (data == NULL)
 		return B_NO_MEMORY;
-	
+
 	status = link.Read(data, size);
 	if (status != B_OK) {
 		free(data);
 		return status;
 	}
-	
+
 	BBitmap* cursorBitmap = new (std::nothrow) BBitmap(BRect(0, 0,
 		cursorWidth - 1, cursorHeight - 1), B_RGBA32);
-	
+
 	if (cursorBitmap == NULL) {
 		free(data);
 		return B_NO_MEMORY;
@@ -1030,12 +1030,12 @@ get_mouse_bitmap(BBitmap** bitmap, BPoint* hotspot)
 		cursorBitmap->SetBits(data, size, 0, B_RGBA32);
 
 	free(data);
-	
+
 	if (status == B_OK && bitmap != NULL)
 		*bitmap = cursorBitmap;
 	else
 		delete cursorBitmap;
-	
+
 	return status;
 }
 
@@ -1076,10 +1076,11 @@ ui_color(color_which which)
 		return make_color(0, 0, 0);
 	}
 
-	if (be_app) {
+	if (be_app != NULL) {
 		server_read_only_memory* shared
 			= BApplication::Private::ServerReadOnlyMemory();
-		return shared->colors[index];
+		if (shared != NULL)
+			return shared->colors[index];
 	}
 
 	return kDefaultColors[index];
