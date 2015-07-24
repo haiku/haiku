@@ -80,7 +80,8 @@ TableCellTextControlEditor::MessageReceived(BMessage* message)
 		{
 			// TODO: highlight the input view in some way to show
 			// invalid inputs
-			break;
+
+			// fall through
 		}
 		case MSG_INPUT_VALIDATION_NEEDED:
 		{
