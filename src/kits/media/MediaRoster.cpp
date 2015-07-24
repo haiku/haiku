@@ -118,9 +118,9 @@ BMediaRosterEx::BMediaRosterEx(status_t* _error)
 	InitRosterDataExchange(BMessenger(this, this));
 
 	if (be_roster->StartWatching(BMessenger(this, this),
-		B_REQUEST_LAUNCHED | B_REQUEST_QUIT) != B_OK)
-			*_error = B_ERROR;
-
+			B_REQUEST_LAUNCHED | B_REQUEST_QUIT) != B_OK) {
+		*_error = B_ERROR;
+	}
 	sServerIsUp = BMediaRoster::IsRunning();
 }
 
@@ -3262,10 +3262,8 @@ BMediaRoster::GetInstancesFor(media_addon_id addon, int32 flavor,
 bool
 BMediaRoster::IsRunning()
 {
-	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)
-		&& be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE))
-		return true;
-	return false;
+	return be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)
+		&& be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE);
 }
 
 

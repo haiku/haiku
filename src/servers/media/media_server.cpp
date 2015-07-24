@@ -116,8 +116,8 @@ ServerApp::ServerApp()
 
 	BMediaRoster* roster = BMediaRoster::Roster();
 	if (roster->StartWatching(BMessenger(this, this),
-		B_MEDIA_SERVER_QUIT) != B_OK) {
-			TRACE("ServerApp: can't watch for B_MEDIA_SERVER_QUIT");
+			B_MEDIA_SERVER_QUIT) != B_OK) {
+		TRACE("ServerApp: can't watch for B_MEDIA_SERVER_QUIT");
 	}
 }
 
@@ -138,8 +138,8 @@ ServerApp::~ServerApp()
 
 	BMediaRoster* roster = BMediaRoster::CurrentRoster();
 	if (roster->StopWatching(BMessenger(this, this),
-		B_MEDIA_SERVER_QUIT) != B_OK) {
-			TRACE("ServerApp: can't unwatch for B_MEDIA_SERVER_QUIT");
+			B_MEDIA_SERVER_QUIT) != B_OK) {
+		TRACE("ServerApp: can't unwatch for B_MEDIA_SERVER_QUIT");
 	}
 }
 
