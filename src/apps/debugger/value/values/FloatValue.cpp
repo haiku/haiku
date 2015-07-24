@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 
-FloatValue::FloatValue(double value)
+FloatValue::FloatValue(const BVariant& value)
 	:
 	fValue(value)
 {
@@ -25,7 +25,21 @@ bool
 FloatValue::ToString(BString& _string) const
 {
 	char buffer[128];
-	snprintf(buffer, sizeof(buffer), "%g", fValue);
+
+	switch (fValue.Type()) {
+		case B_FLOAT_TYPE:
+		{
+			snprintf(buffer, sizeof(buffer), "%f", fValue.ToFloat());
+			break;
+		}
+		case B_DOUBLE_TYPE:
+		{
+			snprintf(buffer, sizeof(buffer), "%g", fValue.ToDouble());
+			break;
+		}
+		default:
+			return false;
+	}
 
 	BString string(buffer);
 	if (string.Length() == 0)

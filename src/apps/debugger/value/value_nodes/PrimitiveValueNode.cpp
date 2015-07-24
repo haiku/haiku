@@ -77,7 +77,7 @@ PrimitiveValueNode::ResolvedLocationAndValue(ValueLoader* valueLoader,
 	else if (BVariant::TypeIsInteger(valueType))
 		value = new(std::nothrow) IntegerValue(valueData);
 	else if (BVariant::TypeIsFloat(valueType))
-		value = new(std::nothrow) FloatValue(valueData.ToDouble());
+		value = new(std::nothrow) FloatValue(valueData);
 	else
 		return B_UNSUPPORTED;
 

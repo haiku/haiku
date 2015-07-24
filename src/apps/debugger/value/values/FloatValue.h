@@ -1,4 +1,4 @@
-/*
+	/*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -11,10 +11,10 @@
 
 class FloatValue : public Value {
 public:
-								FloatValue(double value);
+								FloatValue(const BVariant& value);
 	virtual						~FloatValue();
 
-			double				GetValue() const
+			BVariant			GetValue() const
 									{ return fValue; }
 
 	virtual	bool				ToString(BString& _string) const;
@@ -23,7 +23,7 @@ public:
 	virtual	bool				operator==(const Value& other) const;
 
 private:
-			double				fValue;
+			BVariant			fValue;
 };
 
 
