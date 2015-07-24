@@ -10,6 +10,7 @@
 
 #include "FloatValue.h"
 #include "FloatValueFormatter.h"
+#include "TableCellFloatEditor.h"
 #include "TableCellFormattedValueRenderer.h"
 
 
@@ -73,5 +74,35 @@ FloatValueHandler::GetTableCellValueRenderer(Value* value,
 		return B_NO_MEMORY;
 
 	_renderer = renderer;
+	return B_OK;
+}
+
+
+status_t
+FloatValueHandler::GetTableCellValueEditor(Value* _value, Settings* settings,
+	TableCellValueEditor*& _editor)
+{
+	FloatValue* value = dynamic_cast<FloatValue*>(_value);
+	if (value == NULL)
+		return B_BAD_VALUE;
+
+	ValueFormatter* formatter;
+	status_t error = GetValueFormatter(value, formatter);
+	if (error != B_OK)
+		return error;
+	BReference<ValueFormatter> formatterReference(formatter, true);
+
+	TableCellFloatEditor* editor = new(std::nothrow)
+		TableCellFloatEditor(value, formatter);
+	if (editor == NULL)
+		return B_NO_MEMORY;
+
+	BReference<TableCellFloatEditor> editorReference(editor, true);
+	error = editor->Init();
+	if (error != B_OK)
+		return error;
+
+	editorReference.Detach();
+	_editor = editor;
 	return B_OK;
 }

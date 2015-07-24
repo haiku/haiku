@@ -22,6 +22,22 @@ public:
 									{ return NULL; }
 
 	virtual	status_t			FormatValue(Value* value, BString& _output);
+
+	virtual	bool				SupportsValidation() const;
+
+	virtual	bool				ValidateFormattedValue(
+									const BString& input,
+									type_code type) const;
+
+	virtual	status_t			GetValueFromFormattedInput(
+									const BString& input, type_code type,
+									Value*& _output) const;
+private:
+
+			status_t			_PerformValidation(const BString& input,
+									type_code type,
+									::Value*& _output,
+									bool wantsValue) const;
 };
 
 

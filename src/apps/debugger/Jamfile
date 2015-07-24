@@ -311,6 +311,7 @@ local sources =
 	# user_interface/gui/value
 	TableCellBoolEditor.cpp
 	TableCellEnumerationEditor.cpp
+	TableCellFloatEditor.cpp
 	TableCellFormattedValueEditor.cpp
 	TableCellFormattedValueRenderer.cpp
 	TableCellIntegerEditor.cpp
