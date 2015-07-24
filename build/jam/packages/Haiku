@@ -132,6 +132,10 @@ local launchScripts = <data!launch>system ;
 SEARCH on $(launchScripts) = [ FDirName $(HAIKU_TOP) data launch ] ;
 AddFilesToPackage data launch : $(launchScripts) ;
 
+local userLaunchScripts = <data!launch>user ;
+SEARCH on $(userLaunchScripts) = [ FDirName $(HAIKU_TOP) data launch ] ;
+AddFilesToPackage data user_launch : $(userLaunchScripts) ;
+
 # post install scripts
 local postInstallFiles = add_catalog_entry_attributes.sh
 	default_deskbar_items.sh ;

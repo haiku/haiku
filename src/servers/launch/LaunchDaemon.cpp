@@ -50,6 +50,7 @@ using BSupportKit::BPrivate::JobQueue;
 
 
 static const char* kLaunchDirectory = "launch";
+static const char* kUserLaunchDirectory = "user_launch";
 
 
 class Session {
@@ -353,9 +354,22 @@ LaunchDaemon::ReadyToRun()
 		_InitSystem();
 
 	BStringList paths;
+	if (fUserMode) {
+		// System-wide user specific jobs
+		BPathFinder::FindPaths(B_FIND_PATH_DATA_DIRECTORY, kUserLaunchDirectory,
+			B_FIND_PATHS_SYSTEM_ONLY, paths);
+		_ReadPaths(paths);
+	}
+
 	BPathFinder::FindPaths(B_FIND_PATH_DATA_DIRECTORY, kLaunchDirectory,
 		fUserMode ? B_FIND_PATHS_USER_ONLY : B_FIND_PATHS_SYSTEM_ONLY, paths);
 	_ReadPaths(paths);
+
+	if (fUserMode) {
+		BPathFinder::FindPaths(B_FIND_PATH_SETTINGS_DIRECTORY,
+			kUserLaunchDirectory, B_FIND_PATHS_SYSTEM_ONLY, paths);
+		_ReadPaths(paths);
+	}
 
 	BPathFinder::FindPaths(B_FIND_PATH_SETTINGS_DIRECTORY, kLaunchDirectory,
 		fUserMode ? B_FIND_PATHS_USER_ONLY : B_FIND_PATHS_SYSTEM_ONLY, paths);
