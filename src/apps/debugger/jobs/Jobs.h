@@ -51,6 +51,7 @@ enum {
 	JOB_TYPE_LOAD_SOURCE_CODE,
 	JOB_TYPE_GET_STACK_FRAME_VALUE,
 	JOB_TYPE_RESOLVE_VALUE_NODE_VALUE,
+	JOB_TYPE_WRITE_VALUE_NODE_VALUE,
 	JOB_TYPE_GET_MEMORY_BLOCK,
 	JOB_TYPE_WRITE_MEMORY,
 	JOB_TYPE_EVALUATE_EXPRESSION
@@ -213,6 +214,32 @@ private:
 								fTypeInformation;
 			ValueNodeContainer*	fContainer;
 			ValueNode*			fValueNode;
+};
+
+
+class WriteValueNodeValueJob : public Job {
+public:
+								WriteValueNodeValueJob(
+									DebuggerInterface* debuggerInterface,
+									Architecture* architecture,
+									CpuState* cpuState,
+									TeamTypeInformation* typeInformation,
+									ValueNode* valueNode,
+									Value* newValue);
+	virtual						~WriteValueNodeValueJob();
+
+	virtual	const JobKey&		Key() const;
+	virtual	status_t			Do();
+
+private:
+			SimpleJobKey		fKey;
+			DebuggerInterface*	fDebuggerInterface;
+			Architecture*		fArchitecture;
+			CpuState*			fCpuState;
+			TeamTypeInformation*
+								fTypeInformation;
+			ValueNode*			fValueNode;
+			Value*				fNewValue;
 };
 
 

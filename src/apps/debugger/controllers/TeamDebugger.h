@@ -73,6 +73,9 @@ private:
 	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
 									ValueNodeContainer* container,
 									ValueNode* valueNode);
+	virtual	void				ValueNodeWriteRequested(ValueNode* node,
+									CpuState* state,
+									Value* newValue);
 	virtual	void				ThreadActionRequested(thread_id threadID,
 									uint32 action, target_addr_t address);
 

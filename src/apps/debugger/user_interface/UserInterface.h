@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef USER_INTERFACE_H
@@ -30,9 +30,9 @@ class Thread;
 class TypeComponentPath;
 class UserBreakpoint;
 class UserInterfaceListener;
+class Value;
 class ValueNode;
 class ValueNodeContainer;
-class Variable;
 class Watchpoint;
 
 
@@ -101,6 +101,8 @@ public:
 	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
 									ValueNodeContainer* container,
 									ValueNode* valueNode) = 0;
+	virtual	void				ValueNodeWriteRequested(ValueNode* node,
+									CpuState* state, Value* newValue) = 0;
 	virtual	void				ThreadActionRequested(thread_id threadID,
 									uint32 action,
 									target_addr_t address = 0) = 0;

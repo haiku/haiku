@@ -1035,10 +1035,28 @@ TeamDebugger::ValueNodeValueRequested(CpuState* cpuState,
 	status_t error = fWorker->ScheduleJob(
 		new(std::nothrow) ResolveValueNodeValueJob(fDebuggerInterface,
 			fDebuggerInterface->GetArchitecture(), cpuState,
-			fTeam->GetTeamTypeInformation(), container,	valueNode),	this);
+			fTeam->GetTeamTypeInformation(), container,	valueNode), this);
 	if (error != B_OK) {
 		// scheduling failed -- set the value to invalid
 		valueNode->SetLocationAndValue(NULL, NULL, error);
+	}
+}
+
+void
+TeamDebugger::ValueNodeWriteRequested(ValueNode* node, CpuState* state,
+	Value* newValue)
+{
+	// schedule the job
+	status_t error = fWorker->ScheduleJob(
+		new(std::nothrow) WriteValueNodeValueJob(fDebuggerInterface,
+			fDebuggerInterface->GetArchitecture(), state,
+			fTeam->GetTeamTypeInformation(), node, newValue), this);
+	if (error != B_OK) {
+		BString message;
+		message.SetToFormat("Request to write new value for variable %s "
+			"failed: %s.\n", node->Name().String(), strerror(error));
+		fUserInterface->NotifyUser("Error", message.String(),
+			USER_NOTIFICATION_ERROR);
 	}
 }
 
