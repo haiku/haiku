@@ -16,8 +16,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TRACE(x...)			/*debug_printf("NetReceiver: "x)*/
-#define TRACE_ERROR(x...)	debug_printf("NetReceiver: "x)
+#define TRACE(x...)			/*debug_printf("NetReceiver: " x)*/
+#define TRACE_ERROR(x...)	debug_printf("NetReceiver: " x)
 
 
 NetReceiver::NetReceiver(BNetEndpoint *listener, StreamingRingBuffer *target)

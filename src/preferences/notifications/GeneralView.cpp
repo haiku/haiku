@@ -239,7 +239,8 @@ GeneralView::_CanFindServer(entry_ref* ref)
 		volume.GetName(volName);
 
 		BQuery *query = new BQuery();
-		query->SetPredicate("(BEOS:APP_SIG==\""kNotificationServerSignature"\")");
+		query->SetPredicate("(BEOS:APP_SIG==\"" kNotificationServerSignature
+			"\")");
 		query->SetVolume(&volume);
 		query->Fetch();
 
