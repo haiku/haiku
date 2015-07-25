@@ -1895,16 +1895,10 @@ VariablesView::MessageReceived(BMessage* message)
 		}
 		case MSG_SHOW_VARIABLE_EDIT_WINDOW:
 		{
-			TableCellValueEditor* editor = NULL;
-			if (message->FindPointer("editor", reinterpret_cast<void**>(
-					&editor)) != B_OK) {
-				break;
-			}
-			BReference<TableCellValueEditor> editorReference(editor, true);
 			if (fEditWindow != NULL)
 				fEditWindow->Activate();
 			else {
-				ValueNode* node = NULL;
+				ModelNode* node = NULL;
 				if (message->FindPointer("node", reinterpret_cast<void**>(
 						&node)) != B_OK) {
 					break;
@@ -1916,15 +1910,7 @@ VariablesView::MessageReceived(BMessage* message)
 					break;
 				}
 
-				try {
-					fEditWindow = VariableEditWindow::Create(value, node,
-						editor, this);
-				} catch (...) {
-					fEditWindow = NULL;
-					break;
-				}
-
-				fEditWindow->Show();
+				_HandleEditVariableRequest(node, value);
 			}
 			break;
 		}
@@ -2415,30 +2401,11 @@ VariablesView::TreeTableNodeInvoked(TreeTable* table,
 	if (value == NULL)
 		return;
 
-	// get a value handler
-	ValueHandler* valueHandler;
-	status_t error = ValueHandlerRoster::Default()->FindValueHandler(value,
-		valueHandler);
-	if (error != B_OK)
-		return;
-
-	BReference<ValueHandler> handlerReference(valueHandler, true);
-	TableCellValueRenderer* renderer = node->TableCellRenderer();
-	TableCellValueEditor* editor = NULL;
-	error = valueHandler->GetTableCellValueEditor(value,
-		renderer != NULL ? renderer->GetSettings() : NULL, editor);
-	if (error != B_OK || editor == NULL)
-		return;
-
-	BReference<TableCellValueEditor> editorReference(editor, true);
-
 	BMessage message(MSG_SHOW_VARIABLE_EDIT_WINDOW);
-	message.AddPointer("editor", editor);
-	message.AddPointer("node", node->NodeChild()->Node());
+	message.AddPointer("node", node);
 	message.AddPointer("value", value);
 
-	if (BMessenger(this).SendMessage(&message) == B_OK)
-		editorReference.Detach();
+	BMessenger(this).SendMessage(&message);
 }
 
 
@@ -2635,6 +2602,15 @@ VariablesView::_GetContextActionsForNode(ModelNode* node,
 		ValueNode* valueNode = node->NodeChild()->Node();
 
 		if (valueNode != NULL) {
+			Value* value = valueNode->GetValue();
+			if (location->IsWritable() && value != NULL) {
+				result = _AddContextAction("Edit" B_UTF8_ELLIPSIS,
+					MSG_SHOW_VARIABLE_EDIT_WINDOW, _preActions, message);
+				if (result != B_OK)
+					return result;
+				message->AddPointer("node", node);
+				message->AddPointer("value", value);
+			}
 			AddressType* type = dynamic_cast<AddressType*>(valueNode->GetType());
 			if (type != NULL && type->BaseType() != NULL) {
 				result = _AddContextAction("Cast to array", MSG_TYPECAST_TO_ARRAY,
@@ -3232,6 +3208,40 @@ VariablesView::_HandleTypecastResult(status_t result, ExpressionResult* value)
 	node->NodeChild()->SetNode(valueNode);
 	node->SetCastedType(type);
 	fVariableTableModel->NotifyNodeChanged(node);
+}
+
+
+void
+VariablesView::_HandleEditVariableRequest(ModelNode* node, Value* value)
+{
+	// get a value handler
+	ValueHandler* valueHandler;
+	status_t error = ValueHandlerRoster::Default()->FindValueHandler(value,
+		valueHandler);
+	if (error != B_OK)
+		return;
+
+	ValueNode* valueNode = node->NodeChild()->Node();
+
+	BReference<ValueHandler> handlerReference(valueHandler, true);
+	TableCellValueRenderer* renderer = node->TableCellRenderer();
+	TableCellValueEditor* editor = NULL;
+	error = valueHandler->GetTableCellValueEditor(value,
+		renderer != NULL ? renderer->GetSettings() : NULL, editor);
+	if (error != B_OK || editor == NULL)
+		return;
+
+	BReference<TableCellValueEditor> editorReference(editor, true);
+
+	try {
+		fEditWindow = VariableEditWindow::Create(value, valueNode, editor,
+			this);
+	} catch (...) {
+		fEditWindow = NULL;
+		return;
+	}
+
+	fEditWindow->Show();
 }
 
 

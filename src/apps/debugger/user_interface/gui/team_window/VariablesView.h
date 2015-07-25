@@ -129,6 +129,9 @@ private:
 			void				_HandleTypecastResult(status_t result,
 									ExpressionResult* value);
 
+			void				_HandleEditVariableRequest(ModelNode* node,
+									Value* value);
+
 			status_t			_GetTypeForTypeCode(int32 typeCode,
 									Type*& _resultType) const;
 
