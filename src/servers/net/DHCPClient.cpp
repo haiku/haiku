@@ -85,14 +85,14 @@ enum message_option {
 
 enum message_type {
 	DHCP_NONE = 0,
-	DHCP_DISCOVER,
-	DHCP_OFFER,
-	DHCP_REQUEST,
-	DHCP_DECLINE,
-	DHCP_ACK,
-	DHCP_NACK,
-	DHCP_RELEASE,
-	DHCP_INFORM
+	DHCP_DISCOVER = 1,
+	DHCP_OFFER = 2,
+	DHCP_REQUEST = 3,
+	DHCP_DECLINE = 4,
+	DHCP_ACK = 5,
+	DHCP_NACK = 6,
+	DHCP_RELEASE = 7,
+	DHCP_INFORM = 8
 };
 
 struct dhcp_option_cookie {
@@ -913,7 +913,7 @@ DHCPClient::_TimeoutShift(int socket, dhcp_state& state, time_t& timeout,
 		state = INIT;
 		return false;
 	}
-		
+
 	tries++;
 	timeout += timeout;
 	if (timeout > MAX_TIMEOUT)
