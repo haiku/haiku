@@ -184,6 +184,8 @@ private:
 			bool				_HandlePostSyscall(
 									PostSyscallEvent* event);
 
+			void				_PrepareForTeamExec(TeamExecEvent* event);
+
 			void				_HandleImageDebugInfoChanged(image_id imageID);
 			void				_HandleImageFileChanged(image_id imageID);
 
@@ -259,6 +261,7 @@ private:
 			TeamSettings		fTeamSettings;
 			int					fCommandLineArgc;
 			const char**		fCommandLineArgv;
+			bool				fExecPending;
 };
 
 
