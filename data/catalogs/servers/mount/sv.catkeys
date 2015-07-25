@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-mount_server	1422362183
+1	swedish	x-vnd.Haiku-mount_server	1677274447
 Mount read-only	AutoMounter		Montera endast läsbar
 Error mounting volume:\n\n%s	AutoMounter		Fel vid montering av volym:\n\n%s
 Unmount error	AutoMounter		Avmonteringsfel
@@ -11,7 +11,6 @@ Could not unmount disk \"%s\":\n\t%s	AutoMounter		Kunde inte avmontera disk \"%s
 Mounting volume <unnamed volume>\n\n	AutoMounter		Monterar volym <odöpt volym>\n\n
 OK	AutoMounter		Okej
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Filystemet på volymen är inte Haikus filsystem. Det är rekommenderat att montera den i endast läsbart läge. Detta förhindrar oavsiktlig dataförlust orsakat av fel i Haiku.
-Previous volumes mounted.	AutoMounter		Tidigare volymer monterade.
 Mount error	AutoMounter		Monteringsfel
 It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Det rekommenderas att montera alla extra Haiku-volymer i endast läsbart  läge. Detta förhindrar oavsiktlig dataförlust orsakat av fel i Haiku.
 Force unmount	AutoMounter		Tvinga avmontering

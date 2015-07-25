@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-mount_server	1422362183
+1	finnish	x-vnd.Haiku-mount_server	1677274447
 Mount read-only	AutoMounter		Liitä kirjoitussuojattuna
 Error mounting volume:\n\n%s	AutoMounter		Virhe liitettäessä taltiota:\n\n%s
 Unmount error	AutoMounter		Liittämisen purkuvirhe
@@ -11,7 +11,6 @@ Could not unmount disk \"%s\":\n\t%s	AutoMounter		Levyaseman ”%s” liittämis
 Mounting volume <unnamed volume>\n\n	AutoMounter		Liitetään taltio <nimetön taltio>\n\n
 OK	AutoMounter		Valmis
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Tiedostojärjestelmä tällä taltiolla ei ole Haiku-tiedostojärjestelmä. Suosittelemme painokkaasti, että se liitetään kirjoitussuojatussa tilassa. Tämä estää datan tahattoman häviämisen Haikun virheiden vuoksi.
-Previous volumes mounted.	AutoMounter		Aikaisemmat liitetyt taltiot.
 Mount error	AutoMounter		Liittämisvirhe
 It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		On suositeltavaa liittää kaikki muut Haiku-taltiot kirjoitussuojatussa tilassa. Tämä estää datan tahattoman häviämisen Haikun virheiden vuoksi.
 Force unmount	AutoMounter		Pakota liittämisen purkaminen

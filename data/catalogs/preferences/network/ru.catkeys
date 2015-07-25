@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Network	2520478876
+1	russian	x-vnd.Haiku-Network	950262959
 Static	IntefaceAddressView		Статический
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Службы
@@ -14,6 +14,7 @@ Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Не удалос�
 Disabled	IntefaceAddressView		Отключен
 Ok	NetworkWindow		OK
 launch error	NetworkWindow		Ошибка запуска
+Other	NetworkWindow		Другая
 Automatic	IntefaceAddressView		Автоматический
 Gateway:	IntefaceAddressView		Шлюз:
 Revert	NetworkWindow		Вернуть

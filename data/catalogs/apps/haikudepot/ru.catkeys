@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	1023229167
+1	russian	x-vnd.Haiku-HaikuDepot	3588353727
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -133,6 +133,7 @@ Authentication failed. Connection to the service failed.	UserLoginWindow		Нев
 Cancel	RatePackageWindow		Отмена
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Отправить
+-	no package size		-
 Category:	FilterView		Категория:
 Failed to create account	UserLoginWindow		Не удалось создать учётную запись
 There are problems with the data you entered:\n\n	UserLoginWindow		Проблемы с данными, которые вы ввели:\n\n

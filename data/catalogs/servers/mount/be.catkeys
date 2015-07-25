@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-mount_server	1422362183
+1	belarusian	x-vnd.Haiku-mount_server	1677274447
 Mount read-only	AutoMounter		Мантаваць толькі для чытання
 Error mounting volume:\n\n%s	AutoMounter		Памылка пры мантаванні тома:\n\n%s
 Unmount error	AutoMounter		Памылка пры размантаванні
@@ -11,7 +11,6 @@ Could not unmount disk \"%s\":\n\t%s	AutoMounter		Немагчыма разма�
 Mounting volume <unnamed volume>\n\n	AutoMounter		Мантуецца том <неназваны том>\n\n
 OK	AutoMounter		ОК
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Файлавая сістэма гэтага тому не з'яўляецца файлавай сістэмай Haiku. Настойліва рэкамендуем мантаваць яго у рэжыме толькі для чытання. Гэта прадухіліць страту даных пры памылках у Haiku.
-Previous volumes mounted.	AutoMounter		Змантаваны папярэднія тамы.
 Mount error	AutoMounter		Памылка мантавання
 It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Рэкамендуецца мантаваць усе даданыя тамы Haiku у рэжыме толькі для чытання. Гэта прадухіліць страту даных пры памылках у Haiku.
 Force unmount	AutoMounter		Размантаваць усё роўна

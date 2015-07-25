@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-mount_server	1422362183
+1	english	x-vnd.Haiku-mount_server	1677274447
 Mount read-only	AutoMounter		只读方式挂载
 Error mounting volume:\n\n%s	AutoMounter		错误：\n\n%s 挂载出错。
 Unmount error	AutoMounter		卸载出错
@@ -11,7 +11,6 @@ Could not unmount disk \"%s\":\n\t%s	AutoMounter		无法卸载磁盘\"%s\"：\n\
 Mounting volume <unnamed volume>\n\n	AutoMounter		挂载卷宗<unnamed volume>\n\n
 OK	AutoMounter		确定
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		该卷宗的文件系统不是Haiku文件系统。强烈建议使用只读模式挂载。这会防止由于Haiku的错误导致意外的数据丢失。
-Previous volumes mounted.	AutoMounter		前一个卷已挂载。
 Mount error	AutoMounter		挂载错误
 It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		强烈建议您使用只读模式挂载Haiku的附加卷。这会防止由于Haiku的错误导致意外数据丢失。
 Force unmount	AutoMounter		强制卸载

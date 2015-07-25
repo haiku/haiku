@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-mount_server	1422362183
+1	lithuanian	x-vnd.Haiku-mount_server	1677274447
 Mount read-only	AutoMounter		Prijungti tik skaitymui
 Error mounting volume:\n\n%s	AutoMounter		Klaida prijungiant tomą:\n\n%s
 Unmount error	AutoMounter		Atjungimo klaida
@@ -11,7 +11,6 @@ Could not unmount disk \"%s\":\n\t%s	AutoMounter		Nepavyko atjungti tomo „%s�
 Mounting volume <unnamed volume>\n\n	AutoMounter		Prijungiamas bevardis tomas\n\n
 OK	AutoMounter		Gerai
 The file system on this volume is not the Haiku file system. It is strongly suggested to mount it in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Failų sistema šiame tome nėra „Haiku“ failų sistema. Rekomenduotina jį jungti tik skaitymo veiksena. Tai apsaugotų nuo galimo duomenų praradimo dėl „Haiku“ sistemos klaidų.
-Previous volumes mounted.	AutoMounter		Prijungti ankstesni tomai.
 Mount error	AutoMounter		Prijungimo klaida
 It is suggested to mount all additional Haiku volumes in read-only mode. This will prevent unintentional data loss because of errors in Haiku.	AutoMounter		Papildomus „Haiku“ tomus patartina jungti tik skaitymo veiksena. Tai apsaugotų nuo galimo duomenų praradimo dėl „Haiku“ sistemos klaidų.
 Force unmount	AutoMounter		Atjungti priverstinai
