@@ -234,7 +234,7 @@ DesktopSettingsView::MessageReceived(BMessage* message)
 		{
 			// Turn on and off related settings:
 			fMountVolumesOntoDesktopRadioButton->SetValue(
-				!fShowDisksIconRadioButton->Value() == 1);
+				!(fShowDisksIconRadioButton->Value() == 1));
 			fMountSharedVolumesOntoDesktopCheckBox->SetEnabled(
 				fMountVolumesOntoDesktopRadioButton->Value() == 1);
 
@@ -267,7 +267,7 @@ DesktopSettingsView::MessageReceived(BMessage* message)
 		{
 			// Turn on and off related settings:
 			fShowDisksIconRadioButton->SetValue(
-				!fMountVolumesOntoDesktopRadioButton->Value() == 1);
+				!(fMountVolumesOntoDesktopRadioButton->Value() == 1));
 			fMountSharedVolumesOntoDesktopCheckBox->SetEnabled(
 				fMountVolumesOntoDesktopRadioButton->Value() == 1);
 
