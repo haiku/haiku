@@ -44,7 +44,9 @@ TableCellEnumerationEditor::ConfigureOptions()
 	if (!initialValue->ToVariant(integerValue))
 		return B_NO_MEMORY;
 
-	return SelectOptionFor(integerValue.ToInt32());
+	SelectOptionFor(integerValue.ToInt32());
+
+	return B_OK;
 }
 
 
