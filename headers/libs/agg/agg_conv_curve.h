@@ -23,6 +23,9 @@
 #include "agg_basics.h"
 #include "agg_curves.h"
 
+#include <cmath>
+
+
 namespace agg
 {
 
@@ -165,8 +168,8 @@ namespace agg
         case path_cmd_curve3:
             m_source->vertex(&end_x, &end_y);
 
-			if (!isnan(m_last_x) && !isnan(m_last_y) && !isnan(*x) && !isnan(*y)
-				&& !isnan(end_x) && !isnan(end_y)) {
+			if (!std::isnan(m_last_x) && !std::isnan(m_last_y) && !std::isnan(*x)
+				&& !std::isnan(*y) && !std::isnan(end_x) && !std::isnan(end_y)) {
 				m_curve3.init(m_last_x, m_last_y,
 						*x,       *y,
 						end_x,     end_y);
@@ -181,8 +184,8 @@ namespace agg
             m_source->vertex(&ct2_x, &ct2_y);
             m_source->vertex(&end_x, &end_y);
 
-			if (!isnan(m_last_x) && !isnan(m_last_y) && !isnan(*x) && !isnan(*y)
-				&& !isnan(end_x) && !isnan(end_y)) {
+			if (!std::isnan(m_last_x) && !std::isnan(m_last_y) && !std::isnan(*x)
+				&& !std::isnan(*y) && !std::isnan(end_x) && !std::isnan(end_y)) {
 				m_curve4.init(m_last_x, m_last_y,
 						*x,       *y,
 						ct2_x,    ct2_y,
