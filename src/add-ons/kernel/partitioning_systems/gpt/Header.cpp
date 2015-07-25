@@ -290,24 +290,24 @@ Header::_Read(int fd, off_t offset, void* data, size_t size) const
 
 
 bool
-Header::_IsHeaderValid(const efi_table_header& header, uint64 block)
+Header::_IsHeaderValid(efi_table_header& header, uint64 block)
 {
-	return !memcmp(fHeader.header, EFI_PARTITION_HEADER, sizeof(fHeader.header))
-		&& _ValidateHeaderCRC()
-		&& fHeader.AbsoluteBlock() == block;
+	return !memcmp(header.header, EFI_PARTITION_HEADER, sizeof(header.header))
+		&& _ValidateHeaderCRC(header)
+		&& header.AbsoluteBlock() == block;
 }
 
 
 bool
-Header::_ValidateHeaderCRC()
+Header::_ValidateHeaderCRC(efi_table_header& header)
 {
-	uint32 originalCRC = fHeader.HeaderCRC();
-	fHeader.SetHeaderCRC(0);
+	uint32 originalCRC = header.HeaderCRC();
+	header.SetHeaderCRC(0);
 
-	bool matches = originalCRC == crc32((const uint8*)&fHeader,
+	bool matches = originalCRC == crc32((const uint8*)&header,
 		sizeof(efi_table_header));
 
-	fHeader.SetHeaderCRC(originalCRC);
+	header.SetHeaderCRC(originalCRC);
 	return matches;
 }
 
