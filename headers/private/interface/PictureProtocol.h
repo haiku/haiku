@@ -52,10 +52,11 @@ enum {
 	B_PIC_SET_FONT_BPP			= 0x0388,
 	B_PIC_SET_FONT_FACE			= 0x0389,
 	B_PIC_SET_TRANSFORM			= 0x0390,
+	B_PIC_BLEND_LAYER			= 0x0391
 };
 
 
-const static uint32 kOpsTableSize = 49;
+const static uint32 kOpsTableSize = 50;
 
 
 #endif

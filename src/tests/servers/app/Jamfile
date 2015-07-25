@@ -154,6 +154,7 @@ SharedLibrary libtestappserver.so :
 	BitmapHWInterface.cpp
 	Canvas.cpp
 	DesktopSettings.cpp
+	Layer.cpp
 	OffscreenServerWindow.cpp
 	OffscreenWindow.cpp
 	PictureBoundingBoxPlayer.cpp

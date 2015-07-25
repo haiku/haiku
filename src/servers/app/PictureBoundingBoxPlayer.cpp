@@ -16,6 +16,7 @@
 
 #include "DrawState.h"
 #include "FontManager.h"
+#include "Layer.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerFont.h"
@@ -704,6 +705,18 @@ set_transform(BoundingBoxState* state, BAffineTransform transform)
 }
 
 
+static void
+determine_bounds_nested_layer(BoundingBoxState* state, Layer* layer)
+{
+	TRACE_BB("%p nested layer\n", state);
+
+	BRect boundingBox;
+	PictureBoundingBoxPlayer::Play(layer, state->GetDrawState(), &boundingBox);
+	if (boundingBox.IsValid())
+		state->IncludeRect(boundingBox);
+}
+
+
 const static void* kTableEntries[] = {
 	(const void*)nop,									//	0
 	(const void*)move_pen_by,
@@ -753,7 +766,8 @@ const static void* kTableEntries[] = {
 	(const void*)nop,									//	45
 	(const void*)set_font_face,
 	(const void*)set_blending_mode,
-	(const void*)set_transform							//	48
+	(const void*)set_transform,
+	(const void*)determine_bounds_nested_layer			//	49
 };
 
 

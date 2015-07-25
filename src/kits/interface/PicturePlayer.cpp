@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2007, Haiku Inc.
+ * Copyright 2001-2015, Haiku Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Marcus Overhagen (marcus@overhagen.de)
+ *		Julian Harnath (julian.harnath@rwth-aachen.de)
  */
 
 /**	PicturePlayer is used to play picture data. */
@@ -21,6 +22,9 @@
 
 
 using BPrivate::PicturePlayer;
+
+
+class Layer;
 
 
 typedef void (*fnc)(void*);
@@ -47,6 +51,7 @@ typedef void (*fnc_DrawPixels)(void *, BRect, BRect, int32, int32, int32,
 typedef void (*fnc_DrawPicture)(void *, BPoint, int32);
 typedef void (*fnc_BShape)(void*, BShape*);
 typedef void (*fnc_BAffineTransform)(void*, BAffineTransform);
+typedef void (*fnc_Layer)(void*, const Layer*);
 
 
 static void
@@ -160,7 +165,7 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
 		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
 		(void *)nop, (void *)nop, (void *)nop, (void *)nop,
-		(void *)nop
+		(void *)nop, (void *)nop
 	};
 
 	if ((uint32)tableEntries < kOpsTableSize) {
@@ -543,6 +548,13 @@ PicturePlayer::Play(void **callBackTable, int32 tableEntries, void *userData)
 			{
 				((fnc_BAffineTransform)functionTable[48])(userData,
 					*reinterpret_cast<const BAffineTransform *>(data));
+				break;
+			}
+
+			case B_PIC_BLEND_LAYER:
+			{
+				((fnc_Layer)functionTable[49])(userData,
+					*reinterpret_cast<Layer* const*>(data));
 				break;
 			}
 

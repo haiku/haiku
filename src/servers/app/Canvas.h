@@ -27,6 +27,7 @@ class DrawingEngine;
 class DrawState;
 class IntPoint;
 class IntRect;
+class Layer;
 class ServerPicture;
 
 
@@ -60,6 +61,8 @@ public:
 			SimpleTransform PenToScreenTransform() const;
 			SimpleTransform PenToLocalTransform() const;
 			SimpleTransform ScreenToPenTransform() const;
+
+			void			BlendLayer(Layer* layer);
 
 	virtual	DrawingEngine*	GetDrawingEngine() const = 0;
 	virtual ServerPicture*	GetPicture(int32 token) const = 0;

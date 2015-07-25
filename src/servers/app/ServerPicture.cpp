@@ -18,6 +18,7 @@
 #include "DrawingEngine.h"
 #include "DrawState.h"
 #include "FontManager.h"
+#include "Layer.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
 #include "ServerFont.h"
@@ -785,6 +786,13 @@ set_transform(Canvas* canvas, BAffineTransform transform)
 
 
 static void
+blend_layer(Canvas* canvas, Layer* layer)
+{
+	canvas->BlendLayer(layer);
+}
+
+
+static void
 reserved()
 {
 }
@@ -839,7 +847,8 @@ const static void* kTableEntries[] = {
 	(const void*)reserved,				//	45
 	(const void*)set_font_face,
 	(const void*)set_blending_mode,
-	(const void*)set_transform			//  48
+	(const void*)set_transform,
+	(const void*)blend_layer			//	49
 };
 
 

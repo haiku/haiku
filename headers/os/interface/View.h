@@ -505,6 +505,9 @@ public:
 			void				DrawPictureAsync(const char* filename,
 									long offset, BPoint where);
 
+			void				BeginLayer(uint8 opacity);
+			void				EndLayer();
+
 			status_t			SetEventMask(uint32 mask, uint32 options = 0);
 			uint32				EventMask();
 			status_t			SetMouseEventMask(uint32 mask,

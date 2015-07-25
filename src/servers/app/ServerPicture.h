@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Stefano Ceccherini <stefano.ceccherini@gmail.com>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 #ifndef SERVER_PICTURE_H
 #define SERVER_PICTURE_H
@@ -35,7 +36,7 @@ public:
 								ServerPicture(const ServerPicture& other);
 								ServerPicture(const char* fileName,
 									int32 offset);
-								~ServerPicture();
+	virtual						~ServerPicture();
 
 			int32				Token() { return fToken; }
 			bool				SetOwner(ServerApp* owner);

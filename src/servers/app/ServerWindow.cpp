@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,7 @@
  *		Artur Wyszynski <harakash@gmail.com>
  *		Philippe Saint-Pierre <stpere@gmail.com>
  *		Brecht Machiels <brecht@mos6581.org>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 
 
@@ -61,6 +62,7 @@
 #include "DrawingEngine.h"
 #include "DrawState.h"
 #include "HWInterface.h"
+#include "Layer.h"
 #include "Overlay.h"
 #include "ProfileMessageSupport.h"
 #include "RenderingBuffer.h"
@@ -2184,6 +2186,21 @@ fDesktop->LockSingleWindow();
 			break;
 		}
 
+		case AS_VIEW_BEGIN_LAYER:
+		{
+			DTRACE(("ServerWindow %s: Message AS_VIEW_BEGIN_LAYER\n",
+				Title()));
+
+			uint8 opacity;
+			link.Read<uint8>(&opacity);
+
+			Layer* layer = new(std::nothrow) Layer(opacity);
+			if (layer == NULL)
+				break;
+			fCurrentView->SetPicture(layer);
+			break;
+		}
+
 		default:
 			_DispatchViewDrawingMessage(code, link);
 			break;
@@ -2922,6 +2939,15 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 			break;
 		}
 
+		case AS_VIEW_END_LAYER:
+		{
+			DTRACE(("ServerWindow %s: Message AS_VIEW_END_LAYER\n",
+				Title()));
+			fCurrentView->BlendAllLayers();
+			fCurrentView->SetPicture(NULL);
+			break;
+		}
+
 		default:
 			BString codeString;
 			string_for_message_code(code, codeString);
@@ -2982,6 +3008,11 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			int8 drawingMode;
 			link.Read<int8>(&drawingMode);
+
+			if (dynamic_cast<Layer*>(picture) != NULL) {
+				// drawing mode changes not allowed in layers
+				break;
+			}
 
 			picture->WriteSetDrawingMode((drawing_mode)drawingMode);
 
@@ -3416,6 +3447,42 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			fLink.Flush();
 			return true;
 		}
+
+		case AS_VIEW_BEGIN_LAYER:
+		{
+			uint8 opacity;
+			link.Read<uint8>(&opacity);
+
+			Layer* layer = dynamic_cast<Layer*>(picture);
+			if (layer == NULL)
+				break;
+
+			Layer* nextLayer = new(std::nothrow) Layer(opacity);
+			if (nextLayer == NULL)
+				break;
+
+			nextLayer->PushLayer(layer);
+			fCurrentView->SetPicture(nextLayer);
+			break;
+		}
+
+		case AS_VIEW_END_LAYER:
+		{
+			Layer* layer = dynamic_cast<Layer*>(picture);
+			if (layer == NULL)
+				break;
+
+			Layer* previousLayer = layer->PopLayer();
+			if (previousLayer == NULL) {
+				// End last layer
+				return false;
+			}
+			fCurrentView->SetPicture(previousLayer);
+
+			previousLayer->WriteBlendLayer(layer);
+			break;
+		}
+
 /*
 		case AS_VIEW_SET_BLENDING_MODE:
 		{

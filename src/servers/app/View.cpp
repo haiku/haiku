@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2014, Haiku, Inc.
+ * Copyright (c) 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -9,6 +9,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Marcus Overhagen <marcus@overhagen.de>
  *		Adrien Destugues <pulkomandy@pulkomandy.tk
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 #include "View.h"
 
@@ -19,6 +20,7 @@
 #include "Desktop.h"
 #include "DrawingEngine.h"
 #include "DrawState.h"
+#include "Layer.h"
 #include "Overlay.h"
 #include "ServerApp.h"
 #include "ServerBitmap.h"
@@ -27,6 +29,7 @@
 #include "ServerWindow.h"
 #include "Window.h"
 
+#include "BitmapHWInterface.h"
 #include "drawing_support.h"
 
 #include <List.h>
@@ -969,6 +972,18 @@ View::SetPicture(ServerPicture* picture)
 
 	if (fPicture != NULL)
 		fPicture->AcquireReference();
+}
+
+
+void
+View::BlendAllLayers()
+{
+	if (fPicture == NULL)
+		return;
+	Layer* layer = dynamic_cast<Layer*>(fPicture);
+	if (layer == NULL)
+		return;
+	BlendLayer(layer);
 }
 
 

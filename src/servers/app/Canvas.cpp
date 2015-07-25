@@ -19,8 +19,10 @@
 
 #include <Region.h>
 
+#include "AlphaMask.h"
 #include "DrawingEngine.h"
 #include "DrawState.h"
+#include "Layer.h"
 
 
 #if __GNUC__ >= 3
@@ -215,6 +217,46 @@ Canvas::ScreenToPenTransform() const GCC_2_NRV(transform)
 	_ScreenToLocalTransform(transform);
 	fDrawState->InverseTransform(transform);
 	return transform;
+}
+
+
+void
+Canvas::BlendLayer(Layer* layer)
+{
+	UtilityBitmap* layerBitmap = layer->RenderToBitmap(this);
+	if (layerBitmap == NULL)
+		return;
+
+	BRect destination = layerBitmap->Bounds();
+	destination.OffsetBy(layer->LeftTopOffset());
+	LocalToScreenTransform().Apply(&destination);
+
+	PushState();
+
+	fDrawState->SetDrawingMode(B_OP_ALPHA);
+	fDrawState->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+	fDrawState->SetTransformEnabled(false);
+
+	AlphaMask* mask = new AlphaMask(layer->Opacity());
+	if (mask == NULL) {
+		layerBitmap->ReleaseReference();
+		return;
+	}
+
+	SetAlphaMask(mask);
+	mask->ReleaseReference();
+	ResyncDrawState();
+
+	GetDrawingEngine()->DrawBitmap(layerBitmap, layerBitmap->Bounds(),
+		destination, 0);
+
+	fDrawState->SetTransformEnabled(true);
+
+	PopState();
+	ResyncDrawState();
+
+	layerBitmap->ReleaseReference();
+	layer->ReleaseReference();
 }
 
 

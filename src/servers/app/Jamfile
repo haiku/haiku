@@ -67,6 +67,7 @@ Server app_server :
 	InputManager.cpp
 	IntPoint.cpp
 	IntRect.cpp
+	Layer.cpp
 	MessageLooper.cpp
 	MultiLocker.cpp
 	OffscreenServerWindow.cpp

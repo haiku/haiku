@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2014, Haiku, Inc.
+ * Copyright (c) 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -9,6 +9,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Marcus Overhagen <marcus@overhagen.de>
  *		Adrien Destugues <pulkomandy@pulkomandy.tk>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 #ifndef	VIEW_H
 #define VIEW_H
@@ -155,6 +156,8 @@ public:
 			void			SetPicture(ServerPicture* picture);
 			ServerPicture*	Picture() const
 								{ return fPicture; }
+
+			void			BlendAllLayers();
 
 			// for background clearing
 			virtual void	Draw(DrawingEngine* drawingEngine,
