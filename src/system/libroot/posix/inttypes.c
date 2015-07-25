@@ -1,4 +1,4 @@
-/* 
+/*
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
 ** Distributed under the terms of the Haiku License.
 */
@@ -35,15 +35,13 @@ imaxdiv(intmax_t numer, intmax_t denom)
 intmax_t
 strtoimax(const char *string, char **_end, int base)
 {
-	// ToDo: implement me properly!
-	return (intmax_t)strtol(string, _end, base);
+	return (intmax_t)strtoll(string, _end, base);
 }
 
 
 uintmax_t
 strtoumax(const char *string, char **_end, int base)
 {
-	// ToDo: implement me properly!
-	return (intmax_t)strtoul(string, _end, base);
+	return (intmax_t)strtoull(string, _end, base);
 }
 
