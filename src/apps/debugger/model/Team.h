@@ -137,6 +137,7 @@ public:
 			Image*				ImageByID(image_id imageID) const;
 			Image*				ImageByAddress(target_addr_t address) const;
 			const ImageList&	Images() const;
+			void				ClearImages();
 
 			bool				AddStopImageName(const BString& name);
 			void				RemoveStopImageName(const BString& name);
@@ -160,6 +161,8 @@ public:
 									// returns default
 			const SignalDispositionMappings&
 								GetSignalDispositionMappings() const;
+
+			void				ClearSignalDispositionMappings();
 
 			bool				AddBreakpoint(Breakpoint* breakpoint);
 									// takes over reference (also on error)

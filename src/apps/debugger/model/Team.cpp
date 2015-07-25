@@ -277,6 +277,14 @@ Team::Images() const
 }
 
 
+void
+Team::ClearImages()
+{
+	while (!fImages.IsEmpty())
+		RemoveImage(fImages.First());
+}
+
+
 bool
 Team::AddStopImageName(const BString& name)
 {
@@ -374,6 +382,13 @@ const SignalDispositionMappings&
 Team::GetSignalDispositionMappings() const
 {
 	return fCustomSignalDispositions;
+}
+
+
+void
+Team::ClearSignalDispositionMappings()
+{
+	fCustomSignalDispositions.clear();
 }
 
 
