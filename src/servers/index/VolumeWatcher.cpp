@@ -59,7 +59,7 @@ WatchNameHandler::EntryMoved(const char *name, const char *fromName,
 {
 	entry_ref ref(device, to_directory, name);
 	entry_ref refFrom(device, from_directory, fromName);
-	
+
 	fVolumeWatcher->fMovedList.CurrentList()->push_back(ref);
 	fVolumeWatcher->fMovedFromList.CurrentList()->push_back(refFrom);
 	fVolumeWatcher->_NewEntriesArrived();
@@ -470,7 +470,7 @@ VolumeWatcher::StartWatching()
 void
 VolumeWatcher::Stop()
 {
-	
+
 	char name[255];
 	fVolume.GetName(name);
 

@@ -317,7 +317,7 @@ IndexServer::_StartWatchingAddOns()
 	fPulseRunner = new BMessageRunner(&fAddOnMonitorHandler, &pulse, 1000000LL);
 		// the monitor handler needs a pulse to check if add-ons are ready
 
-	&fAddOnMonitorHandler->AddAddOnDirectories("index_server");
+	fAddOnMonitorHandler.AddAddOnDirectories("index_server");
 }
 
 
