@@ -39,7 +39,8 @@ public:
 			thread_id			ThreadID() const	{ return fThread->ID(); }
 			Thread*				GetThread() const	{ return fThread; }
 
-			status_t			SetBreakpointAndRun(target_addr_t address);
+			status_t			SetBreakpointAndRun(target_addr_t address,
+									bool initialStart = true);
 									// team lock held
 
 			// All Handle*() methods are invoked in team debugger thread,
