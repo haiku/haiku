@@ -181,13 +181,13 @@ BAppFileInfo::SetType(const char* type)
 {
 	// check initialization
 	status_t error = B_OK;
-	if (error == B_OK && InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		error = B_NO_INIT;
 	if (error == B_OK) {
 		if (type != NULL) {
 			// check param
 			size_t typeLen = strlen(type);
-			if (error == B_OK && typeLen >= B_MIME_TYPE_LENGTH)
+			if (typeLen >= B_MIME_TYPE_LENGTH)
 				error = B_BAD_VALUE;
 			// write the data
 			if (error == B_OK) {
@@ -230,13 +230,13 @@ BAppFileInfo::SetSignature(const char* signature)
 {
 	// check initialization
 	status_t error = B_OK;
-	if (error == B_OK && InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		error = B_NO_INIT;
 	if (error == B_OK) {
 		if (signature) {
 			// check param
 			size_t signatureLen = strlen(signature);
-			if (error == B_OK && signatureLen >= B_MIME_TYPE_LENGTH)
+			if (signatureLen >= B_MIME_TYPE_LENGTH)
 				error = B_BAD_VALUE;
 			// write the data
 			if (error == B_OK) {
@@ -318,7 +318,7 @@ BAppFileInfo::SetAppFlags(uint32 flags)
 {
 	// check initialization
 	status_t error = B_OK;
-	if (error == B_OK && InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		error = B_NO_INIT;
 	if (error == B_OK) {
 		// write the data
@@ -334,7 +334,7 @@ BAppFileInfo::RemoveAppFlags()
 {
 	// check initialization
 	status_t error = B_OK;
-	if (error == B_OK && InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		error = B_NO_INIT;
 	if (error == B_OK) {
 		// remove the data
@@ -373,7 +373,7 @@ BAppFileInfo::SetSupportedTypes(const BMessage* types, bool updateMimeDB,
 {
 	// check initialization
 	status_t error = B_OK;
-	if (error == B_OK && InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		error = B_NO_INIT;
 
 	BMimeType mimeType;
@@ -588,7 +588,7 @@ BAppFileInfo::SetVersionInfo(const version_info* info, version_kind kind)
 {
 	// check initialization
 	status_t error = B_OK;
-	if (error == B_OK && InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		error = B_NO_INIT;
 	if (error == B_OK) {
 		if (info != NULL) {
