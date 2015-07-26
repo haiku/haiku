@@ -46,10 +46,10 @@ checkArchive(const BNetEndpoint ne, int32 protocol,
 	localNetAddress.GetAddr(localAddr, &localPort);
 	remoteNetAddress.GetAddr(remoteAddr, &remotePort);
 
-	BMessage archive(0UL);
+	BMessage archive;
 	status_t status = ne.Archive(&archive);
 	if (status != B_OK) {
-		fprintf(stderr, "Archive() failed - %lx:%s\n", status, 
+		fprintf(stderr, "Archive() failed - %lx:%s\n", status,
 			strerror(status));
 		problemCount++;
 		exit(1);
