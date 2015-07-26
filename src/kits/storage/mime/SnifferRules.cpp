@@ -452,7 +452,7 @@ SnifferRules::GuessMimeType(BFile* file, const void *buffer, int32 length,
 	// wrap the buffer by a BMemoryIO
 	BMemoryIO data(buffer, length);
 
-	if (!err && !fHaveDoneFullBuild)
+	if (!fHaveDoneFullBuild)
 		err = BuildRuleList();
 
 	// first ask the MIME sniffer for a suitable type
