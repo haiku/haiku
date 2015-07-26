@@ -120,6 +120,7 @@ void
 Team::SetName(const BString& name)
 {
 	fName = name;
+	_NotifyTeamRenamed();
 }
 
 
@@ -863,6 +864,16 @@ Team::NotifyMemoryChanged(target_addr_t address, target_size_t size)
 
 
 void
+Team::_NotifyTeamRenamed()
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->TeamRenamed(Event(TEAM_EVENT_TEAM_RENAMED, this));
+	}
+}
+
+
+void
 Team::_NotifyThreadAdded(Thread* thread)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -1063,6 +1074,12 @@ Team::UserBreakpointEvent::UserBreakpointEvent(uint32 type, Team* team,
 
 
 Team::Listener::~Listener()
+{
+}
+
+
+void
+Team::Listener::TeamRenamed(const Team::Event& event)
 {
 }
 

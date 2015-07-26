@@ -134,6 +134,7 @@ private:
 									CpuState* state, Value* value);
 
 	// Team::Listener
+	virtual	void				TeamRenamed(const Team::Event& event);
 	virtual	void				ThreadStateChanged(
 									const Team::ThreadEvent& event);
 	virtual	void				ThreadCpuStateChanged(
@@ -157,6 +158,7 @@ private:
 
 			void				_Init();
 
+			void				_UpdateTitle();
 			void				_SetActiveThread(::Thread* thread);
 			void				_SetActiveImage(Image* image);
 			void				_SetActiveStackTrace(StackTrace* stackTrace);

@@ -24,6 +24,8 @@
 
 // team event types
 enum {
+	TEAM_EVENT_TEAM_RENAMED,
+
 	TEAM_EVENT_THREAD_ADDED,
 	TEAM_EVENT_THREAD_REMOVED,
 	TEAM_EVENT_IMAGE_ADDED,
@@ -273,6 +275,7 @@ private:
 			typedef DoublyLinkedList<Listener> ListenerList;
 
 private:
+			void				_NotifyTeamRenamed();
 			void				_NotifyThreadAdded(Thread* thread);
 			void				_NotifyThreadRemoved(Thread* thread);
 			void				_NotifyImageAdded(Image* image);
@@ -473,6 +476,9 @@ protected:
 class Team::Listener : public DoublyLinkedListLinkImpl<Team::Listener> {
 public:
 	virtual						~Listener();
+
+	virtual	void				TeamRenamed(
+									const Team::Event& event);
 
 	virtual	void				ThreadAdded(const Team::ThreadEvent& event);
 	virtual	void				ThreadRemoved(const Team::ThreadEvent& event);

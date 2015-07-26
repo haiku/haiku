@@ -145,12 +145,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fFilePanel(NULL),
 	fActiveSourceWorker(-1)
 {
-	fTeam->Lock();
-	BString name = fTeam->Name();
-	fTeam->Unlock();
-	if (fTeam->ID() >= 0)
-		name << " (" << fTeam->ID() << ")";
-	SetTitle(name.String());
+	_UpdateTitle();
 
 	fTeam->AddListener(this);
 }
@@ -516,6 +511,11 @@ TeamWindow::MessageReceived(BMessage* message)
 				_SetActiveStackTrace(NULL);
 				_UpdateRunButtons();
 			}
+			break;
+		}
+		case MSG_TEAM_RENAMED:
+		{
+			_UpdateTitle();
 			break;
 		}
 		case MSG_THREAD_STATE_CHANGED:
@@ -906,6 +906,13 @@ TeamWindow::ValueNodeWriteRequested(ValueNode* node, CpuState* state,
 
 
 void
+TeamWindow::TeamRenamed(const Team::Event& event)
+{
+	PostMessage(MSG_TEAM_RENAMED);
+}
+
+
+void
 TeamWindow::ThreadStateChanged(const Team::ThreadEvent& event)
 {
 	BMessage message(MSG_THREAD_STATE_CHANGED);
@@ -1138,6 +1145,18 @@ TeamWindow::_Init()
 
 	AutoLocker< ::Team> locker(fTeam);
 	_UpdateRunButtons();
+}
+
+
+void
+TeamWindow::_UpdateTitle()
+{
+	AutoLocker< ::Team> lock(fTeam);
+
+	BString name = fTeam->Name();
+	if (fTeam->ID() >= 0)
+		name << " (" << fTeam->ID() << ")";
+	SetTitle(name.String());
 }
 
 
