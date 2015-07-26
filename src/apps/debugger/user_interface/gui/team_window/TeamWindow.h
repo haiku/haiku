@@ -158,6 +158,9 @@ private:
 
 			void				_Init();
 
+			void				_LoadSettings(
+									const GuiTeamUiSettings* settings);
+
 			void				_UpdateTitle();
 			void				_SetActiveThread(::Thread* thread);
 			void				_SetActiveImage(Image* image);
