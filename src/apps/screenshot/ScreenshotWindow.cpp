@@ -239,7 +239,6 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 
 	saveScreenshot->MakeDefault(true);
 
-	Layout(false);
 	_UpdatePreviewPanel();
 	_UpdateFilenameSelection();
 
@@ -440,6 +439,11 @@ ScreenshotWindow::_NewScreenshot(bool silent, bool clipboard)
 void
 ScreenshotWindow::_UpdatePreviewPanel()
 {
+	// Set the height of fPreview to what the layout suggests
+	fPreview->SetExplicitMinSize(BSize());
+	fPreview->SetExplicitMaxSize(BSize());
+	Layout(false);
+
 	float height = fPreview->Bounds().Height();
 	float width = (fScreenshot->Bounds().Width()
 		/ fScreenshot->Bounds().Height()) * height;
