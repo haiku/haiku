@@ -164,13 +164,13 @@ __exctype (_tolower);
 # endif
 
 # ifdef __USE_EXTERN_INLINES
-extern __inline int
+__extern_inline int
 tolower (int __c) __THROW
 {
   return __c >= -128 && __c < 256 ? __ctype_tolower[__c] : __c;
 }
 
-extern __inline int
+__extern_inline int
 toupper (int __c) __THROW
 {
   return __c >= -128 && __c < 256 ? __ctype_toupper[__c] : __c;

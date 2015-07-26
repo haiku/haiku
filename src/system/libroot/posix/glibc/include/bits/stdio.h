@@ -24,7 +24,7 @@
 #ifdef __cplusplus
 # define __STDIO_INLINE inline
 #else
-# define __STDIO_INLINE extern __inline
+# define __STDIO_INLINE __extern_inline
 #endif
 
 

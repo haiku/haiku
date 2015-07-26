@@ -43,7 +43,7 @@
 # ifdef __cplusplus
 #  define __STRING_INLINE inline
 # else
-#  define __STRING_INLINE extern __inline
+#  define __STRING_INLINE __extern_inline
 # endif
 #endif
 

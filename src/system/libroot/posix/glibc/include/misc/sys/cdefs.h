@@ -226,6 +226,38 @@
 # define __attribute_format_strfmon__(a,b) /* Ignore */
 #endif
 
+
+/* Forces a function to be always inlined.  */
+#if __GNUC_PREREQ (3,2)
+# define __always_inline __inline __attribute__ ((__always_inline__))
+#else
+# define __always_inline __inline
+#endif
+
+/* Associate error messages with the source location of the call site rather
+   than with the source location inside the function.  */
+#if __GNUC_PREREQ (4,3)
+# define __attribute_artificial__ __attribute__ ((__artificial__))
+#else
+# define __attribute_artificial__ /* Ignore */
+#endif
+
+/* GCC 4.3 and above with -std=c99 or -std=gnu99 implements ISO C99
+   inline semantics, unless -fgnu89-inline is used.  */
+#if !defined __cplusplus || __GNUC_PREREQ (4,3)
+# if defined __GNUC_STDC_INLINE__ || defined __cplusplus
+#  define __extern_inline extern __inline __attribute__ ((__gnu_inline__))
+#  define __extern_always_inline \
+  extern __always_inline __attribute__ ((__gnu_inline__))
+# else
+#  define __extern_inline extern __inline
+#  define __extern_always_inline extern __always_inline
+# endif
+#else
+#  define __extern_inline extern __inline
+#endif
+
+
 /* It is possible to compile containing GCC extensions even if GCC is
    run in pedantic mode if the uses are carefully marked using the
    `__extension__' keyword.  But this is not generally available before
