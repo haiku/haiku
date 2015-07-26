@@ -230,7 +230,7 @@ BAppFileInfo::SetSignature(const char* signature)
 {
 	// check initialization
 	status_t error = B_OK;
-	if (B_OK && InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		error = B_NO_INIT;
 	if (error == B_OK) {
 		if (signature) {
