@@ -676,7 +676,7 @@ ResourceFile::_InitPEFFile(BFile& file, const PEFContainerHeader& pefHeader)
 	if (error != B_OK)
 		throw Exception(error, "Failed to get the file size.");
 	// check architecture -- we support PPC only
-	if (memcmp(pefHeader.architecture, kPEFArchitecturePPC, 4))
+	if (memcmp(pefHeader.architecture, kPEFArchitecturePPC, 4) != 0)
 		throw Exception(B_IO_ERROR, "PEF file architecture is not PPC.");
 	fHostEndianess = B_HOST_IS_BENDIAN;
 	// get the section count
