@@ -8,6 +8,8 @@
 
 #include <stdarg.h>
 
+typedef off_t fpos_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -46,6 +48,34 @@ extern int vsnprintf(char *str, size_t size, char const *format, va_list ap);
 extern int vasprintf(char **ret, char const *format, va_list ap);
 
 // ToDo: not everything is or should be implemented here
+extern void		clearerr(FILE *stream);
+extern int		fclose(FILE *stream);
+extern int		feof(FILE *stream);
+extern int		ferror(FILE *stream);
+extern int		fflush(FILE *stream);
+extern int		fgetpos(FILE *stream, fpos_t *position);
+extern FILE		*fopen(const char *name, const char *mode);
+extern size_t	fread(void *buffer, size_t size, size_t numItems, FILE *stream);
+extern FILE		*freopen(const char *name, const char *mode, FILE *stream);
+extern int		fscanf(FILE *stream, char const *format, ...);
+extern int		fseek(FILE *stream, long offset, int seekType);
+extern int		fsetpos(FILE *stream, const fpos_t *position);
+extern long		ftell(FILE *stream);
+extern size_t	fwrite(const void *buffer, size_t size, size_t numItems, FILE *stream);
+extern void		perror(const char *errorPrefix);
+extern int		rename(const char *from, const char *to);
+extern void		rewind(FILE *stream);
+extern int		scanf(char const *format, ...);
+extern void		setbuf (FILE *file, char *buff);
+extern int		setvbuf(FILE *file, char *buff, int mode, size_t size);
+extern int		sscanf(char const *str, char const *format, ...);
+extern FILE		*tmpfile(void);
+extern char 	*tmpnam(char *nameBuffer);
+extern int		ungetc(int c, FILE *stream);
+extern int		vscanf(char const *format, va_list ap);
+extern int		vsscanf(char const *str, char const *format, va_list ap);
+extern int		vfscanf(FILE *stream, char const *format, va_list ap);
+
 extern int    fgetc(FILE *);
 extern char  *fgets(char *, int, FILE *);
 extern int    fputc(int, FILE *);
