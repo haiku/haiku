@@ -164,7 +164,8 @@ MediaWindow::MediaWindow(BRect frame)
 	fAudioOutputs(5, true),
 	fVideoInputs(5, true),
 	fVideoOutputs(5, true),
-	fInitCheck(B_OK)
+	fInitCheck(B_OK),
+	fRestartingServices(false)
 {
 	_InitWindow();
 
@@ -282,6 +283,20 @@ MediaWindow::UpdateOutputListItem(MediaListItem::media_type type,
 bool
 MediaWindow::QuitRequested()
 {
+	if (fRestartingServices == true) {
+		BString text(B_TRANSLATE("The media services are restarting,"
+			" interructions to this process might result"
+			" in media functionalities not correctly running."
+			" Are you really sure to quit?"));
+
+		BAlert* alert = new BAlert(B_TRANSLATE("Warning!"), text,
+			B_TRANSLATE("Do it"), B_TRANSLATE("No"), NULL,
+			B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
+		int32 ret = alert->Go();
+		if (ret == 1)
+			return false;
+	}
+
 	// stop watching the MediaRoster
 	fCurrentNode.SetTo(NULL);
 	be_app->PostMessage(B_QUIT_REQUESTED);
@@ -298,6 +313,7 @@ MediaWindow::MessageReceived(BMessage* message)
 			break;
 		case ML_RESTART_MEDIA_SERVER:
 		{
+			fRestartingServices = true;
 			thread_id thread = spawn_thread(&MediaWindow::_RestartMediaServices,
 				"restart_thread", B_NORMAL_PRIORITY, this);
 			if (thread < 0)
@@ -628,6 +644,7 @@ MediaWindow::_RestartMediaServices(void* data)
 
 	launch_media_server();
 
+	window->fRestartingServices = false;
 	return window->PostMessage(ML_INIT_MEDIA);
 }
 

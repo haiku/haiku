@@ -112,6 +112,7 @@ private:
 			NodeList			fVideoOutputs;
 
 			status_t			fInitCheck;
+			bool				fRestartingServices;
 };
 
 
