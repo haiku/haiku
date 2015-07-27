@@ -84,26 +84,10 @@ struct RosterNotification {
 static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
 
-// This class is provided to ensure the BMediaRoster is quit.
-class MediaRosterUndertaker {
-public:
-	~MediaRosterUndertaker()
-	{
-		if (BMediaRoster::CurrentRoster() != NULL) {
-			BMediaRoster::CurrentRoster()->Lock();
-			BMediaRoster::CurrentRoster()->Quit();
-		}
-	}
-};
-
-
 }	// namespace media
 }	// namespace BPrivate
 
 using namespace BPrivate::media;
-
-
-static MediaRosterUndertaker sUndertaker;
 
 
 BMediaRosterEx::BMediaRosterEx(status_t* _error)
@@ -134,7 +118,6 @@ BMediaRosterEx::BuildConnections()
 	server_register_app_reply reply;
 	request.team = BPrivate::current_team();
 	request.messenger = BMessenger(NULL, this);
-
 	status_t status = QueryServer(SERVER_REGISTER_APP, &request,
 		sizeof(request), &reply, sizeof(reply));
 	if (status != B_OK)
