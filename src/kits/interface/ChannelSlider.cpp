@@ -1,9 +1,9 @@
 /*
- * Copyright 2005-2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2015, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
@@ -640,18 +640,22 @@ BChannelSlider::DrawThumb(BView* into, int32 channel, BPoint where,
 const BBitmap*
 BChannelSlider::ThumbFor(int32 channel, bool pressed)
 {
-	// TODO: Finish me (check allocations... etc)
-	if (fLeftKnob == NULL) {
-		if (fIsVertical) {
-			fLeftKnob = new (std::nothrow) BBitmap(BRect(0, 0, 11, 14),
-				B_CMAP8);
-			fLeftKnob->SetBits(kVerticalKnobData, sizeof(kVerticalKnobData), 0,
-				B_CMAP8);
-		} else {
-			fLeftKnob = new (std::nothrow) BBitmap(BRect(0, 0, 14, 11),
-				B_CMAP8);
+	if (fLeftKnob != NULL)
+		return fLeftKnob;
+
+	if (fIsVertical) {
+		fLeftKnob = new (std::nothrow) BBitmap(BRect(0, 0, 11, 14),
+			B_CMAP8);
+		if (fLeftKnob != NULL) {
+			fLeftKnob->SetBits(kVerticalKnobData,
+					sizeof(kVerticalKnobData), 0, B_CMAP8);
+		}
+	} else {
+		fLeftKnob = new (std::nothrow) BBitmap(BRect(0, 0, 14, 11),
+			B_CMAP8);
+		if (fLeftKnob != NULL) {
 			fLeftKnob->SetBits(kHorizontalKnobData,
-				sizeof(kHorizontalKnobData), 0, B_CMAP8);
+					sizeof(kHorizontalKnobData), 0, B_CMAP8);
 		}
 	}
 
@@ -753,13 +757,15 @@ BChannelSlider::_FinishChange(bool update)
 		if (!fAllChannels) {
 			inMask = new (std::nothrow) bool[CountChannels()];
 			if (inMask) {
-				for (int i=0; i<numChannels; i++)
+				for (int i = 0; i < numChannels; i++)
 					inMask[i] = false;
 				inMask[fCurrentChannel] = true;
 			}
 		}
 		InvokeChannel(update ? ModificationMessage() : NULL, 0, numChannels,
 			inMask);
+
+		delete[] inMask;
 	}
 
 	if (!update) {
