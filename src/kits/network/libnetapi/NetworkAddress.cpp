@@ -151,7 +151,7 @@ BNetworkAddress::Unset()
 {
 	fAddress.ss_family = AF_UNSPEC;
 	fAddress.ss_len = 2;
-	fStatus = B_OK;
+	fStatus = B_NO_INIT;
 }
 
 
@@ -177,8 +177,10 @@ BNetworkAddress::SetTo(const char* host, uint16 port, uint32 flags)
 
 	cookie = 0;
 	status = resolver->GetNextAddress(&cookie, *this);
-	if (status == B_OK)
-		fStatus = B_OK;
+	if (status != B_OK) {
+		Unset();
+		fStatus = status;
+	}
 	return status;
 }
 
@@ -205,8 +207,10 @@ BNetworkAddress::SetTo(const char* host, const char* service, uint32 flags)
 
 	cookie = 0;
 	status = resolver->GetNextAddress(&cookie, *this);
-	if (status == B_OK)
-		fStatus = B_OK;
+	if (status != B_OK) {
+		Unset();
+		fStatus = status;
+	}
 	return status;
 }
 
@@ -231,8 +235,10 @@ BNetworkAddress::SetTo(int family, const char* host, uint16 port, uint32 flags)
 
 	uint32 cookie = 0;
 	status = resolver->GetNextAddress(&cookie, *this);
-	if (status == B_OK)
-		fStatus = B_OK;
+	if (status != B_OK) {
+		Unset();
+		fStatus = status;
+	}
 	return status;
 }
 
@@ -258,8 +264,10 @@ BNetworkAddress::SetTo(int family, const char* host, const char* service,
 
 	uint32 cookie = 0;
 	status = resolver->GetNextAddress(&cookie, *this);
-	if (status == B_OK)
-		fStatus = B_OK;
+	if (status != B_OK) {
+		Unset();
+		fStatus = status;
+	}
 	return status;
 }
 
