@@ -6,6 +6,7 @@
 
 #include "NetworkAddressTest.h"
 
+#include <arpa/inet.h>
 #include <netinet6/in6.h>
 
 #include <NetworkAddress.h>
@@ -84,6 +85,38 @@ NetworkAddressTest::TestWildcard()
 
 
 void
+NetworkAddressTest::TestNullAddr()
+{
+	BNetworkAddress nullAddr(AF_INET, NULL, 555);
+	CPPUNIT_ASSERT(nullAddr.InitCheck() == B_OK);
+
+	CPPUNIT_ASSERT(nullAddr.Family() == AF_INET);
+	CPPUNIT_ASSERT(nullAddr.Length() == sizeof(sockaddr_in));
+	CPPUNIT_ASSERT(nullAddr.Port() == 555);
+	CPPUNIT_ASSERT(!nullAddr.IsEmpty());
+}
+
+
+void
+NetworkAddressTest::TestSetAddressFromFamilyPort()
+{
+	BString addressStr = "192.168.1.1";
+	BNetworkAddress nullAddr(AF_INET, NULL, 555);
+	in_addr_t inetAddress = inet_addr(addressStr.String());
+	CPPUNIT_ASSERT(nullAddr.SetAddress(inetAddress) == B_OK);
+	CPPUNIT_ASSERT(nullAddr.InitCheck() == B_OK);
+
+	CPPUNIT_ASSERT(nullAddr.Family() == AF_INET);
+	CPPUNIT_ASSERT(nullAddr.Length() == sizeof(sockaddr_in));
+
+	sockaddr_in& sin = (sockaddr_in&)nullAddr.SockAddr();
+	CPPUNIT_ASSERT(addressStr == inet_ntoa(sin.sin_addr));
+	CPPUNIT_ASSERT(nullAddr.Port() == 555);
+	CPPUNIT_ASSERT(!nullAddr.IsEmpty());
+}
+
+
+void
 NetworkAddressTest::TestIsLocal()
 {
 	BNetworkAddress local(AF_INET, "localhost");
@@ -131,6 +164,11 @@ NetworkAddressTest::AddTests(BTestSuite& parent)
 		"NetworkAddressTest::TestSetTo", &NetworkAddressTest::TestSetTo));
 	suite.addTest(new CppUnit::TestCaller<NetworkAddressTest>(
 		"NetworkAddressTest::TestWildcard", &NetworkAddressTest::TestWildcard));
+	suite.addTest(new CppUnit::TestCaller<NetworkAddressTest>(
+		"NetworkAddressTest::TestNullAddr", &NetworkAddressTest::TestNullAddr));
+	suite.addTest(new CppUnit::TestCaller<NetworkAddressTest>(
+		"NetworkAddressTest::TestSetAddressFromFamilyPort",
+		&NetworkAddressTest::TestSetAddressFromFamilyPort));
 	suite.addTest(new CppUnit::TestCaller<NetworkAddressTest>(
 		"NetworkAddressTest::TestIsLocal", &NetworkAddressTest::TestIsLocal));
 	suite.addTest(new CppUnit::TestCaller<NetworkAddressTest>(
