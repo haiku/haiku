@@ -20,7 +20,7 @@
 
 Media::Media() 
 	:
-	BApplication(kApplicationSignature),
+	BApplication("application/x-vnd.Haiku-Media"),
 	fIcons(),
 	fWindow(NULL)
 {
