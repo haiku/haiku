@@ -427,7 +427,7 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	fResolverConfiguration(kMsgConfigureResolver),
 	fRunner(NULL),
 	fAssignedAddress(0),
-	fServer(AF_INET, NULL, DHCP_SERVER_PORT),
+	fServer(AF_INET, NULL, DHCP_SERVER_PORT, B_UNCONFIGURED_ADDRESS_FAMILIES),
 	fLeaseTime(0)
 {
 	fTransactionID = (uint32)system_time() ^ rand();
