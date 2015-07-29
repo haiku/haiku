@@ -563,24 +563,24 @@ BChannelSlider::DrawGroove(BView* into, int32 channel, BPoint leftTop,
 	ASSERT(into != NULL);
 	BRect rect(leftTop, bottomRight);
 
-	if (be_control_look != NULL) {
-		rect.InsetBy(-2.5, -2.5);
-		rect.left = floorf(rect.left);
-		rect.top = floorf(rect.top);
-		rect.right = floorf(rect.right);
-		rect.bottom = floorf(rect.bottom);
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		rgb_color barColor = be_control_look->SliderBarColor(base);
-		uint32 flags = 0;
-		be_control_look->DrawSliderBar(into, rect, rect, base,
-			barColor, flags, Orientation());
-		return;
-	}
+	rect.InsetBy(-2.5, -2.5);
+	rect.left = floorf(rect.left);
+	rect.top = floorf(rect.top);
+	rect.right = floorf(rect.right);
+	rect.bottom = floorf(rect.bottom);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color barColor = be_control_look->SliderBarColor(base);
+	uint32 flags = 0;
+	be_control_look->DrawSliderBar(into, rect, rect, base,
+		barColor, flags, Orientation());
 
+#if 0
+	// Disabled original look
 	_DrawGrooveFrame(fBackingView, rect.InsetByCopy(-2.5, -2.5));
 
 	rect.InsetBy(-0.5, -0.5);
 	into->FillRect(rect, B_SOLID_HIGH);
+#endif
 }
 
 
@@ -598,22 +598,19 @@ BChannelSlider::DrawThumb(BView* into, int32 channel, BPoint where,
 	where.x -= bitmapBounds.right / 2.0;
 	where.y -= bitmapBounds.bottom / 2.0;
 
+	BRect rect(bitmapBounds.OffsetToCopy(where));
+	rect.InsetBy(1, 1);
+	rect.left = floorf(rect.left);
+	rect.top = floorf(rect.top);
+	rect.right = ceilf(rect.right + 0.5);
+	rect.bottom = ceilf(rect.bottom + 0.5);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 flags = 0;
+	be_control_look->DrawSliderThumb(into, rect, rect, base,
+		flags, Orientation());
 
-	if (be_control_look != NULL) {
-		BRect rect(bitmapBounds.OffsetToCopy(where));
-		rect.InsetBy(1, 1);
-		rect.left = floorf(rect.left);
-		rect.top = floorf(rect.top);
-		rect.right = ceilf(rect.right + 0.5);
-		rect.bottom = ceilf(rect.bottom + 0.5);
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 flags = 0;
-		be_control_look->DrawSliderThumb(into, rect, rect, base,
-			flags, Orientation());
-		return;
-	}
-
-
+#if 0
+	// Disabled original look which takes into account the pressed state
 	into->PushState();
 
 	into->SetDrawingMode(B_OP_OVER);
@@ -634,6 +631,7 @@ BChannelSlider::DrawThumb(BView* into, int32 channel, BPoint where,
 	}
 
 	into->PopState();
+#endif
 }
 
 
