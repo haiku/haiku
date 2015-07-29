@@ -1,10 +1,12 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_ALERT_H
 #define	_ALERT_H
 
+
+#include <vector>
 
 #include <Window.h>
 
@@ -26,78 +28,97 @@ enum button_spacing {
 
 class BBitmap;
 class BButton;
+class BGroupLayout;
 class BInvoker;
 class BTextView;
+class TAlertView;
+
 
 class BAlert : public BWindow {
 public:
-							BAlert(const char* title, const char* text,
-								const char* button1, const char* button2 = NULL,
-								const char* button3 = NULL,
-								button_width width = B_WIDTH_AS_USUAL,
-								alert_type type = B_INFO_ALERT);
-							BAlert(const char* title, const char* text,
-								const char* button1, const char* button2,
-								const char* button3, button_width width,
-								button_spacing spacing,
-								alert_type type = B_INFO_ALERT);
-		virtual				~BAlert();
+								BAlert();
+								BAlert(const char* title, const char* text,
+									const char* button1,
+									const char* button2 = NULL,
+									const char* button3 = NULL,
+									button_width width = B_WIDTH_AS_USUAL,
+									alert_type type = B_INFO_ALERT);
+								BAlert(const char* title, const char* text,
+									const char* button1, const char* button2,
+									const char* button3, button_width width,
+									button_spacing spacing,
+									alert_type type = B_INFO_ALERT);
+								BAlert(BMessage* data);
+	virtual						~BAlert();
 
-		// Archiving
-							BAlert(BMessage* data);
-		static	BArchivable	*Instantiate(BMessage* data);
-		virtual	status_t	Archive(BMessage* data, bool deep = true) const;
+	// Archiving
+	static	BArchivable*		Instantiate(BMessage* data);
+	virtual	status_t			Archive(BMessage* data, bool deep = true) const;
 
-		// BAlert guts
-				void		SetShortcut(int32 button_index, char key);
-				char		Shortcut(int32 button_index) const;
+	// BAlert guts
+			alert_type			Type() const;
+			void				SetType(alert_type type);
+			void				SetIcon(BBitmap* bitmap);
+			void				SetText(const char* text);
+			void				SetButtonSpacing(button_spacing spacing);
+			void				SetButtonWidth(button_width width);
 
-				int32		Go();
-				status_t	Go(BInvoker* invoker);
+			void				SetShortcut(int32 buttonIndex, char key);
+			char				Shortcut(int32 buttonIndex) const;
 
-		virtual	void		MessageReceived(BMessage* message);
-		virtual	void		FrameResized(float new_width, float new_height);
-				BButton*	ButtonAt(int32 index) const;
-				BTextView*	TextView() const;
+			int32				Go();
+			status_t			Go(BInvoker* invoker);
 
-		virtual BHandler*	ResolveSpecifier(BMessage* message, int32 index,
-								BMessage* specifier, int32 what,
-								const char* property);
-		virtual	status_t	GetSupportedSuites(BMessage* data);
+	virtual	void				MessageReceived(BMessage* message);
+	virtual	void				FrameResized(float newWidth, float newHeight);
 
-		virtual void		DispatchMessage(BMessage* message, BHandler* handler);
-		virtual	void		Quit();
-		virtual	bool		QuitRequested();
+			void				AddButton(const char* label, char key = 0);
+			int32				CountButtons() const;
+			BButton*			ButtonAt(int32 index) const;
 
-		static	BPoint		AlertPosition(float width, float height);
+			BTextView*			TextView() const;
 
-		virtual status_t	Perform(perform_code d, void* arg);
+	virtual BHandler*			ResolveSpecifier(BMessage* message, int32 index,
+									BMessage* specifier, int32 form,
+									const char* property);
+	virtual	status_t			GetSupportedSuites(BMessage* data);
+
+	virtual void				DispatchMessage(BMessage* message,
+									BHandler* handler);
+	virtual	void				Quit();
+	virtual	bool				QuitRequested();
+
+	virtual status_t			Perform(perform_code d, void* arg);
+
+	static	BPoint				AlertPosition(float width, float height);
 
 private:
-		friend class _BAlertFilter_;
+	virtual	void				_ReservedAlert1();
+	virtual	void				_ReservedAlert2();
+	virtual	void				_ReservedAlert3();
 
-		virtual	void		_ReservedAlert1();
-		virtual	void		_ReservedAlert2();
-		virtual	void		_ReservedAlert3();
+			void				_Init(const char* text, const char* button1,
+									const char* button2, const char* button3,
+									button_width width, button_spacing spacing,
+									alert_type type);
+			BBitmap*			_CreateTypeIcon();
+			BButton*			_CreateButton(int32 which, const char* label);
+			void				_Prepare();
 
-				void		_InitObject(const char* text, const char* button1,
-								const char* button2 = NULL,
-								const char* button3 = NULL,
-								button_width width = B_WIDTH_AS_USUAL,
-								button_spacing spacing = B_EVEN_SPACING,
-								alert_type type = B_INFO_ALERT);
-				BBitmap*	_InitIcon();
-				BButton*	_CreateButton(int32 which, const char* label);
-
-		sem_id				fAlertSem;
-		int32				fAlertValue;
-		BButton*			fButtons[3];
-		BTextView*			fTextView;
-		char				fKeys[3];
-		alert_type			fMsgType;
-		button_width		fButtonWidth;
-		BInvoker*			fInvoker;
-		uint32				_reserved[4];
+private:
+			sem_id				fAlertSem;
+			int32				fAlertValue;
+			TAlertView*			fIconView;
+			BTextView*			fTextView;
+			BGroupLayout*		fButtonLayout;
+			std::vector<BButton*> fButtons;
+			std::vector<char>	fKeys;
+			uint8				fType;
+			uint8				fButtonSpacing;
+			uint8				fButtonWidth;
+			BInvoker*			fInvoker;
+			uint32				_reserved[1];
 };
+
 
 #endif	// _ALERT_H
