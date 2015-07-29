@@ -763,10 +763,17 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 				break;
 			}
 			case OPTION_SERVER_ADDRESS:
+			{
 				syslog(LOG_DEBUG, "  server: %s\n",
 					_AddressToString(data).String());
-				fServer.SetAddress(*(in_addr_t*)data);
+				status_t status = fServer.SetAddress(*(in_addr_t*)data);
+				if (status != B_OK) {
+					syslog(LOG_ERR, "   BNetworkAddress::SetAddress failed with %s!\n",
+						strerror(status));
+					fServer.Unset();
+				}
 				break;
+			}
 
 			case OPTION_ADDRESS_LEASE_TIME:
 				syslog(LOG_DEBUG, "  lease time: %lu seconds\n",
