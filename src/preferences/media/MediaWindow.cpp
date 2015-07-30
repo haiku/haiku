@@ -324,6 +324,7 @@ MediaWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case ML_RESTART_THREAD_FINISHED:
 			fRestartThread = -1;
+			_InitMedia(false);
 			break;
 
 		case ML_RESTART_MEDIA_SERVER:
