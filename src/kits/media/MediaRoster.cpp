@@ -3377,6 +3377,11 @@ BMediaRoster::MessageReceived(BMessage* message)
 			// Send the notification to our subscribers
 			if (BMediaRoster::IsRunning()) {
 				sServerIsUp = true;
+				// Wait for media services to wake up
+				// TODO: This should be solved so that the server
+				// have a way to notify us when the system is really
+				// ready to run and we avoid sleeping.
+				snooze(2000000);
 				// Restore our friendship with the media servers
 				if (MediaRosterEx(this)->BuildConnections() != B_OK) {
 					TRACE("BMediaRoster::MessageReceived can't reconnect"
