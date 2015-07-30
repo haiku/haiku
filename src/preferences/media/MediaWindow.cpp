@@ -192,6 +192,8 @@ MediaWindow::MediaWindow(BRect frame)
 	BMediaRoster* roster = BMediaRoster::Roster();
 	roster->StartWatching(BMessenger(this, this),
 		B_MEDIA_SERVER_STARTED);
+	roster->StartWatching(BMessenger(this, this),
+		B_MEDIA_SERVER_QUIT);
 }
 
 
@@ -217,6 +219,8 @@ MediaWindow::~MediaWindow()
 	BMediaRoster* roster = BMediaRoster::CurrentRoster();
 	roster->StopWatching(BMessenger(this, this),
 		B_MEDIA_SERVER_STARTED);
+	roster->StartWatching(BMessenger(this, this),
+		B_MEDIA_SERVER_QUIT);
 }
 
 
@@ -337,6 +341,7 @@ MediaWindow::MessageReceived(BMessage* message)
 				resume_thread(fRestartThread);
 			break;
 		}
+
 		case B_MEDIA_WEB_CHANGED:
 		case ML_SELECTED_NODE:
 		{
@@ -352,12 +357,15 @@ MediaWindow::MessageReceived(BMessage* message)
 			item->AlterWindow(this);
 			break;
 		}
+
 		case B_MEDIA_SERVER_STARTED:
+		case B_MEDIA_SERVER_QUIT:
 		{
 			PRINT_OBJECT(*message);
 			_InitMedia(false);
 			break;
 		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
