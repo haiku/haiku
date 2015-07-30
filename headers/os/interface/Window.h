@@ -165,6 +165,7 @@ public:
 			void				MoveTo(float x, float y);
 			void				ResizeBy(float dx, float dy);
 			void				ResizeTo(float width, float height);
+			void				ResizeToPreferred();
 
 			void				CenterIn(const BRect& rect);
 			void				CenterOnScreen();
