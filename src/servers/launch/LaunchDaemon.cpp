@@ -1215,9 +1215,16 @@ LaunchDaemon::_StartSession(const char* login)
 		if (setuid(user) != 0)
 			exit(EXIT_FAILURE);
 
-		BString home="HOME=\"";
-		home << passwd->pw_dir << "\"";
-		putenv(home.String());
+		if (passwd->pw_dir != NULL && passwd->pw_dir[0] != '\0') {
+			BString home="HOME=\"";
+			home << passwd->pw_dir << "\"";
+			putenv(home.String());
+
+			if (chdir(passwd->pw_dir) != 0) {
+				debug_printf("Could not switch to home dir %s: %s\n",
+					passwd->pw_dir, strerror(errno));
+			}
+		}
 
 		// TODO: This leaks the parent application
 		be_app = NULL;
