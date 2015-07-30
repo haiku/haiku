@@ -119,22 +119,15 @@ ThreadHandler::Init()
 
 
 status_t
-ThreadHandler::SetBreakpointAndRun(target_addr_t address, bool initialStart)
+ThreadHandler::SetBreakpointAndRun(target_addr_t address)
 {
 	status_t error = _InstallTemporaryBreakpoint(address);
 	if (error != B_OK)
 		return error;
 
 	fPreviousInstructionPointer = 0;
-	// when the program is first run, the initial thread is not yet under
-	// the control of the debug nub, so it needs to be resumed rather than
-	// continued.
-	if (initialStart) {
-		resume_thread(ThreadID());
-		// TODO: This should probably better be a DebuggerInterface method,
-		// but this method is used only when debugging a local team anyway.
-	} else
-		fDebuggerInterface->ContinueThread(ThreadID());
+	fDebuggerInterface->ContinueThread(ThreadID());
+
 	// Pretend "step out" mode, so that the temporary breakpoint hit will not
 	// be ignored.
 	fStepMode = STEP_OUT;

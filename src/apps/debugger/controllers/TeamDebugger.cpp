@@ -1962,7 +1962,7 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 				SymbolInfo symbolInfo;
 				if (fDebuggerInterface->GetSymbolInfo(fTeam->ID(), image->ID(),
 						"main", B_SYMBOL_TYPE_TEXT, symbolInfo) == B_OK) {
-					handler->SetBreakpointAndRun(symbolInfo.Address(), false);
+					handler->SetBreakpointAndRun(symbolInfo.Address());
 				}
 			} else {
 				locker.Unlock();
