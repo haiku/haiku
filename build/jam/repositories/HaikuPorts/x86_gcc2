@@ -73,6 +73,7 @@ RemotePackageRepository HaikuPorts
 	chat-20100903-2
 	clipdinger-0.3-1
 	clockwerk-git-3
+	cpctools-0.3.0-1
 	criticalmass-2.2-1
 	ctags-5.8-3
 	colors-2.3-1
@@ -94,6 +95,7 @@ RemotePackageRepository HaikuPorts
 	ed-1.7-1
 	enca-1.15-1
 	enca_devel-1.15-1
+	exomizer-2.0.7-1
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
 	faac-1.28-2
@@ -467,14 +469,16 @@ RemotePackageRepository HaikuPorts
 	unrar-5.2.6-1
 	unzip-6.0-2
 	util_macros-1.19.0-2
+	vasm-1.7c-1
 	vcdimager-0.7.24-2
 	vcdimager_devel-0.7.24-2
-	vlc-0.8.6i-1
-	vlc_devel-0.8.6i-1
 	vim-7.4-3
 	virtualbox_guest_additions-4.3.53_svn-1
-	vmware_addons-1.1.1-2
 	vision-0.9.7.r949-2
+	vlc-0.8.6i-1
+	vlc_devel-0.8.6i-1
+	vlink-0.15-1
+	vmware_addons-1.1.1-2
 	weather-0.1.1_git-1
 	wget-1.16.3-1
 	which-2.21-1
@@ -901,6 +905,7 @@ RemotePackageRepository HaikuPorts
 	confuse_x86
 	copynametoclipboard
 	coreutils
+	cpctools
 	criticalmass
 	ctags
 	curl
@@ -926,6 +931,7 @@ RemotePackageRepository HaikuPorts
 	ed
 	enca
 	enca_x86
+	exomizer
 	expat
 	faac
 	faad2
@@ -1257,11 +1263,13 @@ RemotePackageRepository HaikuPorts
 	util_macros
 	weather
 	vacuum_x86
+	vasm
 	vcdimager
 	vcmi_x86
 	vim
 	vision
 	vlc
+	vlink
 	vmware_addons
 	wget
 	which
