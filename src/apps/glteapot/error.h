@@ -12,6 +12,8 @@ extern void fatalerror(const char *);
 
 #define DEBUGGING 1
 
+#undef assert
+
 #ifdef DEBUGGING
 
 #define assert(a) if (!(a)) { \
