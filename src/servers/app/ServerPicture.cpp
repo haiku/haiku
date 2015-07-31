@@ -538,10 +538,14 @@ set_clipping_rects(Canvas* canvas, const BRect* rects,
 {
 	// TODO: This might be too slow, we should copy the rects
 	// directly to BRegion's internal data
-	BRegion region;
-	for (uint32 c = 0; c < numRects; c++)
-		region.Include(rects[c]);
-	canvas->SetUserClipping(&region);
+	if (numRects == 0)
+		canvas->SetUserClipping(NULL);
+	else {
+		BRegion region;
+		for (uint32 c = 0; c < numRects; c++)
+			region.Include(rects[c]);
+		canvas->SetUserClipping(&region);
+	}
 	canvas->UpdateCurrentDrawingRegion();
 }
 
