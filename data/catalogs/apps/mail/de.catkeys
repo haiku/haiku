@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	233997769
+1	german	x-vnd.Be-MAIL	1310033600
 View	Mail		Ansicht
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attribute von Anhängen:
@@ -146,6 +146,7 @@ Open attachment	Mail		Anhang öffnen
 sent	B_USER_DIRECTORY/mail/sent		Gesendet
 (Date unavailable)	Mail		(Datum nicht verfügbar)
 Put your favorite e-mail queries and query templates in this folder.	Mail		In diesem Ordner können E-Mail-Queries und Query-Vorlagen abgelegt werden.
+Spam	Mail		Spam
 Reply	Mail		Antworten
 From:	Mail		Von:
 Couldn't open this signature. Sorry.	Mail		Diese Signatur konnte leider nicht geöffnet werden.

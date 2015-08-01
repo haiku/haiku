@@ -1,21 +1,15 @@
-1	romanian	x-vnd.Haiku-Media	1716333833
+1	romanian	x-vnd.Haiku-Media	862832618
 Couldn't add volume control in Deskbar: %s\n	Media views		Nu s-a putut adăuga controlul de volum pe bara de desktop: %s\n
-Ready for use…	Media Window		Gata de utilizat...
 Video input:	Media views		Intrare video:
-Waiting for media_server to quit.	Media Window		Se așteaptă ca media_server să se închidă.
-Cleaning up.	Media Window		Se curăță.
 Defaults	Media views		Implicite
 MIDI Settings	Media Window		Configurări MIDI
-Stopping media server…	Media Window		Se oprește serverul media...
 Quit	Media Window		Părăsește
-Starting media server…	Media Window		Se pornește serverul media...
 Video settings	Media Window		Configurări video
 Video output:	Media views		Ieșire video:
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Nu s-a putut conecta la serverul media.\nDoriți să îl porniți?
 Restart media services	Media views		Restartează servicii media
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nu s-a putut elimina controlul de volum de pe bara de desktop: %s\n
 Media	System name		Media
-Telling media_addon_server to quit.	Media Window		Se transmite lui media_addon_server să se închidă.
 Audio mixer	Media Window		Mixaj audio
 This hardware has no controls.	Media Window		Acest hardware nu are controale.
 Audio output:	Media views		Ieșire audio:

@@ -1,17 +1,10 @@
-1	esperanto	x-vnd.Haiku-Media	3056231296
-Ready for use…	Media Window		Preta je uziĝi…
+1	esperanto	x-vnd.Haiku-Media	1580243388
 Video input:	Media views		Videa enigo:
-Waiting for media_server to quit.	Media Window		Atendo de la fino de la plurmedia servilo.
-Cleaning up.	Media Window		Purigante.
 Defaults	Media views		Aprioraj
-Stopping media server…	Media Window		Halto de la plurmedia servilo…
 Quit	Media Window		Eliri
-Starting media server…	Media Window		Lanĉo de plurmedia servilo…
-Done shutting down.	Media Window		Haltado kompleta.
 Video output:	Media views		Videa eligo:
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Ne eblas konekti al la plurmedia servilo.\nĈu vi volas lanĉi ĝin?
 Restart media services	Media views		Relanĉu la plurmediaj servoj
-Telling media_addon_server to quit.	Media Window		Ordonante, ke la plurmedia aldona servilo finu.
 This hardware has no controls.	Media Window		Ĉi-tiu aparato ne havas agordilojn.
 Audio output:	Media views		Sona eligo:
 Audio settings	Media Window		Sonaj agordoj
