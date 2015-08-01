@@ -7,6 +7,15 @@
 #include <ChannelControl.h>
 #include <PropertyInfo.h>
 
+#include <map>
+#include <string>
+
+struct limit_label {
+	std::string min_label;
+	std::string max_label;
+};
+
+typedef std::map<int32, limit_label> label_map;
 
 static property_info
 sPropertyInfo[] = {
@@ -56,6 +65,8 @@ BChannelControl::BChannelControl(BRect frame, const char* name,
 
 	fChannelValues = new int32[channel_count];
 	memset(fChannelValues, 0, sizeof(int32) * channel_count);
+
+	fMultiLabels = (void*)new label_map;
 }
 
 
@@ -80,6 +91,8 @@ BChannelControl::BChannelControl(const char* name, const char* label,
 
 	fChannelValues = new int32[channelCount];
 	memset(fChannelValues, 0, sizeof(int32) * channelCount);
+
+	fMultiLabels = (void*)new label_map;
 }
 
 
@@ -127,6 +140,8 @@ BChannelControl::BChannelControl(BMessage* archive)
 		fModificationMsg = modificationMessage;
 	else
 		delete modificationMessage;
+
+	fMultiLabels = (void*)new label_map;
 }
 
 
@@ -136,6 +151,7 @@ BChannelControl::~BChannelControl()
 	delete[] fChannelMax;
 	delete[] fChannelValues;
 	delete fModificationMsg;
+	delete reinterpret_cast<label_map*>(fMultiLabels);
 }
 
 
@@ -589,7 +605,9 @@ status_t
 BChannelControl::SetLimitLabelsFor(int32 channel, const char* minLabel,
 	const char* maxLabel)
 {
-	return B_ERROR;
+	(*(label_map*)fMultiLabels)[channel].max_label = maxLabel;
+	(*(label_map*)fMultiLabels)[channel].min_label = minLabel;
+	return B_OK;
 }
 
 
@@ -597,13 +615,21 @@ status_t
 BChannelControl::SetLimitLabelsFor(int32 fromChannel, int32 channelCount,
 	const char* minLabel, const char* maxLabel)
 {
-	return B_ERROR;
+	for (int32 i = fromChannel; i < fromChannel + channelCount; i++) {
+		SetLimitLabelsFor(i, minLabel, maxLabel);
+	}
+	return B_OK;
 }
 
 
 const char*
 BChannelControl::MinLimitLabelFor(int32 channel) const
 {
+	if (fMultiLabels != NULL) {
+		label_map::const_iterator iter = ((label_map*)fMultiLabels)->find(channel);
+		if (iter != ((label_map*)fMultiLabels)->end())
+			return (*iter).second.min_label.c_str();
+	}
 	return NULL;
 }
 
@@ -611,6 +637,11 @@ BChannelControl::MinLimitLabelFor(int32 channel) const
 const char*
 BChannelControl::MaxLimitLabelFor(int32 channel) const
 {
+	if (fMultiLabels != NULL) {
+		label_map::const_iterator iter = ((label_map*)fMultiLabels)->find(channel);
+		if (iter != ((label_map*)fMultiLabels)->end())
+			return (*iter).second.max_label.c_str();
+	}
 	return NULL;
 }
 
