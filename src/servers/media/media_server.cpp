@@ -918,13 +918,6 @@ ServerApp::_ControlThread(void* _server)
 	int32 code;
 	while ((size = read_port_etc(server->_ControlPort(), &code, data,
 			sizeof(data), 0, 0)) > 0) {
-
-		// NOTE: This prevents locks in Deskbar and
-		// possibly in other situations.
-		if (size == B_WOULD_BLOCK) {
-			snooze(100);
-			continue;
-		}
 		server->_HandleMessage(code, data, size);
 	}
 
