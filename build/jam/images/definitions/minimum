@@ -3,8 +3,8 @@
 SYSTEM_BIN = [ FFilterByBuildFeatures
 	addattr alert arp autologin
 	bc beep bfsinfo
-	catattr checkfs checkitout chop clear cmp collectcatkeys compress copyattr
-	dc desklink df diff diff3 diskimage draggers
+	catattr checkfs checkitout chop clear collectcatkeys compress copyattr
+	dc desklink df diskimage draggers
 	driveinfo dstcheck dumpcatalog
 	eject error
 	fdinfo ffm filepanel finddir findpaths fortune fstrim
@@ -24,7 +24,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	query quit
 	rc reindex release renice resattr rmattr rmindex roster
 	route
-	safemode screen_blanker screeninfo screenmode sdiff setarch setmime settype
+	safemode screen_blanker screeninfo screenmode setarch setmime settype
 	setversion setvolume shutdown
 	strace su sysinfo
 	tcptester telnet telnetd top
