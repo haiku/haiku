@@ -25,7 +25,7 @@ RemotePackageRepository HaikuPorts
 	automake-1.13.1-4
 	bash-4.3.39-1
 #	bepdf-1.1.1~beta5_2013_04_28-1
-	binutils-2.25_2014_12_27-1
+	binutils-2.25.1_2015_07_31-1
 	bison-2.6.5-1
 	boost-1.55.0-6
 	boost_atomic-1.55.0-6
@@ -66,6 +66,7 @@ RemotePackageRepository HaikuPorts
 	curl-7.42.1-1
 	curl_devel-7.42.1-1
 	cvs-1.12.13.1-6
+	diffutils-3.3-2
 	dos2unix-7.2.2-1
 	doxygen-1.6.3-4
 	dtc-1.4.1-1
@@ -131,7 +132,7 @@ RemotePackageRepository HaikuPorts
 	handbrake-0.10.1-1
 	harfbuzz-0.9.40-1
 	harfbuzz_devel-0.9.40-1
-	help2man-1.44.1-1
+	help2man-1.46.6-1
 	htmldoc-1.8.27-3
 	icu-55.1-3
 	icu_devel-55.1-3
@@ -242,6 +243,10 @@ RemotePackageRepository HaikuPorts
 	mesa_swrast-10.5.2-1
 	mesa_swpipe-10.5.2-1
 	mkdepend-1.7-3
+	mpc-1.0.3-1
+	mpc_devel-1.0.3-1
+	mpfr-3.1.3-1
+	mpfr_devel-3.1.3-1
 	mpg123-1.22.0-1
 	mpg123_devel-1.22.0-1
 	nano-2.4.0-1
@@ -287,8 +292,8 @@ RemotePackageRepository HaikuPorts
 	smpeg_devel-0.4.5-4
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.8.10.0-1
-	sqlite_devel-3.8.10.0-1
+	sqlite-3.8.11.1-1
+	sqlite_devel-3.8.11.1-1
 	subversion-1.8.11-1
 	subversion_devel-1.8.11-1
 	tar-1.27.1-2
@@ -337,6 +342,7 @@ RemotePackageRepository HaikuPorts
 	ctags
 	curl
 	cvs
+	diffutils
 	dos2unix
 	doxygen
 	dtc
@@ -430,6 +436,8 @@ RemotePackageRepository HaikuPorts
 	mercurial
 	mesa
 	mkdepend
+	mpc
+	mpfr
 	mpg123
 	nano
 	nasm
