@@ -573,14 +573,6 @@ BChannelSlider::DrawGroove(BView* into, int32 channel, BPoint leftTop,
 	uint32 flags = 0;
 	be_control_look->DrawSliderBar(into, rect, rect, base,
 		barColor, flags, Orientation());
-
-#if 0
-	// Disabled original look
-	_DrawGrooveFrame(fBackingView, rect.InsetByCopy(-2.5, -2.5));
-
-	rect.InsetBy(-0.5, -0.5);
-	into->FillRect(rect, B_SOLID_HIGH);
-#endif
 }
 
 
@@ -608,30 +600,6 @@ BChannelSlider::DrawThumb(BView* into, int32 channel, BPoint where,
 	uint32 flags = 0;
 	be_control_look->DrawSliderThumb(into, rect, rect, base,
 		flags, Orientation());
-
-#if 0
-	// Disabled original look which takes into account the pressed state
-	into->PushState();
-
-	into->SetDrawingMode(B_OP_OVER);
-	into->DrawBitmapAsync(thumb, where);
-
-	if (pressed) {
-		into->SetDrawingMode(B_OP_ALPHA);
-
-		rgb_color color = tint_color(into->ViewColor(), B_DARKEN_4_TINT);
-		color.alpha = 128;
-		into->SetHighColor(color);
-
-		BRect destRect(where, where);
-		destRect.right += bitmapBounds.right;
-		destRect.bottom += bitmapBounds.bottom;
-
-		into->FillRect(destRect);
-	}
-
-	into->PopState();
-#endif
 }
 
 
