@@ -2,6 +2,22 @@
 #include <ChannelSlider.h>
 #include <Window.h>
 
+#include <string>
+
+
+struct limit_label {
+	std::string min_label;
+	std::string max_label;
+};
+
+
+const struct limit_label kLabels[] = {
+	{ "min_label_1", "max_label_1" },
+	{ "min_label_2", "max_label_2" },
+	{ "min_label_3", "max_label_3" },
+};
+
+
 class MainWindow : public BWindow {
 public:
 	MainWindow()
@@ -34,6 +50,18 @@ public:
 		horizontal->MoveBy(0.0, horizontal->Bounds().Height() + 10.0);
 
 		ResizeTo(horizontal->Frame().right + 10, slider->Frame().bottom + 10);
+
+		for (int32 i = 0; i < horizontal->CountChannels(); i++) {
+			horizontal->SetLimitLabelsFor(i, kLabels[i].min_label.c_str(),
+												kLabels[i].max_label.c_str());
+		}
+
+		for (int32 i = 0; i < horizontal->CountChannels(); i++) {
+			if (strcmp(horizontal->MinLimitLabelFor(i), kLabels[i].min_label.c_str()) != 0)
+				printf("wrong min label for channel %ld\n", i);
+			if (strcmp(horizontal->MaxLimitLabelFor(i), kLabels[i].max_label.c_str()) != 0)
+				printf("wrong max label for channel %ld\n", i);
+		}
 	}
 
 	virtual bool QuitRequested() { be_app->PostMessage(B_QUIT_REQUESTED); return BWindow::QuitRequested() ; }
