@@ -1138,14 +1138,16 @@ TCPEndpoint::_StartPersistTimer()
 void
 TCPEndpoint::_EnterTimeWait()
 {
-	TRACE("_EnterTimeWait()\n");
+	TRACE("_EnterTimeWait()");
 
-	_CancelConnectionTimers();
+	if (fState == TIME_WAIT) {
+		_CancelConnectionTimers();
 
-	if (fState == TIME_WAIT && IsLocal()) {
-		// we do not use TIME_WAIT state for local connections
-		fFlags |= FLAG_DELETE_ON_CLOSE;
-		return;
+		if (IsLocal()) {
+			// we do not use TIME_WAIT state for local connections
+			fFlags |= FLAG_DELETE_ON_CLOSE;
+			return;
+		}
 	}
 
 	_UpdateTimeWait();
