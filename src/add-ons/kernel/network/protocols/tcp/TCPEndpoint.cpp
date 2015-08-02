@@ -1953,7 +1953,8 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 	}
 
 	uint32 length = min_c(fSendQueue.Available(fSendNext), sendWindow);
-	tcp_sequence previousSendNext = fSendNext;
+	bool shouldStartRetransmitTimer = fSendNext == fSendUnacknowledged;
+	bool retransmit = fSendNext < fSendMax;
 
 	do {
 		uint32 segmentMaxSize = fSendMaxSegmentSize
@@ -1968,7 +1969,7 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 		}
 
 		// Determine if we should really send this segment
-		if (!force && !_ShouldSendSegment(segment, segmentLength,
+		if (!force && !retransmit && !_ShouldSendSegment(segment, segmentLength,
 				segmentMaxSize, flightSize)) {
 			if (fSendQueue.Available()
 				&& !gStackModule->is_timer_active(&fPersistTimer)
@@ -2047,23 +2048,24 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			return status;
 		}
 
+		if (shouldStartRetransmitTimer && size > 0) {
+			TRACE("starting initial retransmit timer of: %" B_PRIdBIGTIME,
+				fRetransmitTimeout);
+			gStackModule->set_timer(&fRetransmitTimer, fRetransmitTimeout);
+			shouldStartRetransmitTimer = false;
+		}
+
 		if (segment.flags & TCP_FLAG_ACKNOWLEDGE)
 			fLastAcknowledgeSent = segment.acknowledge;
 
 		length -= segmentLength;
 		segment.flags &= ~(TCP_FLAG_SYNCHRONIZE | TCP_FLAG_RESET
 			| TCP_FLAG_FINISH);
+
+		if (retransmit)
+			break;
+
 	} while (length > 0);
-
-	// if we sent data from the beggining of the send queue,
-	// start the retransmition timer
-	if (previousSendNext == fSendUnacknowledged
-		&& fSendNext > previousSendNext) {
-		TRACE("  SendQueue(): set retransmit timer with rto %" B_PRIdBIGTIME,
-			fRetransmitTimeout);
-
-		gStackModule->set_timer(&fRetransmitTimer, fRetransmitTimeout);
-	}
 
 	return B_OK;
 }
@@ -2120,24 +2122,34 @@ TCPEndpoint::_PrepareSendPath(const sockaddr* peer)
 void
 TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 {
-	size_t previouslyUsed = fSendQueue.Used();
+	TRACE("_Acknowledged(): ack %" B_PRIu32 "; uack %" B_PRIu32 "; next %"
+		B_PRIu32 "; max %" B_PRIu32, segment.acknowledge,
+		fSendUnacknowledged.Number(), fSendNext.Number(), fSendMax.Number());
 
-	fSendQueue.RemoveUntil(segment.acknowledge);
-	fSendUnacknowledged = segment.acknowledge;
+	ASSERT(fSendUnacknowledged <= segment.acknowledge);
 
-	if (fSendNext < fSendUnacknowledged)
-		fSendNext = fSendUnacknowledged;
-
-	if (fSendUnacknowledged == fSendMax)
-		gStackModule->cancel_timer(&fRetransmitTimer);
-
-	if (fSendQueue.Used() < previouslyUsed) {
-		// this ACK acknowledged data
+	if (fSendUnacknowledged < segment.acknowledge) {
+		fSendQueue.RemoveUntil(segment.acknowledge);
+		fSendUnacknowledged = segment.acknowledge;
+		if (fSendNext < fSendUnacknowledged)
+			fSendNext = fSendUnacknowledged;
 
 		if (segment.options & TCP_HAS_TIMESTAMPS)
 			_UpdateRoundTripTime(tcp_diff_timestamp(segment.timestamp_reply));
 		else {
-			// TODO: Fallback to RFC 793 type estimation
+			// TODO: Fallback to RFC 793 type estimation; This just resets
+			// any potential exponential back off that happened due to
+			// retransmits.
+			fRetransmitTimeout = TCP_INITIAL_RTT;
+		}
+
+		if (fSendUnacknowledged == fSendMax) {
+			TRACE("all acknowledged, cancelling retransmission timer");
+			gStackModule->cancel_timer(&fRetransmitTimer);
+		} else {
+			TRACE("data acknowledged, resetting retransmission timer to: %"
+				B_PRIdBIGTIME, fRetransmitTimeout);
+			gStackModule->set_timer(&fRetransmitTimer, fRetransmitTimeout);
 		}
 
 		if (is_writable(fState)) {
@@ -2171,8 +2183,15 @@ void
 TCPEndpoint::_Retransmit()
 {
 	TRACE("Retransmit()");
+
 	_ResetSlowStart();
 	fSendNext = fSendUnacknowledged;
+
+	// Do exponential back off of the retransmit timeout
+	fRetransmitTimeout *= 2;
+	if (fRetransmitTimeout > TCP_MAX_RETRANSMIT_TIMEOUT)
+		fRetransmitTimeout = TCP_MAX_RETRANSMIT_TIMEOUT;
+
 	_SendQueued();
 }
 
@@ -2192,6 +2211,8 @@ TCPEndpoint::_UpdateRoundTripTime(int32 roundTripTime)
 
 	fRetransmitTimeout = ((fRoundTripTime / 4 + fRoundTripDeviation) / 2)
 		* kTimestampFactor;
+	if (fRetransmitTimeout < TCP_MIN_RETRANSMIT_TIMEOUT)
+		fRetransmitTimeout = TCP_MIN_RETRANSMIT_TIMEOUT;
 
 	TRACE("  RTO is now %" B_PRIdBIGTIME " (after rtt %" B_PRId32 "ms)",
 		fRetransmitTimeout, roundTripTime);

@@ -186,6 +186,11 @@ operator==(tcp_sequence a, tcp_sequence b)
 #define TCP_MAX_WINDOW					65535
 #define TCP_MAX_SEGMENT_LIFETIME		60000000	// 60 secs
 
+// Minimum retransmit timeout (consider delayed ack)
+#define TCP_MIN_RETRANSMIT_TIMEOUT		200000		// 200 msecs
+// Maximum retransmit timeout (per RFC6298)
+#define TCP_MAX_RETRANSMIT_TIMEOUT		60000000	// 60 secs
+
 struct tcp_sack {
 	uint32 left_edge;
 	uint32 right_edge;
