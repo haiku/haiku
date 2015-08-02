@@ -1061,7 +1061,7 @@ TCPEndpoint::SendAcknowledge(bool force)
 void
 TCPEndpoint::_StartPersistTimer()
 {
-	gStackModule->set_timer(&fPersistTimer, 1000000LL);
+	gStackModule->set_timer(&fPersistTimer, TCP_PERSIST_TIMEOUT);
 }
 
 

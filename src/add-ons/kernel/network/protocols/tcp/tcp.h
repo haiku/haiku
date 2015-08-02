@@ -185,6 +185,7 @@ operator==(tcp_sequence a, tcp_sequence b)
 #define TCP_DEFAULT_MAX_SEGMENT_SIZE	536
 #define TCP_MAX_WINDOW					65535
 #define TCP_MAX_SEGMENT_LIFETIME		60000000	// 60 secs
+#define TCP_PERSIST_TIMEOUT				1000000		// 1 sec
 
 // Minimum retransmit timeout (consider delayed ack)
 #define TCP_MIN_RETRANSMIT_TIMEOUT		200000		// 200 msecs
