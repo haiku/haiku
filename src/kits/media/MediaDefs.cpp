@@ -1261,7 +1261,7 @@ progress_shutdown(int stage,
 	// parameter "message" is no longer used. It is kept for compatibility with
 	// BeOS as this is used as a shutdown_media_server callback.
 
-	PRINT(("stage : %i\n", stage));
+	TRACE("stage : %i\n", stage);
 	const char* string = "Unknown stage";
 	switch (stage) {
 		case 10:
@@ -1285,7 +1285,7 @@ progress_shutdown(int stage,
 	}
 
 	if (progress == NULL)
-		notify_system(stage, string);
+		notify_system(stage/100.0f, string);
 	else
 		progress(stage, string, cookie);
 }
@@ -1365,14 +1365,14 @@ progress_startup(int stage,
 	// parameter "message" is no longer used. It is kept for compatibility with
 	// BeOS as this is used as a shutdown_media_server callback.
 
-	PRINT(("stage : %i\n", stage));
+	TRACE("stage : %i\n", stage);
 	const char* string = "Unknown stage";
 	switch (stage) {
 		case 10:
 			string = B_TRANSLATE("Stopping media server" B_UTF8_ELLIPSIS);
 			break;
 		case 20:
-			string = B_TRANSLATE("Telling media_addon_server to quit.");
+			string = B_TRANSLATE("Stopping media_addon_server.");
 			break;
 		case 50:
 			string = B_TRANSLATE("Starting media_services.");
@@ -1386,7 +1386,7 @@ progress_startup(int stage,
 	}
 
 	if (progress == NULL)
-		notify_system(stage, string);
+		notify_system(stage/100.0f, string);
 	else
 		progress(stage, string, cookie);
 }
