@@ -150,7 +150,7 @@ private:
 	tcp_sequence	fInitialSendSequence;
 	uint32			fDuplicateAcknowledgeCount;
 
-	net_route 		*fRoute;
+	net_route		*fRoute;
 		// TODO: don't use a net_route, but a net_route_info!!!
 		// (the latter will automatically adapt to routing changes)
 

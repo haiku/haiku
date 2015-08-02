@@ -37,8 +37,8 @@
 
 
 // References:
-//  - RFC 793 - Transmission Control Protocol
-//  - RFC 813 - Window and Acknowledgement Strategy in TCP
+//	- RFC 793 - Transmission Control Protocol
+//	- RFC 813 - Window and Acknowledgement Strategy in TCP
 //	- RFC 1337 - TIME_WAIT Assassination Hazards in TCP
 //
 // Things this implementation currently doesn't implement:
@@ -304,8 +304,6 @@ protected:
 #	define T(x)
 #endif	// TCP_TRACING
 
-// Initial estimate for packet round trip time (RTT)
-#define TCP_INITIAL_RTT		2000000
 
 // constants for the fFlags field
 enum {
@@ -1280,8 +1278,7 @@ TCPEndpoint::_DuplicateAcknowledge(tcp_segment_header &segment)
 
 	if (fDuplicateAcknowledgeCount == 3) {
 		_ResetSlowStart();
-		fCongestionWindow = fSlowStartThreshold + 3
-			* fSendMaxSegmentSize;
+		fCongestionWindow = fSlowStartThreshold + 3 * fSendMaxSegmentSize;
 		fSendNext = segment.acknowledge;
 	} else if (fDuplicateAcknowledgeCount > 3)
 		fCongestionWindow += fSendMaxSegmentSize;
@@ -2253,7 +2250,7 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 		fCongestionWindow += increment;
 	}
 
-	// if there is data left to be send, send it now
+	// if there is data left to be sent, send it now
 	if (fSendQueue.Used() > 0)
 		_SendQueued();
 }
