@@ -170,8 +170,13 @@ VideoProducer::HandleEvent(const media_timed_event* event,
 			_HandleStart(event->event_time);
 			break;
 		case BTimedEventQueue::B_STOP:
+		{
+			EventQueue()->FlushEvents(event->event_time,
+				BTimedEventQueue::B_ALWAYS,
+				true, BTimedEventQueue::B_HANDLE_BUFFER);
 			_HandleStop();
 			break;
+		}
 		case BTimedEventQueue::B_WARP:
 			_HandleTimeWarp(event->bigdata);
 			break;
