@@ -275,7 +275,7 @@ BBufferProducer::HandleMessage(int32 message, const void* data, size_t size)
 				ERROR("BBufferProducer::HandleMessage PRODUCER_SET_BUFFER_GROUP"
 					" group InitCheck() failed.\n");
 				delete group;
-				return B_ERROR;
+				return B_OK;
 			}
 			status_t status = SetBufferGroup(command->source, group);
 			if (command->destination == media_destination::null)
