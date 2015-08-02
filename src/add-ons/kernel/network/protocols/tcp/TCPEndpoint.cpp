@@ -321,7 +321,8 @@ enum {
 };
 
 
-static const int kTimestampFactor = 1024;
+static const int kTimestampFactor = 1000;
+	// conversion factor between usec system time and msec tcp time
 
 
 static inline bigtime_t
