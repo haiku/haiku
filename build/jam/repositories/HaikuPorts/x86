@@ -26,7 +26,7 @@ RemotePackageRepository HaikuPorts
 	beam-1.2-1
 	bepdf-1.2.0-1
 	bescreencapture-1.9.4-1
-	binutils-2.25.1_2015_07_31-1
+	binutils-2.25_12015_07_31-1
 	bison-2.4.3-6
 	buildbot_slave-0.8.8-2
 	burnitnow-0.1.0-1
