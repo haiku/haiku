@@ -226,9 +226,34 @@ protected:
 	tcp_state		fState;
 };
 
-class Timer : public AbstractTraceEntry {
+class TimerSet : public AbstractTraceEntry {
 public:
-	Timer(TCPEndpoint* endpoint, const char* which)
+	TimerSet(TCPEndpoint* endpoint, const char* which, bigtime_t timeout)
+		:
+		fEndpoint(endpoint),
+		fWhich(which),
+		fTimeout(timeout),
+		fState(endpoint->State())
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("tcp:%p (%12s) %s timer set to %" B_PRIdBIGTIME, fEndpoint,
+			name_for_state(fState), fWhich, fTimeout);
+	}
+
+protected:
+	TCPEndpoint*	fEndpoint;
+	const char*		fWhich;
+	bigtime_t		fTimeout;
+	tcp_state		fState;
+};
+
+class TimerTriggered : public AbstractTraceEntry {
+public:
+	TimerTriggered(TCPEndpoint* endpoint, const char* which)
 		:
 		fEndpoint(endpoint),
 		fWhich(which),
@@ -239,7 +264,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("tcp:%p (%12s) %s timer", fEndpoint,
+		out.Print("tcp:%p (%12s) %s timer triggered", fEndpoint,
 			name_for_state(fState), fWhich);
 	}
 
@@ -418,6 +443,7 @@ TCPEndpoint::~TCPEndpoint()
 
 	_CancelConnectionTimers();
 	gStackModule->cancel_timer(&fTimeWaitTimer);
+	T(TimerSet(this, "time-wait", -1));
 
 	if (fManager != NULL) {
 		fManager->Unbind(this);
@@ -1042,11 +1068,13 @@ TCPEndpoint::DelayedAcknowledge()
 	if (gStackModule->cancel_timer(&fDelayedAcknowledgeTimer)) {
 		// timer was active, send an ACK now (with the exception above,
 		// we send every other ACK)
+		T(TimerSet(this, "delayed ack", -1));
 		return SendAcknowledge(true);
 	}
 
 	gStackModule->set_timer(&fDelayedAcknowledgeTimer,
 		TCP_DELAYED_ACKNOWLEDGE_TIMEOUT);
+	T(TimerSet(this, "delayed ack", TCP_DELAYED_ACKNOWLEDGE_TIMEOUT));
 	return B_OK;
 }
 
@@ -1062,6 +1090,7 @@ void
 TCPEndpoint::_StartPersistTimer()
 {
 	gStackModule->set_timer(&fPersistTimer, TCP_PERSIST_TIMEOUT);
+	T(TimerSet(this, "persist", TCP_PERSIST_TIMEOUT));
 }
 
 
@@ -1086,6 +1115,7 @@ void
 TCPEndpoint::_UpdateTimeWait()
 {
 	gStackModule->set_timer(&fTimeWaitTimer, TCP_MAX_SEGMENT_LIFETIME << 1);
+	T(TimerSet(this, "time-wait", TCP_MAX_SEGMENT_LIFETIME << 1));
 }
 
 
@@ -1093,8 +1123,11 @@ void
 TCPEndpoint::_CancelConnectionTimers()
 {
 	gStackModule->cancel_timer(&fRetransmitTimer);
+	T(TimerSet(this, "retransmit", -1));
 	gStackModule->cancel_timer(&fPersistTimer);
+	T(TimerSet(this, "persist", -1));
 	gStackModule->cancel_timer(&fDelayedAcknowledgeTimer);
+	T(TimerSet(this, "delayed ack", -1));
 }
 
 
@@ -2052,6 +2085,7 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			TRACE("starting initial retransmit timer of: %" B_PRIdBIGTIME,
 				fRetransmitTimeout);
 			gStackModule->set_timer(&fRetransmitTimer, fRetransmitTimeout);
+			T(TimerSet(this, "retransmit", fRetransmitTimeout));
 			shouldStartRetransmitTimer = false;
 		}
 
@@ -2146,10 +2180,12 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 		if (fSendUnacknowledged == fSendMax) {
 			TRACE("all acknowledged, cancelling retransmission timer");
 			gStackModule->cancel_timer(&fRetransmitTimer);
+			T(TimerSet(this, "retransmit", -1));
 		} else {
 			TRACE("data acknowledged, resetting retransmission timer to: %"
 				B_PRIdBIGTIME, fRetransmitTimeout);
 			gStackModule->set_timer(&fRetransmitTimer, fRetransmitTimeout);
+			T(TimerSet(this, "retransmit", fRetransmitTimeout));
 		}
 
 		if (is_writable(fState)) {
@@ -2235,7 +2271,7 @@ TCPEndpoint::_ResetSlowStart()
 TCPEndpoint::_RetransmitTimer(net_timer* timer, void* _endpoint)
 {
 	TCPEndpoint* endpoint = (TCPEndpoint*)_endpoint;
-	T(Timer(endpoint, "retransmit"));
+	T(TimerTriggered(endpoint, "retransmit"));
 
 	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
@@ -2249,7 +2285,7 @@ TCPEndpoint::_RetransmitTimer(net_timer* timer, void* _endpoint)
 TCPEndpoint::_PersistTimer(net_timer* timer, void* _endpoint)
 {
 	TCPEndpoint* endpoint = (TCPEndpoint*)_endpoint;
-	T(Timer(endpoint, "persist"));
+	T(TimerTriggered(endpoint, "persist"));
 
 	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
@@ -2267,7 +2303,7 @@ TCPEndpoint::_PersistTimer(net_timer* timer, void* _endpoint)
 TCPEndpoint::_DelayedAcknowledgeTimer(net_timer* timer, void* _endpoint)
 {
 	TCPEndpoint* endpoint = (TCPEndpoint*)_endpoint;
-	T(Timer(endpoint, "delayed ack"));
+	T(TimerTriggered(endpoint, "delayed ack"));
 
 	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
@@ -2285,7 +2321,7 @@ TCPEndpoint::_DelayedAcknowledgeTimer(net_timer* timer, void* _endpoint)
 TCPEndpoint::_TimeWaitTimer(net_timer* timer, void* _endpoint)
 {
 	TCPEndpoint* endpoint = (TCPEndpoint*)_endpoint;
-	T(Timer(endpoint, "time-wait"));
+	T(TimerTriggered(endpoint, "time-wait"));
 
 	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
