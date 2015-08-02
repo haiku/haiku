@@ -274,6 +274,29 @@ protected:
 	tcp_state		fState;
 };
 
+class APICall : public AbstractTraceEntry {
+public:
+	APICall(TCPEndpoint* endpoint, const char* which)
+		:
+		fEndpoint(endpoint),
+		fWhich(which),
+		fState(endpoint->State())
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("tcp:%p (%12s) api call: %s", fEndpoint,
+			name_for_state(fState), fWhich);
+	}
+
+protected:
+	TCPEndpoint*	fEndpoint;
+	const char*		fWhich;
+	tcp_state		fState;
+};
+
 }	// namespace TCPTracing
 
 #	define T(x)	new(std::nothrow) TCPTracing::x
@@ -434,12 +457,16 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 		TCPEndpoint::_DelayedAcknowledgeTimer, this);
 	gStackModule->init_timer(&fTimeWaitTimer, TCPEndpoint::_TimeWaitTimer,
 		this);
+
+	T(APICall(this, "constructor"));
 }
 
 
 TCPEndpoint::~TCPEndpoint()
 {
 	mutex_lock(&fLock);
+
+	T(APICall(this, "destructor"));
 
 	_CancelConnectionTimers();
 	gStackModule->cancel_timer(&fTimeWaitTimer);
@@ -476,6 +503,7 @@ status_t
 TCPEndpoint::Open()
 {
 	TRACE("Open()");
+	T(APICall(this, "open"));
 
 	status_t status = ProtocolSocket::Open();
 	if (status < B_OK)
@@ -492,9 +520,10 @@ TCPEndpoint::Open()
 status_t
 TCPEndpoint::Close()
 {
-	TRACE("Close()");
-
 	MutexLocker locker(fLock);
+
+	TRACE("Close()");
+	T(APICall(this, "close"));
 
 	if (fState == LISTEN)
 		delete_sem(fAcceptSemaphore);
@@ -533,9 +562,10 @@ TCPEndpoint::Close()
 void
 TCPEndpoint::Free()
 {
-	TRACE("Free()");
-
 	MutexLocker _(fLock);
+
+	TRACE("Free()");
+	T(APICall(this, "free"));
 
 	if (fState <= SYNCHRONIZE_SENT)
 		return;
@@ -557,12 +587,13 @@ TCPEndpoint::Free()
 status_t
 TCPEndpoint::Connect(const sockaddr* address)
 {
-	TRACE("Connect() on address %s", PrintAddress(address));
-
 	if (!AddressModule()->is_same_family(address))
 		return EAFNOSUPPORT;
 
 	MutexLocker locker(fLock);
+
+	TRACE("Connect() on address %s", PrintAddress(address));
+	T(APICall(this, "connect"));
 
 	if (gStackModule->is_restarted_syscall()) {
 		bigtime_t timeout = gStackModule->restore_syscall_restart_timeout();
@@ -635,9 +666,10 @@ TCPEndpoint::Connect(const sockaddr* address)
 status_t
 TCPEndpoint::Accept(struct net_socket** _acceptedSocket)
 {
-	TRACE("Accept()");
-
 	MutexLocker locker(fLock);
+
+	TRACE("Accept()");
+	T(APICall(this, "accept"));
 
 	status_t status;
 	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
@@ -679,6 +711,7 @@ TCPEndpoint::Bind(const sockaddr *address)
 	MutexLocker lock(fLock);
 
 	TRACE("Bind() on address %s", PrintAddress(address));
+	T(APICall(this, "bind"));
 
 	if (fState != CLOSED)
 		return EISCONN;
@@ -690,9 +723,11 @@ TCPEndpoint::Bind(const sockaddr *address)
 status_t
 TCPEndpoint::Unbind(struct sockaddr *address)
 {
-	TRACE("Unbind()");
-
 	MutexLocker _(fLock);
+
+	TRACE("Unbind()");
+	T(APICall(this, "unbind"));
+
 	return fManager->Unbind(this);
 }
 
@@ -700,9 +735,10 @@ TCPEndpoint::Unbind(struct sockaddr *address)
 status_t
 TCPEndpoint::Listen(int count)
 {
-	TRACE("Listen()");
-
 	MutexLocker _(fLock);
+
+	TRACE("Listen()");
+	T(APICall(this, "listen"));
 
 	if (fState != CLOSED && fState != LISTEN)
 		return B_BAD_VALUE;
@@ -731,9 +767,10 @@ TCPEndpoint::Listen(int count)
 status_t
 TCPEndpoint::Shutdown(int direction)
 {
-	TRACE("Shutdown(%i)", direction);
-
 	MutexLocker lock(fLock);
+
+	TRACE("Shutdown(%i)", direction);
+	T(APICall(this, "shutdown"));
 
 	if (direction == SHUT_RD || direction == SHUT_RDWR)
 		fFlags |= FLAG_NO_RECEIVE;
@@ -757,6 +794,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 	TRACE("SendData(buffer %p, size %" B_PRIu32 ", flags %#" B_PRIx32
 		") [total %" B_PRIuSIZE " bytes, has %" B_PRIuSIZE "]", buffer,
 		buffer->size, buffer->flags, fSendQueue.Size(), fSendQueue.Free());
+	T(APICall(this, "senddata"));
 
 	uint32 flags = buffer->flags;
 
@@ -856,6 +894,7 @@ TCPEndpoint::SendAvailable()
 		available = EPIPE;
 
 	TRACE("SendAvailable(): %" B_PRIdSSIZE, available);
+	T(APICall(this, "sendavailable"));
 	return available;
 }
 
@@ -876,10 +915,11 @@ TCPEndpoint::FillStat(net_stat *stat)
 status_t
 TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
+	MutexLocker locker(fLock);
+
 	TRACE("ReadData(%" B_PRIuSIZE " bytes, flags %#" B_PRIx32 ")", numBytes,
 		flags);
-
-	MutexLocker locker(fLock);
+	T(APICall(this, "readdata"));
 
 	*_buffer = NULL;
 
@@ -975,6 +1015,7 @@ TCPEndpoint::ReadAvailable()
 	MutexLocker locker(fLock);
 
 	TRACE("ReadAvailable(): %" B_PRIdSSIZE, _AvailableData());
+	T(APICall(this, "readavailable"));
 
 	return _AvailableData();
 }
