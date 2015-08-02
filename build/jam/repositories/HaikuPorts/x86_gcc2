@@ -77,7 +77,7 @@ RemotePackageRepository HaikuPorts
 	criticalmass-2.2-1
 	ctags-5.8-3
 	colors-2.3-1
-	coreutils-8.23-1
+	coreutils-8.24-1
 	curl-7.42.1-1
 	curl_devel-7.42.1-1
 	cvs-1.12.13.1-6
@@ -842,8 +842,8 @@ RemotePackageRepository HaikuPorts
 	vacuum_x86-1.2.5-1
 	vcmi_x86-0.94-1
 	wizznic_x86-0.9.9-2
-	xz_utils_x86-5.0.5-3
-	xz_utils_x86_devel-5.0.5-3
+	xz_utils_x86-5.0.8-2
+	xz_utils_x86_devel-5.0.8-2
 	zlib_x86-1.2.8-4
 	zlib_x86_devel-1.2.8-4
 	:

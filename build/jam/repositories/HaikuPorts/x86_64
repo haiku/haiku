@@ -60,7 +60,7 @@ RemotePackageRepository HaikuPorts
 	clang_analysis-3.5.1-1
 	clipdinger-0.4-1
 	cmake-3.2.3-1
-	coreutils-8.23-1
+	coreutils-8.24-1
 	cppunit-1.12.1-2
 	cppunit_devel-1.12.1-2
 	ctags-5.8-3
@@ -316,8 +316,8 @@ RemotePackageRepository HaikuPorts
 	xml_parser-2.36-1
 	x264-20140308-1
 	x264_devel-20140308-1
-	xz_utils-5.0.6-1
-	xz_utils_devel-5.0.6-1
+	xz_utils-5.0.8-2
+	xz_utils_devel-5.0.8-2
 	yasm-1.2.0-3
 	zip-3.0-2
 	zlib-1.2.8-4

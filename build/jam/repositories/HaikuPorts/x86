@@ -38,7 +38,7 @@ RemotePackageRepository HaikuPorts
 	clang_analysis-3.4-3
 	clipdinger-0.4-1
 	cmake-3.0.0_rc3-1
-	coreutils-8.23-1
+	coreutils-8.24-1
 	cpio-2.10-1
 	ctags-5.8-3
 	curl-7.42.1-1
@@ -234,8 +234,8 @@ RemotePackageRepository HaikuPorts
 	which-2.21-1
 	wpa_supplicant-2.0-3
 	xml_parser-2.36-1
-	xz_utils-5.0.8-1
-	xz_utils_devel-5.0.8-1
+	xz_utils-5.0.8-2
+	xz_utils_devel-5.0.8-2
 	yasm-1.2.0-3
 	zip-3.0-2
 	zlib-1.2.8-4
