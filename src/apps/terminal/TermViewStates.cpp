@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku, Inc.
+ * Copyright 2001-2015, Haiku, Inc.
  * Copyright 2003-2004 Kian Duffy, myob@users.sourceforge.net
  * Parts Copyright 1998-1999 Kazuho Okui and Takashi Murai.
  * All rights reserved. Distributed under the terms of the MIT license.
@@ -23,8 +23,10 @@
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <Cursor.h>
+#include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <MessageRunner.h>
+#include <Path.h>
 #include <PopUpMenu.h>
 #include <ScrollBar.h>
 #include <UTF8.h>
@@ -896,7 +898,8 @@ TermView::HyperLinkState::_GetHyperLinkAt(BPoint where, bool pathPrefixOnly,
 				path.Truncate(colonIndex);
 				if (_EntryExists(path, actualPath)) {
 					BString address = path == actualPath
-						? text : BString(fCurrentDirectory)  << '/' << text;
+						? text
+						: BString(actualPath) << (text.String() + colonIndex);
 					_link = HyperLink(text, address,
 						i == 0
 							? HyperLink::TYPE_PATH_WITH_LINE
@@ -920,6 +923,14 @@ TermView::HyperLinkState::_EntryExists(const BString& path,
 
 	if (path[0] == '/' || fCurrentDirectory.IsEmpty()) {
 		_actualPath = path;
+	} else if (path == "~" || path.StartsWith("~/")) {
+		// Replace '~' with the user's home directory. We don't handle "~user"
+		// here yet.
+		BPath homeDirectory;
+		if (find_directory(B_USER_DIRECTORY, &homeDirectory) != B_OK)
+			return false;
+		_actualPath = homeDirectory.Path();
+		_actualPath << path.String() + 1;
 	} else {
 		_actualPath.Truncate(0);
 		_actualPath << fCurrentDirectory << '/' << path;
