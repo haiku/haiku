@@ -33,6 +33,7 @@ class BStringView;
 class BTabView;
 class ConsoleOutputView;
 class BreakpointEditWindow;
+class ExpressionEvaluationWindow;
 class ExpressionPromptWindow;
 class Image;
 class InspectorWindow;
@@ -240,6 +241,7 @@ private:
 			TeamSettingsWindow*	fTeamSettingsWindow;
 			BreakpointEditWindow* fBreakpointEditWindow;
 			InspectorWindow*	fInspectorWindow;
+			ExpressionEvaluationWindow* fExpressionEvalWindow;
 			ExpressionPromptWindow* fExpressionPromptWindow;
 			GuiTeamUiSettings	fUiSettings;
 			BFilePanel*			fFilePanel;

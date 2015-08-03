@@ -13,16 +13,15 @@
 
 
 ExpressionPromptWindow::ExpressionPromptWindow(BHandler* addTarget,
-	BHandler* closeTarget, bool isPersistent)
+	BHandler* closeTarget)
 	:
-	BWindow(BRect(), isPersistent ? "Add Expression" : "Evaluate Expression",
-		B_FLOATING_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
+	BWindow(BRect(), "Add Expression", B_FLOATING_WINDOW,
+		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	fExpressionInput(NULL),
 	fCancelButton(NULL),
 	fAddButton(NULL),
 	fAddTarget(addTarget),
-	fCloseTarget(closeTarget),
-	fPersistentExpression(isPersistent)
+	fCloseTarget(closeTarget)
 {
 }
 
@@ -33,11 +32,10 @@ ExpressionPromptWindow::~ExpressionPromptWindow()
 
 
 ExpressionPromptWindow*
-ExpressionPromptWindow::Create(BHandler* addTarget, BHandler* closeTarget,
-	bool isPersistent)
+ExpressionPromptWindow::Create(BHandler* addTarget, BHandler* closeTarget)
 {
 	ExpressionPromptWindow* self = new ExpressionPromptWindow(addTarget,
-		closeTarget, isPersistent);
+		closeTarget);
 
 	try {
 		self->_Init();
@@ -54,8 +52,7 @@ ExpressionPromptWindow::Create(BHandler* addTarget, BHandler* closeTarget,
 void
 ExpressionPromptWindow::_Init()
 {
-	fExpressionInput = new BTextControl("Expression:", NULL,
-		new BMessage(MSG_EVALUATE_EXPRESSION));
+	fExpressionInput = new BTextControl("Expression:", NULL, NULL);
 	BLayoutItem* labelItem = fExpressionInput->CreateLabelLayoutItem();
 	BLayoutItem* inputItem = fExpressionInput->CreateTextViewLayoutItem();
 	inputItem->SetExplicitMinSize(BSize(200.0, B_SIZE_UNSET));
@@ -108,12 +105,11 @@ ExpressionPromptWindow::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_ADD_NEW_EXPRESSION:
 		{
-			BMessage addMessage(MSG_EXPRESSION_PROMPT_WINDOW_CLOSED);
+			BMessage addMessage(MSG_ADD_NEW_EXPRESSION);
 			addMessage.AddString("expression", fExpressionInput->Text());
-			addMessage.AddBool("persistent", fPersistentExpression);
-			addMessage.AddMessenger("target", BMessenger(fAddTarget));
+			addMessage.AddBool("persistent", true);
 
-			BMessenger(fCloseTarget).SendMessage(&addMessage);
+			BMessenger(fAddTarget).SendMessage(&addMessage);
 			Quit();
 			break;
 		}

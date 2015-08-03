@@ -40,6 +40,7 @@
 #include "CpuState.h"
 #include "DisassembledCode.h"
 #include "BreakpointEditWindow.h"
+#include "ExpressionEvaluationWindow.h"
 #include "ExpressionPromptWindow.h"
 #include "FileSourceCode.h"
 #include "GuiSettingsUtils.h"
@@ -145,6 +146,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fTeamSettingsWindow(NULL),
 	fBreakpointEditWindow(NULL),
 	fInspectorWindow(NULL),
+	fExpressionEvalWindow(NULL),
 	fExpressionPromptWindow(NULL),
 	fFilePanel(NULL),
 	fActiveSourceWorker(-1)
@@ -166,6 +168,10 @@ TeamWindow::~TeamWindow()
 	if (fInspectorWindow != NULL) {
 		if (fInspectorWindow->Lock())
 			fInspectorWindow->Quit();
+	}
+	if (fExpressionEvalWindow != NULL) {
+		if (fExpressionEvalWindow->Lock())
+			fExpressionEvalWindow->Quit();
 	}
 	if (fExpressionPromptWindow != NULL) {
 		if (fExpressionPromptWindow->Lock())
@@ -345,55 +351,49 @@ TeamWindow::MessageReceived(BMessage* message)
 
 		}
 		case MSG_SHOW_EXPRESSION_WINDOW:
+		{
+			if (fExpressionEvalWindow != NULL) {
+				AutoLocker<BWindow> lock(fExpressionEvalWindow);
+				if (lock.IsLocked())
+					fExpressionEvalWindow->Activate(true);
+			} else {
+				try {
+					fExpressionEvalWindow = ExpressionEvaluationWindow::Create(
+						this, fTeam, fListener);
+					if (fExpressionEvalWindow != NULL)
+						fExpressionEvalWindow->Show();
+				} catch (...) {
+					// TODO: notify user
+				}
+			}
+			break;
+		}
+		case MSG_EXPRESSION_WINDOW_CLOSED:
+		{
+			fExpressionEvalWindow = NULL;
+			break;
+		}
 		case MSG_SHOW_EXPRESSION_PROMPT_WINDOW:
 		{
-			BHandler* addTarget;
-			if (message->what == MSG_SHOW_EXPRESSION_WINDOW)
-				addTarget = fVariablesView;
-			else if (message->FindPointer("target",
-				reinterpret_cast<void**>(&addTarget)) != B_OK) {
-				break;
-			}
-
 			if (fExpressionPromptWindow != NULL) {
 				AutoLocker<BWindow> lock(fExpressionPromptWindow);
 				if (lock.IsLocked())
 					fExpressionPromptWindow->Activate(true);
 			} else {
 				try {
-					// if the request was initiated via the evaluate
-					// expression top level menu item, then this evaluation
-					// should not be persisted.
-					bool persistentExpression =
-						message->what == MSG_SHOW_EXPRESSION_PROMPT_WINDOW;
 					fExpressionPromptWindow = ExpressionPromptWindow::Create(
-						addTarget, this, persistentExpression);
+						fVariablesView, this);
 					if (fExpressionPromptWindow != NULL)
 						fExpressionPromptWindow->Show();
-	           	} catch (...) {
-	           		// TODO: notify user
-	           	}
+				} catch (...) {
+					// TODO: notify user
+				}
 			}
 			break;
 		}
-		case MSG_EXPRESSION_WINDOW_CLOSED:
 		case MSG_EXPRESSION_PROMPT_WINDOW_CLOSED:
 		{
 			fExpressionPromptWindow = NULL;
-
-			const char* expression;
-			BMessenger targetMessenger;
-			if (message->FindString("expression", &expression) == B_OK
-				&& message->FindMessenger("target", &targetMessenger)
-					== B_OK) {
-
-				BMessage addMessage(MSG_ADD_NEW_EXPRESSION);
-				addMessage.AddString("expression", expression);
-				addMessage.AddBool("persistent", message->FindBool(
-					"persistent"));
-
-				targetMessenger.SendMessage(&addMessage);
-			}
 			break;
 		}
 		case MSG_SHOW_TEAM_SETTINGS_WINDOW:
