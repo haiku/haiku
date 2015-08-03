@@ -47,6 +47,7 @@ DrawState::DrawState()
 	fDrawingMode(B_OP_COPY),
 	fAlphaSrcMode(B_PIXEL_ALPHA),
 	fAlphaFncMode(B_ALPHA_OVERLAY),
+	fDrawingModeLocked(false),
 
 	fPenLocation(0.0f, 0.0f),
 	fPenSize(1.0f),
@@ -81,6 +82,7 @@ DrawState::DrawState(const DrawState& other)
 	fDrawingMode(other.fDrawingMode),
 	fAlphaSrcMode(other.fAlphaSrcMode),
 	fAlphaFncMode(other.fAlphaFncMode),
+	fDrawingModeLocked(other.fDrawingModeLocked),
 
 	fPenLocation(other.fPenLocation),
 	fPenSize(other.fPenSize),
@@ -527,16 +529,27 @@ DrawState::SetPattern(const Pattern& pattern)
 void
 DrawState::SetDrawingMode(drawing_mode mode)
 {
-	fDrawingMode = mode;
+	if (!fDrawingModeLocked)
+		fDrawingMode = mode;
 }
 
 
 void
 DrawState::SetBlendingMode(source_alpha srcMode, alpha_function fncMode)
 {
-	fAlphaSrcMode = srcMode;
-	fAlphaFncMode = fncMode;
+	if (!fDrawingModeLocked) {
+		fAlphaSrcMode = srcMode;
+		fAlphaFncMode = fncMode;
+	}
 }
+
+
+void
+DrawState::SetDrawingModeLocked(bool locked)
+{
+	fDrawingModeLocked = locked;
+}
+
 
 
 void

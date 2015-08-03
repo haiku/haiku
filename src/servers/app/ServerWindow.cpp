@@ -2197,6 +2197,13 @@ fDesktop->LockSingleWindow();
 			Layer* layer = new(std::nothrow) Layer(opacity);
 			if (layer == NULL)
 				break;
+
+			if (opacity != 255) {
+				fCurrentView->CurrentState()->SetDrawingMode(B_OP_ALPHA);
+				fCurrentView->CurrentState()->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+				fCurrentView->CurrentState()->SetDrawingModeLocked(true);
+			}
+
 			fCurrentView->SetPicture(layer);
 			break;
 		}
@@ -2945,6 +2952,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 				Title()));
 			fCurrentView->BlendAllLayers();
 			fCurrentView->SetPicture(NULL);
+			fCurrentView->CurrentState()->SetDrawingModeLocked(false);
 			break;
 		}
 
@@ -3008,11 +3016,6 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			int8 drawingMode;
 			link.Read<int8>(&drawingMode);
-
-			if (dynamic_cast<Layer*>(picture) != NULL) {
-				// drawing mode changes not allowed in layers
-				break;
-			}
 
 			picture->WriteSetDrawingMode((drawing_mode)drawingMode);
 
@@ -3460,6 +3463,12 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			Layer* nextLayer = new(std::nothrow) Layer(opacity);
 			if (nextLayer == NULL)
 				break;
+
+			if (opacity != 255) {
+				fCurrentView->CurrentState()->SetDrawingMode(B_OP_ALPHA);
+				fCurrentView->CurrentState()->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+				fCurrentView->CurrentState()->SetDrawingModeLocked(true);
+			}
 
 			nextLayer->PushLayer(layer);
 			fCurrentView->SetPicture(nextLayer);

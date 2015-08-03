@@ -111,6 +111,8 @@ public:
 		alpha_function		AlphaFncMode() const
 								{ return fAlphaFncMode; }
 
+		void				SetDrawingModeLocked(bool locked);
+
 							// pen
 		void				SetPenLocation(BPoint location);
 		BPoint				PenLocation() const;
@@ -173,6 +175,7 @@ protected:
 		drawing_mode		fDrawingMode;
 		source_alpha		fAlphaSrcMode;
 		alpha_function		fAlphaFncMode;
+		bool				fDrawingModeLocked;
 
 		BPoint				fPenLocation;
 		float				fPenSize;
