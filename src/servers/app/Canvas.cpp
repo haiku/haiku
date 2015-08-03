@@ -223,6 +223,15 @@ Canvas::ScreenToPenTransform() const GCC_2_NRV(transform)
 void
 Canvas::BlendLayer(Layer* layer)
 {
+	if (layer->Opacity() == 255) {
+		layer->Play(this);
+		layer->ReleaseReference();
+		return;
+	} else if (layer->Opacity() == 0) {
+		layer->ReleaseReference();
+		return;
+	}
+
 	UtilityBitmap* layerBitmap = layer->RenderToBitmap(this);
 	if (layerBitmap == NULL)
 		return;
