@@ -501,7 +501,7 @@ BAlert::_Init(const char* text, const char* button0, const char* button1,
 	fTextView->SetWordWrap(true);
 	fTextView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
-	fButtonLayout = new BGroupLayout(B_HORIZONTAL);
+	fButtonLayout = new BGroupLayout(B_HORIZONTAL, B_USE_HALF_ITEM_SPACING);
 
 	SetType(type);
 	SetButtonWidth(buttonWidth);
@@ -510,8 +510,8 @@ BAlert::_Init(const char* text, const char* button0, const char* button1,
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
 		.Add(fIconView)
-		.AddGroup(B_VERTICAL)
-			.SetInsets(B_USE_DEFAULT_SPACING)
+		.AddGroup(B_VERTICAL, B_USE_HALF_ITEM_SPACING)
+			.SetInsets(B_USE_HALF_ITEM_INSETS)
 			.Add(fTextView)
 			.AddGroup(B_HORIZONTAL, 0)
 				.AddGlue()
