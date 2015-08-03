@@ -1965,7 +1965,7 @@ VariablesView::MessageReceived(BMessage* message)
 		{
 			ModelNode* node = NULL;
 			if (message->FindPointer("node", reinterpret_cast<void **>(&node))
-				!= B_OK) {
+					!= B_OK) {
 				break;
 			}
 
@@ -1987,9 +1987,8 @@ VariablesView::MessageReceived(BMessage* message)
 				fPendingTypecastInfo->AddListener(this);
 				fListener->ExpressionEvaluationRequested(fPendingTypecastInfo,
 					fStackFrame, fThread);
-				break;
-			} else
-				break;
+			}
+			break;
 		}
 		case MSG_TYPECAST_TO_ARRAY:
 		{
