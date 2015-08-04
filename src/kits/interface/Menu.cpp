@@ -1833,10 +1833,12 @@ BMenu::_UpdateNavigationArea(BPoint position, BRect& navAreaRectAbove,
 	if (submenu != NULL) {
 		BRect menuBounds = ConvertToScreen(Bounds());
 
-		fSelected->Submenu()->LockLooper();
-		BRect submenuBounds = fSelected->Submenu()->ConvertToScreen(
-			fSelected->Submenu()->Bounds());
-		fSelected->Submenu()->UnlockLooper();
+		BRect submenuBounds;
+		if (fSelected->Submenu()->LockLooper()) {
+			submenuBounds = fSelected->Submenu()->ConvertToScreen(
+				fSelected->Submenu()->Bounds());
+			fSelected->Submenu()->UnlockLooper();
+		}
 
 		if (menuBounds.left < submenuBounds.left) {
 			navAreaRectAbove.Set(position.x + NAV_AREA_THRESHOLD,
@@ -1889,10 +1891,12 @@ BMenu::_UpdateStateOpenSelect(BMenuItem* item, BPoint position,
 
 		BRect menuBounds = ConvertToScreen(Bounds());
 
-		fSelected->Submenu()->LockLooper();
-		BRect submenuBounds = fSelected->Submenu()->ConvertToScreen(
-			fSelected->Submenu()->Bounds());
-		fSelected->Submenu()->UnlockLooper();
+		BRect submenuBounds;
+		if (fSelected->Submenu()->LockLooper()) {
+			fSelected->Submenu()->ConvertToScreen(
+				fSelected->Submenu()->Bounds());
+			fSelected->Submenu()->UnlockLooper();
+		}
 
 		float xOffset;
 
@@ -1963,8 +1967,7 @@ BMenu::_UpdateStateClose(BMenuItem* item, const BPoint& where,
 
 	if (buttons != 0 && _IsStickyMode()) {
 		if (item == NULL) {
-			if (item != fSelected) {
-				LockLooper();
+			if (item != fSelected && LockLooper()) {
 				_SelectItem(item, false);
 				UnlockLooper();
 			}
@@ -1978,8 +1981,7 @@ BMenu::_UpdateStateClose(BMenuItem* item, const BPoint& where,
 				// Setting this to NULL will prevent this code
 				// to be executed next time
 		} else {
-			if (item != fSelected) {
-				LockLooper();
+			if (item != fSelected && LockLooper()) {
 				_SelectItem(item, false);
 				UnlockLooper();
 			}
