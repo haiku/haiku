@@ -214,8 +214,8 @@ BMediaEventLooper::ControlLoop()
 	CALLED();
 
 	status_t err;
-	bigtime_t waitUntil = 0;
-	bigtime_t lateness = 0;
+	bigtime_t waitUntil = B_INFINITE_TIMEOUT;
+	bigtime_t tempLateness = 0;
 	bool hasRealtime = false;
 	bool hasEvent = false;
 
@@ -228,11 +228,28 @@ BMediaEventLooper::ControlLoop()
 		if (RunState() == B_QUITTING)
 			return;
 
+		err = WaitForMessage(waitUntil);
+		if (err == B_TIMED_OUT) {
+			media_timed_event event;
+			if (hasEvent)
+				err = fEventQueue.RemoveFirstEvent(&event);
+			else
+				err = fRealTimeQueue.RemoveFirstEvent(&event);
+
+			if (err == B_OK) {
+				tempLateness -= TimeSource()->RealTime();
+				if (tempLateness < 0)
+					tempLateness = 0;
+
+				DispatchEvent(&event, tempLateness, hasRealtime);
+			}
+		} else if (err != B_OK)
+			return;
+
 		// BMediaEventLooper compensates your performance time by adding
 		// the event latency (see SetEventLatency()) and the scheduling
 		// latency (or, for real-time events, only the scheduling latency).
 
-		waitUntil = B_INFINITE_TIMEOUT;
 		hasRealtime = fRealTimeQueue.HasEvents();
 		hasEvent = fEventQueue.HasEvents();
 
@@ -240,9 +257,10 @@ BMediaEventLooper::ControlLoop()
 			waitUntil = TimeSource()->RealTimeFor(
 				fEventQueue.FirstEvent()->event_time,
 				fEventLatency + fSchedulingLatency);
-			lateness = waitUntil;
-		} else if (!hasEvent && !hasRealtime)
-			goto ahead;
+		} else if (!hasRealtime) {
+			waitUntil = B_INFINITE_TIMEOUT;
+			continue;
+		}
 
 		if (hasEvent && hasRealtime) {
 			if (fRealTimeQueue.FirstEventTime()
@@ -255,29 +273,11 @@ BMediaEventLooper::ControlLoop()
 		if (hasRealtime) {
 			waitUntil = fRealTimeQueue.FirstEventTime()
 				- fSchedulingLatency;
-			lateness = waitUntil;
 		}
 
-		if (waitUntil <= TimeSource()->RealTime())
+		tempLateness = waitUntil;
+		if (waitUntil < TimeSource()->RealTime())
 			waitUntil = 0;
-
-ahead:
-		err = WaitForMessage(waitUntil);
-		if (err == B_TIMED_OUT) {
-			media_timed_event event;
-			if (hasEvent)
-				err = fEventQueue.RemoveFirstEvent(&event);
-			else
-				err = fRealTimeQueue.RemoveFirstEvent(&event);
-
-			if (err == B_OK) {
-				lateness -= TimeSource()->RealTime();
-				if (lateness < 0)
-					lateness = 0;
-				DispatchEvent(&event, lateness, hasRealtime);
-			}
-		} else if (err != B_OK)
-			return;
 	}
 }
 
