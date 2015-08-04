@@ -362,6 +362,7 @@ BCommandPipe::operator<<(const BCommandPipe& arg)
 	for (int32 i = 0; i < argc; i++)
 		AddArg(argv[i]);
 
+	free(argv);
 	return *this;
 }
 
