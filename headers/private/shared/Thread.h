@@ -365,11 +365,6 @@ MouseDownThread<View>::MouseDownThread(View* view,
 template<class View>
 MouseDownThread<View>::~MouseDownThread()
 {
-	if (fThreadID > 0) {
-		kill_thread(fThreadID);
-		// dead at this point
-		TRESPASS();
-	}
 }
 
 
@@ -393,7 +388,6 @@ MouseDownThread<View>::TrackBinder(void* castToThis)
 	MouseDownThread* self = static_cast<MouseDownThread*>(castToThis);
 	self->Track();
 	// dead at this point
-	TRESPASS();
 	return B_OK;
 }
 
@@ -427,8 +421,8 @@ MouseDownThread<View>::Track()
 	}
 
 	delete this;
-	ASSERT(!"should not be here");
 }
+
 
 } // namespace BPrivate
 
