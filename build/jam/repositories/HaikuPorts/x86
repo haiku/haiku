@@ -130,8 +130,8 @@ RemotePackageRepository HaikuPorts
 	libpcre_devel-8.21-5
 	libpng-1.5.22-1
 	libpng_devel-1.5.22-1
-	libpng16-1.6.17-1
-	libpng16_devel-1.6.17-1
+	libpng16-1.6.18-1
+	libpng16_devel-1.6.18-1
 	libsanta-3.0.1-1
 	libsanta_devel-3.0.1-1
 	libsdl-1.2.15-6
@@ -144,8 +144,8 @@ RemotePackageRepository HaikuPorts
 	libtheora_devel-1.1.1-2
 	libtool-2.4.2-1
 	libtool_libltdl-2.4.2-1
-	libunistring-0.9.5-1
-	libunistring_devel-0.9.5-1
+	libunistring-0.9.6-1
+	libunistring_devel-0.9.6-1
 	libvorbis-1.3.5-1
 	libvorbis_devel-1.3.5-1
 	libvpx-1.0.0-2
@@ -175,9 +175,9 @@ RemotePackageRepository HaikuPorts
 	mpc_devel-1.0.3-1
 	mpfr-3.1.3-1
 	mpfr_devel-3.1.3-1
-	mpg123-1.22.0-1
-	mpg123_devel-1.22.0-1
-	nano-2.4.0-1
+	mpg123-1.22.3-1
+	mpg123_devel-1.22.3-1
+	nano-2.4.2-1
 	nasm-2.11.08-1
 	ncurses-5.9-10
 	ncurses_devel-5.9-10
@@ -284,8 +284,8 @@ RemotePackageRepository HaikuPorts
 	libogg_x86_gcc2_devel-1.3.0-2
 	libpng_x86_gcc2-1.5.22-1
 	libpng_x86_gcc2_devel-1.5.22-1
-	libpng16_x86_gcc2-1.6.17-1
-	libpng16_x86_gcc2_devel-1.6.17-1
+	libpng16_x86_gcc2-1.6.18-1
+	libpng16_x86_gcc2_devel-1.6.18-1
 	libsolv_x86_gcc2-0.3.0_haiku_2014_12_22-1
 	libsolv_x86_gcc2_devel-0.3.0_haiku_2014_12_22-1
 	libtheora_x86_gcc2-1.1.1-2
