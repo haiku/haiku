@@ -317,8 +317,8 @@ RemotePackageRepository HaikuPorts
 	lua-5.2.1-6
 	lua_devel-5.2.1-6
 	lynx-2.8.9dev.1-1
-	lz4-r117-1
-	lz4_devel-r117-1
+	lz4-r131-1
+	lz4_devel-r131-1
 	lzo-2.09-1
 	lzo_devel-2.09-1
 	m4-1.4.16-5

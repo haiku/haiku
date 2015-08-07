@@ -231,8 +231,8 @@ RemotePackageRepository HaikuPorts
 	llvm-3.5.2-1
 	lua-5.2.3-2
 	lua_devel-5.2.3-2
-	lz4-r130-1
-	lz4_devel-r130-1
+	lz4-r131-1
+	lz4_devel-r131-1
 	lzo-2.09-1
 	lzo_devel-2.09-1
 	m4-1.4.16-5
