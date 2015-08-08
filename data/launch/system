@@ -29,6 +29,7 @@ service x-vnd.Haiku-mount_server {
 }
 
 service x-vnd.Haiku-media_server {
+	requires x-vnd.Haiku-mount_server
 	launch /system/servers/media_server
 	no_safemode
 	legacy
