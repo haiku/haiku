@@ -1,0 +1,7 @@
+1	spanish; castilian	x-vnd.Haiku-DNSClientService	160307182
+DNS settings	DNSClientServiceAddOn		Configuración de DNS
+Move down	DNSSettingsView		Mover abajo
+DNS settings	DNSSettingsView		Configuración de DNS
+Remove	DNSSettingsView		Quitar
+Domain:	DNSSettingsView		Dominio:
+Add	DNSSettingsView		Agregar

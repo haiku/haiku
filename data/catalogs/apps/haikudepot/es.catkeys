@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	133580983
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3640331610
 Name	PackageListView		Nombre
 Available packages	MainWindow		Paquetes disponibles
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
@@ -82,6 +82,7 @@ Create account	UserLoginWindow		Crear cuenta
 Productivity	Model		Productividad
 No, quit HaikuDepot	App		No, salir de HaikuDepot
 Authentication failed	UserLoginWindow		Falló la autenticación
+Logged in as %User%	MainWindow		Sesión iniciada como %User%
 Language	RatePackageWindow		Idioma
 Failed to create or update rating: %s\n	RatePackageWindow		Fallo al crear o actualizar la valoración: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Necesita haber ingresado con una cuenta antes de poder valorar paquetes.
@@ -94,8 +95,14 @@ Games	Model		Juegos
 Rating	PackageListView		Valoraciones
 (%Votes%)	FeaturedPackagesView		(%Votes%)
 There was a puzzling response from the web service.	UserLoginWindow		Hubo una respuesta misteriosa desde el servicio Web.
+Graphics	Model		Gráficos
+Local	MainWindow		Local
 Close	MainWindow		Cerrar
+Preferred language:	UserLoginWindow		Idioma preferido:
+Failed to rate package	RatePackageWindow		Fallo al valorar el paquete
+Internet & Network	Model		Internet y red
 Cancel	MainWindow		Cancelar
+Quit HaikuDepot	App		Salir de HaikuDepot
 Input validation	UserLoginWindow		Validación de entrada
 Update	RatePackageWindow		Actualizar
 Video	Model		Vídeo

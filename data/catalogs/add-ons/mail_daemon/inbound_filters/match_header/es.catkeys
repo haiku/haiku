@@ -1,13 +1,16 @@
-1	spanish; castilian	x-vnd.Haiku-MatchHeader	3677427558
+1	spanish; castilian	x-vnd.Haiku-MatchHeader	3405428083
 <Choose action>	ConfigView		<Elegir acción>
 has	ConfigView		tiene
 Move to	ConfigView		Mover a 
 Then	ConfigView		Luego
 this field is based on the action	ConfigView		este campo está basado en la acción
 Delete message	ConfigView		Borrar mensaje
+value (use REGEX: in front of regular expressions like *spam*)	ConfigView		valor (use REGEX: frente a expresiones regulares como *spam*)
 <Choose account>	ConfigView		<Elegir cuenta>
 Set flags to	ConfigView		Seleccionar banderas a 
 Set as read	ConfigView		Marcar como leído
+Match header	RuleFilter		Cabecera concordante
 Reply with	ConfigView		Responder con
 If	ConfigView		Si
+Match \"%attribute\" against \"%regex\"	RuleFilter		Concordar \"%attribute\" contra \"%regex\"
 header (e.g. Subject)	ConfigView		Cabecera (p. ej. Tema)
