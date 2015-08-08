@@ -143,7 +143,7 @@ BLooper::~BLooper()
 			// msg will automagically post generic reply
 	}
 
-	if (!fOwnsPort) {
+	if (fOwnsPort) {
 		do {
 			delete ReadMessageFromPort(0);
 				// msg will automagically post generic reply
