@@ -3320,13 +3320,13 @@ BMediaRoster::MessageReceived(BMessage* message)
 		{
 			RosterNotification notification;
 			if (message->FindInt32(NOTIFICATION_PARAM_WHAT, &notification.what)
-				!= B_OK) {
+					!= B_OK) {
 				TRACE("BMediaRoster MEDIA_ROSTER_REQUEST_NOTIFICATIONS can't"
 					"find what parameter");
 				return;
 			}
 			if (message->FindMessenger(NOTIFICATION_PARAM_MESSENGER,
-				&notification.messenger) != B_OK) {
+					&notification.messenger) != B_OK) {
 				TRACE("BMediaRoster MEDIA_ROSTER_REQUEST_NOTIFICATIONS can't"
 					"find messenger");
 				return;
@@ -3339,13 +3339,13 @@ BMediaRoster::MessageReceived(BMessage* message)
 		{
 			RosterNotification notification;
 			if (message->FindInt32(NOTIFICATION_PARAM_WHAT, &notification.what)
-				!= B_OK) {
+					!= B_OK) {
 				TRACE("BMediaRoster MEDIA_ROSTER_CANCEL_NOTIFICATIONS can't"
 					"find what parameter");
 				return;
 			}
 			if (message->FindMessenger(NOTIFICATION_PARAM_MESSENGER,
-				&notification.messenger) != B_OK) {
+					&notification.messenger) != B_OK) {
 				TRACE("BMediaRoster MEDIA_ROSTER_CANCEL_NOTIFICATIONS can't"
 					"find messenger");
 				return;
@@ -3355,7 +3355,7 @@ BMediaRoster::MessageReceived(BMessage* message)
 				if (sNotificationList.Get(i, &current) != true)
 					return;
 				if (current->what == notification.what
-					&& current->messenger == notification.messenger) {
+						&& current->messenger == notification.messenger) {
 					sNotificationList.Remove(i);
 					return;
 				}
@@ -3394,7 +3394,7 @@ BMediaRoster::MessageReceived(BMessage* message)
 						return;
 					if (current->what == B_MEDIA_SERVER_STARTED) {
 						if (current->messenger.SendMessage(
-							B_MEDIA_SERVER_STARTED) != B_OK) {
+								B_MEDIA_SERVER_STARTED) != B_OK) {
 							if(!current->messenger.IsValid())
 								sNotificationList.Remove(i);
 						}
@@ -3424,7 +3424,7 @@ BMediaRoster::MessageReceived(BMessage* message)
 						return;
 					if (current->what == B_MEDIA_SERVER_QUIT) {
 						if (current->messenger.SendMessage(
-							B_MEDIA_SERVER_QUIT) != B_OK) {
+								B_MEDIA_SERVER_QUIT) != B_OK) {
 							if(!current->messenger.IsValid())
 								sNotificationList.Remove(i);
 						}
