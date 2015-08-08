@@ -110,7 +110,7 @@ AHCIPort::Init1()
 	// prdt follows after command table
 
 	// disable transitions to partial or slumber state
-	fRegs->sctl |= 0x300;
+	fRegs->sctl.ipm |= TRANSITIONS_TO_PARTIAL_SLUMBER_DISABLED; /*TODO Why "|= and not "=" ??*/
 
 	// clear IRQ status bits
 	fRegs->is = fRegs->is;
@@ -156,7 +156,12 @@ AHCIPort::Init2()
 	TRACE("is   0x%08" B_PRIx32 "\n", fRegs->is);
 	TRACE("cmd  0x%08" B_PRIx32 "\n", fRegs->cmd);
 	TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
-	TRACE("sctl 0x%08" B_PRIx32 "\n", fRegs->sctl);
+	TRACE("sctl.reserved 0x%04" B_PRIx16 "\n", fRegs->sctl.reserved);
+	TRACE("sctl.pmp 0x%02" B_PRIx8 "\n", fRegs->sctl.pmp);
+	TRACE("sctl.spm 0x%02" B_PRIx8 "\n", fRegs->sctl.spm);
+	TRACE("sctl.ipm 0x%02" B_PRIx8 "\n", fRegs->sctl.ipm);
+	TRACE("sctl.spd 0x%02" B_PRIx8 "\n", fRegs->sctl.spd);
+	TRACE("sctl.det 0x%02" B_PRIx8 "\n", fRegs->sctl.det);
 	TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
 	TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
 	TRACE("tfd  0x%08" B_PRIx32 "\n", fRegs->tfd);
@@ -212,10 +217,10 @@ AHCIPort::ResetDevice()
 		TRACE("AHCIPort::ResetDevice PORT_CMD_ST set, behaviour undefined\n");
 
 	// perform a hard reset
-	fRegs->sctl = (fRegs->sctl & ~0xf) | 1;
+	fRegs->sctl.det |= INITIALIZATION; //TODO Why "|=" instead of "=" ?
 	FlushPostedWrites();
 	spin(1100);
-	fRegs->sctl &= ~0xf;
+	fRegs->sctl.det = NO_INITIALIZATION;
 	FlushPostedWrites();
 
 	if (wait_until_set(&fRegs->ssts, 0x1, 100000) < B_OK) {
@@ -364,10 +369,15 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 		TRACE("AHCIPort::InterruptErrorHandler port %d, fCommandsActive 0x%08"
 			B_PRIx32 ", is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n", fIndex,
 			fCommandsActive, is, ci);
-
-		TRACE("ssts 0x%08" B_PRIx32 ", sctl 0x%08" B_PRIx32 ", serr 0x%08"
-			B_PRIx32 ", sact 0x%08" B_PRIx32 "\n",
-			fRegs->ssts, fRegs->sctl, fRegs->serr, fRegs->sact);
+		TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
+		TRACE("sctl.reserved 0x%04" B_PRIx16 "\n", fRegs->sctl.reserved);
+		TRACE("sctl.pmp 0x%02" B_PRIx8 "\n", fRegs->sctl.pmp);
+		TRACE("sctl.spm 0x%02" B_PRIx8 "\n", fRegs->sctl.spm);
+		TRACE("sctl.ipm 0x%02" B_PRIx8 "\n", fRegs->sctl.ipm);
+		TRACE("sctl.spd 0x%02" B_PRIx8 "\n", fRegs->sctl.spd);
+		TRACE("sctl.det 0x%02" B_PRIx8 "\n", fRegs->sctl.det);
+		TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
+		TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
 	}
 
 	// read and clear SError
@@ -413,6 +423,19 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 	}
 	if (is & PORT_INT_PC) {
 		TRACE("Port Connect Change\n");
+		/* spec v1.3, §6.2.2.3 Recovery of Unsolicited COMINIT (a COMINIT that is
+		 * not received as a consequence of issuing a COMRESET to the device) */
+
+		// perform a hard reset
+		fRegs->sctl.det |= INITIALIZATION; //TODO Why "|=" instead of "=" ?
+		FlushPostedWrites();
+		spin(1100); // specification says you must wait 1ms
+		fRegs->sctl.det = NO_INITIALIZATION;
+		FlushPostedWrites();
+
+		// clear error bits to clear PxSERR.DIAG.X
+		fRegs->serr = fRegs->serr;
+		FlushPostedWrites();
 //		fResetPort = true;
 	}
 	if (is & PORT_INT_UF) {

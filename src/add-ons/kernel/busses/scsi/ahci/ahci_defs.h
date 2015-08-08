@@ -76,6 +76,19 @@ enum {
 	INT_DHR			= (1 << 0),		// Device to Host Register FIS Interrupt/Enable
 };
 
+typedef struct {
+	uint16 reserved : 12;
+	uint8 pmp : 4; 		// Port Multiplier Port: Not used by AHCI
+	uint8 spm : 4; 		// Select Power Management: Not used by AHCI
+	uint8 ipm : 4; 		// Interface Power Management Transitions Allowed
+	uint8 spd : 4; 		// Speed Allowed
+	uint8 det : 4; 		// Device Detection Initialization
+} _PACKED scontrol;
+
+#define TRANSITIONS_TO_PARTIAL_SLUMBER_DISABLED 0x300
+#define NO_INITIALIZATION 0
+#define INITIALIZATION 1
+
 
 typedef struct {
 	uint32		clb;			// Command List Base Address (alignment 1024 byte)
@@ -89,7 +102,7 @@ typedef struct {
 	uint32		tfd;			// Task File Data
 	uint32		sig;			// Signature
 	uint32		ssts;			// Serial ATA Status (SCR0: SStatus)
-	uint32		sctl;			// Serial ATA Control (SCR2: SControl)
+	scontrol	sctl;			// Serial ATA Control (SCR2: SControl)
 	uint32		serr;			// Serial ATA Error (SCR1: SError) **RWC**
 	uint32		sact;			// Serial ATA Active (SCR3: SActive) **RW1**
 	uint32		ci;				// Command Issue **RW1**
