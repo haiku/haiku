@@ -405,8 +405,8 @@ WebAppInterface::_GetUserAgentVersionString()
 	}
 
 	BString result;
-	result.SetToFormat("%ld.%ld.%ld", versionInfo.major, versionInfo.middle,
-		versionInfo.minor);
+	result.SetToFormat("%" B_PRId32 ".%" B_PRId32 ".%" B_PRId32,
+		versionInfo.major, versionInfo.middle, versionInfo.minor);
 	return result;
 }
 
