@@ -64,8 +64,8 @@ RemotePackageRepository HaikuPorts
 	cppunit-1.12.1-2
 	cppunit_devel-1.12.1-2
 	ctags-5.8-3
-	curl-7.42.1-1
-	curl_devel-7.42.1-1
+	curl-7.43.0-1
+	curl_devel-7.43.0-1
 	cvs-1.12.13.1-6
 	diffutils-3.3-2
 	dos2unix-7.2.2-1
@@ -260,7 +260,7 @@ RemotePackageRepository HaikuPorts
 	ninja-1.5.1-2
 	nspr-4.10.8-1
 	nspr_devel-4.10.8-1
-	openssh-6.6p1-1
+	openssh-6.9p1-1
 	openssl-1.0.0s-1
 	openssl_devel-1.0.0s-1
 	p7zip-9.20.1-5

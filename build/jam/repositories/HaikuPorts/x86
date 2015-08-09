@@ -41,8 +41,8 @@ RemotePackageRepository HaikuPorts
 	coreutils-8.24-1
 	cpio-2.10-1
 	ctags-5.8-3
-	curl-7.42.1-1
-	curl_devel-7.42.1-1
+	curl-7.43.0-1
+	curl_devel-7.43.0-1
 	cvs-1.12.13.1-6
 	cvsps-2.2b1-1
 	diffutils-3.3-2
@@ -186,7 +186,7 @@ RemotePackageRepository HaikuPorts
 	netcat-1.10-1
 	ninja-1.5.1-2
 	openjdk-1.7_2013_11_08-2
-	openssh-6.0p1-8
+	openssh-6.9p1-1
 	# sync openssl with secondary architecture (x86_gcc2)
 	openssl-1.0.0s-1
 	openssl_devel-1.0.0s-1
@@ -245,8 +245,8 @@ RemotePackageRepository HaikuPorts
 	binutils_x86_gcc2-2.17_2013_04_21-2
 	bzip2_x86_gcc2-1.0.6-5
 	bzip2_x86_gcc2_devel-1.0.6-5
-	curl_x86_gcc2-7.42.1-1
-	curl_x86_gcc2_devel-7.42.1-1
+	curl_x86_gcc2-7.43.0-1
+	curl_x86_gcc2_devel-7.43.0-1
 	expat_x86_gcc2-2.1.0-1
 	expat_x86_gcc2_devel-2.1.0-1
 	ffmpeg_x86_gcc2-0.10.2-4
