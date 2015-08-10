@@ -1433,10 +1433,13 @@ BPoseView::AddPosesTask(void* castToParams)
 
 			if (!view->IsValidAddPosesThread(threadID)) {
 				// this handles the case of a file panel when the directory is
-				// switched and and old AddPosesTask needs to die.
+				// switched and an old AddPosesTask needs to die.
 				// we might no longer be the current async thread
 				// for this view - if not then we're done
 				view->HideBarberPole();
+
+				view->ReturnDirentIterator(container);
+				container = NULL;
 
 				// for now use the same cleanup as failToLock does
 				posesResult->fCount = modelChunkIndex + 1;
@@ -1511,8 +1514,7 @@ BPoseView::AddPosesTask(void* castToParams)
 		PRINT(("add_poses cleanup \n"));
 		// failed to lock window, bail
 		delete posesResult;
-
-		view->ReturnDirentIterator(container);
+		delete container;
 
 		return B_ERROR;
 	}
@@ -1521,10 +1523,11 @@ BPoseView::AddPosesTask(void* castToParams)
 
 	delete posesResult;
 
-	view->ReturnDirentIterator(container);
-
-	if (lock.Lock())
+	if (lock.Lock()) {
+		view->ReturnDirentIterator(container);
 		view->fAddPosesThreads.erase(threadID);
+	} else
+		delete container;
 
 	return B_OK;
 }
