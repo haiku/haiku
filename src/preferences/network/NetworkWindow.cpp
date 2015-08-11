@@ -126,7 +126,7 @@ NetworkWindow::NetworkWindow()
 
 	BScrollView* scrollView = new BScrollView("ScrollView", fListView,
 		0, false, true);
-	scrollView->SetExplicitMinSize(BSize(B_SIZE_UNSET, 42));
+	scrollView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fAddOnShellView = new BView("add-on shell", 0,
 		new BGroupLayout(B_VERTICAL));

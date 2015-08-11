@@ -50,6 +50,7 @@ ServiceView::ServiceView(const char* name, const char* executable,
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(titleView)
 		.Add(descriptionView)
+		.AddGlue()
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
 			.Add(fEnableButton);
