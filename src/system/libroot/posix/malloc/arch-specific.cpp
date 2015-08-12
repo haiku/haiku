@@ -125,13 +125,6 @@ __init_heap(void)
 
 
 extern "C" void
-__init_heap_post_env(void)
-{
-	// no heap options available
-}
-
-
-extern "C" void
 __heap_terminate_after()
 {
 	// nothing to do

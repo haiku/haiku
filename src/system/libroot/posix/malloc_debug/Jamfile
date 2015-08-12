@@ -15,10 +15,9 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		MergeObject <$(architecture)>posix_malloc_debug.o :
 			heap.cpp
-			;
-
-		MergeObject <$(architecture)>posix_malloc_guarded.o :
 			guarded_heap.cpp
+
+			malloc_debug_api.cpp
 			;
 	}
 }

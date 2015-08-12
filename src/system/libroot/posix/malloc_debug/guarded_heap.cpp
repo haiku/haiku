@@ -3,6 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "malloc_debug_api.h"
+
 
 #include <malloc.h>
 #include <stdio.h>
@@ -985,68 +987,36 @@ dump_allocations_full()
 // #pragma mark - Heap Debug API
 
 
-extern "C" status_t
-heap_debug_start_wall_checking(int msInterval)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-extern "C" status_t
-heap_debug_stop_wall_checking()
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-extern "C" void
-heap_debug_set_paranoid_validation(bool enabled)
-{
-}
-
-
-extern "C" void
-heap_debug_set_memory_reuse(bool enabled)
+static void
+guarded_heap_set_memory_reuse(bool enabled)
 {
 	sGuardedHeap.reuse_memory = enabled;
 }
 
 
-extern "C" void
-heap_debug_set_debugger_calls(bool enabled)
+static void
+guarded_heap_set_debugger_calls(bool enabled)
 {
 	sDebuggerCalls = enabled;
 }
 
 
-extern "C" void
-heap_debug_set_default_alignment(size_t defaultAlignment)
+static void
+guarded_heap_set_default_alignment(size_t defaultAlignment)
 {
 	sDefaultAlignment = defaultAlignment;
 }
 
 
-extern "C" void
-heap_debug_validate_heaps()
-{
-}
-
-
-extern "C" void
-heap_debug_validate_walls()
-{
-}
-
-
-extern "C" void
-heap_debug_dump_allocations(bool statsOnly, thread_id thread)
+static void
+guarded_heap_dump_allocations(bool statsOnly, thread_id thread)
 {
 	dump_allocations(sGuardedHeap, statsOnly, thread);
 }
 
 
-extern "C" void
-heap_debug_dump_heaps(bool dumpAreas, bool dumpBins)
+static void
+guarded_heap_dump_heaps(bool dumpAreas, bool dumpBins)
 {
 	WriteLocker heapLocker(sGuardedHeap.lock);
 	dump_guarded_heap(sGuardedHeap);
@@ -1070,31 +1040,16 @@ heap_debug_dump_heaps(bool dumpAreas, bool dumpBins)
 }
 
 
-extern "C" void *
-heap_debug_malloc_with_guard_page(size_t size)
-{
-	return malloc(size);
-}
-
-
-extern "C" status_t
-heap_debug_get_allocation_info(void *address, size_t *size,
-	thread_id *thread)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-extern "C" status_t
-heap_debug_dump_allocations_on_exit(bool enabled)
+static status_t
+guarded_heap_set_dump_allocations_on_exit(bool enabled)
 {
 	sDumpAllocationsOnExit = enabled;
 	return B_OK;
 }
 
 
-extern "C" status_t
-heap_debug_set_stack_trace_depth(size_t stackTraceDepth)
+static status_t
+guarded_heap_set_stack_trace_depth(size_t stackTraceDepth)
 {
 	if (stackTraceDepth == 0) {
 		sStackTraceDepth = 0;
@@ -1139,8 +1094,8 @@ init_after_fork()
 }
 
 
-extern "C" status_t
-__init_heap(void)
+static status_t
+guarded_heap_init(void)
 {
 	if (!guarded_heap_area_create(sGuardedHeap, GUARDED_HEAP_INITIAL_SIZE))
 		return B_ERROR;
@@ -1164,35 +1119,8 @@ __init_heap(void)
 }
 
 
-extern "C" void
-__init_heap_post_env(void)
-{
-	const char *mode = getenv("MALLOC_DEBUG");
-	if (mode != NULL) {
-		if (strchr(mode, 'r'))
-			heap_debug_set_memory_reuse(false);
-		if (strchr(mode, 'e'))
-			heap_debug_dump_allocations_on_exit(true);
-
-		size_t defaultAlignment = 0;
-		const char *argument = strchr(mode, 'a');
-		if (argument != NULL
-			&& sscanf(argument, "a%" B_SCNuSIZE, &defaultAlignment) == 1) {
-			heap_debug_set_default_alignment(defaultAlignment);
-		}
-
-		size_t stackTraceDepth = 0;
-		argument = strchr(mode, 's');
-		if (argument != NULL
-			&& sscanf(argument, "s%" B_SCNuSIZE, &stackTraceDepth) == 1) {
-			heap_debug_set_stack_trace_depth(stackTraceDepth);
-		}
-	}
-}
-
-
-extern "C" void
-__heap_terminate_after()
+static void
+guarded_heap_terminate_after()
 {
 	if (sDumpAllocationsOnExit)
 		dump_allocations_full();
@@ -1202,17 +1130,8 @@ __heap_terminate_after()
 // #pragma mark - Public API
 
 
-extern "C" void*
-sbrk_hook(long)
-{
-	debug_printf("sbrk not supported on malloc debug\n");
-	panic("sbrk not supported on malloc debug\n");
-	return NULL;
-}
-
-
-extern "C" void*
-memalign(size_t alignment, size_t size)
+static void*
+heap_memalign(size_t alignment, size_t size)
 {
 	if (size == 0)
 		size = 1;
@@ -1221,23 +1140,23 @@ memalign(size_t alignment, size_t size)
 }
 
 
-extern "C" void*
-malloc(size_t size)
+static void*
+heap_malloc(size_t size)
 {
-	return memalign(sDefaultAlignment, size);
+	return heap_memalign(sDefaultAlignment, size);
 }
 
 
-extern "C" void
-free(void* address)
+static void
+heap_free(void* address)
 {
 	if (!guarded_heap_free(address))
 		panic("free failed for address %p", address);
 }
 
 
-extern "C" void*
-realloc(void* address, size_t newSize)
+static void*
+heap_realloc(void* address, size_t newSize)
 {
 	if (newSize == 0) {
 		free(address);
@@ -1245,40 +1164,42 @@ realloc(void* address, size_t newSize)
 	}
 
 	if (address == NULL)
-		return memalign(sDefaultAlignment, newSize);
+		return heap_memalign(sDefaultAlignment, newSize);
 
 	return guarded_heap_realloc(address, newSize);
 }
 
 
-extern "C" void*
-calloc(size_t numElements, size_t size)
-{
-	void* address = malloc(numElements * size);
-	if (address != NULL)
-		memset(address, 0, numElements * size);
+heap_implementation __mallocGuardedHeap = {
+	guarded_heap_init,
+	guarded_heap_terminate_after,
 
-	return address;
-}
+	heap_memalign,
+	heap_malloc,
+	heap_free,
+	heap_realloc,
 
+	NULL,	// calloc
+	NULL,	// valloc
+	NULL,	// posix_memalign
 
-extern "C" void*
-valloc(size_t size)
-{
-	return memalign(B_PAGE_SIZE, size);
-}
+	NULL,	// start_wall_checking
+	NULL,	// stop_wall_checking
+	NULL,	// set_paranoid_validation
 
+	guarded_heap_set_memory_reuse,
+	guarded_heap_set_debugger_calls,
+	guarded_heap_set_default_alignment,
 
-extern "C" int
-posix_memalign(void **pointer, size_t alignment, size_t size)
-{
-	// this cryptic line accepts zero and all powers of two
-	if (((~alignment + 1) | ((alignment << 1) - 1)) != ~0UL)
-		return EINVAL;
+	NULL,	// validate_heaps
+	NULL,	// validate_walls
 
-	*pointer = memalign(alignment, size);
-	if (*pointer == NULL)
-		return ENOMEM;
+	guarded_heap_dump_allocations,
+	guarded_heap_dump_heaps,
+	heap_malloc,
 
-	return 0;
-}
+	NULL,	// get_allocation_info
+
+	guarded_heap_set_dump_allocations_on_exit,
+	guarded_heap_set_stack_trace_depth
+};

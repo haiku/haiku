@@ -14,7 +14,7 @@ then
 		To generate such a file run a program with the following
 		environment variables prefixed and pipe the output to a file:
 
-		LD_PRELOAD=libroot_guarded.so MALLOC_DEBUG=es50 program > file
+		LD_PRELOAD=libroot_debug.so MALLOC_DEBUG=ges50 program > file
 
 		The number after the "s" is the stack trace depth. Note that
 		there is an implementation defined maximum.
