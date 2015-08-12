@@ -1216,9 +1216,7 @@ LaunchDaemon::_StartSession(const char* login)
 			exit(EXIT_FAILURE);
 
 		if (passwd->pw_dir != NULL && passwd->pw_dir[0] != '\0') {
-			BString home="HOME=\"";
-			home << passwd->pw_dir << "\"";
-			putenv(home.String());
+			setenv("HOME", passwd->pw_dir, true);
 
 			if (chdir(passwd->pw_dir) != 0) {
 				debug_printf("Could not switch to home dir %s: %s\n",
