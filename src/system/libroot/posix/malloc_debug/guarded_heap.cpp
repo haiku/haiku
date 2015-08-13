@@ -747,7 +747,8 @@ guarded_heap_realloc(void* address, size_t newSize)
 	if (oldSize == newSize)
 		return address;
 
-	void* newBlock = guarded_heap_allocate(sGuardedHeap, newSize, 0);
+	void* newBlock = guarded_heap_allocate(sGuardedHeap, newSize,
+		sDefaultAlignment);
 	if (newBlock == NULL)
 		return NULL;
 
