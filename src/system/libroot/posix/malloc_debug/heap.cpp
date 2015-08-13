@@ -54,7 +54,7 @@ static bool sUseGuardPage = false;
 using namespace std;
 static size_t sDefaultAlignment = alignof(max_align_t);
 #else
-static size_t sDefaultAlignment = 0;
+static size_t sDefaultAlignment = 8;
 #endif
 
 
