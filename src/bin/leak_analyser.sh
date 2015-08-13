@@ -94,6 +94,7 @@ EXCLUDE_PATTERN=""
 if [ -z "$NO_DEFAULTS" ]
 then
 	declare -a DEFAULT_EXCLUDE_LIST=( \
+		"<libroot.so> initialize_before " \
 		"<libroot.so> __cxa_atexit " \
 		"<libroot.so> BPrivate::Libroot::LocaleBackend::LoadBackend" \
 		"<libbe.so> initialize_before " \
@@ -108,8 +109,7 @@ then
 		"<libtracker.so> _init " \
 		"<libtranslation.so> BTranslatorRoster::Default" \
 		"Translator> " \
-		"<libicui18n.so.54> icu::" \
-		"<libicuuc.so.54> icu::" \
+		"<libicu[^.]+.so.[0-9]+> icu(_[0-9]+)?::" \
 	)
 
 	for EXCLUDE in "${DEFAULT_EXCLUDE_LIST[@]}"
