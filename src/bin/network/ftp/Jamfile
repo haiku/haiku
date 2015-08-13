@@ -13,7 +13,7 @@ SubDirCcFlags [ FDefines _BSD_SOURCE=1 ] ;
 
 UseBuildFeatureHeaders libedit ;
 
-BinCommand ftp :
+local ftp_src =
 	cmds.c
 	cmdtab.c
 	complete.c
@@ -24,6 +24,13 @@ BinCommand ftp :
 	progressbar.c
 	ruserpass.c
 	util.c
+;
+Includes [ FGristFiles $(ftp_src) ]
+	: [ BuildFeatureAttribute libedit : headers ] ;
+
+
+BinCommand ftp :
+	$(ftp_src)
 	:
 	[ BuildFeatureAttribute libedit : library ]
 	[ BuildFeatureAttribute ncurses : library ]
