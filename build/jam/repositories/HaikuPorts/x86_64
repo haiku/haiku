@@ -135,10 +135,10 @@ RemotePackageRepository HaikuPorts
 	harfbuzz_devel-0.9.40-1
 	help2man-1.46.6-1
 	htmldoc-1.8.27-3
-	icu-55.1-3
-	icu_devel-55.1-3
-	icu54-54.1-1
-	icu54_devel-54.1-1
+	icu-55.1-5
+	icu_devel-55.1-5
+	icu54-54.1-2
+	icu54_devel-54.1-2
 	intltool-0.40.6-4
 	jam-2.5_2012_10_12-2
 	jasper-1.900.1-4
