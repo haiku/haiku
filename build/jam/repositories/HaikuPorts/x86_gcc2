@@ -860,8 +860,8 @@ RemotePackageRepository HaikuPorts
 	vacuum_x86-1.2.5-1
 	vcmi_x86-0.94-1
 	wizznic_x86-0.9.9-2
-	xmlroff_x86-0.6.2-1
-	xmlroff_x86_devel-0.6.2-1
+	xmlroff_x86-0.6.2-2
+	xmlroff_x86_devel-0.6.2-2
 	xz_utils_x86-5.0.8-2
 	xz_utils_x86_devel-5.0.8-2
 	zlib_x86-1.2.8-4
