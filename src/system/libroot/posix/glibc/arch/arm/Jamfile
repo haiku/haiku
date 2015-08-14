@@ -34,6 +34,9 @@ local genericSources =
 	s_isnan.c s_isnanf.c
 	s_signbit.c s_signbitf.c s_signbitl.c
 
+	s_clog.c s_clogf.c
+	s_log1p.c s_log1pf.c s_log1pl.c
+	s_csqrt.c s_csqrtf.c
 	s_floor.c s_floorf.c
 	s_ceil.c s_ceilf.c
 	s_modf.c
