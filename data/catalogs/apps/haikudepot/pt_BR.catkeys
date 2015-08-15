@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	3134988464
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	4123398005
 Name	PackageListView		Nome
 Available packages	MainWindow		Pacotes disponíveis
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
@@ -133,6 +133,7 @@ If you do not provide an email address, you will not be able to reset your passw
 Authentication failed. Connection to the service failed.	UserLoginWindow		Autenticação falhou. Conexão ao serviço falhou.
 Cancel	RatePackageWindow		Cancelar
 Package action failed	PackageInfoView		Ação do pacote falhou
+OK	UserLoginWindow		OK
 Send	RatePackageWindow		Enviar
 Failed to create account	UserLoginWindow		Falhou ao criar conta
 There are problems with the data you entered:\n\n	UserLoginWindow		Existem problemas com os dados que você inseriu:\n\n
