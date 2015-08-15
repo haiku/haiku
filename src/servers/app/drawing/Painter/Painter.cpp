@@ -102,6 +102,7 @@ using std::nothrow;
 #define fSubpixRasterizer		fInternal.fSubpixRasterizer
 #define fSubpixRenderer			fInternal.fSubpixRenderer
 #define fMaskedUnpackedScanline	fInternal.fMaskedUnpackedScanline
+#define fClippedAlphaMask		fInternal.fClippedAlphaMask
 #define fPath					fInternal.fPath
 #define fCurve					fInternal.fCurve
 
@@ -287,10 +288,13 @@ Painter::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
 
 	fSubpixelPrecise = state->SubPixelPrecise();
 
-	if (state->GetAlphaMask() != NULL)
+	if (state->GetAlphaMask() != NULL) {
 		fMaskedUnpackedScanline = state->GetAlphaMask()->Generate();
-	else
+		fClippedAlphaMask = state->GetAlphaMask()->Mask();
+	} else {
 		fMaskedUnpackedScanline = NULL;
+		fClippedAlphaMask = NULL;
+	}
 
 	// any of these conditions means we need to use a different drawing
 	// mode instance

@@ -29,6 +29,7 @@ struct PainterAggInterface {
 		fSubpixRasterizer(),
 		fSubpixRenderer(fBaseRenderer),
 		fMaskedUnpackedScanline(NULL),
+		fClippedAlphaMask(NULL),
 		fPath(),
 		fCurve(fPath)
 	{
@@ -58,6 +59,7 @@ struct PainterAggInterface {
 	// Alpha-Masked mode: for ClipToPicture
 	// (this uses the standard rasterizer and renderer)
 	scanline_unpacked_masked_type* fMaskedUnpackedScanline;
+	agg::clipped_alpha_mask* fClippedAlphaMask;
 
 	agg::path_storage		fPath;
 	agg::conv_curve<agg::path_storage> fCurve;

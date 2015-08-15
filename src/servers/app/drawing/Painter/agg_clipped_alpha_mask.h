@@ -23,7 +23,7 @@ namespace agg
 		public:
 			typedef int8u cover_type;
 			enum cover_scale_e
-			{ 
+			{
 				cover_shift = 8,
 				cover_none  = 0,
 				cover_full  = 255
@@ -44,46 +44,13 @@ namespace agg
 
 			void combine_hspan(int x, int y, cover_type* dst, int num_pix) const
 			{
-				x -= m_xOffset;
-				y -= m_yOffset;
-
-				int xmax = m_rbuf->width() - 1;
-				int ymax = m_rbuf->height() - 1;
-
 				int count = num_pix;
 				cover_type* covers = dst;
 
-				if(y < 0 || y > ymax)
-				{
-					memset(dst, m_outside, num_pix * sizeof(cover_type));
+				bool has_inside = _set_outside(x, y, covers, count);
+				if (!has_inside)
 					return;
-				}
 
-				if(x < 0)
-				{
-					count += x;
-					if(count <= 0) 
-					{
-						memset(dst, m_outside, num_pix * sizeof(cover_type));
-						return;
-					}
-					memset(covers, m_outside, -x * sizeof(cover_type));
-					covers -= x;
-					x = 0;
-				}
-
-				if(x + count > xmax)
-				{
-					int rest = x + count - xmax - 1;
-					count -= rest;
-					if(count <= 0) 
-					{
-						memset(dst, m_outside, num_pix * sizeof(cover_type));
-						return;
-					}
-					memset(covers + count, m_outside, rest * sizeof(cover_type));
-				}
-	
 				const int8u* mask = m_rbuf->row_ptr(y) + x * Step + Offset;
 				do
 				{
@@ -94,6 +61,67 @@ namespace agg
 				}
 				while(--count);
 			}
+
+			void get_hspan(int x, int y, cover_type* dst, int num_pix) const
+			{
+				int count = num_pix;
+				cover_type* covers = dst;
+
+				bool has_inside = _set_outside(x, y, covers, count);
+				if (!has_inside)
+					return;
+
+				const int8u* mask = m_rbuf->row_ptr(y) + x * Step + Offset;
+				memcpy(covers, mask, count);
+			}
+
+		private:
+			bool _set_outside(int& x, int& y, cover_type*& covers,
+				int& count) const
+			{
+				x -= m_xOffset;
+				y -= m_yOffset;
+
+				int xmax = m_rbuf->width() - 1;
+				int ymax = m_rbuf->height() - 1;
+
+				int num_pix = count;
+				cover_type* dst = covers;
+
+				if(y < 0 || y > ymax)
+				{
+					memset(dst, m_outside, num_pix * sizeof(cover_type));
+					return false;
+				}
+
+				if(x < 0)
+				{
+					count += x;
+					if(count <= 0)
+					{
+						memset(dst, m_outside, num_pix * sizeof(cover_type));
+						return false;
+					}
+					memset(covers, m_outside, -x * sizeof(cover_type));
+					covers -= x;
+					x = 0;
+				}
+
+				if(x + count > xmax)
+				{
+					int rest = x + count - xmax - 1;
+					count -= rest;
+					if(count <= 0)
+					{
+						memset(dst, m_outside, num_pix * sizeof(cover_type));
+						return false;
+					}
+					memset(covers + count, m_outside, rest * sizeof(cover_type));
+				}
+
+				return true;
+			}
+
 
 		private:
 			int m_xOffset;

@@ -220,6 +220,13 @@ AlphaMask::Generate()
 }
 
 
+agg::clipped_alpha_mask*
+AlphaMask::Mask()
+{
+	return &fCachedMask;
+}
+
+
 ServerBitmap*
 AlphaMask::_RenderPicture() const
 {

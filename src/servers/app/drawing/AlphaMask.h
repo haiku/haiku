@@ -32,6 +32,7 @@ public:
 			void				SetPrevious(AlphaMask* mask);
 
 			scanline_unpacked_masked_type* Generate();
+			agg::clipped_alpha_mask* Mask();
 
 private:
 			ServerBitmap*		_RenderPicture() const;
