@@ -97,6 +97,7 @@ public:
 	virtual						~ImageDebugInfoJobListener();
 	virtual	void				ImageDebugInfoJobNeedsUserInput(Job* job,
 									ImageDebugInfoLoadingState* state);
+	virtual	void				ImageDebugInfoJobInProgress(Image* image);
 };
 
 

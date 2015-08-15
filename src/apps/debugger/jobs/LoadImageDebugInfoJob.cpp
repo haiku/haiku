@@ -29,6 +29,12 @@ ImageDebugInfoJobListener::ImageDebugInfoJobNeedsUserInput(Job* job,
 }
 
 
+void
+ImageDebugInfoJobListener::ImageDebugInfoJobInProgress(Image* image)
+{
+}
+
+
 // #pragma mark - LoadImageDebugInfoJob
 
 
@@ -64,6 +70,9 @@ LoadImageDebugInfoJob::Do()
 	AutoLocker<Team> locker(fImage->GetTeam());
 	ImageInfo imageInfo(fImage->Info());
 	locker.Unlock();
+
+	if (fListener != NULL)
+		fListener->ImageDebugInfoJobInProgress(fImage);
 
 	// create the debug info
 	ImageDebugInfo* debugInfo;
