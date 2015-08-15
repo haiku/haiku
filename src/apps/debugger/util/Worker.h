@@ -149,6 +149,8 @@ public:
 									// only valid for jobs that are
 									// suspended pending user input
 
+			bool				HasPendingJobs();
+
 			status_t			AddListener(const JobKey& key,
 									JobListener* listener);
 			void				RemoveListener(const JobKey& key,

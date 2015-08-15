@@ -342,6 +342,14 @@ Worker::ResumeJob(Job* job)
 }
 
 
+bool
+Worker::HasPendingJobs()
+{
+	AutoLocker<Worker> locker(this);
+	return !fJobs.IsEmpty();
+}
+
+
 status_t
 Worker::AddListener(const JobKey& key, JobListener* listener)
 {
