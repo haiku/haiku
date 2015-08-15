@@ -127,6 +127,7 @@ SharedLibrary libtestappserver.so :
 	ProfileMessageSupport.cpp
 	EventDispatcher.cpp
 	EventStream.cpp
+	TestServerLoopAdapter.cpp
 	MessageLooper.cpp
 
 	# Decorator

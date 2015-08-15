@@ -110,7 +110,7 @@ Server test_registrar
 	libstorage_kit_mime.a
 	be localestub [ TargetLibstdc++ ]
 	:
-	registrar.rdef
+	test_registrar.rdef
 ;
 
 if $(TARGET_PLATFORM) = libbe_test {

@@ -16,6 +16,10 @@
 #include <SupportDefs.h>
 
 
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#	define SERVER_PORT_NAME "haiku-test:app_server"
+#endif
+
 #if TEST_MODE
 #	define SERVER_INPUT_PORT "haiku-test:input port"
 #endif
