@@ -82,19 +82,22 @@ Painter::BitmapPainter::Draw(const BRect& sourceRect,
 	if (!_HasScale() && !_HasAffineTransform() && !_HasAlphaMask()) {
 		if (fColorSpace == B_CMAP8) {
 			if (fPainter->fDrawingMode == B_OP_COPY) {
-				DrawBitmapNoScale<CMap8Copy>::Draw(fPainter->fInternal,
-					fBitmap, 1, fOffset, fDestinationRect);
+				DrawBitmapNoScale<CMap8Copy> drawNoScale;
+				drawNoScale.Draw(fPainter->fInternal, fBitmap, 1, fOffset,
+					fDestinationRect);
 				return;
 			}
 			if (fPainter->fDrawingMode == B_OP_OVER) {
-				DrawBitmapNoScale<CMap8Over>::Draw(fPainter->fInternal,
-					fBitmap, 1, fOffset, fDestinationRect);
+				DrawBitmapNoScale<CMap8Over> drawNoScale;
+				drawNoScale.Draw(fPainter->fInternal, fBitmap, 1, fOffset,
+					fDestinationRect);
 				return;
 			}
 		} else if (fColorSpace == B_RGB32) {
 			if (fPainter->fDrawingMode == B_OP_OVER) {
-				DrawBitmapNoScale<Bgr32Over>::Draw(fPainter->fInternal,
-					fBitmap, 4, fOffset, fDestinationRect);
+				DrawBitmapNoScale<Bgr32Over> drawNoScale;
+				drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
+					fDestinationRect);
 				return;
 			}
 		}
@@ -106,16 +109,27 @@ Painter::BitmapPainter::Draw(const BRect& sourceRect,
 	// optimized version if there is no scale
 	if (!_HasScale() && !_HasAffineTransform() && !_HasAlphaMask()) {
 		if (fPainter->fDrawingMode == B_OP_COPY) {
-			DrawBitmapNoScale<Bgr32Copy>::Draw(fPainter->fInternal,
-				fBitmap, 4, fOffset, fDestinationRect);
+			DrawBitmapNoScale<Bgr32Copy> drawNoScale;
+			drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
+				fDestinationRect);
 			return;
 		}
 		if (fPainter->fDrawingMode == B_OP_OVER
 			|| (fPainter->fDrawingMode == B_OP_ALPHA
 				 && fPainter->fAlphaSrcMode == B_PIXEL_ALPHA
 				 && fPainter->fAlphaFncMode == B_ALPHA_OVERLAY)) {
-			DrawBitmapNoScale<Bgr32Alpha>::Draw(fPainter->fInternal,
-				fBitmap, 4, fOffset, fDestinationRect);
+			DrawBitmapNoScale<Bgr32Alpha> drawNoScale;
+			drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
+				fDestinationRect);
+			return;
+		}
+	}
+
+	if (!_HasScale() && !_HasAffineTransform() && _HasAlphaMask()) {
+		if (fPainter->fDrawingMode == B_OP_COPY) {
+			DrawBitmapNoScale<Bgr32CopyMasked> drawNoScale;
+			drawNoScale.Draw(fPainter->fInternal, fBitmap, 4, fOffset,
+				fDestinationRect);
 			return;
 		}
 	}

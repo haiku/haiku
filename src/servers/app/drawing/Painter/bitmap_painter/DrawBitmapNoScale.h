@@ -9,12 +9,14 @@
 #define DRAW_BITMAP_NO_SCALE_H
 
 #include "IntPoint.h"
+#include "IntRect.h"
 #include "Painter.h"
 
 
 template<class BlendType>
 struct DrawBitmapNoScale {
-	static void
+public:
+	void
 	Draw(PainterAggInterface& aggInterface, agg::rendering_buffer& bitmap,
 		uint32 bytesPerSourcePixel, IntPoint offset, BRect destinationRect)
 	{
@@ -49,25 +51,28 @@ struct DrawBitmapNoScale {
 	}
 #endif
 
-		const rgb_color* colorMap = SystemPalette();
+		fColorMap = SystemPalette();
+		fAlphaMask = aggInterface.fClippedAlphaMask;
 		renderer_base& baseRenderer = aggInterface.fBaseRenderer;
 
 		// copy rects, iterate over clipping boxes
 		baseRenderer.first_clip_box();
 		do {
-			int32 x1 = max_c(baseRenderer.xmin(), left);
-			int32 x2 = min_c(baseRenderer.xmax(), right);
-			if (x1 <= x2) {
-				int32 y1 = max_c(baseRenderer.ymin(), top);
-				int32 y2 = min_c(baseRenderer.ymax(), bottom);
-				if (y1 <= y2) {
-					uint8* dstHandle = dst + y1 * dstBPR + x1 * 4;
-					const uint8* srcHandle = src + (y1 - offset.y) * srcBPR
-						+ (x1 - offset.x) * bytesPerSourcePixel;
+			fRect.left  = max_c(baseRenderer.xmin(), left);
+			fRect.right = min_c(baseRenderer.xmax(), right);
+			if (fRect.left <= fRect.right) {
+				fRect.top    = max_c(baseRenderer.ymin(), top);
+				fRect.bottom = min_c(baseRenderer.ymax(), bottom);
+				if (fRect.top <= fRect.bottom) {
+					uint8* dstHandle = dst + fRect.top * dstBPR
+						+ fRect.left * 4;
+					const uint8* srcHandle = src
+						+ (fRect.top  - offset.y) * srcBPR
+						+ (fRect.left - offset.x) * bytesPerSourcePixel;
 
-					for (; y1 <= y2; y1++) {
-						BlendType::BlendRow(dstHandle, srcHandle,
-							x2 - x1 + 1, colorMap);
+					for (; fRect.top <= fRect.bottom; fRect.top++) {
+						static_cast<BlendType*>(this)->BlendRow(dstHandle,
+							srcHandle, fRect.right - fRect.left + 1);
 
 						dstHandle += dstBPR;
 						srcHandle += srcBPR;
@@ -76,18 +81,22 @@ struct DrawBitmapNoScale {
 			}
 		} while (baseRenderer.next_clip_box());
 	}
+
+protected:
+	IntRect fRect;
+	const rgb_color* fColorMap;
+	const agg::clipped_alpha_mask* fAlphaMask;
 };
 
 
 struct CMap8Copy : public DrawBitmapNoScale<CMap8Copy>
 {
-	static void BlendRow(uint8* dst, const uint8* src, int32 numPixels,
-		const rgb_color* colorMap)
+	void BlendRow(uint8* dst, const uint8* src, int32 numPixels)
 	{
 		uint32* d = (uint32*)dst;
 		const uint8* s = src;
 		while (numPixels--) {
-			const rgb_color c = colorMap[*s++];
+			const rgb_color c = fColorMap[*s++];
 			*d++ = (c.alpha << 24) | (c.red << 16) | (c.green << 8) | (c.blue);
 		}
 	}
@@ -96,13 +105,12 @@ struct CMap8Copy : public DrawBitmapNoScale<CMap8Copy>
 
 struct CMap8Over : public DrawBitmapNoScale<CMap8Over>
 {
-	static void BlendRow(uint8* dst, const uint8* src, int32 numPixels,
-		const rgb_color* colorMap)
+	void BlendRow(uint8* dst, const uint8* src, int32 numPixels)
 	{
 		uint32* d = (uint32*)dst;
 		const uint8* s = src;
 		while (numPixels--) {
-			const rgb_color c = colorMap[*s++];
+			const rgb_color c = fColorMap[*s++];
 			if (c.alpha)
 				*d = (c.alpha << 24) | (c.red << 16)
 					| (c.green << 8) | (c.blue);
@@ -114,8 +122,7 @@ struct CMap8Over : public DrawBitmapNoScale<CMap8Over>
 
 struct Bgr32Copy : public DrawBitmapNoScale<Bgr32Copy>
 {
-	static void BlendRow(uint8* dst, const uint8* src, int32 numPixels,
-		const rgb_color*)
+	void BlendRow(uint8* dst, const uint8* src, int32 numPixels)
 	{
 		memcpy(dst, src, numPixels * 4);
 	}
@@ -124,8 +131,7 @@ struct Bgr32Copy : public DrawBitmapNoScale<Bgr32Copy>
 
 struct Bgr32Over : public DrawBitmapNoScale<Bgr32Over>
 {
-	static void BlendRow(uint8* dst, const uint8* src, int32 numPixels,
-		const rgb_color*)
+	void BlendRow(uint8* dst, const uint8* src, int32 numPixels)
 	{
 		uint32* d = (uint32*)dst;
 		uint32* s = (uint32*)src;
@@ -141,8 +147,7 @@ struct Bgr32Over : public DrawBitmapNoScale<Bgr32Over>
 
 struct Bgr32Alpha : public DrawBitmapNoScale<Bgr32Alpha>
 {
-	static void BlendRow(uint8* dst, const uint8* src, int32 numPixels,
-		const rgb_color*)
+	void BlendRow(uint8* dst, const uint8* src, int32 numPixels)
 	{
 		uint32* d = (uint32*)dst;
 		int32 bytes = numPixels * 4;
@@ -162,6 +167,28 @@ struct Bgr32Alpha : public DrawBitmapNoScale<Bgr32Alpha>
 			src += 4;
 		}
 		memcpy(dst, buffer, bytes);
+	}
+};
+
+
+struct Bgr32CopyMasked : public DrawBitmapNoScale<Bgr32CopyMasked>
+{
+	void BlendRow(uint8* dst, const uint8* src, int32 numPixels)
+	{
+		uint8 covers[numPixels];
+		fAlphaMask->get_hspan(fRect.left, fRect.top, covers, numPixels);
+
+		uint32* destination = (uint32*)dst;
+		uint32* source = (uint32*)src;
+		uint8* mask = (uint8*)&covers[0];
+
+		while (numPixels--) {
+			if (*mask != 0)
+				*destination = *source;
+			destination++;
+			source++;
+			mask++;
+		}
 	}
 };
 
