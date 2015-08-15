@@ -32,6 +32,9 @@ service x-vnd.Haiku-media_server {
 	launch /system/servers/media_server
 	no_safemode
 	legacy
+	on {
+		initial_volumes_mounted
+	}
 }
 
 service x-vnd.Haiku-midi_server {

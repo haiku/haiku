@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-PSDTranslator	1706619436
+1	spanish; castilian	x-vnd.Haiku-PSDTranslator	3654055550
 Lab	PSDLoader		Laboratorio
 Uncompressed	PSDConfig		Sin comprimir
 Indexed	PSDLoader		Indizado
@@ -6,8 +6,10 @@ Grayscale	PSDLoader		Escala de grises
 Photoshop image translator	PSDConfig		Transformador de imágenes tipo Photoshop
 Photoshop image translator	PSDTranslator		Transformador de imágenes tipo Photoshop
 Version %d.%d.%d, %s	PSDConfig		Versión %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Documento de Photoshop (Archivo PSD)
 Photoshop image	PSDTranslator		Imagen de Photoshop
 RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Documento grande de Photoshop (Archivo PSB)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Imagen de Photoshop (%s)
 PSDTranslator Settings	PSDConfig		Ajustes de PSDTranslator

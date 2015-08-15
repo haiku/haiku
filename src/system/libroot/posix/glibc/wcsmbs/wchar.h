@@ -218,34 +218,34 @@ extern unsigned long long int __wcstoull_internal (__const wchar_t *
 #if defined __OPTIMIZE__ && __GNUC__ >= 2
 /* Define inline functions which call the internal entry points.  */
 
-extern __inline double wcstod (__const wchar_t *__restrict __nptr,
+__extern_inline double wcstod (__const wchar_t *__restrict __nptr,
 			       wchar_t **__restrict __endptr) __THROW
 { return __wcstod_internal (__nptr, __endptr, 0); }
-extern __inline long int wcstol (__const wchar_t *__restrict __nptr,
+__extern_inline long int wcstol (__const wchar_t *__restrict __nptr,
                                  wchar_t **__restrict __endptr,
 				 int __base) __THROW
 { return __wcstol_internal (__nptr, __endptr, __base, 0); }
-extern __inline unsigned long int wcstoul (__const wchar_t *__restrict __nptr,
+__extern_inline unsigned long int wcstoul (__const wchar_t *__restrict __nptr,
                                            wchar_t **__restrict __endptr,
 					   int __base) __THROW
 { return __wcstoul_internal (__nptr, __endptr, __base, 0); }
 
 # ifdef __USE_GNU
-extern __inline float wcstof (__const wchar_t *__restrict __nptr,
+__extern_inline float wcstof (__const wchar_t *__restrict __nptr,
 			      wchar_t **__restrict __endptr) __THROW
 { return __wcstof_internal (__nptr, __endptr, 0); }
-extern __inline long double wcstold (__const wchar_t *__restrict __nptr,
+__extern_inline long double wcstold (__const wchar_t *__restrict __nptr,
 				     wchar_t **__restrict __endptr) __THROW
 { return __wcstold_internal (__nptr, __endptr, 0); }
 
 
 __extension__
-extern __inline long long int wcstoq (__const wchar_t *__restrict __nptr,
+__extern_inline long long int wcstoq (__const wchar_t *__restrict __nptr,
 				      wchar_t **__restrict __endptr,
 				      int __base) __THROW
 { return __wcstoll_internal (__nptr, __endptr, __base, 0); }
 __extension__
-extern __inline unsigned long long int wcstouq (__const wchar_t *
+__extern_inline unsigned long long int wcstouq (__const wchar_t *
 						__restrict __nptr,
 						wchar_t **__restrict __endptr,
 						int __base) __THROW

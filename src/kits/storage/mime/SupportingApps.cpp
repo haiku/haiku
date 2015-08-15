@@ -165,10 +165,9 @@ SupportingApps::SetSupportedTypes(const char *app, const BMessage *types, bool f
 	std::set<std::string> &newTypes = fSupportedTypes[app];
 	std::set<std::string> &strandedTypes = fStrandedTypes[app];
 	// Make a copy of the previous types if we're doing a full sync
-	if (!err)
+	if (!err) {
 		oldTypes = newTypes;
 
-	if (!err) {
 		// Read through the list of new supported types, creating the new
 		// supported types list and adding the app as a supporting app for
 		// each type.

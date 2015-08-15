@@ -2395,7 +2395,7 @@ BrowserWindow::_NewTabURL(bool isNewWindow) const
 			url = fStartPageURL;
 			break;
 		case OpenSearchPage:
-			url = fSearchPageURL;
+			url.SetToFormat(fSearchPageURL, "");
 			break;
 		case CloneCurrentPage:
 			if (CurrentWebView() != NULL)

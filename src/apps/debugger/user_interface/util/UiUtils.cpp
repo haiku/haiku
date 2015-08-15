@@ -337,6 +337,9 @@ UiUtils::DumpMemory(BString& _output, int32 indentLevel,
 	int32 j;
 	_output.Append('\t', indentLevel);
 	for (int32 i = 0; i < count; i++) {
+		if (!block->Contains(address + i * itemSize))
+			break;
+
 		uint8* value;
 
 		if ((i % displayWidth) == 0) {
@@ -350,8 +353,6 @@ UiUtils::DumpMemory(BString& _output, int32 indentLevel,
 			_output += data;
 			char c;
 			for (j = 0; j < displayed; j++) {
-				if (!block->Contains(address + displayed))
-					break;
 				c = *(block->Data() + address - block->BaseAddress()
 					+ (i * itemSize) + j);
 				if (!isprint(c))

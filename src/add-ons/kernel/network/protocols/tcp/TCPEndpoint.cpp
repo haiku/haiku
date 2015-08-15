@@ -37,8 +37,8 @@
 
 
 // References:
-//  - RFC 793 - Transmission Control Protocol
-//  - RFC 813 - Window and Acknowledgement Strategy in TCP
+//	- RFC 793 - Transmission Control Protocol
+//	- RFC 813 - Window and Acknowledgement Strategy in TCP
 //	- RFC 1337 - TIME_WAIT Assassination Hazards in TCP
 //
 // Things this implementation currently doesn't implement:
@@ -60,16 +60,19 @@
 
 #ifdef TRACE_TCP
 // the space before ', ##args' is important in order for this to work with cpp 2.95
-#	define TRACE(format, args...)	dprintf("%ld: TCP [%llu] %p (%12s) " \
-		format "\n", find_thread(NULL), system_time(), this, \
-		name_for_state(fState) , ##args)
+#	define TRACE(format, args...)	dprintf("%" B_PRId32 ": TCP [%" \
+		B_PRIdBIGTIME "] %p (%12s) " format "\n", find_thread(NULL), \
+		system_time(), this, name_for_state(fState) , ##args)
 #else
 #	define TRACE(args...)			do { } while (0)
 #endif
 
 #ifdef PROBE_TCP
 #	define PROBE(buffer, window) \
-	dprintf("TCP PROBE %llu %s %s %ld snxt %lu suna %lu cw %lu sst %lu win %lu swin %lu smax-suna %lu savail %lu sqused %lu rto %llu\n", \
+	dprintf("TCP PROBE %" B_PRIdBIGTIME " %s %s %" B_PRIu32 " snxt %" B_PRIu32 \
+		" suna %" B_PRIu32 " cw %" B_PRIu32 " sst %" B_PRIu32 " win %" \
+		B_PRIu32 " swin %" B_PRIu32 " smax-suna %" B_PRIu32 " savail %" \
+		B_PRIuSIZE " sqused %" B_PRIuSIZE " rto %" B_PRIdBIGTIME "\n", \
 		system_time(), PrintAddress(buffer->source), \
 		PrintAddress(buffer->destination), buffer->size, fSendNext.Number(), \
 		fSendUnacknowledged.Number(), fCongestionWindow, fSlowStartThreshold, \
@@ -101,9 +104,10 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("tcp:%p (%12s) receive buffer %p (%lu bytes), flags %x, "
-			"seq %lu, ack %lu, wnd %lu", fEndpoint, name_for_state(fState),
-			fBuffer, fBufferSize, fFlags, fSequence, fAcknowledge, fWindow);
+		out.Print("tcp:%p (%12s) receive buffer %p (%" B_PRIu32 " bytes), "
+			"flags %#" B_PRIx8 ", seq %" B_PRIu32 ", ack %" B_PRIu32
+			", wnd %" B_PRIu32, fEndpoint, name_for_state(fState), fBuffer,
+			fBufferSize, fFlags, fSequence, fAcknowledge, fWindow);
 	}
 
 protected:
@@ -137,10 +141,11 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("tcp:%p (%12s) send buffer %p (%lu bytes), flags %x, "
-			"seq %lu, ack %lu, first %lu, last %lu",
-			fEndpoint, name_for_state(fState), fBuffer, fBufferSize, fFlags,
-			fSequence, fAcknowledge, fFirstSequence, fLastSequence);
+		out.Print("tcp:%p (%12s) send buffer %p (%" B_PRIu32 " bytes), "
+			"flags %#" B_PRIx8 ", seq %" B_PRIu32 ", ack %" B_PRIu32
+			", first %" B_PRIu32 ", last %" B_PRIu32, fEndpoint,
+			name_for_state(fState), fBuffer, fBufferSize, fFlags, fSequence,
+			fAcknowledge, fFirstSequence, fLastSequence);
 	}
 
 protected:
@@ -210,7 +215,7 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("tcp:%p (%12s) error at line %ld: %s", fEndpoint,
+		out.Print("tcp:%p (%12s) error at line %" B_PRId32 ": %s", fEndpoint,
 			name_for_state(fState), fLine, fError);
 	}
 
@@ -221,9 +226,34 @@ protected:
 	tcp_state		fState;
 };
 
-class Timer : public AbstractTraceEntry {
+class TimerSet : public AbstractTraceEntry {
 public:
-	Timer(TCPEndpoint* endpoint, const char* which)
+	TimerSet(TCPEndpoint* endpoint, const char* which, bigtime_t timeout)
+		:
+		fEndpoint(endpoint),
+		fWhich(which),
+		fTimeout(timeout),
+		fState(endpoint->State())
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("tcp:%p (%12s) %s timer set to %" B_PRIdBIGTIME, fEndpoint,
+			name_for_state(fState), fWhich, fTimeout);
+	}
+
+protected:
+	TCPEndpoint*	fEndpoint;
+	const char*		fWhich;
+	bigtime_t		fTimeout;
+	tcp_state		fState;
+};
+
+class TimerTriggered : public AbstractTraceEntry {
+public:
+	TimerTriggered(TCPEndpoint* endpoint, const char* which)
 		:
 		fEndpoint(endpoint),
 		fWhich(which),
@@ -234,7 +264,30 @@ public:
 
 	virtual void AddDump(TraceOutput& out)
 	{
-		out.Print("tcp:%p (%12s) %s timer", fEndpoint,
+		out.Print("tcp:%p (%12s) %s timer triggered", fEndpoint,
+			name_for_state(fState), fWhich);
+	}
+
+protected:
+	TCPEndpoint*	fEndpoint;
+	const char*		fWhich;
+	tcp_state		fState;
+};
+
+class APICall : public AbstractTraceEntry {
+public:
+	APICall(TCPEndpoint* endpoint, const char* which)
+		:
+		fEndpoint(endpoint),
+		fWhich(which),
+		fState(endpoint->State())
+	{
+		Initialized();
+	}
+
+	virtual void AddDump(TraceOutput& out)
+	{
+		out.Print("tcp:%p (%12s) api call: %s", fEndpoint,
 			name_for_state(fState), fWhich);
 	}
 
@@ -251,8 +304,6 @@ protected:
 #	define T(x)
 #endif	// TCP_TRACING
 
-// Initial estimate for packet round trip time (RTT)
-#define TCP_INITIAL_RTT		2000000
 
 // constants for the fFlags field
 enum {
@@ -268,7 +319,8 @@ enum {
 };
 
 
-static const int kTimestampFactor = 1024;
+static const int kTimestampFactor = 1000;
+	// conversion factor between usec system time and msec tcp time
 
 
 static inline bigtime_t
@@ -359,68 +411,10 @@ state_needs_finish(int32 state)
 //	#pragma mark -
 
 
-WaitList::WaitList(const char* name)
-{
-	fCondition = 0;
-	fSem = create_sem(0, name);
-}
-
-
-WaitList::~WaitList()
-{
-	delete_sem(fSem);
-}
-
-
-status_t
-WaitList::InitCheck() const
-{
-	return fSem;
-}
-
-
-status_t
-WaitList::Wait(MutexLocker& locker, bigtime_t timeout)
-{
-	locker.Unlock();
-
-	status_t status = B_OK;
-
-	while (!atomic_test_and_set(&fCondition, 0, 1)) {
-		status = acquire_sem_etc(fSem, 1, B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT,
-			timeout);
-		if (status != B_OK)
-			break;
-	}
-
-	locker.Lock();
-	return status;
-}
-
-
-void
-WaitList::Signal()
-{
-	atomic_or(&fCondition, 1);
-#ifdef __HAIKU__
-	release_sem_etc(fSem, 1, B_DO_NOT_RESCHEDULE | B_RELEASE_ALL);
-#else
-	int32 count;
-	if (get_sem_count(fSem, &count) == B_OK && count < 0)
-		release_sem_etc(fSem, -count, B_DO_NOT_RESCHEDULE);
-#endif
-}
-
-
-//	#pragma mark -
-
-
 TCPEndpoint::TCPEndpoint(net_socket* socket)
 	:
 	ProtocolSocket(socket),
 	fManager(NULL),
-	fReceiveList("tcp receive"),
-	fSendList("tcp send"),
 	fOptions(0),
 	fSendWindowShift(0),
 	fReceiveWindowShift(0),
@@ -452,6 +446,9 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 	// TODO: to be replaced with a real read/write locking strategy!
 	mutex_init(&fLock, "tcp lock");
 
+	fReceiveCondition.Init(this, "tcp receive");
+	fSendCondition.Init(this, "tcp send");
+
 	gStackModule->init_timer(&fPersistTimer, TCPEndpoint::_PersistTimer, this);
 	gStackModule->init_timer(&fRetransmitTimer, TCPEndpoint::_RetransmitTimer,
 		this);
@@ -459,6 +456,8 @@ TCPEndpoint::TCPEndpoint(net_socket* socket)
 		TCPEndpoint::_DelayedAcknowledgeTimer, this);
 	gStackModule->init_timer(&fTimeWaitTimer, TCPEndpoint::_TimeWaitTimer,
 		this);
+
+	T(APICall(this, "constructor"));
 }
 
 
@@ -466,8 +465,11 @@ TCPEndpoint::~TCPEndpoint()
 {
 	mutex_lock(&fLock);
 
+	T(APICall(this, "destructor"));
+
 	_CancelConnectionTimers();
 	gStackModule->cancel_timer(&fTimeWaitTimer);
+	T(TimerSet(this, "time-wait", -1));
 
 	if (fManager != NULL) {
 		fManager->Unbind(this);
@@ -489,12 +491,6 @@ TCPEndpoint::~TCPEndpoint()
 status_t
 TCPEndpoint::InitCheck() const
 {
-	if (fReceiveList.InitCheck() < B_OK)
-		return fReceiveList.InitCheck();
-
-	if (fSendList.InitCheck() < B_OK)
-		return fSendList.InitCheck();
-
 	return B_OK;
 }
 
@@ -506,6 +502,7 @@ status_t
 TCPEndpoint::Open()
 {
 	TRACE("Open()");
+	T(APICall(this, "open"));
 
 	status_t status = ProtocolSocket::Open();
 	if (status < B_OK)
@@ -522,9 +519,10 @@ TCPEndpoint::Open()
 status_t
 TCPEndpoint::Close()
 {
-	TRACE("Close()");
-
 	MutexLocker locker(fLock);
+
+	TRACE("Close()");
+	T(APICall(this, "close"));
 
 	if (fState == LISTEN)
 		delete_sem(fAcceptSemaphore);
@@ -546,15 +544,15 @@ TCPEndpoint::Close()
 		bigtime_t maximum = absolute_timeout(socket->linger * 1000000LL);
 
 		while (fSendQueue.Used() > 0) {
-			status = fSendList.Wait(locker, maximum);
+			status = _WaitForCondition(fSendCondition, locker, maximum);
 			if (status == B_TIMED_OUT || status == B_WOULD_BLOCK)
 				break;
 			else if (status < B_OK)
 				return status;
 		}
 
-		TRACE("Close(): after waiting, the SendQ was left with %lu bytes.",
-			fSendQueue.Used());
+		TRACE("Close(): after waiting, the SendQ was left with %" B_PRIuSIZE
+			" bytes.", fSendQueue.Used());
 	}
 	return B_OK;
 }
@@ -563,9 +561,10 @@ TCPEndpoint::Close()
 void
 TCPEndpoint::Free()
 {
-	TRACE("Free()");
-
 	MutexLocker _(fLock);
+
+	TRACE("Free()");
+	T(APICall(this, "free"));
 
 	if (fState <= SYNCHRONIZE_SENT)
 		return;
@@ -587,18 +586,19 @@ TCPEndpoint::Free()
 status_t
 TCPEndpoint::Connect(const sockaddr* address)
 {
-	TRACE("Connect() on address %s", PrintAddress(address));
-
 	if (!AddressModule()->is_same_family(address))
 		return EAFNOSUPPORT;
 
 	MutexLocker locker(fLock);
 
+	TRACE("Connect() on address %s", PrintAddress(address));
+	T(APICall(this, "connect"));
+
 	if (gStackModule->is_restarted_syscall()) {
 		bigtime_t timeout = gStackModule->restore_syscall_restart_timeout();
 		status_t status = _WaitForEstablished(locker, timeout);
-		TRACE("  Connect(): Connection complete: %s (timeout was %llu)",
-			strerror(status), timeout);
+		TRACE("  Connect(): Connection complete: %s (timeout was %"
+			B_PRIdBIGTIME ")", strerror(status), timeout);
 		return posix_error(status);
 	}
 
@@ -656,8 +656,8 @@ TCPEndpoint::Connect(const sockaddr* address)
 	gStackModule->store_syscall_restart_timeout(absoluteTimeout);
 
 	status = _WaitForEstablished(locker, absoluteTimeout);
-	TRACE("  Connect(): Connection complete: %s (timeout was %llu)",
-		strerror(status), timeout);
+	TRACE("  Connect(): Connection complete: %s (timeout was %" B_PRIdBIGTIME
+		")", strerror(status), timeout);
 	return posix_error(status);
 }
 
@@ -665,9 +665,10 @@ TCPEndpoint::Connect(const sockaddr* address)
 status_t
 TCPEndpoint::Accept(struct net_socket** _acceptedSocket)
 {
-	TRACE("Accept()");
-
 	MutexLocker locker(fLock);
+
+	TRACE("Accept()");
+	T(APICall(this, "accept"));
 
 	status_t status;
 	bigtime_t timeout = absolute_timeout(socket->receive.timeout);
@@ -709,6 +710,7 @@ TCPEndpoint::Bind(const sockaddr *address)
 	MutexLocker lock(fLock);
 
 	TRACE("Bind() on address %s", PrintAddress(address));
+	T(APICall(this, "bind"));
 
 	if (fState != CLOSED)
 		return EISCONN;
@@ -720,9 +722,11 @@ TCPEndpoint::Bind(const sockaddr *address)
 status_t
 TCPEndpoint::Unbind(struct sockaddr *address)
 {
-	TRACE("Unbind()");
-
 	MutexLocker _(fLock);
+
+	TRACE("Unbind()");
+	T(APICall(this, "unbind"));
+
 	return fManager->Unbind(this);
 }
 
@@ -730,9 +734,10 @@ TCPEndpoint::Unbind(struct sockaddr *address)
 status_t
 TCPEndpoint::Listen(int count)
 {
-	TRACE("Listen()");
-
 	MutexLocker _(fLock);
+
+	TRACE("Listen()");
+	T(APICall(this, "listen"));
 
 	if (fState != CLOSED && fState != LISTEN)
 		return B_BAD_VALUE;
@@ -761,9 +766,10 @@ TCPEndpoint::Listen(int count)
 status_t
 TCPEndpoint::Shutdown(int direction)
 {
-	TRACE("Shutdown(%i)", direction);
-
 	MutexLocker lock(fLock);
+
+	TRACE("Shutdown(%i)", direction);
+	T(APICall(this, "shutdown"));
 
 	if (direction == SHUT_RD || direction == SHUT_RDWR)
 		fFlags |= FLAG_NO_RECEIVE;
@@ -784,9 +790,10 @@ TCPEndpoint::SendData(net_buffer *buffer)
 {
 	MutexLocker lock(fLock);
 
-	TRACE("SendData(buffer %p, size %lu, flags %lx) [total %lu bytes, has %lu]",
-		buffer, buffer->size, buffer->flags, fSendQueue.Size(),
-		fSendQueue.Free());
+	TRACE("SendData(buffer %p, size %" B_PRIu32 ", flags %#" B_PRIx32
+		") [total %" B_PRIuSIZE " bytes, has %" B_PRIuSIZE "]", buffer,
+		buffer->size, buffer->flags, fSendQueue.Size(), fSendQueue.Free());
+	T(APICall(this, "senddata"));
 
 	uint32 flags = buffer->flags;
 
@@ -812,7 +819,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 	while (left > 0) {
 		while (fSendQueue.Free() < socket->send.low_water_mark) {
 			// wait until enough space is available
-			status_t status = fSendList.Wait(lock, timeout);
+			status_t status = _WaitForCondition(fSendCondition, lock, timeout);
 			if (status < B_OK) {
 				TRACE("  SendData() returning %s (%d)",
 					strerror(posix_error(status)), (int)posix_error(status));
@@ -851,7 +858,7 @@ TCPEndpoint::SendData(net_buffer *buffer)
 		}
 	}
 
-	TRACE("  SendData(): %lu bytes used.", fSendQueue.Used());
+	TRACE("  SendData(): %" B_PRIuSIZE " bytes used.", fSendQueue.Used());
 
 	bool force = false;
 	if ((flags & MSG_OOB) != 0) {
@@ -885,7 +892,8 @@ TCPEndpoint::SendAvailable()
 	else
 		available = EPIPE;
 
-	TRACE("SendAvailable(): %li", available);
+	TRACE("SendAvailable(): %" B_PRIdSSIZE, available);
+	T(APICall(this, "sendavailable"));
 	return available;
 }
 
@@ -906,9 +914,11 @@ TCPEndpoint::FillStat(net_stat *stat)
 status_t
 TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
-	TRACE("ReadData(%lu bytes, flags 0x%x)", numBytes, (unsigned int)flags);
-
 	MutexLocker locker(fLock);
+
+	TRACE("ReadData(%" B_PRIuSIZE " bytes, flags %#" B_PRIx32 ")", numBytes,
+		flags);
+	T(APICall(this, "readdata"));
 
 	*_buffer = NULL;
 
@@ -963,7 +973,7 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		if ((fFlags & FLAG_NO_RECEIVE) != 0)
 			return B_OK;
 
-		status_t status = fReceiveList.Wait(locker, timeout);
+		status_t status = _WaitForCondition(fReceiveCondition, locker, timeout);
 		if (status < B_OK) {
 			// The Open Group base specification mentions that EINTR should be
 			// returned if the recv() is interrupted before _any data_ is
@@ -977,16 +987,18 @@ TCPEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 		}
 	}
 
-	TRACE("  ReadData(): %lu are available.", fReceiveQueue.Available());
+	TRACE("  ReadData(): %" B_PRIuSIZE " are available.",
+		fReceiveQueue.Available());
 
 	if (numBytes < fReceiveQueue.Available())
-		fReceiveList.Signal();
+		fReceiveCondition.NotifyAll();
 
 	bool clone = (flags & MSG_PEEK) != 0;
 
 	ssize_t receivedBytes = fReceiveQueue.Get(numBytes, !clone, _buffer);
 
-	TRACE("  ReadData(): %lu bytes kept.", fReceiveQueue.Available());
+	TRACE("  ReadData(): %" B_PRIuSIZE " bytes kept.",
+		fReceiveQueue.Available());
 
 	// if we are opening the window, check if we should send an ACK
 	if (!clone)
@@ -1001,7 +1013,8 @@ TCPEndpoint::ReadAvailable()
 {
 	MutexLocker locker(fLock);
 
-	TRACE("ReadAvailable(): %li", _AvailableData());
+	TRACE("ReadAvailable(): %" B_PRIdSSIZE, _AvailableData());
+	T(APICall(this, "readavailable"));
 
 	return _AvailableData();
 }
@@ -1095,11 +1108,13 @@ TCPEndpoint::DelayedAcknowledge()
 	if (gStackModule->cancel_timer(&fDelayedAcknowledgeTimer)) {
 		// timer was active, send an ACK now (with the exception above,
 		// we send every other ACK)
+		T(TimerSet(this, "delayed ack", -1));
 		return SendAcknowledge(true);
 	}
 
 	gStackModule->set_timer(&fDelayedAcknowledgeTimer,
 		TCP_DELAYED_ACKNOWLEDGE_TIMEOUT);
+	T(TimerSet(this, "delayed ack", TCP_DELAYED_ACKNOWLEDGE_TIMEOUT));
 	return B_OK;
 }
 
@@ -1114,21 +1129,24 @@ TCPEndpoint::SendAcknowledge(bool force)
 void
 TCPEndpoint::_StartPersistTimer()
 {
-	gStackModule->set_timer(&fPersistTimer, 1000000LL);
+	gStackModule->set_timer(&fPersistTimer, TCP_PERSIST_TIMEOUT);
+	T(TimerSet(this, "persist", TCP_PERSIST_TIMEOUT));
 }
 
 
 void
 TCPEndpoint::_EnterTimeWait()
 {
-	TRACE("_EnterTimeWait()\n");
+	TRACE("_EnterTimeWait()");
 
-	_CancelConnectionTimers();
+	if (fState == TIME_WAIT) {
+		_CancelConnectionTimers();
 
-	if (fState == TIME_WAIT && IsLocal()) {
-		// we do not use TIME_WAIT state for local connections
-		fFlags |= FLAG_DELETE_ON_CLOSE;
-		return;
+		if (IsLocal()) {
+			// we do not use TIME_WAIT state for local connections
+			fFlags |= FLAG_DELETE_ON_CLOSE;
+			return;
+		}
 	}
 
 	_UpdateTimeWait();
@@ -1139,6 +1157,7 @@ void
 TCPEndpoint::_UpdateTimeWait()
 {
 	gStackModule->set_timer(&fTimeWaitTimer, TCP_MAX_SEGMENT_LIFETIME << 1);
+	T(TimerSet(this, "time-wait", TCP_MAX_SEGMENT_LIFETIME << 1));
 }
 
 
@@ -1146,8 +1165,11 @@ void
 TCPEndpoint::_CancelConnectionTimers()
 {
 	gStackModule->cancel_timer(&fRetransmitTimer);
+	T(TimerSet(this, "retransmit", -1));
 	gStackModule->cancel_timer(&fPersistTimer);
+	T(TimerSet(this, "persist", -1));
 	gStackModule->cancel_timer(&fDelayedAcknowledgeTimer);
+	T(TimerSet(this, "delayed ack", -1));
 }
 
 
@@ -1190,7 +1212,7 @@ TCPEndpoint::_MarkEstablished()
 		release_sem_etc(fAcceptSemaphore, 1, B_DO_NOT_RESCHEDULE);
 	}
 
-	fSendList.Signal();
+	fSendCondition.NotifyAll();
 	gSocketModule->notify(socket, B_SELECT_WRITE, fSendQueue.Free());
 }
 
@@ -1204,7 +1226,7 @@ TCPEndpoint::_WaitForEstablished(MutexLocker &locker, bigtime_t timeout)
 		if (socket->error != B_OK)
 			return socket->error;
 
-		status_t status = fSendList.Wait(locker, timeout);
+		status_t status = _WaitForCondition(fSendCondition, locker, timeout);
 		if (status < B_OK)
 			return status;
 	}
@@ -1225,7 +1247,7 @@ TCPEndpoint::_Close()
 
 	fFlags |= FLAG_DELETE_ON_CLOSE;
 
-	fSendList.Signal();
+	fSendCondition.NotifyAll();
 	_NotifyReader();
 
 	if (gSocketModule->has_parent(socket)) {
@@ -1256,8 +1278,7 @@ TCPEndpoint::_DuplicateAcknowledge(tcp_segment_header &segment)
 
 	if (fDuplicateAcknowledgeCount == 3) {
 		_ResetSlowStart();
-		fCongestionWindow = fSlowStartThreshold + 3
-			* fSendMaxSegmentSize;
+		fCongestionWindow = fSlowStartThreshold + 3 * fSendMaxSegmentSize;
 		fSendNext = segment.acknowledge;
 	} else if (fDuplicateAcknowledgeCount > 3)
 		fCongestionWindow += fSendMaxSegmentSize;
@@ -1303,7 +1324,7 @@ TCPEndpoint::_AvailableData() const
 void
 TCPEndpoint::_NotifyReader()
 {
-	fReceiveList.Signal();
+	fReceiveCondition.NotifyAll();
 	gSocketModule->notify(socket, B_SELECT_READ, _AvailableData());
 }
 
@@ -1328,8 +1349,8 @@ TCPEndpoint::_AddData(tcp_segment_header& segment, net_buffer* buffer)
 			segment.flags |= TCP_FLAG_FINISH;
 	}
 
-	TRACE("  _AddData(): adding data, receive next = %lu. Now have %lu bytes.",
-		fReceiveNext.Number(), fReceiveQueue.Available());
+	TRACE("  _AddData(): adding data, receive next = %" B_PRIu32 ". Now have %"
+		B_PRIuSIZE " bytes.", fReceiveNext.Number(), fReceiveQueue.Available());
 
 	if ((segment.flags & TCP_FLAG_PUSH) != 0)
 		fReceiveQueue.SetPushPointer();
@@ -1543,8 +1564,8 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 		// Check sequence number
 		if (!segment_in_sequence(segment, segmentLength, fReceiveNext,
 				fReceiveWindow)) {
-			TRACE("  Receive(): segment out of window, next: %lu wnd: %lu",
-				fReceiveNext.Number(), fReceiveWindow);
+			TRACE("  Receive(): segment out of window, next: %" B_PRIu32
+				" wnd: %" B_PRIu32, fReceiveNext.Number(), fReceiveWindow);
 			if ((segment.flags & TCP_FLAG_RESET) != 0) {
 				// TODO: this doesn't look right - review!
 				return DROP;
@@ -1602,7 +1623,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 		}
 
 		// remove duplicate data at the start
-		TRACE("* remove %ld bytes from the start", drop);
+		TRACE("* remove %" B_PRId32 " bytes from the start", drop);
 		gBufferModule->remove_header(buffer, drop);
 		segment.sequence += drop;
 	}
@@ -1628,14 +1649,14 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 		}
 
 		segment.flags &= ~(TCP_FLAG_FINISH | TCP_FLAG_PUSH);
-		TRACE("* remove %ld bytes from the end", drop);
+		TRACE("* remove %" B_PRId32 " bytes from the end", drop);
 		gBufferModule->remove_trailer(buffer, drop);
 	}
 
 #ifdef TRACE_TCP
 	if (advertisedWindow > fSendWindow) {
-		TRACE("  Receive(): Window update %lu -> %lu", fSendWindow,
-			advertisedWindow);
+		TRACE("  Receive(): Window update %" B_PRIu32 " -> %" B_PRIu32,
+			fSendWindow, advertisedWindow);
 	}
 #endif
 
@@ -1777,7 +1798,7 @@ TCPEndpoint::_Receive(tcp_segment_header& segment, net_buffer* buffer)
 
 	_UpdateTimestamps(segment, segmentLength);
 
-	TRACE("Receive() Action %ld", action);
+	TRACE("Receive() Action %" B_PRId32, action);
 
 	return action;
 }
@@ -1788,9 +1809,9 @@ TCPEndpoint::SegmentReceived(tcp_segment_header& segment, net_buffer* buffer)
 {
 	MutexLocker locker(fLock);
 
-	TRACE("SegmentReceived(): buffer %p (%lu bytes) address %s to %s\n"
-		"\tflags 0x%x, seq %lu, ack %lu, wnd %lu",
-		buffer, buffer->size, PrintAddress(buffer->source),
+	TRACE("SegmentReceived(): buffer %p (%" B_PRIu32 " bytes) address %s "
+		"to %s flags %#" B_PRIx8 ", seq %" B_PRIu32 ", ack %" B_PRIu32
+		", wnd %" B_PRIu32, buffer, buffer->size, PrintAddress(buffer->source),
 		PrintAddress(buffer->destination), segment.flags, segment.sequence,
 		segment.acknowledge,
 		(uint32)segment.advertised_window << fSendWindowShift);
@@ -2006,7 +2027,8 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 	}
 
 	uint32 length = min_c(fSendQueue.Available(fSendNext), sendWindow);
-	tcp_sequence previousSendNext = fSendNext;
+	bool shouldStartRetransmitTimer = fSendNext == fSendUnacknowledged;
+	bool retransmit = fSendNext < fSendMax;
 
 	do {
 		uint32 segmentMaxSize = fSendMaxSegmentSize
@@ -2021,7 +2043,7 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 		}
 
 		// Determine if we should really send this segment
-		if (!force && !_ShouldSendSegment(segment, segmentLength,
+		if (!force && !retransmit && !_ShouldSendSegment(segment, segmentLength,
 				segmentMaxSize, flightSize)) {
 			if (fSendQueue.Available()
 				&& !gStackModule->is_timer_active(&fPersistTimer)
@@ -2048,9 +2070,10 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 		uint32 size = buffer->size;
 		segment.sequence = fSendNext.Number();
 
-		TRACE("SendQueued(): buffer %p (%lu bytes) address %s to %s\n"
-			"\tflags 0x%x, seq %lu, ack %lu, rwnd %hu, cwnd %lu, ssthresh %lu\n"
-			"\tlen %lu first %lu last %lu",
+		TRACE("SendQueued(): buffer %p (%" B_PRIu32 " bytes) address %s to "
+			"%s flags %#" B_PRIx8 ", seq %" B_PRIu32 ", ack %" B_PRIu32
+			", rwnd %" B_PRIu16 ", cwnd %" B_PRIu32 ", ssthresh %" B_PRIu32
+			", len %" B_PRIu32 ", first %" B_PRIu32 ", last %" B_PRIu32,
 			buffer, buffer->size, PrintAddress(buffer->source),
 			PrintAddress(buffer->destination), segment.flags, segment.sequence,
 			segment.acknowledge, segment.advertised_window,
@@ -2099,23 +2122,25 @@ TCPEndpoint::_SendQueued(bool force, uint32 sendWindow)
 			return status;
 		}
 
+		if (shouldStartRetransmitTimer && size > 0) {
+			TRACE("starting initial retransmit timer of: %" B_PRIdBIGTIME,
+				fRetransmitTimeout);
+			gStackModule->set_timer(&fRetransmitTimer, fRetransmitTimeout);
+			T(TimerSet(this, "retransmit", fRetransmitTimeout));
+			shouldStartRetransmitTimer = false;
+		}
+
 		if (segment.flags & TCP_FLAG_ACKNOWLEDGE)
 			fLastAcknowledgeSent = segment.acknowledge;
 
 		length -= segmentLength;
 		segment.flags &= ~(TCP_FLAG_SYNCHRONIZE | TCP_FLAG_RESET
 			| TCP_FLAG_FINISH);
+
+		if (retransmit)
+			break;
+
 	} while (length > 0);
-
-	// if we sent data from the beggining of the send queue,
-	// start the retransmition timer
-	if (previousSendNext == fSendUnacknowledged
-		&& fSendNext > previousSendNext) {
-		TRACE("  SendQueue(): set retransmit timer with rto %llu",
-			fRetransmitTimeout);
-
-		gStackModule->set_timer(&fRetransmitTimer, fRetransmitTimeout);
-	}
 
 	return B_OK;
 }
@@ -2172,29 +2197,41 @@ TCPEndpoint::_PrepareSendPath(const sockaddr* peer)
 void
 TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 {
-	size_t previouslyUsed = fSendQueue.Used();
+	TRACE("_Acknowledged(): ack %" B_PRIu32 "; uack %" B_PRIu32 "; next %"
+		B_PRIu32 "; max %" B_PRIu32, segment.acknowledge,
+		fSendUnacknowledged.Number(), fSendNext.Number(), fSendMax.Number());
 
-	fSendQueue.RemoveUntil(segment.acknowledge);
-	fSendUnacknowledged = segment.acknowledge;
+	ASSERT(fSendUnacknowledged <= segment.acknowledge);
 
-	if (fSendNext < fSendUnacknowledged)
-		fSendNext = fSendUnacknowledged;
-
-	if (fSendUnacknowledged == fSendMax)
-		gStackModule->cancel_timer(&fRetransmitTimer);
-
-	if (fSendQueue.Used() < previouslyUsed) {
-		// this ACK acknowledged data
+	if (fSendUnacknowledged < segment.acknowledge) {
+		fSendQueue.RemoveUntil(segment.acknowledge);
+		fSendUnacknowledged = segment.acknowledge;
+		if (fSendNext < fSendUnacknowledged)
+			fSendNext = fSendUnacknowledged;
 
 		if (segment.options & TCP_HAS_TIMESTAMPS)
 			_UpdateRoundTripTime(tcp_diff_timestamp(segment.timestamp_reply));
 		else {
-			// TODO: Fallback to RFC 793 type estimation
+			// TODO: Fallback to RFC 793 type estimation; This just resets
+			// any potential exponential back off that happened due to
+			// retransmits.
+			fRetransmitTimeout = TCP_INITIAL_RTT;
+		}
+
+		if (fSendUnacknowledged == fSendMax) {
+			TRACE("all acknowledged, cancelling retransmission timer");
+			gStackModule->cancel_timer(&fRetransmitTimer);
+			T(TimerSet(this, "retransmit", -1));
+		} else {
+			TRACE("data acknowledged, resetting retransmission timer to: %"
+				B_PRIdBIGTIME, fRetransmitTimeout);
+			gStackModule->set_timer(&fRetransmitTimer, fRetransmitTimeout);
+			T(TimerSet(this, "retransmit", fRetransmitTimeout));
 		}
 
 		if (is_writable(fState)) {
 			// notify threads waiting on the socket to become writable again
-			fSendList.Signal();
+			fSendCondition.NotifyAll();
 			gSocketModule->notify(socket, B_SELECT_WRITE, fSendQueue.Free());
 		}
 
@@ -2213,7 +2250,7 @@ TCPEndpoint::_Acknowledged(tcp_segment_header& segment)
 		fCongestionWindow += increment;
 	}
 
-	// if there is data left to be send, send it now
+	// if there is data left to be sent, send it now
 	if (fSendQueue.Used() > 0)
 		_SendQueued();
 }
@@ -2223,8 +2260,15 @@ void
 TCPEndpoint::_Retransmit()
 {
 	TRACE("Retransmit()");
+
 	_ResetSlowStart();
 	fSendNext = fSendUnacknowledged;
+
+	// Do exponential back off of the retransmit timeout
+	fRetransmitTimeout *= 2;
+	if (fRetransmitTimeout > TCP_MAX_RETRANSMIT_TIMEOUT)
+		fRetransmitTimeout = TCP_MAX_RETRANSMIT_TIMEOUT;
+
 	_SendQueued();
 }
 
@@ -2244,9 +2288,11 @@ TCPEndpoint::_UpdateRoundTripTime(int32 roundTripTime)
 
 	fRetransmitTimeout = ((fRoundTripTime / 4 + fRoundTripDeviation) / 2)
 		* kTimestampFactor;
+	if (fRetransmitTimeout < TCP_MIN_RETRANSMIT_TIMEOUT)
+		fRetransmitTimeout = TCP_MIN_RETRANSMIT_TIMEOUT;
 
-	TRACE("  RTO is now %llu (after rtt %ldms)", fRetransmitTimeout,
-		roundTripTime);
+	TRACE("  RTO is now %" B_PRIdBIGTIME " (after rtt %" B_PRId32 "ms)",
+		fRetransmitTimeout, roundTripTime);
 }
 
 
@@ -2266,7 +2312,7 @@ TCPEndpoint::_ResetSlowStart()
 TCPEndpoint::_RetransmitTimer(net_timer* timer, void* _endpoint)
 {
 	TCPEndpoint* endpoint = (TCPEndpoint*)_endpoint;
-	T(Timer(endpoint, "retransmit"));
+	T(TimerTriggered(endpoint, "retransmit"));
 
 	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
@@ -2280,7 +2326,7 @@ TCPEndpoint::_RetransmitTimer(net_timer* timer, void* _endpoint)
 TCPEndpoint::_PersistTimer(net_timer* timer, void* _endpoint)
 {
 	TCPEndpoint* endpoint = (TCPEndpoint*)_endpoint;
-	T(Timer(endpoint, "persist"));
+	T(TimerTriggered(endpoint, "persist"));
 
 	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
@@ -2298,7 +2344,7 @@ TCPEndpoint::_PersistTimer(net_timer* timer, void* _endpoint)
 TCPEndpoint::_DelayedAcknowledgeTimer(net_timer* timer, void* _endpoint)
 {
 	TCPEndpoint* endpoint = (TCPEndpoint*)_endpoint;
-	T(Timer(endpoint, "delayed ack"));
+	T(TimerTriggered(endpoint, "delayed ack"));
 
 	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
@@ -2316,7 +2362,7 @@ TCPEndpoint::_DelayedAcknowledgeTimer(net_timer* timer, void* _endpoint)
 TCPEndpoint::_TimeWaitTimer(net_timer* timer, void* _endpoint)
 {
 	TCPEndpoint* endpoint = (TCPEndpoint*)_endpoint;
-	T(Timer(endpoint, "time-wait"));
+	T(TimerTriggered(endpoint, "time-wait"));
 
 	MutexLocker locker(endpoint->fLock);
 	if (!locker.IsLocked())
@@ -2330,6 +2376,21 @@ TCPEndpoint::_TimeWaitTimer(net_timer* timer, void* _endpoint)
 	locker.Unlock();
 
 	gSocketModule->release_socket(endpoint->socket);
+}
+
+
+/*static*/ status_t
+TCPEndpoint::_WaitForCondition(ConditionVariable& condition,
+	MutexLocker& locker, bigtime_t timeout)
+{
+	ConditionVariableEntry entry;
+	condition.Add(&entry);
+
+	locker.Unlock();
+	status_t result = entry.Wait(B_ABSOLUTE_TIMEOUT | B_CAN_INTERRUPT, timeout);
+	locker.Lock();
+
+	return result;
 }
 
 
@@ -2348,7 +2409,7 @@ TCPEndpoint::Dump() const
 	kprintf("  accept sem: %" B_PRId32 "\n", fAcceptSemaphore);
 	kprintf("  options: 0x%" B_PRIx32 "\n", (uint32)fOptions);
 	kprintf("  send\n");
-	kprintf("    window shift: %u\n", fSendWindowShift);
+	kprintf("    window shift: %" B_PRIu8 "\n", fSendWindowShift);
 	kprintf("    unacknowledged: %" B_PRIu32 "\n",
 		fSendUnacknowledged.Number());
 	kprintf("    next: %" B_PRIu32 "\n", fSendNext.Number());
@@ -2357,7 +2418,8 @@ TCPEndpoint::Dump() const
 	kprintf("    window: %" B_PRIu32 "\n", fSendWindow);
 	kprintf("    max window: %" B_PRIu32 "\n", fSendMaxWindow);
 	kprintf("    max segment size: %" B_PRIu32 "\n", fSendMaxSegmentSize);
-	kprintf("    queue: %lu / %lu\n", fSendQueue.Used(), fSendQueue.Size());
+	kprintf("    queue: %" B_PRIuSIZE " / %" B_PRIuSIZE "\n", fSendQueue.Used(),
+		fSendQueue.Size());
 #if DEBUG_BUFFER_QUEUE
 	fSendQueue.Dump();
 #endif
@@ -2366,14 +2428,14 @@ TCPEndpoint::Dump() const
 	kprintf("    initial sequence: %" B_PRIu32 "\n",
 		fInitialSendSequence.Number());
 	kprintf("  receive\n");
-	kprintf("    window shift: %u\n", fReceiveWindowShift);
+	kprintf("    window shift: %" B_PRIu8 "\n", fReceiveWindowShift);
 	kprintf("    next: %" B_PRIu32 "\n", fReceiveNext.Number());
 	kprintf("    max advertised: %" B_PRIu32 "\n",
 		fReceiveMaxAdvertised.Number());
 	kprintf("    window: %" B_PRIu32 "\n", fReceiveWindow);
 	kprintf("    max segment size: %" B_PRIu32 "\n", fReceiveMaxSegmentSize);
-	kprintf("    queue: %lu / %lu\n", fReceiveQueue.Available(),
-		fReceiveQueue.Size());
+	kprintf("    queue: %" B_PRIuSIZE " / %" B_PRIuSIZE "\n",
+		fReceiveQueue.Available(), fReceiveQueue.Size());
 #if DEBUG_BUFFER_QUEUE
 	fReceiveQueue.Dump();
 #endif

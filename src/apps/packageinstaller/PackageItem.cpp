@@ -9,6 +9,7 @@
 
 #include "PackageItem.h"
 
+#include <stdlib.h>
 #include <string.h>
 
 #include <Alert.h>
@@ -42,8 +43,6 @@ enum {
 	P_DATA = 0,
 	P_ATTRIBUTE
 };
-
-extern const char **environ;
 
 
 status_t
@@ -748,7 +747,7 @@ PackageScript::_RunScript(const char* workingDirectory, const BString& script)
 	int old_in  =  dup(0);
 	int old_out  =  dup(1);
 	int old_err  =  dup(2);
-	
+
 	int filedes[2];
 
 	/* Create new pipe FDs as stdin, stdout, stderr */
@@ -763,7 +762,7 @@ PackageScript::_RunScript(const char* workingDirectory, const BString& script)
 	argv[2] = NULL;
 
 	// "load" command.
-	fThreadId = load_image(2, argv, environ);
+	fThreadId = load_image(2, argv, (const char**)environ);
 
 	int i;
 	for (i = 0; i < 2; i++)

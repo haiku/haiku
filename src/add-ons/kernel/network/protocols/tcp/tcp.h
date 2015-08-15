@@ -43,30 +43,30 @@ enum tcp_state {
 };
 
 struct tcp_header {
-	uint16 source_port;
-	uint16 destination_port;
-	uint32 sequence;
-	uint32 acknowledge;
+	uint16	source_port;
+	uint16	destination_port;
+	uint32	sequence;
+	uint32	acknowledge;
 	struct {
 #if B_HOST_IS_LENDIAN == 1
-		uint8 reserved : 4;
-		uint8 header_length : 4;
+		uint8	reserved : 4;
+		uint8	header_length : 4;
 #else
-		uint8 header_length : 4;
-		uint8 reserved : 4;
+		uint8	header_length : 4;
+		uint8	reserved : 4;
 #endif
 	};
-	uint8  flags;
-	uint16 advertised_window;
-	uint16 checksum;
-	uint16 urgent_offset;
+	uint8	flags;
+	uint16	advertised_window;
+	uint16	checksum;
+	uint16	urgent_offset;
 
-	uint32 HeaderLength() const { return (uint32)header_length << 2; }
-	uint32 Sequence() const { return ntohl(sequence); }
-	uint32 Acknowledge() const { return ntohl(acknowledge); }
-	uint16 AdvertisedWindow() const { return ntohs(advertised_window); }
-	uint16 Checksum() const { return ntohs(checksum); }
-	uint16 UrgentOffset() const { return ntohs(urgent_offset); }
+	uint32	HeaderLength() const { return (uint32)header_length << 2; }
+	uint32	Sequence() const { return ntohl(sequence); }
+	uint32	Acknowledge() const { return ntohl(acknowledge); }
+	uint16	AdvertisedWindow() const { return ntohs(advertised_window); }
+	uint16	Checksum() const { return ntohs(checksum); }
+	uint16	UrgentOffset() const { return ntohs(urgent_offset); }
 } _PACKED;
 
 class tcp_sequence {
@@ -185,6 +185,14 @@ operator==(tcp_sequence a, tcp_sequence b)
 #define TCP_DEFAULT_MAX_SEGMENT_SIZE	536
 #define TCP_MAX_WINDOW					65535
 #define TCP_MAX_SEGMENT_LIFETIME		60000000	// 60 secs
+#define TCP_PERSIST_TIMEOUT				1000000		// 1 sec
+
+// Initial estimate for packet round trip time (RTT)
+#define TCP_INITIAL_RTT					2000000		// 2 secs
+// Minimum retransmit timeout (consider delayed ack)
+#define TCP_MIN_RETRANSMIT_TIMEOUT		200000		// 200 msecs
+// Maximum retransmit timeout (per RFC6298)
+#define TCP_MAX_RETRANSMIT_TIMEOUT		60000000	// 60 secs
 
 struct tcp_sack {
 	uint32 left_edge;

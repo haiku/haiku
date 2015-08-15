@@ -7,6 +7,7 @@
  *		François Revol
  *		Axel Dörfler, axeld@pinc-software.de.
  *		Puck Meerburg, puck@puckipedia.nl
+ *		Dario Casalinuovo, b.vitruvio@gmail.com
  */
 
 
@@ -45,31 +46,13 @@ MixerControl::Connect(int32 volumeWhich, float* _value, const char** _error)
 
 	_Disconnect();
 
-	bool retrying = false;
-
 	status_t status = B_OK;
-		// BMediaRoster::Roster() doesn't set it if all is ok
+	// BMediaRoster::Roster() doesn't set it if all is ok
 	const char* errorString = NULL;
 	BMediaRoster* roster = BMediaRoster::Roster(&status);
 
-retry:
-	// Here we release the BMediaRoster once if we can't access the system
-	// mixer, to make sure it really isn't there, and it's not BMediaRoster
-	// that is messed up.
-	if (retrying) {
-		errorString = NULL;
-		PRINT(("retrying to get a Media Roster\n"));
-		/* BMediaRoster looks doomed */
-		roster = BMediaRoster::CurrentRoster();
-		if (roster) {
-			roster->Lock();
-			roster->Quit();
-		}
-		snooze(10000);
-		roster = BMediaRoster::Roster(&status);
-	}
-
-	if (roster != NULL && status == B_OK) {
+	if (BMediaRoster::IsRunning() && roster != NULL
+			&& status == B_OK) {
 		switch (volumeWhich) {
 			case VOLUME_USE_MIXER:
 				status = roster->GetAudioMixer(&fGainMediaNode);
@@ -160,20 +143,11 @@ retry:
 				errorString = "No parameter web";
 				fParameterWeb = NULL;
 			}
-		} else {
-			if (!retrying) {
-				retrying = true;
-				goto retry;
-			}
+		} else
 			errorString = volumeWhich ? "No Audio output" : "No Mixer";
-		}
-	} else {
-		if (!retrying) {
-			retrying = true;
-			goto retry;
-		}
-		errorString = "No Media Roster";
-	}
+
+	} else
+		errorString = "Media services not running";
 
 	if (status != B_OK)
 		fGainMediaNode = media_node::null;

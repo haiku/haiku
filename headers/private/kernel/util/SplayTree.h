@@ -117,7 +117,7 @@ public:
 		}
 
 		return node;
-    }
+	}
 
 	/*!
 		Remove from the tree.
@@ -143,7 +143,7 @@ public:
 		}
 
 		return true;
-    }
+	}
 
 	/*!
 		Find the smallest item in the tree.
@@ -163,9 +163,9 @@ public:
 		return node;
 	}
 
-    /*!
+	/*!
 		Find the largest item in the tree.
-     */
+	*/
 	Node* FindMax()
 	{
 		if (fRoot == NULL)
@@ -179,9 +179,9 @@ public:
 		_Splay(Definition::GetKey(node));
 
 		return node;
-    }
+	}
 
-    /*!
+	/*!
 		Find an item in the tree.
 	*/
 	Node* Lookup(const Key& key)
@@ -192,14 +192,14 @@ public:
 		_Splay(key);
 
 		return Definition::Compare(key, fRoot) == 0 ? fRoot : NULL;
-    }
+	}
 
 	Node* Root() const
 	{
 		return fRoot;
 	}
 
-    /*!
+	/*!
 		Test if the tree is logically empty.
 		\return true if empty, false otherwise.
 	*/
@@ -267,16 +267,16 @@ private:
 
 		_Splay(key) does the splay operation on the given key.
 		If key is in the tree, then the node containing
-		that key becomes the root.  If key is not in the tree,
+		that key becomes the root. If key is not in the tree,
 		then after the splay, key.root is either the greatest key
 		< key in the tree, or the least key > key in the tree.
 
 		This means, among other things, that if you splay with
 		a key that's larger than any in the tree, the rightmost
-		node of the tree becomes the root.  This property is used
+		node of the tree becomes the root. This property is used
 		in the Remove() method.
 	*/
-    void _Splay(const Key& key) {
+	void _Splay(const Key& key) {
 		Link headerLink;
 		headerLink.left = headerLink.right = NULL;
 
@@ -554,7 +554,7 @@ public:
 		return fTree.Root();
 	}
 
-    /*!
+	/*!
 		Test if the tree is logically empty.
 		\return true if empty, false otherwise.
 	*/

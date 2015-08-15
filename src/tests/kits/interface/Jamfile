@@ -82,7 +82,7 @@ SimpleTest ChannelSliderTest :
 	ChannelSliderTest.cpp
 	ChannelSlider.cpp
 	ChannelControl.cpp
-	: be [ TargetLibsupc++ ]
+	: be [ TargetLibstdc++ TargetLibsupc++ ]
 	;
 
 SimpleTest CheckBoxTest :

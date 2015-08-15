@@ -53,7 +53,7 @@ void stressTest(int32 domainNumber, int32 totalCookies, char** flat, ssize_t* si
 	}
 	delete watch;
 
-	BNetworkCookie* c;
+	const BNetworkCookie* c;
 	int16 domain = (rand() % domainNumber);
 	BString host("http://");
 	host << domains[domain] << "/";
@@ -94,7 +94,7 @@ main(int, char**)
 	j.Unflatten(B_ANY_TYPE, flatJar, size);
 
 	int32 count = 0;
-	BNetworkCookie* c;
+	const BNetworkCookie* c;
 	for (BNetworkCookieJar::Iterator it(j.GetIterator()); (c = it.Next()); )
 		count++;
 	cout << "Count : " << count << endl;

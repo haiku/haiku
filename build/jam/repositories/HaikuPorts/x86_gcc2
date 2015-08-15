@@ -26,6 +26,7 @@ RemotePackageRepository HaikuPorts
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
+	2cdt-2014.01.03-1
 	a_book-1.1-3
 	a52dec-0.7.4-2
 	a52dec_devel-0.7.4-2
@@ -71,17 +72,20 @@ RemotePackageRepository HaikuPorts
 	cdrtools-3.01~a30-1
 	cdrtools_devel-3.01~a30-1
 	chat-20100903-2
-	clipdinger-0.3-1
+	clipdinger-0.4-1
 	clockwerk-git-3
+	cpctools-0.3.0-2
 	criticalmass-2.2-1
 	ctags-5.8-3
 	colors-2.3-1
-	coreutils-8.23-1
-	curl-7.42.1-1
-	curl_devel-7.42.1-1
+	coreutils-8.24-1
+	curl-7.43.0-1
+	curl_devel-7.43.0-1
 	cvs-1.12.13.1-6
+	d52-3.4.1-1
 	desknotes-1.1-4
 	dfu_util-0.7-1
+	diffutils-3.3-2
 	distcc-3.1-3
 	djvulibre-3.5.25-2
 	djvulibre_devel-3.5.25-2
@@ -94,6 +98,7 @@ RemotePackageRepository HaikuPorts
 	ed-1.7-1
 	enca-1.15-1
 	enca_devel-1.15-1
+	exomizer-2.0.7-1
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
 	faac-1.28-2
@@ -107,6 +112,8 @@ RemotePackageRepository HaikuPorts
 	findutils-4.4.2-1
 	ffmpeg-0.10.14-3
 	ffmpeg_devel-0.10.14-3
+	fftw-3.3.4-6
+	fftw_devel-3.3.4-6
 	flac-1.3.0-1
 	flac_devel-1.3.0-1
 	flex-2.5.39-1
@@ -164,7 +171,7 @@ RemotePackageRepository HaikuPorts
 	gutenprint_devel-5.2.10-1
 	gyp-r1948-2
 	gzip-1.6-2
-	help2man-1.44.1-1
+	help2man-1.46.6-1
 	htmldoc-1.8.27-3
 	html_parser-3.71-1
 	hubbub-0.3.0-1
@@ -206,6 +213,9 @@ RemotePackageRepository HaikuPorts
 	libcuefile_devel-r475-1
 	libdca-0.0.5-1
 	libdca_devel-0.0.5-1
+	libdsk-1.3.8-1
+	libdsk_devel-1.3.8-1
+	libdsk_tools-1.3.8-1
 	libdvbpsi-1.2.0-1
 	libdvbpsi_devel-1.2.0-1
 	libdvdcss-1.3.0-1
@@ -256,8 +266,8 @@ RemotePackageRepository HaikuPorts
 	libpcre_devel-8.21-5
 	libpng-1.5.22-1
 	libpng_devel-1.5.22-1
-	libpng16-1.6.17-1
-	libpng16_devel-1.6.17-1
+	libpng16-1.6.18-1
+	libpng16_devel-1.6.18-1
 	libpthread_stubs-0.3-2
 	libreplaygain-r475-1
 	libreplaygain_devel-r475-1
@@ -285,8 +295,8 @@ RemotePackageRepository HaikuPorts
 	libusb_compat_devel-0.1.5-2
 	libuuid-1.0.3-2
 	libuuid_devel-1.0.3-2
-	libunistring-0.9.5-1
-	libunistring_devel-0.9.5-1
+	libunistring-0.9.6-1
+	libunistring_devel-0.9.6-1
 	libvorbis-1.3.5-1
 	libvorbis_devel-1.3.5-1
 	libvpx-1.0.0-2
@@ -300,6 +310,8 @@ RemotePackageRepository HaikuPorts
 	libxml2_python-2.8.0-9
 	libxslt-1.1.28-4
 	libxslt_devel-1.1.28-4
+	libzip-0.11.2-1
+	libzip_devel-0.11.2-1
 	lighttpd-1.4.35-2
 	lighttpd_devel-1.4.35-2
 	links-2.8-1
@@ -309,8 +321,8 @@ RemotePackageRepository HaikuPorts
 	lua-5.2.1-6
 	lua_devel-5.2.1-6
 	lynx-2.8.9dev.1-1
-	lz4-r117-1
-	lz4_devel-r117-1
+	lz4-r131-1
+	lz4_devel-r131-1
 	lzo-2.09-1
 	lzo_devel-2.09-1
 	m4-1.4.16-5
@@ -331,15 +343,15 @@ RemotePackageRepository HaikuPorts
 	moe-1.1.2-1
 	mog-0.63.1548-1
 	most-pre5.1_15-1
-	mpg123-1.22.0-1
-	mpg123_devel-1.22.0-1
+	mpg123-1.22.3-1
+	mpg123_devel-1.22.3-1
 	mtr-0.73-1
 	multitalk-1.4-1
 	mupdf-1.7-1
 	mupdf_devel-1.7-1
 	musepack_tools-r475-1
 	musepack_tools_devel-r475-1
-	nano-2.4.0-1
+	nano-2.4.2-1
 	nanosvgtranslator-1.0.1-1
 	nasm-2.11.08-1
 	ncurses-5.9-9
@@ -353,7 +365,7 @@ RemotePackageRepository HaikuPorts
 	openjpeg-2.1.0-2
 	openjpeg_devel-2.1.0-2
 	opensound-4.2_git-2
-	openssh-6.8p1-2
+	openssh-6.9p1-1
 	# sync openssl with secondary architecture (x86)
 	openssl-1.0.0s-1
 	openssl_devel-1.0.0s-1
@@ -439,8 +451,8 @@ RemotePackageRepository HaikuPorts
 	smpeg_devel-0.4.5-3
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.8.8.3-1
-	sqlite_devel-3.8.8.3-1
+	sqlite-3.8.11.1-1
+	sqlite_devel-3.8.11.1-1
 	srm-1.2.12-1
 	substrate-1.0b-1
 	subversion-1.8.11-1
@@ -465,14 +477,16 @@ RemotePackageRepository HaikuPorts
 	unrar-5.2.6-1
 	unzip-6.0-2
 	util_macros-1.19.0-2
+	vasm-1.7c-1
 	vcdimager-0.7.24-2
 	vcdimager_devel-0.7.24-2
-	vlc-0.8.6i-1
-	vlc_devel-0.8.6i-1
 	vim-7.4-3
 	virtualbox_guest_additions-4.3.53_svn-1
-	vmware_addons-1.1.1-2
 	vision-0.9.7.r949-2
+	vlc-0.8.6i-1
+	vlc_devel-0.8.6i-1
+	vlink-0.15-1
+	vmware_addons-1.1.1-2
 	weather-0.1.1_git-1
 	wget-1.16.3-1
 	which-2.21-1
@@ -504,7 +518,7 @@ RemotePackageRepository HaikuPorts
 	avr_gcc_x86-4.8.2_2014_03_20-1
 	avrdude_x86-6.0.1-2
 	beshare_x86-2.31-1
-	binutils_x86-2.25_2014_12_27-1
+	binutils_x86-2.25_12015_07_31-1
 	bison_x86-2.5-1
 	boost_x86-1.55.0-6
 	boost_x86_atomic-1.55.0-6
@@ -533,12 +547,14 @@ RemotePackageRepository HaikuPorts
 	burnitnow_x86-0.1.0-1
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
+	capstone_x86-3.0.4-1
+	capstone_x86_devel-3.0.4-1
 	cmake_x86-3.2.3-1
 	confuse_x86-2.7-2
 	confuse_x86_devel-2.7-2
 	copynametoclipboard-1.0.1-2
-	curl_x86-7.42.1-1
-	curl_x86_devel-7.42.1-1
+	curl_x86-7.43.0-1
+	curl_x86_devel-7.43.0-1
 	cvsps_x86-2.2b1-1
 	dbus_x86-1.8.6-1
 	dbus_x86_devel-1.8.6-1
@@ -556,11 +572,13 @@ RemotePackageRepository HaikuPorts
 	expat_x86_devel-2.1.0-1
 	faad2_x86-2.7-1
 	faad2_x86_devel-2.7-1
+	file_x86-5.15-1
+	file_x86_devel-5.15-1
 	fish_x86-1.23.1_git-1
 	ffmpeg_x86-0.11.5-2
 	ffmpeg_x86_devel-0.11.5-2
-	fftw_x86-3.3.4-4
-	fftw_x86_devel-3.3.4-4
+	fftw_x86-3.3.4-6
+	fftw_x86_devel-3.3.4-6
 	flac_x86-1.3.0-1
 	flac_x86_devel-1.3.0-1
 	flare_x86-0.19-3
@@ -664,8 +682,8 @@ RemotePackageRepository HaikuPorts
 	libid3tag_x86_devel-0.15.1b-1
 	libmad_x86-0.15.1b-2
 	libmad_x86_devel-0.15.1b-2
-	libmikmod_x86-3.3.3-2
-	libmikmod_x86_devel-3.3.3-2
+	libmikmod_x86-3.3.7-1
+	libmikmod_x86_devel-3.3.7-1
 	libmng_x86-2.0.2-1
 	libmng_x86_devel-2.0.2-1
 	libmodplug_x86-0.8.8.4-2
@@ -680,8 +698,8 @@ RemotePackageRepository HaikuPorts
 	libpcre_x86_devel-8.33-2
 	libpng_x86-1.5.22-1
 	libpng_x86_devel-1.5.22-1
-	libpng16_x86-1.6.17-1
-	libpng16_x86_devel-1.6.17-1
+	libpng16_x86-1.6.18-1
+	libpng16_x86_devel-1.6.18-1
 	libqt4_x86-4.8.6.4-4
 	libqt4_x86_devel-4.8.6.4-4
 	librecad_x86-2.0.7-1
@@ -717,6 +735,8 @@ RemotePackageRepository HaikuPorts
 	libxml2_x86_devel-2.9.2-1
 	libxslt_x86-1.1.28-2
 	libxslt_x86_devel-1.1.28-2
+	libzip_x86-0.11.2-1
+	libzip_x86_devel-0.11.2-1
 	llvm_x86-3.5.2-1
 	lmms_x86-1.2.0_git-1
 	lua_x86-5.2.3-2
@@ -734,13 +754,13 @@ RemotePackageRepository HaikuPorts
 	mesa_x86_swrast-10.1.0-2
 	mesa_x86_swpipe-10.1.0-2
 	mosh_x86-1.2.4-1
-	mpc_x86-1.0.2-2
-	mpc_x86_devel-1.0.2-2
+	mpc_x86-1.0.3-1
+	mpc_x86_devel-1.0.3-1
 	mpd_x86-0.18.12_git-1
-	mpfr_x86-3.1.2-2
-	mpfr_x86_devel-3.1.2-2
-	mpg123_x86-1.22.0-1
-	mpg123_x86_devel-1.22.0-1
+	mpfr_x86-3.1.3-1
+	mpfr_x86_devel-3.1.3-1
+	mpg123_x86-1.22.3-1
+	mpg123_x86_devel-1.22.3-1
 	mplayer_x86-1.1.1-3
 	mupdf_x86-1.7-1
 	mupdf_x86_devel-1.7-1
@@ -781,6 +801,8 @@ RemotePackageRepository HaikuPorts
 	quassel_x86-0.10.0-2
 	quicklaunch-0.9.10-1
 	qupzilla_x86-1.8.6-1
+	radare2_x86-0.9.9-1
+	radare2_x86_devel-0.9.9-1
 	rcs_x86-5.9.3-2
 	readline_x86-6.3-2
 	readline_x86_devel-6.3-2
@@ -810,8 +832,8 @@ RemotePackageRepository HaikuPorts
 	smpeg_x86_devel-0.4.5-3
 	speex_x86-1.2~rc1-2
 	speex_x86_devel-1.2~rc1-2
-	sqlite_x86-3.8.8.3-1
-	sqlite_x86_devel-3.8.8.3-1
+	sqlite_x86-3.8.11.1-1
+	sqlite_x86_devel-3.8.11.1-1
 	stlink_x86-1.0.0-1
 	stm32flash_x86-0.3-1
 	strigi_x86-0.7.5-2
@@ -832,12 +854,13 @@ RemotePackageRepository HaikuPorts
 	vacuum_x86-1.2.5-1
 	vcmi_x86-0.94-1
 	wizznic_x86-0.9.9-2
-	xz_utils_x86-5.0.5-3
-	xz_utils_x86_devel-5.0.5-3
+	xz_utils_x86-5.0.8-2
+	xz_utils_x86_devel-5.0.8-2
 	zlib_x86-1.2.8-4
 	zlib_x86_devel-1.2.8-4
 	:
 	# source packages
+	2cdt
 	a_book
 	a52dec
 	a52dec_x86
@@ -887,6 +910,7 @@ RemotePackageRepository HaikuPorts
 	bzr
 	canna
 	capitalbe
+	capstone_x86
 	catkeyseditor
 	caya
 	ccache
@@ -899,11 +923,13 @@ RemotePackageRepository HaikuPorts
 	confuse_x86
 	copynametoclipboard
 	coreutils
+	cpctools
 	criticalmass
 	ctags
 	curl
 	cvs
 	cvsps_x86
+	d52
 	dbus_x86
 	ddrescue_x86
 	desknotes
@@ -913,6 +939,7 @@ RemotePackageRepository HaikuPorts
 	djvulibre_x86
 	djvutranslator
 	djvuviewer
+	diffutils
 	distcc
 	dmidecode
 	documentviewer_x86
@@ -924,16 +951,19 @@ RemotePackageRepository HaikuPorts
 	ed
 	enca
 	enca_x86
+	exomizer
 	expat
 	faac
 	faad2
 	faad2_x86
 	f1spirit
 	file
+	file_x86
 	filwip
 	findutils
 	fish_x86
 	ffmpeg
+	fftw
 	fftw_x86
 	flac
 	flare_x86
@@ -1017,6 +1047,7 @@ RemotePackageRepository HaikuPorts
 	libdbusmenu_qt_x86
 	libdca
 	libdca_x86
+	libdsk
 	libdv_x86
 	libdvbpsi
 	libdvdcss
@@ -1091,6 +1122,8 @@ RemotePackageRepository HaikuPorts
 	libxml2_x86
 	libxslt
 	libxslt_x86
+	libzip
+	libzip_x86
 	lighttpd
 	links
 	llvm_x86
@@ -1122,13 +1155,13 @@ RemotePackageRepository HaikuPorts
 	mksh
 	moe
 	mog
-	mpc_x86
-	mplayer_x86
 	mosh_x86
 	most
+	mpc_x86
 	mpd_x86
 	mpfr_x86
 	mpg123
+	mplayer_x86
 	mtr
 	multitalk
 	mupdf
@@ -1193,6 +1226,7 @@ RemotePackageRepository HaikuPorts
 	quassel_x86
 	quicklaunch
 	qupzilla_x86
+	radare2_x86
 	rcs_x86
 	readline
 	readline_x86
@@ -1254,11 +1288,13 @@ RemotePackageRepository HaikuPorts
 	util_macros
 	weather
 	vacuum_x86
+	vasm
 	vcdimager
 	vcmi_x86
 	vim
 	vision
 	vlc
+	vlink
 	vmware_addons
 	wget
 	which

@@ -84,26 +84,10 @@ struct RosterNotification {
 static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
 
-// This class is provided to ensure the BMediaRoster is quit.
-class MediaRosterUndertaker {
-public:
-	~MediaRosterUndertaker()
-	{
-		if (BMediaRoster::CurrentRoster() != NULL) {
-			BMediaRoster::CurrentRoster()->Lock();
-			BMediaRoster::CurrentRoster()->Quit();
-		}
-	}
-};
-
-
 }	// namespace media
 }	// namespace BPrivate
 
 using namespace BPrivate::media;
-
-
-static MediaRosterUndertaker sUndertaker;
 
 
 BMediaRosterEx::BMediaRosterEx(status_t* _error)
@@ -134,7 +118,6 @@ BMediaRosterEx::BuildConnections()
 	server_register_app_reply reply;
 	request.team = BPrivate::current_team();
 	request.messenger = BMessenger(NULL, this);
-
 	status_t status = QueryServer(SERVER_REGISTER_APP, &request,
 		sizeof(request), &reply, sizeof(reply));
 	if (status != B_OK)
@@ -3337,13 +3320,13 @@ BMediaRoster::MessageReceived(BMessage* message)
 		{
 			RosterNotification notification;
 			if (message->FindInt32(NOTIFICATION_PARAM_WHAT, &notification.what)
-				!= B_OK) {
+					!= B_OK) {
 				TRACE("BMediaRoster MEDIA_ROSTER_REQUEST_NOTIFICATIONS can't"
 					"find what parameter");
 				return;
 			}
 			if (message->FindMessenger(NOTIFICATION_PARAM_MESSENGER,
-				&notification.messenger) != B_OK) {
+					&notification.messenger) != B_OK) {
 				TRACE("BMediaRoster MEDIA_ROSTER_REQUEST_NOTIFICATIONS can't"
 					"find messenger");
 				return;
@@ -3356,13 +3339,13 @@ BMediaRoster::MessageReceived(BMessage* message)
 		{
 			RosterNotification notification;
 			if (message->FindInt32(NOTIFICATION_PARAM_WHAT, &notification.what)
-				!= B_OK) {
+					!= B_OK) {
 				TRACE("BMediaRoster MEDIA_ROSTER_CANCEL_NOTIFICATIONS can't"
 					"find what parameter");
 				return;
 			}
 			if (message->FindMessenger(NOTIFICATION_PARAM_MESSENGER,
-				&notification.messenger) != B_OK) {
+					&notification.messenger) != B_OK) {
 				TRACE("BMediaRoster MEDIA_ROSTER_CANCEL_NOTIFICATIONS can't"
 					"find messenger");
 				return;
@@ -3372,7 +3355,7 @@ BMediaRoster::MessageReceived(BMessage* message)
 				if (sNotificationList.Get(i, &current) != true)
 					return;
 				if (current->what == notification.what
-					&& current->messenger == notification.messenger) {
+						&& current->messenger == notification.messenger) {
 					sNotificationList.Remove(i);
 					return;
 				}
@@ -3394,6 +3377,11 @@ BMediaRoster::MessageReceived(BMessage* message)
 			// Send the notification to our subscribers
 			if (BMediaRoster::IsRunning()) {
 				sServerIsUp = true;
+				// Wait for media services to wake up
+				// TODO: This should be solved so that the server
+				// have a way to notify us when the system is really
+				// ready to run and we avoid sleeping.
+				snooze(2000000);
 				// Restore our friendship with the media servers
 				if (MediaRosterEx(this)->BuildConnections() != B_OK) {
 					TRACE("BMediaRoster::MessageReceived can't reconnect"
@@ -3406,7 +3394,7 @@ BMediaRoster::MessageReceived(BMessage* message)
 						return;
 					if (current->what == B_MEDIA_SERVER_STARTED) {
 						if (current->messenger.SendMessage(
-							B_MEDIA_SERVER_STARTED) != B_OK) {
+								B_MEDIA_SERVER_STARTED) != B_OK) {
 							if(!current->messenger.IsValid())
 								sNotificationList.Remove(i);
 						}
@@ -3436,7 +3424,7 @@ BMediaRoster::MessageReceived(BMessage* message)
 						return;
 					if (current->what == B_MEDIA_SERVER_QUIT) {
 						if (current->messenger.SendMessage(
-							B_MEDIA_SERVER_QUIT) != B_OK) {
+								B_MEDIA_SERVER_QUIT) != B_OK) {
 							if(!current->messenger.IsValid())
 								sNotificationList.Remove(i);
 						}

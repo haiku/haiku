@@ -18,17 +18,13 @@ flags			system_package
 
 provides {
 	haiku=%HAIKU_VERSION% compat>=R1~alpha1
-	diffutils = 2.8.1 compat >= 0
 	cmd:arp
 	cmd:bc
 	cmd:chop
 	cmd:clear
-	cmd:cmp
 	cmd:compress
 	cmd:dc
 	cmd:df
-	cmd:diff = 2.8.1
-	cmd:diff3
 	cmd:ftp
 	cmd:ftpd
 	cmd:hd
@@ -42,7 +38,6 @@ provides {
 	cmd:ps
 	cmd:renice
 	cmd:resattr
-	cmd:sdiff
 	cmd:su
 	cmd:tcpdump
 	cmd:telnet

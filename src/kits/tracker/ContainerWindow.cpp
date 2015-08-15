@@ -1200,7 +1200,7 @@ BContainerWindow::SaveState(BMessage& message) const
 bool
 BContainerWindow::StateNeedsSaving() const
 {
-	return fStateNeedsSaving || PoseView()->StateNeedsSaving();
+	return fPoseView != NULL && (fStateNeedsSaving || fPoseView->StateNeedsSaving());
 }
 
 

@@ -71,7 +71,7 @@ private:
 			void				_SetBusy(bool busy = true);
 
 			VolumeWatcher*		fVolumeWatcher;
-			vint32				fBusy;
+			int32				fBusy;
 };
 
 

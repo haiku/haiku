@@ -310,9 +310,9 @@ ResourceFile::ReadResource(ResourceItem& resource, bool force)
 	status_t error = InitCheck();
 	size_t size = resource.DataSize();
 	if (error == B_OK && (force || !resource.IsLoaded())) {
-		if (error == B_OK)
-			error = resource.SetSize(size);
 		void* data = NULL;
+		error = resource.SetSize(size);
+
 		if (error == B_OK) {
 			data = resource.Data();
 			ssize_t bytesRead = fFile.ReadAt(resource.Offset(), data, size);
@@ -676,7 +676,7 @@ ResourceFile::_InitPEFFile(BFile& file, const PEFContainerHeader& pefHeader)
 	if (error != B_OK)
 		throw Exception(error, "Failed to get the file size.");
 	// check architecture -- we support PPC only
-	if (memcmp(pefHeader.architecture, kPEFArchitecturePPC, 4))
+	if (memcmp(pefHeader.architecture, kPEFArchitecturePPC, 4) != 0)
 		throw Exception(B_IO_ERROR, "PEF file architecture is not PPC.");
 	fHostEndianess = B_HOST_IS_BENDIAN;
 	// get the section count

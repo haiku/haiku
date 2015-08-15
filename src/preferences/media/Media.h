@@ -17,9 +17,6 @@
 #include <Locale.h>
 
 
-static const char* kApplicationSignature = "application/x-vnd.Haiku-Media";
-
-
 class Media : public BApplication {
 public:
 								Media();

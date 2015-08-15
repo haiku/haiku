@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Dario Casalinuovo
  * Copyright 2004, 2006, Jérôme Duval.
  * Copyright 2003-2004, Andrew Bachmann.
  * Copyright 2002-2004, 2006 Marcus Overhagen.
@@ -7,24 +8,34 @@
  */
 
 
+#include <MediaDefs.h>
+
+#include <Application.h>
+#include <Bitmap.h>
+#include <Catalog.h>
+#include <IconUtils.h>
+#include <Locale.h>
+#include <MediaNode.h>
+#include <MediaRoster.h>
+#include <Node.h>
+#include <Notification.h>
+#include <Roster.h>
+
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
 
-#include <MediaDefs.h>
-#include <MediaNode.h>
-#include <MediaRoster.h>
-#include <Roster.h>
-
-#include "debug.h"
-
 #include "AddOnManager.h"
 #include "DataExchange.h"
+#include "debug.h"
 #include "MediaMisc.h"
 
 
 #define META_DATA_MAX_SIZE			(16 << 20)
 #define META_DATA_AREA_MIN_SIZE		32000
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "MediaDefs"
 
 
 // #pragma mark - media_destination
@@ -1219,6 +1230,67 @@ const type_code B_CODEC_TYPE_INFO = 0x040807b2;
 // shutdown_media_server() and launch_media_server()
 // are provided by libbe.so in BeOS R5
 
+#define MEDIA_SERVICE_NOTIFICATION_ID "MediaServiceNotificationID"
+
+
+void
+notify_system(float progress, const char* message)
+{
+	BNotification notification(B_PROGRESS_NOTIFICATION);
+	notification.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
+	notification.SetProgress(progress);
+	notification.SetGroup(B_TRANSLATE("Media Service"));
+	notification.SetContent(message);
+
+	app_info info;
+	be_app->GetAppInfo(&info);
+	BBitmap icon(BRect(0, 0, 32, 32), B_RGBA32);
+	BNode node(&info.ref);
+	BIconUtils::GetVectorIcon(&node, "BEOS:ICON", &icon);
+	notification.SetIcon(&icon);
+
+	notification.Send();
+}
+
+
+void
+progress_shutdown(int stage,
+	bool (*progress)(int stage, const char* message, void* cookie),
+	void* cookie)
+{
+	// parameter "message" is no longer used. It is kept for compatibility with
+	// BeOS as this is used as a shutdown_media_server callback.
+
+	TRACE("stage: %i\n", stage);
+	const char* string = "Unknown stage";
+	switch (stage) {
+		case 10:
+			string = B_TRANSLATE("Stopping media server" B_UTF8_ELLIPSIS);
+			break;
+		case 20:
+			string = B_TRANSLATE("Telling media_addon_server to quit.");
+			break;
+		case 40:
+			string = B_TRANSLATE("Waiting for media_server to quit.");
+			break;
+		case 50:
+			string = B_TRANSLATE("Waiting for media_server to quit.");
+			break;
+		case 70:
+			string = B_TRANSLATE("Cleaning up.");
+			break;
+		case 100:
+			string = B_TRANSLATE("Done shutting down.");
+			break;
+	}
+
+	if (progress == NULL)
+		notify_system(stage / 100.0f, string);
+	else
+		progress(stage, string, cookie);
+}
+
+
 status_t
 shutdown_media_server(bigtime_t timeout,
 	bool (*progress)(int stage, const char* message, void* cookie),
@@ -1233,7 +1305,7 @@ shutdown_media_server(bigtime_t timeout,
 
 	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
 		BMessenger messenger(B_MEDIA_SERVER_SIGNATURE);
-		progress(10, "Telling media_server to quit.", cookie);
+		progress_shutdown(10, progress, cookie);
 
 		err = messenger.SendMessage(&msg, &reply, 2000000, 2000000);
 		if (err != B_OK)
@@ -1246,7 +1318,7 @@ shutdown_media_server(bigtime_t timeout,
 
 	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
 		BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);
-		progress(20, "Telling media_addon_server to quit.", cookie);
+		progress_shutdown(20, progress, cookie);
 
 		err = messenger.SendMessage(&msg, &reply, 2000000, 2000000);
 		if (err != B_OK)
@@ -1258,16 +1330,16 @@ shutdown_media_server(bigtime_t timeout,
 	}
 
 	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
-		progress(40, "Waiting for media_server to quit.", cookie);
+		progress_shutdown(40, progress, cookie);
 		snooze(200000);
 	}
 
 	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
-		progress(50, "Waiting for media_addon_server to quit.", cookie);
+		progress_shutdown(50, progress, cookie);
 		snooze(200000);
 	}
 
-	progress(70, "Cleaning Up.", cookie);
+	progress_shutdown(70, progress, cookie);
 	snooze(1000000);
 
 	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
@@ -1278,30 +1350,78 @@ shutdown_media_server(bigtime_t timeout,
 		kill_team(be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE));
 	}
 
-	progress(100, "Done Shutting Down.", cookie);
+	progress_shutdown(100, progress, cookie);
 	snooze(1000000);
 
 	return B_OK;
 }
 
 
+void
+progress_startup(int stage,
+	bool (*progress)(int stage, const char* message, void* cookie),
+	void* cookie)
+{
+	// parameter "message" is no longer used. It is kept for compatibility with
+	// BeOS as this is used as a shutdown_media_server callback.
+
+	TRACE("stage: %i\n", stage);
+	const char* string = "Unknown stage";
+	switch (stage) {
+		case 10:
+			string = B_TRANSLATE("Stopping media server" B_UTF8_ELLIPSIS);
+			break;
+		case 20:
+			string = B_TRANSLATE("Stopping media_addon_server.");
+			break;
+		case 50:
+			string = B_TRANSLATE("Starting media_services.");
+			break;
+		case 90:
+			string = B_TRANSLATE("Error occurred starting media services.");
+			break;
+		case 100:
+			string = B_TRANSLATE("Ready for use.");
+			break;
+	}
+
+	if (progress == NULL)
+		notify_system(stage / 100.0f, string);
+	else
+		progress(stage, string, cookie);
+}
+
+
 status_t
 launch_media_server(uint32 flags)
+{
+	return launch_media_server(0, NULL, NULL, flags);
+}
+
+
+status_t
+launch_media_server(bigtime_t timeout,
+	bool (*progress)(int stage, const char* message, void* cookie),
+	void* cookie, uint32 flags)
 {
 	if (BMediaRoster::IsRunning())
 		return B_ALREADY_RUNNING;
 
 	// The media_server crashed
 	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
+		progress_startup(10, progress, cookie);
 		kill_team(be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE));
 		snooze(1000000);
 	}
 
 	// The media_addon_server crashed
 	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
+		progress_startup(20, progress, cookie);
 		kill_team(be_roster->TeamFor(B_MEDIA_SERVER_SIGNATURE));
 		snooze(1000000);
 	}
+
+	progress_startup(50, progress, cookie);
 
 	status_t err = be_roster->Launch(B_MEDIA_SERVER_SIGNATURE);
 	if (err != B_OK)
@@ -1318,9 +1438,13 @@ launch_media_server(uint32 flags)
 		if (messenger.IsValid()) {
 			messenger.SendMessage(&msg, &reply, 2000000, 2000000);
 			err = B_OK;
+			progress_startup(100, progress, cookie);
 			break;
 		}
 	}
+
+	if (err != B_OK)
+		progress_startup(90, progress, cookie);
 
 	return err;
 }

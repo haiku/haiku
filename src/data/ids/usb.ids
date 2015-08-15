@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.06.22
-# Date:    2015-06-22 20:34:08
+# Version: 2015.07.27
+# Date:    2015-07-27 20:34:14
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -16955,6 +16955,15 @@
 	6323  USB Electronic Scale
 2237  Kobo Inc.
 	4161  eReader White
+225d  Morpho
+	0001  FINGER VP Multimodal Biometric Sensor
+	0008  CBM-E3 Fingerprint Sensor
+	0009  CBM Fingerprint Sensor [CBM-V3]
+	000a  MSO1300-E3 Fingerprint Sensor
+	000b  MSO1300 Fingerprint Sensor [MSO1300-V3]
+	000c  MSO1350-E3 Fingerprint Sensor & SmartCard Reader
+	000d  MSO1350 Fingerprint Sensor & SmartCard Reader [MSO1350-V3]
+	000e  MorphoAccess SIGMA Biometric Access Control Terminal
 228d  8D Technologies inc.
 	0001  Terminal Bike Key Reader
 22a6  Pie Digital, Inc.

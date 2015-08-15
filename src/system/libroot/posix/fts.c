@@ -80,6 +80,18 @@ static int	 fts_stat(FTS *, FTSENT *, int);
 static int	 fts_safe_changedir(FTS *, FTSENT *, int, char *);
 static int	 fts_ufslinks(FTS *, const FTSENT *);
 
+
+FTS * __fts_open(char * const *argv, int options, int (*compar)(
+		const FTSENT * const *, const FTSENT * const *));
+int __fts_close(FTS *sp);
+FTSENT * __fts_read(FTS *sp);
+int __fts_set(FTS *sp, FTSENT *p, int instr);
+FTSENT * __fts_children(FTS *sp, int instr);
+void *(__fts_get_clientptr)(FTS *sp);
+FTS * (__fts_get_stream)(FTSENT *p);
+void __fts_set_clientptr(FTS *sp, void *clientptr);
+
+
 #define	ISDOT(a)	(a[0] == '.' && (!a[1] || (a[1] == '.' && !a[2])))
 
 #define	CLR(opt)	(sp->fts_options &= ~(opt))
@@ -128,7 +140,7 @@ static const char *ufslike_filesystems[] = {
 #endif /* !__HAIKU__ */
 
 FTS *
-fts_open(argv, options, compar)
+__fts_open(argv, options, compar)
 	char * const *argv;
 	int options;
 	int (*compar)(const FTSENT * const *, const FTSENT * const *);
@@ -245,6 +257,10 @@ mem1:	free(sp);
 	return (NULL);
 }
 
+
+__weak_reference(__fts_open, fts_open);
+
+
 static void
 fts_load(FTS *sp, FTSENT *p)
 {
@@ -270,7 +286,7 @@ fts_load(FTS *sp, FTSENT *p)
 }
 
 int
-fts_close(FTS *sp)
+__fts_close(FTS *sp)
 {
 	FTSENT *freep, *p;
 	int saved_errno;
@@ -315,6 +331,10 @@ fts_close(FTS *sp)
 	return (0);
 }
 
+
+__weak_reference(__fts_close, fts_close);
+
+
 /*
  * Special case of "/" at the end of the path so that slashes aren't
  * appended which would cause paths to be written as "....//foo".
@@ -324,7 +344,7 @@ fts_close(FTS *sp)
 	    ? p->fts_pathlen - 1 : p->fts_pathlen)
 
 FTSENT *
-fts_read(FTS *sp)
+__fts_read(FTS *sp)
 {
 	FTSENT *p, *tmp;
 	int instr;
@@ -510,6 +530,10 @@ name:		t = sp->fts_path + NAPPEND(p->fts_parent);
 	return (sp->fts_cur = p);
 }
 
+
+__weak_reference(__fts_read, fts_read);
+
+
 /*
  * Fts_set takes the stream as an argument although it's not used in this
  * implementation; it would be necessary if anyone wanted to add global
@@ -518,7 +542,7 @@ name:		t = sp->fts_path + NAPPEND(p->fts_parent);
  */
 /* ARGSUSED */
 int
-fts_set(FTS *sp, FTSENT *p, int instr)
+__fts_set(FTS *sp, FTSENT *p, int instr)
 {
 	if (instr != 0 && instr != FTS_AGAIN && instr != FTS_FOLLOW &&
 	    instr != FTS_NOINSTR && instr != FTS_SKIP) {
@@ -529,8 +553,12 @@ fts_set(FTS *sp, FTSENT *p, int instr)
 	return (0);
 }
 
+
+__weak_reference(__fts_set, fts_set);
+
+
 FTSENT *
-fts_children(FTS *sp, int instr)
+__fts_children(FTS *sp, int instr)
 {
 	FTSENT *p;
 	int fd;
@@ -597,33 +625,49 @@ fts_children(FTS *sp, int instr)
 	return (sp->fts_child);
 }
 
+
+__weak_reference(__fts_children, fts_children);
+
+
 #ifndef fts_get_clientptr
 #error "fts_get_clientptr not defined"
 #endif
 
 void *
-(fts_get_clientptr)(FTS *sp)
+(__fts_get_clientptr)(FTS *sp)
 {
 
 	return (fts_get_clientptr(sp));
 }
+
+
+__weak_reference(__fts_get_clientptr, fts_get_clientptr);
+
 
 #ifndef fts_get_stream
 #error "fts_get_stream not defined"
 #endif
 
 FTS *
-(fts_get_stream)(FTSENT *p)
+(__fts_get_stream)(FTSENT *p)
 {
 	return (fts_get_stream(p));
 }
 
+
+__weak_reference(__fts_get_stream, fts_get_stream);
+
+
 void
-fts_set_clientptr(FTS *sp, void *clientptr)
+__fts_set_clientptr(FTS *sp, void *clientptr)
 {
 
 	sp->fts_clientptr = clientptr;
 }
+
+
+__weak_reference(__fts_set_clientptr, fts_set_clientptr);
+
 
 /*
  * This is the tricky part -- do not casually change *anything* in here.  The

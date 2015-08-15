@@ -2521,7 +2521,26 @@ BWindow::ResizeTo(float width, float height)
 }
 
 
-// Center the window in the passed in rect.
+void
+BWindow::ResizeToPreferred()
+{
+	Layout(false);
+
+	float width = fTopView->PreferredSize().width;
+	width = std::min(width, fTopView->MaxSize().width);
+	width = std::max(width, fTopView->MinSize().width);
+
+	float height = fTopView->PreferredSize().height;
+	height = std::min(width, fTopView->MaxSize().height);
+	height = std::max(width, fTopView->MinSize().height);
+
+	if (GetLayout()->HasHeightForWidth())
+		GetLayout()->GetHeightForWidth(width, NULL, NULL, &height);
+
+	ResizeTo(width, height);
+}
+
+
 void
 BWindow::CenterIn(const BRect& rect)
 {
@@ -2534,7 +2553,6 @@ BWindow::CenterIn(const BRect& rect)
 }
 
 
-// Centers the window on the screen the window is currently on.
 void
 BWindow::CenterOnScreen()
 {

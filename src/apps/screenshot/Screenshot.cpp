@@ -308,7 +308,7 @@ Screenshot::_GetActiveWindowFrame()
 				token = tokens[i];
 				windowInfo = get_window_info(token);
 				if (windowInfo && !windowInfo->is_mini
-						&& !windowInfo->show_hide_level > 0) {
+						&& !(windowInfo->show_hide_level > 0)) {
 					foundActiveWindow = true;
 					break;
 				}

@@ -1,7 +1,12 @@
-1	spanish; castilian	x-vnd.Haiku-IMAP	3950045582
+1	spanish; castilian	x-vnd.Haiku-IMAP	354143849
 Destination:	imap_config		Destino:
+Ok	IMAPFolderConfig		Aceptar
 status	IMAPFolderConfig		Estado:
+Configure IMAP Folders	imap_config		Configurar carpetas IMAP
+Cancel	IMAPFolderConfig		Cancelar
 Apply	IMAPFolderConfig		Aplicar
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Recopilando carpetas IMAP, paciencia por favor...
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		No se pudo conectar al servidor \"%server%\":\n%error%
 IMAP Folders	IMAPFolderConfig		Carpetas IMAP
+Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Actualizando la suscripción de las carpetas IMAP, tenga paciencia...
 Failed to fetch available storage.	IMAPFolderConfig		No se pudo recopilar el espacio disponible.

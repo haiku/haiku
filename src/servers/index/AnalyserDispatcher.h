@@ -49,7 +49,7 @@ protected:
 private:
 			FileAnalyser*		_FindAnalyser(const BString& name);
 
-			vint32				fStopped;
+			int32				fStopped;
 };
 
 #endif // ANALYSER_DISPATCHER

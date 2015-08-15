@@ -126,9 +126,8 @@ ThreadHandler::SetBreakpointAndRun(target_addr_t address)
 		return error;
 
 	fPreviousInstructionPointer = 0;
-	resume_thread(ThreadID());
-		// TODO: This should probably better be a DebuggerInterface method,
-		// but this method is used only when debugging a local team anyway.
+	fDebuggerInterface->ContinueThread(ThreadID());
+
 	// Pretend "step out" mode, so that the temporary breakpoint hit will not
 	// be ignored.
 	fStepMode = STEP_OUT;

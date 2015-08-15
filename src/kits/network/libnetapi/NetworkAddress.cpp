@@ -59,28 +59,28 @@ BNetworkAddress::BNetworkAddress()
 
 BNetworkAddress::BNetworkAddress(const char* host, uint16 port, uint32 flags)
 {
-	SetTo(host, port, flags);
+	fStatus = SetTo(host, port, flags);
 }
 
 
 BNetworkAddress::BNetworkAddress(const char* host, const char* service,
 	uint32 flags)
 {
-	SetTo(host, service, flags);
+	fStatus = SetTo(host, service, flags);
 }
 
 
 BNetworkAddress::BNetworkAddress(int family, const char* host, uint16 port,
 	uint32 flags)
 {
-	SetTo(family, host, port, flags);
+	fStatus = SetTo(family, host, port, flags);
 }
 
 
 BNetworkAddress::BNetworkAddress(int family, const char* host,
 	const char* service, uint32 flags)
 {
-	SetTo(family, host, service, flags);
+	fStatus = SetTo(family, host, service, flags);
 }
 
 
@@ -170,11 +170,17 @@ BNetworkAddress::SetTo(const char* host, uint16 port, uint32 flags)
 
 	uint32 cookie = 0;
 	status = resolver->GetNextAddress(AF_INET6, &cookie, *this);
-	if (status == B_OK)
+	if (status == B_OK) {
+		fStatus = B_OK;
 		return B_OK;
+	}
 
 	cookie = 0;
-	return resolver->GetNextAddress(&cookie, *this);
+	status = resolver->GetNextAddress(&cookie, *this);
+	if (status != B_OK)
+		Unset();
+	fStatus = status;
+	return status;
 }
 
 
@@ -193,11 +199,17 @@ BNetworkAddress::SetTo(const char* host, const char* service, uint32 flags)
 
 	uint32 cookie = 0;
 	status = resolver->GetNextAddress(AF_INET6, &cookie, *this);
-	if (status == B_OK)
+	if (status == B_OK) {
+		fStatus = B_OK;
 		return B_OK;
+	}
 
 	cookie = 0;
-	return resolver->GetNextAddress(&cookie, *this);
+	status = resolver->GetNextAddress(&cookie, *this);
+	if (status != B_OK)
+		Unset();
+	fStatus = status;
+	return status;
 }
 
 
@@ -208,6 +220,7 @@ BNetworkAddress::SetTo(int family, const char* host, uint16 port, uint32 flags)
 		if (port != 0)
 			return B_BAD_VALUE;
 		return _ParseLinkAddress(host);
+			// SetToLinkAddress takes care of setting fStatus
 	}
 
 	BReference<const BNetworkAddressResolver> resolver
@@ -219,7 +232,11 @@ BNetworkAddress::SetTo(int family, const char* host, uint16 port, uint32 flags)
 		return status;
 
 	uint32 cookie = 0;
-	return resolver->GetNextAddress(&cookie, *this);
+	status = resolver->GetNextAddress(&cookie, *this);
+	if (status != B_OK)
+		Unset();
+	fStatus = status;
+	return status;
 }
 
 
@@ -231,6 +248,7 @@ BNetworkAddress::SetTo(int family, const char* host, const char* service,
 		if (service != NULL)
 			return B_BAD_VALUE;
 		return _ParseLinkAddress(host);
+			// SetToLinkAddress takes care of setting fStatus
 	}
 
 	BReference<const BNetworkAddressResolver> resolver
@@ -242,7 +260,11 @@ BNetworkAddress::SetTo(int family, const char* host, const char* service,
 		return status;
 
 	uint32 cookie = 0;
-	return resolver->GetNextAddress(&cookie, *this);
+	status = resolver->GetNextAddress(&cookie, *this);
+	if (status != B_OK)
+		Unset();
+	fStatus = status;
+	return status;
 }
 
 
@@ -360,7 +382,7 @@ BNetworkAddress::SetToBroadcast(int family, uint16 port)
 		return fStatus = B_NOT_SUPPORTED;
 
 	SetTo(INADDR_BROADCAST, port);
-	return B_OK;
+	return fStatus;
 }
 
 
@@ -390,7 +412,7 @@ BNetworkAddress::SetToLoopback(int family, uint16 port)
 			return fStatus = B_NOT_SUPPORTED;
 	}
 
-	return B_OK;
+	return fStatus;
 }
 
 
@@ -439,7 +461,7 @@ BNetworkAddress::SetToMask(int family, uint32 prefixLength)
 		}
 
 		default:
-			return fStatus = B_NOT_SUPPORTED;
+			return B_NOT_SUPPORTED;
 	}
 
 	return fStatus = B_OK;
@@ -459,10 +481,10 @@ BNetworkAddress::SetToWildcard(int family, uint16 port)
 			break;
 
 		default:
-			return fStatus = B_NOT_SUPPORTED;
+			return B_NOT_SUPPORTED;
 	}
 
-	return B_OK;
+	return fStatus;
 }
 
 
@@ -522,6 +544,8 @@ BNetworkAddress::SetToLinkLevel(uint8* address, size_t length)
 	link.sdl_len = sizeof(sockaddr_dl);
 	if (length > sizeof(link.sdl_data))
 		link.sdl_len += length - sizeof(link.sdl_data);
+
+	fStatus = B_OK;
 }
 
 
@@ -543,6 +567,8 @@ BNetworkAddress::SetToLinkLevel(const char* name)
 	link.sdl_len = sizeof(sockaddr_dl);
 	if (link.sdl_nlen > sizeof(link.sdl_data))
 		link.sdl_len += link.sdl_nlen - sizeof(link.sdl_data);
+
+	fStatus = B_OK;
 }
 
 
@@ -555,6 +581,8 @@ BNetworkAddress::SetToLinkLevel(uint32 index)
 	link.sdl_family = AF_LINK;
 	link.sdl_len = sizeof(sockaddr_dl);
 	link.sdl_index = index;
+
+	fStatus = B_OK;
 }
 
 

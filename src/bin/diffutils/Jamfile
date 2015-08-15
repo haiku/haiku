@@ -1,4 +1,0 @@
-SubDir HAIKU_TOP src bin diffutils ;
-
-SubInclude HAIKU_TOP src bin diffutils lib ;
-SubInclude HAIKU_TOP src bin diffutils src ; 

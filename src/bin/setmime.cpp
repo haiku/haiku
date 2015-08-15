@@ -103,7 +103,7 @@ const char* kAttrEditable	=	"-attrEditable";
 const char* kAttrExtra		=	"-attrExtra";
 
 
-const uint32 hash(const char* str)
+const uint32 hash_function(const char* str)
 {
 	uint32 h = 0;
 	uint32 g = 0;
@@ -466,7 +466,7 @@ MimeAttribute::StoreInto(BMessage* target)
 const char*
 MimeAttribute::UserArgValue(TUserArgs& map, const char* name)
 {
-	TUserArgsI i = map.find(hash(name));
+	TUserArgsI i = map.find(hash_function(name));
 	if (i == map.end())
 		return NULL;
 	return i->second != NULL ? i->second : "";
@@ -574,7 +574,7 @@ MimeType::_Init(char** argv) throw (Error)
 	map<uint32, const CmdOption*> cmdOptionsMap;
 	for (size_t i = 0; i < sizeof(gCmdOptions) / sizeof(gCmdOptions[0]); i++)
 		cmdOptionsMap.insert(pair<uint32, CmdOption*>(
-							hash(gCmdOptions[i].fName), &gCmdOptions[i]));
+							hash_function(gCmdOptions[i].fName), &gCmdOptions[i]));
 
 	// parse the command line arguments
 	for (char** arg = argv; *arg; arg++) {
@@ -588,7 +588,7 @@ MimeType::_Init(char** argv) throw (Error)
 		}
 
 		// check op.modes, options and attribs
-		uint32 key = hash(*arg);
+		uint32 key = hash_function(*arg);
 
 		map<uint32, const CmdOption*>::iterator I = cmdOptionsMap.find(key);
 		if (I == cmdOptionsMap.end())
@@ -605,7 +605,7 @@ MimeType::_Init(char** argv) throw (Error)
 					throw Error(kWrongModeMessage);
 				fOpMode = key;
 
-				if (hash(I->second->fName) != hash(kCheckSniffRule))
+				if (hash_function(I->second->fName) != hash_function(kCheckSniffRule))
 					break;
 				// else -> fallthrough, CheckRule works both as mode and Option
 			case CmdOption::kOption:
@@ -669,15 +669,15 @@ MimeType::_Init(char** argv) throw (Error)
 		throw Error("error instantiating mime for '%s': %s",
 							Type(), strerror(InitCheck()));
 
-	fDoAdd = fOpMode == hash(kAdd);
-	fDoSet = fOpMode == hash(kSet);
-	fDoForce = fOpMode == hash(kForce);
-	fDoRemove = fOpMode == hash(kRemove);
-	fDumpNormal = fOpMode == hash(kDump);
-	fDumpRule = fOpMode == hash(kDumpSniffRule);
-	fDumpIcon = fOpMode == hash(kDumpIcon);
-	fDumpAll = fOpMode == hash(kDumpAll);
-	fCheckSniffRule = fOpMode == hash(kCheckSniffRule);
+	fDoAdd = fOpMode == hash_function(kAdd);
+	fDoSet = fOpMode == hash_function(kSet);
+	fDoForce = fOpMode == hash_function(kForce);
+	fDoRemove = fOpMode == hash_function(kRemove);
+	fDumpNormal = fOpMode == hash_function(kDump);
+	fDumpRule = fOpMode == hash_function(kDumpSniffRule);
+	fDumpIcon = fOpMode == hash_function(kDumpIcon);
+	fDumpAll = fOpMode == hash_function(kDumpAll);
+	fCheckSniffRule = fOpMode == hash_function(kCheckSniffRule);
 
 	if (fDoAdd || fDoSet || fDoForce || fDoRemove) {
 		if (Type() == NULL)
@@ -835,7 +835,7 @@ MimeType::_SetTo(const char* mimetype) throw (Error)
 		uint32 i = 0;
 		const char* ext = NULL;
 		while (exts.FindString("extensions", i++, &ext) == B_OK)
-			fExtensions.insert(pair<uint32, BString>(hash(ext), ext));
+			fExtensions.insert(pair<uint32, BString>(hash_function(ext), ext));
 	}
 
 	BMessage attrs;
@@ -847,7 +847,7 @@ MimeType::_SetTo(const char* mimetype) throw (Error)
 				break;
 
 			fAttributes.insert(
-					pair<uint32, MimeAttribute>(hash(attr.fName), attr));
+					pair<uint32, MimeAttribute>(hash_function(attr.fName), attr));
 		}
 	}
 
@@ -871,7 +871,7 @@ MimeType::_SetTo(const char* mimetype) throw (Error)
 const char*
 MimeType::_UserArgValue(const char* name)
 {
-	TUserArgsI i = fUserArguments.find(hash(name));
+	TUserArgsI i = fUserArguments.find(hash_function(name));
 	if (i == fUserArguments.end())
 		return NULL;
 
@@ -1030,9 +1030,9 @@ MimeType::_DoEdit() throw (Error)
 
 	// handle extensions update
 	pair<TUserArgsI, TUserArgsI> exts
-							= fUserArguments.equal_range(hash(kExtension));
+							= fUserArguments.equal_range(hash_function(kExtension));
 	for (TUserArgsI i = exts.first; i != exts.second; i++) {
-		uint32 key = hash(i->second);
+		uint32 key = hash_function(i->second);
 		if (fExtensions.find(key) == fExtensions.end())
 			fExtensions.insert(pair<uint32, BString>(key, i->second));
 	}
@@ -1054,18 +1054,18 @@ MimeType::_DoEdit() throw (Error)
 			userAttr != fUserAttributes.end(); userAttr++ )
 	{
 		// search for -attribute "name" in args map
-		TUserArgsI attrArgs = userAttr->find(hash(kAttribute));
+		TUserArgsI attrArgs = userAttr->find(hash_function(kAttribute));
 		if (attrArgs == userAttr->end())
 			throw Error("internal error: %s arg not found", kAttribute);
 
 		// check if we already have this attribute cached
 		map<uint32, MimeAttribute>::iterator
-								attr = fAttributes.find(hash(attrArgs->second));
+								attr = fAttributes.find(hash_function(attrArgs->second));
 		if (attr == fAttributes.end()) {
 			// add new one
 			MimeAttribute mimeAttr(*userAttr);
 			fAttributes.insert(
-				pair<uint32, MimeAttribute>(hash(mimeAttr.fName), mimeAttr));
+				pair<uint32, MimeAttribute>(hash_function(mimeAttr.fName), mimeAttr));
 		} else if (!fDoAdd)
 			attr->second.SyncWith(*userAttr);
 	}

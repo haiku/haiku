@@ -230,7 +230,7 @@ check_signature(const char* signature, image_info& info)
 		return err;
 	}
 
-	if (strcmp(signature, imageSignature))
+	if (strcmp(signature, imageSignature) != 0)
 		return B_MISMATCHED_VALUES;
 
 	return B_OK;

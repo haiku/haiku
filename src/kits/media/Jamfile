@@ -89,7 +89,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ReaderPlugin.cpp
 			WriterPlugin.cpp
 			:
-			be [ TargetLibsupc++ ] [ TargetLibstdc++ ]
+			be localestub [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 			;
 	}
 }

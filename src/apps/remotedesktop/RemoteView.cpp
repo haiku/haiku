@@ -39,9 +39,9 @@ static const uint8 kCursorData[] = { 16 /* size, 16x16 */,
 };
 
 
-#define TRACE(x...)				/*printf("RemoteView: "x)*/
-#define TRACE_ALWAYS(x...)		printf("RemoteView: "x)
-#define TRACE_ERROR(x...)		printf("RemoteView: "x)
+#define TRACE(x...)				/*printf("RemoteView: " x)*/
+#define TRACE_ALWAYS(x...)		printf("RemoteView: " x)
+#define TRACE_ERROR(x...)		printf("RemoteView: " x)
 
 
 typedef struct engine_state {

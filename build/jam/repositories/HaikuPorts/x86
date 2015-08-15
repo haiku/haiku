@@ -26,7 +26,7 @@ RemotePackageRepository HaikuPorts
 	beam-1.2-1
 	bepdf-1.2.0-1
 	bescreencapture-1.9.4-1
-	binutils-2.25_2014_12_27-1
+	binutils-2.25_12015_07_31-1
 	bison-2.4.3-6
 	buildbot_slave-0.8.8-2
 	burnitnow-0.1.0-1
@@ -36,14 +36,16 @@ RemotePackageRepository HaikuPorts
 	cdrtools_devel-3.01~a27-1
 	clang-3.4-3
 	clang_analysis-3.4-3
+	clipdinger-0.4-1
 	cmake-3.0.0_rc3-1
-	coreutils-8.23-1
+	coreutils-8.24-1
 	cpio-2.10-1
 	ctags-5.8-3
-	curl-7.42.1-1
-	curl_devel-7.42.1-1
+	curl-7.43.0-1
+	curl_devel-7.43.0-1
 	cvs-1.12.13.1-6
 	cvsps-2.2b1-1
+	diffutils-3.3-2
 	dos2unix-7.2.2-1
 	doxygen-1.6.3-4
 	dtc-1.4.1-1
@@ -90,7 +92,7 @@ RemotePackageRepository HaikuPorts
 	gzip-1.6-2
 	haikuwebkit-1.4.10-1
 	haikuwebkit_devel-1.4.10-1
-	help2man-1.44.1-1
+	help2man-1.46.6-1
 	htmldoc-1.8.27-3
 	icu-55.1-4
 	icu_devel-55.1-4
@@ -128,8 +130,8 @@ RemotePackageRepository HaikuPorts
 	libpcre_devel-8.21-5
 	libpng-1.5.22-1
 	libpng_devel-1.5.22-1
-	libpng16-1.6.17-1
-	libpng16_devel-1.6.17-1
+	libpng16-1.6.18-1
+	libpng16_devel-1.6.18-1
 	libsanta-3.0.1-1
 	libsanta_devel-3.0.1-1
 	libsdl-1.2.15-6
@@ -142,8 +144,8 @@ RemotePackageRepository HaikuPorts
 	libtheora_devel-1.1.1-2
 	libtool-2.4.2-1
 	libtool_libltdl-2.4.2-1
-	libunistring-0.9.5-1
-	libunistring_devel-0.9.5-1
+	libunistring-0.9.6-1
+	libunistring_devel-0.9.6-1
 	libvorbis-1.3.5-1
 	libvorbis_devel-1.3.5-1
 	libvpx-1.0.0-2
@@ -156,8 +158,8 @@ RemotePackageRepository HaikuPorts
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
 	llvm-3.5.2-1
-	lz4-r117-1
-	lz4_devel-r117-1
+	lz4-r131-1
+	lz4_devel-r131-1
 	lzo-2.09-1
 	lzo_devel-2.09-1
 	m4-1.4.16-5
@@ -169,9 +171,13 @@ RemotePackageRepository HaikuPorts
 	mesa_swrast-10.1.1-1
 	mesa_swpipe-10.1.1-1
 	mkdepend-1.7-3
-	mpg123-1.22.0-1
-	mpg123_devel-1.22.0-1
-	nano-2.4.0-1
+	mpc-1.0.3-1
+	mpc_devel-1.0.3-1
+	mpfr-3.1.3-1
+	mpfr_devel-3.1.3-1
+	mpg123-1.22.3-1
+	mpg123_devel-1.22.3-1
+	nano-2.4.2-1
 	nasm-2.11.08-1
 	ncurses-5.9-10
 	ncurses_devel-5.9-10
@@ -180,7 +186,7 @@ RemotePackageRepository HaikuPorts
 	netcat-1.10-1
 	ninja-1.5.1-2
 	openjdk-1.7_2013_11_08-2
-	openssh-6.0p1-8
+	openssh-6.9p1-1
 	# sync openssl with secondary architecture (x86_gcc2)
 	openssl-1.0.0s-1
 	openssl_devel-1.0.0s-1
@@ -207,8 +213,8 @@ RemotePackageRepository HaikuPorts
 	sharutils-4.14-1
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.8.8.3-1
-	sqlite_devel-3.8.8.3-1
+	sqlite-3.8.11.1-1
+	sqlite_devel-3.8.11.1-1
 	subversion-1.6.18-6
 	subversion_devel-1.6.18-6
 	tar-1.27.1-2
@@ -228,8 +234,8 @@ RemotePackageRepository HaikuPorts
 	which-2.21-1
 	wpa_supplicant-2.0-3
 	xml_parser-2.36-1
-	xz_utils-5.0.8-1
-	xz_utils_devel-5.0.8-1
+	xz_utils-5.0.8-2
+	xz_utils_devel-5.0.8-2
 	yasm-1.2.0-3
 	zip-3.0-2
 	zlib-1.2.8-4
@@ -239,8 +245,8 @@ RemotePackageRepository HaikuPorts
 	binutils_x86_gcc2-2.17_2013_04_21-2
 	bzip2_x86_gcc2-1.0.6-5
 	bzip2_x86_gcc2_devel-1.0.6-5
-	curl_x86_gcc2-7.42.1-1
-	curl_x86_gcc2_devel-7.42.1-1
+	curl_x86_gcc2-7.43.0-1
+	curl_x86_gcc2_devel-7.43.0-1
 	expat_x86_gcc2-2.1.0-1
 	expat_x86_gcc2_devel-2.1.0-1
 	ffmpeg_x86_gcc2-0.10.2-4
@@ -278,8 +284,8 @@ RemotePackageRepository HaikuPorts
 	libogg_x86_gcc2_devel-1.3.0-2
 	libpng_x86_gcc2-1.5.22-1
 	libpng_x86_gcc2_devel-1.5.22-1
-	libpng16_x86_gcc2-1.6.17-1
-	libpng16_x86_gcc2_devel-1.6.17-1
+	libpng16_x86_gcc2-1.6.18-1
+	libpng16_x86_gcc2_devel-1.6.18-1
 	libsolv_x86_gcc2-0.3.0_haiku_2014_12_22-1
 	libsolv_x86_gcc2_devel-0.3.0_haiku_2014_12_22-1
 	libtheora_x86_gcc2-1.1.1-2
@@ -302,8 +308,8 @@ RemotePackageRepository HaikuPorts
 	pkgconfig_x86_gcc2-0.27.1-2
 	speex_x86_gcc2-1.2~rc1-2
 	speex_x86_gcc2_devel-1.2~rc1-2
-	sqlite_x86_gcc2-3.8.8.3-1
-	sqlite_x86_gcc2_devel-3.8.8.3-1
+	sqlite_x86_gcc2-3.8.11.1-1
+	sqlite_x86_gcc2_devel-3.8.11.1-1
 	tiff_x86_gcc2-3.9.6-2
 	tiff_x86_gcc2_devel-3.9.6-2
 	tinyxml_x86_gcc2-2.6.2-1
@@ -329,12 +335,14 @@ RemotePackageRepository HaikuPorts
 	cdrtools
 	clang
 	cmake
+	clipdinger
 	coreutils
 	cpio
 	ctags
 	curl
 	cvs
 	cvsps
+	diffutils
 	dos2unix
 	doxygen
 	dtc
@@ -405,6 +413,8 @@ RemotePackageRepository HaikuPorts
 	mesa
 	mesa_x86_gcc2
 	mkdepend
+	mpc
+	mpfr
 	mpg123
 	nano
 	nasm

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-MAIL	233997769
+1	spanish; castilian	x-vnd.Be-MAIL	1310033600
 View	Mail		Ver
 %d - Date	Mail		%d - Fecha
 Attach attributes:	Mail		Adjuntar atributos:
@@ -146,6 +146,7 @@ Open attachment	Mail		Abrir adjunto
 sent	B_USER_DIRECTORY/mail/sent		enviado
 (Date unavailable)	Mail		(Fecha indisponible)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Ponga sus consultas y plantillas de consulta de correo favoritas en esta carpeta.
+Spam	Mail		Correo basura
 Reply	Mail		Responder
 From:	Mail		De:
 Couldn't open this signature. Sorry.	Mail		No se pudo abrir la firma. Disculpe.

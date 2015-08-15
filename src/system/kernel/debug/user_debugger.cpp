@@ -1,5 +1,6 @@
 /*
  * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1854,6 +1855,18 @@ debug_nub_thread(void *)
 					result = write_port(threadDebugPort,
 						B_DEBUGGED_THREAD_MESSAGE_CONTINUE,
 						&commandMessage, sizeof(commandMessage));
+				} else if (result == B_BAD_THREAD_STATE) {
+					Thread* thread = Thread::GetAndLock(threadID);
+					if (thread == NULL)
+						break;
+
+					BReference<Thread> threadReference(thread, true);
+					ThreadLocker threadLocker(thread, true);
+					if (thread->state == B_THREAD_SUSPENDED) {
+						threadLocker.Unlock();
+						resume_thread(threadID);
+						break;
+					}
 				}
 
 				break;

@@ -618,23 +618,27 @@ BResources::WriteResource(type_code type, int32 id, const void* data,
 		error = InitCheck();
 	if (error == B_OK)
 		error = (fReadOnly ? B_NOT_ALLOWED : B_OK);
-	ResourceItem *item = NULL;
-	if (error == B_OK) {
-		item = fContainer->ResourceAt(fContainer->IndexOf(type, id));
-		if (!item)
-			error = B_BAD_VALUE;
-	}
-	if (error == B_OK && fResourceFile)
+
+	if (error != B_OK)
+		return error;
+
+	ResourceItem *item = fContainer->ResourceAt(fContainer->IndexOf(type, id));
+	if (!item)
+		return B_BAD_VALUE;
+
+	if (fResourceFile) {
 		error = fResourceFile->ReadResource(*item);
-	if (error == B_OK) {
-		if (item) {
-			ssize_t written = item->WriteAt(offset, data, length);
-			if (written < 0)
-				error = written;
-			else if (written != (ssize_t)length)
-				error = B_ERROR;
-		}
+		if (error != B_OK)
+			return error;
 	}
+
+	ssize_t written = item->WriteAt(offset, data, length);
+
+	if (written < 0)
+		error = written;
+	else if (written != (ssize_t)length)
+		error = B_ERROR;
+
 	return error;
 }
 

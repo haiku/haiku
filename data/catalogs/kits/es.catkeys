@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libbe	3211461559
+1	spanish; castilian	x-vnd.Haiku-libbe	3198309111
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -18,6 +18,8 @@ OK	PrintJob		Aceptar
 Green:	ColorControl		Verde:
 Version history:	AboutWindow		Historal de versión:
 Remove replicant	Dragger		Remover replicante
+Select all	TextView		Seleccionar todo
+OK	AboutWindow		Aceptar
 OK	ZombieReplicantView		Aceptar
 Print Server is not responding.	PrintJob		El servidor de impresión no responde.
 Paste	TextView		Pegar

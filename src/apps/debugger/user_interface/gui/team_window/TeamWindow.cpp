@@ -73,7 +73,8 @@ enum {
 	MSG_DEBUG_REPORT_SAVED				= 'drsa',
 	MSG_LOCATE_SOURCE_IF_NEEDED			= 'lsin',
 	MSG_SOURCE_ENTRY_QUERY_COMPLETE		= 'seqc',
-	MSG_CLEAR_STACK_TRACE				= 'clst'
+	MSG_CLEAR_STACK_TRACE				= 'clst',
+	MSG_HANDLE_LOAD_SETTINGS			= 'hlst'
 };
 
 
@@ -145,12 +146,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fFilePanel(NULL),
 	fActiveSourceWorker(-1)
 {
-	fTeam->Lock();
-	BString name = fTeam->Name();
-	fTeam->Unlock();
-	if (fTeam->ID() >= 0)
-		name << " (" << fTeam->ID() << ")";
-	SetTitle(name.String());
+	_UpdateTitle();
 
 	fTeam->AddListener(this);
 }
@@ -518,6 +514,22 @@ TeamWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		case MSG_HANDLE_LOAD_SETTINGS:
+		{
+			GuiTeamUiSettings* settings;
+			if (message->FindPointer("settings",
+				reinterpret_cast<void**>(&settings)) != B_OK) {
+				break;
+			}
+
+			_LoadSettings(settings);
+			break;
+		}
+		case MSG_TEAM_RENAMED:
+		{
+			_UpdateTitle();
+			break;
+		}
 		case MSG_THREAD_STATE_CHANGED:
 		{
 			int32 threadID;
@@ -617,64 +629,9 @@ TeamWindow::QuitRequested()
 status_t
 TeamWindow::LoadSettings(const GuiTeamUiSettings* settings)
 {
-	AutoLocker<BWindow> lock(this);
-	if (!lock.IsLocked())
-		return B_ERROR;
-
-	BMessage teamWindowSettings;
-	// no settings stored yet
-	if (settings->Settings("teamWindow", teamWindowSettings) != B_OK)
-		return B_OK;
-
-	BRect frame;
-	if (teamWindowSettings.FindRect("frame", &frame) == B_OK) {
-		ResizeTo(frame.Width(), frame.Height());
-		MoveTo(frame.left, frame.top);
-	}
-
-	BMessage archive;
-	if (teamWindowSettings.FindMessage("sourceSplit", &archive) == B_OK)
-		GuiSettingsUtils::UnarchiveSplitView(archive, fSourceSplitView);
-
-	if (teamWindowSettings.FindMessage("functionSplit", &archive) == B_OK)
-		GuiSettingsUtils::UnarchiveSplitView(archive, fFunctionSplitView);
-
-	if (teamWindowSettings.FindMessage("imageSplit", &archive) == B_OK)
-		GuiSettingsUtils::UnarchiveSplitView(archive, fImageSplitView);
-
-	if (teamWindowSettings.FindMessage("threadSplit", &archive) == B_OK)
-		GuiSettingsUtils::UnarchiveSplitView(archive, fThreadSplitView);
-
-	if (teamWindowSettings.FindMessage("consoleSplit", &archive) == B_OK)
-		GuiSettingsUtils::UnarchiveSplitView(archive, fConsoleSplitView);
-
-	if (teamWindowSettings.FindMessage("imageListView", &archive) == B_OK)
-		fImageListView->LoadSettings(archive);
-
-	if (teamWindowSettings.FindMessage("imageFunctionsView", &archive) == B_OK)
-		fImageFunctionsView->LoadSettings(archive);
-
-	if (teamWindowSettings.FindMessage("threadListView", &archive) == B_OK)
-		fThreadListView->LoadSettings(archive);
-
-	if (teamWindowSettings.FindMessage("variablesView", &archive) == B_OK)
-		fVariablesView->LoadSettings(archive);
-
-	if (teamWindowSettings.FindMessage("registersView", &archive) == B_OK)
-		fRegistersView->LoadSettings(archive);
-
-	if (teamWindowSettings.FindMessage("stackTraceView", &archive) == B_OK)
-		fStackTraceView->LoadSettings(archive);
-
-	if (teamWindowSettings.FindMessage("breakpointsView", &archive) == B_OK)
-		fBreakpointsView->LoadSettings(archive);
-
-	if (teamWindowSettings.FindMessage("consoleOutputView", &archive) == B_OK)
-		fConsoleOutputView->LoadSettings(archive);
-
-	fUiSettings = *settings;
-
-	return B_OK;
+	BMessage message(MSG_HANDLE_LOAD_SETTINGS);
+	message.AddPointer("settings", settings);
+	return PostMessage(&message);
 }
 
 
@@ -902,6 +859,13 @@ TeamWindow::ValueNodeWriteRequested(ValueNode* node, CpuState* state,
 	Value* newValue)
 {
 	fListener->ValueNodeWriteRequested(node, state, newValue);
+}
+
+
+void
+TeamWindow::TeamRenamed(const Team::Event& event)
+{
+	PostMessage(MSG_TEAM_RENAMED);
 }
 
 
@@ -1138,6 +1102,75 @@ TeamWindow::_Init()
 
 	AutoLocker< ::Team> locker(fTeam);
 	_UpdateRunButtons();
+}
+
+
+void
+TeamWindow::_LoadSettings(const GuiTeamUiSettings* settings)
+{
+	BMessage teamWindowSettings;
+	// no settings stored yet
+	if (settings->Settings("teamWindow", teamWindowSettings) != B_OK)
+		return;
+
+	BRect frame;
+	if (teamWindowSettings.FindRect("frame", &frame) == B_OK) {
+		ResizeTo(frame.Width(), frame.Height());
+		MoveTo(frame.left, frame.top);
+	}
+
+	BMessage archive;
+	if (teamWindowSettings.FindMessage("sourceSplit", &archive) == B_OK)
+		GuiSettingsUtils::UnarchiveSplitView(archive, fSourceSplitView);
+
+	if (teamWindowSettings.FindMessage("functionSplit", &archive) == B_OK)
+		GuiSettingsUtils::UnarchiveSplitView(archive, fFunctionSplitView);
+
+	if (teamWindowSettings.FindMessage("imageSplit", &archive) == B_OK)
+		GuiSettingsUtils::UnarchiveSplitView(archive, fImageSplitView);
+
+	if (teamWindowSettings.FindMessage("threadSplit", &archive) == B_OK)
+		GuiSettingsUtils::UnarchiveSplitView(archive, fThreadSplitView);
+
+	if (teamWindowSettings.FindMessage("consoleSplit", &archive) == B_OK)
+		GuiSettingsUtils::UnarchiveSplitView(archive, fConsoleSplitView);
+
+	if (teamWindowSettings.FindMessage("imageListView", &archive) == B_OK)
+		fImageListView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("imageFunctionsView", &archive) == B_OK)
+		fImageFunctionsView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("threadListView", &archive) == B_OK)
+		fThreadListView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("variablesView", &archive) == B_OK)
+		fVariablesView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("registersView", &archive) == B_OK)
+		fRegistersView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("stackTraceView", &archive) == B_OK)
+		fStackTraceView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("breakpointsView", &archive) == B_OK)
+		fBreakpointsView->LoadSettings(archive);
+
+	if (teamWindowSettings.FindMessage("consoleOutputView", &archive) == B_OK)
+		fConsoleOutputView->LoadSettings(archive);
+
+	fUiSettings = *settings;
+}
+
+
+void
+TeamWindow::_UpdateTitle()
+{
+	AutoLocker< ::Team> lock(fTeam);
+	BString name = fTeam->Name();
+	if (fTeam->ID() >= 0)
+		name << " (" << fTeam->ID() << ")";
+	SetTitle(name.String());
 }
 
 

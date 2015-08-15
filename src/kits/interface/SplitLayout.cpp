@@ -1,5 +1,6 @@
 /*
  * Copyright 2006-2009, Ingo Weinhold <ingo_weinhold@gmx.de>.
+ * Copyright 2015, Rene Gollent, rene@gollent.com.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -493,14 +494,14 @@ BSplitLayout::SetCollapsible(int32 first, int32 last, bool collapsible)
 bool
 BSplitLayout::IsItemCollapsed(int32 index) const
 {
-	return _ItemLayoutInfo(ItemAt(index))->isVisible;
+	return !_ItemLayoutInfo(ItemAt(index))->isVisible;
 }
 
 
 void
 BSplitLayout::SetItemCollapsed(int32 index, bool collapsed)
 {
-	ItemAt(index)->SetVisible(collapsed);
+	ItemAt(index)->SetVisible(!collapsed);
 
 	InvalidateLayout(true);
 }

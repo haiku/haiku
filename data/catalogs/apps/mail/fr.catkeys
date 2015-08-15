@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-MAIL	233997769
+1	french	x-vnd.Be-MAIL	1310033600
 View	Mail		Vue
 %d - Date	Mail		%d - Date
 Attach attributes:	Mail		Attributs du fichier joint :
@@ -146,6 +146,7 @@ Open attachment	Mail		Ouvrir le fichier joint
 sent	B_USER_DIRECTORY/mail/sent		envoyés
 (Date unavailable)	Mail		(Date non disponible)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Mettez vos requêtes d’e-mail et vos modèles de requêtes dans ce dossier.
+Spam	Mail		Courrier indésirable
 Reply	Mail		Répondre
 From:	Mail		De :
 Couldn't open this signature. Sorry.	Mail		Impossible d’ouvrir cette signature. Désolé.

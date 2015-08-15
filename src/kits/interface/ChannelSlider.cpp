@@ -1,9 +1,9 @@
 /*
- * Copyright 2005-2009, Haiku Inc. All Rights Reserved.
+ * Copyright 2005-2015, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Stefano Ceccherini (burton666@libero.it)
+ *		Stefano Ceccherini (stefano.ceccherini@gmail.com)
  *		Stephan Aßmus <superstippi@gmx.de>
  */
 
@@ -563,24 +563,16 @@ BChannelSlider::DrawGroove(BView* into, int32 channel, BPoint leftTop,
 	ASSERT(into != NULL);
 	BRect rect(leftTop, bottomRight);
 
-	if (be_control_look != NULL) {
-		rect.InsetBy(-2.5, -2.5);
-		rect.left = floorf(rect.left);
-		rect.top = floorf(rect.top);
-		rect.right = floorf(rect.right);
-		rect.bottom = floorf(rect.bottom);
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		rgb_color barColor = be_control_look->SliderBarColor(base);
-		uint32 flags = 0;
-		be_control_look->DrawSliderBar(into, rect, rect, base,
-			barColor, flags, Orientation());
-		return;
-	}
-
-	_DrawGrooveFrame(fBackingView, rect.InsetByCopy(-2.5, -2.5));
-
-	rect.InsetBy(-0.5, -0.5);
-	into->FillRect(rect, B_SOLID_HIGH);
+	rect.InsetBy(-2.5, -2.5);
+	rect.left = floorf(rect.left);
+	rect.top = floorf(rect.top);
+	rect.right = floorf(rect.right);
+	rect.bottom = floorf(rect.bottom);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color barColor = be_control_look->SliderBarColor(base);
+	uint32 flags = 0;
+	be_control_look->DrawSliderBar(into, rect, rect, base,
+		barColor, flags, Orientation());
 }
 
 
@@ -598,60 +590,38 @@ BChannelSlider::DrawThumb(BView* into, int32 channel, BPoint where,
 	where.x -= bitmapBounds.right / 2.0;
 	where.y -= bitmapBounds.bottom / 2.0;
 
-
-	if (be_control_look != NULL) {
-		BRect rect(bitmapBounds.OffsetToCopy(where));
-		rect.InsetBy(1, 1);
-		rect.left = floorf(rect.left);
-		rect.top = floorf(rect.top);
-		rect.right = ceilf(rect.right + 0.5);
-		rect.bottom = ceilf(rect.bottom + 0.5);
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 flags = 0;
-		be_control_look->DrawSliderThumb(into, rect, rect, base,
-			flags, Orientation());
-		return;
-	}
-
-
-	into->PushState();
-
-	into->SetDrawingMode(B_OP_OVER);
-	into->DrawBitmapAsync(thumb, where);
-
-	if (pressed) {
-		into->SetDrawingMode(B_OP_ALPHA);
-
-		rgb_color color = tint_color(into->ViewColor(), B_DARKEN_4_TINT);
-		color.alpha = 128;
-		into->SetHighColor(color);
-
-		BRect destRect(where, where);
-		destRect.right += bitmapBounds.right;
-		destRect.bottom += bitmapBounds.bottom;
-
-		into->FillRect(destRect);
-	}
-
-	into->PopState();
+	BRect rect(bitmapBounds.OffsetToCopy(where));
+	rect.InsetBy(1, 1);
+	rect.left = floorf(rect.left);
+	rect.top = floorf(rect.top);
+	rect.right = ceilf(rect.right + 0.5);
+	rect.bottom = ceilf(rect.bottom + 0.5);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 flags = 0;
+	be_control_look->DrawSliderThumb(into, rect, rect, base,
+		flags, Orientation());
 }
 
 
 const BBitmap*
 BChannelSlider::ThumbFor(int32 channel, bool pressed)
 {
-	// TODO: Finish me (check allocations... etc)
-	if (fLeftKnob == NULL) {
-		if (fIsVertical) {
-			fLeftKnob = new (std::nothrow) BBitmap(BRect(0, 0, 11, 14),
-				B_CMAP8);
-			fLeftKnob->SetBits(kVerticalKnobData, sizeof(kVerticalKnobData), 0,
-				B_CMAP8);
-		} else {
-			fLeftKnob = new (std::nothrow) BBitmap(BRect(0, 0, 14, 11),
-				B_CMAP8);
+	if (fLeftKnob != NULL)
+		return fLeftKnob;
+
+	if (fIsVertical) {
+		fLeftKnob = new (std::nothrow) BBitmap(BRect(0, 0, 11, 14),
+			B_CMAP8);
+		if (fLeftKnob != NULL) {
+			fLeftKnob->SetBits(kVerticalKnobData,
+					sizeof(kVerticalKnobData), 0, B_CMAP8);
+		}
+	} else {
+		fLeftKnob = new (std::nothrow) BBitmap(BRect(0, 0, 14, 11),
+			B_CMAP8);
+		if (fLeftKnob != NULL) {
 			fLeftKnob->SetBits(kHorizontalKnobData,
-				sizeof(kHorizontalKnobData), 0, B_CMAP8);
+					sizeof(kHorizontalKnobData), 0, B_CMAP8);
 		}
 	}
 
@@ -753,13 +723,15 @@ BChannelSlider::_FinishChange(bool update)
 		if (!fAllChannels) {
 			inMask = new (std::nothrow) bool[CountChannels()];
 			if (inMask) {
-				for (int i=0; i<numChannels; i++)
+				for (int i = 0; i < numChannels; i++)
 					inMask[i] = false;
 				inMask[fCurrentChannel] = true;
 			}
 		}
 		InvokeChannel(update ? ModificationMessage() : NULL, 0, numChannels,
 			inMask);
+
+		delete[] inMask;
 	}
 
 	if (!update) {

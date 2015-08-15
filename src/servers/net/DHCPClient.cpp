@@ -85,14 +85,14 @@ enum message_option {
 
 enum message_type {
 	DHCP_NONE = 0,
-	DHCP_DISCOVER,
-	DHCP_OFFER,
-	DHCP_REQUEST,
-	DHCP_DECLINE,
-	DHCP_ACK,
-	DHCP_NACK,
-	DHCP_RELEASE,
-	DHCP_INFORM
+	DHCP_DISCOVER = 1,
+	DHCP_OFFER = 2,
+	DHCP_REQUEST = 3,
+	DHCP_DECLINE = 4,
+	DHCP_ACK = 5,
+	DHCP_NACK = 6,
+	DHCP_RELEASE = 7,
+	DHCP_INFORM = 8
 };
 
 struct dhcp_option_cookie {
@@ -427,7 +427,7 @@ DHCPClient::DHCPClient(BMessenger target, const char* device)
 	fResolverConfiguration(kMsgConfigureResolver),
 	fRunner(NULL),
 	fAssignedAddress(0),
-	fServer(AF_INET, NULL, DHCP_SERVER_PORT),
+	fServer(AF_INET, NULL, DHCP_SERVER_PORT, B_UNCONFIGURED_ADDRESS_FAMILIES),
 	fLeaseTime(0)
 {
 	fTransactionID = (uint32)system_time() ^ rand();
@@ -763,10 +763,17 @@ DHCPClient::_ParseOptions(dhcp_message& message, BMessage& address,
 				break;
 			}
 			case OPTION_SERVER_ADDRESS:
+			{
 				syslog(LOG_DEBUG, "  server: %s\n",
 					_AddressToString(data).String());
-				fServer.SetAddress(*(in_addr_t*)data);
+				status_t status = fServer.SetAddress(*(in_addr_t*)data);
+				if (status != B_OK) {
+					syslog(LOG_ERR, "   BNetworkAddress::SetAddress failed with %s!\n",
+						strerror(status));
+					fServer.Unset();
+				}
 				break;
+			}
 
 			case OPTION_ADDRESS_LEASE_TIME:
 				syslog(LOG_DEBUG, "  lease time: %lu seconds\n",
@@ -913,7 +920,7 @@ DHCPClient::_TimeoutShift(int socket, dhcp_state& state, time_t& timeout,
 		state = INIT;
 		return false;
 	}
-		
+
 	tries++;
 	timeout += timeout;
 	if (timeout > MAX_TIMEOUT)

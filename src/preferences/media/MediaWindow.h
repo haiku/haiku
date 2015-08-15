@@ -22,7 +22,6 @@
 #include "MediaListItem.h"
 #include "MediaViews.h"
 
-#define MEDIA_SERVICE_NOTIFICATION_ID "MediaServiceNotificationID"
 #define SETTINGS_FILE "MediaPrefs Settings"
 
 
@@ -72,9 +71,6 @@ private:
 			NodeListItem*		_FindNodeListItem(dormant_node_info* info);
 
 	static	status_t			_RestartMediaServices(void* data);
-	static	bool				_UpdateProgress(int stage, const char* message,
-									void* cookie);
-			void				_Notify(float progress, const char* message);
 
 			void				_ClearParamView();
 			void				_MakeParamView();
@@ -112,6 +108,7 @@ private:
 			NodeList			fVideoOutputs;
 
 			status_t			fInitCheck;
+			thread_id			fRestartThread;
 };
 
 

@@ -21,6 +21,8 @@ MA 02111-1307, USA. */
 
 #ifndef __GMP_H__
 
+#include <features.h>
+
 #ifndef __GNU_MP__
 #define __GNU_MP__ 2
 #define __need_size_t
@@ -41,7 +43,7 @@ MA 02111-1307, USA. */
 
 #ifndef _EXTERN_INLINE
 #ifdef __GNUC__
-#define _EXTERN_INLINE extern __inline__
+#define _EXTERN_INLINE __extern_inline
 #else
 #define _EXTERN_INLINE static
 #endif

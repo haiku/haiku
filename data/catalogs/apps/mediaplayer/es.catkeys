@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1149772289
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1854844358
 raw audio	MediaPlayer-InfoWin		audio bruto
 Location	MediaPlayer-InfoWin		Ubicación
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -91,6 +91,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Empezar a reproducir aut
 Track	Video Track Menu		Pista
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (bloquear falló). Guardar la lista de reproducción falló.
 View options	MediaPlayer-SettingsWindow		Ver opciones
+none	MediaPlayer-Main		ninguno
 Play mode	MediaPlayer-SettingsWindow		Modo de reproducción
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Eliminar entradas
 Video track	MediaPlayer-Main		Pista de vídeo
@@ -119,6 +120,7 @@ raw video	MediaPlayer-InfoWin		video bruto
 Volume of background clips	MediaPlayer-SettingsWindow		Volumen de secuencias de fondo
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Error interno (sin memoria ). Guardar lista de reproducción falló.
 Hide interface	MediaPlayer-Main		Esconder interfaz
+Open clips	MediaPlayer-Main		Abrir las secuencias
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiar entrada
 none	Subtitles menu		ninguno
 Move file to Trash	MediaPlayer-PlaylistWindow		Mover archivo a la papelera

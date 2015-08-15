@@ -2577,9 +2577,11 @@ BTextView::PreferredSize()
 bool
 BTextView::HasHeightForWidth()
 {
-	// ToDo: When not editable and not embedded in a scroll view, we should
-	// assume that all text is supposed to be visible.
-	return BView::HasHeightForWidth();
+	if (IsEditable())
+		return BView::HasHeightForWidth();
+
+	// When not editable, we assume that all text is supposed to be visible.
+	return true;
 }
 
 
@@ -2587,8 +2589,21 @@ void
 BTextView::GetHeightForWidth(float width, float* min, float* max,
 	float* preferred)
 {
-	// ToDo: See above and implement.
-	BView::GetHeightForWidth(width, min, max, preferred);
+	if (IsEditable()) {
+		BView::GetHeightForWidth(width, min, max, preferred);
+		return;
+	}
+
+	// TODO: don't change the actual text rect!
+	fTextRect.right = fTextRect.left + width;
+	_Refresh(0, TextLength(), false);
+
+	if (min != NULL)
+		*min = fTextRect.Height();
+	if (max != NULL)
+		*max = fTextRect.Height();
+	if (preferred != NULL)
+		*preferred = fTextRect.Height();
 }
 
 

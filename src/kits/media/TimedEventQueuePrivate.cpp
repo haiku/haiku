@@ -78,8 +78,6 @@ _event_queue_imp::AddEvent(const media_timed_event &event)
 		 return B_BAD_VALUE;
 	}
 
-	*(bigtime_t *)&event.queued_time = BTimeSource::RealTime();
-
 	//create a new queue
 	if (fFirstEntry == NULL) {
 		ASSERT(fEventCount == 0);

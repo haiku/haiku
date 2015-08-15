@@ -53,9 +53,9 @@ private:
 
 			status_t			_Read(int fd, off_t offset, void* data,
 									size_t size) const;
-			bool				_IsHeaderValid(const efi_table_header& header,
+			static bool			_IsHeaderValid(efi_table_header& header,
 									uint64 block);
-			bool				_ValidateHeaderCRC();
+			static bool			_ValidateHeaderCRC(efi_table_header& header);
 			bool				_ValidateEntriesCRC() const;
 			void				_SetBackupHeaderFromPrimary(uint64 lastBlock);
 			size_t				_EntryArraySize() const

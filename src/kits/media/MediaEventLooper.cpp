@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2015 Dario Casalinuovo <b.vitruvio@gmail.com>
  * Copyright (c) 2002, 2003 Marcus Overhagen <Marcus@Overhagen.de>
  *
  * Permission is hereby granted, free of charge, to any person obtaining
@@ -212,68 +213,71 @@ BMediaEventLooper::ControlLoop()
 {
 	CALLED();
 
-	bool is_realtime = false;
 	status_t err;
-	bigtime_t latency;
-	bigtime_t waituntil;
-	bigtime_t lateness;
-	for (;;) {
-		// while there are no events or it is not time for the earliest event,
-		// process messages using WaitForMessages. Whenever this funtion times out,
-		// we need to handle the next event
-		for (;;) {
-			if (RunState() == B_QUITTING)
-				return;
-			// BMediaEventLooper compensates your performance time by adding the event latency
-			// (see SetEventLatency()) and the scheduling latency (or, for real-time events,
-			// only the scheduling latency).
+	bigtime_t waitUntil = B_INFINITE_TIMEOUT;
+	bigtime_t tempLateness = 0;
+	bool hasRealtime = false;
+	bool hasEvent = false;
 
-			latency = fEventLatency + fSchedulingLatency;
-			waituntil = B_INFINITE_TIMEOUT;
-			if (fEventQueue.HasEvents()) {
-				const media_timed_event *firstEvent = fEventQueue.FirstEvent();
-				waituntil = TimeSource()->RealTimeFor(firstEvent->event_time, latency);
-				is_realtime = false;
-				lateness = firstEvent->queued_time - waituntil;
-				if (lateness > 0) {
-//					if (lateness > 1000)
-//						printf("node %02ld handling %12Ld at %12Ld -- %Ld late,  queued at %Ld now %12Ld \n",
-//							ID(), fEventQueue.FirstEventTime(), TimeSource()->Now(), lateness,
-//							firstEvent->queued_time, TimeSource()->RealTime());
-					is_realtime = false;
-					break;
-				}
-//				printf("node %02ld waiting for %12Ld that will happen at %12Ld\n", ID(), fEventQueue.FirstEventTime(), waituntil);
+	// While there are no events or it is not time for the earliest event,
+	// process messages using WaitForMessages. Whenever this funtion times out,
+	// we need to handle the next event
+
+	fSchedulingLatency = estimate_max_scheduling_latency(fControlThread);
+	while (true) {
+		if (RunState() == B_QUITTING)
+			return;
+
+		err = WaitForMessage(waitUntil);
+		if (err == B_TIMED_OUT) {
+			media_timed_event event;
+			if (hasEvent)
+				err = fEventQueue.RemoveFirstEvent(&event);
+			else
+				err = fRealTimeQueue.RemoveFirstEvent(&event);
+
+			if (err == B_OK) {
+				tempLateness -= TimeSource()->RealTime();
+				if (tempLateness < 0)
+					tempLateness = 0;
+
+				DispatchEvent(&event, tempLateness, hasRealtime);
 			}
-			if (fRealTimeQueue.HasEvents()) {
-				const media_timed_event *firstEvent = fRealTimeQueue.FirstEvent();
-				bigtime_t temp;
-				temp = firstEvent->event_time - fSchedulingLatency;
-				lateness =  firstEvent->queued_time - temp;
-				if (lateness > 0) {
-					is_realtime = true;
-					break;
-				}
-				if (temp < waituntil) {
-					waituntil = temp;
-					is_realtime = true;
-				}
-			}
-			lateness = 0;	// remove any extraneous value if we get this far
-			err = WaitForMessage(waituntil);
-			if (err == B_TIMED_OUT)
-				break;
+		} else if (err != B_OK)
+			return;
+
+		// BMediaEventLooper compensates your performance time by adding
+		// the event latency (see SetEventLatency()) and the scheduling
+		// latency (or, for real-time events, only the scheduling latency).
+
+		hasRealtime = fRealTimeQueue.HasEvents();
+		hasEvent = fEventQueue.HasEvents();
+
+		if (hasEvent) {
+			waitUntil = TimeSource()->RealTimeFor(
+				fEventQueue.FirstEvent()->event_time,
+				fEventLatency + fSchedulingLatency);
+		} else if (!hasRealtime) {
+			waitUntil = B_INFINITE_TIMEOUT;
+			continue;
 		}
-		/// we have timed out - so handle the next event
-		media_timed_event event;
-		if (is_realtime)
-			err = fRealTimeQueue.RemoveFirstEvent(&event);
-		else
-			err = fEventQueue.RemoveFirstEvent(&event);
 
-//		printf("node %02ld handling  %12Ld  at %12Ld\n", ID(), event.event_time, TimeSource()->Now());
+		if (hasEvent && hasRealtime) {
+			if (fRealTimeQueue.FirstEventTime()
+				- fSchedulingLatency <= waitUntil) {
+				hasEvent = false;
+			} else
+				hasRealtime = false;
+		}
 
-		if (err == B_OK) DispatchEvent(&event, lateness, is_realtime);
+		if (hasRealtime) {
+			waitUntil = fRealTimeQueue.FirstEventTime()
+				- fSchedulingLatency;
+		}
+
+		tempLateness = waitUntil;
+		if (waitUntil < TimeSource()->RealTime())
+			waitUntil = 0;
 	}
 }
 

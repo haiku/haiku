@@ -21,8 +21,6 @@
 #include "CollapsingLayouter.h"
 
 
-
-
 // Some words of explanation:
 //
 // This class is the base class for BLayouts that organize their items
@@ -923,13 +921,6 @@ BTwoDimensionalLayout::VerticalCompoundLayouter::InternalGetHeightForWidth(
 		}
 
 		updateCachedInfo = true;
-
-		// get the height for width info
-		fCachedMinHeightForWidth = fHeightForWidthLayouter->MinSize();
-		fCachedMaxHeightForWidth = fHeightForWidthLayouter->MaxSize();
-		fCachedPreferredHeightForWidth
-			= fHeightForWidthLayouter->PreferredSize();
-
 	} else if (localLayouter->HasHeightForWidth()) {
 		// There is a height for width layouter and it has been initialized
 		// in the current layout context. So we just add the height for width

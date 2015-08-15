@@ -25,22 +25,6 @@
 #include <stddef.h>
 
 
-class WaitList {
-public:
-	WaitList(const char* name);
-	~WaitList();
-
-	status_t InitCheck() const;
-
-	status_t Wait(MutexLocker& locker, bigtime_t timeout = B_INFINITE_TIMEOUT);
-	void Signal();
-
-private:
-	int32 fCondition;
-	sem_id fSem;
-};
-
-
 class TCPEndpoint : public net_protocol, public ProtocolSocket {
 public:
 						TCPEndpoint(net_socket* socket);
@@ -132,6 +116,9 @@ private:
 	static	void		_DelayedAcknowledgeTimer(net_timer* timer,
 							void* _endpoint);
 
+	static	status_t	_WaitForCondition(ConditionVariable& condition,
+							MutexLocker& locker, bigtime_t timeout);
+
 private:
 	TCPEndpoint*	fConnectionHashLink;
 	TCPEndpoint*	fEndpointHashLink;
@@ -141,8 +128,10 @@ private:
 
 	mutex			fLock;
 	EndpointManager* fManager;
-	WaitList		fReceiveList;
-	WaitList		fSendList;
+	ConditionVariable
+					fReceiveCondition;
+	ConditionVariable
+					fSendCondition;
 	sem_id			fAcceptSemaphore;
 	uint8			fOptions;
 
@@ -161,7 +150,7 @@ private:
 	tcp_sequence	fInitialSendSequence;
 	uint32			fDuplicateAcknowledgeCount;
 
-	net_route 		*fRoute;
+	net_route		*fRoute;
 		// TODO: don't use a net_route, but a net_route_info!!!
 		// (the latter will automatically adapt to routing changes)
 

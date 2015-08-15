@@ -231,7 +231,8 @@ TeamDebugger::TeamDebugger(Listener* listener, UserInterface* userInterface,
 	fTerminating(false),
 	fKillTeamOnQuit(false),
 	fCommandLineArgc(0),
-	fCommandLineArgv(NULL)
+	fCommandLineArgv(NULL),
+	fExecPending(false)
 {
 	fUserInterface->AcquireReference();
 }
@@ -454,7 +455,8 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, int argc,
 	// set team debugging flags
 	fDebuggerInterface->SetTeamDebuggingFlags(
 		B_TEAM_DEBUG_THREADS | B_TEAM_DEBUG_IMAGES
-			| B_TEAM_DEBUG_POST_SYSCALL | B_TEAM_DEBUG_SIGNALS);
+			| B_TEAM_DEBUG_POST_SYSCALL | B_TEAM_DEBUG_SIGNALS
+			| B_TEAM_DEBUG_TEAM_CREATION);
 
 	// get the initial state of the team
 	AutoLocker< ::Team> teamLocker(fTeam);
@@ -1556,10 +1558,15 @@ TeamDebugger::_HandleDebuggerMessage(DebugEvent* event)
 			break;
 		}
 		case B_DEBUGGER_MESSAGE_TEAM_EXEC:
+		{
 			TRACE_EVENTS("B_DEBUGGER_MESSAGE_TEAM_EXEC: team: %" B_PRId32 "\n",
 				event->Team());
-			// TODO: Handle!
+
+			TeamExecEvent* teamEvent
+				= dynamic_cast<TeamExecEvent*>(event);
+			_PrepareForTeamExec(teamEvent);
 			break;
+		}
 		case B_DEBUGGER_MESSAGE_THREAD_CREATED:
 		{
 			ThreadCreatedEvent* threadEvent
@@ -1850,6 +1857,43 @@ TeamDebugger::_HandlePostSyscall(PostSyscallEvent* event)
 
 
 void
+TeamDebugger::_PrepareForTeamExec(TeamExecEvent* event)
+{
+	// NB: must be called with team lock held.
+
+	_SaveSettings();
+
+	// when notified of exec, we need to clear out data related
+	// to the old team.
+	const ImageList& images = fTeam->Images();
+
+	for (ImageList::ConstIterator it = images.GetIterator();
+			Image* image = it.Next();) {
+		fBreakpointManager->RemoveImageBreakpoints(image);
+	}
+
+	BObjectList<UserBreakpoint> breakpointsToRemove(20, false);
+	const UserBreakpointList& breakpoints = fTeam->UserBreakpoints();
+	for (UserBreakpointList::ConstIterator it = breakpoints.GetIterator();
+			UserBreakpoint* breakpoint = it.Next();) {
+		breakpointsToRemove.AddItem(breakpoint);
+		breakpoint->AcquireReference();
+	}
+
+	for (int32 i = 0; i < breakpointsToRemove.CountItems(); i++) {
+		UserBreakpoint* breakpoint = breakpointsToRemove.ItemAt(i);
+		fTeam->RemoveUserBreakpoint(breakpoint);
+		fTeam->NotifyUserBreakpointChanged(breakpoint);
+		breakpoint->ReleaseReference();
+	}
+
+	fTeam->ClearImages();
+	fTeam->ClearSignalDispositionMappings();
+	fExecPending = true;
+}
+
+
+void
 TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 {
 	// get the image (via the image handler)
@@ -1860,10 +1904,22 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 
 	Image* image = imageHandler->GetImage();
 	BReference<Image> imageReference(image);
+	image_debug_info_state state = image->ImageDebugInfoState();
+
+	bool handlePostExecSetup = fExecPending && image->Type() == B_APP_IMAGE
+		&& state != IMAGE_DEBUG_INFO_LOADING;
+
+	// this needs to be done first so that breakpoints are loaded.
+	// otherwise, UpdateImageBreakpoints() won't find the appropriate
+	// UserBreakpoints to create/install instances for.
+	if (handlePostExecSetup) {
+		fTeam->SetName(image->Name());
+		_LoadSettings();
+		fExecPending = false;
+	}
 
 	locker.Unlock();
 
-	image_debug_info_state state = image->ImageDebugInfoState();
 	if (state == IMAGE_DEBUG_INFO_LOADED
 		|| state == IMAGE_DEBUG_INFO_UNAVAILABLE) {
 		// update breakpoints in the image
@@ -1875,9 +1931,9 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 			fImageInfoPendingThreads->Remove(thread);
 			ObjectDeleter<ImageInfoPendingThread> threadDeleter(thread);
 			locker.Lock();
+			ThreadHandler* handler = _GetThreadHandler(thread->ThreadID());
+			BReference<ThreadHandler> handlerReference(handler);
 			if (fTeam->StopOnImageLoad()) {
-				ThreadHandler* handler = _GetThreadHandler(thread->ThreadID());
-				BReference<ThreadHandler> handlerReference(handler);
 
 				bool stop = true;
 				const BString& imageName = image->Name();
@@ -1899,10 +1955,19 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 						return;
 				} else
 					locker.Unlock();
-			} else
+			} else if (handlePostExecSetup) {
+				// in the case of an exec(), we can't stop in main() until
+				// the new app image has been loaded, so we know where to
+				// set the main breakpoint at.
+				SymbolInfo symbolInfo;
+				if (fDebuggerInterface->GetSymbolInfo(fTeam->ID(), image->ID(),
+						"main", B_SYMBOL_TYPE_TEXT, symbolInfo) == B_OK) {
+					handler->SetBreakpointAndRun(symbolInfo.Address());
+				}
+			} else {
 				locker.Unlock();
-
-			fDebuggerInterface->ContinueThread(thread->ThreadID());
+				fDebuggerInterface->ContinueThread(thread->ThreadID());
+			}
 		}
 	}
 }

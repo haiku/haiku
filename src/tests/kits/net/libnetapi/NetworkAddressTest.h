@@ -18,6 +18,8 @@ public:
 			void				TestUnset();
 			void				TestSetTo();
 			void				TestWildcard();
+			void				TestNullAddr();
+			void				TestSetAddressFromFamilyPort();
 			void				TestIsLocal();
 			void				TestFlatten();
 

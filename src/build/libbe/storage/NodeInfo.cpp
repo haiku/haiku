@@ -177,7 +177,7 @@ BNodeInfo::SetType(const char *type)
 {
 	// check parameter and initialization
 	status_t error = B_OK;
-	if (error == B_OK && type && strlen(type) >= B_MIME_TYPE_LENGTH)
+	if (type && strlen(type) >= B_MIME_TYPE_LENGTH)
 		error = B_BAD_VALUE;
 	if (error == B_OK && InitCheck() != B_OK)
 		error = B_NO_INIT;
@@ -540,7 +540,7 @@ BNodeInfo::SetAppHint(const entry_ref *ref)
 {
 	// check parameter and initialization
 	status_t error = B_OK;
-	if (error == B_OK && InitCheck() != B_OK)
+	if (InitCheck() != B_OK)
 		error = B_NO_INIT;
 	// write/remove the attribute
 	if (error == B_OK) {

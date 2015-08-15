@@ -15,7 +15,6 @@
 #include <Alert.h>
 #include <Application.h>
 #include <Autolock.h>
-#include <Bitmap.h>
 #include <Button.h>
 #include <CardLayout.h>
 #include <Catalog.h>
@@ -26,7 +25,6 @@
 #include <Locale.h>
 #include <MediaRoster.h>
 #include <MediaTheme.h>
-#include <Notification.h>
 #include <Resources.h>
 #include <Roster.h>
 #include <Screen.h>
@@ -46,7 +44,7 @@
 
 
 const uint32 ML_SELECTED_NODE = 'MlSN';
-const uint32 ML_INIT_MEDIA = 'MlIM';
+const uint32 ML_RESTART_THREAD_FINISHED = 'MlRF';
 
 
 class NodeListItemUpdater : public MediaListItem::Visitor {
@@ -101,13 +99,23 @@ MediaWindow::SmartNode::SetTo(const dormant_node_info* info)
 	fNode = new media_node();
 	BMediaRoster* roster = BMediaRoster::Roster();
 
-	// TODO: error codes
+	status_t status = B_OK;
 	media_node_id node_id;
 	if (roster->GetInstancesFor(info->addon, info->flavor_id, &node_id) == B_OK)
-		roster->GetNodeFor(node_id, fNode);
+		status = roster->GetNodeFor(node_id, fNode);
 	else
-		roster->InstantiateDormantNode(*info, fNode, B_FLAVOR_IS_GLOBAL);
-	roster->StartWatching(fMessenger, *fNode, B_MEDIA_WILDCARD);
+		status = roster->InstantiateDormantNode(*info, fNode, B_FLAVOR_IS_GLOBAL);
+
+	if (status != B_OK) {
+		fprintf(stderr, "SmartNode::SetTo error with node %" B_PRId32
+			": %s\n", fNode->node, strerror(status));
+	}
+
+	status = roster->StartWatching(fMessenger, *fNode, B_MEDIA_WILDCARD);
+	if (status != B_OK) {
+		fprintf(stderr, "SmartNode::SetTo can't start watching for"
+			" node %" B_PRId32 "\n", fNode->node);
+	}
 }
 
 
@@ -142,10 +150,22 @@ MediaWindow::SmartNode::_FreeNode()
 {
 	if (!IsSet())
 		return;
-	// TODO: check error codes
+
 	BMediaRoster* roster = BMediaRoster::Roster();
-	roster->StopWatching(fMessenger, *fNode, B_MEDIA_WILDCARD);
-	roster->ReleaseNode(*fNode);
+	if (roster != NULL) {
+		status_t status = roster->StopWatching(fMessenger,
+			*fNode, B_MEDIA_WILDCARD);
+		if (status != B_OK) {
+			fprintf(stderr, "SmartNode::_FreeNode can't unwatch"
+				" media services for node %" B_PRId32 "\n", fNode->node);
+		}
+
+		roster->ReleaseNode(*fNode);
+		if (status != B_OK) {
+			fprintf(stderr, "SmartNode::_FreeNode can't release"
+				" node %" B_PRId32 "\n", fNode->node);
+		}
+	}
 	delete fNode;
 	fNode = NULL;
 }
@@ -164,13 +184,16 @@ MediaWindow::MediaWindow(BRect frame)
 	fAudioOutputs(5, true),
 	fVideoInputs(5, true),
 	fVideoOutputs(5, true),
-	fInitCheck(B_OK)
+	fInitCheck(B_OK),
+	fRestartThread(-1)
 {
 	_InitWindow();
 
 	BMediaRoster* roster = BMediaRoster::Roster();
 	roster->StartWatching(BMessenger(this, this),
 		B_MEDIA_SERVER_STARTED);
+	roster->StartWatching(BMessenger(this, this),
+		B_MEDIA_SERVER_QUIT);
 }
 
 
@@ -196,6 +219,8 @@ MediaWindow::~MediaWindow()
 	BMediaRoster* roster = BMediaRoster::CurrentRoster();
 	roster->StopWatching(BMessenger(this, this),
 		B_MEDIA_SERVER_STARTED);
+	roster->StartWatching(BMessenger(this, this),
+		B_MEDIA_SERVER_QUIT);
 }
 
 
@@ -282,7 +307,15 @@ MediaWindow::UpdateOutputListItem(MediaListItem::media_type type,
 bool
 MediaWindow::QuitRequested()
 {
-	// stop watching the MediaRoster
+	status_t exit = B_OK;
+	if (fRestartThread > 0) {
+		wait_for_thread(fRestartThread, &exit);
+		if (exit != B_OK) {
+			fprintf(stderr, "MediaWindow::QuitRequested wait_for_thread"
+				" returned with an error: %s\n", strerror(exit));
+		}
+	}
+	// Stop watching the MediaRoster
 	fCurrentNode.SetTo(NULL);
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
@@ -293,19 +326,22 @@ void
 MediaWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case ML_INIT_MEDIA:
+		case ML_RESTART_THREAD_FINISHED:
+			fRestartThread = -1;
 			_InitMedia(false);
 			break;
+
 		case ML_RESTART_MEDIA_SERVER:
 		{
-			thread_id thread = spawn_thread(&MediaWindow::_RestartMediaServices,
+			fRestartThread = spawn_thread(&MediaWindow::_RestartMediaServices,
 				"restart_thread", B_NORMAL_PRIORITY, this);
-			if (thread < 0)
+			if (fRestartThread < 0)
 				fprintf(stderr, "couldn't create restart thread\n");
 			else
-				resume_thread(thread);
+				resume_thread(fRestartThread);
 			break;
 		}
+
 		case B_MEDIA_WEB_CHANGED:
 		case ML_SELECTED_NODE:
 		{
@@ -321,14 +357,15 @@ MediaWindow::MessageReceived(BMessage* message)
 			item->AlterWindow(this);
 			break;
 		}
+
 		case B_MEDIA_SERVER_STARTED:
+		case B_MEDIA_SERVER_QUIT:
 		{
 			PRINT_OBJECT(*message);
-
-			_Notify(0.75, B_TRANSLATE("Starting media server"
-				B_UTF8_ELLIPSIS));
+			_InitMedia(false);
 			break;
 		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -405,8 +442,6 @@ MediaWindow::_InitMedia(bool first)
 		if (alert->Go() == 0)
 			return B_ERROR;
 
-		_Notify(0, B_TRANSLATE("Starting media server" B_UTF8_ELLIPSIS));
-
 		Show();
 
 		launch_media_server();
@@ -418,9 +453,6 @@ MediaWindow::_InitMedia(bool first)
 	if (!first && fListView->ItemAt(0) != NULL
 		&& fListView->ItemAt(0)->IsSelected())
 		isVideoSelected = false;
-
-	if (!first || (first && err) )
-		_Notify(1, B_TRANSLATE("Ready for use" B_UTF8_ELLIPSIS));
 
 	while (fListView->CountItems() > 0)
 		delete fListView->RemoveItem((int32)0);
@@ -623,64 +655,10 @@ MediaWindow::_RestartMediaServices(void* data)
 {
 	MediaWindow* window = (MediaWindow*)data;
 	
-	shutdown_media_server(B_INFINITE_TIMEOUT, MediaWindow::_UpdateProgress,
-		data);
-
+	shutdown_media_server();
 	launch_media_server();
 
-	return window->PostMessage(ML_INIT_MEDIA);
-}
-
-
-bool
-MediaWindow::_UpdateProgress(int stage, const char* message, void* cookie)
-{
-	// parameter "message" is no longer used. It is kept for compatibility with
-	// BeOS as this is used as a shutdown_media_server callback.
-
-	PRINT(("stage : %i\n", stage));
-	const char* string = "Unknown stage";
-	switch (stage) {
-		case 10:
-			string = B_TRANSLATE("Stopping media server" B_UTF8_ELLIPSIS);
-			break;
-		case 20:
-			string = B_TRANSLATE("Telling media_addon_server to quit.");
-			break;
-		case 40:
-			string = B_TRANSLATE("Waiting for media_server to quit.");
-			break;
-		case 70:
-			string = B_TRANSLATE("Cleaning up.");
-			break;
-		case 100:
-			string = B_TRANSLATE("Done shutting down.");
-			break;
-	}
-
-	((MediaWindow*)cookie)->_Notify(stage / 150.0, string);
-
-	return true;
-}
-
-
-void
-MediaWindow::_Notify(float progress, const char* message)
-{
-	BNotification notification(B_PROGRESS_NOTIFICATION);
-	notification.SetMessageID(MEDIA_SERVICE_NOTIFICATION_ID);
-	notification.SetProgress(progress);
-	notification.SetGroup(B_TRANSLATE("Media Service"));
-	notification.SetContent(message);
-
-	app_info info;
-	be_roster->GetAppInfo(kApplicationSignature, &info);
-	BBitmap icon(BRect(0, 0, 32, 32), B_RGBA32);
-	BNode node(&info.ref);
-	BIconUtils::GetVectorIcon(&node, "BEOS:ICON", &icon);
-	notification.SetIcon(&icon);
-
-	notification.Send();
+	return window->PostMessage(ML_RESTART_THREAD_FINISHED);
 }
 
 

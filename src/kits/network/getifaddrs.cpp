@@ -78,8 +78,9 @@ getifaddrs(struct ifaddrs** _ifaddrs)
 
 	size_t count = (size_t)config.ifc_value;
 	if (count == 0) {
-		errno = B_BAD_VALUE;
-		return -1;
+		// No interfaces found
+		*_ifaddrs = NULL;
+		return 0;
 	}
 
 	// Allocate a buffer for ifreqs for all interfaces

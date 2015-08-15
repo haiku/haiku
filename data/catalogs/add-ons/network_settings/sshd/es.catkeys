@@ -1,0 +1,2 @@
+1	spanish; castilian	x-vnd.Haiku-SSHService	992151130
+The SSH server allows you to remotely access your machine with a terminal session, as well as file access using the SCP and SFTP protocols.	SSHServiceAddOn		El servidor SSH le permite ingresar remotamente a su máquina con una sesión de terminal, así como a archivos utilizando los protocolos SCP y SFTP.

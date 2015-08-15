@@ -7,22 +7,28 @@
 
 #include <stdio.h>
 
+#include <AppFileInfo.h>
+#include <Application.h>
+#include <Autolock.h>
 #include <File.h>
 #include <HttpHeaders.h>
 #include <HttpRequest.h>
 #include <Json.h>
 #include <Message.h>
+#include <Roster.h>
 #include <Url.h>
 #include <UrlContext.h>
 #include <UrlProtocolListener.h>
 #include <UrlProtocolRoster.h>
 
+#include "AutoLocker.h"
 #include "List.h"
 #include "PackageInfo.h"
 
 
 #define CODE_REPOSITORY_DEFAULT "haikuports"
 #define BASEURL_DEFAULT "https://depot.haiku-os.org"
+#define USERAGENT_FALLBACK_VERSION "0.0.0"
 
 
 class JsonBuilder {
@@ -274,7 +280,8 @@ enum {
 
 
 BString WebAppInterface::fBaseUrl = BString(BASEURL_DEFAULT);
-
+BString WebAppInterface::fUserAgent = BString();
+BLocker WebAppInterface::fUserAgentLocker = BLocker();
 
 WebAppInterface::WebAppInterface()
 	:
@@ -337,7 +344,7 @@ arguments_is_url_valid(const BString& value)
 
 	BString scheme;
 	value.CopyInto(scheme, 0, schemeEnd);
- 
+
 	if (scheme != "http" && scheme != "https") {
 		fprintf(stderr, "the url scheme should be 'http' or 'https'\n");
 		return false;
@@ -356,7 +363,7 @@ arguments_is_url_valid(const BString& value)
     indicate if the URL was acceptable.
     \return B_OK if the base URL was valid and B_BAD_VALUE if not.
  */
-status_t 
+status_t
 WebAppInterface::SetBaseUrl(const BString& url)
 {
 	if (!arguments_is_url_valid(url))
@@ -365,6 +372,60 @@ WebAppInterface::SetBaseUrl(const BString& url)
 	fBaseUrl.SetTo(url);
 
 	return B_OK;
+}
+
+
+const BString
+WebAppInterface::_GetUserAgentVersionString()
+{
+	app_info info;
+
+	if (be_app->GetAppInfo(&info) != B_OK) {
+		fprintf(stderr, "Unable to get the application info\n");
+		be_app->Quit();
+		return BString(USERAGENT_FALLBACK_VERSION);
+	}
+
+	BFile file(&info.ref, B_READ_ONLY);
+
+	if (file.InitCheck() != B_OK) {
+		fprintf(stderr, "Unable to access the application info file\n");
+		be_app->Quit();
+		return BString(USERAGENT_FALLBACK_VERSION);
+	}
+
+	BAppFileInfo appFileInfo(&file);
+	version_info versionInfo;
+
+	if (appFileInfo.GetVersionInfo(
+		&versionInfo, B_APP_VERSION_KIND) != B_OK) {
+		fprintf(stderr, "Unable to establish the application version\n");
+		be_app->Quit();
+		return BString(USERAGENT_FALLBACK_VERSION);
+	}
+
+	BString result;
+	result.SetToFormat("%" B_PRId32 ".%" B_PRId32 ".%" B_PRId32,
+		versionInfo.major, versionInfo.middle, versionInfo.minor);
+	return result;
+}
+
+
+/*! This method will devise a suitable User-Agent header value that
+	can be transmitted with HTTP requests to the server in order
+	to identify this client.
+ */
+const BString
+WebAppInterface::_GetUserAgent()
+{
+	AutoLocker<BLocker> lock(&fUserAgentLocker);
+
+	if (fUserAgent.IsEmpty()) {
+		fUserAgent.SetTo("HaikuDepot/");
+		fUserAgent.Append(_GetUserAgentVersionString());
+	}
+
+	return fUserAgent;
 }
 
 
@@ -592,7 +653,7 @@ WebAppInterface::RetrieveScreenshot(const BString& code,
 	listener.SetDownloadIO(stream);
 
 	BHttpHeaders headers;
-	headers.AddHeader("User-Agent", "X-HDS-Client");
+	headers.AddHeader("User-Agent", _GetUserAgent());
 
 	BHttpRequest request(url, isSecure, "HTTP", &listener);
 	request.SetMethod(B_HTTP_GET);
@@ -715,7 +776,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 
 	BHttpHeaders headers;
 	headers.AddHeader("Content-Type", "application/json");
-	headers.AddHeader("User-Agent", "X-HDS-Client");
+	headers.AddHeader("User-Agent", _GetUserAgent());
 
 	BHttpRequest request(url, isSecure, "HTTP", &listener, &context);
 	request.SetMethod(B_HTTP_POST);
@@ -764,5 +825,3 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	}
 	return status;
 }
-
-

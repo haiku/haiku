@@ -450,9 +450,9 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
 	char *cmd = new char[::strlen(localhost)+8];
 	if (!esmtp)
-		::sprintf(cmd,"HELO %s"CRLF, localhost);
+		::sprintf(cmd,"HELO %s" CRLF, localhost);
 	else
-		::sprintf(cmd,"EHLO %s"CRLF, localhost);
+		::sprintf(cmd,"EHLO %s" CRLF, localhost);
 
 	if (SendCommand(cmd) != B_OK) {
 		delete[] cmd;
@@ -467,7 +467,7 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
 		SSL_library_init();
 		RAND_seed(this,sizeof(SMTPProtocol));
-		::sprintf(cmd, "STARTTLS"CRLF);
+		::sprintf(cmd, "STARTTLS" CRLF);
 
 		if ((p = ::strstr(res, "STARTTLS")) != NULL) {
 			// Server advertises STARTTLS support
@@ -489,9 +489,9 @@ SMTPProtocol::Open(const char *address, int port, bool esmtp)
 
     		// Should send EHLO command again
     		if(!esmtp)
-    			::sprintf(cmd, "HELO %s"CRLF, localhost);
+    			::sprintf(cmd, "HELO %s" CRLF, localhost);
     		else
-    			::sprintf(cmd, "EHLO %s"CRLF, localhost);
+    			::sprintf(cmd, "EHLO %s" CRLF, localhost);
 
     		if (SendCommand(cmd) != B_OK) {
     			delete[] cmd;
@@ -604,7 +604,7 @@ SMTPProtocol::Login(const char *_login, const char *password)
 		// required for authentication to SMTP-servers. Integrity-
 		// and confidentiality-protection are not implemented, as
 		// they are provided by the use of OpenSSL.
-		SendCommand("AUTH DIGEST-MD5"CRLF);
+		SendCommand("AUTH DIGEST-MD5" CRLF);
 		const char *res = fLog.String();
 
 		if (strncmp(res, "334", 3) != 0)
@@ -677,7 +677,7 @@ SMTPProtocol::Login(const char *_login, const char *password)
 	}
 	if (fAuthType & CRAM_MD5) {
 		//******* CRAM-MD5 Authentication ( tested. works fine [with Cyrus SASL] )
-		SendCommand("AUTH CRAM-MD5"CRLF);
+		SendCommand("AUTH CRAM-MD5" CRLF);
 		const char *res = fLog.String();
 
 		if (strncmp(res, "334", 3) != 0)
@@ -715,7 +715,7 @@ SMTPProtocol::Login(const char *_login, const char *password)
 		//******* LOGIN Authentication ( tested. works fine)
 		ssize_t encodedsize; // required by our base64 implementation
 
-		SendCommand("AUTH LOGIN"CRLF);
+		SendCommand("AUTH LOGIN" CRLF);
 		const char *res = fLog.String();
 
 		if (strncmp(res, "334", 3) != 0)
@@ -938,9 +938,9 @@ SMTPProtocol::Send(const char* to, const char* from, BPositionIO *message)
 	delete [] data;
 
 	if (messageEndedWithCRLF)
-		cmd = "."CRLF; // The standard says don't add extra CRLF.
+		cmd = "." CRLF; // The standard says don't add extra CRLF.
 	else
-		cmd = CRLF"."CRLF;
+		cmd = CRLF "." CRLF;
 
 	if (SendCommand(cmd.String()) != B_OK)
 		return B_ERROR;

@@ -10,7 +10,7 @@ public:
 	typedef const DataType* ConstPointer;
 	typedef DataType& Reference;
 	typedef const DataType& ConstReference;
-	
+
 	/*! Constructs the object pointed to by \a object via a
 		zero-parameter constructor.
 	*/
@@ -19,7 +19,7 @@ public:
 		if (object)
 			new(reinterpret_cast<void*>(object)) DataType();
 	}
-	
+
 	/*! Constructs the object pointed to by \a object via a
 		one-parameter constructor using the given argument.
 	*/
@@ -29,7 +29,7 @@ public:
 		if (object)
 			new(reinterpret_cast<void*>(object)) DataType(arg1);
 	}
-	
+
 	/*! Constructs the object pointed to by \a object via a
 		two-parameter constructor using the given arguments.
 	*/
@@ -39,7 +39,7 @@ public:
 		if (object)
 			new(reinterpret_cast<void*>(object)) DataType(arg1, arg2);
 	}
-	
+
 	/*! Constructs the object pointed to by \a object via a
 		three-parameter constructor using the given arguments.
 	*/
@@ -49,7 +49,7 @@ public:
 		if (object)
 			new(reinterpret_cast<void*>(object)) DataType(arg1, arg2, arg3);
 	}
-	
+
 	/*! Constructs the object pointed to by \a object via a
 		four-parameter constructor using the given arguments.
 	*/
@@ -60,7 +60,7 @@ public:
 	               ArgType4 arg4) {
 		if (object)
 			new(reinterpret_cast<void*>(object)) DataType(arg1, arg2, arg3, arg4);
-	}	
+	}
 
 	/*! Calls the destructor for the object pointed to be \a object.
 	*/

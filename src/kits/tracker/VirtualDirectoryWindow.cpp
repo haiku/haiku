@@ -76,6 +76,8 @@ void
 VirtualDirectoryWindow::CreatePoseView(Model* model)
 {
 	fPoseView = NewPoseView(model, kListMode);
+	if (fPoseView == NULL)
+		return;
 
 	fBorderedView->GroupLayout()->AddView(fPoseView);
 	fBorderedView->EnableBorderHighlight(false);

@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.07.10
-#	Date:    2015-07-10 03:15:02
+#	Version: 2015.07.31
+#	Date:    2015-07-31 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -645,6 +645,7 @@
 		18bc 0101  GC-R9600PRO (Primary)
 	4151  RV350 [Radeon 9600 Series]
 		1043 c004  A9600SE
+		174b 7c37  Radeon 9600 SE
 	4152  RV360 [Radeon 9600/X1050 Series]
 		1002 0002  Radeon 9600XT
 		1002 4772  All-in-Wonder 9600 XT
@@ -674,6 +675,7 @@
 		18bc 0100  GC-R9600PRO (Secondary)
 	4171  RV350 [Radeon 9600] (Secondary)
 		1043 c005  A9600SE (Secondary)
+		174b 7c36  Radeon 9600 SE (secondary)
 	4172  RV350 [Radeon 9600/X1050 Series] (Secondary)
 		1002 0003  Radeon 9600XT (Secondary)
 		1002 4773  All-in-Wonder 9600 XT (Secondary)
@@ -1171,6 +1173,7 @@
 		1458 4002  RV100 QY [RADEON 7000 PRO MAYA AV Series]
 		148c 2003  RV100 QY [Radeon 7000 Multi-Display Edition]
 		148c 2023  RV100 QY [Radeon 7000 Evil Master Multi-Display]
+		148c 2081  RV6DE
 		174b 0280  Radeon RV100 QY [Radeon 7000/VE]
 		174b 7112  Radeon VE 7000
 		174b 7c28  Radeon VE 7000 DDR
@@ -7202,6 +7205,8 @@
 		1517 000f  ECDR-GC314-PMC Receiver
 		1885 0700  Tsunami FPGA PMC with Altera Stratix S40
 		1885 0701  Tsunami FPGA PMC with Altera Stratix S30
+	9733  PEX 9733 33-lane, 9-port PCI Express Gen 3 (8.0 GT/s) Switch
+	9749  PEX 9749 49-lane, 13-port PCI Express Gen 3 (8.0 GT/s) Switch
 	a100  Blackmagic Design DeckLink
 	bb04  B&B 3PCIOSD1A Isolated PCI Serial
 	c001  CronyxOmega-PCI (8-port RS232)
@@ -7592,8 +7597,8 @@
 10cd  Advanced System Products, Inc
 	1100  ASC1100
 	1200  ASC1200 [(abp940) Fast SCSI-II]
-	1300  ABP940-U / ABP960-U
-		10cd 1310  ASC1300 SCSI Adapter
+	1300  ASC1300 / ASC3030 [ABP940-U / ABP960-U / ABP3925]
+		10cd 1310  ASC1300/3030 SCSI adapter
 		1195 1320  Ultra-SCSI CardBus PC Card REX CB31
 	2300  ABP940-UW
 	2500  ABP940-U2W
@@ -8839,12 +8844,13 @@
 		1afa 7150  JW-IN7150-HD
 	056d  MCP73 PCI Express bridge
 		1019 297a  MCP73PVT-SM
-		10de cb73  MCP73 PCIe x1 port
+		10de cb73  MCP73 PCI Bridge
 	056e  MCP73 PCI Express bridge
 		1019 297a  MCP73PVT-SM
 		10de 0000  MCP73 PCIe x16 port
 	056f  MCP73 PCI Express bridge
 		1019 297a  MCP73PVT-SM
+		10de 0000  MCP73 PCIe x1 port
 	05b1  NF200 PCIe 2.0 switch
 	05b8  NF200 PCIe 2.0 switch for GTX 295
 	05be  NF200 PCIe 2.0 switch for Quadro Plex S4 / Tesla S870 / Tesla S1070 / Tesla S2050
@@ -8944,6 +8950,7 @@
 	0642  G96 [D9M-10]
 	0643  G96 [GeForce 9500 GT]
 	0644  G96 [GeForce 9500 GS]
+		174b 9600  Geforce 9500GS 512M DDR2 V/D/HDMI
 	0645  G96 [GeForce 9500 GS]
 	0646  G96 [GeForce GT 120]
 	0647  G96M [GeForce 9600M GT]
@@ -9003,6 +9010,7 @@
 		10de 084d  Tesla M2070-Q
 		10de 087f  Tesla M2070-Q
 	06e0  G98 [GeForce 9300 GE]
+		107d 5a96  Geforce 9300GE
 	06e1  G98 [GeForce 9300 GS]
 	06e2  G98 [GeForce 8400]
 	06e3  G98 [GeForce 8300 GS]
@@ -10248,6 +10256,9 @@
 	13f1  GM204GL [Quadro M4000]
 	13f2  GM204GL [Tesla M60]
 	1401  GM206 [GeForce GTX 960]
+	1617  GM204M [GeForce GTX 980M]
+	1618  GM204M [GeForce GTX 970M]
+	1619  GM204M [GeForce GTX 965M]
 	17c2  GM200 [GeForce GTX TITAN X]
 	17c8  GM200 [GeForce GTX 980 Ti]
 	17f0  GM200GL [Quadro M6000]
@@ -11589,6 +11600,8 @@
 		1093 7602  PXIe-8384
 # 32 port / 8 lane PCIe Gen 2 packet switch
 	808f  PES32NT8AG2
+	80cf  F32P08xG3 [PCIe boot mode]
+	80d2  F32P08xG3 NVMe controller
 111e  Eldec
 111f  Precision Digital Images
 	4a47  Precision MX Video engine interface
@@ -13517,7 +13530,9 @@
 	0800  C4 ISDN
 	0a00  A1 ISDN [Fritz]
 		1244 0a00  FRITZ!Card ISDN Controller
-	0e00  Fritz!PCI v2.0 ISDN
+	0e00  Fritz!Card PCI v2.0 ISDN
+	0e80  Fritz!Card PCI v2.1 ISDN
+		1244 0e00  PSB 3100F (AVM KAFKA) [Fritz!Card PCI v2.1]
 	1100  C2 ISDN
 	1200  T1 ISDN
 	2700  Fritz!Card DSL SL
@@ -15129,7 +15144,7 @@
 	7168  PCI2S550 (Dual 16550 UART)
 		1409 0002  SER4036A3V (2x RS232 port)
 		1409 4027  SER4027A (1x RS232 port)
-		1409 4037  SER4037A (2x RS232 port)
+		1409 4037  SER4037A(L) [SUNIX SUN1889] (2x RS232 port)
 # Single DC-37 connector
 		1409 4056  SER4056A (4x RS232)
 		1409 5027  SER4027D
@@ -17625,8 +17640,7 @@
 		126c 8031  2201 Mobile Adapter
 		1385 4400  WAB501 802.11ab Wireless CardBus Card
 		1b47 aa00  8460 802.11ab Wireless CardBus Adapter
-# AR5001G, AR5001X+, AR5002G, AR5002X, AR5004G, AR5004X chipsets
-	0013  AR5212/AR5213 Wireless Network Adapter
+	0013  AR5212/5213/2414 Wireless Network Adapter
 		0308 3402  AG-100 802.11ag Wireless Cardbus Adapter
 		0308 3405  G-102 v2 802.11g Wireless Cardbus Adapter
 		0308 3408  G-170S 802.11g Wireless CardBus Adapter
@@ -17657,7 +17671,7 @@
 		1385 4b00  WG511T 108 Mbps Wireless PC Card (rev.A/B)
 		1385 4d00  WG311T 108 Mbps Wireless PCI Adapter (rev.A2)
 		1385 4f00  WG511U Double 108 Mbps Wireless PC Card
-		1385 5a00  WG311T 108 Mbps Wireless PCI Adapter (rev.A3)
+		1385 5a00  WG311T (rev.A3 v1h3/v1h4) 108 Mbps Wireless PCI Adapter [AR2412]
 		1385 5b00  WG511T 108 Mbps Wireless PC Card (rev.C)
 		1385 5d00  WPN511 RangeMax Wireless PC Card
 		1458 e911  GN-WIAG02
@@ -17784,6 +17798,7 @@
 	002a  AR928X Wireless Network Adapter (PCI-Express)
 		0777 4f05  SR71-X 802.11abgn Wireless ExpressCard Adapter [AR9280]
 		103c 3041  AR5BHB92-H 802.11abgn Wireless Half-size Mini PCIe Card [AR9280]
+		103c 3042  AzureWave AW-NE773 802.11abgn Wireless Half-size Mini PCIe Card [AR9280]
 		105b e006  T77H053.00 802.11bgn Wireless Mini PCIe Card [AR9281]
 		105b e01f  T77H047.31 802.11bgn Wireless Half-size Mini PCIe Card [AR9283]
 		106b 008f  AirPort Extreme
@@ -19198,6 +19213,7 @@
 	0640  88SE9128 SATA III 6Gb/s RAID Controller
 	9120  88SE9120 SATA 6Gb/s Controller
 	9123  88SE9123 PCIe SATA 6.0 Gb/s controller
+		dc93 600e  DC-6xxe series SATA 6G controller
 	9125  88SE9125 PCIe SATA 6.0 Gb/s controller
 	9128  88SE9128 PCIe SATA 6 Gb/s RAID controller
 	9130  88SE9128 PCIe SATA 6 Gb/s RAID controller with HyperDuo
@@ -19231,6 +19247,7 @@
 	1000  FL1000G USB 3.0 Host Controller
 		1d5c 1000  Anker USB 3.0 Express Card
 	1009  FL1009 USB 3.0 Host Controller
+	1100  FL1100 USB 3.0 Host Controller
 1b74  OpenVox Communication Co. Ltd.
 	0115  D115P/D115E Single-port E1/T1 card
 	d130  D130P/D130E Single-port E1/T1 card (3rd GEN)
@@ -19330,6 +19347,7 @@
 	0001  ExaNIC X4
 	0002  ExaNIC X2
 1cf7  Subspace Dynamics
+1d00  Pure Storage
 # CEM Solutions Pvt. Ltd.
 1d21  Allo
 1d26  Kalray Inc.
@@ -19388,6 +19406,16 @@
 		0000 3011  10-Giga TOE Dual Port SFP+/CX4 Low Profile SmartNIC
 		0000 3012  10-Giga TOE Dual Port CX4/SFP+ Low Profile SmartNIC
 		0000 3014  10-Giga TOE Dual Port CX4 Low Profile SmartNIC
+	4010  TN4010 Clean SROM
+	4020  TN9030 10GbE CX4 Ethernet Adapter
+	4022  TN9310 10GbE SFP+ Ethernet Adapter
+		1186 4d00  DXE-810S 10GbE SFP+ Ethernet Adapter
+		1fc9 3015  Ethernet Adapter
+	4024  TN9210 10GBase-T Ethernet Adapter
+	4025  TN9510 10GBase-T/NBASE-T Ethernet Adapter
+		1186 2900  DXE-810T 10GBase-T Ethernet Adapter
+		1fc9 3015  Ethernet Adapter
+	4026  TN9610 10GbE SFP+ Ethernet Adapter
 1fcc  StreamLabs
 	f416  MS416
 	fb01  MH4LM
@@ -21736,6 +21764,8 @@
 	15a1  Ethernet Connection (2) I218-V
 	15a2  Ethernet Connection (3) I218-LM
 	15a3  Ethernet Connection (3) I218-V
+	15a4  Ethernet Switch FM10000 Host Interface
+	15a5  Ethernet Switch FM10000 Host Virtual Interface
 	15a8  Ethernet Connection X552 Virtual Function
 	15aa  Ethernet Connection X552 10 GbE Backplane
 	15ab  Ethernet Connection X552 10 GbE Backplane

@@ -28,7 +28,7 @@
 
 	The C++ language provides two main ways of allocating objects: on the stack,
 	and on the heap. Objects created on the heap must be managed by the
-	application and deleted when they are not needed. Objects allocatede on the
+	application and deleted when they are not needed. Objects allocated on the
 	stack have a lifetime limited to the execution of the block they are
 	declared in.
 
@@ -197,7 +197,7 @@
 
 	The reference to the previously targetted object is released.
 	A reference to the new object is acquired only if \p alreadyHasReference
-	is true.
+	is false.
 */
 
 

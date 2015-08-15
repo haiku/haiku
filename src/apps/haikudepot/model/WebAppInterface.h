@@ -101,6 +101,8 @@ public:
 									BMessage& message);
 
 private:
+	static  const BString		_GetUserAgentVersionString();
+	static	const BString		_GetUserAgent();
 			BString				_FormFullUrl(const BString& suffix) const;
 			status_t			_SendJsonRequest(const char* domain,
 									BString jsonString, uint32 flags,
@@ -108,6 +110,8 @@ private:
 
 private:
 	static	BString				fBaseUrl;
+	static	BString				fUserAgent;
+	static	BLocker				fUserAgentLocker;
 			BString				fUsername;
 			BString				fPassword;
 			BString				fLanguage;

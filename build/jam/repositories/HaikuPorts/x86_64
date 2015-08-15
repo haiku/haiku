@@ -25,7 +25,7 @@ RemotePackageRepository HaikuPorts
 	automake-1.13.1-4
 	bash-4.3.39-1
 #	bepdf-1.1.1~beta5_2013_04_28-1
-	binutils-2.25_2014_12_27-1
+	binutils-2.25_12015_07_31-1
 	bison-2.6.5-1
 	boost-1.55.0-6
 	boost_atomic-1.55.0-6
@@ -58,14 +58,16 @@ RemotePackageRepository HaikuPorts
 	cdrtools_devel-3.01~a29-1
 	clang-3.5.1-1
 	clang_analysis-3.5.1-1
+	clipdinger-0.4-1
 	cmake-3.2.3-1
-	coreutils-8.23-1
+	coreutils-8.24-1
 	cppunit-1.12.1-2
 	cppunit_devel-1.12.1-2
 	ctags-5.8-3
-	curl-7.42.1-1
-	curl_devel-7.42.1-1
+	curl-7.43.0-1
+	curl_devel-7.43.0-1
 	cvs-1.12.13.1-6
+	diffutils-3.3-2
 	dos2unix-7.2.2-1
 	doxygen-1.6.3-4
 	dtc-1.4.1-1
@@ -131,7 +133,7 @@ RemotePackageRepository HaikuPorts
 	handbrake-0.10.1-1
 	harfbuzz-0.9.40-1
 	harfbuzz_devel-0.9.40-1
-	help2man-1.44.1-1
+	help2man-1.46.6-1
 	htmldoc-1.8.27-3
 	icu-55.1-3
 	icu_devel-55.1-3
@@ -189,8 +191,8 @@ RemotePackageRepository HaikuPorts
 	libpcre_devel-8.21-5
 	libpng-1.5.22-1
 	libpng_devel-1.5.22-1
-	libpng16-1.6.17-1
-	libpng16_devel-1.6.17-1
+	libpng16-1.6.18-1
+	libpng16_devel-1.6.18-1
 	librevenge-0.0.1-1
 	librevenge_devel-0.0.1-1
 	libsamplerate-0.1.8-2
@@ -209,8 +211,8 @@ RemotePackageRepository HaikuPorts
 	libtheora_devel-1.1.1-2
 	libtool-2.4.2-1
 	libtool_libltdl-2.4.2-1
-	libunistring-0.9.5-1
-	libunistring_devel-0.9.5-1
+	libunistring-0.9.6-1
+	libunistring_devel-0.9.6-1
 	libusb-1.0.19-2
 	libusb_devel-1.0.19-2
 	libusb_compat-0.1.5-2
@@ -229,8 +231,8 @@ RemotePackageRepository HaikuPorts
 	llvm-3.5.2-1
 	lua-5.2.3-2
 	lua_devel-5.2.3-2
-	lz4-r130-1
-	lz4_devel-r130-1
+	lz4-r131-1
+	lz4_devel-r131-1
 	lzo-2.09-1
 	lzo_devel-2.09-1
 	m4-1.4.16-5
@@ -242,9 +244,13 @@ RemotePackageRepository HaikuPorts
 	mesa_swrast-10.5.2-1
 	mesa_swpipe-10.5.2-1
 	mkdepend-1.7-3
-	mpg123-1.22.0-1
-	mpg123_devel-1.22.0-1
-	nano-2.4.0-1
+	mpc-1.0.3-1
+	mpc_devel-1.0.3-1
+	mpfr-3.1.3-1
+	mpfr_devel-3.1.3-1
+	mpg123-1.22.3-1
+	mpg123_devel-1.22.3-1
+	nano-2.4.2-1
 	nasm-2.11.08-1
 	ncurses-5.9-10
 	ncurses_devel-5.9-10
@@ -254,7 +260,7 @@ RemotePackageRepository HaikuPorts
 	ninja-1.5.1-2
 	nspr-4.10.8-1
 	nspr_devel-4.10.8-1
-	openssh-6.6p1-1
+	openssh-6.9p1-1
 	openssl-1.0.0s-1
 	openssl_devel-1.0.0s-1
 	p7zip-9.20.1-5
@@ -287,8 +293,8 @@ RemotePackageRepository HaikuPorts
 	smpeg_devel-0.4.5-4
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.8.10.0-1
-	sqlite_devel-3.8.10.0-1
+	sqlite-3.8.11.1-1
+	sqlite_devel-3.8.11.1-1
 	subversion-1.8.11-1
 	subversion_devel-1.8.11-1
 	tar-1.27.1-2
@@ -310,8 +316,8 @@ RemotePackageRepository HaikuPorts
 	xml_parser-2.36-1
 	x264-20140308-1
 	x264_devel-20140308-1
-	xz_utils-5.0.6-1
-	xz_utils_devel-5.0.6-1
+	xz_utils-5.0.8-2
+	xz_utils_devel-5.0.8-2
 	yasm-1.2.0-3
 	zip-3.0-2
 	zlib-1.2.8-4
@@ -331,12 +337,14 @@ RemotePackageRepository HaikuPorts
 	bzip2
 	cdrtools
 	clang
+	clipdinger
 	cmake
 	coreutils
 	cppunit
 	ctags
 	curl
 	cvs
+	diffutils
 	dos2unix
 	doxygen
 	dtc
@@ -430,6 +438,8 @@ RemotePackageRepository HaikuPorts
 	mercurial
 	mesa
 	mkdepend
+	mpc
+	mpfr
 	mpg123
 	nano
 	nasm

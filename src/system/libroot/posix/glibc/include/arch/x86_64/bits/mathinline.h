@@ -22,10 +22,10 @@
 
 #define __NTH(fct)    __attribute__ ((__nothrow__)) fct
 
-#ifdef __cplusplus
+#ifndef __extern_always_inline
 # define __MATH_INLINE __inline
 #else
-# define __MATH_INLINE extern __inline
+# define __MATH_INLINE __extern_always_inline
 #endif
 
 

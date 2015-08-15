@@ -1,21 +1,14 @@
-1	lithuanian	x-vnd.Haiku-Media	4081089471
+1	lithuanian	x-vnd.Haiku-Media	2605101563
 Couldn't add volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio patalpinti pranešimų srityje: %s\n
-Ready for use…	Media Window		Pasirengta naudojimui…
 Video input:	Media views		Vaizdo įvestis:
-Waiting for media_server to quit.	Media Window		Laikiama, kol įvairialypės terpės tarnyba (media_server) baigs darbą.
-Cleaning up.	Media Window		Apsitvarkoma.
 Defaults	Media views		Numatytosios reikšmės
-Stopping media server…	Media Window		Stabdoma įvairialypės terpės tarnyba…
 Quit	Media Window		Baigti darbą
-Starting media server…	Media Window		Paleidžiama įvairialypės terpės tarnyba…
-Done shutting down.	Media Window		Išjungta.
 Video settings	Media Window		Vaizdo nuostatos
 Video output:	Media views		Vaizdo išvestis:
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Nepavyko prisijungti prie įvairialypės terpės tarnybos.\nAr norite, kad ji būtų paleista?
 Restart media services	Media views		Perleisti įvairialypės terpės tarnybas
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nepavyko garso valdiklio pašalinti iš pranešimų srities: %s\n
 Media	System name		Įvairialypė terpė
-Telling media_addon_server to quit.	Media Window		Išjungiama įvairialypės terpės papildinių tarnyba (media_addon_server).
 Audio mixer	Media Window		Garsų maišiklis
 This hardware has no controls.	Media Window		Ši aparatūra nederinama.
 Audio output:	Media views		Garso išvestis:

@@ -1113,6 +1113,12 @@ TTracker::OpenContainerWindow(Model* model, BMessage* originalRefsList,
 
 	if (model != NULL && window->LockLooper()) {
 		window->CreatePoseView(model);
+		if (window->PoseView() == NULL) {
+			// Failed initialization.
+			window->PostMessage(B_QUIT_REQUESTED);
+			window->UnlockLooper();
+			return;
+		}
 		window->UnlockLooper();
 	}
 

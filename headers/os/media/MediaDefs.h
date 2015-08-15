@@ -787,11 +787,21 @@ struct buffer_clone_info;
 // media_server and it's friends. You can provide a call back hook which
 // will be called during various steps of the process. This callback should
 // currently always return TRUE. A 'stage' value of 100 means the process is
-// completely finished.
+// completely finished. Differently from BeOS the functions automatically
+// send notifications to the Deskbar if not differently specified.
+// It's also provided a new version of launch_media_server allowing
+// to specify a custom callback for notifications.
+
+// Deprecated
+status_t launch_media_server(uint32 flags);
+
+status_t launch_media_server(bigtime_t timeout = B_INFINITE_TIMEOUT,
+	bool (*progress)(int stage, const char* message, void* cookie) = NULL,
+	void* cookie = NULL, uint32 flags = 0);
+
 status_t shutdown_media_server(bigtime_t timeout = B_INFINITE_TIMEOUT,
 	bool (*progress)(int stage, const char* message, void* cookie) = NULL,
 	void* cookie = NULL);
-status_t launch_media_server(uint32 flags = 0);
 
 
 // Given an image_id, prepare that image_id for realtime media

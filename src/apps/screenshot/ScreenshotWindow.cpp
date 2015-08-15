@@ -439,7 +439,12 @@ ScreenshotWindow::_NewScreenshot(bool silent, bool clipboard)
 void
 ScreenshotWindow::_UpdatePreviewPanel()
 {
-	float height = 150.0f;
+	// Set the height of fPreview to what the layout suggests
+	fPreview->SetExplicitMinSize(BSize());
+	fPreview->SetExplicitMaxSize(BSize());
+	Layout(false);
+
+	float height = fPreview->Bounds().Height();
 	float width = (fScreenshot->Bounds().Width()
 		/ fScreenshot->Bounds().Height()) * height;
 
@@ -451,6 +456,7 @@ ScreenshotWindow::_UpdatePreviewPanel()
 	}
 
 	fPreview->SetExplicitMinSize(BSize(width, height));
+	fPreview->SetExplicitMaxSize(BSize(width, height));
 
 	fPreview->ClearViewBitmap();
 	fPreview->SetViewBitmap(fScreenshot, fScreenshot->Bounds(),
