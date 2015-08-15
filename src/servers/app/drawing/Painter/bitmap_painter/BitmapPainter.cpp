@@ -138,14 +138,24 @@ Painter::BitmapPainter::Draw(const BRect& sourceRect,
 	if (fPainter->fDrawingMode == B_OP_COPY
 		&& !_HasAffineTransform() && !_HasAlphaMask()) {
 		if ((fOptions & B_FILTER_BITMAP_BILINEAR) != 0) {
-			DrawBitmapBilinearCopy drawBilinear;
+			DrawBitmapBilinear<ColorTypeRgb, DrawModeCopy> drawBilinear;
 			drawBilinear.Draw(fPainter, fPainter->fInternal,
 				fBitmap, fOffset, fScaleX, fScaleY, fDestinationRect);
-		}
-		else {
+		} else {
 			DrawBitmapNearestNeighborCopy::Draw(fPainter, fPainter->fInternal,
 				fBitmap, fOffset, fScaleX, fScaleY, fDestinationRect);
 		}
+		return;
+	}
+
+	if (fPainter->fDrawingMode == B_OP_ALPHA
+		&& fPainter->fAlphaSrcMode == B_PIXEL_ALPHA
+		&& fPainter->fAlphaFncMode == B_ALPHA_OVERLAY
+		&& !_HasAffineTransform() && !_HasAlphaMask()
+		&& (fOptions & B_FILTER_BITMAP_BILINEAR) != 0) {
+		DrawBitmapBilinear<ColorTypeRgba, DrawModeAlphaOverlay> drawBilinear;
+		drawBilinear.Draw(fPainter, fPainter->fInternal,
+			fBitmap, fOffset, fScaleX, fScaleY, fDestinationRect);
 		return;
 	}
 

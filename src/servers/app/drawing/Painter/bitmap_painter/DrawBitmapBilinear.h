@@ -10,6 +10,8 @@
 
 #include "Painter.h"
 
+#include <typeinfo>
+
 
 // Prototypes for assembler routines
 extern "C" {
@@ -83,8 +85,8 @@ struct DrawBitmapBilinearOptimized {
 			//printf("x: %ld - %ld\n", xIndexL, xIndexR);
 			//printf("y: %ld - %ld\n", y1, y2);
 
-			OptimizedVersion optimizedVersion;
-			optimizedVersion.DrawToClipRect(xIndexL, xIndexR, y1, y2);
+			static_cast<OptimizedVersion*>(this)->DrawToClipRect(
+				xIndexL, xIndexR, y1, y2);
 
 		} while (baseRenderer.next_clip_box());
 	}
@@ -99,7 +101,134 @@ protected:
 };
 
 
-struct BilinearDefault : DrawBitmapBilinearOptimized<BilinearDefault> {
+struct ColorTypeRgb {
+	static void
+	Interpolate(uint32* t, const uint8* s, uint32 sourceBytesPerRow,
+		uint16 wLeft, uint16 wTop, uint16 wRight, uint16 wBottom)
+	{
+		// left and right of top row
+		t[0] = (s[0] * wLeft + s[4] * wRight) * wTop;
+		t[1] = (s[1] * wLeft + s[5] * wRight) * wTop;
+		t[2] = (s[2] * wLeft + s[6] * wRight) * wTop;
+
+		// left and right of bottom row
+		s += sourceBytesPerRow;
+		t[0] += (s[0] * wLeft + s[4] * wRight) * wBottom;
+		t[1] += (s[1] * wLeft + s[5] * wRight) * wBottom;
+		t[2] += (s[2] * wLeft + s[6] * wRight) * wBottom;
+
+		t[0] >>= 16;
+		t[1] >>= 16;
+		t[2] >>= 16;
+	}
+
+	static void
+	InterpolateLastColumn(uint32* t, const uint8* s, const uint8* sBottom,
+		uint16 wTop, uint16 wBottom)
+	{
+		t[0] = (s[0] * wTop + sBottom[0] * wBottom) >> 8;
+		t[1] = (s[1] * wTop + sBottom[1] * wBottom) >> 8;
+		t[2] = (s[2] * wTop + sBottom[2] * wBottom) >> 8;
+	}
+
+	static void
+	InterpolateLastRow(uint32* t, const uint8* s, uint16 wLeft,
+		uint16 wRight)
+	{
+		t[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
+		t[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
+		t[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
+	}
+};
+
+
+struct ColorTypeRgba {
+	static void
+	Interpolate(uint32* t, const uint8* s, uint32 sourceBytesPerRow,
+		uint16 wLeft, uint16 wTop, uint16 wRight, uint16 wBottom)
+	{
+		// left and right of top row
+		t[0] = (s[0] * wLeft + s[4] * wRight) * wTop;
+		t[1] = (s[1] * wLeft + s[5] * wRight) * wTop;
+		t[2] = (s[2] * wLeft + s[6] * wRight) * wTop;
+		t[3] = (s[3] * wLeft + s[7] * wRight) * wTop;
+
+		// left and right of bottom row
+		s += sourceBytesPerRow;
+
+		t[0] += (s[0] * wLeft + s[4] * wRight) * wBottom;
+		t[1] += (s[1] * wLeft + s[5] * wRight) * wBottom;
+		t[2] += (s[2] * wLeft + s[6] * wRight) * wBottom;
+		t[3] += (s[3] * wLeft + s[7] * wRight) * wBottom;
+
+		t[0] >>= 16;
+		t[1] >>= 16;
+		t[2] >>= 16;
+		t[3] >>= 16;
+	}
+
+	static void
+	InterpolateLastColumn(uint32* t, const uint8* s, const uint8* sBottom,
+		uint16 wTop, uint16 wBottom)
+	{
+		t[0] = (s[0] * wTop + sBottom[0] * wBottom) >> 8;
+		t[1] = (s[1] * wTop + sBottom[1] * wBottom) >> 8;
+		t[2] = (s[2] * wTop + sBottom[2] * wBottom) >> 8;
+		t[3] = (s[3] * wTop + sBottom[3] * wBottom) >> 8;
+	}
+
+	static void
+	InterpolateLastRow(uint32* t, const uint8* s, uint16 wLeft,
+		uint16 wRight)
+	{
+		t[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
+		t[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
+		t[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
+		t[3] = (s[3] * wLeft + s[7] * wRight) >> 8;
+	}
+};
+
+
+struct DrawModeCopy {
+	static void
+	Blend(uint8*& d, uint32* t)
+	{
+		d[0] = t[0];
+		d[1] = t[1];
+		d[2] = t[2];
+		d += 4;
+	}
+};
+
+
+struct DrawModeAlphaOverlay {
+	static void
+	Blend(uint8*& d, uint32* t)
+	{
+		uint8 t0 = t[0];
+		uint8 t1 = t[1];
+		uint8 t2 = t[2];
+		uint8 t3 = t[3];
+
+		if (t3 == 255) {
+			d[0] = t0;
+			d[1] = t1;
+			d[2] = t2;
+		} else {
+			d[0] = ((t0 - d[0]) * t3 + (d[0] << 8)) >> 8;
+			d[1] = ((t1 - d[1]) * t3 + (d[1] << 8)) >> 8;
+			d[2] = ((t2 - d[2]) * t3 + (d[2] << 8)) >> 8;
+		}
+
+		d += 4;
+	}
+};
+
+
+template<class ColorType, class DrawMode>
+struct BilinearDefault :
+	DrawBitmapBilinearOptimized<BilinearDefault<ColorType, DrawMode> > {
+
 	void DrawToClipRect(int32 xIndexL, int32 xIndexR, int32 y1, int32 y2)
 	{
 		// In this mode we anticipate many pixels wich need filtering,
@@ -122,38 +251,33 @@ struct BilinearDefault : DrawBitmapBilinearOptimized<BilinearDefault> {
 
 			// buffer offset into source (top row)
 			register const uint8* src = fSource->row_ptr(fWeightsY[y1].index);
+
 			// buffer handle for destination to be incremented per
 			// pixel
 			register uint8* d = fDestination;
 
 			for (int32 x = xIndexL; x <= xIndexMax; x++) {
 				const uint8* s = src + fWeightsX[x].index;
+
 				// calculate the weighted sum of all four
 				// interpolated pixels
 				const uint16 wLeft = fWeightsX[x].weight;
 				const uint16 wRight = 255 - wLeft;
-				// left and right of top row
-				uint32 t0 = (s[0] * wLeft + s[4] * wRight) * wTop;
-				uint32 t1 = (s[1] * wLeft + s[5] * wRight) * wTop;
-				uint32 t2 = (s[2] * wLeft + s[6] * wRight) * wTop;
 
-				// left and right of bottom row
-				s += fSourceBytesPerRow;
-				t0 += (s[0] * wLeft + s[4] * wRight) * wBottom;
-				t1 += (s[1] * wLeft + s[5] * wRight) * wBottom;
-				t2 += (s[2] * wLeft + s[6] * wRight) * wBottom;
-				d[0] = t0 >> 16;
-				d[1] = t1 >> 16;
-				d[2] = t2 >> 16;
-				d += 4;
+				uint32 t[4];
+				ColorType::Interpolate(&t[0], s, fSourceBytesPerRow,
+					wLeft, wTop, wRight, wBottom);
+				DrawMode::Blend(d, &t[0]);
 			}
 			// last column of pixels if necessary
 			if (xIndexMax < xIndexR) {
 				const uint8* s = src + fWeightsX[xIndexR].index;
 				const uint8* sBottom = s + fSourceBytesPerRow;
-				d[0] = (s[0] * wTop + sBottom[0] * wBottom) >> 8;
-				d[1] = (s[1] * wTop + sBottom[1] * wBottom) >> 8;
-				d[2] = (s[2] * wTop + sBottom[2] * wBottom) >> 8;
+
+				uint32 t[4];
+				ColorType::InterpolateLastColumn(&t[0], s, sBottom, wTop,
+					wBottom);
+				DrawMode::Blend(d, &t[0]);
 			}
 
 			fDestination += fDestinationBytesPerRow;
@@ -171,10 +295,9 @@ struct BilinearDefault : DrawBitmapBilinearOptimized<BilinearDefault> {
 				const uint8* s = src + fWeightsX[x].index;
 				const uint16 wLeft = fWeightsX[x].weight;
 				const uint16 wRight = 255 - wLeft;
-				d[0] = (s[0] * wLeft + s[4] * wRight) >> 8;
-				d[1] = (s[1] * wLeft + s[5] * wRight) >> 8;
-				d[2] = (s[2] * wLeft + s[6] * wRight) >> 8;
-				d += 4;
+				uint32 t[4];
+				ColorType::InterpolateLastRow(&t[0], s, wLeft, wRight);
+				DrawMode::Blend(d, &t[0]);
 			}
 		}
 
@@ -349,7 +472,8 @@ struct BilinearSimd : DrawBitmapBilinearOptimized<BilinearSimd> {
 #endif	// __INTEL__
 
 
-struct DrawBitmapBilinearCopy {
+template<class ColorType, class DrawMode>
+struct DrawBitmapBilinear {
 	void
 	Draw(const Painter* painter, PainterAggInterface& aggInterface,
 		agg::rendering_buffer& bitmap, BPoint offset,
@@ -466,20 +590,23 @@ struct DrawBitmapBilinearCopy {
 
 		int codeSelect = kUseDefaultVersion;
 
-		uint32 neededSIMDFlags = APPSERVER_SIMD_MMX | APPSERVER_SIMD_SSE;
-		if ((gSIMDFlags & neededSIMDFlags) == neededSIMDFlags)
-			codeSelect = kUseSIMDVersion;
-		else {
-			if (scaleX == scaleY && (scaleX == 1.5 || scaleX == 2.0
-				|| scaleX == 2.5 || scaleX == 3.0)) {
-				codeSelect = kOptimizeForLowFilterRatio;
+		if (typeid(ColorType) == typeid(ColorTypeRgb)
+			&& typeid(DrawMode) == typeid(DrawModeCopy)) {
+			uint32 neededSIMDFlags = APPSERVER_SIMD_MMX | APPSERVER_SIMD_SSE;
+			if ((gSIMDFlags & neededSIMDFlags) == neededSIMDFlags)
+				codeSelect = kUseSIMDVersion;
+			else {
+				if (scaleX == scaleY && (scaleX == 1.5 || scaleX == 2.0
+					|| scaleX == 2.5 || scaleX == 3.0)) {
+					codeSelect = kOptimizeForLowFilterRatio;
+				}
 			}
 		}
 
 		switch (codeSelect) {
 			case kUseDefaultVersion:
 			{
-				BilinearDefault bilinearPainter;
+				BilinearDefault<ColorType, DrawMode> bilinearPainter;
 				bilinearPainter.Draw(aggInterface, destinationRect, &bitmap,
 					filterData);
 				break;
