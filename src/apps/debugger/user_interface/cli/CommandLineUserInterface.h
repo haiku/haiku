@@ -42,6 +42,8 @@ public:
 	virtual	void				NotifyUser(const char* title,
 									const char* message,
 									user_notification_type type);
+	virtual	void				NotifyBackgroundWorkStatus(
+									const char* message);
 	virtual	int32				SynchronouslyAskUser(const char* title,
 									const char* message, const char* choice1,
 									const char* choice2, const char* choice3);

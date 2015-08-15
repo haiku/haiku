@@ -203,6 +203,12 @@ CommandLineUserInterface::NotifyUser(const char* title, const char* message,
 }
 
 
+void
+CommandLineUserInterface::NotifyBackgroundWorkStatus(const char* message)
+{
+}
+
+
 int32
 CommandLineUserInterface::SynchronouslyAskUser(const char* title,
 	const char* message, const char* choice1, const char* choice2,
