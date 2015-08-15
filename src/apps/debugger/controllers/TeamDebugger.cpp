@@ -1373,6 +1373,7 @@ void
 TeamDebugger::JobDone(Job* job)
 {
 	TRACE_JOBS("TeamDebugger::JobDone(%p)\n", job);
+	_ResetUserBackgroundStatusIfNeeded();
 }
 
 
@@ -1381,6 +1382,7 @@ TeamDebugger::JobFailed(Job* job)
 {
 	TRACE_JOBS("TeamDebugger::JobFailed(%p)\n", job);
 	// TODO: notify user
+	_ResetUserBackgroundStatusIfNeeded();
 }
 
 
@@ -1390,6 +1392,7 @@ TeamDebugger::JobAborted(Job* job)
 	TRACE_JOBS("TeamDebugger::JobAborted(%p)\n", job);
 	// TODO: For a stack frame source loader thread we should reset the
 	// loading state! Asynchronously due to locking order.
+	_ResetUserBackgroundStatusIfNeeded();
 }
 
 
@@ -1404,6 +1407,16 @@ TeamDebugger::ImageDebugInfoJobNeedsUserInput(Job* job,
 	message.AddPointer("job", job);
 	message.AddPointer("state", state);
 	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::ImageDebugInfoJobInProgress(Image* image)
+{
+	BString message;
+	message.SetToFormat("Loading debug information for %s...",
+		image->Name().String());
+	fUserInterface->NotifyBackgroundWorkStatus(message.String());
 }
 
 
@@ -1908,7 +1921,6 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 
 	bool handlePostExecSetup = fExecPending && image->Type() == B_APP_IMAGE
 		&& state != IMAGE_DEBUG_INFO_LOADING;
-
 	// this needs to be done first so that breakpoints are loaded.
 	// otherwise, UpdateImageBreakpoints() won't find the appropriate
 	// UserBreakpoints to create/install instances for.
@@ -1922,6 +1934,7 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 
 	if (state == IMAGE_DEBUG_INFO_LOADED
 		|| state == IMAGE_DEBUG_INFO_UNAVAILABLE) {
+
 		// update breakpoints in the image
 		fBreakpointManager->UpdateImageBreakpoints(image);
 
@@ -2483,6 +2496,14 @@ TeamDebugger::_NotifyUser(const char* title, const char* text,...)
 
 	// notify the user
 	fUserInterface->NotifyUser(title, buffer, USER_NOTIFICATION_WARNING);
+}
+
+
+void
+TeamDebugger::_ResetUserBackgroundStatusIfNeeded()
+{
+	if (!fWorker->HasPendingJobs())
+		fUserInterface->NotifyBackgroundWorkStatus("Ready.");
 }
 
 

@@ -140,6 +140,7 @@ private:
 
 	virtual	void				ImageDebugInfoJobNeedsUserInput(Job* job,
 									ImageDebugInfoLoadingState* state);
+	virtual	void				ImageDebugInfoJobInProgress(Image* image);
 
 	// Team::Listener
 	virtual	void				ThreadStateChanged(
@@ -234,6 +235,11 @@ private:
 
 			void				_NotifyUser(const char* title,
 									const char* text,...);
+
+			void				_ResetUserBackgroundStatusIfNeeded();
+									// updates user interface to
+									// ready/completed message
+									// for background work status
 
 private:
 			Listener*			fListener;
