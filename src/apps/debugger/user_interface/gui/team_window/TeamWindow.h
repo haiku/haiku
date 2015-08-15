@@ -71,6 +71,8 @@ public:
 			status_t			SaveSettings(
 									GuiTeamUiSettings* settings);
 
+			void				DisplayBackgroundStatus(const char* message);
+
 
 private:
 	enum ActiveSourceObject {
@@ -228,6 +230,7 @@ private:
 			BButton*			fStepOutButton;
 			BMenuBar*			fMenuBar;
 			BStringView*		fSourcePathView;
+			BStringView*		fStatusBarView;
 			ConsoleOutputView*	fConsoleOutputView;
 			BSplitView*			fFunctionSplitView;
 			BSplitView*			fSourceSplitView;

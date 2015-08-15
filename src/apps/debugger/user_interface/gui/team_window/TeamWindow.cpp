@@ -74,7 +74,8 @@ enum {
 	MSG_LOCATE_SOURCE_IF_NEEDED			= 'lsin',
 	MSG_SOURCE_ENTRY_QUERY_COMPLETE		= 'seqc',
 	MSG_CLEAR_STACK_TRACE				= 'clst',
-	MSG_HANDLE_LOAD_SETTINGS			= 'hlst'
+	MSG_HANDLE_LOAD_SETTINGS			= 'hlst',
+	MSG_UPDATE_STATUS_BAR				= 'upsb'
 };
 
 
@@ -133,6 +134,7 @@ TeamWindow::TeamWindow(::Team* team, UserInterfaceListener* listener)
 	fStepOutButton(NULL),
 	fMenuBar(NULL),
 	fSourcePathView(NULL),
+	fStatusBarView(NULL),
 	fConsoleOutputView(NULL),
 	fFunctionSplitView(NULL),
 	fSourceSplitView(NULL),
@@ -525,6 +527,13 @@ TeamWindow::MessageReceived(BMessage* message)
 			_LoadSettings(settings);
 			break;
 		}
+		case MSG_UPDATE_STATUS_BAR:
+		{
+			const char* messageText;
+			if (message->FindString("message", &messageText) == B_OK)
+				fStatusBarView->SetText(messageText);
+			break;
+		}
 		case MSG_TEAM_RENAMED:
 		{
 			_UpdateTitle();
@@ -722,6 +731,15 @@ TeamWindow::SaveSettings(GuiTeamUiSettings* settings)
 		return B_NO_MEMORY;
 
 	return B_OK;
+}
+
+
+void
+TeamWindow::DisplayBackgroundStatus(const char* message)
+{
+	BMessage updateMessage(MSG_UPDATE_STATUS_BAR);
+	updateMessage.AddString("message", message);
+	PostMessage(&updateMessage);
 }
 
 
@@ -995,7 +1013,11 @@ TeamWindow::_Init()
 				.SetInsets(0.0)
 				.Add(fConsoleOutputView = ConsoleOutputView::Create())
 			.End()
-		.End();
+		.End()
+		.Add(fStatusBarView = new BStringView("status", "Ready."));
+
+	fStatusBarView->SetExplicitMinSize(BSize(50.0, B_SIZE_UNSET));
+	fStatusBarView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	// add source view
 	sourceScrollView->SetTarget(fSourceView = SourceView::Create(fTeam, this));
