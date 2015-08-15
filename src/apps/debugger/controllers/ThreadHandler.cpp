@@ -76,14 +76,13 @@ private:
 
 
 ThreadHandler::ThreadHandler(Thread* thread, Worker* worker,
-	DebuggerInterface* debuggerInterface,
-	ImageDebugInfoJobListener* listener,
+	DebuggerInterface* debuggerInterface, JobListener* jobListener,
 	BreakpointManager* breakpointManager)
 	:
 	fThread(thread),
 	fWorker(worker),
 	fDebuggerInterface(debuggerInterface),
-	fDebugInfoJobListener(listener),
+	fJobListener(jobListener),
 	fBreakpointManager(breakpointManager),
 	fStepMode(STEP_NONE),
 	fStepStatement(NULL),
@@ -113,7 +112,7 @@ void
 ThreadHandler::Init()
 {
 	fWorker->ScheduleJob(new(std::nothrow) GetThreadStateJob(fDebuggerInterface,
-		fThread));
+		fThread), fJobListener);
 	fConditionWaitSem = create_sem(0, "breakpoint condition waiter");
 }
 
@@ -458,7 +457,8 @@ ThreadHandler::HandleThreadStateChanged()
 	if (fThread->State() == THREAD_STATE_STOPPED
 			&& fThread->GetCpuState() == NULL) {
 		fWorker->ScheduleJob(
-			new(std::nothrow) GetCpuStateJob(fDebuggerInterface, fThread));
+			new(std::nothrow) GetCpuStateJob(fDebuggerInterface, fThread),
+			fJobListener);
 	}
 }
 
@@ -475,8 +475,8 @@ ThreadHandler::HandleCpuStateChanged()
 	if (fThread->GetCpuState() != NULL && fThread->GetStackTrace() == NULL) {
 		fWorker->ScheduleJob(
 			new(std::nothrow) GetStackTraceJob(fDebuggerInterface,
-				fDebugInfoJobListener, fDebuggerInterface->GetArchitecture(),
-				fThread));
+				fJobListener, fDebuggerInterface->GetArchitecture(),
+				fThread), fJobListener);
 	}
 }
 
@@ -954,7 +954,8 @@ ThreadHandler::_HandleBreakpointConditionIfNeeded(CpuState* cpuState)
 
 		status_t error = fWorker->ScheduleJob(
 			new(std::nothrow) ExpressionEvaluationJob(fThread->GetTeam(),
-				fDebuggerInterface, language, expressionInfo, frame, fThread));
+				fDebuggerInterface, language, expressionInfo, frame, fThread),
+			fJobListener);
 
 		BPrivate::ObjectDeleter<ExpressionEvaluationListener> deleter(
 			listener);

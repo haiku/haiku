@@ -32,8 +32,7 @@ class WatchpointManager;
 
 
 class TeamDebugger : public BLooper, private UserInterfaceListener,
-	private JobListener, private ImageDebugInfoJobListener,
-	private Team::Listener {
+	private JobListener, private Team::Listener {
 public:
 	class Listener;
 
@@ -134,13 +133,11 @@ private:
 									QuitOption quitOption);
 
 	// JobListener
+	virtual	void				JobStarted(Job* job);
 	virtual	void				JobDone(Job* job);
+	virtual	void				JobWaitingForInput(Job* job);
 	virtual	void				JobFailed(Job* job);
 	virtual	void				JobAborted(Job* job);
-
-	virtual	void				ImageDebugInfoJobNeedsUserInput(Job* job,
-									ImageDebugInfoLoadingState* state);
-	virtual	void				ImageDebugInfoJobInProgress(Image* image);
 
 	// Team::Listener
 	virtual	void				ThreadStateChanged(

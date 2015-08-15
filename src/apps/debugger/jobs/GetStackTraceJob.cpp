@@ -18,12 +18,11 @@
 
 
 GetStackTraceJob::GetStackTraceJob(DebuggerInterface* debuggerInterface,
-	ImageDebugInfoJobListener* listener, Architecture* architecture,
-	Thread* thread)
+	JobListener* listener, Architecture* architecture, Thread* thread)
 	:
 	fKey(thread, JOB_TYPE_GET_STACK_TRACE),
 	fDebuggerInterface(debuggerInterface),
-	fDebugInfoJobListener(listener),
+	fJobListener(listener),
 	fArchitecture(architecture),
 	fThread(thread)
 {
@@ -32,6 +31,9 @@ GetStackTraceJob::GetStackTraceJob(DebuggerInterface* debuggerInterface,
 	fCpuState = fThread->GetCpuState();
 	if (fCpuState != NULL)
 		fCpuState->AcquireReference();
+
+
+	SetDescription("Retrieving stack trace for thread %" B_PRId32, fThread->ID());
 }
 
 
@@ -84,7 +86,7 @@ GetStackTraceJob::GetImageDebugInfo(Image* image, ImageDebugInfo*& _info)
 		// schedule a job, if not loaded
 		ImageDebugInfo* info;
 		status_t error = LoadImageDebugInfoJob::ScheduleIfNecessary(GetWorker(),
-			image, fDebugInfoJobListener, &info);
+			image, fJobListener, &info);
 		if (error != B_OK)
 			return error;
 

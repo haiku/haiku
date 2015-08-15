@@ -13,6 +13,7 @@
 #include <new>
 
 #include <Entry.h>
+#include <InterfaceDefs.h>
 #include <Message.h>
 #include <StringList.h>
 
@@ -1370,10 +1371,36 @@ TeamDebugger::UserInterfaceQuitRequested(QuitOption quitOption)
 
 
 void
+TeamDebugger::JobStarted(Job* job)
+{
+	BString description(job->GetDescription());
+	if (!description.IsEmpty()) {
+		description.Append(B_UTF8_ELLIPSIS);
+		fUserInterface->NotifyBackgroundWorkStatus(description.String());
+	}
+}
+
+
+void
 TeamDebugger::JobDone(Job* job)
 {
 	TRACE_JOBS("TeamDebugger::JobDone(%p)\n", job);
 	_ResetUserBackgroundStatusIfNeeded();
+}
+
+
+void
+TeamDebugger::JobWaitingForInput(Job* job)
+{
+	LoadImageDebugInfoJob* infoJob = dynamic_cast<LoadImageDebugInfoJob*>(job);
+
+	if (infoJob == NULL)
+		return;
+
+	BMessage message(MSG_DEBUG_INFO_NEEDS_USER_INPUT);
+	message.AddPointer("job", infoJob);
+	message.AddPointer("state", infoJob->GetLoadingState());
+	PostMessage(&message);
 }
 
 
@@ -1393,30 +1420,6 @@ TeamDebugger::JobAborted(Job* job)
 	// TODO: For a stack frame source loader thread we should reset the
 	// loading state! Asynchronously due to locking order.
 	_ResetUserBackgroundStatusIfNeeded();
-}
-
-
-void
-TeamDebugger::ImageDebugInfoJobNeedsUserInput(Job* job,
-	ImageDebugInfoLoadingState* state)
-{
-	TRACE_JOBS("TeamDebugger::DebugInfoJobNeedsUserInput(%p, %p)\n",
-		job, state);
-
-	BMessage message(MSG_DEBUG_INFO_NEEDS_USER_INPUT);
-	message.AddPointer("job", job);
-	message.AddPointer("state", state);
-	PostMessage(&message);
-}
-
-
-void
-TeamDebugger::ImageDebugInfoJobInProgress(Image* image)
-{
-	BString message;
-	message.SetToFormat("Loading debug information for %s...",
-		image->Name().String());
-	fUserInterface->NotifyBackgroundWorkStatus(message.String());
 }
 
 
