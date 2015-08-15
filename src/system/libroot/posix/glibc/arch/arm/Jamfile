@@ -35,6 +35,7 @@ local genericSources =
 	s_signbit.c s_signbitf.c s_signbitl.c
 
 	s_nan.c s_nanf.c s_nanl.c
+	e_hypot.c e_hypotf.c e_hypotl.c
 	w_hypot.c w_hypotf.c w_hypotl.c
 	s_fpclassify.c s_fpclassifyf.c
 	s_clog.c s_clogf.c s_clogl.c
@@ -54,12 +55,16 @@ local genericSources =
 	halfulp.c
 	mpa.c mplog.c mpexp.c
 	s_sin.c
-	s_atan.c s_atanf.c
+	s_atan.c s_atanf.c s_atanl.c
 	s_tan.c
-	e_asin.c w_asin.c
+	e_asin.c e_asinl.c
+	w_asin.c w_asinl.c
 	e_log10.c w_log10.c
+	e_logf.c e_logl.c
 	e_acos.c w_acos.c
-	e_atan2.c w_atan2.c w_atan2l.c mpatan2.c mpatan.c mptan.c mpsqrt.c w_sqrt.c w_sqrtf.c
+	e_atan2.c e_atan2l.c
+	w_atan2.c w_atan2l.c mpatan2.c mpatan.c mptan.c mpsqrt.c w_sqrt.c w_sqrtf.c
+	e_sqrtl.c
 	e_fmod.c w_fmod.c
 	e_log.c w_log.c
 	e_cosh.c w_cosh.c
