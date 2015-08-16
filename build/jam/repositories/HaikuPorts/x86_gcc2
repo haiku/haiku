@@ -52,7 +52,7 @@ RemotePackageRepository HaikuPorts
 	belife-1.0.0-2
 	bemines-1.0b2-1
 	bepdf-1.2.0-1
-	bepodder-1.3.0-1
+	bepodder-1.3.0-2
 	bescreencapture-1.9.4-1
 	bezilla-2.0.0.22-1
 	binutils-2.17_2013_04_21-2
@@ -726,6 +726,8 @@ RemotePackageRepository HaikuPorts
 	libtheora_x86_devel-1.1.1-2
 	libtool_x86-2.4.2-1
 	libtool_x86_libltdl-2.4.2-1
+	libtorrent_rasterbar_x86-1.0.6-1
+	libtorrent_rasterbar_x86_devel-1.0.6-1
 	libusb_x86-1.0.18-1
 	libusb_x86_devel-1.0.18-1
 	libuuid_x86-1.0.3-2
@@ -799,6 +801,7 @@ RemotePackageRepository HaikuPorts
 	protrekkr_x86-2.5.4-2
 	popt_x86-1.16-1
 	popt_x86_devel-1.16-1
+	qbittorrent_x86-3.2.3-1
 	qemu_x86-2.1.2-1
 	qca2_x86-2.0.3-1
 	qca2_x86_devel-2.0.3-1
@@ -1118,6 +1121,7 @@ RemotePackageRepository HaikuPorts
 	libtheora
 	libtool
 	libtool_x86
+	libtorrent_rasterbar_x86
 	libunistring
 	libusb
 	libusb_x86
@@ -1230,6 +1234,7 @@ RemotePackageRepository HaikuPorts
 	python_setuptools
 	python_twisted
 	python_zope.interface
+	qbittorrent_x86
 	qemacs
 	qemu_x86
 	qca2_x86
