@@ -802,7 +802,7 @@ RemotePackageRepository HaikuPorts
 	protrekkr_x86-2.5.4-2
 	popt_x86-1.16-1
 	popt_x86_devel-1.16-1
-	qbittorrent_x86-3.2.3-1
+	qbittorrent_x86-3.2.3-2
 	qemu_x86-2.1.2-1
 	qca2_x86-2.0.3-1
 	qca2_x86_devel-2.0.3-1
@@ -810,7 +810,7 @@ RemotePackageRepository HaikuPorts
 	qjson_x86_devel-0.8.1-1
 	qmplay2_x86-15.05.30-2
 	quassel_x86-0.10.0-2
-	quicklaunch-0.9.10-1
+	quicklaunch-0.9.11-1
 	qupzilla_x86-1.8.6-1
 	radare2_x86-0.9.9-1
 	radare2_x86_devel-0.9.9-1
