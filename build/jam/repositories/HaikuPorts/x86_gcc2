@@ -162,6 +162,7 @@ RemotePackageRepository HaikuPorts
 	gperf-3.0.4-1
 	gpgme-1.5.2-2
 	gpgme_devel-1.5.2-2
+	grafx2-2.5-1
 	grep-2.20-1
 	groff-1.20.1-3
 	gtk_doc-1.20-1
@@ -1016,6 +1017,7 @@ RemotePackageRepository HaikuPorts
 	gperf
 	gpgme
 	gpgme_x86
+	grafx2
 	graphite2_x86
 	grep
 	groff
