@@ -60,7 +60,7 @@ NanotimeChartAxisLegendSource::GetAxisLegends(const ChartDataRange& range,
 		decomposed_nanotime decomposed;
 		decompose_time(time, decomposed);
 		char buffer[128];
-		snprintf(buffer, sizeof(buffer), "%02lld:%02d:%02d.%09d",
+		snprintf(buffer, sizeof(buffer), "%02" B_PRId64 ":%02d:%02d.%09d",
 			decomposed.hours, decomposed.minutes, decomposed.seconds,
 			decomposed.nanos);
 // TODO: Drop superfluous nanoseconds digits, or even nanoseconds and seconds

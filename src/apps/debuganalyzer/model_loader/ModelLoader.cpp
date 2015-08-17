@@ -721,9 +721,9 @@ ModelLoader::_ProcessEvent(uint32 event, uint32 cpu, const void* buffer,
 			break;
 
 		default:
-printf("unsupported event type %lu, size: %lu\n", event, size);
-return B_BAD_DATA;
-			break;
+			printf("unsupported event type %" B_PRIu32 ", size: %" B_PRIuSIZE
+				"\n", event, size);
+			return B_BAD_DATA;
 	}
 
 	return B_OK;
@@ -889,8 +889,10 @@ ModelLoader::_HandleTeamRemoved(system_profiler_team_removed* event)
 {
 	if (Model::Team* team = fModel->TeamByID(event->team))
 		team->SetDeletionTime(fState->LastEventTime());
-	else
-		printf("Warning: Removed event for unknown team: %ld\n", event->team);
+	else {
+		printf("Warning: Removed event for unknown team: %" B_PRId32 "\n",
+			event->team);
+	}
 }
 
 
@@ -913,7 +915,7 @@ ModelLoader::_HandleThreadRemoved(system_profiler_thread_removed* event)
 {
 	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
-		printf("Warning: Removed event for unknown thread: %ld\n",
+		printf("Warning: Removed event for unknown thread: %" B_PRId32 "\n",
 			event->thread);
 		thread = _AddUnknownThread(event->thread);
 	}
@@ -931,7 +933,7 @@ ModelLoader::_HandleThreadScheduled(uint32 cpu,
 
 	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
-		printf("Warning: Schedule event for unknown thread: %ld\n",
+		printf("Warning: Schedule event for unknown thread: %" B_PRId32 "\n",
 			event->thread);
 		thread = _AddUnknownThread(event->thread);
 		return;
@@ -966,8 +968,8 @@ ModelLoader::_HandleThreadScheduled(uint32 cpu,
 
 	thread = fState->LookupThread(event->previous_thread);
 	if (thread == NULL) {
-		printf("Warning: Schedule event for unknown previous thread: %ld\n",
-			event->previous_thread);
+		printf("Warning: Schedule event for unknown previous thread: %" B_PRId32
+			"\n", event->previous_thread);
 		thread = _AddUnknownThread(event->previous_thread);
 	}
 
@@ -1035,8 +1037,8 @@ ModelLoader::_HandleThreadEnqueuedInRunQueue(
 
 	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
-		printf("Warning: Enqueued in run queue event for unknown thread: %ld\n",
-			event->thread);
+		printf("Warning: Enqueued in run queue event for unknown thread: %"
+			B_PRId32 "\n", event->thread);
 		thread = _AddUnknownThread(event->thread);
 	}
 
@@ -1073,7 +1075,7 @@ ModelLoader::_HandleThreadRemovedFromRunQueue(uint32 cpu,
 	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
 		printf("Warning: Removed from run queue event for unknown thread: "
-			"%ld\n", event->thread);
+			"%" B_PRId32 "\n", event->thread);
 		thread = _AddUnknownThread(event->thread);
 	}
 
@@ -1112,8 +1114,8 @@ ModelLoader::_HandleIOSchedulerAdded(system_profiler_io_scheduler_added* event)
 {
 	Model::IOScheduler* scheduler = fModel->IOSchedulerByID(event->scheduler);
 	if (scheduler != NULL) {
-		printf("Warning: Duplicate added event for I/O scheduler %ld\n",
-			event->scheduler);
+		printf("Warning: Duplicate added event for I/O scheduler %" B_PRId32
+			"\n", event->scheduler);
 		return;
 	}
 
@@ -1134,12 +1136,13 @@ ModelLoader::_HandleIORequestScheduled(io_request_scheduled* event)
 
 	ExtendedThreadSchedulingState* thread = fState->LookupThread(event->thread);
 	if (thread == NULL) {
-		printf("Warning: I/O request for unknown thread %ld\n", event->thread);
+		printf("Warning: I/O request for unknown thread %" B_PRId32 "\n",
+			event->thread);
 		thread = _AddUnknownThread(event->thread);
 	}
 
 	if (fModel->IOSchedulerByID(event->scheduler) == NULL) {
-		printf("Warning: I/O requests for unknown scheduler %ld\n",
+		printf("Warning: I/O requests for unknown scheduler %" B_PRId32 "\n",
 			event->scheduler);
 		// TODO: Add state for unknown scheduler, as we do for threads.
 		return;
@@ -1307,8 +1310,8 @@ ModelLoader::_AddThreadWaitObject(ExtendedThreadSchedulingState* thread,
 		= fModel->WaitObjectGroupFor(type, object);
 	if (waitObjectGroup == NULL) {
 		// The algorithm should prevent this case.
-printf("ModelLoader::_AddThreadWaitObject(): Unknown wait object: type: %lu, "
-"object: %#lx\n", type, object);
+		printf("ModelLoader::_AddThreadWaitObject(): Unknown wait object: type:"
+			" %" B_PRIu32 ", " "object: %#" B_PRIxADDR "\n", type, object);
 		return;
 	}
 

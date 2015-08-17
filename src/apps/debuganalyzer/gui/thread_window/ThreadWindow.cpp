@@ -27,8 +27,8 @@ static BString
 get_window_name(Model::Thread* thread)
 {
 	char buffer[1024];
-	snprintf(buffer, sizeof(buffer), "Thread: %s (%ld)", thread->Name(),
-		thread->ID());
+	snprintf(buffer, sizeof(buffer), "Thread: %s (%" B_PRId32 ")",
+		thread->Name(), thread->ID());
 	return BString(buffer);
 }
 

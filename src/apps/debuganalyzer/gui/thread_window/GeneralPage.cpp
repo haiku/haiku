@@ -55,7 +55,7 @@ ThreadWindow::GeneralPage::SetModel(Model* model, Model::Thread* thread)
 
 		// ID
 		char buffer[128];
-		snprintf(buffer, sizeof(buffer), "%ld", fThread->ID());
+		snprintf(buffer, sizeof(buffer), "%" B_PRId32, fThread->ID());
 		fThreadIDView->SetText(buffer);
 
 		// team
@@ -65,28 +65,28 @@ ThreadWindow::GeneralPage::SetModel(Model* model, Model::Thread* thread)
 		char timeBuffer[64];
 		format_nanotime(fThread->TotalRunTime(), timeBuffer,
 			sizeof(timeBuffer));
-		snprintf(buffer, sizeof(buffer), "%s (%lld)", timeBuffer,
+		snprintf(buffer, sizeof(buffer), "%s (%" B_PRId64 ")", timeBuffer,
 			fThread->Runs());
 		fRunTimeView->SetText(buffer);
 
 		// wait time
 		format_nanotime(fThread->TotalWaitTime(), timeBuffer,
 			sizeof(timeBuffer));
-		snprintf(buffer, sizeof(buffer), "%s (%lld)", timeBuffer,
+		snprintf(buffer, sizeof(buffer), "%s (%" B_PRId64 ")", timeBuffer,
 			fThread->Waits());
 		fWaitTimeView->SetText(buffer);
 
 		// latencies
 		format_nanotime(fThread->TotalLatency(), timeBuffer,
 			sizeof(timeBuffer));
-		snprintf(buffer, sizeof(buffer), "%s (%lld)", timeBuffer,
+		snprintf(buffer, sizeof(buffer), "%s (%" B_PRId64 ")", timeBuffer,
 			fThread->Latencies());
 		fLatencyView->SetText(buffer);
 
 		// preemptions
 		format_nanotime(fThread->TotalRerunTime(), timeBuffer,
 			sizeof(timeBuffer));
-		snprintf(buffer, sizeof(buffer), "%s (%lld)", timeBuffer,
+		snprintf(buffer, sizeof(buffer), "%s (%" B_PRId64 ")", timeBuffer,
 			fThread->Preemptions());
 		fPreemptionView->SetText(buffer);
 

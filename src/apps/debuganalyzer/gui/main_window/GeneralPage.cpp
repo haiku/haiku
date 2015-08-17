@@ -68,11 +68,11 @@ MainWindow::GeneralPage::SetModel(Model* model)
 		fIdleTimeView->SetText(buffer);
 
 		// team count
-		snprintf(buffer, sizeof(buffer), "%ld", fModel->CountTeams());
+		snprintf(buffer, sizeof(buffer), "%" B_PRId32, fModel->CountTeams());
 		fTeamCountView->SetText(buffer);
 
 		// threads
-		snprintf(buffer, sizeof(buffer), "%ld", fModel->CountThreads());
+		snprintf(buffer, sizeof(buffer), "%" B_PRId32, fModel->CountThreads());
 		fThreadCountView->SetText(buffer);
 	} else {
 		fDataSourceView->SetText("");

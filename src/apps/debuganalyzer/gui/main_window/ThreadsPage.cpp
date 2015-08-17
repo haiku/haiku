@@ -51,8 +51,8 @@ public:
 			{
 				char buffer[128];
 				Model::Team* team = thread->GetTeam();
-				snprintf(buffer, sizeof(buffer), "%s (%ld)", team->Name(),
-					team->ID());
+				snprintf(buffer, sizeof(buffer), "%s (%" B_PRId32 ")",
+					team->Name(), team->ID());
 				value.SetTo(buffer);
 				return true;
 			}

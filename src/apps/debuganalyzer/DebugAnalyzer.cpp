@@ -38,11 +38,11 @@ printf("ReadyToRun()\n");
 			PostMessage(B_QUIT_REQUESTED);
 	}
 
-    virtual void ArgvReceived(int32 argc, char** argv)
+	virtual void ArgvReceived(int32 argc, char** argv)
 	{
-printf("ArgvReceived()\n");
-for (int32 i = 0; i < argc; i++)
-printf("  arg %ld: \"%s\"\n", i, argv[i]);
+		printf("ArgvReceived()\n");
+		for (int32 i = 0; i < argc; i++)
+			printf("  arg %" B_PRId32 ": \"%s\"\n", i, argv[i]);
 
 		for (int32 i = 1; i < argc; i++) {
 			PathDataSource* dataSource = new(std::nothrow) PathDataSource;
