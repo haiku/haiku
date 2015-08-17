@@ -587,6 +587,9 @@ bfs_lookup(fs_volume* _volume, fs_vnode* _directory, const char* file,
 	status = tree->Find((uint8*)file, (uint16)strlen(file), _vnodeID);
 	if (status != B_OK) {
 		//PRINT(("bfs_walk() could not find %Ld:\"%s\": %s\n", directory->BlockNumber(), file, strerror(status)));
+		if (status == B_ENTRY_NOT_FOUND)
+			entry_cache_add_missing(volume->ID(), directory->ID(), file);
+
 		return status;
 	}
 
