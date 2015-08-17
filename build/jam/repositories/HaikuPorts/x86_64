@@ -59,7 +59,7 @@ RemotePackageRepository HaikuPorts
 	clang-3.5.1-1
 	clang_analysis-3.5.1-1
 	clipdinger-0.4-1
-	cmake-3.3.0-1
+	cmake-3.3.1-1
 	coreutils-8.24-1
 	cppunit-1.12.1-2
 	cppunit_devel-1.12.1-2
@@ -248,12 +248,14 @@ RemotePackageRepository HaikuPorts
 	mpc_devel-1.0.3-1
 	mpfr-3.1.3-1
 	mpfr_devel-3.1.3-1
-	mpg123-1.22.3-1
-	mpg123_devel-1.22.3-1
+	mpg123-1.22.4-1
+	mpg123_devel-1.22.4-1
 	nano-2.4.2-1
 	nasm-2.11.08-1
 	ncurses-5.9-10
 	ncurses_devel-5.9-10
+	ncurses6-6.0-1
+	ncurses6_devel-6.0-1
 	neon-0.29.6-7
 	neon_devel-0.29.6-7
 	netcat-1.10-1
@@ -306,7 +308,7 @@ RemotePackageRepository HaikuPorts
 	tinyxml-2.6.2-1
 	tinyxml_devel-2.6.2-1
 	transmission-2.84-3
-	unrar-5.1.5-1
+	unrar-5.3.2-1
 	unzip-6.0-2
 	vim-7.4-2
 	vision-0.9.7.r949-3
@@ -444,6 +446,7 @@ RemotePackageRepository HaikuPorts
 	nano
 	nasm
 	ncurses
+	ncurses6
 	neon
 	netcat
 	ninja
