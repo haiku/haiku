@@ -126,6 +126,8 @@ extern fssh_status_t	fssh_file_map_translate(void *_map, fssh_off_t offset,
 extern fssh_status_t	fssh_entry_cache_add(fssh_dev_t mountID,
 							fssh_ino_t dirID, const char* name,
 							fssh_ino_t nodeID);
+extern fssh_status_t	fssh_entry_cache_add_missing(fssh_dev_t mountID,
+							fssh_ino_t dirID, const char* name);
 extern fssh_status_t	fssh_entry_cache_remove(fssh_dev_t mountID,
 							fssh_ino_t dirID, const char* name);
 

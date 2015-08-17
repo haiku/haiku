@@ -36,6 +36,7 @@ struct EntryCacheEntry {
 			ino_t				dir_id;
 			int32				generation;
 			int32				index;
+			bool				missing;
 			char				name[1];
 };
 
@@ -87,12 +88,12 @@ public:
 			status_t			Init();
 
 			status_t			Add(ino_t dirID, const char* name,
-									ino_t nodeID);
+									ino_t nodeID, bool missing);
 
 			status_t			Remove(ino_t dirID, const char* name);
 
 			bool				Lookup(ino_t dirID, const char* name,
-									ino_t& nodeID);
+									ino_t& nodeID, bool& missing);
 
 			const char*			DebugReverseLookup(ino_t nodeID, ino_t& _dirID);
 

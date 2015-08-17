@@ -2089,9 +2089,12 @@ static status_t
 lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
 {
 	ino_t id;
+	bool missing;
 
-	if (dir->mount->entry_cache.Lookup(dir->id, name, id))
-		return get_vnode(dir->device, id, _vnode, true, false);
+	if (dir->mount->entry_cache.Lookup(dir->id, name, id, missing)) {
+		return missing ? B_ENTRY_NOT_FOUND
+			: get_vnode(dir->device, id, _vnode, true, false);
+	}
 
 	status_t status = FS_CALL(dir, lookup, name, &id);
 	if (status != B_OK)
@@ -4011,7 +4014,22 @@ entry_cache_add(dev_t mountID, ino_t dirID, const char* name, ino_t nodeID)
 		return B_BAD_VALUE;
 	locker.Unlock();
 
-	return mount->entry_cache.Add(dirID, name, nodeID);
+	return mount->entry_cache.Add(dirID, name, nodeID, false);
+}
+
+
+extern "C" status_t
+entry_cache_add_missing(dev_t mountID, ino_t dirID, const char* name)
+{
+	// lookup mount -- the caller is required to make sure that the mount
+	// won't go away
+	MutexLocker locker(sMountMutex);
+	struct fs_mount* mount = find_mount(mountID);
+	if (mount == NULL)
+		return B_BAD_VALUE;
+	locker.Unlock();
+
+	return mount->entry_cache.Add(dirID, name, -1, true);
 }
 
 

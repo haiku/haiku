@@ -871,6 +871,7 @@
 
 /* entry cache */
 #define entry_cache_add					fssh_entry_cache_add
+#define entry_cache_add_missing			fssh_entry_cache_add_missing
 #define entry_cache_remove				fssh_entry_cache_remove
 
 ////////////////////////////////////////////////////////////////////////////////
