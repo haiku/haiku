@@ -101,6 +101,7 @@ enum {
 enum ConflictCheckResult {
 	kCanceled = kUserCanceled,
 	kPrompt,
+	kSkipAll,
 	kReplace,
 	kReplaceAll,
 	kNoConflicts
@@ -2019,9 +2020,12 @@ PreFlightNameCheck(BObjectList<entry_ref>* srcList, const BDirectory* destDir,
 		BString replaceMsg(B_TRANSLATE_NOCOLLECT(kReplaceManyStr));
 		replaceMsg.ReplaceAll("%verb", verb);
 
-		BAlert* alert = new BAlert("", replaceMsg.String(),
-			B_TRANSLATE("Cancel"), B_TRANSLATE("Prompt"),
-			B_TRANSLATE("Replace all"));
+		BAlert* alert = new BAlert();
+		alert->SetText(replaceMsg.String());
+		alert->AddButton(B_TRANSLATE("Cancel"));
+		alert->AddButton(B_TRANSLATE("Prompt"));
+		alert->AddButton(B_TRANSLATE("Skip all"));
+		alert->AddButton(B_TRANSLATE("Replace all"));
 		alert->SetShortcut(0, B_ESCAPE);
 		switch (alert->Go()) {
 			case 0:
@@ -2032,7 +2036,11 @@ PreFlightNameCheck(BObjectList<entry_ref>* srcList, const BDirectory* destDir,
 				return kPrompt;
 
 			case 2:
-				// user selected "Replace All"
+				// user selected "Skip all"
+				return kSkipAll;
+
+			case 3:
+				// user selected "Replace all"
 				return kReplaceAll;
 		}
 	}
@@ -2060,7 +2068,7 @@ FileStatToString(StatStruct* stat, char* buffer, int32 length)
 status_t
 CheckName(uint32 moveMode, const BEntry* sourceEntry,
 	const BDirectory* destDir, bool multipleCollisions,
-	ConflictCheckResult& conflictMode)
+	ConflictCheckResult& conflictResolution)
 {
 	if (moveMode == kDuplicateSelection) {
 		// when duplicating, we will never have a conflict
@@ -2147,7 +2155,10 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 		return B_ERROR;
 	}
 
-	if (conflictMode != kReplaceAll) {
+	if (conflictResolution == kSkipAll)
+		return B_ERROR;
+
+	if (conflictResolution != kReplaceAll) {
 		// prompt user to determine whether to replace or not
 		BString replaceMsg;
 
@@ -2187,24 +2198,38 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 		// special case single collision (don't need Replace All shortcut)
 		BAlert* alert;
 		if (multipleCollisions || sourceIsDirectory) {
-			alert = new BAlert("", replaceMsg.String(),
-				B_TRANSLATE("Skip"), B_TRANSLATE("Replace all"));
+			alert = new BAlert();
+			alert->SetText(replaceMsg.String());
+			alert->AddButton(B_TRANSLATE("Skip"));
+			alert->AddButton(B_TRANSLATE("Skip all"));
+			alert->AddButton(B_TRANSLATE("Replace"));
+			alert->AddButton(B_TRANSLATE("Replace all"));
+			switch (alert->Go()) {
+				case 0:
+					conflictResolution = kCanceled;
+					return B_ERROR;
+				case 1:
+					conflictResolution = kSkipAll;
+					return B_ERROR;
+				case 2:
+					conflictResolution = kReplace;
+					break;
+				case 3:
+					conflictResolution = kReplaceAll;
+					break;
+			}
 		} else {
 			alert = new BAlert("", replaceMsg.String(),
 				B_TRANSLATE("Cancel"), B_TRANSLATE("Replace"));
 			alert->SetShortcut(0, B_ESCAPE);
-		}
-		switch (alert->Go()) {
-			case 0:		// user selected "Cancel" or "Skip"
-				replaceAll = kCanceled;
-				return B_ERROR;
-
-			case 1:		// user selected "Replace" or "Replace All"
-				replaceAll = kReplaceAll;
-					// doesn't matter which since a single
-					// collision "Replace" is equivalent to a
-					// "Replace All"
-				break;
+			switch (alert->Go()) {
+				case 0:
+					conflictResolution = kCanceled;
+					return B_ERROR;
+				case 1:
+					conflictResolution = kReplace;
+					break;
+			}
 		}
 	}
 
