@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -2601,7 +2601,7 @@ BTextView::GetHeightForWidth(float width, float* min, float* max,
 	if (min != NULL)
 		*min = fTextRect.Height();
 	if (max != NULL)
-		*max = fTextRect.Height();
+		*max = B_SIZE_UNLIMITED;
 	if (preferred != NULL)
 		*preferred = fTextRect.Height();
 }
