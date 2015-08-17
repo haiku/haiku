@@ -65,153 +65,156 @@ class BMenuBar;
 class BMenuItem;
 class Words;
 
+
 class TMailWindow : public BWindow {
-	public:
+public:
 								TMailWindow(BRect frame, const char* title,
 									TMailApp* app, const entry_ref* ref,
 									const char* to, const BFont *font,
 									bool resending,
 									BMessenger* trackerMessenger);
-		virtual					~TMailWindow();
+	virtual						~TMailWindow();
 
-		virtual	void			FrameResized(float width, float height);
-		virtual	void			MenusBeginning();
-		virtual	void			MessageReceived(BMessage*);
-		virtual	bool			QuitRequested();
-		virtual	void			Show();
-		virtual	void			Zoom(BPoint, float, float);
-		virtual	void			WindowActivated(bool state);
+	virtual	void				FrameResized(float width, float height);
+	virtual	void				MenusBeginning();
+	virtual	void				MessageReceived(BMessage*);
+	virtual	bool				QuitRequested();
+	virtual	void				Show();
+	virtual	void				Zoom(BPoint, float, float);
+	virtual	void				WindowActivated(bool state);
 
-				void			SetTo(const char* mailTo, const char* subject,
+			void				SetTo(const char* mailTo, const char* subject,
 									const char* ccTo = NULL,
 									const char* bccTo = NULL,
 									const BString* body = NULL,
 									BMessage* enclosures = NULL);
-				void			AddSignature(BMailMessage*);
-				void			Forward(entry_ref*, TMailWindow*,
+			void				AddSignature(BMailMessage*);
+			void				Forward(entry_ref*, TMailWindow*,
 									bool includeAttachments);
-				void			Print();
-				void			PrintSetup();
-				void			Reply(entry_ref*, TMailWindow*, uint32);
-				void			CopyMessage(entry_ref* ref, TMailWindow* src);
-				status_t		Send(bool);
-				status_t		SaveAsDraft();
-				status_t		OpenMessage(const entry_ref* ref,
+			void				Print();
+			void				PrintSetup();
+			void				Reply(entry_ref*, TMailWindow*, uint32);
+			void				CopyMessage(entry_ref* ref, TMailWindow* src);
+			status_t			Send(bool now);
+			status_t			SaveAsDraft();
+			status_t			OpenMessage(const entry_ref* ref,
 									uint32 characterSetForDecoding
 										= B_MAIL_NULL_CONVERSION);
 
-				status_t		GetMailNodeRef(node_ref &nodeRef) const;
-				BEmailMessage*	Mail() const { return fMail; }
+			status_t			GetMailNodeRef(node_ref &nodeRef) const;
+			BEmailMessage*		Mail() const { return fMail; }
 
-				bool			GetTrackerWindowFile(entry_ref*,
+			bool				GetTrackerWindowFile(entry_ref*,
 									bool dir) const;
-				void			SaveTrackerPosition(entry_ref*);
-				void			SetOriginatingWindow(BWindow* window);
+			void				SaveTrackerPosition(entry_ref*);
+			void				SetOriginatingWindow(BWindow* window);
 
-				void			PreserveReadingPos(bool save);
-				void			MarkMessageRead(entry_ref* message,
+			void				PreserveReadingPos(bool save);
+			void				MarkMessageRead(entry_ref* message,
 									read_flags flag);
-				void			SetTrackerSelectionToCurrent();
-				TMailWindow*	FrontmostWindow();
-				void			UpdateViews();
-				void			UpdatePreferences();
+			void				SetTrackerSelectionToCurrent();
+			TMailWindow*		FrontmostWindow();
+			void				UpdateViews();
+			void				UpdatePreferences();
 
-	protected:
-				void			SetTitleForMessage();
-				void			AddEnclosure(BMessage* msg);
-				void			BuildToolBar();
-				status_t		TrainMessageAs(const char* commandWord);
+protected:
+			void				SetTitleForMessage();
+			void				AddEnclosure(BMessage* msg);
+			void				BuildToolBar();
+			status_t			TrainMessageAs(const char* commandWord);
 
-	private:
-				void			_UpdateSizeLimits();
+private:
+			void				_UpdateSizeLimits();
 
-				status_t		_GetQueryPath(BPath* path) const;
-				void			_RebuildQueryMenu(bool firstTime = false);
-				char*			_BuildQueryString(BEntry* entry) const;
+			status_t			_GetQueryPath(BPath* path) const;
+			void				_RebuildQueryMenu(bool firstTime = false);
+			char*				_BuildQueryString(BEntry* entry) const;
 
- 				void			_AddReadButton();
-				void			_UpdateReadButton();
+			void				_AddReadButton();
+			void				_UpdateReadButton();
 
-				void			_SetDownloading(bool downloading);
+			void				_SetDownloading(bool downloading);
 
-				TMailApp*		fApp;
+	static	BBitmap*			_RetrieveVectorIcon(int32 id);
 
-				BEmailMessage*	fMail;
-				entry_ref*		fRef;
-					// Reference to currently displayed file
-				int32			fFieldState;
-				BFilePanel*		fPanel;
-				BMenuBar*		fMenuBar;
-				BMenuItem*		fAdd;
-				BMenuItem*		fCut;
-				BMenuItem*		fCopy;
-				BMenuItem*		fHeader;
-				BMenuItem*		fPaste;
-				BMenuItem*		fPrint;
-				BMenuItem*		fPrintSetup;
-				BMenuItem*		fQuote;
-				BMenuItem*		fRaw;
-				BMenuItem*		fRemove;
-				BMenuItem*		fRemoveQuote;
-				BMenuItem*		fSendNow;
-				BMenuItem*		fSendLater;
-				BMenuItem*		fUndo;
-				BMenuItem*		fRedo;
-				BMenuItem*		fNextMsg;
-				BMenuItem*		fPrevMsg;
-				BMenuItem*		fDeleteNext;
-				BMenuItem*		fSpelling;
-				BMenu*			fSaveAddrMenu;
+private:
+			TMailApp*			fApp;
 
-				BMenu*			fQueryMenu;
-				BMenu*			fLeaveStatusMenu;
+			BEmailMessage*		fMail;
+			entry_ref*			fRef;
+				// Reference to currently displayed file
+			int32				fFieldState;
+			BFilePanel*			fPanel;
+			BMenuBar*			fMenuBar;
+			BMenuItem*			fAdd;
+			BMenuItem*			fCut;
+			BMenuItem*			fCopy;
+			BMenuItem*			fHeader;
+			BMenuItem*			fPaste;
+			BMenuItem*			fPrint;
+			BMenuItem*			fPrintSetup;
+			BMenuItem*			fQuote;
+			BMenuItem*			fRaw;
+			BMenuItem*			fRemove;
+			BMenuItem*			fRemoveQuote;
+			BMenuItem*			fSendNow;
+			BMenuItem*			fSendLater;
+			BMenuItem*			fUndo;
+			BMenuItem*			fRedo;
+			BMenuItem*			fNextMsg;
+			BMenuItem*			fPrevMsg;
+			BMenuItem*			fDeleteNext;
+			BMenuItem*			fSpelling;
+			BMenu*				fSaveAddrMenu;
 
-				static BBitmap*					_RetrieveVectorIcon(int32 id);
-				struct BitmapItem {
-					BBitmap* bm;
-					int32 id;
-				};
-				static BObjectList<BitmapItem>	fBitmapCache;
-				static BLocker					fBitmapCacheLock;
+			BMenu*				fQueryMenu;
+			BMenu*				fLeaveStatusMenu;
 
-				BToolBar*		fToolBar;
+	struct BitmapItem {
+		BBitmap* bm;
+		int32 id;
+	};
+	static	BObjectList<BitmapItem>	sBitmapCache;
+	static	BLocker				sBitmapCacheLock;
 
-				BRect			fZoom;
-				TContentView*	fContentView;
-				THeaderView*	fHeaderView;
-				TEnclosuresView* fEnclosuresView;
-				TMenu*			fSignature;
+			BToolBar*			fToolBar;
 
-				BMessenger		fTrackerMessenger;
-					// Talks to tracker window that this was launched from.
-				BMessenger		fMessengerToSpamServer;
+			BRect				fZoom;
+			TContentView*		fContentView;
+			THeaderView*		fHeaderView;
+			TEnclosuresView*	fEnclosuresView;
+			TMenu*				fSignature;
 
-				entry_ref		fPrevRef;
-				entry_ref		fNextRef;
-				bool			fPrevTrackerPositionSaved : 1;
-				bool			fNextTrackerPositionSaved : 1;
+			BMessenger			fTrackerMessenger;
+				// Talks to tracker window that this was launched from.
+			BMessenger			fMessengerToSpamServer;
 
-				entry_ref		fOpenFolder;
+			entry_ref			fPrevRef;
+			entry_ref			fNextRef;
+			bool				fPrevTrackerPositionSaved : 1;
+			bool				fNextTrackerPositionSaved : 1;
 
-				bool			fSigAdded : 1;
-				bool			fIncoming : 1;
-				bool			fReplying : 1;
-				bool			fResending : 1;
-				bool			fSent : 1;
-				bool			fDraft : 1;
-				bool			fChanged : 1;
+			entry_ref			fOpenFolder;
 
-				static BList	sWindowList;
-				static BLocker	sWindowListLock;
+			bool				fSigAdded : 1;
+			bool				fIncoming : 1;
+			bool				fReplying : 1;
+			bool				fResending : 1;
+			bool				fSent : 1;
+			bool				fDraft : 1;
+			bool				fChanged : 1;
 
-				entry_ref		fRepliedMail;
-				BMessenger*		fOriginatingWindow;
+	static	BList				sWindowList;
+	static	BLocker				sWindowListLock;
 
-				bool			fAutoMarkRead : 1;
-				bool			fKeepStatusOnQuit;
+			entry_ref			fRepliedMail;
+			BMessenger*			fOriginatingWindow;
 
-				bool			fDownloading;
+			bool				fAutoMarkRead : 1;
+			bool				fKeepStatusOnQuit;
+
+			bool				fDownloading;
 };
 
-#endif // _MAIL_WINDOW_H
 
+#endif // _MAIL_WINDOW_H

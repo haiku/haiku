@@ -150,6 +150,7 @@ public:
 	virtual	void SetLabel(const char *text);
 	virtual void SetText(const char *text);
 	const char *Text() const;
+			int32				TextLength() const;
 	BTextView *TextView();		
 	virtual	void SetDivider(float dividing_line);
 	float Divider() const;

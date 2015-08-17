@@ -1253,6 +1253,13 @@ BComboBox::Text() const
 }
 
 
+int32
+BComboBox::TextLength() const
+{
+	return fText->TextLength();
+}
+
+
 BTextView *
 BComboBox::TextView()
 {
