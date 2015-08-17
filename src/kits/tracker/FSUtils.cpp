@@ -1024,7 +1024,7 @@ MoveTask(BObjectList<entry_ref>* srcList, BEntry* destEntry, BList* pointList,
 
 			// resolve name collisions and hierarchy problems
 			if (CheckName(moveMode, &sourceEntry, &destDir,
-				collisionCount > 1, conflictCheckResult) != B_OK) {
+					collisionCount > 1, conflictCheckResult) != B_OK) {
 				// we will skip the current item, because we got a conflict
 				// and were asked to or because there was some conflict
 
@@ -1152,7 +1152,7 @@ CopyFile(BEntry* srcFile, StatStruct* srcStat, BDirectory* destDir,
 	BEntry conflictingEntry;
 	if (destDir->FindEntry(destName, &conflictingEntry) == B_OK) {
 		switch (loopControl->OverwriteOnConflict(srcFile, destName, destDir,
-			false, false)) {
+				false, false)) {
 			case TrackerCopyLoopControl::kSkip:
 				// we are about to ignore this entire directory
 				return;
@@ -1573,36 +1573,35 @@ status_t
 RecursiveMove(BEntry* entry, BDirectory* destDir,
 	CopyLoopControl* loopControl)
 {
-	char name[B_FILE_NAME_LENGTH];
-	if (entry->GetName(name) == B_OK) {
-		if (destDir->Contains(name)) {
-			BPath path (destDir, name);
-			BDirectory subDir (path.Path());
-			entry_ref ref;
-			entry->GetRef(&ref);
-			BDirectory source(&ref);
-			if (source.InitCheck() == B_OK) {
-				source.Rewind();
-				BEntry current;
-				while (source.GetNextEntry(&current) == B_OK) {
-					if (current.IsDirectory()) {
-						RecursiveMove(&current, &subDir, loopControl);
-						current.Remove();
-					} else {
-						current.GetName(name);
-						if (loopControl->OverwriteOnConflict(&current, name,
+	const char* name = entry->Name();
+
+	if (destDir->Contains(name)) {
+		BPath path (destDir, name);
+		BDirectory subDir (path.Path());
+		entry_ref ref;
+		entry->GetRef(&ref);
+		BDirectory source(&ref);
+		if (source.InitCheck() == B_OK) {
+			source.Rewind();
+			BEntry current;
+			while (source.GetNextEntry(&current) == B_OK) {
+				if (current.IsDirectory()) {
+					RecursiveMove(&current, &subDir, loopControl);
+					current.Remove();
+				} else {
+					name = current.Name();
+					if (loopControl->OverwriteOnConflict(&current, name,
 							&subDir, true, false)
 								!= TrackerCopyLoopControl::kSkip) {
-							MoveError::FailOnError(current.MoveTo(&subDir,
-								NULL, true));
-						}
+						MoveError::FailOnError(current.MoveTo(&subDir,
+							NULL, true));
 					}
 				}
 			}
-			entry->Remove();
-		} else
-			MoveError::FailOnError(entry->MoveTo(destDir));
-	}
+		}
+		entry->Remove();
+	} else
+		MoveError::FailOnError(entry->MoveTo(destDir));
 
 	return B_OK;
 }
@@ -1998,7 +1997,6 @@ ConflictCheckResult
 PreFlightNameCheck(BObjectList<entry_ref>* srcList, const BDirectory* destDir,
 	int32* collisionCount, uint32 moveMode)
 {
-
 	// count the number of name collisions in dest folder
 	*collisionCount = 0;
 
@@ -2009,10 +2007,8 @@ PreFlightNameCheck(BObjectList<entry_ref>* srcList, const BDirectory* destDir,
 		BDirectory parent;
 		entry.GetParent(&parent);
 
-		if (parent != *destDir) {
-			if (destDir->Contains(srcRef->name))
-				(*collisionCount)++;
-		}
+		if (parent != *destDir && destDir->Contains(srcRef->name))
+			(*collisionCount)++;
 	}
 
 	// prompt user only if there is more than one collision, otherwise the
@@ -2064,16 +2060,15 @@ FileStatToString(StatStruct* stat, char* buffer, int32 length)
 status_t
 CheckName(uint32 moveMode, const BEntry* sourceEntry,
 	const BDirectory* destDir, bool multipleCollisions,
-	ConflictCheckResult &replaceAll)
+	ConflictCheckResult& conflictMode)
 {
-	if (moveMode == kDuplicateSelection)
+	if (moveMode == kDuplicateSelection) {
 		// when duplicating, we will never have a conflict
 		return B_OK;
+	}
 
 	// see if item already exists in destination dir
-	status_t err = B_OK;
-	char name[B_FILE_NAME_LENGTH];
-	sourceEntry->GetName(name);
+	const char* name = sourceEntry->Name();
 	bool sourceIsDirectory = sourceEntry->IsDirectory();
 
 	BDirectory srcDirectory;
@@ -2082,8 +2077,7 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 		BEntry destEntry;
 		destDir->GetEntry(&destEntry);
 
-		if (moveMode != kCreateLink
-			&& moveMode != kCreateRelativeLink
+		if (moveMode != kCreateLink && moveMode != kCreateRelativeLink
 			&& (srcDirectory == *destDir
 				|| srcDirectory.Contains(&destEntry))) {
 			BAlert* alert = new BAlert("",
@@ -2108,9 +2102,10 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 	}
 
 	BEntry entry;
-	if (destDir->FindEntry(name, &entry) != B_OK)
+	if (destDir->FindEntry(name, &entry) != B_OK) {
 		// no conflict, return
 		return B_OK;
+	}
 
 	if (moveMode == kCreateLink	|| moveMode == kCreateRelativeLink) {
 		// if we are creating link in the same directory, the conflict will
@@ -2124,8 +2119,8 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 	bool destIsDir = entry.IsDirectory();
 	// be sure not to replace the parent directory of the item being moved
 	if (destIsDir) {
-		BDirectory test_dir(&entry);
-		if (test_dir.Contains(sourceEntry)) {
+		BDirectory targetDir(&entry);
+		if (targetDir.Contains(sourceEntry)) {
 			BAlert* alert = new BAlert("",
 				B_TRANSLATE("You can't replace a folder "
 				"with one of its sub-folders."),
@@ -2141,18 +2136,18 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 	if (moveMode != kCreateLink
 		&& moveMode != kCreateRelativeLink
 		&& destIsDir != sourceIsDirectory) {
-			BAlert* alert = new BAlert("", sourceIsDirectory
-				? B_TRANSLATE("You cannot replace a file with a folder or a "
+		BAlert* alert = new BAlert("", sourceIsDirectory
+			? B_TRANSLATE("You cannot replace a file with a folder or a "
 				"symbolic link.")
-				: B_TRANSLATE("You cannot replace a folder or a symbolic link "
+			: B_TRANSLATE("You cannot replace a folder or a symbolic link "
 				"with a file."), B_TRANSLATE("OK"),	0, 0, B_WIDTH_AS_USUAL,
-				B_WARNING_ALERT);
-			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-			alert->Go();
-			return B_ERROR;
-		}
+			B_WARNING_ALERT);
+		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
+		alert->Go();
+		return B_ERROR;
+	}
 
-	if (replaceAll != kReplaceAll) {
+	if (conflictMode != kReplaceAll) {
 		// prompt user to determine whether to replace or not
 		BString replaceMsg;
 
@@ -2170,8 +2165,8 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 			char sourceBuffer[96], destBuffer[96];
 			StatStruct statBuffer;
 
-			if (!sourceEntry->IsDirectory() && sourceEntry->GetStat(
-				&statBuffer) == B_OK) {
+			if (!sourceEntry->IsDirectory()
+				&& sourceEntry->GetStat(&statBuffer) == B_OK) {
 				FileStatToString(&statBuffer, sourceBuffer, 96);
 			} else
 				sourceBuffer[0] = '\0';
@@ -2185,10 +2180,8 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 			replaceMsg.ReplaceAll("%name", name);
 			replaceMsg.ReplaceFirst("%dest", destBuffer);
 			replaceMsg.ReplaceFirst("%src", sourceBuffer);
-			replaceMsg.ReplaceFirst("%movemode",
-				moveMode == kMoveSelectionTo
-				? B_TRANSLATE("moving")
-				: B_TRANSLATE("copying"));
+			replaceMsg.ReplaceFirst("%movemode", moveMode == kMoveSelectionTo
+				? B_TRANSLATE("moving") : B_TRANSLATE("copying"));
 		}
 
 		// special case single collision (don't need Replace All shortcut)
@@ -2216,22 +2209,21 @@ CheckName(uint32 moveMode, const BEntry* sourceEntry,
 	}
 
 	// delete destination item
-	if (!destIsDir)
-		err = entry.Remove();
-	else
+	if (destIsDir)
 		return B_OK;
 
-	if (err != B_OK) {
+	status_t status = entry.Remove();
+	if (status != B_OK) {
 		BString error(B_TRANSLATE("There was a problem trying to replace "
 			"\"%name\". The item might be open or busy."));
-		error.ReplaceFirst("%name", name);;
+		error.ReplaceFirst("%name", name);
 		BAlert* alert = new BAlert("", error.String(),
 			B_TRANSLATE("Cancel"), 0, 0, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go();
 	}
 
-	return err;
+	return status;
 }
 
 
@@ -2962,14 +2954,10 @@ FSRecursiveCreateFolder(BPath path)
 	entry.SetTo(path.Path());
 	if (entry.Exists())
 		return B_FILE_EXISTS;
-	else {
-		char name[B_FILE_NAME_LENGTH];
-		BDirectory parent;
 
-		entry.GetParent(&parent);
-		entry.GetName(name);
-		parent.CreateDirectory(name, NULL);
-	}
+	BDirectory parent;
+	entry.GetParent(&parent);
+	parent.CreateDirectory(entry.Name(), NULL);
 
 	return B_OK;
 }
@@ -3017,8 +3005,7 @@ _RestoreTask(BObjectList<entry_ref>* list)
 			if (!originalEntry.Exists()) {
 				BDirectory dir(parentPath.Path());
 				if (dir.InitCheck() == B_OK) {
-					char leafName[B_FILE_NAME_LENGTH];
-					originalEntry.GetName(leafName);
+					const char* leafName = originalEntry.Name();
 					if (entry.MoveTo(&dir, leafName) == B_OK) {
 						BNode node(&entry);
 						if (node.InitCheck() == B_OK)
