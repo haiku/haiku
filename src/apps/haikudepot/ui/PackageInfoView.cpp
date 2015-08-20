@@ -1426,6 +1426,7 @@ PackageInfoView::MessageReceived(BMessage* message)
 			}
 
 			if ((changes & PKG_CHANGED_STATE) != 0) {
+				fPagesView->SetPackage(package, false);
 				fPackageActionView->SetPackage(*package.Get());
 			}
 

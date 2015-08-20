@@ -39,6 +39,7 @@ private:
 			sem_id				fContentPopulatorSem;
 			BLocker				fPackageLock;
 			PackageInfoRef		fPackage;
+			PackageState		fLastPackageState;
 };
 
 #endif // PACKAGE_CONTENTS_VIEW_H
