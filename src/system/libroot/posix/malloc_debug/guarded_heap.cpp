@@ -497,51 +497,77 @@ guarded_heap_add_area(guarded_heap& heap, uint32 counter)
 
 
 static void*
+guarded_heap_allocate_with_area(size_t size, size_t alignment)
+{
+	size_t infoSpace = alignment >= B_PAGE_SIZE ? B_PAGE_SIZE
+		: (sizeof(guarded_heap_page) + alignment - 1) & ~(alignment - 1);
+
+	size_t pagesNeeded = (size + infoSpace + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+
+	if (alignment > B_PAGE_SIZE)
+		pagesNeeded += alignment / B_PAGE_SIZE - 1;
+
+	void* address = NULL;
+	area_id area = create_area("guarded_heap_huge_allocation", &address,
+		B_ANY_ADDRESS, (pagesNeeded + 1) * B_PAGE_SIZE, B_NO_LOCK,
+		B_READ_AREA | B_WRITE_AREA);
+	if (area < 0) {
+		panic("failed to create area for allocation of %" B_PRIuSIZE " pages",
+			pagesNeeded);
+		return NULL;
+	}
+
+	// We just use a page object
+	guarded_heap_page* page = (guarded_heap_page*)address;
+	page->flags = GUARDED_HEAP_PAGE_FLAG_USED | GUARDED_HEAP_PAGE_FLAG_FIRST
+		| GUARDED_HEAP_PAGE_FLAG_AREA;
+	page->allocation_size = size;
+	page->allocation_base = (void*)(((addr_t)address
+		+ pagesNeeded * B_PAGE_SIZE - size) & ~(alignment - 1));
+	page->alignment = alignment;
+	page->thread = find_thread(NULL);
+	page->alloc_stack_trace_depth = guarded_heap_fill_stack_trace(
+		page->stack_trace, sStackTraceDepth, 2);
+	page->free_stack_trace_depth = 0;
+
+	if (alignment <= B_PAGE_SIZE) {
+		// Protect just the guard page.
+		mprotect((void*)((addr_t)address + pagesNeeded * B_PAGE_SIZE),
+			B_PAGE_SIZE, 0);
+	} else {
+		// Protect empty pages before the allocation start...
+		addr_t protectedStart = (addr_t)address + B_PAGE_SIZE;
+		size_t protectedSize = (addr_t)page->allocation_base - protectedStart;
+		if (protectedSize > 0)
+			mprotect((void*)protectedStart, protectedSize, 0);
+
+		// ... and after allocation end.
+		size_t allocatedPages = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+		protectedStart = (addr_t)page->allocation_base
+			+ allocatedPages * B_PAGE_SIZE;
+		protectedSize = (addr_t)address + (pagesNeeded + 1) * B_PAGE_SIZE
+			- protectedStart;
+
+		// There is at least the guard page.
+		mprotect((void*)protectedStart, protectedSize, 0);
+	}
+
+	return page->allocation_base;
+}
+
+
+static void*
 guarded_heap_allocate(guarded_heap& heap, size_t size, size_t alignment)
 {
 	if (alignment == 0)
 		alignment = 1;
 
-	if (alignment > B_PAGE_SIZE) {
-		panic("alignment of %" B_PRIuSIZE " not supported", alignment);
-		return NULL;
-	}
-
 	size_t pagesNeeded = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE + 1;
-	if (pagesNeeded * B_PAGE_SIZE >= GUARDED_HEAP_AREA_USE_THRESHOLD) {
+	if (alignment > B_PAGE_SIZE
+		|| pagesNeeded * B_PAGE_SIZE >= GUARDED_HEAP_AREA_USE_THRESHOLD) {
 		// Don't bother, use an area directly. Since it will also fault once
 		// it is deleted, that fits our model quite nicely.
-
-		pagesNeeded = (size + sizeof(guarded_heap_page) + B_PAGE_SIZE - 1)
-			/ B_PAGE_SIZE;
-
-		void* address = NULL;
-		area_id area = create_area("guarded_heap_huge_allocation", &address,
-			B_ANY_ADDRESS, (pagesNeeded + 1) * B_PAGE_SIZE, B_NO_LOCK,
-			B_READ_AREA | B_WRITE_AREA);
-		if (area < 0) {
-			panic("failed to create area for allocation of %" B_PRIuSIZE
-				" pages", pagesNeeded);
-			return NULL;
-		}
-
-		// We just use a page object
-		guarded_heap_page* page = (guarded_heap_page*)address;
-		page->flags = GUARDED_HEAP_PAGE_FLAG_USED
-			| GUARDED_HEAP_PAGE_FLAG_FIRST | GUARDED_HEAP_PAGE_FLAG_AREA;
-		page->allocation_size = size;
-		page->allocation_base = (void*)(((addr_t)address
-			+ pagesNeeded * B_PAGE_SIZE - size) & ~(alignment - 1));
-		page->alignment = alignment;
-		page->thread = find_thread(NULL);
-		page->alloc_stack_trace_depth = guarded_heap_fill_stack_trace(
-			page->stack_trace, sStackTraceDepth, 2);
-		page->free_stack_trace_depth = 0;
-
-		mprotect((void*)((addr_t)address + pagesNeeded * B_PAGE_SIZE),
-			B_PAGE_SIZE, 0);
-
-		return page->allocation_base;
+		return guarded_heap_allocate_with_area(size, alignment);
 	}
 
 	void* result = NULL;
