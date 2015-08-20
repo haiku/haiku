@@ -1145,8 +1145,8 @@ restart:
 		rw_lock_read_unlock(&sVnodeLock);
 		if (!canWait || --tries < 0) {
 			// vnode doesn't seem to become unbusy
-			dprintf("vnode %" B_PRIdDEV ":%" B_PRIdINO " is not becoming unbusy!\n",
-				mountID, vnodeID);
+			dprintf("vnode %" B_PRIdDEV ":%" B_PRIdINO
+				" is not becoming unbusy!\n", mountID, vnodeID);
 			return B_BUSY;
 		}
 		snooze(5000); // 5 ms
@@ -1300,7 +1300,7 @@ free_unused_vnodes(int32 level)
 		AutoLocker<Vnode> nodeLocker(vnode);
 
 		// Check whether the node is still unused -- since we only append to the
-		// the tail of the unused queue, the vnode should still be at its head.
+		// tail of the unused queue, the vnode should still be at its head.
 		// Alternatively we could check its ref count for 0 and its busy flag,
 		// but if the node is no longer at the head of the queue, it means it
 		// has been touched in the meantime, i.e. it is no longer the least
@@ -2100,7 +2100,7 @@ lookup_dir_entry(struct vnode* dir, const char* name, struct vnode** _vnode)
 	if (status != B_OK)
 		return status;
 
-	// The lookup() hook call get_vnode() or publish_vnode(), so we do already
+	// The lookup() hook calls get_vnode() or publish_vnode(), so we do already
 	// have a reference and just need to look the node up.
 	rw_lock_read_lock(&sVnodeLock);
 	*_vnode = lookup_vnode(dir->device, id);
@@ -8890,7 +8890,7 @@ _user_open_entry_ref(dev_t device, ino_t inode, const char* userName,
 
 	if ((openMode & O_CREAT) != 0) {
 		return file_create_entry_ref(device, inode, name, openMode, perms,
-		 false);
+			false);
 	}
 
 	return file_open_entry_ref(device, inode, name, openMode, false);

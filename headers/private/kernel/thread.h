@@ -302,7 +302,7 @@ thread_is_blocked(Thread* thread)
 	especially with a client lock that uses the thread blocking API. After a
 	blocked thread has been interrupted or the the time out occurred it cannot
 	acquire the client lock (or any other lock using the thread blocking API)
-	without first making sure that the thread doesn't still appears to be
+	without first making sure that the thread doesn't still appear to be
 	waiting to other client code. Otherwise another thread could try to unblock
 	it which could erroneously unblock the thread while already waiting on the
 	client lock. So usually when interruptions or timeouts are possible a
