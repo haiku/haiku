@@ -2607,9 +2607,13 @@ BRoster::_InitMessenger()
 	BMessage data;
 	if (BLaunchRoster().GetData("application/x-vnd.Haiku-registrar", data)
 			== B_OK) {
+
 		port_id port = data.GetInt32("port", -1);
 		team_id team = data.GetInt32("team", -1);
-		if (port >= 0) {
+
+		if (port >= 0 && team != current_team()) {
+			// Make sure we aren't the registrar ourselves.
+
 			DBG(OUT("  found roster port\n"));
 
 			BMessenger::Private(fMessenger).SetTo(team, port,
