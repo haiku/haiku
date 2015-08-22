@@ -2200,7 +2200,8 @@ fDesktop->LockSingleWindow();
 
 			if (opacity != 255) {
 				fCurrentView->CurrentState()->SetDrawingMode(B_OP_ALPHA);
-				fCurrentView->CurrentState()->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+				fCurrentView->CurrentState()->SetBlendingMode(B_PIXEL_ALPHA,
+					B_ALPHA_COMPOSITE);
 				fCurrentView->CurrentState()->SetDrawingModeLocked(true);
 			}
 
@@ -3466,7 +3467,8 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 
 			if (opacity != 255) {
 				fCurrentView->CurrentState()->SetDrawingMode(B_OP_ALPHA);
-				fCurrentView->CurrentState()->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+				fCurrentView->CurrentState()->SetBlendingMode(B_PIXEL_ALPHA,
+					B_ALPHA_COMPOSITE);
 				fCurrentView->CurrentState()->SetDrawingModeLocked(true);
 			}
 

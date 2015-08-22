@@ -626,8 +626,8 @@ set_pen_location(Canvas* canvas, BPoint pt)
 static void
 set_drawing_mode(Canvas* canvas, drawing_mode mode)
 {
-	canvas->CurrentState()->SetDrawingMode(mode);
-	canvas->GetDrawingEngine()->SetDrawingMode(mode);
+	if (canvas->CurrentState()->SetDrawingMode(mode))
+		canvas->GetDrawingEngine()->SetDrawingMode(mode);
 }
 
 

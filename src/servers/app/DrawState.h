@@ -100,11 +100,11 @@ public:
 								{ return fPattern; }
 
 							// drawing/blending mode
-		void				SetDrawingMode(drawing_mode mode);
+		bool				SetDrawingMode(drawing_mode mode);
 		drawing_mode		GetDrawingMode() const
 								{ return fDrawingMode; }
 
-		void				SetBlendingMode(source_alpha srcMode,
+		bool				SetBlendingMode(source_alpha srcMode,
 								alpha_function fncMode);
 		source_alpha		AlphaSrcMode() const
 								{ return fAlphaSrcMode; }

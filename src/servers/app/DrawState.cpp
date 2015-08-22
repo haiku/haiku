@@ -526,21 +526,26 @@ DrawState::SetPattern(const Pattern& pattern)
 }
 
 
-void
+bool
 DrawState::SetDrawingMode(drawing_mode mode)
 {
-	if (!fDrawingModeLocked)
+	if (!fDrawingModeLocked) {
 		fDrawingMode = mode;
+		return true;
+	}
+	return false;
 }
 
 
-void
+bool
 DrawState::SetBlendingMode(source_alpha srcMode, alpha_function fncMode)
 {
 	if (!fDrawingModeLocked) {
 		fAlphaSrcMode = srcMode;
 		fAlphaFncMode = fncMode;
+		return true;
 	}
+	return false;
 }
 
 
