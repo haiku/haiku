@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2015, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -98,7 +98,6 @@ CliContext::CliContext()
 	fInputLoopWaitingForEvents(0),
 	fEventsOccurred(0),
 	fInputLoopWaiting(false),
-	fInteractive(true),
 	fTerminating(false),
 	fCurrentThread(NULL),
 	fCurrentStackTrace(NULL),
@@ -216,13 +215,6 @@ CliContext::Terminating()
 	_SignalInputLoop(EVENT_QUIT);
 
 	// TODO: Signal the input loop, should it be in PromptUser()!
-}
-
-
-void
-CliContext::SetInteractive(bool interactive)
-{
-	fInteractive = interactive;
 }
 
 
@@ -415,6 +407,7 @@ CliContext::ProcessPendingEvents()
 
 		switch (event->Type()) {
 			case EVENT_QUIT:
+			case EVENT_DEBUG_REPORT_CHANGED:
 			case EVENT_USER_INTERRUPT:
 				break;
 			case EVENT_THREAD_ADDED:
@@ -453,13 +446,6 @@ CliContext::ProcessPendingEvents()
 				if (fExpressionValue != NULL)
 					fExpressionValue->AcquireReference();
 				break;
-			case EVENT_DEBUG_REPORT_CHANGED:
-				if (!IsInteractive()) {
-					Terminating();
-					QuitSession(true);
-				}
-				break;
-
 		}
 	}
 }

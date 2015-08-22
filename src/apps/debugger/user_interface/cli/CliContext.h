@@ -1,6 +1,6 @@
 /*
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef CLI_CONTEXT_H
@@ -56,9 +56,6 @@ public:
 			void				Terminating();
 
 			bool				IsTerminating() const	{ return fTerminating; }
-
-			bool				IsInteractive() const	{ return fInteractive; }
-			void				SetInteractive(bool interactive);
 
 			// service methods for the input loop thread follow
 
@@ -150,7 +147,6 @@ private:
 			uint32				fInputLoopWaitingForEvents;
 			uint32				fEventsOccurred;
 			bool				fInputLoopWaiting;
-			bool				fInteractive;
 	volatile bool				fTerminating;
 
 			Thread*				fCurrentThread;
