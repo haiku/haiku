@@ -14,6 +14,8 @@ RemotePackageRepository HaikuPorts
 	droid-113-1
 	flare_x86_data-0.19-3
 	freedroidrpg_x86_data-0.15.1-1
+	gws-0.1.8-1
+	haikuporter-1.0.0-1
 	hub-1.12.4-1
 	openttd_gfx-0.4.7-1
 	openttd_msx-0.3.1-1
@@ -1030,6 +1032,7 @@ RemotePackageRepository HaikuPorts
 	gutenprint
 	gyp
 	gzip
+	haikuporter
 	haikuwebkit_x86
 	harfbuzz_x86
 	help2man
