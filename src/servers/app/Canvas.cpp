@@ -246,7 +246,7 @@ Canvas::BlendLayer(Layer* layer)
 	fDrawState->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
 	fDrawState->SetTransformEnabled(false);
 
-	AlphaMask* mask = new AlphaMask(layer->Opacity());
+	AlphaMask* mask = new UniformAlphaMask(layer->Opacity());
 	if (mask == NULL) {
 		layerBitmap->ReleaseReference();
 		return;

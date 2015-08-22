@@ -280,6 +280,7 @@ Painter::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
 	// and messed up the state. For other graphics state changes, the
 	// Painter methods are used directly, so this function is much less
 	// speed critical than it used to be.
+
 	SetTransform(state->CombinedTransform(), xOffset, yOffset);
 
 	SetPenSize(state->PenSize());
@@ -289,7 +290,7 @@ Painter::SetDrawState(const DrawState* state, int32 xOffset, int32 yOffset)
 	fSubpixelPrecise = state->SubPixelPrecise();
 
 	if (state->GetAlphaMask() != NULL) {
-		fMaskedUnpackedScanline = state->GetAlphaMask()->Generate();
+		fMaskedUnpackedScanline = state->GetAlphaMask()->Scanline();
 		fClippedAlphaMask = state->GetAlphaMask()->Mask();
 	} else {
 		fMaskedUnpackedScanline = NULL;

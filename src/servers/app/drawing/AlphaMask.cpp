@@ -15,222 +15,73 @@
 #include "BitmapManager.h"
 #include "Canvas.h"
 #include "DrawingEngine.h"
+#include "PictureBoundingBoxPlayer.h"
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
+#include "Shape.h"
 
 
-AlphaMask::AlphaMask(ServerPicture* picture, bool inverse, BPoint origin,
-		const DrawState& drawState)
+// #pragma mark - AlphaMask
+
+
+AlphaMask::AlphaMask(AlphaMask* previousMask, bool inverse)
 	:
-	fPreviousMask(NULL),
-
-	fPicture(picture),
+	fPreviousMask(previousMask),
+	fBounds(),
+	fViewOrigin(),
 	fInverse(inverse),
-	fOrigin(origin),
 	fBackgroundOpacity(0),
-	fDrawState(drawState),
-
-	fViewBounds(),
-	fViewOffset(),
-
-	fCachedBitmap(NULL),
-	fCachedBounds(),
-	fCachedOffset(),
-
+	fBits(NULL),
 	fBuffer(),
-	fCachedMask(),
-	fScanline(fCachedMask)
+	fMask(),
+	fScanline(fMask)
 {
-	fPicture->AcquireReference();
 }
 
 
 AlphaMask::AlphaMask(uint8 backgroundOpacity)
 	:
-	fPreviousMask(NULL),
-
-	fPicture(NULL),
+	fPreviousMask(),
+	fBounds(),
+	fViewOrigin(),
 	fInverse(false),
-	fOrigin(0, 0),
 	fBackgroundOpacity(backgroundOpacity),
-	fDrawState(),
-
-	fViewBounds(),
-	fViewOffset(),
-
-	fCachedBitmap(NULL),
-	fCachedBounds(),
-	fCachedOffset(),
-
+	fBits(NULL),
 	fBuffer(),
-	fCachedMask(),
-	fScanline(fCachedMask)
+	fMask(),
+	fScanline(fMask)
 {
 }
 
 
 AlphaMask::~AlphaMask()
 {
-	if (fPicture != NULL)
-		fPicture->ReleaseReference();
-	delete[] fCachedBitmap;
-	SetPrevious(NULL);
+	delete[] fBits;
 }
 
 
-void
-AlphaMask::Update(BRect bounds, BPoint offset)
+IntPoint
+AlphaMask::SetViewOrigin(IntPoint viewOrigin)
 {
-	fViewBounds = bounds;
-	fViewOffset = offset;
+	if (viewOrigin == fViewOrigin)
+		return fViewOrigin;
 
-	if (fPreviousMask != NULL)
-		fPreviousMask->Update(bounds, offset);
-}
+	IntPoint oldOrigin = fViewOrigin;
+	fViewOrigin = viewOrigin;
 
-
-BPoint
-AlphaMask::Update(BPoint offset)
-{
-	BPoint oldOffset = fViewOffset;
-	fViewOffset = offset;
-
-	if (oldOffset == fCachedOffset && fCachedBitmap != NULL) {
-		// No need to redraw the picture when only the offset is shifted
-		fCachedOffset = offset;
-		_AttachMaskToBuffer();
-	}
-
-	if (fPreviousMask != NULL)
-		fPreviousMask->Update(offset);
-
-	return oldOffset;
-}
-
-
-void
-AlphaMask::SetPrevious(AlphaMask* mask)
-{
-	// Since multiple DrawStates can point to the same AlphaMask,
-	// don't accept ourself as the "previous" mask on the state stack.
-	if (mask == this || mask == fPreviousMask)
-		return;
-
-	if (mask != NULL)
-		mask->AcquireReference();
-	if (fPreviousMask != NULL)
-		fPreviousMask->ReleaseReference();
-	fPreviousMask = mask;
-}
-
-
-scanline_unpacked_masked_type*
-AlphaMask::Generate()
-{
-	if (fPicture == NULL) {
-		fBuffer.attach(NULL, 0, 0, 0);
-		_AttachMaskToBuffer();
-		return &fScanline;
-	}
-
-	if (!fViewBounds.IsValid())
-		return NULL;
-
-	// See if a cached bitmap can be used. Don't use it when the view offset
-	// or bounds have changed.
-	if (fCachedBitmap != NULL
-		&& fViewBounds == fCachedBounds && fViewOffset == fCachedOffset) {
-		return &fScanline;
-	}
-
-	uint32 width = fViewBounds.IntegerWidth() + 1;
-	uint32 height = fViewBounds.IntegerHeight() + 1;
-
-	if (fViewBounds != fCachedBounds || fCachedBitmap == NULL) {
-		delete[] fCachedBitmap;
-		fCachedBitmap = new(std::nothrow) uint8[width * height];
-	}
-
-	// If rendering the picture fails, we will draw without any clipping.
-	ServerBitmap* bitmap = _RenderPicture();
-	if (bitmap == NULL || fCachedBitmap == NULL) {
-		fBuffer.attach(NULL, 0, 0, 0);
-		return NULL;
-	}
-
-	uint8* bits = bitmap->Bits();
-	uint32 bytesPerRow = bitmap->BytesPerRow();
-	uint8* row = bits;
-	uint8* pixel = fCachedBitmap;
-
-	// Let any previous masks also regenerate themselves. Updating the cached
-	// mask bitmap is only necessary after the view size changed or the
-	// scrolling offset, which definitely affects any masks of lower states
-	// as well, so it works recursively until the bottom mask is regenerated.
-	bool transferBitmap = true;
-	if (fPreviousMask != NULL) {
-		fPreviousMask->Generate();
-		if (fPreviousMask->fCachedBitmap != NULL) {
-			uint8* previousBits = fPreviousMask->fCachedBitmap;
-			for (uint32 y = 0; y < height; y++) {
-				for (uint32 x = 0; x < width; x++) {
-					if (previousBits[0] != 0) {
-						if (fInverse)
-							pixel[0] = 255 - row[3];
-						else
-							pixel[0] = row[3];
-						pixel[0] = pixel[0] * previousBits[0] / 255;
-					} else
-						pixel[0] = 0;
-					previousBits++;
-					pixel++;
-					row += 4;
-				}
-				bits += bytesPerRow;
-				row = bits;
-			}
-			transferBitmap = false;
-		}
-	}
-
-	if (transferBitmap) {
-		for (uint32 y = 0; y < height; y++) {
-			for (uint32 x = 0; x < width; x++) {
-				if (fInverse)
-					pixel[0] = 255 - row[3];
-				else
-					pixel[0] = row[3];
-				pixel++;
-				row += 4;
-			}
-			bits += bytesPerRow;
-			row = bits;
-		}
-	}
-
-	bitmap->ReleaseReference();
-
-	fCachedBounds = fViewBounds;
-	fCachedOffset = fViewOffset;
-
-	fBuffer.attach(fCachedBitmap, width, height, width);
 	_AttachMaskToBuffer();
 
-	return &fScanline;
-}
+	if (fPreviousMask != NULL)
+		fPreviousMask->SetViewOrigin(viewOrigin);
 
-
-agg::clipped_alpha_mask*
-AlphaMask::Mask()
-{
-	return &fCachedMask;
+	return oldOrigin;
 }
 
 
 ServerBitmap*
-AlphaMask::_RenderPicture() const
+AlphaMask::_CreateTemporaryBitmap(BRect bounds) const
 {
-	UtilityBitmap* bitmap = new(std::nothrow) UtilityBitmap(fViewBounds,
+	UtilityBitmap* bitmap = new(std::nothrow) UtilityBitmap(bounds,
 		B_RGBA32, 0);
 	if (bitmap == NULL)
 		return NULL;
@@ -240,34 +91,67 @@ AlphaMask::_RenderPicture() const
 		return NULL;
 	}
 
-	// Clear the bitmap with the transparent color
 	memset(bitmap->Bits(), fBackgroundOpacity, bitmap->BitsLength());
 
-	// Render the picture to the bitmap
-	BitmapHWInterface interface(bitmap);
-	DrawingEngine* engine = interface.CreateDrawingEngine();
-	if (engine == NULL) {
-		delete bitmap;
-		return NULL;
-	}
-
-	OffscreenCanvas canvas(engine, fDrawState);
-	canvas.PushState();
-
-	if (engine->LockParallelAccess()) {
-		// FIXME ConstrainClippingRegion docs says passing NULL disables
-		// all clipping. This doesn't work and will crash in Painter.
-		BRegion clipping;
-		clipping.Include(fViewBounds);
-		engine->ConstrainClippingRegion(&clipping);
-		fPicture->Play(&canvas);
-		engine->UnlockParallelAccess();
-	}
-
-	canvas.PopState();
-	delete engine;
-
 	return bitmap;
+}
+
+
+void
+AlphaMask::_Generate()
+{
+	ServerBitmap* const bitmap = _RenderSource();
+	BReference<ServerBitmap> bitmapRef(bitmap, true);
+	if (bitmap == NULL) {
+		_SetNoClipping();
+		return;
+	}
+
+	const int32 width = fBounds.IntegerWidth() + 1;
+	const int32 height = fBounds.IntegerHeight() + 1;
+
+	delete[] fBits;
+	fBits = new(std::nothrow) uint8[width * height];
+
+	uint8* source = bitmap->Bits();
+	uint8* destination = fBits;
+	uint32 numPixels = width * height;
+
+	if (fPreviousMask != NULL) {
+		int32 previousStartX = fBounds.left - fPreviousMask->fBounds.left;
+		int32 previousStartY = fBounds.top - fPreviousMask->fBounds.top;
+		if (previousStartX < 0)
+			previousStartX = 0;
+		if (previousStartY < 0)
+			previousStartY = 0;
+
+		for (int32 y = previousStartY; y < previousStartY + height; y++) {
+			uint8* previousRow = fPreviousMask->fBuffer.row_ptr(y);
+			for (int32 x = previousStartX; x < previousStartX + width; x++) {
+				uint8 sourceAlpha = fInverse ? 255 - source[3] : source[3];
+				*destination = sourceAlpha * previousRow[x] / 255;
+				destination++;
+				source += 4;
+			}
+		}
+	} else {
+		while (numPixels--) {
+			*destination = fInverse ? 255 - source[3] : source[3];
+			destination++;
+			source += 4;
+		}
+	}
+
+	fBuffer.attach(fBits, width, height, width);
+	_AttachMaskToBuffer();
+}
+
+
+void
+AlphaMask::_SetNoClipping()
+{
+	fBuffer.attach(NULL, 0, 0, 0);
+	_AttachMaskToBuffer();
 }
 
 
@@ -277,6 +161,202 @@ AlphaMask::_AttachMaskToBuffer()
 	uint8 outsideOpacity = fInverse ? 255 - fBackgroundOpacity
 		: fBackgroundOpacity;
 
-	fCachedMask.attach(fBuffer, fViewOffset.x + fOrigin.x,
-		fViewOffset.y + fOrigin.y, outsideOpacity);
+	AlphaMask* previousMask = fPreviousMask;
+	while (previousMask != NULL && outsideOpacity != 0) {
+		uint8 previousOutsideOpacity = previousMask->fInverse
+			? 255 - previousMask->fBackgroundOpacity
+			: previousMask->fBackgroundOpacity;
+		outsideOpacity = outsideOpacity * previousOutsideOpacity / 255;
+		previousMask = previousMask->fPreviousMask;
+	}
+
+	const IntPoint maskOffset = _Offset();
+	const int32 offsetX = fBounds.left + maskOffset.x + fViewOrigin.x;
+	const int32 offsetY = fBounds.top + maskOffset.y + fViewOrigin.y;
+
+	fMask.attach(fBuffer, offsetX, offsetY, outsideOpacity);
+}
+
+
+// #pragma mark - UniformAlphaMask
+
+
+UniformAlphaMask::UniformAlphaMask(uint8 opacity)
+	:
+	AlphaMask(opacity)
+{
+	fBounds.Set(0, 0, 0, 0);
+	_SetNoClipping();
+}
+
+
+ServerBitmap*
+UniformAlphaMask::_RenderSource()
+{
+	return NULL;
+}
+
+
+IntPoint
+UniformAlphaMask::_Offset()
+{
+	return IntPoint(0, 0);
+}
+
+
+// #pragma mark - VectorAlphaMask
+
+
+template<class VectorMaskType>
+VectorAlphaMask<VectorMaskType>::VectorAlphaMask(AlphaMask* previousMask,
+	BPoint where, bool inverse)
+	:
+	AlphaMask(previousMask, inverse),
+	fWhere(where)
+{
+}
+
+
+template<class VectorMaskType>
+ServerBitmap*
+VectorAlphaMask<VectorMaskType>::_RenderSource()
+{
+	fBounds = static_cast<VectorMaskType*>(this)->DetermineBoundingBox();
+	if (fPreviousMask != NULL)
+		fBounds = fBounds & fPreviousMask->fBounds;
+	if (!fBounds.IsValid())
+		return NULL;
+
+	ServerBitmap* bitmap = _CreateTemporaryBitmap(fBounds);
+	if (bitmap == NULL)
+		return NULL;
+
+	// Render the picture to the bitmap
+	BitmapHWInterface interface(bitmap);
+	DrawingEngine* engine = interface.CreateDrawingEngine();
+	if (engine == NULL) {
+		bitmap->ReleaseReference();
+		return NULL;
+	}
+	engine->SetRendererOffset(fBounds.left, fBounds.top);
+
+	OffscreenCanvas canvas(engine,
+		static_cast<VectorMaskType*>(this)->GetDrawState());
+
+	DrawState* const drawState = canvas.CurrentState();
+	drawState->SetDrawingMode(B_OP_ALPHA);
+	drawState->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
+	drawState->SetDrawingModeLocked(true);
+	canvas.PushState();
+
+	if (engine->LockParallelAccess()) {
+		BRegion clipping;
+		clipping.Set((clipping_rect)fBounds);
+		engine->ConstrainClippingRegion(&clipping);
+		static_cast<VectorMaskType*>(this)->DrawVectors(&canvas);
+		engine->UnlockParallelAccess();
+	}
+
+	delete engine;
+
+	return bitmap;
+}
+
+
+template<class VectorMaskType>
+IntPoint
+VectorAlphaMask<VectorMaskType>::_Offset()
+{
+	return fWhere;
+}
+
+
+
+// #pragma mark - PictureAlphaMask
+
+
+PictureAlphaMask::PictureAlphaMask(AlphaMask* previousMask,
+	ServerPicture* picture, const DrawState& drawState, BPoint where,
+	bool inverse)
+	:
+	VectorAlphaMask<PictureAlphaMask>(previousMask, where, inverse),
+	fPicture(picture),
+	fDrawState(new DrawState(drawState))
+{
+	_Generate();
+}
+
+
+PictureAlphaMask::~PictureAlphaMask()
+{
+	delete fDrawState;
+}
+
+
+void
+PictureAlphaMask::DrawVectors(Canvas* canvas)
+{
+	fPicture->Play(canvas);
+}
+
+
+BRect
+PictureAlphaMask::DetermineBoundingBox() const
+{
+	BRect boundingBox;
+	PictureBoundingBoxPlayer::Play(fPicture, fDrawState, &boundingBox);
+
+	if (!boundingBox.IsValid())
+		return boundingBox;
+
+	// Round up and add an additional 2 pixels on the bottom/right to
+	// compensate for the various types of rounding used in Painter.
+	boundingBox.left = floorf(boundingBox.left);
+	boundingBox.right = ceilf(boundingBox.right) + 2;
+	boundingBox.top = floorf(boundingBox.top);
+	boundingBox.bottom = ceilf(boundingBox.bottom) + 2;
+
+	return boundingBox;
+}
+
+
+const DrawState&
+PictureAlphaMask::GetDrawState() const
+{
+	return *fDrawState;
+}
+
+
+// #pragma mark - ShapeAlphaMask
+
+
+ShapeAlphaMask::ShapeAlphaMask(AlphaMask* previousMask,  BPoint where,
+	bool inverse)
+	:
+	VectorAlphaMask<ShapeAlphaMask>(previousMask, where, inverse),
+	fDrawState()
+{
+	_Generate();
+}
+
+
+void
+ShapeAlphaMask::DrawVectors(Canvas* canvas)
+{
+	// TODO
+}
+
+
+BRect
+ShapeAlphaMask::DetermineBoundingBox() const
+{
+	// TODO
+	return BRect(0, 0, 0, 0);
+}
+
+
+const DrawState&
+ShapeAlphaMask::GetDrawState() const
+{
+	return fDrawState;
 }

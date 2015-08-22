@@ -1942,11 +1942,13 @@ fDesktop->LockSingleWindow();
 			if (picture == NULL)
 				break;
 
-			AlphaMask* mask = new(std::nothrow) AlphaMask(
-				picture, inverse, where, *fCurrentView->CurrentState());
+			AlphaMask* const mask = new PictureAlphaMask(
+				fCurrentView->GetAlphaMask(), picture,
+				*fCurrentView->CurrentState(), where, inverse);
 			fCurrentView->SetAlphaMask(mask);
 			if (mask != NULL)
 				mask->ReleaseReference();
+
 			_UpdateDrawState(fCurrentView);
 
 			picture->ReleaseReference();
@@ -3812,7 +3814,7 @@ ServerWindow::_UpdateDrawState(View* view)
 		BPoint leftTop(0, 0);
 		if (view->GetAlphaMask() != NULL) {
 			view->LocalToScreenTransform().Apply(&leftTop);
- 			view->GetAlphaMask()->Update(view->Bounds(), leftTop);
+			view->GetAlphaMask()->SetViewOrigin(leftTop);
 			leftTop = BPoint(0, 0);
 		}
 		view->PenToScreenTransform().Apply(&leftTop);

@@ -17,6 +17,7 @@
 #include <GraphicsDefs.h>
 #include <InterfaceDefs.h>
 #include <Point.h>
+#include <Referenceable.h>
 #include <View.h>
 
 #include "ServerFont.h"
@@ -70,7 +71,7 @@ public:
 								{ return fCombinedTransform; }
 		void				SetTransformEnabled(bool enabled);
 
-		DrawState*			Squash();
+		DrawState*			Squash() const;
 
 							// additional clipping as requested by client
 		void				SetClippingRegion(const BRegion* region);
@@ -166,7 +167,7 @@ protected:
 
 		BRegion*			fClippingRegion;
 
-		AlphaMask*			fAlphaMask;
+		BReference<AlphaMask> fAlphaMask;
 
 		rgb_color			fHighColor;
 		rgb_color			fLowColor;

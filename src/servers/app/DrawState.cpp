@@ -110,8 +110,6 @@ DrawState::~DrawState()
 {
 	delete fClippingRegion;
 	delete fPreviousState;
-	if (fAlphaMask != NULL)
-		fAlphaMask->ReleaseReference();
 }
 
 
@@ -389,15 +387,10 @@ DrawState::SetTransformEnabled(bool enabled)
 
 
 DrawState*
-DrawState::Squash()
+DrawState::Squash() const
 {
 	DrawState* const squashedState = new DrawState(*this);
-
-	squashedState->fOrigin = fCombinedOrigin;
-	squashedState->fScale = fCombinedScale;
-	squashedState->fTransform = fCombinedTransform;
-
-	return squashedState;
+	return squashedState->PushState();
 }
 
 
@@ -461,24 +454,14 @@ DrawState::SetAlphaMask(AlphaMask* mask)
 {
 	// NOTE: In BeOS, it wasn't possible to clip to a BPicture and keep
 	// regular custom clipping to a BRegion at the same time.
-	if (fAlphaMask == mask)
-		return;
-
-	if (mask != NULL)
-		mask->AcquireReference();
-	if (fAlphaMask != NULL)
-		fAlphaMask->ReleaseReference();
-	fAlphaMask = mask;
-	if (fAlphaMask != NULL && fPreviousState != NULL)
-		fAlphaMask->SetPrevious(fPreviousState->fAlphaMask);
-
+	fAlphaMask.SetTo(mask);
 }
 
 
 AlphaMask*
 DrawState::GetAlphaMask() const
 {
-	return fAlphaMask;
+	return fAlphaMask.Get();
 }
 
 

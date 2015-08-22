@@ -121,10 +121,10 @@ Layer::RenderToBitmap(Canvas* canvas)
 	LayerCanvas layerCanvas(layerEngine, canvas->CurrentState());
 
 	AlphaMask* const mask = layerCanvas.GetAlphaMask();
-	BPoint oldOffset;
+	IntPoint oldOffset;
 	if (mask != NULL) {
 		// Move alpha mask to bitmap origin
-		oldOffset = mask->Update(BPoint(0, 0));
+		oldOffset = mask->SetViewOrigin(IntPoint(0, 0));
 	}
 
 	canvas->CurrentState()->SetDrawingMode(B_OP_ALPHA);
@@ -147,7 +147,7 @@ Layer::RenderToBitmap(Canvas* canvas)
 		// Note: this needs to be adapted if setting alpha masks is
 		// implemented as BPicture command (the mask now might be a different
 		// one than before).
-		mask->Update(oldOffset);
+		mask->SetViewOrigin(oldOffset);
 		layerCanvas.ResyncDrawState();
 	}
 
