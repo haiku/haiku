@@ -1,10 +1,10 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the OpenBeOS distribution and is covered
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 /*!
 	\file RegistrarThreadManager.h
-	RegistrarThreadManager interface declaration 
+	RegistrarThreadManager interface declaration
 */
 
 #ifndef REGISTRAR_THREAD_MANAGER_H
@@ -21,7 +21,7 @@ class RegistrarThreadManager : public BHandler {
 public:
 	RegistrarThreadManager();
 	~RegistrarThreadManager();
-	
+
 	// BHandler virtuals
 	virtual	void MessageReceived(BMessage* message);
 
@@ -30,14 +30,15 @@ public:
 	status_t CleanupThreads();
 	status_t ShutdownThreads();
 	status_t KillThreads();
-	
+
 	uint ThreadCount() const;
-	
+
 	static const int kThreadLimit = 12;
 private:
 
-	std::list<RegistrarThread*>::iterator& RemoveThread(std::list<RegistrarThread*>::iterator &i);
-	
+	std::list<RegistrarThread*>::iterator&
+		RemoveThread(std::list<RegistrarThread*>::iterator &i);
+
 	std::list<RegistrarThread*> fThreads;
 	int32 fThreadCount;
 };
