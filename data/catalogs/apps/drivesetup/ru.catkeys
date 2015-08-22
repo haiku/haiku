@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-DriveSetup	1450212098
+1	russian	x-vnd.Haiku-DriveSetup	2321187933
 DriveSetup	System name		Разметка диска
 Could not acquire partitioning information.	MainWindow		Невозможно получить информацию о разделах.
 Cancel	AbstractParametersPanel		Отмена
@@ -44,6 +44,7 @@ Change	ChangeParametersPanel		Изменить
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите записать изменения на диск прямо сейчас?\n\nВсе данные на диске %s будут безвозвратно потеряны, если вы продолжите!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Вы уверены, что хотите удалить выбранный раздел?\n\nВсе данные на этом разделе будут безвозвратно потеряны, если вы продолжите!
 Create…	MainWindow		Создать…
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Вы уверены, что хотите отформатировать весь диск? (Обычно на диске сначала создаются разделы) Повторный запрос будет выдан непосредственно перед записью изменений на диск.
 The disk has been successfully initialized.\n	MainWindow		Диск был успешно инициализирован.\n
 Could not unmount partition %s.	MainWindow		Невозможно отключить раздел %s.
 Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Не удалось изменить параметры раздела. Изменения не были записаны на диск.

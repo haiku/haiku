@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-MAIL	233997769
+1	polish	x-vnd.Be-MAIL	1310033600
 View	Mail		Widok
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Dołączaj atrybuty:
@@ -146,6 +146,7 @@ Open attachment	Mail		Otwórz załącznik
 sent	B_USER_DIRECTORY/mail/sent		sent
 (Date unavailable)	Mail		(Data niedostępna)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Umieść swoje ulubione zapytania wiadomości i szablony zapytań w tym katalogu.
+Spam	Mail		Spam
 Reply	Mail		Odpowiedz
 From:	Mail		Od:
 Couldn't open this signature. Sorry.	Mail		Nie można otworzyć tej sygnaturki. Przepraszamy.

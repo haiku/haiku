@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	233997769
+1	hungarian	x-vnd.Be-MAIL	1310033600
 View	Mail		Nézet
 %d - Date	Mail		%d - dátum
 Attach attributes:	Mail		Jellemzők csatolása:
@@ -146,6 +146,7 @@ Open attachment	Mail		Megnyitás
 sent	B_USER_DIRECTORY/mail/sent		Elküldött
 (Date unavailable)	Mail		(A dátum nem elérhető)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Helyezze a kedvenc lekérdezéseket és a lekérdezési sablonokat ebbe a mappába.
+Spam	Mail		Levélszemét
 Reply	Mail		Válasz
 From:	Mail		Feladó:
 Couldn't open this signature. Sorry.	Mail		Sajnálom, de nem nyitható meg ez az aláírás.

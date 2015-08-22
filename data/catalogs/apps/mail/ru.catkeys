@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	233997769
+1	russian	x-vnd.Be-MAIL	1310033600
 View	Mail		Вид
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
@@ -146,6 +146,7 @@ Open attachment	Mail		Открыть вложение
 sent	B_USER_DIRECTORY/mail/sent		Отправленные
 (Date unavailable)	Mail		(Дата недоступна)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Перенесите в эту папку ваши почтовые запросы.
+Spam	Mail		Спам
 Reply	Mail		Ответить
 From:	Mail		От:
 Couldn't open this signature. Sorry.	Mail		Невозможно открыть эту подпись. Извините.
