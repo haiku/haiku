@@ -50,12 +50,12 @@ typedef PictureBoundingBoxPlayer::State BoundingBoxState;
 
 class PictureBoundingBoxPlayer::State {
 public:
-	State(DrawState* drawState, BRect* boundingBox)
+	State(const DrawState* drawState, BRect* boundingBox)
 		:
 		fDrawState(drawState->Squash()),
 		fBoundingBox(boundingBox)
 	{
-		fBoundingBox->Set(INT_MAX, INT_MAX, 0, 0);
+		fBoundingBox->Set(INT_MAX, INT_MAX, INT_MIN, INT_MIN);
 	}
 
 	~State()
@@ -97,7 +97,7 @@ public:
 private:
 	void _AffineTransformRect(BRect& rect)
 	{
-		BAffineTransform transform = fDrawState->Transform();
+		BAffineTransform transform = fDrawState->CombinedTransform();
 		if (transform.IsIdentity())
 			return;
 
@@ -111,8 +111,8 @@ private:
 
 		float minX = INT_MAX;
 		float minY = INT_MAX;
-		float maxX = 0;
-		float maxY = 0;
+		float maxX = INT_MIN;
+		float maxY = INT_MIN;
 
 		for (uint32 i = 0; i < 4; i++) {
 			if (transformedShape[i].x < minX)
@@ -776,7 +776,7 @@ const static void* kTableEntries[] = {
 
 /* static */ void
 PictureBoundingBoxPlayer::Play(ServerPicture* picture,
-	DrawState* drawState, BRect* outBoundingBox)
+	const DrawState* drawState, BRect* outBoundingBox)
 {
 	State state(drawState, outBoundingBox);
 

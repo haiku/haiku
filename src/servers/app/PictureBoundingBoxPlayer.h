@@ -20,7 +20,7 @@ public:
 
 public:
 	static	void				Play(ServerPicture* picture,
-									DrawState* drawState,
+									const DrawState* drawState,
 									BRect* outBoundingBox);
 };
 
