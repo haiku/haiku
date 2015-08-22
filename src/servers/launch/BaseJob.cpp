@@ -172,7 +172,7 @@ BaseJob::GetSourceFilesEnvironment(BStringList& environment)
 {
 	int32 count = fSourceFiles.CountStrings();
 	for (int32 index = 0; index < count; index++) {
-		_GetSourceFileEnvironment(fSourceFiles.StringAt(index), fEnvironment);
+		_GetSourceFileEnvironment(fSourceFiles.StringAt(index), environment);
 	}
 }
 
