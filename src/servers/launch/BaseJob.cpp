@@ -151,7 +151,7 @@ BaseJob::SetEnvironment(const BMessage& message)
 		}
 
 		BString variable = name;
-		variable << "='";
+		variable << "=";
 
 		const char* argument;
 		for (int32 argumentIndex = 0; message.FindString(name, argumentIndex,
@@ -160,7 +160,6 @@ BaseJob::SetEnvironment(const BMessage& message)
 				variable << " ";
 			variable += argument;
 		}
-		variable << "'";
 
 		fEnvironment.Add(variable);
 	}
