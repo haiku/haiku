@@ -243,6 +243,9 @@ RegistrarThreadManager::ThreadCount() const
 std::list<RegistrarThread*>::iterator&
 RegistrarThreadManager::RemoveThread(std::list<RegistrarThread*>::iterator &i)
 {
+	status_t dummy;
+	wait_for_thread((*i)->Id(), &dummy);
+
 	delete *i;
 	atomic_add(&fThreadCount, -1);
 	return (i = fThreads.erase(i));
