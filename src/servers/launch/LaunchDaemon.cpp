@@ -1262,13 +1262,10 @@ void
 LaunchDaemon::_SetupEnvironment()
 {
 	// Determine safemode kernel option
-	BString safemode = "SAFEMODE=";
-	safemode << (IsSafeMode() ? "yes" : "no");
-
-	putenv(safemode.String());
+	setenv("SAFEMODE", IsSafeMode() ? "yes" : "no", true);
 
 	// Default locale settings
-	putenv("LC_TYPE=en_US.UTF-8");
+	setenv("LC_TYPE", "en_US.UTF-8", true);
 }
 
 
