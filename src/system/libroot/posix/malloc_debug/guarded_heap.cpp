@@ -163,7 +163,8 @@ struct guarded_heap_page {
 	size_t				allocation_size;
 	void*				allocation_base;
 	size_t				alignment;
-	thread_id			thread;
+	thread_id			allocating_thread;
+	thread_id			freeing_thread;
 	list_link			free_list_link;
 	size_t				alloc_stack_trace_depth;
 	size_t				free_stack_trace_depth;
@@ -316,7 +317,8 @@ guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 		guarded_heap_page& page = area.pages[startPageIndex + i];
 		page.flags = GUARDED_HEAP_PAGE_FLAG_USED;
 		if (i == 0) {
-			page.thread = find_thread(NULL);
+			page.allocating_thread = find_thread(NULL);
+			page.freeing_thread = -1;
 			page.allocation_size = allocationSize;
 			page.allocation_base = allocationBase;
 			page.alignment = alignment;
@@ -326,7 +328,8 @@ guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 			page.free_stack_trace_depth = 0;
 			firstPage = &page;
 		} else {
-			page.thread = firstPage->thread;
+			page.allocating_thread = firstPage->allocating_thread;
+			page.freeing_thread = -1;
 			page.allocation_size = allocationSize;
 			page.allocation_base = allocationBase;
 			page.alignment = alignment;
@@ -358,7 +361,7 @@ guarded_heap_free_page(guarded_heap_area& area, size_t pageIndex,
 	else
 		page.flags |= GUARDED_HEAP_PAGE_FLAG_DEAD;
 
-	page.thread = find_thread(NULL);
+	page.freeing_thread = find_thread(NULL);
 
 	list_add_item(&area.free_list, &page);
 
@@ -525,7 +528,8 @@ guarded_heap_allocate_with_area(size_t size, size_t alignment)
 	page->allocation_base = (void*)(((addr_t)address
 		+ pagesNeeded * B_PAGE_SIZE - size) & ~(alignment - 1));
 	page->alignment = alignment;
-	page->thread = find_thread(NULL);
+	page->allocating_thread = find_thread(NULL);
+	page->freeing_thread = -1;
 	page->alloc_stack_trace_depth = guarded_heap_fill_stack_trace(
 		page->stack_trace, sStackTraceDepth, 2);
 	page->free_stack_trace_depth = 0;
@@ -811,7 +815,8 @@ dump_guarded_heap_page(guarded_heap_page& page)
 	printf("allocation size: %" B_PRIuSIZE "\n", page.allocation_size);
 	printf("allocation base: %p\n", page.allocation_base);
 	printf("alignment: %" B_PRIuSIZE "\n", page.alignment);
-	printf("allocating thread: %" B_PRId32 "\n", page.thread);
+	printf("allocating thread: %" B_PRId32 "\n", page.allocating_thread);
+	printf("freeing thread: %" B_PRId32 "\n", page.freeing_thread);
 }
 
 
@@ -862,9 +867,10 @@ dump_guarded_heap_page(void* address, bool doPanic)
 			panic("thread %" B_PRId32 " tried accessing address %p which is " \
 				state " (base: 0x%" B_PRIxADDR ", size: %" B_PRIuSIZE \
 				", alignment: %" B_PRIuSIZE ", allocated by thread: %" \
-				B_PRId32 ")", find_thread(NULL), address, \
-				page.allocation_base, page.allocation_size, page.alignment, \
-				page.thread)
+				B_PRId32 ", freed by thread: %" B_PRId32 ")", \
+				find_thread(NULL), address, page.allocation_base, \
+				page.allocation_size, page.alignment, page.allocating_thread, \
+				page.freeing_thread)
 
 		if ((page.flags & GUARDED_HEAP_PAGE_FLAG_USED) == 0)
 			DO_PANIC("not allocated");
@@ -980,7 +986,7 @@ dump_allocations(guarded_heap& heap, bool statsOnly, thread_id thread)
 				continue;
 			}
 
-			if (thread >= 0 && thread != page.thread)
+			if (thread >= 0 && thread != page.allocating_thread)
 				continue;
 
 			allocationCount++;
@@ -991,8 +997,8 @@ dump_allocations(guarded_heap& heap, bool statsOnly, thread_id thread)
 
 			print_stdout("allocation: base: %p; size: %" B_PRIuSIZE
 				"; thread: %" B_PRId32 "; alignment: %" B_PRIuSIZE "\n",
-				page.allocation_base, page.allocation_size, page.thread,
-				page.alignment);
+				page.allocation_base, page.allocation_size,
+				page.allocating_thread, page.alignment);
 
 			guarded_heap_print_stack_trace(page.stack_trace,
 				page.alloc_stack_trace_depth);
