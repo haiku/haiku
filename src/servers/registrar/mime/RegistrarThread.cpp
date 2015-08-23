@@ -41,7 +41,7 @@ RegistrarThread::RegistrarThread(const char *name, int32 priority,
 	fName[0] = 0;
 	status_t err = name && fManagerMessenger.IsValid() ? B_OK : B_BAD_VALUE;
 	if (err == B_OK)
-		strcpy(fName, name);
+		strlcpy(fName, name, sizeof(fName));
 	fStatus = err;
 }
 
