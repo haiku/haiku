@@ -230,14 +230,14 @@ PowerStatusView::_DrawBattery(BRect rect)
 		SetScale(std::min(Bounds().Width(), Bounds().Height()) / 16);
 
 		static const BPoint points[] = {
-			BPoint(2,13),
-			BPoint(9,5),
-			BPoint(9,7),
-			BPoint(16,2),
-			BPoint(8,11),
-			BPoint(8,9)
+			BPoint(2, 13),
+			BPoint(9, 5),
+			BPoint(9, 7),
+			BPoint(16, 2),
+			BPoint(8, 11),
+			BPoint(8, 9)
 		};
-		FillPolygon(points,6);
+		FillPolygon(points, 6);
 
 		SetScale(1);
 		SetDrawingMode(B_OP_OVER);
