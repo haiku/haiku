@@ -260,14 +260,14 @@ static void
 guarded_heap_print_stack_traces(guarded_heap_page& page)
 {
 	if (page.alloc_stack_trace_depth > 0) {
-		printf("alloc stack trace (%" B_PRIuSIZE "):\n",
+		print_stdout("alloc stack trace (%" B_PRIuSIZE "):\n",
 			page.alloc_stack_trace_depth);
 		guarded_heap_print_stack_trace(page.stack_trace,
 			page.alloc_stack_trace_depth);
 	}
 
 	if (page.free_stack_trace_depth > 0) {
-		printf("free stack trace (%" B_PRIuSIZE "):\n",
+		print_stdout("free stack trace (%" B_PRIuSIZE "):\n",
 			page.free_stack_trace_depth);
 		guarded_heap_print_stack_trace(
 			&page.stack_trace[page.alloc_stack_trace_depth],
