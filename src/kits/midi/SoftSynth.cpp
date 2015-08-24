@@ -14,9 +14,13 @@
 
 #include <MidiRoster.h>
 #include <MidiConsumer.h>
+#include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <Node.h>
+#include <NodeInfo.h>
 #include <Path.h>
+#include <PathFinder.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -100,6 +104,8 @@ BSoftSynth::IsLoaded(void) const
 status_t 
 BSoftSynth::SetDefaultInstrumentsFile()
 {
+	// TODO: Duplicated code, check MidiSettingsView::_LoadSettings() and
+	// MidiSettingsView::_RetrieveSoftSynthList()
 	// We first search for a setting file (or symlink to it)
 	// in the user settings directory
 	char buffer[512];
@@ -112,18 +118,48 @@ BSoftSynth::SetDefaultInstrumentsFile()
 			char soundFont[512];
 			sscanf(buffer, "# Midi Settings\n soundfont = %s\n",
 				soundFont);
-			return SetInstrumentsFile(soundFont);
+			if (SetInstrumentsFile(soundFont) == B_OK)
+				return B_OK;
 		}
 	}
 
-	// TODO: Use the first soundfont found in the synth directory
-	// instead of hardcoding
+	// Try a well-known (and usually present on a default install) soft synth
 	if (find_directory(B_SYNTH_DIRECTORY, &path, false, NULL) == B_OK) {
-		path.Append("TimGM6mb.sf2");
-		return SetInstrumentsFile(path.Path());
+		path.Append("synth/TimGM6mb.sf2");
+		if (SetInstrumentsFile(path.Path()) == B_OK)
+			return B_OK;
 	}
 
-	// TODO: Write the settings file
+	// Just use the first soundfont we find
+	BStringList paths;
+	status_t status = BPathFinder::FindPaths(B_FIND_PATH_DATA_DIRECTORY,
+			"synth", paths);
+
+	if (status != B_OK)
+		return B_ERROR;
+
+	for (int32 i = 0; i < paths.CountStrings(); i++) {
+		BDirectory directory(paths.StringAt(i).String());
+		BEntry entry;
+		if (directory.InitCheck() != B_OK)
+			continue;
+		while (directory.GetNextEntry(&entry) == B_OK) {
+			BNode node(&entry);
+			BNodeInfo nodeInfo(&node);
+			char mimeType[B_MIME_TYPE_LENGTH];
+			// TODO: For some reason the mimetype check fails.
+			// maybe because the file hasn't yet been sniffed and recognized?
+			if (nodeInfo.GetType(mimeType) == B_OK
+				/*&& !strcmp(mimeType, "audio/x-soundfont")*/) {
+				BPath fullPath = paths.StringAt(i).String();
+				fullPath.Append(entry.Name());
+				if (SetInstrumentsFile(fullPath.Path()) == B_OK)
+					return B_OK;
+			}
+		}
+	}
+
+	// TODO: Write the settings file ?
 	
 	return B_ERROR;
 }
