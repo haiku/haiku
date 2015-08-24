@@ -935,13 +935,13 @@ Interface::SetDown()
 	if ((flags & IFF_UP) == 0)
 		return;
 
-	RecursiveLocker interfacesLock(sLock);
+	RecursiveLocker interfacesLocker(sLock);
 
 	if (IsBusy())
 		return;
 
 	SetBusy(true);
-	interfacesLock.Unlock();
+	interfacesLocker.Unlock();
 
 	DatalinkTable::Iterator iterator = fDatalinkTable.GetIterator();
 	while (domain_datalink* datalink = iterator.Next()) {
