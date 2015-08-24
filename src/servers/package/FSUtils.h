@@ -157,7 +157,7 @@ public:
 			else if (index == 0)
 				fPath.Truncate(1);
 			else
-				fPath.Truncate(index - 1);
+				fPath.Truncate(index);
 			return *this;
 		}
 
