@@ -10,8 +10,7 @@ typedef void (*synth_file_hook)(int32 arg);
 
 class BMidiStore;
 
-class BMidiSynthFile : public BMidiSynth
-{
+class BMidiSynthFile : public BMidiSynth {
 public:
 
 	BMidiSynthFile();

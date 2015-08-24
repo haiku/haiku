@@ -9,8 +9,7 @@
 
 class BSynth;
 
-class BMidiSynth : public BMidi
-{
+class BMidiSynth : public BMidi {
 public:
 
 	BMidiSynth(); 

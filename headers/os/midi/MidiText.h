@@ -6,8 +6,7 @@
 #include <Midi.h>
 #include <stdio.h>
 
-class BMidiText : public BMidi 
-{
+class BMidiText : public BMidi {
 public:
 
 	BMidiText();
