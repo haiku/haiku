@@ -91,6 +91,8 @@ MidiSettingsView::MessageReceived(BMessage* message)
 void
 MidiSettingsView::_RetrieveSoftSynthList()
 {
+	// TODO: Duplicated code between here
+	// and BSoftSynth::SetDefaultInstrumentsFile
 	BStringList paths;
 	status_t status = BPathFinder::FindPaths(B_FIND_PATH_DATA_DIRECTORY,
 			"synth", paths);
@@ -108,9 +110,10 @@ MidiSettingsView::_RetrieveSoftSynthList()
 			BNode node(&entry);
 			BNodeInfo nodeInfo(&node);
 			char mimeType[B_MIME_TYPE_LENGTH];
-			// TODO: For some reason this doesn't work
+			// TODO: For some reason the mimetype check fails.
+			// maybe because the file hasn't yet been sniffed and recognized?
 			if (nodeInfo.GetType(mimeType) == B_OK
-					/*&& !strcmp(mimeType, "audio/x-soundfont")*/) {
+				/*&& !strcmp(mimeType, "audio/x-soundfont")*/) {
 				BPath fullPath = paths.StringAt(i).String();
 				fullPath.Append(entry.Name());
 				fListView->AddItem(new BStringItem(fullPath.Path()));
