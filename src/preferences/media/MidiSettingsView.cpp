@@ -37,7 +37,7 @@ MidiSettingsView::MidiSettingsView()
 	SettingsView()
 {
 	BBox* defaultsBox = new BBox("SoundFont");
-	defaultsBox->SetLabel(B_TRANSLATE("SoundFont"));
+	defaultsBox->SetLabel(B_TRANSLATE("Available SoundFonts"));
 	BGridView* defaultsGridView = new BGridView();
 
 	fListView = new BListView(B_SINGLE_SELECTION_LIST);
