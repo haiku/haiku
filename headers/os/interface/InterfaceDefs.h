@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_INTERFACE_DEFS_H
@@ -228,17 +228,17 @@ enum vertical_alignment {
 
 
 enum {
-	B_USE_DEFAULT_SPACING = -2,
-	B_USE_ITEM_SPACING = -3,
-	B_USE_ITEM_INSETS = -3,
-	B_USE_HALF_ITEM_SPACING = -4,
-	B_USE_HALF_ITEM_INSETS = -4,
-	B_USE_WINDOW_INSETS = -5,
-	B_USE_WINDOW_SPACING = -5,
-	B_USE_SMALL_INSETS = -6,
-	B_USE_SMALL_SPACING = -6,
-	B_USE_BIG_INSETS = -7,
-	B_USE_BIG_SPACING = -7
+	B_USE_DEFAULT_SPACING = -1002,
+	B_USE_ITEM_SPACING = -1003,
+	B_USE_ITEM_INSETS = -1003,
+	B_USE_HALF_ITEM_SPACING = -1004,
+	B_USE_HALF_ITEM_INSETS = -1004,
+	B_USE_WINDOW_INSETS = -1005,
+	B_USE_WINDOW_SPACING = -1005,
+	B_USE_SMALL_INSETS = -1006,
+	B_USE_SMALL_SPACING = -1006,
+	B_USE_BIG_INSETS = -1007,
+	B_USE_BIG_SPACING = -1007
 };
 
 
