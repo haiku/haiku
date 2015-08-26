@@ -82,6 +82,13 @@ enum {
 	B_USB_REQUEST_HID_SET_PROTOCOL
 };
 
+// HID Class-specific requests report types
+enum {
+	B_USB_REQUEST_HID_INPUT_REPORT = 0x01,
+	B_USB_REQUEST_HID_OUTPUT_REPORT,
+	B_USB_REQUEST_HID_FEATURE_REPORT
+};
+
 // HID Usage Pages
 enum {
 	B_HID_USAGE_PAGE_GENERIC_DESKTOP = 0x1,
