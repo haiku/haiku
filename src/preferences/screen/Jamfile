@@ -6,7 +6,6 @@ UsePrivateHeaders [ FDirName graphics common ] ;
 UsePrivateHeaders [ FDirName graphics radeon ] ;
 UsePrivateHeaders interface ;
 
-SubDirC++Flags -O0 -g ;
 Preference Screen :
 	AlertWindow.cpp
 	MonitorView.cpp
