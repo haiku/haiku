@@ -2068,7 +2068,7 @@ BRoster::_ResolveApp(const char* inType, entry_ref* ref,
 	}
 
 	// create meta mime
-	if (error == B_OK) {
+	if (!fNoRegistrar && error == B_OK) {
 		BPath path;
 		if (path.SetTo(&appRef) == B_OK)
 			create_app_meta_mime(path.Path(), false, true, false);
@@ -2077,7 +2077,7 @@ BRoster::_ResolveApp(const char* inType, entry_ref* ref,
 	// set the app hint on the type -- but only if the file has the
 	// respective signature, otherwise unset the app hint
 	BAppFileInfo appFileInfo;
-	if (error == B_OK) {
+	if (!fNoRegistrar && error == B_OK) {
 		char signature[B_MIME_TYPE_LENGTH];
 		if (appFileInfo.SetTo(&appFile) == B_OK
 			&& appFileInfo.GetSignature(signature) == B_OK) {
@@ -2481,6 +2481,9 @@ BRoster::_GetFileType(const entry_ref* file, BNodeInfo* nodeInfo,
 	// first try the node info
 	if (nodeInfo->GetType(mimeType) == B_OK)
 		return B_OK;
+
+	if (fNoRegistrar)
+		return B_NO_INIT;
 
 	// Try to update the file's MIME info and just read the updated type.
 	// If that fails, sniff manually.
