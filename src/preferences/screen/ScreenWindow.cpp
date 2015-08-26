@@ -1185,7 +1185,7 @@ void
 ScreenWindow::_CheckApplyEnabled()
 {
 	bool applyEnabled = true;
-	
+
 	if (fSelected == fActive) {
 		applyEnabled = false;
 		if (fAllWorkspacesItem->IsMarked()) {
@@ -1200,7 +1200,7 @@ ScreenWindow::_CheckApplyEnabled()
 			}
 		}
 	}
-	
+
 	fApplyButton->SetEnabled(applyEnabled);
 
 	uint32 columns;
@@ -1336,8 +1336,8 @@ ScreenWindow::_Apply()
 		fActive = fSelected;
 
 		// TODO: only show alert when this is an unknown mode
-		BWindow* window = new AlertWindow(this);
-		window->Show();
+		BAlert* window = new AlertWindow(this);
+		window->Go(NULL);
 	} else {
 		char message[256];
 		snprintf(message, sizeof(message),
