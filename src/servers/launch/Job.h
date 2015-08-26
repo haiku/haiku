@@ -15,6 +15,8 @@
 #include <OS.h>
 #include <StringList.h>
 
+#include <locks.h>
+
 
 using namespace BSupportKit;
 class BMessage;
@@ -68,6 +70,8 @@ public:
 			status_t			Launch();
 			bool				IsLaunched() const;
 
+			status_t			HandleGetLaunchData(BMessage* message);
+
 protected:
 	virtual	status_t			Execute();
 
@@ -78,6 +82,11 @@ private:
 			void				_AddStringList(std::vector<const char*>& array,
 									const BStringList& list);
 
+			void				_SetLaunchStatus(status_t launchStatus);
+
+			status_t			_SendLaunchDataReply(BMessage* message);
+			void				_SendPendingLaunchDataReplies();
+
 private:
 			BStringList			fArguments;
 			BStringList			fRequirements;
@@ -87,8 +96,12 @@ private:
 			PortMap				fPortMap;
 			status_t			fInitStatus;
 			team_id				fTeam;
+			status_t			fLaunchStatus;
+			mutex				fLaunchStatusLock;
 			::Target*			fTarget;
 			::Condition*		fCondition;
+			BObjectList<BMessage>
+								fPendingLaunchDataReplies;
 };
 
 

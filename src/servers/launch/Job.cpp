@@ -27,8 +27,11 @@ Job::Job(const char* name)
 	fCreateDefaultPort(false),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
-	fTarget(NULL)
+	fLaunchStatus(B_NO_INIT),
+	fTarget(NULL),
+	fPendingLaunchDataReplies(0, false)
 {
+	mutex_init(&fLaunchStatusLock, "launch status lock");
 }
 
 
@@ -40,8 +43,12 @@ Job::Job(const Job& other)
 	fCreateDefaultPort(other.CreateDefaultPort()),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
-	fTarget(other.Target())
+	fLaunchStatus(B_NO_INIT),
+	fTarget(other.Target()),
+	fPendingLaunchDataReplies(0, false)
 {
+	mutex_init(&fLaunchStatusLock, "launch status lock");
+
 	fCondition = other.fCondition;
 	// TODO: copy events
 	//fEvent = other.fEvent;
@@ -343,16 +350,21 @@ Job::Launch()
 		// Launch by signature
 		BString signature("application/");
 		signature << Name();
-		return BRoster::Private().Launch(signature.String(), NULL, NULL,
-			0, NULL, &environment[0], &fTeam);
+
+		status_t status = BRoster::Private().Launch(signature.String(), NULL,
+			NULL, 0, NULL, &environment[0], &fTeam);
+		_SetLaunchStatus(status);
+		return status;
 	}
 
 	// Build argument vector
 
 	entry_ref ref;
 	status_t status = get_ref_for_path(fArguments.StringAt(0).String(), &ref);
-	if (status != B_OK)
+	if (status != B_OK) {
+		_SetLaunchStatus(status);
 		return status;
+	}
 
 	std::vector<const char*> args;
 
@@ -365,15 +377,28 @@ Job::Launch()
 	}
 
 	// Launch via entry_ref
-	return BRoster::Private().Launch(NULL, &ref, NULL, count, &args[0],
+	status = BRoster::Private().Launch(NULL, &ref, NULL, count, &args[0],
 		&environment[0], &fTeam);
+	_SetLaunchStatus(status);
+	return status;
 }
 
 
 bool
 Job::IsLaunched() const
 {
-	return fTeam >= 0;
+	return fLaunchStatus != B_NO_INIT;
+}
+
+
+status_t
+Job::HandleGetLaunchData(BMessage* message)
+{
+	MutexLocker launchLocker(fLaunchStatusLock);
+	if (IsLaunched())
+		return _SendLaunchDataReply(message);
+
+	return fPendingLaunchDataReplies.AddItem(message) ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -433,4 +458,50 @@ Job::_AddStringList(std::vector<const char*>& array, const BStringList& list)
 	for (int32 index = 0; index < count; index++) {
 		array.push_back(list.StringAt(index).String());
 	}
+}
+
+
+void
+Job::_SetLaunchStatus(status_t launchStatus)
+{
+	MutexLocker launchLocker(fLaunchStatusLock);
+	fLaunchStatus = launchStatus != B_NO_INIT ? launchStatus : B_ERROR;
+	launchLocker.Unlock();
+
+	_SendPendingLaunchDataReplies();
+}
+
+
+status_t
+Job::_SendLaunchDataReply(BMessage* message)
+{
+	BMessage reply(fTeam < 0 ? fTeam : (uint32)B_OK);
+	if (reply.what == B_OK) {
+		reply.AddInt32("team", fTeam);
+
+		PortMap::const_iterator iterator = fPortMap.begin();
+		for (; iterator != fPortMap.end(); iterator++) {
+			BString name;
+			if (iterator->second.HasString("name"))
+				name << iterator->second.GetString("name") << "_";
+			name << "port";
+
+			reply.AddInt32(name.String(),
+				iterator->second.GetInt32("port", -1));
+		}
+	}
+
+	message->SendReply(&reply);
+	delete message;
+	return B_OK;
+}
+
+
+void
+Job::_SendPendingLaunchDataReplies()
+{
+	for (int32 i = 0; i < fPendingLaunchDataReplies.CountItems(); i++)
+		_SendLaunchDataReply(fPendingLaunchDataReplies.ItemAt(i));
+
+	fPendingLaunchDataReplies.MakeEmpty();
 }

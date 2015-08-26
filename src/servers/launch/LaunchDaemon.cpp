@@ -483,31 +483,29 @@ LaunchDaemon::_HandleGetLaunchData(BMessage* message)
 				launchJob = false;
 			}
 		}
-	}
+	} else
+		launchJob = false;
 
+	bool ownsMessage = false;
 	if (reply.what == B_OK) {
-		// If the job has not been launched yet, we'll pass on our
-		// team here. The rationale behind this is that this team
-		// will temporarily own the synchronous reply ports.
-		reply.AddInt32("team", job->Team() < 0
-			? current_team() : job->Team());
-
-		PortMap::const_iterator iterator = job->Ports().begin();
-		for (; iterator != job->Ports().end(); iterator++) {
-			BString name;
-			if (iterator->second.HasString("name"))
-				name << iterator->second.GetString("name") << "_";
-			name << "port";
-
-			reply.AddInt32(name.String(),
-				iterator->second.GetInt32("port", -1));
-		}
-
 		// Launch the job if it hasn't been launched already
 		if (launchJob)
 			_LaunchJob(job);
+
+		DetachCurrentMessage();
+		status_t result = job->HandleGetLaunchData(message);
+		if (result == B_OK) {
+			// Replying is delegated to the job.
+			return;
+		}
+
+		ownsMessage = true;
+		reply.what = result;
 	}
+
 	message->SendReply(&reply);
+	if (ownsMessage)
+		delete message;
 }
 
 
