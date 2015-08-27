@@ -18,6 +18,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Midi.cpp
 			MidiGlue.cpp
 			MidiPort.cpp
+			MidiSettings.cpp
 			MidiStore.cpp
 			MidiSynth.cpp
 			MidiSynthFile.cpp

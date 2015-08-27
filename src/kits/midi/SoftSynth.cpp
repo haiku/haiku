@@ -21,8 +21,11 @@
 #include <NodeInfo.h>
 #include <Path.h>
 #include <PathFinder.h>
+
 #include <string.h>
 #include <stdlib.h>
+
+#include <MidiSettings.h>
 
 #include "debug.h"
 #include "MidiGlue.h"   // for MAKE_BIGTIME
@@ -108,22 +111,15 @@ BSoftSynth::SetDefaultInstrumentsFile()
 	// MidiSettingsView::_RetrieveSoftSynthList()
 	// We first search for a setting file (or symlink to it)
 	// in the user settings directory
-	char buffer[512];
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-		path.Append("midi");
-		BFile file(path.Path(), B_READ_ONLY);
-		if (file.InitCheck() == B_OK
-				&& file.Read(buffer, sizeof(buffer)) > 0) {
-			char soundFont[512];
-			sscanf(buffer, "# Midi Settings\n soundfont = %s\n",
-				soundFont);
-			if (SetInstrumentsFile(soundFont) == B_OK)
-				return B_OK;
-		}
+
+	struct BPrivate::midi_settings settings;
+	if (BPrivate::read_midi_settings(&settings) == B_OK) {
+		if (SetInstrumentsFile(settings.soundfont_file) == B_OK)
+			return B_OK;
 	}
 
 	// Try a well-known (and usually present on a default install) soft synth
+	BPath path;
 	if (find_directory(B_SYNTH_DIRECTORY, &path, false, NULL) == B_OK) {
 		path.Append("synth/TimGM6mb.sf2");
 		if (SetInstrumentsFile(path.Path()) == B_OK)

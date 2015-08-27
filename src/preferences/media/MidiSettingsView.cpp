@@ -5,6 +5,8 @@
 
 #include "MidiSettingsView.h"
 
+#include <MidiSettings.h>
+
 #include <Box.h>
 #include <Catalog.h>
 #include <Directory.h>
@@ -26,8 +28,6 @@
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Midi View"
-
-#define SETTINGS_FILE "midi"
 
 const static uint32 kSelectSoundFont = 'SeSf';
 
@@ -126,25 +126,13 @@ MidiSettingsView::_RetrieveSoftSynthList()
 void
 MidiSettingsView::_LoadSettings()
 {
-	// TODO: Duplicated code between here
-	// and BSoftSynth::SetDefaultInstrumentsFile
-	char buffer[512];
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-		path.Append(SETTINGS_FILE);
-		BFile file(path.Path(), B_READ_ONLY);
-		if (file.InitCheck() == B_OK) {
-			file.Read(buffer, sizeof(buffer));
-			char soundFont[512];
-			sscanf(buffer, "# Midi Settings\n soundfont = %s\n",
-				soundFont);
-
-			for (int32 i = 0; i < fListView->CountItems(); i++) {
-				BStringItem* item = (BStringItem*)fListView->ItemAt(i);
-				if (!strcmp(item->Text(), soundFont)) {
-					fListView->Select(i);
-					break;
-				}
+	struct BPrivate::midi_settings settings;
+	if (BPrivate::read_midi_settings(&settings) == B_OK) {
+		for (int32 i = 0; i < fListView->CountItems(); i++) {
+			BStringItem* item = (BStringItem*)fListView->ItemAt(i);
+			if (!strcmp(item->Text(), settings.soundfont_file)) {
+				fListView->Select(i);
+				break;
 			}
 		}
 	}
@@ -162,16 +150,8 @@ MidiSettingsView::_SaveSettings()
 	if (item == NULL)
 		return;
 
-	char buffer[512];
-	snprintf(buffer, 512, "# Midi Settings\n soundfont = %s\n",
-			item->Text());
-
-	BPath path;
-	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
-		path.Append(SETTINGS_FILE);
-		BFile file(path.Path(), B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE);
-		if (file.InitCheck() == B_OK)
-			file.Write(buffer, strlen(buffer));
-	}
+	struct BPrivate::midi_settings settings;
+	strlcpy(settings.soundfont_file, item->Text(), sizeof(settings.soundfont_file));
+	BPrivate::write_midi_settings(settings);
 }
 
