@@ -228,11 +228,12 @@ BMediaEventLooper::ControlLoop()
 			return;
 
 		err = WaitForMessage(waitUntil);
-		if (err == B_TIMED_OUT) {
+		if (err == B_TIMED_OUT
+				|| err == B_WOULD_BLOCK) {
 			media_timed_event event;
 			if (hasEvent)
 				err = fEventQueue.RemoveFirstEvent(&event);
-			else
+			else if (hasRealtime)
 				err = fRealTimeQueue.RemoveFirstEvent(&event);
 
 			if (err == B_OK) {
