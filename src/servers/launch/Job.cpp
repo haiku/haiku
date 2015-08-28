@@ -352,7 +352,7 @@ Job::Launch()
 		signature << Name();
 
 		status_t status = BRoster::Private().Launch(signature.String(), NULL,
-			NULL, 0, NULL, &environment[0], &fTeam);
+			NULL, 0, NULL, &environment[0], &fTeam, NULL, false);
 		_SetLaunchStatus(status);
 		return status;
 	}
@@ -378,7 +378,7 @@ Job::Launch()
 
 	// Launch via entry_ref
 	status = BRoster::Private().Launch(NULL, &ref, NULL, count, &args[0],
-		&environment[0], &fTeam);
+		&environment[0], &fTeam, NULL, false);
 	_SetLaunchStatus(status);
 	return status;
 }
