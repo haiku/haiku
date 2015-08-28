@@ -24,6 +24,8 @@ class BMessage;
 class Finder;
 class Target;
 
+struct entry_ref;
+
 
 typedef std::map<BString, BMessage> PortMap;
 
@@ -86,6 +88,12 @@ private:
 
 			status_t			_SendLaunchDataReply(BMessage* message);
 			void				_SendPendingLaunchDataReplies();
+
+			status_t			_CreateAndTransferPorts();
+
+			status_t			_Launch(const char* signature, entry_ref* ref,
+									int argCount, const char* const* args,
+									const char** environment);
 
 private:
 			BStringList			fArguments;
