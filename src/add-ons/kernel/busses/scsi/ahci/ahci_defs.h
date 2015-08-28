@@ -85,9 +85,10 @@ typedef struct {
 	uint8 det : 4; 		// Device Detection Initialization
 } _PACKED scontrol;
 
-#define TRANSITIONS_TO_PARTIAL_SLUMBER_DISABLED 0x300
-#define NO_INITIALIZATION 0
-#define INITIALIZATION 1
+#define IPM_TRANSITIONS_TO_PARTIAL_DISABLED 0x1
+#define IPM_TRANSITIONS_TO_SLUMBER_DISABLED 0x2
+#define DET_NO_INITIALIZATION	0x0
+#define DET_INITIALIZATION		0x1
 
 
 typedef struct {

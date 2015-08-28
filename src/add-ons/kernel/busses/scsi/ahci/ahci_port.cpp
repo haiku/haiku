@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2008-2015 Haiku, Inc. All rights reserved.
  * Copyright 2007-2009, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -110,7 +110,8 @@ AHCIPort::Init1()
 	// prdt follows after command table
 
 	// disable transitions to partial or slumber state
-	fRegs->sctl.ipm |= TRANSITIONS_TO_PARTIAL_SLUMBER_DISABLED; /*TODO Why "|= and not "=" ??*/
+	fRegs->sctl.ipm = IPM_TRANSITIONS_TO_PARTIAL_DISABLED
+		| IPM_TRANSITIONS_TO_SLUMBER_DISABLED;
 
 	// clear IRQ status bits
 	fRegs->is = fRegs->is;
@@ -213,23 +214,13 @@ AHCIPort::Uninit()
 void
 AHCIPort::ResetDevice()
 {
-	if (fRegs->cmd & PORT_CMD_ST)
-		TRACE("AHCIPort::ResetDevice PORT_CMD_ST set, behaviour undefined\n");
-
 	// perform a hard reset
-	fRegs->sctl.det |= INITIALIZATION; //TODO Why "|=" instead of "=" ?
-	FlushPostedWrites();
-	spin(1100);
-	fRegs->sctl.det = NO_INITIALIZATION;
-	FlushPostedWrites();
+	_HardReset();
 
-	if (wait_until_set(&fRegs->ssts, 0x1, 100000) < B_OK) {
+	if (wait_until_set(&fRegs->ssts, 0x1, 100000) < B_OK)
 		TRACE("AHCIPort::ResetDevice port %d no device detected\n", fIndex);
-	}
 
-	// clear error bits
-	fRegs->serr = fRegs->serr;
-	FlushPostedWrites();
+	_ClearErrorRegister();
 
 	if (fRegs->ssts & 1) {
 		if (wait_until_set(&fRegs->ssts, 0x3, 500000) < B_OK) {
@@ -238,9 +229,7 @@ AHCIPort::ResetDevice()
 		}
 	}
 
-	// clear error bits
-	fRegs->serr = fRegs->serr;
-	FlushPostedWrites();
+	_ClearErrorRegister();
 }
 
 
@@ -423,20 +412,13 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 	}
 	if (is & PORT_INT_PC) {
 		TRACE("Port Connect Change\n");
-		/* spec v1.3, §6.2.2.3 Recovery of Unsolicited COMINIT (a COMINIT that is
-		 * not received as a consequence of issuing a COMRESET to the device) */
+		// Spec v1.3, §6.2.2.3 Recovery of Unsolicited COMINIT
 
 		// perform a hard reset
-		fRegs->sctl.det |= INITIALIZATION; //TODO Why "|=" instead of "=" ?
-		FlushPostedWrites();
-		spin(1100); // specification says you must wait 1ms
-		fRegs->sctl.det = NO_INITIALIZATION;
-		FlushPostedWrites();
+		_HardReset();
 
 		// clear error bits to clear PxSERR.DIAG.X
-		fRegs->serr = fRegs->serr;
-		FlushPostedWrites();
-//		fResetPort = true;
+		_ClearErrorRegister();
 	}
 	if (is & PORT_INT_UF) {
 		TRACE("Unknown FIS\n");
@@ -1246,4 +1228,30 @@ AHCIPort::ScsiGetRestrictions(bool* isATAPI, bool* noAutoSense,
 	TRACE("AHCIPort::ScsiGetRestrictions port %d: isATAPI %d, noAutoSense %d, "
 		"maxBlocks %" B_PRIu32 "\n", fIndex, *isATAPI, *noAutoSense,
 		*maxBlocks);
+}
+
+
+void
+AHCIPort::_HardReset()
+{
+	if ((fRegs->cmd & PORT_CMD_ST) != 0) {
+		// We shouldn't perform a reset, but at least document it
+		TRACE("AHCIPort::_HardReset() PORT_CMD_ST set, behaviour undefined\n");
+	}
+
+	fRegs->sctl.det = DET_INITIALIZATION;
+	FlushPostedWrites();
+	spin(1100);
+		// You must wait 1ms at minimum
+	fRegs->sctl.det = DET_NO_INITIALIZATION;
+	FlushPostedWrites();
+}
+
+
+void
+AHCIPort::_ClearErrorRegister()
+{
+	// clear error bits
+	fRegs->serr = fRegs->serr;
+	FlushPostedWrites();
 }
