@@ -284,6 +284,7 @@ AudioSettingsView::AudioSettingsView()
 		.Add(defaultsBox)
 		.AddGroup(B_HORIZONTAL)
 			.Add(_MakeVolumeCheckBox())
+			.AddGlue()
 			.Add(MakeRestartButton())
 			.End()
 		.AddGlue();
