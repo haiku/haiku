@@ -11,7 +11,6 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <MediaNode.h>
-#include <MediaRoster.h>
 #include <OS.h>
 #include <Path.h>
 #include <TimeSource.h>
@@ -46,7 +45,8 @@ const char *kDefaultManagerSettingsFile				= "MDefaultManager";
 
 
 DefaultManager::DefaultManager()
- :	fMixerConnected(false),
+	:
+	fMixerConnected(false),
  	fPhysicalVideoOut(-1),
 	fPhysicalVideoIn(-1),
 	fPhysicalAudioOut(-1),
@@ -57,7 +57,8 @@ DefaultManager::DefaultManager()
 	fPhysicalAudioOutInputID(0),
 	fRescanThread(-1),
 	fRescanRequested(0),
- 	fRescanLock("rescan default manager")
+	fRescanLock("rescan default manager"),
+	fRoster(NULL)
 {
 	strcpy(fPhysicalAudioOutInputName, "default");
 	fBeginHeader[0] = 0xab00150b;
@@ -66,6 +67,10 @@ DefaultManager::DefaultManager()
 	fEndHeader[0] = 0x7465726d;
 	fEndHeader[1] = 0x6d666c67;
 	fEndHeader[2] = 0x00000002;
+
+	fRoster = BMediaRoster::Roster();
+	if (fRoster == NULL)
+		TRACE("DefaultManager: The roster is NULL\n");
 }
 
 
@@ -393,7 +398,7 @@ DefaultManager::_RescanThread()
 
 		// Connect the mixer and physical audio out (soundcard)
 		if (!fMixerConnected && fAudioMixer != -1 && fPhysicalAudioOut != -1) {
-			fMixerConnected = B_OK == _ConnectMixerToOutput();
+			fMixerConnected = _ConnectMixerToOutput() == B_OK;
 			if (!fMixerConnected)
 				TRACE("DefaultManager: failed to connect mixer and "
 					"soundcard\n");
@@ -455,7 +460,7 @@ DefaultManager::_FindPhysical(volatile media_node_id *id, uint32 default_type,
 	memset(&format, 0, sizeof(format));
 	format.type = type;
 	count = MAX_NODE_INFOS;
-	rv = BMediaRoster::Roster()->GetLiveNodes(&info[0], &count,
+	rv = fRoster->GetLiveNodes(&info[0], &count,
 		isInput ? NULL : &format, isInput ? &format : NULL, NULL,
 		isInput ? B_BUFFER_PRODUCER | B_PHYSICAL_INPUT
 			: B_BUFFER_CONSUMER | B_PHYSICAL_OUTPUT);
@@ -493,7 +498,7 @@ DefaultManager::_FindPhysical(volatile media_node_id *id, uint32 default_type,
 		}
 		if (msg) {	// we have a default info msg
 			dormant_node_info dninfo;
-			if (BMediaRoster::Roster()->GetDormantNodeFor(info[i].node,
+			if (fRoster->GetDormantNodeFor(info[i].node,
 					&dninfo) != B_OK) {
 				ERROR("Couldn't GetDormantNodeFor\n");
 				continue;
@@ -533,17 +538,17 @@ DefaultManager::_FindTimeSource()
 	 */
 	if (fPhysicalAudioOut != -1) {
 		media_node clone;
-		if (B_OK == BMediaRoster::Roster()->GetNodeFor(fPhysicalAudioOut,
-			&clone)) {
+		if (fRoster->GetNodeFor(fPhysicalAudioOut,
+				&clone) == B_OK) {
 			if (clone.kind & B_TIME_SOURCE) {
 				fTimeSource = clone.node;
-				BMediaRoster::Roster()->StartTimeSource(clone,
+				fRoster->StartTimeSource(clone,
 					system_time() + 1000);
-				BMediaRoster::Roster()->ReleaseNode(clone);
+				fRoster->ReleaseNode(clone);
 				TRACE("Default DAC timesource created!\n");
 				return;
 			}
-			BMediaRoster::Roster()->ReleaseNode(clone);
+			fRoster->ReleaseNode(clone);
 		} else {
 			TRACE("Default DAC is not a timesource!\n");
 		}
@@ -556,7 +561,7 @@ DefaultManager::_FindTimeSource()
 	memset(&input, 0, sizeof(input));
 	input.type = B_MEDIA_RAW_AUDIO;
 	count = MAX_NODE_INFOS;
-	rv = BMediaRoster::Roster()->GetLiveNodes(&info[0], &count, &input, NULL, NULL,
+	rv = fRoster->GetLiveNodes(&info[0], &count, &input, NULL, NULL,
 		B_TIME_SOURCE | B_PHYSICAL_OUTPUT);
 	if (rv == B_OK && count >= 1) {
 		for (int i = 0; i < count; i++)
@@ -573,7 +578,7 @@ DefaultManager::_FindTimeSource()
 				continue;
 			TRACE("Default DAC timesource \"%s\" created!\n", info[i].name);
 			fTimeSource = info[i].node.node;
-			BMediaRoster::Roster()->StartTimeSource(info[i].node,
+			fRoster->StartTimeSource(info[i].node,
 				system_time() + 1000);
 			return;
 		}
@@ -593,8 +598,11 @@ DefaultManager::_FindAudioMixer()
 	int32 count;
 	status_t rv;
 
+	if (fRoster == NULL)
+		fRoster = BMediaRoster::Roster();
+
 	count = 1;
-	rv = BMediaRoster::Roster()->GetLiveNodes(&info, &count, NULL, NULL, NULL,
+	rv = fRoster->GetLiveNodes(&info, &count, NULL, NULL, NULL,
 		B_BUFFER_PRODUCER | B_BUFFER_CONSUMER | B_SYSTEM_MIXER);
 	if (rv != B_OK || count != 1) {
 		TRACE("Couldn't find audio mixer node\n");
@@ -608,7 +616,6 @@ DefaultManager::_FindAudioMixer()
 status_t
 DefaultManager::_ConnectMixerToOutput()
 {
-	BMediaRoster 		*roster;
 	media_node 			timesource;
 	media_node 			mixer;
 	media_node 			soundcard;
@@ -623,18 +630,19 @@ DefaultManager::_ConnectMixerToOutput()
 	int32 				count;
 	status_t 			rv;
 
-	roster = BMediaRoster::Roster();
+	if (fRoster == NULL)
+		fRoster = BMediaRoster::Roster();
 
-	rv = roster->GetNodeFor(fPhysicalAudioOut, &soundcard);
+	rv = fRoster->GetNodeFor(fPhysicalAudioOut, &soundcard);
 	if (rv != B_OK) {
 		TRACE("DefaultManager: failed to find soundcard (physical audio "
 			"output)\n");
 		return B_ERROR;
 	}
 
-	rv = roster->GetNodeFor(fAudioMixer, &mixer);
+	rv = fRoster->GetNodeFor(fAudioMixer, &mixer);
 	if (rv != B_OK) {
-		roster->ReleaseNode(soundcard);
+		fRoster->ReleaseNode(soundcard);
 		TRACE("DefaultManager: failed to find mixer\n");
 		return B_ERROR;
 	}
@@ -642,7 +650,7 @@ DefaultManager::_ConnectMixerToOutput()
 	// we now have the mixer and soundcard nodes,
 	// find a free input/output and connect them
 
-	rv = roster->GetFreeOutputsFor(mixer, &output, 1, &count,
+	rv = fRoster->GetFreeOutputsFor(mixer, &output, 1, &count,
 		B_MEDIA_RAW_AUDIO);
 	if (rv != B_OK || count != 1) {
 		TRACE("DefaultManager: can't find free mixer output\n");
@@ -650,7 +658,7 @@ DefaultManager::_ConnectMixerToOutput()
 		goto finish;
 	}
 
-	rv = roster->GetFreeInputsFor(soundcard, inputs, MAX_INPUT_INFOS, &count,
+	rv = fRoster->GetFreeInputsFor(soundcard, inputs, MAX_INPUT_INFOS, &count,
 		B_MEDIA_RAW_AUDIO);
 	if (rv != B_OK || count < 1) {
 		TRACE("DefaultManager: can't find free soundcard inputs\n");
@@ -668,7 +676,7 @@ DefaultManager::_ConnectMixerToOutput()
 		switch (i) {
 			case 0:
 				TRACE("DefaultManager: Trying connect in native format (1)\n");
-				if (B_OK != roster->GetFormatFor(input, &format)) {
+				if (fRoster->GetFormatFor(input, &format) != B_OK) {
 					ERROR("DefaultManager: GetFormatFor failed\n");
 					continue;
 				}
@@ -706,7 +714,7 @@ DefaultManager::_ConnectMixerToOutput()
 			case 4:
 				// BeOS R5 multiaudio node bug workaround
 				TRACE("DefaultManager: Trying connect in native format (2)\n");
-				if (B_OK != roster->GetFormatFor(input, &format)) {
+				if (fRoster->GetFormatFor(input, &format) != B_OK) {
 					ERROR("DefaultManager: GetFormatFor failed\n");
 					continue;
 				}
@@ -718,7 +726,7 @@ DefaultManager::_ConnectMixerToOutput()
 				break;
 
 		}
-		rv = roster->Connect(output.source, input.destination, &format,
+		rv = fRoster->Connect(output.source, input.destination, &format,
 			&newoutput, &newinput);
 		if (rv == B_OK)
 			break;
@@ -728,25 +736,25 @@ DefaultManager::_ConnectMixerToOutput()
 		goto finish;
 	}
 
-	roster->SetRunModeNode(mixer, BMediaNode::B_INCREASE_LATENCY);
-	roster->SetRunModeNode(soundcard, BMediaNode::B_RECORDING);
+	fRoster->SetRunModeNode(mixer, BMediaNode::B_INCREASE_LATENCY);
+	fRoster->SetRunModeNode(soundcard, BMediaNode::B_RECORDING);
 
-	roster->GetTimeSource(&timesource);
-	roster->SetTimeSourceFor(mixer.node, timesource.node);
-	roster->SetTimeSourceFor(soundcard.node, timesource.node);
-	roster->PrerollNode(mixer);
-	roster->PrerollNode(soundcard);
+	fRoster->GetTimeSource(&timesource);
+	fRoster->SetTimeSourceFor(mixer.node, timesource.node);
+	fRoster->SetTimeSourceFor(soundcard.node, timesource.node);
+	fRoster->PrerollNode(mixer);
+	fRoster->PrerollNode(soundcard);
 
-	ts = roster->MakeTimeSourceFor(mixer);
+	ts = fRoster->MakeTimeSourceFor(mixer);
 	start_at = ts->Now() + 50000;
-	roster->StartNode(mixer, start_at);
-	roster->StartNode(soundcard, start_at);
+	fRoster->StartNode(mixer, start_at);
+	fRoster->StartNode(soundcard, start_at);
 	ts->Release();
 
 finish:
-	roster->ReleaseNode(mixer);
-	roster->ReleaseNode(soundcard);
-	roster->ReleaseNode(timesource);
+	fRoster->ReleaseNode(mixer);
+	fRoster->ReleaseNode(soundcard);
+	fRoster->ReleaseNode(timesource);
 	return rv;
 }
 
