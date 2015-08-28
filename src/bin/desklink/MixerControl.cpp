@@ -28,8 +28,10 @@ MixerControl::MixerControl(int32 volumeWhich)
 	fMuteParameter(NULL),
 	fMin(0.0f),
 	fMax(0.0f),
-	fStep(0.0f)
+	fStep(0.0f),
+	fRoster(NULL)
 {
+	fRoster = BMediaRoster::Roster();
 }
 
 
@@ -47,22 +49,22 @@ MixerControl::Connect(int32 volumeWhich, float* _value, const char** _error)
 	_Disconnect();
 
 	status_t status = B_OK;
-	// BMediaRoster::Roster() doesn't set it if all is ok
 	const char* errorString = NULL;
-	BMediaRoster* roster = BMediaRoster::Roster(&status);
+	if (fRoster == NULL)
+		fRoster = BMediaRoster::Roster(&status);
 
-	if (BMediaRoster::IsRunning() && roster != NULL
+	if (BMediaRoster::IsRunning() && fRoster != NULL
 			&& status == B_OK) {
 		switch (volumeWhich) {
 			case VOLUME_USE_MIXER:
-				status = roster->GetAudioMixer(&fGainMediaNode);
+				status = fRoster->GetAudioMixer(&fGainMediaNode);
 				break;
 			case VOLUME_USE_PHYS_OUTPUT:
-				status = roster->GetAudioOutput(&fGainMediaNode);
+				status = fRoster->GetAudioOutput(&fGainMediaNode);
 				break;
 		}
 		if (status == B_OK) {
-			status = roster->GetParameterWebFor(fGainMediaNode, &fParameterWeb);
+			status = fRoster->GetParameterWebFor(fGainMediaNode, &fParameterWeb);
 			if (status == B_OK) {
 				// Finding the Mixer slider in the audio output ParameterWeb
 				int32 numParams = fParameterWeb->CountParameters();
@@ -252,9 +254,11 @@ MixerControl::_Disconnect()
 	fParameterWeb = NULL;
 	fMixerParameter = NULL;
 
-	BMediaRoster* roster = BMediaRoster::CurrentRoster();
-	if (roster != NULL && fGainMediaNode != media_node::null)
-		roster->ReleaseNode(fGainMediaNode);
+	if (fRoster == NULL)
+		fRoster = BMediaRoster::Roster();
+
+	if (fRoster != NULL && fGainMediaNode != media_node::null)
+		fRoster->ReleaseNode(fGainMediaNode);
 
 	fGainMediaNode = media_node::null;
 }
