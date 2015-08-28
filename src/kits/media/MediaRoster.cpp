@@ -44,6 +44,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 
 #include <new>
 
+#include <Autolock.h>
 #include <BufferConsumer.h>
 #include <BufferProducer.h>
 #include <Locker.h>
@@ -83,6 +84,7 @@ struct RosterNotification {
 
 static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
+static BLocker sInitLocker("BMediaRoster::Roster locker");
 
 }	// namespace media
 }	// namespace BPrivate
@@ -2188,10 +2190,14 @@ BMediaRoster::UnregisterNode(BMediaNode* node)
 /*static*/ BMediaRoster*
 BMediaRoster::Roster(status_t* out_error)
 {
-	static BLocker locker("BMediaRoster::Roster locker");
-	locker.Lock();
+	BAutolock lock(sInitLocker);
+
+	if (!lock.IsLocked())
+		return NULL;
+
 	if (out_error)
 		*out_error = B_OK;
+
 	if (sDefaultInstance == NULL) {
 		status_t err;
 		sDefaultInstance = new (std::nothrow) BMediaRosterEx(&err);
@@ -2207,7 +2213,6 @@ BMediaRoster::Roster(status_t* out_error)
 				*out_error = err;
 		}
 	}
-	locker.Unlock();
 	return sDefaultInstance;
 }
 
