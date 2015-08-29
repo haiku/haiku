@@ -144,7 +144,8 @@ AppAccessRequestWindow::AppAccessRequestWindow(const char* keyringName,
 	:
 	BWindow(BRect(50, 50, 100, 100), B_TRANSLATE("Application keyring access"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
-			| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+			| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS
+			| B_CLOSE_ON_ESCAPE),
 	fRequestView(NULL),
 	fDoneSem(-1),
 	fResult(kMessageDisallow)
@@ -172,20 +173,6 @@ AppAccessRequestWindow::~AppAccessRequestWindow()
 {
 	if (fDoneSem >= 0)
 		delete_sem(fDoneSem);
-}
-
-
-void
-AppAccessRequestWindow::DispatchMessage(BMessage* message, BHandler* handler)
-{
-	int8 key;
-	if (message->what == B_KEY_DOWN
-		&& message->FindInt8("byte", 0, &key) == B_OK
-		&& key == B_ESCAPE) {
-		PostMessage(kMessageDisallow);
-	}
-
-	BWindow::DispatchMessage(message, handler);
 }
 
 

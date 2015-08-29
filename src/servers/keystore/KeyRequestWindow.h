@@ -18,8 +18,6 @@ public:
 									KeyRequestWindow();
 virtual								~KeyRequestWindow();
 
-virtual	void						DispatchMessage(BMessage* message,
-										BHandler* handler);
 virtual	void						MessageReceived(BMessage* message);
 
 		status_t					RequestKey(const BString& keyringName,
