@@ -152,7 +152,7 @@ private:
 
 KeyRequestWindow::KeyRequestWindow()
 	:
-	BWindow(BRect(50, 50, 269, 302), B_TRANSLATE("Unlock keyring"),
+	BWindow(BRect(50, 50, 100, 100), B_TRANSLATE("Unlock keyring"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
 			| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fRequestView(NULL),
@@ -218,6 +218,7 @@ KeyRequestWindow::RequestKey(const BString& keyringName, BMessage& keyMessage)
 {
 	fRequestView->SetUp(keyringName);
 
+	ResizeToPreferred();
 	CenterOnScreen();
 	Show();
 

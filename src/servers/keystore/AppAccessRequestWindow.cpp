@@ -142,7 +142,7 @@ AppAccessRequestWindow::AppAccessRequestWindow(const char* keyringName,
 	const char* signature, const char* path, const char* accessString,
 	bool appIsNew, bool appWasUpdated)
 	:
-	BWindow(BRect(50, 50, 269, 302), B_TRANSLATE("Application keyring access"),
+	BWindow(BRect(50, 50, 100, 100), B_TRANSLATE("Application keyring access"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
 			| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fRequestView(NULL),
@@ -208,6 +208,7 @@ AppAccessRequestWindow::MessageReceived(BMessage* message)
 status_t
 AppAccessRequestWindow::RequestAppAccess(bool& allowAlways)
 {
+	ResizeToPreferred();
 	CenterOnScreen();
 	Show();
 
