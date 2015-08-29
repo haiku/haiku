@@ -48,6 +48,7 @@ StdBinCommands
 	release.c
 	renice.c
 	rescan.c
+	system_time.cpp
 	unchop.c
 	uptime.cpp
 	vmstat.cpp
