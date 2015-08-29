@@ -264,7 +264,6 @@ BAlert::SetShortcut(int32 index, char key)
 char
 BAlert::Shortcut(int32 index) const
 {
-
 	if (index >= 0 && (size_t)index < fKeys.size())
 		return fKeys[index];
 
