@@ -2132,6 +2132,13 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 			return B_NO_MEMORY;
 		}
 #ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+	} else if ((fHeader->flags & MESSAGE_FLAG_REPLY_AS_KMESSAGE) != 0) {
+		KMessage toMessage;
+		result = BPrivate::MessageAdapter::ConvertToKMessage(this, toMessage);
+		if (result != B_OK)
+			return result;
+
+		return toMessage.SendTo(port, token);
 	} else if (fHeader->data_size > B_PAGE_SIZE * 10) {
 		// ToDo: bind the above size to the max port message size
 		// use message passing by area for such a large message
@@ -2166,13 +2173,6 @@ BMessage::_SendMessage(port_id port, team_id portOwner, int32 token,
 			header->message_area = transfered;
 		}
 #endif
-	} else if ((fHeader->flags & MESSAGE_FLAG_REPLY_AS_KMESSAGE) != 0) {
-		KMessage toMessage;
-		result = BPrivate::MessageAdapter::ConvertToKMessage(this, toMessage);
-		if (result != B_OK)
-			return result;
-
-		return toMessage.SendTo(port, token);
 	} else {
 		size = FlattenedSize();
 		buffer = (char*)malloc(size);
