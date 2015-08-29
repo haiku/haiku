@@ -3460,9 +3460,13 @@ BMediaRoster::MessageReceived(BMessage* message)
 			node->DeleteHook(node); // we don't call Release(), see above!
 			return;
 		}
+
+		default:
+			printf("BMediaRoster::MessageReceived: unknown message!\n");
+			message->PrintToStream();
+			BLooper::MessageReceived(message);
+			break;
 	}
-	printf("BMediaRoster::MessageReceived: unknown message!\n");
-	message->PrintToStream();
 }
 
 
