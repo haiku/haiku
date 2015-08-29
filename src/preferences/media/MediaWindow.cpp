@@ -308,9 +308,9 @@ bool
 MediaWindow::QuitRequested()
 {
 	if (fRestartThread > 0) {
-		BString text(B_TRANSLATE("Quitting Media now will stop"
-			"restarting the media services. Flaky or unavailable media"
-			"functionality is likely the result."));
+		BString text(B_TRANSLATE("Quitting Media now will stop the "
+			"restarting of the media services. Flaky or unavailable media "
+			"functionality is the likely result."));
 
 		fRestartAlert = new BAlert(B_TRANSLATE("Warning!"), text,
 			B_TRANSLATE("Quit anyway"), NULL, NULL,
