@@ -185,6 +185,15 @@ KeyRequestWindow::~KeyRequestWindow()
 }
 
 
+bool
+KeyRequestWindow::QuitRequested()
+{
+	fResult = B_CANCELED;
+	release_sem(fDoneSem);
+	return false;
+}
+
+
 void
 KeyRequestWindow::MessageReceived(BMessage* message)
 {

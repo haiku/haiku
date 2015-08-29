@@ -18,6 +18,7 @@ public:
 									KeyRequestWindow();
 virtual								~KeyRequestWindow();
 
+virtual	bool						QuitRequested();
 virtual	void						MessageReceived(BMessage* message);
 
 		status_t					RequestKey(const BString& keyringName,

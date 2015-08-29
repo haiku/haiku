@@ -176,6 +176,15 @@ AppAccessRequestWindow::~AppAccessRequestWindow()
 }
 
 
+bool
+AppAccessRequestWindow::QuitRequested()
+{
+	fResult = kMessageDisallow;
+	release_sem(fDoneSem);
+	return false;
+}
+
+
 void
 AppAccessRequestWindow::MessageReceived(BMessage* message)
 {

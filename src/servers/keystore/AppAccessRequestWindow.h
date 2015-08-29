@@ -23,6 +23,7 @@ public:
 										bool appWasUpdated);
 virtual								~AppAccessRequestWindow();
 
+virtual	bool						QuitRequested();
 virtual	void						MessageReceived(BMessage* message);
 
 		status_t					RequestAppAccess(bool& allowAlways);
