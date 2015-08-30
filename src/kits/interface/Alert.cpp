@@ -520,6 +520,8 @@ BAlert::_Init(const char* text, const char* button0, const char* button1,
 	AddButton(button0);
 	AddButton(button1);
 	AddButton(button2);
+
+	AddCommonFilter(new(std::nothrow) _BAlertFilter_(this));
 }
 
 
@@ -810,7 +812,7 @@ _BAlertFilter_::Filter(BMessage* msg, BHandler** target)
 	if (msg->what == B_KEY_DOWN) {
 		char byte;
 		if (msg->FindInt8("byte", (int8*)&byte) == B_OK) {
-			for (int i = 0; i < 3; ++i) {
+			for (int i = 0; i < fAlert->CountButtons(); ++i) {
 				if (byte == fAlert->Shortcut(i) && fAlert->ButtonAt(i)) {
 					char space = ' ';
 					fAlert->ButtonAt(i)->KeyDown(&space, 1);
