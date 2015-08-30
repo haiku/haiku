@@ -257,7 +257,7 @@ StreamBase::Open()
 	fContext->pb = fIOContext;
 
 	// Allocate our context and probe the input format
-	if (avformat_open_input(&fContext, "", NULL, NULL) < 0) {
+	if (avformat_open_input(&fContext, ".mod", NULL, NULL) < 0) {
 		TRACE("StreamBase::Open() - avformat_open_input() failed!\n");
 		// avformat_open_input() frees the context in case of failure
 		fContext = NULL;
@@ -1505,7 +1505,7 @@ AVFormatReader::Sniff(int32* _streamCount)
 	streamDeleter.Detach();
 
 	#ifdef TRACE_AVFORMAT_READER
-	dump_format(const_cast<AVFormatContext*>(stream->Context()), 0, "", 0);
+	av_dump_format(const_cast<AVFormatContext*>(stream->Context()), 0, "", 0);
 	#endif
 
 	if (_streamCount != NULL)
