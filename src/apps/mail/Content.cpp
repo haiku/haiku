@@ -635,35 +635,103 @@ TextRunArray::~TextRunArray()
 }
 
 
-//====================================================================
 //	#pragma mark -
 
 
-TContentView::TContentView(BRect rect, bool incoming, BFont* font,
+TContentView::TContentView(bool incoming, BFont* font,
 	bool showHeader, bool coloredQuotes)
 	:
-	BView(rect, "m_content", B_FOLLOW_ALL,
-		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
-
+	BView("m_content", B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE),
 	fFocus(false),
 	fIncoming(incoming)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fOffset = 12;
 
-	BRect r(rect);
-	r.OffsetTo(0, 0);
-	r.right -= B_V_SCROLL_BAR_WIDTH;
-	r.bottom -= B_H_SCROLL_BAR_HEIGHT;
-	r.top += 4;
-	BRect text(r);
-	text.OffsetTo(0, 0);
-	text.InsetBy(5, 5);
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
+	// TODO: control look should give us the spacing information
+	layout->SetInsets(-2, 0, -2, -2);
+	SetLayout(layout);
 
-	fTextView = new TTextView(r, text, fIncoming, this, font, showHeader,
+	fTextView = new TTextView(fIncoming, this, font, showHeader,
 		coloredQuotes);
-	BScrollView *scroll = new BScrollView("", fTextView, B_FOLLOW_ALL, 0, true, true);
+	BScrollView *scroll = new BScrollView("", fTextView, 0, true, true);
 	AddChild(scroll);
+}
+
+
+void
+TContentView::FindString(const char *str)
+{
+	int32	finish;
+	int32	pass = 0;
+	int32	start = 0;
+
+	if (str == NULL)
+		return;
+
+	//
+	//	Start from current selection or from the beginning of the pool
+	//
+	const char *text = fTextView->Text();
+	int32 count = fTextView->TextLength();
+	fTextView->GetSelection(&start, &finish);
+	if (start != finish)
+		start = finish;
+	if (!count || text == NULL)
+		return;
+
+	//
+	//	Do the find
+	//
+	while (pass < 2) {
+		long found = -1;
+		char lc = tolower(str[0]);
+		char uc = toupper(str[0]);
+		for (long i = start; i < count; i++) {
+			if (text[i] == lc || text[i] == uc) {
+				const char *s = str;
+				const char *t = text + i;
+				while (*s && (tolower(*s) == tolower(*t))) {
+					s++;
+					t++;
+				}
+				if (*s == 0) {
+					found = i;
+					break;
+				}
+			}
+		}
+
+		//
+		//	Select the text if it worked
+		//
+		if (found != -1) {
+			Window()->Activate();
+			fTextView->Select(found, found + strlen(str));
+			fTextView->ScrollToSelection();
+			fTextView->MakeFocus(true);
+			return;
+		}
+		else if (start) {
+			start = 0;
+			text = fTextView->Text();
+			count = fTextView->TextLength();
+			pass++;
+		} else {
+			beep();
+			return;
+		}
+	}
+}
+
+
+void
+TContentView::Focus(bool focus)
+{
+	if (fFocus != focus) {
+		fFocus = focus;
+		Draw(Frame());
+	}
 }
 
 
@@ -769,100 +837,13 @@ TContentView::MessageReceived(BMessage *msg)
 }
 
 
-void
-TContentView::FindString(const char *str)
-{
-	int32	finish;
-	int32	pass = 0;
-	int32	start = 0;
-
-	if (str == NULL)
-		return;
-
-	//
-	//	Start from current selection or from the beginning of the pool
-	//
-	const char *text = fTextView->Text();
-	int32 count = fTextView->TextLength();
-	fTextView->GetSelection(&start, &finish);
-	if (start != finish)
-		start = finish;
-	if (!count || text == NULL)
-		return;
-
-	//
-	//	Do the find
-	//
-	while (pass < 2) {
-		long found = -1;
-		char lc = tolower(str[0]);
-		char uc = toupper(str[0]);
-		for (long i = start; i < count; i++) {
-			if (text[i] == lc || text[i] == uc) {
-				const char *s = str;
-				const char *t = text + i;
-				while (*s && (tolower(*s) == tolower(*t))) {
-					s++;
-					t++;
-				}
-				if (*s == 0) {
-					found = i;
-					break;
-				}
-			}
-		}
-
-		//
-		//	Select the text if it worked
-		//
-		if (found != -1) {
-			Window()->Activate();
-			fTextView->Select(found, found + strlen(str));
-			fTextView->ScrollToSelection();
-			fTextView->MakeFocus(true);
-			return;
-		}
-		else if (start) {
-			start = 0;
-			text = fTextView->Text();
-			count = fTextView->TextLength();
-			pass++;
-		} else {
-			beep();
-			return;
-		}
-	}
-}
-
-
-void
-TContentView::Focus(bool focus)
-{
-	if (fFocus != focus) {
-		fFocus = focus;
-		Draw(Frame());
-	}
-}
-
-
-void
-TContentView::FrameResized(float /* width */, float /* height */)
-{
-	BRect r(fTextView->Bounds());
-	r.OffsetTo(0, 0);
-	r.InsetBy(5, 5);
-	fTextView->SetTextRect(r);
-}
-
-
-//====================================================================
 //	#pragma mark -
 
 
-TTextView::TTextView(BRect frame, BRect text, bool incoming, TContentView *view,
+TTextView::TTextView(bool incoming, TContentView *view,
 	BFont *font, bool showHeader, bool coloredQuotes)
 	:
-	BTextView(frame, "", text, B_FOLLOW_ALL, B_WILL_DRAW | B_NAVIGABLE),
+	BTextView("", B_WILL_DRAW | B_NAVIGABLE),
 
 	fHeader(showHeader),
 	fColoredQuotes(coloredQuotes),
@@ -883,6 +864,9 @@ TTextView::TTextView(BRect frame, BRect text, bool incoming, TContentView *view,
 {
 	fStopSem = create_sem(1, "reader_sem");
 	SetStylable(true);
+	SetInsets(4, 4, 4, 4);
+		// TODO: have some font size related value here
+		// (ideally the same as in BTextControl, etc. from BControlLook)
 
 	fEnclosures = new BList();
 

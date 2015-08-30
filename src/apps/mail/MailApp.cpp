@@ -116,7 +116,10 @@ TMailApp::TMailApp()
 	fStartWithSpellCheckOn(false),
 	fShowSpamGUI(true),
 	fMailCharacterSet(B_MAIL_UTF8_CONVERSION),
-	fContentFont(be_fixed_font)
+	fContentFont(be_fixed_font),
+
+	fPeople(fPeopleQueryList),
+	fPeopleGroups(fPeopleQueryList)
 {
 	// set default values
 	fContentFont.SetSize(12.0);
@@ -460,6 +463,9 @@ TMailApp::ReadyToRun()
 	fs_create_index(volume.Device(), INDEX_SIGNATURE, B_STRING_TYPE, 0);
 	fs_create_index(volume.Device(), INDEX_STATUS, B_STRING_TYPE, 0);
 	fs_create_index(volume.Device(), B_MAIL_ATTR_FLAGS, B_INT32_TYPE, 0);
+
+	// Start people queries
+	fPeopleQueryList.Init("META:email=**");
 
 	// Load dictionaries
 	BPath indexDir;

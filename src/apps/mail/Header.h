@@ -35,103 +35,77 @@ All rights reserved.
 #define _HEADER_H
 
 
-#include "ComboBox.h"
-
-#include <Box.h>
+#include <GridView.h>
 #include <NodeInfo.h>
-#include <Point.h>
-#include <Rect.h>
 #include <TextControl.h>
-#include <View.h>
-#include <Window.h>
-#include <fs_attr.h>
+
+#include "AddressTextControl.h"
 
 
-#define TO_FIELD_H			 39
-#define FROM_FIELD_H		 31
-#define TO_FIELD_V			  7
-#define TO_FIELD_WIDTH		270
-#define FROM_FIELD_WIDTH	280
-
-#define ACCOUNT_FIELD_WIDTH	165
-
-#define SUBJECT_FIELD_H		 18
-#define SUBJECT_FIELD_V		 33
-#define SUBJECT_FIELD_WIDTH	270
-#define SUBJECT_FIELD_HEIGHT 16
-
-#define CC_FIELD_H			 40
-#define CC_FIELD_V			 58
-#define CC_FIELD_WIDTH		192
-#define CC_FIELD_HEIGHT		 16
-
-#define BCC_FIELD_H			268
-#define BCC_FIELD_V			 58
-#define BCC_FIELD_WIDTH		197
-#define BCC_FIELD_HEIGHT	 16
-
+class BEmailMessage;
 class BFile;
 class BMenuField;
 class BMenuItem;
 class BPopUpMenu;
 class BStringView;
-class QPopupMenu;
-class TTextControl;
+class LabelView;
 
 
-class THeaderView : public BBox {
+class THeaderView : public BGridView {
 public:
-							THeaderView(BRect, BRect, bool incoming,
-								bool resending, uint32 defaultCharacterSet,
-								int32 defaultAccount);
+								THeaderView(bool incoming, bool resending,
+									int32 defaultAccount);
 
-	virtual	void			MessageReceived(BMessage*);
-	virtual	void			AttachedToWindow();
-			status_t		LoadMessage(BEmailMessage*);
+			const char*			From() const;
+			void				SetFrom(const char* from);
 
-			BPopUpMenu*		fAccountMenu;
-			BPopUpMenu*		fEncodingMenu;
-			int32			fAccountID;
-			TTextControl*	fAccountTo;
-			TTextControl*	fAccount;
-			TTextControl*	fBcc;
-			TTextControl*	fCc;
-			TTextControl*	fSubject;
-			TTextControl*	fTo;
-			BStringView*	fDateLabel;
-			BStringView*	fDate;
-			bool			fIncoming;
-			uint32			fCharacterSetUserSees;
+			AddressTextControl*	ToControl() const
+									{ return fToControl; }
+			bool				IsToEmpty() const;
+			const char*			To() const;
+			void				SetTo(const char* to);
 
-private:		
-			void			InitEmailCompletion();
-			void			InitGroupCompletion();
+			bool				IsCcEmpty() const;
+			const char*			Cc() const;
+			void				SetCc(const char* cc);
 
-			bool			fResending;
-			QPopupMenu*		fBccMenu;
-			QPopupMenu*		fCcMenu;
-			QPopupMenu*		fToMenu;
-			BDefaultChoiceList	fEmailList;
-};
+			bool				IsBccEmpty() const;
+			const char*			Bcc() const;
+			void				SetBcc(const char* bcc);
 
+			bool				IsSubjectEmpty() const;
+			const char*			Subject() const;
+			void				SetSubject(const char* subject);
 
-class TTextControl : public BComboBox {
-public:
-							TTextControl(BRect, const char*, BMessage*, bool,
-								bool, int32 resizingMode = B_FOLLOW_NONE);
+			bool				IsDateEmpty() const;
+			const char*			Date() const;
+			void				SetDate(const char* date);
 
-	virtual	void			AttachedToWindow();
-	virtual	void			MessageReceived(BMessage*);
+			int32				AccountID() const;
+			const char*			AccountName() const;
+			void				SetAccount(int32 id);
+			void				SetAccount(const char* name);
 
-			bool			HasFocus();
+			status_t			SetFromMessage(BEmailMessage* mail);
+
+	virtual	void				MessageReceived(BMessage*);
+	virtual	void				AttachedToWindow();
 
 private:
-			bool			fIncoming;
-			bool			fResending;
-			char			fLabel[100];
-			BPopUpMenu*		fRefDropMenu;
-			int32			fCommand;
+			BPopUpMenu*			fAccountMenu;
+			int32				fAccountID;
+			BTextControl*		fAccount;
+			BTextControl*		fFromControl;
+			LabelView*			fToLabel;
+			AddressTextControl*	fToControl;
+			LabelView*			fCcLabel;
+			AddressTextControl*	fCcControl;
+			AddressTextControl*	fBccControl;
+			BTextControl*		fSubjectControl;
+			BStringView*		fDateView;
+			bool				fIncoming;
+			bool				fResending;
 };
 
-#endif	/* _HEADER_H */
 
+#endif	/* _HEADER_H */

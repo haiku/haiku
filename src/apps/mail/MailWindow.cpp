@@ -43,22 +43,30 @@ of their respective holders. All rights reserved.
 #include <sys/utsname.h>
 #include <unistd.h>
 
+#include <AppFileInfo.h>
 #include <Autolock.h>
+#include <Bitmap.h>
+#include <CharacterSet.h>
+#include <CharacterSetRoster.h>
 #include <Clipboard.h>
 #include <Debug.h>
 #include <E-mail.h>
 #include <File.h>
 #include <IconUtils.h>
-#include <InterfaceKit.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Node.h>
 #include <PathMonitor.h>
+#include <PrintJob.h>
+#include <Query.h>
+#include <Resources.h>
 #include <Roster.h>
 #include <Screen.h>
-#include <StorageKit.h>
 #include <String.h>
+#include <StringView.h>
 #include <TextView.h>
 #include <UTF8.h>
+#include <VolumeRoster.h>
 
 #include <fs_index.h>
 #include <fs_info.h>
@@ -169,7 +177,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	const entry_ref* ref, const char* to, const BFont* font, bool resending,
 	BMessenger* messenger)
 	:
-	BWindow(rect, title, B_DOCUMENT_WINDOW, 0),
+	BWindow(rect, title, B_DOCUMENT_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS),
 
 	fApp(app),
 	fMail(NULL),
@@ -177,6 +185,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fFieldState(0),
 	fPanel(NULL),
 	fLeaveStatusMenu(NULL),
+	fEncodingMenu(NULL),
 	fZoom(rect),
 	fEnclosuresView(NULL),
 	fPrevTrackerPositionSaved(false),
@@ -196,7 +205,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	if (messenger != NULL)
 		fTrackerMessenger = *messenger;
 
-	float height;
 	BMenu* menu;
 	BMenu* subMenu;
 	BMenuItem* item;
@@ -429,24 +437,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		menu->AddSeparatorItem();
 		fSaveAddrMenu = subMenu = new BMenu(B_TRANSLATE("Save address"));
 		menu->AddItem(subMenu);
-		fMenuBar->AddItem(menu);
-
-		// Spam Menu
-
-		if (fApp->ShowSpamGUI()) {
-			menu = new BMenu("Spam filtering");
-			menu->AddItem(new BMenuItem("Mark as spam and move to trash",
-				new BMessage(M_TRAIN_SPAM_AND_DELETE), 'K'));
-			menu->AddItem(new BMenuItem("Mark as spam",
-				new BMessage(M_TRAIN_SPAM), 'K', B_OPTION_KEY));
-			menu->AddSeparatorItem();
-			menu->AddItem(new BMenuItem("Unmark this message",
-				new BMessage(M_UNTRAIN)));
-			menu->AddSeparatorItem();
-			menu->AddItem(new BMenuItem("Mark as genuine",
-				new BMessage(M_TRAIN_GENUINE), 'K', B_SHIFT_KEY));
-			fMenuBar->AddItem(menu);
-		}
 	} else {
 		menu->AddItem(fSendNow = new BMenuItem(B_TRANSLATE("Send message"),
 			new BMessage(M_SEND_NOW), 'M'));
@@ -468,6 +458,80 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 				B_TRANSLATE("Remove enclosure"),
 				new BMessage(M_REMOVE), 'T'));
 		}
+	}
+
+	// Encoding menu
+
+	fEncodingMenu = new BMenu(B_TRANSLATE("Encoding"));
+
+	BMenuItem* automaticItem = NULL;
+	if (!resending && fIncoming) {
+		// Reading a message, display the Automatic item
+		msg = new BMessage(CHARSET_CHOICE_MADE);
+		msg->AddInt32("charset", B_MAIL_NULL_CONVERSION);
+		automaticItem = new BMenuItem(B_TRANSLATE("Automatic"), msg);
+		fEncodingMenu->AddItem(automaticItem);
+		fEncodingMenu->AddSeparatorItem();
+	}
+
+	uint32 defaultCharSet = resending || !fIncoming
+		? fApp->MailCharacterSet() : B_MAIL_NULL_CONVERSION;
+	bool markedCharSet = false;
+
+	BCharacterSetRoster roster;
+	BCharacterSet charSet;
+	while (roster.GetNextCharacterSet(&charSet) == B_OK) {
+		BString name(charSet.GetPrintName());
+		const char* mime = charSet.GetMIMEName();
+		if (mime != NULL)
+			name << " (" << mime << ")";
+
+		uint32 convertID;
+		if (mime == NULL || strcasecmp(mime, "UTF-8") != 0)
+			convertID = charSet.GetConversionID();
+		else
+			convertID = B_MAIL_UTF8_CONVERSION;
+
+		msg = new BMessage(CHARSET_CHOICE_MADE);
+		msg->AddInt32("charset", convertID);
+		fEncodingMenu->AddItem(item = new BMenuItem(name.String(), msg));
+		if (convertID == defaultCharSet && !markedCharSet) {
+			item->SetMarked(true);
+			markedCharSet = true;
+		}
+	}
+
+	msg = new BMessage(CHARSET_CHOICE_MADE);
+	msg->AddInt32("charset", B_MAIL_US_ASCII_CONVERSION);
+	fEncodingMenu->AddItem(item = new BMenuItem("US-ASCII", msg));
+	if (defaultCharSet == B_MAIL_US_ASCII_CONVERSION && !markedCharSet) {
+		item->SetMarked(true);
+		markedCharSet = true;
+	}
+
+	if (automaticItem != NULL && !markedCharSet)
+		automaticItem->SetMarked(true);
+
+	menu->AddSeparatorItem();
+	menu->AddItem(fEncodingMenu);
+	fMenuBar->AddItem(menu);
+	fEncodingMenu->SetRadioMode(true);
+	fEncodingMenu->SetTargetForItems(this);
+
+	// Spam Menu
+
+	if (!resending && fIncoming && fApp->ShowSpamGUI()) {
+		menu = new BMenu("Spam filtering");
+		menu->AddItem(new BMenuItem("Mark as spam and move to trash",
+			new BMessage(M_TRAIN_SPAM_AND_DELETE), 'K'));
+		menu->AddItem(new BMenuItem("Mark as spam",
+			new BMessage(M_TRAIN_SPAM), 'K', B_OPTION_KEY));
+		menu->AddSeparatorItem();
+		menu->AddItem(new BMenuItem("Unmark this message",
+			new BMessage(M_UNTRAIN)));
+		menu->AddSeparatorItem();
+		menu->AddItem(new BMenuItem("Mark as genuine",
+			new BMessage(M_TRAIN_GENUINE), 'K', B_SHIFT_KEY));
 		fMenuBar->AddItem(menu);
 	}
 
@@ -478,49 +542,28 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	_RebuildQueryMenu(true);
 
-	// Menu Bar
-
-	AddChild(fMenuBar);
-	height = fMenuBar->Bounds().bottom + 1;
-
 	// Button Bar
 
 	BuildToolBar();
 
-	float bbheight = 0;
+	if (!fApp->ShowToolBar())
+		fToolBar->Hide();
 
-	bool showToolBar = fApp->ShowToolBar();
-
-	if (showToolBar) {
-		bbheight = fToolBar->MinSize().height;
-		fToolBar->ResizeTo(Bounds().right, bbheight);
-		fToolBar->MoveTo(0, height);
-		fToolBar->Show();
-	}
-
-	r.top = r.bottom = height + bbheight + 1;
-	fHeaderView = new THeaderView (r, rect, fIncoming, resending,
-		(resending || !fIncoming)
-		? fApp->MailCharacterSet()
-			// Use preferences setting for composing mail.
-		: B_MAIL_NULL_CONVERSION,
-			// Default is automatic selection for reading mail.
+	fHeaderView = new THeaderView(fIncoming, resending,
 		fApp->DefaultAccount());
 
-	r = Frame();
-	r.OffsetTo(0, 0);
-	r.top = fHeaderView->Frame().bottom - 1;
-	fContentView = new TContentView(r, fIncoming, const_cast<BFont*>(font),
+	fContentView = new TContentView(fIncoming, const_cast<BFont*>(font),
 		false, fApp->ColoredQuotes());
 		// TContentView needs to be properly const, for now cast away constness
 
-	AddChild(fHeaderView);
-	if (fEnclosuresView)
-		AddChild(fEnclosuresView);
-	AddChild(fContentView);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.Add(fMenuBar)
+		.Add(fToolBar)
+		.Add(fHeaderView)
+		.Add(fContentView);
 
-	if (to)
-		fHeaderView->fTo->SetText(to);
+	if (to != NULL)
+		fHeaderView->SetTo(to);
 
 	AddShortcut('n', B_COMMAND_KEY, new BMessage(M_NEW));
 
@@ -564,9 +607,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		}
 	}
 
-	OpenMessage(ref, fHeaderView->fCharacterSetUserSees);
-
-	_UpdateSizeLimits();
+	OpenMessage(ref, _CurrentCharacterSet());
 
 	AddShortcut('q', B_SHIFT_KEY, new BMessage(kMsgQuitAndKeepAllStatus));
 }
@@ -664,50 +705,20 @@ TMailWindow::BuildToolBar()
 			_AddReadButton();
 	}
 	fToolBar->AddGlue();
-
-	fToolBar->Hide();
-	AddChild(fToolBar);
 }
 
 
 void
 TMailWindow::UpdateViews()
 {
-	float bbheight = 0;
-	float nextY = fMenuBar->Frame().bottom + 1;
-
 	uint8 showToolBar = fApp->ShowToolBar();
 
 	// Show/Hide Button Bar
 	if (showToolBar) {
-		// Create the Button Bar if needed
-		if (!fToolBar)
-			BuildToolBar();
-
-		bbheight = fToolBar->MinSize().height;
-		fToolBar->ResizeTo(Bounds().right, bbheight);
-		fToolBar->MoveTo(0, nextY);
-		nextY += bbheight + 1;
 		if (fToolBar->IsHidden())
 			fToolBar->Show();
-		else
-			fToolBar->Invalidate();
-	} else if (fToolBar && !fToolBar->IsHidden())
+	} else if (!fToolBar->IsHidden())
 		fToolBar->Hide();
-
-	// Arange other views to match
-	fHeaderView->MoveTo(0, nextY);
-	nextY = fHeaderView->Frame().bottom;
-	if (fEnclosuresView) {
-		fEnclosuresView->MoveTo(0, nextY);
-		nextY = fEnclosuresView->Frame().bottom + 1;
-	}
-	BRect bounds(Bounds());
-	fContentView->MoveTo(0, nextY - 1);
-	fContentView->ResizeTo(bounds.right - bounds.left,
-		bounds.bottom - nextY + 1);
-
-	_UpdateSizeLimits();
 }
 
 
@@ -839,7 +850,7 @@ TMailWindow::SetTrackerSelectionToCurrent()
 void
 TMailWindow::PreserveReadingPos(bool save)
 {
-	BScrollBar* scroll = fContentView->fTextView->ScrollBar(B_VERTICAL);
+	BScrollBar* scroll = fContentView->TextView()->ScrollBar(B_VERTICAL);
 	if (scroll == NULL || fRef == NULL)
 		return;
 
@@ -893,17 +904,15 @@ TMailWindow::FrameResized(float width, float height)
 void
 TMailWindow::MenusBeginning()
 {
-	bool enable;
 	int32 finish = 0;
 	int32 start = 0;
-	BTextView* textView;
 
 	if (!fIncoming) {
-		bool gotToField = fHeaderView->fTo->Text()[0] != 0;
-		bool gotCcField = fHeaderView->fCc->Text()[0] != 0;
-		bool gotBccField = fHeaderView->fBcc->Text()[0] != 0;
-		bool gotSubjectField = fHeaderView->fSubject->Text()[0] != 0;
-		bool gotText = fContentView->fTextView->Text()[0] != 0;
+		bool gotToField = !fHeaderView->IsToEmpty();
+		bool gotCcField = !fHeaderView->IsCcEmpty();
+		bool gotBccField = !fHeaderView->IsBccEmpty();
+		bool gotSubjectField = !fHeaderView->IsSubjectEmpty();
+		bool gotText = fContentView->TextView()->Text()[0] != 0;
 		fSendNow->SetEnabled(gotToField || gotBccField);
 		fSendLater->SetEnabled(fChanged && (gotToField || gotCcField
 			|| gotBccField || gotSubjectField || gotText));
@@ -922,13 +931,12 @@ TMailWindow::MenusBeginning()
 			&& fEnclosuresView->fList->CurrentSelection() >= 0);
 	} else {
 		if (fResending) {
-			enable = strlen(fHeaderView->fTo->Text());
+			bool enable = !fHeaderView->IsToEmpty();
 			fSendNow->SetEnabled(enable);
-			// fSendLater->SetEnabled(enable);
+			//fSendLater->SetEnabled(enable);
 
-			if (fHeaderView->fTo->HasFocus()) {
-				textView = fHeaderView->fTo->TextView();
-				textView->GetSelection(&start, &finish);
+			if (fHeaderView->ToControl()->HasFocus()) {
+				fHeaderView->ToControl()->GetSelection(&start, &finish);
 
 				fCut->SetEnabled(start != finish);
 				be_clipboard->Lock();
@@ -950,15 +958,16 @@ TMailWindow::MenusBeginning()
 		}
 	}
 
-	fPrint->SetEnabled(fContentView->fTextView->TextLength());
+	fPrint->SetEnabled(fContentView->TextView()->TextLength());
 
-	textView = dynamic_cast<BTextView*>(CurrentFocus());
+	BTextView* textView = dynamic_cast<BTextView*>(CurrentFocus());
 	if (textView != NULL
-		&& dynamic_cast<TTextControl*>(textView->Parent()) != NULL) {
+		&& (dynamic_cast<AddressTextControl*>(textView->Parent()) != NULL
+			|| dynamic_cast<BTextControl*>(textView->Parent()) != NULL)) {
 		// one of To:, Subject:, Account:, Cc:, Bcc:
 		textView->GetSelection(&start, &finish);
-	} else if (fContentView->fTextView->IsFocus()) {
-		fContentView->fTextView->GetSelection(&start, &finish);
+	} else if (fContentView->TextView()->IsFocus()) {
+		fContentView->TextView()->GetSelection(&start, &finish);
 		if (!fIncoming) {
 			fQuote->SetEnabled(true);
 			fRemoveQuote->SetEnabled(true);
@@ -1019,7 +1028,7 @@ TMailWindow::MessageReceived(BMessage* msg)
 				break;
 
 			// reload the current message
-			OpenMessage(&ref, fHeaderView->fCharacterSetUserSees);
+			OpenMessage(&ref, _CurrentCharacterSet());
 			break;
 		}
 
@@ -1035,7 +1044,7 @@ TMailWindow::MessageReceived(BMessage* msg)
 				if (fieldMask == FIELD_BODY)
 					length = ((TTextView*)source)->TextLength();
 				else
-					length = ((BComboBox*)source)->TextView()->TextLength();
+					length = ((AddressTextControl*)source)->TextLength();
 
 				if (length)
 					fFieldState |= fieldMask;
@@ -1056,10 +1065,10 @@ TMailWindow::MessageReceived(BMessage* msg)
 			// Update title bar if "subject" has changed
 			if (!fIncoming && (fieldMask & FIELD_SUBJECT) != 0) {
 				// If no subject, set to "Mail"
-				if (!fHeaderView->fSubject->TextView()->TextLength())
+				if (fHeaderView->IsSubjectEmpty())
 					SetTitle(B_TRANSLATE_SYSTEM_NAME("Mail"));
 				else
-					SetTitle(fHeaderView->fSubject->Text());
+					SetTitle(fHeaderView->Subject());
 			}
 			break;
 		}
@@ -1251,7 +1260,7 @@ TMailWindow::MessageReceived(BMessage* msg)
 				TMailWindow* window
 					= static_cast<TMailApp*>(be_app)->FindWindow(nextRef);
 				if (window == NULL)
-					OpenMessage(&nextRef, fHeaderView->fCharacterSetUserSees);
+					OpenMessage(&nextRef, _CurrentCharacterSet());
 				else
 					window->Activate();
 
@@ -1324,7 +1333,7 @@ TMailWindow::MessageReceived(BMessage* msg)
 
 			BMessage message(M_HEADER);
 			message.AddBool("header", showHeader);
-			PostMessage(&message, fContentView->fTextView);
+			PostMessage(&message, fContentView->TextView());
 			break;
 		}
 		case M_RAW:
@@ -1333,7 +1342,7 @@ TMailWindow::MessageReceived(BMessage* msg)
 			fRaw->SetMarked(raw);
 			BMessage message(M_RAW);
 			message.AddBool("raw", raw);
-			PostMessage(&message, fContentView->fTextView);
+			PostMessage(&message, fContentView->TextView());
 			break;
 		}
 		case M_SEND_NOW:
@@ -1519,6 +1528,16 @@ TMailWindow::MessageReceived(BMessage* msg)
 			break;
 
 		case CHARSET_CHOICE_MADE:
+		{
+			int32 charSet;
+			if (msg->FindInt32("charset", &charSet) != B_OK)
+				break;
+
+			BMessage update(FIELD_CHANGED);
+			update.AddInt32("bitmask", 0);
+				// just enable the save button
+			PostMessage(&update);
+
 			if (fIncoming && !fResending) {
 				// The user wants to see the message they are reading (not
 				// composing) displayed with a different kind of character set
@@ -1527,11 +1546,10 @@ TMailWindow::MessageReceived(BMessage* msg)
 				// retrieved from the header view when it is needed.
 
 				entry_ref fileRef = *fRef;
-				int32 characterSet;
-				msg->FindInt32("charset", &characterSet);
-				OpenMessage(&fileRef, characterSet);
+				OpenMessage(&fileRef, charSet);
 			}
 			break;
+		}
 
 		case REFS_RECEIVED:
 			AddEnclosure(msg);
@@ -1569,8 +1587,7 @@ TMailWindow::MessageReceived(BMessage* msg)
 					else if (currentFlag != B_READ && !wasReadMsg)
 						MarkMessageRead(fRef, B_SEEN);
 
-					OpenMessage(&nextRef,
-						fHeaderView->fCharacterSetUserSees);
+					OpenMessage(&nextRef, _CurrentCharacterSet());
 				} else {
 					window->Activate();
 					//fSent = true;
@@ -1597,15 +1614,15 @@ TMailWindow::MessageReceived(BMessage* msg)
 		case RESET_BUTTONS:
 			fChanged = false;
 			fFieldState = 0;
-			if (fHeaderView->fTo->TextView()->TextLength())
+			if (!fHeaderView->IsToEmpty())
 				fFieldState |= FIELD_TO;
-			if (fHeaderView->fSubject->TextView()->TextLength())
+			if (!fHeaderView->IsSubjectEmpty())
 				fFieldState |= FIELD_SUBJECT;
-			if (fHeaderView->fCc->TextView()->TextLength())
+			if (!fHeaderView->IsCcEmpty())
 				fFieldState |= FIELD_CC;
-			if (fHeaderView->fBcc->TextView()->TextLength())
+			if (!fHeaderView->IsBccEmpty())
 				fFieldState |= FIELD_BCC;
-			if (fContentView->fTextView->TextLength())
+			if (fContentView->TextView()->TextLength() != 0)
 				fFieldState |= FIELD_BODY;
 
 			fToolBar->SetActionEnabled(M_SAVE_AS_DRAFT, false);
@@ -1628,7 +1645,7 @@ TMailWindow::MessageReceived(BMessage* msg)
 				alert->Go();
 			} else {
 				fSpelling->SetMarked(!fSpelling->IsMarked());
-				fContentView->fTextView->EnableSpellCheck(
+				fContentView->TextView()->EnableSpellCheck(
 					fSpelling->IsMarked());
 			}
 			break;
@@ -1724,12 +1741,12 @@ TMailWindow::QuitRequested()
 	int32 result;
 
 	if ((!fIncoming || (fIncoming && fResending)) && fChanged && !fSent
-		&& (strlen(fHeaderView->fTo->Text())
-			|| strlen(fHeaderView->fSubject->Text())
-			|| (fHeaderView->fCc && strlen(fHeaderView->fCc->Text()))
-			|| (fHeaderView->fBcc && strlen(fHeaderView->fBcc->Text()))
-			|| (fContentView->fTextView
-				&& strlen(fContentView->fTextView->Text()))
+		&& (!fHeaderView->IsToEmpty()
+			|| !fHeaderView->IsSubjectEmpty()
+			|| !fHeaderView->IsCcEmpty()
+			|| !fHeaderView->IsBccEmpty()
+			|| (fContentView->TextView() != NULL
+				&& strlen(fContentView->TextView()->Text()))
 			|| (fEnclosuresView != NULL
 				&& fEnclosuresView->fList->CountItems()))) {
 		if (fResending) {
@@ -1818,11 +1835,10 @@ TMailWindow::Show()
 {
 	if (Lock()) {
 		if (!fResending && (fIncoming || fReplying)) {
-			fContentView->fTextView->MakeFocus(true);
+			fContentView->TextView()->MakeFocus(true);
 		} else {
-			BTextView* textView = fHeaderView->fTo->TextView();
-			fHeaderView->fTo->MakeFocus(true);
-			textView->Select(0, textView->TextLength());
+			fHeaderView->ToControl()->MakeFocus(true);
+			fHeaderView->ToControl()->SelectAll();
 		}
 		Unlock();
 	}
@@ -1838,16 +1854,16 @@ TMailWindow::Zoom(BPoint /*pos*/, float /*x*/, float /*y*/)
 
 	BRect rect = Frame();
 	width = 80 * fApp->ContentFont().StringWidth("M")
-		+ (rect.Width() - fContentView->fTextView->Bounds().Width() + 6);
+		+ (rect.Width() - fContentView->TextView()->Bounds().Width() + 6);
 
 	BScreen screen(this);
 	BRect screenFrame = screen.Frame();
 	if (width > (screenFrame.Width() - 8))
 		width = screenFrame.Width() - 8;
 
-	height = max_c(fContentView->fTextView->CountLines(), 20)
-		* fContentView->fTextView->LineHeight(0)
-		+ (rect.Height() - fContentView->fTextView->Bounds().Height());
+	height = max_c(fContentView->TextView()->CountLines(), 20)
+		* fContentView->TextView()->LineHeight(0)
+		+ (rect.Height() - fContentView->TextView()->Bounds().Height());
 	if (height > (screenFrame.Height() - 29))
 		height = screenFrame.Height() - 29;
 
@@ -1917,22 +1933,12 @@ TMailWindow::Forward(entry_ref* ref, TMailWindow* window,
 	if (file.InitCheck() < B_NO_ERROR)
 		return;
 
-	fHeaderView->fSubject->SetText(fMail->Subject());
+	fHeaderView->SetSubject(fMail->Subject());
 
 	// set mail account
 
-	if (useAccountFrom == ACCOUNT_FROM_MAIL) {
-		fHeaderView->fAccountID = fMail->Account();
-
-		BMenu* menu = fHeaderView->fAccountMenu;
-		for (int32 i = menu->CountItems(); i-- > 0;) {
-			BMenuItem* item = menu->ItemAt(i);
-			BMessage* msg;
-			if (item && (msg = item->Message()) != NULL
-				&& msg->FindInt32("id") == fHeaderView->fAccountID)
-				item->SetMarked(true);
-		}
-	}
+	if (useAccountFrom == ACCOUNT_FROM_MAIL)
+		fHeaderView->SetAccount(fMail->Account());
 
 	if (fMail->CountComponents() > 1) {
 		// if there are any enclosures to be added, first add the enclosures
@@ -1942,7 +1948,7 @@ TMailWindow::Forward(entry_ref* ref, TMailWindow* window,
 			fEnclosuresView->AddEnclosuresFromMail(fMail);
 	}
 
-	fContentView->fTextView->LoadMessage(fMail, false, NULL);
+	fContentView->TextView()->LoadMessage(fMail, false, NULL);
 	fChanged = false;
 	fFieldState = 0;
 }
@@ -1974,24 +1980,24 @@ TMailWindow::Print()
 			B_FOLLOW_ALL_SIDES);
 
 		//---------Init the header fields
-		#define add_header_field(field) { \
+		#define add_header_field(label, field) { \
 			/*header_view.SetFontAndColor(be_bold_font);*/ \
-			header_view.Insert(fHeaderView->field->Label()); \
+			header_view.Insert(label); \
 			header_view.Insert(" "); \
 			/*header_view.SetFontAndColor(be_plain_font);*/ \
-			header_view.Insert(fHeaderView->field->Text()); \
+			header_view.Insert(field); \
 			header_view.Insert("\n"); \
 		}
 
-		add_header_field(fSubject);
-		add_header_field(fTo);
-		if (fHeaderView->fCc != NULL && fHeaderView->fCc->TextLength() != 0)
-			add_header_field(fCc);
+		add_header_field("Subject:", fHeaderView->Subject());
+		add_header_field("To:", fHeaderView->To());
+		if (!fHeaderView->IsCcEmpty())
+			add_header_field(B_TRANSLATE("Cc:"), fHeaderView->Cc());
 
-		if (fHeaderView->fDate != NULL)
-			header_view.Insert(fHeaderView->fDate->Text());
+		if (!fHeaderView->IsDateEmpty())
+			header_view.Insert(fHeaderView->Date());
 
-		int32 maxLine = fContentView->fTextView->CountLines();
+		int32 maxLine = fContentView->TextView()->CountLines();
 		BRect pageRect = print.PrintableRect();
 		BRect curPageRect = pageRect;
 
@@ -2011,26 +2017,26 @@ TMailWindow::Print()
 		header_height += 5;
 
 		do {
-			int32 lineOffset = fContentView->fTextView->OffsetAt(lastLine);
+			int32 lineOffset = fContentView->TextView()->OffsetAt(lastLine);
 			curPageRect.OffsetTo(0,
-				fContentView->fTextView->PointAt(lineOffset).y);
+				fContentView->TextView()->PointAt(lineOffset).y);
 
 			int32 fromLine = lastLine;
-			lastLine = fContentView->fTextView->LineAt(
+			lastLine = fContentView->TextView()->LineAt(
 				BPoint(0.0, curPageRect.bottom - ((curPage == 1)
 					? header_height : 0)));
 
-			float curPageHeight = fContentView->fTextView->TextHeight(
+			float curPageHeight = fContentView->TextView()->TextHeight(
 				fromLine, lastLine) + (curPage == 1 ? header_height : 0);
 
 			if (curPageHeight > pageRect.Height()) {
-				curPageHeight = fContentView->fTextView->TextHeight(
+				curPageHeight = fContentView->TextView()->TextHeight(
 					fromLine, --lastLine) + (curPage == 1 ? header_height : 0);
 			}
 			curPageRect.bottom = curPageRect.top + curPageHeight - 1.0;
 
 			if (curPage >= print.FirstPage() && curPage <= print.LastPage()) {
-				print.DrawView(fContentView->fTextView, curPageRect,
+				print.DrawView(fContentView->TextView(), curPageRect,
 					BPoint(0.0, curPage == 1 ? header_height : 0.0));
 				print.SpoolPage();
 			}
@@ -2069,18 +2075,18 @@ TMailWindow::SetTo(const char* mailTo, const char* subject, const char* ccTo,
 {
 	Lock();
 
-	if (mailTo && mailTo[0])
-		fHeaderView->fTo->SetText(mailTo);
-	if (subject && subject[0])
-		fHeaderView->fSubject->SetText(subject);
-	if (ccTo && ccTo[0])
-		fHeaderView->fCc->SetText(ccTo);
-	if (bccTo && bccTo[0])
-		fHeaderView->fBcc->SetText(bccTo);
+	if (mailTo != NULL && mailTo[0])
+		fHeaderView->SetTo(mailTo);
+	if (subject != NULL && subject[0])
+		fHeaderView->SetSubject(subject);
+	if (ccTo != NULL && ccTo[0])
+		fHeaderView->SetCc(ccTo);
+	if (bccTo != NULL && bccTo[0])
+		fHeaderView->SetBcc(bccTo);
 
-	if (body && body->Length()) {
-		fContentView->fTextView->SetText(body->String(), body->Length());
-		fContentView->fTextView->GoToLine(0);
+	if (body != NULL && body->Length()) {
+		fContentView->TextView()->SetText(body->String(), body->Length());
+		fContentView->TextView()->GoToLine(0);
 	}
 
 	if (enclosures && enclosures->HasRef("refs"))
@@ -2096,23 +2102,20 @@ TMailWindow::CopyMessage(entry_ref* ref, TMailWindow* src)
 	BNode file(ref);
 	if (file.InitCheck() == B_OK) {
 		BString string;
-		if (fHeaderView->fTo
-			&& file.ReadAttrString(B_MAIL_ATTR_TO, &string) == B_OK)
-			fHeaderView->fTo->SetText(string.String());
+		if (file.ReadAttrString(B_MAIL_ATTR_TO, &string) == B_OK)
+			fHeaderView->SetTo(string);
 
-		if (fHeaderView->fSubject
-			&& file.ReadAttrString(B_MAIL_ATTR_SUBJECT, &string) == B_OK)
-			fHeaderView->fSubject->SetText(string.String());
+		if (file.ReadAttrString(B_MAIL_ATTR_SUBJECT, &string) == B_OK)
+			fHeaderView->SetSubject(string);
 
-		if (fHeaderView->fCc
-			&& file.ReadAttrString(B_MAIL_ATTR_CC, &string) == B_OK)
-			fHeaderView->fCc->SetText(string.String());
+		if (file.ReadAttrString(B_MAIL_ATTR_CC, &string) == B_OK)
+			fHeaderView->SetCc(string);
 	}
 
-	TTextView* text = src->fContentView->fTextView;
+	TTextView* text = src->fContentView->TextView();
 	text_run_array* style = text->RunArray(0, text->TextLength());
 
-	fContentView->fTextView->SetText(text->Text(), text->TextLength(), style);
+	fContentView->TextView()->SetText(text->Text(), text->TextLength(), style);
 
 	free(style);
 }
@@ -2141,9 +2144,9 @@ TMailWindow::Reply(entry_ref* ref, TMailWindow* window, uint32 type)
 		useAccountFrom == ACCOUNT_FROM_MAIL, QUOTE);
 
 	// set header fields
-	fHeaderView->fTo->SetText(fMail->To());
-	fHeaderView->fCc->SetText(fMail->CC());
-	fHeaderView->fSubject->SetText(fMail->Subject());
+	fHeaderView->SetTo(fMail->To());
+	fHeaderView->SetCc(fMail->CC());
+	fHeaderView->SetSubject(fMail->Subject());
 
 	int32 accountID;
 	BFile file(window->fRef, B_READ_ONLY);
@@ -2155,18 +2158,9 @@ TMailWindow::Reply(entry_ref* ref, TMailWindow* window, uint32 type)
 
 	if ((useAccountFrom == ACCOUNT_FROM_MAIL) || (accountID > -1)) {
 		if (useAccountFrom == ACCOUNT_FROM_MAIL)
-			fHeaderView->fAccountID = fMail->Account();
+			fHeaderView->SetAccount(fMail->Account());
 		else
-			fHeaderView->fAccountID = accountID;
-
-		BMenu* menu = fHeaderView->fAccountMenu;
-		for (int32 i = menu->CountItems(); i-- > 0;) {
-			BMenuItem* item = menu->ItemAt(i);
-			BMessage* msg;
-			if (item && (msg = item->Message()) != NULL
-				&& msg->FindInt32("id") == fHeaderView->fAccountID)
-				item->SetMarked(true);
-		}
+			fHeaderView->SetAccount(accountID);
 	}
 
 	// create preamble string
@@ -2194,44 +2188,44 @@ TMailWindow::Reply(entry_ref* ref, TMailWindow* window, uint32 type)
 	// insert (if selection) or load (if whole mail) message text into text view
 
 	int32 finish, start;
-	window->fContentView->fTextView->GetSelection(&start, &finish);
+	window->fContentView->TextView()->GetSelection(&start, &finish);
 	if (start != finish) {
 		char* text = (char*)malloc(finish - start + 1);
 		if (text == NULL)
 			return;
 
-		window->fContentView->fTextView->GetText(start, finish - start, text);
+		window->fContentView->TextView()->GetText(start, finish - start, text);
 		if (text[strlen(text) - 1] != '\n') {
 			text[strlen(text)] = '\n';
 			finish++;
 		}
-		fContentView->fTextView->SetText(text, finish - start);
+		fContentView->TextView()->SetText(text, finish - start);
 		free(text);
 
-		finish = fContentView->fTextView->CountLines();
+		finish = fContentView->TextView()->CountLines();
 		for (int32 loop = 0; loop < finish; loop++) {
-			fContentView->fTextView->GoToLine(loop);
-			fContentView->fTextView->Insert((const char*)QUOTE);
+			fContentView->TextView()->GoToLine(loop);
+			fContentView->TextView()->Insert((const char*)QUOTE);
 		}
 
 		if (fApp->ColoredQuotes()) {
-			const BFont* font = fContentView->fTextView->Font();
-			int32 length = fContentView->fTextView->TextLength();
+			const BFont* font = fContentView->TextView()->Font();
+			int32 length = fContentView->TextView()->TextLength();
 
 			TextRunArray style(length / 8 + 8);
 
-			FillInQuoteTextRuns(fContentView->fTextView, NULL,
-				fContentView->fTextView->Text(), length, font, &style.Array(),
+			FillInQuoteTextRuns(fContentView->TextView(), NULL,
+				fContentView->TextView()->Text(), length, font, &style.Array(),
 				style.MaxEntries());
 
-			fContentView->fTextView->SetRunArray(0, length, &style.Array());
+			fContentView->TextView()->SetRunArray(0, length, &style.Array());
 		}
 
-		fContentView->fTextView->GoToLine(0);
+		fContentView->TextView()->GoToLine(0);
 		if (preamble.Length() > 0)
-			fContentView->fTextView->Insert(preamble);
+			fContentView->TextView()->Insert(preamble);
 	} else {
-		fContentView->fTextView->LoadMessage(mail, true, preamble);
+		fContentView->TextView()->LoadMessage(mail, true, preamble);
 	}
 
 	fReplying = true;
@@ -2241,10 +2235,6 @@ TMailWindow::Reply(entry_ref* ref, TMailWindow* window, uint32 type)
 status_t
 TMailWindow::Send(bool now)
 {
-	uint32 characterSetToUse = fApp->MailCharacterSet();
-	mail_encoding encodingForBody = quoted_printable;
-	mail_encoding encodingForHeaders = quoted_printable;
-
 	if (!now) {
 		status_t status = SaveAsDraft();
 		if (status != B_OK) {
@@ -2257,8 +2247,9 @@ TMailWindow::Send(bool now)
 		return status;
 	}
 
-	if (fHeaderView != NULL)
-		characterSetToUse = fHeaderView->fCharacterSetUserSees;
+	uint32 characterSetToUse = _CurrentCharacterSet();
+	mail_encoding encodingForBody = quoted_printable;
+	mail_encoding encodingForHeaders = quoted_printable;
 
 	// Set up the encoding to use for converting binary to printable ASCII.
 	// Normally this will be quoted printable, but for some old software,
@@ -2286,19 +2277,19 @@ TMailWindow::Send(bool now)
 	// Count the number of characters in the message body which aren't in the
 	// currently selected character set.  Also see if the resulting encoded
 	// text can safely use 7 bit characters.
-	if (fContentView->fTextView->TextLength() > 0) {
+	if (fContentView->TextView()->TextLength() > 0) {
 		// First do a trial encoding with the user's character set.
 		int32 converterState = 0;
 		int32 originalLength;
 		BString tempString;
 		int32 tempStringLength;
 		char* tempStringPntr;
-		originalLength = fContentView->fTextView->TextLength();
+		originalLength = fContentView->TextView()->TextLength();
 		tempStringLength = originalLength * 6;
 			// Some character sets bloat up on escape codes
 		tempStringPntr = tempString.LockBuffer (tempStringLength);
 		if (tempStringPntr != NULL && mail_convert_from_utf8(characterSetToUse,
-				fContentView->fTextView->Text(), &originalLength,
+				fContentView->TextView()->Text(), &originalLength,
 				tempStringPntr, &tempStringLength, &converterState,
 				0x1A /* used for unknown characters */) == B_OK) {
 			// Check for any characters which don't fit in a 7 bit encoding.
@@ -2369,11 +2360,11 @@ TMailWindow::Send(bool now)
 		result = file.InitCheck();
 		if (result == B_OK) {
 			BEmailMessage mail(&file);
-			mail.SetTo(fHeaderView->fTo->Text(), characterSetToUse,
+			mail.SetTo(fHeaderView->To(), characterSetToUse,
 				encodingForHeaders);
 
-			if (fHeaderView->fAccountID != ~0L)
-				mail.SendViaAccount(fHeaderView->fAccountID);
+			if (fHeaderView->AccountID() != ~0L)
+				mail.SendViaAccount(fHeaderView->AccountID());
 
 			result = mail.Send(now);
 		}
@@ -2386,13 +2377,11 @@ TMailWindow::Send(bool now)
 		// CC field meant that it got sent out anyway, so pass in empty strings
 		// when changing the header to force it to remove the header.
 
-		fMail->SetTo(fHeaderView->fTo->Text(), characterSetToUse,
+		fMail->SetTo(fHeaderView->To(), characterSetToUse, encodingForHeaders);
+		fMail->SetSubject(fHeaderView->Subject(), characterSetToUse,
 			encodingForHeaders);
-		fMail->SetSubject(fHeaderView->fSubject->Text(), characterSetToUse,
-			encodingForHeaders);
-		fMail->SetCC(fHeaderView->fCc->Text(), characterSetToUse,
-			encodingForHeaders);
-		fMail->SetBCC(fHeaderView->fBcc->Text());
+		fMail->SetCC(fHeaderView->Cc(), characterSetToUse, encodingForHeaders);
+		fMail->SetBCC(fHeaderView->Bcc());
 
 		//--- Add X-Mailer field
 		{
@@ -2421,7 +2410,7 @@ TMailWindow::Send(bool now)
 
 		// the content text is always added to make sure there is a mail body
 		fMail->SetBodyTextTo("");
-		fContentView->fTextView->AddAsContent(fMail, fApp->WrapMode(),
+		fContentView->TextView()->AddAsContent(fMail, fApp->WrapMode(),
 			characterSetToUse, encodingForBody);
 
 		if (fEnclosuresView != NULL) {
@@ -2440,8 +2429,8 @@ TMailWindow::Send(bool now)
 				fMail->Attach(item->Ref(), fApp->AttachAttributes());
 			}
 		}
-		if (fHeaderView->fAccountID != ~0L)
-			fMail->SendViaAccount(fHeaderView->fAccountID);
+		if (fHeaderView->AccountID() != ~0L)
+			fMail->SendViaAccount(fHeaderView->AccountID());
 
 		result = fMail->Send(now);
 
@@ -2571,12 +2560,12 @@ TMailWindow::SaveAsDraft()
 			{
 				char fileName[B_FILE_NAME_LENGTH];
 				// save as some version of the message's subject
-				if (strlen(fHeaderView->fSubject->Text()) == 0)
+				if (fHeaderView->IsSubjectEmpty()) {
 					strlcpy(fileName, B_TRANSLATE("Untitled"),
 						sizeof(fileName));
-				else
-					strlcpy(fileName, fHeaderView->fSubject->Text(),
-						sizeof(fileName));
+				} else {
+					strlcpy(fileName, fHeaderView->Subject(), sizeof(fileName));
+				}
 
 				uint32 originalLength = strlen(fileName);
 
@@ -2623,25 +2612,26 @@ TMailWindow::SaveAsDraft()
 	}
 
 	// Write the content of the message
-	draft.Write(fContentView->fTextView->Text(),
-		fContentView->fTextView->TextLength());
+	draft.Write(fContentView->TextView()->Text(),
+		fContentView->TextView()->TextLength());
 
 	// Add the header stuff as attributes
-	WriteAttrString(&draft, B_MAIL_ATTR_NAME, fHeaderView->fTo->Text());
-	WriteAttrString(&draft, B_MAIL_ATTR_TO, fHeaderView->fTo->Text());
-	WriteAttrString(&draft, B_MAIL_ATTR_SUBJECT, fHeaderView->fSubject->Text());
-	if (fHeaderView->fCc != NULL)
-		WriteAttrString(&draft, B_MAIL_ATTR_CC, fHeaderView->fCc->Text());
-	if (fHeaderView->fBcc != NULL)
-		WriteAttrString(&draft, B_MAIL_ATTR_BCC, fHeaderView->fBcc->Text());
+	WriteAttrString(&draft, B_MAIL_ATTR_NAME, fHeaderView->To());
+	WriteAttrString(&draft, B_MAIL_ATTR_TO, fHeaderView->To());
+	WriteAttrString(&draft, B_MAIL_ATTR_SUBJECT, fHeaderView->Subject());
+	if (!fHeaderView->IsCcEmpty())
+		WriteAttrString(&draft, B_MAIL_ATTR_CC, fHeaderView->Cc());
+	if (!fHeaderView->IsBccEmpty())
+		WriteAttrString(&draft, B_MAIL_ATTR_BCC, fHeaderView->Bcc());
 
 	// Add account
-	BMenuItem* menuItem = fHeaderView->fAccountMenu->FindMarked();
-	if (menuItem != NULL)
-		WriteAttrString(&draft, B_MAIL_ATTR_ACCOUNT, menuItem->Label());
+	if (fHeaderView->AccountName() != NULL) {
+		WriteAttrString(&draft, B_MAIL_ATTR_ACCOUNT,
+			fHeaderView->AccountName());
+	}
 
 	// Add encoding
-	menuItem = fHeaderView->fEncodingMenu->FindMarked();
+	BMenuItem* menuItem = fEncodingMenu->FindMarked();
 	if (menuItem != NULL)
 		WriteAttrString(&draft, "MAIL:encoding", menuItem->Label());
 
@@ -2838,7 +2828,7 @@ TMailWindow::OpenMessage(const entry_ref* ref, uint32 characterSetForDecoding)
 	fPrevTrackerPositionSaved = false;
 	fNextTrackerPositionSaved = false;
 
-	fContentView->fTextView->StopLoad();
+	fContentView->TextView()->StopLoad();
 	delete fMail;
 	fMail = NULL;
 
@@ -2870,28 +2860,25 @@ TMailWindow::OpenMessage(const entry_ref* ref, uint32 characterSetForDecoding)
 
 		// Load the raw UTF-8 text from the file.
 		file.GetSize(&size);
-		fContentView->fTextView->SetText(&file, 0, size);
+		fContentView->TextView()->SetText(&file, 0, size);
 
 		// Restore Fields from attributes
 		if (node.ReadAttrString(B_MAIL_ATTR_TO, &string) == B_OK)
-			fHeaderView->fTo->SetText(string.String());
+			fHeaderView->SetTo(string);
 		if (node.ReadAttrString(B_MAIL_ATTR_SUBJECT, &string) == B_OK)
-			fHeaderView->fSubject->SetText(string.String());
+			fHeaderView->SetSubject(string);
 		if (node.ReadAttrString(B_MAIL_ATTR_CC, &string) == B_OK)
-			fHeaderView->fCc->SetText(string.String());
+			fHeaderView->SetCc(string);
 		if (node.ReadAttrString(B_MAIL_ATTR_BCC, &string) == B_OK)
-			fHeaderView->fBcc->SetText(string.String());
+			fHeaderView->SetBcc(string);
 
 		// Restore account
-		if (node.ReadAttrString(B_MAIL_ATTR_ACCOUNT, &string) == B_OK) {
-			BMenuItem* accountItem = fHeaderView->fAccountMenu->FindItem(string.String());
-			if (accountItem != NULL)
-				accountItem->SetMarked(true);
-		}
+		if (node.ReadAttrString(B_MAIL_ATTR_ACCOUNT, &string) == B_OK)
+			fHeaderView->SetAccount(string);
 
 		// Restore encoding
 		if (node.ReadAttrString("MAIL:encoding", &string) == B_OK) {
-			BMenuItem* encodingItem = fHeaderView->fEncodingMenu->FindItem(string.String());
+			BMenuItem* encodingItem = fEncodingMenu->FindItem(string.String());
 			if (encodingItem != NULL)
 				encodingItem->SetMarked(true);
 		}
@@ -2923,7 +2910,7 @@ TMailWindow::OpenMessage(const entry_ref* ref, uint32 characterSetForDecoding)
 		// A real mail message, parse its headers to get from, to, etc.
 		fMail = new BEmailMessage(fRef, characterSetForDecoding);
 		fIncoming = true;
-		fHeaderView->LoadMessage(fMail);
+		fHeaderView->SetFromMessage(fMail);
 	}
 
 	err = fMail->InitCheck();
@@ -2977,9 +2964,9 @@ TMailWindow::OpenMessage(const entry_ref* ref, uint32 characterSetForDecoding)
 		}
 
 		// Clear out existing contents of text view.
-		fContentView->fTextView->SetText("", (int32)0);
+		fContentView->TextView()->SetText("", (int32)0);
 
-		fContentView->fTextView->LoadMessage(fMail, false, NULL);
+		fContentView->TextView()->LoadMessage(fMail, false, NULL);
 
 		if (fApp->ShowToolBar())
 			_UpdateReadButton();
@@ -3001,31 +2988,6 @@ TMailWindow::FrontmostWindow()
 
 
 // #pragma mark -
-
-
-void
-TMailWindow::_UpdateSizeLimits()
-{
-	float minWidth, maxWidth, minHeight, maxHeight;
-	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-
-	float height;
-	fMenuBar->GetPreferredSize(&minWidth, &height);
-
-	minHeight = height;
-
-	if (fToolBar != NULL) {
-		minWidth = fToolBar->MinSize().width;
-		height = fToolBar->MinSize().height;
-		minHeight += height;
-	} else {
-		minWidth = WIND_WIDTH;
-	}
-
-	minHeight += fHeaderView->Bounds().Height() + ENCLOSURES_HEIGHT + 60;
-
-	SetSizeLimits(minWidth, RIGHT_BOUNDARY, minHeight, RIGHT_BOUNDARY);
-}
 
 
 status_t
@@ -3231,4 +3193,18 @@ void
 TMailWindow::_SetDownloading(bool downloading)
 {
 	fDownloading = downloading;
+}
+
+
+uint32
+TMailWindow::_CurrentCharacterSet() const
+{
+	uint32 defaultCharSet = fResending || !fIncoming
+		? fApp->MailCharacterSet() : B_MAIL_NULL_CONVERSION;
+
+	BMenuItem* marked = fEncodingMenu->FindMarked();
+	if (marked == NULL)
+		return defaultCharSet;
+
+	return marked->Message()->GetInt32("charset", defaultCharSet);
 }

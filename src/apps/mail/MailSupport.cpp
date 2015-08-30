@@ -166,4 +166,3 @@ add_query_menu_items(BMenu* menu, const char* attribute, uint32 what,
 
 	return index;
 }
-

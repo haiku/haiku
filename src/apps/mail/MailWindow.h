@@ -124,8 +124,6 @@ protected:
 			status_t			TrainMessageAs(const char* commandWord);
 
 private:
-			void				_UpdateSizeLimits();
-
 			status_t			_GetQueryPath(BPath* path) const;
 			void				_RebuildQueryMenu(bool firstTime = false);
 			char*				_BuildQueryString(BEntry* entry) const;
@@ -134,6 +132,7 @@ private:
 			void				_UpdateReadButton();
 
 			void				_SetDownloading(bool downloading);
+			uint32				_CurrentCharacterSet() const;
 
 	static	BBitmap*			_RetrieveVectorIcon(int32 id);
 
@@ -169,6 +168,7 @@ private:
 
 			BMenu*				fQueryMenu;
 			BMenu*				fLeaveStatusMenu;
+			BMenu*				fEncodingMenu;
 
 	struct BitmapItem {
 		BBitmap* bm;

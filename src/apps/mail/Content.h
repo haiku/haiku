@@ -102,26 +102,25 @@ struct hyper_text {
 class TSavePanel;
 
 
-//====================================================================
-
 class TContentView : public BView {
-	public:
-		TContentView(BRect, bool incoming, BFont*,
-			bool showHeader, bool coloredQuotes); 
-		virtual void MessageReceived(BMessage *);
-		void FindString(const char *);
-		void Focus(bool);
-		void FrameResized(float, float);
+public:
+								TContentView(bool incoming, BFont* font,
+									bool showHeader, bool coloredQuotes);
 
-		TTextView *fTextView;
+			void				FindString(const char *);
+			void				Focus(bool);
 
-	private:
-		bool	fFocus;
-		bool	fIncoming;
-		float	fOffset;
+			TTextView*			TextView() const { return fTextView; }
+
+	virtual	void				MessageReceived(BMessage* message);
+
+private:
+			TTextView*			fTextView;
+			bool				fFocus;
+			bool				fIncoming;
+			float				fOffset;
 };
 
-//====================================================================
 
 enum {
 	S_CLEAR_ERRORS = 1,
@@ -148,7 +147,7 @@ struct quote_context {
 
 class TTextView : public BTextView {
 	public:
-								TTextView(BRect, BRect, bool incoming,
+								TTextView(bool incoming,
 									TContentView*, BFont*, bool showHeader,
 									bool coloredQuotes);
 								~TTextView();
@@ -283,7 +282,7 @@ class TSavePanel : public BFilePanel {
 		TSavePanel(hyper_text*, TTextView*);
 		virtual void SendMessage(const BMessenger*, BMessage*);
 		void SetEnclosure(hyper_text*);
-	
+
 	private:
 		hyper_text *fEnclosure;
 		TTextView *fView;

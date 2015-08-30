@@ -10,10 +10,12 @@ UsePrivateHeaders textencoding ;
 UsePrivateHeaders shared ;
 UsePrivateHeaders storage ;
 
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src apps webpositive autocompletion ] ;
+
 AddResources Mail : pictures.rdef  ;
 
 Application Mail :
-	ComboBox.cpp
+	AddressTextControl.cpp
 	Content.cpp
 	Enclosures.cpp
 	FindWindow.cpp
@@ -23,7 +25,9 @@ Application Mail :
 	MailSupport.cpp
 	MailWindow.cpp
 	MessageStatus.cpp
+	People.cpp
 	Prefs.cpp
+	QueryList.cpp
 	QueryMenu.cpp
 	Signature.cpp
 	Status.cpp
@@ -31,6 +35,12 @@ Application Mail :
 	WIndex.cpp
 	Words.cpp
 	KUndoBuffer.cpp
+
+	# autocompletion
+	AutoCompleter.cpp
+	AutoCompleterDefaultImpl.cpp
+	TextViewCompleter.cpp
+
 	: libshared.a be tracker [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 		localestub libmail.so libtextencoding.so
 	: Mail.rdef

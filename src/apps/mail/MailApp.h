@@ -34,12 +34,16 @@ All rights reserved.
 #ifndef _MAIL_APP_H
 #define _MAIL_APP_H
 
+
 #include <Application.h>
 #include <Catalog.h>
 #include <Entry.h>
 #include <Font.h>
 #include <List.h>
 #include <String.h>
+
+#include "People.h"
+#include "QueryList.h"
 
 
 class BFile;
@@ -90,6 +94,13 @@ class TMailApp : public BApplication {
 									{ return fShowSpamGUI; }
 				BFont			ContentFont();
 
+				QueryList&		PeopleQueryList()
+									{ return fPeopleQueryList; }
+				PersonList&		People()
+									{ return fPeople; }
+				GroupList&		PeopleGroups()
+									{ return fPeopleGroups; }
+
 	private:
 				void			_ClearPrintSettings();
 				void			_CheckForSpamFilterExistence();
@@ -128,6 +139,10 @@ class TMailApp : public BApplication {
 				int32			fUseAccountFrom;
 				uint32			fMailCharacterSet;
 				BFont			fContentFont;
+
+				QueryList		fPeopleQueryList;
+				PersonList		fPeople;
+				GroupList		fPeopleGroups;
 };
 
 
