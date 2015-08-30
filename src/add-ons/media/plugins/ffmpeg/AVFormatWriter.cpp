@@ -53,7 +53,7 @@ static const size_t kIOBufferSize = 64 * 1024;
 #define OPEN_CODEC_CONTEXT 1
 #define GET_CONTEXT_DEFAULTS 0
 
-#if __GNUC__ > 2
+#if LIBAVCODEC_VERSION_INT > ((54 << 16) | (23 << 8))
 typedef AVCodecID CodecID;
 #endif
 
