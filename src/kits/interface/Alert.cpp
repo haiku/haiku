@@ -691,6 +691,11 @@ BAlert::_Prepare()
 
 	ResizeToPreferred();
 
+	// Return early if we've already been moved...
+	if (Frame().left != 0 && Frame().right != 0)
+		return;
+
+	// otherwise center ourselves on-top of parent window/screen
 	BWindow* parent = dynamic_cast<BWindow*>(BLooper::LooperForThread(
 		find_thread(NULL)));
 	const BRect frame = parent != NULL ? parent->Frame()
