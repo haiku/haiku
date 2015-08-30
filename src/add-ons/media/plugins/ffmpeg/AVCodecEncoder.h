@@ -17,6 +17,11 @@ extern "C" {
 #include "EncoderPlugin.h"
 
 
+#if __GNUC__ > 2
+typedef AVCodecID CodecID;
+#endif
+
+
 class AVCodecEncoder : public Encoder {
 public:
 								AVCodecEncoder(uint32 codecID,

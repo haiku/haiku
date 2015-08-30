@@ -11,9 +11,15 @@ extern "C" {
 	#include "avformat.h"
 }
 
+
+#if __GNUC__ > 2
+typedef AVCodecID CodecID;
+#endif
+
+
 //XXX: newer versions have it in libavformat/internal.h
 typedef struct AVCodecTag {
-    enum CodecID id;
+    CodecID id;
     unsigned int tag;
 } AVCodecTag;
 

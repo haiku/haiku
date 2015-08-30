@@ -40,9 +40,9 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	:
 	Encoder(),
 	fBitRateScale(bitRateScale),
-	fCodecID((enum CodecID)codecID),
+	fCodecID((CodecID)codecID),
 	fCodec(NULL),
-	fOwnContext(avcodec_alloc_context()),
+	fOwnContext(avcodec_alloc_context3(NULL)),
 	fContext(fOwnContext),
 	fCodecInitStatus(CODEC_INIT_NEEDED),
 
@@ -494,7 +494,7 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 	fContext->strict_std_compliance = -2;
 
 	// Open the codec
-	int result = avcodec_open(fContext, fCodec);
+	int result = avcodec_open2(fContext, fCodec, NULL);
 	if (result >= 0)
 		fCodecInitStatus = CODEC_INIT_DONE;
 	else

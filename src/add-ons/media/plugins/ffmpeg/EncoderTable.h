@@ -13,6 +13,11 @@ extern "C" {
 }
 
 
+#if __GNUC__ > 2
+typedef AVCodecID CodecID;
+#endif
+
+
 struct EncoderDescription {
 	media_codec_info		codec_info;
 	media_format_family		format_family;
