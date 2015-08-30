@@ -377,6 +377,7 @@ BAlert::AddButton(const char* label, char key)
 	fButtons.push_back(button);
 	fKeys.push_back(key);
 
+	SetDefaultButton(button);
 	fButtonLayout->AddView(button);
 }
 
@@ -642,8 +643,6 @@ BAlert::_Prepare()
 	// Must have at least one button
 	if (CountButtons() == 0)
 		debugger("BAlerts must have at least one button.");
-
-	SetDefaultButton(ButtonAt(CountButtons() - 1));
 
 	float fontFactor = be_plain_font->Size() / 11.0f;
 
