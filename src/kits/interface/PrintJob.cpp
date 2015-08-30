@@ -747,22 +747,12 @@ PrintServerMessenger::~PrintServerMessenger()
 void
 PrintServerMessenger::RejectUserInput()
 {
-	// TODO: This code is sort of a hack:
-	// It creates a BAlert then moves it out of the screen to
-	// block user input.
 	fHiddenApplicationModalWindow = new BAlert("bogus", "app_modal", "OK");
-	BButton* defaultButton = fHiddenApplicationModalWindow->DefaultButton();
-	if (defaultButton != NULL) {
-		// TODO: Doing this is useless, since BAlert now sets its
-		// default button on Go().
-		defaultButton->SetEnabled(false);
-		fHiddenApplicationModalWindow->SetDefaultButton(NULL);
-	}
+	fHiddenApplicationModalWindow->DefaultButton()->SetEnabled(false);
+	fHiddenApplicationModalWindow->SetDefaultButton(NULL);
 	fHiddenApplicationModalWindow->SetFlags(fHiddenApplicationModalWindow->Flags() | B_CLOSE_ON_ESCAPE);
-	fHiddenApplicationModalWindow->Go(NULL);
-
-	// Moved here because now BAlert centers itself on screen in Go().
 	fHiddenApplicationModalWindow->MoveTo(-65000, -65000);
+	fHiddenApplicationModalWindow->Go(NULL);
 }
 
 
@@ -876,6 +866,7 @@ PrintServerMessenger::MessengerThread(void* data)
 		messenger->SetResult(NULL);
 		return B_ERROR;
 	}
+
 
 	BMessage reply;
 	if (printServer.SendMessage(request, &reply) != B_OK
