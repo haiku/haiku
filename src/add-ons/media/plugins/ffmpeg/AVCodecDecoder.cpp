@@ -57,7 +57,7 @@
 // Otherwise the alternative code could simply be removed from this file.
 #endif
 
-#if LIBAVCODEC_VERSION_INT > ((54 << 16) | (23 << 8))
+#if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
 typedef AVCodecID CodecID;
 #endif
 
