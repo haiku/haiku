@@ -110,8 +110,9 @@ AHCIPort::Init1()
 	// prdt follows after command table
 
 	// disable transitions to partial or slumber state
-	fRegs->sctl.ipm = IPM_TRANSITIONS_TO_PARTIAL_DISABLED
-		| IPM_TRANSITIONS_TO_SLUMBER_DISABLED;
+	fRegs->sctl = (fRegs->sctl & ~SATA_CONTROL_IPM_MASK)
+		| (IPM_TRANSITIONS_TO_PARTIAL_DISABLED
+			| IPM_TRANSITIONS_TO_SLUMBER_DISABLED) << SATA_CONTROL_IPM_SHIFT;
 
 	// clear IRQ status bits
 	fRegs->is = fRegs->is;
@@ -157,12 +158,12 @@ AHCIPort::Init2()
 	TRACE("is   0x%08" B_PRIx32 "\n", fRegs->is);
 	TRACE("cmd  0x%08" B_PRIx32 "\n", fRegs->cmd);
 	TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
-	TRACE("sctl.reserved 0x%04" B_PRIx16 "\n", fRegs->sctl.reserved);
-	TRACE("sctl.pmp 0x%02" B_PRIx8 "\n", fRegs->sctl.pmp);
-	TRACE("sctl.spm 0x%02" B_PRIx8 "\n", fRegs->sctl.spm);
-	TRACE("sctl.ipm 0x%02" B_PRIx8 "\n", fRegs->sctl.ipm);
-	TRACE("sctl.spd 0x%02" B_PRIx8 "\n", fRegs->sctl.spd);
-	TRACE("sctl.det 0x%02" B_PRIx8 "\n", fRegs->sctl.det);
+	TRACE("sctl.ipm 0x%02" B_PRIx32 "\n",
+		(fRegs->sctl & SATA_CONTROL_IPM_MASK) >> SATA_CONTROL_IPM_SHIFT);
+	TRACE("sctl.spd 0x%02" B_PRIx32 "\n",
+		(fRegs->sctl & SATA_CONTROL_SPD_MASK) >> SATA_CONTROL_SPD_SHIFT);
+	TRACE("sctl.det 0x%02" B_PRIx32 "\n",
+		(fRegs->sctl & SATA_CONTROL_DET_MASK) >> SATA_CONTROL_DET_SHIFT);
 	TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
 	TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
 	TRACE("tfd  0x%08" B_PRIx32 "\n", fRegs->tfd);
@@ -359,12 +360,12 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 			B_PRIx32 ", is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n", fIndex,
 			fCommandsActive, is, ci);
 		TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
-		TRACE("sctl.reserved 0x%04" B_PRIx16 "\n", fRegs->sctl.reserved);
-		TRACE("sctl.pmp 0x%02" B_PRIx8 "\n", fRegs->sctl.pmp);
-		TRACE("sctl.spm 0x%02" B_PRIx8 "\n", fRegs->sctl.spm);
-		TRACE("sctl.ipm 0x%02" B_PRIx8 "\n", fRegs->sctl.ipm);
-		TRACE("sctl.spd 0x%02" B_PRIx8 "\n", fRegs->sctl.spd);
-		TRACE("sctl.det 0x%02" B_PRIx8 "\n", fRegs->sctl.det);
+		TRACE("sctl.ipm 0x%02" B_PRIx32 "\n",
+			(fRegs->sctl & SATA_CONTROL_IPM_MASK) >> SATA_CONTROL_IPM_SHIFT);
+		TRACE("sctl.spd 0x%02" B_PRIx32 "\n",
+			(fRegs->sctl & SATA_CONTROL_SPD_MASK) >> SATA_CONTROL_SPD_SHIFT);
+		TRACE("sctl.det 0x%02" B_PRIx32 "\n",
+			(fRegs->sctl & SATA_CONTROL_DET_MASK) >> SATA_CONTROL_DET_SHIFT);
 		TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
 		TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
 	}
@@ -1239,11 +1240,13 @@ AHCIPort::_HardReset()
 		TRACE("AHCIPort::_HardReset() PORT_CMD_ST set, behaviour undefined\n");
 	}
 
-	fRegs->sctl.det = DET_INITIALIZATION;
+	fRegs->sctl = (fRegs->sctl & ~SATA_CONTROL_DET_MASK)
+		| DET_INITIALIZATION << SATA_CONTROL_DET_SHIFT;
 	FlushPostedWrites();
 	spin(1100);
 		// You must wait 1ms at minimum
-	fRegs->sctl.det = DET_NO_INITIALIZATION;
+	fRegs->sctl = (fRegs->sctl & ~SATA_CONTROL_DET_MASK)
+		| DET_NO_INITIALIZATION << SATA_CONTROL_DET_SHIFT;
 	FlushPostedWrites();
 }
 

@@ -78,19 +78,24 @@ enum {
 									// Interrupt/Enable
 };
 
-typedef struct {
-	uint16 reserved : 12;
-	uint8 pmp : 4;		// Port Multiplier Port: Not used by AHCI
-	uint8 spm : 4;		// Select Power Management: Not used by AHCI
-	uint8 ipm : 4;		// Interface Power Management Transitions Allowed
-	uint8 spd : 4;		// Speed Allowed
-	uint8 det : 4;		// Device Detection Initialization
-} _PACKED scontrol;
+
+// Device Detection Initialization
+#define SATA_CONTROL_DET_SHIFT	0
+#define SATA_CONTROL_DET_MASK	0x0000000f
+
+#define DET_NO_INITIALIZATION	0x0
+#define DET_INITIALIZATION		0x1
+
+// Speed Allowed
+#define SATA_CONTROL_SPD_SHIFT	4
+#define SATA_CONTROL_SPD_MASK	0x000000f0
+
+// Interface Power Management Transitions Allowed
+#define SATA_CONTROL_IPM_SHIFT	8
+#define SATA_CONTROL_IPM_MASK	0x00000f00
 
 #define IPM_TRANSITIONS_TO_PARTIAL_DISABLED 0x1
 #define IPM_TRANSITIONS_TO_SLUMBER_DISABLED 0x2
-#define DET_NO_INITIALIZATION	0x0
-#define DET_INITIALIZATION		0x1
 
 
 typedef struct {
@@ -106,7 +111,7 @@ typedef struct {
 	uint32		tfd;			// Task File Data
 	uint32		sig;			// Signature
 	uint32		ssts;			// Serial ATA Status (SCR0: SStatus)
-	scontrol	sctl;			// Serial ATA Control (SCR2: SControl)
+	uint32		sctl;			// Serial ATA Control (SCR2: SControl)
 	uint32		serr;			// Serial ATA Error (SCR1: SError) **RWC**
 	uint32		sact;			// Serial ATA Active (SCR3: SActive) **RW1**
 	uint32		ci;				// Command Issue **RW1**
