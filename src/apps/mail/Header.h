@@ -79,6 +79,7 @@ public:
 
 			bool				IsDateEmpty() const;
 			const char*			Date() const;
+			void				SetDate(time_t date);
 			void				SetDate(const char* date);
 
 			int32				AccountID() const;
@@ -102,6 +103,7 @@ private:
 			AddressTextControl*	fBccControl;
 			BTextControl*		fSubjectControl;
 			BStringView*		fDateView;
+			time_t				fDate;
 			bool				fIncoming;
 			bool				fResending;
 };

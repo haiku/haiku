@@ -226,28 +226,28 @@ BEmailMessage::ForwardMessage(bool accountFromMail, bool includeAttachments)
 
 
 const char*
-BEmailMessage::To()
+BEmailMessage::To() const
 {
 	return HeaderField("To");
 }
 
 
 const char*
-BEmailMessage::From()
+BEmailMessage::From() const
 {
 	return HeaderField("From");
 }
 
 
 const char*
-BEmailMessage::ReplyTo()
+BEmailMessage::ReplyTo() const
 {
 	return HeaderField("Reply-To");
 }
 
 
 const char*
-BEmailMessage::CC()
+BEmailMessage::CC() const
 {
 	return HeaderField("Cc");
 		// Note case of CC is "Cc" in our internal headers.
@@ -255,21 +255,25 @@ BEmailMessage::CC()
 
 
 const char*
-BEmailMessage::Subject()
+BEmailMessage::Subject() const
 {
 	return HeaderField("Subject");
 }
 
 
-const char*
-BEmailMessage::Date()
+time_t
+BEmailMessage::Date() const
 {
-	return HeaderField("Date");
+	const char* dateField = HeaderField("Date");
+	if (dateField == NULL)
+		return -1;
+
+	return ParseDateWithTimeZone(dateField);
 }
 
 
 int
-BEmailMessage::Priority()
+BEmailMessage::Priority() const
 {
 	int priorityNumber;
 	const char* priorityString;

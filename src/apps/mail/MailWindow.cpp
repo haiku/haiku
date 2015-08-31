@@ -2177,7 +2177,7 @@ TMailWindow::Reply(entry_ref* ref, TMailWindow* window, uint32 type)
 	if (address.Length() <= 0)
 		address = B_TRANSLATE("(Address unavailable)");
 
-	BString date(mail->Date());
+	BString date(mail->HeaderField("Date"));
 	if (date.Length() <= 0)
 		date = B_TRANSLATE("(Date unavailable)");
 

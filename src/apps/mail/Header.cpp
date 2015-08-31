@@ -38,6 +38,7 @@ of their respective holders. All rights reserved.
 #include <stdio.h>
 
 #include <ControlLook.h>
+#include <DateTimeFormat.h>
 #include <E-mail.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
@@ -430,6 +431,22 @@ THeaderView::Date() const
 
 
 void
+THeaderView::SetDate(time_t date)
+{
+	fDate = date;
+
+	if (fDateView != NULL) {
+		BDateTimeFormat formatter;
+
+		BString string;
+		formatter.Format(string, date, B_FULL_DATE_FORMAT,
+			B_MEDIUM_TIME_FORMAT);
+		SetDate(string);
+	}
+}
+
+
+void
 THeaderView::SetDate(const char* date)
 {
 	if (fDateView != NULL)
@@ -505,8 +522,12 @@ THeaderView::SetFromMessage(BEmailMessage* mail)
 		SetAccount(accountName);
 
 	// Set the date on this message
-	const char* dateField = mail->Date();
-	SetDate(dateField != NULL ? dateField : B_TRANSLATE("Unknown"));
+	time_t date = mail->Date();
+	if (date <= 0) {
+		const char* dateField = mail->HeaderField("Date");
+		SetDate(dateField != NULL ? dateField : B_TRANSLATE("Unknown"));
+	} else
+		SetDate(date);
 
 	return B_OK;
 }

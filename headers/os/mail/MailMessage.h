@@ -55,13 +55,13 @@ public:
 				// addresses the message appropriately, but ForwardMessage()
 				// leaves it unaddressed.
 
-			const char*			To();
-			const char*			From();
-			const char*			ReplyTo();
-			const char*			CC();
-			const char*			Subject();
-			const char*			Date();
-			int					Priority();
+			const char*			To() const;
+			const char*			From() const;
+			const char*			ReplyTo() const;
+			const char*			CC() const;
+			const char*			Subject() const;
+			time_t				Date() const;
+			int					Priority() const;
 
 			void				SetSubject(const char* to,
 									uint32 charset = B_MAIL_NULL_CONVERSION,
