@@ -145,6 +145,8 @@ LabelView::Draw(BRect updateRect)
 {
 	if (Text() != NULL) {
 		BRect rect = Bounds();
+		// TODO: solve this better (alignment of label and text)
+		rect.top++;
 
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 		uint32 flags = 0;
@@ -209,6 +211,8 @@ HeaderTextControl::Draw(BRect updateRect)
 	if (Label() != NULL) {
 		rect = CreateLabelLayoutItem()->Frame().OffsetByCopy(-Frame().left,
 			-Frame().top);
+		// TODO: solve this better (alignment of label and text)
+		rect.top++;
 
 		alignment labelAlignment;
 		GetAlignment(&labelAlignment, NULL);
