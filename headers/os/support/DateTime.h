@@ -91,6 +91,8 @@ public:
 								BDate();
 								BDate(const BDate& other);
 								BDate(int32 year, int32 month, int32 day);
+								BDate(time_t time,
+									time_type type = B_LOCAL_TIME);
 								BDate(const BMessage* archive);
 								~BDate();
 

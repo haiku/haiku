@@ -486,6 +486,23 @@ BDate::BDate(int32 year, int32 month, int32 day)
 }
 
 
+BDate::BDate(time_t time, time_type type)
+{
+	struct tm result;
+	struct tm* timeinfo;
+
+	if (type == B_GMT_TIME)
+		timeinfo = gmtime_r(&time, &result);
+	else
+		timeinfo = localtime_r(&time, &result);
+
+	if (timeinfo != NULL) {
+		_SetDate(timeinfo->tm_year + 1900, timeinfo->tm_mon + 1,
+			timeinfo->tm_mday);
+	}
+}
+
+
 /*!
 	Constructs a new BDate object from the provided archive.
 */
@@ -586,21 +603,7 @@ BDate::IsValid(int32 year, int32 month, int32 day)
 BDate
 BDate::CurrentDate(time_type type)
 {
-	time_t timer;
-	struct tm result;
-	struct tm* timeinfo;
-
-	time(&timer);
-
-	if (type == B_GMT_TIME)
-		timeinfo = gmtime_r(&timer, &result);
-	else
-		timeinfo = localtime_r(&timer, &result);
-
-	if (timeinfo == NULL)
-		return BDate();
-
-	return BDate(timeinfo->tm_year + 1900, timeinfo->tm_mon +1, timeinfo->tm_mday);
+	return BDate(time(NULL), type);
 }
 
 
