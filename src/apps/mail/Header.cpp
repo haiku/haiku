@@ -149,7 +149,6 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 	:
 	fAccountMenu(NULL),
 	fAccountID(defaultAccount),
-	fAccount(NULL),
 	fFromControl(NULL),
 	fBccControl(NULL),
 	fDateView(NULL),
@@ -461,6 +460,9 @@ THeaderView::SetAccount(int32 id)
 {
 	fAccountID = id;
 
+	if (fAccountMenu == NULL)
+		return;
+
 	for (int32 i = fAccountMenu->CountItems(); i-- > 0;) {
 		BMenuItem* item = fAccountMenu->ItemAt(i);
 		if (item == NULL)
@@ -478,6 +480,9 @@ THeaderView::SetAccount(int32 id)
 void
 THeaderView::SetAccount(const char* name)
 {
+	if (fAccountMenu == NULL)
+		return;
+
 	BMenuItem* item = fAccountMenu->FindItem(name);
 	if (item != NULL) {
 		item->SetMarked(true);
@@ -496,7 +501,7 @@ THeaderView::SetFromMessage(BEmailMessage* mail)
 	SetCc(mail->CC());
 
 	BString accountName;
-	if (fAccount != NULL && mail->GetAccountName(accountName) == B_OK)
+	if (mail->GetAccountName(accountName) == B_OK)
 		SetAccount(accountName);
 
 	// Set the date on this message
@@ -553,8 +558,6 @@ THeaderView::AttachedToWindow()
 	fCcControl->SetTarget(Looper());
 	if (fBccControl != NULL)
 		fBccControl->SetTarget(Looper());
-	if (fAccount != NULL)
-		fAccount->SetTarget(Looper());
 	if (fAccountMenu != NULL)
 		fAccountMenu->SetTargetForItems(this);
 

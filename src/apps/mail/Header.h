@@ -94,7 +94,6 @@ public:
 private:
 			BPopUpMenu*			fAccountMenu;
 			int32				fAccountID;
-			BTextControl*		fAccount;
 			BTextControl*		fFromControl;
 			LabelView*			fToLabel;
 			AddressTextControl*	fToControl;
