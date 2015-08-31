@@ -686,9 +686,10 @@ TMailWindow::BuildToolBar()
 			B_TRANSLATE("Print"));
 		fToolBar->AddAction(M_DELETE_NEXT, this, _RetrieveVectorIcon(4), NULL,
 			B_TRANSLATE("Trash"));
-		if (fApp->ShowSpamGUI())
-			fToolBar->AddAction(M_SPAM_BUTTON, this, _RetrieveVectorIcon(10), NULL,
-				B_TRANSLATE("Spam"));
+		if (fApp->ShowSpamGUI()) {
+			fToolBar->AddAction(M_SPAM_BUTTON, this, _RetrieveVectorIcon(10),
+				NULL, B_TRANSLATE("Spam"));
+		}
 		fToolBar->AddSeparator();
 		fToolBar->AddAction(M_NEXTMSG, this, _RetrieveVectorIcon(6), NULL,
 			B_TRANSLATE("Next"));
@@ -700,6 +701,11 @@ TMailWindow::BuildToolBar()
 		fToolBar->SetActionVisible(M_READ, false);
 		fToolBar->AddAction(M_PREVMSG, this, _RetrieveVectorIcon(7), NULL,
 			B_TRANSLATE("Previous"));
+
+		if (!fTrackerMessenger.IsValid()) {
+			fToolBar->SetActionEnabled(M_NEXTMSG, false);
+			fToolBar->SetActionEnabled(M_PREVMSG, false);
+		}
 
 		if (!fAutoMarkRead)
 			_AddReadButton();
@@ -950,11 +956,6 @@ TMailWindow::MenusBeginning()
 		} else {
 			fCut->SetEnabled(false);
 			fPaste->SetEnabled(false);
-
-			if (!fTrackerMessenger.IsValid()) {
-				fNextMsg->SetEnabled(false);
-				fPrevMsg->SetEnabled(false);
-			}
 		}
 	}
 
