@@ -104,6 +104,20 @@ private:
 };
 
 
+class HeaderTextControl : public BTextControl {
+public:
+								HeaderTextControl(const char* label,
+									const char* name, BMessage* message);
+
+	virtual	void				AttachedToWindow();
+	virtual	void				SetEnabled(bool enabled);
+	virtual	void				Draw(BRect updateRect);
+
+private:
+			void				_UpdateTextViewColors();
+};
+
+
 // #pragma mark - LabelView
 
 
@@ -143,6 +157,101 @@ LabelView::Draw(BRect updateRect)
 }
 
 
+// #pragma mark - HeaderTextControl
+
+
+HeaderTextControl::HeaderTextControl(const char* label, const char* name,
+	BMessage* message)
+	:
+	BTextControl(label, name, message)
+{
+}
+
+
+void
+HeaderTextControl::AttachedToWindow()
+{
+	BTextControl::AttachedToWindow();
+	_UpdateTextViewColors();
+}
+
+
+void
+HeaderTextControl::SetEnabled(bool enabled)
+{
+	BTextControl::SetEnabled(enabled);
+	_UpdateTextViewColors();
+}
+
+
+void
+HeaderTextControl::Draw(BRect updateRect)
+{
+	bool enabled = IsEnabled();
+	bool active = TextView()->IsFocus() && Window()->IsActive();
+
+	BRect rect = TextView()->Frame();
+	rect.InsetBy(-2, -2);
+
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 flags = 0;
+	if (!enabled)
+		flags = BControlLook::B_DISABLED;
+
+	if (enabled) {
+		if (active)
+			flags |= BControlLook::B_FOCUSED;
+
+		be_control_look->DrawTextControlBorder(this, rect, updateRect, base,
+			flags);
+	}
+
+	if (Label() != NULL) {
+		rect = CreateLabelLayoutItem()->Frame().OffsetByCopy(-Frame().left,
+			-Frame().top);
+
+		alignment labelAlignment;
+		GetAlignment(&labelAlignment, NULL);
+
+		be_control_look->DrawLabel(this, Label(), rect, updateRect,
+			base, flags, BAlignment(labelAlignment, B_ALIGN_MIDDLE));
+	}
+}
+
+
+void
+HeaderTextControl::_UpdateTextViewColors()
+{
+	BTextView* textView = TextView();
+
+	BFont font;
+	textView->GetFontAndColor(0, &font);
+
+	rgb_color textColor;
+	if (!textView->IsEditable() || IsEnabled())
+		textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+	else {
+		textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_DISABLED_LABEL_TINT);
+	}
+
+	textView->SetFontAndColor(&font, B_FONT_ALL, &textColor);
+
+	rgb_color color;
+	if (!textView->IsEditable())
+		color = ui_color(B_PANEL_BACKGROUND_COLOR);
+	else if (IsEnabled())
+		color = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+	else {
+		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+			B_LIGHTEN_2_TINT);
+	}
+
+	textView->SetViewColor(color);
+	textView->SetLowColor(color);
+}
+
+
 // #pragma mark - THeaderView
 
 
@@ -152,13 +261,13 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 	fAccountID(defaultAccount),
 	fFromControl(NULL),
 	fBccControl(NULL),
-	fDateView(NULL),
+	fDateControl(NULL),
 	fIncoming(incoming),
 	fResending(resending)
 {
 	// From
 	if (fIncoming) {
-		fFromControl = new BTextControl(B_TRANSLATE("From:"), NULL, NULL);
+		fFromControl = new HeaderTextControl(B_TRANSLATE("From:"), NULL, NULL);
 		fFromControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 		fFromControl->SetEnabled(false);
 	}
@@ -251,7 +360,7 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 	}
 
 	// Subject
-	fSubjectControl = new BTextControl(B_TRANSLATE("Subject:"), NULL,
+	fSubjectControl = new HeaderTextControl(B_TRANSLATE("Subject:"), NULL,
 		new BMessage(SUBJECT_FIELD));
 	msg = new BMessage(FIELD_CHANGED);
 	msg->AddInt32("bitmask", FIELD_SUBJECT);
@@ -261,17 +370,17 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 		fSubjectControl->SetEnabled(false);
 
 	// Date
-	LabelView* dateLabel = NULL;
 	if (fIncoming) {
-		dateLabel = new LabelView(B_TRANSLATE("Date:"));
-		dateLabel->SetEnabled(false);
-		fDateView = new BStringView("", "");
-		fDateView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+		fDateControl = new HeaderTextControl(B_TRANSLATE("Date:"), NULL, NULL);
+		fDateControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+		fDateControl->SetEnabled(false);
 	}
 
 	BGridLayout* layout = GridLayout();
 
 	layout->SetInsets(B_USE_DEFAULT_SPACING);
+	if (fIncoming)
+		layout->SetHorizontalSpacing(0);
 	layout->SetVerticalSpacing(B_USE_HALF_ITEM_SPACING);
 
 	int32 row = 0;
@@ -297,9 +406,10 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 	layout->AddItem(fSubjectControl->CreateTextViewLayoutItem(), 1, row++,
 		3, 1);
 
-	if (fDateView != NULL) {
-		layout->AddView(dateLabel, 0, row);
-		layout->AddView(fDateView, 1, row++, 3, 1);
+	if (fDateControl != NULL) {
+		layout->AddItem(fDateControl->CreateLabelLayoutItem(), 0, row);
+		layout->AddItem(fDateControl->CreateTextViewLayoutItem(), 1, row++,
+			3, 1);
 	}
 }
 
@@ -426,7 +536,7 @@ THeaderView::IsDateEmpty() const
 const char*
 THeaderView::Date() const
 {
-	return fDateView != NULL ? fDateView->Text() : NULL;
+	return fDateControl != NULL ? fDateControl->Text() : NULL;
 }
 
 
@@ -435,7 +545,7 @@ THeaderView::SetDate(time_t date)
 {
 	fDate = date;
 
-	if (fDateView != NULL) {
+	if (fDateControl != NULL) {
 		BDateTimeFormat formatter;
 
 		BString string;
@@ -449,8 +559,8 @@ THeaderView::SetDate(time_t date)
 void
 THeaderView::SetDate(const char* date)
 {
-	if (fDateView != NULL)
-		fDateView->SetText(date);
+	if (fDateControl != NULL)
+		fDateControl->SetText(date);
 }
 
 

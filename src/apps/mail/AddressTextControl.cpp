@@ -36,7 +36,6 @@
 
 
 static const uint32 kMsgAddAddress = 'adad';
-static const float kHorizontalTextRectInset = 4.0;
 static const float kVerticalTextRectInset = 2.0;
 
 
@@ -393,9 +392,9 @@ AddressTextControl::TextView::_AlignTextRect()
 	textRect.left = 0.0;
 	float vInset = max_c(1,
 		floorf((textRect.Height() - LineHeight(0)) / 2.0 + 0.5));
-	float hInset = kHorizontalTextRectInset;
 
-	if (be_control_look)
+	float hInset = 0;
+	if (be_control_look != NULL)
 		hInset = be_control_look->DefaultLabelSpacing();
 
 	textRect.InsetBy(hInset, vInset);
@@ -692,6 +691,9 @@ AddressTextControl::WindowActivated(bool active)
 void
 AddressTextControl::Draw(BRect updateRect)
 {
+	if (!IsEditable())
+		return;
+
 	BRect bounds(Bounds());
 	rgb_color base(LowColor());
 	uint32 flags = 0;
@@ -724,7 +726,7 @@ AddressTextControl::SetEnabled(bool enabled)
 
 	fPopUpButton->SetEnabled(enabled);
 
-	_UpdateTextViewColors(enabled);
+	_UpdateTextViewColors();
 }
 
 
@@ -959,13 +961,13 @@ AddressTextControl::_AddAddress(const char* text)
 
 
 void
-AddressTextControl::_UpdateTextViewColors(bool enabled)
+AddressTextControl::_UpdateTextViewColors()
 {
 	BFont font;
 	fTextView->GetFontAndColor(0, &font);
 
 	rgb_color textColor;
-	if (enabled)
+	if (!IsEditable() || IsEnabled())
 		textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
 	else {
 		textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
@@ -975,7 +977,9 @@ AddressTextControl::_UpdateTextViewColors(bool enabled)
 	fTextView->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
 	rgb_color color;
-	if (enabled)
+	if (!IsEditable())
+		color = ui_color(B_PANEL_BACKGROUND_COLOR);
+	else if (IsEnabled())
 		color = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 	else {
 		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),

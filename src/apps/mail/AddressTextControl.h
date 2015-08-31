@@ -44,7 +44,7 @@ public:
 
 private:
 			void				_AddAddress(const char* text);
-			void				_UpdateTextViewColors(bool enabled);
+			void				_UpdateTextViewColors();
 
 private:
 			class TextView;

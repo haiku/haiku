@@ -37,7 +37,6 @@ All rights reserved.
 
 #include <GridView.h>
 #include <NodeInfo.h>
-#include <TextControl.h>
 
 #include "AddressTextControl.h"
 
@@ -48,6 +47,7 @@ class BMenuField;
 class BMenuItem;
 class BPopUpMenu;
 class BStringView;
+class HeaderTextControl;
 class LabelView;
 
 
@@ -95,14 +95,14 @@ public:
 private:
 			BPopUpMenu*			fAccountMenu;
 			int32				fAccountID;
-			BTextControl*		fFromControl;
+			HeaderTextControl*	fFromControl;
 			LabelView*			fToLabel;
 			AddressTextControl*	fToControl;
 			LabelView*			fCcLabel;
 			AddressTextControl*	fCcControl;
 			AddressTextControl*	fBccControl;
-			BTextControl*		fSubjectControl;
-			BStringView*		fDateView;
+			HeaderTextControl*	fSubjectControl;
+			HeaderTextControl*	fDateControl;
 			time_t				fDate;
 			bool				fIncoming;
 			bool				fResending;
