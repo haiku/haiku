@@ -186,7 +186,7 @@ BMailComponent::SetHeaderField(const char* key, BMessage* structure,
 
 
 const char*
-BMailComponent::HeaderField(const char* key, int32 index)
+BMailComponent::HeaderField(const char* key, int32 index) const
 {
 	const char* string = NULL;
 
@@ -196,7 +196,8 @@ BMailComponent::HeaderField(const char* key, int32 index)
 
 
 status_t
-BMailComponent::HeaderField(const char* key, BMessage* structure, int32 index)
+BMailComponent::HeaderField(const char* key, BMessage* structure,
+	int32 index) const
 {
 	BString string = HeaderField(key, index);
 	if (string == "")
@@ -265,7 +266,7 @@ BMailComponent::RemoveHeader(const char* key)
 
 
 const char*
-BMailComponent::HeaderAt(int32 index)
+BMailComponent::HeaderAt(int32 index) const
 {
 #if defined(HAIKU_TARGET_PLATFORM_DANO)
 	const
@@ -503,7 +504,7 @@ status_t
 BTextMailComponent::GetDecodedData(BPositionIO* data)
 {
 	ParseRaw();
-	
+
 	if (data == NULL)
 		return B_IO_ERROR;
 
@@ -657,7 +658,7 @@ BTextMailComponent::RenderToRFC822(BPositionIO* render_to)
 	status_t status = ParseRaw();
 	if (status < B_OK)
 		return status;
-	
+
 	BMimeType type;
 	MIMEType(&type);
 	BString content_type;

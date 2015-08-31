@@ -56,9 +56,9 @@ class BMailComponent {
 			const char *key, BMessage *structured_header,
 			bool replace_existing = true);
 
-		const char *HeaderAt(int32 index);
-		const char *HeaderField(const char *key, int32 index = 0);
-		status_t	HeaderField(const char *key, BMessage *structured_header, int32 index = 0);
+		const char *HeaderAt(int32 index) const;
+		const char *HeaderField(const char *key, int32 index = 0) const;
+		status_t	HeaderField(const char *key, BMessage *structured_header, int32 index = 0) const;
 
 		status_t	RemoveHeader(const char *key);
 
