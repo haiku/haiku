@@ -31,6 +31,8 @@
 #else
 #	define TRACE(a...)
 #endif
+
+#define ERROR(a...) dprintf("ahci: " a)
 //#define FLOW(a...)	dprintf("ahci: " a)
 //#define RWTRACE(a...) dprintf("ahci: " a)
 #define FLOW(a...)
@@ -566,9 +568,18 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 
 	ASSERT(sizeof(ataData) == 512);
 
-	if (cmd->evpd || cmd->page_code
-		|| request->data_length < sizeof(scsiData)) {
-		TRACE("invalid request\n");
+	if (cmd->evpd)
+		TRACE("VPD inquiry page %d\n", cmd->page_code);
+	else if (cmd->page_code) {
+		// page_code without evpd is invalid per SCSI spec
+		ERROR("page code %d on non-VPD request\n", cmd->page_code);
+		request->subsys_status = SCSI_REQ_ABORTED;
+		request->device_status = SCSI_STATUS_CHECK_CONDITION;
+		// TODO: Sense ILLEGAL REQUEST + INVALID FIELD IN CDB?
+		gSCSI->finished(request, 1);
+		return;
+	} else if (request->data_length < sizeof(scsiData)) {
+		ERROR("invalid request\n");
 		request->subsys_status = SCSI_REQ_ABORTED;
 		gSCSI->finished(request, 1);
 		return;
@@ -582,7 +593,7 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 	sreq.WaitForCompletion();
 
 	if ((sreq.CompletionStatus() & ATA_ERR) != 0) {
-		TRACE("identify device failed\n");
+		ERROR("identify device failed\n");
 		request->subsys_status = SCSI_REQ_CMP_ERR;
 		gSCSI->finished(request, 1);
 		return;
@@ -637,6 +648,31 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 					? (ataData.supports_read_zero_after_trim
 						? ", zero" : ", random") : "");
 		}
+	}
+
+	if (cmd->evpd) {
+		switch (cmd->page_code) {
+			case SCSI_PAGE_SUPPORTED_VPD:
+			case SCSI_PAGE_USN:
+			case SCSI_PAGE_BLOCK_LIMITS:
+				//max_unmap_lba_count
+				//	= ataData.max_data_set_management_lba_range_blocks;
+				//max_unmap_blk_count = 
+				//	= ataData.max_data_set_management_lba_range_blocks;
+			case SCSI_PAGE_BLOCK_DEVICE_CHARS:
+			case SCSI_PAGE_LB_PROVISIONING:
+			case SCSI_PAGE_REFERRALS:
+				ERROR("VPD AHCI page %d not yet implemented!\n",
+					cmd->page_code);
+				//request->subsys_status = SCSI_REQ_CMP;
+				request->subsys_status = SCSI_REQ_ABORTED;
+				gSCSI->finished(request, 1);
+				return;
+		}
+		ERROR("unknown VPD page code!\n");
+		request->subsys_status = SCSI_REQ_ABORTED;
+		gSCSI->finished(request, 1);
+		return;
 	}
 
 #if 0
