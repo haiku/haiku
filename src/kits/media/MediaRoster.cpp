@@ -86,6 +86,22 @@ static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
 static BLocker sInitLocker("BMediaRoster::Roster locker");
 
+
+class MediaRosterUndertaker {
+public:
+	~MediaRosterUndertaker()
+	{
+		BAutolock _(sInitLocker);
+		if (BMediaRoster::CurrentRoster() != NULL
+				&& BMediaRoster::CurrentRoster()->Lock()) {
+			BMediaRoster::CurrentRoster()->Quit();
+		}
+	}
+};
+
+
+static MediaRosterUndertaker sMediaRosterUndertaker;
+
 }	// namespace media
 }	// namespace BPrivate
 
@@ -96,8 +112,8 @@ BMediaRosterEx::BMediaRosterEx(status_t* _error)
 	:
 	BMediaRoster()
 {
-	gDormantNodeManager = new DormantNodeManager;
-	gTimeSourceObjectManager = new TimeSourceObjectManager;
+	gDormantNodeManager = new DormantNodeManager();
+	gTimeSourceObjectManager = new TimeSourceObjectManager();
 
 	*_error = BuildConnections();
 
@@ -108,6 +124,19 @@ BMediaRosterEx::BMediaRosterEx(status_t* _error)
 		*_error = B_ERROR;
 	}
 	sServerIsUp = BMediaRoster::IsRunning();
+}
+
+
+void
+BMediaRosterEx::Quit()
+{
+	if (be_roster->StopWatching(BMessenger(this, this)) != B_OK)
+			TRACE("Can't unregister roster notifications");
+
+	if (sNotificationList.CountItems() != 0)
+		sNotificationList.MakeEmpty();
+
+	BMediaRoster::Quit();
 }
 
 
@@ -3474,13 +3503,6 @@ bool
 BMediaRoster::QuitRequested()
 {
 	CALLED();
-
-	if (be_roster->StopWatching(BMessenger(this, this)) != B_OK)
-			TRACE("Can't unregister roster notifications");
-
-	if (sNotificationList.CountItems() != 0)
-		sNotificationList.MakeEmpty();
-
 	return true;
 }
 
