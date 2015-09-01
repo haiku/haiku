@@ -90,6 +90,26 @@ const struct color_scheme kColorSchemeSlate = {
 	{ 70, 70, 70, 255 },
 };
 
+const struct color_scheme kColorSchemeSolarizedDark = {
+	B_TRANSLATE("Solarized Dark"),
+	{ 119, 137, 139, 255 },
+	{ 0, 36, 45, 255 },
+	{ 0, 46, 57, 255 },
+	{ 120, 137, 139, 255 },
+	{ 136, 151, 151, 255 },
+	{ 0, 46, 57, 255 },
+};
+
+const struct color_scheme kColorSchemeSolarizedLight = {
+	B_TRANSLATE("Solarized Light"),
+	{ 90, 112, 120, 255 },
+	{ 253, 244, 223, 255 },
+	{ 236, 228, 207, 255 },
+	{ 90, 112, 120, 255 },
+	{ 78, 99, 106, 255 },
+	{ 236, 228, 207, 255 },
+};
+
 struct color_scheme gCustomColorScheme = {
 	B_TRANSLATE("Custom")
 };
@@ -101,6 +121,8 @@ const color_scheme* gPredefinedColorSchemes[] = {
 	&kColorSchemeProfessional,
 	&kColorSchemeRetro,
 	&kColorSchemeSlate,
+	&kColorSchemeSolarizedDark,
+	&kColorSchemeSolarizedLight,
 	&gCustomColorScheme,
 	NULL
 };
