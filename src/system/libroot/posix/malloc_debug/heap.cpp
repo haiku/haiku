@@ -10,8 +10,9 @@
  */
 
 
+#include "malloc_debug_api.h"
+
 #include <malloc.h>
-#include <malloc_debug.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -38,6 +39,9 @@
 #define ASSERT(x)	if (!(x)) panic("assert failed: %s", #x);
 
 
+static void *debug_heap_memalign(size_t alignment, size_t size);
+
+
 static bool sDebuggerCalls = true;
 static bool sReuseMemory = true;
 static bool sParanoidValidation = false;
@@ -50,7 +54,7 @@ static bool sUseGuardPage = false;
 using namespace std;
 static size_t sDefaultAlignment = alignof(max_align_t);
 #else
-static size_t sDefaultAlignment = 0;
+static size_t sDefaultAlignment = 8;
 #endif
 
 
@@ -773,7 +777,7 @@ heap_remove_area(heap_allocator *heap, heap_area *area)
 }
 
 
-heap_allocator *
+static heap_allocator *
 heap_create_allocator(const char *name, addr_t base, size_t size,
 	const heap_class *heapClass)
 {
@@ -1103,15 +1107,7 @@ heap_allocate_from_bin(heap_allocator *heap, uint32 binIndex, size_t size)
 }
 
 
-static bool
-is_valid_alignment(size_t number)
-{
-	// this cryptic line accepts zero and all powers of two
-	return ((~number + 1) | ((number << 1) - 1)) == ~0UL;
-}
-
-
-void *
+static void *
 heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 {
 	INFO(("memalign(alignment = %lu, size = %lu)\n", alignment, size));
@@ -1172,7 +1168,7 @@ heap_memalign(heap_allocator *heap, size_t alignment, size_t size)
 }
 
 
-status_t
+static status_t
 heap_free(heap_allocator *heap, void *address)
 {
 	if (address == NULL)
@@ -1473,7 +1469,7 @@ heap_realloc(heap_allocator *heap, void *address, void **newAddress,
 	newSize -= sizeof(addr_t) + sizeof(heap_leak_check_info);
 
 	// if not, allocate a new chunk of memory
-	*newAddress = memalign(sDefaultAlignment, newSize);
+	*newAddress = debug_heap_memalign(sDefaultAlignment, newSize);
 	if (*newAddress == NULL) {
 		// we tried but it didn't work out, but still the operation is done
 		return B_OK;
@@ -1643,8 +1639,8 @@ heap_wall_checker(void *data)
 //	#pragma mark - Heap Debug API
 
 
-extern "C" status_t
-heap_debug_start_wall_checking(int msInterval)
+static status_t
+debug_heap_start_wall_checking(int msInterval)
 {
 	if (sWallCheckThread < 0) {
 		sWallCheckThread = spawn_thread(heap_wall_checker, "heap wall checker",
@@ -1659,8 +1655,8 @@ heap_debug_start_wall_checking(int msInterval)
 }
 
 
-extern "C" status_t
-heap_debug_stop_wall_checking()
+static status_t
+debug_heap_stop_wall_checking()
 {
 	int32 result;
 	sStopWallChecking = true;
@@ -1668,66 +1664,52 @@ heap_debug_stop_wall_checking()
 }
 
 
-extern "C" void
-heap_debug_set_paranoid_validation(bool enabled)
+static void
+debug_heap_set_paranoid_validation(bool enabled)
 {
 	sParanoidValidation = enabled;
 }
 
 
-extern "C" void
-heap_debug_set_memory_reuse(bool enabled)
+static void
+debug_heap_set_memory_reuse(bool enabled)
 {
 	sReuseMemory = enabled;
 }
 
 
-extern "C" void
-heap_debug_set_debugger_calls(bool enabled)
+static void
+debug_heap_set_debugger_calls(bool enabled)
 {
 	sDebuggerCalls = enabled;
 }
 
 
-extern "C" void
-heap_debug_set_default_alignment(size_t defaultAlignment)
+static void
+debug_heap_set_default_alignment(size_t defaultAlignment)
 {
 	sDefaultAlignment = defaultAlignment;
 }
 
 
-extern "C" void
-heap_debug_validate_heaps()
+static void
+debug_heap_validate_heaps()
 {
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
 		heap_validate_heap(sHeaps[i]);
 }
 
 
-extern "C" void
-heap_debug_validate_walls()
-{
-	heap_validate_walls();
-}
-
-
-extern "C" void
-heap_debug_dump_allocations(bool statsOnly, thread_id thread)
-{
-	dump_allocations(statsOnly, thread);
-}
-
-
-extern "C" void
-heap_debug_dump_heaps(bool dumpAreas, bool dumpBins)
+static void
+debug_heap_dump_heaps(bool dumpAreas, bool dumpBins)
 {
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++)
 		dump_allocator(sHeaps[i], dumpAreas, dumpBins);
 }
 
 
-extern "C" void *
-heap_debug_malloc_with_guard_page(size_t size)
+static void *
+debug_heap_malloc_with_guard_page(size_t size)
 {
 	size_t areaSize = ROUNDUP(size + sizeof(area_allocation_info) + B_PAGE_SIZE,
 		B_PAGE_SIZE);
@@ -1775,8 +1757,8 @@ heap_debug_malloc_with_guard_page(size_t size)
 }
 
 
-extern "C" status_t
-heap_debug_get_allocation_info(void *address, size_t *size,
+static status_t
+debug_heap_get_allocation_info(void *address, size_t *size,
 	thread_id *thread)
 {
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
@@ -1807,25 +1789,11 @@ heap_debug_get_allocation_info(void *address, size_t *size,
 }
 
 
-extern "C" status_t
-heap_debug_dump_allocations_on_exit(bool enabled)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-extern "C" status_t
-heap_debug_set_stack_trace_depth(size_t stackTraceDepth)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
 //	#pragma mark - Init
 
 
-extern "C" status_t
-__init_heap(void)
+static status_t
+debug_heap_init(void)
 {
 	// This will locate the heap base at 384 MB and reserve the next 1152 MB
 	// for it. They may get reclaimed by other areas, though, but the maximum
@@ -1853,53 +1821,11 @@ __init_heap(void)
 }
 
 
-extern "C" void
-__init_heap_post_env(void)
-{
-	const char *mode = getenv("MALLOC_DEBUG");
-	if (mode != NULL) {
-		if (strchr(mode, 'p'))
-			heap_debug_set_paranoid_validation(true);
-		if (strchr(mode, 'w'))
-			heap_debug_start_wall_checking(500);
-		else if (strchr(mode, 'W'))
-			heap_debug_start_wall_checking(100);
-		if (strchr(mode, 'g'))
-			sUseGuardPage = true;
-		if (strchr(mode, 'r'))
-			heap_debug_set_memory_reuse(false);
-
-		size_t defaultAlignment = 0;
-		const char *argument = strchr(mode, 'a');
-		if (argument != NULL
-			&& sscanf(argument, "a%" B_SCNuSIZE, &defaultAlignment) == 1) {
-			heap_debug_set_default_alignment(defaultAlignment);
-		}
-	}
-}
-
-
-extern "C" void
-__heap_terminate_after()
-{
-	// nothing to do
-}
-
-
 //	#pragma mark - Public API
 
 
-extern "C" void *
-sbrk_hook(long)
-{
-	debug_printf("sbrk not supported on malloc debug\n");
-	panic("sbrk not supported on malloc debug\n");
-	return NULL;
-}
-
-
-void *
-memalign(size_t alignment, size_t size)
+static void *
+debug_heap_memalign(size_t alignment, size_t size)
 {
 	size_t alignedSize = size + sizeof(addr_t) + sizeof(heap_leak_check_info);
 	if (alignment != 0 && alignment < B_PAGE_SIZE)
@@ -1974,18 +1900,18 @@ memalign(size_t alignment, size_t size)
 }
 
 
-void *
-malloc(size_t size)
+static void *
+debug_heap_malloc(size_t size)
 {
 	if (sUseGuardPage)
-		return heap_debug_malloc_with_guard_page(size);
+		return debug_heap_malloc_with_guard_page(size);
 
-	return memalign(sDefaultAlignment, size);
+	return debug_heap_memalign(sDefaultAlignment, size);
 }
 
 
-void
-free(void *address)
+static void
+debug_heap_free(void *address)
 {
 	for (uint32 i = 0; i < HEAP_CLASS_COUNT; i++) {
 		heap_allocator *heap = sHeaps[i];
@@ -2017,11 +1943,11 @@ free(void *address)
 }
 
 
-void *
-realloc(void *address, size_t newSize)
+static void *
+debug_heap_realloc(void *address, size_t newSize)
 {
 	if (address == NULL)
-		return memalign(sDefaultAlignment, newSize);
+		return debug_heap_memalign(sDefaultAlignment, newSize);
 
 	if (newSize == 0) {
 		free(address);
@@ -2079,7 +2005,7 @@ realloc(void *address, size_t newSize)
 			}
 
 			// have to allocate/copy/free - TODO maybe resize the area instead?
-			newAddress = malloc(newSize);
+			newAddress = debug_heap_memalign(sDefaultAlignment, newSize);
 			if (newAddress == NULL) {
 				panic("realloc(): failed to allocate new block of %ld"
 					" bytes\n", newSize);
@@ -2100,33 +2026,32 @@ realloc(void *address, size_t newSize)
 }
 
 
-void *
-calloc(size_t numElements, size_t size)
-{
-	void *address = malloc(numElements * size);
-	if (address != NULL)
-		memset(address, 0, numElements * size);
+heap_implementation __mallocDebugHeap = {
+	debug_heap_init,
+	NULL,	// terminate_after
 
-	return address;
-}
+	debug_heap_memalign,
+	debug_heap_malloc,
+	debug_heap_free,
+	debug_heap_realloc,
 
+	NULL,	// calloc
+	NULL,	// valloc
+	NULL,	// posix_memalign
 
-extern "C" void *
-valloc(size_t size)
-{
-	return memalign(B_PAGE_SIZE, size);
-}
+	debug_heap_start_wall_checking,
+	debug_heap_stop_wall_checking,
+	debug_heap_set_paranoid_validation,
+	debug_heap_set_memory_reuse,
+	debug_heap_set_debugger_calls,
+	debug_heap_set_default_alignment,
+	debug_heap_validate_heaps,
+	heap_validate_walls,
+	dump_allocations,
+	debug_heap_dump_heaps,
+	debug_heap_malloc_with_guard_page,
+	debug_heap_get_allocation_info,
 
-
-extern "C" int
-posix_memalign(void **pointer, size_t alignment, size_t size)
-{
-	if (!is_valid_alignment(alignment))
-		return EINVAL;
-
-	*pointer = memalign(alignment, size);
-	if (*pointer == NULL)
-		return ENOMEM;
-
-	return 0;
-}
+	NULL,	// set_dump_allocations_on_exit
+	NULL	// set_stack_trace_depth
+};

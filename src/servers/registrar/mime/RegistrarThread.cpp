@@ -15,32 +15,33 @@
 
 /*!	\class RegistrarThread
 	\brief Base thread class for threads spawned and managed by the registrar
-	
 */
 
 // constructor
 /*! \brief Creates a new RegistrarThread object, spawning the object's
 	thread.
-	
+
 	Call Run() to actually get the thread running.
-	
+
 	\param name The desired name of the new thread
 	\param priority The desired priority of the new thread
 	\param managerMessenger A BMessenger to the thread manager to which this
 	                        thread does or will belong.
 */
-RegistrarThread::RegistrarThread(const char *name, int32 priority, BMessenger managerMessenger)
-	: fManagerMessenger(managerMessenger)
-	, fShouldExit(false)
-	, fIsFinished(false)
-	, fStatus(B_NO_INIT)
-	, fId(-1)
-	, fPriority(priority)
+RegistrarThread::RegistrarThread(const char *name, int32 priority,
+	BMessenger managerMessenger)
+	:
+	fManagerMessenger(managerMessenger),
+	fShouldExit(false),
+	fIsFinished(false),
+	fStatus(B_NO_INIT),
+	fId(-1),
+	fPriority(priority)
 {
 	fName[0] = 0;
 	status_t err = name && fManagerMessenger.IsValid() ? B_OK : B_BAD_VALUE;
 	if (err == B_OK)
-		strcpy(fName, name);
+		strlcpy(fName, name, sizeof(fName));
 	fStatus = err;
 }
 
@@ -71,7 +72,7 @@ RegistrarThread::Run()
 		fId = spawn_thread(&RegistrarThread::EntryFunction, fName,
 			fPriority, (void*)this);
 		err = fId >= 0 ? B_OK : fId;
-		if (err == B_OK)	
+		if (err == B_OK)
 			err = resume_thread(fId);
 	}
 	return err;
@@ -86,13 +87,13 @@ RegistrarThread::Id() const
 }
 
 // Name
-//! Returns the name of the thread 
+//! Returns the name of the thread
 const char*
 RegistrarThread::Name() const
 {
 	return fName;
 }
-	
+
 // AskToExit
 /*! \brief Signals to thread that it needs to quit politely as soon
 	as possible.

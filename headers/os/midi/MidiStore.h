@@ -12,8 +12,7 @@ class BFile;
 class BList;
 class BMidiEvent;
 
-class BMidiStore : public BMidi
-{
+class BMidiStore : public BMidi {
 public:
 
 	BMidiStore();

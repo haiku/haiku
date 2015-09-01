@@ -453,7 +453,7 @@ struct Thread : TeamThreadIteratorEntry<thread_id>, KernelReferenceable {
 										// modified by the thread itself and
 										// thus freely readable by it
 
-	void 			(*cancel_function)(int);
+	void			(*cancel_function)(int);
 
 	struct {
 		uint8		parameters[SYSCALL_RESTART_PARAMETER_SIZE];

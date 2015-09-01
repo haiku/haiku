@@ -42,6 +42,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			AboutWindow.cpp
 			AbstractLayout.cpp
 			AbstractLayoutItem.cpp
+			AbstractSpinner.cpp
 			AffineTransform.cpp
 			Alert.cpp
 			Alignment.cpp
@@ -60,6 +61,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ControlLook.cpp
 			DecorInfo.cpp
 			Deskbar.cpp
+			DecimalSpinner.cpp
 			Dragger.cpp
 			Font.cpp
 			Gradient.cpp
@@ -116,6 +118,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Size.cpp
 			Slider.cpp
 			SpaceLayoutItem.cpp
+			Spinner.cpp
 			SplitLayout.cpp
 			SplitLayoutBuilder.cpp
 			SplitView.cpp

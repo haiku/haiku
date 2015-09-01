@@ -203,23 +203,18 @@ void
 BMenuFrame::Draw(BRect updateRect)
 {
 	if (fMenu != NULL && fMenu->CountItems() == 0) {
-		if (be_control_look != NULL) {
-			BRect rect(Bounds());
-			be_control_look->DrawMenuBackground(this, rect, updateRect,
-				ui_color(B_MENU_BACKGROUND_COLOR));
-			SetDrawingMode(B_OP_OVER);
-		} else {
-			// TODO: Review this as it's a bit hacky.
-			// Menu has a size of 0, 0, since there are no items in it.
-			// So the BMenuFrame class has to fake it and draw an empty item.
-			// Note that we can't add a real "empty" item because then we
-			// couldn't tell if the item was added by us or not.
-			// See also BMenu::UpdateWindowViewSize()
-			SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
-			SetLowColor(HighColor());
-			FillRect(updateRect);
-		}
+		BRect rect(Bounds());
+		be_control_look->DrawMenuBackground(this, rect, updateRect,
+			ui_color(B_MENU_BACKGROUND_COLOR));
+		SetDrawingMode(B_OP_OVER);
 
+		// TODO: Review this as it's a bit hacky.
+		// Since there are no items in this menu, its size is 0x0.
+		// To show an empty BMenu, we use BMenuFrame to draw an empty item.
+		// It would be nice to simply add a real "empty" item, but in that case
+		// we couldn't tell if the item was added by us or not, and applications
+		// could break (because CountItems() would return 1 for an empty BMenu).
+		// See also BMenu::UpdateWindowViewSize()
 		font_height height;
 		GetFontHeight(&height);
 		SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
@@ -229,18 +224,6 @@ BMenuFrame::Draw(BRect updateRect)
 			ceilf(height.ascent + 1));
 		DrawString(kEmptyMenuLabel, where);
 	}
-
-	if (be_control_look != NULL)
-		return;
-
-	SetHighColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
-		B_DARKEN_2_TINT));
-	BRect bounds(Bounds());
-
-	StrokeLine(BPoint(bounds.right, bounds.top),
-		BPoint(bounds.right, bounds.bottom - 1));
-	StrokeLine(BPoint(bounds.left + 1, bounds.bottom),
-		BPoint(bounds.right, bounds.bottom));
 }
 
 

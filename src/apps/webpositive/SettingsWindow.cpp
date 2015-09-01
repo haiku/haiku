@@ -19,6 +19,7 @@
 #include <ScrollView.h>
 #include <SeparatorView.h>
 #include <SpaceLayoutItem.h>
+#include <Spinner.h>
 #include <TabView.h>
 #include <TextControl.h>
 #include <debugger.h>
@@ -303,18 +304,12 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 	fNewTabBehaviorMenu = new BMenuField("new tab behavior",
 		B_TRANSLATE("New tabs:"), newTabBehaviorMenu);
 
-	fDaysInHistoryMenuControl = new BTextControl("days in history",
-		B_TRANSLATE("Number of days to keep links in History menu:"), "",
+	fDaysInHistory = new BSpinner("days in history",
+		B_TRANSLATE("Number of days to keep links in History menu:"),
 		new BMessage(MSG_HISTORY_MENU_DAYS_CHANGED));
-	fDaysInHistoryMenuControl->SetModificationMessage(
-		new BMessage(MSG_HISTORY_MENU_DAYS_CHANGED));
-	BString maxHistoryAge;
-	maxHistoryAge << BrowsingHistory::DefaultInstance()->MaxHistoryItemAge();
-	fDaysInHistoryMenuControl->SetText(maxHistoryAge.String());
-	for (uchar i = 0; i < '0'; i++)
-		fDaysInHistoryMenuControl->TextView()->DisallowChar(i);
-	for (uchar i = '9' + 1; i <= 128; i++)
-		fDaysInHistoryMenuControl->TextView()->DisallowChar(i);
+	fDaysInHistory->SetRange(1, 35);
+	fDaysInHistory->SetValue(
+		BrowsingHistory::DefaultInstance()->MaxHistoryItemAge());
 
 	fShowTabsIfOnlyOnePage = new BCheckBox("show tabs if only one page",
 		B_TRANSLATE("Show tabs if only one page is open"),
@@ -360,7 +355,7 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 		.Add(fAutoHideInterfaceInFullscreenMode)
 		.Add(fAutoHidePointer)
 		.Add(fShowHomeButton)
-		.Add(fDaysInHistoryMenuControl)
+		.Add(fDaysInHistory)
 		.Add(BSpaceLayoutItem::CreateHorizontalStrut(spacing))
 
 		.SetInsets(spacing, spacing, spacing, spacing)
@@ -580,7 +575,7 @@ SettingsWindow::_CanApplySettings() const
 	canApply = canApply || ((fShowHomeButton->Value() == B_CONTROL_ON)
 		!= fSettings->GetValue(kSettingsKeyShowHomeButton, true));
 
-	canApply = canApply || (_MaxHistoryAge()
+	canApply = canApply || (fDaysInHistory->Value()
 		!= BrowsingHistory::DefaultInstance()->MaxHistoryItemAge());
 
 	// New window policy
@@ -639,12 +634,8 @@ void
 SettingsWindow::_ApplySettings()
 {
 	// Store general settings
-	int32 maxHistoryAge = _MaxHistoryAge();
-	BString text;
-	text << maxHistoryAge;
-	fDaysInHistoryMenuControl->SetText(text.String());
-	BrowsingHistory::DefaultInstance()->SetMaxHistoryItemAge(maxHistoryAge);
-
+	BrowsingHistory::DefaultInstance()->SetMaxHistoryItemAge(
+		(uint32)fDaysInHistory->Value());
 	fSettings->SetValue(kSettingsKeyStartPageURL, fStartPageControl->Text());
 	fSettings->SetValue(kSettingsKeySearchPageURL, fSearchPageControl->Text());
 	fSettings->SetValue(kSettingsKeyDownloadPath, fDownloadFolderControl->Text());
@@ -712,7 +703,6 @@ SettingsWindow::_ApplySettings()
 	// the default values, unless the page settings have local overrides.
 	BWebSettings::Default()->Apply();
 
-
 	_ValidateControlsEnabledStatus();
 }
 
@@ -738,9 +728,8 @@ SettingsWindow::_RevertSettings()
 	fShowHomeButton->SetValue(
 		fSettings->GetValue(kSettingsKeyShowHomeButton, true));
 
-	BString text;
-	text << BrowsingHistory::DefaultInstance()->MaxHistoryItemAge();
-	fDaysInHistoryMenuControl->SetText(text.String());
+	fDaysInHistory->SetValue(
+		BrowsingHistory::DefaultInstance()->MaxHistoryItemAge());
 
 	// New window policy
 	uint32 newWindowPolicy = fSettings->GetValue(kSettingsKeyNewWindowPolicy,
@@ -800,9 +789,9 @@ SettingsWindow::_RevertSettings()
 		false));
 	fProxyAddressControl->SetText(fSettings->GetValue(kSettingsKeyProxyAddress,
 		""));
-	text = "";
-	text << fSettings->GetValue(kSettingsKeyProxyPort, (uint32)0);
-	fProxyPortControl->SetText(text.String());
+	BString keyProxyPort;
+	keyProxyPort << fSettings->GetValue(kSettingsKeyProxyPort, (uint32)0);
+	fProxyPortControl->SetText(keyProxyPort.String());
 	fUseProxyAuthCheckBox->SetValue(fSettings->GetValue(kSettingsKeyUseProxyAuth,
 		false));
 	fProxyUsernameControl->SetText(fSettings->GetValue(kSettingsKeyProxyUsername,
@@ -862,18 +851,6 @@ SettingsWindow::_NewTabPolicy() const
 	else if (markedItem == fNewTabBehaviorOpenSearchItem)
 		newTabPolicy = OpenSearchPage;
 	return newTabPolicy;
-}
-
-
-int32
-SettingsWindow::_MaxHistoryAge() const
-{
-	int32 maxHistoryAge = atoi(fDaysInHistoryMenuControl->Text());
-	if (maxHistoryAge <= 0)
-		maxHistoryAge = 1;
-	if (maxHistoryAge >= 35)
-		maxHistoryAge = 35;
-	return maxHistoryAge;
 }
 
 

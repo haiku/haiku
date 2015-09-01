@@ -15,6 +15,8 @@
 /* Synthesizer things */
 
 #define B_SYNTH_DIRECTORY    B_SYSTEM_DATA_DIRECTORY
+
+/* Deprecated */
 #define B_BIG_SYNTH_FILE     "synth/big_synth.sy"
 #define B_LITTLE_SYNTH_FILE  "synth/little_synth.sy"
 

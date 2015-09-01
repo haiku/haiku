@@ -104,6 +104,8 @@ extern status_t file_map_translate(void *map, off_t offset, size_t size,
 /* entry cache */
 extern status_t entry_cache_add(dev_t mountID, ino_t dirID, const char* name,
 					ino_t nodeID);
+extern status_t entry_cache_add_missing(dev_t mountID, ino_t dirID,
+					const char* name);
 extern status_t entry_cache_remove(dev_t mountID, ino_t dirID,
 					const char* name);
 

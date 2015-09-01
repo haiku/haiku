@@ -55,4 +55,10 @@ static __huge_val_t __huge_val = { __HUGE_VAL_bytes };
 
 #endif	/* GCC.  */
 
+#if __GNUC_PREREQ(3,3)
+# define HUGE_VALL  (__builtin_huge_vall())
+#else
+# define HUGE_VALL  ((long double) HUGE_VAL)
+#endif
+
 #define HUGE_VALF HUGE_VAL

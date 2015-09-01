@@ -46,6 +46,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui teams_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui utility_windows ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface report ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value ] ;
@@ -320,6 +321,9 @@ local sources =
 	TableCellValueEditor.cpp
 	TableCellValueRenderer.cpp
 	TableCellValueRendererUtils.cpp
+
+	# user_interface/report
+	ReportUserInterface.cpp
 
 	# user_interface/util
 	UiUtils.cpp

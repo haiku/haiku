@@ -37,6 +37,8 @@ public:
 							BMediaRosterEx(status_t* out_error);
 		virtual				~BMediaRosterEx();
 
+		virtual void		Quit();
+
 		status_t			SaveNodeConfiguration(BMediaNode* node);
 		status_t 			LoadNodeConfiguration(media_addon_id addonid,
 							int32 flavorid, BMessage* out_msg);

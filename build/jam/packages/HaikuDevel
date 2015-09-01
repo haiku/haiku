@@ -21,7 +21,6 @@ AddFilesToPackage develop lib : kernel.so : _KERNEL_ ;
 # additional libraries
 local developmentLibs =
 	<revisioned>libroot_debug.so
-	<revisioned>libroot_guarded.so
 	;
 
 AddFilesToPackage lib : $(developmentLibs) ;

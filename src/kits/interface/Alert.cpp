@@ -264,7 +264,6 @@ BAlert::SetShortcut(int32 index, char key)
 char
 BAlert::Shortcut(int32 index) const
 {
-
 	if (index >= 0 && (size_t)index < fKeys.size())
 		return fKeys[index];
 
@@ -378,6 +377,7 @@ BAlert::AddButton(const char* label, char key)
 	fButtons.push_back(button);
 	fKeys.push_back(key);
 
+	SetDefaultButton(button);
 	fButtonLayout->AddView(button);
 }
 
@@ -520,6 +520,8 @@ BAlert::_Init(const char* text, const char* button0, const char* button1,
 	AddButton(button0);
 	AddButton(button1);
 	AddButton(button2);
+
+	AddCommonFilter(new(std::nothrow) _BAlertFilter_(this));
 }
 
 
@@ -644,8 +646,6 @@ BAlert::_Prepare()
 	if (CountButtons() == 0)
 		debugger("BAlerts must have at least one button.");
 
-	SetDefaultButton(ButtonAt(CountButtons() - 1));
-
 	float fontFactor = be_plain_font->Size() / 11.0f;
 
 	if (fIconView->Bitmap() == NULL)
@@ -691,6 +691,11 @@ BAlert::_Prepare()
 
 	ResizeToPreferred();
 
+	// Return early if we've already been moved...
+	if (Frame().left != 0 && Frame().right != 0)
+		return;
+
+	// otherwise center ourselves on-top of parent window/screen
 	BWindow* parent = dynamic_cast<BWindow*>(BLooper::LooperForThread(
 		find_thread(NULL)));
 	const BRect frame = parent != NULL ? parent->Frame()
@@ -812,7 +817,7 @@ _BAlertFilter_::Filter(BMessage* msg, BHandler** target)
 	if (msg->what == B_KEY_DOWN) {
 		char byte;
 		if (msg->FindInt8("byte", (int8*)&byte) == B_OK) {
-			for (int i = 0; i < 3; ++i) {
+			for (int i = 0; i < fAlert->CountButtons(); ++i) {
 				if (byte == fAlert->Shortcut(i) && fAlert->ButtonAt(i)) {
 					char space = ' ';
 					fAlert->ButtonAt(i)->KeyDown(&space, 1);

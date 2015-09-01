@@ -29,20 +29,21 @@ enum {
 	CAP_SALP		= (1 << 26),	// Supports Aggressive Link Power Management
 	CAP_SAL			= (1 << 25),	// Supports Activity LED
 	CAP_SCLO		= (1 << 24),	// Supports Command List Override
-	CAP_ISS_MASK 	= 0xf, 			// Interface Speed Support
+	CAP_ISS_MASK	= 0xf,			// Interface Speed Support
 	CAP_ISS_SHIFT	= 20,
-	CAP_SNZO 		= (1 << 19),	// Supports Non-Zero DMA Offsets
-	CAP_SAM 		= (1 << 18),	// Supports AHCI mode only
-	CAP_SPM 		= (1 << 17),	// Supports Port Multiplier
-	CAP_FBSS 		= (1 << 16),	// FIS-based Switching Supported
-	CAP_PMD 		= (1 << 15),	// PIO Multiple DRQ Block
-	CAP_SSC 		= (1 << 14),	// Slumber State Capable
-	CAP_PSC 		= (1 << 13),	// Partial State Capable
-	CAP_NCS_MASK 	= 0x1f,			// Number of Command Slots (zero-based number)
+	CAP_SNZO		= (1 << 19),	// Supports Non-Zero DMA Offsets
+	CAP_SAM			= (1 << 18),	// Supports AHCI mode only
+	CAP_SPM			= (1 << 17),	// Supports Port Multiplier
+	CAP_FBSS		= (1 << 16),	// FIS-based Switching Supported
+	CAP_PMD			= (1 << 15),	// PIO Multiple DRQ Block
+	CAP_SSC			= (1 << 14),	// Slumber State Capable
+	CAP_PSC			= (1 << 13),	// Partial State Capable
+	CAP_NCS_MASK	= 0x1f,			// Number of Command Slots
+									// (zero-based number)
 	CAP_NCS_SHIFT	= 8,
-	CAP_CCCS 		= (1 << 7),		// Command Completion Coalescing Supported
-	CAP_EMS 		= (1 << 6),		// Enclosure Management Supported
-	CAP_SXS 		= (1 << 5), 	// Supports External SATA
+	CAP_CCCS		= (1 << 7),		// Command Completion Coalescing Supported
+	CAP_EMS			= (1 << 6),		// Enclosure Management Supported
+	CAP_SXS			= (1 << 5),		// Supports External SATA
 	CAP_NP_MASK		= 0x1f,			// Number of Ports (zero-based number)
 	CAP_NP_SHIFT	= 0,
 };
@@ -73,19 +74,40 @@ enum {
 	INT_SDB			= (1 << 3),		// Set Device Bits Interrupt/Enable
 	INT_DS			= (1 << 2),		// DMA Setup FIS Interrupt/Enable
 	INT_PS			= (1 << 1),		// PIO Setup FIS Interrupt/Enable
-	INT_DHR			= (1 << 0),		// Device to Host Register FIS Interrupt/Enable
+	INT_DHR			= (1 << 0),		// Device to Host Register FIS
+									// Interrupt/Enable
 };
 
 
+// Device Detection Initialization
+#define SATA_CONTROL_DET_SHIFT	0
+#define SATA_CONTROL_DET_MASK	0x0000000f
+
+#define DET_NO_INITIALIZATION	0x0
+#define DET_INITIALIZATION		0x1
+
+// Speed Allowed
+#define SATA_CONTROL_SPD_SHIFT	4
+#define SATA_CONTROL_SPD_MASK	0x000000f0
+
+// Interface Power Management Transitions Allowed
+#define SATA_CONTROL_IPM_SHIFT	8
+#define SATA_CONTROL_IPM_MASK	0x00000f00
+
+#define IPM_TRANSITIONS_TO_PARTIAL_DISABLED 0x1
+#define IPM_TRANSITIONS_TO_SLUMBER_DISABLED 0x2
+
+
 typedef struct {
-	uint32		clb;			// Command List Base Address (alignment 1024 byte)
+	uint32		clb;			// Command List Base Address
+								// (alignment 1024 byte)
 	uint32		clbu;			// Command List Base Address Upper 32-Bits
 	uint32		fb;				// FIS Base Address (alignment 256 byte)
 	uint32		fbu;			// FIS Base Address Upper 32-Bits
 	uint32		is;				// Interrupt Status **RWC**
 	uint32		ie;				// Interrupt Enable
 	uint32		cmd;			// Command and Status
-	uint32 		res1;			// Reserved
+	uint32		res1;			// Reserved
 	uint32		tfd;			// Task File Data
 	uint32		sig;			// Signature
 	uint32		ssts;			// Serial ATA Status (SCR0: SStatus)
@@ -102,9 +124,9 @@ typedef struct {
 
 
 enum {
-	PORT_CMD_ICC_ACTIVE	 = (1 << 28),	// Interface Communication control
-	PORT_CMD_ICC_SLUMBER = (6 << 28),	// Interface Communication control
-	PORT_CMD_ICC_MASK    = (0xf<<28),	// Interface Communication control
+	PORT_CMD_ICC_ACTIVE		= (1 << 28),	// Interface Communication control
+	PORT_CMD_ICC_SLUMBER	= (6 << 28),	// Interface Communication control
+	PORT_CMD_ICC_MASK		= (0xf<<28),	// Interface Communication control
 	PORT_CMD_ATAPI	= (1 << 24),	// Device is ATAPI
 	PORT_CMD_CR		= (1 << 15),	// Command List Running (DMA active)
 	PORT_CMD_FR		= (1 << 14),	// FIS Receive Running
@@ -136,17 +158,17 @@ enum {
 	PORT_INT_DHR	= (1 << 0),		// Device to Host Register FIS Interrupt
 };
 
-#define PORT_INT_ERROR 	(PORT_INT_TFE | PORT_INT_HBF | PORT_INT_HBD \
-						 | PORT_INT_IF | PORT_INT_INF | PORT_INT_OF \
-						 | PORT_INT_IPM | PORT_INT_PRC | PORT_INT_PC \
-						 | PORT_INT_UF)
+#define PORT_INT_ERROR	(PORT_INT_TFE | PORT_INT_HBF | PORT_INT_HBD \
+							| PORT_INT_IF | PORT_INT_INF | PORT_INT_OF \
+							| PORT_INT_IPM | PORT_INT_PRC | PORT_INT_PC \
+							| PORT_INT_UF)
 
 #define PORT_INT_MASK	(PORT_INT_ERROR | PORT_INT_DP | PORT_INT_SDB \
-						 | PORT_INT_DS | PORT_INT_PS | PORT_INT_DHR)
+							| PORT_INT_DS | PORT_INT_PS | PORT_INT_DHR)
 
 enum {
-	ATA_BSY 		= 0x80,
-	ATA_DF 			= 0x20,
+	ATA_BSY			= 0x80,
+	ATA_DF			= 0x20,
 	ATA_DRQ			= 0x08,
 	ATA_ERR			= 0x01,
 };
@@ -154,11 +176,11 @@ enum {
 
 enum {
 	PORT_FBS_DWE_SHIFT		= 16,	// Device With Error
-	PORT_FBS_DWE_MASK 		= 0xf,
+	PORT_FBS_DWE_MASK		= 0xf,
 	PORT_FBS_ADO_SHIFT		= 12,	// Active Device Optimization
-	PORT_FBS_ADO_MASK 		= 0xf,
+	PORT_FBS_ADO_MASK		= 0xf,
 	PORT_FBS_DEV_SHIFT		= 8,	// Device To Issue
-	PORT_FBS_DEV_MASK 		= 0xf,
+	PORT_FBS_DEV_MASK		= 0xf,
 	PORT_FBS_SDE			= 0x04,	// Single Device Error
 	PORT_FBS_DEC			= 0x02,	// Device Error Clear
 	PORT_FBS_EN				= 0x01,	// Enable
@@ -167,7 +189,7 @@ enum {
 
 enum {
 	PORT_DEVSLP_DM_SHIFT	= 25,	// DITO Multiplier
-	PORT_DEVSLP_DM_MASK 	= 0xf,
+	PORT_DEVSLP_DM_MASK		= 0xf,
 	PORT_DEVSLP_DITO_SHIFT	= 15,	// Device Sleep Idle Timeout
 	PORT_DEVSLP_DITO_MASK	= 0x3ff,
 	PORT_DEVSLP_MDAT_SHIFT	= 10,	// Minimum Device Sleep Assertion Time
@@ -180,12 +202,13 @@ enum {
 
 
 enum {
-	CAP2_DESO 		= (1 << 5),		// DevSleep Entrance from Slumber Only
-	CAP2_SADM 		= (1 << 4),		// Supports Aggressive Device Sleep Management
-	CAP2_SDS 		= (1 << 3), 	// Supports Device Sleep
-	CAP2_APST 		= (1 << 2),		// Automatic Partial to Slumber Transitions
-	CAP2_NVMP 		= (1 << 1),		// NVMHCI Present
-	CAP2_BOH 		= (1 << 0), 	// BIOS/OS Handoff
+	CAP2_DESO		= (1 << 5),		// DevSleep Entrance from Slumber Only
+	CAP2_SADM		= (1 << 4),		// Supports Aggressive Device Sleep
+									// Management
+	CAP2_SDS		= (1 << 3),		// Supports Device Sleep
+	CAP2_APST		= (1 << 2),		// Automatic Partial to Slumber Transitions
+	CAP2_NVMP		= (1 << 1),		// NVMHCI Present
+	CAP2_BOH		= (1 << 0),		// BIOS/OS Handoff
 };
 
 
@@ -221,21 +244,22 @@ typedef struct {
 
 
 typedef struct {
-  union {
-   struct {
-	uint16		cfl : 5;		// command FIS length
-	uint16		a : 1;			// ATAPI
-	uint16		w : 1;			// Write
-	uint16		p : 1;			// Prefetchable
-	uint16		r : 1;			// Reset
-	uint16		b : 1;			// Build In Self Test
-	uint16		c : 1;			// Clear Busy upon R_OK
-	uint16		: 1;
-	uint16		pmp : 4;		// Port Multiplier Port
-	uint16		prdtl;			// physical region description table length;
-   } _PACKED;
-    uint32		prdtl_flags_cfl;
-  } _PACKED;
+	union {
+		struct {
+			uint16		cfl : 5;		// command FIS length
+			uint16		a : 1;			// ATAPI
+			uint16		w : 1;			// Write
+			uint16		p : 1;			// Prefetchable
+			uint16		r : 1;			// Reset
+			uint16		b : 1;			// Build In Self Test
+			uint16		c : 1;			// Clear Busy upon R_OK
+			uint16		: 1;
+			uint16		pmp : 4;		// Port Multiplier Port
+			uint16		prdtl;			// physical region description table
+										// length;
+		} _PACKED;
+		uint32		prdtl_flags_cfl;
+	} _PACKED;
 	uint32		prdbc;			// PRD Byte Count
 	uint32		ctba;			// command table desciptor base address
 								// (alignment 128 byte)
@@ -251,16 +275,16 @@ typedef struct {
 //  1 - C bit (0x80)
 //  2 - Command
 //  3 - Features
-//  4 - Sector Number           (LBA Low, bits 0-7)
-//  5 - Cylinder Low            (LBA Mid, bits 8-15)
-//  6 - Cylinder High           (LBA High, bits 16-23)
-//  7 - Device / Head           (for 28-bit LBA commands, bits 24-27)
-//  8 - Sector Number expanded  (LBA Low-previous, bits 24-31)
-//  9 - Cylinder Low expanded   (LBA Mid-previous, bits 32-39)
-// 10 - Cylinder High expanded  (LBA High-previous, bits 40-47)
+//  4 - Sector Number			(LBA Low, bits 0-7)
+//  5 - Cylinder Low			(LBA Mid, bits 8-15)
+//  6 - Cylinder High			(LBA High, bits 16-23)
+//  7 - Device / Head			(for 28-bit LBA commands, bits 24-27)
+//  8 - Sector Number expanded	(LBA Low-previous, bits 24-31)
+//  9 - Cylinder Low expanded	(LBA Mid-previous, bits 32-39)
+// 10 - Cylinder High expanded	(LBA High-previous, bits 40-47)
 // 11 - Features expanded
-// 12 - Sector Count            (Sector count, bits 0-7)
-// 13 - Sector Count expanded   (Sector count, bits 8-15)
+// 12 - Sector Count			(Sector count, bits 0-7)
+// 13 - Sector Count expanded	(Sector count, bits 8-15)
 // 14 - Reserved (0)
 // 15 - Control
 // 16 - Reserved (0)

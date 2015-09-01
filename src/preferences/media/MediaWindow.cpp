@@ -12,7 +12,6 @@
 
 #include <stdio.h>
 
-#include <Alert.h>
 #include <Application.h>
 #include <Autolock.h>
 #include <Button.h>
@@ -185,7 +184,8 @@ MediaWindow::MediaWindow(BRect frame)
 	fVideoInputs(5, true),
 	fVideoOutputs(5, true),
 	fInitCheck(B_OK),
-	fRestartThread(-1)
+	fRestartThread(-1),
+	fRestartAlert(NULL)
 {
 	_InitWindow();
 
@@ -307,13 +307,16 @@ MediaWindow::UpdateOutputListItem(MediaListItem::media_type type,
 bool
 MediaWindow::QuitRequested()
 {
-	status_t exit = B_OK;
 	if (fRestartThread > 0) {
-		wait_for_thread(fRestartThread, &exit);
-		if (exit != B_OK) {
-			fprintf(stderr, "MediaWindow::QuitRequested wait_for_thread"
-				" returned with an error: %s\n", strerror(exit));
-		}
+		BString text(B_TRANSLATE("Quitting Media now will stop the "
+			"restarting of the media services. Flaky or unavailable media "
+			"functionality is the likely result."));
+
+		fRestartAlert = new BAlert(B_TRANSLATE("Warning!"), text,
+			B_TRANSLATE("Quit anyway"), NULL, NULL,
+			B_WIDTH_AS_USUAL, B_OFFSET_SPACING, B_WARNING_ALERT);
+
+		fRestartAlert->Go();
 	}
 	// Stop watching the MediaRoster
 	fCurrentNode.SetTo(NULL);
@@ -657,6 +660,11 @@ MediaWindow::_RestartMediaServices(void* data)
 	
 	shutdown_media_server();
 	launch_media_server();
+
+	if (window->fRestartAlert != NULL
+			&& window->fRestartAlert->Lock()) {
+		window->fRestartAlert->Quit();
+	}
 
 	return window->PostMessage(ML_RESTART_THREAD_FINISHED);
 }

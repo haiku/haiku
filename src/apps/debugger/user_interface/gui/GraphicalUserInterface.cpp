@@ -248,6 +248,13 @@ GraphicalUserInterface::NotifyUser(const char* title, const char* message,
 }
 
 
+void
+GraphicalUserInterface::NotifyBackgroundWorkStatus(const char* message)
+{
+	fTeamWindow->DisplayBackgroundStatus(message);
+}
+
+
 int32
 GraphicalUserInterface::SynchronouslyAskUser(const char* title,
 	const char* message, const char* choice1, const char* choice2,

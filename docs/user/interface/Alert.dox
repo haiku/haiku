@@ -227,7 +227,7 @@ int32 button_index = alert->Go();
 		See button_width for details.
 	\param spacing Determines how the buttons are spaced. Options are
 		\li \c B_EVEN_SPACING
-		\li \c B_OFFSET_SPACING 
+		\li \c B_OFFSET_SPACING
 
 		See button_spacing for details.
 	\param type Constant that determines which alert icon is displayed.
@@ -408,7 +408,7 @@ int32 button_index = alert->Go();
 
 /*!
 	\fn BTextView* BAlert::TextView() const
-	\brief Returns a TextView containing the text of the Alert.
+	\brief Returns the Alert's TextView.
 
 	\since BeOS R3
 */

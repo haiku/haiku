@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku, Inc.
+ * Copyright 2001-2014 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,6 +40,7 @@
 #include <PopUpMenu.h>
 #include <Screen.h>
 #include <SpaceLayoutItem.h>
+#include <Spinner.h>
 #include <String.h>
 #include <StringView.h>
 #include <Roster.h>
@@ -164,14 +165,14 @@ screen_errors(status_t status)
 }
 
 
-//	#pragma mark -
+//	#pragma mark - ScreenWindow
 
 
 ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	:
 	BWindow(settings->WindowFrame(), B_TRANSLATE_SYSTEM_NAME("Screen"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
-		| B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES),
+			| B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES),
 	fIsVesa(false),
 	fBootWorkspaceApplied(false),
 	fOtherRefresh(NULL),
@@ -194,7 +195,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	// we need the "Current Workspace" first to get its height
 
-	BPopUpMenu *popUpMenu = new BPopUpMenu(B_TRANSLATE("Current workspace"),
+	BPopUpMenu* popUpMenu = new BPopUpMenu(B_TRANSLATE("Current workspace"),
 		true, true);
 	fAllWorkspacesItem = new BMenuItem(B_TRANSLATE("All workspaces"),
 		new BMessage(WORKSPACE_CHECK_MSG));
@@ -234,34 +235,32 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 		B_TRANSLATE("Workspaces"));
 	workspaces->SetAlignment(B_ALIGN_CENTER);
 
-	fColumnsControl = new BTextControl(B_TRANSLATE("Columns:"), "0",
+	fColumnsControl = new BSpinner("columns", B_TRANSLATE("Columns:"),
 		new BMessage(kMsgWorkspaceColumnsChanged));
-	fColumnsControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-	fRowsControl = new BTextControl(B_TRANSLATE("Rows:"), "0",
-		new BMessage(kMsgWorkspaceRowsChanged));
-	fRowsControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
+	fColumnsControl->SetAlignment(B_ALIGN_RIGHT);
+	fColumnsControl->SetRange(1, 32);
 
-	float tiny = be_control_look->DefaultItemSpacing() / 4;
+	fRowsControl = new BSpinner("rows", B_TRANSLATE("Rows:"),
+		new BMessage(kMsgWorkspaceRowsChanged));
+	fRowsControl->SetAlignment(B_ALIGN_RIGHT);
+	fRowsControl->SetRange(1, 32);
+
+	uint32 columns;
+	uint32 rows;
+	BPrivate::get_workspaces_layout(&columns, &rows);
+	fColumnsControl->SetValue(columns);
+	fRowsControl->SetValue(rows);
+
 	screenBox->AddChild(BLayoutBuilder::Group<>()
 		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
 			.Add(workspaces)
-			.AddGrid(0.0, tiny)
+			.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
 				// columns
 				.Add(fColumnsControl->CreateLabelLayoutItem(), 0, 0)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
-					B_USE_SMALL_SPACING), 1, 0)
-				.Add(fColumnsControl->CreateTextViewLayoutItem(), 2, 0)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(tiny), 3, 0)
-				.Add(_CreateColumnRowButton(true, false), 4, 0)
-				.Add(_CreateColumnRowButton(true, true), 5, 0)
+				.Add(fColumnsControl->CreateTextViewLayoutItem(), 1, 0)
 				// rows
 				.Add(fRowsControl->CreateLabelLayoutItem(), 0, 1)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(
-					B_USE_SMALL_SPACING), 1, 1)
-				.Add(fRowsControl->CreateTextViewLayoutItem(), 2, 1)
-				.Add(BSpaceLayoutItem::CreateHorizontalStrut(tiny), 3, 1)
-				.Add(_CreateColumnRowButton(false, false), 4, 1)
-				.Add(_CreateColumnRowButton(false, true), 5, 1)
+				.Add(fRowsControl->CreateTextViewLayoutItem(), 1, 1)
 				.End()
 			.End()
 		.View());
@@ -872,17 +871,33 @@ ScreenWindow::_UpdateWorkspaceButtons()
 	uint32 rows;
 	BPrivate::get_workspaces_layout(&columns, &rows);
 
-	char text[32];
-	snprintf(text, sizeof(text), "%" B_PRId32, columns);
-	fColumnsControl->SetText(text);
+	// Set the max values enabling/disabling the up/down arrows
 
-	snprintf(text, sizeof(text), "%" B_PRId32, rows);
-	fRowsControl->SetText(text);
+	if (rows == 1)
+		fColumnsControl->SetMaxValue(32);
+	else if (rows == 2)
+		fColumnsControl->SetMaxValue(16);
+	else if (rows <= 4)
+		fColumnsControl->SetMaxValue(8);
+	else if (rows <= 8)
+		fColumnsControl->SetMaxValue(4);
+	else if (rows <= 16)
+		fColumnsControl->SetMaxValue(2);
+	else if (rows <= 32)
+		fColumnsControl->SetMaxValue(1);
 
-	_GetColumnRowButton(true, false)->SetEnabled(columns != 1 && rows != 32);
-	_GetColumnRowButton(true, true)->SetEnabled((columns + 1) * rows < 32);
-	_GetColumnRowButton(false, false)->SetEnabled(rows != 1 && columns != 32);
-	_GetColumnRowButton(false, true)->SetEnabled(columns * (rows + 1) < 32);
+	if (columns == 1)
+		fRowsControl->SetMaxValue(32);
+	else if (columns == 2)
+		fRowsControl->SetMaxValue(16);
+	else if (columns <= 4)
+		fRowsControl->SetMaxValue(8);
+	else if (columns <= 8)
+		fRowsControl->SetMaxValue(4);
+	else if (columns <= 16)
+		fRowsControl->SetMaxValue(2);
+	else if (columns <= 32)
+		fRowsControl->SetMaxValue(1);
 }
 
 
@@ -918,51 +933,33 @@ ScreenWindow::MessageReceived(BMessage* message)
 			_CheckApplyEnabled();
 			break;
 
-		case kMsgWorkspaceLayoutChanged:
-		{
-			int32 deltaX = 0;
-			int32 deltaY = 0;
-			message->FindInt32("delta_x", &deltaX);
-			message->FindInt32("delta_y", &deltaY);
-
-			if (deltaX == 0 && deltaY == 0)
-				break;
-
-			uint32 newColumns;
-			uint32 newRows;
-			BPrivate::get_workspaces_layout(&newColumns, &newRows);
-
-			newColumns += deltaX;
-			newRows += deltaY;
-			BPrivate::set_workspaces_layout(newColumns, newRows);
-
-			_UpdateWorkspaceButtons();
-			_CheckApplyEnabled();
-			break;
-		}
-
 		case kMsgWorkspaceColumnsChanged:
 		{
-			uint32 newColumns = strtoul(fColumnsControl->Text(), NULL, 10);
+			uint32 newColumns = (uint32)fColumnsControl->Value();
 
 			uint32 rows;
 			BPrivate::get_workspaces_layout(NULL, &rows);
 			BPrivate::set_workspaces_layout(newColumns, rows);
 
 			_UpdateWorkspaceButtons();
+			fRowsControl->SetValue(rows);
+				// enables/disables up/down arrows
 			_CheckApplyEnabled();
+
 			break;
 		}
 
 		case kMsgWorkspaceRowsChanged:
 		{
-			uint32 newRows = strtoul(fRowsControl->Text(), NULL, 10);
+			uint32 newRows = (uint32)fRowsControl->Value();
 
 			uint32 columns;
 			BPrivate::get_workspaces_layout(&columns, NULL);
 			BPrivate::set_workspaces_layout(columns, newRows);
 
 			_UpdateWorkspaceButtons();
+			fColumnsControl->SetValue(columns);
+				// enables/disables up/down arrows
 			_CheckApplyEnabled();
 			break;
 		}
@@ -1133,7 +1130,6 @@ ScreenWindow::MessageReceived(BMessage* message)
 
 		default:
 			BWindow::MessageReceived(message);
-			break;
 	}
 }
 
@@ -1169,33 +1165,6 @@ ScreenWindow::_WriteVesaModeFile(const screen_mode& mode) const
 }
 
 
-BButton*
-ScreenWindow::_CreateColumnRowButton(bool columns, bool plus)
-{
-	BMessage* message = new BMessage(kMsgWorkspaceLayoutChanged);
-	message->AddInt32("delta_x", columns ? (plus ? 1 : -1) : 0);
-	message->AddInt32("delta_y", !columns ? (plus ? 1 : -1) : 0);
-
-	BButton* button = new BButton(plus ? "+" : "\xe2\x88\x92", message);
-	button->SetFontSize(be_plain_font->Size() * 0.9);
-
-	BSize size = button->MinSize();
-	size.width = button->StringWidth("+") + 16;
-	button->SetExplicitMinSize(size);
-	button->SetExplicitMaxSize(size);
-
-	fWorkspacesButtons[(columns ? 0 : 2) + (plus ? 1 : 0)] = button;
-	return button;
-}
-
-
-BButton*
-ScreenWindow::_GetColumnRowButton(bool columns, bool plus)
-{
-	return fWorkspacesButtons[(columns ? 0 : 2) + (plus ? 1 : 0)];
-}
-
-
 void
 ScreenWindow::_BuildSupportedColorSpaces()
 {
@@ -1216,7 +1185,7 @@ void
 ScreenWindow::_CheckApplyEnabled()
 {
 	bool applyEnabled = true;
-	
+
 	if (fSelected == fActive) {
 		applyEnabled = false;
 		if (fAllWorkspacesItem->IsMarked()) {
@@ -1231,7 +1200,7 @@ ScreenWindow::_CheckApplyEnabled()
 			}
 		}
 	}
-	
+
 	fApplyButton->SetEnabled(applyEnabled);
 
 	uint32 columns;
@@ -1367,8 +1336,8 @@ ScreenWindow::_Apply()
 		fActive = fSelected;
 
 		// TODO: only show alert when this is an unknown mode
-		BWindow* window = new AlertWindow(this);
-		window->Show();
+		BAlert* window = new AlertWindow(this);
+		window->Go(NULL);
 	} else {
 		char message[256];
 		snprintf(message, sizeof(message),

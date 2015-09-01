@@ -509,7 +509,7 @@ BApplication::_InitData(const char* signature, bool initGUI, status_t* _error)
 
 		// create meta MIME
 		BPath path;
-		if (path.SetTo(&ref) == B_OK)
+		if (registerApp && path.SetTo(&ref) == B_OK)
 			create_app_meta_mime(path.Path(), false, true, false);
 
 #ifndef RUN_WITHOUT_APP_SERVER

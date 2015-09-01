@@ -80,7 +80,7 @@ private:
 	static	const uint32		kFlagsCovering		= 0x00000100;
 	static	const uint32		kFlagsType			= 0xfffff000;
 
-	static	const uint32		kBucketCount		 = 32;
+	static	const uint32		kBucketCount		= 32;
 
 			struct LockWaiter : DoublyLinkedListLinkImpl<LockWaiter> {
 				LockWaiter*		next;

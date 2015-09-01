@@ -13,6 +13,7 @@
 #include <new>
 
 #include <Entry.h>
+#include <InterfaceDefs.h>
 #include <Message.h>
 #include <StringList.h>
 
@@ -1370,9 +1371,36 @@ TeamDebugger::UserInterfaceQuitRequested(QuitOption quitOption)
 
 
 void
+TeamDebugger::JobStarted(Job* job)
+{
+	BString description(job->GetDescription());
+	if (!description.IsEmpty()) {
+		description.Append(B_UTF8_ELLIPSIS);
+		fUserInterface->NotifyBackgroundWorkStatus(description.String());
+	}
+}
+
+
+void
 TeamDebugger::JobDone(Job* job)
 {
 	TRACE_JOBS("TeamDebugger::JobDone(%p)\n", job);
+	_ResetUserBackgroundStatusIfNeeded();
+}
+
+
+void
+TeamDebugger::JobWaitingForInput(Job* job)
+{
+	LoadImageDebugInfoJob* infoJob = dynamic_cast<LoadImageDebugInfoJob*>(job);
+
+	if (infoJob == NULL)
+		return;
+
+	BMessage message(MSG_DEBUG_INFO_NEEDS_USER_INPUT);
+	message.AddPointer("job", infoJob);
+	message.AddPointer("state", infoJob->GetLoadingState());
+	PostMessage(&message);
 }
 
 
@@ -1381,6 +1409,7 @@ TeamDebugger::JobFailed(Job* job)
 {
 	TRACE_JOBS("TeamDebugger::JobFailed(%p)\n", job);
 	// TODO: notify user
+	_ResetUserBackgroundStatusIfNeeded();
 }
 
 
@@ -1390,20 +1419,7 @@ TeamDebugger::JobAborted(Job* job)
 	TRACE_JOBS("TeamDebugger::JobAborted(%p)\n", job);
 	// TODO: For a stack frame source loader thread we should reset the
 	// loading state! Asynchronously due to locking order.
-}
-
-
-void
-TeamDebugger::ImageDebugInfoJobNeedsUserInput(Job* job,
-	ImageDebugInfoLoadingState* state)
-{
-	TRACE_JOBS("TeamDebugger::DebugInfoJobNeedsUserInput(%p, %p)\n",
-		job, state);
-
-	BMessage message(MSG_DEBUG_INFO_NEEDS_USER_INPUT);
-	message.AddPointer("job", job);
-	message.AddPointer("state", state);
-	PostMessage(&message);
+	_ResetUserBackgroundStatusIfNeeded();
 }
 
 
@@ -1908,7 +1924,6 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 
 	bool handlePostExecSetup = fExecPending && image->Type() == B_APP_IMAGE
 		&& state != IMAGE_DEBUG_INFO_LOADING;
-
 	// this needs to be done first so that breakpoints are loaded.
 	// otherwise, UpdateImageBreakpoints() won't find the appropriate
 	// UserBreakpoints to create/install instances for.
@@ -1922,6 +1937,7 @@ TeamDebugger::_HandleImageDebugInfoChanged(image_id imageID)
 
 	if (state == IMAGE_DEBUG_INFO_LOADED
 		|| state == IMAGE_DEBUG_INFO_UNAVAILABLE) {
+
 		// update breakpoints in the image
 		fBreakpointManager->UpdateImageBreakpoints(image);
 
@@ -2483,6 +2499,14 @@ TeamDebugger::_NotifyUser(const char* title, const char* text,...)
 
 	// notify the user
 	fUserInterface->NotifyUser(title, buffer, USER_NOTIFICATION_WARNING);
+}
+
+
+void
+TeamDebugger::_ResetUserBackgroundStatusIfNeeded()
+{
+	if (!fWorker->HasPendingJobs())
+		fUserInterface->NotifyBackgroundWorkStatus("Ready.");
 }
 
 

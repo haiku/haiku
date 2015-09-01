@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	3588353727
+1	russian	x-vnd.Haiku-HaikuDepot	4273323974
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -53,6 +53,7 @@ The user name needs to be at least 3 letters long.	UserLoginWindow		Имя по�
 Log in	UserLoginWindow		Войти…
 Repeat pass phrase:	UserLoginWindow		Повторить пароль:
 Ratings	PackageInfoView		Оценки
+But none could be listed here, sorry.	UserLoginWindow		Но не удалось определить с какими именно, извините.
 System & Utilities	Model		Система и утилиты
 Inactive	PackageListView		Неактивный
 Refresh depots	MainWindow		Обновить склады
@@ -89,6 +90,7 @@ Failed to create or update rating: %s\n	RatePackageWindow		Не удалось �
 You need to be logged into an account before you can rate packages.	MainWindow		Вы должны войти в свою учётную запись перед тем как оценить пакет.
  It responded with: 	RatePackageWindow		 Он ответил так: 
 User name:	UserLoginWindow		Имя пользователя:
+User Menu	MainWindow		Меню пользователя
 Unstable but usable	RatePackageWindow		Нестабилен, но пригодный для использования
 The email address appears to be malformed.	UserLoginWindow		Некорректный адрес электронной почты.
 Games	Model		Игры
@@ -131,6 +133,7 @@ If you do not provide an email address, you will not be able to reset your passw
  It responded with: 	UserLoginWindow		 Он ответил так: 
 Authentication failed. Connection to the service failed.	UserLoginWindow		Неверный логин/пароль. Соединение с сервисом прервано.
 Cancel	RatePackageWindow		Отмена
+Package action failed	PackageInfoView		Действие с пакетом не удалось.
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Отправить
 -	no package size		-

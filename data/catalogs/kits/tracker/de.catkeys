@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	3987439873
+1	german	x-vnd.Haiku-libtracker	1787267522
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-ons
 Mount settings…	ContainerWindow		Einhänge-Einstellungen…
@@ -19,6 +19,7 @@ Modified	QueryPoseView		Geändert
 Created	ContainerWindow		Erstellt
 Error %error loading add-On %name.	ContainerWindow		Fehler %error beim Laden von Add-On %name.
 If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Wird der Settings-Ordner %ifYouDoAction, kann %osName vielleicht nicht mehr fehlerfrei arbeiten!
+Skip all	FSUtils		Alle überspringen
 contains	SelectionWindow		enthält
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Im Root-Verzeichnis des Systems kann leider nichts gespeichert werden.
 Show shared volumes on Desktop	SettingsView		Netzwerk-Laufwerke auf dem Desktop zeigen

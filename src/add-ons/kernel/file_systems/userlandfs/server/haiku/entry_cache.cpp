@@ -18,6 +18,13 @@ entry_cache_add(dev_t mountID, ino_t dirID, const char* name, ino_t nodeID)
 
 
 status_t
+entry_cache_add_missing(dev_t mountID, ino_t dirID, const char* name)
+{
+	return B_OK;
+}
+
+
+status_t
 entry_cache_remove(dev_t mountID, ino_t dirID, const char* name)
 {
 	return B_OK;

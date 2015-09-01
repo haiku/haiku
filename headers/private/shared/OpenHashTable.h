@@ -233,21 +233,21 @@ template<class Element, class ElementVec>
 int32
 OpenHashTable<Element, ElementVec>::ArraySize() const
 {
-	 return fArraySize;
+	return fArraySize;
 }
 
 template<class Element, class ElementVec>
 int32
 OpenHashTable<Element, ElementVec>::VectorSize() const
 {
-	 return fElementVector->Size();
+	return fElementVector->Size();
 }
 
 template<class Element, class ElementVec>
 int32
 OpenHashTable<Element, ElementVec>::CountElements() const
 {
-	 return fElementCount;
+	return fElementCount;
 }
 
 

@@ -17,6 +17,11 @@ extern "C" {
 #include "EncoderPlugin.h"
 
 
+#if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
+typedef AVCodecID CodecID;
+#endif
+
+
 class AVCodecEncoder : public Encoder {
 public:
 								AVCodecEncoder(uint32 codecID,

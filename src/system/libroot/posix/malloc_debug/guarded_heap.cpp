@@ -3,6 +3,8 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "malloc_debug_api.h"
+
 
 #include <malloc.h>
 #include <stdio.h>
@@ -36,7 +38,7 @@ static int32 sStackEndTLSIndex = -1;
 using namespace std;
 static size_t sDefaultAlignment = alignof(max_align_t);
 #else
-static size_t sDefaultAlignment = 0;
+static size_t sDefaultAlignment = 8;
 #endif
 
 
@@ -161,7 +163,8 @@ struct guarded_heap_page {
 	size_t				allocation_size;
 	void*				allocation_base;
 	size_t				alignment;
-	thread_id			thread;
+	thread_id			allocating_thread;
+	thread_id			freeing_thread;
 	list_link			free_list_link;
 	size_t				alloc_stack_trace_depth;
 	size_t				free_stack_trace_depth;
@@ -257,14 +260,14 @@ static void
 guarded_heap_print_stack_traces(guarded_heap_page& page)
 {
 	if (page.alloc_stack_trace_depth > 0) {
-		printf("alloc stack trace (%" B_PRIuSIZE "):\n",
+		print_stdout("alloc stack trace (%" B_PRIuSIZE "):\n",
 			page.alloc_stack_trace_depth);
 		guarded_heap_print_stack_trace(page.stack_trace,
 			page.alloc_stack_trace_depth);
 	}
 
 	if (page.free_stack_trace_depth > 0) {
-		printf("free stack trace (%" B_PRIuSIZE "):\n",
+		print_stdout("free stack trace (%" B_PRIuSIZE "):\n",
 			page.free_stack_trace_depth);
 		guarded_heap_print_stack_trace(
 			&page.stack_trace[page.alloc_stack_trace_depth],
@@ -314,7 +317,8 @@ guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 		guarded_heap_page& page = area.pages[startPageIndex + i];
 		page.flags = GUARDED_HEAP_PAGE_FLAG_USED;
 		if (i == 0) {
-			page.thread = find_thread(NULL);
+			page.allocating_thread = find_thread(NULL);
+			page.freeing_thread = -1;
 			page.allocation_size = allocationSize;
 			page.allocation_base = allocationBase;
 			page.alignment = alignment;
@@ -324,7 +328,8 @@ guarded_heap_page_allocate(guarded_heap_area& area, size_t startPageIndex,
 			page.free_stack_trace_depth = 0;
 			firstPage = &page;
 		} else {
-			page.thread = firstPage->thread;
+			page.allocating_thread = firstPage->allocating_thread;
+			page.freeing_thread = -1;
 			page.allocation_size = allocationSize;
 			page.allocation_base = allocationBase;
 			page.alignment = alignment;
@@ -356,7 +361,7 @@ guarded_heap_free_page(guarded_heap_area& area, size_t pageIndex,
 	else
 		page.flags |= GUARDED_HEAP_PAGE_FLAG_DEAD;
 
-	page.thread = find_thread(NULL);
+	page.freeing_thread = find_thread(NULL);
 
 	list_add_item(&area.free_list, &page);
 
@@ -495,51 +500,78 @@ guarded_heap_add_area(guarded_heap& heap, uint32 counter)
 
 
 static void*
+guarded_heap_allocate_with_area(size_t size, size_t alignment)
+{
+	size_t infoSpace = alignment >= B_PAGE_SIZE ? B_PAGE_SIZE
+		: (sizeof(guarded_heap_page) + alignment - 1) & ~(alignment - 1);
+
+	size_t pagesNeeded = (size + infoSpace + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+
+	if (alignment > B_PAGE_SIZE)
+		pagesNeeded += alignment / B_PAGE_SIZE - 1;
+
+	void* address = NULL;
+	area_id area = create_area("guarded_heap_huge_allocation", &address,
+		B_ANY_ADDRESS, (pagesNeeded + 1) * B_PAGE_SIZE, B_NO_LOCK,
+		B_READ_AREA | B_WRITE_AREA);
+	if (area < 0) {
+		panic("failed to create area for allocation of %" B_PRIuSIZE " pages",
+			pagesNeeded);
+		return NULL;
+	}
+
+	// We just use a page object
+	guarded_heap_page* page = (guarded_heap_page*)address;
+	page->flags = GUARDED_HEAP_PAGE_FLAG_USED | GUARDED_HEAP_PAGE_FLAG_FIRST
+		| GUARDED_HEAP_PAGE_FLAG_AREA;
+	page->allocation_size = size;
+	page->allocation_base = (void*)(((addr_t)address
+		+ pagesNeeded * B_PAGE_SIZE - size) & ~(alignment - 1));
+	page->alignment = alignment;
+	page->allocating_thread = find_thread(NULL);
+	page->freeing_thread = -1;
+	page->alloc_stack_trace_depth = guarded_heap_fill_stack_trace(
+		page->stack_trace, sStackTraceDepth, 2);
+	page->free_stack_trace_depth = 0;
+
+	if (alignment <= B_PAGE_SIZE) {
+		// Protect just the guard page.
+		mprotect((void*)((addr_t)address + pagesNeeded * B_PAGE_SIZE),
+			B_PAGE_SIZE, 0);
+	} else {
+		// Protect empty pages before the allocation start...
+		addr_t protectedStart = (addr_t)address + B_PAGE_SIZE;
+		size_t protectedSize = (addr_t)page->allocation_base - protectedStart;
+		if (protectedSize > 0)
+			mprotect((void*)protectedStart, protectedSize, 0);
+
+		// ... and after allocation end.
+		size_t allocatedPages = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE;
+		protectedStart = (addr_t)page->allocation_base
+			+ allocatedPages * B_PAGE_SIZE;
+		protectedSize = (addr_t)address + (pagesNeeded + 1) * B_PAGE_SIZE
+			- protectedStart;
+
+		// There is at least the guard page.
+		mprotect((void*)protectedStart, protectedSize, 0);
+	}
+
+	return page->allocation_base;
+}
+
+
+static void*
 guarded_heap_allocate(guarded_heap& heap, size_t size, size_t alignment)
 {
 	if (alignment == 0)
 		alignment = 1;
 
-	if (alignment > B_PAGE_SIZE) {
-		panic("alignment of %" B_PRIuSIZE " not supported", alignment);
-		return NULL;
-	}
-
 	size_t pagesNeeded = (size + B_PAGE_SIZE - 1) / B_PAGE_SIZE + 1;
-	if (pagesNeeded * B_PAGE_SIZE >= GUARDED_HEAP_AREA_USE_THRESHOLD) {
+	if (alignment > B_PAGE_SIZE
+		|| pagesNeeded * B_PAGE_SIZE >= GUARDED_HEAP_AREA_USE_THRESHOLD) {
 		// Don't bother, use an area directly. Since it will also fault once
 		// it is deleted, that fits our model quite nicely.
-
-		pagesNeeded = (size + sizeof(guarded_heap_page) + B_PAGE_SIZE - 1)
-			/ B_PAGE_SIZE;
-
-		void* address = NULL;
-		area_id area = create_area("guarded_heap_huge_allocation", &address,
-			B_ANY_ADDRESS, (pagesNeeded + 1) * B_PAGE_SIZE, B_NO_LOCK,
-			B_READ_AREA | B_WRITE_AREA);
-		if (area < 0) {
-			panic("failed to create area for allocation of %" B_PRIuSIZE
-				" pages", pagesNeeded);
-			return NULL;
-		}
-
-		// We just use a page object
-		guarded_heap_page* page = (guarded_heap_page*)address;
-		page->flags = GUARDED_HEAP_PAGE_FLAG_USED
-			| GUARDED_HEAP_PAGE_FLAG_FIRST | GUARDED_HEAP_PAGE_FLAG_AREA;
-		page->allocation_size = size;
-		page->allocation_base = (void*)(((addr_t)address
-			+ pagesNeeded * B_PAGE_SIZE - size) & ~(alignment - 1));
-		page->alignment = alignment;
-		page->thread = find_thread(NULL);
-		page->alloc_stack_trace_depth = guarded_heap_fill_stack_trace(
-			page->stack_trace, sStackTraceDepth, 2);
-		page->free_stack_trace_depth = 0;
-
-		mprotect((void*)((addr_t)address + pagesNeeded * B_PAGE_SIZE),
-			B_PAGE_SIZE, 0);
-
-		return page->allocation_base;
+		return guarded_heap_allocate_with_area(size, alignment);
 	}
 
 	void* result = NULL;
@@ -745,7 +777,8 @@ guarded_heap_realloc(void* address, size_t newSize)
 	if (oldSize == newSize)
 		return address;
 
-	void* newBlock = guarded_heap_allocate(sGuardedHeap, newSize, 0);
+	void* newBlock = guarded_heap_allocate(sGuardedHeap, newSize,
+		sDefaultAlignment);
 	if (newBlock == NULL)
 		return NULL;
 
@@ -782,7 +815,8 @@ dump_guarded_heap_page(guarded_heap_page& page)
 	printf("allocation size: %" B_PRIuSIZE "\n", page.allocation_size);
 	printf("allocation base: %p\n", page.allocation_base);
 	printf("alignment: %" B_PRIuSIZE "\n", page.alignment);
-	printf("allocating thread: %" B_PRId32 "\n", page.thread);
+	printf("allocating thread: %" B_PRId32 "\n", page.allocating_thread);
+	printf("freeing thread: %" B_PRId32 "\n", page.freeing_thread);
 }
 
 
@@ -833,9 +867,10 @@ dump_guarded_heap_page(void* address, bool doPanic)
 			panic("thread %" B_PRId32 " tried accessing address %p which is " \
 				state " (base: 0x%" B_PRIxADDR ", size: %" B_PRIuSIZE \
 				", alignment: %" B_PRIuSIZE ", allocated by thread: %" \
-				B_PRId32 ")", find_thread(NULL), address, \
-				page.allocation_base, page.allocation_size, page.alignment, \
-				page.thread)
+				B_PRId32 ", freed by thread: %" B_PRId32 ")", \
+				find_thread(NULL), address, page.allocation_base, \
+				page.allocation_size, page.alignment, page.allocating_thread, \
+				page.freeing_thread)
 
 		if ((page.flags & GUARDED_HEAP_PAGE_FLAG_USED) == 0)
 			DO_PANIC("not allocated");
@@ -951,7 +986,7 @@ dump_allocations(guarded_heap& heap, bool statsOnly, thread_id thread)
 				continue;
 			}
 
-			if (thread >= 0 && thread != page.thread)
+			if (thread >= 0 && thread != page.allocating_thread)
 				continue;
 
 			allocationCount++;
@@ -962,8 +997,8 @@ dump_allocations(guarded_heap& heap, bool statsOnly, thread_id thread)
 
 			print_stdout("allocation: base: %p; size: %" B_PRIuSIZE
 				"; thread: %" B_PRId32 "; alignment: %" B_PRIuSIZE "\n",
-				page.allocation_base, page.allocation_size, page.thread,
-				page.alignment);
+				page.allocation_base, page.allocation_size,
+				page.allocating_thread, page.alignment);
 
 			guarded_heap_print_stack_trace(page.stack_trace,
 				page.alloc_stack_trace_depth);
@@ -985,68 +1020,36 @@ dump_allocations_full()
 // #pragma mark - Heap Debug API
 
 
-extern "C" status_t
-heap_debug_start_wall_checking(int msInterval)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-extern "C" status_t
-heap_debug_stop_wall_checking()
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-extern "C" void
-heap_debug_set_paranoid_validation(bool enabled)
-{
-}
-
-
-extern "C" void
-heap_debug_set_memory_reuse(bool enabled)
+static void
+guarded_heap_set_memory_reuse(bool enabled)
 {
 	sGuardedHeap.reuse_memory = enabled;
 }
 
 
-extern "C" void
-heap_debug_set_debugger_calls(bool enabled)
+static void
+guarded_heap_set_debugger_calls(bool enabled)
 {
 	sDebuggerCalls = enabled;
 }
 
 
-extern "C" void
-heap_debug_set_default_alignment(size_t defaultAlignment)
+static void
+guarded_heap_set_default_alignment(size_t defaultAlignment)
 {
 	sDefaultAlignment = defaultAlignment;
 }
 
 
-extern "C" void
-heap_debug_validate_heaps()
-{
-}
-
-
-extern "C" void
-heap_debug_validate_walls()
-{
-}
-
-
-extern "C" void
-heap_debug_dump_allocations(bool statsOnly, thread_id thread)
+static void
+guarded_heap_dump_allocations(bool statsOnly, thread_id thread)
 {
 	dump_allocations(sGuardedHeap, statsOnly, thread);
 }
 
 
-extern "C" void
-heap_debug_dump_heaps(bool dumpAreas, bool dumpBins)
+static void
+guarded_heap_dump_heaps(bool dumpAreas, bool dumpBins)
 {
 	WriteLocker heapLocker(sGuardedHeap.lock);
 	dump_guarded_heap(sGuardedHeap);
@@ -1070,31 +1073,16 @@ heap_debug_dump_heaps(bool dumpAreas, bool dumpBins)
 }
 
 
-extern "C" void *
-heap_debug_malloc_with_guard_page(size_t size)
-{
-	return malloc(size);
-}
-
-
-extern "C" status_t
-heap_debug_get_allocation_info(void *address, size_t *size,
-	thread_id *thread)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-extern "C" status_t
-heap_debug_dump_allocations_on_exit(bool enabled)
+static status_t
+guarded_heap_set_dump_allocations_on_exit(bool enabled)
 {
 	sDumpAllocationsOnExit = enabled;
 	return B_OK;
 }
 
 
-extern "C" status_t
-heap_debug_set_stack_trace_depth(size_t stackTraceDepth)
+static status_t
+guarded_heap_set_stack_trace_depth(size_t stackTraceDepth)
 {
 	if (stackTraceDepth == 0) {
 		sStackTraceDepth = 0;
@@ -1139,8 +1127,8 @@ init_after_fork()
 }
 
 
-extern "C" status_t
-__init_heap(void)
+static status_t
+guarded_heap_init(void)
 {
 	if (!guarded_heap_area_create(sGuardedHeap, GUARDED_HEAP_INITIAL_SIZE))
 		return B_ERROR;
@@ -1164,35 +1152,8 @@ __init_heap(void)
 }
 
 
-extern "C" void
-__init_heap_post_env(void)
-{
-	const char *mode = getenv("MALLOC_DEBUG");
-	if (mode != NULL) {
-		if (strchr(mode, 'r'))
-			heap_debug_set_memory_reuse(false);
-		if (strchr(mode, 'e'))
-			heap_debug_dump_allocations_on_exit(true);
-
-		size_t defaultAlignment = 0;
-		const char *argument = strchr(mode, 'a');
-		if (argument != NULL
-			&& sscanf(argument, "a%" B_SCNuSIZE, &defaultAlignment) == 1) {
-			heap_debug_set_default_alignment(defaultAlignment);
-		}
-
-		size_t stackTraceDepth = 0;
-		argument = strchr(mode, 's');
-		if (argument != NULL
-			&& sscanf(argument, "s%" B_SCNuSIZE, &stackTraceDepth) == 1) {
-			heap_debug_set_stack_trace_depth(stackTraceDepth);
-		}
-	}
-}
-
-
-extern "C" void
-__heap_terminate_after()
+static void
+guarded_heap_terminate_after()
 {
 	if (sDumpAllocationsOnExit)
 		dump_allocations_full();
@@ -1202,17 +1163,8 @@ __heap_terminate_after()
 // #pragma mark - Public API
 
 
-extern "C" void*
-sbrk_hook(long)
-{
-	debug_printf("sbrk not supported on malloc debug\n");
-	panic("sbrk not supported on malloc debug\n");
-	return NULL;
-}
-
-
-extern "C" void*
-memalign(size_t alignment, size_t size)
+static void*
+heap_memalign(size_t alignment, size_t size)
 {
 	if (size == 0)
 		size = 1;
@@ -1221,23 +1173,23 @@ memalign(size_t alignment, size_t size)
 }
 
 
-extern "C" void*
-malloc(size_t size)
+static void*
+heap_malloc(size_t size)
 {
-	return memalign(sDefaultAlignment, size);
+	return heap_memalign(sDefaultAlignment, size);
 }
 
 
-extern "C" void
-free(void* address)
+static void
+heap_free(void* address)
 {
 	if (!guarded_heap_free(address))
 		panic("free failed for address %p", address);
 }
 
 
-extern "C" void*
-realloc(void* address, size_t newSize)
+static void*
+heap_realloc(void* address, size_t newSize)
 {
 	if (newSize == 0) {
 		free(address);
@@ -1245,40 +1197,42 @@ realloc(void* address, size_t newSize)
 	}
 
 	if (address == NULL)
-		return memalign(sDefaultAlignment, newSize);
+		return heap_memalign(sDefaultAlignment, newSize);
 
 	return guarded_heap_realloc(address, newSize);
 }
 
 
-extern "C" void*
-calloc(size_t numElements, size_t size)
-{
-	void* address = malloc(numElements * size);
-	if (address != NULL)
-		memset(address, 0, numElements * size);
+heap_implementation __mallocGuardedHeap = {
+	guarded_heap_init,
+	guarded_heap_terminate_after,
 
-	return address;
-}
+	heap_memalign,
+	heap_malloc,
+	heap_free,
+	heap_realloc,
 
+	NULL,	// calloc
+	NULL,	// valloc
+	NULL,	// posix_memalign
 
-extern "C" void*
-valloc(size_t size)
-{
-	return memalign(B_PAGE_SIZE, size);
-}
+	NULL,	// start_wall_checking
+	NULL,	// stop_wall_checking
+	NULL,	// set_paranoid_validation
 
+	guarded_heap_set_memory_reuse,
+	guarded_heap_set_debugger_calls,
+	guarded_heap_set_default_alignment,
 
-extern "C" int
-posix_memalign(void **pointer, size_t alignment, size_t size)
-{
-	// this cryptic line accepts zero and all powers of two
-	if (((~alignment + 1) | ((alignment << 1) - 1)) != ~0UL)
-		return EINVAL;
+	NULL,	// validate_heaps
+	NULL,	// validate_walls
 
-	*pointer = memalign(alignment, size);
-	if (*pointer == NULL)
-		return ENOMEM;
+	guarded_heap_dump_allocations,
+	guarded_heap_dump_heaps,
+	heap_malloc,
 
-	return 0;
-}
+	NULL,	// get_allocation_info
+
+	guarded_heap_set_dump_allocations_on_exit,
+	guarded_heap_set_stack_trace_depth
+};

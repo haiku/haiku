@@ -27,8 +27,11 @@ Job::Job(const char* name)
 	fCreateDefaultPort(false),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
-	fTarget(NULL)
+	fLaunchStatus(B_NO_INIT),
+	fTarget(NULL),
+	fPendingLaunchDataReplies(0, false)
 {
+	mutex_init(&fLaunchStatusLock, "launch status lock");
 }
 
 
@@ -40,8 +43,12 @@ Job::Job(const Job& other)
 	fCreateDefaultPort(other.CreateDefaultPort()),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
-	fTarget(other.Target())
+	fLaunchStatus(B_NO_INIT),
+	fTarget(other.Target()),
+	fPendingLaunchDataReplies(0, false)
 {
+	mutex_init(&fLaunchStatusLock, "launch status lock");
+
 	fCondition = other.fCondition;
 	// TODO: copy events
 	//fEvent = other.fEvent;
@@ -237,50 +244,6 @@ Job::Init(const Finder& finder, std::set<BString>& dependencies)
 		}
 	}
 
-	// Create ports
-	// TODO: prefix system ports with "system:"
-
-	bool defaultPort = false;
-
-	for (PortMap::iterator iterator = fPortMap.begin();
-			iterator != fPortMap.end(); iterator++) {
-		BString name(Name());
-		const char* suffix = iterator->second.GetString("name");
-		if (suffix != NULL)
-			name << ':' << suffix;
-		else
-			defaultPort = true;
-
-		const int32 capacity = iterator->second.GetInt32("capacity",
-			B_LOOPER_PORT_DEFAULT_CAPACITY);
-
-		port_id port = create_port(capacity, name.String());
-		if (port < 0) {
-			fInitStatus = port;
-			break;
-		}
-		iterator->second.SetInt32("port", port);
-
-		if (name == "x-vnd.haiku-registrar:auth") {
-			// Allow the launch_daemon to access the registrar authentication
-			BPrivate::set_registrar_authentication_port(port);
-		}
-	}
-
-	if (fInitStatus == B_OK && fCreateDefaultPort && !defaultPort) {
-		BMessage data;
-		data.AddInt32("capacity", B_LOOPER_PORT_DEFAULT_CAPACITY);
-
-		port_id port = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, Name());
-		if (port < 0) {
-			// TODO: log error
-			fInitStatus = port;
-		} else {
-			data.SetInt32("port", port);
-			AddPort(data);
-		}
-	}
-
 	return fInitStatus;
 }
 
@@ -343,16 +306,18 @@ Job::Launch()
 		// Launch by signature
 		BString signature("application/");
 		signature << Name();
-		return BRoster::Private().Launch(signature.String(), NULL, NULL,
-			0, NULL, &environment[0], &fTeam);
+
+		return _Launch(signature.String(), NULL, 0, NULL, &environment[0]);
 	}
 
 	// Build argument vector
 
 	entry_ref ref;
 	status_t status = get_ref_for_path(fArguments.StringAt(0).String(), &ref);
-	if (status != B_OK)
+	if (status != B_OK) {
+		_SetLaunchStatus(status);
 		return status;
+	}
 
 	std::vector<const char*> args;
 
@@ -365,15 +330,25 @@ Job::Launch()
 	}
 
 	// Launch via entry_ref
-	return BRoster::Private().Launch(NULL, &ref, NULL, count, &args[0],
-		&environment[0], &fTeam);
+	return _Launch(NULL, &ref, count, &args[0], &environment[0]);
 }
 
 
 bool
 Job::IsLaunched() const
 {
-	return fTeam >= 0;
+	return fLaunchStatus != B_NO_INIT;
+}
+
+
+status_t
+Job::HandleGetLaunchData(BMessage* message)
+{
+	MutexLocker launchLocker(fLaunchStatusLock);
+	if (IsLaunched())
+		return _SendLaunchDataReply(message);
+
+	return fPendingLaunchDataReplies.AddItem(message) ? B_OK : B_NO_MEMORY;
 }
 
 
@@ -433,4 +408,127 @@ Job::_AddStringList(std::vector<const char*>& array, const BStringList& list)
 	for (int32 index = 0; index < count; index++) {
 		array.push_back(list.StringAt(index).String());
 	}
+}
+
+
+void
+Job::_SetLaunchStatus(status_t launchStatus)
+{
+	MutexLocker launchLocker(fLaunchStatusLock);
+	fLaunchStatus = launchStatus != B_NO_INIT ? launchStatus : B_ERROR;
+	launchLocker.Unlock();
+
+	_SendPendingLaunchDataReplies();
+}
+
+
+status_t
+Job::_SendLaunchDataReply(BMessage* message)
+{
+	BMessage reply(fTeam < 0 ? fTeam : (uint32)B_OK);
+	if (reply.what == B_OK) {
+		reply.AddInt32("team", fTeam);
+
+		PortMap::const_iterator iterator = fPortMap.begin();
+		for (; iterator != fPortMap.end(); iterator++) {
+			BString name;
+			if (iterator->second.HasString("name"))
+				name << iterator->second.GetString("name") << "_";
+			name << "port";
+
+			reply.AddInt32(name.String(),
+				iterator->second.GetInt32("port", -1));
+		}
+	}
+
+	message->SendReply(&reply);
+	delete message;
+	return B_OK;
+}
+
+
+void
+Job::_SendPendingLaunchDataReplies()
+{
+	for (int32 i = 0; i < fPendingLaunchDataReplies.CountItems(); i++)
+		_SendLaunchDataReply(fPendingLaunchDataReplies.ItemAt(i));
+
+	fPendingLaunchDataReplies.MakeEmpty();
+}
+
+
+status_t
+Job::_CreateAndTransferPorts()
+{
+	// TODO: prefix system ports with "system:"
+
+	bool defaultPort = false;
+
+	for (PortMap::iterator iterator = fPortMap.begin();
+			iterator != fPortMap.end(); iterator++) {
+		BString name(Name());
+		const char* suffix = iterator->second.GetString("name");
+		if (suffix != NULL)
+			name << ':' << suffix;
+		else
+			defaultPort = true;
+
+		const int32 capacity = iterator->second.GetInt32("capacity",
+			B_LOOPER_PORT_DEFAULT_CAPACITY);
+
+		port_id port = create_port(capacity, name.String());
+		if (port < 0)
+			return port;
+
+		status_t result = set_port_owner(port, fTeam);
+		if (result != B_OK)
+			return result;
+
+		iterator->second.SetInt32("port", port);
+
+		if (name == "x-vnd.haiku-registrar:auth") {
+			// Allow the launch_daemon to access the registrar authentication
+			BPrivate::set_registrar_authentication_port(port);
+		}
+	}
+
+	if (fCreateDefaultPort && !defaultPort) {
+		BMessage data;
+		data.AddInt32("capacity", B_LOOPER_PORT_DEFAULT_CAPACITY);
+
+		port_id port = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, Name());
+		if (port < 0)
+			return port;
+
+		status_t result = set_port_owner(port, fTeam);
+		if (result != B_OK)
+			return result;
+
+		data.SetInt32("port", port);
+		AddPort(data);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+Job::_Launch(const char* signature, entry_ref* ref, int argCount,
+	const char* const* args, const char** environment)
+{
+	thread_id mainThread = -1;
+	status_t result = BRoster::Private().Launch(signature, ref, NULL, argCount,
+		args, environment, &fTeam, &mainThread, true);
+
+	if (result == B_OK) {
+		result = _CreateAndTransferPorts();
+
+		if (result == B_OK)
+			resume_thread(mainThread);
+		else
+			kill_thread(mainThread);
+	}
+
+	_SetLaunchStatus(result);
+	return result;
 }

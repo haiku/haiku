@@ -56,6 +56,7 @@ private:
 			float			fMin;
 			float			fMax;
 			float			fStep;
+			BMediaRoster*	fRoster;
 };
 
 #endif	// MIXER_CONTROL_H

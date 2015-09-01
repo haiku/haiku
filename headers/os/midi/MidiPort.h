@@ -9,8 +9,7 @@ class BMidiProducer;
 
 namespace BPrivate { class BMidiPortGlue; }
 
-class BMidiPort : public BMidi 
-{
+class BMidiPort : public BMidi {
 public:
 
 	BMidiPort(const char* name = NULL);

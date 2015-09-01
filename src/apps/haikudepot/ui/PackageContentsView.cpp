@@ -239,7 +239,8 @@ private:
 PackageContentsView::PackageContentsView(const char* name)
 	:
 	BView("package_contents_view", B_WILL_DRAW),
-	fPackageLock("package contents populator lock")
+	fPackageLock("package contents populator lock"),
+	fLastPackageState(NONE)
 {
 	fContentListView = new BOutlineListView("content list view",
 		B_SINGLE_SELECTION_LIST);
@@ -283,8 +284,14 @@ PackageContentsView::AllAttached()
 void
 PackageContentsView::SetPackage(const PackageInfoRef& package)
 {
-	if (fPackage == package)
+	// When getting a ref to the same package, don't return when the
+	// package state has changed, since in that case, we may now be able
+	// to read contents where we previously could not. (For example, the
+	// package has been installed.)
+	if (fPackage == package
+		&& (package.Get() == NULL || package->State() == fLastPackageState)) {
 		return;
+	}
 
 //	printf("PackageContentsView::SetPackage(%s)\n",
 //		package.Get() != NULL ? package->Name().String() : "NULL");
@@ -294,6 +301,7 @@ PackageContentsView::SetPackage(const PackageInfoRef& package)
 	{
 		BAutolock lock(&fPackageLock);
 		fPackage = package;
+		fLastPackageState = package.Get() != NULL ? package->State() : NONE;
 	}
 	release_sem_etc(fContentPopulatorSem, 1, 0);
 }

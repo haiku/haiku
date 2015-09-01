@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -26,6 +26,7 @@
 #include "GraphicalUserInterface.h"
 #include "ImageDebugLoadingStateHandlerRoster.h"
 #include "MessageCodes.h"
+#include "ReportUserInterface.h"
 #include "SettingsManager.h"
 #include "SignalSet.h"
 #include "StartTeamWindow.h"
@@ -143,7 +144,6 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 
 			case 's':
 			{
-				options.useCLI = true;
 				options.saveReport = true;
 				options.reportPath = optarg;
 				break;
@@ -382,6 +382,21 @@ public:
 								CliDebugger();
 								~CliDebugger();
 
+			bool				Run(const Options& options);
+
+private:
+	// TeamDebugger::Listener
+	virtual void 				TeamDebuggerStarted(TeamDebugger* debugger);
+	virtual	void				TeamDebuggerRestartRequested(
+									TeamDebugger* debugger);
+	virtual void 				TeamDebuggerQuit(TeamDebugger* debugger);
+};
+
+
+class ReportDebugger : private TeamDebugger::Listener  {
+public:
+								ReportDebugger();
+								~ReportDebugger();
 			bool				Run(const Options& options);
 
 private:
@@ -723,8 +738,7 @@ CliDebugger::Run(const Options& options)
 
 	// create the command line UI
 	CommandLineUserInterface* userInterface
-		= new(std::nothrow) CommandLineUserInterface(options.saveReport,
-			options.reportPath, options.thread);
+		= new(std::nothrow) CommandLineUserInterface();
 	if (userInterface == NULL) {
 		fprintf(stderr, "Error: Out of memory!\n");
 		return false;
@@ -774,6 +788,89 @@ CliDebugger::TeamDebuggerQuit(TeamDebugger* debugger)
 }
 
 
+// #pragma mark - ReportDebugger
+
+
+ReportDebugger::ReportDebugger()
+{
+}
+
+
+ReportDebugger::~ReportDebugger()
+{
+}
+
+
+bool
+ReportDebugger::Run(const Options& options)
+{
+	// initialize global objects and settings manager
+	status_t error = global_init();
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Global initialization failed: %s\n",
+			strerror(error));
+		return false;
+	}
+
+	SettingsManager settingsManager;
+	error = settingsManager.Init();
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Settings manager initialization failed: "
+			"%s\n", strerror(error));
+		return false;
+	}
+
+	// create the report UI
+	ReportUserInterface* userInterface
+		= new(std::nothrow) ReportUserInterface(options.thread, options.reportPath);
+	if (userInterface == NULL) {
+		fprintf(stderr, "Error: Out of memory!\n");
+		return false;
+	}
+	BReference<UserInterface> userInterfaceReference(userInterface, true);
+
+	// get/run the program to be debugged and start the team debugger
+	DebuggedProgramInfo programInfo;
+	if (!get_debugged_program(options, programInfo))
+		return false;
+
+	TeamDebugger* teamDebugger = start_team_debugger(programInfo.team,
+		&settingsManager, this, programInfo.thread,
+		programInfo.commandLineArgc, programInfo.commandLineArgv,
+		programInfo.stopInMain, userInterface);
+	if (teamDebugger == NULL)
+		return false;
+
+	thread_id teamDebuggerThread = teamDebugger->Thread();
+
+	// run the input loop
+	userInterface->Run();
+
+	// wait for the team debugger thread to terminate
+	wait_for_thread(teamDebuggerThread, NULL);
+
+	return true;
+}
+
+
+void
+ReportDebugger::TeamDebuggerStarted(TeamDebugger* debugger)
+{
+}
+
+
+void
+ReportDebugger::TeamDebuggerRestartRequested(TeamDebugger* debugger)
+{
+}
+
+
+void
+ReportDebugger::TeamDebuggerQuit(TeamDebugger* debugger)
+{
+}
+
+
 // #pragma mark -
 
 
@@ -791,6 +888,9 @@ main(int argc, const char* const* argv)
 
 	if (options.useCLI) {
 		CliDebugger debugger;
+		return debugger.Run(options) ? 0 : 1;
+	} else if (options.saveReport) {
+		ReportDebugger debugger;
 		return debugger.Run(options) ? 0 : 1;
 	}
 

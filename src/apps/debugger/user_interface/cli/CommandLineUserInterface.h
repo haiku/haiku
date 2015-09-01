@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -17,12 +17,9 @@
 class CliCommand;
 
 
-class CommandLineUserInterface : public UserInterface,
-	public ::Team::Listener {
+class CommandLineUserInterface : public UserInterface {
 public:
-								CommandLineUserInterface(bool saveReport,
-									const char* reportPath,
-									thread_id reportTargetThread);
+								CommandLineUserInterface();
 	virtual						~CommandLineUserInterface();
 
 	virtual	const char*			ID() const;
@@ -42,6 +39,8 @@ public:
 	virtual	void				NotifyUser(const char* title,
 									const char* message,
 									user_notification_type type);
+	virtual	void				NotifyBackgroundWorkStatus(
+									const char* message);
 	virtual	int32				SynchronouslyAskUser(const char* title,
 									const char* message, const char* choice1,
 									const char* choice2, const char* choice3);
@@ -51,10 +50,6 @@ public:
 									// Called by the main thread, when
 									// everything has been set up. Enters the
 									// input loop.
-
-	// Team::Listener
-	virtual	void				ThreadStateChanged(
-									const Team::ThreadEvent& event);
 
 private:
 			struct CommandEntry;
@@ -80,15 +75,9 @@ private:
 									const CommandEntry* command1,
 									const CommandEntry* command2);
 
-			bool				_ReportTargetThreadStopNeeded() const;
-			void				_SubmitSaveReport();
-
 private:
 			CliContext			fContext;
 			CommandList			fCommands;
-			const char*			fReportPath;
-			bool				fSaveReport;
-			thread_id			fReportTargetThread;
 			sem_id				fShowSemaphore;
 			bool				fShown;
 	volatile bool				fTerminating;

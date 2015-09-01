@@ -152,9 +152,10 @@ private:
 
 KeyRequestWindow::KeyRequestWindow()
 	:
-	BWindow(BRect(50, 50, 269, 302), B_TRANSLATE("Unlock keyring"),
+	BWindow(BRect(50, 50, 100, 100), B_TRANSLATE("Unlock keyring"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
-			| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+			| B_NOT_ZOOMABLE | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS
+			| B_CLOSE_ON_ESCAPE),
 	fRequestView(NULL),
 	fDoneSem(-1),
 	fResult(B_ERROR)
@@ -184,17 +185,12 @@ KeyRequestWindow::~KeyRequestWindow()
 }
 
 
-void
-KeyRequestWindow::DispatchMessage(BMessage* message, BHandler* handler)
+bool
+KeyRequestWindow::QuitRequested()
 {
-	int8 key;
-	if (message->what == B_KEY_DOWN
-		&& message->FindInt8("byte", 0, &key) == B_OK
-		&& key == B_ESCAPE) {
-		PostMessage(kMessageCancel);
-	}
-
-	BWindow::DispatchMessage(message, handler);
+	fResult = B_CANCELED;
+	release_sem(fDoneSem);
+	return false;
 }
 
 
@@ -218,6 +214,7 @@ KeyRequestWindow::RequestKey(const BString& keyringName, BMessage& keyMessage)
 {
 	fRequestView->SetUp(keyringName);
 
+	ResizeToPreferred();
 	CenterOnScreen();
 	Show();
 

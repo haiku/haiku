@@ -318,7 +318,7 @@ protected:
 		int32 lineHeight = (int32)fFontInfo.lineHeight;
 		minLine = (int32)rect.top / lineHeight;
 		maxLine = ((int32)ceilf(rect.bottom) + lineHeight - 1) / lineHeight;
-		minLine = std::max(minLine, 0L);
+		minLine = std::max(minLine, (int32)0);
 		maxLine = std::min(maxLine, CountLines() - 1);
 	}
 
@@ -1449,7 +1449,8 @@ printf("failed to read event!\n");
 		Model::ThreadSchedulingState* thread = fState.LookupThread(
 			event->thread);
 		if (thread == NULL) {
-			printf("Schedule event for unknown thread: %ld\n", event->thread);
+			printf("Schedule event for unknown thread: %" B_PRId32 "\n",
+				event->thread);
 			return;
 		}
 
@@ -1464,8 +1465,8 @@ printf("failed to read event!\n");
 
 		thread = fState.LookupThread(event->previous_thread);
 		if (thread == NULL) {
-			printf("Schedule event for unknown previous thread: %ld\n",
-				event->previous_thread);
+			printf("Schedule event for unknown previous thread: %" B_PRId32
+				"\n", event->previous_thread);
 			return;
 		}
 
@@ -1529,8 +1530,8 @@ printf("failed to read event!\n");
 		Model::ThreadSchedulingState* thread = fState.LookupThread(
 			event->thread);
 		if (thread == NULL) {
-			printf("Enqueued in run queue event for unknown thread: %ld\n",
-				event->thread);
+			printf("Enqueued in run queue event for unknown thread: %" B_PRId32
+				"\n", event->thread);
 			return;
 		}
 
@@ -1559,8 +1560,8 @@ printf("failed to read event!\n");
 		Model::ThreadSchedulingState* thread = fState.LookupThread(
 			event->thread);
 		if (thread == NULL) {
-			printf("Removed from run queue event for unknown thread: %ld\n",
-				event->thread);
+			printf("Removed from run queue event for unknown thread: %" B_PRId32
+				"\n", event->thread);
 			return;
 		}
 

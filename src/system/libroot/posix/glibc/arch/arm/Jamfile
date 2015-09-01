@@ -34,6 +34,13 @@ local genericSources =
 	s_isnan.c s_isnanf.c
 	s_signbit.c s_signbitf.c s_signbitl.c
 
+	s_nan.c s_nanf.c s_nanl.c
+	e_hypot.c e_hypotf.c e_hypotl.c
+	w_hypot.c w_hypotf.c w_hypotl.c
+	s_fpclassify.c s_fpclassifyf.c
+	s_clog.c s_clogf.c s_clogl.c
+	s_log1p.c s_log1pf.c s_log1pl.c
+	s_csqrt.c s_csqrtf.c s_csqrtl.c
 	s_floor.c s_floorf.c
 	s_ceil.c s_ceilf.c
 	s_modf.c
@@ -48,12 +55,16 @@ local genericSources =
 	halfulp.c
 	mpa.c mplog.c mpexp.c
 	s_sin.c
-	s_atan.c s_atanf.c
+	s_atan.c s_atanf.c s_atanl.c
 	s_tan.c
-	e_asin.c w_asin.c
+	e_asin.c e_asinl.c
+	w_asin.c w_asinl.c
 	e_log10.c w_log10.c
+	e_logf.c e_logl.c
 	e_acos.c w_acos.c
-	e_atan2.c w_atan2.c mpatan2.c mpatan.c mptan.c mpsqrt.c w_sqrt.c w_sqrtf.c
+	e_atan2.c e_atan2l.c
+	w_atan2.c w_atan2l.c mpatan2.c mpatan.c mptan.c mpsqrt.c w_sqrt.c w_sqrtf.c
+	e_sqrtl.c
 	e_fmod.c w_fmod.c
 	e_log.c w_log.c
 	e_cosh.c w_cosh.c
@@ -62,7 +73,7 @@ local genericSources =
 	s_sinf.c k_sinf.c
 	s_ldexp.c s_ldexpf.c
 	s_scalbnf.c s_scalbn.c
-	s_copysign.c
+	s_copysign.c s_copysignf.c s_copysignl.c
 	s_tanh.c s_tanf.c k_tanf.c
 	s_lround.c s_lroundf.c s_round.c s_roundf.c
 	s_rint.c s_rintf.c s_lrintf.c

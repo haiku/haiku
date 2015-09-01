@@ -21,6 +21,7 @@
 #include "DataExchange.h"
 
 #include <Autolock.h>
+#include <MediaRoster.h>
 #include <Message.h>
 
 class NodeManager;
@@ -76,6 +77,7 @@ private:
 			thread_id			fRescanThread;
 			int32 				fRescanRequested;
 			BLocker				fRescanLock;
+			BMediaRoster*		fRoster;
 };
 
 #endif // _DEFAULT_MANAGER_H

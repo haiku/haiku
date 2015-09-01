@@ -183,7 +183,9 @@ private:
 									const BList* messageList, int argc,
 									const char* const* args,
 									const char** environment,
-									team_id* appTeam) const;
+									team_id* appTeam,
+									thread_id* appThread,
+									bool launchSuspended) const;
 
 			status_t			_UpdateActiveApp(team_id team) const;
 

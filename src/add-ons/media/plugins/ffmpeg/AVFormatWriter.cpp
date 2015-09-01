@@ -53,6 +53,9 @@ static const size_t kIOBufferSize = 64 * 1024;
 #define OPEN_CODEC_CONTEXT 1
 #define GET_CONTEXT_DEFAULTS 0
 
+#if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
+typedef AVCodecID CodecID;
+#endif
 
 // #pragma mark - AVFormatWriter::StreamCookie
 
@@ -109,7 +112,8 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 	BAutolock _(fStreamLock);
 
 	fPacket.stream_index = fContext->nb_streams;
-	fStream = av_new_stream(fContext, fPacket.stream_index);
+	fStream = avformat_new_stream(fContext, NULL);
+	fStream->id = fPacket.stream_index;
 
 	if (fStream == NULL) {
 		TRACE("  failed to add new stream\n");
@@ -200,6 +204,10 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 		// Now negociate the actual format with the encoder
 		// First check if the requested format is acceptable
 		AVCodec* codec = avcodec_find_encoder(fStream->codec->codec_id);
+		
+		if (codec == NULL)
+			return B_MEDIA_BAD_FORMAT;
+		
 		const enum AVSampleFormat *p = codec->sample_fmts;
 		for (; *p != -1; p++) {
 			if (*p == fStream->codec->sample_fmt)
@@ -466,7 +474,7 @@ AVFormatWriter::CommitHeader()
 		AVCodecContext* codecContext = stream->codec;
 		codecContext->strict_std_compliance = -2;
 		AVCodec* codec = avcodec_find_encoder(codecContext->codec_id);
-		if (codec == NULL || avcodec_open(codecContext, codec) < 0) {
+		if (codec == NULL || avcodec_open2(codecContext, codec, NULL) < 0) {
 			TRACE("  stream[%u] - failed to open AVCodecContext\n", i);
 		}
 		TRACE("  stream[%u] time_base: (%d/%d), codec->time_base: (%d/%d)\n",

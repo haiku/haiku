@@ -726,8 +726,8 @@ void __ilogb() {}
 void __ilogbf() {}
 void __ilogbl() {}
 void __init_env() {}
+void __init_env_post_heap() {}
 void __init_heap() {}
-void __init_heap_post_env() {}
 void __init_once() {}
 void __init_pthread() {}
 void __init_pwd_backend() {}

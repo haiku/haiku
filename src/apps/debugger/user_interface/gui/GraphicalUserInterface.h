@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef GRAPHICAL_USER_INTERFACE_H
@@ -38,6 +38,8 @@ public:
 	virtual	void				NotifyUser(const char* title,
 									const char* message,
 									user_notification_type type);
+	virtual	void				NotifyBackgroundWorkStatus(
+									const char* message);
 	virtual	int32				SynchronouslyAskUser(const char* title,
 									const char* message, const char* choice1,
 									const char* choice2, const char* choice3);

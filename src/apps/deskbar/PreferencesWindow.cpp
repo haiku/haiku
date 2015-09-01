@@ -10,8 +10,6 @@
 
 #include "PreferencesWindow.h"
 
-#include <ctype.h>
-
 #include <Box.h>
 #include <Button.h>
 #include <Catalog.h>
@@ -31,7 +29,7 @@
 #include <Screen.h>
 #include <Slider.h>
 #include <SpaceLayoutItem.h>
-#include <TextControl.h>
+#include <Spinner.h>
 #include <View.h>
 
 #include "BarApp.h"
@@ -66,11 +64,11 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 	fMenuRecentFolders = new BCheckBox(B_TRANSLATE("Recent folders:"),
 		new BMessage(kUpdateRecentCounts));
 
-	fMenuRecentDocumentCount = new BTextControl(NULL, NULL,
+	fMenuRecentDocumentCount = new BSpinner("recent documents", NULL,
 		new BMessage(kUpdateRecentCounts));
-	fMenuRecentApplicationCount = new BTextControl(NULL, NULL,
+	fMenuRecentApplicationCount = new BSpinner("recent applications", NULL,
 		new BMessage(kUpdateRecentCounts));
-	fMenuRecentFolderCount = new BTextControl(NULL, NULL,
+	fMenuRecentFolderCount = new BSpinner("recent folders", NULL,
 		new BMessage(kUpdateRecentCounts));
 
 	// Applications controls
@@ -103,46 +101,20 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 		new BMessage(kAutoHide));
 
 	// Menu settings
-	BTextView* docTextView = fMenuRecentDocumentCount->TextView();
-	BTextView* appTextView = fMenuRecentApplicationCount->TextView();
-	BTextView* folderTextView = fMenuRecentFolderCount->TextView();
-
-	for (int32 i = 0; i < 256; i++) {
-		if (!isdigit(i)) {
-			docTextView->DisallowChar(i);
-			appTextView->DisallowChar(i);
-			folderTextView->DisallowChar(i);
-		}
-	}
-
-	docTextView->SetMaxBytes(4);
-	appTextView->SetMaxBytes(4);
-	folderTextView->SetMaxBytes(4);
-
-	int32 docCount = fSettings.recentDocsCount;
-	int32 appCount = fSettings.recentAppsCount;
-	int32 folderCount = fSettings.recentFoldersCount;
-
 	fMenuRecentDocuments->SetValue(fSettings.recentDocsEnabled);
 	fMenuRecentDocumentCount->SetEnabled(fSettings.recentDocsEnabled);
+	fMenuRecentDocumentCount->SetRange(0, 50);
+	fMenuRecentDocumentCount->SetValue(fSettings.recentDocsCount);
 
 	fMenuRecentApplications->SetValue(fSettings.recentAppsEnabled);
 	fMenuRecentApplicationCount->SetEnabled(fSettings.recentAppsEnabled);
+	fMenuRecentApplicationCount->SetRange(0, 50);
+	fMenuRecentApplicationCount->SetValue(fSettings.recentAppsCount);
 
 	fMenuRecentFolders->SetValue(fSettings.recentFoldersEnabled);
 	fMenuRecentFolderCount->SetEnabled(fSettings.recentFoldersEnabled);
-
-	BString docString;
-	BString appString;
-	BString folderString;
-
-	docString << docCount;
-	appString << appCount;
-	folderString << folderCount;
-
-	fMenuRecentDocumentCount->SetText(docString.String());
-	fMenuRecentApplicationCount->SetText(appString.String());
-	fMenuRecentFolderCount->SetText(folderString.String());
+	fMenuRecentFolderCount->SetRange(0, 50);
+	fMenuRecentFolderCount->SetValue(fSettings.recentFoldersCount);
 
 	// Applications settings
 	fAppsSort->SetValue(fSettings.sortRunningApps);
@@ -516,21 +488,15 @@ PreferencesWindow::_UpdatePreferences(desk_settings* settings)
 		updateRecentCounts = true;
 	}
 	if (current->recentDocsCount != settings->recentDocsCount) {
-		BString docString;
-		docString << settings->recentDocsCount;
-		fMenuRecentDocumentCount->SetText(docString.String());
+		fMenuRecentDocumentCount->SetValue(settings->recentDocsCount);
 		updateRecentCounts = true;
 	}
 	if (current->recentFoldersCount != settings->recentFoldersCount) {
-		BString folderString;
-		folderString << settings->recentFoldersCount;
-		fMenuRecentFolderCount->SetText(folderString.String());
+		fMenuRecentFolderCount->SetValue(settings->recentFoldersCount);
 		updateRecentCounts = true;
 	}
 	if (current->recentAppsCount != settings->recentAppsCount) {
-		BString appString;
-		appString << settings->recentAppsCount;
-		fMenuRecentApplicationCount->SetText(appString.String());
+		fMenuRecentApplicationCount->SetValue(settings->recentAppsCount);
 		updateRecentCounts = true;
 	}
 	if (current->alwaysOnTop != settings->alwaysOnTop) {
@@ -556,13 +522,9 @@ PreferencesWindow::_UpdateRecentCounts()
 {
 	BMessage message(kUpdateRecentCounts);
 
-	int32 docCount = atoi(fMenuRecentDocumentCount->Text());
-	int32 appCount = atoi(fMenuRecentApplicationCount->Text());
-	int32 folderCount = atoi(fMenuRecentFolderCount->Text());
-
-	message.AddInt32("documents", max_c(0, docCount));
-	message.AddInt32("applications", max_c(0, appCount));
-	message.AddInt32("folders", max_c(0, folderCount));
+	message.AddInt32("documents", fMenuRecentDocumentCount->Value());
+	message.AddInt32("applications", fMenuRecentApplicationCount->Value());
+	message.AddInt32("folders", fMenuRecentFolderCount->Value());
 
 	message.AddBool("documentsEnabled", fMenuRecentDocuments->Value());
 	message.AddBool("applicationsEnabled", fMenuRecentApplications->Value());

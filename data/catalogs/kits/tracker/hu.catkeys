@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	4204393626
+1	hungarian	x-vnd.Haiku-libtracker	2004221275
 OK	WidgetAttributeText		Rendben
 Add-ons	FilePanelPriv		Kiegészítők
 Mount settings…	ContainerWindow		Csatolási beállítások…
@@ -19,6 +19,7 @@ Modified	QueryPoseView		Módosítva
 Created	ContainerWindow		Létrehozva
 Error %error loading add-On %name.	ContainerWindow		Hiba a bővítmény (%name) betöltése közben: %error.
 If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ha %ifYouDoAction a beállítások mappát, akkor lehet, hogy a %osName nem fog megfelelően működni!\n\nBiztosan folytatni akarja?
+Skip all	FSUtils		Mindet kihagyja
 contains	SelectionWindow		tartalmaz
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Sajnos nem lehet a rendszer gyökérmappájába menteni.
 Show shared volumes on Desktop	SettingsView		Megosztott lemezek megjelenítése az Asztalon

@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 
 #include <Entry.h>
+#include <InterfaceDefs.h>
 #include <Path.h>
 #include <package/solver/Solver.h>
 #include <package/solver/SolverPackage.h>
@@ -108,6 +109,10 @@ DwarfLoadingStateHandler::HandleState(
 			BString command;
 			command.SetToFormat("/bin/pkgman install -y %s",
 				requiredPackage.String());
+			BString notification;
+			notification.SetToFormat("Installing package %s" B_UTF8_ELLIPSIS,
+				requiredPackage.String());
+			interface->NotifyBackgroundWorkStatus(notification);
 			int error = system(command.String());
 			if (interface->IsInteractive()) {
 				if (WIFEXITED(error)) {

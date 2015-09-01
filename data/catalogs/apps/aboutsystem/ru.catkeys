@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-About	14540716
+1	russian	x-vnd.Haiku-About	3251436090
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Все права защищены © 1999-2010 авторы Gutenprint.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Все права защищены © 1996-2002, 2006 David Turner, Robert Wilhelm и Werner Lemberg.
 Past website & marketing:\n	AboutView		Старый вебсайт и маркетинг:\n
@@ -8,6 +8,7 @@ Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Все �
 %d MiB total	AboutView		Всего %d МБ
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (основателю проекта)\n\n
 %d MiB used (%d%%)	AboutView		%d МБ использовано (%d%%)
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Содержит программное обеспечение из проекта GNU, выпущен под лицензиями GPL и LGPL:\nGNU библиотека, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\n\nВсе права защищены © Фонд свободного программного обеспечения.
 AboutSystem	System name		О системе
 Copyright © 2003 Peter Hanappe and others.	AboutView		Все права защищены © 2003 Peter Hanappe и другие.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Все права защищены © 1994-1997 Mark Kilgard.
@@ -40,6 +41,7 @@ Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Все пр
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Все права защищены © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Все права защищены © 1994-2009, Thomas G. Lane, Guido Vollbeding. Это программное обеспечение частично основано на работе Independent JPEG Group.
 Past maintainers:\n	AboutView		Предыдущие разработчики:\n
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Содержит программное обеспечение из проекта FreeBSD, выпущен под лицензией BSD:\ncal, ftpd, ping, telnet, telnetd, tracerout\nВсе права защищены © 1994-2008 Проект FreeBSD.
 GNU GPL v3	AboutWindow		GNU GPL v3
 \n\nSpecial thanks to:\n	AboutView		\n\nОсобая благодарность:\n
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n…а также те, кого мы забыли упомянуть (простите!)\n\n

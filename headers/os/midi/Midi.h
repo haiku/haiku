@@ -10,8 +10,7 @@ class BList;
 class BMidiLocalProducer;
 class BMidiLocalConsumer;
 
-class BMidi 
-{
+class BMidi {
 public:
 
 	BMidi();

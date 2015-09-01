@@ -26,7 +26,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	route
 	safemode screen_blanker screeninfo screenmode setarch setmime settype
 	setversion setvolume shutdown
-	strace su sysinfo
+	strace su sysinfo system_time
 	tcptester telnet telnetd top
 	traceroute trash
 	unchop unmount

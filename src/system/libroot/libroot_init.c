@@ -77,9 +77,9 @@ initialize_before(image_id imageID)
 	__gCPUCount = info.cpu_count;
 
 	__init_time((addr_t)__gCommPageAddress);
-	__init_heap();
 	__init_env(__gRuntimeLoader->program_args);
-	__init_heap_post_env();
+	__init_heap();
+	__init_env_post_heap();
 	__init_pwd_backend();
 	__set_stack_protection();
 }

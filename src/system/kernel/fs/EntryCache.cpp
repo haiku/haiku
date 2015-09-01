@@ -90,7 +90,7 @@ EntryCache::Init()
 
 
 status_t
-EntryCache::Add(ino_t dirID, const char* name, ino_t nodeID)
+EntryCache::Add(ino_t dirID, const char* name, ino_t nodeID, bool missing)
 {
 	EntryCacheKey key(dirID, name);
 
@@ -99,6 +99,7 @@ EntryCache::Add(ino_t dirID, const char* name, ino_t nodeID)
 	EntryCacheEntry* entry = fEntries.Lookup(key);
 	if (entry != NULL) {
 		entry->node_id = nodeID;
+		entry->missing = missing;
 		if (entry->generation != fCurrentGeneration) {
 			if (entry->index >= 0) {
 				fGenerations[entry->generation].entries[entry->index] = NULL;
@@ -114,6 +115,7 @@ EntryCache::Add(ino_t dirID, const char* name, ino_t nodeID)
 
 	entry->node_id = nodeID;
 	entry->dir_id = dirID;
+	entry->missing = missing;
 	entry->generation = fCurrentGeneration;
 	entry->index = kEntryNotInArray;
 	strcpy(entry->name, name);
@@ -155,7 +157,8 @@ EntryCache::Remove(ino_t dirID, const char* name)
 
 
 bool
-EntryCache::Lookup(ino_t dirID, const char* name, ino_t& _nodeID)
+EntryCache::Lookup(ino_t dirID, const char* name, ino_t& _nodeID,
+	bool& _missing)
 {
 	EntryCacheKey key(dirID, name);
 
@@ -171,6 +174,7 @@ EntryCache::Lookup(ino_t dirID, const char* name, ino_t& _nodeID)
 		// The entry is already in the current generation or is being moved to
 		// it by another thread.
 		_nodeID = entry->node_id;
+		_missing = entry->missing;
 		return true;
 	}
 
@@ -184,6 +188,7 @@ EntryCache::Lookup(ino_t dirID, const char* name, ino_t& _nodeID)
 		fGenerations[fCurrentGeneration].entries[index] = entry;
 		entry->index = index;
 		_nodeID = entry->node_id;
+		_missing = entry->missing;
 		return true;
 	}
 
@@ -201,6 +206,7 @@ EntryCache::Lookup(ino_t dirID, const char* name, ino_t& _nodeID)
 	_AddEntryToCurrentGeneration(entry);
 
 	_nodeID = entry->node_id;
+	_missing = entry->missing;
 	return true;
 }
 

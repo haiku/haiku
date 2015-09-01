@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	235954604
+1	russian	x-vnd.Haiku-Terminal	2918699501
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -34,6 +34,7 @@ Settings	Terminal TermWindow		Настройки
 Window size	Terminal TermWindow		Размер окна
 Selected text	Terminal AppearancePrefView		Выделенного текста
 Find	Terminal FindWindow		Найти
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Этот шаблон описывает заголовки окна.\nВозможно использовать следующие переменные:\n
 Appearance	Terminal PrefWindow		Внешний вид
 Tab title:	Terminal AppearancePrefView		Заголовок вкладки:
 OK	Terminal SetTitleWindow		ОК
@@ -76,6 +77,7 @@ Midnight	Terminal colors scheme		Полночь
 Decrease	Terminal TermWindow		Уменьшить
 Default	Terminal colors scheme		По умолчанию
 Create link here	Terminal TermView		Создать ссылку здесь
+The pattern specifying the tab titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Этот шаблон описывает заголовки вкладок.\nВозможно использовать следующие переменные:
 Close	Terminal TermWindow		Закрыть
 Text	Terminal AppearancePrefView		Текста
 Clear all	Terminal TermWindow		Очистить всё

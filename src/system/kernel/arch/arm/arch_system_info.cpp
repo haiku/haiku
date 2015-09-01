@@ -29,7 +29,8 @@ arch_fill_topology_node(cpu_topology_node_info* node, int32 cpu)
 {
 	switch (node->type) {
 		case B_TOPOLOGY_ROOT:
-			node->data.root.platform = B_CPU_PPC_64;
+			// TODO: ARM_64?
+			node->data.root.platform = B_CPU_ARM;
 			break;
 
 		case B_TOPOLOGY_PACKAGE:

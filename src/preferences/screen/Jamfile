@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src preferences screen ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders [ FDirName graphics common ] ;
@@ -8,7 +7,6 @@ UsePrivateHeaders [ FDirName graphics radeon ] ;
 UsePrivateHeaders interface ;
 
 Preference Screen :
-	AlertView.cpp
 	AlertWindow.cpp
 	MonitorView.cpp
 	multimon.cpp
@@ -31,7 +29,6 @@ if $(TARGET_PLATFORM) = libbe_test {
 DoCatalogs Screen :
 	x-vnd.Haiku-Screen
 	:
-	AlertView.cpp
 	AlertWindow.cpp
 	RefreshSlider.cpp
 	RefreshWindow.cpp

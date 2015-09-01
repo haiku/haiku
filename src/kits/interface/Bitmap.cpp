@@ -429,16 +429,15 @@ BBitmap::Archive(BMessage* data, bool deep) const
 					break;
 			}
 		}
-		// Note: R5 does not archive the data if B_BITMAP_IS_CONTIGUOUS is
-		// true and it does save all formats as B_RAW_TYPE and it does save
-		// the data even if B_BITMAP_ACCEPTS_VIEWS is set (as opposed to
-		// the BeBook)
-		if (ret == B_OK) {
-			const_cast<BBitmap*>(this)->_AssertPointer();
-			ret = data->AddData("_data", B_RAW_TYPE, fBasePointer, fSize);
-		}
 	}
-
+	// Note: R5 does not archive the data if B_BITMAP_IS_CONTIGUOUS is
+	// true and it does save all formats as B_RAW_TYPE and it does save
+	// the data even if B_BITMAP_ACCEPTS_VIEWS is set (as opposed to
+	// the BeBook)
+	if (ret == B_OK) {
+		const_cast<BBitmap*>(this)->_AssertPointer();
+		ret = data->AddData("_data", B_RAW_TYPE, fBasePointer, fSize);
+	}
 	return ret;
 }
 

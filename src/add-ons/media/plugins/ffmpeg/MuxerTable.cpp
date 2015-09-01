@@ -318,6 +318,62 @@ const media_file_format gMuxerTable[] = {
 		"webm",
 		{ 0 }
 	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MISC_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"audio/xm",
+		"Fast Tracker eXtended Module",
+		"xm",
+		"xm",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MISC_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"audio/s3m",
+		"Scream Tracker 3",
+		"s3m",
+		"s3m",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MISC_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"audio/it",
+		"Impulse Tracker",
+		"it",
+		"it",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MISC_FORMAT_FAMILY,
+		100,
+		{ 0 },
+		"audio/x-mod",
+		"Protracker MOD",
+		"mod",
+		"mod",
+		{ 0 }
+	},
 };
 
 const size_t gMuxerCount = sizeof(gMuxerTable) / sizeof(media_file_format);

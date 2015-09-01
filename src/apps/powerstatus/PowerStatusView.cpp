@@ -11,6 +11,7 @@
 
 #include "PowerStatusView.h"
 
+#include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -220,6 +221,26 @@ PowerStatusView::_DrawBattery(BRect rect)
 			} else
 				FillRect(rect);
 		}
+	}
+
+	if (fOnline) {
+		// When charging, draw a lightning symbol over the battery.
+		SetHighColor(255, 255, 0, 180);
+		SetDrawingMode(B_OP_ALPHA);
+		SetScale(std::min(Bounds().Width(), Bounds().Height()) / 16);
+
+		static const BPoint points[] = {
+			BPoint(2, 13),
+			BPoint(9, 5),
+			BPoint(9, 7),
+			BPoint(16, 2),
+			BPoint(8, 11),
+			BPoint(8, 9)
+		};
+		FillPolygon(points, 6);
+
+		SetScale(1);
+		SetDrawingMode(B_OP_OVER);
 	}
 
 	SetHighColor(0, 0, 0);

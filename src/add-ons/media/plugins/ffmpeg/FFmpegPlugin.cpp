@@ -53,7 +53,7 @@ manage_locks(void** _lock, enum AVLockOp operation)
 		case AV_LOCK_CREATE:
 			TRACE("  AV_LOCK_CREATE\n");
 			*lock = new(std::nothrow) BLocker("FFmpeg lock");
-		 	if (*lock == NULL)
+			if (*lock == NULL)
 				return 1;
 			break;
 

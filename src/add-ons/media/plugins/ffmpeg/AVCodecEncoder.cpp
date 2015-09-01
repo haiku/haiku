@@ -40,9 +40,9 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	:
 	Encoder(),
 	fBitRateScale(bitRateScale),
-	fCodecID((enum CodecID)codecID),
+	fCodecID((CodecID)codecID),
 	fCodec(NULL),
-	fOwnContext(avcodec_alloc_context()),
+	fOwnContext(avcodec_alloc_context3(NULL)),
 	fContext(fOwnContext),
 	fCodecInitStatus(CODEC_INIT_NEEDED),
 
@@ -494,7 +494,7 @@ AVCodecEncoder::_OpenCodecIfNeeded()
 	fContext->strict_std_compliance = -2;
 
 	// Open the codec
-	int result = avcodec_open(fContext, fCodec);
+	int result = avcodec_open2(fContext, fCodec, NULL);
 	if (result >= 0)
 		fCodecInitStatus = CODEC_INIT_DONE;
 	else
@@ -591,43 +591,78 @@ status_t
 AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 	int64 frameCount, media_encode_info* info)
 {
-	// Encode one audio chunk/frame. The bufferSize has already been adapted
-	// to the needed size for fContext->frame_size, or we are writing raw
-	// audio.
-	int usedBytes = avcodec_encode_audio(fContext, fChunkBuffer,
-		bufferSize, reinterpret_cast<const short*>(buffer));
+	status_t ret;
 
-	if (usedBytes < 0) {
-		TRACE("  avcodec_encode_audio() failed: %d\n", usedBytes);
-		return B_ERROR;
+	// Encode one audio chunk/frame.
+	AVPacket packet;
+	av_init_packet(&packet);
+	// By leaving these NULL, we let the encoder allocate memory as it needs.
+	// This way we don't risk iving a too small buffer.
+	packet.data = NULL;
+	packet.size = 0;
+
+	// We need to wrap our input data into an AVFrame structure.
+	AVFrame frame;
+	int gotPacket = 0;
+
+	if (buffer) {
+		avcodec_get_frame_defaults(&frame);
+
+		frame.nb_samples = frameCount;
+
+		ret = avcodec_fill_audio_frame(&frame, fContext->channels,
+				fContext->sample_fmt, (const uint8_t *) buffer, bufferSize, 1);
+
+		if (ret != 0)
+			return B_ERROR;
+
+		/* Set the presentation time of the frame */
+		frame.pts = (bigtime_t)(fFramesWritten * 1000000LL
+			/ fInputFormat.u.raw_audio.frame_rate);
+		fFramesWritten += frame.nb_samples;
+
+		ret = avcodec_encode_audio2(fContext, &packet, &frame, &gotPacket);
+	} else {
+		// If called with NULL, ask the encoder to flush any buffers it may
+		// have pending.
+		ret = avcodec_encode_audio2(fContext, &packet, NULL, &gotPacket);
 	}
-	if (usedBytes == 0)
-		return B_OK;
 
-//	// Maybe we need to use this PTS to calculate start_time:
-//	if (fContext->coded_frame->pts != kNoPTSValue) {
-//		TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
-//			fContext->coded_frame->pts, fContext->time_base.num,
-//			fContext->time_base.den);
-//	} else {
-//		TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
-//			fContext->time_base.num, fContext->time_base.den);
-//	}
+	if (buffer && frame.extended_data != frame.data)
+		av_freep(&frame.extended_data);
 
-	// Setup media_encode_info, most important is the time stamp.
-	info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
-		/ fInputFormat.u.raw_audio.frame_rate);
-	info->flags = B_MEDIA_KEY_FRAME;
-
-	// Write the chunk
-	status_t ret = WriteChunk(fChunkBuffer, usedBytes, info);
-	if (ret != B_OK) {
-		TRACE("  error writing chunk: %s\n", strerror(ret));
-		return ret;
+	if (ret != 0) {
+		TRACE("  avcodec_encode_audio() failed: %ld\n", ret);
+		return B_ERROR;
 	}
 
 	fFramesWritten += frameCount;
 
+	if (gotPacket) {
+		if (fContext->coded_frame) {
+			// Store information about the coded frame in the context.
+			fContext->coded_frame->pts = packet.pts;
+			fContext->coded_frame->key_frame = !!(packet.flags & AV_PKT_FLAG_KEY);
+		}
+
+		// Setup media_encode_info, most important is the time stamp.
+		info->start_time = packet.pts;
+
+		if (packet.flags & AV_PKT_FLAG_KEY)
+			info->flags = B_MEDIA_KEY_FRAME;
+		else
+			info->flags = 0;
+
+		// We got a packet out of the encoder, write it to the output stream
+		ret = WriteChunk(packet.data, packet.size, info);
+		if (ret != B_OK) {
+			TRACE("  error writing chunk: %s\n", strerror(ret));
+			av_free_packet(&packet);
+			return ret;
+		}
+	}
+
+	av_free_packet(&packet);
 	return B_OK;
 }
 

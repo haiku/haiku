@@ -2078,7 +2078,8 @@ fDesktop->UnlockSingleWindow();
 						fDesktop->EventDispatcher().SetDragMessage(dragMessage,
 							bitmap, offset);
 fDesktop->LockSingleWindow();
-						bitmap->ReleaseReference();
+						if (bitmap != NULL)
+							bitmap->ReleaseReference();
 				}
 				delete[] buffer;
 			}

@@ -215,7 +215,6 @@ BMediaEventLooper::ControlLoop()
 
 	status_t err;
 	bigtime_t waitUntil = B_INFINITE_TIMEOUT;
-	bigtime_t tempLateness = 0;
 	bool hasRealtime = false;
 	bool hasEvent = false;
 
@@ -229,19 +228,20 @@ BMediaEventLooper::ControlLoop()
 			return;
 
 		err = WaitForMessage(waitUntil);
-		if (err == B_TIMED_OUT) {
+		if (err == B_TIMED_OUT
+				|| err == B_WOULD_BLOCK) {
 			media_timed_event event;
 			if (hasEvent)
 				err = fEventQueue.RemoveFirstEvent(&event);
-			else
+			else if (hasRealtime)
 				err = fRealTimeQueue.RemoveFirstEvent(&event);
 
 			if (err == B_OK) {
-				tempLateness -= TimeSource()->RealTime();
-				if (tempLateness < 0)
-					tempLateness = 0;
+				bigtime_t lateness = waitUntil - TimeSource()->RealTime();
+				if (lateness < 0)
+					lateness = 0;
 
-				DispatchEvent(&event, tempLateness, hasRealtime);
+				DispatchEvent(&event, lateness, hasRealtime);
 			}
 		} else if (err != B_OK)
 			return;
@@ -255,29 +255,23 @@ BMediaEventLooper::ControlLoop()
 
 		if (hasEvent) {
 			waitUntil = TimeSource()->RealTimeFor(
-				fEventQueue.FirstEvent()->event_time,
+				fEventQueue.FirstEventTime(),
 				fEventLatency + fSchedulingLatency);
 		} else if (!hasRealtime) {
 			waitUntil = B_INFINITE_TIMEOUT;
 			continue;
 		}
 
-		if (hasEvent && hasRealtime) {
-			if (fRealTimeQueue.FirstEventTime()
-				- fSchedulingLatency <= waitUntil) {
+		if (hasRealtime) {
+			bigtime_t realtimeWait = fRealTimeQueue.FirstEventTime()
+				- fSchedulingLatency;
+
+			if (!hasEvent || realtimeWait <= waitUntil) {
+				waitUntil = realtimeWait;
 				hasEvent = false;
 			} else
 				hasRealtime = false;
 		}
-
-		if (hasRealtime) {
-			waitUntil = fRealTimeQueue.FirstEventTime()
-				- fSchedulingLatency;
-		}
-
-		tempLateness = waitUntil;
-		if (waitUntil < TimeSource()->RealTime())
-			waitUntil = 0;
 	}
 }
 

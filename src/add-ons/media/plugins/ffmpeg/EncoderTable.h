@@ -13,6 +13,11 @@ extern "C" {
 }
 
 
+#if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
+typedef AVCodecID CodecID;
+#endif
+
+
 struct EncoderDescription {
 	media_codec_info		codec_info;
 	media_format_family		format_family;

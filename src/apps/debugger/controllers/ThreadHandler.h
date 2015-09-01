@@ -20,6 +20,7 @@ class BreakpointManager;
 class DebuggerInterface;
 class ExpressionResult;
 class ImageDebugInfoJobListener;
+class JobListener;
 class StackFrame;
 class Statement;
 class Worker;
@@ -30,7 +31,7 @@ class ThreadHandler : public BReferenceable, private ImageDebugInfoProvider,
 public:
 								ThreadHandler(Thread* thread, Worker* worker,
 									DebuggerInterface* debuggerInterface,
-									ImageDebugInfoJobListener* listener,
+									JobListener* listener,
 									BreakpointManager* breakpointManager);
 								~ThreadHandler();
 
@@ -117,7 +118,7 @@ private:
 			Thread*				fThread;
 			Worker*				fWorker;
 			DebuggerInterface*	fDebuggerInterface;
-			ImageDebugInfoJobListener* fDebugInfoJobListener;
+			JobListener*		fJobListener;
 			BreakpointManager*	fBreakpointManager;
 			uint32				fStepMode;
 			Statement*			fStepStatement;

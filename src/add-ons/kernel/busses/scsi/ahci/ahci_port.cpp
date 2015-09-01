@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2008-2015 Haiku, Inc. All rights reserved.
  * Copyright 2007-2009, Marcus Overhagen. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
@@ -110,7 +110,9 @@ AHCIPort::Init1()
 	// prdt follows after command table
 
 	// disable transitions to partial or slumber state
-	fRegs->sctl |= 0x300;
+	fRegs->sctl = (fRegs->sctl & ~SATA_CONTROL_IPM_MASK)
+		| (IPM_TRANSITIONS_TO_PARTIAL_DISABLED
+			| IPM_TRANSITIONS_TO_SLUMBER_DISABLED) << SATA_CONTROL_IPM_SHIFT;
 
 	// clear IRQ status bits
 	fRegs->is = fRegs->is;
@@ -156,7 +158,12 @@ AHCIPort::Init2()
 	TRACE("is   0x%08" B_PRIx32 "\n", fRegs->is);
 	TRACE("cmd  0x%08" B_PRIx32 "\n", fRegs->cmd);
 	TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
-	TRACE("sctl 0x%08" B_PRIx32 "\n", fRegs->sctl);
+	TRACE("sctl.ipm 0x%02" B_PRIx32 "\n",
+		(fRegs->sctl & SATA_CONTROL_IPM_MASK) >> SATA_CONTROL_IPM_SHIFT);
+	TRACE("sctl.spd 0x%02" B_PRIx32 "\n",
+		(fRegs->sctl & SATA_CONTROL_SPD_MASK) >> SATA_CONTROL_SPD_SHIFT);
+	TRACE("sctl.det 0x%02" B_PRIx32 "\n",
+		(fRegs->sctl & SATA_CONTROL_DET_MASK) >> SATA_CONTROL_DET_SHIFT);
 	TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
 	TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
 	TRACE("tfd  0x%08" B_PRIx32 "\n", fRegs->tfd);
@@ -208,23 +215,13 @@ AHCIPort::Uninit()
 void
 AHCIPort::ResetDevice()
 {
-	if (fRegs->cmd & PORT_CMD_ST)
-		TRACE("AHCIPort::ResetDevice PORT_CMD_ST set, behaviour undefined\n");
-
 	// perform a hard reset
-	fRegs->sctl = (fRegs->sctl & ~0xf) | 1;
-	FlushPostedWrites();
-	spin(1100);
-	fRegs->sctl &= ~0xf;
-	FlushPostedWrites();
+	_HardReset();
 
-	if (wait_until_set(&fRegs->ssts, 0x1, 100000) < B_OK) {
+	if (wait_until_set(&fRegs->ssts, 0x1, 100000) < B_OK)
 		TRACE("AHCIPort::ResetDevice port %d no device detected\n", fIndex);
-	}
 
-	// clear error bits
-	fRegs->serr = fRegs->serr;
-	FlushPostedWrites();
+	_ClearErrorRegister();
 
 	if (fRegs->ssts & 1) {
 		if (wait_until_set(&fRegs->ssts, 0x3, 500000) < B_OK) {
@@ -233,9 +230,7 @@ AHCIPort::ResetDevice()
 		}
 	}
 
-	// clear error bits
-	fRegs->serr = fRegs->serr;
-	FlushPostedWrites();
+	_ClearErrorRegister();
 }
 
 
@@ -364,10 +359,15 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 		TRACE("AHCIPort::InterruptErrorHandler port %d, fCommandsActive 0x%08"
 			B_PRIx32 ", is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n", fIndex,
 			fCommandsActive, is, ci);
-
-		TRACE("ssts 0x%08" B_PRIx32 ", sctl 0x%08" B_PRIx32 ", serr 0x%08"
-			B_PRIx32 ", sact 0x%08" B_PRIx32 "\n",
-			fRegs->ssts, fRegs->sctl, fRegs->serr, fRegs->sact);
+		TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
+		TRACE("sctl.ipm 0x%02" B_PRIx32 "\n",
+			(fRegs->sctl & SATA_CONTROL_IPM_MASK) >> SATA_CONTROL_IPM_SHIFT);
+		TRACE("sctl.spd 0x%02" B_PRIx32 "\n",
+			(fRegs->sctl & SATA_CONTROL_SPD_MASK) >> SATA_CONTROL_SPD_SHIFT);
+		TRACE("sctl.det 0x%02" B_PRIx32 "\n",
+			(fRegs->sctl & SATA_CONTROL_DET_MASK) >> SATA_CONTROL_DET_SHIFT);
+		TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
+		TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
 	}
 
 	// read and clear SError
@@ -413,7 +413,13 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 	}
 	if (is & PORT_INT_PC) {
 		TRACE("Port Connect Change\n");
-//		fResetPort = true;
+		// Spec v1.3, §6.2.2.3 Recovery of Unsolicited COMINIT
+
+		// perform a hard reset
+		_HardReset();
+
+		// clear error bits to clear PxSERR.DIAG.X
+		_ClearErrorRegister();
 	}
 	if (is & PORT_INT_UF) {
 		TRACE("Unknown FIS\n");
@@ -1223,4 +1229,32 @@ AHCIPort::ScsiGetRestrictions(bool* isATAPI, bool* noAutoSense,
 	TRACE("AHCIPort::ScsiGetRestrictions port %d: isATAPI %d, noAutoSense %d, "
 		"maxBlocks %" B_PRIu32 "\n", fIndex, *isATAPI, *noAutoSense,
 		*maxBlocks);
+}
+
+
+void
+AHCIPort::_HardReset()
+{
+	if ((fRegs->cmd & PORT_CMD_ST) != 0) {
+		// We shouldn't perform a reset, but at least document it
+		TRACE("AHCIPort::_HardReset() PORT_CMD_ST set, behaviour undefined\n");
+	}
+
+	fRegs->sctl = (fRegs->sctl & ~SATA_CONTROL_DET_MASK)
+		| DET_INITIALIZATION << SATA_CONTROL_DET_SHIFT;
+	FlushPostedWrites();
+	spin(1100);
+		// You must wait 1ms at minimum
+	fRegs->sctl = (fRegs->sctl & ~SATA_CONTROL_DET_MASK)
+		| DET_NO_INITIALIZATION << SATA_CONTROL_DET_SHIFT;
+	FlushPostedWrites();
+}
+
+
+void
+AHCIPort::_ClearErrorRegister()
+{
+	// clear error bits
+	fRegs->serr = fRegs->serr;
+	FlushPostedWrites();
 }

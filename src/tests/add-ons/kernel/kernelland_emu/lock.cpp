@@ -479,11 +479,11 @@ _rw_lock_read_unlock_threads_locked(rw_lock* lock)
 	if (--lock->active_readers > 0)
 		return;
 
- 	if (lock->active_readers < 0) {
- 		panic("rw_lock_read_unlock(): lock %p not read-locked", lock);
+	if (lock->active_readers < 0) {
+		panic("rw_lock_read_unlock(): lock %p not read-locked", lock);
 		lock->active_readers = 0;
- 		return;
- 	}
+		return;
+	}
 
 	rw_lock_unblock(lock);
 }

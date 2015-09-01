@@ -6,7 +6,7 @@ if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
 	SubDirC++Flags -fmultiple-symbol-spaces ;
 }
 
-UsePrivateHeaders media shared ;
+UsePrivateHeaders media midi shared ;
 
 Preference Media :
 	Media.cpp
@@ -15,7 +15,7 @@ Preference Media :
 	MediaViews.cpp
 	MediaWindow.cpp
 	MidiSettingsView.cpp
-	: media be localestub [ TargetLibsupc++ ]
+	: media midi be localestub [ TargetLibsupc++ ]
 	: media.rdef
 	;
 

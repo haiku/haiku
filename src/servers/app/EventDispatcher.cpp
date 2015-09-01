@@ -612,7 +612,8 @@ EventDispatcher::SetDragMessage(BMessage& message,
 
 	if (fLastButtons == 0) {
 		// mouse buttons has already been released or was never pressed
-		bitmap->ReleaseReference();
+		if (bitmap != NULL)
+			bitmap->ReleaseReference();
 		return;
 	}
 

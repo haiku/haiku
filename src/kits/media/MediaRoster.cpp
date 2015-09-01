@@ -44,6 +44,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 
 #include <new>
 
+#include <Autolock.h>
 #include <BufferConsumer.h>
 #include <BufferProducer.h>
 #include <Locker.h>
@@ -83,6 +84,23 @@ struct RosterNotification {
 
 static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
+static BLocker sInitLocker("BMediaRoster::Roster locker");
+
+
+class MediaRosterUndertaker {
+public:
+	~MediaRosterUndertaker()
+	{
+		BAutolock _(sInitLocker);
+		if (BMediaRoster::CurrentRoster() != NULL
+				&& BMediaRoster::CurrentRoster()->Lock()) {
+			BMediaRoster::CurrentRoster()->Quit();
+		}
+	}
+};
+
+
+static MediaRosterUndertaker sMediaRosterUndertaker;
 
 }	// namespace media
 }	// namespace BPrivate
@@ -94,8 +112,8 @@ BMediaRosterEx::BMediaRosterEx(status_t* _error)
 	:
 	BMediaRoster()
 {
-	gDormantNodeManager = new DormantNodeManager;
-	gTimeSourceObjectManager = new TimeSourceObjectManager;
+	gDormantNodeManager = new DormantNodeManager();
+	gTimeSourceObjectManager = new TimeSourceObjectManager();
 
 	*_error = BuildConnections();
 
@@ -106,6 +124,19 @@ BMediaRosterEx::BMediaRosterEx(status_t* _error)
 		*_error = B_ERROR;
 	}
 	sServerIsUp = BMediaRoster::IsRunning();
+}
+
+
+void
+BMediaRosterEx::Quit()
+{
+	if (be_roster->StopWatching(BMessenger(this, this)) != B_OK)
+			TRACE("Can't unregister roster notifications");
+
+	if (sNotificationList.CountItems() != 0)
+		sNotificationList.MakeEmpty();
+
+	BMediaRoster::Quit();
 }
 
 
@@ -2188,10 +2219,14 @@ BMediaRoster::UnregisterNode(BMediaNode* node)
 /*static*/ BMediaRoster*
 BMediaRoster::Roster(status_t* out_error)
 {
-	static BLocker locker("BMediaRoster::Roster locker");
-	locker.Lock();
+	BAutolock lock(sInitLocker);
+
+	if (!lock.IsLocked())
+		return NULL;
+
 	if (out_error)
 		*out_error = B_OK;
+
 	if (sDefaultInstance == NULL) {
 		status_t err;
 		sDefaultInstance = new (std::nothrow) BMediaRosterEx(&err);
@@ -2207,7 +2242,6 @@ BMediaRoster::Roster(status_t* out_error)
 				*out_error = err;
 		}
 	}
-	locker.Unlock();
 	return sDefaultInstance;
 }
 
@@ -3455,9 +3489,11 @@ BMediaRoster::MessageReceived(BMessage* message)
 			node->DeleteHook(node); // we don't call Release(), see above!
 			return;
 		}
+
+		default:
+			BLooper::MessageReceived(message);
+			break;
 	}
-	printf("BMediaRoster::MessageReceived: unknown message!\n");
-	message->PrintToStream();
 }
 
 
@@ -3465,13 +3501,6 @@ bool
 BMediaRoster::QuitRequested()
 {
 	CALLED();
-
-	if (be_roster->StopWatching(BMessenger(this, this)) != B_OK)
-			TRACE("Can't unregister roster notifications");
-
-	if (sNotificationList.CountItems() != 0)
-		sNotificationList.MakeEmpty();
-
 	return true;
 }
 

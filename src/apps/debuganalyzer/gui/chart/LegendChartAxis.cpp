@@ -89,7 +89,7 @@ LegendChartAxis::_FilterLegends(int32 totalSize, int32 spacing,
 	// Filter out all higher level legends colliding with lower level or
 	// preceeding same-level legends. We iterate backwards from the lower to
 	// the higher levels
-	for (int32 level = std::max(minLevel, 0L); level <= maxLevel;) {
+	for (int32 level = std::max(minLevel, (int32)0); level <= maxLevel;) {
 		legendCount = fLegends.CountItems();
 
 		// get the first legend position/end

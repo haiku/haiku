@@ -14,6 +14,8 @@ RemotePackageRepository HaikuPorts
 	droid-113-1
 	flare_x86_data-0.19-3
 	freedroidrpg_x86_data-0.15.1-1
+	gws-0.1.8-1
+	haikuporter-1.0.0-1
 	hub-1.12.4-1
 	openttd_gfx-0.4.7-1
 	openttd_msx-0.3.1-1
@@ -43,7 +45,7 @@ RemotePackageRepository HaikuPorts
 	autoconf-2.69-5
 	automake-1.13.1-4
 	avra-1.3.0-1
-	bash-4.3.39-1
+	bash-4.3.42-1
 	beae-1.2-3
 	beam-1.2-1
 	becjk-1.0.1-1
@@ -52,7 +54,7 @@ RemotePackageRepository HaikuPorts
 	belife-1.0.0-2
 	bemines-1.0b2-1
 	bepdf-1.2.0-1
-	bepodder-1.3.0-1
+	bepodder-1.3.0-2
 	bescreencapture-1.9.4-1
 	bezilla-2.0.0.22-1
 	binutils-2.17_2013_04_21-2
@@ -79,8 +81,8 @@ RemotePackageRepository HaikuPorts
 	ctags-5.8-3
 	colors-2.3-1
 	coreutils-8.24-1
-	curl-7.43.0-1
-	curl_devel-7.43.0-1
+	curl-7.44.0-1
+	curl_devel-7.44.0-1
 	cvs-1.12.13.1-6
 	d52-3.4.1-1
 	desknotes-1.1-4
@@ -162,6 +164,7 @@ RemotePackageRepository HaikuPorts
 	gperf-3.0.4-1
 	gpgme-1.5.2-2
 	gpgme_devel-1.5.2-2
+	grafx2-2.5-2
 	grep-2.20-1
 	groff-1.20.1-3
 	gtk_doc-1.20-1
@@ -182,6 +185,7 @@ RemotePackageRepository HaikuPorts
 	imagemagick_devel-6.8.9_8-1
 	intltool-0.40.6-4
 	itstool-2.0.2-1
+	jabber4haiku-1.2.1-1
 	jam-2.5_2012_10_12-2
 	jasper-1.900.1-4
 	jasper_devel-1.900.1-4
@@ -260,8 +264,8 @@ RemotePackageRepository HaikuPorts
 	libogg_devel-1.3.0-2
 	libpaper-1.1.24-1
 	libpaper_devel-1.1.24-1
-	libpcap-1.7.3-1
-	libpcap_devel-1.7.3-1
+	libpcap-1.7.4-1
+	libpcap_devel-1.7.4-1
 	libpcre-8.21-5
 	libpcre_devel-8.21-5
 	libpng-1.5.22-1
@@ -308,15 +312,15 @@ RemotePackageRepository HaikuPorts
 	libxml2-2.8.0-9
 	libxml2_devel-2.8.0-9
 	libxml2_python-2.8.0-9
-	libxslt-1.1.28-4
-	libxslt_devel-1.1.28-4
+	libxslt-1.1.28-5
+	libxslt_devel-1.1.28-5
 	libzip-0.11.2-1
 	libzip_devel-0.11.2-1
 	lighttpd-1.4.35-2
 	lighttpd_devel-1.4.35-2
 	links-2.8-1
 	lmarbles-1.0.8-2
-	lnlauncher-1.1.2-1
+	lnlauncher-1.1.2-2
 	ltris-1.0.19-1
 	lua-5.2.1-6
 	lua_devel-5.2.1-6
@@ -343,8 +347,8 @@ RemotePackageRepository HaikuPorts
 	moe-1.1.2-1
 	mog-0.63.1548-1
 	most-pre5.1_15-1
-	mpg123-1.22.3-1
-	mpg123_devel-1.22.3-1
+	mpg123-1.22.4-1
+	mpg123_devel-1.22.4-1
 	mtr-0.73-1
 	multitalk-1.4-1
 	mupdf-1.7-1
@@ -356,6 +360,8 @@ RemotePackageRepository HaikuPorts
 	nasm-2.11.08-1
 	ncurses-5.9-9
 	ncurses_devel-5.9-9
+	ncurses6-6.0-1
+	ncurses6_devel-6.0-1
 	neon-0.29.6-6
 	neon_devel-0.29.6-6
 	netcat-1.10-1
@@ -464,7 +470,7 @@ RemotePackageRepository HaikuPorts
 	tar-1.26-6
 	tcl-8.5.18-1
 	tcl_devel-8.5.18-1
-	tcpdump-4.7.4-1
+	tcpdump-4.7.4-2
 	texinfo-4.13a-7
 	tiff-3.9.6-2
 	tiff_devel-3.9.6-2
@@ -474,7 +480,7 @@ RemotePackageRepository HaikuPorts
 	twolame-0.3.13-1
 	twolame_devel-0.3.13-1
 	ubertuber-0.9.11-1
-	unrar-5.2.6-1
+	unrar-5.3.2-1
 	unzip-6.0-2
 	util_macros-1.19.0-2
 	vasm-1.7c-1
@@ -499,7 +505,7 @@ RemotePackageRepository HaikuPorts
 	xrick-021212-2
 	yab-1.7.5-2
 	yab_ide-2.2.5-1
-	yasm-1.2.0-3
+	yasm-1.3.0-1
 	zip-3.0-2
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
@@ -547,14 +553,16 @@ RemotePackageRepository HaikuPorts
 	burnitnow_x86-0.1.0-1
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
+	cairo_x86-1.12.18-1
+	cairo_x86_devel-1.12.18-1
 	capstone_x86-3.0.4-1
 	capstone_x86_devel-3.0.4-1
-	cmake_x86-3.2.3-1
+	cmake_x86-3.3.1-1
 	confuse_x86-2.7-2
 	confuse_x86_devel-2.7-2
 	copynametoclipboard-1.0.1-2
-	curl_x86-7.43.0-1
-	curl_x86_devel-7.43.0-1
+	curl_x86-7.44.0-1
+	curl_x86_devel-7.44.0-1
 	cvsps_x86-2.2b1-1
 	dbus_x86-1.8.6-1
 	dbus_x86_devel-1.8.6-1
@@ -584,8 +592,8 @@ RemotePackageRepository HaikuPorts
 	flare_x86-0.19-3
 	fluidsynth_x86-1.1.6-2
 	fluidsynth_x86_devel-1.1.6-2
-	fontconfig_x86-2.11.1-2
-	fontconfig_x86_devel-2.11.1-2
+	fontconfig_x86-2.11.1-3
+	fontconfig_x86_devel-2.11.1-3
 	freedroidrpg_x86-0.15.1-1
 	freetype_x86-2.6-1
 	freetype_x86_devel-2.6-1
@@ -595,6 +603,8 @@ RemotePackageRepository HaikuPorts
 	gcc_x86_syslibs-4.8.5_2015_07_11-2
 	gcc_x86_syslibs_devel-4.8.5_2015_07_11-2
 	gcc6809_x86-4.6.1-2
+	gdk_pixbuf_x86-2.31.5-1
+	gdk_pixbuf_x86_devel-2.31.5-1
 	gettext_x86-0.18.1.1-6
 	gettext_x86_libintl-0.18.1.1-6
 	giflib_x86-5.1.0-1
@@ -616,8 +626,8 @@ RemotePackageRepository HaikuPorts
 	graphite2_x86_devel-1.2.4-1
 	guilib_x86-1.2.1-1
 	guilib_x86_devel-1.2.1-1
-	haikuwebkit_x86-1.4.11-1
-	haikuwebkit_x86_devel-1.4.11-1
+	haikuwebkit_x86-1.4.12-1
+	haikuwebkit_x86_devel-1.4.12-1
 	harfbuzz_x86-0.9.39-1
 	harfbuzz_x86_devel-0.9.39-1
 	icu_x86-55.1-1
@@ -721,6 +731,8 @@ RemotePackageRepository HaikuPorts
 	libtheora_x86_devel-1.1.1-2
 	libtool_x86-2.4.2-1
 	libtool_x86_libltdl-2.4.2-1
+	libtorrent_rasterbar_x86-1.0.6-1
+	libtorrent_rasterbar_x86_devel-1.0.6-1
 	libusb_x86-1.0.18-1
 	libusb_x86_devel-1.0.18-1
 	libuuid_x86-1.0.3-2
@@ -733,8 +745,8 @@ RemotePackageRepository HaikuPorts
 	libwebp_x86_devel-0.4.1-1
 	libxml2_x86-2.9.2-1
 	libxml2_x86_devel-2.9.2-1
-	libxslt_x86-1.1.28-2
-	libxslt_x86_devel-1.1.28-2
+	libxslt_x86-1.1.28-5
+	libxslt_x86_devel-1.1.28-5
 	libzip_x86-0.11.2-1
 	libzip_x86_devel-0.11.2-1
 	llvm_x86-3.5.2-1
@@ -759,8 +771,8 @@ RemotePackageRepository HaikuPorts
 	mpd_x86-0.18.12_git-1
 	mpfr_x86-3.1.3-1
 	mpfr_x86_devel-3.1.3-1
-	mpg123_x86-1.22.3-1
-	mpg123_x86_devel-1.22.3-1
+	mpg123_x86-1.22.4-1
+	mpg123_x86_devel-1.22.4-1
 	mplayer_x86-1.1.1-3
 	mupdf_x86-1.7-1
 	mupdf_x86_devel-1.7-1
@@ -768,6 +780,8 @@ RemotePackageRepository HaikuPorts
 	musicpc_x86-0.26-1
 	ncurses_x86-5.9-9
 	ncurses_x86_devel-5.9-9
+	ncurses6_x86-6.0-1
+	ncurses6_x86_devel-6.0-1
 	ninja_x86-1.5.1-2
 	ocp_x86-0.1.21_git-1
 	openal_x86-1.13.0-2
@@ -780,6 +794,8 @@ RemotePackageRepository HaikuPorts
 	openssl_x86-1.0.0s-1
 	openssl_x86_devel-1.0.0s-1
 	openttd_x86-1.3.3-1
+	pango_x86-1.37.0-1
+	pango_x86_devel-1.37.0-1
 	pciutils_x86-3.2.1-1
 	pciutils_x86_devel-3.2.1-1
 	physfs_x86-2.0.3-1
@@ -792,6 +808,7 @@ RemotePackageRepository HaikuPorts
 	protrekkr_x86-2.5.4-2
 	popt_x86-1.16-1
 	popt_x86_devel-1.16-1
+	qbittorrent_x86-3.2.3-2
 	qemu_x86-2.1.2-1
 	qca2_x86-2.0.3-1
 	qca2_x86_devel-2.0.3-1
@@ -799,7 +816,7 @@ RemotePackageRepository HaikuPorts
 	qjson_x86_devel-0.8.1-1
 	qmplay2_x86-15.05.30-2
 	quassel_x86-0.10.0-2
-	quicklaunch-0.9.10-1
+	quicklaunch-0.9.11-1
 	qupzilla_x86-1.8.6-1
 	radare2_x86-0.9.9-1
 	radare2_x86_devel-0.9.9-1
@@ -854,6 +871,8 @@ RemotePackageRepository HaikuPorts
 	vacuum_x86-1.2.5-1
 	vcmi_x86-0.94-1
 	wizznic_x86-0.9.9-2
+	xmlroff_x86-0.6.2-2
+	xmlroff_x86_devel-0.6.2-2
 	xz_utils_x86-5.0.8-2
 	xz_utils_x86_devel-5.0.8-2
 	zlib_x86-1.2.8-4
@@ -908,6 +927,7 @@ RemotePackageRepository HaikuPorts
 	burnitnow_x86
 	bzip2
 	bzr
+	cairo_x86
 	canna
 	capitalbe
 	capstone_x86
@@ -988,6 +1008,7 @@ RemotePackageRepository HaikuPorts
 	gettext
 	gettext_x86
 	gdb
+	gdk_pixbuf_x86
 	giflib
 	git
 	glew
@@ -1002,6 +1023,7 @@ RemotePackageRepository HaikuPorts
 	gperf
 	gpgme
 	gpgme_x86
+	grafx2
 	graphite2_x86
 	grep
 	groff
@@ -1010,6 +1032,7 @@ RemotePackageRepository HaikuPorts
 	gutenprint
 	gyp
 	gzip
+	haikuporter
 	haikuwebkit_x86
 	harfbuzz_x86
 	help2man
@@ -1021,6 +1044,7 @@ RemotePackageRepository HaikuPorts
 	imagemagick
 	intltool
 	itstool
+	jabber4haiku
 	jam
 	jasper
 	jbig2dec
@@ -1106,6 +1130,7 @@ RemotePackageRepository HaikuPorts
 	libtheora
 	libtool
 	libtool_x86
+	libtorrent_rasterbar_x86
 	libunistring
 	libusb
 	libusb_x86
@@ -1172,6 +1197,7 @@ RemotePackageRepository HaikuPorts
 	nano
 	nasm
 	ncurses
+	ncurses6
 	neon
 	netcat
 	netpulse
@@ -1189,6 +1215,7 @@ RemotePackageRepository HaikuPorts
 	openttd_x86
 	p7zip
 	paladin
+	pango_x86
 	paragui
 	patch
 	pciutils
@@ -1217,6 +1244,7 @@ RemotePackageRepository HaikuPorts
 	python_setuptools
 	python_twisted
 	python_zope.interface
+	qbittorrent_x86
 	qemacs
 	qemu_x86
 	qca2_x86
@@ -1305,6 +1333,7 @@ RemotePackageRepository HaikuPorts
 	yasm
 	youtube_dl
 	xcb_proto
+	xmlroff_x86
 	xmlto
 	xml_parser
 	xproto

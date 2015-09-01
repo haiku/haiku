@@ -24,8 +24,8 @@ using namespace BPrivate;
 
 /*!
 	\class RegistrarThreadManager
-	\brief RegistrarThreadManager is the master of all threads spawned by the registrar
-
+	\brief RegistrarThreadManager is the master of all threads spawned by the
+		registrar
 */
 
 //! Creates a new RegistrarThreadManager object
@@ -35,8 +35,8 @@ RegistrarThreadManager::RegistrarThreadManager()
 }
 
 // destructor
-/*! \brief Destroys the RegistrarThreadManager object, killing and deleting any still
-	running threads.
+/*! \brief Destroys the RegistrarThreadManager object, killing and deleting any
+	still running threads.
 */
 RegistrarThreadManager::~RegistrarThreadManager()
 {
@@ -44,9 +44,11 @@ RegistrarThreadManager::~RegistrarThreadManager()
 }
 
 // MessageReceived
-/*! \brief Handles \c B_REG_MIME_UPDATE_THREAD_FINISHED messages, passing on all others.
+/*! \brief Handles \c B_REG_MIME_UPDATE_THREAD_FINISHED messages, passing on all
+	others.
 
-	Each \c B_REG_MIME_UPDATE_THREAD_FINISHED message triggers a call to CleanupThreads().
+	Each \c B_REG_MIME_UPDATE_THREAD_FINISHED message triggers a call to
+	CleanupThreads().
 */
 void
 RegistrarThreadManager::MessageReceived(BMessage* message)
@@ -57,7 +59,7 @@ RegistrarThreadManager::MessageReceived(BMessage* message)
 			CleanupThreads();
 			break;
 		}
-		
+
 		default:
 		{
 			BHandler::MessageReceived(message);
@@ -71,15 +73,16 @@ RegistrarThreadManager::MessageReceived(BMessage* message)
 	RegistrarThreadManager object.
 
 	\param thread Pointer to a newly allocated \c RegistrarThread object.
-	
-	If the result of the function is \c B_OK, the \c RegistrarThreadManager object
-	assumes ownership of \a thread; if the result is an error code, it
+
+	If the result of the function is \c B_OK, the \c RegistrarThreadManager
+	object assumes ownership of \a thread; if the result is an error code, it
 	does not.
-	
+
 	\return
 	- \c B_OK: success
-	- \c B_NO_MORE_THREADS: the number of concurrently allowed threads (defined by
-	                        RegistrarThreadManager::kThreadLimit) has already been reached
+	- \c B_NO_MORE_THREADS: the number of concurrently allowed threads (defined
+							by RegistrarThreadManager::kThreadLimit) has
+							already been reached
 	- \c B_BAD_THREAD_STATE: the thread has already been launched
 	- other error code: failure
 */
@@ -110,14 +113,14 @@ RegistrarThreadManager::LaunchThread(RegistrarThread *thread)
 		}
 	}
 	if (!err)
-		DBG(OUT("RegistrarThreadManager::LaunchThread(): launched new '%s' thread, "
-			"id %ld\n", thread->Name(), thread->Id()));
+		DBG(OUT("RegistrarThreadManager::LaunchThread(): launched new '%s'"
+			" thread, id %ld\n", thread->Name(), thread->Id()));
 	return err;
 }
 
 // CleanupThreads
 /*! \brief Frees the resources of any threads that are no longer running
-	
+
 	\todo This function should perhaps be triggered periodically by a
 	BMessageRunner once we have our own BMessageRunner implementation.
 */
@@ -128,18 +131,19 @@ RegistrarThreadManager::CleanupThreads()
 	for (i = fThreads.begin(); i != fThreads.end(); ) {
 		if (*i) {
 			if ((*i)->IsFinished()) {
-				DBG(OUT("RegistrarThreadManager::CleanupThreads(): Cleaning up thread %ld\n",
-					(*i)->Id()));
+				DBG(OUT("RegistrarThreadManager::CleanupThreads(): Cleaning up"
+					" thread %ld\n", (*i)->Id()));
 				RemoveThread(i);
 					// adjusts i
 			} else
 				++i;
 		} else {
-			OUT("WARNING: RegistrarThreadManager::CleanupThreads(): NULL mime_update_thread_shared_data "
-				"pointer found in and removed from RegistrarThreadManager::fThreads list\n");
+			OUT("WARNING: RegistrarThreadManager::CleanupThreads(): NULL"
+				" mime_update_thread_shared_data pointer found in and removed"
+				" from RegistrarThreadManager::fThreads list\n");
 			i = fThreads.erase(i);
 		}
-	}			
+	}
 	return B_OK;
 }
 
@@ -157,28 +161,29 @@ RegistrarThreadManager::ShutdownThreads()
 	for (i = fThreads.begin(); i != fThreads.end(); ) {
 		if (*i) {
 			if ((*i)->IsFinished()) {
-				DBG(OUT("RegistrarThreadManager::ShutdownThreads(): Cleaning up thread %ld\n",
-					(*i)->Id()));
+				DBG(OUT("RegistrarThreadManager::ShutdownThreads(): Cleaning up"
+					" thread %ld\n", (*i)->Id()));
 				RemoveThread(i);
 					// adjusts i
 			} else {
-				DBG(OUT("RegistrarThreadManager::ShutdownThreads(): Shutting down thread %ld\n",
-					(*i)->Id()));
+				DBG(OUT("RegistrarThreadManager::ShutdownThreads(): Shutting"
+					" down thread %ld\n", (*i)->Id()));
 				(*i)->AskToExit();
 				++i;
 			}
 		} else {
-			OUT("WARNING: RegistrarThreadManager::ShutdownThreads(): NULL mime_update_thread_shared_data "
-				"pointer found in and removed from RegistrarThreadManager::fThreads list\n");
+			OUT("WARNING: RegistrarThreadManager::ShutdownThreads(): NULL"
+				" mime_update_thread_shared_data pointer found in and removed"
+				" from RegistrarThreadManager::fThreads list\n");
 			i = fThreads.erase(i);
 		}
 	}
-	
+
 	/*! \todo We may want to iterate back through the list at this point,
 		snooze for a moment if find an unfinished thread, and kill it if
 		it still isn't finished by the time we're done snoozing.
 	*/
-	
+
 	return B_OK;
 }
 
@@ -195,21 +200,22 @@ RegistrarThreadManager::KillThreads()
 	for (i = fThreads.begin(); i != fThreads.end(); ) {
 		if (*i) {
 			if (!(*i)->IsFinished()) {
-				DBG(OUT("RegistrarThreadManager::KillThreads(): Killing thread %ld\n",
-					(*i)->Id()));
+				DBG(OUT("RegistrarThreadManager::KillThreads(): Killing thread"
+					" %ld\n", (*i)->Id()));
 				status_t err = kill_thread((*i)->Id());
 				if (err)
-					OUT("WARNING: RegistrarThreadManager::KillThreads(): kill_thread(%"
-						B_PRId32 ") failed with error code 0x%" B_PRIx32 "\n",
-						(*i)->Id(), err);
-			}				
-			DBG(OUT("RegistrarThreadManager::KillThreads(): Cleaning up thread %ld\n",
-				(*i)->Id()));
+					OUT("WARNING: RegistrarThreadManager::KillThreads():"
+						" kill_thread(%" B_PRId32 ") failed with error code"
+						" 0x%" B_PRIx32 "\n", (*i)->Id(), err);
+			}
+			DBG(OUT("RegistrarThreadManager::KillThreads(): Cleaning up thread"
+				" %ld\n", (*i)->Id()));
 			RemoveThread(i);
 				// adjusts i
 		} else {
-			OUT("WARNING: RegistrarThreadManager::KillThreads(): NULL mime_update_thread_shared_data "
-				"pointer found in and removed from RegistrarThreadManager::fThreads list\n");
+			OUT("WARNING: RegistrarThreadManager::KillThreads(): NULL"
+				" mime_update_thread_shared_data pointer found in and removed"
+				" from RegistrarThreadManager::fThreads list\n");
 			i = fThreads.erase(i);
 		}
 	}
@@ -222,7 +228,7 @@ RegistrarThreadManager::KillThreads()
 	This is not necessarily a count of how many threads are actually running,
 	as threads may remain in the thread list that are finished and waiting
 	to be cleaned up.
-	
+
 	\return The number of threads currently under management
 */
 uint
@@ -237,6 +243,9 @@ RegistrarThreadManager::ThreadCount() const
 std::list<RegistrarThread*>::iterator&
 RegistrarThreadManager::RemoveThread(std::list<RegistrarThread*>::iterator &i)
 {
+	status_t dummy;
+	wait_for_thread((*i)->Id(), &dummy);
+
 	delete *i;
 	atomic_add(&fThreadCount, -1);
 	return (i = fThreads.erase(i));

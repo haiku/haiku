@@ -51,6 +51,8 @@ private:
 	status_t	WaitForTransfer(int *tfd, bigtime_t timeout);
 	void		FinishTransfer();
 
+	inline	void				_HardReset();
+	inline	void				_ClearErrorRegister();
 
 //	uint8 *		SetCommandFis(volatile command_list_entry *cmd, volatile fis *fis, const void *data, size_t dataSize);
 	status_t	FillPrdTable(volatile prd *prdTable, int *prdCount, int prdMax, const void *data, size_t dataSize);

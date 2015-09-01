@@ -10,6 +10,7 @@
 #define MEDIA_WINDOW_H
 
 
+#include <Alert.h>
 #include <ListView.h>
 #include <MediaAddOn.h>
 #include <ParameterWeb.h>
@@ -109,6 +110,7 @@ private:
 
 			status_t			fInitCheck;
 			thread_id			fRestartThread;
+			BAlert*				fRestartAlert;
 };
 
 

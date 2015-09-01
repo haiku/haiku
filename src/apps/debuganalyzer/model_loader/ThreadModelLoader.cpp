@@ -114,9 +114,9 @@ ThreadModelLoader::_Load()
 
 	// create the groups
 	int32 waitObjectCount = waitObjects.CountItems();
-printf("%ld wait objects\n", waitObjectCount);
+	printf("%" B_PRId32 " wait objects\n", waitObjectCount);
 	for (int32 i = 0; i < waitObjectCount;) {
-printf("new wait object group at %ld\n", i);
+		printf("new wait object group at %" B_PRId32 "\n", i);
 		// collect the objects for this group
 		Model::ThreadWaitObject* firstObject = waitObjects.ItemAt(i);
 		int32 k = i + 1;

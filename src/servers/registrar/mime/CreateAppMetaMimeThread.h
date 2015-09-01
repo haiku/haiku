@@ -1,10 +1,10 @@
 //----------------------------------------------------------------------
-//  This software is part of the OpenBeOS distribution and is covered 
+//  This software is part of the OpenBeOS distribution and is covered
 //  by the OpenBeOS license.
 //---------------------------------------------------------------------
 /*!
 	\file CreateAppMetaMimeThread.h
-	CreateAppMetaMimeThread interface declaration 
+	CreateAppMetaMimeThread interface declaration
 */
 
 #ifndef _CREATE_APP_META_MIME_THREAD_H

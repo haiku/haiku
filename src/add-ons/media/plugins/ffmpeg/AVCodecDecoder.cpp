@@ -57,6 +57,10 @@
 // Otherwise the alternative code could simply be removed from this file.
 #endif
 
+#if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
+typedef AVCodecID CodecID;
+#endif
+
 
 struct wave_format_ex {
 	uint16 format_tag;
@@ -409,10 +413,10 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	if (fRawDecodedAudio->opaque == NULL)
 		return B_NO_MEMORY;
 
-	TRACE("  bit_rate = %d, sample_rate = %d, channels = %d, init = %d, "
+	TRACE("  bit_rate = %d, sample_rate = %d, channels = %d, "
 		"output frame size: %d, count: %ld, rate: %.2f\n",
 		fContext->bit_rate, fContext->sample_rate, fContext->channels,
-		result, fOutputFrameSize, fOutputFrameCount, fOutputFrameRate);
+		fOutputFrameSize, fOutputFrameCount, fOutputFrameRate);
 
 	return B_OK;
 }
@@ -716,7 +720,7 @@ AVCodecDecoder::_DecodeNextAudioFrame()
 	dump_ffframe_audio(fRawDecodedAudio, "ffaudi");
 #endif
 
-	TRACE_AUDIO("  frame count: %lld current: %lld\n",
+	TRACE_AUDIO("  frame count: %ld current: %lld\n",
 		fRawDecodedAudio->nb_samples, fFrame);
 
 	return B_OK;
@@ -1193,7 +1197,7 @@ AVCodecDecoder::_DecodeNextVideoFrame()
 			fRawDecodedPicture, &gotVideoFrame, &fTempPacket);
 		if (encodedDataSizeInBytes < 0) {
 			TRACE("[v] AVCodecDecoder: ignoring error in decoding frame %lld:"
-				" %d\n", fFrame, len);
+				" %d\n", fFrame, encodedDataSizeInBytes);
 			// NOTE: An error from avcodec_decode_video2() is ignored by the
 			// FFMPEG 0.10.2 example decoding_encoding.c. Only the packet
 			// buffers are flushed accordingly

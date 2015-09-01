@@ -316,6 +316,16 @@
 	  entry_cache_add() function when it encounters an entry that might not yet
 	  be known to the entry cache and entry_cache_remove() when a directory
 	  entry has been removed.
+	  The entry cache can also be used for negative caching. If the file system
+	  determines that the requested entry is not present during a lookup, it can
+	  cache this lookup failure by calling entry_cache_add_missing(). Further
+	  calls to fs_vnode_ops::lookup() for the missing entry will then be
+	  avoided.
+	  Note that it is safe to call entry_cache_add() and
+	  entry_cache_add_missing() with the same directory/name pair previously
+	  given to either function to update a cache entry, without needing to call
+	  entry_cache_remove() first. It is also safe to call entry_cache_remove()
+	  for pairs that have never been added to the cache.
 */
 
 // TODO:

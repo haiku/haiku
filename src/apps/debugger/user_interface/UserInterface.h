@@ -66,6 +66,15 @@ public:
 	virtual	void				NotifyUser(const char* title,
 									const char* message,
 									user_notification_type type) = 0;
+	virtual	void				NotifyBackgroundWorkStatus(const char* message)
+									= 0;
+									// this is used to inform the user about
+									// background processing work, but doesn't
+									// otherwise require any form of
+									// user interaction, i.e. for a status bar
+									// to indicate that debug information is
+									// being parsed.
+
 	virtual	int32				SynchronouslyAskUser(const char* title,
 									const char* message, const char* choice1,
 									const char* choice2, const char* choice3)

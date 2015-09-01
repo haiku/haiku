@@ -445,6 +445,8 @@ InterfaceAddress::_Init(net_interface* netInterface, net_domain* netDomain)
 
 Interface::Interface(const char* interfaceName,
 	net_device_interface* deviceInterface)
+	:
+	fBusy(false)
 {
 	TRACE("Interface %p: new \"%s\", device interface %p\n", this,
 		interfaceName, deviceInterface);
@@ -933,13 +935,13 @@ Interface::SetDown()
 	if ((flags & IFF_UP) == 0)
 		return;
 
-	// TODO: We acquire also the net_interfaces lock here
-	// to avoid a lock inversion in the ipv6 protocol implementation
-	// (see ticket #9377).
-	// A better solution would be to avoid locking the interface lock (fLock)
-	// when calling the lower layers.
 	RecursiveLocker interfacesLocker(sLock);
-	RecursiveLocker locker(fLock);
+
+	if (IsBusy())
+		return;
+
+	SetBusy(true);
+	interfacesLocker.Unlock();
 
 	DatalinkTable::Iterator iterator = fDatalinkTable.GetIterator();
 	while (domain_datalink* datalink = iterator.Next()) {
@@ -947,6 +949,8 @@ Interface::SetDown()
 	}
 
 	flags &= ~IFF_UP;
+
+	SetBusy(false);
 }
 
 
@@ -1076,10 +1080,11 @@ Interface::_SetUp()
 	if (status != B_OK)
 		return status;
 
+	RecursiveLocker interfacesLocker(sLock);
+	SetBusy(true);
+	interfacesLocker.Unlock();
+
 	// Propagate flag to all datalink protocols
-
-	RecursiveLocker locker(fLock);
-
 	DatalinkTable::Iterator iterator = fDatalinkTable.GetIterator();
 	while (domain_datalink* datalink = iterator.Next()) {
 		status = datalink->first_info->interface_up(datalink->first_protocol);
@@ -1097,6 +1102,7 @@ Interface::_SetUp()
 			}
 
 			down_device_interface(fDeviceInterface);
+			SetBusy(false);
 			return status;
 		}
 	}
@@ -1109,6 +1115,8 @@ Interface::_SetUp()
 	}
 
 	flags |= IFF_UP;
+	SetBusy(false);
+
 	return B_OK;
 }
 
@@ -1409,7 +1417,7 @@ get_interface(net_domain* domain, uint32 index)
 		interface = sInterfaces.First();
 	else
 		interface = find_interface(index);
-	if (interface == NULL)
+	if (interface == NULL || interface->IsBusy())
 		return NULL;
 
 	if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
@@ -1426,7 +1434,7 @@ get_interface(net_domain* domain, const char* name)
 	RecursiveLocker locker(sLock);
 
 	Interface* interface = find_interface(name);
-	if (interface == NULL)
+	if (interface == NULL || interface->IsBusy())
 		return NULL;
 
 	if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
@@ -1445,6 +1453,8 @@ get_interface_for_device(net_domain* domain, uint32 index)
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
 		if (interface->device->index == index) {
+			if (interface->IsBusy())
+				return NULL;
 			if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
 				return NULL;
 
@@ -1470,6 +1480,8 @@ get_interface_for_link(net_domain* domain, const sockaddr* _linkAddress)
 
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
+		if (interface->IsBusy())
+			continue;
 		// Test if the hardware address matches, or if the given interface
 		// matches, or if at least the index matches.
 		if ((linkAddress.sdl_alen == interface->device->address.length
@@ -1479,6 +1491,8 @@ get_interface_for_link(net_domain* domain, const sockaddr* _linkAddress)
 				&& !strcmp(interface->name, (const char*)linkAddress.sdl_data))
 			|| (linkAddress.sdl_nlen == 0 && linkAddress.sdl_alen == 0
 				&& linkAddress.sdl_index == interface->index)) {
+			if (interface->IsBusy())
+				return NULL;
 			if (interface->CreateDomainDatalinkIfNeeded(domain) != B_OK)
 				return NULL;
 
@@ -1516,6 +1530,9 @@ get_interface_address_for_destination(net_domain* domain,
 
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
+		if (interface->IsBusy())
+			continue;
+
 		InterfaceAddress* address
 			= interface->AddressForDestination(domain, destination);
 		if (address != NULL)
@@ -1543,6 +1560,8 @@ get_interface_address_for_link(net_domain* domain, const sockaddr* address,
 
 	InterfaceList::Iterator iterator = sInterfaces.GetIterator();
 	while (Interface* interface = iterator.Next()) {
+		if (interface->IsBusy())
+			continue;
 		// Test if the hardware address matches, or if the given interface
 		// matches, or if at least the index matches.
 		if (linkAddress.sdl_alen == interface->device->address.length

@@ -10,6 +10,7 @@
 
 #include <ObjectList.h>
 #include <Referenceable.h>
+#include <String.h>
 #include <util/DoublyLinkedList.h>
 #include <util/OpenHashTable.h>
 
@@ -69,7 +70,9 @@ class JobListener {
 public:
 	virtual						~JobListener();
 
+	virtual	void				JobStarted(Job* job);
 	virtual	void				JobDone(Job* job);
+	virtual	void				JobWaitingForInput(Job* job);
 	virtual	void				JobFailed(Job* job);
 	virtual	void				JobAborted(Job* job);
 };
@@ -89,9 +92,13 @@ public:
 			Worker*				GetWorker() const	{ return fWorker; }
 			job_state			State() const		{ return fState; }
 
+			const BString&		GetDescription() const
+									{ return fDescription; }
+
 protected:
 			job_wait_status		WaitFor(const JobKey& key);
 			status_t			WaitForUserInput();
+			void				SetDescription(const char* format, ...);
 
 private:
 			friend class Worker;
@@ -122,6 +129,7 @@ private:
 			JobList				fDependentJobs;
 			job_wait_status		fWaitStatus;
 			ListenerList		fListeners;
+			BString				fDescription;
 
 public:
 			Job*				fNext;
@@ -148,6 +156,8 @@ public:
 			status_t			ResumeJob(Job* job);
 									// only valid for jobs that are
 									// suspended pending user input
+
+			bool				HasPendingJobs();
 
 			status_t			AddListener(const JobKey& key,
 									JobListener* listener);

@@ -205,7 +205,12 @@ __init_env(const struct user_space_program_args *args)
 	// protect our implementation
 	environ = args->env;
 	sManagedEnviron = NULL;
+}
 
+
+void
+__init_env_post_heap()
+{
 	atfork(environ_fork_hook);
 }
 

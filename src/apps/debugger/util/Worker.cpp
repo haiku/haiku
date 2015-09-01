@@ -71,7 +71,19 @@ JobListener::~JobListener()
 
 
 void
+JobListener::JobStarted(Job* job)
+{
+}
+
+
+void
 JobListener::JobDone(Job* job)
+{
+}
+
+
+void
+JobListener::JobWaitingForInput(Job* job)
 {
 }
 
@@ -118,6 +130,15 @@ status_t
 Job::WaitForUserInput()
 {
 	return fWorker->WaitForUserInput(this);
+}
+
+
+void
+Job::SetDescription(const char* format, ...)
+{
+	va_list args;
+	va_start(args, format);
+	fDescription.SetToFormatVarArgs(format, args);
 }
 
 
@@ -179,6 +200,13 @@ Job::NotifyListeners()
 	for (int32 i = count - 1; i >= 0; i--) {
 		JobListener* listener = fListeners.ItemAt(i);
 		switch (fState) {
+			case JOB_STATE_ACTIVE:
+				listener->JobStarted(this);
+				break;
+			case JOB_STATE_WAITING:
+				if (fWaitStatus == JOB_USER_INPUT_WAITING)
+					listener->JobWaitingForInput(this);
+				break;
 			case JOB_STATE_SUCCEEDED:
 				listener->JobDone(this);
 				break;
@@ -342,6 +370,14 @@ Worker::ResumeJob(Job* job)
 }
 
 
+bool
+Worker::HasPendingJobs()
+{
+	AutoLocker<Worker> locker(this);
+	return !fJobs.IsEmpty();
+}
+
+
 status_t
 Worker::AddListener(const JobKey& key, JobListener* listener)
 {
@@ -395,6 +431,7 @@ Worker::WaitForUserInput(Job* waitingJob)
 		return B_INTERRUPTED;
 
 	waitingJob->SetWaitStatus(JOB_USER_INPUT_WAITING);
+	waitingJob->NotifyListeners();
 	fSuspendedJobs.Add(waitingJob);
 
 	return B_OK;
@@ -451,6 +488,7 @@ Worker::_ProcessJobs()
 		// process the next job
 		if (Job* job = fUnscheduledJobs.RemoveHead()) {
 			job->SetState(JOB_STATE_ACTIVE);
+			job->NotifyListeners();
 
 			locker.Unlock();
 			status_t error = job->Do();

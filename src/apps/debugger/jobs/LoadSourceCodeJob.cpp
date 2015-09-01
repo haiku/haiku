@@ -30,6 +30,9 @@ LoadSourceCodeJob::LoadSourceCodeJob(
 	fLoadForFunction(loadForFunction)
 {
 	fFunctionInstance->AcquireReference();
+
+	SetDescription("Loading source code for function %s",
+		fFunctionInstance->PrettyName().String());
 }
 
 

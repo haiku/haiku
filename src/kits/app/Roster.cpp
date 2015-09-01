@@ -923,7 +923,7 @@ BRoster::Launch(const char* mimeType, BMessage* initialMessage,
 		messageList.AddItem(initialMessage);
 
 	return _LaunchApp(mimeType, NULL, &messageList, 0, NULL,
-		(const char**)environ, _appTeam);
+		(const char**)environ, _appTeam, NULL, false);
 }
 
 
@@ -935,7 +935,7 @@ BRoster::Launch(const char* mimeType, BList* messageList,
 		return B_BAD_VALUE;
 
 	return _LaunchApp(mimeType, NULL, messageList, 0, NULL,
-		(const char**)environ, _appTeam);
+		(const char**)environ, _appTeam, NULL, false);
 }
 
 
@@ -947,7 +947,7 @@ BRoster::Launch(const char* mimeType, int argc, const char* const* args,
 		return B_BAD_VALUE;
 
 	return _LaunchApp(mimeType, NULL, NULL, argc, args, (const char**)environ,
-		_appTeam);
+		_appTeam, NULL, false);
 }
 
 
@@ -963,7 +963,7 @@ BRoster::Launch(const entry_ref* ref, const BMessage* initialMessage,
 		messageList.AddItem(const_cast<BMessage*>(initialMessage));
 
 	return _LaunchApp(NULL, ref, &messageList, 0, NULL, (const char**)environ,
-		_appTeam);
+		_appTeam, NULL, false);
 }
 
 
@@ -975,7 +975,7 @@ BRoster::Launch(const entry_ref* ref, const BList* messageList,
 		return B_BAD_VALUE;
 
 	return _LaunchApp(NULL, ref, messageList, 0, NULL, (const char**)environ,
-		appTeam);
+		appTeam, NULL, false);
 }
 
 
@@ -987,7 +987,7 @@ BRoster::Launch(const entry_ref* ref, int argc, const char* const* args,
 		return B_BAD_VALUE;
 
 	return _LaunchApp(NULL, ref, NULL, argc, args, (const char**)environ,
-		appTeam);
+		appTeam, NULL, false);
 }
 
 
@@ -1800,6 +1800,10 @@ BRoster::_UpdateActiveApp(team_id team) const
 	\c B_REFS_RECEIVED message, if no arguments are supplied via \a argc and
 	\args.
 
+	If \a launchSuspended is set to true, the main thread of the loaded app
+	(returned in \a appThread) is kept in the suspended state and not
+	automatically resumed.
+
 	\param mimeType MIME type for which the application shall be launched.
 	       May be \c NULL.
 	\param ref entry_ref referring to the file for which an application shall
@@ -1811,6 +1815,10 @@ BRoster::_UpdateActiveApp(team_id team) const
 	       to the launched application.
 	\param appTeam Pointer to a pre-allocated team_id variable to be set to
 	       the team ID of the launched application.
+	\param appThread Pointer to a pre-allocated thread_id variable to
+		   be set to the thread ID of the launched main thread.
+	\param launchSuspended Indicates whether to keep the app thread in the
+		   suspended state or resume it.
 
 	\return A status code.
 	\retval B_OK Everything went fine.
@@ -1828,7 +1836,8 @@ BRoster::_UpdateActiveApp(team_id team) const
 status_t
 BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 	const BList* messageList, int argc, const char* const* args,
-	const char** environment, team_id* _appTeam) const
+	const char** environment, team_id* _appTeam,
+	thread_id* _appThread, bool launchSuspended) const
 {
 	DBG(OUT("BRoster::_LaunchApp()"));
 
@@ -1856,6 +1865,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 	status_t error = B_OK;
 	ArgVector argVector;
 	team_id team = -1;
+	thread_id appThread = -1;
 
 	do {
 		// find the app
@@ -1900,7 +1910,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 		if (error == B_OK && !alreadyRunning) {
 			DBG(OUT("  token: %lu\n", appToken));
 			// load the app image
-			thread_id appThread = load_image(argVector.Count(),
+			appThread = load_image(argVector.Count(),
 				const_cast<const char**>(argVector.Args()), environment);
 
 			// get the app team
@@ -1922,7 +1932,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 			DBG(OUT("  set thread and team: %s (%lx)\n", strerror(error),
 				error));
 			// resume the launched team
-			if (error == B_OK)
+			if (error == B_OK && !launchSuspended)
 				error = resume_thread(appThread);
 
 			DBG(OUT("  resume thread: %s (%lx)\n", strerror(error), error));
@@ -1983,6 +1993,9 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 			error = B_ALREADY_RUNNING;
 		else if (_appTeam)
 			*_appTeam = team;
+
+		if (_appThread != NULL)
+			*_appThread = appThread;
 	}
 
 	DBG(OUT("BRoster::_LaunchApp() done: %s (%lx)\n",
@@ -2068,7 +2081,7 @@ BRoster::_ResolveApp(const char* inType, entry_ref* ref,
 	}
 
 	// create meta mime
-	if (error == B_OK) {
+	if (!fNoRegistrar && error == B_OK) {
 		BPath path;
 		if (path.SetTo(&appRef) == B_OK)
 			create_app_meta_mime(path.Path(), false, true, false);
@@ -2077,7 +2090,7 @@ BRoster::_ResolveApp(const char* inType, entry_ref* ref,
 	// set the app hint on the type -- but only if the file has the
 	// respective signature, otherwise unset the app hint
 	BAppFileInfo appFileInfo;
-	if (error == B_OK) {
+	if (!fNoRegistrar && error == B_OK) {
 		char signature[B_MIME_TYPE_LENGTH];
 		if (appFileInfo.SetTo(&appFile) == B_OK
 			&& appFileInfo.GetSignature(signature) == B_OK) {
@@ -2482,6 +2495,9 @@ BRoster::_GetFileType(const entry_ref* file, BNodeInfo* nodeInfo,
 	if (nodeInfo->GetType(mimeType) == B_OK)
 		return B_OK;
 
+	if (fNoRegistrar)
+		return B_NO_INIT;
+
 	// Try to update the file's MIME info and just read the updated type.
 	// If that fails, sniff manually.
 	BPath path;
@@ -2610,7 +2626,10 @@ BRoster::_InitMessenger()
 	if (BLaunchRoster().GetData(B_REGISTRAR_SIGNATURE, data) == B_OK) {
 		port_id port = data.GetInt32("port", -1);
 		team_id team = data.GetInt32("team", -1);
-		if (port >= 0) {
+
+		if (port >= 0 && team != current_team()) {
+			// Make sure we aren't the registrar ourselves.
+
 			DBG(OUT("  found roster port\n"));
 
 			BMessenger::Private(fMessenger).SetTo(team, port,

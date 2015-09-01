@@ -785,7 +785,7 @@ Model::AddTeam(const system_profiler_team_added* event, nanotime_t time)
 {
 	Team* team = TeamByID(event->team);
 	if (team != NULL) {
-		fprintf(stderr, "Duplicate team: %ld\n", event->team);
+		fprintf(stderr, "Duplicate team: %" B_PRId32 "\n", event->team);
 		// TODO: User feedback!
 		return team;
 	}
@@ -830,7 +830,7 @@ Model::AddThread(const system_profiler_thread_added* event, nanotime_t time)
 	// check whether we do already know the thread
 	Thread* thread = ThreadByID(event->thread);
 	if (thread != NULL) {
-		fprintf(stderr, "Duplicate thread: %ld\n", event->thread);
+		fprintf(stderr, "Duplicate thread: %" B_PRId32 "\n", event->thread);
 		// TODO: User feedback!
 		return thread;
 	}
@@ -838,7 +838,7 @@ Model::AddThread(const system_profiler_thread_added* event, nanotime_t time)
 	// get its team
 	Team* team = TeamByID(event->team);
 	if (team == NULL) {
-		fprintf(stderr, "No team for thread: %ld\n", event->thread);
+		fprintf(stderr, "No team for thread: %" B_PRId32 "\n", event->thread);
 		return NULL;
 	}
 

@@ -59,7 +59,7 @@ BigtimeChartAxisLegendSource::GetAxisLegends(const ChartDataRange& range,
 		decomposed_bigtime decomposed;
 		decompose_time(time, decomposed);
 		char buffer[128];
-		snprintf(buffer, sizeof(buffer), "%02lld:%02d:%02d.%06d",
+		snprintf(buffer, sizeof(buffer), "%02" B_PRIu64 ":%02d:%02d.%06d",
 			decomposed.hours, decomposed.minutes, decomposed.seconds,
 			decomposed.micros);
 // TODO: Drop superfluous micro seconds digits, or even microseconds and seconds
