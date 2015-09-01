@@ -3491,8 +3491,6 @@ BMediaRoster::MessageReceived(BMessage* message)
 		}
 
 		default:
-			printf("BMediaRoster::MessageReceived: unknown message!\n");
-			message->PrintToStream();
 			BLooper::MessageReceived(message);
 			break;
 	}
