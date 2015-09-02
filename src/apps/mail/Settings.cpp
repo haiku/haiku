@@ -70,7 +70,7 @@ Settings::Settings()
 	fWrapMode(true),
 	fAttachAttributes(true),
 	fColoredQuotes(true),
-	fShowButtonBar(true),
+	fShowButtonBar(kShowToolBar),
 	fWarnAboutUnencodableCharacters(true),
 	fStartWithSpellCheckOn(false),
 	fShowSpamGUI(true),
@@ -279,17 +279,12 @@ Settings::LoadSettings()
 		}
 	}
 
-	bool boolValue;
-	if (settings.FindBool("WordWrapMode", &boolValue) == B_OK)
-		fWrapMode = boolValue;
-
-	if (settings.FindBool("AutoMarkRead", &boolValue) == B_OK)
-		fAutoMarkRead = boolValue;
+	fWrapMode = settings.GetBool("WordWrapMode", fWrapMode);
+	fAutoMarkRead = settings.GetBool("AutoMarkRead", fAutoMarkRead);
 
 	BString string;
-	if (settings.FindString("SignatureText", &string) == B_OK) {
+	if (settings.FindString("SignatureText", &string) == B_OK)
 		fSignature = string;
-	}
 
 	if (settings.FindInt32("CharacterSet", &int32Value) == B_OK)
 		fMailCharacterSet = int32Value;
@@ -300,9 +295,7 @@ Settings::LoadSettings()
 		fMailCharacterSet = B_MS_WINDOWS_CONVERSION;
 	}
 
-	int8 int8Value;
-	if (settings.FindInt8("ShowButtonBar", &int8Value) == B_OK)
-		fShowButtonBar = int8Value;
+	fShowButtonBar = settings.GetInt8("ShowButtonBar", fShowButtonBar);
 
 	if (settings.FindInt32("UseAccountFrom", &int32Value) == B_OK)
 		fUseAccountFrom = int32Value;
@@ -310,21 +303,16 @@ Settings::LoadSettings()
 		|| fUseAccountFrom > ACCOUNT_FROM_MAIL)
 		fUseAccountFrom = ACCOUNT_USE_DEFAULT;
 
-	if (settings.FindBool("ColoredQuotes", &boolValue) == B_OK)
-		fColoredQuotes = boolValue;
+	fColoredQuotes = settings.GetBool("ColoredQuotes", fColoredQuotes);
 
-	if (settings.FindString("ReplyPreamble", &string) == B_OK) {
+	if (settings.FindString("ReplyPreamble", &string) == B_OK)
 		fReplyPreamble = string;
-	}
 
-	if (settings.FindBool("AttachAttributes", &boolValue) == B_OK)
-		fAttachAttributes = boolValue;
-
-	if (settings.FindBool("WarnAboutUnencodableCharacters", &boolValue) == B_OK)
-		fWarnAboutUnencodableCharacters = boolValue;
-
-	if (settings.FindBool("StartWithSpellCheck", &boolValue) == B_OK)
-		fStartWithSpellCheckOn = boolValue;
+	fAttachAttributes = settings.GetBool("AttachAttributes", fAttachAttributes);
+	fWarnAboutUnencodableCharacters = settings.GetBool(
+		"WarnAboutUnencodableCharacters", fWarnAboutUnencodableCharacters);
+	fStartWithSpellCheckOn = settings.GetBool("StartWithSpellCheck",
+		fStartWithSpellCheckOn);
 
 	return B_OK;
 }

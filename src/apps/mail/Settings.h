@@ -45,6 +45,10 @@ All rights reserved.
 #define ACCOUNT_USE_DEFAULT	0
 #define ACCOUNT_FROM_MAIL	1
 
+static const uint8 kHideToolBar = 0;
+static const uint8 kShowToolBar = 1;
+static const uint8 kShowToolBarIconsOnly = 2;
+
 
 class BMessage;
 

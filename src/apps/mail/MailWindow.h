@@ -130,6 +130,8 @@ private:
 
 			void				_AddReadButton();
 			void				_UpdateReadButton();
+			void				_UpdateLabel(uint32 command, const char* label,
+									bool show);
 
 			void				_SetDownloading(bool downloading);
 			uint32				_CurrentCharacterSet() const;

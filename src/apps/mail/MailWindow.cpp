@@ -46,6 +46,7 @@ of their respective holders. All rights reserved.
 #include <AppFileInfo.h>
 #include <Autolock.h>
 #include <Bitmap.h>
+#include <Button.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 #include <Clipboard.h>
@@ -90,6 +91,7 @@ of their respective holders. All rights reserved.
 #include "Prefs.h"
 #include "QueryMenu.h"
 #include "Signature.h"
+#include "Settings.h"
 #include "Status.h"
 #include "String.h"
 #include "Utilities.h"
@@ -720,6 +722,22 @@ TMailWindow::UpdateViews()
 	if (showToolBar) {
 		if (fToolBar->IsHidden())
 			fToolBar->Show();
+
+		bool showLabel = showToolBar == kShowToolBar;
+		_UpdateLabel(M_NEW, B_TRANSLATE("New"), showLabel);
+		_UpdateLabel(M_SEND_NOW, B_TRANSLATE("Send"), showLabel);
+		_UpdateLabel(M_SIG_MENU, B_TRANSLATE("Signature"), showLabel);
+		_UpdateLabel(M_SAVE_AS_DRAFT, B_TRANSLATE("Save"), showLabel);
+		_UpdateLabel(M_PRINT, B_TRANSLATE("Print"), showLabel);
+		_UpdateLabel(M_DELETE, B_TRANSLATE("Trash"), showLabel);
+		_UpdateLabel(M_REPLY, B_TRANSLATE("Reply"), showLabel);
+		_UpdateLabel(M_FORWARD, B_TRANSLATE("Forward"), showLabel);
+		_UpdateLabel(M_DELETE_NEXT, B_TRANSLATE("Trash"), showLabel);
+		_UpdateLabel(M_SPAM_BUTTON, B_TRANSLATE("Spam"), showLabel);
+		_UpdateLabel(M_NEXTMSG, B_TRANSLATE("Next"), showLabel);
+		_UpdateLabel(M_UNREAD, B_TRANSLATE("Unread"), showLabel);
+		_UpdateLabel(M_READ, B_TRANSLATE(" Read "), showLabel);
+		_UpdateLabel(M_PREVMSG, B_TRANSLATE("Previous"), showLabel);
 	} else if (!fToolBar->IsHidden())
 		fToolBar->Hide();
 }
@@ -3184,6 +3202,17 @@ TMailWindow::_UpdateReadButton()
 			_AddReadButton();
 	}
 	UpdateViews();
+}
+
+
+void
+TMailWindow::_UpdateLabel(uint32 command, const char* label, bool show)
+{
+	BButton* button = fToolBar->FindButton(command);
+	if (button != NULL) {
+		button->SetLabel(show ? label : NULL);
+		button->SetToolTip(show ? NULL : label);
+	}
 }
 
 

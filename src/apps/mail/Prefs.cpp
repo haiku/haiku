@@ -58,6 +58,7 @@ using namespace BPrivate;
 #include "MailSupport.h"
 #include "MailWindow.h"
 #include "Messages.h"
+#include "Settings.h"
 #include "Signature.h"
 
 
@@ -902,20 +903,20 @@ TPrefsWindow::_BuildButtonBarMenu(uint8 show)
 	BPopUpMenu* menu = new BPopUpMenu("");
 
 	msg = new BMessage(P_BUTTON_BAR);
-	msg->AddInt8("bar", 1);
+	msg->AddInt8("bar", kShowToolBar);
 	menu->AddItem(item = new BMenuItem(
 		B_TRANSLATE("Show icons & labels"), msg));
 	if (show & 1)
 		item->SetMarked(true);
 
 	msg = new BMessage(P_BUTTON_BAR);
-	msg->AddInt8("bar", 2);
+	msg->AddInt8("bar", kShowToolBarIconsOnly);
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show icons only"), msg));
 	if (show & 2)
 		item->SetMarked(true);
 
 	msg = new BMessage(P_BUTTON_BAR);
-	msg->AddInt8("bar", 0);
+	msg->AddInt8("bar", kHideToolBar);
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Hide"), msg));
 	if (!show)
 		item->SetMarked(true);
