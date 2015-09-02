@@ -206,12 +206,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	if (messenger != NULL)
 		fTrackerMessenger = *messenger;
 
-	BMenu* menu;
-	BMenu* subMenu;
-	BMenuItem* item;
-	BMessage* msg;
 	BFile file(ref, B_READ_ONLY);
-
 	if (ref) {
 		fRef = new entry_ref(*ref);
 		fIncoming = true;
@@ -219,17 +214,16 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		fIncoming = false;
 
 	fAutoMarkRead = fApp->AutoMarkRead();
-	BRect r(0, 0, RIGHT_BOUNDARY, 15);
-	fMenuBar = new BMenuBar(r, "");
+	fMenuBar = new BMenuBar("menuBar");
 
 	// File Menu
 
-	menu = new BMenu(B_TRANSLATE("File"));
+	BMenu* menu = new BMenu(B_TRANSLATE("File"));
 
-	msg = new BMessage(M_NEW);
+	BMessage* msg = new BMessage(M_NEW);
 	msg->AddInt32("type", M_NEW);
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("New mail message"),
-		msg, 'N'));
+	BMenuItem* item = new BMenuItem(B_TRANSLATE("New mail message"), msg, 'N');
+	menu->AddItem(item);
 	item->SetTarget(be_app);
 
 	// Cheap hack - only show the drafts menu when composing messages.  Insert
@@ -259,7 +253,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	if (!resending && fIncoming) {
 		menu->AddSeparatorItem();
 
-		subMenu = new BMenu(B_TRANSLATE("Close and "));
+		BMenu* subMenu = new BMenu(B_TRANSLATE("Close and "));
 
 		read_flags flag;
 		read_read_attr(file, flag);
