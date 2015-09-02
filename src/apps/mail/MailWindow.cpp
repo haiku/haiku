@@ -184,6 +184,7 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 	fRef(NULL),
 	fFieldState(0),
 	fPanel(NULL),
+	fSaveAddrMenu(NULL),
 	fLeaveStatusMenu(NULL),
 	fEncodingMenu(NULL),
 	fZoom(rect),
@@ -434,9 +435,6 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 		fNextMsg = new BMenuItem(B_TRANSLATE("Next message"),
 			new BMessage(M_NEXTMSG), B_DOWN_ARROW);
 		menu->AddItem(fNextMsg);
-		menu->AddSeparatorItem();
-		fSaveAddrMenu = subMenu = new BMenu(B_TRANSLATE("Save address"));
-		menu->AddItem(subMenu);
 	} else {
 		menu->AddItem(fSendNow = new BMenuItem(B_TRANSLATE("Send message"),
 			new BMessage(M_SEND_NOW), 'M'));
@@ -458,6 +456,11 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 				B_TRANSLATE("Remove enclosure"),
 				new BMessage(M_REMOVE), 'T'));
 		}
+	}
+	if (fIncoming) {
+		menu->AddSeparatorItem();
+		fSaveAddrMenu = new BMenu(B_TRANSLATE("Save address"));
+		menu->AddItem(fSaveAddrMenu);
 	}
 
 	// Encoding menu
