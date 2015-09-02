@@ -136,7 +136,7 @@ BToolBar::AddView(BView* view)
 void
 BToolBar::SetActionEnabled(uint32 command, bool enabled)
 {
-	if (BButton* button = _FindButton(command))
+	if (BButton* button = FindButton(command))
 		button->SetEnabled(enabled);
 }
 
@@ -144,7 +144,7 @@ BToolBar::SetActionEnabled(uint32 command, bool enabled)
 void
 BToolBar::SetActionPressed(uint32 command, bool pressed)
 {
-	if (BButton* button = _FindButton(command))
+	if (BButton* button = FindButton(command))
 		button->SetValue(pressed);
 }
 
@@ -152,7 +152,7 @@ BToolBar::SetActionPressed(uint32 command, bool pressed)
 void
 BToolBar::SetActionVisible(uint32 command, bool visible)
 {
-	BButton* button = _FindButton(command);
+	BButton* button = FindButton(command);
 	if (button == NULL)
 		return;
 	for (int32 i = 0; BLayoutItem* item = GroupLayout()->ItemAt(i); i++) {
@@ -161,6 +161,26 @@ BToolBar::SetActionVisible(uint32 command, bool visible)
 		item->SetVisible(visible);
 		break;
 	}
+}
+
+
+BButton*
+BToolBar::FindButton(uint32 command) const
+{
+	for (int32 i = 0; BView* view = ChildAt(i); i++) {
+		BButton* button = dynamic_cast<BButton*>(view);
+		if (button == NULL)
+			continue;
+		BMessage* message = button->Message();
+		if (message == NULL)
+			continue;
+		if (message->what == command) {
+			return button;
+			// Assumes there is only one button with this message...
+			break;
+		}
+	}
+	return NULL;
 }
 
 
@@ -194,26 +214,6 @@ BToolBar::_Init()
 	GroupLayout()->SetSpacing(1);
 
 	SetFlags(Flags() | B_FRAME_EVENTS | B_PULSE_NEEDED);
-}
-
-
-BButton*
-BToolBar::_FindButton(uint32 command) const
-{
-	for (int32 i = 0; BView* view = ChildAt(i); i++) {
-		BButton* button = dynamic_cast<BButton*>(view);
-		if (button == NULL)
-			continue;
-		BMessage* message = button->Message();
-		if (message == NULL)
-			continue;
-		if (message->what == command) {
-			return button;
-			// Assumes there is only one button with this message...
-			break;
-		}
-	}
-	return NULL;
 }
 
 

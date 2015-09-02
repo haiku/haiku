@@ -39,12 +39,13 @@ public:
 			void				SetActionPressed(uint32 command, bool pressed);
 			void				SetActionVisible(uint32 command, bool visible);
 
+			BButton*			FindButton(uint32 command) const;
+
 private:
 	virtual	void				Pulse();
 	virtual	void				FrameResized(float width, float height);
 
 			void				_Init();
-			BButton*			_FindButton(uint32 command) const;
 			void				_HideToolTips() const;
 
 			orientation			fOrientation;
