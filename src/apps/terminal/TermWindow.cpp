@@ -236,12 +236,12 @@ TermWindow::TermWindow(const BString& title, Arguments* args)
 		SetWorkspaces(workspaces);
 	} else {
 		// use computed defaults
-		int i = id / 16;
-		int j = id % 16;
-		int k = (j * 16) + (i * 64) + 50;
-		int l = (j * 16)  + 50;
+		int row = id / 16;
+		int column = id % 16;
+		int x = (column * 16) + (row * 64) + 50;
+		int y = (column * 16) + 50;
 
-		MoveTo(k, l);
+		MoveTo(x, y);
 	}
 
 	// init the GUI and add a tab
