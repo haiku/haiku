@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Copyright (c) 2003-4 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
  *
@@ -71,6 +71,7 @@ static const uint32 ONETHREETWOTWENTYFIVE				= 'hunv';
 static const uint32 FULLSCREEN							= 'fscr';
 
 static const uint32 MSG_FONT_CHANGED					= 'fntc';
+static const uint32 MSG_SAVE_AS_DEFAULT					= 'sadf';
 static const uint32 MSG_CHECK_CHILDREN					= 'ckch';
 static const uint32 MSG_REMOVE_RESIZE_VIEW_IF_NEEDED	= 'rmrv';
 static const uint32 MSG_TERMINAL_BUFFER_CHANGED			= 'bufc';

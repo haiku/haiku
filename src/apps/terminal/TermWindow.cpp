@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2015, Haiku, Inc. All rights reserved.
  * Copyright (c) 2004 Daniel Furrer <assimil8or@users.sourceforge.net>
  * Copyright (c) 2003-2004 Kian Duffy <myob@users.sourceforge.net>
  * Copyright (C) 1998,99 Kazuho Okui and Takashi Murai.
@@ -523,10 +523,10 @@ TermWindow::_SetupMenu()
 			.AddItem(windowSize)
 			.AddItem(fEncodingMenu)
 			.AddItem(fFontSizeMenu)
+			.AddItem(B_TRANSLATE("Save as default"), MSG_SAVE_AS_DEFAULT)
 			.AddSeparator()
 			.AddItem(B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), MENU_PREF_OPEN)
-		.End()
-	;
+		.End();
 
 	AddChild(fMenuBar);
 
@@ -933,6 +933,15 @@ TermWindow::MessageReceived(BMessage *message)
 			_SetTermColors(_ActiveTermViewContainerView());
 			_ActiveTermViewContainerView()->Invalidate();
 			_ActiveTermView()->Invalidate();
+			break;
+		}
+		case MSG_SAVE_AS_DEFAULT:
+		{
+			BPath path;
+			if (PrefHandler::GetDefaultPath(path) == B_OK) {
+				PrefHandler::Default()->SaveAsText(path.Path(),
+					PREFFILE_MIMETYPE);
+			}
 			break;
 		}
 
