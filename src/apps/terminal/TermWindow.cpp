@@ -225,11 +225,13 @@ TermWindow::TermWindow(const BString& title, Arguments* args)
 	if (_LoadWindowPosition(&frame, &workspaces) == B_OK) {
 		// make sure the window is still on screen
 		// (for example if there was a resolution change)
-		if (frame.Intersects(BScreen(this).Frame())) {
-			MoveTo(frame.LeftTop());
+		BRect screenFrame = BScreen(this).Frame();
+		if (frame.Width() <= screenFrame.Width()
+			&& frame.Height() <= screenFrame.Height())
 			ResizeTo(frame.Width(), frame.Height());
-		} else
-			CenterOnScreen();
+
+		MoveTo(frame.LeftTop());
+		MoveOnScreen();
 
 		SetWorkspaces(workspaces);
 	} else {
