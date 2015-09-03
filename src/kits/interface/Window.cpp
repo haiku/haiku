@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -2565,6 +2565,47 @@ void
 BWindow::CenterOnScreen(screen_id id)
 {
 	CenterIn(BScreen(id).Frame());
+}
+
+
+void
+BWindow::MoveOnScreen()
+{
+	// Set size limits now if needed
+	UpdateSizeLimits();
+
+	BRect screenFrame = BScreen(this).Frame();
+	BRect frame = Frame();
+
+	float borderWidth;
+	float tabHeight;
+	_GetDecoratorSize(&borderWidth, &tabHeight);
+
+	frame.InsetBy(-borderWidth, -borderWidth);
+	frame.top -= tabHeight;
+
+	if (!frame.Intersects(screenFrame)) {
+		// Off and away
+		CenterOnScreen();
+		return;
+	}
+
+	// Move such that the upper left corner, and most of the window
+	// will be visible.
+	float left = frame.left;
+	if (left < screenFrame.left)
+		left = screenFrame.left;
+	else if (frame.right > screenFrame.right)
+		left = std::max(0.f, screenFrame.right - frame.Width());
+
+	float top = frame.top;
+	if (top < screenFrame.top)
+		top = screenFrame.top;
+	else if (frame.bottom > screenFrame.bottom)
+		top = std::max(0.f, screenFrame.bottom - frame.Height());
+
+	if (top != frame.top || left != frame.left)
+		MoveTo(left + borderWidth, top + tabHeight + borderWidth);
 }
 
 

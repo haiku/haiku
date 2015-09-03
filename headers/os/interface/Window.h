@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2011, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_WINDOW_H
@@ -170,6 +170,7 @@ public:
 			void				CenterIn(const BRect& rect);
 			void				CenterOnScreen();
 			void				CenterOnScreen(screen_id id);
+			void				MoveOnScreen();
 
 	virtual	void				Show();
 	virtual	void				Hide();
