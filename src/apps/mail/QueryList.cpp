@@ -24,7 +24,15 @@ initQueryLooper()
 }
 
 
-// #pragma mark -
+// #pragma mark - QueryListener
+
+
+QueryListener::~QueryListener()
+{
+}
+
+
+// #pragma mark - QueryList
 
 
 QueryList::QueryList()

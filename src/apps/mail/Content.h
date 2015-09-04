@@ -61,7 +61,7 @@ class TScrollView;
 class TTextView;
 class BFile;
 class BList;
-class BPopupMenu;
+class BPopUpMenu;
 
 struct text_run_array;
 

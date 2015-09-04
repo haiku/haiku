@@ -21,6 +21,7 @@ struct QueryList;
 
 class QueryListener {
 public:
+	virtual 				~QueryListener();
 	virtual	void				EntryCreated(QueryList& source,
 									const entry_ref& ref, ino_t node) = 0;
 	virtual	void				EntryRemoved(QueryList& source,

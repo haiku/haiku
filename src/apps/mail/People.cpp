@@ -6,6 +6,8 @@
 
 #include "People.h"
 
+#include <stdio.h>
+
 #include <Autolock.h>
 #include <Node.h>
 
