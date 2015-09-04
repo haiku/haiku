@@ -213,8 +213,12 @@ BMediaEncoder::BMediaEncoder & operator=(const BMediaEncoder &);
 BMediaEncoder::write_chunk(void* classptr, const void* chunk_data,
 	size_t chunk_len, media_encode_info* info)
 {
-	UNIMPLEMENTED();
-	return B_OK;
+	CALLED();
+
+	BMediaEncoder* encoder = static_cast<BMediaEncoder*>(classptr);
+	if (encoder == NULL)
+		return B_BAD_VALUE;
+	return encoder->WriteChunk(chunk_data, chunk_len, info);
 }
 
 
