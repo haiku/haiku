@@ -7,7 +7,7 @@ The captcha puzzle needs to be solved.	UserLoginWindow		Musisz rozwiązać test 
 Changelog	PackageInfoView		Dziennik zmian
 Your rating:	RatePackageWindow		Twoja ocena:
 The passwords do not match.	UserLoginWindow		Hasła nie zgadzają się.
-Log in…	MainWindow		Zaloguj
+Log in…	MainWindow		Zaloguj…
 Rate %Package%	RatePackageWindow		Oceń %Package%
 Stability:	RatePackageWindow		Stabilność:
 Click a package to view information	PackageInfoView		Kliknij na pakiet, aby zobaczyć informacje

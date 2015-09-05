@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-MAIL	233997769
+1	belarusian	x-vnd.Be-MAIL	3209807243
 View	Mail		Агляд
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Атрыбуты ўкладання:
@@ -117,8 +117,6 @@ User interface	Mail		Інтэрфейс карыстача
 Cancel	Mail		Адмяніць
 Send message	Mail		Даслаць паведамленне
 Remove enclosure	Mail		Выдаліць укладанне
-Account:	Mail		Акаунт:
-Decoding:	Mail		Кадаванне:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Выбачайце, але мне не ўдалося знайсці праграму якая можа працаваць с дадзенымі тыпу 'Person'.
 Delete	Mail		Выдаліць
 Don't send	Mail		Не дасылаць

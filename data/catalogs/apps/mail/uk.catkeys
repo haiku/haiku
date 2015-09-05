@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-MAIL	233997769
+1	ukrainian	x-vnd.Be-MAIL	3209807243
 View	Mail		Вигляд
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Додати атрибути:
@@ -117,8 +117,6 @@ User interface	Mail		Інтерфейс користувача
 Cancel	Mail		Відмінити
 Send message	Mail		Відіслати лист
 Remove enclosure	Mail		Видалити вкладення
-Account:	Mail		Аккаунт:
-Decoding:	Mail		Розкодування:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Вибачте не знайдено жодного додатка що підтримує дані типу 'Person'.
 Delete	Mail		Видалити
 Don't send	Mail		Не надсилати

@@ -1,0 +1,10 @@
+1	swedish	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		DNS-inställningar
+Move down	DNSSettingsView		Flytta nedåt
+DNS settings	DNSSettingsView		DNS-inställningar
+Remove	DNSSettingsView		Radera
+Domain:	DNSSettingsView		Domän:
+Add	DNSSettingsView		Lägg till
+Server:	DNSSettingsView		Server:
+Move up	DNSSettingsView		Flytta uppåt
+Apply	DNSSettingsView		Verkställ

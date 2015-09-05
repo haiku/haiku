@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-MAIL	2646020355
+1	dutch; flemish	x-vnd.Be-MAIL	1326862533
 View	Mail		Bekijken
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attributen bijvoegen:
@@ -115,8 +115,6 @@ User interface	Mail		Gebruikersinterface
 Cancel	Mail		Annuleren
 Send message	Mail		Bericht versturen
 Remove enclosure	Mail		Bijlage verwijderen
-Account:	Mail		Account:
-Decoding:	Mail		Bezig met decoderen:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Sorry, kon geen toepassing vinden die het 'Person'-datatype ondersteunt.
 Delete	Mail		Verwijderen
 Leave as '%s'	Mail		Behouden als '%s'

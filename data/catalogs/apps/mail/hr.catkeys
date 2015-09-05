@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Be-MAIL	4234925566
+1	croatian	x-vnd.Be-MAIL	1120205077
 View	Mail		Pogled
 %d - Date	Mail		%d - Datum
 An error occurred trying to save the attachment.	Mail		Došlo je do greške pri spremanju privitka.
@@ -87,7 +87,6 @@ Next message	Mail		Sljedeća poruka
 User interface	Mail		Korisničko sučelje
 Cancel	Mail		Otkaži
 Send message	Mail		Pošalji poruku
-Account:	Mail		Račun:
 Delete	Mail		Izbriši
 Don't send	Mail		Ne šalji
 Leave as '%s'	Mail		Ostavi kao '%s'

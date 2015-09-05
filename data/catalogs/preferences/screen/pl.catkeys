@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Screen	2339556848
+1	polish	x-vnd.Haiku-Screen	4090394050
 yes	Screen		tak
 Use laptop panel:	Screen		Użyj ekranu laptopa:
 15 bits/pixel, 32768 colors	Screen		15 bitów/piksel, 32768 kolorów
@@ -39,6 +39,7 @@ bits/pixel	Screen		bitów/piksel
 Refresh rate:	Screen		Częstotliwość odświeżania:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Czy chcesz zachować te ustawienia?
+Confirm changes	Screen		Potwierdź zmiany
 Rows:	Screen		Wiersze:
 vertically	Screen		pionowo
 Resolution:	Screen		Rozdzielczość:

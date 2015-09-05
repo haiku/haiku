@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-MAIL	233997769
+1	lithuanian	x-vnd.Be-MAIL	3209807243
 View	Mail		Rodymas
 %d - Date	Mail		%d – data
 Attach attributes:	Mail		Pridedamų failų požymių įtraukimas:
@@ -117,8 +117,6 @@ User interface	Mail		Naudotojo sąsaja
 Cancel	Mail		Atsisakyti
 Send message	Mail		Siųsti laišką
 Remove enclosure	Mail		Pašalinti priedą
-Account:	Mail		Paskyra:
-Decoding:	Mail		Koduotė:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Apgailestaujame, tačiau nepavyko rasti programos, palaikančios „Person“ tipo failus.
 Delete	Mail		Šalinti
 Don't send	Mail		Nesiųsti

@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-MAIL	233997769
+1	english	x-vnd.Be-MAIL	3209807243
 View	Mail		查看
 %d - Date	Mail		%d - 日期
 Attach attributes:	Mail		附加属性：
@@ -117,8 +117,6 @@ User interface	Mail		用户界面
 Cancel	Mail		取消
 Send message	Mail		发送邮件
 Remove enclosure	Mail		删除格式
-Account:	Mail		账户：
-Decoding:	Mail		解码：
 Sorry, could not find an application that supports the 'Person' data type.	Mail		对不起，无法找到支持‘个人’数据类型的程序。
 Delete	Mail		删除
 Don't send	Mail		不发送

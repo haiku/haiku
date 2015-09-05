@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-MAIL	1310033600
+1	french	x-vnd.Be-MAIL	4285843074
 View	Mail		Vue
 %d - Date	Mail		%d - Date
 Attach attributes:	Mail		Attributs du fichier joint :
@@ -117,8 +117,6 @@ User interface	Mail		Interface utilisateur
 Cancel	Mail		Annuler
 Send message	Mail		Envoyer le message
 Remove enclosure	Mail		Enlever la pièce jointe
-Account:	Mail		Compte :
-Decoding:	Mail		Décodage :
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Désolé, aucune application ne peut ouvrir les données de type « Person ».
 Delete	Mail		Effacer
 Don't send	Mail		Ne pas envoyer

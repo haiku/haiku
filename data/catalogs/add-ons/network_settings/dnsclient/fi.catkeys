@@ -1,0 +1,10 @@
+1	finnish	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		DNS-asetukset
+Move down	DNSSettingsView		Siirrä alaspäin
+DNS settings	DNSSettingsView		DNS-asetukset
+Remove	DNSSettingsView		Poista
+Domain:	DNSSettingsView		Verkkotunnus:
+Add	DNSSettingsView		Lisää
+Server:	DNSSettingsView		Palvelin:
+Move up	DNSSettingsView		Siirrä ylöspäin
+Apply	DNSSettingsView		Käytä

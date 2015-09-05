@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-MAIL	1310033600
+1	spanish; castilian	x-vnd.Be-MAIL	4285843074
 View	Mail		Ver
 %d - Date	Mail		%d - Fecha
 Attach attributes:	Mail		Adjuntar atributos:
@@ -117,8 +117,6 @@ User interface	Mail		Interfaz de usuario
 Cancel	Mail		Cancelar
 Send message	Mail		Enviar mensaje
 Remove enclosure	Mail		Remover anexo
-Account:	Mail		Cuenta:
-Decoding:	Mail		Decodificar:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Lo siento, no se pudo encontrar una aplicación que soporte el tipo de dato 'Persona'.
 Delete	Mail		Borrar
 Don't send	Mail		No enviar

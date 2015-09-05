@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-MAIL	1310033600
+1	japanese	x-vnd.Be-MAIL	4285843074
 View	Mail		表示
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付:
@@ -117,8 +117,6 @@ User interface	Mail		インターフェイスの設定
 Cancel	Mail		中止
 Send message	Mail		メッセージを送信
 Remove enclosure	Mail		添付ファイルを削除
-Account:	Mail		アカウント:
-Decoding:	Mail		文字コード:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		People データ形式をサポートするアプリケーションが見つかりませんでした。
 Delete	Mail		削除
 Don't send	Mail		送信しない

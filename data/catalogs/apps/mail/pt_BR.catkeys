@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-MAIL	233997769
+1	portuguese (brazil)	x-vnd.Be-MAIL	3209807243
 View	Mail		Visualizar
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Anexar Atributos:
@@ -117,8 +117,6 @@ User interface	Mail		Interface de usuário
 Cancel	Mail		Cancelar
 Send message	Mail		Enviar mensagem
 Remove enclosure	Mail		Remover compartimento
-Account:	Mail		Conta:
-Decoding:	Mail		Decodificação:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Desculpe, não foi possível encontrar um aplicativo que suporte o tipo de dados 'Pessoa'.
 Delete	Mail		Excluir
 Don't send	Mail		Não enviar

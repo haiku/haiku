@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-MAIL	233997769
+1	finnish	x-vnd.Be-MAIL	4285843074
 View	Mail		Näkymä
 %d - Date	Mail		%d - Päivämäärä
 Attach attributes:	Mail		Liittämisattribuutit:
@@ -117,8 +117,6 @@ User interface	Mail		Käyttöliittymä
 Cancel	Mail		Peru
 Send message	Mail		Lähetä viesti
 Remove enclosure	Mail		Poista liite
-Account:	Mail		Tili:
-Decoding:	Mail		Purkaminen:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		’Person’-tietotyyppiä tukevan sovelluksen löytäminen epäonnistui.
 Delete	Mail		Poista
 Don't send	Mail		Älä lähetä
@@ -146,6 +144,7 @@ Open attachment	Mail		Avaa liite
 sent	B_USER_DIRECTORY/mail/sent		lähetetty
 (Date unavailable)	Mail		(Päivämäärä ei ole saatavilla)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Laita suosikkisähköpostikyselysi ja kyselymallinteet tähän kansioon.
+Spam	Mail		Roskaposti
 Reply	Mail		Vastaa
 From:	Mail		Lähettäjä:
 Couldn't open this signature. Sorry.	Mail		Tämän allekirjoituksen avaus epäonnistui.

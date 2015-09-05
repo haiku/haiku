@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Screen	2339556848
+1	swedish	x-vnd.Haiku-Screen	4090394050
 yes	Screen		ja
 Use laptop panel:	Screen		Använd bärbar panel:
 15 bits/pixel, 32768 colors	Screen		15 bitar/pixel, 32768 färger
@@ -39,6 +39,7 @@ bits/pixel	Screen		bitar/pixel
 Refresh rate:	Screen		Uppdateringsfrekvens:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Vill du behålla inställningarna?
+Confirm changes	Screen		Bekräfta ändringar
 Rows:	Screen		Rader:
 vertically	Screen		vertikalt
 Resolution:	Screen		Upplösning:

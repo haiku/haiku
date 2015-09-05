@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-MAIL	1310033600
+1	polish	x-vnd.Be-MAIL	4285843074
 View	Mail		Widok
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Dołączaj atrybuty:
@@ -117,8 +117,6 @@ User interface	Mail		Interfejs użytkownika
 Cancel	Mail		Anuluj
 Send message	Mail		Wyślij wiadomość
 Remove enclosure	Mail		Usuń załącznik
-Account:	Mail		Konto:
-Decoding:	Mail		Dekodowanie:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Przepraszamy, nie można znaleźć aplikacji która obsługuje typ danych „Osoba”.
 Delete	Mail		Usuń
 Don't send	Mail		Nie wysyłaj

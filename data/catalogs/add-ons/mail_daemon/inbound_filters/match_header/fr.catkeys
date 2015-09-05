@@ -5,7 +5,7 @@ Move to	ConfigView		Déplacer vers
 Then	ConfigView		Alors
 this field is based on the action	ConfigView		ce champ est basé sur l’action
 Delete message	ConfigView		Supprimer le message
-value (use REGEX: in front of regular expressions like *spam*)	ConfigView		valeur (utilisez REGEX : devant les expressions régulières comme *spam*)
+value (use REGEX: in front of regular expressions like *spam*)	ConfigView		valeur (utilisez REGEX: devant les expressions régulières comme *spam*)
 <Choose account>	ConfigView		<Choisir un compte>
 Set flags to	ConfigView		Placez les drapeaux à
 Set as read	ConfigView		Marquer comme lu

@@ -1,6 +1,8 @@
-1	german	x-vnd.Haiku-Media	862832618
+1	german	x-vnd.Haiku-Media	3383826947
 Couldn't add volume control in Deskbar: %s\n	Media views		Die Lautstärkeregelung konnte nicht in der Deskbar installiert werden: %s\n
 Video input:	Media views		Video-Eingang:
+Warning!	Media Window		Achtung!
+Quit anyway	Media Window		Trotzdem beenden
 Defaults	Media views		Standardwerte
 MIDI Settings	Media Window		MIDI-Einstellungen
 Quit	Media Window		Beenden

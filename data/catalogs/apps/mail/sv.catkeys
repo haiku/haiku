@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-MAIL	233997769
+1	swedish	x-vnd.Be-MAIL	4285843074
 View	Mail		Visa
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Bifoga attribut:
@@ -117,8 +117,6 @@ User interface	Mail		Användargränssnitt
 Cancel	Mail		Avbryt
 Send message	Mail		Skicka meddelande
 Remove enclosure	Mail		Ta bort bilaga
-Account:	Mail		Konto:
-Decoding:	Mail		Avkodar:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Kunde inte hitta en applikation som supporterar 'Person' datatypen.
 Delete	Mail		Ta bort
 Don't send	Mail		Skicka inte
@@ -146,6 +144,7 @@ Open attachment	Mail		Öppna bilaga
 sent	B_USER_DIRECTORY/mail/sent		skickat
 (Date unavailable)	Mail		(Datum inte tillgänglig)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Lägg din e-post fråga och frågemall i denna folder.
+Spam	Mail		Skräppost
 Reply	Mail		Svara
 From:	Mail		Från:
 Couldn't open this signature. Sorry.	Mail		Kunde inte öppna denna signatur.

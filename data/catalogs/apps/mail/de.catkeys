@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-MAIL	1310033600
+1	german	x-vnd.Be-MAIL	4285843074
 View	Mail		Ansicht
 %d - Date	Mail		%d - Datum
 Attach attributes:	Mail		Attribute von Anhängen:
@@ -117,8 +117,6 @@ User interface	Mail		Programmoberfläche
 Cancel	Mail		Abbrechen
 Send message	Mail		Nachricht senden
 Remove enclosure	Mail		Anhang entfernen
-Account:	Mail		Konto:
-Decoding:	Mail		Kodierung:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Es konnte leider keine Anwendung gefunden werden, die den Datentyp 'Person' unterstützt.
 Delete	Mail		Löschen
 Don't send	Mail		Nicht senden

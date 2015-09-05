@@ -1,6 +1,8 @@
-1	french	x-vnd.Haiku-Media	862832618
+1	french	x-vnd.Haiku-Media	3383826947
 Couldn't add volume control in Deskbar: %s\n	Media views		Impossible d’insérer le contrôle du volume dans la Deskbar : %s\n
 Video input:	Media views		Entrée vidéo :
+Warning!	Media Window		Attention !
+Quit anyway	Media Window		Quitter quand même
 Defaults	Media views		Par défaut
 MIDI Settings	Media Window		Réglages MIDI
 Quit	Media Window		Quitter

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Screen	2339556848
+1	german	x-vnd.Haiku-Screen	4090394050
 yes	Screen		Ja
 Use laptop panel:	Screen		Laptop-Panel verwenden:
 15 bits/pixel, 32768 colors	Screen		15 Bits/Pixel, 32768 Farben
@@ -39,6 +39,7 @@ bits/pixel	Screen		Bits/Pixel
 Refresh rate:	Screen		Bildwiederholrate:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Sollen diese Einstellungen beibehalten werden?
+Confirm changes	Screen		Änderungen bestätigen
 Rows:	Screen		Zeilen:
 vertically	Screen		vertikal
 Resolution:	Screen		Auflösung:

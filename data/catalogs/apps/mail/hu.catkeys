@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-MAIL	1310033600
+1	hungarian	x-vnd.Be-MAIL	4285843074
 View	Mail		Nézet
 %d - Date	Mail		%d - dátum
 Attach attributes:	Mail		Jellemzők csatolása:
@@ -117,8 +117,6 @@ User interface	Mail		Felhasználói felület
 Cancel	Mail		Mégse
 Send message	Mail		Levél küldése
 Remove enclosure	Mail		Melléklet eltávolítása
-Account:	Mail		Felhasználói fiók:
-Decoding:	Mail		Kódolás:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Sajnálom, de nem található olyan program, ami támogatja a 'Névjegy' formátumot.
 Delete	Mail		Törlés
 Don't send	Mail		Ne küldje

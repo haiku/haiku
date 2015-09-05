@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-MAIL	2809023250
+1	romanian	x-vnd.Be-MAIL	1489865428
 View	Mail		Vizualizare
 %d - Date	Mail		%d - Dată
 Attach attributes:	Mail		Atașează atribute:
@@ -113,8 +113,6 @@ User interface	Mail		Interfață cu utilizatorul
 Cancel	Mail		Anulează
 Send message	Mail		Trimite mesaj
 Remove enclosure	Mail		Elimină contur
-Account:	Mail		Cont:
-Decoding:	Mail		Decodare:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Îmi pare rău, nu s-a putut găsi o aplicație care suportă tipul de date „Persoană”.
 Delete	Mail		Șterge
 Don't send	Mail		Nu trimite

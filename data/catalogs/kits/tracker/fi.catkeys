@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	4204393626
+1	finnish	x-vnd.Haiku-libtracker	2004221275
 OK	WidgetAttributeText		Valmis
 Add-ons	FilePanelPriv		Lisäosat
 Mount settings…	ContainerWindow		Liittämisasetukset...
@@ -19,6 +19,7 @@ Modified	QueryPoseView		Muokattu
 Created	ContainerWindow		Luotu
 Error %error loading add-On %name.	ContainerWindow		Virhe %error ladattaessa lisäosaa %name.
 If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jos kohdistat toiminnon ”%ifYouDoAction” asetuskansioon, ”%osName” ei ehkä toimi oikein!\n\nOletko varma, että haluat tehdä tämän?
+Skip all	FSUtils		Ohita kaikki
 contains	SelectionWindow		sisältää
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Et voi tallentaa asioita järjestelmäsi root-kansioon.
 Show shared volumes on Desktop	SettingsView		Näytä jaetut taltiot työpöydällä

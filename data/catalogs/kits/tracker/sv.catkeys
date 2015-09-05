@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	4204393626
+1	swedish	x-vnd.Haiku-libtracker	2004221275
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Tillägg
 Mount settings…	ContainerWindow		Monteringsinställningar...
@@ -19,6 +19,7 @@ Modified	QueryPoseView		Modifierad
 Created	ContainerWindow		Skapad
 Error %error loading add-On %name.	ContainerWindow		Fel %error vid laddning av Tillägg %name.
 If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Om du %ifYouDoAction inställnings foldern, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?
+Skip all	FSUtils		Hoppa över alla
 contains	SelectionWindow		innehåller
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Du kan inte spara i roten på filsystemet.
 Show shared volumes on Desktop	SettingsView		Visa delade volymer på Skrivbordet

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-MAIL	1310033600
+1	russian	x-vnd.Be-MAIL	4285843074
 View	Mail		Вид
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
@@ -117,8 +117,6 @@ User interface	Mail		Интерфейс пользователя
 Cancel	Mail		Отмена
 Send message	Mail		Послать сообщение
 Remove enclosure	Mail		Удалить вложения
-Account:	Mail		Аккаунт:
-Decoding:	Mail		Кодировка:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Извините, не удалось найти приложение поддерживающее тип файлов 'Персона'.
 Delete	Mail		Удалить
 Don't send	Mail		Не отправлять

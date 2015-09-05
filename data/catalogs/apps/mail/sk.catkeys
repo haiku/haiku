@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-MAIL	3366038826
+1	slovak	x-vnd.Be-MAIL	2046881004
 View	Mail		Zobraziť
 %d - Date	Mail		%d - Dátum
 Attach attributes:	Mail		Pripojiť atribúty:
@@ -116,8 +116,6 @@ User interface	Mail		Používateľské rozhranie
 Cancel	Mail		Zrušiť
 Send message	Mail		Poslať správu
 Remove enclosure	Mail		Odstrániť prílohu
-Account:	Mail		Účet:
-Decoding:	Mail		Dekódovanie:
 Sorry, could not find an application that supports the 'Person' data type.	Mail		Ľutujeme, nebola nájdená aplikácia podporujúca dátový typ „Osoba“.
 Delete	Mail		Zmazať
 Leave as '%s'	Mail		Ponechať ako „%s“

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-libtracker	4204393626
+1	polish	x-vnd.Haiku-libtracker	2004221275
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Wtyczki
 Mount settings…	ContainerWindow		Ustawienia montowania…
@@ -19,6 +19,7 @@ Modified	QueryPoseView		Zmodyfikowano
 Created	ContainerWindow		Utworzono
 Error %error loading add-On %name.	ContainerWindow		Błąd %error przy ładowaniu wtyczki %name.
 If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Jeśli wykonasz %ifYouDoAction na folderze ustawień, %osName może przestać działać poprawnie!\n\nNa pewno chcesz to zrobić?
+Skip all	FSUtils		Pomiń wszystkie
 contains	SelectionWindow		zawiera
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Przepraszamy, nie możesz zapisywać w katalogu głównym systemu.
 Show shared volumes on Desktop	SettingsView		Pokaż wspólne woluminy na Pulpicie
