@@ -558,6 +558,69 @@ AHCIPort::ScsiTestUnitReady(scsi_ccb* request)
 
 
 void
+AHCIPort::ScsiVPDInquiry(scsi_ccb* request, ata_device_infoblock* ataData)
+{
+	TRACE("AHCIPort::ScsiVPDInquiry port %d\n", fIndex);
+
+	const scsi_cmd_inquiry* cmd = (const scsi_cmd_inquiry*)request->cdb;
+
+	size_t vpdDataLength = 0;
+	status_t transactionResult = B_ERROR;
+
+	switch (cmd->page_code) {
+		case SCSI_PAGE_SUPPORTED_VPD:
+		{
+			scsi_page_list vpdPageData;
+			vpdDataLength = sizeof(vpdPageData);
+
+			vpdPageData.page_code = cmd->page_code;
+			// Our supported pages
+			vpdPageData.page_length = 1;
+			vpdPageData.pages[0] = SCSI_PAGE_BLOCK_LIMITS;
+
+			transactionResult = sg_memcpy(request->sg_list, request->sg_count,
+				&vpdPageData, vpdDataLength);
+			break;
+		}
+		case SCSI_PAGE_BLOCK_LIMITS:
+		{
+			scsi_page_block_limits vpdPageData;
+			vpdDataLength = sizeof(vpdPageData);
+
+			vpdPageData.page_code = cmd->page_code;
+			vpdPageData.max_unmap_lba_count
+				= ataData->max_data_set_management_lba_range_blocks;
+
+			transactionResult = sg_memcpy(request->sg_list, request->sg_count,
+				&vpdPageData, vpdDataLength);
+			break;
+		}
+		case SCSI_PAGE_USN:
+		case SCSI_PAGE_BLOCK_DEVICE_CHARS:
+		case SCSI_PAGE_LB_PROVISIONING:
+		case SCSI_PAGE_REFERRALS:
+			ERROR("VPD AHCI page %d not yet implemented!\n",
+				cmd->page_code);
+			//request->subsys_status = SCSI_REQ_CMP;
+			request->subsys_status = SCSI_REQ_ABORTED;
+			return;
+		default:
+			ERROR("unknown VPD page code!\n");
+			request->subsys_status = SCSI_REQ_ABORTED;
+			return;
+	}
+
+	if (transactionResult < B_OK) {
+		request->subsys_status = SCSI_DATA_RUN_ERR;
+	} else {
+		request->subsys_status = SCSI_REQ_CMP;
+		request->data_resid = request->data_length
+			- vpdDataLength;
+	}
+}
+
+
+void
 AHCIPort::ScsiInquiry(scsi_ccb* request)
 {
 	TRACE("AHCIPort::ScsiInquiry port %d\n", fIndex);
@@ -568,11 +631,17 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 
 	ASSERT(sizeof(ataData) == 512);
 
-	if (cmd->evpd)
-		TRACE("VPD inquiry page %d\n", cmd->page_code);
-	else if (cmd->page_code) {
+	if (cmd->evpd) {
+		TRACE("VPD inquiry page 0x%X\n", cmd->page_code);
+		if (!request->data || request->data_length == 0) {
+			ERROR("invalid VPD request\n");
+			request->subsys_status = SCSI_REQ_ABORTED;
+			gSCSI->finished(request, 1);
+			return;
+		}
+	} else if (cmd->page_code) {
 		// page_code without evpd is invalid per SCSI spec
-		ERROR("page code %d on non-VPD request\n", cmd->page_code);
+		ERROR("page code 0x%X on non-VPD request\n", cmd->page_code);
 		request->subsys_status = SCSI_REQ_ABORTED;
 		request->device_status = SCSI_STATUS_CHECK_CONDITION;
 		// TODO: Sense ILLEGAL REQUEST + INVALID FIELD IN CDB?
@@ -595,6 +664,13 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 	if ((sreq.CompletionStatus() & ATA_ERR) != 0) {
 		ERROR("identify device failed\n");
 		request->subsys_status = SCSI_REQ_CMP_ERR;
+		gSCSI->finished(request, 1);
+		return;
+	}
+
+	if (cmd->evpd) {
+		// Simulate SCSI VPD data.
+		ScsiVPDInquiry(request, &ataData);
 		gSCSI->finished(request, 1);
 		return;
 	}
@@ -648,31 +724,6 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 					? (ataData.supports_read_zero_after_trim
 						? ", zero" : ", random") : "");
 		}
-	}
-
-	if (cmd->evpd) {
-		switch (cmd->page_code) {
-			case SCSI_PAGE_SUPPORTED_VPD:
-			case SCSI_PAGE_USN:
-			case SCSI_PAGE_BLOCK_LIMITS:
-				//max_unmap_lba_count
-				//	= ataData.max_data_set_management_lba_range_blocks;
-				//max_unmap_blk_count = 
-				//	= ataData.max_data_set_management_lba_range_blocks;
-			case SCSI_PAGE_BLOCK_DEVICE_CHARS:
-			case SCSI_PAGE_LB_PROVISIONING:
-			case SCSI_PAGE_REFERRALS:
-				ERROR("VPD AHCI page %d not yet implemented!\n",
-					cmd->page_code);
-				//request->subsys_status = SCSI_REQ_CMP;
-				request->subsys_status = SCSI_REQ_ABORTED;
-				gSCSI->finished(request, 1);
-				return;
-		}
-		ERROR("unknown VPD page code!\n");
-		request->subsys_status = SCSI_REQ_ABORTED;
-		gSCSI->finished(request, 1);
-		return;
 	}
 
 #if 0

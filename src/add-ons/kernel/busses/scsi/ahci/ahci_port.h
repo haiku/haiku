@@ -5,7 +5,11 @@
 #ifndef _AHCI_PORT_H
 #define _AHCI_PORT_H
 
+
+#include <ATAInfoBlock.h>
+
 #include "ahci_defs.h"
+
 
 class AHCIController;
 class sata_request;
@@ -32,6 +36,8 @@ public:
 private:
 	void		ScsiTestUnitReady(scsi_ccb *request);
 	void		ScsiInquiry(scsi_ccb *request);
+	void		ScsiVPDInquiry(scsi_ccb* request, ata_device_infoblock* ataData);
+
 	void		ScsiReadCapacity(scsi_ccb *request);
 	void		ScsiReadCapacity16(scsi_ccb *request);
 	void		ScsiReadWrite(scsi_ccb *request, uint64 lba, size_t sectorCount, bool isWrite);
