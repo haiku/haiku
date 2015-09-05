@@ -14,6 +14,7 @@
 #include <stdio.h>
 #include <stack>
 
+#include "AlphaMask.h"
 #include "DrawingEngine.h"
 #include "DrawState.h"
 #include "FontManager.h"
@@ -466,11 +467,23 @@ set_clipping_rects(void* _context, size_t numRects, const BRect rects[])
 
 
 static void
-clip_to_picture(void* context, const BPicture& picture, const BPoint& pt,
+clip_to_picture(void* _context, int32 pictureToken, const BPoint& where,
 	bool clipToInverse)
 {
-	printf("ClipToPicture(picture, BPoint(%.2f, %.2f), %s)\n",
-		pt.x, pt.y, clipToInverse ? "inverse" : "");
+	DrawingContext* context = reinterpret_cast<DrawingContext *>(_context);
+
+	ServerPicture* picture = context->GetPicture(pictureToken);
+	if (picture == NULL)
+		return;
+
+	AlphaMask* mask = new(std::nothrow) AlphaMask(
+		picture, clipToInverse, where, *context->CurrentState());
+	context->SetAlphaMask(mask);
+	context->UpdateCurrentDrawingRegion();
+	if (mask != NULL)
+		mask->ReleaseReference();
+
+	picture->ReleaseReference();
 }
 
 

@@ -198,6 +198,25 @@ PictureDataWriter::WriteSetPattern(const ::pattern& pattern)
 
 
 status_t
+PictureDataWriter::WriteClipToPicture(int32 pictureToken,
+						const BPoint& origin, bool inverse)
+{
+	// TODO: I don't know if it's compatible with R5's BPicture version
+	try {
+		BeginOp(B_PIC_CLIP_TO_PICTURE);
+		Write<int32>(pictureToken);
+		Write<BPoint>(origin);
+		Write<bool>(inverse);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
 PictureDataWriter::WriteSetClipping(const BRegion& region)
 {
 	// TODO: I don't know if it's compatible with R5's BPicture version

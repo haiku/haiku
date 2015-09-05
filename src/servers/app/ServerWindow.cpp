@@ -3346,6 +3346,30 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_VIEW_CLIP_TO_PICTURE:
+		{
+			int32 pictureToken;
+			BPoint where;
+			bool inverse = false;
+
+			link.Read<int32>(&pictureToken);
+			if (pictureToken < 0)
+				break;
+
+			link.Read<BPoint>(&where);
+			if (link.Read<bool>(&inverse) != B_OK)
+				break;
+
+			ServerPicture* picture = fServerApp->GetPicture(pictureToken);
+			if (picture == NULL)
+				break;
+
+			picture->WriteClipToPicture(picture->Token(), where, inverse);
+
+			picture->ReleaseReference();
+			break;
+		}
+
 		case AS_VIEW_BEGIN_PICTURE:
 		{
 			ServerPicture* newPicture = App()->CreatePicture();

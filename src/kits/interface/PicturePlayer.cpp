@@ -215,9 +215,12 @@ set_clipping_rects(void* _context, size_t numRects, const BRect _rects[])
 
 
 static void
-clip_to_picture(void* context, const BPicture& picture, const BPoint& origin,
+clip_to_picture(void* _context, int32 token, const BPoint& origin,
 	bool clipToInverse)
 {
+	adapter_context* context = reinterpret_cast<adapter_context*>(_context);
+	((void (*)(void*, int32, BPoint, bool))context->function_table[21])(
+			context->user_data, token, origin, clipToInverse);
 }
 
 
@@ -930,7 +933,14 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 
 			case B_PIC_CLIP_TO_PICTURE:
 			{
-				// TODO: Implement
+				const int32* token;
+				const BPoint* where;
+				const bool* inverse;
+				if (callbacks.clip_to_picture == NULL || !reader.Get(token)
+					|| !reader.Get(where) || !reader.Get(inverse))
+					break;
+
+				callbacks.clip_to_picture(userData, *token, *where, *inverse);
 				break;
 			}
 

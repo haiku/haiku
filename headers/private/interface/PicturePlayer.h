@@ -51,7 +51,7 @@ struct picture_player_callbacks {
 	void (*draw_picture)(void* userData, const BPoint& where, int32 token);
 	void (*set_clipping_rects)(void* userData, size_t numRects,
 		const BRect rects[]);
-	void (*clip_to_picture)(void* userData, const BPicture& picture,
+	void (*clip_to_picture)(void* userData, int32 token,
 		const BPoint& where, bool clipToInverse);
 	void (*push_state)(void* userData);
 	void (*pop_state)(void* userData);

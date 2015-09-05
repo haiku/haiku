@@ -40,6 +40,8 @@ public:
 			status_t			WriteSetScale(const float& scale);
 			status_t			WriteSetTransform(BAffineTransform transform);
 			status_t			WriteSetPattern(const ::pattern& pattern);
+			status_t			WriteClipToPicture(int32 pictureToken,
+									const BPoint& origin, bool inverse);
 			status_t			WriteSetClipping(const BRegion& region);
 			status_t			WriteClearClipping();
 
