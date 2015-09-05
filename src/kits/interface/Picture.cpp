@@ -184,7 +184,7 @@ BPicture::BPicture(BMessage* data)
 		// TODO: For now. We'll see if it's worth to support old style data
 		debugger("old style BPicture data is not supported");
 	} else if (version == 1) {
-		fExtent->ImportData(data, size);
+		fExtent->ImportData(pictureData, size);
 
 //		swap_data(fExtent->fNewData, fExtent->fNewSize);
 
