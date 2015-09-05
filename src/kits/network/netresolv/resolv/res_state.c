@@ -133,16 +133,18 @@ __res_put_state(res_state res)
 	pthread_mutex_unlock(&res_mtx);
 }
 
+
 /*
- * This is aliased via a macro to _res; don't allow multi-threaded programs
- * to use it.
+ * This is aliased via a macro to _res.
+ * This function is not thread safe.
  */
 res_state
 __res_state(void)
 {
-	static const char res[] = "_res is not supported for multi-threaded"
-	    " programs.\n";
-	(void)write(STDERR_FILENO, res, sizeof(res) - 1);
-	abort();
-	return NULL;
+	if ((_nres.options & RES_INIT) == 0 && res_ninit(&_nres) == -1) {
+		h_errno = NETDB_INTERNAL;
+		return NULL;
+	}
+
+	return &_nres;
 }
