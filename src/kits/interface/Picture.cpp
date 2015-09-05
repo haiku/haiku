@@ -66,11 +66,11 @@ struct _BPictureExtent_ {
 							~_BPictureExtent_();
 
 			const void*		Data() const { return fNewData; }
-			status_t 		ImportData(const void* data,
+			status_t		ImportData(const void* data,
 								const int32& size);
 
 			status_t		Flatten(BDataIO* stream);
-			status_t 		Unflatten(BDataIO* stream);
+			status_t		Unflatten(BDataIO* stream);
 
 			int32			Size() const { return fNewSize; }
 			status_t		SetSize(const int32& size);

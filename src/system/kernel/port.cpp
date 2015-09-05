@@ -117,7 +117,7 @@ struct Port : public KernelReferenceable {
 	team_id				owner;
 	Port*				name_hash_link;
 	size_t				name_hash;
-	int32		 		capacity;
+	int32				capacity;
 	mutex				lock;
 	int32				state;
 	uint32				read_count;

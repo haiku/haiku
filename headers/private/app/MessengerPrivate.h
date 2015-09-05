@@ -18,7 +18,7 @@ class BMessenger::Private {
 		port_id	Port()
 			{ return fMessenger->fPort; }
 		int32 Token()
-			 { return fMessenger->fHandlerToken; }
+			{ return fMessenger->fHandlerToken; }
 		team_id	Team()
 			{ return fMessenger->fTeam; }
 		bool IsPreferredTarget()

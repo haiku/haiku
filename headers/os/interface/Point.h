@@ -20,13 +20,13 @@ public:
 								BPoint();
 								BPoint(float x, float y);
 								BPoint(const BPoint& p);
-		
+
 			BPoint&				operator=(const BPoint& other);
 			void				Set(float x, float y);
 
 			void				ConstrainTo(BRect rect);
 			void				PrintToStream() const;
-			
+
 			BPoint				operator-() const;
 			BPoint				operator+(const BPoint& other) const;
 			BPoint				operator-(const BPoint& other) const;

@@ -14,30 +14,30 @@ class BHttpHeader {
 public:
 								BHttpHeader();
 								BHttpHeader(const char* string);
-								BHttpHeader(const char* name, 
+								BHttpHeader(const char* name,
 									const char* value);
 								BHttpHeader(const BHttpHeader& copy);
-	
+
 	// Header data modification
 			void				SetName(const char* name);
 			void				SetValue(const char* value);
 			bool				SetHeader(const char* string);
-	
+
 	// Header data access
 			const char*			Name() const;
-			const char* 		Value() const;
-			const char* 		Header() const;
-			
+			const char*			Value() const;
+			const char*			Header() const;
+
 	// Header data test
 			bool				NameIs(const char* name) const;
-			
+
 	// Overloaded members
 			BHttpHeader&		operator=(const BHttpHeader& other);
 
 private:
 			BString				fName;
 			BString				fValue;
-			
+
 	mutable	BString				fRawHeader;
 	mutable	bool				fRawHeaderValid;
 };
@@ -48,27 +48,27 @@ public:
 								BHttpHeaders();
 								BHttpHeaders(const BHttpHeaders& copy);
 								~BHttpHeaders();
-					
+
 	// Header list access
 			const char*			HeaderValue(const char* name) const;
 			BHttpHeader&		HeaderAt(int32 index) const;
-			
+
 	// Header count
 			int32				CountHeaders() const;
-			
+
 	// Header list tests
 			int32				HasHeader(const char* name) const;
-					
+
 	// Header add or replacement
 			bool				AddHeader(const char* line);
-			bool				AddHeader(const char* name, 
+			bool				AddHeader(const char* name,
 									const char* value);
 			bool				AddHeader(const char* name,
 									int32 value);
-			
+
 	// Header deletion
-			void 				Clear();
-			
+			void				Clear();
+
 	// Overloaded operators
 			BHttpHeaders&		operator=(const BHttpHeaders& other);
 			BHttpHeader&		operator[](int32 index) const;
@@ -77,7 +77,7 @@ public:
 private:
 			void				_EraseData();
 			bool				_AddOrDeleteHeader(BHttpHeader* header);
-			
+
 private:
 			BList				fHeaderList;
 };
