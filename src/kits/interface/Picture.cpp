@@ -62,27 +62,26 @@ BPicture::Private::ReconnectToAppServer()
 
 
 struct _BPictureExtent_ {
-							_BPictureExtent_(const int32& size = 0);
+							_BPictureExtent_(int32 size = 0);
 							~_BPictureExtent_();
 
 			const void*		Data() const { return fNewData; }
-			status_t		ImportData(const void* data,
-								const int32& size);
+			status_t		ImportData(const void* data, int32 size);
 
 			status_t		Flatten(BDataIO* stream);
 			status_t		Unflatten(BDataIO* stream);
 
 			int32			Size() const { return fNewSize; }
-			status_t		SetSize(const int32& size);
+			status_t		SetSize(int32 size);
 
 			bool			AddPicture(BPicture* picture)
 								{ return fPictures.AddItem(picture); }
-			void			DeletePicture(const int32& index)
+			void			DeletePicture(int32 index)
 								{ delete static_cast<BPicture*>
 									(fPictures.RemoveItem(index)); }
 
 			BList*			Pictures() { return &fPictures; }
-			BPicture*		PictureAt(const int32& index)
+			BPicture*		PictureAt(int32 index)
 								{ return static_cast<BPicture*>
 									(fPictures.ItemAt(index)); }
 
@@ -166,11 +165,9 @@ BPicture::BPicture(BMessage* data)
 		endian = 0;
 
 	const void* pictureData;
-	int32 size;
-	if (data->FindData("_data", B_RAW_TYPE, &pictureData, (ssize_t*)&size)
-			!= B_OK) {
+	ssize_t size;
+	if (data->FindData("_data", B_RAW_TYPE, &pictureData, &size) != B_OK)
 		return;
-	}
 
 	// Load sub pictures
 	BMessage pictureMessage;
@@ -549,7 +546,7 @@ BPicture::operator=(const BPicture&)
 
 
 // _BPictureExtent_
-_BPictureExtent_::_BPictureExtent_(const int32& size)
+_BPictureExtent_::_BPictureExtent_(int32 size)
 	:
 	fNewData(NULL),
 	fNewSize(0)
@@ -567,7 +564,7 @@ _BPictureExtent_::~_BPictureExtent_()
 
 
 status_t
-_BPictureExtent_::ImportData(const void* data, const int32& size)
+_BPictureExtent_::ImportData(const void* data, int32 size)
 {
 	if (data == NULL)
 		return B_BAD_VALUE;
@@ -669,7 +666,7 @@ _BPictureExtent_::Flatten(BDataIO* stream)
 
 
 status_t
-_BPictureExtent_::SetSize(const int32& size)
+_BPictureExtent_::SetSize(int32 size)
 {
 	if (size < 0)
 		return B_BAD_VALUE;
