@@ -5,8 +5,10 @@
 #ifndef __ATA_TYPES_H__
 #define __ATA_TYPES_H__
 
+
 #include <iovec.h>
 #include <lendian_bitfield.h>
+
 
 // ATA task file.
 // contains the command block interpreted under different conditions with
@@ -22,7 +24,7 @@ union ata_task_file {
 		uint8	sector_number;
 		uint8	cylinder_0_7;
 		uint8	cylinder_8_15;
-		LBITFIELD8_3(
+		B_LBITFIELD8_3(
 			head				: 4,
 			device				: 1,
 			mode				: 3
@@ -35,7 +37,7 @@ union ata_task_file {
 		uint8	lba_0_7;
 		uint8	lba_8_15;
 		uint8	lba_16_23;
-		LBITFIELD8_3(
+		B_LBITFIELD8_3(
 			lba_24_27			: 4,
 			device				: 1,
 			mode				: 3
@@ -43,19 +45,19 @@ union ata_task_file {
 		uint8	command;
 	} lba;
 	struct {
-		LBITFIELD8_3(
+		B_LBITFIELD8_3(
 			dma					: 1,
 			ovl					: 1,
 			_0_res2				: 6
 		);
-		LBITFIELD8_2(
+		B_LBITFIELD8_2(
 			_1_res0				: 3,
 			tag					: 5
 		);
 		uint8	_2_res;
 		uint8	byte_count_0_7;
 		uint8	byte_count_8_15;
-		LBITFIELD8_6(
+		B_LBITFIELD8_6(
 			lun					: 3,
 			_5_res3				: 1,
 			device				: 1,
@@ -66,14 +68,14 @@ union ata_task_file {
 		uint8	command;
 	} packet;
 	struct {
-		LBITFIELD8_5(
+		B_LBITFIELD8_5(
 			ili					: 1,
 			eom					: 1,
 			abrt				: 1,
 			_0_res3				: 1,
 			sense_key			: 4
 		);
-		LBITFIELD8_4(
+		B_LBITFIELD8_4(
 			cmd_or_data			: 1,	// 1 - cmd, 0 - data
 			input_or_output	 	: 1,	// 0 - input (to device), 1 - output
 			release				: 1,
@@ -82,14 +84,14 @@ union ata_task_file {
 		uint8	_2_res;
 		uint8	byte_count_0_7;
 		uint8	byte_count_8_15;
-		LBITFIELD8_5(
+		B_LBITFIELD8_5(
 			_4_res0				: 4,
 			device				: 1,
 			_4_obs5				: 1,
 			_4_res6				: 1,
 			_4_obs7				: 1
 		);
-		LBITFIELD8_7(
+		B_LBITFIELD8_7(
 			chk					: 1,
 			_7_res1 			: 2,
 			drq					: 1,
@@ -101,7 +103,7 @@ union ata_task_file {
 	} packet_res;
 	struct {
 		uint8	sector_count;
-		LBITFIELD8_4(					// only <tag> is defined for write
+		B_LBITFIELD8_4(					// only <tag> is defined for write
 			cmd_or_data			: 1,	// 1 - cmd, 0 - data
 			input_or_output		: 1,	// 0 - input (to device), 1 - output
 			release				: 1,
@@ -110,7 +112,7 @@ union ata_task_file {
 		uint8	lba_0_7;
 		uint8	lba_8_15;
 		uint8	lba_16_23;
-		LBITFIELD8_3(
+		B_LBITFIELD8_3(
 			lba_24_27			: 4,
 			device				: 1,
 			mode				: 3
@@ -124,7 +126,7 @@ union ata_task_file {
 		uint8	lba_0_7;
 		uint8	lba_8_15;
 		uint8	lba_16_23;
-		LBITFIELD8_3(
+		B_LBITFIELD8_3(
 			_5low_res0			: 4,
 			device				: 1,
 			mode				: 3
@@ -141,7 +143,7 @@ union ata_task_file {
 	struct {
 		// low order bytes
 		uint8	sector_count_0_7;
-		LBITFIELD8_4(
+		B_LBITFIELD8_4(
 			cmd_or_data			: 1,	// 1 - cmd, 0 - data
 			input_or_output	 	: 1,	// 0 - input (to device), 1 - output
 			release				: 1,
@@ -150,7 +152,7 @@ union ata_task_file {
 		uint8	lba_0_7;
 		uint8	lba_8_15;
 		uint8	lba_16_23;
-		LBITFIELD8_3(
+		B_LBITFIELD8_3(
 			_5low_res0			: 4,
 			device				: 1,
 			mode				: 3
@@ -212,14 +214,14 @@ enum {
 
 	// packet
 	ATA_MASK_BYTE_COUNT					= 0x18,
-	
+
 	// packet and dma queued result
 	ATA_MASK_ERROR						= 0x01,
 	ATA_MASK_INTERRUPT_REASON			= 0x02,
 
 	ATA_MASK_DEVICE_HEAD				= 0x20,
 	ATA_MASK_COMMAND					= 0x40,
-	
+
 	ATA_MASK_STATUS						= 0x40,
 
 	// for 48 bits, the following flags tell which registers to load twice
@@ -228,7 +230,7 @@ enum {
 	ATA_MASK_LBA_LOW_48					= 0x200 | ATA_MASK_LBA_LOW,
 	ATA_MASK_LBA_MID_48					= 0x400 | ATA_MASK_LBA_MID,
 	ATA_MASK_LBA_HIGH_48				= 0x800 | ATA_MASK_LBA_HIGH,
-	
+
 	ATA_MASK_HOB						= 0xf80
 };
 
