@@ -56,7 +56,7 @@ public:
 			// NOTE: Another option would be to use
 			// ItemType::operator=(const ItemType& other), but then
 			// we would need to be carefull which objects are already
-			// initialized. Also the ItemType requires to implement the
+			// initialized. Also ItemType would be required to implement the
 			// operator, while doing it this way requires only a copy
 			// constructor.
 			_Resize(0);
