@@ -91,6 +91,16 @@ public:
 									const UndoableEditListenerRef& listener);
 
 private:
+			status_t			_Insert(int32 textOffset, const BString& text,
+									const CharacterStyle& characterStyle,
+									const ParagraphStyle& paragraphStyle,
+									int32& firstParagraph,
+									int32& paragraphCount);
+			status_t			_Remove(int32 textOffset, int32 length,
+									int32& firstParagraph,
+									int32& paragraphCount);
+
+private:
 			void				_NotifyTextChanging(
 									TextChangingEvent& event) const;
 			void				_NotifyTextChanged(
