@@ -61,6 +61,8 @@ public:
 
 	virtual	status_t			Insert(int32 offset, const BString& string);
 	virtual	status_t			Remove(int32 offset, int32 length);
+	virtual	status_t			Replace(int32 offset, int32 length,
+									const BString& string);
 
 			void				LineUp(bool select);
 			void				LineDown(bool select);
