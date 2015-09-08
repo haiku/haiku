@@ -170,7 +170,7 @@ public:
 			void				CenterIn(const BRect& rect);
 			void				CenterOnScreen();
 			void				CenterOnScreen(screen_id id);
-			void				MoveOnScreen();
+			void				MoveOnScreen(bool resize = false);
 
 	virtual	void				Show();
 	virtual	void				Hide();

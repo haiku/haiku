@@ -3,6 +3,7 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
 #include "App.h"
 
 #include <stdio.h>
@@ -14,6 +15,7 @@
 #include <package/PackageInfo.h>
 #include <Path.h>
 #include <Roster.h>
+#include <Screen.h>
 #include <String.h>
 
 #include "support.h"
@@ -73,7 +75,7 @@ App::ReadyToRun()
 	BMessage settings;
 	_LoadSettings(settings);
 
-	fMainWindow = new MainWindow(_GetNextWindowFrame(false), settings);
+	fMainWindow = new MainWindow(settings);
 	_ShowWindow(fMainWindow);
 }
 
@@ -175,8 +177,7 @@ App::_Open(const BEntry& entry)
 	BMessage settings;
 	_LoadSettings(settings);
 
-	MainWindow* window = new MainWindow(_GetNextWindowFrame(true), settings,
-		package);
+	MainWindow* window = new MainWindow(settings, package);
 	_ShowWindow(window);
 }
 
@@ -226,31 +227,6 @@ App::_StoreSettings(const BMessage& settings)
 	}
 
 	save_settings(&fSettings, "main_settings", "HaikuDepot");
-}
-
-
-BRect
-App::_GetNextWindowFrame(bool singlePackageMode)
-{
-	BRect frame;
-	const char* frameName;
-	if (singlePackageMode) {
-		frame = BRect(50.0, 50.0, 649.0, 349.0);
-		frameName = "small window frame";
-	}
-	else {
-		frame = BRect(50.0, 50.0, 749.0, 549.0);
-		frameName = "window frame";
-	}
-	BMessage settings;
-	if (_LoadSettings(settings)) {
-		BRect windowFrame;
-		if (settings.FindRect(frameName, &windowFrame) == B_OK)
-			frame = windowFrame;
-	}
-
-	make_sure_frame_is_on_screen(frame);
-	return frame;
 }
 
 

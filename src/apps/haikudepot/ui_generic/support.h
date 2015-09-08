@@ -21,9 +21,6 @@ status_t load_settings(BMessage* message, const char* fileName,
 status_t save_settings(const BMessage* message, const char* fileName,
 	const char* folder = NULL);
 
-bool make_sure_frame_is_on_screen(BRect& frame, float borderWidth = 5.0f,
-	float tabHeight = 20.0f, BWindow* window = NULL);
-
 status_t get_app_resources(BResources& resources);
 
 void set_small_font(BView* view);

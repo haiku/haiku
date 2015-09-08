@@ -30,7 +30,6 @@ private:
 
 			bool				_LoadSettings(BMessage& settings);
 			void				_StoreSettings(const BMessage& windowSettings);
-			BRect				_GetNextWindowFrame(bool singlePackageMode);
 
 			void				_CheckPackageDaemonRuns();
 			bool				_LaunchPackageDaemon();

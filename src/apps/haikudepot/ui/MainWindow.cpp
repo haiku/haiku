@@ -1,9 +1,11 @@
 /*
+ * Copyright 2015, Axel Dörfler, <axeld@pinc-software.de>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
+
 
 #include "MainWindow.h"
 
@@ -21,6 +23,7 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Messenger.h>
+#include <Screen.h>
 #include <ScrollView.h>
 #include <StringList.h>
 #include <StringView.h>
@@ -113,9 +116,9 @@ private:
 };
 
 
-MainWindow::MainWindow(BRect frame, const BMessage& settings)
+MainWindow::MainWindow(const BMessage& settings)
 	:
-	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
+	BWindow(BRect(50, 50, 650, 550), B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fScreenshotWindow(NULL),
@@ -201,16 +204,13 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 	if (settings.FindBool("show source packages", &showOption) == B_OK)
 		fModel.SetShowSourcePackages(showOption);
 
-	BString username;
-	if (settings.FindString("username", &username) == B_OK
-		&& username.Length() > 0) {
-		fModel.SetUsername(username);
-	}
-
 	if (fModel.ShowFeaturedPackages())
 		fListLayout->SetVisibleItem((int32)0);
 	else
 		fListLayout->SetVisibleItem(1);
+
+	_RestoreUserName(settings);
+	_RestoreWindowFrame(settings);
 
 	// start worker threads
 	BPackageRoster().StartWatching(this,
@@ -222,10 +222,9 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings)
 }
 
 
-MainWindow::MainWindow(BRect frame, const BMessage& settings,
-	const PackageInfoRef& package)
+MainWindow::MainWindow(const BMessage& settings, const PackageInfoRef& package)
 	:
-	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
+	BWindow(BRect(50, 50, 650, 350), B_TRANSLATE_SYSTEM_NAME("HaikuDepot"),
 		B_DOCUMENT_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS),
 	fScreenshotWindow(NULL),
@@ -249,11 +248,8 @@ MainWindow::MainWindow(BRect frame, const BMessage& settings,
 	fModel.AddListener(fModelListener);
 
 	// Restore settings
-	BString username;
-	if (settings.FindString("username", &username) == B_OK
-		&& username.Length() > 0) {
-		fModel.SetUsername(username);
-	}
+	_RestoreUserName(settings);
+	_RestoreWindowFrame(settings);
 
 	fPackageInfoView->SetPackage(package);
 
@@ -507,9 +503,8 @@ MainWindow::MessageReceived(BMessage* message)
 void
 MainWindow::StoreSettings(BMessage& settings) const
 {
-	if (fSinglePackageMode)
-		settings.AddRect("small window frame", Frame());
-	else {
+	settings.AddRect(_WindowFrameName(), Frame());
+	if (!fSinglePackageMode) {
 		settings.AddRect("window frame", Frame());
 
 		BMessage columnSettings;
@@ -625,6 +620,60 @@ MainWindow::_BuildUserMenu(BMenuBar* menuBar)
 	fUserMenu->AddItem(fLogOutItem);
 
 	menuBar->AddItem(fUserMenu);
+}
+
+
+void
+MainWindow::_RestoreUserName(const BMessage& settings)
+{
+	BString username;
+	if (settings.FindString("username", &username) == B_OK
+		&& username.Length() > 0) {
+		fModel.SetUsername(username);
+	}
+}
+
+
+const char*
+MainWindow::_WindowFrameName() const
+{
+	if (fSinglePackageMode)
+		return "small window frame";
+
+	return "window frame";
+}
+
+
+void
+MainWindow::_RestoreWindowFrame(const BMessage& settings)
+{
+	BRect frame = Frame();
+
+	BRect windowFrame;
+	bool fromSettings = false;
+	if (settings.FindRect(_WindowFrameName(), &windowFrame) == B_OK) {
+		frame = windowFrame;
+		fromSettings = true;
+	} else if (!fSinglePackageMode) {
+		// Resize to occupy a certain screen size
+		BRect screenFrame = BScreen(this).Frame();
+		float width = frame.Width();
+		float height = frame.Height();
+		if (width < screenFrame.Width() * .666f
+			&& height < screenFrame.Height() * .666f) {
+			frame.bottom = frame.top + screenFrame.Height() * .666f;
+			frame.right = frame.left
+				+ std::min(screenFrame.Width() * .666f, height * 7 / 5);
+		}
+	}
+
+	MoveTo(frame.LeftTop());
+	ResizeTo(frame.Width(), frame.Height());
+
+	if (fromSettings)
+		MoveOnScreen(true);
+	else
+		CenterOnScreen();
 }
 
 

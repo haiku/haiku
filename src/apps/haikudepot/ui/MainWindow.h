@@ -35,10 +35,8 @@ enum {
 class MainWindow : public BWindow, private PackageInfoListener,
 	private PackageActionHandler {
 public:
-								MainWindow(BRect frame,
-									const BMessage& settings);
-								MainWindow(BRect frame,
-									const BMessage& settings,
+								MainWindow(const BMessage& settings);
+								MainWindow(const BMessage& settings,
 									const PackageInfoRef& package);
 	virtual						~MainWindow();
 
@@ -62,6 +60,10 @@ private:
 private:
 			void				_BuildMenu(BMenuBar* menuBar);
 			void				_BuildUserMenu(BMenuBar* menuBar);
+
+			void				_RestoreUserName(const BMessage& settings);
+			const char*			_WindowFrameName() const;
+			void				_RestoreWindowFrame(const BMessage& settings);
 
 			void				_InitWorkerThreads();
 			void				_AdoptModel();
