@@ -1,4 +1,5 @@
 /*
+ * Copyright 2015, Axel Dörfler, <axeld@pinc-software.de>.
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, <rene@gollent.com>.
  * All rights reserved. Distributed under the terms of the MIT License.
@@ -11,6 +12,7 @@
 
 #include <Autolock.h>
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <MessageFormat.h>
 #include <ScrollBar.h>
 #include <StringForSize.h>
@@ -708,18 +710,24 @@ PackageListView::PackageListView(BLocker* modelLock)
 	fModelLock(modelLock),
 	fPackageListener(new(std::nothrow) PackageListener(this))
 {
-	AddColumn(new PackageColumn(B_TRANSLATE("Name"), 150, 50, 300,
-		B_TRUNCATE_MIDDLE), kTitleColumn);
-	AddColumn(new PackageColumn(B_TRANSLATE("Rating"), 80, 50, 100,
-		B_TRUNCATE_MIDDLE), kRatingColumn);
-	AddColumn(new PackageColumn(B_TRANSLATE("Description"), 300, 80, 1000,
+	float scale = be_plain_font->Size() / 12.f;
+	float spacing = be_control_look->DefaultItemSpacing() * 2;
+
+	AddColumn(new PackageColumn(B_TRANSLATE("Name"), 150 * scale, 50 * scale,
+		300 * scale, B_TRUNCATE_MIDDLE), kTitleColumn);
+	AddColumn(new PackageColumn(B_TRANSLATE("Rating"), 80 * scale, 50 * scale,
+		100 * scale, B_TRUNCATE_MIDDLE), kRatingColumn);
+	AddColumn(new PackageColumn(B_TRANSLATE("Description"), 300 * scale,
+		80 * scale, 1000 * scale,
 		B_TRUNCATE_MIDDLE), kDescriptionColumn);
 	PackageColumn* sizeColumn = new PackageColumn(B_TRANSLATE("Size"),
-		60, 50, 100, B_TRUNCATE_END);
+		spacing + StringWidth(B_TRANSLATE("9999.99 KiB")), 50 * scale,
+		140 * scale, B_TRUNCATE_END);
 	sizeColumn->SetAlignment(B_ALIGN_RIGHT);
 	AddColumn(sizeColumn, kSizeColumn);
-	AddColumn(new PackageColumn(B_TRANSLATE("Status"), 60, 60, 100,
-		B_TRUNCATE_END), kStatusColumn);
+	AddColumn(new PackageColumn(B_TRANSLATE("Status"),
+		spacing + StringWidth(B_TRANSLATE("Available")), 60 * scale,
+		140 * scale, B_TRUNCATE_END), kStatusColumn);
 
 	fItemCountView = new ItemCountView();
 	AddStatusView(fItemCountView);
