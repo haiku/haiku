@@ -33,7 +33,7 @@ static const uint32 kMsgProbeDevice = 'prFl';
 
 OpenWindow::OpenWindow()
 	:
-	BWindow(BRect(0, 0, 35, 10), B_TRANSLATE_SYSTEM_NAME("DiskProbe"),
+	BWindow(BRect(0, 0, 350, 10), B_TRANSLATE_SYSTEM_NAME("DiskProbe"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
@@ -56,18 +56,14 @@ OpenWindow::OpenWindow()
 	BButton *cancelButton = new BButton("cancel", B_TRANSLATE("Cancel"),
 		new BMessage(B_QUIT_REQUESTED));
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_SMALL_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
 		.Add(field)
 		.AddGroup(B_HORIZONTAL)
 			.Add(cancelButton)
 			.Add(probeFileButton)
 			.AddGlue()
-			.Add(probeDeviceButton)
-			.End()
-		.SetInsets(B_USE_DEFAULT_SPACING)
-	);
+			.Add(probeDeviceButton);
 
 	CenterOnScreen();
 }
@@ -82,7 +78,8 @@ void
 OpenWindow::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
-		case kMsgProbeDevice: {
+		case kMsgProbeDevice:
+		{
 			BMenuItem *item = fDevicesMenu->FindMarked();
 			if (item == NULL)
 				break;
@@ -97,7 +94,8 @@ OpenWindow::MessageReceived(BMessage *message)
 			PostMessage(B_QUIT_REQUESTED);
 			break;
 
-		case B_SIMPLE_DATA: {
+		case B_SIMPLE_DATA:
+		{
 			// if it's a file drop, open it
 			entry_ref ref;
 			if (message->FindRef("refs", 0, &ref) == B_OK) {

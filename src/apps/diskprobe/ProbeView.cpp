@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -490,16 +490,14 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 	GridLayout()->AddView(line, 1, 0);
 
 	BFont boldFont = *be_bold_font;
-	boldFont.SetSize(10.0);
 	BFont plainFont = *be_plain_font;
-	plainFont.SetSize(10.0);
+	boldFont.SetSize(plainFont.Size() * 0.83);
+	plainFont.SetSize(plainFont.Size() * 0.83);
 
 	BStringView *stringView = new BStringView(
 		B_EMPTY_STRING, editor.IsAttribute()
-		? B_TRANSLATE("Attribute: ")
-		: editor.IsDevice()
-		? B_TRANSLATE("Device: ")
-		: B_TRANSLATE("File: "));
+			? B_TRANSLATE("Attribute: ") : editor.IsDevice()
+			? B_TRANSLATE("Device: ") : B_TRANSLATE("File: "));
 	stringView->SetFont(&boldFont);
 	line->AddChild(stringView);
 
@@ -524,7 +522,6 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 		get_type_string(buffer, sizeof(buffer), editor.Type());
 		fTypeControl = new BTextControl(B_EMPTY_STRING, NULL, buffer,
 			new BMessage(kMsgPositionUpdate));
-		fTypeControl->SetDivider(0.0);
 		fTypeControl->SetFont(&plainFont);
 		fTypeControl->TextView()->SetFontAndColor(&plainFont);
 		fTypeControl->SetEnabled(false);
@@ -542,7 +539,7 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 
 	BGroupLayoutBuilder(line).AddGlue();
 
-	line = new BGroupView(B_HORIZONTAL);
+	line = new BGroupView(B_HORIZONTAL, B_USE_SMALL_SPACING);
 	GridLayout()->AddView(line, 1, 1);
 
 	stringView = new BStringView(B_EMPTY_STRING, B_TRANSLATE("Block: "));
@@ -1078,8 +1075,8 @@ EditorLooper::Find(off_t startAt, const uint8 *data, size_t dataSize,
 			// If the user had to wait more than 8 seconds for the result,
 			// we are trying to please him with a requester...
 			BAlert* alert = new BAlert(B_TRANSLATE("DiskProbe request"),
-				B_TRANSLATE("Could not find search string."), 
-				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL, 
+				B_TRANSLATE("Could not find search string."),
+				B_TRANSLATE("OK"), NULL, NULL, B_WIDTH_AS_USUAL,
 				B_WARNING_ALERT);
 			alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 			alert->Go(NULL);
@@ -1254,7 +1251,7 @@ ProbeView::_UpdateAttributesMenu(BMenu *menu)
 	if (menu->CountItems() == 0) {
 		// if there are no attributes, add an item to the menu
 		// that says so
-		BMenuItem *item = new BMenuItem(B_TRANSLATE_COMMENT("none", 
+		BMenuItem *item = new BMenuItem(B_TRANSLATE_COMMENT("none",
 			"No attributes"), NULL);
 		item->SetEnabled(false);
 		menu->AddItem(item);
@@ -1448,7 +1445,7 @@ ProbeView::AttachedToWindow()
 
 	// "View" menu
 
-	menu = new BMenu(B_TRANSLATE_COMMENT("View", 
+	menu = new BMenu(B_TRANSLATE_COMMENT("View",
 		"This is the last menubar item 'File Edit Block View'"));
 
 	// Number Base (hex/decimal)
@@ -1527,8 +1524,8 @@ ProbeView::AttachedToWindow()
 			item->SetMarked(true);
 	}
 	subMenu->AddSeparatorItem();
-	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Fit", 
-		"Size of fonts, fits to available room"), 
+	subMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Fit",
+		"Size of fonts, fits to available room"),
 		message = new BMessage(kMsgFontSize)));
 	message->AddFloat("font_size", 0.0f);
 	if (fontSize == 0)
