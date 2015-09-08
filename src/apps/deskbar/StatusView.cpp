@@ -144,8 +144,11 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 	if (logoBitmap != NULL) {
 		gMinimumWindowWidth = std::max(gMinimumWindowWidth,
 			2 * (logoBitmap->Bounds().Width() + 8));
-		fMinimumTrayWidth = gMinimumWindowWidth - kGutter - kDragRegionWidth;
 	}
+	gMinimumWindowWidth = std::max(gMinimumWindowWidth,
+			be_plain_font->StringWidth("WWWWWWWWW") + 20);
+	if (vertical)
+		fMinimumTrayWidth = gMinimumWindowWidth - kGutter - kDragRegionWidth;
 
 	// Create the time view
 	fTime = new TTimeView(fMinimumTrayWidth, kMaxReplicantHeight - 1.0);
