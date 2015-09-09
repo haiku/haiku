@@ -899,12 +899,7 @@ TFilePanel::RestoreState()
 	}
 
 	// Finish UI creation now that the PoseView is initialized
-	BLayoutItem* item
-		= fBorderedView->GroupLayout()->AddView(0, fPoseView->TitleView());
-	BSize minSize = item->MinSize();
-	BSize maxSize = item->MaxSize();
-	item->SetExplicitMinSize(BSize(minSize.Width(), kTitleViewHeight));
-	item->SetExplicitMaxSize(BSize(maxSize.Width(), kTitleViewHeight));
+	fBorderedView->GroupLayout()->AddView(0, fPoseView->TitleView());
 
 	BRect rect(fBorderedView->Frame());
 	rect.right = rect.left + kCountViewWidth;

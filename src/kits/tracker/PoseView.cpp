@@ -9911,7 +9911,7 @@ BPoseView::CheckAutoScroll(BPoint mouseLoc, bool shouldScroll)
 	border.bottom = border.top;
 	border.top -= kBorderHeight;
 	if (ViewMode() == kListMode)
-		border.top -= kTitleViewHeight;
+		border.top -= TitleView()->Bounds().Height();
 
 	bool selectionScrolling = fSelectionRectInfo.isDragging;
 

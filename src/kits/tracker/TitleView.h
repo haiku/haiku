@@ -50,7 +50,6 @@ class BColumnTitle;
 class ColumnTrackState;
 class OffscreenBitmap;
 
-const int32 kTitleViewHeight = 16;
 const int32 kEdgeSize = 6;
 const int32 kTitleColumnLeftExtraMargin = 11;
 const int32 kTitleColumnRightExtraMargin = 5;
@@ -69,6 +68,9 @@ public:
 	virtual	void MouseDown(BPoint where);
 	virtual	void MouseUp(BPoint where);
 	virtual	void Draw(BRect updateRect);
+
+	virtual	BSize				MinSize();
+	virtual	BSize				MaxSize();
 
 	void Draw(BRect, bool useOffscreen = false,
 		bool updateOnly = true,
@@ -90,9 +92,11 @@ private:
 	BColumnTitle* InColumnResizeArea(BPoint) const;
 	BColumnTitle* FindColumnTitle(const BColumn*) const;
 
+private:
 	BPoseView* fPoseView;
 	BObjectList<BColumnTitle> fTitleList;
 	BCursor fHorizontalResizeCursor;
+			float				fPreferredHeight;
 
 	BColumnTitle* fPreviouslyClickedColumnTitle;
 	bigtime_t fPreviousLeftClickTime;

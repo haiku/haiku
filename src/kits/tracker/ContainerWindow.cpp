@@ -953,18 +953,12 @@ BContainerWindow::Init(const BMessage* message)
 void
 BContainerWindow::InitLayout()
 {
-	BLayoutItem* item
-		= fBorderedView->GroupLayout()->AddView(0, fPoseView->TitleView());
-	BSize minSize = item->MinSize();
-	BSize maxSize = item->MaxSize();
-	item->SetExplicitMinSize(BSize(minSize.Width(), kTitleViewHeight));
-	item->SetExplicitMaxSize(BSize(maxSize.Width(), kTitleViewHeight));
+	fBorderedView->GroupLayout()->AddView(0, fPoseView->TitleView());
 
-	item = fCountContainer->GroupLayout()->AddView(fPoseView->CountView());
-	minSize = item->MinSize();
-	maxSize = item->MaxSize();
+	BLayoutItem* item = fCountContainer->GroupLayout()->AddView(
+		fPoseView->CountView());
 	item->SetExplicitMinSize(BSize(kCountViewWidth, B_H_SCROLL_BAR_HEIGHT));
-	item->SetExplicitMaxSize(BSize(kCountViewWidth, maxSize.Height()));
+	item->SetExplicitMaxSize(BSize(kCountViewWidth, B_SIZE_UNSET));
 
 	// Eliminate the extra borders
 	fMenuContainer->GroupLayout()->SetInsets(0, 0, -1, 0);

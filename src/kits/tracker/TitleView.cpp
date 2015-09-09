@@ -124,8 +124,12 @@ BTitleView::BTitleView(BPoseView* view)
 #endif
 
 	BFont font(be_plain_font);
-	font.SetSize(9);
+	font.SetSize(floorf(be_plain_font->Size() * 0.75f));
 	SetFont(&font);
+
+	font_height height;
+	GetFontHeight(&height);
+	fPreferredHeight = ceilf(height.ascent + height.descent) + 2;
 
 	Reset();
 }
@@ -190,6 +194,20 @@ BTitleView::RemoveTitle(BColumn* column)
 }
 
 
+BSize
+BTitleView::MinSize()
+{
+	return BSize(16, fPreferredHeight);
+}
+
+
+BSize
+BTitleView::MaxSize()
+{
+	return BSize(B_SIZE_UNLIMITED, fPreferredHeight);
+}
+
+
 void
 BTitleView::Draw(BRect rect)
 {
@@ -215,8 +233,8 @@ BTitleView::Draw(BRect /*updateRect*/, bool useOffscreen, bool updateOnly,
 		view->SetOrigin(-bounds.left, 0);
 		view->SetLowColor(LowColor());
 		view->SetHighColor(HighColor());
-		BFont font(be_plain_font);
-		font.SetSize(9);
+		BFont font;
+		GetFont(&font);
 		view->SetFont(&font);
 	} else
 		view = this;
@@ -452,7 +470,7 @@ BRect
 BColumnTitle::Bounds() const
 {
 	BRect bounds(fColumn->Offset() - kTitleColumnLeftExtraMargin, 0, 0,
-		kTitleViewHeight);
+		fParent->Bounds().Height());
 	bounds.right = bounds.left + fColumn->Width() + kTitleColumnExtraMargin;
 
 	return bounds;
@@ -463,7 +481,10 @@ void
 BColumnTitle::Draw(BView* view, bool pressed)
 {
 	BRect bounds(Bounds());
-	BPoint loc(0, bounds.bottom - 4);
+
+	font_height height;
+	view->GetFontHeight(&height);
+	BPoint loc(0, bounds.top + ceilf(height.ascent) + 2);
 
 	if (pressed) {
 		bounds.bottom--;
