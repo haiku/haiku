@@ -272,7 +272,9 @@ SEARCH on $(driverSettingsFiles)
 AddFilesToHaikuImage home config settings kernel drivers
 	: $(driverSettingsFiles) ;
 
-local networkSettingsFiles = <network-settings>services ;
+local networkSettingsFiles = <network-settings>services
+	<network-settings>hosts ;
+
 SEARCH on $(networkSettingsFiles)
 	= [ FDirName $(HAIKU_TOP) data settings network ] ;
 AddFilesToHaikuImage system settings network : $(networkSettingsFiles) ;
