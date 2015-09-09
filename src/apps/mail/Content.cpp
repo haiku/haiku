@@ -41,6 +41,7 @@ of their respective holders. All rights reserved.
 #include <Alert.h>
 #include <Beep.h>
 #include <Clipboard.h>
+#include <ControlLook.h>
 #include <Debug.h>
 #include <E-mail.h>
 #include <Input.h>
@@ -648,14 +649,14 @@ TContentView::TContentView(bool incoming, BFont* font,
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
-	// TODO: control look should give us the spacing information
-	layout->SetInsets(-2, 0, -2, -2);
 	SetLayout(layout);
 
 	fTextView = new TTextView(fIncoming, this, font, showHeader,
 		coloredQuotes);
-	BScrollView *scroll = new BScrollView("", fTextView, 0, true, true);
-	AddChild(scroll);
+
+	BScrollView* scrollView = new BScrollView("", fTextView, 0, true, true);
+	scrollView->SetBorders(BControlLook::B_TOP_BORDER);
+	AddChild(scrollView);
 }
 
 

@@ -1,7 +1,7 @@
 /*
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2004-2015, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009 Stephan Aßmus, superstippi@gmx.de.
- * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -29,8 +29,9 @@ static const float kPlainBorderSize = 1;
 BScrollView::BScrollView(const char* name, BView* target, uint32 resizingMode,
 	uint32 flags, bool horizontal, bool vertical, border_style border)
 	:
-	BView(_ComputeFrame(target, horizontal, vertical, border), name,
-		resizingMode, _ModifyFlags(flags, border)),
+	BView(_ComputeFrame(target, horizontal, vertical, border,
+		BControlLook::B_ALL_BORDERS), name, resizingMode,
+		_ModifyFlags(flags, border)),
 	fTarget(target),
 	fBorder(border)
 {
@@ -131,7 +132,7 @@ BScrollView::Archive(BMessage* archive, bool deep) const
 	// The highlighted state is not archived, but since it is
 	// usually (or should be) used to indicate focus, this
 	// is probably the right thing to do.
-	
+
 	return status;
 }
 
@@ -206,9 +207,9 @@ BScrollView::AttachedToWindow()
 		return;
 	}
 
-	if (fHorizontalScrollBar)
+	if (fHorizontalScrollBar != NULL)
 		fHorizontalScrollBar->ResizeBy(-B_V_SCROLL_BAR_WIDTH, 0);
-	else if (fVerticalScrollBar)
+	else if (fVerticalScrollBar != NULL)
 		fVerticalScrollBar->ResizeBy(0, -B_H_SCROLL_BAR_HEIGHT);
 }
 
@@ -254,7 +255,7 @@ BScrollView::Draw(BRect updateRect)
 
 	be_control_look->DrawScrollViewFrame(this, rect, updateRect,
 		verticalScrollBarFrame, horizontalScrollBarFrame, base, fBorder,
-		flags);
+		flags, fBorders);
 }
 
 
@@ -276,7 +277,7 @@ BScrollView::FrameResized(float newWidth, float newHeight)
 	BRect bounds = Bounds();
 	float border = _BorderSize() - 1;
 
-	if (be_control_look && fHorizontalScrollBar && fVerticalScrollBar) {
+	if (fHorizontalScrollBar != NULL && fVerticalScrollBar != NULL) {
 		BRect scrollCorner(bounds);
 		scrollCorner.left = min_c(
 			fPreviousWidth - fVerticalScrollBar->Frame().Height(),
@@ -447,10 +448,7 @@ BScrollView::SetBorder(border_style border)
 		SetFlags(_ModifyFlags(Flags(), border));
 
 		DoLayout();
-
-		BRect bounds(Bounds());
-		Invalidate(BRect(bounds.LeftTop(), bounds.RightBottom()));
-		Invalidate(BRect(bounds.LeftBottom(), bounds.RightBottom()));
+		Invalidate();
 		return;
 	}
 
@@ -503,6 +501,25 @@ border_style
 BScrollView::Border() const
 {
 	return fBorder;
+}
+
+
+void
+BScrollView::SetBorders(uint32 borders)
+{
+	if (fBorders == borders || (Flags() & B_SUPPORTS_LAYOUT) == 0)
+		return;
+
+	fBorders = borders;
+	DoLayout();
+	Invalidate();
+}
+
+
+uint32
+BScrollView::Borders() const
+{
+	return fBorders;
 }
 
 
@@ -565,7 +582,10 @@ BScrollView::SetTarget(BView* target)
 		fVerticalScrollBar->SetTarget(target);
 
 	if (target != NULL) {
-		target->MoveTo(_BorderSize(), _BorderSize());
+		float borderSize = _BorderSize();
+		target->MoveTo((fBorders & BControlLook::B_LEFT_BORDER) != 0
+			? borderSize : 0, (fBorders & BControlLook::B_TOP_BORDER) != 0
+				? borderSize : 0);
 		BRect innerFrame = _InnerFrame();
 		target->ResizeTo(innerFrame.Width() - 1, innerFrame.Height() - 1);
 		target->TargetedByScrollView(this);
@@ -715,6 +735,7 @@ BScrollView::_Init(bool horizontal, bool vertical)
 	fHorizontalScrollBar = NULL;
 	fVerticalScrollBar = NULL;
 	fHighlighted = false;
+	fBorders = BControlLook::B_ALL_BORDERS;
 
 	if (be_control_look != NULL)
 		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
@@ -773,9 +794,9 @@ BRect
 BScrollView::_InnerFrame() const
 {
 	BRect frame = Bounds();
+	_InsetBorders(frame, fBorder, fBorders);
 
 	float borderSize = _BorderSize();
-	frame.InsetBy(borderSize, borderSize);
 
 	if (fHorizontalScrollBar != NULL) {
 		frame.bottom -= B_H_SCROLL_BAR_HEIGHT;
@@ -806,7 +827,7 @@ BRect
 BScrollView::_ComputeFrame(BRect targetRect) const
 {
 	return _ComputeFrame(targetRect, fHorizontalScrollBar != NULL,
-		fVerticalScrollBar != NULL, fBorder);
+		fVerticalScrollBar != NULL, fBorder, fBorders);
 }
 
 
@@ -860,17 +881,16 @@ BScrollView::_AlignScrollBars(bool horizontal, bool vertical, BRect targetFrame)
 */
 /*static*/ BRect
 BScrollView::_ComputeFrame(BRect frame, bool horizontal, bool vertical,
-	border_style border)
+	border_style border, uint32 borders)
 {
 	if (vertical)
 		frame.right += B_V_SCROLL_BAR_WIDTH;
 	if (horizontal)
 		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
 
-	float borderSize = _BorderSize(border);
-	frame.InsetBy(-borderSize, -borderSize);
+	_InsetBorders(frame, border, borders);
 
-	if (borderSize == 0) {
+	if (_BorderSize(border) == 0) {
 		if (vertical)
 			frame.right++;
 		if (horizontal)
@@ -883,10 +903,10 @@ BScrollView::_ComputeFrame(BRect frame, bool horizontal, bool vertical,
 
 /*static*/ BRect
 BScrollView::_ComputeFrame(BView *target, bool horizontal, bool vertical,
-	border_style border)
+	border_style border, uint32 borders)
 {
 	return _ComputeFrame(target != NULL ? target->Frame()
-		: BRect(0, 0, 16, 16), horizontal, vertical, border);
+		: BRect(0, 0, 16, 16), horizontal, vertical, border, borders);
 }
 
 
@@ -916,6 +936,21 @@ BScrollView::_ModifyFlags(int32 flags, border_style border)
 		return flags | B_WILL_DRAW | (flags & B_FULL_UPDATE_ON_RESIZE ? 0 : B_FRAME_EVENTS);
 
 	return flags & ~(B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE);
+}
+
+
+/*static*/ void
+BScrollView::_InsetBorders(BRect& frame, border_style border, uint32 borders)
+{
+	float borderSize = _BorderSize(border);
+	if ((borders & BControlLook::B_LEFT_BORDER) != 0)
+		frame.left += borderSize;
+	if ((borders & BControlLook::B_TOP_BORDER) != 0)
+		frame.top += borderSize;
+	if ((borders & BControlLook::B_RIGHT_BORDER) != 0)
+		frame.right -= borderSize;
+	if ((borders & BControlLook::B_BOTTOM_BORDER) != 0)
+		frame.bottom -= borderSize;
 }
 
 

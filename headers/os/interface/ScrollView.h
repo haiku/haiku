@@ -1,11 +1,6 @@
 /*
- * Copyright 2004-2009, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
- *
- * Authors:
- *		Axel Dörfler, axeld@pinc-software.de
- *		John Scipione, jscpione@gmail.com
  */
 #ifndef _SCROLL_VIEW_H
 #define _SCROLL_VIEW_H
@@ -71,6 +66,8 @@ public:
 
 	virtual	void				SetBorder(border_style border);
 			border_style		Border() const;
+			void				SetBorders(uint32 borders);
+			uint32				Borders() const;
 
 	virtual	status_t			SetBorderHighlighted(bool highlight);
 			bool				IsBorderHighlighted() const;
@@ -111,12 +108,15 @@ private:
 									bool vertical, BRect targetFrame);
 
 	static	BRect				_ComputeFrame(BRect frame, bool horizontal,
-									bool vertical, border_style border);
+									bool vertical, border_style border,
+									uint32 borders);
 	static	BRect				_ComputeFrame(BView* target, bool horizontal,
-									bool vertical, border_style border);
+									bool vertical, border_style border,
+									uint32 borders);
 	static	float				_BorderSize(border_style border);
 	static	int32				_ModifyFlags(int32 flags, border_style border);
-
+	static	void				_InsetBorders(BRect& frame, border_style border,
+									uint32 borders);
 private:
 			BView*				fTarget;
 			BScrollBar*			fHorizontalScrollBar;
@@ -125,8 +125,9 @@ private:
 			uint16				fPreviousWidth;
 			uint16				fPreviousHeight;
 			bool				fHighlighted;
+			uint32				fBorders;
 
-			uint32				_reserved[3];
+			uint32				_reserved[2];
 };
 
 #endif // _SCROLL_VIEW_H
