@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -286,7 +286,8 @@ BMenuBar::Draw(BRect updateRect)
 	be_control_look->DrawBorder(this, rect, updateRect, base,
 		B_PLAIN_BORDER, flags, BControlLook::B_BOTTOM_BORDER);
 
-	be_control_look->DrawMenuBarBackground(this, rect, updateRect, base);
+	be_control_look->DrawMenuBarBackground(this, rect, updateRect, base,
+		0, fBorders);
 
 	_DrawItems(updateRect);
 }
@@ -366,6 +367,20 @@ menu_bar_border
 BMenuBar::Border() const
 {
 	return fBorder;
+}
+
+
+void
+BMenuBar::SetBorders(uint32 borders)
+{
+	fBorders = borders;
+}
+
+
+uint32
+BMenuBar::Borders() const
+{
+	return fBorders;
 }
 
 
@@ -726,6 +741,7 @@ BMenuBar::_RestoreFocus()
 void
 BMenuBar::_InitData(menu_layout layout)
 {
+	fBorders = BControlLook::B_ALL_BORDERS;
 	fLastBounds = new BRect(Bounds());
 	SetItemMargins(8, 2, 8, 2);
 	_SetIgnoreHidden(true);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2003-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MENU_BAR_H
@@ -36,7 +36,7 @@ public:
 										| B_FRAME_EVENTS);
 								BMenuBar(BMessage* archive);
 	virtual						~BMenuBar();
-		
+
 	static	BArchivable*		Instantiate(BMessage* archive);
 	virtual	status_t			Archive(BMessage* archive,
 									bool deep = true) const;
@@ -74,7 +74,9 @@ public:
 
 	virtual	void				SetBorder(menu_bar_border border);
 			menu_bar_border		Border() const;
-	
+			void				SetBorders(uint32 borders);
+			uint32				Borders() const;
+
 	virtual status_t			Perform(perform_code code, void* data);
 
 private:
@@ -94,7 +96,7 @@ private:
 			void				StartMenuBar(int32 menuIndex,
 									bool sticky = true, bool showMenu = false,
 									BRect* special_rect = NULL);
-			
+
 	static	int32				_TrackTask(void *arg);
 			BMenuItem*			_Track(int32 *action, int32 startIndex = -1,
 									bool showMenu = false);
@@ -107,7 +109,8 @@ private:
 			int32				fPrevFocusToken;
 			sem_id				fMenuSem;
 			BRect*				fLastBounds;
-			uint32				_reserved[2];
+			uint32				fBorders;
+			uint32				_reserved[1];
 
 			bool				fTracking;
 };
