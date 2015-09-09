@@ -524,11 +524,7 @@ BPose::PointInPose(BPoint loc, const BPoseView* poseView, BPoint where,
 		*hitWidget = NULL;
 
 	// check intersection with icon
-	BRect rect;
-	rect.left = loc.x + kListOffset;
-	rect.right = rect.left + B_MINI_ICON;
-	rect.bottom = loc.y + poseView->ListElemHeight();
-	rect.top = rect.bottom - B_MINI_ICON;
+	BRect rect = _IconRect(poseView, loc);
 	if (rect.Contains(where))
 		return true;
 
@@ -572,11 +568,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 	ModelNodeLazyOpener modelOpener(fModel);
 
 	if (poseView->ViewMode() == kListMode) {
-		uint32 size = poseView->IconSizeInt();
-		BRect iconRect(rect);
-		iconRect.left += kListOffset;
-		iconRect.right = iconRect.left + size;
-		iconRect.top = iconRect.bottom - size;
+		BRect iconRect = _IconRect(poseView, rect.LeftTop());
 		if (updateRect.Intersects(iconRect)) {
 			iconRect.OffsetBy(offset);
 			DrawIcon(iconRect.LeftTop(), drawView, poseView->IconSize(),
@@ -988,6 +980,19 @@ BPose::CalcRect(const BPoseView* poseView) const
 			rect.right += ceil(widget->TextWidth(poseView) + 1);
 	}
 
+	return rect;
+}
+
+
+BRect
+BPose::_IconRect(const BPoseView* poseView, BPoint location) const
+{
+	uint32 size = poseView->IconSizeInt();
+	BRect rect;
+	rect.left = location.x + kListOffset;
+	rect.right = rect.left + size;
+	rect.top = location.y + (poseView->ListElemHeight() - size) / 2.f;
+	rect.bottom = rect.top + size;
 	return rect;
 }
 

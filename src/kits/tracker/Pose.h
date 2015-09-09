@@ -137,6 +137,8 @@ private:
 	void EditPreviousNextWidgetCommon(BPoseView* poseView, bool next);
 	void CreateWidgets(BPoseView*);
 	bool TestLargeIconPixel(BPoint) const;
+			BRect				_IconRect(const BPoseView* poseView,
+									BPoint location) const;
 
 	Model* fModel;
 	BObjectList<BTextWidget> fWidgetList;
