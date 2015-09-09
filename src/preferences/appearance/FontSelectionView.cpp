@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2011, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -251,7 +251,8 @@ FontSelectionView::CreateFontsMenuBarLayoutItem()
 void
 FontSelectionView::_BuildSizesMenu()
 {
-	const int32 sizes[] = {7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 21, 24, 0};
+	const int32 sizes[] = {7, 8, 9, 10, 11, 12, 13, 14, 16, 18, 19, 20,
+		21, 24, 0};
 
 	// build size menu
 	for (int32 i = 0; sizes[i]; i++) {
