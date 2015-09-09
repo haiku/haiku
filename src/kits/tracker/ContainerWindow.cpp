@@ -440,7 +440,8 @@ DraggableContainerIcon::Draw(BRect updateRect)
 	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
 	be_control_look->DrawBorder(this, rect, updateRect, base, B_PLAIN_BORDER,
 		0, BControlLook::B_BOTTOM_BORDER);
-	be_control_look->DrawMenuBarBackground(this, rect, updateRect, base);
+	be_control_look->DrawMenuBarBackground(this, rect, updateRect, base, 0,
+		BControlLook::B_ALL_BORDERS & ~BControlLook::B_LEFT_BORDER);
 
 	// Draw the icon, straddling the border
 	SetDrawingMode(B_OP_ALPHA);
@@ -869,7 +870,6 @@ BContainerWindow::Init(const BMessage* message)
 
 	if (ShouldAddMenus()) {
 		fMenuBar = new BMenuBar("MenuBar");
-		fMenuBar->SetBorder(B_BORDER_FRAME);
 		fMenuContainer->GroupLayout()->AddView(fMenuBar);
 		AddMenus();
 
@@ -3275,14 +3275,15 @@ BContainerWindow::_AddFolderIcon()
 	if (iconSize < 16)
 		iconSize = 16;
 
-	fDraggableIcon = new(std::nothrow)
-		DraggableContainerIcon;
-
+	fDraggableIcon = new(std::nothrow) DraggableContainerIcon();
 	if (fDraggableIcon != NULL) {
-		BLayoutItem* item =
-			fMenuContainer->GroupLayout()->AddView(fDraggableIcon);
+		BLayoutItem* item = fMenuContainer->GroupLayout()->AddView(
+			fDraggableIcon);
 		item->SetExplicitMinSize(BSize(iconSize + 5, iconSize));
 		item->SetExplicitMaxSize(BSize(iconSize + 5, item->MaxSize().Height()));
+
+		fMenuBar->SetBorders(
+			BControlLook::B_ALL_BORDERS & ~BControlLook::B_RIGHT_BORDER);
 	}
 }
 
