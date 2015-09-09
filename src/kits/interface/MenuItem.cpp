@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -683,8 +683,9 @@ BMenuItem::_DrawMarkSymbol()
 	BRect r(fBounds);
 	float leftMargin;
 	MenuPrivate(fSuper).GetItemMargins(&leftMargin, NULL, NULL, NULL);
-	r.right = r.left + leftMargin - 3;
-	r.left += 1;
+	float gap = leftMargin / 4;
+	r.right = r.left + leftMargin - gap;
+	r.left += gap / 3;
 
 	BPoint center(floorf((r.left + r.right) / 2.0),
 		floorf((r.top + r.bottom) / 2.0));
