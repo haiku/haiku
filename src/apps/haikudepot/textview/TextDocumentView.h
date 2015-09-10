@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2013-2015, Stephan Aßmus <superstippi@gmx.de>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef TEXT_DOCUMENT_VIEW_H
@@ -14,6 +14,7 @@
 
 
 class BClipboard;
+class BMessageRunner;
 
 
 class TextDocumentView : public BView {
@@ -25,7 +26,6 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 	virtual void				Draw(BRect updateRect);
-	virtual	void				Pulse();
 
 	virtual	void				AttachedToWindow();
 	virtual void				FrameResized(float width, float height);
@@ -75,6 +75,8 @@ private:
 
 			void				_UpdateScrollBars();
 
+			void				_ShowCaret(bool show);
+			void				_BlinkCaret();
 			void				_DrawCaret(int32 textOffset);
 			void				_DrawSelection();
 			void				_GetSelectionShape(BShape& shape,
@@ -91,6 +93,8 @@ private:
 			float				fInsetBottom;
 
 			BRect				fCaretBounds;
+			BMessageRunner*		fCaretBlinker;
+			int32				fCaretBlinkToken;
 			bool				fSelectionEnabled;
 			bool				fShowCaret;
 			bool				fMouseDown;
