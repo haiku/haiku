@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.07.27
-# Date:    2015-07-27 20:34:14
+# Version: 2015.09.04
+# Date:    2015-09-04 20:34:09
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -26,7 +26,7 @@
 0003  Club Mac
 0004  Nebraska Furniture Mart
 0011  Unknown
-	7788  Flash mass storage drive
+	7788  counterfeit flash drive
 0053  Planex
 	5301  GW-US54ZGL 802.11bg
 0079  DragonRise Inc.
@@ -271,6 +271,7 @@
 	1116  Jornada 568 Pocket PC
 	1117  LaserJet 1300n
 	1151  PSC-750xi Printer/Scanner/Copier
+	1198  HID-compliant mouse
 	1202  PhotoSmart 320 series
 	1204  DeskJet 930c
 	1205  ScanJet 4500C/5550C
@@ -462,7 +463,7 @@
 	3e17  LaserJet P1006
 	3f02  PhotoSmart 7550~
 	3f11  PSC-1315/PSC-1317
-	4002  PhotoSmart 635/715/720/735/935 (storage)
+	4002  PhotoSmart 635/715/720/735/935/E337 (storage)
 	4004  CP1160
 	4102  PhotoSmart 618
 	4105  ScanJet 4370
@@ -804,6 +805,7 @@
 	d739  Propox ISPcable III
 	d9a9  Actisense USG-1 NMEA Serial Gateway
 	d9aa  Actisense NGT-1 NMEA2000 PC Interface
+	d9ab  Actisense NGT-1 NMEA2000 Gateway
 	daf4  Qundis Serial Infrared Head
 	e0d0  Total Phase Aardvark I2C/SPI Host Adapter
 	e521  EVER Sinline XL Series UPS
@@ -852,6 +854,7 @@
 	fc82  SEMC DSS-20/DSS-25 SyncStation
 	fd48  ShipModul MiniPlex-4xUSB NMEA Multiplexer
 	fd49  ShipModul MiniPlex-4xUSB-AIS NMEA Multiplexer
+	fd4b  ShipModul MiniPlex NMEA Multiplexer
 	ff08  ToolHouse LoopBack Adapter
 	ff18  ScienceScope Logbook ML
 	ff19  Logbook Bus
@@ -1068,6 +1071,7 @@
 	402b  Photo Printer 6850
 	402e  605 Photo Printer
 	4034  805 Photo Printer
+	404f  305 Photo Printer
 	4056  ESP 7200 Series AiO
 	4109  EasyShare Printer Dock Series 3
 	410d  EasyShare G600 Printer Dock
@@ -1078,6 +1082,8 @@
 	6003  i50
 	6004  i60
 	6005  i80
+	6029  i900
+	602a  i900
 040b  Weltrend Semiconductor
 	0a68  Func MS-3 gaming mouse [WT6573F MCU]
 	6510  Weltrend Bar Code Reader
@@ -1417,8 +1423,11 @@
 	02e3  5230 (PC-Suite mode)
 	02e4  5230 (Imaging mode)
 	0360  C1-01 Ovi Suite Mode
+	0396  C7-00 (Modem mode)
 	03a4  C5 (Storage mode)
-	03c0  C7-00
+	03c0  C7-00 (Mass storage mode)
+	03c1  C7-00 (Media transfer mode)
+	03cd  C7-00 (Nokia Suite mode)
 	03d1  N950
 	0400  7600 Phone Parent
 	0401  6650 GSM Phone
@@ -1485,9 +1494,11 @@
 	0508  E65 (PC Suite mode)
 	0509  E65 (Storage mode)
 	0518  N9 Phone
+	054d  C2-01
 	0600  Digital Pen SU-1B
 	0610  CS-15 (Internet Stick 3G modem)
-	0661  Lumia 920
+	0661  Lumia 620/920
+	069a  130 [RM-1035] (Charging only)
 	0720  X (RM-980)
 	0800  Connectivity Cable DKU-5
 	0801  Data Cable DKU-6
@@ -1513,6 +1524,7 @@
 	2020  USB Hub
 	20cd  Sitecom Internal Multi Memory reader/writer MD-005
 	20fc  6-in-1 Card Reader
+	2134  Hub
 	2228  9-in-2 Card Reader
 	223a  8-in-1 Card Reader
 	2503  USB 2.0 Hub
@@ -1529,6 +1541,7 @@
 	4060  Ultra Fast Media Reader
 	4064  Ultra Fast Media Reader
 	5434  Hub
+	5534  Hub
 	7500  LAN7500 Ethernet 10/100/1000 Adapter
 	9512  SMC9512/9514 USB Hub
 	9514  SMC9514 Hub
@@ -1861,9 +1874,10 @@
 	0006  Easy Mouse+
 	000b  NetMouse Wheel(P+U)
 	000c  TACOMA Fingerprint V1.06.01
-	000e  VideoCAM Web
+	000e  Genius NetScroll Optical
 	0013  TACOMA Fingerprint Mouse V1.06.01
 	001a  Genius WebScroll+
+	002e  NetScroll + Traveler / NetScroll 110
 	0036  Pocket Mouse LE
 	0039  NetScroll+ Superior
 	003a  NetScroll+ Mini Traveler / Genius NetScroll 120
@@ -2254,7 +2268,9 @@
 	0779  LifeCam HD-3000
 	0780  Comfort Curve Keyboard 3000
 	0797  Optical Mouse 200
+	07a5  Wireless Receiver 1461C
 	07f8  Wired Keyboard 600 (model 1576)
+	07fd  Nano Transceiver 1.1
 	930a  ISOUSB.SYS Intel 82930 Isochronous IO Test Board
 	ffca  Catalina
 	fff8  Keyboard
@@ -2383,6 +2399,7 @@
 	082b  Webcam C170
 	082d  HD Pro Webcam C920
 	0830  QuickClip
+	0836  B525 HD Webcam
 	0837  BCC950 ConferenceCam
 	0840  QuickCam Express
 	0843  Webcam C930e
@@ -2489,7 +2506,7 @@
 	0a29  H600 [Wireless Headset]
 	0a37  USB Headset H540
 	0a38  Headset H340
-	0a44  Wired headset
+	0a44  Headset H390
 	0a4d  G430 Surround Sound Gaming Headset
 	0b02  C-UV35 [Bluetooth Mini-Receiver] (HID proxy mode)
 	8801  Video Camera
@@ -2562,6 +2579,7 @@
 	c06b  G700 Wireless Gaming Mouse
 	c06c  Optical Mouse
 	c077  M105 Optical Mouse
+	c07c  M-R0017 [G700s Rechargeable Gaming Mouse]
 	c101  UltraX Media Remote
 	c110  Harmony 785/885 Remote
 	c111  Harmony 525 Remote
@@ -2637,7 +2655,7 @@
 	c305  Internet Keyboard
 	c307  Internet Keyboard
 	c308  Internet Navigator Keyboard
-	c309  Internet Keyboard
+	c309  Y-BF37 [Internet Navigator Keyboard]
 	c30a  iTouch Composite
 	c30b  NetPlay Keyboard
 	c30c  Internet Keys (X)
@@ -2690,6 +2708,7 @@
 	c52d  R700 Remote Presenter receiver
 	c52e  MK260 Wireless Combo Receiver
 	c52f  Unifying Receiver
+	c531  C-U0007 [Unifying Receiver]
 	c532  Unifying Receiver
 	c534  Unifying Receiver
 	c603  3Dconnexion Spacemouse Plus XT
@@ -2992,6 +3011,7 @@
 	a007  External Disk USB 3.0
 	a009  Stor.E Basics
 	a00d  STOR.E BASICS 500GB
+	a202  Canvio Basics HDD
 	b001  Stor.E Partner
 	d000  External Disk 2TB Model DT01ABA200
 	d010  External Disk 3TB
@@ -3031,9 +3051,11 @@
 	5710  Joystick in FS Mode
 	5720  STM microSD Flash Device
 	5721  Hantek DDS-3X25 Arbitrary Waveform Generator
+	5730  STM32 Audio Streaming
 	5740  STM32F407
 	7270  ST Micro Serial Bridge
 	7554  56k SoftModem
+	91d1  Sensor Hub
 	df11  STM Device in DFU Mode
 	ff10  Swann ST56 Modem
 0484  Specialix
@@ -3051,6 +3073,7 @@
 	e003  Pirelli DP-L10
 	e00d  Broadcom Bluetooth 2.1 Device
 	e00f  Foxconn T77H114 BCM2070 [Single-Chip Bluetooth 2.1 + EDR Adapter]
+	e011  Acer Bluetooth module
 	e016  Ubee PXU1900 WiMAX Adapter [Beceem BCSM250]
 	e02c  Atheros AR5BBU12 Bluetooth Device
 	e032  Broadcom BCM20702 Bluetooth
@@ -3435,6 +3458,7 @@
 	1729  MX700 ser
 	172b  MP140 ser
 	1736  PIXMA MX320 series
+	173a  MP250 series printer
 	173b  PIXMA MP270 All-In-One Printer
 	173e  MP560
 	173f  Pixma MP640 Multifunction device
@@ -3723,6 +3747,7 @@
 	3160  Digital IXUS 860 IS
 	3170  SELPHY CP750
 	3171  SELPHY CP740
+	3172  SELPHY CP520
 	3173  PowerShot SD890 IS DIGITAL ELPH / Digital IXUS 970 IS / IXY DIGITAL 820 IS
 	3174  PowerShot SD790 IS DIGITAL ELPH / Digital IXUS 90 IS / IXY DIGITAL 95 IS
 	3175  IXY Digital 25 IS
@@ -3849,6 +3874,7 @@
 	329a  PowerShot SX60 HS
 	329b  PowerShot SX520 HS
 	329c  PowerShot SX400 IS
+	329f  PowerShot SX530 HS
 04aa  DaeWoo Telecom, Ltd
 04ab  Chromatic Research
 04ac  Micro Audiometrics Corp.
@@ -4321,6 +4347,7 @@
 	300d  Atheros AR3012 Bluetooth
 	300f  Atheros AR3012 Bluetooth
 	7025  HP HD Webcam
+	7046  TOSHIBA Web Camera - HD
 	9304  Hub
 	f01c  TT1280DA DVB-T TV Tuner
 04cb  Fuji Photo Film Co., Ltd
@@ -4467,10 +4494,13 @@
 	8001  ICD2 in-circuit debugger
 	8101  PIC24F Starter Kit
 	8107  Microstick II
+	8108  ChipKit Pro MX7 (PIC32MX)
 	9004  Microchip REAL ICE
 	900a  PICkit3
 	c001  PicoLCD 20x4
 	e11c  TL866CS EEPROM Programmer [MiniPRO]
+	f2c4  Macareux-labs Hygrometry Temperature Sensor
+	f3aa  Macareux-labs Usbce Bootloader mode
 	f437  SBE Tech Ultrasonic Anemometer
 	f4b5  SmartScope
 	f8da  Hughski Ltd. ColorHug
@@ -4491,7 +4521,7 @@
 	0499  Optical Mouse
 	1203  Keyboard
 	1400  PS/2 keyboard + mouse controller
-	1503  Shortboard Lefty
+	1503  Keyboard
 	1603  Keyboard
 	1702  Keyboard LKS02
 	2011  Keyboard [Diatec Filco Majestouch 1]
@@ -4828,6 +4858,7 @@
 	60c4  M2 Portable Hard Drive USB 3.0
 	6124  D3 Station External Hard Drive
 	6125  D3 Station External Hard Drive
+	61b5  M3 Portable Hard Drive 2TB
 	61b6  M3 Portable Hard Drive 1TB
 	6601  Mobile Phone
 	6602  Galaxy
@@ -4878,6 +4909,7 @@
 	6875  GT-B3710 Standalone LTE device (Commercial)
 	6876  GT-B3710 LTE Modem
 	6877  Galaxy S
+	687a  GT-E2370 mobile phone
 	6888  GT-B3730 Composite LTE device (Commercial)
 	6889  GT-B3730 Composite LTE device (Commercial)
 	689a  LTE Storage Driver [CMC2xx]
@@ -4929,6 +4961,7 @@
 	0760  Acer KU-0760 Keyboard
 	0841  HP Multimedia Keyboard
 	0860  2.4G Multimedia Wireless Kit
+	1061  HP KG-1061 Wireless Keyboard+Mouse
 	1121  Periboard 717 Mini Wireless Keyboard
 	a001  E-Video DC-100 Camera
 	a120  ORITE CCD Webcam(PC370R)
@@ -4939,6 +4972,7 @@
 	a128  PC Camera (SN9C202 + OV7663 + EEPROM)
 	a133  Gateway Webcam
 	a136  LabTec Webcam 5500
+	a147  Medion Webcam
 	a204  DSC WIA Device (1300)
 	a208  DSC WIA Device (2320)
 	a209  Labtec DC-2320
@@ -4996,6 +5030,8 @@
 	b354  UVC 1.00 device HD UVC WebCam
 	b394  Integrated Camera
 	b3f6  HD WebCam (Acer)
+	b40e  HP Truevision HD camera
+	b444  Lenovo Integrated Webcam
 04f3  Elan Microelectronics Corp.
 	000a  Touchscreen
 	0103  ActiveJet K-2024 Multimedia Keyboard
@@ -5006,6 +5042,7 @@
 	0230  3D Optical Mouse
 	0232  Mouse
 	02f4  2.4G Cordless Mouse
+	0381  Touchscreen
 	04a0  Dream Cheeky Stress/Panic Button
 04f4  Harting Elektronik, Inc.
 04f5  Fujitsu-ICL Systems, Inc.
@@ -5065,16 +5102,17 @@
 	010b  MFC-860
 	010c  MFC-7400J
 	010d  MFC-9200J
-	010e  MFC3100C Scanner
-	010f  MFC 5100C
-	0110  MFC4800 Scanner
-	0111  MFC 6800
+	010e  MFC-3100C Scanner
+	010f  MFC-5100C
+	0110  MFC-4800 Scanner
+	0111  MFC-6800
 	0112  DCP1000 Port(FaxModem)
 	0113  MFC-8500
 	0114  MFC9700 Port(FaxModem)
-	0115  MFC9800 Scanner
+	0115  MFC-9800 Scanner
 	0116  DCP1400 Scanner
 	0119  MFC-9660
+	011a  MFC-9860
 	011b  MFC-9880
 	011c  MFC-9760
 	011d  MFC-9070
@@ -5083,13 +5121,20 @@
 	0120  MFC580 Port(FaxModem)
 	0121  MFC-590
 	0122  MFC-5100J
+	0124  MFC-4800J
+	0125  MFC-6800J
+	0127  MFC-9800J
+	0128  MFC-8500J
 	0129  Imagistics 2500 (MFC-8640D clone)
+	012b  MFC-9030
+	012e  FAX4100e IntelliFax 4100e
 	012f  FAX-4750e
+	0130  FAX-5750e
 	0132  MFC-5200C RemovableDisk
 	0135  MFC-100 Scanner
 	0136  MFC-150CL Scanner
 	013c  MFC-890 Port
-	013d  MFC-5200J Printer
+	013d  MFC-5200J
 	013e  MFC-4420C RemovableDisk
 	013f  MFC-4820C RemovableDisk
 	0140  DCP-8020
@@ -5099,14 +5144,17 @@
 	0144  DCP-4020C RemovableDisk
 	0146  MFC-3220C
 	0147  FAX-1820C Printer
-	0148  MFC-3320CN Printer
+	0148  MFC-3320CN
 	0149  FAX-1920CN Printer
 	014a  MFC-3420C
 	014b  MFC-3820CN
+	014c  DCP-3020C
 	014d  FAX-1815C Printer
 	014e  MFC-8820J
+	014f  DCP-8025J
 	0150  MFC-8220 Port(FaxModem)
 	0151  MFC-8210J
+	0153  DCP-1000J
 	0157  MFC-3420J Printer
 	0158  MFC-3820JN Port(FaxModem)
 	015d  MFC Composite Device
@@ -5166,31 +5214,44 @@
 	01ae  DCP-750CW RemovableDisk
 	01af  MFC-440CN
 	01b0  MFC-660CN
-	01b1  MFC-665CW Remote Setup Port
-	01b2  MFC-845CW Remote Setup Port
-	01b4  MFC-460CN Remote Setup Port
+	01b1  MFC-665CW
+	01b2  MFC-845CW
+	01b4  MFC-460CN
 	01b5  MFC-630CD
 	01b6  MFC-850CDN
-	01b7  MFC-5460CN Remote Setup Port
+	01b7  MFC-5460CN
 	01b8  MFC-5860CN
 	01ba  MFC-3360C
 	01bd  MFC-8660DN
 	01be  DCP-750CN RemovableDisk
-	01bf  MFC-860CDN Remote Setup Port
+	01bf  MFC-860CDN
 	01c0  DCP-128C
 	01c1  DCP-129C
 	01c2  DCP-131C
 	01c3  DCP-329C
 	01c4  DCP-331C
 	01c5  MFC-239C
-	01ca  MFC-9440CN Remote Setup Port
+	01c9  DCP-9040CN
+	01ca  MFC-9440CN
+	01cb  DCP-9045CDN
+	01cc  MFC-9840CDW
 	01ce  DCP-135C
 	01cf  DCP-150C
 	01d0  DCP-350C
 	01d1  DCP-560CN
+	01d2  DCP-770CW
+	01d3  DCP-770CN
 	01d4  MFC-230C
 	01d5  MFC-235C
 	01d6  MFC-260C
+	01d7  MFC-465CN
+	01d8  MFC-680CN
+	01d9  MFC-685CW
+	01da  MFC-885CW
+	01db  MFC-480CN
+	01dc  MFC-650CD
+	01dd  MFC-870CDN
+	01de  MFC-880CDN
 	01df  DCP-155C
 	01e0  MFC-265C
 	01e1  DCP-153C
@@ -5201,8 +5262,18 @@
 	01e9  DCP-7040
 	01ea  DCP-7030
 	01eb  MFC-7320
+	01ec  MFC-9640CW
 	01f4  MFC-5890CN
+	020a  MFC-8670DN
+	020c  DCP-9042CDN
+	020d  MFC-9450CDN
+	0216  MFC-8880DN
 	0217  MFC-8480DN
+	0219  MFC-8380DN
+	021a  MFC-8370DN
+	021b  DCP-8070D
+	021c  MFC-9320CW
+	021d  MFC-9120CN
 	0223  DCP-365CN
 	0248  DCP-7055 scanner/printer
 	0273  DCP-7057 scanner/printer
@@ -16902,6 +16973,9 @@
 20f4  TRENDnet
 	648b  TEW-648UBM 802.11n 150Mbps Micro Wireless N Adapter [Realtek RTL8188CUS]
 20f7  XIMEA
+	3001  Camera with CMOS sensor [MQ]
+	3021  Camera with CCD sensor [MD]
+	30b3  Camera with CMOS sensor in Vision mode [MQ]
 	a003  Subminiature 5Mpix B/W Camera, MU9PM-MH
 2100  RT Systems
 	9e52  Yaesu VX-7
