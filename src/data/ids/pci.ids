@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.09.03
-#	Date:    2015-09-03 03:15:02
+#	Version: 2015.09.10
+#	Date:    2015-09-10 03:15:01
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -634,7 +634,6 @@
 	131b  Kaveri [Radeon R4 Graphics]
 	131c  Kaveri [Radeon R7 Graphics]
 	131d  Kaveri [Radeon R6 Graphics]
-	145b  Zeppelin Non-Transparent Bridge
 	1714  BeaverCreek HDMI Audio [Radeon HD 6500D and 6400G-6600G series]
 		103c 168b  ProBook 4535s
 	3150  RV380/M24 [Mobility Radeon X600]
@@ -1279,7 +1278,7 @@
 	5652  RV410/M26 [Mobility Radeon X700]
 	5653  RV410/M26 [Mobility Radeon X700]
 		1025 0080  Aspire 5024WLMi
-		103c 0940  HP Compaq NW8240 Mobile Workstation
+		103c 0940  Compaq NW8240 Mobile Workstation
 	5654  264VT [Mach64 VT]
 		1002 5654  Mach64VT Reference
 	5655  264VT3 [Mach64 VT3]
@@ -3239,6 +3238,7 @@
 		174b aa98  Radeon HD 6450 1GB DDR3
 	aaa0  Tahiti XT HDMI Audio [Radeon HD 7970 Series]
 	aab0  Cape Verde/Pitcairn HDMI Audio [Radeon HD 7700/7800 Series]
+	aac8  Hawaii HDMI Audio
 	ac00  Theater 600 Pro
 	ac02  TV Wonder HD 600 PCIe
 	ac12  Theater HD T507 (DVB-T) TV tuner/capture device
@@ -3773,6 +3773,7 @@
 	1423  Family 15h (Models 30h-3fh) I/O Memory Management Unit
 	1426  Family 15h (Models 30h-3fh) Processor Root Port
 	1439  Family 16h Processor Functions 5:1
+	145b  Zeppelin Non-Transparent Bridge
 	1510  Family 14h Processor Root Complex
 		174b 1001  PURE Fusion Mini
 	1512  Family 14h Processor Root Port
@@ -4833,30 +4834,30 @@
 		103c 3212  Smart Array E200
 	3239  Smart Array Gen9 Controllers
 		103c 21bd  P244br
-		103c 21be  Smart Array
+		103c 21be  P741m
 		103c 21bf  H240ar
 		103c 21c0  P440ar
-		103c 21c1  Smart Array
+		103c 21c1  P840ar
 		103c 21c2  P440
 		103c 21c3  P441
 		103c 21c4  Smart Array
-		103c 21c5  Smart Array
+		103c 21c5  P841
 		103c 21c6  H244br
 		103c 21c7  H240
 		103c 21c8  H241
 		103c 21c9  Smart Array
-		103c 21ca  Smart Array
+		103c 21ca  P246br
 		103c 21cb  P840
 		103c 21cc  Smart Array
-		103c 21cd  Smart Array
-		103c 21ce  Smart Array
+		103c 21cd  P240nr
+		103c 21ce  H240nr
 	323a  Smart Array G6 controllers
 		103c 3241  Smart Array P212
 		103c 3243  Smart Array P410
 		103c 3245  Smart Array P410i
 		103c 3247  Smart Array P411
 		103c 3249  Smart Array P812
-		103c 324a  HP Smart Array 712m (Mezzanine RAID controller)
+		103c 324a  Smart Array 712m (Mezzanine RAID controller)
 		103c 324b  Smart Array P711m (Mezzanine RAID controller)
 	323b  Smart Array Gen8 Controllers
 		103c 3350  P222
@@ -10306,11 +10307,11 @@
 	17f0  GM200GL [Quadro M6000]
 10df  Emulex Corporation
 	0720  OneConnect NIC (Skyhawk)
-		103c 1934  HP FlexFabric 20Gb 2-port 650M Adapter
-		103c 1935  HP FlexFabric 20Gb 2-port 650FLB Adapter
-		103c 21d4  HP StoreFabric CN1200E 10Gb Converged Network Adapter
-		103c 220a  HP FlexFabric 10Gb 2-port 556FLR-SFP+ Adapter
-		103c 803f  HP Ethernet 10Gb 2-port 557SFP+ Adapter
+		103c 1934  FlexFabric 20Gb 2-port 650M Adapter
+		103c 1935  FlexFabric 20Gb 2-port 650FLB Adapter
+		103c 21d4  StoreFabric CN1200E 10Gb Converged Network Adapter
+		103c 220a  FlexFabric 10Gb 2-port 556FLR-SFP+ Adapter
+		103c 803f  Ethernet 10Gb 2-port 557SFP+ Adapter
 		17aa 1056  ThinkServer OCm14102-UX-L AnyFabric
 		17aa 1057  ThinkServer OCm14104-UX-L AnyFabric
 		17aa 1059  ThinkServer OCm14104-UT-L AnyFabric
@@ -16230,8 +16231,8 @@
 		103c 280a  DC5750 Microtower
 	167d  NetXtreme BCM5751M Gigabit Ethernet PCI Express
 		1014 0577  ThinkPad Z60t
-		103c 0934  HP nx8220
-		103c 0940  HP Compaq nw8240 Mobile Workstation
+		103c 0934  nx8220
+		103c 0940  Compaq nw8240 Mobile Workstation
 		17aa 2081  ThinkPad R60e
 	167e  NetXtreme BCM5751F Fast Ethernet PCI Express
 	167f  NetLink BCM5787F Fast Ethernet PCI Express
@@ -16254,15 +16255,15 @@
 	168d  NetXtreme II BCM57840 10/20 Gigabit Ethernet
 	168e  NetXtreme II BCM57810 10 Gigabit Ethernet
 		103c 1798  Flex-10 10Gb 2-port 530FLB Adapter [Meru]
-		103c 17a5  HP Flex-10 10Gb 2-port 530M Adapter
-		103c 18d3  HP Ethernet 10Gb 2-port 530T Adapter
-		103c 1930  HP FlexFabric 10Gb 2-port 534FLR-SFP+ Adapter
-		103c 1931  HP StoreFabric CN1100R Dual Port Converged Network Adapter
-		103c 1932  HP FlexFabric 10Gb 2-port 534FLB Adapter
-		103c 1933  HP FlexFabric 10Gb 2-port 534M Adapter
-		103c 193a  HP FlexFabric 10Gb 2-port 533FLR-T Adapter
-		103c 3382  HP Ethernet 10Gb 2-port 530FLR-SFP+ Adapter
-		103c 339d  HP Ethernet 10Gb 2-port 530SFP+ Adapter
+		103c 17a5  Flex-10 10Gb 2-port 530M Adapter
+		103c 18d3  Ethernet 10Gb 2-port 530T Adapter
+		103c 1930  FlexFabric 10Gb 2-port 534FLR-SFP+ Adapter
+		103c 1931  StoreFabric CN1100R Dual Port Converged Network Adapter
+		103c 1932  FlexFabric 10Gb 2-port 534FLB Adapter
+		103c 1933  FlexFabric 10Gb 2-port 534M Adapter
+		103c 193a  FlexFabric 10Gb 2-port 533FLR-T Adapter
+		103c 3382  Ethernet 10Gb 2-port 530FLR-SFP+ Adapter
+		103c 339d  Ethernet 10Gb 2-port 530SFP+ Adapter
 	1690  NetXtreme BCM57760 Gigabit Ethernet PCIe
 	1691  NetLink BCM57788 Gigabit Ethernet PCIe
 		1028 04aa  XPS 8300
@@ -16288,14 +16289,14 @@
 	16a0  NetLink BCM5785 Fast Ethernet
 	16a1  BCM57840 NetXtreme II 10 Gigabit Ethernet
 	16a2  BCM57840 NetXtreme II 10/20-Gigabit Ethernet
-		103c 1916  HP FlexFabric 20Gb 2-port 630FLB Adapter
-		103c 1917  HP FlexFabric 20Gb 2-port 630M Adapter
+		103c 1916  FlexFabric 20Gb 2-port 630FLB Adapter
+		103c 1917  FlexFabric 20Gb 2-port 630M Adapter
 		103c 2231  3820C 10/20Gb Converged Network Adapter
 		103c 22fa  FlexFabric 10Gb 2-port 536FLB Adapter
 	16a3  NetXtreme BCM57786 Gigabit Ethernet PCIe
 	16a4  BCM57840 NetXtreme II Ethernet Multi Function
-		103c 1916  HP NPAR 20Gb 2-port 630FLB Adapter
-		103c 1917  HP NPAR 20Gb 2-port 630M Adapter
+		103c 1916  NPAR 20Gb 2-port 630FLB Adapter
+		103c 1917  NPAR 20Gb 2-port 630M Adapter
 		103c 2231  3820C 10/20Gb Converged Network Adapter (NPAR 1.5)
 		103c 22fa  FlexFabric 10Gb 2-port 536FLB Adapter (NPAR 1.5)
 # The Broadcom 57800 device has two 1Gig ports and two 10Gig ports. The subsystem information can be used to differentiate.
@@ -16341,32 +16342,32 @@
 		103c 703b  NC373i Integrated Multifunction Gigabit Server Adapter
 		103c 703d  NC373F PCI Express Multifunction Gigabit Server Adapter
 	16ad  NetXtreme II BCM57840 10/20 Gigabit Ethernet Virtual Function
-		103c 1916  HP FlexFabric 20Gb 2-port 630FLB Adapter
-		103c 1917  HP FlexFabric 20Gb 2-port 630M Adapter
+		103c 1916  FlexFabric 20Gb 2-port 630FLB Adapter
+		103c 1917  FlexFabric 20Gb 2-port 630M Adapter
 		103c 2231  3820C 10/20Gb Converged Network Adapter (SR-IOV VF)
 		103c 22fa  FlexFabric 10Gb 2-port 536FLB Adapter (SR-IOV VF)
 	16ae  NetXtreme II BCM57810 10 Gigabit Ethernet Multi Function
-		103c 1798  HP NPAR 10Gb 2-port 530FLB Adapter
-		103c 17a5  HP NPAR 10Gb 2-port 530M Adapter
-		103c 18d3  HP NPAR 10Gb 2-port 530T Adapter
-		103c 1930  HP NPAR 10Gb 2-port 534FLR-SFP+ Adapter
-		103c 1931  HP NPAR CN1100R Dual Port Converged Network Adapter
-		103c 1932  HP NPAR 10Gb 2-port 534FLB Adapter
-		103c 1933  HP NPAR 10Gb 2-port 534M Adapter
-		103c 193a  HP NPAR 10Gb 2-port 533FLR-T Adapter
-		103c 3382  HP NPAR 10Gb 2-port 530FLR-SFP+ Adapter
-		103c 339d  HP NPAR 10Gb 2-port 530SFP+ Adapter
+		103c 1798  NPAR 10Gb 2-port 530FLB Adapter
+		103c 17a5  NPAR 10Gb 2-port 530M Adapter
+		103c 18d3  NPAR 10Gb 2-port 530T Adapter
+		103c 1930  NPAR 10Gb 2-port 534FLR-SFP+ Adapter
+		103c 1931  NPAR CN1100R Dual Port Converged Network Adapter
+		103c 1932  NPAR 10Gb 2-port 534FLB Adapter
+		103c 1933  NPAR 10Gb 2-port 534M Adapter
+		103c 193a  NPAR 10Gb 2-port 533FLR-T Adapter
+		103c 3382  NPAR 10Gb 2-port 530FLR-SFP+ Adapter
+		103c 339d  NPAR 10Gb 2-port 530SFP+ Adapter
 	16af  NetXtreme II BCM57810 10 Gigabit Ethernet Virtual Function
-		103c 1798  HP Flex-10 10Gb 2-port 530FLB Adapter
-		103c 17a5  HP Flex-10 10Gb 2-port 530M Adapter
-		103c 18d3  HP Ethernet 10Gb 2-port 530T Adapter
-		103c 1930  HP FlexFabric 10Gb 2-port 534FLR-SFP+ Adapter
-		103c 1931  HP StoreFabric CN1100R Dual Port Converged Network Adapter
-		103c 1932  HP FlexFabric 10Gb 2-port 534FLB Adapter
-		103c 1933  HP FlexFabric 10Gb 2-port 534M Adapter
-		103c 193a  HP FlexFabric 10Gb 2-port 533FLR-T Adapter
-		103c 3382  HP Ethernet 10Gb 2-port 530FLR-SFP+ Adapter
-		103c 339d  HP Ethernet 10Gb 2-port 530SFP+ Adapter
+		103c 1798  Flex-10 10Gb 2-port 530FLB Adapter
+		103c 17a5  Flex-10 10Gb 2-port 530M Adapter
+		103c 18d3  Ethernet 10Gb 2-port 530T Adapter
+		103c 1930  FlexFabric 10Gb 2-port 534FLR-SFP+ Adapter
+		103c 1931  StoreFabric CN1100R Dual Port Converged Network Adapter
+		103c 1932  FlexFabric 10Gb 2-port 534FLB Adapter
+		103c 1933  FlexFabric 10Gb 2-port 534M Adapter
+		103c 193a  FlexFabric 10Gb 2-port 533FLR-T Adapter
+		103c 3382  Ethernet 10Gb 2-port 530FLR-SFP+ Adapter
+		103c 339d  Ethernet 10Gb 2-port 530SFP+ Adapter
 	16b0  NetXtreme BCM57761 Gigabit Ethernet PCIe
 	16b1  NetLink BCM57781 Gigabit Ethernet PCIe
 		1849 96b1  Z77 Extreme4 motherboard
@@ -17551,15 +17552,15 @@
 1642  Bitland(ShenZhen) Information Technology Co., Ltd.
 1657  Brocade Communications Systems, Inc.
 	0013  425/825/42B/82B 4Gbps/8Gbps PCIe dual port FC HBA
-		103c 1742  HP 82B 8Gbps dual port FC HBA
-		103c 1744  HP 42B 4Gbps dual port FC HBA
+		103c 1742  82B 8Gbps dual port FC HBA
+		103c 1744  42B 4Gbps dual port FC HBA
 		1657 0014  425/825 4Gbps/8Gbps PCIe dual port FC HBA
 	0014  1010/1020/1007/1741 10Gbps CNA
 		1657 0014  1010/1020/1007/1741 10Gbps CNA - FCOE
 		1657 0015  1010/1020/1007/1741 10Gbps CNA - LL
 	0017  415/815/41B/81B 4Gbps/8Gbps PCIe single port FC HBA
-		103c 1741  HP 41B 4Gbps single port FC HBA
-		103c 1743  HP 81B 8Gbps single port FC HBA
+		103c 1741  41B 4Gbps single port FC HBA
+		103c 1743  81B 8Gbps single port FC HBA
 		1657 0014  415/815 4Gbps/8Gbps single port PCIe FC HBA
 	0021  804 8Gbps FC HBA for HP Bladesystem c-class
 # AnyIO Adapter
@@ -19515,6 +19516,7 @@
 2955  Connectix Virtual PC
 	6e61  OHCI USB 1.1 controller
 2a15  3D Vision(???)
+2bd8  ROPEX Industrie-Elektronik GmbH
 3000  Hansol Electronics Inc.
 3142  Post Impression Systems.
 31ab  Zonet
@@ -21267,7 +21269,7 @@
 		8086 1199  PRO/1000 GT Quad Port Server Adapter
 	10b6  82598 10GbE PCI-Express Ethernet Controller
 	10b9  82572EI Gigabit Ethernet Controller (Copper)
-		103c 704a  HP 110T PCIe Gigabit Server Adapter
+		103c 704a  110T PCIe Gigabit Server Adapter
 		8086 1083  PRO/1000 PT Desktop Adapter
 		8086 1093  PRO/1000 PT Desktop Adapter
 	10ba  80003ES2LAN Gigabit Ethernet Controller (Copper)
@@ -21395,6 +21397,7 @@
 		108e 7b11  Ethernet Server Adapter X520-2
 		1734 11a9  10 Gigabit Dual Port Network Connection
 		17aa 1071  ThinkServer X520-2 AnyFabric
+		17aa 4007  82599ES 10-Gigabit SFI/SFP+ Network Connection
 		8086 0002  Ethernet Server Adapter X520-DA2
 		8086 0003  Ethernet Server Adapter X520-2
 		8086 0006  Ethernet Server Adapter X520-1
@@ -21681,6 +21684,7 @@
 		1093 775b  PCIe-8237 Ethernet Adapter
 		10a9 802a  UV2-BaseIO dual-port GbE
 		17aa 1074  ThinkServer I350-T4 AnyFabric
+		17aa 4005  I350 Gigabit Network Connection
 		8086 0001  Ethernet Server Adapter I350-T4
 		8086 0002  Ethernet Server Adapter I350-T2
 		8086 00a1  Ethernet Server Adapter I350-T4
@@ -21723,6 +21727,7 @@
 		108e 7b15  Sun Dual Port 10 GbE PCIe 2.0 Low Profile Adapter, Base-T
 		1137 00bf  Ethernet Converged Network Adapter X540-T2
 		17aa 1073  ThinkServer X540-T2 AnyFabric
+		17aa 4006  Ethernet Controller 10-Gigabit X540-AT2
 		8086 0001  Ethernet Converged Network Adapter X540-T2
 		8086 0002  Ethernet Converged Network Adapter X540-T1
 		8086 001a  Ethernet Converged Network Adapter X540-T2
@@ -21758,6 +21763,7 @@
 	154d  Ethernet 10G 2P X520 Adapter
 		8086 7b11  10GbE 2P X520 Adapter
 	1557  82599 10 Gigabit Network Connection
+		17aa 4008  82599EN 10 Gigabit Network Connection
 		8086 0001  Ethernet OCP Server Adapter X520-1
 	1558  Ethernet Converged Network Adapter X520-Q1
 		8086 011a  Ethernet Converged Network Adapter X520-Q1
@@ -22483,7 +22489,7 @@
 		104d 80df  Vaio PCG-FX403
 	2448  82801 Mobile PCI Bridge
 		1028 040b  Latitude E6510
-		103c 0934  HP Compaq nw8240 Mobile Workstation
+		103c 0934  Compaq nw8240 Mobile Workstation
 		103c 099c  NX6110/NC6120
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a3  Compaq nw8440
@@ -23128,7 +23134,7 @@
 		e4bf 0cd3  CD3-JIVE
 		e4bf 58b1  XB1
 	2591  Mobile 915GM/PM Express PCI Express Root Port
-		103c 0934  HP Compaq nw8240 Mobile Workstation
+		103c 0934  Compaq nw8240 Mobile Workstation
 	2592  Mobile 915GM/GMS/910GML Express Graphics Controller
 		103c 099c  NX6110/NC6120
 		103c 308a  NC6220
@@ -23378,13 +23384,13 @@
 		e4bf 0cd3  CD3-JIVE
 		e4bf 58b1  XB1
 	2660  82801FB/FBM/FR/FW/FRW (ICH6 Family) PCI Express Port 1
-		103c 0934  HP Compaq nw8240 Mobile Workstation
+		103c 0934  Compaq nw8240 Mobile Workstation
 		103c 099c  NX6110/NC6120
 		e4bf 0ccd  CCD-CALYPSO
 		e4bf 0cd3  CD3-JIVE
 		e4bf 58b1  XB1
 	2662  82801FB/FBM/FR/FW/FRW (ICH6 Family) PCI Express Port 2
-		103c 0934  HP Compaq nw8240 Mobile Workstation
+		103c 0934  Compaq nw8240 Mobile Workstation
 		e4bf 0ccd  CCD-CALYPSO
 		e4bf 0cd3  CD3-JIVE
 		e4bf 58b1  XB1
@@ -24045,7 +24051,7 @@
 		1028 01f9  Dell Latitude D630
 		1028 01ff  Dell Precision M4300
 		1028 0256  Studio 1735
-		103c 2802  HP Compaq dc7700p
+		103c 2802  Compaq dc7700p
 		103c 30c0  Compaq 6710b
 		103c 30c1  Compaq 6910p
 		103c 30cc  Pavilion dv6700
@@ -25285,7 +25291,7 @@
 		15d9 060d  C7SIM-Q Motherboard
 	3b23  5 Series/3400 Series Chipset 4 port SATA AHCI Controller
 	3b25  5 Series/3400 Series Chipset SATA RAID Controller
-		103c 3118  HP Smart Array B110i SATA RAID Controller
+		103c 3118  Smart Array B110i SATA RAID Controller
 	3b26  5 Series/3400 Series Chipset 2 port SATA IDE Controller
 	3b28  5 Series/3400 Series Chipset 4 port SATA IDE Controller
 		144d c06a  R730 Laptop
@@ -27035,6 +27041,7 @@ dada  Datapath Limited
 	1153  VisionDVI-DL
 	1154  VisionSDI2
 db10  Diablo Technologies
+dc93  Dawicontrol GmbH
 dcba  Dynamic Engineering
 	0046  PCIe Altera Cyclone IV
 # VPX format Receiver Controller Board
