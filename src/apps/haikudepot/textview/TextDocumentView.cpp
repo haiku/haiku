@@ -50,6 +50,7 @@ TextDocumentView::~TextDocumentView()
 {
 	// Don't forget to remove listeners
 	SetTextEditor(TextEditorRef());
+	delete fCaretBlinker;
 }
 
 
