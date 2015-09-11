@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -224,13 +224,11 @@ put_fd(struct file_descriptor* descriptor)
 			descriptor->ops->fd_free(descriptor);
 
 		// prevent this descriptor from being closed/freed again
-		descriptor->open_count = -1;
-		descriptor->ref_count = -1;
 		descriptor->ops = NULL;
 		descriptor->u.vnode = NULL;
 
 		// the file descriptor is kept intact, so that it's not
-		// reused until someone explicetly closes it
+		// reused until someone explicitly closes it
 	}
 }
 
@@ -295,13 +293,8 @@ get_fd_locked(struct io_context* context, int fd)
 	struct file_descriptor* descriptor = context->fds[fd];
 
 	if (descriptor != NULL) {
-		// Disconnected descriptors cannot be accessed anymore
-		if (descriptor->open_mode & O_DISCONNECTED)
-			descriptor = NULL;
-		else {
-			TFD(GetFD(context, fd, descriptor));
-			inc_fd_ref_count(descriptor);
-		}
+		TFD(GetFD(context, fd, descriptor));
+		inc_fd_ref_count(descriptor);
 	}
 
 	return descriptor;
@@ -323,7 +316,7 @@ get_open_fd(struct io_context* context, int fd)
 	MutexLocker _(context->io_mutex);
 
 	file_descriptor* descriptor = get_fd_locked(context, fd);
-	if (descriptor == NULL)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return NULL;
 
 	atomic_add(&descriptor->open_count, 1);
@@ -427,7 +420,8 @@ dup2_fd(int oldfd, int newfd, bool kernel)
 	// the table size could be changed)
 	if ((uint32)oldfd >= context->table_size
 		|| (uint32)newfd >= context->table_size
-		|| context->fds[oldfd] == NULL) {
+		|| context->fds[oldfd] == NULL
+		|| (context->fds[oldfd]->open_mode & O_DISCONNECTED) != 0) {
 		mutex_unlock(&context->io_mutex);
 		return B_FILE_ERROR;
 	}
@@ -508,10 +502,10 @@ fd_ioctl(bool kernelFD, int fd, uint32 op, void* buffer, size_t length)
 	int status;
 
 	descriptor = get_fd(get_current_io_context(kernelFD), fd);
-	if (descriptor == NULL)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return B_FILE_ERROR;
 
-	if (descriptor->ops->fd_ioctl)
+	if (descriptor->ops->fd_ioctl != NULL)
 		status = descriptor->ops->fd_ioctl(descriptor, op, buffer, length);
 	else
 		status = B_DEV_INVALID_IOCTL;
@@ -567,7 +561,7 @@ select_fd(int32 fd, struct select_info* info, bool kernel)
 	MutexLocker locker(context->io_mutex);
 
 	struct file_descriptor* descriptor = fdGetter.SetTo(context, fd, true);
-	if (descriptor == NULL)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return B_FILE_ERROR;
 
 	uint16 eventsToSelect = info->selected_events & ~B_EVENT_INVALID;
@@ -685,7 +679,7 @@ fd_is_valid(int fd, bool kernel)
 {
 	struct file_descriptor* descriptor
 		= get_fd(get_current_io_context(kernel), fd);
-	if (descriptor == NULL)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return false;
 
 	put_fd(descriptor);
@@ -726,7 +720,7 @@ common_user_io(int fd, off_t pos, void* buffer, size_t length, bool write)
 
 	FDGetter fdGetter;
 	struct file_descriptor* descriptor = fdGetter.SetTo(fd, false);
-	if (!descriptor)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return B_FILE_ERROR;
 
 	if (write ? (descriptor->open_mode & O_RWMASK) == O_RDONLY
@@ -778,7 +772,7 @@ common_user_vector_io(int fd, off_t pos, const iovec* userVecs, size_t count,
 
 	FDGetter fdGetter;
 	struct file_descriptor* descriptor = fdGetter.SetTo(fd, false);
-	if (!descriptor)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return B_FILE_ERROR;
 
 	if (write ? (descriptor->open_mode & O_RWMASK) == O_RDONLY
@@ -891,12 +885,12 @@ _user_seek(int fd, off_t pos, int seekType)
 	struct file_descriptor* descriptor;
 
 	descriptor = get_fd(get_current_io_context(false), fd);
-	if (!descriptor)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return B_FILE_ERROR;
 
 	TRACE(("user_seek(descriptor = %p)\n", descriptor));
 
-	if (descriptor->ops->fd_seek)
+	if (descriptor->ops->fd_seek != NULL)
 		pos = descriptor->ops->fd_seek(descriptor, pos, seekType);
 	else
 		pos = ESPIPE;
@@ -937,7 +931,7 @@ _user_read_dir(int fd, struct dirent* userBuffer, size_t bufferSize,
 	io_context* ioContext = get_current_io_context(false);
 	FDGetter fdGetter;
 	struct file_descriptor* descriptor = fdGetter.SetTo(ioContext, fd, false);
-	if (descriptor == NULL)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_read_dir == NULL)
@@ -983,10 +977,10 @@ _user_rewind_dir(int fd)
 	TRACE(("user_rewind_dir(fd = %d)\n", fd));
 
 	descriptor = get_fd(get_current_io_context(false), fd);
-	if (descriptor == NULL)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return B_FILE_ERROR;
 
-	if (descriptor->ops->fd_rewind_dir)
+	if (descriptor->ops->fd_rewind_dir != NULL)
 		status = descriptor->ops->fd_rewind_dir(descriptor);
 	else
 		status = B_UNSUPPORTED;
@@ -1124,7 +1118,7 @@ _kern_write(int fd, off_t pos, const void* buffer, size_t length)
 	FDGetter fdGetter;
 	struct file_descriptor* descriptor = fdGetter.SetTo(fd, true);
 
-	if (descriptor == NULL)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return B_FILE_ERROR;
 	if ((descriptor->open_mode & O_RWMASK) == O_RDONLY)
 		return B_FILE_ERROR;
@@ -1252,7 +1246,7 @@ _kern_read_dir(int fd, struct dirent* buffer, size_t bufferSize,
 
 	struct io_context* ioContext = get_current_io_context(true);
 	descriptor = get_fd(ioContext, fd);
-	if (descriptor == NULL)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_read_dir) {
@@ -1278,7 +1272,7 @@ _kern_rewind_dir(int fd)
 	TRACE(("sys_rewind_dir(fd = %d)\n",fd));
 
 	descriptor = get_fd(get_current_io_context(true), fd);
-	if (descriptor == NULL)
+	if (descriptor == NULL || (descriptor->open_mode & O_DISCONNECTED) != 0)
 		return B_FILE_ERROR;
 
 	if (descriptor->ops->fd_rewind_dir)
