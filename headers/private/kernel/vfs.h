@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -58,6 +58,7 @@ typedef struct io_context {
 	struct list node_monitors;
 	uint32		num_monitors;
 	uint32		max_monitors;
+	bool		inherit_fds;
 } io_context;
 
 

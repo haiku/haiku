@@ -1,6 +1,6 @@
 /*
  * Copyright 2005-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2014, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -4820,7 +4820,7 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 	MutexLocker parentLocker;
 
 	size_t tableSize;
-	if (parentContext) {
+	if (parentContext != NULL) {
 		parentLocker.SetTo(parentContext->io_mutex, false);
 		tableSize = parentContext->table_size;
 	} else
@@ -4847,7 +4847,7 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 
 	// Copy all parent file descriptors
 
-	if (parentContext) {
+	if (parentContext != NULL) {
 		size_t i;
 
 		mutex_lock(&sIOContextRootLock);
@@ -4860,23 +4860,25 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 		if (context->cwd)
 			inc_vnode_ref_count(context->cwd);
 
-		for (i = 0; i < tableSize; i++) {
-			struct file_descriptor* descriptor = parentContext->fds[i];
+		if (parentContext->inherit_fds) {
+			for (i = 0; i < tableSize; i++) {
+				struct file_descriptor* descriptor = parentContext->fds[i];
 
-			if (descriptor != NULL) {
-				bool closeOnExec = fd_close_on_exec(parentContext, i);
-				if (closeOnExec && purgeCloseOnExec)
-					continue;
+				if (descriptor != NULL) {
+					bool closeOnExec = fd_close_on_exec(parentContext, i);
+					if (closeOnExec && purgeCloseOnExec)
+						continue;
 
-				TFD(InheritFD(context, i, descriptor, parentContext));
+					TFD(InheritFD(context, i, descriptor, parentContext));
 
-				context->fds[i] = descriptor;
-				context->num_used_fds++;
-				atomic_add(&descriptor->ref_count, 1);
-				atomic_add(&descriptor->open_count, 1);
+					context->fds[i] = descriptor;
+					context->num_used_fds++;
+					atomic_add(&descriptor->ref_count, 1);
+					atomic_add(&descriptor->open_count, 1);
 
-				if (closeOnExec)
-					fd_set_close_on_exec(context, i, true);
+					if (closeOnExec)
+						fd_set_close_on_exec(context, i, true);
+				}
 			}
 		}
 
@@ -4893,6 +4895,7 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 	}
 
 	context->table_size = tableSize;
+	context->inherit_fds = parentContext != NULL;
 
 	list_init(&context->node_monitors);
 	context->max_monitors = DEFAULT_NODE_MONITORS;
@@ -8143,7 +8146,7 @@ _kern_open(int fd, const char* path, int openMode, int perms)
 	if (openMode & O_CREAT)
 		return file_create(fd, pathBuffer.LockBuffer(), openMode, perms, true);
 
-	return file_open(fd, pathBuffer.LockBuffer(), openMode | O_CLOEXEC, true);
+	return file_open(fd, pathBuffer.LockBuffer(), openMode, true);
 }
 
 
