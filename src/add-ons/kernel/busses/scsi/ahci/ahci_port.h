@@ -57,7 +57,7 @@ private:
 	status_t	WaitForTransfer(int *tfd, bigtime_t timeout);
 	void		FinishTransfer();
 
-	inline	void				_HardReset();
+	inline	bool				_HardReset();
 	inline	void				_ClearErrorRegister();
 
 //	uint8 *		SetCommandFis(volatile command_list_entry *cmd, volatile fis *fis, const void *data, size_t dataSize);
@@ -90,10 +90,13 @@ private:
 	volatile prd *					fPRDTable;
 };
 
+
 inline void
 AHCIPort::FlushPostedWrites()
 {
 	volatile uint32 dummy = fRegs->cmd;
 	dummy = dummy;
 }
+
+
 #endif	// _AHCI_PORT_H

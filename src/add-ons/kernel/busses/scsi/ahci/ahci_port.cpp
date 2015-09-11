@@ -218,7 +218,8 @@ void
 AHCIPort::ResetDevice()
 {
 	// perform a hard reset
-	_HardReset();
+	if (!_HardReset())
+		return;
 
 	if (wait_until_set(&fRegs->ssts, 0x1, 100000) < B_OK)
 		TRACE("AHCIPort::ResetDevice port %d no device detected\n", fIndex);
@@ -418,7 +419,8 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 		// Spec v1.3, §6.2.2.3 Recovery of Unsolicited COMINIT
 
 		// perform a hard reset
-		_HardReset();
+		if (!_HardReset())
+			return;
 
 		// clear error bits to clear PxSERR.DIAG.X
 		_ClearErrorRegister();
@@ -1319,12 +1321,13 @@ AHCIPort::ScsiGetRestrictions(bool* isATAPI, bool* noAutoSense,
 }
 
 
-void
+bool
 AHCIPort::_HardReset()
 {
 	if ((fRegs->cmd & PORT_CMD_ST) != 0) {
 		// We shouldn't perform a reset, but at least document it
 		TRACE("AHCIPort::_HardReset() PORT_CMD_ST set, behaviour undefined\n");
+		return false;
 	}
 
 	fRegs->sctl = (fRegs->sctl & ~SATA_CONTROL_DET_MASK)
@@ -1335,6 +1338,8 @@ AHCIPort::_HardReset()
 	fRegs->sctl = (fRegs->sctl & ~SATA_CONTROL_DET_MASK)
 		| DET_NO_INITIALIZATION << SATA_CONTROL_DET_SHIFT;
 	FlushPostedWrites();
+
+	return true;
 }
 
 
