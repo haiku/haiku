@@ -8143,7 +8143,7 @@ _kern_open(int fd, const char* path, int openMode, int perms)
 	if (openMode & O_CREAT)
 		return file_create(fd, pathBuffer.LockBuffer(), openMode, perms, true);
 
-	return file_open(fd, pathBuffer.LockBuffer(), openMode, true);
+	return file_open(fd, pathBuffer.LockBuffer(), openMode | O_CLOEXEC, true);
 }
 
 
