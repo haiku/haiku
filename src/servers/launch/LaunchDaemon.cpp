@@ -1291,9 +1291,25 @@ LaunchDaemon::_AddInitJob(BJob* job)
 // #pragma mark -
 
 
+static void
+open_stdio(int targetFD, int openMode)
+{
+	int fd = open("/dev/null", openMode);
+	if (fd != targetFD) {
+		dup2(fd, targetFD);
+		close(fd);
+	}
+}
+
+
 int
 main()
 {
+	// Make stdin/out/err available
+	open_stdio(STDIN_FILENO, O_RDONLY);
+	open_stdio(STDOUT_FILENO, O_WRONLY);
+	dup2(STDOUT_FILENO, STDERR_FILENO);
+
 	EventMap events;
 	status_t status;
 	LaunchDaemon* daemon = new LaunchDaemon(false, events, status);
