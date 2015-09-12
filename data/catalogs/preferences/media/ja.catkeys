@@ -1,6 +1,8 @@
-1	japanese	x-vnd.Haiku-Media	862832618
+1	japanese	x-vnd.Haiku-Media	4205337498
 Couldn't add volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar に追加できませんでした: %s\n
 Video input:	Media views		ビデオ入力:
+Warning!	Media Window		警告
+Quit anyway	Media Window		強制終了
 Defaults	Media views		デフォルト
 MIDI Settings	Media Window		MIDI 設定
 Quit	Media Window		終了
@@ -10,6 +12,7 @@ Could not connect to the media server.\nWould you like to start it ?	Media Windo
 Restart media services	Media views		メディアサービスを再起動
 Couldn't remove volume control in Deskbar: %s\n	Media views		音量コントロールを Deskbar から削除できませんでした: %s\n
 Media	System name		メディア
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		メディアプレファレンスを今終了すると、メディアサービスの再起動を停止します。結果として、メディア機能が少しおかしくなるか利用できなくなります。
 Audio mixer	Media Window		オーディオミキサー
 This hardware has no controls.	Media Window		このハードウェアにはコントロールがありません。
 Audio output:	Media views		オーディオ出力:

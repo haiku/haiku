@@ -1,7 +1,8 @@
-1	japanese	x-vnd.Be-MAIL	4285843074
+1	japanese	x-vnd.Be-MAIL	1865394837
 View	Mail		表示
 %d - Date	Mail		%d - 日付
 Attach attributes:	Mail		属性の添付:
+Unknown	Mail		不明
 Inconsistency occurred in the undo/redo buffer.	Mail		Undo/Redo バッファに不一致が発生しました。
 An error occurred trying to save the attachment.	Mail		添付ファイルの保存の際にエラーが発生しました。 
 Copy to new	Mail		新規メッセージにコピー
@@ -146,6 +147,7 @@ sent	B_USER_DIRECTORY/mail/sent		送信済みメール
 Put your favorite e-mail queries and query templates in this folder.	Mail		お気に入りの電子メールクエリーとクエリテンプレートをこのフォルダーに入れてください。
 Spam	Mail		スパム
 Reply	Mail		返信
+Encoding	Mail		エンコーディング
 From:	Mail		差出人:
 Couldn't open this signature. Sorry.	Mail		この署名を開くことはできませんでした。
 Open draft	Mail		下書きを開く

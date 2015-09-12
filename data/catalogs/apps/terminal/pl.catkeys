@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Terminal	2696855708
+1	polish	x-vnd.Haiku-Terminal	2093402207
 Not found.	Terminal TermWindow		Nie znaleziono.
 Switch Terminals	Terminal TermWindow		Przełącz terminal
 Change directory	Terminal TermView		Zmień katalog
@@ -86,10 +86,12 @@ Text encoding	Terminal TermWindow		Kodowanie tekstu
 size	Terminal TermView		rozmiar
 Close window	Terminal TermWindow		Zamknij okno
 Copy absolute path	Terminal TermView		Kopiuj ścieżkę absolutną
+Save as default	Terminal TermWindow		Zapisz jako domyślny
 Set tab title	Terminal TermWindow		Ustaw tytuł karty
 Settings…	Terminal TermWindow		Ustawienia…
 Abort	Terminal Shell		Anuluj
 Open link	Terminal TermView		Otwórz odnośnik
+Solarized Light	Terminal colors scheme		Solarized Light
 Edit	Terminal TermWindow		Edycja
 Color:	Terminal AppearancePrefView		Kolor:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Wzór ustalający tytuł okna. Następujące wyznaczniki\nmogą zostać użyte:\n
@@ -109,6 +111,7 @@ Find next	Terminal TermWindow		Znajdź następny
 Close active tab	Terminal TermWindow		Zamknij aktywną kartę
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t–\tZnak „%”.\n\t%<\t–\tRozpoczyna sekcję, która będzie pokazana tylko jeśli znacznik\n\t\t\tnastępujący nie będzie pusty.\n\t%>\t–\tRozpoczyna sekcję, która będzie pokazana tylko jeśli znacznik\n\t\t\tpomiędzy poprzednią sekcją %< a obecną nie będzie pusty.\n\t%-\t–\tKończy powyższe sekcje.\n\nKażdy znak niebędący alfanumerycznym, znajdujący się pomiędzy „%” a literą\nformatującą wstawi spację, tylko jeśli znacznik nie jest pusty. Zostanie\nona dodana do sekcji %<.
 Paste	Terminal TermWindow		Wklej
+Solarized Dark	Terminal colors scheme		Solarized Dark
 Shell 	Terminal TermWindow		Powłoka
 Cancel	Terminal TermView		Anuluj
 Use default	Terminal SetTitleWindow		Użyj domyślnych

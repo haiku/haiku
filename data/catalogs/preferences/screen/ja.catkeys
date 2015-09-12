@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Screen	2339556848
+1	japanese	x-vnd.Haiku-Screen	4090394050
 yes	Screen		はい
 Use laptop panel:	Screen		ラップトップパネルを使用:
 15 bits/pixel, 32768 colors	Screen		15ビット/画素, 32768色
@@ -39,6 +39,7 @@ bits/pixel	Screen		ビット/画素
 Refresh rate:	Screen		リフレッシュレート:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		これらの設定を保存しますか?
+Confirm changes	Screen		変更の確認
 Rows:	Screen		行:
 vertically	Screen		垂直に
 Resolution:	Screen		解像度:

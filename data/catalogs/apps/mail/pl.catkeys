@@ -1,7 +1,8 @@
-1	polish	x-vnd.Be-MAIL	4285843074
+1	polish	x-vnd.Be-MAIL	1865394837
 View	Mail		Widok
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Dołączaj atrybuty:
+Unknown	Mail		Nieznany
 Inconsistency occurred in the undo/redo buffer.	Mail		Powstała niespójność pomiędzy buforem cofnij/powtórz.
 An error occurred trying to save the attachment.	Mail		Wystąpił błąd podczas zapisu załącznika.
 Copy to new	Mail		Kopiuj do nowego
@@ -146,6 +147,7 @@ sent	B_USER_DIRECTORY/mail/sent		sent
 Put your favorite e-mail queries and query templates in this folder.	Mail		Umieść swoje ulubione zapytania wiadomości i szablony zapytań w tym katalogu.
 Spam	Mail		Spam
 Reply	Mail		Odpowiedz
+Encoding	Mail		Kodowanie
 From:	Mail		Od:
 Couldn't open this signature. Sorry.	Mail		Nie można otworzyć tej sygnaturki. Przepraszamy.
 Open draft	Mail		Otwórz szkic

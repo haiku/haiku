@@ -1,7 +1,8 @@
-1	french	x-vnd.Be-MAIL	4285843074
+1	french	x-vnd.Be-MAIL	1865394837
 View	Mail		Vue
 %d - Date	Mail		%d - Date
 Attach attributes:	Mail		Attributs du fichier joint :
+Unknown	Mail		Inconnu
 Inconsistency occurred in the undo/redo buffer.	Mail		Une incohérence est survenue dans le tampon d’annulation.
 An error occurred trying to save the attachment.	Mail		Une erreur s’est produite en essayant de sauvegarder le fichier joint.
 Copy to new	Mail		Copier vers nouveau
@@ -146,6 +147,7 @@ sent	B_USER_DIRECTORY/mail/sent		envoyés
 Put your favorite e-mail queries and query templates in this folder.	Mail		Mettez vos requêtes d’e-mail et vos modèles de requêtes dans ce dossier.
 Spam	Mail		Courrier indésirable
 Reply	Mail		Répondre
+Encoding	Mail		Encodage
 From:	Mail		De :
 Couldn't open this signature. Sorry.	Mail		Impossible d’ouvrir cette signature. Désolé.
 Open draft	Mail		Ouvrir le brouillon

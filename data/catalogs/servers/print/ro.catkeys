@@ -17,7 +17,7 @@ Page %1 to %2, %3 copies	ConfigWindow		Pagina %1 la %2, %3 copii
 Yes	PrintServerApp		Da
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger (432 x 279 mm)
 Would you like to set one up now?	PrintServerApp		Doriți să configurați una acum?
-A6	ConfigWindow	ISO 216 paper size	A6 (105 x 148 mm)
+A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Portret
 All pages	ConfigWindow		Toate paginile
 There is no default printer set up.	PrintServerApp		Nu există o imprimantă implicită configurată.

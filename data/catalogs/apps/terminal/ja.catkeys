@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	2696855708
+1	japanese	x-vnd.Haiku-Terminal	2093402207
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -86,10 +86,12 @@ Text encoding	Terminal TermWindow		テキストエンコーディング
 size	Terminal TermView		サイズ
 Close window	Terminal TermWindow		ウィンドウを閉じる
 Copy absolute path	Terminal TermView		絶対パスをコピー
+Save as default	Terminal TermWindow		デフォルトとして保存
 Set tab title	Terminal TermWindow		タブのタイトルを設定
 Settings…	Terminal TermWindow		設定…
 Abort	Terminal Shell		中断
 Open link	Terminal TermView		リンクを開く
+Solarized Light	Terminal colors scheme		Solarized Light
 Edit	Terminal TermWindow		編集
 Color:	Terminal AppearancePrefView		色:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		パターンはウィンドウタイトルを指定します。次のプレースホルダーが\n使用できます:\n
@@ -109,6 +111,7 @@ Find next	Terminal TermWindow		次を検索
 Close active tab	Terminal TermWindow		タブを閉じる
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t文字 '%'.\n\t%<\t-\tあとでプレースホルダーが空にならない場合のみ表示される\n\t\t\tセクションを開始します。\n\t%>\t-\t前の %< セクションと、このセクションの間のプレースホルダーが\n\t\t\t空にならない場合のみ表示されるセクションを開始します。\n\t%-\t-\t%< または %> セクションを終了します。\n\n'%' とフォーマット文字間の英数字以外の文字は、プレースホルダーが\n空でない場合にスペースのみを挿入します。
 Paste	Terminal TermWindow		貼り付け
+Solarized Dark	Terminal colors scheme		Solarized Dark
 Shell 	Terminal TermWindow		シェル
 Cancel	Terminal TermView		中止
 Use default	Terminal SetTitleWindow		デフォルトを使用

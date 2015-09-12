@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2582940445
+1	romanian	x-vnd.Haiku-libtracker	3589941242
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Module
 Mount settings…	ContainerWindow		Configurări montare...
@@ -276,6 +276,7 @@ Permissions	ContainerWindow		Permisiuni
 moving	FSUtils		se mută
 Identify	InfoWindow		Identifică
 Recent folders	ContainerWindow		Dosare recente
+rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	a redenumi
 Close all	ContainerWindow		Închide tot
 Include trash	FindPanel		Include gunoi
 Query template	FindPanel		Șablon interogare

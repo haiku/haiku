@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Media	3383826947
+1	polish	x-vnd.Haiku-Media	4205337498
 Couldn't add volume control in Deskbar: %s\n	Media views		Nie można dodać sterowania głośnością w Deskbarze: %s\n
 Video input:	Media views		Wejście wideo:
 Warning!	Media Window		Uwaga!
@@ -12,6 +12,7 @@ Could not connect to the media server.\nWould you like to start it ?	Media Windo
 Restart media services	Media views		Ponowne uruchomienie usług multimedialnych
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nie można usunąć sterowania głośnością w Deskbarze: %s\n
 Media	System name		Nośnik
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Zakończenie panelu w tej chwili zatrzyma restartowanie usług mediów. Może to skutkować niestabilnością lub niedostępnością funkcji multimedialnych.
 Audio mixer	Media Window		Mikser audio
 This hardware has no controls.	Media Window		Ten sprzęt nie ma żadnych ustawień.
 Audio output:	Media views		Wyjście dźwięku:

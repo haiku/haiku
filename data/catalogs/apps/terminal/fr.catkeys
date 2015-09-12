@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	2696855708
+1	french	x-vnd.Haiku-Terminal	2093402207
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -86,10 +86,12 @@ Text encoding	Terminal TermWindow		Encodage texte
 size	Terminal TermView		taille
 Close window	Terminal TermWindow		Fermer la fenêtre
 Copy absolute path	Terminal TermView		Copier le chemin absolu
+Save as default	Terminal TermWindow		Enregistrer comme valeur par défaut
 Set tab title	Terminal TermWindow		Changer le titre de l’onglet
 Settings…	Terminal TermWindow		Réglages…
 Abort	Terminal Shell		Abandonner
 Open link	Terminal TermView		Ouvrir le lien
+Solarized Light	Terminal colors scheme		Ensoleillé
 Edit	Terminal TermWindow		Éditer
 Color:	Terminal AppearancePrefView		Couleur :
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Le modèle utilisé pour composer le titre des fenêtres peut\ncontenir les éléments suivants :\n
@@ -109,6 +111,7 @@ Find next	Terminal TermWindow		Rechercher le suivant
 Close active tab	Terminal TermWindow		Fermer l’onglet actif
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tLe caractère « % ».\n\t%<\t-\tDémarre une section qui ne sera affiché que si un\n\t\t\tparamètre qui suit n'est pas vide.\n\t%>\t-\tDémarre une section qui ne sera affiché que si un paramètre\n\t\t\tentre la précédente section %< et celui-ci n’est pas vide.\n\t%-\t-\tTermine une section. %< ou %>.\n\nTout caractère non alpha-numérique entre « % » et la lettre de format insérera un espace\nque si la valeur du paramètre n’est pas vide. Il s’ajoutera à la section %<.
 Paste	Terminal TermWindow		Coller
+Solarized Dark	Terminal colors scheme		Ombragé
 Shell 	Terminal TermWindow		Interpréteur de commande
 Cancel	Terminal TermView		Annuler
 Use default	Terminal SetTitleWindow		Par défaut
