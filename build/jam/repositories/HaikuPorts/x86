@@ -202,7 +202,7 @@ RemotePackageRepository HaikuPorts
 	openssl_devel-1.0.0s-2
 	p7zip-9.20.1-4
 	patch-2.7.5-1
-	pe-2.4.5-1
+	pe-2.4.5-2
 	perl-5.18.2-2
 	pixman-0.32.6-1
 	pkgconfig-0.27.1-2
