@@ -232,7 +232,7 @@ ACPI_PHYSICAL_ADDRESS
 AcpiOsGetRootPointer()
 {
 #ifdef _KERNEL_MODE
-	ACPI_SIZE address;
+	ACPI_PHYSICAL_ADDRESS address;
 	ACPI_STATUS status;
 	DEBUG_FUNCTION();
 	if (sACPIRoot == 0) {
