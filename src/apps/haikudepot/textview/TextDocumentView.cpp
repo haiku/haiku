@@ -369,6 +369,7 @@ TextDocumentView::SelectAll()
 
 	fTextEditor->SelectAll();
 	_ShowCaret(false);
+	Invalidate();
 }
 
 
