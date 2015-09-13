@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,8 +113,6 @@
  *
  *****************************************************************************/
 
-
-#define __UTXFINIT_C__
 #define EXPORT_ACPI_INTERFACES
 
 #include "acpi.h"
@@ -126,6 +124,11 @@
 
 #define _COMPONENT          ACPI_UTILITIES
         ACPI_MODULE_NAME    ("utxfinit")
+
+/* For AcpiExec only */
+void
+AeDoObjectOverrides (
+    void);
 
 
 /*******************************************************************************
@@ -201,17 +204,6 @@ AcpiInitializeSubsystem (
         return_ACPI_STATUS (Status);
     }
 
-    /* If configured, initialize the AML debugger */
-
-#ifdef ACPI_DEBUGGER
-    Status = AcpiDbInitialize ();
-    if (ACPI_FAILURE (Status))
-    {
-        ACPI_EXCEPTION ((AE_INFO, Status, "During Debugger initialization"));
-        return_ACPI_STATUS (Status);
-    }
-#endif
-
     return_ACPI_STATUS (AE_OK);
 }
 
@@ -263,11 +255,14 @@ AcpiEnableSubsystem (
      * Obtain a permanent mapping for the FACS. This is required for the
      * Global Lock and the Firmware Waking Vector
      */
-    Status = AcpiTbInitializeFacs ();
-    if (ACPI_FAILURE (Status))
+    if (!(Flags & ACPI_NO_FACS_INIT))
     {
-        ACPI_WARNING ((AE_INFO, "Could not map the FACS table"));
-        return_ACPI_STATUS (Status);
+        Status = AcpiTbInitializeFacs ();
+        if (ACPI_FAILURE (Status))
+        {
+            ACPI_WARNING ((AE_INFO, "Could not map the FACS table"));
+            return_ACPI_STATUS (Status);
+        }
     }
 
 #endif /* !ACPI_REDUCED_HARDWARE */
@@ -381,6 +376,14 @@ AcpiInitializeObjects (
             return_ACPI_STATUS (Status);
         }
     }
+
+#ifdef ACPI_EXEC_APP
+    /*
+     * This call implements the "initialization file" option for AcpiExec.
+     * This is the precise point that we want to perform the overrides.
+     */
+    AeDoObjectOverrides ();
+#endif
 
     /*
      * Execute any module-level code that was detected during the table load

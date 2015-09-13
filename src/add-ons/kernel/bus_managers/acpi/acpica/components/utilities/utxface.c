@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,8 +113,6 @@
  *
  *****************************************************************************/
 
-
-#define __UTXFACE_C__
 #define EXPORT_ACPI_INTERFACES
 
 #include "acpi.h"
@@ -172,14 +170,6 @@ AcpiTerminate (
     /* Free the mutex objects */
 
     AcpiUtMutexTerminate ();
-
-
-#ifdef ACPI_DEBUGGER
-
-    /* Shut down the debugger */
-
-    AcpiDbTerminate ();
-#endif
 
     /* Now we can shutdown the OS-dependent layer */
 
@@ -337,7 +327,7 @@ AcpiGetStatistics (
     Stats->SciCount = AcpiSciCount;
     Stats->GpeCount = AcpiGpeCount;
 
-    ACPI_MEMCPY (Stats->FixedEventCount, AcpiFixedEventCount,
+    memcpy (Stats->FixedEventCount, AcpiFixedEventCount,
         sizeof (AcpiFixedEventCount));
 
 
@@ -441,7 +431,7 @@ AcpiInstallInterface (
 
     /* Parameter validation */
 
-    if (!InterfaceName || (ACPI_STRLEN (InterfaceName) == 0))
+    if (!InterfaceName || (strlen (InterfaceName) == 0))
     {
         return (AE_BAD_PARAMETER);
     }
@@ -506,7 +496,7 @@ AcpiRemoveInterface (
 
     /* Parameter validation */
 
-    if (!InterfaceName || (ACPI_STRLEN (InterfaceName) == 0))
+    if (!InterfaceName || (strlen (InterfaceName) == 0))
     {
         return (AE_BAD_PARAMETER);
     }
@@ -678,7 +668,7 @@ AcpiDecodePldBuffer (
 
     /* Parameter validation */
 
-    if (!InBuffer || !ReturnBuffer || (Length < 16))
+    if (!InBuffer || !ReturnBuffer || (Length < ACPI_PLD_REV1_BUFFER_SIZE))
     {
         return (AE_BAD_PARAMETER);
     }
@@ -694,7 +684,9 @@ AcpiDecodePldBuffer (
     ACPI_MOVE_32_TO_32 (&Dword, &Buffer[0]);
     PldInfo->Revision =             ACPI_PLD_GET_REVISION (&Dword);
     PldInfo->IgnoreColor =          ACPI_PLD_GET_IGNORE_COLOR (&Dword);
-    PldInfo->Color =                ACPI_PLD_GET_COLOR (&Dword);
+    PldInfo->Red =                  ACPI_PLD_GET_RED (&Dword);
+    PldInfo->Green =                ACPI_PLD_GET_GREEN (&Dword);
+    PldInfo->Blue =                 ACPI_PLD_GET_BLUE (&Dword);
 
     /* Second 32-bit DWord */
 
@@ -728,7 +720,7 @@ AcpiDecodePldBuffer (
     PldInfo->Rotation =             ACPI_PLD_GET_ROTATION (&Dword);
     PldInfo->Order =                ACPI_PLD_GET_ORDER (&Dword);
 
-    if (Length >= ACPI_PLD_BUFFER_SIZE)
+    if (Length >= ACPI_PLD_REV2_BUFFER_SIZE)
     {
         /* Fifth 32-bit DWord (Revision 2 of _PLD) */
 

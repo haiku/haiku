@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Module Name: hwacpi - ACPI Hardware Initialization/Mode Interface
+ * Module Name: dsdebug - Parser/Interpreter interface - debugging
  *
  *****************************************************************************/
 
@@ -115,179 +115,207 @@
 
 #include "acpi.h"
 #include "accommon.h"
+#include "acdispat.h"
+#include "acnamesp.h"
+#include "acdisasm.h"
+#include "acinterp.h"
 
 
-#define _COMPONENT          ACPI_HARDWARE
-        ACPI_MODULE_NAME    ("hwacpi")
+#define _COMPONENT          ACPI_DISPATCHER
+        ACPI_MODULE_NAME    ("dsdebug")
 
 
-#if (!ACPI_REDUCED_HARDWARE) /* Entire module */
-/******************************************************************************
+#if defined(ACPI_DEBUG_OUTPUT) || defined(ACPI_DEBUGGER)
+
+/* Local prototypes */
+
+static void
+AcpiDsPrintNodePathname (
+    ACPI_NAMESPACE_NODE     *Node,
+    const char              *Message);
+
+
+/*******************************************************************************
  *
- * FUNCTION:    AcpiHwSetMode
+ * FUNCTION:    AcpiDsPrintNodePathname
  *
- * PARAMETERS:  Mode            - SYS_MODE_ACPI or SYS_MODE_LEGACY
+ * PARAMETERS:  Node            - Object
+ *              Message         - Prefix message
  *
- * RETURN:      Status
- *
- * DESCRIPTION: Transitions the system into the requested mode.
+ * DESCRIPTION: Print an object's full namespace pathname
+ *              Manages allocation/freeing of a pathname buffer
  *
  ******************************************************************************/
 
-ACPI_STATUS
-AcpiHwSetMode (
-    UINT32                  Mode)
+static void
+AcpiDsPrintNodePathname (
+    ACPI_NAMESPACE_NODE     *Node,
+    const char              *Message)
 {
-
+    ACPI_BUFFER             Buffer;
     ACPI_STATUS             Status;
-    UINT32                  Retry;
 
 
-    ACPI_FUNCTION_TRACE (HwSetMode);
+    ACPI_FUNCTION_TRACE (DsPrintNodePathname);
 
-
-    /* If the Hardware Reduced flag is set, machine is always in acpi mode */
-
-    if (AcpiGbl_ReducedHardware)
+    if (!Node)
     {
-        return_ACPI_STATUS (AE_OK);
+        ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DISPATCH, "[NULL NAME]"));
+        return_VOID;
     }
 
-    /*
-     * ACPI 2.0 clarified that if SMI_CMD in FADT is zero,
-     * system does not support mode transition.
-     */
-    if (!AcpiGbl_FADT.SmiCommand)
+    /* Convert handle to full pathname and print it (with supplied message) */
+
+    Buffer.Length = ACPI_ALLOCATE_LOCAL_BUFFER;
+
+    Status = AcpiNsHandleToPathname (Node, &Buffer, TRUE);
+    if (ACPI_SUCCESS (Status))
     {
-        ACPI_ERROR ((AE_INFO, "No SMI_CMD in FADT, mode transition failed"));
-        return_ACPI_STATUS (AE_NO_HARDWARE_RESPONSE);
-    }
-
-    /*
-     * ACPI 2.0 clarified the meaning of ACPI_ENABLE and ACPI_DISABLE
-     * in FADT: If it is zero, enabling or disabling is not supported.
-     * As old systems may have used zero for mode transition,
-     * we make sure both the numbers are zero to determine these
-     * transitions are not supported.
-     */
-    if (!AcpiGbl_FADT.AcpiEnable && !AcpiGbl_FADT.AcpiDisable)
-    {
-        ACPI_ERROR ((AE_INFO,
-            "No ACPI mode transition supported in this system "
-            "(enable/disable both zero)"));
-        return_ACPI_STATUS (AE_OK);
-    }
-
-    switch (Mode)
-    {
-    case ACPI_SYS_MODE_ACPI:
-
-        /* BIOS should have disabled ALL fixed and GP events */
-
-        Status = AcpiHwWritePort (AcpiGbl_FADT.SmiCommand,
-                        (UINT32) AcpiGbl_FADT.AcpiEnable, 8);
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Attempting to enable ACPI mode\n"));
-        break;
-
-    case ACPI_SYS_MODE_LEGACY:
-        /*
-         * BIOS should clear all fixed status bits and restore fixed event
-         * enable bits to default
-         */
-        Status = AcpiHwWritePort (AcpiGbl_FADT.SmiCommand,
-                    (UINT32) AcpiGbl_FADT.AcpiDisable, 8);
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-                    "Attempting to enable Legacy (non-ACPI) mode\n"));
-        break;
-
-    default:
-
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
-    }
-
-    if (ACPI_FAILURE (Status))
-    {
-        ACPI_EXCEPTION ((AE_INFO, Status,
-            "Could not write ACPI mode change"));
-        return_ACPI_STATUS (Status);
-    }
-
-    /*
-     * Some hardware takes a LONG time to switch modes. Give them 3 sec to
-     * do so, but allow faster systems to proceed more quickly.
-     */
-    Retry = 3000;
-    while (Retry)
-    {
-        if (AcpiHwGetMode () == Mode)
+        if (Message)
         {
-            ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Mode %X successfully enabled\n",
-                Mode));
-            return_ACPI_STATUS (AE_OK);
+            ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DISPATCH, "%s ", Message));
         }
-        AcpiOsStall (ACPI_USEC_PER_MSEC);
-        Retry--;
+
+        ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DISPATCH, "[%s] (Node %p)",
+            (char *) Buffer.Pointer, Node));
+        ACPI_FREE (Buffer.Pointer);
     }
 
-    ACPI_ERROR ((AE_INFO, "Hardware did not change modes"));
-    return_ACPI_STATUS (AE_NO_HARDWARE_RESPONSE);
+    return_VOID;
 }
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiHwGetMode
+ * FUNCTION:    AcpiDsDumpMethodStack
  *
- * PARAMETERS:  none
+ * PARAMETERS:  Status          - Method execution status
+ *              WalkState       - Current state of the parse tree walk
+ *              Op              - Executing parse op
  *
- * RETURN:      SYS_MODE_ACPI or SYS_MODE_LEGACY
+ * RETURN:      None
  *
- * DESCRIPTION: Return current operating state of system. Determined by
- *              querying the SCI_EN bit.
+ * DESCRIPTION: Called when a method has been aborted because of an error.
+ *              Dumps the method execution stack.
  *
  ******************************************************************************/
 
-UINT32
-AcpiHwGetMode (
-    void)
+void
+AcpiDsDumpMethodStack (
+    ACPI_STATUS             Status,
+    ACPI_WALK_STATE         *WalkState,
+    ACPI_PARSE_OBJECT       *Op)
 {
-    ACPI_STATUS             Status;
-    UINT32                  Value;
+    ACPI_PARSE_OBJECT       *Next;
+    ACPI_THREAD_STATE       *Thread;
+    ACPI_WALK_STATE         *NextWalkState;
+    ACPI_NAMESPACE_NODE     *PreviousMethod = NULL;
+    ACPI_OPERAND_OBJECT     *MethodDesc;
 
 
-    ACPI_FUNCTION_TRACE (HwGetMode);
+    ACPI_FUNCTION_TRACE (DsDumpMethodStack);
 
+    /* Ignore control codes, they are not errors */
 
-    /* If the Hardware Reduced flag is set, machine is always in acpi mode */
-
-    if (AcpiGbl_ReducedHardware)
+    if ((Status & AE_CODE_MASK) == AE_CODE_CONTROL)
     {
-        return_UINT32 (ACPI_SYS_MODE_ACPI);
+        return_VOID;
+    }
+
+    /* We may be executing a deferred opcode */
+
+    if (WalkState->DeferredNode)
+    {
+        ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
+            "Executing subtree for Buffer/Package/Region\n"));
+        return_VOID;
     }
 
     /*
-     * ACPI 2.0 clarified that if SMI_CMD in FADT is zero,
-     * system does not support mode transition.
+     * If there is no Thread, we are not actually executing a method.
+     * This can happen when the iASL compiler calls the interpreter
+     * to perform constant folding.
      */
-    if (!AcpiGbl_FADT.SmiCommand)
+    Thread = WalkState->Thread;
+    if (!Thread)
     {
-        return_UINT32 (ACPI_SYS_MODE_ACPI);
+        return_VOID;
     }
 
-    Status = AcpiReadBitRegister (ACPI_BITREG_SCI_ENABLE, &Value);
-    if (ACPI_FAILURE (Status))
+    /* Display exception and method name */
+
+    ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
+        "\n**** Exception %s during execution of method ",
+        AcpiFormatException (Status)));
+    AcpiDsPrintNodePathname (WalkState->MethodNode, NULL);
+
+    /* Display stack of executing methods */
+
+    ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DISPATCH,
+        "\n\nMethod Execution Stack:\n"));
+    NextWalkState = Thread->WalkStateList;
+
+    /* Walk list of linked walk states */
+
+    while (NextWalkState)
     {
-        return_UINT32 (ACPI_SYS_MODE_LEGACY);
+        MethodDesc = NextWalkState->MethodDesc;
+        if (MethodDesc)
+        {
+            AcpiExStopTraceMethod (
+                    (ACPI_NAMESPACE_NODE *) MethodDesc->Method.Node,
+                    MethodDesc, WalkState);
+        }
+
+        ACPI_DEBUG_PRINT ((ACPI_DB_DISPATCH,
+            "    Method [%4.4s] executing: ",
+            AcpiUtGetNodeName (NextWalkState->MethodNode)));
+
+        /* First method is the currently executing method */
+
+        if (NextWalkState == WalkState)
+        {
+            if (Op)
+            {
+                /* Display currently executing ASL statement */
+
+                Next = Op->Common.Next;
+                Op->Common.Next = NULL;
+
+#ifdef ACPI_DISASSEMBLER
+                AcpiDmDisassemble (NextWalkState, Op, ACPI_UINT32_MAX);
+#endif
+                Op->Common.Next = Next;
+            }
+        }
+        else
+        {
+            /*
+             * This method has called another method
+             * NOTE: the method call parse subtree is already deleted at this
+             * point, so we cannot disassemble the method invocation.
+             */
+            ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DISPATCH, "Call to method "));
+            AcpiDsPrintNodePathname (PreviousMethod, NULL);
+        }
+
+        PreviousMethod = NextWalkState->MethodNode;
+        NextWalkState = NextWalkState->Next;
+        ACPI_DEBUG_PRINT_RAW ((ACPI_DB_DISPATCH, "\n"));
     }
 
-    if (Value)
-    {
-        return_UINT32 (ACPI_SYS_MODE_ACPI);
-    }
-    else
-    {
-        return_UINT32 (ACPI_SYS_MODE_LEGACY);
-    }
+    return_VOID;
 }
 
-#endif /* !ACPI_REDUCED_HARDWARE */
+#else
+
+void
+AcpiDsDumpMethodStack (
+    ACPI_STATUS             Status,
+    ACPI_WALK_STATE         *WalkState,
+    ACPI_PARSE_OBJECT       *Op)
+{
+    return;
+}
+
+#endif

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,8 +113,6 @@
  *
  *****************************************************************************/
 
-#define __UTHEX_C__
-
 #include "acpi.h"
 #include "accommon.h"
 
@@ -156,9 +154,9 @@ AcpiUtHexToAsciiChar (
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiUtHexCharToValue
+ * FUNCTION:    AcpiUtAsciiCharToHex
  *
- * PARAMETERS:  AsciiChar             - Hex character in Ascii
+ * PARAMETERS:  HexChar                 - Hex character in Ascii
  *
  * RETURN:      The binary value of the ascii/hex character
  *

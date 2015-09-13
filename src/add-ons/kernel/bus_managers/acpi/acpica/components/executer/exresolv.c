@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __EXRESOLV_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -425,8 +423,8 @@ AcpiExResolveMultiple (
     ACPI_OBJECT_TYPE        *ReturnType,
     ACPI_OPERAND_OBJECT     **ReturnDesc)
 {
-    ACPI_OPERAND_OBJECT     *ObjDesc = (void *) Operand;
-    ACPI_NAMESPACE_NODE     *Node;
+    ACPI_OPERAND_OBJECT     *ObjDesc = ACPI_CAST_PTR (void, Operand);
+    ACPI_NAMESPACE_NODE     *Node = ACPI_CAST_PTR (ACPI_NAMESPACE_NODE, Operand);
     ACPI_OBJECT_TYPE        Type;
     ACPI_STATUS             Status;
 
@@ -446,7 +444,7 @@ AcpiExResolveMultiple (
     case ACPI_DESC_TYPE_NAMED:
 
         Type = ((ACPI_NAMESPACE_NODE *) ObjDesc)->Type;
-        ObjDesc = AcpiNsGetAttachedObject ((ACPI_NAMESPACE_NODE *) ObjDesc);
+        ObjDesc = AcpiNsGetAttachedObject (Node);
 
         /* If we had an Alias node, use the attached object for type info */
 
@@ -454,6 +452,14 @@ AcpiExResolveMultiple (
         {
             Type = ((ACPI_NAMESPACE_NODE *) ObjDesc)->Type;
             ObjDesc = AcpiNsGetAttachedObject ((ACPI_NAMESPACE_NODE *) ObjDesc);
+        }
+
+        if (!ObjDesc)
+        {
+            ACPI_ERROR ((AE_INFO,
+                "[%4.4s] Node is unresolved or uninitialized",
+                AcpiUtGetNodeName (Node)));
+            return_ACPI_STATUS (AE_AML_UNINITIALIZED_NODE);
         }
         break;
 

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,7 +113,6 @@
  *
  *****************************************************************************/
 
-
 #ifndef __ACPARSER_H__
 #define __ACPARSER_H__
 
@@ -144,6 +143,9 @@
  * Parser interfaces
  *
  *****************************************************************************/
+
+extern const UINT8      AcpiGbl_ShortOpIndex[];
+extern const UINT8      AcpiGbl_LongOpIndex[];
 
 
 /*
@@ -376,7 +378,7 @@ AcpiPsDeleteParseTree (
  */
 ACPI_PARSE_OBJECT *
 AcpiPsCreateScopeOp (
-    void);
+    UINT8                   *Aml);
 
 void
 AcpiPsInitOp (
@@ -385,7 +387,8 @@ AcpiPsInitOp (
 
 ACPI_PARSE_OBJECT *
 AcpiPsAllocOp (
-    UINT16                  opcode);
+    UINT16                  Opcode,
+    UINT8                   *Aml);
 
 void
 AcpiPsFreeOp (

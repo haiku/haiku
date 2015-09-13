@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -118,7 +118,7 @@
 
 /* Current ACPICA subsystem version in YYYYMMDD format */
 
-#define ACPI_CA_VERSION                 0x20140724
+#define ACPI_CA_VERSION                 0x20150818
 
 #include "acconfig.h"
 #include "actypes.h"
@@ -274,6 +274,15 @@ ACPI_INIT_GLOBAL (UINT8,            AcpiGbl_DoNotUseXsdt, FALSE);
 ACPI_INIT_GLOBAL (UINT8,            AcpiGbl_Use32BitFadtAddresses, FALSE);
 
 /*
+ * Optionally use 32-bit FACS table addresses.
+ * It is reported that some platforms fail to resume from system suspending
+ * if 64-bit FACS table address is selected:
+ * https://bugzilla.kernel.org/show_bug.cgi?id=74021
+ * Default is TRUE, favor the 32-bit addresses.
+ */
+ACPI_INIT_GLOBAL (UINT8,            AcpiGbl_Use32BitFacsAddresses, TRUE);
+
+/*
  * Optionally truncate I/O addresses to 16 bits. Provides compatibility
  * with other ACPI implementations. NOTE: During ACPICA initialization,
  * this value is set to TRUE if any Windows OSI strings have been
@@ -294,6 +303,11 @@ ACPI_INIT_GLOBAL (UINT8,            AcpiGbl_DisableAutoRepair, FALSE);
 ACPI_INIT_GLOBAL (UINT8,            AcpiGbl_DisableSsdtTableInstall, FALSE);
 
 /*
+ * Optionally enable runtime namespace override.
+ */
+ACPI_INIT_GLOBAL (UINT8,            AcpiGbl_RuntimeNamespaceOverride, TRUE);
+
+/*
  * We keep track of the latest version of Windows that has been requested by
  * the BIOS. ACPI 5.0.
  */
@@ -311,7 +325,9 @@ ACPI_INIT_GLOBAL (BOOLEAN,          AcpiGbl_ReducedHardware, FALSE);
  * traced each time it is executed.
  */
 ACPI_INIT_GLOBAL (UINT32,           AcpiGbl_TraceFlags, 0);
-ACPI_INIT_GLOBAL (ACPI_NAME,        AcpiGbl_TraceMethodName, 0);
+ACPI_INIT_GLOBAL (const char *,     AcpiGbl_TraceMethodName, NULL);
+ACPI_INIT_GLOBAL (UINT32,           AcpiGbl_TraceDbgLevel, ACPI_TRACE_LEVEL_DEFAULT);
+ACPI_INIT_GLOBAL (UINT32,           AcpiGbl_TraceDbgLayer, ACPI_TRACE_LAYER_DEFAULT);
 
 /*
  * Runtime configuration of debug output control masks. We want the debug
@@ -575,7 +591,7 @@ AcpiReallocateRootTable (
 ACPI_EXTERNAL_RETURN_STATUS (
 ACPI_STATUS
 AcpiFindRootPointer (
-    ACPI_SIZE               *RsdpAddress))
+    ACPI_PHYSICAL_ADDRESS   *RsdpAddress))
 
 ACPI_EXTERNAL_RETURN_STATUS (
 ACPI_STATUS
@@ -668,7 +684,7 @@ AcpiGetData (
 ACPI_EXTERNAL_RETURN_STATUS (
 ACPI_STATUS
 AcpiDebugTrace (
-    char                    *Name,
+    const char              *Name,
     UINT32                  DebugLevel,
     UINT32                  DebugLayer,
     UINT32                  Flags))
@@ -768,6 +784,15 @@ AcpiRemoveFixedEventHandler (
 ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiInstallGpeHandler (
+    ACPI_HANDLE             GpeDevice,
+    UINT32                  GpeNumber,
+    UINT32                  Type,
+    ACPI_GPE_HANDLER        Address,
+    void                    *Context))
+
+ACPI_HW_DEPENDENT_RETURN_STATUS (
+ACPI_STATUS
+AcpiInstallGpeRawHandler (
     ACPI_HANDLE             GpeDevice,
     UINT32                  GpeNumber,
     UINT32                  Type,
@@ -960,6 +985,11 @@ AcpiEnableAllRuntimeGpes (
 
 ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
+AcpiEnableAllWakeupGpes (
+    void))
+
+ACPI_HW_DEPENDENT_RETURN_STATUS (
+ACPI_STATUS
 AcpiGetGpeDevice (
     UINT32                  GpeIndex,
     ACPI_HANDLE             *GpeDevice))
@@ -1124,14 +1154,8 @@ AcpiLeaveSleepState (
 ACPI_HW_DEPENDENT_RETURN_STATUS (
 ACPI_STATUS
 AcpiSetFirmwareWakingVector (
-    UINT32                  PhysicalAddress))
-
-#if ACPI_MACHINE_WIDTH == 64
-ACPI_HW_DEPENDENT_RETURN_STATUS (
-ACPI_STATUS
-AcpiSetFirmwareWakingVector64 (
-    UINT64                  PhysicalAddress))
-#endif
+    ACPI_PHYSICAL_ADDRESS   PhysicalAddress,
+    ACPI_PHYSICAL_ADDRESS   PhysicalAddress64))
 
 
 /*
@@ -1241,11 +1265,27 @@ AcpiDebugPrintRaw (
     const char              *Format,
     ...))
 
+ACPI_DBG_DEPENDENT_RETURN_VOID (
+void
+AcpiTracePoint (
+    ACPI_TRACE_EVENT_TYPE   Type,
+    BOOLEAN                 Begin,
+    UINT8                   *Aml,
+    char                    *Pathname))
+
 ACPI_APP_DEPENDENT_RETURN_VOID (
 ACPI_PRINTF_LIKE(1)
 void ACPI_INTERNAL_VAR_XFACE
 AcpiLogError (
     const char              *Format,
     ...))
+
+ACPI_STATUS
+AcpiInitializeDebugger (
+    void);
+
+void
+AcpiTerminateDebugger (
+    void);
 
 #endif /* __ACXFACE_H__ */

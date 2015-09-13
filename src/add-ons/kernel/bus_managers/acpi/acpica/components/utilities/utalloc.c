@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,8 +113,6 @@
  *
  *****************************************************************************/
 
-#define __UTALLOC_C__
-
 #include "acpi.h"
 #include "accommon.h"
 #include "acdebug.h"
@@ -153,7 +151,7 @@ AcpiOsAllocateZeroed (
     {
         /* Clear the memory block */
 
-        ACPI_MEMSET (Allocation, 0, Size);
+        memset (Allocation, 0, Size);
     }
 
     return (Allocation);
@@ -263,7 +261,7 @@ AcpiUtDeleteCaches (
 
     if (AcpiGbl_DisplayFinalMemStats)
     {
-        ACPI_STRCPY (Buffer, "MEMORY");
+        strcpy (Buffer, "MEMORY");
         (void) AcpiDbDisplayStatistics (Buffer);
     }
 #endif
@@ -433,6 +431,6 @@ AcpiUtInitializeBuffer (
 
     /* Have a valid buffer, clear it */
 
-    ACPI_MEMSET (Buffer->Pointer, 0, RequiredLength);
+    memset (Buffer->Pointer, 0, RequiredLength);
     return (AE_OK);
 }

@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -114,8 +114,6 @@
  *
  *****************************************************************************/
 
-
-#define __NSXFEVAL_C__
 #define EXPORT_ACPI_INTERFACES
 
 #include "acpi.h"
@@ -832,7 +830,7 @@ AcpiNsGetDeviceCallback (
             return (AE_CTRL_DEPTH);
         }
 
-        NoMatch = ACPI_STRCMP (Hid->String, Info->Hid);
+        NoMatch = strcmp (Hid->String, Info->Hid);
         ACPI_FREE (Hid);
 
         if (NoMatch)
@@ -856,7 +854,7 @@ AcpiNsGetDeviceCallback (
             Found = FALSE;
             for (i = 0; i < Cid->Count; i++)
             {
-                if (ACPI_STRCMP (Cid->Ids[i].String, Info->Hid) == 0)
+                if (strcmp (Cid->Ids[i].String, Info->Hid) == 0)
                 {
                     /* Found a matching CID */
 

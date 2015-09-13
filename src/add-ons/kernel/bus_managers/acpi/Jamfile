@@ -10,6 +10,7 @@ SubDirCcFlags -D_KERNEL_MODE ;
 local common_src =
 	acgetline.c
 	ahids.c
+	ahtable.c
 	ahuuids.c
 	cmfsize.c
 	dmtbdump.c
@@ -19,6 +20,7 @@ local common_src =
 local dispatcher_src =
 	dsargs.c
 	dscontrol.c
+	dsdebug.c
 	dsfield.c
 	dsinit.c
 	dsmethod.c
@@ -134,7 +136,6 @@ local resources_src =
 	rsaddr.c
 	rscalc.c
 	rscreate.c
-	rsdump.c
 	rsinfo.c
 	rsio.c
 	rsirq.c
@@ -180,6 +181,7 @@ local utilities_src =
 	utmath.c
 	utmisc.c
 	utmutex.c
+	utnonansi.c
 	utobject.c
 	utosi.c
 	utownerid.c

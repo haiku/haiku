@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -123,7 +123,9 @@
 #define METHOD_NAME__BBN        "_BBN"
 #define METHOD_NAME__CBA        "_CBA"
 #define METHOD_NAME__CID        "_CID"
+#define METHOD_NAME__CLS        "_CLS"
 #define METHOD_NAME__CRS        "_CRS"
+#define METHOD_NAME__DDN        "_DDN"
 #define METHOD_NAME__HID        "_HID"
 #define METHOD_NAME__INI        "_INI"
 #define METHOD_NAME__PLD        "_PLD"
@@ -131,6 +133,10 @@
 #define METHOD_NAME__PRS        "_PRS"
 #define METHOD_NAME__PRT        "_PRT"
 #define METHOD_NAME__PRW        "_PRW"
+#define METHOD_NAME__PS0        "_PS0"
+#define METHOD_NAME__PS1        "_PS1"
+#define METHOD_NAME__PS2        "_PS2"
+#define METHOD_NAME__PS3        "_PS3"
 #define METHOD_NAME__REG        "_REG"
 #define METHOD_NAME__SB_        "_SB_"
 #define METHOD_NAME__SEG        "_SEG"

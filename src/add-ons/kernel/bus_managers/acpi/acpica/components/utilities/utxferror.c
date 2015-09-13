@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,7 +113,6 @@
  *
  *****************************************************************************/
 
-#define __UTXFERROR_C__
 #define EXPORT_ACPI_INTERFACES
 
 #include "acpi.h"
@@ -196,8 +195,18 @@ AcpiException (
 
 
     ACPI_MSG_REDIRECT_BEGIN;
-    AcpiOsPrintf (ACPI_MSG_EXCEPTION "%s, ", AcpiFormatException (Status));
 
+    /* For AE_OK, just print the message */
+
+    if (ACPI_SUCCESS (Status))
+    {
+        AcpiOsPrintf (ACPI_MSG_EXCEPTION);
+
+    }
+    else
+    {
+        AcpiOsPrintf (ACPI_MSG_EXCEPTION "%s, ", AcpiFormatException (Status));
+    }
     va_start (ArgList, Format);
     AcpiOsVprintf (Format, ArgList);
     ACPI_MSG_SUFFIX;

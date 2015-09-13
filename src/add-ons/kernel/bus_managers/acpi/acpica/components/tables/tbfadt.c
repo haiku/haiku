@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __TBFADT_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -450,14 +448,22 @@ AcpiTbParseFadt (
     /* Obtain the DSDT and FACS tables via their addresses within the FADT */
 
     AcpiTbInstallFixedTable ((ACPI_PHYSICAL_ADDRESS) AcpiGbl_FADT.XDsdt,
-        ACPI_SIG_DSDT, ACPI_TABLE_INDEX_DSDT);
+        ACPI_SIG_DSDT, &AcpiGbl_DsdtIndex);
 
     /* If Hardware Reduced flag is set, there is no FACS */
 
     if (!AcpiGbl_ReducedHardware)
     {
-        AcpiTbInstallFixedTable ((ACPI_PHYSICAL_ADDRESS) AcpiGbl_FADT.XFacs,
-            ACPI_SIG_FACS, ACPI_TABLE_INDEX_FACS);
+        if (AcpiGbl_FADT.Facs)
+        {
+            AcpiTbInstallFixedTable ((ACPI_PHYSICAL_ADDRESS) AcpiGbl_FADT.Facs,
+                ACPI_SIG_FACS, &AcpiGbl_FacsIndex);
+        }
+        if (AcpiGbl_FADT.XFacs)
+        {
+            AcpiTbInstallFixedTable ((ACPI_PHYSICAL_ADDRESS) AcpiGbl_FADT.XFacs,
+                ACPI_SIG_FACS, &AcpiGbl_XFacsIndex);
+        }
     }
 }
 
@@ -499,11 +505,11 @@ AcpiTbCreateLocalFadt (
 
     /* Clear the entire local FADT */
 
-    ACPI_MEMSET (&AcpiGbl_FADT, 0, sizeof (ACPI_TABLE_FADT));
+    memset (&AcpiGbl_FADT, 0, sizeof (ACPI_TABLE_FADT));
 
     /* Copy the original FADT, up to sizeof (ACPI_TABLE_FADT) */
 
-    ACPI_MEMCPY (&AcpiGbl_FADT, Table,
+    memcpy (&AcpiGbl_FADT, Table,
         ACPI_MIN (Length, sizeof (ACPI_TABLE_FADT)));
 
     /* Take a copy of the Hardware Reduced flag */
@@ -607,12 +613,9 @@ AcpiTbConvertFadt (
     AcpiGbl_FADT.Header.Length = sizeof (ACPI_TABLE_FADT);
 
     /*
-     * Expand the 32-bit FACS and DSDT addresses to 64-bit as necessary.
+     * Expand the 32-bit DSDT addresses to 64-bit as necessary.
      * Later ACPICA code will always use the X 64-bit field.
      */
-    AcpiGbl_FADT.XFacs = AcpiTbSelectAddress ("FACS",
-        AcpiGbl_FADT.Facs, AcpiGbl_FADT.XFacs);
-
     AcpiGbl_FADT.XDsdt = AcpiTbSelectAddress ("DSDT",
         AcpiGbl_FADT.Dsdt, AcpiGbl_FADT.XDsdt);
 

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -285,6 +285,7 @@ typedef struct acpi_object_method
     UINT8                           ParamCount;
     UINT8                           SyncLevel;
     union acpi_operand_object       *Mutex;
+    union acpi_operand_object       *Node;
     UINT8                           *AmlStart;
     union
     {
@@ -410,6 +411,7 @@ typedef struct acpi_object_region_field
     UINT16                          ResourceLength;
     union acpi_operand_object       *RegionObj;         /* Containing OpRegion object */
     UINT8                           *ResourceBuffer;    /* ResourceTemplate for serial regions/fields */
+    UINT16                          PinNumberIndex;     /* Index relative to previous Connection/Template */
 
 } ACPI_OBJECT_REGION_FIELD;
 
@@ -501,13 +503,14 @@ typedef struct acpi_object_addr_handler
 typedef struct acpi_object_reference
 {
     ACPI_OBJECT_COMMON_HEADER
-     UINT8                           Class;              /* Reference Class */
-     UINT8                           TargetType;         /* Used for Index Op */
-     UINT8                           Reserved;
-     void                            *Object;            /* NameOp=>HANDLE to obj, IndexOp=>ACPI_OPERAND_OBJECT */
-     ACPI_NAMESPACE_NODE             *Node;              /* RefOf or Namepath */
-     union acpi_operand_object       **Where;            /* Target of Index */
-     UINT32                          Value;              /* Used for Local/Arg/Index/DdbHandle */
+    UINT8                           Class;              /* Reference Class */
+    UINT8                           TargetType;         /* Used for Index Op */
+    UINT8                           Reserved;
+    void                            *Object;            /* NameOp=>HANDLE to obj, IndexOp=>ACPI_OPERAND_OBJECT */
+    ACPI_NAMESPACE_NODE             *Node;              /* RefOf or Namepath */
+    union acpi_operand_object       **Where;            /* Target of Index */
+    UINT8                           *IndexPointer;      /* Used for Buffers and Strings */
+    UINT32                          Value;              /* Used for Local/Arg/Index/DdbHandle */
 
 } ACPI_OBJECT_REFERENCE;
 

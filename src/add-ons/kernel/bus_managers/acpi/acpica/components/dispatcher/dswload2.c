@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __DSWLOAD2_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -418,7 +416,7 @@ AcpiDsLoad2BeginOp (
     {
         /* Create a new op */
 
-        Op = AcpiPsAllocOp (WalkState->Opcode);
+        Op = AcpiPsAllocOp (WalkState->Opcode, WalkState->Aml);
         if (!Op)
         {
             return_ACPI_STATUS (AE_NO_MEMORY);

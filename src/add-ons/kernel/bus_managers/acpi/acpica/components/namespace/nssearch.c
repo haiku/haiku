@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __NSSEARCH_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -412,10 +410,42 @@ AcpiNsSearchAndEnter (
          * If we found it AND the request specifies that a find is an error,
          * return the error
          */
-        if ((Status == AE_OK) &&
-            (Flags & ACPI_NS_ERROR_IF_FOUND))
+        if (Status == AE_OK)
         {
-            Status = AE_ALREADY_EXISTS;
+            /* The node was found in the namespace */
+
+            /*
+             * If the namespace override feature is enabled for this node,
+             * delete any existing attached sub-object and make the node
+             * look like a new node that is owned by the override table.
+             */
+            if (Flags & ACPI_NS_OVERRIDE_IF_FOUND)
+            {
+                ACPI_DEBUG_PRINT ((ACPI_DB_NAMES,
+                    "Namespace override: %4.4s pass %u type %X Owner %X\n",
+                    ACPI_CAST_PTR(char, &TargetName), InterpreterMode,
+                    (*ReturnNode)->Type, WalkState->OwnerId));
+
+                AcpiNsDeleteChildren (*ReturnNode);
+                if (AcpiGbl_RuntimeNamespaceOverride)
+                {
+                    AcpiUtRemoveReference ((*ReturnNode)->Object);
+                    (*ReturnNode)->Object = NULL;
+                    (*ReturnNode)->OwnerId = WalkState->OwnerId;
+                }
+                else
+                {
+                    AcpiNsRemoveNode (*ReturnNode);
+                    *ReturnNode = ACPI_ENTRY_NOT_FOUND;
+                }
+            }
+
+            /* Return an error if we don't expect to find the object */
+
+            else if (Flags & ACPI_NS_ERROR_IF_FOUND)
+            {
+                Status = AE_ALREADY_EXISTS;
+            }
         }
 
 #ifdef ACPI_ASL_COMPILER

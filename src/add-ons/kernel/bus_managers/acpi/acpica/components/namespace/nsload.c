@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,8 +113,6 @@
  *
  *****************************************************************************/
 
-#define __NSLOAD_C__
-
 #include "acpi.h"
 #include "accommon.h"
 #include "acnamesp.h"
@@ -202,7 +200,21 @@ AcpiNsLoadTable (
     }
     else
     {
-        (void) AcpiTbReleaseOwnerId (TableIndex);
+        /*
+         * On error, delete any namespace objects created by this table.
+         * We cannot initialize these objects, so delete them. There are
+         * a couple of expecially bad cases:
+         * AE_ALREADY_EXISTS - namespace collision.
+         * AE_NOT_FOUND - the target of a Scope operator does not
+         * exist. This target of Scope must already exist in the
+         * namespace, as per the ACPI specification.
+         */
+        (void) AcpiUtReleaseMutex (ACPI_MTX_NAMESPACE);
+        AcpiNsDeleteNamespaceByOwner (
+            AcpiGbl_RootTableList.Tables[TableIndex].OwnerId);
+            AcpiTbReleaseOwnerId (TableIndex);
+
+        return_ACPI_STATUS (Status);
     }
 
 Unlock:

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __EXPREP_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -586,6 +584,8 @@ AcpiExPrepFieldValue (
             ObjDesc->Field.ResourceBuffer = Info->ResourceBuffer;
             ObjDesc->Field.ResourceLength = Info->ResourceLength;
         }
+
+        ObjDesc->Field.PinNumberIndex = Info->PinNumberIndex;
 
         /* Allow full data read from EC address space */
 

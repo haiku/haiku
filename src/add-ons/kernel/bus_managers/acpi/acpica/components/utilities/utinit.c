@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,9 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-
-#define __UTINIT_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -299,11 +296,10 @@ AcpiUtInitGlobals (
     AcpiGbl_AcpiHardwarePresent         = TRUE;
     AcpiGbl_LastOwnerIdIndex            = 0;
     AcpiGbl_NextOwnerIdOffset           = 0;
-    AcpiGbl_TraceDbgLevel               = 0;
-    AcpiGbl_TraceDbgLayer               = 0;
     AcpiGbl_DebuggerConfiguration       = DEBUGGER_THREADING;
     AcpiGbl_OsiMutex                    = NULL;
     AcpiGbl_RegMethodsExecuted          = FALSE;
+    AcpiGbl_MaxLoopIterations           = 0xFFFF;
 
     /* Hardware oriented */
 

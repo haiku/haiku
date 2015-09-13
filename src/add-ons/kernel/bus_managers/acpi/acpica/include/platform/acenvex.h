@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -127,6 +127,18 @@
 
 #if defined(_LINUX) || defined(__linux__)
 #include "aclinuxex.h"
+
+#elif defined(WIN32)
+#include "acwinex.h"
+
+#elif defined(_AED_EFI)
+#include "acefiex.h"
+
+#elif defined(_GNU_EFI)
+#include "acefiex.h"
+
+#elif defined(__DragonFly__)
+#include "acdragonflyex.h"
 
 #endif
 

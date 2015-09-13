@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,8 +113,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __NSREPAIR2_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -711,7 +709,7 @@ AcpiNsRepair_HID (
      */
     for (Dest = NewString->String.Pointer; *Source; Dest++, Source++)
     {
-        *Dest = (char) ACPI_TOUPPER (*Source);
+        *Dest = (char) toupper ((int) *Source);
     }
 
     AcpiUtRemoveReference (ReturnObject);

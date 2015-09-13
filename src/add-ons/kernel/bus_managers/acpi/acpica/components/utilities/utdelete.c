@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __UTDELETE_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -278,7 +276,7 @@ AcpiUtDeleteInternalObj (
             Object, Object->Event.OsSemaphore));
 
         (void) AcpiOsDeleteSemaphore (Object->Event.OsSemaphore);
-        Object->Event.OsSemaphore = 0;
+        Object->Event.OsSemaphore = NULL;
         break;
 
     case ACPI_TYPE_METHOD:
@@ -293,6 +291,10 @@ AcpiUtDeleteInternalObj (
             AcpiOsDeleteMutex (Object->Method.Mutex->Mutex.OsMutex);
             AcpiUtDeleteObjectDesc (Object->Method.Mutex);
             Object->Method.Mutex = NULL;
+        }
+        if (Object->Method.Node)
+        {
+            Object->Method.Node = NULL;
         }
         break;
 

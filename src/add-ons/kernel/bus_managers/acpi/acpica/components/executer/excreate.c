@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,8 +113,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __EXCREATE_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -601,6 +599,7 @@ AcpiExCreateMethod (
 
     ObjDesc->Method.AmlStart = AmlStart;
     ObjDesc->Method.AmlLength = AmlLength;
+    ObjDesc->Method.Node = Operand[0];
 
     /*
      * Disassemble the method flags. Split off the ArgCount, Serialized

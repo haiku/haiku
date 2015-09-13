@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,8 +113,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __NSCONVERT_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -276,7 +274,7 @@ AcpiNsConvertToString (
          * Copy the raw buffer data with no transform. String is already NULL
          * terminated at Length+1.
          */
-        ACPI_MEMCPY (NewObject->String.Pointer,
+        memcpy (NewObject->String.Pointer,
             OriginalObject->Buffer.Pointer, Length);
         break;
 
@@ -343,7 +341,7 @@ AcpiNsConvertToBuffer (
             return (AE_NO_MEMORY);
         }
 
-        ACPI_MEMCPY (NewObject->Buffer.Pointer,
+        memcpy (NewObject->Buffer.Pointer,
             OriginalObject->String.Pointer, OriginalObject->String.Length);
         break;
 

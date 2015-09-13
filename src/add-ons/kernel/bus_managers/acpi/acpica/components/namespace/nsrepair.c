@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __NSREPAIR_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -597,10 +595,10 @@ AcpiNsRemoveNullElements (
     case ACPI_PTYPE2_MIN:
     case ACPI_PTYPE2_REV_FIXED:
     case ACPI_PTYPE2_FIX_VAR:
-
         break;
 
     default:
+    case ACPI_PTYPE2_VAR_VAR:
     case ACPI_PTYPE1_FIXED:
     case ACPI_PTYPE1_OPTION:
         return;

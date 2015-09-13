@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,7 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
 
 #include "acpi.h"
 #include "accommon.h"
@@ -468,7 +467,7 @@ AcpiEvMatchGpeMethod (
 
     /* 4) The last two characters of the name are the hex GPE Number */
 
-    GpeNumber = ACPI_STRTOUL (&Name[2], NULL, 16);
+    GpeNumber = strtoul (&Name[2], NULL, 16);
     if (GpeNumber == ACPI_UINT32_MAX)
     {
         /* Conversion failed; invalid method, just ignore it */
@@ -492,15 +491,17 @@ AcpiEvMatchGpeMethod (
         return_ACPI_STATUS (AE_OK);
     }
 
-    if ((GpeEventInfo->Flags & ACPI_GPE_DISPATCH_MASK) ==
-            ACPI_GPE_DISPATCH_HANDLER)
+    if ((ACPI_GPE_DISPATCH_TYPE (GpeEventInfo->Flags) ==
+            ACPI_GPE_DISPATCH_HANDLER) ||
+        (ACPI_GPE_DISPATCH_TYPE (GpeEventInfo->Flags) ==
+            ACPI_GPE_DISPATCH_RAW_HANDLER))
     {
         /* If there is already a handler, ignore this GPE method */
 
         return_ACPI_STATUS (AE_OK);
     }
 
-    if ((GpeEventInfo->Flags & ACPI_GPE_DISPATCH_MASK) ==
+    if (ACPI_GPE_DISPATCH_TYPE (GpeEventInfo->Flags) ==
             ACPI_GPE_DISPATCH_METHOD)
     {
         /*
@@ -515,6 +516,10 @@ AcpiEvMatchGpeMethod (
         }
         return_ACPI_STATUS (AE_OK);
     }
+
+    /* Disable the GPE in case it's been enabled already. */
+
+    (void) AcpiHwLowSetGpe (GpeEventInfo, ACPI_GPE_DISABLE);
 
     /*
      * Add the GPE information from above to the GpeEventInfo block for

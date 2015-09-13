@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,8 +113,6 @@
  *
  *****************************************************************************/
 
-#define __NSACCESS_C__
-
 #include "acpi.h"
 #include "accommon.h"
 #include "amlcode.h"
@@ -185,7 +183,7 @@ AcpiNsRootInitialize (
     {
         /* _OSI is optional for now, will be permanent later */
 
-        if (!ACPI_STRCMP (InitVal->Name, "_OSI") && !AcpiGbl_CreateOsiMethod)
+        if (!strcmp (InitVal->Name, "_OSI") && !AcpiGbl_CreateOsiMethod)
         {
             continue;
         }
@@ -265,7 +263,7 @@ AcpiNsRootInitialize (
 
                 /* Build an object around the static string */
 
-                ObjDesc->String.Length = (UINT32) ACPI_STRLEN (Val);
+                ObjDesc->String.Length = (UINT32) strlen (Val);
                 ObjDesc->String.Pointer = Val;
                 ObjDesc->Common.Flags |= AOPOBJ_STATIC_POINTER;
                 break;
@@ -286,7 +284,7 @@ AcpiNsRootInitialize (
 
                 /* Special case for ACPI Global Lock */
 
-                if (ACPI_STRCMP (InitVal->Name, "_GL_") == 0)
+                if (strcmp (InitVal->Name, "_GL_") == 0)
                 {
                     AcpiGbl_GlobalLockMutex = ObjDesc;
 
@@ -393,7 +391,9 @@ AcpiNsLookup (
         return_ACPI_STATUS (AE_BAD_PARAMETER);
     }
 
-    LocalFlags = Flags & ~(ACPI_NS_ERROR_IF_FOUND | ACPI_NS_SEARCH_PARENT);
+    LocalFlags = Flags &
+        ~(ACPI_NS_ERROR_IF_FOUND | ACPI_NS_OVERRIDE_IF_FOUND |
+          ACPI_NS_SEARCH_PARENT);
     *ReturnNode = ACPI_ENTRY_NOT_FOUND;
     AcpiGbl_NsLookupCount++;
 
@@ -644,6 +644,13 @@ AcpiNsLookup (
             if (Flags & ACPI_NS_ERROR_IF_FOUND)
             {
                 LocalFlags |= ACPI_NS_ERROR_IF_FOUND;
+            }
+
+            /* Set override flag according to caller */
+
+            if (Flags & ACPI_NS_OVERRIDE_IF_FOUND)
+            {
+                LocalFlags |= ACPI_NS_OVERRIDE_IF_FOUND;
             }
         }
 

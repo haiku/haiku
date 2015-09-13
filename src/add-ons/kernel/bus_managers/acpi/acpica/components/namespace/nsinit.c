@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,9 +113,6 @@
  *
  *****************************************************************************/
 
-
-#define __NSXFINIT_C__
-
 #include "acpi.h"
 #include "accommon.h"
 #include "acnamesp.h"
@@ -180,7 +177,7 @@ AcpiNsInitializeObjects (
 
     /* Set all init info to zero */
 
-    ACPI_MEMSET (&Info, 0, sizeof (ACPI_INIT_WALK_INFO));
+    memset (&Info, 0, sizeof (ACPI_INIT_WALK_INFO));
 
     /* Walk entire namespace from the supplied root */
 
@@ -689,7 +686,7 @@ AcpiNsInitOneDevice (
     ACPI_DEBUG_EXEC (AcpiUtDisplayInitPathname (
         ACPI_TYPE_METHOD, DeviceNode, METHOD_NAME__INI));
 
-    ACPI_MEMSET (Info, 0, sizeof (ACPI_EVALUATE_INFO));
+    memset (Info, 0, sizeof (ACPI_EVALUATE_INFO));
     Info->PrefixNode = DeviceNode;
     Info->RelativePathname = METHOD_NAME__INI;
     Info->Parameters = NULL;

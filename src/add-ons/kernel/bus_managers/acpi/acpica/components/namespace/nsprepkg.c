@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -393,6 +393,53 @@ AcpiNsCheckPackage (
         Status = AcpiNsCheckPackageList (Info, Package, Elements, Count);
         break;
 
+    case ACPI_PTYPE2_VAR_VAR:
+        /*
+         * Returns a variable list of packages, each with a variable list
+         * of objects.
+         */
+        break;
+
+    case ACPI_PTYPE2_UUID_PAIR:
+
+        /* The package must contain pairs of (UUID + type) */
+
+        if (Count & 1)
+        {
+            ExpectedCount = Count + 1;
+            goto PackageTooSmall;
+        }
+
+        while (Count > 0)
+        {
+            Status = AcpiNsCheckObjectType(Info, Elements,
+                        Package->RetInfo.ObjectType1, 0);
+            if (ACPI_FAILURE(Status))
+            {
+                return (Status);
+            }
+
+            /* Validate length of the UUID buffer */
+
+            if ((*Elements)->Buffer.Length != 16)
+            {
+                ACPI_WARN_PREDEFINED ((AE_INFO, Info->FullPathname,
+                    Info->NodeFlags, "Invalid length for UUID Buffer"));
+                return (AE_AML_OPERAND_VALUE);
+            }
+
+            Status = AcpiNsCheckObjectType(Info, Elements + 1,
+                        Package->RetInfo.ObjectType2, 0);
+            if (ACPI_FAILURE(Status))
+            {
+                return (Status);
+            }
+
+            Elements += 2;
+            Count -= 2;
+         }
+         break;
+
     default:
 
         /* Should not get here if predefined info table is correct */
@@ -520,6 +567,12 @@ AcpiNsCheckPackageList (
             {
                 return (Status);
             }
+            break;
+
+        case ACPI_PTYPE2_VAR_VAR:
+            /*
+             * Each subpackage has a fixed or variable number of elements
+             */
             break;
 
         case ACPI_PTYPE2_FIXED:

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __UTPREDEF_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -240,7 +238,7 @@ AcpiUtGetExpectedReturnTypes (
 
     if (!ExpectedBtypes)
     {
-        ACPI_STRCPY (Buffer, "NONE");
+        strcpy (Buffer, "NONE");
         return;
     }
 
@@ -254,7 +252,7 @@ AcpiUtGetExpectedReturnTypes (
 
         if (ExpectedBtypes & ThisRtype)
         {
-            ACPI_STRCAT (Buffer, &UtRtypeNames[i][j]);
+            strcat (Buffer, &UtRtypeNames[i][j]);
             j = 0;              /* Use name separator from now on */
         }
 

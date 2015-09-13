@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -114,8 +114,6 @@
  *
  *****************************************************************************/
 
-#define __NSDUMP_C__
-
 #include "acpi.h"
 #include "accommon.h"
 #include "acnamesp.h"
@@ -197,7 +195,7 @@ AcpiNsPrintPathname (
     {
         for (i = 0; i < 4; i++)
         {
-            ACPI_IS_PRINT (Pathname[i]) ?
+            isprint ((int) Pathname[i]) ?
                 AcpiOsPrintf ("%c", Pathname[i]) :
                 AcpiOsPrintf ("?");
         }
@@ -388,9 +386,9 @@ AcpiNsDumpOneObject (
         {
         case ACPI_TYPE_PROCESSOR:
 
-            AcpiOsPrintf ("ID %02X Len %02X Addr %p\n",
+            AcpiOsPrintf ("ID %02X Len %02X Addr %8.8X%8.8X\n",
                 ObjDesc->Processor.ProcId, ObjDesc->Processor.Length,
-                ACPI_CAST_PTR (void, ObjDesc->Processor.Address));
+                ACPI_FORMAT_UINT64 (ObjDesc->Processor.Address));
             break;
 
         case ACPI_TYPE_DEVICE:
@@ -463,7 +461,7 @@ AcpiNsDumpOneObject (
             if (ObjDesc->Region.Flags & AOPOBJ_DATA_VALID)
             {
                 AcpiOsPrintf (" Addr %8.8X%8.8X Len %.4X\n",
-                    ACPI_FORMAT_NATIVE_UINT (ObjDesc->Region.Address),
+                    ACPI_FORMAT_UINT64 (ObjDesc->Region.Address),
                     ObjDesc->Region.Length);
             }
             else

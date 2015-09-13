@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __DSOBJECT_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -422,7 +420,7 @@ AcpiDsBuildInternalBufferObj (
 
         if (ByteList)
         {
-            ACPI_MEMCPY (ObjDesc->Buffer.Pointer, ByteList->Named.Data,
+            memcpy (ObjDesc->Buffer.Pointer, ByteList->Named.Data,
                          ByteListLength);
         }
     }
@@ -849,7 +847,7 @@ AcpiDsInitObjectFromOp (
     case ACPI_TYPE_STRING:
 
         ObjDesc->String.Pointer = Op->Common.Value.String;
-        ObjDesc->String.Length = (UINT32) ACPI_STRLEN (Op->Common.Value.String);
+        ObjDesc->String.Length = (UINT32) strlen (Op->Common.Value.String);
 
         /*
          * The string is contained in the ACPI table, don't ever try

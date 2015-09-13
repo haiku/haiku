@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __DSINIT_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -298,7 +296,7 @@ AcpiDsInitializeObjects (
 
     /* Set all init info to zero */
 
-    ACPI_MEMSET (&Info, 0, sizeof (ACPI_INIT_WALK_INFO));
+    memset (&Info, 0, sizeof (ACPI_INIT_WALK_INFO));
 
     Info.OwnerId = OwnerId;
     Info.TableIndex = TableIndex;
@@ -329,10 +327,19 @@ AcpiDsInitializeObjects (
         return_ACPI_STATUS (Status);
     }
 
+    /* DSDT is always the first AML table */
+
+    if (ACPI_COMPARE_NAME (Table->Signature, ACPI_SIG_DSDT))
+    {
+        ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT, "\nInitializing Namespace objects:\n"));
+    }
+
+    /* Summary of objects initialized */
+
     ACPI_DEBUG_PRINT_RAW ((ACPI_DB_INIT,
-        "Table [%4.4s] (id %4.4X) - %4u Objects with %3u Devices, "
-        "%3u Regions, %3u Methods (%u/%u/%u Serial/Non/Cvt)\n",
-        Table->Signature, OwnerId, Info.ObjectCount, Info.DeviceCount,
+        "Table [%4.4s:%8.8s] (id %.2X) - %4u Objects with %3u Devices, "
+        "%3u Regions, %4u Methods (%u/%u/%u Serial/Non/Cvt)\n",
+        Table->Signature, Table->OemTableId, OwnerId, Info.ObjectCount, Info.DeviceCount,
         Info.OpRegionCount, Info.MethodCount, Info.SerialMethodCount,
         Info.NonSerialMethodCount, Info.SerializedMethodCount));
 

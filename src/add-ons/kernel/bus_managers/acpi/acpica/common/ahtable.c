@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Module Name: hwacpi - ACPI Hardware Initialization/Mode Interface
+ * Module Name: ahtable - Table of known ACPI tables with descriptions
  *
  *****************************************************************************/
 
@@ -117,177 +117,106 @@
 #include "accommon.h"
 
 
-#define _COMPONENT          ACPI_HARDWARE
-        ACPI_MODULE_NAME    ("hwacpi")
+/* Local prototypes */
 
+const AH_TABLE *
+AcpiAhGetTableInfo (
+    char                    *Signature);
 
-#if (!ACPI_REDUCED_HARDWARE) /* Entire module */
-/******************************************************************************
- *
- * FUNCTION:    AcpiHwSetMode
- *
- * PARAMETERS:  Mode            - SYS_MODE_ACPI or SYS_MODE_LEGACY
- *
- * RETURN:      Status
- *
- * DESCRIPTION: Transitions the system into the requested mode.
- *
- ******************************************************************************/
-
-ACPI_STATUS
-AcpiHwSetMode (
-    UINT32                  Mode)
-{
-
-    ACPI_STATUS             Status;
-    UINT32                  Retry;
-
-
-    ACPI_FUNCTION_TRACE (HwSetMode);
-
-
-    /* If the Hardware Reduced flag is set, machine is always in acpi mode */
-
-    if (AcpiGbl_ReducedHardware)
-    {
-        return_ACPI_STATUS (AE_OK);
-    }
-
-    /*
-     * ACPI 2.0 clarified that if SMI_CMD in FADT is zero,
-     * system does not support mode transition.
-     */
-    if (!AcpiGbl_FADT.SmiCommand)
-    {
-        ACPI_ERROR ((AE_INFO, "No SMI_CMD in FADT, mode transition failed"));
-        return_ACPI_STATUS (AE_NO_HARDWARE_RESPONSE);
-    }
-
-    /*
-     * ACPI 2.0 clarified the meaning of ACPI_ENABLE and ACPI_DISABLE
-     * in FADT: If it is zero, enabling or disabling is not supported.
-     * As old systems may have used zero for mode transition,
-     * we make sure both the numbers are zero to determine these
-     * transitions are not supported.
-     */
-    if (!AcpiGbl_FADT.AcpiEnable && !AcpiGbl_FADT.AcpiDisable)
-    {
-        ACPI_ERROR ((AE_INFO,
-            "No ACPI mode transition supported in this system "
-            "(enable/disable both zero)"));
-        return_ACPI_STATUS (AE_OK);
-    }
-
-    switch (Mode)
-    {
-    case ACPI_SYS_MODE_ACPI:
-
-        /* BIOS should have disabled ALL fixed and GP events */
-
-        Status = AcpiHwWritePort (AcpiGbl_FADT.SmiCommand,
-                        (UINT32) AcpiGbl_FADT.AcpiEnable, 8);
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Attempting to enable ACPI mode\n"));
-        break;
-
-    case ACPI_SYS_MODE_LEGACY:
-        /*
-         * BIOS should clear all fixed status bits and restore fixed event
-         * enable bits to default
-         */
-        Status = AcpiHwWritePort (AcpiGbl_FADT.SmiCommand,
-                    (UINT32) AcpiGbl_FADT.AcpiDisable, 8);
-        ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-                    "Attempting to enable Legacy (non-ACPI) mode\n"));
-        break;
-
-    default:
-
-        return_ACPI_STATUS (AE_BAD_PARAMETER);
-    }
-
-    if (ACPI_FAILURE (Status))
-    {
-        ACPI_EXCEPTION ((AE_INFO, Status,
-            "Could not write ACPI mode change"));
-        return_ACPI_STATUS (Status);
-    }
-
-    /*
-     * Some hardware takes a LONG time to switch modes. Give them 3 sec to
-     * do so, but allow faster systems to proceed more quickly.
-     */
-    Retry = 3000;
-    while (Retry)
-    {
-        if (AcpiHwGetMode () == Mode)
-        {
-            ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Mode %X successfully enabled\n",
-                Mode));
-            return_ACPI_STATUS (AE_OK);
-        }
-        AcpiOsStall (ACPI_USEC_PER_MSEC);
-        Retry--;
-    }
-
-    ACPI_ERROR ((AE_INFO, "Hardware did not change modes"));
-    return_ACPI_STATUS (AE_NO_HARDWARE_RESPONSE);
-}
+extern const AH_TABLE      AcpiSupportedTables[];
 
 
 /*******************************************************************************
  *
- * FUNCTION:    AcpiHwGetMode
+ * FUNCTION:    AcpiAhGetTableInfo
  *
- * PARAMETERS:  none
+ * PARAMETERS:  Signature           - ACPI signature (4 chars) to match
  *
- * RETURN:      SYS_MODE_ACPI or SYS_MODE_LEGACY
+ * RETURN:      Pointer to a valid AH_TABLE. Null if no match found.
  *
- * DESCRIPTION: Return current operating state of system. Determined by
- *              querying the SCI_EN bit.
+ * DESCRIPTION: Find a match in the "help" table of supported ACPI tables
  *
  ******************************************************************************/
 
-UINT32
-AcpiHwGetMode (
-    void)
+const AH_TABLE *
+AcpiAhGetTableInfo (
+    char                    *Signature)
 {
-    ACPI_STATUS             Status;
-    UINT32                  Value;
+    const AH_TABLE      *Info;
 
 
-    ACPI_FUNCTION_TRACE (HwGetMode);
-
-
-    /* If the Hardware Reduced flag is set, machine is always in acpi mode */
-
-    if (AcpiGbl_ReducedHardware)
+    for (Info = AcpiSupportedTables; Info->Signature; Info++)
     {
-        return_UINT32 (ACPI_SYS_MODE_ACPI);
+        if (ACPI_COMPARE_NAME (Signature, Info->Signature))
+        {
+            return (Info);
+        }
     }
 
-    /*
-     * ACPI 2.0 clarified that if SMI_CMD in FADT is zero,
-     * system does not support mode transition.
-     */
-    if (!AcpiGbl_FADT.SmiCommand)
-    {
-        return_UINT32 (ACPI_SYS_MODE_ACPI);
-    }
-
-    Status = AcpiReadBitRegister (ACPI_BITREG_SCI_ENABLE, &Value);
-    if (ACPI_FAILURE (Status))
-    {
-        return_UINT32 (ACPI_SYS_MODE_LEGACY);
-    }
-
-    if (Value)
-    {
-        return_UINT32 (ACPI_SYS_MODE_ACPI);
-    }
-    else
-    {
-        return_UINT32 (ACPI_SYS_MODE_LEGACY);
-    }
+    return (NULL);
 }
 
-#endif /* !ACPI_REDUCED_HARDWARE */
+
+/*
+ * Note: Any tables added here should be duplicated within AcpiDmTableData
+ * in the file common/dmtable.c
+ */
+const AH_TABLE      AcpiSupportedTables[] =
+{
+    {ACPI_SIG_ASF,  "Alert Standard Format table"},
+    {ACPI_SIG_BERT, "Boot Error Record Table"},
+    {ACPI_SIG_BGRT, "Boot Graphics Resource Table"},
+    {ACPI_SIG_BOOT, "Simple Boot Flag Table"},
+    {ACPI_SIG_CPEP, "Corrected Platform Error Polling table"},
+    {ACPI_SIG_CSRT, "Core System Resource Table"},
+    {ACPI_SIG_DBG2, "Debug Port table type 2"},
+    {ACPI_SIG_DBGP, "Debug Port table"},
+    {ACPI_SIG_DMAR, "DMA Remapping table"},
+    {ACPI_SIG_DRTM, "Dynamic Root of Trust for Measurement table"},
+    {ACPI_SIG_DSDT, "Differentiated System Description Table (AML table)"},
+    {ACPI_SIG_ECDT, "Embedded Controller Boot Resources Table"},
+    {ACPI_SIG_EINJ, "Error Injection table"},
+    {ACPI_SIG_ERST, "Error Record Serialization Table"},
+    {ACPI_SIG_FACS, "Firmware ACPI Control Structure"},
+    {ACPI_SIG_FADT, "Fixed ACPI Description Table (FADT)"},
+    {ACPI_SIG_FPDT, "Firmware Performance Data Table"},
+    {ACPI_SIG_GTDT, "Generic Timer Description Table"},
+    {ACPI_SIG_HEST, "Hardware Error Source Table"},
+    {ACPI_SIG_HPET, "High Precision Event Timer table"},
+    {ACPI_SIG_IORT, "IO Remapping Table"},
+    {ACPI_SIG_IVRS, "I/O Virtualization Reporting Structure"},
+    {ACPI_SIG_LPIT, "Low Power Idle Table"},
+    {ACPI_SIG_MADT, "Multiple APIC Description Table (MADT)"},
+    {ACPI_SIG_MCFG, "Memory Mapped Configuration table"},
+    {ACPI_SIG_MCHI, "Management Controller Host Interface table"},
+    {ACPI_SIG_MPST, "Memory Power State Table"},
+    {ACPI_SIG_MSCT, "Maximum System Characteristics Table"},
+    {ACPI_SIG_MSDM, "Microsoft Data Management table"},
+    {ACPI_SIG_MTMR, "MID Timer Table"},
+    {ACPI_SIG_NFIT, "NVDIMM Firmware Interface Table"},
+    {ACPI_SIG_PCCT, "Platform Communications Channel Table"},
+    {ACPI_SIG_PMTT, "Platform Memory Topology Table"},
+    {ACPI_RSDP_NAME,"Root System Description Pointer"},
+    {ACPI_SIG_RSDT, "Root System Description Table"},
+    {ACPI_SIG_S3PT, "S3 Performance Table"},
+    {ACPI_SIG_SBST, "Smart Battery Specification Table"},
+    {ACPI_SIG_SLIC, "Software Licensing Description Table"},
+    {ACPI_SIG_SLIT, "System Locality Information Table"},
+    {ACPI_SIG_SPCR, "Serial Port Console Redirection table"},
+    {ACPI_SIG_SPMI, "Server Platform Management Interface table"},
+    {ACPI_SIG_SRAT, "System Resource Affinity Table"},
+    {ACPI_SIG_SSDT, "Secondary System Description Table (AML table)"},
+    {ACPI_SIG_STAO, "Status Override table"},
+    {ACPI_SIG_TCPA, "Trusted Computing Platform Alliance table"},
+    {ACPI_SIG_TPM2, "Trusted Platform Module hardware interface table"},
+    {ACPI_SIG_UEFI, "UEFI Boot Optimization Table"},
+    {ACPI_SIG_VRTC, "Virtual Real-Time Clock Table"},
+    {ACPI_SIG_WAET, "Windows ACPI Emulated Devices Table"},
+    {ACPI_SIG_WDAT, "Watchdog Action Table"},
+    {ACPI_SIG_WDDT, "Watchdog Description Table"},
+    {ACPI_SIG_WDRT, "Watchdog Resource Table"},
+    {ACPI_SIG_WPBT, "Windows Platform Binary Table"},
+    {ACPI_SIG_XENV, "Xen Environment table"},
+    {ACPI_SIG_XSDT, "Extended System Description Table"},
+    {NULL,          NULL}
+};

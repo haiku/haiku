@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -114,8 +114,6 @@
  *
  *****************************************************************************/
 
-#define __NSUTILS_C__
-
 #include "acpi.h"
 #include "accommon.h"
 #include "acnamesp.h"
@@ -164,7 +162,7 @@ AcpiNsPrintNodePathname (
 
     Buffer.Length = ACPI_ALLOCATE_LOCAL_BUFFER;
 
-    Status = AcpiNsHandleToPathname (Node, &Buffer);
+    Status = AcpiNsHandleToPathname (Node, &Buffer, TRUE);
     if (ACPI_SUCCESS (Status))
     {
         if (Message)
@@ -421,7 +419,7 @@ AcpiNsBuildInternalName (
             {
                 /* Convert the character to uppercase and save it */
 
-                Result[i] = (char) ACPI_TOUPPER ((int) *ExternalName);
+                Result[i] = (char) toupper ((int) *ExternalName);
                 ExternalName++;
             }
         }
@@ -770,6 +768,24 @@ AcpiNsTerminate (
 
     ACPI_FUNCTION_TRACE (NsTerminate);
 
+
+#ifdef ACPI_EXEC_APP
+    {
+        ACPI_OPERAND_OBJECT     *Prev;
+        ACPI_OPERAND_OBJECT     *Next;
+
+        /* Delete any module-level code blocks */
+
+        Next = AcpiGbl_ModuleCodeList;
+        while (Next)
+        {
+            Prev = Next;
+            Next = Next->Method.Mutex;
+            Prev->Method.Mutex = NULL; /* Clear the Mutex (cheated) field */
+            AcpiUtRemoveReference (Prev);
+        }
+    }
+#endif
 
     /*
      * Free the entire namespace -- all nodes and all objects

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -209,10 +209,6 @@
 /* Size of the root table array is increased by this increment */
 
 #define ACPI_ROOT_TABLE_SIZE_INCREMENT  4
-
-/* Maximum number of While() loop iterations before forced abort */
-
-#define ACPI_MAX_LOOP_ITERATIONS        0xFFFF
 
 /* Maximum sleep allowed via Sleep() operator */
 

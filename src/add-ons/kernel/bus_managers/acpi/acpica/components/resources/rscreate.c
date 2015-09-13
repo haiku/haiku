@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __RSCREATE_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -444,16 +442,17 @@ AcpiRsCreatePciRoutingTable (
                                     (UINT8 *) OutputBuffer->Pointer);
                 PathBuffer.Pointer = UserPrt->Source;
 
-                Status = AcpiNsHandleToPathname ((ACPI_HANDLE) Node, &PathBuffer);
+                Status = AcpiNsHandleToPathname ((ACPI_HANDLE) Node,
+                            &PathBuffer, FALSE);
 
                 /* +1 to include null terminator */
 
-                UserPrt->Length += (UINT32) ACPI_STRLEN (UserPrt->Source) + 1;
+                UserPrt->Length += (UINT32) strlen (UserPrt->Source) + 1;
                 break;
 
             case ACPI_TYPE_STRING:
 
-                ACPI_STRCPY (UserPrt->Source, ObjDesc->String.Pointer);
+                strcpy (UserPrt->Source, ObjDesc->String.Pointer);
 
                 /*
                  * Add to the Length field the length of the string

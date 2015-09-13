@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __DSOPCODE_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -551,7 +549,7 @@ AcpiDsEvalRegionOperands (
 
     ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "RgnObj %p Addr %8.8X%8.8X Len %X\n",
         ObjDesc,
-        ACPI_FORMAT_NATIVE_UINT (ObjDesc->Region.Address),
+        ACPI_FORMAT_UINT64 (ObjDesc->Region.Address),
         ObjDesc->Region.Length));
 
     /* Now the address and length are valid for this opregion */
@@ -587,8 +585,8 @@ AcpiDsEvalTableRegionOperands (
     ACPI_OPERAND_OBJECT     **Operand;
     ACPI_NAMESPACE_NODE     *Node;
     ACPI_PARSE_OBJECT       *NextOp;
-    UINT32                  TableIndex;
     ACPI_TABLE_HEADER       *Table;
+    UINT32                  TableIndex;
 
 
     ACPI_FUNCTION_TRACE_PTR (DsEvalTableRegionOperands, Op);
@@ -614,6 +612,8 @@ AcpiDsEvalTableRegionOperands (
         return_ACPI_STATUS (Status);
     }
 
+    Operand = &WalkState->Operands[0];
+
     /*
      * Resolve the Signature string, OemId string,
      * and OemTableId string operands
@@ -622,48 +622,56 @@ AcpiDsEvalTableRegionOperands (
                 ACPI_WALK_OPERANDS, WalkState);
     if (ACPI_FAILURE (Status))
     {
-        return_ACPI_STATUS (Status);
+        goto Cleanup;
     }
-
-    Operand = &WalkState->Operands[0];
 
     /* Find the ACPI table */
 
-    Status = AcpiTbFindTable (Operand[0]->String.Pointer,
-                Operand[1]->String.Pointer, Operand[2]->String.Pointer,
-                &TableIndex);
+    Status = AcpiTbFindTable (
+                Operand[0]->String.Pointer,
+                Operand[1]->String.Pointer,
+                Operand[2]->String.Pointer, &TableIndex);
     if (ACPI_FAILURE (Status))
     {
-        return_ACPI_STATUS (Status);
+        if (Status == AE_NOT_FOUND)
+        {
+            ACPI_ERROR ((AE_INFO,
+                "ACPI Table [%4.4s] OEM:(%s, %s) not found in RSDT/XSDT",
+                Operand[0]->String.Pointer,
+                Operand[1]->String.Pointer,
+                Operand[2]->String.Pointer));
+        }
+        goto Cleanup;
     }
-
-    AcpiUtRemoveReference (Operand[0]);
-    AcpiUtRemoveReference (Operand[1]);
-    AcpiUtRemoveReference (Operand[2]);
 
     Status = AcpiGetTableByIndex (TableIndex, &Table);
     if (ACPI_FAILURE (Status))
     {
-        return_ACPI_STATUS (Status);
+        goto Cleanup;
     }
 
     ObjDesc = AcpiNsGetAttachedObject (Node);
     if (!ObjDesc)
     {
-        return_ACPI_STATUS (AE_NOT_EXIST);
+        Status = AE_NOT_EXIST;
+        goto Cleanup;
     }
 
-    ObjDesc->Region.Address = (ACPI_PHYSICAL_ADDRESS) ACPI_TO_INTEGER (Table);
+    ObjDesc->Region.Address = ACPI_PTR_TO_PHYSADDR (Table);
     ObjDesc->Region.Length = Table->Length;
 
     ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "RgnObj %p Addr %8.8X%8.8X Len %X\n",
-        ObjDesc,
-        ACPI_FORMAT_NATIVE_UINT (ObjDesc->Region.Address),
+        ObjDesc, ACPI_FORMAT_UINT64 (ObjDesc->Region.Address),
         ObjDesc->Region.Length));
 
     /* Now the address and length are valid for this opregion */
 
     ObjDesc->Region.Flags |= AOPOBJ_DATA_VALID;
+
+Cleanup:
+    AcpiUtRemoveReference (Operand[0]);
+    AcpiUtRemoveReference (Operand[1]);
+    AcpiUtRemoveReference (Operand[2]);
 
     return_ACPI_STATUS (Status);
 }

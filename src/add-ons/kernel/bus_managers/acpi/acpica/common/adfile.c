@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -113,7 +113,7 @@
  *
  *****************************************************************************/
 
-
+#include "aslcompiler.h"
 #include "acpi.h"
 #include "accommon.h"
 #include "acapps.h"
@@ -278,7 +278,7 @@ FlGenerateFilename (
      * Copy the original filename to a new buffer. Leave room for the worst
      * case where we append the suffix, an added dot and the null terminator.
      */
-    NewFilename = ACPI_ALLOCATE_ZEROED ((ACPI_SIZE)
+    NewFilename = UtStringCacheCalloc ((ACPI_SIZE)
         strlen (InputFilename) + strlen (Suffix) + 2);
     if (!NewFilename)
     {
@@ -327,7 +327,7 @@ FlStrdup (
     char                *NewString;
 
 
-    NewString = ACPI_ALLOCATE ((ACPI_SIZE) strlen (String) + 1);
+    NewString = UtStringCacheCalloc ((ACPI_SIZE) strlen (String) + 1);
     if (!NewString)
     {
         return (NULL);
@@ -367,7 +367,10 @@ FlSplitInputPathname (
     char                    *Filename;
 
 
-    *OutDirectoryPath = NULL;
+    if (OutDirectoryPath)
+    {
+        *OutDirectoryPath = NULL;
+    }
 
     if (!InputPath)
     {
@@ -409,11 +412,13 @@ FlSplitInputPathname (
 
     if (!Filename)
     {
-        ACPI_FREE (DirectoryPath);
         return (AE_NO_MEMORY);
     }
 
-    *OutDirectoryPath = DirectoryPath;
+    if (OutDirectoryPath)
+    {
+        *OutDirectoryPath = DirectoryPath;
+    }
 
     if (OutFilename)
     {
@@ -421,6 +426,5 @@ FlSplitInputPathname (
         return (AE_OK);
     }
 
-    ACPI_FREE (Filename);
     return (AE_OK);
 }

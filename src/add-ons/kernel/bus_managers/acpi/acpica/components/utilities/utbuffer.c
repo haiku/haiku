@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -112,8 +112,6 @@
  * such license, approval or letter.
  *
  *****************************************************************************/
-
-#define __UTBUFFER_C__
 
 #include "acpi.h"
 #include "accommon.h"
@@ -232,8 +230,17 @@ AcpiUtDumpBuffer (
                 return;
             }
 
+            /*
+             * Add comment characters so rest of line is ignored when
+             * compiled
+             */
+            if (j == 0)
+            {
+                AcpiOsPrintf ("// ");
+            }
+
             BufChar = Buffer[(ACPI_SIZE) i + j];
-            if (ACPI_IS_PRINT (BufChar))
+            if (isprint (BufChar))
             {
                 AcpiOsPrintf ("%c", BufChar);
             }
@@ -406,7 +413,7 @@ AcpiUtDumpBufferToFile (
             }
 
             BufChar = Buffer[(ACPI_SIZE) i + j];
-            if (ACPI_IS_PRINT (BufChar))
+            if (isprint (BufChar))
             {
                 AcpiUtFilePrintf (File, "%c", BufChar);
             }

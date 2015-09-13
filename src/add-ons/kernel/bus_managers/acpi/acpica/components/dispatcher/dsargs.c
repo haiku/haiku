@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2014, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -114,8 +114,6 @@
  *
  *****************************************************************************/
 
-#define __DSARGS_C__
-
 #include "acpi.h"
 #include "accommon.h"
 #include "acparser.h"
@@ -168,7 +166,7 @@ AcpiDsExecuteArguments (
 
     /* Allocate a new parser op to be the root of the parsed tree */
 
-    Op = AcpiPsAllocOp (AML_INT_EVAL_SUBTREE_OP);
+    Op = AcpiPsAllocOp (AML_INT_EVAL_SUBTREE_OP, AmlStart);
     if (!Op)
     {
         return_ACPI_STATUS (AE_NO_MEMORY);
@@ -215,7 +213,7 @@ AcpiDsExecuteArguments (
 
     /* Evaluate the deferred arguments */
 
-    Op = AcpiPsAllocOp (AML_INT_EVAL_SUBTREE_OP);
+    Op = AcpiPsAllocOp (AML_INT_EVAL_SUBTREE_OP, AmlStart);
     if (!Op)
     {
         return_ACPI_STATUS (AE_NO_MEMORY);

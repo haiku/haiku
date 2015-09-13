@@ -636,7 +636,7 @@ status_t
 ns_handle_to_pathname(acpi_handle targetHandle, acpi_data *buffer)
 {
 	status_t status = AcpiNsHandleToPathname(targetHandle,
-		(ACPI_BUFFER*)buffer);
+		(ACPI_BUFFER*)buffer, false);
 	return status == AE_OK ? B_OK : B_ERROR;
 }
 
@@ -737,17 +737,14 @@ prepare_sleep_state(uint8 state, void (*wakeFunc)(void), size_t size)
 		if (status != B_OK)
 			return status;
 
-#if ACPI_MACHINE_WIDTH == 32
 #	if B_HAIKU_PHYSICAL_BITS > 32
 		if (wakeVector.address >= 0x100000000LL) {
-			ERROR("prepare_sleep_state(): ACPI_MACHINE_WIDTH == 32, but we "
-				"have a physical address >= 4 GB\n");
+			ERROR("prepare_sleep_state(): ACPI 2.0c says use 32 bit "
+				"vector, but we have a physical address >= 4 GB\n");
 		}
 #	endif
-		acpiStatus = AcpiSetFirmwareWakingVector(wakeVector.address);
-#else
-		acpiStatus = AcpiSetFirmwareWakingVector64(wakeVector.address);
-#endif
+		acpiStatus = AcpiSetFirmwareWakingVector(wakeVector.address,
+			wakeVector.address);
 		if (acpiStatus != AE_OK)
 			return B_ERROR;
 	}
