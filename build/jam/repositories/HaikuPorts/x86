@@ -70,8 +70,10 @@ RemotePackageRepository HaikuPorts
 	gcc_syslibs_devel-4.8.5_2015_07_11-2
 	gettext-0.19.4-1
 	gettext_libintl-0.19.4-1
-	giflib-5.1.0-1
-	giflib_devel-5.1.0-1
+	giflib-5.1.1-1
+	giflib_devel-5.1.1-1
+	giflib6-5.0.5-2
+	giflib6_devel-5.0.5-2
 	git-2.2.2-1
 	git_arch-2.2.2-1
 	git_cvs-2.2.2-1
@@ -112,8 +114,8 @@ RemotePackageRepository HaikuPorts
 	jpeg_tools-9a-1
 	keymapswitcher-1.2.7.10-1
 	less-458-1
-	libedit-2012_06_01_3.0-1
-	libedit_devel-2012_06_01_3.0-1
+	libedit-2015_03_21_3.1-2
+	libedit_devel-2015_03_21_3.1-2
 	libevent-2.0.21-7
 	libevent_devel-2.0.21-7
 	libexecinfo-1.1-1
@@ -218,8 +220,8 @@ RemotePackageRepository HaikuPorts
 	qrencode_devel-3.3.0-1
 	readline-6.3.8-1
 	readline_devel-6.3.8-1
-	ruby-1.9.1-2
-	ruby_devel-1.9.1-2
+	ruby-2.2.2-1
+	ruby_devel-2.2.2-1
 	scons-2.3.1-4
 	sed-4.2.1-6
 	sharutils-4.14-1
@@ -374,6 +376,7 @@ RemotePackageRepository HaikuPorts
 	gcc_x86_gcc2
 	gettext
 	giflib
+	giflib6
 	git
 	glew
 	glib2
