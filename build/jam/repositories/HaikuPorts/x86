@@ -136,6 +136,7 @@ RemotePackageRepository HaikuPorts
 	libpcap_devel-1.7.4-1
 	libpcre-8.37-1
 	libpcre_devel-8.37-1
+	libpcre0-8.21-6
 	libpng-1.5.22-1
 	libpng_devel-1.5.22-1
 	libpng16-1.6.18-1
@@ -410,6 +411,7 @@ RemotePackageRepository HaikuPorts
 	libogg
 	libpcap
 	libpcre
+	libpcre0
 	libpng
 	libpng16
 	libsanta
