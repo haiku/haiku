@@ -213,7 +213,8 @@ TimeZoneView::_InitView()
 	_BuildZoneMenu();
 	BScrollView* scrollList = new BScrollView("scrollList", fZoneList,
 		B_FRAME_EVENTS | B_WILL_DRAW, false, true);
-	scrollList->SetExplicitMinSize(BSize(200, 0));
+	scrollList->SetExplicitMinSize(
+		BSize(200 * be_plain_font->Size() / 12.0f, 0));
 
 	fCurrent = new TTZDisplay("currentTime", B_TRANSLATE("Current time:"));
 	fPreview = new TTZDisplay("previewTime", B_TRANSLATE("Preview time:"));
