@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2009-2015, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2011, Philippe Saint-Pierre, stpere@gmail.com.
  * Distributed under the terms of the MIT License.
  */
@@ -33,8 +33,10 @@
 #include "CharacterView.h"
 #include "UnicodeBlockView.h"
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "CharacterWindow"
+
 
 static const uint32 kMsgUnicodeBlockSelected = 'unbs';
 static const uint32 kMsgCharacterChanged = 'chch';
@@ -123,9 +125,9 @@ private:
 
 CharacterWindow::CharacterWindow()
 	:
-	BWindow(BRect(100, 100, 700, 550), B_TRANSLATE_SYSTEM_NAME("CharacterMap"), 
+	BWindow(BRect(100, 100, 700, 550), B_TRANSLATE_SYSTEM_NAME("CharacterMap"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE
-		| B_AUTO_UPDATE_SIZE_LIMITS)
+			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	BMessage settings;
 	_LoadSettings(settings);
@@ -134,6 +136,10 @@ CharacterWindow::CharacterWindow()
 	if (settings.FindRect("window frame", &frame) == B_OK) {
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
+	} else {
+		float scaling = be_plain_font->Size() / 12.0f;
+		ResizeTo(Frame().Width() * scaling, Frame().Height() * scaling);
+		CenterOnScreen();
 	}
 
 	// create GUI
@@ -173,11 +179,11 @@ CharacterWindow::CharacterWindow()
 	const char* family;
 	const char* style;
 	BString displayName;
-	
+
 	if (settings.FindString("font family", &family) == B_OK
 		&& settings.FindString("font style", &style) == B_OK) {
 		_SetFont(family, style);
-		displayName << family << " " << style; 
+		displayName << family << " " << style;
 	} else {
 		font_family currentFontFamily;
 		font_style currentFontStyle;
@@ -211,18 +217,17 @@ CharacterWindow::CharacterWindow()
 	fCodeView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		fCodeView->PreferredSize().Height()));
 
-	// set minimum width for character pane to prevent UI
+	// Set minimum width for character pane to prevent UI
 	// from jumping when longer code strings are displayed.
 	// use 'w' character for sizing as it's likely the widest
 	// character for a Latin font.  40 characters is a little
-	// wider than needed so hopefully this covers other 
+	// wider than needed so hopefully this covers other
 	// non-Latin fonts that may be wider.
 	BFont viewFont;
 	fCodeView->GetFont(&viewFont);
-	fCharacterView->SetExplicitMinSize(BSize(viewFont.StringWidth(
-		"w") * 40,
+	fCharacterView->SetExplicitMinSize(BSize(viewFont.StringWidth("w") * 40,
 		B_SIZE_UNSET));
-		
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(menuBar)
 		.AddGroup(B_HORIZONTAL)
@@ -275,7 +280,7 @@ CharacterWindow::CharacterWindow()
 	fUnicodeBlockView->SetTarget(this);
 
 	fFilterControl->MakeFocus();
-	
+
 	fUnicodeBlockView->SelectBlockForCharacter(0);
 }
 
@@ -344,7 +349,7 @@ CharacterWindow::MessageReceived(BMessage* message)
 
 			fGlyphView->SetText(glyph);
 			fCodeView->SetText(text);
-			
+
 			fUnicodeBlockView->SelectBlockForCharacter(character);
 			break;
 		}
@@ -369,12 +374,12 @@ CharacterWindow::MessageReceived(BMessage* message)
 				fSelectedFontItem = item;
 
 				_SetFont(item->Menu()->Name(), item->Label());
-				
+
 				BString displayName;
 				displayName << item->Menu()->Name() << " " << item->Label();
-			
+
 				fFontSizeSlider->SetLabel(displayName);
-				
+
 				item = item->Menu()->Superitem();
 				item->SetMarked(true);
 			}
@@ -467,7 +472,7 @@ CharacterWindow::_LoadSettings(BMessage& settings)
 {
 	BFile file;
 	status_t status = _OpenSettings(file, B_READ_ONLY);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
 
 	return settings.Unflatten(&file);
@@ -533,7 +538,6 @@ BMenu*
 CharacterWindow::_CreateFontMenu()
 {
 	BMenu* menu = new BMenu(B_TRANSLATE("Font"));
-
 	_UpdateFontMenu(menu);
 
 	return menu;
@@ -589,10 +593,9 @@ CharacterWindow::_UpdateFontMenu(BMenu* menu)
 }
 
 
-void CharacterWindow::MenusBeginning()
+void
+CharacterWindow::MenusBeginning()
 {
-	if (update_font_families(false) == true) {
+	if (update_font_families(false) == true)
 		_UpdateFontMenu(fFontMenu);
-	}	
 }
-
