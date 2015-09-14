@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -11,6 +11,8 @@
 
 
 #include "BackgroundsView.h"
+
+#include <algorithm>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -1155,7 +1157,7 @@ Preview::Preview()
 	BControl("PreView", NULL, NULL, B_WILL_DRAW | B_SUBPIXEL_PRECISE)
 {
 	float aspectRatio = BScreen().Frame().Width() / BScreen().Frame().Height();
-	float previewWidth = 120.0f;
+	float previewWidth = 120.0f * std::max(1.0f, be_plain_font->Size() / 12.0f);
 	float previewHeight = ceil(previewWidth / aspectRatio);
 
 	ResizeTo(previewWidth, previewHeight);
