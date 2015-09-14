@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2004-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -153,6 +153,7 @@ KeymapWindow::KeymapWindow()
 
 	ResizeTo(windowFrame.Width(), windowFrame.Height());
 	MoveTo(windowFrame.LeftTop());
+	MoveOnScreen();
 
 	// TODO: this might be a bug in the interface kit, but scrolling to
 	// selection does not correctly work unless the window is shown.
@@ -1057,6 +1058,9 @@ KeymapWindow::_LoadSettings(BRect& windowFrame, BString& keyboardLayout)
 		windowFrame.right = 899;
 		windowFrame.bottom = 349;
 	}
+	float scaling = be_plain_font->Size() / 12.0f;
+	windowFrame.right *= scaling;
+	windowFrame.bottom *= scaling;
 
 	keyboardLayout = "";
 
@@ -1071,23 +1075,6 @@ KeymapWindow::_LoadSettings(BRect& windowFrame, BString& keyboardLayout)
 				windowFrame = frame;
 
 			settings.FindString("keyboard layout", &keyboardLayout);
-		}
-	}
-
-	if (!screen.Frame().Contains(windowFrame)) {
-		// Make sure the window is not larger than the screen
-		if (windowFrame.Width() > screen.Frame().Width())
-			windowFrame.right = windowFrame.left + screen.Frame().Width();
-		if (windowFrame.Height() > screen.Frame().Height())
-			windowFrame.bottom = windowFrame.top + screen.Frame().Height();
-
-		// Make sure the window is on screen (and center if it isn't)
-		if (windowFrame.left < screen.Frame().left
-			|| windowFrame.right > screen.Frame().right
-			|| windowFrame.top < screen.Frame().top
-			|| windowFrame.bottom > screen.Frame().bottom) {
-			windowFrame.OffsetTo(BAlert::AlertPosition(windowFrame.Width(),
-				windowFrame.Height()));
 		}
 	}
 
