@@ -143,7 +143,7 @@ PulseApp::BuildPulse()
 	else
 		pulseWindow = new PulseWindow(prefs->normal_window_rect);
 
-	pulseWindow->MoveOnScreen();
+	pulseWindow->MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
 	pulseWindow->Show();
 }
 

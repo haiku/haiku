@@ -83,6 +83,12 @@ enum {
 #define B_CURRENT_WORKSPACE				0
 #define B_ALL_WORKSPACES				0xffffffff
 
+// MoveOnScreen() flags
+enum {
+	B_DO_NOT_RESIZE_TO_FIT				= 0x0001,
+	B_MOVE_IF_PARTIALLY_OFFSCREEN		= 0x0002
+};
+
 
 class BWindow : public BLooper {
 public:
@@ -170,7 +176,7 @@ public:
 			void				CenterIn(const BRect& rect);
 			void				CenterOnScreen();
 			void				CenterOnScreen(screen_id id);
-			void				MoveOnScreen(bool resize = false);
+			void				MoveOnScreen(uint32 flags = 0);
 
 	virtual	void				Show();
 	virtual	void				Hide();

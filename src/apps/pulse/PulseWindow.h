@@ -27,7 +27,6 @@ class PulseWindow : public BWindow {
 		virtual bool QuitRequested();
 		virtual void MessageReceived(BMessage *message);
 
-		void MoveOnScreen();
 		void SetMode(int newmode);
 
 	private:

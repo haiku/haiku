@@ -2569,7 +2569,7 @@ BWindow::CenterOnScreen(screen_id id)
 
 
 void
-BWindow::MoveOnScreen(bool resize)
+BWindow::MoveOnScreen(uint32 flags)
 {
 	// Set size limits now if needed
 	UpdateSizeLimits();
@@ -2584,7 +2584,7 @@ BWindow::MoveOnScreen(bool resize)
 	frame.InsetBy(-borderWidth, -borderWidth);
 	frame.top -= tabHeight;
 
-	if (resize) {
+	if ((flags & B_DO_NOT_RESIZE_TO_FIT) == 0) {
 		// Make sure the window fits on the screen
 		if (frame.Width() > screenFrame.Width())
 			frame.right -= frame.Width() - screenFrame.Width();
@@ -2594,7 +2594,9 @@ BWindow::MoveOnScreen(bool resize)
 		ResizeTo(frame.Width(), frame.Height());
 	}
 
-	if (!frame.Intersects(screenFrame)) {
+	if ((flags & B_MOVE_IF_PARTIALLY_OFFSCREEN) == 0
+			&& !screenFrame.Contains(frame)
+		|| !frame.Intersects(screenFrame)) {
 		// Off and away
 		CenterOnScreen();
 		return;

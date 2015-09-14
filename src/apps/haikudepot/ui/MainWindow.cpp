@@ -671,7 +671,7 @@ MainWindow::_RestoreWindowFrame(const BMessage& settings)
 	ResizeTo(frame.Width(), frame.Height());
 
 	if (fromSettings)
-		MoveOnScreen(true);
+		MoveOnScreen();
 	else
 		CenterOnScreen();
 }

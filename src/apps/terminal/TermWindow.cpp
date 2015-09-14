@@ -13,6 +13,7 @@
  *		Siarzhuk Zharski, zharik@gmx.li
  */
 
+
 #include "TermWindow.h"
 
 #include <new>
@@ -231,7 +232,7 @@ TermWindow::TermWindow(const BString& title, Arguments* args)
 			ResizeTo(frame.Width(), frame.Height());
 
 		MoveTo(frame.LeftTop());
-		MoveOnScreen();
+		MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
 
 		SetWorkspaces(workspaces);
 	} else {

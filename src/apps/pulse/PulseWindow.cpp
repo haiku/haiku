@@ -124,25 +124,6 @@ PulseWindow::MessageReceived(BMessage *message)
 
 
 void
-PulseWindow::MoveOnScreen()
-{
-	// check if the window is on screen, and move it if not
-	BRect frame = Frame();
-	BRect screenFrame = BScreen().Frame();
-
-	if (frame.left > screenFrame.right)
-		MoveBy(screenFrame.right - frame.right - 10, 0);
-	else if (frame.right < 0)
-		MoveTo(10, frame.top);
-
-	if (frame.top > screenFrame.bottom)
-		MoveBy(0, screenFrame.bottom - frame.bottom - 10);
-	else if (frame.bottom < 0)
-		MoveTo(frame.left, 10);
-}
-
-
-void
 PulseWindow::SetMode(int newmode)
 {
 	PulseApp *pulseapp = (PulseApp *)be_app;
@@ -163,7 +144,7 @@ PulseWindow::SetMode(int newmode)
 				pulseapp->prefs->normal_window_rect.IntegerHeight());
 			MoveTo(pulseapp->prefs->normal_window_rect.left,
 				pulseapp->prefs->normal_window_rect.top);
-			MoveOnScreen();
+			MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
 			break;
 
 		case PV_MINI_MODE:
@@ -183,7 +164,7 @@ PulseWindow::SetMode(int newmode)
 				pulseapp->prefs->mini_window_rect.IntegerHeight());
 			MoveTo(pulseapp->prefs->mini_window_rect.left,
 				pulseapp->prefs->mini_window_rect.top);
-			MoveOnScreen();
+			MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
 			break;
 
 		case PV_DESKBAR_MODE:
