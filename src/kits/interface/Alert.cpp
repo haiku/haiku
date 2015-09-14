@@ -335,9 +335,9 @@ BAlert::MessageReceived(BMessage* msg)
 
 	int32 which;
 	if (msg->FindInt32("which", &which) == B_OK) {
-		if (fAlertSem < B_OK) {
+		if (fAlertSem < 0) {
 			// Semaphore hasn't been created; we're running asynchronous
-			if (fInvoker) {
+			if (fInvoker != NULL) {
 				BMessage* out = fInvoker->Message();
 				if (out && (out->ReplaceInt32("which", which) == B_OK
 							|| out->AddInt32("which", which) == B_OK))
@@ -490,6 +490,10 @@ BAlert::_Init(const char* text, const char* button0, const char* button1,
 	const char* button2, button_width buttonWidth, button_spacing spacing,
 	alert_type type)
 {
+	fInvoker = NULL;
+	fAlertSem = -1;
+	fAlertValue = -1;
+
 	fIconView = new TAlertView();
 
 	fTextView = new BTextView("_tv_");
