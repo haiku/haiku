@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -226,8 +226,9 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 	fDeviceInfo->SetAlignment(B_ALIGN_CENTER);
 	screenBox->AddChild(fDeviceInfo);
 
-	fMonitorView = new MonitorView(BRect(0.0, 0.0, 80.0, 80.0),
-		"monitor", screen.Frame().IntegerWidth() + 1,
+	float scaling = std::max(1.0f, be_plain_font->Size() / 12.0f);
+	fMonitorView = new MonitorView(BRect(0.0, 0.0, 80.0 * scaling,
+			80.0 * scaling), "monitor", screen.Frame().IntegerWidth() + 1,
 		screen.Frame().IntegerHeight() + 1);
 	screenBox->AddChild(fMonitorView);
 
@@ -538,6 +539,8 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 
 	_UpdateControls();
 	_UpdateMonitor();
+
+	MoveOnScreen();
 }
 
 
@@ -1237,10 +1240,10 @@ ScreenWindow::_UpdateMonitor()
 
 		fMonitorInfo->SetText(text);
 
-		if (fMonitorInfo->IsHidden())
+		if (fMonitorInfo->IsHidden(fMonitorInfo))
 			fMonitorInfo->Show();
 	} else {
-		if (!fMonitorInfo->IsHidden())
+		if (!fMonitorInfo->IsHidden(fMonitorInfo))
 			fMonitorInfo->Hide();
 	}
 

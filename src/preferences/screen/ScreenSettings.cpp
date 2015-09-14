@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -9,10 +9,11 @@
  */
 
 
-#include <StorageKit.h>
-#include <Screen.h>
-
 #include "ScreenSettings.h"
+
+#include <File.h>
+#include <FindDirectory.h>
+#include <Path.h>
 
 
 static const char* kSettingsFileName = "Screen_data";
@@ -20,37 +21,16 @@ static const char* kSettingsFileName = "Screen_data";
 
 ScreenSettings::ScreenSettings()
 {
-	BScreen screen(B_MAIN_SCREEN_ID);
-	BRect screenFrame = screen.Frame();
-
-	fWindowFrame.Set(0, 0, 450, 250);
+	fWindowFrame.Set(-1, -1, 450, 250);
 
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		path.Append(kSettingsFileName);
 
 		BFile file(path.Path(), B_READ_ONLY);
-		if (file.InitCheck() == B_OK) {
+		if (file.InitCheck() == B_OK)
 			file.Read(&fWindowFrame, sizeof(BRect));
-
-			// make sure the window is visible on screen
-			if (fWindowFrame.Width() > screenFrame.Width())
-				fWindowFrame.right = fWindowFrame.left + 450;
-			if (fWindowFrame.Height() > screenFrame.Height())
-				fWindowFrame.bottom = fWindowFrame.top + 250;
-
-			if (screenFrame.right >= fWindowFrame.left + 40
-				&& screenFrame.bottom >= fWindowFrame.top + 40
-				&& screenFrame.left <= fWindowFrame.right - 40
-				&& screenFrame.top <= fWindowFrame.bottom - 40)
-				return;
-		}
 	}
-
-	// Center on screen
-	fWindowFrame.OffsetTo(
-		screenFrame.left + (screenFrame.Width() - fWindowFrame.Width()) / 2,
-		screenFrame.top + (screenFrame.Height() - fWindowFrame.Height()) /2);
 }
 
 
