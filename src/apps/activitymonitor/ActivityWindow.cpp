@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -47,6 +47,10 @@ ActivityWindow::ActivityWindow()
 	if (settings.FindRect("window frame", &frame) == B_OK) {
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
+	} else {
+		float scaling = be_plain_font->Size() / 12.0f;
+		ResizeTo(Frame().Width() * scaling, Frame().Height() * scaling);
+		CenterOnScreen();
 	}
 
 #ifdef __HAIKU__
