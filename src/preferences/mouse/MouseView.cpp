@@ -12,6 +12,8 @@
 
 #include "MouseView.h"
 
+#include <algorithm>
+
 #include <Box.h>
 #include <Button.h>
 #include <Debug.h>
@@ -95,6 +97,7 @@ MouseView::MouseView(const MouseSettings &settings)
 	fOldButtons(0)
 {
 	SetEventMask(B_POINTER_EVENTS, B_NO_POINTER_HISTORY);
+	fScaling = std::max(1.0f, be_plain_font->Size() / 12.0f);
 }
 
 
@@ -129,9 +132,9 @@ void
 MouseView::GetPreferredSize(float* _width, float* _height)
 {
 	if (_width != NULL)
-		*_width = kMouseDownWidth + 2;
+		*_width = fScaling * (kMouseDownWidth + 2);
 	if (_height != NULL)
-		*_height = 104;
+		*_height = fScaling * 104;
 }
 
 
@@ -157,8 +160,7 @@ void
 MouseView::MouseUp(BPoint)
 {
 	fButtons = 0;
-	Invalidate(BRect(0, kButtonTop, kMouseDownWidth,
-		kButtonTop + kMouseDownHeight));
+	Invalidate(_ButtonsRect());
 	fOldButtons = fButtons;
 }
 
@@ -182,17 +184,14 @@ MouseView::MouseDown(BPoint where)
 	GetClippingRegion(&clipping);
 
 	if (fOldButtons != fButtons) {
-		Invalidate(BRect(0, kButtonTop, kMouseDownWidth, kButtonTop
-			+ kMouseDownHeight));
+		Invalidate(_ButtonsRect());
 		fOldButtons = fButtons;
 	}
 
 	const int32* offset = getButtonOffsets(fType);
 	int32 button = -1;
 	for (int32 i = 0; i <= fType; i++) {
-		BRect frame(offset[i], kButtonTop, offset[i + 1] - 1,
-			kButtonTop + kMouseDownHeight);
-		if (frame.Contains(where)) {
+		if (_ButtonRect(offset, i).Contains(where)) {
 			button = i;
 			break;
 		}
@@ -229,7 +228,7 @@ MouseView::Draw(BRect updateFrame)
 {
 	SetDrawingMode(B_OP_ALPHA);
 	SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
-	SetScale(1.8);
+	SetScale(fScaling * 1.8);
 
 	BShape mouseShape;
 	mouseShape.MoveTo(BPoint(16, 12));
@@ -245,12 +244,12 @@ MouseView::Draw(BRect updateFrame)
 	mouseShape.Close();
 
 	// Draw the shadow
-	SetOrigin(-17, -11);
+	SetOrigin(-17 * fScaling, -11 * fScaling);
 	SetHighColor(kMouseShadowColor);
 	FillShape(&mouseShape, B_SOLID_HIGH);
 
 	// Draw the body
-	SetOrigin(-21, -14);
+	SetOrigin(-21 * fScaling, -14 * fScaling);
 	BGradientRadial bodyGradient(28, 24, 128);
 	bodyGradient.AddColor(kMouseBodyTopColor, 0);
 	bodyGradient.AddColor(kMouseBodyBottomColor, 255);
@@ -258,7 +257,7 @@ MouseView::Draw(BRect updateFrame)
 	FillShape(&mouseShape, bodyGradient);
 
 	// Draw the outline
-	SetPenSize(1 / 1.8);
+	SetPenSize(1 / 1.8 / fScaling);
 	SetDrawingMode(B_OP_OVER);
 	SetHighColor(kMouseOutlineColor);
 
@@ -279,8 +278,8 @@ MouseView::Draw(BRect updateFrame)
 	// Separator between the buttons
 	const int32* offset = getButtonOffsets(fType);
 	for (int32 i = 1; i < fType; i++) {
-		StrokeLine(BPoint(offset[i], kButtonTop),
-			BPoint(offset[i], kButtonTop + kMouseDownHeight));
+		BRect buttonRect = _ButtonRect(offset, i);
+		StrokeLine(buttonRect.LeftTop(), buttonRect.LeftBottom());
 	}
 
 	mouse_map map;
@@ -299,16 +298,16 @@ MouseView::Draw(BRect updateFrame)
 		if (pressed) {
 			SetDrawingMode(B_OP_ALPHA);
 			SetHighColor(kButtonPressedColor);
-			FillRect(BRect(offset[i], kButtonTop, offset[i + 1] - 1,
-				kButtonTop + kMouseDownHeight));
+			FillRect(_ButtonRect(offset, i));
 		}
 
-		BRect border(offset[i] + 1, kButtonTop + 5, offset[i + 1] - 1,
-			kButtonTop + kMouseDownHeight - 4);
+		BRect border(fScaling * (offset[i] + 1), fScaling * (kButtonTop + 5),
+			fScaling * offset[i + 1] - 1,
+			fScaling * (kButtonTop + kMouseDownHeight - 4));
 		if (i == 0)
-			border.left += 5;
+			border.left += fScaling * 5;
 		if (i == fType - 1)
-			border.right -= 4;
+			border.right -= fScaling * 4;
 
 		char number[2] = {0};
 		number[0] = getMappingNumber(map.button[_ConvertFromVisualOrder(i)])
@@ -324,6 +323,23 @@ MouseView::Draw(BRect updateFrame)
 
 	if (fButtons != 0)
 		ClipToPicture(NULL);
+}
+
+
+BRect
+MouseView::_ButtonsRect() const
+{
+	return BRect(0, fScaling * kButtonTop, fScaling * kMouseDownWidth,
+			fScaling * (kButtonTop + kMouseDownHeight));
+}
+
+
+BRect
+MouseView::_ButtonRect(const int32* offsets, int index) const
+{
+	return BRect(fScaling * offsets[index], fScaling * kButtonTop,
+		fScaling * offsets[index + 1] - 1,
+		fScaling * (kButtonTop + kMouseDownHeight));
 }
 
 
@@ -349,8 +365,8 @@ void
 MouseView::_CreateButtonsPicture()
 {
 	BeginPicture(&fButtonsPicture);
-	SetScale(1.8);
-	SetOrigin(-21, -14);
+	SetScale(1.8 * fScaling);
+	SetOrigin(-21 * fScaling, -14 * fScaling);
 
 	BShape mouseShape;
 	mouseShape.MoveTo(BPoint(48, 12));

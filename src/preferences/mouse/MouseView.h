@@ -35,6 +35,9 @@ public:
 		virtual	void			Draw(BRect frame);
 
 private:
+				BRect			_ButtonsRect() const;
+				BRect			_ButtonRect(const int32* offsets,
+									int index) const;
 				int32			_ConvertFromVisualOrder(int32 button);
 				void			_CreateButtonsPicture();
 
@@ -46,6 +49,7 @@ private:
 				BPicture		fButtonsPicture;
 				int32			fDigitBaseline;
 				int32			fDigitHeight;
+				float			fScaling;
 
 				int32			fType;
 				uint32			fButtons;
