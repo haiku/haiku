@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010, Haiku. All rights reserved.
+ * Copyright 2003-2015, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -25,10 +25,8 @@ HApp::HApp()
 	:
 	BApplication("application/x-vnd.Haiku-Sounds")
 {
-	BRect rect;
-	rect.Set(200, 150, 590, 570);
-
-	HWindow* window = new HWindow(rect, B_TRANSLATE_SYSTEM_NAME("Sounds"));
+	HWindow* window = new HWindow(BRect(-1, -1, 390, 420),
+		B_TRANSLATE_SYSTEM_NAME("Sounds"));
 	window->Show();
 }
 

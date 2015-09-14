@@ -56,18 +56,19 @@ HWindow::HWindow(BRect rect, const char* name)
 	fFilePanel->SetTarget(this);
 
 	BPath path;
-	BMessage msg;
-
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
 		path.Append(kSettingsFile);
 		BFile file(path.Path(), B_READ_ONLY);
 
+		BMessage msg;
 		if (file.InitCheck() == B_OK && msg.Unflatten(&file) == B_OK
 			&& msg.FindRect("frame", &fFrame) == B_OK) {
 			MoveTo(fFrame.LeftTop());
 			ResizeTo(fFrame.Width(), fFrame.Height());
 		}
 	}
+
+	MoveOnScreen();
 }
 
 
