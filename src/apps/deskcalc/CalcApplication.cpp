@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2012 Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2015 Haiku, Inc. All Rights Reserved.
  * Copyright 1997, 1998 R3 Software Ltd. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
@@ -57,7 +57,9 @@ CalcApplication::ReadyToRun()
 	BMessage settings;
 	_LoadSettings(settings);
 
-	BRect frame(0, 0, kDefaultWindowWidth - 1, kDefaultWindowHeight - 1);
+	float scaling = be_plain_font->Size() / 12.0f;
+	BRect frame(0, 0, (kDefaultWindowWidth * scaling) - 1,
+		(kDefaultWindowHeight * scaling) - 1);
 	fCalcWindow = new CalcWindow(frame, &settings);
 
 	// reveal window
