@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2014, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -143,7 +143,7 @@ GenerateSudoku::_GenerateThread(void* _self)
 
 SudokuWindow::SudokuWindow()
 	:
-	BWindow(BRect(100, 100, 500, 520), B_TRANSLATE_SYSTEM_NAME("Sudoku"),
+	BWindow(BRect(-1, -1, 400, 420), B_TRANSLATE_SYSTEM_NAME("Sudoku"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_QUIT_ON_WINDOW_CLOSE),
 	fGenerator(NULL),
 	fStoredState(NULL),
@@ -157,8 +157,13 @@ SudokuWindow::SudokuWindow()
 		MoveTo(frame.LeftTop());
 		ResizeTo(frame.Width(), frame.Height());
 		frame.OffsetTo(B_ORIGIN);
-	} else
+	} else {
+		float scaling = std::max(1.0f, be_plain_font->Size() / 12.0f);
+		ResizeTo(Frame().Width() * scaling, Frame().Height() * scaling);
 		frame = Bounds();
+	}
+
+	MoveOnScreen();
 
 	if (settings.HasMessage("stored state")) {
 		fStoredState = new BMessage;
