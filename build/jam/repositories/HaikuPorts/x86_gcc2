@@ -107,6 +107,7 @@ RemotePackageRepository HaikuPorts
 	faac_devel-1.28-2
 	faad2-2.7-1
 	faad2_devel-2.7-1
+	fasm-1.71.39-1
 	f1spirit-0.rc9.1615-1
 	file-5.15-1
 	file_devel-5.15-1
@@ -976,6 +977,7 @@ RemotePackageRepository HaikuPorts
 	faac
 	faad2
 	faad2_x86
+	fasm
 	f1spirit
 	file
 	file_x86
