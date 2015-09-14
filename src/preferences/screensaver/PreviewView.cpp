@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2013 Haiku, Inc. All Rights Reserved.
+ * Copyright 2003-2015 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,6 +10,7 @@
 
 #include "PreviewView.h"
 
+#include <algorithm>
 #include <iostream>
 
 #include <CardLayout.h>
@@ -137,7 +138,7 @@ PreviewView::AddPreview()
 
 	float aspectRatio = 4.0f / 3.0f;
 		// 4:3 monitor
-	float previewWidth = 120.0f;
+	float previewWidth = 120.0f * std::max(1.0f, be_plain_font->Size() / 12.0f);
 	float previewHeight = ceilf(previewWidth / aspectRatio);
 
 	fSaverView->SetExplicitSize(BSize(previewWidth, previewHeight));
