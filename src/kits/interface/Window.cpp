@@ -2594,8 +2594,8 @@ BWindow::MoveOnScreen(uint32 flags)
 		ResizeTo(frame.Width(), frame.Height());
 	}
 
-	if ((flags & B_MOVE_IF_PARTIALLY_OFFSCREEN) == 0
-			&& !screenFrame.Contains(frame)
+	if (((flags & B_MOVE_IF_PARTIALLY_OFFSCREEN) == 0
+			&& !screenFrame.Contains(frame))
 		|| !frame.Intersects(screenFrame)) {
 		// Off and away
 		CenterOnScreen();
