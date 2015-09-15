@@ -888,7 +888,7 @@ BScrollView::_ComputeFrame(BRect frame, bool horizontal, bool vertical,
 	if (horizontal)
 		frame.bottom += B_H_SCROLL_BAR_HEIGHT;
 
-	_InsetBorders(frame, border, borders);
+	_InsetBorders(frame, border, borders, true);
 
 	if (_BorderSize(border) == 0) {
 		if (vertical)
@@ -940,9 +940,11 @@ BScrollView::_ModifyFlags(int32 flags, border_style border)
 
 
 /*static*/ void
-BScrollView::_InsetBorders(BRect& frame, border_style border, uint32 borders)
+BScrollView::_InsetBorders(BRect& frame, border_style border, uint32 borders, bool expand)
 {
 	float borderSize = _BorderSize(border);
+	if (expand)
+		borderSize = -borderSize;
 	if ((borders & BControlLook::B_LEFT_BORDER) != 0)
 		frame.left += borderSize;
 	if ((borders & BControlLook::B_TOP_BORDER) != 0)

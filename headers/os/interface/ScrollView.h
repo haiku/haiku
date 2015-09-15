@@ -116,7 +116,7 @@ private:
 	static	float				_BorderSize(border_style border);
 	static	int32				_ModifyFlags(int32 flags, border_style border);
 	static	void				_InsetBorders(BRect& frame, border_style border,
-									uint32 borders);
+									uint32 borders, bool expand = false);
 private:
 			BView*				fTarget;
 			BScrollBar*			fHorizontalScrollBar;
