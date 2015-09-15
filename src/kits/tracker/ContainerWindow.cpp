@@ -968,7 +968,7 @@ BContainerWindow::InitLayout()
 	if (fPoseView->VScrollBar() != NULL) {
 		fVScrollBarContainer = new BGroupView(B_VERTICAL, 0);
 		fVScrollBarContainer->GroupLayout()->AddView(fPoseView->VScrollBar());
-		fVScrollBarContainer->GroupLayout()->SetInsets(-1, 0, 0, 0);
+		fVScrollBarContainer->GroupLayout()->SetInsets(-1, -1, 0, 0);
 		fPoseContainer->GridLayout()->AddView(fVScrollBarContainer, 1, 1);
 	}
 	if (fPoseView->HScrollBar() != NULL) {
