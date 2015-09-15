@@ -22,8 +22,8 @@ static const int32 kHelpLines = 3;
 static const console_color kBackgroundColor = BLACK;
 static const console_color kTextColor = WHITE;
 static const console_color kCopyrightColor = CYAN;
-static const console_color kTitleColor = WHITE;
-static const console_color kTitleBackgroundColor = RED;
+static const console_color kTitleColor = YELLOW;
+static const console_color kTitleBackgroundColor = kBackgroundColor;
 static const console_color kHelpTextColor = WHITE;
 
 static const console_color kItemColor = GRAY;
