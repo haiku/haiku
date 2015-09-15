@@ -416,14 +416,15 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 	}
 	if (is & PORT_INT_PC) {
 		TRACE("Port Connect Change\n");
+		// TODO: check if the COMINIT is actually unsolicited!
 		// Spec v1.3, §6.2.2.3 Recovery of Unsolicited COMINIT
 
 		// perform a hard reset
-		if (!_HardReset())
-			return;
-
-		// clear error bits to clear PxSERR.DIAG.X
-		_ClearErrorRegister();
+//		if (!_HardReset())
+//			return;
+//
+//		// clear error bits to clear PxSERR.DIAG.X
+//		_ClearErrorRegister();
 	}
 	if (is & PORT_INT_UF) {
 		TRACE("Unknown FIS\n");
