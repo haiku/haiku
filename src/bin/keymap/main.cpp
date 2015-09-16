@@ -147,7 +147,7 @@ main(int argc, char** argv)
 
 			case 'H':
 			default:
-				usage();
+				mode = kUnspecified;
 				break;
 		}
 	}
