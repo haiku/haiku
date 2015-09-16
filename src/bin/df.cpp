@@ -207,6 +207,9 @@ main(int argc, char **argv)
 					case 'b':
 						showBlocks = true;
 						break;
+					case 'h':
+						// human readable units in Unix df
+						break;
 					default:
 						ShowUsage(programName);
 				}
