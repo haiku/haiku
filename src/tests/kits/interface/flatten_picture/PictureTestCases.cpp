@@ -8,6 +8,12 @@
 
 #include "PictureTestCases.h"
 
+#include <GradientLinear.h>
+#include <GradientRadial.h>
+#include <GradientRadialFocus.h>
+#include <GradientDiamond.h>
+#include <GradientConic.h>
+
 #include <stdio.h>
 
 static const rgb_color kBlack = {0, 0, 0};
@@ -65,6 +71,24 @@ static void testDrawStringWithLength(BView *view, BRect frame)
 	view->SetHighColor(kBlack);
 	view->DrawString("Haiku [ÖÜÄöüä]", 13, BPoint(frame.left, baseline));
 }
+
+
+static void testDrawStringWithOffsets(BView* view, BRect frame)
+{
+	BFont font;
+	view->GetFont(&font);
+	font_height height;
+	font.GetHeight(&height);
+	float baseline = frame.bottom - height.descent;
+	// draw base line
+	view->SetHighColor(kGreen);
+	view->StrokeLine(BPoint(frame.left, baseline - 1), BPoint(frame.right, baseline -1));
+
+	view->SetHighColor(kBlack);
+	const BPoint pointArray[] = { BPoint(frame.left, baseline) };
+	view->DrawString("Haiku [ÖÜÄöüä]", pointArray, sizeof(pointArray) / sizeof(pointArray[0]));
+}
+
 
 static void testFillArc(BView *view, BRect frame)
 {
@@ -152,6 +176,52 @@ static void testFillRect(BView *view, BRect frame)
 {
 	frame.InsetBy(2, 2);
 	view->FillRect(frame);
+}
+
+
+static void testFillRectGradientLinear(BView* view, BRect frame)
+{
+	BGradientLinear gradient(0, 0, frame.right, frame.bottom);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	view->FillRect(frame, gradient);
+}
+
+static void testFillRectGradientRadial(BView* view, BRect frame)
+{
+	BGradientRadial gradient(10, 10, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	view->FillRect(frame, gradient);
+}
+
+static void testFillRectGradientRadialFocus(BView* view, BRect frame)
+{
+	BGradientRadialFocus gradient(0, 0, 10, 10, 5);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	view->FillRect(frame, gradient);
+}
+
+static void testFillRectGradientDiamond(BView* view, BRect frame)
+{
+	BGradientDiamond gradient(0, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	view->FillRect(frame, gradient);
+}
+
+static void testFillRectGradientConic(BView* view, BRect frame)
+{
+	BGradientConic gradient(0, 0, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	view->FillRect(frame, gradient);
 }
 
 static void testStrokeRect(BView *view, BRect frame)
@@ -678,9 +748,9 @@ static void testSetOriginAndScale5(BView *view, BRect frame)
 	view->FillRect(r);
 	
 	view->PushState();
-		view->SetScale(0.75);
-		view->SetHighColor(kGreen);
-		view->FillRect(r);
+	view->SetScale(0.75);
+	view->SetHighColor(kGreen);
+	view->FillRect(r);
 	view->PopState();
 }
 
@@ -757,6 +827,9 @@ static void testFontRotation(BView* view, BRect frame)
 		fprintf(stderr, "Error: Rotation is %f but should be 90.0\n", font.Rotation());
 }
 
+
+
+
 // TODO
 // - blending mode
 // - line mode
@@ -770,6 +843,8 @@ TestCase gTestCases[] = {
 	{ "Test DrawChar", testDrawChar },
 	{ "Test Draw String", testDrawString },
 	{ "Test Draw String With Length", testDrawStringWithLength },
+	{ "Test Draw String With Offsets", testDrawStringWithOffsets },
+
 	{ "Test FillArc", testFillArc },
 	{ "Test StrokeArc", testStrokeArc },
 	// testFillBezier fails under BeOS because the
@@ -781,6 +856,11 @@ TestCase gTestCases[] = {
 	{ "Test FillPolygon", testFillPolygon },
 	{ "Test StrokePolygon", testStrokePolygon },
 	{ "Test FillRect", testFillRect },
+	{ "Test FillRectGradientLinear", testFillRectGradientLinear },
+	{ "Test FillRectGradientRadial", testFillRectGradientRadial },
+	{ "Test FillRectGradientRadialFocus", testFillRectGradientRadialFocus },
+	{ "Test FillRectGradientDiamond", testFillRectGradientDiamond },
+	{ "Test FillRectGradientConic", testFillRectGradientConic },
 	{ "Test StrokeRect", testStrokeRect },
 	{ "Test FillRegion", testFillRegion },
 	{ "Test FillRoundRect", testFillRoundRect },
