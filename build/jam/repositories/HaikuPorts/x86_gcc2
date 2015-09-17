@@ -769,7 +769,7 @@ RemotePackageRepository HaikuPorts
 	mosh_x86-1.2.4-1
 	mpc_x86-1.0.3-1
 	mpc_x86_devel-1.0.3-1
-	mpd_x86-0.18.12_git-1
+	mpd_x86-0.19.10_git-1
 	mpfr_x86-3.1.3-1
 	mpfr_x86_devel-3.1.3-1
 	mpg123_x86-1.22.4-1
