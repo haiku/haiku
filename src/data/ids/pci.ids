@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.09.10
-#	Date:    2015-09-10 03:15:01
+#	Version: 2015.09.16
+#	Date:    2015-09-16 03:15:02
 #
 #	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
 #	PCI ID Project at http://pci-ids.ucw.cz/.
@@ -18423,6 +18423,7 @@
 	5390  RT5390 Wireless 802.11n 1T/1R PCIe
 		103c 1636  U98Z077.00 Half-size Mini PCIe Card
 	5392  RT5392 PCIe Wireless Network Adapter
+	539b  RT5390R 802.11bgn PCIe Wireless Network Adapter
 	539f  RT5390 [802.11 b/g/n 1T1R G-band PCI Express Single Chip]
 		103c 1637  Pavilion DM1Z-3000 PCIe wireless card
 	5592  RT5592 PCIe Wireless Network Adapter
