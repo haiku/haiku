@@ -70,6 +70,8 @@ local genericSources =
 	s_erf.c s_erff.c # s_erfl.c
 	s_expm1f.c s_expm1.c
 	s_finite.c s_finitef.c # s_finitel.c
+	s_clog.c s_clogf.c # s_clogl.c
+	s_csqrt.c s_csqrtf.c # s_csqrtl.c
 	s_floor.c s_floorf.c # s_floorl.c
 	s_fma.c s_fmaf.c # s_fmal.c
 	s_fpclassify.c s_fpclassifyf.c # s_fpclassifyl.c
