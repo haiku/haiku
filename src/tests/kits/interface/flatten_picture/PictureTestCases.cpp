@@ -178,7 +178,6 @@ static void testFillRect(BView *view, BRect frame)
 	view->FillRect(frame);
 }
 
-
 static void testFillRectGradientLinear(BView* view, BRect frame)
 {
 	BGradientLinear gradient(0, 0, frame.right, frame.bottom);
@@ -234,9 +233,69 @@ static void testFillRegion(BView *view, BRect frame)
 {
 	frame.InsetBy(2, 2);
 	BRegion region(frame);
-	frame.InsetBy(2, 2);
+	frame.InsetBy(10, 10);
 	region.Exclude(frame);
 	view->FillRegion(&region);
+}
+
+static void testFillRegionGradientLinear(BView* view, BRect frame)
+{
+	BGradientLinear gradient(0, 0, frame.right, frame.bottom);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	BRegion region(frame);
+	frame.InsetBy(10, 10);
+	region.Exclude(frame);
+	view->FillRegion(&region, gradient);
+}
+
+static void testFillRegionGradientRadial(BView* view, BRect frame)
+{
+	BGradientRadial gradient(10, 10, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	BRegion region(frame);
+	frame.InsetBy(10, 10);
+	region.Exclude(frame);
+	view->FillRegion(&region, gradient);
+}
+
+static void testFillRegionGradientRadialFocus(BView* view, BRect frame)
+{
+	BGradientRadialFocus gradient(0, 0, 10, 10, 5);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	BRegion region(frame);
+	frame.InsetBy(10, 10);
+	region.Exclude(frame);
+	view->FillRegion(&region, gradient);
+}
+
+static void testFillRegionGradientDiamond(BView* view, BRect frame)
+{
+	BGradientDiamond gradient(0, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	BRegion region(frame);
+	frame.InsetBy(10, 10);
+	region.Exclude(frame);
+	view->FillRegion(&region, gradient);
+}
+
+static void testFillRegionGradientConic(BView* view, BRect frame)
+{
+	BGradientConic gradient(0, 0, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	BRegion region(frame);
+	frame.InsetBy(10, 10);
+	region.Exclude(frame);
+	view->FillRegion(&region, gradient);
 }
 
 static void testFillRoundRect(BView *view, BRect frame)
@@ -873,6 +932,11 @@ TestCase gTestCases[] = {
 	{ "Test FillRectGradientConic", testFillRectGradientConic },
 	{ "Test StrokeRect", testStrokeRect },
 	{ "Test FillRegion", testFillRegion },
+	{ "Test FillRegionGradientLinear", testFillRegionGradientLinear },
+	{ "Test FillRegionGradientRadial", testFillRegionGradientRadial },
+	{ "Test FillRegionGradientRadialFocus", testFillRegionGradientRadialFocus },
+	{ "Test FillRegionGradientDiamond", testFillRegionGradientDiamond },
+	{ "Test FillRegionGradientConic", testFillRegionGradientConic },
 	{ "Test FillRoundRect", testFillRoundRect },
 	{ "Test StrokeRoundRect", testStrokeRoundRect },
 	{ "Test FillTriangle", testFillTriangle },
@@ -903,7 +967,7 @@ TestCase gTestCases[] = {
 	{ "Test SetScale", testSetScale },
 	// testSetScale2 fails under BeOS. The picture versions of the
 	// rectangle are twice as large as the direct draw version
-	{ "Test SetScale2*", testSetScale2 },
+	{ "Test SetScale2", testSetScale2 },
 	{ "Test SetScale3", testSetScale3 },
 	{ "Test SetOriginAndScale", testSetOriginAndScale },
 	{ "Test SetOriginAndScale2", testSetOriginAndScale2 },
