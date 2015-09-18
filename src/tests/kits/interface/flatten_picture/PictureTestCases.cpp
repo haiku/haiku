@@ -364,6 +364,71 @@ static void testFillTriangle(BView *view, BRect frame)
 	view->FillTriangle(points[0], points[1], points[2]); 
 }
 
+static void testFillTriangleGradientLinear(BView* view, BRect frame)
+{
+	BGradientLinear gradient(0, 0, frame.right, frame.bottom);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	BPoint points[3];
+	points[0] = BPoint(frame.left, frame.bottom);
+	points[1] = BPoint(centerPoint(frame).x, frame.top);
+	points[2] = BPoint(frame.right, frame.bottom);
+	view->FillTriangle(points[0], points[1], points[2], gradient);
+}
+
+static void testFillTriangleGradientRadial(BView* view, BRect frame)
+{
+	BGradientRadial gradient(10, 10, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	BPoint points[3];
+	points[0] = BPoint(frame.left, frame.bottom);
+	points[1] = BPoint(centerPoint(frame).x, frame.top);
+	points[2] = BPoint(frame.right, frame.bottom);
+	view->FillTriangle(points[0], points[1], points[2], gradient);
+}
+
+static void testFillTriangleGradientRadialFocus(BView* view, BRect frame)
+{
+	BGradientRadialFocus gradient(0, 0, 10, 10, 5);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	BPoint points[3];
+	points[0] = BPoint(frame.left, frame.bottom);
+	points[1] = BPoint(centerPoint(frame).x, frame.top);
+	points[2] = BPoint(frame.right, frame.bottom);
+	view->FillTriangle(points[0], points[1], points[2], gradient);
+}
+
+static void testFillTriangleGradientDiamond(BView* view, BRect frame)
+{
+	BGradientDiamond gradient(0, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	BPoint points[3];
+	points[0] = BPoint(frame.left, frame.bottom);
+	points[1] = BPoint(centerPoint(frame).x, frame.top);
+	points[2] = BPoint(frame.right, frame.bottom);
+	view->FillTriangle(points[0], points[1], points[2], gradient);
+}
+
+static void testFillTriangleGradientConic(BView* view, BRect frame)
+{
+	BGradientConic gradient(0, 0, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	BPoint points[3];
+	points[0] = BPoint(frame.left, frame.bottom);
+	points[1] = BPoint(centerPoint(frame).x, frame.top);
+	points[2] = BPoint(frame.right, frame.bottom);
+	view->FillTriangle(points[0], points[1], points[2], gradient);
+}
+
 static void testStrokeTriangle(BView *view, BRect frame)
 {
 	frame.InsetBy(2, 2);
@@ -987,9 +1052,13 @@ TestCase gTestCases[] = {
 	{ "Test FillRoundRectGradientRadialFocus", testFillRoundRectGradientRadialFocus },
 	{ "Test FillRoundRectGradientDiamond", testFillRoundRectGradientDiamond },
 	{ "Test FillRoundRectGradientConic", testFillRoundRectGradientConic },
-
 	{ "Test StrokeRoundRect", testStrokeRoundRect },
 	{ "Test FillTriangle", testFillTriangle },
+	{ "Test FillTriangleGradientLinear", testFillTriangleGradientLinear },
+	{ "Test FillTriangleGradientRadial", testFillTriangleGradientRadial },
+	{ "Test FillTriangleGradientRadialFocus", testFillTriangleGradientRadialFocus },
+	{ "Test FillTriangleGradientDiamond", testFillTriangleGradientDiamond },
+	{ "Test FillTriangleGradientConic", testFillTriangleGradientConic },
 	{ "Test StrokeTriangle", testStrokeTriangle },
 	{ "Test StrokeLine", testStrokeLine },
 	{ "Test FillShape", testFillShape },
