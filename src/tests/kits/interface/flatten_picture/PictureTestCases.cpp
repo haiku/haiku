@@ -404,6 +404,16 @@ static void testInvertRect(BView *view, BRect frame)
 	view->InvertRect(frame);
 }
 
+static void testInvertRectSetDrawingMode(BView *view, BRect frame)
+{
+	view->SetDrawingMode(B_OP_ALPHA);
+	view->SetHighColor(128, 128, 128, 128);
+	frame.InsetBy(2, 2);
+	view->InvertRect(frame);
+	frame.InsetBy(10, 10);
+	view->FillRect(frame, B_SOLID_HIGH);
+}
+
 static bool isBorder(int32 x, int32 y, int32 width, int32 height) {
 	return x == 0 || y == 0 || x == width - 1 || y == height - 1;
 }
@@ -877,6 +887,7 @@ TestCase gTestCases[] = {
 	{ "Test Draw Scaled Picture", testDrawScaledPicture },
 	{ "Test LineArray", testLineArray },
 	{ "Test InvertRect", testInvertRect },
+	{ "Test InvertRectSetDrawingMode", testInvertRectSetDrawingMode },
 	{ "Test DrawBitmap", testDrawBitmap },
 	{ "Test DrawBitmapAtPoint", testDrawBitmapAtPoint },
 	{ "Test DrawBitmapAtRect", testDrawBitmapAtRect },
