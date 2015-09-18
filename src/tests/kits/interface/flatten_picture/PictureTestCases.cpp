@@ -304,6 +304,50 @@ static void testFillRoundRect(BView *view, BRect frame)
 	view->FillRoundRect(frame, 5, 3);
 }
 
+static void testFillRoundRectGradientLinear(BView* view, BRect frame)
+{
+	BGradientLinear gradient(0, 0, frame.right, frame.bottom);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	view->FillRoundRect(frame, 5, 3, gradient);
+}
+
+static void testFillRoundRectGradientRadial(BView* view, BRect frame)
+{
+	BGradientRadial gradient(10, 10, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	view->FillRoundRect(frame, 5, 3, gradient);
+}
+
+static void testFillRoundRectGradientRadialFocus(BView* view, BRect frame)
+{
+	BGradientRadialFocus gradient(0, 0, 10, 10, 5);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	view->FillRoundRect(frame, 5, 3, gradient);
+}
+
+static void testFillRoundRectGradientDiamond(BView* view, BRect frame)
+{
+	BGradientDiamond gradient(0, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	view->FillRoundRect(frame, 5, 3, gradient);
+}
+
+static void testFillRoundRectGradientConic(BView* view, BRect frame)
+{
+	BGradientConic gradient(0, 0, 10);
+	gradient.AddColor(kRed, 0);
+	gradient.AddColor(kBlue, 255);
+	frame.InsetBy(2, 2);
+	view->FillRoundRect(frame, 5, 3, gradient);
+}
+
 static void testStrokeRoundRect(BView *view, BRect frame)
 {
 	frame.InsetBy(2, 2);
@@ -938,6 +982,12 @@ TestCase gTestCases[] = {
 	{ "Test FillRegionGradientDiamond", testFillRegionGradientDiamond },
 	{ "Test FillRegionGradientConic", testFillRegionGradientConic },
 	{ "Test FillRoundRect", testFillRoundRect },
+	{ "Test FillRoundRectGradientLinear", testFillRoundRectGradientLinear },
+	{ "Test FillRoundRectGradientRadial", testFillRoundRectGradientRadial },
+	{ "Test FillRoundRectGradientRadialFocus", testFillRoundRectGradientRadialFocus },
+	{ "Test FillRoundRectGradientDiamond", testFillRoundRectGradientDiamond },
+	{ "Test FillRoundRectGradientConic", testFillRoundRectGradientConic },
+
 	{ "Test StrokeRoundRect", testStrokeRoundRect },
 	{ "Test FillTriangle", testFillTriangle },
 	{ "Test StrokeTriangle", testStrokeTriangle },
