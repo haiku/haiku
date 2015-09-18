@@ -17,14 +17,23 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		UsePrivateHeaders libroot ;
 
-		MergeObject <$(architecture)>posix_gnu_math.o :
-			cabs.c cabsf.c cabsl.c
-			carg.c cargf.c cargl.c
-			cimag.c cimagf.c cimagl.c
-			conj.c conjf.c conjl.c
-			creal.c crealf.c creall.c
+		local longDoubleObjects ;
+		switch $(architecture) {
+			case ppc : longDoubleObjects = ;
+			case m68k : longDoubleObjects = ;
+			case * : longDoubleObjects = cabsl.c cargl.c cimagl.c conjl.c creall.c k_casinhl.c ;
+		}
 
-			k_casinh.c k_casinhf.c k_casinhl.c
+		MergeObject <$(architecture)>posix_gnu_math.o :
+			cabs.c cabsf.c
+			carg.c cargf.c
+			cimag.c cimagf.c
+			conj.c conjf.c
+			creal.c crealf.c
+
+			k_casinh.c k_casinhf.c
+
+			$(longDoubleObjects)
 			;
 	}
 }
