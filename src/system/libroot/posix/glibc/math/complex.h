@@ -84,7 +84,7 @@ __BEGIN_DECLS
 
 /* And the long double versions.  It is non-critical to define them
    here unconditionally since `long double' is required in ISO C99.  */
-#if __STDC__ - 0 || __GNUC__ - 0 && !defined __NO_LONG_DOUBLE_MATH
+#if (__STDC__ - 0 || __GNUC__ - 0) && !defined __NO_LONG_DOUBLE_MATH
 # ifndef _Mlong_double_
 #  define _Mlong_double_	long double
 # endif
