@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	2696855708
+1	german	x-vnd.Haiku-Terminal	2093402207
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -86,10 +86,12 @@ Text encoding	Terminal TermWindow		Kodierung
 size	Terminal TermView		Größe
 Close window	Terminal TermWindow		Fenster schließen
 Copy absolute path	Terminal TermView		Absoluten Pfad kopieren
+Save as default	Terminal TermWindow		Als Standardwerte speichern
 Set tab title	Terminal TermWindow		Reiter umbenennen
 Settings…	Terminal TermWindow		Einstellungen...
 Abort	Terminal Shell		Abbrechen
 Open link	Terminal TermView		Link öffnen
+Solarized Light	Terminal colors scheme		Solarized hell
 Edit	Terminal TermWindow		Bearbeiten
 Color:	Terminal AppearancePrefView		Farbe:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Die Formel für den Fenstertitel. Folgende Variablen\nstehen zur Verfügung:\n
@@ -109,6 +111,7 @@ Find next	Terminal TermWindow		Weitersuchen
 Close active tab	Terminal TermWindow		Aktiven Reiter schließen
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tDas Zeichen '%'.\n\t%<\t-\tKennzeichnet den Beginn eines Abschnitts der nur angezeigt\n\t\t\twird, falls die darauf folgende Variable nicht leer ist.\n\t%>\t-\tKennzeichnet den Beginn eines Abschnitts der nur angezeigt\n\t\t\twird, falls eine Variable zwischen diesem und eines vorangegangenen\n\t\t\t%< Abschnitts nicht leer ist.\n\t%-\t-\tKennzeichnet das Ende eines %< or %> Abschnitts.\n\nJedes nicht-numerische Zeichen zwischen '%' und dem Formattierungszeichen erzeugt nur \ndann ein Leerzeichen, wenn der Variablenwert nicht leer ist. Es wird dem %< Abschnitt \nhinzugefügt.
 Paste	Terminal TermWindow		Einfügen
+Solarized Dark	Terminal colors scheme		Solarized dunkel
 Shell 	Terminal TermWindow		Konsole
 Cancel	Terminal TermView		Abbrechen
 Use default	Terminal SetTitleWindow		Standardwerte

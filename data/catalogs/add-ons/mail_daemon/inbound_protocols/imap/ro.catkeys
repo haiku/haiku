@@ -1,6 +1,9 @@
-1	romanian	x-vnd.Haiku-IMAP	3950045582
+1	romanian	x-vnd.Haiku-IMAP	4272388921
 Destination:	imap_config		Destinație:
+Ok	IMAPFolderConfig		Ok
 status	IMAPFolderConfig		stare
+Configure IMAP Folders	imap_config		Configurează dosare IMAP
+Cancel	IMAPFolderConfig		Anulează
 Apply	IMAPFolderConfig		Aplică
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Se aduc dosarele IMAP, aveți răbdare...
 IMAP Folders	IMAPFolderConfig		Dosare IMAP

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Screen	2339556848
+1	hungarian	x-vnd.Haiku-Screen	4090394050
 yes	Screen		igen
 Use laptop panel:	Screen		Használt laptopképernyő:
 15 bits/pixel, 32768 colors	Screen		15 bit/pixel, 32768 szín
@@ -39,6 +39,7 @@ bits/pixel	Screen		bit/pixel
 Refresh rate:	Screen		Frissítési frekvencia:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Kívánja megtartani ezeket a beállításokat?
+Confirm changes	Screen		Változtatások megerősítése
 Rows:	Screen		Sorok:
 vertically	Screen		függőlegesen
 Resolution:	Screen		Felbontás:

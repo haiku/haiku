@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	4273323974
+1	hungarian	x-vnd.Haiku-HaikuDepot	2365524674
 Name	PackageListView		Név
 Available packages	MainWindow		Elérhető csomagok
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
@@ -84,6 +84,7 @@ Productivity	Model		Alkalmazások
 No, quit HaikuDepot	App		Nem, a Raktár bezárása.
 Authentication failed	UserLoginWindow		A hitelesítés sikertelen
 Logged in as %User%	MainWindow		Bejelentkezett mint %User%
+9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Nyelv
 Size	PackageListView		Méret
 Failed to create or update rating: %s\n	RatePackageWindow		Az értékelés létrehozása vagy frissítése nem sikerült: %s\n

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	2696855708
+1	hungarian	x-vnd.Haiku-Terminal	1112752202
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -86,10 +86,12 @@ Text encoding	Terminal TermWindow		Szöveg kódolása
 size	Terminal TermView		méret
 Close window	Terminal TermWindow		Ablak bezárása
 Copy absolute path	Terminal TermView		Teljes útvonal másolása
+Save as default	Terminal TermWindow		Beállítás alapértelmezettként
 Set tab title	Terminal TermWindow		Lap címének beállítása
 Settings…	Terminal TermWindow		Beállítások…
 Abort	Terminal Shell		Megszakítás
 Open link	Terminal TermView		Hivatkozás megnyitása
+Solarized Light	Terminal colors scheme		Égetett fény
 Edit	Terminal TermWindow		Szerkesztés
 Color:	Terminal AppearancePrefView		Szín:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Az ablak címét meghatározó minta. A következő kódok használhatóak:

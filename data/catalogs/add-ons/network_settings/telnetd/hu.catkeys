@@ -1,0 +1,3 @@
+1	hungarian	x-vnd.Haiku-TelnetService	1209067113
+Telnet server	TelnetServiceAddOn		Telnet kiszolgáló
+The Telnet server allows you to remotely access your machine with a terminal session using the telnet protocol.\n\nPlease note that it is an insecure and unencrypted connection.	TelnetServiceAddOn		Az Telnet kiszolgáló lehetővé teszi a számítógép távolról való elérését a telnet protokoll segítségével.\n\nKérjük, vegye figyelembe, hogy ez egy nem biztonságos és nem titkosított kapcsolat.

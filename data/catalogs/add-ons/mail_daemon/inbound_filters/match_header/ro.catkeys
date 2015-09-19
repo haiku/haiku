@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MatchHeader	3677427558
+1	romanian	x-vnd.Haiku-MatchHeader	86843817
 <Choose action>	ConfigView		<Selectează acțiunea>
 has	ConfigView		are
 Move to	ConfigView		Mută la
@@ -8,6 +8,7 @@ Delete message	ConfigView		Șterge mesajul
 <Choose account>	ConfigView		<Selectează contul>
 Set flags to	ConfigView		Stabilește indicatorii la
 Set as read	ConfigView		Marchează ca citit
+Match header	RuleFilter		Potrivește antet
 Reply with	ConfigView		Răspunde cu
 If	ConfigView		Dacă
 header (e.g. Subject)	ConfigView		antet (ex. Subiect)
