@@ -21,6 +21,8 @@ RemotePackageRepository HaikuPorts
 	apr_devel-1.5.0-1
 	apr_util-1.5.4-1
 	apr_util_devel-1.5.4-1
+	aspell-0.60.6.1-1
+	aspell_devel-0.60.6.1-1
 	autoconf-2.69-6
 	automake-1.13.1-4
 	bash-4.3.42-1
@@ -67,6 +69,8 @@ RemotePackageRepository HaikuPorts
 	curl-7.44.0-1
 	curl_devel-7.44.0-1
 	cvs-1.12.13.1-6
+	dbus-1.8.6-1
+	dbus_devel-1.8.6-1
 	diffutils-3.3-2
 	dos2unix-7.2.2-1
 	doxygen-1.6.3-4
@@ -101,18 +105,17 @@ RemotePackageRepository HaikuPorts
 	gettext_libintl-0.18.1.1-6
 	giflib-5.1.0-1
 	giflib_devel-5.1.0-1
-	git-1.8.3.4-3
-	git_arch-1.8.3.4-3
-	git_cvs-1.8.3.4-3
-	git_daemon-1.8.3.4-3
-	git_email-1.8.3.4-3
-	git_remote_helpers-1.8.3.4-3
-	git_svn-1.8.3.4-3
+	git-2.2.2-1
+	git_arch-2.2.2-1
+	git_cvs-2.2.2-1
+	git_daemon-2.2.2-1
+	git_email-2.2.2-1
+	git_svn-2.2.2-1
 	glew-1.11.0-1
 	glew_devel-1.11.0-1
 	glew_util-1.11.0-1
-	glib2-2.38.1-4
-	glib2_devel-2.38.1-4
+	glib2-2.38.1-5
+	glib2_devel-2.38.1-5
 	glu-9.0.0-3
 	glu_devel-9.0.0-3
 	gmp-6.0.0-1
@@ -123,8 +126,8 @@ RemotePackageRepository HaikuPorts
 	gpgme_devel-1.5.4-1
 	graphite2-1.2.4-1
 	graphite2_devel-1.2.4-1
-	grep-2.20-1
-	grep_debuginfo-2.20-1
+	grep-2.21-1
+	grep_debuginfo-2.21-1
 	groff-1.20.1-3
 	gutenprint-5.2.10-1
 	gutenprint_devel-5.2.10-1
@@ -145,15 +148,15 @@ RemotePackageRepository HaikuPorts
 	jasper-1.900.1-4
 	jasper_devel-1.900.1-4
 	jasper_tools-1.900.1-4
-	jpeg-9-3
-	jpeg_devel-9-3
-	jpeg_tools-9-3
+	jpeg-9a-1
+	jpeg_devel-9a-1
+	jpeg_tools-9a-1
 	keymapswitcher-1.2.7.10-1
 	lame-3.99.5-5
 	lame_devel-3.99.5-5
 	lcms-2.7-1
 	lcms_devel-2.7-1
-	less-451-4
+	less-458-1
 	libasr-1.0.2-1
 	libasr_devel-1.0.2-1
 	libass-0.12.2-1
@@ -166,14 +169,16 @@ RemotePackageRepository HaikuPorts
 	libdvdread_devel-5.0.3-2
 	libdvdnav-5.0.3-3
 	libdvdnav_devel-5.0.3-3
-	libedit-2015_03_21_3.1-1
-	libedit_devel-2015_03_21_3.1-1
+	libedit-2015_03_21_3.1-2
+	libedit_devel-2015_03_21_3.1-2
 	libevent-2.0.21-7
 	libevent_devel-2.0.21-7
 	libexecinfo-1.1-2
 	libexecinfo_devel-1.1-2
 	libffi-3.2.1-2
 	libffi_devel-3.2.1-2
+	libgsasl-1.8.0-1
+	libgsasl_devel-1.8.0-1
 	libgpg_error-1.19-1
 	libgpg_error_devel-1.19-1
 	libicns-0.8.1-1
@@ -194,12 +199,15 @@ RemotePackageRepository HaikuPorts
 	libogg_devel-1.3.0-2
 	libpcap-1.7.4-1
 	libpcap_devel-1.7.4-1
-	libpcre-8.21-5
-	libpcre_devel-8.21-5
+	libpcre0-8.21-6
+	libpcre-8.37-1
+	libpcre_devel-8.37-1
 	libpng-1.5.22-1
 	libpng_devel-1.5.22-1
 	libpng16-1.6.18-1
 	libpng16_devel-1.6.18-1
+	libqt4-4.8.7-2
+	libqt4_devel-4.8.7-2
 	librevenge-0.0.1-1
 	librevenge_devel-0.0.1-1
 	libsamplerate-0.1.8-2
@@ -270,11 +278,11 @@ RemotePackageRepository HaikuPorts
 	nspr-4.10.8-1
 	nspr_devel-4.10.8-1
 	openssh-6.9p1-1
-	openssl-1.0.0s-1
-	openssl_devel-1.0.0s-1
+	openssl-1.0.0s-2
+	openssl_devel-1.0.0s-2
 	p7zip-9.20.1-5
 	patch-2.7.5-1
-	pe-2.4.5-1
+	pe-2.4.5-2
 	perl-5.18.2-2
 	pixman-0.32.6-1
 	pixman_devel-0.32.6-1
@@ -282,13 +290,15 @@ RemotePackageRepository HaikuPorts
 	python-2.7.10-1
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
+	qca2-2.0.3-1
+	qca2_devel-2.0.3-1
 	qemu-2.1.2-2
 	qrencode-3.3.0-2
 	qrencode_devel-3.3.0-2
-	readline-6.3-2
-	readline_devel-6.3-2
-	ruby-1.9.1-2
-	ruby_devel-1.9.1-2
+	readline-6.3.8-1
+	readline_devel-6.3.8-1
+	ruby-2.2.2-1
+	ruby_devel-2.2.2-1
 	scons-2.3.1-4
 	sdl_gfx-2.0.25-2
 	sdl_gfx_devel-2.0.25-2
@@ -310,7 +320,8 @@ RemotePackageRepository HaikuPorts
 	sqlite_devel-3.8.11.1-1
 	subversion-1.8.11-1
 	subversion_devel-1.8.11-1
-	tar-1.27.1-2
+	tar-1.28-1
+	tar_debuginfo-1.28-1
 	tcpdump-4.7.4-2
 	texinfo-4.13a-7
 	tiff-3.9.6-2
@@ -341,6 +352,7 @@ RemotePackageRepository HaikuPorts
 	# source packages
 	a52dec
 	apr
+	aspell
 	autoconf
 	automake
 	bash
@@ -357,6 +369,7 @@ RemotePackageRepository HaikuPorts
 	ctags
 	curl
 	cvs
+	dbus
 	diffutils
 	dos2unix
 	doxygen
@@ -416,6 +429,7 @@ RemotePackageRepository HaikuPorts
 	libevent
 	libexecinfo
 	libffi
+	libgsasl
 	libgpg_error
 	libicns
 	libiconv
@@ -425,9 +439,11 @@ RemotePackageRepository HaikuPorts
 	libmp4v2
 	libmpeg2
 	libogg
+	libpcre0
 	libpcre
 	libpng
 	libpng16
+	libqt4
 	librevenge
 	libsamplerate
 	libsdl
@@ -477,6 +493,7 @@ RemotePackageRepository HaikuPorts
 	python
 	python_twisted
 	python_zope.interface
+	qca2
 	qemu
 	qrencode
 	readline
