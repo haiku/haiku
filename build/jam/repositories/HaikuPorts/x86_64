@@ -69,6 +69,7 @@ RemotePackageRepository HaikuPorts
 	curl-7.44.0-1
 	curl_devel-7.44.0-1
 	cvs-1.12.13.1-6
+	cvsps-2.2b1-1
 	dbus-1.8.6-1
 	dbus_devel-1.8.6-1
 	diffutils-3.3-2
@@ -369,6 +370,7 @@ RemotePackageRepository HaikuPorts
 	ctags
 	curl
 	cvs
+	cvsps
 	dbus
 	diffutils
 	dos2unix
