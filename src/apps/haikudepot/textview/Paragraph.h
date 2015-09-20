@@ -38,6 +38,7 @@ public:
 
 			int32				Length() const;
 			bool				IsEmpty() const;
+			bool				EndsWith(BString string) const;
 
 			BString				Text() const;
 			BString				Text(int32 start, int32 length) const;

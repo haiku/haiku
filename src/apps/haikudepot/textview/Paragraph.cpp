@@ -260,6 +260,17 @@ Paragraph::IsEmpty() const
 }
 
 
+bool
+Paragraph::EndsWith(BString string) const
+{
+	int length = Length();
+	int endLength = string.CountChars();
+	int start = length - endLength;
+	BString end = Text(start, endLength);
+	return end == string;
+}
+
+
 BString
 Paragraph::Text() const
 {
