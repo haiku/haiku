@@ -545,7 +545,9 @@ TextDocument::_Insert(int32 textOffset, TextDocumentRef document,
 		// Insert back the second paragraph-part
 		if (paragraph2.IsEmpty()) {
 			// Make sure Paragraph has at least one TextSpan, even
-			// if its empty.
+			// if its empty. This handles the case of inserting a
+			// line-break at the end of the document. It than needs to
+			// have a new, empty paragraph at the end.
 			const TextSpanList& spans = paragraph1.TextSpans();
 			const TextSpan& span = spans.LastItem();
 			if (!paragraph2.Append(TextSpan("", span.Style())))
