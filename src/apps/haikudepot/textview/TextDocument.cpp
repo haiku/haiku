@@ -18,8 +18,8 @@ TextDocument::TextDocument()
 }
 
 
-TextDocument::TextDocument(const CharacterStyle& characterStyle,
-	const ParagraphStyle& paragraphStyle)
+TextDocument::TextDocument(CharacterStyle characterStyle,
+	ParagraphStyle paragraphStyle)
 	:
 	fParagraphs(),
 	fEmptyLastParagraph(paragraphStyle),
@@ -79,7 +79,7 @@ TextDocument::Insert(int32 textOffset, const BString& text)
 
 status_t
 TextDocument::Insert(int32 textOffset, const BString& text,
-	const CharacterStyle& style)
+	CharacterStyle style)
 {
 	return Replace(textOffset, 0, text, style);
 }
@@ -87,7 +87,7 @@ TextDocument::Insert(int32 textOffset, const BString& text,
 
 status_t
 TextDocument::Insert(int32 textOffset, const BString& text,
-	const CharacterStyle& characterStyle, const ParagraphStyle& paragraphStyle)
+	CharacterStyle characterStyle, ParagraphStyle paragraphStyle)
 {
 	return Replace(textOffset, 0, text, characterStyle, paragraphStyle);
 }
@@ -115,7 +115,7 @@ TextDocument::Replace(int32 textOffset, int32 length, const BString& text)
 
 status_t
 TextDocument::Replace(int32 textOffset, int32 length, const BString& text,
-	const CharacterStyle& style)
+	CharacterStyle style)
 {
 	return Replace(textOffset, length, text, style,
 		ParagraphStyleAt(textOffset));
@@ -124,7 +124,18 @@ TextDocument::Replace(int32 textOffset, int32 length, const BString& text,
 
 status_t
 TextDocument::Replace(int32 textOffset, int32 length, const BString& text,
-	const CharacterStyle& characterStyle, const ParagraphStyle& paragraphStyle)
+	CharacterStyle characterStyle, ParagraphStyle paragraphStyle)
+{
+	TextDocumentRef document = NormalizeText(text, characterStyle,
+		paragraphStyle);
+	if (document.Get() == NULL || document->Length() != text.CountChars())
+		return B_NO_MEMORY;
+	return Replace(textOffset, length, document);
+}
+
+
+status_t
+TextDocument::Replace(int32 textOffset, int32 length, TextDocumentRef document)
 {
 	int32 firstParagraph = 0;
 	int32 paragraphCount = 0;
@@ -135,8 +146,7 @@ TextDocument::Replace(int32 textOffset, int32 length, const BString& text,
 	if (ret != B_OK)
 		return ret;
 
-	ret = _Insert(textOffset, text, characterStyle, paragraphStyle,
-		firstParagraph, paragraphCount);
+	ret = _Insert(textOffset, document, firstParagraph, paragraphCount);
 
 	_NotifyTextChanged(TextChangedEvent(firstParagraph, paragraphCount));
 
@@ -178,6 +188,13 @@ TextDocument::ParagraphStyleAt(int32 textOffset) const
 
 
 // #pragma mark -
+
+
+int32
+TextDocument::CountParagraphs() const
+{
+	return fParagraphs.CountItems();
+}
 
 
 int32
@@ -350,32 +367,71 @@ TextDocument::PrintToStream() const
 }
 
 
+/*static*/ TextDocumentRef
+TextDocument::NormalizeText(const BString& text,
+	CharacterStyle characterStyle, ParagraphStyle paragraphStyle)
+{
+	TextDocumentRef document(new(std::nothrow) TextDocument(characterStyle,
+			paragraphStyle), true);
+	if (document.Get() == NULL)
+		throw B_NO_MEMORY;
+
+	Paragraph paragraph(paragraphStyle);
+
+	// Append TextSpans, splitting 'text' into Paragraphs at line breaks.
+	int32 length = text.CountChars();
+	int32 chunkStart = 0;
+	while (chunkStart < length) {
+		int32 chunkEnd = text.FindFirst('\n', chunkStart);
+		bool foundLineBreak = chunkEnd >= chunkStart;
+		if (foundLineBreak)
+			chunkEnd++;
+		else
+			chunkEnd = length;
+
+		BString chunk;
+		text.CopyCharsInto(chunk, chunkStart, chunkEnd - chunkStart);
+		TextSpan span(chunk, characterStyle);
+
+		if (!paragraph.Append(span))
+			throw B_NO_MEMORY;
+		if (paragraph.Length() > 0 && !document->Append(paragraph))
+			throw B_NO_MEMORY;
+
+		paragraph = Paragraph(paragraphStyle);
+		chunkStart = chunkEnd + 1;
+	}
+
+	return document;
+}
+
+
 // #pragma mark -
 
 
 bool
-TextDocument::AddListener(const TextListenerRef& listener)
+TextDocument::AddListener(TextListenerRef listener)
 {
 	return fTextListeners.Add(listener);
 }
 
 
 bool
-TextDocument::RemoveListener(const TextListenerRef& listener)
+TextDocument::RemoveListener(TextListenerRef listener)
 {
 	return fTextListeners.Remove(listener);
 }
 
 
 bool
-TextDocument::AddUndoListener(const UndoableEditListenerRef& listener)
+TextDocument::AddUndoListener(UndoableEditListenerRef listener)
 {
 	return fUndoListeners.Add(listener);
 }
 
 
 bool
-TextDocument::RemoveUndoListener(const UndoableEditListenerRef& listener)
+TextDocument::RemoveUndoListener(UndoableEditListenerRef listener)
 {
 	return fUndoListeners.Remove(listener);
 }
@@ -385,8 +441,7 @@ TextDocument::RemoveUndoListener(const UndoableEditListenerRef& listener)
 
 
 status_t
-TextDocument::_Insert(int32 textOffset, const BString& text,
-	const CharacterStyle& characterStyle, const ParagraphStyle& paragraphStyle,
+TextDocument::_Insert(int32 textOffset, TextDocumentRef document,
 	int32& index, int32& paragraphCount)
 {
 	int32 paragraphOffset;
@@ -394,86 +449,128 @@ TextDocument::_Insert(int32 textOffset, const BString& text,
 	if (index < 0)
 		return B_BAD_VALUE;
 
-	if (text.Length() == 0)
+	if (document->Length() == 0)
 		return B_OK;
 
 	textOffset -= paragraphOffset;
 
-	bool hasLineBreaks = text.FindFirst('\n', 0) >= 0;
+	bool hasLineBreaks;
+	if (document->CountParagraphs() > 1) {
+		hasLineBreaks = true;
+	} else {
+		const Paragraph& paragraph = document->ParagraphAt(0);
+		hasLineBreaks = paragraph.EndsWith("\n");
+	}
 
 	if (hasLineBreaks) {
 		// Split paragraph at textOffset
 		Paragraph paragraph1(ParagraphAt(index).Style());
-		Paragraph paragraph2(paragraphStyle);
-		const TextSpanList& textSpans = ParagraphAt(index).TextSpans();
-		int32 spanCount = textSpans.CountItems();
-		for (int32 i = 0; i < spanCount; i++) {
-			const TextSpan& span = textSpans.ItemAtFast(i);
-			int32 spanLength = span.CountChars();
-			if (textOffset >= spanLength) {
-				paragraph1.Append(span);
-				textOffset -= spanLength;
-			} else if (textOffset > 0) {
-				paragraph1.Append(
-					span.SubSpan(0, textOffset));
-				paragraph2.Append(
-					span.SubSpan(textOffset, spanLength - textOffset));
-				textOffset = 0;
-			} else {
-				paragraph2.Append(span);
+		Paragraph paragraph2(document->ParagraphAt(
+			document->CountParagraphs() - 1).Style());
+		{
+			const TextSpanList& textSpans = ParagraphAt(index).TextSpans();
+			int32 spanCount = textSpans.CountItems();
+			for (int32 i = 0; i < spanCount; i++) {
+				const TextSpan& span = textSpans.ItemAtFast(i);
+				int32 spanLength = span.CountChars();
+				if (textOffset >= spanLength) {
+					if (!paragraph1.Append(span))
+						return B_NO_MEMORY;
+					textOffset -= spanLength;
+				} else if (textOffset > 0) {
+					if (!paragraph1.Append(
+							span.SubSpan(0, textOffset))
+						|| !paragraph2.Append(
+							span.SubSpan(textOffset,
+								spanLength - textOffset))) {
+						return B_NO_MEMORY;
+					}
+					textOffset = 0;
+				} else {
+					if (!paragraph2.Append(span))
+						return B_NO_MEMORY;
+				}
 			}
 		}
 
 		fParagraphs.Remove(index);
 
-		// Insert TextSpans, splitting 'text' into Paragraphs at line breaks.
-		int32 length = text.CountChars();
-		int32 chunkStart = 0;
-		while (chunkStart < length) {
-			int32 chunkEnd = text.FindFirst('\n', chunkStart);
-			bool foundLineBreak = chunkEnd >= chunkStart;
-			if (foundLineBreak)
-				chunkEnd++;
-			else
-				chunkEnd = length;
-
-			BString chunk;
-			text.CopyCharsInto(chunk, chunkStart, chunkEnd - chunkStart);
-			TextSpan span(chunk, characterStyle);
-
-			if (foundLineBreak) {
+		// Append first paragraph in other document to first part of
+		// paragraph at insert position
+		{
+			const Paragraph& otherParagraph = document->ParagraphAt(0);
+			const TextSpanList& textSpans = otherParagraph.TextSpans();
+			int32 spanCount = textSpans.CountItems();
+			for (int32 i = 0; i < spanCount; i++) {
+				const TextSpan& span = textSpans.ItemAtFast(i);
+				// TODO: Import/map CharacterStyles
 				if (!paragraph1.Append(span))
 					return B_NO_MEMORY;
-				if (paragraph1.Length() > 0) {
-					if (!fParagraphs.Add(paragraph1, index))
-						return B_NO_MEMORY;
-					index++;
-				}
-				paragraph1 = Paragraph(paragraphStyle);
-			} else {
-				if (!paragraph2.Prepend(span))
-					return B_NO_MEMORY;
 			}
-
-			chunkStart = chunkEnd + 1;
 		}
 
+		// Insert the first paragraph-part again to the document		
+		if (!fParagraphs.Add(paragraph1, index))
+			return B_NO_MEMORY;
+		paragraphCount++;
+
+		// Insert the other document's paragraph save for the last one
+		for (int32 i = 1; i < document->CountParagraphs() - 1; i++) {
+			const Paragraph& otherParagraph = document->ParagraphAt(i);
+			// TODO: Import/map CharacterStyles and ParagraphStyle
+			if (!fParagraphs.Add(otherParagraph, ++index))
+				return B_NO_MEMORY;
+			paragraphCount++;
+		}
+
+		int32 lastIndex = document->CountParagraphs() - 1;
+		if (lastIndex > 0) {
+			const Paragraph& otherParagraph = document->ParagraphAt(lastIndex);
+			if (otherParagraph.EndsWith("\n")) {
+				// TODO: Import/map CharacterStyles and ParagraphStyle
+				if (!fParagraphs.Add(otherParagraph, ++index))
+					return B_NO_MEMORY;
+			} else {
+				const TextSpanList& textSpans = otherParagraph.TextSpans();
+				int32 spanCount = textSpans.CountItems();
+				for (int32 i = 0; i < spanCount; i++) {
+					const TextSpan& span = textSpans.ItemAtFast(i);
+					// TODO: Import/map CharacterStyles
+					if (!paragraph2.Prepend(span))
+						return B_NO_MEMORY;
+				}
+			}
+		}
+
+		// Insert back the second paragraph-part
 		if (paragraph2.IsEmpty()) {
 			// Make sure Paragraph has at least one TextSpan, even
 			// if its empty.
 			const TextSpanList& spans = paragraph1.TextSpans();
 			const TextSpan& span = spans.LastItem();
-			paragraph2.Append(TextSpan("", span.Style()));
+			if (!paragraph2.Append(TextSpan("", span.Style())))
+				return B_NO_MEMORY;
 		}
 
-		if (!fParagraphs.Add(paragraph2, index))
+		if (!fParagraphs.Add(paragraph2, ++index))
 			return B_NO_MEMORY;
+
 		paragraphCount++;
 	} else {
 		Paragraph paragraph(ParagraphAt(index));
-		paragraph.Insert(textOffset, TextSpan(text, characterStyle));
+		const Paragraph& otherParagraph = document->ParagraphAt(0);
+
+		const TextSpanList& textSpans = otherParagraph.TextSpans();
+		int32 spanCount = textSpans.CountItems();
+		for (int32 i = 0; i < spanCount; i++) {
+			const TextSpan& span = textSpans.ItemAtFast(i);
+			paragraph.Insert(textOffset, span);
+			textOffset += span.CountChars();
+		}
+
 		if (!fParagraphs.Replace(index, paragraph))
 			return B_NO_MEMORY;
+
 		paragraphCount++;
 	}
 

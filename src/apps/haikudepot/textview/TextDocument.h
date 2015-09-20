@@ -26,8 +26,8 @@ class TextDocument : public BReferenceable {
 public:
 								TextDocument();
 								TextDocument(
-									const CharacterStyle& characterStyle,
-									const ParagraphStyle& paragraphStyle);
+									CharacterStyle characterStyle,
+									ParagraphStyle paragraphStyle);
 								TextDocument(const TextDocument& other);
 
 			TextDocument&		operator=(const TextDocument& other);
@@ -37,10 +37,10 @@ public:
 			// Text insertion and removing
 			status_t			Insert(int32 textOffset, const BString& text);
 			status_t			Insert(int32 textOffset, const BString& text,
-									const CharacterStyle& style);
+									CharacterStyle style);
 			status_t			Insert(int32 textOffset, const BString& text,
-									const CharacterStyle& characterStyle,
-									const ParagraphStyle& paragraphStyle);
+									CharacterStyle characterStyle,
+									ParagraphStyle paragraphStyle);
 
 			status_t			Remove(int32 textOffset, int32 length);
 
@@ -48,11 +48,13 @@ public:
 									const BString& text);
 			status_t			Replace(int32 textOffset, int32 length,
 									const BString& text,
-									const CharacterStyle& style);
+									CharacterStyle style);
 			status_t			Replace(int32 textOffset, int32 length,
 									const BString& text,
-									const CharacterStyle& characterStyle,
-									const ParagraphStyle& paragraphStyle);
+									CharacterStyle characterStyle,
+									ParagraphStyle paragraphStyle);
+			status_t			Replace(int32 textOffset, int32 length,
+									TextDocumentRef document);
 
 			// Style access
 			const CharacterStyle& CharacterStyleAt(int32 textOffset) const;
@@ -61,6 +63,8 @@ public:
 			// Paragraph access
 			const ParagraphList& Paragraphs() const
 									{ return fParagraphs; }
+
+			int32				CountParagraphs() const;
 
 			int32				ParagraphIndexFor(int32 textOffset,
 									int32& paragraphOffset) const;
@@ -82,18 +86,22 @@ public:
 
 			void				PrintToStream() const;
 
+			// Support
+	static	TextDocumentRef		NormalizeText(const BString& text,
+									CharacterStyle characterStyle,
+									ParagraphStyle paragraphStyle);
+
 			// Listener support
-			bool				AddListener(const TextListenerRef& listener);
-			bool				RemoveListener(const TextListenerRef& listener);
+			bool				AddListener(TextListenerRef listener);
+			bool				RemoveListener(TextListenerRef listener);
 			bool				AddUndoListener(
-									const UndoableEditListenerRef& listener);
+									UndoableEditListenerRef listener);
 			bool				RemoveUndoListener(
-									const UndoableEditListenerRef& listener);
+									UndoableEditListenerRef listener);
 
 private:
-			status_t			_Insert(int32 textOffset, const BString& text,
-									const CharacterStyle& characterStyle,
-									const ParagraphStyle& paragraphStyle,
+			status_t			_Insert(int32 textOffset,
+									TextDocumentRef document,
 									int32& firstParagraph,
 									int32& paragraphCount);
 			status_t			_Remove(int32 textOffset, int32 length,
