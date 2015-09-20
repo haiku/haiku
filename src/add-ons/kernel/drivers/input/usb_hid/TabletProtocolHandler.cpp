@@ -289,8 +289,8 @@ TabletProtocolHandler::_ReadReport(void *buffer, uint32 *cookie)
 		yTilt = fYTilt->ScaledFloatData();
 
 	bool inRange = true;
-	if (fRange != NULL)
-		inRange = fRange->Extract() == B_OK && fRange->Valid();
+	if (fRange != NULL && fRange->Extract() == B_OK && fRange->Valid())
+		inRange = fRange->Data() & 1 != 0;
 
 	bool eraser = false;
 	if (fEraser != NULL && fEraser->Extract() == B_OK && fEraser->Valid())
