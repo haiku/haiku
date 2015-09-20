@@ -101,8 +101,8 @@ RemotePackageRepository HaikuPorts
 	gcc-4.8.5_2015_07_11-1
 	gcc_syslibs-4.8.5_2015_07_11-1
 	gcc_syslibs_devel-4.8.5_2015_07_11-1
-	gettext-0.18.1.1-6
-	gettext_libintl-0.18.1.1-6
+	gettext-0.19.4-1
+	gettext_libintl-0.19.4-1
 	giflib-5.1.0-1
 	giflib_devel-5.1.0-1
 	git-2.2.2-1
