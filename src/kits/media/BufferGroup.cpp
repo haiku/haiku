@@ -284,9 +284,9 @@ BBufferGroup::ReclaimAllBuffers()
 	// this has happened when the "fReclaimSem" can be aquired "fBufferCount"
 	// times
 
-	status_t status;
+	status_t status = B_ERROR;
 	do {
-		status = acquire_sem_etc(fReclaimSem, count, 0, 0);
+		status = acquire_sem_etc(fReclaimSem, count, B_RELATIVE_TIMEOUT, 0);
 	} while (status == B_INTERRUPTED);
 
 	if (status != B_OK)
