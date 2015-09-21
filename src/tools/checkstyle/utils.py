@@ -27,9 +27,9 @@ def openHtml(fileList, outputFileName):
         <style type="text/css">""" + cssStyle() + """</style>
     </head>
     <body>
-        <p><b>File list:</b><br>""")
+        <p><b>File list:</b><br/>""")
     for fileName in fileList:
-        file.write(fileName + "<br>")
+        file.write(fileName + "<br/>")
     file.write("</p>")
     file.close()
 
@@ -37,7 +37,6 @@ def openHtml(fileList, outputFileName):
 def closeHtml(outputFileName):
     file = open(outputFileName, 'a')
     file.write("""
-        </pre>
     </body>
     </html>""")
 
@@ -67,14 +66,14 @@ def renderHtml(text, highlights, sourceFileName, outputFileName):
     file.write('<table><tr><td><pre class="code"><span class="linenumber">')
     count = 1
     for line in temp.split('\n'):
-        file.write(str(count).rjust(4)+"<br>")
+        file.write(str(count).rjust(4)+"<br/>")
         count += 1
 
     file.write('</span></pre></td><td><pre class="code">')
 
     for line in temp.split('\n'):
         file.write('<span class="linehead"> </span>' + line.replace('\r', ' ') \
-             + '<br>')
+             + '<br/>')
 
     file.write("</pre></td></tr></table>")
 
