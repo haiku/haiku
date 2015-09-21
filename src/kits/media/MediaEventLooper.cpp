@@ -230,6 +230,10 @@ BMediaEventLooper::ControlLoop()
 		err = WaitForMessage(waitUntil);
 		if (err == B_TIMED_OUT
 				|| err == B_WOULD_BLOCK) {
+			// NOTE: The reference for doing the lateness calculus this way can
+			// be found in the BeBook article "A BMediaEventLooper Example".
+			// The value which we are going to calculate, is referred there as
+			// 'lateness'.
 			media_timed_event event;
 			if (hasEvent)
 				err = fEventQueue.RemoveFirstEvent(&event);
@@ -237,11 +241,13 @@ BMediaEventLooper::ControlLoop()
 				err = fRealTimeQueue.RemoveFirstEvent(&event);
 
 			if (err == B_OK) {
-				bigtime_t lateness = waitUntil - TimeSource()->RealTime();
-				if (lateness < 0)
-					lateness = 0;
-
-				DispatchEvent(&event, lateness, hasRealtime);
+				// We are going to do this calculus in performance time
+				// because otherwise we could get erroneous values.
+				// This calculus allow us to detect both early and late
+				// buffers, this is the meaning of the lateness concept.
+				bigtime_t lateness = event.event_time - fEventLatency
+					- fSchedulingLatency - TimeSource()->Now();
+				DispatchEvent(&event, -lateness, hasRealtime);
 			}
 		} else if (err != B_OK)
 			return;
