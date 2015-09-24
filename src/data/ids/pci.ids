@@ -1,11 +1,11 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.09.16
-#	Date:    2015-09-16 03:15:02
+#	Version: 2015.09.24
+#	Date:    2015-09-24 03:15:02
 #
-#	Maintained by Martin Mares <mj@ucw.cz> and other volunteers from the
-#	PCI ID Project at http://pci-ids.ucw.cz/.
+#	Maintained by Albert Pool, Martin Mares, and other volunteers from
+#	the PCI ID Project at http://pci-ids.ucw.cz/.
 #
 #	New data are always welcome, especially if they are accurate. If you have
 #	anything to contribute, please follow the instructions at the web site.
@@ -2895,8 +2895,8 @@
 	72a8  RV570 [Radeon X1950 GT] (Secondary)
 	72b1  RV560 [Radeon X1650 XT] (Secondary)
 	72b3  RV560 [Radeon X1650 GT] (Secondary)
-	7300  Fiji [Radeon R9 FURY Series]
-		1002 0b36  Radeon R9 FURY X
+	7300  Fiji [Radeon R9 FURY / NANO Series]
+		1002 0b36  Radeon R9 FURY X / NANO
 		1043 049e  Radeon R9 FURY
 		1043 04a0  Radeon R9 FURY X
 		174b e329  Radeon R9 FURY
@@ -10296,6 +10296,8 @@
 	13f0  GM204GL [Quadro M5000]
 	13f1  GM204GL [Quadro M4000]
 	13f2  GM204GL [Tesla M60]
+	13f8  GM204GLM [Quadro M5000M]
+	13f9  GM204GLM [Quadro M4000M]
 	13fa  GM204GLM [Quadro M3000M]
 	1401  GM206 [GeForce GTX 960]
 	1402  GM206 [GeForce GTX 950]
@@ -15504,6 +15506,11 @@
 	5090  T540-5090 Unified Wire Ethernet Controller
 	5091  T522-5091 Unified Wire Ethernet Controller
 	5092  T520-5092 Unified Wire Ethernet Controller
+	5093  T580-5093 Unified Wire Ethernet Controller
+	5094  T540-5094 Unified Wire Ethernet Controller
+	5095  T540-5095 Unified Wire Ethernet Controller
+	5096  T580-5096 Unified Wire Ethernet Controller
+	5097  T520-5097 Unified Wire Ethernet Controller
 	5401  T520-CR Unified Wire Ethernet Controller
 	5402  T522-CR Unified Wire Ethernet Controller
 	5403  T540-CR Unified Wire Ethernet Controller
@@ -15540,6 +15547,11 @@
 	5490  T540-5090 Unified Wire Ethernet Controller
 	5491  T522-5091 Unified Wire Ethernet Controller
 	5492  T520-5092 Unified Wire Ethernet Controller
+	5493  T580-5093 Unified Wire Ethernet Controller
+	5494  T540-5094 Unified Wire Ethernet Controller
+	5495  T540-5095 Unified Wire Ethernet Controller
+	5496  T580-5096 Unified Wire Ethernet Controller
+	5497  T520-5097 Unified Wire Ethernet Controller
 	5501  T520-CR Unified Wire Storage Controller
 	5502  T522-CR Unified Wire Storage Controller
 	5503  T540-CR Unified Wire Storage Controller
@@ -15576,6 +15588,11 @@
 	5590  T540-5090 Unified Wire Storage Controller
 	5591  T522-5091 Unified Wire Storage Controller
 	5592  T520-5092 Unified Wire Storage Controller
+	5593  T580-5093 Unified Wire Storage Controller
+	5594  T540-5094 Unified Wire Storage Controller
+	5595  T540-5095 Unified Wire Storage Controller
+	5596  T580-5096 Unified Wire Storage Controller
+	5597  T520-5097 Unified Wire Storage Controller
 	5601  T520-CR Unified Wire Storage Controller
 	5602  T522-CR Unified Wire Storage Controller
 	5603  T540-CR Unified Wire Storage Controller
@@ -15612,6 +15629,11 @@
 	5690  T540-5090 Unified Wire Storage Controller
 	5691  T522-5091 Unified Wire Storage Controller
 	5692  T520-5092 Unified Wire Storage Controller
+	5693  T580-5093 Unified Wire Storage Controller
+	5694  T540-5094 Unified Wire Storage Controller
+	5695  T540-5095 Unified Wire Storage Controller
+	5696  T580-5096 Unified Wire Storage Controller
+	5697  T520-5097 Unified Wire Storage Controller
 	5701  T520-CR Unified Wire Ethernet Controller
 	5702  T522-CR Unified Wire Ethernet Controller
 	5703  T540-CR Unified Wire Ethernet Controller
@@ -15646,6 +15668,11 @@
 	5790  T540-5090 Unified Wire Ethernet Controller
 	5791  T522-5091 Unified Wire Ethernet Controller
 	5792  T520-5092 Unified Wire Ethernet Controller
+	5793  T580-5093 Unified Wire Ethernet Controller
+	5794  T540-5094 Unified Wire Ethernet Controller
+	5795  T540-5095 Unified Wire Ethernet Controller
+	5796  T580-5096 Unified Wire Ethernet Controller
+	5797  T520-5097 Unified Wire Ethernet Controller
 	5801  T520-CR Unified Wire Ethernet Controller [VF]
 	5802  T522-CR Unified Wire Ethernet Controller [VF]
 	5803  T540-CR Unified Wire Ethernet Controller [VF]
@@ -15682,6 +15709,11 @@
 	5890  T540-5090 Unified Wire Ethernet Controller [VF]
 	5891  T522-5091 Unified Wire Ethernet Controller [VF]
 	5892  T520-5092 Unified Wire Ethernet Controller [VF]
+	5893  T580-5093 Unified Wire Ethernet Controller [VF]
+	5894  T540-5094 Unified Wire Ethernet Controller [VF]
+	5895  T540-5095 Unified Wire Ethernet Controller [VF]
+	5896  T580-5096 Unified Wire Ethernet Controller [VF]
+	5897  T520-5097 Unified Wire Ethernet Controller [VF]
 	a000  PE10K Unified Wire Ethernet Controller
 1426  Storage Technology Corp.
 1427  Better On-Line Solutions
@@ -17899,6 +17931,8 @@
 	003c  QCA986x/988x 802.11ac Wireless Network Adapter
 	003e  QCA6174 802.11ac Wireless Network Adapter
 		1a56 1525  Killer N1525 Wireless-AC
+	0040  QCA9980/9990 802.11ac Wireless Network Adapter
+	0041  QCA6164 802.11ac Wireless Network Adapter
 	0207  AR5210 Wireless Network Adapter [AR5000 802.11a]
 	1014  AR5212 802.11abg NIC
 		1014 058a  ThinkPad 11a/b/g Wireless LAN Mini Express Adapter (AR5BXB6)
@@ -18898,6 +18932,8 @@
 		1a56 1201  Killer E2100 Gigabit Ethernet Controller
 # PCIe interface for emulator
 	fc02  RedStone
+# CFI device over PCIe
+	fc03  CFI
 1958  Faster Technology, LLC.
 1959  PA Semi, Inc
 	a000  PA6T Core
@@ -19416,6 +19452,10 @@
 	0100  CAN-PCIe-02
 1cd2  SesKion GmbH
 	0301  Simulyzer-RT CompactPCI Serial DIO-1 card
+	0302  Simulyzer-RT CompactPCI Serial PSI5-ECU-1 card
+	0303  Simulyzer-RT CompactPCI Serial PSI5-SIM-1 card
+	0304  Simulyzer-RT CompactPCI Serial PWR-ANA-1 card
+1cdd  secunet Security Networks AG
 1ce4  Exablaze
 	0001  ExaNIC X4
 	0002  ExaNIC X2
