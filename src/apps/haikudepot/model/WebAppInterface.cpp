@@ -485,6 +485,7 @@ WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
 					.AddItem("PKGSCREENSHOTS")
 					.AddItem("PKGICONS")
 					.AddItem("PKGVERSIONLOCALIZATIONDESCRIPTIONS")
+					.AddItem("PKGCHANGELOG")
 				.EndArray()
 			.EndObject()
 		.EndArray()
