@@ -1189,6 +1189,13 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 
 		append_word_list(foundInfo, "prominence");
 	}
+	
+	BString changelog;
+	if (data.FindString("pkgChangelogContent", &changelog) == B_OK) {
+		package->SetChangelog(changelog);
+
+		append_word_list(foundInfo, "changelog");
+	}
 
 	BMessage screenshots;
 	if (data.FindMessage("pkgScreenshots", &screenshots) == B_OK) {
