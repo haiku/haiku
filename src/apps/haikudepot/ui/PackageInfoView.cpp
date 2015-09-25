@@ -1415,18 +1415,20 @@ PackageInfoView::MessageReceived(BMessage* message)
 
 			if ((changes & PKG_CHANGED_SUMMARY) != 0
 				|| (changes & PKG_CHANGED_DESCRIPTION) != 0
-				|| (changes & PKG_CHANGED_SCREENSHOTS) != 0) {
+				|| (changes & PKG_CHANGED_SCREENSHOTS) != 0
+				|| (changes & PKG_CHANGED_TITLE) != 0
+				|| (changes & PKG_CHANGED_RATINGS) != 0
+				|| (changes & PKG_CHANGED_STATE) != 0
+				|| (changes & PKG_CHANGED_CHANGELOG) != 0) {
 				fPagesView->SetPackage(package, false);
 			}
 
 			if ((changes & PKG_CHANGED_TITLE) != 0
 				|| (changes & PKG_CHANGED_RATINGS) != 0) {
-				fPagesView->SetPackage(package, false);
 				fTitleView->SetPackage(*package.Get());
 			}
 
 			if ((changes & PKG_CHANGED_STATE) != 0) {
-				fPagesView->SetPackage(package, false);
 				fPackageActionView->SetPackage(*package.Get());
 			}
 
