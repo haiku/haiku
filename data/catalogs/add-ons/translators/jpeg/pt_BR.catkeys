@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-JPEGTranslator	965709535
+1	portuguese (brazil)	x-vnd.Haiku-JPEGTranslator	3788699631
 Output quality	JPEGTranslator		Qualidade de saída
 JPEG images	JPEGTranslator		Imagens JPEG
 Prevent colors 'washing out'	JPEGTranslator		Prevenir cores 'lavadas'
@@ -15,6 +15,7 @@ Output smoothing strength	JPEGTranslator		Suavização
 High	JPEGTranslator		Alto
 Write	JPEGTranslator		Escrever
 Write black-and-white images as RGB24	JPEGTranslator		Gravar imagens preto-e-branco como RGB24
+Version %d.%d.%d	JPEGTranslator		Versão %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		Ler imagens em escala-de-cinza como RGB32
 Read	JPEGTranslator		Ler
 JPEG Library Warning: %s\n	be_jerror		Aviso da biblioteca JPEG: %s\n

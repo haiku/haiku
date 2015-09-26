@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Screen	1388881963
+1	portuguese (brazil)	x-vnd.Haiku-Screen	4090394050
 yes	Screen		sim
 Use laptop panel:	Screen		Usar o painel do laptop:
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 cores
@@ -12,6 +12,7 @@ Set background…	Screen		Mudar plano de fundo...
 Undo	Screen		Desfazer
 if needed	Screen		se necessário
 Screen preferences by the Haiku team	Screen		Preferências de Tela pelo time do Haiku
+Settings will revert in %seconds.	Screen		As definições serão revertidas em %segundos.
 Screen	System name		Monitor
 OK	Screen		OK
 Workspaces	Screen		Workspaces
@@ -38,6 +39,7 @@ bits/pixel	Screen		bits/pixel
 Refresh rate:	Screen		Taxa de atualizão:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Você deseja manter essas configurações?
+Confirm changes	Screen		Confirmar alterações
 Rows:	Screen		Linhas:
 vertically	Screen		verticalmente
 Resolution:	Screen		Resolução:

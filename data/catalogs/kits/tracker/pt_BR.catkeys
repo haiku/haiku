@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	2103160378
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	2004221275
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Adicionais
 Mount settings…	ContainerWindow		Configurações de montagem...
@@ -19,6 +19,7 @@ Modified	QueryPoseView		Modificado
 Created	ContainerWindow		Criado
 Error %error loading add-On %name.	ContainerWindow		Erro %error carregando adicional %name.
 If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Se %ifYouDoAction a pasta de definições, %osName pode não se comportar apropriadamente!\n\nEstá seguro de que quer fazer isto?
+Skip all	FSUtils		Pula tudo
 contains	SelectionWindow		contém
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Desculpe, mas você não pode salvar coisas no menu raiz de seu sistema.
 Show shared volumes on Desktop	SettingsView		Mostrar volumes compartilhados no Desktop
@@ -179,6 +180,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		Erro na expressão regula
 Mount all	MountMenu		Montar tudo
 calculating…	InfoWindow		calculando...
 Mount all disks now	AutoMounterSettings		Montar todos os discos agora
+Hide dotfiles	SettingsView		Esconder arquivos de ponto
 Untitled bitmap	PoseView		Bitmap sem título
 of %items	StatusWindow		de %items
 Description:	InfoWindow		Descrição
@@ -200,8 +202,10 @@ Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Mover
 Get info	ContainerWindow		Obter info
 Error creating link to \"%name\".	FSUtils		Erro criando link para \"%name\".
 Select	SelectionWindow		Selecionar
+{0, plural, one{# byte} other{# bytes}}	WidgetAttributeText		{0, plural, um{# byte} outros{# bytes}}
 Or	FindPanel		Ou
 The Tracker must be running to see set the default printer.	PoseView		O Tracker precisa estar funcionando parar ver e definir uma impressora padrão.
+{0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, um{# byte} outros{# bytes}}
 by formula	FindPanel		por fórmula
 40 x 40	DeskWindow		40 x 40
 Name	PoseView		Nome
@@ -212,6 +216,7 @@ Created:	InfoWindow		Criado:
 Copying: 	StatusWindow		Copiando:
 Capacity:	InfoWindow		Capacidade:
 Delete	FilePanelPriv		Deletar
+{0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, um{(# byte)} outros{(# bytes)}}
 Save	FindPanel		Salvar
 copy	FSUtils	filename copy	cópia
 Temporary	FindPanel		Temporário
@@ -247,6 +252,7 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		Desculpe, você não
 Name	ContainerWindow		Nome
 Reverse order	ContainerWindow		Inverter ordem
 48 x 48	DeskWindow		48 x 48
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, um{# item} outros{# itens}}
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		Adicionar a pasta atual
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Não foi possível abrir \"%document\" com o aplicativo \"%app\" (Símbolo faltando: %symbol). \n
@@ -290,6 +296,7 @@ Cancel	PoseView		Cancelar
 You can't move or copy items to read-only volumes.	FSUtils		Não é possível mover ou copiar itens para volumes em modo somente leitura.
 Unknown	FilePermissionsView		Desconhecido
 All files and folders	FindPanel		Todos os arquivos e pastas
+{0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, um{para # arquivo} outros{para # arquivos}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Não foi possível abrir \"%document\" (Bibliotecas faltando: %library). \n
 The Tracker must be running to see Info windows.	PoseView		O Rastreador deve ser executado par ver a janela de Informações.
 Other	FilePermissionsView		Outro

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-PRNT	200447094
+1	portuguese (brazil)	x-vnd.Be-PRNT	2163275033
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Impressora: %printer_name%\nDriver: %driver%\n
 Waiting	JobListView		Aguardando
 Print test page	PrintersWindow		Imprimir página de teste
@@ -9,6 +9,7 @@ Cancel	AddPrinterDialog		Cancelar
 Add printer	AddPrinterDialog		Adicionar impressora
 Green	TestPageView		Verde
 Printers	PrintersWindow		Impressoras
+Add…	PrintersWindow		Adicionar...
 Default Printer	PrinterListView		Impressora padrão
 Transport: %transport% %transport_address%	PrinterListView		Transporte: %transport% %transport_address%
 No pending jobs.	PrinterListView		Nenhuma tarefa na fila.

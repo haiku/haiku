@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-PSDTranslator	1706619436
+1	portuguese (brazil)	x-vnd.Haiku-PSDTranslator	3654055550
 Lab	PSDLoader		Lab
 Uncompressed	PSDConfig		Sem compressão
 Indexed	PSDLoader		Indexado
@@ -6,8 +6,10 @@ Grayscale	PSDLoader		Escala de cinza
 Photoshop image translator	PSDConfig		Tradutor de imagem do Photoshop
 Photoshop image translator	PSDTranslator		Tradutor de imagem do Photoshop
 Version %d.%d.%d, %s	PSDConfig		Versão %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Documento do Photoshop (arquivo PSD)
 Photoshop image	PSDTranslator		Imagem do Photoshop
 RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Documento Grande do Photoshop (arquivo PSB)
 RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Imagem do Photoshop (%s)
 PSDTranslator Settings	PSDConfig		Definições do Tradutor PSD

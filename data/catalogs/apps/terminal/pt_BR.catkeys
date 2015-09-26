@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	1611726434
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	2093402207
 Not found.	Terminal TermWindow		Não localizado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Change directory	Terminal TermView		Mudar de pasta
@@ -26,12 +26,16 @@ Window title:	Terminal TermWindow		Título da janela:
 Unrecognized option \"%s\"\n	Terminal arguments parsing		Opção não reconhecida \"%s\"\n
 Blue	Terminal colors scheme		Azul
 Custom	Terminal colors scheme		Personalizado
+Encoding:	Terminal AppearancePrefView		Codificação:
 %app% settings	Terminal PrefWindow	window title	%app% definições
 Cancel	Terminal SetTitleWindow		Cancelar
 Increase	Terminal TermWindow		Aumentar
 Settings	Terminal TermWindow		Configurações
+Window size	Terminal TermWindow		Tamanho da janela
 Selected text	Terminal AppearancePrefView		Texto selecionado
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tEste diretório de trabalho tem um processo ativo na\n\t\t\tguia atual. Opcionalmente, o número máximo de componentes do caminho\n\t\t\tpode ser especificado. Por exemplo, '% 2d' para dois componentes no máximo.\n\t%e\t-\tO nome do aplicativo Terminal para a localidade atual.\n\t%i\t-\tA codificação da guia atual. Não exibido para UTF-8.\n\t%i\t-\tO índice da janela.\n\t%p\t-\tO nome do processo ativo na guia atual.\n\t%t\t-\tO título da guia atual.
 Find	Terminal FindWindow		Localizar
+The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		O padrão especificando os títulos da janela. Os seguintes espaços reservados\npodem ser usados:
 Appearance	Terminal PrefWindow		Aparência
 Tab title:	Terminal AppearancePrefView		Título da guia:
 OK	Terminal SetTitleWindow		OK
@@ -47,6 +51,7 @@ The following processes are still running:\n\n\t%1\n\nIf you close the Terminal,
 Custom	Terminal AppearancePrefView	Window size	Personalizado
 Insert path	Terminal TermView		Inserir caminho
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Terminal Haiku\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui e Takashi Murai.\n\nUtilização: %s [OPTION] [SHELL]\n
+Window size:	Terminal AppearancePrefView		Tamanho da janela:
 No search string was entered.	Terminal TermWindow		Não foi introduzida nenhuma expressão para localizar.
 Font size	Terminal TermWindow		Tamanho da fonte
 Blinking cursor	Terminal AppearancePrefView		Cursor piscante
@@ -81,10 +86,12 @@ Text encoding	Terminal TermWindow		Codificação de texto
 size	Terminal TermView		tamanho
 Close window	Terminal TermWindow		Fechar janela
 Copy absolute path	Terminal TermView		Copiar caminho absoluto
+Save as default	Terminal TermWindow		Salvar como padrão
 Set tab title	Terminal TermWindow		Definir o título da guia
 Settings…	Terminal TermWindow		Configurações...
 Abort	Terminal Shell		Cancelar
 Open link	Terminal TermView		Abrir vínculo
+Solarized Light	Terminal colors scheme		Solarizado Claro
 Edit	Terminal TermWindow		Editar
 Color:	Terminal AppearancePrefView		Cor:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		O padrão especificando o título da janela. Os seguintes espaços reservados\npodem ser usados:\n
@@ -104,6 +111,7 @@ Find next	Terminal TermWindow		Localizar próximo
 Close active tab	Terminal TermWindow		Fechar a aba ativa
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tO caractere '%'.\n\t%<\t-\tInicia uma seção que somente será mostrada se um espaço reservado\n\t\t\tposteriormente não está vazio.\n\t%>\t-\Inicia uma seção que somente será mostrada se um espaço reservado\n\t\t\tentre uma seção %< prévia e esta seção não está vazio.\n\t%-\t-\tEncerra uma seção %< ou %>.\n\nQualquer caractere não alfanumérico entre '%' e a letra formato irá inserir um espaço, apenas\n se o espaço reservado não está vazio. Ele adicionará à seção %<.
 Paste	Terminal TermWindow		Colar
+Solarized Dark	Terminal colors scheme		Solarizado Escuro
 Shell 	Terminal TermWindow		Shell
 Cancel	Terminal TermView		Cancelar
 Use default	Terminal SetTitleWindow		Usar padrão

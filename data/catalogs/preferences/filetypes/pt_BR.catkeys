@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-FileTypes	3116280330
+1	portuguese (brazil)	x-vnd.Haiku-FileTypes	734679611
 Application types…	FileTypes Window		Tipos de aplicativo...
 Description:	Application Types Window		Descrição:
 Args only	Application Type Window		Somente argumentos
@@ -52,6 +52,7 @@ Set preferred application	Preferred App Menu		Definir aplicativo preferido
 Don't save	Application Type Window		Não salvar
 Save changes before closing?	Application Type Window		Salvar alterações antes de fechar?
 File	Application Type Window		Arquivo
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, um{# tipo de Aplicação pode ser removido} outros{# tipos de Aplicação podem ser removidos}}
 Version:	Application Type Window		Versão:
 Select…	FileTypes Window		Selecionar...
 FileTypes request	FileTypes		Requerimento do Tipos de Arquivo

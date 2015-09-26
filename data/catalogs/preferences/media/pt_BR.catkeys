@@ -1,7 +1,10 @@
-1	portuguese (brazil)	x-vnd.Haiku-Media	2605101563
+1	portuguese (brazil)	x-vnd.Haiku-Media	4205337498
 Couldn't add volume control in Deskbar: %s\n	Media views		Não foi possível adicionar controle de volume ao Deskbar: %s\n
 Video input:	Media views		Entrada de vídeo:
+Warning!	Media Window		Aviso!
+Quit anyway	Media Window		Sair mesmo assim
 Defaults	Media views		Padrões
+MIDI Settings	Media Window		Configurações do MIDI
 Quit	Media Window		Sair
 Video settings	Media Window		Definições de vídeo
 Video output:	Media views		Saída de vídeo:
@@ -9,6 +12,7 @@ Could not connect to the media server.\nWould you like to start it ?	Media Windo
 Restart media services	Media views		Reiniciar serviços multimídia
 Couldn't remove volume control in Deskbar: %s\n	Media views		Não foi possível remover o controle de volume no Deskbar: %s\n
 Media	System name		Mídia
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Sair da Mídia agora irá parar a reinicialização dos serviços de mídia. Funcionalidade de mídia intermitente ou indisponível é o resultado mais provável.
 Audio mixer	Media Window		Misturador de áudio
 This hardware has no controls.	Media Window		Este hardware não tem controles.
 Audio output:	Media views		Saída de áudio:

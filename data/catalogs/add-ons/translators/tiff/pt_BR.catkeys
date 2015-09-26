@@ -1,5 +1,6 @@
-1	portuguese (brazil)	x-vnd.Haiku-TIFFTranslator	40018330
+1	portuguese (brazil)	x-vnd.Haiku-TIFFTranslator	2234713102
 LZW	TIFFView		LZW
+Version %d.%d.%d, %s	TIFFView		Versão %d.%d.%d, %s
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header: não foi possível definir diretório\n
 TIFF image	TIFFTranslator		imagem TIFF
 TIFF Library:	TIFFView		Biblioteca TIFF:

@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	4123398005
+1	portuguese (brazil)	x-vnd.Haiku-HaikuDepot	2365524674
 Name	PackageListView		Nome
 Available packages	MainWindow		Pacotes disponíveis
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
@@ -84,7 +84,9 @@ Productivity	Model		Produtividade
 No, quit HaikuDepot	App		Não, fechar Depósito Haiku
 Authentication failed	UserLoginWindow		A autenticação falhou
 Logged in as %User%	MainWindow		Autenticado como %User%
+9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Idioma
+Size	PackageListView		Tamanho
 Failed to create or update rating: %s\n	RatePackageWindow		Falha ao criar ou atualizar classificação: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Você precisa estar autenticado em uma conta antes de poder classificar pacotes.
  It responded with: 	RatePackageWindow		 Ele respondeu com: 
@@ -135,6 +137,8 @@ Cancel	RatePackageWindow		Cancelar
 Package action failed	PackageInfoView		Ação do pacote falhou
 OK	UserLoginWindow		OK
 Send	RatePackageWindow		Enviar
+-	no package size		-
+Category:	FilterView		Categoria:
 Failed to create account	UserLoginWindow		Falhou ao criar conta
 There are problems with the data you entered:\n\n	UserLoginWindow		Existem problemas com os dados que você inseriu:\n\n
 Featured packages	MainWindow		Pacotes em destaque

@@ -1,9 +1,12 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	1661579051
+1	portuguese (brazil)	x-vnd.Haiku-MediaConverter	341686525
 Video using parameters form settings	MediaConverter		Vídeo utilizando definições de forma de parâmetros
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, um{O arquivo não foi reconhecido como um arquivo de mídia suportado:} outros{# arquivos não foram reconhecidos como arquivos de mídia suportados:}}
 Video encoding:	MediaConverter		Codificação de vídeo:
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error read audio frame %lld	MediaConverter		Erro ao ler quadro de áudio %lld
 No audio	Audio codecs list		Sem áudio
 Error	MediaConverter		Erro
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, um{# bit} outros{# bits}}
 Error loading a file	MediaConverter		Erro ao carregar um arquivo
 Error read video frame %lld	MediaConverter		Erro ao ler quadro de vídeo %lld
 File Error	MediaConverter-FileInfo		Erro no Arquivo
@@ -16,6 +19,7 @@ MediaConverter	System name		Conversor de Mídia
 No video	Video codecs list		Nenhum vídeo
 Duration:	MediaConverter-FileInfo		Duração:
 OK	MediaConverter		OK
+%.1f kHz mono	MediaFileInfo		%.1f kHz mono
 Error converting '%filename'	MediaConverter		Erro ao converter '%filename'
 Low	MediaConverter		Baixo
 Conversion completed	MediaConverter		Conversão concluída
@@ -24,8 +28,10 @@ OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		 segundos
 Source files	MediaConverter		Arquivos fonte
 Error writing video frame %lld	MediaConverter		Erro gravando quadro de vídeo %lld
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, um{# quadro} outros{# quadros}}
 Error writing audio frame %lld	MediaConverter		Erro gravando quadro de áudio %lld
 Cancelling	MediaConverter		Cancelando
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, um{# byte} outros{# bytes}}
 Error loading files	MediaConverter		Erro ao carregar arquivos
 Cancel	MediaConverter		Cancelar
 None available	Video codecs		Nenhum disponível
@@ -53,6 +59,7 @@ Drop media files onto this window	MediaConverter		Soltar arquivos de mídia sobr
 Audio encoding:	MediaConverter		Codificação de áudio:
 Audio quality not supported	MediaConverter		Qualidade de áudio não suportada
 File	Menu		Arquivo
+%.1f kHz stereo	MediaFileInfo		%.1f kHz estéreo
 Convert	MediaConverter		Converter
 Writing audio track: %ld%% complete	MediaConverter		Gravando trilha de áudio: %ld%% concluído
 Video quality: %3d%%	MediaConverter		Qualidade de vídeo: %3d%%

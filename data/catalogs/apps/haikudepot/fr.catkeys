@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-HaikuDepot	4273323974
+1	french	x-vnd.Haiku-HaikuDepot	2365524674
 Name	PackageListView		Nom
 Available packages	MainWindow		Paquets disponibles
 Open %DeskbarLink%	PackageManager		Ouvrir %DeskbarLink%
@@ -84,6 +84,7 @@ Productivity	Model		Bureautique
 No, quit HaikuDepot	App		Non, quitter le Dépôt Haiku
 Authentication failed	UserLoginWindow		L’authentification a échoué
 Logged in as %User%	MainWindow		Connecté en tant que %User%
+9999.99 KiB	PackageListView		9999.99 Kio
 Language	RatePackageWindow		Langue
 Size	PackageListView		Taille
 Failed to create or update rating: %s\n	RatePackageWindow		Votre évaluation n’a pas été prise en compte : %s\n

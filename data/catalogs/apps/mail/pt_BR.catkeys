@@ -1,7 +1,8 @@
-1	portuguese (brazil)	x-vnd.Be-MAIL	3209807243
+1	portuguese (brazil)	x-vnd.Be-MAIL	1865394837
 View	Mail		Visualizar
 %d - Date	Mail		%d - Data
 Attach attributes:	Mail		Anexar Atributos:
+Unknown	Mail		Desconhecido
 Inconsistency occurred in the undo/redo buffer.	Mail		Ocorreu um erro de inconsistência na memória intermédia do Desfazer/Refazer.
 An error occurred trying to save the attachment.	Mail		Ocorreu um erro ao tentar salvar o anexo.
 Copy to new	Mail		Copiar para novo
@@ -144,7 +145,9 @@ Open attachment	Mail		Abrir anexo
 sent	B_USER_DIRECTORY/mail/sent		enviado
 (Date unavailable)	Mail		(Data indisponível)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Ponha suas consultas de correio e de modelos preferidas nesta pasta.
+Spam	Mail		Mensagens não solicitadas
 Reply	Mail		Resposta
+Encoding	Mail		Codificação
 From:	Mail		De:
 Couldn't open this signature. Sorry.	Mail		Não foi possível abrir esta assinatura. Desculpe.
 Open draft	Mail		Abrir rascunho

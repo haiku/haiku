@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	3890917719
+1	portuguese (brazil)	x-vnd.Haiku-MediaPlayer	2711018042
 raw audio	MediaPlayer-InfoWin		áudio não processado
 Location	MediaPlayer-InfoWin		Local
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -120,6 +120,7 @@ raw video	MediaPlayer-InfoWin		vídeo não processado
 Volume of background clips	MediaPlayer-SettingsWindow		Volume dos clipes em segundo plano
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Erro interno (sem memória). Falha ao salvar a lista de reprodução.
 Hide interface	MediaPlayer-Main		Ocultar interface
+Open clips	MediaPlayer-Main		Clipes abertos
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiar Entrada
 none	Subtitles menu		nenhum
 Move file to Trash	MediaPlayer-PlaylistWindow		Mover o arquivo para a Lixeira

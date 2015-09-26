@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libbe	3211461559
+1	portuguese (brazil)	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GB
@@ -12,12 +12,16 @@ Copy	TextView		Copiar
 alpha	AboutWindow		alfa
 Error	PrintJob		Erro
 All Rights Reserved.	AboutWindow		Todos os direitos reservados.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, um{# byte} outros{# bytes}}
 About %app%	AboutWindow		Sobre %app%
+No pages to print!	PrintJob		Nenhuma página para imprimir!
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Verde:
 Version history:	AboutWindow		Histórico de versões
 Remove replicant	Dragger		Remover replicante
+Select all	TextView		Selecionar tudo
+OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Servidor de impressão não está respondendo.
 Paste	TextView		Colar

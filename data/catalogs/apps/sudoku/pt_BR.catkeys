@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Sudoku	2463385585
+1	portuguese (brazil)	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Restaurar instantâneo
 Could not set Sudoku:\n%s\n	SudokuWindow		Não foi possível definir Sudoku:\n%s\n
 Export as…	SudokuWindow		Exportar como…
@@ -26,6 +26,7 @@ Text	SudokuWindow		Texto
 Creating solvable field	SudokuGenerator		Criando campo solucionável
 View	SudokuWindow		Visualizar
 Progress monitor	ProgressWindow		Monitor de progresso
+Set all hints	SudokuWindow		Defina todas as dicas
 Mark invalid values	SudokuWindow		Marcar valores inválidos
 Blank	SudokuWindow		Vazio
 Help	SudokuWindow		Ajuda

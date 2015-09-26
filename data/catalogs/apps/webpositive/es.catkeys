@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-WebPositive	1617788973
+1	spanish; castilian	x-vnd.Haiku-WebPositive	3331290494
 Show home button	Settings Window		Mostar botón de inicio
 Username:	Authentication Panel		Nombre de usuario:
 Copy URL to clipboard	Download Window		Copiar URL al portapapeles
@@ -46,6 +46,7 @@ Restart	Download Window		Reiniciar
 Proxy server	Settings Window		Servidor Proxy
 Open containing folder	Download Window		Abrir carpeta contenedora
 New window	WebPositive Window		Nueva ventana
+WebPositive	Download Window		WebPositive
 Open	Download Window		Abrir
 Reload	WebPositive Window		Recargar
 Downloads	Download Window		Descargas
@@ -101,6 +102,7 @@ Open start page	Settings Window		Abrir la página de inicio
 Continue downloads	WebPositive		Continuar descargas
 Cancel	Download Window		Cancelar
 Open search page	Settings Window		Abrir página de búsqueda
+Clear	Console Window		Limpiar
 Password:	Authentication Panel		Contraseña:
 Back	WebPositive Window		Atrás
 New browser window	Download Window		Nueva ventana de navegador
