@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.09.19
-# Date:    2015-09-19 20:34:12
+# Version: 2015.09.28
+# Date:    2015-09-28 20:34:09
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -13020,9 +13020,9 @@
 0db3  Tekram Technology Co., Ltd
 0db4  Chung Fu Chen Yeh Enterprise Corp.
 0db5  Access IS
-	0139  LSR116 CDC
-	013a  LSR116 Keyboard
-	013b  LSR116 HID
+	0139  Barcode Module - CDC serial
+	013a  Barcode Module - Virtual Keyboard
+	013b  Barcode Module - HID
 	0160  NFC and Smartcard Module (NSM)
 0db7  ELCON Systemtechnik
 	0002  Goldpfeil P-LAN
