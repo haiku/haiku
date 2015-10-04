@@ -33,7 +33,7 @@ RemotePackageRepository HaikuPorts
 	a52dec-0.7.4-2
 	a52dec_devel-0.7.4-2
 	acr-0.9.9_git-1
-	album-0.9.3-1
+	album-0.9.4-1
 	ale-0.9.1-2
 	app2png-1.0.0-1
 	apr-1.5.2-1
@@ -74,7 +74,7 @@ RemotePackageRepository HaikuPorts
 	cdrtools-3.01~a30-1
 	cdrtools_devel-3.01~a30-1
 	chat-20100903-2
-	clipdinger-0.4-1
+	clipdinger-0.4-2
 	clockwerk-git-3
 	cpctools-0.3.0-2
 	criticalmass-2.2-1
@@ -321,7 +321,7 @@ RemotePackageRepository HaikuPorts
 	lighttpd_devel-1.4.35-2
 	links-2.8-1
 	lmarbles-1.0.8-2
-	lnlauncher-1.1.2-2
+	lnlauncher-1.1.2-4
 	ltris-1.0.19-1
 	lua-5.2.1-6
 	lua_devel-5.2.1-6
@@ -366,7 +366,7 @@ RemotePackageRepository HaikuPorts
 	neon-0.29.6-6
 	neon_devel-0.29.6-6
 	netcat-1.10-1
-	netpulse-0.2.3-4
+	netpulse-0.2.3-5
 	netsurf-3.2-1
 	ocaml-4.02.1-1
 	openjpeg-2.1.0-2
@@ -493,7 +493,7 @@ RemotePackageRepository HaikuPorts
 	vlc-0.8.6i-1
 	vlc_devel-0.8.6i-1
 	vlink-0.15-1
-	vmware_addons-1.1.1-2
+	vmware_addons-1.1.1-3
 	weather-0.1.1_git-1
 	wget-1.16.3-1
 	which-2.21-1
@@ -520,6 +520,8 @@ RemotePackageRepository HaikuPorts
 	arm_none_eabi_gcc_x86-4.8.4-1
 	arm_none_eabi_gdb_x86-7.7-1
 	arm_none_eabi_newlib_x86-2.1.0-2
+	aspell_x86-0.60.6.1-1
+	aspell_x86_devel-0.60.6.1-1
 	automoc_x86-0.9.88-2
 	avr_binutils_x86-2.24_2014_03_19-5
 	avr_gcc_x86-4.8.2_2014_03_20-1
@@ -655,6 +657,8 @@ RemotePackageRepository HaikuPorts
 	libassuan_x86_devel-2.1.3-1
 	libattica_x86-0.4.2-1
 	libattica_x86_devel-0.4.2-1
+	libbluray_x86-0.8.1-1
+	libbluray_x86_devel-0.8.1-1
 	libcddb_x86-1.3.2-1
 	libcddb_x86_devel-1.3.2-1
 	libcdio_x86-0.93-2
@@ -685,6 +689,8 @@ RemotePackageRepository HaikuPorts
 	libftdi_x86_devel-1.0-2
 	libgpg_error_x86-1.15-1
 	libgpg_error_x86_devel-1.15-1
+	libgsasl_x86-1.8.0-1
+	libgsasl_x86_devel-1.8.0-1
 	libicns_x86-0.8.1-1
 	libicns_x86_devel-0.8.1-1
 	libiconv_x86-1.13.1-6
@@ -819,6 +825,7 @@ RemotePackageRepository HaikuPorts
 	quassel_x86-0.10.0-2
 	quicklaunch-0.9.12-1
 	qupzilla_x86-1.8.6-1
+	qutim_x86-0.3.3-1
 	radare2_x86-0.9.9-1
 	radare2_x86_devel-0.9.9-1
 	rcs_x86-5.9.3-2
@@ -848,6 +855,8 @@ RemotePackageRepository HaikuPorts
 	smjpeg_x86_devel-0.2.1-1
 	smpeg_x86-0.4.5-3
 	smpeg_x86_devel-0.4.5-3
+	smplayer_x86-15.9.0-1
+	smtube_x86-15.5.10-1
 	speex_x86-1.2~rc1-2
 	speex_x86_devel-1.2~rc1-2
 	sqlite_x86-3.8.11.1-1
@@ -896,6 +905,7 @@ RemotePackageRepository HaikuPorts
 	arm_none_eabi_newlib_x86
 	armyknife
 	asciidoc
+	aspell_x86
 	autoconf
 	automake
 	automoc_x86
@@ -1065,6 +1075,7 @@ RemotePackageRepository HaikuPorts
 	libassuan
 	libassuan_x86
 	libattica_x86
+	libbluray_x86
 	libcddb
 	libcddb_x86
 	libcdio
@@ -1094,6 +1105,7 @@ RemotePackageRepository HaikuPorts
 	libgcrypt
 	libgpg_error
 	libgpg_error_x86
+	libgsasl_x86
 	libicns
 	libiconv
 	libid3tag
@@ -1256,6 +1268,7 @@ RemotePackageRepository HaikuPorts
 	quassel_x86
 	quicklaunch
 	qupzilla_x86
+	qutim_x86
 	radare2_x86
 	rcs_x86
 	readline
@@ -1287,6 +1300,8 @@ RemotePackageRepository HaikuPorts
 	slimevolley
 	smjpeg
 	smpeg
+	smplayer_x86
+	smtube_x86
 	speex
 	sqlite
 	sqlite_x86
