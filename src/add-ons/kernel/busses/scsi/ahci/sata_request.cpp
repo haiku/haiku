@@ -121,7 +121,7 @@ sata_request::SetATAPICommand(size_t transferLength)
 void
 sata_request::Finish(int tfd, size_t bytesTransfered)
 {
-	if ((tfd & (ATA_ERR | ATA_DF)) != 0) {
+	if ((tfd & (ATA_STATUS_ERROR | ATA_STATUS_DEVICE_FAULT)) != 0) {
 		uint8 status = tfd & 0xff;
 		uint8 error = (tfd >> 8) & 0xff;
 
@@ -135,7 +135,7 @@ sata_request::Finish(int tfd, size_t bytesTransfered)
 		fCcb->data_resid = fCcb->data_length - bytesTransfered;
 		fCcb->device_status = SCSI_STATUS_GOOD;
 		fCcb->subsys_status = SCSI_REQ_CMP;
-		if (tfd & (ATA_ERR | ATA_DF)) {
+		if (tfd & (ATA_STATUS_ERROR | ATA_STATUS_DEVICE_FAULT)) {
 			fCcb->subsys_status = SCSI_REQ_CMP_ERR;
 			if (fIsATAPI) {
 				if (!IsTestUnitReady()) {
@@ -187,7 +187,7 @@ sata_request::Abort()
 		gSCSI->finished(fCcb, 1);
 		delete this;
 	} else {
-		fCompletionStatus = ATA_ERR;
+		fCompletionStatus = ATA_STATUS_ERROR;
 		release_sem(fCompletionSem);
 	}
 }

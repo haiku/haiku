@@ -48,8 +48,13 @@ private:
 	void		ExecuteSataRequest(sata_request *request, bool isWrite = false);
 
 	void		ResetDevice();
-	status_t	ResetPort(bool forceDeviceReset = false);
+	status_t	SoftReset();
+	status_t	PortReset();
 	status_t	PostReset();
+
+	bool		Enable();
+	bool		Disable();
+
 	void		FlushPostedWrites();
 	void		DumpD2HFis();
 
@@ -57,7 +62,6 @@ private:
 	status_t	WaitForTransfer(int *tfd, bigtime_t timeout);
 	void		FinishTransfer();
 
-	inline	bool				_HardReset();
 	inline	void				_ClearErrorRegister();
 
 //	uint8 *		SetCommandFis(volatile command_list_entry *cmd, volatile fis *fis, const void *data, size_t dataSize);
@@ -79,7 +83,7 @@ private:
 	uint64							fSectorCount;
 	bool							fIsATAPI;
 	bool							fTestUnitReadyActive;
-	bool							fResetPort;
+	bool							fSoftReset;
 	bool							fError;
 	bool							fTrimSupported;
 	uint32							fMaxTrimRangeBlocks;

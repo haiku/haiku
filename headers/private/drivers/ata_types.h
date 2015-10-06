@@ -248,12 +248,12 @@ enum {
 	ATA_STATUS_BUSY						= 0x80		// busy
 };
 
-// device control register
+// device control register (ATA command block)
 enum {
 												// bit 0 must be zero
 	ATA_DEVICE_CONTROL_DISABLE_INTS		= 0x02,	// disable INTRQ
 	ATA_DEVICE_CONTROL_SOFT_RESET		= 0x04,	// software device reset
-	ATA_DEVICE_CONTROL_BIT3				= 0x08,	// don't know, but must be set
+	ATA_DEVICE_CONTROL_BIT3				= 0x08,	// obsolete. Must always be set
 												// bits inbetween are reserved
 	ATA_DEVICE_CONTROL_HIGH_ORDER_BYTE	= 0x80	// read high order byte
 												// (for 48-bit lba)

@@ -5,6 +5,7 @@
 #ifndef _AHCI_DEFS_H
 #define _AHCI_DEFS_H
 
+#include <ata_types.h>
 #include <bus/PCI.h>
 #include <bus/SCSI.h>
 #include <PCI_x86.h>
@@ -97,6 +98,11 @@ enum {
 #define IPM_TRANSITIONS_TO_PARTIAL_DISABLED 0x1
 #define IPM_TRANSITIONS_TO_SLUMBER_DISABLED 0x2
 
+// Device signatures
+#define	SATA_SIG_ATA			0x00000101 // SATA drive
+#define	SATA_SIG_ATAPI			0xEB140101 // ATAPI drive
+#define	SATA_SIG_SEMB			0xC33C0101 // Enclosure management bridge
+#define	SATA_SIG_PM				0x96690101 // Port multiplier
 
 typedef struct {
 	uint32		clb;			// Command List Base Address
@@ -130,7 +136,7 @@ enum {
 	PORT_CMD_ATAPI	= (1 << 24),	// Device is ATAPI
 	PORT_CMD_CR		= (1 << 15),	// Command List Running (DMA active)
 	PORT_CMD_FR		= (1 << 14),	// FIS Receive Running
-	PORT_CMD_FER	= (1 << 4),		// FIS Receive Enable
+	PORT_CMD_FRE	= (1 << 4),		// FIS Receive Enable
 	PORT_CMD_CLO	= (1 << 3),		// Command List Override
 	PORT_CMD_POD	= (1 << 2),		// Power On Device
 	PORT_CMD_SUD	= (1 << 1),		// Spin-up Device
@@ -165,14 +171,6 @@ enum {
 
 #define PORT_INT_MASK	(PORT_INT_ERROR | PORT_INT_DP | PORT_INT_SDB \
 							| PORT_INT_DS | PORT_INT_PS | PORT_INT_DHR)
-
-enum {
-	ATA_BSY			= 0x80,
-	ATA_DF			= 0x20,
-	ATA_DRQ			= 0x08,
-	ATA_ERR			= 0x01,
-};
-
 
 enum {
 	PORT_FBS_DWE_SHIFT		= 16,	// Device With Error
