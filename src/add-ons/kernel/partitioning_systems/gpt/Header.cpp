@@ -20,6 +20,10 @@
 #	include <new>
 #endif
 
+#ifndef _BOOT_MODE
+#include "uuid.h"
+#endif
+
 #include "crc32.h"
 #include "utility.h"
 
@@ -138,7 +142,9 @@ Header::Header(uint64 lastBlock, uint32 blockSize)
 	fHeader.SetHeaderCRC(0);
 	fHeader.SetAbsoluteBlock(EFI_HEADER_LOCATION);
 	fHeader.SetAlternateBlock(lastBlock);
-	// TODO: set disk guid
+	uuid_t uuid;
+	uuid_generate_random(uuid);
+	memcpy((uint8*)&fHeader.disk_guid, uuid, sizeof(guid_t));
 	fHeader.SetEntriesBlock(EFI_PARTITION_ENTRIES_BLOCK);
 	fHeader.SetEntryCount(EFI_PARTITION_ENTRY_COUNT);
 	fHeader.SetEntrySize(EFI_PARTITION_ENTRY_SIZE);

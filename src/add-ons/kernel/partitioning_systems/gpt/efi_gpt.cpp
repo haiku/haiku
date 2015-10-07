@@ -23,6 +23,10 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef _BOOT_MODE
+#include "uuid.h"
+#endif
+
 #include "Header.h"
 #include "utility.h"
 
@@ -765,7 +769,9 @@ efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 
 	efi_partition_entry& entry = header->EntryAt(entryIndex);
 	entry.partition_type = typeGUID;
-	// TODO: set unique partition ID
+	uuid_t uuid;
+	uuid_generate_random(uuid);
+	memcpy((uint8*)&entry.unique_guid, uuid, sizeof(guid_t));
 	to_ucs2(name, strlen(name), entry.name, EFI_PARTITION_NAME_LENGTH);
 	entry.SetStartBlock((validatedOffset - partition->offset)
 		/ partition->block_size);
