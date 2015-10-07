@@ -193,7 +193,7 @@ Header::WriteEntry(int fd, uint32 entryIndex)
 	uint32 entryOffset = entryIndex * fHeader.EntrySize() % fBlockSize;
 
 	status_t status = _Write(fd,
-		(fHeader.EntriesBlock() + blockOffset) * fBlockSize,
+		(fHeader.EntriesBlock() + blockOffset) * fBlockSize + entryOffset,
 		fEntries + entryOffset, fBlockSize);
 	if (status != B_OK)
 		return status;
@@ -203,7 +203,7 @@ Header::WriteEntry(int fd, uint32 entryIndex)
 
 	// Write backup
 	status_t backupStatus = _Write(fd,
-		(fBackupHeader.EntriesBlock() + blockOffset) * fBlockSize,
+		(fBackupHeader.EntriesBlock() + blockOffset) * fBlockSize + entryOffset,
 		fEntries + entryOffset, fBlockSize);
 
 	return status == B_OK ? backupStatus : status;
@@ -351,7 +351,7 @@ Header::_Dump(const efi_table_header& header)
 	dprintf("EFI header: %.8s\n", header.header);
 	dprintf("EFI revision: %" B_PRIx32 "\n", header.Revision());
 	dprintf("header size: %" B_PRId32 "\n", header.HeaderSize());
-	dprintf("header CRC: %" B_PRId32 "\n", header.HeaderCRC());
+	dprintf("header CRC: %" B_PRIx32 "\n", header.HeaderCRC());
 	dprintf("absolute block: %" B_PRIu64 "\n", header.AbsoluteBlock());
 	dprintf("alternate block: %" B_PRIu64 "\n", header.AlternateBlock());
 	dprintf("first usable block: %" B_PRIu64 "\n", header.FirstUsableBlock());
@@ -360,7 +360,7 @@ Header::_Dump(const efi_table_header& header)
 	dprintf("entries block: %" B_PRIu64 "\n", header.EntriesBlock());
 	dprintf("entry size:  %" B_PRIu32 "\n", header.EntrySize());
 	dprintf("entry count: %" B_PRIu32 "\n", header.EntryCount());
-	dprintf("entries CRC: %" B_PRIu32 "\n", header.EntriesCRC());
+	dprintf("entries CRC: %" B_PRIx32 "\n", header.EntriesCRC());
 }
 
 
