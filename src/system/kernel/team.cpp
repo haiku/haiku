@@ -2948,7 +2948,8 @@ team_set_foreground_process_group(int32 ttyIndex, pid_t processGroupID)
 	// ignore or block SIGTTOU. Otherwise the group gets a SIGTTOU.
 	if (session->foreground_group != -1
 		&& session->foreground_group != team->group_id
-		&& team->SignalActionFor(SIGTTOU).sa_handler != SIG_IGN) {
+		&& team->SignalActionFor(SIGTTOU).sa_handler != SIG_IGN
+		&& (thread->sig_block_mask & SIGNAL_TO_MASK(SIGTTOU)) == 0) {
 		InterruptsSpinLocker signalLocker(team->signal_lock);
 
 		if (!is_team_signal_blocked(team, SIGTTOU)) {
