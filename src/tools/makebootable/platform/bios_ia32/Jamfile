@@ -11,11 +11,14 @@ SEARCH_SOURCE
 USES_BE_API on <build>makebootable = true ;
 
 local hostPlatformSources ;
+local hostPlatformLibs ;
 if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd || $(HOST_PLATFORM) = darwin {
 	UsePrivateHeaders interface ;
+	UseHeaders [ FDirName $(HAIKU_TOP) src libs uuid ] ;
 
 	hostPlatformSources = PartitionMap.cpp PartitionMapParser.cpp
 		crc32.cpp Header.cpp utility.cpp ;
+	hostPlatformLibs = libuuid_kernel.a ;
 
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel
 		partitioning_systems intel ] ;
@@ -35,7 +38,7 @@ if $(HOST_PLATFORM) != darwin && $(HOST_PLATFORM) != cygwin
 BuildPlatformMain <build>makebootable :
 	makebootable.cpp
 	$(hostPlatformSources)
-	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++)
+	: $(HOST_LIBBE) $(HOST_LIBSTDC++) $(HOST_LIBSUPC++) $(hostPlatformLibs)
 ;
 
 # on Darwin write the boot loader code into an attribute
