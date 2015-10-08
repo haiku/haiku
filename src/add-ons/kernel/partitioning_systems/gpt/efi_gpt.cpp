@@ -835,6 +835,7 @@ efi_gpt_delete_child(int fd, partition_id partitionID, partition_id childID,
 		return B_ERROR;
 
 	efi_partition_entry& entry = header->EntryAt(entryIndex);
+	memset(&entry, 0, sizeof(efi_partition_entry));
 	entry.partition_type = kEmptyGUID;
 
 	status_t result = header->WriteEntry(fd, entryIndex);
