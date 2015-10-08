@@ -18,7 +18,6 @@ if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd || $(HOST_PLATFORM) = 
 
 	hostPlatformSources = PartitionMap.cpp PartitionMapParser.cpp
 		crc32.cpp Header.cpp utility.cpp ;
-	hostPlatformLibs = libuuid_build.a ;
 
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel
 		partitioning_systems intel ] ;

@@ -20,7 +20,7 @@
 #	include <new>
 #endif
 
-#ifndef _BOOT_MODE
+#if !defined(_BOOT_MODE) && !defined(_USER_MODE)
 #include "uuid.h"
 #endif
 
@@ -125,7 +125,7 @@ Header::Header(int fd, uint64 lastBlock, uint32 blockSize)
 }
 
 
-#ifndef _BOOT_MODE
+#if !defined(_BOOT_MODE) && !defined(_USER_MODE)
 Header::Header(uint64 lastBlock, uint32 blockSize)
 	:
 	fBlockSize(blockSize),
@@ -173,7 +173,7 @@ Header::Header(uint64 lastBlock, uint32 blockSize)
 
 	fStatus = B_OK;
 }
-#endif // !_BOOT_MODE
+#endif // !_BOOT_MODE && !_USER_MODE
 
 
 Header::~Header()
