@@ -92,7 +92,7 @@ ValueWriter::WriteValue(ValueLocation* location, BVariant& value)
 			case VALUE_PIECE_LOCATION_REGISTER:
 			{
 				TRACE_LOCALS("  piece %" B_PRId32 ": register: %" B_PRIu32
-					", bits: %" B_PRIu32 "\n", i, piece.reg, bitSize);
+					", bits: %" B_PRIu64 "\n", i, piece.reg, piece.bitSize);
 
 				const Register* target = registers + piece.reg;
 				BVariant pieceValue;
