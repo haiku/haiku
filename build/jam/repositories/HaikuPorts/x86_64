@@ -7,7 +7,8 @@ RemotePackageRepository HaikuPorts
 	ca_root_certificates-2014_08_13-1
 	caladea-20130214-3
 	carlito-20130920-1
-	dejavu-2.34-1
+	dejavu-2.34-2
+	droid-113-2
 	texi2html-1.82-2
 	timgmsoundfont-fixed-5
 	vl_gothic-20141206-1
@@ -17,8 +18,8 @@ RemotePackageRepository HaikuPorts
 	# primary architecture (x86_64)
 	a52dec-0.7.4-2
 	a52dec_devel-0.7.4-2
-	apr-1.5.0-1
-	apr_devel-1.5.0-1
+	apr-1.5.2-1
+	apr_devel-1.5.2-1
 	apr_util-1.5.4-1
 	apr_util_devel-1.5.4-1
 	aspell-0.60.6.1-1
@@ -68,7 +69,7 @@ RemotePackageRepository HaikuPorts
 	ctags-5.8-3
 	curl-7.44.0-1
 	curl_devel-7.44.0-1
-	cvs-1.12.13.1-6
+	cvs-1.12.13.1-7
 	cvsps-2.2b1-1
 	dbus-1.8.6-1
 	dbus_devel-1.8.6-1
@@ -152,7 +153,7 @@ RemotePackageRepository HaikuPorts
 	jpeg-9a-1
 	jpeg_devel-9a-1
 	jpeg_tools-9a-1
-	keymapswitcher-1.2.7.10-1
+	keymapswitcher-1.2.7.11-1
 	lame-3.99.5-5
 	lame_devel-3.99.5-5
 	lcms-2.7-1
@@ -275,6 +276,7 @@ RemotePackageRepository HaikuPorts
 	neon-0.29.6-7
 	neon_devel-0.29.6-7
 	netcat-1.10-1
+	netpulse-0.2.3-5
 	ninja-1.5.1-2
 	nspr-4.10.8-1
 	nspr_devel-4.10.8-1
@@ -296,6 +298,9 @@ RemotePackageRepository HaikuPorts
 	qemu-2.1.2-2
 	qrencode-3.3.0-2
 	qrencode_devel-3.3.0-2
+	quicklaunch-0.9.12-1
+	qupzilla-1.8.6-1
+	qutim-0.3.3-1
 	readline-6.3.8-1
 	readline_devel-6.3.8-1
 	ruby-2.2.2-1
@@ -482,6 +487,7 @@ RemotePackageRepository HaikuPorts
 	ncurses6
 	neon
 	netcat
+	netpulse
 	ninja
 	nspr
 	openssh
@@ -498,6 +504,7 @@ RemotePackageRepository HaikuPorts
 	qca2
 	qemu
 	qrencode
+	quicklaunch
 	readline
 	ruby
 	scons
