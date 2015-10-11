@@ -4681,7 +4681,9 @@ vfs_stat_vnode(struct vnode* vnode, struct stat* stat)
 	if (status == B_OK) {
 		stat->st_dev = vnode->device;
 		stat->st_ino = vnode->id;
-		stat->st_rdev = -1;
+		// the rdev field must stay unset for non-special files
+		if (!S_ISBLK(stat->st_mode) && !S_ISCHR(stat->st_mode))
+			stat->st_rdev = -1;
 	}
 
 	return status;
@@ -4696,14 +4698,7 @@ vfs_stat_node_ref(dev_t device, ino_t inode, struct stat* stat)
 	if (status != B_OK)
 		return status;
 
-	status = FS_CALL(vnode, read_stat, stat);
-
-	// fill in the st_dev and st_ino fields
-	if (status == B_OK) {
-		stat->st_dev = vnode->device;
-		stat->st_ino = vnode->id;
-		stat->st_rdev = -1;
-	}
+	status = vfs_stat_vnode(vnode, stat);
 
 	put_vnode(vnode);
 	return status;
@@ -6435,16 +6430,7 @@ common_read_stat(struct file_descriptor* descriptor, struct stat* stat)
 	stat->st_mtim.tv_nsec = 0;
 	stat->st_atim.tv_nsec = 0;
 
-	status_t status = FS_CALL(vnode, read_stat, stat);
-
-	// fill in the st_dev and st_ino fields
-	if (status == B_OK) {
-		stat->st_dev = vnode->device;
-		stat->st_ino = vnode->id;
-		stat->st_rdev = -1;
-	}
-
-	return status;
+	return vfs_stat_vnode(vnode, stat);
 }
 
 
@@ -6477,14 +6463,7 @@ common_path_read_stat(int fd, char* path, bool traverseLeafLink,
 	if (status != B_OK)
 		return status;
 
-	status = FS_CALL(vnode, read_stat, stat);
-
-	// fill in the st_dev and st_ino fields
-	if (status == B_OK) {
-		stat->st_dev = vnode->device;
-		stat->st_ino = vnode->id;
-		stat->st_rdev = -1;
-	}
+	status = vfs_stat_vnode(vnode, stat);
 
 	put_vnode(vnode);
 	return status;

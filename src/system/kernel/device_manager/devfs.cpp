@@ -1758,6 +1758,7 @@ devfs_read_stat(fs_volume* _volume, fs_vnode* _vnode, struct stat* stat)
 		stat));
 
 	stat->st_ino = vnode->id;
+	stat->st_rdev = vnode->id;
 	stat->st_size = 0;
 	stat->st_mode = vnode->stream.type;
 
