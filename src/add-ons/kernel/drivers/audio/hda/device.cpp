@@ -35,6 +35,9 @@ hda_open(const char* name, uint32 flags, void** cookie)
 	atomic_add(&controller->opened, 1);
 
 	*cookie = controller;
+
+	get_settings_from_file();	// optional user-settable sample rate, buffer frames and count
+
 	return B_OK;
 }
 

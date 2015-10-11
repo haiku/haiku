@@ -192,6 +192,8 @@ void RouteAppNodeManager::nodeCreated(
 	if(err == B_OK)
 	{
 		BTimeSource* ts = roster->MakeTimeSourceFor(ref->node());
+		if (ts == NULL)
+			return;
 		if(ts->Node() != systemClock)
 		{
 			g->setTimeSource(ts->Node());
