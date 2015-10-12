@@ -1,19 +1,18 @@
 /*
- * Copyright 2001-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ithamar R. Adema
  *		Michael Pfeiffer
  */
+
+
 #include "PrintServerApp.h"
 
-#include "BeUtils.h"
-#include "Printer.h"
-#include "pr_server.h"
-#include "Transport.h"
+#include <stdio.h>
+#include <unistd.h>
 
-// BeOS API
 #include <Alert.h>
 #include <Autolock.h>
 #include <Catalog.h>
@@ -30,11 +29,10 @@
 #include <PrintJob.h>
 #include <String.h>
 
-// ANSI C
-#include <stdio.h>
-	// for printf
-#include <unistd.h>
-	// for unlink
+#include "BeUtils.h"
+#include "Printer.h"
+#include "pr_server.h"
+#include "Transport.h"
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -46,45 +44,42 @@ typedef struct _printer_data {
 } printer_data_t;
 
 
-
 static const char* kSettingsName = "print_server_settings";
-
 
 BLocker *gLock = NULL;
 
 
-/**
- * Main entry point of print_server.
- *
- * @returns B_OK if application was started, or an errorcode if
- *          application failed to start.
- */
+/*!	Main entry point of print_server.
+
+	@returns B_OK if application was started, or an errorcode if
+			the application failed to start.
+*/
 int
 main()
 {
-	status_t rc = B_OK;
 	gLock = new BLocker();
-	PrintServerApp print_server(&rc);
-	if (rc == B_OK) {
-		print_server.Run();
-	}
+
+	status_t status = B_OK;
+	PrintServerApp printServer(&status);
+	if (status == B_OK)
+		printServer.Run();
+
 	delete gLock;
-	return rc;
+	return status;
 }
 
 
-/**
- * Constructor for print_server's application class. Retrieves the
- * name of the default printer from storage, caches the icons for
- * a selected printer.
- *
- * @param err Pointer to status_t for storing result of application
- *          initialisation.
- *
- * @see BApplication
- */
+/*!	Constructor for print_server's application class. Retrieves the
+	name of the default printer from storage, caches the icons for
+	a selected printer.
+
+	@param err Pointer to status_t for storing result of application
+			initialisation.
+	@see BApplication
+*/
 PrintServerApp::PrintServerApp(status_t* err)
-	: Inherited(PSRV_SIGNATURE_TYPE, err),
+	:
+	Inherited(PSRV_SIGNATURE_TYPE, err),
 	fDefaultPrinter(NULL),
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	fIconSize(0),
@@ -209,7 +204,6 @@ PrintServerApp::RegisterPrinter(BDirectory* printer)
 		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_CNX, &connection) == B_OK
 		&& printer->ReadAttrString(PSRV_PRINTER_ATTR_STATE, &state) == B_OK
 		&& state == "free") {
-
  		BAutolock lock(gLock);
 		if (lock.IsLocked()) {
 			// check if printer is already registered
@@ -221,9 +215,9 @@ PrintServerApp::RegisterPrinter(BDirectory* printer)
 				return;
 
 			// register new printer
-			Resource* r = fResourceManager.Allocate(transport.String(),
+			Resource* resource = fResourceManager.Allocate(transport.String(),
 				address.String(), connection.String());
-		 	AddHandler(new Printer(printer, r));
+			AddHandler(new Printer(printer, resource));
 		 	Acquire();
 		}
 	}
@@ -266,7 +260,8 @@ PrintServerApp::EntryRemoved(node_ref* node)
 {
 	Printer* printer = Printer::Find(node);
 	if (printer) {
-		if (printer == fDefaultPrinter) fDefaultPrinter = NULL;
+		if (printer == fDefaultPrinter)
+			fDefaultPrinter = NULL;
 		UnregisterPrinter(printer);
 	}
 }
@@ -276,44 +271,34 @@ void
 PrintServerApp::AttributeChanged(node_ref* node)
 {
 	BDirectory printer(node);
-	if (printer.InitCheck() == B_OK) {
+	if (printer.InitCheck() == B_OK)
 		RegisterPrinter(&printer);
-	}
 }
 
 
-// ---------------------------------------------------------------
-// SetupPrinterList
-//
-// This method builds the internal list of printers from disk. It
-// also installs a node monitor to be sure that the list keeps
-// updated with the definitions on disk.
-//
-// Parameters:
-//    none.
-//
-// Returns:
-//    B_OK if successful, or an errorcode if failed.
-// ---------------------------------------------------------------
+/*!	This method builds the internal list of printers from disk. It
+	also installs a node monitor to be sure that the list keeps
+	updated with the definitions on disk.
+
+	@return B_OK if successful, or an errorcode if failed.
+*/
 status_t
 PrintServerApp::SetupPrinterList()
 {
-	status_t rc;
-
 	// Find directory containing printer definition nodes
 	BPath path;
-	rc = ::find_directory(B_USER_PRINTERS_DIRECTORY, &path);
-	if (rc != B_OK)
-		return rc;
+	status_t status = find_directory(B_USER_PRINTERS_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
 
 	// Directory has to exist in order to watch it
 	mode_t mode = 0777;
 	create_directory(path.Path(), mode);
 
 	BDirectory dir(path.Path());
-	rc = dir.InitCheck();
-	if (rc != B_OK)
-		return rc;
+	status = dir.InitCheck();
+	if (status != B_OK)
+		return status;
 
 	// Register printer definition nodes
 	BEntry entry;
@@ -337,17 +322,11 @@ PrintServerApp::SetupPrinterList()
 	return B_OK;
 }
 
-// ---------------------------------------------------------------
-// void MessageReceived(BMessage* msg)
-//
-// Message handling method for print_server application class.
-//
-// Parameters:
-//      msg - Actual message sent to application class.
-//
-// Returns:
-//      void.
-// ---------------------------------------------------------------
+
+/*!	Message handling method for print_server application class.
+
+	@param msg Actual message sent to application class.
+*/
 void
 PrintServerApp::MessageReceived(BMessage* msg)
 {
@@ -378,44 +357,35 @@ PrintServerApp::MessageReceived(BMessage* msg)
 }
 
 
-// ---------------------------------------------------------------
-// CreatePrinter(const char* printerName, const char* driverName,
-//               const char* connection, const char* transportName,
-//               const char* transportPath)
-//
-// Creates printer definition/spool directory. It sets the
-// attributes of the directory to the values passed and calls
-// the driver's add_printer method to handle any configuration
-// needed.
-//
-// Parameters:
-//    printerName - Name of printer to create.
-//    driverName - Name of driver to use for this printer.
-//    connection - "Local" or "Network".
-//    transportName - Name of transport driver to use.
-//    transportPath  - Configuration data for transport driver.
-//
-// Returns:
-// ---------------------------------------------------------------
+/*!	Creates printer definition/spool directory. It sets the
+	attributes of the directory to the values passed and calls
+	the driver's add_printer method to handle any configuration
+	needed.
+
+	@param printerName Name of printer to create.
+	@param driverName Name of driver to use for this printer.
+	@param connection "Local" or "Network".
+	@param transportName Name of transport driver to use.
+	@param transportPath Configuration data for transport driver.
+*/
 status_t
 PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 	const char* connection, const char* transportName,
 	const char* transportPath)
 {
-	status_t rc;
-
 	// Find directory containing printer definitions
 	BPath path;
-	rc = ::find_directory(B_USER_PRINTERS_DIRECTORY,&path,true,NULL);
-	if (rc != B_OK)
-		return rc;
+	status_t status = find_directory(B_USER_PRINTERS_DIRECTORY, &path, true,
+		NULL);
+	if (status != B_OK)
+		return status;
 
 	// Create our printer definition/spool directory
 	BDirectory printersDir(path.Path());
 	BDirectory printer;
 
-	rc = printersDir.CreateDirectory(printerName, &printer);
-	if (rc == B_FILE_EXISTS) {
+	status = printersDir.CreateDirectory(printerName, &printer);
+	if (status == B_FILE_EXISTS) {
 		printer.SetTo(&printersDir, printerName);
 
 		BString info;
@@ -427,8 +397,8 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 				if (fDefaultPrinter) {
 					// the printer exists, but is not the default printer
 					if (strcmp(fDefaultPrinter->Name(), printerName) != 0)
-						rc = B_OK;
-					return rc;
+						status = B_OK;
+					return status;
 				}
 				// the printer exists, but no default at all
 				return B_OK;
@@ -448,10 +418,10 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 				B_TRANSLATE("Cancel"), B_TRANSLATE("OK"));
 			alert->SetShortcut(0, B_ESCAPE);
 			if (alert->Go() == 0)
-				return rc;
+				return status;
 		}
-	} else if (rc != B_OK) {
-		return rc;
+	} else if (status != B_OK) {
+		return status;
 	}
 
 	// Set its type to a printer
@@ -470,46 +440,38 @@ PrintServerApp::CreatePrinter(const char* printerName, const char* driverName,
 	printer.WriteAttr(PSRV_PRINTER_ATTR_CNX, B_STRING_TYPE, 0, connection,
 		::strlen(connection) + 1);
 
-	rc = Printer::ConfigurePrinter(driverName, printerName);
-	if (rc == B_OK) {
+	status = Printer::ConfigurePrinter(driverName, printerName);
+	if (status == B_OK) {
 		// Notify printer driver that a new printer definition node
 		// has been created.
 		printer.WriteAttr(PSRV_PRINTER_ATTR_STATE, B_STRING_TYPE, 0, "free",
 			::strlen("free")+1);
 	}
 
-	if (rc != B_OK) {
+	if (status != B_OK) {
 		BEntry entry;
 		if (printer.GetEntry(&entry) == B_OK)
 			entry.Remove();
 	}
 
-	return rc;
+	return status;
 }
 
 
-// ---------------------------------------------------------------
-// SelectPrinter(const char* printerName)
-//
-// Makes a new printer the active printer. This is done simply
-// by changing our class attribute fDefaultPrinter, and changing
-// the icon of the BNode for the printer. Ofcourse, we need to
-// change the icon of the "old" default printer first back to a
-// "non-active" printer icon first.
-//
-// Parameters:
-//		printerName - Name of the new active printer.
-//
-// Returns:
-//      B_OK on success, or error code otherwise.
-// ---------------------------------------------------------------
+/*!	Makes a new printer the active printer. This is done simply
+	by changing our class attribute fDefaultPrinter, and changing
+	the icon of the BNode for the printer. Ofcourse, we need to
+	change the icon of the "old" default printer first back to a
+	"non-active" printer icon first.
+
+	@param printerName Name of the new active printer.
+	@return B_OK on success, or error code otherwise.
+*/
 status_t
 PrintServerApp::SelectPrinter(const char* printerName)
 {
-	status_t rc;
-	BNode node;
-
 	// Find the node of the "old" default printer
+	BNode node;
 	if (fDefaultPrinter != NULL
 		&& FindPrinterNode(fDefaultPrinter->Name(), node) == B_OK) {
 		// and remove the custom icon
@@ -519,8 +481,8 @@ PrintServerApp::SelectPrinter(const char* printerName)
 	}
 
 	// Find the node for the new default printer
-	rc=FindPrinterNode(printerName, node);
-	if (rc == B_OK) {
+	status_t status = FindPrinterNode(printerName, node);
+	if (status == B_OK) {
 		// and add the custom icon
 		BNodeInfo info(&node);
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
@@ -536,16 +498,11 @@ PrintServerApp::SelectPrinter(const char* printerName)
 		// update our pref file
 	be_roster->Broadcast(new BMessage(B_PRINTER_CHANGED));
 
-	return rc;
+	return status;
 }
 
 
-// ---------------------------------------------------------------
-// HandleSpooledJobs()
-//
-// Handles calling the printer drivers for printing a spooled job.
-//
-// ---------------------------------------------------------------
+//! Handles calling the printer drivers for printing a spooled job.
 void
 PrintServerApp::HandleSpooledJobs()
 {
@@ -557,18 +514,11 @@ PrintServerApp::HandleSpooledJobs()
 }
 
 
-// ---------------------------------------------------------------
-// RetrieveDefaultPrinter()
-//
-// Loads the currently selected printer from a private settings
-// file.
-//
-// Parameters:
-//     none.
-//
-// Returns:
-//     Error code on failore, or B_OK if all went fine.
-// ---------------------------------------------------------------
+/*!	Loads the currently selected printer from a private settings
+	file.
+
+	@return Error code on failore, or B_OK if all went fine.
+*/
 status_t
 PrintServerApp::RetrieveDefaultPrinter()
 {
@@ -577,18 +527,11 @@ PrintServerApp::RetrieveDefaultPrinter()
 }
 
 
-// ---------------------------------------------------------------
-// StoreDefaultPrinter()
-//
-// Stores the currently selected printer in a private settings
-// file.
-//
-// Parameters:
-//     none.
-//
-// Returns:
-//     Error code on failore, or B_OK if all went fine.
-// ---------------------------------------------------------------
+/*!	Stores the currently selected printer in a private settings
+	file.
+
+	@return Error code on failore, or B_OK if all went fine.
+*/
 status_t
 PrintServerApp::StoreDefaultPrinter()
 {
@@ -600,27 +543,22 @@ PrintServerApp::StoreDefaultPrinter()
 }
 
 
-// ---------------------------------------------------------------
-// FindPrinterNode(const char* name, BNode& node)
-//
-// Find the BNode representing the specified printer. It searches
-// *only* in the users printer definitions.
-//
-// Parameters:
-//     name - Name of the printer to look for.
-//     node - BNode to set to the printer definition node.
-//
-// Returns:
-//     B_OK if found, an error code otherwise.
-// ---------------------------------------------------------------
+/*!	Find the BNode representing the specified printer. It searches
+	*only* in the users printer definitions.
+
+	@param name Name of the printer to look for.
+	@param node BNode to set to the printer definition node.
+	@return B_OK if found, an error code otherwise.
+*/
 status_t
 PrintServerApp::FindPrinterNode(const char* name, BNode& node)
 {
 	// Find directory containing printer definitions
 	BPath path;
-	status_t rc = ::find_directory(B_USER_PRINTERS_DIRECTORY, &path, true, NULL);
-	if (rc != B_OK)
-		return rc;
+	status_t status = find_directory(B_USER_PRINTERS_DIRECTORY, &path, true,
+		NULL);
+	if (status != B_OK)
+		return status;
 
 	path.Append(name);
 	return node.SetTo(path.Path());
@@ -628,8 +566,7 @@ PrintServerApp::FindPrinterNode(const char* name, BNode& node)
 
 
 bool 
-PrintServerApp::OpenSettings(BFile& file, const char* name,
-	bool forReading)
+PrintServerApp::OpenSettings(BFile& file, const char* name, bool forReading)
 {
 	BPath path;
 	uint32 openMode = forReading ? B_READ_ONLY : B_CREATE_FILE | B_ERASE_FILE
@@ -641,7 +578,8 @@ PrintServerApp::OpenSettings(BFile& file, const char* name,
 
 
 void 
-PrintServerApp::LoadSettings() {
+PrintServerApp::LoadSettings()
+{
 	BFile file;
 	if (OpenSettings(file, kSettingsName, true)) {
 		fSettings->Load(&file);
@@ -651,7 +589,8 @@ PrintServerApp::LoadSettings() {
 
 
 void 
-PrintServerApp::SaveSettings() {
+PrintServerApp::SaveSettings()
+{
 	BFile file;
 	if (OpenSettings(file, kSettingsName, false)) {
 		fSettings->SetUseConfigWindow(fUseConfigWindow);

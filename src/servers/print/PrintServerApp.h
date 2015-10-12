@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  */
 #ifndef _PRINT_SERVER_APP_H
 #define _PRINT_SERVER_APP_H
+
 
 #include <Application.h>
 #include <Bitmap.h>
@@ -19,81 +20,91 @@
 #include "ResourceManager.h"
 #include "Settings.h"
 
+
 class Printer;
 class Transport;
+
 
 // The global BLocker for synchronisation.
 extern BLocker *gLock;
 
+
 // The print_server application.
 class PrintServerApp : public BApplication, public FolderListener {
-	private:
+private:
 		typedef BApplication Inherited;
 
-	public:
-		PrintServerApp(status_t *err);
-		~PrintServerApp();
+public:
+								PrintServerApp(status_t* error);
+								~PrintServerApp();
 
-		void Acquire();
-		void Release();
+			void				Acquire();
+			void				Release();
 
-		bool QuitRequested();
-		void MessageReceived(BMessage *msg);
-		void NotifyPrinterDeletion(Printer *printer);
+	virtual	bool				QuitRequested();
+	virtual	void				MessageReceived(BMessage* msg);
+			void				NotifyPrinterDeletion(Printer* printer);
 
-		// Scripting support, see PrintServerApp.Scripting.cpp
-		status_t GetSupportedSuites(BMessage *msg);
-		void HandleScriptingCommand(BMessage *msg);
-		Printer *GetPrinterFromSpecifier(BMessage *msg);
-		Transport *GetTransportFromSpecifier(BMessage *msg);
-		BHandler *ResolveSpecifier(BMessage *msg, int32 index, BMessage *spec,
-			int32 form, const char *prop);
-	private:
-		bool OpenSettings(BFile &file, const char *name, bool forReading);
-		void LoadSettings();
-		void SaveSettings();
+	// Scripting support, see PrintServerApp.Scripting.cpp
+	virtual	status_t			GetSupportedSuites(BMessage* msg);
+			void				HandleScriptingCommand(BMessage* msg);
+			Printer*			GetPrinterFromSpecifier(BMessage* msg);
+			Transport*			GetTransportFromSpecifier(BMessage* msg);
+	virtual	BHandler*			ResolveSpecifier(BMessage* msg, int32 index,
+									BMessage* specifier, int32 form,
+									const char* property);
 
-		status_t SetupPrinterList();
+private:
+			bool				OpenSettings(BFile& file, const char* name,
+									bool forReading);
+			void				LoadSettings();
+			void				SaveSettings();
 
-		void HandleSpooledJobs();
+			status_t			SetupPrinterList();
 
-		status_t SelectPrinter(const char *printerName);
-		status_t CreatePrinter(const char *printerName, const char *driverName,
-			const char *connection, const char *transportName,
-			const char *transportPath);
+			void				HandleSpooledJobs();
 
-		void RegisterPrinter(BDirectory *node);
-		void UnregisterPrinter(Printer *printer);
+			status_t			SelectPrinter(const char* printerName);
+			status_t			CreatePrinter(const char* printerName,
+									const char* driverName,
+									const char* connection,
+									const char* transportName,
+									const char* transportPath);
 
-		// FolderListener
-		void EntryCreated(node_ref *node, entry_ref *entry);
-		void EntryRemoved(node_ref *node);
-		void AttributeChanged(node_ref *node);
+			void				RegisterPrinter(BDirectory* node);
+			void				UnregisterPrinter(Printer* printer);
 
-		status_t StoreDefaultPrinter();
-		status_t RetrieveDefaultPrinter();
+	// FolderListener
+			void				EntryCreated(node_ref* node, entry_ref* entry);
+			void				EntryRemoved(node_ref* node);
+			void				AttributeChanged(node_ref* node);
 
-		status_t FindPrinterNode(const char *name, BNode &node);
+			status_t			StoreDefaultPrinter();
+			status_t			RetrieveDefaultPrinter();
+
+			status_t			FindPrinterNode(const char* name, BNode& node);
 
 		// "Classic" BeOS R5 support, see PrintServerApp.R5.cpp
-		static status_t async_thread(void *data);
-		void AsyncHandleMessage(BMessage *msg);
-		void Handle_BeOSR5_Message(BMessage *msg);
+	static	status_t			async_thread(void* data);
+			void				AsyncHandleMessage(BMessage* msg);
+			void				Handle_BeOSR5_Message(BMessage* msg);
 
-		ResourceManager fResourceManager;
-		Printer *fDefaultPrinter;
+private:
+			ResourceManager		fResourceManager;
+			Printer*			fDefaultPrinter;
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
-		size_t fIconSize;
-		uint8 *fSelectedIcon;
+			size_t				fIconSize;
+			uint8*				fSelectedIcon;
 #else
-		BBitmap *fSelectedIconMini;
-		BBitmap *fSelectedIconLarge;
+			BBitmap*			fSelectedIconMini;
+			BBitmap*			fSelectedIconLarge;
 #endif
-		int32 fReferences;
-		sem_id fHasReferences;
-		Settings *fSettings;
-		bool fUseConfigWindow;
-		FolderWatcher *fFolder;
+			int32				fReferences;
+			sem_id				fHasReferences;
+			Settings*			fSettings;
+			bool				fUseConfigWindow;
+			FolderWatcher*		fFolder;
 };
 
-#endif
+
+#endif	// _PRINT_SERVER_APP_H
