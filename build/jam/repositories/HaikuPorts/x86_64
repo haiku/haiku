@@ -64,25 +64,26 @@ RemotePackageRepository HaikuPorts
 	clipdinger-0.4-1
 	cmake-3.3.1-1
 	coreutils-8.24-1
+	cpio-2.12-1
 	cppunit-1.12.1-2
 	cppunit_devel-1.12.1-2
 	ctags-5.8-3
-	curl-7.44.0-1
-	curl_devel-7.44.0-1
+	curl-7.45.0-1
+	curl_devel-7.45.0-1
 	cvs-1.12.13.1-7
 	cvsps-2.2b1-1
 	dbus-1.8.6-1
 	dbus_devel-1.8.6-1
 	diffutils-3.3-2
-	dos2unix-7.2.2-1
+	dos2unix-7.3.1-1
 	doxygen-1.6.3-4
 	dtc-1.4.1-1
 	enca-1.15-1
 	enca_devel-1.15-1
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
-	file-5.15-1
-	file_devel-5.15-1
+	file-5.25-1
+	file_devel-5.25-1
 	findutils-4.4.2-1
 	ffmpeg-0.11.5-2
 	ffmpeg_devel-0.11.5-2
@@ -95,16 +96,16 @@ RemotePackageRepository HaikuPorts
 	fontconfig_devel-2.11.1-3
 	fossil-1.33-1
 	freeciv-2.5.1-1
-	freetype-2.6-2
-	freetype_devel-2.6-2
+	freetype-2.6.1-1
+	freetype_devel-2.6.1-1
 	fribidi-0.19.6-2
 	fribidi_devel-0.19.6-2
 	gawk-4.1.0-2
 	gcc-4.8.5_2015_07_11-1
 	gcc_syslibs-4.8.5_2015_07_11-1
 	gcc_syslibs_devel-4.8.5_2015_07_11-1
-	gettext-0.19.4-1
-	gettext_libintl-0.19.4-1
+	gettext-0.19.6-1
+	gettext_libintl-0.19.6-1
 	giflib-5.1.0-1
 	giflib_devel-5.1.0-1
 	git-2.2.2-1
@@ -113,9 +114,9 @@ RemotePackageRepository HaikuPorts
 	git_daemon-2.2.2-1
 	git_email-2.2.2-1
 	git_svn-2.2.2-1
-	glew-1.11.0-1
-	glew_devel-1.11.0-1
-	glew_util-1.11.0-1
+	glew-1.13.0-1
+	glew_devel-1.13.0-1
+	glew_util-1.13.0-1
 	glib2-2.38.1-5
 	glib2_devel-2.38.1-5
 	glu-9.0.0-3
@@ -137,8 +138,8 @@ RemotePackageRepository HaikuPorts
 	haikuwebkit-1.4.12-1
 	haikuwebkit_devel-1.4.12-1
 	handbrake-0.10.1-1
-	harfbuzz-0.9.40-1
-	harfbuzz_devel-0.9.40-1
+	harfbuzz-1.0.0-1
+	harfbuzz_devel-1.0.0-1
 	help2man-1.46.6-1
 	htmldoc-1.8.27-3
 	icu-55.1-5
@@ -161,8 +162,8 @@ RemotePackageRepository HaikuPorts
 	less-458-1
 	libasr-1.0.2-1
 	libasr_devel-1.0.2-1
-	libass-0.12.2-1
-	libass_devel-0.12.2-1
+	libass-0.13.0-1
+	libass_devel-0.13.0-1
 	libassuan-2.2.0-1
 	libassuan_devel-2.2.0-1
 	libbluray-0.8.1-1
@@ -187,6 +188,8 @@ RemotePackageRepository HaikuPorts
 	libicns_devel-0.8.1-1
 	libiconv-1.13.1-6
 	libiconv_devel-1.13.1-6
+	libidn-1.32-1
+	libidn_devel-1.32-1
 	libmad-0.15.1b-2
 	libmad_devel-0.15.1b-2
 	libmikmod-3.3.7-1
@@ -224,6 +227,8 @@ RemotePackageRepository HaikuPorts
 	libssh2_devel-1.5.0-1
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
+	libtasn1-4.7-1
+	libtasn1_devel-4.7-1
 	libtheora-1.1.1-2
 	libtheora_devel-1.1.1-2
 	libtool-2.4.2-1
@@ -252,7 +257,7 @@ RemotePackageRepository HaikuPorts
 	lz4_devel-r131-1
 	lzo-2.09-1
 	lzo_devel-2.09-1
-	m4-1.4.16-5
+	m4-1.4.17-1
 	make-3.82-5
 	man-1.6g-4
 	mercurial-2.9.2-1
@@ -280,7 +285,7 @@ RemotePackageRepository HaikuPorts
 	ninja-1.5.1-2
 	nspr-4.10.8-1
 	nspr_devel-4.10.8-1
-	openssh-6.9p1-1
+	openssh-7.1p1-1
 	openssl-1.0.0s-2
 	openssl_devel-1.0.0s-2
 	p7zip-9.20.1-5
@@ -320,6 +325,8 @@ RemotePackageRepository HaikuPorts
 	sharutils-4.15.2-1
 	smpeg-0.4.5-4
 	smpeg_devel-0.4.5-4
+	snappy-1.1.3-1
+	snappy_devel-1.1.3-1
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
 	sqlite-3.8.11.1-1
@@ -336,7 +343,7 @@ RemotePackageRepository HaikuPorts
 	tinyxml-2.6.2-1
 	tinyxml_devel-2.6.2-1
 	transmission-2.84-3
-	unrar-5.3.2-1
+	unrar-5.3.4-1
 	unzip-6.0-2
 	vim-7.4-2
 	vision-0.9.7.r949-3
@@ -346,8 +353,8 @@ RemotePackageRepository HaikuPorts
 	xml_parser-2.36-1
 	x264-20140308-1
 	x264_devel-20140308-1
-	xz_utils-5.0.8-2
-	xz_utils_devel-5.0.8-2
+	xz_utils-5.2.2-1
+	xz_utils_devel-5.2.2-1
 	yasm-1.3.0-1
 	zip-3.0-2
 	zlib-1.2.8-4
@@ -371,6 +378,7 @@ RemotePackageRepository HaikuPorts
 	clipdinger
 	cmake
 	coreutils
+	cpio
 	cppunit
 	ctags
 	curl
@@ -440,6 +448,7 @@ RemotePackageRepository HaikuPorts
 	libgpg_error
 	libicns
 	libiconv
+	libidn
 	libmad
 	libmikmod
 	libmkv
@@ -458,6 +467,7 @@ RemotePackageRepository HaikuPorts
 	libsndfile
 	libssh2
 	libsolv
+	libtasn1
 	libtheora
 	libtool
 	libvorbis
@@ -516,6 +526,7 @@ RemotePackageRepository HaikuPorts
 	serf
 	sharutils
 	smpeg
+	snappy
 	speex
 	sqlite
 	subversion
