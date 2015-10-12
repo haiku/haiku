@@ -62,7 +62,7 @@ RemotePackageRepository HaikuPorts
 	clang-3.5.1-1
 	clang_analysis-3.5.1-1
 	clipdinger-0.4-1
-	cmake-3.3.1-1
+	cmake-3.3.2-1
 	coreutils-8.24-1
 	cpio-2.12-1
 	cppunit-1.12.1-2
@@ -235,8 +235,8 @@ RemotePackageRepository HaikuPorts
 	libtool_libltdl-2.4.2-1
 	libunistring-0.9.6-1
 	libunistring_devel-0.9.6-1
-	libusb-1.0.19-2
-	libusb_devel-1.0.19-2
+	libusb-1.0.20-1
+	libusb_devel-1.0.20-1
 	libusb_compat-0.1.5-2
 	libusb_compat_devel-0.1.5-2
 	libvorbis-1.3.5-2
