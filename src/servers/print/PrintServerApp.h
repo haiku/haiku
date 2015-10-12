@@ -92,13 +92,8 @@ private:
 private:
 			ResourceManager		fResourceManager;
 			Printer*			fDefaultPrinter;
-#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 			size_t				fIconSize;
 			uint8*				fSelectedIcon;
-#else
-			BBitmap*			fSelectedIconMini;
-			BBitmap*			fSelectedIconLarge;
-#endif
 			int32				fReferences;
 			sem_id				fHasReferences;
 			Settings*			fSettings;
