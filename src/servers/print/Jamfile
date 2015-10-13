@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src servers print ;
 
-UsePrivateHeaders shared print ;
+UsePrivateHeaders app shared print ;
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers libs print libprint ] ;
 
 AddResources print_server :

@@ -10,10 +10,10 @@
 #define _PRINT_SERVER_APP_H
 
 
-#include <Application.h>
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <OS.h>
+#include <Server.h>
 #include <String.h>
 
 #include "FolderWatcher.h"
@@ -30,9 +30,9 @@ extern BLocker *gLock;
 
 
 // The print_server application.
-class PrintServerApp : public BApplication, public FolderListener {
+class PrintServerApp : public BServer, public FolderListener {
 private:
-		typedef BApplication Inherited;
+		typedef BServer Inherited;
 
 public:
 								PrintServerApp(status_t* error);
