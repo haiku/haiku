@@ -52,7 +52,7 @@ class Events {
 public:
 	static	Event*			FromMessage(const BMessenger& target,
 								const BMessage& message);
-	static	Event*			AddOnDemand(Event* event);
+	static	Event*			AddOnDemand(const BMessenger& target, Event* event);
 	static	bool			ResolveRegisteredEvent(Event* event,
 								const char* name);
 	static	void			TriggerRegisteredEvent(Event* event,

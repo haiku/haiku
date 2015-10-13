@@ -53,6 +53,12 @@ static const char* kLaunchDirectory = "launch";
 static const char* kUserLaunchDirectory = "user_launch";
 
 
+enum launch_options {
+	FORCE_NOW		= 0x01,
+	TRIGGER_DEMAND	= 0x02
+};
+
+
 class Session {
 public:
 								Session(uid_t user, const BMessenger& target);
@@ -138,7 +144,7 @@ private:
 			void				_InitJobs(Target* target);
 			void				_LaunchJobs(Target* target,
 									bool forceNow = false);
-			void				_LaunchJob(Job* job, bool forceNow = false);
+			void				_LaunchJob(Job* job, uint32 options = 0);
 			void				_AddTarget(Target* target);
 			void				_SetCondition(BaseJob* job,
 									const BMessage& message);
@@ -490,7 +496,7 @@ LaunchDaemon::_HandleGetLaunchData(BMessage* message)
 	if (reply.what == B_OK) {
 		// Launch the job if it hasn't been launched already
 		if (launchJob)
-			_LaunchJob(job);
+			_LaunchJob(job, TRIGGER_DEMAND);
 
 		DetachCurrentMessage();
 		status_t result = job->HandleGetLaunchData(message);
@@ -1021,19 +1027,23 @@ LaunchDaemon::_LaunchJobs(Target* target, bool forceNow)
 	Calling this method will trigger a demand event.
 */
 void
-LaunchDaemon::_LaunchJob(Job* job, bool forceNow)
+LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 {
-	if (job == NULL || job->IsLaunched() || (!forceNow
+	if (job == NULL || job->IsLaunched() || ((options & FORCE_NOW) == 0
 		&& (!job->EventHasTriggered() || !job->CheckCondition(*this)
-			|| Events::TriggerDemand(job->Event())))) {
+			|| ((options & TRIGGER_DEMAND) != 0
+					&& Events::TriggerDemand(job->Event()))))) {
 		return;
 	}
 
 	int32 count = job->Requirements().CountStrings();
 	for (int32 index = 0; index < count; index++) {
 		Job* requirement = FindJob(job->Requirements().StringAt(index));
-		if (requirement != NULL)
-			_LaunchJob(requirement);
+		if (requirement != NULL) {
+			// TODO: For jobs that have their communication channels set up,
+			// we would not need to trigger demand at this point
+			_LaunchJob(requirement, TRIGGER_DEMAND);
+		}
 	}
 
 	if (job->Target() != NULL)
@@ -1087,7 +1097,7 @@ LaunchDaemon::_SetEvent(BaseJob* job, const BMessage& message)
 	}
 
 	if (message.GetBool("on_demand")) {
-		event = Events::AddOnDemand(event);
+		event = Events::AddOnDemand(this, event);
 		updated = true;
 	}
 
