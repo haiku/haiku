@@ -50,13 +50,14 @@ private:
 	void		ResetDevice();
 	status_t	SoftReset();
 	status_t	PortReset();
-	status_t	PostReset();
+	status_t	Probe();
 
 	bool		Enable();
 	bool		Disable();
 
 	void		FlushPostedWrites();
 	void		DumpD2HFis();
+	void		DumpHBAState();
 
 	void		StartTransfer();
 	status_t	WaitForTransfer(int *tfd, bigtime_t timeout);

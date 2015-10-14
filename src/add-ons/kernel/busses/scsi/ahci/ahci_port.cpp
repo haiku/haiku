@@ -160,16 +160,7 @@ AHCIPort::Init2()
 	// reset port and probe info
 	SoftReset();
 
-	TRACE("ie   0x%08" B_PRIx32 "\n", fRegs->ie);
-	TRACE("is   0x%08" B_PRIx32 "\n", fRegs->is);
-	TRACE("cmd  0x%08" B_PRIx32 "\n", fRegs->cmd);
-	TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
-	TRACE("sctl.ipm 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_IPM_MASK);
-	TRACE("sctl.spd 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_SPD_MASK);
-	TRACE("sctl.det 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_DET_MASK);
-	TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
-	TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
-	TRACE("tfd  0x%08" B_PRIx32 "\n", fRegs->tfd);
+	DumpHBAState();
 
 	TRACE("%s: port %d, device %s\n", __func__, fIndex,
 		fDevicePresent ? "present" : "absent");
@@ -305,7 +296,7 @@ AHCIPort::SoftReset()
 	return PortReset();
 	#endif
 
-	return PostReset();
+	return Probe();
 }
 
 
@@ -337,18 +328,18 @@ AHCIPort::PortReset()
 
 	Enable();
 
-	return PostReset();
+	return Probe();
 }
 
 
 status_t
-AHCIPort::PostReset()
+AHCIPort::Probe()
 {
 	if ((fRegs->tfd & 0xff) == 0xff)
 		snooze(200000);
 
 	if ((fRegs->tfd & 0xff) == 0xff) {
-		TRACE("AHCIPort::PostReset port %d: invalid task file status 0xff\n",
+		TRACE("%s: port %d: invalid task file status 0xff\n", __func__,
 			fIndex);
 		return B_ERROR;
 	}
@@ -409,6 +400,21 @@ AHCIPort::DumpD2HFis()
 
 
 void
+AHCIPort::DumpHBAState()
+{
+	TRACE("Port %d state:\n", fIndex);
+	TRACE("  ie   0x%08" B_PRIx32 "\n", fRegs->ie);
+	TRACE("  is   0x%08" B_PRIx32 "\n", fRegs->is);
+	TRACE("  cmd  0x%08" B_PRIx32 "\n", fRegs->cmd);
+	TRACE("  ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
+	TRACE("  sctl 0x%08" B_PRIx32 "\n", fRegs->sctl);
+	TRACE("  serr 0x%08" B_PRIx32 "\n", fRegs->serr);
+	TRACE("  sact 0x%08" B_PRIx32 "\n", fRegs->sact);
+	TRACE("  tfd  0x%08" B_PRIx32 "\n", fRegs->tfd);
+}
+
+
+void
 AHCIPort::Interrupt()
 {
 	uint32 is = fRegs->is;
@@ -444,9 +450,7 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 			B_PRIx32 ", is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n", fIndex,
 			fCommandsActive, is, ci);
 		TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
-		TRACE("sctl.ipm 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_IPM_MASK);
-		TRACE("sctl.spd 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_SPD_MASK);
-		TRACE("sctl.det 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_DET_MASK);
+		TRACE("sctl 0x%08" B_PRIx32 "\n", fRegs->sctl);
 		TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
 		TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
 	}
@@ -1157,11 +1161,12 @@ AHCIPort::ExecuteSataRequest(sata_request* request, bool isWrite)
 	int tfd;
 	status_t status = WaitForTransfer(&tfd, 20000000);
 
-	FLOW("tfd %#x\n", tfd);
-	FLOW("prdbc %ld\n", fCommandList->prdbc);
-	FLOW("ci   0x%08" B_PRIx32 "\n", fRegs->ci);
-	FLOW("is   0x%08" B_PRIx32 "\n", fRegs->is);
-	FLOW("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
+	FLOW("Port %d sata request flow:\n", fIndex);
+	FLOW("  tfd %#x\n", tfd);
+	FLOW("  prdbc %ld\n", fCommandList->prdbc);
+	FLOW("  ci   0x%08" B_PRIx32 "\n", fRegs->ci);
+	FLOW("  is   0x%08" B_PRIx32 "\n", fRegs->is);
+	FLOW("  serr 0x%08" B_PRIx32 "\n", fRegs->serr);
 
 /*
 	TRACE("ci   0x%08" B_PRIx32 "\n", fRegs->ci);
