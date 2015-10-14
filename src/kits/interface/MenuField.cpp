@@ -1068,16 +1068,30 @@ BMenuField::_DrawLabel(BRect updateRect)
 		rect = Bounds();
 		rect.right = fDivider;
 	}
+
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
 
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	uint32 flags = 0;
 	if (!IsEnabled())
 		flags |= BControlLook::B_DISABLED;
 
-	be_control_look->DrawLabel(this, label, rect, updateRect, base, flags,
+	// save the current low color
+	const rgb_color lowColor = LowColor();
+
+	MenuPrivate menuPrivate(fMenuBar);
+	if (menuPrivate.State() != MENU_STATE_CLOSED) {
+		// highlight the background of the label grey (like BeOS R5)
+		SetLowColor(ui_color(B_MENU_SELECTED_BACKGROUND_COLOR));
+		BRect fillRect(rect.InsetByCopy(0, kVMargin));
+		FillRect(fillRect, B_SOLID_LOW);
+	}
+
+	be_control_look->DrawLabel(this, label, rect, updateRect, LowColor(), flags,
 		BAlignment(fAlign, B_ALIGN_MIDDLE));
+
+	// restore the previous low color
+	SetLowColor(lowColor);
 }
 
 
