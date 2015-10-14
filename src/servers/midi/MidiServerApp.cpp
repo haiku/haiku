@@ -1,43 +1,48 @@
 /*
  * Copyright (c) 2002-2004 Matthijs Hollemans
- * 
- * Permission is hereby granted, free of charge, to any person obtaining a 
- * copy of this software and associated documentation files (the "Software"), 
- * to deal in the Software without restriction, including without limitation 
- * the rights to use, copy, modify, merge, publish, distribute, sublicense, 
- * and/or sell copies of the Software, and to permit persons to whom the 
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
  * Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in 
+ *
+ * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
 
-#include "debug.h"
-#include "MidiServerApp.h"
-#include "PortDrivers.h"
-#include "ServerDefs.h"
-#include "protocol.h"
 
-#include <Alert.h>
+#include "MidiServerApp.h"
 
 #include <new>
 
+#include <Alert.h>
+
+#include "debug.h"
+#include "protocol.h"
+#include "PortDrivers.h"
+#include "ServerDefs.h"
+
+
 using std::nothrow;
 
+
 MidiServerApp::MidiServerApp()
-	: BApplication(MIDI_SERVER_SIGNATURE)
+	:
+	BApplication(MIDI_SERVER_SIGNATURE)
 {
 	TRACE(("Running Haiku MIDI server"))
 
-	nextId = 1;
+	fNextID = 1;
 	fDeviceWatcher = new(std::nothrow) DeviceWatcher();
 	if (fDeviceWatcher != NULL)
 		fDeviceWatcher->Run();
@@ -49,12 +54,12 @@ MidiServerApp::~MidiServerApp()
 	if (fDeviceWatcher && fDeviceWatcher->Lock())
 		fDeviceWatcher->Quit();
 
-	for (int32 t = 0; t < CountApps(); ++t) {
-		delete AppAt(t);
+	for (int32 t = 0; t < _CountApps(); ++t) {
+		delete _AppAt(t);
 	}
 
-	for (int32 t = 0; t < CountEndpoints(); ++t) {
-		delete EndpointAt(t);
+	for (int32 t = 0; t < _CountEndpoints(); ++t) {
+		delete _EndpointAt(t);
 	}
 }
 
@@ -67,7 +72,7 @@ MidiServerApp::AboutRequested()
 		"notes disguised as bytes\n"
 		"propagating to endpoints,\n"
 		"an aural delight",
-		"OK", 0, 0, B_WIDTH_AS_USUAL, 
+		"OK", 0, 0, B_WIDTH_AS_USUAL,
 		B_INFO_ALERT);
 	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 	alert->Go();
@@ -77,53 +82,65 @@ MidiServerApp::AboutRequested()
 void
 MidiServerApp::MessageReceived(BMessage* msg)
 {
-	#ifdef DEBUG
+#ifdef DEBUG
 	printf("IN "); msg->PrintToStream();
-	#endif
+#endif
 
 	switch (msg->what) {
-		case MSG_REGISTER_APP:         OnRegisterApp(msg);       break;
-		case MSG_CREATE_ENDPOINT:      OnCreateEndpoint(msg);    break;
-		case MSG_DELETE_ENDPOINT:      OnDeleteEndpoint(msg);    break;
-		case MSG_PURGE_ENDPOINT:       OnPurgeEndpoint(msg);     break;
-		case MSG_CHANGE_ENDPOINT:      OnChangeEndpoint(msg);    break;
-		case MSG_CONNECT_ENDPOINTS:    OnConnectDisconnect(msg); break;
-		case MSG_DISCONNECT_ENDPOINTS: OnConnectDisconnect(msg); break;
+		case MSG_REGISTER_APP:
+			_OnRegisterApp(msg);
+			break;
+		case MSG_CREATE_ENDPOINT:
+			_OnCreateEndpoint(msg);
+			break;
+		case MSG_DELETE_ENDPOINT:
+			_OnDeleteEndpoint(msg);
+			break;
+		case MSG_PURGE_ENDPOINT:
+			_OnPurgeEndpoint(msg);
+			break;
+		case MSG_CHANGE_ENDPOINT:
+			_OnChangeEndpoint(msg);
+			break;
+		case MSG_CONNECT_ENDPOINTS:
+			_OnConnectDisconnect(msg);
+			break;
+		case MSG_DISCONNECT_ENDPOINTS:
+			_OnConnectDisconnect(msg);
+			break;
 
-		default: super::MessageReceived(msg); break;
+		default:
+			super::MessageReceived(msg);
+			break;
 	}
 }
 
 
 void
-MidiServerApp::OnRegisterApp(BMessage* msg)
+MidiServerApp::_OnRegisterApp(BMessage* msg)
 {
-	TRACE(("MidiServerApp::OnRegisterApp"))
+	TRACE(("MidiServerApp::_OnRegisterApp"))
 
-	// We only send the "app registered" message upon success, 
-	// so if anything goes wrong here, we do not let the app 
+	// We only send the "app registered" message upon success,
+	// so if anything goes wrong here, we do not let the app
 	// know about it, and we consider it unregistered. (Most
-	// likely, the app is dead. If not, it freezes forever 
+	// likely, the app is dead. If not, it freezes forever
 	// in anticipation of a message that will never arrive.)
 
 	app_t* app = new app_t;
 
-	if (msg->FindMessenger("midi:messenger", &app->messenger) == B_OK) {
-		if (SendAllEndpoints(app)) {
-			if (SendAllConnections(app)) {
-				BMessage reply;
-				reply.what = MSG_APP_REGISTERED;
+	if (msg->FindMessenger("midi:messenger", &app->messenger) == B_OK
+		&& _SendAllEndpoints(app)
+		&& _SendAllConnections(app)) {
+		BMessage reply;
+		reply.what = MSG_APP_REGISTERED;
 
-				if (SendNotification(app, &reply)) {
-					apps.AddItem(app);
-
-					#ifdef DEBUG
-					DumpApps();
-					#endif
-
-					return;
-				}
-			}
+		if (_SendNotification(app, &reply)) {
+			fApps.AddItem(app);
+#ifdef DEBUG
+			_DumpApps();
+#endif
+			return;
 		}
 	}
 
@@ -132,229 +149,235 @@ MidiServerApp::OnRegisterApp(BMessage* msg)
 
 
 void
-MidiServerApp::OnCreateEndpoint(BMessage* msg)
+MidiServerApp::_OnCreateEndpoint(BMessage* msg)
 {
-	TRACE(("MidiServerApp::OnCreateEndpoint"))
+	TRACE(("MidiServerApp::_OnCreateEndpoint"))
 
-	status_t err;
-	endpoint_t* endp = new endpoint_t;
+	status_t status;
+	endpoint_t* endpoint = new endpoint_t;
 
-	endp->app = WhichApp(msg);
-	if (endp->app == NULL) {
-		err = B_ERROR;
+	endpoint->app = _WhichApp(msg);
+	if (endpoint->app == NULL) {
+		status = B_ERROR;
 	} else {
-		err = B_BAD_VALUE;
+		status = B_BAD_VALUE;
 
-		if (msg->FindBool("midi:consumer", &endp->consumer) == B_OK
-			&& msg->FindBool("midi:registered", &endp->registered) == B_OK
-			&& msg->FindString("midi:name", &endp->name) == B_OK
-			&& msg->FindMessage("midi:properties", &endp->properties) == B_OK) {
-			if (endp->consumer) {
-				if (msg->FindInt32("midi:port", &endp->port) == B_OK
-					&& msg->FindInt64("midi:latency", &endp->latency) == B_OK)
-					err = B_OK;
+		if (msg->FindBool("midi:consumer", &endpoint->consumer) == B_OK
+			&& msg->FindBool("midi:registered", &endpoint->registered) == B_OK
+			&& msg->FindString("midi:name", &endpoint->name) == B_OK
+			&& msg->FindMessage("midi:properties", &endpoint->properties)
+					== B_OK) {
+			if (endpoint->consumer) {
+				if (msg->FindInt32("midi:port", &endpoint->port) == B_OK
+					&& msg->FindInt64("midi:latency", &endpoint->latency)
+							== B_OK)
+					status = B_OK;
 			} else
-				err = B_OK;
+				status = B_OK;
 		}
 	}
 
 	BMessage reply;
 
-	if (err == B_OK) {
-		endp->id = nextId++;
-		reply.AddInt32("midi:id", endp->id);
+	if (status == B_OK) {
+		endpoint->id = fNextID++;
+		reply.AddInt32("midi:id", endpoint->id);
 	}
 
-	reply.AddInt32("midi:result", err);
+	reply.AddInt32("midi:result", status);
 
-	if (SendReply(endp->app, msg, &reply) && err == B_OK)
-		AddEndpoint(msg, endp);
+	if (_SendReply(endpoint->app, msg, &reply) && status == B_OK)
+		_AddEndpoint(msg, endpoint);
 	else
-		delete endp;
+		delete endpoint;
 }
 
 
 void
-MidiServerApp::OnDeleteEndpoint(BMessage* msg)
+MidiServerApp::_OnDeleteEndpoint(BMessage* msg)
 {
-	TRACE(("MidiServerApp::OnDeleteEndpoint"))
+	TRACE(("MidiServerApp::_OnDeleteEndpoint"))
 
-	// Clients send the "delete endpoint" message from 
-	// the BMidiEndpoint destructor, so there is no point 
-	// sending a reply, because the endpoint object will 
+	// Clients send the "delete endpoint" message from
+	// the BMidiEndpoint destructor, so there is no point
+	// sending a reply, because the endpoint object will
 	// be destroyed no matter what.
 
-	app_t* app = WhichApp(msg);
+	app_t* app = _WhichApp(msg);
 	if (app != NULL) {
-		endpoint_t* endp = WhichEndpoint(msg, app);
-		if (endp != NULL)
-			RemoveEndpoint(app, endp);
+		endpoint_t* endpoint = _WhichEndpoint(msg, app);
+		if (endpoint != NULL)
+			_RemoveEndpoint(app, endpoint);
 	}
 }
 
 
 void
-MidiServerApp::OnPurgeEndpoint(BMessage* msg)
+MidiServerApp::_OnPurgeEndpoint(BMessage* msg)
 {
-	TRACE(("MidiServerApp::OnPurgeEndpoint"))
+	TRACE(("MidiServerApp::_OnPurgeEndpoint"))
 
 	// This performs the same task as OnDeleteEndpoint(),
 	// except that this message was send by the midi_server
-	// itself, so we don't check that the app that made the 
+	// itself, so we don't check that the app that made the
 	// request really is the owner of the endpoint. (But we
 	// _do_ check that the message came from the server.)
 
 	if (!msg->IsSourceRemote()) {
 		int32 id;
 		if (msg->FindInt32("midi:id", &id) == B_OK) {
-			endpoint_t* endp = FindEndpoint(id);
-			if (endp != NULL)
-				RemoveEndpoint(NULL, endp);
+			endpoint_t* endpoint = _FindEndpoint(id);
+			if (endpoint != NULL)
+				_RemoveEndpoint(NULL, endpoint);
 		}
 	}
 }
 
 
 void
-MidiServerApp::OnChangeEndpoint(BMessage* msg)
+MidiServerApp::_OnChangeEndpoint(BMessage* msg)
 {
-	TRACE(("MidiServerApp::OnChangeEndpoint"))
+	TRACE(("MidiServerApp::_OnChangeEndpoint"))
 
-	endpoint_t* endp = NULL;
-	status_t err;
+	endpoint_t* endpoint = NULL;
+	status_t status;
 
-	app_t* app = WhichApp(msg);
-	if (app == NULL) 
-		err = B_ERROR; 
+	app_t* app = _WhichApp(msg);
+	if (app == NULL)
+		status = B_ERROR;
 	else {
-		endp = WhichEndpoint(msg, app);
-		if (endp == NULL) 
-			err = B_BAD_VALUE; 
+		endpoint = _WhichEndpoint(msg, app);
+		if (endpoint == NULL)
+			status = B_BAD_VALUE;
 		else
-			err = B_OK;
+			status = B_OK;
 	}
 
 	BMessage reply;
-	reply.AddInt32("midi:result", err);
+	reply.AddInt32("midi:result", status);
 
-	if (SendReply(app, msg, &reply) && err == B_OK) {
-		TRACE(("Endpoint %" B_PRId32 " (%p) changed", endp->id, endp))
+	if (_SendReply(app, msg, &reply) && status == B_OK) {
+		TRACE(("Endpoint %" B_PRId32 " (%p) changed", endpoint->id, endpoint))
 
 		BMessage notify;
 		notify.what = MSG_ENDPOINT_CHANGED;
-		notify.AddInt32("midi:id", endp->id);
+		notify.AddInt32("midi:id", endpoint->id);
 
 		bool registered;
 		if (msg->FindBool("midi:registered", &registered) == B_OK) {
 			notify.AddBool("midi:registered", registered);
-			endp->registered = registered;
+			endpoint->registered = registered;
 		}
 
 		BString name;
 		if (msg->FindString("midi:name", &name) == B_OK) {
 			notify.AddString("midi:name", name);
-			endp->name = name;
+			endpoint->name = name;
 		}
 
 		BMessage properties;
 		if (msg->FindMessage("midi:properties", &properties) == B_OK) {
 			notify.AddMessage("midi:properties", &properties);
-			endp->properties = properties;
+			endpoint->properties = properties;
 		}
 
 		bigtime_t latency;
 		if (msg->FindInt64("midi:latency", &latency) == B_OK) {
 			notify.AddInt64("midi:latency", latency);
-			endp->latency = latency;
+			endpoint->latency = latency;
 		}
 
-		NotifyAll(&notify, app);
+		_NotifyAll(&notify, app);
 
-		#ifdef DEBUG
-		DumpEndpoints();
-		#endif
+#ifdef DEBUG
+		_DumpEndpoints();
+#endif
 	}
 }
 
 
 void
-MidiServerApp::OnConnectDisconnect(BMessage* msg)
+MidiServerApp::_OnConnectDisconnect(BMessage* msg)
 {
-	TRACE(("MidiServerApp::OnConnectDisconnect"))
+	TRACE(("MidiServerApp::_OnConnectDisconnect"))
 
-	bool mustConnect = (msg->what == MSG_CONNECT_ENDPOINTS);
+	bool mustConnect = msg->what == MSG_CONNECT_ENDPOINTS;
 
-	status_t err;
-	endpoint_t* prod = NULL;
-	endpoint_t* cons = NULL;
+	status_t status;
+	endpoint_t* producer = NULL;
+	endpoint_t* consumer = NULL;
 
-	app_t* app = WhichApp(msg);
-	if (app == NULL) 
-		err = B_ERROR; 
+	app_t* app = _WhichApp(msg);
+	if (app == NULL)
+		status = B_ERROR;
 	else {
-		err = B_BAD_VALUE;
+		status = B_BAD_VALUE;
 
-		int32 prodId, consId;
-		if (msg->FindInt32("midi:producer", &prodId) == B_OK
-			&& msg->FindInt32("midi:consumer", &consId) == B_OK) {
-			prod = FindEndpoint(prodId);
-			cons = FindEndpoint(consId);
+		int32 producerID;
+		int32 consumerID;
+		if (msg->FindInt32("midi:producer", &producerID) == B_OK
+			&& msg->FindInt32("midi:consumer", &consumerID) == B_OK) {
+			producer = _FindEndpoint(producerID);
+			consumer = _FindEndpoint(consumerID);
 
-			if (prod != NULL && !prod->consumer) {
-				if (cons != NULL && cons->consumer) {
+			if (producer != NULL && !producer->consumer) {
+				if (consumer != NULL && consumer->consumer) {
 					// It is an error to connect two endpoints that
 					// are already connected, or to disconnect two
 					// endpoints that are not connected at all.
 
-					if (mustConnect == prod->connections.HasItem(cons))
-						err = B_ERROR;
+					if (mustConnect == producer->connections.HasItem(consumer))
+						status = B_ERROR;
 					else
-						err = B_OK;
+						status = B_OK;
 				}
 			}
 		}
 	}
 
 	BMessage reply;
-	reply.AddInt32("midi:result", err);
+	reply.AddInt32("midi:result", status);
 
-	if (SendReply(app, msg, &reply) && err == B_OK) {
+	if (_SendReply(app, msg, &reply) && status == B_OK) {
 		if (mustConnect) {
-			TRACE(("Connection made: %" B_PRId32 " ---> %" B_PRId32, prod->id,
-				cons->id))
+			TRACE(("Connection made: %" B_PRId32 " ---> %" B_PRId32,
+				producer->id, consumer->id))
 
-			prod->connections.AddItem(cons);
+			producer->connections.AddItem(consumer);
 		} else {
-			TRACE(("Connection broken: %" B_PRId32 " -X-> %" B_PRId32, prod->id,
-				cons->id))
+			TRACE(("Connection broken: %" B_PRId32 " -X-> %" B_PRId32,
+				producer->id, consumer->id))
 
-			prod->connections.RemoveItem(cons);
+			producer->connections.RemoveItem(consumer);
 		}
 
 		BMessage notify;
-		MakeConnectedNotification(&notify, prod, cons, mustConnect);
-		NotifyAll(&notify, app);
+		_MakeConnectedNotification(&notify, producer, consumer, mustConnect);
+		_NotifyAll(&notify, app);
 
-		#ifdef DEBUG
-		DumpEndpoints();
-		#endif
+#ifdef DEBUG
+		_DumpEndpoints();
+#endif
 	}
 }
 
 
+/*!	Sends an app MSG_ENDPOINT_CREATED notifications for
+	all current endpoints. Used when the app registers.
+*/
 bool
-MidiServerApp::SendAllEndpoints(app_t* app)
+MidiServerApp::_SendAllEndpoints(app_t* app)
 {
 	ASSERT(app != NULL)
 
 	BMessage notify;
 
-	for (int32 t = 0; t < CountEndpoints(); ++t) {
-		endpoint_t* endp = EndpointAt(t);
+	for (int32 t = 0; t < _CountEndpoints(); ++t) {
+		endpoint_t* endpoint = _EndpointAt(t);
 
-		MakeCreatedNotification(&notify, endp);
+		_MakeCreatedNotification(&notify, endpoint);
 
-		if (!SendNotification(app, &notify))
+		if (!_SendNotification(app, &notify))
 			return false;
 	}
 
@@ -362,22 +385,25 @@ MidiServerApp::SendAllEndpoints(app_t* app)
 }
 
 
+/*!	Sends an app MSG_ENDPOINTS_CONNECTED notifications for
+	all current connections. Used when the app registers.
+*/
 bool
-MidiServerApp::SendAllConnections(app_t* app)
+MidiServerApp::_SendAllConnections(app_t* app)
 {
 	ASSERT(app != NULL)
 
 	BMessage notify;
 
-	for (int32 t = 0; t < CountEndpoints(); ++t) {
-		endpoint_t* prod = EndpointAt(t);
-		if (!prod->consumer) {
-			for (int32 k = 0; k < CountConnections(prod); ++k) {
-				endpoint_t* cons = ConnectionAt(prod, k);
+	for (int32 t = 0; t < _CountEndpoints(); ++t) {
+		endpoint_t* producer = _EndpointAt(t);
+		if (!producer->consumer) {
+			for (int32 k = 0; k < _CountConnections(producer); ++k) {
+				endpoint_t* consumer = _ConnectionAt(producer, k);
 
-				MakeConnectedNotification(&notify, prod, cons, true);
+				_MakeConnectedNotification(&notify, producer, consumer, true);
 
-				if (!SendNotification(app, &notify))
+				if (!_SendNotification(app, &notify))
 					return false;
 			}
 		}
@@ -387,97 +413,111 @@ MidiServerApp::SendAllConnections(app_t* app)
 }
 
 
+/*!	Adds the specified endpoint to the roster, and notifies
+	all other applications about this event.
+*/
 void
-MidiServerApp::AddEndpoint(BMessage* msg, endpoint_t* endp)
+MidiServerApp::_AddEndpoint(BMessage* msg, endpoint_t* endpoint)
 {
 	ASSERT(msg != NULL)
-	ASSERT(endp != NULL)
-	ASSERT(!endpoints.HasItem(endp))
+	ASSERT(endpoint != NULL)
+	ASSERT(!fEndpoints.HasItem(endpoint))
 
-	TRACE(("Endpoint %" B_PRId32 " (%p) added", endp->id, endp))
+	TRACE(("Endpoint %" B_PRId32 " (%p) added", endpoint->id, endpoint))
 
-	endpoints.AddItem(endp);
+	fEndpoints.AddItem(endpoint);
 
 	BMessage notify;
-	MakeCreatedNotification(&notify, endp);
-	NotifyAll(&notify, endp->app);
+	_MakeCreatedNotification(&notify, endpoint);
+	_NotifyAll(&notify, endpoint->app);
 
-	#ifdef DEBUG
-	DumpEndpoints();
-	#endif
+#ifdef DEBUG
+	_DumpEndpoints();
+#endif
 }
 
 
+/*!	Removes an endpoint from the roster, and notifies all
+	other apps about this event. "app" is the application
+	that the endpoint belongs to; if it is NULL, the app
+	no longer exists and we're purging the endpoint.
+*/
 void
-MidiServerApp::RemoveEndpoint(app_t* app, endpoint_t* endp)
+MidiServerApp::_RemoveEndpoint(app_t* app, endpoint_t* endpoint)
 {
-	ASSERT(endp != NULL)
-	ASSERT(endpoints.HasItem(endp))
+	ASSERT(endpoint != NULL)
+	ASSERT(fEndpoints.HasItem(endpoint))
 
-	TRACE(("Endpoint %" B_PRId32 " (%p) removed", endp->id, endp))
+	TRACE(("Endpoint %" B_PRId32 " (%p) removed", endpoint->id, endpoint))
 
-	endpoints.RemoveItem(endp);
+	fEndpoints.RemoveItem(endpoint);
 
-	if (endp->consumer)
-		DisconnectDeadConsumer(endp);
+	if (endpoint->consumer)
+		_DisconnectDeadConsumer(endpoint);
 
 	BMessage notify;
 	notify.what = MSG_ENDPOINT_DELETED;
-	notify.AddInt32("midi:id", endp->id);
-	NotifyAll(&notify, app);
+	notify.AddInt32("midi:id", endpoint->id);
+	_NotifyAll(&notify, app);
 
-	delete endp;
+	delete endpoint;
 
-	#ifdef DEBUG
-	DumpEndpoints();
-	#endif
+#ifdef DEBUG
+	_DumpEndpoints();
+#endif
 }
 
 
+/*!	Removes a consumer from the list of connections of
+	all the producers it is connected to, just before
+	we remove it from the roster.
+*/
 void
-MidiServerApp::DisconnectDeadConsumer(endpoint_t* cons)
+MidiServerApp::_DisconnectDeadConsumer(endpoint_t* consumer)
 {
-	ASSERT(cons != NULL)
-	ASSERT(cons->consumer)
+	ASSERT(consumer != NULL)
+	ASSERT(consumer->consumer)
 
-	for (int32 t = 0; t < CountEndpoints(); ++t) {
-		endpoint_t* prod = EndpointAt(t);
-		if (!prod->consumer)
-			prod->connections.RemoveItem(cons);
+	for (int32 t = 0; t < _CountEndpoints(); ++t) {
+		endpoint_t* producer = _EndpointAt(t);
+		if (!producer->consumer)
+			producer->connections.RemoveItem(consumer);
 	}
 }
 
 
+//! Fills up a MSG_ENDPOINT_CREATED message.
 void
-MidiServerApp::MakeCreatedNotification(BMessage* msg, endpoint_t* endp)
+MidiServerApp::_MakeCreatedNotification(BMessage* msg, endpoint_t* endpoint)
 {
 	ASSERT(msg != NULL)
-	ASSERT(endp != NULL)
+	ASSERT(endpoint != NULL)
 
 	msg->MakeEmpty();
 	msg->what = MSG_ENDPOINT_CREATED;
-	msg->AddInt32("midi:id", endp->id);
-	msg->AddBool("midi:consumer", endp->consumer);
-	msg->AddBool("midi:registered", endp->registered);
-	msg->AddString("midi:name", endp->name);
-	msg->AddMessage("midi:properties", &endp->properties);
+	msg->AddInt32("midi:id", endpoint->id);
+	msg->AddBool("midi:consumer", endpoint->consumer);
+	msg->AddBool("midi:registered", endpoint->registered);
+	msg->AddString("midi:name", endpoint->name);
+	msg->AddMessage("midi:properties", &endpoint->properties);
 
-	if (endp->consumer) {
-		msg->AddInt32("midi:port", endp->port);
-		msg->AddInt64("midi:latency", endp->latency);
+	if (endpoint->consumer) {
+		msg->AddInt32("midi:port", endpoint->port);
+		msg->AddInt64("midi:latency", endpoint->latency);
 	}
 }
 
 
+//! Fills up a MSG_ENDPOINTS_(DIS)CONNECTED message.
 void
-MidiServerApp::MakeConnectedNotification(BMessage* msg, endpoint_t* prod,
-	endpoint_t* cons, bool mustConnect)
+MidiServerApp::_MakeConnectedNotification(BMessage* msg, endpoint_t* producer,
+	endpoint_t* consumer, bool mustConnect)
 {
 	ASSERT(msg != NULL)
-	ASSERT(prod != NULL)
-	ASSERT(cons != NULL)
-	ASSERT(!prod->consumer)
-	ASSERT(cons->consumer)
+	ASSERT(producer != NULL)
+	ASSERT(consumer != NULL)
+	ASSERT(!producer->consumer)
+	ASSERT(consumer->consumer)
 
 	msg->MakeEmpty();
 
@@ -486,20 +526,23 @@ MidiServerApp::MakeConnectedNotification(BMessage* msg, endpoint_t* prod,
 	else
 		msg->what = MSG_ENDPOINTS_DISCONNECTED;
 
-	msg->AddInt32("midi:producer", prod->id);
-	msg->AddInt32("midi:consumer", cons->id);
+	msg->AddInt32("midi:producer", producer->id);
+	msg->AddInt32("midi:consumer", consumer->id);
 }
 
 
+/*!	Figures out which application a message came from.
+	Returns NULL if the application is not registered.
+*/
 app_t*
-MidiServerApp::WhichApp(BMessage* msg)
+MidiServerApp::_WhichApp(BMessage* msg)
 {
 	ASSERT(msg != NULL)
 
 	BMessenger retadr = msg->ReturnAddress();
 
-	for (int32 t = 0; t < CountApps(); ++t) {
-		app_t* app = AppAt(t);
+	for (int32 t = 0; t < _CountApps(); ++t) {
+		app_t* app = _AppAt(t);
 		if (app->messenger.Team() == retadr.Team())
 			return app;
 	}
@@ -510,17 +553,22 @@ MidiServerApp::WhichApp(BMessage* msg)
 }
 
 
+/*!	Looks at the "midi:id" field from a message, and returns
+	the endpoint object that corresponds to that ID. It also
+	checks whether the application specified by "app" really
+	owns the endpoint. Returns NULL on error.
+*/
 endpoint_t*
-MidiServerApp::WhichEndpoint(BMessage* msg, app_t* app)
+MidiServerApp::_WhichEndpoint(BMessage* msg, app_t* app)
 {
 	ASSERT(msg != NULL)
 	ASSERT(app != NULL)
 
 	int32 id;
 	if (msg->FindInt32("midi:id", &id) == B_OK) {
-		endpoint_t* endp = FindEndpoint(id);
-		if (endp != NULL && endp->app == app)
-			return endp;
+		endpoint_t* endpoint = _FindEndpoint(id);
+		if (endpoint != NULL && endpoint->app == app)
+			return endpoint;
 	}
 
 	TRACE(("Endpoint not found or wrong app"))
@@ -528,14 +576,17 @@ MidiServerApp::WhichEndpoint(BMessage* msg, app_t* app)
 }
 
 
+/*!	Returns the endpoint with the specified ID, or
+	\c NULL if no such endpoint exists on the roster.
+*/
 endpoint_t*
-MidiServerApp::FindEndpoint(int32 id)
+MidiServerApp::_FindEndpoint(int32 id)
 {
 	if (id > 0) {
-		for (int32 t = 0; t < CountEndpoints(); ++t) {
-			endpoint_t* endp = EndpointAt(t);
-			if (endp->id == id)
-				return endp;
+		for (int32 t = 0; t < _CountEndpoints(); ++t) {
+			endpoint_t* endpoint = _EndpointAt(t);
+			if (endpoint->id == id)
+				return endpoint;
 		}
 	}
 
@@ -544,92 +595,105 @@ MidiServerApp::FindEndpoint(int32 id)
 }
 
 
+/*!	Sends notification messages to all registered apps,
+	except to the application that triggered the event.
+	The "except" app is allowed to be NULL.
+*/
 void
-MidiServerApp::NotifyAll(BMessage* msg, app_t* except)
+MidiServerApp::_NotifyAll(BMessage* msg, app_t* except)
 {
 	ASSERT(msg != NULL)
 
-	for (int32 t = CountApps() - 1; t >= 0; --t) {
-		app_t* app = AppAt(t);
-		if (app != except) {
-			if (!SendNotification(app, msg)) {
-				delete (app_t*)apps.RemoveItem(t);
-
-				#ifdef DEBUG
-				DumpApps();
-				#endif
-			}
+	for (int32 t = _CountApps() - 1; t >= 0; --t) {
+		app_t* app = _AppAt(t);
+		if (app != except && !_SendNotification(app, msg)) {
+			delete (app_t*)fApps.RemoveItem(t);
+#ifdef DEBUG
+			_DumpApps();
+#endif
 		}
 	}
 }
 
 
+/*!	Sends a notification message to an application, which is
+	not necessarily registered yet. Applications never reply
+	to such notification messages.
+*/
 bool
-MidiServerApp::SendNotification(app_t* app, BMessage* msg)
+MidiServerApp::_SendNotification(app_t* app, BMessage* msg)
 {
 	ASSERT(app != NULL)
 	ASSERT(msg != NULL)
 
-	status_t err = app->messenger.SendMessage(msg, (BHandler*) NULL, TIMEOUT);
+	status_t status = app->messenger.SendMessage(msg, (BHandler*) NULL,
+		TIMEOUT);
+	if (status != B_OK)
+		_DeliveryError(app);
 
-	if (err != B_OK)
-		DeliveryError(app);
-
-	return err == B_OK;
+	return status == B_OK;
 }
 
 
+/*!	Sends a reply to a request made by an application.
+	If "app" is NULL, the application is not registered
+	(and the reply should contain an error code).
+*/
 bool
-MidiServerApp::SendReply(app_t* app, BMessage* msg, BMessage* reply)
+MidiServerApp::_SendReply(app_t* app, BMessage* msg, BMessage* reply)
 {
 	ASSERT(msg != NULL)
 	ASSERT(reply != NULL)
 
-	status_t err = msg->SendReply(reply, (BHandler*) NULL, TIMEOUT);
-
-	if (err != B_OK && app != NULL) {
-		DeliveryError(app);
-		apps.RemoveItem(app);
+	status_t status = msg->SendReply(reply, (BHandler*) NULL, TIMEOUT);
+	if (status != B_OK && app != NULL) {
+		_DeliveryError(app);
+		fApps.RemoveItem(app);
 		delete app;
 
-		#ifdef DEBUG
-		DumpApps();
-		#endif
+#ifdef DEBUG
+		_DumpApps();
+#endif
 	}
 
-	return err == B_OK;
+	return status == B_OK;
 }
 
 
+/*!	Removes an app and all of its endpoints from the roster
+	if a reply or notification message cannot be delivered.
+	(Waiting for communications to fail is actually our only
+	way to get rid of stale endpoints.)
+*/
 void
-MidiServerApp::DeliveryError(app_t* app)
+MidiServerApp::_DeliveryError(app_t* app)
 {
 	ASSERT(app != NULL)
-	
-	// We cannot communicate with the app, so we assume it's 
-	// dead. We need to remove its endpoints from the roster, 
-	// but we cannot do that right away; removing endpoints 
-	// triggers a bunch of new notifications and we don't want 
-	// those to get in the way of the notifications we are 
+
+	// We cannot communicate with the app, so we assume it's
+	// dead. We need to remove its endpoints from the roster,
+	// but we cannot do that right away; removing endpoints
+	// triggers a bunch of new notifications and we don't want
+	// those to get in the way of the notifications we are
 	// currently sending out. Instead, we consider the death
-	// of an app as a separate event, and pretend that the 
+	// of an app as a separate event, and pretend that the
 	// now-dead app sent us delete requests for its endpoints.
 
 	TRACE(("Delivery error; unregistering app (%p)", app))
 
 	BMessage msg;
 
-	for (int32 t = 0; t < CountEndpoints(); ++t) {
-		endpoint_t* endp = EndpointAt(t);
-		if (endp->app == app) {
+	for (int32 t = 0; t < _CountEndpoints(); ++t) {
+		endpoint_t* endpoint = _EndpointAt(t);
+		if (endpoint->app == app) {
 			msg.MakeEmpty();
 			msg.what = MSG_PURGE_ENDPOINT;
-			msg.AddInt32("midi:id", endp->id);
+			msg.AddInt32("midi:id", endpoint->id);
 
 			// It is not safe to post a message to your own
-			// looper's message queue, because you risk a 
+			// looper's message queue, because you risk a
 			// deadlock if the queue is full. The chance of
-			// that happening is fairly small, but just in 
+			// that happening is fairly small, but just in
 			// case, we catch it with a timeout. Because this
 			// situation is so unlikely, I decided to simply
 			// forget about the whole "purge" message then.
@@ -644,65 +708,65 @@ MidiServerApp::DeliveryError(app_t* app)
 
 
 int32
-MidiServerApp::CountApps()
+MidiServerApp::_CountApps()
 {
-	return apps.CountItems();
+	return fApps.CountItems();
 }
 
 
 app_t*
-MidiServerApp::AppAt(int32 index)
+MidiServerApp::_AppAt(int32 index)
 {
 	ASSERT(index >= 0 && index < CountApps())
 
-	return (app_t*)apps.ItemAt(index);
+	return (app_t*)fApps.ItemAt(index);
 }
 
 
 int32
-MidiServerApp::CountEndpoints()
+MidiServerApp::_CountEndpoints()
 {
-	return endpoints.CountItems();
+	return fEndpoints.CountItems();
 }
 
 
 endpoint_t*
-MidiServerApp::EndpointAt(int32 index)
+MidiServerApp::_EndpointAt(int32 index)
 {
 	ASSERT(index >= 0 && index < CountEndpoints())
 
-	return (endpoint_t*)endpoints.ItemAt(index);
+	return (endpoint_t*)fEndpoints.ItemAt(index);
 }
 
 
 int32
-MidiServerApp::CountConnections(endpoint_t* prod)
+MidiServerApp::_CountConnections(endpoint_t* producer)
 {
-	ASSERT(prod != NULL)
-	ASSERT(!prod->consumer)
+	ASSERT(producer != NULL)
+	ASSERT(!producer->consumer)
 
-	return prod->connections.CountItems();
+	return producer->connections.CountItems();
 }
 
 
 endpoint_t*
-MidiServerApp::ConnectionAt(endpoint_t* prod, int32 index)
+MidiServerApp::_ConnectionAt(endpoint_t* producer, int32 index)
 {
-	ASSERT(prod != NULL)
-	ASSERT(!prod->consumer)
-	ASSERT(index >= 0 && index < CountConnections(prod))
+	ASSERT(producer != NULL)
+	ASSERT(!producer->consumer)
+	ASSERT(index >= 0 && index < _CountConnections(producer))
 
-	return (endpoint_t*)prod->connections.ItemAt(index);
+	return (endpoint_t*)producer->connections.ItemAt(index);
 }
 
 
 #ifdef DEBUG
 void
-MidiServerApp::DumpApps()
+MidiServerApp::_DumpApps()
 {
 	printf("*** START DumpApps\n");
 
-	for (int32 t = 0; t < CountApps(); ++t) {
+	for (int32 t = 0; t < _CountApps(); ++t) {
 		app_t* app = AppAt(t);
 
 		printf("\tapp %" B_PRId32 " (%p): team %" B_PRId32 "\n", t, app,
@@ -711,41 +775,39 @@ MidiServerApp::DumpApps()
 
 	printf("*** END DumpApps\n");
 }
-#endif
 
 
-#ifdef DEBUG
 void
-MidiServerApp::DumpEndpoints()
+MidiServerApp::_DumpEndpoints()
 {
 	printf("*** START DumpEndpoints\n");
 
-	for (int32 t = 0; t < CountEndpoints(); ++t) {
-		endpoint_t* endp = EndpointAt(t);
+	for (int32 t = 0; t < _CountEndpoints(); ++t) {
+		endpoint_t* endpoint = _EndpointAt(t);
 
-		printf("\tendpoint %" B_PRId32 " (%p):\n", t, endp);
+		printf("\tendpoint %" B_PRId32 " (%p):\n", t, endpoint);
 		printf("\t\tid %" B_PRId32 ", name '%s', %s, %s, app %p\n",
-			endp->id, endp->name.String(),
-			endp->consumer ? "consumer" : "producer",
-			endp->registered ? "registered" : "unregistered",
-			endp->app);
-		printf("\t\tproperties: "); endp->properties.PrintToStream();
+			endpoint->id, endpoint->name.String(),
+			endpoint->consumer ? "consumer" : "producer",
+			endpoint->registered ? "registered" : "unregistered",
+			endpoint->app);
+		printf("\t\tproperties: "); endpoint->properties.PrintToStream();
 
-		if (endp->consumer)
+		if (endpoint->consumer)
 			printf("\t\tport %" B_PRId32 ", latency %" B_PRIdBIGTIME "\n",
-				endp->port, endp->latency);
+				endpoint->port, endpoint->latency);
 		else {
 			printf("\t\tconnections:\n");
-			for (int32 k = 0; k < CountConnections(endp); ++k) {
-				endpoint_t* cons = ConnectionAt(endp, k);
-				printf("\t\t\tid %" B_PRId32 " (%p)\n", cons->id, cons);
+			for (int32 k = 0; k < CountConnections(endpoint); ++k) {
+				endpoint_t* consumer = ConnectionAt(endpoint, k);
+				printf("\t\t\tid %" B_PRId32 " (%p)\n", consumer->id, consumer);
 			}
 		}
 	}
 
 	printf("*** END DumpEndpoints\n");
 }
-#endif
+#endif	// DEBUG
 
 
 //	#pragma mark -
@@ -758,4 +820,3 @@ main()
 	app.Run();
 	return 0;
 }
-
