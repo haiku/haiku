@@ -8,6 +8,8 @@ RemotePackageRepository HaikuPorts
 	caladea-20130214-3
 	carlito-20130920-1
 	dejavu-2.34-2
+	docbook_xml_dtd-4.5-2
+	docbook_xsl_stylesheets-1.78.1-1
 	droid-113-2
 	texi2html-1.82-2
 	timgmsoundfont-fixed-5
@@ -132,6 +134,7 @@ RemotePackageRepository HaikuPorts
 	grep-2.21-1
 	grep_debuginfo-2.21-1
 	groff-1.20.1-3
+	gtk_doc-1.20-1
 	gutenprint-5.2.10-1
 	gutenprint_devel-5.2.10-1
 	gzip-1.6-2
@@ -147,6 +150,7 @@ RemotePackageRepository HaikuPorts
 	icu54-54.1-2
 	icu54_devel-54.1-2
 	intltool-0.40.6-4
+	itstool-2.0.2-1
 	jam-2.5_2012_10_12-2
 	jasper-1.900.1-4
 	jasper_devel-1.900.1-4
@@ -245,9 +249,9 @@ RemotePackageRepository HaikuPorts
 	libvpx_devel-1.0.0-2
 	libwebp-0.4.1-1
 	libwebp_devel-0.4.1-1
-	libxml2-2.9.2-1
-	libxml2_devel-2.9.2-1
-	libxml2_python-2.9.2-1
+	libxml2-2.9.2-2
+	libxml2_devel-2.9.2-2
+	libxml2_python-2.9.2-2
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
 	llvm-3.5.2-1
@@ -283,8 +287,10 @@ RemotePackageRepository HaikuPorts
 	netcat-1.10-1
 	netpulse-0.2.3-5
 	ninja-1.5.1-2
-	nspr-4.10.8-1
-	nspr_devel-4.10.8-1
+	nspr-4.10.9-1
+	nspr_devel-4.10.9-1
+	nss-3.20-1
+	nss_devel-3.20-1
 	openssh-7.1p1-1
 	openssl-1.0.0s-2
 	openssl_devel-1.0.0s-2
@@ -417,6 +423,7 @@ RemotePackageRepository HaikuPorts
 	graphite2
 	grep
 	groff
+	gtk_doc
 	gutenprint
 	gzip
 	haikuwebkit
@@ -426,6 +433,7 @@ RemotePackageRepository HaikuPorts
 	icu
 	icu54
 	intltool
+	itstool
 	jam
 	jasper
 	jpeg
@@ -500,6 +508,7 @@ RemotePackageRepository HaikuPorts
 	netpulse
 	ninja
 	nspr
+	nss
 	openssh
 	openssl
 	p7zip
