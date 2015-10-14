@@ -7,12 +7,14 @@
  */
 
 
+#include "NotificationServer.h"
+
 #include <Beep.h>
 #include <Notifications.h>
 #include <PropertyInfo.h>
+#include <stdlib.h>
 
 #include "NotificationWindow.h"
-#include "NotificationServer.h"
 
 
 const char* kSoundNames[] = {
