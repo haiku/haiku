@@ -117,9 +117,7 @@ AHCIPort::Init1()
 	// prdt follows after command table
 
 	// disable transitions to partial or slumber state
-	fRegs->sctl = (fRegs->sctl & ~SATA_CONTROL_IPM_MASK)
-		| (IPM_TRANSITIONS_TO_PARTIAL_DISABLED
-			| IPM_TRANSITIONS_TO_SLUMBER_DISABLED) << SATA_CONTROL_IPM_SHIFT;
+	fRegs->sctl |= (SCTL_PORT_IPM_NOPART | SCTL_PORT_IPM_NOSLUM);
 
 	// clear IRQ status bits
 	fRegs->is = fRegs->is;
@@ -166,17 +164,12 @@ AHCIPort::Init2()
 	TRACE("is   0x%08" B_PRIx32 "\n", fRegs->is);
 	TRACE("cmd  0x%08" B_PRIx32 "\n", fRegs->cmd);
 	TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
-	TRACE("sctl.ipm 0x%02" B_PRIx32 "\n",
-		(fRegs->sctl & SATA_CONTROL_IPM_MASK) >> SATA_CONTROL_IPM_SHIFT);
-	TRACE("sctl.spd 0x%02" B_PRIx32 "\n",
-		(fRegs->sctl & SATA_CONTROL_SPD_MASK) >> SATA_CONTROL_SPD_SHIFT);
-	TRACE("sctl.det 0x%02" B_PRIx32 "\n",
-		(fRegs->sctl & SATA_CONTROL_DET_MASK) >> SATA_CONTROL_DET_SHIFT);
+	TRACE("sctl.ipm 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_IPM_MASK);
+	TRACE("sctl.spd 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_SPD_MASK);
+	TRACE("sctl.det 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_DET_MASK);
 	TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
 	TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
 	TRACE("tfd  0x%08" B_PRIx32 "\n", fRegs->tfd);
-
-	fDevicePresent = (fRegs->ssts & 0xf) == 0x3;
 
 	TRACE("%s: port %d, device %s\n", __func__, fIndex,
 		fDevicePresent ? "present" : "absent");
@@ -229,12 +222,12 @@ AHCIPort::ResetDevice()
 		return;
 	}
 
-	if (wait_until_set(&fRegs->ssts, 0x1, 100000) < B_OK)
+	if (wait_until_set(&fRegs->ssts, SSTS_PORT_DET_NODEV, 100000) < B_OK)
 		TRACE("AHCIPort::ResetDevice port %d no device detected\n", fIndex);
 
 	_ClearErrorRegister();
 
-	if (fRegs->ssts & 1) {
+	if (fRegs->ssts & SSTS_PORT_DET_NOPHY) {
 		if (wait_until_set(&fRegs->ssts, 0x3, 500000) < B_OK) {
 			TRACE("AHCIPort::ResetDevice port %d device present but no phy "
 				"communication\n", fIndex);
@@ -328,25 +321,19 @@ AHCIPort::PortReset()
 		return B_ERROR;
 	}
 
-	fRegs->sctl = (fRegs->sctl & ~SATA_CONTROL_DET_MASK)
-		| DET_INITIALIZATION << SATA_CONTROL_DET_SHIFT;
+	fRegs->sctl |= SCTL_PORT_DET_INIT;
 	FlushPostedWrites();
 	spin(1100);
 		// You must wait 1ms at minimum
-	fRegs->sctl = (fRegs->sctl & ~SATA_CONTROL_DET_MASK)
-		| DET_NO_INITIALIZATION << SATA_CONTROL_DET_SHIFT;
+	fRegs->sctl = (fRegs->sctl & ~HBA_PORT_DET_MASK) | SCTL_PORT_DET_NOINIT;
+
 	FlushPostedWrites();
 
-	if (wait_until_set(&fRegs->ssts, 0x3, 500000) < B_OK) {
-		TRACE("AHCIPort::PortReset port %d device present but no phy "
-			"communication\n", fIndex);
-		return B_ERROR;
+	if (wait_until_set(&fRegs->ssts, SSTS_PORT_DET_PRESENT, 500000) < B_OK) {
+		TRACE("%s: port %d: no device detected\n", __func__, fIndex);
+		fDevicePresent = false;
+		return B_OK;
 	}
-
-	//if ((fRegs->tfd & 0xff) == 0x7f) {
-	//	TRACE("AHCIPort::PostReset port %d: no device\n", fIndex);
-	//	return B_OK;
-	//}
 
 	Enable();
 
@@ -366,9 +353,26 @@ AHCIPort::PostReset()
 		return B_ERROR;
 	}
 
+	switch (fRegs->ssts & HBA_PORT_SPD_MASK) {
+		case 0x10:
+			TRACE("%s: port %d link speed 1.5Gb/s\n", __func__, fIndex);
+			break;
+		case 0x20:
+			TRACE("%s: port %d link speed 3.0Gb/s\n", __func__, fIndex);
+			break;
+		case 0x30:
+			TRACE("%s: port %d link speed 6.0Gb/s\n", __func__, fIndex);
+			break;
+		default:
+			TRACE("%s: port %d link speed unrestricted\n", __func__, fIndex);
+			break;
+	}
+
 	wait_until_clear(&fRegs->tfd, ATA_STATUS_BUSY, 31000000);
 
+	fDevicePresent = (fRegs->ssts & HBA_PORT_DET_MASK) == SSTS_PORT_DET_PRESENT;
 	fIsATAPI = fRegs->sig == SATA_SIG_ATAPI;
+
 	if (fIsATAPI)
 		fRegs->cmd |= PORT_CMD_ATAPI;
 	else
@@ -440,12 +444,9 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 			B_PRIx32 ", is 0x%08" B_PRIx32 ", ci 0x%08" B_PRIx32 "\n", fIndex,
 			fCommandsActive, is, ci);
 		TRACE("ssts 0x%08" B_PRIx32 "\n", fRegs->ssts);
-		TRACE("sctl.ipm 0x%02" B_PRIx32 "\n",
-			(fRegs->sctl & SATA_CONTROL_IPM_MASK) >> SATA_CONTROL_IPM_SHIFT);
-		TRACE("sctl.spd 0x%02" B_PRIx32 "\n",
-			(fRegs->sctl & SATA_CONTROL_SPD_MASK) >> SATA_CONTROL_SPD_SHIFT);
-		TRACE("sctl.det 0x%02" B_PRIx32 "\n",
-			(fRegs->sctl & SATA_CONTROL_DET_MASK) >> SATA_CONTROL_DET_SHIFT);
+		TRACE("sctl.ipm 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_IPM_MASK);
+		TRACE("sctl.spd 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_SPD_MASK);
+		TRACE("sctl.det 0x%02" B_PRIx32 "\n", fRegs->sctl & HBA_PORT_DET_MASK);
 		TRACE("serr 0x%08" B_PRIx32 "\n", fRegs->serr);
 		TRACE("sact 0x%08" B_PRIx32 "\n", fRegs->sact);
 	}
@@ -488,18 +489,21 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 	}
 	if (is & PORT_INT_PRC) {
 		TRACE("PhyReady Change\n");
-//		fSoftReset = true;
+		//fSoftReset = true;
 	}
 	if (is & PORT_INT_PC) {
 		TRACE("Port Connect Change\n");
-		// TODO: check if the COMINIT is actually unsolicited!
+		// Unsolicited when we had a port connect change without us requesting
 		// Spec v1.3, §6.2.2.3 Recovery of Unsolicited COMINIT
-		// Spec v1.3.1, §7.4 Interaction of command list and port change status
-		// TODO: Issue COMRESET ?
-		//PortReset();
-		//HBAReset(); ???
 
-		// clear error bits to clear PxSERR.DIAG.X
+		// TODO: This isn't enough
+		//if ((fRegs->sctl & SCTL_PORT_DET_INIT) == 0) {
+		//	TRACE("%s: unsolicited port connect change\n", __func__);
+		//	fSoftReset = true;
+		//	fError = true;
+		//}
+
+		// XXX: This shouldn't be needed here... but we can loop without it
 		_ClearErrorRegister();
 	}
 	if (is & PORT_INT_UF) {

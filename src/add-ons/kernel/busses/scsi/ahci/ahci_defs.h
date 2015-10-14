@@ -80,23 +80,26 @@ enum {
 };
 
 
-// Device Detection Initialization
-#define SATA_CONTROL_DET_SHIFT	0
-#define SATA_CONTROL_DET_MASK	0x0000000f
+// Serial ATA Status and control
+#define HBA_PORT_IPM_MASK		0x00000f00	// Interface Power Management
+#define SSTS_PORT_IPM_ACTIVE	0x00000100	// active state
+#define SSTS_PORT_IPM_PARTIAL	0x00000200	// partial state
+#define SSTS_PORT_IPM_SLUMBER	0x00000600	// slumber power management state
+#define SSTS_PORT_IPM_DEVSLEEP	0x00000800	// devsleep power management state
+#define SCTL_PORT_IPM_NORES		0x00000000	// no power restrictions
+#define SCTL_PORT_IPM_NOPART	0x00000100	// no transitions to partial
+#define SCTL_PORT_IPM_NOSLUM	0x00000200	// no transitions to slumber
 
-#define DET_NO_INITIALIZATION	0x0
-#define DET_INITIALIZATION		0x1
+#define HBA_PORT_SPD_MASK		0x000000f0	// Interface speed
 
-// Speed Allowed
-#define SATA_CONTROL_SPD_SHIFT	4
-#define SATA_CONTROL_SPD_MASK	0x000000f0
-
-// Interface Power Management Transitions Allowed
-#define SATA_CONTROL_IPM_SHIFT	8
-#define SATA_CONTROL_IPM_MASK	0x00000f00
-
-#define IPM_TRANSITIONS_TO_PARTIAL_DISABLED 0x1
-#define IPM_TRANSITIONS_TO_SLUMBER_DISABLED 0x2
+#define HBA_PORT_DET_MASK		0x0000000f	// Device Detection
+#define SSTS_PORT_DET_NODEV		0x00000000	// no device detected
+#define SSTS_PORT_DET_NOPHY		0x00000001	// device present but PHY not est.
+#define SSTS_PORT_DET_PRESENT	0x00000003	// device present and PHY est.
+#define SSTS_PORT_DET_OFFLINE	0x00000004	// device offline due to disabled
+#define SCTL_PORT_DET_NOINIT	0x00000000	// no initalization request
+#define SCTL_PORT_DET_INIT		0x00000001	// perform interface initalization
+#define SCTL_PORT_DET_DISABLE	0x00000004	// disable phy
 
 // Device signatures
 #define	SATA_SIG_ATA			0x00000101 // SATA drive
