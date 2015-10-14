@@ -1,10 +1,11 @@
 /*
- * Copyright 2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2010-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Pier Luigi Fiorini, pierluigi.fiorini@gmail.com
  */
+
 
 #include <Beep.h>
 #include <Notifications.h>
@@ -12,6 +13,7 @@
 
 #include "NotificationWindow.h"
 #include "NotificationServer.h"
+
 
 const char* kSoundNames[] = {
 	"Information notification",
@@ -22,8 +24,9 @@ const char* kSoundNames[] = {
 };
 
 
-NotificationServer::NotificationServer()
-	: BApplication(kNotificationServerSignature)
+NotificationServer::NotificationServer(status_t& error)
+	:
+	BServer(kNotificationServerSignature, true, &error)
 {
 }
 
@@ -96,6 +99,9 @@ NotificationServer::ResolveSpecifier(BMessage* msg, int32 index,
 }
 
 
+// #pragma mark -
+
+
 int
 main(int argc, char* argv[])
 {
@@ -106,8 +112,10 @@ main(int argc, char* argv[])
 		add_system_beep_event(kSoundNames[i++], 0);
 
 	// Start!
-	NotificationServer server;
-	server.Run();
+	status_t error;
+	NotificationServer server(error);
+	if (error == B_OK)
+		server.Run();
 
-	return 0;
+	return error == B_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }

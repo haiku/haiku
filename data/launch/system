@@ -70,7 +70,7 @@ service x-vnd.Haiku-print_server {
 service x-vnd.Haiku-notification_server {
 	launch /system/servers/notification_server
 	no_safemode
-	legacy
+	on_demand
 }
 
 service x-vnd.Haiku-power_daemon {
