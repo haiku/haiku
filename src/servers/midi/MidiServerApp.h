@@ -9,7 +9,7 @@
 #define MIDI_SERVER_APP_H
 
 
-#include <Application.h>
+#include <Server.h>
 #include <List.h>
 
 #include "DeviceWatcher.h"
@@ -24,16 +24,16 @@ struct endpoint_t;
 	incoming messages from libmidi2.so, and notifies the apps
 	when something interesting happens.
 */
-class MidiServerApp : public BApplication {
+class MidiServerApp : public BServer {
 public:
-								MidiServerApp();
+								MidiServerApp(status_t& error);
 	virtual						~MidiServerApp();
 
 	virtual	void				AboutRequested();
 	virtual	void				MessageReceived(BMessage* msg);
 
 private:
-	typedef BApplication super;
+	typedef BServer super;
 
 			void				_OnRegisterApp(BMessage* msg);
 			void				_OnCreateEndpoint(BMessage* msg);

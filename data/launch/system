@@ -40,7 +40,7 @@ service x-vnd.Haiku-media_server {
 service x-vnd.Haiku-midi_server {
 	launch /system/servers/midi_server
 	no_safemode
-	legacy
+	on_demand
 }
 
 service x-vnd.Haiku-mail_daemon {

@@ -1,4 +1,12 @@
 /*
+ * Copyright 2002-2015, Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Matthijs Hollemans
+ */
+
+/*
  * Copyright (c) 2002-2004 Matthijs Hollemans
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -36,9 +44,9 @@
 using std::nothrow;
 
 
-MidiServerApp::MidiServerApp()
+MidiServerApp::MidiServerApp(status_t& error)
 	:
-	BApplication(MIDI_SERVER_SIGNATURE)
+	BServer(MIDI_SERVER_SIGNATURE, true, &error)
 {
 	TRACE(("Running Haiku MIDI server"))
 
@@ -816,7 +824,11 @@ MidiServerApp::_DumpEndpoints()
 int
 main()
 {
-	MidiServerApp app;
-	app.Run();
-	return 0;
+	status_t status;
+	MidiServerApp app(status);
+
+	if (status == B_OK)
+		app.Run();
+
+	return status == B_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
