@@ -661,6 +661,9 @@ AddressTextControl::AddressTextControl(const char* name, BMessage* message)
 
 	SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_CENTER));
+
+	SetEnabled(fEditable);
+		// Sets the B_NAVIGABLE flag on the TextView
 }
 
 
