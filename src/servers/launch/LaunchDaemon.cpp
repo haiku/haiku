@@ -74,12 +74,19 @@ private:
 };
 
 
-class RegisteredEvent {
+/*!	This class is the connection between the external events that are part of
+	a job, and the external event source.
+
+	There is one object per registered event source, and it keeps all jobs that
+	reference the event as listeners. If the event source triggers the event,
+	the object will be used to trigger the jobs.
+*/
+class ExternalEventSource {
 public:
-								RegisteredEvent(BMessenger& source,
+								ExternalEventSource(BMessenger& source,
 									const char* ownerName,
 									const char* name);
-								~RegisteredEvent();
+								~ExternalEventSource();
 
 			const char*			Name() const;
 
@@ -98,7 +105,7 @@ private:
 typedef std::map<BString, Job*> JobMap;
 typedef std::map<uid_t, Session*> SessionMap;
 typedef std::map<BString, Target*> TargetMap;
-typedef std::map<BString, RegisteredEvent*> EventMap;
+typedef std::map<BString, ExternalEventSource*> EventMap;
 
 
 class LaunchDaemon : public BServer, public Finder, public ConditionContext {
@@ -153,11 +160,13 @@ private:
 			void				_SetEnvironment(BaseJob* job,
 									const BMessage& message);
 
-			RegisteredEvent*	_FindEvent(const char* owner,
+			ExternalEventSource*
+								_FindEvent(const char* owner,
 									const char* name) const;
-			void				_ResolveRegisteredEvents(RegisteredEvent* event,
+			void				_ResolveExternalEvents(
+									ExternalEventSource* event,
 									const BString& name);
-			void				_ResolveRegisteredEvents(BaseJob* job);
+			void				_ResolveExternalEvents(BaseJob* job);
 			void				_ForwardEventMessage(uid_t user,
 									BMessage* message);
 
@@ -208,8 +217,8 @@ Session::Session(uid_t user, const BMessenger& daemon)
 // #pragma mark -
 
 
-RegisteredEvent::RegisteredEvent(BMessenger& source, const char* ownerName,
-	const char* name)
+ExternalEventSource::ExternalEventSource(BMessenger& source,
+	const char* ownerName, const char* name)
 	:
 	fName(name),
 	fListeners(5, true)
@@ -217,34 +226,34 @@ RegisteredEvent::RegisteredEvent(BMessenger& source, const char* ownerName,
 }
 
 
-RegisteredEvent::~RegisteredEvent()
+ExternalEventSource::~ExternalEventSource()
 {
 }
 
 
 const char*
-RegisteredEvent::Name() const
+ExternalEventSource::Name() const
 {
 	return fName.String();
 }
 
 
 int32
-RegisteredEvent::CountListeners() const
+ExternalEventSource::CountListeners() const
 {
 	return fListeners.CountItems();
 }
 
 
 BaseJob*
-RegisteredEvent::ListenerAt(int32 index) const
+ExternalEventSource::ListenerAt(int32 index) const
 {
 	return fListeners.ItemAt(index);
 }
 
 
 status_t
-RegisteredEvent::AddListener(BaseJob* job)
+ExternalEventSource::AddListener(BaseJob* job)
 {
 	if (fListeners.AddItem(job))
 		return B_OK;
@@ -254,7 +263,7 @@ RegisteredEvent::AddListener(BaseJob* job)
 
 
 void
-RegisteredEvent::RemoveListener(BaseJob* job)
+ExternalEventSource::RemoveListener(BaseJob* job)
 {
 	fListeners.RemoveItem(job);
 }
@@ -635,18 +644,18 @@ LaunchDaemon::_HandleRegisterLaunchEvent(BMessage* message)
 			// Register event
 			ownerName = get_leaf(ownerName);
 
-			RegisteredEvent* event = new (std::nothrow) RegisteredEvent(
-				source, ownerName, name);
+			ExternalEventSource* event = new (std::nothrow)
+				ExternalEventSource(source, ownerName, name);
 			if (event != NULL) {
 				// Use short name, and fully qualified name
 				BString eventName = name;
 				fEvents.insert(std::make_pair(eventName, event));
-				_ResolveRegisteredEvents(event, eventName);
+				_ResolveExternalEvents(event, eventName);
 
 				eventName.Prepend("/");
 				eventName.Prepend(ownerName);
 				fEvents.insert(std::make_pair(eventName, event));
-				_ResolveRegisteredEvents(event, eventName);
+				_ResolveExternalEvents(event, eventName);
 			} else
 				status = B_NO_MEMORY;
 		} else
@@ -708,7 +717,7 @@ LaunchDaemon::_HandleNotifyLaunchEvent(BMessage* message)
 		const char* ownerName = message->GetString("owner");
 		// TODO: support arguments (as selectors)
 
-		RegisteredEvent* event = _FindEvent(ownerName, name);
+		ExternalEventSource* event = _FindEvent(ownerName, name);
 		if (event != NULL) {
 			// Evaluate all of its jobs
 			int32 count = event->CountListeners();
@@ -1103,7 +1112,7 @@ LaunchDaemon::_SetEvent(BaseJob* job, const BMessage& message)
 
 	if (updated) {
 		job->SetEvent(event);
-		_ResolveRegisteredEvents(job);
+		_ResolveExternalEvents(job);
 	}
 }
 
@@ -1117,7 +1126,7 @@ LaunchDaemon::_SetEnvironment(BaseJob* job, const BMessage& message)
 }
 
 
-RegisteredEvent*
+ExternalEventSource*
 LaunchDaemon::_FindEvent(const char* owner, const char* name) const
 {
 	if (name == NULL)
@@ -1145,7 +1154,7 @@ LaunchDaemon::_FindEvent(const char* owner, const char* name) const
 
 
 void
-LaunchDaemon::_ResolveRegisteredEvents(RegisteredEvent* event,
+LaunchDaemon::_ResolveExternalEvents(ExternalEventSource* event,
 	const BString& name)
 {
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
@@ -1158,14 +1167,14 @@ LaunchDaemon::_ResolveRegisteredEvents(RegisteredEvent* event,
 
 
 void
-LaunchDaemon::_ResolveRegisteredEvents(BaseJob* job)
+LaunchDaemon::_ResolveExternalEvents(BaseJob* job)
 {
 	if (job->Event() == NULL)
 		return;
 
 	for (EventMap::iterator iterator = fEvents.begin();
 			iterator != fEvents.end(); iterator++) {
-		RegisteredEvent* event = iterator->second;
+		ExternalEventSource* event = iterator->second;
 		if (Events::ResolveRegisteredEvent(job->Event(), event->Name()))
 			event->AddListener(job);
 	}
