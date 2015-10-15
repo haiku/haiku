@@ -9,10 +9,11 @@
 
 #include "NotificationServer.h"
 
+#include <stdlib.h>
+
 #include <Beep.h>
 #include <Notifications.h>
 #include <PropertyInfo.h>
-#include <stdlib.h>
 
 #include "NotificationWindow.h"
 
