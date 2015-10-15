@@ -141,8 +141,8 @@ RemotePackageRepository HaikuPorts
 	haikuwebkit-1.4.12-1
 	haikuwebkit_devel-1.4.12-1
 	handbrake-0.10.1-1
-	harfbuzz-1.0.0-1
-	harfbuzz_devel-1.0.0-1
+	harfbuzz-1.0.5-1
+	harfbuzz_devel-1.0.5-1
 	help2man-1.46.6-1
 	htmldoc-1.8.27-3
 	icu-55.1-5
@@ -200,6 +200,8 @@ RemotePackageRepository HaikuPorts
 	libmikmod_devel-3.3.7-1
 	libmkv-0.6.5.1-3
 	libmkv_devel-0.6.5.1-3
+	libmodplug-0.8.8.5-1
+	libmodplug_devel-0.8.8.5-1
 	libmp4v2-2.0.0-2
 	libmp4v2_devel-2.0.0-2
 	libmpeg2-0.5.1-3
@@ -335,8 +337,8 @@ RemotePackageRepository HaikuPorts
 	snappy_devel-1.1.3-1
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.8.11.1-1
-	sqlite_devel-3.8.11.1-1
+	sqlite-3.9.0.0-1
+	sqlite_devel-3.9.0.0-1
 	subversion-1.8.11-1
 	subversion_devel-1.8.11-1
 	tar-1.28-1
@@ -346,6 +348,9 @@ RemotePackageRepository HaikuPorts
 	tiff-3.9.6-2
 	tiff_devel-3.9.6-2
 	tiff_tools-3.9.6-2
+	tiff4-4.0.6-1
+	tiff4_devel-4.0.6-1
+	tiff4_tools-4.0.6-1
 	tinyxml-2.6.2-1
 	tinyxml_devel-2.6.2-1
 	transmission-2.84-3
@@ -460,6 +465,7 @@ RemotePackageRepository HaikuPorts
 	libmad
 	libmikmod
 	libmkv
+	libmodplug
 	libmp4v2
 	libmpeg2
 	libogg
@@ -544,6 +550,7 @@ RemotePackageRepository HaikuPorts
 	texi2html
 	texinfo
 	tiff
+	tiff4
 	tinyxml
 	transmission
 	unrar
