@@ -731,9 +731,7 @@ BContainerWindow::CreatePoseView(Model* model)
 		&& !fPoseView->IsFilePanel()) {
 		fNavigator = new BNavigator(model);
 		fPoseContainer->GridLayout()->AddView(fNavigator, 0, 0, 2);
-		if (settings.ShowNavigator())
-			fBorderedView->GroupLayout()->SetInsets(1);
-		else
+		if (!settings.ShowNavigator())
 			fNavigator->Hide();
 	}
 
@@ -1618,8 +1616,6 @@ BContainerWindow::MessageReceived(BMessage* message)
 							fPoseContainer->GridLayout()->AddView(fNavigator,
 								0, 0, 2);
 							fNavigator->Hide();
-							fBorderedView->GroupLayout()->SetInsets(1, 0,
-								1, 1);
 							SetPathWatchingEnabled(settings.ShowNavigator()
 								|| settings.ShowFullPathInTitleBar());
 						}
@@ -4072,8 +4068,6 @@ BContainerWindow::ShowNavigator(bool show)
 
 		if (PoseView()->VScrollBar())
 			PoseView()->UpdateScrollRange();
-
-		fBorderedView->GroupLayout()->SetInsets(1);
 	} else {
 		if (!Navigator() || Navigator()->IsHidden())
 			return;
@@ -4082,7 +4076,6 @@ BContainerWindow::ShowNavigator(bool show)
 			PoseView()->UpdateScrollRange();
 
 		fNavigator->Hide();
-		fBorderedView->GroupLayout()->SetInsets(1, 0, 1, 1);
 	}
 }
 

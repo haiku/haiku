@@ -76,6 +76,7 @@ protected:
 	virtual void MessageReceived(BMessage* msg);
 	virtual void AttachedToWindow();
 	virtual void AllAttached();
+	virtual void Draw(BRect updateRect);
 
 	void GoForward(bool option);
 		// is option key held down?

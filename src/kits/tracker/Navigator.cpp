@@ -35,6 +35,7 @@ All rights reserved.
 
 #include "Navigator.h"
 
+#include <ControlLook.h>
 #include <TextControl.h>
 #include <Window.h>
 
@@ -67,7 +68,12 @@ BNavigator::BNavigator(const Model* model)
 		new BMessage(kNavigatorCommandLocation));
 	fLocation->SetDivider(0);
 
-	GroupLayout()->SetInsets(0, 0, B_USE_HALF_ITEM_INSETS, 0);
+	GroupLayout()->SetInsets(0.0f, 0.0f, B_USE_HALF_ITEM_INSETS, 1.0f);
+		// 1px bottom inset used for border
+
+	// Needed to draw the bottom border
+	SetFlags(Flags() | B_WILL_DRAW);
+	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 
@@ -111,6 +117,21 @@ BNavigator::AllAttached()
 {
 	// Inital setup of widget states
 	UpdateLocation(0, kActionSet);
+}
+
+
+void
+BNavigator::Draw(BRect updateRect)
+{
+	// Draw a 1px bottom border, like BMenuBar
+	BRect rect(Bounds());
+	rgb_color base = LowColor();
+	uint32 flags = 0;
+
+	be_control_look->DrawBorder(this, rect, updateRect, base,
+		B_PLAIN_BORDER, flags, BControlLook::B_BOTTOM_BORDER);
+
+	_inherited::Draw(rect & updateRect);
 }
 
 
