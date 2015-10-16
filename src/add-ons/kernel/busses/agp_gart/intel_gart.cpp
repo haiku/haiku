@@ -1,6 +1,14 @@
 /*
  * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Jerome Duval, jerome.duval@gmail.com
+ *		Adrien Destugues, pulkomandy@gmail.com
+ *		Michael Lotz, mmlr@mlotz.ch
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
 
@@ -104,6 +112,14 @@ const struct supported_device {
 	{0x0c00, 0x0412, INTEL_TYPE_IVBG, "Haswell Desktop"},
 	{0x0c04, 0x0416, INTEL_TYPE_IVBGM, "Haswell Mobile"},
 	{0x0d04, 0x0d26, INTEL_TYPE_IVBGM, "Haswell Mobile"},
+
+	// XXX: 0x0f00 only confirmed on 0x0f30, 0x0f31
+	{0x0f00, 0x0155, INTEL_TYPE_VLVG, "ValleyView Desktop"},
+	{0x0f00, 0x0f30, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
+	{0x0f00, 0x0f31, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
+	{0x0f00, 0x0f32, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
+	{0x0f00, 0x0f33, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
+	{0x0f00, 0x0157, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
 };
 
 struct intel_info {
@@ -392,6 +408,7 @@ intel_map(intel_info &info)
 		info.display.u.h0.base_registers[mmioIndex],
 		info.display.u.h0.base_register_sizes[mmioIndex], B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
+
 	if (mmioMapper.InitCheck() < B_OK) {
 		dprintf("agp_intel: could not map memory I/O!\n");
 		return info.registers_area;

@@ -100,6 +100,13 @@ const struct supported_device {
 	{0x0412, INTEL_TYPE_IVBG, "Haswell Desktop"},
 	{0x0416, INTEL_TYPE_IVBGM, "Haswell Mobile"},
 	{0x0d26, INTEL_TYPE_IVBGM, "Haswell Mobile"},
+
+	{0x0155, INTEL_TYPE_VLVG, "ValleyView Desktop"},
+	{0x0f30, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
+	{0x0f31, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
+	{0x0f32, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
+	{0x0f33, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
+	{0x0157, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;

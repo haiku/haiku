@@ -37,6 +37,9 @@ intel_en_gating(intel_info &info)
 	} else if (info.device_type.InGroup(INTEL_TYPE_IVB)) {
 		TRACE("IvyBridge clock gating\n");
 		write32(info, 0x42020, (1L << 28));
+	} else if (info.device_type.InGroup(INTEL_TYPE_VLV)) {
+		TRACE("ValleyView clock gating\n");
+		write32(info, VLV_DISPLAY_BASE + 0x6200, (1L << 28));
 	} else if (info.device_type.InGroup(INTEL_TYPE_ILK)) {
 		TRACE("IronLake clock gating\n");
 		write32(info, 0x42020, (1L << 7) | (1L << 5));

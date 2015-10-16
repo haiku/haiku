@@ -140,7 +140,8 @@ get_pll_limits(pll_limits &limits)
 
 	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_ILK)
 		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB)
-		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IVB)) {
+		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IVB)
+		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_VLV)) {
 		// TODO: support LVDS output limits as well
 		static const pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
@@ -351,6 +352,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 		controlRegister = INTEL_DISPLAY_B_CONTROL;
 	} else {
 		// TODO: not supported
+		TRACE("%s: pllRegister not yet supported\n", __func__);
 		return;
 	}
 
@@ -565,7 +567,8 @@ set_frame_buffer_base()
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_ILK)
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_IVB)) {
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_IVB)
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_VLV)) {
 		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
 		read32(baseRegister);

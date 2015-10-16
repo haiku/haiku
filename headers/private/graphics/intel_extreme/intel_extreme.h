@@ -39,6 +39,7 @@
 #define INTEL_TYPE_ILK			(INTEL_TYPE_9xx | 0x1000)
 #define INTEL_TYPE_SNB			(INTEL_TYPE_9xx | 0x2000)
 #define INTEL_TYPE_IVB			(INTEL_TYPE_9xx | 0x4000)
+#define INTEL_TYPE_VLV			(INTEL_TYPE_9xx | 0x8000)
 // models
 #define INTEL_TYPE_SERVER		0x0004
 #define INTEL_TYPE_MOBILE		0x0008
@@ -61,6 +62,11 @@
 #define INTEL_TYPE_IVBG			(INTEL_TYPE_IVB)
 #define INTEL_TYPE_IVBGM		(INTEL_TYPE_IVB | INTEL_TYPE_MOBILE)
 #define INTEL_TYPE_IVBGS		(INTEL_TYPE_IVB | INTEL_TYPE_SERVER)
+#define INTEL_TYPE_VLVG			(INTEL_TYPE_VLV)
+#define INTEL_TYPE_VLVGM		(INTEL_TYPE_VLV | INTEL_TYPE_MOBILE)
+
+// ValleyView MMIO offset
+#define VLV_DISPLAY_BASE		0x180000
 
 #define DEVICE_NAME				"intel_extreme"
 #define INTEL_ACCELERANT_NAME	"intel_extreme.accelerant"
@@ -131,7 +137,7 @@ struct DeviceType {
 	bool HasPlatformControlHub() const
 	{
 		return InGroup(INTEL_TYPE_ILK) || InGroup(INTEL_TYPE_SNB)
-			|| InGroup(INTEL_TYPE_IVB);
+			|| InGroup(INTEL_TYPE_IVB) || InGroup(INTEL_TYPE_VLV);
 	}
 };
 
@@ -166,6 +172,7 @@ struct intel_shared_info {
 
 	area_id			registers_area;			// area of memory mapped registers
 	uint32			register_blocks[REGISTER_BLOCK_COUNT];
+
 	uint8*			status_page;
 	phys_addr_t		physical_status_page;
 	uint8*			graphics_memory;
@@ -368,7 +375,6 @@ struct intel_free_graphics_memory {
 #define PCH_INTERRUPT_VBLANK_PIPEB_SNB		(1 << 15)
 
 // display ports
-#define INTEL_DISPLAY_A_ANALOG_PORT		(0x1100 | REGS_SOUTH_TRANSCODER_PORT)
 #define DISPLAY_MONITOR_PORT_ENABLED	(1UL << 31)
 #define DISPLAY_MONITOR_PIPE_B			(1UL << 30)
 #define DISPLAY_MONITOR_VGA_POLARITY	(1UL << 15)
@@ -380,9 +386,6 @@ struct intel_free_graphics_memory {
 #define DISPLAY_MONITOR_POLARITY_MASK	(3UL << 3)
 #define DISPLAY_MONITOR_POSITIVE_HSYNC	(1UL << 3)
 #define DISPLAY_MONITOR_POSITIVE_VSYNC	(2UL << 3)
-#define INTEL_DISPLAY_A_DIGITAL_PORT	(0x1120 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_C_DIGITAL			(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_LVDS_PORT			(0x1180 | REGS_SOUTH_TRANSCODER_PORT)
 #define LVDS_POST2_RATE_SLOW			14 // PLL Divisors
 #define LVDS_POST2_RATE_FAST			7
 #define LVDS_CLKB_POWER_MASK			(3 << 4)
@@ -436,7 +439,11 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_A_IMAGE_SIZE		(0x001c | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_B_IMAGE_SIZE		(0x101c | REGS_NORTH_PIPE_AND_PORT)
 
+#define INTEL_DISPLAY_A_ANALOG_PORT		(0x1100 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DISPLAY_A_DIGITAL_PORT	(0x1120 | REGS_SOUTH_TRANSCODER_PORT)
 #define INTEL_DISPLAY_B_DIGITAL_PORT	(0x1140 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DISPLAY_C_DIGITAL			(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DISPLAY_LVDS_PORT			(0x1180 | REGS_SOUTH_TRANSCODER_PORT)
 
 // planes
 #define INTEL_DISPLAY_A_PIPE_CONTROL	(0x0008 | REGS_NORTH_PLANE_CONTROL)
