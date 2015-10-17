@@ -18,6 +18,7 @@
 #include "BaseJob.h"
 #include "LaunchDaemon.h"
 #include "Utility.h"
+#include "VolumeWatcher.h"
 
 
 class EventContainer : public Event {
@@ -115,6 +116,21 @@ private:
 };
 
 
+class VolumeMountedEvent : public Event, public VolumeListener {
+public:
+								VolumeMountedEvent(Event* parent,
+									const BMessage& args);
+
+	virtual	status_t			Register(EventRegistrator& registrator);
+	virtual	void				Unregister(EventRegistrator& registrator);
+
+	virtual	BString				ToString() const;
+
+	virtual	void				VolumeMounted(dev_t device);
+	virtual	void				VolumeUnmounted(dev_t device);
+};
+
+
 static Event*
 create_event(Event* parent, const char* name, const BMessenger* target,
 	const BMessage& args)
@@ -130,6 +146,8 @@ create_event(Event* parent, const char* name, const BMessenger* target,
 		return new DemandEvent(parent);
 	if (strcmp(name, "file_created") == 0)
 		return new FileCreatedEvent(parent, args);
+	if (strcmp(name, "volume_mounted") == 0)
+		return new VolumeMountedEvent(parent, args);
 
 	return new ExternalEvent(parent, name, args);
 }
@@ -500,6 +518,51 @@ FileCreatedEvent::ToString() const
 	BString string = "file_created ";
 	string << fPath.Path();
 	return string;
+}
+
+
+// #pragma mark -
+
+
+VolumeMountedEvent::VolumeMountedEvent(Event* parent, const BMessage& args)
+	:
+	Event(parent)
+{
+}
+
+
+status_t
+VolumeMountedEvent::Register(EventRegistrator& registrator)
+{
+	VolumeWatcher::Register(this);
+	return B_OK;
+}
+
+
+void
+VolumeMountedEvent::Unregister(EventRegistrator& registrator)
+{
+	VolumeWatcher::Unregister(this);
+}
+
+
+BString
+VolumeMountedEvent::ToString() const
+{
+	return "volume_mounted";
+}
+
+
+void
+VolumeMountedEvent::VolumeMounted(dev_t device)
+{
+	Trigger();
+}
+
+
+void
+VolumeMountedEvent::VolumeUnmounted(dev_t device)
+{
 }
 
 

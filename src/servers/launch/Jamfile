@@ -16,6 +16,7 @@ Server launch_daemon
 	SettingsParser.cpp
 	Target.cpp
 	Utility.cpp
+	VolumeWatcher.cpp
 	Worker.cpp
 
 	# init jobs
