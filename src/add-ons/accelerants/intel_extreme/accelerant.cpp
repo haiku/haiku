@@ -181,6 +181,29 @@ uninit_common(void)
 }
 
 
+static void
+dump_ports()
+{
+	if (gInfo->port_count == 0) {
+		TRACE("%s: No ports connected\n", __func__);
+		return;
+	}
+
+	TRACE("%s: Connected ports: (port_count: %d)\n", __func__,
+		gInfo->port_count);
+
+	for (uint32 i = 0; i < gInfo->port_count; i++) {
+		Port* port = gInfo->ports[i];
+		if (!port) {
+			TRACE("port %d: INVALID ALLOC!\n", i);
+			continue;
+		}
+		TRACE("port %d: %s %s\n", i, port->PortName(),
+			port->IsConnected() ? "connected" : "disconnected");
+	}
+}
+
+
 static bool
 has_connected_port(port_index portIndex, uint32 type)
 {
@@ -302,7 +325,8 @@ intel_init_accelerant(int device)
 	} else
 		delete analogPort;
 
-	TRACE("connected ports detected: %" B_PRIu32 "\n", gInfo->port_count);
+	// On TRACE, dump ports and states
+	dump_ports();
 
 	status = create_mode_list();
 	if (status != B_OK) {

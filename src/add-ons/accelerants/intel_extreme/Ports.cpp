@@ -83,7 +83,7 @@ Port::GetEDID(edid1_info* edid, bool forceRead)
 			return fEDIDState;
 		}
 
-		TRACE("%s: using register %" B_PRIx32 "\n", PortName(), ddcRegister);
+		TRACE("%s: using register %" B_PRIxADDR "\n", PortName(), ddcRegister);
 
 		i2c_bus bus;
 		bus.cookie = (void*)ddcRegister;
@@ -184,7 +184,7 @@ AnalogPort::IsConnected()
 }
 
 
-uint32
+addr_t
 AnalogPort::_DDCRegister()
 {
 	// always fixed
@@ -218,7 +218,7 @@ LVDSPort::IsConnected()
 }
 
 
-uint32
+addr_t
 LVDSPort::_DDCRegister()
 {
 	// always fixed
@@ -245,7 +245,7 @@ DigitalPort::IsConnected()
 }
 
 
-uint32
+addr_t
 DigitalPort::_DDCRegister()
 {
 	switch (PortIndex()) {

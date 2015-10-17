@@ -64,7 +64,7 @@ static	status_t					_SetI2CSignals(void* cookie, int clock,
 										int data);
 
 private:
-virtual	uint32						_DDCRegister() = 0;
+virtual	addr_t						_DDCRegister() = 0;
 
 		port_index					fPortIndex;
 		char*						fPortName;
@@ -84,7 +84,7 @@ virtual	uint32						Type() const
 virtual	bool						IsConnected();
 
 protected:
-virtual	uint32						_DDCRegister();
+virtual	addr_t						_DDCRegister();
 };
 
 
@@ -98,7 +98,7 @@ virtual	uint32						Type() const
 virtual	bool						IsConnected();
 
 protected:
-virtual	uint32						_DDCRegister();
+virtual	addr_t						_DDCRegister();
 };
 
 
@@ -114,7 +114,7 @@ virtual	uint32						Type() const
 virtual	bool						IsConnected();
 
 protected:
-virtual	uint32						_DDCRegister();
+virtual	addr_t						_DDCRegister();
 };
 
 
