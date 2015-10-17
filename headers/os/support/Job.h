@@ -71,6 +71,7 @@ protected:
 	virtual	status_t			Execute() = 0;
 	virtual	void				Cleanup(status_t jobResult);
 
+			void				SetState(BJobState state);
 			void				SetErrorString(const BString&);
 
 			void				NotifyStateListeners();

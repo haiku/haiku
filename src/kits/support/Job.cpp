@@ -227,6 +227,13 @@ BJob::DependantJobAt(int32 index) const
 
 
 void
+BJob::SetState(BJobState state)
+{
+	fState = state;
+}
+
+
+void
 BJob::NotifyStateListeners()
 {
 	int32 count = fStateListeners.CountItems();
