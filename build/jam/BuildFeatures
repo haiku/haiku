@@ -359,7 +359,7 @@ if [ IsPackageAvailable haikuwebkit_devel ] {
 
 
 # libpng
-if [ IsPackageAvailable libpng_devel ] {
+if [ IsPackageAvailable libpng16_devel ] {
 	ExtractBuildFeatureArchives libpng :
 		file: base libpng16
 			runtime: lib
@@ -538,13 +538,13 @@ if [ IsPackageAvailable libwebp_devel ] {
 
 
 # ncurses
-if [ IsPackageAvailable ncurses_devel ] {
+if [ IsPackageAvailable ncurses6_devel ] {
 	ExtractBuildFeatureArchives ncurses :
-		file: base ncurses
+		file: base ncurses6
 			runtime: lib
-		file: devel ncurses_devel
+		file: devel ncurses6_devel
 			depends: base
-			library: $(developLibDir)/libncurses.so.5
+			library: $(developLibDir)/libncurses.so.6
 			headers: $(developHeadersDir)
 		;
 

@@ -72,13 +72,14 @@ requires {
 	lib:libicutest
 	lib:libicutu
 	lib:libicuuc
+	lib:libncurses >= 6.0
 #ifdef HAIKU_REGULAR_BUILD
 	lib:libexpat
 	lib:libgutenprint
 	lib:libicns
 	lib:libjasper
 	lib:libjpeg
-	lib:libpng
+	lib:libpng >= 16.0
 	lib:libqrencode
 	lib:libtiff
 	lib:libwebp
