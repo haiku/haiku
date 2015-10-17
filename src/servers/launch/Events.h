@@ -16,8 +16,11 @@ class Event;
 
 class EventRegistrator {
 public:
-	virtual	status_t			RegisterEvent(Event* event) = 0;
-	virtual	void				UnregisterEvent(Event* event) = 0;
+	virtual	status_t			RegisterExternalEvent(Event* event,
+									const char* name,
+									const BStringList& arguments) = 0;
+	virtual	void				UnregisterExternalEvent(Event* event,
+									const char* name) = 0;
 };
 
 
@@ -27,13 +30,13 @@ public:
 	virtual						~Event();
 
 	virtual	status_t			Register(
-									EventRegistrator& registrator) const = 0;
+									EventRegistrator& registrator) = 0;
 	virtual	void				Unregister(
-									EventRegistrator& registrator) const = 0;
+									EventRegistrator& registrator) = 0;
 
 			bool				Triggered() const;
 	virtual	void				Trigger();
-			void				ResetTrigger();
+	virtual	void				ResetTrigger();
 
 	virtual	BaseJob*			Owner() const;
 	virtual	void				SetOwner(BaseJob* owner);
@@ -42,7 +45,7 @@ public:
 
 	virtual	BString				ToString() const = 0;
 
-private:
+protected:
 			Event*				fParent;
 			bool				fTriggered;
 };
@@ -53,9 +56,9 @@ public:
 	static	Event*			FromMessage(const BMessenger& target,
 								const BMessage& message);
 	static	Event*			AddOnDemand(const BMessenger& target, Event* event);
-	static	bool			ResolveRegisteredEvent(Event* event,
-								const char* name);
-	static	void			TriggerRegisteredEvent(Event* event,
+	static	bool			ResolveExternalEvent(Event* event,
+								const char* name, uint32 flags);
+	static	void			TriggerExternalEvent(Event* event,
 								const char* name);
 	static	bool			TriggerDemand(Event* event);
 };

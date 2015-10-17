@@ -341,6 +341,14 @@ Job::IsLaunched() const
 }
 
 
+bool
+Job::IsRunning() const
+{
+	// TODO: monitor team status; should jobs be allowed to run multiple times?
+	return State() == B_JOB_STATE_SUCCEEDED && IsLaunched() && IsService();
+}
+
+
 status_t
 Job::HandleGetLaunchData(BMessage* message)
 {
@@ -353,9 +361,22 @@ Job::HandleGetLaunchData(BMessage* message)
 
 
 status_t
+Job::Run()
+{
+	status_t status = BJob::Run();
+
+	// TODO: monitor team, don't just do this
+	if (!IsService())
+		SetState(B_JOB_STATE_WAITING_TO_RUN);
+
+	return status;
+}
+
+
+status_t
 Job::Execute()
 {
-	if (!IsLaunched())
+	if (!IsLaunched() || !IsService())
 		return Launch();
 
 	return B_OK;

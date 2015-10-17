@@ -71,8 +71,11 @@ public:
 
 			status_t			Launch();
 			bool				IsLaunched() const;
+			bool				IsRunning() const;
 
 			status_t			HandleGetLaunchData(BMessage* message);
+
+	virtual	status_t			Run();
 
 protected:
 	virtual	status_t			Execute();

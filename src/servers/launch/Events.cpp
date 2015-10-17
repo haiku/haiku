@@ -9,8 +9,9 @@
 #include <stdio.h>
 
 #include <Entry.h>
-#include <ObjectList.h>
+#include <LaunchRoster.h>
 #include <Message.h>
+#include <ObjectList.h>
 #include <Path.h>
 #include <StringList.h>
 
@@ -33,8 +34,8 @@ public:
 
 			const BMessenger&	Target() const;
 
-	virtual	status_t			Register(EventRegistrator& registrator) const;
-	virtual	void				Unregister(EventRegistrator& registrator) const;
+	virtual	status_t			Register(EventRegistrator& registrator);
+	virtual	void				Unregister(EventRegistrator& registrator);
 
 	virtual	void				Trigger();
 
@@ -48,6 +49,7 @@ protected:
 			BaseJob*			fOwner;
 			BMessenger			fTarget;
 			BObjectList<Event>	fEvents;
+			bool				fRegistered;
 };
 
 
@@ -58,6 +60,8 @@ public:
 								OrEvent(BaseJob* owner,
 									const BMessenger& target);
 
+	virtual	void				ResetTrigger();
+
 	virtual	BString				ToString() const;
 };
 
@@ -66,8 +70,8 @@ class DemandEvent : public Event {
 public:
 								DemandEvent(Event* parent);
 
-	virtual	status_t			Register(EventRegistrator& registrator) const;
-	virtual	void				Unregister(EventRegistrator& registrator) const;
+	virtual	status_t			Register(EventRegistrator& registrator);
+	virtual	void				Unregister(EventRegistrator& registrator);
 
 	virtual	BString				ToString() const;
 };
@@ -79,16 +83,19 @@ public:
 									const BMessage& args);
 
 			const BString&		Name() const;
-			bool				Resolve();
+			bool				Resolve(uint32 flags);
 
-	virtual	status_t			Register(EventRegistrator& registrator) const;
-	virtual	void				Unregister(EventRegistrator& registrator) const;
+	virtual	void				ResetTrigger();
+
+	virtual	status_t			Register(EventRegistrator& registrator);
+	virtual	void				Unregister(EventRegistrator& registrator);
 
 	virtual	BString				ToString() const;
 
 private:
 			BString				fName;
 			BStringList			fArguments;
+			uint32				fFlags;
 			bool				fResolved;
 };
 
@@ -98,8 +105,8 @@ public:
 								FileCreatedEvent(Event* parent,
 									const BMessage& args);
 
-	virtual	status_t			Register(EventRegistrator& registrator) const;
-	virtual	void				Unregister(EventRegistrator& registrator) const;
+	virtual	status_t			Register(EventRegistrator& registrator);
+	virtual	void				Unregister(EventRegistrator& registrator);
 
 	virtual	BString				ToString() const;
 
@@ -198,7 +205,8 @@ EventContainer::EventContainer(Event* parent, const BMessenger* target,
 	const BMessage& args)
 	:
 	Event(parent),
-	fEvents(5, true)
+	fEvents(5, true),
+	fRegistered(false)
 {
 	if (target != NULL)
 		fTarget = *target;
@@ -222,7 +230,8 @@ EventContainer::EventContainer(BaseJob* owner, const BMessenger& target)
 	Event(NULL),
 	fOwner(owner),
 	fTarget(target),
-	fEvents(5, true)
+	fEvents(5, true),
+	fRegistered(false)
 {
 }
 
@@ -250,8 +259,11 @@ EventContainer::Target() const
 
 
 status_t
-EventContainer::Register(EventRegistrator& registrator) const
+EventContainer::Register(EventRegistrator& registrator)
 {
+	if (fRegistered)
+		return B_OK;
+
 	int32 count = fEvents.CountItems();
 	for (int32 index = 0; index < count; index++) {
 		Event* event = fEvents.ItemAt(index);
@@ -260,12 +272,13 @@ EventContainer::Register(EventRegistrator& registrator) const
 			return status;
 	}
 
+	fRegistered = true;
 	return B_OK;
 }
 
 
 void
-EventContainer::Unregister(EventRegistrator& registrator) const
+EventContainer::Unregister(EventRegistrator& registrator)
 {
 	int32 count = fEvents.CountItems();
 	for (int32 index = 0; index < count; index++) {
@@ -334,6 +347,20 @@ OrEvent::OrEvent(BaseJob* owner, const BMessenger& target)
 }
 
 
+void
+OrEvent::ResetTrigger()
+{
+	fTriggered = false;
+
+	int32 count = fEvents.CountItems();
+	for (int32 index = 0; index < count; index++) {
+		Event* event = fEvents.ItemAt(index);
+		event->ResetTrigger();
+		fTriggered |= event->Triggered();
+	}
+}
+
+
 BString
 OrEvent::ToString() const
 {
@@ -354,14 +381,14 @@ DemandEvent::DemandEvent(Event* parent)
 
 
 status_t
-DemandEvent::Register(EventRegistrator& registrator) const
+DemandEvent::Register(EventRegistrator& registrator)
 {
 	return B_OK;
 }
 
 
 void
-DemandEvent::Unregister(EventRegistrator& registrator) const
+DemandEvent::Unregister(EventRegistrator& registrator)
 {
 }
 
@@ -381,6 +408,7 @@ ExternalEvent::ExternalEvent(Event* parent, const char* name,
 	:
 	Event(parent),
 	fName(name),
+	fFlags(0),
 	fResolved(false)
 {
 	const char* argument;
@@ -399,26 +427,38 @@ ExternalEvent::Name() const
 
 
 bool
-ExternalEvent::Resolve()
+ExternalEvent::Resolve(uint32 flags)
 {
 	if (fResolved)
 		return false;
 
 	fResolved = true;
+	fFlags = flags;
 	return true;
 }
 
 
-status_t
-ExternalEvent::Register(EventRegistrator& registrator) const
+void
+ExternalEvent::ResetTrigger()
 {
-	return B_OK;
+	if ((fFlags & B_STICKY_EVENT) != 0)
+		return;
+
+	Event::ResetTrigger();
+}
+
+
+status_t
+ExternalEvent::Register(EventRegistrator& registrator)
+{
+	return registrator.RegisterExternalEvent(this, Name().String(), fArguments);
 }
 
 
 void
-ExternalEvent::Unregister(EventRegistrator& registrator) const
+ExternalEvent::Unregister(EventRegistrator& registrator)
 {
+	registrator.UnregisterExternalEvent(this, Name().String());
 }
 
 
@@ -441,7 +481,7 @@ FileCreatedEvent::FileCreatedEvent(Event* parent, const BMessage& args)
 
 
 status_t
-FileCreatedEvent::Register(EventRegistrator& registrator) const
+FileCreatedEvent::Register(EventRegistrator& registrator)
 {
 	// TODO: implement!
 	return B_ERROR;
@@ -449,7 +489,7 @@ FileCreatedEvent::Register(EventRegistrator& registrator) const
 
 
 void
-FileCreatedEvent::Unregister(EventRegistrator& registrator) const
+FileCreatedEvent::Unregister(EventRegistrator& registrator)
 {
 }
 
@@ -493,7 +533,7 @@ Events::AddOnDemand(const BMessenger& target, Event* event)
 
 
 /*static*/ bool
-Events::ResolveRegisteredEvent(Event* event, const char* name)
+Events::ResolveExternalEvent(Event* event, const char* name, uint32 flags)
 {
 	if (event == NULL)
 		return false;
@@ -503,10 +543,10 @@ Events::ResolveRegisteredEvent(Event* event, const char* name)
 				index++) {
 			Event* event = container->Events().ItemAt(index);
 			if (ExternalEvent* external = dynamic_cast<ExternalEvent*>(event)) {
-				if (external->Name() == name && external->Resolve())
+				if (external->Name() == name && external->Resolve(flags))
 					return true;
 			} else if (dynamic_cast<EventContainer*>(event) != NULL) {
-				if (ResolveRegisteredEvent(event, name))
+				if (ResolveExternalEvent(event, name, flags))
 					return true;
 			}
 		}
@@ -516,7 +556,7 @@ Events::ResolveRegisteredEvent(Event* event, const char* name)
 
 
 /*static*/ void
-Events::TriggerRegisteredEvent(Event* event, const char* name)
+Events::TriggerExternalEvent(Event* event, const char* name)
 {
 	if (event == NULL)
 		return;
@@ -531,7 +571,7 @@ Events::TriggerRegisteredEvent(Event* event, const char* name)
 					return;
 				}
 			} else if (dynamic_cast<EventContainer*>(event) != NULL) {
-				TriggerRegisteredEvent(event, name);
+				TriggerExternalEvent(event, name);
 			}
 		}
 	}

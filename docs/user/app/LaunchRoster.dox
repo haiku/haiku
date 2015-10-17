@@ -211,8 +211,13 @@ on {
 
 	The latter form can be used to solve ambiguous event definitions.
 
+	By specifying the \c B_STICKY_EVENT flag, you can mark the event as being
+	a permanent change. Once triggered, such an event will stay triggered, ie.
+	even new targets or jobs will consider it triggered.
+
 	\param source The messenger the event is coming from.
 	\param name The name of the event.
+	\param flags Flags for the event as described.
 	\return B_OK if the event could be registered, otherwise an error code.
 
 	\since Haiku R1

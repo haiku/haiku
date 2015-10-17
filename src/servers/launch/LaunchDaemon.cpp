@@ -85,10 +85,12 @@ class ExternalEventSource {
 public:
 								ExternalEventSource(BMessenger& source,
 									const char* ownerName,
-									const char* name);
+									const char* name, uint32 flags);
 								~ExternalEventSource();
 
 			const char*			Name() const;
+			uint32				Flags() const
+									{ return fFlags; }
 
 			int32				CountListeners() const;
 			BaseJob*			ListenerAt(int32 index) const;
@@ -98,6 +100,7 @@ public:
 
 private:
 			BString				fName;
+			uint32				fFlags;
 			BObjectList<BaseJob> fListeners;
 };
 
@@ -108,7 +111,8 @@ typedef std::map<BString, Target*> TargetMap;
 typedef std::map<BString, ExternalEventSource*> EventMap;
 
 
-class LaunchDaemon : public BServer, public Finder, public ConditionContext {
+class LaunchDaemon : public BServer, public Finder, public ConditionContext,
+	public EventRegistrator {
 public:
 								LaunchDaemon(bool userMode,
 									const EventMap& events, status_t& error);
@@ -118,8 +122,16 @@ public:
 	virtual	Target*				FindTarget(const char* name) const;
 			Session*			FindSession(uid_t user) const;
 
+	// ConditionContext
 	virtual	bool				IsSafeMode() const;
 	virtual	bool				BootVolumeIsReadOnly() const;
+
+	// EventRegistrator
+	virtual	status_t			RegisterExternalEvent(Event* event,
+									const char* name,
+									const BStringList& arguments);
+	virtual	void				UnregisterExternalEvent(Event* event,
+									const char* name);
 
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
@@ -218,9 +230,10 @@ Session::Session(uid_t user, const BMessenger& daemon)
 
 
 ExternalEventSource::ExternalEventSource(BMessenger& source,
-	const char* ownerName, const char* name)
+	const char* ownerName, const char* name, uint32 flags)
 	:
 	fName(name),
+	fFlags(flags),
 	fListeners(5, true)
 {
 }
@@ -349,6 +362,22 @@ bool
 LaunchDaemon::BootVolumeIsReadOnly() const
 {
 	return fReadOnlyBootVolume;
+}
+
+
+status_t
+LaunchDaemon::RegisterExternalEvent(Event* event, const char* name,
+	const BStringList& arguments)
+{
+	// TODO: register actual event with event source
+	return B_OK;
+}
+
+
+void
+LaunchDaemon::UnregisterExternalEvent(Event* event, const char* name)
+{
+	// TODO!
 }
 
 
@@ -482,7 +511,7 @@ LaunchDaemon::_HandleGetLaunchData(BMessage* message)
 				return;
 		}
 		reply.what = B_NAME_NOT_FOUND;
-	} else if (!job->IsLaunched()) {
+	} else if (job->IsService() && !job->IsLaunched()) {
 		if (job->InitCheck() == B_NO_INIT || !job->CheckCondition(*this)) {
 			// The job exists, but cannot be started yet, as its
 			// conditions are not met; don't make it available yet
@@ -638,6 +667,7 @@ LaunchDaemon::_HandleRegisterLaunchEvent(BMessage* message)
 
 		const char* name = message->GetString("name");
 		const char* ownerName = message->GetString("owner");
+		uint32 flags = message->GetUInt32("flags", 0);
 		BMessenger source;
 		if (name != NULL && ownerName != NULL
 			&& message->FindMessenger("source", &source) == B_OK) {
@@ -645,7 +675,7 @@ LaunchDaemon::_HandleRegisterLaunchEvent(BMessage* message)
 			ownerName = get_leaf(ownerName);
 
 			ExternalEventSource* event = new (std::nothrow)
-				ExternalEventSource(source, ownerName, name);
+				ExternalEventSource(source, ownerName, name, flags);
 			if (event != NULL) {
 				// Use short name, and fully qualified name
 				BString eventName = name;
@@ -723,7 +753,7 @@ LaunchDaemon::_HandleNotifyLaunchEvent(BMessage* message)
 			int32 count = event->CountListeners();
 			for (int32 index = 0; index < count; index++) {
 				BaseJob* listener = event->ListenerAt(index);
-				Events::TriggerRegisteredEvent(listener->Event(), name);
+				Events::TriggerExternalEvent(listener->Event(), name);
 			}
 		}
 	}
@@ -851,6 +881,9 @@ LaunchDaemon::_AddTargets(BMessage& message)
 		_SetEvent(target, targetMessage);
 		_SetEnvironment(target, targetMessage);
 		_AddJobs(target, targetMessage);
+
+		if (target->Event() != NULL)
+			target->Event()->Register(*this);
 	}
 }
 
@@ -980,6 +1013,8 @@ LaunchDaemon::_InitJobs(Target* target)
 				|| job->Condition()->Test(*this)) {
 				std::set<BString> dependencies;
 				status = job->Init(*this, dependencies);
+				if (status == B_OK && job->Event() != NULL)
+					status = job->Event()->Register(*this);
 			}
 		}
 
@@ -1030,18 +1065,20 @@ LaunchDaemon::_LaunchJobs(Target* target, bool forceNow)
 /*!	Adds the specified \a job to the launch queue
 	queue, except those that are triggered by events.
 
-	Unless \a forceNow is true, the target is only launched if its events,
+	Unless \c FORCE_NOW is set, the target is only launched if its events,
 	if any, have been triggered already.
 
-	Calling this method will trigger a demand event.
+	Calling this method will trigger a demand event if \c TRIGGER_DEMAND has
+	been set.
 */
 void
 LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 {
-	if (job == NULL || job->IsLaunched() || ((options & FORCE_NOW) == 0
-		&& (!job->EventHasTriggered() || !job->CheckCondition(*this)
-			|| ((options & TRIGGER_DEMAND) != 0
-					&& Events::TriggerDemand(job->Event()))))) {
+	if (job == NULL || (job->IsService() && job->IsLaunched())
+		|| ((options & FORCE_NOW) == 0
+			&& (!job->EventHasTriggered() || !job->CheckCondition(*this)
+				|| ((options & TRIGGER_DEMAND) != 0
+						&& Events::TriggerDemand(job->Event()))))) {
 		return;
 	}
 
@@ -1160,7 +1197,7 @@ LaunchDaemon::_ResolveExternalEvents(ExternalEventSource* event,
 	for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
 			iterator++) {
 		Job* job = iterator->second;
-		if (Events::ResolveRegisteredEvent(job->Event(), name))
+		if (Events::ResolveExternalEvent(job->Event(), name, event->Flags()))
 			event->AddListener(job);
 	}
 }
@@ -1175,7 +1212,8 @@ LaunchDaemon::_ResolveExternalEvents(BaseJob* job)
 	for (EventMap::iterator iterator = fEvents.begin();
 			iterator != fEvents.end(); iterator++) {
 		ExternalEventSource* event = iterator->second;
-		if (Events::ResolveRegisteredEvent(job->Event(), event->Name()))
+		if (Events::ResolveExternalEvent(job->Event(), event->Name(),
+				event->Flags()))
 			event->AddListener(job);
 	}
 }

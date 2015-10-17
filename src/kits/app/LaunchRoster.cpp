@@ -206,9 +206,10 @@ BLaunchRoster::StartSession(const char* login)
 
 
 status_t
-BLaunchRoster::RegisterEvent(const BMessenger& source, const char* name)
+BLaunchRoster::RegisterEvent(const BMessenger& source, const char* name,
+	uint32 flags)
 {
-	return _UpdateEvent(B_REGISTER_LAUNCH_EVENT, source, name);
+	return _UpdateEvent(B_REGISTER_LAUNCH_EVENT, source, name, flags);
 }
 
 
@@ -241,7 +242,7 @@ BLaunchRoster::_InitMessenger()
 
 status_t
 BLaunchRoster::_UpdateEvent(uint32 what, const BMessenger& source,
-	const char* name)
+	const char* name, uint32 flags)
 {
 	if (be_app == NULL || name == NULL || name[0] == '\0')
 		return B_BAD_VALUE;
@@ -254,6 +255,8 @@ BLaunchRoster::_UpdateEvent(uint32 what, const BMessenger& source,
 		status = request.AddString("owner", be_app->Signature());
 	if (status == B_OK)
 		status = request.AddString("name", name);
+	if (status == B_OK && flags != 0)
+		status = request.AddUInt32("flags", flags);
 	if (status != B_OK)
 		return status;
 

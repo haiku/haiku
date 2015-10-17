@@ -81,7 +81,7 @@ AutoMounter::AutoMounter()
 
 	BDiskDeviceRoster().StartWatching(this,
 		B_DEVICE_REQUEST_DEVICE | B_DEVICE_REQUEST_DEVICE_LIST);
-	BLaunchRoster().RegisterEvent(this, kInitialMountEvent);
+	BLaunchRoster().RegisterEvent(this, kInitialMountEvent, B_STICKY_EVENT);
 }
 
 

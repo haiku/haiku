@@ -9,6 +9,12 @@
 #include <Messenger.h>
 
 
+// Flags for RegisterEvent()
+enum {
+	B_STICKY_EVENT	= 0x01
+};
+
+
 class BLaunchRoster {
 public:
 								BLaunchRoster();
@@ -31,7 +37,7 @@ public:
 			status_t			StartSession(const char* login);
 
 			status_t			RegisterEvent(const BMessenger& source,
-									const char* name);
+									const char* name, uint32 flags);
 			status_t			UnregisterEvent(const BMessenger& source,
 									const char* name);
 			status_t			NotifyEvent(const BMessenger& source,
@@ -44,7 +50,8 @@ private:
 
 			void				_InitMessenger();
 			status_t			_UpdateEvent(uint32 what,
-									const BMessenger& source, const char* name);
+									const BMessenger& source, const char* name,
+									uint32 flags = 0);
 
 private:
 			BMessenger			fMessenger;
