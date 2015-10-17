@@ -19,18 +19,20 @@
 #include <unistd.h>
 #include <syslog.h>
 
+#include <new>
+
 #include <AGP.h>
 
 
 #undef TRACE
 #define TRACE_ACCELERANT
 #ifdef TRACE_ACCELERANT
-#	define TRACE(x...) _sPrintf("intel_extreme accelerant:" x)
+#	define TRACE(x...) _sPrintf("intel_extreme:" x)
 #else
 #	define TRACE(x...)
 #endif
 
-#define ERROR(x...) _sPrintf("intel_extreme accelerant: " x)
+#define ERROR(x...) _sPrintf("intel_extreme: " x)
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
@@ -179,6 +181,23 @@ uninit_common(void)
 }
 
 
+static bool
+has_connected_port(port_index portIndex, uint32 type)
+{
+	for (uint32 i = 0; i < gInfo->port_count; i++) {
+		Port* port = gInfo->ports[i];
+		if (type != INTEL_PORT_TYPE_ANY && port->Type() != type)
+			continue;
+		if (portIndex != INTEL_PORT_ANY && port->PortIndex() != portIndex)
+			continue;
+
+		return true;
+	}
+
+	return false;
+}
+
+
 //	#pragma mark - public accelerant functions
 
 
@@ -199,36 +218,91 @@ intel_init_accelerant(int device)
 
 	setup_ring_buffer(info.primary_ring_buffer, "intel primary ring buffer");
 
-	// determine head depending on what's already enabled from the BIOS
-	// TODO: it would be nicer to retrieve this data via DDC - else the
-	//	display is gone for good if the BIOS decides to only show the
-	//	picture on the connected analog monitor!
-	gInfo->head_mode = 0;
-	if (read32(INTEL_DISPLAY_B_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
-		gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
-	if (read32(INTEL_DISPLAY_A_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
-		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
+	TRACE("pipe control for: 0x%" B_PRIx32 " 0x%" B_PRIx32 "\n",
+		read32(INTEL_PIPE_CONTROL), read32(INTEL_PIPE_CONTROL));
 
-	uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT);
+	// Try to determine what ports to use. We use the following heuristic:
+	// * Check for DisplayPort, these can be more or less detected reliably.
+	// * Check for HDMI, it'll fail on devices not having HDMI for us to fall
+	//   back to DVI.
+	// * Assume DVI B if no HDMI and no DisplayPort is present, confirmed by
+	//   reading EDID in the IsConnected() call.
+	// * Check for analog if possible (there's a detection bit on PCH),
+	//   otherwise the assumed presence is confirmed by reading EDID in
+	//   IsConnected().
 
-	// If we have an enabled display pipe we save the passed information and
-	// assume it is the valid panel size..
-	// Later we query for proper EDID info if it exists, or figure something
-	// else out. (Default modes, etc.)
-	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
-	if ((hasPCH && (lvds & PCH_LVDS_DETECTED) != 0)
-		|| (!hasPCH && (lvds & DISPLAY_PIPE_ENABLED) != 0)) {
-		save_lvds_mode();
-		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
+	gInfo->port_count = 0;
+	for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {
+		Port* displayPort = new(std::nothrow) DisplayPort((port_index)i);
+		if (displayPort == NULL)
+			return B_NO_MEMORY;
+
+		if (displayPort->IsConnected())
+			gInfo->ports[gInfo->port_count++] = displayPort;
+		else
+			delete displayPort;
 	}
 
-	TRACE("head detected: %#x\n", gInfo->head_mode);
-	TRACE("adpa: %08" B_PRIx32 ", dova: %08" B_PRIx32 ", dovb: %08" B_PRIx32
-		", lvds: %08" B_PRIx32 "\n",
-		read32(INTEL_DISPLAY_A_ANALOG_PORT),
-		read32(INTEL_DISPLAY_A_DIGITAL_PORT),
-		read32(INTEL_DISPLAY_B_DIGITAL_PORT),
-		read32(INTEL_DISPLAY_LVDS_PORT));
+	for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {
+		if (has_connected_port((port_index)i, INTEL_PORT_TYPE_ANY)) {
+			// we overlap with a DisplayPort, this is not HDMI
+			continue;
+		}
+
+		Port* hdmiPort = new(std::nothrow) HDMIPort((port_index)i);
+		if (hdmiPort == NULL)
+			return B_NO_MEMORY;
+
+		if (hdmiPort->IsConnected())
+			gInfo->ports[gInfo->port_count++] = hdmiPort;
+		else
+			delete hdmiPort;
+	}
+
+	if (!has_connected_port(INTEL_PORT_ANY, INTEL_PORT_TYPE_ANY)) {
+		// there's neither DisplayPort nor HDMI so far, assume DVI B
+		Port* dviPort = new(std::nothrow) DigitalPort(INTEL_PORT_B);
+		if (dviPort == NULL)
+			return B_NO_MEMORY;
+
+		if (dviPort->IsConnected()) {
+			gInfo->ports[gInfo->port_count++] = dviPort;
+			gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
+		} else
+			delete dviPort;
+	}
+
+	// always try the LVDS port, it'll simply fail if not applicable
+	Port* lvdsPort = new(std::nothrow) LVDSPort();
+	if (lvdsPort == NULL)
+		return B_NO_MEMORY;
+	if (lvdsPort->IsConnected()) {
+		gInfo->ports[gInfo->port_count++] = lvdsPort;
+		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
+		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
+	} else
+		delete lvdsPort;
+
+	// also always try eDP, it'll also just fail if not applicable
+	Port* eDPPort = new(std::nothrow) EmbeddedDisplayPort();
+	if (eDPPort == NULL)
+		return B_NO_MEMORY;
+	if (eDPPort->IsConnected())
+		gInfo->ports[gInfo->port_count++] = eDPPort;
+	else
+		delete eDPPort;
+
+	// then finally always try the analog port
+	Port* analogPort = new(std::nothrow) AnalogPort();
+	if (analogPort == NULL)
+		return B_NO_MEMORY;
+	if (analogPort->IsConnected()) {
+		gInfo->ports[gInfo->port_count++] = analogPort;
+		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
+	} else
+		delete analogPort;
+
+	TRACE("connected ports detected: %" B_PRIu32 "\n", gInfo->port_count);
 
 	status = create_mode_list();
 	if (status != B_OK) {

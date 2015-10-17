@@ -14,6 +14,8 @@
 #include <edid.h>
 #include <video_overlay.h>
 
+#include "Ports.h"
+
 
 struct overlay {
 	overlay_buffer	buffer;
@@ -48,6 +50,9 @@ struct accelerant_info {
 	uint32			last_vertical_overlay_scale;
 	uint32			overlay_position_buffer_offset;
 
+	uint32			port_count;
+	Port*			ports[MAX_PORTS];
+
 	edid1_info		edid_info;
 	bool			has_edid;
 
@@ -64,10 +69,12 @@ struct accelerant_info {
 	display_mode	lvds_panel_mode;
 };
 
-#define HEAD_MODE_A_ANALOG		0x01
-#define HEAD_MODE_B_DIGITAL		0x02
-#define HEAD_MODE_CLONE			0x03
-#define HEAD_MODE_LVDS_PANEL	0x08
+#define HEAD_MODE_A_ANALOG		0x0001
+#define HEAD_MODE_B_DIGITAL		0x0002
+#define HEAD_MODE_CLONE			0x0003
+#define HEAD_MODE_LVDS_PANEL	0x0008
+#define HEAD_MODE_TESTING		0x1000
+#define HEAD_MODE_STIPPI		0x2000
 
 extern accelerant_info* gInfo;
 

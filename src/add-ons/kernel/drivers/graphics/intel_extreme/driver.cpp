@@ -100,6 +100,7 @@ const struct supported_device {
 	{0x0412, INTEL_TYPE_IVBG, "Haswell Desktop"},
 	{0x0416, INTEL_TYPE_IVBGM, "Haswell Mobile"},
 	{0x0d26, INTEL_TYPE_IVBGM, "Haswell Mobile"},
+	{0x0a16, INTEL_TYPE_IVBGM, "Haswell Mobile"},
 
 	{0x0155, INTEL_TYPE_VLVG, "ValleyView Desktop"},
 	{0x0f30, INTEL_TYPE_VLVGM, "ValleyView Mobile"},

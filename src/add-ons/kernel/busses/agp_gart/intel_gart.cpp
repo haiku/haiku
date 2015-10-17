@@ -47,6 +47,7 @@
 	(*((volatile uint32*)(address)))
 
 
+// PCI "Host bridge" is most cases :-)
 const struct supported_device {
 	uint32		bridge_id;
 	uint32		display_id;
@@ -112,6 +113,7 @@ const struct supported_device {
 	{0x0c00, 0x0412, INTEL_TYPE_IVBG, "Haswell Desktop"},
 	{0x0c04, 0x0416, INTEL_TYPE_IVBGM, "Haswell Mobile"},
 	{0x0d04, 0x0d26, INTEL_TYPE_IVBGM, "Haswell Mobile"},
+	{0x0a04, 0x0a16, INTEL_TYPE_IVBGM, "Haswell Mobile"},
 
 	// XXX: 0x0f00 only confirmed on 0x0f30, 0x0f31
 	{0x0f00, 0x0155, INTEL_TYPE_VLVG, "ValleyView Desktop"},
@@ -374,6 +376,19 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 static void
 set_gtt_entry(intel_info &info, uint32 offset, phys_addr_t physicalAddress)
 {
+	if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_96x
+		|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_Gxx
+		|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x
+		|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_IGD
+		|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_ILK
+		|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_VLV) {
+		// possible high bits are stored in the lower end
+		physicalAddress |= (physicalAddress >> 28) & 0x00f0;
+	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB) {
+		physicalAddress |= (physicalAddress >> 28) & 0x0ff0;
+		physicalAddress |= 0x02; // cache control, l3 cacheable
+	}
+
 	// TODO: this is not 64-bit safe!
 	write32(info.gtt_base + (offset >> GTT_PAGE_SHIFT),
 		(uint32)physicalAddress | GTT_ENTRY_VALID);
