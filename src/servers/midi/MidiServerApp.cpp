@@ -725,7 +725,7 @@ MidiServerApp::_CountApps()
 app_t*
 MidiServerApp::_AppAt(int32 index)
 {
-	ASSERT(index >= 0 && index < CountApps())
+	ASSERT(index >= 0 && index < _CountApps())
 
 	return (app_t*)fApps.ItemAt(index);
 }
@@ -741,7 +741,7 @@ MidiServerApp::_CountEndpoints()
 endpoint_t*
 MidiServerApp::_EndpointAt(int32 index)
 {
-	ASSERT(index >= 0 && index < CountEndpoints())
+	ASSERT(index >= 0 && index < _CountEndpoints())
 
 	return (endpoint_t*)fEndpoints.ItemAt(index);
 }
@@ -775,7 +775,7 @@ MidiServerApp::_DumpApps()
 	printf("*** START DumpApps\n");
 
 	for (int32 t = 0; t < _CountApps(); ++t) {
-		app_t* app = AppAt(t);
+		app_t* app = _AppAt(t);
 
 		printf("\tapp %" B_PRId32 " (%p): team %" B_PRId32 "\n", t, app,
 			app->messenger.Team());
@@ -806,8 +806,8 @@ MidiServerApp::_DumpEndpoints()
 				endpoint->port, endpoint->latency);
 		else {
 			printf("\t\tconnections:\n");
-			for (int32 k = 0; k < CountConnections(endpoint); ++k) {
-				endpoint_t* consumer = ConnectionAt(endpoint, k);
+			for (int32 k = 0; k < _CountConnections(endpoint); ++k) {
+				endpoint_t* consumer = _ConnectionAt(endpoint, k);
 				printf("\t\t\tid %" B_PRId32 " (%p)\n", consumer->id, consumer);
 			}
 		}
