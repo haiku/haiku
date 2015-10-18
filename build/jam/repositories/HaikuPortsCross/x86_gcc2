@@ -31,8 +31,8 @@ BootstrapPackageRepository HaikuPortsCross
 	icu_bootstrap_devel-54.1-1
 	m4_bootstrap-1.4.16-1
 	make_bootstrap-3.82-1
-	ncurses_bootstrap-5.9-1
-	ncurses_bootstrap_devel-5.9-1
+	ncurses_bootstrap-6.0-1
+	ncurses_bootstrap_devel-6.0-1
 	python_bootstrap-2.7.6-1
 	sed_bootstrap-4.2.1-1
 	texinfo_bootstrap-4.13a-1
@@ -47,8 +47,8 @@ BootstrapPackageRepository HaikuPortsCross
 		freetype_bootstrap_x86_devel-2.4.9-1
 		icu_bootstrap_x86-4.8.1.1-1
 		icu_bootstrap_x86_devel-4.8.1.1-1
-		ncurses_bootstrap_x86-5.9-1
-		ncurses_bootstrap_x86_devel-5.9-1
+		ncurses_bootstrap_x86-6.0-1
+		ncurses_bootstrap_x86_devel-6.0-1
 		zlib_bootstrap_x86-1.2.8-2
 		zlib_bootstrap_x86_devel-1.2.8-2
 	}@ # secondary_x86
