@@ -243,16 +243,24 @@ void
 JobQueue::_RequeueDependantJobsOf(BJob* job)
 {
 	while (BJob* dependantJob = job->DependantJobAt(0)) {
-		try {
-			fQueuedJobs->erase(dependantJob);
-		} catch (...) {
+		JobPriorityQueue::iterator found = fQueuedJobs->find(dependantJob);
+		bool removed = false;
+		if (found != fQueuedJobs->end()) {
+			try {
+				fQueuedJobs->erase(dependantJob);
+				removed = true;
+			} catch (...) {
+			}
 		}
 		dependantJob->RemoveDependency(job);
-		try {
-			fQueuedJobs->insert(dependantJob);
-			if (dependantJob->IsRunnable())
-				release_sem(fHaveRunnableJobSem);
-		} catch (...) {
+		if (removed) {
+			// Only insert a job if it was in our queue before
+			try {
+				fQueuedJobs->insert(dependantJob);
+				if (dependantJob->IsRunnable())
+					release_sem(fHaveRunnableJobSem);
+			} catch (...) {
+			}
 		}
 	}
 }
@@ -266,8 +274,15 @@ JobQueue::_RemoveDependantJobsOf(BJob* job)
 			fQueuedJobs->erase(dependantJob);
 		} catch (...) {
 		}
+
+		if (dependantJob->State() != B_JOB_STATE_ABORTED) {
+			BJob::Private(*dependantJob).SetState(B_JOB_STATE_ABORTED);
+			BJob::Private(*dependantJob).NotifyStateListeners();
+		}
+
 		_RemoveDependantJobsOf(dependantJob);
 		dependantJob->RemoveDependency(job);
+		// TODO: we need some sort of ownership management
 		delete dependantJob;
 	}
 }

@@ -30,6 +30,16 @@ public:
 		fJob._ClearTicketNumber();
 	}
 
+	void SetState(BJobState state)
+	{
+		fJob.SetState(state);
+	}
+
+	void NotifyStateListeners()
+	{
+		fJob.NotifyStateListeners();
+	}
+
 private:
 			BJob&				fJob;
 };
