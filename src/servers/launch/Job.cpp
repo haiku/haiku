@@ -25,6 +25,7 @@ Job::Job(const char* name)
 	fEnabled(true),
 	fService(false),
 	fCreateDefaultPort(false),
+	fLaunching(false),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
 	fLaunchStatus(B_NO_INIT),
@@ -349,6 +350,20 @@ Job::IsRunning() const
 }
 
 
+bool
+Job::IsLaunching() const
+{
+	return fLaunching;
+}
+
+
+void
+Job::SetLaunching(bool launching)
+{
+	fLaunching = launching;
+}
+
+
 status_t
 Job::HandleGetLaunchData(BMessage* message)
 {
@@ -376,10 +391,12 @@ Job::Run()
 status_t
 Job::Execute()
 {
+	status_t status = B_OK;
 	if (!IsLaunched() || !IsService())
-		return Launch();
+		status = Launch();
 
-	return B_OK;
+	fLaunching = false;
+	return status;
 }
 
 

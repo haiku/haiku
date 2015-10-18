@@ -73,6 +73,9 @@ public:
 			bool				IsLaunched() const;
 			bool				IsRunning() const;
 
+			bool				IsLaunching() const;
+			void				SetLaunching(bool launching);
+
 			status_t			HandleGetLaunchData(BMessage* message);
 
 	virtual	status_t			Run();
@@ -104,6 +107,7 @@ private:
 			bool				fEnabled;
 			bool				fService;
 			bool				fCreateDefaultPort;
+			bool				fLaunching;
 			PortMap				fPortMap;
 			status_t			fInitStatus;
 			team_id				fTeam;

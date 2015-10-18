@@ -1074,7 +1074,7 @@ LaunchDaemon::_LaunchJobs(Target* target, bool forceNow)
 void
 LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 {
-	if (job == NULL || (job->IsService() && job->IsLaunched())
+	if (job == NULL || job->IsLaunching() || job->IsRunning()
 		|| ((options & FORCE_NOW) == 0
 			&& (!job->EventHasTriggered() || !job->CheckCondition(*this)
 				|| ((options & TRIGGER_DEMAND) != 0
@@ -1097,6 +1097,7 @@ LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 	if (job->Event() != NULL)
 		job->Event()->ResetTrigger();
 
+	job->SetLaunching(true);
 	fJobQueue.AddJob(job);
 }
 
