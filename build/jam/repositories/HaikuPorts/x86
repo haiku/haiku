@@ -124,8 +124,8 @@ RemotePackageRepository HaikuPorts
 	libffi_devel-3.2.1-2
 	libgsasl-1.8.0-1
 	libgsasl_devel-1.8.0-1
-	libicns-0.8.1-1
-	libicns_devel-0.8.1-1
+	libicns-0.8.1-3
+	libicns_devel-0.8.1-3
 	libiconv-1.13.1-6
 	libiconv_devel-1.13.1-6
 	liblayout-1.4.2-1
@@ -161,8 +161,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis_devel-1.3.5-1
 	libvpx-1.0.0-2
 	libvpx_devel-1.0.0-2
-	libwebp-0.4.1-1
-	libwebp_devel-0.4.1-1
+	libwebp-0.4.1-2
+	libwebp_devel-0.4.1-2
 	libxml2-2.9.2-1
 	libxml2_devel-2.9.2-1
 	libxml2_python-2.9.2-1
@@ -217,8 +217,8 @@ RemotePackageRepository HaikuPorts
 	qca2-2.0.3-1
 	qca2_devel-2.0.3-1
 	qemu-2.1.2-1
-	qrencode-3.3.0-1
-	qrencode_devel-3.3.0-1
+	qrencode-3.4.4-1
+	qrencode_devel-3.4.4-1
 	readline-6.3.8-1
 	readline_devel-6.3.8-1
 	ruby-2.2.2-1
@@ -294,8 +294,8 @@ RemotePackageRepository HaikuPorts
 	jpeg_x86_gcc2_devel-9-3
 	libffi_x86_gcc2-3.0.13-1
 	libffi_x86_gcc2_devel-3.0.13-1
-	libicns_x86_gcc2-0.8.1-1
-	libicns_x86_gcc2_devel-0.8.1-1
+	libicns_x86_gcc2-0.8.1-3
+	libicns_x86_gcc2_devel-0.8.1-3
 	libiconv_x86_gcc2-1.13.1-6
 	libiconv_x86_gcc2_devel-1.13.1-6
 	libogg_x86_gcc2-1.3.0-2
@@ -312,8 +312,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis_x86_gcc2_devel-1.3.5-1
 	libvpx_x86_gcc2-1.0.0-2
 	libvpx_x86_gcc2_devel-1.0.0-2
-	libwebp_x86_gcc2-0.4.1-1
-	libwebp_x86_gcc2_devel-0.4.1-1
+	libwebp_x86_gcc2-0.4.1-2
+	libwebp_x86_gcc2_devel-0.4.1-2
 	libxml2_x86_gcc2-2.9.2-1
 	libxml2_x86_gcc2_devel-2.9.2-1
 	mesa_x86_gcc2-7.9.2-5
