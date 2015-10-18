@@ -8,7 +8,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	driveinfo dstcheck dumpcatalog
 	eject error
 	fdinfo ffm filepanel finddir findpaths fortune fstrim
-	ftp ftpd
+	ftp@libedit ftpd
 	getarch groupadd groupdel groupmod
 	hd hey
 	ideinfo@ide idestatus@ide ifconfig iroster isvolume
@@ -39,7 +39,7 @@ SYSTEM_APPS = [ FFilterByBuildFeatures
 	AboutSystem ActivityMonitor
 	BootManager@x86,x86_64
 	CharacterMap
-	Debugger DeskCalc Devices DiskProbe DiskUsage DriveSetup
+	Debugger@libedit DeskCalc Devices DiskProbe DiskUsage DriveSetup
 	Expander
 	NetworkStatus
 	ProcessController
