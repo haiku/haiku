@@ -480,6 +480,9 @@ RemotePackageRepository HaikuPorts
 	tiff-3.9.6-2
 	tiff_devel-3.9.6-2
 	tiff_tools-3.9.6-2
+	tiff4-4.0.6-1
+	tiff4_devel-4.0.6-1
+	tiff4_tools-4.0.6-1
 	tinyxml-2.6.2-1
 	tinyxml_devel-2.6.2-1
 	twolame-0.3.13-1
@@ -880,6 +883,8 @@ RemotePackageRepository HaikuPorts
 	texlive_x86_devel-2014-1
 	tiff_x86-3.9.6-2
 	tiff_x86_devel-3.9.6-2
+	tiff4_x86-4.0.6-1
+	tiff4_x86_devel-4.0.6-1
 	tinyxml_x86-2.6.2-1
 	tinyxml_x86_devel-2.6.2-1
 	tig_x86-2.1-1
@@ -1334,6 +1339,7 @@ RemotePackageRepository HaikuPorts
 	texi2html
 	texinfo
 	tiff
+	tiff4
 	tig_x86
 	tinyxml
 	transmission_x86
