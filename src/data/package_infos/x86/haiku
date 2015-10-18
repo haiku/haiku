@@ -81,7 +81,7 @@ requires {
 	lib:libjpeg
 	lib:libpng >= 16.0
 	lib:libqrencode
-	lib:libtiff
+	lib:libtiff >= 5.2
 	lib:libwebp
 #endif
 	lib:libsolv

@@ -32,7 +32,7 @@ AddHaikuImagePackages [ FFilterByBuildFeatures
 		mesa mesa_devel mesa_swrast
 		netcat
 		sed sharutils
-		tar tcpdump tiff unzip wget which zip
+		tar tcpdump unzip wget which zip
 	}@
 ] ;
 if $(HAIKU_PACKAGING_ARCHS[1]) != x86_gcc2 {

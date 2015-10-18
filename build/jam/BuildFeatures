@@ -504,13 +504,13 @@ if [ IsPackageAvailable qrencode_kdl_devel ] {
 
 
 # tiff
-if [ IsPackageAvailable tiff_devel ] {
+if [ IsPackageAvailable tiff4_devel ] {
 	ExtractBuildFeatureArchives tiff :
-		file: base tiff
+		file: base tiff4
 			runtime: lib
-		file: devel tiff_devel
+		file: devel tiff4_devel
 			depends: base
-			library: $(developLibDir)/libtiff.so.3
+			library: $(developLibDir)/libtiff.so.5
 			headers: $(developHeadersDir) $(developHeadersDir)/tiff
 		;
 
