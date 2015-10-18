@@ -10,6 +10,8 @@
 static const bigtime_t kWorkerTimeout = 1000000;
 	// One second until a worker thread quits without a job
 
+static const int32 kWorkerCountPerCPU = 3;
+
 static int32 sWorkerCount;
 
 
@@ -91,12 +93,13 @@ Worker::_Process(void* _self)
 
 MainWorker::MainWorker(JobQueue& queue)
 	:
-	Worker(queue)
+	Worker(queue),
+	fMaxWorkerCount(kWorkerCountPerCPU)
 {
 	// TODO: keep track of workers, and quit them on destruction
 	system_info info;
 	if (get_system_info(&info) == B_OK)
-		fCPUCount = info.cpu_count;
+		fMaxWorkerCount = info.cpu_count * kWorkerCountPerCPU;
 }
 
 
@@ -116,7 +119,7 @@ MainWorker::Run(BJob* job)
 	if (jobCount > INT_MAX)
 		jobCount = INT_MAX;
 
-	if ((int32)jobCount > count && count < fCPUCount) {
+	if ((int32)jobCount > count && count < fMaxWorkerCount) {
 		Worker* worker = new Worker(fJobQueue);
 		worker->Init();
 	}

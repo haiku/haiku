@@ -44,7 +44,7 @@ protected:
 	virtual	status_t			Run(BJob* job);
 
 private:
-			int32				fCPUCount;
+			int32				fMaxWorkerCount;
 };
 
 
