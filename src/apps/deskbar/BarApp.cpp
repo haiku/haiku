@@ -94,7 +94,7 @@ main()
 
 TBarApp::TBarApp()
 	:
-	BApplication(kDeskbarSignature),
+	BServer(kDeskbarSignature, true, NULL),
 	fSettingsFile(NULL),
 	fClockSettingsFile(NULL),
 	fPreferencesWindow(NULL)

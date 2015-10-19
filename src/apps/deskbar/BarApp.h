@@ -36,7 +36,7 @@ All rights reserved.
 #define BAR_APP_H
 
 
-#include <Application.h>
+#include <Server.h>
 
 #include "BarSettings.h"
 
@@ -105,7 +105,7 @@ public:
 			BBitmap*				iconCache[kIconCacheCount];
 };
 
-class TBarApp : public BApplication {
+class TBarApp : public BServer {
 public:
 									TBarApp();
 	virtual							~TBarApp();
