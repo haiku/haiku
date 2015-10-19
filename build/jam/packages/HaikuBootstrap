@@ -126,6 +126,14 @@ local bootScripts = PostInstallScript SetupEnvironment
 SEARCH on $(bootScripts) = [ FDirName $(HAIKU_TOP) data system boot ] ;
 AddFilesToPackage boot : $(bootScripts) ;
 
+local launchScripts = <data!launch>system ;
+SEARCH on $(launchScripts) = [ FDirName $(HAIKU_TOP) data launch ] ;
+AddFilesToPackage data launch : $(launchScripts) ;
+
+local userLaunchScripts = <data!launch>user ;
+SEARCH on $(userLaunchScripts) = [ FDirName $(HAIKU_TOP) data launch ] ;
+AddFilesToPackage data user_launch : $(userLaunchScripts) ;
+
 # post install scripts
 local postInstallFiles = default_deskbar_items.sh ;
 postInstallFiles = $(postInstallFiles:G=post-install) ;

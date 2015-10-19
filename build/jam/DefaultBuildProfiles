@@ -172,8 +172,8 @@ rule DefineDefaultBuildProfiles
 				libedit_devel
 				m4
 				make
-				ncurses
-				ncurses_devel
+				ncurses6
+				ncurses6_devel
 				python
 				sed
 				texinfo
@@ -197,8 +197,8 @@ rule DefineDefaultBuildProfiles
 						libsolv
 						libedit
 						libedit_devel
-						ncurses
-						ncurses_devel
+						ncurses6
+						ncurses6_devel
 						zlib
 						zlib_devel
 						;
