@@ -112,6 +112,7 @@ public:
 	virtual	void				AttachedToWindow();
 	virtual	void				SetEnabled(bool enabled);
 	virtual	void				Draw(BRect updateRect);
+	virtual	void				MessageReceived(BMessage* message);
 
 private:
 			void				_UpdateTextViewColors();
@@ -219,6 +220,25 @@ HeaderTextControl::Draw(BRect updateRect)
 
 		be_control_look->DrawLabel(this, Label(), rect, updateRect,
 			base, flags, BAlignment(labelAlignment, B_ALIGN_MIDDLE));
+	}
+}
+
+
+void
+HeaderTextControl::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case M_SELECT:
+		{
+			BTextView* textView = TextView();
+			if (textView != NULL)
+				textView->SelectAll();
+			break;
+		}
+
+		default:
+			BTextControl::MessageReceived(message);
+			break;
 	}
 }
 
