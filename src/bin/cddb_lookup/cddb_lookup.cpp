@@ -1,80 +1,80 @@
 /*
- * Copyright 2008-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2008-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *              Bruno Albuquerque, bga@bug-br.org.br
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Bruno Albuquerque, bga@bug-br.org.br
  */
 
-#include "cddb_daemon.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include <Application.h>
 #include <Directory.h>
 #include <Entry.h>
 #include <fs_info.h>
 #include <Message.h>
-#include <NodeMonitor.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
 
+#include <scsi_cmds.h>
+
 #include "cddb_server.h"
 
+
+class CDDBLookup : public BApplication {
+public:
+								CDDBLookup();
+	virtual						~CDDBLookup();
+
+			void				LookupAll();
+			status_t			Lookup(const dev_t device);
+
+private:
+			bool				_CanLookup(const dev_t device, uint32* cddbId,
+										scsi_toc_toc* toc) const;
+			QueryResponseData*	_SelectResult(BList* response) const;
+			status_t			_WriteCDData(dev_t device,
+									QueryResponseData* diskData,
+									ReadResponseData* readResponse);
+};
+
+
+extern const char *__progname;
+static const char *kProgramName = __progname;
 
 static const char* kCddaFsName = "cdda";
 static const int kMaxTocSize = 1024;
 
 
-CDDBDaemon::CDDBDaemon()
-	: BApplication("application/x-vnd.Haiku-cddb_daemon"),
-	  fVolumeRoster(new BVolumeRoster)
+CDDBLookup::CDDBLookup()
+	:
+	BApplication("application/x-vnd.Haiku-cddb_lookup")
 {
-	fVolumeRoster->StartWatching();
-	
-	BVolume volume;
-	printf("Checking currently mounted volumes ...\n");
-	while (fVolumeRoster->GetNextVolume(&volume) == B_OK) {
-		if (_Lookup(volume.Device()) != B_OK) {
-			continue;
-		}
-	}
-	printf("Checking complete. Listening for device mounts.\n");
 }
 
 
-CDDBDaemon::~CDDBDaemon()
+CDDBLookup::~CDDBLookup()
 {
-	fVolumeRoster->StopWatching();
-	delete fVolumeRoster;
 }
 
 
 void
-CDDBDaemon::MessageReceived(BMessage* message)
+CDDBLookup::LookupAll()
 {
-	switch(message->what) {
-		case B_NODE_MONITOR:
-			int32 opcode;
-			if (message->FindInt32("opcode", &opcode) == B_OK) {
-				if (opcode == B_DEVICE_MOUNTED) {
-					dev_t device;
-					if (message->FindInt32("new device", &device) == B_OK) {
-						if (_Lookup(device) != B_OK)
-							break;
-					}
-				}		
-			}
-			break;
-		default:
-			BApplication::MessageReceived(message);
+	BVolumeRoster roster;
+	BVolume volume;
+	while (roster.GetNextVolume(&volume) == B_OK) {
+		Lookup(volume.Device());
 	}
 }
 
 
 status_t
-CDDBDaemon::_Lookup(const dev_t device)
+CDDBLookup::Lookup(const dev_t device)
 {
 	scsi_toc_toc* toc = (scsi_toc_toc*)malloc(kMaxTocSize);
 	if (toc == NULL)
@@ -86,7 +86,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 		printf("Skipping device with id %" B_PRId32 ".\n", device);
 		return B_BAD_TYPE;
 	}
-		
+
 	printf("Looking up CD with CDDB Id %08" B_PRIx32 ".\n", cddbId);
 
 	CDDBServer cddb_server("freedb.freedb.org:80");
@@ -99,7 +99,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 		free(toc);
 		return result;
 	}
-			
+
 	free(toc);
 
 	QueryResponseData* diskData = _SelectResult(&queryResponse);
@@ -112,7 +112,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 	if ((result = cddb_server.Read(diskData, &readResponse)) != B_OK) {
 		return result;
 	}
-	
+
 	if (_WriteCDData(device, diskData, &readResponse) == B_OK) {
 		printf("CD data saved.\n");
 	} else {
@@ -124,7 +124,7 @@ CDDBDaemon::_Lookup(const dev_t device)
 	for (int32 i = 0; i < count; ++i) {
 		delete (QueryResponseData*)queryResponse.RemoveItem((int32)0);
 	}
-						
+
 	queryResponse.MakeEmpty();
 
 	// Delete itens in the track data BList in the read response data;
@@ -132,15 +132,15 @@ CDDBDaemon::_Lookup(const dev_t device)
 	for (int32 i = 0; i < count; ++i) {
 		delete (TrackData*)readResponse.tracks.RemoveItem((int32)0);
 	}
-						
+
 	readResponse.tracks.MakeEmpty();
-							
+
 	return B_OK;
 }
 
 
 bool
-CDDBDaemon::_CanLookup(const dev_t device, uint32* cddbId,
+CDDBLookup::_CanLookup(const dev_t device, uint32* cddbId,
 	scsi_toc_toc* toc) const
 {
 	if (cddbId == NULL || toc == NULL)
@@ -151,7 +151,7 @@ CDDBDaemon::_CanLookup(const dev_t device, uint32* cddbId,
 	fs_stat_dev(device, &info);
 	if (strncmp(info.fsh_name, kCddaFsName, strlen(kCddaFsName)) != 0)
 		return false;
-	
+
 	// Does it have the CD:do_lookup attribute and is it true?
 	BVolume volume(device);
 	BDirectory directory;
@@ -165,19 +165,19 @@ CDDBDaemon::_CanLookup(const dev_t device, uint32* cddbId,
 	// Does it have the CD:cddbid attribute?
 	if (directory.ReadAttr("CD:cddbid", B_UINT32_TYPE, 0, (void *)cddbId,
 		sizeof(uint32)) < B_OK)
-		return false;		
+		return false;
 
 	// Does it have the CD:toc attribute?
 	if (directory.ReadAttr("CD:toc", B_RAW_TYPE, 0, (void *)toc,
 		kMaxTocSize) < B_OK)
 		return false;
-	
+
 	return true;
 }
 
 
 QueryResponseData*
-CDDBDaemon::_SelectResult(BList* response) const
+CDDBLookup::_SelectResult(BList* response) const
 {
 	// Select a single CD match from the response and return it.
 	//
@@ -197,7 +197,7 @@ CDDBDaemon::_SelectResult(BList* response) const
 		if (numItems > 1) {
 			printf("Returning first entry.\n");
 		}
-		
+
 		return (QueryResponseData*)response->ItemAt(0L);
 	}
 
@@ -206,81 +206,88 @@ CDDBDaemon::_SelectResult(BList* response) const
 
 
 status_t
-CDDBDaemon::_WriteCDData(dev_t device, QueryResponseData* diskData,
+CDDBLookup::_WriteCDData(dev_t device, QueryResponseData* diskData,
 	ReadResponseData* readResponse)
 {
 	// Rename volume.
 	BVolume volume(device);
-	
-	status_t result;
+
 	status_t error = B_OK;
-	
+
 	BString name = diskData->artist << " - " << diskData->title;
 	name.ReplaceSet("/", " ");
-	
-	if ((result = volume.SetName(name.String())) != B_OK) {
+
+	status_t result = volume.SetName(name.String());
+	if (result != B_OK) {
 		printf("Can't set volume name.\n");
 		return result;
 	}
-	
-	// Rename tracks and add relevant Audio attributes.	
+
+	// Rename tracks and add relevant Audio attributes.
 	BDirectory cddaRoot;
 	volume.GetRootDirectory(&cddaRoot);
-	
+
 	BEntry entry;
 	int index = 0;
 	while (cddaRoot.GetNextEntry(&entry) == B_OK) {
 		TrackData* data = (TrackData*)((readResponse->tracks).ItemAt(index));
-		
+
 		// Update name.
 		int trackNum = index + 1; // index=0 is actually Track 1
 		name.SetToFormat("%02d %s.wav", trackNum, data->title.String());
 		name.ReplaceSet("/", " ");
 
-		if ((result = entry.Rename(name.String())) != B_OK) {
-			printf("Failed renaming entry at index %d to \"%s\".\n", index,
-				name.String());
+		result = entry.Rename(name.String());
+		if (result != B_OK) {
+			fprintf(stderr, "%s: Failed renaming entry at index %d to "
+				"\"%s\".\n", kProgramName, index, name.String());
 			error = result;
 				// User can benefit from continuing through all tracks.
 				// Report error later.
 		}
-		
+
 		// Add relevant attributes. We consider an error here as non-fatal.
 		BNode node(&entry);
-		node.WriteAttr("Media:Title", B_STRING_TYPE, 0, (data->title).String(),
-			(data->title).Length());
+		node.WriteAttr("Media:Title", B_STRING_TYPE, 0, data->title.String(),
+			data->title.Length());
 		node.WriteAttr("Audio:Album", B_STRING_TYPE, 0,
-			(readResponse->title).String(),
-			(readResponse->title).Length());
+			readResponse->title.String(),
+			readResponse->title.Length());
 		if (readResponse->genre.Length() != 0) {
 			node.WriteAttr("Media:Genre", B_STRING_TYPE, 0,
-				(readResponse->genre).String(),
-				(readResponse->genre).Length());
+				readResponse->genre.String(),
+				readResponse->genre.Length());
 		}
 		if (readResponse->year != 0) {
 			node.WriteAttr("Media:Year", B_INT32_TYPE, 0,
-				&(readResponse->year), sizeof(int32));
+				&readResponse->year, sizeof(int32));
 		}
 
 		if (data->artist == "") {
 			node.WriteAttr("Audio:Artist", B_STRING_TYPE, 0,
-				(readResponse->artist).String(),
-				(readResponse->artist).Length());
+				readResponse->artist.String(),
+				readResponse->artist.Length());
 		} else {
 			node.WriteAttr("Audio:Artist", B_STRING_TYPE, 0,
-				(data->artist).String(), (data->artist).Length());			
+				data->artist.String(), data->artist.Length());
 		}
-			
+
 		index++;
 	}
-	
+
 	return error;
-}	
+}
 
 
-int main(void) {
-	printf("CDDB Daemon for Haiku v1.0.0 started.\n");
-	CDDBDaemon* cddbDaemon = new CDDBDaemon();
-	cddbDaemon->Run();
-	delete cddbDaemon; 
+// #pragma mark -
+
+
+int
+main(void)
+{
+	// TODO: support arguments to specify a device
+	CDDBLookup cddb;
+	cddb.LookupAll();
+
+	return 0;
 }

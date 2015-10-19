@@ -1,11 +1,12 @@
 /*
- * Copyright 2008-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2008-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *              Bruno Albuquerque, bga@bug-br.org.br
  */
  
+
 #include "cddb_server.h"
 
 #include <errno.h>
@@ -21,7 +22,8 @@ static const uint32 kFramesPerSecond = 75;
 static const uint32 kFramesPerMinute = kFramesPerSecond * 60;
 
 
-CDDBServer::CDDBServer(const BString& cddbServer):
+CDDBServer::CDDBServer(const BString& cddbServer)
+	:
 	fInitialized(false),
 	fConnected(false)
 {
@@ -92,7 +94,7 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
 		output.MoveInto(statusCode, 0, 3);
 		if (statusCode == "210" || statusCode == "211") {
 			// TODO(bga): We can get around with returning the first result
-			// in case of multiple matches, but we most definitely needs a
+			// in case of multiple matches, but we most definitely need a
 			// better handling of inexact matches.
 			if (statusCode == "211")
 				printf("Warning : Inexact match found.\n");
@@ -367,7 +369,7 @@ CDDBServer::_SendCddbCommand(const BString& command, BString* output)
 	// Assemble full command string.
 	BString fullCommand;
 	fullCommand << command << "&hello=" << fLocalUserName << " " <<
-		fLocalHostName << " cddb_daemon 1.0&proto=6";
+		fLocalHostName << " cddb_lookup 1.0&proto=6";
 
 	// Replace spaces by + signs.
 	fullCommand.ReplaceAll(" ", "+");

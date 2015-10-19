@@ -4,6 +4,7 @@
 include [ FDirName $(HAIKU_BUILD_RULES_DIR) images definitions minimum ] ;
 
 SYSTEM_BIN += [ FFilterByBuildFeatures
+	cddb_lookup
 	clipboard CortexAddOnHost
 	FirstBootPrompt	fwcontrol@x86
 	installsound
@@ -91,7 +92,6 @@ rule HaikuImageGetPrivateSystemLibs
 
 
 SYSTEM_SERVERS += [ FFilterByBuildFeatures
-	cddb_daemon
 	mail_daemon media_addon_server media_server midi_server
 	nfs4_idmapper_server
 	print_server print_addon_server
