@@ -9,6 +9,7 @@
 
 #include "ConditionsTest.h"
 #include "SettingsParserTest.h"
+#include "UtilityTest.h"
 
 
 BTestSuite*
@@ -18,6 +19,7 @@ getTestSuite()
 
 	SettingsParserTest::AddTests(*suite);
 	ConditionsTest::AddTests(*suite);
+	UtilityTest::AddTests(*suite);
 
 	return suite;
 }

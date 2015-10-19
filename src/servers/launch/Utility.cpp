@@ -99,4 +99,20 @@ EjectMedia(const char* path)
 }
 
 
+BString
+TranslatePath(const char* originalPath)
+{
+	BString path = originalPath;
+
+	// TODO: get actual home directory!
+	const char* home = "/boot/home";
+	path.ReplaceAll("$HOME", home);
+	path.ReplaceAll("${HOME}", home);
+	if (path.StartsWith("~/"))
+		path.ReplaceFirst("~", home);
+
+	return path;
+}
+
+
 }	// namespace Utility

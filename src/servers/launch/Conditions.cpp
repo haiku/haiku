@@ -413,7 +413,7 @@ FileExistsCondition::FileExistsCondition(const BMessage& args)
 {
 	for (int32 index = 0;
 			const char* path = args.GetString("args", index, NULL); index++) {
-		fPaths.Add(path);
+		fPaths.Add(Utility::TranslatePath(path));
 	}
 }
 

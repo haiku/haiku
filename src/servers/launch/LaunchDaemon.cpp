@@ -975,7 +975,7 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 		const char* argument;
 		for (int32 index = 0; message.FindString("launch", index, &argument)
 				== B_OK; index++) {
-			job->AddArgument(argument);
+			job->AddArgument(Utility::TranslatePath(argument));
 		}
 	}
 

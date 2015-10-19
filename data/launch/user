@@ -17,7 +17,7 @@ target desktop {
 	}
 
 	job user-bootscript {
-		launch /bin/sh /boot/home/config/settings/boot/UserBootscript
+		launch /bin/sh ~/config/settings/boot/UserBootscript
 	}
 
 	job create-installer-link {
@@ -26,7 +26,7 @@ target desktop {
 			read_only
 			file_exists /boot/system/apps/Installer
 		}
-		launch /bin/ln -sf /boot/system/apps/Installer /boot/home/Desktop/Installer
+		launch /bin/ln -sf /boot/system/apps/Installer ~/Desktop/Installer
 	}
 }
 

@@ -6,7 +6,7 @@
 #define UTILITY_H
 
 
-#include <SupportDefs.h>
+#include <String.h>
 
 
 namespace Utility {
@@ -15,6 +15,8 @@ namespace Utility {
 
 	status_t BlockMedia(const char* path, bool block);
 	status_t EjectMedia(const char* path);
+
+	BString TranslatePath(const char* path);
 }
 
 

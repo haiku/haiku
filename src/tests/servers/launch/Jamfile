@@ -11,6 +11,7 @@ UnitTestLib liblaunch_daemontest.so :
 
 	SettingsParserTest.cpp
 	ConditionsTest.cpp
+	UtilityTest.cpp
 
 	# from the launch_daemon
 	SettingsParser.cpp
