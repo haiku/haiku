@@ -30,6 +30,30 @@ RemotePackageRepository HaikuPorts
 	bescreencapture-1.9.4-1
 	binutils-2.25_12015_07_31-1
 	bison-2.6.5-1
+	boost-1.55.0-6
+	boost_atomic-1.55.0-6
+	boost_chrono-1.55.0-6
+	boost_context-1.55.0-6
+	boost_coroutine-1.55.0-6
+	boost_date_time-1.55.0-6
+	boost_devel-1.55.0-6
+	boost_filesystem-1.55.0-6
+	boost_graph-1.55.0-6
+	boost_iostreams-1.55.0-6
+	boost_locale-1.55.0-6
+	boost_log-1.55.0-6
+	boost_math-1.55.0-6
+	boost_program_options-1.55.0-6
+	boost_random-1.55.0-6
+	boost_regex-1.55.0-6
+	boost_serialization-1.55.0-6
+	boost_signals-1.55.0-6
+	boost_system-1.55.0-6
+	boost_test-1.55.0-6
+	boost_thread-1.55.0-6
+	boost_timer-1.55.0-6
+	boost_unit_test_framework-1.55.0-6
+	boost_wave-1.55.0-6
 	buildbot_slave-0.8.8-2
 	burnitnow-0.1.0-1
 	bzip2-1.0.6-5
@@ -352,6 +376,7 @@ RemotePackageRepository HaikuPorts
 	binutils
 	binutils_x86_gcc2
 	bison
+	boost
 	buildbot_slave
 	burnitnow
 	bzip2
