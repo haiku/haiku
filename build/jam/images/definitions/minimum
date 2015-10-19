@@ -254,6 +254,10 @@ local userBootScripts = UserBootscript UserSetupEnvironment.sample ;
 SEARCH on $(userBootScripts) = [ FDirName $(HAIKU_TOP) data config boot ] ;
 AddFilesToHaikuImage home config settings boot : $(userBootScripts) ;
 
+SEARCH on <user-first-login>first_login
+	= [ FDirName $(HAIKU_TOP) data settings ] ;
+AddFilesToHaikuImage home config settings : <user-first-login>first_login ;
+
 local etcDir = [ FDirName $(HAIKU_TOP) data etc ] ;
 local etcFiles = inputrc profile ;
 etcFiles = $(etcFiles:G=etc) ;

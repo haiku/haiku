@@ -20,6 +20,11 @@ target desktop {
 		launch /bin/sh ~/config/settings/boot/UserBootscript
 	}
 
+	job first-login {
+		launch /bin/sh /system/boot/PostInstallScript "first login" ~/config/settings/first_login /boot/system/boot/first-login
+		if file_exists ~/config/settings/first_login
+	}
+
 	job create-installer-link {
 		# When run from a read-only medium a.k.a. live desktop
 		if {
