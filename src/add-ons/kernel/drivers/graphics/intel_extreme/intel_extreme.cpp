@@ -98,7 +98,7 @@ intel_interrupt_handler(void* data)
 
 		// Intel changed the PCH register mapping between Sandy Bridge and the
 		// later generations (Ivy Bridge and up).
-		if (info.device_type.InFamily(INTEL_TYPE_SNB)) {
+		if (info.device_type.InGroup(INTEL_TYPE_SNB)) {
 			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA_SNB
 				: INTERRUPT_VBLANK_PIPEA;
 			if ((identity & mask) != 0) {
@@ -347,11 +347,12 @@ intel_extreme_init(intel_info &info)
 	}
 
 	// "I nearly got violent with the hw guys when they told me..."
-	if (info.device_type.InFamily(INTEL_TYPE_VLV)) {
+	if (info.device_type.InGroup(INTEL_TYPE_VLV)) {
 		TRACE("%s: ValleyView MMIO offset engaged\n", __func__);
 		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)] += VLV_DISPLAY_BASE;
 		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)] += VLV_DISPLAY_BASE;
 		blocks[REGISTER_BLOCK(REGS_SOUTH_SHARED)] += VLV_DISPLAY_BASE;
+		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)] += VLV_DISPLAY_BASE;
 	}
 
 	// make sure bus master, memory-mapped I/O, and frame buffer is enabled

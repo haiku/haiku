@@ -280,6 +280,9 @@ HDMIPort::IsConnected()
 		return false;
 
 	uint32 portRegister = _PortRegister();
+	TRACE("%s %d: PortRegister: %" B_PRIx32 "\n", PortName(), PortIndex(),
+		portRegister);
+
 	if (portRegister == 0)
 		return false;
 
@@ -298,17 +301,23 @@ HDMIPort::_PortRegister()
 {
 	// on PCH there's an additional port sandwiched in
 	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
+	bool fourthGen = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_VLV);
 
 	switch (PortIndex()) {
 		case INTEL_PORT_B:
+			if (fourthGen)
+				return GEN4_HDMI_PORT_B;
 			return hasPCH ? PCH_HDMI_PORT_B : INTEL_HDMI_PORT_B;
 		case INTEL_PORT_C:
+			if (fourthGen)
+				return GEN4_HDMI_PORT_C;
 			return hasPCH ? PCH_HDMI_PORT_C : INTEL_HDMI_PORT_C;
 		case INTEL_PORT_D:
+			// TODO: Is CherryView? GEN4_HDMI_PORT_D
 			return hasPCH ? PCH_HDMI_PORT_D : 0;
 		default:
 			return 0;
-	}
+		}
 
 	return 0;
 }
