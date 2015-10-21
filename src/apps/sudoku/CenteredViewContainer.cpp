@@ -1,12 +1,16 @@
 /*
- * Copyright 2007, Michael Pfeiffer, laplace@users.sourceforge.net. All rights reserved.
- * Distributed under the terms of the MIT License.
+ * Copyright 2007, Michael Pfeiffer, laplace@users.sourceforge.net.
+ * All rights reserved. Distributed under the terms of the MIT License.
  */
+
+
 #include "CenteredViewContainer.h"
 
-CenteredViewContainer::CenteredViewContainer(BView *target, BRect frame, const char* name, uint32 resizingMode)
-	: BView(frame, name, resizingMode, B_WILL_DRAW | B_FRAME_EVENTS)
-	, fTarget(target)
+
+CenteredViewContainer::CenteredViewContainer(BView* target, const char* name)
+	:
+	BView(name, B_WILL_DRAW | B_FRAME_EVENTS),
+	fTarget(target)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 		// to avoid flickering
@@ -18,13 +22,13 @@ CenteredViewContainer::~CenteredViewContainer()
 {
 }
 
-void 
+void
 CenteredViewContainer::Draw(BRect updateRect)
 {
 	FillRect(updateRect);
 }
 
-void 
+void
 CenteredViewContainer::FrameResized(float width, float height)
 {
 	BView::FrameResized(width, height);
@@ -40,5 +44,5 @@ void CenteredViewContainer::_CenterTarget(float width, float height)
 	fTarget->ResizeTo(size, size);
 	fTarget->FrameResized(size, size);
 		// in BeOS R5 BView::FrameResized is not (always) called automatically
-		// after ResizeTo() 
+		// after ResizeTo()
 }
