@@ -121,11 +121,8 @@ BPose::~BPose()
 			delete volume;
 	}
 	int32 count = fWidgetList.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		BTextWidget* widget = fWidgetList.ItemAt(i);
-		if (widget != NULL)
-			delete widget;
-	}
+	for (int32 i = 0; i < count; i++)
+		delete fWidgetList.ItemAt(i);
 
 	delete fModel;
 }
