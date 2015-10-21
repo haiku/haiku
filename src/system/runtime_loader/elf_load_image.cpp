@@ -527,7 +527,7 @@ load_image(char const* name, image_type type, const char* rpath,
 		goto err2;
 	}
 
-	status = map_image(fd, path, image);
+	status = map_image(fd, path, image, eheader.e_type == ET_EXEC);
 	if (status < B_OK) {
 		FATAL("%s: Could not map image: %s\n", image->path, strerror(status));
 		status = B_ERROR;
