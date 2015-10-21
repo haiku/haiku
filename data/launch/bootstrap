@@ -1,0 +1,4 @@
+service bootstrap_daemon {
+	launch /bin/python /boot/home/config/settings/boot/launch/bootstrap_daemon.py
+	legacy
+}

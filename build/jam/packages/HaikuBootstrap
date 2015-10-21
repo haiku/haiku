@@ -130,7 +130,7 @@ local launchScripts = <data!launch>system ;
 SEARCH on $(launchScripts) = [ FDirName $(HAIKU_TOP) data launch ] ;
 AddFilesToPackage data launch : $(launchScripts) ;
 
-local userLaunchScripts = <data!launch>user ;
+local userLaunchScripts = <data!launch>user <data!launch>bootstrap ;
 SEARCH on $(userLaunchScripts) = [ FDirName $(HAIKU_TOP) data launch ] ;
 AddFilesToPackage data user_launch : $(userLaunchScripts) ;
 
@@ -202,7 +202,7 @@ AddSymlinkToPackage add-ons Tracker
 AddFilesToPackage add-ons input_server devices
 	: <input>keyboard <input>mouse <input>tablet <input>wacom ;
 AddFilesToPackage add-ons input_server filters
-	: screen_saver shortcut_catcher switch_workspace ;
+	: switch_workspace ;
 
 AddFilesToPackage add-ons kernel network : <net>notifications stack ;
 AddFilesToPackage add-ons kernel network : dns_resolver ;
