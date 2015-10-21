@@ -35,6 +35,8 @@ public:
 								SudokuView(BRect frame, const char* name,
 									const BMessage& settings,
 									uint32 resizingMode);
+								SudokuView(const char* name,
+									const BMessage& settings);
 								SudokuView(BMessage* archive);
 	virtual						~SudokuView();
 
