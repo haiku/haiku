@@ -120,6 +120,12 @@ BPose::~BPose()
 		if (gPeriodicUpdatePoses.RemovePose(this, (void**)&volume))
 			delete volume;
 	}
+	int32 count = fWidgetList.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		BTextWidget* widget = fWidgetList.ItemAt(i);
+		if (widget != NULL)
+			delete widget;
+	}
 
 	delete fModel;
 }
