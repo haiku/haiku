@@ -86,6 +86,7 @@ public:
 			const BString&		Name() const;
 			bool				Resolve(uint32 flags);
 
+			void				ResetSticky();
 	virtual	void				ResetTrigger();
 
 	virtual	status_t			Register(EventRegistrator& registrator);
@@ -457,12 +458,18 @@ ExternalEvent::Resolve(uint32 flags)
 
 
 void
-ExternalEvent::ResetTrigger()
+ExternalEvent::ResetSticky()
 {
 	if ((fFlags & B_STICKY_EVENT) != 0)
-		return;
+		Event::ResetTrigger();
+}
 
-	Event::ResetTrigger();
+
+void
+ExternalEvent::ResetTrigger()
+{
+	if ((fFlags & B_STICKY_EVENT) == 0)
+		Event::ResetTrigger();
 }
 
 
@@ -635,6 +642,30 @@ Events::TriggerExternalEvent(Event* event, const char* name)
 				}
 			} else if (dynamic_cast<EventContainer*>(event) != NULL) {
 				TriggerExternalEvent(event, name);
+			}
+		}
+	}
+	return;
+}
+
+
+/*static*/ void
+Events::ResetStickyExternalEvent(Event* event, const char* name)
+{
+	if (event == NULL)
+		return;
+
+	if (EventContainer* container = dynamic_cast<EventContainer*>(event)) {
+		for (int32 index = 0; index < container->Events().CountItems();
+				index++) {
+			Event* event = container->Events().ItemAt(index);
+			if (ExternalEvent* external = dynamic_cast<ExternalEvent*>(event)) {
+				if (external->Name() == name) {
+					external->ResetSticky();
+					return;
+				}
+			} else if (dynamic_cast<EventContainer*>(event) != NULL) {
+				ResetStickyExternalEvent(event, name);
 			}
 		}
 	}

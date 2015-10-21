@@ -31,6 +31,7 @@ enum {
 	B_REGISTER_LAUNCH_EVENT		= 'lnre',
 	B_UNREGISTER_LAUNCH_EVENT	= 'lnue',
 	B_NOTIFY_LAUNCH_EVENT		= 'lnne',
+	B_RESET_STICKY_LAUNCH_EVENT	= 'lnRe',
 };
 
 

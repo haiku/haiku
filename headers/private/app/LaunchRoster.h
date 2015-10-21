@@ -42,6 +42,8 @@ public:
 									const char* name);
 			status_t			NotifyEvent(const BMessenger& source,
 									const char* name);
+			status_t			ResetStickyEvent(const BMessenger& source,
+									const char* name);
 
 	class Private;
 

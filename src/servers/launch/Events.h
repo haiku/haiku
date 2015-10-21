@@ -60,6 +60,8 @@ public:
 								const char* name, uint32 flags);
 	static	void			TriggerExternalEvent(Event* event,
 								const char* name);
+	static	void			ResetStickyExternalEvent(Event* event,
+								const char* name);
 	static	bool			TriggerDemand(Event* event);
 };
 

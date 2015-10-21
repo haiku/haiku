@@ -227,6 +227,13 @@ BLaunchRoster::NotifyEvent(const BMessenger& source, const char* name)
 }
 
 
+status_t
+BLaunchRoster::ResetStickyEvent(const BMessenger& source, const char* name)
+{
+	return _UpdateEvent(B_RESET_STICKY_LAUNCH_EVENT, source, name);
+}
+
+
 void
 BLaunchRoster::_InitMessenger()
 {

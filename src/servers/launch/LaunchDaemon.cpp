@@ -144,7 +144,8 @@ private:
 			void				_HandleRegisterLaunchEvent(BMessage* message);
 			void				_HandleUnregisterLaunchEvent(BMessage* message);
 			void				_HandleNotifyLaunchEvent(BMessage* message);
-
+			void				_HandleResetStickyLaunchEvent(
+									BMessage* message);
 			uid_t				_GetUserID(BMessage* message);
 
 			void				_ReadPaths(const BStringList& paths);
@@ -463,6 +464,10 @@ LaunchDaemon::MessageReceived(BMessage* message)
 			_HandleNotifyLaunchEvent(message);
 			break;
 
+		case B_RESET_STICKY_LAUNCH_EVENT:
+			_HandleResetStickyLaunchEvent(message);
+			break;
+
 		case kMsgEventTriggered:
 		{
 			// An internal event has been triggered.
@@ -754,6 +759,34 @@ LaunchDaemon::_HandleNotifyLaunchEvent(BMessage* message)
 			for (int32 index = 0; index < count; index++) {
 				BaseJob* listener = event->ListenerAt(index);
 				Events::TriggerExternalEvent(listener->Event(), name);
+			}
+		}
+	}
+
+	_ForwardEventMessage(user, message);
+}
+
+
+void
+LaunchDaemon::_HandleResetStickyLaunchEvent(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	if (user == 0 || fUserMode) {
+		// Reset sticky events
+		const char* name = message->GetString("name");
+		const char* ownerName = message->GetString("owner");
+		// TODO: support arguments (as selectors)
+
+		ExternalEventSource* event = _FindEvent(ownerName, name);
+		if (event != NULL) {
+			// Evaluate all of its jobs
+			int32 count = event->CountListeners();
+			for (int32 index = 0; index < count; index++) {
+				BaseJob* listener = event->ListenerAt(index);
+				Events::ResetStickyExternalEvent(listener->Event(), name);
 			}
 		}
 	}
