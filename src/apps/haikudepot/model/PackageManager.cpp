@@ -209,7 +209,7 @@ private:
 	void _SetDownloadedPackagesState(PackageState state)
 	{
 		for (PackageInfoSet::iterator it = fDownloadedPackages.begin();
-			it != fDownloadedPackages.end(); ++it) {
+				it != fDownloadedPackages.end(); ++it) {
 			(*it)->SetState(state);
 		}
 	}
