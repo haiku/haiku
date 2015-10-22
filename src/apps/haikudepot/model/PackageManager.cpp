@@ -277,7 +277,6 @@ public:
 
 	void StartApplyingChanges(
 		BPackageManager::InstalledRepository& repository)
-
 	{
 		BPackageManager::InstalledRepository::PackageList& packages
 			= repository.PackagesToDeactivate();
