@@ -147,7 +147,8 @@ public:
 				"%s (%s)\n", packageNameString, ex.Message().String(),
 				ex.Details().String());
 			BAlert* alert(new(std::nothrow) BAlert(B_TRANSLATE("Fatal error"),
-				errorString, B_TRANSLATE("Close")));
+				errorString, B_TRANSLATE("Close"), NULL, NULL,
+				B_WIDTH_AS_USUAL, B_STOP_ALERT));
 			if (alert != NULL)
 				alert->Go(NULL);
 			return ex.Error();
@@ -252,7 +253,8 @@ public:
 				"%s (%s)\n", packageName, ex.Message().String(),
 				ex.Details().String());
 			BAlert* alert(new(std::nothrow) BAlert(B_TRANSLATE("Fatal error"),
-				errorString, B_TRANSLATE("Close")));
+				errorString, B_TRANSLATE("Close"), NULL, NULL,
+				B_WIDTH_AS_USUAL, B_STOP_ALERT));
 			if (alert != NULL)
 				alert->Go(NULL);
 			return ex.Error();
