@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.10.11
-#	Date:    2015-10-11 03:15:02
+#	Version: 2015.10.21
+#	Date:    2015-10-21 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -8814,7 +8814,7 @@
 	0446  MCP65 SMBus
 		103c 30cf  Pavilion dv9668eg Laptop
 	0447  MCP65 SMU
-		103c 30cf  Pavilion dv9668eg Laptop
+		103c 30cf  Pavilion dv9500/9600/9700 series
 	0448  MCP65 IDE
 		103c 30cf  Pavilion dv9668eg Laptop
 	0449  MCP65 PCI bridge
@@ -12078,6 +12078,7 @@
 		1137 012c  VIC 1340 MLOM Ethernet NIC
 		1137 012e  VIC 1227 PCIe Ethernet NIC
 		1137 0137  VIC 1380 Mezzanine Ethernet NIC
+		1137 014d  VIC 1385 PCIe Ethernet NIC
 	0044  VIC Ethernet NIC Dynamic
 		1137 0047  VIC P81E PCIe Ethernet NIC Dynamic
 		1137 0048  VIC M81KR Mezzanine Ethernet NIC Dynamic
@@ -12583,7 +12584,7 @@
 		103c 30b5  Presario V3242AU
 		103c 30b7  Presario V6133CL
 		103c 30cc  Pavilion dv6700
-		103c 30cf  Pavilion dv9668eg Laptop
+		103c 30cf  Pavilion dv9500/9600/9700 series
 		1043 1237  A6J-Q008
 		1043 1967  V6800V
 		144d c018  X20 IV
@@ -12629,6 +12630,7 @@
 		1028 024f  Dell Latitude e6500
 		103c 03b5  Presario V3242AU
 		103c 30b7  Presario V6133CL
+		103c 30cf  Pavilion dv9500/9600/9700 series
 		1183 0843  Alienware Aurora m9700
 	0852  xD-Picture Card Controller
 		1025 0121  Aspire 5920G
@@ -14017,7 +14019,7 @@
 	8213  IT8213 IDE Controller
 		1458 b000  GA-EG45M-DS2H Mainboard
 	8330  IT8330G
-	8872  IT8874F PCI Dual Serial Port Controller
+	8872  IT887xF PCI to ISA I/O chip with SMB, GPIO, Serial or Parallel Port
 	8888  IT8888F/G PCI to ISA Bridge with SMB [Golden Gate]
 	8889  IT8889F PCI to ISA Bridge
 	8893  IT8893E PCIe to PCI Bridge
@@ -15513,7 +15515,7 @@
 	5011  T520-LL-CR Unified Wire Ethernet Controller
 	5012  T560-CR Unified Wire Ethernet Controller
 	5013  T580-CHR Unified Wire Ethernet Controller
-	5014  T580-LP-SO-CR Unified Wire Ethernet Controller
+	5014  T580-SO-CR Unified Wire Ethernet Controller
 	5015  T502-BT Unified Wire Ethernet Controller
 	5016  T580-OCP-SO Unified Wire Ethernet Controller
 	5017  T520-OCP-SO Unified Wire Ethernet Controller
@@ -15554,7 +15556,7 @@
 	5411  T520-LL-CR Unified Wire Ethernet Controller
 	5412  T560-CR Unified Wire Ethernet Controller
 	5413  T580-CHR Unified Wire Ethernet Controller
-	5414  T580-LP-SO-CR Unified Wire Ethernet Controller
+	5414  T580-SO-CR Unified Wire Ethernet Controller
 	5415  T502-BT Unified Wire Ethernet Controller
 	5416  T580-OCP-SO Unified Wire Ethernet Controller
 	5417  T520-OCP-SO Unified Wire Ethernet Controller
@@ -15595,7 +15597,7 @@
 	5511  T520-LL-CR Unified Wire Storage Controller
 	5512  T560-CR Unified Wire Storage Controller
 	5513  T580-CHR Unified Wire Storage Controller
-	5514  T580-LP-SO-CR Unified Wire Storage Controller
+	5514  T580-SO-CR Unified Wire Storage Controller
 	5515  T502-BT Unified Wire Storage Controller
 	5516  T580-OCP-SO Unified Wire Storage Controller
 	5517  T520-OCP-SO Unified Wire Storage Controller
@@ -15636,7 +15638,7 @@
 	5611  T520-LL-CR Unified Wire Storage Controller
 	5612  T560-CR Unified Wire Storage Controller
 	5613  T580-CHR Unified Wire Storage Controller
-	5614  T580-LP-SO-CR Unified Wire Storage Controller
+	5614  T580-SO-CR Unified Wire Storage Controller
 	5615  T502-BT Unified Wire Storage Controller
 	5616  T580-OCP-SO Unified Wire Storage Controller
 	5617  T520-OCP-SO Unified Wire Storage Controller
@@ -15677,7 +15679,7 @@
 	5711  T520-LL-CR Unified Wire Ethernet Controller
 	5712  T560-CR Unified Wire Ethernet Controller
 	5713  T580-CR Unified Wire Ethernet Controller
-	5714  T580-LP-SO-CR Unified Wire Ethernet Controller
+	5714  T580-SO-CR Unified Wire Ethernet Controller
 	5715  T502-BT Unified Wire Ethernet Controller
 	5780  T540-5080 Unified Wire Ethernet Controller
 	5781  T540-5081 Unified Wire Ethernet Controller
@@ -15716,7 +15718,7 @@
 	5811  T520-LL-CR Unified Wire Ethernet Controller [VF]
 	5812  T560-CR Unified Wire Ethernet Controller [VF]
 	5813  T580-CHR Unified Wire Ethernet Controller [VF]
-	5814  T580-LP-SO-CR Unified Wire Ethernet Controller [VF]
+	5814  T580-SO-CR Unified Wire Ethernet Controller [VF]
 	5815  T502-BT Unified Wire Ethernet Controller [VF]
 	5816  T580-OCP-SO Unified Wire Ethernet Controller [VF]
 	5817  T520-OCP-SO Unified Wire Ethernet Controller [VF]
@@ -21934,6 +21936,7 @@
 	15ae  Ethernet Connection X552 1000BASE-T
 	15b7  Ethernet Connection (2) I219-LM
 	15b8  Ethernet Connection (2) I219-V
+	15b9  Ethernet Connection (3) I219-LM
 	15d1  Ethernet Controller 10G X550T
 		8086 0002  Ethernet Converged Network Adapter X550-T1
 		8086 00a2  Ethernet Converged Network Adapter X550-T1
