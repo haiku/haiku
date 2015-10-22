@@ -349,11 +349,20 @@ intel_extreme_init(intel_info &info)
 	// "I nearly got violent with the hw guys when they told me..."
 	if (info.device_type.InGroup(INTEL_TYPE_VLV)) {
 		TRACE("%s: ValleyView MMIO offset engaged\n", __func__);
+		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)] += VLV_DISPLAY_BASE;
 		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)] += VLV_DISPLAY_BASE;
-		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)] += VLV_DISPLAY_BASE;
-		blocks[REGISTER_BLOCK(REGS_SOUTH_SHARED)] += VLV_DISPLAY_BASE;
-		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)] += VLV_DISPLAY_BASE;
 	}
+
+	TRACE("REGS_NORTH_SHARED: 0x%X\n",
+		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]);
+	TRACE("REGS_NORTH_PIPE_AND_PORT: 0x%X\n",
+		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)]);
+	TRACE("REGS_NORTH_PLANE_CONTROL: 0x%X\n",
+		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)]);
+	TRACE("REGS_SOUTH_SHARED: 0x%X\n",
+		blocks[REGISTER_BLOCK(REGS_SOUTH_SHARED)]);
+	TRACE("REGS_SOUTH_TRANSCODER_PORT: 0x%X\n",
+		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)]);
 
 	// make sure bus master, memory-mapped I/O, and frame buffer is enabled
 	set_pci_config(info.pci, PCI_command, 2, get_pci_config(info.pci,
