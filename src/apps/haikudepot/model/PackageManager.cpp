@@ -125,6 +125,7 @@ public:
 			| BPackageManager::B_ADD_REMOTE_REPOSITORIES
 			| BPackageManager::B_REFRESH_REPOSITORIES);
 		PackageInfoRef ref(Package());
+		PackageState state = ref->State();
 		ref->SetState(PENDING);
 
 		fPackageManager->SetCurrentActionPackage(ref, true);
@@ -140,7 +141,6 @@ public:
 		try {
 			fPackageManager->Install(&packageNameString, 1);
 		} catch (BFatalErrorException ex) {
-			_SetDownloadedPackagesState(NONE);
 			BString errorString;
 			errorString.SetToFormat(
 				"Fatal error occurred while installing package %s: "
@@ -150,13 +150,16 @@ public:
 				errorString, B_TRANSLATE("Close"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT));
 			if (alert != NULL)
-				alert->Go(NULL);
+				alert->Go();
+			_SetDownloadedPackagesState(NONE);
+			ref->SetState(state);
 			return ex.Error();
 		} catch (BAbortedByUserException ex) {
 			fprintf(stderr, "Installation of package "
 				"%s aborted by user: %s\n", packageNameString,
 				ex.Message().String());
 			_SetDownloadedPackagesState(NONE);
+			ref->SetState(state);
 			return B_OK;
 		} catch (BNothingToDoException ex) {
 			fprintf(stderr, "Nothing to do while installing package "
@@ -166,6 +169,7 @@ public:
 			fprintf(stderr, "Exception occurred while installing package "
 				"%s: %s\n", packageNameString, ex.Message().String());
 			_SetDownloadedPackagesState(NONE);
+			ref->SetState(state);
 			return B_ERROR;
 		}
 
@@ -241,6 +245,7 @@ public:
 	{
 		fPackageManager->Init(BPackageManager::B_ADD_INSTALLED_REPOSITORIES);
 		PackageInfoRef ref(Package());
+		PackageState state = ref->State();
 		fPackageManager->SetCurrentActionPackage(ref, false);
 		fPackageManager->AddProgressListener(this);
 		const char* packageName = ref->Name().String();
@@ -256,7 +261,8 @@ public:
 				errorString, B_TRANSLATE("Close"), NULL, NULL,
 				B_WIDTH_AS_USUAL, B_STOP_ALERT));
 			if (alert != NULL)
-				alert->Go(NULL);
+				alert->Go();
+			ref->SetState(state);
 			return ex.Error();
 		} catch (BAbortedByUserException ex) {
 			return B_OK;
@@ -265,6 +271,7 @@ public:
 		} catch (BException ex) {
 			fprintf(stderr, "Exception occurred while uninstalling package "
 				"%s: %s\n", packageName, ex.Message().String());
+			ref->SetState(state);
 			return B_ERROR;
 		}
 
