@@ -166,7 +166,7 @@ public:
 			fprintf(stderr, "Exception occurred while installing package "
 				"%s: %s\n", packageNameString, ex.Message().String());
 			_SetDownloadedPackagesState(NONE);
-			return B_ERROR;;
+			return B_ERROR;
 		}
 
 		fPackageManager->RemoveProgressListener(this);
