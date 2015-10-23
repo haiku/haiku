@@ -85,7 +85,7 @@ BottomlineWindow::HandleInputMethodEvent(BMessage* event, EventList& newEvents)
 		|| event->FindString("be:string", &string) != B_OK) 
 		return;
 
-	SERIAL_PRINT(("IME : %i, %s\n", opcode, string));
+	SERIAL_PRINT(("IME : %" B_PRId32 ", %s\n", opcode, string));
 	SERIAL_PRINT(("IME : confirmed\n"));
 
 	int32 length = strlen(string);

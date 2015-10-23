@@ -131,8 +131,8 @@ MethodReplicant::AttachedToWindow()
 void
 MethodReplicant::MessageReceived(BMessage* message)
 {
-	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, message->what >> 24,
-		message->what >> 16, message->what >> 8, message->what));
+	PRINT(("%s what:%c%c%c%c\n", __PRETTY_FUNCTION__, (char)(message->what >> 24),
+		(char)(message->what >> 16), (char)(message->what >> 8), (char)message->what));
 	PRINT_OBJECT(*message);
 
 	switch (message->what) {
