@@ -20,26 +20,27 @@
 
 #define VENDOR_ID_INTEL			0x8086
 
-#define INTEL_TYPE_FAMILY_MASK	0x000f0000
-#define INTEL_TYPE_GROUP_MASK	0x000ffff0
-#define INTEL_TYPE_MODEL_MASK	0x000fffff
+#define INTEL_TYPE_FAMILY_MASK	0x00f00000
+#define INTEL_TYPE_GROUP_MASK	0x00fffff0
+#define INTEL_TYPE_MODEL_MASK	0x00ffffff
 // families
-#define INTEL_TYPE_7xx			0x00010000
-#define INTEL_TYPE_8xx			0x00020000
-#define INTEL_TYPE_9xx			0x00040000
+#define INTEL_TYPE_7xx			0x00100000	// First Gen
+#define INTEL_TYPE_8xx			0x00200000	// Second Gen
+#define INTEL_TYPE_9xx			0x00400000	// Third Gen +
 // groups
-#define INTEL_TYPE_83x			(INTEL_TYPE_8xx | 0x0010)
-#define INTEL_TYPE_85x			(INTEL_TYPE_8xx | 0x0020)
-#define INTEL_TYPE_91x			(INTEL_TYPE_9xx | 0x0040)
-#define INTEL_TYPE_94x			(INTEL_TYPE_9xx | 0x0080)
-#define INTEL_TYPE_96x			(INTEL_TYPE_9xx | 0x0100)
-#define INTEL_TYPE_Gxx			(INTEL_TYPE_9xx | 0x0200)
-#define INTEL_TYPE_G4x			(INTEL_TYPE_9xx | 0x0400)
-#define INTEL_TYPE_IGD			(INTEL_TYPE_9xx | 0x0800)
-#define INTEL_TYPE_ILK			(INTEL_TYPE_9xx | 0x1000)
-#define INTEL_TYPE_SNB			(INTEL_TYPE_9xx | 0x2000)
-#define INTEL_TYPE_IVB			(INTEL_TYPE_9xx | 0x4000)
-#define INTEL_TYPE_VLV			(INTEL_TYPE_9xx | 0x8000)
+#define INTEL_TYPE_83x			(INTEL_TYPE_8xx | 0x00010)
+#define INTEL_TYPE_85x			(INTEL_TYPE_8xx | 0x00020)
+#define INTEL_TYPE_91x			(INTEL_TYPE_9xx | 0x00040)
+#define INTEL_TYPE_94x			(INTEL_TYPE_9xx | 0x00080)
+#define INTEL_TYPE_96x			(INTEL_TYPE_9xx | 0x00100)
+#define INTEL_TYPE_Gxx			(INTEL_TYPE_9xx | 0x00200)
+#define INTEL_TYPE_G4x			(INTEL_TYPE_9xx | 0x00400)
+#define INTEL_TYPE_IGD			(INTEL_TYPE_9xx | 0x00800)
+#define INTEL_TYPE_ILK			(INTEL_TYPE_9xx | 0x01000)
+#define INTEL_TYPE_SNB			(INTEL_TYPE_9xx | 0x02000)
+#define INTEL_TYPE_IVB			(INTEL_TYPE_9xx | 0x04000)
+#define INTEL_TYPE_HAS			(INTEL_TYPE_9xx | 0x08000)
+#define INTEL_TYPE_VLV			(INTEL_TYPE_9xx | 0x10000)
 // models
 #define INTEL_TYPE_SERVER		0x0004
 #define INTEL_TYPE_MOBILE		0x0008
@@ -94,10 +95,10 @@
 #define ICH_SHARED_REGISTER_BASE						0x00000
 #define ICH_PORT_REGISTER_BASE							0x60000
 
-// PCH - Platform Control Hub - Newer hardware moves from a MCH/ICH based setup
-// to a PCH based one, that means anything that used to communicate via (G)MCH
-// registers needs to use different ones on PCH based platforms (Ironlake and
-// up, SandyBridge, etc.).
+// PCH - Platform Control Hub - Some hardware moves from a MCH/ICH based
+// setup to a PCH based one, that means anything that used to communicate via
+// (G)MCH registers needs to use different ones on PCH based platforms
+// (Ironlake, SandyBridge, IvyBridge, Some Haswell).
 #define PCH_NORTH_SHARED_REGISTER_BASE					0x40000
 #define PCH_NORTH_PIPE_AND_PORT_REGISTER_BASE			0x60000
 #define PCH_NORTH_PLANE_CONTROL_REGISTER_BASE			0x70000
@@ -141,21 +142,15 @@ struct DeviceType {
 
 	bool SupportsHDMI() const
 	{
-		switch (type & INTEL_TYPE_GROUP_MASK) {
-			case INTEL_TYPE_G4x:
-			case INTEL_TYPE_ILK:
-			case INTEL_TYPE_SNB:
-			case INTEL_TYPE_IVBG:
-			case INTEL_TYPE_VLV:
-				return true;
-		}
-		return false;
+		return InGroup(INTEL_TYPE_G4x) || InGroup(INTEL_TYPE_ILK)
+			|| InGroup(INTEL_TYPE_SNB) || InGroup(INTEL_TYPE_IVBG)
+			|| InGroup(INTEL_TYPE_HAS) || InGroup(INTEL_TYPE_VLV);
 	}
 
 	bool HasPlatformControlHub() const
 	{
 		return InGroup(INTEL_TYPE_ILK) || InGroup(INTEL_TYPE_SNB)
-			|| InGroup(INTEL_TYPE_IVB) || InGroup(INTEL_TYPE_VLV);
+			|| InGroup(INTEL_TYPE_IVB) || InGroup(INTEL_TYPE_HAS);
 	}
 };
 
@@ -463,16 +458,16 @@ struct intel_free_graphics_memory {
 #define INTEL_DIGITAL_PORT_C			(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
 #define INTEL_DIGITAL_LVDS_PORT			(0x1180 | REGS_SOUTH_TRANSCODER_PORT)
 
-#define INTEL_HDMI_PORT_B				(0x1140 | REGS_NORTH_PIPE_AND_PORT)
-#define INTEL_HDMI_PORT_C				(0x1160 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_HDMI_PORT_B				(0x1140 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_HDMI_PORT_C				(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
 
 #define PCH_HDMI_PORT_B					(0x1140 | REGS_SOUTH_TRANSCODER_PORT)
 #define PCH_HDMI_PORT_C					(0x1150 | REGS_SOUTH_TRANSCODER_PORT)
 #define PCH_HDMI_PORT_D					(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
 
-#define GEN4_HDMI_PORT_B				(0x1140 | REGS_SOUTH_TRANSCODER_PORT)
-#define GEN4_HDMI_PORT_C				(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
-#define GEN4_HDMI_PORT_D				(0x116C | REGS_SOUTH_TRANSCODER_PORT)
+#define GEN4_HDMI_PORT_B				(0x1140 | REGS_NORTH_PIPE_AND_PORT)
+#define GEN4_HDMI_PORT_C				(0x1160 | REGS_NORTH_PIPE_AND_PORT)
+#define GEN4_HDMI_PORT_D				(0x116C | REGS_NORTH_PIPE_AND_PORT)
 
 #define INTEL_DISPLAY_PORT_A			(0x4000 | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_PORT_B			(0x4100 | REGS_NORTH_PIPE_AND_PORT)

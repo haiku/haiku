@@ -79,6 +79,7 @@ Port::GetEDID(edid1_info* edid, bool forceRead)
 
 		addr_t ddcRegister = _DDCRegister();
 		if (ddcRegister == 0) {
+			TRACE("%s: no DDC register found\n", PortName());
 			fEDIDState = B_ERROR;
 			return fEDIDState;
 		}
@@ -248,6 +249,7 @@ DigitalPort::IsConnected()
 addr_t
 DigitalPort::_DDCRegister()
 {
+	//TODO: IS BROXTON, B = B, C = C, D = NIL
 	switch (PortIndex()) {
 		case INTEL_PORT_B:
 			return INTEL_I2C_IO_E;

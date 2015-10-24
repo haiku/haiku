@@ -321,7 +321,7 @@ intel_extreme_init(intel_info &info)
 
 	// setup the register blocks for the different architectures
 	if (info.device_type.HasPlatformControlHub()) {
-		// PCH based platforms (IronLake and up)
+		// PCH based platforms (IronLake through ultra-low-power Broadwells)
 		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]
 			= PCH_NORTH_SHARED_REGISTER_BASE;
 		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)]
@@ -346,9 +346,8 @@ intel_extreme_init(intel_info &info)
 			= ICH_PORT_REGISTER_BASE;
 	}
 
-	// "I nearly got violent with the hw guys when they told me..."
 	if (info.device_type.InGroup(INTEL_TYPE_VLV)) {
-		TRACE("%s: ValleyView MMIO offset engaged\n", __func__);
+		// "I nearly got violent with the hw guys when they told me..."
 		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)] += VLV_DISPLAY_BASE;
 		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)] += VLV_DISPLAY_BASE;
 	}
