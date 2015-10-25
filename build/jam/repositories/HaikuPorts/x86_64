@@ -13,6 +13,7 @@ RemotePackageRepository HaikuPorts
 	droid-113-2
 	texi2html-1.82-2
 	timgmsoundfont-fixed-5
+	unknown_horizons-2014.1-1
 	vl_gothic-20141206-1
 	wqy_microhei-0.2.0~beta-3
 	:
@@ -74,6 +75,7 @@ RemotePackageRepository HaikuPorts
 	curl_devel-7.45.0-1
 	cvs-1.12.13.1-7
 	cvsps-2.2b1-1
+	cython-0.23.4-1
 	dbus-1.8.6-1
 	dbus_devel-1.8.6-1
 	diffutils-3.3-2
@@ -84,6 +86,9 @@ RemotePackageRepository HaikuPorts
 	enca_devel-1.15-1
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
+	fife-0.4.0~20150801-1
+	fifechan-0.1.2-1
+	fifechan_devel-0.1.2-1
 	file-5.25-1
 	file_devel-5.25-1
 	findutils-4.4.2-1
@@ -293,6 +298,8 @@ RemotePackageRepository HaikuPorts
 	nspr_devel-4.10.9-1
 	nss-3.20-1
 	nss_devel-3.20-1
+	openal-1.13.0-2
+	openal_devel-1.13.0-2
 	openssh-7.1p1-1
 	openssl-1.0.0s-2
 	openssl_devel-1.0.0s-2
@@ -303,9 +310,12 @@ RemotePackageRepository HaikuPorts
 	pixman-0.32.6-1
 	pixman_devel-0.32.6-1
 	pkgconfig-0.27.1-2
+	pyenet-20141025-1
 	python-2.7.10-1
+	python_setuptools-5.3-2
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
+	pyyaml-3.11-1
 	qca2-2.0.3-1
 	qca2_devel-2.0.3-1
 	qemu-2.1.2-2
@@ -395,6 +405,7 @@ RemotePackageRepository HaikuPorts
 	curl
 	cvs
 	cvsps
+	cython
 	dbus
 	diffutils
 	dos2unix
@@ -402,6 +413,8 @@ RemotePackageRepository HaikuPorts
 	dtc
 	enca
 	expat
+	fife
+	fifechan
 	file
 	findutils
 	ffmpeg
@@ -515,6 +528,7 @@ RemotePackageRepository HaikuPorts
 	ninja
 	nspr
 	nss
+	openal
 	openssh
 	openssl
 	p7zip
@@ -523,9 +537,12 @@ RemotePackageRepository HaikuPorts
 	perl
 	pixman
 	pkgconfig
+	pyenet
 	python
+	python_setuptools
 	python_twisted
 	python_zope.interface
+	pyyaml
 	qca2
 	qemu
 	qrencode
