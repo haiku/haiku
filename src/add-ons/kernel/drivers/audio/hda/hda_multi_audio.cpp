@@ -618,7 +618,7 @@ get_control_gain_mute(hda_audio_group* audioGroup,
 static status_t
 get_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 {
-	uint32 id;
+	int32 id;
 	hda_multi_mixer_control *control = NULL;
 	for (int32 i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
@@ -686,7 +686,7 @@ get_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 static status_t
 set_mix(hda_audio_group* audioGroup, multi_mix_value_info * mmvi)
 {
-	uint32 id;
+	int32 id;
 	hda_multi_mixer_control *control = NULL;
 	for (int32 i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
