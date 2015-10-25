@@ -17,6 +17,7 @@
 
 #include "BaseJob.h"
 #include "LaunchDaemon.h"
+#include "NetworkWatcher.h"
 #include "Utility.h"
 #include "VolumeWatcher.h"
 
@@ -64,6 +65,16 @@ public:
 	virtual	void				ResetTrigger();
 
 	virtual	BString				ToString() const;
+};
+
+
+class StickyEvent : public Event {
+public:
+								StickyEvent(Event* parent);
+	virtual						~StickyEvent();
+
+	virtual	void				ResetSticky();
+	virtual	void				ResetTrigger();
 };
 
 
@@ -132,6 +143,20 @@ public:
 };
 
 
+class NetworkAvailableEvent : public StickyEvent, public NetworkListener {
+public:
+								NetworkAvailableEvent(Event* parent,
+									const BMessage& args);
+
+	virtual	status_t			Register(EventRegistrator& registrator);
+	virtual	void				Unregister(EventRegistrator& registrator);
+
+	virtual	BString				ToString() const;
+
+	virtual	void				NetworkAvailabilityChanged(bool available);
+};
+
+
 static Event*
 create_event(Event* parent, const char* name, const BMessenger* target,
 	const BMessage& args)
@@ -149,6 +174,8 @@ create_event(Event* parent, const char* name, const BMessenger* target,
 		return new FileCreatedEvent(parent, args);
 	if (strcmp(name, "volume_mounted") == 0)
 		return new VolumeMountedEvent(parent, args);
+	if (strcmp(name, "network_available") == 0)
+		return new NetworkAvailableEvent(parent, args);
 
 	return new ExternalEvent(parent, name, args);
 }
@@ -389,6 +416,35 @@ OrEvent::ToString() const
 }
 
 
+// #pragma mark - StickyEvent
+
+
+StickyEvent::StickyEvent(Event* parent)
+	:
+	Event(parent)
+{
+}
+
+
+StickyEvent::~StickyEvent()
+{
+}
+
+
+void
+StickyEvent::ResetSticky()
+{
+	Event::ResetTrigger();
+}
+
+
+void
+StickyEvent::ResetTrigger()
+{
+	// This is a sticky event; we don't reset the trigger here
+}
+
+
 // #pragma mark - demand
 
 
@@ -570,6 +626,49 @@ VolumeMountedEvent::VolumeMounted(dev_t device)
 void
 VolumeMountedEvent::VolumeUnmounted(dev_t device)
 {
+}
+
+
+// #pragma mark -
+
+
+NetworkAvailableEvent::NetworkAvailableEvent(Event* parent,
+	const BMessage& args)
+	:
+	StickyEvent(parent)
+{
+}
+
+
+status_t
+NetworkAvailableEvent::Register(EventRegistrator& registrator)
+{
+	NetworkWatcher::Register(this);
+	return B_OK;
+}
+
+
+void
+NetworkAvailableEvent::Unregister(EventRegistrator& registrator)
+{
+	NetworkWatcher::Unregister(this);
+}
+
+
+BString
+NetworkAvailableEvent::ToString() const
+{
+	return "network_available";
+}
+
+
+void
+NetworkAvailableEvent::NetworkAvailabilityChanged(bool available)
+{
+	if (available)
+		Trigger();
+	else
+		ResetSticky();
 }
 
 

@@ -13,6 +13,7 @@
 #include <Message.h>
 #include <StringList.h>
 
+#include "NetworkWatcher.h"
 #include "Utility.h"
 
 
@@ -102,6 +103,15 @@ private:
 };
 
 
+class NetworkAvailableCondition : public Condition {
+public:
+	virtual	bool				Test(ConditionContext& context) const;
+	virtual	bool				IsConstant(ConditionContext& context) const;
+
+	virtual	BString				ToString() const;
+};
+
+
 static Condition*
 create_condition(const char* name, const BMessage& args)
 {
@@ -118,6 +128,8 @@ create_condition(const char* name, const BMessage& args)
 		return new ReadOnlyCondition(args);
 	if (strcmp(name, "file_exists") == 0)
 		return new FileExistsCondition(args);
+	if (strcmp(name, "network_available") == 0)
+		return new NetworkAvailableCondition();
 
 	return NULL;
 }
@@ -442,6 +454,30 @@ FileExistsCondition::ToString() const
 	}
 	string += "]";
 	return string;
+}
+
+
+// #pragma mark - network_available
+
+
+bool
+NetworkAvailableCondition::Test(ConditionContext& context) const
+{
+	return NetworkWatcher::NetworkAvailable(false);
+}
+
+
+bool
+NetworkAvailableCondition::IsConstant(ConditionContext& context) const
+{
+	return false;
+}
+
+
+BString
+NetworkAvailableCondition::ToString() const
+{
+	return "network_available";
 }
 
 
