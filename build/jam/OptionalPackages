@@ -206,8 +206,41 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 
 # Welcome
 if [ IsOptionalHaikuImagePackageAdded Welcome ] {
-	AddPackageFilesToHaikuImage system : haiku_userguide.hpkg
+	AddPackageFilesToHaikuImage system : haiku_userguide_ca.hpkg
 		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_de.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_en.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_es.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_fi.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_fr.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_hu.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_it.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_jp.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_pl.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_pt_BR.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_pt_PT.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_ru.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_sk.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_sv_SE.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_uk.hpkg
+		: nameFromMetaInfo ;
+	AddPackageFilesToHaikuImage system : haiku_userguide_zh_CN.hpkg
+		: nameFromMetaInfo ;
+
 	AddPackageFilesToHaikuImage system : haiku_welcome.hpkg : nameFromMetaInfo ;
 
 	AddSymlinkToHaikuImage home Desktop	: /boot/system/bin/welcome
