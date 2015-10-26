@@ -87,18 +87,18 @@
 	\fn static BTranslatorRoster* BTranslatorRoster::Default();
 	\brief Gets the default BTranslatorRoster.
 
-	At any point, there is only one default roster. It is created when it is
-	first requested (possibly after being deleted) and is poplated according
-	to the following rules:
+	At any point, there is only one default roster. It is created when this
+	method is called for the first time (possibly after being deleted) and is
+	populated according to the following rules:
 
-	If the environment variable \c TRANSLATORS is set, it will be populated
-	with all translators that are present in the directories denoted by
-	\c TRANSLATORS. The paths are separated by a colon (<tt>:</tt>). If
-	multiple paths contain a translator with the same name, the translator
+	If the environment variable \c TRANSLATORS is set, the default roster will
+	be populated with all translators that are present in the directories
+	denoted by \c TRANSLATORS. The paths are separated by a colon (<tt>:</tt>).
+	If multiple paths contain a translator with the same name, the translator
 	that is located in the path that appears earliest in \c TRANSLATORS will
 	be kept.
 
-	If \c TRANSLATORS is unset, the user non-packaged add-ons directory, the
+	If \c TRANSLATORS is not set, the user non-packaged add-ons directory, the
 	user add-ons directory, the system non-packaged add-ons directory and the
 	system add-ons directory will be used. If those directories do not contain
 	a subdirectory \c Translators, it will be created. The subdirectories are
