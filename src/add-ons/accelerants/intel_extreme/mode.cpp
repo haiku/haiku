@@ -293,7 +293,7 @@ set_frame_buffer_base()
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_ILK)
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)
 		|| sharedInfo.device_type.InGroup(INTEL_TYPE_IVB)
-		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_VLV)) {
+		|| sharedInfo.device_type.InGroup(INTEL_TYPE_VLV)) {
 		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
 		read32(baseRegister);
