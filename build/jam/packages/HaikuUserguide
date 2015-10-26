@@ -18,7 +18,7 @@ local haikuUserGuidePackageDE = haiku_userguide_de.hpkg ;
 HaikuPackage $(haikuUserGuidePackageDE) ;
 
 CopyDirectoryToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide de ]
-	: ca ;
+	: de ;
 CopyDirectoryToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide images ]
 	: images ;
 AddFilesToPackage documentation userguide : [ FDirName $(HAIKU_TOP) docs userguide Haiku-doc.css ]
