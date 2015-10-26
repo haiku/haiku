@@ -1,14 +1,19 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Lotz, mmlr@mlotz.ch
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 #ifndef INTEL_PORTS_H
 #define INTEL_PORTS_H
 
+
 #include <edid.h>
+
+#include "intel_extreme.h"
+#include "pll.h"
 
 
 #define MAX_PORTS	20	// a generous upper bound
@@ -55,6 +60,9 @@ virtual	status_t					GetEDID(edid1_info* edid,
 
 virtual	status_t					GetPLLLimits(pll_limits& limits);
 
+virtual status_t					SetDisplayMode(display_mode* mode,
+										uint32 colorMode) { return B_ERROR; };
+
 protected:
 		void						_SetName(const char* name);
 
@@ -62,6 +70,8 @@ static	status_t					_GetI2CSignals(void* cookie, int* _clock,
 										int* _data);
 static	status_t					_SetI2CSignals(void* cookie, int clock,
 										int data);
+
+		display_mode*				fCurrentMode;
 
 private:
 virtual	addr_t						_DDCRegister() = 0;
@@ -83,6 +93,9 @@ virtual	uint32						Type() const
 
 virtual	bool						IsConnected();
 
+virtual status_t					SetDisplayMode(display_mode* mode,
+										uint32 colorMode);
+
 protected:
 virtual	addr_t						_DDCRegister();
 };
@@ -96,6 +109,9 @@ virtual	uint32						Type() const
 										{ return INTEL_PORT_TYPE_LVDS; }
 
 virtual	bool						IsConnected();
+
+virtual status_t					SetDisplayMode(display_mode* mode,
+										uint32 colorMode);
 
 protected:
 virtual	addr_t						_DDCRegister();
@@ -112,6 +128,7 @@ virtual	uint32						Type() const
 										{ return INTEL_PORT_TYPE_DVI; }
 
 virtual	bool						IsConnected();
+
 
 protected:
 virtual	addr_t						_DDCRegister();

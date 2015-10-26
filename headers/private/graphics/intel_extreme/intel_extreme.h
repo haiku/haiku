@@ -570,7 +570,7 @@ struct intel_free_graphics_memory {
 #define I2C_RESERVED					((1 << 13) | (1 << 5))
 
 // TODO: on IronLake this is in the north shared block at 0x41000
-#define INTEL_VGA_DISPLAY_CONTROL		0x71400
+#define INTEL_VGA_DISPLAY_CONTROL		(0x1400 | REGS_NORTH_PLANE_CONTROL)
 #define VGA_DISPLAY_DISABLED			(1UL << 31)
 
 // LVDS panel
@@ -586,7 +586,6 @@ struct intel_free_graphics_memory {
 #define PCH_PANEL_STATUS				0xc7204
 #define PANEL_REGISTER_UNLOCK			(0xabcd << 16)
 #define PCH_LVDS_DETECTED				(1 << 1)
-
 
 // ring buffer commands
 

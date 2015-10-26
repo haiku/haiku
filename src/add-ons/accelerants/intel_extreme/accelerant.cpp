@@ -325,6 +325,8 @@ intel_init_accelerant(int device)
 	} else
 		delete analogPort;
 
+	gInfo->head_mode |= HEAD_MODE_TESTING;
+
 	// On TRACE, dump ports and states
 	dump_ports();
 

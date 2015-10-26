@@ -69,6 +69,7 @@ struct accelerant_info {
 	display_mode	lvds_panel_mode;
 };
 
+
 #define HEAD_MODE_A_ANALOG		0x0001
 #define HEAD_MODE_B_DIGITAL		0x0002
 #define HEAD_MODE_CLONE			0x0003
