@@ -72,8 +72,8 @@ write_8_check(addr_t *P, Elf32_Word value)
 
 
 static int
-relocate_rela(image_t *rootImage, image_t *image, struct Elf32_Rela *rel,
-	int rel_len, SymbolLookupCache* cache)
+relocate_rela(image_t *rootImage, image_t *image, Elf32_Rela *rel, int rel_len,
+	SymbolLookupCache* cache)
 {
 	int i;
 	addr_t S;
@@ -84,7 +84,7 @@ relocate_rela(image_t *rootImage, image_t *image, struct Elf32_Rela *rel,
 #define A	((addr_t)rel[i].r_addend)
 # define B	(image->regions[0].delta)
 
-	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < rel_len; i++) {
+	for (i = 0; i * (int)sizeof(Elf32_Rel) < rel_len; i++) {
 		unsigned type = ELF32_R_TYPE(rel[i].r_info);
 
 		switch (type) {
@@ -97,7 +97,7 @@ relocate_rela(image_t *rootImage, image_t *image, struct Elf32_Rela *rel,
 			case R_68K_GLOB_DAT:
 			case R_68K_JMP_SLOT:
 			{
-				struct Elf32_Sym *sym;
+				Elf32_Sym *sym;
 				status_t status;
 				sym = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
 
@@ -303,7 +303,7 @@ arch_relocate_image(image_t *rootImage, image_t *image,
 		//TRACE(("RELA relocations not supported\n"));
 		//return EOPNOTSUPP;
 
-		//for (i = 1; i * (int)sizeof(struct Elf32_Rela) < image->rela_len; i++) {
+		//for (i = 1; i * (int)sizeof(Elf32_Rela) < image->rela_len; i++) {
 		//	printf("rela: type %d\n", ELF32_R_TYPE(image->rela[i].r_info));
 		//}
 	}

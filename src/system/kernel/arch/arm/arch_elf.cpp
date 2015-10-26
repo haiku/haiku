@@ -164,12 +164,12 @@ is_in_image(struct elf_image_info *image, addr_t address)
 
 #ifdef _BOOT_MODE
 status_t
-boot_arch_elf_relocate_rel(struct preloaded_elf32_image *image,
-	struct Elf32_Rel *rel, int relLength)
+boot_arch_elf_relocate_rel(struct preloaded_elf32_image *image, Elf32_Rel *rel,
+	int relLength)
 #else
 int
 arch_elf_relocate_rel(struct elf_image_info *image,
-	struct elf_image_info *resolveImage, struct Elf32_Rel *rel, int relLength)
+	struct elf_image_info *resolveImage, Elf32_Rel *rel, int relLength)
 #endif
 {
 	addr_t S;
@@ -181,7 +181,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 
 	S = A = P = 0;
 
-	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < relLength; i++) {
+	for (i = 0; i * (int)sizeof(Elf32_Rel) < relLength; i++) {
 		TRACE(("looking at rel type %s, offset 0x%lx\n",
 			kRelocations[ELF32_R_TYPE(rel[i].r_info)], rel[i].r_offset));
 
@@ -191,7 +191,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 			case R_ARM_GLOB_DAT:
 			case R_ARM_ABS32:
 			{
-				struct Elf32_Sym *symbol;
+				Elf32_Sym *symbol;
 				status_t status;
 
 				symbol = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
@@ -309,15 +309,15 @@ write_8_check(addr_t P, Elf32_Word value)
 #ifdef _BOOT_MODE
 status_t
 boot_arch_elf_relocate_rela(struct preloaded_elf32_image *image,
-	struct Elf32_Rela *rel, int rel_len)
+	Elf32_Rela *rel, int rel_len)
 #else
 int
 arch_elf_relocate_rela(struct elf_image_info *image,
-	struct elf_image_info *resolve_image, struct Elf32_Rela *rel, int rel_len)
+	struct elf_image_info *resolve_image, Elf32_Rela *rel, int rel_len)
 #endif
 {
 	int i;
-	struct Elf32_Sym *sym;
+	Elf32_Sym *sym;
 	int vlErr;
 	addr_t S = 0;   // symbol address
 	addr_t R = 0;   // section relative symbol address
@@ -345,7 +345,7 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 		return B_ERROR; \
 	}
 
-	for (i = 0; i * (int)sizeof(struct Elf32_Rela) < rel_len; i++) {
+	for (i = 0; i * (int)sizeof(Elf32_Rela) < rel_len; i++) {
 		#if CHATTY
 		dprintf("looking at rel type %d, offset 0x%lx, "
 		"sym 0x%lx, addend 0x%lx\n", ELF32_R_TYPE(rel[i].r_info),

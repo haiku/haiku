@@ -18,8 +18,8 @@
 
 
 static int
-relocate_rel(image_t *rootImage, image_t *image, struct Elf32_Rel *rel,
-	int rel_len, SymbolLookupCache* cache)
+relocate_rel(image_t *rootImage, image_t *image, Elf32_Rel *rel, int rel_len,
+	SymbolLookupCache* cache)
 {
 	int i;
 	addr_t S;
@@ -29,7 +29,7 @@ relocate_rel(image_t *rootImage, image_t *image, struct Elf32_Rel *rel,
 # define A	(*(P))
 # define B	(image->regions[0].delta)
 
-	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < rel_len; i++) {
+	for (i = 0; i * (int)sizeof(Elf32_Rel) < rel_len; i++) {
 		unsigned type = ELF32_R_TYPE(rel[i].r_info);
 		unsigned symbolIndex = ELF32_R_SYM(rel[i].r_info);
 
@@ -133,7 +133,7 @@ arch_relocate_image(image_t* rootImage, image_t* image,
 		TRACE(("RELA relocations not supported\n"));
 		return EOPNOTSUPP;
 
-		//for (i = 1; i * (int)sizeof(struct Elf32_Rela) < image->rela_len; i++) {
+		//for (i = 1; i * (int)sizeof(Elf32_Rela) < image->rela_len; i++) {
 		//	printf("rela: type %d\n", ELF32_R_TYPE(image->rela[i].r_info));
 		//}
 	}

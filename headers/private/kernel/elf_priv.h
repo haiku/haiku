@@ -9,8 +9,8 @@
 #define _KERNEL_ELF_PRIV_H
 
 
-#include <elf32.h>
-#include <elf64.h>
+#include <elf_private.h>
+
 #include <image.h>
 
 
