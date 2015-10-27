@@ -182,8 +182,8 @@ RemotePackageRepository HaikuPorts
 	libqt4_devel-4.8.7-2
 	libsanta-3.0.1-1
 	libsanta_devel-3.0.1-1
-	libsdl-1.2.15-6
-	libsdl_devel-1.2.15-6
+	libsdl-1.2.15-9
+	libsdl_devel-1.2.15-9
 	libssh2-1.5.0-1
 	libssh2_devel-1.5.0-1
 	libsolv-0.3.0_haiku_2014_12_22-1

@@ -279,8 +279,8 @@ RemotePackageRepository HaikuPorts
 	libreplaygain_devel-r475-1
 	libsanta-3.0.0-3
 	libsanta_devel-3.0.0-3
-	libsdl-1.2.15-6
-	libsdl_devel-1.2.15-6
+	libsdl-1.2.15-9
+	libsdl_devel-1.2.15-9
 	libsdl2-2.0.3-2
 	libsdl2_devel-2.0.3-2
 	libsigc++-1.2.7-1
@@ -734,8 +734,8 @@ RemotePackageRepository HaikuPorts
 	libsanta_x86_devel-3.0.1-1
 	libsigc++_x86-2.4.1-1
 	libsigc++_x86_devel-2.4.1-1
-	libsdl_x86-1.2.15-7
-	libsdl_x86_devel-1.2.15-7
+	libsdl_x86-1.2.15-9
+	libsdl_x86_devel-1.2.15-9
 	libsdl2_x86-2.0.1-3
 	libsdl2_x86_devel-2.0.1-3
 	libsndfile_x86-1.0.25-3
@@ -1148,6 +1148,7 @@ RemotePackageRepository HaikuPorts
 	libsanta_x86
 	libsamplerate_x86
 	libsdl
+	libsdl_x86
 	libsdl2
 	libsdl2_x86
 	libsigc++
