@@ -13,6 +13,7 @@
 
 .section .init
 	// The image ID is preserved on the stack.
+	add		$0x8, %rsp
 	pop		%rdi
 	call	__haiku_init_after
 	movq	%rbp, %rsp
@@ -20,6 +21,7 @@
 	ret
 
 .section .fini
+	add		$0x8, %rsp
 	pop		%rdi
 	call	__haiku_term_after
 	movq	%rbp, %rsp
