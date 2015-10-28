@@ -64,7 +64,7 @@ count_regions(const char* imagePath, char const* buff, int phnum, int phentsize)
 				// will be handled at some other place
 				break;
 			case PT_INTERP:
-				// should check here for appropiate interpreter
+				// should check here for appropriate interpreter
 				break;
 			case PT_NOTE:
 				// unsupported

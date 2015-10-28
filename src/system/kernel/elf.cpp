@@ -2231,6 +2231,12 @@ load_kernel_add_on(const char *path)
 			case PT_DYNAMIC:
 				image->dynamic_section = programHeaders[i].p_vaddr;
 				continue;
+			case PT_INTERP:
+				// should check here for appropriate interpreter
+				continue;
+			case PT_PHDR:
+				// we don't use it
+				continue;
 			default:
 				dprintf("%s: unhandled pheader type %#" B_PRIx32 "\n", fileName,
 					programHeaders[i].p_type);
