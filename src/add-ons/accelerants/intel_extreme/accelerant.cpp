@@ -221,29 +221,9 @@ has_connected_port(port_index portIndex, uint32 type)
 }
 
 
-//	#pragma mark - public accelerant functions
-
-
-/*! Init primary accelerant */
-status_t
-intel_init_accelerant(int device)
+static status_t
+probe_ports()
 {
-	CALLED();
-
-	status_t status = init_common(device, false);
-	if (status != B_OK)
-		return status;
-
-	intel_shared_info &info = *gInfo->shared_info;
-
-	init_lock(&info.accelerant_lock, "intel extreme accelerant");
-	init_lock(&info.engine_lock, "intel extreme engine");
-
-	setup_ring_buffer(info.primary_ring_buffer, "intel primary ring buffer");
-
-	TRACE("pipe control for: 0x%" B_PRIx32 " 0x%" B_PRIx32 "\n",
-		read32(INTEL_PIPE_CONTROL), read32(INTEL_PIPE_CONTROL));
-
 	// Try to determine what ports to use. We use the following heuristic:
 	// * Check for DisplayPort, these can be more or less detected reliably.
 	// * Check for HDMI, it'll fail on devices not having HDMI for us to fall
@@ -325,10 +305,47 @@ intel_init_accelerant(int device)
 	} else
 		delete analogPort;
 
-	gInfo->head_mode |= HEAD_MODE_TESTING;
+	if (gInfo->port_count == 0)
+		return B_ERROR;
+
+	return B_OK;
+}
+
+
+//	#pragma mark - public accelerant functions
+
+
+/*! Init primary accelerant */
+status_t
+intel_init_accelerant(int device)
+{
+	CALLED();
+
+	status_t status = init_common(device, false);
+	if (status != B_OK)
+		return status;
+
+	intel_shared_info &info = *gInfo->shared_info;
+
+	init_lock(&info.accelerant_lock, "intel extreme accelerant");
+	init_lock(&info.engine_lock, "intel extreme engine");
+
+	setup_ring_buffer(info.primary_ring_buffer, "intel primary ring buffer");
+
+	TRACE("pipe control for: 0x%" B_PRIx32 " 0x%" B_PRIx32 "\n",
+		read32(INTEL_PIPE_CONTROL), read32(INTEL_PIPE_CONTROL));
+
+	// Probe all ports
+	status = probe_ports();
 
 	// On TRACE, dump ports and states
 	dump_ports();
+
+	if (status != B_OK) {
+		ERROR("Error: zero active displays were found!\n");
+		uninit_common();
+		return status;
+	}
 
 	status = create_mode_list();
 	if (status != B_OK) {
