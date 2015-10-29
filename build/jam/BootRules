@@ -145,5 +145,5 @@ rule BuildMBR binary : source
 actions BuildMBR
 {
 	$(RM) $(1)
-	$(HAIKU_CC_$(HAIKU_PACKAGING_ARCH)) $(2) -o $(1) $(MBRFLAGS) -nostdlib -Xlinker --oformat=binary -Xlinker -S -Xlinker -N -Xlinker "-e start" -Xlinker "-Ttext=0x600"
+	$(HAIKU_CC_$(HAIKU_PACKAGING_ARCH)) $(2) -o $(1) $(MBRFLAGS) -nostdlib -Xlinker --oformat=binary -Xlinker -S -Xlinker -N -Xlinker --entry=start -Xlinker -Ttext=0x600
 }
