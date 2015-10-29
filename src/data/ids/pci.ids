@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.10.21
-#	Date:    2015-10-21 03:15:02
+#	Version: 2015.10.29
+#	Date:    2015-10-29 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -2093,6 +2093,7 @@
 		1458 228c  R9 290X WindForce 3X
 		1458 228d  R9 290X WindForce 3X OC
 		1458 2290  R9 290X WindForce 3X
+		1458 22c1  Grenada PRO [Radeon R9 390]
 		1462 3070  R9 290X Lightning
 		1462 3071  R9 290X Lightning
 		1462 3072  R9 290X Lightning LE
@@ -3238,6 +3239,7 @@
 		174b aa98  Radeon HD 6450 1GB DDR3
 	aaa0  Tahiti XT HDMI Audio [Radeon HD 7970 Series]
 	aab0  Cape Verde/Pitcairn HDMI Audio [Radeon HD 7700/7800 Series]
+	aac0  Tobago HDMI Audio [Radeon R7 360 / R9 360 OEM]
 	aac8  Hawaii HDMI Audio
 	ac00  Theater 600 Pro
 	ac02  TV Wonder HD 600 PCIe
@@ -7159,7 +7161,7 @@
 		1369 a801  LCM200
 		1397 3136  4xS0-ISDN PCI Adapter
 		1397 3137  S2M-E1-ISDN PCI Adapter
-		1518 0200  Kontron ThinkIO-C
+		1518 0200  ThinkIO-C
 		15ed 1002  MCCS 8-port Serial Hot Swap
 		15ed 1003  MCCS 16-port Serial Hot Swap
 # MIL-STD-1553B Board
@@ -10493,6 +10495,7 @@
 		103c 1985  Pavilion 17-e163sg Notebook PC
 	5249  RTS5249 PCI Express Card Reader
 		103c 1909  ZBook 15
+	5286  RTS5286 PCI Express Card Reader
 	5288  RTS5288 PCI Express Card Reader
 	5289  RTL8411 PCI Express Card Reader
 		1043 1457  K55A Laptop
@@ -12124,7 +12127,7 @@
 1138  Ziatech Corporation
 	8905  8905 [STD 32 Bridge]
 1139  Dynamic Pictures, Inc
-	0001  VGA Compatable 3D Graphics
+	0001  VGA Compatible 3D Graphics
 113a  FWB Inc
 113b  Network Computing Devices
 113c  Cyclone Microsystems, Inc.
@@ -15104,6 +15107,8 @@
 	1752  PCI-1752
 	1754  PCI-1754
 	1756  PCI-1756
+# FPGA bridge to two SJA1000
+	c302  MIOe-3680 2-Port CAN-Bus MIOe Module with Isolation Protection
 13ff  Silicon Spice Inc
 1400  Artx Inc
 	1401  9432 TX
@@ -15889,7 +15894,6 @@
 1485  ERMA - Electronic GmBH
 1486  L3 Communications Telemetry & Instrumentation
 1487  MARQUETTE Medical Systems
-1488  KONTRON Electronik GmBH
 1489  KYE Systems Corporation
 148a  OPTO
 148b  INNOMEDIALOGIC Inc.
@@ -16880,6 +16884,8 @@
 	2464  HSF 56k Data/Fax/Voice Modem (Mob SmartDAA)
 	2465  HSF 56k Data/Fax/Voice/Spkp (w/HS) Modem (Mob SmartDAA)
 	2466  HSF 56k Data/Fax/Voice/Spkp Modem (Mob SmartDAA)
+	2702  HSFi modem RD01-D270
+		1028 8d88  SmartHSFi V92 56K PCI Modem
 	2f00  HSF 56k HSFi Modem
 		13e0 8d84  IBM HSFi V.90
 		13e0 8d85  Compaq Stinger
@@ -17296,8 +17302,8 @@
 158d  Point Multimedia Systems
 158e  Lara Technology Inc
 158f  Ditect Coop
-# nee 3PAR Inc.
-1590  Hewlett-Packard Company
+# formerly 3PAR Inc.
+1590  Hewlett Packard Enterprise
 	0001  Eagle Cluster Manager
 	0002  Osprey Cluster Manager
 	0003  Harrier Cluster Manager
@@ -18514,6 +18520,7 @@
 184a  Thales Computers
 	1100  MAX II cPLD
 1850  Advantest Corporation
+	0048  EK220-66401 Computer Interface Card
 1851  Microtune, Inc.
 1852  Anritsu Corp.
 1853  SMSC Automotive Infotainment System Group
@@ -21860,9 +21867,9 @@
 		1028 0000  Ethernet 10G X710 rNDC
 		1028 1f99  Ethernet 10G 4P X710/I350 rNDC
 		1028 1f9c  Ethernet 10G 4P X710 SFP+ rNDC
-		103c 0000  HPE Ethernet 10Gb 562SFP+ Adapter
-		103c 22fc  HPE Ethernet 10Gb 2-port 562FLR-SFP+ Adapter
-		103c 22fd  HPE Ethernet 10Gb 2-port 562SFP+ Adapter
+		103c 0000  Ethernet 10Gb 562SFP+ Adapter
+		103c 22fc  HP Ethernet 10Gb 2-port 562FLR-SFP+ Adapter
+		103c 22fd  HP Ethernet 10Gb 2-port 562SFP+ Adapter
 		1137 0000  Ethernet Converged NIC X710-4
 		1137 013b  Ethernet Converged NIC X710-4
 		17aa 0000  ThinkServer X710 AnyFabric for 10GbE SFP+
@@ -22024,6 +22031,7 @@
 		e4bf 3100  CX1-BAND
 	1962  80960RM (i960RM) Microprocessor
 		105a 0000  SuperTrak SX6000 I2O CPU
+	19df  DNV SMBus controller
 	1a21  82840 840 [Carmel] Chipset Host Bridge (Hub A)
 	1a23  82840 840 [Carmel] Chipset AGP Bridge
 	1a24  82840 840 [Carmel] Chipset PCI Bridge (Hub B)
@@ -25728,6 +25736,7 @@
 	530d  80310 (IOP) IO Processor
 	5845  QEMU NVM Express Controller
 		1af4 1100  QEMU Virtual Machine
+	5ad4  Broxton SMBus Controller
 	65c0  5100 Chipset Memory Controller Hub
 	65e2  5100 Chipset PCI Express x4 Port 2
 	65e3  5100 Chipset PCI Express x4 Port 3
@@ -26381,6 +26390,7 @@
 	a012  Atom Processor D4xx/D5xx/N4xx/N5xx Integrated Graphics Controller
 		144d c072  Notebook N150P
 	a013  Atom Processor D4xx/D5xx/N4xx/N5xx CHAPS counter
+	a102  Sunrise Point-H SATA controller [AHCI mode]
 	a103  Sunrise Point-H SATA Controller [AHCI mode]
 	a105  Sunrise Point-H SATA Controller [RAID mode]
 	a107  Sunrise Point-H SATA Controller [RAID mode]
@@ -26555,7 +26565,7 @@
 8686  ScaleMP
 	1010  vSMPowered system controller [vSMP CTL]
 8800  Trigem Computer Inc.
-	2008  Video assistent component
+	2008  Video assistant component
 8866  T-Square Design Inc.
 8888  Silicon Magic
 8912  TRX
