@@ -7,6 +7,7 @@ TARGET_WARNING_C++FLAGS_$(TARGET_PACKAGING_ARCH)
 # POSIX/libc tests
 SimpleTest abort_test : abort_test.cpp ;
 SimpleTest SyslogTest : SyslogTest.cpp ;
+SimpleTest brk_test : brk_test.c ;
 SimpleTest clearenv : clearenv.cpp ;
 SimpleTest dirent_test : dirent_test.cpp ;
 SimpleTest flock_test : flock_test.cpp ;

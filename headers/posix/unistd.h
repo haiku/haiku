@@ -7,6 +7,7 @@
 
 
 #include <null.h>
+#include <stdint.h>
 #include <sys/types.h>
 
 
@@ -221,7 +222,9 @@ extern void		_exit(int status) __attribute__ ((noreturn));
 
 extern pid_t	tcgetpgrp(int fd);
 extern int		tcsetpgrp(int fd, pid_t pgrpid);
-extern void		*sbrk(long incr);
+
+extern int		brk(void *addr);
+extern void		*sbrk(intptr_t increment);
 
 extern unsigned	int	alarm(unsigned int seconds);
 extern useconds_t	ualarm(useconds_t microSeconds, useconds_t interval);

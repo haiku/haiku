@@ -1307,14 +1307,24 @@ common_getrlimit(int resource, struct rlimit * rlp)
 		return B_BAD_ADDRESS;
 
 	switch (resource) {
-		case RLIMIT_NOFILE:
-		case RLIMIT_NOVMON:
-			return vfs_getrlimit(resource, rlp);
+		case RLIMIT_AS:
+			rlp->rlim_cur = __HAIKU_ADDR_MAX;
+			rlp->rlim_max = __HAIKU_ADDR_MAX;
+			return B_OK;
 
 		case RLIMIT_CORE:
 			rlp->rlim_cur = 0;
 			rlp->rlim_max = 0;
 			return B_OK;
+
+		case RLIMIT_DATA:
+			rlp->rlim_cur = RLIM_INFINITY;
+			rlp->rlim_max = RLIM_INFINITY;
+			return B_OK;
+
+		case RLIMIT_NOFILE:
+		case RLIMIT_NOVMON:
+			return vfs_getrlimit(resource, rlp);
 
 		case RLIMIT_STACK:
 		{
@@ -1338,15 +1348,15 @@ common_setrlimit(int resource, const struct rlimit * rlp)
 		return B_BAD_ADDRESS;
 
 	switch (resource) {
-		case RLIMIT_NOFILE:
-		case RLIMIT_NOVMON:
-			return vfs_setrlimit(resource, rlp);
-
 		case RLIMIT_CORE:
 			// We don't support core file, so allow settings to 0/0 only.
 			if (rlp->rlim_cur != 0 || rlp->rlim_max != 0)
 				return EINVAL;
 			return B_OK;
+
+		case RLIMIT_NOFILE:
+		case RLIMIT_NOVMON:
+			return vfs_setrlimit(resource, rlp);
 
 		default:
 			return EINVAL;

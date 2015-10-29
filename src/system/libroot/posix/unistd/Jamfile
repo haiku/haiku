@@ -12,6 +12,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		MergeObject <$(architecture)>posix_unistd.o :
 			access.c
 			alarm.c
+			brk.c
 			chown.c
 			chroot.cpp
 			close.c
@@ -33,7 +34,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			pipe.c
 			process.c
 			read.c
-			sbrk.c
 			sleep.c
 			sync.c
 			system.cpp
