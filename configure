@@ -75,8 +75,6 @@ options:
                               on to the make building the build tools.
   --no-downloads              Do not download anything. Useful when trying to
                               bootstrap and build Haiku from source only.
-  --remote-user <username>    Use given username when logging into
-                              git.haiku-os.org (via ssh).
   --target=TARGET             Select build target platform.
                               [default=${TARGET_PLATFORM}]
                               valid targets=r5,bone,dano,haiku
