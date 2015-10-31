@@ -444,7 +444,7 @@ RemotePackageRepository HaikuPorts
 	gtk_doc
 	gutenprint
 	gzip
-	haikuwebkit
+#	haikuwebkit
 	handbrake
 	harfbuzz
 	htmldoc

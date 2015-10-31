@@ -1063,7 +1063,7 @@ RemotePackageRepository HaikuPorts
 	gyp
 	gzip
 	haikuporter
-	haikuwebkit_x86
+#	haikuwebkit_x86
 	harfbuzz_x86
 	help2man
 	htmldoc

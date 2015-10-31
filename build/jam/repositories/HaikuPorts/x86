@@ -461,7 +461,7 @@ RemotePackageRepository HaikuPorts
 	jam
 	jasper
 	jpeg
-	haikuwebkit
+#	haikuwebkit
 	help2man
 	keymapswitcher
 	less
