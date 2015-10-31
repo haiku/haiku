@@ -718,6 +718,8 @@ RemotePackageRepository HaikuPorts
 	libmodplug_x86_devel-0.8.8.4-2
 	libmpdclient_x86-2.11_git-1
 	libmpdclient_x86_devel-2.11_git-1
+	libmpeg2_x86-0.5.1-3
+	libmpeg2_x86_devel-0.5.1-3
 	libogg_x86-1.3.0-2
 	libogg_x86_devel-1.3.0-2
 	libpaper_x86-1.1.24-1
@@ -849,6 +851,7 @@ RemotePackageRepository HaikuPorts
 	rocksndiamonds_x86-3.3.1.2-2
 	ruby_x86-2.2.2-1
 	ruby_x86_devel-2.2.2-1
+	scummvm_x86-1.7.0-3
 	sdcc_x86-3.4.0-1
 	sdl_gfx_x86-2.0.24-1
 	sdl_gfx_x86_devel-2.0.24-1
@@ -1136,6 +1139,7 @@ RemotePackageRepository HaikuPorts
 	libmodplug
 	libmpdclient_x86
 	libmpeg2
+	libmpeg2_x86
 	libogg
 	libpaper
 	libpcap
@@ -1299,6 +1303,7 @@ RemotePackageRepository HaikuPorts
 	ruby
 	sawteeth
 	scons
+	scummvm_x86
 	sdcc_x86
 	sdl_gfx
 	sdl_image
