@@ -8,6 +8,7 @@ RemotePackageRepository HaikuPorts
 	ca_root_certificates-2014_08_13-1
 	caladea-20130214-3
 	carlito-20130920-1
+	colormake-0.9.20140503-1
 	dejavu-2.34-2
 	docbook_xml_dtd-4.5-2
 	docbook_xsl_stylesheets-1.78.1-1
@@ -404,6 +405,7 @@ RemotePackageRepository HaikuPorts
 	psqlodbc_devel-09.03.0400-1
 	python-2.7.9-1
 	python_dateutil-1.5-2
+	python_imaging-1.1.7-1
 	python_lxml-3.3.5-2
 	python_mechanize-0.2.5-2
 	python_requests-2.3.0-2
@@ -1269,6 +1271,7 @@ RemotePackageRepository HaikuPorts
 	psqlodbc
 	python
 	python_dateutil
+	python_imaging
 	python_lxml
 	python_mechanize
 	python_requests
