@@ -1336,9 +1336,7 @@ BrowserWindow::CreateNewTab(const BString& _url, bool select,
 	bool applyNewPagePolicy = webView == NULL;
 	// Executed in app thread (new BWebPage needs to be created in app thread).
 	if (webView == NULL)
-		webView = new BWebView("web view");
-
-	webView->SetContext(fContext);
+		webView = new BWebView("web view", fContext);
 
 	bool isNewWindow = fTabManager->CountTabs() == 0;
 
