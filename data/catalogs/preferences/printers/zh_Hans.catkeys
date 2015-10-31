@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-PRNT	200447094
+1	english	x-vnd.Be-PRNT	2163275033
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		打印机：%printer_name%\n驱动：%driver%\n
 Waiting	JobListView		等待
 Print test page	PrintersWindow		打印测试页面
@@ -9,6 +9,7 @@ Cancel	AddPrinterDialog		取消
 Add printer	AddPrinterDialog		添加打印机
 Green	TestPageView		红
 Printers	PrintersWindow		打印机
+Add…	PrintersWindow		添加…
 Default Printer	PrinterListView		默认打印机
 Transport: %transport% %transport_address%	PrinterListView		传输: %transport% %transport_address%
 No pending jobs.	PrinterListView		无挂起任务。

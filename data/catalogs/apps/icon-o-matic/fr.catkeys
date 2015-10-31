@@ -1,4 +1,4 @@
-1	french	x-vnd.haiku-icon_o_matic	4112423386
+1	french	x-vnd.haiku-icon_o_matic	2781670565
 Select All	Icon-O-Matic-PathManipulator		Sélectionner tout
 Add Style	Icon-O-Matic-AddStylesCmd		Ajouter un style
 Color (#%02x%02x%02x)	Style name after dropping a color		Couleur (#%02x%02x%02x)
@@ -109,17 +109,21 @@ Radial	Icon-O-Matic-StyleTypes		Radial
 Perspective	Icon-O-Matic-TransformersList		Perspective
 Add shape with path & style	Icon-O-Matic-Menu-Shape		Ajoute une forme avec le chemin & le style
 Gradient	Icon-O-Matic-StyleTypes		Dégradé
+Min LOD	Icon-O-Matic-PropertyNames		Niveau de détail minimal
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Attribut BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Inverser la sélection
+Drop shapes	Icon-O-Matic-ShapesList		Supprimer les formes
 Export as…	Icon-O-Matic-Menu-File		Exporter sous…
 Transformation	Transformation		Transformation
 Move Transformers	Icon-O-Matic-MoveTransformersCmd		Déplacer les transformations
 Move Styles	Icon-O-Matic-MoveStylesCmd		Déplacer les styles
 Reset transformation	Icon-O-Matic-StylesList		Réinitialiser la transformation
+Max LOD	Icon-O-Matic-PropertyNames		Niveau de détail maximal
 Flip	Icon-O-Matic-PathManipulator		Retourner
 Conic	Icon-O-Matic-StyleTypes		Conique
 Split Control Points	Icon-O-Matic-SplitPointsCmd		Diviser les points de contrôle
 Save	Icon-O-Matic-Menu-Settings		Sauvegarder
+Add empty	Icon-O-Matic-ShapesList		Ajouter une forme vide
 Close	Icon-O-Matic-Menu-File		Fermer
 Cancel	Icon-O-Matic-ColorPicker		Annuler
 Paste	Icon-O-Matic-Properties		Coller

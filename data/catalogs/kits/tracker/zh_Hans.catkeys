@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	1313160091
+1	english	x-vnd.Haiku-libtracker	2004221275
 OK	WidgetAttributeText		确定
 Add-ons	FilePanelPriv		附加组件
 Mount settings…	ContainerWindow		挂载设置...
@@ -19,6 +19,7 @@ Modified	QueryPoseView		修改
 Created	ContainerWindow		创建
 Error %error loading add-On %name.	ContainerWindow		载入附加组件 %name 出错：%error 。
 If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		如果您 %ifYouDoAction settings 目录, %osName 可能无法正常工作！\n\n您是否确认执行此操作？
+Skip all	FSUtils		跳过所有
 contains	SelectionWindow		包含
 Sorry, you can't save things at the root of your system.	FilePanelPriv		对不起，您不能够在系统根目录保存内容。
 Show shared volumes on Desktop	SettingsView		在桌面显示共享卷。
@@ -179,6 +180,7 @@ Error in regular expression:\n\n'%errstring'	PoseView		正则表达式错误：\
 Mount all	MountMenu		挂载所有
 calculating…	InfoWindow		计算...
 Mount all disks now	AutoMounterSettings		挂载所有磁盘
+Hide dotfiles	SettingsView		隐藏 dotfiles
 Untitled bitmap	PoseView		未命名位图
 of %items	StatusWindow		of %items
 Description:	InfoWindow		描述：

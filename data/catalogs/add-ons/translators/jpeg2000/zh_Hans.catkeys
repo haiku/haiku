@@ -1,6 +1,7 @@
-1	english	x-vnd.Haiku-JPEG2000Translator	547915409
+1	english	x-vnd.Haiku-JPEG2000Translator	3265915643
 Write	JPEG2000Translator		写入
 JPEG2000 images	JPEG2000Translator		JPEG2000 图像
+Version %d.%d.%d	JPEG2000Translator		版本 %d.%d.%d
 Output only codestream (.jpc)	JPEG2000Translator		输出仅 (.jpc)
 Write black-and-white images as RGB24	JPEG2000Translator		以 RGB24 格式写入黑白图像
 Output quality	JPEG2000Translator		输出质量
