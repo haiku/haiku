@@ -82,8 +82,8 @@ RemotePackageRepository HaikuPorts
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
 	fife-0.4.0~20150801-1
-	fifechan-0.1.2-1
-	fifechan_devel-0.1.2-1
+	fifechan-0.1.2-2
+	fifechan_devel-0.1.2-2
 	file-5.15-1
 	file_devel-5.15-1
 	findutils-4.4.2-3
