@@ -1,6 +1,12 @@
 # unit test pseudo target
 NotFile unittests ;
 
+rule UnitTestDependency
+{
+	Depends unittests : $(1) ;
+}
+
+
 rule UnitTestLib
 {
 	# UnitTestLib <lib> : <sources> : <libraries> ;
@@ -30,7 +36,7 @@ rule UnitTestLib
 	MakeLocate $(lib) : $(TARGET_UNIT_TEST_LIB_DIR) ;
 	SharedLibrary $(lib) : $(sources) : $(libraries) libcppunit.so ;
 
-	Depends unittests : $(lib) ;
+	UnitTestDependency $(lib) ;
 }
 
 
@@ -60,7 +66,7 @@ rule UnitTest
 	SimpleTest $(target) : $(sources) : $(libraries) libcppunit.so
 		: $(resources) ;
 
-	Depends unittests : $(target) ;
+	UnitTestDependency $(target) ;
 }
 
 
