@@ -9,7 +9,7 @@
 #
 
 
-netcat=netcat
+netcat=nc
 report_site=fake.haikuware.com
 report_cgi=http://haikuware.com/hwreport.php
 packages="dmidecode netcat"
