@@ -139,7 +139,7 @@ Port::_SetI2CSignals(void* cookie, int clock, int data)
 	addr_t ioRegister = (addr_t)cookie;
 	uint32 value;
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_83x)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_83x)) {
 		// on these chips, the reserved values are fixed
 		value = 0;
 	} else {
@@ -203,7 +203,7 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	pll_divisors divisors;
 	compute_pll_divisors(target, &divisors, false);
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 		write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
 			(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
 				& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
@@ -220,8 +220,10 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	}
 
 	uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL;
-	if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
-		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)
+		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
+		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
+		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 			pll |= ((1 << (divisors.post1 - 1))
 					<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT)
 				& DISPLAY_PLL_IGD_POST1_DIVISOR_MASK;
@@ -237,7 +239,7 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 		pll |= DISPLAY_PLL_MODE_ANALOG;
 
-		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x))
+		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x))
 			pll |= 6 << DISPLAY_PLL_PULSE_PHASE_SHIFT;
 	} else {
 		if (!divisors.post2_high)
@@ -400,13 +402,15 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		compute_pll_divisors(target, &divisors, true);
 
 	uint32 dpll = DISPLAY_PLL_NO_VGA_CONTROL | DISPLAY_PLL_ENABLED;
-	if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
+	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)
+		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
+		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
 		dpll |= LVDS_PLL_MODE_LVDS;
 			// DPLL mode LVDS for i915+
 	}
 
 	// Compute bitmask from p1 value
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 		dpll |= (1 << (divisors.post1 - 1))
 			<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
 	} else {
@@ -426,7 +430,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		// (I don't know how to detect that)
 
 	if ((dpll & DISPLAY_PLL_ENABLED) != 0) {
-		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
 				(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
 					& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
@@ -466,7 +470,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	write32(INTEL_DIGITAL_LVDS_PORT, lvds);
 	read32(INTEL_DIGITAL_LVDS_PORT);
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 		write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
 			(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
 				& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
@@ -488,7 +492,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Wait for the clocks to stabilize
 	spin(150);
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)) {
 		float adjusted = ((referenceClock * divisors.m) / divisors.n)
 			/ divisors.post;
 		uint32 pixelMultiply;
@@ -682,7 +686,7 @@ HDMIPort::_PortRegister()
 {
 	// on PCH there's an additional port sandwiched in
 	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
-	bool fourthGen = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_VLV);
+	bool fourthGen = gInfo->shared_info->device_type.InGroup(INTEL_GROUP_SLV);
 
 	switch (PortIndex()) {
 		case INTEL_PORT_B:
@@ -694,7 +698,8 @@ HDMIPort::_PortRegister()
 				return GEN4_HDMI_PORT_C;
 			return hasPCH ? PCH_HDMI_PORT_C : INTEL_HDMI_PORT_C;
 		case INTEL_PORT_D:
-			// TODO: Is CherryView? GEN4_HDMI_PORT_D
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_AIR))
+				return CHV_HDMI_PORT_D;
 			return hasPCH ? PCH_HDMI_PORT_D : 0;
 		default:
 			return 0;

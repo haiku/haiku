@@ -82,7 +82,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	}
 
 	pll_divisors divisors;
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 		divisors.m1 = 0;
 		divisors.m2 = (pllDivisor & DISPLAY_PLL_IGD_M2_DIVISOR_MASK)
 			>> DISPLAY_PLL_M2_DIVISOR_SHIFT;
@@ -100,8 +100,10 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	pll_limits limits;
 	get_pll_limits(&limits);
 
-	if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
-		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)
+		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
+		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
+		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 			divisors.post1 = (pll & DISPLAY_PLL_IGD_POST1_DIVISOR_MASK)
 				>> DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
 		} else {
@@ -110,7 +112,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 		}
 
 		if (pllRegister == INTEL_DISPLAY_B_PLL
-			&& !gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)) {
+			&& !gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)) {
 			// TODO: Fix this? Need to support dual channel LVDS.
 			divisors.post2 = LVDS_POST2_RATE_SLOW;
 		} else {
@@ -242,12 +244,12 @@ sanitize_display_mode(display_mode& mode)
 	// Some cards only support even pixel counts, while others require an odd
 	// one.
 	uint16 pixelCount = 1;
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_Gxx)
-			|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)
-			|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_94x)
-			|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_91x)
-			|| gInfo->shared_info->device_type.InFamily(INTEL_TYPE_8xx)
-			|| gInfo->shared_info->device_type.InFamily(INTEL_TYPE_7xx)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_Gxx)
+			|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)
+			|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_94x)
+			|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_91x)
+			|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_8xx)
+			|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_7xx)) {
 		pixelCount = 2;
 	}
 
@@ -288,12 +290,11 @@ set_frame_buffer_base()
 		surfaceRegister = INTEL_DISPLAY_B_SURFACE;
 	}
 
-	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_G4x)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_ILK)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_SNB)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_IVB)
-		|| sharedInfo.device_type.InGroup(INTEL_TYPE_VLV)) {
+	if (sharedInfo.device_type.InGroup(INTEL_GROUP_96x)
+		|| sharedInfo.device_type.InGroup(INTEL_GROUP_G4x)
+		|| sharedInfo.device_type.InGroup(INTEL_GROUP_ILK)
+		|| sharedInfo.device_type.InFamily(INTEL_FAMILY_SER5)
+		|| sharedInfo.device_type.InFamily(INTEL_FAMILY_SOC0)) {
 		write32(baseRegister, mode.v_display_start * sharedInfo.bytes_per_row
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
 		read32(baseRegister);
@@ -625,7 +626,7 @@ if (first) {
 		pll_divisors divisors;
 		compute_pll_divisors(&target, &divisors, false);
 
-		if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
 				(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
 					& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
@@ -642,8 +643,10 @@ if (first) {
 		}
 
 		uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL;
-		if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
-			if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+		if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)
+			|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
+			|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 				pll |= ((1 << (divisors.post1 - 1))
 						<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT)
 					& DISPLAY_PLL_IGD_POST1_DIVISOR_MASK;
@@ -657,7 +660,7 @@ if (first) {
 			if (divisors.post2_high)
 				pll |= DISPLAY_PLL_DIVIDE_HIGH;
 
-			if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x))
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x))
 				pll |= 6 << DISPLAY_PLL_PULSE_PHASE_SHIFT;
 		} else {
 			if (!divisors.post2_high)

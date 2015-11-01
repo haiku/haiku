@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 #ifndef INTEL_EXTREME_H
 #define INTEL_EXTREME_H
@@ -20,51 +21,60 @@
 
 #define VENDOR_ID_INTEL			0x8086
 
-#define INTEL_TYPE_FAMILY_MASK	0x00f00000
-#define INTEL_TYPE_GROUP_MASK	0x00fffff0
-#define INTEL_TYPE_MODEL_MASK	0x00ffffff
+#define INTEL_FAMILY_MASK	0x00ff0000
+#define INTEL_GROUP_MASK	0x00fffff0
+#define INTEL_MODEL_MASK	0x00ffffff
 // families
-#define INTEL_TYPE_7xx			0x00100000	// First Gen
-#define INTEL_TYPE_8xx			0x00200000	// Second Gen
-#define INTEL_TYPE_9xx			0x00400000	// Third Gen +
+#define INTEL_FAMILY_7xx	0x00010000	// First Gen
+#define INTEL_FAMILY_8xx	0x00020000	// Second Gen
+#define INTEL_FAMILY_9xx	0x00040000	// Third Gen +
+#define INTEL_FAMILY_SER5	0x00080000	// Intel5 Series
+#define INTEL_FAMILY_POVR	0x00100000	// PowerVR (uugh)
+#define INTEL_FAMILY_SOC0	0x00200000  // Atom SOC
 // groups
-#define INTEL_TYPE_83x			(INTEL_TYPE_8xx | 0x00010)
-#define INTEL_TYPE_85x			(INTEL_TYPE_8xx | 0x00020)
-#define INTEL_TYPE_91x			(INTEL_TYPE_9xx | 0x00040)
-#define INTEL_TYPE_94x			(INTEL_TYPE_9xx | 0x00080)
-#define INTEL_TYPE_96x			(INTEL_TYPE_9xx | 0x00100)
-#define INTEL_TYPE_Gxx			(INTEL_TYPE_9xx | 0x00200)
-#define INTEL_TYPE_G4x			(INTEL_TYPE_9xx | 0x00400)
-#define INTEL_TYPE_IGD			(INTEL_TYPE_9xx | 0x00800)
-#define INTEL_TYPE_ILK			(INTEL_TYPE_9xx | 0x01000)
-#define INTEL_TYPE_SNB			(INTEL_TYPE_9xx | 0x02000)
-#define INTEL_TYPE_IVB			(INTEL_TYPE_9xx | 0x04000)
-#define INTEL_TYPE_HAS			(INTEL_TYPE_9xx | 0x08000)
-#define INTEL_TYPE_VLV			(INTEL_TYPE_9xx | 0x10000)
+#define INTEL_GROUP_83x		(INTEL_FAMILY_8xx  | 0x0010)
+#define INTEL_GROUP_85x		(INTEL_FAMILY_8xx  | 0x0020)
+#define INTEL_GROUP_91x		(INTEL_FAMILY_9xx  | 0x0010)
+#define INTEL_GROUP_94x		(INTEL_FAMILY_9xx  | 0x0020)
+#define INTEL_GROUP_96x		(INTEL_FAMILY_9xx  | 0x0040)
+#define INTEL_GROUP_Gxx		(INTEL_FAMILY_9xx  | 0x0080)
+#define INTEL_GROUP_G4x		(INTEL_FAMILY_9xx  | 0x0100)
+#define INTEL_GROUP_IGD		(INTEL_FAMILY_9xx  | 0x0200)
+#define INTEL_GROUP_ILK		(INTEL_FAMILY_9xx  | 0x0400)  // IronLake
+#define INTEL_GROUP_SNB		(INTEL_FAMILY_SER5 | 0x0010)  // SandyBridge
+#define INTEL_GROUP_IVB		(INTEL_FAMILY_SER5 | 0x0020)  // IvyBridge
+#define INTEL_GROUP_HAS		(INTEL_FAMILY_SER5 | 0x0040)  // Haswell
+#define INTEL_GROUP_SLT		(INTEL_FAMILY_POVR | 0x0010)  // Saltwell
+#define INTEL_GROUP_FSM		(INTEL_FAMILY_POVR | 0x0020)  // Fu.Silvermont
+#define INTEL_GROUP_SLV		(INTEL_FAMILY_SOC0 | 0x0010)  // Silvermont
+#define INTEL_GROUP_AIR		(INTEL_FAMILY_SOC0 | 0x0020)  // Airmont
+#define INTEL_GROUP_GOL		(INTEL_FAMILY_SOC0 | 0x0040)  // Goldmont
 // models
-#define INTEL_TYPE_SERVER		0x0004
-#define INTEL_TYPE_MOBILE		0x0008
-#define INTEL_TYPE_915			(INTEL_TYPE_91x)
-#define INTEL_TYPE_915M			(INTEL_TYPE_91x | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_945			(INTEL_TYPE_94x)
-#define INTEL_TYPE_945M			(INTEL_TYPE_94x | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_965			(INTEL_TYPE_96x)
-#define INTEL_TYPE_965M			(INTEL_TYPE_96x | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_G33			(INTEL_TYPE_Gxx)
-#define INTEL_TYPE_G45			(INTEL_TYPE_G4x)
-#define INTEL_TYPE_GM45			(INTEL_TYPE_G4x | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_IGDG			(INTEL_TYPE_IGD)
-#define INTEL_TYPE_IGDGM		(INTEL_TYPE_IGD | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_ILKG			(INTEL_TYPE_ILK)
-#define INTEL_TYPE_ILKGM		(INTEL_TYPE_ILK | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_SNBG			(INTEL_TYPE_SNB)
-#define INTEL_TYPE_SNBGM		(INTEL_TYPE_SNB | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_SNBGS		(INTEL_TYPE_SNB | INTEL_TYPE_SERVER)
-#define INTEL_TYPE_IVBG			(INTEL_TYPE_IVB)
-#define INTEL_TYPE_IVBGM		(INTEL_TYPE_IVB | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_IVBGS		(INTEL_TYPE_IVB | INTEL_TYPE_SERVER)
-#define INTEL_TYPE_VLVG			(INTEL_TYPE_VLV)
-#define INTEL_TYPE_VLVGM		(INTEL_TYPE_VLV | INTEL_TYPE_MOBILE)
+#define INTEL_TYPE_SERVER	0x0004
+#define INTEL_TYPE_MOBILE	0x0008
+#define INTEL_MODEL_915		(INTEL_GROUP_91x)
+#define INTEL_MODEL_915M	(INTEL_GROUP_91x | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_945		(INTEL_GROUP_94x)
+#define INTEL_MODEL_945M	(INTEL_GROUP_94x | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_965		(INTEL_GROUP_96x)
+#define INTEL_MODEL_965M	(INTEL_GROUP_96x | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_G33		(INTEL_GROUP_Gxx)
+#define INTEL_MODEL_G45		(INTEL_GROUP_G4x)
+#define INTEL_MODEL_GM45	(INTEL_GROUP_G4x | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_IGDG	(INTEL_GROUP_IGD)
+#define INTEL_MODEL_IGDGM	(INTEL_GROUP_IGD | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_ILKG	(INTEL_GROUP_ILK)
+#define INTEL_MODEL_ILKGM	(INTEL_GROUP_ILK | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_SNBG	(INTEL_GROUP_SNB)
+#define INTEL_MODEL_SNBGM	(INTEL_GROUP_SNB | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_SNBGS	(INTEL_GROUP_SNB | INTEL_TYPE_SERVER)
+#define INTEL_MODEL_IVBG	(INTEL_GROUP_IVB)
+#define INTEL_MODEL_IVBGM	(INTEL_GROUP_IVB | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_IVBGS	(INTEL_GROUP_IVB | INTEL_TYPE_SERVER)
+#define INTEL_MODEL_HAS		(INTEL_GROUP_HAS)
+#define INTEL_MODEL_HASM	(INTEL_GROUP_HAS | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_VLV		(INTEL_GROUP_SLV)
+#define INTEL_MODEL_VLVM	(INTEL_GROUP_SLV | INTEL_TYPE_MOBILE)
 
 // ValleyView MMIO offset
 #define VLV_DISPLAY_BASE		0x180000
@@ -122,35 +132,34 @@ struct DeviceType {
 
 	bool InFamily(uint32 family) const
 	{
-		return (type & INTEL_TYPE_FAMILY_MASK) == family;
+		return (type & INTEL_FAMILY_MASK) == family;
 	}
 
 	bool InGroup(uint32 group) const
 	{
-		return (type & INTEL_TYPE_GROUP_MASK) == group;
+		return (type & INTEL_GROUP_MASK) == group;
 	}
 
 	bool IsModel(uint32 model) const
 	{
-		return (type & INTEL_TYPE_MODEL_MASK) == model;
+		return (type & INTEL_MODEL_MASK) == model;
 	}
 
 	bool IsMobile() const
 	{
-		return (type & INTEL_TYPE_MODEL_MASK) == INTEL_TYPE_MOBILE;
+		return (type & INTEL_MODEL_MASK) == INTEL_TYPE_MOBILE;
 	}
 
 	bool SupportsHDMI() const
 	{
-		return InGroup(INTEL_TYPE_G4x) || InGroup(INTEL_TYPE_ILK)
-			|| InGroup(INTEL_TYPE_SNB) || InGroup(INTEL_TYPE_IVBG)
-			|| InGroup(INTEL_TYPE_HAS) || InGroup(INTEL_TYPE_VLV);
+		return InGroup(INTEL_GROUP_G4x) || InGroup(INTEL_GROUP_ILK)
+			|| InFamily(INTEL_FAMILY_SER5) || InFamily(INTEL_FAMILY_SOC0);
 	}
 
 	bool HasPlatformControlHub() const
 	{
-		return InGroup(INTEL_TYPE_ILK) || InGroup(INTEL_TYPE_SNB)
-			|| InGroup(INTEL_TYPE_IVB) || InGroup(INTEL_TYPE_HAS);
+		return InGroup(INTEL_GROUP_ILK) || InGroup(INTEL_GROUP_SNB)
+			|| InGroup(INTEL_GROUP_IVB) || InGroup(INTEL_GROUP_HAS);
 	}
 };
 
@@ -842,7 +851,7 @@ struct overlay_registers {
 inline bool
 intel_uses_physical_overlay(intel_shared_info &info)
 {
-	return !info.device_type.InGroup(INTEL_TYPE_Gxx);
+	return !info.device_type.InGroup(INTEL_GROUP_Gxx);
 }
 
 

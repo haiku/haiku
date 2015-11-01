@@ -44,10 +44,8 @@ get_pll_limits(pll_limits* limits)
 	// Note, the limits are taken from the X driver; they have not yet been
 	// tested
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_ILK)
-		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB)
-		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IVB)
-		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_VLV)) {
+	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
+		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
 		// TODO: support LVDS output limits as well
 		pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
@@ -56,26 +54,7 @@ get_pll_limits(pll_limits* limits)
 			225000, 1760000, 3510000
 		};
 		memcpy(limits, &kLimits, sizeof(pll_limits));
-	} else if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_G4x)) {
-		// TODO: support LVDS output limits as well
-		pll_limits kLimits = {
-			// p, p1, p2, high,   n,   m, m1, m2
-			{ 10,  1, 10, false,  1, 104, 17,  5},	// min
-			{ 30,  3, 10, true,   4, 138, 23, 11},	// max
-			270000, 1750000, 3500000
-		};
-		memcpy(limits, &kLimits, sizeof(pll_limits));
-	} else if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
-		// TODO: support LVDS output limits as well
-		// m1 is reserved and must be 0
-		pll_limits kLimits = {
-			// p, p1, p2, high,   n,   m, m1,  m2
-			{  5,  1, 10, false,  3,   2,  0,   2},	// min
-			{ 80,  8,  5, true,   6, 256,  0, 256},	// max
-			200000, 1700000, 3500000
-		};
-		memcpy(limits, &kLimits, sizeof(pll_limits));
-	} else if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
+	} else if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)) {
 		// TODO: support LVDS output limits as well
 		// (Update: Output limits are adjusted in the computation (post2=7/14))
 		// Should move them here!
@@ -84,6 +63,25 @@ get_pll_limits(pll_limits* limits)
 			{  5,  1, 10, false,  5,  70, 12,  7},	// min
 			{ 80,  8,  5, true,  10, 120, 22, 11},	// max
 			200000, 1400000, 2800000
+		};
+		memcpy(limits, &kLimits, sizeof(pll_limits));
+	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_G4x)) {
+		// TODO: support LVDS output limits as well
+		pll_limits kLimits = {
+			// p, p1, p2, high,   n,   m, m1, m2
+			{ 10,  1, 10, false,  1, 104, 17,  5},	// min
+			{ 30,  3, 10, true,   4, 138, 23, 11},	// max
+			270000, 1750000, 3500000
+		};
+		memcpy(limits, &kLimits, sizeof(pll_limits));
+	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
+		// TODO: support LVDS output limits as well
+		// m1 is reserved and must be 0
+		pll_limits kLimits = {
+			// p, p1, p2, high,   n,   m, m1,  m2
+			{  5,  1, 10, false,  3,   2,  0,   2},	// min
+			{ 80,  8,  5, true,   6, 256,  0, 256},	// max
+			200000, 1700000, 3500000
 		};
 		memcpy(limits, &kLimits, sizeof(pll_limits));
 	} else {
@@ -160,7 +158,7 @@ compute_pll_divisors(display_mode* current, pll_divisors* divisors,
 	float best = requestedPixelClock;
 	pll_divisors bestDivisors;
 
-	bool is_igd = gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD);
+	bool is_igd = gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD);
 	for (divisors->m1 = limits.min.m1; divisors->m1 <= limits.max.m1;
 			divisors->m1++) {
 		for (divisors->m2 = limits.min.m2; divisors->m2 <= limits.max.m2

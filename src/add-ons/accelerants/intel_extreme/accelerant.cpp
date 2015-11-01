@@ -149,7 +149,7 @@ init_common(int device, bool isClone)
 			+ gInfo->shared_info->overlay_offset);
 	}
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)) {
 		// allocate some extra memory for the 3D context
 		if (intel_allocate_memory(INTEL_i965_3D_CONTEXT_SIZE,
 				B_APERTURE_NON_RESERVED, gInfo->context_base) == B_OK) {
@@ -233,6 +233,12 @@ probe_ports()
 	// * Check for analog if possible (there's a detection bit on PCH),
 	//   otherwise the assumed presence is confirmed by reading EDID in
 	//   IsConnected().
+
+	TRACE("adpa: %08" B_PRIx32 "\n", read32(INTEL_ANALOG_PORT));
+	TRACE("dova: %08" B_PRIx32 ", dovb: %08" B_PRIx32
+		", dovc: %08" B_PRIx32 "\n", read32(INTEL_DIGITAL_PORT_A),
+		read32(INTEL_DIGITAL_PORT_B), read32(INTEL_DIGITAL_PORT_C));
+	TRACE("lvds: %08" B_PRIx32 "\n", read32(INTEL_DIGITAL_LVDS_PORT));
 
 	gInfo->port_count = 0;
 	for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {
@@ -442,7 +448,7 @@ intel_get_accelerant_device_info(accelerant_device_info* info)
 	CALLED();
 
 	info->version = B_ACCELERANT_VERSION;
-	strcpy(info->name, gInfo->shared_info->device_type.InFamily(INTEL_TYPE_7xx)
+	strcpy(info->name, gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_7xx)
 		? "Intel Extreme Graphics 1" : "Intel Extreme Graphics 2");
 	strcpy(info->chipset, gInfo->shared_info->device_identifier);
 	strcpy(info->serial_no, "None");

@@ -98,7 +98,7 @@ intel_interrupt_handler(void* data)
 
 		// Intel changed the PCH register mapping between Sandy Bridge and the
 		// later generations (Ivy Bridge and up).
-		if (info.device_type.InGroup(INTEL_TYPE_SNB)) {
+		if (info.device_type.InGroup(INTEL_GROUP_SNB)) {
 			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA_SNB
 				: INTERRUPT_VBLANK_PIPEA;
 			if ((identity & mask) != 0) {
@@ -287,7 +287,8 @@ intel_extreme_init(intel_info &info)
 
 	int fbIndex = 0;
 	int mmioIndex = 1;
-	if (info.device_type.InFamily(INTEL_TYPE_9xx)) {
+	if (info.device_type.InFamily(INTEL_FAMILY_9xx)
+		| info.device_type.InFamily(INTEL_FAMILY_SER5)) {
 		// For some reason Intel saw the need to change the order of the
 		// mappings with the introduction of the i9xx family
 		mmioIndex = 0;
@@ -346,7 +347,7 @@ intel_extreme_init(intel_info &info)
 			= ICH_PORT_REGISTER_BASE;
 	}
 
-	if (info.device_type.InGroup(INTEL_TYPE_VLV)) {
+	if (info.device_type.InGroup(INTEL_GROUP_SLV)) {
 		// "I nearly got violent with the hw guys when they told me..."
 		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)] += VLV_DISPLAY_BASE;
 		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)] += VLV_DISPLAY_BASE;
@@ -403,10 +404,11 @@ intel_extreme_init(intel_info &info)
 	info.shared_info->got_vbt = get_lvds_mode_from_bios(
 		&info.shared_info->current_mode);
 	/* at least 855gm can't drive more than one head at time */
-	if (info.device_type.InFamily(INTEL_TYPE_8xx))
+	if (info.device_type.InFamily(INTEL_FAMILY_8xx))
 		info.shared_info->single_head_locked = 1;
 
-	if (info.device_type.InFamily(INTEL_TYPE_9xx)) {
+	if (info.device_type.InFamily(INTEL_FAMILY_9xx)
+		| info.device_type.InFamily(INTEL_FAMILY_SER5)) {
 		info.shared_info->pll_info.reference_frequency = 96000;	// 96 kHz
 		info.shared_info->pll_info.max_frequency = 400000;
 			// 400 MHz RAM DAC speed

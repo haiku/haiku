@@ -61,7 +61,7 @@ DisplayPipe::Disable()
 void
 DisplayPipe::ConfigureTimings(const pll_divisors& divisors)
 {
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 			write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
 				(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
 					& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
@@ -78,8 +78,8 @@ DisplayPipe::ConfigureTimings(const pll_divisors& divisors)
 		}
 
 		uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL;
-		if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_9xx)) {
-			if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)) {
+		if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)) {
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 				pll |= ((1 << (divisors.post1 - 1))
 						<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT)
 					& DISPLAY_PLL_IGD_POST1_DIVISOR_MASK;
@@ -95,7 +95,7 @@ DisplayPipe::ConfigureTimings(const pll_divisors& divisors)
 
 			pll |= DISPLAY_PLL_MODE_ANALOG;
 
-			if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x))
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x))
 				pll |= 6 << DISPLAY_PLL_PULSE_PHASE_SHIFT;
 		} else {
 			if (!divisors.post2_high)

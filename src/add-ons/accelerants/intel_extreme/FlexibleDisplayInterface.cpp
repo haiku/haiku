@@ -62,7 +62,7 @@ FDITransmitter::EnablePLL()
 void
 FDITransmitter::DisablePLL()
 {
-	if (gInfo->shared_info->device_type.IsGroup(INTEL_TYPE_ILK)) {
+	if (gInfo->shared_info->device_type.IsGroup(INTEL_GROUP_ILK)) {
 		// on IronLake the FDI PLL is alaways enabled, so no point in trying...
 		return;
 	}
