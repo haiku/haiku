@@ -711,20 +711,19 @@ if (first) {
 
 	// RIP ANALOG
 
-	if ((gInfo->head_mode & HEAD_MODE_TESTING) == 0) {
-		set_display_power_mode(sharedInfo.dpms_mode);
+	// TODO: This may not be neccesary (see DPMS OFF at top)
+	set_display_power_mode(sharedInfo.dpms_mode);
 
-		// Changing bytes per row seems to be ignored if the plane/pipe is turned
-		// off
+	// Changing bytes per row seems to be ignored if the plane/pipe is turned
+	// off
 
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-			write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow);
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-			write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
+	if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
+		write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow);
+	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
+		write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
 
-		set_frame_buffer_base();
-			// triggers writing back double-buffered registers
-	}
+	set_frame_buffer_base();
+		// triggers writing back double-buffered registers
 
 	// update shared info
 	sharedInfo.bytes_per_row = bytesPerRow;
