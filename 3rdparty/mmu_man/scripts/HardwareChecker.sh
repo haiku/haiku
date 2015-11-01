@@ -12,7 +12,7 @@
 netcat=netcat
 report_site=fake.haikuware.com
 report_cgi=http://haikuware.com/hwreport.php
-packages="dmidecode"
+packages="dmidecode netcat"
 
 do_notify ()
 {
@@ -373,11 +373,11 @@ check_all ()
 
 tf=/tmp/hw_checker_$$.html
 
-do_notify 0.0 "Checking for network..."
-detect_network
-
 do_notify 0.0 "Checking for needed packages..."
 try_install_packages
+
+do_notify 0.0 "Checking for network..."
+detect_network
 
 check_all > "$tf"
 
