@@ -2,9 +2,6 @@
 #
 # configure [ <options> ]
 
-# set flag to exit script when exit command is executed
-set -e
-
 # usage
 #
 # Prints usage.
