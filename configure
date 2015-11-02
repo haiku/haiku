@@ -658,8 +658,7 @@ rmdir haikuCaseTest haikucasetest 2>/dev/null
 if [ $caseInsensitive != 0 ]; then
 	echo "You need a case-sensitive file-system to build Haiku."
 	if [ $HOST_PLATFORM = "darwin" ]; then
-		echo "You can create a case-sensitive disk image using Disk Utility and use"
-		echo "it to store the Haiku sources on."
+		echo "You can create a case-sensitive disk image using Disk Utility."
 	fi
 	exit 1
 fi
