@@ -248,10 +248,7 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				frameBufferSize = 64 << 20;
 			else
 				frameBufferSize = 128 << 20;
-		} else if (info.type->InFamily(INTEL_FAMILY_9xx)
-			|| info.type->InFamily(INTEL_FAMILY_SER5)
-			|| info.type->InFamily(INTEL_FAMILY_SOC0)
-			|| info.type->InFamily(INTEL_FAMILY_POVR)) {
+		} else if (info.type->Generation() >= 3) {
 			frameBufferSize = info.display.u.h0.base_register_sizes[2];
 		}
 
@@ -385,16 +382,22 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 static void
 set_gtt_entry(intel_info &info, uint32 offset, phys_addr_t physicalAddress)
 {
-	if (info.type->InGroup(INTEL_GROUP_96x)
-		|| info.type->InGroup(INTEL_GROUP_Gxx)
-		|| info.type->InGroup(INTEL_GROUP_G4x)
-		|| info.type->InGroup(INTEL_GROUP_IGD)
-		|| info.type->InGroup(INTEL_GROUP_ILK)) {
-		// possible high bits are stored in the lower end
-		physicalAddress |= (physicalAddress >> 28) & 0x00f0;
-	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
+	if (info.type->Generation() >= 8) {
+		// Airmont, Goldmont
+
+		physicalAddress |= (physicalAddress >> 28) & 0x07f0;
+		// TODO: cache control?
+	} else if (info.type->Generation() >= 6) {
+		// SandyBridge, IronLake, IvyBridge, Haswell
+
 		physicalAddress |= (physicalAddress >> 28) & 0x0ff0;
 		physicalAddress |= 0x02; // cache control, l3 cacheable
+	} else if (info.type->Generation() >= 4) {
+		// Intel 9xx minus 91x, 94x, G33
+
+		// possible high bits are stored in the lower end
+		physicalAddress |= (physicalAddress >> 28) & 0x00f0;
+		// TODO: cache control?
 	}
 
 	// TODO: this is not 64-bit safe!
@@ -419,10 +422,7 @@ intel_map(intel_info &info)
 {
 	int fbIndex = 0;
 	int mmioIndex = 1;
-	if (info.type->InFamily(INTEL_FAMILY_9xx)
-		|| info.type->InFamily(INTEL_FAMILY_SER5)
-		|| info.type->InFamily(INTEL_FAMILY_SOC0)
-		|| info.type->InFamily(INTEL_FAMILY_POVR)) {
+	if (info.type->Generation() >= 3) {
 		// for some reason Intel saw the need to change the order of the
 		// mappings with the introduction of the i9xx family
 		mmioIndex = 0;

@@ -160,6 +160,34 @@ struct DeviceType {
 	{
 		return InFamily(INTEL_FAMILY_SER5);
 	}
+
+	int Generation() const
+	{
+		if (InFamily(INTEL_FAMILY_7xx))
+			return 1;
+		if (InFamily(INTEL_FAMILY_8xx))
+			return 2;
+		if (InGroup(INTEL_GROUP_91x) || InGroup(INTEL_GROUP_94x)
+				|| IsModel(INTEL_MODEL_G33))
+			return 3;
+		if (InFamily(INTEL_FAMILY_9xx))
+			return 4;
+		if (InGroup(INTEL_GROUP_ILK))
+			return 5;
+		if (InGroup(INTEL_GROUP_SNB))
+			return 6;
+		if (InFamily(INTEL_FAMILY_SER5) || InGroup(INTEL_GROUP_SLV))
+			return 7;
+
+		// TODO: Groups below here might need some tweaking
+		if (InGroup(INTEL_GROUP_AIR) || InGroup(INTEL_GROUP_GOL))
+			return 8;
+
+		// TODO: SkyLake, Broxton is gen 9
+
+		// Generation 0 means somethins is wrong :-)
+		return 0;
+	}
 };
 
 // info about PLL on graphics card
