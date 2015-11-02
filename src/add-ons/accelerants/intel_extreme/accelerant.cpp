@@ -347,11 +347,8 @@ intel_init_accelerant(int device)
 	// On TRACE, dump ports and states
 	dump_ports();
 
-	if (status != B_OK) {
-		ERROR("Error: zero active displays were found!\n");
-		uninit_common();
-		return status;
-	}
+	if (status != B_OK)
+		ERROR("Warning: zero active displays were found!\n");
 
 	status = create_mode_list();
 	if (status != B_OK) {
