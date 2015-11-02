@@ -21,6 +21,8 @@
 #include <KernelExport.h>
 #include <PCI.h>
 
+#include <new>
+
 
 //#define TRACE_INTEL
 #ifdef TRACE_INTEL
@@ -51,7 +53,7 @@
 const struct supported_device {
 	uint32		bridge_id;
 	uint32		display_id;
-	uint32		type;
+	int32		type;
 	const char	*name;
 } kSupportedDevices[] = {
 	{0x3575, 0x3577, INTEL_GROUP_83x, "i830GM"},
@@ -127,15 +129,15 @@ const struct supported_device {
 struct intel_info {
 	pci_info	bridge;
 	pci_info	display;
-	uint32		type;
+	DeviceType*	type;
 
-	uint32		*gtt_base;
+	uint32*		gtt_base;
 	phys_addr_t	gtt_physical_base;
 	area_id		gtt_area;
 	size_t		gtt_entries;
 	size_t		gtt_stolen_entries;
 
-	vuint32		*registers;
+	vuint32*	registers;
 	area_id		registers_area;
 
 	addr_t		aperture_base;
@@ -174,7 +176,7 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 {
 	// read stolen memory from the PCI configuration of the PCI bridge
 	uint8 controlRegister = INTEL_GRAPHICS_MEMORY_CONTROL;
-	if ((info.type & INTEL_GROUP_MASK) == INTEL_GROUP_SNB)
+	if (info.type->InGroup(INTEL_GROUP_SNB))
 		controlRegister = SNB_GRAPHICS_MEMORY_CONTROL;
 
 	uint16 memoryConfig = get_pci_config(info.bridge, controlRegister, 2);
@@ -182,7 +184,7 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 	gttSize = 0;
 	stolenSize = 0;
 
-	if (info.type == INTEL_MODEL_965) {
+	if (info.type->IsModel(INTEL_MODEL_965)) {
 		switch (memoryConfig & i965_GTT_MASK) {
 			case i965_GTT_128K:
 				gttSize = 128 << 10;
@@ -194,8 +196,8 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				gttSize = 512 << 10;
 				break;
 		}
-	} else if (info.type == INTEL_MODEL_G33
-	           || (info.type & INTEL_GROUP_MASK) == INTEL_GROUP_IGD) {
+	} else if (info.type->IsModel(INTEL_MODEL_G33)
+	           || info.type->InGroup(INTEL_GROUP_IGD)) {
 		switch (memoryConfig & G33_GTT_MASK) {
 			case G33_GTT_1M:
 				gttSize = 1 << 20;
@@ -204,8 +206,8 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				gttSize = 2 << 20;
 				break;
 		}
-	} else if ((info.type & INTEL_GROUP_MASK) == INTEL_GROUP_G4x
-			|| (info.type & INTEL_GROUP_MASK) == INTEL_GROUP_ILK) {
+	} else if (info.type->InGroup(INTEL_GROUP_G4x)
+			|| info.type->InGroup(INTEL_GROUP_ILK)) {
 		switch (memoryConfig & G4X_GTT_MASK) {
 			case G4X_GTT_NONE:
 				gttSize = 0;
@@ -224,7 +226,7 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				gttSize = 4 << 20;
 				break;
 		}
-	} else if ((info.type & INTEL_GROUP_MASK) == INTEL_GROUP_SNB) {
+	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
 		switch (memoryConfig & SNB_GTT_SIZE_MASK) {
 			case SNB_GTT_SIZE_NONE:
 				gttSize = 0;
@@ -240,14 +242,18 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 		// older models have the GTT as large as their frame buffer mapping
 		// TODO: check if the i9xx version works with the i8xx chips as well
 		size_t frameBufferSize = 0;
-		if ((info.type & INTEL_FAMILY_8xx) != 0) {
-			if (info.type == INTEL_GROUP_83x
+		if (info.type->InFamily(INTEL_FAMILY_8xx)) {
+			if (info.type->InGroup(INTEL_GROUP_83x)
 				&& (memoryConfig & MEMORY_MASK) == i830_FRAME_BUFFER_64M)
 				frameBufferSize = 64 << 20;
 			else
 				frameBufferSize = 128 << 20;
-		} else if ((info.type & INTEL_FAMILY_9xx) != 0)
+		} else if (info.type->InFamily(INTEL_FAMILY_9xx)
+			|| info.type->InFamily(INTEL_FAMILY_SER5)
+			|| info.type->InFamily(INTEL_FAMILY_SOC0)
+			|| info.type->InFamily(INTEL_FAMILY_POVR)) {
 			frameBufferSize = info.display.u.h0.base_register_sizes[2];
+		}
 
 		TRACE("frame buffer size %lu MB\n", frameBufferSize >> 20);
 		gttSize = frameBufferSize / 1024;
@@ -255,7 +261,7 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 
 	// TODO: test with different models!
 
-	if (info.type == INTEL_GROUP_83x) {
+	if (info.type->InGroup(INTEL_GROUP_83x)) {
 		// Older chips
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i830_LOCAL_MEMORY_ONLY:
@@ -273,7 +279,7 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				memorySize *= 8;
 				break;
 		}
-	} else if ((info.type & INTEL_GROUP_MASK) == INTEL_GROUP_SNB) {
+	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
 		switch (memoryConfig & SNB_STOLEN_MEMORY_MASK) {
 			case SNB_STOLEN_MEMORY_32MB:
 				memorySize *= 32;
@@ -324,8 +330,11 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				memorySize *= 512;
 				break;
 		}
-	} else if (info.type == INTEL_GROUP_85x
-		|| (info.type & INTEL_FAMILY_9xx) == INTEL_FAMILY_9xx) {
+	} else if (info.type->InGroup(INTEL_GROUP_85x)
+		|| info.type->InFamily(INTEL_FAMILY_9xx)
+        || info.type->InFamily(INTEL_FAMILY_SER5)
+        || info.type->InFamily(INTEL_FAMILY_SOC0)
+        || info.type->InFamily(INTEL_FAMILY_POVR)) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i855_STOLEN_MEMORY_4M:
 				memorySize *= 4;
@@ -376,14 +385,14 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 static void
 set_gtt_entry(intel_info &info, uint32 offset, phys_addr_t physicalAddress)
 {
-	if ((info.type & INTEL_GROUP_MASK) == INTEL_GROUP_96x
-		|| (info.type & INTEL_GROUP_MASK) == INTEL_GROUP_Gxx
-		|| (info.type & INTEL_GROUP_MASK) == INTEL_GROUP_G4x
-		|| (info.type & INTEL_GROUP_MASK) == INTEL_GROUP_IGD
-		|| (info.type & INTEL_GROUP_MASK) == INTEL_GROUP_ILK) {
+	if (info.type->InGroup(INTEL_GROUP_96x)
+		|| info.type->InGroup(INTEL_GROUP_Gxx)
+		|| info.type->InGroup(INTEL_GROUP_G4x)
+		|| info.type->InGroup(INTEL_GROUP_IGD)
+		|| info.type->InGroup(INTEL_GROUP_ILK)) {
 		// possible high bits are stored in the lower end
 		physicalAddress |= (physicalAddress >> 28) & 0x00f0;
-	} else if ((info.type & INTEL_GROUP_MASK) == INTEL_GROUP_SNB) {
+	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
 		physicalAddress |= (physicalAddress >> 28) & 0x0ff0;
 		physicalAddress |= 0x02; // cache control, l3 cacheable
 	}
@@ -410,7 +419,10 @@ intel_map(intel_info &info)
 {
 	int fbIndex = 0;
 	int mmioIndex = 1;
-	if ((info.type & INTEL_FAMILY_MASK) == INTEL_FAMILY_9xx) {
+	if (info.type->InFamily(INTEL_FAMILY_9xx)
+		|| info.type->InFamily(INTEL_FAMILY_SER5)
+		|| info.type->InFamily(INTEL_FAMILY_SOC0)
+		|| info.type->InFamily(INTEL_FAMILY_POVR)) {
 		// for some reason Intel saw the need to change the order of the
 		// mappings with the introduction of the i9xx family
 		mmioIndex = 0;
@@ -447,16 +459,8 @@ intel_map(intel_info &info)
 	if (get_memory_map(scratchAddress, B_PAGE_SIZE, &entry, 1) != B_OK)
 		return B_ERROR;
 
-	if ((info.type & INTEL_FAMILY_MASK) == INTEL_FAMILY_9xx) {
-		if ((info.type & INTEL_GROUP_MASK) == INTEL_GROUP_G4x
-			|| (info.type & INTEL_GROUP_MASK) == INTEL_GROUP_ILK
-			|| (info.type & INTEL_GROUP_MASK) == INTEL_GROUP_SNB) {
-			info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
-					+ (2UL << 20);
-		} else
-			info.gtt_physical_base
-				= get_pci_config(info.display, i915_GTT_BASE, 4);
-	} else {
+	// TODO: Review these
+	if (info.type->InFamily(INTEL_FAMILY_8xx)) {
 		info.gtt_physical_base = read32(info.registers
 			+ INTEL_PAGE_TABLE_CONTROL) & ~PAGE_TABLE_ENABLED;
 		if (info.gtt_physical_base == 0) {
@@ -466,6 +470,12 @@ intel_map(intel_info &info)
 			info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
 				+ i830_GTT_BASE;
 		}
+	} else if (info.type->InGroup(INTEL_GROUP_91x)) {
+		info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
+	} else {
+		// 945+?
+		info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
+			+ (2UL << 20);
 	}
 
 	size_t gttSize, stolenSize;
@@ -653,7 +663,7 @@ intel_init()
 		for (uint32 i = 0; i < sizeof(kSupportedDevices)
 				/ sizeof(kSupportedDevices[0]); i++) {
 			if (sInfo.bridge.device_id == kSupportedDevices[i].bridge_id) {
-				sInfo.type = kSupportedDevices[i].type;
+				sInfo.type = new DeviceType(kSupportedDevices[i].type);
 				if (has_display_device(sInfo.display,
 						kSupportedDevices[i].display_id)) {
 					TRACE("found intel bridge\n");
@@ -670,6 +680,8 @@ intel_init()
 static void
 intel_uninit()
 {
+	if (sInfo.type)
+		delete sInfo.type;
 }
 
 

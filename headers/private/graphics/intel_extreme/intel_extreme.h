@@ -40,10 +40,10 @@
 #define INTEL_GROUP_Gxx		(INTEL_FAMILY_9xx  | 0x0080)
 #define INTEL_GROUP_G4x		(INTEL_FAMILY_9xx  | 0x0100)
 #define INTEL_GROUP_IGD		(INTEL_FAMILY_9xx  | 0x0200)
-#define INTEL_GROUP_ILK		(INTEL_FAMILY_9xx  | 0x0400)  // IronLake
-#define INTEL_GROUP_SNB		(INTEL_FAMILY_SER5 | 0x0010)  // SandyBridge
-#define INTEL_GROUP_IVB		(INTEL_FAMILY_SER5 | 0x0020)  // IvyBridge
-#define INTEL_GROUP_HAS		(INTEL_FAMILY_SER5 | 0x0040)  // Haswell
+#define INTEL_GROUP_ILK		(INTEL_FAMILY_SER5 | 0x0010)  // IronLake
+#define INTEL_GROUP_SNB		(INTEL_FAMILY_SER5 | 0x0020)  // SandyBridge
+#define INTEL_GROUP_IVB		(INTEL_FAMILY_SER5 | 0x0040)  // IvyBridge
+#define INTEL_GROUP_HAS		(INTEL_FAMILY_SER5 | 0x0080)  // Haswell
 #define INTEL_GROUP_SLT		(INTEL_FAMILY_POVR | 0x0010)  // Saltwell
 #define INTEL_GROUP_FSM		(INTEL_FAMILY_POVR | 0x0020)  // Fu.Silvermont
 #define INTEL_GROUP_SLV		(INTEL_FAMILY_SOC0 | 0x0010)  // Silvermont
@@ -152,14 +152,13 @@ struct DeviceType {
 
 	bool SupportsHDMI() const
 	{
-		return InGroup(INTEL_GROUP_G4x) || InGroup(INTEL_GROUP_ILK)
-			|| InFamily(INTEL_FAMILY_SER5) || InFamily(INTEL_FAMILY_SOC0);
+		return InGroup(INTEL_GROUP_G4x) || InFamily(INTEL_FAMILY_SER5)
+			|| InFamily(INTEL_FAMILY_SOC0);
 	}
 
 	bool HasPlatformControlHub() const
 	{
-		return InGroup(INTEL_GROUP_ILK) || InGroup(INTEL_GROUP_SNB)
-			|| InGroup(INTEL_GROUP_IVB) || InGroup(INTEL_GROUP_HAS);
+		return InFamily(INTEL_FAMILY_SER5);
 	}
 };
 
