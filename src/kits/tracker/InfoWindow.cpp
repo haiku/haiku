@@ -1123,6 +1123,7 @@ AttributeView::ModelChanged(Model* model, BMessage* message)
 				Window()->SetTitle(title.String());
 				WidgetAttributeText::AttrAsString(model, &fPathStr, kAttrPath,
 					B_STRING_TYPE, 0, this);
+				Invalidate();
 			}
 			break;
 		}
