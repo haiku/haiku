@@ -330,17 +330,33 @@ LVDSPort::LVDSPort()
 	:
 	Port(INTEL_PORT_C, "LVDS")
 {
+	// Always unlock LVDS port as soon as we start messing with it.
+	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
+		write32(PCH_PANEL_CONTROL,
+			read32(PCH_PANEL_CONTROL) | PANEL_REGISTER_UNLOCK);
+	}
 }
 
 
 bool
 LVDSPort::IsConnected()
 {
+	// Older generations don't have LVDS detection. If not mobile skip.
+	if (gInfo->shared_info->device_type.Generation() <= 4) {
+		if (!gInfo->shared_info->device_type.IsMobile()) {
+			TRACE("LVDS: Skipping LVDS detection due to gen and not mobile\n");
+			return false;
+		}
+	}
+
 	uint32 registerValue = read32(INTEL_DIGITAL_LVDS_PORT);
 	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
 		// there's a detection bit we can use
-		if ((registerValue & PCH_LVDS_DETECTED) == 0)
+		if ((registerValue & PCH_LVDS_DETECTED) == 0) {
+			TRACE("LVDS: Not detected\n");
 			return false;
+		}
+		// TODO: Skip if eDP support
 	}
 
 	// Try getting EDID, as the LVDS port doesn't overlap with anything else,

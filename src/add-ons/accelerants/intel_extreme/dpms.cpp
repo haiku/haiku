@@ -99,10 +99,6 @@ static void
 enable_lvds_panel(bool enable)
 {
 	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
-	if (hasPCH) {
-		// TODO: fix for PCH
-		return;
-	}
 
 	int controlRegister = hasPCH ? PCH_PANEL_CONTROL : INTEL_PANEL_CONTROL;
 	int statusRegister = hasPCH ? PCH_PANEL_STATUS : INTEL_PANEL_STATUS;
