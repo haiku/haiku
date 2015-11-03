@@ -117,8 +117,12 @@ BLocker::Unlock()
 	// unlock. This is bad practice, but we must allow it for compatibility
 	// reasons. We can at least warn the developer that something is probably
 	// wrong.
-	if (!IsLocked())
-		fprintf(stderr, "Trying to unlock from the wrong thread (#6400)");
+	if (!IsLocked()) {
+		fprintf(stderr, "Unlocking BLocker with sem %" B_PRId32
+			" from wrong thread %" B_PRId32 ", current holder %" B_PRId32
+			" (see issue #6400).\n", fSemaphoreID, find_thread(NULL),
+			fLockOwner);
+	}
 
 	// Decrement the number of outstanding locks this thread holds
 	// on this BLocker.
@@ -135,7 +139,7 @@ BLocker::Unlock()
 		int32 oldBenaphoreCount = atomic_add(&fBenaphoreCount, -1);
 
 		// If the oldBenaphoreCount is greater than 1, then there is
-		// at lease one thread waiting for the lock in the case of a
+		// at least one thread waiting for the lock in the case of a
 		// benaphore.
 		if (oldBenaphoreCount > 1) {
 			// Since there are threads waiting for the lock, it must
