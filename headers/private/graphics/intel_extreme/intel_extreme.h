@@ -24,6 +24,7 @@
 #define INTEL_FAMILY_MASK	0x00ff0000
 #define INTEL_GROUP_MASK	0x00fffff0
 #define INTEL_MODEL_MASK	0x00ffffff
+#define INTEL_TYPE_MASK		0x0000000f
 // families
 #define INTEL_FAMILY_7xx	0x00010000	// First Gen
 #define INTEL_FAMILY_8xx	0x00020000	// Second Gen
@@ -147,7 +148,7 @@ struct DeviceType {
 
 	bool IsMobile() const
 	{
-		return (type & INTEL_MODEL_MASK) == INTEL_TYPE_MOBILE;
+		return (type & INTEL_TYPE_MASK) == INTEL_TYPE_MOBILE;
 	}
 
 	bool SupportsHDMI() const
