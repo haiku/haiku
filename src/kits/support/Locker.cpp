@@ -279,8 +279,11 @@ BLocker::AcquireLock(bigtime_t timeout, status_t *error)
 		// Set the lock owner to this thread and increment the recursive count
 		// by one.  The recursive count is incremented because one more Unlock()
 		// is now required to release the lock (ie, 0 => 1, 1 => 2 etc).
-		fLockOwner = find_thread(NULL);
-		fRecursiveCount++;
+		if (fLockOwner < 0) {
+			fLockOwner = find_thread(NULL);
+			fRecursiveCount = 1;
+		} else
+			fRecursiveCount++;
 	}
 
 	if (error != NULL)
