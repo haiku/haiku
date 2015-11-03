@@ -24,12 +24,13 @@
 #include <new>
 
 
-//#define TRACE_INTEL
+#define TRACE_INTEL
 #ifdef TRACE_INTEL
-#	define TRACE(x...) dprintf("\33[33magp-intel:\33[0m " x)
+#	define TRACE(x...) dprintf("intel_gart: " x)
 #else
 #	define TRACE(x...) ;
 #endif
+#define ERROR(x...) dprintf("intel_gart: " x)
 
 #ifndef __HAIKU__
 #	define B_KERNEL_READ_AREA	0
@@ -171,100 +172,29 @@ has_display_device(pci_info &info, uint32 deviceID)
 }
 
 
-static void
-determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
+static uint16
+gtt_memory_config(intel_info &info)
 {
-	// read stolen memory from the PCI configuration of the PCI bridge
 	uint8 controlRegister = INTEL_GRAPHICS_MEMORY_CONTROL;
 	if (info.type->InGroup(INTEL_GROUP_SNB))
 		controlRegister = SNB_GRAPHICS_MEMORY_CONTROL;
 
-	uint16 memoryConfig = get_pci_config(info.bridge, controlRegister, 2);
+	return get_pci_config(info.bridge, controlRegister, 2);
+}
+
+
+static size_t
+determine_gtt_stolen(intel_info &info)
+{
+	uint16 memoryConfig = gtt_memory_config(info);
 	size_t memorySize = 1 << 20; // 1 MB
-	gttSize = 0;
-	stolenSize = 0;
-
-	if (info.type->IsModel(INTEL_MODEL_965)) {
-		switch (memoryConfig & i965_GTT_MASK) {
-			case i965_GTT_128K:
-				gttSize = 128 << 10;
-				break;
-			case i965_GTT_256K:
-				gttSize = 256 << 10;
-				break;
-			case i965_GTT_512K:
-				gttSize = 512 << 10;
-				break;
-		}
-	} else if (info.type->IsModel(INTEL_MODEL_G33)
-	           || info.type->InGroup(INTEL_GROUP_IGD)) {
-		switch (memoryConfig & G33_GTT_MASK) {
-			case G33_GTT_1M:
-				gttSize = 1 << 20;
-				break;
-			case G33_GTT_2M:
-				gttSize = 2 << 20;
-				break;
-		}
-	} else if (info.type->InGroup(INTEL_GROUP_G4x)
-			|| info.type->InGroup(INTEL_GROUP_ILK)) {
-		switch (memoryConfig & G4X_GTT_MASK) {
-			case G4X_GTT_NONE:
-				gttSize = 0;
-				break;
-			case G4X_GTT_1M_NO_IVT:
-				gttSize = 1 << 20;
-				break;
-			case G4X_GTT_2M_NO_IVT:
-			case G4X_GTT_2M_IVT:
-				gttSize = 2 << 20;
-				break;
-			case G4X_GTT_3M_IVT:
-				gttSize = 3 << 20;
-				break;
-			case G4X_GTT_4M_IVT:
-				gttSize = 4 << 20;
-				break;
-		}
-	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
-		switch (memoryConfig & SNB_GTT_SIZE_MASK) {
-			case SNB_GTT_SIZE_NONE:
-				gttSize = 0;
-				break;
-			case SNB_GTT_SIZE_1MB:
-				gttSize = 1 << 20;
-				break;
-			case SNB_GTT_SIZE_2MB:
-				gttSize = 2 << 20;
-				break;
-		}
-	} else {
-		// older models have the GTT as large as their frame buffer mapping
-		// TODO: check if the i9xx version works with the i8xx chips as well
-		size_t frameBufferSize = 0;
-		if (info.type->InFamily(INTEL_FAMILY_8xx)) {
-			if (info.type->InGroup(INTEL_GROUP_83x)
-				&& (memoryConfig & MEMORY_MASK) == i830_FRAME_BUFFER_64M)
-				frameBufferSize = 64 << 20;
-			else
-				frameBufferSize = 128 << 20;
-		} else if (info.type->Generation() >= 3) {
-			frameBufferSize = info.display.u.h0.base_register_sizes[2];
-		}
-
-		TRACE("frame buffer size %lu MB\n", frameBufferSize >> 20);
-		gttSize = frameBufferSize / 1024;
-	}
-
-	// TODO: test with different models!
 
 	if (info.type->InGroup(INTEL_GROUP_83x)) {
 		// Older chips
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i830_LOCAL_MEMORY_ONLY:
 				// TODO: determine its size!
-				dprintf("intel_gart: getting local memory size not "
-					"implemented.\n");
+				ERROR("getting local memory size not implemented.\n");
 				break;
 			case i830_STOLEN_512K:
 				memorySize >>= 1;
@@ -374,8 +304,88 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 		// TODO: error out!
 		memorySize = 4096;
 	}
+	return memorySize - 4096;
+}
 
-	stolenSize = memorySize - 4096;
+
+static size_t
+determine_gtt_size(intel_info &info)
+{
+	uint16 memoryConfig = gtt_memory_config(info);
+	size_t gttSize = 0;
+
+	if (info.type->IsModel(INTEL_MODEL_965)) {
+		switch (memoryConfig & i965_GTT_MASK) {
+			case i965_GTT_128K:
+				gttSize = 128 << 10;
+				break;
+			case i965_GTT_256K:
+				gttSize = 256 << 10;
+				break;
+			case i965_GTT_512K:
+				gttSize = 512 << 10;
+				break;
+		}
+	} else if (info.type->IsModel(INTEL_MODEL_G33)
+	           || info.type->InGroup(INTEL_GROUP_IGD)) {
+		switch (memoryConfig & G33_GTT_MASK) {
+			case G33_GTT_1M:
+				gttSize = 1 << 20;
+				break;
+			case G33_GTT_2M:
+				gttSize = 2 << 20;
+				break;
+		}
+	} else if (info.type->InGroup(INTEL_GROUP_G4x)
+			|| info.type->InGroup(INTEL_GROUP_ILK)) {
+		switch (memoryConfig & G4X_GTT_MASK) {
+			case G4X_GTT_NONE:
+				gttSize = 0;
+				break;
+			case G4X_GTT_1M_NO_IVT:
+				gttSize = 1 << 20;
+				break;
+			case G4X_GTT_2M_NO_IVT:
+			case G4X_GTT_2M_IVT:
+				gttSize = 2 << 20;
+				break;
+			case G4X_GTT_3M_IVT:
+				gttSize = 3 << 20;
+				break;
+			case G4X_GTT_4M_IVT:
+				gttSize = 4 << 20;
+				break;
+		}
+	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
+		switch (memoryConfig & SNB_GTT_SIZE_MASK) {
+			case SNB_GTT_SIZE_NONE:
+				gttSize = 0;
+				break;
+			case SNB_GTT_SIZE_1MB:
+				gttSize = 1 << 20;
+				break;
+			case SNB_GTT_SIZE_2MB:
+				gttSize = 2 << 20;
+				break;
+		}
+	} else {
+		// older models have the GTT as large as their frame buffer mapping
+		// TODO: check if the i9xx version works with the i8xx chips as well
+		size_t frameBufferSize = 0;
+		if (info.type->InFamily(INTEL_FAMILY_8xx)) {
+			if (info.type->InGroup(INTEL_GROUP_83x)
+				&& (memoryConfig & MEMORY_MASK) == i830_FRAME_BUFFER_64M)
+				frameBufferSize = 64 << 20;
+			else
+				frameBufferSize = 128 << 20;
+		} else if (info.type->Generation() >= 3) {
+			frameBufferSize = info.display.u.h0.base_register_sizes[2];
+		}
+
+		TRACE("frame buffer size %lu MB\n", frameBufferSize >> 20);
+		gttSize = frameBufferSize / 1024;
+	}
+	return gttSize;
 }
 
 
@@ -436,7 +446,7 @@ intel_map(intel_info &info)
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
 
 	if (mmioMapper.InitCheck() < B_OK) {
-		dprintf("agp_intel: could not map memory I/O!\n");
+		ERROR("could not map memory I/O!\n");
 		return info.registers_area;
 	}
 
@@ -451,7 +461,7 @@ intel_map(intel_info &info)
 		&scratchAddress, B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (scratchCreator.InitCheck() < B_OK) {
-		dprintf("agp_intel: could not create scratch page!\n");
+		ERROR("could not create scratch page!\n");
 		return info.scratch_area;
 	}
 
@@ -466,7 +476,7 @@ intel_map(intel_info &info)
 		if (info.gtt_physical_base == 0) {
 			// TODO: not sure how this is supposed to work under Linux/FreeBSD,
 			// but on my i865, this code is needed for Haiku.
-			dprintf("intel_gart: Use GTT address fallback.\n");
+			ERROR("Use GTT address fallback.\n");
 			info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
 				+ i830_GTT_BASE;
 		}
@@ -478,8 +488,8 @@ intel_map(intel_info &info)
 			+ (2UL << 20);
 	}
 
-	size_t gttSize, stolenSize;
-	determine_memory_sizes(info, gttSize, stolenSize);
+	size_t gttSize = determine_gtt_size(info);
+	size_t stolenSize = determine_gtt_stolen(info);
 
 	info.gtt_entries = gttSize / 4096;
 	info.gtt_stolen_entries = stolenSize / 4096;
@@ -492,7 +502,7 @@ intel_map(intel_info &info)
 		info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.gtt_base);
 	if (gttMapper.InitCheck() < B_OK) {
-		dprintf("intel_gart: could not map GTT!\n");
+		ERROR("could not map GTT!\n");
 		return info.gtt_area;
 	}
 
@@ -501,16 +511,14 @@ intel_map(intel_info &info)
 	if (info.aperture_size == 0)
 		info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex];
 
-	dprintf("intel_gart: detected %ld MB of stolen memory, aperture "
-		"size %ld MB, GTT size %ld KB\n", (stolenSize + (1023 << 10)) >> 20,
+	ERROR("detected %ld MB of stolen memory, aperture size %ld MB, "
+		"GTT size %ld KB\n", (stolenSize + (1023 << 10)) >> 20,
 		info.aperture_size >> 20, gttSize >> 10);
 
-	dprintf("intel_gart: GTT base = 0x%" B_PRIxPHYSADDR "\n",
-		info.gtt_physical_base);
-	dprintf("intel_gart: MMIO base = 0x%" B_PRIx32 "\n",
+	ERROR("GTT base = 0x%" B_PRIxPHYSADDR "\n", info.gtt_physical_base);
+	ERROR("MMIO base = 0x%" B_PRIx32 "\n",
 		info.display.u.h0.base_registers[mmioIndex]);
-	dprintf("intel_gart: GMR base = 0x%" B_PRIxPHYSADDR "\n",
-		info.aperture_physical_base);
+	ERROR("GMR base = 0x%" B_PRIxPHYSADDR "\n", info.aperture_physical_base);
 
 	AreaKeeper apertureMapper;
 	info.aperture_area = apertureMapper.Map("intel graphics aperture",
@@ -519,7 +527,7 @@ intel_map(intel_info &info)
 		B_READ_AREA | B_WRITE_AREA, (void**)&info.aperture_base);
 	if (apertureMapper.InitCheck() < B_OK) {
 		// try again without write combining
-		dprintf(DEVICE_NAME ": enabling write combined mode failed.\n");
+		ERROR("enabling write combined mode failed.\n");
 
 		info.aperture_area = apertureMapper.Map("intel graphics aperture",
 			info.aperture_physical_base, info.aperture_size,
@@ -527,7 +535,7 @@ intel_map(intel_info &info)
 			(void**)&info.aperture_base);
 	}
 	if (apertureMapper.InitCheck() < B_OK) {
-		dprintf(DEVICE_NAME ": could not map graphics aperture!\n");
+		ERROR("could not map graphics aperture!\n");
 		return info.aperture_area;
 	}
 

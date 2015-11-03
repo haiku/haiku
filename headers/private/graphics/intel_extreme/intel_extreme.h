@@ -304,7 +304,9 @@ struct intel_free_graphics_memory {
 // Register definitions, taken from X driver
 
 // PCI bridge memory management
-#define INTEL_GRAPHICS_MEMORY_CONTROL	0x52
+#define INTEL_GRAPHICS_MEMORY_CONTROL	0x52		// i830+
+#define SNB_GRAPHICS_MEMORY_CONTROL		0x50
+
 	// GGC - (G)MCH Graphics Control Register
 #define MEMORY_CONTROL_ENABLED			0x0004
 #define MEMORY_MASK						0x0001
@@ -338,7 +340,6 @@ struct intel_free_graphics_memory {
 #define G4X_STOLEN_MEMORY_352MB			0xd0
 
 // SandyBridge (SNB)
-#define SNB_GRAPHICS_MEMORY_CONTROL		0x50
 
 #define SNB_STOLEN_MEMORY_MASK			0xf8
 #define SNB_STOLEN_MEMORY_32MB			(1 << 3)
