@@ -39,14 +39,15 @@
 
 static void print_sem_info(sem_info *info)
 {
-	printf("%7ld%31s%7ld\n", info->sem ,info->name , info->count);
+	printf("%7" B_PRId32 "%31s%7" B_PRId32 "\n", info->sem, info->name,
+		info->count);
 }
 
 
 static void print_header(team_info *tinfo)
 {
 	if (tinfo != NULL)
-		printf("TEAM  %ld (%s):\n", tinfo->team, tinfo->args );
+		printf("TEAM  %" B_PRId32 " (%s):\n", tinfo->team, tinfo->args);
 
 	printf("     ID                           name  count\n");
 	printf("---------------------------------------------\n");
@@ -75,7 +76,9 @@ int main(int argc, char **argv)
 
 	// show up some stats first...
 	get_system_info(&sysinfo);
-	printf("sem: total: %5li, used: %5li, left: %5li\n\n", sysinfo.max_sems, sysinfo.used_sems, sysinfo.max_sems - sysinfo.used_sems);
+	printf("sem: total: %5" B_PRIu32 ", used: %5" B_PRIu32 ", left: %5" B_PRIu32
+		"\n\n", sysinfo.max_sems, sysinfo.used_sems,
+		sysinfo.max_sems - sysinfo.used_sems);
 
 	if (argc == 1) {
 		while (get_next_team_info( &cookie, &tinfo) == B_OK)
@@ -106,7 +109,7 @@ int main(int argc, char **argv)
 					print_header(NULL);
 					print_sem_info(&info);
 				} else
-					printf("semaphore %ld unknown\n\n", id);
+					printf("semaphore %" B_PRId32 " unknown\n\n", id);
 
 				i++;
 			}
@@ -116,7 +119,7 @@ int main(int argc, char **argv)
 			if (get_team_info(team, &tinfo) == B_OK)
 				list_sems(&tinfo);
 			else
-				printf("team %ld unknown\n\n", team);
+				printf("team %" B_PRId32 " unknown\n\n", team);
 		}
 	}
 
