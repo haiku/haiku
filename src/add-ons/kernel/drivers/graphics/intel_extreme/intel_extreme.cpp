@@ -347,7 +347,7 @@ intel_extreme_init(intel_info &info)
 			= ICH_PORT_REGISTER_BASE;
 	}
 
-	if (info.device_type.InGroup(INTEL_GROUP_SLV)) {
+	if (info.device_type.InGroup(INTEL_GROUP_VLV)) {
 		// "I nearly got violent with the hw guys when they told me..."
 		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)] += VLV_DISPLAY_BASE;
 		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)] += VLV_DISPLAY_BASE;

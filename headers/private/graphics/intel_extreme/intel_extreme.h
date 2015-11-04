@@ -47,9 +47,9 @@
 #define INTEL_GROUP_HAS		(INTEL_FAMILY_SER5 | 0x0080)  // Haswell
 #define INTEL_GROUP_SLT		(INTEL_FAMILY_POVR | 0x0010)  // Saltwell
 #define INTEL_GROUP_FSM		(INTEL_FAMILY_POVR | 0x0020)  // Fu.Silvermont
-#define INTEL_GROUP_SLV		(INTEL_FAMILY_SOC0 | 0x0010)  // Silvermont
-#define INTEL_GROUP_AIR		(INTEL_FAMILY_SOC0 | 0x0020)  // Airmont
-#define INTEL_GROUP_GOL		(INTEL_FAMILY_SOC0 | 0x0040)  // Goldmont
+#define INTEL_GROUP_VLV		(INTEL_FAMILY_SOC0 | 0x0010)  // ValleyView
+#define INTEL_GROUP_CHV		(INTEL_FAMILY_SOC0 | 0x0020)  // CherryView
+#define INTEL_GROUP_BXT		(INTEL_FAMILY_SOC0 | 0x0040)  // Broxton
 // models
 #define INTEL_TYPE_SERVER	0x0004
 #define INTEL_TYPE_MOBILE	0x0008
@@ -74,8 +74,8 @@
 #define INTEL_MODEL_IVBGS	(INTEL_GROUP_IVB | INTEL_TYPE_SERVER)
 #define INTEL_MODEL_HAS		(INTEL_GROUP_HAS)
 #define INTEL_MODEL_HASM	(INTEL_GROUP_HAS | INTEL_TYPE_MOBILE)
-#define INTEL_MODEL_VLV		(INTEL_GROUP_SLV)
-#define INTEL_MODEL_VLVM	(INTEL_GROUP_SLV | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_VLV		(INTEL_GROUP_VLV)
+#define INTEL_MODEL_VLVM	(INTEL_GROUP_VLV | INTEL_TYPE_MOBILE)
 
 // ValleyView MMIO offset
 #define VLV_DISPLAY_BASE		0x180000
@@ -177,14 +177,12 @@ struct DeviceType {
 			return 5;
 		if (InGroup(INTEL_GROUP_SNB))
 			return 6;
-		if (InFamily(INTEL_FAMILY_SER5) || InGroup(INTEL_GROUP_SLV))
+		if (InFamily(INTEL_FAMILY_SER5) || InGroup(INTEL_GROUP_VLV))
 			return 7;
-
-		// TODO: Groups below here might need some tweaking
-		if (InGroup(INTEL_GROUP_AIR) || InGroup(INTEL_GROUP_GOL))
+		if (InGroup(INTEL_GROUP_CHV))
 			return 8;
-
-		// TODO: SkyLake, Broxton is gen 9
+		if (InGroup(INTEL_GROUP_BXT))
+			return 9;
 
 		// Generation 0 means somethins is wrong :-)
 		return 0;
@@ -305,7 +303,6 @@ struct intel_free_graphics_memory {
 
 // PCI bridge memory management
 #define INTEL_GRAPHICS_MEMORY_CONTROL	0x52		// i830+
-#define SNB_GRAPHICS_MEMORY_CONTROL		0x50
 
 	// GGC - (G)MCH Graphics Control Register
 #define MEMORY_CONTROL_ENABLED			0x0004
@@ -340,6 +337,8 @@ struct intel_free_graphics_memory {
 #define G4X_STOLEN_MEMORY_352MB			0xd0
 
 // SandyBridge (SNB)
+
+#define SNB_GRAPHICS_MEMORY_CONTROL		0x50
 
 #define SNB_STOLEN_MEMORY_MASK			0xf8
 #define SNB_STOLEN_MEMORY_32MB			(1 << 3)

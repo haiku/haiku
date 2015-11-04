@@ -393,18 +393,15 @@ static void
 set_gtt_entry(intel_info &info, uint32 offset, phys_addr_t physicalAddress)
 {
 	if (info.type->Generation() >= 8) {
-		// Airmont, Goldmont
-
+		// CHV + BXT
 		physicalAddress |= (physicalAddress >> 28) & 0x07f0;
 		// TODO: cache control?
 	} else if (info.type->Generation() >= 6) {
 		// SandyBridge, IronLake, IvyBridge, Haswell
-
 		physicalAddress |= (physicalAddress >> 28) & 0x0ff0;
 		physicalAddress |= 0x02; // cache control, l3 cacheable
 	} else if (info.type->Generation() >= 4) {
 		// Intel 9xx minus 91x, 94x, G33
-
 		// possible high bits are stored in the lower end
 		physicalAddress |= (physicalAddress >> 28) & 0x00f0;
 		// TODO: cache control?

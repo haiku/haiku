@@ -418,11 +418,9 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		compute_pll_divisors(target, &divisors, true);
 
 	uint32 dpll = DISPLAY_PLL_NO_VGA_CONTROL | DISPLAY_PLL_ENABLED;
-	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)
-		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
-		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
+	if (gInfo->shared_info->device_type.Generation() >= 4) {
+		// DPLL mode LVDS for i915+
 		dpll |= LVDS_PLL_MODE_LVDS;
-			// DPLL mode LVDS for i915+
 	}
 
 	// Compute bitmask from p1 value
@@ -702,7 +700,7 @@ HDMIPort::_PortRegister()
 {
 	// on PCH there's an additional port sandwiched in
 	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
-	bool fourthGen = gInfo->shared_info->device_type.InGroup(INTEL_GROUP_SLV);
+	bool fourthGen = gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV);
 
 	switch (PortIndex()) {
 		case INTEL_PORT_B:
@@ -714,7 +712,7 @@ HDMIPort::_PortRegister()
 				return GEN4_HDMI_PORT_C;
 			return hasPCH ? PCH_HDMI_PORT_C : INTEL_HDMI_PORT_C;
 		case INTEL_PORT_D:
-			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_AIR))
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV))
 				return CHV_HDMI_PORT_D;
 			return hasPCH ? PCH_HDMI_PORT_D : 0;
 		default:

@@ -35,12 +35,12 @@
 #undef TRACE
 #define TRACE_MODE
 #ifdef TRACE_MODE
-#	define TRACE(x...) _sPrintf("intel_extreme accelerant:" x)
+#	define TRACE(x...) _sPrintf("intel_extreme:" x)
 #else
 #	define TRACE(x...)
 #endif
 
-#define ERROR(x...) _sPrintf("intel_extreme accelerant: " x)
+#define ERROR(x...) _sPrintf("intel_extreme: " x)
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
@@ -77,7 +77,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 		imageSizeRegister = INTEL_DISPLAY_B_IMAGE_SIZE;
 		controlRegister = INTEL_DISPLAY_B_CONTROL;
 	} else {
-		// TODO: not supported
+		ERROR("%s: PLL not supported\n", __func__);
 		return;
 	}
 
