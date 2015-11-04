@@ -11,6 +11,7 @@
 
 #include <Application.h>
 #include <String.h>
+#include <StringList.h>
 
 #include <launch.h>
 #include <LaunchDaemonDefs.h>
@@ -234,6 +235,68 @@ BLaunchRoster::ResetStickyEvent(const BMessenger& source, const char* name)
 }
 
 
+status_t
+BLaunchRoster::GetTargets(BStringList& targets)
+{
+	BMessage request(B_GET_LAUNCH_TARGETS);
+	status_t status = request.AddInt32("user", getuid());
+	if (status != B_OK)
+		return status;
+
+	// send the request
+	BMessage result;
+	status = fMessenger.SendMessage(&request, &result);
+
+	// evaluate the reply
+	if (status == B_OK)
+		status = result.what;
+
+	if (status == B_OK)
+		status = result.FindStrings("target", &targets);
+
+	return status;
+}
+
+
+status_t
+BLaunchRoster::GetTargetInfo(const char* name, BMessage& info)
+{
+	return _GetInfo(B_GET_LAUNCH_TARGET_INFO, name, info);
+}
+
+
+status_t
+BLaunchRoster::GetJobs(const char* target, BStringList& jobs)
+{
+	BMessage request(B_GET_LAUNCH_JOBS);
+	status_t status = request.AddInt32("user", getuid());
+	if (status == B_OK && target != NULL)
+		status = request.AddString("target", target);
+	if (status != B_OK)
+		return status;
+
+	// send the request
+	BMessage result;
+	status = fMessenger.SendMessage(&request, &result);
+
+	// evaluate the reply
+	if (status == B_OK)
+		status = result.what;
+
+	if (status == B_OK)
+		status = result.FindStrings("job", &jobs);
+
+	return status;
+}
+
+
+status_t
+BLaunchRoster::GetJobInfo(const char* name, BMessage& info)
+{
+	return _GetInfo(B_GET_LAUNCH_JOB_INFO, name, info);
+}
+
+
 void
 BLaunchRoster::_InitMessenger()
 {
@@ -270,6 +333,31 @@ BLaunchRoster::_UpdateEvent(uint32 what, const BMessenger& source,
 	// send the request
 	BMessage result;
 	status = fMessenger.SendMessage(&request, &result);
+
+	// evaluate the reply
+	if (status == B_OK)
+		status = result.what;
+
+	return status;
+}
+
+
+status_t
+BLaunchRoster::_GetInfo(uint32 what, const char* name, BMessage& info)
+{
+	if (name == NULL || name[0] == '\0')
+		return B_BAD_VALUE;
+
+	BMessage request(what);
+	status_t status = request.AddInt32("user", getuid());
+	if (status == B_OK)
+		status = request.AddString("name", name);
+	if (status != B_OK)
+		return status;
+
+	// send the request
+	BMessage result;
+	status = fMessenger.SendMessage(&request, &info);
 
 	// evaluate the reply
 	if (status == B_OK)

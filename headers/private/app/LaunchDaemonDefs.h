@@ -32,6 +32,10 @@ enum {
 	B_UNREGISTER_LAUNCH_EVENT	= 'lnue',
 	B_NOTIFY_LAUNCH_EVENT		= 'lnne',
 	B_RESET_STICKY_LAUNCH_EVENT	= 'lnRe',
+	B_GET_LAUNCH_TARGETS		= 'lngt',
+	B_GET_LAUNCH_JOBS			= 'lngj',
+	B_GET_LAUNCH_TARGET_INFO	= 'lntI',
+	B_GET_LAUNCH_JOB_INFO		= 'lnjI',
 };
 
 

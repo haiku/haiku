@@ -44,6 +44,13 @@
 #include "Worker.h"
 
 
+#ifdef DEBUG
+#	define TRACE(x, ...) debug_printf(x, __VA_ARGS__)
+#else
+#	define TRACE(x, ...) ;
+#endif
+
+
 using namespace ::BPrivate;
 using namespace BSupportKit;
 using BSupportKit::BPrivate::JobQueue;
@@ -180,6 +187,8 @@ private:
 									ExternalEventSource* event,
 									const BString& name);
 			void				_ResolveExternalEvents(BaseJob* job);
+			void				_GetTargetInfo(Target* target, BMessage& info);
+			void				_GetJobInfo(Job* job, BMessage& info);
 			void				_ForwardEventMessage(uid_t user,
 									BMessage* message);
 
@@ -467,6 +476,125 @@ LaunchDaemon::MessageReceived(BMessage* message)
 		case B_RESET_STICKY_LAUNCH_EVENT:
 			_HandleResetStickyLaunchEvent(message);
 			break;
+
+		case B_GET_LAUNCH_TARGETS:
+		{
+			uid_t user = _GetUserID(message);
+			if (user < 0)
+				return;
+
+			BMessage reply;
+			status_t status = B_OK;
+
+			if (!fUserMode) {
+				// Request the data from the user's daemon, too
+				Session* session = FindSession(user);
+				if (session != NULL) {
+					BMessage request(B_GET_LAUNCH_TARGETS);
+					status = request.AddInt32("user", 0);
+					if (status == B_OK) {
+						status = session->Daemon().SendMessage(&request,
+							&reply);
+					}
+					if (status == B_OK)
+						status = reply.what;
+				} else
+					status = B_NAME_NOT_FOUND;
+			}
+
+			if (status == B_OK) {
+				TargetMap::const_iterator iterator = fTargets.begin();
+				for (; iterator != fTargets.end(); iterator++)
+					reply.AddString("target", iterator->first);
+			}
+
+			reply.what = status;
+			message->SendReply(&reply);
+			break;
+		}
+		case B_GET_LAUNCH_TARGET_INFO:
+		{
+			uid_t user = _GetUserID(message);
+			if (user < 0)
+				return;
+
+			const char* name = message->GetString("name");
+			Target* target = FindTarget(name);
+			if (target == NULL && !fUserMode) {
+				_ForwardEventMessage(user, message);
+				break;
+			}
+
+			BMessage reply(uint32(target != NULL ? B_OK : B_NAME_NOT_FOUND));
+			if (target != NULL)
+				_GetTargetInfo(target, reply);
+			message->SendReply(&reply);
+			break;
+		}
+		case B_GET_LAUNCH_JOBS:
+		{
+			uid_t user = _GetUserID(message);
+			if (user < 0)
+				return;
+
+			const char* targetName = message->GetString("target");
+
+			BMessage reply;
+			status_t status = B_OK;
+
+			if (!fUserMode) {
+				// Request the data from the user's daemon, too
+				Session* session = FindSession(user);
+				if (session != NULL) {
+					BMessage request(B_GET_LAUNCH_JOBS);
+					status = request.AddInt32("user", 0);
+					if (status == B_OK && targetName != NULL)
+						status = request.AddString("target", targetName);
+					if (status == B_OK) {
+						status = session->Daemon().SendMessage(&request,
+							&reply);
+					}
+					if (status == B_OK)
+						status = reply.what;
+				} else
+					status = B_NAME_NOT_FOUND;
+			}
+
+			if (status == B_OK) {
+				JobMap::const_iterator iterator = fJobs.begin();
+				for (; iterator != fJobs.end(); iterator++) {
+					Job* job = iterator->second;
+					if (targetName != NULL && (job->Target() == NULL
+							|| job->Target()->Title() != targetName)) {
+						continue;
+					}
+					reply.AddString("job", iterator->first);
+				}
+			}
+
+			reply.what = status;
+			message->SendReply(&reply);
+			break;
+		}
+		case B_GET_LAUNCH_JOB_INFO:
+		{
+			uid_t user = _GetUserID(message);
+			if (user < 0)
+				return;
+
+			const char* name = message->GetString("name");
+			Job* job = FindJob(name);
+			if (job == NULL && !fUserMode) {
+				_ForwardEventMessage(user, message);
+				break;
+			}
+
+			BMessage reply(uint32(job != NULL ? B_OK : B_NAME_NOT_FOUND));
+			if (job != NULL)
+				_GetJobInfo(job, reply);
+			message->SendReply(&reply);
+			break;
+		}
 
 		case kMsgEventTriggered:
 		{
@@ -854,6 +982,7 @@ LaunchDaemon::_ReadFile(const char* context, BEntry& entry)
 	BMessage message;
 	status = parser.ParseFile(path.Path(), message);
 	if (status == B_OK) {
+		TRACE("launch_daemon: read file %s\n", path.Path());
 		_AddJobs(NULL, message);
 		_AddTargets(message);
 		_AddRunTargets(message);
@@ -977,6 +1106,8 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 
 	Job* job = FindJob(name);
 	if (job == NULL) {
+		TRACE("  add job \"%s\"\n", name.String());
+
 		job = new (std::nothrow) Job(name);
 		if (job == NULL)
 			return;
@@ -984,7 +1115,8 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 		job->SetService(service);
 		job->SetCreateDefaultPort(service);
 		job->SetTarget(target);
-	}
+	} else
+		TRACE("  amend job \"%s\"\n", name.String());
 
 	if (message.HasBool("disabled"))
 		job->SetEnabled(!message.GetBool("disabled", !job->IsEnabled()));
@@ -1002,15 +1134,8 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 		job->AddPort(portMessage);
 	}
 
-	if (message.HasString("launch")) {
-		job->Arguments().MakeEmpty();
-
-		const char* argument;
-		for (int32 index = 0; message.FindString("launch", index, &argument)
-				== B_OK; index++) {
-			job->AddArgument(Utility::TranslatePath(argument));
-		}
-	}
+	if (message.HasString("launch"))
+		message.FindStrings("launch", &job->Arguments());
 
 	const char* requirement;
 	for (int32 index = 0;
@@ -1182,6 +1307,7 @@ LaunchDaemon::_SetEvent(BaseJob* job, const BMessage& message)
 	}
 
 	if (updated) {
+		TRACE("    event: %s\n", event->ToString().String());
 		job->SetEvent(event);
 		_ResolveExternalEvents(job);
 	}
@@ -1250,6 +1376,27 @@ LaunchDaemon::_ResolveExternalEvents(BaseJob* job)
 				event->Flags()))
 			event->AddListener(job);
 	}
+}
+
+
+void
+LaunchDaemon::_GetTargetInfo(Target* target, BMessage& info)
+{
+	info.SetString("name", target->Name());
+}
+
+
+void
+LaunchDaemon::_GetJobInfo(Job* job, BMessage& info)
+{
+	info.SetString("name", job->Name());
+	info.SetInt32("team", job->Team());
+	info.SetBool("running", job->IsRunning());
+	info.SetBool("launched", job->IsLaunched());
+
+	PortMap::const_iterator iterator = job->Ports().begin();
+	for (; iterator != job->Ports().end(); iterator++)
+		info.AddMessage("port", &iterator->second);
 }
 
 

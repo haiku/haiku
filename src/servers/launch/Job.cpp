@@ -17,6 +17,7 @@
 #include <user_group.h>
 
 #include "Target.h"
+#include "Utility.h"
 
 
 Job::Job(const char* name)
@@ -314,18 +315,21 @@ Job::Launch()
 	// Build argument vector
 
 	entry_ref ref;
-	status_t status = get_ref_for_path(fArguments.StringAt(0).String(), &ref);
+	status_t status = get_ref_for_path(
+		Utility::TranslatePath(fArguments.StringAt(0).String()), &ref);
 	if (status != B_OK) {
 		_SetLaunchStatus(status);
 		return status;
 	}
 
+	std::vector<BString> strings;
 	std::vector<const char*> args;
 
 	size_t count = fArguments.CountStrings() - 1;
 	if (count > 0) {
 		for (int32 i = 1; i < fArguments.CountStrings(); i++) {
-			args.push_back(fArguments.StringAt(i));
+			strings.push_back(Utility::TranslatePath(fArguments.StringAt(i)));
+			args.push_back(strings.back());
 		}
 		args.push_back(NULL);
 	}

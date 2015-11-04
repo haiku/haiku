@@ -45,6 +45,11 @@ public:
 			status_t			ResetStickyEvent(const BMessenger& source,
 									const char* name);
 
+			status_t			GetTargets(BStringList& targets);
+			status_t			GetTargetInfo(const char* name, BMessage& info);
+			status_t			GetJobs(const char* target, BStringList& jobs);
+			status_t			GetJobInfo(const char* name, BMessage& info);
+
 	class Private;
 
 private:
@@ -54,6 +59,8 @@ private:
 			status_t			_UpdateEvent(uint32 what,
 									const BMessenger& source, const char* name,
 									uint32 flags = 0);
+			status_t			_GetInfo(uint32 what, const char* name,
+									BMessage& info);
 
 private:
 			BMessenger			fMessenger;
