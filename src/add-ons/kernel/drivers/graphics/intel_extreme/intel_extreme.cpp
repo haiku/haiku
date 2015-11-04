@@ -287,8 +287,7 @@ intel_extreme_init(intel_info &info)
 
 	int fbIndex = 0;
 	int mmioIndex = 1;
-	if (info.device_type.InFamily(INTEL_FAMILY_9xx)
-		| info.device_type.InFamily(INTEL_FAMILY_SER5)) {
+	if (info.device_type.Generation() >= 4) {
 		// For some reason Intel saw the need to change the order of the
 		// mappings with the introduction of the i9xx family
 		mmioIndex = 0;
@@ -316,6 +315,10 @@ intel_extreme_init(intel_info &info)
 		gGART->unmap_aperture(info.aperture);
 		return info.registers_area;
 	}
+
+	ERROR("Init Intel generation %" B_PRId32 " GPU %s PCH split.\n",
+		info.device_type.Generation(),
+		info.device_type.HasPlatformControlHub() ? "with" : "without");
 
 	uint32* blocks = info.shared_info->register_blocks;
 	blocks[REGISTER_BLOCK(REGS_FLAT)] = 0;
