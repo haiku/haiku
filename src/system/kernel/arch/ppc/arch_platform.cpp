@@ -18,7 +18,7 @@
 
 // TODO: declare this in some header
 extern void *gFDT;
-extern "C" DebugUART *debug_uart_from_fdt(const void *fdt);
+extern DebugUART *debug_uart_from_fdt(const void *fdt);
 
 static PPCPlatform *sPPCPlatform;
 
