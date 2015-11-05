@@ -14,7 +14,7 @@
 
 .text
 
-// ToDo: fixme
+// TODO: FIXME
 FUNCTION(reboot):
     b   .
 FUNCTION_END(reboot)
@@ -64,6 +64,7 @@ FUNCTION(arch_int_restore_interrupts):
 	blr
 FUNCTION_END(arch_int_restore_interrupts)
 
+
 /* bool arch_int_are_interrupts_enabled(void) */
 FUNCTION(arch_int_are_interrupts_enabled):
 	mfmsr	%r3							// load msr
@@ -73,7 +74,7 @@ FUNCTION(arch_int_are_interrupts_enabled):
 FUNCTION_END(arch_int_are_interrupts_enabled)
 
 
-// ToDo: fixme
+// TODO: FIXME
 FUNCTION(dbg_save_registers):
 	blr
 FUNCTION_END(dbg_save_registers)
@@ -88,6 +89,7 @@ FUNCTION(get_time_base):
 	bne-	1b							// if so, repeat
 	blr
 FUNCTION_END(get_time_base)
+
 
 /* void getibats(int bats[8]); */
 FUNCTION(getibats):
@@ -109,6 +111,7 @@ FUNCTION(getibats):
 	stwu		%r0,4(%r3)
 	blr
 FUNCTION_END(getibats)
+
 
 // void setibats(int bats[8]);
 FUNCTION(setibats):
@@ -140,6 +143,7 @@ FUNCTION(setibats):
 	blr
 FUNCTION_END(setibats)
 
+
 // void getdbats(int bats[8]);
 FUNCTION(getdbats):
 	mfdbatu 	%r0,0
@@ -160,6 +164,7 @@ FUNCTION(getdbats):
 	stwu		%r0,4(%r3)
 	blr
 FUNCTION_END(getdbats)
+
 
 // void setdbats(int bats[8]);
 FUNCTION(setdbats):
@@ -184,11 +189,13 @@ FUNCTION(setdbats):
 	blr
 FUNCTION_END(setdbats)
 
+
 // unsigned int gethid0();
 FUNCTION(gethid0):
 	mfspr		%r3, 1008
 	blr
 FUNCTION_END(gethid0)
+
 
 // void sethid0(unsigned int val);
 FUNCTION(sethid0):
@@ -198,11 +205,13 @@ FUNCTION(sethid0):
 	blr
 FUNCTION_END(sethid0)
 
+
 // unsigned int getl2cr();
 FUNCTION(getl2cr):
 	mfspr		%r3, 1017
 	blr
 FUNCTION_END(getl2cr)
+
 
 // void setl2cr(unsigned int val);
 FUNCTION(setl2cr):
