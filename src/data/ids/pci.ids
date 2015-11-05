@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.10.29
-#	Date:    2015-10-29 03:15:02
+#	Version: 2015.11.05
+#	Date:    2015-11-05 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -3961,6 +3961,7 @@
 	790f  FCH PCI Bridge
 	7914  FCH USB XHCI Controller
 	9600  RS780 Host Bridge
+		1043 82ee  M378A-CM Motherboard
 		1043 82f1  M3A78-EH Motherboard
 	9601  RS880 Host Bridge
 		1019 2120  A785GM-M
@@ -5475,7 +5476,6 @@
 	6400  MPC190 Security Processor (S1 family, encryption)
 	6405  MPC184 Security Processor (S1 family)
 1058  Electronics & Telecommunications RSH
-# Formerly: Teknor Industrial Computers Inc
 1059  Kontron
 105a  Promise Technology, Inc.
 	0d30  PDC20265 (FastTrak100 Lite/Ultra100)
@@ -10583,7 +10583,7 @@
 		1043 11f5  A6J-Q008
 		1043 16d5  U6V/U31J laptop
 		1043 81aa  P5B
-		1043 82c6  M3A78-EH Motherboard
+		1043 82c6  M3A78 Series Motherboard
 		1043 83a3  M4A785TD Motherboard
 		1043 8432  P8P67 and other motherboards
 		1043 8505  P8 series motherboard
@@ -15824,6 +15824,12 @@
 		1028 1fbb  Express Flash NVMe SM1715 1.6TB SFF
 		1028 1fbc  Express Flash NVMe SM1715 1.6TB AIC
 	a821  NVMe SSD Controller 172X
+		1028 1fb7  Express Flash NVMe PM1725 3.2TB SFF
+		1028 1fb8  Express Flash NVMe PM1725 3.2TB AIC
+		1028 1fb9  Express Flash NVMe PM1725 6.4TB AIC
+		1028 1fc1  Express Flash NVMe PM1725 800GB SFF
+		1028 1fc2  Express Flash NVMe PM1725 1.6TB SFF
+		1028 1fc4  Express Flash NVMe PM1725 1.6TB AIC
 144e  OLITEC
 144f  Askey Computer Corp.
 1450  Octave Communications Ind.
@@ -17080,8 +17086,8 @@
 		1320 10bd  SURECOM EP-320X-S 100/10M Ethernet PCI Adapter
 	0891  MTD-8xx 100/10M Ethernet PCI Adapter
 1517  ECHOTEK Corp
-# nee PEP MODULAR Computers GmbH
-1518  Kontron Modular Computers GmbH
+# old ID, now 1059
+1518  Kontron
 1519  TELEFON AKTIEBOLAGET LM Ericsson
 151a  Globetek
 	1002  PCI-1002
@@ -19419,6 +19425,12 @@
 		1bb1 6511  Nytro XH6550-2GB DRAM
 # 8GB variant of Nytro PCIe controller
 		1bb1 6512  Nytro XH6550-8GB DRAM
+# 1.5 TB Nytro PCIe controller
+		1bb1 6521  Nytro XP6500-8A1536 1.5TB
+# 2TB Nytro PCIe controller
+		1bb1 6522  Nytro XP6500-8A2048
+# 4TB Nytro PCIe controller
+		1bb1 6523  Nytro XP6500-8A4096
 1bb3  Bluecherry
 	4304  BC-04120A MPEG4 4 port video encoder / decoder
 	4309  BC-08240A MPEG4 4 port video encoder / decoder
@@ -19441,6 +19453,7 @@
 	1101  OmniBus II PCIe Multi-Protocol Interface Card
 	1102  OmniBusBox II Multi-Protocol Interface Core
 	1103  OmniBus II cPCIe/PXIe Multi-Protocol Interface Card
+1bd4  Inspur Electronic Information Industry Co., Ltd.
 1bee  IXXAT Automation GmbH
 	0003  CAN-IB200/PCIe
 1bf4  VTI Instruments Corporation
@@ -21464,6 +21477,7 @@
 		1028 1f63  10GbE 2P X520k bNDC
 		103c 17d2  Ethernet 10Gb 2-port 560M Adapter
 		103c 18d0  Ethernet 10Gb 2-port 560FLB Adapter
+		1059 0111  T4007 10GbE interface
 		8086 000c  Ethernet X520 10GbE Dual Port KX4-KR Mezz
 	10f9  82599 10 Gigabit Dual Port Network Connection
 	10fb  82599ES 10-Gigabit SFI/SFP+ Network Connection
@@ -21827,6 +21841,9 @@
 		8086 0002  Ethernet Server Adapter I210-T1
 	1536  I210 Gigabit Fiber Network Connection
 	1537  I210 Gigabit Backplane Connection
+		1059 0110  T4005 1GbE interface
+		1059 0111  T4007 1GbE interface
+		1059 0120  T4008 1GbE interface
 	1538  I210 Gigabit Network Connection
 	1539  I211 Gigabit Network Connection
 	153a  Ethernet Connection I217-LM
@@ -21860,6 +21877,8 @@
 	1563  Ethernet Controller 10G X550T
 		8086 0001  Ethernet Converged Network Adapter X550-T2
 		8086 001a  Ethernet Converged Network Adapter X550-T2
+	156c  DSL5520 Thunderbolt [Falcon Ridge]
+	156d  DSL5520 Thunderbolt [Falcon Ridge]
 	156f  Ethernet Connection I219-LM
 	1570  Ethernet Connection I219-V
 	1571  XL710/X710 Virtual Function
@@ -21937,6 +21956,7 @@
 	15a5  Ethernet Switch FM10000 Host Virtual Interface
 	15a8  Ethernet Connection X552 Virtual Function
 	15aa  Ethernet Connection X552 10 GbE Backplane
+		1059 0120  T4008 10GbE interface
 	15ab  Ethernet Connection X552 10 GbE Backplane
 	15ac  Ethernet Connection X552 10 GbE SFP+
 	15ad  Ethernet Connection X552/X557-AT 10GBASE-T
