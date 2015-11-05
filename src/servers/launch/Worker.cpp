@@ -31,7 +31,7 @@ Worker::~Worker()
 status_t
 Worker::Init()
 {
-	fThread = spawn_thread(&Worker::_Process, "worker", B_NORMAL_PRIORITY,
+	fThread = spawn_thread(&Worker::_Process, Name(), B_NORMAL_PRIORITY,
 		this);
 	if (fThread < 0)
 		return fThread;
@@ -67,6 +67,13 @@ bigtime_t
 Worker::Timeout() const
 {
 	return kWorkerTimeout;
+}
+
+
+const char*
+Worker::Name() const
+{
+	return "worker";
 }
 
 
@@ -107,6 +114,13 @@ bigtime_t
 MainWorker::Timeout() const
 {
 	return B_INFINITE_TIMEOUT;
+}
+
+
+const char*
+MainWorker::Name() const
+{
+	return "main worker";
 }
 
 

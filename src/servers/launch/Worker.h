@@ -24,6 +24,7 @@ public:
 protected:
 	virtual	status_t			Process();
 	virtual	bigtime_t			Timeout() const;
+	virtual	const char*			Name() const;
 	virtual	status_t			Run(BJob* job);
 
 private:
@@ -41,6 +42,7 @@ public:
 
 protected:
 	virtual	bigtime_t			Timeout() const;
+	virtual	const char*			Name() const;
 	virtual	status_t			Run(BJob* job);
 
 private:
