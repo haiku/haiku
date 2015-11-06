@@ -22,6 +22,7 @@ using namespace BSupportKit;
 class BMessage;
 
 class Finder;
+class Job;
 class Target;
 
 struct entry_ref;
@@ -30,11 +31,21 @@ struct entry_ref;
 typedef std::map<BString, BMessage> PortMap;
 
 
+class TeamRegistrator {
+public:
+	virtual	void				RegisterTeam(Job* job) = 0;
+};
+
+
 class Job : public BaseJob {
 public:
 								Job(const char* name);
 								Job(const Job& other);
 	virtual						~Job();
+
+			::TeamRegistrator*	TeamRegistrator() const;
+			void				SetTeamRegistrator(
+									::TeamRegistrator* registrator);
 
 			bool				IsEnabled() const;
 			void				SetEnabled(bool enable);
@@ -72,6 +83,8 @@ public:
 			status_t			Launch();
 			bool				IsLaunched() const;
 			bool				IsRunning() const;
+			void				TeamDeleted();
+			bool				CanBeLaunched() const;
 
 			bool				IsLaunching() const;
 			void				SetLaunching(bool launching);
@@ -117,6 +130,7 @@ private:
 			::Condition*		fCondition;
 			BObjectList<BMessage>
 								fPendingLaunchDataReplies;
+			::TeamRegistrator*	fTeamRegistrator;
 };
 
 

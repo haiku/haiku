@@ -27,8 +27,11 @@
 #include <AppMisc.h>
 #include <LaunchDaemonDefs.h>
 #include <LaunchRosterPrivate.h>
+#include <locks.h>
+#include <MessengerPrivate.h>
 #include <RosterPrivate.h>
 #include <syscalls.h>
+#include <system_info.h>
 
 #include "multiuser_utils.h"
 
@@ -116,10 +119,11 @@ typedef std::map<BString, Job*> JobMap;
 typedef std::map<uid_t, Session*> SessionMap;
 typedef std::map<BString, Target*> TargetMap;
 typedef std::map<BString, ExternalEventSource*> EventMap;
+typedef std::map<team_id, Job*> TeamMap;
 
 
 class LaunchDaemon : public BServer, public Finder, public ConditionContext,
-	public EventRegistrator {
+	public EventRegistrator, public TeamRegistrator {
 public:
 								LaunchDaemon(bool userMode,
 									const EventMap& events, status_t& error);
@@ -139,6 +143,9 @@ public:
 									const BStringList& arguments);
 	virtual	void				UnregisterExternalEvent(Event* event,
 									const char* name);
+
+	// TeamRegistrator
+	virtual	void				RegisterTeam(Job* job);
 
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
@@ -208,6 +215,8 @@ private:
 			SessionMap			fSessions;
 			MainWorker*			fMainWorker;
 			Target*				fInitTarget;
+			TeamMap				fTeams;
+			mutex				fTeamsLock;
 			bool				fSafeMode;
 			bool				fReadOnlyBootVolume;
 			bool				fUserMode;
@@ -305,6 +314,8 @@ LaunchDaemon::LaunchDaemon(bool userMode, const EventMap& events,
 	fInitTarget(userMode ? NULL : new Target("init")),
 	fUserMode(userMode)
 {
+	mutex_init(&fTeamsLock, "teams lock");
+
 	fMainWorker = new MainWorker(fJobQueue);
 	fMainWorker->Init();
 
@@ -392,6 +403,14 @@ LaunchDaemon::UnregisterExternalEvent(Event* event, const char* name)
 
 
 void
+LaunchDaemon::RegisterTeam(Job* job)
+{
+	MutexLocker locker(fTeamsLock);
+	fTeams.insert(std::make_pair(job->Team(), job));
+}
+
+
+void
 LaunchDaemon::ReadyToRun()
 {
 	_RetrieveKernelOptions();
@@ -429,6 +448,12 @@ LaunchDaemon::ReadyToRun()
 		fUserMode ? B_FIND_PATHS_USER_ONLY : B_FIND_PATHS_SYSTEM_ONLY, paths);
 	_ReadPaths(paths);
 
+	BMessenger target(this);
+	BMessenger::Private messengerPrivate(target);
+	port_id port = messengerPrivate.Port();
+	int32 token = messengerPrivate.Token();
+	__start_watching_system(-1, B_WATCH_SYSTEM_TEAM_DELETION, port, token);
+
 	_InitJobs(NULL);
 	_LaunchJobs(NULL);
 
@@ -445,6 +470,30 @@ void
 LaunchDaemon::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_SYSTEM_OBJECT_UPDATE:
+		{
+			int32 opcode = message->GetInt32("opcode", 0);
+			team_id team = (team_id)message->GetInt32("team", -1);
+			if (opcode != B_TEAM_DELETED || team < 0)
+				break;
+
+			MutexLocker locker(fTeamsLock);
+
+			TeamMap::iterator found = fTeams.find(team);
+			if (found != fTeams.end()) {
+				Job* job = found->second;
+				TRACE("Job %s ended!\n", job->Name());
+				job->TeamDeleted();
+
+				if (job->IsService()) {
+					// TODO: take restart throttle into account
+					// TODO: don't restart on shutdown
+					_LaunchJob(job);
+				}
+			}
+			break;
+		}
+
 		case B_GET_LAUNCH_DATA:
 			_HandleGetLaunchData(message);
 			break;
@@ -1112,6 +1161,7 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 		if (job == NULL)
 			return;
 
+		job->SetTeamRegistrator(this);
 		job->SetService(service);
 		job->SetCreateDefaultPort(service);
 		job->SetTarget(target);
@@ -1232,7 +1282,7 @@ LaunchDaemon::_LaunchJobs(Target* target, bool forceNow)
 void
 LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 {
-	if (job == NULL || job->IsLaunching() || job->IsRunning()
+	if (job == NULL || !job->CanBeLaunched()
 		|| ((options & FORCE_NOW) == 0
 			&& (!job->EventHasTriggered() || !job->CheckCondition(*this)
 				|| ((options & TRIGGER_DEMAND) != 0
@@ -1256,7 +1306,12 @@ LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 		job->Event()->ResetTrigger();
 
 	job->SetLaunching(true);
-	fJobQueue.AddJob(job);
+
+	status_t status = fJobQueue.AddJob(job);
+	if (status != B_OK) {
+		debug_printf("Adding job %s to queue failed: %s\n", job->Name(),
+			strerror(status));
+	}
 }
 
 
@@ -1532,7 +1587,11 @@ LaunchDaemon::_AddInitJob(BJob* job)
 static void
 open_stdio(int targetFD, int openMode)
 {
+#ifdef DEBUG
+	int fd = open("/dev/dprintf", openMode);
+#else
 	int fd = open("/dev/null", openMode);
+#endif
 	if (fd != targetFD) {
 		dup2(fd, targetFD);
 		close(fd);

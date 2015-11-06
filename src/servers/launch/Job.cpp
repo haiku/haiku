@@ -81,6 +81,20 @@ Job::~Job()
 }
 
 
+::TeamRegistrator*
+Job::TeamRegistrator() const
+{
+	return fTeamRegistrator;
+}
+
+
+void
+Job::SetTeamRegistrator(::TeamRegistrator* registrator)
+{
+	fTeamRegistrator = registrator;
+}
+
+
 bool
 Job::IsEnabled() const
 {
@@ -349,8 +363,24 @@ Job::IsLaunched() const
 bool
 Job::IsRunning() const
 {
-	// TODO: monitor team status; should jobs be allowed to run multiple times?
-	return State() == B_JOB_STATE_SUCCEEDED && IsLaunched() && IsService();
+	return fTeam >= 0;
+}
+
+
+void
+Job::TeamDeleted()
+{
+	fTeam = -1;
+	if (IsService())
+		SetState(B_JOB_STATE_WAITING_TO_RUN);
+}
+
+
+bool
+Job::CanBeLaunched() const
+{
+	// Services cannot be launched while they are running
+	return !IsLaunching() && (!IsService() || !IsRunning());
 }
 
 
@@ -384,7 +414,7 @@ Job::Run()
 {
 	status_t status = BJob::Run();
 
-	// TODO: monitor team, don't just do this
+	// Jobs can be relaunched at any time
 	if (!IsService())
 		SetState(B_JOB_STATE_WAITING_TO_RUN);
 
@@ -396,8 +426,10 @@ status_t
 Job::Execute()
 {
 	status_t status = B_OK;
-	if (!IsLaunched() || !IsService())
+	if (!IsRunning() || !IsService())
 		status = Launch();
+	else
+		debug_printf("Ignore launching %s\n", Name());
 
 	fLaunching = false;
 	return status;
@@ -459,6 +491,9 @@ Job::_SetLaunchStatus(status_t launchStatus)
 	MutexLocker launchLocker(fLaunchStatusLock);
 	fLaunchStatus = launchStatus != B_NO_INIT ? launchStatus : B_ERROR;
 	launchLocker.Unlock();
+
+	if (fTeamRegistrator != NULL)
+		fTeamRegistrator->RegisterTeam(this);
 
 	_SendPendingLaunchDataReplies();
 }
