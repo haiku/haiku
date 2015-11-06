@@ -419,6 +419,7 @@ ELFLoader<Class>::Resolve(ImageType* image, SymType* symbol,
 		case SHN_UNDEF:
 			// Since we do that only for the kernel, there shouldn't be
 			// undefined symbols.
+			TRACE(("elf_resolve_symbol: undefined symbol\n"));
 			return B_MISSING_SYMBOL;
 		case SHN_ABS:
 			*symbolAddress = symbol->st_value;
