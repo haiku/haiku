@@ -9,8 +9,10 @@
 #include <stdio.h>
 
 #include <Entry.h>
+#include <File.h>
 #include <ObjectList.h>
 #include <Message.h>
+#include <Path.h>
 #include <StringList.h>
 
 #include "NetworkWatcher.h"
@@ -112,6 +114,21 @@ public:
 };
 
 
+class SettingCondition : public Condition {
+public:
+								SettingCondition(const BMessage& args);
+
+	virtual	bool				Test(ConditionContext& context) const;
+
+	virtual	BString				ToString() const;
+
+private:
+			BPath				fPath;
+			BString				fField;
+			BString				fValue;
+};
+
+
 static Condition*
 create_condition(const char* name, const BMessage& args)
 {
@@ -130,6 +147,8 @@ create_condition(const char* name, const BMessage& args)
 		return new FileExistsCondition(args);
 	if (strcmp(name, "network_available") == 0)
 		return new NetworkAvailableCondition();
+	if (strcmp(name, "setting") == 0)
+		return new SettingCondition(args);
 
 	return NULL;
 }
@@ -478,6 +497,69 @@ BString
 NetworkAvailableCondition::ToString() const
 {
 	return "network_available";
+}
+
+
+// #pragma mark - setting
+
+
+SettingCondition::SettingCondition(const BMessage& args)
+{
+	fPath.SetTo(Utility::TranslatePath(args.GetString("args", 0, NULL)));
+	fField = args.GetString("args", 1, NULL);
+	fValue = args.GetString("args", 2, NULL);
+}
+
+
+bool
+SettingCondition::Test(ConditionContext& context) const
+{
+	BFile file(fPath.Path(), B_READ_ONLY);
+	if (file.InitCheck() != B_OK)
+		return false;
+
+	BMessage settings;
+	if (settings.Unflatten(&file) == B_OK) {
+		type_code type;
+		int32 count;
+		if (settings.GetInfo(fField, &type, &count) == B_OK) {
+			switch (type) {
+				case B_BOOL_TYPE:
+				{
+					bool value = settings.GetBool(fField);
+					bool expect = fValue.IsEmpty();
+					if (!expect) {
+						expect = fValue == "true" || fValue == "yes"
+							|| fValue == "on" || fValue == "1";
+					}
+					return value == expect;
+				}
+				case B_STRING_TYPE:
+				{
+					BString value = settings.GetString(fField);
+					if (fValue.IsEmpty() && !value.IsEmpty())
+						return true;
+
+					return fValue == value;
+				}
+			}
+		}
+	}
+	// TODO: check for driver settings, too?
+
+	return false;
+}
+
+
+BString
+SettingCondition::ToString() const
+{
+	BString string = "setting file ";
+	string << fPath.Path() << ", field " << fField;
+	if (!fValue.IsEmpty())
+		string << ", value " << fValue;
+
+	return string;
 }
 
 

@@ -43,12 +43,6 @@ service x-vnd.Haiku-midi_server {
 	on_demand
 }
 
-service x-vnd.Haiku-mail_daemon {
-	launch /system/servers/mail_daemon -E
-	no_safemode
-	legacy
-}
-
 service x-vnd.Haiku-net_server {
 	launch /system/servers/net_server
 	no_safemode

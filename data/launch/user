@@ -16,6 +16,13 @@ target desktop {
 		}
 	}
 
+	service x-vnd.Haiku-mail_daemon {
+		launch /system/servers/mail_daemon -E
+		if setting ~/config/settings/Mail/new_mail_daemon DaemonAutoStarts
+		no_safemode
+		legacy
+	}
+
 	job user-bootscript {
 		launch /bin/sh ~/config/settings/boot/UserBootscript
 	}
