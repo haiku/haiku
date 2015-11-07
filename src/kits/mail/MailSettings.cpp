@@ -23,6 +23,7 @@
 #include <Message.h>
 #include <Messenger.h>
 #include <Path.h>
+#include <PathFinder.h>
 #include <String.h>
 #include <Window.h>
 
@@ -431,23 +432,24 @@ BMailAddOnSettings::Load(const BMessage& message)
 		return B_BAD_VALUE;
 
 	BPath path(pathString);
+
 	if (!path.IsAbsolute()) {
-		directory_which which[] = {
-			B_USER_ADDONS_DIRECTORY,
-			B_SYSTEM_ADDONS_DIRECTORY
-		};
+		BStringList paths;
+		BPathFinder().FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, "mail_daemon",
+			paths);
 
-		for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
-			status_t status = find_directory(which[i], &path);
-			if (status != B_OK)
-				continue;
+		status_t status = B_ENTRY_NOT_FOUND;
 
-			path.Append("mail_daemon");
-			path.Append(pathString);
-
-			if (BEntry(path.Path()).Exists())
+		for (int32 i = 0; i < paths.CountStrings(); i++) {
+			path.SetTo(paths.StringAt(i), pathString);
+			BEntry entry(path.Path());
+			if (entry.Exists()) {
+				status = B_OK;
 				break;
+			}
 		}
+		if (status != B_OK)
+			return status;
 	}
 
 	status_t status = get_ref_for_path(path.Path(), &fRef);
@@ -737,17 +739,11 @@ BMailAccountSettings::ReturnAddress() const
 bool
 BMailAccountSettings::SetInboundAddOn(const char* name)
 {
-	BPath path;
-	status_t status = find_directory(B_BEOS_ADDONS_DIRECTORY, &path);
-	if (status != B_OK)
-		return false;
-	path.Append("mail_daemon");
-	path.Append("inbound_protocols");
-	path.Append(name);
 	entry_ref ref;
-	get_ref_for_path(path.Path(), &ref);
-	fInboundSettings.SetAddOnRef(ref);
+	if (_GetAddOnRef("mail_daemon/inbound_protocols", name, ref) != B_OK)
+		return false;
 
+	fInboundSettings.SetAddOnRef(ref);
 	return true;
 }
 
@@ -755,17 +751,11 @@ BMailAccountSettings::SetInboundAddOn(const char* name)
 bool
 BMailAccountSettings::SetOutboundAddOn(const char* name)
 {
-	BPath path;
-	status_t status = find_directory(B_BEOS_ADDONS_DIRECTORY, &path);
-	if (status != B_OK)
-		return false;
-	path.Append("mail_daemon");
-	path.Append("outbound_protocols");
-	path.Append(name);
 	entry_ref ref;
-	get_ref_for_path(path.Path(), &ref);
-	fOutboundSettings.SetAddOnRef(ref);
+	if (_GetAddOnRef("mail_daemon/outbound_protocols", name, ref) != B_OK)
+		return false;
 
+	fOutboundSettings.SetAddOnRef(ref);
 	return true;
 }
 
@@ -979,4 +969,23 @@ BMailAccountSettings::_CreateAccountFilePath()
 
 	path.Append(fileName);
 	return fAccountFile.SetTo(path.Path());
+}
+
+
+status_t
+BMailAccountSettings::_GetAddOnRef(const char* subPath, const char* name,
+	entry_ref& ref)
+{
+	BStringList paths;
+	BPathFinder().FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, subPath, paths);
+
+	for (int32 i = 0; i < paths.CountStrings(); i++) {
+		BPath path(paths.StringAt(i), name);
+		BEntry entry(path.Path());
+		if (entry.Exists()) {
+			if (entry.GetRef(&ref) == B_OK)
+				return B_OK;
+		}
+	}
+	return B_ENTRY_NOT_FOUND;
 }
