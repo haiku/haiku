@@ -353,6 +353,10 @@ rule CreateAsmStructOffsetsHeader header : source
 	flags += -Wno-invalid-offsetof ;
 		# TODO: Rather get rid of the respective offsetof() instances.
 
+	if $(HAIKU_CC_IS_CLANG_$(TARGET_PACKAGING_ARCH)) = 1 {
+		flags += -no-integrated-as ;
+	}
+
 	# locate object, search for source, and set on target variables
 
 	Depends $(header) : $(source) $(PLATFORM) ;
@@ -370,10 +374,6 @@ rule CreateAsmStructOffsetsHeader header : source
 		$(includesSeparator)
 		[ FSysIncludes $(sysHeaders) : $(systemIncludesOption) ] ;
 	CCDEFS on $(header) = [ FDefines $(defines) ] ;
-
-	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-		C++FLAGS on $(header) += -no-integrated-as ;
-	}
 
 	CreateAsmStructOffsetsHeader1 $(header) : $(source) ;
 }
