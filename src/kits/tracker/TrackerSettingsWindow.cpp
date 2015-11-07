@@ -96,20 +96,20 @@ TrackerSettingsWindow::TrackerSettingsWindow()
 
 	fSettingsContainerBox = new BBox("SettingsContainerBox");
 
-	const float spacing = be_control_look->DefaultItemSpacing();
+//	const float spacing = be_control_look->DefaultItemSpacing();
 
 	BLayoutBuilder::Group<>(this)
-		.AddGroup(B_HORIZONTAL, spacing)
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(scrollView)
-			.AddGroup(B_VERTICAL, spacing)
+			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
 				.Add(fSettingsContainerBox)
-				.AddGroup(B_HORIZONTAL, spacing)
+				.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 					.Add(fDefaultsButton)
 					.Add(fRevertButton)
 					.AddGlue()
 				.End()
 			.End()
-		.SetInsets(spacing, spacing, spacing, spacing)
+		.SetInsets(B_USE_WINDOW_SPACING)
 		.End();
 
 	fSettingsTypeListView->AddItem(new SettingsItem(B_TRANSLATE("Desktop"),

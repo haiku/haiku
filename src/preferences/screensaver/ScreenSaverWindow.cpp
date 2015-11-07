@@ -349,7 +349,7 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 	fadeNeverText->MakeSelectable(false);
 	fadeNeverText->SetText(B_TRANSLATE("Don't fade when mouse is here"));
 
-	box->AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
+	box->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, 0)
 		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
 			B_USE_DEFAULT_SPACING)
 		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
@@ -384,7 +384,8 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 		.View());
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
-		.SetInsets(B_USE_SMALL_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, 0)
 		.Add(box)
 		.End();
 }
@@ -555,7 +556,8 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 	fSettingsBox->SetLabel(B_TRANSLATE("Screensaver settings"));
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, 0)
 		.AddGroup(B_VERTICAL)
 			.Add(fPreviewView)
 			.Add(saversListScrollView)
@@ -931,7 +933,7 @@ ScreenSaverWindow::ScreenSaverWindow()
 		B_ALIGN_USE_FULL_HEIGHT));
 	topView->SetExplicitMinSize(BSize(fMinWidth, fMinHeight));
 	BLayoutBuilder::Group<>(topView, B_VERTICAL)
-		.SetInsets(0, B_USE_SMALL_SPACING, 0, 0)
+		.SetInsets(0, B_USE_DEFAULT_SPACING, 0, B_USE_WINDOW_SPACING)
 		.Add(fTabView)
 		.End();
 

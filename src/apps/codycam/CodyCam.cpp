@@ -617,7 +617,7 @@ VideoWindow::_BuildCaptureControls()
 	fCaptureSetupBox = new BBox("Capture Controls", B_WILL_DRAW);
 	fCaptureSetupBox->SetLabel(B_TRANSLATE("Capture controls"));
 
-	BGridLayout *controlsLayout = new BGridLayout(kXBuffer, 0);
+	BGridLayout *controlsLayout = new BGridLayout(B_USE_DEFAULT_SPACING, 0);
 	controlsLayout->SetInsets(10, 15, 5, 5);
 	fCaptureSetupBox->SetLayout(controlsLayout);
 
@@ -680,7 +680,7 @@ VideoWindow::_BuildCaptureControls()
 
 	fUploadClientSelector->SetLabel(B_TRANSLATE("Type:"));
 
-	BGridLayout *ftpLayout = new BGridLayout(kXBuffer, 0);
+	BGridLayout *ftpLayout = new BGridLayout(B_USE_DEFAULT_SPACING, 0);
 	ftpLayout->SetInsets(10, 15, 5, 5);
 	fFtpSetupBox->SetLayout(ftpLayout);
 
@@ -837,10 +837,10 @@ VideoWindow::ToggleMenuOnOff()
 {
 	BMenuItem* item = fMenu->FindItem(msg_video);
 	item->SetEnabled(!item->IsEnabled());
-	
+
 	item = fMenu->FindItem(msg_start);
 	item->SetEnabled(!item->IsEnabled());
-	
+
 	item = fMenu->FindItem(msg_stop);
 	item->SetEnabled(!item->IsEnabled());
 }

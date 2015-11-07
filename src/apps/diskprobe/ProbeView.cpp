@@ -481,7 +481,8 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 	fLastPosition(0)
 {
 	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	GridLayout()->SetInsets(B_USE_SMALL_SPACING);
+	GridLayout()->SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+		B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING);
 
 	fIconView = new IconView(ref, editor.IsDevice());
 	GridLayout()->AddView(fIconView, 0, 0, 1, 2);

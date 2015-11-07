@@ -103,7 +103,7 @@ PoorManPreferencesWindow::MessageReceived(BMessage* message)
 			PoorManServer* server;
 			win = ((PoorManApplication*)be_app)->GetPoorManWindow();
 			server = win->GetServer();
-	
+
 			PRINT(("Pref Window: sendDir CheckBox: %d\n",
 				fSiteView->SendDirValue()));
 			server->SetListDir(fSiteView->SendDirValue());
@@ -118,7 +118,7 @@ PoorManPreferencesWindow::MessageReceived(BMessage* message)
 				win->SetDirLabel(fSiteView->WebDir());
 			}
 
-			PRINT(("Pref Window: logConsole CheckBox: %d\n", 
+			PRINT(("Pref Window: logConsole CheckBox: %d\n",
 				fLoggingView->LogConsoleValue()));
 			win->SetLogConsoleFlag(fLoggingView->LogConsoleValue());
 			PRINT(("Pref Window: logFile CheckBox: %d\n",
@@ -127,13 +127,13 @@ PoorManPreferencesWindow::MessageReceived(BMessage* message)
 			PRINT(("Pref Window: logFileName: %s\n",
 				fLoggingView->LogFileName()));
 			win->SetLogPath(fLoggingView->LogFileName());
-	
+
 			PRINT(("Pref Window: MaxConnections Slider: %" B_PRId32 "\n",
 				fAdvancedView->MaxSimultaneousConnections()));
 			server->SetMaxConns(fAdvancedView->MaxSimultaneousConnections());
 			win->SetMaxConnections(
 				(int16)fAdvancedView->MaxSimultaneousConnections());
-	
+
 			if (Lock())
 				Quit();
 			break;
@@ -190,7 +190,7 @@ PoorManPreferencesWindow::SelectWebDir(BMessage* message)
 
 	PRINT(("DIR: %s\n", path.Path()));
 	fSiteView->SetWebDir(path.Path());
-	
+
 	bool temp;
 	if (message->FindBool("Default Dialog", &temp) == B_OK) {
 		PoorManWindow* win = ((PoorManApplication *)be_app)->GetPoorManWindow();
@@ -199,7 +199,7 @@ PoorManPreferencesWindow::SelectWebDir(BMessage* message)
 			win->SetWebDir(fSiteView->WebDir());
 			win->SetDirLabel(fSiteView->WebDir());
 			win->SaveSettings();
-			win->Show();		
+			win->Show();
 		}
 		if (Lock())
 			Quit();

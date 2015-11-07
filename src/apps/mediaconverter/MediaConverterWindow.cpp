@@ -161,7 +161,7 @@ MediaConverterWindow::MediaConverterWindow(BRect frame)
 {
 	BPath outputDir;
 	if (find_directory(B_USER_DIRECTORY, &outputDir) != B_OK)
-		outputDir.SetTo("/boot/home");	
+		outputDir.SetTo("/boot/home");
 	fOutputDir.SetTo(outputDir.Path());
 
 	fMenuBar = new BMenuBar("menubar");

@@ -231,7 +231,7 @@ DataTranslationsWindow::_SetupViews()
 
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(scrollView, 3)
 		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 6)
 			.SetInsets(0, 0, 0, 0)

@@ -173,7 +173,7 @@ InstallerWindow::InstallerWindow()
 
 	fStatusView = new BTextView("statusView", be_plain_font, NULL,
 		B_WILL_DRAW);
-	fStatusView->SetInsets(10, 10, 10, 10);
+	fStatusView->SetInsets(10, 0, 10, 0);
 	fStatusView->MakeEditable(false);
 	fStatusView->MakeSelectable(false);
 
@@ -249,15 +249,13 @@ InstallerWindow::InstallerWindow()
 	toolsMenu->AddItem(fMakeBootableItem);
 	mainMenu->AddItem(toolsMenu);
 
-	float spacing = be_control_look->DefaultItemSpacing();
-
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(mainMenu)
 		.Add(logoGroup)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-		.AddGroup(B_VERTICAL, spacing)
-			.SetInsets(spacing)
-			.AddGrid(new BGridView(0.0f, spacing))
+		.AddGroup(B_VERTICAL, B_USE_ITEM_SPACING)
+			.SetInsets(B_USE_WINDOW_SPACING)
+			.AddGrid(new BGridView(B_USE_ITEM_SPACING, B_USE_ITEM_SPACING))
 				.Add(fSrcMenuField->CreateLabelLayoutItem(), 0, 0)
 				.Add(fSrcMenuField->CreateMenuBarLayoutItem(), 1, 0)
 				.Add(fDestMenuField->CreateLabelLayoutItem(), 0, 1)
@@ -271,7 +269,7 @@ InstallerWindow::InstallerWindow()
 				.Add(fSizeView, 0, 6, 2)
 			.End()
 
-			.AddGroup(B_HORIZONTAL, spacing)
+			.AddGroup(B_HORIZONTAL, B_USE_WINDOW_SPACING)
 				.Add(fLaunchDriveSetupButton)
 				.AddGlue()
 				.Add(fBeginButton);

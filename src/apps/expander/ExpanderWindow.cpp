@@ -80,9 +80,9 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	size.width = std::max(size.width, fSourceButton->PreferredSize().width);
 	size.width = std::max(size.width, fExpandButton->PreferredSize().width);
 
-	fDestButton->SetExplicitMaxSize(size);
-	fSourceButton->SetExplicitMaxSize(size);
-	fExpandButton->SetExplicitMaxSize(size);
+	fDestButton->SetExplicitSize(size);
+	fSourceButton->SetExplicitSize(size);
+	fExpandButton->SetExplicitSize(size);
 
 	fListingText = new BTextView("listingText");
 	fListingText->SetText("");

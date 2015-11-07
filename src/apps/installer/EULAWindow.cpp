@@ -142,10 +142,10 @@ EULAWindow::EULAWindow()
 	if (!be_roster->IsRunning(kTrackerSignature))
 		SetWorkspaces(B_ALL_WORKSPACES);
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 10)
-		.SetInsets(10)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(scrollView)
-		.AddGroup(B_HORIZONTAL, 10)
+		.AddGroup(B_HORIZONTAL, B_USE_ITEM_SPACING)
 			.AddGlue()
 			.Add(cancelButton)
 			.Add(continueButton);

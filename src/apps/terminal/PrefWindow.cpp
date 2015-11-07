@@ -43,7 +43,7 @@ PrefWindow::PrefWindow(const BMessenger& messenger)
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddGroup(B_VERTICAL)
-		.SetInsets(10, 10, 10, 10)
+		.SetInsets(B_USE_WINDOW_SPACING)
 			.Add(fAppearanceView = new AppearancePrefView(
 				B_TRANSLATE("Appearance"), fTerminalMessenger))
 			.AddGroup(B_HORIZONTAL)

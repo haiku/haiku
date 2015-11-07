@@ -87,7 +87,7 @@ ScreenshotApp::MessageReceived(BMessage* message)
 			BApplication::MessageReceived(message);
 			break;
 	}
-	
+
 	if (status != B_OK)
 		be_app->PostMessage(B_QUIT_REQUESTED);
 }
@@ -97,12 +97,12 @@ void
 ScreenshotApp::ArgvReceived(int32 argc, char** argv)
 {
 	for (int32 i = 0; i < argc; i++) {
-		if (strcmp(argv[i], "-s") == 0 
+		if (strcmp(argv[i], "-s") == 0
 			|| strcmp(argv[i], "--silent") == 0)
 			fSilent = true;
-		else if (strcmp(argv[i], "-c") == 0 
+		else if (strcmp(argv[i], "-c") == 0
 			|| strcmp(argv[i], "--clipboard") == 0)
-			fClipboard = true;			
+			fClipboard = true;
 	}
 }
 

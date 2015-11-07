@@ -331,7 +331,7 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 		new BMessage(MSG_SHOW_HOME_BUTTON_CHANGED));
 	fShowHomeButton->SetValue(B_CONTROL_ON);
 
-	BView* view = BGroupLayoutBuilder(B_VERTICAL, spacing / 2)
+	BView* view = BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(BGridLayoutBuilder(spacing / 2, spacing / 2)
 			.Add(fStartPageControl->CreateLabelLayoutItem(), 0, 0)
 			.Add(fStartPageControl->CreateTextViewLayoutItem(), 1, 0)
@@ -355,10 +355,11 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 		.Add(fAutoHideInterfaceInFullscreenMode)
 		.Add(fAutoHidePointer)
 		.Add(fShowHomeButton)
-		.Add(fDaysInHistory)
 		.Add(BSpaceLayoutItem::CreateHorizontalStrut(spacing))
+		.Add(fDaysInHistory)
 
-		.SetInsets(spacing, spacing, spacing, spacing)
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 
 		.TopView()
 	;
@@ -417,7 +418,8 @@ SettingsWindow::_CreateFontsPage(float spacing)
 		.Add(fFixedSizesMenu->CreateLabelLayoutItem(), 0, 13)
 		.Add(fFixedSizesMenu->CreateMenuBarLayoutItem(), 1, 13)
 
-		.SetInsets(spacing, spacing, spacing, spacing)
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 
 		.View()
 	;
@@ -473,7 +475,7 @@ SettingsWindow::_CreateProxyPage(float spacing)
 	fProxyPasswordControl->SetText(
 		fSettings->GetValue(kSettingsKeyProxyPassword, ""));
 
-	BView* view = BGroupLayoutBuilder(B_VERTICAL, spacing / 2)
+	BView* view = BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(fUseProxyCheckBox)
 		.Add(BGridLayoutBuilder(spacing / 2, spacing / 2)
 			.Add(fProxyAddressControl->CreateLabelLayoutItem(), 0, 0)
@@ -492,7 +494,8 @@ SettingsWindow::_CreateProxyPage(float spacing)
 		)
 		.Add(BSpaceLayoutItem::CreateGlue())
 
-		.SetInsets(spacing, spacing, spacing, spacing)
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 
 		.TopView()
 	;

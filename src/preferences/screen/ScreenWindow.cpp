@@ -535,7 +535,7 @@ ScreenWindow::ScreenWindow(ScreenSettings* settings)
 			.Add(fRevertButton)
 			.AddGlue()
 			.End()
-		.SetInsets(B_USE_DEFAULT_SPACING);
+		.SetInsets(B_USE_WINDOW_SPACING);
 
 	_UpdateControls();
 	_UpdateMonitor();

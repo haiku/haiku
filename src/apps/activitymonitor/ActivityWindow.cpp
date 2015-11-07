@@ -64,7 +64,7 @@ ActivityWindow::ActivityWindow()
 
 	fLayout = new BGroupLayout(B_VERTICAL);
 	float inset = ceilf(be_plain_font->Size() * 0.7);
-	fLayout->SetInsets(inset, inset, inset, inset);
+	fLayout->SetInsets(B_USE_WINDOW_SPACING);
 	fLayout->SetSpacing(inset);
 
 	BView* top = new BView("top", 0, fLayout);

@@ -200,8 +200,9 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 	BBox* previewBox = new BBox(B_FANCY_BORDER, fPreview);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
-		.SetInsets(kSpacing)
-		.AddGroup(B_HORIZONTAL, kSpacing)
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+				B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 			.Add(previewBox)
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fActiveWindow)

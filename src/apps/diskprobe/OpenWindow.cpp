@@ -57,7 +57,7 @@ OpenWindow::OpenWindow()
 		new BMessage(B_QUIT_REQUESTED));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(field)
 		.AddGroup(B_HORIZONTAL)
 			.Add(cancelButton)

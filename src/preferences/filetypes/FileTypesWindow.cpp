@@ -547,7 +547,7 @@ FileTypesWindow::FileTypesWindow(const BMessage& settings)
 		.SetInsets(0)
 		.Add(menuBar)
 		.AddGroup(B_HORIZONTAL, 0)
-			.SetInsets(padding, padding, padding, padding)
+			.SetInsets(B_USE_WINDOW_SPACING)
 			.AddSplit(fMainSplitView)
 				.AddGroup(B_VERTICAL, padding)
 					.Add(typeListScrollView)
@@ -1194,7 +1194,7 @@ FileTypesWindow::_MoveUpAttributeIndex(int32 index)
 			// so just ignore this attribute name.
 			// NOTE: This shows that the attribute description is
 			// too fragile. It would have been better to pack each
-			// attribute description into a separate BMessage. 
+			// attribute description into a separate BMessage.
 			continue;
 		}
 
@@ -1207,7 +1207,7 @@ FileTypesWindow::_MoveUpAttributeIndex(int32 index)
 			else if (j == index)
 				originalIndex = j - 1;
 			else
-				originalIndex = j; 
+				originalIndex = j;
 			attributes.FindData(kAttributeNames[i], type,
 				originalIndex, &data, &size);
 			if (j == 0) {

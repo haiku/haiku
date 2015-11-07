@@ -325,7 +325,7 @@ ModifierKeysWindow::ModifierKeysWindow()
 			.Add(fRevertButton)
 			.Add(fOkButton)
 			.End()
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING)
 		.End();
 
 	_MarkMenuItems();

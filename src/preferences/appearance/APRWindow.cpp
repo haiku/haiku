@@ -112,7 +112,7 @@ APRWindow::_UpdateButtons()
 {
 	fDefaultsButton->SetEnabled(_IsDefaultable());
 	fRevertButton->SetEnabled(_IsRevertable());
-}	
+}
 
 
 bool

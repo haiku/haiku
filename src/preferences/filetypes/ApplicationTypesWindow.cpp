@@ -256,9 +256,10 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 				.Add(fTrackerButton)
 				.AddGlue()
 				.End()
-			.AddGlue()
+			.AddGlue(10.0)
 			.End()
-		.SetInsets(padding, padding, padding, padding);
+
+		.SetInsets(B_USE_WINDOW_SPACING);
 
 	BMimeType::StartWatching(this);
 	_SetType(NULL);

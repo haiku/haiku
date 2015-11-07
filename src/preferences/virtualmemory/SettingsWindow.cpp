@@ -213,7 +213,7 @@ SettingsWindow::SettingsWindow()
 	fRevertButton->SetEnabled(false);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(box)
 		.AddGroup(B_HORIZONTAL)
 			.Add(fDefaultsButton)

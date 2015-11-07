@@ -1173,7 +1173,7 @@ MessageView::SetTo(BMessage& message)
 	fTextView->SetText("");
 
 	char text[512];
-	snprintf(text, sizeof(text), B_TRANSLATE_COMMENT("what: '%.4s'\n\n", 
+	snprintf(text, sizeof(text), B_TRANSLATE_COMMENT("what: '%.4s'\n\n",
 		"'What' is a message specifier that defines the type of the message."),
 		(char*)&message.what);
 	fTextView->Insert(text);
