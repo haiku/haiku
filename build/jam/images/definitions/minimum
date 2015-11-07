@@ -13,7 +13,7 @@ SYSTEM_BIN = [ FFilterByBuildFeatures
 	hd hey
 	ideinfo@ide idestatus@ide ifconfig iroster isvolume
 	kernel_debugger keymap keystore
-	linkcatkeys listarea listattr listimage listdev
+	launch_roster linkcatkeys listarea listattr listimage listdev
 	listport listres listsem listusb locale logger login lsindex
 	makebootable message mimeset mkfs mkindex
 	modifiers mount mountvolume
