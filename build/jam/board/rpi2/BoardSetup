@@ -59,6 +59,9 @@ HAIKU_BOARD_SDIMAGE_SIZE = 128 ;
 #
 
 local flags = -march=armv7-a -mfloat-abi=hard ;
+if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+	flags += -D__ARM_ARCH__=7 ;
+}
 
 HAIKU_ASFLAGS_$(HAIKU_PACKAGING_ARCH) += $(flags) ;
 HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH) += $(flags) ;
