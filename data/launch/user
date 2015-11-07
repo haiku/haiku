@@ -27,6 +27,14 @@ target desktop {
 		launch /bin/sh ~/config/settings/boot/UserBootscript
 	}
 
+	job check-daylight-saving-time {
+		launch /system/bin/dstcheck
+	}
+
+	job update-time {
+		launch /system/preferences/Time "" --update
+	}
+
 	job first-login {
 		launch /bin/sh /system/boot/PostInstallScript "first login" ~/config/settings/first_login /boot/system/boot/first-login
 		if file_exists ~/config/settings/first_login
