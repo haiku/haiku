@@ -371,13 +371,17 @@ rule CreateAsmStructOffsetsHeader header : source
 		[ FSysIncludes $(sysHeaders) : $(systemIncludesOption) ] ;
 	CCDEFS on $(header) = [ FDefines $(defines) ] ;
 
+	if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
+		C++FLAGS on $(header) += -no-integrated-as ;
+	}
+
 	CreateAsmStructOffsetsHeader1 $(header) : $(source) ;
 }
 
 actions CreateAsmStructOffsetsHeader1
 {
  	$(C++) -S "$(2)" $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o - \
-		| grep "#define" | sed -e 's/[\$\#]\([0-9]\)/\1/' > "$(1)"
+		| grep "#define" | $(SED) -e 's/[\$\#]\([0-9]\)/\1/' > "$(1)"
 }
 
 rule MergeObjectFromObjects
