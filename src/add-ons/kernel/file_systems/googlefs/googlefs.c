@@ -596,7 +596,7 @@ int googlefs_free_cookie(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *co
 	err = LOCK(&node->l);
 	if (err)
 		return err;
-	err = SLL_REMOVE(node->opened, next, cookie); /* just to amke sure */
+	err = SLL_REMOVE(node->opened, next, cookie); /* just to make sure */
 //	if (err)
 //		goto err_n_l;
 	if (/*!node->is_perm &&*/ false) { /* not yet */
@@ -1166,7 +1166,7 @@ int googlefs_free_attr_cookie_h(fs_volume *_volume, fs_vnode *_node, fs_file_coo
 	err = LOCK(&node->l);
 	if (err)
 		return err;
-	err = SLL_REMOVE(node->opened, next, cookie); /* just to amke sure */
+	err = SLL_REMOVE(node->opened, next, cookie); /* just to make sure */
 //	if (err)
 //		goto err_n_l;
 	UNLOCK(&node->l);
