@@ -903,6 +903,7 @@ PathHandler::MessageReceived(BMessage* message)
 			if (message->FindInt32("opcode", &opcode) != B_OK)
 				return;
 
+			BAutolock _(sLocker);
 			switch (opcode) {
 				case B_ENTRY_CREATED:
 					_EntryCreated(message);
