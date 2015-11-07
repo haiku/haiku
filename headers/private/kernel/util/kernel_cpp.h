@@ -33,6 +33,16 @@ extern void operator delete(void *ptr) throw ();
 extern void operator delete[](void *ptr) throw ();
 #endif
 
+#if __cplusplus >= 201402L
+
+inline void
+operator delete(void *ptr, size_t size) throw ()
+{
+	free(ptr);
+}
+
+#endif // __cplusplus >= 201402L
+
 #endif	// #if _KERNEL_MODE
 
 #endif	// __cplusplus
