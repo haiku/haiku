@@ -30,7 +30,7 @@
 
 #define TESTURL "http://www.google.com/search?hl=en&ie=UTF-8&num=50&q=beos"
 //#define BASEURL "http://www.google.com/search?hl=en&ie=UTF-8&num=50&q="
-#define BASEURL "/search?hl=en&ie=UTF-8&oe=UTF-8"
+#define BASEURL "/search?hl=en&ie=UTF-8&oe=UTF-8&gws_rd=cr"
 #define FMT_NUM "&num=%u"
 #define FMT_Q "&q=%s"
 
