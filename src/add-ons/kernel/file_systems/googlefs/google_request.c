@@ -35,7 +35,7 @@
 #define FMT_Q "&q=%s"
 
 /* parse_google_html.c */
-extern int google_parse_results(const char *html, size_t htmlsize, struct google_result **results);
+extern int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct google_result **results);
 
 // move that to ksocket inlined
 static int kinet_aton(const char *in, struct in_addr *addr)
@@ -150,7 +150,7 @@ status_t google_request_process(struct google_request *req)
 		close(fd);
 	}
 #endif /* FAKE_INPUT */	
-	err = count = google_parse_results(req->cnx->data, req->cnx->datalen, &req->results);
+	err = count = google_parse_results(req->cnx->data, req->cnx->datalen, &req->nextid, &req->results);
 	if (err < 0)
 		goto err_get;
 #ifdef DO_PUBLISH
