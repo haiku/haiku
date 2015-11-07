@@ -11,6 +11,7 @@
 
 .align 4
 FUNCTION(memcpy):
+FUNCTION(__aeabi_memcpy):
 	// check for zero length copy or the same pointer
 	cmp		r2, #0
 	cmpne	r1, r0
@@ -165,4 +166,5 @@ FUNCTION(memcpy):
 	// check for zero length copy or the same pointer
 
 FUNCTION_END(memcpy)
+FUNCTION_END(__aeabi_memcpy)
 #endif
