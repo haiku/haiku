@@ -36,6 +36,7 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 		new BMessage(MSG_PREF_BTN_DONE));
 
 	fPrefTabView = new BTabView("Pref Tab View", B_WIDTH_FROM_WIDEST);
+	fPrefTabView->SetBorder(B_NO_BORDER);
 
 	// Site Tab
 	fSiteTab = new BTab();
@@ -75,15 +76,16 @@ PoorManPreferencesWindow::PoorManPreferencesWindow(BRect frame, char * name)
 	fLogFilePanel->SetButtonLabel(B_DEFAULT_BUTTON, B_TRANSLATE("Create"));
 	change_title = fLogFilePanel->Window();
 	change_title->SetTitle(STR_FILEPANEL_CREATE_LOG_FILE);
-	
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_WINDOW_INSETS)
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, B_USE_DEFAULT_SPACING, 0, B_USE_WINDOW_SPACING)
 		.Add(fPrefTabView)
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
 			.Add(fCancelButton)
-			.Add(fDoneButton);
+			.Add(fDoneButton)
+			.SetInsets(B_USE_WINDOW_SPACING, 0, B_USE_WINDOW_SPACING, 0);
 }
 
 

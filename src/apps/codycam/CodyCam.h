@@ -114,7 +114,7 @@ private:
 
 class VideoWindow : public BWindow {
 public:
-							VideoWindow(BRect frame, const char* title,
+							VideoWindow(const char* title,
 								window_type type, uint32 flags,
 								port_id* consumerport);
 							~VideoWindow();
@@ -164,7 +164,7 @@ private:
 			ftp_msg_info	fFtpInfo;
 
 			Settings*		fSettings;
-			
+
 			BMenu* 			fMenu;
 
 			StringValueSetting*		fServerSetting;
@@ -182,7 +182,7 @@ private:
 
 class ControlWindow : public BWindow {
 public:
-							ControlWindow(const BRect& frame, BView* controls,
+							ControlWindow(BView* controls,
 								media_node node);
 			void			MessageReceived(BMessage* message);
 			bool			QuitRequested();

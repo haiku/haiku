@@ -36,15 +36,6 @@
 #define WINDOW_OFFSET_X 28
 #define WINDOW_OFFSET_Y 28
 
-const int32 kBtnHeight = 20;
-const int32 kBtnWidth = 60;
-const int32 kBtnBuffer = 25;
-const int32 kXBuffer = 10;
-const int32 kYBuffer = 10;
-const int32 kMenuHeight = 15;
-const int32 kButtonHeight = 15;
-const int32 kSliderViewRectHeight = 40;
-
 #define	CALL		printf
 #define ERROR		printf
 #define FTPINFO		printf
@@ -133,7 +124,7 @@ CodyCam::~CodyCam()
 void
 CodyCam::ReadyToRun()
 {
-	fWindow = new VideoWindow(BRect(28, 28, 28, 28),
+	fWindow = new VideoWindow(
 		(const char*) B_TRANSLATE_SYSTEM_NAME("CodyCam"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, &fPort);
 
@@ -187,10 +178,7 @@ CodyCam::MessageReceived(BMessage *message)
 			status_t err = fMediaRoster->GetParameterWebFor(node, &web);
 			if (err >= B_OK && web != NULL) {
 				view = BMediaTheme::ViewFor(web);
-				fVideoControlWindow = new ControlWindow(
-					BRect(2 * WINDOW_OFFSET_X + WINDOW_SIZE_X, WINDOW_OFFSET_Y,
-					2 * WINDOW_OFFSET_X + WINDOW_SIZE_X + view->Bounds().right,
-					WINDOW_OFFSET_Y + view->Bounds().bottom), view, node);
+				fVideoControlWindow = new ControlWindow(view, node);
 				fMediaRoster->StartWatching(BMessenger(NULL,
 					fVideoControlWindow), node,	B_MEDIA_WEB_CHANGED);
 				fVideoControlWindow->Show();
@@ -407,10 +395,10 @@ CodyCam::_TearDownNodes()
 //	#pragma mark - Video Window Class
 
 
-VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
+VideoWindow::VideoWindow(const char* title, window_type type,
 		uint32 flags, port_id* consumerPort)
 	:
-	BWindow(frame, title, type, flags),
+	BWindow(BRect(50, 50, 50, 50), title, type, flags),
 	fPortPtr(consumerPort),
 	fVideoView(NULL)
 {
@@ -428,7 +416,7 @@ VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
 
 	_SetUpSettings("codycam", "");
 
-	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), "menu bar");
+	BMenuBar* menuBar = new BMenuBar("menu bar");
 
 	BMenuItem* menuItem;
 	fMenu = new BMenu(B_TRANSLATE("File"));
@@ -466,17 +454,17 @@ VideoWindow::VideoWindow(BRect frame, const char* title, window_type type,
 	box->AddChild(fVideoView);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
-		.SetInsets(0, 0, 0, 0)
 		.Add(menuBar)
-		.AddGroup(B_VERTICAL, kYBuffer)
-			.SetInsets(kXBuffer, kYBuffer, kXBuffer, kYBuffer)
+		.AddGroup(B_VERTICAL)
+			.SetInsets(B_USE_WINDOW_SPACING)
 			.Add(box)
-			.AddGroup(B_HORIZONTAL, kXBuffer)
-				.SetInsets(0, 0, 0, 0)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 				.Add(fCaptureSetupBox)
 				.Add(fFtpSetupBox)
 				.End()
-			.Add(fStatusLine);
+			.Add(fStatusLine)
+			.End()
+		.AddGlue();
 
 	Show();
 }
@@ -849,10 +837,10 @@ VideoWindow::ToggleMenuOnOff()
 //	#pragma mark -
 
 
-ControlWindow::ControlWindow(const BRect& frame, BView* controls,
+ControlWindow::ControlWindow(BView* controls,
 	media_node node)
 	:
-	BWindow(frame, B_TRANSLATE("Video settings"), B_TITLED_WINDOW,
+	BWindow(BRect(), B_TRANSLATE("Video settings"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS)
 {
 	fView = controls;

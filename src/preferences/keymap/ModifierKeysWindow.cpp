@@ -28,6 +28,7 @@
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Resources.h>
+#include <SeparatorView.h>
 #include <Size.h>
 #include <StringView.h>
 
@@ -289,7 +290,7 @@ ModifierKeysWindow::ModifierKeysWindow()
 		new BMessage(kMsgApplyModifiers));
 	fOkButton->MakeDefault(true);
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_SMALL_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
 			.Add(keyRole, 0, 0)
 			.Add(keyLabel, 1, 0)

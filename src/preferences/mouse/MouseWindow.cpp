@@ -22,6 +22,7 @@
 #include <MenuItem.h>
 #include <Message.h>
 #include <Screen.h>
+#include <SeparatorView.h>
 #include <Slider.h>
 
 #include "MouseWindow.h"
@@ -39,8 +40,6 @@ MouseWindow::MouseWindow(BRect _rect)
 {
 	// Add the main settings view
 	fSettingsView = new SettingsView(fSettings);
-	fSettingsBox = new BBox("main box");
-	fSettingsBox->AddChild(fSettingsView);
 
 	// Add the "Default" button
 	fDefaultsButton = new BButton(B_TRANSLATE("Defaults"),
@@ -58,12 +57,19 @@ MouseWindow::MouseWindow(BRect _rect)
 
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
-		.Add(fSettingsBox)
 		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+				B_USE_WINDOW_SPACING, 0)
+			.Add(fSettingsView)
+			.End()
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_WINDOW_SPACING, 0, B_USE_WINDOW_SPACING,
+				B_USE_WINDOW_SPACING)
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
-			.AddGlue();
+			.AddGlue()
+			.End();
 
 	// check if the window is on screen
 	BRect rect = BScreen().Frame();

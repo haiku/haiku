@@ -20,6 +20,7 @@
 #include <Locale.h>
 #include <Message.h>
 #include <Screen.h>
+#include <SeparatorView.h>
 #include <Slider.h>
 #include <TextControl.h>
 
@@ -36,8 +37,6 @@ KeyboardWindow::KeyboardWindow()
 
 	// Add the main settings view
 	fSettingsView = new KeyboardView();
-	BBox* fSettingsBox = new BBox("keyboard_box");
-	fSettingsBox->AddChild(fSettingsView);
 
 	// Add the "Default" button..
 	fDefaultsButton = new BButton(B_TRANSLATE("Defaults"), new BMessage(BUTTON_DEFAULTS));
@@ -48,12 +47,18 @@ KeyboardWindow::KeyboardWindow()
 
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
-		.Add(fSettingsBox)
 		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+				B_USE_WINDOW_SPACING, 0)
+			.Add(fSettingsView)
+			.End()
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_WINDOW_SPACING, 0, B_USE_WINDOW_SPACING,
+				B_USE_WINDOW_SPACING)
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
-			.AddGlue();
+			.End();
 
 	BSlider* slider = (BSlider* )FindView("key_repeat_rate");
 	if (slider !=NULL)

@@ -35,6 +35,7 @@
 #include <MessageFilter.h>
 #include <Path.h>
 #include <Roster.h>
+#include <SeparatorView.h>
 #include <SpaceLayoutItem.h>
 #include <String.h>
 #include <StringView.h>
@@ -227,10 +228,10 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 				.AddGlue()
 			.End()
 		.End()
-		.AddStrut(kSpacing)
-		.Add(divider)
-		.AddStrut(kSpacing)
-		.AddGroup(B_HORIZONTAL, kSpacing)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL, 0)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING)
 			.Add(new BButton("", B_TRANSLATE("Copy to clipboard"),
 				new BMessage(B_COPY)))
 			.Add(new BButton("", B_TRANSLATE("New screenshot"),

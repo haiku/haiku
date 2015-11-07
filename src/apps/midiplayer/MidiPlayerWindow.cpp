@@ -29,6 +29,7 @@
 #include <Locale.h>
 #include <MidiProducer.h>
 #include <MidiRoster.h>
+#include <SeparatorView.h>
 #include <StorageKit.h>
 #include <SpaceLayoutItem.h>
 
@@ -252,46 +253,41 @@ MidiPlayerWindow::CreateViews()
 		new BMessage(MSG_PLAY_STOP));
 	fPlayButton->SetEnabled(false);
 
-	BBox* divider = new BBox(B_EMPTY_STRING, B_WILL_DRAW | B_FRAME_EVENTS,
-		B_FANCY_BORDER);
-	divider->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, 1));
-
 	BStringView* volumeLabel = new BStringView(NULL, B_TRANSLATE("Volume:"));
 	volumeLabel->SetAlignment(B_ALIGN_LEFT);
 
 	// Build the layout
-	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_SMALL_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(fScopeView)
-		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
-			.AddGroup(B_HORIZONTAL, 0.0f)
-				.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
-					.Add(fShowScopeCheckBox, 1, 0)
+		.AddGroup(B_VERTICAL, 0)
+			.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
+				.Add(fShowScopeCheckBox, 1, 0)
 
-					.Add(fReverbMenuField->CreateLabelLayoutItem(), 0, 1)
-					.AddGroup(B_HORIZONTAL, 0.0f, 1, 1)
-						.Add(fReverbMenuField->CreateMenuBarLayoutItem())
-						.AddGlue()
-						.End()
-
-					.Add(fInputMenuField->CreateLabelLayoutItem(), 0, 2)
-					.AddGroup(B_HORIZONTAL, 0.0f, 1, 2)
-						.Add(fInputMenuField->CreateMenuBarLayoutItem())
-						.AddGlue()
-						.End()
-
-					.Add(volumeLabel, 0, 3)
-					.Add(fVolumeSlider, 0, 4, 2, 1)
+				.Add(fReverbMenuField->CreateLabelLayoutItem(), 0, 1)
+				.AddGroup(B_HORIZONTAL, 0.0f, 1, 1)
+					.Add(fReverbMenuField->CreateMenuBarLayoutItem())
+					.AddGlue()
 					.End()
-				.AddGlue()
+
+				.Add(fInputMenuField->CreateLabelLayoutItem(), 0, 2)
+				.AddGroup(B_HORIZONTAL, 0.0f, 1, 2)
+					.Add(fInputMenuField->CreateMenuBarLayoutItem())
+					.AddGlue()
+					.End()
+
+				.Add(volumeLabel, 0, 3)
+				.Add(fVolumeSlider, 0, 4, 2, 1)
 				.End()
 			.AddGlue()
-			.Add(divider)
-			.AddGlue()
-			.Add(fPlayButton)
-			.AddGlue()
-			.SetInsets(B_USE_WINDOW_INSETS)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
+
 			.End()
-		.SetInsets(0)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_VERTICAL, 0)
+			.Add(fPlayButton)
+			.SetInsets(0, B_USE_DEFAULT_SPACING, 0, B_USE_WINDOW_SPACING)
+			.End()
 		.End();
 }
 

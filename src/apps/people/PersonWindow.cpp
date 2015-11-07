@@ -45,7 +45,7 @@ PersonWindow::PersonWindow(BRect frame, const char* title,
 		const char* nameAttribute, const char* categoryAttribute,
 		const entry_ref* ref)
 	:
-	BWindow(frame, title, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+	BWindow(frame, title, B_TITLED_WINDOW, B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fRef(NULL),
 	fPanel(NULL),
