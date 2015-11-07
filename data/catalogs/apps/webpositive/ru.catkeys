@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	98059607
+1	russian	x-vnd.Haiku-WebPositive	3678460971
 Show home button	Settings Window		Показывать кнопку Домой
 Username:	Authentication Panel		Имя пользователя:
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
@@ -48,6 +48,7 @@ Restart	Download Window		Перезапустить
 Proxy server	Settings Window		Прокси-сервер
 Open containing folder	Download Window		Открыть папку с файлом
 New window	WebPositive Window		Новое окно
+WebPositive	Download Window		WebPositive
 Open	Download Window		Открыть
 Reload	WebPositive Window		Обновить
 Downloads	Download Window		Загрузки
