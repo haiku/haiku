@@ -49,7 +49,7 @@ service x-vnd.Haiku-net_server {
 	legacy
 }
 
-service x-vnd.Haiku-print_server {
+service x-vnd.Be-PSRV {
 	launch /system/servers/print_server
 	no_safemode
 	on_demand
