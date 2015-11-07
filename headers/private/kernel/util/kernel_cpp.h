@@ -22,6 +22,17 @@ extern const nothrow_t std::nothrow;
 typedef struct {} mynothrow_t;
 extern const mynothrow_t mynothrow;
 
+#ifndef __clang__
+extern void* operator new(size_t size) throw (std::bad_alloc);
+extern void* operator new[](size_t size) throw (std::bad_alloc);
+extern void* operator new(size_t size, const std::nothrow_t &) throw ();
+extern void* operator new[](size_t size, const std::nothrow_t &) throw ();
+extern void* operator new(size_t size, const mynothrow_t &) throw ();
+extern void* operator new[](size_t size, const mynothrow_t &) throw ();
+extern void operator delete(void *ptr) throw ();
+extern void operator delete[](void *ptr) throw ();
+#endif
+
 #endif	// #if _KERNEL_MODE
 
 #endif	// __cplusplus
