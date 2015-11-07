@@ -43,6 +43,7 @@ int dbgstep = 0;
 #define G_END_SNIPSET "<br>"
 #define G_BEGIN_CACHESIM " <a class=fl href=\""
 #define G_END_CACHESIM "\">"
+#define G_URL_PREFIX "http://www.google.com"
 
 int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct google_result **results)
 {
@@ -88,6 +89,7 @@ int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct
 		char *item;
 		long itemlen;
 		char *tmp;
+		char *urlp;
 		int i;
 #ifdef TESTME
 		dbgstep = 0;
@@ -119,10 +121,17 @@ int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct
 		PRST;
 		p+= strlen(G_END_URL);
 		//printf(DBG"[%ld] found token 2\n", numres);
-		itemlen = p - item - strlen(G_END_URL);
-		itemlen = MIN(GR_MAX_URL-1, itemlen);
-		strncpy(nres->url, item, itemlen);
-		nres->url[itemlen] = '\0';
+		itemlen = GR_MAX_URL-1;
+		urlp = nres->url;
+		if (!strncmp(item, "/url?", 5)) {
+			strcpy(urlp, G_URL_PREFIX);
+			itemlen -= strlen(G_URL_PREFIX);
+			urlp += strlen(G_URL_PREFIX);
+			printf("plop\n");
+		}
+		itemlen = MIN(itemlen, p - item - strlen(G_END_URL));
+		strncpy(urlp, item, itemlen);
+		urlp[itemlen] = '\0';
 		
 		/* find name */
 		//<b>Google</b> Web APIs - FAQ</a><table
