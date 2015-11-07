@@ -16,6 +16,9 @@
 #include <boot/net/TCP.h>
 
 
+using std::nothrow;
+
+
 // sNetStack
 NetStack *NetStack::sNetStack = NULL;
 

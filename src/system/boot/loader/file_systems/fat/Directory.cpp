@@ -26,6 +26,9 @@
 #define TRACE(x) do {} while (0)
 
 
+using std::nothrow;
+
+
 namespace FATFS {
 
 

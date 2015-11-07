@@ -24,6 +24,7 @@
 
 
 using namespace FATFS;
+using std::nothrow;
 
 
 Volume::Volume(boot::Partition *partition)

@@ -37,6 +37,10 @@ static const uint32 kFloppyArchiveOffset = BOOT_ARCHIVE_IMAGE_OFFSET * 1024;
 	// defined at build time, see build/jam/BuildSetup
 static const size_t kTarRegionSize = 8 * 1024 * 1024;	// 8 MB
 
+
+using std::nothrow;
+
+
 namespace TarFS {
 
 

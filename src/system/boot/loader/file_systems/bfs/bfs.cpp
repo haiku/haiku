@@ -27,6 +27,7 @@
 
 
 using namespace BFS;
+using std::nothrow;
 
 
 Volume::Volume(boot::Partition *partition)

@@ -22,6 +22,9 @@
 #endif
 
 
+using std::nothrow;
+
+
 // #pragma mark - UDPPacket
 
 

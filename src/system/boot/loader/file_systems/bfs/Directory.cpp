@@ -19,6 +19,9 @@
 extern Node *get_node_from(int fd);
 
 
+using std::nothrow;
+
+
 namespace BFS {
 
 
