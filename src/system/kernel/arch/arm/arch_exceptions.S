@@ -32,20 +32,20 @@
 	str		r0, [sp, #-4]!				/* Push return address */
 	str		lr, [sp, #-4]!				/* Push SVC lr */
 	str		r2, [sp, #-4]!				/* Push SVC sp */
-	msr		spsr_all, r3				/* Restore correct spsr */
+	msr		spsr, r3					/* Restore correct spsr */
 	ldmdb	r1, {r0-r3}					/* Restore 4 regs from xxx mode */
 	sub		sp, sp, #(4*15)				/* Adjust the stack pointer */
 	stmia	sp, {r0-r12}				/* Push the user mode registers */
 	add		r0, sp, #(4*13)				/* Adjust the stack pointer */
 	stmia	r0, {r13-r14}^				/* Push the user mode registers */
 	mov		r0, r0						/* NOP for previous instruction */
-	mrs		r0, spsr_all
+	mrs		r0, spsr
 	str		r0, [sp, #-4]!				/* Save spsr */
 .endm
 
 .macro PULLFRAMEFROMSVCANDEXIT
 	ldr		r0, [sp], #0x0004			/* Get the SPSR from stack */
-	msr		spsr_all, r0				/* restore SPSR */
+	msr		spsr, r0					/* restore SPSR */
 	ldmia	sp, {r0-r14}^				/* Restore registers (usr mode) */
 	mov		r0, r0						/* NOP for previous instruction */
 	add		sp, sp, #(4*15)				/* Adjust the stack pointer */
