@@ -128,9 +128,10 @@ status_t http_get(struct http_cnx *cnx, const char *url)
 	long contentlen = 0;
 	if (strlen(url) > 4096 - 128)
 		return EINVAL;
-	req = malloc(4096);
+	req = malloc(4096+1);
 	if (!req)
 		return B_NO_MEMORY;
+	req[4096] = '\0';
 	/* no snprintf in kernel :( */
 	sprintf(req, "GET %s HTTP/"HTTPVER"\r\nUser-Agent: " GOOGLEFS_UA "\r\nAccept: */*\r\n\r\n", url);
 	reqlen = strlen(req);
@@ -140,10 +141,24 @@ status_t http_get(struct http_cnx *cnx, const char *url)
 	reqlen = 4096;
 	err = len = read(cnx->sock, req, reqlen);
 	printf("read(sock) = %d\n", len);
+	if (err < 0)
+		goto err0;
 	//write(1, req, len);
-	err = B_NO_MEMORY;
+	{
+		int fd;
+		// debug output
+		fd = open("/tmp/google.html_", O_CREAT|O_TRUNC|O_RDWR, 0644);
+		write(fd, req, len);
+		close(fd);
+	}
+
+	err = EINVAL;
 	if (len < 10)
 		goto err0;
+	if (!strstr(req, "HTTP/1.0 200"))
+		goto err0;
+
+	err = B_NO_MEMORY;
 	if (!strstr(req, "\r\n\r\n")) {
 		if (!strstr(req, "\n\n")) /* shouldn't happen */
 			goto err0;
