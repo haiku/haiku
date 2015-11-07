@@ -14,10 +14,6 @@
 #include <pthread.h>
 #include <stdio.h>
 
-#include <map>
-#include <new>
-#include <set>
-
 #include <Autolock.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -185,7 +181,7 @@ public:
 		fIsDirectory = S_ISDIR(st.st_mode);
 
 		// start watching
-		uint32 flags = fChild == NULL ?  pathFlags : B_WATCH_DIRECTORY;
+		uint32 flags = fChild == NULL ? pathFlags : B_WATCH_DIRECTORY;
 			// In theory B_WATCH_NAME would suffice for all existing ancestors,
 			// plus B_WATCH_DIRECTORY for the parent of the first not existing
 			// ancestor. In practice this complicates the transitions when an
@@ -582,7 +578,7 @@ private:
 
 			status_t			_AddNode(const node_ref& nodeRef,
 									bool isDirectory, bool notify,
-					   				Entry* entry = NULL, Node** _node = NULL);
+									Entry* entry = NULL, Node** _node = NULL);
 			void				_DeleteNode(Node* node, bool notify);
 			Node*				_GetNode(const node_ref& nodeRef) const;
 
@@ -605,7 +601,7 @@ private:
 			void				_NotifyEntryMoved(const entry_ref& fromEntryRef,
 									const entry_ref& toEntryRef,
 									const node_ref& nodeRef,
-							 		const char* fromPath, const char* path,
+									const char* fromPath, const char* path,
 									bool isDirectory, bool wasAdded,
 									bool wasRemoved) const;
 			void				_NotifyTarget(BMessage& message,
