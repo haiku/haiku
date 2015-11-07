@@ -358,7 +358,7 @@ TarFS::Directory::Open(void** _cookie, int mode)
 	_inherited::Open(_cookie, mode);
 
 	EntryIterator* iterator
-		= new(std::nothrow) EntryIterator(fEntries.GetIterator());
+		= new(nothrow) EntryIterator(fEntries.GetIterator());
 	if (iterator == NULL)
 		return B_NO_MEMORY;
 

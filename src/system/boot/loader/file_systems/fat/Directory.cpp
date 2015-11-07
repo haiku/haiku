@@ -514,7 +514,7 @@ Directory::CreateFile(const char* name, mode_t permissions, Node** _node)
 		return error;
 
 	// create a File object
-	File* file = new(std::nothrow) File(fVolume, entryOffset,
+	File* file = new(nothrow) File(fVolume, entryOffset,
 		entry.Cluster(fVolume.FatBits()), entry.Size(), name);
 	if (file == NULL)
 		return B_NO_MEMORY;
