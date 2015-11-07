@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2015, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -246,7 +246,7 @@ SplitChallengeIntoMap(BString str, map<BString,BString>& m)
 // #pragma mark -
 
 
-SMTPProtocol::SMTPProtocol(BMailAccountSettings& settings)
+SMTPProtocol::SMTPProtocol(const BMailAccountSettings& settings)
 	:
 	BOutboundMailProtocol(settings),
 	fAuthType(0)
@@ -1061,8 +1061,8 @@ SMTPProtocol::SendCommand(const char *cmd)
 // #pragma mark -
 
 
-BOutboundMailProtocol*
-instantiate_outbound_protocol(BMailAccountSettings& settings)
+extern "C" BOutboundMailProtocol*
+instantiate_outbound_protocol(const BMailAccountSettings& settings)
 {
 	return new SMTPProtocol(settings);
 }
