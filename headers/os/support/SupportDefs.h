@@ -250,7 +250,7 @@ extern void*	get_stack_frame(void);
 
 /* Use the built-in atomic functions, if requested and available. */
 
-#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ >= 7) || defined(__clang__)
 
 
 static __inline__ void
