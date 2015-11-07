@@ -15,10 +15,9 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <FindDirectory.h>
-#include <GridLayout.h>
-#include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <Layout.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -207,9 +206,7 @@ AddPrinterDialog::_BuildGUI(int stage)
 	BButton *cancel = new BButton(NULL, B_TRANSLATE("Cancel"),
 		new BMessage(B_CANCEL));
 
-	SetLayout(new BGridLayout());
-
-	AddChild(BGridLayoutBuilder(0, 4)
+	BLayoutBuilder::Grid<>(this, B_USE_ITEM_SPACING, B_USE_ITEM_SPACING)
 		.Add(fName->CreateLabelLayoutItem(), 0, 0)
 		.Add(fName->CreateTextViewLayoutItem(), 1, 0)
 		.Add(printerMenuField->CreateLabelLayoutItem(), 0, 1)
@@ -221,8 +218,8 @@ AddPrinterDialog::_BuildGUI(int stage)
 			.Add(cancel)
 			.Add(fOk)
 			, 0, 3, 2)
-		.SetInsets(8, 8, 8, 8)
-		);
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING);
 
 	SetDefaultButton(fOk);
 	fOk->MakeDefault(true);

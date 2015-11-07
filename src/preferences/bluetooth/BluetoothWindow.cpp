@@ -2,20 +2,21 @@
  * Copyright 2008-10, Oliver Ruiz Dorantes, <oliver.ruiz.dorantes_at_gmail.com>
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-#include "BluetoothWindow.h"
 
+
+#include "BluetoothWindow.h"
+#include "RemoteDevicesView.h"
 
 #include <Button.h>
 #include <Catalog.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Messenger.h>
-#include <SpaceLayoutItem.h>
-#include <TabView.h>
 #include <Roster.h>
+#include <TabView.h>
+
 #include <stdio.h>
 
 #include <bluetooth/LocalDevice.h>
-#include "RemoteDevicesView.h"
 
 #include "defs.h"
 
@@ -91,18 +92,17 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 
 	fRevertButton->SetEnabled(false);
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(fMenubar)
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
+		.AddStrut(B_USE_DEFAULT_SPACING)
 		.Add(tabView)
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+		.AddStrut(B_USE_DEFAULT_SPACING)
+		.AddGroup(B_HORIZONTAL, 0)
 			.Add(fRevertButton)
 			.AddGlue()
 			.Add(fDefaultsButton)
-		)
-		.SetInsets(5, 5, 5, 5)
-	);
+			.End()
+		.SetInsets(B_USE_WINDOW_SPACING);
 }
 
 

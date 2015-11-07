@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 #include <Catalog.h>
-#include <GridLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <Slider.h>
 #include <String.h>
@@ -94,17 +94,15 @@ SettingsWindow::SettingsWindow(ActivityWindow* target)
 	   	B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
 	fTarget(target)
 {
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	fIntervalSlider = new IntervalSlider(B_TRANSLATE("Update time interval:"),
 		new BMessage(kMsgUpdateTimeInterval), kNumUpdateIntervals);
 	fIntervalSlider->SetInterval(target->RefreshInterval());
 
 	// controls pane
-	AddChild(BGroupLayoutBuilder(B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(fIntervalSlider)
-		.SetInsets(10, 10, 10, 10)
-	);
+		.SetInsets(B_USE_WINDOW_SPACING);
+
 	if (target->IsAlwaysOnTop())
 		SetFeel(B_MODAL_ALL_WINDOW_FEEL);
 }

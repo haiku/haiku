@@ -44,7 +44,7 @@ of their respective holders. All rights reserved.
 #include <CharacterSetRoster.h>
 #include <E-mail.h>
 #include <GridView.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <InterfaceKit.h>
 #include <Locale.h>
 #include <MailSettings.h>
@@ -263,19 +263,16 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 		fAttachAttributesMenu);
 	add_menu_to_layout(menu, mailLayout, layoutRow);
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, kSpacing)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(interfaceBox)
 		.Add(mailBox)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, kSpacing)
+		.AddGroup(B_HORIZONTAL, 0)
 			.Add(fRevert)
 			.AddGlue()
 			.Add(cancelButton)
 			.Add(okButton)
-		)
-		.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
-	);
+			.End()
+		.SetInsets(B_USE_WINDOW_SPACING);
 
 	Show();
 }

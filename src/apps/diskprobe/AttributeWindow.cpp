@@ -14,9 +14,8 @@
 #include <Alert.h>
 #include <Catalog.h>
 #include <Directory.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
 #include <GroupView.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -72,10 +71,10 @@ EditorTabView::SetTypeEditorTab(BView *view)
 	}
 
 	BGroupView* group = new BGroupView(B_VERTICAL);
-	BGroupLayoutBuilder(group)
-		.AddGlue()
-		.Add(view, 0)
-		.AddGlue();
+		BLayoutBuilder::Group<>(group, B_VERTICAL)
+		.SetInsets(B_USE_WINDOW_SPACING, 0, B_USE_WINDOW_SPACING, 0)
+		.Add(view)
+		.AddGlue(25.0f);
 
 	group->SetName(view->Name());
 

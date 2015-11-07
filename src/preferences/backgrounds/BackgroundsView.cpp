@@ -222,21 +222,22 @@ BackgroundsView::BackgroundsView()
 	fApply->SetExplicitAlignment(BAlignment(B_ALIGN_RIGHT,
 		B_ALIGN_NO_VERTICAL));
 
-	AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
-		.AddGroup(B_HORIZONTAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(B_USE_WINDOW_SPACING)
+		.AddGroup(B_HORIZONTAL, 0)
 			.AddGroup(B_VERTICAL, 0)
 				.AddStrut(floorf(rightbox->TopBorderOffset()
 					- previewBox->TopBorderOffset()) - 1)
 				.Add(previewBox)
 				.End()
+			.AddStrut(B_USE_DEFAULT_SPACING)
 			.Add(rightbox)
 			.End()
-		.AddGroup(B_HORIZONTAL)
+		.AddGroup(B_HORIZONTAL, 0)
 			.Add(fRevert)
 			.Add(fApply)
-			.End()
-		.SetInsets(B_USE_DEFAULT_SPACING)
-		.View());
+			.SetInsets(0, B_USE_DEFAULT_SPACING, 0,	0)
+			.End();
 
 	fApply->MakeDefault(true);
 }

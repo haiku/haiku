@@ -187,14 +187,10 @@ BootPromptWindow::BootPromptWindow()
 	_PopulateLanguages();
 	_PopulateKeymaps();
 
-	float spacing = be_control_look->DefaultItemSpacing();
-
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, 0)
-		.AddGroup(B_HORIZONTAL, spacing)
-			.AddGroup(B_VERTICAL, spacing)
-				.AddGroup(B_VERTICAL, spacing)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.AddGroup(B_HORIZONTAL)
+			.AddGroup(B_VERTICAL)
+				.AddGroup(B_VERTICAL)
 					.Add(fLanguagesLabelView)
 					.Add(languagesScrollView)
 				.End()
@@ -203,17 +199,17 @@ BootPromptWindow::BootPromptWindow()
 				.End()
 			.End()
 			.Add(fInfoTextView)
-			.SetInsets(spacing, spacing, spacing, spacing)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+				B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 		.End()
 		.Add(new BSeparatorView(B_HORIZONTAL))
-		.AddGroup(B_HORIZONTAL, spacing)
+		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
 			.Add(fInstallerButton)
 			.Add(fDesktopButton)
-			.SetInsets(spacing, spacing, spacing, spacing)
-		.End()
-		.View()
-	);
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING)
+		.End();
 
 	fLanguagesListView->MakeFocus();
 
