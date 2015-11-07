@@ -42,6 +42,7 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <ScrollView.h>
+#include <SeparatorView.h>
 #include <StringView.h>
 #include <TabView.h>
 #include <TextControl.h>
@@ -208,6 +209,7 @@ ConfigWindow::ConfigWindow()
 	fSaveSettings(false)
 {
 	BTabView* tabView = new BTabView("tab");
+	tabView->SetBorder(B_NO_BORDER);
 
 	// accounts listview
 
@@ -231,7 +233,8 @@ ConfigWindow::ConfigWindow()
 		false, true);
 
 	BLayoutBuilder::Group<>(view, B_HORIZONTAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 		.AddGroup(B_VERTICAL)
 			.Add(scroller)
 			.AddGroup(B_HORIZONTAL)
@@ -287,11 +290,13 @@ ConfigWindow::ConfigWindow()
 		editMenuButton->SetEnabled(false);
 
 	BLayoutBuilder::Group<>(view, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
-		.AddGlue()
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
+//		.AddGlue()
 		.AddGroup(B_HORIZONTAL, 0.f)
 			.AddGlue()
 			.Add(fCheckMailCheckBox)
+			.AddStrut(be_control_look->DefaultLabelSpacing())
 			.Add(fIntervalControl->CreateTextViewLayoutItem())
 			.AddStrut(be_control_look->DefaultLabelSpacing())
 			.Add(fIntervalControl->CreateLabelLayoutItem())
@@ -313,13 +318,16 @@ ConfigWindow::ConfigWindow()
 	BButton* revertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevertSettings));
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, B_USE_DEFAULT_SPACING, 0, B_USE_WINDOW_SPACING)
 		.Add(tabView)
-		.AddGroup(B_HORIZONTAL)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL, 0)
 			.Add(revertButton)
 			.AddGlue()
-			.Add(applyButton);
+			.Add(applyButton)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, 0);
 
 	_LoadSettings();
 		// this will also move our window to the stored position

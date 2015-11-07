@@ -524,7 +524,8 @@ NetworkTimeView::_InitView()
 			.Add(fResetButton)
 			.Add(fSynchronizeButton)
 		.End()
-		.SetInsets(B_USE_DEFAULT_SPACING);
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 

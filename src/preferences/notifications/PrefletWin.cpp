@@ -16,6 +16,7 @@
 #include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <Path.h>
+#include <SeparatorView.h>
 
 #include <notification/Notifications.h>
 
@@ -33,11 +34,12 @@ const int32 kApply = '_APY';
 PrefletWin::PrefletWin()
 	:
 	BWindow(BRect(0, 0, 1, 1), B_TRANSLATE_SYSTEM_NAME("Notifications"),
-		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_NOT_RESIZABLE
-		| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
+		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
+		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	// Preflet container view
 	fMainView = new PrefletView(this);
+	fMainView->SetBorder(B_NO_BORDER);
 
 	// Apply and revert buttons
 	fRevert = new BButton("revert", B_TRANSLATE("Revert"),
@@ -47,13 +49,16 @@ PrefletWin::PrefletWin()
 	fApply->SetEnabled(false);
 
 	// Build the layout
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0)
 		.Add(fMainView)
+		.Add(new BSeparatorView(B_HORIZONTAL))
 		.AddGroup(B_HORIZONTAL)
 			.Add(fRevert)
 			.AddGlue()
-			.Add(fApply);
+			.Add(fApply)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING);
 
 	ReloadSettings();
 

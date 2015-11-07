@@ -186,18 +186,18 @@ DateTimeView::_InitView()
 		B_WILL_DRAW | B_FRAME_EVENTS, B_FANCY_BORDER);
 	divider->SetExplicitMaxSize(BSize(1, B_SIZE_UNLIMITED));
 
-	const float kInset = be_control_look->DefaultItemSpacing();
-	BLayoutBuilder::Group<>(this)
-		.AddGroup(B_VERTICAL, kInset / 2)
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+		.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
 			.Add(fDateEdit)
 			.Add(fCalendarView)
 		.End()
 		.Add(divider)
-		.AddGroup(B_VERTICAL, 0)
+		.AddGroup(B_VERTICAL)
 			.Add(fTimeEdit)
 			.Add(fClock)
 		.End()
-		.SetInsets(kInset, kInset, kInset, kInset);
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 

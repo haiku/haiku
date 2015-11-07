@@ -16,6 +16,7 @@
 #include <LayoutBuilder.h>
 #include <Message.h>
 #include <Screen.h>
+#include <SeparatorView.h>
 #include <TabView.h>
 
 #include "BaseView.h"
@@ -129,6 +130,7 @@ TTimeWindow::_InitWindow()
 	fTabView->AddTab(fTimeZoneView);
 	fTabView->AddTab(fNetworkTimeView);
 	fTabView->AddTab(fClockView);
+	fTabView->SetBorder(B_NO_BORDER);
 
 	fBaseView->AddChild(fTabView);
 
@@ -139,10 +141,14 @@ TTimeWindow::_InitWindow()
 	fRevertButton->SetExplicitAlignment(
 		BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, B_USE_DEFAULT_SPACING, 0, 0)
 		.Add(fBaseView)
-		.Add(fRevertButton);
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL)
+			.Add(fRevertButton)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, B_USE_WINDOW_SPACING);
 }
 
 

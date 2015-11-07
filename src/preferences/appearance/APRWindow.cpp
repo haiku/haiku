@@ -16,6 +16,7 @@
 #include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Messenger.h>
+#include <SeparatorView.h>
 #include <TabView.h>
 
 #include "AntialiasingSettingsView.h"
@@ -61,15 +62,19 @@ APRWindow::APRWindow(BRect frame)
 	tabView->AddTab(fColorsView);
 	tabView->AddTab(fLookAndFeelSettings);
 	tabView->AddTab(fAntialiasingSettings);
+	tabView->SetBorder(B_NO_BORDER);
 
 	_UpdateButtons();
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING)
 		.Add(tabView)
+		.Add(new BSeparatorView(B_HORIZONTAL))
 		.AddGroup(B_HORIZONTAL)
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_DEFAULT_SPACING, 0)
 			.AddGlue();
 }
 

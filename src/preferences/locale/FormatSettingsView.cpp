@@ -227,17 +227,13 @@ FormatSettingsView::FormatSettingsView()
 		.Add(BSpaceLayoutItem::CreateGlue(), 2, 1)
 		.View());
 
-	BGroupLayout* rootLayout = new BGroupLayout(B_VERTICAL, spacing);
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLayout(rootLayout);
-	BLayoutBuilder::Group<>(rootLayout)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(fUseLanguageStringsCheckBox)
 		.Add(fDateBox)
 		.Add(fTimeBox)
 		.AddGroup(B_HORIZONTAL, spacing)
 			.Add(fNumberBox)
 			.Add(fMonetaryBox)
-			.AddGlue()
 			.End()
 		.AddGlue();
 }

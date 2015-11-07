@@ -21,8 +21,6 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
 #include <InterfaceDefs.h>
 #include <LayoutBuilder.h>
 #include <Locale.h>
@@ -95,7 +93,7 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 		.AddGroup(B_VERTICAL, 1)
 			.Add(new BStringView("single", B_TRANSLATE("Single:")))
 			.Add(fArrowStyleSingle)
-			.Add(new BStringView("spacer", ""))
+			.AddStrut(B_USE_DEFAULT_SPACING)
 			.Add(new BStringView("double", B_TRANSLATE("Double:")))
 			.Add(fArrowStyleDouble)
 			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
@@ -105,32 +103,23 @@ LookAndFeelSettingsView::LookAndFeelSettingsView(const char* name)
 	arrowStyleBox->AddChild(arrowStyleView);
 	arrowStyleBox->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_CENTER));
+	arrowStyleBox->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	BStringView* scrollBarLabel
 		= new BStringView("scroll bar", B_TRANSLATE("Scroll bar:"));
 	scrollBarLabel->SetExplicitAlignment(
 		BAlignment(B_ALIGN_LEFT, B_ALIGN_TOP));
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	// control layout
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_DEFAULT_SPACING)
-		.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
-			.Add(BGridLayoutBuilder(B_USE_DEFAULT_SPACING,
-					B_USE_DEFAULT_SPACING)
-				.Add(fDecorMenuField->CreateLabelLayoutItem(), 0, 0)
-		        .Add(fDecorMenuField->CreateMenuBarLayoutItem(), 1, 0)
-				.Add(fDecorInfoButton, 2, 0)
-			)
-			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
-				.Add(scrollBarLabel)
-				.Add(arrowStyleBox)
-			.End()
-			.AddGlue()
-		.End()
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-	);
+	BLayoutBuilder::Grid<>(this, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+		.Add(fDecorMenuField->CreateLabelLayoutItem(), 0, 0)
+        .Add(fDecorMenuField->CreateMenuBarLayoutItem(), 1, 0)
+		.Add(fDecorInfoButton, 2, 0)
+		.Add(scrollBarLabel, 0, 1)
+		.Add(arrowStyleBox, 1, 1)
+		.AddGlue(0, 2)
+		.SetInsets(B_USE_WINDOW_SPACING);
+
 	// TODO : Decorator Preview Image?
 }
 

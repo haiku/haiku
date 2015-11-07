@@ -67,7 +67,8 @@ ClockView::ClockView(const char* name)
 		.AddGroup(B_VERTICAL, 0)
 			.Add(showClockBox)
 		.End()
-		.SetInsets(B_USE_DEFAULT_SPACING);
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 

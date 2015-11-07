@@ -11,6 +11,7 @@
 #include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuItem.h>
 #include <MenuField.h>
@@ -81,8 +82,6 @@ SettingsWindow::SettingsWindow(BRect frame, SettingsMessage* settings)
 			| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE),
 	fSettings(settings)
 {
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	fApplyButton = new BButton(B_TRANSLATE("Apply"), new BMessage(MSG_APPLY));
 	fCancelButton = new BButton(B_TRANSLATE("Cancel"),
 		new BMessage(MSG_CANCEL));
@@ -92,17 +91,19 @@ SettingsWindow::SettingsWindow(BRect frame, SettingsMessage* settings)
 	float spacing = be_control_look->DefaultItemSpacing();
 
 	BTabView* tabView = new BTabView("settings pages", B_WIDTH_FROM_LABEL);
+	tabView->SetBorder(B_NO_BORDER);
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, B_USE_DEFAULT_SPACING, 0, B_USE_WINDOW_SPACING)
 		.Add(tabView)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, 0)
 			.Add(fRevertButton)
 			.AddGlue()
 			.Add(fCancelButton)
-			.Add(fApplyButton)
-		)
-		.SetInsets(spacing, spacing, spacing, spacing)
-	);
+			.Add(fApplyButton);
 
 	tabView->AddTab(_CreateGeneralPage(spacing));
 	tabView->AddTab(_CreateFontsPage(spacing));
@@ -484,6 +485,7 @@ SettingsWindow::_CreateProxyPage(float spacing)
 			.Add(fProxyPortControl->CreateLabelLayoutItem(), 0, 1)
 			.Add(fProxyPortControl->CreateTextViewLayoutItem(), 1, 1)
 		)
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing))
 		.Add(fUseProxyAuthCheckBox)
 		.Add(BGridLayoutBuilder(spacing / 2, spacing / 2)
 			.Add(fProxyUsernameControl->CreateLabelLayoutItem(), 0, 0)
