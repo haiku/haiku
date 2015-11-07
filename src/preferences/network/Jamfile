@@ -34,6 +34,8 @@ Preference Network :
 DoCatalogs Network :
 	x-vnd.Haiku-Network
 	:
+	InterfaceListItem.cpp
+	InterfaceView.cpp
 	Network.cpp
 	NetworkWindow.cpp
 	NetworkProfile.cpp
