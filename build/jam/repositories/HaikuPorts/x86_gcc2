@@ -596,7 +596,7 @@ RemotePackageRepository HaikuPorts
 	faad2_x86_devel-2.7-1
 	file_x86-5.15-1
 	file_x86_devel-5.15-1
-	fish_x86-1.23.1_git-1
+	fish_x86-2.2.0-2
 	ffmpeg_x86-0.11.5-2
 	ffmpeg_x86_devel-0.11.5-2
 	fftw_x86-3.3.4-6
