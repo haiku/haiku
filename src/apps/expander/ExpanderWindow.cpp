@@ -102,35 +102,33 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 
 	const float spacing = be_control_look->DefaultItemSpacing();
 	BGroupLayout* pathLayout;
-	BLayoutBuilder::Group<>(this, B_VERTICAL, 0.0)
-		.SetInsets(0.0)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(fBar)
-		.AddGroup(B_VERTICAL, spacing)
-			.AddGroup(B_HORIZONTAL, spacing)
-				.AddGroup(B_VERTICAL, 5.0)
-					.Add(fSourceButton)
-					.Add(fDestButton)
-					.Add(fExpandButton)
+		.AddGroup(B_VERTICAL, B_USE_ITEM_SPACING)
+			.AddGroup(B_HORIZONTAL, B_USE_ITEM_SPACING)
+				.Add(fSourceButton)
+				.Add(fSourceText = new BTextControl(NULL, NULL,
+					new BMessage(MSG_SOURCETEXT)))
 				.End()
-				.AddGroup(B_VERTICAL, spacing)
-					.Add(fSourceText = new BTextControl(NULL, NULL,
-						new BMessage(MSG_SOURCETEXT)))
-					.Add(fDestText = new BTextControl(NULL, NULL,
-						new BMessage(MSG_DESTTEXT)))
-					.AddGroup(B_HORIZONTAL, spacing)
-						.GetLayout(&pathLayout)
-						.Add(fShowContents = new BCheckBox(
-							B_TRANSLATE("Show contents"),
-							new BMessage(MSG_SHOWCONTENTS)))
-						.Add(fStatusView = new BStringView(NULL,
-								statusPlaceholderString))
+			.AddGroup(B_HORIZONTAL, B_USE_ITEM_SPACING)
+				.Add(fDestButton)
+				.Add(fDestText = new BTextControl(NULL, NULL,
+					new BMessage(MSG_DESTTEXT)))
+				.End()
+			.AddGroup(B_HORIZONTAL, B_USE_ITEM_SPACING)
+				.Add(fExpandButton)
+				.AddGroup(B_HORIZONTAL, B_USE_ITEM_SPACING)
+					.GetLayout(&pathLayout)
+					.Add(fShowContents = new BCheckBox(
+						B_TRANSLATE("Show contents"),
+						new BMessage(MSG_SHOWCONTENTS)))
+					.Add(fStatusView = new BStringView(NULL,
+						statusPlaceholderString))
 					.End()
 				.End()
-			.End()
 			.Add(fScrollView)
-			.SetInsets(spacing, spacing, spacing, spacing)
-		.End()
-	.End();
+			.SetInsets(B_USE_WINDOW_SPACING)
+			.End();
 
 	pathLayout->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	size = GetLayout()->View()->PreferredSize();
@@ -140,6 +138,8 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	SetSizeLimits(size.Width(), 32767.0f, fSizeLimit, fSizeLimit);
 	SetZoomLimits(Bounds().Width(), fSizeLimit);
 	fPreviousHeight = -1;
+
+	fScrollView->Hide();
 
 	Show();
 }
@@ -309,9 +309,12 @@ ExpanderWindow::MessageReceived(BMessage* message)
 				if (fListingStarted)
 					StopListing();
 
+				fScrollView->Hide();
 				_UpdateWindowSize(false);
-			} else
+			} else {
+				fScrollView->Show();
 				StartListing();
+			}
 			break;
 
 		case MSG_SOURCETEXT:

@@ -21,6 +21,7 @@
 #include <Path.h>
 #include <RadioButton.h>
 #include <Screen.h>
+#include <SeparatorView.h>
 #include <StringView.h>
 #include <TextControl.h>
 
@@ -50,13 +51,6 @@ ExpanderPreferences::ExpanderPreferences(BMessage* settings)
 	fUsePanel(NULL)
 {
 	const float kSpacing = be_control_look->DefaultItemSpacing();
-
-	BBox* settingsBox = new BBox(B_PLAIN_BORDER, NULL);
-	BGroupLayout* settingsLayout = new BGroupLayout(B_VERTICAL, kSpacing / 2);
-	settingsBox->SetLayout(settingsLayout);
-	BBox* buttonBox = new BBox(B_PLAIN_BORDER, NULL);
-	BGroupLayout* buttonLayout = new BGroupLayout(B_HORIZONTAL, kSpacing / 2);
-	buttonBox->SetLayout(buttonLayout);
 
 	BStringView* expansionLabel = new BStringView("stringViewExpansion",
 		B_TRANSLATE("Expansion"));
@@ -103,53 +97,49 @@ ExpanderPreferences::ExpanderPreferences(BMessage* settings)
 
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
-		.AddGroup(settingsLayout)
-			.AddGroup(B_HORIZONTAL)
-				.Add(expansionLabel)
-				.AddGlue()
-			.End()
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+				B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
+			.Add(expansionLabel)
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fAutoExpand)
 				.Add(fCloseWindow)
-				.SetInsets(kSpacing, 0, 0, 0)
-			.End()
-			.AddGroup(B_HORIZONTAL, 0)
-				.Add(destinationLabel)
 				.AddGlue()
-				.SetInsets(0, kSpacing, 0, 0)
-			.End()
+				.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING, 0,
+					B_USE_ITEM_SPACING)
+				.End()
+			.Add(destinationLabel)
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fLeaveDest)
 				.Add(fSameDest)
 				.Add(fDestUse)
 				.AddGroup(B_HORIZONTAL, 0)
 					.Add(fDestText, 0.8)
-					.AddStrut(be_control_look->DefaultLabelSpacing())
+					.AddStrut(B_USE_ITEM_SPACING)
 					.Add(fSelect, 0.2)
-					.SetInsets(kSpacing * 2, 0, kSpacing / 2, 0)
-				.End()
-				.SetInsets(kSpacing, 0, 0, 0)
-			.End()
-			.AddGroup(B_HORIZONTAL, 0)
-				.Add(otherLabel)
+					.SetInsets(kSpacing * 2, 0, 0, 0)
+					.End()
 				.AddGlue()
-				.SetInsets(0, kSpacing / 2, 0, 0)
-			.End()
+				.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING, 0,
+					B_USE_ITEM_SPACING)
+				.End()
+			.Add(otherLabel)
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fOpenDest)
 				.Add(fAutoShow)
-				.SetInsets(kSpacing, 0, 0, 0)
-			.End()
-			.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
-		.End()
-		.AddGroup(buttonLayout)
-			.AddGroup(B_HORIZONTAL, kSpacing)
 				.AddGlue()
-				.Add(cancel)
-				.Add(okbutton)
+				.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING, 0, 0)
+				.End()
 			.End()
-			.SetInsets(kSpacing, kSpacing, kSpacing, kSpacing)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
+			.SetInsets(0, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING)
+			.AddGlue()
+			.Add(cancel)
+			.Add(okbutton)
 		.End();
+
 
 	fDestText->SetExplicitAlignment(
 		BAlignment(B_ALIGN_HORIZONTAL_UNSET, B_ALIGN_VERTICAL_CENTER));
