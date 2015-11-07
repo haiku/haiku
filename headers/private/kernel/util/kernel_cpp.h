@@ -22,65 +22,6 @@ extern const nothrow_t std::nothrow;
 typedef struct {} mynothrow_t;
 extern const mynothrow_t mynothrow;
 
-
-inline void *
-operator new(size_t size) throw (std::bad_alloc)
-{
-	// we don't actually throw any exceptions, but we have to
-	// keep the prototype as specified in <new>, or else GCC 3
-	// won't like us
-	return malloc(size);
-}
-
-
-inline void *
-operator new[](size_t size) throw (std::bad_alloc)
-{
-	return malloc(size);
-}
-
-
-inline void *
-operator new(size_t size, const std::nothrow_t &) throw ()
-{
-	return malloc(size);
-}
-
-
-inline void *
-operator new[](size_t size, const std::nothrow_t &) throw ()
-{
-	return malloc(size);
-}
-
-
-inline void *
-operator new(size_t size, const mynothrow_t &) throw ()
-{
-	return malloc(size);
-}
-
-
-inline void *
-operator new[](size_t size, const mynothrow_t &) throw ()
-{
-	return malloc(size);
-}
-
-
-inline void
-operator delete(void *ptr) throw ()
-{
-	free(ptr);
-}
-
-
-inline void
-operator delete[](void *ptr) throw ()
-{
-	free(ptr);
-}
-
 #endif	// #if _KERNEL_MODE
 
 #endif	// __cplusplus
