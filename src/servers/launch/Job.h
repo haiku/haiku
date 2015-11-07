@@ -20,6 +20,7 @@
 
 using namespace BSupportKit;
 class BMessage;
+class BMessenger;
 
 class Finder;
 class Job;
@@ -90,6 +91,7 @@ public:
 			void				SetLaunching(bool launching);
 
 			status_t			HandleGetLaunchData(BMessage* message);
+			status_t			GetMessenger(BMessenger& messenger);
 
 	virtual	status_t			Run();
 

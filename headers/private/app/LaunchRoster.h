@@ -34,6 +34,9 @@ public:
 									const BMessage* data = NULL,
 									const char* baseName = NULL);
 
+			status_t			Start(const char* name);
+			status_t			Stop(const char* name, bool force = false);
+
 			status_t			StartSession(const char* login);
 
 			status_t			RegisterEvent(const BMessenger& source,
@@ -56,6 +59,9 @@ private:
 	friend class Private;
 
 			void				_InitMessenger();
+			status_t			_SendRequest(BMessage& request);
+			status_t			_SendRequest(BMessage& request,
+									BMessage& reply);
 			status_t			_UpdateEvent(uint32 what,
 									const BMessenger& source, const char* name,
 									uint32 flags = 0);

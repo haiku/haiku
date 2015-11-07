@@ -26,6 +26,8 @@ namespace BPrivate {
 enum {
 	B_GET_LAUNCH_DATA			= 'lnda',
 	B_LAUNCH_TARGET				= 'lntg',
+	B_LAUNCH_JOB				= 'lnjo',
+	B_STOP_LAUNCH_JOB			= 'lnsj',
 	B_LAUNCH_SESSION			= 'lnse',
 	B_REGISTER_SESSION_DAEMON	= 'lnrs',
 	B_REGISTER_LAUNCH_EVENT		= 'lnre',

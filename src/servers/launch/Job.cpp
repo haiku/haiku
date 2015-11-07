@@ -13,6 +13,7 @@
 #include <Message.h>
 #include <Roster.h>
 
+#include <MessagePrivate.h>
 #include <RosterPrivate.h>
 #include <user_group.h>
 
@@ -43,6 +44,7 @@ Job::Job(const Job& other)
 	fEnabled(other.IsEnabled()),
 	fService(other.IsService()),
 	fCreateDefaultPort(other.CreateDefaultPort()),
+	fLaunching(other.IsLaunching()),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
 	fLaunchStatus(B_NO_INIT),
@@ -380,7 +382,7 @@ bool
 Job::CanBeLaunched() const
 {
 	// Services cannot be launched while they are running
-	return !IsLaunching() && (!IsService() || !IsRunning());
+	return IsEnabled() && !IsLaunching() && (!IsService() || !IsRunning());
 }
 
 
@@ -406,6 +408,30 @@ Job::HandleGetLaunchData(BMessage* message)
 		return _SendLaunchDataReply(message);
 
 	return fPendingLaunchDataReplies.AddItem(message) ? B_OK : B_NO_MEMORY;
+}
+
+
+status_t
+Job::GetMessenger(BMessenger& messenger)
+{
+	PortMap::const_iterator iterator = fPortMap.begin();
+	for (; iterator != fPortMap.end(); iterator++) {
+		if (iterator->second.HasString("name"))
+			continue;
+
+		port_id port = (port_id)iterator->second.GetInt32("port", -1);
+		if (port >= 0) {
+			BMessenger::Private(messenger).SetTo(fTeam, port,
+				B_PREFERRED_TOKEN);
+			return B_OK;
+		}
+	}
+
+	// There is no default port, try roster via signature
+	BString signature = "application/";
+	signature << Name();
+
+	return messenger.SetTo(signature);
 }
 
 

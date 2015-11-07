@@ -153,6 +153,8 @@ public:
 private:
 			void				_HandleGetLaunchData(BMessage* message);
 			void				_HandleLaunchTarget(BMessage* message);
+			void				_HandleLaunchJob(BMessage* message);
+			void				_HandleStopLaunchJob(BMessage* message);
 			void				_HandleLaunchSession(BMessage* message);
 			void				_HandleRegisterSessionDaemon(BMessage* message);
 			void				_HandleRegisterLaunchEvent(BMessage* message);
@@ -179,6 +181,7 @@ private:
 			void				_LaunchJobs(Target* target,
 									bool forceNow = false);
 			void				_LaunchJob(Job* job, uint32 options = 0);
+			void				_StopJob(Job* job, bool force);
 			void				_AddTarget(Target* target);
 			void				_SetCondition(BaseJob* job,
 									const BMessage& message);
@@ -501,11 +504,16 @@ LaunchDaemon::MessageReceived(BMessage* message)
 		case B_LAUNCH_TARGET:
 			_HandleLaunchTarget(message);
 			break;
+		case B_LAUNCH_JOB:
+			_HandleLaunchJob(message);
+			break;
+		case B_STOP_LAUNCH_JOB:
+			_HandleStopLaunchJob(message);
+			break;
 
 		case B_LAUNCH_SESSION:
 			_HandleLaunchSession(message);
 			break;
-
 		case B_REGISTER_SESSION_DAEMON:
 			_HandleRegisterSessionDaemon(message);
 			break;
@@ -513,15 +521,12 @@ LaunchDaemon::MessageReceived(BMessage* message)
 		case B_REGISTER_LAUNCH_EVENT:
 			_HandleRegisterLaunchEvent(message);
 			break;
-
 		case B_UNREGISTER_LAUNCH_EVENT:
 			_HandleUnregisterLaunchEvent(message);
 			break;
-
 		case B_NOTIFY_LAUNCH_EVENT:
 			_HandleNotifyLaunchEvent(message);
 			break;
-
 		case B_RESET_STICKY_LAUNCH_EVENT:
 			_HandleResetStickyLaunchEvent(message);
 			break;
@@ -784,6 +789,67 @@ LaunchDaemon::_HandleLaunchTarget(BMessage* message)
 		target->AddData(data.GetString("name"), data);
 
 	_LaunchJobs(target);
+}
+
+
+void
+LaunchDaemon::_HandleLaunchJob(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	const char* name = message->GetString("name");
+
+	Job* job = FindJob(name);
+	if (job == NULL) {
+		Session* session = FindSession(user);
+		if (session != NULL) {
+			// Forward request to user launch_daemon
+			if (session->Daemon().SendMessage(message) == B_OK)
+				return;
+		}
+
+		BMessage reply(B_NAME_NOT_FOUND);
+		message->SendReply(&reply);
+		return;
+	}
+
+	job->SetEnabled(true);
+	_LaunchJob(job, FORCE_NOW);
+
+	BMessage reply((uint32)B_OK);
+	message->SendReply(&reply);
+}
+
+
+void
+LaunchDaemon::_HandleStopLaunchJob(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	const char* name = message->GetString("name");
+
+	Job* job = FindJob(name);
+	if (job == NULL) {
+		Session* session = FindSession(user);
+		if (session != NULL) {
+			// Forward request to user launch_daemon
+			if (session->Daemon().SendMessage(message) == B_OK)
+				return;
+		}
+
+		BMessage reply(B_NAME_NOT_FOUND);
+		message->SendReply(&reply);
+		return;
+	}
+
+	_StopJob(job, message->GetBool("force"));
+
+	BMessage reply((uint32)B_OK);
+	message->SendReply(&reply);
 }
 
 
@@ -1312,6 +1378,33 @@ LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 		debug_printf("Adding job %s to queue failed: %s\n", job->Name(),
 			strerror(status));
 	}
+}
+
+
+void
+LaunchDaemon::_StopJob(Job* job, bool force)
+{
+	// TODO: find out which jobs require this job, and don't stop if any,
+	// unless force, and then stop them all.
+	job->SetEnabled(false);
+
+	if (!job->IsRunning())
+		return;
+
+	// Be nice first, and send a simple quit message
+	BMessenger messenger;
+	if (job->GetMessenger(messenger) == B_OK) {
+		BMessage request(B_QUIT_REQUESTED);
+		messenger.SendMessage(&request);
+
+		// TODO: wait a bit before going further
+		return;
+	}
+	// TODO: allow custom shutdown
+
+	send_signal(-job->Team(), SIGINT);
+	// TODO: this would be the next step, again, after a delay
+	//send_signal(job->Team(), SIGKILL);
 }
 
 
