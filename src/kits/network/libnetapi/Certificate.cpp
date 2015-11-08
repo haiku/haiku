@@ -60,7 +60,7 @@ BCertificate::BCertificate(Private* data)
 
 BCertificate::BCertificate(const BCertificate& other)
 {
-	fPrivate = new<std::nothrow>BCertificate::Private(other.fPrivate);
+	fPrivate = new(std::nothrow) BCertificate::Private(other.fPrivate);
 }
 
 
@@ -153,7 +153,7 @@ BCertificate::String() const
 bool
 BCertificate::operator==(const BCertificate& other)
 {
-	return X509_cmp(fPrivate.fX509, other.fPrivate.fX509) == 0;
+	return X509_cmp(fPrivate->fX509, other.fPrivate->fX509) == 0;
 }
 
 
@@ -168,7 +168,7 @@ BCertificate::Private::Private(X509* data)
 
 BCertificate::Private::~Private()
 {
-	sk_X509_pop_free(chain, X509_free)
+	sk_X509_pop_free(fX509, X509_free);
 }
 
 
