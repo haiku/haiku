@@ -318,6 +318,37 @@ probe_ports()
 }
 
 
+static status_t
+assign_pipes()
+{
+	uint32 assigned = 0;
+
+	// TODO: At some point we should "group" ports to pipes with the same mode.
+	// You can drive multiple ports from a single pipe as long as the mode is
+	// the same.
+
+    for (uint32 i = 0; i < gInfo->port_count; i++) {
+        if (gInfo->ports[i] == NULL)
+            continue;
+		if (gInfo->ports[i]->IsConnected()) {
+			pipe_index currentPipe = INTEL_PIPE_A;
+			if (assigned == 1)
+				currentPipe = INTEL_PIPE_B;
+			else if (assigned > 2) {
+				ERROR("%s: No pipes left to assign to port %s!\n", __func__,
+					gInfo->ports[i]->PortName());
+				continue;
+			}
+
+			gInfo->ports[i]->AssignPipe(currentPipe);
+			assigned++;
+		}
+    }
+
+	return B_OK;
+}
+
+
 //	#pragma mark - public accelerant functions
 
 
@@ -349,6 +380,11 @@ intel_init_accelerant(int device)
 
 	if (status != B_OK)
 		ERROR("Warning: zero active displays were found!\n");
+
+	status = assign_pipes();
+
+	if (status != B_OK)
+		ERROR("Warning: error while assigning pipes!\n");
 
 	status = create_mode_list();
 	if (status != B_OK) {

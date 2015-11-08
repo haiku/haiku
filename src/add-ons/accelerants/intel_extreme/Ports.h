@@ -12,6 +12,7 @@
 
 #include <edid.h>
 
+#include "DisplayPipe.h"
 #include "intel_extreme.h"
 #include "pll.h"
 
@@ -39,14 +40,6 @@ enum port_index {
 };
 
 
-// TODO: This likely should go in some pipe header
-enum pipe_index {
-	INTEL_PIPE_ANY,
-	INTEL_PIPE_A,
-	INTEL_PIPE_B
-};
-
-
 class Port {
 public:
 									Port(port_index index,
@@ -60,12 +53,9 @@ virtual	uint32						Type() const = 0;
 		port_index					PortIndex() const
 										{ return fPortIndex; }
 
-		pipe_index					PipeIndex() const
-										{ return fPipeIndex; }
-
 virtual	bool						IsConnected() = 0;
 
-		void						PipeSelect(pipe_index pipeIndex);
+		status_t					AssignPipe(pipe_index pipeIndex);
 
 		bool						HasEDID();
 virtual	status_t					GetEDID(edid1_info* edid,
@@ -93,7 +83,7 @@ virtual addr_t						_PortRegister() = 0;
 		port_index					fPortIndex;
 		char*						fPortName;
 
-		pipe_index					fPipeIndex;
+		DisplayPipe*				fDisplayPipe;
 
 		status_t					fEDIDState;
 		edid1_info					fEDIDInfo;
@@ -179,7 +169,7 @@ virtual	uint32						Type() const
 virtual	bool						IsConnected();
 
 protected:
-virtual	uint32						_PortRegister();
+virtual	addr_t						_PortRegister();
 };
 
 

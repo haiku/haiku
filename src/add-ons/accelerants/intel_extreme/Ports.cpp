@@ -21,6 +21,8 @@
 #include "accelerant_protos.h"
 #include "intel_extreme.h"
 
+#include <new>
+
 
 #undef TRACE
 #define TRACE_PORTS
@@ -38,7 +40,7 @@ Port::Port(port_index index, const char* baseName)
 	:
 	fPortIndex(index),
 	fPortName(NULL),
-	fPipeIndex(INTEL_PIPE_ANY),
+	fDisplayPipe(NULL),
 	fEDIDState(B_NO_INIT)
 {
 	char portID[2];
@@ -71,8 +73,8 @@ Port::HasEDID()
 }
 
 
-void
-Port::PipeSelect(pipe_index pipeIndex)
+status_t
+Port::AssignPipe(pipe_index pipeIndex)
 {
     CALLED();
 
@@ -80,7 +82,7 @@ Port::PipeSelect(pipe_index pipeIndex)
 	if (portRegister == 0) {
 		ERROR("%s: Invalid PortRegister ((0x%" B_PRIx32 ") for %s\n", __func__,
 			portRegister, PortName());
-		return;
+		return B_ERROR;
 	}
 
 	TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe %s\n", __func__,
@@ -93,8 +95,14 @@ Port::PipeSelect(pipe_index pipeIndex)
     else
         write32(portRegister, portState | DISPLAY_MONITOR_PIPE_B);
 
-	fPipeIndex = pipeIndex;
+	fDisplayPipe = new(std::nothrow) DisplayPipe(pipeIndex);
+
+	if (fDisplayPipe == NULL)
+		return B_NO_MEMORY;
+
 	read32(portRegister);
+
+	return B_OK;
 }
 
 
@@ -730,7 +738,7 @@ HDMIPort::IsConnected()
 		return false;
 
 	addr_t portRegister = _PortRegister();
-	TRACE("%s - %d: PortRegister: %" B_PRIx32 "\n", PortName(), PortIndex(),
+	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
 		portRegister);
 
 	if (portRegister == 0)

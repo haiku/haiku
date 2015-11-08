@@ -18,7 +18,7 @@ Addon intel_extreme.accelerant :
 #	overlay_3d_i965.cpp
 	pll.cpp
 	# classes
-#	DisplayPipe.cpp
+	DisplayPipe.cpp
 #	FlexibleDisplayInterface.cpp
 #	PanelFitter.cpp
 	Ports.cpp
