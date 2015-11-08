@@ -1365,11 +1365,11 @@ int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
 	UNLOCK(&ns->l);
 reuse:
 	/* put the chocolate on the cookie */
+	c->node = qn;
 	LOCK(&qn->l);
 	SLL_INSERT(qn->opened, next, c);
 	UNLOCK(&qn->l);
 	qn->qcompleted = 1; /* tell other cookies we're done */
-	c->node = qn;
 	*cookie = c;
 	free(qstring);
 	return B_OK;
