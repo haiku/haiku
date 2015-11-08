@@ -787,7 +787,7 @@ else
 		if [ $useClang = 1 ]; then
 			target=${crossToolsPrefix##*/}
 			target=${target%-}
-			gcc="clang -target ${target}"
+			gcc="clang -target ${target} -no-integrated-as"
 		else
 			gcc="${crossToolsPrefix}gcc"
 		fi
