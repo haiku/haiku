@@ -24,8 +24,6 @@ BTranslator::BTranslator()
 
 BTranslator::~BTranslator()
 {
-	if (fOwningRoster != NULL)
-		fOwningRoster->TranslatorDeleted(fID);
 }
 
 
@@ -52,10 +50,24 @@ BTranslator *BTranslator::Acquire()
 BTranslator *BTranslator::Release()
 {
 	int32 oldValue = atomic_add(&fRefCount, -1);
-	if (oldValue > 0)
+	if (oldValue > 1)
 		return this;
 
-	delete this;
+	if (fOwningRoster == NULL) {
+		delete this;
+		return NULL;
+	}
+
+	// If we have ever been part of a roster, notify the roster to delete us
+	// and unload our image in a thread-safe way
+	BMessage deleteRequest(B_DELETE_TRANSLATOR);
+
+	deleteRequest.AddPointer("ptr", this);
+	deleteRequest.AddInt32("id", fID);
+
+	BMessenger sender(fOwningRoster);
+	sender.SendMessage(&deleteRequest);
+
 	return NULL;
 }
 

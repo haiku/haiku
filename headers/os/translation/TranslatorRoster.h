@@ -23,6 +23,17 @@ class BView;
 struct entry_ref;
 
 
+class BTranslatorReleaseDelegate {
+public:
+								BTranslatorReleaseDelegate(BTranslator* translator);
+
+			void				Release();
+
+private:
+			BTranslator*		fUnderlying;
+};
+
+
 class BTranslatorRoster : public BArchivable {
 public:
 								BTranslatorRoster();
@@ -85,6 +96,8 @@ public:
 	virtual	status_t			GetConfigurationMessage(
 									translator_id translatorID,
 									BMessage* ioExtension);
+
+			BTranslatorReleaseDelegate*	AcquireTranslator(int32 translatorID);
 
 			status_t			GetRefFor(translator_id translatorID,
 									entry_ref* ref);

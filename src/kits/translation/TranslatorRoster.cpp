@@ -193,9 +193,6 @@ BTranslatorRoster::Private::~Private()
 	while (iterator != fTranslators.end()) {
 		BTranslator* translator = iterator->second.translator;
 
-		translator->fOwningRoster = NULL;
-			// we don't want to be notified about this anymore
-
 		images.insert(iterator->second.image);
 		translator->Release();
 
@@ -314,6 +311,19 @@ BTranslatorRoster::Private::MessageReceived(BMessage* message)
 						_RemoveTranslators(&nodeRef);
 					break;
 				}
+			}
+			break;
+		}
+
+		case B_DELETE_TRANSLATOR:
+		{
+			// A translator's refcount has been reduced to zero and it wants
+			// us to delete it.
+			int32 id;
+			void* self;
+			if (message->FindInt32("id", &id) == B_OK
+				&& message->FindPointer("ptr", &self) == B_OK) {
+				_TranslatorDeleted(id, (BTranslator*)self);
 			}
 			break;
 		}
@@ -592,6 +602,7 @@ BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref,
 			if (AddTranslator(translator, image, &ref, nodeRef.node) == B_OK) {
 				if (update)
 					update->AddInt32("translator_id", translator->fID);
+				fImageOrigins.insert(std::make_pair(translator, image));
 				count++;
 				created++;
 			} else {
@@ -600,8 +611,12 @@ BTranslatorRoster::Private::CreateTranslators(const entry_ref& ref,
 			}
 		}
 
-		if (created == 0)
+		if (created == 0) {
 			unload_add_on(image);
+		} else {
+			// Initial refcount for the image that was just loaded
+			fKnownImages.insert(std::make_pair(image, created));
+		}
 
 		quarantine.Remove();
 		return B_OK;
@@ -850,17 +865,26 @@ BTranslatorRoster::Private::GetRefFor(translator_id id, entry_ref& ref)
 
 
 void
-BTranslatorRoster::Private::TranslatorDeleted(translator_id id)
+BTranslatorRoster::Private::_TranslatorDeleted(translator_id id, BTranslator* self)
 {
 	BAutolock locker(this);
 
 	TranslatorMap::iterator iterator = fTranslators.find(id);
-	if (iterator == fTranslators.end())
-		return;
+	if (iterator != fTranslators.end())
+		fTranslators.erase(iterator);
 
-	fTranslators.erase(iterator);
+	image_id image = fImageOrigins[self];
+
+	delete self;
+
+	int32 former = atomic_add(&fKnownImages[image], -1);
+	if (former == 1)
+	{
+		unload_add_on(image);
+		fImageOrigins.erase(self);
+		fKnownImages.erase(image);
+	}
 }
-
 
 /*static*/ int
 BTranslatorRoster::Private::_CompareSupport(const void* _a, const void* _b)
@@ -1073,9 +1097,6 @@ BTranslatorRoster::Private::_RemoveTranslators(const node_ref* nodeRef,
 		if ((ref != NULL && item.ref == *ref)
 			|| (nodeRef != NULL && item.ref.device == nodeRef->device
 				&& item.node == nodeRef->node)) {
-			item.translator->fOwningRoster = NULL;
-				// if the translator is busy, we don't want to be notified
-				// about the removal later on
 			item.translator->Release();
 			image = item.image;
 			update.AddInt32("translator_id", iterator->first);
@@ -1085,11 +1106,6 @@ BTranslatorRoster::Private::_RemoveTranslators(const node_ref* nodeRef,
 
 		iterator = next;
 	}
-
-	// Unload image from the removed translator
-
-	if (image >= B_OK)
-		unload_add_on(image);
 
 	_NotifyListeners(update);
 }
@@ -1149,6 +1165,21 @@ BTranslatorRoster::Private::_NotifyListeners(BMessage& update) const
 
 
 //	#pragma mark -
+
+BTranslatorReleaseDelegate::BTranslatorReleaseDelegate(BTranslator* translator)
+	:
+	fUnderlying(translator)
+{
+}
+
+
+void
+BTranslatorReleaseDelegate::Release()
+{
+	fUnderlying->Release();
+	// ReleaseDelegate is only allowed to release a translator once.
+	delete this;
+}
 
 
 BTranslatorRoster::BTranslatorRoster()
@@ -1662,6 +1693,20 @@ BTranslatorRoster::MakeConfigurationView(translator_id id,
 		return B_NO_TRANSLATOR;
 
 	return translator->MakeConfigurationView(ioExtension, _view, _extent);
+}
+
+
+BTranslatorReleaseDelegate*
+BTranslatorRoster::AcquireTranslator(int32 id)
+{
+	BAutolock locker(fPrivate);
+
+	BTranslator* translator = fPrivate->FindTranslator(id);
+	if (translator == NULL)
+		return NULL;
+
+	translator->Acquire();
+	return new BTranslatorReleaseDelegate(translator);
 }
 
 

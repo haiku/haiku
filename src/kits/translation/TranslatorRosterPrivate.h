@@ -33,6 +33,8 @@ typedef std::map<translator_id, translator_item> TranslatorMap;
 typedef std::vector<BMessenger> MessengerList;
 typedef std::vector<node_ref> NodeRefList;
 typedef std::set<entry_ref> EntryRefSet;
+typedef std::map<image_id, int32> ImageMap;
+typedef std::map<BTranslator*, image_id> TranslatorImageMap;
 
 
 class BTranslatorRoster::Private : public BHandler, public BLocker {
@@ -78,8 +80,6 @@ public:
 			status_t			StartWatching(BMessenger target);
 			status_t			StopWatching(BMessenger target);
 
-			void				TranslatorDeleted(translator_id id);
-
 private:
 	static	int					_CompareSupport(const void* _a, const void* _b);
 
@@ -107,11 +107,15 @@ private:
 									const char* name);
 			void				_EntryAdded(const entry_ref& ref);
 			void				_NotifyListeners(BMessage& update) const;
+			void				_TranslatorDeleted(translator_id id,
+									BTranslator *self);
 
 			NodeRefList			fDirectories;
 			TranslatorMap		fTranslators;
 			MessengerList		fMessengers;
 			EntryRefSet			fRescanEntries;
+			ImageMap			fKnownImages;
+			TranslatorImageMap	fImageOrigins;
 			const char*			fABISubDirectory;
 			int32				fNextID;
 			bool				fLazyScanning;

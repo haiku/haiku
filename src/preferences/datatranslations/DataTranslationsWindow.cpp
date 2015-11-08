@@ -53,7 +53,8 @@ DataTranslationsWindow::DataTranslationsWindow()
 	:
 	BWindow(BRect(0, 0, 550, 350), B_TRANSLATE_SYSTEM_NAME("DataTranslations"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE
-		| B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS)
+		| B_NOT_RESIZABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	fRelease(NULL)
 {
 	MoveTo(DataTranslationsSettings::Instance()->WindowCorner());
 
@@ -151,6 +152,10 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 		fRightBox->RemoveChild(fConfigView);
 		delete fConfigView;
 		fConfigView = NULL;
+		if (fRelease != NULL) {
+			fRelease->Release();
+			fRelease = NULL;
+		}
 	}
 
 	BMessage emptyMsg;
@@ -165,6 +170,10 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 		// force config views to all have the same color
 	fRightBox->AddChild(fConfigView);
 
+	// Make sure the translator's image doesn't get unloaded while we are still
+	// showing a config view whose code is in the image
+	fRelease = roster->AcquireTranslator(id);
+
 	return B_OK;
 }
 
@@ -176,6 +185,11 @@ DataTranslationsWindow::_ShowInfoView()
 		fRightBox->RemoveChild(fConfigView);
 		delete fConfigView;
 		fConfigView = NULL;
+		if (fRelease != NULL) {
+			fRelease->Release();
+			fRelease = NULL;
+		}
+
 	}
 
 	BTextView* view = new BTextView("info text");

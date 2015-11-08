@@ -20,6 +20,7 @@
 
 #include "TranslatorListView.h"
 
+class BTranslatorReleaseDelegate;
 
 class DataTranslationsWindow : public BWindow {
 public:
@@ -39,6 +40,7 @@ private:
 			void			_SetupViews();
 
 			TranslatorListView*	fTranslatorListView;
+			BTranslatorReleaseDelegate*		fRelease;
 
 			BBox*			fRightBox;
 			BView*			fConfigView;
