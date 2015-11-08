@@ -1968,51 +1968,6 @@ get_root_vnode(bool kernel)
 }
 
 
-/*!	\brief Resolves a vnode to the vnode it is covered by, if any.
-
-	Given an arbitrary vnode (identified by mount and node ID), the function
-	checks, whether the vnode is covered by another vnode. If it is, the
-	function returns the mount and node ID of the covering vnode. Otherwise
-	it simply returns the supplied mount and node ID.
-
-	In case of error (e.g. the supplied node could not be found) the variables
-	for storing the resolved mount and node ID remain untouched and an error
-	code is returned.
-
-	\param mountID The mount ID of the vnode in question.
-	\param nodeID The node ID of the vnode in question.
-	\param resolvedMountID Pointer to storage for the resolved mount ID.
-	\param resolvedNodeID Pointer to storage for the resolved node ID.
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code, if something went wrong.
-*/
-status_t
-vfs_resolve_vnode_to_covering_vnode(dev_t mountID, ino_t nodeID,
-	dev_t* resolvedMountID, ino_t* resolvedNodeID)
-{
-	// get the node
-	struct vnode* node;
-	status_t error = get_vnode(mountID, nodeID, &node, true, false);
-	if (error != B_OK)
-		return error;
-
-	// resolve the node
-	if (Vnode* coveringNode = get_covering_vnode(node)) {
-		put_vnode(node);
-		node = coveringNode;
-	}
-
-	// set the return values
-	*resolvedMountID = node->device;
-	*resolvedNodeID = node->id;
-
-	put_vnode(node);
-
-	return B_OK;
-}
-
-
 /*!	\brief Gets the directory path and leaf name for a given path.
 
 	The supplied \a path is transformed to refer to the directory part of
@@ -3613,6 +3568,60 @@ is_user_in_group(gid_t gid)
 }
 
 
+static status_t
+free_io_context(io_context* context)
+{
+	uint32 i;
+
+	TIOC(FreeIOContext(context));
+
+	if (context->root)
+		put_vnode(context->root);
+
+	if (context->cwd)
+		put_vnode(context->cwd);
+
+	mutex_lock(&context->io_mutex);
+
+	for (i = 0; i < context->table_size; i++) {
+		if (struct file_descriptor* descriptor = context->fds[i]) {
+			close_fd(descriptor);
+			put_fd(descriptor);
+		}
+	}
+
+	mutex_destroy(&context->io_mutex);
+
+	remove_node_monitors(context);
+	free(context->fds);
+	free(context);
+
+	return B_OK;
+}
+
+
+static status_t
+resize_monitor_table(struct io_context* context, const int newSize)
+{
+	int	status = B_OK;
+
+	if (newSize <= 0 || newSize > MAX_NODE_MONITORS)
+		return B_BAD_VALUE;
+
+	mutex_lock(&context->io_mutex);
+
+	if ((size_t)newSize < context->num_monitors) {
+		status = B_BUSY;
+		goto out;
+	}
+	context->max_monitors = newSize;
+
+out:
+	mutex_unlock(&context->io_mutex);
+	return status;
+}
+
+
 //	#pragma mark - public API for file systems
 
 
@@ -4913,38 +4922,6 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 }
 
 
-static status_t
-vfs_free_io_context(io_context* context)
-{
-	uint32 i;
-
-	TIOC(FreeIOContext(context));
-
-	if (context->root)
-		put_vnode(context->root);
-
-	if (context->cwd)
-		put_vnode(context->cwd);
-
-	mutex_lock(&context->io_mutex);
-
-	for (i = 0; i < context->table_size; i++) {
-		if (struct file_descriptor* descriptor = context->fds[i]) {
-			close_fd(descriptor);
-			put_fd(descriptor);
-		}
-	}
-
-	mutex_destroy(&context->io_mutex);
-
-	remove_node_monitors(context);
-	free(context->fds);
-	free(context);
-
-	return B_OK;
-}
-
-
 void
 vfs_get_io_context(io_context* context)
 {
@@ -4956,7 +4933,7 @@ void
 vfs_put_io_context(io_context* context)
 {
 	if (atomic_add(&context->ref_count, -1) == 1)
-		vfs_free_io_context(context);
+		free_io_context(context);
 }
 
 
@@ -5023,25 +5000,48 @@ vfs_resize_fd_table(struct io_context* context, uint32 newSize)
 }
 
 
-static status_t
-vfs_resize_monitor_table(struct io_context* context, const int newSize)
+/*!	\brief Resolves a vnode to the vnode it is covered by, if any.
+
+	Given an arbitrary vnode (identified by mount and node ID), the function
+	checks, whether the vnode is covered by another vnode. If it is, the
+	function returns the mount and node ID of the covering vnode. Otherwise
+	it simply returns the supplied mount and node ID.
+
+	In case of error (e.g. the supplied node could not be found) the variables
+	for storing the resolved mount and node ID remain untouched and an error
+	code is returned.
+
+	\param mountID The mount ID of the vnode in question.
+	\param nodeID The node ID of the vnode in question.
+	\param resolvedMountID Pointer to storage for the resolved mount ID.
+	\param resolvedNodeID Pointer to storage for the resolved node ID.
+	\return
+	- \c B_OK, if everything went fine,
+	- another error code, if something went wrong.
+*/
+status_t
+vfs_resolve_vnode_to_covering_vnode(dev_t mountID, ino_t nodeID,
+	dev_t* resolvedMountID, ino_t* resolvedNodeID)
 {
-	int	status = B_OK;
+	// get the node
+	struct vnode* node;
+	status_t error = get_vnode(mountID, nodeID, &node, true, false);
+	if (error != B_OK)
+		return error;
 
-	if (newSize <= 0 || newSize > MAX_NODE_MONITORS)
-		return B_BAD_VALUE;
-
-	mutex_lock(&context->io_mutex);
-
-	if ((size_t)newSize < context->num_monitors) {
-		status = B_BUSY;
-		goto out;
+	// resolve the node
+	if (Vnode* coveringNode = get_covering_vnode(node)) {
+		put_vnode(node);
+		node = coveringNode;
 	}
-	context->max_monitors = newSize;
 
-out:
-	mutex_unlock(&context->io_mutex);
-	return status;
+	// set the return values
+	*resolvedMountID = node->device;
+	*resolvedNodeID = node->id;
+
+	put_vnode(node);
+
+	return B_OK;
 }
 
 
@@ -5160,7 +5160,7 @@ vfs_setrlimit(int resource, const struct rlimit* rlp)
 				&& rlp->rlim_max != MAX_NODE_MONITORS)
 				return B_NOT_ALLOWED;
 
-			return vfs_resize_monitor_table(get_current_io_context(false),
+			return resize_monitor_table(get_current_io_context(false),
 				rlp->rlim_cur);
 
 		default:
