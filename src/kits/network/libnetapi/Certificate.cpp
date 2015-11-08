@@ -58,6 +58,12 @@ BCertificate::BCertificate(Private* data)
 }
 
 
+BCertificate::BCertificate(const BCertificate& other)
+{
+	fPrivate = new<std::nothrow>BCertificate::Private(other.fPrivate);
+}
+
+
 BCertificate::~BCertificate()
 {
 	delete fPrivate;
@@ -65,42 +71,42 @@ BCertificate::~BCertificate()
 
 
 int
-BCertificate::Version()
+BCertificate::Version() const
 {
 	return X509_get_version(fPrivate->fX509) + 1;
 }
 
 
 time_t
-BCertificate::StartDate()
+BCertificate::StartDate() const
 {
 	return parse_ASN1(X509_get_notBefore(fPrivate->fX509));
 }
 
 
 time_t
-BCertificate::ExpirationDate()
+BCertificate::ExpirationDate() const
 {
 	return parse_ASN1(X509_get_notAfter(fPrivate->fX509));
 }
 
 
 bool
-BCertificate::IsValidAuthority()
+BCertificate::IsValidAuthority() const
 {
 	return X509_check_ca(fPrivate->fX509) > 0;
 }
 
 
 bool
-BCertificate::IsSelfSigned()
+BCertificate::IsSelfSigned() const
 {
 	return X509_check_issued(fPrivate->fX509, fPrivate->fX509) == X509_V_OK;
 }
 
 
 BString
-BCertificate::Issuer()
+BCertificate::Issuer() const
 {
 	X509_NAME* name = X509_get_issuer_name(fPrivate->fX509);
 	return decode_X509_NAME(name);
@@ -108,7 +114,7 @@ BCertificate::Issuer()
 
 
 BString
-BCertificate::Subject()
+BCertificate::Subject() const
 {
 	X509_NAME* name = X509_get_subject_name(fPrivate->fX509);
 	return decode_X509_NAME(name);
@@ -116,7 +122,7 @@ BCertificate::Subject()
 
 
 BString
-BCertificate::SignatureAlgorithm()
+BCertificate::SignatureAlgorithm() const
 {
 	int algorithmIdentifier = OBJ_obj2nid(
 		fPrivate->fX509->cert_info->key->algor->algorithm);
@@ -130,7 +136,7 @@ BCertificate::SignatureAlgorithm()
 
 
 BString
-BCertificate::String()
+BCertificate::String() const
 {
 	BIO *buffer = BIO_new(BIO_s_mem());
 	X509_print_ex(buffer, fPrivate->fX509, XN_FLAG_COMPAT, X509_FLAG_COMPAT);
@@ -144,16 +150,34 @@ BCertificate::String()
 }
 
 
+bool
+BCertificate::operator==(const BCertificate& other)
+{
+	return X509_cmp(fPrivate.fX509, other.fPrivate.fX509) == 0;
+}
+
+
 // #pragma mark - BCertificate::Private
 
 
 BCertificate::Private::Private(X509* data)
-	: fX509(data)
+	: fX509(X509_dup(data))
 {
 }
 
 
+BCertificate::Private::~Private()
+{
+	sk_X509_pop_free(chain, X509_free)
+}
+
+
 #else
+
+
+BCertificate::BCertificate(const BCertificate& other)
+{
+}
 
 
 BCertificate::BCertificate(Private* data)
@@ -167,59 +191,65 @@ BCertificate::~BCertificate()
 
 
 time_t
-BCertificate::StartDate()
+BCertificate::StartDate() const
 {
 	return B_NOT_SUPPORTED;
 }
 
 
 time_t
-BCertificate::ExpirationDate()
+BCertificate::ExpirationDate() const
 {
 	return B_NOT_SUPPORTED;
 }
 
 
 bool
-BCertificate::IsValidAuthority()
+BCertificate::IsValidAuthority() const
 {
 	return false;
 }
 
 
 int
-BCertificate::Version()
+BCertificate::Version() const
 {
 	return B_NOT_SUPPORTED;
 }
 
 
 BString
-BCertificate::Issuer()
+BCertificate::Issuer() const
 {
 	return BString();
 }
 
 
 BString
-BCertificate::Subject()
+BCertificate::Subject() const
 {
 	return BString();
 }
 
 
 BString
-BCertificate::SignatureAlgorithm()
+BCertificate::SignatureAlgorithm() const
 {
 	return BString();
 }
 
 
 BString
-BCertificate::String()
+BCertificate::String() const
 {
 	return BString();
 }
 
+
+bool
+BCertificate::operator==(const BCertificate& other)
+{
+	return false;
+}
 
 #endif

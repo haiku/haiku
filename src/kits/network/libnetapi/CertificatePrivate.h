@@ -13,6 +13,7 @@
 class BCertificate::Private {
 public:
 	Private(X509* data);
+	~Private();
 
 public:
 	X509* fX509;

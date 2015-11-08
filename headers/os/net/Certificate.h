@@ -12,29 +12,29 @@
 
 class BCertificate {
 public:
+				BCertificate(const BCertificate& other);
 				~BCertificate();
 
-	int			Version();
+	int			Version() const;
 
-	time_t		StartDate();
-	time_t		ExpirationDate();
+	time_t		StartDate() const;
+	time_t		ExpirationDate() const;
 
-	bool		IsValidAuthority();
-	bool		IsSelfSigned();
+	bool		IsValidAuthority() const;
+	bool		IsSelfSigned() const;
 
-	BString		Issuer();
-	BString		Subject();
-	BString		SignatureAlgorithm();
+	BString		Issuer() const;
+	BString		Subject() const;
+	BString		SignatureAlgorithm() const;
 
-	BString		String();
+	BString		String() const;
+
+	bool		operator==(const BCertificate& other);
 
 private:
 	friend class BSecureSocket::Private;
 	class Private;
 				BCertificate(Private* data);
-
-				BCertificate(const BCertificate& other);
-					// copy-construction not allowed
 
 	Private*	fPrivate;
 };
