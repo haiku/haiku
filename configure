@@ -307,16 +307,7 @@ standard_gcc_settings()
 	set_variable HAIKU_CPU_$targetArch $targetCpu
 
 	get_build_tool_path CC_$targetArch "$gcc"
-	if [ $useClang = 1 ]; then
-		# The get_build_tool_path above is needed to get the path to the rest
-		# of the build tools
-		local path=`dirname $(get_variable HAIKU_CC_$targetArch)`
-		set_variable HAIKU_CC_$targetArch \
-			"PATH=\\\"$path:\\\$PATH\\\" clang -target $gccMachine"
-		set_variable HAIKU_CC_IS_CLANG_$targetArch 1
-	else
-		set_variable HAIKU_CC_IS_CLANG_$targetArch 0
-	fi
+	set_variable HAIKU_CC_IS_CLANG_$targetArch $useClang
 	set_variable HAIKU_GCC_RAW_VERSION_$targetArch $gccRawVersion
 	set_variable HAIKU_GCC_MACHINE_$targetArch $gccMachine
 	set_variable HAIKU_GCC_LIB_DIR_$targetArch $gccdir
@@ -362,7 +353,8 @@ set_default_value()
 get_build_tool_path()
 {
 	local var="HAIKU_$1"
-	local path=$2
+	local cmd=$2
+	local path=${2%% *}
 
 	if [ -f "$path" ]; then
 		# get absolute path
@@ -377,7 +369,7 @@ get_build_tool_path()
 		}
 	fi
 
-	eval "$var=$path"
+	eval "$var=\"$path ${cmd#${2%% *}}\""
 }
 
 is_in_list()
@@ -792,7 +784,13 @@ else
 		fi
 
 		# prepare gcc settings and get the actual target architecture
-		gcc="${crossToolsPrefix}gcc"
+		if [ $useClang = 1 ]; then
+			target=${crossToolsPrefix##*/}
+			target=${target%-}
+			gcc="clang -target ${target}"
+		else
+			gcc="${crossToolsPrefix}gcc"
+		fi
 		if [ -z "${crossToolsPrefix}" ]; then
 			gcc=`get_variable HAIKU_CC_$targetArch`
 		fi
