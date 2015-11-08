@@ -44,7 +44,7 @@ FUNCTION(__swap_float):
 	movl	4(%esp), %eax
 	bswap	%eax
 	movl	%eax, 4(%esp)
-	fld		4(%esp)
+	flds	4(%esp)
 	ret
 FUNCTION_END(__swap_float)
 
