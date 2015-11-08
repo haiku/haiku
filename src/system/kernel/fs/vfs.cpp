@@ -2483,7 +2483,7 @@ get_vnode_name(struct vnode* vnode, struct vnode* parent, struct dirent* buffer,
 	if (bufferSize < sizeof(struct dirent))
 		return B_BAD_VALUE;
 
-	// See if the vnode is convering another vnode and move to the covered
+	// See if the vnode is covering another vnode and move to the covered
 	// vnode so we get the underlying file system
 	VNodePutter vnodePutter;
 	if (Vnode* coveredVnode = get_covered_vnode(vnode)) {
