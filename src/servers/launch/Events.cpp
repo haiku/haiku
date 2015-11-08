@@ -186,7 +186,8 @@ create_event(Event* parent, const char* name, const BMessenger* target,
 
 Event::Event(Event* parent)
 	:
-	fParent(parent)
+	fParent(parent),
+	fTriggered(false)
 {
 }
 
