@@ -1628,7 +1628,7 @@ static fs_volume_ops sGoogleFSVolumeOps = {
 static fs_vnode_ops sGoogleFSVnodeOps = {
 	/* vnode operations */
 	&googlefs_walk,
-	NULL, // fs_get_vnode_name
+	&googlefs_get_vnode_name, //NULL, // fs_get_vnode_name
 	&googlefs_release_vnode,
 	&googlefs_remove_vnode,
 
