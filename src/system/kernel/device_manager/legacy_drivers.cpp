@@ -219,27 +219,6 @@ public:
 };
 
 
-}	// unnamed namespace
-
-
-static status_t unload_driver(legacy_driver *driver);
-static status_t load_driver(legacy_driver *driver);
-
-
-static DriverWatcher sDriverWatcher;
-static int32 sDriverEventsPending;
-static DriverEventList sDriverEvents;
-static mutex sDriverEventsLock = MUTEX_INITIALIZER("driver events");
-	// inner lock, protects the sDriverEvents list only
-static DirectoryWatcher sDirectoryWatcher;
-static DirectoryNodeHash sDirectoryNodeHash;
-static recursive_lock sLock;
-static bool sWatching;
-
-
-//	#pragma mark - driver private
-
-
 struct DriverHash {
 	typedef const char*			KeyType;
 	typedef legacy_driver		ValueType;
@@ -268,7 +247,27 @@ struct DriverHash {
 typedef BOpenHashTable<DriverHash> DriverTable;
 
 
+}	// unnamed namespace
+
+
+static status_t unload_driver(legacy_driver *driver);
+static status_t load_driver(legacy_driver *driver);
+
+
+static DriverWatcher sDriverWatcher;
+static int32 sDriverEventsPending;
+static DriverEventList sDriverEvents;
+static mutex sDriverEventsLock = MUTEX_INITIALIZER("driver events");
+	// inner lock, protects the sDriverEvents list only
+static DirectoryWatcher sDirectoryWatcher;
+static DirectoryNodeHash sDirectoryNodeHash;
+static recursive_lock sLock;
+static bool sWatching;
+
 static DriverTable* sDriverHash;
+
+
+//	#pragma mark - driver private
 
 
 /*!	Collects all published devices of a driver, compares them to what the

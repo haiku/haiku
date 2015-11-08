@@ -111,11 +111,6 @@ const static size_t kMaxPathLength = 65536;
 	// on PATH_MAX
 
 
-struct vnode_hash_key {
-	dev_t	device;
-	ino_t	vnode;
-};
-
 typedef DoublyLinkedList<vnode> VnodeList;
 
 /*!	\brief Structure to manage a mounted file system
@@ -171,6 +166,9 @@ struct fs_mount {
 	bool			owns_file_device;
 };
 
+
+namespace {
+
 struct advisory_lock : public DoublyLinkedListLinkImpl<advisory_lock> {
 	list_link		link;
 	team_id			team;
@@ -181,6 +179,9 @@ struct advisory_lock : public DoublyLinkedListLinkImpl<advisory_lock> {
 };
 
 typedef DoublyLinkedList<advisory_lock> LockList;
+
+} // namespace
+
 
 struct advisory_locking {
 	sem_id			lock;
@@ -251,6 +252,13 @@ static rw_lock sVnodeLock = RW_LOCK_INITIALIZER("vfs_vnode_lock");
 static mutex sIOContextRootLock = MUTEX_INITIALIZER("io_context::root lock");
 
 
+namespace {
+
+struct vnode_hash_key {
+	dev_t	device;
+	ino_t	vnode;
+};
+
 struct VnodeHash {
 	typedef vnode_hash_key	KeyType;
 	typedef	struct vnode	ValueType;
@@ -310,6 +318,8 @@ struct MountHash {
 };
 
 typedef BOpenHashTable<MountHash> MountTable;
+
+} // namespace
 
 
 #define VNODE_HASH_TABLE_SIZE 1024
@@ -520,7 +530,8 @@ static struct fd_ops sQueryOps = {
 };
 
 
-// VNodePutter
+namespace {
+
 class VNodePutter {
 public:
 	VNodePutter(struct vnode* vnode = NULL) : fVNode(vnode) {}
@@ -596,6 +607,8 @@ private:
 	int		fFD;
 	bool	fKernel;
 };
+
+} // namespace
 
 
 #if VFS_PAGES_IO_TRACING

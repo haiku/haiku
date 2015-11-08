@@ -33,6 +33,9 @@
 #	define TRACE_ERROR(x)	dprintf x
 #endif
 
+
+namespace {
+
 // Queue for holding blocked threads
 struct queued_thread : DoublyLinkedListLinkImpl<queued_thread> {
 	queued_thread(Thread *_thread, int32 _message_length)
@@ -373,6 +376,9 @@ struct IpcHashTableDefinition {
 		return variable->Link();
 	}
 };
+
+} // namespace
+
 
 // Arbitrary limits
 #define MAX_XSI_MESSAGE			4096

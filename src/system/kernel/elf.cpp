@@ -53,6 +53,8 @@
 #endif
 
 
+namespace {
+
 #define IMAGE_HASH_SIZE 16
 
 struct ImageHashDefinition {
@@ -76,6 +78,9 @@ struct ImageHashDefinition {
 };
 
 typedef BOpenHashTable<ImageHashDefinition> ImageHash;
+
+} // namespace
+
 
 static ImageHash *sImagesHash;
 

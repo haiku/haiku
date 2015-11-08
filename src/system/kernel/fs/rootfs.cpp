@@ -46,6 +46,8 @@
 #endif
 
 
+namespace {
+
 struct rootfs_stream {
 	mode_t						type;
 	struct stream_dir {
@@ -124,11 +126,13 @@ enum {
 	ITERATION_STATE_BEGIN	= ITERATION_STATE_DOT,
 };
 
-// extern and in a private namespace only to make forward declaration possible
-namespace {
-	extern fs_volume_ops sVolumeOps;
-	extern fs_vnode_ops sVnodeOps;
-}
+
+// extern only to make forward declaration possible
+extern fs_volume_ops sVolumeOps;
+extern fs_vnode_ops sVnodeOps;
+
+} // namespace
+
 
 #define ROOTFS_HASH_SIZE 16
 

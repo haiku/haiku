@@ -73,6 +73,8 @@
 #endif
 
 
+namespace {
+
 class AreaCacheLocking {
 public:
 	inline bool Lock(VMCache* lockable)
@@ -228,6 +230,8 @@ private:
 	VMCache*	fTopCache;
 	VMCache*	fBottomCache;
 };
+
+} // namespace
 
 
 // The memory reserve an allocation of the certain priority must not touch.

@@ -24,6 +24,8 @@
 #include <util/StringHash.h>
 
 
+namespace {
+
 class SemInfo {
 public:
 	SemInfo()
@@ -363,6 +365,8 @@ struct TeamSemHashDefinition {
 		return semaphore->HashLink();
 	}
 };
+
+} // namespace
 
 
 struct realtime_sem_context {

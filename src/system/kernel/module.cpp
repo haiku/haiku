@@ -275,45 +275,6 @@ private:
 	NotificationList	fNotifications;
 };
 
-}	// namespace Module
-
-using namespace Module;
-
-/* These are the standard base paths where we start to look for modules
- * to load. Order is important, the last entry here will be searched
- * first.
- */
-static const directory_which kModulePaths[] = {
-	B_BEOS_ADDONS_DIRECTORY,
-	B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
-	B_USER_ADDONS_DIRECTORY,
-	B_USER_NONPACKAGED_ADDONS_DIRECTORY,
-};
-
-static const uint32 kNumModulePaths = sizeof(kModulePaths)
-	/ sizeof(kModulePaths[0]);
-static const uint32 kFirstNonSystemModulePath = 1;
-
-
-static ModuleNotificationService sModuleNotificationService;
-static bool sDisableUserAddOns = false;
-
-/*	Locking scheme: There is a global lock only; having several locks
-	makes trouble if dependent modules get loaded concurrently ->
-	they have to wait for each other, i.e. we need one lock per module;
-	also we must detect circular references during init and not dead-lock.
-
-	Reference counting: get_module() increments the ref count of a module,
-	put_module() decrements it. When a B_KEEP_LOADED module is initialized
-	the ref count is incremented once more, so it never gets
-	uninitialized/unloaded. A referenced module, unless it's built-in, has a
-	non-null module_image and owns a reference to the image. When the last
-	module reference is put, the image's reference is released and module_image
-	zeroed (as long as the boot volume has not been mounted, it is not zeroed).
-	An unreferenced module image is unloaded (when the boot volume is mounted).
-*/
-static recursive_lock sModulesLock;
-
 
 struct ModuleHash {
 	typedef const char* KeyType;
@@ -363,6 +324,45 @@ struct ImageHash {
 };
 
 typedef BOpenHashTable<ImageHash> ImageTable;
+
+}	// namespace Module
+
+using namespace Module;
+
+/* These are the standard base paths where we start to look for modules
+ * to load. Order is important, the last entry here will be searched
+ * first.
+ */
+static const directory_which kModulePaths[] = {
+	B_BEOS_ADDONS_DIRECTORY,
+	B_SYSTEM_NONPACKAGED_ADDONS_DIRECTORY,
+	B_USER_ADDONS_DIRECTORY,
+	B_USER_NONPACKAGED_ADDONS_DIRECTORY,
+};
+
+static const uint32 kNumModulePaths = sizeof(kModulePaths)
+	/ sizeof(kModulePaths[0]);
+static const uint32 kFirstNonSystemModulePath = 1;
+
+
+static ModuleNotificationService sModuleNotificationService;
+static bool sDisableUserAddOns = false;
+
+/*	Locking scheme: There is a global lock only; having several locks
+	makes trouble if dependent modules get loaded concurrently ->
+	they have to wait for each other, i.e. we need one lock per module;
+	also we must detect circular references during init and not dead-lock.
+
+	Reference counting: get_module() increments the ref count of a module,
+	put_module() decrements it. When a B_KEEP_LOADED module is initialized
+	the ref count is incremented once more, so it never gets
+	uninitialized/unloaded. A referenced module, unless it's built-in, has a
+	non-null module_image and owns a reference to the image. When the last
+	module reference is put, the image's reference is released and module_image
+	zeroed (as long as the boot volume has not been mounted, it is not zeroed).
+	An unreferenced module image is unloaded (when the boot volume is mounted).
+*/
+static recursive_lock sModulesLock;
 
 
 /* We store the loaded modules by directory path, and all known modules

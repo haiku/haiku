@@ -33,6 +33,8 @@
 #define ADD_DEBUGGER_COMMANDS
 
 
+namespace {
+
 struct ImageTableDefinition {
 	typedef image_id		KeyType;
 	typedef struct image	ValueType;
@@ -67,6 +69,8 @@ public:
 		DefaultNotificationService::Notify(event, eventCode);
 	}
 };
+
+} // namespace
 
 
 static image_id sNextImageID = 1;
