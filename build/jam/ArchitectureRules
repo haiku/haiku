@@ -43,10 +43,7 @@ rule ArchitectureSetup architecture
 
 	local cpu = $(HAIKU_CPU_$(architecture)) ;
 	if $(cpu) = arm {
-		if $(HAIKU_CC_IS_CLANG_$(architecture)) = 1 {
-			# Clang only defines __ARMEL__ when using -target arm-haiku-unknown
-			gccBaseFlags += -D__ARM__=1 ;
-		} else {
+		if $(HAIKU_CC_IS_CLANG_$(architecture)) != 1 {
 			# For stackcrawls - not supported by Clang
 			gccBaseFlags += -mapcs-frame ;
 		}
