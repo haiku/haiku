@@ -471,7 +471,7 @@ DemandEvent::Unregister(EventRegistrator& registrator)
 BString
 DemandEvent::ToString() const
 {
-	return "event";
+	return "demand";
 }
 
 
