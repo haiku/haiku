@@ -30,7 +30,7 @@ void program_pipe_color_modes(uint32 colorMode);
 class DisplayPipe {
 public:
 									DisplayPipe(pipe_index pipeIndex);
-virtual								~DisplayPipe();
+									~DisplayPipe();
 
 		pipe_index					Index()
 										{ return fPipeIndex; }

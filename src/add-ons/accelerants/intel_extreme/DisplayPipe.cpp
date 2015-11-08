@@ -53,6 +53,11 @@ DisplayPipe::DisplayPipe(pipe_index pipeIndex)
 }
 
 
+DisplayPipe::~DisplayPipe()
+{
+}
+
+
 bool
 DisplayPipe::IsEnabled()
 {
