@@ -101,7 +101,7 @@ RemotePackageRepository HaikuPorts
 	flex-2.5.39-1
 	fontconfig-2.11.94-1
 	fontconfig_devel-2.11.94-1
-	fossil-1.33-1
+	fossil-1.34-1
 	freeciv-2.5.1-1
 	freetype-2.6.1-1
 	freetype_devel-2.6.1-1
