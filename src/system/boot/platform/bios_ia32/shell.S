@@ -442,3 +442,5 @@ GLOBAL(gMultiBootInfo):
 	.long	0
 
 .org 1024
+
+.section .bss
