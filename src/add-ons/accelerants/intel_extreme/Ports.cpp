@@ -38,6 +38,7 @@ Port::Port(port_index index, const char* baseName)
 	:
 	fPortIndex(index),
 	fPortName(NULL),
+	fPipeIndex(INTEL_PIPE_ANY),
 	fEDIDState(B_NO_INIT)
 {
 	char portID[2];
@@ -67,6 +68,33 @@ Port::HasEDID()
 		GetEDID(NULL);
 
 	return fEDIDState == B_OK;
+}
+
+
+void
+Port::PipeSelect(pipe_index pipeIndex)
+{
+    CALLED();
+
+    uint32 portRegister = _PortRegister();
+	if (portRegister == 0) {
+		ERROR("%s: Invalid PortRegister ((0x%" B_PRIx32 ") for %s\n", __func__,
+			portRegister, PortName());
+		return;
+	}
+
+	TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe %s\n", __func__,
+		PortName(), portRegister, (pipeIndex == INTEL_PIPE_A) ? "A" : "B");
+
+    uint32 portState = read32(portRegister);
+
+    if (pipeIndex == INTEL_PIPE_A)
+        write32(portRegister, portState & ~DISPLAY_MONITOR_PIPE_B);
+    else
+        write32(portRegister, portState | DISPLAY_MONITOR_PIPE_B);
+
+	fPipeIndex = pipeIndex;
+	read32(portRegister);
 }
 
 
@@ -191,6 +219,14 @@ AnalogPort::_DDCRegister()
 {
 	// always fixed
 	return INTEL_I2C_IO_A;
+}
+
+
+addr_t
+AnalogPort::_PortRegister()
+{
+	// always fixed
+	return INTEL_ANALOG_PORT;
 }
 
 
@@ -373,6 +409,14 @@ LVDSPort::_DDCRegister()
 }
 
 
+addr_t
+LVDSPort::_PortRegister()
+{
+	// always fixed
+	return INTEL_DIGITAL_LVDS_PORT;
+}
+
+
 status_t
 LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
@@ -465,7 +509,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	}
 
 	uint32 lvds = read32(INTEL_DIGITAL_LVDS_PORT) | LVDS_PORT_EN
-		| LVDS_A0A2_CLKA_POWER_UP | LVDS_PIPEB_SELECT;
+		| LVDS_A0A2_CLKA_POWER_UP;
 
 	lvds |= LVDS_18BIT_DITHER;
 		// TODO: do not do this if the connected panel is 24-bit
@@ -662,6 +706,13 @@ DigitalPort::_DDCRegister()
 }
 
 
+addr_t
+DigitalPort::_PortRegister()
+{
+	return 0;
+}
+
+
 // #pragma mark - HDMI
 
 
@@ -678,7 +729,7 @@ HDMIPort::IsConnected()
 	if (!gInfo->shared_info->device_type.SupportsHDMI())
 		return false;
 
-	uint32 portRegister = _PortRegister();
+	addr_t portRegister = _PortRegister();
 	TRACE("%s - %d: PortRegister: %" B_PRIx32 "\n", PortName(), PortIndex(),
 		portRegister);
 
@@ -688,14 +739,14 @@ HDMIPort::IsConnected()
 	if (!gInfo->shared_info->device_type.HasPlatformControlHub()
 		&& PortIndex() == INTEL_PORT_C) {
 		// there's no detection bit on this port
-	} else if ((read32(portRegister) & PORT_DETECTED) == 0)
+	} else if ((read32(portRegister) & DISPLAY_MONITOR_PORT_DETECTED) == 0)
 		return false;
 
 	return HasEDID();
 }
 
 
-uint32
+addr_t
 HDMIPort::_PortRegister()
 {
 	// on PCH there's an additional port sandwiched in
@@ -736,18 +787,18 @@ DisplayPort::DisplayPort(port_index index, const char* baseName)
 bool
 DisplayPort::IsConnected()
 {
-	uint32 portRegister = _PortRegister();
+	addr_t portRegister = _PortRegister();
 	if (portRegister == 0)
 		return false;
 
-	if ((read32(portRegister) & PORT_DETECTED) == 0)
+	if ((read32(portRegister) & DISPLAY_MONITOR_PORT_DETECTED) == 0)
 		return false;
 
 	return HasEDID();
 }
 
 
-uint32
+addr_t
 DisplayPort::_PortRegister()
 {
 	switch (PortIndex()) {

@@ -189,16 +189,16 @@ dump_ports()
 		return;
 	}
 
-	TRACE("%s: Connected ports: (port_count: %d)\n", __func__,
+	TRACE("%s: Connected ports: (port_count: %" B_PRIu32 ")\n", __func__,
 		gInfo->port_count);
 
 	for (uint32 i = 0; i < gInfo->port_count; i++) {
 		Port* port = gInfo->ports[i];
 		if (!port) {
-			TRACE("port %d: INVALID ALLOC!\n", i);
+			TRACE("port %" B_PRIu32 ":: INVALID ALLOC!\n", i);
 			continue;
 		}
-		TRACE("port %d: %s %s\n", i, port->PortName(),
+		TRACE("port %" B_PRIu32 ": %s %s\n", i, port->PortName(),
 			port->IsConnected() ? "connected" : "disconnected");
 	}
 }

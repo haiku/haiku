@@ -424,7 +424,7 @@ struct intel_free_graphics_memory {
 #define PCH_INTERRUPT_VBLANK_PIPEA_SNB		(1 << 7)
 #define PCH_INTERRUPT_VBLANK_PIPEB_SNB		(1 << 15)
 
-// display ports
+// graphics port control
 #define DISPLAY_MONITOR_PORT_ENABLED	(1UL << 31)
 #define DISPLAY_MONITOR_PIPE_B			(1UL << 30)
 #define DISPLAY_MONITOR_VGA_POLARITY	(1UL << 15)
@@ -436,13 +436,14 @@ struct intel_free_graphics_memory {
 #define DISPLAY_MONITOR_POLARITY_MASK	(3UL << 3)
 #define DISPLAY_MONITOR_POSITIVE_HSYNC	(1UL << 3)
 #define DISPLAY_MONITOR_POSITIVE_VSYNC	(2UL << 3)
+#define DISPLAY_MONITOR_PORT_DETECTED	(1UL << 2) // TMDS/DisplayPort only
+
 #define LVDS_POST2_RATE_SLOW			14 // PLL Divisors
 #define LVDS_POST2_RATE_FAST			7
 #define LVDS_CLKB_POWER_MASK			(3 << 4)
 #define LVDS_CLKB_POWER_UP				(3 << 4)
 #define LVDS_PORT_EN					(1 << 31)
 #define LVDS_A0A2_CLKA_POWER_UP			(3 << 8)
-#define LVDS_PIPEB_SELECT				(1 << 30)
 #define LVDS_B0B3PAIRS_POWER_UP			(3 << 2)
 #define LVDS_PLL_MODE_LVDS				(2 << 26)
 #define LVDS_18BIT_DITHER				(1 << 25)
@@ -510,9 +511,6 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_PORT_B			(0x4100 | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_PORT_C			(0x4200 | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_PORT_D			(0x4300 | REGS_NORTH_PIPE_AND_PORT)
-
-// valid for both DVI/HDMI and DisplayPort
-#define PORT_DETECTED					(1 << 2)
 
 // planes
 #define INTEL_PIPE_BASE_REGISTER		(0x0000 | REGS_NORTH_PLANE_CONTROL)

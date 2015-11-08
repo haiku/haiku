@@ -39,6 +39,14 @@ enum port_index {
 };
 
 
+// TODO: This likely should go in some pipe header
+enum pipe_index {
+	INTEL_PIPE_ANY,
+	INTEL_PIPE_A,
+	INTEL_PIPE_B
+};
+
+
 class Port {
 public:
 									Port(port_index index,
@@ -52,7 +60,12 @@ virtual	uint32						Type() const = 0;
 		port_index					PortIndex() const
 										{ return fPortIndex; }
 
+		pipe_index					PipeIndex() const
+										{ return fPipeIndex; }
+
 virtual	bool						IsConnected() = 0;
+
+		void						PipeSelect(pipe_index pipeIndex);
 
 		bool						HasEDID();
 virtual	status_t					GetEDID(edid1_info* edid,
@@ -75,9 +88,12 @@ static	status_t					_SetI2CSignals(void* cookie, int clock,
 
 private:
 virtual	addr_t						_DDCRegister() = 0;
+virtual addr_t						_PortRegister() = 0;
 
 		port_index					fPortIndex;
 		char*						fPortName;
+
+		pipe_index					fPipeIndex;
 
 		status_t					fEDIDState;
 		edid1_info					fEDIDInfo;
@@ -98,6 +114,7 @@ virtual status_t					SetDisplayMode(display_mode* mode,
 
 protected:
 virtual	addr_t						_DDCRegister();
+virtual addr_t						_PortRegister();
 };
 
 
@@ -115,6 +132,7 @@ virtual status_t					SetDisplayMode(display_mode* mode,
 
 protected:
 virtual	addr_t						_DDCRegister();
+virtual addr_t						_PortRegister();
 };
 
 
@@ -132,6 +150,7 @@ virtual	bool						IsConnected();
 
 protected:
 virtual	addr_t						_DDCRegister();
+virtual addr_t						_PortRegister();
 };
 
 
@@ -145,7 +164,7 @@ virtual	uint32						Type() const
 virtual	bool						IsConnected();
 
 protected:
-		uint32						_PortRegister();
+virtual addr_t						_PortRegister();
 };
 
 
@@ -160,7 +179,7 @@ virtual	uint32						Type() const
 virtual	bool						IsConnected();
 
 protected:
-		uint32						_PortRegister();
+virtual	uint32						_PortRegister();
 };
 
 

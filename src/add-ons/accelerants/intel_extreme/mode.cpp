@@ -615,6 +615,9 @@ if (first) {
 		if (!gInfo->ports[i]->IsConnected())
 			continue;
 
+		// XXX: For now we force everything on PIPE A
+		gInfo->ports[i]->PipeSelect(INTEL_PIPE_A);
+
 		status_t status = gInfo->ports[i]->SetDisplayMode(&target, colorMode);
 		if (status != B_OK)
 			ERROR("%s: Unable to set display mode!\n", __func__);
