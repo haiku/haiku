@@ -392,13 +392,15 @@ int googlefs_closedir(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie *cookie
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
 	status_t err = B_OK;
-	TRACE((PFS "closedir(%ld, %Ld)\n", ns->nsid, node->vnid));
+//	node = cookie->node; // work around VFS bug
+	TRACE((PFS "closedir(%ld, %Ld, %p)\n", ns->nsid, node->vnid, cookie));
 	err = LOCK(&node->l);
 	if (err)
 		return err;
 	
 	SLL_REMOVE(node->opened, next, cookie);
 	UNLOCK(&node->l);
+
 	return err;
 }
 
@@ -470,7 +472,14 @@ int googlefs_free_dircookie(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie *
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
-	TRACE((PFS"freedircookie(%ld, %Ld)\n", ns->nsid, node?node->vnid:0LL));
+	status_t err = B_OK;
+//	node = cookie->node; // work around VFS bug
+	TRACE((PFS"freedircookie(%ld, %Ld, %p)\n", ns->nsid, node?node->vnid:0LL, cookie));
+	err = LOCK(&node->l);
+	if (err)
+		return err;
+	err = SLL_REMOVE(node->opened, next, cookie); /* just to make sure */
+	UNLOCK(&node->l);
 	free(cookie);
 	return B_OK;
 }
@@ -1017,7 +1026,13 @@ int googlefs_free_attrdircookie(fs_volume *_volume, fs_vnode *_node, fs_attr_dir
 {
 	fs_nspace *ns = (fs_nspace *)_volume->private_volume;
 	fs_node *node = (fs_node *)_node->private_node;
+	status_t err = B_OK;
 	TRACE((PFS"free_attrdircookie(%ld, %Ld)\n", ns->nsid, node->vnid));
+	err = LOCK(&node->l);
+	if (err)
+		return err;
+	SLL_REMOVE(node->opened, next, cookie); /* just to make sure */
+	UNLOCK(&node->l);
 	free(cookie);
 	return B_OK;
 }
@@ -1419,7 +1434,23 @@ int googlefs_close_query(fs_volume *_volume, fs_query_cookie *cookie)
 /* protos are different... */
 int googlefs_free_query_cookie(fs_volume *_volume, fs_dir_cookie *cookie)
 {
+	status_t err = B_OK;
+	fs_node *q;
 	TRACE((PFS"free_query_cookie(%ld)\n", _volume->id));
+	q = cookie->node;
+	if (!q)
+		goto no_node;
+	err = LOCK(&q->l);
+	if (err)
+		return err;
+	err = SLL_REMOVE(q->opened, next, cookie); /* just to make sure */
+	if (q->request /*&& !q->opened*/) {
+		err = google_request_close(q->request);
+	}
+//	if (err)
+//		goto err_n_l;
+	UNLOCK(&q->l);
+no_node:
 	free(cookie);
 	return B_OK;
 }
