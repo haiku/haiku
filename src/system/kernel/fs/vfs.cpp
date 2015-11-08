@@ -2528,8 +2528,8 @@ get_vnode_name(struct vnode* vnode, struct vnode* parent, struct dirent* buffer,
 			}
 		}
 
-		FS_CALL(vnode, close_dir, cookie);
-		FS_CALL(vnode, free_dir_cookie, cookie);
+		FS_CALL(parent, close_dir, cookie);
+		FS_CALL(parent, free_dir_cookie, cookie);
 	}
 	return status;
 }
