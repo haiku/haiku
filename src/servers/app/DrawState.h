@@ -26,6 +26,7 @@
 
 class AlphaMask;
 class BRegion;
+class shape_data;
 
 namespace BPrivate {
 	class LinkReceiver;
@@ -79,6 +80,9 @@ public:
 		bool				HasClipping() const;
 		bool				HasAdditionalClipping() const;
 		bool				GetCombinedClippingRegion(BRegion* region) const;
+
+		bool				ClipToRect(BRect rect, bool inverse);
+		void				ClipToShape(shape_data* shape, bool inverse);
 
 			void			SetAlphaMask(AlphaMask* mask);
 			AlphaMask*		GetAlphaMask() const;

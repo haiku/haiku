@@ -2586,6 +2586,34 @@ BView::ConstrainClippingRegion(BRegion* region)
 }
 
 
+void
+BView::ClipToRect(BRect rect)
+{
+	_ClipToRect(rect, false);
+}
+
+
+void
+BView::ClipToInverseRect(BRect rect)
+{
+	_ClipToRect(rect, true);
+}
+
+
+void
+BView::ClipToShape(BShape* shape)
+{
+	_ClipToShape(shape, false);
+}
+
+
+void
+BView::ClipToInverseShape(BShape* shape)
+{
+	_ClipToShape(shape, true);
+}
+
+
 //	#pragma mark - Drawing Functions
 
 
@@ -5267,6 +5295,40 @@ BView::_ClipToPicture(BPicture* picture, BPoint where, bool invert, bool sync)
 		// ServerPicture is found of the token.
 		if (sync)
 			Sync();
+	}
+}
+
+
+void
+BView::_ClipToRect(BRect rect, bool inverse)
+{
+	if (_CheckOwnerLockAndSwitchCurrent()) {
+		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_RECT);
+		fOwner->fLink->Attach<bool>(inverse);
+		fOwner->fLink->Attach<BRect>(rect);
+		_FlushIfNotInTransaction();
+	}
+}
+
+
+void
+BView::_ClipToShape(BShape* shape, bool inverse)
+{
+	if (shape == NULL)
+		return;
+
+	shape_data* sd = (shape_data*)shape->fPrivateData;
+	if (sd->opCount == 0 || sd->ptCount == 0)
+		return;
+
+	if (_CheckOwnerLockAndSwitchCurrent()) {
+		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_SHAPE);
+		fOwner->fLink->Attach<bool>(inverse);
+		fOwner->fLink->Attach<int32>(sd->opCount);
+		fOwner->fLink->Attach<int32>(sd->ptCount);
+		fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(uint32));
+		fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
+		_FlushIfNotInTransaction();
 	}
 }
 

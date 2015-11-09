@@ -760,6 +760,43 @@ blend_layer(void* _canvas, Layer* layer)
 }
 
 
+static void
+clip_to_rect(void* _canvas, const BRect& rect, bool inverse)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+	bool needDrawStateUpdate = canvas->ClipToRect(rect, inverse);
+	if (needDrawStateUpdate)
+		canvas->ResyncDrawState();
+	canvas->UpdateCurrentDrawingRegion();
+}
+
+
+static void
+clip_to_shape(void* _canvas, int32 opCount, const uint32 opList[],
+	int32 ptCount, const BPoint ptList[], bool inverse)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+	shape_data shapeData;
+
+	// TODO: avoid copies
+	shapeData.opList = (uint32*)malloc(opCount * sizeof(uint32));
+	memcpy(shapeData.opList, opList, opCount * sizeof(uint32));
+	shapeData.ptList = (BPoint*)malloc(ptCount * sizeof(BPoint));
+	memcpy(shapeData.ptList, ptList, ptCount * sizeof(BPoint));
+
+	shapeData.opCount = opCount;
+	shapeData.opSize = opCount * sizeof(uint32);
+	shapeData.ptCount = ptCount;
+	shapeData.ptSize = ptCount * sizeof(BPoint);
+
+	canvas->ClipToShape(&shapeData, inverse);
+	canvas->ResyncDrawState();
+
+	free(shapeData.opList);
+	free(shapeData.ptList);
+}
+
+
 static const BPrivate::picture_player_callbacks kPicturePlayerCallbacks = {
 	move_pen_by,
 	stroke_line,
@@ -801,7 +838,9 @@ static const BPrivate::picture_player_callbacks kPicturePlayerCallbacks = {
 	set_font_face,
 	set_blending_mode,
 	set_transform,
-	blend_layer
+	blend_layer,
+	clip_to_rect,
+	clip_to_shape
 };
 
 

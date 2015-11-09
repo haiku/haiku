@@ -29,6 +29,7 @@ class IntPoint;
 class IntRect;
 class Layer;
 class ServerPicture;
+class shape_data;
 
 
 class Canvas {
@@ -52,6 +53,9 @@ public:
 
 			void			SetUserClipping(const BRegion* region);
 				// region is expected in view coordinates
+
+			bool			ClipToRect(BRect rect, bool inverse);
+			void			ClipToShape(shape_data* shape, bool inverse);
 
 			void			SetAlphaMask(AlphaMask* mask);
 			AlphaMask*		GetAlphaMask() const;
@@ -90,6 +94,7 @@ public:
 
 	virtual void			RebuildClipping(bool deep) { /* TODO */ }
 	virtual void			ResyncDrawState();
+	virtual void			UpdateCurrentDrawingRegion();
 	virtual ServerPicture*	GetPicture(int32 token) const
 								{ /* TODO */ return NULL; }
 
@@ -99,6 +104,7 @@ protected:
 
 private:
 			DrawingEngine*	fDrawingEngine;
+			BRegion			fCurrentDrawingRegion;
 };
 
 

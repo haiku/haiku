@@ -676,6 +676,42 @@ PictureDataWriter::WriteBlendLayer(Layer* layer)
 }
 
 
+status_t
+PictureDataWriter::WriteClipToRect(const BRect& rect, bool inverse)
+{
+	try {
+		BeginOp(B_PIC_CLIP_TO_RECT);
+		Write<bool>(inverse);
+		Write<BRect>(rect);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteClipToShape(int32 opCount, const void* opList,
+	int32 ptCount, const void* ptList, bool inverse)
+{
+	try {
+		BeginOp(B_PIC_CLIP_TO_SHAPE);
+		Write<bool>(inverse);
+		Write<int32>(opCount);
+		Write<int32>(ptCount);
+		WriteData(opList, opCount * sizeof(uint32));
+		WriteData(ptList, ptCount * sizeof(BPoint));
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
 // private
 void
 PictureDataWriter::BeginOp(const int16& op)

@@ -223,6 +223,11 @@ public:
 			void				ClipToInversePicture(BPicture* picture,
 									BPoint where = B_ORIGIN, bool sync = true);
 
+			void				ClipToRect(BRect rect);
+			void				ClipToInverseRect(BRect rect);
+			void				ClipToShape(BShape* shape);
+			void				ClipToInverseShape(BShape* shape);
+
 	virtual	void				SetDrawingMode(drawing_mode mode);
 			drawing_mode		DrawingMode() const;
 
@@ -650,6 +655,9 @@ private:
 									uint32 followFlags, uint32 options);
 			void				_ClipToPicture(BPicture* picture, BPoint where,
 									bool invert, bool sync);
+
+			void				_ClipToRect(BRect rect, bool inverse);
+			void				_ClipToShape(BShape* shape, bool inverse);
 
 			bool				_CheckOwnerLockAndSwitchCurrent() const;
 			bool				_CheckOwnerLock() const;

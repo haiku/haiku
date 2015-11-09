@@ -16,10 +16,12 @@
 
 class LayerCanvas : public Canvas {
 public:
-	LayerCanvas(DrawingEngine* drawingEngine, DrawState* drawState)
+	LayerCanvas(DrawingEngine* drawingEngine, DrawState* drawState,
+		BRect bitmapBounds)
 		:
 		Canvas(),
-		fDrawingEngine(drawingEngine)
+		fDrawingEngine(drawingEngine),
+		fBitmapBounds(bitmapBounds)
 	{
 		delete fDrawState;
 		fDrawState = drawState;
@@ -44,6 +46,20 @@ public:
 		fDrawingEngine->SetDrawState(fDrawState);
 	}
 
+	virtual void UpdateCurrentDrawingRegion()
+	{
+		bool hasDrawStateClipping = fDrawState->GetCombinedClippingRegion(
+			&fCurrentDrawingRegion);
+
+		BRegion bitmapRegion(fBitmapBounds);
+		if (hasDrawStateClipping)
+			fCurrentDrawingRegion.IntersectWith(&bitmapRegion);
+		else
+			fCurrentDrawingRegion = bitmapRegion;
+
+		fDrawingEngine->ConstrainClippingRegion(&fCurrentDrawingRegion);
+	}
+
 protected:
 	virtual void _LocalToScreenTransform(SimpleTransform&) const
 	{
@@ -55,6 +71,8 @@ protected:
 
 private:
 	DrawingEngine*	fDrawingEngine;
+	BRegion			fCurrentDrawingRegion;
+	BRect			fBitmapBounds;
 };
 
 
@@ -118,7 +136,7 @@ Layer::RenderToBitmap(Canvas* canvas)
 		// Painter), to prevent this origin from being further transformed by
 		// e.g. scaling.
 
-	LayerCanvas layerCanvas(layerEngine, canvas->CurrentState());
+	LayerCanvas layerCanvas(layerEngine, canvas->CurrentState(), boundingBox);
 
 	AlphaMask* const mask = layerCanvas.GetAlphaMask();
 	IntPoint oldOffset;
@@ -134,8 +152,7 @@ Layer::RenderToBitmap(Canvas* canvas)
 		// Apply state to the new drawing engine of the layer canvas
 
 	if (layerEngine->LockParallelAccess()) {
-		const BRegion region(boundingBox);
-		layerEngine->ConstrainClippingRegion(&region);
+		layerCanvas.UpdateCurrentDrawingRegion();
 
 		// Draw recorded picture into bitmap
 		Play(&layerCanvas);

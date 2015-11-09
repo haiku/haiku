@@ -44,6 +44,7 @@
 
 #include <MessagePrivate.h>
 #include <PortLink.h>
+#include <ShapePrivate.h>
 #include <ServerProtocolStructs.h>
 #include <ViewPrivate.h>
 #include <WindowInfo.h>
@@ -2016,6 +2017,51 @@ fDesktop->LockSingleWindow();
 			break;
 		}
 
+		case AS_VIEW_CLIP_TO_RECT:
+		{
+			bool inverse;
+			BRect rect;
+
+			link.Read<bool>(&inverse);
+			link.Read<BRect>(&rect);
+
+			bool needDrawStateUpdate = fCurrentView->ClipToRect(
+				rect, inverse);
+			fCurrentDrawingRegionValid = false;
+
+			if (needDrawStateUpdate)
+				_UpdateDrawState(fCurrentView);
+
+			_UpdateCurrentDrawingRegion();
+
+			BRegion region(fCurrentDrawingRegion);
+			fCurrentView->ScreenToLocalTransform().Apply(&region);
+
+			break;
+		}
+
+		case AS_VIEW_CLIP_TO_SHAPE:
+		{
+			bool inverse;
+			link.Read<bool>(&inverse);
+
+			shape_data shape;
+			link.Read<int32>(&shape.opCount);
+			link.Read<int32>(&shape.ptCount);
+			shape.opList = new(nothrow) uint32[shape.opCount];
+			shape.ptList = new(nothrow) BPoint[shape.ptCount];
+			if (link.Read(shape.opList, shape.opCount * sizeof(uint32)) >= B_OK
+				&& link.Read(shape.ptList,
+					shape.ptCount * sizeof(BPoint)) >= B_OK) {
+				fCurrentView->ClipToShape(&shape, inverse);
+				_UpdateDrawState(fCurrentView);
+			}
+
+			delete[] shape.opList;
+			delete[] shape.ptList;
+			break;
+		}
+
 		case AS_VIEW_INVALIDATE_RECT:
 		{
 			// NOTE: looks like this call is NOT affected by origin and scale
@@ -3434,6 +3480,39 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			picture->WriteClipToPicture(picture->Token(), where, inverse);
 
 			picture->ReleaseReference();
+			break;
+		}
+
+		case AS_VIEW_CLIP_TO_RECT:
+		{
+			bool inverse;
+			BRect rect;
+			link.Read<bool>(&inverse);
+			link.Read<BRect>(&rect);
+			picture->WriteClipToRect(rect, inverse);
+
+			break;
+		}
+
+		case AS_VIEW_CLIP_TO_SHAPE:
+		{
+			bool inverse;
+			link.Read<bool>(&inverse);
+
+			shape_data shape;
+			link.Read<int32>(&shape.opCount);
+			link.Read<int32>(&shape.ptCount);
+			shape.opList = new(nothrow) uint32[shape.opCount];
+			shape.ptList = new(nothrow) BPoint[shape.ptCount];
+			if (link.Read(shape.opList, shape.opCount * sizeof(uint32)) >= B_OK
+				&& link.Read(shape.ptList,
+					shape.ptCount * sizeof(BPoint)) >= B_OK) {
+				picture->WriteClipToShape(shape.opCount, shape.opList,
+					shape.ptCount, shape.ptList, inverse);
+			}
+
+			delete[] shape.opList;
+			delete[] shape.ptList;
 			break;
 		}
 

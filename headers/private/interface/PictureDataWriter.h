@@ -96,6 +96,11 @@ public:
 									const int32& token);
 
 			status_t			WriteBlendLayer(Layer* layer);
+			status_t			WriteClipToRect(const BRect& rect,
+									bool inverse);
+			status_t			WriteClipToShape(int32 opCount,
+									const void* opList, int32 ptCount,
+									const void* ptList, bool inverse);
 
 protected:
 	// throw a status_t on error

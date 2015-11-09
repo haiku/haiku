@@ -347,6 +347,10 @@ enum {
 	AS_VIEW_SET_FILL_RULE,
 	AS_VIEW_GET_FILL_RULE,
 
+	// New clipping: cumulative, transformed
+	AS_VIEW_CLIP_TO_RECT,
+	AS_VIEW_CLIP_TO_SHAPE,
+
 	AS_LAST_CODE
 };
 

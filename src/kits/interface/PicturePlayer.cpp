@@ -1223,6 +1223,39 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				break;
 			}
 
+			case B_PIC_CLIP_TO_RECT:
+			{
+				const bool* inverse;
+				const BRect* rect;
+
+				if (callbacks.clip_to_rect == NULL || !reader.Get(inverse)
+					|| !reader.Get(rect)) {
+					break;
+				}
+
+				callbacks.clip_to_rect(userData, *rect, *inverse);
+				break;
+			}
+
+			case B_PIC_CLIP_TO_SHAPE:
+			{
+				const bool* inverse;
+				const uint32* opCount;
+				const uint32* pointCount;
+				const uint32* opList;
+				const BPoint* pointList;
+				if (callbacks.clip_to_shape == NULL || !reader.Get(inverse)
+					|| !reader.Get(opCount) || !reader.Get(pointCount)
+					|| !reader.Get(opList, *opCount)
+					|| !reader.Get(pointList, *pointCount)) {
+					break;
+				}
+
+				callbacks.clip_to_shape(userData, *opCount, opList,
+					*pointCount, pointList, *inverse);
+				break;
+			}
+
 			default:
 				break;
 		}

@@ -149,6 +149,22 @@ Canvas::SetUserClipping(const BRegion* region)
 }
 
 
+bool
+Canvas::ClipToRect(BRect rect, bool inverse)
+{
+	bool needDrawStateUpdate = fDrawState->ClipToRect(rect, inverse);
+	RebuildClipping(false);
+	return needDrawStateUpdate;
+}
+
+
+void
+Canvas::ClipToShape(shape_data* shape, bool inverse)
+{
+	fDrawState->ClipToShape(shape, inverse);
+}
+
+
 void
 Canvas::SetAlphaMask(AlphaMask* mask)
 {
@@ -286,4 +302,14 @@ void
 OffscreenCanvas::ResyncDrawState()
 {
 	fDrawingEngine->SetDrawState(fDrawState);
+}
+
+
+void
+OffscreenCanvas::UpdateCurrentDrawingRegion()
+{
+	if (fDrawState->HasClipping()) {
+		fDrawState->GetCombinedClippingRegion(&fCurrentDrawingRegion);
+		fDrawingEngine->ConstrainClippingRegion(&fCurrentDrawingRegion);
+	}
 }

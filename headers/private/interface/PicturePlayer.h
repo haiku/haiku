@@ -85,6 +85,9 @@ struct picture_player_callbacks {
 		alpha_function alphaFunctionMode);
 	void (*set_transform)(void* userData, const BAffineTransform& transform);
 	void (*blend_layer)(void* userData, Layer* layer);
+	void (*clip_to_rect)(void* userData, const BRect& rect, bool inverse);
+	void (*clip_to_shape)(void* userData, int32 opCount, const uint32 opList[],
+		int32 ptCount, const BPoint ptList[], bool inverse);
 };
 
 

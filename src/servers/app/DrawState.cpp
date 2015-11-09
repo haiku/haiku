@@ -19,6 +19,7 @@
 #include <stdio.h>
 
 #include <Region.h>
+#include <ShapePrivate.h>
 
 #include "AlphaMask.h"
 #include "LinkReceiver.h"
@@ -446,6 +447,79 @@ DrawState::GetCombinedClippingRegion(BRegion* region) const
 			return fPreviousState->GetCombinedClippingRegion(region);
 	}
 	return false;
+}
+
+
+bool
+DrawState::ClipToRect(BRect rect, bool inverse)
+{
+	if (!rect.IsValid())
+		return false;
+
+	if (!fCombinedTransform.IsIdentity()) {
+		if (fCombinedTransform.IsDilation()) {
+			BPoint points[2] = { rect.LeftTop(), rect.RightBottom() };
+			fCombinedTransform.Apply(&points[0], 2);
+			rect.Set(points[0].x, points[0].y, points[1].x, points[1].y);
+		} else {
+			uint32 ops[] = {
+				OP_MOVETO | OP_LINETO | 3,
+				OP_CLOSE
+			};
+			BPoint points[4] = {
+				BPoint(rect.left,  rect.top),
+				BPoint(rect.right, rect.top),
+				BPoint(rect.right, rect.bottom),
+				BPoint(rect.left,  rect.bottom)
+			};
+			shape_data rectShape;
+			rectShape.opList = &ops[0];
+			rectShape.opCount = 2;
+			rectShape.opSize = sizeof(uint32) * 2;
+			rectShape.ptList = &points[0];
+			rectShape.ptCount = 4;
+			rectShape.ptSize = sizeof(BPoint) * 4;
+
+			ClipToShape(&rectShape, inverse);
+			return true;
+		}
+	}
+
+	if (inverse) {
+		if (fClippingRegion == NULL) {
+			fClippingRegion = new(nothrow) BRegion(BRect(
+				-(1 << 16), -(1 << 16), (1 << 16), (1 << 16)));
+				// TODO: we should have a definition for a rect (or region)
+				// with "infinite" area. For now, this region size should do...
+		}
+		fClippingRegion->Exclude(rect);
+	} else {
+		if (fClippingRegion == NULL)
+			fClippingRegion = new(nothrow) BRegion(rect);
+		else {
+			BRegion rectRegion(rect);
+			fClippingRegion->IntersectWith(&rectRegion);
+		}
+	}
+
+	return false;
+}
+
+
+void
+DrawState::ClipToShape(shape_data* shape, bool inverse)
+{
+	if (shape->ptCount == 0)
+		return;
+
+	if (!fCombinedTransform.IsIdentity())
+		fCombinedTransform.Apply(shape->ptList, shape->ptCount);
+
+	AlphaMask* const mask = new ShapeAlphaMask(GetAlphaMask(), *shape,
+		BPoint(0, 0), inverse);
+	SetAlphaMask(mask);
+	if (mask != NULL)
+		mask->ReleaseReference();
 }
 
 
