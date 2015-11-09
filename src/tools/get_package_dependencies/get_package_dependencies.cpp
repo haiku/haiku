@@ -14,6 +14,7 @@
 #include <map>
 
 #include <package/RepositoryCache.h>
+#include <package/manager/Exceptions.h>
 #include <package/manager/RepositoryBuilder.h>
 #include <package/solver/Solver.h>
 #include <package/solver/SolverPackageSpecifier.h>
@@ -83,12 +84,13 @@ main(int argc, const char* const* argv)
 
 	// add the "installed" repository with the given packages
 	BSolverRepository installedRepository;
-	{
-		BRepositoryBuilder installedRepositoryBuilder(installedRepository,
-			"installed");
+	try {
+		BRepositoryBuilder installedRepositoryBuilder(installedRepository, "installed");
 		for (int i = 0; i < packageCount; i++)
 			installedRepositoryBuilder.AddPackage(packages[i]);
 		installedRepositoryBuilder.AddToSolver(solver, true);
+	} catch (BFatalErrorException e) {
+		DIE(B_OK, "%s", e.Details().String());
 	}
 
 	// add external repositories
