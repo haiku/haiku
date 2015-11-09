@@ -159,7 +159,8 @@ BUrlContext::HasCertificateException(const BCertificate& certificate)
 
 		int operator()(const BCertificate* item) const
 		{
-			return *item == fItemToMatch;
+			/* Must return 0 if there is a match! */
+			return !(*item == fItemToMatch);
 		}
 
 		const BCertificate& fItemToMatch;
