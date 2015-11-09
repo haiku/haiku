@@ -42,6 +42,19 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
 # define elf_w(x)       _Uelf64_##x
 #endif
 
+#ifdef __HAIKU__
+# define ELFMAG ELF_MAGIC
+#endif
+#ifndef SELFMAG
+# define SELFMAG 4
+#endif
+#ifndef EV_NONE
+# define EV_NONE 0
+#endif
+#ifndef EV_CURRENT
+# define EV_CURRENT 1
+#endif
+
 extern int elf_w (get_proc_name) (unw_addr_space_t as,
                                   pid_t pid, unw_word_t ip,
                                   char *buf, size_t len,
