@@ -29,7 +29,7 @@ public:
 
 	BString		String() const;
 
-	bool		operator==(const BCertificate& other);
+	bool		operator==(const BCertificate& other) const;
 
 private:
 	friend class BSecureSocket::Private;

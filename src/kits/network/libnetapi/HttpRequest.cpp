@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 Haiku Inc. All rights reserved.
+ * Copyright 2010-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1083,9 +1083,14 @@ bool
 BHttpRequest::_CertificateVerificationFailed(BCertificate& certificate,
 	const char* message)
 {
-	if (fListener != NULL) {
-		return fListener->CertificateVerificationFailed(this, certificate,
-			message);
+	if (fContext->HasCertificateException(certificate))
+		return true;
+
+	if (fListener != NULL
+		&& fListener->CertificateVerificationFailed(this, certificate, message)) {
+		// User asked us to continue anyway, let's add a temporary exception for this certificate
+		fContext->AddCertificateException(certificate);
+		return true;
 	}
 
 	return false;

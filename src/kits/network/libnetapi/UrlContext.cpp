@@ -1,9 +1,10 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Christophe Huriaux, c.huriaux@gmail.com
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
  */
 
 
@@ -19,6 +20,7 @@ BUrlContext::BUrlContext()
 	:
 	fCookieJar(),
 	fAuthenticationMap(NULL),
+	fCertificates(20, true),
 	fProxyHost(),
 	fProxyPort(0)
 {
@@ -84,6 +86,16 @@ BUrlContext::SetProxy(BString host, uint16 port)
 }
 
 
+void
+BUrlContext::AddCertificateException(const BCertificate& certificate)
+{
+	BCertificate* copy = new(std::nothrow) BCertificate(certificate);
+	if (copy != NULL) {
+		fCertificates.AddItem(copy);
+	}
+}
+
+
 // #pragma mark Context accessors
 
 
@@ -132,4 +144,26 @@ uint16
 BUrlContext::GetProxyPort()
 {
 	return fProxyPort;
+}
+
+
+bool
+BUrlContext::HasCertificateException(const BCertificate& certificate)
+{
+	struct Equals: public UnaryPredicate<const BCertificate> {
+		Equals(const BCertificate& itemToMatch)
+			:
+			fItemToMatch(itemToMatch)
+		{
+		}
+
+		int operator()(const BCertificate* item) const
+		{
+			return *item == fItemToMatch;
+		}
+
+		const BCertificate& fItemToMatch;
+	} comparator(certificate);
+
+	return fCertificates.FindIf(comparator) != NULL;
 }
