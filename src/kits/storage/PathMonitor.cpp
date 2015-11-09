@@ -58,7 +58,6 @@ typedef BOpenHashTable<WatcherHashDefinition> WatcherMap;
 
 static pthread_once_t sInitOnce = PTHREAD_ONCE_INIT;
 static WatcherMap* sWatchers = NULL;
-static BLocker* sLocker = NULL;
 static BLooper* sLooper = NULL;
 static BPathMonitor::BWatchingInterface* sDefaultWatchingInterface = NULL;
 static BPathMonitor::BWatchingInterface* sWatchingInterface = NULL;
@@ -840,10 +839,7 @@ PathHandler::PathHandler(const char* path, uint32 flags,
 		return;
 
 	// add ourselves to the looper
-	if (!looper->Lock())
-		debugger("PathHandler: failed to lock the looper");
 	looper->AddHandler(this);
-	looper->Unlock();
 
 	// start watching
 	fStatus = _StartWatchingAncestors(fRoot, false);
@@ -878,13 +874,9 @@ PathHandler::InitCheck() const
 void
 PathHandler::Quit()
 {
-	if (sLooper->Lock()) {
-		TRACE("%p->PathHandler::Quit()\n", this);
-		sWatchingInterface->StopWatching(this);
-		sLooper->RemoveHandler(this);
-		sLooper->Unlock();
-	} else
-		TRACE("%p->PathHandler::Quit(): failed to lock looper\n", this);
+	TRACE("%p->PathHandler::Quit()\n", this);
+	sWatchingInterface->StopWatching(this);
+	sLooper->RemoveHandler(this);
 	delete this;
 }
 
@@ -899,7 +891,6 @@ PathHandler::MessageReceived(BMessage* message)
 			if (message->FindInt32("opcode", &opcode) != B_OK)
 				return;
 
-			BAutolock _(sLocker);
 			switch (opcode) {
 				case B_ENTRY_CREATED:
 					_EntryCreated(message);
@@ -2001,7 +1992,7 @@ BPathMonitor::StartWatching(const char* path, uint32 flags,
 	if (status != B_OK)
 		return status;
 
-	BAutolock _(sLocker);
+	BAutolock _(sLooper);
 
 	Watcher* watcher = sWatchers->Lookup(target);
 	bool newWatcher = false;
@@ -2051,12 +2042,12 @@ BPathMonitor::StartWatching(const char* path, uint32 flags,
 /*static*/ status_t
 BPathMonitor::StopWatching(const char* path, const BMessenger& target)
 {
-	if (sLocker == NULL)
+	if (sLooper == NULL)
 		return B_BAD_VALUE;
 
 	TRACE("BPathMonitor::StopWatching(%s)\n", path);
 
-	BAutolock _(sLocker);
+	BAutolock _(sLooper);
 
 	Watcher* watcher = sWatchers->Lookup(target);
 	if (watcher == NULL)
@@ -2081,10 +2072,10 @@ BPathMonitor::StopWatching(const char* path, const BMessenger& target)
 /*static*/ status_t
 BPathMonitor::StopWatching(const BMessenger& target)
 {
-	if (sLocker == NULL)
+	if (sLooper == NULL)
 		return B_BAD_VALUE;
 
-	BAutolock _(sLocker);
+	BAutolock _(sLooper);
 
 	Watcher* watcher = sWatchers->Lookup(target);
 	if (watcher == NULL)
@@ -2124,11 +2115,6 @@ BPathMonitor::_InitIfNeeded()
 /*static*/ void
 BPathMonitor::_Init()
 {
-	sLocker = new (std::nothrow) BLocker("path monitor");
-	TRACE("Create PathMonitor locker\n");
-	if (sLocker == NULL)
-		return;
-
 	sDefaultWatchingInterface = new(std::nothrow) BWatchingInterface;
 	if (sDefaultWatchingInterface == NULL)
 		return;
