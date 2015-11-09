@@ -514,6 +514,14 @@ BAffineTransform::IsIdentity(double epsilon) const
 
 
 bool
+BAffineTransform::IsDilation(double epsilon) const
+{
+	return IsEqualEpsilon(shy, 0.0, epsilon)
+		&& IsEqualEpsilon(shx, 0.0, epsilon);
+}
+
+
+bool
 BAffineTransform::IsEqual(const BAffineTransform& other, double epsilon) const
 {
 	return IsEqualEpsilon(sx, other.sx, epsilon)

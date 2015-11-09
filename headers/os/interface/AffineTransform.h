@@ -171,6 +171,8 @@ public:
 										= kDefaultEpsilon) const;
 			bool					IsIdentity(double epsilon
 										= kDefaultEpsilon) const;
+			bool					IsDilation(double epsilon
+										= kDefaultEpsilon) const;
 			bool					IsEqual(const BAffineTransform& other,
 										double epsilon
 											= kDefaultEpsilon) const;
