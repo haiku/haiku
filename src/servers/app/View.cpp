@@ -823,6 +823,17 @@ View::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
 	if (!fVisible || !fWindow)
 		return;
 
+	// TODO: figure out what to do when we have a transform which is not
+	// a dilation
+	BAffineTransform transform = CurrentState()->CombinedTransform();
+	if (!transform.IsIdentity() && transform.IsDilation()) {
+		BPoint points[4] = { src.LeftTop(), src.RightBottom(),
+							 dst.LeftTop(), dst.RightBottom() };
+		transform.Apply(&points[0], 4);
+		src.Set(points[0].x, points[0].y, points[1].x, points[1].y);
+		dst.Set(points[2].x, points[2].y, points[3].x, points[3].y);
+	}
+
 	// TODO: confirm that in R5 this call is affected by origin and scale
 
 	// blitting version
