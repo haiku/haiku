@@ -19,6 +19,7 @@
 class BShape;
 class ServerBitmap;
 class ServerPicture;
+class shape_data;
 
 
 // #pragma mark - AlphaMask
@@ -121,6 +122,7 @@ private:
 class ShapeAlphaMask : public VectorAlphaMask<ShapeAlphaMask> {
 public:
 								ShapeAlphaMask(AlphaMask* previousMask,
+									const shape_data& shape,
 									BPoint where, bool inverse);
 
 			void				DrawVectors(Canvas* canvas);
@@ -128,6 +130,8 @@ public:
 			const DrawState&	GetDrawState() const;
 
 private:
+			const shape_data&	fShape;
+			BRect				fBounds;
 			DrawState			fDrawState;
 };
 

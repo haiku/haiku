@@ -19,6 +19,7 @@
 #include "ServerBitmap.h"
 #include "ServerPicture.h"
 #include "Shape.h"
+#include "ShapePrivate.h"
 
 
 // #pragma mark - AlphaMask
@@ -249,6 +250,8 @@ VectorAlphaMask<VectorMaskType>::_RenderSource()
 	drawState->SetDrawingModeLocked(true);
 	canvas.PushState();
 
+	canvas.ResyncDrawState();
+
 	if (engine->LockParallelAccess()) {
 		BRegion clipping;
 		clipping.Set((clipping_rect)fBounds);
@@ -330,12 +333,14 @@ PictureAlphaMask::GetDrawState() const
 // #pragma mark - ShapeAlphaMask
 
 
-ShapeAlphaMask::ShapeAlphaMask(AlphaMask* previousMask,  BPoint where,
-	bool inverse)
+ShapeAlphaMask::ShapeAlphaMask(AlphaMask* previousMask,
+	const shape_data& shape, BPoint where, bool inverse)
 	:
 	VectorAlphaMask<ShapeAlphaMask>(previousMask, where, inverse),
+	fShape(shape),
 	fDrawState()
 {
+	fBounds = fShape.DetermineBoundingBox();
 	_Generate();
 }
 
@@ -343,15 +348,17 @@ ShapeAlphaMask::ShapeAlphaMask(AlphaMask* previousMask,  BPoint where,
 void
 ShapeAlphaMask::DrawVectors(Canvas* canvas)
 {
-	// TODO
+	canvas->GetDrawingEngine()->DrawShape(fBounds,
+		fShape.opCount, fShape.opList,
+		fShape.ptCount, fShape.ptList,
+		true, BPoint(0, 0), 1.0);
 }
 
 
 BRect
 ShapeAlphaMask::DetermineBoundingBox() const
 {
-	// TODO
-	return BRect(0, 0, 0, 0);
+	return fBounds;
 }
 
 
