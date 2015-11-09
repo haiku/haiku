@@ -254,7 +254,7 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	uint32 extraPLLFlags = 0;
 	if (gInfo->shared_info->device_type.Generation() >= 4)
-		extraPLLFlags |= DISPLAY_PLL_MODE_ANALOG;
+		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
 
 	// Program pipe PLL's
 	fDisplayPipe->ConfigureTimings(divisors, extraPLLFlags);
@@ -655,11 +655,53 @@ DigitalPort::_DDCRegister()
 addr_t
 DigitalPort::_PortRegister()
 {
-	ERROR("%s: %s PortRegister fallthrough\n", __func__, PortName());
+	switch (PortIndex()) {
+		case INTEL_PORT_A:
+			return INTEL_DIGITAL_PORT_A;
+		case INTEL_PORT_B:
+			return INTEL_DIGITAL_PORT_B;
+		case INTEL_PORT_C:
+			return INTEL_DIGITAL_PORT_C;
+		default:
+			return 0;
+	}
 	return 0;
 }
 
 
+status_t
+DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
+{
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
+		target->virtual_height);
+
+	if (fDisplayPipe == NULL) {
+		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
+		return B_ERROR;
+	}
+
+	pll_divisors divisors;
+	compute_pll_divisors(target, &divisors, false);
+
+	uint32 extraPLLFlags = 0;
+	if (gInfo->shared_info->device_type.Generation() >= 4)
+		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
+
+	// Program pipe PLL's
+	fDisplayPipe->ConfigureTimings(divisors, extraPLLFlags);
+
+	// Program target display mode
+	fDisplayPipe->Enable(target, _PortRegister());
+
+	// XXX: Crashes?
+	// Set fCurrentMode to our set display mode
+	//memcpy(fCurrentMode, target, sizeof(display_mode));
+
+	return B_OK;
+}
+
+
+// #pragma mark - LVDS Panel
 // #pragma mark - HDMI
 
 

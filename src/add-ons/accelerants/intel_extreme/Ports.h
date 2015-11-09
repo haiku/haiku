@@ -137,6 +137,8 @@ virtual	uint32						Type() const
 
 virtual	bool						IsConnected();
 
+virtual status_t					SetDisplayMode(display_mode* mode,
+										uint32 colorMode);
 
 protected:
 virtual	addr_t						_DDCRegister();

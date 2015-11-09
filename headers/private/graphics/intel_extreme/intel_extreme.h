@@ -452,7 +452,7 @@ struct intel_free_graphics_memory {
 #define DISPLAY_PLL_2X_CLOCK			(1UL << 30)
 #define DISPLAY_PLL_SYNC_LOCK_ENABLED	(1UL << 29)
 #define DISPLAY_PLL_NO_VGA_CONTROL		(1UL << 28)
-#define DISPLAY_PLL_MODE_ANALOG			(1UL << 26)
+#define DISPLAY_PLL_MODE_NORMAL			(1UL << 26)
 #define DISPLAY_PLL_MODE_LVDS			(2UL << 26)
 #define DISPLAY_PLL_DIVIDE_HIGH			(1UL << 24)
 #define DISPLAY_PLL_DIVIDE_4X			(1UL << 23)
