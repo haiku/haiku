@@ -775,6 +775,16 @@ XHCI::AddTo(Stack *stack)
 				continue;
 			}
 
+			// whitelists a few devices for the time being
+			switch ((item->vendor_id << 16) | item->device_id) {
+				case 0x10330194:	// Nec Corporation uPD720200
+				case 0x1b731009:	// Fresco Logic FL1009
+					break;
+				default:
+					TRACE_MODULE_ERROR("found device but unsupported\n");
+					continue;
+			}
+
 			TRACE_MODULE("found device at IRQ %u\n",
 				item->u.h0.interrupt_line);
 			XHCI *bus = new(std::nothrow) XHCI(item, stack);
