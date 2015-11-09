@@ -620,8 +620,11 @@ if (first) {
 			ERROR("%s: Unable to set display mode!\n", __func__);
 	}
 
+	TRACE("%s: Port configuration completed successfully!\n", __func__);
+
 	// RIP DIGITAL / LVDS (strange..)
 
+	#if 0
 	if ((gInfo->head_mode & HEAD_MODE_STIPPI) != 0) {
 		pll_divisors divisors;
 		compute_pll_divisors(&target, &divisors, false);
@@ -711,6 +714,7 @@ if (first) {
 				& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
 			| colorMode);
 	}
+	#endif
 
 	// RIP ANALOG
 

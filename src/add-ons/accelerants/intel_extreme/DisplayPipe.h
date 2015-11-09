@@ -36,11 +36,12 @@ public:
 										{ return fPipeIndex; }
 
 		bool						IsEnabled();
-		void						Enable(const display_mode& mode);
+		void						Enable(display_mode* mode,
+										addr_t portRegister);
 		void						Disable();
 
-		void						ConfigureTimings(
-										const pll_divisors& divisors);
+		void						ConfigureTimings(const pll_divisors& divisors,
+										uint32 extraFlags);
 
 		// access to the various parts of the pipe
 	//	::FDILink*					FDILink()
@@ -54,8 +55,10 @@ private:
 	//	FDILink*					fFDILink;
 	//	PanelFitter*				fPanelFitter;
 
-		addr_t						fBaseRegister;
 		pipe_index					fPipeIndex;
+
+		addr_t						fPipeBase;
+		addr_t						fPlaneBase;
 };
 
 

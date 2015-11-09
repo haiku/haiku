@@ -38,9 +38,9 @@
 
 Port::Port(port_index index, const char* baseName)
 	:
+	fDisplayPipe(NULL),
 	fPortIndex(index),
 	fPortName(NULL),
-	fDisplayPipe(NULL),
 	fEDIDState(B_NO_INIT)
 {
 	char portID[2];
@@ -121,7 +121,7 @@ Port::GetEDID(edid1_info* edid, bool forceRead)
 			return fEDIDState;
 		}
 
-		TRACE("%s: using register %" B_PRIxADDR "\n", PortName(), ddcRegister);
+		TRACE("%s: using ddc @ 0x%" B_PRIxADDR "\n", PortName(), ddcRegister);
 
 		i2c_bus bus;
 		bus.cookie = (void*)ddcRegister;
@@ -241,127 +241,30 @@ AnalogPort::_PortRegister()
 status_t
 AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
-	TRACE("%s: %s-%d %dx%d\n", __func__, PortName(), PortIndex(),
-		target->virtual_width, target->virtual_height);
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
+		target->virtual_height);
+
+	if (fDisplayPipe == NULL) {
+		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
+		return B_ERROR;
+	}
 
 	pll_divisors divisors;
 	compute_pll_divisors(target, &divisors, false);
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
-		write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
-			(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
-				& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
-			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-				& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
-	} else {
-		write32(INTEL_DISPLAY_A_PLL_DIVISOR_0,
-			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
-				& DISPLAY_PLL_N_DIVISOR_MASK)
-			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
-				& DISPLAY_PLL_M1_DIVISOR_MASK)
-			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-				& DISPLAY_PLL_M2_DIVISOR_MASK));
-	}
+	uint32 extraPLLFlags = 0;
+	if (gInfo->shared_info->device_type.Generation() >= 4)
+		extraPLLFlags |= DISPLAY_PLL_MODE_ANALOG;
 
-	uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL;
-	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)
-		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
-		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
-		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
-			pll |= ((1 << (divisors.post1 - 1))
-					<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT)
-				& DISPLAY_PLL_IGD_POST1_DIVISOR_MASK;
-		} else {
-			pll |= ((1 << (divisors.post1 - 1))
-					<< DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
-//			pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-//				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
-		}
-		if (divisors.post2_high)
-			pll |= DISPLAY_PLL_DIVIDE_HIGH;
+	// Program pipe PLL's
+	fDisplayPipe->ConfigureTimings(divisors, extraPLLFlags);
 
-		pll |= DISPLAY_PLL_MODE_ANALOG;
+	// Program target display mode
+	fDisplayPipe->Enable(target, _PortRegister());
 
-		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x))
-			pll |= 6 << DISPLAY_PLL_PULSE_PHASE_SHIFT;
-	} else {
-		if (!divisors.post2_high)
-			pll |= DISPLAY_PLL_DIVIDE_4X;
-
-		pll |= DISPLAY_PLL_2X_CLOCK;
-
-		if (divisors.post1 > 2) {
-			pll |= ((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-				& DISPLAY_PLL_POST1_DIVISOR_MASK;
-		} else
-			pll |= DISPLAY_PLL_POST1_DIVIDE_2;
-	}
-
-	// Programmer's Ref says we must allow the DPLL to "warm up" before starting the plane
-	// so mask its bit, wait, enable its bit
-	write32(INTEL_DISPLAY_A_PLL, pll & ~DISPLAY_PLL_NO_VGA_CONTROL);
-	read32(INTEL_DISPLAY_A_PLL);
-	spin(150);
-	write32(INTEL_DISPLAY_A_PLL, pll);
-	read32(INTEL_DISPLAY_A_PLL);
-	spin(150);
-
-	// update timing parameters
-	write32(INTEL_DISPLAY_A_HTOTAL,
-		((uint32)(target->timing.h_total - 1) << 16)
-		| ((uint32)target->timing.h_display - 1));
-	write32(INTEL_DISPLAY_A_HBLANK,
-		((uint32)(target->timing.h_total - 1) << 16)
-		| ((uint32)target->timing.h_display - 1));
-	write32(INTEL_DISPLAY_A_HSYNC,
-		((uint32)(target->timing.h_sync_end - 1) << 16)
-		| ((uint32)target->timing.h_sync_start - 1));
-
-	write32(INTEL_DISPLAY_A_VTOTAL,
-		((uint32)(target->timing.v_total - 1) << 16)
-		| ((uint32)target->timing.v_display - 1));
-	write32(INTEL_DISPLAY_A_VBLANK,
-		((uint32)(target->timing.v_total - 1) << 16)
-		| ((uint32)target->timing.v_display - 1));
-	write32(INTEL_DISPLAY_A_VSYNC,
-		((uint32)(target->timing.v_sync_end - 1) << 16)
-		| ((uint32)target->timing.v_sync_start - 1));
-
-	write32(INTEL_DISPLAY_A_IMAGE_SIZE,
-		((uint32)(target->virtual_width - 1) << 16)
-		| ((uint32)target->virtual_height - 1));
-
-	write32(INTEL_ANALOG_PORT, (read32(INTEL_ANALOG_PORT)
-			& ~(DISPLAY_MONITOR_POLARITY_MASK
-				| DISPLAY_MONITOR_VGA_POLARITY))
-		| ((target->timing.flags & B_POSITIVE_HSYNC) != 0
-			? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
-		| ((target->timing.flags & B_POSITIVE_VSYNC) != 0
-			? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
-
-	// TODO: verify the two comments below: the X driver doesn't seem to
-	//		care about both of them!
-
-	// These two have to be set for display B, too - this obviously means
-	// that the second head always must adopt the color space of the first
-	// head.
-	write32(INTEL_DISPLAY_A_CONTROL, (read32(INTEL_DISPLAY_A_CONTROL)
-			& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
-		| colorMode);
-
-	if ((gInfo->head_mode & HEAD_MODE_B_DIGITAL) != 0) {
-		write32(INTEL_DISPLAY_B_IMAGE_SIZE,
-			((uint32)(target->virtual_width - 1) << 16)
-			| ((uint32)target->virtual_height - 1));
-
-		write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
-				& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
-			| colorMode);
-	}
-
+	// XXX: Crashes?
 	// Set fCurrentMode to our set display mode
-	memcpy(fCurrentMode, target, sizeof(display_mode));
+	//memcpy(fCurrentMode, target, sizeof(display_mode));
 
 	return B_OK;
 }
@@ -428,6 +331,22 @@ LVDSPort::_PortRegister()
 status_t
 LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
+    CALLED();
+	if (target == NULL) {
+		ERROR("%s: Invalid target mode passed!\n", __func__);
+		return B_ERROR;
+	}
+
+	TRACE("%s: %s-%d %dx%d\n", __func__, PortName(), PortIndex(),
+		target->virtual_width, target->virtual_height);
+
+	if (fDisplayPipe == NULL) {
+		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
+		return B_ERROR;
+	}
+
+	// TODO: Fix software scaling?
+#if 0
 	// For LVDS panels, we actually always set the native mode in hardware
 	// Then we use the panel fitter to scale the picture to that.
 	display_mode hardwareTarget;
@@ -515,16 +434,18 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		read32(INTEL_DISPLAY_B_PLL);
 		spin(150);
 	}
+#endif
 
-	uint32 lvds = read32(INTEL_DIGITAL_LVDS_PORT) | LVDS_PORT_EN
-		| LVDS_A0A2_CLKA_POWER_UP;
+
+	pll_divisors divisors;
+	compute_pll_divisors(target, &divisors, true);
+
+	uint32 lvds = read32(_PortRegister())
+		| LVDS_PORT_EN | LVDS_A0A2_CLKA_POWER_UP;
 
 	lvds |= LVDS_18BIT_DITHER;
 		// TODO: do not do this if the connected panel is 24-bit
 		// (I don't know how to detect that)
-
-	float referenceClock = gInfo->shared_info->pll_info.reference_frequency
-		/ 1000.0f;
 
 	// Set the B0-B3 data pairs corresponding to whether we're going to
 	// set the DPLLs for dual-channel mode or not.
@@ -533,9 +454,22 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	else
 		lvds &= ~(LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP);
 
-	write32(INTEL_DIGITAL_LVDS_PORT, lvds);
-	read32(INTEL_DIGITAL_LVDS_PORT);
+	write32(_PortRegister(), lvds);
+	read32(_PortRegister());
 
+	uint32 extraPLLFlags = 0;
+
+	// DPLL mode LVDS for i915+
+	if (gInfo->shared_info->device_type.Generation() >= 4)
+		extraPLLFlags |= DISPLAY_PLL_MODE_LVDS;
+
+	// Program pipe PLL's
+	fDisplayPipe->ConfigureTimings(divisors, extraPLLFlags);
+
+	// Program target display mode
+	fDisplayPipe->Enable(target, _PortRegister());
+
+#if 0
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 		write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
 			(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
@@ -558,6 +492,9 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Wait for the clocks to stabilize
 	spin(150);
 
+	float referenceClock = gInfo->shared_info->pll_info.reference_frequency
+		/ 1000.0f;
+
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)) {
 		float adjusted = ((referenceClock * divisors.m) / divisors.n)
 			/ divisors.post;
@@ -570,7 +507,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 				/ (target->timing.pixel_clock / 1000.0f));
 		}
 
-		write32(INTEL_DISPLAY_B_PLL_MULTIPLIER_DIVISOR, (0 << 24)
+		write32(INTEL_DISPLAY_B_PLL_MD, (0 << 24)
 			| ((pixelMultiply - 1) << 8));
 	} else
 		write32(INTEL_DISPLAY_B_PLL, dpll);
@@ -655,10 +592,6 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			| ((uint32)target->timing.v_sync_start - 1));
 	}
 
-	write32(INTEL_DISPLAY_B_IMAGE_SIZE,
-		((uint32)(target->virtual_width - 1) << 16)
-		| ((uint32)target->virtual_height - 1));
-
 	write32(INTEL_DISPLAY_B_POS, 0);
 	write32(INTEL_DISPLAY_B_PIPE_SIZE,
 		((uint32)(target->timing.v_display - 1) << 16)
@@ -671,6 +604,11 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	write32(INTEL_DISPLAY_B_PIPE_CONTROL,
 		read32(INTEL_DISPLAY_B_PIPE_CONTROL) | INTEL_PIPE_ENABLED);
 	read32(INTEL_DISPLAY_B_PIPE_CONTROL);
+#endif
+
+	// XXX: Crashes?
+	// Set fCurrentMode to our set display mode
+	//memcpy(fCurrentMode, target, sizeof(display_mode));
 
 	return B_OK;
 }
@@ -717,6 +655,7 @@ DigitalPort::_DDCRegister()
 addr_t
 DigitalPort::_PortRegister()
 {
+	ERROR("%s: %s PortRegister fallthrough\n", __func__, PortName());
 	return 0;
 }
 
