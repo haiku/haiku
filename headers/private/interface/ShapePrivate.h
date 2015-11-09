@@ -27,6 +27,36 @@ struct shape_data {
 	BPoint*	ptList;
 	int32	ptCount;
 	int32	ptSize;
+
+	BRect DetermineBoundingBox() const
+	{
+		BRect bounds;
+
+		if (ptCount == 0)
+			return bounds;
+
+		// TODO: This implementation doesn't take into account curves at all.
+		bounds.left = ptList[0].x;
+		bounds.top = ptList[0].y;
+		bounds.right = ptList[0].x;
+		bounds.bottom = ptList[0].y;
+
+		for (int32 i = 1; i < ptCount; i++) {
+			if (bounds.left > ptList[i].x)
+				bounds.left = ptList[i].x;
+
+			if (bounds.top > ptList[i].y)
+				bounds.top = ptList[i].y;
+
+			if (bounds.right < ptList[i].x)
+				bounds.right = ptList[i].x;
+
+			if (bounds.bottom < ptList[i].y)
+				bounds.bottom = ptList[i].y;
+		}
+
+		return bounds;
+	}
 };
 
 
