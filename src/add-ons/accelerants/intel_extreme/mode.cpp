@@ -623,99 +623,6 @@ if (first) {
 	TRACE("%s: Port configuration completed successfully!\n", __func__);
 
 	// RIP DIGITAL / LVDS (strange..)
-
-	#if 0
-	if ((gInfo->head_mode & HEAD_MODE_STIPPI) != 0) {
-		pll_divisors divisors;
-		compute_pll_divisors(&target, &divisors, false);
-
-		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
-			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
-				(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
-					& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
-				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-					& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
-		} else {
-			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
-				(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
-					& DISPLAY_PLL_N_DIVISOR_MASK)
-				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
-					& DISPLAY_PLL_M1_DIVISOR_MASK)
-				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-					& DISPLAY_PLL_M2_DIVISOR_MASK));
-		}
-
-		uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL;
-		if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)
-			|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
-			|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
-			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
-				pll |= ((1 << (divisors.post1 - 1))
-						<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT)
-					& DISPLAY_PLL_IGD_POST1_DIVISOR_MASK;
-			} else {
-				pll |= ((1 << (divisors.post1 - 1))
-						<< DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-					& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
-//				pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-//					& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
-			}
-			if (divisors.post2_high)
-				pll |= DISPLAY_PLL_DIVIDE_HIGH;
-
-			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x))
-				pll |= 6 << DISPLAY_PLL_PULSE_PHASE_SHIFT;
-		} else {
-			if (!divisors.post2_high)
-				pll |= DISPLAY_PLL_DIVIDE_4X;
-
-			pll |= DISPLAY_PLL_2X_CLOCK;
-
-			if (divisors.post1 > 2) {
-				pll |= ((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-					& DISPLAY_PLL_POST1_DIVISOR_MASK;
-			} else
-				pll |= DISPLAY_PLL_POST1_DIVIDE_2;
-		}
-
-		write32(INTEL_DISPLAY_B_PLL, pll);
-		read32(INTEL_DISPLAY_B_PLL);
-		spin(150);
-		write32(INTEL_DISPLAY_B_PLL, pll);
-		read32(INTEL_DISPLAY_B_PLL);
-		spin(150);
-
-		// update timing parameters
-		write32(INTEL_DISPLAY_B_HTOTAL,
-			((uint32)(target.timing.h_total - 1) << 16)
-			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_B_HBLANK,
-			((uint32)(target.timing.h_total - 1) << 16)
-			| ((uint32)target.timing.h_display - 1));
-		write32(INTEL_DISPLAY_B_HSYNC,
-			((uint32)(target.timing.h_sync_end - 1) << 16)
-			| ((uint32)target.timing.h_sync_start - 1));
-
-		write32(INTEL_DISPLAY_B_VTOTAL,
-			((uint32)(target.timing.v_total - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_B_VBLANK,
-			((uint32)(target.timing.v_total - 1) << 16)
-			| ((uint32)target.timing.v_display - 1));
-		write32(INTEL_DISPLAY_B_VSYNC,
-			((uint32)(target.timing.v_sync_end - 1) << 16)
-			| ((uint32)target.timing.v_sync_start - 1));
-
-		write32(INTEL_DISPLAY_B_IMAGE_SIZE,
-			((uint32)(target.virtual_width - 1) << 16)
-			| ((uint32)target.virtual_height - 1));
-
-		write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
-				& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
-			| colorMode);
-	}
-	#endif
-
 	// RIP ANALOG
 
 	// We set the same color mode across all pipes
@@ -732,13 +639,13 @@ if (first) {
 	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
 		write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
 
-	set_frame_buffer_base();
-		// triggers writing back double-buffered registers
-
 	// update shared info
 	sharedInfo.bytes_per_row = bytesPerRow;
 	sharedInfo.current_mode = target;
 	sharedInfo.bits_per_pixel = bitsPerPixel;
+
+	set_frame_buffer_base();
+		// triggers writing back double-buffered registers
 
 	return B_OK;
 }
