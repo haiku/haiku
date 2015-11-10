@@ -82,6 +82,8 @@ public:
 	inline	const BAffineTransform&	TranslateBy(double x, double y);
 			const BAffineTransform&	TranslateBy(const BPoint& delta);
 
+	inline	const BAffineTransform&	PreTranslateBy(double x, double y);
+
 			BAffineTransform		TranslateByCopy(double x, double y) const;
 			BAffineTransform		TranslateByCopy(const BPoint& delta) const;
 
@@ -91,6 +93,8 @@ public:
 	inline	const BAffineTransform&	RotateBy(double angle);
 			const BAffineTransform&	RotateBy(const BPoint& center,
 										double angle);
+
+	inline	const BAffineTransform&	PreRotateBy(double angleRadians);
 
 			BAffineTransform		RotateByCopy(double angle) const;
 			BAffineTransform		RotateByCopy(const BPoint& center,
@@ -108,6 +112,8 @@ public:
 			const BAffineTransform&	ScaleBy(const BPoint& scale);
 			const BAffineTransform&	ScaleBy(const BPoint& center,
 										const BPoint& scale);
+
+	inline	const BAffineTransform&	PreScaleBy(double x, double y);
 
 			BAffineTransform		ScaleByCopy(double scale) const;
 			BAffineTransform		ScaleByCopy(const BPoint& center,
@@ -245,6 +251,15 @@ BAffineTransform::TranslateBy(double x, double y)
 
 
 inline const BAffineTransform&
+BAffineTransform::PreTranslateBy(double x, double y)
+{
+	tx += x * sx + y * shx;
+	ty += x * shy + y * sy;
+	return *this;
+}
+
+
+inline const BAffineTransform&
 BAffineTransform::RotateBy(double angle)
 {
 	double ca = cos(angle);
@@ -258,6 +273,21 @@ BAffineTransform::RotateBy(double angle)
 	sx = t0;
 	shx = t2;
 	tx = t4;
+	return *this;
+}
+
+
+inline const BAffineTransform&
+BAffineTransform::PreRotateBy(double angle)
+{
+	double ca = cos(angle);
+	double sa = sin(angle);
+	double newSx = sx * ca + shx * sa;
+	double newSy = -shy * sa + sy * ca;
+	shy = shy * ca + sy * sa;
+	shx = -sx * sa + shx * ca;
+	sx = newSx;
+	sy = newSy;
 	return *this;
 }
 
@@ -289,6 +319,17 @@ BAffineTransform::ScaleBy(double s)
 	shy *= m;
 	sy *= m;
 	ty *= m;
+	return *this;
+}
+
+
+inline const BAffineTransform&
+BAffineTransform::PreScaleBy(double x, double y)
+{
+	sx *= x;
+	shx *= y;
+	shy *= x;
+	sy *= y;
 	return *this;
 }
 
