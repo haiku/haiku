@@ -1925,6 +1925,56 @@ BView::Transform() const
 
 
 void
+BView::TranslateBy(double x, double y)
+{
+	if (fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_AFFINE_TRANSLATE);
+		fOwner->fLink->Attach<double>(x);
+		fOwner->fLink->Attach<double>(y);
+
+		fState->valid_flags &= ~B_VIEW_TRANSFORM_BIT;
+	}
+
+	fState->archiving_flags |= B_VIEW_TRANSFORM_BIT;
+}
+
+
+void
+BView::ScaleBy(double x, double y)
+{
+	if (fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_AFFINE_SCALE);
+		fOwner->fLink->Attach<double>(x);
+		fOwner->fLink->Attach<double>(y);
+
+		fState->valid_flags &= ~B_VIEW_TRANSFORM_BIT;
+	}
+
+	fState->archiving_flags |= B_VIEW_TRANSFORM_BIT;
+}
+
+
+void
+BView::RotateBy(double angleRadians)
+{
+	if (fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_AFFINE_ROTATE);
+		fOwner->fLink->Attach<double>(angleRadians);
+
+		fState->valid_flags &= ~B_VIEW_TRANSFORM_BIT;
+	}
+
+	fState->archiving_flags |= B_VIEW_TRANSFORM_BIT;
+}
+
+
+void
 BView::SetLineMode(cap_mode lineCap, join_mode lineJoin, float miterLimit)
 {
 	if (fState->IsValid(B_VIEW_LINE_MODES_BIT)

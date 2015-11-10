@@ -184,6 +184,53 @@ PictureDataWriter::WriteSetTransform(BAffineTransform transform)
 
 
 status_t
+PictureDataWriter::WriteTranslateBy(double x, double y)
+{
+	try {
+		BeginOp(B_PIC_AFFINE_TRANSLATE);
+		Write<double>(x);
+		Write<double>(y);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteScaleBy(double x, double y)
+{
+	try {
+		BeginOp(B_PIC_AFFINE_SCALE);
+		Write<double>(x);
+		Write<double>(y);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteRotateBy(double angleRadians)
+{
+	try {
+		BeginOp(B_PIC_AFFINE_ROTATE);
+		Write<double>(angleRadians);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
 PictureDataWriter::WriteSetPattern(const ::pattern& pattern)
 {
 	try {

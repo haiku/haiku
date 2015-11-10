@@ -300,6 +300,9 @@ public:
 								// more powerful alternative.
 			void				SetTransform(BAffineTransform transform);
 			BAffineTransform	Transform() const;
+			void				TranslateBy(double x, double y);
+			void				ScaleBy(double x, double y);
+			void				RotateBy(double angleRadians);
 
 			void				PushState();
 			void				PopState();

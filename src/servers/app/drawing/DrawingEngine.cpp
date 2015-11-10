@@ -322,6 +322,13 @@ DrawingEngine::SetFont(const DrawState* state)
 }
 
 
+void
+DrawingEngine::SetTransform(const BAffineTransform& transform)
+{
+	fPainter->SetTransform(transform);
+}
+
+
 // #pragma mark -
 
 

@@ -41,6 +41,9 @@ public:
 									const float& miterLimit);
 			status_t			WriteSetScale(const float& scale);
 			status_t			WriteSetTransform(BAffineTransform transform);
+			status_t			WriteTranslateBy(double x, double y);
+			status_t			WriteScaleBy(double x, double y);
+			status_t			WriteRotateBy(double angleRadians);
 			status_t			WriteSetPattern(const ::pattern& pattern);
 			status_t			WriteClipToPicture(int32 pictureToken,
 									const BPoint& origin, bool inverse);

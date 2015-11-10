@@ -1213,6 +1213,42 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				break;
 			}
 
+			case B_PIC_AFFINE_TRANSLATE:
+			{
+				const double* x;
+				const double* y;
+				if (callbacks.translate_by == NULL || !reader.Get(x)
+					|| !reader.Get(y)) {
+					break;
+				}
+
+				callbacks.translate_by(userData, *x, *y);
+				break;
+			}
+
+			case B_PIC_AFFINE_SCALE:
+			{
+				const double* x;
+				const double* y;
+				if (callbacks.scale_by == NULL || !reader.Get(x)
+					|| !reader.Get(y)) {
+					break;
+				}
+
+				callbacks.scale_by(userData, *x, *y);
+				break;
+			}
+
+			case B_PIC_AFFINE_ROTATE:
+			{
+				const double* angleRadians;
+				if (callbacks.rotate_by == NULL || !reader.Get(angleRadians))
+					break;
+
+				callbacks.rotate_by(userData, *angleRadians);
+				break;
+			}
+
 			case B_PIC_BLEND_LAYER:
 			{
 				Layer* const* layer;

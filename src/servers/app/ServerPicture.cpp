@@ -749,6 +749,40 @@ set_transform(void* _canvas, const BAffineTransform& transform)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	canvas->CurrentState()->SetTransform(transform);
+	canvas->GetDrawingEngine()->SetTransform(transform);
+}
+
+
+static void
+translate_by(void* _canvas, double x, double y)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+	BAffineTransform transform = canvas->CurrentState()->Transform();
+	transform.PreTranslateBy(x, y);
+	canvas->CurrentState()->SetTransform(transform);
+	canvas->GetDrawingEngine()->SetTransform(transform);
+}
+
+
+static void
+scale_by(void* _canvas, double x, double y)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+	BAffineTransform transform = canvas->CurrentState()->Transform();
+	transform.PreScaleBy(x, y);
+	canvas->CurrentState()->SetTransform(transform);
+	canvas->GetDrawingEngine()->SetTransform(transform);
+}
+
+
+static void
+rotate_by(void* _canvas, double angleRadians)
+{
+	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
+	BAffineTransform transform = canvas->CurrentState()->Transform();
+	transform.PreRotateBy(angleRadians);
+	canvas->CurrentState()->SetTransform(transform);
+	canvas->GetDrawingEngine()->SetTransform(transform);
 }
 
 
@@ -838,6 +872,9 @@ static const BPrivate::picture_player_callbacks kPicturePlayerCallbacks = {
 	set_font_face,
 	set_blending_mode,
 	set_transform,
+	translate_by,
+	scale_by,
+	rotate_by,
 	blend_layer,
 	clip_to_rect,
 	clip_to_shape

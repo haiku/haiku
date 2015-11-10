@@ -1635,6 +1635,44 @@ fDesktop->LockSingleWindow();
 			fLink.Flush();
 			break;
 		}
+		case AS_VIEW_AFFINE_TRANSLATE:
+		{
+			double x, y;
+			link.Read<double>(&x);
+			link.Read<double>(&y);
+			BAffineTransform current =
+				fCurrentView->CurrentState()->Transform();
+			current.PreTranslateBy(x, y);
+			fCurrentView->CurrentState()->SetTransform(current);
+			_UpdateDrawState(fCurrentView);
+			break;
+		}
+
+		case AS_VIEW_AFFINE_SCALE:
+		{
+			double x, y;
+			link.Read<double>(&x);
+			link.Read<double>(&y);
+			BAffineTransform current =
+				fCurrentView->CurrentState()->Transform();
+			current.PreScaleBy(x, y);
+			fCurrentView->CurrentState()->SetTransform(current);
+			_UpdateDrawState(fCurrentView);
+			break;
+		}
+
+		case AS_VIEW_AFFINE_ROTATE:
+		{
+			double angleRadians;
+			link.Read<double>(&angleRadians);
+			BAffineTransform current =
+				fCurrentView->CurrentState()->Transform();
+			current.PreRotateBy(angleRadians);
+			fCurrentView->CurrentState()->SetTransform(current);
+			_UpdateDrawState(fCurrentView);
+			break;
+		}
+
 		case AS_VIEW_SET_PEN_LOC:
 		{
 			BPoint location;
@@ -3133,11 +3171,38 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 				break;
 
 			picture->WriteSetTransform(transform);
-
-			fCurrentView->CurrentState()->SetTransform(transform);
-			_UpdateDrawState(fCurrentView);
 			break;
 		}
+
+		case AS_VIEW_AFFINE_TRANSLATE:
+		{
+			double x, y;
+			link.Read<double>(&x);
+			link.Read<double>(&y);
+
+			picture->WriteTranslateBy(x, y);
+			break;
+		}
+
+		case AS_VIEW_AFFINE_SCALE:
+		{
+			double x, y;
+			link.Read<double>(&x);
+			link.Read<double>(&y);
+
+			picture->WriteScaleBy(x, y);
+			break;
+		}
+
+		case AS_VIEW_AFFINE_ROTATE:
+		{
+			double angleRadians;
+			link.Read<double>(&angleRadians);
+
+			picture->WriteRotateBy(angleRadians);
+			break;
+		}
+
 
 		case AS_VIEW_SET_PATTERN:
 		{
