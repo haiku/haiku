@@ -288,7 +288,7 @@ probe_ports()
 	if (lvdsPort->IsConnected()) {
 		gInfo->ports[gInfo->port_count++] = lvdsPort;
 		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
-		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
+		gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
 	} else
 		delete lvdsPort;
 
