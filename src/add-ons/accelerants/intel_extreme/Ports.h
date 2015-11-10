@@ -66,6 +66,9 @@ virtual	status_t					GetPLLLimits(pll_limits& limits);
 virtual status_t					SetDisplayMode(display_mode* mode,
 										uint32 colorMode) { return B_ERROR; };
 
+virtual pipe_index					PipePreference()
+										{ return INTEL_PIPE_ANY; };
+
 protected:
 		void						_SetName(const char* name);
 
@@ -119,6 +122,9 @@ virtual	bool						IsConnected();
 
 virtual status_t					SetDisplayMode(display_mode* mode,
 										uint32 colorMode);
+
+virtual pipe_index					PipePreference()
+										{ return INTEL_PIPE_B; };
 
 protected:
 virtual	addr_t						_DDCRegister();

@@ -325,11 +325,20 @@ assign_pipes()
 
 	// TODO: At some point we should "group" ports to pipes with the same mode.
 	// You can drive multiple ports from a single pipe as long as the mode is
-	// the same.
+	// the same. For the moment we could get displays with the wrong pipes
+	// assigned when the count is > 1;
 
     for (uint32 i = 0; i < gInfo->port_count; i++) {
         if (gInfo->ports[i] == NULL)
             continue;
+
+		if (gInfo->ports[i]->PipePreference() != INTEL_PIPE_ANY) {
+			// Some ports *really* need to be assigned a pipe due to
+			// implementation bugs.
+			gInfo->ports[i]->AssignPipe(gInfo->ports[i]->PipePreference());
+			continue;
+		}
+
 		if (gInfo->ports[i]->IsConnected()) {
 			pipe_index currentPipe = INTEL_PIPE_A;
 			if (assigned == 1)

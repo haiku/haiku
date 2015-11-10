@@ -53,9 +53,14 @@ DisplayPipe::DisplayPipe(pipe_index pipeIndex)
 //	fFDILink(NULL),
 //	fPanelFitter(NULL),
 	fPipeIndex(pipeIndex),
-	fPipeBase(REGS_NORTH_PIPE_AND_PORT + pipeIndex * INTEL_DISPLAY_OFFSET),
-	fPlaneBase(REGS_NORTH_PLANE_CONTROL + pipeIndex * INTEL_PLANE_OFFSET)
+	fPipeBase(REGS_NORTH_PIPE_AND_PORT),
+	fPlaneBase(REGS_NORTH_PLANE_CONTROL)
 {
+	if (pipeIndex == INTEL_PIPE_B) {
+		fPipeBase += INTEL_DISPLAY_OFFSET;
+		fPlaneBase += INTEL_PLANE_OFFSET;
+	}
+
 	TRACE("DisplayPipe %s. Pipe Base: 0x%" B_PRIxADDR
 		" Plane Base: 0x% " B_PRIxADDR "\n", (pipeIndex == INTEL_PIPE_A)
 			? "A" : "B", fPipeBase, fPlaneBase);

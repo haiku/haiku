@@ -17,6 +17,7 @@
 
 
 enum pipe_index {
+	INTEL_PIPE_ANY,
 	INTEL_PIPE_A,
 	INTEL_PIPE_B
 };
