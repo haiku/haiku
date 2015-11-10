@@ -5,7 +5,7 @@ RemotePackageRepository HaikuPorts
 	# architecture "any" packages
 	avr_libc_x86-1.8.0-2
 	be_book-2008_10_26-1
-	ca_root_certificates-2014_08_13-1
+	ca_root_certificates-2015_10_28-1
 	caladea-20130214-3
 	carlito-20130920-1
 	colormake-0.9.20140503-1
@@ -82,8 +82,8 @@ RemotePackageRepository HaikuPorts
 	ctags-5.8-3
 	colors-2.3-1
 	coreutils-8.24-1
-	curl-7.44.0-1
-	curl_devel-7.44.0-1
+	curl-7.45.0-2
+	curl_devel-7.45.0-2
 	cvs-1.12.13.1-6
 	d52-3.4.1-1
 	desknotes-1.1-4
@@ -146,12 +146,12 @@ RemotePackageRepository HaikuPorts
 	giddy3-1.4-1
 	giflib-5.0.5-2
 	giflib_devel-5.0.5-2
-	git-2.2.2-1
-	git_arch-2.2.2-1
-	git_cvs-2.2.2-1
-	git_daemon-2.2.2-1
-	git_email-2.2.2-1
-	git_svn-2.2.2-1
+	git-2.2.2-2
+	git_arch-2.2.2-2
+	git_cvs-2.2.2-2
+	git_daemon-2.2.2-2
+	git_email-2.2.2-2
+	git_svn-2.2.2-2
 	glew-1.11.0-1
 	glew_devel-1.11.0-1
 	glew_util-1.11.0-1
@@ -376,8 +376,8 @@ RemotePackageRepository HaikuPorts
 	opensound-4.2_git-2
 	openssh-6.9p1-1
 	# sync openssl with secondary architecture (x86)
-	openssl-1.0.0s-1
-	openssl_devel-1.0.0s-1
+	openssl-1.0.2d-4
+	openssl_devel-1.0.2d-4
 	p7zip-9.20.1-4
 	paladin-git-5
 	paragui-1.1.8-1
@@ -403,7 +403,7 @@ RemotePackageRepository HaikuPorts
 	psiconv_devel-0.9.8-1
 	psqlodbc-09.03.0400-1
 	psqlodbc_devel-09.03.0400-1
-	python-2.7.9-1
+	python-2.7.10-1
 	python_dateutil-1.5-2
 	python_imaging-1.1.7-1
 	python_lxml-3.3.5-2
@@ -506,7 +506,7 @@ RemotePackageRepository HaikuPorts
 	vmware_addons-1.1.1-3
 	vncserver-1.26-1
 	weather-0.1.1_git-1
-	wget-1.16.3-1
+	wget-1.16.3-2
 	which-2.21-1
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-3
@@ -575,8 +575,8 @@ RemotePackageRepository HaikuPorts
 	confuse_x86-2.7-2
 	confuse_x86_devel-2.7-2
 	copynametoclipboard-1.0.1-2
-	curl_x86-7.44.0-1
-	curl_x86_devel-7.44.0-1
+	curl_x86-7.45.0-1
+	curl_x86_devel-7.45.0-1
 	cvsps_x86-2.2b1-1
 	dbus_x86-1.8.6-1
 	dbus_x86_devel-1.8.6-1
@@ -812,8 +812,8 @@ RemotePackageRepository HaikuPorts
 	openjdk_x86_devel-1.7.u80_b32-3
 	openjpeg_x86-2.1.0-2
 	openjpeg_x86_devel-2.1.0-2
-	openssl_x86-1.0.0s-1
-	openssl_x86_devel-1.0.0s-1
+	openssl_x86-1.0.2d-2
+	openssl_x86_devel-1.0.2d-2
 	openttd_x86-1.3.3-1
 	pango_x86-1.37.0-1
 	pango_x86_devel-1.37.0-1
