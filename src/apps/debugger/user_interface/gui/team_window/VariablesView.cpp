@@ -647,7 +647,7 @@ protected:
 class VariablesView::VariableTableModel : public TreeTableModel,
 	public TreeTableToolTipProvider {
 public:
-								VariableTableModel();
+								VariableTableModel(ValueNodeManager* manager);
 								~VariableTableModel();
 
 			status_t			Init();
@@ -1106,30 +1106,27 @@ VariablesView::ContainerListener::ModelNodeRestoreViewStateRequested(
 // #pragma mark - VariableTableModel
 
 
-VariablesView::VariableTableModel::VariableTableModel()
+VariablesView::VariableTableModel::VariableTableModel(
+	ValueNodeManager* manager)
 	:
 	fThread(NULL),
-	fNodeManager(NULL),
+	fNodeManager(manager),
 	fContainerListener(NULL),
 	fNodeTable()
 {
+	fNodeManager->AcquireReference();
 }
 
 
 VariablesView::VariableTableModel::~VariableTableModel()
 {
-	if (fNodeManager != NULL)
-		fNodeManager->ReleaseReference();
+	fNodeManager->ReleaseReference();
 }
 
 
 status_t
 VariablesView::VariableTableModel::Init()
 {
-	fNodeManager = new(std::nothrow) ValueNodeManager();
-	if (fNodeManager == NULL)
-		return B_NO_MEMORY;
-
 	return fNodeTable.Init();
 }
 
@@ -1809,12 +1806,12 @@ VariablesView::~VariablesView()
 
 
 /*static*/ VariablesView*
-VariablesView::Create(Listener* listener)
+VariablesView::Create(Listener* listener, ValueNodeManager* manager)
 {
 	VariablesView* self = new VariablesView(listener);
 
 	try {
-		self->_Init();
+		self->_Init(manager);
 	} catch (...) {
 		delete self;
 		throw;
@@ -2489,7 +2486,7 @@ VariablesView::ExpressionEvaluated(ExpressionInfo* info, status_t result,
 
 
 void
-VariablesView::_Init()
+VariablesView::_Init(ValueNodeManager* manager)
 {
 	fVariableTable = new TreeTable("variable list", 0, B_FANCY_BORDER);
 	AddChild(fVariableTable->ToView());
@@ -2503,7 +2500,7 @@ VariablesView::_Init()
 	fVariableTable->AddColumn(new StringTableColumn(2, "Type", 80, 40, 1000,
 		B_TRUNCATE_END, B_ALIGN_LEFT));
 
-	fVariableTableModel = new VariableTableModel;
+	fVariableTableModel = new VariableTableModel(manager);
 	if (fVariableTableModel->Init() != B_OK)
 		throw std::bad_alloc();
 	fVariableTable->SetTreeTableModel(fVariableTableModel);

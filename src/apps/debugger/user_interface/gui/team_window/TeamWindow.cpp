@@ -57,6 +57,7 @@
 #include "TypeComponentPath.h"
 #include "UiUtils.h"
 #include "UserInterface.h"
+#include "ValueNodeManager.h"
 #include "Value.h"
 #include "Variable.h"
 #include "WatchPromptWindow.h"
@@ -1049,8 +1050,10 @@ TeamWindow::_Init()
 //		.SetInsets(0.0f)
 		.Add(fBreakpointsView = BreakpointsView::Create(fTeam, this));
 
+	ValueNodeManager* manager = new ValueNodeManager;
+
 	// add local variables tab
-	BView* tab = fVariablesView = VariablesView::Create(this);
+	BView* tab = fVariablesView = VariablesView::Create(this, manager);
 	fLocalsTabView->AddTab(tab);
 
 	// add registers tab
