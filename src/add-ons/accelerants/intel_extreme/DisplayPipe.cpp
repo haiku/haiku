@@ -97,6 +97,9 @@ DisplayPipe::Enable(display_mode* target, addr_t portAddress)
 	// Enable display pipe
 	_Enable(true);
 
+	// Wait for the clocks to stabilize
+	spin(150);
+
 	// update timing (fPipeBase bumps the DISPLAY_A to B when needed)
 	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_HTOTAL),
 		((uint32)(target->timing.h_total - 1) << 16)
@@ -118,9 +121,15 @@ DisplayPipe::Enable(display_mode* target, addr_t portAddress)
 		((uint32)(target->timing.v_sync_end - 1) << 16)
 		| ((uint32)target->timing.v_sync_start - 1));
 
+	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_POS), 0);
+
+	// TODO: Review these
 	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_IMAGE_SIZE),
 		((uint32)(target->virtual_width - 1) << 16)
-		| ((uint32)target->virtual_height - 1));
+			| ((uint32)target->virtual_height - 1));
+	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_PIPE_SIZE),
+		((uint32)(target->timing.v_display - 1) << 16)
+			| ((uint32)target->timing.h_display - 1));
 
 	write32(portAddress, (read32(portAddress)
 			& ~(DISPLAY_MONITOR_POLARITY_MASK
@@ -140,18 +149,29 @@ DisplayPipe::Disable()
 
 
 void
-DisplayPipe::ConfigureTimings(const pll_divisors& divisors, uint32 extraFlags)
+DisplayPipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
+	uint32 extraFlags)
 {
 	CALLED();
 
 	addr_t pllDivisorA = INTEL_DISPLAY_A_PLL_DIVISOR_0;
 	addr_t pllDivisorB = INTEL_DISPLAY_A_PLL_DIVISOR_1;
 	addr_t pllControl = INTEL_DISPLAY_A_PLL;
+	addr_t pllMD = INTEL_DISPLAY_A_PLL_MD;
 
 	if (fPipeIndex == INTEL_PIPE_B) {
 		pllDivisorA = INTEL_DISPLAY_B_PLL_DIVISOR_0;
 		pllDivisorB = INTEL_DISPLAY_B_PLL_DIVISOR_1;
 		pllControl = INTEL_DISPLAY_B_PLL;
+		pllMD = INTEL_DISPLAY_B_PLL_MD;
+	}
+
+	float refFreq = gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
+
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)) {
+		float adjusted = ((refFreq * divisors.m) / divisors.n) 	/ divisors.post;
+		uint32 pixelMultiply = uint32(adjusted 	/ (pixelClock / 1000.0f));
+		write32(pllMD, (0 << 24) | ((pixelMultiply - 1) << 8));
 	}
 
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
@@ -199,6 +219,7 @@ DisplayPipe::ConfigureTimings(const pll_divisors& divisors, uint32 extraFlags)
 		} else
 			pll |= DISPLAY_PLL_POST1_DIVIDE_2;
 	}
+
 
 	write32(pllControl, pll);
 	read32(pllControl);

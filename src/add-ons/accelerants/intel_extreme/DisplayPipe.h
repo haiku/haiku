@@ -41,7 +41,9 @@ public:
 										addr_t portRegister);
 		void						Disable();
 
-		void						ConfigureTimings(const pll_divisors& divisors,
+		void						ConfigureTimings(
+										const pll_divisors& divisors,
+										uint32 pixelClock,
 										uint32 extraFlags);
 
 		// access to the various parts of the pipe

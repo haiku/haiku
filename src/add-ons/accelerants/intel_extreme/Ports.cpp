@@ -257,7 +257,8 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
 
 	// Program pipe PLL's
-	fDisplayPipe->ConfigureTimings(divisors, extraPLLFlags);
+	fDisplayPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
+		extraPLLFlags);
 
 	// Program target display mode
 	fDisplayPipe->Enable(target, _PortRegister());
@@ -463,57 +464,14 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (gInfo->shared_info->device_type.Generation() >= 4)
 		extraPLLFlags |= DISPLAY_PLL_MODE_LVDS;
 
-	// Program pipe PLL's
-	fDisplayPipe->ConfigureTimings(divisors, extraPLLFlags);
+	// Program pipe PLL's (pixel_clock is *always* the hardware pixel clock)
+	fDisplayPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
+		extraPLLFlags);
 
 	// Program target display mode
 	fDisplayPipe->Enable(target, _PortRegister());
 
 #if 0
-	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
-		write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
-			(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
-				& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
-			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-				& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
-	} else {
-		write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
-			(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
-				& DISPLAY_PLL_N_DIVISOR_MASK)
-			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
-				& DISPLAY_PLL_M1_DIVISOR_MASK)
-			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-				& DISPLAY_PLL_M2_DIVISOR_MASK));
-	}
-
-	write32(INTEL_DISPLAY_B_PLL, dpll);
-	read32(INTEL_DISPLAY_B_PLL);
-
-	// Wait for the clocks to stabilize
-	spin(150);
-
-	float referenceClock = gInfo->shared_info->pll_info.reference_frequency
-		/ 1000.0f;
-
-	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)) {
-		float adjusted = ((referenceClock * divisors.m) / divisors.n)
-			/ divisors.post;
-		uint32 pixelMultiply;
-		if (needsScaling) {
-			pixelMultiply = uint32(adjusted
-				/ (hardwareTarget.timing.pixel_clock / 1000.0f));
-		} else {
-			pixelMultiply = uint32(adjusted
-				/ (target->timing.pixel_clock / 1000.0f));
-		}
-
-		write32(INTEL_DISPLAY_B_PLL_MD, (0 << 24)
-			| ((pixelMultiply - 1) << 8));
-	} else
-		write32(INTEL_DISPLAY_B_PLL, dpll);
-
-	read32(INTEL_DISPLAY_B_PLL);
-	spin(150);
 
 	// update timing parameters
 	if (needsScaling) {
@@ -591,19 +549,6 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			(uint32)(target->timing.v_sync_end - 1) << 16)
 			| ((uint32)target->timing.v_sync_start - 1));
 	}
-
-	write32(INTEL_DISPLAY_B_POS, 0);
-	write32(INTEL_DISPLAY_B_PIPE_SIZE,
-		((uint32)(target->timing.v_display - 1) << 16)
-		| ((uint32)target->timing.h_display - 1));
-
-	write32(INTEL_DISPLAY_B_CONTROL, (read32(INTEL_DISPLAY_B_CONTROL)
-			& ~(DISPLAY_CONTROL_COLOR_MASK | DISPLAY_CONTROL_GAMMA))
-		| colorMode);
-
-	write32(INTEL_DISPLAY_B_PIPE_CONTROL,
-		read32(INTEL_DISPLAY_B_PIPE_CONTROL) | INTEL_PIPE_ENABLED);
-	read32(INTEL_DISPLAY_B_PIPE_CONTROL);
 #endif
 
 	// XXX: Crashes?
@@ -688,7 +633,8 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
 
 	// Program pipe PLL's
-	fDisplayPipe->ConfigureTimings(divisors, extraPLLFlags);
+	fDisplayPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
+		extraPLLFlags);
 
 	// Program target display mode
 	fDisplayPipe->Enable(target, _PortRegister());
