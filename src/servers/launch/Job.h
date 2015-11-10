@@ -81,6 +81,9 @@ public:
 			const PortMap&		Ports() const;
 			port_id				Port(const char* name = NULL) const;
 
+			port_id				DefaultPort() const;
+			void				SetDefaultPort(port_id port);
+
 			status_t			Launch();
 			bool				IsLaunched() const;
 			bool				IsRunning() const;
@@ -126,6 +129,7 @@ private:
 			PortMap				fPortMap;
 			status_t			fInitStatus;
 			team_id				fTeam;
+			port_id				fDefaultPort;
 			status_t			fLaunchStatus;
 			mutex				fLaunchStatusLock;
 			::Target*			fTarget;

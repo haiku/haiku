@@ -232,6 +232,9 @@ private:
 static const char*
 get_leaf(const char* signature)
 {
+	if (signature == NULL)
+		return NULL;
+
 	const char* separator = strrchr(signature, '/');
 	if (separator != NULL)
 		return separator + 1;
@@ -469,6 +472,9 @@ LaunchDaemon::ReadyToRun()
 		if (target != NULL)
 			_LaunchJobs(target);
 	}
+
+	if (fUserMode)
+		be_roster->StartWatching(this, B_REQUEST_LAUNCHED);
 }
 
 
@@ -495,6 +501,41 @@ LaunchDaemon::MessageReceived(BMessage* message)
 					// TODO: take restart throttle into account
 					// TODO: don't restart on shutdown
 					_LaunchJob(job);
+				}
+			}
+			break;
+		}
+		case B_SOME_APP_LAUNCHED:
+		{
+			team_id team = (team_id)message->GetInt32("be:team", -1);
+			Job* job = NULL;
+
+			MutexLocker locker(fTeamsLock);
+
+			TeamMap::iterator found = fTeams.find(team);
+			if (found != fTeams.end()) {
+				job = found->second;
+				locker.Unlock();
+			} else {
+				locker.Unlock();
+
+				// Find job by name instead
+				const char* signature = message->GetString("be:signature");
+				job = FindJob(get_leaf(signature));
+				if (job != NULL) {
+					TRACE("Updated default port of untracked team %d, %s\n",
+						(int)team, signature);
+				}
+			}
+
+			if (job != NULL) {
+				// Update port info
+				app_info info;
+				status_t status = be_roster->GetRunningAppInfo(team, &info);
+				if (status == B_OK && info.port != job->DefaultPort()) {
+					TRACE("Update default port for %s to %d\n", job->Name(),
+						(int)info.port);
+					job->SetDefaultPort(info.port);
 				}
 			}
 			break;
@@ -1654,7 +1695,11 @@ LaunchDaemon::_StartSession(const char* login)
 		// TODO: This leaks the parent application
 		be_app = NULL;
 
-		// TODO: take over system jobs, and reserve their names
+		// Reinitialize be_roster
+		BRoster::Private().DeleteBeRoster();
+		BRoster::Private().InitBeRoster();
+
+		// TODO: take over system jobs, and reserve their names (or ask parent)
 		status_t status;
 		LaunchDaemon* daemon = new LaunchDaemon(true, fEvents, status);
 		if (status == B_OK)

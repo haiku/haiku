@@ -30,6 +30,7 @@ Job::Job(const char* name)
 	fLaunching(false),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
+	fDefaultPort(-1),
 	fLaunchStatus(B_NO_INIT),
 	fTarget(NULL),
 	fPendingLaunchDataReplies(0, false)
@@ -47,6 +48,7 @@ Job::Job(const Job& other)
 	fLaunching(other.IsLaunching()),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
+	fDefaultPort(-1),
 	fLaunchStatus(B_NO_INIT),
 	fTarget(other.Target()),
 	fPendingLaunchDataReplies(0, false)
@@ -298,6 +300,20 @@ Job::Port(const char* name) const
 }
 
 
+port_id
+Job::DefaultPort() const
+{
+	return fDefaultPort;
+}
+
+
+void
+Job::SetDefaultPort(port_id port)
+{
+	fDefaultPort = port;
+}
+
+
 status_t
 Job::Launch()
 {
@@ -373,8 +389,12 @@ void
 Job::TeamDeleted()
 {
 	fTeam = -1;
+	fDefaultPort = -1;
+
 	if (IsService())
 		SetState(B_JOB_STATE_WAITING_TO_RUN);
+
+	_SetLaunchStatus(B_NO_INIT);
 }
 
 
@@ -414,24 +434,12 @@ Job::HandleGetLaunchData(BMessage* message)
 status_t
 Job::GetMessenger(BMessenger& messenger)
 {
-	PortMap::const_iterator iterator = fPortMap.begin();
-	for (; iterator != fPortMap.end(); iterator++) {
-		if (iterator->second.HasString("name"))
-			continue;
+	if (fDefaultPort < 0)
+		return B_NAME_NOT_FOUND;
 
-		port_id port = (port_id)iterator->second.GetInt32("port", -1);
-		if (port >= 0) {
-			BMessenger::Private(messenger).SetTo(fTeam, port,
-				B_PREFERRED_TOKEN);
-			return B_OK;
-		}
-	}
-
-	// There is no default port, try roster via signature
-	BString signature = "application/";
-	signature << Name();
-
-	return messenger.SetTo(signature);
+	BMessenger::Private(messenger).SetTo(fTeam, fDefaultPort,
+		B_PREFERRED_TOKEN);
+	return B_OK;
 }
 
 
@@ -518,9 +526,6 @@ Job::_SetLaunchStatus(status_t launchStatus)
 	fLaunchStatus = launchStatus != B_NO_INIT ? launchStatus : B_ERROR;
 	launchLocker.Unlock();
 
-	if (fTeamRegistrator != NULL)
-		fTeamRegistrator->RegisterTeam(this);
-
 	_SendPendingLaunchDataReplies();
 }
 
@@ -588,6 +593,8 @@ Job::_CreateAndTransferPorts()
 			return result;
 
 		iterator->second.SetInt32("port", port);
+		if (suffix == NULL)
+			fDefaultPort = port;
 
 		if (name == "x-vnd.haiku-registrar:auth") {
 			// Allow the launch_daemon to access the registrar authentication
@@ -608,6 +615,7 @@ Job::_CreateAndTransferPorts()
 			return result;
 
 		data.SetInt32("port", port);
+		fDefaultPort = port;
 		AddPort(data);
 	}
 
@@ -626,9 +634,12 @@ Job::_Launch(const char* signature, entry_ref* ref, int argCount,
 	if (result == B_OK) {
 		result = _CreateAndTransferPorts();
 
-		if (result == B_OK)
+		if (result == B_OK) {
 			resume_thread(mainThread);
-		else
+
+			if (fTeamRegistrator != NULL)
+				fTeamRegistrator->RegisterTeam(this);
+		} else
 			kill_thread(mainThread);
 	}
 
