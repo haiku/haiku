@@ -14,12 +14,12 @@
 #undef TRACE
 //#define TRACE_DPMS
 #ifdef TRACE_DPMS
-#	define TRACE(x...) _sPrintf("intel_extreme accelerant:" x)
+#	define TRACE(x...) _sPrintf("intel_extreme: " x)
 #else
 #	define TRACE(x...)
 #endif
 
-#define ERROR(x...) _sPrintf("intel_extreme accelerant: " x)
+#define ERROR(x...) _sPrintf("intel_extreme: " x)
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 

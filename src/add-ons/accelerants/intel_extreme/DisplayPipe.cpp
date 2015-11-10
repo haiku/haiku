@@ -216,8 +216,6 @@ DisplayPipe::_Enable(bool enable)
 
 	addr_t targetRegister = fPlaneBase + INTEL_PIPE_CONTROL;
 
-	TRACE("%s: @ %" B_PRIxADDR "\n", __func__, targetRegister);
-
 	write32(targetRegister, (read32(targetRegister) & ~INTEL_PIPE_ENABLED)
 		| (enable ? INTEL_PIPE_ENABLED : 0));
 	read32(targetRegister);

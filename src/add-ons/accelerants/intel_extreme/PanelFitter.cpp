@@ -16,13 +16,16 @@
 #include <string.h>
 
 
+#undef TRACE
 #define TRACE_FITTER
 #ifdef TRACE_FITTER
-extern "C" void _sPrintf(const char* format, ...);
-#	define TRACE(x) _sPrintf x
+#   define TRACE(x...) _sPrintf("intel_extreme: " x)
 #else
-#	define TRACE(x) ;
+#   define TRACE(x...)
 #endif
+
+#define ERROR(x...) _sPrintf("intel_extreme: " x)
+#define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
 // #pragma mark - PanelFitter

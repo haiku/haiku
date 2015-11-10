@@ -27,7 +27,7 @@
 #undef TRACE
 #define TRACE_PORTS
 #ifdef TRACE_PORTS
-#   define TRACE(x...) _sPrintf("intel_extreme:" x)
+#   define TRACE(x...) _sPrintf("intel_extreme: " x)
 #else
 #   define TRACE(x...)
 #endif

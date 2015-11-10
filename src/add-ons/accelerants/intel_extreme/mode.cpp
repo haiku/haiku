@@ -35,7 +35,7 @@
 #undef TRACE
 #define TRACE_MODE
 #ifdef TRACE_MODE
-#	define TRACE(x...) _sPrintf("intel_extreme:" x)
+#	define TRACE(x...) _sPrintf("intel_extreme: " x)
 #else
 #	define TRACE(x...)
 #endif
