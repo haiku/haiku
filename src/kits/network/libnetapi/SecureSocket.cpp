@@ -193,6 +193,18 @@ BSecureSocket::Private::_CreateContext()
 	SSL_CTX_load_verify_locations(sContext, certificateStore.Path(), NULL);
 	SSL_CTX_set_verify(sContext, SSL_VERIFY_PEER, VerifyCallback);
 
+	// OpenSSL 1.0.2 and later: use the alternate "trusted first" algorithm to validate certificate
+	// chains. This makes the validation stop as soon as a recognized certificate is found in the
+	// chain, instead of validating the whole chain, then seeing if the root certificate is known.
+#ifdef X509_V_FLAG_TRUSTED_FIRST
+	X509_VERIFY_PARAM* verifyParam = X509_VERIFY_PARAM_new();
+	X509_VERIFY_PARAM_set_flags(verifyParam, X509_V_FLAG_TRUSTED_FIRST);
+	SSL_CTX_set1_param(sContext, verifyParam);
+
+	// TODO we need to free this after freeing the SSL context (which we currently never do)
+	// X509_VERIFY_PARAM_free(verifyParam);
+#endif
+
 	// Get an unique index number for storing application data in SSL
 	// structs. We will store a pointer to the BSecureSocket class there.
 	sDataIndex = SSL_get_ex_new_index(0, NULL, NULL, NULL, NULL);
