@@ -26,6 +26,33 @@ THE SOFTWARE.
 
 */
 
+#include <fs_interface.h>
+
+
+struct initialize_parameters {
+	uint32	fatBits;
+	uint32	flags;
+	bool	verbose;
+};
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+status_t
+dosfs_initialize(int fd, partition_id partitionID, const char* name,
+	const char* parameterString, off_t /*partitionSize*/, disk_job_id job);
+status_t
+dosfs_uninitialize(int fd, partition_id partitionID, off_t partitionSize,
+	uint32 blockSize, disk_job_id job);
+
+#ifdef __cplusplus
+}
+#endif
+
+
+#ifdef MKDOS
+
 #define ATTRIBUTE_PACKED __attribute__((packed))
 
 struct bootsector1216 {
@@ -167,3 +194,4 @@ uint8 bootcode[] = {
 #define BACKUP_SECTOR_NUM 6
 #define FAT32_ROOT_CLUSTER 2
 
+#endif
