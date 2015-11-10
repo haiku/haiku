@@ -2560,8 +2560,8 @@ VariablesView::_RequestNodeValue(ModelNode* node)
 	containerLocker.Unlock();
 
 	// request resolution of the value
-	fListener->ValueNodeValueRequested(fStackFrame->GetCpuState(), container,
-		valueNode);
+	fListener->ValueNodeValueRequested(fStackFrame != NULL
+			? fStackFrame->GetCpuState() : NULL, container, valueNode);
 }
 
 
