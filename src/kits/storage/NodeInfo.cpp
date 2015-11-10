@@ -624,25 +624,3 @@ BNodeInfo::operator=(const BNodeInfo &nodeInfo)
 BNodeInfo::BNodeInfo(const BNodeInfo &)
 {
 }
-
-
-namespace BPrivate {
-
-/*!	Private method used by Tracker.
-
-	This should be moved to the Tracker source.
-*/
-extern bool
-CheckNodeIconHintPrivate(const BNode* node, bool checkMiniIconOnly)
-{
-	attr_info info;
-	if (node->GetAttrInfo(kNIMiniIconAttribute, &info) != B_OK && checkMiniIconOnly)
-		return false;
-
-	if (node->GetAttrInfo(kNILargeIconAttribute, &info) != B_OK)
-		return false;
-
-	return true;
-}
-
-}	// namespace BPrivate
