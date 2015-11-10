@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014, Adrien Destugues, pulkomandy@gmail.com
+ * Copyright 2012-2015, Adrien Destugues, pulkomandy@gmail.com
  * Distributed under the terms of the MIT licence.
  */
 
@@ -184,6 +184,10 @@ TermView::KeyDown(const char* bytes, int32 numBytes)
 			numBytes = 1;
 			bytes = "\x7F";
 			break;
+		case '\n':
+			numBytes = fLineTerminator.Length();
+			bytes = fLineTerminator.String();
+			break;
 	}
 
 	// Send the bytes to the serial port
@@ -211,6 +215,13 @@ TermView::MessageReceived(BMessage* message)
 		default:
 			BView::MessageReceived(message);
 	}
+}
+
+
+void
+TermView::SetLineTerminator(BString terminator)
+{
+	fLineTerminator = terminator;
 }
 
 
@@ -255,6 +266,7 @@ TermView::_Init()
 	background.alpha = 255;
 
 	SetViewColor(background);
+	SetLineTerminator("\n");
 }
 
 

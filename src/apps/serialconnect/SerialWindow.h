@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014, Adrien Destugues, pulkomandy@pulkomandy.tk
+ * Copyright 2012-2015, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under the terms of the MIT licence.
  */
 
@@ -31,6 +31,7 @@ class SerialWindow: public BWindow
 						BMenu*			fParityMenu;
 						BMenu*			fFlowcontrolMenu;
 						BMenu*			fBaudrateMenu;
+						BMenu*			fLineTerminatorMenu;
 						BFilePanel*		fLogFilePanel;
 
 		static const	int				kBaudrates[];

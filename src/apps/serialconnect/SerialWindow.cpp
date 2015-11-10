@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014, Adrien Destugues, pulkomandy@pulkomandy.tk
+ * Copyright 2012-2015, Adrien Destugues, pulkomandy@pulkomandy.tk
  * Distributed under the terms of the MIT licence.
  */
 
@@ -116,6 +116,9 @@ SerialWindow::SerialWindow()
 	fDatabitsMenu->SetRadioMode(true);
 	settingsMenu->AddItem(fDatabitsMenu);
 
+	fLineTerminatorMenu = new BMenu("Line terminator");
+	fLineTerminatorMenu->SetRadioMode(true);
+	settingsMenu->AddItem(fLineTerminatorMenu);
 
 	BMessage* message = new BMessage(kMsgSettings);
 	message->AddInt32("parity", B_NO_PARITY);
@@ -194,6 +197,22 @@ SerialWindow::SerialWindow()
 	fFlowcontrolMenu->AddItem(both);
 	fFlowcontrolMenu->AddItem(noFlow);
 	fFlowcontrolMenu->SetTargetForItems(be_app);
+
+	message = new BMessage(kMsgSettings);
+	message->AddString("terminator", "\n");
+	BMenuItem* lf = new BMenuItem("LF (\\n)", message);
+
+	message = new BMessage(kMsgSettings);
+	message->AddString("terminator", "\r");
+	BMenuItem* cr = new BMenuItem("CR (\\r)", message);
+
+	message = new BMessage(kMsgSettings);
+	message->AddString("terminator", "\r\n");
+	BMenuItem* crlf = new BMenuItem("CR/LF (\\r\\n)", message);
+
+	fLineTerminatorMenu->AddItem(lf);
+	fLineTerminatorMenu->AddItem(cr);
+	fLineTerminatorMenu->AddItem(crlf);
 
 	CenterOnScreen();
 }
@@ -283,6 +302,7 @@ void SerialWindow::MessageReceived(BMessage* message)
 			data_bits dataBits;
 			parity_mode parity;
 			uint32 flowcontrol;
+			BString terminator;
 
 			if (message->FindInt32("databits", (int32*)&dataBits) == B_OK) {
 				for (int i = 0; i < fDatabitsMenu->CountItems(); i++) {
@@ -337,6 +357,18 @@ void SerialWindow::MessageReceived(BMessage* message)
 					item->Message()->FindInt32("baudrate", &code);
 
 					if (baudrate == code)
+						item->SetMarked(true);
+				}
+			}
+
+			if (message->FindString("terminator", &terminator) == B_OK) {
+				fTermView->SetLineTerminator(terminator);
+				for (int i = 0; i < fLineTerminatorMenu->CountItems(); i++) {
+					BMenuItem* item = fLineTerminatorMenu->ItemAt(i);
+					BString code;
+					item->Message()->FindString("terminator", &code);
+
+					if (terminator == code)
 						item->SetMarked(true);
 				}
 			}
