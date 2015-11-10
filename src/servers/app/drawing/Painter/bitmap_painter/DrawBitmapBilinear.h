@@ -238,41 +238,42 @@ struct BilinearDefault :
 		// The last column/row handling does not need to be performed
 		// for all clipping rects!
 		int32 yMax = y2;
-		if (fWeightsY[yMax].weight == 255)
+		if (this->fWeightsY[yMax].weight == 255)
 			yMax--;
 		int32 xIndexMax = xIndexR;
-		if (fWeightsX[xIndexMax].weight == 255)
+		if (this->fWeightsX[xIndexMax].weight == 255)
 			xIndexMax--;
 
 		for (; y1 <= yMax; y1++) {
 			// cache the weight of the top and bottom row
-			const uint16 wTop = fWeightsY[y1].weight;
-			const uint16 wBottom = 255 - fWeightsY[y1].weight;
+			const uint16 wTop = this->fWeightsY[y1].weight;
+			const uint16 wBottom = 255 - this->fWeightsY[y1].weight;
 
 			// buffer offset into source (top row)
-			register const uint8* src = fSource->row_ptr(fWeightsY[y1].index);
+			register const uint8* src = this->fSource->row_ptr(
+				this->fWeightsY[y1].index);
 
 			// buffer handle for destination to be incremented per
 			// pixel
-			register uint8* d = fDestination;
+			register uint8* d = this->fDestination;
 
 			for (int32 x = xIndexL; x <= xIndexMax; x++) {
-				const uint8* s = src + fWeightsX[x].index;
+				const uint8* s = src + this->fWeightsX[x].index;
 
 				// calculate the weighted sum of all four
 				// interpolated pixels
-				const uint16 wLeft = fWeightsX[x].weight;
+				const uint16 wLeft = this->fWeightsX[x].weight;
 				const uint16 wRight = 255 - wLeft;
 
 				uint32 t[4];
-				ColorType::Interpolate(&t[0], s, fSourceBytesPerRow,
+				ColorType::Interpolate(&t[0], s, this->fSourceBytesPerRow,
 					wLeft, wTop, wRight, wBottom);
 				DrawMode::Blend(d, &t[0]);
 			}
 			// last column of pixels if necessary
 			if (xIndexMax < xIndexR) {
-				const uint8* s = src + fWeightsX[xIndexR].index;
-				const uint8* sBottom = s + fSourceBytesPerRow;
+				const uint8* s = src + this->fWeightsX[xIndexR].index;
+				const uint8* sBottom = s + this->fSourceBytesPerRow;
 
 				uint32 t[4];
 				ColorType::InterpolateLastColumn(&t[0], s, sBottom, wTop,
@@ -280,20 +281,20 @@ struct BilinearDefault :
 				DrawMode::Blend(d, &t[0]);
 			}
 
-			fDestination += fDestinationBytesPerRow;
+			this->fDestination += this->fDestinationBytesPerRow;
 		}
 
 		// last row of pixels if necessary
 		// buffer offset into source (bottom row)
 		register const uint8* src
-			= fSource->row_ptr(fWeightsY[y2].index);
+			= this->fSource->row_ptr(this->fWeightsY[y2].index);
 		// buffer handle for destination to be incremented per pixel
-		register uint8* d = fDestination;
+		register uint8* d = this->fDestination;
 
 		if (yMax < y2) {
 			for (int32 x = xIndexL; x <= xIndexMax; x++) {
-				const uint8* s = src + fWeightsX[x].index;
-				const uint16 wLeft = fWeightsX[x].weight;
+				const uint8* s = src + this->fWeightsX[x].index;
+				const uint16 wLeft = this->fWeightsX[x].weight;
 				const uint16 wRight = 255 - wLeft;
 				uint32 t[4];
 				ColorType::InterpolateLastRow(&t[0], s, wLeft, wRight);
@@ -303,7 +304,7 @@ struct BilinearDefault :
 
 		// pixel in bottom right corner if necessary
 		if (yMax < y2 && xIndexMax < xIndexR) {
-			const uint8* s = src + fWeightsX[xIndexR].index;
+			const uint8* s = src + this->fWeightsX[xIndexR].index;
 			*(uint32*)d = *(uint32*)s;
 		}
 	}

@@ -11,6 +11,7 @@
 #include "IntPoint.h"
 #include "IntRect.h"
 #include "Painter.h"
+#include "SystemPalette.h"
 
 
 template<class BlendType>

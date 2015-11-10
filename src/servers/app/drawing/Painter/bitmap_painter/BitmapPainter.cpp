@@ -262,7 +262,7 @@ Painter::BitmapPainter::_ConvertColorSpace(
 		return;
 	}
 
-	BBitmap* conversionBitmap = new(nothrow) BBitmap(fBitmapBounds,
+	BBitmap* conversionBitmap = new(std::nothrow) BBitmap(fBitmapBounds,
 		B_BITMAP_NO_SERVER_LINK, B_RGBA32);
 	if (conversionBitmap == NULL) {
 		fprintf(stderr, "BitmapPainter::_ConvertColorSpace() - "
