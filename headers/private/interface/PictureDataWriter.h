@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2007 Haiku, Inc. All rights reserved.
+ * Copyright 2006-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stefano Ceccherini, burton666@libero.it
+ *		Julian Harnath, <julian.harnath@rwth-achen.de>
  */
 #ifndef _PICTURE_DATA_WRITER_H
 #define _PICTURE_DATA_WRITER_H
@@ -17,6 +18,7 @@
 #include <stack>
 
 
+class Layer;
 class BPositionIO;
 class BRegion;
 
@@ -92,6 +94,8 @@ public:
 
 			status_t			WriteDrawPicture(const BPoint& where,
 									const int32& token);
+
+			status_t			WriteBlendLayer(Layer* layer);
 
 protected:
 	// throw a status_t on error

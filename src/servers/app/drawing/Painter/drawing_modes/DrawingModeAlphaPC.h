@@ -43,7 +43,7 @@ blend_pixel_alpha_pc(int x, int y, const color_type& c, uint8 cover,
 
 // blend_hline_alpha_pc
 void
-blend_hline_alpha_pc(int x, int y, unsigned len, 
+blend_hline_alpha_pc(int x, int y, unsigned len,
 					 const color_type& c, uint8 cover,
 					 agg_buffer* buffer, const PatternHandler* pattern)
 {
@@ -52,7 +52,7 @@ blend_hline_alpha_pc(int x, int y, unsigned len,
 		rgb_color color = pattern->ColorAt(x, y);
 		uint16 alpha = color.alpha * cover;
 		if (alpha) {
-			if (alpha == 255) {
+			if (alpha == 255 * 255) {
 				ASSIGN_ALPHA_PC(p, color.red, color.green, color.blue);
 			} else {
 				BLEND_ALPHA_PC(p, color.red, color.green, color.blue, alpha);
@@ -65,7 +65,7 @@ blend_hline_alpha_pc(int x, int y, unsigned len,
 
 // blend_solid_hspan_alpha_pc
 void
-blend_solid_hspan_alpha_pc(int x, int y, unsigned len, 
+blend_solid_hspan_alpha_pc(int x, int y, unsigned len,
 						   const color_type& c, const uint8* covers,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {
@@ -88,7 +88,7 @@ blend_solid_hspan_alpha_pc(int x, int y, unsigned len,
 
 // blend_solid_vspan_alpha_pc
 void
-blend_solid_vspan_alpha_pc(int x, int y, unsigned len, 
+blend_solid_vspan_alpha_pc(int x, int y, unsigned len,
 						   const color_type& c, const uint8* covers,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {
@@ -112,8 +112,8 @@ blend_solid_vspan_alpha_pc(int x, int y, unsigned len,
 
 // blend_color_hspan_alpha_pc
 void
-blend_color_hspan_alpha_pc(int x, int y, unsigned len, 
-						   const color_type* colors, 
+blend_color_hspan_alpha_pc(int x, int y, unsigned len,
+						   const color_type* colors,
 						   const uint8* covers, uint8 cover,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {

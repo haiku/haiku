@@ -3,7 +3,7 @@
  * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
  * All rights reserved. Distributed under the terms of the MIT License.
  *
- * DrawingMode implementing B_OP_ALPHA in "Constant Overlay" mode on B_RGBA32.
+ * DrawingMode implementing B_OP_ALPHA in "Pixel Overlay" mode on B_RGBA32.
  *
  */
 

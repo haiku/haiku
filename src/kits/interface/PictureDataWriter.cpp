@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2009 Haiku, Inc. All rights reserved.
+ * Copyright 2006-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stefano Ceccherini, stefano.ceccherini@gmail.com
+ *		Julian Harnath, <julian.harnath@rwth-achen.de>
  */
 
 #include <PictureDataWriter.h>
@@ -651,6 +652,21 @@ PictureDataWriter::WritePopState()
 {
 	try {
 		BeginOp(B_PIC_POP_STATE);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteBlendLayer(Layer* layer)
+{
+	try {
+		BeginOp(B_PIC_BLEND_LAYER);
+		Write<Layer*>(layer);
 		EndOp();
 	} catch (status_t& status) {
 		return status;

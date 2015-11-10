@@ -20,6 +20,7 @@
 #include "DrawingModeAlphaCO.h"
 #include "DrawingModeAlphaCOSolid.h"
 #include "DrawingModeAlphaPC.h"
+#include "DrawingModeAlphaPCSolid.h"
 #include "DrawingModeAlphaPO.h"
 #include "DrawingModeAlphaPOSolid.h"
 #include "DrawingModeBlend.h"
@@ -211,7 +212,7 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 		case B_OP_COPY:
 			if (text) {
 				fBlendPixel = blend_pixel_copy_text;
-				fBlendHLine = blend_hline_copy_text; 
+				fBlendHLine = blend_hline_copy_text;
 				fBlendSolidHSpanSubpix = blend_solid_hspan_copy_text_subpix;
 				fBlendSolidHSpan = blend_solid_hspan_copy_text;
 				fBlendSolidVSpan = blend_solid_vspan_copy_text;
@@ -327,12 +328,21 @@ PixelFormat::SetDrawingMode(drawing_mode mode, source_alpha alphaSrcMode,
 					}
 					fBlendColorHSpan = blend_color_hspan_alpha_po;
 				} else if (alphaFncMode == B_ALPHA_COMPOSITE) {
-					fBlendPixel = blend_pixel_alpha_pc;
-					fBlendHLine = blend_hline_alpha_pc;
-					fBlendSolidHSpanSubpix = blend_solid_hspan_alpha_pc_subpix;
-					fBlendSolidHSpan = blend_solid_hspan_alpha_pc;
-					fBlendSolidVSpan = blend_solid_vspan_alpha_pc;
-					fBlendColorHSpan = blend_color_hspan_alpha_pc;
+					if (fPatternHandler->IsSolid()) {
+						fBlendPixel = blend_pixel_alpha_pc_solid;
+						fBlendHLine = blend_hline_alpha_pc_solid;
+						fBlendSolidHSpanSubpix = blend_solid_hspan_alpha_pc_subpix;
+						fBlendSolidHSpan = blend_solid_hspan_alpha_pc_solid;
+						fBlendSolidVSpan = blend_solid_vspan_alpha_pc_solid;
+						fBlendColorHSpan = blend_color_hspan_alpha_pc_solid;
+					} else {
+						fBlendPixel = blend_pixel_alpha_pc;
+						fBlendHLine = blend_hline_alpha_pc;
+						fBlendSolidHSpanSubpix = blend_solid_hspan_alpha_pc_subpix;
+						fBlendSolidHSpan = blend_solid_hspan_alpha_pc;
+						fBlendSolidVSpan = blend_solid_vspan_alpha_pc;
+						fBlendColorHSpan = blend_color_hspan_alpha_pc;
+					}
 				}
 			}
 			break;

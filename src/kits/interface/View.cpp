@@ -7,6 +7,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Adrian Oanca, adioanca@cotty.iren.ro
  *		Ingo Weinhold. ingo_weinhold@gmx.de
+ *		Julian Harnath, julian.harnath@rwth-aachen.de
  */
 
 
@@ -3934,6 +3935,27 @@ BView::DrawPictureAsync(const char* filename, long offset, BPoint where)
 
 
 void
+BView::BeginLayer(uint8 opacity)
+{
+	if (_CheckOwnerLockAndSwitchCurrent()) {
+		fOwner->fLink->StartMessage(AS_VIEW_BEGIN_LAYER);
+		fOwner->fLink->Attach<uint8>(opacity);
+		_FlushIfNotInTransaction();
+	}
+}
+
+
+void
+BView::EndLayer()
+{
+	if (_CheckOwnerLockAndSwitchCurrent()) {
+		fOwner->fLink->StartMessage(AS_VIEW_END_LAYER);
+		_FlushIfNotInTransaction();
+	}
+}
+
+
+void
 BView::Invalidate(BRect invalRect)
 {
 	if (fOwner == NULL)
@@ -5225,7 +5247,7 @@ BView::_ClipToPicture(BPicture* picture, BPoint where, bool invert, bool sync)
 	if (picture == NULL) {
 		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_PICTURE);
 		fOwner->fLink->Attach<int32>(-1);
-		
+
 		// NOTE: No need to sync here, since the -1 token cannot
 		// become invalid on the server.
 	} else {
@@ -5240,7 +5262,7 @@ BView::_ClipToPicture(BPicture* picture, BPoint where, bool invert, bool sync)
 		// the client creates BPictures on the stack, these BPictures may
 		// have issued a AS_DELETE_PICTURE command to the ServerApp when Draw()
 		// goes out of scope, and the command is processed earlier in the
-		// ServerApp thread than the AS_VIEW_CLIP_TO_PICTURE command in the 
+		// ServerApp thread than the AS_VIEW_CLIP_TO_PICTURE command in the
 		// ServerWindow thread, which will then have the result that no
 		// ServerPicture is found of the token.
 		if (sync)

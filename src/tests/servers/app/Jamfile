@@ -127,6 +127,7 @@ SharedLibrary libtestappserver.so :
 	ProfileMessageSupport.cpp
 	EventDispatcher.cpp
 	EventStream.cpp
+	TestServerLoopAdapter.cpp
 	MessageLooper.cpp
 
 	# Decorator
@@ -152,10 +153,12 @@ SharedLibrary libtestappserver.so :
 
 	AlphaMask.cpp
 	BitmapHWInterface.cpp
+	Canvas.cpp
 	DesktopSettings.cpp
-	DrawingContext.cpp
+	Layer.cpp
 	OffscreenServerWindow.cpp
 	OffscreenWindow.cpp
+	PictureBoundingBoxPlayer.cpp
 	RegionPool.cpp
 	Screen.cpp
 	ScreenConfigurations.cpp
@@ -173,9 +176,9 @@ SharedLibrary libtestappserver.so :
 	[ BuildFeatureAttribute freetype : library ]
 ;
 
-Includes [ FGristFiles AppServer.cpp BitmapManager.cpp
+Includes [ FGristFiles AppServer.cpp BitmapManager.cpp Canvas.cpp
 	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp
-	DrawState.cpp DrawingContext.cpp DrawingEngine.cpp ServerApp.cpp
+	DrawState.cpp DrawingEngine.cpp ServerApp.cpp
 	ServerBitmap.cpp ServerCursor.cpp ServerFont.cpp ServerPicture.cpp
 	ServerWindow.cpp View.cpp Window.cpp WorkspacesView.cpp
 	$(decorator_src) $(font_src) ]
@@ -249,6 +252,7 @@ SubInclude HAIKU_TOP src tests servers app statusbar ;
 SubInclude HAIKU_TOP src tests servers app stress_test ;
 SubInclude HAIKU_TOP src tests servers app textview ;
 SubInclude HAIKU_TOP src tests servers app transformation ;
+SubInclude HAIKU_TOP src tests servers app unit_tests ;
 SubInclude HAIKU_TOP src tests servers app view_state ;
 SubInclude HAIKU_TOP src tests servers app view_transit ;
 SubInclude HAIKU_TOP src tests servers app window_creation ;

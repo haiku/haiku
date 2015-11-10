@@ -53,7 +53,7 @@ main(int argc, char* argv[])
 		while (get_next_thread_info(teamInfo.team, &threadCookie, &threadInfo)
 				== B_OK) {
 			// search for the roster thread
-			if (!strcmp(threadInfo.name, "_roster_thread_")) {
+			if (!strcmp(threadInfo.name, "roster")) {
 				port_id port = find_port("haiku-test:roster");
 				port_info portInfo;
 				if (get_port_info(port, &portInfo) == B_OK

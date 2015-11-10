@@ -1,6 +1,7 @@
 /*
  * Copyright 2005-2006, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
+ * Copyright 2015, Julian Harnath <julian.harnath@rwth-aachen.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  * Copyright 2002-2004 Maxim Shemanarev (http://www.antigrain.com)
@@ -36,7 +37,9 @@ namespace agg
 			m_ren(ren),
 			m_region(NULL),
 			m_curr_cb(0),
-			m_bounds(m_ren.xmin(), m_ren.ymin(), m_ren.xmax(), m_ren.ymax())
+			m_bounds(m_ren.xmin(), m_ren.ymin(), m_ren.xmax(), m_ren.ymax()),
+			m_offset_x(0),
+			m_offset_y(0)
 		{
 		}
 
@@ -49,11 +52,15 @@ namespace agg
 		unsigned height() const { return m_ren.height(); }
 
 		//--------------------------------------------------------------------
-		const rect_i& clip_box() const { return m_ren.clip_box(); }
-		int			  xmin()	 const { return m_ren.xmin(); }
-		int			  ymin()	 const { return m_ren.ymin(); }
-		int			  xmax()	 const { return m_ren.xmax(); }
-		int			  ymax()	 const { return m_ren.ymax(); }
+		const rect_i& clip_box() const { return m_bounds; }
+		int			  xmin()	 const { return translate_from_base_ren_x(
+											m_ren.xmin()); }
+		int			  ymin()	 const { return translate_from_base_ren_y(
+											m_ren.ymin()); }
+		int			  xmax()	 const { return translate_from_base_ren_x(
+											m_ren.xmax()); }
+		int			  ymax()	 const { return translate_from_base_ren_y(
+											m_ren.ymax()); }
 
 		//--------------------------------------------------------------------
 		const rect_i& bounding_clip_box() const { return m_bounds;	  }
@@ -69,7 +76,12 @@ namespace agg
 			if(m_region && m_region->CountRects() > 0)
 			{
 				clipping_rect cb = m_region->RectAtInt(0);
-				m_ren.clip_box_naked(cb.left, cb.top, cb.right, cb.bottom);
+				translate_to_base_ren(cb);
+				m_ren.clip_box_naked(
+					cb.left,
+					cb.top,
+					cb.right,
+					cb.bottom);
 			}
 			else
 				m_ren.clip_box_naked(0, 0, -1, -1);
@@ -81,7 +93,12 @@ namespace agg
 			if(m_region && (int)(++m_curr_cb) < m_region->CountRects())
 			{
 				clipping_rect cb = m_region->RectAtInt(m_curr_cb);
-				m_ren.clip_box_naked(cb.left, cb.top, cb.right, cb.bottom);
+				translate_to_base_ren(cb);
+				m_ren.clip_box_naked(
+					cb.left,
+					cb.top,
+					cb.right,
+					cb.bottom);
 				return true;
 			}
 			return false;
@@ -94,6 +111,7 @@ namespace agg
 			m_region = NULL;
 			m_curr_cb = 0;
 			m_bounds = m_ren.clip_box();
+			translate_from_base_ren(m_bounds);
 		}
 
 		//--------------------------------------------------------------------
@@ -118,6 +136,68 @@ namespace agg
 		}
 
 		//--------------------------------------------------------------------
+		void set_offset(int offset_x, int offset_y)
+		{
+			m_offset_x = offset_x;
+			m_offset_y = offset_y;
+
+			if (m_region == NULL) {
+				m_bounds = m_ren.clip_box();
+				translate_from_base_ren(m_bounds);
+			}
+		}
+
+		//--------------------------------------------------------------------
+		void translate_to_base_ren_x(int& x)
+		{
+			x -= m_offset_x;
+		}
+
+		void translate_to_base_ren_y(int& y)
+		{
+			y -= m_offset_y;
+		}
+
+		void translate_to_base_ren(int& x, int&y)
+		{
+			x -= m_offset_x;
+			y -= m_offset_y;
+		}
+
+		void translate_to_base_ren(clipping_rect& clip)
+		{
+			clip.left   -= m_offset_x;
+			clip.right  -= m_offset_x;
+			clip.top    -= m_offset_y;
+			clip.bottom -= m_offset_y;
+		}
+
+		//--------------------------------------------------------------------
+		int translate_from_base_ren_x(int x) const
+		{
+			return x + m_offset_x;
+		}
+
+		int translate_from_base_ren_y(int y) const
+		{
+			return y + m_offset_y;
+		}
+
+		void translate_from_base_ren(int& x, int& y)
+		{
+			x += m_offset_x;
+			y += m_offset_y;
+		}
+
+		void translate_from_base_ren(rect_i& rect)
+		{
+			rect.x1 += m_offset_x;
+			rect.x2 += m_offset_x;
+			rect.y1 += m_offset_y;
+			rect.y2 += m_offset_y;
+		}
+
+		//--------------------------------------------------------------------
 		void clear(const color_type& c)
 		{
 			m_ren.clear(c);
@@ -126,6 +206,8 @@ namespace agg
 		//--------------------------------------------------------------------
 		void copy_pixel(int x, int y, const color_type& c)
 		{
+			translate_to_base_ren(x, y);
+
 			first_clip_box();
 			do
 			{
@@ -141,6 +223,8 @@ namespace agg
 		//--------------------------------------------------------------------
 		void blend_pixel(int x, int y, const color_type& c, cover_type cover)
 		{
+			translate_to_base_ren(x, y);
+
 			first_clip_box();
 			do
 			{
@@ -156,6 +240,8 @@ namespace agg
 		//--------------------------------------------------------------------
 		color_type pixel(int x, int y) const
 		{
+			translate_to_base_ren(x, y);
+
 			first_clip_box();
 			do
 			{
@@ -171,6 +257,9 @@ namespace agg
 		//--------------------------------------------------------------------
 		void copy_hline(int x1, int y, int x2, const color_type& c)
 		{
+			translate_to_base_ren(x1, y);
+			translate_to_base_ren_x(x2);
+
 			first_clip_box();
 			do
 			{
@@ -182,6 +271,9 @@ namespace agg
 		//--------------------------------------------------------------------
 		void copy_vline(int x, int y1, int y2, const color_type& c)
 		{
+			translate_to_base_ren(x, y1);
+			translate_to_base_ren_y(y2);
+
 			first_clip_box();
 			do
 			{
@@ -194,6 +286,9 @@ namespace agg
 		void blend_hline(int x1, int y, int x2,
 						 const color_type& c, cover_type cover)
 		{
+			translate_to_base_ren(x1, y);
+			translate_to_base_ren_x(x2);
+
 			first_clip_box();
 			do
 			{
@@ -201,11 +296,14 @@ namespace agg
 			}
 			while(next_clip_box());
 		}
-		
+
 		//--------------------------------------------------------------------
 		void blend_vline(int x, int y1, int y2,
 						 const color_type& c, cover_type cover)
 		{
+			translate_to_base_ren(x, y1);
+			translate_to_base_ren_y(y2);
+
 			first_clip_box();
 			do
 			{
@@ -217,6 +315,9 @@ namespace agg
 		//--------------------------------------------------------------------
 		void copy_bar(int x1, int y1, int x2, int y2, const color_type& c)
 		{
+			translate_to_base_ren(x1, y1);
+			translate_to_base_ren(x2, y2);
+
 			first_clip_box();
 			do
 			{
@@ -229,6 +330,9 @@ namespace agg
 		void blend_bar(int x1, int y1, int x2, int y2,
 					   const color_type& c, cover_type cover)
 		{
+			translate_to_base_ren(x1, y1);
+			translate_to_base_ren(x2, y2);
+
 			first_clip_box();
 			do
 			{
@@ -242,6 +346,8 @@ namespace agg
 		void blend_solid_hspan(int x, int y, int len,
 							   const color_type& c, const cover_type* covers)
 		{
+			translate_to_base_ren(x, y);
+
 			first_clip_box();
 			do
 			{
@@ -254,6 +360,8 @@ namespace agg
 		void blend_solid_hspan_subpix(int x, int y, int len,
 							   const color_type& c, const cover_type* covers)
 		{
+			translate_to_base_ren(x, y);
+
 			first_clip_box();
 			do
 			{
@@ -266,6 +374,8 @@ namespace agg
 		void blend_solid_vspan(int x, int y, int len,
 							   const color_type& c, const cover_type* covers)
 		{
+			translate_to_base_ren(x, y);
+
 			first_clip_box();
 			do
 			{
@@ -280,6 +390,8 @@ namespace agg
 							   const cover_type* covers,
 							   cover_type cover = cover_full)
 		{
+			translate_to_base_ren(x, y);
+
 			first_clip_box();
 			do
 			{
@@ -294,6 +406,8 @@ namespace agg
 							   const cover_type* covers,
 							   cover_type cover = cover_full)
 		{
+			translate_to_base_ren(x, y);
+
 			first_clip_box();
 			do
 			{
@@ -308,6 +422,7 @@ namespace agg
 									   const cover_type* covers,
 									   cover_type cover = cover_full)
 		{
+			translate_to_base_ren(x, y);
 			m_ren.blend_color_hspan_no_clip(x, y, len, colors, covers, cover);
 		}
 
@@ -317,6 +432,7 @@ namespace agg
 									   const cover_type* covers,
 									   cover_type cover = cover_full)
 		{
+			translate_to_base_ren(x, y);
 			m_ren.blend_color_vspan_no_clip(x, y, len, colors, covers, cover);
 		}
 
@@ -326,6 +442,7 @@ namespace agg
 					   int x_to=0,
 					   int y_to=0)
 		{
+			translate_to_base_ren(x_to, y_to);
 			first_clip_box();
 			do
 			{
@@ -343,6 +460,9 @@ namespace agg
 		BRegion*		   m_region;
 		unsigned		   m_curr_cb;
 		rect_i			   m_bounds;
+
+		int				   m_offset_x;
+		int				   m_offset_y;
 	};
 
 

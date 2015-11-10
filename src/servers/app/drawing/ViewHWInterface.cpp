@@ -483,7 +483,8 @@ ViewHWInterface::SetMode(const display_mode& mode)
 		// has not been created either, but we need one to display
 		// a real BWindow in the test environment.
 		// be_app->Run() needs to be called in another thread
-		BApplication* app = new BApplication("application/x-vnd.haiku-app-server");
+		BApplication* app = new BApplication(
+			"application/x-vnd.Haiku-test-app_server");
 		app->Unlock();
 
 		thread_id appThread = spawn_thread(run_app_thread, "app thread",

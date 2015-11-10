@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001-2014, Haiku, Inc.
+ * Copyright (c) 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -9,12 +9,13 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Marcus Overhagen <marcus@overhagen.de>
  *		Adrien Destugues <pulkomandy@pulkomandy.tk>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 #ifndef	VIEW_H
 #define VIEW_H
 
 
-#include "DrawingContext.h"
+#include "Canvas.h"
 #include "IntRect.h"
 
 #include <GraphicsDefs.h>
@@ -37,7 +38,7 @@ class ServerCursor;
 class ServerPicture;
 class BGradient;
 
-class View: public DrawingContext {
+class View: public Canvas {
 public:
 							View(IntRect frame, IntPoint scrollingOffset,
 								const char* name, int32 token,
@@ -111,31 +112,7 @@ public:
 
 			View*			ViewAt(const BPoint& where);
 
-			// coordinate conversion
-			void			ConvertToParent(BPoint* point) const;
-			void			ConvertToParent(IntPoint* point) const;
-			void			ConvertToParent(BRect* rect) const;
-			void			ConvertToParent(IntRect* rect) const;
-			void			ConvertToParent(BRegion* region) const;
-
-			void			ConvertFromParent(BPoint* point) const;
-			void			ConvertFromParent(IntPoint* point) const;
-			void			ConvertFromParent(BRect* rect) const;
-			void			ConvertFromParent(IntRect* rect) const;
-			void			ConvertFromParent(BRegion* region) const;
-
-			void			ConvertToScreen(BPoint* point) const;
-			void			ConvertToScreen(IntPoint* point) const;
-			void			ConvertToScreen(BRect* rect) const;
-			void			ConvertToScreen(IntRect* rect) const;
-			void			ConvertToScreen(BRegion* region) const;
-
-			void			ConvertFromScreen(BPoint* point) const;
-			void			ConvertFromScreen(IntPoint* point) const;
-			void			ConvertFromScreen(BRect* rect) const;
-			void			ConvertFromScreen(IntRect* rect) const;
-			void			ConvertFromScreen(BRegion* region) const;
-
+public:
 			void			MoveBy(int32 dx, int32 dy,
 								BRegion* dirtyRegion);
 
@@ -179,6 +156,8 @@ public:
 			void			SetPicture(ServerPicture* picture);
 			ServerPicture*	Picture() const
 								{ return fPicture; }
+
+			void			BlendAllLayers();
 
 			// for background clearing
 			virtual void	Draw(DrawingEngine* drawingEngine,
@@ -235,6 +214,11 @@ public:
 #endif
 
 protected:
+	virtual	void			_LocalToScreenTransform(
+								SimpleTransform& transform) const;
+	virtual	void			_ScreenToLocalTransform(
+								SimpleTransform& transform) const;
+
 			BRegion&		_ScreenClipping(BRegion* windowContentClipping,
 								bool force = false) const;
 			void			_MoveScreenClipping(int32 x, int32 y,

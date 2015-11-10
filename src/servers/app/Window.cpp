@@ -817,7 +817,7 @@ Window::InvalidateView(View* view, BRegion& viewRegion)
 		if (!fContentRegionValid)
 			_UpdateContentRegion();
 
-		view->ConvertToScreen(&viewRegion);
+		view->LocalToScreenTransform().Apply(&viewRegion);
 		viewRegion.IntersectWith(&VisibleContentRegion());
 		if (viewRegion.CountRects() > 0) {
 			viewRegion.IntersectWith(

@@ -1213,6 +1213,16 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				break;
 			}
 
+			case B_PIC_BLEND_LAYER:
+			{
+				Layer* const* layer;
+				if (callbacks.blend_layer == NULL || !reader.Get<Layer*>(layer))
+					break;
+
+				callbacks.blend_layer(userData, *layer);
+				break;
+			}
+
 			default:
 				break;
 		}

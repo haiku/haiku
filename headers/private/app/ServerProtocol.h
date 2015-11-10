@@ -7,6 +7,7 @@
  *		Jérôme Duval, jerome.duval@free.fr
  *		Axel Dörfler, axeld@pinc-software.de
  *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
+ *		Julian Harnath, <julian.harnath@rwth-aachen.de>
  */
 #ifndef APP_SERVER_PROTOCOL_H
 #define APP_SERVER_PROTOCOL_H
@@ -14,6 +15,10 @@
 
 #include <SupportDefs.h>
 
+
+#ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#	define SERVER_PORT_NAME "haiku-test:app_server"
+#endif
 
 #if TEST_MODE
 #	define SERVER_INPUT_PORT "haiku-test:input port"
@@ -319,6 +324,8 @@ enum {
 	AS_VIEW_SET_VIEW_BITMAP,
 	AS_VIEW_SET_PATTERN,
 	AS_SET_CURRENT_VIEW,
+	AS_VIEW_BEGIN_LAYER,
+	AS_VIEW_END_LAYER,
 
 	// BDirectWindow/BWindowScreen codes
 	AS_DIRECT_WINDOW_GET_SYNC_DATA,
