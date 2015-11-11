@@ -4,7 +4,7 @@ RemotePackageRepository HaikuPorts
 	:
 	# architecture "any" packages
 	be_book-2008_10_26-1
-	ca_root_certificates-2015_10_28-1
+	ca_root_certificates-2014_08_13-1
 	caladea-20130214-3
 	carlito-20130920-1
 	dejavu-2.34-1
@@ -17,10 +17,10 @@ RemotePackageRepository HaikuPorts
 	# repository architecture packages
 	# primary architecture (x86)
 	ale-0.9.1-2
-	apr-1.5.2-1
-	apr_devel-1.5.2-1
-	apr_util-1.5.4-1
-	apr_util_devel-1.5.4-1
+	apr-1.4.6-7
+	apr_devel-1.4.6-7
+	apr_util-1.4.1-4
+	apr_util_devel-1.4.1-4
 	aspell-0.60.6.1-1
 	aspell_devel-0.60.6.1-1
 	autoconf-2.69-6
@@ -68,8 +68,8 @@ RemotePackageRepository HaikuPorts
 	coreutils-8.24-1
 	cpio-2.10-1
 	ctags-5.8-3
-	curl-7.45.0-2
-	curl_devel-7.45.0-2
+	curl-7.44.0-1
+	curl_devel-7.44.0-1
 	cvs-1.12.13.1-6
 	cvsps-2.2b1-1
 	cython-0.23.4-1
@@ -105,13 +105,13 @@ RemotePackageRepository HaikuPorts
 	giflib_devel-5.1.1-1
 	giflib6-5.0.5-2
 	giflib6_devel-5.0.5-2
-	git-2.2.2-2
-	git_arch-2.2.2-2
-	git_cvs-2.2.2-2
-	git_daemon-2.2.2-2
-	git_email-2.2.2-2
+	git-2.2.2-1
+	git_arch-2.2.2-1
+	git_cvs-2.2.2-1
+	git_daemon-2.2.2-1
+	git_email-2.2.2-1
 	git_remote_helpers-1.8.3.4-4
-	git_svn-2.2.2-2
+	git_svn-2.2.2-1
 	glew-1.11.0-1
 	glew_devel-1.11.0-1
 	glew_util-1.11.0-1
@@ -127,8 +127,8 @@ RemotePackageRepository HaikuPorts
 	gutenprint-5.2.10-1
 	gutenprint_devel-5.2.10-1
 	gzip-1.6-2
-	haikuwebkit-1.5.0-1
-	haikuwebkit_devel-1.5.0-1
+	haikuwebkit-1.4.13-1
+	haikuwebkit_devel-1.4.13-1
 	help2man-1.46.6-1
 	htmldoc-1.8.27-3
 	icu-55.1-5
@@ -205,8 +205,6 @@ RemotePackageRepository HaikuPorts
 	libxml2_python-2.9.2-1
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
-	libz-1.2.8.2015.08.23-1
-	libz_devel-1.2.8.2015.08.23-1
 	llvm-3.5.2-1
 	lz4-r131-1
 	lz4_devel-r131-1
@@ -240,10 +238,10 @@ RemotePackageRepository HaikuPorts
 	openal-1.13.0-2
 	openal_devel-1.13.0-2
 	openjdk-1.7_2013_11_08-2
-	openssh-7.1p1-1
+	openssh-6.9p1-1
 	# sync openssl with secondary architecture (x86_gcc2)
-	openssl-1.0.2d-4
-	openssl_devel-1.0.2d-4
+	openssl-1.0.0s-2
+	openssl_devel-1.0.0s-2
 	p7zip-9.20.1-4
 	patch-2.7.5-1
 	pe-2.4.5-2
@@ -251,7 +249,7 @@ RemotePackageRepository HaikuPorts
 	pixman-0.32.6-1
 	pkgconfig-0.27.1-2
 	pyenet-20141025-1
-	python-2.7.10-2
+	python-2.7.10-1
 	python_mako-1.0.1-1
 	python_setuptools-5.3-2
 	python_twisted-13.2.0-1
@@ -280,8 +278,6 @@ RemotePackageRepository HaikuPorts
 	sdl_ttf-2.0.11-2
 	sdl_ttf_devel-2.0.11-2
 	sed-4.2.1-6
-	serf-1.3.8-1
-	serf_devel-1.3.8-1
 	sharutils-4.14-1
 	smpeg-0.4.5-4
 	smpeg_devel-0.4.5-4
@@ -289,8 +285,8 @@ RemotePackageRepository HaikuPorts
 	speex_devel-1.2~rc1-2
 	sqlite-3.8.11.1-1
 	sqlite_devel-3.8.11.1-1
-	subversion-1.8.11-6
-	subversion_devel-1.8.11-6
+	subversion-1.6.18-6
+	subversion_devel-1.6.18-6
 	tar-1.27.1-2
 	tcpdump-4.7.4-2
 	texinfo-4.13a-7
@@ -307,9 +303,9 @@ RemotePackageRepository HaikuPorts
 	unzip-6.0-2
 	vision-0.9.7.r949-3
 	vim-7.4-1
-	wget-1.16.3-2
+	wget-1.16.3-1
 	which-2.21-1
-	wpa_supplicant-2.0-4
+	wpa_supplicant-2.0-3
 	xml_parser-2.36-1
 	xz_utils-5.0.8-2
 	xz_utils_devel-5.0.8-2
@@ -322,8 +318,8 @@ RemotePackageRepository HaikuPorts
 	binutils_x86_gcc2-2.17_2013_04_21-2
 	bzip2_x86_gcc2-1.0.6-5
 	bzip2_x86_gcc2_devel-1.0.6-5
-	curl_x86_gcc2-7.45.0-2
-	curl_x86_gcc2_devel-7.45.0-2
+	curl_x86_gcc2-7.44.0-1
+	curl_x86_gcc2_devel-7.44.0-1
 	expat_x86_gcc2-2.1.0-1
 	expat_x86_gcc2_devel-2.1.0-1
 	ffmpeg_x86_gcc2-0.10.2-4
@@ -382,8 +378,8 @@ RemotePackageRepository HaikuPorts
 	ncurses_x86_gcc2_devel-5.9-10
 	ncurses6_x86_gcc2-6.0-1
 	ncurses6_x86_gcc2_devel-6.0-1
-	openssl_x86_gcc2-1.0.2d-4
-	openssl_x86_gcc2_devel-1.0.2d-4
+	openssl_x86_gcc2-1.0.0s-2
+	openssl_x86_gcc2_devel-1.0.0s-2
 	pkgconfig_x86_gcc2-0.27.1-2
 	speex_x86_gcc2-1.2~rc1-2
 	speex_x86_gcc2_devel-1.2~rc1-2
