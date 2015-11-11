@@ -114,6 +114,8 @@ private:
 			void				_SendPendingLaunchDataReplies();
 
 			status_t			_CreateAndTransferPorts();
+			port_id				_CreateAndTransferPort(const char* name,
+									int32 capacity);
 
 			status_t			_Launch(const char* signature, entry_ref* ref,
 									int argCount, const char* const* args,
@@ -130,6 +132,7 @@ private:
 			status_t			fInitStatus;
 			team_id				fTeam;
 			port_id				fDefaultPort;
+			uint32				fToken;
 			status_t			fLaunchStatus;
 			mutex				fLaunchStatusLock;
 			::Target*			fTarget;

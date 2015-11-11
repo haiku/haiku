@@ -31,6 +31,7 @@ Job::Job(const char* name)
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
 	fDefaultPort(-1),
+	fToken((uint32)B_PREFERRED_TOKEN),
 	fLaunchStatus(B_NO_INIT),
 	fTarget(NULL),
 	fPendingLaunchDataReplies(0, false)
@@ -49,6 +50,7 @@ Job::Job(const Job& other)
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
 	fDefaultPort(-1),
+	fToken((uint32)B_PREFERRED_TOKEN),
 	fLaunchStatus(B_NO_INIT),
 	fTarget(other.Target()),
 	fPendingLaunchDataReplies(0, false)
@@ -437,8 +439,7 @@ Job::GetMessenger(BMessenger& messenger)
 	if (fDefaultPort < 0)
 		return B_NAME_NOT_FOUND;
 
-	BMessenger::Private(messenger).SetTo(fTeam, fDefaultPort,
-		B_PREFERRED_TOKEN);
+	BMessenger::Private(messenger).SetTo(fTeam, fDefaultPort, fToken);
 	return B_OK;
 }
 
@@ -565,6 +566,10 @@ Job::_SendPendingLaunchDataReplies()
 }
 
 
+/*!	Creates the ports for a newly launched job. If the registrar already
+	pre-registered the application, \c fDefaultPort will already be set, and
+	honored when filling the ports message.
+*/
 status_t
 Job::_CreateAndTransferPorts()
 {
@@ -584,17 +589,18 @@ Job::_CreateAndTransferPorts()
 		const int32 capacity = iterator->second.GetInt32("capacity",
 			B_LOOPER_PORT_DEFAULT_CAPACITY);
 
-		port_id port = create_port(capacity, name.String());
-		if (port < 0)
-			return port;
+		port_id port = -1;
+		if (suffix != NULL || fDefaultPort < 0) {
+			port = _CreateAndTransferPort(name.String(), capacity);
+			if (port < 0)
+				return port;
 
-		status_t result = set_port_owner(port, fTeam);
-		if (result != B_OK)
-			return result;
+			if (suffix == NULL)
+				fDefaultPort = port;
+		} else if (suffix == NULL)
+			port = fDefaultPort;
 
 		iterator->second.SetInt32("port", port);
-		if (suffix == NULL)
-			fDefaultPort = port;
 
 		if (name == "x-vnd.haiku-registrar:auth") {
 			// Allow the launch_daemon to access the registrar authentication
@@ -606,20 +612,39 @@ Job::_CreateAndTransferPorts()
 		BMessage data;
 		data.AddInt32("capacity", B_LOOPER_PORT_DEFAULT_CAPACITY);
 
-		port_id port = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, Name());
-		if (port < 0)
-			return port;
+		port_id port = -1;
+		if (fDefaultPort < 0) {
+			port = _CreateAndTransferPort(Name(),
+				B_LOOPER_PORT_DEFAULT_CAPACITY);
+			if (port < 0)
+				return port;
 
-		status_t result = set_port_owner(port, fTeam);
-		if (result != B_OK)
-			return result;
+			fDefaultPort = port;
+		} else
+			port = fDefaultPort;
 
 		data.SetInt32("port", port);
-		fDefaultPort = port;
 		AddPort(data);
 	}
 
 	return B_OK;
+}
+
+
+port_id
+Job::_CreateAndTransferPort(const char* name, int32 capacity)
+{
+	port_id port = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, Name());
+	if (port < 0)
+		return port;
+
+	status_t status = set_port_owner(port, fTeam);
+	if (status != B_OK) {
+		delete_port(port);
+		return status;
+	}
+
+	return port;
 }
 
 
@@ -629,8 +654,7 @@ Job::_Launch(const char* signature, entry_ref* ref, int argCount,
 {
 	thread_id mainThread = -1;
 	status_t result = BRoster::Private().Launch(signature, ref, NULL, argCount,
-		args, environment, &fTeam, &mainThread, true);
-
+		args, environment, &fTeam, &mainThread, &fDefaultPort, &fToken, true);
 	if (result == B_OK) {
 		result = _CreateAndTransferPorts();
 

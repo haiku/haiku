@@ -923,7 +923,7 @@ BRoster::Launch(const char* mimeType, BMessage* initialMessage,
 		messageList.AddItem(initialMessage);
 
 	return _LaunchApp(mimeType, NULL, &messageList, 0, NULL,
-		(const char**)environ, _appTeam, NULL, false);
+		(const char**)environ, _appTeam, NULL, NULL, NULL, false);
 }
 
 
@@ -935,7 +935,7 @@ BRoster::Launch(const char* mimeType, BList* messageList,
 		return B_BAD_VALUE;
 
 	return _LaunchApp(mimeType, NULL, messageList, 0, NULL,
-		(const char**)environ, _appTeam, NULL, false);
+		(const char**)environ, _appTeam, NULL, NULL, NULL, false);
 }
 
 
@@ -947,7 +947,7 @@ BRoster::Launch(const char* mimeType, int argc, const char* const* args,
 		return B_BAD_VALUE;
 
 	return _LaunchApp(mimeType, NULL, NULL, argc, args, (const char**)environ,
-		_appTeam, NULL, false);
+		_appTeam, NULL, NULL, NULL, false);
 }
 
 
@@ -963,7 +963,7 @@ BRoster::Launch(const entry_ref* ref, const BMessage* initialMessage,
 		messageList.AddItem(const_cast<BMessage*>(initialMessage));
 
 	return _LaunchApp(NULL, ref, &messageList, 0, NULL, (const char**)environ,
-		_appTeam, NULL, false);
+		_appTeam, NULL, NULL, NULL, false);
 }
 
 
@@ -975,7 +975,7 @@ BRoster::Launch(const entry_ref* ref, const BList* messageList,
 		return B_BAD_VALUE;
 
 	return _LaunchApp(NULL, ref, messageList, 0, NULL, (const char**)environ,
-		appTeam, NULL, false);
+		appTeam, NULL, NULL, NULL, false);
 }
 
 
@@ -987,7 +987,7 @@ BRoster::Launch(const entry_ref* ref, int argc, const char* const* args,
 		return B_BAD_VALUE;
 
 	return _LaunchApp(NULL, ref, NULL, argc, args, (const char**)environ,
-		appTeam, NULL, false);
+		appTeam, NULL, NULL, NULL, false);
 }
 
 
@@ -1516,7 +1516,7 @@ BRoster::_SetThread(team_id team, thread_id thread) const
 */
 status_t
 BRoster::_SetThreadAndTeam(uint32 entryToken, thread_id thread,
-	team_id team) const
+	team_id team, port_id* _port) const
 {
 	status_t error = B_OK;
 
@@ -1540,6 +1540,9 @@ BRoster::_SetThreadAndTeam(uint32 entryToken, thread_id thread,
 	if (error == B_OK && reply.what != B_REG_SUCCESS
 		&& reply.FindInt32("error", &error) != B_OK)
 		error = B_ERROR;
+
+	if (error == B_OK && _port != NULL)
+		*_port = reply.GetInt32("port", -1);
 
 	return error;
 }
@@ -1836,8 +1839,8 @@ BRoster::_UpdateActiveApp(team_id team) const
 status_t
 BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 	const BList* messageList, int argc, const char* const* args,
-	const char** environment, team_id* _appTeam,
-	thread_id* _appThread, bool launchSuspended) const
+	const char** environment, team_id* _appTeam, thread_id* _appThread,
+	port_id* _appPort, uint32* _appToken, bool launchSuspended) const
 {
 	DBG(OUT("BRoster::_LaunchApp()"));
 
@@ -1866,6 +1869,8 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 	ArgVector argVector;
 	team_id team = -1;
 	thread_id appThread = -1;
+	port_id appPort = -1;
+	uint32 appToken = 0;
 
 	do {
 		// find the app
@@ -1885,7 +1890,6 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 			return error;
 
 		// pre-register the app (but ignore scipts)
-		uint32 appToken = 0;
 		app_info appInfo;
 		bool isScript = wasDocument && docRef != NULL && *docRef == appRef;
 		if (!isScript && !fNoRegistrar) {
@@ -1900,6 +1904,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 					&appInfo);
 				if (error == B_OK) {
 					otherAppFlags = appInfo.flags;
+					appPort = appInfo.port;
 					team = appInfo.team;
 				}
 			}
@@ -1927,7 +1932,7 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 			DBG(OUT("  load image: %s (%lx)\n", strerror(error), error));
 			// finish the registration
 			if (error == B_OK && !isScript && !fNoRegistrar)
-				error = _SetThreadAndTeam(appToken, appThread, team);
+				error = _SetThreadAndTeam(appToken, appThread, team, &appPort);
 
 			DBG(OUT("  set thread and team: %s (%lx)\n", strerror(error),
 				error));
@@ -1996,6 +2001,10 @@ BRoster::_LaunchApp(const char* mimeType, const entry_ref* ref,
 
 		if (_appThread != NULL)
 			*_appThread = appThread;
+		if (_appPort != NULL)
+			*_appPort = appPort;
+		if (_appToken != NULL)
+			*_appToken = appToken;
 	}
 
 	DBG(OUT("BRoster::_LaunchApp() done: %s (%lx)\n",
