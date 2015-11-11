@@ -256,42 +256,15 @@ BSecureSocket::~BSecureSocket()
 status_t
 BSecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 {
-	if (fPrivate == NULL)
-		return B_NO_MEMORY;
-
-	status_t state = fPrivate->InitCheck();
-	if (state != B_OK)
-		return state;
-
-	status_t status = BSocket::Connect(peer, timeout);
+	status_t status = InitCheck();
 	if (status != B_OK)
 		return status;
 
-	// Do this only after BSocket::Connect has checked wether we're already
-	// connected. We don't want to kill an existing SSL session, as that would
-	// likely crash the protocol loop for it.
-	if (fPrivate->fSSL != NULL) {
-		SSL_free(fPrivate->fSSL);
-	}
+	status = BSocket::Connect(peer, timeout);
+	if (status != B_OK)
+		return status;
 
-	fPrivate->fSSL = SSL_new(BSecureSocket::Private::Context());
-	if (fPrivate->fSSL == NULL) {
-		BSocket::Disconnect();
-		return B_NO_MEMORY;
-	}
-
-	BIO_set_fd(fPrivate->fBIO, fSocket, BIO_NOCLOSE);
-	SSL_set_bio(fPrivate->fSSL, fPrivate->fBIO, fPrivate->fBIO);
-	SSL_set_ex_data(fPrivate->fSSL, Private::sDataIndex, this);
-
-	int returnValue = SSL_connect(fPrivate->fSSL);
-	if (returnValue <= 0) {
-		TRACE("SSLConnection can't connect\n");
-		BSocket::Disconnect();
-		return fPrivate->ErrorCode(returnValue);
-	}
-
-	return B_OK;
+	return _Setup();
 }
 
 
@@ -319,6 +292,17 @@ BSecureSocket::WaitForReadable(bigtime_t timeout) const
 		return B_OK;
 
 	return BSocket::WaitForReadable(timeout);
+}
+
+
+status_t
+BSecureSocket::InitCheck()
+{
+	if (fPrivate == NULL)
+		return B_NO_MEMORY;
+
+	status_t state = fPrivate->InitCheck();
+	return state;
 }
 
 
@@ -360,6 +344,37 @@ BSecureSocket::Write(const void* buffer, size_t size)
 		return bytesWritten;
 
 	return fPrivate->ErrorCode(bytesWritten);
+}
+
+
+status_t
+BSecureSocket::_Setup()
+{
+	// Do this only after BSocket::Connect has checked wether we're already
+	// connected. We don't want to kill an existing SSL session, as that would
+	// likely crash the protocol loop for it.
+	if (fPrivate->fSSL != NULL) {
+		SSL_free(fPrivate->fSSL);
+	}
+
+	fPrivate->fSSL = SSL_new(BSecureSocket::Private::Context());
+	if (fPrivate->fSSL == NULL) {
+		BSocket::Disconnect();
+		return B_NO_MEMORY;
+	}
+
+	BIO_set_fd(fPrivate->fBIO, fSocket, BIO_NOCLOSE);
+	SSL_set_bio(fPrivate->fSSL, fPrivate->fBIO, fPrivate->fBIO);
+	SSL_set_ex_data(fPrivate->fSSL, Private::sDataIndex, this);
+
+	int returnValue = SSL_connect(fPrivate->fSSL);
+	if (returnValue <= 0) {
+		TRACE("SSLConnection can't connect\n");
+		BSocket::Disconnect();
+		return fPrivate->ErrorCode(returnValue);
+	}
+
+	return B_OK;
 }
 
 

@@ -16,6 +16,12 @@
 #include <NetworkRequest.h>
 
 
+namespace BPrivate {
+	class CheckedSecureSocket;
+	class CheckedProxySecureSocket;
+};
+
+
 class BHttpRequest : public BNetworkRequest {
 public:
 								BHttpRequest(const BUrl& url,
@@ -76,7 +82,8 @@ private:
 			BString&			_ResultStatusText();
 
 	// SSL failure management
-	friend	class				CheckedSecureSocket;
+	friend	class				BPrivate::CheckedSecureSocket;
+	friend	class				BPrivate::CheckedProxySecureSocket;
 			bool				_CertificateVerificationFailed(
 									BCertificate& certificate,
 									const char* message);

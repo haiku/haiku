@@ -23,6 +23,7 @@
 #include <Debug.h>
 #include <DynamicBuffer.h>
 #include <File.h>
+#include <ProxySecureSocket.h>
 #include <Socket.h>
 #include <SecureSocket.h>
 #include <StackOrHeapArray.h>
@@ -32,33 +33,66 @@
 static const int32 kHttpBufferSize = 4096;
 
 
-class CheckedSecureSocket: public BSecureSocket
-{
-public:
-					CheckedSecureSocket(BHttpRequest* request);
+namespace BPrivate {
 
-	bool			CertificateVerificationFailed(BCertificate& certificate,
-						const char* message);
+	class CheckedSecureSocket: public BSecureSocket
+	{
+		public:
+			CheckedSecureSocket(BHttpRequest* request);
 
-private:
-	BHttpRequest*	fRequest;
+			bool			CertificateVerificationFailed(BCertificate& certificate,
+					const char* message);
+
+		private:
+			BHttpRequest*	fRequest;
+	};
+
+
+	CheckedSecureSocket::CheckedSecureSocket(BHttpRequest* request)
+		:
+		BSecureSocket(),
+		fRequest(request)
+	{
+	}
+
+
+	bool
+	CheckedSecureSocket::CertificateVerificationFailed(BCertificate& certificate,
+		const char* message)
+	{
+		return fRequest->_CertificateVerificationFailed(certificate, message);
+	}
+
+
+	class CheckedProxySecureSocket: public BProxySecureSocket
+	{
+		public:
+			CheckedProxySecureSocket(const BNetworkAddress& proxy, BHttpRequest* request);
+
+			bool			CertificateVerificationFailed(BCertificate& certificate,
+					const char* message);
+
+		private:
+			BHttpRequest*	fRequest;
+	};
+
+
+	CheckedProxySecureSocket::CheckedProxySecureSocket(const BNetworkAddress& proxy,
+		BHttpRequest* request)
+		:
+		BProxySecureSocket(proxy),
+		fRequest(request)
+	{
+	}
+
+
+	bool
+	CheckedProxySecureSocket::CertificateVerificationFailed(BCertificate& certificate,
+		const char* message)
+	{
+		return fRequest->_CertificateVerificationFailed(certificate, message);
+	}
 };
-
-
-CheckedSecureSocket::CheckedSecureSocket(BHttpRequest* request)
-	:
-	BSecureSocket(),
-	fRequest(request)
-{
-}
-
-
-bool
-CheckedSecureSocket::CertificateVerificationFailed(BCertificate& certificate,
-	const char* message)
-{
-	return fRequest->_CertificateVerificationFailed(certificate, message);
-}
 
 
 BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
@@ -488,9 +522,13 @@ BHttpRequest::_MakeRequest()
 {
 	delete fSocket;
 
-	if (fSSL)
-		fSocket = new(std::nothrow) CheckedSecureSocket(this);
-	else
+	if (fSSL) {
+		if (fContext->UseProxy()) {
+			BNetworkAddress proxy(fContext->GetProxyHost(), fContext->GetProxyPort());
+			fSocket = new(std::nothrow) BPrivate::CheckedProxySecureSocket(proxy, this);
+		} else
+			fSocket = new(std::nothrow) BPrivate::CheckedSecureSocket(this);
+	} else
 		fSocket = new(std::nothrow) BSocket();
 
 	if (fSocket == NULL)
