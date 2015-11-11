@@ -313,6 +313,16 @@ void
 Job::SetDefaultPort(port_id port)
 {
 	fDefaultPort = port;
+
+	PortMap::iterator iterator = fPortMap.begin();
+	for (; iterator != fPortMap.end(); iterator++) {
+		BString name;
+		if (iterator->second.HasString("name"))
+			continue;
+
+		iterator->second.SetInt32("port", (int32)port);
+		break;
+	}
 }
 
 
@@ -396,7 +406,8 @@ Job::TeamDeleted()
 	if (IsService())
 		SetState(B_JOB_STATE_WAITING_TO_RUN);
 
-	_SetLaunchStatus(B_NO_INIT);
+	MutexLocker locker(fLaunchStatusLock);
+	fLaunchStatus = B_NO_INIT;
 }
 
 
