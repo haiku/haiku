@@ -468,6 +468,20 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	fDisplayPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
 		extraPLLFlags);
 
+	// Power on Panel
+	addr_t panelControl = INTEL_PANEL_CONTROL;
+	addr_t panelStatus = INTEL_PANEL_STATUS;
+	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
+		panelControl = PCH_PANEL_CONTROL;
+		panelStatus = PCH_PANEL_STATUS;
+	}
+	write32(panelControl, read32(panelControl) | PANEL_CONTROL_POWER_TARGET_ON);
+
+	// TODO: A wait_for power on status to be set would be better here
+	spin(1000);
+	if ((read32(panelStatus) & PANEL_STATUS_POWER_ON) == 0)
+		ERROR("%s: %s didn't power on in 250ms!\n", __func__, PortName());
+
 	// Program target display mode
 	fDisplayPipe->Enable(target, _PortRegister());
 
