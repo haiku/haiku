@@ -452,4 +452,18 @@ BSecureSocket::Write(const void* buffer, size_t size)
 }
 
 
+status_t
+BSecureSocket::InitCheck()
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
+BSecureSocket::_Setup()
+{
+	return B_UNSUPPORTED;
+}
+
+
 #endif	// !OPENSSL_ENABLED
