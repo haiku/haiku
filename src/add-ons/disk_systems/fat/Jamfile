@@ -11,7 +11,7 @@ Addon <disk_system>fat :
 	FATAddOn.cpp
 	InitializeParameterEditor.cpp
 
-	: be localestub $(HAIKU_LOCALE_LIBS) $(TARGET_LIBSUPC++) libshared.a
+	: be localestub [ TargetLibsupc++ ] libshared.a
 ;
 
 DoCatalogs <disk_system>fat :
