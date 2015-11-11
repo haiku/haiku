@@ -518,6 +518,7 @@ BColumnTitle::Draw(BView* view, bool pressed)
 			break;
 	}
 
+	view->SetLowColor(pressed ? sDarkTitleBackground : sTitleBackground);
 	view->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 1.75));
 	view->DrawString(titleString.String(), loc);
 
