@@ -347,6 +347,15 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	}
 
 	// TODO: Fix software scaling?
+
+	// Disable PanelFitter for now
+	addr_t panelFitterControl = PCH_PANEL_FITTER_BASE_REGISTER
+		+ PCH_PANEL_FITTER_CONTROL;
+	if (fDisplayPipe->Index() == INTEL_PIPE_B)
+		panelFitterControl += PCH_PANEL_FITTER_PIPE_OFFSET;
+	write32(panelFitterControl, (read32(panelFitterControl) & ~PANEL_FITTER_ENABLED));
+	read32(panelFitterControl);
+
 #if 0
 	// For LVDS panels, we actually always set the native mode in hardware
 	// Then we use the panel fitter to scale the picture to that.
