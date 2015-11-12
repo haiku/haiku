@@ -29,7 +29,9 @@ AlphaMask::AlphaMask(AlphaMask* previousMask, bool inverse)
 	:
 	fPreviousMask(previousMask),
 	fBounds(),
-	fViewOrigin(),
+	fClippedToCanvas(true),
+	fCanvasOrigin(),
+	fCanvasBounds(),
 	fInverse(inverse),
 	fBackgroundOpacity(0),
 	fBits(NULL),
@@ -44,7 +46,9 @@ AlphaMask::AlphaMask(uint8 backgroundOpacity)
 	:
 	fPreviousMask(),
 	fBounds(),
-	fViewOrigin(),
+	fClippedToCanvas(true),
+	fCanvasOrigin(),
+	fCanvasBounds(),
 	fInverse(false),
 	fBackgroundOpacity(backgroundOpacity),
 	fBits(NULL),
@@ -62,18 +66,30 @@ AlphaMask::~AlphaMask()
 
 
 IntPoint
-AlphaMask::SetViewOrigin(IntPoint viewOrigin)
+AlphaMask::SetCanvasGeometry(IntPoint origin, IntRect bounds)
 {
-	if (viewOrigin == fViewOrigin)
-		return fViewOrigin;
+	if (origin == fCanvasOrigin && bounds.Width() == fCanvasBounds.Width()
+		&& bounds.Height() == fCanvasBounds.Height())
+		return fCanvasOrigin;
 
-	IntPoint oldOrigin = fViewOrigin;
-	fViewOrigin = viewOrigin;
+	IntPoint oldOrigin = fCanvasOrigin;
+	fCanvasOrigin = origin;
+	IntRect oldBounds = fCanvasBounds;
+	fCanvasBounds = IntRect(0, 0, bounds.Width(), bounds.Height());
+
+	if (fClippedToCanvas && (fCanvasBounds.Width() > oldBounds.Width()
+		|| fCanvasBounds.Height() > oldBounds.Height())) {
+		// The canvas is now larger than before and we previously
+		// drew the alpha mask clipped to the (old) bounds of the
+		// canvas. So we now have to redraw the alpha mask with the
+		// new size.
+		_Generate();
+	}
 
 	_AttachMaskToBuffer();
 
 	if (fPreviousMask != NULL)
-		fPreviousMask->SetViewOrigin(viewOrigin);
+		fPreviousMask->SetCanvasGeometry(origin, bounds);
 
 	return oldOrigin;
 }
@@ -101,7 +117,7 @@ AlphaMask::_CreateTemporaryBitmap(BRect bounds) const
 void
 AlphaMask::_Generate()
 {
-	ServerBitmap* const bitmap = _RenderSource();
+	ServerBitmap* const bitmap = _RenderSource(fCanvasBounds);
 	BReference<ServerBitmap> bitmapRef(bitmap, true);
 	if (bitmap == NULL) {
 		_SetNoClipping();
@@ -156,6 +172,13 @@ AlphaMask::_SetNoClipping()
 }
 
 
+const IntRect&
+AlphaMask::_PreviousMaskBounds() const
+{
+	return fPreviousMask->fBounds;
+}
+
+
 void
 AlphaMask::_AttachMaskToBuffer()
 {
@@ -172,8 +195,8 @@ AlphaMask::_AttachMaskToBuffer()
 	}
 
 	const IntPoint maskOffset = _Offset();
-	const int32 offsetX = fBounds.left + maskOffset.x + fViewOrigin.x;
-	const int32 offsetY = fBounds.top + maskOffset.y + fViewOrigin.y;
+	const int32 offsetX = fBounds.left + maskOffset.x + fCanvasOrigin.x;
+	const int32 offsetY = fBounds.top + maskOffset.y + fCanvasOrigin.y;
 
 	fMask.attach(fBuffer, offsetX, offsetY, outsideOpacity);
 }
@@ -192,7 +215,7 @@ UniformAlphaMask::UniformAlphaMask(uint8 opacity)
 
 
 ServerBitmap*
-UniformAlphaMask::_RenderSource()
+UniformAlphaMask::_RenderSource(const IntRect&)
 {
 	return NULL;
 }
@@ -220,11 +243,19 @@ VectorAlphaMask<VectorMaskType>::VectorAlphaMask(AlphaMask* previousMask,
 
 template<class VectorMaskType>
 ServerBitmap*
-VectorAlphaMask<VectorMaskType>::_RenderSource()
+VectorAlphaMask<VectorMaskType>::_RenderSource(const IntRect& canvasBounds)
 {
 	fBounds = static_cast<VectorMaskType*>(this)->DetermineBoundingBox();
+
+	if (fBounds.Width() > canvasBounds.Width()
+		|| fBounds.Height() > canvasBounds.Height()) {
+		fBounds = fBounds & canvasBounds;
+		fClippedToCanvas = true;
+	} else
+		fClippedToCanvas = false;
+
 	if (fPreviousMask != NULL)
-		fBounds = fBounds & fPreviousMask->fBounds;
+		fBounds = fBounds & _PreviousMaskBounds();
 	if (!fBounds.IsValid())
 		return NULL;
 
@@ -242,7 +273,7 @@ VectorAlphaMask<VectorMaskType>::_RenderSource()
 	engine->SetRendererOffset(fBounds.left, fBounds.top);
 
 	OffscreenCanvas canvas(engine,
-		static_cast<VectorMaskType*>(this)->GetDrawState());
+		static_cast<VectorMaskType*>(this)->GetDrawState(), fBounds);
 
 	DrawState* const drawState = canvas.CurrentState();
 	drawState->SetDrawingMode(B_OP_ALPHA);
@@ -286,7 +317,6 @@ PictureAlphaMask::PictureAlphaMask(AlphaMask* previousMask,
 	fPicture(picture),
 	fDrawState(new DrawState(drawState))
 {
-	_Generate();
 }
 
 
@@ -340,8 +370,7 @@ ShapeAlphaMask::ShapeAlphaMask(AlphaMask* previousMask,
 	fShape(shape),
 	fDrawState()
 {
-	fBounds = fShape.DetermineBoundingBox();
-	_Generate();
+	fShapeBounds = fShape.DetermineBoundingBox();
 }
 
 
@@ -358,7 +387,7 @@ ShapeAlphaMask::DrawVectors(Canvas* canvas)
 BRect
 ShapeAlphaMask::DetermineBoundingBox() const
 {
-	return fBounds;
+	return fShapeBounds;
 }
 
 

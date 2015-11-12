@@ -3983,7 +3983,7 @@ ServerWindow::_UpdateDrawState(View* view)
 		BPoint leftTop(0, 0);
 		if (view->GetAlphaMask() != NULL) {
 			view->LocalToScreenTransform().Apply(&leftTop);
-			view->GetAlphaMask()->SetViewOrigin(leftTop);
+			view->GetAlphaMask()->SetCanvasGeometry(leftTop, view->Bounds());
 			leftTop = BPoint(0, 0);
 		}
 		view->PenToScreenTransform().Apply(&leftTop);

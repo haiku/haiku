@@ -60,6 +60,11 @@ public:
 		fDrawingEngine->ConstrainClippingRegion(&fCurrentDrawingRegion);
 	}
 
+	virtual	IntRect Bounds() const
+	{
+		return fBitmapBounds;
+	}
+
 protected:
 	virtual void _LocalToScreenTransform(SimpleTransform&) const
 	{
@@ -142,7 +147,7 @@ Layer::RenderToBitmap(Canvas* canvas)
 	IntPoint oldOffset;
 	if (mask != NULL) {
 		// Move alpha mask to bitmap origin
-		oldOffset = mask->SetViewOrigin(IntPoint(0, 0));
+		oldOffset = mask->SetCanvasGeometry(IntPoint(0, 0), boundingBox);
 	}
 
 	canvas->CurrentState()->SetDrawingMode(B_OP_ALPHA);
@@ -164,7 +169,8 @@ Layer::RenderToBitmap(Canvas* canvas)
 		// Note: this needs to be adapted if setting alpha masks is
 		// implemented as BPicture command (the mask now might be a different
 		// one than before).
-		mask->SetViewOrigin(oldOffset);
+		layerCanvas.CurrentState()->CombinedTransform().Apply(oldOffset);
+		mask->SetCanvasGeometry(oldOffset, boundingBox);
 		layerCanvas.ResyncDrawState();
 	}
 

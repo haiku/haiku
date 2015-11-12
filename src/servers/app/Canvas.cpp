@@ -289,10 +289,11 @@ Canvas::BlendLayer(Layer* layer)
 
 
 OffscreenCanvas::OffscreenCanvas(DrawingEngine* engine,
-		const DrawState& state)
+		const DrawState& state, const IntRect& bounds)
 	:
 	Canvas(state),
-	fDrawingEngine(engine)
+	fDrawingEngine(engine),
+	fBounds(bounds)
 {
 	ResyncDrawState();
 }
@@ -312,4 +313,11 @@ OffscreenCanvas::UpdateCurrentDrawingRegion()
 		fDrawState->GetCombinedClippingRegion(&fCurrentDrawingRegion);
 		fDrawingEngine->ConstrainClippingRegion(&fCurrentDrawingRegion);
 	}
+}
+
+
+IntRect
+OffscreenCanvas::Bounds() const
+{
+	return fBounds;
 }

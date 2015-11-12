@@ -32,7 +32,8 @@ public:
 								AlphaMask(uint8 backgroundOpacity);
 	virtual						~AlphaMask();
 
-			IntPoint			SetViewOrigin(IntPoint viewOrigin);
+			IntPoint			SetCanvasGeometry(IntPoint origin,
+									IntRect bounds);
 
 			scanline_unpacked_masked_type* Scanline()
 								{ return &fScanline; }
@@ -44,19 +45,22 @@ protected:
 			ServerBitmap*		_CreateTemporaryBitmap(BRect bounds) const;
 			void				_Generate();
 			void				_SetNoClipping();
+			const IntRect&		_PreviousMaskBounds() const;
 
 private:
-	virtual	ServerBitmap*		_RenderSource() = 0;
+	virtual	ServerBitmap*		_RenderSource(const IntRect& canvasBounds) = 0;
  	virtual	IntPoint			_Offset() = 0;
 
 			void				_AttachMaskToBuffer();
 
-public:
+protected:
 			BReference<AlphaMask> fPreviousMask;
 			IntRect				fBounds;
+			bool				fClippedToCanvas;
 
 private:
-			IntPoint			fViewOrigin;
+			IntPoint			fCanvasOrigin;
+			IntRect				fCanvasBounds;
 			const bool			fInverse;
 			uint8				fBackgroundOpacity;
 
@@ -72,7 +76,7 @@ public:
 								UniformAlphaMask(uint8 opacity);
 
 private:
-	virtual	ServerBitmap*		_RenderSource();
+	virtual	ServerBitmap*		_RenderSource(const IntRect& canvasBounds);
 	virtual	IntPoint			_Offset();
 };
 
@@ -87,7 +91,7 @@ public:
 									BPoint where, bool inverse);
 
 private:
-	virtual	ServerBitmap*		_RenderSource();
+	virtual	ServerBitmap*		_RenderSource(const IntRect& canvasBounds);
 	virtual	IntPoint			_Offset();
 
 protected:
@@ -131,7 +135,7 @@ public:
 
 private:
 			const shape_data&	fShape;
-			BRect				fBounds;
+			BRect				fShapeBounds;
 			DrawState			fDrawState;
 };
 

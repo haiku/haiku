@@ -799,8 +799,11 @@ clip_to_rect(void* _canvas, const BRect& rect, bool inverse)
 {
 	Canvas* const canvas = reinterpret_cast<Canvas*>(_canvas);
 	bool needDrawStateUpdate = canvas->ClipToRect(rect, inverse);
-	if (needDrawStateUpdate)
+	if (needDrawStateUpdate) {
+		canvas->CurrentState()->GetAlphaMask()->SetCanvasGeometry(BPoint(0, 0),
+			canvas->Bounds());
 		canvas->ResyncDrawState();
+	}
 	canvas->UpdateCurrentDrawingRegion();
 }
 
@@ -824,6 +827,8 @@ clip_to_shape(void* _canvas, int32 opCount, const uint32 opList[],
 	shapeData.ptSize = ptCount * sizeof(BPoint);
 
 	canvas->ClipToShape(&shapeData, inverse);
+	canvas->CurrentState()->GetAlphaMask()->SetCanvasGeometry(BPoint(0, 0),
+		canvas->Bounds());
 	canvas->ResyncDrawState();
 
 	free(shapeData.opList);

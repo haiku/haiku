@@ -50,7 +50,7 @@ public:
 
 			IntRect			Frame() const
 								{ return fFrame; }
-			IntRect			Bounds() const;
+	virtual	IntRect			Bounds() const;
 
 			void			SetResizeMode(uint32 resizeMode)
 								{ fResizeMode = resizeMode; }

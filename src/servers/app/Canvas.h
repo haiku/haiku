@@ -60,6 +60,8 @@ public:
 			void			SetAlphaMask(AlphaMask* mask);
 			AlphaMask*		GetAlphaMask() const;
 
+	virtual	IntRect			Bounds() const = 0;
+
 			SimpleTransform LocalToScreenTransform() const;
 			SimpleTransform ScreenToLocalTransform() const;
 			SimpleTransform PenToScreenTransform() const;
@@ -88,7 +90,7 @@ protected:
 class OffscreenCanvas : public Canvas {
 public:
 							OffscreenCanvas(DrawingEngine* engine,
-								const DrawState& state);
+								const DrawState& state, const IntRect& bounds);
 
 	virtual DrawingEngine*	GetDrawingEngine() const { return fDrawingEngine; }
 
@@ -97,6 +99,7 @@ public:
 	virtual void			UpdateCurrentDrawingRegion();
 	virtual ServerPicture*	GetPicture(int32 token) const
 								{ /* TODO */ return NULL; }
+	virtual	IntRect			Bounds() const;
 
 protected:
 	virtual	void			_LocalToScreenTransform(SimpleTransform&) const {}
@@ -105,6 +108,7 @@ protected:
 private:
 			DrawingEngine*	fDrawingEngine;
 			BRegion			fCurrentDrawingRegion;
+			IntRect			fBounds;
 };
 
 
