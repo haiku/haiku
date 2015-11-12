@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.11.05
-#	Date:    2015-11-05 03:15:01
+#	Version: 2015.11.08
+#	Date:    2015-11-08 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10495,6 +10495,7 @@
 		103c 1985  Pavilion 17-e163sg Notebook PC
 	5249  RTS5249 PCI Express Card Reader
 		103c 1909  ZBook 15
+	5250  RTS5250 PCI Express Card Reader
 	5286  RTS5286 PCI Express Card Reader
 	5288  RTS5288 PCI Express Card Reader
 	5289  RTL8411 PCI Express Card Reader
@@ -19017,6 +19018,7 @@
 	2062  AR8152 v2.0 Fast Ethernet
 # E2200, E2201, E2205
 	e091  Killer E220x Gigabit Ethernet Controller
+	e0a1  Killer E2400 Gigabit Ethernet Controller
 196a  Sensory Networks Inc.
 	0101  NodalCore C-1000 Content Classification Accelerator
 	0102  NodalCore C-2000 Content Classification Accelerator
@@ -21918,8 +21920,8 @@
 	1583  Ethernet Controller XL710 for 40GbE QSFP+
 		1028 0000  Ethernet 40G 2P XL710 QSFP+ rNDC
 		1028 1f9f  Ethernet 40G 2P XL710 QSFP+ rNDC
-		108e 0000  Quad 10Gb Ethernet Adapter
-		108e 7b1b  Quad 10Gb Ethernet Adapter
+		108e 0000  10 Gb/40 Gb Ethernet Adapter
+		108e 7b1b  10 Gb/40 Gb Ethernet Adapter
 		1137 0000  Ethernet Converged NIC XL710-Q2
 		1137 013c  Ethernet Converged NIC XL710-Q2
 		8086 0000  Ethernet Converged Network Adapter XL710-Q2
