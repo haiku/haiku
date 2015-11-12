@@ -77,8 +77,19 @@ BNetworkCookieJar::BNetworkCookieJar(BMessage* archive)
 
 BNetworkCookieJar::~BNetworkCookieJar()
 {
-	for (Iterator it = GetIterator(); it.Next() != NULL;)
+	for (Iterator it = GetIterator(); it.Next() != NULL;) {
 		delete it.Remove();
+	}
+
+	fCookieHashMap->Lock();
+
+	PrivateHashMap::Iterator it = fCookieHashMap->GetIterator();
+	while(it.HasNext()) {
+		BNetworkCookieList* list = *it.NextValue();
+		it.Remove();
+		list->LockForWriting();
+		delete list;
+	}
 
 	delete fCookieHashMap;
 }
@@ -95,12 +106,10 @@ BNetworkCookieJar::AddCookie(const BNetworkCookie& cookie)
 		return B_NO_MEMORY;
 
 	status_t result = AddCookie(heapCookie);
-	if (result != B_OK) {
+	if (result != B_OK)
 		delete heapCookie;
-		return result;
-	}
 
-	return B_OK;
+	return result;
 }
 
 
@@ -509,9 +518,6 @@ BNetworkCookieJar::Iterator::Iterator(const BNetworkCookieJar* cookieJar)
 	fLastElement(NULL),
 	fIndex(0)
 {
-	if (!fCookieJar->fCookieHashMap->Lock())
-		return;
-
 	fIterator = new(std::nothrow) PrivateIterator(
 		fCookieJar->fCookieHashMap->GetIterator());
 
@@ -522,15 +528,12 @@ BNetworkCookieJar::Iterator::Iterator(const BNetworkCookieJar* cookieJar)
 
 BNetworkCookieJar::Iterator::~Iterator()
 {
-	if (!fIterator)
-		return;
-
 	if (fList != NULL)
 		fList->Unlock();
+	if (fLastList != NULL)
+		fLastList->Unlock();
 
 	delete fIterator;
-
-	fCookieJar->fCookieHashMap->Unlock();
 }
 
 
@@ -540,7 +543,9 @@ BNetworkCookieJar::Iterator::operator=(const Iterator& other)
 	if (this == &other)
 		return *this;
 
-	fCookieJar->fCookieHashMap->Unlock();
+	delete fIterator;
+	if (fList != NULL)
+		fList->Unlock();
 
 	fCookieJar = other.fCookieJar;
 	fIterator = NULL;
@@ -550,13 +555,10 @@ BNetworkCookieJar::Iterator::operator=(const Iterator& other)
 	fLastElement = NULL;
 	fIndex = 0;
 
-	if (fCookieJar->fCookieHashMap->Lock())
-	{
-		fIterator = new(std::nothrow) PrivateIterator(
-			fCookieJar->fCookieHashMap->GetIterator());
+	fIterator = new(std::nothrow) PrivateIterator(
+		fCookieJar->fCookieHashMap->GetIterator());
 
-		_FindNext();
-	}
+	_FindNext();
 
 	return *this;
 }
@@ -591,17 +593,21 @@ BNetworkCookieJar::Iterator::NextDomain()
 
 	if (!fIterator->fCookieMapIterator.HasNext()) {
 		fElement = NULL;
-		return NULL;
+		return result;
 	}
 
 	if (fList != NULL)
 		fList->Unlock();
 
-	fList = *fIterator->fCookieMapIterator.NextValue();
-	fList->LockForReading();
+	if (fCookieJar->fCookieHashMap->Lock()) {
+		fList = *fIterator->fCookieMapIterator.NextValue();
+		fList->LockForReading();
+
+		fCookieJar->fCookieHashMap->Unlock();
+	}
+
 	fIndex = 0;
 	fElement = fList->ItemAt(fIndex);
-
 	return result;
 }
 
@@ -615,28 +621,36 @@ BNetworkCookieJar::Iterator::Remove()
 	const BNetworkCookie* result = fLastElement;
 
 	if (fIndex == 0) {
-		if (fLastList->LockForWriting() == B_OK)
-		{
-			if (fLastList->CountItems() == 1) {
-				fIterator->fCookieMapIterator.Remove();
-				delete fLastList;
-				fLastList = NULL;
-			} else {
+		if (fLastList && fCookieJar->fCookieHashMap->Lock()) {
+			// We are on the first item of fList, so we need to remove the
+			// last of fLastList
+			fLastList->Unlock();
+			if (fLastList->LockForWriting() == B_OK)
+			{
 				fLastList->RemoveItemAt(fLastList->CountItems() - 1);
+				// TODO if the list became empty, we could remove it from the
+				// map, but this can be a problem if other iterators are still
+				// referencing it. Is there a safe place and locking pattern
+				// where we can do that?
 				fLastList->Unlock();
+				fLastList->LockForReading();
 			}
+			fCookieJar->fCookieHashMap->Unlock();
 		}
 	} else {
 		fIndex--;
 
-		// Switch to a write lock
-		fList->Unlock();
-		if (fList->LockForWriting() == B_OK)
-		{
-			fList->RemoveItemAt(fIndex);
+		if (fCookieJar->fCookieHashMap->Lock()) {
+			// Switch to a write lock
 			fList->Unlock();
+			if (fList->LockForWriting() == B_OK)
+			{
+				fList->RemoveItemAt(fIndex);
+				fList->Unlock();
+			}
+			fList->LockForReading();
+			fCookieJar->fCookieHashMap->Unlock();
 		}
-		fList->LockForReading();
 	}
 
 	fLastElement = NULL;
@@ -651,22 +665,29 @@ BNetworkCookieJar::Iterator::_FindNext()
 
 	fIndex++;
 	if (fList && fIndex < fList->CountItems()) {
+		// Get an element from the current list
 		fElement = fList->ItemAt(fIndex);
 		return;
 	}
 
 	if (fIterator == NULL || !fIterator->fCookieMapIterator.HasNext()) {
+		// We are done iterating
 		fElement = NULL;
 		return;
 	}
 
+	// Get an element from the next list
+	if (fLastList != NULL) {
+		fLastList->Unlock();
+	}
 	fLastList = fList;
 
-	if (fList)
-		fList->Unlock();
+	if (fCookieJar->fCookieHashMap->Lock()) {
+		fList = *(fIterator->fCookieMapIterator.NextValue());
+		fList->LockForReading();
 
-	fList = *(fIterator->fCookieMapIterator.NextValue());
-	fList->LockForReading();
+		fCookieJar->fCookieHashMap->Unlock();
+	}
 
 	fIndex = 0;
 	fElement = fList->ItemAt(fIndex);
@@ -711,8 +732,10 @@ BNetworkCookieJar::UrlIterator::UrlIterator(const BNetworkCookieJar* cookieJar,
 
 BNetworkCookieJar::UrlIterator::~UrlIterator()
 {
-	if (fList)
+	if (fList != NULL)
 		fList->Unlock();
+	if (fLastList != NULL)
+		fLastList->Unlock();
 
 	delete fIterator;
 }
@@ -745,18 +768,22 @@ BNetworkCookieJar::UrlIterator::Remove()
 
 	const BNetworkCookie* result = fLastElement;
 
-	if (fLastList->LockForWriting() == B_OK)
-	{
-		fLastList->RemoveItemAt(fLastIndex);
-
-		if (fLastList->CountItems() == 0) {
-			HashString lastKey(fLastElement->Domain(),
-				fLastElement->Domain().Length());
-
-			delete fCookieJar->fCookieHashMap->Remove(lastKey);
-		}
-
+	if (fCookieJar->fCookieHashMap->Lock()) {
 		fLastList->Unlock();
+		if (fLastList->LockForWriting() == B_OK)
+		{
+			fLastList->RemoveItemAt(fLastIndex);
+
+			if (fLastList->CountItems() == 0) {
+				fIterator->fCookieMapIterator.Remove();
+				delete fLastList;
+				fLastList = NULL;
+			} else {
+				fLastList->Unlock();
+				fLastList->LockForReading();
+			}
+		}
+		fCookieJar->fCookieHashMap->Unlock();
 	}
 
 	fLastElement = NULL;
@@ -841,15 +868,24 @@ BNetworkCookieJar::UrlIterator::_FindNext()
 {
 	fLastIndex = fIndex;
 	fLastElement = fElement;
+	if (fLastList != NULL)
+		fLastList->Unlock();
+
 	fLastList = fList;
+	if (fLastList)
+		fLastList->LockForReading();
 
-	while (!_FindPath()) {
-		if (!_SuperDomain()) {
-			fElement = NULL;
-			return;
+	if (fCookieJar->fCookieHashMap->Lock()) {
+		while (!_FindPath()) {
+			if (!_SuperDomain()) {
+				fElement = NULL;
+				fCookieJar->fCookieHashMap->Unlock();
+				return;
+			}
+
+			_FindDomain();
 		}
-
-		_FindDomain();
+		fCookieJar->fCookieHashMap->Unlock();
 	}
 }
 
@@ -865,8 +901,9 @@ BNetworkCookieJar::UrlIterator::_FindDomain()
 
 		if (fList == NULL)
 			fElement = NULL;
-		else
+		else {
 			fList->LockForReading();
+		}
 		fCookieJar->fCookieHashMap->Unlock();
 	}
 
@@ -902,6 +939,7 @@ BNetworkCookieList::BNetworkCookieList()
 
 BNetworkCookieList::~BNetworkCookieList()
 {
+	// Note: this is expected to be called with the write lock held.
 	pthread_rwlock_destroy(&fLock);
 }
 
