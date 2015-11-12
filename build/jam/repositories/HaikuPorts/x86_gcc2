@@ -371,7 +371,7 @@ RemotePackageRepository HaikuPorts
 	neon_devel-0.29.6-6
 	netcat-1.10-1
 	netpulse-0.2.3-5
-	netsurf-3.3-1
+	netsurf-3.3-2
 	ocaml-4.02.1-1
 	openjpeg-2.1.0-2
 	openjpeg_devel-2.1.0-2
