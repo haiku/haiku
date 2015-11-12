@@ -77,7 +77,7 @@ static	status_t					_GetI2CSignals(void* cookie, int* _clock,
 static	status_t					_SetI2CSignals(void* cookie, int clock,
 										int data);
 
-		display_mode*				fCurrentMode;
+		display_mode				fCurrentMode;
 		DisplayPipe*				fDisplayPipe;
 
 

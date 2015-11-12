@@ -263,9 +263,8 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Program target display mode
 	fDisplayPipe->Enable(target, _PortRegister());
 
-	// XXX: Crashes?
 	// Set fCurrentMode to our set display mode
-	//memcpy(fCurrentMode, target, sizeof(display_mode));
+	memcpy(&fCurrentMode, target, sizeof(display_mode));
 
 	return B_OK;
 }
@@ -574,9 +573,8 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	}
 #endif
 
-	// XXX: Crashes?
 	// Set fCurrentMode to our set display mode
-	//memcpy(fCurrentMode, target, sizeof(display_mode));
+	memcpy(&fCurrentMode, target, sizeof(display_mode));
 
 	return B_OK;
 }
@@ -662,9 +660,8 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Program target display mode
 	fDisplayPipe->Enable(target, _PortRegister());
 
-	// XXX: Crashes?
 	// Set fCurrentMode to our set display mode
-	//memcpy(fCurrentMode, target, sizeof(display_mode));
+	memcpy(&fCurrentMode, target, sizeof(display_mode));
 
 	return B_OK;
 }
