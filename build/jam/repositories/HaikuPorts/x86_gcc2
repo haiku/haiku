@@ -296,14 +296,16 @@ RemotePackageRepository HaikuPorts
 	libtheora_devel-1.1.1-2
 	libtool-2.4.2-1
 	libtool_libltdl-2.4.2-1
+	libunistring-0.9.6-1
+	libunistring_devel-0.9.6-1
 	libusb-1.0.19-2
 	libusb_devel-1.0.19-2
 	libusb_compat-0.1.5-2
 	libusb_compat_devel-0.1.5-2
+	libutf8proc-1.1.6-1
+	libutf8proc_devel-1.1.6-1
 	libuuid-1.0.3-2
 	libuuid_devel-1.0.3-2
-	libunistring-0.9.6-1
-	libunistring_devel-0.9.6-1
 	libvorbis-1.3.5-1
 	libvorbis_devel-1.3.5-1
 	libvpx-1.0.0-2
@@ -1170,6 +1172,7 @@ RemotePackageRepository HaikuPorts
 	libusb
 	libusb_x86
 	libusb_compat
+	libutf8proc
 	libuuid
 	libuuid_x86
 	libvorbis
