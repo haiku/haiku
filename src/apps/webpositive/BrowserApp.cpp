@@ -189,7 +189,7 @@ BrowserApp::ReadyToRun()
 	BRect consoleWindowFrame = fSettings->GetValue("console window frame",
 		BRect(50, 50, 400, 300));
 	BRect cookieWindowFrame = fSettings->GetValue("cookie window frame",
-		BRect());
+		BRect(50, 50, 400, 300));
 	bool showDownloads = fSettings->GetValue("show downloads", false);
 
 	fDownloadWindow = new DownloadWindow(downloadWindowFrame, showDownloads,
