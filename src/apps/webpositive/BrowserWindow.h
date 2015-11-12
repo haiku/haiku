@@ -83,7 +83,8 @@ enum {
 	WINDOW_CLOSED					= 'wndc',
 	SHOW_DOWNLOAD_WINDOW			= 'sdwd',
 	SHOW_SETTINGS_WINDOW			= 'sswd',
-	SHOW_CONSOLE_WINDOW				= 'scwd'
+	SHOW_CONSOLE_WINDOW				= 'scwd',
+	SHOW_COOKIE_WINDOW				= 'skwd'
 };
 
 #define INTEGRATE_MENU_INTO_TAB_BAR 0

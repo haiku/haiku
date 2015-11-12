@@ -32,13 +32,14 @@ local sources =
 	BrowserApp.cpp
 	BrowserWindow.cpp
 	BrowsingHistory.cpp
+	ConsoleWindow.cpp
+	CookieWindow.cpp
 	CredentialsStorage.cpp
 	DownloadProgressView.cpp
 	DownloadWindow.cpp
 	SettingsKeys.cpp
 	SettingsWindow.cpp
 	URLInputGroup.cpp
-	ConsoleWindow.cpp
 ;
 
 # We build WebPositive only for one architecture -- the first architecture for
@@ -74,6 +75,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			[ BuildFeatureAttribute webkit : libraries ]
 			[ TargetLibstdc++ ] localestub
 			[ MultiArchDefaultGristFiles libshared.a ]
+			[ MultiArchDefaultGristFiles libcolumnlistview.a ]
 			be network bnetapi tracker translation
 			:
 			WebPositive.rdef

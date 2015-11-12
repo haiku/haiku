@@ -419,6 +419,8 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		new BMessage(SHOW_DOWNLOAD_WINDOW), 'D'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings"),
 		new BMessage(SHOW_SETTINGS_WINDOW)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Cookie manager"),
+		new BMessage(SHOW_COOKIE_WINDOW)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Script console"),
 		new BMessage(SHOW_CONSOLE_WINDOW)));
 	BMenuItem* aboutItem = new BMenuItem(B_TRANSLATE("About"),
@@ -1087,6 +1089,7 @@ BrowserWindow::MessageReceived(BMessage* message)
 		case SHOW_DOWNLOAD_WINDOW:
 		case SHOW_SETTINGS_WINDOW:
 		case SHOW_CONSOLE_WINDOW:
+		case SHOW_COOKIE_WINDOW:
 			message->AddUInt32("workspaces", Workspaces());
 			be_app->PostMessage(message);
 			break;

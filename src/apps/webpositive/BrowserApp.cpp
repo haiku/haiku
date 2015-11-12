@@ -49,6 +49,7 @@
 #include "SettingsMessage.h"
 #include "SettingsWindow.h"
 #include "ConsoleWindow.h"
+#include "CookieWindow.h"
 #include "NetworkCookieJar.h"
 #include "WebKitInfo.h"
 #include "WebPage.h"
@@ -79,7 +80,8 @@ BrowserApp::BrowserApp()
 	fContext(NULL),
 	fDownloadWindow(NULL),
 	fSettingsWindow(NULL),
-	fConsoleWindow(NULL)
+	fConsoleWindow(NULL),
+	fCookieWindow(NULL)
 {
 #if ENABLE_NATIVE_COOKIES
 	BString cookieStorePath = kApplicationName;
@@ -186,6 +188,8 @@ BrowserApp::ReadyToRun()
 		BRect());
 	BRect consoleWindowFrame = fSettings->GetValue("console window frame",
 		BRect(50, 50, 400, 300));
+	BRect cookieWindowFrame = fSettings->GetValue("cookie window frame",
+		BRect());
 	bool showDownloads = fSettings->GetValue("show downloads", false);
 
 	fDownloadWindow = new DownloadWindow(downloadWindowFrame, showDownloads,
@@ -208,6 +212,7 @@ BrowserApp::ReadyToRun()
 	BWebPage::SetDownloadListener(BMessenger(fDownloadWindow));
 	
 	fConsoleWindow = new ConsoleWindow(consoleWindowFrame);
+	fCookieWindow = new CookieWindow(cookieWindowFrame, fContext->GetCookieJar());
 
 	fInitialized = true;
 
@@ -274,6 +279,9 @@ BrowserApp::MessageReceived(BMessage* message)
 		break;
 	case SHOW_CONSOLE_WINDOW:
 		_ShowWindow(message, fConsoleWindow);
+		break;
+	case SHOW_COOKIE_WINDOW:
+		_ShowWindow(message, fCookieWindow);
 		break;
 	case ADD_CONSOLE_MESSAGE:
 		fConsoleWindow->PostMessage(message);
@@ -353,14 +361,18 @@ BrowserApp::QuitRequested()
 		fSettings->SetValue("settings window frame", fSettingsWindow->Frame());
 		fSettingsWindow->Unlock();
 	}
-	
 	if (fConsoleWindow->Lock()) {
 		fSettings->SetValue("console window frame", fConsoleWindow->Frame());
 		fConsoleWindow->Unlock();
 	}
+	if (fCookieWindow->Lock()) {
+		fSettings->SetValue("cookie window frame", fCookieWindow->Frame());
+		fCookieWindow->Unlock();
+	}
 
 	BMessage cookieArchive;
 	BNetworkCookieJar& cookieJar = fContext->GetCookieJar();
+	cookieJar.PurgeForExit();
 	if (cookieJar.Archive(&cookieArchive) == B_OK)
 		fCookies->SetValue("cookies", cookieArchive);
 
