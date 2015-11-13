@@ -202,6 +202,15 @@ DisplayPipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 	//		pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
 	//			& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
 		}
+		#if 0
+		// TODO: ??? LVDS?
+		switch (divisors.post2) {
+			case 5:
+			case 7:
+				pll |= DISPLAY_PLL_DIVIDE_HIGH;
+				break;
+		}
+		#endif
 		if (divisors.post2_high)
 			pll |= DISPLAY_PLL_DIVIDE_HIGH;
 

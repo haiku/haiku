@@ -452,9 +452,12 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	uint32 lvds = read32(_PortRegister())
 		| LVDS_PORT_EN | LVDS_A0A2_CLKA_POWER_UP;
 
-	lvds |= LVDS_18BIT_DITHER;
-		// TODO: do not do this if the connected panel is 24-bit
-		// (I don't know how to detect that)
+	if (gInfo->shared_info->device_type.Generation() == 4) {
+		// LVDS_A3_POWER_UP == 24bpp
+		// otherwise, 18bpp
+		if ((lvds & LVDS_A3_POWER_MASK) != LVDS_A3_POWER_UP)
+			lvds |= LVDS_18BIT_DITHER;
+	}
 
 	// Set the B0-B3 data pairs corresponding to whether we're going to
 	// set the DPLLs for dual-channel mode or not.
@@ -462,6 +465,13 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		lvds |= LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP;
 	else
 		lvds &= ~(LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP);
+
+	// Set LVDS sync polarity
+	lvds &= ~(LVDS_HSYNC_POLARITY | LVDS_VSYNC_POLARITY);
+	if ((target->timing.flags & B_POSITIVE_HSYNC) != 0)
+		lvds |= LVDS_HSYNC_POLARITY;
+	if ((target->timing.flags & B_POSITIVE_VSYNC) != 0)
+		lvds |= LVDS_VSYNC_POLARITY;
 
 	write32(_PortRegister(), lvds);
 	read32(_PortRegister());
@@ -486,9 +496,9 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	write32(panelControl, read32(panelControl) | PANEL_CONTROL_POWER_TARGET_ON);
 
 	// TODO: A wait_for power on status to be set would be better here
-	spin(1000);
+	spin(750);
 	if ((read32(panelStatus) & PANEL_STATUS_POWER_ON) == 0)
-		ERROR("%s: %s didn't power on in 250ms!\n", __func__, PortName());
+		ERROR("%s: %s didn't power on in 750ms!\n", __func__, PortName());
 
 	// Program target display mode
 	fDisplayPipe->Enable(target, _PortRegister());

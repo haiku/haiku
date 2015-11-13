@@ -138,7 +138,8 @@ compute_pll_divisors(display_mode* current, pll_divisors* divisors,
 	TRACE("%s: required MHz: %g\n", __func__, requestedPixelClock);
 
 	if (isLVDS) {
-		if ((read32(INTEL_DIGITAL_LVDS_PORT) & LVDS_CLKB_POWER_MASK)
+		if (requestedPixelClock >= 112.199
+			|| (read32(INTEL_DIGITAL_LVDS_PORT) & LVDS_CLKB_POWER_MASK)
 				== LVDS_CLKB_POWER_UP)
 			divisors->post2 = LVDS_POST2_RATE_FAST;
 		else
