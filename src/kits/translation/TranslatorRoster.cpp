@@ -1,10 +1,11 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Wilber
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Markus Himmel, markus@himmel-villmar.de
+ *		Michael Wilber
  */
 
 /*!
@@ -878,13 +879,13 @@ BTranslatorRoster::Private::_TranslatorDeleted(translator_id id, BTranslator* se
 	delete self;
 
 	int32 former = atomic_add(&fKnownImages[image], -1);
-	if (former == 1)
-	{
+	if (former == 1) {
 		unload_add_on(image);
 		fImageOrigins.erase(self);
 		fKnownImages.erase(image);
 	}
 }
+
 
 /*static*/ int
 BTranslatorRoster::Private::_CompareSupport(const void* _a, const void* _b)
@@ -1166,6 +1167,7 @@ BTranslatorRoster::Private::_NotifyListeners(BMessage& update) const
 
 //	#pragma mark -
 
+
 BTranslatorReleaseDelegate::BTranslatorReleaseDelegate(BTranslator* translator)
 	:
 	fUnderlying(translator)
@@ -1180,6 +1182,9 @@ BTranslatorReleaseDelegate::Release()
 	// ReleaseDelegate is only allowed to release a translator once.
 	delete this;
 }
+
+
+//	#pragma mark -
 
 
 BTranslatorRoster::BTranslatorRoster()
