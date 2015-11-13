@@ -60,8 +60,8 @@ get_pll_limits(pll_limits* limits)
 		// Should move them here!
 		pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
-			{  5,  1, 10, false,  5,  70, 12,  7},	// min
-			{ 80,  8,  5, true,  10, 120, 22, 11},	// max
+			{  5,  1, 10, false,  1,  70, 12,  7},	// min
+			{ 80,  8,  5, true,   6, 120, 22, 11},	// max
 			200000, 1400000, 2800000
 		};
 		memcpy(limits, &kLimits, sizeof(pll_limits));
