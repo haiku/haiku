@@ -2335,7 +2335,13 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 	}
 
 	_UpdateCurrentDrawingRegion();
-	if (fCurrentDrawingRegion.CountRects() <= 0) {
+	if (fCurrentDrawingRegion.CountRects() <= 0 && code != AS_VIEW_END_LAYER) {
+			// If the command is AS_VIEW_END_LAYER, then we continue even if
+			// the clipping region is empty. The layer itself might set a valid
+			// clipping while its contents are drawn, and even if it doesn't,
+			// we must still play back its picture so that we don't leak
+			// nested layer instances.
+
 		DTRACE(("ServerWindow %s: _DispatchViewDrawingMessage(): View: %s, "
 			"INVALID CLIPPING!\n", Title(), fCurrentView->Name()));
 		if (link.NeedsReply()) {
