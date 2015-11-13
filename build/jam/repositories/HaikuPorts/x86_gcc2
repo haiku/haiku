@@ -17,7 +17,7 @@ RemotePackageRepository HaikuPorts
 	freedroidrpg_x86_data-0.15.1-1
 	gws-0.1.8-1
 	haikuporter-1.0.0-1
-	hub-1.12.4-1
+	hub-1.12.4-2
 	openttd_gfx-0.4.7-1
 	openttd_msx-0.3.1-1
 	openttd_sfx-0.2.3-1
@@ -110,7 +110,7 @@ RemotePackageRepository HaikuPorts
 	faad2-2.7-1
 	faad2_devel-2.7-1
 	fasm-1.71.39-1
-	f1spirit-0.rc9.1615-1
+	f1spirit-0.rc9.1615-2
 	file-5.15-1
 	file_devel-5.15-1
 	filwip-1.0.0-5
@@ -435,8 +435,8 @@ RemotePackageRepository HaikuPorts
 	sdl_image_devel-1.2.12-4
 	sdl_mixer-1.2.12-3
 	sdl_mixer_devel-1.2.12-3
-	sdl_net-1.2.8-4
-	sdl_net_devel-1.2.8-4
+	sdl_net-1.2.8-5
+	sdl_net_devel-1.2.8-5
 	sdl_sound-1.0.3-2
 	sdl_sound_devel-1.0.3-2
 	sdl_ttf-2.0.11-1
