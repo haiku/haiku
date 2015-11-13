@@ -243,9 +243,6 @@ Canvas::BlendLayer(Layer* layer)
 		layer->Play(this);
 		layer->ReleaseReference();
 		return;
-	} else if (layer->Opacity() == 0) {
-		layer->ReleaseReference();
-		return;
 	}
 
 	UtilityBitmap* layerBitmap = layer->RenderToBitmap(this);
