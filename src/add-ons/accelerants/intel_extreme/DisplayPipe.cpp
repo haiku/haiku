@@ -94,9 +94,6 @@ DisplayPipe::Enable(display_mode* target, addr_t portAddress)
 		return;
 	}
 
-	// Enable display pipe
-	_Enable(true);
-
 	// Wait for the clocks to stabilize
 	spin(150);
 
@@ -123,6 +120,11 @@ DisplayPipe::Enable(display_mode* target, addr_t portAddress)
 
 	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_POS), 0);
 
+	// This is useful for debugging: it sets the border to red, so you
+	// can see what is border and what is porch (black area around the
+	// sync)
+	//write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_RED), 0x00FF0000);
+
 	// TODO: Review these
 	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_IMAGE_SIZE),
 		((uint32)(target->virtual_width - 1) << 16)
@@ -138,6 +140,10 @@ DisplayPipe::Enable(display_mode* target, addr_t portAddress)
 			? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
 		| ((target->timing.flags & B_POSITIVE_VSYNC) != 0
 			? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
+
+	// Enable display pipe
+	_Enable(true);
+
 }
 
 

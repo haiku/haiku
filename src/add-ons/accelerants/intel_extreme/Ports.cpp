@@ -100,6 +100,10 @@ Port::AssignPipe(pipe_index pipeIndex)
 	if (fDisplayPipe == NULL)
 		return B_NO_MEMORY;
 
+	// Disable display pipe until modesetting enables it
+	if (fDisplayPipe->IsEnabled())
+		fDisplayPipe->Disable();
+
 	read32(portRegister);
 
 	return B_OK;
