@@ -847,7 +847,7 @@ BHttpRequest::_SendRequest()
 			request << ':' << Url().Port();
 	}
 
-	if (Url().HasPath())
+	if (Url().HasPath() && Url().Path().Length() > 0)
 		request << Url().Path();
 	else
 		request << '/';
