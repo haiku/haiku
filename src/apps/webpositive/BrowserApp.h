@@ -79,6 +79,7 @@ private:
 
 			SettingsMessage*	fSettings;
 			SettingsMessage*	fCookies;
+			SettingsMessage*	fSession;
 			BUrlContext*		fContext;
 
 			DownloadWindow*		fDownloadWindow;

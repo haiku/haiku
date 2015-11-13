@@ -77,6 +77,7 @@ BrowserApp::BrowserApp()
 	fInitialized(false),
 	fSettings(NULL),
 	fCookies(NULL),
+	fSession(NULL),
 	fContext(NULL),
 	fDownloadWindow(NULL),
 	fSettingsWindow(NULL),
@@ -92,6 +93,11 @@ BrowserApp::BrowserApp()
 	fContext = new BUrlContext();
 	fContext->SetCookieJar(BNetworkCookieJar(&cookieArchive));
 #endif
+
+	BString sessionStorePath = kApplicationName;
+	sessionStorePath << "/Session";
+	fSession = new SettingsMessage(B_USER_SETTINGS_DIRECTORY,
+		sessionStorePath.String());
 }
 
 
@@ -100,6 +106,7 @@ BrowserApp::~BrowserApp()
 	delete fLaunchRefsMessage;
 	delete fSettings;
 	delete fCookies;
+	delete fSession;
 	delete fContext;
 }
 
@@ -223,6 +230,29 @@ BrowserApp::ReadyToRun()
 		delete fLaunchRefsMessage;
 		fLaunchRefsMessage = NULL;
 	}
+
+	BMessage archivedWindow;
+	for (int i = 0; fSession->FindMessage("window", i, &archivedWindow) == B_OK;
+		i++) {
+
+		BRect frame = archivedWindow.FindRect("window frame");
+		BString url;
+		archivedWindow.FindString("tab", 0, &url);
+		BrowserWindow* window = new(std::nothrow) BrowserWindow(frame,
+			fSettings, url, fContext);
+
+		if (window != NULL) {
+			window->Show();
+
+			for (int j = 1; archivedWindow.FindString("tab", j, &url) == B_OK;
+				j++) {
+				printf("Create %d:%d\n", i, j);
+				_CreateNewTab(window, url, false);
+				pagesCreated++;
+			}
+		}
+	}
+
 	if (pagesCreated == 0)
 		_CreateNewWindow("", fullscreen);
 
@@ -267,8 +297,11 @@ BrowserApp::MessageReceived(BMessage* message)
 	case WINDOW_CLOSED:
 		fWindowCount--;
 		message->FindRect("window frame", &fLastWindowFrame);
-		if (fWindowCount <= 0)
-			PostMessage(B_QUIT_REQUESTED);
+		if (fWindowCount <= 0) {
+			BMessage* message = new BMessage(B_QUIT_REQUESTED);
+			message->AddMessage("window", DetachCurrentMessage());
+			PostMessage(message);
+		}
 		break;
 
 	case SHOW_DOWNLOAD_WINDOW:
@@ -333,19 +366,36 @@ BrowserApp::QuitRequested()
 		}
 	}
 
-	for (int i = 0; BWindow* window = WindowAt(i); i++) {
-		BrowserWindow* webWindow = dynamic_cast<BrowserWindow*>(window);
-		if (!webWindow)
-			continue;
-		if (!webWindow->Lock())
-			continue;
-		if (webWindow->QuitRequested()) {
-			fLastWindowFrame = webWindow->WindowFrame();
-			webWindow->Quit();
-			i--;
-		} else {
-			webWindow->Unlock();
-			return false;
+	fSession->MakeEmpty();
+
+	/* See if we got here because the last window is already closed.
+	 * In that case we only need to save that one, which is already archived */
+	BMessage* message = CurrentMessage();
+	BMessage windowMessage;
+	
+	status_t ret = message->FindMessage("window", &windowMessage);
+	if (ret == B_OK) {
+		fSession->AddMessage("window", &windowMessage);
+	} else {
+		for (int i = 0; BWindow* window = WindowAt(i); i++) {
+			BrowserWindow* webWindow = dynamic_cast<BrowserWindow*>(window);
+			if (!webWindow)
+				continue;
+			if (!webWindow->Lock())
+				continue;
+
+			BMessage windowArchive;
+			webWindow->Archive(&windowArchive, true);
+			fSession->AddMessage("window", &windowArchive);
+
+			if (webWindow->QuitRequested()) {
+				fLastWindowFrame = webWindow->WindowFrame();
+				webWindow->Quit();
+				i--;
+			} else {
+				webWindow->Unlock();
+				return false;
+			}
 		}
 	}
 

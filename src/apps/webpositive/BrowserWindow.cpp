@@ -1186,10 +1186,32 @@ BrowserWindow::MessageReceived(BMessage* message)
 }
 
 
+status_t
+BrowserWindow::Archive(BMessage* archive, bool deep) const
+{
+	status_t ret = archive->AddRect("window frame", Frame());
+
+	for (int i = 0; i < fTabManager->CountTabs(); i++) {
+		BWebView* view = dynamic_cast<BWebView*>(fTabManager->ViewForTab(i));
+		if (view == NULL) {
+			continue;
+		}
+
+		if (ret == B_OK)
+			ret = archive->AddString("tab", view->MainFrameURL());
+	}
+
+	return ret;
+}
+
+
 bool
 BrowserWindow::QuitRequested()
 {
 	// TODO: Check for modified form data and ask user for confirmation, etc.
+
+	BMessage message(WINDOW_CLOSED);
+	Archive(&message);
 
 	// Iterate over all tabs to delete all BWebViews.
 	// Do this here, so WebKit tear down happens earlier.
@@ -1197,7 +1219,6 @@ BrowserWindow::QuitRequested()
 	while (fTabManager->CountTabs() > 0)
 		_ShutdownTab(0);
 
-	BMessage message(WINDOW_CLOSED);
 	message.AddRect("window frame", WindowFrame());
 	be_app->PostMessage(&message);
 	return true;

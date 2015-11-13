@@ -104,6 +104,7 @@ public:
 	virtual	void				DispatchMessage(BMessage* message,
 									BHandler* target);
 	virtual	void				MessageReceived(BMessage* message);
+	virtual	status_t			Archive(BMessage* archive, bool deep =true) const;
 	virtual	bool				QuitRequested();
 	virtual	void				MenusBeginning();
 	virtual	void				MenusEnded();
