@@ -82,8 +82,8 @@ TestServerLoopAdapter::_DispatchMessage(int32 code,
  			// since we can find out the port by getting the desktop instance
  			// ourselves
 
-			free(targetScreen);
 			Desktop* desktop = _FindDesktop(userID, targetScreen);
+			free(targetScreen);
 
 			BPrivate::LinkSender reply(replyPort);
 			if (desktop != NULL) {
