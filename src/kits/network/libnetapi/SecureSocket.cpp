@@ -183,6 +183,9 @@ BSecureSocket::Private::_CreateContext()
 	// Disable legacy protocols. They have known vulnerabilities.
 	SSL_CTX_set_options(sContext, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
 
+	// Don't bother us with ERROR_WANT_READ.
+	SSL_CTX_set_mode(sContext, SSL_MODE_AUTO_RETRY);
+
 	// Setup certificate verification
 	BPath certificateStore;
 	find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);
