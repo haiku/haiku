@@ -314,6 +314,7 @@ PackageManager::_PrintResult(InstalledRepository& installationRepository)
 		= installationRepository.PackagesToDeactivate();
 
 	BStringList upgradedPackages;
+	BStringList upgradedPackageVersions;
 	for (int32 i = 0;
 		BSolverPackage* installPackage = packagesToActivate.ItemAt(i);
 		i++) {
@@ -322,6 +323,7 @@ PackageManager::_PrintResult(InstalledRepository& installationRepository)
 			j++) {
 			if (installPackage->Info().Name() == uninstallPackage->Info().Name()) {
 				upgradedPackages.Add(installPackage->Info().Name());
+				upgradedPackageVersions.Add(uninstallPackage->Info().Version().ToString());
 				break;
 			}
 		}
@@ -335,9 +337,11 @@ PackageManager::_PrintResult(InstalledRepository& installationRepository)
 		else
 			repository.SetToFormat("repository %s", package->Repository()->Name().String());
 
-		if (upgradedPackages.HasString(package->Info().Name())) {
-			printf("    upgrade package %s to %s from %s\n",
+		int position = upgradedPackages.IndexOf(package->Info().Name());
+		if (position >= 0) {
+			printf("    upgrade package %s-%s to %s from %s\n",
 				package->Info().Name().String(),
+				upgradedPackageVersions.StringAt(position).String(),
 				package->Info().Version().ToString().String(),
 				repository.String());
 		} else {
