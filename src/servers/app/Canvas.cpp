@@ -262,9 +262,10 @@ Canvas::BlendLayer(Layer* layer)
 	fDrawState->SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_COMPOSITE);
 	fDrawState->SetTransformEnabled(false);
 
-	AlphaMask* mask = new UniformAlphaMask(layer->Opacity());
+	AlphaMask* mask = new(std::nothrow) UniformAlphaMask(layer->Opacity());
 	if (mask == NULL) {
 		layerBitmap->ReleaseReference();
+		layer->ReleaseReference();
 		return;
 	}
 
@@ -296,6 +297,12 @@ OffscreenCanvas::OffscreenCanvas(DrawingEngine* engine,
 	fBounds(bounds)
 {
 	ResyncDrawState();
+}
+
+
+OffscreenCanvas::~OffscreenCanvas()
+{
+	delete fDrawState;
 }
 
 

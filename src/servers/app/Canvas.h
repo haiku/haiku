@@ -91,6 +91,7 @@ class OffscreenCanvas : public Canvas {
 public:
 							OffscreenCanvas(DrawingEngine* engine,
 								const DrawState& state, const IntRect& bounds);
+	virtual					~OffscreenCanvas();
 
 	virtual DrawingEngine*	GetDrawingEngine() const { return fDrawingEngine; }
 
