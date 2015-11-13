@@ -2086,11 +2086,12 @@ fDesktop->LockSingleWindow();
 			shape_data shape;
 			link.Read<int32>(&shape.opCount);
 			link.Read<int32>(&shape.ptCount);
+			shape.opSize = shape.opCount * sizeof(uint32);
+			shape.ptSize = shape.ptCount * sizeof(BPoint);
 			shape.opList = new(nothrow) uint32[shape.opCount];
 			shape.ptList = new(nothrow) BPoint[shape.ptCount];
-			if (link.Read(shape.opList, shape.opCount * sizeof(uint32)) >= B_OK
-				&& link.Read(shape.ptList,
-					shape.ptCount * sizeof(BPoint)) >= B_OK) {
+			if (link.Read(shape.opList, shape.opSize) >= B_OK
+				&& link.Read(shape.ptList, shape.ptSize) >= B_OK) {
 				fCurrentView->ClipToShape(&shape, inverse);
 				_UpdateDrawState(fCurrentView);
 			}
@@ -3044,6 +3045,7 @@ ServerWindow::_DispatchViewDrawingMessage(int32 code,
 		{
 			DTRACE(("ServerWindow %s: Message AS_VIEW_END_LAYER\n",
 				Title()));
+
 			fCurrentView->BlendAllLayers();
 			fCurrentView->SetPicture(NULL);
 			fCurrentView->CurrentState()->SetDrawingModeLocked(false);
@@ -3573,11 +3575,12 @@ ServerWindow::_DispatchPictureMessage(int32 code, BPrivate::LinkReceiver& link)
 			shape_data shape;
 			link.Read<int32>(&shape.opCount);
 			link.Read<int32>(&shape.ptCount);
+			shape.opSize = shape.opCount * sizeof(uint32);
+			shape.ptSize = shape.ptCount * sizeof(BPoint);
 			shape.opList = new(nothrow) uint32[shape.opCount];
 			shape.ptList = new(nothrow) BPoint[shape.ptCount];
-			if (link.Read(shape.opList, shape.opCount * sizeof(uint32)) >= B_OK
-				&& link.Read(shape.ptList,
-					shape.ptCount * sizeof(BPoint)) >= B_OK) {
+			if (link.Read(shape.opList, shape.opSize) >= B_OK
+				&& link.Read(shape.ptList, shape.ptSize) >= B_OK) {
 				picture->WriteClipToShape(shape.opCount, shape.opList,
 					shape.ptCount, shape.ptList, inverse);
 			}

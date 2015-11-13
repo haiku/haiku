@@ -515,8 +515,9 @@ DrawState::ClipToShape(shape_data* shape, bool inverse)
 	if (!fCombinedTransform.IsIdentity())
 		fCombinedTransform.Apply(shape->ptList, shape->ptCount);
 
-	AlphaMask* const mask = new ShapeAlphaMask(GetAlphaMask(), *shape,
+	AlphaMask* const mask = ShapeAlphaMask::Create(GetAlphaMask(), *shape,
 		BPoint(0, 0), inverse);
+
 	SetAlphaMask(mask);
 	if (mask != NULL)
 		mask->ReleaseReference();

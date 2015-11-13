@@ -20,6 +20,7 @@ class BShape;
 class ServerBitmap;
 class ServerPicture;
 class shape_data;
+class UtilityBitmap;
 
 
 // #pragma mark - AlphaMask
@@ -29,6 +30,8 @@ class AlphaMask : public BReferenceable {
 public:
 								AlphaMask(AlphaMask* previousMask,
 									bool inverse);
+								AlphaMask(AlphaMask* previousMask,
+									AlphaMask* other);
 								AlphaMask(uint8 backgroundOpacity);
 	virtual						~AlphaMask();
 
@@ -41,11 +44,14 @@ public:
 			agg::clipped_alpha_mask* Mask()
 								{ return &fMask; }
 
+			size_t				BitmapSize() const;
+
 protected:
 			ServerBitmap*		_CreateTemporaryBitmap(BRect bounds) const;
 			void				_Generate();
 			void				_SetNoClipping();
 			const IntRect&		_PreviousMaskBounds() const;
+	virtual	void				_AddToCache() = 0;
 
 private:
 	virtual	ServerBitmap*		_RenderSource(const IntRect& canvasBounds) = 0;
@@ -59,12 +65,22 @@ protected:
 			bool				fClippedToCanvas;
 
 private:
+	friend class AlphaMaskCache;
+
 			IntPoint			fCanvasOrigin;
 			IntRect				fCanvasBounds;
 			const bool			fInverse;
 			uint8				fBackgroundOpacity;
 
-			uint8*				fBits;
+			int32				fNextMaskCount;
+			bool				fInCache;
+			uint32				fIndirectCacheReferences;
+									// number of times this mask has been
+									// seen as "previous mask" of another
+									// one in the cache, without being
+									// in the cache itself
+
+			UtilityBitmap*		fBits;
 			agg::rendering_buffer fBuffer;
 			agg::clipped_alpha_mask fMask;
 			scanline_unpacked_masked_type fScanline;
@@ -78,6 +94,7 @@ public:
 private:
 	virtual	ServerBitmap*		_RenderSource(const IntRect& canvasBounds);
 	virtual	IntPoint			_Offset();
+	virtual void				_AddToCache();
 };
 
 
@@ -89,6 +106,8 @@ class VectorAlphaMask : public AlphaMask {
 public:
 								VectorAlphaMask(AlphaMask* previousMask,
 									BPoint where, bool inverse);
+								VectorAlphaMask(AlphaMask* previousMask,
+									VectorAlphaMask* other);
 
 private:
 	virtual	ServerBitmap*		_RenderSource(const IntRect& canvasBounds);
@@ -115,6 +134,9 @@ public:
 			const DrawState&	GetDrawState() const;
 
 private:
+	virtual void				_AddToCache();
+
+private:
 			BReference<ServerPicture> fPicture;
 			DrawState*			fDrawState;
 };
@@ -124,8 +146,17 @@ private:
 
 
 class ShapeAlphaMask : public VectorAlphaMask<ShapeAlphaMask> {
-public:
+private:
 								ShapeAlphaMask(AlphaMask* previousMask,
+									const shape_data& shape,
+									BPoint where, bool inverse);
+								ShapeAlphaMask(AlphaMask* previousMask,
+									ShapeAlphaMask* other);
+
+public:
+	virtual						~ShapeAlphaMask();
+
+	static	ShapeAlphaMask*		Create(AlphaMask* previousMask,
 									const shape_data& shape,
 									BPoint where, bool inverse);
 
@@ -134,9 +165,14 @@ public:
 			const DrawState&	GetDrawState() const;
 
 private:
-			const shape_data&	fShape;
+	virtual void				_AddToCache();
+
+private:
+	friend class AlphaMaskCache;
+
+			shape_data*			fShape;
 			BRect				fShapeBounds;
-			DrawState			fDrawState;
+	static	DrawState*			fDrawState;
 };
 
 

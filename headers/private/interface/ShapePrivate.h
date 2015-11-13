@@ -9,6 +9,13 @@
 #ifndef SHAPE_PRIVATE_H
 #define SHAPE_PRIVATE_H
 
+#include <Point.h>
+#include <Rect.h>
+#include <Referenceable.h>
+
+#include <string.h>
+#include <stdio.h>
+
 
 #define OP_LINETO			0x10000000
 #define OP_BEZIERTO			0x20000000
@@ -20,13 +27,42 @@
 #define OP_SMALL_ARC_TO_CCW	0x08000000
 
 
-struct shape_data {
+struct shape_data : public BReferenceable {
 	uint32*	opList;
+	BPoint*	ptList;
 	int32	opCount;
 	int32	opSize;
-	BPoint*	ptList;
 	int32	ptCount;
 	int32	ptSize;
+
+	bool    fOwnsMemory;
+
+	shape_data()
+		:
+		fOwnsMemory(false)
+	{
+	}
+
+	~shape_data()
+	{
+		if (fOwnsMemory) {
+			delete[] opList;
+			delete[] ptList;
+		}
+	}
+
+	shape_data(const shape_data& other)
+	{
+		opList = new(std::nothrow) uint32[other.opCount];
+		ptList = new(std::nothrow) BPoint[other.ptCount];
+		fOwnsMemory = true;
+		opCount = other.opCount;
+		opSize = other.opSize;
+		ptCount = other.ptCount;
+		ptSize = other.ptSize;
+		memcpy(opList, other.opList, opSize);
+		memcpy(ptList, other.ptList, ptSize);
+	}
 
 	BRect DetermineBoundingBox() const
 	{

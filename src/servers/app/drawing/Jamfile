@@ -17,6 +17,7 @@ Includes [ FGristFiles AlphaMask.cpp DrawingEngine.cpp ]
 
 StaticLibrary libasdrawing.a :
 	AlphaMask.cpp
+	AlphaMaskCache.cpp
 	BitmapBuffer.cpp
 	BitmapDrawingEngine.cpp
 	drawing_support.cpp
