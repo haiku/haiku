@@ -378,7 +378,7 @@ PictureAlphaMask::PictureAlphaMask(AlphaMask* previousMask,
 	:
 	VectorAlphaMask<PictureAlphaMask>(previousMask, where, inverse),
 	fPicture(picture),
-	fDrawState(new DrawState(drawState))
+	fDrawState(new(std::nothrow) DrawState(drawState))
 {
 }
 
@@ -440,8 +440,7 @@ ShapeAlphaMask::ShapeAlphaMask(AlphaMask* previousMask,
 	const shape_data& shape, BPoint where, bool inverse)
 	:
 	VectorAlphaMask<ShapeAlphaMask>(previousMask, where, inverse),
-	fShape(new shape_data(shape)),
-	fDrawState()
+	fShape(new(std::nothrow) shape_data(shape))
 {
 	if (fDrawState == NULL)
 		fDrawState = new(std::nothrow) DrawState();

@@ -1981,7 +1981,7 @@ fDesktop->LockSingleWindow();
 			if (picture == NULL)
 				break;
 
-			AlphaMask* const mask = new PictureAlphaMask(
+			AlphaMask* const mask = new(std::nothrow) PictureAlphaMask(
 				fCurrentView->GetAlphaMask(), picture,
 				*fCurrentView->CurrentState(), where, inverse);
 			fCurrentView->SetAlphaMask(mask);

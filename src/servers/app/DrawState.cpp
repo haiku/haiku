@@ -390,7 +390,7 @@ DrawState::SetTransformEnabled(bool enabled)
 DrawState*
 DrawState::Squash() const
 {
-	DrawState* const squashedState = new DrawState(*this);
+	DrawState* const squashedState = new(nothrow) DrawState(*this);
 	return squashedState->PushState();
 }
 
