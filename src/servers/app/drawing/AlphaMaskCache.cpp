@@ -173,16 +173,12 @@ AlphaMaskCache::_FindUncachedPreviousMasks(AlphaMask* mask, bool reference)
 void
 AlphaMaskCache::_PrintAndResetStatistics()
 {
-	debug_printf("AlphaMaskCache statistics: size=%4ld bytes=%4ld lower=%4ld "
-		"total=%4ld too_large=%4ld replaced=%4ld hit=%4ld miss=%4ld\n",
-		fShapeMasks.size(),
-		fCurrentCacheBytes,
-		fLowerMaskReferencedCount,
-		fShapeMasks.size() + fLowerMaskReferencedCount,
-		fTooLargeMaskCount,
-		fMasksReplacedCount,
-		fHitCount,
-		fMissCount);
+	debug_printf("AlphaMaskCache statistics: size=%" B_PRIuSIZE " bytes=%"
+		B_PRIuSIZE " lower=%4" B_PRIu32 " total=%" B_PRIuSIZE " too_large=%4"
+		B_PRIu32 " replaced=%4" B_PRIu32 " hit=%4" B_PRIu32 " miss=%4" B_PRIu32
+		"\n", fShapeMasks.size(), fCurrentCacheBytes, fLowerMaskReferencedCount,
+		fShapeMasks.size() + fLowerMaskReferencedCount, fTooLargeMaskCount,
+		fMasksReplacedCount, fHitCount, fMissCount);
 	fTooLargeMaskCount = 0;
 	fMasksReplacedCount = 0;
 	fHitCount = 0;
