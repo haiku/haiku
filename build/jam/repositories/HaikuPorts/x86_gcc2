@@ -578,8 +578,8 @@ RemotePackageRepository HaikuPorts
 	confuse_x86-2.7-2
 	confuse_x86_devel-2.7-2
 	copynametoclipboard-1.0.1-2
-	curl_x86-7.45.0-1
-	curl_x86_devel-7.45.0-1
+	curl_x86-7.45.0-2
+	curl_x86_devel-7.45.0-2
 	cvsps_x86-2.2b1-1
 	dbus_x86-1.8.6-1
 	dbus_x86_devel-1.8.6-1
