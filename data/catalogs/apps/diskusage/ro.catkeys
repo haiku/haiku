@@ -1,5 +1,6 @@
-1	romanian	x-vnd.Haiku-DiskUsage	1435170580
+1	romanian	x-vnd.Haiku-DiskUsage	1448575393
 Scanning %refName%	Scanner		Se scanează %refName%
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d fișiere
 Size	Info Window		Dimensiune
 Rescan	Pie View		Rescanează
 Kind	Info Window		Tip

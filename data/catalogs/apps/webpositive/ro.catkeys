@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-WebPositive	1585649103
+1	romanian	x-vnd.Haiku-WebPositive	871083171
 Username:	Authentication Panel		Nume utilizator:
 Copy URL to clipboard	Download Window		Copiază URL în clipboard
 Cancel	Settings Window		Anulează
@@ -35,6 +35,7 @@ Standard font:	Settings Window		Font standard:
 Restart	Download Window		Repornire
 Proxy server	Settings Window		Server proxy
 New window	WebPositive Window		Fereastră nouă
+WebPositive	Download Window		WebPositive
 Open	Download Window		Deschide
 Reload	WebPositive Window		Reîncarcă
 Downloads	Download Window		Descărcări
