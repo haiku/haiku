@@ -235,7 +235,7 @@ inline void
 ConvertRawAudioFormatToAVSampleFormat(uint32 rawAudioFormatIn,
 	AVSampleFormat& sampleFormatOut)
 {
-	switch(rawAudioFormatIn) {
+	switch (rawAudioFormatIn) {
 		case media_raw_audio_format::B_AUDIO_FLOAT:
 			sampleFormatOut = AV_SAMPLE_FMT_FLT;
 			return;
@@ -281,24 +281,29 @@ inline void
 ConvertAVSampleFormatToRawAudioFormat(AVSampleFormat sampleFormatIn,
 	uint32& rawAudioFormatOut)
 {
-	switch(sampleFormatIn) {
+	switch (sampleFormatIn) {
 		case AV_SAMPLE_FMT_FLT:
+		case AV_SAMPLE_FMT_FLTP:
 			rawAudioFormatOut = media_raw_audio_format::B_AUDIO_FLOAT;
 			return;
 
 		case AV_SAMPLE_FMT_DBL:
+		case AV_SAMPLE_FMT_DBLP:
 			rawAudioFormatOut = media_raw_audio_format::B_AUDIO_DOUBLE;
 			return;
 
 		case AV_SAMPLE_FMT_S32:
+		case AV_SAMPLE_FMT_S32P:
 			rawAudioFormatOut = media_raw_audio_format::B_AUDIO_INT;
 			return;
 
 		case AV_SAMPLE_FMT_S16:
+		case AV_SAMPLE_FMT_S16P:
 			rawAudioFormatOut = media_raw_audio_format::B_AUDIO_SHORT;
 			return;
 
 		case AV_SAMPLE_FMT_U8:
+		case AV_SAMPLE_FMT_U8P:
 			rawAudioFormatOut = media_raw_audio_format::B_AUDIO_UCHAR;
 			return;
 
@@ -310,5 +315,6 @@ ConvertAVSampleFormatToRawAudioFormat(AVSampleFormat sampleFormatIn,
 	const uint32 kBAudioNone = 0;
 	rawAudioFormatOut = kBAudioNone;
 }
+
 
 #endif // UTILITIES_H

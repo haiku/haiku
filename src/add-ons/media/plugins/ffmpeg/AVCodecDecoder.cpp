@@ -766,6 +766,10 @@ AVCodecDecoder::_ApplyEssentialAudioContainerPropertiesToContext()
 		= static_cast<int>(containerProperties.frame_size);
 	ConvertRawAudioFormatToAVSampleFormat(
 		containerProperties.output.format, fContext->sample_fmt);
+#if LIBAVCODEC_VERSION_INT > ((52 << 16) | (114 << 8))
+	ConvertRawAudioFormatToAVSampleFormat(
+		containerProperties.output.format, fContext->request_sample_fmt);
+#endif
 	fContext->sample_rate
 		= static_cast<int>(containerProperties.output.frame_rate);
 	fContext->channels
@@ -904,8 +908,18 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 		debugger("fDecodedDataBufferSize not multiple of frame size!");
 
 	size_t remainingSize = frames * fOutputFrameSize;
+
+#if 0
+	// Some decoders do not support format conversion on themselves, or use
+	// "planar" audio (each channel separated instead of interleaved samples).
+	// If this is a problem we will need to use swresample to convert the data
+	// here, instead of directly copying it.
+	swr_convert(fResampleContext, fRawDecodedAudio->data,
+		fDecodedDataBuffer->data + fDecodedDataBufferOffset, frames);
+#else
 	memcpy(fRawDecodedAudio->data[0], fDecodedDataBuffer->data[0]
 		+ fDecodedDataBufferOffset, remainingSize);
+#endif
 
 	bool firstAudioFramesCopiedToRawDecodedAudio
 		= fRawDecodedAudio->data[0] != fDecodedData;
