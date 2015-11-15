@@ -34,7 +34,7 @@ RemotePackageRepository HaikuPorts
 	a52dec-0.7.4-2
 	a52dec_devel-0.7.4-2
 	acr-0.9.9_git-1
-	album-0.9.4-1
+	album-0.9.4-2
 	ale-0.9.1-2
 	app2png-1.0.0-1
 	apr-1.5.2-1
@@ -48,7 +48,7 @@ RemotePackageRepository HaikuPorts
 	avra-1.3.0-1
 	bash-4.3.42-1
 	beae-1.2-3
-	beam-1.2-1
+	beam-1.2-2
 	becjk-1.0.1-1
 	beezer-0.99.hg-4
 	befar-4.2_beta-3
@@ -56,7 +56,8 @@ RemotePackageRepository HaikuPorts
 	bemines-1.0b2-1
 	bepdf-1.2.0-1
 	bepodder-1.3.0-2
-	bescreencapture-1.9.4-1
+	bescreencapture-2.0-2
+	bescreencapture_inputfilter-2.0-2
 	bezilla-2.0.0.22-1
 	binutils-2.17_2013_04_21-2
 	bison-2.4.3-6
@@ -70,7 +71,7 @@ RemotePackageRepository HaikuPorts
 	canna-1.0.1-1
 	capitalbe-1.0-2
 	catkeyseditor-0.1.1-1
-	caya-2013.10.12-2
+	caya-0.0.3-3
 	ccache-3.1.9-1
 	cdrtools-3.01~a30-1
 	cdrtools_devel-3.01~a30-1
@@ -80,7 +81,7 @@ RemotePackageRepository HaikuPorts
 	cpctools-0.3.0-2
 	criticalmass-2.2-1
 	ctags-5.8-3
-	colors-2.3-1
+	colors-2.3-2
 	coreutils-8.24-1
 	curl-7.45.0-2
 	curl_devel-7.45.0-2
@@ -298,8 +299,8 @@ RemotePackageRepository HaikuPorts
 	libtool_libltdl-2.4.2-1
 	libunistring-0.9.6-1
 	libunistring_devel-0.9.6-1
-	libusb-1.0.19-2
-	libusb_devel-1.0.19-2
+	libusb-1.0.20-2
+	libusb_devel-1.0.20-2
 	libusb_compat-0.1.5-2
 	libusb_compat_devel-0.1.5-2
 	libutf8proc-1.1.6-1
@@ -338,7 +339,7 @@ RemotePackageRepository HaikuPorts
 	mailnews-2.0.0.25-1
 	make-3.82-5
 	man-1.6g-4
-	mc-4.8.13-1
+	mc-4.8.15-1
 	mda_vst-20100214-1
 	mercurial-2.9.2-1
 	mesa-7.9.2-10
@@ -381,7 +382,7 @@ RemotePackageRepository HaikuPorts
 	openssl-1.0.2d-4
 	openssl_devel-1.0.2d-4
 	p7zip-9.20.1-4
-	paladin-git-5
+	paladin-git-6
 	paragui-1.1.8-1
 	paragui_devel-1.1.8-1
 	patch-2.7.5-1
@@ -420,6 +421,7 @@ RemotePackageRepository HaikuPorts
 	# the non-devel package isn't useful
 	qrencode_kdl_devel-3.3.0-2
 	qsystray-0.1-3
+	quickres-20011026-2
 	rdesktop-1.8.0-2
 	readline-6.3.8-1
 	readline_devel-6.3.8-1
@@ -450,7 +452,7 @@ RemotePackageRepository HaikuPorts
 	sdl2_ttf_devel-2.0.12-3
 	sdllopan-10-2
 	sed-4.2.1-6
-	seeker-1.0-2
+	seeker-1.0-3
 	sequitur-2.1.2-3
 	serf-1.3.8-1
 	serf_devel-1.3.8-1
@@ -507,7 +509,7 @@ RemotePackageRepository HaikuPorts
 	vlc_devel-0.8.6i-1
 	vlink-0.15-1
 	vmware_addons-1.1.1-3
-	vncserver-1.26-1
+	vncserver-1.27-1
 	weather-0.1.1_git-1
 	wget-1.16.3-2
 	which-2.21-1
@@ -589,7 +591,7 @@ RemotePackageRepository HaikuPorts
 	djvulibre_x86-3.5.25-1
 	djvulibre_x86_devel-3.5.25-1
 	documentviewer_x86-0.3_git-7
-	dosbox_x86-0.74-1
+	dosbox_x86-0.74-2
 	dtc_x86-1.4.1-1
 	enca_x86-1.15-1
 	enca_x86_devel-1.15-1
@@ -639,6 +641,7 @@ RemotePackageRepository HaikuPorts
 	goonies_x86-1.4.1528-2
 	gpgme_x86-1.5.2-2
 	gpgme_x86_devel-1.5.2-2
+	gphoto2_x86-2.5.8-1
 	graphite2_x86-1.2.4-1
 	graphite2_x86_devel-1.2.4-1
 	guilib_x86-1.2.1-1
@@ -701,8 +704,12 @@ RemotePackageRepository HaikuPorts
 	libffi_x86_devel-3.0.13-1
 	libftdi_x86-1.0-2
 	libftdi_x86_devel-1.0-2
+	libgcrypt_x86-1.6.3-1
+	libgcrypt_x86_devel-1.6.3-1
 	libgpg_error_x86-1.15-1
 	libgpg_error_x86_devel-1.15-1
+	libgphoto2_x86-2.5.8-1
+	libgphoto2_x86_devel-2.5.8-1
 	libgsasl_x86-1.8.0-1
 	libgsasl_x86_devel-1.8.0-1
 	libicns_x86-0.8.1-3
@@ -725,6 +732,8 @@ RemotePackageRepository HaikuPorts
 	libmpeg2_x86_devel-0.5.1-3
 	libogg_x86-1.3.0-2
 	libogg_x86_devel-1.3.0-2
+	libotr_x86-4.1.0-1
+	libotr_x86_devel-4.1.0-1
 	libpaper_x86-1.1.24-1
 	libpaper_x86_devel-1.1.24-1
 	libpcre_x86-8.33-2
@@ -754,10 +763,10 @@ RemotePackageRepository HaikuPorts
 	libtheora_x86_devel-1.1.1-2
 	libtool_x86-2.4.2-1
 	libtool_x86_libltdl-2.4.2-1
-	libtorrent_rasterbar_x86-1.0.6-1
-	libtorrent_rasterbar_x86_devel-1.0.6-1
-	libusb_x86-1.0.18-1
-	libusb_x86_devel-1.0.18-1
+	libtorrent_rasterbar_x86-1.0.6-2
+	libtorrent_rasterbar_x86_devel-1.0.6-2
+	libusb_x86-1.0.20-2
+	libusb_x86_devel-1.0.20-2
 	libuuid_x86-1.0.3-2
 	libuuid_x86_devel-1.0.3-2
 	libvorbis_x86-1.3.5-2
@@ -788,7 +797,7 @@ RemotePackageRepository HaikuPorts
 	mesa_x86_devel-10.1.0-2
 	mesa_x86_swrast-10.1.0-2
 	mesa_x86_swpipe-10.1.0-2
-	mosh_x86-1.2.4-1
+	mosh_x86-1.2.4-2
 	mpc_x86-1.0.3-1
 	mpc_x86_devel-1.0.3-1
 	mpd_x86-0.19.10_git-1
@@ -1059,6 +1068,7 @@ RemotePackageRepository HaikuPorts
 	gperf
 	gpgme
 	gpgme_x86
+	gphoto2_x86
 	grafx2
 	graphite2_x86
 	grep
@@ -1127,8 +1137,10 @@ RemotePackageRepository HaikuPorts
 	libffi_x86
 	libftdi_x86
 	libgcrypt
+	libgcrypt_x86
 	libgpg_error
 	libgpg_error_x86
+	libgphoto2_x86
 	libgsasl_x86
 	libicns
 	libiconv
@@ -1144,6 +1156,7 @@ RemotePackageRepository HaikuPorts
 	libmpeg2
 	libmpeg2_x86
 	libogg
+	libotr_x86
 	libpaper
 	libpcap
 	libpcre
