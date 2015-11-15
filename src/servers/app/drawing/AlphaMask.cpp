@@ -22,6 +22,8 @@
 #include "Shape.h"
 #include "ShapePrivate.h"
 
+#include <AutoLocker.h>
+
 
 // #pragma mark - AlphaMask
 
@@ -103,6 +105,8 @@ AlphaMask::~AlphaMask()
 IntPoint
 AlphaMask::SetCanvasGeometry(IntPoint origin, IntRect bounds)
 {
+	AutoLocker<BLocker> locker(fLock);
+
 	if (origin == fCanvasOrigin && bounds.Width() == fCanvasBounds.Width()
 		&& bounds.Height() == fCanvasBounds.Height())
 		return fCanvasOrigin;
@@ -159,6 +163,8 @@ AlphaMask::_CreateTemporaryBitmap(BRect bounds) const
 void
 AlphaMask::_Generate()
 {
+	AutoLocker<BLocker> locker(fLock);
+
 	ServerBitmap* const bitmap = _RenderSource(fCanvasBounds);
 	BReference<ServerBitmap> bitmapRef(bitmap, true);
 	if (bitmap == NULL) {
@@ -484,6 +490,7 @@ ShapeAlphaMask::Create(AlphaMask* previousMask, const shape_data& shape,
 		// TODO: don't make a new mask if the cache entry has no drawstate
 		// using it anymore, because then we ca just immediately reuse it
 		AlphaMask* cachedMask = mask;
+		AutoLocker<BLocker> locker(mask->fLock);
 		mask = new(std::nothrow) ShapeAlphaMask(previousMask, mask);
 		cachedMask->ReleaseReference();
 	}

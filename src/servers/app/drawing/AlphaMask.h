@@ -15,6 +15,8 @@
 #include "drawing/Painter/defines.h"
 #include "IntRect.h"
 
+#include <Locker.h>
+
 
 class BShape;
 class ServerBitmap;
@@ -63,6 +65,7 @@ protected:
 			BReference<AlphaMask> fPreviousMask;
 			IntRect				fBounds;
 			bool				fClippedToCanvas;
+			BLocker				fLock;
 
 private:
 	friend class AlphaMaskCache;
