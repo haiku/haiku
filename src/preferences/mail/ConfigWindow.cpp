@@ -218,6 +218,8 @@ ConfigWindow::ConfigWindow()
 	tabView->TabAt(0)->SetLabel(B_TRANSLATE("Accounts"));
 
 	fAccountsListView = new AccountsListView(this);
+	fAccountsListView->SetExplicitPreferredSize(BSize(
+		fAccountsListView->StringWidth("W") * 22, B_SIZE_UNSET));
 
 	BButton* addButton = new BButton(NULL, B_TRANSLATE("Add"),
 		new BMessage(kMsgAddAccount));
@@ -330,10 +332,12 @@ ConfigWindow::ConfigWindow()
 				B_USE_WINDOW_SPACING, 0);
 
 	_LoadSettings();
-		// this will also move our window to the stored position
 
 	fAccountsListView->SetSelectionMessage(new BMessage(kMsgAccountSelected));
 	fAccountsListView->MakeFocus(true);
+
+	ResizeToPreferred();
+	CenterOnScreen();
 }
 
 
@@ -374,6 +378,8 @@ ConfigWindow::_BuildHowToView()
 		"Select an item in the list to change its settings."));
 	text->MakeEditable(false);
 	text->MakeSelectable(false);
+	float fontFactor = be_plain_font->Size() / 12.0f;
+	text->SetExplicitPreferredSize(BSize(300 * fontFactor,400 * fontFactor));
 
 	BLayoutBuilder::Group<>(groupView, B_VERTICAL)
 		.AddGlue()
@@ -406,8 +412,6 @@ ConfigWindow::_LoadSettings()
 		fprintf(stderr, B_TRANSLATE("Error retrieving general settings: %s\n"),
 			strerror(status));
 	}
-
-	CenterOnScreen();
 }
 
 
