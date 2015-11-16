@@ -1549,6 +1549,8 @@ BWindow::GetSizeLimits(float* _minWidth, float* _maxWidth, float* _minHeight,
 void
 BWindow::UpdateSizeLimits()
 {
+	BAutolock locker(this);
+
 	if ((fFlags & B_AUTO_UPDATE_SIZE_LIMITS) != 0) {
 		// Get min/max constraints of the top view and enforce window
 		// size limits respectively.
@@ -2524,6 +2526,7 @@ BWindow::ResizeTo(float width, float height)
 void
 BWindow::ResizeToPreferred()
 {
+	BAutolock locker(this);
 	Layout(false);
 
 	float width = fTopView->PreferredSize().width;
@@ -2544,6 +2547,8 @@ BWindow::ResizeToPreferred()
 void
 BWindow::CenterIn(const BRect& rect)
 {
+	BAutolock locker(this);
+
 	// Set size limits now if needed
 	UpdateSizeLimits();
 
