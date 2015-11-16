@@ -557,11 +557,11 @@ TMailWindow::TMailWindow(BRect rect, const char* title, TMailApp* app,
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(fMenuBar)
+		.Add(fToolBar)
 		.AddGroup(B_VERTICAL, 0)
-			.Add(fToolBar)
 			.Add(fHeaderView)
-			.SetInsets(B_USE_WINDOW_SPACING, 0, B_USE_WINDOW_SPACING, 0)
-			.End()
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
+		.End()
 		.Add(fContentView);
 
 	if (to != NULL)
