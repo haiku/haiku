@@ -79,7 +79,6 @@ Settings::Settings()
 	fMailCharacterSet(B_MS_WINDOWS_CONVERSION),
 	fContentFont(be_fixed_font)
 {
-	fContentFont.SetSize(12.0);
 	fSignature = B_TRANSLATE("None");
 
 	LoadSettings();

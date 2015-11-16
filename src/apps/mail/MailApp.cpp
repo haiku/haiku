@@ -122,25 +122,22 @@ TMailApp::TMailApp()
 	fPeopleGroups(fPeopleQueryList)
 {
 	// set default values
-	fContentFont.SetSize(12.0);
 	fAutoMarkRead = true;
 	fSignature = (char*)malloc(strlen(B_TRANSLATE("None")) + 1);
 	strcpy(fSignature, B_TRANSLATE("None"));
 	fReplyPreamble = strdup(B_TRANSLATE("%e wrote:\\n"));
 
 	fMailWindowFrame.Set(0, 0, 0, 0);
-	fSignatureWindowFrame.Set(6, TITLE_BAR_HEIGHT, 6 + kSigWidth,
-		TITLE_BAR_HEIGHT + kSigHeight);
-	fPrefsWindowPos.Set(6, TITLE_BAR_HEIGHT);
 
-	const BCharacterSet *defaultComposeEncoding =
-		BCharacterSetRoster::FindCharacterSetByName(
-		B_TRANSLATE_COMMENT("UTF-8", "This string is used as a key to set "
-		"default message compose encoding. It must be correct IANA name from "
-		"http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding"
-		"/character_sets.cpp Translate it only if you want to change default "
-		"message compose encoding for your locale. If you don't know what is "
-		"it and why it may needs changing, just leave \"UTF-8\"."));
+	const BCharacterSet* defaultComposeEncoding
+		= BCharacterSetRoster::FindCharacterSetByName(B_TRANSLATE_COMMENT(
+			"UTF-8", "This string is used as a key to set default message "
+			"compose encoding. It must be correct IANA name from "
+			"http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding"
+			"/character_sets.cpp Translate it only if you want to change "
+			"default message compose encoding for your locale. If you don't "
+			"know what is it and why it may needs changing, just leave "
+			"\"UTF-8\"."));
 	if (defaultComposeEncoding != NULL)
 		fMailCharacterSet = defaultComposeEncoding->GetConversionID();
 
@@ -325,15 +322,21 @@ TMailApp::MessageReceived(BMessage *msg)
 			if (fPrefsWindow)
 				fPrefsWindow->Activate(true);
 			else {
-				fPrefsWindow = new TPrefsWindow(BRect(fPrefsWindowPos.x,
-						fPrefsWindowPos.y, fPrefsWindowPos.x + PREF_WIDTH,
-						fPrefsWindowPos.y + PREF_HEIGHT),
+				fPrefsWindow = new TPrefsWindow(fPrefsWindowPos,
 						&fContentFont, NULL, &fWrapMode, &fAttachAttributes,
 						&fColoredQuotes, &fDefaultAccount, &fUseAccountFrom,
 						&fReplyPreamble, &fSignature, &fMailCharacterSet,
 						&fWarnAboutUnencodableCharacters,
 						&fStartWithSpellCheckOn, &fAutoMarkRead,
 						&fShowToolBar);
+				if (fPrefsWindowPos.x <= 0 || fPrefsWindowPos.y <= 0) {
+					TMailWindow* window = _ActiveWindow();
+					if (window != NULL)
+						fPrefsWindow->CenterIn(window->Frame());
+					else
+						fPrefsWindow->CenterOnScreen();
+				}
+				fPrefsWindow->MoveOnScreen();
 				fPrefsWindow->Show();
 			}
 			break;
@@ -341,10 +344,8 @@ TMailApp::MessageReceived(BMessage *msg)
 		case PREFS_CHANGED:
 		{
 			// Notify all Mail windows
-			TMailWindow	*window;
-			for (int32 i = 0; (window=(TMailWindow *)fWindowList.ItemAt(i))
-				!= NULL; i++)
-			{
+			for (int32 i = 0; i < fWindowList.CountItems(); i++) {
+				TMailWindow* window = (TMailWindow*)fWindowList.ItemAt(i);
 				window->Lock();
 				window->UpdatePreferences();
 				window->UpdateViews();
@@ -358,10 +359,18 @@ TMailApp::MessageReceived(BMessage *msg)
 			break;
 
 		case M_EDIT_SIGNATURE:
-			if (fSigWindow)
+			if (fSigWindow != NULL)
 				fSigWindow->Activate(true);
 			else {
 				fSigWindow = new TSignatureWindow(fSignatureWindowFrame);
+				if (!fSignatureWindowFrame.IsValid()) {
+					TMailWindow* window = _ActiveWindow();
+					if (window != NULL)
+						fSigWindow->CenterIn(window->Frame());
+					else
+						fSigWindow->CenterOnScreen();
+				}
+				fSigWindow->MoveOnScreen();
 				fSigWindow->Show();
 			}
 			break;
@@ -372,7 +381,7 @@ TMailApp::MessageReceived(BMessage *msg)
 
 		case REFS_RECEIVED:
 			if (msg->HasPointer("window")) {
-				msg->FindPointer("window", (void **)&window);
+				msg->FindPointer("window", (void**)&window);
 				BMessage message(*msg);
 				window->PostMessage(&message, window);
 			}
@@ -382,8 +391,8 @@ TMailApp::MessageReceived(BMessage *msg)
 			switch (msg->FindInt32("kind")) {
 				case MAIL_WINDOW:
 				{
-					TMailWindow	*window;
-					if( msg->FindPointer( "window", (void **)&window ) == B_OK )
+					TMailWindow* window;
+					if( msg->FindPointer("window", (void**)&window) == B_OK)
 						fWindowList.RemoveItem(window);
 					fWindowCount--;
 					break;
@@ -739,6 +748,18 @@ TMailApp::_CheckForSpamFilterExistence()
 }
 
 
+TMailWindow*
+TMailApp::_ActiveWindow()
+{
+	for (int32 i = 0; i < fWindowList.CountItems(); i++) {
+		TMailWindow* window = (TMailWindow*)fWindowList.ItemAt(i);
+		if (window->IsActive())
+			return window;
+	}
+	return NULL;
+}
+
+
 void
 TMailApp::SetPrintSettings(const BMessage* printSettings)
 {
@@ -1091,42 +1112,18 @@ TMailWindow*
 TMailApp::NewWindow(const entry_ref* ref, const char* to, bool resend,
 	BMessenger* trackerMessenger)
 {
-	BScreen screen(B_MAIN_SCREEN_ID);
-	BRect screenFrame = screen.Frame();
-
+	float fontFactor = be_plain_font->Size() / 12.0f;
 	BRect r;
 	if (fMailWindowFrame.Width() < 64 || fMailWindowFrame.Height() < 20) {
 		// default size
-		r.Set(6, TITLE_BAR_HEIGHT, 6 + WIND_WIDTH,
-			TITLE_BAR_HEIGHT + WIND_HEIGHT);
+		r.Set(40 * fontFactor, 40 * fontFactor, fontFactor * (40 + WIND_WIDTH),
+			fontFactor * (40 + WIND_HEIGHT));
 	} else
 		r = fMailWindowFrame;
 
-	// make sure the window is not larger than the screen space
-	if (r.Height() > screenFrame.Height())
-		r.bottom = r.top + screenFrame.Height();
-	if (r.Width() > screenFrame.Width())
-		r.bottom = r.top + screenFrame.Width();
-
 	// cascading windows
-	r.OffsetBy(((fWindowCount + 5) % 10) * 15 - 75,
-		((fWindowCount + 5) % 10) * 15 - 75);
-
-	// make sure the window is still on screen
-	if (r.left - 6 < screenFrame.left)
-		r.OffsetTo(screenFrame.left + 8, r.top);
-
-	if (r.left + 20 > screenFrame.right)
-		r.OffsetTo(6, r.top);
-
-	if (r.top - 26 < screenFrame.top)
-		r.OffsetTo(r.left, screenFrame.top + 26);
-
-	if (r.top + 20 > screenFrame.bottom)
-		r.OffsetTo(r.left, TITLE_BAR_HEIGHT);
-
-	if (r.Width() < WIND_WIDTH)
-		r.right = r.left + WIND_WIDTH;
+	r.OffsetBy(fontFactor * (((fWindowCount + 5) % 10) * 15 - 75),
+		fontFactor * (((fWindowCount + 5) % 10) * 15 - 75));
 
 	fWindowCount++;
 
@@ -1148,6 +1145,7 @@ TMailApp::NewWindow(const entry_ref* ref, const char* to, bool resend,
 		&fContentFont, resend, trackerMessenger);
 	fWindowList.AddItem(window);
 
+	window->MoveOnScreen();
 	return window;
 }
 

@@ -31,22 +31,16 @@ of Be Incorporated in the United States and other countries. Other brand product
 names are registered trademarks or trademarks of their respective holders.
 All rights reserved.
 */
-
-//--------------------------------------------------------------------
-//	
-//	Signature.h
-//
-//--------------------------------------------------------------------
-
 #ifndef _SIGNATURE_H
 #define _SIGNATURE_H
 
+
 #include <Alert.h>
 #include <Beep.h>
-#include <Box.h>
 #include <FindDirectory.h>
 #include <Font.h>
 #include <fs_index.h>
+#include <GridView.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -55,9 +49,6 @@ All rights reserved.
 #include <Path.h>
 #include <TextControl.h>
 #include <Window.h>
-
-const float kSigHeight = 200;
-const float kSigWidth = 457;
 
 
 #define INDEX_SIGNATURE		"_signature"
@@ -98,48 +89,47 @@ private:
 	TSignatureView *fSigView;
 };
 
-//--------------------------------------------------------------------
 
-class TSignatureView : public BBox {
+class TSignatureView : public BGridView {
 public:
-	TSignatureView(BRect); 
-	virtual	void AttachedToWindow();
+								TSignatureView();
+	virtual	void				AttachedToWindow();
 
-	TNameControl *fName;
-	TSigTextView *fTextView;
+			TNameControl*		fName;
+			TSigTextView*		fTextView;
 
 private:
-	float fOffset;
+			float				fOffset;
 };
 
-//====================================================================
 
 class TNameControl : public BTextControl {
 public:
-	TNameControl(BRect, const char*, BMessage*);
-	virtual void AttachedToWindow();
-	virtual void MessageReceived(BMessage*);
+								TNameControl(const char* label,
+									BMessage* invocationMessage);
+
+	virtual void				AttachedToWindow();
+	virtual void				MessageReceived(BMessage* message);
 
 private:
 	char fLabel[100];
 };
 
-//====================================================================
 
 class TSigTextView : public BTextView {
 public:
-	TSigTextView(BRect, BRect); 
-	void FrameResized(float width, float height);
+								TSigTextView();
 
-	virtual void DeleteText(int32, int32);
-	virtual void KeyDown(const char*, int32);
-	virtual void InsertText(const char*, int32, int32, const text_run_array*);
-	virtual void MessageReceived(BMessage*);
+	virtual void				DeleteText(int32 offset, int32 length);
+	virtual void				KeyDown(const char*, int32);
+	virtual void				InsertText(const char*, int32, int32,
+									const text_run_array*);
+	virtual void				MessageReceived(BMessage* message);
 
 	bool fDirty;
 
 private:
-	TSignatureView *fParent;
+			TSignatureView*		fParent;
 };
 
 #endif // #ifndef _SIGNATURE_H

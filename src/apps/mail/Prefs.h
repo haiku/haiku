@@ -47,8 +47,6 @@ class BTextControl;
 #define ACCOUNT_USE_DEFAULT	0
 #define ACCOUNT_FROM_MAIL	1
 
-#define	PREF_WIDTH			340
-#define PREF_HEIGHT			330
 
 struct EncodingItem {
 			char*				name;
@@ -60,7 +58,7 @@ extern const EncodingItem kEncodings[];
 
 class TPrefsWindow : public BWindow {
 public:
-								TPrefsWindow(BRect rect, BFont* font,
+								TPrefsWindow(BPoint leftTop, BFont* font,
 									int32* level, bool* warp,
 									bool* attachAttributes, bool* cquotes,
 									int32* account, int32* replyTo,
@@ -91,7 +89,7 @@ private:
 			BPopUpMenu*			_BuildAutoMarkReadMenu(
 									bool autoMarkRead);
 			BPopUpMenu*			_BuildButtonBarMenu(uint8 show);
-			
+
 			BPopUpMenu*			_BuildBoolMenu(uint32 msg,
 									const char* boolItem, bool isTrue);
 

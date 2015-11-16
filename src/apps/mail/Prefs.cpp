@@ -64,26 +64,14 @@ using namespace BPrivate;
 
 #define B_TRANSLATION_CONTEXT "Mail"
 
-#define BUTTON_WIDTH		70
-#define BUTTON_HEIGHT		20
-#define ITEM_SPACE			6
-
-#define OK_BUTTON_X1		(PREF_WIDTH - BUTTON_WIDTH - 6)
-#define OK_BUTTON_X2		(OK_BUTTON_X1 + BUTTON_WIDTH)
-
-#define REVERT_BUTTON_X1	8
-#define REVERT_BUTTON_X2	(REVERT_BUTTON_X1 + BUTTON_WIDTH)
-
-enum	P_MESSAGES			{P_OK = 128, P_CANCEL, P_REVERT, P_FONT,
-							 P_SIZE, P_LEVEL, P_WRAP, P_ATTACH_ATTRIBUTES,
-							 P_SIG, P_ENC, P_WARN_UNENCODABLE,
-							 P_SPELL_CHECK_START_ON, P_BUTTON_BAR,
-							 P_ACCOUNT, P_REPLYTO, P_REPLY_PREAMBLE,
-							 P_COLORED_QUOTES, P_MARK_READ};
-
-extern BPoint	prefs_window;
-
-//#pragma mark -
+enum P_MESSAGES {
+	P_OK = 128, P_CANCEL, P_REVERT, P_FONT,
+	P_SIZE, P_LEVEL, P_WRAP, P_ATTACH_ATTRIBUTES,
+	P_SIG, P_ENC, P_WARN_UNENCODABLE,
+	P_SPELL_CHECK_START_ON, P_BUTTON_BAR,
+	P_ACCOUNT, P_REPLYTO, P_REPLY_PREAMBLE,
+	P_COLORED_QUOTES, P_MARK_READ
+};
 
 
 static inline void
@@ -96,12 +84,17 @@ add_menu_to_layout(BMenuField* menu, BGridLayout* layout, int32& row)
 }
 
 
-TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
-	bool* attachAttributes, bool* cquotes, int32* account, int32* replyTo,
-	char** preamble, char** sig, uint32* encoding, bool* warnUnencodable,
-	bool* spellCheckStartOn, bool* autoMarkRead, uint8* buttonBar)
+// #pragma mark -
+
+
+TPrefsWindow::TPrefsWindow(BPoint leftTop, BFont* font, int32* level,
+	bool* wrap, bool* attachAttributes, bool* cquotes, int32* account,
+	int32* replyTo, char** preamble, char** sig, uint32* encoding,
+	bool* warnUnencodable, bool* spellCheckStartOn, bool* autoMarkRead,
+	uint8* buttonBar)
 	:
-	BWindow(rect, B_TRANSLATE("Mail preferences"),
+	BWindow(BRect(leftTop.x, leftTop.y, leftTop.x + 100, leftTop.y + 100),
+		B_TRANSLATE("Mail preferences"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS),
 
@@ -149,16 +142,14 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 
 	// group boxes
 
-	const float kSpacing = 8;
-
-	BGridView* interfaceView = new BGridView(kSpacing, kSpacing);
+	BGridView* interfaceView = new BGridView();
 	BGridLayout* interfaceLayout = interfaceView->GridLayout();
-	interfaceLayout->SetInsets(kSpacing, kSpacing, kSpacing, kSpacing);
-	BGridView* mailView = new BGridView(kSpacing, kSpacing);
+	BGridView* mailView = new BGridView();
 	BGridLayout* mailLayout = mailView->GridLayout();
-	mailLayout->SetInsets(kSpacing, kSpacing, kSpacing, kSpacing);
 
+	interfaceLayout->SetInsets(B_USE_DEFAULT_SPACING);
 	interfaceLayout->AlignLayoutWith(mailLayout, B_HORIZONTAL);
+	mailLayout->SetInsets(B_USE_DEFAULT_SPACING);
 
 	BBox* interfaceBox = new BBox(B_FANCY_BORDER, interfaceView);
 	interfaceBox->SetLabel(B_TRANSLATE("User interface"));
@@ -266,12 +257,12 @@ TPrefsWindow::TPrefsWindow(BRect rect, BFont* font, int32* level, bool* wrap,
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(interfaceBox)
 		.Add(mailBox)
-		.AddGroup(B_HORIZONTAL, 0)
+		.AddGroup(B_HORIZONTAL)
 			.Add(fRevert)
 			.AddGlue()
 			.Add(cancelButton)
 			.Add(okButton)
-			.End()
+		.End()
 		.SetInsets(B_USE_WINDOW_SPACING);
 
 	Show();
