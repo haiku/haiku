@@ -243,6 +243,7 @@ BrowserApp::ReadyToRun()
 
 		if (window != NULL) {
 			window->Show();
+			pagesCreated++;
 
 			for (int j = 1; archivedWindow.FindString("tab", j, &url) == B_OK;
 				j++) {
