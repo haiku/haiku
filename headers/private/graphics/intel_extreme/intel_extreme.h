@@ -522,6 +522,11 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_PORT_C			(0x4200 | REGS_SOUTH_TRANSCODER_PORT)
 #define INTEL_DISPLAY_PORT_D			(0x4300 | REGS_SOUTH_TRANSCODER_PORT)
 
+// Unless you're a damn Valley/CherryView unicorn :-(
+#define VLV_DISPLAY_PORT_B				(VLV_DISPLAY_BASE + 0x64100)
+#define VLV_DISPLAY_PORT_C				(VLV_DISPLAY_BASE + 0x64200)
+#define CHV_DISPLAY_PORT_D				(VLV_DISPLAY_BASE + 0x64300)
+
 // planes
 #define INTEL_PIPE_ENABLED				(1UL << 31)
 #define INTEL_PIPE_CONTROL				0x0008

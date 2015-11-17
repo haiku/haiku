@@ -770,14 +770,35 @@ DisplayPort::IsConnected()
 addr_t
 DisplayPort::_PortRegister()
 {
+	// There are 6000 lines of intel linux code probing DP registers
+	// to properly detect DP vs eDP to then in-turn properly figure out
+	// what is DP and what is HDMI. It only takes 3 lines to
+	// ignore DisplayPort on ValleyView / CherryView
+
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV)
+		|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV))
+		return 0;
+
+	// Intel, are humans even involved anymore?
+	// This is a lot more complex than this code makes it look. (see defines)
+	// INTEL_DISPLAY_PORT_X moves around a lot based on PCH
+	// except on ValleyView and CherryView.
 	switch (PortIndex()) {
 		case INTEL_PORT_A:
 			return INTEL_DISPLAY_PORT_A;
 		case INTEL_PORT_B:
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
+				return VLV_DISPLAY_PORT_B;
 			return INTEL_DISPLAY_PORT_B;
 		case INTEL_PORT_C:
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
+				return VLV_DISPLAY_PORT_C;
 			return INTEL_DISPLAY_PORT_C;
 		case INTEL_PORT_D:
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV))
+				return CHV_DISPLAY_PORT_D;
+			else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
+				return 0;
 			return INTEL_DISPLAY_PORT_D;
 		default:
 			return 0;
