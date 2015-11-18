@@ -266,12 +266,17 @@ struct BilinearDefault :
 				const uint16 wRight = 255 - wLeft;
 
 				uint32 t[4];
-				ColorType::Interpolate(&t[0], s, this->fSourceBytesPerRow,
-					wLeft, wTop, wRight, wBottom);
+
+				if (fSource->height() > 1) {
+					ColorType::Interpolate(&t[0], s, this->fSourceBytesPerRow,
+						wLeft, wTop, wRight, wBottom);
+				} else {
+					ColorType::InterpolateLastRow(&t[0], s,  wLeft, wRight);
+				}
 				DrawMode::Blend(d, &t[0]);
 			}
 			// last column of pixels if necessary
-			if (xIndexMax < xIndexR) {
+			if (xIndexMax < xIndexR && fSource->height() > 1) {
 				const uint8* s = src + this->fWeightsX[xIndexR].index;
 				const uint8* sBottom = s + this->fSourceBytesPerRow;
 
