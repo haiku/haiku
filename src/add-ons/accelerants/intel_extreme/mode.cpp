@@ -622,9 +622,6 @@ if (first) {
 
 	TRACE("%s: Port configuration completed successfully!\n", __func__);
 
-	// RIP DIGITAL / LVDS (strange..)
-	// RIP ANALOG
-
 	// We set the same color mode across all pipes
 	program_pipe_color_modes(colorMode);
 
@@ -656,7 +653,10 @@ intel_get_display_mode(display_mode* _currentMode)
 {
 	CALLED();
 
-	retrieve_current_mode(*_currentMode, INTEL_DISPLAY_A_PLL);
+	*_currentMode = gInfo->shared_info->current_mode;
+
+	// This seems unreliable. We should always know the current_mode
+	//retrieve_current_mode(*_currentMode, INTEL_DISPLAY_A_PLL);
 	return B_OK;
 }
 

@@ -94,9 +94,6 @@ DisplayPipe::Enable(display_mode* target, addr_t portAddress)
 		return;
 	}
 
-	// Wait for the clocks to stabilize
-	spin(150);
-
 	// update timing (fPipeBase bumps the DISPLAY_A to B when needed)
 	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_HTOTAL),
 		((uint32)(target->timing.h_total - 1) << 16)
@@ -118,24 +115,24 @@ DisplayPipe::Enable(display_mode* target, addr_t portAddress)
 		((uint32)(target->timing.v_sync_end - 1) << 16)
 		| ((uint32)target->timing.v_sync_start - 1));
 
+	// XXX: Is it ok to do these on non-digital?
 	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_POS), 0);
+	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_IMAGE_SIZE),
+		((uint32)(target->virtual_width - 1) << 16)
+			| ((uint32)target->virtual_height - 1));
+
+	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_PIPE_SIZE),
+		((uint32)(target->timing.v_display - 1) << 16)
+			| ((uint32)target->timing.h_display - 1));
 
 	// This is useful for debugging: it sets the border to red, so you
 	// can see what is border and what is porch (black area around the
 	// sync)
 	//write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_RED), 0x00FF0000);
 
-	// TODO: Review these
-	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_IMAGE_SIZE),
-		((uint32)(target->virtual_width - 1) << 16)
-			| ((uint32)target->virtual_height - 1));
-	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_PIPE_SIZE),
-		((uint32)(target->timing.v_display - 1) << 16)
-			| ((uint32)target->timing.h_display - 1));
-
-	write32(portAddress, (read32(portAddress)
-			& ~(DISPLAY_MONITOR_POLARITY_MASK
-				| DISPLAY_MONITOR_VGA_POLARITY))
+	// XXX: Is it ok to do this on non-analog?
+	write32(portAddress, (read32(portAddress) & ~(DISPLAY_MONITOR_POLARITY_MASK
+			| DISPLAY_MONITOR_VGA_POLARITY))
 		| ((target->timing.flags & B_POSITIVE_HSYNC) != 0
 			? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
 		| ((target->timing.flags & B_POSITIVE_VSYNC) != 0
@@ -235,7 +232,8 @@ DisplayPipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 			pll |= DISPLAY_PLL_POST1_DIVIDE_2;
 	}
 
-	write32(pllControl, pll);
+	// Allow the PLL to warm up by masking its bit.
+	write32(pllControl, pll & ~DISPLAY_PLL_NO_VGA_CONTROL);
 	read32(pllControl);
 	spin(150);
 	write32(pllControl, pll);
