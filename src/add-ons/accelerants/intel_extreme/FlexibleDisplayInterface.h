@@ -9,10 +9,13 @@
 #define INTEL_FDI_H
 
 
+#include "intel_extreme.h"
+
+
 class FDITransmitter {
 public:
-									FDITransmitter(int32 pipeIndex);
-virtual								~FDITransmitter();
+									FDITransmitter(pipe_index pipeIndex);
+									~FDITransmitter();
 
 		bool						IsPLLEnabled();
 		void						EnablePLL();
@@ -25,7 +28,8 @@ private:
 
 class FDIReceiver {
 public:
-									FDIReceiver(int32 pipeIndex);
+									FDIReceiver(pipe_index pipeIndex);
+									~FDIReceiver();
 
 		bool						IsPLLEnabled();
 		void						EnablePLL();
@@ -40,14 +44,18 @@ protected:
 
 class FDILink {
 public:
-									FDILink(int32 pipeIndex);
+									FDILink(pipe_index pipeIndex);
+									~FDILink();
 
-		FDITransmitter&				Transmitter();
-		FDIReceiver&				Receiver();
+		FDITransmitter&				Transmitter()
+										{ return fTransmitter; };
+		FDIReceiver&				Receiver()
+										{ return fReceiver; };
 
 private:
 		FDITransmitter				fTransmitter;
 		FDIReceiver					fReceiver;
 };
+
 
 #endif // INTEL_FDI_H

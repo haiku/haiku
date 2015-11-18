@@ -350,6 +350,7 @@ assign_pipes()
 			}
 
 			gInfo->ports[i]->AssignPipe(currentPipe);
+
 			assigned++;
 		}
     }

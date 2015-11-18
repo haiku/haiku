@@ -6,8 +6,6 @@
  *		Michael Lotz, mmlr@mlotz.ch
  *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
-
-
 #include "DisplayPipe.h"
 
 #include "accelerant.h"
@@ -16,6 +14,8 @@
 
 #include <stdlib.h>
 #include <string.h>
+
+#include <new>
 
 
 #define TRACE_PIPE
@@ -28,6 +28,7 @@ extern "C" void _sPrintf(const char* format, ...);
 
 #define ERROR(x...) _sPrintf("intel_extreme: " x)
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
+
 
 // PIPE: 6
 // PLANE: 7
@@ -50,7 +51,7 @@ program_pipe_color_modes(uint32 colorMode)
 
 DisplayPipe::DisplayPipe(pipe_index pipeIndex)
 	:
-//	fFDILink(NULL),
+	fFDILink(NULL),
 //	fPanelFitter(NULL),
 	fPipeIndex(pipeIndex),
 	fPipeBase(REGS_NORTH_PIPE_AND_PORT),
@@ -59,6 +60,12 @@ DisplayPipe::DisplayPipe(pipe_index pipeIndex)
 	if (pipeIndex == INTEL_PIPE_B) {
 		fPipeBase += INTEL_DISPLAY_OFFSET;
 		fPlaneBase += INTEL_PLANE_OFFSET;
+	}
+
+	// Program FDILink if PCH
+	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
+		if (fFDILink == NULL)
+			fFDILink = new(std::nothrow) FDILink(pipeIndex);
 	}
 
 	TRACE("DisplayPipe %s. Pipe Base: 0x%" B_PRIxADDR

@@ -12,8 +12,9 @@
 
 #include <edid.h>
 
-#include "DisplayPipe.h"
 #include "intel_extreme.h"
+
+#include "DisplayPipe.h"
 #include "pll.h"
 
 
@@ -68,6 +69,9 @@ virtual status_t					SetDisplayMode(display_mode* mode,
 
 virtual pipe_index					PipePreference()
 										{ return INTEL_PIPE_ANY; };
+
+		::DisplayPipe*				Pipe()
+										{ return fDisplayPipe; };
 
 protected:
 		void						_SetName(const char* name);

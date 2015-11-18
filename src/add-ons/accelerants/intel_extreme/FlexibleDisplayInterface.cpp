@@ -9,11 +9,12 @@
 
 #include "FlexibleDisplayInterface.h"
 
-#include "accelerant.h"
-#include "intel_extreme.h"
-
 #include <stdlib.h>
 #include <string.h>
+#include <KernelExport.h>
+
+#include "accelerant.h"
+#include "intel_extreme.h"
 
 
 #define TRACE_FDI
@@ -28,9 +29,16 @@ extern "C" void _sPrintf(const char* format, ...);
 // #pragma mark - FDITransmitter
 
 
-FDITransmitter::FDITransmitter(int32 pipeIndex)
+FDITransmitter::FDITransmitter(pipe_index pipeIndex)
 	:
-	fBaseRegister(PCH_FDI_TX_BASE_REGISTER + pipeIndex * PCH_FDI_TX_PIPE_OFFSET)
+	fRegisterBase(PCH_FDI_TX_BASE_REGISTER)
+{
+	if (pipeIndex == INTEL_PIPE_B)
+		fRegisterBase += PCH_FDI_TX_PIPE_OFFSET * 1;
+}
+
+
+FDITransmitter::~FDITransmitter()
 {
 }
 
@@ -38,7 +46,7 @@ FDITransmitter::FDITransmitter(int32 pipeIndex)
 bool
 FDITransmitter::IsPLLEnabled()
 {
-	return (read32(fBaseRegister + PCH_FDI_TX_CONTROL) & PCH_FDI_TX_PLL_ENABLED)
+	return (read32(fRegisterBase + PCH_FDI_TX_CONTROL) & FDI_TX_PLL_ENABLED)
 		!= 0;
 }
 
@@ -46,14 +54,14 @@ FDITransmitter::IsPLLEnabled()
 void
 FDITransmitter::EnablePLL()
 {
-	uint32 targetRegister = fBaseRegister + PCH_FDI_TX_CONTROL;
+	uint32 targetRegister = fRegisterBase + PCH_FDI_TX_CONTROL;
 	uint32 value = read32(targetRegister);
-	if ((value & PCH_FDI_TX_PLL_ENABLED) != 0) {
+	if ((value & FDI_TX_PLL_ENABLED) != 0) {
 		// already enabled, possibly IronLake where it always is
 		return;
 	}
 
-	write32(targetRegister, value | PCH_FDI_TX_PLL_ENABLED);
+	write32(targetRegister, value | FDI_TX_PLL_ENABLED);
 	read32(targetRegister);
 	spin(100); // warmup 10us + dmi delay 20us, be generous
 }
@@ -62,13 +70,13 @@ FDITransmitter::EnablePLL()
 void
 FDITransmitter::DisablePLL()
 {
-	if (gInfo->shared_info->device_type.IsGroup(INTEL_GROUP_ILK)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_ILK)) {
 		// on IronLake the FDI PLL is alaways enabled, so no point in trying...
 		return;
 	}
 
-	uint32 targetRegister = fBaseRegister + PCH_FDI_TX_CONTROL;
-	write32(targetRegister, read32(targetRegister) & ~PCH_FDI_TX_PLL_ENABLED);
+	uint32 targetRegister = fRegisterBase + PCH_FDI_TX_CONTROL;
+	write32(targetRegister, read32(targetRegister) & ~FDI_TX_PLL_ENABLED);
 	read32(targetRegister);
 	spin(100);
 }
@@ -77,9 +85,16 @@ FDITransmitter::DisablePLL()
 // #pragma mark - FDIReceiver
 
 
-FDIReceiver::FDIReceiver(int32 pipeIndex)
+FDIReceiver::FDIReceiver(pipe_index pipeIndex)
 	:
-	fBaseRegister(PCH_FDI_RX_BASE_REGISTER + pipeIndex * PCH_FDI_RX_PIPE_OFFSET)
+	fRegisterBase(PCH_FDI_RX_BASE_REGISTER)
+{
+	if (pipeIndex == INTEL_PIPE_B)
+		fRegisterBase += PCH_FDI_RX_PIPE_OFFSET * 1;
+}
+
+
+FDIReceiver::~FDIReceiver()
 {
 }
 
@@ -87,7 +102,7 @@ FDIReceiver::FDIReceiver(int32 pipeIndex)
 bool
 FDIReceiver::IsPLLEnabled()
 {
-	return (read32(fBaseRegister + PCH_FDI_RX_CONTROL) & PCH_FDI_RX_PLL_ENABLED)
+	return (read32(fRegisterBase + PCH_FDI_RX_CONTROL) & FDI_RX_PLL_ENABLED)
 		!= 0;
 }
 
@@ -95,12 +110,12 @@ FDIReceiver::IsPLLEnabled()
 void
 FDIReceiver::EnablePLL()
 {
-	uint32 targetRegister = fBaseRegister + PCH_FDI_RX_CONTROL;
+	uint32 targetRegister = fRegisterBase + PCH_FDI_RX_CONTROL;
 	uint32 value = read32(targetRegister);
-	if ((value & PCH_FDI_RX_PLL_ENABLED) != 0)
+	if ((value & FDI_RX_PLL_ENABLED) != 0)
 		return;
 
-	write32(targetRegister, value | PCH_FDI_RX_PLL_ENABLED);
+	write32(targetRegister, value | FDI_RX_PLL_ENABLED);
 	read32(targetRegister);
 	spin(200); // warmup 10us + dmi delay 20us, be generous
 }
@@ -109,19 +124,19 @@ FDIReceiver::EnablePLL()
 void
 FDIReceiver::DisablePLL()
 {
-	uint32 targetRegister = fBaseRegister + PCH_FDI_RX_CONTROL;
-	write32(targetRegister, read32(targetRegister) & ~PCH_FDI_RX_PLL_ENABLED);
+	uint32 targetRegister = fRegisterBase + PCH_FDI_RX_CONTROL;
+	write32(targetRegister, read32(targetRegister) & ~FDI_RX_PLL_ENABLED);
 	read32(targetRegister);
 	spin(100);
 }
 
 
 void
-FDIReceiver::SwtichClock(bool toPCDClock)
+FDIReceiver::SwitchClock(bool toPCDClock)
 {
-	uint32 targetRegister = fBaseRegister + PCH_FDI_RX_CONTROL;
-	write32(targetRegister, (read32(targetRegister) & ~PCH_FDI_RX_CLOCK_MASK)
-		| (toPCDClock ? PCH_FDI_RX_CLOCK_PCD : PCH_FDI_RX_CLOCK_RAW));
+	uint32 targetRegister = fRegisterBase + PCH_FDI_RX_CONTROL;
+	write32(targetRegister, (read32(targetRegister) & ~FDI_RX_CLOCK_MASK)
+		| (toPCDClock ? FDI_RX_CLOCK_PCD : FDI_RX_CLOCK_RAW));
 	read32(targetRegister);
 	spin(200);
 }
@@ -130,9 +145,14 @@ FDIReceiver::SwtichClock(bool toPCDClock)
 // #pragma mark - FDILink
 
 
-FDILink::FDILink(int32 pipeIndex)
+FDILink::FDILink(pipe_index pipeIndex)
 	:
 	fTransmitter(pipeIndex),
 	fReceiver(pipeIndex)
+{
+}
+
+
+FDILink::~FDILink()
 {
 }

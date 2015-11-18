@@ -263,6 +263,12 @@ struct intel_shared_info {
 	bool			has_vesa_edid_info;
 };
 
+enum pipe_index {
+    INTEL_PIPE_ANY,
+    INTEL_PIPE_A,
+    INTEL_PIPE_B
+};
+
 //----------------- ioctl() interface ----------------
 
 // magic code for ioctls
@@ -710,12 +716,17 @@ struct intel_free_graphics_memory {
 // FDI receiver A is hooked up to transcoder A, FDI receiver B is hooked up to
 // transcoder B, so we have the same mapping as with the display pipes.
 #define PCH_FDI_RX_BASE_REGISTER		0xf0000
+#define PCH_FDI_TX_BASE_REGISTER		0x60000
 #define PCH_FDI_RX_PIPE_OFFSET			0x01000
+#define PCH_FDI_TX_PIPE_OFFSET			0x01000
 
-#define PCH_FDI_RX_CONTROL				0x0c
+#define PCH_FDI_RX_CONTROL				0x00c
+#define PCH_FDI_TX_CONTROL				0x100
 #define FDI_RX_CLOCK_MASK				(1 << 4)
 #define FDI_RX_CLOCK_RAW				(0 << 4)
 #define FDI_RX_CLOCK_PCD				(1 << 4)
+#define FDI_TX_PLL_ENABLED				(1 << 14)
+#define FDI_RX_PLL_ENABLED				(1 << 13)
 
 #define PCH_FDI_RX_TRANS_UNIT_SIZE_1	0x30
 #define PCH_FDI_RX_TRANS_UNIT_SIZE_2	0x38

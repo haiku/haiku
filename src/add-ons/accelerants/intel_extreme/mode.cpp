@@ -23,10 +23,6 @@
 
 #include "accelerant_protos.h"
 #include "accelerant.h"
-#if 0
-#include "DisplayPipe.h"
-#include "FlexibleDisplayInterface.h"
-#endif
 #include "pll.h"
 #include "Ports.h"
 #include "utility.h"

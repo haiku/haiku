@@ -19,7 +19,7 @@ Addon intel_extreme.accelerant :
 	pll.cpp
 	# classes
 	DisplayPipe.cpp
-#	FlexibleDisplayInterface.cpp
+	FlexibleDisplayInterface.cpp
 #	PanelFitter.cpp
 	Ports.cpp
 	: be $(TARGET_LIBSTDC++) libaccelerantscommon.a

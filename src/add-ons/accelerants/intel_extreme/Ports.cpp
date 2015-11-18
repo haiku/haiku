@@ -19,6 +19,7 @@
 
 #include "accelerant.h"
 #include "accelerant_protos.h"
+#include "FlexibleDisplayInterface.h"
 #include "intel_extreme.h"
 
 #include <new>
@@ -82,6 +83,12 @@ Port::AssignPipe(pipe_index pipeIndex)
 	if (portRegister == 0) {
 		ERROR("%s: Invalid PortRegister ((0x%" B_PRIx32 ") for %s\n", __func__,
 			portRegister, PortName());
+		return B_ERROR;
+	}
+
+	// TODO: UnAssignPipe?  This likely needs reworked a little
+	if (fDisplayPipe != NULL) {
+		ERROR("%s: Can't reassign DisplayPipe (yet)\n", __func__);
 		return B_ERROR;
 	}
 
@@ -251,6 +258,14 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (fDisplayPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
 		return B_ERROR;
+	}
+
+	// Train FDI if it exists
+	FDILink* link = fDisplayPipe->FDI();
+	if (link != NULL) {
+		link->Receiver().EnablePLL();
+		link->Receiver().SwitchClock(true);
+		link->Transmitter().EnablePLL();
 	}
 
 	pll_divisors divisors;
@@ -658,6 +673,14 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (fDisplayPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
 		return B_ERROR;
+	}
+
+	// Train FDI if it exists
+	FDILink* link = fDisplayPipe->FDI();
+	if (link != NULL) {
+		link->Receiver().EnablePLL();
+		link->Receiver().SwitchClock(true);
+		link->Transmitter().EnablePLL();
 	}
 
 	pll_divisors divisors;
