@@ -152,6 +152,7 @@ SharedLibrary libtestappserver.so :
 	MallocBuffer.cpp
 
 	AlphaMask.cpp
+	AlphaMaskCache.cpp
 	BitmapHWInterface.cpp
 	Canvas.cpp
 	DesktopSettings.cpp
