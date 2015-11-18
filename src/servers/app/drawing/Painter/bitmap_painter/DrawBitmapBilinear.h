@@ -267,7 +267,7 @@ struct BilinearDefault :
 
 				uint32 t[4];
 
-				if (fSource->height() > 1) {
+				if (this->fSource->height() > 1) {
 					ColorType::Interpolate(&t[0], s, this->fSourceBytesPerRow,
 						wLeft, wTop, wRight, wBottom);
 				} else {
@@ -276,7 +276,7 @@ struct BilinearDefault :
 				DrawMode::Blend(d, &t[0]);
 			}
 			// last column of pixels if necessary
-			if (xIndexMax < xIndexR && fSource->height() > 1) {
+			if (xIndexMax < xIndexR && this->fSource->height() > 1) {
 				const uint8* s = src + this->fWeightsX[xIndexR].index;
 				const uint8* sBottom = s + this->fSourceBytesPerRow;
 
