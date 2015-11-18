@@ -4,6 +4,7 @@
  * Copyright (C) 2001 Axel Dörfler.
  * Copyright (C) 2004 Marcus Overhagen.
  * Copyright (C) 2009 Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright (C) 2015 Adrien Destugues <pulkomandy@pulkomandy.tk>.
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
@@ -12,12 +13,15 @@
 
 //! libavcodec based decoder for Haiku
 
+
 #include <MediaFormats.h>
+
 
 extern "C" {
 	#include "avcodec.h"
-	#include "swscale.h"
+	#include "swresample.h"
 }
+
 
 #include "DecoderPlugin.h"
 #include "ReaderPlugin.h"
@@ -93,6 +97,7 @@ private:
 			// FFmpeg related members
 			AVCodec*			fCodec;
 			AVCodecContext*		fContext;
+			SwrContext*			fResampleContext;
 			uint8_t*			fDecodedData;
 			size_t				fDecodedDataSizeInBytes;
 			AVFrame*			fPostProcessedDecodedPicture;
@@ -102,7 +107,9 @@ private:
 			bool 				fCodecInitDone;
 
 			gfx_convert_func	fFormatConversionFunc;
+#if USE_SWS_FOR_COLOR_SPACE_CONVERSION
 			SwsContext*			fSwsContext;
+#endif
 
 			char*				fExtraData;
 			int					fExtraDataSize;
@@ -119,7 +126,6 @@ private:
 			bool				fAudioDecodeError;
 
 			AVFrame*			fDecodedDataBuffer;
-			int32				fDecodedDataBufferOffset;
 			int32				fDecodedDataBufferSize;
 
 			AVPacket			fTempPacket;
