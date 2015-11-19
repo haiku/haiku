@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.11.08
-#	Date:    2015-11-08 03:15:01
+#	Version: 2015.11.19
+#	Date:    2015-11-19 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -5815,12 +5815,12 @@
 		1077 e4f1  FastLinQ QL45462H 40GbE iSCSI Adapter
 		1077 e4f2  FastLinQ QL45461H 40GbE iSCSI Adapter
 	1664  FastLinQ QL45000 Series Gigabit Ethernet Controller (SR-IOV VF)
-		1077 e4f1  FastLinQ QL45412H 40GbE Adapter (SR-IOV VF)
-		1077 e4f2  FastLinQ QL45412H 40GbE Adapter (SR-IOV VF)
+		1077 e4f1  FastLinQ QL45462H 40GbE Adapter (SR-IOV VF)
+		1077 e4f2  FastLinQ QL45461H 40GbE Adapter (SR-IOV VF)
 		1077 e4f3  FastLinQ QL45412H 40GbE Adapter (SR-IOV VF)
 		1077 e4f4  FastLinQ QL45411H 40GbE Adapter (SR-IOV VF)
-		1077 e4f6  FastLinQ QL45411H 25GbE Adapter (SR-IOV VF)
-		1077 e4f7  FastLinQ QL45412H 25GbE Adapter (SR-IOV VF)
+		1077 e4f6  FastLinQ QL45211H 25GbE Adapter (SR-IOV VF)
+		1077 e4f7  FastLinQ QL45212H 25GbE Adapter (SR-IOV VF)
 		1077 e4f8  FastLinQ QL45611H 100GbE Adapter (SR-IOV VF)
 	2020  ISP2020A Fast!SCSI Basic Adapter
 	2031  ISP8324-based 16Gb Fibre Channel to PCI Express Adapter
@@ -16461,6 +16461,14 @@
 		103c 1321  Core I/O LAN/SCSI Combo [AB314A]
 		14e4 0009  NetXtreme BCM5703 1000Base-T
 		14e4 000a  NetXtreme BCM5703 1000Base-SX
+	16c8  BCM57301 NetXtreme-C Single-port 10Gb Ethernet
+	16c9  BCM57302 NetXtreme-C Dual-port 10Gb/25Gb Ethernet
+	16ca  BCM57304 NetXtreme-C Dual-port 10Gb/25Gb/40Gb/50Gb Ethernet
+	16cb  BCM57304 NetXtreme-C Ethernet Virtual Function
+	16d0  BCM57402 NetXtreme-E Dual-port 10Gb Ethernet
+	16d1  BCM57404 NetXtreme-E Dual-port 10Gb/25Gb Ethernet
+	16d2  BCM57406 NetXtreme-E Dual-port 10GBase-T Ethernet
+	16d3  BCM57404 NetXtreme-E Ethernet Virtual Function
 	16dd  NetLink BCM5781 Gigabit Ethernet PCI Express
 	16f3  NetXtreme BCM5727 Gigabit Ethernet PCIe
 	16f7  NetXtreme BCM5753 Gigabit Ethernet PCI Express
@@ -19479,6 +19487,8 @@
 	00a4  FBC4XGG3 Capture 4x10Gb
 	00a5  FBC2XLG Capture 2x40Gb
 	00a6  FBC1CG Capture 1x100Gb
+	00a9  FBC2XGHH Capture 2x10Gb
+	00af  Capture slave device
 # Used on V120 VME Crate Controller
 1c32  Highland Technology, Inc.
 1c33  Daktronics, Inc
@@ -20096,6 +20106,10 @@
 5431  AuzenTech, Inc.
 544c  Teralogic Inc
 	0350  TL880-based HDTV/ATSC tuner
+544d  TBS Technologies
+	6178  DVB-S2 4 Tuner PCIe Card
+		544d 6904  TBS6904 DVB-S2 Quad Tuner PCIe Card
+		544d 6905  TBS6905 DVB-S2 Quad Tuner PCIe Card
 5452  SCANLAB AG
 	3443  RTC4
 5455  Technische University Berlin
@@ -21969,6 +21983,10 @@
 	15d1  Ethernet Controller 10G X550T
 		8086 0002  Ethernet Converged Network Adapter X550-T1
 		8086 00a2  Ethernet Converged Network Adapter X550-T1
+	15d5  Ethernet Connection (5) I219-LM
+	15d6  Ethernet Connection (5) I219-V
+	15d7  Ethernet Connection (4) I219-LM
+	15d8  Ethernet Connection (4) I219-V
 	1600  Broadwell-U Host Bridge -OPI
 	1601  Broadwell-U PCI Express x16 Controller
 	1602  Broadwell-U Integrated Graphics
@@ -26337,6 +26355,7 @@
 	9c2d  8 Series USB EHCI #2
 	9c31  8 Series USB xHCI HC
 		17aa 2214  ThinkPad X240
+		8086 7270  Apple MacBookAir6,2 / MacBookPro11,1
 	9c35  8 Series SDIO Controller
 	9c36  8 Series Audio DSP Controller
 	9c3a  8 Series HECI #0
