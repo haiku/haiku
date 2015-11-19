@@ -45,10 +45,14 @@ BufferCache::GetBuffer(media_buffer_id id)
 	buffer_clone_info info;
 	info.buffer = id;
 	BBuffer* buffer = new(std::nothrow) BBuffer(info);
-	if (buffer == NULL || buffer->Data() == NULL) {
+	if (buffer == NULL || buffer->ID() <= 0
+			|| buffer->Data() == NULL) {
 		delete buffer;
 		return NULL;
 	}
+
+	if (buffer->ID() != id)
+		debugger("BufferCache::GetBuffer: IDs mismatch");
 
 	try {
 		fMap.insert(std::make_pair(id, buffer));
