@@ -716,25 +716,25 @@ struct intel_free_graphics_memory {
 // FDI receiver A is hooked up to transcoder A, FDI receiver B is hooked up to
 // transcoder B, so we have the same mapping as with the display pipes.
 #define PCH_FDI_RX_BASE_REGISTER		0xf0000
-#define PCH_FDI_TX_BASE_REGISTER		0x60000
 #define PCH_FDI_RX_PIPE_OFFSET			0x01000
-#define PCH_FDI_TX_PIPE_OFFSET			0x01000
-
 #define PCH_FDI_RX_CONTROL				0x00c
-#define PCH_FDI_TX_CONTROL				0x100
-#define FDI_RX_CLOCK_MASK				(1 << 4)
-#define FDI_RX_CLOCK_RAW				(0 << 4)
-#define FDI_RX_CLOCK_PCD				(1 << 4)
-#define FDI_TX_PLL_ENABLED				(1 << 14)
+#define FDI_RX_ENABLE					(1 << 31)
 #define FDI_RX_PLL_ENABLED				(1 << 13)
 
 #define PCH_FDI_RX_TRANS_UNIT_SIZE_1	0x30
 #define PCH_FDI_RX_TRANS_UNIT_SIZE_2	0x38
 #define FDI_RX_TRANS_UNIT_SIZE(x)		((x - 1) << 25)
 #define FDI_RX_TRANS_UNIT_MASK			0x7e000000
-	// Transfer unit size 1 is the primary and fixed transfer unit size,
-	// TU size 2 is the lower power state transfer unit size when using dynamic
-	// refresh rates (we don't do that though).
+
+#define FDI_RX_CLOCK_MASK				(1 << 4)
+#define FDI_RX_CLOCK_RAW				(0 << 4)
+#define FDI_RX_CLOCK_PCD				(1 << 4)
+
+#define PCH_FDI_TX_BASE_REGISTER		0x60000
+#define PCH_FDI_TX_PIPE_OFFSET			0x01000
+#define PCH_FDI_TX_CONTROL				0x100
+#define FDI_TX_ENABLE					(1 << 31)
+#define FDI_TX_PLL_ENABLED				(1 << 14)
 
 // CPU Panel Fitters - These are for IronLake and up and are the CPU internal
 // panel fitters.

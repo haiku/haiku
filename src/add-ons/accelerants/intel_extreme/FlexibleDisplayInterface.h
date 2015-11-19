@@ -17,6 +17,9 @@ public:
 									FDITransmitter(pipe_index pipeIndex);
 									~FDITransmitter();
 
+		void						Enable();
+		void						Disable();
+
 		bool						IsPLLEnabled();
 		void						EnablePLL();
 		void						DisablePLL();
@@ -30,6 +33,9 @@ class FDIReceiver {
 public:
 									FDIReceiver(pipe_index pipeIndex);
 									~FDIReceiver();
+
+		void						Enable();
+		void						Disable();
 
 		bool						IsPLLEnabled();
 		void						EnablePLL();
