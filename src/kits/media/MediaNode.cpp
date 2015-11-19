@@ -151,7 +151,12 @@ BMediaNode*
 BMediaNode::Acquire()
 {
 	CALLED();
-	atomic_add(&fRefCount,1);
+	if (atomic_add(&fRefCount,1) == 0) {
+		status_t status = B_ERROR;
+		BMediaRoster* roster = BMediaRoster::Roster(&status);
+		if (roster != NULL && status == B_OK)
+			MediaRosterEx(roster)->RegisterLocalNode(this);
+	}
 	return this;
 }
 
@@ -161,13 +166,26 @@ BMediaNode::Release()
 {
 	CALLED();
 	if (atomic_add(&fRefCount, -1) == 1) {
-		TRACE("BMediaNode::Release() saving node %ld configuration\n", fNodeID);
-		MediaRosterEx(BMediaRoster::Roster())->SaveNodeConfiguration(this);
-		if (DeleteHook(this) != B_OK) {
-			ERROR("BMediaNode::Release(): DeleteHook failed\n");
-			return Acquire();
+		status_t status = B_ERROR;
+		BMediaRoster* roster = BMediaRoster::Roster(&status);
+		if (roster != NULL && status == B_OK) {
+			MediaRosterEx(roster)->UnregisterLocalNode(this);
+
+			// Only addons needs the configuration to be saved.
+			int32 id;
+			if (AddOn(&id) != NULL) {
+				TRACE("BMediaNode::Release() saving node %ld"
+					" configuration\n", fNodeID);
+				MediaRosterEx(roster)->SaveNodeConfiguration(this);
+			}
+
+			if (DeleteHook(this) != B_OK) {
+				ERROR("BMediaNode::Release(): DeleteHook failed\n");
+				return Acquire();
+			}
+			return NULL;
 		}
-		return NULL;
+		TRACE("BMediaRoster::Release() the media roster is NULL!");
 	}
 	return this;
 }

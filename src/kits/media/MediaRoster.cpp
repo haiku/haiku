@@ -3530,23 +3530,19 @@ BMediaRoster::MessageReceived(BMessage* message)
 
 		case NODE_FINAL_RELEASE:
 		{
-			// this function is called by a BMediaNode to delete
+			// This function is called by a BMediaNode to delete
 			// itself, as this needs to be done from another thread
 			// context, it is done here.
-			// TODO: If a node is released using BMediaRoster::ReleaseNode()
-			// TODO: instead of using BMediaNode::Release() / BMediaNode::Acquire()
-			// TODO: fRefCount of the BMediaNode will not be correct.
 
-			BMediaNode *node;
-			message->FindPointer("node", reinterpret_cast<void **>(&node));
-
-			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE saving "
-				"node %" B_PRId32 " configuration\n", node->ID());
-			MediaRosterEx(BMediaRoster::Roster())->SaveNodeConfiguration(node);
-
-			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE releasing "
-				"node %" B_PRId32 "\n", node->ID());
-			node->DeleteHook(node); // we don't call Release(), see above!
+			BMediaNode* node = NULL;
+			status_t err = message->FindPointer("node",
+				reinterpret_cast<void **>(&node));
+			if (err == B_OK && node != NULL)
+				node->Release();
+			else {
+				TRACE("BMediaRoster::MessageReceived: CRITICAL! received"
+					"a release request but the node can't be found.");
+			}
 			return;
 		}
 
