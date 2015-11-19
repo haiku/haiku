@@ -1,9 +1,10 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Lotz, mmlr@mlotz.ch
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 
 
@@ -213,6 +214,135 @@ FDILink::FDILink(pipe_index pipeIndex)
 	fTransmitter(pipeIndex),
 	fReceiver(pipeIndex)
 {
+}
+
+
+status_t
+FDILink::Train(display_mode* target)
+{
+	CALLED();
+
+	uint32 bitsPerPixel;
+	switch (target->space) {
+		case B_RGB32_LITTLE:
+			bitsPerPixel = 32;
+			break;
+		case B_RGB16_LITTLE:
+			bitsPerPixel = 16;
+			break;
+		case B_RGB15_LITTLE:
+			bitsPerPixel = 15;
+			break;
+		case B_CMAP8:
+		default:
+			bitsPerPixel = 8;
+			break;
+    }
+
+	// Khz / 10. ( each output octet encoded as 10 bits.
+	uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10;
+	uint32 bps = target->timing.pixel_clock * bitsPerPixel * 21 / 20;
+
+	uint32 lanes = bps / (linkBandwidth * 8);
+
+	TRACE("%s: FDI Link Lanes: %" B_PRIu32 "\n", __func__, lanes);
+
+	// Over IVB supports AutoTraining of FDI
+	if (gInfo->shared_info->device_type.Generation() >= 7)
+		return _AutoTrain(lanes);
+
+	//return _ManualTrain(lanes);
+	return B_ERROR;
+}
+
+
+status_t
+FDILink::_ManualTrain(uint32 lanes)
+{
+	CALLED();
+
+	// This all needs review
+
+	// Enable FDI clocks
+	Receiver().EnablePLL();
+	Receiver().SwitchClock(true);
+	Transmitter().EnablePLL();
+
+	ERROR("TODO: Generation 5 FDI Link Training\n");
+
+	// Enable pipes
+	Transmitter().Enable();
+	Receiver().Enable();
+	return B_OK;
+}
+
+
+status_t
+FDILink::_AutoTrain(uint32 lanes)
+{
+	CALLED();
+	uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
+	uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
+
+	uint32 buffer = read32(txControl);
+	buffer &= ~(7 << 19);
+	buffer |= (lanes - 1) << 19;
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB))
+		buffer &= ~FDI_LINK_TRAIN_NONE_IVB;
+	else
+		buffer &= ~FDI_LINK_TRAIN_NONE;
+	write32(txControl, buffer);
+
+	static const int snb_b_fdi_train_param[] = {
+		FDI_LINK_TRAIN_400MV_0DB_SNB_B,
+		FDI_LINK_TRAIN_400MV_6DB_SNB_B,
+		FDI_LINK_TRAIN_600MV_3_5DB_SNB_B,
+		FDI_LINK_TRAIN_800MV_0DB_SNB_B,
+	};
+
+	bool trained = false;
+
+	for (uint32 i = 0; i < (sizeof(snb_b_fdi_train_param)
+		/ sizeof(snb_b_fdi_train_param[0])); i++) {
+		for (int j = 0; j < 2; j++) {
+			buffer = read32(txControl);
+			buffer |= FDI_AUTO_TRAINING;
+			buffer &= ~FDI_LINK_TRAIN_VOL_EMP_MASK;
+			buffer |= snb_b_fdi_train_param[i];
+			write32(txControl, buffer | FDI_TX_ENABLE);
+
+			write32(rxControl, read32(rxControl) | FDI_RX_ENABLE);
+
+			spin(5);
+
+			buffer = read32(txControl);
+			if ((buffer & FDI_AUTO_TRAIN_DONE) != 0) {
+				TRACE("%s: FDI auto train complete!\n", __func__);
+				trained = true;
+				break;
+			}
+
+			write32(txControl, read32(txControl) & ~FDI_TX_ENABLE);
+			write32(rxControl, read32(rxControl) & ~FDI_RX_ENABLE);
+			read32(rxControl);
+
+			spin(31);
+		}
+	}
+
+	if (!trained) {
+		ERROR("%s: FDI auto train failed!\n", __func__);
+		return B_ERROR;
+	}
+
+	// Enable ecc
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB)) {
+		write32(rxControl, read32(rxControl)
+			| FDI_FS_ERRC_ENABLE | FDI_FE_ERRC_ENABLE);
+		read32(rxControl);
+	}
+
+	return B_OK;
 }
 
 

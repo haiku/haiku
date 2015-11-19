@@ -472,6 +472,18 @@ intel_extreme_init(intel_info &info)
 
 	init_interrupt_handler(info);
 
+	if (info.device_type.HasPlatformControlHub()) {
+		if (info.device_type.Generation() == 5) {
+			info.shared_info->fdi_link_frequency = (read32(info, FDI_PLL_BIOS_0)
+				& FDI_PLL_FB_CLOCK_MASK) + 2;
+			info.shared_info->fdi_link_frequency *= 100;
+		} else {
+			info.shared_info->fdi_link_frequency = 2700;
+		}
+	} else {
+		info.shared_info->fdi_link_frequency = 0;
+	}
+
 	TRACE("%s: completed successfully!\n", __func__);
 	return B_OK;
 }

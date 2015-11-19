@@ -1,9 +1,10 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Michael Lotz, mmlr@mlotz.ch
+ *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
 #ifndef INTEL_FDI_H
 #define INTEL_FDI_H
@@ -24,6 +25,9 @@ public:
 		void						EnablePLL();
 		void						DisablePLL();
 
+		uint32						Base()
+										 { return fRegisterBase; };
+
 private:
 		uint32						fRegisterBase;
 };
@@ -43,6 +47,9 @@ public:
 
 		void						SwitchClock(bool toPCDClock);
 
+		uint32						Base()
+										 { return fRegisterBase; };
+
 protected:
 		uint32						fRegisterBase;
 };
@@ -58,7 +65,12 @@ public:
 		FDIReceiver&				Receiver()
 										{ return fReceiver; };
 
+		status_t					Train(display_mode* target);
+
 private:
+		status_t					_ManualTrain(uint32 lanes);
+		status_t					_AutoTrain(uint32 lanes);
+
 		FDITransmitter				fTransmitter;
 		FDIReceiver					fReceiver;
 };

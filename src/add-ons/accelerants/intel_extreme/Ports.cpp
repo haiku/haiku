@@ -262,11 +262,8 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	// Train FDI if it exists
 	FDILink* link = fDisplayPipe->FDI();
-	if (link != NULL) {
-		link->Receiver().EnablePLL();
-		link->Receiver().SwitchClock(true);
-		link->Transmitter().EnablePLL();
-	}
+	if (link != NULL)
+		link->Train(target);
 
 	pll_divisors divisors;
 	compute_pll_divisors(target, &divisors, false);
@@ -677,11 +674,8 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	// Train FDI if it exists
 	FDILink* link = fDisplayPipe->FDI();
-	if (link != NULL) {
-		link->Receiver().EnablePLL();
-		link->Receiver().SwitchClock(true);
-		link->Transmitter().EnablePLL();
-	}
+	if (link != NULL)
+		link->Train(target);
 
 	pll_divisors divisors;
 	compute_pll_divisors(target, &divisors, false);

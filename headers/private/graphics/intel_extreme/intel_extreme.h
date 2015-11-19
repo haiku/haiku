@@ -230,6 +230,8 @@ struct intel_shared_info {
 	addr_t			frame_buffer;
 	uint32			frame_buffer_offset;
 
+	uint32			fdi_link_frequency;	// In Mhz
+
 	bool			got_vbt;
 	bool			single_head_locked;
 
@@ -721,11 +723,15 @@ struct intel_free_graphics_memory {
 #define FDI_RX_ENABLE					(1 << 31)
 #define FDI_RX_PLL_ENABLED				(1 << 13)
 
+#define FDI_FS_ERRC_ENABLE				(1 << 27)
+#define FDI_FE_ERRC_ENABLE				(1 << 26)
+
 #define PCH_FDI_RX_TRANS_UNIT_SIZE_1	0x30
 #define PCH_FDI_RX_TRANS_UNIT_SIZE_2	0x38
 #define FDI_RX_TRANS_UNIT_SIZE(x)		((x - 1) << 25)
 #define FDI_RX_TRANS_UNIT_MASK			0x7e000000
 
+#define FDI_RX_ENHANCE_FRAME_ENABLE		(1 << 6)
 #define FDI_RX_CLOCK_MASK				(1 << 4)
 #define FDI_RX_CLOCK_RAW				(0 << 4)
 #define FDI_RX_CLOCK_PCD				(1 << 4)
@@ -734,7 +740,54 @@ struct intel_free_graphics_memory {
 #define PCH_FDI_TX_PIPE_OFFSET			0x01000
 #define PCH_FDI_TX_CONTROL				0x100
 #define FDI_TX_ENABLE					(1 << 31)
+#define FDI_TX_ENHANCE_FRAME_ENABLE		(1 << 18)
 #define FDI_TX_PLL_ENABLED				(1 << 14)
+
+#define FDI_PLL_BIOS_0					0x46000
+#define FDI_PLL_FB_CLOCK_MASK			0xff
+#define FDI_PLL_BIOS_1					0x46004
+#define FDI_PLL_BIOS_2					0x46008
+
+#define FDI_LINK_TRAIN_PATTERN_1		(0 << 28)
+#define FDI_LINK_TRAIN_PATTERN_2		(1 << 28)
+#define FDI_LINK_TRAIN_PATTERN_IDLE		(2 << 28)
+#define FDI_LINK_TRAIN_NONE				(3 << 28)
+#define FDI_LINK_TRAIN_VOLTAGE_0_4V		(0 << 25)
+#define FDI_LINK_TRAIN_VOLTAGE_0_6V		(1 << 25)
+#define FDI_LINK_TRAIN_VOLTAGE_0_8V		(2 << 25)
+#define FDI_LINK_TRAIN_VOLTAGE_1_2V		(3 << 25)
+#define FDI_LINK_TRAIN_PRE_EMPHASIS_NONE (0 << 22)
+#define FDI_LINK_TRAIN_PRE_EMPHASIS_1_5X (1 << 22)
+#define FDI_LINK_TRAIN_PRE_EMPHASIS_2X	(2 << 22)
+#define FDI_LINK_TRAIN_PRE_EMPHASIS_3X	(3 << 22)
+
+#define FDI_AUTO_TRAINING				(1 << 10)
+#define FDI_AUTO_TRAIN_DONE				(1 << 1)
+
+// SNB A-stepping
+#define FDI_LINK_TRAIN_400MV_0DB_SNB_A	(0x38 << 22)
+#define FDI_LINK_TRAIN_400MV_6DB_SNB_A	(0x02 << 22)
+#define FDI_LINK_TRAIN_600MV_3_5DB_SNB_A (0x01 << 22)
+#define FDI_LINK_TRAIN_800MV_0DB_SNB_A	(0x00 << 22)
+
+// SNB B-stepping
+#define FDI_LINK_TRAIN_400MV_0DB_SNB_B	(0x00 << 22)
+#define FDI_LINK_TRAIN_400MV_6DB_SNB_B	(0x3a << 22)
+#define FDI_LINK_TRAIN_600MV_3_5DB_SNB_B (0x39 << 22)
+#define FDI_LINK_TRAIN_800MV_0DB_SNB_B	(0x38 << 22)
+#define FDI_LINK_TRAIN_VOL_EMP_MASK		(0x3f << 22)
+
+#define FDI_LINK_TRAIN_PATTERN_1_CPT	(0 << 8)
+#define FDI_LINK_TRAIN_PATTERN_2_CPT	(1 << 8)
+#define FDI_LINK_TRAIN_PATTERN_IDLE_CPT	(2 << 8)
+#define FDI_LINK_TRAIN_NORMAL_CPT		(3 << 8)
+#define FDI_LINK_TRAIN_PATTERN_MASK_CPT	(3 << 8)
+
+// IvyBridge changes it up because... they hate developers?
+#define FDI_LINK_TRAIN_PATTERN_1_IVB	(0 << 8)
+#define FDI_LINK_TRAIN_PATTERN_2_IVB	(1 << 8)
+#define FDI_LINK_TRAIN_PATTERN_IDLE_IVB	(2 << 8)
+#define FDI_LINK_TRAIN_NONE_IVB			(3 << 8)
 
 // CPU Panel Fitters - These are for IronLake and up and are the CPU internal
 // panel fitters.
