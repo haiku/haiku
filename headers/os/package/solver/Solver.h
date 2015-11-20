@@ -32,6 +32,7 @@ public:
 				B_FIND_IN_DESCRIPTION		= 0x08,
 				B_FIND_IN_PROVIDES			= 0x10,
 				B_FIND_INSTALLED_ONLY		= 0x20,
+				B_FIND_IN_REQUIRES			= 0x40,
 			};
 
 			// VerifyInstallation() flags

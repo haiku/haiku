@@ -292,6 +292,15 @@ LibsolvSolver::FindPackages(const char* searchString, uint32 flags,
 			queue_push2(&selection, SOLVER_SOLVABLE, iterator.solvid);
 	}
 
+	// search package requires
+	if ((flags & B_FIND_IN_REQUIRES) != 0) {
+		dataiterator_set_keyname(&iterator, SOLVABLE_REQUIRES);
+		dataiterator_set_search(&iterator, 0, 0);
+
+		while (dataiterator_step(&iterator))
+			queue_push2(&selection, SOLVER_SOLVABLE, iterator.solvid);
+	}
+
 	return _GetFoundPackages(selection, flags, _packages);
 }
 
