@@ -193,14 +193,11 @@ Header::InitCheck() const
 status_t
 Header::WriteEntry(int fd, uint32 entryIndex)
 {
-	// Determine block to write
-	off_t blockOffset =
-		+ entryIndex * fHeader.EntrySize() / fBlockSize;
-	uint32 entryOffset = entryIndex * fHeader.EntrySize() % fBlockSize;
+	off_t entryOffset = entryIndex * fHeader.EntrySize();
 
 	status_t status = _Write(fd,
-		(fHeader.EntriesBlock() + blockOffset) * fBlockSize + entryOffset,
-		fEntries + entryOffset, fBlockSize);
+		fHeader.EntriesBlock() * fBlockSize + entryOffset,
+		fEntries + entryOffset, fHeader.EntrySize());
 	if (status != B_OK)
 		return status;
 
@@ -209,8 +206,8 @@ Header::WriteEntry(int fd, uint32 entryIndex)
 
 	// Write backup
 	status_t backupStatus = _Write(fd,
-		(fBackupHeader.EntriesBlock() + blockOffset) * fBlockSize + entryOffset,
-		fEntries + entryOffset, fBlockSize);
+		fBackupHeader.EntriesBlock() * fBlockSize + entryOffset,
+		fEntries + entryOffset, fHeader.EntrySize());
 
 	return status == B_OK ? backupStatus : status;
 }
