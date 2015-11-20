@@ -247,12 +247,23 @@ FDILink::Train(display_mode* target)
 
 	TRACE("%s: FDI Link Lanes: %" B_PRIu32 "\n", __func__, lanes);
 
-	// Over IVB supports AutoTraining of FDI
-	if (gInfo->shared_info->device_type.Generation() >= 7)
-		return _AutoTrain(lanes);
+	// Enable FDI clocks
+	Receiver().EnablePLL();
+	Receiver().SwitchClock(true);
+	Transmitter().EnablePLL();
 
-	//return _ManualTrain(lanes);
-	return B_ERROR;
+	status_t result = B_ERROR;
+
+	// Over IVB supports AutoTraining of FDI
+	if (gInfo->shared_info->device_type.Generation() >= 7) {
+		result = _AutoTrain(lanes);
+		if (result != B_OK) {
+			ERROR("%s: FDI auto-training fault. Attempting manual train.\n",
+				__func__);
+			return _ManualTrain(lanes);
+		}
+	}
+	return _ManualTrain(lanes);
 }
 
 
@@ -261,14 +272,8 @@ FDILink::_ManualTrain(uint32 lanes)
 {
 	CALLED();
 
-	// This all needs review
-
-	// Enable FDI clocks
-	Receiver().EnablePLL();
-	Receiver().SwitchClock(true);
-	Transmitter().EnablePLL();
-
-	ERROR("TODO: Generation 5 FDI Link Training\n");
+	// This needs completed
+	ERROR("TODO: Manual FDI Link Training\n");
 
 	// Enable pipes
 	Transmitter().Enable();
@@ -285,8 +290,11 @@ FDILink::_AutoTrain(uint32 lanes)
 	uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
 
 	uint32 buffer = read32(txControl);
+
+	// Clear port width selection and set number of lanes
 	buffer &= ~(7 << 19);
 	buffer |= (lanes - 1) << 19;
+
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB))
 		buffer &= ~FDI_LINK_TRAIN_NONE_IVB;
 	else
@@ -335,7 +343,7 @@ FDILink::_AutoTrain(uint32 lanes)
 		return B_ERROR;
 	}
 
-	// Enable ecc
+	// Enable ecc on IVB
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB)) {
 		write32(rxControl, read32(rxControl)
 			| FDI_FS_ERRC_ENABLE | FDI_FE_ERRC_ENABLE);
