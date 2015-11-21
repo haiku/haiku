@@ -2596,7 +2596,10 @@ BWindow::MoveOnScreen(uint32 flags)
 		if (frame.Height() > screenFrame.Height())
 			frame.bottom -= frame.Height() - screenFrame.Height();
 
-		ResizeTo(frame.Width(), frame.Height());
+		BRect innerFrame = frame;
+		innerFrame.top += tabHeight;
+		innerFrame.InsetBy(borderWidth, borderWidth);
+		ResizeTo(innerFrame.Width(), innerFrame.Height());
 	}
 
 	if (((flags & B_MOVE_IF_PARTIALLY_OFFSCREEN) == 0
