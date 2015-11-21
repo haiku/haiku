@@ -20,6 +20,7 @@
 extern "C" {
 	#include "avcodec.h"
 	#include "swresample.h"
+	#include "swscale.h"
 }
 
 
@@ -28,6 +29,16 @@ extern "C" {
 
 #include "CodecTable.h"
 #include "gfx_util.h"
+
+
+#ifdef __x86_64
+#define USE_SWS_FOR_COLOR_SPACE_CONVERSION 1
+#else
+#define USE_SWS_FOR_COLOR_SPACE_CONVERSION 0
+// NOTE: David's color space conversion is much faster than the FFmpeg
+// version. Perhaps the SWS code can be used for unsupported conversions?
+// Otherwise the alternative code could simply be removed from this file.
+#endif
 
 
 class AVCodecDecoder : public Decoder {

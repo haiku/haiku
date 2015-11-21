@@ -50,14 +50,6 @@
 	static int sDumpedPackets = 0;
 #endif
 
-#ifdef __x86_64
-#define USE_SWS_FOR_COLOR_SPACE_CONVERSION 1
-#else
-#define USE_SWS_FOR_COLOR_SPACE_CONVERSION 0
-// NOTE: David's color space conversion is much faster than the FFmpeg
-// version. Perhaps the SWS code can be used for unsupported conversions?
-// Otherwise the alternative code could simply be removed from this file.
-#endif
 
 #if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
 typedef AVCodecID CodecID;
