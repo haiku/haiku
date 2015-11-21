@@ -16,7 +16,7 @@ target desktop {
 		}
 	}
 
-	service x-vnd.Haiku-mail_daemon {
+	service x-vnd.Be-POST {
 		launch /system/servers/mail_daemon -E
 		if setting ~/config/settings/Mail/new_mail_daemon DaemonAutoStarts
 		no_safemode
