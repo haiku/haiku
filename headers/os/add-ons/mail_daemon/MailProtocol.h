@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2015, Haiku, Inc. All Rights Reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011 Clemens Zeidler. All rights reserved.
  *
@@ -52,7 +52,7 @@ typedef status_t BMailFilterAction;
 
 class BMailProtocol : public BLooper {
 public:
-								BMailProtocol(
+								BMailProtocol(const char* name,
 									const BMailAccountSettings& settings);
 	virtual						~BMailProtocol();
 
@@ -109,6 +109,8 @@ protected:
 									const BMailProtocolSettings& settings);
 
 private:
+	static	BString				_LooperName(const char* name,
+									const BMailAccountSettings& settings);
 			BMailFilter*		_LoadFilter(const BMailAddOnSettings& settings);
 			BMailFilterAction	_ProcessHeaderFetched(entry_ref& ref,
 									BFile& mail, BMessage& attributes);
@@ -127,7 +129,7 @@ private:
 
 class BInboundMailProtocol : public BMailProtocol {
 public:
-								BInboundMailProtocol(
+								BInboundMailProtocol(const char* name,
 									const BMailAccountSettings& settings);
 	virtual						~BInboundMailProtocol();
 
@@ -147,13 +149,17 @@ protected:
 
 class BOutboundMailProtocol : public BMailProtocol {
 public:
-								BOutboundMailProtocol(
+								BOutboundMailProtocol(const char* name,
 									const BMailAccountSettings& settings);
 	virtual						~BOutboundMailProtocol();
 
+	virtual	status_t			SendMessages(const BMessage& message,
+									off_t totalBytes);
+
 	virtual void				MessageReceived(BMessage* message);
 
-	virtual	status_t			SendMessages(const BMessage& message,
+protected:
+	virtual	status_t			HandleSendMessages(const BMessage& message,
 									off_t totalBytes) = 0;
 };
 

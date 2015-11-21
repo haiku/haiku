@@ -27,10 +27,11 @@ public:
 									const BMailAccountSettings& settings);
 	virtual						~SMTPProtocol();
 
+protected:
 			status_t			Connect();
 			void				Disconnect();
 
-	virtual	status_t			SendMessages(const BMessage& message,
+	virtual	status_t			HandleSendMessages(const BMessage& message,
 									off_t totalBytes);
 
 			status_t			Open(const char *server, int port, bool esmtp);

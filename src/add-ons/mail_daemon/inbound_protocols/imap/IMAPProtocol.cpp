@@ -15,7 +15,7 @@
 
 IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 	:
-	BInboundMailProtocol(settings),
+	BInboundMailProtocol("IMAP", settings),
 	fSettings(settings.Name(), settings.InboundSettings()),
 	fWorkers(5, false)
 {

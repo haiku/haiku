@@ -94,25 +94,6 @@ public:
 };
 
 
-class OutboundMessenger : public BMessenger {
-public:
-	OutboundMessenger(BOutboundMailProtocol* protocol)
-		:
-		BMessenger(protocol)
-	{
-	}
-
-	status_t SendMessages(const BMessage& files, off_t totalBytes)
-	{
-		BMessage message(kMsgSendMessages);
-		message.Append(files);
-		message.AddInt64("bytes", totalBytes);
-
-		return SendMessage(&message);
-	}
-};
-
-
 // #pragma mark -
 
 
@@ -498,12 +479,8 @@ MailDaemonApplication::SendPendingMessages(BMessage* msg)
 {
 	BVolumeRoster roster;
 	BVolume volume;
-
 	std::map<int32, send_mails_info> messages;
-
-	int32 account = -1;
-	if (msg->FindInt32("account", &account) != B_OK)
-		account = -1;
+	int32 account = msg->GetInt32("account", -1);
 
 	if (!msg->HasString("message_path")) {
 		while (roster.GetNextVolume(&volume) == B_OK) {
@@ -564,7 +541,7 @@ MailDaemonApplication::SendPendingMessages(BMessage* msg)
 		if (info.bytes == 0)
 			continue;
 
-		OutboundMessenger(protocol).SendMessages(info.files, info.bytes);
+		protocol->SendMessages(info.files, info.bytes);
 	}
 }
 
