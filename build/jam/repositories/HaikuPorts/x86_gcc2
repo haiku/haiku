@@ -178,6 +178,7 @@ RemotePackageRepository HaikuPorts
 	gutenprint_devel-5.2.10-1
 	gyp-r1948-2
 	gzip-1.6-2
+	hdialog-0.2-2
 	help2man-1.46.6-1
 	htmldoc-1.8.27-3
 	html_parser-3.71-1
@@ -1081,6 +1082,7 @@ RemotePackageRepository HaikuPorts
 	haikuporter
 #	haikuwebkit_x86
 	harfbuzz_x86
+	hdialog
 	help2man
 	htmldoc
 	html_parser
