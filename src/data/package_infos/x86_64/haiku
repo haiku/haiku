@@ -82,6 +82,8 @@ requires {
 	lib:libqrencode
 	lib:libtiff >= 5.2
 	lib:libwebp
+	lib:libssl >= 1.0.0
+	lib:libcrypto >= 1.0.0
 #endif
 	lib:libsolv
 	lib:libsolvext
