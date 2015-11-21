@@ -223,7 +223,7 @@ TPrefsWindow::TPrefsWindow(BPoint leftTop, BFont* font, int32* level,
 
 	fReplyPreambleMenu = _BuildReplyPreambleMenu();
 	menu = new BMenuField("replyPreamble", NULL, fReplyPreambleMenu);
-	menu->SetExplicitMaxSize(BSize(27, B_SIZE_UNSET));
+	menu->SetExplicitMaxSize(BSize(menu->MinSize().width, B_SIZE_UNSET));
 
 	mailLayout->AddItem(fReplyPreamble->CreateLabelLayoutItem(), 0, layoutRow);
 	mailLayout->AddItem(fReplyPreamble->CreateTextViewLayoutItem(), 1,
