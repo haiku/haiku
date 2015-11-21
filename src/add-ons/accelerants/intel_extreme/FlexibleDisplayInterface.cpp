@@ -262,6 +262,7 @@ FDILink::Train(display_mode* target)
 				__func__);
 			return _ManualTrain(lanes);
 		}
+		return B_OK;
 	}
 	return _ManualTrain(lanes);
 }
