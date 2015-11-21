@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-StyledEdit	2854691267
+1	croatian	x-vnd.Haiku-StyledEdit	993302155
 StyledEdit	System name		StyleEdit
 Paste	Menus		Zalijepi
 OK	LoadAlert		U redu
@@ -14,6 +14,7 @@ Page setup…	Menus		Postavke stranice...
 Print…	Menus		Ispis...
 Can't undo	Menus		Nemoguće vratiti korak nazad
 Save	Menus		Spremi
+Default	Menus		Zadano
 Replace with:	FindandReplaceWindow		Zamjeni sa:
 Cancel	SaveAlert		Otkaži
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nemoguće obrnuti, datoteka nije pronađena: \"%s\".
@@ -56,7 +57,7 @@ Cancel	QuitAlert		Poništi
 Find…	Menus		Pronađi...
 Select all	Menus		Odaberi sve
 Don't save	SaveAlert		Nemoj spremiti
-Error loading \"%s\":\n\t%s	LoadAlert		Greška pri učitavanju \"%s\":\n%s
+Error loading \"%s\":\n\t%s	LoadAlert		Greška pri učitavanju \"%s\":\n\t%s
 Untitled 	StyledEditWindow		Neimenovano 
 OK	SaveAlert		U redu
 Find	FindandReplaceWindow		Pronađi

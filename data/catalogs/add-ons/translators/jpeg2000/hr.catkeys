@@ -1,6 +1,7 @@
-1	croatian	x-vnd.Haiku-JPEG2000Translator	2432784737
+1	croatian	x-vnd.Haiku-JPEG2000Translator	855817675
 Write	JPEG2000Translator		Piši
 JPEG2000 images	JPEG2000Translator		JPEG2000 slike
+Version %d.%d.%d	JPEG2000Translator		Verzija %d.%d.%d
 Write black-and-white images as RGB24	JPEG2000Translator		Piši crno-bijele slike kao RGB24
 Output quality	JPEG2000Translator		Kvaliteta izlaza
 Read	JPEG2000Translator		Čitaj

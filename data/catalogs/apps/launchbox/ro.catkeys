@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-LaunchBox	4192523522
+1	romanian	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Nou
 Set description…	LaunchBox		Configurează descriere...
 Vertical layout	LaunchBox		Aranjament vertical
@@ -6,6 +6,7 @@ OK	LaunchBox		OK
 Pad 1	LaunchBox		Suport 1
 last chance	LaunchBox		ultima încercare
 Quit	LaunchBox		Părăsește
+Open containing folder	LaunchBox		Deschide dosarul conținător
 Clear button	LaunchBox		Eliberează buton
 LaunchBox	System name		CasetăLansare
 Ignore double-click	LaunchBox		Ignoră dublu-clic
@@ -24,6 +25,7 @@ Name Panel	LaunchBox		Panou nume
 Add button here	LaunchBox		Adăugați buton aici
 Description for '%3'	LaunchBox		Descriere pentru „%3”
 Settings	LaunchBox		Configurări
+Failed to launch 'something', error in Pad data.	LaunchBox		Nu s-a putut lansa 'ceva', eroare în data Pad.
 Pad %1	LaunchBox		Suport %1
 Close	LaunchBox		Închide
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		A eșuat trimiterea comenzii „deschide dosar” la Tracker.\n\nEroare:

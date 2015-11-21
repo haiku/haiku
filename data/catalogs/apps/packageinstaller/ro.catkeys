@@ -1,13 +1,18 @@
-1	romanian	x-vnd.Haiku-PackageInstaller	2667374063
+1	romanian	x-vnd.Haiku-PackageInstaller	591566249
 Install to:	PackageView		Instalează la:
 OK	PackageView		OK
 Accept	PackageTextViewer		Acceptare
 Continue	PackageInstall		Continuare
+The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Instalarea pachetului cerut a eșuat pe acest sistem. S-ar putea să fie o problemă cu fișierul pachet țintă. Consultați această problemă cu distribuitorul de pachete.
 Image not loaded correctly	PackageImageViewer		Imaginea nu s-a încărcat corect
 No package selected.	PackageInfo		Niciun pachet selectat.
+The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Se pare că pachetul dat este deja instalat în sistem. Doriți să-l dezinstalați pe cel existent și să continuați cu instalarea?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Doriți să țineți minte această decizie pentru restul acestei instalări?\n
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Se pare că există o nepotrivire de dimensiune de fișier în fișierul pachetului. Pachetul ar putea să fie corupt sau să fi fost modificat după crearea lui. Doriți să mai continuați?
 Error while installing the package\n	PackageView		Eroare în timpul instalării pachetului\n
+Disclaimer	PackageTextViewer		Declarație de neasumare a responsabiltății
 %name% (%size% free)	PackageView		%name% (%size% liber)
+The installation of the package has been aborted.	PackageView		Instalarea pachetului a fost anulată.
 Done	PackageInstall		Terminat
 All existing files will be replaced?	PackageView		Toate fișierele existente vor fi înlocuite?
 Preparing package	PackageInstall		Se pregătește pachetul
@@ -19,18 +24,33 @@ Other…	PackageView		Altele...
 No installation type selected	PackageView		Niciun tip de instalare selectat
 Installing files and folders	PackageInstall		Se instalează fișiere și dosare
 Package installer	PackageView		Instalator de pachete
+Skip all	PackageView		Omite tot
+The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Elementul '%s' există deja pe calea dată.\nÎl înlocuiți cu cel din acest pachet sau omiteți?
+The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Scriptul '%s' există deja pe calea dată.\nÎl îinlocuiți cu cel din acest pachet sau omiteți?
 Running post-installation scripts	PackageInstall		Se rulează scripturi post-instalare
+Skip	PackageView		Omite
+The directory named '%s' already exits in the given path.\nReplace the directory with one from this package or skip it?	PackageView		Dosarul '%s' există deja pe calea dată.\nÎl înlocuiți cu cel din acest pachet sau omiteți?
 The package you requested has been successfully installed on your system.	PackageView		Pachetul pe care l-ați solicitat a fost instalat cu succes în sistem.
 Error! \"%s\" is not a valid path.\n	Packageinstaller main		Eroare! \"%s\" nu este o cale validă.\n
 Installation type:	PackageView		Tip instalare:
 Error (%s)! Could not open \"%s\".\n	Packageinstaller main		Eroare (%s)! Nu s-a putut deschide \"%s\".\n
 Finishing installation	PackageInstall		Se termină instalarea
 Installing package	PackageStatus		Se instalează pachetul
+Ask again	PackageView		Întreabă din nou
+Abort	PackageView		Anulează
+Replace all	PackageView		Înlocuiește tot
 Decline	PackageTextViewer		Refuzare
+The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Fișierul '%s'  există deja pe calea dată.\nÎnlocuiți fișierul cu cel din acest pachet sau omiteți?
+All existing files will be skipped?	PackageView		Toate fișierele existente vor fi sărite?
 Continue	PackageInfo		Continuare
 %index% of %total%	PackageInstall		%index% din %total%
+Abort	PackageInfo		Anulează
 PackageInstaller	System name		PackageInstaller
+Abort	PackageInstall		Anulează
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Continuare
 Begin	PackageView		Început
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Legătura simbolică '%s' există deja pe calea dată.\nÎnlocuiți legătura cu aceea din acest pachet sau omiteți?
 Replace	PackageView		Înlocuire
+Installation progress	PackageView		Progres instalare
+The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Fișierul de pachet nu se poate citi.\nUnul din motivele posibile ar putea fi că fișierul solicitat nu este un pachet .pkg BeOS valid.

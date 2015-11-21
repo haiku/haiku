@@ -22,7 +22,7 @@ Uninstall	PackageManager		Deinstaliraj
 An error occurred while obtaining the package list: %message%	MainWindow		Došlo je do greške kod pribavljanja liste paketa: %poruka%
 Your rating was updated successfully.	RatePackageWindow		Ocjena je uspješno poslana.
 <no info>	PackageInfoView		<no info>
-An error occurred while initializing the package manager: %message%	MainWindow		Došlo je do greške pri iniciranju upravitelja paketima:%poruka%
+An error occurred while initializing the package manager: %message%	MainWindow		Došlo je do greške pri iniciranju upravitelja paketima: %poruka%
 Email address:	UserLoginWindow		Adresa e-pošte:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Vaše ocjenjivanje je uspješno poslano, Možete ga ažurirati ili ukloniti bilo kada ocjenjujući paket ponovno.
 Very unstable	RatePackageWindow		Vrlo nestabilan
@@ -50,12 +50,12 @@ Log out	MainWindow		Odjava
 Education	Model		Obrazovanje
 Search terms:	FilterView		Pojmovi pretrage:
 %Version%	PackageInfoView		%Verzija%
-An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Dogodila se greška kod osvježavanja repozitorija:%greška%(%pojedinosti%)
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Dogodila se greška kod osvježavanja repozitorija:%greška% (%pojedinosti%)
 It was not possible to contact the web service.	RatePackageWindow		Nije bilo moguće kontaktirati web servis.
 Create account	UserLoginWindow		Napravi račun
 Productivity	Model		Produktivnost
 Authentication failed	UserLoginWindow		Neuspjela ovjera
-Logged in as %User%	MainWindow		Prijavljen kao  %korisnik%
+Logged in as %User%	MainWindow		Prijavljen kao %korisnik%
 Language	RatePackageWindow		Jezik
 User name:	UserLoginWindow		Korisničko ime:
 User Menu	MainWindow		Korisnički izbornik
@@ -74,7 +74,7 @@ Cancel	MainWindow		Otkaži
 Update	RatePackageWindow		Ažuriraj
 Video	Model		Video
 All categories	FilterView		Sve kategorije
-An error occurred while refreshing the repository: %error%	MainWindow		Dogodila se greška kod osvježavanja repozitorija:%greška%
+An error occurred while refreshing the repository: %error%	MainWindow		Dogodila se greška kod osvježavanja repozitorija: %greška%
 Login or Create account	MainWindow		Prijava ili napravi račun
 OK	PackageInfoView		U redu
 Uninstalled	PackageListView		Deinstalirani
@@ -87,7 +87,7 @@ OK	UserLoginWindow		U redu
 Send	RatePackageWindow		Pošalji
 Category:	FilterView		Kategorija:
 Failed to create account	UserLoginWindow		Neuspjelo kreiranje računa
-There are problems with the data you entered:\n\n	UserLoginWindow		Ima problema sa podacima koje ste unijeli:\n
+There are problems with the data you entered:\n\n	UserLoginWindow		Ima problema sa podacima koje ste unijeli:\n\n
 Success	RatePackageWindow		Uspjeh
 Business	Model		Posao
 Audio	Model		Audio

@@ -1,4 +1,16 @@
-1	romanian	x-vnd.Haiku-TGATranslator	3023739273
+1	romanian	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		Salvează cu Compresie RLE
+Targa image (%d bits truecolor)	TGATranslator		Imagine Targa (%d biți truecolor)
 Ignore TGA alpha channel	TGAView		Ignoră canalul alfa TGA
+Targa image (%d bits colormap)	TGATranslator		Imagine Targa (%d biți colormap)
+TGA image translator	TGAView		Traducător imagine TGA
+Targa image (%d bits RLE colormap)	TGATranslator		Imagine Targa (%d biți colormap RLE)
+Targa image (%d bits gray)	TGATranslator		Imagine Targa (%d biți gri)
+Written by the Haiku Translation Kit Team	TGAView		Scris de Echipa de Traducători Haiku
+Targa image (%d bits RLE truecolor)	TGATranslator		Imagine Targa (%d biți RLE truecolor)
 TGA images	TGATranslator		Imagini TGA
+Version %d.%d.%d, %s	TGAView		Versiune %d.%d.%d, %s
+TGATranslator Settings	TGATranslator		Configurări TGATranslator
+TGA image translator	TGATranslator		Traducător imagine TGA
+Targa image (%d bits RLE gray)	TGATranslator		Imagine Targa (%d biți gri RLE)
 TGA Settings	TGAMain		Configurări TGA

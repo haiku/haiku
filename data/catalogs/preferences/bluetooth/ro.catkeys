@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-BluetoothPrefs	3310400226
+1	romanian	x-vnd.Haiku-BluetoothPrefs	3212620536
 About Bluetooth…	Window		Despre Bluetooth...
 Handheld	Settings view		Calculator de buzunar
 Default inquiry time:	Settings view		Timp implicit de întrebare:
@@ -29,6 +29,7 @@ Start please	main		Pornește
 Start bluetooth services…	Window		Pornește servicii bluetooth...
 Policy...	Settings view		Regulă...
 61 secs	Settings view		61 secunde
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Sistem Bluetooth Haiku, (ARCE)\n\nCreat de Oliver Ruiz Dorantes\n\nCu sprijinul al:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nMulțumesc persoanelor care au ajutat...\n\nExpediere/Donare hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomic:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nCu patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTestare:\n\t- Petter H. Juliussen\nCare mi-au dat toate cunoștințele:\n\t- echipa yellowTAB
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nu există niciun dispozitiv local Bluetooth înregistrat pe sistem.
 Identify us as...	Settings view		Identificare ca...
  packets: 	Device View		 pachete: 

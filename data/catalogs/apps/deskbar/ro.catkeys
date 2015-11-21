@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-TSKB	2450865335
+1	romanian	x-vnd.Be-TSKB	2335730970
 Power off	DeskbarMenu		Oprire
 Sort applications by name	PreferencesWindow		Sortează aplicații după nume
 Suspend	DeskbarMenu		Suspendare
@@ -22,13 +22,17 @@ Always on top	PreferencesWindow		Întotdeauna deasupra
 Show all	WindowMenu		Afișează tot
 No windows	WindowMenu		Fără ferestre
 Deskbar	System name		Deskbar
+Restart system	DeskbarMenu		Repornire sistem
+Large	PreferencesWindow		Mare
 Auto-raise	PreferencesWindow		Auto-montează
 Recent folders:	PreferencesWindow		Dosare recente:
 Show application expander	PreferencesWindow		Afișează extensorul de aplicație
+Restart Tracker	DeskbarMenu		Repornire Tracker
 Close all	WindowMenu		Închide tot
 Deskbar preferences	PreferencesWindow		Preferințe Deskbar
 Mount	DeskbarMenu		Montare
 Revert	PreferencesWindow		Revenire
+Small	PreferencesWindow		Mic
 Recent applications:	PreferencesWindow		Aplicații recente:
 Shutdown…	DeskbarMenu		Oprire...
 Tracker always first	PreferencesWindow		Trackerul întotdeauna primul
@@ -38,6 +42,7 @@ About this system	DeskbarMenu		Despre acest sistem
 Show calendar…	TimeView		Afișează calendar...
 Deskbar preferences…	DeskbarMenu		Preferințe Deskbar...
 Expand new applications	PreferencesWindow		Extinde aplicații noi
+Show replicants	DeskbarMenu		Arată replicanții
 Hide application names	PreferencesWindow		Ascunde numele aplicațiilor
 Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo-uri
 Icon size	PreferencesWindow		Dimensiune pictogramă

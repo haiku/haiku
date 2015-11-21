@@ -1,4 +1,5 @@
-1	romanian	x-vnd.Haiku-WebPositive	871083171
+1	romanian	x-vnd.Haiku-WebPositive	1282126593
+Show home button	Settings Window		Afișează butonul home
 Username:	Authentication Panel		Nume utilizator:
 Copy URL to clipboard	Download Window		Copiază URL în clipboard
 Cancel	Settings Window		Anulează
@@ -7,55 +8,84 @@ Quit	WebPositive		Renunţă
 The download could not be opened.	Download Window		Descărcarea nu a putut fi deschisă.
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Dosarul de descărcări nu a putut fi deschis..\n\nEroare: %error
 Open location	WebPositive Window		Deschide locația
+Clear history	WebPositive Window		Șterge istoricul
 WebPositive	System name		WebPositive
 Yesterday	WebPositive Window		Ieri
+Default standard font size:	Settings Window		Dimensiune font standard implicită:
 Start page:	Settings Window		Pagină de start:
 History	WebPositive Window		Istoric
 Error opening downloads folder	Download Window		Eroare la deschiderea dosarului de descărcări
 Paste	WebPositive Window		Lipire
+Expiration	Cookie Manager		Expirare
+Double-click or middle-click to open new tab.	Tab Manager		Dublu clic sau clic mijloc pentru a descide un tab nou.
 Proxy username:	Settings Window		Nume utilizator proxy:
 Save page as…	WebPositive Window		Salvează pagina ca…
 Over %days left	Download Window		Peste %days rămase
 Settings	Settings Window		Configurări
 Confirmation	WebPositive Window		Confirmare
 Window	WebPositive Window		Fereastră
+Cookie manager	Cookie Manager		Manager cookie
+Decrease size	WebPositive Window		Micșorează dimensiune
 Serif font:	Settings Window		Font serif:
 Loading %url	WebPositive Window		Se încarcă %url
+Download aborted	Download Window		Descărcare abandonată
+Value	Cookie Manager		Valoare
 Page source	WebPositive Window		Sursa paginii
 Next	WebPositive Window		Următorul
+Find next	WebPositive Window		Caută următorul
 Download folder:	Settings Window		Dosar descărcări:
 Edit	WebPositive Window		Editează
 Cancel	Authentication Panel		Anulează
+Match case	WebPositive Window		Majuscule semnificative
 Search page:	Settings Window		Caută pagina:
+Zoom text only	WebPositive Window		Mărește numai textul
+Default fixed font size:	Settings Window		Dimensiune font fixat implicită:
 Close tab	WebPositive Window		Închide tabul
-Quit	WebPositive Window		Renunţă
-Full screen	WebPositive Window		Ecran complet
+Auto-hide mouse pointer	Settings Window		Ascunde automat indicatorul mouseului
+Quit	WebPositive Window		Ieșire
+Full screen	WebPositive Window		Pe tot ecranul
 Open download error	Download Window		Deschide eroarea descărcării
+The cookie jar is empty!	Cookie Manager		Borcanul cu cookie este liber!
 Standard font:	Settings Window		Font standard:
+Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Caută apariția anterioară a textului căutat
 Restart	Download Window		Repornire
 Proxy server	Settings Window		Server proxy
+Open containing folder	Download Window		Deschide dosarul conținător
 New window	WebPositive Window		Fereastră nouă
 WebPositive	Download Window		WebPositive
 Open	Download Window		Deschide
 Reload	WebPositive Window		Reîncarcă
 Downloads	Download Window		Descărcări
 Sans serif font:	Settings Window		Font sans serif:
+Delete	Cookie Manager		Șterge
 Forward	WebPositive Window		Înainte
 of	Download Window	...as in '12kB of 256kB'	din
 Revert	Settings Window		Revenire
 Fixed font:	Settings Window		Font fix:
 Cut	WebPositive Window		Tăiere
+Bookmark this page	WebPositive Window		Însemnează această pagină
+There was an error trying to show the Bookmarks folder.\n\nError: %error	WebPositive Window	Don't translate variable %error	A apărut o eroare încercând să afișez dosarul Favorite.\n\nEroare: %error
 Open downloads folder	Download Window		Deschide dosarul de descărcări
 Proxy password:	Settings Window		Parolă proxy:
+Number of days to keep links in History menu:	Settings Window		Număr de zile de păstrare a legăturilor in meniul Istoric:
 Hide	Download Window		Ascunde
+Reset size	WebPositive Window		Restabilește dimensiunea
 Find:	WebPositive Window		Caută:
 Increase size	WebPositive Window		Mărește dimensiunea
+There was an error retrieving the bookmark folder.\n\nError: %error	WebPositive Window	Don't translate the variable %error	A apărut o eroare la obținerea dosarului de favorite.\n\nEroare: %error
 Downloads	WebPositive Window		Descărcări
+Requesting %url	WebPositive Window		Se solicită %url
+Find next occurrence of search terms	WebPositive Window	find bar next button tooltip	Găsește următoarea apariție a elementelor căutate
 Apply	Settings Window		Aplică
+Bookmark info	WebPositive Window		Informație favorit
 Size:	Font Selection view		Dimensiune:
+Show tabs if only one page is open	Settings Window		Afișează taburile dacă doar o pagină este deschisă
 About	WebPositive Window		Despre
+Finish: 	Download Window	Finishing time	Terminare: 
 Fonts	Settings Window		Fonturi
 OK	Download Window		OK
+Page source error	WebPositive Window		Eroare a paginii sursă
+Open blank page	Settings Window		Deschide pagină goală
 New tabs:	Settings Window		Taburi noi:
 Cancel	WebPositive Window		Anulează
 Open all	WebPositive Window		Deschide toate
@@ -69,26 +99,34 @@ Find	WebPositive Window		Căutare
 Find previous	WebPositive Window		Caută precedentul
 Settings	WebPositive Window		Configurări
 Script console	WebPositive Window		Consola scriptului
+Name	Cookie Manager		Nume
 Proxy server address:	Settings Window		Adresă server proxy:
 Proxy server port:	Settings Window		Port server proxy:
 Bookmarks	WebPositive Window		Semne de carte
 Paste	URL Bar		Lipire
+Cookie manager	WebPositive Window		Manager cookie
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Ascunde textul parolei
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Șipotul țâșnește hipnotic azvârlindu-se în mrejele bălții fumegânde
 Over 1 minute left	Download Window		Peste un minut rămas
 Open start page	Settings Window		Deschide pagina de start
 Continue downloads	WebPositive		Continuă descărcări
 Cancel	Download Window		Anulează
+Flags	Cookie Manager		Indicatori
 Open search page	Settings Window		Deschide pagina de căutare
 Clear	Console Window		Eliberează
 Password:	Authentication Panel		Parolă:
+Path	Cookie Manager		Cale
 Back	WebPositive Window		Înapoi
+New browser window	Download Window		Fereastră navigator nouă
 Today	WebPositive Window		Astăzi
 Over %hours left	Download Window		Peste %hours rămase
 Remember username and password for this site	Authentication Panel		Ține minte numele de utilizator și parola pentru această pagină
 Earlier	WebPositive Window		Mai devreme
 Authentication required	Authentication Panel		Autentificare necesară
 Use proxy server to connect to the internet	Settings Window		Utilizează server proxy pentru conectare la internet
+There are still downloads in progress, do you really want to quit WebPositive now?	WebPositive		Mai sunt încă descărcări în progres, sigur doriți să închideți WebPositive acum?
+Auto-hide interface in full screen mode	Settings Window		Ascunde automat interfața în modul ecran complet
 %url failed	WebPositive Window	Loading URL failed. Don't translate variable %url.	%url a eșuat
 %seconds left	Download Window		%seconds rămase
 New tab	WebPositive Window		Tab nou
@@ -96,11 +134,24 @@ Downloads in progress	WebPositive		Descărcări în progres
 Style:	Font Selection view		Stil:
 General	Settings Window		General
 View	WebPositive Window		Vizualizare
+Previous	WebPositive Window		Precedent
+There was an error creating the bookmark file.\n\nError: %error	WebPositive Window	Don't translate variable %error	A apărut o eroare la crearea fișierului favorit.\n\nEroare: %error
+Bookmark error	WebPositive Window		Eroare de favorit
+Do you really want to clear the browsing history?	WebPositive Window		Sigur doriți să ștergeți istoricul navigării?
 Copy	WebPositive Window		Copiază
+Open bookmarks confirmation	WebPositive Window		Deschide confirmarea favoritului
+Remove missing	Download Window		Elimină ce lipsește
 Clone current page	Settings Window		Clonează pagina curentă
+Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Doriți să deschideți %addedCount favorite dintr-o dată?
+Session cookie	Cookie Manager		Cookie sesiune
 OK	Authentication Panel		OK
 Copy	URL Bar		Copiază
 Download finished	Download Window		Descărcare terminată
+Show bookmark bar	WebPositive Window		Afișează bară favorite
 OK	WebPositive Window		OK
+Manage bookmarks	WebPositive Window		Administrează favorite
+A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Există deja un favorit pentru această pagină (%bookmarkName).
+Cookies for %s	Cookie Manager		Cookies pentru %s
 New windows:	Settings Window		Ferestre noi:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url s-a terminat.
+Remove finished	Download Window		Eliminare terminată

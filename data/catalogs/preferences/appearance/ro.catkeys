@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Appearance	4022094371
+1	romanian	x-vnd.Haiku-Appearance	727801787
 Plain font:	Font view		Font simplu:
 Control highlight	Colors tab		Punct principal de control
 Control border	Colors tab		Margine de control
@@ -24,34 +24,46 @@ Tooltip background	Colors tab		Fundalul indiciului
 Selected menu item background	Colors tab		Fundalul elementului de meniu selectat
 Antialiasing	APRWindow		Anti-alias
 Navigation base	Colors tab		Bază de navigare
+Selected list item text	Colors tab		Textul elementului din listă selectat
 Window border	Colors tab		Margine fereastră
+Double:	DecorSettingsView		Dublu:
 Window tab text	Colors tab		Text fereastră tab
 Document text	Colors tab		Document text
 Navigation pulse	Colors tab		Puls de navigare
 Selected menu item text	Colors tab		Textul elementului de meniu selectat
 Menu background	Colors tab		Fundalul meniului
+List background	Colors tab		Fundal listă
 OK	DecorSettingsView		OK
+Control mark	Colors tab		Semn control
 Size:	Font Selection view		Dimensiune:
 Decorator:	DecorSettingsView		Decorator:
+Selected list item background	Colors tab		Fundalul elementului din listă selectat
 Panel background	Colors tab		Fundalul panoului
 Menu font:	Font view		Font meniu:
 Colors	APRWindow		Culori
 Control background	Colors tab		Fundalul controlului   
 Inactive window tab	Colors tab		Fereastră tab inactivă
+List item text	Colors tab		Textul elementului din listă
 Appearance	System name		Aspect
 Fixed font:	Font view		Font fix:
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Cosașul se azvârli hipnotic în mrejele bălții fumegânde.
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nAutori:\n\t%decorAuthors\n\nURL: %decorURL\nLicență: %decorLic\n\n%decorDesc\n
 Reduce colored edges filter strength:	AntialiasingSettingsView		Reduce intensitatea filtrului marginilor colorate:
 Subpixel based anti-aliasing in combination with glyph hinting is not available in this build of Haiku to avoid possible patent issues. To enable this feature, you have to build Haiku yourself and enable certain options in the libfreetype configuration header.	AntialiasingSettingsView		Anti-aliasul pe bază de subpixel în combinație cu indiciul glyph nu este diponibilă în această versiune compilată Haiku pentru a evita problemele posibile de încălcare a proprietății intelectuale. Pentru a face disponibilă această caracteristică, trebuie să construiți o altă variantă Haiku și să activați anumite opțiuni în antetul de configurație libfreetype.
+Scroll bar thumb	Colors tab		Miniatură bară de derulare
 Control text	Colors tab		Text de control
+Single:	DecorSettingsView		Unic:
 Tooltip text	Colors tab		Text de indiciu
+Bold font:	Font view		Font aldin
 Inactive window border	Colors tab		Margine fereastră inactivă
 Menu item text	Colors tab		Text de element meniu
 LCD subpixel	AntialiasingSettingsView		Subpixel LCD
 Selected menu item border	Colors tab		Marginea elementului de meniu selectat
 Strong	AntialiasingSettingsView		Îngroșat
 Panel text	Colors tab		Text de panou
+Arrow style	DecorSettingsView		Stil săgeată
 Monospaced fonts only	AntialiasingSettingsView		Doar fonturi monospațiate
+Look and feel	APRWindow		Aspect
 Antialiasing menu	AntialiasingSettingsView		Meniu anticrenelare
 Fonts	APRWindow		Fonturi
 Glyph hinting:	AntialiasingSettingsView		Indiciu glyph:

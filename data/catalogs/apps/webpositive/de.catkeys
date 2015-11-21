@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-WebPositive	98059607
+1	german	x-vnd.Haiku-WebPositive	1282126593
 Show home button	Settings Window		Home-Symbol anzeigen
 Username:	Authentication Panel		Benutzername:
 Copy URL to clipboard	Download Window		Adresse kopieren
@@ -16,6 +16,7 @@ Start page:	Settings Window		Startseite:
 History	WebPositive Window		Verlauf
 Error opening downloads folder	Download Window		Fehler beim Öffnen des Download-Ordners
 Paste	WebPositive Window		Einfügen
+Expiration	Cookie Manager		Ablaufdatum
 Double-click or middle-click to open new tab.	Tab Manager		Doppel- oder Mittelklick, um neuen Reiter zu öffnen.
 Proxy username:	Settings Window		Proxy-Nutzername:
 Save page as…	WebPositive Window		Seite speichern unter…
@@ -23,10 +24,12 @@ Over %days left	Download Window		Noch über %days Tage
 Settings	Settings Window		Einstellungen
 Confirmation	WebPositive Window		Bestätigung
 Window	WebPositive Window		Fenster
+Cookie manager	Cookie Manager		Cookieverwaltung
 Decrease size	WebPositive Window		Verkleinern
 Serif font:	Settings Window		Serifenschrift:
 Loading %url	WebPositive Window		%url wird geladen
 Download aborted	Download Window		Download abgebrochen
+Value	Cookie Manager		Wert
 Page source	WebPositive Window		Quelltext der Seite
 Next	WebPositive Window		Vorwärts
 Find next	WebPositive Window		Nächster Treffer
@@ -42,16 +45,19 @@ Auto-hide mouse pointer	Settings Window		Mauszeiger automatisch ausblenden
 Quit	WebPositive Window		Beenden
 Full screen	WebPositive Window		Vollbild
 Open download error	Download Window		Fehler beim Öffnen
+The cookie jar is empty!	Cookie Manager		Keine Cookies vorhanden!
 Standard font:	Settings Window		Standardschrift:
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Vorheriger Treffer
 Restart	Download Window		Neustart
 Proxy server	Settings Window		Proxy-Server
 Open containing folder	Download Window		Speicherort öffnen
 New window	WebPositive Window		Neues Fenster
+WebPositive	Download Window		WebPositive
 Open	Download Window		Öffnen
 Reload	WebPositive Window		Aktualisieren
 Downloads	Download Window		Downloads
 Sans serif font:	Settings Window		Serifenlose Schrift:
+Delete	Cookie Manager		Löschen
 Forward	WebPositive Window		Vorwärts
 of	Download Window	...as in '12kB of 256kB'	von
 Revert	Settings Window		Anfangswerte
@@ -93,10 +99,12 @@ Find	WebPositive Window		Suchen
 Find previous	WebPositive Window		Vorheriger Treffer
 Settings	WebPositive Window		Einstellungen
 Script console	WebPositive Window		Skript-Konsole
+Name	Cookie Manager		Bezeichnung
 Proxy server address:	Settings Window		Proxy-Serveradresse:
 Proxy server port:	Settings Window		Proxy-Serverport:
 Bookmarks	WebPositive Window		Lesezeichen
 Paste	URL Bar		Einfügen
+Cookie manager	WebPositive Window		Cookieverwaltung
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Passwort verstecken
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Falsches Üben von Xylophonmusik quält jeden größeren Zwerg.
@@ -104,9 +112,11 @@ Over 1 minute left	Download Window		Noch über 1 Minute
 Open start page	Settings Window		Startseite öffnen
 Continue downloads	WebPositive		Downloads fortsetzen
 Cancel	Download Window		Abbrechen
+Flags	Cookie Manager		Kennzeichen
 Open search page	Settings Window		Suchmaschine öffnen
 Clear	Console Window		Leeren
 Password:	Authentication Panel		Passwort:
+Path	Cookie Manager		Pfad
 Back	WebPositive Window		Zurück
 New browser window	Download Window		Neues Browser-Fenster
 Today	WebPositive Window		Heute
@@ -133,6 +143,7 @@ Open bookmarks confirmation	WebPositive Window		Lesezeichen öffnen
 Remove missing	Download Window		Fehlende entfernen
 Clone current page	Settings Window		Aktuelle Seite verwenden
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Sollen alle %addedCount Lesezeichen auf einmal geöffnet werden?
+Session cookie	Cookie Manager		Sitzungs-Cookie
 OK	Authentication Panel		OK
 Copy	URL Bar		Kopieren
 Download finished	Download Window		Download abgeschlossen
@@ -140,6 +151,7 @@ Show bookmark bar	WebPositive Window		Lesezeichenleiste einblenden
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Lesezeichen verwalten
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Es existiert bereits ein Lesezeichen für diese Seite (%bookmarkName).
+Cookies for %s	Cookie Manager		Cookies für %s
 New windows:	Settings Window		Neue Fenster:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url geladen
 Remove finished	Download Window		Fertige entfernen

@@ -1,6 +1,7 @@
-1	croatian	x-vnd.Haiku-libtracker	2305255954
+1	croatian	x-vnd.Haiku-libtracker	1923324920
 OK	WidgetAttributeText		U redu
 Add-ons	FilePanelPriv		Dodaci
+Mount settings…	ContainerWindow		Postavke za montiranje...
 Desktop	Model		Radna površina
 Identify	ContainerWindow		Identificiraj
 Warning space color	SettingsView		Boja upozoravajućeg prostora
@@ -56,6 +57,7 @@ Name = %name	FindPanel	FindResultTitle	Ime = %ime
 Are you sure you want to move or copy the selected item(s) to this folder?	PoseView		Jeste li sigurni da želite premjestiti ili kopirati odabranu stavku(e) u ovu mapu?
 Does not handle file	OpenWithWindow		Ne rukuje datotekom
 Arrange by	ContainerWindow		Posloži po
+Mount server error	AutoMounterSettings		Greška montiranja poslužitelja
 Search	FindPanel		Traži
 Preparing to empty Trash…	StatusWindow		Priprema za pražnjenje smeća...
 Disks	Model		Diskovi
@@ -158,6 +160,7 @@ Preparing to restore items…	StatusWindow		Pripremanje da se vrate stavke..
 Replace other file	WidgetAttributeText		Zamjeni drugu datoteku
 48 x 48	ContainerWindow		48 x 48
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Označena stavka nemože biti pomaknuta u smeće. Želite izbrisati(ovu operaciju nemožete vratiti)
+Invert	SelectionWindow		Obrnuto
 rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	preimenujte
 Find	FindPanel		Nađi
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Premjesti

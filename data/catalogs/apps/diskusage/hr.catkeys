@@ -1,5 +1,8 @@
-1	croatian	x-vnd.Haiku-DiskUsage	1764668385
+1	croatian	x-vnd.Haiku-DiskUsage	3802310970
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%veličina% u {0, množina, jedna{# datoteka} ostalo{# datoteke}}
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d datoteke
 Size	Info Window		Veličina
+Rescan	Pie View		Ponovno skeniraj
 Kind	Info Window		Vrsta
 file unavailable	Pie View		datoteka nedostupna
 Path	Info Window		Putanja

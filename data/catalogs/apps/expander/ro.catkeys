@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Expander	2825579001
+1	romanian	x-vnd.Haiku-Expander	2177073262
 Expand	ExpanderMenu		Extinde
 Close window when done expanding	ExpanderPreferences		Închide fereastra atunci când s-a încheiat extinderea
 Set destination…	ExpanderMenu		Setează destinația…
@@ -16,9 +16,13 @@ Cancel	ExpanderWindow		Renunță
 Automatically expand files	ExpanderPreferences		Extinde fișiere automat
 Creating listing for '%s'	ExpanderWindow		Se creează enumerarea pentru „%s”
 Continue	ExpanderWindow		Continuă
+Destination folder	ExpanderPreferences		Dosar destinație
+Other	ExpanderPreferences		Altele
 Cancel	ExpanderPreferences		Anulează
+Expansion	ExpanderPreferences		Expansiune
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ești sigur că vrei să oprești extinderea\nacestei arhive? Elementele dezarhivate pot fi incomplete.
 Select	DirectoryFilePanel		Selectează
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Dosarul de destinație nu există. Doriți să-l creați?
 Same directory as source (archive) file	ExpanderPreferences		Același dosar ca fișierul sursă (arhivă)
 Expanding '%s'	ExpanderWindow		Se extinde „%s”
 Settings	ExpanderMenu		Setări
@@ -29,7 +33,9 @@ Show contents	ExpanderWindow		Afișează conținut
 Automatically show contents listing	ExpanderPreferences		Afișează automat enumerarea conținuturilor
 OK	ExpanderPreferences		OK
 Leave destination folder path empty	ExpanderPreferences		Lasă goală calea dosarului de destinație
+Failed to create the destination folder.	ExpanderWindow		Nu s-a putut crea dosarul de destinație.
 Select '%s'…	DirectoryFilePanel		Selectează '%s'...
+Create	ExpanderWindow		Creează
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Dosarul a fost mutat, redenumit\nsau nu este suportat.
 The file doesn't exist	ExpanderWindow		Fișierul nu există
 Stop	ExpanderMenu		Oprește

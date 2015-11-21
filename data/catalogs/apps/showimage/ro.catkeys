@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ShowImage	910320152
+1	romanian	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Utilizează ca fundal...
 File	Menus		Fișier
 Slide delay	Menus		Întârziere imagine
@@ -21,9 +21,11 @@ Edit	Menus		Editează
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Nu s-a putut încărca imaginea! Fișierul sau un traducător de imagine nu există pentru aceasta.
 First page	Menus		Prima pagină
 The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Documentul '%s' (pagina %d) a fost modificat. Doriți să închideți documentul?
+Leave full screen	Menus		Părăsește pe tot ecranul
 Close	Menus		Închide
 Close	ClosePrompt		Închide
 Resize to (in 1/72 inches):	PrintOptionsWindow		Redimensionează la (în 1/72 țoli):
+Rating	Menus		Evaluare
 Flip left to right	Menus		Inversează stânga cu dreapta
 Show caption in full screen mode	Menus		Afișează legendă în modul ecran complet
 DPI:	PrintOptionsWindow		DPI:
@@ -42,12 +44,15 @@ Progress monitor	ProgressWindow		Monitor de progres
 Last page	Menus		Ultima pagină
 Stretch to window	Menus		Întinde la fereastră
 Previous file	Menus		Fișier anterior
+ShowImage	System name		ShowImage
 Slide show	Menus		Succesiune imagini
 Fit image to page	PrintOptionsWindow		Potrivește imagine la pagină
 Flip top to bottom	Menus		Inversează sus cu jos
 Select all	Menus		Selectează tot
+Zoom factor in %:	PrintOptionsWindow		Factor de mărire %:
 Width:	PrintOptionsWindow		Lățime:
 Image	Menus		Imagine
+Move to Trash	Menus		Mută la gunoi
 OK	Alerts		OK
 Rotate clockwise	Menus		Rotește în sens orar
 Job setup	PrintOptionsWindow		Configurare sarcină

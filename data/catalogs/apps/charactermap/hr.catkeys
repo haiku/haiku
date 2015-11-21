@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-CharacterMap	1727845192
+1	croatian	x-vnd.Haiku-CharacterMap	909726968
 View	CharacterWindow		Pogled
 Hebrew	UnicodeBlocks		Hebrejski
 Khmer	UnicodeBlocks		Kmerski
@@ -16,6 +16,7 @@ Cuneiform	UnicodeBlocks		Klinasto pismo
 Phonetic extensions	UnicodeBlocks		Fonetička proširenja
 Khmer symbols	UnicodeBlocks		Kmerski simboli
 Tagbanwa	UnicodeBlocks		Tagbanwa
+Kanbun	UnicodeBlocks		Kanbun
 Syriac	UnicodeBlocks		Sirijski
 Musical symbols	UnicodeBlocks		Glazbeni simboli
 Coptic	UnicodeBlocks		Koptski
@@ -34,6 +35,7 @@ Small form variants	UnicodeBlocks		Varijante malih oblika
 IPA extensions	UnicodeBlocks		IPA proširenja
 Thaana	UnicodeBlocks		Thaana
 Ogham	UnicodeBlocks		Ogham
+Combining diacritical marks for symbols	UnicodeBlocks		Kombinirane dijakritičke oznake za simbole
 Syloti Nagri	UnicodeBlocks		Syloti Nagri
 Arabic supplement	UnicodeBlocks		Arapski nadomjestak
 Latin extended C	UnicodeBlocks		Latinični prošireni C
@@ -67,6 +69,7 @@ Miscellaneous symbols	UnicodeBlocks		Ostali simboli
 Old Persian	UnicodeBlocks		Staroperzijski
 Myanmar	UnicodeBlocks		Mijanmarski
 Latin extended D	UnicodeBlocks		Latinični prošireni D
+Byzantine musical symbols	UnicodeBlocks		Bizantski glazbeni simboli
 Tibetan	UnicodeBlocks		Tibetanski
 Ancient Greek numbers	UnicodeBlocks		Starogrčki brojevi
 Vai	UnicodeBlocks		Vai
@@ -82,15 +85,20 @@ CJK unified ideographs extension B	UnicodeBlocks		CJK ujedinjeni ideografi proš
 Tai Xuan Jing symbols	UnicodeBlocks		Tai Xuan Jing simboli
 Buhid	UnicodeBlocks		Buhid
 Telugu	UnicodeBlocks		Telugu
+Thai	UnicodeBlocks		Tajlandski
 Gurmukhi	UnicodeBlocks		Gurmuki
 CharacterMap	System name		Karta znakova
+Lao	UnicodeBlocks		Lao
 Gothic	UnicodeBlocks		Gotički
+Limbu	UnicodeBlocks		Limbu
+Rejang	UnicodeBlocks		Rejang
 Phoenician	UnicodeBlocks		Fenički
 Mongolian	UnicodeBlocks		Mongolski
 Supplemental arrows A	UnicodeBlocks		Dodatne strelice A
 Miscellaneous symbols and arrows	UnicodeBlocks		Ostali simboli i strelice
 Yijing hexagram symbols	UnicodeBlocks		Yijing heksagramski simboli
 Supplemental mathematical operators	UnicodeBlocks		Nadomjesni matematički operatori
+Kayah Li	UnicodeBlocks		Kayah Li
 Alphabetic presentation forms	UnicodeBlocks		Oblici abecednog prikaza
 Halfwidth and fullwidth forms	UnicodeBlocks		Obrasci polovične i pune širine
 Latin extended B	UnicodeBlocks		Latinični prošireni B

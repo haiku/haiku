@@ -1,8 +1,10 @@
-1	romanian	x-vnd.Haiku-DeskCalc	2724783408
+1	romanian	x-vnd.Haiku-DeskCalc	1694821448
 Compact	CalcView		Compact
 Scientific	CalcView		Științific
 DeskCalc	System name		DeskCalc
 Basic	CalcView		Simplu
 Radians	CalcView		Radiani
 Enable Num Lock on startup	CalcView		Activează tasta Num Lock la pornire
+Calculating	CalcView		Calculare
+Degrees	CalcView		Grade
 Audio Feedback	CalcView		Reacție audio

@@ -1,8 +1,10 @@
-1	romanian	x-vnd.Haiku-PowerStatus	3224068645
+1	romanian	x-vnd.Haiku-PowerStatus	3969330583
 Design capacity low warning: 	PowerStatus		Avertisment de capacitate redusă model:
 Show percent	PowerStatus		Afișează procentaj
 Design capacity: 	PowerStatus		Capacitate model:
  mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		Nivelul bateriei devine scăzut, puneți în priză dispozitivul.
+Battery low	PowerStatus		Baterie scăzută
 Type: 	PowerStatus		Tip:
 non-rechargeable	PowerStatus		nu este reîncărcabilă
 Empty battery slot	PowerStatus		Fantă liberă de baterie
@@ -27,10 +29,12 @@ Install in Deskbar	PowerStatus		Instalează pe bara de desktop
 Capacity: 	PowerStatus		Capacitate:
 Battery discharging	PowerStatus		Se descarcă bateria
 Serial number: 	PowerStatus		Număr de serie:
+Battery critical	PowerStatus		Baterie critică
 Capacity granularity 1: 	PowerStatus		Capacitate de granulozitate 1:
 OEM info: 	PowerStatus		Info OEM:
 Design voltage: 	PowerStatus		Voltaj model:
 Battery charging	PowerStatus		Se încarcă bateria
+The battery level is critical, please plug in the device immediately.	PowerStatus		Nivelul bateriei este critic, puneți în priză dispozitivul acum.
 Design capacity warning: 	PowerStatus		Avertisment capacitate model:
 Battery info	PowerStatus		Info baterie
 Quit	PowerStatus		Părăsește

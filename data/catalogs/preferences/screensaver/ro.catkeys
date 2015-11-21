@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ScreenSaver	3955331319
+1	romanian	x-vnd.Haiku-ScreenSaver	557704281
 Could not load screen saver	ScreenSaver		Nu s-a putut încărca protectorul de ecran
 30 seconds	ScreenSaver		30 de secunde
 Start screensaver	ScreenSaver		Pornește protectorul de ecran
@@ -10,7 +10,9 @@ Display Power Management Signaling not available	ScreenSaver		Semnalarea afișaj
 ScreenSaver	System name		ProtectorEcran
 Test	ScreenSaver		Testează
 General	ScreenSaver		General
+Fade now when mouse is here	ScreenSaver		Estompează acum când mouse-ul este aici
 Enable screensaver	ScreenSaver		Activează protectorul de ecran
+Don't fade when mouse is here	ScreenSaver		Nu estompa când mouse-ul este aici
 Cancel	ScreenSaver		Anulează
 Turn off screen	ScreenSaver		Închide ecranul
 No options available	ScreenSaver		Nu există opțiuni disponibile

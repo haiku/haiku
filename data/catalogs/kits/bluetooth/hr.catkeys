@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Bluetooth	3064073961
+1	croatian	x-vnd.Haiku-Bluetooth	2418272625
 Display	DeviceClass		Zaslon
 Printer	DeviceClass		Pisač
 Uncategorized	DeviceClass		Nesortirano
@@ -8,6 +8,7 @@ Phone	DeviceClass		Telefon
 Controller	DeviceClass		Kontroler
 No service available	DeviceClass		Nema dostupnih servisa
 Handheld	DeviceClass		Priručni
+Invalid device class!\n	DeviceClass		Neispravna klasa uređaja!\n
 Computer	DeviceClass		Računalo
 Cellular	DeviceClass		Mobitel
 Microphone	DeviceClass		Mikrofon
@@ -26,6 +27,7 @@ SIM card reader	DeviceClass		Čitač SIM kartica
 Headphones	DeviceClass		Slušalice
 Information	DeviceClass		Informacija
 Remote control	DeviceClass		Udaljena kontrola
+Gaming/Toy	DeviceClass		Igranje/Igračka
 Audio	DeviceClass		Audio
 Robot	DeviceClass		Robot
 Loudspeaker	DeviceClass		Zvučnik

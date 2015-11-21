@@ -1,7 +1,8 @@
-1	romanian	x-vnd.Be-MAIL	1489865428
+1	romanian	x-vnd.Be-MAIL	1865394837
 View	Mail		Vizualizare
 %d - Date	Mail		%d - Dată
 Attach attributes:	Mail		Atașează atribute:
+Unknown	Mail		Necunoscut
 Inconsistency occurred in the undo/redo buffer.	Mail		A apărut o inconsecvență în preîncărcarea refă/repetă.
 An error occurred trying to save the attachment.	Mail		A apărut o eroare când s-a încercat salvarea atașamentului.
 Copy to new	Mail		Copiază la nou
@@ -10,12 +11,14 @@ Edit	Mail		Editează
 Print	Mail		Tipărește
 <none>	Mail		<nimic>
 New mail message	Mail		Mesaj email nou
+Untitled	Mail		Fără titlu
 Automatic	Mail		Automat
 Automatically mark mail as read:	Mail		Marchează automat mailul ca citit:
 helpful message	Mail		mesaj ajutător
 Colored quotes:	Mail		Citate colorate:
 Subject:	Mail		Subiect:
 Reply to all	Mail		Răspunde la toate
+Enclosure: %name% (Type: %type%)	Mail	Don't translate the variables %name% and %type%.	Închidere: %name% (Tip: %type%)
 Show icons & labels	Mail		Afișează pictograme & etichete
 Remove attachment	Mail		Elimină atașament
 Button bar:	Mail		Bară de butoane:
@@ -25,6 +28,7 @@ Don't save	Mail		Nu salva
 Expert	Mail		Expert
 Reply account:	Mail		Cont de răspuns:
 Message	Mail		Mesaj
+Settings…	Mail		Configurări…
 Reply to sender	Mail		Răspunde la expeditor
 There is no installed handler for URL links.	Mail		Nu există un operator instalat pentru legături URL.
 Signature	Mail		Semnătură
@@ -104,6 +108,7 @@ Close	Mail		Închide
 No matches	Mail		Niciun rezultat
 The mail_daemon is not running. The message is queued and will be sent when the mail_daemon is started.	Mail		Mail_serviciu nu rulează. Mesajul stă la rând și va fi trimis când mail_serviciu este pornit.
 Really delete this signature? This cannot be undone.	Mail		Sigur ștergeți această semnătură? Această operație nu este reversibilă.
+Save this message as a draft before closing?	Mail		Salvați acest mesaj ca o ciornă înainte să închideți?
 Open	Mail		Deschide
 draft	B_USER_DIRECTORY/mail/draft		ciornă
 Quote	Mail		Citat
@@ -140,7 +145,9 @@ Open attachment	Mail		Deschide atașament
 sent	B_USER_DIRECTORY/mail/sent		trimis
 (Date unavailable)	Mail		(Dată indisponibilă)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Plasați interogările de email și șabloanele de interogări preferate în acest dosar.
+Spam	Mail		Spam
 Reply	Mail		Răspuns
+Encoding	Mail		Codare
 From:	Mail		De la:
 Couldn't open this signature. Sorry.	Mail		Nu s-a putut deschide acestă semnătură. Îmi pare rău.
 Open draft	Mail		Deschide ciornă

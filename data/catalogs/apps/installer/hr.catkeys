@@ -53,7 +53,7 @@ OK	InstallerWindow		Uredu
 Set up partitions…	InstallerWindow		Postavi particije...
 The partition can't be mounted. Please choose a different partition.	InstallProgress		Particija se ne može montirati.molim izaberite drugu particiju.
 Install anyway	InstallProgress		Ipak instaliraj
-An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Došlo je do greške i instalacija nije dovršena:\n\Greška:   %s
+An error was encountered and the installation was not completed:\n\nError:  %s	InstallerWindow		Došlo je do greške i instalacija nije dovršena:\n\nGreška:  %s
 Press the Begin button to install from '%1s' onto '%2s'.	InstallerWindow		Pritisnite tipku Počni za instalaciju sa '%1s' na '%2s'.
 Have fun and thanks a lot for trying out Haiku! We hope you like it!	InstallerApp		Uživajte i puno vam hvala na isprobavanju Haiku-a!Nadamo se da vam se sviđa!
 OK	InstallProgress		U redu

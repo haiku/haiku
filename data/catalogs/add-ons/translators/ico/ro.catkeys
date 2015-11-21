@@ -1,8 +1,9 @@
-1	romanian	x-vnd.Haiku-ICOTranslator	1211895126
+1	romanian	x-vnd.Haiku-ICOTranslator	3916328565
 Cursor	ICOTranslator		Cursor
 Version %d.%d.%d, %s	ConfigView		Versiune %d.%d.%d, %s
 Windows %s %ld bit image	ICOTranslator		Imagine Windows %s %ld bit
 Valid icon sizes are 16, 32, or 48	ConfigView		Dimensiunile valide de pictogramă sunt 16, 32, sau 48
+Windows icons	ICOTranslator		Pictograme Windows
 Enforce valid icon sizes	ConfigView		Aplică dimensiunile valide de pictogramă
 ICO Settings	main		Configurări ICO
 Windows icon translator	ICOTranslator		Traducător pictogramă Windows

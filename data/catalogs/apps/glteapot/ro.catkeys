@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-GLTeapot	1557538833
+1	romanian	x-vnd.Haiku-GLTeapot	1569683445
 Upper center	TeapotWindow		Centru sus
 Lighting	TeapotWindow		Iluminare
 Off	TeapotWindow		Oprit
@@ -11,6 +11,8 @@ Quit	TeapotWindow		Părăsește
 Filled polygons	TeapotWindow		Poligoane completate
 Settings	TeapotWindow		Configurări
 Fog	TeapotWindow		Ceață
+Backface culling	TeapotWindow		Tăiere selectivă verso
+Z-buffered	TeapotWindow		Preîncărcat-Z
 File	TeapotWindow		Fișier
 Perspective	TeapotWindow		Perspectivă
 GLTeapot	System name		CeainicGL

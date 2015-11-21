@@ -1,6 +1,7 @@
-1	romanian	x-vnd.Haiku-SMTP	988031659
+1	romanian	x-vnd.Haiku-SMTP	2740407895
 SMTP server:	ConfigView		Server SMTP:
 STARTTLS	ConfigView		STARTTLS
+Error while logging in to %serv	smtp		Eroare la autentificare la %serv
 Unencrypted	ConfigView		Necriptat
 . The server says:\n	smtp		. Serverul spune:\n
 ESMTP	ConfigView		ESMTP

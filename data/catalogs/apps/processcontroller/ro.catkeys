@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-ProcessController	4031596464
+1	romanian	x-vnd.Haiku-ProcessController	1761882987
 Memory usage	ProcessController		Utilizarea memoriei
 Kill this team!	ProcessController		Omoară această echipă!
 Idle priority	ProcessController		Prioritate în așteptare
@@ -7,6 +7,7 @@ Custom priority	ProcessController		Prioritate personalizată
 This team is already gone…	ProcessController		Această echipă este plecată deja...
 Error saving file	ProcessController		Eroare la salvarea fișierului
 Real-time priority	ProcessController		Prioritate în timp real
+Power saving	ProcessController		Economisire de energie
 Your setting file could not be saved!\n(%s)	ProcessController		Fișierul de configurare nu a putut fi salvat!\n(%s)
 What do you want to do with the team \"%s\"?	ProcessController		Ce doriți să faceți cu echipa \"%s\"?
 This thread is already gone…	ProcessController		Acest fir de execuție este plecat deja...

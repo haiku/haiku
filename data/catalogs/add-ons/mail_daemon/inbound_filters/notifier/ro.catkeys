@@ -1,7 +1,9 @@
-1	romanian	x-vnd.Haiku-NewMailNotification	2338542986
+1	romanian	x-vnd.Haiku-NewMailNotification	73789504
+You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		Aveți {0, plural, one{Un mesaj nou} other{# mesaje noi}} pentru %account.
 none	NotifierConfigView		nimic
 Method:	NotifierConfigView		Metodă:
 Beep	NotifierConfigView		Bip
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{Un mesaj nou} other{# mesaje noi}}
 New mails notification	NotifierFilter		Înștiințare mailuri noi
 Central alert	NotifierConfigView		Alertă centrală
 OK	NotifierFilter		OK

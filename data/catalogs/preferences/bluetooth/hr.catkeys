@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-BluetoothPrefs	2584094224
+1	croatian	x-vnd.Haiku-BluetoothPrefs	2022344066
 About Bluetooth…	Window		O Bluetooth-u...
 Manufacturer: 	Device View		Proizvođač: 
 Add device to list	Inquiry panel		Dodaj uređaj na listu
@@ -24,6 +24,7 @@ Quit	main		Isključi
 Start please	main		Molim započni
 Start bluetooth services…	Window		Pokreni bluetooth servise....
 61 secs	Settings view		61 sekunda
+Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth sustav, (ARCE)\n\nNapravio Oliver Ruiz Dorantes\n\nUz pomoć:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nHvala pojedincima koji su pomogli...\n\nŠaljući/poklanjajući sklopovlje:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEkonomski:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nSa zakrpama:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTestirajući:\n\t- Petter H. Juliussen\nTko mi je dao svo znanje:\n\t- the yellowTAB team
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nema Bluetooth lokalnog uređaja redistriranog u sustavu.
 Identify us as...	Settings view		Indetificiraj nas kao...
  packets: 	Device View		 paketi: 
@@ -35,6 +36,7 @@ Revert	Window		Obrnuto
 Remote devices	Window		Udaljeni uređaji
 Laptop	Settings view		Prijenosno računalo
 Work offline	main		Radi izvanmrežno
+Service classes: 	Device View		Klase servisa: 
 Connections & channels…	Window		Spajanja i kanali...
 Refresh LocalDevices…	Window		Osvježi lokalne uređaje...
 Settings	Window		Postavke
@@ -42,5 +44,6 @@ Only from trusted devices	Settings view		Samo sa sigurnih uređaja
 Scanning progress	Inquiry panel		Napredak pregledavanja
 Always ask	Settings view		Uvijek pitaj
 Pick device...	Settings view		Odaberi uređaj...
+Retrieving names...	Inquiry panel		Dohvaćam imena...
 Help	Window		Pomoć
 Add…	Remote devices		Dodaj...

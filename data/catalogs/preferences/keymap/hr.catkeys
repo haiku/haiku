@@ -1,21 +1,58 @@
-1	croatian	x-vnd.Haiku-Keymap	1959302094
+1	croatian	x-vnd.Haiku-Keymap	2754930379
+Dvorak	Keyboard Layout View		Dvorak
+Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Obrnuto
+Slovak	Keyboard Layout View		Slovački
+Hungarian	Keyboard Layout View		Mađarski
+German	Keyboard Layout View		Njemački
+Swiss-French	Keyboard Layout View		Švicarski francuski
+Greek	Keyboard Layout View		Grčki
+Menu	Keyboard Layout View	Menu key	Izbornik
+US	Keyboard Layout View		US
+Spanish	Keyboard Layout View		Španjolski
+Belarusian	Keyboard Layout View		Bjeloruski
+Italian	Keyboard Layout View		Talijanski
 Cancel	Modifier keys window		Otkaži
+Russian	Keyboard Layout View		Ruski
+Icelandic	Keyboard Layout View		Islandski
+Command	Keyboard Layout View	Command key	Naredba
+Polish	Keyboard Layout View		Poljski
+Serbian (Cyrillic)	Keyboard Layout View		Srpski (ćirilica)
+French	Keyboard Layout View		Francuski
+Faeroese	Keyboard Layout View		Farski
+Japanese	Keyboard Layout View		Japanski
+Bulgarian (Phonetic)	Keyboard Layout View		Bugarski (fonetski)
 Defaults	Keymap window		Zadano
 Quit	Keymap window		Završi
 Switch shortcut keys to Haiku mode	Keymap window		Prebaci tipke prečaca u Haiku način rada
+ISO-9995	Keyboard Layout View		ISO-9995
 Disabled	Modifier keys window	Do nothing	Onemogućeno
+Belarusian (Latin)	Keyboard Layout View		Bjeloruski (latinica)
+Danish	Keyboard Layout View		Danski
 Open…	Keymap window		Otvori...
+Russian (Typewriter)	Keyboard Layout View		Ruski (pisaći stroj)
 System:	Keymap window		Sustav:
+Lithuanian	Keyboard Layout View		Litvanski
+Finnish	Keyboard Layout View		Finski
 Option:	Modifier keys window	Option key role name	Opcija:
+Switch shortcut keys	Keymap window		Prebaci tipke prečaca
+Norwegian	Keyboard Layout View		Norveški
 User:	Keymap window		Korisnik:
+Esperanto	Keyboard Layout View		Esperanto
+Arabic (102)	Keyboard Layout View		Arapski (102)
+United-Kingdom	Keyboard Layout View		Ujedinjeno Kraljevstvo
 Key	Modifier keys window	As in a computer keyboard key	Tipka
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl tipka
 Control:	Modifier keys window	Control key role name	Control:
+Swiss-German	Keyboard Layout View		Švicarski njemački
 Layout	Keymap window		Raspored
 Switch shortcut keys to Windows/Linux mode	Keymap window		Prebaci tipke prečaca u Windows/Linux način rada
+Albanian	Keyboard Layout View		Albanski
 Revert	Keymap window		Obrnuto
 Command:	Modifier keys window	Command key role name	Naredba:
+Latin-American	Keyboard Layout View		Latinoamerički
+Spanish (Dvorak)	Keyboard Layout View		Španjolski (Dvorak)
+Lithuanian (Standard)	Keyboard Layout View		Litvanski (standadni)
 Save as…	Keymap window		Spremi kao...
 File	Keymap window		Datoteka
 (Current)	Keymap window		(Trenutno)

@@ -1,11 +1,14 @@
-1	romanian	x-vnd.Haiku-MediaConverter	3215615925
+1	romanian	x-vnd.Haiku-MediaConverter	341686525
 Video using parameters form settings	MediaConverter		Video ce utilizează configurările parametrilor de formular
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Fișierul nu a fost recunoscut ca un fișier media suportat:} other{# fișiere nu au fost recunoscute ca fișiere media suportate:}}
 Video encoding:	MediaConverter		Codare video:
 %u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
+Error read audio frame %lld	MediaConverter		Eroare la citirea cadrului audio %lld
 No audio	Audio codecs list		Fără audio
 Error	MediaConverter		Eroare
 {0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# bit} other{# biți}}
 Error loading a file	MediaConverter		Eroare la încărcarea unui fișier
+Error read video frame %lld	MediaConverter		Eroare la citirea cadrului video %lld
 File Error	MediaConverter-FileInfo		Eroare fișier
 Open…	Menu		Deschide...
 Start [ms]: 	MediaConverter		Start [ms]:
@@ -24,7 +27,9 @@ Audio:	MediaConverter-FileInfo		Audio:
 OK	MediaConverter-FileInfo		OK
  seconds	MediaFileInfo		 secunde
 Source files	MediaConverter		Fișiere sursă
+Error writing video frame %lld	MediaConverter		Eroare la scrierea cadrului video %lld
 {0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# cadru} other{# cadre}}
+Error writing audio frame %lld	MediaConverter		Eroare la scrierea cadrului audio %lld
 Cancelling	MediaConverter		Se anulează
 {0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# octet} other{# octeți}}
 Error loading files	MediaConverter		Eroare la încărcarea fișierelor
@@ -58,6 +63,7 @@ File	Menu		Fișier
 Convert	MediaConverter		Convertește
 Writing audio track: %ld%% complete	MediaConverter		Scriere pistă audio: %ld%% complet
 Video quality: %3d%%	MediaConverter		Calitate video: %3d%%
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz Canal %ld
 Output folder	MediaConverter		Dosar de ieșire
 Audio quality: %3d%%	MediaConverter		Calitate audio: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		A apărut o eroare la citirea informațiilor despre fișier.\n\nEroare:

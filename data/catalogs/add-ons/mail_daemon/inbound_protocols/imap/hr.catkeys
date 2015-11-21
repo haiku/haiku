@@ -1,6 +1,9 @@
-1	croatian	x-vnd.Haiku-IMAP	3950045582
+1	croatian	x-vnd.Haiku-IMAP	4272388921
 Destination:	imap_config		Odredište:
+Ok	IMAPFolderConfig		U redu
 status	IMAPFolderConfig		stanje
+Configure IMAP Folders	imap_config		Konfiguriraj IMAP mape
+Cancel	IMAPFolderConfig		Otkaži
 Apply	IMAPFolderConfig		Primjeni
 Fetching IMAP folders, have patience...	IMAPFolderConfig		Dohvaćam IMAP mape,budite strpljivi...
 IMAP Folders	IMAPFolderConfig		IMAP mape

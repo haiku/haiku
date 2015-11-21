@@ -1,5 +1,5 @@
-1	romanian	x-vnd.Haiku-FileTypes	3116280330
-Application types…	FileTypes Window		Tipuri de aplicații...
+1	romanian	x-vnd.Haiku-FileTypes	734679611
+Application types…	FileTypes Window		Tipuri de aplicații…
 Description:	Application Types Window		Descriere:
 Args only	Application Type Window		Doar arg
 Recognition rule is not valid:\n\n	FileTypes Window		Regula de recunoaștere nu este validă:\n\n
@@ -15,7 +15,7 @@ Choose type	Type List Window		Alege tip
 New file type	New File Type Window		Tip de fișier nou:
 Rule:	FileTypes Window		Regulă:
 Add icon…	Icon View		Adaugă pictogramă...
-Multiple files from \"%s\" file type	FileType Window		Fișiere multiple de la tipul de fișier \„%s\”
+Multiple files from \"%s\" file type	FileType Window		Fișiere multiple de la tipul de fișier \"%s\"
 File type	FileType Window		Tip de fișier
 Could not change attributes	Attribute Window		Nu s-au putut modifica atributele
 Could not retrieve preferred application of this file	Preferred App Menu		Nu s-a putut obține aplicația preferată a acestui fișier
@@ -35,7 +35,7 @@ Multiple launch	Application Type Window		Pornire multiplă
 Could not set preferred application	FileTypes Window		Nu s-a putut stabili aplicația preferată)
 Group:	New File Type Window		Grup:
 %1 application type	Application Type Window		%1 tip aplicație
-Done	Extension Window		Gata
+Done	Extension Window		Finalizat
 Application type	Application Type Window		Tip de aplicație
 Done	Type List Window		Gata
 Attribute	Attribute Window		Atribut
@@ -52,28 +52,29 @@ Set preferred application	Preferred App Menu		Stabilire aplicație preferată
 Don't save	Application Type Window		Nu salva
 Save changes before closing?	Application Type Window		Doriți să salvați modificările înainte de a închide?
 File	Application Type Window		Fișier
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Tip aplicație ar putea fi eliminat} other{# Tipuri aplicație ar putea fi eliminate}}
 Version:	Application Type Window		Versiune:
-Select…	FileTypes Window		Selectează...
+Select…	FileTypes Window		Selectează…
 FileTypes request	FileTypes		Cerere TipuriFișier
-Open…	FileTypes Window		Deschide...
-Select…	FileType Window		Selectează...
+Open…	FileTypes Window		Deschide…
+Select…	FileType Window		Selectează…
 Launch	Application Types Window		Lansează
-Same as…	FileType Window	The same APPLICATION as ...	Aceeași ca...
+Same as…	FileType Window	The same APPLICATION as ...	Aceeași ca…
 Abort	Application Types Window		Renunță
 FileTypes	FileTypes		TipuriFișier
 OK	FileTypes		OK
 Extra attributes	FileTypes Window		Atribute suplimentare
 Development	Application Type Window		Dezvoltare
-Edit…	Application Types Window		Editează...
+Edit…	Application Types Window		Editează…
 Icon	FileType Window		Pictogramă
 Final	Application Types Window		Final
 Development	Application Types Window		Dezvoltare
 Open file	FileTypes		Deschide fișier
 Special:	Attribute Window		Special:
 Alpha	Application Type Window		Alfa
-Add…	FileTypes Window		Adaugă...
+Add…	FileTypes Window		Adaugă…
 Signature:	Application Type Window		Semnătură:
-Add…	Application Type Window		Adaugă...
+Add…	Application Type Window		Adaugă…
 [Multiple files] file types	FileType Window		[Fișiere multiple] tipuri de fișiere
 Information	Application Types Window		Infomație
 Gamma	Application Types Window		Gama
@@ -82,10 +83,10 @@ Select preferred application	FileType Window		Selectează aplicația preferată
 Single launch	Application Type Window		Pornire unică
 Golden master	Application Types Window		Versiune principală
 %s file type	FileType Window		%s tip fișier
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Aplicația \„%s\” nu suportă acest tip de fișier.\nSigur doriți să o configurați oricum?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Aplicația \"%s\” nu suportă acest tip de fișier.\nSigur doriți să o configurați oricum?
 Type:	Attribute Window		Tip:
 Removing uninstalled application types	Application Types Window		Se elimină tipurile de aplicații dezinstalate
-Done	Attribute Window		Gata
+Done	Attribute Window		Finalizat
 no icon	FileTypes Window		fără pictogramă
 Alpha	Application Types Window		Alfa
 Version	Application Types Window		Versiune
@@ -94,7 +95,7 @@ Add new group	New File Type Window		Adaugă grup nou
 Move down	FileTypes Window		Deplasează în jos
 Cancel	Application Type Window		Anulează
 Settings	FileTypes Window		Configurări
-New resource file…	FileTypes Window		Fișier resursă nou...
+New resource file…	FileTypes Window		Fișier resursă nou…
 Cancel	New File Type Window		Anulează
 Icon	FileTypes Window		Pictogramă
 Extension:	Extension Window		Extensie:
@@ -115,20 +116,20 @@ Application flags	Application Type Window		Indicatoare de aplicație
 Cancel	Type List Window		Anulează
 Move up	FileTypes Window		Deplasează în sus
 Description	FileTypes Window		Descriere
-Save request	Application Type Window		Salvează cerere
+Save request	Application Type Window		Cerere de salvat
 Beta	Application Type Window		Beta
-None	FileTypes Window		Nimic
+None	FileTypes Window		Niciunul
 Remove	FileTypes Window		Elimină
 Attribute name:	Attribute Window		Nume atribut:
 Extension	Extension Window		Extensie:
 Add type	New File Type Window		Adaugă tip
 Internal name:	Attribute Window		Nume intern:
-Show in Tracker…	Application Types Window		Afișează în Tracker...
+Show in Tracker…	Application Types Window		Afișează în Tracker…
 Final	Application Type Window		Final
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Lățime:
 Display as:	Attribute Window	Tracker offers different display modes for attributes.	Afișează ca:
 This file type already exists	New File Type Window		Acest tip de fișier există deja
-Same as…	FileTypes Window		La fel ca...
+Same as…	FileTypes Window		La fel ca…
 Exclusive launch	Application Type Window		Pornire exclusivă
 FileTypes	System name		TipuriFișier
 Application types	Application Types Window		Tipuri de aplicație
@@ -149,8 +150,8 @@ Preferred application	FileTypes Window		Aplicație preferată
 Short description:	Application Type Window		Descriere scurtă:
 File could not be opened	Preferred App Menu		Fișierul nu a putut fi deschis
 Could not change file extensions	Extension Window		Nu s-au putut modifica extensiile fișierului
-Edit icon…	Icon View		Editează pictogramă...
-Same as…	FileType Window	The same TYPE as ...	Același ca...
-Save into resource file…	Application Type Window		Salvează în fișierul resursă...
+Edit icon…	Icon View		Editează pictograma…
+Same as…	FileType Window	The same TYPE as ...	Același ca…
+Save into resource file…	Application Type Window		Salvează în fișierul resursă…
 Visible	Attribute Window		Vizibil
 Could not install file type	New File Type Window		Nu s-a putut instala tipul de fișier

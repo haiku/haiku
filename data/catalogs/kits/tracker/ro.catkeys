@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	3589941242
+1	romanian	x-vnd.Haiku-libtracker	2004221275
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Module
 Mount settings…	ContainerWindow		Configurări montare...
@@ -17,6 +17,9 @@ Permissions	InfoWindow		Permisiuni
 Recent documents	FavoritesMenu		Documente recente
 Modified	QueryPoseView		Modificat
 Created	ContainerWindow		Creat
+Error %error loading add-On %name.	ContainerWindow		Eroare %error la încărcarea add-on %name.
+If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Dacă %ifYouDoAction dosarul de configurări, %osName poate să nu se comporte cum trebuie!\n\nSigur doriți să faceți asta?
+Skip all	FSUtils		Omite tot
 contains	SelectionWindow		conține
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Îmi pare rău, nu puteți salva lucruri la administratorul sistemului.
 Show shared volumes on Desktop	SettingsView		Afișează volumele comune pe desktop
@@ -27,6 +30,7 @@ File	ContainerWindow		Fișier
 Handles any %type	OpenWithWindow		Gestionează orice %type
 Delete	ContainerWindow		Șterge
 32 x 32	ContainerWindow		32 x 32
+Cannot unmount the boot volume \"%name\".	FSUtils		Nu se poate demonta volumul de pornine \"%name\".
 Open with…	ContainerWindow		Deschide cu...
 Write	FilePermissionsView		Scrie
 Modified	PoseView		Modificat
@@ -34,6 +38,7 @@ Make active printer	ContainerWindow		Stabilește ca imprimantă activă
 Create link here	ContainerWindow		Crează legătură aici
 Moving: 	StatusWindow		Se mută:
 before	FindPanel		înainte
+Error emptying Trash	FSUtils		Eroare la golirea coșului de gunoi
 On	FindPanel		Pornit
 MiB	WidgetAttributeText		MiB
 greater than	FindPanel		mai mare decât
@@ -55,6 +60,7 @@ apps	B_APPS_DIRECTORY		apps
 Icon view	ContainerWindow		Vizualizare pictogramă
 Size	QueryPoseView		Dimensiune
 Emptying Trash… 	StatusWindow		Se curăță gunoiul...
+Tracker New Templates	B_USER_SETTINGS_DIRECTORY/Tracker/Tracker New Templates		Modele noi Tracker
 Close all in workspace	ContainerWindow		Închide tot din spațiul de lucru
 Empty Trash	ContainerWindow		Gunoi vid
 Name = %name	FindPanel	FindResultTitle	Nume = %name
@@ -70,6 +76,8 @@ Create link	ContainerWindow		Crează legătură
 Decrease size	DeskWindow		Micșorează dimensiunea
 Size	ContainerWindow		Dimensiune
 All disks	AutoMounterSettings		Toate discurile
+Would you like to find some other suitable application?	FSUtils		Doriți să găsiți altă aplicație potrivită?
+Finish: %time - %finishtime left	StatusWindow		Terminare: %time - %finishtime rămas
 Could not open \"%document\" with application \"%app\" (Missing libraries: %library). \n	FSUtils		Nu s-a putut deschide \"%document\" cu aplicația \"%app\" (Biblioteci lipsă: %library). \n
 no items	CountView		fără elemente
 Ignore case	SelectionWindow		Ignoră caz
@@ -80,6 +88,7 @@ Tracker preferences	TrackerSettingsWindow		Preferințe tracker
 Cut	FilePanelPriv		Taie
 Replace	FilePanelPriv		Înlocuiește
 Opens with:	InfoWindow		Se deschide cu:
+If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Dacă %ifYouDoAction configurările mime, %osName poate să nu se comporte cum trebuie!\n\nSigur doriți să faceți asta?
 Open	ContainerWindow		Deschide
 96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Eroare la calcularea dimensiunii dosarului.
@@ -89,6 +98,7 @@ Favorites	FavoritesMenu		Favorite
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" este un executabil nesuportat.
 Sorry, you can't copy items to the Trash.	PoseView		Îmi pare rău, nu puteți să copiați elemente la gunoi.
 matches wildcard expression	SelectionWindow		se potrivește expresiei metacaracter
+rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	redenumiți
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nu puteți înlocui un dosar sau o legătură simbolică printr-un fișier.
 Show space bars on volumes	SettingsView		Afișează bara de spațiu pe volume
 Invert selection	ContainerWindow		Inversează selecție
@@ -97,12 +107,15 @@ Resize to fit	ContainerWindow		Redimensionează pentru a potrivi
 Add printer…	ContainerWindow		Adaugă imprimantă...
 New folder	ContainerWindow		Dosar nou
 Kind	ContainerWindow		Fel
+rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	a redenumi
 home	B_USER_DIRECTORY		acasă
 Select…	ContainerWindow		Selectează...
 Copy to	ContainerWindow		Copiază la
 Move to Trash	ContainerWindow		Mută la gunoi
 Move to	ContainerWindow		Mută la 
+Create %s clipping	PoseView		Creează %s tăieri
 Set new link target	InfoWindow		Configurează destinație legăturii noi
+If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Dacă %ifYouDoAction dosarul de system sau conținutul său, nu veți putea să porniți %osName!\n\nSigur doriți să faceți asta?\n\nPentru a %toDoAction dosarul de sistem sau continutul său, țineți apăsat tasta Shift și dați clic pe \"%toConfirmAction\".
 Save as Query template:	FindPanel		Salvează ca șablon interogare:
 preferences	B_PREFERENCES_DIRECTORY		preferințe
 Cancel	FSUtils		Anulează
@@ -110,12 +123,14 @@ move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben
 Edit name	ContainerWindow		Editează nume
 Show volumes on Desktop	SettingsView		Afișează volumele pe desktop
 KiB	WidgetAttributeText		KiB
+Error %error loading Add-On %name.	ContainerWindow		Eroare %error la încărcarea add-on %name.
 Defaults	TrackerSettingsWindow		Implicite
 Mini icon view	ContainerWindow		Vizualizare mini pictogramă
 OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Nu s-a putut deschide \"%name\". Fișierul este marcat din greșeală ca executabil. 
 Add-ons	ContainerWindow		Module
 Edit templates…	TemplatesMenu		Editează șabloane...
+Finish: %time - Over %finishtime left	StatusWindow		Terminare: %time - Peste %finishtime rămase
 An item named \"%name\" already exists in this folder. Would you like to replace it with the symbolic link you are creating?	FSUtils		Un element numit \"%name\" există deja în acest dosar. Doriți să-l înlocuiți cu legătura simbolică pe care o creați?
 Fewer options	FindPanel		Mai puține opțiuni
 Sorry, there is not enough free space on the destination volume to copy the selection.	FSUtils		Îmi pare rău, nu există destul spațiu liber pe volumul de destinație pentru a copia selecția.
@@ -138,6 +153,7 @@ Unmount	InfoWindow		Demontează
 no supporting apps	OpenWithWindow		fără aplicații de suport
 That name is already taken. Please type another one.	InfoWindow		Numele este luat deja. Tastați altul.
 Sorry, you can't create links in the Trash.	PoseView		Îmi pare rău, nu puteți crea legături în gunoi.
+An item named \"%name\" already exists in this folder, and may contain\nitems with the same names. Would you like to replace them with those contained in the folder you are %verb?	FSUtils		Un element \"%name\" există deja în acest dosar, și ar putea să conțină\nelemente cu aceleași nume. Doriți să le înlocuiți cu cele conținute în dosarul pe care îl %verb?
 Link \"%name\" to:	InfoWindow	File dialog title for new sym link	Leagă \"%name\" la:
 All disks	FindPanel		Toate discurile
 Revert	TrackerSettingsWindow		Revenire
@@ -158,11 +174,15 @@ Outline selection rectangle only	SettingsView		Conturează doar selecția dreptu
 Select all	DeskWindow		Selectează tot
 OK	InfoWindow		OK
 Replace	FSUtils		Înlocuiește
+You are trying to replace the item:\n\t%name%dest\nwith:\n\t%name%src\n\nWould you like to replace it with the one you are %movemode?	FSUtils		Încercați să înlocuiți elementul:\n\t%name%dest\ncu:\n\t%name%src\n\nDoriți să-l înlocuiți cu cel pe care îl %movemode?
 Mini icon view	DeskWindow		Vizualizare mini pictogramă
+Error in regular expression:\n\n'%errstring'	PoseView		Eroare în expresia regulată:\n\n'%errstring'
 Mount all	MountMenu		Montează tot
 calculating…	InfoWindow		se calculează...
 Mount all disks now	AutoMounterSettings		Montează toate discurile acum
+Hide dotfiles	SettingsView		Ascunde fișierele punct
 Untitled bitmap	PoseView		Imagine fără nume
+of %items	StatusWindow		din %items
 Description:	InfoWindow		Descriere:
 New	DeskWindow		Nou
 Open	InfoWindow		Deschide
@@ -173,8 +193,10 @@ Replace other file	WidgetAttributeText		Înlocuiește alt fișier
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Câteva din elementele selectate nu pot fi mutate la gunoi. Doriți să le ștergeți în schimb? (Această operație nu poate fi inversată.)
 You cannot create a link to the root directory.	FSUtils		Nu puteți crea o legătură către dosarul administrator.
 48 x 48	ContainerWindow		48 x 48
+Could not find application \"%appname\"	OpenWithWindow		Nu s-a putut găsi aplicația \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Elementul selectat nu poate fi mutat la gunoi. Doriți să îl ștergeți în schimb? (Această operație nu poate fi inversată.)
 Invert	SelectionWindow		Inversează
+rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	redenumiți
 Find	FindPanel		Găsește
 Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Mută
 Get info	ContainerWindow		Obține info
@@ -204,6 +226,7 @@ Preparing to copy items…	StatusWindow		Se pregătește copierea elementelor...
 Save query as template…	FindPanel		Salvează interogarea ca șablon…
 Show folder location in title tab	SettingsView		Afișează locația dosarului în tabul de titlu
 Proceed	FSUtils		Continuă
+Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Unele elemente există deja în acest dosar cu aceleași nume ca elementele pe care le %verb.\n \nDoriți să le înlocuiți cu acelea pe care le %verb sau să fiți solicitat pentru fiecare?
 The mount server could not be contacted.	AutoMounterSettings		Serverul de montare nu a putut fi contactat.
 Error deleting items	FSUtils		Eroare la ștergerea elementelor
 Create relative link here	ContainerWindow		Creează legătură relativă aici
@@ -219,6 +242,7 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Fișierul \"%name\" există deja în dosarul specificat. Doriți să-l înlocuiți?
 Cancel	ContainerWindow		Anulează
 Only the boot disk	AutoMounterSettings		Numai discul de boot
+If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Dacă %ifYouDoAction dosarul config, %osName poate să nu se comporte cum trebuie!\n\nSigur doriți să faceți asta?
 Unmount	ContainerWindow		Demontează
 Copy layout	ContainerWindow		Copiază aranjament
 label too long	PoseView		etichetă prea lungă
@@ -228,8 +252,10 @@ Sorry, you cannot edit that attribute.	WidgetAttributeText		Îmi pare rău, nu p
 Name	ContainerWindow		Nume
 Reverse order	ContainerWindow		Ordine inversă
 48 x 48	DeskWindow		48 x 48
+{0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# item} other{# itemi}}
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		Adaugă dosar curent
+Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Nu s-a putut deschide \"%document\" cu aplicația \"%app\" (Simbol lipsăȘ %symbol).\n
 The target disk does not support creating links.	FSUtils		Discul destinație nu suportă crearea de legături.
 starts with	SelectionWindow		începe cu
 Preparing to delete items…	StatusWindow		Se pregătește ștergerea elementelor...
@@ -238,12 +264,14 @@ Would you like to find a suitable application to open the file?	FSUtils		Doriți
 There was an error writing the attribute.	WidgetAttributeText		A apărut o eroare la scrierea atributului.
 Recalculate folder size	InfoWindow		Recalculează dimensiunea dosarului
 Unknown	WidgetAttributeText		Necunoscut
+Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nu s-a putut deschide \"%document\" (Simbol lipsă: %symbol). \n
 by name	FindPanel		după nume
 Creating links: 	StatusWindow		Se creează legăturile:
 Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Redenumire
 Paused: click to resume or stop	StatusWindow		Pauză: dați clic pentru a relua sau a opri
 Preferred for %type	OpenWithWindow		Preferat pentru %type
 GiB	WidgetAttributeText		GiB
+There was an error deleting \"%name\":\n\t%error	FSUtils		A apărut o eroare la ștergerea a \"%name\":\n\t%error
 Paste	FilePanelPriv		Lipește
 Copy more	ContainerWindow		Copiază mai mult
 OK	PoseView		OK
@@ -253,6 +281,7 @@ New folder	TemplatesMenu		Dosar nou
 Move here	ContainerWindow		Mută aici
 File	FilePanelPriv		Fișier
 Real name	ContainerWindow		Nume real
+Error moving \"%name\"	FSUtils		Eroare la mutarea \"%name\"
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Trebuie să plasați elementele pe una din pictogramele de disc în fereastra \"Discuri\".
 Cancel	WidgetAttributeText		Anulează
 Could not find an application to open \"%name\" (%error). 	FSUtils		Nu s-a putut găsi o aplicație pentru a deschide \"%name\" (%error).
@@ -260,6 +289,7 @@ Create a Query template	FindPanel		Creează un șablon interogare
 Previously mounted disks	AutoMounterSettings		Discuri montate anterior
 %Ld B	WidgetAttributeText		%Ld Octeți
 copying	FSUtils		se copiază
+Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Eroare la copierea dosarului \"%name\":\n\t%error\n\nDoriți să continuați?
 move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	mutați
 Show Disks icon	SettingsView		Afișează pictogramă Discuri
 Cancel	PoseView		Anulează
@@ -291,6 +321,7 @@ after	FindPanel		după
 Select…	QueryContainerWindow		Selectează...
 More options	FindPanel		Mai multe opțiuni
 link	FSUtils	filename link	legătură
+At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		La %func \nfind_directory() eșuat. \nMotiv: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Numele specificat nu e legal. Alegeți altul.
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Nu puteți muta un dosar în el însuși sau în subdosarele acestuia.
 List view	ContainerWindow		Vizualizare listă
@@ -298,6 +329,7 @@ Handles any file	OpenWithWindow		Gestionează orice fișier
 Get info	FilePanelPriv		Obține info
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		Anulează
+The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Aplicația \"%appname\" nu suportă tipul de document pe care urmează să-l deschideți.\nSigur doriți să continuați?\n\nDacă știți că aplicația suportă tipul de document, ar trebui să contactați editorul aplicației și să cereți să fie actualizată aplicația lor astfel încât să listeze acest tip de document ca fiind suportat.
 Disks	DirMenu		Discuri
 New folder %ld	FSUtils		Dosar nou %ld
 All BeOS disks	AutoMounterSettings		Toate discurile BeOS
@@ -309,6 +341,7 @@ You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		
 Untitled clipping	PoseView		Tăietură fără nume
 Don't automount	AutoMounterSettings		Nu automonta
 Save	FilePanelPriv		Salvează
+To: %dir	StatusWindow		La: %dir
 Window	FilePanelPriv		Fereastră
 Edit name	FilePanelPriv		Editează nume
 Size:	InfoWindow		Dimensiune:
@@ -324,11 +357,14 @@ Favorites	FilePanelPriv		Favorite
 Name	QueryPoseView		Nume
 Delete	FSUtils		Șterge
 Modified	FindPanel		Modificat
+Error moving \"%name\" to Trash. (%error)	FSUtils		Eroare la mutarea \"%name\" la Gunoi. (%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		Nu puteți înlocui un dosar cu unul din subdosarele acestuia.
+<No recent items>	FavoritesMenu		<Niciun element recent>
 Preferences…	ContainerWindow		Preferințe…
 Move	PoseView		Mută
 Open and make preferred	OpenWithWindow		Deschide sau fixează ca preferat
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Sigur doriți să ștergeți elementul(ele) selectat(e)? Această operație nu poate fi inversată.
+If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Dacă %ifYouDoAction dosarul personal, %osName ar putea să nu se comporte cum trebuie!\n\nSigur doriți să faceți asta?\n\nPentru a %toDoAction dosarul personal, tineți apăsată tasta Shift și dați clic pe \"%toConfirmAction\".
 Add-ons	DeskWindow		Module
 Name	FindPanel		Nume
 And	FindPanel		Și
@@ -337,6 +373,7 @@ Copy	FilePanelPriv		Copiază
 Icon view	DeskWindow		Vizualizare pictogramă
 Select all	QueryContainerWindow		Selectează tot
 Files cannot be moved or deleted from a read-only volume.	PoseView		Fișierele nu pot fi mutate sau șterse dintr-un volum protejat la scriere.
+There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		A apărut o problemă încercând să se înlocuiască \"%name\". Elementul ar putea fi deschis sau ocupat.
 Owner	FilePermissionsView		Posesor
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		A apărut o problemă la încercarea de a salva în dosarul pe care l-ați specificat. Încercați altul.
 Restore	ContainerWindow		Restaurează
@@ -353,7 +390,9 @@ That name is too long. Please type another one.	InfoWindow		Numele este prea lun
 OK	FSUtils		OK
 Paste layout	ContainerWindow		Lipește aranjament
 Select	InfoWindow		Selectează
+Could not update permissions of file \"%name\". %error	FSUtils		Nu s-au putut actualiza permisiunile fișierului \"%name\". %error
 Select…	FilePanelPriv		Selectează...
+\"%name\" is a legacy executable. Please obtain an updated version or recompile the application.	FSUtils		\"%name\" este un executabil moștenit. Obțineți o versiune actualizată sau recompilați aplicația.
 There was an error resolving the link.	Tracker		A apărut o eroare la rezolvarea legăturii.
 %BytesPerSecond/s	StatusWindow		%BytesPerSecond/s
 You can't move or copy the trash.	FSUtils		Nu puteți să mutați sau să copiați gunoiul.
@@ -384,6 +423,7 @@ Move to Trash	FSUtils		Mută la gunoi
 Automatic disk mounting	AutoMounterSettings		Montare de disc automată
 Original name	ContainerWindow		Nume original
 Find	FSUtils		Găsește
+Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Eroare la copierea fișierului \"%name\":\n\t%error\n\nDoriți să continuați?
 Single window navigation	SettingsView		Navigare cu o singură fereastră
 parent folder	NavMenu		dosar superior
 contains	FindPanel		conține

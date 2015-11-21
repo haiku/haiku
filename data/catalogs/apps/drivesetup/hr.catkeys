@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-DriveSetup	1367973124
+1	croatian	x-vnd.Haiku-DriveSetup	2164410054
 Cancel	AbstractParametersPanel		Otkaži
 Delete	MainWindow		Izbriši
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite zapisati promjene natrag na disk?\n\nSvi podati na odabranoj particiji biti će nepovratno izgubljeni ako tonapravite!
@@ -56,6 +56,7 @@ End: %s	Support		Kraj: %s
 Cancel	MainWindow		Otkaži
 Delete partition	MainWindow		Izbriši particiju
 Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		jeste li digurn ida želite promjeniti parametre na odabranoj particiji?\n\nParticiju možda drugi operativni sustav ne može prepoznati!
+Disk system \"%s\" not found!	MainWindow		Sustav diska \"%s\" nije nađen!
 Eject	MainWindow		Izbaci
 Partition	MainWindow		Particija
 Force unmount	MainWindow		Prisili odmontiranje

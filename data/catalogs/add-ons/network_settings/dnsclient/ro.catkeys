@@ -1,0 +1,10 @@
+1	romanian	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		Setări DNS
+Move down	DNSSettingsView		Mută în jos
+DNS settings	DNSSettingsView		Setări DNS
+Remove	DNSSettingsView		Elimină
+Domain:	DNSSettingsView		Domeniu:
+Add	DNSSettingsView		Adaugă
+Server:	DNSSettingsView		Server:
+Move up	DNSSettingsView		Mută în sus
+Apply	DNSSettingsView		Aplică

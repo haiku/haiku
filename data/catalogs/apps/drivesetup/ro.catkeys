@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-DriveSetup	3968441779
+1	romanian	x-vnd.Haiku-DriveSetup	2321187933
 DriveSetup	System name		ConfigurareDiscuri
 Could not acquire partitioning information.	MainWindow		Nu s-au putut obține informațiile de partiționare.
 Cancel	AbstractParametersPanel		Anulează
@@ -17,6 +17,7 @@ No disk devices have been recognized.	DiskView		Nu au fost recunoscute dispoziti
 Failed to initialize the disk %s!\n	MainWindow		Inițializarea discului %s a eșuat!\n
 The selected disk is read-only.	MainWindow		Discul selectat este protejat la scriere.
 Are you sure you want to format the partition \"%s\"? You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să formatați partiția \"%s\"? Veți fi întrebat din nou înainte ca schimbările să fie scrise pe disc.
+Should unmounting be forced?\n\nNote: If an application is currently writing to the volume, unmounting it now might result in loss of data.\n	MainWindow		Ar trebui să fie forțată demontarea?\n\nNotă: Dacă o aplicație scrie acum pe volum, demontarea acestuia poate rezulta în pierderi de date.\n
 Could not mount partition %s.	MainWindow		Nu s-a putut monta partiția %s.
 The partition %s has been successfully formatted.\n	MainWindow		Partiția %s a fost formatată cu succes.\n
 Change parameters	MainWindow		Modifică parametrii
@@ -43,18 +44,30 @@ Change	ChangeParametersPanel		Modificare
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul %s vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să ștergeți partiția selectată?\n\nToate datele de pe partiție vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Create…	MainWindow		Crează...
+Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să formatați un disc liber? (Majoritatea persoanelor mai întâi inițializează discul cu un sistem de partiționare) Veți fi întrebat din nou înainte ca modificările să fie scrise pe disc.
+The disk has been successfully initialized.\n	MainWindow		Discul a fost inițializat cu succes.\n
 Could not unmount partition %s.	MainWindow		Nu se poate demonta partiția %s.
+Failed to change the parameters of the partition. No changes have been written to disk.	MainWindow		Nu s-au putut modifica parametrii partiției. Nicio modificare scrisă pe disc.
+Failed to format the partition %s!\n	MainWindow		Nu s-a putut formata partiția %s!\n
 Mount	MainWindow		Montează
+Partition type	PartitionList		Tip partiție
+The panel experienced a problem!	MainWindow		Panoul a avut o problemă!
+Change parameters…	MainWindow		Modifică parametrii…
 Device	PartitionList		Dispozitiv
 Disk	MainWindow		Disc
+Are you sure you want to initialize the selected disk? All data will be lost. You will be asked again before changes are written to the disk.\n	MainWindow		Sigur doriți să inițializați discul selectat? Toate datele vor fi pierdute. Veți fi întrebat din nou înainte ca modificările să fie scrise pe disc.\n
+Partition size	CreateParametersPanel		Dimensiune partiție
 Device	DiskView		Dispozitiv
 Active	PartitionList		Activ
 Volume name	PartitionList		Nume volum
 Continue	MainWindow		Continuă
 Cannot delete the selected partition.	MainWindow		Nu se poate șterge partiția selectată.
 Mount all	MainWindow		Montează tot
+End: %s	Support		Sfârșit: %s
+The panel could not return successfully.	MainWindow		Panoul nu a putut returna cu succes.
 Cancel	MainWindow		Anulează
 Delete partition	MainWindow		Șterge partiție
+Are you sure you want to change parameters of the selected partition?\n\nThe partition may no longer be recognized by other operating systems anymore!	MainWindow		Sigur doriți să modificați parametrii partiției selectate?\n\nE posibil ca partiția să nu mai fie recunoscută de alte sisteme de operare!
 Disk system \"%s\" not found!	MainWindow		Sistemul de disc \"%s\" nu a fost găsit!
 Eject	MainWindow		Scoate
 Partition	MainWindow		Partiție
@@ -65,8 +78,10 @@ File system	PartitionList		Sistem de fișiere
 Validation of the given creation parameters failed.	MainWindow		Validarea parametrilor de creare furnizați a eșuat.
 Partition type:	ChangeParametersPanel		Tip partiție:
 Size	PartitionList		Dimensiune
+Wipe (not implemented)	MainWindow		Ștergere (nu este implementat)
 Validation of the given initialization parameters failed.	MainWindow		Validarea parametrilor de inițializare furnizați a eșuat.
 The selected partition does not contain a partitioning system.	MainWindow		Partiția selectată nu conține un sistem de partiționare.
+Offset: %s	Support		Deplasare: %s
 Are you sure you want to write the changes back to disk now?\n\nAll data on the partition %s will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe partiția %s vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 The partition %s is currently mounted.	MainWindow		Partiția %s este montantă curent.
 Surface test (not implemented)	MainWindow		Test de suprafață (nu este implementat)

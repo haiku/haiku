@@ -1,4 +1,4 @@
-1	romanian	x-vnd.haiku-icon_o_matic	2192714724
+1	romanian	x-vnd.haiku-icon_o_matic	3554185674
 Select All	Icon-O-Matic-PathManipulator		Selectează tot
 Add Style	Icon-O-Matic-AddStylesCmd		Adaugă stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Culoare (#%02x%02x%02x)
@@ -42,6 +42,7 @@ Untitled	Icon-O-Matic-Main		Fără titlu
 Multi Set 	Multi Set (property name)		Configurare multi
 any of the other lists to	Empty property list - 2nd line		oricare din celelalte liste la
 Save as…	Icon-O-Matic-Menu-File		Salvează ca...
+Don't save	Icon-O-Matic-Menu-Settings		Nu salva
 Change Color	Icon-O-Matic-SetColorCmd		Schimbă culoarea
 Style	Icon-O-Matic-Menus		Stil
 <modify path>	Icon-O-Matic-PathCmd		<schimbă calea>
@@ -72,6 +73,7 @@ Undo	Icon-O-Matic-Main		Refă
 Click on a shape above	Empty transformers list - 1st line		Dați clic pe o formă de mai sus
 Add Shape	Icon-O-Matic-AddShapesCmd		Adaugă formă
 Contour	Transformation		Contur
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Salvați modificările pictogramei curente înainte să închideți?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<nimic de repetat>
 Perspective	Transformation		Perspectivă
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Mută transformator
@@ -116,6 +118,7 @@ Gradient	Icon-O-Matic-StyleTypes		Degrade
 Min LOD	Icon-O-Matic-PropertyNames		LOD min
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atribut BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Inversează selecția
+Drop shapes	Icon-O-Matic-ShapesList		Renunță la forme
 Export as…	Icon-O-Matic-Menu-File		Exportă ca...
 Transformation	Transformation		Transformare
 Click on an object in	Empty property list - 1st line		Dați clic pe un obiect în

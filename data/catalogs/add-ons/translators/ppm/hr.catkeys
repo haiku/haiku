@@ -1,4 +1,5 @@
-1	croatian	x-vnd.Haiku-PPMTranslator	231047584
+1	croatian	x-vnd.Haiku-PPMTranslator	1666693390
+Version %d.%d.%d, %s	PPMTranslator		Verzija %d.%d.%d %s
 PPM Settings	PPMMain		PPM postavke
 OK	PPMMain		OK
 Grayscale 8 bits	PPMTranslator		Sivo 8 bit-a
@@ -7,6 +8,7 @@ PPM image	PPMTranslator		PPM slika
 RGBA 5:5:5:1 16 bits	PPMTranslator		RGBA 5:5:5:1 16 bit-a
 Be Bitmap Format (PPMTranslator)	PPMTranslator		Be Bitmap Format (PPM prevoditelj)
 CMYA 8:8:8:8 32 bits	PPMTranslator		CMYA 8:8:8:8 32 bit-a
+Input color space:	PPMTranslator		Prostor za unešenu boju:
 CMYK 8:8:8:8 32 bits	PPMTranslator		CMYK 8:8:8:8 32 bit-a
 PPM image translator	PPMTranslator		PPM prevoditelj slika
 bits/space	PPMTranslator		bit-a/prostor

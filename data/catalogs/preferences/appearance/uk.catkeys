@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-Appearance	727801787
-Plain font:	Font view		Простий текст
+Plain font:	Font view		Простий шрифт:
 Control highlight	Colors tab		Простий шрифт:
 Control border	Colors tab		Межа елемента
 Antialiasing type:	AntialiasingSettingsView		Тип зглажування:
@@ -10,13 +10,13 @@ Grayscale	AntialiasingSettingsView		Відтінки сірого
 Shine	Colors tab		Сяйво
 About	DecorSettingsView		Про декоратор
 About decorator	DecorSettingsView		Про Декоратор
-Off	AntialiasingSettingsView		Вимкнути
+Off	AntialiasingSettingsView		Про декоратор
 Choose Decorator	DecorSettingsView		Вибір декоратора
 Success	Colors tab		Успіх
 Inactive window tab text	Colors tab		Текст заголовку неактивного вікна
 Failure	Colors tab		Невдача
 Hinting menu	AntialiasingSettingsView		Меню коректування
-Scroll bar:	DecorSettingsView		Смуга прокрутки
+Scroll bar:	DecorSettingsView		Смуга прокрутки:
 Document background	Colors tab		Тло документа
 Revert	APRWindow		Повернути
 Window tab	Colors tab		Заголовок вікна
@@ -26,10 +26,10 @@ Antialiasing	APRWindow		Зглажування
 Navigation base	Colors tab		Основа навігації
 Selected list item text	Colors tab		Текст виділеного пункту меню
 Window border	Colors tab		Межа вікна
-Double:	DecorSettingsView		Подвійний
+Double:	DecorSettingsView		Подвійний:
 Window tab text	Colors tab		Текст заголовку вікна
 Document text	Colors tab		Текст документа
-Navigation pulse	Colors tab		Навігаційна пульсація
+Navigation pulse	Colors tab		Навігація pulse
 Selected menu item text	Colors tab		Текст виділеного пункту меню
 Menu background	Colors tab		Тло меню
 List background	Colors tab		Тло списку
@@ -38,7 +38,7 @@ Control mark	Colors tab		Відмітка
 Size:	Font Selection view		Розмір:
 Decorator:	DecorSettingsView		Декоратор:
 Selected list item background	Colors tab		Тло вибраного пункта меню
-Panel background	Colors tab		Тло панелі
+Panel background	Colors tab		Декоратор:
 Menu font:	Font view		Шрифт меню:
 Colors	APRWindow		Кольори
 Control background	Colors tab		Тло елементу

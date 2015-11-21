@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-WebPositive	3678460971
+1	russian	x-vnd.Haiku-WebPositive	1282126593
 Show home button	Settings Window		Показывать кнопку Домой
 Username:	Authentication Panel		Имя пользователя:
 Copy URL to clipboard	Download Window		Копировать ссылку на загрузку
@@ -16,6 +16,7 @@ Start page:	Settings Window		Начальная страница:
 History	WebPositive Window		История
 Error opening downloads folder	Download Window		Ошибка открытия каталога загрузок
 Paste	WebPositive Window		Вставить
+Expiration	Cookie Manager		Срок действия
 Double-click or middle-click to open new tab.	Tab Manager		Нажатие средней кнопки или двойной клик откроет новую вкладку.
 Proxy username:	Settings Window		Имя пользователя прокси:
 Save page as…	WebPositive Window		Сохранить страницу как…
@@ -23,10 +24,12 @@ Over %days left	Download Window		Осталось более %days дней
 Settings	Settings Window		Настройки
 Confirmation	WebPositive Window		Подтверждение
 Window	WebPositive Window		Окно
+Cookie manager	Cookie Manager		Менеджер куков
 Decrease size	WebPositive Window		Уменьшить размер
 Serif font:	Settings Window		Шрифт с засечками:
 Loading %url	WebPositive Window		Загрузка %url
 Download aborted	Download Window		Загрузка прервана
+Value	Cookie Manager		Значение
 Page source	WebPositive Window		Код страницы
 Next	WebPositive Window		Далее
 Find next	WebPositive Window		Найти далее
@@ -42,6 +45,7 @@ Auto-hide mouse pointer	Settings Window		Автоматически скрыва
 Quit	WebPositive Window		Выход
 Full screen	WebPositive Window		Полноэкранный режим
 Open download error	Download Window		Ошибка при открытии загруженного файла
+The cookie jar is empty!	Cookie Manager		Архив куков пуст!
 Standard font:	Settings Window		Обычный шрифт:
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Найти назад
 Restart	Download Window		Перезапустить
@@ -53,6 +57,7 @@ Open	Download Window		Открыть
 Reload	WebPositive Window		Обновить
 Downloads	Download Window		Загрузки
 Sans serif font:	Settings Window		Шрифт без засечек:
+Delete	Cookie Manager		Удалить
 Forward	WebPositive Window		Вперёд
 of	Download Window	...as in '12kB of 256kB'	из
 Revert	Settings Window		Вернуть
@@ -94,10 +99,12 @@ Find	WebPositive Window		Найти
 Find previous	WebPositive Window		Найти ранее
 Settings	WebPositive Window		Настройки
 Script console	WebPositive Window		Консоль сценариев
+Name	Cookie Manager		Имя
 Proxy server address:	Settings Window		Адрес прокси-сервера:
 Proxy server port:	Settings Window		Порт прокси-сервера:
 Bookmarks	WebPositive Window		Закладки
 Paste	URL Bar		Вставить
+Cookie manager	WebPositive Window		Менеджер куков
 /s)	Download Window	...as in 'per second'	/с)
 Hide password text	Authentication Panel		Скрыть текст пароля
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Эй, жлоб! Где туз? Прячь юных съёмщиц в шкаф.
@@ -105,9 +112,11 @@ Over 1 minute left	Download Window		Осталось более 1 минуты
 Open start page	Settings Window		Открыть стартовую страницу
 Continue downloads	WebPositive		Продолжить загрузку
 Cancel	Download Window		Отмена
+Flags	Cookie Manager		Флаги
 Open search page	Settings Window		Открыть поисковую страницу
 Clear	Console Window		Очистить
 Password:	Authentication Panel		Пароль:
+Path	Cookie Manager		Путь
 Back	WebPositive Window		Назад
 New browser window	Download Window		Новое окно браузера
 Today	WebPositive Window		Сегодня
@@ -134,6 +143,7 @@ Open bookmarks confirmation	WebPositive Window		Подтверждение от�
 Remove missing	Download Window		Убрать отсутствующие
 Clone current page	Settings Window		Клонировать текущую страницу
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Вы хотите открыть сразу %addedCount закладок?
+Session cookie	Cookie Manager		Куки сессии
 OK	Authentication Panel		OK
 Copy	URL Bar		Копировать
 Download finished	Download Window		Загрузка завершена
@@ -141,6 +151,7 @@ Show bookmark bar	WebPositive Window		Показать панель заклад
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Изменить закладки…
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Закладка для этой страницы (%bookmarkName) уже существует.
+Cookies for %s	Cookie Manager		Куки для %s
 New windows:	Settings Window		Новые окна:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url загружен
 Remove finished	Download Window		Убрать загруженные
