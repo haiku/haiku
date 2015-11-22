@@ -107,6 +107,9 @@ rule PreprocessPackageOrRepositoryInfo target : source : architecture
 		sedReplacements
 			+= %HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX%, ;
 	}
+	for feature in $(HAIKU_BUILD_FEATURES) {
+		defines += HAIKU_BUILD_FEATURE_$(feature:U)_ENABLED ;
+	}
 
 	local revisionFile = [ DetermineEffectiveHaikuRevision ] ;
 	Depends $(target) : $(source) $(revisionFile) ;
