@@ -178,7 +178,7 @@ Services::~Services()
 	// stop all services
 
 	while (!fNameMap.empty()) {
-		_StopService(*fNameMap.begin()->second);
+		_StopService(fNameMap.begin()->second);
 	}
 }
 
@@ -297,20 +297,20 @@ Services::_StartService(struct service& service)
 
 
 status_t
-Services::_StopService(struct service& service)
+Services::_StopService(struct service* service)
 {
-	printf("Stop service '%s'\n", service.name.c_str());
+	printf("Stop service '%s'\n", service->name.c_str());
 
 	// remove service from maps
 	{
-		ServiceNameMap::iterator iterator = fNameMap.find(service.name);
+		ServiceNameMap::iterator iterator = fNameMap.find(service->name);
 		if (iterator != fNameMap.end())
 			fNameMap.erase(iterator);
 	}
 
-	if (!service.stand_alone) {
-		ConnectionList::const_iterator iterator = service.connections.begin();
-		for (; iterator != service.connections.end(); iterator++) {
+	if (!service->stand_alone) {
+		ConnectionList::const_iterator iterator = service->connections.begin();
+		for (; iterator != service->connections.end(); iterator++) {
 			const service_connection& connection = *iterator;
 
 			ServiceSocketMap::iterator socketIterator
@@ -324,12 +324,12 @@ Services::_StopService(struct service& service)
 	}
 
 	// Shutdown the running server, if any
-	if (service.process != -1) {
-		printf("  Sending SIGTERM to process %" B_PRId32 "\n", service.process);
-		kill(-service.process, SIGTERM);
+	if (service->process != -1) {
+		printf("  Sending SIGTERM to process %" B_PRId32 "\n", service->process);
+		kill(-service->process, SIGTERM);
 	}
 
-	delete &service;
+	delete service;
 	return B_OK;
 }
 
@@ -394,7 +394,7 @@ Services::_Update(const BMessage& services)
 
 			if (*service != *iterator->second) {
 				printf("Restart service %s\n", service->name.c_str());
-				_StopService(*iterator->second);
+				_StopService(iterator->second);
 				_StartService(*service);
 			} else
 				iterator->second->update = fUpdate;
@@ -410,7 +410,7 @@ Services::_Update(const BMessage& services)
 
 		if (service->update != fUpdate) {
 			// this service has to be removed
-			_StopService(*service);
+			_StopService(service);
 		}
 	}
 }

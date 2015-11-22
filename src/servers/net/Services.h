@@ -36,7 +36,7 @@ private:
 			void				_NotifyListener(bool quit = false);
 			void				_UpdateMinMaxSocket(int socket);
 			status_t			_StartService(struct service& service);
-			status_t			_StopService(struct service& service);
+			status_t			_StopService(struct service* service);
 			status_t			_ToService(const BMessage& message,
 									struct service*& service);
 			void				_Update(const BMessage& services);
