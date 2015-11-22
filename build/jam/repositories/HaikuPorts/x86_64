@@ -25,11 +25,11 @@ RemotePackageRepository HaikuPorts
 	apr_devel-1.5.2-1
 	apr_util-1.5.4-1
 	apr_util_devel-1.5.4-1
-	aspell-0.60.6.1-1
-	aspell_devel-0.60.6.1-1
+	aspell-0.60.6.1-2
+	aspell_devel-0.60.6.1-2
 	autoconf-2.69-6
 	automake-1.13.1-4
-	bash-4.3.42-1
+	bash-4.3.42-2
 #	bepdf-1.1.1~beta5_2013_04_28-1
 	binutils-2.25_12015_07_31-1
 	bison-2.6.5-1
@@ -65,7 +65,7 @@ RemotePackageRepository HaikuPorts
 	clang-3.5.1-1
 	clang_analysis-3.5.1-1
 	clipdinger-0.4-1
-	cmake-3.3.2-1
+	cmake-3.3.2-3
 	coreutils-8.24-1
 	cpio-2.12-1
 	cppunit-1.12.1-2
@@ -111,8 +111,8 @@ RemotePackageRepository HaikuPorts
 	gcc-4.8.5_2015_07_11-1
 	gcc_syslibs-4.8.5_2015_07_11-1
 	gcc_syslibs_devel-4.8.5_2015_07_11-1
-	gettext-0.19.6-1
-	gettext_libintl-0.19.6-1
+	gettext-0.19.6-2
+	gettext_libintl-0.19.6-2
 	giflib-5.1.0-1
 	giflib_devel-5.1.0-1
 	git-2.2.2-2
@@ -164,11 +164,11 @@ RemotePackageRepository HaikuPorts
 	jpeg_devel-9a-1
 	jpeg_tools-9a-1
 	keymapswitcher-1.2.7.11-1
-	lame-3.99.5-5
-	lame_devel-3.99.5-5
+	lame-3.99.5-6
+	lame_devel-3.99.5-6
 	lcms-2.7-1
 	lcms_devel-2.7-1
-	less-458-1
+	less-458-2
 	libasr-1.0.2-2
 	libasr_devel-1.0.2-2
 	libass-0.13.0-1
@@ -181,8 +181,8 @@ RemotePackageRepository HaikuPorts
 	libdvdread_devel-5.0.3-2
 	libdvdnav-5.0.3-3
 	libdvdnav_devel-5.0.3-3
-	libedit-2015_03_21_3.1-2
-	libedit_devel-2015_03_21_3.1-2
+	libedit-2015_03_21_3.1-3
+	libedit_devel-2015_03_21_3.1-3
 	libevent-2.0.21-8
 	libevent_devel-2.0.21-8
 	libexecinfo-1.1-2
@@ -222,8 +222,8 @@ RemotePackageRepository HaikuPorts
 	libpng_devel-1.5.22-1
 	libpng16-1.6.18-1
 	libpng16_devel-1.6.18-1
-	libqt4-4.8.7-2
-	libqt4_devel-4.8.7-2
+	libqt4-4.8.7-4
+	libqt4_devel-4.8.7-4
 	librevenge-0.0.1-1
 	librevenge_devel-0.0.1-1
 	libsamplerate-0.1.8-2
@@ -283,14 +283,14 @@ RemotePackageRepository HaikuPorts
 	mpfr_devel-3.1.3-1
 	mpg123-1.22.4-1
 	mpg123_devel-1.22.4-1
-	nano-2.4.2-1
+	nano-2.4.2-2
 	nasm-2.11.08-1
 	ncurses-5.9-10
 	ncurses_devel-5.9-10
 	ncurses6-6.0-1
 	ncurses6_devel-6.0-1
-	neon-0.30.1-1
-	neon_devel-0.30.1-1
+	neon-0.30.1-2
+	neon_devel-0.30.1-2
 	netcat-1.10-1
 	netpulse-0.2.3-5
 	ninja-1.5.1-2
@@ -300,7 +300,7 @@ RemotePackageRepository HaikuPorts
 	nss_devel-3.20-1
 	openal-1.13.0-2
 	openal_devel-1.13.0-2
-	openssh-7.1p1-2
+	openssh-7.1p1-3
 	openssl-1.0.2d-4
 	openssl_devel-1.0.2d-4
 	p7zip-9.20.1-5
@@ -311,7 +311,7 @@ RemotePackageRepository HaikuPorts
 	pixman_devel-0.32.6-1
 	pkgconfig-0.27.1-2
 	pyenet-20141025-1
-	python-2.7.10-2
+	python-2.7.10-3
 	python_setuptools-5.3-2
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
@@ -324,10 +324,10 @@ RemotePackageRepository HaikuPorts
 	quicklaunch-0.9.12-1
 	qupzilla-1.8.6-1
 	qutim-0.3.3-1
-	readline-6.3.8-1
-	readline_devel-6.3.8-1
-	ruby-2.2.2-2
-	ruby_devel-2.2.2-2
+	readline-6.3.8-2
+	readline_devel-6.3.8-2
+	ruby-2.2.2-3
+	ruby_devel-2.2.2-3
 	scons-2.3.1-4
 	sdl_gfx-2.0.25-2
 	sdl_gfx_devel-2.0.25-2
@@ -354,7 +354,7 @@ RemotePackageRepository HaikuPorts
 	tar-1.28-1
 	tar_debuginfo-1.28-1
 	tcpdump-4.7.4-2
-	texinfo-4.13a-7
+	texinfo-4.13a-8
 	tiff-3.9.6-2
 	tiff_devel-3.9.6-2
 	tiff_tools-3.9.6-2
@@ -366,7 +366,7 @@ RemotePackageRepository HaikuPorts
 	transmission-2.84-4
 	unrar-5.3.4-1
 	unzip-6.0-2
-	vim-7.4-2
+	vim-7.4-3
 	vision-0.9.7.r949-3
 	wget-1.17.0-1
 	which-2.21-1
