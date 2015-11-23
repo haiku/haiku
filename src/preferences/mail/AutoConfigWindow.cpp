@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2015, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -16,6 +16,7 @@
 #include <Directory.h>
 #include <File.h>
 #include <FindDirectory.h>
+#include <LayoutBuilder.h>
 #include <MailSettings.h>
 #include <Message.h>
 #include <Path.h>
@@ -30,45 +31,35 @@
 AutoConfigWindow::AutoConfigWindow(BRect rect, ConfigWindow *parent)
 	:
 	BWindow(rect, B_TRANSLATE("Create new account"), B_TITLED_WINDOW_LOOK,
-		B_MODAL_APP_WINDOW_FEEL,
-		B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_AVOID_FRONT, B_ALL_WORKSPACES),
+		B_MODAL_APP_WINDOW_FEEL, B_NOT_ZOOMABLE | B_AVOID_FRONT
+			| B_AUTO_UPDATE_SIZE_LIMITS, B_ALL_WORKSPACES),
 	fParentWindow(parent),
 	fAccount(NULL),
 	fMainConfigState(true),
 	fServerConfigState(false),
 	fAutoConfigServer(true)
 {
-	fRootView = new BView(Bounds(), "root auto config view",
-		B_FOLLOW_ALL_SIDES, B_NAVIGABLE);
-	fRootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(fRootView);
+	fContainerView = new BGroupView("config container");
 
-	int32 buttonHeight = 25;
-	int32 buttonWidth = 50;
-	BRect buttonRect = Bounds();
-	buttonRect.InsetBy(5,5);
-	buttonRect.top = buttonRect.bottom - buttonHeight;
-	buttonRect.left = buttonRect.right - 2 * buttonWidth - 5;
-	buttonRect.right = buttonRect.left + buttonWidth;
-	fBackButton = new BButton(buttonRect, "back", B_TRANSLATE("Back"),
+	fBackButton = new BButton("back", B_TRANSLATE("Back"),
 		new BMessage(kBackMsg));
 	fBackButton->SetEnabled(false);
-	fRootView->AddChild(fBackButton);
 
-	buttonRect.left += 5 + buttonWidth;
-	buttonRect.right = buttonRect.left + buttonWidth;
-	fNextButton = new BButton(buttonRect, "next", B_TRANSLATE("Next"),
+	fNextButton = new BButton("next", B_TRANSLATE("Next"),
 		new BMessage(kOkMsg));
 	fNextButton->MakeDefault(true);
-	fRootView->AddChild(fNextButton);
 
-	fBoxRect = Bounds();
-	fBoxRect.InsetBy(5,5);
-	fBoxRect.bottom-= buttonHeight + 5;
-
-	fMainView = new AutoConfigView(fBoxRect, fAutoConfig);
+	fMainView = new AutoConfigView(fAutoConfig);
 	fMainView->SetLabel(B_TRANSLATE("Account settings"));
-	fRootView->AddChild(fMainView);
+	fContainerView->AddChild(fMainView);
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(fContainerView)
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fBackButton)
+			.Add(fNextButton);
 
 	// Add a shortcut to close the window using Command-W
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
@@ -77,7 +68,6 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, ConfigWindow *parent)
 
 AutoConfigWindow::~AutoConfigWindow()
 {
-
 }
 
 
@@ -95,7 +85,8 @@ AutoConfigWindow::MessageReceived(BMessage* msg)
 					invalidMailAlert = new BAlert("invalidMailAlert",
 						B_TRANSLATE("Enter a valid e-mail address."),
 						B_TRANSLATE("OK"));
-					invalidMailAlert->SetFlags(invalidMailAlert->Flags() | B_CLOSE_ON_ESCAPE);
+					invalidMailAlert->SetFlags(invalidMailAlert->Flags()
+						| B_CLOSE_ON_ESCAPE);
 					invalidMailAlert->Go();
 					return;
 				}
@@ -114,8 +105,8 @@ AutoConfigWindow::MessageReceived(BMessage* msg)
 				fServerConfigState = true;
 				fMainView->Hide();
 
-				fServerView = new ServerSettingsView(fBoxRect, fAccountInfo);
-				fRootView->AddChild(fServerView);
+				fServerView = new ServerSettingsView(fAccountInfo);
+				fContainerView->AddChild(fServerView);
 
 				fBackButton->SetEnabled(true);
 				fNextButton->SetLabel(B_TRANSLATE("Finish"));
@@ -135,7 +126,7 @@ AutoConfigWindow::MessageReceived(BMessage* msg)
 				fMainConfigState = true;
 				fServerConfigState = false;
 
-				fRootView->RemoveChild(fServerView);
+				fContainerView->RemoveChild(fServerView);
 				delete fServerView;
 
 				fMainView->Show();

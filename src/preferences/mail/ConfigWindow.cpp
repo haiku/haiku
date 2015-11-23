@@ -511,7 +511,8 @@ ConfigWindow::QuitRequested()
 void
 ConfigWindow::MessageReceived(BMessage *msg)
 {
-	BRect autoConfigRect(0, 0, 400, 300);
+	float fontFactor = be_plain_font->Size() / 12.0f;
+	BRect autoConfigRect(0, 0, 400 * fontFactor, 300 * fontFactor);
 	BRect frame;
 
 	AutoConfigWindow *autoConfigWindow = NULL;

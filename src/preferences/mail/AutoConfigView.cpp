@@ -13,6 +13,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <FindDirectory.h>
+#include <LayoutBuilder.h>
 #include <Message.h>
 #include <MenuItem.h>
 #include <Path.h>
@@ -27,70 +28,57 @@
 #define B_TRANSLATION_CONTEXT "E-Mail"
 
 
-AutoConfigView::AutoConfigView(BRect rect, AutoConfig &config)
+AutoConfigView::AutoConfigView(AutoConfig &config)
 	:
-	BBox(rect),
+	BBox("auto config"),
 	fAutoConfig(config)
 {
-	int32 stepSize = 30;
-	int32 divider = 100;
-	BPoint topLeft(20, 20);
-	BPoint rightDown(rect.Width() - 20, 20 + stepSize);
+	// Search for SMTP entry_ref
+	_GetSMTPAddOnRef(&fSMTPAddOnRef);
 
-	// protocol view
-	topLeft.y += stepSize;
-	rightDown.y += stepSize;
-	fInProtocolsField = _SetupProtocolView(BRect(topLeft, rightDown));
-	if (fInProtocolsField)
-		AddChild(fInProtocolsField);
+	fInProtocolsField = new BMenuField(NULL, NULL, _SetupProtocolMenu());
 
-	// search for smtp ref
-	_GetSMTPAddonRef(&fSMTPAddonRef);
+	fEmailView = new BTextControl("email", B_TRANSLATE("E-mail address:"),
+		"", new BMessage(kEMailChangedMsg));
 
-	// email view
-	topLeft.y += stepSize;
-	rightDown.y += stepSize;
-	fEmailView = new BTextControl(BRect(topLeft, rightDown), "email",
-		B_TRANSLATE("E-mail address:"), "", new BMessage(kEMailChangedMsg));
-	fEmailView->SetDivider(divider);
-	AddChild(fEmailView);
+	fLoginNameView = new BTextControl("login", B_TRANSLATE("Login name:"),
+		"", NULL);
 
-	// login name view
-	topLeft.y += stepSize;
-	rightDown.y += stepSize;
-	fLoginNameView = new BTextControl(BRect(topLeft, rightDown),
-		"login", B_TRANSLATE("Login name:"), "", NULL);
-	fLoginNameView->SetDivider(divider);
-	AddChild(fLoginNameView);
-
-	// password view
-	topLeft.y += stepSize;
-	rightDown.y += stepSize;
-	fPasswordView = new BTextControl(BRect(topLeft, rightDown), "password",
-		B_TRANSLATE("Password:"), "", NULL);
-	fPasswordView->SetDivider(divider);
+	fPasswordView = new BTextControl("password", B_TRANSLATE("Password:"),
+		"", NULL);
 	fPasswordView->TextView()->HideTyping(true);
-	AddChild(fPasswordView);
 
-	// account view
-	topLeft.y += stepSize;
-	rightDown.y += stepSize;
-	fAccountNameView = new BTextControl(BRect(topLeft, rightDown), "account",
-		B_TRANSLATE("Account name:"), "", NULL);
-	fAccountNameView->SetDivider(divider);
-	AddChild(fAccountNameView);
+	fAccountNameView = new BTextControl("account", B_TRANSLATE("Account name:"),
+		"", NULL);
 
-	// name view
-	topLeft.y += stepSize;
-	rightDown.y += stepSize;
-	fNameView = new BTextControl(BRect(topLeft, rightDown), "name",
-		B_TRANSLATE("Real name:"), "", NULL);
-	AddChild(fNameView);
-	fNameView->SetDivider(divider);
+	fNameView = new BTextControl("name", B_TRANSLATE("Real name:"), "", NULL);
 
 	struct passwd* passwd = getpwent();
 	if (passwd != NULL)
 		fNameView->SetText(passwd->pw_gecos);
+
+	AddChild(BLayoutBuilder::Grid<>()
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetSpacing(B_USE_HALF_ITEM_SPACING, B_USE_HALF_ITEM_SPACING)
+
+		.Add(fInProtocolsField->CreateLabelLayoutItem(), 0, 0)
+		.Add(fInProtocolsField->CreateMenuBarLayoutItem(), 1, 0)
+
+		.Add(fEmailView->CreateLabelLayoutItem(), 0, 1)
+		.Add(fEmailView->CreateTextViewLayoutItem(), 1, 1)
+
+		.Add(fLoginNameView->CreateLabelLayoutItem(), 0, 2)
+		.Add(fLoginNameView->CreateTextViewLayoutItem(), 1, 2)
+
+		.Add(fPasswordView->CreateLabelLayoutItem(), 0, 3)
+		.Add(fPasswordView->CreateTextViewLayoutItem(), 1, 3)
+
+		.Add(fAccountNameView->CreateLabelLayoutItem(), 0, 4)
+		.Add(fAccountNameView->CreateTextViewLayoutItem(), 1, 4)
+
+		.Add(fNameView->CreateLabelLayoutItem(), 0, 5)
+		.Add(fNameView->CreateTextViewLayoutItem(), 1, 5)
+		.View());
 }
 
 
@@ -145,7 +133,7 @@ AutoConfigView::GetBasicAccountInfo(account_info &info)
 	else
 		info.inboundType = POP;
 
-	info.outboundProtocol = fSMTPAddonRef;
+	info.outboundProtocol = fSMTPAddOnRef;
 	info.name = fNameView->Text();
 	info.accountName = fAccountNameView->Text();
 	info.email = fEmailView->Text();
@@ -156,17 +144,18 @@ AutoConfigView::GetBasicAccountInfo(account_info &info)
 }
 
 
-BMenuField*
-AutoConfigView::_SetupProtocolView(BRect rect)
+BPopUpMenu*
+AutoConfigView::_SetupProtocolMenu()
 {
 	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("Choose Protocol"));
 
+	// TODO: use path finder!
 	for (int i = 0; i < 2; i++) {
 		BPath path;
 		status_t status = find_directory((i == 0) ? B_USER_ADDONS_DIRECTORY :
 			B_BEOS_ADDONS_DIRECTORY, &path);
 		if (status != B_OK)
-			return NULL;
+			return menu;
 
 		path.Append("mail_daemon");
 		path.Append("inbound_protocols");
@@ -175,13 +164,11 @@ AutoConfigView::_SetupProtocolView(BRect rect)
 		entry_ref protocolRef;
 		while (dir.GetNextRef(&protocolRef) == B_OK)
 		{
-			char name[B_FILE_NAME_LENGTH];
 			BEntry entry(&protocolRef);
-			entry.GetName(name);
 
-			BMenuItem *item;
-			BMessage *msg = new BMessage(kProtokollChangedMsg);
-			menu->AddItem(item = new BMenuItem(name, msg));
+			BMessage* msg = new BMessage(kProtokollChangedMsg);
+			BMenuItem* item = new BMenuItem(entry.Name(), msg);
+			menu->AddItem(item);
 			msg->AddRef("protocol", &protocolRef);
 
 			item->SetMarked(true);
@@ -193,14 +180,12 @@ AutoConfigView::_SetupProtocolView(BRect rect)
 	if (imapItem)
 		imapItem->SetMarked(true);
 
-	BMenuField *protocolsMenuField = new BMenuField(rect, NULL, NULL, menu);
-	protocolsMenuField->ResizeToPreferred();
-	return protocolsMenuField;
+	return menu;
 }
 
 
 status_t
-AutoConfigView::_GetSMTPAddonRef(entry_ref *ref)
+AutoConfigView::_GetSMTPAddOnRef(entry_ref *ref)
 {
 	directory_which which[] = {
 		B_USER_ADDONS_DIRECTORY,
@@ -279,30 +264,22 @@ AutoConfigView::IsValidMailAddress(BString email)
 // #pragma mark -
 
 
-ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
+ServerSettingsView::ServerSettingsView(const account_info &info)
 	:
-	BView(rect, NULL,B_FOLLOW_ALL,0),
+	BGroupView("server", B_VERTICAL),
 	fInboundAccount(true),
 	fOutboundAccount(true),
 	fInboundAuthMenu(NULL),
 	fOutboundAuthMenu(NULL),
 	fInboundEncrItemStart(NULL),
 	fOutboundEncrItemStart(NULL),
-	fImageId(-1)
+	fImageID(-1)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-	int32 divider = 120;
-
 	fInboundAccount = true;
 	fOutboundAccount = true;
 
 	// inbound
-	BRect boxRect = Bounds();
-	boxRect.bottom /= 2;
-	boxRect.bottom -= 5;
-
-	BBox *box = new BBox(boxRect);
+	BBox* box = new BBox("inbound");
 	box->SetLabel(B_TRANSLATE("Incoming"));
 	AddChild(box);
 
@@ -312,112 +289,124 @@ ServerSettingsView::ServerSettingsView(BRect rect, const account_info &info)
 	else
 		serverName = info.providerInfo.pop_server;
 
-	fInboundNameView = new BTextControl(BRect(10, 20, rect.Width() - 20, 35),
-		"inbound", B_TRANSLATE("Server Name:"), serverName.String(),
-		new BMessage(kServerChangedMsg));
-	fInboundNameView->SetDivider(divider);
+	BGridView* grid = new BGridView("inner");
+	grid->GridLayout()->SetInsets(B_USE_DEFAULT_SPACING);
+	box->AddChild(grid);
 
-	box->AddChild(fInboundNameView);
+	fInboundNameView = new BTextControl("inbound", B_TRANSLATE("Server Name:"),
+		serverName, new BMessage(kServerChangedMsg));
+	grid->GridLayout()->AddItem(fInboundNameView->CreateLabelLayoutItem(),
+		0, 0);
+	grid->GridLayout()->AddItem(fInboundNameView->CreateTextViewLayoutItem(),
+		1, 0);
 
-	_GetAuthEncrMenu(info.inboundProtocol, &fInboundAuthMenu,
-		&fInboundEncryptionMenu);
+	int32 row = 1;
+
+	_GetAuthEncrMenu(info.inboundProtocol, fInboundAuthMenu,
+		fInboundEncryptionMenu);
 	if (fInboundAuthMenu != NULL) {
 		int authID = info.providerInfo.authentification_pop;
 		if (info.inboundType == POP)
 			fInboundAuthMenu->Menu()->ItemAt(authID)->SetMarked(true);
 		fInboundAuthItemStart = fInboundAuthMenu->Menu()->FindMarked();
-		box->AddChild(fInboundAuthMenu);
-		fInboundAuthMenu->SetDivider(divider);
-		fInboundAuthMenu->MoveTo(10, 50);
+
+		grid->GridLayout()->AddItem(fInboundAuthMenu->CreateLabelLayoutItem(),
+			0, row);
+		grid->GridLayout()->AddItem(fInboundAuthMenu->CreateMenuBarLayoutItem(),
+			1, row++);
 	}
-	if (fInboundEncryptionMenu) {
+	if (fInboundEncryptionMenu != NULL) {
 		BMenuItem *item = NULL;
 		if (info.inboundType == POP) {
 			item = fInboundEncryptionMenu->Menu()->ItemAt(
 				info.providerInfo.ssl_pop);
 			if (item != NULL)
 				item->SetMarked(true);
-			fInboundEncryptionMenu->MoveTo(10, 80);
 		}
 		if (info.inboundType == IMAP) {
 			item = fInboundEncryptionMenu->Menu()->ItemAt(
 				info.providerInfo.ssl_imap);
 			if (item != NULL)
 				item->SetMarked(true);
-			fInboundEncryptionMenu->MoveTo(10, 50);
 		}
 		fInboundEncrItemStart = fInboundEncryptionMenu->Menu()->FindMarked();
-		box->AddChild(fInboundEncryptionMenu);
-		fInboundEncryptionMenu->SetDivider(divider);
-	}
 
-	if (!fInboundAccount) {
-		fInboundNameView->SetEnabled(false);
-		if (fInboundAuthMenu)
-			fInboundAuthMenu->SetEnabled(false);
+		grid->GridLayout()->AddItem(
+			fInboundEncryptionMenu->CreateLabelLayoutItem(), 0, row);
+		grid->GridLayout()->AddItem(
+			fInboundEncryptionMenu->CreateMenuBarLayoutItem(), 1, row++);
 	}
+	grid->GridLayout()->AddItem(BSpaceLayoutItem::CreateGlue(), 0, row);
+
+	if (!fInboundAccount)
+		box->Hide();
 
 	// outbound
-	boxRect = Bounds();
-	boxRect.top = boxRect.bottom / 2;
-	boxRect.top += 5;
-
-	box = new BBox(boxRect);
+	box = new BBox("outbound");
 	box->SetLabel(B_TRANSLATE("Outgoing"));
 	AddChild(box);
 
+	grid = new BGridView("inner");
+	grid->GridLayout()->SetInsets(B_USE_DEFAULT_SPACING);
+	box->AddChild(grid);
+
 	serverName = info.providerInfo.smtp_server;
-	fOutboundNameView = new BTextControl(BRect(10, 20, rect.Width() - 20, 30),
-		"outbound", B_TRANSLATE("Server name:"), serverName.String(),
+	fOutboundNameView = new BTextControl("outbound",
+		B_TRANSLATE("Server name:"), serverName.String(),
 		new BMessage(kServerChangedMsg));
-	fOutboundNameView->SetDivider(divider);
+	grid->GridLayout()->AddItem(fOutboundNameView->CreateLabelLayoutItem(),
+		0, 0);
+	grid->GridLayout()->AddItem(fOutboundNameView->CreateTextViewLayoutItem(),
+		1, 0);
 
-	box->AddChild(fOutboundNameView);
+	row = 1;
 
-	_GetAuthEncrMenu(info.outboundProtocol, &fOutboundAuthMenu,
-		&fOutboundEncryptionMenu);
+	_GetAuthEncrMenu(info.outboundProtocol, fOutboundAuthMenu,
+		fOutboundEncryptionMenu);
 	if (fOutboundAuthMenu != NULL) {
-		BMenuItem *item = fOutboundAuthMenu->Menu()->ItemAt(
+		BMenuItem* item = fOutboundAuthMenu->Menu()->ItemAt(
 			info.providerInfo.authentification_smtp);
 		if (item != NULL)
 			item->SetMarked(true);
 		fOutboundAuthItemStart = item;
-		box->AddChild(fOutboundAuthMenu);
-		fOutboundAuthMenu->SetDivider(divider);
-		fOutboundAuthMenu->MoveTo(10, 50);
+
+		grid->GridLayout()->AddItem(fOutboundAuthMenu->CreateLabelLayoutItem(),
+			0, row);
+		grid->GridLayout()->AddItem(
+			fOutboundAuthMenu->CreateMenuBarLayoutItem(), 1, row++);
 	}
 	if (fOutboundEncryptionMenu != NULL) {
-		BMenuItem *item = fOutboundEncryptionMenu->Menu()->ItemAt(
+		BMenuItem* item = fOutboundEncryptionMenu->Menu()->ItemAt(
 			info.providerInfo.ssl_smtp);
 		if (item != NULL)
 			item->SetMarked(true);
 		fOutboundEncrItemStart = item;
-		box->AddChild(fOutboundEncryptionMenu);
-		fOutboundEncryptionMenu->SetDivider(divider);
-		fOutboundEncryptionMenu->MoveTo(10, 80);
-	}
 
-	if (!fOutboundAccount) {
-		fOutboundNameView->SetEnabled(false);
-		if (fOutboundAuthMenu)
-			fOutboundAuthMenu->SetEnabled(false);
+		grid->GridLayout()->AddItem(
+			fOutboundEncryptionMenu->CreateLabelLayoutItem(), 0, row);
+		grid->GridLayout()->AddItem(
+			fOutboundEncryptionMenu->CreateMenuBarLayoutItem(), 1, row++);
 	}
+	grid->GridLayout()->AddItem(BSpaceLayoutItem::CreateGlue(), 0, row);
 
+	if (!fOutboundAccount)
+		box->Hide();
 }
 
 
 ServerSettingsView::~ServerSettingsView()
 {
+	// Remove manually, as their code may be located in an add-on
 	RemoveChild(fInboundAuthMenu);
 	RemoveChild(fInboundEncryptionMenu);
 	delete fInboundAuthMenu;
 	delete fInboundEncryptionMenu;
-	unload_add_on(fImageId);
+	unload_add_on(fImageID);
 }
 
 
 void
-ServerSettingsView::GetServerInfo(account_info &info)
+ServerSettingsView::GetServerInfo(account_info& info)
 {
 	if (info.inboundType == IMAP) {
 		info.providerInfo.imap_server = fInboundNameView->Text();
@@ -470,27 +459,11 @@ ServerSettingsView::GetServerInfo(account_info &info)
 void
 ServerSettingsView::_DetectMenuChanges()
 {
-	bool changed = false;
-	if (fInboundAuthMenu != NULL) {
-		BMenuItem *item = fInboundAuthMenu->Menu()->FindMarked();
-		if (fInboundAuthItemStart != item)
-			changed = true;
-	}
-	if (fInboundEncryptionMenu != NULL) {
-		BMenuItem *item = fInboundEncryptionMenu->Menu()->FindMarked();
-		if (fInboundEncrItemStart != item)
-			changed = true;
-	}
-	if (fOutboundAuthMenu != NULL) {
-		BMenuItem *item = fOutboundAuthMenu->Menu()->FindMarked();
-		if (fOutboundAuthItemStart != item)
-			changed = true;
-	}
-	if (fOutboundEncryptionMenu != NULL) {
-		BMenuItem *item = fOutboundEncryptionMenu->Menu()->FindMarked();
-		if (fOutboundEncrItemStart != item)
-			changed = true;
-	}
+	bool changed = _HasMarkedChanged(fInboundAuthMenu, fInboundAuthItemStart)
+		| _HasMarkedChanged(fInboundEncryptionMenu, fInboundEncrItemStart)
+		| _HasMarkedChanged(fOutboundAuthMenu, fOutboundAuthItemStart)
+		| _HasMarkedChanged(fOutboundEncryptionMenu, fOutboundEncrItemStart);
+
 	if (changed) {
 		BMessage msg(kServerChangedMsg);
 		BMessenger messenger(NULL, Window()->Looper());
@@ -499,18 +472,31 @@ ServerSettingsView::_DetectMenuChanges()
 }
 
 
+bool
+ServerSettingsView::_HasMarkedChanged(BMenuField* field,
+	BMenuItem* originalItem)
+{
+	if (field != NULL) {
+		BMenuItem *item = field->Menu()->FindMarked();
+		if (item != originalItem)
+			return true;
+	}
+	return false;
+}
+
+
 void
 ServerSettingsView::_GetAuthEncrMenu(entry_ref protocol,
-	BMenuField** authField, BMenuField** sslField)
+	BMenuField*& authField, BMenuField*& sslField)
 {
 	BMailAccountSettings dummySettings;
 	BView *view = new BStringView("", "Not here!");//CreateConfigView(protocol, dummySettings.InboundSettings(),
 //		dummySettings, fImageId);
 
-	*authField = (BMenuField *)view->FindView("auth_method");
-	*sslField = (BMenuField *)view->FindView("flavor");
+	authField = (BMenuField*)view->FindView("auth_method");
+	sslField = (BMenuField*)view->FindView("flavor");
 
-	view->RemoveChild(*authField);
-	view->RemoveChild(*sslField);
+	view->RemoveChild(authField);
+	view->RemoveChild(sslField);
 	delete view;
 }
