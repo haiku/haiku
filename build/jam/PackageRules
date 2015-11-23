@@ -108,7 +108,8 @@ rule PreprocessPackageOrRepositoryInfo target : source : architecture
 			+= %HAIKU_SECONDARY_PACKAGING_ARCH_SUFFIX%, ;
 	}
 	for feature in $(HAIKU_BUILD_FEATURES) {
-		defines += HAIKU_BUILD_FEATURE_$(feature:U)_ENABLED ;
+		local featureSplit = [ FSplitString $(feature) : ":" ] ;
+		defines += HAIKU_BUILD_FEATURE_$(featureSplit:UJ=_)_ENABLED ;
 	}
 
 	local revisionFile = [ DetermineEffectiveHaikuRevision ] ;
