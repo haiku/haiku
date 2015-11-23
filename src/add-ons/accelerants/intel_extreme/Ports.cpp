@@ -37,6 +37,34 @@
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
+static bool
+wait_for_set(addr_t address, uint32 mask, uint32 timeout)
+{
+	int interval = 50;
+	uint32 i = 0;
+	for(i = 0; i <= timeout; i += interval) {
+		spin(interval);
+		if ((read32(address) & mask) != 0)
+			return true;
+	}
+	return false;
+}
+
+
+static bool
+wait_for_clear(addr_t address, uint32 mask, uint32 timeout)
+{
+	int interval = 50;
+	uint32 i = 0;
+	for(i = 0; i <= timeout; i += interval) {
+		spin(interval);
+		if ((read32(address) & mask) == 0)
+			return true;
+	}
+	return false;
+}
+
+
 Port::Port(port_index index, const char* baseName)
 	:
 	fDisplayPipe(NULL),
@@ -361,6 +389,20 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		return B_ERROR;
 	}
 
+	addr_t panelControl = INTEL_PANEL_CONTROL;
+	addr_t panelStatus = INTEL_PANEL_STATUS;
+	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
+		panelControl = PCH_PANEL_CONTROL;
+		panelStatus = PCH_PANEL_STATUS;
+	}
+
+	// Power off Panel
+	write32(panelControl, read32(panelControl) & ~PANEL_CONTROL_POWER_TARGET_ON);
+	read32(panelControl);
+
+	if (!wait_for_clear(panelStatus, PANEL_STATUS_POWER_ON, 1000))
+		ERROR("%s: %s didn't power off within 1000ms!\n", __func__, PortName());
+
 	// TODO: Fix software scaling?
 
 	// Disable PanelFitter for now
@@ -503,18 +545,11 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		extraPLLFlags);
 
 	// Power on Panel
-	addr_t panelControl = INTEL_PANEL_CONTROL;
-	addr_t panelStatus = INTEL_PANEL_STATUS;
-	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
-		panelControl = PCH_PANEL_CONTROL;
-		panelStatus = PCH_PANEL_STATUS;
-	}
 	write32(panelControl, read32(panelControl) | PANEL_CONTROL_POWER_TARGET_ON);
+	read32(panelControl);
 
-	// TODO: A wait_for power on status to be set would be better here
-	spin(750);
-	if ((read32(panelStatus) & PANEL_STATUS_POWER_ON) == 0)
-		ERROR("%s: %s didn't power on in 750ms!\n", __func__, PortName());
+	if (!wait_for_set(panelStatus, PANEL_STATUS_POWER_ON, 1000))
+		ERROR("%s: %s didn't power on within 1000ms!\n", __func__, PortName());
 
 	// Program target display mode
 	fDisplayPipe->Enable(target, _PortRegister());
