@@ -240,31 +240,17 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 
 	// On Intel's Panther Point and Lynx Point Chipset taking ownership 
 	// of EHCI owned ports, is what we do here.
-	if (fPCIInfo->vendor_id == PCI_VENDOR_INTEL 
-		&& (fPCIInfo->device_id == PCI_DEVICE_INTEL_PANTHER_POINT_XHCI
-			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_XHCI
-			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_LP_XHCI
-			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_BAYTRAIL_XHCI
-			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_WILDCAT_POINT_XHCI)) {
-		
-		TRACE("Intel xHC Controller\n");
-		TRACE("Looking for EHCI owned ports\n");
-		uint32 ports = sPCIModule->read_pci_config(fPCIInfo->bus,
-			fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_USB3PRM, 4);		
-		TRACE("Superspeed Ports: 0x%" B_PRIx32 "\n", ports);
-		sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-			fPCIInfo->function, XHCI_INTEL_USB3_PSSEN, 4, ports);
-		ports = sPCIModule->read_pci_config(fPCIInfo->bus,
-			fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_USB3_PSSEN, 4);
-		TRACE("Superspeed ports now under XHCI : 0x%" B_PRIx32 "\n", ports);
-		ports = sPCIModule->read_pci_config(fPCIInfo->bus,
-			fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_USB2PRM, 4);
-		TRACE("USB 2.0 Ports : 0x%" B_PRIx32 "\n", ports);
-		sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
-			fPCIInfo->function, XHCI_INTEL_XUSB2PR, 4, ports);
-		ports = sPCIModule->read_pci_config(fPCIInfo->bus,
-			fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_XUSB2PR, 4);
-		TRACE("USB 2.0 ports now under XHCI: 0x%" B_PRIx32 "\n", ports);
+	if (fPCIInfo->vendor_id == PCI_VENDOR_INTEL) {
+		switch (fPCIInfo->device_id) {
+			case PCI_DEVICE_INTEL_PANTHER_POINT_XHCI:
+			case PCI_DEVICE_INTEL_LYNX_POINT_XHCI:
+			case PCI_DEVICE_INTEL_LYNX_POINT_LP_XHCI:
+			case PCI_DEVICE_INTEL_BAYTRAIL_XHCI:
+			case PCI_DEVICE_INTEL_WILDCAT_POINT_XHCI:
+			case PCI_DEVICE_INTEL_WILDCAT_POINT_LP_XHCI:
+				_SwitchIntelPorts();
+				break;
+		}
 	}
 
 	// halt the host controller
@@ -357,6 +343,30 @@ XHCI::~XHCI()
 		sPCIx86Module = NULL;
 		put_module(B_PCI_X86_MODULE_NAME);
 	}
+}
+
+
+void
+XHCI::_SwitchIntelPorts()
+{
+	TRACE("Intel xHC Controller\n");
+	TRACE("Looking for EHCI owned ports\n");
+	uint32 ports = sPCIModule->read_pci_config(fPCIInfo->bus,
+		fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_USB3PRM, 4);
+	TRACE("Superspeed Ports: 0x%" B_PRIx32 "\n", ports);
+	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+		fPCIInfo->function, XHCI_INTEL_USB3_PSSEN, 4, ports);
+	ports = sPCIModule->read_pci_config(fPCIInfo->bus,
+		fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_USB3_PSSEN, 4);
+	TRACE("Superspeed ports now under XHCI : 0x%" B_PRIx32 "\n", ports);
+	ports = sPCIModule->read_pci_config(fPCIInfo->bus,
+		fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_USB2PRM, 4);
+	TRACE("USB 2.0 Ports : 0x%" B_PRIx32 "\n", ports);
+	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
+		fPCIInfo->function, XHCI_INTEL_XUSB2PR, 4, ports);
+	ports = sPCIModule->read_pci_config(fPCIInfo->bus,
+		fPCIInfo->device, fPCIInfo->function, XHCI_INTEL_XUSB2PR, 4);
+	TRACE("USB 2.0 ports now under XHCI: 0x%" B_PRIx32 "\n", ports);
 }
 
 
