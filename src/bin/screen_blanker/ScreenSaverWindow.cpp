@@ -37,8 +37,8 @@ ScreenSaverFilter::Filter(BMessage* message, BHandler** target)
 				// in test mode, all mouse move events are ignored
 				bool transitOnly = false;
 				if (fTestMode
-					|| message->FindBool("be:transit_only", &transitOnly) == B_OK
-					&& transitOnly)
+					|| (message->FindBool("be:transit_only", &transitOnly)
+						== B_OK && transitOnly))
 					return B_DISPATCH_MESSAGE;
 
 				// Fall through
