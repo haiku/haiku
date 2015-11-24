@@ -347,9 +347,9 @@ assign_pipes()
 	// assigned when the count is > 1;
 
 	uint32 current = 0;
-    for (uint32 i = 0; i < gInfo->port_count; i++) {
-        if (gInfo->ports[i] == NULL)
-            continue;
+	for (uint32 i = 0; i < gInfo->port_count; i++) {
+		if (gInfo->ports[i] == NULL)
+			continue;
 
 		pipe_index preference = gInfo->ports[i]->PipePreference();
 		if (preference != INTEL_PIPE_ANY) {
@@ -370,7 +370,7 @@ assign_pipes()
 			gInfo->ports[i]->SetPipe(gInfo->pipes[current]);
 			current++;
 		}
-    }
+	}
 
 	return B_OK;
 }
