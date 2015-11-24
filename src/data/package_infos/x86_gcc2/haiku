@@ -74,15 +74,31 @@ requires {
 	lib:libicuuc
 	lib:libncurses >= 6.0
 #ifdef HAIKU_REGULAR_BUILD
+#ifdef HAIKU_BUILD_FEATURE_X86_GCC2_EXPAT_ENABLED
 	lib:libexpat
+#endif
+#ifdef HAIKU_BUILD_FEATURE_X86_GCC2_GUTENPRINT_ENABLED
 	lib:libgutenprint
+#endif
+#ifdef HAIKU_BUILD_FEATURE_X86_GCC2_LIBICNS_ENABLED
 	lib:libicns
+#endif
+#ifdef HAIKU_BUILD_FEATURE_X86_GCC2_JASPER_ENABLED
 	lib:libjasper
+#endif
+#ifdef HAIKU_BUILD_FEATURE_X86_GCC2_JPEG_ENABLED
 	lib:libjpeg
+#endif
+#ifdef HAIKU_BUILD_FEATURE_X86_GCC2_LIBPNG_ENABLED
 	lib:libpng >= 16.0
+#endif
 	lib:libqrencode
+#ifdef HAIKU_BUILD_FEATURE_X86_GCC2_TIFF_ENABLED
 	lib:libtiff >= 5.2
+#endif
+#ifdef HAIKU_BUILD_FEATURE_X86_GCC2_LIBWEBP_ENABLED
 	lib:libwebp
+#endif
 #endif
 	lib:libsolv
 	lib:libsolvext
