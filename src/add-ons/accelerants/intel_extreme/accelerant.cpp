@@ -37,6 +37,7 @@
 
 
 struct accelerant_info* gInfo;
+uint32 gDumpCount;
 
 
 class AreaCloner {
@@ -89,6 +90,36 @@ AreaCloner::Keep()
 //	#pragma mark -
 
 
+// intel_reg --mmio=ie-0001.bin --devid=27a2 dump
+void
+dump_registers()
+{
+	char filename[255];
+
+	sprintf(filename, "/boot/system/cache/tmp/ie-%04" B_PRId32 ".bin",
+		gDumpCount);
+
+	ERROR("%s: Taking register dump #%" B_PRId32 "\n", __func__, gDumpCount);
+
+	int fd = open(filename, O_CREAT | O_WRONLY, 0644);
+	uint32 data = 0;
+	if (fd >= 0) {
+		for (int32 i = 0; i < 0x80000; i += sizeof(data)) {
+			//char line[512];
+			//int length = sprintf(line, "%05" B_PRIx32 ": "
+			//	"%08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32 "\n",
+			//	i, read32(i), read32(i + 4), read32(i + 8), read32(i + 12));
+			data = read32(i);
+			write(fd, &data, sizeof(data));
+		}
+		close(fd);
+		sync();
+	}
+
+	gDumpCount++;
+}
+
+
 /*! This is the common accelerant_info initializer. It is called by
 	both, the first accelerant and all clones.
 */
@@ -96,6 +127,9 @@ static status_t
 init_common(int device, bool isClone)
 {
 	// initialize global accelerant info structure
+
+	// Number of register dumps we have... taken.
+	gDumpCount = 0;
 
 	gInfo = (accelerant_info*)malloc(sizeof(accelerant_info));
 	if (gInfo == NULL)

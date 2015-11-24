@@ -101,6 +101,7 @@ write32(uint32 encodedRegister, uint32 value)
 		+ REGISTER_REGISTER(encodedRegister)) = value;
 }
 
+void dump_registers(void);
 
 // dpms.cpp
 extern void enable_display_plane(bool enable);

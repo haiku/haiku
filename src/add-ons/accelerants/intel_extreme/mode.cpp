@@ -470,26 +470,11 @@ intel_set_display_mode(display_mode* mode)
 	// This would avoid the screen being off when switching workspaces when they
 	// have the same resolution.
 
-#if 0
-static bool first = true;
-if (first) {
-	int fd = open("/boot/home/ie_.regs", O_CREAT | O_WRONLY, 0644);
-	if (fd >= 0) {
-		for (int32 i = 0; i < 0x80000; i += 16) {
-			char line[512];
-			int length = sprintf(line, "%05lx: %08lx %08lx %08lx %08lx\n",
-				i, read32(i), read32(i + 4), read32(i + 8), read32(i + 12));
-			write(fd, line, length);
-		}
-		close(fd);
-		sync();
-	}
-	first = false;
-}
-#endif
-
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	Autolock locker(sharedInfo.accelerant_lock);
+
+	// First register dump
+	dump_registers();
 
 	// TODO: This may not be neccesary
 	set_display_power_mode(B_DPMS_OFF);
@@ -639,6 +624,9 @@ if (first) {
 
 	set_frame_buffer_base();
 		// triggers writing back double-buffered registers
+
+	// Second register dump
+	dump_registers();
 
 	return B_OK;
 }
