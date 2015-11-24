@@ -294,6 +294,23 @@ device_icon kMSIconData = { (int32)sizeof(kMemoryStickIcon),
 	(void *)kMemoryStickIcon };
 device_icon kSDIconData = { (int32)sizeof(kSDIcon), (void *)kSDIcon };
 
+struct {
+	const char *product;
+	device_icon *icon;
+	const char *name;
+} kIconMatches[] = {
+	// matches for Hama USB 2.0 Card Reader 35 in 1
+	// vendor: "Transcend Information, Inc."
+	// product: "63-in-1 Multi-Card Reader/Writer" ver. 0100
+	// which report things like "Generic " "USB  CF Reader  "
+//	{ " CF Reader", &kCFIconData, "devices/drive-removable-media-flash" },
+	{ " SD Reader", &kSDIconData, "devices/drive-removable-media-flash" },
+	{ " MS Reader", &kMSIconData, "devices/drive-removable-media-flash" },
+//	{ " SM Reader", &kSMIconData, "devices/drive-removable-media-flash" },
+	{ NULL, NULL }
+};
+
+
 //
 //#pragma mark - Forward Declarations
 //
@@ -1336,6 +1353,8 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case B_GET_ICON_NAME:
 		{
 			const char *iconName = "devices/drive-removable-media-usb";
+			char product[sizeof(lun->product_name)+1];
+
 			switch (lun->device_type) {
 				case B_CD:
 				case B_OPTICAL:
@@ -1343,6 +1362,13 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 					break;
 				case B_TAPE:	// TODO
 				default:
+					snprintf(product, sizeof(product), "%.16s",
+						lun->product_name);
+					for (int i = 0; kIconMatches[i].product; i++) {
+						if (strstr(product, kIconMatches[i].product) == NULL)
+							continue;
+						iconName = kIconMatches[i].name;
+					}
 					break;
 			}
 			result = user_strlcpy((char *)buffer, iconName,
@@ -1353,6 +1379,7 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 		case B_GET_VECTOR_ICON:
 		{
 			device_icon *icon = &kKeyIconData;
+			char product[sizeof(lun->product_name)+1];
 
 			if (length != sizeof(device_icon)) {
 				result = B_BAD_VALUE;
@@ -1366,6 +1393,13 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 					break;
 				case B_TAPE:	// TODO
 				default:
+					snprintf(product, sizeof(product), "%.16s",
+						lun->product_name);
+					for (int i = 0; kIconMatches[i].product; i++) {
+						if (strstr(product, kIconMatches[i].product) == NULL)
+							continue;
+						icon = kIconMatches[i].icon;
+					}
 					break;
 			}
 
