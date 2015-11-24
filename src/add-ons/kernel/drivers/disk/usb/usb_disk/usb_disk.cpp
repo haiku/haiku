@@ -288,6 +288,12 @@ const unsigned char kSDIcon[] = {
 	0x0a, 0x08, 0x02, 0x08, 0x09, 0x00
 };
 
+device_icon kKeyIconData = { (int32)sizeof(kDeviceIcon), (void *)kDeviceIcon };
+device_icon kCDIconData = { (int32)sizeof(kCDIcon), (void *)kCDIcon };
+device_icon kMSIconData = { (int32)sizeof(kMemoryStickIcon),
+	(void *)kMemoryStickIcon };
+device_icon kSDIconData = { (int32)sizeof(kSDIcon), (void *)kSDIcon };
+
 //
 //#pragma mark - Forward Declarations
 //
@@ -1328,15 +1334,39 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 			break;
 
 		case B_GET_ICON_NAME:
-			result = user_strlcpy((char *)buffer,
-				"devices/drive-removable-media-usb", B_FILE_NAME_LENGTH);
+		{
+			const char *iconName = "devices/drive-removable-media-usb";
+			switch (lun->device_type) {
+				case B_CD:
+				case B_OPTICAL:
+					iconName = "devices/drive-optical";
+					break;
+				case B_TAPE:	// TODO
+				default:
+					break;
+			}
+			result = user_strlcpy((char *)buffer, iconName,
+				B_FILE_NAME_LENGTH);
 			break;
+		}
 
 		case B_GET_VECTOR_ICON:
 		{
+			device_icon *icon = &kKeyIconData;
+
 			if (length != sizeof(device_icon)) {
 				result = B_BAD_VALUE;
 				break;
+			}
+
+			switch (lun->device_type) {
+				case B_CD:
+				case B_OPTICAL:
+					icon = &kCDIconData;
+					break;
+				case B_TAPE:	// TODO
+				default:
+					break;
 			}
 
 			device_icon iconData;
@@ -1345,15 +1375,15 @@ usb_disk_ioctl(void *cookie, uint32 op, void *buffer, size_t length)
 				break;
 			}
 
-			if (iconData.icon_size >= (int32)sizeof(kDeviceIcon)) {
-				if (user_memcpy(iconData.icon_data, kDeviceIcon,
-						sizeof(kDeviceIcon)) != B_OK) {
+			if (iconData.icon_size >= icon->icon_size) {
+				if (user_memcpy(iconData.icon_data, icon->icon_data,
+						(size_t)icon->icon_size) != B_OK) {
 					result = B_BAD_ADDRESS;
 					break;
 				}
 			}
 
-			iconData.icon_size = sizeof(kDeviceIcon);
+			iconData.icon_size = icon->icon_size;
 			result = user_memcpy(buffer, &iconData, sizeof(device_icon));
 			break;
 		}
