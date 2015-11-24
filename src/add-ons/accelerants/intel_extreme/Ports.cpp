@@ -526,9 +526,11 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	// Set LVDS sync polarity
 	lvds &= ~(LVDS_HSYNC_POLARITY | LVDS_VSYNC_POLARITY);
-	if ((target->timing.flags & B_POSITIVE_HSYNC) != 0)
+
+	// set on - polarity.
+	if ((target->timing.flags & B_POSITIVE_HSYNC) == 0)
 		lvds |= LVDS_HSYNC_POLARITY;
-	if ((target->timing.flags & B_POSITIVE_VSYNC) != 0)
+	if ((target->timing.flags & B_POSITIVE_VSYNC) == 0)
 		lvds |= LVDS_VSYNC_POLARITY;
 
 	write32(_PortRegister(), lvds);
