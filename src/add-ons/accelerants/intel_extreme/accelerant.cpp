@@ -158,6 +158,26 @@ init_common(int device, bool isClone)
 		}
 	}
 
+	gInfo->pipe_count = 0;
+
+	// Allocate all of our pipes
+	for (int i = 0; i < MAX_PIPES; i++) {
+		switch (i) {
+			case 0:
+				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_A);
+				break;
+			case 1:
+				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_B);
+				break;
+			default:
+				ERROR("%s: Unknown pipe %d\n", __func__, i);
+		}
+		if (gInfo->pipes[i] == NULL)
+			ERROR("%s: Error allocating pipe %d\n", __func__, i);
+		else
+			gInfo->pipe_count++;
+	}
+
 	return B_OK;
 }
 
@@ -321,37 +341,34 @@ probe_ports()
 static status_t
 assign_pipes()
 {
-	uint32 assigned = 0;
-
 	// TODO: At some point we should "group" ports to pipes with the same mode.
 	// You can drive multiple ports from a single pipe as long as the mode is
 	// the same. For the moment we could get displays with the wrong pipes
 	// assigned when the count is > 1;
 
+	uint32 current = 0;
     for (uint32 i = 0; i < gInfo->port_count; i++) {
         if (gInfo->ports[i] == NULL)
             continue;
 
-		if (gInfo->ports[i]->PipePreference() != INTEL_PIPE_ANY) {
+		pipe_index preference = gInfo->ports[i]->PipePreference();
+		if (preference != INTEL_PIPE_ANY) {
 			// Some ports *really* need to be assigned a pipe due to
 			// implementation bugs.
-			gInfo->ports[i]->AssignPipe(gInfo->ports[i]->PipePreference());
+			int index = (preference == INTEL_PIPE_B) ? 1 : 0;
+			gInfo->ports[i]->SetPipe(gInfo->pipes[index]);
 			continue;
 		}
 
 		if (gInfo->ports[i]->IsConnected()) {
-			pipe_index currentPipe = INTEL_PIPE_A;
-			if (assigned == 1)
-				currentPipe = INTEL_PIPE_B;
-			else if (assigned > 2) {
+			if (current >= gInfo->pipe_count) {
 				ERROR("%s: No pipes left to assign to port %s!\n", __func__,
 					gInfo->ports[i]->PortName());
 				continue;
 			}
-
-			gInfo->ports[i]->AssignPipe(currentPipe);
-
-			assigned++;
+	
+			gInfo->ports[i]->SetPipe(gInfo->pipes[current]);
+			current++;
 		}
     }
 

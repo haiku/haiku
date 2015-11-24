@@ -14,7 +14,7 @@
 
 #include "intel_extreme.h"
 
-#include "DisplayPipe.h"
+#include "Pipes.h"
 #include "pll.h"
 
 
@@ -56,7 +56,10 @@ virtual	uint32						Type() const = 0;
 
 virtual	bool						IsConnected() = 0;
 
-		status_t					AssignPipe(pipe_index pipeIndex);
+		status_t					SetPipe(Pipe* pipe);
+		::Pipe*						GetPipe()
+										{ return fPipe; };
+
 
 		bool						HasEDID();
 virtual	status_t					GetEDID(edid1_info* edid,
@@ -70,9 +73,6 @@ virtual status_t					SetDisplayMode(display_mode* mode,
 virtual pipe_index					PipePreference()
 										{ return INTEL_PIPE_ANY; };
 
-		::DisplayPipe*				Pipe()
-										{ return fDisplayPipe; };
-
 protected:
 		void						_SetName(const char* name);
 
@@ -82,8 +82,7 @@ static	status_t					_SetI2CSignals(void* cookie, int clock,
 										int data);
 
 		display_mode				fCurrentMode;
-		DisplayPipe*				fDisplayPipe;
-
+		Pipe*						fPipe;
 
 private:
 virtual	addr_t						_DDCRegister() = 0;

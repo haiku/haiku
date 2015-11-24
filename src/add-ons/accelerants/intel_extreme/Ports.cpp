@@ -67,7 +67,7 @@ wait_for_clear(addr_t address, uint32 mask, uint32 timeout)
 
 Port::Port(port_index index, const char* baseName)
 	:
-	fDisplayPipe(NULL),
+	fPipe(NULL),
 	fPortIndex(index),
 	fPortName(NULL),
 	fEDIDState(B_NO_INIT)
@@ -103,9 +103,14 @@ Port::HasEDID()
 
 
 status_t
-Port::AssignPipe(pipe_index pipeIndex)
+Port::SetPipe(Pipe* pipe)
 {
     CALLED();
+
+	if (pipe == NULL) {
+		ERROR("%s: Invalid pipe provided!\n", __func__);
+		return B_ERROR;
+	}
 
     uint32 portRegister = _PortRegister();
 	if (portRegister == 0) {
@@ -115,29 +120,29 @@ Port::AssignPipe(pipe_index pipeIndex)
 	}
 
 	// TODO: UnAssignPipe?  This likely needs reworked a little
-	if (fDisplayPipe != NULL) {
-		ERROR("%s: Can't reassign DisplayPipe (yet)\n", __func__);
+	if (fPipe != NULL) {
+		ERROR("%s: Can't reassign display pipe (yet)\n", __func__);
 		return B_ERROR;
 	}
 
 	TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe %s\n", __func__,
-		PortName(), portRegister, (pipeIndex == INTEL_PIPE_A) ? "A" : "B");
+		PortName(), portRegister, (pipe->Index() == INTEL_PIPE_A) ? "A" : "B");
 
     uint32 portState = read32(portRegister);
 
-    if (pipeIndex == INTEL_PIPE_A)
+    if (pipe->Index() == INTEL_PIPE_A)
         write32(portRegister, portState & ~DISPLAY_MONITOR_PIPE_B);
     else
         write32(portRegister, portState | DISPLAY_MONITOR_PIPE_B);
 
-	fDisplayPipe = new(std::nothrow) DisplayPipe(pipeIndex);
+	fPipe = pipe;
 
-	if (fDisplayPipe == NULL)
+	if (fPipe == NULL)
 		return B_NO_MEMORY;
 
 	// Disable display pipe until modesetting enables it
-	if (fDisplayPipe->IsEnabled())
-		fDisplayPipe->Disable();
+	if (fPipe->IsEnabled())
+		fPipe->Disable();
 
 	read32(portRegister);
 
@@ -283,13 +288,13 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
 		target->virtual_height);
 
-	if (fDisplayPipe == NULL) {
+	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
 		return B_ERROR;
 	}
 
 	// Train FDI if it exists
-	FDILink* link = fDisplayPipe->FDI();
+	FDILink* link = fPipe->FDI();
 	if (link != NULL)
 		link->Train(target);
 
@@ -301,11 +306,11 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
 
 	// Program pipe PLL's
-	fDisplayPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
+	fPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
 		extraPLLFlags);
 
 	// Program target display mode
-	fDisplayPipe->Enable(target, _PortRegister());
+	fPipe->Enable(target, _PortRegister());
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));
@@ -384,7 +389,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	TRACE("%s: %s-%d %dx%d\n", __func__, PortName(), PortIndex(),
 		target->virtual_width, target->virtual_height);
 
-	if (fDisplayPipe == NULL) {
+	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
 		return B_ERROR;
 	}
@@ -408,7 +413,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Disable PanelFitter for now
 	addr_t panelFitterControl = PCH_PANEL_FITTER_BASE_REGISTER
 		+ PCH_PANEL_FITTER_CONTROL;
-	if (fDisplayPipe->Index() == INTEL_PIPE_B)
+	if (fPipe->Index() == INTEL_PIPE_B)
 		panelFitterControl += PCH_PANEL_FITTER_PIPE_OFFSET;
 	write32(panelFitterControl, (read32(panelFitterControl) & ~PANEL_FITTER_ENABLED));
 	read32(panelFitterControl);
@@ -543,7 +548,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		extraPLLFlags |= DISPLAY_PLL_MODE_LVDS;
 
 	// Program pipe PLL's (pixel_clock is *always* the hardware pixel clock)
-	fDisplayPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
+	fPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
 		extraPLLFlags);
 
 	// Power on Panel
@@ -554,7 +559,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		ERROR("%s: %s didn't power on within 1000ms!\n", __func__, PortName());
 
 	// Program target display mode
-	fDisplayPipe->Enable(target, _PortRegister());
+	fPipe->Enable(target, _PortRegister());
 
 #if 0
 
@@ -704,13 +709,13 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
 		target->virtual_height);
 
-	if (fDisplayPipe == NULL) {
+	if (fPipe == NULL) {
 		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
 		return B_ERROR;
 	}
 
 	// Train FDI if it exists
-	FDILink* link = fDisplayPipe->FDI();
+	FDILink* link = fPipe->FDI();
 	if (link != NULL)
 		link->Train(target);
 
@@ -722,11 +727,11 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
 
 	// Program pipe PLL's
-	fDisplayPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
+	fPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
 		extraPLLFlags);
 
 	// Program target display mode
-	fDisplayPipe->Enable(target, _PortRegister());
+	fPipe->Enable(target, _PortRegister());
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));

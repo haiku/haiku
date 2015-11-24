@@ -6,7 +6,7 @@
  *		Michael Lotz, mmlr@mlotz.ch
  *		Alexander von Gluck IV, kallisti5@unixzen.com
  */
-#include "DisplayPipe.h"
+#include "Pipes.h"
 
 #include "accelerant.h"
 #include "intel_extreme.h"
@@ -33,6 +33,7 @@ extern "C" void _sPrintf(const char* format, ...);
 // PIPE: 6
 // PLANE: 7
 
+
 void
 program_pipe_color_modes(uint32 colorMode)
 {
@@ -46,10 +47,10 @@ program_pipe_color_modes(uint32 colorMode)
 }
 
 
-// #pragma mark - DisplayPipe
+// #pragma mark - Pipe
 
 
-DisplayPipe::DisplayPipe(pipe_index pipeIndex)
+Pipe::Pipe(pipe_index pipeIndex)
 	:
 	fFDILink(NULL),
 //	fPanelFitter(NULL),
@@ -68,19 +69,19 @@ DisplayPipe::DisplayPipe(pipe_index pipeIndex)
 			fFDILink = new(std::nothrow) FDILink(pipeIndex);
 	}
 
-	TRACE("DisplayPipe %s. Pipe Base: 0x%" B_PRIxADDR
+	TRACE("Pipe %s. Pipe Base: 0x%" B_PRIxADDR
 		" Plane Base: 0x% " B_PRIxADDR "\n", (pipeIndex == INTEL_PIPE_A)
 			? "A" : "B", fPipeBase, fPlaneBase);
 }
 
 
-DisplayPipe::~DisplayPipe()
+Pipe::~Pipe()
 {
 }
 
 
 bool
-DisplayPipe::IsEnabled()
+Pipe::IsEnabled()
 {
 	CALLED();
 	return (read32(fPlaneBase + INTEL_PIPE_CONTROL) & INTEL_PIPE_ENABLED) != 0;
@@ -88,7 +89,7 @@ DisplayPipe::IsEnabled()
 
 
 void
-DisplayPipe::Enable(display_mode* target, addr_t portAddress)
+Pipe::Enable(display_mode* target, addr_t portAddress)
 {
 	CALLED();
 
@@ -152,14 +153,14 @@ DisplayPipe::Enable(display_mode* target, addr_t portAddress)
 
 
 void
-DisplayPipe::Disable()
+Pipe::Disable()
 {
 	_Enable(false);
 }
 
 
 void
-DisplayPipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
+Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 	uint32 extraFlags)
 {
 	CALLED();
@@ -250,7 +251,7 @@ DisplayPipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 
 
 void
-DisplayPipe::_Enable(bool enable)
+Pipe::_Enable(bool enable)
 {
 	CALLED();
 

@@ -18,15 +18,18 @@
 #include "FlexibleDisplayInterface.h"
 
 
+#define MAX_PIPES	2
+
+
 void program_pipe_color_modes(uint32 colorMode);
 
 //class FDILink;
 //class PanelFitter;
 
-class DisplayPipe {
+class Pipe {
 public:
-									DisplayPipe(pipe_index pipeIndex);
-									~DisplayPipe();
+									Pipe(pipe_index pipeIndex);
+									~Pipe();
 
 		pipe_index					Index()
 										{ return fPipeIndex; }

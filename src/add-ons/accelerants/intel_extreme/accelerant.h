@@ -15,6 +15,7 @@
 #include <video_overlay.h>
 
 #include "Ports.h"
+#include "Pipes.h"
 
 
 struct overlay {
@@ -52,6 +53,9 @@ struct accelerant_info {
 
 	uint32			port_count;
 	Port*			ports[MAX_PORTS];
+
+	uint32			pipe_count;
+	Pipe*			pipes[MAX_PIPES];
 
 	edid1_info		edid_info;
 	bool			has_edid;
