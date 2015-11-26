@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.11.19
-#	Date:    2015-11-19 03:15:02
+#	Version: 2015.11.25
+#	Date:    2015-11-25 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -367,6 +367,7 @@
 		1028 1f4c  PERC H330 Mini (for blades)
 		1028 1f4d  PERC H330 Embedded (for monolithic)
 		1054 306a  SAS 3004 iMR ROMB
+		1d49 04db  ServeRAID M1210 SAS/SATA Controller
 	0060  MegaRAID SAS 1078
 		1000 1006  MegaRAID SAS 8888ELP
 		1000 100a  MegaRAID SAS 8708ELP
@@ -9684,6 +9685,7 @@
 	0fea  GK107M [GeForce GT 755M Mac Edition]
 	0fec  GK107M [GeForce 710A]
 	0fed  GK107M [GeForce 820M]
+	0fee  GK107M [GeForce 810M]
 	0fef  GK107GL [GRID K340]
 	0ff1  GK107 [NVS 1000]
 	0ff2  GK107GL [GRID K1]
@@ -9812,6 +9814,7 @@
 	10c5  GT218 [GeForce 405]
 	10d8  GT218 [NVS 300]
 	1140  GF117M [GeForce 610M/710M/810M/820M / GT 620M/625M/630M/720M]
+		1019 0799  GeForce 820M
 		1019 999f  GeForce GT 720M
 		1025 0600  GeForce GT 620M
 		1025 0606  GeForce GT 620M
@@ -10117,12 +10120,18 @@
 		1854 0180  GeForce 710M
 		1854 0190  GeForce GT 720M
 		1854 0192  GeForce GT 720M
+		1854 0224  GeForce 820M
+		1b0a 01c0  GeForce 820M
 		1b0a 20dd  GeForce GT 620M
 		1b0a 20df  GeForce GT 620M
 		1b0a 210e  GeForce 820M
 		1b0a 2202  GeForce GT 720M
 		1b0a 90d7  GeForce 820M
 		1b0a 90dd  GeForce 820M
+		1b50 5530  GeForce 820M
+		1b6c 5531  GeForce GT 720M
+		1bab 0106  GeForce 820M
+		1d05 1013  GeForce 810M
 	1180  GK104 [GeForce GTX 680]
 		1043 83f1  GTX680-DC2-2GD5
 		3842 3682  GeForce GTX 680 Mac Edition
@@ -10301,12 +10310,19 @@
 	1393  GM107M [GeForce 840M]
 	1398  GM107M [GeForce 845M]
 	139a  GM107M [GeForce GTX 950M]
+		17aa 362c  GeForce GTX 950A
+		17aa 362f  GeForce GTX 950A
+		17aa 363f  GeForce GTX 950A
+		17aa 3640  GeForce GTX 950A
+		17aa 36b9  GeForce GTX 950A
 	139b  GM107M [GeForce GTX 960M]
+		103c 2b4c  GeForce GTX 960A
 	139c  GM107M [GeForce 940M]
 	13b0  GM107GLM [Quadro M2000M]
 	13b1  GM107GLM [Quadro M1000M]
 	13b2  GM107GLM [Quadro M600M]
 	13b3  GM107GLM [Quadro K2200M]
+	13b9  GM107GL [NVS 810]
 	13ba  GM107GL [Quadro K2200]
 	13bb  GM107GL [Quadro K620]
 	13bc  GM107GL [Quadro K1200]
@@ -10319,6 +10335,7 @@
 	13d7  GM204M [GeForce GTX 980M]
 	13d8  GM204M [GeForce GTX 970M]
 	13d9  GM204M [GeForce GTX 965M]
+	13da  GM204M [GeForce GTX 980]
 	13f0  GM204GL [Quadro M5000]
 	13f1  GM204GL [Quadro M4000]
 	13f2  GM204GL [Tesla M60]
@@ -10327,12 +10344,15 @@
 	13fa  GM204GLM [Quadro M3000M]
 	1401  GM206 [GeForce GTX 960]
 	1402  GM206 [GeForce GTX 950]
+	1407  GM206 [GeForce GTX 750 v2]
 	1617  GM204M [GeForce GTX 980M]
 	1618  GM204M [GeForce GTX 970M]
 	1619  GM204M [GeForce GTX 965M]
+	161a  GM204M [GeForce GTX 980]
 	17c2  GM200 [GeForce GTX TITAN X]
 	17c8  GM200 [GeForce GTX 980 Ti]
 	17f0  GM200GL [Quadro M6000]
+	17fd  GM200GL [Tesla M40]
 10df  Emulex Corporation
 	0720  OneConnect NIC (Skyhawk)
 		103c 1934  FlexFabric 20Gb 2-port 650M Adapter
@@ -19523,6 +19543,7 @@
 1cf7  Subspace Dynamics
 1d00  Pure Storage
 1d1d  CNEX Labs
+	1f1f  QEMU NVM Express LightNVM Controller
 	2807  8800 series NVMe SSD
 # CEM Solutions Pvt. Ltd.
 1d21  Allo
@@ -19532,6 +19553,7 @@
 1d40  Techman Electronics (Changshu) Co., Ltd.
 1d44  DPT
 	a400  PM2x24/PM3224
+1d49  Lenovo
 1d5c  Fantasia Trading LLC
 1d61  Technobox, Inc.
 1d65  Imagine Communications Corp.
@@ -20687,6 +20709,8 @@
 		8086 3705  DC P3500 SSD [2.5" SFF]
 		8086 3709  DC P3600 SSD [Add-in Card]
 		8086 370a  DC P3600 SSD [2.5" SFF]
+		8086 370d  SSD 750 Series [Add-in Card]
+		8086 370e  SSD 750 Series [2.5" SFF]
 	095a  Wireless 7265
 # Stone Peak 2 AC
 		8086 1010  Dual Band Wireless-AC 7265
