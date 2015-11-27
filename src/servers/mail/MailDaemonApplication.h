@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2015, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
@@ -10,12 +10,12 @@
 
 #include <map>
 
-#include <Application.h>
 #include <ObjectList.h>
 #include <Message.h>
 #include <MessageRunner.h>
 #include <Node.h>
 #include <Query.h>
+#include <Server.h>
 #include <String.h>
 
 #include <MailProtocol.h>
@@ -41,7 +41,7 @@ struct account_protocols {
 typedef std::map<int32, account_protocols> AccountMap;
 
 
-class MailDaemonApplication : public BApplication {
+class MailDaemonApplication : public BServer {
 public:
 								MailDaemonApplication();
 	virtual						~MailDaemonApplication();

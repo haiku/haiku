@@ -162,8 +162,7 @@ account_protocols::account_protocols()
 
 MailDaemonApplication::MailDaemonApplication()
 	:
-	BApplication(B_MAIL_DAEMON_SIGNATURE),
-
+	BServer(B_MAIL_DAEMON_SIGNATURE, true, NULL),
 	fAutoCheckRunner(NULL)
 {
 	fErrorLogWindow = new ErrorLogWindow(BRect(200, 200, 500, 250),

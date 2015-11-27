@@ -17,7 +17,6 @@ target desktop {
 		if setting ~/config/settings/Mail/new_mail_daemon DaemonAutoStarts
 		on initial_volumes_mounted
 		no_safemode
-		legacy
 	}
 
 	job user-bootscript {
