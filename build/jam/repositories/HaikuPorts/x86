@@ -87,8 +87,8 @@ RemotePackageRepository HaikuPorts
 	file-5.15-1
 	file_devel-5.15-1
 	findutils-4.4.2-3
-	ffmpeg-2.8.2-1
-	ffmpeg_devel-2.8.2-1
+	ffmpeg-2.8.2-2
+	ffmpeg_devel-2.8.2-2
 	flac-1.3.1-1
 	flac_devel-1.3.1-1
 	flex-2.5.39-2
@@ -105,13 +105,13 @@ RemotePackageRepository HaikuPorts
 	giflib_devel-5.1.1-1
 	giflib6-5.0.5-2
 	giflib6_devel-5.0.5-2
-	git-2.2.2-1
-	git_arch-2.2.2-1
-	git_cvs-2.2.2-1
-	git_daemon-2.2.2-1
-	git_email-2.2.2-1
+	git-2.2.2-3
+	git_arch-2.2.2-3
+	git_cvs-2.2.2-3
+	git_daemon-2.2.2-3
+	git_email-2.2.2-3
 	git_remote_helpers-1.8.3.4-4
-	git_svn-2.2.2-1
+	git_svn-2.2.2-3
 	glew-1.11.0-1
 	glew_devel-1.11.0-1
 	glew_util-1.11.0-1
@@ -178,8 +178,8 @@ RemotePackageRepository HaikuPorts
 	libpng_devel-1.5.22-1
 	libpng16-1.6.18-1
 	libpng16_devel-1.6.18-1
-	libqt4-4.8.7-4
-	libqt4_devel-4.8.7-4
+	libqt4-4.8.7-5
+	libqt4_devel-4.8.7-5
 	libsanta-3.0.1-1
 	libsanta_devel-3.0.1-1
 	libsdl-1.2.15-9
@@ -202,9 +202,9 @@ RemotePackageRepository HaikuPorts
 	libvpx_devel-1.0.0-2
 	libwebp-0.4.1-2
 	libwebp_devel-0.4.1-2
-	libxml2-2.9.3-1
-	libxml2_devel-2.9.3-1
-	libxml2_python-2.9.3-1
+	libxml2-2.9.3-2
+	libxml2_devel-2.9.3-2
+	libxml2_python-2.9.3-2
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
 	llvm-3.5.2-1
@@ -240,7 +240,7 @@ RemotePackageRepository HaikuPorts
 	openal-1.13.0-2
 	openal_devel-1.13.0-2
 	openjdk-1.7_2013_11_08-2
-	openssh-7.1p1-1
+	openssh-7.1p1-3
 	# sync openssl with secondary architecture (x86_gcc2)
 	openssl-1.0.2d-4
 	openssl_devel-1.0.2d-4
@@ -251,7 +251,7 @@ RemotePackageRepository HaikuPorts
 	pixman-0.32.6-1
 	pkgconfig-0.27.1-2
 	pyenet-20141025-1
-	python-2.7.10-2
+	python-2.7.10-3
 	python_mako-1.0.1-1
 	python_setuptools-5.3-2
 	python_twisted-13.2.0-1
@@ -281,8 +281,8 @@ RemotePackageRepository HaikuPorts
 	sdl_ttf-2.0.11-2
 	sdl_ttf_devel-2.0.11-2
 	sed-4.2.1-6
-	serf-1.3.8-1
-	serf_devel-1.3.8-1
+	serf-1.3.8-2
+	serf_devel-1.3.8-2
 	sharutils-4.14-1
 	smpeg-0.4.5-4
 	smpeg_devel-0.4.5-4
@@ -290,8 +290,8 @@ RemotePackageRepository HaikuPorts
 	speex_devel-1.2~rc1-2
 	sqlite-3.8.11.1-1
 	sqlite_devel-3.8.11.1-1
-	subversion-1.8.11-7
-	subversion_devel-1.8.11-7
+	subversion-1.8.11-8
+	subversion_devel-1.8.11-8
 	tar-1.27.1-2
 	tcpdump-4.7.4-2
 	texinfo-4.13a-7
@@ -308,7 +308,7 @@ RemotePackageRepository HaikuPorts
 	unzip-6.0-2
 	vision-0.9.7.r949-3
 	vim-7.4-1
-	wget-1.16.3-1
+	wget-1.17.0-1
 	which-2.21-1
 	wpa_supplicant-2.0-4
 	xml_parser-2.36-1
