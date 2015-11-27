@@ -3,6 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include <errno.h>
 #include <getopt.h>
 #include <pwd.h>
@@ -189,7 +190,8 @@ main(int argc, const char* const* argv)
 	KMessage reply;
 	status_t error = send_authentication_request_to_registrar(message, reply);
 	if (error != B_OK) {
-		fprintf(stderr, "Error: Failed to create user: %s\n", strerror(error));
+		fprintf(stderr, "Error: Failed to set the password: %s\n",
+			strerror(error));
 		exit(1);
 	}
 
