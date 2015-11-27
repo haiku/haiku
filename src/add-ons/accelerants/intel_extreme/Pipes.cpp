@@ -185,13 +185,25 @@ Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 		write32(pllMD, (0 << 24) | ((pixelMultiply - 1) << 8));
 	}
 
+	// XXX: For now we assume no LVDS downclocking and program the same divisor
+	// value to both divisor 0 (standard) and 1 (reduced divisor)
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
 		write32(pllDivisorA, (((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
 				& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
 			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
 				& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
+		write32(pllDivisorB, (((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
+				& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
+			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
+				& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
 	} else {
 		write32(pllDivisorA, (((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
+				& DISPLAY_PLL_N_DIVISOR_MASK)
+			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
+				& DISPLAY_PLL_M1_DIVISOR_MASK)
+			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
+				& DISPLAY_PLL_M2_DIVISOR_MASK));
+		write32(pllDivisorB, (((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
 				& DISPLAY_PLL_N_DIVISOR_MASK)
 			| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
 				& DISPLAY_PLL_M1_DIVISOR_MASK)
