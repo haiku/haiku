@@ -62,7 +62,7 @@ public:
 								const char* name);
 	static	void			ResetStickyExternalEvent(Event* event,
 								const char* name);
-	static	bool			TriggerDemand(Event* event);
+	static	bool			TriggerDemand(Event* event, bool testOnly = false);
 };
 
 

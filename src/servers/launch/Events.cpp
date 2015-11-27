@@ -775,11 +775,13 @@ Events::ResetStickyExternalEvent(Event* event, const char* name)
 
 /*!	This will trigger a demand event, if it exists.
 
+	\param testOnly If \c true, the deman will not actually be triggered,
+			it will only be checked if it could.
 	\return \c true, if there is a demand event, and it has been
 			triggered by this call. \c false if not.
 */
 /*static*/ bool
-Events::TriggerDemand(Event* event)
+Events::TriggerDemand(Event* event, bool testOnly)
 {
 	if (event == NULL || event->Triggered())
 		return false;
@@ -789,11 +791,14 @@ Events::TriggerDemand(Event* event)
 				index++) {
 			Event* childEvent = container->Events().ItemAt(index);
 			if (dynamic_cast<DemandEvent*>(childEvent) != NULL) {
+				if (testOnly)
+					return true;
+
 				childEvent->Trigger();
 				break;
 			}
 			if (dynamic_cast<EventContainer*>(childEvent) != NULL) {
-				if (TriggerDemand(childEvent))
+				if (TriggerDemand(childEvent, testOnly))
 					break;
 			}
 		}

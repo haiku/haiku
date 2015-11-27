@@ -184,7 +184,11 @@ private:
 			void				_InitJobs(Target* target);
 			void				_LaunchJobs(Target* target,
 									bool forceNow = false);
-			void				_LaunchJob(Job* job, uint32 options = 0);
+			bool				_CanLaunchJob(Job* job, uint32 options,
+									bool testOnly = false);
+			bool				_CanLaunchJobRequirements(Job* job,
+									uint32 options);
+			bool				_LaunchJob(Job* job, uint32 options = 0);
 			void				_StopJob(Job* job, bool force);
 			void				_AddTarget(Target* target);
 			void				_SetCondition(BaseJob* job,
@@ -1428,6 +1432,45 @@ LaunchDaemon::_LaunchJobs(Target* target, bool forceNow)
 }
 
 
+/*!	Checks whether or not the specified \a job can be launched.
+	If \a testOnly is \c false, calling this method will trigger a demand
+	to the \a job.
+*/
+bool
+LaunchDaemon::_CanLaunchJob(Job* job, uint32 options, bool testOnly)
+{
+	if (job == NULL || !job->CanBeLaunched())
+		return false;
+
+	return (options & FORCE_NOW) != 0
+		|| (job->EventHasTriggered() && job->CheckCondition(*this)
+			&& ((options & TRIGGER_DEMAND) == 0
+				|| Events::TriggerDemand(job->Event(), testOnly)));
+}
+
+
+/*!	Checks recursively if the requirements of the specified job can be launched,
+	if they are not running already.
+	Calling this method will not trigger a demand for the requirements.
+*/
+bool
+LaunchDaemon::_CanLaunchJobRequirements(Job* job, uint32 options)
+{
+	int32 count = job->Requirements().CountStrings();
+	for (int32 index = 0; index < count; index++) {
+		Job* requirement = FindJob(job->Requirements().StringAt(index));
+		if (requirement != NULL
+			&& !requirement->IsRunning() && !requirement->IsLaunching()
+			&& (!_CanLaunchJob(requirement, options, true)
+				|| _CanLaunchJobRequirements(requirement, options))) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
 /*!	Adds the specified \a job to the launch queue
 	queue, except those that are triggered by events.
 
@@ -1437,24 +1480,30 @@ LaunchDaemon::_LaunchJobs(Target* target, bool forceNow)
 	Calling this method will trigger a demand event if \c TRIGGER_DEMAND has
 	been set.
 */
-void
+bool
 LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 {
-	if (job == NULL || !job->CanBeLaunched()
-		|| ((options & FORCE_NOW) == 0
-			&& (!job->EventHasTriggered() || !job->CheckCondition(*this)
-				|| ((options & TRIGGER_DEMAND) != 0
-						&& Events::TriggerDemand(job->Event()))))) {
-		return;
-	}
+	if (job != NULL && (job->IsLaunching() || job->IsRunning()))
+		return true;
 
+	if (!_CanLaunchJob(job, options))
+		return false;
+
+	// Test if we can launch all requirements
+	if (!_CanLaunchJobRequirements(job, options | TRIGGER_DEMAND))
+		return false;
+
+	// Actually launch the requirements
 	int32 count = job->Requirements().CountStrings();
 	for (int32 index = 0; index < count; index++) {
 		Job* requirement = FindJob(job->Requirements().StringAt(index));
 		if (requirement != NULL) {
 			// TODO: For jobs that have their communication channels set up,
 			// we would not need to trigger demand at this point
-			_LaunchJob(requirement, TRIGGER_DEMAND);
+			if (!_LaunchJob(requirement, options | TRIGGER_DEMAND)) {
+				// Failed to put a requirement into the launch queue
+				return false;
+			}
 		}
 	}
 
@@ -1469,7 +1518,10 @@ LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 	if (status != B_OK) {
 		debug_printf("Adding job %s to queue failed: %s\n", job->Name(),
 			strerror(status));
+		return false;
 	}
+
+	return true;
 }
 
 
