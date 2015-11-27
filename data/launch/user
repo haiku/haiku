@@ -4,21 +4,18 @@ target desktop {
 	service x-vnd.Be-TRAK {
 		launch /system/Tracker
 		legacy
-		on {
-			initial_volumes_mounted
-		}
+		on initial_volumes_mounted
 	}
 
 	service x-vnd.Be-TSKB {
 		launch /system/Deskbar
-		on {
-			initial_volumes_mounted
-		}
+		on initial_volumes_mounted
 	}
 
 	service x-vnd.Be-POST {
-		launch /system/servers/mail_daemon -E
+		launch /system/servers/mail_daemon
 		if setting ~/config/settings/Mail/new_mail_daemon DaemonAutoStarts
+		on initial_volumes_mounted
 		no_safemode
 		legacy
 	}
@@ -38,6 +35,7 @@ target desktop {
 	job first-login {
 		launch /bin/sh /system/boot/PostInstallScript "first login" ~/config/settings/first_login /boot/system/boot/first-login
 		if file_exists ~/config/settings/first_login
+		requires x-vnd.Be-TSKB
 	}
 
 	job create-installer-link {
