@@ -70,6 +70,10 @@ public:
 			BStringList&		Requirements();
 			void				AddRequirement(const char* requirement);
 
+			const BStringList&	Pending() const;
+			BStringList&		Pending();
+			void				AddPending(const char* pending);
+
 	virtual	bool				CheckCondition(ConditionContext& context) const;
 
 			status_t			Init(const Finder& jobs,
@@ -137,6 +141,7 @@ private:
 			mutex				fLaunchStatusLock;
 			::Target*			fTarget;
 			::Condition*		fCondition;
+			BStringList			fPendingJobs;
 			BObjectList<BMessage>
 								fPendingLaunchDataReplies;
 			::TeamRegistrator*	fTeamRegistrator;

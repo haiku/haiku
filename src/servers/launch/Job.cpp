@@ -207,6 +207,27 @@ Job::AddRequirement(const char* requirement)
 }
 
 
+const BStringList&
+Job::Pending() const
+{
+	return fPendingJobs;
+}
+
+
+BStringList&
+Job::Pending()
+{
+	return fPendingJobs;
+}
+
+
+void
+Job::AddPending(const char* pending)
+{
+	fPendingJobs.Add(pending);
+}
+
+
 bool
 Job::CheckCondition(ConditionContext& context) const
 {

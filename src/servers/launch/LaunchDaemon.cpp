@@ -1463,6 +1463,7 @@ LaunchDaemon::_CanLaunchJobRequirements(Job* job, uint32 options)
 			&& !requirement->IsRunning() && !requirement->IsLaunching()
 			&& (!_CanLaunchJob(requirement, options, true)
 				|| _CanLaunchJobRequirements(requirement, options))) {
+			requirement->AddPending(job->Name());
 			return false;
 		}
 	}
@@ -1519,6 +1520,18 @@ LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 		debug_printf("Adding job %s to queue failed: %s\n", job->Name(),
 			strerror(status));
 		return false;
+	}
+
+	// Try to launch pending jobs as well
+	count = job->Pending().CountStrings();
+	for (int32 index = 0; index < count; index++) {
+		Job* pending = FindJob(job->Pending().StringAt(index));
+		if (pending != NULL && _LaunchJob(pending, 0)) {
+			// Remove the job from the pending list once its in the launch
+			// queue, so that is not being launched again next time.
+			index--;
+			count--;
+		}
 	}
 
 	return true;
