@@ -94,7 +94,8 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	}
 
 	pll_limits limits;
-	get_pll_limits(&limits);
+	get_pll_limits(&limits, false);
+		// TODO: Detect LVDS connector vs assume no
 
 	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)
 		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)

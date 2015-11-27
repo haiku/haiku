@@ -33,7 +33,7 @@ struct pll_limits {
 };
 
 
-void get_pll_limits(pll_limits* limits);
+void get_pll_limits(pll_limits* limits, bool isLVDS);
 bool valid_pll_divisors(pll_divisors* divisors, pll_limits* limits);
 void compute_pll_divisors(display_mode* current, pll_divisors* divisors,
 	bool isLVDS);

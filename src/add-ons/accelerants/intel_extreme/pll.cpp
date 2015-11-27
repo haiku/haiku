@@ -39,7 +39,7 @@
 
 
 void
-get_pll_limits(pll_limits* limits)
+get_pll_limits(pll_limits* limits, bool isLVDS)
 {
 	// Note, the limits are taken from the X driver; they have not yet been
 	// tested
@@ -55,15 +55,20 @@ get_pll_limits(pll_limits* limits)
 		};
 		memcpy(limits, &kLimits, sizeof(pll_limits));
 	} else if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)) {
-		// TODO: support LVDS output limits as well
 		// (Update: Output limits are adjusted in the computation (post2=7/14))
 		// Should move them here!
 		pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
-			{  5,  1, 10, false,  1,  70, 12,  7},	// min
-			{ 80,  8,  5, true,   6, 120, 22, 11},	// max
+			{  5,  1, 10, false,  1,  70, 8,  3},	// min
+			{ 80,  8,  5, true,   6, 120, 18, 7},	// max
 			200000, 1400000, 2800000
 		};
+		if (isLVDS) {
+			kLimits.min.post = 7;
+			kLimits.max.post = 98;
+			kLimits.min.post2 = 14;
+			kLimits.max.post2 = 7;
+		}
 		memcpy(limits, &kLimits, sizeof(pll_limits));
 	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_G4x)) {
 		// TODO: support LVDS output limits as well
@@ -133,12 +138,12 @@ compute_pll_divisors(display_mode* current, pll_divisors* divisors,
 	float referenceClock
 		= gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
 	pll_limits limits;
-	get_pll_limits(&limits);
+	get_pll_limits(&limits, isLVDS);
 
 	TRACE("%s: required MHz: %g\n", __func__, requestedPixelClock);
 
 	if (isLVDS) {
-		if (requestedPixelClock >= 112.199
+		if (requestedPixelClock > 112.999
 			|| (read32(INTEL_DIGITAL_LVDS_PORT) & LVDS_CLKB_POWER_MASK)
 				== LVDS_CLKB_POWER_UP)
 			divisors->post2 = LVDS_POST2_RATE_FAST;
