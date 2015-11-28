@@ -99,6 +99,10 @@ requires {
 #ifdef HAIKU_BUILD_FEATURE_X86_GCC2_LIBWEBP_ENABLED
 	lib:libwebp
 #endif
+#ifdef HAIKU_BUILD_FEATURE_X86_GCC2_OPENSSL_ENABLED
+	lib:libssl >= 1.0.0
+	lib:libcrypto >= 1.0.0
+#endif
 #endif
 	lib:libsolv
 	lib:libsolvext
