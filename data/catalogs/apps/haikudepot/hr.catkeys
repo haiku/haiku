@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-HaikuDepot	2644962330
+1	croatian	x-vnd.Haiku-HaikuDepot	1582810306
 Name	PackageListView		Ime
 Close	RatePackageWindow		Zatvori
 Changelog	PackageInfoView		Dnevnik promjena
@@ -12,6 +12,7 @@ Stability	RatePackageWindow		Stabilnost
 for %Version%	PackageInfoView		za %Verziju%
 Description	PackageListView		Opis
 Install	PackageManager		Instaliraj
+Source packages	MainWindow		 Izvorni paketi
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Neuspjela ovjera. Korisnik ne postoji ili je isporučena kriva lozinka.
 Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Račun je uspješno napravljen. Sada možete ocijeniti pakete i raditi ostale korisne stvari.
 Tools	MainWindow		Alati
@@ -38,6 +39,7 @@ The password is too weak or invalid. Please use at least 8 characters with at le
 Rate package	RatePackageWindow		Ocijeni paket
 Development	Model		Razvoj
 Fatal error	PackageManager		Ozbiljna greška
+Log in	UserLoginWindow		Prijava
 Ratings	PackageInfoView		Ocjenjivanja
 Inactive	PackageListView		Neaktivan
 Science & Mathematics	Model		Znanost i matematika

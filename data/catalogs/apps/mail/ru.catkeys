@@ -1,7 +1,8 @@
-1	russian	x-vnd.Be-MAIL	4285843074
+1	russian	x-vnd.Be-MAIL	1865394837
 View	Mail		Вид
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Прикрепление атрибутов:
+Unknown	Mail		Неизвестно
 Inconsistency occurred in the undo/redo buffer.	Mail		Произошло несоответствие в буфере отмены/повтора.
 An error occurred trying to save the attachment.	Mail		Произошла ошибка при попытке сохранить вложение.
 Copy to new	Mail		Копировать в новое
@@ -146,6 +147,7 @@ sent	B_USER_DIRECTORY/mail/sent		Отправленные
 Put your favorite e-mail queries and query templates in this folder.	Mail		Перенесите в эту папку ваши почтовые запросы.
 Spam	Mail		Спам
 Reply	Mail		Ответить
+Encoding	Mail		Кодировка:
 From:	Mail		От:
 Couldn't open this signature. Sorry.	Mail		Невозможно открыть эту подпись. Извините.
 Open draft	Mail		Открыть черновики

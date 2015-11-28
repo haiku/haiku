@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	4273323974
+1	russian	x-vnd.Haiku-HaikuDepot	2365524674
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -84,6 +84,7 @@ Productivity	Model		Офис
 No, quit HaikuDepot	App		Нет, выйти из HaikuDepot
 Authentication failed	UserLoginWindow		Авторизация завершилась неудачно
 Logged in as %User%	MainWindow		Выполнен вход под пользователем %User%
+9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Язык
 Size	PackageListView		Размер
 Failed to create or update rating: %s\n	RatePackageWindow		Не удалось создать или изменить рейтинг: %s\n

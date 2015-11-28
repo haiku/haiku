@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Screen	524939929
+1	croatian	x-vnd.Haiku-Screen	1475614814
 yes	Screen		da
 Use laptop panel:	Screen		Koristi laptop ploču:
 15 bits/pixel, 32768 colors	Screen		15 bits/pixel, 32768 boja
@@ -12,6 +12,7 @@ Set background…	Screen		Postavi pozadinu...
 Undo	Screen		Poništi
 if needed	Screen		ako je potrebno
 Screen preferences by the Haiku team	Screen		Osobitosti ekrana koje je načinio Haiku tim
+Settings will revert in %seconds.	Screen		Postavke će se vratiti za %sekundi.
 Screen	System name		Ekran
 OK	Screen		U redu
 Workspaces	Screen		Radni prostori

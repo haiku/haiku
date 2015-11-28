@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Devices	4104827202
+1	croatian	x-vnd.Haiku-Devices	230229748
 Manufacturer	DeviceSCSI		Proizvođač
 Order by:	DevicesView		Poredaj po:
 ACPI controller	Device		ACPI upravljač
@@ -62,6 +62,7 @@ Device name	Device		Ime uređaja
 Manufacturer	Device		Proizvođač
 Name	PropertyList		Ime
 Manufacturer	DevicePCI		Proizvođač
+Satellite communications controller	Device		Kontroler za satelitsku komunikaciju
 SCSI Information	DeviceSCSI		SCSI informacija
 Array	DeviceSCSI		Polje
 Bridge	Device		Most
@@ -69,6 +70,7 @@ Refresh devices	DevicesView		Osvježi uređaje
 Unknown device	DevicesView		Nepoznati uređaj
 Bus Information	Device		Bus informacija
 Connection	DevicesView		Veza
+Generate system information	DevicesView		Generiraj informacije sustava
 Encryption controller	Device		Kontroler enkripcije
 Unclassified device	Device		Neklasificirani uređaj
 Device name	DeviceSCSI		Ime uređaja

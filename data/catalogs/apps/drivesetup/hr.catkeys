@@ -1,4 +1,5 @@
-1	croatian	x-vnd.Haiku-DriveSetup	2164410054
+1	croatian	x-vnd.Haiku-DriveSetup	2839217548
+Could not acquire partitioning information.	MainWindow		Nisam mogao dobiti informacije o particioniranju.
 Cancel	AbstractParametersPanel		Otkaži
 Delete	MainWindow		Izbriši
 Are you sure you want to write the changes back to disk now?\n\nAll data on the selected partition will be irretrievably lost if you do so!	MainWindow		Jeste li sigurni da želite zapisati promjene natrag na disk?\n\nSvi podati na odabranoj particiji biti će nepovratno izgubljeni ako tonapravite!

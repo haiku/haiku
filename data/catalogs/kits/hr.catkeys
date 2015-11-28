@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libbe	2350648452
+1	croatian	x-vnd.Haiku-libbe	1658467380
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
 Written by:	AboutWindow		Napisao:
@@ -27,5 +27,6 @@ Warning	Dragger		Upozorenje
 Undo	TextView		Poništi
 Red:	ColorControl		Crveno:
 %3.2f MiB	StringForSize		%3.2f MiB
+About %app…	Dragger		O %programu%...
 Error	ZombieReplicantView		Greška
 Blue:	ColorControl		Plavo:

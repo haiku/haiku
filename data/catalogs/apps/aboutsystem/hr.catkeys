@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-About	2296666983
+1	croatian	x-vnd.Haiku-About	558479067
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Autorsko pravo © 1999-2010 Gutenprint autora. Sva prava pridržana.
 Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Autorska prava © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.
 Past website & marketing:\n	AboutView		Bivša web stranica & marketing:\n
@@ -51,6 +51,7 @@ Current maintainers:\n	AboutView		Trenutni održavatelji:\n
 Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Autorska prava © 2006-2007 Intel Corporation. Sva prava pridržana.
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Kod koji je jedinstven za Haiku, posebno kernel i sav kod sa kojim su povezani programi, distribuiraju se pod uvjetima <MIT license>. Neke biblioteke sustava sadrže kod trće strane distribuiran pod <LGPL licencom>. Autorska prava za kod treće strane možete naći ispod.\n\n
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Sadrži software koji je razvio  NetBSD Foundation, Inc. i njihovi doprinositelji:\nftp, tput\nAutorska prava © 1996-2008 The NetBSD Foundation, Inc. Sva prava pridržana.
+GNU GPL v2	AboutWindow		GNU LGPL v2
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google i njhovi Google Summer of Code i Google Code In programi\n
 The Haikuware team and their bounty program\n	AboutView		Haikuware tim i njihov darežljivi program\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Autorska prava © 1995, 1998-2001 Jef Poskanzer. Sva prava pridržana.
@@ -62,6 +63,7 @@ Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Autorska prava 
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Autorska prava © 1998-2000 Thai Open Source Software Center Ltd i Clark Cooper.
 Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Autorska prava © 2004-2005 Intel Corporation. Sva prava pridržana.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Autorska prava © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Autorska prava © 2000-2007 Fabrice Bellard, et al.
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Autorska prava © 1999-2007 Michael C. Ring.Sva prava pridržana.
 The BeGeistert team\n	AboutView		BeGeistert tim\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		Sveučilište u Aucklandu i Christof Lutteroth\n\n

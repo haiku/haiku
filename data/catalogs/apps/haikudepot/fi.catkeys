@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	4273323974
+1	finnish	x-vnd.Haiku-HaikuDepot	2365524674
 Name	PackageListView		Nimi
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
@@ -84,6 +84,7 @@ Productivity	Model		Tuottavuus
 No, quit HaikuDepot	App		Ei, poistu HaikuVarastosta
 Authentication failed	UserLoginWindow		Todennus epäonnistui
 Logged in as %User%	MainWindow		Kirjautuneena tunnuksella %User%
+9999.99 KiB	PackageListView		9999.99 kibitavua
 Language	RatePackageWindow		Kieli
 Size	PackageListView		Koko
 Failed to create or update rating: %s\n	RatePackageWindow		Arvosanan luominen tai päivittäminen epäonnistui: %s\n

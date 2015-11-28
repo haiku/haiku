@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	4204393626
+1	russian	x-vnd.Haiku-libtracker	2004221275
 OK	WidgetAttributeText		ОК
 Add-ons	FilePanelPriv		Дополнения
 Mount settings…	ContainerWindow		Настройка подключения дисков…
@@ -19,6 +19,7 @@ Modified	QueryPoseView		Изменён
 Created	ContainerWindow		Создан
 Error %error loading add-On %name.	ContainerWindow		Ошибка %error при запуске дополнения %name.
 If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Если вы %ifYouDoAction папку settings, %osName может начать работать некорректно!\n\nВы уверены, что хотите сделать это?
+Skip all	FSUtils		Пропустить все
 contains	SelectionWindow		содержит
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Извините, сохранение объектов в корневой папке системы невозможно.
 Show shared volumes on Desktop	SettingsView		Показывать значки общих дисков

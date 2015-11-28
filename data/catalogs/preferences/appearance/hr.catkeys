@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Appearance	3650085136
+1	croatian	x-vnd.Haiku-Appearance	1125400238
 Plain font:	Font view		Obični font:
 Shadow	Colors tab		Sjena
 On	AntialiasingSettingsView		Uključeno
@@ -6,6 +6,7 @@ Defaults	APRWindow		Zadano
 Grayscale	AntialiasingSettingsView		Sivo
 Shine	Colors tab		Sjaj
 About	DecorSettingsView		O programu
+About decorator	DecorSettingsView		O dekoratoru
 Off	AntialiasingSettingsView		Isključeno
 Choose Decorator	DecorSettingsView		Odaberite dekorator
 Success	Colors tab		Uspjeh

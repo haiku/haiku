@@ -1,4 +1,4 @@
-1	croatian	x-vnd.haiku-screenshot	3515613680
+1	croatian	x-vnd.haiku-screenshot	2753042206
 seconds	ScreenshotWindow		sekunde
 Desktop	ScreenshotWindow		Radna površina
 Include window border	ScreenshotWindow		Uključi rub prozora
@@ -7,6 +7,7 @@ Select	ScreenshotWindow		Odaberi
 Capture active window	ScreenshotWindow		Uhvati aktivni prozor
 Cancel	ScreenshotWindow		Odustani
 Name:	ScreenshotWindow		Ime:
+Choose folder…	ScreenshotWindow		Izaberite mapu...
 Choose folder	ScreenshotWindow		Izaberite mapu
 Save	ScreenshotWindow		Spremi
 Overwrite	ScreenshotWindow		Prebriši

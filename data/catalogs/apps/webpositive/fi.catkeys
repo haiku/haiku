@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-WebPositive	98059607
+1	finnish	x-vnd.Haiku-WebPositive	1282126593
 Show home button	Settings Window		Näytä aloitussivupainike
 Username:	Authentication Panel		Käyttäjätunnus:
 Copy URL to clipboard	Download Window		Kopioi verkko-osoite leikepöydälle
@@ -16,6 +16,7 @@ Start page:	Settings Window		Aloitussivu:
 History	WebPositive Window		Historia
 Error opening downloads folder	Download Window		Virhe avattaessa latauskansiota
 Paste	WebPositive Window		Liitä
+Expiration	Cookie Manager		Vanheneminen
 Double-click or middle-click to open new tab.	Tab Manager		Välilehden avaamiseksi napsauta hiiren kakkos- tai keskipainikkeella.
 Proxy username:	Settings Window		Välityspalvelimen käyttäjätunnus:
 Save page as…	WebPositive Window		Tallenna sivu nimellä...
@@ -23,10 +24,12 @@ Over %days left	Download Window		Yli %days jäljellä
 Settings	Settings Window		Asetukset
 Confirmation	WebPositive Window		Vahvistus
 Window	WebPositive Window		Ikkuna
+Cookie manager	Cookie Manager		Evästeiden hallinta
 Decrease size	WebPositive Window		Pienennä kirjasinkokoa
 Serif font:	Settings Window		Pääteviivallinen kirjasin:
 Loading %url	WebPositive Window		Ladataan %url
 Download aborted	Download Window		Lataaminen keskeytettiin
+Value	Cookie Manager		Arvo
 Page source	WebPositive Window		Sivulähde
 Next	WebPositive Window		Seuraava
 Find next	WebPositive Window		Etsi seuraava
@@ -42,16 +45,19 @@ Auto-hide mouse pointer	Settings Window		Piilota hiiren osoitin automaattisesti
 Quit	WebPositive Window		Lopeta
 Full screen	WebPositive Window		Koko näyttö
 Open download error	Download Window		Avaa latausvirhe
+The cookie jar is empty!	Cookie Manager		Evästesäiliö on tyhjä!
 Standard font:	Settings Window		Vakiokirjasin:
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Etsi haettavien merkkijonojen edellinen esiintymä
 Restart	Download Window		Käynnistä uudelleen
 Proxy server	Settings Window		Välityspalvelin
 Open containing folder	Download Window		Avaa kansio, josta tiedosto löytyy
 New window	WebPositive Window		Uusi ikkuna
+WebPositive	Download Window		WebPositive
 Open	Download Window		Avaa
 Reload	WebPositive Window		Lataa uudelleen
 Downloads	Download Window		Lataukset
 Sans serif font:	Settings Window		Sans serif -kirjasin:
+Delete	Cookie Manager		Poista
 Forward	WebPositive Window		Lähetä edelleen
 of	Download Window	...as in '12kB of 256kB'	/
 Revert	Settings Window		Palauta
@@ -93,10 +99,12 @@ Find	WebPositive Window		Etsi
 Find previous	WebPositive Window		Etsi edellinen
 Settings	WebPositive Window		Asetukset
 Script console	WebPositive Window		Skriptikonsoli
+Name	Cookie Manager		Nimi
 Proxy server address:	Settings Window		Välityspalvelimen osoite:
 Proxy server port:	Settings Window		Välityspalvelimen portti:
 Bookmarks	WebPositive Window		Kirjanmerkit
 Paste	URL Bar		Liitä
+Cookie manager	WebPositive Window		Evästeiden hallinta
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Piilota salasanateksti
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Albert osti fagotin ja töräytti puhkuvan melodian.
@@ -104,9 +112,11 @@ Over 1 minute left	Download Window		Yli 1 minuutti jäljellä
 Open start page	Settings Window		Avaa aloitussivu
 Continue downloads	WebPositive		Jatka latauksia
 Cancel	Download Window		Peru
+Flags	Cookie Manager		Liput
 Open search page	Settings Window		Avaa etsintäsivu
 Clear	Console Window		Tyhjennä
 Password:	Authentication Panel		Salasana:
+Path	Cookie Manager		Polku
 Back	WebPositive Window		Takaisin
 New browser window	Download Window		Uusi selainikkuna
 Today	WebPositive Window		Tänään
@@ -133,6 +143,7 @@ Open bookmarks confirmation	WebPositive Window		Avaa kirjanmerkkien vahvistamine
 Remove missing	Download Window		Poista puuttuva
 Clone current page	Settings Window		Kloonaa nykyinen sivu
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Haluatko avata kaikki %addedCount-kirjanmerkit kerralla?
+Session cookie	Cookie Manager		Istuntoeväste
 OK	Authentication Panel		Valmis
 Copy	URL Bar		Kopioi
 Download finished	Download Window		Lataus valmistui
@@ -140,6 +151,7 @@ Show bookmark bar	WebPositive Window		Näytä kirjanmerkkipalkki
 OK	WebPositive Window		Valmis
 Manage bookmarks	WebPositive Window		Hallinnoi kirjanmerkkejä
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Kirjanmerkki (%bookmarkName) tälle sivulle on jo olemassa.
+Cookies for %s	Cookie Manager		Evästeet kohteelle %s
 New windows:	Settings Window		Uudet ikkunat:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url valmis
 Remove finished	Download Window		Poista päättyneet

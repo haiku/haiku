@@ -1,31 +1,48 @@
-1	finnish	x-vnd.Haiku-Network	950262959
+1	finnish	x-vnd.Haiku-Network	2512967175
 Static	IntefaceAddressView		Staattinen
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Palvelut
+no link	InterfaceListItem		ei yhteyttä
 WPA2	WPA2 protected network		WPA2
+Choose automatically	IntefaceView		Valitse automaattisesti
+connected	IntefaceView		yhdistetty
+Ethernet device	InterfaceListItem		Ethernet-laite
 The netmask defines your local network	IntefaceAddressView		Verkkopeite määrittää paikallisen verkkosi
-%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%nimi% (%authenticationMode%)
 Network	NetworkWindow		Verkko
 Show network status in Deskbar	NetworkWindow		Näytä verkkotila Työkalupalkissa
 The method for obtaining an IP address	IntefaceAddressView		IP-osoitteen hakemismenettely
+connected	InterfaceListItem		yhdistetty
+disabled	InterfaceListItem		poissa käytöstä
 Dial Up	NetworkWindow		Puhelinverkkoyhteys
 Apply	IntefaceAddressView		Käytä
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Verkkotilan asentaminen Työkalupalkkiin epäonnistui: %s
+MAC address:	IntefaceView		MAC-osoite:
+Wireless device	InterfaceListItem		Langaton laite
 Disabled	IntefaceAddressView		Poissa käytöstä
+Renegotiate	IntefaceView		Neuvottele uudelleen
 Ok	NetworkWindow		Valmis
+Network:	IntefaceView		Verkko:
 launch error	NetworkWindow		käynnistysvirhe
 Other	NetworkWindow		Muu
 Automatic	IntefaceAddressView		Automaattinen
 Gateway:	IntefaceAddressView		Yhdyskäytävä:
 Revert	NetworkWindow		Palauta
 Enable	ServiceView		Ota käyttöön
+disconnected	IntefaceView		katkaistu
+Status:	IntefaceView		Tila:
+Link speed:	IntefaceView		Yhteysnopeus:
 Your gateway to the internet	IntefaceAddressView		Yhdyskäytäväsi internettiin
 New…	NetworkWindow		Uusi...
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Tila:
 WPA	WPA protected network		WPA
+Sent:	IntefaceView		Lähetetty:
 open	Open network		avaa
 IP Address:	IntefaceAddressView		IP-osoite:
+Received:	IntefaceView		Vastaanotettu:
+Disable	IntefaceView		Poista käytöstä
+<no wireless networks found>	IntefaceView		<langatonta verkkoa ei löytynyt>
 Netmask:	IntefaceAddressView		Verkkopeite:
 Disable	ServiceView		Poista käytöstä
 Your IP address	IntefaceAddressView		IP-osoitteesi

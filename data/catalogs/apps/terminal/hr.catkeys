@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Terminal	1642748281
+1	croatian	x-vnd.Haiku-Terminal	1500922367
 Not found.	Terminal TermWindow		Nije pronađeno.
 Switch Terminals	Terminal TermWindow		Zamjeni terminale
 Change directory	Terminal TermView		Promijeni direktorij
@@ -26,6 +26,7 @@ Custom	Terminal colors scheme		Prilagođeno
 Cancel	Terminal SetTitleWindow		Odustani
 Increase	Terminal TermWindow		Povećaj
 Settings	Terminal TermWindow		Postavke
+Window size	Terminal TermWindow		Veličina prozora
 Selected text	Terminal AppearancePrefView		Odabrani tekst
 Find	Terminal FindWindow		Nađi
 Appearance	Terminal PrefWindow		Izgled

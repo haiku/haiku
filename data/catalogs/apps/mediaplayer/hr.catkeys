@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-MediaPlayer	1712188690
+1	croatian	x-vnd.Haiku-MediaPlayer	2716727182
 Location	MediaPlayer-InfoWin		Lokacija
 %d kHz	MediaPlayer-InfoWin		%d kHz
 <unknown>	PlaylistItem-album		<nepoznato>
@@ -54,6 +54,7 @@ Audio track	MediaPlayer-Main		Audio zapis
 Import Entries	MediaPlayer-ImportPLItemsCmd		Uvezi unose
 Pause	MediaPlayer-Main		Pauza
 Track	Video Track Menu		Zapis
+Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interna greška (neuspjelo zaključavanje). Neuspjelo spremanje liste izvođenja.
 View options	MediaPlayer-SettingsWindow		Pogledaj opcije
 none	MediaPlayer-Main		nijedan
 Play mode	MediaPlayer-SettingsWindow		Način izvođenja
@@ -72,6 +73,7 @@ Error: 	MediaPlayer-Main		Greška:
 Large	MediaPlayer-SettingsWindow		Veliko
 Bottom of video	MediaPlayer-SettingsWindow		Dno videa
 Stop	MediaPlayer-Main		Zaustavi
+Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Interna greška (nedostaje memorije). Neuspjelo spremanje liste izvođenja.
 Hide interface	MediaPlayer-Main		Sakrij sučelje
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiraj unos
 none	Subtitles menu		nijedan

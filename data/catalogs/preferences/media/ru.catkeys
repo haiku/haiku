@@ -1,6 +1,8 @@
-1	russian	x-vnd.Haiku-Media	862832618
+1	russian	x-vnd.Haiku-Media	4205337498
 Couldn't add volume control in Deskbar: %s\n	Media views		Не удалось добавить регулятор громкости в Deskbar: %s\n
 Video input:	Media views		Видео вход:
+Warning!	Media Window		Внимание!
+Quit anyway	Media Window		Всё равно выйти
 Defaults	Media views		По умолчанию
 MIDI Settings	Media Window		Настройки MIDI
 Quit	Media Window		Выход
@@ -10,6 +12,7 @@ Could not connect to the media server.\nWould you like to start it ?	Media Windo
 Restart media services	Media views		Перезапустить медиа службы
 Couldn't remove volume control in Deskbar: %s\n	Media views		Не удалось удалить регулятор громкости из Deskbar: %s\n
 Media	System name		Медиа
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Закрытие медиа префлета сейчас остановит перезапуск медиа служб. В результате чего возможна нестабильная работа c медиа.
 Audio mixer	Media Window		Микшер
 This hardware has no controls.	Media Window		Это оборудование не имеет параметров настройки.
 Audio output:	Media views		Аудио выход:

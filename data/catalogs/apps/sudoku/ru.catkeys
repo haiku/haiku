@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Sudoku	2463385585
+1	russian	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Восстановить состояние
 Could not set Sudoku:\n%s\n	SudokuWindow		Не удалось установить Судоку:\n%s\n
 Export as…	SudokuWindow		Экспортировать как…
@@ -26,6 +26,7 @@ Text	SudokuWindow		Текст
 Creating solvable field	SudokuGenerator		Создание решаемого поля
 View	SudokuWindow		Вид
 Progress monitor	ProgressWindow		Монитор состояния
+Set all hints	SudokuWindow		Установить все подсказки
 Mark invalid values	SudokuWindow		Пометить некорректные значения
 Blank	SudokuWindow		Пустая
 Help	SudokuWindow		Помощь

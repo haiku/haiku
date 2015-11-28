@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Keymap	2754930379
+1	croatian	x-vnd.Haiku-Keymap	3559769161
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Obrnuto
@@ -35,6 +35,7 @@ System:	Keymap window		Sustav:
 Lithuanian	Keyboard Layout View		Litvanski
 Finnish	Keyboard Layout View		Finski
 Option:	Modifier keys window	Option key role name	Opcija:
+Control	Keyboard Layout View	Control key	Control
 Switch shortcut keys	Keymap window		Prebaci tipke prečaca
 Norwegian	Keyboard Layout View		Norveški
 User:	Keymap window		Korisnik:
@@ -44,6 +45,7 @@ United-Kingdom	Keyboard Layout View		Ujedinjeno Kraljevstvo
 Key	Modifier keys window	As in a computer keyboard key	Tipka
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Ctrl tipka
 Control:	Modifier keys window	Control key role name	Control:
+Option	Keyboard Layout View	Option key	Opcija
 Swiss-German	Keyboard Layout View		Švicarski njemački
 Layout	Keymap window		Raspored
 Switch shortcut keys to Windows/Linux mode	Keymap window		Prebaci tipke prečaca u Windows/Linux način rada
@@ -53,7 +55,14 @@ Command:	Modifier keys window	Command key role name	Naredba:
 Latin-American	Keyboard Layout View		Latinoamerički
 Spanish (Dvorak)	Keyboard Layout View		Španjolski (Dvorak)
 Lithuanian (Standard)	Keyboard Layout View		Litvanski (standadni)
+Canadian-French	Keyboard Layout View		Kanadski francuski
 Save as…	Keymap window		Spremi kao...
+Serbian (Latin)	Keyboard Layout View		Srpski (latinica)
 File	Keymap window		Datoteka
+Num lock	Keyboard Layout View		Num Lock
+Swedish	Keyboard Layout View		Švedski
+Macedonian	Keyboard Layout View		Makedonski
 (Current)	Keymap window		(Trenutno)
 Font	Keymap window		Font
+Keymap	System name		Raspored tipkovnice
+Ukrainian	Keyboard Layout View		Ukrajinski

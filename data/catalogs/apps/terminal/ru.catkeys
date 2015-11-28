@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	2918699501
+1	russian	x-vnd.Haiku-Terminal	2090807552
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -33,6 +33,7 @@ Increase	Terminal TermWindow		Увеличить
 Settings	Terminal TermWindow		Настройки
 Window size	Terminal TermWindow		Размер окна
 Selected text	Terminal AppearancePrefView		Выделенного текста
+\t%d\t-\tThe current working directory of the active process in the\n\t\t\tcurrent tab. Optionally the maximum number of path components\n\t\t\tcan be specified. E.g. '%2d' for at most two components.\n\t%T\t-\tThe Terminal application name for the current locale.\n\t%e\t-\tThe encoding of the current tab. Not shown for UTF-8.\n\t%i\t-\tThe index of the window.\n\t%p\t-\tThe name of the active process in the current tab.\n\t%t\t-\tThe title of the current tab.	Terminal ToolTips		\t%d\t-\tТекущая директория активного процесса текущей вкладки.\n\t\t\tОпционально можно указать максимальное число отображаемых компонентов пути.\n\t\t\tНапример '%2d' отобразит последние 2 компонента.\n\t%T\t-\tИмя приложения Терминал для текущей локали.\n\t%e\t-\tКодировка текущей вкладки. Для UTF-8 не отображается.\n\t%i\t-\tНомер окна.\n\t%p\t-\tНазвание активного процесса в текущей вкладке.\n\t%t\t-\tЗаголовок текущей вкладки.\n
 Find	Terminal FindWindow		Найти
 The pattern specifying the window titles. The following placeholders\ncan be used:	Terminal AppearancePrefView		Этот шаблон описывает заголовки окна.\nВозможно использовать следующие переменные:\n
 Appearance	Terminal PrefWindow		Внешний вид

@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-FileTypes	1270839902
+1	croatian	x-vnd.Haiku-FileTypes	1730022709
 Application types…	FileTypes Window		Vrste programa...
 Description:	Application Types Window		Opis:
 Add group	New File Type Window		Dodaj grupu
@@ -39,6 +39,7 @@ Name:	Application Types Window		Ime:
 Group name:	New File Type Window		Ime grupe:
 Preferred application	FileType Window		Poželjni program
 Progress	Application Types Window		Napredak
+Set preferred application	Preferred App Menu		Odaberi poželjni program
 Don't save	Application Type Window		Ne spremaj
 Save changes before closing?	Application Type Window		Spremiti promjene prije zatvaranja?
 File	Application Type Window		Datoteka

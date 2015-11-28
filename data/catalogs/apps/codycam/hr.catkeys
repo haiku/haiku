@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-CodyCam	524061542
+1	croatian	x-vnd.Haiku-CodyCam	4144146144
 Upload…	VideoConsumer.cpp		Pošalji...
 Every 30 seconds	CodyCam		Svakih 30 sekunda
 File name:	CodyCam		Ime datoteke:
@@ -26,6 +26,7 @@ Every 15 minutes	CodyCam		Svakih 15 minuta
 Can't find an available connection to the video window	CodyCam		Ne mogu naći dostupnu vezu prema video prozoru
 Every 8 hours	CodyCam		Svakih 8 sati
 Rename failed	VideoConsumer.cpp		Neuspjelo preimenovanje
+Cannot start time source!	CodyCam		Ne mogu pokrenuti video izvor!
 Cannot register the video window	CodyCam		Ne mogu pokrenuti video prozor
 CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		Svaka 24 sata
@@ -35,7 +36,9 @@ Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Ne mogu n
 invalid upload client %ld\n	VideoConsumer.cpp		neispravni klijent slanja %ld\n
 Every 15 seconds	CodyCam		Svakih 15 sekundi
 Error writing output file	VideoConsumer.cpp		Greška pri pisanju izlazne datoteke
+Cannot set the time source for the video source	CodyCam		Ne mogu postaviti izvor vremena za izvor videa
 Type:	CodyCam		Tip:
+Cannot set the time source for the video window	CodyCam		Ne mogu povstavit izvor vremena za video prozor
 Stop video	CodyCam		Zaustavi video
 Locking the window\n	VideoConsumer.cpp		Zaključavanje prozora\n
 File %s; Line %ld # %s	SettingsHandler		Datoteka %s; Redak %ld # %s

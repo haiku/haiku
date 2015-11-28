@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Be-PRNT	1358844686
+1	croatian	x-vnd.Be-PRNT	3321672625
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Pisač: %ime_pisača%\nUpravljački program:   %upravljački program%\n
 Waiting	JobListView		Čekanje
 Print test page	PrintersWindow		Ispiši test stranicu
@@ -9,6 +9,7 @@ Cancel	AddPrinterDialog		Otkaži
 Add printer	AddPrinterDialog		Dodaj pisač
 Green	TestPageView		Zelena
 Printers	PrintersWindow		Pisači
+Add…	PrintersWindow		Dodaj ...
 Default Printer	PrinterListView		Zadani pisač
 No pending jobs.	PrinterListView		Nema zadataka na čekanju.
 pages	JobListView		stranice

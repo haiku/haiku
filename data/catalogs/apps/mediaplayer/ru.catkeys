@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	1447703998
+1	russian	x-vnd.Haiku-MediaPlayer	2711018042
 raw audio	MediaPlayer-InfoWin		raw аудио
 Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -68,6 +68,7 @@ Select all	MediaPlayer-PlaylistWindow		Выделить все
 Move Entry	MediaPlayer-MovePLItemsCmd		Переместить запись
 Open	MediaPlayer-PlaylistWindow		Открыть
 Stop playing.	MediaPlayer-Main		Остановить проигрывание.
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		Seek by the specified amounts of microseconds.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' не может быть открыт.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Ошибка: 
 Audio	MediaPlayer-InfoWin		Аудио
@@ -136,6 +137,7 @@ Edit	MediaPlayer-PlaylistWindow		Изменить
 Start media server	MediaPlayer-Main		Запустить медиа сервер
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Переключить в полноэкранный режим.
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Gets the duration of the currently playing item in microseconds.
 ToggleFullscreen	MediaPlayer-Main		Переключить в полноэкранный режим
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Моно} =2{Стерео} few{# канала} other{# каналов}}
 <unnamed>	PlaylistItem-name		<без названия>

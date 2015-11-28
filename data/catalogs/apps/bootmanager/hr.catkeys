@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-BootManager	763483488
+1	croatian	x-vnd.Haiku-BootManager	1163164732
 The boot manager has been successfully installed on your system.	BootManagerController		Upravitelj podizanja sustava uspješno je instaliran u vaš sustav.
 After two seconds	DefaultPartitionPage		Nakon dvije sekunde
 Uninstall Boot Manager	UninstallPage	Title	Deinstaliraj Upravitelj podizanja sustava
@@ -24,6 +24,7 @@ Please specify a default partition and a timeout.\nThe boot menu will load the d
 After one second	DefaultPartitionPage		Nakon jedne sekunde
 The following partitions were detected. Please check the box next to the partitions to be included in the boot menu. You can also set the names of the partitions as you would like them to appear in the boot menu.	PartitionsPage		Slijedeće particije su nađene.Stavite kvačicu pokraj particija da bi bile uključene u izbornik podizanja sustava.Također možete dati ime particijama kako želite da se pojavljuju u izborniku podizanja sustava.
 After one minute	DefaultPartitionPage		Nakon jedne minute
+The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Stari Master Boot Record se ne može spremiti u %s. Možete nastaviti sa instalacijom, ali nema načina da deinstalirate boot izbornik.
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Master Boot Record boot uređaja (%DISK) uspješno je obnovljen sa %DATOTEKE.
 Quit	WizardView	Button	Isključi
 Write boot menu	BootManagerController	Button	Zapiši izbornik podizanja sustava
@@ -45,9 +46,13 @@ Drives	DrivesPage	Title	Pogoni
 No space available!	DrivesPage	Cannot install	Nema dostupnog prostora!
 Never	DefaultPartitionPage		Nikada
 Partition table not compatible	BootManagerController	Title	Particijska tablica nije kompatibilna
+Old Master Boot Record saved	BootManagerController	Title	Stari Master Boot Record spremljen
 Boot Manager is unable to read the partition table!	BootManagerController		Upravitelj podizanja sustava ne može čitati particijsku tablicu!
 Error reading partition table	BootManagerController	Title	Greška pri čitanju particijske tablice
 Installation of boot menu failed	BootManagerController	Title	Neuspjela deinstalacija izbornika podizanja sustava
+The partition table of the first hard disk is not compatible with Boot Manager.\nBoot Manager only works with IBM PC MBR partitions.	BootManagerController		Particijska tablica na prvom tvrdom disku nije kompatibilna sa upraviteljen podizanja sustava.\nUpravitelj podizanja sustava radi samo sa IBM PC MBR particijama.
+Backup Master Boot Record	BootManagerController	Title	Sigurtnosna kopija Master Boot Recorda
+About to write the boot menu to disk. Are you sure you want to continue?	BootManagerController		Spremate se zapisati izbornik podizanja na disk. Jeste li sigurni da želite nastaviti?
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Stari Master Boot Record je uspješno spremljen na %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Zadana particija:
 Partitions	DefaultPartitionPage	Pop up menu title	Particije
