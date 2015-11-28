@@ -83,9 +83,30 @@ struct RosterNotification {
 };
 
 
+struct LocalNode {
+				LocalNode(BMediaNode* local_node)
+					:
+					node(local_node) {}
+
+				LocalNode()
+					:
+					node(NULL) {}
+
+	bool 		operator==(const LocalNode& a)
+				{
+					if (a.node == this->node)
+						return true;
+					return false;
+				}
+
+	BMediaNode* node;
+};
+
+
 static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
 static BLocker sInitLocker("BMediaRoster::Roster locker");
+static List<LocalNode> sRegisteredNodes;
 
 
 class MediaRosterUndertaker {
@@ -95,6 +116,18 @@ public:
 		BAutolock _(sInitLocker);
 		if (BMediaRoster::CurrentRoster() != NULL
 				&& BMediaRoster::CurrentRoster()->Lock()) {
+
+			// Detect any forgotten node
+			if (sRegisteredNodes.CountItems() > 0) {
+				for (int32 i = 0; i < sRegisteredNodes.CountItems(); i++) {
+					LocalNode* node = NULL;
+					sRegisteredNodes.Get(i, &node);
+					if (node != NULL) {
+						ERROR("BMediaRoster: Node with ID %" B_PRId32
+							" was not released correctly\n", node->node->ID());
+					}
+				}
+			}
 
 			if (be_app != NULL)
 				be_app->UnregisterLooper(BMediaRoster::CurrentRoster());
@@ -178,6 +211,22 @@ BMediaRosterEx::~BMediaRosterEx()
 		sizeof(reply));
 
 	BPrivate::SharedBufferList::Invalidate();
+}
+
+
+void
+BMediaRosterEx::RegisterLocalNode(BMediaNode* node)
+{
+	sRegisteredNodes.Insert(LocalNode(node));
+}
+
+
+void
+BMediaRosterEx::UnregisterLocalNode(BMediaNode* node)
+{
+	int32 index = sRegisteredNodes.Find(LocalNode(node));
+	if (index != -1)
+		sRegisteredNodes.Remove(index);
 }
 
 
