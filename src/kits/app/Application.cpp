@@ -61,6 +61,7 @@ BMessenger be_app_messenger;
 
 pthread_once_t sAppResourcesInitOnce = PTHREAD_ONCE_INIT;
 BResources* BApplication::sAppResources = NULL;
+BObjectList<BLooper> sOnQuitLooperList;
 
 
 enum {
@@ -305,6 +306,13 @@ BApplication::~BApplication()
 
 	// tell all loopers(usually windows) to quit. Also, wait for them.
 	_QuitAllWindows(true);
+
+	// quit registered loopers
+	for (int32 i = 0; i < sOnQuitLooperList.CountItems(); i++) {
+		BLooper* looper = sOnQuitLooperList.ItemAt(i);
+		if (looper->Lock())
+			looper->Quit();
+	}
 
 	// unregister from the roster
 	BRoster::Private().RemoveApp(Team());
@@ -957,6 +965,40 @@ BApplication::LooperAt(int32 index) const
 		looper = gLooperList.LooperAt(index);
 
 	return looper;
+}
+
+
+status_t
+BApplication::RegisterLooper(BLooper* looper)
+{
+	BWindow* window = dynamic_cast<BWindow*>(looper);
+	if (window != NULL)
+		return B_BAD_VALUE;
+
+	if (sOnQuitLooperList.HasItem(looper))
+		return B_ERROR;
+
+	if (sOnQuitLooperList.AddItem(looper) != true)
+		return B_ERROR;
+
+	return B_OK;
+}
+
+
+status_t
+BApplication::UnregisterLooper(BLooper* looper)
+{
+	BWindow* window = dynamic_cast<BWindow*>(looper);
+	if (window != NULL)
+		return B_BAD_VALUE;
+
+	if (!sOnQuitLooperList.HasItem(looper))
+		return B_ERROR;
+
+	if (sOnQuitLooperList.RemoveItem(looper) != true)
+		return B_ERROR;
+
+	return B_OK;
 }
 
 

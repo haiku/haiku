@@ -85,6 +85,11 @@ public:
 									BHandler* handler);
 			void				SetPulseRate(bigtime_t rate);
 
+	// Register a BLooper to be quit before the BApplication
+	// object is destroyed.
+			status_t			RegisterLooper(BLooper* looper);
+			status_t			UnregisterLooper(BLooper* looper);
+
 	// More scripting
 	virtual status_t			GetSupportedSuites(BMessage* data);
 

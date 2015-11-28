@@ -42,8 +42,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 
 #include <MediaRoster.h>
 
-#include <new>
-
+#include <Application.h>
 #include <Autolock.h>
 #include <BufferConsumer.h>
 #include <BufferProducer.h>
@@ -58,8 +57,9 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 #include <String.h>
 #include <TimeSource.h>
 
-#include <AppMisc.h>
+#include <new>
 
+#include <AppMisc.h>
 #include <DataExchange.h>
 #include <debug.h>
 #include <DormantNodeManager.h>
@@ -82,6 +82,7 @@ struct RosterNotification {
 	int32		what;
 };
 
+
 static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
 static BLocker sInitLocker("BMediaRoster::Roster locker");
@@ -94,6 +95,10 @@ public:
 		BAutolock _(sInitLocker);
 		if (BMediaRoster::CurrentRoster() != NULL
 				&& BMediaRoster::CurrentRoster()->Lock()) {
+
+			if (be_app != NULL)
+				be_app->UnregisterLooper(BMediaRoster::CurrentRoster());
+
 			BMediaRoster::CurrentRoster()->Quit();
 		}
 	}
@@ -2221,6 +2226,9 @@ BMediaRoster::Roster(status_t* out_error)
 {
 	BAutolock lock(sInitLocker);
 
+	if (be_app == NULL)
+		TRACE("Warning! You should have a valid BApplication.");
+
 	if (!lock.IsLocked())
 		return NULL;
 
@@ -2240,8 +2248,11 @@ BMediaRoster::Roster(status_t* out_error)
 			}
 			if (out_error)
 				*out_error = err;
+		} else if (be_app != NULL) {
+			be_app->RegisterLooper(sDefaultInstance);
 		}
 	}
+
 	return sDefaultInstance;
 }
 
