@@ -410,7 +410,7 @@ RemotePackageRepository HaikuPorts
 	psqlodbc_devel-09.03.0400-1
 	python-2.7.10-1
 	python_dateutil-1.5-2
-	python_imaging-1.1.7-1
+	python_imaging-1.1.7-2
 	python_lxml-3.3.5-2
 	python_mechanize-0.2.5-2
 	python_requests-2.3.0-2
