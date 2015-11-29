@@ -122,8 +122,8 @@ RemotePackageRepository HaikuPorts
 	glew-1.13.0-1
 	glew_devel-1.13.0-1
 	glew_util-1.13.0-1
-	glib2-2.38.1-6
-	glib2_devel-2.38.1-6
+	glib2-2.46.2-1
+	glib2_devel-2.46.2-1
 	glu-9.0.0-3
 	glu_devel-9.0.0-3
 	gmp-6.0.0-1
@@ -166,6 +166,8 @@ RemotePackageRepository HaikuPorts
 	lame_devel-3.99.5-6
 	lcms-2.7-1
 	lcms_devel-2.7-1
+	lensfun-0.3.2-1
+	lensfun_devel-0.3.2-1
 	less-458-2
 	libasr-1.0.2-2
 	libasr_devel-1.0.2-2
@@ -195,6 +197,8 @@ RemotePackageRepository HaikuPorts
 	libicns_devel-0.8.1-3
 	libiconv-1.13.1-6
 	libiconv_devel-1.13.1-6
+	libidl-0.8.14-1
+	libidl_devel-0.8.14-1
 	libidn-1.32-1
 	libidn_devel-1.32-1
 	libmad-0.15.1b-2
@@ -307,7 +311,7 @@ RemotePackageRepository HaikuPorts
 	perl-5.18.2-2
 	pixman-0.32.6-1
 	pixman_devel-0.32.6-1
-	pkgconfig-0.27.1-2
+	pkgconfig-0.29-1
 	pyenet-20141025-1
 	python-2.7.10-3
 	python_setuptools-5.3-2
@@ -457,6 +461,7 @@ RemotePackageRepository HaikuPorts
 	keymapswitcher
 	lame
 	lcms
+	lensfun
 	less
 	libasr
 	libass
@@ -472,6 +477,7 @@ RemotePackageRepository HaikuPorts
 	libgpg_error
 	libicns
 	libiconv
+	libidl
 	libidn
 	libmad
 	libmikmod
