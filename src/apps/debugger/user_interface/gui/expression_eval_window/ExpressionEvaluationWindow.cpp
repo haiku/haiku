@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #include "ExpressionEvaluationWindow.h"
@@ -10,7 +10,9 @@
 #include <String.h>
 #include <TextControl.h>
 
-#include "AutoLocker.h"
+#include <AutoDeleter.h>
+#include <AutoLocker.h>
+
 #include "CppLanguage.h"
 #include "FunctionDebugInfo.h"
 #include "FunctionInstance.h"
@@ -26,6 +28,9 @@
 
 
 enum {
+	MSG_THREAD_ADDED				= 'thad',
+	MSG_THREAD_REMOVED				= 'thar',
+
 	MSG_THREAD_SELECTION_CHANGED	= 'thsc',
 	MSG_FRAME_SELECTION_CHANGED		= 'frsc'
 };
@@ -144,11 +149,80 @@ ExpressionEvaluationWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_THREAD_ADDED:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) == B_OK)
+				_HandleThreadAdded(threadID);
+			break;
+		}
+
+		case MSG_THREAD_REMOVED:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) == B_OK)
+				_HandleThreadRemoved(threadID);
+			break;
+		}
+
+		case MSG_THREAD_STATE_CHANGED:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) == B_OK)
+				_HandleThreadStateChanged(threadID);
+			break;
+		}
+
+		case MSG_THREAD_STACK_TRACE_CHANGED:
+		{
+			int32 threadID;
+			if (message->FindInt32("thread", &threadID) == B_OK)
+				_HandleThreadStackTraceChanged(threadID);
+			break;
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
 	}
 
+}
+
+
+void
+ExpressionEvaluationWindow::ThreadAdded(const Team::ThreadEvent& event)
+{
+	BMessage message(MSG_THREAD_ADDED);
+	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
+}
+
+
+void
+ExpressionEvaluationWindow::ThreadRemoved(const Team::ThreadEvent& event)
+{
+	BMessage message(MSG_THREAD_REMOVED);
+	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
+}
+
+
+void
+ExpressionEvaluationWindow::ThreadStateChanged(const Team::ThreadEvent& event)
+{
+	BMessage message(MSG_THREAD_STATE_CHANGED);
+	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
+}
+
+
+void
+ExpressionEvaluationWindow::ThreadStackTraceChanged(
+	const Team::ThreadEvent& event)
+{
+	BMessage message(MSG_THREAD_STACK_TRACE_CHANGED);
+	message.AddInt32("thread", event.GetThread()->ID());
+	PostMessage(&message);
 }
 
 
@@ -240,6 +314,12 @@ ExpressionEvaluationWindow::_HandleThreadSelectionChanged(int32 threadID)
 	fSelectedThread = fTeam->ThreadByID(threadID);
 	if (fSelectedThread != NULL)
 		fSelectedThread->AcquireReference();
+	else if (fThreadList->Menu()->FindMarked() == NULL) {
+		// if the selected thread was cleared due to a thread event
+		// rather than user selection, we need to reset the marked item
+		// to reflect the new state.
+		fThreadList->Menu()->ItemAt(0)->SetMarked(true);
+	}
 
 	_UpdateFrameList();
 
@@ -287,6 +367,93 @@ ExpressionEvaluationWindow::_HandleFrameSelectionChanged(int32 index)
 
 
 void
+ExpressionEvaluationWindow::_HandleThreadAdded(int32 threadID)
+{
+	AutoLocker< ::Team> teamLocker(fTeam);
+	::Thread* thread = fTeam->ThreadByID(threadID);
+	if (thread == NULL)
+		return;
+
+	if (thread->State() != THREAD_STATE_STOPPED)
+		return;
+
+	BMenuItem* item = NULL;
+	if (_CreateThreadMenuItem(thread, item) != B_OK)
+		return;
+
+	BMenu* threadMenu = fThreadList->Menu();
+	int32 index = 1;
+	// find appropriate insertion index to keep menu sorted in thread order.
+	for (; index < threadMenu->CountItems(); index++) {
+		BMenuItem* threadItem = threadMenu->ItemAt(index);
+		BMessage* message = threadItem->Message();
+		if (message->FindInt32("thread") > threadID)
+			break;
+	}
+
+	bool added = false;
+	if (index == threadMenu->CountItems())
+		added = threadMenu->AddItem(item);
+	else
+		added = threadMenu->AddItem(item, index);
+
+	if (!added)
+		delete item;
+}
+
+
+void
+ExpressionEvaluationWindow::_HandleThreadRemoved(int32 threadID)
+{
+	BMenu* threadMenu = fThreadList->Menu();
+	for (int32 i = 0; i < threadMenu->CountItems(); i++) {
+		BMenuItem* item = threadMenu->ItemAt(i);
+		BMessage* message = item->Message();
+		if (message->FindInt32("thread") == threadID) {
+			threadMenu->RemoveItem(i);
+			delete item;
+			break;
+		}
+	}
+
+	if (fSelectedThread != NULL && threadID == fSelectedThread->ID())
+		_HandleThreadSelectionChanged(-1);
+}
+
+
+void
+ExpressionEvaluationWindow::_HandleThreadStateChanged(int32 threadID)
+{
+	AutoLocker< ::Team> teamLocker(fTeam);
+
+	::Thread* thread = fTeam->ThreadByID(threadID);
+	if (thread == NULL)
+		return;
+
+	if (thread->State() == THREAD_STATE_STOPPED)
+		_HandleThreadAdded(threadID);
+	else
+		_HandleThreadRemoved(threadID);
+}
+
+
+void
+ExpressionEvaluationWindow::_HandleThreadStackTraceChanged(int32 threadID)
+{
+	AutoLocker< ::Team> teamLocker(fTeam);
+
+	::Thread* thread = fTeam->ThreadByID(threadID);
+	if (thread == NULL)
+		return;
+
+	if (thread != fSelectedThread)
+		return;
+
+	_UpdateFrameList();
+}
+
+
+void
 ExpressionEvaluationWindow::_UpdateThreadList()
 {
 	AutoLocker< ::Team> teamLocker(fTeam);
@@ -305,25 +472,15 @@ ExpressionEvaluationWindow::_UpdateThreadList()
 		if (thread->State() != THREAD_STATE_STOPPED)
 			continue;
 
-		BString nameString;
-		nameString.SetToFormat("%" B_PRId32 ": %s", thread->ID(),
-			thread->Name());
-
-		BMessage* message = new(std::nothrow) BMessage(
-			MSG_THREAD_SELECTION_CHANGED);
-		if (message == NULL)
+		BMenuItem* item = NULL;
+		if (_CreateThreadMenuItem(thread, item) != B_OK)
 			return;
 
-		message->AddInt32("thread", thread->ID());
-
-		BMenuItem* item = new(std::nothrow) BMenuItem(nameString,
-			message);
-		if (item == NULL)
-			return;
-
+		ObjectDeleter<BMenuItem> itemDeleter(item);
 		if (!threadMenu->AddItem(item))
 			return;
 
+		itemDeleter.Detach();
 		if (fSelectedThread == NULL) {
 			item->SetMarked(true);
 			_HandleThreadSelectionChanged(thread->ID());
@@ -379,4 +536,29 @@ ExpressionEvaluationWindow::_UpdateFrameList()
 			_HandleFrameSelectionChanged(i);
 		}
 	}
+}
+
+
+status_t
+ExpressionEvaluationWindow::_CreateThreadMenuItem(::Thread* thread,
+	BMenuItem*& _item) const
+{
+	BString nameString;
+	nameString.SetToFormat("%" B_PRId32 ": %s", thread->ID(),
+		thread->Name());
+
+	BMessage* message = new(std::nothrow) BMessage(
+		MSG_THREAD_SELECTION_CHANGED);
+	if (message == NULL)
+		return B_NO_MEMORY;
+
+	ObjectDeleter<BMessage> messageDeleter(message);
+	message->AddInt32("thread", thread->ID());
+	_item = new(std::nothrow) BMenuItem(nameString,
+		message);
+	if (_item == NULL)
+		return B_NO_MEMORY;
+
+	messageDeleter.Detach();
+	return B_OK;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef EXPRESSION_EVALUATION_WINDOW_H
@@ -41,6 +41,15 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 
+	// Team::Listener
+	virtual	void				ThreadAdded(const Team::ThreadEvent& event);
+	virtual	void				ThreadRemoved(const Team::ThreadEvent& event);
+
+	virtual	void				ThreadStateChanged(
+									const Team::ThreadEvent& event);
+	virtual	void				ThreadStackTraceChanged(
+									const Team::ThreadEvent& event);
+
 	// VariablesView::Listener
 	virtual	void				ValueNodeValueRequested(CpuState* cpuState,
 									ValueNodeContainer* container,
@@ -62,8 +71,16 @@ private:
 			void				_HandleThreadSelectionChanged(int32 threadID);
 			void				_HandleFrameSelectionChanged(int32 index);
 
+			void				_HandleThreadAdded(int32 threadID);
+			void				_HandleThreadRemoved(int32 threadID);
+			void				_HandleThreadStateChanged(int32 threadID);
+			void				_HandleThreadStackTraceChanged(int32 threadID);
+
 			void				_UpdateThreadList();
 			void				_UpdateFrameList();
+
+			status_t			_CreateThreadMenuItem(::Thread* thread,
+									BMenuItem*& _item) const;
 
 private:
 			BTextControl*		fExpressionInput;
