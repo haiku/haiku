@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku Inc. All rights reserved.
+ * Copyright 2009-2015, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  */
 #ifndef _ENCODER_PLUGIN_H
@@ -121,6 +121,9 @@ public:
 
 	virtual	Encoder*			NewEncoder(
 									const media_codec_info& codecInfo) = 0;
+
+	virtual	Encoder*			NewEncoder(
+									const media_format& format) = 0;
 
 	virtual	status_t			RegisterNextEncoder(int32* cookie,
 									media_codec_info* codecInfo,

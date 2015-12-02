@@ -151,9 +151,40 @@ PluginManager::CreateDecoder(Decoder** _decoder, const media_format& format)
 status_t
 PluginManager::CreateDecoder(Decoder** decoder, const media_codec_info& mci)
 {
-	// TODO
-	debugger("not implemented");
-	return B_ERROR;
+	TRACE("PluginManager::CreateDecoder enter\n");
+	entry_ref ref;
+	status_t status = AddOnManager::GetInstance()->GetEncoder(&ref, mci.id);
+	if (status != B_OK)
+		return status;
+
+	MediaPlugin* plugin = GetPlugin(ref);
+	if (plugin == NULL) {
+		ERROR("PluginManager::CreateDecoder: GetPlugin failed\n");
+		return B_ERROR;
+	}
+
+	DecoderPlugin* decoderPlugin = dynamic_cast<DecoderPlugin*>(plugin);
+	if (decoderPlugin == NULL) {
+		ERROR("PluginManager::CreateDecoder: dynamic_cast failed\n");
+		PutPlugin(plugin);
+		return B_ERROR;
+	}
+
+	// TODO: In theory, one DecoderPlugin could support multiple Decoders,
+	// but this is not yet handled (passing "0" as index/ID).
+	*decoder = decoderPlugin->NewDecoder(0);
+	if (*decoder == NULL) {
+		ERROR("PluginManager::CreateDecoder: NewDecoder() failed\n");
+		PutPlugin(plugin);
+		return B_ERROR;
+	}
+	TRACE("  created decoder: %p\n", *decoder);
+	(*decoder)->fMediaPlugin = plugin;
+
+	TRACE("PluginManager::CreateDecoder leave\n");
+
+	return B_OK;
+
 }
 
 
@@ -289,6 +320,51 @@ PluginManager::CreateEncoder(Encoder** _encoder,
 	(*_encoder)->fMediaPlugin = plugin;
 
 	TRACE("PluginManager::CreateEncoder leave\n");
+
+	return B_OK;
+}
+
+
+status_t
+PluginManager::CreateEncoder(Encoder** encoder, const media_format& format)
+{
+	TRACE("PluginManager::CreateEncoder enter nr2\n");
+
+	entry_ref ref;
+
+	status_t ret = AddOnManager::GetInstance()->GetDecoderForFormat(
+		&ref, format);
+
+	if (ret != B_OK) {
+		ERROR("PluginManager::CreateEncoder: can't get decoder for format: "
+			"%s\n", strerror(ret));
+		return ret;
+	}
+
+	MediaPlugin* plugin = GetPlugin(ref);
+	if (plugin == NULL) {
+		ERROR("PluginManager::CreateEncoder: GetPlugin failed\n");
+		return B_ERROR;
+	}
+
+	EncoderPlugin* encoderPlugin = dynamic_cast<EncoderPlugin*>(plugin);
+	if (encoderPlugin == NULL) {
+		ERROR("PluginManager::CreateEncoder: dynamic_cast failed\n");
+		PutPlugin(plugin);
+		return B_ERROR;
+	}
+
+
+	*encoder = encoderPlugin->NewEncoder(format);
+	if (*encoder == NULL) {
+		ERROR("PluginManager::CreateEncoder: NewEncoder() failed\n");
+		PutPlugin(plugin);
+		return B_ERROR;
+	}
+	TRACE("  created encoder: %p\n", *encoder);
+	(*encoder)->fMediaPlugin = plugin;
+
+	TRACE("PluginManager::CreateEncoder leave nr2\n");
 
 	return B_OK;
 }

@@ -34,6 +34,9 @@ public:
 
 	virtual	Encoder*			NewEncoder(
 									const media_codec_info& codecInfo);
+
+	virtual	Encoder*			NewEncoder(const media_format& format);
+
 	virtual	status_t			RegisterNextEncoder(int32* cookie,
 									media_codec_info* codecInfo,
 									media_format_family* formatFamily,

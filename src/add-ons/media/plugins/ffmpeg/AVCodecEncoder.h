@@ -27,6 +27,8 @@ public:
 								AVCodecEncoder(uint32 codecID,
 									int bitRateScale);
 
+								AVCodecEncoder(const media_format& format);
+
 	virtual						~AVCodecEncoder();
 
 	virtual	status_t			AcceptedFormat(
@@ -48,6 +50,7 @@ public:
 	// codec buffer size.
 
 private:
+			void				_Init();
 			status_t			_Setup();
 
 			bool				_OpenCodecIfNeeded();

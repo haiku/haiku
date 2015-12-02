@@ -8,6 +8,15 @@
 
 #include <MediaFormats.h>
 
+namespace BPrivate {
+	namespace media {
+		class Encoder;
+		class EncoderPlugin;
+	}
+}
+
+using namespace BPrivate::media;
+
 
 class BMediaEncoder {
 public:
@@ -65,6 +74,8 @@ private:
 			BMediaEncoder&		operator=(const BMediaEncoder& other);
 
 private:
+			status_t			_AttachToEncoder();
+
 	static	status_t			write_chunk(void* classPtr,
 									const void* buffer, size_t size,
 									media_encode_info* info);
@@ -73,7 +84,7 @@ private:
 			void				ReleaseEncoder();
 
 			uint32				_reserved_was_fEncoderMgr;
-			uint32				_reserved_was_fEncoder;
+			Encoder*			fEncoder;
 
 			int32				fEncoderID;
 			bool				fFormatValid;
@@ -84,7 +95,7 @@ private:
 };
 
 
-class BMediaBufferEncoder: public BMediaEncoder {
+class BMediaBufferEncoder : public BMediaEncoder {
 public:
 								BMediaBufferEncoder();
 								BMediaBufferEncoder(

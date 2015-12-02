@@ -1,6 +1,8 @@
-/* 
+/*
+ * Copyright 2015, Dario Casalinuovo. All rights reserved.
+ * Copyright 2012, Fredrik Modéen. All rights reserved.
  * Copyright 2004-2007, Marcus Overhagen. All rights reserved.
- * Distributed under the terms of the OpenBeOS License.
+ * Distributed under the terms of the MIT License.
  */
 #ifndef _PLUGIN_MANAGER_H
 #define _PLUGIN_MANAGER_H
@@ -51,6 +53,10 @@ public:
 			status_t			CreateEncoder(Encoder** encoder,
 									const media_codec_info* codecInfo,
 									uint32 flags);
+
+			status_t			CreateEncoder(Encoder** encoder,
+									const media_format& format);
+
 			void				DestroyEncoder(Encoder* encoder);
 	
 private:
