@@ -55,8 +55,7 @@ BMediaEncoder::BMediaEncoder(const media_codec_info *mci)
 BMediaEncoder::~BMediaEncoder()
 {
 	CALLED();
-	gPluginManager.DestroyEncoder(fEncoder);
-	fEncoder = NULL;
+	ReleaseEncoder();
 }
 
 
@@ -72,33 +71,26 @@ BMediaEncoder::SetTo(const media_format *output_format)
 {
 	CALLED();
 
-	gPluginManager.DestroyEncoder(fEncoder);
-	fEncoder = NULL;
-	fInitStatus = B_OK;
 	status_t err = B_ERROR;
-	if (output_format != NULL) {
-		media_format format = *output_format;
+	ReleaseEncoder();
 
-		status_t err = gPluginManager.CreateEncoder(&fEncoder, format);
-		if (err != B_OK)
-			goto fail;
+	if (output_format == NULL)
+		return fInitStatus;
 
+	media_format format = *output_format;
+	err = gPluginManager.CreateEncoder(&fEncoder, format);
+	if (fEncoder != NULL && err == B_OK) {
 		err = _AttachToEncoder();
-		if (err != B_OK)
-			goto fail;
-
-		err = SetFormat(NULL, &format);
-		if (err != B_OK)
-			goto fail;
-
-		return B_OK;
+		if (err == B_OK) {
+			err = SetFormat(NULL, &format);
+			if (err == B_OK) {
+				fInitStatus = B_OK;
+				return B_OK;
+			}
+		}
 	}
-
-fail:
+	ReleaseEncoder();
 	fInitStatus = err;
-	gPluginManager.DestroyEncoder(fEncoder);
-	fEncoder = NULL;
-	fInitStatus = B_NO_INIT;
 	return err;
 }
 
@@ -108,24 +100,18 @@ BMediaEncoder::SetTo(const media_codec_info *mci)
 {
 	CALLED();
 
-	gPluginManager.DestroyEncoder(fEncoder);
-	fEncoder = NULL;
-
+	ReleaseEncoder();
 	status_t err = gPluginManager.CreateEncoder(&fEncoder, mci, 0);
-	if (err < B_OK)
-		goto fail;
+	if (fEncoder != NULL && err == B_OK) {
+		err = _AttachToEncoder();
+		if (err == B_OK) {
+			fInitStatus = B_OK;
+			return B_OK;
+		}
+	}
 
-	err = _AttachToEncoder();
-	if (err < B_OK)
-		goto fail;
-
-	fInitStatus = B_OK;
-	return B_OK;
-
-fail:
-	gPluginManager.DestroyEncoder(fEncoder);
-	fEncoder = NULL;
-	fInitStatus = B_NO_INIT;
+	ReleaseEncoder();
+	fInitStatus = err;
 	return err;
 }
 
@@ -232,7 +218,12 @@ BMediaEncoder::Init()
 void 
 BMediaEncoder::ReleaseEncoder()
 {
-	UNIMPLEMENTED();
+	CALLED();
+	if (fEncoder != NULL) {
+		gPluginManager.DestroyEncoder(fEncoder);
+		fEncoder = NULL;
+	}
+	fInitStatus = B_NO_INIT;
 }
 
 
