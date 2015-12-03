@@ -31,17 +31,17 @@ BMediaEncoder::BMediaEncoder()
 }
 
 
-BMediaEncoder::BMediaEncoder(const media_format *output_format)
+BMediaEncoder::BMediaEncoder(const media_format* outputFormat)
 	:
 	fEncoder(NULL),
 	fInitStatus(B_NO_INIT)
 {
 	CALLED();
-	SetTo(output_format);
+	SetTo(outputFormat);
 }
 
 
-BMediaEncoder::BMediaEncoder(const media_codec_info *mci)
+BMediaEncoder::BMediaEncoder(const media_codec_info* mci)
 	:
 	fEncoder(NULL),
 	fInitStatus(B_NO_INIT)
@@ -67,17 +67,17 @@ BMediaEncoder::InitCheck() const
 
 
 status_t 
-BMediaEncoder::SetTo(const media_format *output_format)
+BMediaEncoder::SetTo(const media_format* outputFormat)
 {
 	CALLED();
 
 	status_t err = B_ERROR;
 	ReleaseEncoder();
 
-	if (output_format == NULL)
+	if (outputFormat == NULL)
 		return fInitStatus;
 
-	media_format format = *output_format;
+	media_format format = *outputFormat;
 	err = gPluginManager.CreateEncoder(&fEncoder, format);
 	if (fEncoder != NULL && err == B_OK) {
 		err = _AttachToEncoder();
@@ -96,7 +96,7 @@ BMediaEncoder::SetTo(const media_format *output_format)
 
 
 status_t 
-BMediaEncoder::SetTo(const media_codec_info *mci)
+BMediaEncoder::SetTo(const media_codec_info* mci)
 {
 	CALLED();
 
@@ -117,36 +117,36 @@ BMediaEncoder::SetTo(const media_codec_info *mci)
 
 
 status_t 
-BMediaEncoder::SetFormat(media_format *input_format,
-	media_format *output_format, media_file_format *mfi)
+BMediaEncoder::SetFormat(media_format* inputFormat,
+	media_format* outputFormat, media_file_format* mfi)
 {
 	CALLED();
 	TRACE("BMediaEncoder::SetFormat. Input = %d, Output = %d\n",
-		input_format->type, output_format->type);
+		inputFormat->type, outputFormat->type);
 
 	if (!fEncoder)
 		return B_NO_INIT;
 
 	//TODO: How we support output_format and mfi?
-	return fEncoder->SetUp(input_format);
+	return fEncoder->SetUp(inputFormat);
 }
 
 
 status_t 
-BMediaEncoder::Encode(const void *buffer, 
-	int64 frame_count, media_encode_info *info)
+BMediaEncoder::Encode(const void* buffer,
+	int64 frameCount, media_encode_info* info)
 {
 	CALLED();
 
 	if (!fEncoder)
 		return B_NO_INIT;
 
-	return fEncoder->Encode(buffer, frame_count, info);
+	return fEncoder->Encode(buffer, frameCount, info);
 }
 
 
 status_t 
-BMediaEncoder::GetEncodeParameters(encode_parameters *parameters) const
+BMediaEncoder::GetEncodeParameters(encode_parameters* parameters) const
 {
 	CALLED();
 
@@ -158,7 +158,7 @@ BMediaEncoder::GetEncodeParameters(encode_parameters *parameters) const
 
 
 status_t 
-BMediaEncoder::SetEncodeParameters(encode_parameters *parameters)
+BMediaEncoder::SetEncodeParameters(encode_parameters* parameters)
 {
 	CALLED();
 
@@ -174,7 +174,7 @@ BMediaEncoder::SetEncodeParameters(encode_parameters *parameters)
  *************************************************************/
 
 /* virtual */ status_t 
-BMediaEncoder::AddTrackInfo(uint32 code, const char *data, size_t size)
+BMediaEncoder::AddTrackInfo(uint32 code, const char* data, size_t size)
 {
 	CALLED();
 
@@ -283,16 +283,16 @@ BMediaBufferEncoder::BMediaBufferEncoder()
 }
 
 
-BMediaBufferEncoder::BMediaBufferEncoder(const media_format *output_format)
+BMediaBufferEncoder::BMediaBufferEncoder(const media_format* outputFormat)
 	:
-	BMediaEncoder(output_format),
+	BMediaEncoder(outputFormat),
 	fBuffer(NULL)
 {
 	CALLED();
 }
 
 
-BMediaBufferEncoder::BMediaBufferEncoder(const media_codec_info *mci)
+BMediaBufferEncoder::BMediaBufferEncoder(const media_codec_info* mci)
 	:
 	BMediaEncoder(mci),
 	fBuffer(NULL)
@@ -302,21 +302,21 @@ BMediaBufferEncoder::BMediaBufferEncoder(const media_codec_info *mci)
 
 
 status_t
-BMediaBufferEncoder::EncodeToBuffer(void *output_buffer,
-	size_t *output_size, const void *input_buffer,
-	int64 frame_count, media_encode_info *info)
+BMediaBufferEncoder::EncodeToBuffer(void* outputBuffer,
+	size_t* outputSize, const void* inputBuffer,
+	int64 frameCount, media_encode_info* info)
 {
 	CALLED();
 
 	status_t error;
-	fBuffer = output_buffer;
-	fBufferSize = *output_size;
-	error = Encode(input_buffer, frame_count, info);
+	fBuffer = outputBuffer;
+	fBufferSize = *outputSize;
+	error = Encode(inputBuffer, frameCount, info);
 	if (fBuffer) {
 		fBuffer = NULL;
-		*output_size = 0;
+		*outputSize = 0;
 	} else {
-		*output_size = fBufferSize;
+		*outputSize = fBufferSize;
 	}
 	return error;
 }
@@ -327,25 +327,25 @@ BMediaBufferEncoder::EncodeToBuffer(void *output_buffer,
  *************************************************************/
 
 status_t
-BMediaBufferEncoder::WriteChunk(const void *chunk_data,
-	size_t chunk_len, media_encode_info *info)
+BMediaBufferEncoder::WriteChunk(const void* chunkData,
+	size_t chunkLen, media_encode_info* info)
 {
 	CALLED();
 
 	if (fBuffer == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	if (chunk_len < 0)
+	if (chunkLen < 0)
 		return B_ERROR;
 
-	if (chunk_len > (size_t)fBufferSize) {
-		memcpy(fBuffer, chunk_data, fBufferSize);
+	if (chunkLen > (size_t)fBufferSize) {
+		memcpy(fBuffer, chunkData, fBufferSize);
 		fBuffer = NULL;
 		return B_DEVICE_FULL;
 	}
 
-	memcpy(fBuffer, chunk_data, chunk_len);
-	fBufferSize = chunk_len;
+	memcpy(fBuffer, chunkData, chunkLen);
+	fBufferSize = chunkLen;
 	fBuffer = NULL;
 	return B_NO_ERROR;
 }
