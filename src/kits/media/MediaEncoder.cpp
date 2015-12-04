@@ -16,8 +16,6 @@
 
 #include "debug.h"
 
-//TODO: SetTo, SetFormat, Enode Class
-
 /*************************************************************
  * public BMediaEncoder
  *************************************************************/
@@ -81,13 +79,8 @@ BMediaEncoder::SetTo(const media_format* outputFormat)
 	err = gPluginManager.CreateEncoder(&fEncoder, format);
 	if (fEncoder != NULL && err == B_OK) {
 		err = _AttachToEncoder();
-		if (err == B_OK) {
-			err = SetFormat(NULL, &format);
-			if (err == B_OK) {
-				fInitStatus = B_OK;
-				return B_OK;
-			}
-		}
+		if (err == B_OK)
+			return err;
 	}
 	ReleaseEncoder();
 	fInitStatus = err;
@@ -127,7 +120,10 @@ BMediaEncoder::SetFormat(media_format* inputFormat,
 	if (!fEncoder)
 		return B_NO_INIT;
 
-	//TODO: How we support output_format and mfi?
+	if (outputFormat != NULL)
+		SetTo(outputFormat);
+
+	//TODO: How we support mfi?
 	return fEncoder->SetUp(inputFormat);
 }
 
