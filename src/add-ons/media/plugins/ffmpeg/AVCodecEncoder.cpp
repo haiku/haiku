@@ -54,25 +54,6 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 }
 
 
-AVCodecEncoder::AVCodecEncoder(const media_format& format)
-	:
-	Encoder(),
-	fBitRateScale(1), // TODO: is it OK?
-	fCodecID(CodecID(-1)),
-	fCodec(NULL),
-	fOwnContext(avcodec_alloc_context3(NULL)),
-	fContext(fOwnContext),
-	fCodecInitStatus(CODEC_INIT_NEEDED),
-	fFrame(avcodec_alloc_frame()),
-	fSwsContext(NULL),
-	fFramesWritten(0)
-{
-	TRACE("AVCodecEncoder::AVCodecEncoder()\n");
-	_Init();
-	SetUp(&format);
-}
-
-
 void
 AVCodecEncoder::_Init()
 {
