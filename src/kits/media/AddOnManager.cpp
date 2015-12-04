@@ -131,6 +131,46 @@ AddOnManager::GetDecoderForFormat(entry_ref* _decoderRef,
 
 
 status_t
+AddOnManager::GetEncoderForFormat(entry_ref* _encoderRef,
+	const media_format& outputFormat)
+{
+	if ((outputFormat.type == B_MEDIA_RAW_VIDEO
+			|| outputFormat.type == B_MEDIA_RAW_AUDIO)) {
+		return B_MEDIA_BAD_FORMAT;
+	}
+
+	if (outputFormat.type == B_MEDIA_NO_TYPE
+			|| outputFormat.type == B_MEDIA_UNKNOWN_TYPE) {
+		return B_MEDIA_BAD_FORMAT;
+	}
+
+	BAutolock locker(fLock);
+	RegisterAddOns();
+
+	char** directories = NULL;
+	size_t directoryCount = 0;
+
+	if (find_paths_etc(get_architecture(), B_FIND_PATH_ADD_ONS_DIRECTORY,
+			"media/plugins", B_FIND_PATH_EXISTING_ONLY, &directories,
+			&directoryCount) != B_OK) {
+		printf("AddOnManager::GetDecoderForFormat: failed to locate plugins\n");
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	MemoryDeleter directoriesDeleter(directories);
+
+	BPath path;
+	for (uint i = 0; i < directoryCount; i++) {
+		path.SetTo(directories[i]);
+		if (_FindEncoder(outputFormat, path, _encoderRef))
+			return B_OK;
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
 AddOnManager::GetReaders(entry_ref* outRefs, int32* outCount,
 	int32 maxCount)
 {
@@ -534,6 +574,33 @@ AddOnManager::_FindDecoder(const media_format& format, const BPath& path,
 			*_decoderRef = info->ref;
 			return true;
 		}
+	}
+	return false;
+}
+
+
+bool
+AddOnManager::_FindEncoder(const media_format& format, const BPath& path,
+	entry_ref* _encoderRef)
+{
+	node_ref nref;
+	BDirectory directory;
+	if (directory.SetTo(path.Path()) != B_OK
+		|| directory.GetNodeRef(&nref) != B_OK) {
+		return false;
+	}
+
+	encoder_info* info;
+	for (fEncoderList.Rewind(); fEncoderList.GetNext(&info);) {
+		if (info->ref.directory != nref.node)
+			continue;
+
+		// check if the decoder matches the supplied format
+		if (!info->outputFormat.Matches(&format)) {
+			*_encoderRef = info->ref;
+			return true;
+		}
+		continue;
 	}
 	return false;
 }

@@ -332,7 +332,7 @@ PluginManager::CreateEncoder(Encoder** encoder, const media_format& format)
 
 	entry_ref ref;
 
-	status_t ret = AddOnManager::GetInstance()->GetDecoderForFormat(
+	status_t ret = AddOnManager::GetInstance()->GetEncoderForFormat(
 		&ref, format);
 
 	if (ret != B_OK) {
