@@ -78,7 +78,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	}
 
 	pll_divisors divisors;
-	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
 		divisors.m1 = 0;
 		divisors.m2 = (pllDivisor & DISPLAY_PLL_IGD_M2_DIVISOR_MASK)
 			>> DISPLAY_PLL_M2_DIVISOR_SHIFT;
@@ -100,7 +100,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)
 		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
 		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
-		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
+		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
 			divisors.post1 = (pll & DISPLAY_PLL_IGD_POST1_DIVISOR_MASK)
 				>> DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
 		} else {

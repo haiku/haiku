@@ -187,7 +187,7 @@ Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 
 	// XXX: For now we assume no LVDS downclocking and program the same divisor
 	// value to both divisor 0 (standard) and 1 (reduced divisor)
-	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
 		write32(pllDivisorA, (((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
 				& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
 			| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
@@ -213,8 +213,10 @@ Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 
 	uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL | extraFlags;
 
-	if (gInfo->shared_info->device_type.Generation() >= 4) {
-		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
+	if (gInfo->shared_info->device_type.Generation() >= 4
+		|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
+
+		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
 			pll |= ((1 << (divisors.post1 - 1))
 					<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT)
 				& DISPLAY_PLL_IGD_POST1_DIVISOR_MASK;
@@ -222,9 +224,10 @@ Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 			pll |= ((1 << (divisors.post1 - 1))
 					<< DISPLAY_PLL_POST1_DIVISOR_SHIFT)
 				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
-	//		pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
-	//			& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
+		//	pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+		//		& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
 		}
+
 		#if 0
 		// TODO: ??? LVDS?
 		switch (divisors.post2) {
@@ -234,6 +237,7 @@ Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 				break;
 		}
 		#endif
+
 		if (divisors.post2_high)
 			pll |= DISPLAY_PLL_DIVIDE_HIGH;
 

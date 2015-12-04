@@ -79,7 +79,7 @@ get_pll_limits(pll_limits* limits, bool isLVDS)
 			270000, 1750000, 3500000
 		};
 		memcpy(limits, &kLimits, sizeof(pll_limits));
-	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
+	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
 		// TODO: support LVDS output limits as well
 		// m1 is reserved and must be 0
 		pll_limits kLimits = {
@@ -130,6 +130,35 @@ valid_pll_divisors(pll_divisors* divisors, pll_limits* limits)
 }
 
 
+static uint32
+compute_pll_m(pll_divisors* divisors)
+{
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV)
+		|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV)) {
+		return divisors->m1 * divisors->m2;
+	}
+
+	// Pineview, m1 is reserved
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN))
+		return divisors->m2 + 2;
+
+	if (gInfo->shared_info->device_type.Generation() >= 3)
+		return 5 * (divisors->m1 + 2) + (divisors->m2 + 2);
+
+	// TODO: This logic needs validated... PLL's were calculated differently
+	// on 8xx chipsets
+
+	return 5 * divisors->m1 + divisors->m2;
+}
+
+
+static uint32
+compute_pll_p(pll_divisors* divisors)
+{
+	return divisors->post1 * divisors->post2;
+}
+
+
 void
 compute_pll_divisors(display_mode* current, pll_divisors* divisors,
 	bool isLVDS)
@@ -164,17 +193,17 @@ compute_pll_divisors(display_mode* current, pll_divisors* divisors,
 	float best = requestedPixelClock;
 	pll_divisors bestDivisors;
 
-	bool is_igd = gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD);
+	bool is_pine = gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN);
 	for (divisors->m1 = limits.min.m1; divisors->m1 <= limits.max.m1;
 			divisors->m1++) {
 		for (divisors->m2 = limits.min.m2; divisors->m2 <= limits.max.m2
-				&& ((divisors->m2 < divisors->m1) || is_igd); divisors->m2++) {
+				&& ((divisors->m2 < divisors->m1) || is_pine); divisors->m2++) {
 			for (divisors->n = limits.min.n; divisors->n <= limits.max.n;
 					divisors->n++) {
 				for (divisors->post1 = limits.min.post1;
 						divisors->post1 <= limits.max.post1; divisors->post1++) {
-					divisors->m = 5 * divisors->m1 + divisors->m2;
-					divisors->post = divisors->post1 * divisors->post2;
+					divisors->m = compute_pll_m(divisors);
+					divisors->post = compute_pll_p(divisors);
 
 					if (!valid_pll_divisors(divisors, &limits))
 						continue;

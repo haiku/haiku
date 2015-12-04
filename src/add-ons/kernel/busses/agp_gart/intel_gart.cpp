@@ -90,8 +90,8 @@ const struct supported_device {
 	{0x2e40, 0x2e42, INTEL_MODEL_G45, "B43"},
 	{0x2e90, 0x2e92, INTEL_MODEL_G45, "B43"},
 
-	{0xa000, 0xa001, INTEL_MODEL_IGDG, "Atom_Dx10"},
-	{0xa010, 0xa011, INTEL_MODEL_IGDGM, "Atom_N4x0"},
+	{0xa000, 0xa001, INTEL_MODEL_PINE, "Atom_Dx10"},
+	{0xa010, 0xa011, INTEL_MODEL_PINEM, "Atom_N4x0"},
 
 	{0x0040, 0x0042, INTEL_MODEL_ILKG, "IronLake Desktop"},
 	{0x0044, 0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
@@ -327,7 +327,7 @@ determine_gtt_size(intel_info &info)
 				break;
 		}
 	} else if (info.type->IsModel(INTEL_MODEL_G33)
-	           || info.type->InGroup(INTEL_GROUP_IGD)) {
+	           || info.type->InGroup(INTEL_GROUP_PIN)) {
 		switch (memoryConfig & G33_GTT_MASK) {
 			case G33_GTT_1M:
 				gttSize = 1 << 20;
