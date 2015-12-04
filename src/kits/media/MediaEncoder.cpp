@@ -148,8 +148,8 @@ BMediaEncoder::GetEncodeParameters(encode_parameters* parameters) const
 
 	if (fEncoder == NULL)
 		return B_NO_INIT;
-	else
-		return fEncoder->GetEncodeParameters(parameters);
+
+	return fEncoder->GetEncodeParameters(parameters);
 }
 
 
@@ -160,8 +160,8 @@ BMediaEncoder::SetEncodeParameters(encode_parameters* parameters)
 
 	if (fEncoder == NULL)
 		return B_NO_INIT;
-	else
-		return fEncoder->SetEncodeParameters(parameters);
+
+	return fEncoder->SetEncodeParameters(parameters);
 }
 
 
@@ -176,8 +176,8 @@ BMediaEncoder::AddTrackInfo(uint32 code, const char* data, size_t size)
 
 	if (fEncoder == NULL)
 		return B_NO_INIT;
-	else
-		return fEncoder->AddTrackInfo(code, data, size);
+
+	return fEncoder->AddTrackInfo(code, data, size);
 }
 
 
