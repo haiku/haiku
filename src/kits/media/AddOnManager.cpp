@@ -595,8 +595,8 @@ AddOnManager::_FindEncoder(const media_format& format, const BPath& path,
 		if (info->ref.directory != nref.node)
 			continue;
 
-		// check if the decoder matches the supplied format
-		if (!info->outputFormat.Matches(&format)) {
+		// check if the encoder matches the supplied format
+		if (info->outputFormat.Matches(&format)) {
 			*_encoderRef = info->ref;
 			return true;
 		}
