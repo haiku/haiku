@@ -3344,22 +3344,6 @@ BMediaRoster::IsRunning()
 }
 
 
-status_t
-BMediaRoster::SetRealtimeFlags(uint32 enabled)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-
-status_t
-BMediaRoster::GetRealtimeFlags(uint32* _enabled)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-
 ssize_t
 BMediaRoster::AudioBufferSizeFor(int32 channelCount, uint32 sampleFormat,
 	float frameRate, bus_type busKind)
@@ -3585,20 +3569,7 @@ BMediaRoster::~BMediaRoster()
 	sDefaultInstance = NULL;
 }
 
-
 //	#pragma mark - private BMediaRoster
-
-
-//! Deprecated call.
-status_t
-BMediaRoster::SetOutputBuffersFor(const media_source& output,
-	BBufferGroup* group, bool willReclaim)
-{
-	UNIMPLEMENTED();
-	debugger("BMediaRoster::SetOutputBuffersFor missing\n");
-	return B_ERROR;
-}
-
 
 // FBC reserved virtuals
 status_t BMediaRoster::_Reserved_MediaRoster_0(void*) { return B_ERROR; }
@@ -3622,34 +3593,6 @@ BMediaRoster::BMediaRoster()
 	Run();
 }
 
-
-// TODO: Looks like these can be safely removed:
-/*static*/ status_t
-BMediaRoster::ParseCommand(BMessage& reply)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-
-status_t
-BMediaRoster::GetDefaultInfo(media_node_id forDefault, BMessage& config)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-
-status_t
-BMediaRoster::SetRunningDefault(media_node_id forDefault,
-	const media_node& node)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-
 // #pragma mark - static variables
-
 
 BMediaRoster* BMediaRoster::sDefaultInstance = NULL;

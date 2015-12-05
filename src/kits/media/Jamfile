@@ -22,6 +22,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SharedLibrary [ MultiArchDefaultGristFiles libmedia.so ] :
 			# Private Media Kit
 			!missing_symbols.cpp
+			Deprecated.cpp
 			MediaRecorder.cpp
 
 			# Public Media Kit

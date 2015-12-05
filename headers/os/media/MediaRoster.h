@@ -320,9 +320,7 @@ public:
 										// _inOutCount defaults to 1
 										// if unspecified (NULL).
 
-	// General MediaKit configuration:
-			status_t			SetRealtimeFlags(uint32 enabledFlags);
-			status_t			GetRealtimeFlags(uint32* _enabledFlags);
+	// Returns the preferred audio buffer size
 			ssize_t				AudioBufferSizeFor(int32 channelCount,
 									uint32 sampleFormat, float frameRate,
 									bus_type busType = B_UNKNOWN_BUS);
@@ -345,10 +343,6 @@ public:
 	virtual						~BMediaRoster();
 
 private:
-	// This method is deprecated:
-			status_t			SetOutputBuffersFor(const media_source& output,
-									BBufferGroup* group,
-									bool willReclaim = false);
 
 	// Reserving virtual function slots.
 	virtual	status_t			_Reserved_MediaRoster_0(void*);
@@ -367,13 +361,22 @@ private:
 	// Roster() or CurrentRoster().
 								BMediaRoster();
 
-	// TODO: Looks like these can be safely removed:
+	// Those methods are deprecated or considered useless
+	// NOTE: planned to be removed once we break the API.
+			status_t			SetOutputBuffersFor(const media_source& output,
+									BBufferGroup* group,
+									bool willReclaim = false);
+
+			status_t			SetRealtimeFlags(uint32 enabledFlags);
+			status_t			GetRealtimeFlags(uint32* _enabledFlags);
+
 	static	status_t			ParseCommand(BMessage& reply);
 
 			status_t			GetDefaultInfo(media_node_id forDefault,
 									BMessage& _config);
 			status_t			SetRunningDefault(media_node_id forDefault,
 									const media_node& node);
+	// End of deprecated methods
 
 private:
 			uint32				_reserved_media_roster_[67];
