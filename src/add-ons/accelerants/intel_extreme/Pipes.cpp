@@ -216,6 +216,7 @@ Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 	if (gInfo->shared_info->device_type.Generation() >= 4
 		|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
 
+		// post1 divisor << 1 , 1-8
 		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
 			pll |= ((1 << (divisors.post1 - 1))
 					<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT)
@@ -228,16 +229,7 @@ Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 		//		& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
 		}
 
-		#if 0
-		// TODO: ??? LVDS?
-		switch (divisors.post2) {
-			case 5:
-			case 7:
-				pll |= DISPLAY_PLL_DIVIDE_HIGH;
-				break;
-		}
-		#endif
-
+		// p2 clock divider. 5 or 7 high
 		if (divisors.post2_high)
 			pll |= DISPLAY_PLL_DIVIDE_HIGH;
 

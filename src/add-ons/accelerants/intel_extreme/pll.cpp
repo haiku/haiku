@@ -44,19 +44,41 @@ get_pll_limits(pll_limits* limits, bool isLVDS)
 	// Note, the limits are taken from the X driver; they have not yet been
 	// tested
 
-	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
-		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
-		// TODO: support LVDS output limits as well
+	// TODO: Breakout BXT
+
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV)) {
+		pll_limits kLimits = {
+			// p, p1, p2, high,   n,   m, m1, m2
+			{  5,  2, 14, false,  1,  79, 2,  24 << 22},	// min
+			{ 80,  4,  1, true,   1, 127, 2,  175 << 22},	// max
+			225000, 4800000, 6480000
+		};
+		memcpy(limits, &kLimits, sizeof(pll_limits));
+	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV)) {
+		pll_limits kLimits = {
+			// p, p1, p2, high,   n,   m, m1, m2
+			{  5,  2, 20, false,  1,  79, 2,  11},	// min
+			{ 80,  3,  2, true,   7, 127, 3,  156},	// max
+			225000, 4000000, 6000000
+		};
+		memcpy(limits, &kLimits, sizeof(pll_limits));
+	} else if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
+		|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_BXT)) {
 		pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
 			{  5,  1, 10, false,  1,  79, 12,  5},	// min
 			{ 80,  8,  5, true,   5, 127, 22,  9},	// max
 			225000, 1760000, 3510000
 		};
+		// TODO: validate these LVDS dividers!
+		if (isLVDS) {
+			kLimits.min.post = 7;
+			kLimits.max.post = 98;
+			kLimits.min.post2 = 14;
+			kLimits.max.post2 = 7;
+		}
 		memcpy(limits, &kLimits, sizeof(pll_limits));
 	} else if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)) {
-		// (Update: Output limits are adjusted in the computation (post2=7/14))
-		// Should move them here!
 		pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
 			{  5,  1, 10, false,  1,  70, 8,  3},	// min
@@ -71,32 +93,49 @@ get_pll_limits(pll_limits* limits, bool isLVDS)
 		}
 		memcpy(limits, &kLimits, sizeof(pll_limits));
 	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_G4x)) {
-		// TODO: support LVDS output limits as well
 		pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
 			{ 10,  1, 10, false,  1, 104, 17,  5},	// min
 			{ 30,  3, 10, true,   4, 138, 23, 11},	// max
 			270000, 1750000, 3500000
 		};
+		// TODO: validate these LVDS dividers!
+		if (isLVDS) {
+			kLimits.min.post = 7;
+			kLimits.max.post = 98;
+			kLimits.min.post2 = 14;
+			kLimits.max.post2 = 7;
+		}
 		memcpy(limits, &kLimits, sizeof(pll_limits));
 	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
-		// TODO: support LVDS output limits as well
 		// m1 is reserved and must be 0
 		pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1,  m2
 			{  5,  1, 10, false,  3,   2,  0,   2},	// min
-			{ 80,  8,  5, true,   6, 256,  0, 256},	// max
+			{ 80,  8,  5, true,   6, 256,  0, 254},	// max
 			200000, 1700000, 3500000
 		};
+		if (isLVDS) {
+			kLimits.min.post = 7;
+			kLimits.max.post = 112;
+			kLimits.min.post2 = 14;
+			kLimits.max.post2 = 14;
+		}
 		memcpy(limits, &kLimits, sizeof(pll_limits));
 	} else {
-		// TODO: support LVDS output limits as well
 		static pll_limits kLimits = {
 			// p, p1, p2, high,   n,   m, m1, m2
 			{  4,  2,  4, false,  5,  96, 20,  8},
 			{128, 33,  2, true,  18, 140, 28, 18},
 			165000, 930000, 1400000
 		};
+		// TODO: Validate these LVDS dividers!
+		if (isLVDS) {
+			kLimits.min.post = 7;
+			kLimits.max.post = 98;
+			kLimits.min.post2 = 14;
+			kLimits.max.post2 = 7;
+		}
 		memcpy(limits, &kLimits, sizeof(pll_limits));
 	}
 
@@ -171,13 +210,19 @@ compute_pll_divisors(display_mode* current, pll_divisors* divisors,
 
 	TRACE("%s: required MHz: %g\n", __func__, requestedPixelClock);
 
+	// Calculate p2
 	if (isLVDS) {
 		if (requestedPixelClock > 112.999
 			|| (read32(INTEL_DIGITAL_LVDS_PORT) & LVDS_CLKB_POWER_MASK)
-				== LVDS_CLKB_POWER_UP)
-			divisors->post2 = LVDS_POST2_RATE_FAST;
-		else
-			divisors->post2 = LVDS_POST2_RATE_SLOW;
+				== LVDS_CLKB_POWER_UP) {
+			// slow DAC timing
+			divisors->post2 = limits.min.post2;
+			divisors->post2_high = limits.min.post2_high;
+		} else {
+			// fast DAC timing
+			divisors->post2 = limits.max.post2;
+			divisors->post2_high = limits.max.post2_high;
+		}
 	} else {
 		if (current->timing.pixel_clock < limits.min_post2_frequency) {
 			// slow DAC timing
