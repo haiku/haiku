@@ -1,31 +1,48 @@
-1	french	x-vnd.Haiku-Network	950262959
+1	french	x-vnd.Haiku-Network	2512967175
 Static	IntefaceAddressView		Statique
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Services
+no link	InterfaceListItem		aucun lien
 WPA2	WPA2 protected network		WPA2
+Choose automatically	IntefaceView		Choisir automatiquement
+connected	IntefaceView		connecté
+Ethernet device	InterfaceListItem		Périphérique Ethernet
 The netmask defines your local network	IntefaceAddressView		Le masque réseau détermine votre réseau local
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Réseau
 Show network status in Deskbar	NetworkWindow		Afficher l’État du réseau dans la Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Méthode d'obtention de l'adresse IP
+connected	InterfaceListItem		connecté
+disabled	InterfaceListItem		désactivé
 Dial Up	NetworkWindow		Connexion téléphonique
 Apply	IntefaceAddressView		Appliquer
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Échec de l’installation de l’État du réseau dans la Deskbar : %s
+MAC address:	IntefaceView		Adresse MAC :
+Wireless device	InterfaceListItem		Périphérique sans fil
 Disabled	IntefaceAddressView		Désactivé
+Renegotiate	IntefaceView		Renégocier
 Ok	NetworkWindow		Valider
+Network:	IntefaceView		Réseau :
 launch error	NetworkWindow		erreur du lancement
 Other	NetworkWindow		Autre
 Automatic	IntefaceAddressView		Automatique
 Gateway:	IntefaceAddressView		Passerelle :
 Revert	NetworkWindow		Rétablir
 Enable	ServiceView		Activer
+disconnected	IntefaceView		déconnecté
+Status:	IntefaceView		État :
+Link speed:	IntefaceView		Vitesse du lien :
 Your gateway to the internet	IntefaceAddressView		Votre passerelle vers l'internet
 New…	NetworkWindow		Nouveau…
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Mode :
 WPA	WPA protected network		WPA
+Sent:	IntefaceView		Envoyé :
 open	Open network		ouvrir
 IP Address:	IntefaceAddressView		Adresse IP :
+Received:	IntefaceView		Reçu :
+Disable	IntefaceView		Désactiver
+<no wireless networks found>	IntefaceView		<aucun réseau sans fil trouvé>
 Netmask:	IntefaceAddressView		Masque réseau :
 Disable	ServiceView		Désactiver
 Your IP address	IntefaceAddressView		Votre adresse IP
