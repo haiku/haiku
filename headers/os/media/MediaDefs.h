@@ -792,9 +792,6 @@ struct buffer_clone_info;
 // It's also provided a new version of launch_media_server allowing
 // to specify a custom callback for notifications.
 
-// Deprecated
-status_t launch_media_server(uint32 flags);
-
 status_t launch_media_server(bigtime_t timeout = B_INFINITE_TIMEOUT,
 	bool (*progress)(int stage, const char* message, void* cookie) = NULL,
 	void* cookie = NULL, uint32 flags = 0);

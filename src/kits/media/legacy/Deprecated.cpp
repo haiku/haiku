@@ -4,6 +4,7 @@
  */
 
 
+#include <MediaDefs.h>
 #include <MediaRoster.h>
 #include <SupportDefs.h>
 
@@ -68,10 +69,19 @@ BMediaRoster::SetOutputBuffersFor(const media_source& output,
 
 // MediaDefs.h
 
+status_t launch_media_server(uint32 flags);
+
 status_t media_realtime_init_image(image_id image, uint32 flags);
 
 status_t media_realtime_init_thread(thread_id thread, size_t stack_used,
 	uint32 flags);
+
+
+status_t
+launch_media_server(uint32 flags)
+{
+	return launch_media_server(0, NULL, NULL, flags);
+}
 
 
 //	Given an image_id, prepare that image_id for realtime media
@@ -85,6 +95,7 @@ media_realtime_init_image(image_id image, uint32 flags)
 	UNIMPLEMENTED();
 	return B_OK;
 }
+
 
 //	Given a thread ID, and an optional indication of what the thread is
 //	doing in "flags", prepare the thread for real-time media performance.

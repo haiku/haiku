@@ -1393,13 +1393,6 @@ progress_startup(int stage,
 
 
 status_t
-launch_media_server(uint32 flags)
-{
-	return launch_media_server(0, NULL, NULL, flags);
-}
-
-
-status_t
 launch_media_server(bigtime_t timeout,
 	bool (*progress)(int stage, const char* message, void* cookie),
 	void* cookie, uint32 flags)
