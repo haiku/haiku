@@ -383,6 +383,11 @@ RemotePackageRepository HaikuPorts
 	# sync openssl with secondary architecture (x86)
 	openssl-1.0.2d-5
 	openssl_devel-1.0.2d-5
+	opus-1.1.1-1
+	opus_devel-1.1.1-1
+	opusfile-0.6-1
+	opusfile_devel-0.6-1
+	opus_tools-0.1.9-1
 	p7zip-9.20.1-4
 	paladin-git-6
 	paragui-1.1.8-1
@@ -1271,6 +1276,9 @@ RemotePackageRepository HaikuPorts
 	openssh
 	openssl
 	openttd_x86
+	opus
+	opusfile
+	opus_tools
 	p7zip
 	paladin
 	pango_x86
