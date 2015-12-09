@@ -28,7 +28,8 @@ RemotePackageRepository HaikuPorts
 	aspell-0.60.6.1-2
 	aspell_devel-0.60.6.1-2
 	autoconf-2.69-6
-	automake-1.13.1-4
+	automake-1.15.0-1
+	automake113-1.13.1-1
 	bash-4.3.42-2
 #	bepdf-1.1.1~beta5_2013_04_28-1
 	binutils-2.25_12015_07_31-1
@@ -220,10 +221,10 @@ RemotePackageRepository HaikuPorts
 	libpcre0-8.21-6
 	libpcre-8.38-1
 	libpcre_devel-8.38-1
-	libpng-1.5.22-1
-	libpng_devel-1.5.22-1
-	libpng16-1.6.18-1
-	libpng16_devel-1.6.18-1
+	libpng-1.5.25-1
+	libpng_devel-1.5.25-1
+	libpng16-1.6.20-1
+	libpng16_devel-1.6.20-1
 	libqt4-4.8.7-4
 	libqt4_devel-4.8.7-4
 	librevenge-0.0.1-1
@@ -303,8 +304,8 @@ RemotePackageRepository HaikuPorts
 	openal-1.13.0-2
 	openal_devel-1.13.0-2
 	openssh-7.1p1-3
-	openssl-1.0.2d-4
-	openssl_devel-1.0.2d-4
+	openssl-1.0.2e-1
+	openssl_devel-1.0.2e-1
 	p7zip-9.20.1-5
 	patch-2.7.5-1
 	pe-2.4.5-2
@@ -313,10 +314,11 @@ RemotePackageRepository HaikuPorts
 	pixman_devel-0.32.6-1
 	pkgconfig-0.29-1
 	pyenet-20141025-1
-	python-2.7.10-3
+	python-2.7.11-1
 	python_setuptools-5.3-2
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
+	python3-3.5.1-1
 	pyyaml-3.11-1
 	qca2-2.0.3-1
 	qca2_devel-2.0.3-1
@@ -392,6 +394,7 @@ RemotePackageRepository HaikuPorts
 	aspell
 	autoconf
 	automake
+	automake113
 	bash
 #	bepdf
 	binutils
@@ -546,6 +549,7 @@ RemotePackageRepository HaikuPorts
 	python_setuptools
 	python_twisted
 	python_zope.interface
+	python3
 	pyyaml
 	qca2
 	qemu
