@@ -143,8 +143,7 @@ void
 BQueryPoseView::AttachedToWindow()
 {
 	_inherited::AttachedToWindow();
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR, B_DARKEN_1_TINT);
 }
 
 

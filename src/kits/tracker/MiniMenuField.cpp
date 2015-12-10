@@ -61,11 +61,7 @@ MiniMenuField::~MiniMenuField()
 void
 MiniMenuField::AttachedToWindow()
 {
-	if (Parent() != NULL) {
-		SetViewColor(Parent()->ViewColor());
-		SetLowColor(Parent()->ViewColor());
-	}
-
+	AdoptParentColors();
 	SetHighColor(0, 0, 0);
 }
 

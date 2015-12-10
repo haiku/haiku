@@ -382,8 +382,11 @@ DraggableContainerIcon::MouseMoved(BPoint where, uint32, const BMessage*)
 	view->SetHighColor(0, 0, 0, 0);
 	view->FillRect(view->Bounds());
 	view->SetDrawingMode(B_OP_ALPHA);
-	view->SetHighColor(0, 0, 0, 128);
+
+	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+	textColor.alpha = 128;
 		// set the level of transparency by value
+	view->SetHighColor(textColor);
 	view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 
 	// Draw the icon
@@ -517,7 +520,7 @@ BContainerWindow::BContainerWindow(LockingList<BWindow>* list,
 		fRootLayout = new BGroupLayout(B_VERTICAL, 0);
 		fRootLayout->SetInsets(0);
 		SetLayout(fRootLayout);
-		fRootLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fRootLayout->Owner()->AdoptSystemColors();
 
 		if (!fIsDesktop) {
 			fMenuContainer = new BGroupView(B_HORIZONTAL, 0);
@@ -4327,8 +4330,6 @@ BorderedView::BorderedView()
 	fEnableBorderHighlight(true)
 {
 	GroupLayout()->SetInsets(1);
-	SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_2_TINT));
 }
 
 
@@ -4354,9 +4355,11 @@ BorderedView::PoseViewFocused(bool focused)
 	if (window == NULL)
 		return;
 
-	rgb_color base;
+	color_which base = B_DOCUMENT_BACKGROUND_COLOR;
+	float tint = B_DARKEN_2_TINT;
 	if (focused && window->IsActive() && fEnableBorderHighlight) {
-		base = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
+		base = B_KEYBOARD_NAVIGATION_COLOR;
+		tint = B_NO_TINT;
 
 		BScrollBar* hScrollBar = window->PoseView()->HScrollBar();
 		if (hScrollBar != NULL)
@@ -4365,12 +4368,8 @@ BorderedView::PoseViewFocused(bool focused)
 		BScrollBar* vScrollBar = window->PoseView()->VScrollBar();
 		if (vScrollBar != NULL)
 			vScrollBar->SetBorderHighlighted(focused);
-	} else {
-		base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		base = tint_color(base, B_DARKEN_2_TINT);
 	}
-	SetViewColor(base);
-
+	SetViewUIColor(base, tint);
 	Invalidate();
 }
 

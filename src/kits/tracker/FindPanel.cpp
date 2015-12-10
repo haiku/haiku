@@ -725,8 +725,8 @@ FindPanel::FindPanel(BFile* node, FindWindow* parent, bool fromTemplate,
 	fAttrGrid(NULL),
 	fDraggableIcon(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
 
 	uint32 initialMode = InitialMode(node);
 

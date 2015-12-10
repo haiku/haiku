@@ -600,11 +600,7 @@ DraggableIcon::PreferredRect(BPoint offset, icon_size which)
 void
 DraggableIcon::AttachedToWindow()
 {
-	BView* parent = Parent();
-	if (parent != NULL) {
-		SetViewColor(parent->ViewColor());
-		SetLowColor(parent->LowColor());
-	}
+	AdoptParentColors();
 }
 
 
@@ -1275,8 +1271,8 @@ SeparatorLine::SeparatorLine(BPoint where, float length, bool vertical,
 	BView(LineBounds(where, length, vertical), name,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

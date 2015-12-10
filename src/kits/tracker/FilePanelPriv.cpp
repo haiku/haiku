@@ -654,7 +654,7 @@ TFilePanel::Init(const BMessage*)
 {
 	BRect windRect(Bounds());
 	fBackView = new BView(Bounds(), "View", B_FOLLOW_ALL, 0);
-	fBackView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fBackView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(fBackView);
 
 	// add poseview menu bar

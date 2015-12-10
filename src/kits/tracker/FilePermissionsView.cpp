@@ -60,6 +60,8 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 	BView(rect, "FilePermissionsView", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW),
 	fModel(model)
 {
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+
 	// Constants for the column labels: "User", "Group" and "Other".
 	const float kColumnLabelMiddle = 77, kColumnLabelTop = 6,
 		kColumnLabelSpacing = 37, kColumnLabelBottom = 20,
@@ -202,8 +204,6 @@ FilePermissionsView::FilePermissionsView(BRect rect, Model* model)
 		"", "", "", new BMessage(kNewGroupEntered));
 	fGroupTextControl->SetDivider(0);
 	AddChild(fGroupTextControl);
-
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	ModelChanged(model);
 }

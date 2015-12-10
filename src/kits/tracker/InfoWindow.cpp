@@ -120,7 +120,7 @@ public:
 	void ReLinkTargetModel(Model*);
 	void BeginEditingTitle();
 	void FinishEditingTitle(bool);
-	float CurrentFontHeight(float size = -1);
+	float CurrentFontHeight();
 
 	BTextView* TextView() const { return fTitleEditView; }
 
@@ -187,6 +187,8 @@ private:
 	BWindow* fPathWindow;
 	BWindow* fLinkWindow;
 	BWindow* fDescWindow;
+	color_which fCurrentLinkColorWhich;
+	color_which fCurrentPathColorWhich;
 
 	typedef BView _inherited;
 };
@@ -202,17 +204,8 @@ const float kBorderWidth = 32.0f;
 const float kIconHorizOffset = 18.0f;
 const float kIconVertOffset = 6.0f;
 
-// The font height's for the two types of information we display
-const float kTitleFontHeight = 14.0f;
-const float kAttribFontHeight = 10.0f;
-
 // Amount you have to move the mouse before a drag starts
 const float kDragSlop = 3.0f;
-
-const rgb_color kAttrTitleColor = {0, 0, 0, 255};
-const rgb_color kAttrValueColor = {0, 0, 0, 255};
-const rgb_color kLinkColor = {0, 0, 220, 255};
-const rgb_color kDarkBorderColor = {184, 184, 184, 255};
 
 const uint32 kSetPreferredApp = 'setp';
 const uint32 kSelectNewSymTarget = 'snew';
@@ -328,6 +321,7 @@ BInfoWindow::~BInfoWindow()
 BRect
 BInfoWindow::InfoWindowRect(bool)
 {
+	// starting size of window
 	return BRect(70, 50, 385, 240);
 }
 
@@ -370,6 +364,13 @@ BInfoWindow::Show()
 
 	AutoLock<BWindow> lock(this);
 
+	const BFont* font = be_plain_font;
+	float width = font->StringWidth("This is a really long string which we"
+		"will use to find the window width");
+
+	float height = font->Size() * 15;
+	ResizeTo(width, height);
+
 	BRect attrRect(Bounds());
 	fAttributeView = new AttributeView(attrRect, TargetModel());
 	AddChild(fAttributeView);
@@ -390,7 +391,6 @@ BInfoWindow::Show()
 		windRect.OffsetTo(50, 50);
 
 	MoveTo(windRect.LeftTop());
-	ResizeTo(windRect.Width(), windRect.Height());
 
 	// volume case is handled by view
 	if (!TargetModel()->IsVolume() && !TargetModel()->IsRoot()) {
@@ -641,29 +641,31 @@ BInfoWindow::MessageReceived(BMessage* message)
 			break;
 
 		case kPermissionsSelected:
+		{
+			BRect permissionsBounds(kBorderWidth + 1,
+						fAttributeView->Bounds().bottom,
+						fAttributeView->Bounds().right,
+						fAttributeView->Bounds().bottom + 80);
+
 			if (fPermissionsView == NULL) {
 				// Only true on first call.
 				fPermissionsView = new FilePermissionsView(
-					BRect(kBorderWidth + 1,
-						fAttributeView->Bounds().bottom,
-						fAttributeView->Bounds().right,
-						fAttributeView->Bounds().bottom + 80),
-					fModel);
-
-				ResizeBy(0, fPermissionsView->Bounds().Height());
+					permissionsBounds, fModel);
+				ResizeBy(0, permissionsBounds.Height());
 				fAttributeView->AddChild(fPermissionsView);
 				fAttributeView->SetPermissionsSwitchState(kPaneSwitchOpen);
 			} else if (fPermissionsView->IsHidden()) {
 				fPermissionsView->ModelChanged(fModel);
 				fPermissionsView->Show();
-				ResizeBy(0, fPermissionsView->Bounds().Height());
+				ResizeBy(0, permissionsBounds.Height());
 				fAttributeView->SetPermissionsSwitchState(kPaneSwitchOpen);
 			} else {
 				fPermissionsView->Hide();
-				ResizeBy(0, -fPermissionsView->Bounds().Height());
+				ResizeBy(0, -permissionsBounds.Height());
 				fAttributeView->SetPermissionsSwitchState(kPaneSwitchClosed);
 			}
 			break;
+		}
 
 		default:
 			_inherited::MessageReceived(message);
@@ -840,11 +842,13 @@ AttributeView::AttributeView(BRect rect, Model* model)
 	fTitleEditView(NULL),
 	fPathWindow(NULL),
 	fLinkWindow(NULL),
-	fDescWindow(NULL)
+	fDescWindow(NULL),
+	fCurrentLinkColorWhich(B_LINK_TEXT_COLOR),
+	fCurrentPathColorWhich(fCurrentLinkColorWhich)
 {
 	// Set view color to standard background grey
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetFont(be_plain_font);
 	// If the model is a symlink, then we deference the model to
 	// get the targets icon
 	if (fModel->IsSymLink()) {
@@ -868,7 +872,6 @@ AttributeView::AttributeView(BRect rect, Model* model)
 	BFont currentFont;
 	font_height fontMetrics;
 	GetFont(&currentFont);
-	currentFont.SetSize(kTitleFontHeight);
 	currentFont.GetHeight(&fontMetrics);
 
 	fTitleRect.left = fIconRect.right + 5;
@@ -890,8 +893,8 @@ AttributeView::AttributeView(BRect rect, Model* model)
 
 	// Find offset for attributes, might be overiden below if there
 	// is a prefered handle menu displayed
-	currentFont.SetSize(kAttribFontHeight);
-	fDivider = currentFont.StringWidth(B_TRANSLATE("Modified:"))
+	currentFont.SetSize(currentFont.Size() - 2);
+	fDivider = currentFont.StringWidth(B_TRANSLATE("Description:"))
 		+ kBorderMargin + kBorderWidth + 1;
 	// Add a preferred handler pop-up menu if this item
 	// is a file...This goes in place of the Link To:
@@ -902,7 +905,6 @@ AttributeView::AttributeView(BRect rect, Model* model)
 
 		// But don't add the menu if the file is executable
 		if (!fModel->IsExecutable()) {
-			SetFontSize(kAttribFontHeight);
 			float lineHeight = CurrentFontHeight();
 
 			BRect preferredAppRect(kBorderWidth + kBorderMargin,
@@ -915,7 +917,7 @@ AttributeView::AttributeView(BRect rect, Model* model)
 			fPreferredAppMenu->SetDivider(fDivider);
 			fDivider += (preferredAppRect.left - 2);
 			fPreferredAppMenu->SetFont(&currentFont);
-			fPreferredAppMenu->SetHighColor(kAttrTitleColor);
+			fPreferredAppMenu->SetHighUIColor(B_PANEL_TEXT_COLOR);
 			fPreferredAppMenu->SetLabel(B_TRANSLATE("Opens with:"));
 
 			char prefSignature[B_MIME_TYPE_LENGTH];
@@ -1333,6 +1335,9 @@ AttributeView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 		}
 	}
 
+	fCurrentLinkColorWhich = B_LINK_TEXT_COLOR;
+	fCurrentPathColorWhich = fCurrentLinkColorWhich;
+
 	switch (fTrackingState) {
 		case link_track:
 			if (fLinkRect.Contains(where) != fMouseDown) {
@@ -1362,9 +1367,8 @@ AttributeView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 				// Find the required height
 				BFont font;
 				GetFont(&font);
-				font.SetSize(kAttribFontHeight);
 
-				float height = CurrentFontHeight(kAttribFontHeight)
+				float height = CurrentFontHeight()
 					+ fIconRect.Height() + 8;
 				BRect rect(0, 0, min_c(fIconRect.Width()
 						+ font.StringWidth(fModel->Name()) + 4,
@@ -1384,8 +1388,10 @@ AttributeView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 				view->SetHighColor(0, 0, 0, 0);
 				view->FillRect(view->Bounds());
 				view->SetDrawingMode(B_OP_ALPHA);
-				view->SetHighColor(0, 0, 0, 128);
-					// set the level of transparency by  value
+				rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+				textColor.alpha = 128;
+					// set transparency by value
+				view->SetHighColor(textColor);
 				view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_COMPOSITE);
 
 				// Draw the icon
@@ -1452,37 +1458,45 @@ AttributeView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 				BScreen screen(Window());
 				BFont font;
 				GetFont(&font);
-				font.SetSize(kAttribFontHeight);
 				float maxWidth = (Bounds().Width()
 					- (fDivider + kBorderMargin));
 
-				if (fPathRect.Contains(point)
-					&& font.StringWidth(fPathStr.String()) > maxWidth) {
-					fTrackingState = no_track;
-					BRect rect(fPathRect);
-					rect.OffsetBy(Window()->Frame().left,
-						Window()->Frame().top);
+				if (fPathRect.Contains(point)) {
+					if (fCurrentPathColorWhich != B_LINK_HOVER_COLOR)
+						fCurrentPathColorWhich = B_LINK_HOVER_COLOR;
 
-					if (!fPathWindow
-						|| BMessenger(fPathWindow).IsValid() == false) {
-						fPathWindow = OpenToolTipWindow(screen, rect,
-							"fPathWindow", fPathStr.String(),
-							BMessenger(this),
-							new BMessage(kOpenLinkSource));
+					if (font.StringWidth(fPathStr.String()) > maxWidth) {
+						fTrackingState = no_track;
+						BRect rect(fPathRect);
+						rect.OffsetBy(Window()->Frame().left,
+							Window()->Frame().top);
+
+						if (fPathWindow == NULL
+							|| BMessenger(fPathWindow).IsValid() == false) {
+							fPathWindow = OpenToolTipWindow(screen, rect,
+								"fPathWindow", fPathStr.String(),
+								BMessenger(this),
+								new BMessage(kOpenLinkSource));
+						}
 					}
-				} else if (fLinkRect.Contains(point)
-					&& font.StringWidth(fLinkToStr.String()) > maxWidth) {
-					fTrackingState = no_track;
-					BRect rect(fLinkRect);
-					rect.OffsetBy(Window()->Frame().left,
-						Window()->Frame().top);
+				} else if (fLinkRect.Contains(point)) {
 
-					if (!fLinkWindow
-						|| BMessenger(fLinkWindow).IsValid() == false) {
-						fLinkWindow = OpenToolTipWindow(screen, rect,
-							"fLinkWindow", fLinkToStr.String(),
-							BMessenger(this),
-							new BMessage(kOpenLinkTarget));
+					if (fCurrentLinkColorWhich != B_LINK_HOVER_COLOR)
+						fCurrentLinkColorWhich = B_LINK_HOVER_COLOR;
+
+					if (font.StringWidth(fLinkToStr.String()) > maxWidth) {
+						fTrackingState = no_track;
+						BRect rect(fLinkRect);
+						rect.OffsetBy(Window()->Frame().left,
+							Window()->Frame().top);
+
+						if (!fLinkWindow
+							|| BMessenger(fLinkWindow).IsValid() == false) {
+							fLinkWindow = OpenToolTipWindow(screen, rect,
+								"fLinkWindow", fLinkToStr.String(),
+								BMessenger(this),
+								new BMessage(kOpenLinkTarget));
+						}
 					}
 				} else if (fDescRect.Contains(point)
 					&& font.StringWidth(fDescStr.String()) > maxWidth) {
@@ -1502,6 +1516,9 @@ AttributeView::MouseMoved(BPoint where, uint32, const BMessage* dragMessage)
 			break;
 		}
 	}
+
+	DelayedInvalidate(16666, fPathRect);
+	DelayedInvalidate(16666, fLinkRect);
 }
 
 
@@ -1700,10 +1717,13 @@ AttributeView::Draw(BRect)
 	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	FillRect(Bounds());
 
+	rgb_color labelColor = ui_color(B_PANEL_TEXT_COLOR);
+	rgb_color attributeColor = mix_color(HighColor(), labelColor, 192);
+
 	// Draw the dark grey area on the left
 	BRect drawBounds(Bounds());
 	drawBounds.right = kBorderWidth;
-	SetHighColor(kDarkBorderColor);
+	SetHighUIColor(B_PANEL_BACKGROUND_COLOR, B_DARKEN_2_TINT);
 	FillRect(drawBounds);
 
 	// Draw the icon, straddling the border
@@ -1719,12 +1739,12 @@ AttributeView::Draw(BRect)
 	// Draw the main title if the user is not currently editing it
 	if (fTitleEditView == NULL) {
 		SetFont(be_bold_font);
-		SetFontSize(kTitleFontHeight);
+		SetFontSize(be_bold_font->Size());
 		GetFont(&currentFont);
 		currentFont.GetHeight(&fontMetrics);
 		lineHeight = CurrentFontHeight() + 5;
 		lineBase = fTitleRect.bottom - fontMetrics.descent;
-		SetHighColor(kAttrValueColor);
+		SetHighColor(labelColor);
 		MovePenTo(BPoint(fIconRect.right + 6, lineBase));
 
 		// Recalculate the rect width
@@ -1743,7 +1763,6 @@ AttributeView::Draw(BRect)
 
 	// Draw the attribute font stuff
 	SetFont(be_plain_font);
-	SetFontSize(kAttribFontHeight);
 	GetFontHeight(&fontMetrics);
 	lineHeight = CurrentFontHeight() + 5;
 
@@ -1751,7 +1770,7 @@ AttributeView::Draw(BRect)
 	lineBase = fTitleRect.bottom + lineHeight;
 
 	// Capacity/size
-	SetHighColor(kAttrTitleColor);
+	SetHighColor(labelColor);
 	if (fModel->IsVolume() || fModel->IsRoot()) {
 		MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Capacity:"))),
 			lineBase));
@@ -1766,7 +1785,7 @@ AttributeView::Draw(BRect)
 	}
 
 	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
-	SetHighColor(kAttrValueColor);
+	SetHighColor(attributeColor);
 	// Check for possible need of truncation
 	if (StringWidth(fSizeString.String())
 			> (Bounds().Width() - (fDivider + kBorderMargin))) {
@@ -1783,33 +1802,32 @@ AttributeView::Draw(BRect)
 	lineBase += lineHeight;
 
 	// Created
-	SetHighColor(kAttrTitleColor);
+	SetHighColor(labelColor);
 	MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Created:"))),
 		lineBase));
-	SetHighColor(kAttrTitleColor);
 	DrawString(B_TRANSLATE("Created:"));
 	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
-	SetHighColor(kAttrValueColor);
+	SetHighColor(attributeColor);
 	DrawString(fCreatedStr.String());
 	lineBase += lineHeight;
 
 	// Modified
 	MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Modified:"))),
 		lineBase));
-	SetHighColor(kAttrTitleColor);
+	SetHighColor(labelColor);
 	DrawString(B_TRANSLATE("Modified:"));
 	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
-	SetHighColor(kAttrValueColor);
+	SetHighColor(attributeColor);
 	DrawString(fModifiedStr.String());
 	lineBase += lineHeight;
 
 	// Kind
 	MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Kind:"))),
 		lineBase));
-	SetHighColor(kAttrTitleColor);
+	SetHighColor(labelColor);
 	DrawString(B_TRANSLATE("Kind:"));
 	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
-	SetHighColor(kAttrValueColor);
+	SetHighColor(attributeColor);
 	DrawString(fKindStr.String());
 	lineBase += lineHeight;
 
@@ -1819,11 +1837,11 @@ AttributeView::Draw(BRect)
 	// Path
 	MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Location:"))),
 		lineBase));
-	SetHighColor(kAttrTitleColor);
+	SetHighColor(labelColor);
 	DrawString(B_TRANSLATE("Location:"));
 
 	MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
-	SetHighColor(kLinkColor);
+	SetHighUIColor(fCurrentPathColorWhich);
 
 	// Check for truncation
 	if (StringWidth(fPathStr.String()) > (Bounds().Width()
@@ -1847,10 +1865,10 @@ AttributeView::Draw(BRect)
 	if (fModel->IsSymLink()) {
 		MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Link to:"))),
 			lineBase));
-		SetHighColor(kAttrTitleColor);
+		SetHighColor(labelColor);
 		DrawString(B_TRANSLATE("Link to:"));
 		MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
-		SetHighColor(kLinkColor);
+		SetHighUIColor(fCurrentLinkColorWhich);
 
 		// Check for truncation
 		if (StringWidth(fLinkToStr.String()) > (Bounds().Width()
@@ -1875,10 +1893,10 @@ AttributeView::Draw(BRect)
 		//Version
 		MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Version:"))),
 			lineBase));
-		SetHighColor(kAttrTitleColor);
+		SetHighColor(labelColor);
 		DrawString(B_TRANSLATE("Version:"));
 		MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
-		SetHighColor(kAttrValueColor);
+		SetHighColor(attributeColor);
 		BString nameString;
 		if (fModel->GetVersionString(nameString, B_APP_VERSION_KIND) == B_OK)
 			DrawString(nameString.String());
@@ -1889,10 +1907,10 @@ AttributeView::Draw(BRect)
 		// Description
 		MovePenTo(BPoint(fDivider - (StringWidth(B_TRANSLATE("Description:"))),
 			lineBase));
-		SetHighColor(kAttrTitleColor);
+		SetHighColor(labelColor);
 		DrawString(B_TRANSLATE("Description:"));
 		MovePenTo(BPoint(fDivider + kDrawMargin, lineBase));
-		SetHighColor(kAttrValueColor);
+		SetHighColor(attributeColor);
 		// Check for truncation
 		if (StringWidth(fDescStr.String()) > (Bounds().Width()
 				- (fDivider + kBorderMargin))) {
@@ -1921,9 +1939,8 @@ AttributeView::BeginEditingTitle()
 	if (fTitleEditView != NULL)
 		return;
 
-	BFont font;
-	GetFont(&font);
-	font.SetSize(kTitleFontHeight);
+	BFont font(be_plain_font);
+	font.SetSize(font.Size() + 2);
 	BRect textFrame(fTitleRect);
 	textFrame.right = Bounds().Width() - 5;
 	BRect textRect(textFrame);
@@ -1993,9 +2010,8 @@ AttributeView::FinishEditingTitle(bool commit)
 					entry.Rename(text);
 
 				// Adjust the size of the text rect
-				BFont currentFont;
-				GetFont(&currentFont);
-				currentFont.SetSize(kTitleFontHeight);
+				BFont currentFont(be_plain_font);
+				currentFont.SetSize(currentFont.Size() + 2);
 				fTitleRect.right = min_c(fTitleRect.left
 						+ currentFont.StringWidth(fTitleEditView->Text()),
 					Bounds().Width() - 5);
@@ -2057,13 +2073,10 @@ AttributeView::WindowActivated(bool active)
 
 
 float
-AttributeView::CurrentFontHeight(float size)
+AttributeView::CurrentFontHeight()
 {
 	BFont font;
 	GetFont(&font);
-	if (size > -1)
-		font.SetSize(size);
-
 	font_height fontHeight;
 	font.GetHeight(&fontHeight);
 
@@ -2233,7 +2246,7 @@ AttributeView::SetSizeString(const char* sizeString)
 	fSizeString = sizeString;
 
 	BRect bounds(Bounds());
-	float lineHeight = CurrentFontHeight(kAttribFontHeight) + 6;
+	float lineHeight = CurrentFontHeight() + 6;
 	bounds.Set(fDivider, fIconRect.bottom, bounds.right,
 		fIconRect.bottom + lineHeight);
 	Invalidate(bounds);
@@ -2249,7 +2262,7 @@ TrackingView::TrackingView(BRect frame, const char* str, BMessage* message)
 	fMouseDown(false),
 	fMouseInView(false)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetEventMask(B_POINTER_EVENTS, 0);
 }
 
@@ -2272,7 +2285,7 @@ TrackingView::MouseMoved(BPoint, uint32 transit, const BMessage*)
 		InvertRect(Bounds());
 
 	fMouseInView = (transit == B_ENTERED_VIEW || transit == B_INSIDE_VIEW);
-
+	DelayedInvalidate(16666, Bounds());
 	if (!fMouseInView && !fMouseDown)
 		Window()->Close();
 }
@@ -2295,9 +2308,10 @@ void
 TrackingView::Draw(BRect)
 {
 	if (Message() != NULL)
-		SetHighColor(kLinkColor);
+		SetHighUIColor(fMouseInView ? B_LINK_HOVER_COLOR
+			: B_LINK_TEXT_COLOR);
 	else
-		SetHighColor(kAttrValueColor);
+		SetHighUIColor(B_PANEL_TEXT_COLOR);
 	SetLowColor(ViewColor());
 
 	font_height fontHeight;

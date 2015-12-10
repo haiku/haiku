@@ -76,7 +76,7 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 
 	BView* backgroundView = new BView(Bounds(), "bgView", B_FOLLOW_ALL,
 		B_WILL_DRAW);
-	backgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	backgroundView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(backgroundView);
 
 	BMenu* menu = new BPopUpMenu("");
