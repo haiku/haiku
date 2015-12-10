@@ -19,7 +19,7 @@ StringView::StringView(const char* string)
 	  fStringWidth(0),
 	  fExplicitMinSize(B_SIZE_UNSET, B_SIZE_UNSET)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fTextColor = (rgb_color){ 0, 0, 0, 255 };
 }
 

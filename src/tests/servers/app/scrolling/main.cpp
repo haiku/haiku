@@ -21,8 +21,8 @@ class TestView : public BView {
 						  fTracking(false),
 						  fLastMousePos(0.0, 0.0)
 					{
-						SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-						SetLowColor(ViewColor());
+						SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+						SetLowUIColor(ViewUIColor());
 					}
 
 	virtual	void	MessageReceived(BMessage* message);

@@ -44,7 +44,7 @@ Window::Window()
 		B_FRAME_EVENTS | B_WILL_DRAW);
 	view->MakeEditable(false);
 	view->SetAlignment(B_ALIGN_CENTER);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	view->SetText("The window will be hidden and shown every 2 seconds.");
 	AddChild(view);
 

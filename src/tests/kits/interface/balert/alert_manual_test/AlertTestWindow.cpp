@@ -96,7 +96,7 @@ AlertTestWindow::Test()
 	);
 	if (fAlertType == 'H') {
 		BView *master = pAlert->ChildAt(0);
-		master->SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
+		master->SetViewUIColor(B_MENU_BACKGROUND_COLOR);
 	}
 	
 	BPoint pt;

@@ -66,7 +66,6 @@ enum {
 	SPACE_LABEL		= 40,
 	SPACE_POPUP		= 53,
 	INSTANT_LOAD	= 205,
-	LEFT_WIDTH		= 96,
 	LEFT_OFFSET		= 2,
 	STATUS_BOX		= 98,
 	STATUS_LABEL	= 13,
@@ -89,6 +88,11 @@ enum {
 	REFRESH_RATE_H	= 320,
 	REFRESH_RATE_V	= 34
 };
+
+
+// Now calculated based off font size
+int32 LEFT_WIDTH = 96;
+
 
 /* min, max and standard setting of the star count, also
    called starfield density. */
@@ -142,9 +146,6 @@ enum {
 
 /* no comments (almost :-) */
 #define		abs(x) 	(((x)>0)?(x):-(x))
-
-/* default background color for the UI. */
-rgb_color	background_color = { 216, 216, 216, 255 };
 
 /* the 7 colors for stars. */
 static rgb_color	color_list[7] = {
@@ -476,8 +477,14 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	/* top line background */
 	r.Set(0.0, 0.0, frame.right, TOP_LEFT_LIMIT - 1);
 	fTopView = new BView(r, "top view", B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW);
-	fTopView->SetViewColor(background_color);
+	fTopView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(fTopView);
+
+	LEFT_WIDTH = (int32)fTopView->StringWidth(B_TRANSLATE("Full screen"))
+							+ 22 + H_BORDER;
+
+	if (LEFT_WIDTH < 96)
+		LEFT_WIDTH = 96;
 
 	h = 2;
 	v = V_BORDER;
@@ -628,7 +635,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	/* left column gray background */
 	r.Set(0.0, TOP_LEFT_LIMIT, LEFT_WIDTH - 1, frame.bottom);
 	fLeftView = new BView(r, "top view", B_FOLLOW_LEFT | B_FOLLOW_TOP_BOTTOM, B_WILL_DRAW);
-	fLeftView->SetViewColor(background_color);
+	fLeftView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(fLeftView);
 
 	h2 = LEFT_OFFSET;
@@ -722,7 +729,7 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 		boxWidth = max_c(width + r.left, boxWidth);
 		fLeftView->AddChild(button);
 
-	v2 += AUTO_DEMO+LEFT_OFFSET*2;
+	v2 += button->Frame().Height()+LEFT_OFFSET*2;
 	h = h2;
 	v = v2;
 
@@ -893,6 +900,13 @@ ChartWindow::ChartWindow(BRect frame, const char *name)
 	fChartView = new ChartView(r);
 	fChartView->SetViewColor(0, 0, 0);
 	AddChild(fChartView);
+
+	/*Resize Window Height to fit contents, if needed*/
+	r = Bounds();
+	r.bottom = fSpecialBox->Frame().bottom + H_BORDER * 2 + 20;
+
+	if (r.Height() > Bounds().Height())
+		ResizeTo(r.Width(), r.Height());
 
 	/* allocate the semaphores */
 	fDrawingLock = create_sem(1, "chart locker");
@@ -1206,7 +1220,7 @@ ChartWindow::OpenColorPalette(BPoint here)
 		point.Set(0, 0);
 		BColorControl *colorControl = new ChartColorControl(point,
 			new BMessage(COLOR_PALETTE_MSG));
-		colorControl->SetViewColor(background_color);
+		colorControl->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		colorControl->SetTarget(NULL, this);
 		colorControl->SetValue(fCurrentSettings.back_color);
 		colorControl->ResizeToPreferred();
@@ -1234,7 +1248,7 @@ ChartWindow::OpenStarDensity(BPoint here)
 		frame.OffsetTo(0.0, 0.0);
 		BSlider	*slider = new BSlider(frame, "", NULL, new BMessage(STAR_DENSITY_MSG),
 							 STAR_DENSITY_MIN, STAR_DENSITY_MAX);
-		slider->SetViewColor(background_color);
+		slider->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		slider->SetTarget(NULL, this);
 		slider->SetValue(fCurrentSettings.star_density);
 		slider->SetModificationMessage(new BMessage(STAR_DENSITY_MSG));
@@ -1264,7 +1278,7 @@ ChartWindow::OpenRefresh(BPoint here)
 							 B_NOT_RESIZABLE | B_NOT_ZOOMABLE | B_WILL_ACCEPT_FIRST_CLICK);
 		frame.OffsetTo(0.0, 0.0);
 		BSlider *slider = new BSlider(frame, "", NULL, new BMessage(REFRESH_RATE_MSG), 0, 1000);
-		slider->SetViewColor(background_color);
+		slider->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		slider->SetTarget(NULL, this);
 		slider->SetValue((int32)(1000 * log(fCurrentSettings.refresh_rate / REFRESH_RATE_MIN) /
 						log(REFRESH_RATE_MAX/REFRESH_RATE_MIN)));

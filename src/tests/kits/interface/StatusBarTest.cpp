@@ -32,7 +32,7 @@ Window::Window()
 			B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS)
 {
 	BView* main = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	main->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	main->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(main);
 
 	BRect rect(20, 10, 400, 30);

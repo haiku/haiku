@@ -410,7 +410,7 @@ PPDConfigView::PPDConfigView(BRect bounds, const char *name, uint32 resizeMask, 
 
 	// add details view
 	fDetails = new BView(listBounds, "details", B_FOLLOW_ALL_SIDES, B_WILL_DRAW);
-	fDetails->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fDetails->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	
 	BScrollView* scrollView = new BScrollView("details-scroll-view", 
 		fDetails, B_FOLLOW_ALL_SIDES, 0, true, true);

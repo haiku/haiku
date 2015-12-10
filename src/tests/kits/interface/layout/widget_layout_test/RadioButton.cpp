@@ -16,7 +16,7 @@
 RadioButton::RadioButton(BMessage* message, BMessenger target)
 	: AbstractButton(BUTTON_POLICY_SELECT_ON_RELEASE, message, target)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

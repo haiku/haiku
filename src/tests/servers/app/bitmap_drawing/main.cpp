@@ -551,7 +551,7 @@ show_window(BRect frame, const char* name)
 								   B_FOLLOW_LEFT | B_FOLLOW_BOTTOM);
 	view->AddChild(control);
 	control->SetTarget(view);
-	control->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	control->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	window->Show();
 }

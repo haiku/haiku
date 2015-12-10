@@ -16,7 +16,7 @@
 CheckBox::CheckBox(BMessage* message, BMessenger target)
 	: AbstractButton(BUTTON_POLICY_TOGGLE_ON_RELEASE, message, target)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

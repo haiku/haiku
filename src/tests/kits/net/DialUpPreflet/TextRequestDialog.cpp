@@ -33,7 +33,7 @@ TextRequestDialog::TextRequestDialog(const char *title, const char *information,
 {
 	BRect rect = Bounds();
 	BView *backgroundView = new BView(rect, "background", B_FOLLOW_ALL_SIDES, 0);
-	backgroundView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	backgroundView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	rect.InsetBy(5, 5);
 	rect.bottom = rect.top;
 		// init
@@ -43,7 +43,7 @@ TextRequestDialog::TextRequestDialog(const char *title, const char *information,
 		textRect.OffsetTo(0, 0);
 		fTextView = new BTextView(rect, "TextView", textRect, B_FOLLOW_NONE,
 			B_WILL_DRAW);
-		fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fTextView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		fTextView->MakeSelectable(false);
 		fTextView->MakeEditable(false);
 		fTextView->SetText(information);

@@ -56,7 +56,7 @@ Window::Window(BRect frame, window_look look, window_feel feel)
 {
 	BRect rect(Bounds());
 	BView *view = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(view);
 
 	if (!IsModal() && !IsFloating())
