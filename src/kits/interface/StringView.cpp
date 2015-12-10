@@ -128,16 +128,16 @@ BStringView::Archive(BMessage* data, bool deep) const
 void
 BStringView::AttachedToWindow()
 {
-	rgb_color color = B_TRANSPARENT_COLOR;
+	if (HasDefaultColors()) {
+		AdoptParentColors();
+		SetHighUIColor(B_PANEL_TEXT_COLOR);
+	}
 
-	BView* parent = Parent();
-	if (parent != NULL)
-		color = parent->ViewColor();
-
-	if (color == B_TRANSPARENT_COLOR)
-		color = ui_color(B_PANEL_BACKGROUND_COLOR);
-
-	SetViewColor(color);
+	if (ViewColor() == B_TRANSPARENT_COLOR) {
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+		SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
+		SetHighUIColor(B_PANEL_TEXT_COLOR);
+	}
 }
 
 
@@ -254,7 +254,8 @@ BStringView::Draw(BRect updateRect)
 	if (!fText)
 		return;
 
-	SetLowColor(ViewColor());
+	if (LowUIColor() == B_NO_COLOR)
+		SetLowColor(ViewColor());
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);

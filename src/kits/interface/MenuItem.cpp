@@ -445,8 +445,8 @@ BMenuItem::DrawContent()
 void
 BMenuItem::Draw()
 {
-	const rgb_color lowColor = fSuper->LowColor();
-	const rgb_color highColor = fSuper->HighColor();
+	const color_which lowColor = fSuper->LowUIColor();
+	const color_which highColor = fSuper->HighUIColor();
 
 	bool enabled = IsEnabled();
 	bool selected = IsSelected();
@@ -493,8 +493,8 @@ BMenuItem::Draw()
 	}
 
 	// restore the parent menu's low color and high color
-	fSuper->SetLowColor(lowColor);
-	fSuper->SetHighColor(highColor);
+	fSuper->SetLowUIColor(lowColor);
+	fSuper->SetHighUIColor(highColor);
 }
 
 

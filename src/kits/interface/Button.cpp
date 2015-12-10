@@ -1,5 +1,5 @@
 /*
- *	Copyright 2001-2014 Haiku Inc. All rights reserved.
+ *	Copyright 2001-2015 Haiku Inc. All rights reserved.
  *  Distributed under the terms of the MIT License.
  *
  *	Authors:
@@ -132,9 +132,14 @@ BButton::Archive(BMessage* data, bool deep) const
 void
 BButton::Draw(BRect updateRect)
 {
+	// Allow improved customization & integration
+	float buttonTint = B_DARKEN_1_TINT;
+	if (ViewUIColor() != B_CONTROL_BACKGROUND_COLOR)
+		buttonTint = B_NO_TINT;
+
 	BRect rect(Bounds());
 	rgb_color background = LowColor();
-	rgb_color base = background;
+	rgb_color base = tint_color(ViewColor(), buttonTint);
 	uint32 flags = be_control_look->Flags(this);
 	if (_Flag(FLAG_DEFAULT))
 		flags |= BControlLook::B_DEFAULT_BUTTON;
@@ -223,17 +228,25 @@ BButton::MouseDown(BPoint where)
 	}
 }
 
-
 void
 BButton::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
-		// low color will now be the parents view color
+	SetViewUIColor(B_CONTROL_BACKGROUND_COLOR);
+
+	// Ensure BButton's low color is the parent's VIEW color.
+	// We don't want to adopt the standard control lowcolor.
+	if (Parent() != NULL) {
+		float tint = B_NO_TINT;
+		color_which which = ViewUIColor(&tint);
+		if (which != B_NO_COLOR)
+			SetLowUIColor(which, tint);
+		else
+			SetLowColor(ViewColor());
+	}
 
 	if (IsDefault())
 		Window()->SetDefaultButton(this);
-
-	SetViewColor(B_TRANSPARENT_COLOR);
 }
 
 

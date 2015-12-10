@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc.
+ * Copyright 2001-2015 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -394,7 +394,10 @@ BSlider::AttachedToWindow()
 	BView* view = OffscreenView();
 	if (view && view->LockLooper()) {
 		view->SetViewColor(B_TRANSPARENT_COLOR);
-		view->SetLowColor(LowColor());
+		if (LowUIColor() != B_NO_COLOR)
+			view->SetLowUIColor(LowUIColor());
+		else
+			view->SetLowColor(LowColor());
 		view->UnlockLooper();
 	}
 
@@ -411,6 +414,12 @@ void
 BSlider::AllAttached()
 {
 	BControl::AllAttached();
+
+	// When using a layout we may not have a parent, so we need to employ the
+	// standard system colors manually. Due to how layouts work, this must
+	// happen here, rather than in AttachedToWindow().
+	if (Parent() == NULL)
+		SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -1006,7 +1015,7 @@ BSlider::DrawHashMarks()
 	BView* view = OffscreenView();
 
 	if (be_control_look != NULL) {
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+		rgb_color base = ui_color(B_CONTROL_MARK_COLOR);
 		uint32 flags = be_control_look->Flags(this);
 		be_control_look->DrawSliderHashMarks(view, frame, frame, base,
 			fHashMarkCount, fHashMarks, flags, fOrientation);

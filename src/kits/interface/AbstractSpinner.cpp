@@ -311,9 +311,6 @@ SpinnerButton::SpinnerButton(BRect frame, const char* name,
 	fIsMouseOver(false),
 	fRepeatDelay(100000)
 {
-	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetViewColor(bgColor);
-	SetLowColor(bgColor);
 }
 
 
@@ -327,6 +324,7 @@ SpinnerButton::AttachedToWindow()
 {
 	fParent = static_cast<BAbstractSpinner*>(Parent());
 
+	AdoptParentColors();
 	BView::AttachedToWindow();
 }
 
@@ -534,9 +532,6 @@ SpinnerTextView::SpinnerTextView(BRect rect, BRect textRect)
 		B_WILL_DRAW | B_NAVIGABLE),
 	fParent(NULL)
 {
-	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetViewColor(bgColor);
-	SetLowColor(bgColor);
 }
 
 
@@ -550,6 +545,7 @@ SpinnerTextView::AttachedToWindow()
 {
 	fParent = static_cast<BAbstractSpinner*>(Parent());
 
+	AdoptParentColors();
 	BTextView::AttachedToWindow();
 }
 
@@ -1480,10 +1476,6 @@ BAbstractSpinner::_DrawTextView(BRect updateRect)
 void
 BAbstractSpinner::_InitObject()
 {
-	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetViewColor(bgColor);
-	SetLowColor(bgColor);
-
 	fAlignment = B_ALIGN_LEFT;
 	fButtonStyle = SPINNER_BUTTON_PLUS_MINUS;
 
@@ -1594,7 +1586,6 @@ void
 BAbstractSpinner::_UpdateTextViewColors(bool enable)
 {
 	rgb_color textColor;
-	rgb_color bgColor;
 	BFont font;
 
 	fTextView->GetFontAndColor(0, &font);
@@ -1608,15 +1599,22 @@ BAbstractSpinner::_UpdateTextViewColors(bool enable)
 
 	fTextView->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
-	if (enable)
-		bgColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-	else {
-		bgColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_LIGHTEN_2_TINT);
+	if (enable) {
+		fTextView->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+		fTextView->SetLowUIColor(ViewUIColor());
+	} else {
+		color_which which = ViewUIColor();
+
+		if (which != B_NO_COLOR) {
+			fTextView->SetViewUIColor(which, B_LIGHTEN_2_TINT);
+			fTextView->SetLowUIColor(which, B_LIGHTEN_2_TINT);
+		} else {
+			rgb_color color = tint_color(ViewColor(), B_LIGHTEN_2_TINT);
+			fTextView->SetViewColor(color);
+			fTextView->SetLowColor(color);
+		}
 	}
 
-	fTextView->SetViewColor(bgColor);
-	fTextView->SetLowColor(bgColor);
 }
 
 

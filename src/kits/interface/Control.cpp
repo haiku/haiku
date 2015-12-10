@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku, Inc.
+ * Copyright 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -151,19 +151,20 @@ BControl::WindowActivated(bool active)
 void
 BControl::AttachedToWindow()
 {
-	rgb_color color;
+	AdoptParentColors();
 
-	BView* parent = Parent();
-	if (parent != NULL) {
-		// inherit the color from parent
-		color = parent->ViewColor();
-		if (color == B_TRANSPARENT_COLOR)
-			color = ui_color(B_PANEL_BACKGROUND_COLOR);
-	} else
-		color = ui_color(B_PANEL_BACKGROUND_COLOR);
+	if (ViewColor() == B_TRANSPARENT_COLOR)
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	SetViewColor(color);
-	SetLowColor(color);
+	// Force view color as low color
+	if (Parent() != NULL) {
+		float tint = B_NO_TINT;
+		color_which which = ViewUIColor(&tint);
+		if (which != B_NO_COLOR)
+			SetLowUIColor(which, tint);
+		else
+			SetLowColor(ViewColor());
+	}
 
 	if (!Messenger().IsValid())
 		SetTarget(Window());
@@ -610,6 +611,9 @@ BControl::operator=(const BControl &)
 void
 BControl::InitData(BMessage* data)
 {
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
+
 	fLabel = NULL;
 	SetLabel(B_EMPTY_STRING);
 	fValue = B_CONTROL_OFF;

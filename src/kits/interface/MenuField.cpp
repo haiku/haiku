@@ -428,19 +428,7 @@ void
 BMenuField::AttachedToWindow()
 {
 	CALLED();
-	rgb_color color;
-
-	BView* parent = Parent();
-	if (parent != NULL) {
-		// inherit the color from parent
-		color = parent->ViewColor();
-		if (color == B_TRANSPARENT_COLOR)
-			color = ui_color(B_PANEL_BACKGROUND_COLOR);
-	} else
-		color = ui_color(B_PANEL_BACKGROUND_COLOR);
-
-	SetViewColor(color);
-	SetLowColor(color);
+	AdoptParentColors();
 }
 
 
@@ -1078,6 +1066,7 @@ BMenuField::_DrawLabel(BRect updateRect)
 
 	// save the current low color
 	const rgb_color lowColor = LowColor();
+	rgb_color textColor;
 
 	MenuPrivate menuPrivate(fMenuBar);
 	if (menuPrivate.State() != MENU_STATE_CLOSED) {
@@ -1085,10 +1074,12 @@ BMenuField::_DrawLabel(BRect updateRect)
 		SetLowColor(ui_color(B_MENU_SELECTED_BACKGROUND_COLOR));
 		BRect fillRect(rect.InsetByCopy(0, kVMargin));
 		FillRect(fillRect, B_SOLID_LOW);
-	}
+		textColor = ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR);
+	} else
+		textColor = ui_color(B_MENU_ITEM_TEXT_COLOR);
 
 	be_control_look->DrawLabel(this, label, rect, updateRect, LowColor(), flags,
-		BAlignment(fAlign, B_ALIGN_MIDDLE));
+		BAlignment(fAlign, B_ALIGN_MIDDLE), &textColor);
 
 	// restore the previous low color
 	SetLowColor(lowColor);

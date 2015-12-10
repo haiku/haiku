@@ -219,7 +219,7 @@ BTextToolTip::_InitData(const char* text)
 	fTextView = new BTextView("tool tip text");
 	fTextView->SetText(text);
 	fTextView->MakeEditable(false);
-	fTextView->SetViewColor(ui_color(B_TOOL_TIP_BACKGROUND_COLOR));
+	fTextView->SetViewUIColor(B_TOOL_TIP_BACKGROUND_COLOR);
 	rgb_color color = ui_color(B_TOOL_TIP_TEXT_COLOR);
 	fTextView->SetFontAndColor(NULL, 0, &color);
 	fTextView->SetWordWrap(false);

@@ -745,4 +745,6 @@ BMenuBar::_InitData(menu_layout layout)
 	fLastBounds = new BRect(Bounds());
 	SetItemMargins(8, 2, 8, 2);
 	_SetIgnoreHidden(true);
+	SetLowUIColor(B_MENU_BACKGROUND_COLOR);
+	SetViewColor(B_TRANSPARENT_COLOR);
 }

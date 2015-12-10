@@ -1,10 +1,11 @@
 /*
- * Copyright 2007-2012 Haiku, Inc.
+ * Copyright 2007-2015 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ryan Leavengood <leavengood@gmail.com>
  *		John Scipione <jscipione@gmail.com>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 
@@ -68,6 +69,8 @@ public:
 								const char* signature);
 	virtual					~AboutView();
 
+	virtual	void			AllAttached();
+
 			BTextView*		InfoView() const { return fInfoView; };
 
 			BBitmap*		Icon();
@@ -99,7 +102,7 @@ StripeView::StripeView(BBitmap* icon)
 	BView("StripeView", B_WILL_DRAW),
 	fIcon(icon)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	float width = 0.0f;
 	if (icon != NULL)
@@ -159,6 +162,7 @@ AboutView::AboutView(const char* appName, const char* signature)
 	:
 	BGroupView("AboutView", B_VERTICAL)
 {
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fNameView = new BStringView("name", appName);
 	BFont font;
 	fNameView->GetFont(&font);
@@ -176,7 +180,6 @@ AboutView::AboutView(const char* appName, const char* signature)
 	fInfoView->MakeEditable(false);
 	fInfoView->SetWordWrap(true);
 	fInfoView->SetInsets(5.0, 5.0, 5.0, 5.0);
-	fInfoView->SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	fInfoView->SetStylable(true);
 
 	BScrollView* infoViewScroller = new BScrollView(
@@ -205,12 +208,22 @@ AboutView::AboutView(const char* appName, const char* signature)
 				.End()
 			.End()
 		.AddGlue()
-		.End();
+		.View()->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+
 }
 
 
 AboutView::~AboutView()
 {
+}
+
+
+void
+AboutView::AllAttached()
+{
+	fNameView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fInfoView->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+	fVersionView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

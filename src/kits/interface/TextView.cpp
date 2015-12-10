@@ -3051,8 +3051,10 @@ BTextView::_InitObject(BRect textRect, const BFont* initialFont,
 
 	_NormalizeFont(&font);
 
+	rgb_color documentTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+
 	if (initialColor == NULL)
-		initialColor = &kBlackColor;
+		initialColor = &documentTextColor;
 
 	fText = new BPrivate::TextGapBuffer;
 	fLines = new LineBuffer;
@@ -3113,6 +3115,7 @@ BTextView::_InitObject(BRect textRect, const BFont* initialFont,
 	fLastClickOffset = -1;
 
 	SetDoesUndo(true);
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 }
 
 
