@@ -131,7 +131,7 @@ HalftoneView::HalftoneView(BRect frame, const char* name, uint32 resizeMask,
 	:
 	BView(frame, name, resizeMask, flags)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BRect r(frame);
 	float size, max;

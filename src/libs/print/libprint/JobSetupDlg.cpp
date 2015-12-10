@@ -160,7 +160,7 @@ JobSetupView::JobSetupView(JobData* jobData, PrinterData* printerData,
 	fOddNumberedPages(NULL),
 	fEvenNumberedPages(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

@@ -38,7 +38,7 @@ FileControl::FileControl(const char* name, const char* label,
 	:
 	BView(name, 0)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
 
 	fText = new BTextControl("file_path", label, pathOfFile, NULL);

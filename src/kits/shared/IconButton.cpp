@@ -79,15 +79,10 @@ BIconButton::MessageReceived(BMessage* message)
 void
 BIconButton::AttachedToWindow()
 {
-	rgb_color background = B_TRANSPARENT_COLOR;
-	if (BView* parent = Parent()) {
-		background = parent->ViewColor();
-		if (background == B_TRANSPARENT_COLOR)
-			background = parent->LowColor();
-	}
-	if (background == B_TRANSPARENT_COLOR)
-		background = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetLowColor(background);
+	AdoptParentColors();
+
+	if (ViewUIColor() != B_NO_COLOR)
+		SetLowUIColor(ViewUIColor());
 
 	SetTarget(fTargetCache);
 	if (!Target())

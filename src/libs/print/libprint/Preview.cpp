@@ -882,7 +882,7 @@ PreviewWindow::PreviewWindow(BFile* jobFile, bool showOkAndCancelButtons)
 	fPreview = new PreviewView(jobFile, bounds);
 	fPreviewScroller = new BScrollView("PreviewScroller", fPreview, B_FOLLOW_ALL,
 		B_FRAME_EVENTS, true, true, B_FANCY_BORDER);
-	fPreviewScroller->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fPreviewScroller->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	panel->AddChild(fPreviewScroller);
 
 	if (fPreview->InitCheck() == B_OK) {

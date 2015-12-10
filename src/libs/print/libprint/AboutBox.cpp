@@ -39,7 +39,7 @@ AboutBoxView::AboutBoxView(BRect rect, const char *driver_name, const char *vers
 	fDriverName = driver_name;
 	fVersion     = version;
 	fCopyright   = copyright;
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetDrawingMode(B_OP_SELECT);
 }
 

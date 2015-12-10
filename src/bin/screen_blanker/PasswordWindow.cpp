@@ -33,7 +33,7 @@ PasswordWindow::PasswordWindow()
 		| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES)
 {
 	BView* topView = new BView(Bounds(), "topView", B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	topView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(topView);
 
 	BRect bounds(Bounds());

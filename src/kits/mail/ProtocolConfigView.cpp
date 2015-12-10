@@ -125,7 +125,7 @@ MailProtocolConfigView::MailProtocolConfigView(uint32 optionsMask)
 	fRemoveFromServerCheckBox(NULL),
 	fBodyDownloadConfig(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BGridLayout* layout = new BGridLayout(0.f);
 	SetLayout(layout);

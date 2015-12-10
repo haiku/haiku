@@ -158,7 +158,7 @@ BCalendarView::AttachedToWindow()
 	if (!Messenger().IsValid())
 		SetTarget(Window(), NULL);
 
-	SetViewColor(ui_color(B_LIST_BACKGROUND_COLOR));
+	SetViewUIColor(B_LIST_BACKGROUND_COLOR);
 }
 
 
