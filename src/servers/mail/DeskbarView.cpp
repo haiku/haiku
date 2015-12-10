@@ -125,12 +125,12 @@ DeskbarView::~DeskbarView()
 void DeskbarView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AdoptParentColors();
 
-	SetLowColor(ViewColor());
+	if (ViewUIColor() == B_NO_COLOR)
+		SetLowColor(ViewColor());
+	else
+		SetLowUIColor(ViewUIColor());
 
 	if (be_roster->IsRunning(B_MAIL_DAEMON_SIGNATURE)) {
 		_RefreshMailQuery();

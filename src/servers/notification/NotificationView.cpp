@@ -74,7 +74,7 @@ NotificationView::NotificationView(NotificationWindow* win,
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
 
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	switch (fNotification->Type()) {
