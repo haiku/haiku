@@ -1212,7 +1212,7 @@ TSwitchManager::GroupList()
 TBox::TBox(BRect bounds, TSwitchManager* manager, TSwitcherWindow* window,
 		TIconView* iconView)
 	:
-	BBox(bounds, "top", B_FOLLOW_NONE, B_WILL_DRAW, B_NO_BORDER),
+	BBox(bounds, "top", B_FOLLOW_ALL, B_WILL_DRAW, B_NO_BORDER),
 	fManager(manager),
 	fWindow(window),
 	fIconView(iconView),
@@ -1322,11 +1322,18 @@ TBox::Draw(BRect update)
 	float center = (bounds.right + bounds.left) / 2;
 
 	BRect box(3, 3, bounds.right - 3, 3 + height + kChildInset * 2);
+	rgb_color panelColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 	rgb_color white = {255, 255, 255, 255};
-	rgb_color standardGray = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color standardGray = panelColor;
 	rgb_color veryDarkGray = {128, 128, 128, 255};
-	rgb_color darkGray = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_1_TINT);
+	rgb_color darkGray = tint_color(panelColor, B_DARKEN_1_TINT);
+
+	if (panelColor.Brightness() < 100) {
+		standardGray = tint_color(panelColor, 0.8);
+		darkGray = tint_color(panelColor, 0.85);
+		white = make_color(200, 200, 200, 255);
+		veryDarkGray = make_color(0, 0, 0, 255);
+	}
 
 	// Fill the area with dark gray
 	SetHighColor(darkGray);
@@ -1407,10 +1414,18 @@ TBox::Draw(BRect update)
 void
 TBox::DrawIconScrollers(bool force)
 {
-	rgb_color backgroundColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_1_TINT);
-	rgb_color dark = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_4_TINT);
+	rgb_color panelColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color backgroundColor;
+	rgb_color dark;
+
+	if (panelColor.Brightness() > 100) {
+		backgroundColor = tint_color(panelColor, B_DARKEN_1_TINT);
+		dark = tint_color(backgroundColor, B_DARKEN_3_TINT);
+	} else {
+		backgroundColor = tint_color(panelColor, 0.85);
+		dark = tint_color(panelColor, B_LIGHTEN_1_TINT);
+	}
+
 	bool updateLeft = false;
 	bool updateRight = false;
 
@@ -1481,8 +1496,18 @@ TBox::DrawIconScrollers(bool force)
 void
 TBox::DrawWindowScrollers(bool force)
 {
-	rgb_color backgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color dark = tint_color(backgroundColor, B_DARKEN_4_TINT);
+	rgb_color panelColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color backgroundColor;
+	rgb_color dark;
+
+	if (panelColor.Brightness() > 100) {
+		backgroundColor = tint_color(panelColor, B_DARKEN_1_TINT);
+		dark = tint_color(backgroundColor, B_DARKEN_2_TINT);
+	} else {
+		backgroundColor = panelColor;
+		dark = tint_color(panelColor, B_LIGHTEN_2_TINT);
+	}
+
 	bool updateUp = false;
 	bool updateDown = false;
 
@@ -1593,10 +1618,18 @@ TSwitcherWindow::TSwitcherWindow(BRect frame, TSwitchManager* manager)
 
 	fTopView = new TBox(Bounds(), fManager, this, fIconView);
 	AddChild(fTopView);
+	fTopView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fTopView->SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
+	fTopView->SetHighUIColor(B_PANEL_TEXT_COLOR);
 
 	SetPulseRate(0);
 	fTopView->AddChild(fIconView);
 	fTopView->AddChild(fWindowView);
+
+	if (be_plain_font->Size() != 12) {
+		float sizeDelta = be_plain_font->Size() - 12;
+		ResizeBy(0, sizeDelta);
+	}
 }
 
 
@@ -1803,19 +1836,13 @@ TIconView::TIconView(BRect frame, TSwitchManager* manager,
 	fManager(manager)
 {
 	BRect rect(0, 0, kSlotSize - 1, kSlotSize - 1);
-	rgb_color color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_1_TINT);
 
 	fOffView = new BView(rect, "off_view", B_FOLLOW_NONE, B_WILL_DRAW);
-	fOffView->SetHighColor(color);
 	fOffBitmap = new BBitmap(rect, B_RGB32, true);
 	fOffBitmap->AddChild(fOffView);
 
 	fCurrentSmall = new BBitmap(BRect(0, 0, 15, 15), kIconFormat);
 	fCurrentLarge = new BBitmap(BRect(0, 0, 31, 31), kIconFormat);
-
-	SetViewColor(color);
-	SetLowColor(color);
 }
 
 
@@ -1873,6 +1900,11 @@ TIconView::AnimateIcon(BBitmap* startIcon, BBitmap* endIcon)
 	destRect.OffsetBy(BPoint(off, off));
 
 	fOffBitmap->Lock();
+	rgb_color backgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	if (backgroundColor.Brightness() > 100)
+		fOffView->SetHighColor(tint_color(backgroundColor, B_DARKEN_1_TINT));
+	else
+		fOffView->SetHighColor(tint_color(backgroundColor, 0.85));
 
 	for (int i = 0; i < 2; i++) {
 		startIconBounds.InsetBy(amount, amount);
@@ -1999,6 +2031,18 @@ TIconView::FrameOf(int32 index) const
 void
 TIconView::DrawTeams(BRect update)
 {
+	float tint = B_NO_TINT;
+	rgb_color panelColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+	if (panelColor.Brightness() < 100)
+		tint = 0.85;
+	else
+		tint = B_DARKEN_1_TINT;
+
+	SetHighUIColor(B_PANEL_BACKGROUND_COLOR, tint);
+	SetLowUIColor(ViewUIColor(), tint);
+
+	FillRect(update);
 	int32 mainIndex = fManager->CurrentIndex();
 	BList* list = fManager->GroupList();
 	int32 count = list->CountItems();
@@ -2098,10 +2142,7 @@ TWindowView::TWindowView(BRect rect, TSwitchManager* manager,
 void
 TWindowView::AttachedToWindow()
 {
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -2249,8 +2290,12 @@ TWindowView::Draw(BRect update)
 		DrawBitmap(bitmap, p);
 
 		if (!local) {
-			SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-				B_DARKEN_4_TINT));
+			rgb_color color = ui_color(B_PANEL_BACKGROUND_COLOR);
+			if (color.Brightness() > 100)
+				SetHighColor(tint_color(color, B_DARKEN_4_TINT));
+			else
+				SetHighColor(tint_color(color, B_LIGHTEN_1_TINT));
+
 			p.x -= 8;
 			p.y += 4;
 			StrokeLine(p + BPoint(2, 2), p + BPoint(2, 2));
@@ -2261,13 +2306,12 @@ TWindowView::Draw(BRect update)
 
 			StrokeLine(p + BPoint(1, 8), p + BPoint(1, 8));
 			StrokeLine(p + BPoint(3, 8), p + BPoint(6, 8));
-
-			SetHighColor(0, 0, 0);
 		}
 
 		point.x += 21;
 		MovePenTo(point);
 
+		SetHighUIColor(B_PANEL_TEXT_COLOR);
 		DrawString(title.String());
 		SetDrawingMode(B_OP_COPY);
 

@@ -85,7 +85,7 @@ ScrollArrow::ScrollArrow(BRect frame)
 	BView(frame, "menu scroll arrow", B_FOLLOW_NONE, B_WILL_DRAW),
 	fEnabled(false)
 {
-	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	SetViewUIColor(B_MENU_BACKGROUND_COLOR);
 }
 
 

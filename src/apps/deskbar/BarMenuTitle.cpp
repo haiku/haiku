@@ -86,7 +86,7 @@ TBarMenuTitle::Draw()
 		return;
 
 	BRect frame(Frame());
-	rgb_color base = menu->LowColor();
+	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
 
 	menu->PushState();
 

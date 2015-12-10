@@ -822,7 +822,7 @@ TExpandoMenuBar::DrawBackground(BRect updateRect)
 		return;
 
 	BRect bounds(Bounds());
-	rgb_color menuColor = LowColor();
+	rgb_color menuColor = ui_color(B_MENU_BACKGROUND_COLOR);
 	rgb_color hilite = tint_color(menuColor, B_DARKEN_1_TINT);
 	rgb_color vlight = tint_color(menuColor, B_LIGHTEN_2_TINT);
 

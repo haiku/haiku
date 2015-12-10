@@ -135,11 +135,13 @@ TTimeView::AttachedToWindow()
 	fCurrentTime = time(NULL);
 
 	SetFont(be_plain_font);
+	float tint = B_NO_TINT;
+
 	if (Parent()) {
 		fParent = Parent();
-		SetViewColor(Parent()->ViewColor());
+		SetViewUIColor(Parent()->ViewUIColor(&tint), tint);
 	} else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	CalculateTextPlacement();
 	ResizeToPreferred();
@@ -152,9 +154,9 @@ TTimeView::Draw(BRect /*updateRect*/)
 	PushState();
 
 	SetHighColor(ViewColor());
-	SetLowColor(ViewColor());
+	SetLowUIColor(ViewUIColor());
 	FillRect(Bounds());
-	SetHighColor(ui_color(B_MENU_ITEM_TEXT_COLOR));
+	SetHighUIColor(B_MENU_ITEM_TEXT_COLOR);
 
 	DrawString(fCurrentTimeStr, fTimeLocation);
 

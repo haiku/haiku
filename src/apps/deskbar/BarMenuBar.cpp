@@ -74,7 +74,7 @@ TSeparatorItem::Draw()
 
 	BRect frame(Frame());
 	frame.right = frame.left + kSepItemWidth;
-	rgb_color base = menu->LowColor();
+	rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
 
 	menu->PushState();
 

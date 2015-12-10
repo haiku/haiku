@@ -113,7 +113,7 @@ TWindowMenuItem::Draw()
 
 	// TODO: Tint this smartly based on the low color, this does
 	// nothing to black.
-	rgb_color menuColor = tint_color(Menu()->LowColor(), 1.07);
+	rgb_color menuColor = tint_color(ui_color(B_MENU_BACKGROUND_COLOR), 1.07);
 	BRect frame(Frame());
 	BMenu* menu = Menu();
 
