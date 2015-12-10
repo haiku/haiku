@@ -451,7 +451,7 @@ public:
 				uint32 flags) :
 			BView(name, flags)
 			{
-				SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+				SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 				fTitle = new BStringView("title",
 					B_TRANSLATE("PPM image translator"));

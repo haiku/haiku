@@ -52,7 +52,7 @@ add_font_selection_view(BGridLayout* layout, FontSelectionView* view,
 FontView::FontView()
 	: BView("Fonts", B_WILL_DRAW )
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fPlainView = new FontSelectionView("plain", B_TRANSLATE("Plain font:"));
 	fBoldView = new FontSelectionView("bold", B_TRANSLATE("Bold font:"));

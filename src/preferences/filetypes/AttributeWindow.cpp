@@ -129,7 +129,7 @@ AttributeWindow::AttributeWindow(FileTypesWindow* target, BMimeType& mimeType,
 	typeMenuField->SetAlignment(B_ALIGN_RIGHT);
 	// we must set the color manually when adding a menuField directly
 	// into a window.
-	typeMenuField->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	typeMenuField->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	typeMenuField->SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	fVisibleCheckBox = new BCheckBox("visible", B_TRANSLATE("Visible"),

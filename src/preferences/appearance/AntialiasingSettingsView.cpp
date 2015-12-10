@@ -26,6 +26,7 @@
 #include <String.h>
 #include <TextView.h>
 
+
 #include "APRWindow.h"
 
 #undef B_TRANSLATION_CONTEXT
@@ -115,24 +116,17 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 
 #ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
 	// subpixelAntialiasingDisabledLabel
-	BFont infoFont(*be_plain_font);
-	infoFont.SetFace(B_ITALIC_FACE);
-	rgb_color infoColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DARKEN_4_TINT);
 	// TODO: Replace with layout friendly constructor once available.
-	BRect textBounds = Bounds();
-	BTextView* subpixelAntialiasingDisabledLabel = new BTextView(
-		textBounds, "unavailable label", textBounds, &infoFont, &infoColor,
-		B_FOLLOW_NONE, B_WILL_DRAW | B_SUPPORTS_LAYOUT);
-	subpixelAntialiasingDisabledLabel->SetText(B_TRANSLATE(
+	fSubpixelAntialiasingDisabledLabel
+		= new BTextView("unavailable label");
+	fSubpixelAntialiasingDisabledLabel->SetText(B_TRANSLATE(
 		"Subpixel based anti-aliasing in combination with glyph hinting is not "
 		"available in this build of Haiku to avoid possible patent issues. To "
 		"enable this feature, you have to build Haiku yourself and enable "
 		"certain options in the libfreetype configuration header."));
-	subpixelAntialiasingDisabledLabel->SetViewColor(
-		ui_color(B_PANEL_BACKGROUND_COLOR));
-	subpixelAntialiasingDisabledLabel->MakeEditable(false);
-	subpixelAntialiasingDisabledLabel->MakeSelectable(false);
+	fSubpixelAntialiasingDisabledLabel->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fSubpixelAntialiasingDisabledLabel->MakeEditable(false);
+	fSubpixelAntialiasingDisabledLabel->MakeSelectable(false);
 #endif // !FT_CONFIG_OPTION_SUBPIXEL_RENDERING
 
 	BLayoutBuilder::Grid<>(this, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
@@ -147,7 +141,7 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 
 #ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
 		// hinting+subpixel unavailable info
-		.Add(subpixelAntialiasingDisabledLabel, 0, 3, 2)
+		.Add(fSubpixelAntialiasingDisabledLabel, 0, 3, 2)
 #else
 		.Add(BSpaceLayoutItem::CreateGlue(), 0, 3, 2)
 #endif
@@ -157,6 +151,7 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	_SetCurrentAntialiasing();
 	_SetCurrentHinting();
 	_SetCurrentAverageWeight();
+	_UpdateColors();
 }
 
 
@@ -168,10 +163,10 @@ AntialiasingSettingsView::~AntialiasingSettingsView()
 void
 AntialiasingSettingsView::AttachedToWindow()
 {
-	if (Parent() != NULL)
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AdoptParentColors();
+
+	if (Parent() == NULL)
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fAntialiasingMenu->SetTargetForItems(this);
 	fHintingMenu->SetTargetForItems(this);
@@ -222,6 +217,12 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 			set_average_weight(fCurrentAverageWeight);
 
 			Window()->PostMessage(kMsgUpdate);
+			break;
+		}
+		case B_COLORS_UPDATED:
+		{
+			if (msg->HasColor(ui_color_name(B_PANEL_BACKGROUND_COLOR)))
+				_UpdateColors();
 			break;
 		}
 		default:
@@ -316,6 +317,23 @@ void
 AntialiasingSettingsView::_SetCurrentAverageWeight()
 {
 	fAverageWeightControl->SetValue(fCurrentAverageWeight);
+}
+
+
+void
+AntialiasingSettingsView::_UpdateColors()
+{
+#ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+	rgb_color infoColor = disable_color(ui_color(B_PANEL_BACKGROUND_COLOR),
+		ui_color(B_PANEL_TEXT_COLOR));
+
+	BFont font;
+	uint32 mode = 0;
+	fSubpixelAntialiasingDisabledLabel->GetFontAndColor(&font, &mode);
+	font.SetFace(B_ITALIC_FACE);
+	fSubpixelAntialiasingDisabledLabel->SetFontAndColor(&font, mode,
+		&infoColor);
+#endif
 }
 
 

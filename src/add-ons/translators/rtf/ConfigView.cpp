@@ -20,7 +20,7 @@
 ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 	: BView(frame, B_TRANSLATE("RTF-Translator Settings"), resize, flags)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BStringView *titleView = new BStringView("title",
 		B_TRANSLATE("Rich Text Format (RTF) translator"));

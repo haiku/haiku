@@ -431,7 +431,7 @@ GeneralView::GeneralView(GeneralAddon *addon, BRect frame)
 //		B_FOLLOW_NONE, 0);
 		// BControl automatically sets the view color when attached (we want that)
 	fAuthenticationView = new BView(rect, "authenticationView", B_FOLLOW_NONE, 0);
-	fAuthenticationView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fAuthenticationView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	rect = fAuthenticationView->Bounds();
 	rect.bottom = rect.top + 20;
 	fUsername = new BTextControl(rect, "username", kLabelName, NULL, NULL);

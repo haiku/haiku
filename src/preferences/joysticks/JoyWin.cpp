@@ -88,7 +88,7 @@ JoyWin::JoyWin(BRect frame, const char *title)
 		B_WILL_DRAW | B_FRAME_EVENTS | B_FULL_UPDATE_ON_RESIZE,
 		B_PLAIN_BORDER);
 
-	box->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	box->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// Add listViews with their scrolls
 	box->AddChild(new BScrollView("PortScroll", fGamePortL,

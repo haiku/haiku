@@ -65,8 +65,7 @@ DateTimeView::~DateTimeView()
 void
 DateTimeView::AttachedToWindow()
 {
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
+	AdoptParentColors();
 
 	if (!fInitialized) {
 		fInitialized = true;

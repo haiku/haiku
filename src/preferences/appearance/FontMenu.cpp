@@ -61,7 +61,6 @@
  		font.SetFamilyAndStyle(info.f_family, info.f_style);
  		font.SetSize(info.font_size);
  		SetFont(&font);
- 		SetViewColor(info.background_color);
 		InvalidateLayout();
 
 		// font style menus 		

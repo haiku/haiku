@@ -35,7 +35,7 @@ RefreshWindow::RefreshWindow(BPoint position, float current, float min, float ma
 	max = floorf(max);
 
 	BView* topView = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	topView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(topView);
 
 	BRect rect = Bounds().InsetByCopy(8, 8);

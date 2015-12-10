@@ -41,7 +41,7 @@ ServiceView::ServiceView(const char* name, const char* executable,
 
 	BTextView* descriptionView = new BTextView("description");
 	descriptionView->SetText(description);
-	descriptionView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	descriptionView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	descriptionView->MakeEditable(false);
 
 	fEnableButton = new BButton("toggler", B_TRANSLATE("Enable"),

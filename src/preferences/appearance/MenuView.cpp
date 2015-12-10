@@ -23,7 +23,7 @@
 MenuView::MenuView(BRect frame, const char *name, int32 resize, int32 flags)
 	: BView(frame, name, resize, flags)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	get_menu_info(&menuinfo);
 	revertinfo = menuinfo;

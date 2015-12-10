@@ -25,7 +25,7 @@ const char* kShortName2 = B_TRANSLATE_MARK("RAWTranslator Settings");
 ConfigView::ConfigView(uint32 flags)
 	: BView(kShortName2, flags)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BStringView *fTitle = new BStringView("title", B_TRANSLATE("RAW image translator"));
 	fTitle->SetFont(be_bold_font);

@@ -35,8 +35,7 @@ TTZDisplay::~TTZDisplay()
 void
 TTZDisplay::AttachedToWindow()
 {
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
+	AdoptParentColors();
 }
 
 

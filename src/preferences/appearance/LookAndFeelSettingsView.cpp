@@ -132,10 +132,10 @@ LookAndFeelSettingsView::~LookAndFeelSettingsView()
 void
 LookAndFeelSettingsView::AttachedToWindow()
 {
-	if (Parent() != NULL)
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AdoptParentColors();
+
+	if (Parent() == NULL)
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fDecorMenu->SetTargetForItems(this);
 	fDecorInfoButton->SetTarget(this);
@@ -325,6 +325,8 @@ LookAndFeelSettingsView::IsRevertable()
 void
 LookAndFeelSettingsView::Revert()
 {
-	_SetDecor(fSavedDecor);
-	_SetDoubleScrollBarArrows(fSavedDoubleArrowsValue);
+	if (IsRevertable()) {
+		_SetDecor(fSavedDecor);
+		_SetDoubleScrollBarArrows(fSavedDoubleArrowsValue);
+	}
 }

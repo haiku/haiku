@@ -57,7 +57,7 @@ PasswordWindow::_Setup()
 	float spacing = be_control_look->DefaultItemSpacing();
 
 	BView* topView = new BView("topView", B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	topView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	topView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 
 	BBox* networkBox = new BBox("networkBox");

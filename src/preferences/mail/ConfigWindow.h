@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012, Haiku Inc. All rights reserved.
+ * Copyright 2004-2015, Haiku Inc. All rights reserved.
  * Copyright 2001, Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -23,6 +23,7 @@ class BListView;
 class BButton;
 class BMenuField;
 class BMailSettings;
+class BTextView;
 class CenterContainer;
 
 
@@ -90,6 +91,7 @@ private:
 			BCheckBox*			fCheckMailCheckBox;
 			BTextControl*		fIntervalControl;
 			BMenuField*			fStatusModeField;
+			BTextView*			fHowToTextView;
 
 			bool				fSaveSettings;
 			BObjectList<BMailAccountSettings>	fAccounts;

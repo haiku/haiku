@@ -76,8 +76,8 @@ TIFFView::TIFFView(const char* name, uint32 flags,
 {
 	fSettings = settings;
 
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ViewColor());
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
 
 	fTitle = new BStringView("title", B_TRANSLATE("TIFF image translator"));
 	fTitle->SetFont(be_bold_font);

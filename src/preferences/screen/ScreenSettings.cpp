@@ -21,7 +21,8 @@ static const char* kSettingsFileName = "Screen_data";
 
 ScreenSettings::ScreenSettings()
 {
-	fWindowFrame.Set(-1, -1, 450, 250);
+	fWindowFrame.Set(0, 0, 450, 250);
+	BPoint offset;
 
 	BPath path;
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &path) == B_OK) {
@@ -29,8 +30,10 @@ ScreenSettings::ScreenSettings()
 
 		BFile file(path.Path(), B_READ_ONLY);
 		if (file.InitCheck() == B_OK)
-			file.Read(&fWindowFrame, sizeof(BRect));
+			file.Read(&offset, sizeof(BPoint));
 	}
+
+	fWindowFrame.OffsetBy(offset);
 }
 
 
@@ -42,9 +45,11 @@ ScreenSettings::~ScreenSettings()
 
 	path.Append(kSettingsFileName);
 
+	BPoint offset = fWindowFrame.LeftTop();
+
 	BFile file(path.Path(), B_WRITE_ONLY | B_CREATE_FILE);
 	if (file.InitCheck() == B_OK)
-		file.Write(&fWindowFrame, sizeof(BRect));
+		file.Write(&offset, sizeof(BPoint));
 }
 
 

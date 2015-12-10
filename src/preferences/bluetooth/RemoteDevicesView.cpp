@@ -41,7 +41,7 @@ using namespace Bluetooth;
 RemoteDevicesView::RemoteDevicesView(const char* name, uint32 flags)
  :	BView(name, flags)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	addButton = new BButton("add", B_TRANSLATE("Add" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgAddDevices));
@@ -66,7 +66,7 @@ RemoteDevicesView::RemoteDevicesView(const char* name, uint32 flags)
 	fDeviceList = new BListView("DeviceList", B_SINGLE_SELECTION_LIST);
 
 	fScrollView = new BScrollView("ScrollView", fDeviceList, 0, false, true);
-	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fScrollView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	SetLayout(new BGroupLayout(B_VERTICAL));
 

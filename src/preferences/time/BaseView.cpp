@@ -41,7 +41,8 @@ TTimeBaseView::Pulse()
 void
 TTimeBaseView::AttachedToWindow()
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
 }
 
 

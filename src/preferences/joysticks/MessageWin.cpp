@@ -21,7 +21,7 @@ MessageWin::MessageWin(BRect parentFrame, const char *title,
 	: BWindow(parentFrame ,title ,look ,feel, flags, workspace)
 {
 	fBox = new BBox(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW, B_PLAIN_BORDER);
-	fBox->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fBox->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fBox->SetLowColor(fBox->ViewColor());
 
     // Rects for the text view
@@ -32,7 +32,7 @@ MessageWin::MessageWin(BRect parentFrame, const char *title,
 
 	fText = new BTextView(outside, "message", insider, B_FOLLOW_NONE, B_WILL_DRAW);
 	fText->MakeEditable(false);
-	fText->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fText->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fText->SetLowColor(fText->ViewColor());
 
 	fBox->AddChild(fText);

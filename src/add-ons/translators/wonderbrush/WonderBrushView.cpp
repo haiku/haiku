@@ -51,7 +51,7 @@ WonderBrushView::WonderBrushView(const BRect &frame, const char *name,
 	:	BView(frame, name, resize, flags),
 		fSettings(settings)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BStringView *titleView = new BStringView("title",
 		B_TRANSLATE("WonderBrush image translator"));

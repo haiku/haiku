@@ -29,7 +29,7 @@ STXTView::STXTView(const BRect &frame, const char *name, uint32 resizeMode,
 	: BView(frame, name, resizeMode, flags)
 {
 	fSettings = settings;
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BStringView *titleView = new BStringView("title",
 		B_TRANSLATE("StyledEdit file translator"));

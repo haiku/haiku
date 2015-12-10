@@ -28,6 +28,9 @@
 #define B_TRANSLATION_CONTEXT "AutoConfigWindow"
 
 
+const float kSpacing = 10;
+
+
 AutoConfigWindow::AutoConfigWindow(BRect rect, ConfigWindow *parent)
 	:
 	BWindow(rect, B_TRANSLATE("Create new account"), B_TITLED_WINDOW_LOOK,
@@ -60,6 +63,10 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, ConfigWindow *parent)
 			.AddGlue()
 			.Add(fBackButton)
 			.Add(fNextButton);
+
+	// determine the proper height
+	float newHeight = fMainView->Frame().bottom + buttonHeight + kSpacing * 2;
+	ResizeBy(0, newHeight - Bounds().Height());
 
 	// Add a shortcut to close the window using Command-W
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));

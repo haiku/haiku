@@ -227,6 +227,8 @@ FormatSettingsView::FormatSettingsView()
 		.Add(BSpaceLayoutItem::CreateGlue(), 2, 1)
 		.View());
 
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(fUseLanguageStringsCheckBox)
 		.Add(fDateBox)

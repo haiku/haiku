@@ -35,7 +35,7 @@ ScreenCornerSelector::ScreenCornerSelector(BRect frame, const char* name,
 	fCurrentCorner(NO_CORNER),
 	fPreviousCorner(-1)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

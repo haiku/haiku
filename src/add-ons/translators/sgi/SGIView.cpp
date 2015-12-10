@@ -123,7 +123,7 @@ SGIView::SGIView(const char* name, uint32 flags, TranslatorSettings* settings)
 	infoView->SetWordWrap(false);
 	infoView->MakeEditable(false);
 	infoView->MakeResizable(true);
-	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	infoView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(B_USE_DEFAULT_SPACING)

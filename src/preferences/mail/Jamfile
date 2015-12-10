@@ -1,7 +1,7 @@
 SubDir HAIKU_TOP src preferences mail ;
 
 UsePublicHeaders [ FDirName add-ons mail_daemon ] ;
-UsePrivateHeaders mail ;
+UsePrivateHeaders interface mail ;
 
 SubDirHdrs [ FDirName $(HAIKU_TOP) headers os add-ons mail_daemon ] ;
 

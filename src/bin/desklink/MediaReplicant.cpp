@@ -32,6 +32,7 @@
 #include <Roster.h>
 #include <String.h>
 #include <StringView.h>
+#include <TextView.h>
 #include <ToolTip.h>
 #include <ToolTipManager.h>
 
@@ -57,23 +58,17 @@ static const char* kReplicantName = "MediaReplicant";
 static const char* kSettingsFile = "x-vnd.Haiku-desklink";
 
 
-class VolumeToolTip : public BToolTip {
+class VolumeToolTip : public BTextToolTip {
 public:
 	VolumeToolTip(int32 which = VOLUME_USE_MIXER)
 		:
+		BTextToolTip(""),
 		fWhich(which)
 	{
-		fView = new BStringView("", "");
 	}
 
 	virtual ~VolumeToolTip()
 	{
-		delete fView;
-	}
-
-	virtual BView* View() const
-	{
-		return fView;
 	}
 
 	virtual void AttachedToWindow()
@@ -91,17 +86,18 @@ public:
 		if (!Lock())
 			return;
 
+		BTextView* view = (BTextView*)View();
+
 		if (fMuteMessage.Length() != 0)
-			fView->SetText(fMuteMessage.String());
+			view->SetText(fMuteMessage.String());
 		else {
 			MixerControl control;
 			control.Connect(fWhich);
 
 			BString text;
 			text.SetToFormat(B_TRANSLATE("%g dB"), control.Volume());
-			fView->SetText(text.String());
+			view->SetText(text.String());
 		}
-
 		Unlock();
 	}
 
@@ -111,7 +107,6 @@ public:
 	}
 
 private:
-	BStringView*	fView;
 	int32			fWhich;
 	BString			fMuteMessage;
 };
@@ -211,9 +206,7 @@ MediaReplicant::Archive(BMessage* data, bool deep) const
 void
 MediaReplicant::AttachedToWindow()
 {
-	BView* parent = Parent();
-	if (parent)
-		SetViewColor(parent->ViewColor());
+	AdoptParentColors();
 
 	BView::AttachedToWindow();
 }

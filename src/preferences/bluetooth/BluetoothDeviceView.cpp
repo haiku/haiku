@@ -67,7 +67,7 @@ BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice,
 
 	fIcon = new BView(BRect(0, 0, 32 - 1, 32 - 1), "Icon", B_FOLLOW_ALL,
 		B_WILL_DRAW);
-	fIcon->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fIcon->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	SetBluetoothDevice(bDevice);
 

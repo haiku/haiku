@@ -55,7 +55,7 @@ ConfigView::ConfigView(TranslatorSettings* settings)
 	: BGroupView(B_TRANSLATE("WebPTranslator Settings"), B_VERTICAL),
 	fSettings(settings)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BStringView* title = new BStringView("title",
 		B_TRANSLATE("WebP image translator"));

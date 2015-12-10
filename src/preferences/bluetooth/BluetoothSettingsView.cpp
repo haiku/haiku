@@ -131,7 +131,7 @@ BluetoothSettingsView::AttachedToWindow()
 	if (Parent() != NULL)
 		SetViewColor(Parent()->ViewColor());
 	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fPolicyMenu->SetTargetForItems(this);
 	fClassMenu->SetTargetForItems(this);

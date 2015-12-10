@@ -54,7 +54,7 @@ CalibWin::CalibWin(BRect frame,const char *title, window_look look,
 
 	fView = new BView(Bounds(),"View3", B_FOLLOW_NONE,B_WILL_DRAW);
 
-	fView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// Adding object
   	fBox->AddChild(fStringView3);

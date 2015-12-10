@@ -184,7 +184,7 @@ class BitmapView : public BView {
 
 		virtual void AttachedToWindow()
 		{
-			SetViewColor(Parent()->ViewColor());
+			AdoptParentColors();
 		}
 
 		virtual void Draw(BRect updateRect)
@@ -229,7 +229,7 @@ ConfigWindow::ConfigWindow()
 	fConfigView = new BView(NULL, 0);
 	fConfigView->SetLayout(new BGroupLayout(B_VERTICAL));
 	fConfigView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
-	fConfigView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fConfigView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BScrollView* scroller = new BScrollView(NULL, fAccountsListView, 0,
 		false, true);
@@ -370,26 +370,34 @@ ConfigWindow::_BuildHowToView()
 		}
 	}
 
-	BTextView* text = new BTextView(NULL, B_WILL_DRAW);
-	text->SetAlignment(B_ALIGN_CENTER);
-	text->SetText(B_TRANSLATE(
+	fHowToTextView = new BTextView(NULL, B_WILL_DRAW);
+	fHowToTextView->SetAlignment(B_ALIGN_CENTER);
+	fHowToTextView->SetText(B_TRANSLATE(
 		"Create a new account with the Add button.\n\n"
 		"Remove an account with the Remove button on the selected item.\n\n"
 		"Select an item in the list to change its settings."));
-	text->MakeEditable(false);
-	text->MakeSelectable(false);
-	float fontFactor = be_plain_font->Size() / 12.0f;
-	text->SetExplicitPreferredSize(BSize(300 * fontFactor,400 * fontFactor));
+
+	fHowToTextView->MakeEditable(false);
+	fHowToTextView->MakeSelectable(false);
+
+	BFont font(be_plain_font);
+	float fontFactor = font.Size() / 12.0f;
+
+	fHowToTextView->SetExplicitPreferredSize(
+		BSize(300 * fontFactor,400 * fontFactor));
+
+	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+	fHowToTextView->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 
 	BLayoutBuilder::Group<>(groupView, B_VERTICAL)
 		.AddGlue()
-		.Add(text)
+		.Add(fHowToTextView)
 		.AddGlue();
 
 	if (bitmapView != NULL)
 		groupView->GetLayout()->AddView(1, bitmapView);
 
-	text->SetViewColor(groupView->ViewColor());
+	fHowToTextView->AdoptSystemColors();
 
 	return groupView;
 }
@@ -517,6 +525,17 @@ ConfigWindow::MessageReceived(BMessage *msg)
 
 	AutoConfigWindow *autoConfigWindow = NULL;
 	switch (msg->what) {
+		case B_COLORS_UPDATED:
+		{
+			rgb_color textColor;
+			if (msg->FindColor(ui_color_name(B_PANEL_TEXT_COLOR), &textColor)
+					== B_OK) {
+				BFont font;
+				fHowToTextView->SetFontAndColor(&font, 0, &textColor);
+			}
+			break;
+		}
+
 		case kMsgAccountsRightClicked:
 		{
 			BPoint point;
