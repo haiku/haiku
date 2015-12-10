@@ -56,6 +56,7 @@ Server app_server :
 	CursorData.cpp
 	CursorManager.cpp
 	CursorSet.cpp
+	DelayedMessage.cpp
 	Desktop.cpp
 	DesktopListener.cpp
 	DesktopSettings.cpp

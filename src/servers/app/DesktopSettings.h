@@ -1,10 +1,11 @@
 /*
- * Copyright 2001-2013, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 #ifndef DESKTOP_SETTINGS_H
 #define DESKTOP_SETTINGS_H
@@ -13,6 +14,8 @@
 #include <InterfaceDefs.h>
 #include <Menu.h>
 #include <Message.h>
+
+#include <ServerProtocolStructs.h>
 
 
 class Desktop;
@@ -97,8 +100,8 @@ public:
 
 			void				SetShowAllDraggers(bool show);
 
-			void				SetUIColor(color_which which,
-									const rgb_color color);
+			void				SetUIColors(const BMessage& colors,
+									bool* changed = NULL);
 
 			void				SetSubpixelAntialiasing(bool subpix);
 			void				SetHinting(uint8 hinting);

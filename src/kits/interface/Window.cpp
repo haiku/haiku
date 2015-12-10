@@ -47,6 +47,7 @@
 #include <PortLink.h>
 #include <RosterPrivate.h>
 #include <ServerProtocol.h>
+#include <ServerProtocolStructs.h>
 #include <TokenSpace.h>
 #include <ToolTipManager.h>
 #include <ToolTipWindow.h>
@@ -733,7 +734,7 @@ BWindow::MessageReceived(BMessage* message)
 				// we're talking to the server application using our own
 				// communication channel (fLink) - we better make sure no one
 				// interferes by locking that channel (which AppServerLink does
-				// implicetly)
+				// implicitly)
 
 			fLink->StartMessage(AS_CREATE_WINDOW);
 
@@ -1436,6 +1437,20 @@ FrameMoved(origin);
 		case B_LAYOUT_WINDOW:
 		{
 			Layout(false);
+			break;
+		}
+
+		case B_COLORS_UPDATED:
+		{
+			fTopView->_ColorsUpdated(message);
+			target->MessageReceived(message);
+			break;
+		}
+
+		case B_FONTS_UPDATED:
+		{
+			fTopView->_FontsUpdated(message);
+			target->MessageReceived(message);
 			break;
 		}
 
@@ -2699,6 +2714,10 @@ BWindow::Run()
 void
 BWindow::SetLayout(BLayout* layout)
 {
+	// Adopt layout's colors for fTopView
+	if (layout != NULL)
+		fTopView->AdoptViewColors(layout->View());
+
 	fTopView->SetLayout(layout);
 }
 
@@ -2724,6 +2743,13 @@ BWindow::Layout(bool force)
 
 	// Do the actual layout
 	fTopView->Layout(force);
+}
+
+
+bool
+BWindow::IsOffscreenWindow() const
+{
+	return fOffscreen;
 }
 
 
@@ -3205,8 +3231,7 @@ BWindow::_CreateTopView()
 
 	BRect frame = fFrame.OffsetToCopy(B_ORIGIN);
 	// TODO: what to do here about std::nothrow?
-	fTopView = new BView(frame, "fTopView",
-		B_FOLLOW_ALL, B_WILL_DRAW);
+	fTopView = new BView(frame, "fTopView", B_FOLLOW_ALL, B_WILL_DRAW);
 	fTopView->fTopLevelView = true;
 
 	//inhibit check_lock()
@@ -3222,7 +3247,6 @@ BWindow::_CreateTopView()
 
 	// we can't use AddChild() because this is the top view
 	fTopView->_CreateSelf();
-
 	STRACE(("BuildTopView ended\n"));
 }
 

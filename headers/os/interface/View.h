@@ -107,6 +107,7 @@ inline uint32 _rule_(uint32 r1, uint32 r2, uint32 r3, uint32 r4)
 #define B_FOLLOW_TOP_BOTTOM	_rule_(_VIEW_TOP_, 0, _VIEW_BOTTOM_, 0)
 #define B_FOLLOW_V_CENTER	_rule_(_VIEW_CENTER_, 0, _VIEW_CENTER_, 0)
 
+#define B_FOLLOW_LEFT_TOP	B_FOLLOW_TOP | B_FOLLOW_LEFT
 
 class BBitmap;
 class BCursor;
@@ -242,32 +243,38 @@ public:
 			void				SetViewCursor(const BCursor* cursor,
 									bool sync = true);
 
+			bool				HasDefaultColors() const;
+			bool				HasSystemColors() const;
+			void				AdoptParentColors();
+			void				AdoptSystemColors();
+			void				AdoptViewColors(BView* view);
+
 	virtual	void				SetViewColor(rgb_color color);
 			void				SetViewColor(uchar red, uchar green, uchar blue,
 									uchar alpha = 255);
 			rgb_color			ViewColor() const;
 
+			void				SetViewUIColor(color_which which,
+									float tint = B_NO_TINT);
+			color_which			ViewUIColor(float* tint = NULL) const;
+
 			void				SetViewBitmap(const BBitmap* bitmap,
 									BRect srcRect, BRect dstRect,
-									uint32 followFlags
-										= B_FOLLOW_TOP | B_FOLLOW_LEFT,
+									uint32 followFlags = B_FOLLOW_LEFT_TOP,
 									uint32 options = B_TILE_BITMAP);
 			void				SetViewBitmap(const BBitmap* bitmap,
-									uint32 followFlags
-										= B_FOLLOW_TOP | B_FOLLOW_LEFT,
+									uint32 followFlags = B_FOLLOW_LEFT_TOP,
 									uint32 options = B_TILE_BITMAP);
 			void				ClearViewBitmap();
 
 			status_t			SetViewOverlay(const BBitmap* overlay,
 									BRect srcRect, BRect dstRect,
 									rgb_color* colorKey,
-									uint32 followFlags
-										= B_FOLLOW_TOP | B_FOLLOW_LEFT,
+									uint32 followFlags = B_FOLLOW_LEFT_TOP,
 									uint32 options = 0);
 			status_t			SetViewOverlay(const BBitmap* overlay,
 									rgb_color* colorKey,
-									uint32 followFlags
-										= B_FOLLOW_TOP | B_FOLLOW_LEFT,
+									uint32 followFlags = B_FOLLOW_LEFT_TOP,
 									uint32 options = 0);
 			void				ClearViewOverlay();
 
@@ -276,10 +283,18 @@ public:
 									uchar alpha = 255);
 			rgb_color			HighColor() const;
 
+			void				SetHighUIColor(color_which which,
+									float tint = B_NO_TINT);
+			color_which			HighUIColor(float* tint = NULL) const;
+
 	virtual	void				SetLowColor(rgb_color color);
 			void				SetLowColor(uchar red, uchar green, uchar blue,
 									uchar alpha = 255);
 			rgb_color			LowColor() const;
+
+			void				SetLowUIColor(color_which which,
+									float tint = B_NO_TINT);
+			color_which			LowUIColor(float* tint = NULL) const;
 
 			void				SetLineMode(cap_mode lineCap,
 									join_mode lineJoin,
@@ -495,6 +510,9 @@ public:
 			void				Invalidate(BRect invalRect);
 			void				Invalidate(const BRegion* invalRegion);
 			void				Invalidate();
+			void				DelayedInvalidate(bigtime_t delay);
+			void				DelayedInvalidate(bigtime_t delay,
+									BRect invalRect);
 
 			void				SetDiskMode(char* filename, long offset);
 
@@ -691,9 +709,11 @@ private:
 
 			void				_Activate(bool state);
 			void				_Attach();
+			void				_ColorsUpdated(BMessage* message);
 			void				_Detach();
 			void				_Draw(BRect screenUpdateRect);
 			void				_DrawAfterChildren(BRect screenUpdateRect);
+			void				_FontsUpdated(BMessage*);
 			void				_Pulse();
 
 			void				_UpdateStateForRemove();

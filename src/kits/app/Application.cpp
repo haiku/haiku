@@ -1044,6 +1044,8 @@ BApplication::DispatchMessage(BMessage* message, BHandler* handler)
 		return;
 	}
 
+	message->PrintToStream();
+
 	switch (message->what) {
 		case B_ARGV_RECEIVED:
 			_ArgvReceived(message);
@@ -1099,6 +1101,23 @@ BApplication::DispatchMessage(BMessage* message, BHandler* handler)
 			bool active;
 			if (message->FindBool("active", &active) == B_OK)
 				AppActivated(active);
+			break;
+		}
+
+		case B_COLORS_UPDATED:
+		{
+			AutoLocker<BLooperList> listLock(gLooperList);
+			if (!listLock.IsLocked())
+				break;
+
+			BWindow* window = NULL;
+			uint32 count = gLooperList.CountLoopers();
+			for (uint32 index = 0; index < count; ++index) {
+				window = dynamic_cast<BWindow*>(gLooperList.LooperAt(index));
+				if (window == NULL || (window != NULL && window->fOffscreen))
+					continue;
+				window->PostMessage(message);
+			}
 			break;
 		}
 

@@ -1078,6 +1078,7 @@
 	\since BeOS R3
 */
 
+
 /*!
 	\fn status_t BMessage::AddFloat(const char* name, float aFloat)
 	\brief Convenience method to add a \c float to the label \a name.
@@ -1115,6 +1116,26 @@
 	\see ReplaceDouble()
 
 	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BMessage::AddColor(const char* name, rgb_color aColor)
+	\brief Convenience method to add a \c rgb_color to the label \a name.
+
+	This method calls AddData() with the \c B_RGB_32_BIT_TYPE \a type.
+
+	\param name The label to associate the data with.
+	\param aColor The value to store in the message.
+
+	\returns A status code, \c B_OK on success or an error code.
+
+	\see AddColor() for a more detailed overview of the inner workings.
+	\see FindColor()
+	\see GetColor()
+	\see ReplaceColor()
+
+	\since Haiku R1
 */
 
 
@@ -1808,6 +1829,48 @@
 
 
 /*!
+	\fn status_t BMessage::FindColor(const char* name, rgb_color* value)
+	\brief Find a color with the label \a name.
+
+	This is an overloaded version of
+	FindColor(const char*, int32, rgb_color*) const
+	where the data is sought at \a index \c 0.
+
+	\param name The label to which the data is associated.
+	\param value The object in which the data should be copied.
+
+	\returns A status code, \c B_OK on success or an error code.
+	\retval B_OK The object now contains the requested data.
+	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BMessage::FindColor(const char* name, int32 index,
+		rgb_color* value) const
+	\brief Find a color at the label \a name at an \a index.
+
+	This method looks for the data with the \c B_RGB_32_BIT_TYPE, and copies
+	it into a provided buffer.
+
+	\param name The label to which the data is associated.
+	\param index The index from which the data should be copied.
+	\param value The object in which the data should be copied.
+
+	\returns A status code, \c B_OK on success or an error code.
+	\retval B_OK The object now contains the requested data.
+	\retval B_BAD_INDEX The \a index does not exist.
+	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\see FindColor(const char*, rgb_color*) const
+
+	\since BeOS R3
+*/
+
+
+/*!
 	\fn status_t BMessage::FindPointer(const char* name, void** pointer) const
 	\brief Find a pointer at the label \a name.
 
@@ -1849,7 +1912,7 @@
 	\retval B_BAD_INDEX The \a index does not exist.
 	\retval B_NAME_NOT_FOUND There is no field with this \a name.
 
-	\see FindPointer(const char*, double*) const
+	\see FindPointer(const char*, void*) const
 
 	\since BeOS R3
 */
@@ -2566,6 +2629,49 @@
 	\see ReplaceDouble(const char*, double)
 
 	\since BeOS R3
+*/
+
+
+/*!
+	\fn status_t BMessage::ReplaceColor(const char* name, rgb_color aColot)
+	\brief Replace a color at the label \a name.
+
+	This method is an overloaded method of
+	ReplaceColor(const char*, int32, rgb_color).
+	It replaces the data at \a index \c 0.
+
+	\param name The name associated with the data to replace.
+	\param aColor Where to store in the message.
+
+	\returns A status code, \c B_OK on success or an error code.
+	\retval B_OK The operation succeeded.
+	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn status_t BMessage::ReplaceColor(const char* name, int32 index,
+		rgb_color aColor)
+	\brief Replace a rgb_color at the label \a name at a specified
+	       \a index.
+
+	The data at the specified \a name and \a index will be replaced, if it
+	matches the \c B_RGB_32_BIT_TYPE.
+
+	\param name The name associated with the data to replace.
+	\param index The index in the array to replace.
+	\param aColor Where to store in the message.
+
+	\returns A status code, \c B_OK on success or an error code.
+	\retval B_OK The operation succeeded.
+	\retval B_BAD_INDEX The index was out of range.
+	\retval B_NAME_NOT_FOUND There is no field with this \a name.
+
+	\see ReplaceColor(const char*, rgb_color)
+
+	\since Haiku R1
 */
 
 
@@ -3500,6 +3606,38 @@ bool enabled = GetBool("enabled", false);
 	\fn double BMessage::GetDouble(const char* name, int32 index,
 		double defaultValue) const
 	\brief Return the double value from message with \a name and \a index, or
+	       \a defaultValue if not found.
+
+	\param name The name of the item to retrieve.
+	\param index The index of the item to retrieve if there is more than one.
+	\param defaultValue The value to use if the item specified by \a name
+	       is not found.
+
+	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn rgb_color BMessage::GetColor(const char* name, rgb_color defaultValue) const
+	\brief Return the rgb_color value from message with \a name, or
+	       \a defaultValue if not found.
+
+	\param name The name of the item to retrieve.
+	\param defaultValue The value to use if the item specified by \a name
+	       is not found.
+
+	\return The item with \a name, or \a defaultValue if not found.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn rgb_color BMessage::GetColor(const char* name, int32 index,
+		rgb_colorr defaultValue) const
+	\brief Return the rgb_color value from message with \a name and \a index, or
 	       \a defaultValue if not found.
 
 	\param name The name of the item to retrieve.

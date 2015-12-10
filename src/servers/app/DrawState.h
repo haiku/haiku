@@ -8,6 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
  *		Julian Harnath <julian.harnath@rwth-aachen.de>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 #ifndef _DRAW_STATE_H_
 #define _DRAW_STATE_H_
@@ -100,6 +101,12 @@ public:
 		rgb_color			LowColor() const
 								{ return fLowColor; }
 
+		void				SetHighUIColor(color_which which, float tint);
+		color_which			HighUIColor(float* tint) const;
+
+		void				SetLowUIColor(color_which which, float tint);
+		color_which			LowUIColor(float* tint) const;
+
 		void				SetPattern(const Pattern& pattern);
 		const Pattern&		GetPattern() const
 								{ return fPattern; }
@@ -175,6 +182,11 @@ protected:
 
 		rgb_color			fHighColor;
 		rgb_color			fLowColor;
+
+		color_which			fWhichHighColor;
+		color_which			fWhichLowColor;
+		float				fWhichHighColorTint;
+		float				fWhichLowColorTint;
 		Pattern				fPattern;
 
 		drawing_mode		fDrawingMode;

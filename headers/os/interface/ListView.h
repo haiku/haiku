@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _LIST_VIEW_H
@@ -26,8 +26,7 @@ public:
 								BListView(BRect frame, const char* name,
 									list_view_type type
 										= B_SINGLE_SELECTION_LIST,
-									uint32 resizeMask = B_FOLLOW_LEFT
-										| B_FOLLOW_TOP,
+									uint32 resizeMask = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW
 										| B_FRAME_EVENTS | B_NAVIGABLE);
 								BListView(const char* name,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -12,6 +12,7 @@
  *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  *		Philippe Saint-Pierre, stpere@gmail.com
  *		Wim van der Meer, <WPJvanderMeer@gmail.com>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 
@@ -2813,25 +2814,6 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
-		case AS_SET_UI_COLOR:
-		{
-			STRACE(("ServerApp %s: Set UI Color\n", Signature()));
-
-			// Attached Data:
-			// 1) color_which which
-			// 2) rgb_color color
-
-			color_which which;
-			rgb_color color;
-
-			link.Read<color_which>(&which);
-			if (link.Read<rgb_color>(&color) == B_OK) {
-				LockedDesktopSettings settings(fDesktop);
-				settings.SetUIColor(which, color);
-			}
-			break;
-		}
-
 		case AS_GET_ACCELERANT_INFO:
 		{
 			STRACE(("ServerApp %s: get accelerant info\n", Signature()));
@@ -3204,7 +3186,7 @@ ServerApp::_MessageLooper()
 		STRACE(("info: ServerApp::_MessageLooper() listening on port %" B_PRId32
 			".\n", fMessagePort));
 
-		err = receiver.GetNextMessage(code, B_INFINITE_TIMEOUT);
+		err = receiver.GetNextMessage(code);
 		if (err != B_OK || code == B_QUIT_REQUESTED) {
 			STRACE(("ServerApp: application seems to be gone...\n"));
 

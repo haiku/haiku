@@ -10,6 +10,7 @@
  *		Marcus Overhagen <marcus@overhagen.de>
  *		Adrien Destugues <pulkomandy@pulkomandy.tk
  *		Julian Harnath <julian.harnath@rwth-aachen.de>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 #include "View.h"
 
@@ -90,6 +91,8 @@ View::View(IntRect frame, IntPoint scrollingOffset, const char* name,
 	fScrollingOffset(scrollingOffset),
 
 	fViewColor((rgb_color){ 255, 255, 255, 255 }),
+	fWhichViewColor(B_NO_COLOR),
+	fWhichViewColorTint(B_NO_TINT),
 	fViewBitmap(NULL),
 	fBitmapResizingMode(0),
 	fBitmapOptions(0),
@@ -433,6 +436,21 @@ View::FindViews(uint32 flags, BObjectList<View>& list, int32& left)
 		if (left == 0)
 			break;
 	}
+}
+
+
+bool
+View::HasView(View* view)
+{
+	if (view == this)
+		return true;
+
+	for (View* child = FirstChild(); child; child = child->NextSibling()) {
+		if (child->HasView(view))
+			return true;
+	}
+
+	return false;
 }
 
 
@@ -901,6 +919,54 @@ View::CopyBits(IntRect src, IntRect dst, BRegion& windowContentClipping)
 
 	fWindow->RecycleRegion(dirty);
 	fWindow->RecycleRegion(copyRegion);
+}
+
+
+// #pragma mark -
+
+
+void
+View::ColorUpdated(color_which which, rgb_color color)
+{
+	float tint = B_NO_TINT;
+
+	if (fWhichViewColor == which)
+		SetViewColor(tint_color(color, fWhichViewColorTint));
+
+	if (CurrentState()->HighUIColor(&tint) == which)
+		CurrentState()->SetHighColor(tint_color(color, tint));
+
+	if (CurrentState()->LowUIColor(&tint) == which)
+		CurrentState()->SetLowColor(tint_color(color, tint));
+
+	for (View* child = FirstChild(); child != NULL;
+			child = child->NextSibling()) {
+
+		child->ColorUpdated(which, color);
+	}
+}
+
+
+void
+View::SetViewUIColor(color_which which, float tint)
+{
+	if (which != B_NO_COLOR) {
+		DesktopSettings settings(fWindow->Desktop());
+		SetViewColor(tint_color(settings.UIColor(which), tint));
+	}
+
+	fWhichViewColor = which;
+	fWhichViewColorTint = tint;
+}
+
+
+color_which
+View::ViewUIColor(float* tint)
+{
+	if (tint != NULL)
+		*tint = fWhichViewColorTint;
+
+	return fWhichViewColor;
 }
 
 

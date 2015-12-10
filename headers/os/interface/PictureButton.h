@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _PICTURE_BUTTON_H
@@ -22,8 +22,7 @@ public:
 									BPicture* off, BPicture* on,
 									BMessage* message,
 									uint32 behavior = B_ONE_STATE_BUTTON,
-									uint32 resizingMode = B_FOLLOW_LEFT
-										| B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT_TOP,
 									uint32 flgs = B_WILL_DRAW | B_NAVIGABLE);
 								BPictureButton(BMessage* archive);
 

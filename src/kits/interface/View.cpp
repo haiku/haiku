@@ -8,6 +8,7 @@
  *		Adrian Oanca, adioanca@cotty.iren.ro
  *		Ingo Weinhold. ingo_weinhold@gmx.de
  *		Julian Harnath, julian.harnath@rwth-aachen.de
+ *		Joseph Groover, looncraz@looncraz.net
  */
 
 
@@ -141,6 +142,14 @@ ViewState::ViewState()
 	high_color = (rgb_color){ 0, 0, 0, 255 };
 	low_color = (rgb_color){ 255, 255, 255, 255 };
 	view_color = low_color;
+	which_view_color = B_NO_COLOR;
+	which_view_color_tint = B_NO_TINT;
+
+	which_high_color = B_NO_COLOR;
+	which_high_color_tint = B_NO_TINT;
+
+	which_low_color = B_NO_COLOR;
+	which_low_color_tint = B_NO_TINT;
 
 	pattern = B_SOLID_HIGH;
 	drawing_mode = B_OP_COPY;
@@ -220,6 +229,10 @@ ViewState::UpdateServerState(BPrivate::PortLink &link)
 	info.penSize = pen_size;
 	info.highColor = high_color;
 	info.lowColor = low_color;
+	info.whichHighColor = which_high_color;
+	info.whichLowColor = which_low_color;
+	info.whichHighColorTint = which_high_color_tint;
+	info.whichLowColorTint = which_low_color_tint;
 	info.pattern = pattern;
 	info.drawingMode = drawing_mode;
 	info.origin = origin;
@@ -456,13 +469,36 @@ BView::BView(BMessage* archive)
 			| B_FONT_SHEAR | B_FONT_ROTATION);
 	}
 
-	int32 color;
+	int32 color = 0;
 	if (archive->FindInt32("_color", 0, &color) == B_OK)
 		SetHighColor(get_rgb_color(color));
 	if (archive->FindInt32("_color", 1, &color) == B_OK)
 		SetLowColor(get_rgb_color(color));
 	if (archive->FindInt32("_color", 2, &color) == B_OK)
 		SetViewColor(get_rgb_color(color));
+
+	float tint = B_NO_TINT;
+	if (archive->FindInt32("_uicolor", 0, &color) == B_OK
+		&& color != B_NO_COLOR) {
+		if (archive->FindFloat("_uitint", 0, &tint) != B_OK)
+			tint = B_NO_TINT;
+
+		SetHighUIColor((color_which)color, tint);
+	}
+	if (archive->FindInt32("_uicolor", 1, &color) == B_OK
+		&& color != B_NO_COLOR) {
+		if (archive->FindFloat("_uitint", 1, &tint) != B_OK)
+			tint = B_NO_TINT;
+
+		SetLowUIColor((color_which)color, tint);
+	}
+	if (archive->FindInt32("_uicolor", 2, &color) == B_OK
+		&& color != B_NO_COLOR) {
+		if (archive->FindFloat("_uitint", 2, &tint) != B_OK)
+			tint = B_NO_TINT;
+
+		SetViewUIColor((color_which)color, tint);
+	}
 
 	uint32 evMask;
 	uint32 options;
@@ -594,6 +630,20 @@ BView::Archive(BMessage* data, bool deep) const
 		ret = data->AddInt32("_color", get_uint32_color(LowColor()));
 	if (ret == B_OK)
 		ret = data->AddInt32("_color", get_uint32_color(ViewColor()));
+
+	if (ret == B_OK)
+		ret = data->AddInt32("_uicolor", (int32)HighUIColor());
+	if (ret == B_OK)
+		ret = data->AddInt32("_uicolor", (int32)LowUIColor());
+	if (ret == B_OK)
+		ret = data->AddInt32("_uicolor", (int32)ViewUIColor());
+
+	if (ret == B_OK)
+		ret = data->AddFloat("_uitint", fState->which_high_color_tint);
+	if (ret == B_OK)
+		ret = data->AddFloat("_uitint", fState->which_low_color_tint);
+	if (ret == B_OK)
+		ret = data->AddFloat("_uitint", fState->which_view_color_tint);
 
 //	NOTE: we do not use this flag any more
 //	if ( 1 ){
@@ -2304,6 +2354,8 @@ BView::PenSize() const
 void
 BView::SetHighColor(rgb_color color)
 {
+	SetHighUIColor(B_NO_COLOR);
+
 	// are we up-to-date already?
 	if (fState->IsValid(B_VIEW_HIGH_COLOR_BIT)
 		&& fState->high_color == color)
@@ -2346,8 +2398,72 @@ BView::HighColor() const
 
 
 void
+BView::SetHighUIColor(color_which which, float tint)
+{
+	if (fState->IsValid(B_VIEW_WHICH_HIGH_COLOR_BIT)
+		&& fState->which_high_color == which
+		&& fState->which_high_color_tint == tint)
+		return;
+
+	if (fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_SET_HIGH_UI_COLOR);
+		fOwner->fLink->Attach<color_which>(which);
+		fOwner->fLink->Attach<float>(tint);
+
+		fState->valid_flags |= B_VIEW_WHICH_HIGH_COLOR_BIT;
+	}
+
+	fState->which_high_color = which;
+	fState->which_high_color_tint = tint;
+
+	if (which != B_NO_COLOR) {
+		fState->archiving_flags |= B_VIEW_WHICH_HIGH_COLOR_BIT;
+		fState->archiving_flags &= ~B_VIEW_HIGH_COLOR_BIT;
+		fState->valid_flags |= B_VIEW_HIGH_COLOR_BIT;
+
+		fState->high_color = tint_color(ui_color(which), tint);
+	} else {
+		fState->valid_flags &= ~B_VIEW_HIGH_COLOR_BIT;
+		fState->archiving_flags &= ~B_VIEW_WHICH_HIGH_COLOR_BIT;
+	}
+}
+
+
+color_which
+BView::HighUIColor(float* tint) const
+{
+	if (!fState->IsValid(B_VIEW_WHICH_HIGH_COLOR_BIT)
+		&& fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_GET_HIGH_UI_COLOR);
+
+		int32 code;
+		if (fOwner->fLink->FlushWithReply(code) == B_OK
+			&& code == B_OK) {
+			fOwner->fLink->Read<color_which>(&fState->which_high_color);
+			fOwner->fLink->Read<float>(&fState->which_high_color_tint);
+			fOwner->fLink->Read<rgb_color>(&fState->high_color);
+
+			fState->valid_flags |= B_VIEW_WHICH_HIGH_COLOR_BIT;
+			fState->valid_flags |= B_VIEW_HIGH_COLOR_BIT;
+		}
+	}
+
+	if (tint != NULL)
+		*tint = fState->which_high_color_tint;
+
+	return fState->which_high_color;
+}
+
+
+void
 BView::SetLowColor(rgb_color color)
 {
+	SetLowUIColor(B_NO_COLOR);
+
 	if (fState->IsValid(B_VIEW_LOW_COLOR_BIT)
 		&& fState->low_color == color)
 		return;
@@ -2389,9 +2505,150 @@ BView::LowColor() const
 
 
 void
+BView::SetLowUIColor(color_which which, float tint)
+{
+	if (fState->IsValid(B_VIEW_WHICH_LOW_COLOR_BIT)
+		&& fState->which_low_color == which
+		&& fState->which_low_color_tint == tint)
+		return;
+
+	if (fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_SET_LOW_UI_COLOR);
+		fOwner->fLink->Attach<color_which>(which);
+		fOwner->fLink->Attach<float>(tint);
+
+		fState->valid_flags |= B_VIEW_WHICH_LOW_COLOR_BIT;
+	}
+
+	fState->which_low_color = which;
+	fState->which_low_color_tint = tint;
+
+	if (which != B_NO_COLOR) {
+		fState->archiving_flags |= B_VIEW_WHICH_LOW_COLOR_BIT;
+		fState->archiving_flags &= ~B_VIEW_LOW_COLOR_BIT;
+		fState->valid_flags |= B_VIEW_LOW_COLOR_BIT;
+
+		fState->low_color = tint_color(ui_color(which), tint);
+	} else {
+		fState->valid_flags &= ~B_VIEW_LOW_COLOR_BIT;
+		fState->archiving_flags &= ~B_VIEW_WHICH_LOW_COLOR_BIT;
+	}
+}
+
+
+color_which
+BView::LowUIColor(float* tint) const
+{
+	if (!fState->IsValid(B_VIEW_WHICH_LOW_COLOR_BIT)
+		&& fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_GET_LOW_UI_COLOR);
+
+		int32 code;
+		if (fOwner->fLink->FlushWithReply(code) == B_OK
+			&& code == B_OK) {
+			fOwner->fLink->Read<color_which>(&fState->which_low_color);
+			fOwner->fLink->Read<float>(&fState->which_low_color_tint);
+			fOwner->fLink->Read<rgb_color>(&fState->low_color);
+
+			fState->valid_flags |= B_VIEW_WHICH_LOW_COLOR_BIT;
+			fState->valid_flags |= B_VIEW_LOW_COLOR_BIT;
+		}
+	}
+
+	if (tint != NULL)
+		*tint = fState->which_low_color_tint;
+
+	return fState->which_low_color;
+}
+
+
+bool
+BView::HasDefaultColors() const
+{
+	// If we don't have any of these flags, then we have default colors
+	uint32 testMask = B_VIEW_VIEW_COLOR_BIT | B_VIEW_HIGH_COLOR_BIT
+		| B_VIEW_LOW_COLOR_BIT | B_VIEW_WHICH_VIEW_COLOR_BIT
+		| B_VIEW_WHICH_HIGH_COLOR_BIT | B_VIEW_WHICH_LOW_COLOR_BIT;
+
+	return (fState->archiving_flags & testMask) == 0;
+}
+
+
+bool
+BView::HasSystemColors() const
+{
+	return fState->which_view_color == B_PANEL_BACKGROUND_COLOR
+		&& fState->which_high_color == B_PANEL_TEXT_COLOR
+		&& fState->which_low_color == B_PANEL_BACKGROUND_COLOR
+		&& fState->which_view_color_tint == B_NO_TINT
+		&& fState->which_high_color_tint == B_NO_TINT
+		&& fState->which_low_color_tint == B_NO_TINT;
+}
+
+
+void
+BView::AdoptParentColors()
+{
+	AdoptViewColors(Parent());
+}
+
+
+void
+BView::AdoptSystemColors()
+{
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
+}
+
+
+void
+BView::AdoptViewColors(BView* view)
+{
+	if (view == NULL || !view->LockLooper())
+		return;
+
+	float tint = B_NO_TINT;
+	float viewTint = tint;
+	color_which viewWhich = view->ViewUIColor(&viewTint);
+
+	// View color
+	if (viewWhich != B_NO_COLOR)
+		SetViewUIColor(viewWhich, viewTint);
+	else
+		SetViewColor(view->ViewColor());
+
+	// Low color
+	color_which which = view->LowUIColor(&tint);
+	if (which != B_NO_COLOR)
+		SetLowUIColor(which, tint);
+	else if (viewWhich != B_NO_COLOR)
+		SetLowUIColor(viewWhich, viewTint);
+	else
+		SetLowColor(view->LowColor());
+
+	// High color
+	which = view->HighUIColor(&tint);
+	if (which != B_NO_COLOR)
+		SetHighUIColor(which, tint);
+	else
+		SetHighColor(view->HighColor());
+
+	view->UnlockLooper();
+}
+
+
+void
 BView::SetViewColor(rgb_color color)
 {
-	if (fState->IsValid(B_VIEW_VIEW_COLOR_BIT) && fState->view_color == color)
+	SetViewUIColor(B_NO_COLOR);
+
+	if (fState->IsValid(B_VIEW_VIEW_COLOR_BIT)
+		&& fState->view_color == color)
 		return;
 
 	if (fOwner) {
@@ -2428,6 +2685,71 @@ BView::ViewColor() const
 	}
 
 	return fState->view_color;
+}
+
+
+void
+BView::SetViewUIColor(color_which which, float tint)
+{
+	if (fState->IsValid(B_VIEW_WHICH_VIEW_COLOR_BIT)
+		&& fState->which_view_color == which
+		&& fState->which_view_color_tint == tint)
+		return;
+
+	if (fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_SET_VIEW_UI_COLOR);
+		fOwner->fLink->Attach<color_which>(which);
+		fOwner->fLink->Attach<float>(tint);
+
+		fState->valid_flags |= B_VIEW_WHICH_VIEW_COLOR_BIT;
+	}
+
+	fState->which_view_color = which;
+	fState->which_view_color_tint = tint;
+
+	if (which != B_NO_COLOR) {
+		fState->archiving_flags |= B_VIEW_WHICH_VIEW_COLOR_BIT;
+		fState->archiving_flags &= ~B_VIEW_VIEW_COLOR_BIT;
+		fState->valid_flags |= B_VIEW_VIEW_COLOR_BIT;
+
+		fState->view_color = tint_color(ui_color(which), tint);
+	} else {
+		fState->valid_flags &= ~B_VIEW_VIEW_COLOR_BIT;
+		fState->archiving_flags &= ~B_VIEW_WHICH_VIEW_COLOR_BIT;
+	}
+
+	if (!fState->IsValid(B_VIEW_WHICH_LOW_COLOR_BIT))
+		SetLowUIColor(which, tint);
+}
+
+
+color_which
+BView::ViewUIColor(float* tint) const
+{
+	if (!fState->IsValid(B_VIEW_WHICH_VIEW_COLOR_BIT)
+		&& fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_GET_VIEW_UI_COLOR);
+
+		int32 code;
+		if (fOwner->fLink->FlushWithReply(code) == B_OK
+			&& code == B_OK) {
+			fOwner->fLink->Read<color_which>(&fState->which_view_color);
+			fOwner->fLink->Read<float>(&fState->which_view_color_tint);
+			fOwner->fLink->Read<rgb_color>(&fState->view_color);
+
+			fState->valid_flags |= B_VIEW_WHICH_VIEW_COLOR_BIT;
+			fState->valid_flags |= B_VIEW_VIEW_COLOR_BIT;
+		}
+	}
+
+	if (tint != NULL)
+		*tint = fState->which_view_color_tint;
+
+	return fState->which_view_color;
 }
 
 
@@ -4100,6 +4422,35 @@ BView::Invalidate()
 
 
 void
+BView::DelayedInvalidate(bigtime_t delay)
+{
+	DelayedInvalidate(delay, Bounds());
+}
+
+
+void
+BView::DelayedInvalidate(bigtime_t delay, BRect invalRect)
+{
+	if (fOwner == NULL)
+		return;
+
+	invalRect.left = (int)invalRect.left;
+	invalRect.top = (int)invalRect.top;
+	invalRect.right = (int)invalRect.right;
+	invalRect.bottom = (int)invalRect.bottom;
+	if (!invalRect.IsValid())
+		return;
+
+	_CheckLockAndSwitchCurrent();
+
+	fOwner->fLink->StartMessage(AS_VIEW_DELAYED_INVALIDATE_RECT);
+	fOwner->fLink->Attach<bigtime_t>(system_time() + delay);
+	fOwner->fLink->Attach<BRect>(invalRect);
+	fOwner->fLink->Flush();
+}
+
+
+void
 BView::InvertRect(BRect rect)
 {
 	if (fOwner) {
@@ -4598,6 +4949,11 @@ BView::MessageReceived(BMessage* message)
 				break;
 			}
 
+			// prevent message repeats
+			case B_COLORS_UPDATED:
+			case B_FONTS_UPDATED:
+				break;
+
 			default:
 				BHandler::MessageReceived(message);
 				break;
@@ -4940,7 +5296,6 @@ BView::InvalidateLayout(bool descendants)
  			|| fLayoutData->fLayoutInvalidationDisabled > 0) {
 		return;
 	}
-
 	fLayoutData->fLayoutValid = false;
 	fLayoutData->fMinMaxValid = false;
 	LayoutInvalidated(descendants);
@@ -4957,7 +5312,8 @@ BView::InvalidateLayout(bool descendants)
 	else
 		_InvalidateParentLayout();
 
-	if (fTopLevelView && fOwner)
+	if (fTopLevelView
+		&& fOwner != NULL)
 		fOwner->PostMessage(B_LAYOUT_WINDOW);
 }
 
@@ -5266,6 +5622,12 @@ BView::_InitData(BRect frame, const char* name, uint32 resizingMode,
 	fLayoutData = new LayoutData;
 
 	fToolTip = NULL;
+
+	if ((flags & B_SUPPORTS_LAYOUT) != 0) {
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+		SetLowUIColor(ViewUIColor());
+		SetHighUIColor(B_PANEL_TEXT_COLOR);
+	}
 }
 
 
@@ -5545,7 +5907,7 @@ BView::_ResizeBy(int32 deltaWidth, int32 deltaHeight)
 	}
 
 	// layout the children
-	if (fFlags & B_SUPPORTS_LAYOUT) {
+	if ((fFlags & B_SUPPORTS_LAYOUT) != 0) {
 		Relayout();
 	} else {
 		for (BView* child = fFirstChild; child; child = child->fNextSibling)
@@ -5624,7 +5986,26 @@ BView::_Activate(bool active)
 void
 BView::_Attach()
 {
+	if (fOwner != NULL) {
+		// unmask state flags to force [re]syncing with the app_server
+		fState->valid_flags &= ~(B_VIEW_WHICH_VIEW_COLOR_BIT
+			| B_VIEW_WHICH_LOW_COLOR_BIT | B_VIEW_WHICH_HIGH_COLOR_BIT);
+
+		if (fState->which_view_color != B_NO_COLOR)
+			SetViewUIColor(fState->which_view_color,
+				fState->which_view_color_tint);
+
+		if (fState->which_high_color != B_NO_COLOR)
+			SetHighUIColor(fState->which_high_color,
+				fState->which_high_color_tint);
+
+		if (fState->which_low_color != B_NO_COLOR)
+			SetLowUIColor(fState->which_low_color,
+				fState->which_low_color_tint);
+	}
+
 	AttachedToWindow();
+
 	fAttached = true;
 
 	// after giving the view a chance to do this itself,
@@ -5650,6 +6031,46 @@ BView::_Attach()
 	}
 
 	AllAttached();
+}
+
+
+void
+BView::_ColorsUpdated(BMessage* message)
+{
+	if (fTopLevelView
+		&& fLayoutData->fLayout != NULL
+		&& !fState->IsValid(B_VIEW_WHICH_VIEW_COLOR_BIT)) {
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+		SetHighUIColor(B_PANEL_TEXT_COLOR);
+	}
+
+	rgb_color color;
+
+	const char* colorName = ui_color_name(fState->which_view_color);
+	if (colorName != NULL && message->FindColor(colorName, &color) == B_OK) {
+		fState->view_color = tint_color(color, fState->which_view_color_tint);
+		fState->valid_flags |= B_VIEW_VIEW_COLOR_BIT;
+	}
+
+	colorName = ui_color_name(fState->which_low_color);
+	if (colorName != NULL && message->FindColor(colorName, &color) == B_OK) {
+		fState->low_color = tint_color(color, fState->which_low_color_tint);
+		fState->valid_flags |= B_VIEW_LOW_COLOR_BIT;
+	}
+
+	colorName = ui_color_name(fState->which_high_color);
+	if (colorName != NULL && message->FindColor(colorName, &color) == B_OK) {
+		fState->high_color = tint_color(color, fState->which_high_color_tint);
+		fState->valid_flags |= B_VIEW_HIGH_COLOR_BIT;
+	}
+
+	MessageReceived(message);
+
+	for (BView* child = fFirstChild; child != NULL;
+			child = child->fNextSibling)
+		child->_ColorsUpdated(message);
+
+	Invalidate();
 }
 
 
@@ -5741,6 +6162,18 @@ BView::_DrawAfterChildren(BRect updateRect)
 	DrawAfterChildren(updateRect);
 	PopState();
 	Flush();
+}
+
+
+void
+BView::_FontsUpdated(BMessage* message)
+{
+	MessageReceived(message);
+
+	for (BView* child = fFirstChild; child != NULL;
+			child = child->fNextSibling) {
+		child->_FontsUpdated(message);
+	}
 }
 
 

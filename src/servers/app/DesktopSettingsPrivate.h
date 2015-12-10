@@ -1,10 +1,11 @@
 /*
- * Copyright 2005-2013, Haiku.
+ * Copyright 2005-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 #ifndef DESKTOP_SETTINGS_PRIVATE_H
 #define DESKTOP_SETTINGS_PRIVATE_H
@@ -72,7 +73,13 @@ public:
 			const BMessage*		WorkspacesMessage(int32 index) const;
 
 			void				SetUIColor(color_which which,
-									const rgb_color color);
+									const rgb_color color,
+									bool* changed = NULL);
+			void				SetUIColors(const BMessage& colors,
+									bool* changed = NULL);
+									// changed must be boolean array equal in
+									// size to colors' size
+
 			rgb_color			UIColor(color_which which) const;
 
 			void				SetSubpixelAntialiasing(bool subpix);

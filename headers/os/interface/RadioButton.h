@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_RADIO_BUTTON_H
@@ -14,8 +14,7 @@ class BRadioButton : public BControl {
 public:
 								BRadioButton(BRect frame, const char* name,
 									const char* label, BMessage* message,
-									uint32 resizingMode
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BRadioButton(const char* name,
 									const char* label, BMessage* message,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012 Haiku, Inc. All rights reserved.
+ * Copyright 2008-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _GRAPHICS_DEFS_H
@@ -57,6 +57,8 @@ typedef struct rgb_color {
 		return *this;
 	}
 
+	int32 Brightness() const;
+
 	inline bool
 	operator==(const rgb_color& other) const
 	{
@@ -86,6 +88,11 @@ make_color(uint8 red, uint8 green, uint8 blue, uint8 alpha = 255)
 	return color;
 }
 #endif
+
+
+rgb_color mix_color(rgb_color color1, rgb_color color2, uint8 amount);
+rgb_color blend_color(rgb_color color1, rgb_color color2, uint8 amount);
+rgb_color disable_color(rgb_color color, rgb_color background);
 
 
 extern const rgb_color 	B_TRANSPARENT_COLOR;

@@ -9,9 +9,11 @@
  *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
  *		Brecht Machiels <brecht@mos6581.org>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 #ifndef DESKTOP_H
 #define DESKTOP_H
+#include "RapidDebug.h"
 
 
 #include <Autolock.h>
@@ -22,7 +24,10 @@
 #include <Region.h>
 #include <Window.h>
 
+#include <ServerProtocolStructs.h>
+
 #include "CursorManager.h"
+#include "DelayedMessage.h"
 #include "DesktopListener.h"
 #include "DesktopSettings.h"
 #include "EventDispatcher.h"
@@ -56,7 +61,8 @@ namespace BPrivate {
 class Desktop : public DesktopObservable, public MessageLooper,
 	public ScreenOwner {
 public:
-								Desktop(uid_t userID, const char* targetScreen);
+								Desktop(uid_t userID,
+									const char* targetScreen);
 	virtual						~Desktop();
 
 			void				RegisterListener(DesktopListener* listener);
@@ -73,6 +79,9 @@ public:
 
 			void				BroadcastToAllApps(int32 code);
 			void				BroadcastToAllWindows(int32 code);
+
+			int32				GetAllWindowTargets(DelayedMessage& message);
+			int32				GetAllAppTargets(DelayedMessage& message);
 
 			filter_result		KeyEvent(uint32 what, int32 key,
 									int32 modifiers);
@@ -191,6 +200,8 @@ public:
 									Window* window);
 
 			void				FontsChanged(Window* window);
+			void				ColorUpdated(Window* window, color_which which,
+									rgb_color color);
 
 			void				SetWindowLook(Window* window, window_look look);
 			void				SetWindowFeel(Window* window, window_feel feel);
@@ -252,6 +263,8 @@ public:
 			StackAndTile*		GetStackAndTile() { return &fStackAndTile; }
 private:
 			WindowList&			_Windows(int32 index);
+
+			void				_FlushPendingColors();
 
 			void				_LaunchInputServer();
 			void				_GetLooperName(char* name, size_t size);
@@ -359,6 +372,8 @@ private:
 			Window*				fBack;
 
 			StackAndTile		fStackAndTile;
+
+			BMessage			fPendingColors;
 };
 
 #endif	// DESKTOP_H

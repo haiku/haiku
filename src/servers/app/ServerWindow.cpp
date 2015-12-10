@@ -12,6 +12,7 @@
  *		Philippe Saint-Pierre <stpere@gmail.com>
  *		Brecht Machiels <brecht@mos6581.org>
  *		Julian Harnath <julian.harnath@rwth-aachen.de>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 
@@ -1015,7 +1016,15 @@ ServerWindow::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 		{
 			// Has the all-window look
 			fDesktop->FontsChanged(fWindow);
-			// TODO: tell client about this, too, and relayout...
+			break;
+		}
+
+		// Forward to client
+		case B_FONTS_UPDATED:
+		{
+			// TODO: would knowing which font was changed be useful?
+			BMessage message(code);
+			SendMessageToClient(&message);
 			break;
 		}
 
@@ -1770,6 +1779,116 @@ fDesktop->LockSingleWindow();
 			fWindow->GetDrawingEngine()->SetHighColor(color);
 			break;
 		}
+
+		case AS_VIEW_SET_HIGH_UI_COLOR:
+		{
+			color_which which = B_NO_COLOR;
+			float tint = B_NO_TINT;
+
+			if (link.Read<color_which>(&which) != B_OK
+				|| link.Read<float>(&tint) != B_OK )
+				break;
+
+			fCurrentView->CurrentState()->SetHighUIColor(which, tint);
+
+			// TODO: should we do more color_which validity checking?
+			if (which != B_NO_COLOR) {
+				DesktopSettings settings(fDesktop);
+				rgb_color color = tint_color(settings.UIColor(which), tint);
+
+				fCurrentView->CurrentState()->SetHighColor(color);
+				fWindow->GetDrawingEngine()->SetHighColor(color);
+			}
+			break;
+		}
+		case AS_VIEW_SET_LOW_UI_COLOR:
+		{
+			color_which which = B_NO_COLOR;
+			float tint = B_NO_TINT;
+
+			if (link.Read<color_which>(&which) != B_OK
+				|| link.Read<float>(&tint) != B_OK )
+				break;
+
+			fCurrentView->CurrentState()->SetLowUIColor(which, tint);
+
+			// TODO: should we do more color_which validity checking?
+			if (which != B_NO_COLOR) {
+				DesktopSettings settings(fDesktop);
+				rgb_color color = tint_color(settings.UIColor(which), tint);
+
+				fCurrentView->CurrentState()->SetLowColor(color);
+				fWindow->GetDrawingEngine()->SetLowColor(color);
+			}
+			break;
+		}
+		case AS_VIEW_SET_VIEW_UI_COLOR:
+		{
+			color_which which = B_NO_COLOR;
+			float tint = B_NO_TINT;
+
+			if (link.Read<color_which>(&which) != B_OK
+				|| link.Read<float>(&tint) != B_OK )
+				break;
+
+			// TODO: should we do more color_which validity checking?
+			fCurrentView->SetViewUIColor(which, tint);
+			break;
+		}
+		case AS_VIEW_GET_HIGH_UI_COLOR:
+		{
+			float tint;
+			color_which which = fCurrentView->CurrentState()->HighUIColor(&tint);
+			rgb_color color = fCurrentView->CurrentState()->HighColor();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_HIGH_UI_COLOR: "
+				"View: %s -> color_which(%i) tint(%.3f) - rgb_color(%i, %i,"
+				" %i, %i)\n", Title(), fCurrentView->Name(), which, tint,
+				color.red, color.green, color.blue, color.alpha));
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<color_which>(which);
+			fLink.Attach<float>(tint);
+			fLink.Attach<rgb_color>(color);
+			fLink.Flush();
+			break;
+		}
+		case AS_VIEW_GET_LOW_UI_COLOR:
+		{
+			float tint;
+			color_which which = fCurrentView->CurrentState()->LowUIColor(&tint);
+			rgb_color color = fCurrentView->CurrentState()->LowColor();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_LOW_UI_COLOR: "
+				"View: %s -> color_which(%i) tint(%.3f) - rgb_color(%i, %i,"
+				" %i, %i)\n", Title(), fCurrentView->Name(), which, tint,
+				color.red, color.green, color.blue, color.alpha));
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<color_which>(which);
+			fLink.Attach<float>(tint);
+			fLink.Attach<rgb_color>(color);
+			fLink.Flush();
+			break;
+		}
+		case AS_VIEW_GET_VIEW_UI_COLOR:
+		{
+			float tint;
+			color_which which = fCurrentView->ViewUIColor(&tint);
+			rgb_color color = fCurrentView->ViewColor();
+
+			DTRACE(("ServerWindow %s: Message AS_VIEW_GET_VIEW_UI_COLOR: "
+				"View: %s -> color_which(%i) tint(%.3f) - rgb_color(%i, %i,"
+				" %i, %i)\n", Title(), fCurrentView->Name(), which, tint,
+				color.red, color.green, color.blue, color.alpha));
+
+			fLink.StartMessage(B_OK);
+			fLink.Attach<color_which>(which);
+			fLink.Attach<float>(tint);
+			fLink.Attach<rgb_color>(color);
+			fLink.Flush();
+			break;
+		}
 		case AS_VIEW_GET_HIGH_COLOR:
 		{
 			rgb_color color = fCurrentView->CurrentState()->HighColor();
@@ -2112,11 +2231,45 @@ fDesktop->LockSingleWindow();
 					fCurrentView->Name(), invalidRect.left, invalidRect.top,
 					invalidRect.right, invalidRect.bottom));
 
+				View* view = NULL;
+				if (link.Read<View*>(&view) != B_OK)
+					view = fCurrentView;
+
+				// make sure the view is still available!
+				if (view != fCurrentView
+					&& !fWindow->TopView()->HasView(view))
+					break;
+
 				BRegion dirty(invalidRect);
-				fWindow->InvalidateView(fCurrentView, dirty);
+				fWindow->InvalidateView(view, dirty);
 			}
 			break;
 		}
+
+		case AS_VIEW_DELAYED_INVALIDATE_RECT:
+		{
+			bigtime_t time = 0;
+			BRect invalidRect;
+			if (link.Read<bigtime_t>(&time) == B_OK
+				&& link.Read<BRect>(&invalidRect) == B_OK) {
+				DTRACE(("ServerWindow %s: Message "
+					"AS_VIEW_DELAYED_INVALIDATE_RECT: "
+					"View: %s -> BRect(%.1f, %.1f, %.1f, %.1f) at time %llu\n",
+					Title(), fCurrentView->Name(), invalidRect.left,
+					invalidRect.top, invalidRect.right, invalidRect.bottom,
+					time));
+
+				DelayedMessage delayed(AS_VIEW_INVALIDATE_RECT, time, true);
+				delayed.AddTarget(MessagePort());
+				delayed.SetMerge(DM_MERGE_DUPLICATES);
+
+				if (delayed.Attach<BRect>(invalidRect) == B_OK
+						&& delayed.Attach<View*>(fCurrentView) == B_OK)
+					delayed.Flush();
+			}
+			break;
+		}
+
 		case AS_VIEW_INVALIDATE_REGION:
 		{
 			// NOTE: looks like this call is NOT affected by origin and scale

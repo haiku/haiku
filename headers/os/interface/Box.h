@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2013 Haiku, Inc. All Rights Reserved.
+ * Copyright 2005-2015 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BOX_H
@@ -12,8 +12,7 @@
 class BBox : public BView {
 	public:
 							BBox(BRect frame, const char* name = NULL,
-								uint32 resizingMode = B_FOLLOW_LEFT
-									| B_FOLLOW_TOP,
+								uint32 resizingMode = B_FOLLOW_LEFT_TOP,
 								uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
 									| B_NAVIGABLE_JUMP,
 								border_style border = B_FANCY_BORDER);

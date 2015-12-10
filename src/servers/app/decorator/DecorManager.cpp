@@ -63,10 +63,12 @@ DecorAddOn::AllocateDecorator(Desktop* desktop, DrawingEngine* engine,
 
 	DesktopSettings settings(desktop);
 	Decorator* decorator;
-	decorator = _AllocateDecorator(settings, rect);
+	decorator = _AllocateDecorator(settings, rect, desktop);
 	desktop->UnlockSingleWindow();
 	if (!decorator)
 		return NULL;
+
+	decorator->UpdateColors(settings);
 
 	if (decorator->AddTab(settings, title, look, flags) == false) {
 		delete decorator;
@@ -94,9 +96,10 @@ DecorAddOn::GetDesktopListeners()
 
 
 Decorator*
-DecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect)
+DecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
+	Desktop* desktop)
 {
-	return new (std::nothrow)SATDecorator(settings, rect);
+	return new (std::nothrow)SATDecorator(settings, rect, desktop);
 }
 
 

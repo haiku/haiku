@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc.
+ * Copyright 2001-2015 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 #ifndef DECORATOR_H
 #define DECORATOR_H
@@ -20,6 +21,7 @@
 
 #include "DrawState.h"
 
+class Desktop;
 class DesktopSettings;
 class DrawingEngine;
 class ServerBitmap;
@@ -98,7 +100,8 @@ public:
 	};
 
 								Decorator(DesktopSettings& settings,
-									BRect frame);
+											BRect frame,
+											Desktop* desktop);
 	virtual						~Decorator();
 
 	virtual	Decorator::Tab*		AddTab(DesktopSettings& settings,
@@ -123,6 +126,11 @@ public:
 
 			void				FontsChanged(DesktopSettings& settings,
 									BRegion* updateRegion = NULL);
+			void				ColorsChanged(DesktopSettings& settings,
+									BRegion* updateRegion = NULL);
+
+	virtual void				UpdateColors(DesktopSettings& settings) = 0;
+
 			void				SetLook(int32 tab, DesktopSettings& settings,
 									window_look look,
 									BRegion* updateRegion = NULL);
@@ -160,6 +168,7 @@ public:
 	virtual	Region				RegionAt(BPoint where, int32& tab) const;
 
 			const BRegion&		GetFootprint();
+			::Desktop*			GetDesktop();
 
 			void				MoveBy(float x, float y);
 			void				MoveBy(BPoint offset);
@@ -281,6 +290,7 @@ protected:
 			BObjectList<Decorator::Tab>	fTabList;
 
 private:
+			Desktop*			fDesktop;
 			BRegion				fFootprint;
 			bool				fFootprintValid : 1;
 

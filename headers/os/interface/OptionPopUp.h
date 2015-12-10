@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _OPTION_POP_UP_H
@@ -16,13 +16,12 @@ class BOptionPopUp : public BOptionControl {
 public:
 								BOptionPopUp(BRect frame, const char* name,
 									const char* label, BMessage* message,
-									uint32 resizeMask = B_FOLLOW_LEFT
-										| B_FOLLOW_TOP,
+									uint32 resizeMask = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW);
 								BOptionPopUp(BRect frame, const char* name,
 									const char* label,  BMessage* message,
 									bool fixed, uint32 resizeMask
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+										= B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW);
 								BOptionPopUp(const char* name,
 									const char* label, BMessage* message,

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2009-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CONTROL_LOOK_H
@@ -85,6 +85,7 @@ public:
 		B_PARTIALLY_ACTIVATED	= 1 << 7, // like B_ACTIVATED, but for tri-state
 		B_FLAT					= 1 << 8, // flat look (e.g. button background)
 		B_INVALID				= 1 << 9, // invalid value, use B_FAILURE_COLOR
+		B_IS_CONTROL			= 1 << 10, // use control colors
 
 		B_BLEND_FRAME			= 1 << 16,
 	};
@@ -328,27 +329,32 @@ public:
 
 	/*virtual*/	void			DrawLabel(BView* view, const char* label,
 									BRect rect, const BRect& updateRect,
-									const rgb_color& base, uint32 flags);
+									const rgb_color& base, uint32 flags,
+									const rgb_color* textColor = NULL);
 	virtual	void				DrawLabel(BView* view, const char* label,
 									BRect rect, const BRect& updateRect,
 									const rgb_color& base, uint32 flags,
-									const BAlignment& alignment);
+									const BAlignment& alignment,
+									const rgb_color* textColor = NULL);
 	// TODO: Would be nice to have a (non-virtual) version of this method
 	// which takes an array of labels and locations. That would save some
 	// setup with the view graphics state.
 	/*virtual*/	void			DrawLabel(BView* view, const char* label,
 									const rgb_color& base, uint32 flags,
-									const BPoint& where);
+									const BPoint& where,
+									const rgb_color* textColor = NULL);
 
 			void				DrawLabel(BView* view, const char* label,
 									const BBitmap* icon, BRect rect,
 									const BRect& updateRect,
-									const rgb_color& base, uint32 flags);
+									const rgb_color& base, uint32 flags,
+									const rgb_color* textColor = NULL);
 	virtual	void				DrawLabel(BView* view, const char* label,
 									const BBitmap* icon, BRect rect,
 									const BRect& updateRect,
 									const rgb_color& base, uint32 flags,
-									const BAlignment& alignment);
+									const BAlignment& alignment,
+									const rgb_color* textColor = NULL);
 
 	virtual	void				GetFrameInsets(frame_type frameType,
 									uint32 flags, float& _left, float& _top,

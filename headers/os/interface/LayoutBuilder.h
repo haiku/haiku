@@ -457,9 +457,7 @@ Group<ParentBuilder>::Group(BWindow* window, orientation orientation,
 	fLayout(new BGroupLayout(orientation, spacing))
 {
 	window->SetLayout(fLayout);
-
-	fLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		// TODO: we get a white background if we don't do this
+	fLayout->Owner()->AdoptSystemColors();
 }
 
 
@@ -469,9 +467,11 @@ Group<ParentBuilder>::Group(BView* view, orientation orientation,
 	:
 	fLayout(new BGroupLayout(orientation, spacing))
 {
+
+	if (view->HasDefaultColors())
+		view->AdoptSystemColors();
+
 	view->SetLayout(fLayout);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		// TODO: we get a white background if we don't do this
 }
 
 
@@ -796,9 +796,7 @@ Grid<ParentBuilder>::Grid(BWindow* window, float horizontalSpacing,
 	fLayout(new BGridLayout(horizontalSpacing, verticalSpacing))
 {
 	window->SetLayout(fLayout);
-
-	fLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		// TODO: we get a white background if we don't do this
+	fLayout->Owner()->AdoptSystemColors();
 }
 
 
@@ -808,9 +806,10 @@ Grid<ParentBuilder>::Grid(BView* view, float horizontalSpacing,
 	:
 	fLayout(new BGridLayout(horizontalSpacing, verticalSpacing))
 {
+	if (view->HasDefaultColors())
+		view->AdoptSystemColors();
+
 	view->SetLayout(fLayout);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		// TODO: we get a white background if we don't do this
 }
 
 

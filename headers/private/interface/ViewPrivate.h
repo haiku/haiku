@@ -42,8 +42,11 @@ enum {
 	B_VIEW_PATTERN_BIT			= 0x00020000,
 	B_VIEW_TRANSFORM_BIT		= 0x00040000,
 	B_VIEW_FILL_RULE_BIT		= 0x00080000,
+	B_VIEW_WHICH_VIEW_COLOR_BIT	= 0x00100000,
+	B_VIEW_WHICH_LOW_COLOR_BIT	= 0x00200000,
+	B_VIEW_WHICH_HIGH_COLOR_BIT	= 0x00400000,
 
-	B_VIEW_ALL_BITS				= 0x000fffff,
+	B_VIEW_ALL_BITS				= 0x00ffffff,
 
 	// these used for archiving only
 	B_VIEW_RESIZE_BIT			= 0x00001000,
@@ -107,6 +110,15 @@ class ViewState {
 
 		// This one is not affected by pop state/push state
 		rgb_color			view_color;
+		color_which			which_view_color;
+		float				which_view_color_tint;
+
+		// these are cached values
+		color_which			which_low_color;
+		float				which_low_color_tint;
+
+		color_which			which_high_color;
+		float				which_high_color_tint;
 
 		::pattern			pattern;
 

@@ -11,6 +11,7 @@
 
 
 class BBitmap;
+class BMessage;
 class BPoint;
 class BRect;
 
@@ -296,6 +297,7 @@ enum bitmap_drawing_options {
 // Default UI Colors
 
 enum color_which {
+	B_NO_COLOR = 0,
 	B_PANEL_BACKGROUND_COLOR = 1,
 	B_PANEL_TEXT_COLOR = 10,
 	B_DOCUMENT_BACKGROUND_COLOR = 11,
@@ -309,6 +311,11 @@ enum color_which {
 	B_NAVIGATION_PULSE_COLOR = 17,
 	B_SHINE_COLOR = 18,
 	B_SHADOW_COLOR = 19,
+
+	B_LINK_TEXT_COLOR = 33,
+	B_LINK_HOVER_COLOR = 34,
+	B_LINK_VISITED_COLOR = 35,
+	B_LINK_ACTIVE_COLOR = 36,
 
 	B_MENU_BACKGROUND_COLOR = 2,
 	B_MENU_SELECTED_BACKGROUND_COLOR = 6,
@@ -463,7 +470,10 @@ void			set_accept_first_click(bool acceptFirstClick);
 bool			accept_first_click();
 
 rgb_color		ui_color(color_which which);
+const char*		ui_color_name(color_which which);
+color_which		which_ui_color(const char* name);
 void			set_ui_color(const color_which& which, const rgb_color& color);
+void			set_ui_colors(const BMessage* colors);
 rgb_color		tint_color(rgb_color color, float tint);
 
 extern "C" status_t _init_interface_kit_();

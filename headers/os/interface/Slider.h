@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SLIDER_H
@@ -30,8 +30,7 @@ public:
 									const char* label, BMessage* message,
 									int32 minValue, int32 maxValue,
 									thumb_style thumbType = B_BLOCK_THUMB,
-									uint32 resizingMode
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_NAVIGABLE | B_WILL_DRAW
 										| B_FRAME_EVENTS);
 
@@ -40,8 +39,7 @@ public:
 									int32 minValue, int32 maxValue,
 									orientation posture,
 									thumb_style thumbType = B_BLOCK_THUMB,
-									uint32 resizingMode
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_NAVIGABLE | B_WILL_DRAW
 										| B_FRAME_EVENTS);
 

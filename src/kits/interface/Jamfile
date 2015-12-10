@@ -57,7 +57,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			CheckBox.cpp
 			ColorConversion.cpp
 			ColorControl.cpp
-			ColorTools.cpp
 			Control.cpp
 			ControlLook.cpp
 			DecorInfo.cpp
