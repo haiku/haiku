@@ -26,7 +26,7 @@ PropertyListPlain::PropertyListPlain(const char* name)
 	:
 	BView(name, 0, NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetLayout(new BGroupLayout(B_VERTICAL));
 }
 
@@ -42,10 +42,13 @@ PropertyListPlain::AddAttributes(const Attributes& attributes)
 {
 	RemoveAll();
 	BGroupLayoutBuilder layout(B_VERTICAL);
-	BTextView* view = new BTextView(BRect(0, 0, 1000, 1000),
-		"", BRect(5, 5, 995, 995), B_FOLLOW_ALL_SIDES);
 
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	BTextView* view = new BTextView(BRect(0, 0, 1000, 1000),
+		"attribs", BRect(5, 5, 995, 995), B_FOLLOW_ALL_SIDES);
+
+	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+	view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	view->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 	view->MakeEditable(false);
 
 	for (unsigned int i = 0; i < attributes.size(); i++) {
@@ -59,6 +62,7 @@ PropertyListPlain::AddAttributes(const Attributes& attributes)
 	}
 	layout.Add(view);
 
+	fAttributeViews.AddItem(view);
 	AddChild(layout);
 }
 
@@ -78,6 +82,22 @@ void
 PropertyListPlain::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_COLORS_UPDATED:
+		{
+			rgb_color color;
+			if (message->FindColor(ui_color_name(B_PANEL_TEXT_COLOR), &color)
+					!= B_OK)
+				break;
+
+			BTextView* view = NULL;
+			int32 count = fAttributeViews.CountItems();
+			for (int32 index = 0; index < count; ++index) {
+				view = fAttributeViews.ItemAt(index);
+				view->SetFontAndColor(be_plain_font, 0, &color);
+			}
+			break;
+		}
+
 		default:
 			BView::MessageReceived(message);
 	}

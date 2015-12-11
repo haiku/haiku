@@ -492,7 +492,7 @@ FindWindow::FindWindow(BRect _rect, BMessage& previous, BMessenger& target,
 	fTarget(target)
 {
 	BView* view = new BView(Bounds(), "main", B_FOLLOW_ALL, 0);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(view);
 
 	int8 mode = kAsciiMode;

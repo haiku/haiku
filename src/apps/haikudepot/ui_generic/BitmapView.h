@@ -17,7 +17,7 @@ public:
 
 	virtual						~BitmapView();
 
-	virtual	void				AttachedToWindow();
+	virtual	void				AllAttached();
 	virtual	void				Draw(BRect updateRect);
 
 	virtual	BSize				MinSize();

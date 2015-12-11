@@ -18,10 +18,15 @@ CharacterStyleData::CharacterStyleData()
 
 	fGlyphSpacing(0.0f),
 
-	fFgColor((rgb_color){ 0, 0, 0, 255 }),
-	fBgColor((rgb_color){ 255, 255, 255, 255 }),
-	fStrikeOutColor((rgb_color){ 0, 0, 0, 255 }),
-	fUnderlineColor((rgb_color){ 0, 0, 0, 255 }),
+	fWhichFgColor(B_PANEL_TEXT_COLOR),
+	fWhichBgColor(B_PANEL_BACKGROUND_COLOR),
+	fWhichStrikeOutColor(fWhichFgColor),
+	fWhichUnderlineColor(fWhichFgColor),
+
+	fFgColor(ui_color(fWhichFgColor)),
+	fBgColor(ui_color(fWhichBgColor)),
+	fStrikeOutColor(fFgColor),
+	fUnderlineColor(fFgColor),
 
 	fStrikeOutStyle(STRIKE_OUT_NONE),
 	fUnderlineStyle(UNDERLINE_NONE)
@@ -38,6 +43,11 @@ CharacterStyleData::CharacterStyleData(const CharacterStyleData& other)
 	fWidth(other.fWidth),
 
 	fGlyphSpacing(other.fGlyphSpacing),
+
+	fWhichFgColor(other.fWhichFgColor),
+	fWhichBgColor(other.fWhichBgColor),
+	fWhichStrikeOutColor(other.fWhichStrikeOutColor),
+	fWhichUnderlineColor(other.fWhichUnderlineColor),
 
 	fFgColor(other.fFgColor),
 	fBgColor(other.fBgColor),
@@ -62,6 +72,11 @@ CharacterStyleData::operator==(const CharacterStyleData& other) const
 		&& fWidth == other.fWidth
 
 		&& fGlyphSpacing == other.fGlyphSpacing
+
+		&& fWhichFgColor == other.fWhichFgColor
+		&& fWhichBgColor == other.fWhichBgColor
+		&& fWhichStrikeOutColor == other.fWhichStrikeOutColor
+		&& fWhichUnderlineColor == other.fWhichUnderlineColor
 
 		&& fFgColor == other.fFgColor
 		&& fBgColor == other.fBgColor
@@ -180,6 +195,21 @@ CharacterStyleData::SetGlyphSpacing(float glyphSpacing)
 
 
 CharacterStyleDataRef
+CharacterStyleData::SetForegroundColor(color_which which)
+{
+	if (fWhichFgColor == which)
+		return CharacterStyleDataRef(this);
+
+	CharacterStyleData* ret = new(std::nothrow) CharacterStyleData(*this);
+	if (ret == NULL)
+		return CharacterStyleDataRef(this);
+
+	ret->fWhichFgColor = which;
+	return CharacterStyleDataRef(ret, true);
+}
+
+
+CharacterStyleDataRef
 CharacterStyleData::SetForegroundColor(rgb_color color)
 {
 	if (fFgColor == color)
@@ -190,6 +220,22 @@ CharacterStyleData::SetForegroundColor(rgb_color color)
 		return CharacterStyleDataRef(this);
 
 	ret->fFgColor = color;
+	ret->fWhichFgColor = B_NO_COLOR;
+	return CharacterStyleDataRef(ret, true);
+}
+
+
+CharacterStyleDataRef
+CharacterStyleData::SetBackgroundColor(color_which which)
+{
+	if (fWhichBgColor == which)
+		return CharacterStyleDataRef(this);
+
+	CharacterStyleData* ret = new(std::nothrow) CharacterStyleData(*this);
+	if (ret == NULL)
+		return CharacterStyleDataRef(this);
+
+	ret->fWhichBgColor = which;
 	return CharacterStyleDataRef(ret, true);
 }
 
@@ -205,6 +251,22 @@ CharacterStyleData::SetBackgroundColor(rgb_color color)
 		return CharacterStyleDataRef(this);
 
 	ret->fBgColor = color;
+	ret->fWhichBgColor = B_NO_COLOR;
+	return CharacterStyleDataRef(ret, true);
+}
+
+
+CharacterStyleDataRef
+CharacterStyleData::SetStrikeOutColor(color_which which)
+{
+	if (fWhichStrikeOutColor == which)
+		return CharacterStyleDataRef(this);
+
+	CharacterStyleData* ret = new(std::nothrow) CharacterStyleData(*this);
+	if (ret == NULL)
+		return CharacterStyleDataRef(this);
+
+	ret->fWhichStrikeOutColor = which;
 	return CharacterStyleDataRef(ret, true);
 }
 
@@ -220,6 +282,22 @@ CharacterStyleData::SetStrikeOutColor(rgb_color color)
 		return CharacterStyleDataRef(this);
 
 	ret->fStrikeOutColor = color;
+	ret->fWhichStrikeOutColor = B_NO_COLOR;
+	return CharacterStyleDataRef(ret, true);
+}
+
+
+CharacterStyleDataRef
+CharacterStyleData::SetUnderlineColor(color_which which)
+{
+	if (fWhichUnderlineColor == which)
+		return CharacterStyleDataRef(this);
+
+	CharacterStyleData* ret = new(std::nothrow) CharacterStyleData(*this);
+	if (ret == NULL)
+		return CharacterStyleDataRef(this);
+
+	ret->fWhichUnderlineColor = which;
 	return CharacterStyleDataRef(ret, true);
 }
 
@@ -235,6 +313,7 @@ CharacterStyleData::SetUnderlineColor(rgb_color color)
 		return CharacterStyleDataRef(this);
 
 	ret->fUnderlineColor = color;
+	ret->fWhichUnderlineColor = B_NO_COLOR;
 	return CharacterStyleDataRef(ret, true);
 }
 

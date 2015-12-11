@@ -136,7 +136,7 @@ FindPanel::~FindPanel()
 void FindPanel::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	Window()->SetDefaultButton(fFindButton);
 	fFindButton->SetTarget(this);
 

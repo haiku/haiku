@@ -173,6 +173,7 @@ InstallerWindow::InstallerWindow()
 
 	fStatusView = new BTextView("statusView", be_plain_font, NULL,
 		B_WILL_DRAW);
+	fStatusView->SetViewColor(255, 255, 255, 255);
 	fStatusView->SetInsets(10, 0, 10, 0);
 	fStatusView->MakeEditable(false);
 	fStatusView->MakeSelectable(false);

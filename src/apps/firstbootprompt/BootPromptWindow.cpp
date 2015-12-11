@@ -28,6 +28,7 @@
 #include <MutableLocaleRoster.h>
 #include <ObjectList.h>
 #include <Path.h>
+#include <Screen.h>
 #include <ScrollView.h>
 #include <SeparatorView.h>
 #include <StringItem.h>
@@ -155,10 +156,21 @@ BootPromptWindow::BootPromptWindow()
 {
 	SetSizeLimits(450, 16384, 350, 16384);
 
+	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
 	fInfoTextView = new BTextView("");
-	fInfoTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fInfoTextView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fInfoTextView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 	fInfoTextView->MakeEditable(false);
 	fInfoTextView->MakeSelectable(false);
+
+	// Carefully designed to not exceed the 640x480 resolution with a 12pt font.
+	float width = fInfoTextView->StringWidth("Thank you for trying out Haiku,"
+		" We hope you like it!") * 1.5;
+	float height = be_plain_font->Size() * 36;
+
+	BRect newFrame(0, 0, width, height);
+	newFrame = newFrame & BScreen().Frame();
+	ResizeTo(newFrame.Width(), newFrame.Height());
 
 	fDesktopButton = new BButton("", new BMessage(MSG_BOOT_DESKTOP));
 	fDesktopButton->SetTarget(be_app);

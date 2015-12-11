@@ -220,7 +220,7 @@ void ResourceUsageWindow::InitWindow(BList &list)
 
 	// Create the TabView and Tabs
 	BTabView *tabView = new BTabView(rtab,"resource_usage_tabview");
-	tabView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	tabView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	
 	rtab = tabView->Bounds();
 	rtab.InsetBy(5,5);

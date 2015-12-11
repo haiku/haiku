@@ -373,7 +373,7 @@ RecorderWindow::InitWindow()
 		fSoundList = new SoundListView(r, B_TRANSLATE("Sound List"),
 			B_FOLLOW_ALL);
 		fSoundList->SetSelectionMessage(new BMessage(SOUND_SELECTED));
-		fSoundList->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fSoundList->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		BScrollView *scroller = new BScrollView("scroller", fSoundList,
 			B_FOLLOW_ALL, 0, false, true, B_FANCY_BORDER);
 		fBottomBox->AddChild(scroller);

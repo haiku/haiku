@@ -127,7 +127,7 @@ WatchPromptWindow::_Init()
 
 	fTypeField = new BMenuField("Type:", typeMenu);
 	BLayoutItem* labelItem = fTypeField->CreateLabelLayoutItem();
-	labelItem->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	labelItem->View()->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)
 		.AddGroup(B_HORIZONTAL, 4.0f)

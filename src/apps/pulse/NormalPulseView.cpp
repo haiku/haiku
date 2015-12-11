@@ -50,9 +50,8 @@ NormalPulseView::NormalPulseView(BRect rect)
 	: PulseView(rect, "NormalPulseView"),
 	fHasBrandLogo(false)
 {
-	rgb_color color = { 168, 168, 168, 0xff };
-	SetViewColor(color);
-	SetLowColor(color);
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
 
 	mode1->SetLabel(B_TRANSLATE("Mini mode"));
 	mode1->SetMessage(new BMessage(PV_MINI_MODE));

@@ -45,15 +45,8 @@ ShowImageStatusView::AttachedToWindow()
 
 	BScrollBar* scrollBar = fScrollView->ScrollBar(B_HORIZONTAL);
 	MoveTo(0.0, scrollBar->Frame().top);
-	rgb_color color = B_TRANSPARENT_COLOR;
-	BView* parent = Parent();
-	if (parent != NULL)
-		color = parent->ViewColor();
 
-	if (color == B_TRANSPARENT_COLOR)
-		color = ui_color(B_PANEL_BACKGROUND_COLOR);
-
-	SetViewColor(color);
+	AdoptParentColors();
 
 	ResizeToPreferred();
 }
@@ -98,7 +91,8 @@ ShowImageStatusView::Draw(BRect updateRect)
 	}
 
 	BRect bounds(Bounds());
-	rgb_color highColor = HighColor();
+	rgb_color highColor = ui_color(B_PANEL_TEXT_COLOR);
+
 	SetHighColor(tint_color(ViewColor(), B_DARKEN_2_TINT));
 	StrokeLine(bounds.LeftTop(), bounds.RightTop());
 

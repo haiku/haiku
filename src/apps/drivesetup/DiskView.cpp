@@ -349,9 +349,8 @@ DiskView::DiskView(const BRect& frame, uint32 resizeMode,
 	SetLayout(layout);
 
 	SetViewColor(B_TRANSPARENT_COLOR);
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetHighColor(tint_color(base, B_DARKEN_2_TINT));
-	SetLowColor(tint_color(base, (B_DARKEN_2_TINT + B_DARKEN_1_TINT) / 2));
+	SetHighUIColor(B_PANEL_BACKGROUND_COLOR, B_DARKEN_2_TINT);
+	SetLowUIColor(B_PANEL_BACKGROUND_COLOR, 1.221f);
 
 #ifdef HAIKU_TARGET_PLATFORM_LIBBE_TEST
 	PartitionView* view;
@@ -421,7 +420,13 @@ DiskView::Draw(BRect updateRect)
 		(bounds.Height() - (fh.ascent + fh.descent) * 2) / 2.0);
 
 	FillRoundRect(messageBounds, 4, 4, B_SOLID_LOW);
-	SetHighColor(tint_color(HighColor(), B_DARKEN_4_TINT));
+	rgb_color color = LowColor();
+	if (color.Brightness() > 100)
+		color = tint_color(color, B_DARKEN_4_TINT);
+	else
+		color = tint_color(color, B_LIGHTEN_2_TINT);
+
+	SetHighColor(color);
 	BPoint textOffset;
 	textOffset.x = messageBounds.left + fh.ascent;
 	textOffset.y = (messageBounds.top + messageBounds.bottom

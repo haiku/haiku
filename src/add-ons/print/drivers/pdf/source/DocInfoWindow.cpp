@@ -56,7 +56,7 @@ DocInfoWindow::DocInfoWindow(BMessage *docInfo)
 {
 	BRect bounds(Bounds());
 	BView *background = new BView(bounds, "bachground", B_FOLLOW_ALL, B_WILL_DRAW);
-	background->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	background->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(background);
 
 	bounds.InsetBy(10.0, 10.0);
@@ -238,7 +238,7 @@ DocInfoWindow::_SetupDocInfoView(BBox* panel)
 	bounds.right -= B_V_SCROLL_BAR_WIDTH;
 	bounds.InsetBy(2.0, 2.0);
 	fTable = new BView(bounds, "table", B_FOLLOW_ALL, B_WILL_DRAW);
-	fTable->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fTable->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fTableScrollView = new BScrollView("scroll_table", fTable, B_FOLLOW_ALL, 0,
 		false, true);

@@ -171,7 +171,7 @@ TeamMonitorWindow::TeamMonitorWindow()
 	layout->SetSpacing(inset);
 	SetLayout(layout);
 
-	layout->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	layout->View()->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fListView = new BListView("teams");
 	fListView->SetSelectionMessage(new BMessage(TM_SELECTED_TEAM));
@@ -606,7 +606,7 @@ TeamDescriptionView::TeamDescriptionView()
 		BAlignment(B_ALIGN_HORIZONTAL_UNSET, B_ALIGN_VERTICAL_CENTER));
 
 	BView* teamPropertiesView = new BView("team properties", B_WILL_DRAW);
-	teamPropertiesView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	teamPropertiesView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL);
 	teamPropertiesView->SetLayout(layout);
 	BGroupLayoutBuilder(layout)
@@ -738,7 +738,7 @@ AllShowingTextView::AllShowingTextView(const char* name)
 {
 	MakeEditable(false);
 	MakeSelectable(false);
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

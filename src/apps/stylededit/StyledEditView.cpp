@@ -37,8 +37,8 @@ StyledEditView::StyledEditView(BRect viewFrame, BRect textBounds,
 		&(fInitialColor = ui_color(B_DOCUMENT_TEXT_COLOR)),
 		B_FOLLOW_ALL, B_FRAME_EVENTS | B_WILL_DRAW)
 {
-	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
-	SetLowColor(ViewColor());
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
 
 	fMessenger = new BMessenger(handler);
 	fSuppressChanges = false;

@@ -205,7 +205,7 @@ TypeEditorView::TypeMatches()
 StringEditor::StringEditor(DataEditor& editor)
 	: TypeEditorView(B_TRANSLATE("String editor"), 0, editor)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	BStringView *stringView = new BStringView(B_EMPTY_STRING,
@@ -283,7 +283,7 @@ StringEditor::MessageReceived(BMessage *message)
 MimeTypeEditor::MimeTypeEditor(BRect rect, DataEditor& editor)
 	: TypeEditorView(rect, B_TRANSLATE("MIME type editor"), B_FOLLOW_LEFT_RIGHT, 0, editor)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fTextControl = new BTextControl(rect.InsetByCopy(5, 5), B_EMPTY_STRING,
 		B_TRANSLATE("MIME type:"), NULL, new BMessage(kMsgValueChanged), B_FOLLOW_ALL);
@@ -374,7 +374,7 @@ MimeTypeEditor::MessageReceived(BMessage *message)
 NumberEditor::NumberEditor(BRect rect, DataEditor &editor)
 	: TypeEditorView(rect, B_TRANSLATE("Number editor"), B_FOLLOW_LEFT_RIGHT, 0, editor)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fTextControl = new BTextControl(rect.InsetByCopy(5, 5), B_EMPTY_STRING,
 		_TypeLabel(), NULL, new BMessage(kMsgValueChanged), B_FOLLOW_ALL);
@@ -750,7 +750,7 @@ NumberEditor::MessageReceived(BMessage *message)
 BooleanEditor::BooleanEditor(BRect rect, DataEditor &editor)
 	: TypeEditorView(rect, B_TRANSLATE("Boolean editor"), B_FOLLOW_NONE, 0, editor)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BPopUpMenu *menu = new BPopUpMenu("bool");
 	BMessage *message;
@@ -906,7 +906,7 @@ ImageView::AttachedToWindow()
 	if (Parent() != NULL)
 		SetViewColor(Parent()->ViewColor());
 	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fEditor.StartWatching(this);
 	if (fScaleSlider != NULL)
@@ -1119,7 +1119,7 @@ ImageView::_UpdateImage()
 MessageView::MessageView(BRect rect, DataEditor &editor)
 	: TypeEditorView(rect, B_TRANSLATE("Message View"), B_FOLLOW_ALL, 0, editor)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	rect = Bounds().InsetByCopy(10, 10);
 	rect.right -= B_V_SCROLL_BAR_WIDTH;
@@ -1128,8 +1128,8 @@ MessageView::MessageView(BRect rect, DataEditor &editor)
 	fTextView = new BTextView(rect, B_EMPTY_STRING,
 		rect.OffsetToCopy(B_ORIGIN).InsetByCopy(5, 5),
 		B_FOLLOW_ALL, B_WILL_DRAW);
-	fTextView->SetViewColor(ViewColor());
-	fTextView->SetLowColor(ViewColor());
+	fTextView->SetViewUIColor(ViewUIColor());
+	fTextView->SetLowUIColor(ViewUIColor());
 
 	BScrollView *scrollView = new BScrollView("scroller", fTextView,
 		B_FOLLOW_ALL, B_WILL_DRAW, true, true);

@@ -116,7 +116,7 @@ public:
 
 	virtual void AttachedToWindow()
 	{
-		SetViewColor(Parent()->ViewColor());
+		AdoptParentColors();
 	}
 
 	virtual void Draw(BRect updateRect)
@@ -257,7 +257,8 @@ DownloadProgressView::Init(BMessage* archive)
 	}
 
 	fInfoView = new BStringView("info view", "");
-	
+	fInfoView->SetViewColor(ViewColor());
+
 	BSize topButtonSize = fTopButton->PreferredSize();
 	BSize bottomButtonSize = fBottomButton->PreferredSize();
 	if (bottomButtonSize.width < topButtonSize.width)
@@ -275,6 +276,7 @@ DownloadProgressView::Init(BMessage* archive)
 	;
 	verticalGroup->SetViewColor(ViewColor());
 	layout->AddView(verticalGroup);
+
 	verticalGroup = BGroupLayoutBuilder(B_VERTICAL, 3)
 		.Add(fTopButton)
 		.Add(fBottomButton)
@@ -288,8 +290,6 @@ DownloadProgressView::Init(BMessage* archive)
 	float fontSize = font.Size() * 0.8f;
 	font.SetSize(max_c(8.0f, fontSize));
 	fInfoView->SetFont(&font, B_FONT_SIZE);
-	fInfoView->SetHighColor(tint_color(fInfoView->LowColor(),
-		B_DARKEN_4_TINT));
 	fInfoView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	return true;
@@ -340,6 +340,10 @@ DownloadProgressView::DetachedFromWindow()
 void
 DownloadProgressView::AllAttached()
 {
+	fStatusBar->SetLowColor(ViewColor());
+	fInfoView->SetLowColor(ViewColor());
+	fInfoView->SetHighColor(0, 0, 0, 255);
+
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(245, 245, 245);
 	SetHighColor(tint_color(LowColor(), B_DARKEN_1_TINT));

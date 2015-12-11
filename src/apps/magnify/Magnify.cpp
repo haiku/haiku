@@ -808,7 +808,7 @@ void
 TInfoView::AttachedToWindow()
 {
 	BBox::AttachedToWindow();
-
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	dynamic_cast<TWindow*>(Window())->PixelCount(&fHPixelCount, &fVPixelCount);
 	fPixelSize = dynamic_cast<TWindow*>(Window())->PixelSize();
 
@@ -1050,7 +1050,6 @@ TMagnify::TMagnify(BRect r, TWindow* parent)
 	fParent(parent),
 	fStickCoordinates(false)
 {
-	SetViewColor(B_TRANSPARENT_32_BIT);
 }
 
 
@@ -1073,6 +1072,7 @@ TMagnify::AttachedToWindow()
 
 	resume_thread(fThread);
 
+	SetViewColor(B_TRANSPARENT_32_BIT);
 	MakeFocus();
 }
 

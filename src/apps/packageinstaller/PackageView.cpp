@@ -471,16 +471,19 @@ private:
 void
 PackageView::_InitView()
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	float fontHeight = be_plain_font->Size();
+	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
 
 	BTextView* packageDescriptionView = new DescriptionTextView(
 		"package description", fontHeight * 13);
-	packageDescriptionView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	packageDescriptionView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	packageDescriptionView->SetText(fInfo.GetDescription());
 	packageDescriptionView->MakeEditable(false);
 	packageDescriptionView->MakeSelectable(false);
+	packageDescriptionView->SetFontAndColor(be_plain_font, B_FONT_ALL,
+		&textColor);
 
 	BScrollView* descriptionScrollView = new BScrollView(
 		"package description scroll view", packageDescriptionView,
@@ -500,11 +503,11 @@ PackageView::_InitView()
 		// Left inset needs to match BMenuField text offset
 	fInstallTypeDescriptionView->SetText(
 		B_TRANSLATE("No installation type selected"));
-	fInstallTypeDescriptionView->SetViewColor(
-		ui_color(B_PANEL_BACKGROUND_COLOR));
+	fInstallTypeDescriptionView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	BFont font(be_plain_font);
 	font.SetSize(ceilf(font.Size() * 0.85));
-	fInstallTypeDescriptionView->SetFontAndColor(&font);
+	fInstallTypeDescriptionView->SetFontAndColor(&font, B_FONT_ALL,
+		&textColor);
 
 	BScrollView* installTypeScrollView = new BScrollView(
 		"install type description scroll view", fInstallTypeDescriptionView,

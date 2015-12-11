@@ -231,6 +231,12 @@ CalcView::AttachedToWindow()
 void
 CalcView::MessageReceived(BMessage* message)
 {
+	if (message->what == B_COLORS_UPDATED
+		&& message->HasColor(ui_color_name(B_PANEL_BACKGROUND_COLOR))) {
+		_Colorize();
+		return;
+	}
+
 	if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
 		// if we are embedded in desktop we need to receive these
 		// message here since we don't have a parent BWindow
@@ -504,7 +510,7 @@ CalcView::Draw(BRect updateRect)
 
 			be_control_look->DrawLabel(this, key->label, frame, updateRect,
 				fBaseColor, flags, BAlignment(B_ALIGN_HORIZONTAL_CENTER,
-					B_ALIGN_VERTICAL_CENTER));
+					B_ALIGN_VERTICAL_CENTER), &fButtonTextColor);
 
 			key++;
 		}
@@ -1288,6 +1294,8 @@ CalcView::_AudioFeedback(bool inBackGround)
 void
 CalcView::_Colorize()
 {
+	fBaseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+
 	// calculate light and dark color from base color
 	fLightColor.red		= (uint8)(fBaseColor.red * 1.25);
 	fLightColor.green	= (uint8)(fBaseColor.green * 1.25);
@@ -1300,16 +1308,13 @@ CalcView::_Colorize()
 	fDarkColor.alpha	= 255;
 
 	// keypad text color
-	uint8 lightness = (fBaseColor.red + fBaseColor.green + fBaseColor.blue) / 3;
-	if (lightness > 200)
+	if (fBaseColor.Brightness() > 100)
 		fButtonTextColor = (rgb_color){ 0, 0, 0, 255 };
 	else
 		fButtonTextColor = (rgb_color){ 255, 255, 255, 255 };
 
 	// expression text color
-	lightness = (fExpressionBGColor.red
-		+ fExpressionBGColor.green + fExpressionBGColor.blue) / 3;
-	if (lightness > 200)
+	if (fExpressionBGColor.Brightness() > 100)
 		fExpressionTextColor = (rgb_color){ 0, 0, 0, 255 };
 	else
 		fExpressionTextColor = (rgb_color){ 255, 255, 255, 255 };

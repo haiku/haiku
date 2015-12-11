@@ -133,7 +133,7 @@ SwatchGroup::SwatchGroup(BRect frame)
 
 	// configure self
 	ResizeTo(width, fAlphaSlider->Frame().bottom + 4);
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// add views
 	AddChild(fCurrentColorSV);

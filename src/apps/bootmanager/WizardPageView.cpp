@@ -21,7 +21,7 @@ WizardPageView::WizardPageView(BMessage* settings, BRect frame,
 	BView(frame, name, resizingMode, flags),
 	fSettings(settings)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -30,7 +30,7 @@ WizardPageView::WizardPageView(BMessage* settings, const char* name)
 	BView(name, B_WILL_DRAW),
 	fSettings(settings)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -54,9 +54,10 @@ WizardPageView::CreateDescription(BRect frame, const char* name,
 		B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_PULSE_NEEDED | B_FRAME_EVENTS);
 	view->MakeEditable(false);
-	view->SetViewColor(ViewColor());
+	view->SetViewUIColor(ViewUIColor());
 	view->SetStylable(true);
 	view->SetText(description);
+
 	return view;
 }
 
@@ -67,9 +68,10 @@ WizardPageView::CreateDescription(const char* name,
 {
 	BTextView* view = new BTextView("text");
 	view->MakeEditable(false);
-	view->SetViewColor(ViewColor());
+	view->SetViewUIColor(ViewUIColor());
 	view->SetStylable(true);
 	view->SetText(description);
+
 	return view;
 }
 
@@ -84,7 +86,15 @@ WizardPageView::MakeHeading(BTextView* view)
 		BFont font;
 		view->GetFont(&font);
 		font.SetFace(B_BOLD_FACE);
-		view->SetFontAndColor(0, indexFirstLineEnd, &font);
+		font.SetSize(font.Size() + 1);
+		rgb_color color = ui_color(B_PANEL_TEXT_COLOR);
+		view->SetFontAndColor(0, indexFirstLineEnd, &font, B_FONT_ALL,
+			&color);
+
+		font.SetFace(B_REGULAR_FACE);
+		font.SetSize(font.Size() - 1);
+		view->SetFontAndColor(indexFirstLineEnd + 1, view->TextLength(),
+			&font, B_FONT_ALL, &color);
 	}
 }
 

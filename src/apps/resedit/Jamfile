@@ -7,7 +7,7 @@ UsePrivateHeaders shared interface ;
 local columnViewSources ;
 
 if ! $(TARGET_PLATFORM_HAIKU_COMPATIBLE) {
-	columnViewSources = ColumnListView.cpp ColumnTypes.cpp ColorTools.cpp ;
+	columnViewSources = ColumnListView.cpp ColumnTypes.cpp ;
 }
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits interface ] ;

@@ -124,7 +124,7 @@ FontsWindow::FontsWindow(Fonts *fonts)
 	// add a *dialog* background
 	BView* embeddingPanel = new BView("Embedding", B_WILL_DRAW
 		| B_FRAME_EVENTS | B_NAVIGABLE_JUMP);
-	embeddingPanel->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	embeddingPanel->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// add font list
 #if USE_CLV
@@ -166,7 +166,7 @@ FontsWindow::FontsWindow(Fonts *fonts)
 	// add a *dialog* background
 	BView* cjkPanel = new BView("CJK", B_WILL_DRAW | B_FRAME_EVENTS
 		| B_NAVIGABLE_JUMP);
-	cjkPanel->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	cjkPanel->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BListView* list = 
 		new DragListView(BRect(),

@@ -1451,10 +1451,12 @@ TermView::FrameResized(float width, float height)
 	bool hasResizeView = fResizeRunner != NULL;
 	if (!hasResizeView) {
 		// show the current size in a view
-		fResizeView = new BStringView(BRect(100, 100, 300, 140),
-			B_TRANSLATE("size"), "");
+		fResizeView = new BStringView(BRect(100, 100, 300, 140), "size", "");
 		fResizeView->SetAlignment(B_ALIGN_CENTER);
 		fResizeView->SetFont(be_bold_font);
+		fResizeView->SetViewColor(fTextBackColor);
+		fResizeView->SetLowColor(fTextBackColor);
+		fResizeView->SetHighColor(fTextForeColor);
 
 		BMessage message(MSG_REMOVE_RESIZE_VIEW_IF_NEEDED);
 		fResizeRunner = new(std::nothrow) BMessageRunner(BMessenger(this),

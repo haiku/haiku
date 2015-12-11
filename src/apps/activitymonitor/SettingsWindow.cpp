@@ -38,6 +38,7 @@ public:
 		SetLimitLabels(min.String(), max.String());
 		SetHashMarks(B_HASH_MARKS_BOTTOM);
 		SetHashMarkCount(levels);
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 		if (message != NULL)
 			SetModificationMessage(new BMessage(*message));

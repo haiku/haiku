@@ -154,7 +154,7 @@ TEnclosuresView::TEnclosuresView(BRect rect, BRect windowRect)
 		B_WILL_DRAW),
 	fFocus(false)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BFont font(be_plain_font);
 	font.SetSize(font.Size() * kPlainFontSizeScale);

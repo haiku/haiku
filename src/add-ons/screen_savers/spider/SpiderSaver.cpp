@@ -338,7 +338,7 @@ SpiderView::SpiderView(BRect frame, SpiderSaver* saver,
 	: BView(frame, "spider view", B_FOLLOW_NONE, B_WILL_DRAW | B_PULSE_NEEDED),
 	  fSaver(saver)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	frame.OffsetTo(0.0, 0.0);
 	frame.InsetBy(10.0, 5.0);

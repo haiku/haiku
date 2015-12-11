@@ -37,7 +37,7 @@ PatchView::PatchView(BRect rect)
 	BView(rect, "PatchView", B_FOLLOW_ALL, B_WILL_DRAW),
 	fUnknownDeviceIcon(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BRect iconRect(0, 0, LARGE_ICON_SIZE - 1, LARGE_ICON_SIZE - 1);
 	fUnknownDeviceIcon = new BBitmap(iconRect, B_RGBA32);
@@ -68,6 +68,7 @@ PatchView::AttachedToWindow()
 	
 	BMessenger msgr(this);
 	roster->StartWatching(&msgr);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
 }
 
 

@@ -17,7 +17,7 @@ Group::Group(BRect frame, const char* name, orientation direction)
 	  fInset(4.0),
 	  fSpacing(0.0)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 // destructor

@@ -31,7 +31,7 @@ ImageEditor::ImageEditor(const BRect &frame, ResourceData *data, BHandler *owner
 		imgsize.Set(0, 0, 200, 200);
 	
 	BView *back = new BView(Bounds(), "back", B_FOLLOW_ALL, B_WILL_DRAW);
-	back->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	back->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(back);
 	
 	BRect r;

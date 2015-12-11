@@ -181,9 +181,9 @@ InspectorWindow::_Init()
 		.End()
 	.End();
 
-	fHexMode->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fEndianMode->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fTextMode->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fHexMode->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fEndianMode->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fTextMode->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	int32 targetEndian = fTeam->GetArchitecture()->IsBigEndian()
 		? EndianModeBigEndian : EndianModeLittleEndian;

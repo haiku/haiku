@@ -85,8 +85,7 @@ FontSelectionView::FontSelectionView(const char* name, const char* label,
 
 	fPreviewText->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED,
 		B_SIZE_UNLIMITED));
-	fPreviewText->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		1.65));
+	fPreviewText->SetHighUIColor(B_PANEL_BACKGROUND_COLOR, 1.65);
 	fPreviewText->SetAlignment(B_ALIGN_RIGHT);
 	_UpdateFontPreview();
 }

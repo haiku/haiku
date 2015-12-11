@@ -50,7 +50,7 @@ ResView::ResView(const BRect &frame, const char *name, const int32 &resize,
   	fOpenPanel(NULL),
   	fSavePanel(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	if (ref) {
 		fRef = new entry_ref;
 		*fRef = *ref;

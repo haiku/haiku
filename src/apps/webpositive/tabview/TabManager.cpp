@@ -338,7 +338,7 @@ public:
 	{
 		SetFlags(Flags() | B_WILL_DRAW);
 		SetViewColor(B_TRANSPARENT_COLOR);
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 		GroupLayout()->SetInsets(0, 6, 0, 0);
 	}
 

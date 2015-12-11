@@ -656,8 +656,8 @@ AddressTextControl::AddressTextControl(const char* name, BMessage* message)
 		.Add(fPopUpButton);
 
 	SetFlags(Flags() | B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE);
-	SetLowColor(ViewColor());
-	SetViewColor(fTextView->ViewColor());
+	SetLowUIColor(ViewUIColor());
+	SetViewUIColor(fTextView->ViewUIColor());
 
 	SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_VERTICAL_CENTER));

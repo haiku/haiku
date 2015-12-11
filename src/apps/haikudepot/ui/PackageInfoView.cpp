@@ -14,6 +14,7 @@
 #include <Button.h>
 #include <CardLayout.h>
 #include <Catalog.h>
+#include <ColumnListView.h>
 #include <Font.h>
 #include <GridView.h>
 #include <LayoutBuilder.h>
@@ -127,9 +128,8 @@ public:
 		BView("diagram bar view", B_WILL_DRAW),
 		fValue(0.0f)
 	{
-		SetViewColor(B_TRANSPARENT_COLOR);
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
+		SetHighUIColor(B_CONTROL_MARK_COLOR);
 	}
 
 	virtual ~DiagramBarView()
@@ -138,11 +138,6 @@ public:
 
 	virtual void AttachedToWindow()
 	{
-		BView* parent = Parent();
-		if (parent != NULL) {
-			SetLowColor(parent->ViewColor());
-			SetHighColor(tint_color(LowColor(), B_DARKEN_2_TINT));
-		}
 	}
 
 	virtual void Draw(BRect updateRect)
@@ -325,7 +320,7 @@ public:
 		fRatingLayout = new BCardLayout();
 		ratingStack->SetLayout(fRatingLayout);
 		ratingStack->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-		ratingStack->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		ratingStack->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 		BGroupView* ratingGroup = new BGroupView(B_HORIZONTAL,
 			B_USE_SMALL_SPACING);
@@ -471,7 +466,7 @@ public:
 		fStatusLabel(NULL),
 		fStatusBar(NULL)
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 		SetLayout(fLayout);
 		fLayout->AddItem(BSpaceLayoutItem::CreateGlue());
@@ -684,11 +679,10 @@ public:
 		fEmailIcon("text/x-email"),
 		fWebsiteIcon("text/html")
 	{
-		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			kContentTint));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
 		fDescriptionView = new MarkupTextView("description view");
-		fDescriptionView->SetLowColor(ViewColor());
+		fDescriptionView->SetViewUIColor(ViewUIColor(), kContentTint);
 		fDescriptionView->SetInsets(be_plain_font->Size());
 
 		BScrollView* scrollView = new CustomScrollView(
@@ -714,17 +708,20 @@ public:
 
 		fEmailIconView = new BitmapView("email icon view");
 		fEmailLinkView = new LinkView("email link view", "",
-			new BMessage(MSG_EMAIL_PUBLISHER), kLightBlack);
+			new BMessage(MSG_EMAIL_PUBLISHER));
 		fEmailLinkView->SetFont(&smallFont);
 
 		fWebsiteIconView = new BitmapView("website icon view");
 		fWebsiteLinkView = new LinkView("website link view", "",
-			new BMessage(MSG_VISIT_PUBLISHER_WEBSITE), kLightBlack);
+			new BMessage(MSG_VISIT_PUBLISHER_WEBSITE));
 		fWebsiteLinkView->SetFont(&smallFont);
 
 		BGroupView* leftGroup = new BGroupView(B_VERTICAL,
 			B_USE_DEFAULT_SPACING);
-		leftGroup->SetViewColor(ViewColor());
+
+		fScreenshotView->SetViewUIColor(ViewUIColor(), kContentTint);
+		fEmailLinkView->SetViewUIColor(ViewUIColor(), kContentTint);
+		fWebsiteLinkView->SetViewUIColor(ViewUIColor(), kContentTint);
 
 		BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0.0f)
 //			.Add(BSpaceLayoutItem::CreateHorizontalStrut(32.0f))
@@ -758,6 +755,14 @@ public:
 		fScreenshotView->SetTarget(this);
 		fEmailLinkView->SetTarget(this);
 		fWebsiteLinkView->SetTarget(this);
+	}
+
+	virtual void AllAttached()
+	{
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
+
+		for (int32 index = 0; index < CountChildren(); ++index)
+			ChildAt(index)->AdoptParentColors();
 	}
 
 	virtual void MessageReceived(BMessage* message)
@@ -867,8 +872,7 @@ public:
 		:
 		BGroupView(B_HORIZONTAL, 0.0f)
 	{
-		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			kContentTint));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
 		fAvatarView = new BitmapView("avatar view");
 		if (rating.User().Avatar().Get() != NULL) {
@@ -878,10 +882,10 @@ public:
 		fAvatarView->SetExplicitMinSize(BSize(16.0f, 16.0f));
 
 		fNameView = new BStringView("user name", rating.User().NickName());
+
 		BFont nameFont(be_bold_font);
 		nameFont.SetSize(std::max(9.0f, floorf(nameFont.Size() * 0.9f)));
 		fNameView->SetFont(&nameFont);
-		fNameView->SetHighColor(kLightBlack);
 		fNameView->SetExplicitMaxSize(
 			BSize(nameFont.StringWidth("xxxxxxxxxxxxxxxxxxxxxx"), B_SIZE_UNSET));
 
@@ -900,7 +904,6 @@ public:
 		BFont versionFont(be_plain_font);
 		versionFont.SetSize(std::max(9.0f, floorf(versionFont.Size() * 0.85f)));
 		fPackageVersionView->SetFont(&versionFont);
-		fPackageVersionView->SetHighColor(kLightBlack);
 
 		// TODO: User rating IDs to identify which rating to vote up or down
 //		BMessage* voteUpMessage = new BMessage(MSG_VOTE_UP);
@@ -928,7 +931,6 @@ public:
 //		fDownVoteCountView->SetText(voteCountLabel);
 
 		fTextView = new TextView("rating text");
-		fTextView->SetViewColor(ViewColor());
 		ParagraphStyle paragraphStyle(fTextView->ParagraphStyle());
 		paragraphStyle.SetJustify(true);
 		fTextView->SetParagraphStyle(paragraphStyle);
@@ -957,6 +959,21 @@ public:
 			.End()
 			.SetInsets(B_USE_DEFAULT_SPACING)
 		;
+
+		SetFlags(Flags() | B_WILL_DRAW);
+	}
+
+	void AllAttached()
+	{
+		for (int32 index = 0; index < CountChildren(); ++index)
+			ChildAt(index)->AdoptParentColors();
+	}
+
+	void Draw(BRect rect)
+	{
+		rgb_color color = mix_color(ViewColor(), ui_color(B_PANEL_TEXT_COLOR), 64);
+		SetHighColor(color);
+		StrokeLine(Bounds().LeftBottom(), Bounds().RightBottom());
 	}
 
 private:
@@ -981,8 +998,8 @@ public:
 		:
 		BGridView("rating summary view", B_USE_HALF_ITEM_SPACING, 0.0f)
 	{
-		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			kContentTint - 0.1));
+		float tint = kContentTint - 0.1;
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, tint);
 
 		BLayoutBuilder::Grid<> layoutBuilder(this);
 
@@ -995,7 +1012,7 @@ public:
 			label.SetToFormat("%" B_PRId32, 5 - i);
 			fLabelViews[i] = new BStringView("", label);
 			fLabelViews[i]->SetFont(&smallFont);
-			fLabelViews[i]->SetHighColor(kLightBlack);
+			fLabelViews[i]->SetViewUIColor(ViewUIColor(), tint);
 			layoutBuilder.Add(fLabelViews[i], 0, i);
 
 			fDiagramBarViews[i] = new DiagramBarView();
@@ -1003,7 +1020,7 @@ public:
 
 			fCountViews[i] = new BStringView("", "");
 			fCountViews[i]->SetFont(&smallFont);
-			fCountViews[i]->SetHighColor(kLightBlack);
+			fCountViews[i]->SetViewUIColor(ViewUIColor(), tint);
 			fCountViews[i]->SetAlignment(B_ALIGN_RIGHT);
 			layoutBuilder.Add(fCountViews[i], 2, i);
 		}
@@ -1049,14 +1066,13 @@ public:
 		fThumbsUpIcon(BitmapRef(new SharedBitmap(502), true)),
 		fThumbsDownIcon(BitmapRef(new SharedBitmap(503), true))
 	{
-		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			kContentTint));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
 		fRatingSummaryView = new RatingSummaryView();
 
 		ScrollableGroupView* ratingsContainerView = new ScrollableGroupView();
-		ratingsContainerView->SetViewColor(
-			tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), kContentTint));
+		ratingsContainerView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR,
+												kContentTint);
 		fRatingContainerLayout = ratingsContainerView->GroupLayout();
 
 		BScrollView* scrollView = new RatingsScrollView(
@@ -1093,8 +1109,10 @@ public:
 		if (count == 0) {
 			BStringView* noRatingsView = new BStringView("no ratings",
 				B_TRANSLATE("No user ratings available."));
+			noRatingsView->SetViewUIColor(ViewUIColor(), kContentTint);
 			noRatingsView->SetAlignment(B_ALIGN_CENTER);
-			noRatingsView->SetHighColor(kLightBlack);
+			noRatingsView->SetHighColor(disable_color(ui_color(B_PANEL_TEXT_COLOR),
+				ViewColor()));
 			noRatingsView->SetExplicitMaxSize(
 				BSize(B_SIZE_UNLIMITED, B_SIZE_UNLIMITED));
 			fRatingContainerLayout->AddView(0, noRatingsView);
@@ -1178,8 +1196,7 @@ public:
 		:
 		BGroupView("package contents view", B_HORIZONTAL)
 	{
-		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			kContentTint));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
 		fPackageContents = new PackageContentsView("contents_list");
 		AddChild(fPackageContents);
@@ -1218,11 +1235,10 @@ public:
 		:
 		BGroupView("package changelog view", B_HORIZONTAL)
 	{
-		SetViewColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			kContentTint));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR, kContentTint);
 
 		fTextView = new MarkupTextView("changelog view");
-		fTextView->SetLowColor(ViewColor());
+		fTextView->SetLowUIColor(ViewUIColor());
 		fTextView->SetInsets(be_plain_font->Size());
 
 		BScrollView* scrollView = new CustomScrollView(

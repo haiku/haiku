@@ -175,13 +175,13 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 
 	BMenuField* menuLocation = new BMenuField(B_TRANSLATE("Save in:"),
 		fOutputPathMenu);
-	menuLocation->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	menuLocation->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fTranslatorMenu = new BMenu(B_TRANSLATE("Please select"));
 	_SetupTranslatorMenu();
 	BMenuField* menuFormat = new BMenuField(B_TRANSLATE("Save as:"),
 		fTranslatorMenu);
-	menuFormat->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	menuFormat->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BButton* showSettings =  new BButton("",
 		B_TRANSLATE("Settings" B_UTF8_ELLIPSIS), new BMessage(kSettings));

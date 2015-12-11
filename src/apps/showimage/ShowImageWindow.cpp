@@ -164,7 +164,7 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	// visible portion without colliding with the menu bar.
 
 	BView* contentView = new BView(BRect(), "content", B_FOLLOW_NONE, 0);
-	contentView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	contentView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	contentView->SetExplicitMinSize(BSize(250, 100));
 	AddChild(contentView);
 

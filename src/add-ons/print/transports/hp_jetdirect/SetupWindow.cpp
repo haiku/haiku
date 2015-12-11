@@ -88,7 +88,7 @@ SetupView::SetupView(BRect frame, BDirectory* directory)
 	: BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW),
 	fPrinterDirectory(directory)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

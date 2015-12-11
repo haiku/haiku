@@ -17,8 +17,8 @@ RatingView::RatingView(const char* name)
 	fStarBitmap(501),
 	fRating(-1.0f)
 {
-	SetViewColor(B_TRANSPARENT_COLOR);
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
 }
 
 
@@ -30,9 +30,7 @@ RatingView::~RatingView()
 void
 RatingView::AttachedToWindow()
 {
-	BView* parent = Parent();
-	if (parent != NULL)
-		SetLowColor(parent->ViewColor());
+	AdoptParentColors();
 }
 
 

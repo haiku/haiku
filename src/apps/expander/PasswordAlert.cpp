@@ -64,7 +64,7 @@ PasswordAlert::PasswordAlert(const char* title, const char* text)
 
 	fTextControl = new BTextControl(textControlRect, "_password_", text,
 		NULL, new BMessage('pass'), B_FOLLOW_ALL);
-	fTextControl->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fTextControl->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fTextControl->TextView()->HideTyping(true);
 	fTextControl->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
 	fTextControl->SetDivider(10 + fTextControl->StringWidth(text));
@@ -190,7 +190,7 @@ TAlertView::TAlertView(BRect frame)
 	BView(frame, "TAlertView", B_FOLLOW_ALL_SIDES, B_WILL_DRAW),
 	fIconBitmap(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

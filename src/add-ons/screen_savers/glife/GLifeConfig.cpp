@@ -32,7 +32,7 @@ GLifeConfig::GLifeConfig(BRect frame, GLifeState* pglsState)
 	m_pglsState(pglsState)
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// Info text
 	BStringView* name = new BStringView(frame, B_EMPTY_STRING,

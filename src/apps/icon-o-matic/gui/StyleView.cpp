@@ -62,7 +62,7 @@ StyleView::StyleView(BRect frame)
 	fIgnoreControlGradientNotifications(false),
 	fPreviousBounds(frame.OffsetToCopy(B_ORIGIN))
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// style type
 	BMenu* menu = new BPopUpMenu(B_TRANSLATE("<unavailable>"));

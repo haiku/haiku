@@ -24,7 +24,7 @@ NetworkStatusWindow::NetworkStatusWindow()
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS)
 {
 	BView* topView = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	topView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(topView);
 
 	SetSizeLimits(25, 265, 25, 265);

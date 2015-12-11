@@ -74,7 +74,7 @@ GroupListView::GroupListView(const char* name, GroupListModel* model,
 	fGroupRenderer(NULL),
 	fSelectionMessage(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetModel(model);
 }
 

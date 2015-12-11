@@ -18,8 +18,6 @@ BitmapView::BitmapView(const char* name)
 	fBitmap(NULL),
 	fScaleBitmap(true)
 {
-	SetViewColor(B_TRANSPARENT_COLOR);
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 
@@ -29,15 +27,9 @@ BitmapView::~BitmapView()
 
 
 void
-BitmapView::AttachedToWindow()
+BitmapView::AllAttached()
 {
-	BView* parent = Parent();
-	if (parent != NULL) {
-		rgb_color color = parent->ViewColor();
-		if (color == B_TRANSPARENT_COLOR)
-			color = parent->LowColor();
-		SetLowColor(color);
-	}
+	AdoptParentColors();
 }
 
 

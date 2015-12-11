@@ -65,7 +65,7 @@ RuleFilterConfig::RuleFilterConfig(const BMailAddOnSettings& addOnSettings)
 	BMailSettingsView("rulefilter_config"),
 	fActionMenu(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	MatchHeaderSettings settings(addOnSettings);
 	fAction = settings.Action();

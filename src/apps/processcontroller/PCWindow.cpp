@@ -47,7 +47,7 @@ PCWindow::PCWindow()
 	BRect rect = Bounds();
 
 	BView* topView = new BView(rect, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	topView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(topView);
 
 	// set up a rectangle && instantiate a new view

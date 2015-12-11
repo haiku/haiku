@@ -42,7 +42,7 @@ BitmapView::BitmapView(BRect frame, const char *name, BMessage *mod, BBitmap *bi
 						const char *label, border_style borderstyle, int32 resize, int32 flags)
   :	BView(frame, name, resize, flags)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	
 	if (bitmap && bitmap->IsValid())
 		fBitmap = bitmap;

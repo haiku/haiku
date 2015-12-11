@@ -604,7 +604,7 @@ SettingsView::SettingsView(BRect frame)
 void
 SettingsView::AttachedToWindow()
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fWidthMenu->Menu()->SetTargetForItems(this);
 	fColorMenu->Menu()->SetTargetForItems(this);

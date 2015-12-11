@@ -61,7 +61,8 @@ LoginApp::ReadyToRun()
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		alert->Go(NULL);
 	} else {
-		BRect frame(0, 0, 450, 150);
+		float sizeDelta = (float)be_plain_font->Size()/12.0f;
+		BRect frame(0, 0, 450 * sizeDelta, 150 * sizeDelta);
 		frame.OffsetBySelf(screen.Frame().Width()/2 - frame.Width()/2,
 			screen.Frame().Height()/2 - frame.Height()/2);
 		fLoginWindow = new LoginWindow(frame);

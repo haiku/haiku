@@ -31,7 +31,7 @@ void
 DurationView::AttachedToWindow()
 {
 	BStringView::AttachedToWindow();
-	SetHighColor(tint_color(ViewColor(), B_DARKEN_4_TINT));
+	_UpdateTextColor();
 }
 
 
@@ -43,6 +43,17 @@ DurationView::MouseDown(BPoint where)
 	if (mode == kLastMode)
 		mode = 0;
 	SetMode(mode);
+}
+
+
+void
+DurationView::MessageReceived(BMessage* message)
+{
+	if (message->what == B_COLORS_UPDATED
+		&& message->HasColor(ui_color_name(B_PANEL_TEXT_COLOR)))
+			_UpdateTextColor();
+
+	BStringView::MessageReceived(message);
 }
 
 
@@ -125,6 +136,13 @@ DurationView::_Update()
 			_GenerateString(fDuration);
 			break;
 	}
+}
+
+
+void
+DurationView::_UpdateTextColor()
+{
+	SetHighColor(mix_color(ViewColor(), ui_color(B_PANEL_TEXT_COLOR), 128));
 }
 
 
