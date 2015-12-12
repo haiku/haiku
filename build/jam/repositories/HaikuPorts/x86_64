@@ -15,6 +15,7 @@ RemotePackageRepository HaikuPorts
 	timgmsoundfont-fixed-5
 	unknown_horizons-2014.1-1
 	vl_gothic-20141206-1
+	youtube_dl-2015.06.15-1
 	wqy_microhei-0.2.0~beta-3
 	:
 	# repository architecture packages
@@ -61,8 +62,8 @@ RemotePackageRepository HaikuPorts
 	buildbot_slave-0.8.8-2
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
-	cdrtools-3.01~a29-1
-	cdrtools_devel-3.01~a29-1
+	cdrtools-3.02~a03-1
+	cdrtools_devel-3.02~a03-1
 	clang-3.5.1-1
 	clang_analysis-3.5.1-1
 	clipdinger-0.4-1
@@ -142,8 +143,8 @@ RemotePackageRepository HaikuPorts
 	gutenprint-5.2.10-1
 	gutenprint_devel-5.2.10-1
 	gzip-1.6-2
-	haikuwebkit-1.4.13-1
-	haikuwebkit_devel-1.4.13-1
+	haikuwebkit-1.5.1-1
+	haikuwebkit_devel-1.5.1-1
 	handbrake-0.10.1-1
 	harfbuzz-1.1.1-1
 	harfbuzz_devel-1.1.1-1
@@ -369,6 +370,7 @@ RemotePackageRepository HaikuPorts
 	tinyxml-2.6.2-1
 	tinyxml_devel-2.6.2-1
 	transmission-2.84-4
+	ubertuber-0.9.11-1
 	unrar-5.3.4-1
 	unzip-6.0-2
 	vim-7.4-3
@@ -578,6 +580,7 @@ RemotePackageRepository HaikuPorts
 	tiff4
 	tinyxml
 	transmission
+	ubertuber
 	unrar
 	unzip
 	vim
@@ -589,6 +592,7 @@ RemotePackageRepository HaikuPorts
 	xml_parser
 	x264
 	xz_utils
+	youtube_dl
 	zip
 	zlib
 	:
