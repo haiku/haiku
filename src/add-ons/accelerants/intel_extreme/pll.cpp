@@ -215,13 +215,13 @@ compute_pll_divisors(display_mode* current, pll_divisors* divisors,
 		if (requestedPixelClock > 112.999
 			|| (read32(INTEL_DIGITAL_LVDS_PORT) & LVDS_CLKB_POWER_MASK)
 				== LVDS_CLKB_POWER_UP) {
+			// fast DAC timing via 2 channels
+			divisors->post2 = limits.max.post2;
+			divisors->post2_high = limits.max.post2_high;
+		} else {
 			// slow DAC timing
 			divisors->post2 = limits.min.post2;
 			divisors->post2_high = limits.min.post2_high;
-		} else {
-			// fast DAC timing
-			divisors->post2 = limits.max.post2;
-			divisors->post2_high = limits.max.post2_high;
 		}
 	} else {
 		if (current->timing.pixel_clock < limits.min_post2_frequency) {
