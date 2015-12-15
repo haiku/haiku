@@ -327,10 +327,10 @@ LVDSPort::LVDSPort()
 	Port(INTEL_PORT_C, "LVDS")
 {
 	// Always unlock LVDS port as soon as we start messing with it.
-	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
-		write32(PCH_PANEL_CONTROL,
-			read32(PCH_PANEL_CONTROL) | PANEL_REGISTER_UNLOCK);
-	}
+	uint32 panelControl = INTEL_PANEL_CONTROL;
+	if (gInfo->shared_info->device_type.HasPlatformControlHub())
+		panelControl = PCH_PANEL_CONTROL;
+	write32(panelControl, read32(panelControl) | PANEL_REGISTER_UNLOCK);
 }
 
 
@@ -525,9 +525,9 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	// Set the B0-B3 data pairs corresponding to whether we're going to
 	// set the DPLLs for dual-channel mode or not.
 	if (divisors.post2_high)
-		lvds |= LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP;
+		lvds |= LVDS_B0B3_POWER_UP | LVDS_CLKB_POWER_UP;
 	else
-		lvds &= ~(LVDS_B0B3PAIRS_POWER_UP | LVDS_CLKB_POWER_UP);
+		lvds &= ~(LVDS_B0B3_POWER_UP | LVDS_CLKB_POWER_UP);
 
 	// Set LVDS sync polarity
 	lvds &= ~(LVDS_HSYNC_POLARITY | LVDS_VSYNC_POLARITY);
@@ -538,6 +538,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if ((target->timing.flags & B_POSITIVE_VSYNC) == 0)
 		lvds |= LVDS_VSYNC_POLARITY;
 
+	TRACE("%s: LVDS Control: 0x%" B_PRIx32 "\n", __func__, lvds);
 	write32(_PortRegister(), lvds);
 	read32(_PortRegister());
 

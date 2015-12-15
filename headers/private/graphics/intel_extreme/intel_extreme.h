@@ -448,12 +448,13 @@ struct intel_free_graphics_memory {
 
 #define LVDS_POST2_RATE_SLOW			14 // PLL Divisors
 #define LVDS_POST2_RATE_FAST			7
+#define LVDS_B0B3_POWER_MASK			(3 << 2)
+#define LVDS_B0B3_POWER_UP				(3 << 2)
 #define LVDS_CLKB_POWER_MASK			(3 << 4)
 #define LVDS_CLKB_POWER_UP				(3 << 4)
 #define LVDS_A3_POWER_MASK				(3 << 6)
 #define LVDS_A3_POWER_UP				(3 << 6)
 #define LVDS_A0A2_CLKA_POWER_UP			(3 << 8)
-#define LVDS_B0B3PAIRS_POWER_UP			(3 << 2)
 #define LVDS_BORDER_ENABLE				(1 << 15)
 #define LVDS_HSYNC_POLARITY				(1 << 20)
 #define LVDS_VSYNC_POLARITY				(1 << 21)
