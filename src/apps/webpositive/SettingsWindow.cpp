@@ -452,7 +452,7 @@ SettingsWindow::_CreateProxyPage(float spacing)
 	fProxyPortControl->SetModificationMessage(
 		new BMessage(MSG_PROXY_PORT_CHANGED));
 	fProxyPortControl->SetText(
-		fSettings->GetValue(kSettingsKeyProxyAddress, ""));
+		fSettings->GetValue(kSettingsKeyProxyPort, ""));
 
 	fUseProxyAuthCheckBox = new BCheckBox("use authentication",
 		B_TRANSLATE("Proxy server requires authentication"),
