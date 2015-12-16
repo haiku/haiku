@@ -491,6 +491,7 @@ RemotePackageRepository HaikuPorts
 	tcl_devel-8.5.18-1
 	tcpdump-4.7.4-2
 	texinfo-4.13a-7
+	thememanager-1.0_git-3
 	tiff-3.9.6-2
 	tiff_devel-3.9.6-2
 	tiff_tools-3.9.6-2
@@ -1382,6 +1383,7 @@ RemotePackageRepository HaikuPorts
 	tcpdump
 	texi2html
 	texinfo
+	thememanager
 	tiff
 	tiff4
 	tig_x86
