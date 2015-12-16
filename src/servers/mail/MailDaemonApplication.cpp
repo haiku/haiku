@@ -372,22 +372,27 @@ MailDaemonApplication::MessageReceived(BMessage* msg)
 
 		case B_QUERY_UPDATE:
 		{
-			int32 what;
-			msg->FindInt32("opcode", &what);
-			switch (what) {
+			int32 previousCount = fNewMessages;
+
+			int32 opcode = msg->GetInt32("opcode", -1);
+			switch (opcode) {
 				case B_ENTRY_CREATED:
 					fNewMessages++;
 					break;
 				case B_ENTRY_REMOVED:
 					fNewMessages--;
 					break;
+				default:
+					return;
 			}
 
 			_UpdateNewMessagesNotification();
 
 			if (fSettingsFile.ShowStatusWindow()
-					!= B_MAIL_SHOW_STATUS_WINDOW_NEVER)
+					!= B_MAIL_SHOW_STATUS_WINDOW_NEVER
+				&& previousCount < fNewMessages) {
 				fNotification->Send();
+			}
 			break;
 		}
 
