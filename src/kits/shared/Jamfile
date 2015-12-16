@@ -46,6 +46,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			PromptWindow.cpp
 			QueryFile.cpp
 			RegExp.cpp
+			RWLocker.cpp
 			RWLockManager.cpp
 			SHA256.cpp
 			ShakeTrackingFilter.cpp

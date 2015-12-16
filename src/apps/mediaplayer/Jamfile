@@ -101,7 +101,6 @@ Application MediaPlayer :
 	ListenerAdapter.cpp
 	MessageEvent.cpp
 	Notifier.cpp
-	RWLocker.cpp
 	SettingsMessage.cpp
 	StackBlurFilter.cpp
 
@@ -114,14 +113,14 @@ Application MediaPlayer :
 	MainWin.cpp
 	VideoView.cpp
 
-	: be game media tracker translation textencoding [ TargetLibstdc++ ] 
+	: be game media tracker translation textencoding [ TargetLibstdc++ ]
 		localestub libshared.a
 	: MediaPlayer.rdef
 ;
 
-DoCatalogs MediaPlayer : 
+DoCatalogs MediaPlayer :
 	x-vnd.Haiku-MediaPlayer
-	: 
+	:
 	CopyPLItemsCommand.cpp
 	ImportPLItemsCommand.cpp
 	InfoWin.cpp
