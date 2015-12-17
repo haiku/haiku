@@ -47,7 +47,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		UseHeaders [ FDirName $(ffmpegHeaders) libavformat ] ;
 		UseHeaders [ FDirName $(ffmpegHeaders) libavutil ] ;
 		UseHeaders [ FDirName $(ffmpegHeaders) libswscale ] ;
-		UseHeaders [ FDirName $(ffmpegHeaders) libswresample ] ;
 
 		Addon [ MultiArchDefaultGristFiles ffmpeg ] :
 			$(sources)
