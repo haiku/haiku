@@ -19,7 +19,7 @@ if $(TARGET_ARCH) = x86 {
 	PAINTER_ARCH_SOURCES = painter_bilinear_scale.nasm ;
 }
 
-Includes [ FGristFiles AGGTextRenderer.cpp Painter.cpp ]
+Includes [ FGristFiles AGGTextRenderer.cpp BitmapPainter.cpp Painter.cpp ]
 	: [ BuildFeatureAttribute freetype : headers ] ;
 
 StaticLibrary libpainter.a :
