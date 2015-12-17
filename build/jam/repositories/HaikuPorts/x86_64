@@ -153,8 +153,8 @@ RemotePackageRepository HaikuPorts
 	harfbuzz_devel-1.1.1-1
 	help2man-1.46.6-1
 	htmldoc-1.8.27-3
-	icu-55.1-5
-	icu_devel-55.1-5
+	icu-55.1-6
+	icu_devel-55.1-6
 	icu54-54.1-2
 	icu54_devel-54.1-2
 	intltool-0.40.6-4
@@ -378,7 +378,7 @@ RemotePackageRepository HaikuPorts
 	unzip-6.0-2
 	vim-7.4-3
 	vision-0.9.7.r949-3
-	wget-1.17.0-1
+	wget-1.17.1-1
 	which-2.21-1
 	wpa_supplicant-2.0-4
 	xml_parser-2.36-1
