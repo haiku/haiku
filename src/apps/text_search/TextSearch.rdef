@@ -22,7 +22,8 @@ resource file_types message {
 	"types" = "text",
 	"types" = "application/x-vnd.Be-directory",
 	"types" = "application/x-vnd.Be-symlink",
-	"types" = "application/x-vnd.Be-volume"
+	"types" = "application/x-vnd.Be-volume",
+	"types" = "application/xhtml+xml"
 };
 
 resource vector_icon {
