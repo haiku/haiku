@@ -5,11 +5,13 @@
  * Copyright (C) 2004 Marcus Overhagen
  * Copyright (C) 2009 Stephan Amßus <superstippi@gmx.de>
  * Copyright (C) 2014 Colin Günther <coling@gmx.de>
+ * Copyright (C) 2015 Adrien Destugues <pulkomandy@pulkomandy.tk>
  *
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 //! libavcodec based decoder for Haiku
+
 
 #include "AVCodecDecoder.h"
 
@@ -87,6 +89,7 @@ AVCodecDecoder::AVCodecDecoder()
 	fIsAudio(false),
 	fCodec(NULL),
 	fContext(avcodec_alloc_context3(NULL)),
+	fResampleContext(NULL),
 	fDecodedData(NULL),
 	fDecodedDataSizeInBytes(0),
 	fPostProcessedDecodedPicture(avcodec_alloc_frame()),
@@ -144,6 +147,7 @@ AVCodecDecoder::~AVCodecDecoder()
 	if (fCodecInitDone)
 		avcodec_close(fContext);
 
+	swr_free(&fResampleContext);
 	free(fChunkBuffer);
 	free(fDecodedData);
 
@@ -229,8 +233,7 @@ AVCodecDecoder::Setup(media_format* ioEncodedFormat, const void* infoBuffer,
 		} else {
 			if (fIsAudio) {
 				fBlockAlign
-					= ioEncodedFormat->u.encoded_audio.output
-						.buffer_size;
+					= ioEncodedFormat->u.encoded_audio.output.buffer_size;
 				TRACE("  using buffer_size as block align: %d\n",
 					fBlockAlign);
 			}
@@ -404,6 +407,13 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 		= av_realloc(fRawDecodedAudio->opaque, sizeof(avformat_codec_context));
 	if (fRawDecodedAudio->opaque == NULL)
 		return B_NO_MEMORY;
+
+	fResampleContext = swr_alloc_set_opts(NULL,
+		fContext->channel_layout, fContext->request_sample_fmt,
+		fContext->sample_rate,
+		fContext->channel_layout, fContext->sample_fmt, fContext->sample_rate,
+		0, NULL);
+	swr_init(fResampleContext);
 
 	TRACE("  bit_rate = %d, sample_rate = %d, channels = %d, "
 		"output frame size: %d, count: %ld, rate: %.2f\n",
@@ -894,24 +904,42 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 	assert(fRawDecodedAudio->nb_samples < fOutputFrameCount);
 	assert(fOutputFrameRate > 0);
 
-	int32 frames = min_c(fOutputFrameCount - fRawDecodedAudio->nb_samples,
-		fDecodedDataBufferSize / fOutputFrameSize);
+	int32 outFrames = fOutputFrameCount - fRawDecodedAudio->nb_samples;
+	int32 inFrames = fDecodedDataBufferSize;
+
+	int32 frames = min_c(outFrames, inFrames);
 	if (frames == 0)
 		debugger("fDecodedDataBufferSize not multiple of frame size!");
 
-	size_t remainingSize = frames * fOutputFrameSize;
+	// The old version of libswresample available for gcc2 gets confused when
+	// the frame counts for inout and output don't match. So, we use it with
+	// equal frame counts (but it can still perform re-matrixing of the audio).
+#if LIBSWRESAMPLE_VERSION_INT <= AV_VERSION_INT(0, 6, 100)
+	//outFrames = frames;
+	inFrames = frames;
+#endif
 
-#if 0
 	// Some decoders do not support format conversion on themselves, or use
 	// "planar" audio (each channel separated instead of interleaved samples).
-	// If this is a problem we will need to use swresample to convert the data
-	// here, instead of directly copying it.
-	swr_convert(fResampleContext, fRawDecodedAudio->data,
-		fDecodedDataBuffer->data + fDecodedDataBufferOffset, frames);
-#else
-	memcpy(fRawDecodedAudio->data[0], fDecodedDataBuffer->data[0]
-		+ fDecodedDataBufferOffset, remainingSize);
-#endif
+	// In that case, we use swresample to convert the data (and it is
+	// smart enough to do just a copy, when possible)
+	const uint8_t* ptr[8];
+	for (int i = 0; i < 8; i++) {
+		if (fDecodedDataBuffer->data[i] == NULL)
+			ptr[i] = NULL;
+		else
+			ptr[i] = fDecodedDataBuffer->data[i] + fDecodedDataBufferOffset;
+	}
+
+	int32 result = swr_convert(fResampleContext, fRawDecodedAudio->data,
+		outFrames, ptr, inFrames);
+
+	size_t remainingSize = inFrames * fOutputFrameSize;
+	size_t decodedSize = outFrames * fOutputFrameSize;
+	fDecodedDataBufferSize -= inFrames;
+
+	if (result < 0)
+		debugger("resampling failed");
 
 	bool firstAudioFramesCopiedToRawDecodedAudio
 		= fRawDecodedAudio->data[0] != fDecodedData;
@@ -925,22 +953,21 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 		codecContext->sample_rate = fContext->sample_rate;
 	}
 
-	fRawDecodedAudio->data[0] += remainingSize;
-	fRawDecodedAudio->linesize[0] += remainingSize;
-	fRawDecodedAudio->nb_samples += frames;
+	fRawDecodedAudio->data[0] += decodedSize;
+	fRawDecodedAudio->linesize[0] += decodedSize;
+	fRawDecodedAudio->nb_samples += outFrames;
 
 	fDecodedDataBufferOffset += remainingSize;
-	fDecodedDataBufferSize -= remainingSize;
 
 	// Update start times accordingly
 	bigtime_t framesTimeInterval = static_cast<bigtime_t>(
 		(1000000LL * frames) / fOutputFrameRate);
 	fDecodedDataBuffer->pkt_dts += framesTimeInterval;
-		// Start time of buffer is updated in case that it contains
-		// more audio frames to move.
+	// Start time of buffer is updated in case that it contains
+	// more audio frames to move.
 	fTempPacket.dts += framesTimeInterval;
-		// Start time of fTempPacket is updated in case the fTempPacket
-		// contains more audio frames to decode.
+	// Start time of fTempPacket is updated in case the fTempPacket
+	// contains more audio frames to decode.
 }
 
 
@@ -965,6 +992,7 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 		2. fDecodedDataBufferOffset is set to zero.
 		3. fDecodedDataBuffer contains audio frames.
 
+
 	\returns B_OK on successfully decoding one audio frame chunk.
 	\returns B_LAST_BUFFER_ERROR No more audio frame chunks available. From
 		this point on further calls will return this same error.
@@ -975,7 +1003,7 @@ AVCodecDecoder::_DecodeNextAudioFrameChunk()
 {
 	assert(fDecodedDataBufferSize == 0);
 
-	while(fDecodedDataBufferSize == 0) {
+	while (fDecodedDataBufferSize == 0) {
 		status_t loadingChunkStatus
 			= _LoadNextChunkIfNeededAndAssignStartTime();
 		if (loadingChunkStatus != B_OK)
@@ -1068,9 +1096,7 @@ AVCodecDecoder::_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer()
 	if (gotNoAudioFrame)
 		return B_OK;
 
-	fDecodedDataBufferSize = av_samples_get_buffer_size(NULL,
-		fContext->channels, fDecodedDataBuffer->nb_samples,
-		fContext->sample_fmt, 1);
+	fDecodedDataBufferSize = fDecodedDataBuffer->nb_samples;
 	if (fDecodedDataBufferSize < 0)
 		fDecodedDataBufferSize = 0;
 
