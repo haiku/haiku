@@ -37,7 +37,7 @@ Battery charging	PowerStatus		Se încarcă bateria
 The battery level is critical, please plug in the device immediately.	PowerStatus		Nivelul bateriei este critic, puneți în priză dispozitivul acum.
 Design capacity warning: 	PowerStatus		Avertisment capacitate model:
 Battery info	PowerStatus		Info baterie
-Quit	PowerStatus		Părăsește
+Quit	PowerStatus		Închidere
 rechargeable	PowerStatus		reîncărcabilă
 charging	PowerStatus		se încarcă
 You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Puteți să rulați StareConsum într-o ferestră sau să îl instalați pe bara de desktop.

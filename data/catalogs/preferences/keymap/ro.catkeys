@@ -6,7 +6,7 @@ Slovak	Keyboard Layout View		Slovacă
 Hungarian	Keyboard Layout View		Maghiară
 German	Keyboard Layout View		Germană
 Swiss-French	Keyboard Layout View		Franceză elvețiană
-Warning: left and right key roles do not match	Modifier keys window		Avertisment: rolurile pentru tasta stângă și dreapta nu se potrivesc.
+Warning: left and right key roles do not match	Modifier keys window		Avertisment: rolurile pentru tastele stânga și dreapta nu se potrivesc
 Belgian (comma)	Keyboard Layout View		Belgian (Virgulă)
 Scroll lock	Keyboard Layout View		Scroll lock
 Belarusian (Mac)	Keyboard Layout View		Belarusă (Mac)
@@ -16,7 +16,7 @@ US	Keyboard Layout View		Engleză US
 Left control	Keyboard Layout View		Control stânga
 Spanish	Keyboard Layout View		Spaniolă
 Ukrainian (Mac)	Keyboard Layout View		Ucraineană (Mac)
-Belarusian	Keyboard Layout View		Bielorusă
+Belarusian	Keyboard Layout View		Bielarusă
 Italian	Keyboard Layout View		Italiană
 Polish (Typewriter)	Keyboard Layout View		Poloneză (Mașină de scris)
 Tilde trigger	Keymap window		Declanșator tildă
@@ -39,7 +39,7 @@ Dvorak (programmer's)	Keyboard Layout View		Dvorak (programatori)
 Estonian	Keyboard Layout View		Estonă
 Russian (Mac)	Keyboard Layout View		Rusă (Mac)
 Defaults	Keymap window		Implicite
-Quit	Keymap window		Părăsește
+Quit	Keymap window		Închidere
 Dutch	Keyboard Layout View		Olandeză
 Switch shortcut keys to Haiku mode	Keymap window		Schimbă scurtăturile la modul Haiku
 Circumflex trigger	Keymap window		Declanșator circumflex
@@ -72,7 +72,7 @@ Shift key	Modifier keys window	Label of key above Ctrl, usually Shift	Tasta Shif
 User:	Keymap window		Utilizator:
 Esperanto	Keyboard Layout View		Esperanto
 Arabic (102)	Keyboard Layout View		Arabă (102)
-United-Kingdom	Keyboard Layout View		Regatul Unit al Marii Britanii
+United-Kingdom	Keyboard Layout View		Regatul Unit
 German (Mac)	Keyboard Layout View		Germană (Mac)
 Right option	Keyboard Layout View		Opțiune dreapta
 Right shift	Keyboard Layout View		Shift dreapta
@@ -111,7 +111,7 @@ Swedish	Keyboard Layout View		Suedeză
 Macedonian	Keyboard Layout View		Macedoneană
 (Current)	Keymap window		(Curent)
 Font	Keymap window		Font
-Keymap	System name		HartăTaste
+Keymap	System name		Keymap
 French (Mac)	Keyboard Layout View		Franceză (Mac)
 Left shift	Keyboard Layout View		Shift stânga
 Shift	Keyboard Layout View	Shift key	Shift

@@ -48,7 +48,7 @@ Loop audio	MediaPlayer-SettingsWindow		Repetă audio
 Container	MediaPlayer-InfoWin		Recipient
 Nothing to Play	MediaPlayer-Main		Nimic de redat
 Muted	MediaPlayer-SettingsWindow		Mut
-Quit	MediaPlayer-Main		Părăsește
+Quit	MediaPlayer-Main		Închidere
 Video	MediaPlayer-Main		Video
 Start playing.	MediaPlayer-Main		Începe redarea
 There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Nu există niciun decodor instalat pentru a gestiona formatul fișierului, sau decodorul întâmpină probleme cu versiunea specifică a formatului.

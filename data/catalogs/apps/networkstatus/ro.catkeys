@@ -19,4 +19,4 @@ OK	NetworkStatusView		OK
 NetworkStatus	System name		StareRețea
 Open network preferences…	NetworkStatusView		Deschide preferințe de rețea...
 Could not join wireless network:\n	NetworkStatusView		Nu s-a putut face legătura la rețeaua fără fir:\n
-Quit	NetworkStatusView		Părăsește
+Quit	NetworkStatusView		Închidere

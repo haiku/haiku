@@ -4,7 +4,7 @@ Username:	Authentication Panel		Nume utilizator:
 Copy URL to clipboard	Download Window		Copiază URL în clipboard
 Cancel	Settings Window		Anulează
 Close window	WebPositive Window		Închide fereastra
-Quit	WebPositive		Renunţă
+Quit	WebPositive		Închidere
 The download could not be opened.	Download Window		Descărcarea nu a putut fi deschisă.
 The downloads folder could not be opened.\n\nError: %error	Download Window	Don't translate variable %error	Dosarul de descărcări nu a putut fi deschis..\n\nEroare: %error
 Open location	WebPositive Window		Deschide locația
@@ -42,7 +42,7 @@ Zoom text only	WebPositive Window		Mărește numai textul
 Default fixed font size:	Settings Window		Dimensiune font fixat implicită:
 Close tab	WebPositive Window		Închide tabul
 Auto-hide mouse pointer	Settings Window		Ascunde automat indicatorul mouseului
-Quit	WebPositive Window		Ieșire
+Quit	WebPositive Window		Închidere
 Full screen	WebPositive Window		Pe tot ecranul
 Open download error	Download Window		Deschide eroarea descărcării
 The cookie jar is empty!	Cookie Manager		Borcanul cu cookie este liber!

@@ -3,7 +3,7 @@ Pairs did not find enough vector icons to start; it needs at least %zu, found %z
 %app%\n\twritten by Ralf Schülke\n\tCopyright 2008-2010, Haiku Inc.\n\n	PairsWindow		%app%\n\tscris de Ralf Schülke\n\tDrepturi de autor 2008-2010, Haiku Inc.\n\n
 Expert (8x8)	PairsWindow		Avansat (8x8)
 Beginner (4x4)	PairsWindow		Începător (4x4)
-You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ați completat jocul in {0, plural, one{# clic} other{# clicuri}}.\n
+You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ați completat jocul în {0, plural, one{# click} other{# clicks}}.\n
 Quit game	PairsWindow		Închide jocul
 Large	PairsWindow		Mare
 Small	PairsWindow		Mic
@@ -12,7 +12,7 @@ OK	Pairs		OK
 Size	PairsWindow		Dimensiune
 New	PairsWindow		Nou
 Intermediate (6x6)	PairsWindow		Mediu (6x6)
-Quit	PairsWindow		Închide
+Quit	PairsWindow		Închidere
 Pairs	System name		Perechi
 New game	PairsWindow		Joc nou
 Medium	PairsWindow		Mediu

@@ -4,8 +4,8 @@ Are you sure you want to abort the installation and restart the system?	Installe
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Program de instalare\n\tscris de Jérôme Duval și Stephan Aßmus\n\tDrepturi de autor 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
 Here you have to comment out the line \"GRUB_HIDDEN_TIMEOUT=0\" by putting a \"#\" in front of it in order to actually display the boot menu.\n\n	InstallerApp		Aici trebuie să transformați linia \"GRUB_HIDDEN_TIMEOUT=0\" într-un comentariu punând un \"#\" în fața acesteia pentru a afișa meniul de pornire a sistemului.\n\n
-Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalarea s-a terminat. Sectorul de boot a fost scris pe „%s”. Clic pe Părăsește pentru a ieși din programul de instalare sau alege un volum de destinație nou pentru a executa altă instalare.
-Quit	InstallerApp		Părăsește
+Installation completed. Boot sector has been written to '%s'. Press Quit to leave the Installer or choose a new target volume to perform another installation.	InstallerWindow		Instalarea s-a terminat. Sectorul de boot a fost scris pe „%s”. Clic pe Închidere pentru a ieși din programul de instalare sau alege un volum de destinație nou pentru a executa altă instalare.
+Quit	InstallerApp		Închidere
 Additional disk space required: 0.0 KiB	InstallerWindow		Spațiu de disc adițional necesar: 0.0 KiB
 \tsudo update-grub\n\n\n	InstallerApp		\tsudo update-grub\n\n\n
 Stop	InstallerWindow	In alert after pressing Stop	Oprește
@@ -14,7 +14,7 @@ Starting Installation.	InstallProgress		Se pornește instalarea.
 This is alpha-quality software! It means there is a high risk of losing important data. Make frequent backups! You have been warned.\n\n\n	InstallerApp		Acestea sunt programe de calitatea alfa! Înseamnă că există un mare risc de a pierde date importante. Efectuați copii de rezervă frecvente! Ați fost avertizat!\n\n\n
 Are you sure you want to abort the installation?	InstallerWindow		Sigur dorești să renunți la instalare?
 Are you sure you want to install onto the current boot disk? The Installer will have to reboot your machine if you proceed.	InstallProgress		Sigur doriți să instalați pe discul de bot curent? Programul de instalare va fi nevoit să repornească sistemul dacă veți continua.
-Quit Boot Manager	InstallerWindow		Părăsește Administratorul de boot
+Quit Boot Manager	InstallerWindow		Închide Boot Manager
 Stop	InstallerWindow		Oprește
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
 If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Dacă abordarea os-prober nu funcționează, GRUB 3 utilizează un fișier de configurare extra pentru a adăuga intrări personalizate la meniul de pornire. Pentru a le adăuga la început, trebuie să creați/editați un fișier prin lansarea editorului preferat dintr-un Terminal în felul acesta:\n\n
@@ -30,8 +30,8 @@ Continue	InstallerWindow	In alert after pressing Stop	Continuă
 Write boot sector to '%s'	InstallerWindow		Scrie sectorul de pornire a sistemului pe „%s”
 Collecting copy information.	InstallProgress		Se colectează informațiile de copiere.
 Choose the source disk from the pop-up menu. Then click \"Begin\".	InstallerWindow		Alege discul sursă din meniul contextual. Apoi apasă \"Începe\".
-Quit Boot Manager and DriveSetup	InstallerWindow		Părăsește Administratorul de boot și ConfigurareDrive
-Quit	InstallerWindow		Părăsește
+Quit Boot Manager and DriveSetup	InstallerWindow		Închide Boot Manager și DriveSetup
+Quit	InstallerWindow		Închidere
 Welcome to the Haiku Installer!\n\n	InstallerApp		Bine ați venit la Programul de instalare Haiku!\n\n
 Boot sector successfully written.	InstallProgress		Sector de boot scris cu succes.
 Performing installation.	InstallProgress		Se execută instalarea.
@@ -65,7 +65,7 @@ You can't install the contents of a disk onto itself. Please choose a different 
 ???	InstallerWindow	Unknown currently copied item	???
 \"n\" is the partition number, which for GRUB 2 starts with \"1\"\n	InstallerApp		\"n\" este numărul partiției, care pentru GRUB 2 începe cu \"1\"\n
 Starting with os-prober v1.44 (e.g. in Ubuntu 11.04 or later), Haiku should be recognized out of the box. To add Haiku to the GRUB menu, open a Terminal and enter:\n\n	InstallerApp		Începând cu os-prober v1.44 (e.g. în Ubuntu 11.05 sau mai târziu), Haiku ar trebui să fie recunoscut direct. Pentru a adăuga Haiku la meniul GRUB, deschideți un Terminal și scrieți:\n\n
-Quit DriveSetup	InstallerWindow		Părăsește ConfigurăriDrive
+Quit DriveSetup	InstallerWindow		Închide DriveSetup
 \"N\" is the hard disk number, starting with \"0\".\n	InstallerApp		\"N\" este numărul hard discului, care începe cu \"0\".\n
 Hide optional packages	InstallerWindow		Ascunde pachetele opționale
 Please close the DriveSetup window before closing the Installer window.	InstallerWindow		Alegeți fereastra ConfigurareDrive înainte de a închide fereastra Programului de instalare.

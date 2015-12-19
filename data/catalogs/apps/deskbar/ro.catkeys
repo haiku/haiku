@@ -13,7 +13,7 @@ Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplicații
 Find…	DeskbarMenu		Căutare...
 Show clock	Tray		Afișează ceasul
 Window	PreferencesWindow		Fereastră
-Defaults	PreferencesWindow		Valori implicite
+Defaults	PreferencesWindow		Implicite
 Menu	PreferencesWindow		Meniu
 Recent documents	DeskbarMenu		Documente recente
 Auto-hide	PreferencesWindow		Ascundere automată
@@ -48,4 +48,4 @@ Demos	B_USER_DESKBAR_DIRECTORY/Demos		Demo-uri
 Icon size	PreferencesWindow		Dimensiune pictogramă
 Desktop applets	B_USER_DESKBAR_DIRECTORY/Desktop applets		Miniaplicații desktop
 Hide all	WindowMenu		Ascunde tot
-Quit application	WindowMenu		Părăsește aplicația
+Quit application	WindowMenu		Închide aplicația

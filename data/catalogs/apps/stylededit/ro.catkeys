@@ -25,7 +25,7 @@ Case-sensitive	FindandReplaceWindow		Sensibil la majuscule
 Reload	NodeMonitorAlerts		Reîncărcare
 Replace in all windows	FindandReplaceWindow		Înlocuiește în toate ferestrele
 Wrap lines	Menus		Încadrează linii
-Quit	Menus		Părăsește
+Quit	Menus		Închidere
 File \"%file%\" was removed by another application, recover it?	NodeMonitorAlerts		Fișierul \"%file%\" a fost eliminat de altă aplicație, îl recuperați?
 Document statistics	Statistics		Statistici document
 Cancel	RevertToSavedAlert		Anulează

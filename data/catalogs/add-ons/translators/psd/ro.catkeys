@@ -14,7 +14,7 @@ RGBA	PSDLoader		RGBA
 Photoshop image (%s)	PSDTranslator		Imagine Photoshop (%s)
 PSDTranslator Settings	PSDConfig		Configurări PSDTranslator
 RGB	PSDLoader		RGB
-Bitmap	PSDLoader		Hartă de biți
+Bitmap	PSDLoader		Bitmap
 CMYK	PSDLoader		CMYK
 Compression: 	PSDConfig		Comprimare: 
 Format: 	PSDConfig		Format: 

@@ -20,7 +20,7 @@ Source Code: 	AboutView		Cod sursă:
 {0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Procesor:} other{# Procesoare:}}
 Kernel:	AboutView		Nucleu:
 BSD (4-clause)	AboutWindow		BSD (clauza 4)
-The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor ale codului Haiku reprezintă proprietatea a Haiku, Inc. sau a respectivilor autori, atunci când este notat explicit în sursă. Haiku® şi logo-ul HAIKU® sunt mărci înregistrate ale Haiku, Inc.\n\n
+The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Drepturile de autor ale codului Haiku reprezintă proprietatea a Haiku, Inc. sau a respectivilor autori atunci când este notat explicit în sursă. Haiku® şi logoul HAIKU® sunt mărci înregistrate ale Haiku, Inc.\n\n
 Marvell (firmware)	AboutWindow		Marvell (firmware)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Drepturi de autor © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nToate drepturile rezervate.
 GNU LGPL v2	AboutWindow		GNU LGPL v2

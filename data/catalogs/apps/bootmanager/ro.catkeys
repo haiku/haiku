@@ -28,7 +28,7 @@ The following partitions were detected. Please check the box next to the partiti
 After one minute	DefaultPartitionPage		După un minut
 The old Master Boot Record could not be saved to %s. You can continue the installation but there will be no way to uninstall the boot menu.	BootManagerController		Vechea Înregistrare de Boot Principală nu s-a putut salva la %s. Puteți continua instalarea dar nu o să mai aveți cum să dezinstalați meniul de boot.
 The Master Boot Record of the boot device (%DISK) has been successfully restored from %FILE.	BootManagerController		Înregistrarea de boot principală a unității de boot (%DISK) a fost restaurată cu succes de la %FILE.
-Quit	WizardView	Button	Părăsește
+Quit	WizardView	Button	Închidere
 Write boot menu	BootManagerController	Button	Scrie meniul de boot
 The Master Boot Record could not be restored!	BootManagerController		Înregistrarea de boot principală nu a putut fi restaurată!
 Uninstall	DrivesPage	Button	Dezinstalează

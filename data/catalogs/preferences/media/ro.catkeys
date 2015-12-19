@@ -2,10 +2,10 @@
 Couldn't add volume control in Deskbar: %s\n	Media views		Nu s-a putut adăuga controlul de volum pe bara de desktop: %s\n
 Video input:	Media views		Intrare video:
 Warning!	Media Window		Avertisment!
-Quit anyway	Media Window		Ieșiți oricum
+Quit anyway	Media Window		Închide oricum
 Defaults	Media views		Implicite
 MIDI Settings	Media Window		Configurări MIDI
-Quit	Media Window		Părăsește
+Quit	Media Window		Închidere
 Video settings	Media Window		Configurări video
 Video output:	Media views		Ieșire video:
 Could not connect to the media server.\nWould you like to start it ?	Media Window		Nu s-a putut conecta la serverul media.\nDoriți să îl porniți?

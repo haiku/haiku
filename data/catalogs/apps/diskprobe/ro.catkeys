@@ -42,7 +42,7 @@ Back	ProbeView		Înapoi
 Device	ProbeView		Dispozitiv
 Unknown type	TypeEditors		Tip necunoscut
 Block 0x%Lx	ProbeView		Bloc 0x%Lx
-Quit	FileWindow		Părăsește
+Quit	FileWindow		Închidere
 Undo	ProbeView		Refă
 Close	ProbeView		Închide
 Number	TypeEditors	This is the type of editor	Număr
@@ -74,7 +74,7 @@ Raw editor	AttributeWindow		Editor brut
 Message View	TypeEditors		Vizualizare mesaj
 DiskProbe request	ProbeView		Cerere TestareDisc
 32 bit unsigned size:	TypeEditors		dimensiune naturală 32 bit:
-Flattened bitmap	TypeEditors		Hartă de biți teșită
+Flattened bitmap	TypeEditors		Bitmap neted
 Open file…	FileWindow		Deschide fișier...
 Next	ProbeView		Următor
 Close	FileWindow		Închide

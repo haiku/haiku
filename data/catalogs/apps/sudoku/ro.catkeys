@@ -32,4 +32,4 @@ Blank	SudokuWindow		Spațiu
 Help	SudokuWindow		Ajutor
 Searching for removable values	SudokuGenerator		Se caută valorile care se pot elimina
 Undo	SudokuWindow		Anulează
-Quit	SudokuWindow		Renunţă
+Quit	SudokuWindow		Închidere

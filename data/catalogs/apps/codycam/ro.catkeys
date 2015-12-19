@@ -3,7 +3,7 @@ Upload…	VideoConsumer.cpp		Încărcare...
 Capturing Image…	VideoConsumer.cpp		Se capturează imaginea...
 Every 30 seconds	CodyCam		La fiecare 30 de secunde
 File name:	CodyCam		Nume fișier:
-Last Capture: 	VideoConsumer.cpp		Ultima captură:
+Last Capture: 	VideoConsumer.cpp		Ultima captură: 
 Server login failed	VideoConsumer.cpp		Autentificarea la server a eșuat
 Remote host has closed the connection.\n	FtpClient		Gazda la distanță a închis conexiunea.\n
 Login:	CodyCam		Autentificare:
@@ -72,7 +72,7 @@ capture rate expected	CodyCam		cota de captură așteptată
 Error getting initial latency for the capture node	CodyCam		Eroare la obținerea latenței inițiale pentru modul captură
 Send to…	CodyCam		Trimite la...
 on or off expected	Settings	Do not translate 'on' and 'off'	on sau off așteptat
-Quit	CodyCam		Părăsește
+Quit	CodyCam		Închidere
 cmd: '%s'\n	FtpClient		cmd: „%s”\n
 Never	CodyCam		Niciodată
 Cannot create a video window	CodyCam		Nu se poate crea o fereastră video

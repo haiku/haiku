@@ -19,7 +19,7 @@ Processor %d	ProcessController		Procesor %d
 ProcessController is already installed in Deskbar.	ProcessController		ControlerProces este instalat deja pe bara de desktop.
 This is the last active processor...\nYou can't turn it off!	ProcessController		Acesta este ultimul procesor activ...\nNu puteți să îl opriți!
 Info	ProcessController		Detalii
-Quit application	ProcessController		Părăsește aplicația
+Quit application	ProcessController		Închide aplicația
 Low priority	ProcessController		Prioritate scăzută
 What do you want to do with the thread \"%s\"?	ProcessController		Ce doriți să faceți cu firul de execuție \"%s\"?
 Gone teams…	ProcessController		Echipe plecate...
@@ -33,7 +33,7 @@ New Terminal	ProcessController		Terminal nou
 Urgent priority	ProcessController		Prioritate urgentă
 About ProcessController…	ProcessController		Despre ControlerProces
 Ok!	ProcessController		OK!
-Quit an application	ProcessController		Părăsește o aplicație
+Quit an application	ProcessController		Închide o aplicație
 Install in Deskbar	ProcessController		Instalează pe bara de desktop
 Threads and CPU usage	ProcessController		Utilizare fire de execuție și CPU
 Urgent display priority	ProcessController		Prioritate afișaj urgent

@@ -16,7 +16,7 @@ Processor	DeviceSCSI		Procesor
 RBC	DeviceSCSI		RBC
 Detailed	DevicesView		Detaliat
 Category	DevicesView		Categorie
-Quit	DevicesView		Părăsește
+Quit	DevicesView		Închidere
 Device paths	Device		Căi dispozitiv
 Scanner	DeviceSCSI		Scanner
 Printer	DeviceSCSI		Imprimantă

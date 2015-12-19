@@ -12,7 +12,7 @@ Copy	TextView		Copiază
 alpha	AboutWindow		alfa
 Error	PrintJob		Eroare
 All Rights Reserved.	AboutWindow		Toate drepturile rezervate.
-{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# octet} other{# octeți}}
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
 About %app%	AboutWindow		Despre %app%
 No pages to print!	PrintJob		Fără pagini de imprimat!
 OK	Dragger		OK

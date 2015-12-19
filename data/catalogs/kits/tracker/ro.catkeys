@@ -4,7 +4,7 @@ Add-ons	FilePanelPriv		Module
 Mount settings…	ContainerWindow		Configurări montare...
 Desktop	Model		Desktop
 Identify	ContainerWindow		Identifică
-Warning space color	SettingsView		Avertisment despre spațiul de culoare
+Warning space color	SettingsView		Culoare spațiu avertisment
 Open	OpenWithWindow		Deschide
 Tracker status	StatusWindow		Stare tracker
 Eject when unmounting	AutoMounterSettings		Scoate la demontare
@@ -145,7 +145,7 @@ Resize to fit	QueryContainerWindow		Redimensionează pentru a potrivi
 Desktop	TrackerSettingsWindow		Desktop
 Sorry, you can't copy items to the Trash.	FSClipBoard		Îmi pare rău, nu puteți copia elementele la gunoi.
 by attribute	FindPanel		după atribut
-Disk mounting during boot	AutoMounterSettings		Montare de disc în timpul pornirii sistemului
+Disk mounting during boot	AutoMounterSettings		Montare disc în timpul pornirii
 New Query	FindPanel		Interogare nouă
 Preparing to move items…	StatusWindow		Se pregătește mutarea elementelor...
 You cannot replace a file with a folder or a symbolic link.	FSUtils		Nu puteți înlocui un fișier cu un dosar sau o legătură simbolică.
@@ -259,7 +259,7 @@ Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol)
 The target disk does not support creating links.	FSUtils		Discul destinație nu suportă crearea de legături.
 starts with	SelectionWindow		începe cu
 Preparing to delete items…	StatusWindow		Se pregătește ștergerea elementelor...
-Enable type-ahead filtering	SettingsView		Activează filtrarea tastează-înainte
+Enable type-ahead filtering	SettingsView		Activează filtrarea type-ahead
 Would you like to find a suitable application to open the file?	FSUtils		Doriți să găsiți o aplicație potrivită pentru a deschide fișierul?
 There was an error writing the attribute.	WidgetAttributeText		A apărut o eroare la scrierea atributului.
 Recalculate folder size	InfoWindow		Recalculează dimensiunea dosarului
@@ -420,7 +420,7 @@ Edit query	ContainerWindow		Editează interogarea
 Find…	ContainerWindow		Găsește...
 Create a Query	FindPanel		Creează o interogare
 Move to Trash	FSUtils		Mută la gunoi
-Automatic disk mounting	AutoMounterSettings		Montare de disc automată
+Automatic disk mounting	AutoMounterSettings		Montare disc automată
 Original name	ContainerWindow		Nume original
 Find	FSUtils		Găsește
 Error copying file \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Eroare la copierea fișierului \"%name\":\n\t%error\n\nDoriți să continuați?

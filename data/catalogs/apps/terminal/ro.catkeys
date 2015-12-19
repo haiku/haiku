@@ -8,7 +8,7 @@ OK	Terminal TermWindow		OK
 New Terminal	Terminal TermWindow		Terminal nou
 Terminal couldn't start the shell. Sorry.	Terminal TermApp		Terminalul nu a putut porni shell. Îmi pare rău.
 Match case	Terminal FindWindow		Potrivire caz
-Quit	Terminal TermWindow		Părăsește
+Quit	Terminal TermWindow		Închidere
 Use default shell	Terminal Shell		Utilizează shell implicit
 Confirm exit if active programs exist	Terminal AppearancePrefView		Confirmă ieșirea dacă există programe active
 The pattern specifying the current tab title. The following placeholders\ncan be used:\n	Terminal TermWindow		Tiparul care specifică titlul tabului curent. Următoarele marcaje\npot fi utilizate:\n
@@ -27,7 +27,7 @@ Unrecognized option \"%s\"\n	Terminal arguments parsing		Opțiune \"%s\" nerecun
 Blue	Terminal colors scheme		Albastru
 Custom	Terminal colors scheme		Personalizat
 Encoding:	Terminal AppearancePrefView		Codare:
-%app% settings	Terminal PrefWindow	window title	configurări %app%
+%app% settings	Terminal PrefWindow	window title	Configurări %app%
 Cancel	Terminal SetTitleWindow		Anulează
 Increase	Terminal TermWindow		Mărește
 Settings	Terminal TermWindow		Configurări
@@ -109,7 +109,7 @@ Copy link location	Terminal TermView		Copiază locația legăturii
 Tab title:	Terminal TermWindow		Titlu tab:
 Find next	Terminal TermWindow		Găsește următorul
 Close active tab	Terminal TermWindow		Închide tabul activ
-\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tCaracterul '%'.\n\t%<\t-\tPornește o secțiune care va fi afișată doar dacă un substituent\n\t\t\tnu va fi după aceea liber.\n\t%>\t-\tPornește o secțiune care va fi afișată doar dacă un substituent\n\t\t\tîntre o secțiune precedentă %< și aceasta nu else liber.\n\t%-\t-\tTermină o secțiune %< sau %>.\n\nOrice caractere non alfa-numerice între '%' și litera de formatare vor insera doar un spațiu\ndacă valoarea substituentului nu este liberă. Va adăuga la secțiunea %<.
+\t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%>\t%%\t-\tCaracterul „%s”.\n\t%<\t-\tÎncepe o secțiune care va fi afișată doar dacă un substituent\n\t\t\tnu va fi după aceea liber.\n\t%>\t-\tÎncepe o secțiune care va fi afișată doar dacă un substituent\n\t\t\tîntre o secțiune precedentă %< și aceasta nu este liber.\n\t%-\t-\tTermină o secțiune %< sau %>.\n\nOrice caractere non-alfanumerice între „%” și litera de formatare vor insera doar un spațiu\ndacă valoarea substituentului nu este liberă. Va adăuga la secțiunea %<.
 Paste	Terminal TermWindow		Lipește
 Solarized Dark	Terminal colors scheme		Întuneric solarizat
 Shell 	Terminal TermWindow		Shell

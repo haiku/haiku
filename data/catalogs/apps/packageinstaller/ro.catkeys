@@ -23,7 +23,7 @@ Stop	PackageStatus		Oprire
 Other…	PackageView		Altele...
 No installation type selected	PackageView		Niciun tip de instalare selectat
 Installing files and folders	PackageInstall		Se instalează fișiere și dosare
-Package installer	PackageView		Instalator de pachete
+Package installer	PackageView		Program de instalare pachete
 Skip all	PackageView		Omite tot
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Elementul '%s' există deja pe calea dată.\nÎl înlocuiți cu cel din acest pachet sau omiteți?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Scriptul '%s' există deja pe calea dată.\nÎl îinlocuiți cu cel din acest pachet sau omiteți?

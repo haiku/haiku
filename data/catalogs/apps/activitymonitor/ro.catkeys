@@ -1,5 +1,5 @@
 1	romanian	x-vnd.Haiku-ActivityMonitor	2455521641
-P-faults	DataSource		Defecțiuni de tip P
+P-faults	DataSource		Defecțiuni-P
 Media nodes	DataSource		Noduri media
 Threads	DataSource		Fire de execuție
 Always on top	ActivityWindow		Mereu deasupra
@@ -25,7 +25,7 @@ Cache	DataSource		Cache
 %.1f faults/s	DataSource		%.1f defecțiuni/s
 Update time interval:	SettingsWindow		Actualizează intervalul de timp:
 TX	DataSource	Shorter version for Sending	TX
-Quit	ActivityWindow		Părăsește
+Quit	ActivityWindow		Închidere
 Block cache memory	DataSource		Blochează memoria tampon
 Remove graph	ActivityView		Elimină grafic
 %lld sec.	SettingsWindow		%lld sec.
@@ -34,7 +34,7 @@ CPU usage	DataSource		Utilizare CPU
 Raw clipboard	DataSource		Clipboard brut
 Sems	DataSource		Sems
 %.1f MiB	DataSource		%.1f MO
-ActivityMonitor	System name		MonitorActivitate
+ActivityMonitor	System name		ActivityMonitor
 Running applications	DataSource		Aplicații care rulează
 Semaphores	DataSource		Semafoare
 Block cache	DataSource		Blochează cache

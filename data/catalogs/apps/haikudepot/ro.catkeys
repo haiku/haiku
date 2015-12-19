@@ -81,7 +81,7 @@ There are problems in the form:\n\n	UserLoginWindow		Sunt probleme de forma:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Pachetul nu a fost găsit de către serviciul web. Asta înseamnă că acesta provine probabil de la un depozit care nu este urmărit acolo. Evaluarea unor asemenea pachete nu este suportată.
 Create account	UserLoginWindow		Creează cont
 Productivity	Model		Productivitate
-No, quit HaikuDepot	App		Nu, ieșire HaikuDepot
+No, quit HaikuDepot	App		Nu, închideți HaikuDepot
 Authentication failed	UserLoginWindow		Autentificarea a eșuat
 Logged in as %User%	MainWindow		Autentificat ca %User%
 9999.99 KiB	PackageListView		9999.99 KiB
@@ -105,7 +105,7 @@ Preferred language:	UserLoginWindow		Limbă preferată:
 Failed to rate package	RatePackageWindow		Eșec la evaluarea pachetului
 Internet & Network	Model		Internet & Rețea
 Cancel	MainWindow		Anulează
-Quit HaikuDepot	App		Ieșire HaikuDepot
+Quit HaikuDepot	App		Închide HaikuDepot
 Input validation	UserLoginWindow		Validare intrare
 Update	RatePackageWindow		Actualizare
 Video	Model		Video
@@ -123,7 +123,7 @@ Show	MainWindow		Arată
 Stable	RatePackageWindow		Stabil
 Unknown	PackageListView		Necunoscut
 All depots	FilterView		Toate depozitele
-Comment language:	RatePackageWindow		Limba comentariului:
+Comment language:	RatePackageWindow		Limbă comentariu:
 Pass phrase:	UserLoginWindow		Parolă:
 Screenshot	ScreenshotWindow		Captură ecran
 Not specified	RatePackageWindow		Nespecificat
