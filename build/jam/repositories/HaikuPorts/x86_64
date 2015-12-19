@@ -180,8 +180,8 @@ RemotePackageRepository HaikuPorts
 	libass_devel-0.13.0-1
 	libassuan-2.2.0-1
 	libassuan_devel-2.2.0-1
-	libbluray-0.8.1-1
-	libbluray_devel-0.8.1-1
+	libbluray-0.9.2-1
+	libbluray_devel-0.9.2-1
 	libdvdread-5.0.3-2
 	libdvdread_devel-5.0.3-2
 	libdvdnav-5.0.3-3
