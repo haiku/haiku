@@ -223,6 +223,16 @@ check_cpu_features()
 			"\tand %%r3,%%r3,%%r4\n"
 			"\tmtccr0 %%r3"
 			: : : "r3", "r4");
+
+		// kernel_args is a packed structure with 64bit fields so...
+		// we must enable unaligned transfers by setting the FLSTA bit to 0
+		// XXX: actually doesn't work for float ops which gcc emits :-(
+		asm volatile(
+			"mfccr0 %%r3\n"
+			"\tli %%r4,~(1<<(31-23))\n"
+			"\tand %%r3,%%r3,%%r4\n"
+			"\tmtccr0 %%r3"
+			: : : "r3", "r4");
 	}
 
 	// we do need an FPU for vsnprintf to work
