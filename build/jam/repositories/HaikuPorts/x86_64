@@ -194,6 +194,8 @@ RemotePackageRepository HaikuPorts
 	libexecinfo_devel-1.1-2
 	libffi-3.2.1-2
 	libffi_devel-3.2.1-2
+	libgcrypt-1.6.4-1
+	libgcrypt_devel-1.6.4-1
 	libgsasl-1.8.0-1
 	libgsasl_devel-1.8.0-1
 	libgpg_error-1.20-1
@@ -482,6 +484,7 @@ RemotePackageRepository HaikuPorts
 	libevent
 	libexecinfo
 	libffi
+	libgcrypt
 	libgsasl
 	libgpg_error
 	libicns
