@@ -216,9 +216,10 @@ check_cpu_features()
 	if (is_440) {
 		// the FPU is implemented as an Auxiliary Processing Unit,
 		// so we must enable transfers by setting the DAPUIB bit to 0
+		// (11th bit)
 		asm volatile(
 			"mfccr0 %%r3\n"
-			"\tlis %%r4,~(1<<(20-16))\n"
+			"\tlis %%r4,~(1<<(31-11-16))\n"
 			"\tand %%r3,%%r3,%%r4\n"
 			"\tmtccr0 %%r3"
 			: : : "r3", "r4");
