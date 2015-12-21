@@ -43,9 +43,9 @@
 #define _POSIX_THREADS						(200112L)
 #define _POSIX_MAPPED_FILES					(200809L)
 #define _POSIX_THREAD_PROCESS_SHARED		(200809L)
-#define _POSIX_THREAD_ATTR_STACKADDR		(-1)	/* currently unsupported */
+#undef  _POSIX_THREAD_ATTR_STACKADDR		/* currently unsupported */
 #define _POSIX_THREAD_ATTR_STACKSIZE		(200809L)
-#define _POSIX_THREAD_PRIORITY_SCHEDULING	(-1)	/* currently unsupported */
+#undef  _POSIX_THREAD_PRIORITY_SCHEDULING	/* currently unsupported */
 #define _POSIX_REALTIME_SIGNALS				(200809L)
 #define _POSIX_MEMORY_PROTECTION			(200809L)
 #define _POSIX_MONOTONIC_CLOCK				(200809L)
