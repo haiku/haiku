@@ -915,7 +915,7 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 	// the frame counts for inout and output don't match. So, we use it with
 	// equal frame counts (but it can still perform re-matrixing of the audio).
 #if LIBSWRESAMPLE_VERSION_INT <= AV_VERSION_INT(0, 6, 100)
-	//outFrames = frames;
+	outFrames = frames;
 	inFrames = frames;
 #endif
 
