@@ -156,13 +156,11 @@ __sysconf(int name)
 		case _SC_THREAD_STACK_MIN:
 			return MIN_USER_STACK_SIZE;
 		case _SC_THREAD_ATTR_STACKADDR:
-			return -1;
-				// currently unsupported
+			return _POSIX_THREAD_ATTR_STACKADDR;
 		case _SC_THREAD_ATTR_STACKSIZE:
 			return _POSIX_THREAD_ATTR_STACKSIZE;
 		case _SC_THREAD_PRIORITY_SCHEDULING:
-			return -1;
-				// currently unsupported
+			return _POSIX_THREAD_PRIORITY_SCHEDULING;
 		case _SC_REALTIME_SIGNALS:
 			return _POSIX_REALTIME_SIGNALS;
 		case _SC_MEMORY_PROTECTION:
