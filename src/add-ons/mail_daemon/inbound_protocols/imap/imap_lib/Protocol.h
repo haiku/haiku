@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013, Haiku Inc. All Rights Reserved.
+ * Copyright 2001-2015, Haiku Inc. All Rights Reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2010 Clemens Zeidler. All rights reserved.
  *
@@ -21,7 +21,10 @@
 
 
 #define xEOF    236
-const bigtime_t kIMAP4ClientTimeout = 1000000 * 60; // 60 sec
+
+
+const bigtime_t kIMAP4ClientTimeout = 1000000 * 60;
+	// 60 seconds
 
 
 namespace IMAP {
@@ -66,7 +69,7 @@ public:
 			// Some convenience methods
 			status_t			GetFolders(FolderList& folders,
 									BString& separator);
-			status_t			GetSubscribedFolders(StringList& folders,
+			status_t			GetSubscribedFolders(BStringList& folders,
 									BString& separator);
 			status_t			SubscribeFolder(const char* folder);
 			status_t			UnsubscribeFolder(const char* folder);
@@ -92,7 +95,7 @@ protected:
 
 private:
 			status_t			_Disconnect();
-			status_t			_GetAllFolders(StringList& folders);
+			status_t			_GetAllFolders(BStringList& folders);
 			void				_ParseCapabilities(
 									const ArgumentList& arguments);
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013, Haiku Inc. All Rights Reserved.
+ * Copyright 2010-2015, Haiku Inc. All Rights Reserved.
  * Copyright 2010 Clemens Zeidler. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -8,12 +8,11 @@
 #define COMMANDS_H
 
 
+#include <StringList.h>
+
 #include <vector>
 
 #include "Response.h"
-
-
-typedef std::vector<BString> StringList;
 
 
 namespace IMAP {
@@ -284,7 +283,7 @@ public:
 	virtual	BString				CommandString();
 	virtual	bool				HandleUntagged(Response& response);
 
-	const	StringList&			FolderList();
+			const BStringList&	FolderList();
 			const BString&		Separator() { return fSeparator; }
 
 private:
@@ -293,7 +292,7 @@ private:
 private:
 			RFC3501Encoding		fEncoding;
 			const char*			fPrefix;
-			StringList			fFolders;
+			BStringList			fFolders;
 			BString				fSeparator;
 			bool				fSubscribedOnly;
 };

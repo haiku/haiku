@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2015, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -696,12 +696,12 @@ ListCommand::HandleUntagged(Response& response)
 			// The folder INBOX is always case insensitive
 			if (folder.ICompare("INBOX") == 0)
 				folder = "Inbox";
-			fFolders.push_back(folder);
+			fFolders.Add(folder);
 		} catch (ParseException& exception) {
 			// Decoding failed, just add the plain text
 			fprintf(stderr, "Decoding \"%s\" failed: %s\n", folder.String(),
 				exception.Message());
-			fFolders.push_back(folder);
+			fFolders.Add(folder);
 		}
 		return true;
 	}
@@ -710,7 +710,7 @@ ListCommand::HandleUntagged(Response& response)
 }
 
 
-const StringList&
+const BStringList&
 ListCommand::FolderList()
 {
 	return fFolders;
