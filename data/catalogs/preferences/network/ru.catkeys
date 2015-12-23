@@ -1,31 +1,48 @@
-1	russian	x-vnd.Haiku-Network	950262959
+1	russian	x-vnd.Haiku-Network	2512967175
 Static	IntefaceAddressView		Статический
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Службы
+no link	InterfaceListItem		нет соединения
 WPA2	WPA2 protected network		WPA2
+Choose automatically	IntefaceView		Выбрать автоматически
+connected	IntefaceView		подключено
+Ethernet device	InterfaceListItem		Ethernet устройство
 The netmask defines your local network	IntefaceAddressView		Маска подсети определяет вашу локальную сеть 
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Сеть
 Show network status in Deskbar	NetworkWindow		Отображать статус интерфейсов в Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Метод получения IP-адреса
+connected	InterfaceListItem		подключено
+disabled	InterfaceListItem		отключен
 Dial Up	NetworkWindow		Модемное
 Apply	IntefaceAddressView		Применить
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Не удалось установить NetworkStatus в Deskbar: %s
+MAC address:	IntefaceView		MAC-адрес:
+Wireless device	InterfaceListItem		Беспроводное устройство
 Disabled	IntefaceAddressView		Отключен
+Renegotiate	IntefaceView		Переполучить
 Ok	NetworkWindow		OK
+Network:	IntefaceView		Сеть
 launch error	NetworkWindow		Ошибка запуска
 Other	NetworkWindow		Другая
 Automatic	IntefaceAddressView		Автоматический
 Gateway:	IntefaceAddressView		Шлюз:
 Revert	NetworkWindow		Вернуть
 Enable	ServiceView		Включить
+disconnected	IntefaceView		отключено
+Status:	IntefaceView		Статус:
+Link speed:	IntefaceView		Скорость соединения:
 Your gateway to the internet	IntefaceAddressView		Ваш шлюз в интернет
 New…	NetworkWindow		Создать…
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Режим:
 WPA	WPA protected network		WPA
+Sent:	IntefaceView		Отправлено:
 open	Open network		открытая
 IP Address:	IntefaceAddressView		IP-адрес:
+Received:	IntefaceView		Получено:
+Disable	IntefaceView		Отключить
+<no wireless networks found>	IntefaceView		<беспроводные сети не найдены>
 Netmask:	IntefaceAddressView		Маска подсети:
 Disable	ServiceView		Отключить
 Your IP address	IntefaceAddressView		Ваш IP-адрес

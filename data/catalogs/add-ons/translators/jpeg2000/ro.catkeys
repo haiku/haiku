@@ -1,6 +1,7 @@
-1	romanian	x-vnd.Haiku-JPEG2000Translator	547915409
+1	romanian	x-vnd.Haiku-JPEG2000Translator	3265915643
 Write	JPEG2000Translator		Scrie
 JPEG2000 images	JPEG2000Translator		Imagini JPEG2000
+Version %d.%d.%d	JPEG2000Translator		Versiune %d.%d.%d
 Output only codestream (.jpc)	JPEG2000Translator		Produce doar flux de cod (.jpc)
 Write black-and-white images as RGB24	JPEG2000Translator		Scrie imaginile alb-negru ca RGB24
 Output quality	JPEG2000Translator		Calitatea rezultatului

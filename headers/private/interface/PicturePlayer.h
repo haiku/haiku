@@ -23,6 +23,7 @@ class BAffineTransform;
 class BList;
 class BPicture;
 class BShape;
+class Layer;
 
 
 namespace BPrivate {
@@ -83,6 +84,13 @@ struct picture_player_callbacks {
 	void (*set_blending_mode)(void* userData, source_alpha alphaSourceMode,
 		alpha_function alphaFunctionMode);
 	void (*set_transform)(void* userData, const BAffineTransform& transform);
+	void (*translate_by)(void* userData, double x, double y);
+	void (*scale_by)(void* userData, double x, double y);
+	void (*rotate_by)(void* userData, double angleRadians);
+	void (*blend_layer)(void* userData, Layer* layer);
+	void (*clip_to_rect)(void* userData, const BRect& rect, bool inverse);
+	void (*clip_to_shape)(void* userData, int32 opCount, const uint32 opList[],
+		int32 ptCount, const BPoint ptList[], bool inverse);
 };
 
 

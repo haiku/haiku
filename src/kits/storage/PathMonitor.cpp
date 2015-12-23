@@ -14,10 +14,6 @@
 #include <pthread.h>
 #include <stdio.h>
 
-#include <map>
-#include <new>
-#include <set>
-
 #include <Autolock.h>
 #include <Directory.h>
 #include <Entry.h>
@@ -62,7 +58,6 @@ typedef BOpenHashTable<WatcherHashDefinition> WatcherMap;
 
 static pthread_once_t sInitOnce = PTHREAD_ONCE_INIT;
 static WatcherMap* sWatchers = NULL;
-static BLocker* sLocker = NULL;
 static BLooper* sLooper = NULL;
 static BPathMonitor::BWatchingInterface* sDefaultWatchingInterface = NULL;
 static BPathMonitor::BWatchingInterface* sWatchingInterface = NULL;
@@ -185,7 +180,7 @@ public:
 		fIsDirectory = S_ISDIR(st.st_mode);
 
 		// start watching
-		uint32 flags = fChild == NULL ?  pathFlags : B_WATCH_DIRECTORY;
+		uint32 flags = fChild == NULL ? pathFlags : B_WATCH_DIRECTORY;
 			// In theory B_WATCH_NAME would suffice for all existing ancestors,
 			// plus B_WATCH_DIRECTORY for the parent of the first not existing
 			// ancestor. In practice this complicates the transitions when an
@@ -582,7 +577,7 @@ private:
 
 			status_t			_AddNode(const node_ref& nodeRef,
 									bool isDirectory, bool notify,
-					   				Entry* entry = NULL, Node** _node = NULL);
+									Entry* entry = NULL, Node** _node = NULL);
 			void				_DeleteNode(Node* node, bool notify);
 			Node*				_GetNode(const node_ref& nodeRef) const;
 
@@ -605,7 +600,7 @@ private:
 			void				_NotifyEntryMoved(const entry_ref& fromEntryRef,
 									const entry_ref& toEntryRef,
 									const node_ref& nodeRef,
-							 		const char* fromPath, const char* path,
+									const char* fromPath, const char* path,
 									bool isDirectory, bool wasAdded,
 									bool wasRemoved) const;
 			void				_NotifyTarget(BMessage& message,
@@ -844,10 +839,7 @@ PathHandler::PathHandler(const char* path, uint32 flags,
 		return;
 
 	// add ourselves to the looper
-	if (!looper->Lock())
-		debugger("PathHandler: failed to lock the looper");
 	looper->AddHandler(this);
-	looper->Unlock();
 
 	// start watching
 	fStatus = _StartWatchingAncestors(fRoot, false);
@@ -882,13 +874,9 @@ PathHandler::InitCheck() const
 void
 PathHandler::Quit()
 {
-	if (sLooper->Lock()) {
-		TRACE("%p->PathHandler::Quit()\n", this);
-		sWatchingInterface->StopWatching(this);
-		sLooper->RemoveHandler(this);
-		sLooper->Unlock();
-	} else
-		TRACE("%p->PathHandler::Quit(): failed to lock looper\n", this);
+	TRACE("%p->PathHandler::Quit()\n", this);
+	sWatchingInterface->StopWatching(this);
+	sLooper->RemoveHandler(this);
 	delete this;
 }
 
@@ -2004,7 +1992,7 @@ BPathMonitor::StartWatching(const char* path, uint32 flags,
 	if (status != B_OK)
 		return status;
 
-	BAutolock _(sLocker);
+	BAutolock _(sLooper);
 
 	Watcher* watcher = sWatchers->Lookup(target);
 	bool newWatcher = false;
@@ -2054,12 +2042,12 @@ BPathMonitor::StartWatching(const char* path, uint32 flags,
 /*static*/ status_t
 BPathMonitor::StopWatching(const char* path, const BMessenger& target)
 {
-	if (sLocker == NULL)
+	if (sLooper == NULL)
 		return B_BAD_VALUE;
 
 	TRACE("BPathMonitor::StopWatching(%s)\n", path);
 
-	BAutolock _(sLocker);
+	BAutolock _(sLooper);
 
 	Watcher* watcher = sWatchers->Lookup(target);
 	if (watcher == NULL)
@@ -2084,10 +2072,10 @@ BPathMonitor::StopWatching(const char* path, const BMessenger& target)
 /*static*/ status_t
 BPathMonitor::StopWatching(const BMessenger& target)
 {
-	if (sLocker == NULL)
+	if (sLooper == NULL)
 		return B_BAD_VALUE;
 
-	BAutolock _(sLocker);
+	BAutolock _(sLooper);
 
 	Watcher* watcher = sWatchers->Lookup(target);
 	if (watcher == NULL)
@@ -2127,11 +2115,6 @@ BPathMonitor::_InitIfNeeded()
 /*static*/ void
 BPathMonitor::_Init()
 {
-	sLocker = new (std::nothrow) BLocker("path monitor");
-	TRACE("Create PathMonitor locker\n");
-	if (sLocker == NULL)
-		return;
-
 	sDefaultWatchingInterface = new(std::nothrow) BWatchingInterface;
 	if (sDefaultWatchingInterface == NULL)
 		return;

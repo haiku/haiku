@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	2696855708
+1	english	x-vnd.Haiku-Terminal	2093402207
 Not found.	Terminal TermWindow		未找到。  
 Switch Terminals	Terminal TermWindow		切换终端
 Change directory	Terminal TermView		更改目录
@@ -86,10 +86,12 @@ Text encoding	Terminal TermWindow		文字编码
 size	Terminal TermView		大小
 Close window	Terminal TermWindow		关闭窗口
 Copy absolute path	Terminal TermView		复制绝对路径
+Save as default	Terminal TermWindow		默认保存
 Set tab title	Terminal TermWindow		设置标签标题
 Settings…	Terminal TermWindow		设置…
 Abort	Terminal Shell		放弃
 Open link	Terminal TermView		打开链接
+Solarized Light	Terminal colors scheme		浅色的 Solarized
 Edit	Terminal TermWindow		编辑
 Color:	Terminal AppearancePrefView		颜色：
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		该图案指定了窗口标题。可以使用下述的\n占位符：\n
@@ -109,6 +111,7 @@ Find next	Terminal TermWindow		查找下一个
 Close active tab	Terminal TermWindow		关闭活动标签
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\t字符 '%' 。\n\t%<\t-\t开始新区块，仅当其后的占位符不为空时显示。\n\t%>\t-\t开始新区块，仅当之前的 %< 和该区块不为空时显示。\n\t%-\t-\t结束一个 %< 或者 %> 区块。\n\n仅当占位符的值不为空时，任何位于 '%' 和格式化字符之间的非字母数字字符都\n将会插入一个空格。它将会添加到 %< 区块。
 Paste	Terminal TermWindow		粘贴
+Solarized Dark	Terminal colors scheme		深色的 Solarized
 Shell 	Terminal TermWindow		Shell
 Cancel	Terminal TermView		取消
 Use default	Terminal SetTitleWindow		使用默认

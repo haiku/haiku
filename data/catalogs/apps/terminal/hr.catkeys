@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Terminal	3084408124
+1	croatian	x-vnd.Haiku-Terminal	1500922367
 Not found.	Terminal TermWindow		Nije pronađeno.
 Switch Terminals	Terminal TermWindow		Zamjeni terminale
 Change directory	Terminal TermView		Promijeni direktorij
@@ -26,6 +26,7 @@ Custom	Terminal colors scheme		Prilagođeno
 Cancel	Terminal SetTitleWindow		Odustani
 Increase	Terminal TermWindow		Povećaj
 Settings	Terminal TermWindow		Postavke
+Window size	Terminal TermWindow		Veličina prozora
 Selected text	Terminal AppearancePrefView		Odabrani tekst
 Find	Terminal FindWindow		Nađi
 Appearance	Terminal PrefWindow		Izgled
@@ -38,7 +39,8 @@ Cannot execute \"%command\":\n\t%error	Terminal Shell		Ne mogu izvršiti \"%nare
 Window title…	Terminal TermWindow		Naslov prozora...
 Full screen	Terminal TermWindow		Puni zaslon
 Page setup…	Terminal TermWindow		Postavljanje stranice...
-The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Sljedeći procesi još rade:\n\nt%1qn\nAko zatvorite terminal, procesi će biti isključeni.
+The following processes are still running:\n\n\t%1\n\nIf you close the Terminal, the processes will be killed.	Terminal TermWindow		Sljedeći procesi još rade:\n\n\t%1\n\nAko zatvorite terminal, procesi će biti isključeni.
+Custom	Terminal AppearancePrefView	Window size	Prilagođeno
 Insert path	Terminal TermView		Unesi putanju
 Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nUsage: %s [OPTION] [SHELL]\n	Terminal TermApp		Haiku Terminal\nCopyright 2001-2009 Haiku, Inc.\nCopyright(C) 1999 Kazuho Okui and Takashi Murai.\n\nNačin korištenja: %s [OPTION] [SHELL]\n
 Window size:	Terminal AppearancePrefView		Veličina prozora

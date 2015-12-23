@@ -1213,6 +1213,85 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 				break;
 			}
 
+			case B_PIC_AFFINE_TRANSLATE:
+			{
+				const double* x;
+				const double* y;
+				if (callbacks.translate_by == NULL || !reader.Get(x)
+					|| !reader.Get(y)) {
+					break;
+				}
+
+				callbacks.translate_by(userData, *x, *y);
+				break;
+			}
+
+			case B_PIC_AFFINE_SCALE:
+			{
+				const double* x;
+				const double* y;
+				if (callbacks.scale_by == NULL || !reader.Get(x)
+					|| !reader.Get(y)) {
+					break;
+				}
+
+				callbacks.scale_by(userData, *x, *y);
+				break;
+			}
+
+			case B_PIC_AFFINE_ROTATE:
+			{
+				const double* angleRadians;
+				if (callbacks.rotate_by == NULL || !reader.Get(angleRadians))
+					break;
+
+				callbacks.rotate_by(userData, *angleRadians);
+				break;
+			}
+
+			case B_PIC_BLEND_LAYER:
+			{
+				Layer* const* layer;
+				if (callbacks.blend_layer == NULL || !reader.Get<Layer*>(layer))
+					break;
+
+				callbacks.blend_layer(userData, *layer);
+				break;
+			}
+
+			case B_PIC_CLIP_TO_RECT:
+			{
+				const bool* inverse;
+				const BRect* rect;
+
+				if (callbacks.clip_to_rect == NULL || !reader.Get(inverse)
+					|| !reader.Get(rect)) {
+					break;
+				}
+
+				callbacks.clip_to_rect(userData, *rect, *inverse);
+				break;
+			}
+
+			case B_PIC_CLIP_TO_SHAPE:
+			{
+				const bool* inverse;
+				const uint32* opCount;
+				const uint32* pointCount;
+				const uint32* opList;
+				const BPoint* pointList;
+				if (callbacks.clip_to_shape == NULL || !reader.Get(inverse)
+					|| !reader.Get(opCount) || !reader.Get(pointCount)
+					|| !reader.Get(opList, *opCount)
+					|| !reader.Get(pointList, *pointCount)) {
+					break;
+				}
+
+				callbacks.clip_to_shape(userData, *opCount, opList,
+					*pointCount, pointList, *inverse);
+				break;
+			}
+
 			default:
 				break;
 		}

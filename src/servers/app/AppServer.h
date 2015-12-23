@@ -15,7 +15,6 @@
 #include <Locker.h>
 #include <ObjectList.h>
 #include <OS.h>
-#include <Server.h>
 #include <String.h>
 #include <Window.h>
 
@@ -23,12 +22,21 @@
 #include "ServerConfig.h"
 
 
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#	include <Server.h>
+#	define SERVER_BASE BServer
+#else
+#	include "TestServerLoopAdapter.h"
+#	define SERVER_BASE TestServerLoopAdapter
+#endif
+
+
 class ServerApp;
 class BitmapManager;
 class Desktop;
 
 
-class AppServer : public BServer  {
+class AppServer : public SERVER_BASE {
 public:
 								AppServer(status_t* status);
 	virtual						~AppServer();
@@ -39,7 +47,7 @@ public:
 private:
 			Desktop*			_CreateDesktop(uid_t userID,
 									const char* targetScreen);
-			Desktop*			_FindDesktop(uid_t userID,
+	virtual	Desktop*			_FindDesktop(uid_t userID,
 									const char* targetScreen);
 
 			void				_LaunchInputServer();

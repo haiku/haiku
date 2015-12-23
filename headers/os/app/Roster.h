@@ -161,7 +161,8 @@ private:
 									thread_id thread) const;
 
 			status_t			_SetThreadAndTeam(uint32 entryToken,
-									thread_id thread, team_id team) const;
+									thread_id thread, team_id team,
+									port_id* _port) const;
 
 			status_t			_CompleteRegistration(team_id team,
 									thread_id thread, port_id port) const;
@@ -183,8 +184,8 @@ private:
 									const BList* messageList, int argc,
 									const char* const* args,
 									const char** environment,
-									team_id* appTeam,
-									thread_id* appThread,
+									team_id* _appTeam, thread_id* _appThread,
+									port_id* _appPort, uint32* _appToken,
 									bool launchSuspended) const;
 
 			status_t			_UpdateActiveApp(team_id team) const;

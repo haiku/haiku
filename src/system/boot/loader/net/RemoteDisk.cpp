@@ -18,6 +18,10 @@
 
 static const bigtime_t kRequestTimeout = 100000LL;
 
+
+using std::nothrow;
+
+
 #if __BYTE_ORDER == __LITTLE_ENDIAN
 
 static inline

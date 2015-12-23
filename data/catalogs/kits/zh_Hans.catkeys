@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libbe	436685149
+1	english	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		伽马
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -20,6 +20,7 @@ OK	PrintJob		确定
 Green:	ColorControl		绿色:
 Version history:	AboutWindow		版本历史：
 Remove replicant	Dragger		删除克隆控件
+Select all	TextView		全选
 OK	AboutWindow		确定
 OK	ZombieReplicantView		确定
 Print Server is not responding.	PrintJob		打印服务未响应。

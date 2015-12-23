@@ -169,6 +169,15 @@ Transformable::IsIdentity() const
 }
 
 
+bool
+Transformable::IsDilation() const
+{
+	double m[6];
+	store_to(m);
+	return m[1] == 0.0 && m[2] == 0.0;
+}
+
+
 void
 Transformable::Transform(double* x, double* y) const
 {

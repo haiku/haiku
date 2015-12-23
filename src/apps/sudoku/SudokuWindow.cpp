@@ -14,6 +14,7 @@
 #include <File.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
+#include <LayoutBuilder.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -22,7 +23,6 @@
 
 #include <be_apps/Tracker/RecentItems.h>
 
-#include "CenteredViewContainer.h"
 #include "ProgressWindow.h"
 #include "Sudoku.h"
 #include "SudokuField.h"
@@ -176,27 +176,16 @@ SudokuWindow::SudokuWindow()
 	int32 level = 0;
 	settings.FindInt32("level", &level);
 
-	// create GUI
+	// Create GUI
 
-	BMenuBar* menuBar = new BMenuBar(Bounds(), "menu");
-	AddChild(menuBar);
+	BMenuBar* menuBar = new BMenuBar("menu");
+	fSudokuView = new SudokuView("sudoku view", settings);
 
-	frame.top = menuBar->Frame().bottom;
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.Add(menuBar)
+		.Add(fSudokuView);
 
-	BView* top = new BView(frame, NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	AddChild(top);
-
-	fSudokuView = new SudokuView(
-		top->Bounds().InsetByCopy(10, 10).OffsetToSelf(0, 0),
-		"sudoku view", settings, B_FOLLOW_NONE);
-	CenteredViewContainer* container = new CenteredViewContainer(fSudokuView,
-		top->Bounds().InsetByCopy(10, 10),
-		"center", B_FOLLOW_ALL);
-	container->SetHighColor(top->ViewColor());
-	top->AddChild(container);
-
-	// add menu
+	// Build menu
 
 	// "File" menu
 	BMenu* menu = new BMenu(B_TRANSLATE("File"));

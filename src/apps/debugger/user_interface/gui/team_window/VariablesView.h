@@ -26,6 +26,7 @@ class ValueLocation;
 class ValueNode;
 class ValueNodeChild;
 class ValueNodeContainer;
+class ValueNodeManager;
 class Value;
 class Variable;
 class VariableEditWindow;
@@ -42,7 +43,8 @@ public:
 								VariablesView(Listener* listener);
 								~VariablesView();
 
-	static	VariablesView*		Create(Listener* listener);
+	static	VariablesView*		Create(Listener* listener,
+									ValueNodeManager* manager);
 									// throws
 
 			void				SetStackFrame(Thread* thread,
@@ -93,7 +95,7 @@ private:
 				ExpressionInfoTable;
 
 private:
-			void				_Init();
+			void				_Init(ValueNodeManager* manager);
 
 			void				_RequestNodeValue(ModelNode* node);
 			status_t			_GetContextActionsForNode(ModelNode* node,

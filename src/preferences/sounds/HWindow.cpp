@@ -314,7 +314,7 @@ HWindow::_InitGUI()
 	playbutton->SetExplicitSize(buttonsSize);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(fEventList)
 		.AddGroup(B_HORIZONTAL)
 			.Add(menuField)

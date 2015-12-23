@@ -17,12 +17,14 @@
 #include "VariableValueNodeChild.h"
 
 
-ValueNodeManager::ValueNodeManager()
+ValueNodeManager::ValueNodeManager(bool addFrameNodes)
 	:
+	fAddFrameNodes(addFrameNodes),
 	fContainer(NULL),
 	fStackFrame(NULL),
 	fThread(NULL)
 {
+	SetStackFrame(NULL, NULL);
 }
 
 
@@ -50,22 +52,22 @@ ValueNodeManager::SetStackFrame(Thread* thread,
 	fStackFrame = stackFrame;
 	fThread = thread;
 
-	if (fStackFrame != NULL) {
-		fContainer = new(std::nothrow) ValueNodeContainer;
-		if (fContainer == NULL)
-			return B_NO_MEMORY;
+	fContainer = new(std::nothrow) ValueNodeContainer;
+	if (fContainer == NULL)
+		return B_NO_MEMORY;
 
-		status_t error = fContainer->Init();
-		if (error != B_OK) {
-			delete fContainer;
-			fContainer = NULL;
-			return error;
-		}
+	status_t error = fContainer->Init();
+	if (error != B_OK) {
+		delete fContainer;
+		fContainer = NULL;
+		return error;
+	}
 
-		AutoLocker<ValueNodeContainer> containerLocker(fContainer);
+	AutoLocker<ValueNodeContainer> containerLocker(fContainer);
 
-		fContainer->AddListener(this);
+	fContainer->AddListener(this);
 
+	if (fStackFrame != NULL && fAddFrameNodes) {
 		for (int32 i = 0; Variable* variable = fStackFrame->ParameterAt(i);
 				i++) {
 			_AddNode(variable);

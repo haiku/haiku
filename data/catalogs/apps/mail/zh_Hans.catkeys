@@ -1,7 +1,8 @@
-1	english	x-vnd.Be-MAIL	3209807243
+1	english	x-vnd.Be-MAIL	1865394837
 View	Mail		查看
 %d - Date	Mail		%d - 日期
 Attach attributes:	Mail		附加属性：
+Unknown	Mail		未知
 Inconsistency occurred in the undo/redo buffer.	Mail		缓冲区发生错误，撤销/重复操作无法执行。
 An error occurred trying to save the attachment.	Mail		出现错误，保存为副件。
 Copy to new	Mail		转发
@@ -144,7 +145,9 @@ Open attachment	Mail		打开附件
 sent	B_USER_DIRECTORY/mail/sent		已发送
 (Date unavailable)	Mail		（日期不可用）
 Put your favorite e-mail queries and query templates in this folder.	Mail		放置您最喜爱的邮件查询和查询模板到该文件夹。
+Spam	Mail		垃圾邮件
 Reply	Mail		回复
+Encoding	Mail		编码
 From:	Mail		从：
 Couldn't open this signature. Sorry.	Mail		署名无法打开，对不起。
 Open draft	Mail		打开草稿

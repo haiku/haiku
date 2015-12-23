@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2015, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  */
 
@@ -43,11 +43,11 @@ using namespace BPrivate;
 const uint32 kMsgDeleteMessage = '&DeM';
 const uint32 kMsgAppendMessage = '&ApM';
 
-const uint32 kMsgSendMessage = '&SeM';
 
-
-BMailProtocol::BMailProtocol(const BMailAccountSettings& settings)
+BMailProtocol::BMailProtocol(const char* name,
+	const BMailAccountSettings& settings)
 	:
+	BLooper(_LooperName(name, settings)),
 	fAccountSettings(settings),
 	fMailNotifier(NULL)
 {
@@ -273,6 +273,20 @@ BMailProtocol::LoadFilters(const BMailProtocolSettings& settings)
 }
 
 
+/*static*/ BString
+BMailProtocol::_LooperName(const char* addOnName,
+	const BMailAccountSettings& settings)
+{
+	BString name = addOnName;
+
+	const char* accountName = settings.Name();
+	if (accountName != NULL && accountName[0] != '\0')
+		name << " " << accountName;
+
+	return name;
+}
+
+
 BMailFilter*
 BMailProtocol::_LoadFilter(const BMailAddOnSettings& settings)
 {
@@ -374,9 +388,10 @@ BMailProtocol::_NotifyBodyFetched(const entry_ref& ref, BFile& file,
 // #pragma mark -
 
 
-BInboundMailProtocol::BInboundMailProtocol(const BMailAccountSettings& settings)
+BInboundMailProtocol::BInboundMailProtocol(const char* name,
+	const BMailAccountSettings& settings)
 	:
-	BMailProtocol(settings)
+	BMailProtocol(name, settings)
 {
 	LoadFilters(fAccountSettings.InboundSettings());
 }
@@ -472,10 +487,10 @@ BInboundMailProtocol::NotiyMailboxSynchronized(status_t status)
 // #pragma mark -
 
 
-BOutboundMailProtocol::BOutboundMailProtocol(
+BOutboundMailProtocol::BOutboundMailProtocol(const char* name,
 	const BMailAccountSettings& settings)
 	:
-	BMailProtocol(settings)
+	BMailProtocol(name, settings)
 {
 	LoadFilters(fAccountSettings.OutboundSettings());
 }
@@ -486,12 +501,23 @@ BOutboundMailProtocol::~BOutboundMailProtocol()
 }
 
 
+status_t
+BOutboundMailProtocol::SendMessages(const BMessage& files, off_t totalBytes)
+{
+	BMessage message(kMsgSendMessages);
+	message.Append(files);
+	message.AddInt64("bytes", totalBytes);
+
+	return BMessenger(this).SendMessage(&message);
+}
+
+
 void
 BOutboundMailProtocol::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kMsgSendMessage:
-			SendMessages(*message, message->FindInt64("bytes"));
+		case kMsgSendMessages:
+			HandleSendMessages(*message, message->FindInt64("bytes"));
 			break;
 
 		default:

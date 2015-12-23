@@ -60,13 +60,10 @@ PersonView::PersonView(const char* name, const char* categoryAttribute,
 	if (fRef != NULL)
 		file = new BFile(fRef, B_READ_ONLY);
 
-	float spacing = be_control_look->DefaultItemSpacing();
-	BGridLayout* layout = GridLayout();
-	layout->SetInsets(spacing, spacing, spacing, spacing);
-
 	// Add picture "field", using ID photo 35mm x 45mm ratio
 	fPictureView = new PictureView(70, 90, ref);
 
+	BGridLayout* layout = GridLayout();
 	layout->AddView(fPictureView, 0, 0, 1, 5);
 	layout->ItemAt(0, 0)->SetExplicitAlignment(
 		BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));
@@ -353,7 +350,7 @@ PersonView::SetAttribute(const char* attribute, bool update)
 {
 	char* value = NULL;
 	attr_info info;
-	BFile* file = NULL;	
+	BFile* file = NULL;
 
 	if (fRef != NULL)
 		file = new(std::nothrow) BFile(fRef, B_READ_ONLY);

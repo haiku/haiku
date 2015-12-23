@@ -16,8 +16,7 @@
 
 #include <Box.h>
 #include <Catalog.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -136,10 +135,8 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 	subpixelAntialiasingDisabledLabel->MakeSelectable(false);
 #endif // !FT_CONFIG_OPTION_SUBPIXEL_RENDERING
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
+	BLayoutBuilder::Grid<>(this, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 	// controls pane
-	AddChild(BGridLayoutBuilder(10, 10)
 		.Add(fHintingMenuField->CreateLabelLayoutItem(), 0, 0)
 		.Add(fHintingMenuField->CreateMenuBarLayoutItem(), 1, 0)
 
@@ -154,9 +151,8 @@ AntialiasingSettingsView::AntialiasingSettingsView(const char* name)
 #else
 		.Add(BSpaceLayoutItem::CreateGlue(), 0, 3, 2)
 #endif
-
-		.SetInsets(10, 10, 10, 10)
-	);
+		.AddGlue(0, 4)
+		.SetInsets(B_USE_WINDOW_SPACING);
 
 	_SetCurrentAntialiasing();
 	_SetCurrentHinting();

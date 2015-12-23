@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Haiku, Inc.
+ * Copyright 2014-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,46 +13,169 @@
 
 #include "DrawState.h"
 #include "drawing/Painter/defines.h"
+#include "IntRect.h"
+
+#include <Locker.h>
 
 
+class BShape;
 class ServerBitmap;
 class ServerPicture;
+class shape_data;
+class UtilityBitmap;
+
+
+// #pragma mark - AlphaMask
 
 
 class AlphaMask : public BReferenceable {
 public:
-								AlphaMask(ServerPicture* mask, bool inverse,
-									BPoint origin, const DrawState& drawState);
-								~AlphaMask();
+								AlphaMask(AlphaMask* previousMask,
+									bool inverse);
+								AlphaMask(AlphaMask* previousMask,
+									AlphaMask* other);
+								AlphaMask(uint8 backgroundOpacity);
+	virtual						~AlphaMask();
 
-			void				Update(BRect bounds, BPoint offset);
+			IntPoint			SetCanvasGeometry(IntPoint origin,
+									IntRect bounds);
 
-			void				SetPrevious(AlphaMask* mask);
+			scanline_unpacked_masked_type* Scanline()
+								{ return &fScanline; }
 
-			scanline_unpacked_masked_type* Generate();
+			agg::clipped_alpha_mask* Mask()
+								{ return &fMask; }
+
+			size_t				BitmapSize() const;
+
+protected:
+			ServerBitmap*		_CreateTemporaryBitmap(BRect bounds) const;
+			void				_Generate();
+			void				_SetNoClipping();
+			const IntRect&		_PreviousMaskBounds() const;
+	virtual	void				_AddToCache() = 0;
 
 private:
-			ServerBitmap*		_RenderPicture() const;
+	virtual	ServerBitmap*		_RenderSource(const IntRect& canvasBounds) = 0;
+ 	virtual	IntPoint			_Offset() = 0;
 
+			void				_AttachMaskToBuffer();
+
+protected:
+			BReference<AlphaMask> fPreviousMask;
+			IntRect				fBounds;
+			bool				fClippedToCanvas;
+			BLocker				fLock;
 
 private:
-			AlphaMask*			fPreviousMask;
+	friend class AlphaMaskCache;
 
-			ServerPicture*		fPicture;
+			IntPoint			fCanvasOrigin;
+			IntRect				fCanvasBounds;
 			const bool			fInverse;
-			BPoint				fOrigin;
-			DrawState			fDrawState;
+			uint8				fBackgroundOpacity;
 
-			BRect				fViewBounds;
-			BPoint				fViewOffset;
+			int32				fNextMaskCount;
+			bool				fInCache;
+			uint32				fIndirectCacheReferences;
+									// number of times this mask has been
+									// seen as "previous mask" of another
+									// one in the cache, without being
+									// in the cache itself
 
-			uint8*				fCachedBitmap;
-			BRect				fCachedBounds;
-			BPoint				fCachedOffset;
-
+			UtilityBitmap*		fBits;
 			agg::rendering_buffer fBuffer;
-			agg::clipped_alpha_mask fCachedMask;
+			agg::clipped_alpha_mask fMask;
 			scanline_unpacked_masked_type fScanline;
+};
+
+
+class UniformAlphaMask : public AlphaMask {
+public:
+								UniformAlphaMask(uint8 opacity);
+
+private:
+	virtual	ServerBitmap*		_RenderSource(const IntRect& canvasBounds);
+	virtual	IntPoint			_Offset();
+	virtual void				_AddToCache();
+};
+
+
+// #pragma mark - VectorAlphaMask
+
+
+template<class VectorMaskType>
+class VectorAlphaMask : public AlphaMask {
+public:
+								VectorAlphaMask(AlphaMask* previousMask,
+									BPoint where, bool inverse);
+								VectorAlphaMask(AlphaMask* previousMask,
+									VectorAlphaMask* other);
+
+private:
+	virtual	ServerBitmap*		_RenderSource(const IntRect& canvasBounds);
+	virtual	IntPoint			_Offset();
+
+protected:
+			BPoint				fWhere;
+};
+
+
+// #pragma mark - PictureAlphaMask
+
+
+class PictureAlphaMask : public VectorAlphaMask<PictureAlphaMask> {
+public:
+								PictureAlphaMask(AlphaMask* previousMask,
+									ServerPicture* picture,
+									const DrawState& drawState, BPoint where,
+									bool inverse);
+	virtual						~PictureAlphaMask();
+
+			void				DrawVectors(Canvas* canvas);
+			BRect				DetermineBoundingBox() const;
+			const DrawState&	GetDrawState() const;
+
+private:
+	virtual void				_AddToCache();
+
+private:
+			BReference<ServerPicture> fPicture;
+			DrawState*			fDrawState;
+};
+
+
+// #pragma mark - ShapeAlphaMask
+
+
+class ShapeAlphaMask : public VectorAlphaMask<ShapeAlphaMask> {
+private:
+								ShapeAlphaMask(AlphaMask* previousMask,
+									const shape_data& shape,
+									BPoint where, bool inverse);
+								ShapeAlphaMask(AlphaMask* previousMask,
+									ShapeAlphaMask* other);
+
+public:
+	virtual						~ShapeAlphaMask();
+
+	static	ShapeAlphaMask*		Create(AlphaMask* previousMask,
+									const shape_data& shape,
+									BPoint where, bool inverse);
+
+			void				DrawVectors(Canvas* canvas);
+			BRect				DetermineBoundingBox() const;
+			const DrawState&	GetDrawState() const;
+
+private:
+	virtual void				_AddToCache();
+
+private:
+	friend class AlphaMaskCache;
+
+			shape_data*			fShape;
+			BRect				fShapeBounds;
+	static	DrawState*			fDrawState;
 };
 
 

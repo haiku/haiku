@@ -1,6 +1,7 @@
 /*
  * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2015, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,6 +14,7 @@
 #include <errno.h>
 #include <signal.h>
 
+#include <algorithm>
 #include <map>
 #include <string>
 #include <vector>
@@ -32,6 +34,12 @@
 using std::map;
 using std::string;
 using std::vector;
+
+
+struct syscall_stats {
+	bigtime_t	time;
+	uint32		count;
+};
 
 
 extern void get_syscalls0(vector<Syscall*> &syscalls);
@@ -64,12 +72,13 @@ static const char *kCommandName = __progname;
 static const char *kUsage =
 "Usage: %s [ <options> ] [ <thread or team ID> | <executable with args> ]\n"
 "\n"
-"Traces the the syscalls of a thread or a team. If an executable with\n"
+"Traces the syscalls of a thread or a team. If an executable with\n"
 "arguments is supplied, it is loaded and it's main thread traced.\n"
 "\n"
 "Options:\n"
 "  -a             - Don't print syscall arguments.\n"
-"  -c             - Don't colorize output.\n"
+"  -c             - Record and dump syscall usage statistics.\n"
+"  -C             - Same as -c, but also print syscalls as usual.\n"
 "  -d <name>      - Filter the types that have their contents retrieved.\n"
 "                   <name> is one of: strings, enums, simple, complex or\n"
 "                                     pointer_values\n"
@@ -78,6 +87,7 @@ static const char *kUsage =
 "  -i             - Print integers in decimal format instead of hexadecimal.\n"
 "  -l             - Also trace loading the executable. Only considered when\n"
 "                   an executable is provided.\n"
+"  --no-color     - Don't colorize output.\n"
 "  -r             - Don't print syscall return values.\n"
 "  -s             - Also trace all threads spawned by the supplied thread,\n"
 "                   respectively the loaded executable's main thread.\n"
@@ -107,6 +117,11 @@ static const char *const *sArgv;
 // syscalls
 static vector<Syscall*>			sSyscallVector;
 static map<string, Syscall*>	sSyscallMap;
+
+// statistics
+typedef map<string, syscall_stats> StatsMap;
+static StatsMap sSyscallStats;
+static bigtime_t sSyscallTime;
 
 
 struct Team {
@@ -249,6 +264,29 @@ init_syscalls()
 
 
 static void
+record_syscall_stats(const Syscall& syscall, debug_post_syscall& message)
+{
+	syscall_stats& stats = sSyscallStats[syscall.Name()];
+	stats.count++;
+
+	bigtime_t time = message.end_time - message.start_time;
+	stats.time += time;
+	sSyscallTime += time;
+}
+
+
+static void
+print_buffer(FILE *outputFile, char* buffer, int32 length)
+{
+	// output either to file or serial debug line
+	if (outputFile != NULL)
+		fwrite(buffer, length, 1, outputFile);
+	else
+		_kern_debug_output(buffer);
+}
+
+
+static void
 print_to_string(char **_buffer, int32 *_length, const char *format, ...)
 {
 	va_list list;
@@ -262,14 +300,12 @@ print_to_string(char **_buffer, int32 *_length, const char *format, ...)
 
 
 static void
-print_syscall(FILE *outputFile, debug_post_syscall &message,
+print_syscall(FILE *outputFile, Syscall* syscall, debug_post_syscall &message,
 	MemoryReader &memoryReader, bool printArguments, uint32 contentsFlags,
 	bool printReturnValue, bool colorize, bool decimal)
 {
 	char buffer[4096], *string = buffer;
 	int32 length = (int32)sizeof(buffer);
-	int32 syscallNumber = message.syscall;
-	Syscall *syscall = sSyscallVector[syscallNumber];
 
 	Context ctx(syscall, (char *)message.args, memoryReader,
 		    contentsFlags, decimal);
@@ -313,8 +349,8 @@ print_syscall(FILE *outputFile, debug_post_syscall &message,
 			// if the return type is status_t or ssize_t, print human-readable
 			// error codes
 			if (returnType->TypeName() == "status_t"
-					|| ((returnType->TypeName() == "ssize_t"
-					 || returnType->TypeName() == "int")
+				|| ((returnType->TypeName() == "ssize_t"
+						|| returnType->TypeName() == "int")
 					&& message.return_value < 0)) {
 				print_to_string(&string, &length, " %s", strerror(message.return_value));
 			}
@@ -339,12 +375,7 @@ print_syscall(FILE *outputFile, debug_post_syscall &message,
 //	printf("%08lx", message.args[i]);
 //}
 //printf("\n");
-
-	// output either to file or serial debug line
-	if (outputFile != NULL)
-		fwrite(buffer, sizeof(buffer) - length, 1, outputFile);
-	else
-		_kern_debug_output(buffer);
+	print_buffer(outputFile, buffer, sizeof(buffer) - length);
 }
 
 
@@ -379,11 +410,52 @@ print_signal(FILE *outputFile, debug_signal_received &message,
 			strsignal(signalNumber));
 	}
 
-	// output either to file or serial debug line
-	if (outputFile != NULL)
-		fwrite(buffer, sizeof(buffer) - length, 1, outputFile);
-	else
-		_kern_debug_output(buffer);
+	print_buffer(outputFile, buffer, sizeof(buffer) - length);
+}
+
+
+static bool
+compare_stats_by_time(
+	const std::pair<const std::string*, const syscall_stats*>& a,
+	const std::pair<const std::string*, const syscall_stats*>& b)
+{
+	return a.second->time > b.second->time;
+}
+
+
+static void
+print_stats(FILE* outputFile)
+{
+	char buffer[4096], *string = buffer;
+	int32 length = (int32)sizeof(buffer);
+
+	typedef std::vector<std::pair<const std::string*, const syscall_stats*> >
+		StatsRefVector;
+	StatsRefVector calls;
+	StatsMap::const_iterator iterator = sSyscallStats.begin();
+	for (; iterator != sSyscallStats.end(); iterator++)
+		calls.push_back(std::make_pair(&iterator->first, &iterator->second));
+
+	// Sort calls by time spent
+	std::sort(calls.begin(), calls.end(), compare_stats_by_time);
+
+	print_to_string(&string, &length, "\n%-6s %-10s %-7s %-10s Syscall\n",
+		"Time %", "Usecs", "Calls", "Usecs/call");
+	print_to_string(&string, &length, "------ ---------- ------- ---------- "
+		"--------------------\n");
+
+	StatsRefVector::const_iterator callIterator = calls.begin();
+	for (; callIterator != calls.end(); callIterator++) {
+		const syscall_stats& stats = *callIterator->second;
+		double percent = stats.time * 100.0 / sSyscallTime;
+		bigtime_t perCall = stats.time / stats.count;
+
+		print_to_string(&string, &length, "%6.2f %10" B_PRIu64 " %7" B_PRIu32
+			" %10" B_PRIu64 " %s\n", percent, stats.time, stats.count, perCall,
+			callIterator->first->c_str());
+	}
+
+	print_buffer(outputFile, buffer, sizeof(buffer) - length);
 }
 
 
@@ -398,6 +470,8 @@ main(int argc, const char *const *argv)
 	int32 programArgCount = 0;
 	bool printArguments = true;
 	bool colorize = true;
+	bool stats = false;
+	bool trace = true;
 	uint32 contentsFlags = 0;
 	bool decimalFormat = false;
 	bool fastMode = false;
@@ -420,6 +494,11 @@ main(int argc, const char *const *argv)
 			} else if (strcmp(arg, "-a") == 0) {
 				printArguments = false;
 			} else if (strcmp(arg, "-c") == 0) {
+				stats = true;
+				trace = false;
+			} else if (strcmp(arg, "-C") == 0) {
+				stats = true;
+			} else if (strcmp(arg, "--no-color") == 0) {
 				colorize = false;
 			} else if (strcmp(arg, "-d") == 0) {
 				const char *what = NULL;
@@ -607,15 +686,23 @@ main(int argc, const char *const *argv)
 				Team* team = it->second;
 				MemoryReader& memoryReader = team->GetMemoryReader();
 
-				print_syscall(outputFile, message.post_syscall, memoryReader,
-					printArguments, contentsFlags, printReturnValues,
-					colorize, decimalFormat);
+				int32 syscallNumber = message.post_syscall.syscall;
+				Syscall* syscall = sSyscallVector[syscallNumber];
+
+				if (stats)
+					record_syscall_stats(*syscall, message.post_syscall);
+
+				if (trace) {
+					print_syscall(outputFile, syscall, message.post_syscall,
+						memoryReader, printArguments, contentsFlags,
+						printReturnValues, colorize, decimalFormat);
+				}
 				break;
 			}
 
 			case B_DEBUGGER_MESSAGE_SIGNAL_RECEIVED:
 			{
-				if (traceSignal)
+				if (traceSignal && trace)
 					print_signal(outputFile, message.signal_received, colorize);
 				break;
 			}
@@ -684,6 +771,11 @@ main(int argc, const char *const *argv)
 				exit(1);
 			}
 		}
+	}
+
+	if (stats) {
+		// Dump recorded statistics
+		print_stats(outputFile);
 	}
 
 	if (outputFile != NULL && outputFile != stdout)

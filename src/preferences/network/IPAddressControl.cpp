@@ -78,7 +78,8 @@ IPAddressControl::_UpdateMark()
 	}
 
 	BNetworkAddress address;
-	bool success = address.SetTo(fFamily, Text()) == B_OK;
+	bool success = address.SetTo(fFamily, Text(), (char*)NULL,
+		B_NO_ADDRESS_RESOLUTION) == B_OK;
 
 	MarkAsInvalid(!success);
 }

@@ -1,0 +1,28 @@
+name			haiku_userguide_pt_PT
+version			%HAIKU_VERSION%
+architecture	any
+summary			"The Haiku user documentation (Portuguese translation)"
+description		"The user guide describes the Haiku operating system from a \
+user's perspective.
+It's recommended reading for people that are new to the system as well as the \
+seasoned Haiku or former BeOS user. It describes the fundamentals of the \
+graphical user interface as well as the special features that are unique to \
+the BeOS/Haiku system. All included applications and preferences are \
+described in detail and tips and little workshops help to work most \
+efficiently under Haiku.
+
+This is the Portuguese translation of the user guide. Thanks to everyone who \
+contributed!"
+
+packager		"The Haiku build system"
+vendor			"Haiku Project"
+
+copyrights		"2001-2015 Haiku, Inc. et al"
+licenses		MIT
+
+provides {
+	haiku_userguide_pt_PT=%HAIKU_VERSION%
+}
+
+requires {
+}

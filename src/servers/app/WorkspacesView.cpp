@@ -90,7 +90,7 @@ WorkspacesView::_WorkspaceAt(int32 i)
 	_GetGrid(columns, rows);
 
 	BRect frame = Bounds();
-	ConvertToScreen(&frame);
+	LocalToScreenTransform().Apply(&frame);
 
 	int32 width = frame.IntegerWidth() / columns;
 	int32 height = frame.IntegerHeight() / rows;
@@ -356,7 +356,7 @@ void
 WorkspacesView::_Invalidate() const
 {
 	BRect frame = Bounds();
-	ConvertToScreen(&frame);
+	LocalToScreenTransform().Apply(&frame);
 
 	BRegion region(frame);
 	Window()->MarkContentDirty(region);
@@ -385,7 +385,7 @@ WorkspacesView::Draw(DrawingEngine* drawingEngine, BRegion* effectiveClipping,
 	drawingEngine->ConstrainClippingRegion(&gridRegion);
 
 	BRect frame = Bounds();
-	ConvertToScreen(&frame);
+	LocalToScreenTransform().Apply(&frame);
 
 	// horizontal lines
 

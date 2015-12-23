@@ -154,9 +154,9 @@ MessageLooper::_MessageLooper()
 
 		Lock();
 
-		if (code == kMsgQuitLooper) {
+		if (code == kMsgQuitLooper)
 			Quit();
-		} else
+		else
 			_DispatchMessage(code, receiver);
 
 		Unlock();

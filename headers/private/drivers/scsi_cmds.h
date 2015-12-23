@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2013, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2015, Haiku, Inc. All RightsReserved.
  * Copyright 2002/03, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -222,7 +222,7 @@
 
 typedef struct scsi_cmd_inquiry {
 	uint8	opcode;
-	LBITFIELD8_3(
+	B_LBITFIELD8_3(
 		evpd : 1,						// enhanced vital product data
 		_res1_1 : 4,
 		lun : 3
@@ -234,20 +234,20 @@ typedef struct scsi_cmd_inquiry {
 } _PACKED scsi_cmd_inquiry;
 
 typedef struct scsi_res_inquiry {
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		device_type : 5,
 		device_qualifier : 3
 	);
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		device_type_modifier : 7,		// obsolete, normally set to zero
 		removable_medium : 1
 	);
-	LBITFIELD8_3(						// 0 always means "not conforming"
+	B_LBITFIELD8_3(						// 0 always means "not conforming"
 		ansi_version : 3,				// 1 for SCSI-1, 2 for SCSI-2 etc.
 		ecma_version : 3,
 		iso_version : 2
 	);
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		response_data_format : 4,		// 2 = SCSI/2 compliant
 		_res3_4 : 2,
 		term_iop : 1,					// 1 = supports TERMINATE I/O PROCESS
@@ -257,7 +257,7 @@ typedef struct scsi_res_inquiry {
 	uint8	additional_length;			// total (whished) length = this + 4
 	uint8	_res5;
 	uint8	_res6;
-	LBITFIELD8_8(
+	B_LBITFIELD8_8(
 		soft_reset : 1,					// 0 = soft reset leads to hard reset
 		cmd_queue : 1,					// 1 = supports tagged command queuing
 		_res7_2 : 1,
@@ -319,7 +319,7 @@ enum scsi_device_type {
 
 // vital product data: supported pages
 typedef struct scsi_page_list {
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		device_type : 5,
 		device_qualifier : 3
 	);
@@ -332,7 +332,7 @@ typedef struct scsi_page_list {
 
 // vital product data: unit serial number page
 typedef struct scsi_page_usn {
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		device_type : 5,
 		device_qualifier : 3
 	);
@@ -344,14 +344,14 @@ typedef struct scsi_page_usn {
 } _PACKED scsi_page_usn;
 
 typedef struct scsi_page_block_limits {
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		device_type : 5,
 		device_qualifier : 3
 	);
 	uint8	page_code;
 
 	uint16	_page_length;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		wsnz : 1,
 		_res4_1 : 7
 	);
@@ -369,7 +369,7 @@ typedef struct scsi_page_block_limits {
 } _PACKED scsi_page_block_limits;
 
 typedef struct scsi_page_lb_provisioning {
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		device_type : 5,
 		device_qualifier : 3
 	);
@@ -377,7 +377,7 @@ typedef struct scsi_page_lb_provisioning {
 
 	uint16	page_length;
 	uint8	threshold_exponent;
-	LBITFIELD8_7(
+	B_LBITFIELD8_7(
 		dp : 1,
 		anc_sup : 1,
 		lbprz : 1,
@@ -386,7 +386,7 @@ typedef struct scsi_page_lb_provisioning {
 		lbpws : 1,
 		lbpu : 1
 	);
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		provisioning_type : 3,
 		_res6_3 : 5
 	);
@@ -398,14 +398,14 @@ typedef struct scsi_page_lb_provisioning {
 
 typedef struct scsi_cmd_read_capacity {
 	uint8	opcode;
-	LBITFIELD8_3(
+	B_LBITFIELD8_3(
 		relative_address : 1,		// relative address
 		_res1_1 : 4,
 		lun : 3
 	);
 	uint32	lba;
 	uint8	_res6[2];
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		pmi : 1,							// partial medium indicator
 		_res8_1 : 7
 	);
@@ -438,7 +438,7 @@ typedef struct scsi_res_read_capacity_long {
 
 typedef struct scsi_cmd_rw_6 {
 	uint8	opcode;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		high_lba : 5,
 		lun : 3
 	);
@@ -453,7 +453,7 @@ typedef struct scsi_cmd_rw_6 {
 
 typedef struct scsi_cmd_rw_10 {
 	uint8	opcode;
-	LBITFIELD8_5(
+	B_LBITFIELD8_5(
 		relative_address : 1,		// relative address
 		_res1_1 : 2,
 		force_unit_access : 1,		// force unit access (1 = safe, cacheless access)
@@ -471,7 +471,7 @@ typedef struct scsi_cmd_rw_10 {
 
 typedef struct scsi_cmd_rw_12 {
 	uint8	opcode;
-	LBITFIELD8_5(
+	B_LBITFIELD8_5(
 		relative_address : 1,		// relative address
 		_res1_1 : 2,
 		force_unit_access : 1,		// force unit access (1 = safe, cacheless access)
@@ -489,7 +489,7 @@ typedef struct scsi_cmd_rw_12 {
 
 typedef struct scsi_cmd_rw_16 {
 	uint8	opcode;
-	LBITFIELD8_6(
+	B_LBITFIELD8_6(
 		_res1_0 : 1,
 		force_unit_access_non_volatile : 1,
 		_res1_2 : 1,
@@ -499,7 +499,7 @@ typedef struct scsi_cmd_rw_16 {
 	);
 	uint64	lba;					// big endian
 	uint32	length;
-	LBITFIELD8_3(
+	B_LBITFIELD8_3(
 		group_number : 5,
 		_res_14_5 : 2,
 		_res_14_7 : 1
@@ -512,7 +512,7 @@ typedef struct scsi_cmd_rw_16 {
 
 typedef struct scsi_cmd_wsame_16 {
 	uint8	opcode;
-	LBITFIELD8_6(
+	B_LBITFIELD8_6(
 		_res1_0 : 1,
 		lb_data : 1,
 		pb_data : 1,
@@ -522,7 +522,7 @@ typedef struct scsi_cmd_wsame_16 {
 	);
 	uint64	lba;
 	uint32	length;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		group_number : 5,
 		_res14_5 : 3
 	);
@@ -534,12 +534,12 @@ typedef struct scsi_cmd_wsame_16 {
 
 typedef struct scsi_cmd_unmap {
 	uint8	opcode;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		anchor : 1,
 		_reserved1_7 : 7
 	);
 	uint32	_reserved1;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		group_number : 5,
 		_reserved5_7 : 3
 	);
@@ -565,7 +565,7 @@ struct scsi_unmap_parameter_list {
 
 typedef struct scsi_cmd_request_sense {
 	uint8	opcode;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		_res1_0 : 5,
 		lun : 3
 	);
@@ -581,12 +581,12 @@ typedef struct scsi_cmd_request_sense {
 #define SCSIS_DEFERRED_ERROR 0x71
 
 typedef struct scsi_sense {
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		error_code : 7,
 		valid : 1							// 0 = not conforming to standard
 	);
 	uint8 segment_number;					// for COPY/COPY AND VERIFY/COMPARE
-	LBITFIELD8_5(
+	B_LBITFIELD8_5(
 		sense_key : 4,
 		res2_4 : 1,
 		ILI : 1,							// incorrect length indicator - req. block
@@ -612,7 +612,7 @@ typedef struct scsi_sense {
 
 	union {
 		struct {
-		LBITFIELD8_2(
+		B_LBITFIELD8_2(
 			high_key_spec : 7,
 			SKSV : 1						// 1 = sense key specific (byte 15-17) valid
 		);
@@ -622,7 +622,7 @@ typedef struct scsi_sense {
 
 		// ILLEGAL REQUEST
 		struct {
-		LBITFIELD8_5(
+		B_LBITFIELD8_5(
 			bit_pointer : 3,				// points to (highest) invalid bit of parameter
 			BPV : 1,						// 1 = bit_pointer is valid
 			res15_4 : 2,
@@ -635,7 +635,7 @@ typedef struct scsi_sense {
 
 		// access error (RECOVERED, HARDWARE or MEDIUM ERROR)
 		struct {
-		LBITFIELD8_2(
+		B_LBITFIELD8_2(
 			res15_0 : 7,
 			SKSV : 1
 		);
@@ -645,7 +645,7 @@ typedef struct scsi_sense {
 
 		// format progress (if sense key = NOT READY)
 		struct {
-		LBITFIELD8_2(
+		B_LBITFIELD8_2(
 			res15_0 : 7,
 			SKSV : 1
 		);
@@ -661,12 +661,12 @@ typedef struct scsi_sense {
 
 typedef struct scsi_cmd_prevent_allow {
 	uint8	opcode;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		_res1_0 : 5,
 		lun : 3
 	);
 	uint8	_res2[2];
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		prevent : 1,		// 1 - prevent medium removal, 0 - allow removal
 		_res4_1 : 7
 	);
@@ -677,13 +677,13 @@ typedef struct scsi_cmd_prevent_allow {
 
 typedef struct scsi_cmd_ssu {
 	uint8	opcode;
-	LBITFIELD8_3(
+	B_LBITFIELD8_3(
 		immediately : 1,			// 1 - return immediately, 0 - return on completion
 		_res1_1 : 4,
 		lun : 3
 	);
 	uint8 res2[2];
-	LBITFIELD8_3(
+	B_LBITFIELD8_3(
 		start : 1,			// 1 - load+start, i.e. allow, 0 - eject+stop, i.e. deny
 		load_eject : 1,			// 1 - include loading/ejecting, 0 - only to allow/deny
 		_res4_2 : 6
@@ -696,7 +696,7 @@ typedef struct scsi_cmd_ssu {
 
 typedef struct scsi_cmd_mode_select_6 {
 	uint8	opcode;
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		save_pages : 1,		// 1 = save pages to non-volatile memory
 		_res1_1 : 3,
 		pf : 1,				// 0 = old SCSI-1; 1 = new SCSI-2 format
@@ -712,13 +712,13 @@ typedef struct scsi_cmd_mode_select_6 {
 
 typedef struct scsi_cmd_mode_sense_6 {
 	uint8	opcode;
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		_res1_0 : 3,
 		disable_block_desc : 1,		// disable block descriptors
 		_res1_4 : 1,
 		lun : 3
 	);
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		page_code : 6,
 		page_control : 2			// page control field
 	);
@@ -732,7 +732,7 @@ typedef struct scsi_cmd_mode_sense_6 {
 
 typedef struct scsi_cmd_mode_select_10 {
 	uint8	opcode;
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		save_pages : 1,				// 1 = save pages to non-volatile memory
 		_res1_1 : 3,
 		pf : 1,						// 0 = old SCSI-1; 1 = new SCSI-2 format
@@ -748,13 +748,13 @@ typedef struct scsi_cmd_mode_select_10 {
 
 typedef struct scsi_cmd_mode_sense_10 {
 	uint8	opcode;
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		_res1_0 : 3,
 		disable_block_desc : 1,		// disable block descriptors
 		_res1_4 : 1,
 		lun : 3
 	);
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		page_code : 6,
 		page_control : 2			// page control field
 	);
@@ -792,7 +792,7 @@ typedef struct scsi_mode_param_header_10 {
 
 // content of dev_spec_parameter for direct access devices
 typedef struct scsi_mode_param_dev_spec_da {
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		_res0_0 : 4,
 		dpo_fua : 1,			// 1 = supports DPO and FUA, see READ (10) (sense only)
 		_res0_6 : 1,
@@ -814,7 +814,7 @@ typedef struct scsi_mode_param_block_desc {
 
 // header of a mode pages
 typedef struct scsi_modepage_header {
-	LBITFIELD8_3(
+	B_LBITFIELD8_3(
 		page_code : 6,
 		_res0_6 : 1,
 		PS : 1				// 1 = page can be saved (only valid for MODE SENSE)
@@ -828,17 +828,17 @@ typedef struct scsi_modepage_header {
 
 typedef struct scsi_modepage_control {
 	scsi_modepage_header header;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		RLEC : 1,			// Report Log Exception Condition
 		res2_1 : 7
 	);
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		DQue : 1,			// disable Queuing
 		QErr : 1,			// abort queued commands on contingent allegiance condition
 		res3_2 : 2,
 		QAM : 4				// Queue Algorithm Modifier
 	);
-	LBITFIELD8_5(
+	B_LBITFIELD8_5(
 		EAENP : 1,			// error AEN permission; true = send AEN on deferred error
 							// false = generate UA condition after deferred error
 		UAAENP : 1,			// unit attention AEN permission; true = send AEN,
@@ -865,7 +865,7 @@ typedef struct scsi_modepage_control {
 
 typedef struct scsi_modepage_audio {
 	scsi_modepage_header header;
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		_res2_0 : 1,
 		stop_on_track_crossing : 1,		// Stop On Track Crossing
 			// 0 - stop according transfer length, 1 - stop at end of track
@@ -875,7 +875,7 @@ typedef struct scsi_modepage_audio {
 	uint8 _res3[3];
 	uint8 _obsolete6[2];
 	struct {
-		LBITFIELD8_2(
+		B_LBITFIELD8_2(
 			channel : 4,	// select channel to connect to this port
 			_res0_4 : 4
 		);
@@ -895,7 +895,7 @@ typedef struct scsi_modepage_audio {
 
 typedef struct scsi_cmd_tur {
 	uint8	opcode;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		_res1_0 : 5,
 		lun : 3
 	);
@@ -908,13 +908,13 @@ typedef struct scsi_cmd_tur {
 
 typedef struct scsi_cmd_read_toc {
 	uint8	opcode;
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		_res1_0 : 1,
 		time : 1,					// true, to use MSF format, false for LBA format
 		_res1_2 : 3,
 		lun : 3
 	);
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		format : 4,					// see below
 		_res2_4 : 4
 	);
@@ -960,7 +960,7 @@ typedef struct scsi_cd_track_number {
 // one track for SCSI_TOC_FORMAT_TOC
 typedef struct scsi_toc_track {
 	uint8	_res0;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		control : 4,
 		adr : 4
 	);
@@ -1006,13 +1006,13 @@ typedef struct scsi_toc_toc {
 
 typedef struct scsi_cmd_read_subchannel {
 	uint8	opcode;
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		_res1_0 : 1,
 		time : 1,					// true, to use MSF format, false for LBA format
 		_res1_2 : 3,
 		lun : 3
 	);
-	LBITFIELD8_3(
+	B_LBITFIELD8_3(
 		_res2_0 : 6,
 		subq : 1,					// 1 - return Q sub-channel data
 		_res2_7 : 1
@@ -1050,7 +1050,7 @@ enum scsi_audio_status {
 
 typedef struct scsi_cd_current_position {
 	uint8	format_code;			// always 1
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		control : 4,				// see scsi_q_control
 		adr : 4						// see scsi_adr
 	);
@@ -1071,7 +1071,7 @@ typedef struct scsi_cd_current_position {
 
 typedef struct scsi_cmd_play_msf {
 	uint8	opcode;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		_res1_0 : 5,
 		lun : 3
 	);
@@ -1090,7 +1090,7 @@ typedef struct scsi_cmd_play_msf {
 
 typedef struct scsi_cmd_stop_play {
 	uint8	opcode;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		_res1_0 : 5,
 		lun : 3
 	);
@@ -1103,12 +1103,12 @@ typedef struct scsi_cmd_stop_play {
 
 typedef struct scsi_cmd_pause_resume {
 	uint8	opcode;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		_res1_0 : 5,
 		lun : 3
 	);
 	uint8	_res2[6];
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		resume : 1,				// 1 for resume, 0 for pause
 		_res8_2 : 7
 	);
@@ -1120,7 +1120,7 @@ typedef struct scsi_cmd_pause_resume {
 
 typedef struct scsi_cmd_scan {
 	uint8	opcode;
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		relative_address : 1,	// must be zero
 		_res1_1 : 3,
 		direct : 1,				// direction: 0 forward, 1 backward
@@ -1132,7 +1132,7 @@ typedef struct scsi_cmd_scan {
 		scsi_cd_track_number track_number;
 	} start;
 	uint8	_res6[3];
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		res9_0 : 6,
 		type : 2				// actual type of <start> (see below)
 	);
@@ -1152,7 +1152,7 @@ enum scsi_scan_type {
 
 typedef struct scsi_cmd_read_cd {
 	uint8	opcode;
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		relative_address : 1,	// must be zero
 		_res1_1 : 1,
 		sector_type : 3,		// required sector type (1=CDDA)
@@ -1162,7 +1162,7 @@ typedef struct scsi_cmd_read_cd {
 	uint8	high_length;
 	uint8	mid_length;
 	uint8	low_length;
-	LBITFIELD8_6(
+	B_LBITFIELD8_6(
 		_res9_0 : 1,
 		error_field : 2,
 		edc_ecc : 1,			// include EDC/ECC; includes 8 byte padding for Mode 1 format
@@ -1171,7 +1171,7 @@ typedef struct scsi_cmd_read_cd {
 		header_code : 2,
 		sync : 1				// if 1, include sync field from sector
 	);
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		sub_channel_selection : 4,
 		_res10_4 : 4
 	);
@@ -1206,7 +1206,7 @@ enum scsi_read_cd_sub_channel_selection {
 
 typedef struct scsi_cmd_sync_cache {
 	uint8	opcode;
-	LBITFIELD8_4(
+	B_LBITFIELD8_4(
 		relative_address : 1,	// must be zero
 		immediately : 1,		// 1 - return immediately, 0 - return on completion
 		_res1_1 : 3,

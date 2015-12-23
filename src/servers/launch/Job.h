@@ -20,8 +20,10 @@
 
 using namespace BSupportKit;
 class BMessage;
+class BMessenger;
 
 class Finder;
+class Job;
 class Target;
 
 struct entry_ref;
@@ -30,11 +32,21 @@ struct entry_ref;
 typedef std::map<BString, BMessage> PortMap;
 
 
+class TeamRegistrator {
+public:
+	virtual	void				RegisterTeam(Job* job) = 0;
+};
+
+
 class Job : public BaseJob {
 public:
 								Job(const char* name);
 								Job(const Job& other);
 	virtual						~Job();
+
+			::TeamRegistrator*	TeamRegistrator() const;
+			void				SetTeamRegistrator(
+									::TeamRegistrator* registrator);
 
 			bool				IsEnabled() const;
 			void				SetEnabled(bool enable);
@@ -58,6 +70,10 @@ public:
 			BStringList&		Requirements();
 			void				AddRequirement(const char* requirement);
 
+			const BStringList&	Pending() const;
+			BStringList&		Pending();
+			void				AddPending(const char* pending);
+
 	virtual	bool				CheckCondition(ConditionContext& context) const;
 
 			status_t			Init(const Finder& jobs,
@@ -69,14 +85,20 @@ public:
 			const PortMap&		Ports() const;
 			port_id				Port(const char* name = NULL) const;
 
+			port_id				DefaultPort() const;
+			void				SetDefaultPort(port_id port);
+
 			status_t			Launch();
 			bool				IsLaunched() const;
 			bool				IsRunning() const;
+			void				TeamDeleted();
+			bool				CanBeLaunched() const;
 
 			bool				IsLaunching() const;
 			void				SetLaunching(bool launching);
 
 			status_t			HandleGetLaunchData(BMessage* message);
+			status_t			GetMessenger(BMessenger& messenger);
 
 	virtual	status_t			Run();
 
@@ -96,6 +118,8 @@ private:
 			void				_SendPendingLaunchDataReplies();
 
 			status_t			_CreateAndTransferPorts();
+			port_id				_CreateAndTransferPort(const char* name,
+									int32 capacity);
 
 			status_t			_Launch(const char* signature, entry_ref* ref,
 									int argCount, const char* const* args,
@@ -111,12 +135,16 @@ private:
 			PortMap				fPortMap;
 			status_t			fInitStatus;
 			team_id				fTeam;
+			port_id				fDefaultPort;
+			uint32				fToken;
 			status_t			fLaunchStatus;
 			mutex				fLaunchStatusLock;
 			::Target*			fTarget;
 			::Condition*		fCondition;
+			BStringList			fPendingJobs;
 			BObjectList<BMessage>
 								fPendingLaunchDataReplies;
+			::TeamRegistrator*	fTeamRegistrator;
 };
 
 

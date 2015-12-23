@@ -171,6 +171,8 @@ public:
 
 private:
 			status_t			_CreateAccountFilePath();
+			status_t			_GetAddOnRef(const char* subPath,
+									const char* name, entry_ref& ref);
 
 private:
 			status_t			fStatus;

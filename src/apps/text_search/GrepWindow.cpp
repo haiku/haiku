@@ -547,19 +547,19 @@ GrepWindow::_LayoutViews()
 		"ScrollSearchResults", fSearchResults,
 		B_FULL_UPDATE_ON_RESIZE, true, true);
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_HALF_ITEM_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0, 0, -1, -1)
 		.Add(fMenuBar)
-		.AddGrid(B_USE_HALF_ITEM_SPACING)
-			.SetInsets(B_USE_ITEM_INSETS, B_USE_HALF_ITEM_INSETS,
-				B_USE_ITEM_INSETS, 0)
+		.AddGrid(B_USE_HALF_ITEM_INSETS)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+				B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 			.Add(fSearchText, 0, 0, 3)
 			.Add(fShowLinesCheckbox, 0, 1)
 			.Add(BSpaceLayoutItem::CreateGlue(), 1, 1)
 			.Add(fButton, 2, 1)
 		.End()
 		.AddGroup(B_VERTICAL, 0)
-			.SetInsets(-1, 0, -1, -1)
+			.SetInsets(-2, 0, -1, -1)
 			.Add(scroller)
 		.End()
 	.End();

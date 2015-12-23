@@ -13,19 +13,19 @@
 #include <Alert.h>
 #include <Catalog.h>
 #include <Directory.h>
-#include <Message.h>
 #include <FindDirectory.h>
-#include <GroupLayout.h>
-#include <GridLayoutBuilder.h>
-#include <SpaceLayoutItem.h>
-#include <TextControl.h>
+#include <LayoutBuilder.h>
 #include <Menu.h>
 #include <MenuItem.h>
 #include <MenuField.h>
+#include <Message.h>
 #include <Mime.h>
 #include <Node.h>
-#include <notification/Notifications.h>
 #include <Path.h>
+#include <SpaceLayoutItem.h>
+#include <TextControl.h>
+
+#include <notification/Notifications.h>
 
 #include "DisplayView.h"
 #include "SettingsHost.h"
@@ -52,18 +52,13 @@ DisplayView::DisplayView(SettingsHost* host)
 	fIconSize->SetLabelFromMarked(true);
 	fIconSizeField = new BMenuField(B_TRANSLATE("Icon size:"), fIconSize);
 
-	// Calculate inset
-	float inset = ceilf(be_plain_font->Size() * 0.7f);
-
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(BGridLayoutBuilder(inset, inset)
+	BLayoutBuilder::Grid<>(this, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 		.Add(fWindowWidth->CreateLabelLayoutItem(), 0, 0)
 		.Add(fWindowWidth->CreateTextViewLayoutItem(), 1, 0)
 		.Add(fIconSizeField->CreateLabelLayoutItem(), 0, 1)
 		.Add(fIconSizeField->CreateMenuBarLayoutItem(), 1, 1)
-		.Add(BSpaceLayoutItem::CreateGlue(), 0, 2, 2, 1)
-		.SetInsets(inset, inset, inset, inset)
-	);
+		.AddGlue(0, 2)
+		.SetInsets(B_USE_WINDOW_SPACING);
 }
 
 

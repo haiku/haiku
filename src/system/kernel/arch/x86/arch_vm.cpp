@@ -59,6 +59,8 @@
 void *gDmaAddress;
 
 
+namespace {
+
 struct memory_type_range : DoublyLinkedListLinkImpl<memory_type_range> {
 	uint64						base;
 	uint64						size;
@@ -88,6 +90,9 @@ struct update_mtrr_info {
 
 
 typedef DoublyLinkedList<memory_type_range> MemoryTypeRangeList;
+
+} // namespace
+
 
 static mutex sMemoryTypeLock = MUTEX_INITIALIZER("memory type ranges");
 static MemoryTypeRangeList sMemoryTypeRanges;

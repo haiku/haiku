@@ -297,8 +297,9 @@ UiUtils::PrintValueNodeGraph(BString& _output, ValueNodeChild* child,
 	}
 
 	if (node->CountChildren() == 1
-		&& node->GetType()->Kind() == TYPE_ADDRESS
-		&& node->ChildAt(0)->GetType()->Kind() == TYPE_COMPOUND) {
+		&& node->GetType()->ResolveRawType(false)->Kind() == TYPE_ADDRESS
+		&& node->ChildAt(0)->GetType()->ResolveRawType(false)->Kind()
+			== TYPE_COMPOUND) {
 		// for the case of a pointer to a compound type,
 		// we want to hide the intervening compound node and print
 		// the children directly.

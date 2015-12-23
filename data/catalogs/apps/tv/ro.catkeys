@@ -10,7 +10,7 @@ TV	System name		TV
 No border	MainWin		Fără margine
 Always on top	MainWin		Întotdeauna deasupra
 OK	MainWin		OK
-Quit	MainWin		Părăsește
+Quit	MainWin		Închidere
 Full screen	MainWin		Ecran complet
 Debug	MainWin		Depanare
 Scale to native size	MainWin		Scalează la dimensiunea nativă

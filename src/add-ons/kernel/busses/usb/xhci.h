@@ -196,6 +196,8 @@ private:
 	inline	uint32				ReadDoorReg32(uint32 reg);
 	inline	void				WriteDoorReg32(uint32 reg, uint32 value);
 
+			void				_SwitchIntelPorts();
+
 	static	pci_module_info *	sPCIModule;
 	static	pci_x86_module_info *sPCIx86Module;
 

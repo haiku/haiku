@@ -92,6 +92,9 @@ public:
 
 		status_t			BuildConnections();
 
+		void				RegisterLocalNode(BMediaNode* node);
+		void				UnregisterLocalNode(BMediaNode* node);
+
 private:
 	friend class BMediaRoster;
 };

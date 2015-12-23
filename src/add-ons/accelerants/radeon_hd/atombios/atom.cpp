@@ -496,7 +496,7 @@ static void
 atom_op_add(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
-	uint32 dst, src, saved;
+	uint32 dst, src, saved = 0;
 	int dptr = *ptr;
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
 	src = atom_get_src(ctx, attr, ptr);
@@ -513,7 +513,7 @@ static void
 atom_op_and(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
-	uint32 dst, src, saved;
+	uint32 dst, src, saved = 0;
 	int dptr = *ptr;
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
 	src = atom_get_src(ctx, attr, ptr);
@@ -559,7 +559,7 @@ static void
 atom_op_clear(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
-	uint32 saved;
+	uint32 saved = 0;
 	int dptr = *ptr;
 	attr &= 0x38;
 	attr |= atom_def_dst[attr>>3]<<6;
@@ -684,7 +684,7 @@ static void
 atom_op_mask(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
-	uint32 dst, mask, src, saved;
+	uint32 dst, mask, src, saved = 0;
 	int dptr = *ptr;
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
 	mask = atom_get_src_direct(ctx, ((attr >> 3) & 7), ptr);
@@ -740,7 +740,7 @@ static void
 atom_op_or(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
-	uint32 dst, src, saved;
+	uint32 dst, src, saved = 0;
 	int dptr = *ptr;
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
 	src = atom_get_src(ctx, attr, ptr);
@@ -848,7 +848,7 @@ atom_op_setregblock(atom_exec_context *ctx, int *ptr, int arg)
 static void atom_op_shift_left(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++), shift;
-	uint32 saved, dst;
+	uint32 saved = 0, dst;
 	int dptr = *ptr;
 	attr &= 0x38;
 	attr |= atom_def_dst[attr >> 3] << 6;
@@ -866,7 +866,7 @@ static void atom_op_shift_left(atom_exec_context *ctx, int *ptr, int arg)
 static void atom_op_shift_right(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++), shift;
-	uint32 saved, dst;
+	uint32 saved = 0, dst;
 	int dptr = *ptr;
 	attr &= 0x38;
 	attr |= atom_def_dst[attr >> 3] << 6;
@@ -884,7 +884,7 @@ static void atom_op_shift_right(atom_exec_context *ctx, int *ptr, int arg)
 static void atom_op_shl(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++), shift;
-	uint32 saved, dst;
+	uint32 saved = 0, dst;
 	int dptr = *ptr;
 	uint32 dst_align = atom_dst_to_src[(attr >> 3) & 7][(attr >> 6) & 3];
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
@@ -905,7 +905,7 @@ static void atom_op_shl(atom_exec_context *ctx, int *ptr, int arg)
 static void atom_op_shr(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++), shift;
-	uint32 saved, dst;
+	uint32 saved = 0, dst;
 	int dptr = *ptr;
 	uint32 dst_align = atom_dst_to_src[(attr >> 3) & 7][(attr >> 6) & 3];
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
@@ -927,7 +927,7 @@ static void
 atom_op_sub(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
-	uint32 dst, src, saved;
+	uint32 dst, src, saved = 0;
 	int dptr = *ptr;
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
 	src = atom_get_src(ctx, attr, ptr);
@@ -984,7 +984,7 @@ static void
 atom_op_xor(atom_exec_context *ctx, int *ptr, int arg)
 {
 	uint8 attr = U8((*ptr)++);
-	uint32 dst, src, saved;
+	uint32 dst, src, saved = 0;
 	int dptr = *ptr;
 	dst = atom_get_dst(ctx, arg, attr, ptr, &saved, 1);
 	src = atom_get_src(ctx, attr, ptr);

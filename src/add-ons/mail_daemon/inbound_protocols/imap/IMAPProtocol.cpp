@@ -15,7 +15,7 @@
 
 IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 	:
-	BInboundMailProtocol(settings),
+	BInboundMailProtocol("IMAP", settings),
 	fSettings(settings.Name(), settings.InboundSettings()),
 	fWorkers(5, false)
 {
@@ -41,7 +41,7 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 {
 	// Get list of subscribed folders
 
-	StringList newFolders;
+	BStringList newFolders;
 	BString separator;
 	status_t status = protocol.GetSubscribedFolders(newFolders, separator);
 	if (status != B_OK)
@@ -49,20 +49,19 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 
 	// Determine how many new mailboxes we have
 
-	StringList::iterator folderIterator = newFolders.begin();
-	while (folderIterator != newFolders.end()) {
-		if (fFolders.find(*folderIterator) != fFolders.end())
-			folderIterator = newFolders.erase(folderIterator);
+	for (int32 i = 0; i < newFolders.CountStrings();) {
+		if (fFolders.find(newFolders.StringAt(i)) != fFolders.end())
+			newFolders.Remove(i);
 		else
-			folderIterator++;
+			i++;
 	}
 
-	int32 totalMailboxes = fFolders.size() + newFolders.size();
+	int32 totalMailboxes = fFolders.size() + newFolders.CountStrings();
 	int32 workersWanted = 1;
 	if (idle)
 		workersWanted = std::min(fSettings.MaxConnections(), totalMailboxes);
 
-	if (newFolders.empty() && fWorkers.CountItems() == workersWanted) {
+	if (newFolders.IsEmpty() && fWorkers.CountItems() == workersWanted) {
 		// Nothing to do - we've already distributed everything
 		return B_OK;
 	}
@@ -95,9 +94,8 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 	}
 
 	// Update known mailboxes
-	folderIterator = newFolders.begin();
-	for (; folderIterator != newFolders.end(); folderIterator++) {
-		const BString& mailbox = *folderIterator;
+	for (int32 i = 0; i < newFolders.CountStrings(); i++) {
+		const BString& mailbox = newFolders.StringAt(i);
 		fFolders.insert(std::make_pair(mailbox,
 			_CreateFolder(mailbox, separator)));
 	}

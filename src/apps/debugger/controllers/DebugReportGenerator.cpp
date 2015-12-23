@@ -750,8 +750,9 @@ DebugReportGenerator::_ResolveValueIfNeeded(ValueNode* node, StackFrame* frame,
 			// since in the case of a pointer to a compound we hide
 			// the intervening compound, don't consider the hidden node
 			// a level for the purposes of depth traversal
-			if (node->GetType()->Kind() == TYPE_ADDRESS
-				&& child->GetType()->Kind() == TYPE_COMPOUND) {
+			if (node->GetType()->ResolveRawType(false)->Kind() == TYPE_ADDRESS
+				&& child->GetType()->ResolveRawType(false)->Kind()
+					== TYPE_COMPOUND) {
 				_ResolveValueIfNeeded(child->Node(), frame, maxDepth);
 			} else
 				_ResolveValueIfNeeded(child->Node(), frame, maxDepth - 1);

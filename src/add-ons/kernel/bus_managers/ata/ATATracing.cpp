@@ -23,7 +23,7 @@ ata_trace_printf(uint32 flags, const char *format, ...)
 		size_t totalBytes = vsnprintf(sTraceBuffer + sTraceBufferOffset,
 			sizeof(sTraceBuffer) - sTraceBufferOffset, format, arguments);
 		sTraceBufferOffset += std::min(totalBytes,
-			sizeof(sTraceBuffer) - sTraceBufferOffset - 1);
+			(size_t)(sizeof(sTraceBuffer) - sTraceBufferOffset - 1));
 		va_end(arguments);
 	}
 

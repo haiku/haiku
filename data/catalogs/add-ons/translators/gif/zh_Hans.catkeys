@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-GIFTranslator	2626723192
+1	english	x-vnd.Haiku-GIFTranslator	2201651797
 Websafe	GIFView		网络安全色
 Write interlaced images	GIFView		写入隔行图像
 Optimal	GIFView		最佳效果
@@ -11,6 +11,7 @@ Palette:	GIFView		调色板：
 GIF image	GIFTranslator		GIF 图像
 Write transparent images	GIFView		写入透明图像
 GIF images	GIFTranslator		GIF 图像
+Version %d.%d.%d, %s	GIFView		版本 %d.%d.%d %s
 Use RGB color	GIFView		启用 RGB 颜色
 Use dithering	GIFView		启用抖动
 GIF Settings	GIFTranslator		GIF 设置

@@ -12,27 +12,27 @@
 
 #include <vector>
 
-#include <Roster.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
 #include <Alert.h>
-#include <Font.h>
 #include <Button.h>
 #include <Catalog.h>
-#include <StringView.h>
-#include <TextControl.h>
 #include <CheckBox.h>
-#include <String.h>
-#include <FindDirectory.h>
-#include <Node.h>
-#include <notification/Notifications.h>
-#include <Path.h>
-#include <File.h>
 #include <Directory.h>
-#include <VolumeRoster.h>
-#include <Volume.h>
+#include <File.h>
+#include <FindDirectory.h>
+#include <Font.h>
+#include <LayoutBuilder.h>
+#include <Node.h>
+#include <Path.h>
 #include <Query.h>
+#include <Roster.h>
+#include <String.h>
+#include <StringView.h>
 #include <SymLink.h>
+#include <TextControl.h>
+#include <Volume.h>
+#include <VolumeRoster.h>
+
+#include <notification/Notifications.h>
 
 #include "GeneralView.h"
 #include "SettingsHost.h"
@@ -62,20 +62,15 @@ GeneralView::GeneralView(SettingsHost* host)
 		B_TRANSLATE("seconds of inactivity"));
 
 	// Default position
-	// TODO: Here will come a screen representation with the four corners 
+	// TODO: Here will come a screen representation with the four corners
 	// clickable
 
-	// Calculate inset
-	float inset = ceilf(be_plain_font->Size() * 0.7f);
-
-	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, inset)
-		.AddGroup(B_HORIZONTAL, inset)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.AddGroup(B_HORIZONTAL, B_USE_WINDOW_SPACING)
 			.Add(fNotificationBox)
 			.AddGlue()
 		.End()
-
-		.AddGroup(B_VERTICAL, inset)
+		.AddGroup(B_VERTICAL, B_USE_WINDOW_SPACING)
 			.Add(fAutoStart)
 			.AddGroup(B_HORIZONTAL)
 				.AddGroup(B_HORIZONTAL, 2)
@@ -84,9 +79,8 @@ GeneralView::GeneralView(SettingsHost* host)
 				.End()
 			.End()
 		.End()
-		.SetInsets(inset, inset, inset, inset)
-		.AddGlue()
-	);
+		.SetInsets(B_USE_WINDOW_SPACING)
+		.AddGlue();
 }
 
 
@@ -165,7 +159,7 @@ GeneralView::MessageReceived(BMessage* msg)
 				}
 			}
 			break;
-		} 
+		}
 		case kSettingChanged:
 			SettingsPane::MessageReceived(msg);
 			break;

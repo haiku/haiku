@@ -9,7 +9,7 @@
 #define _KERNEL_ELF_H
 
 
-#include <elf_common.h>
+#include <elf_private.h>
 #include <thread.h>
 #include <image.h>
 

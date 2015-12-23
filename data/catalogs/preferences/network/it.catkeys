@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Network	950262959
+1	italian	x-vnd.Haiku-Network	4045838872
 Static	IntefaceAddressView		Statico
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Servizi
@@ -26,6 +26,7 @@ Mode:	IntefaceAddressView		Modalità:
 WPA	WPA protected network		WPA
 open	Open network		apri
 IP Address:	IntefaceAddressView		Indirizzo IP:
+Disable	IntefaceView		Disabilita
 Netmask:	IntefaceAddressView		Netmask:
 Disable	ServiceView		Disabilita
 Your IP address	IntefaceAddressView		Il tuo indirizzo IP

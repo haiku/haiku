@@ -64,7 +64,7 @@ count_regions(const char* imagePath, char const* buff, int phnum, int phentsize)
 				// will be handled at some other place
 				break;
 			case PT_INTERP:
-				// should check here for appropiate interpreter
+				// should check here for appropriate interpreter
 				break;
 			case PT_NOTE:
 				// unsupported
@@ -527,7 +527,7 @@ load_image(char const* name, image_type type, const char* rpath,
 		goto err2;
 	}
 
-	status = map_image(fd, path, image);
+	status = map_image(fd, path, image, eheader.e_type == ET_EXEC);
 	if (status < B_OK) {
 		FATAL("%s: Could not map image: %s\n", image->path, strerror(status));
 		status = B_ERROR;
@@ -552,7 +552,7 @@ load_image(char const* name, image_type type, const char* rpath,
 		#if __GNUC__ == 2
 			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_4)
 				sSearchPathSubDir = "x86";
-		#elif __GNUC__ == 4
+		#elif __GNUC__ >= 4
 			if ((image->abi & B_HAIKU_ABI_MAJOR) == B_HAIKU_ABI_GCC_2)
 				sSearchPathSubDir = "x86_gcc2";
 		#endif

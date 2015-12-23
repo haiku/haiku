@@ -89,6 +89,7 @@ StdBinCommands
 	draggers.cpp
 	ffm.cpp
 	iroster.cpp
+	launch_roster.cpp
 	listattr.cpp
 	listfont.cpp
 	listres.cpp

@@ -15,6 +15,9 @@
 #include <stdio.h>
 
 
+using std::nothrow;
+
+
 namespace FFS {
 
 

@@ -160,8 +160,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.AddGlue()
 			.Add(BSpaceLayoutItem::CreateVerticalStrut(B_USE_SMALL_SPACING))
 			.Add(fAppsIconSizeSlider)
-			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End()
 		.View());
 
@@ -187,8 +186,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.Add(new BButton(B_TRANSLATE("Edit in Tracker"
 					B_UTF8_ELLIPSIS), new BMessage(kEditInTracker)))
 			.AddGlue()
-			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End()
 		.View());
 
@@ -202,8 +200,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 			.Add(fWindowAutoRaise)
 			.Add(fWindowAutoHide)
 			.AddGlue()
-			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.SetInsets(B_USE_DEFAULT_SPACING)
 			.End()
 		.View());
 
@@ -228,7 +225,7 @@ PreferencesWindow::PreferencesWindow(BRect frame)
 				.Add(fRevertButton)
 				.AddGlue()
 				.End()
-			.SetInsets(B_USE_DEFAULT_SPACING)
+			.SetInsets(B_USE_WINDOW_SPACING)
 			.End();
 
 	BMessage windowSettings;

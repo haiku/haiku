@@ -257,4 +257,23 @@ on {
 */
 
 
+/*!
+	\fn status_t BLaunchRoster::ResetStickyEvent(const BMessenger& source,
+			const char* name);
+	\brief Resets a previously triggered sticky event.
+
+	When an event triggered that is marked as \c B_STICKY_EVENT, its status
+	will be reset when you call this method for it.
+
+	You must have previously registered the event, in order to make the
+	launch_daemon do anything. Unknown event notifications will be ignored.
+
+	\param source The messenger the event is coming from.
+	\param name The name of the event.
+	\return B_OK if the event could be reset, otherwise an error code.
+
+	\since Haiku R1
+*/
+
+
 //! @}

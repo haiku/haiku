@@ -12,11 +12,12 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes
 UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter font_support ] ;
 UseBuildFeatureHeaders freetype ;
 
-Includes [ FGristFiles AlphaMask.cpp DrawingEngine.cpp ]
+Includes [ FGristFiles AlphaMask.cpp AlphaMaskCache.cpp DrawingEngine.cpp ]
 	: [ BuildFeatureAttribute freetype : headers ] ;
 
 StaticLibrary libasdrawing.a :
 	AlphaMask.cpp
+	AlphaMaskCache.cpp
 	BitmapBuffer.cpp
 	BitmapDrawingEngine.cpp
 	drawing_support.cpp

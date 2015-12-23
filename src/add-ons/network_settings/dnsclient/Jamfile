@@ -4,6 +4,8 @@ UsePublicHeaders [ FDirName add-ons network_settings ] ;
 UsePrivateHeaders app libroot kernel net ;
 UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] : false ;
 
+AddResources DNSClientService : DNSClientService.rdef ;
+
 Addon DNSClientService :
 	DNSClientServiceAddOn.cpp
 	DNSSettingsView.cpp

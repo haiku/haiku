@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2015, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -246,9 +246,9 @@ SplitChallengeIntoMap(BString str, map<BString,BString>& m)
 // #pragma mark -
 
 
-SMTPProtocol::SMTPProtocol(BMailAccountSettings& settings)
+SMTPProtocol::SMTPProtocol(const BMailAccountSettings& settings)
 	:
-	BOutboundMailProtocol(settings),
+	BOutboundMailProtocol("SMTP", settings),
 	fAuthType(0)
 {
 	fSettingsMessage = settings.OutboundSettings();
@@ -329,13 +329,16 @@ SMTPProtocol::Disconnect()
 
 //! Process EMail to be sent
 status_t
-SMTPProtocol::SendMessages(const BMessage& message, off_t totalBytes)
+SMTPProtocol::HandleSendMessages(const BMessage& message, off_t totalBytes)
 {
 	type_code type;
 	int32 count;
 	status_t status = message.GetInfo("ref", &type, &count);
 	if (status != B_OK)
 		return status;
+
+	// TODO: sort out already sent messages -- the request could
+	// be issued while we're busy sending them already
 
 	SetTotalItems(count);
 	SetTotalItemsSize(totalBytes);
@@ -1061,8 +1064,8 @@ SMTPProtocol::SendCommand(const char *cmd)
 // #pragma mark -
 
 
-BOutboundMailProtocol*
-instantiate_outbound_protocol(BMailAccountSettings& settings)
+extern "C" BOutboundMailProtocol*
+instantiate_outbound_protocol(const BMailAccountSettings& settings)
 {
 	return new SMTPProtocol(settings);
 }

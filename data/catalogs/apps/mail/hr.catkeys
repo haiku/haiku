@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Be-MAIL	1120205077
+1	croatian	x-vnd.Be-MAIL	2196240908
 View	Mail		Pogled
 %d - Date	Mail		%d - Datum
 An error occurred trying to save the attachment.	Mail		Došlo je do greške pri spremanju privitka.
@@ -106,6 +106,7 @@ Save as draft	Mail		Spremi kao skicu
 Open attachment	Mail		Otvori privitak
 sent	B_USER_DIRECTORY/mail/sent		poslano
 (Date unavailable)	Mail		(Datum je nedostupan)
+Spam	Mail		Neželjena poruka
 Reply	Mail		Odgovori
 From:	Mail		Od:
 Open draft	Mail		Otvori nacrt

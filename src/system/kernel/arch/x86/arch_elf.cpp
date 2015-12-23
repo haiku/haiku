@@ -59,12 +59,12 @@ static const char *kRelocations[] = {
 
 #ifdef _BOOT_MODE
 status_t
-boot_arch_elf_relocate_rel(struct preloaded_elf32_image *image,
-	struct Elf32_Rel *rel, int relLength)
+boot_arch_elf_relocate_rel(struct preloaded_elf32_image *image, Elf32_Rel *rel,
+	int relLength)
 #else
 int
 arch_elf_relocate_rel(struct elf_image_info *image,
-	struct elf_image_info *resolveImage, struct Elf32_Rel *rel, int relLength)
+	struct elf_image_info *resolveImage, Elf32_Rel *rel, int relLength)
 #endif
 {
 	addr_t S;
@@ -76,7 +76,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 
 	S = A = P = 0;
 
-	for (i = 0; i * (int)sizeof(struct Elf32_Rel) < relLength; i++) {
+	for (i = 0; i * (int)sizeof(Elf32_Rel) < relLength; i++) {
 		TRACE(("looking at rel type %s, offset 0x%lx\n",
 			kRelocations[ELF32_R_TYPE(rel[i].r_info)], rel[i].r_offset));
 
@@ -88,7 +88,7 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 			case R_386_JMP_SLOT:
 			case R_386_GOTOFF:
 			{
-				struct Elf32_Sym *symbol;
+				Elf32_Sym *symbol;
 				status_t status;
 
 				symbol = SYMBOL(image, ELF32_R_SYM(rel[i].r_info));
@@ -171,11 +171,11 @@ arch_elf_relocate_rel(struct elf_image_info *image,
 #ifdef _BOOT_MODE
 status_t
 boot_arch_elf_relocate_rela(struct preloaded_elf32_image *image,
-	struct Elf32_Rela *rel, int relLength)
+	Elf32_Rela *rel, int relLength)
 #else
 int
 arch_elf_relocate_rela(struct elf_image_info *image,
-	struct elf_image_info *resolveImage, struct Elf32_Rela *rel, int relLength)
+	struct elf_image_info *resolveImage, Elf32_Rela *rel, int relLength)
 #endif
 {
 	dprintf("arch_elf_relocate_rela: not supported on x86\n");

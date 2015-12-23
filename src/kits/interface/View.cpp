@@ -7,6 +7,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Adrian Oanca, adioanca@cotty.iren.ro
  *		Ingo Weinhold. ingo_weinhold@gmx.de
+ *		Julian Harnath, julian.harnath@rwth-aachen.de
  */
 
 
@@ -1924,6 +1925,56 @@ BView::Transform() const
 
 
 void
+BView::TranslateBy(double x, double y)
+{
+	if (fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_AFFINE_TRANSLATE);
+		fOwner->fLink->Attach<double>(x);
+		fOwner->fLink->Attach<double>(y);
+
+		fState->valid_flags &= ~B_VIEW_TRANSFORM_BIT;
+	}
+
+	fState->archiving_flags |= B_VIEW_TRANSFORM_BIT;
+}
+
+
+void
+BView::ScaleBy(double x, double y)
+{
+	if (fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_AFFINE_SCALE);
+		fOwner->fLink->Attach<double>(x);
+		fOwner->fLink->Attach<double>(y);
+
+		fState->valid_flags &= ~B_VIEW_TRANSFORM_BIT;
+	}
+
+	fState->archiving_flags |= B_VIEW_TRANSFORM_BIT;
+}
+
+
+void
+BView::RotateBy(double angleRadians)
+{
+	if (fOwner != NULL) {
+		_CheckLockAndSwitchCurrent();
+
+		fOwner->fLink->StartMessage(AS_VIEW_AFFINE_ROTATE);
+		fOwner->fLink->Attach<double>(angleRadians);
+
+		fState->valid_flags &= ~B_VIEW_TRANSFORM_BIT;
+	}
+
+	fState->archiving_flags |= B_VIEW_TRANSFORM_BIT;
+}
+
+
+void
 BView::SetLineMode(cap_mode lineCap, join_mode lineJoin, float miterLimit)
 {
 	if (fState->IsValid(B_VIEW_LINE_MODES_BIT)
@@ -2582,6 +2633,34 @@ BView::ConstrainClippingRegion(BRegion* region)
 		fState->valid_flags &= ~B_VIEW_CLIP_REGION_BIT;
 		fState->archiving_flags |= B_VIEW_CLIP_REGION_BIT;
 	}
+}
+
+
+void
+BView::ClipToRect(BRect rect)
+{
+	_ClipToRect(rect, false);
+}
+
+
+void
+BView::ClipToInverseRect(BRect rect)
+{
+	_ClipToRect(rect, true);
+}
+
+
+void
+BView::ClipToShape(BShape* shape)
+{
+	_ClipToShape(shape, false);
+}
+
+
+void
+BView::ClipToInverseShape(BShape* shape)
+{
+	_ClipToShape(shape, true);
 }
 
 
@@ -3934,6 +4013,27 @@ BView::DrawPictureAsync(const char* filename, long offset, BPoint where)
 
 
 void
+BView::BeginLayer(uint8 opacity)
+{
+	if (_CheckOwnerLockAndSwitchCurrent()) {
+		fOwner->fLink->StartMessage(AS_VIEW_BEGIN_LAYER);
+		fOwner->fLink->Attach<uint8>(opacity);
+		_FlushIfNotInTransaction();
+	}
+}
+
+
+void
+BView::EndLayer()
+{
+	if (_CheckOwnerLockAndSwitchCurrent()) {
+		fOwner->fLink->StartMessage(AS_VIEW_END_LAYER);
+		_FlushIfNotInTransaction();
+	}
+}
+
+
+void
 BView::Invalidate(BRect invalRect)
 {
 	if (fOwner == NULL)
@@ -5225,7 +5325,7 @@ BView::_ClipToPicture(BPicture* picture, BPoint where, bool invert, bool sync)
 	if (picture == NULL) {
 		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_PICTURE);
 		fOwner->fLink->Attach<int32>(-1);
-		
+
 		// NOTE: No need to sync here, since the -1 token cannot
 		// become invalid on the server.
 	} else {
@@ -5240,11 +5340,45 @@ BView::_ClipToPicture(BPicture* picture, BPoint where, bool invert, bool sync)
 		// the client creates BPictures on the stack, these BPictures may
 		// have issued a AS_DELETE_PICTURE command to the ServerApp when Draw()
 		// goes out of scope, and the command is processed earlier in the
-		// ServerApp thread than the AS_VIEW_CLIP_TO_PICTURE command in the 
+		// ServerApp thread than the AS_VIEW_CLIP_TO_PICTURE command in the
 		// ServerWindow thread, which will then have the result that no
 		// ServerPicture is found of the token.
 		if (sync)
 			Sync();
+	}
+}
+
+
+void
+BView::_ClipToRect(BRect rect, bool inverse)
+{
+	if (_CheckOwnerLockAndSwitchCurrent()) {
+		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_RECT);
+		fOwner->fLink->Attach<bool>(inverse);
+		fOwner->fLink->Attach<BRect>(rect);
+		_FlushIfNotInTransaction();
+	}
+}
+
+
+void
+BView::_ClipToShape(BShape* shape, bool inverse)
+{
+	if (shape == NULL)
+		return;
+
+	shape_data* sd = (shape_data*)shape->fPrivateData;
+	if (sd->opCount == 0 || sd->ptCount == 0)
+		return;
+
+	if (_CheckOwnerLockAndSwitchCurrent()) {
+		fOwner->fLink->StartMessage(AS_VIEW_CLIP_TO_SHAPE);
+		fOwner->fLink->Attach<bool>(inverse);
+		fOwner->fLink->Attach<int32>(sd->opCount);
+		fOwner->fLink->Attach<int32>(sd->ptCount);
+		fOwner->fLink->Attach(sd->opList, sd->opCount * sizeof(uint32));
+		fOwner->fLink->Attach(sd->ptList, sd->ptCount * sizeof(BPoint));
+		_FlushIfNotInTransaction();
 	}
 }
 

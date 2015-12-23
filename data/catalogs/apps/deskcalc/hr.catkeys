@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-DeskCalc	1425096792
+1	croatian	x-vnd.Haiku-DeskCalc	1694821448
 Compact	CalcView		Kompaktno
 Scientific	CalcView		Znanstveno
 DeskCalc	System name		DeskCalc
@@ -7,3 +7,4 @@ Radians	CalcView		Radijani
 Enable Num Lock on startup	CalcView		Omogući Num Lock pri pokretanju
 Calculating	CalcView		Računanje
 Degrees	CalcView		Stupnjevi
+Audio Feedback	CalcView		Zvučna povratna informacija

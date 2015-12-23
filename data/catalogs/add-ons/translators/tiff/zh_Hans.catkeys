@@ -1,5 +1,6 @@
-1	english	x-vnd.Haiku-TIFFTranslator	40018330
+1	english	x-vnd.Haiku-TIFFTranslator	2234713102
 LZW	TIFFView		LZW
+Version %d.%d.%d, %s	TIFFView		版本 %d.%d.%d, %s
 identify_tiff_header: couldn't set directory\n	TIFFTranslator		identify_tiff_header：无法设置目录\n
 TIFF image	TIFFTranslator		TIFF 图像
 TIFF Library:	TIFFView		TIFF 库：

@@ -86,11 +86,7 @@
 //   has a reference to a deleted port.
 
 
-struct port_message;
-
-
-static void put_port_message(port_message* message);
-
+namespace {
 
 struct port_message : DoublyLinkedListLinkImpl<port_message> {
 	int32				code;
@@ -103,6 +99,13 @@ struct port_message : DoublyLinkedListLinkImpl<port_message> {
 
 typedef DoublyLinkedList<port_message> MessageList;
 
+} // namespace
+
+
+static void put_port_message(port_message* message);
+
+
+namespace {
 
 struct Port : public KernelReferenceable {
 	enum State {
@@ -232,6 +235,8 @@ public:
 
 			void			Notify(uint32 opcode, port_id team);
 };
+
+} // namespace
 
 
 // #pragma mark - tracing

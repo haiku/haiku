@@ -2,12 +2,12 @@
 Line	Playground		Linie
 Fill	Playground		Umplere
 Over	Playground		Deasupra
-Quit	Playground		Renunţă
-Rect	Playground		Rectangular
-Select	Playground		Selectează
+Quit	Playground		Închidere
+Rect	Playground		Dreptunghi
+Select	Playground		Selectare
 Click and drag to draw an object	Playground		Clic și trage pentru a desena un obiect
 Controls	Playground		Controale
-Round rect	Playground		Dreptunghi rotund
+Round rect	Playground		Drept. rotund
 Alpha:	Playground		Alfa:
 Mode:	Playground		Mod:
 Submenu	Playground		Submeniu
@@ -23,7 +23,7 @@ Alpha	Playground		Alfa
 New object	Playground		Obiect nou
 Test	Playground		Testare
 Max	Playground		Maxim
-Add	Playground		Adaugă
+Add	Playground		Adăugare
 Playground	System name		Teren de joacă
 Erase	Playground		Ștergere
 File	Playground		Fișier

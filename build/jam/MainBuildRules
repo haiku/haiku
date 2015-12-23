@@ -353,6 +353,10 @@ rule CreateAsmStructOffsetsHeader header : source
 	flags += -Wno-invalid-offsetof ;
 		# TODO: Rather get rid of the respective offsetof() instances.
 
+	if $(HAIKU_CC_IS_CLANG_$(TARGET_PACKAGING_ARCH)) = 1 {
+		flags += -no-integrated-as ;
+	}
+
 	# locate object, search for source, and set on target variables
 
 	Depends $(header) : $(source) $(PLATFORM) ;
@@ -377,7 +381,7 @@ rule CreateAsmStructOffsetsHeader header : source
 actions CreateAsmStructOffsetsHeader1
 {
  	$(C++) -S "$(2)" $(C++FLAGS) $(CCDEFS) $(CCHDRS) -o - \
-		| grep "#define" | sed -e 's/[\$\#]\([0-9]\)/\1/' > "$(1)"
+		| grep "#define" | $(SED) -e 's/[\$\#]\([0-9]\)/\1/' > "$(1)"
 }
 
 rule MergeObjectFromObjects

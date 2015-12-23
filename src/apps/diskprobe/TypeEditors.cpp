@@ -14,9 +14,8 @@
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Catalog.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
 #include <IconUtils.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -852,8 +851,6 @@ ImageView::ImageView(DataEditor &editor)
 	fBitmap(NULL),
 	fScaleSlider(NULL)
 {
-	BGroupLayout* layout = new BGroupLayout(B_HORIZONTAL);
-	SetLayout(layout);
 	if (editor.Type() == B_MINI_ICON_TYPE
 		|| editor.Type() == B_LARGE_ICON_TYPE
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
@@ -877,7 +874,7 @@ ImageView::ImageView(DataEditor &editor)
 		fScaleSlider->SetHashMarks(B_HASH_MARKS_BOTH);
 		fScaleSlider->SetHashMarkCount(15);
 
-		BGroupLayoutBuilder(layout)
+		BLayoutBuilder::Group<>(this, B_HORIZONTAL)
 			.SetInsets(B_USE_WINDOW_SPACING, 256, B_USE_WINDOW_SPACING,
 				B_H_SCROLL_BAR_HEIGHT) // Leave space for the icon
 			.AddGlue()
@@ -887,7 +884,7 @@ ImageView::ImageView(DataEditor &editor)
 			.End()
 			.AddGlue();
 	} else {
-		BGroupLayoutBuilder(layout)
+		BLayoutBuilder::Group<>(this, B_HORIZONTAL)
 			.SetInsets(B_USE_WINDOW_SPACING, 256, B_USE_WINDOW_SPACING,
 				B_USE_WINDOW_SPACING) // Leave space for the icon
 			.AddGlue()
@@ -1173,7 +1170,7 @@ MessageView::SetTo(BMessage& message)
 	fTextView->SetText("");
 
 	char text[512];
-	snprintf(text, sizeof(text), B_TRANSLATE_COMMENT("what: '%.4s'\n\n", 
+	snprintf(text, sizeof(text), B_TRANSLATE_COMMENT("what: '%.4s'\n\n",
 		"'What' is a message specifier that defines the type of the message."),
 		(char*)&message.what);
 	fTextView->Insert(text);

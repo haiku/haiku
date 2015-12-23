@@ -7496,7 +7496,7 @@ BPoseView::WasDoubleClick(const BPose* pose, BPoint point, int32 buttons)
 
 
 static void
-AddPoseRefToMessage(BPose*, Model* model, BMessage* message)
+AddPoseRefToMessage(Model* model, BMessage* message)
 {
 	// Make sure that every file added to the message has its
 	// MIME type set.
@@ -7536,7 +7536,12 @@ BPoseView::DragSelectedPoses(const BPose* pose, BPoint clickPoint)
 	// add Tracker token so that refs received recipients can script us
 	message.AddMessenger("TrackerViewToken", BMessenger(this));
 
-	EachPoseAndModel(fSelectionList, &AddPoseRefToMessage, &message);
+	// cannot use EachPoseAndModel here, because that iterates the selected
+	// poses in reverse order
+	for (int32 index = 0; index < fSelectionList->CountItems(); index++) {
+		AddPoseRefToMessage(fSelectionList->ItemAt(index)->TargetModel(),
+			&message);
+	}
 
 	// make sure button is still down
 	uint32 buttons;

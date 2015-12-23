@@ -356,12 +356,12 @@ ElfFile::_CheckElfHeader(Elf32_Ehdr& elfHeader)
 		&& elfHeader.e_ident[4] == ELFCLASS32
 		&& elfHeader.e_shoff > 0
 		&& elfHeader.e_shnum > 0
-		&& elfHeader.e_shentsize >= sizeof(struct Elf32_Shdr)
+		&& elfHeader.e_shentsize >= sizeof(Elf32_Shdr)
 		&& elfHeader.e_shstrndx != SHN_UNDEF
 		&& elfHeader.e_shstrndx < elfHeader.e_shnum
 		&& elfHeader.e_phoff > 0
 		&& elfHeader.e_phnum > 0
-		&& elfHeader.e_phentsize >= sizeof(struct Elf32_Phdr);
+		&& elfHeader.e_phentsize >= sizeof(Elf32_Phdr);
 }
 
 
@@ -372,10 +372,10 @@ ElfFile::_CheckElfHeader(Elf64_Ehdr& elfHeader)
 		&& elfHeader.e_ident[4] == ELFCLASS64
 		&& elfHeader.e_shoff > 0
 		&& elfHeader.e_shnum > 0
-		&& elfHeader.e_shentsize >= sizeof(struct Elf64_Shdr)
+		&& elfHeader.e_shentsize >= sizeof(Elf64_Shdr)
 		&& elfHeader.e_shstrndx != SHN_UNDEF
 		&& elfHeader.e_shstrndx < elfHeader.e_shnum
 		&& elfHeader.e_phoff > 0
 		&& elfHeader.e_phnum > 0
-		&& elfHeader.e_phentsize >= sizeof(struct Elf64_Phdr);
+		&& elfHeader.e_phentsize >= sizeof(Elf64_Phdr);
 }

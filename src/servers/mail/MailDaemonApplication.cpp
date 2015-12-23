@@ -94,25 +94,6 @@ public:
 };
 
 
-class OutboundMessenger : public BMessenger {
-public:
-	OutboundMessenger(BOutboundMailProtocol* protocol)
-		:
-		BMessenger(protocol)
-	{
-	}
-
-	status_t SendMessages(const BMessage& files, off_t totalBytes)
-	{
-		BMessage message(kMsgSendMessages);
-		message.Append(files);
-		message.AddInt64("bytes", totalBytes);
-
-		return SendMessage(&message);
-	}
-};
-
-
 // #pragma mark -
 
 
@@ -181,8 +162,7 @@ account_protocols::account_protocols()
 
 MailDaemonApplication::MailDaemonApplication()
 	:
-	BApplication(B_MAIL_DAEMON_SIGNATURE),
-
+	BServer(B_MAIL_DAEMON_SIGNATURE, true, NULL),
 	fAutoCheckRunner(NULL)
 {
 	fErrorLogWindow = new ErrorLogWindow(BRect(200, 200, 500, 250),
@@ -392,22 +372,27 @@ MailDaemonApplication::MessageReceived(BMessage* msg)
 
 		case B_QUERY_UPDATE:
 		{
-			int32 what;
-			msg->FindInt32("opcode", &what);
-			switch (what) {
+			int32 previousCount = fNewMessages;
+
+			int32 opcode = msg->GetInt32("opcode", -1);
+			switch (opcode) {
 				case B_ENTRY_CREATED:
 					fNewMessages++;
 					break;
 				case B_ENTRY_REMOVED:
 					fNewMessages--;
 					break;
+				default:
+					return;
 			}
 
 			_UpdateNewMessagesNotification();
 
 			if (fSettingsFile.ShowStatusWindow()
-					!= B_MAIL_SHOW_STATUS_WINDOW_NEVER)
+					!= B_MAIL_SHOW_STATUS_WINDOW_NEVER
+				&& previousCount < fNewMessages) {
 				fNotification->Send();
+			}
 			break;
 		}
 
@@ -498,12 +483,8 @@ MailDaemonApplication::SendPendingMessages(BMessage* msg)
 {
 	BVolumeRoster roster;
 	BVolume volume;
-
 	std::map<int32, send_mails_info> messages;
-
-	int32 account = -1;
-	if (msg->FindInt32("account", &account) != B_OK)
-		account = -1;
+	int32 account = msg->GetInt32("account", -1);
 
 	if (!msg->HasString("message_path")) {
 		while (roster.GetNextVolume(&volume) == B_OK) {
@@ -564,7 +545,7 @@ MailDaemonApplication::SendPendingMessages(BMessage* msg)
 		if (info.bytes == 0)
 			continue;
 
-		OutboundMessenger(protocol).SendMessages(info.files, info.bytes);
+		protocol->SendMessages(info.files, info.bytes);
 	}
 }
 

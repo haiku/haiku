@@ -306,32 +306,7 @@ BRect
 BShape::Bounds() const
 {
 	shape_data* data = (shape_data*)fPrivateData;
-	BRect bounds;
-
-	if (data->ptCount == 0)
-		return bounds;
-
-	// TODO: This implementation doesn't take into account curves at all.
-	bounds.left = data->ptList[0].x;
-	bounds.top = data->ptList[0].y;
-	bounds.right = data->ptList[0].x;
-	bounds.bottom = data->ptList[0].y;
-
-	for (int32 i = 1; i < data->ptCount; i++) {
-		if (bounds.left > data->ptList[i].x)
-			bounds.left = data->ptList[i].x;
-
-		if (bounds.top > data->ptList[i].y)
-			bounds.top = data->ptList[i].y;
-
-		if (bounds.right < data->ptList[i].x)
-			bounds.right = data->ptList[i].x;
-
-		if (bounds.bottom < data->ptList[i].y)
-			bounds.bottom = data->ptList[i].y;
-	}
-
-	return bounds;
+	return data->DetermineBoundingBox();
 }
 
 

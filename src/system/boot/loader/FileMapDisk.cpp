@@ -24,6 +24,10 @@
 #	define TRACE(x) ;
 #endif
 
+
+using std::nothrow;
+
+
 // constructor
 FileMapDisk::FileMapDisk()
 	:

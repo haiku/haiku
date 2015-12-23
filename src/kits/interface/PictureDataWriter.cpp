@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2009 Haiku, Inc. All rights reserved.
+ * Copyright 2006-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stefano Ceccherini, stefano.ceccherini@gmail.com
+ *		Julian Harnath, <julian.harnath@rwth-achen.de>
  */
 
 #include <PictureDataWriter.h>
@@ -173,6 +174,53 @@ PictureDataWriter::WriteSetTransform(BAffineTransform transform)
 	try {
 		BeginOp(B_PIC_SET_TRANSFORM);
 		Write<BAffineTransform>(transform);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteTranslateBy(double x, double y)
+{
+	try {
+		BeginOp(B_PIC_AFFINE_TRANSLATE);
+		Write<double>(x);
+		Write<double>(y);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteScaleBy(double x, double y)
+{
+	try {
+		BeginOp(B_PIC_AFFINE_SCALE);
+		Write<double>(x);
+		Write<double>(y);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteRotateBy(double angleRadians)
+{
+	try {
+		BeginOp(B_PIC_AFFINE_ROTATE);
+		Write<double>(angleRadians);
 		EndOp();
 	} catch (status_t& status) {
 		return status;
@@ -651,6 +699,57 @@ PictureDataWriter::WritePopState()
 {
 	try {
 		BeginOp(B_PIC_POP_STATE);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteBlendLayer(Layer* layer)
+{
+	try {
+		BeginOp(B_PIC_BLEND_LAYER);
+		Write<Layer*>(layer);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteClipToRect(const BRect& rect, bool inverse)
+{
+	try {
+		BeginOp(B_PIC_CLIP_TO_RECT);
+		Write<bool>(inverse);
+		Write<BRect>(rect);
+		EndOp();
+	} catch (status_t& status) {
+		return status;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+PictureDataWriter::WriteClipToShape(int32 opCount, const void* opList,
+	int32 ptCount, const void* ptList, bool inverse)
+{
+	try {
+		BeginOp(B_PIC_CLIP_TO_SHAPE);
+		Write<bool>(inverse);
+		Write<int32>(opCount);
+		Write<int32>(ptCount);
+		WriteData(opList, opCount * sizeof(uint32));
+		WriteData(ptList, ptCount * sizeof(BPoint));
 		EndOp();
 	} catch (status_t& status) {
 		return status;

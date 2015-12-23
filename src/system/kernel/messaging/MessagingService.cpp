@@ -568,7 +568,7 @@ _user_register_messaging_service(sem_id lockSem, sem_id counterSem)
 	if (!sMessagingService->Lock())
 		return B_BAD_VALUE;
 
-	area_id areaID;
+	area_id areaID = 0;
 	status_t error = sMessagingService->RegisterService(lockSem, counterSem,
 		areaID);
 

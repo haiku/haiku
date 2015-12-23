@@ -11,11 +11,11 @@
 #ifndef _RUNTIME_LOADER_H
 #define _RUNTIME_LOADER_H
 
+
 #include <image.h>
 #include <OS.h>
 
-#include <elf32.h>
-#include <elf64.h>
+#include <elf_private.h>
 
 
 // #pragma mark - runtime loader libroot interface

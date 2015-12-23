@@ -50,7 +50,7 @@ UtilityTest::AddTests(BTestSuite& parent)
 	CppUnit::TestSuite& suite = *new CppUnit::TestSuite("UtilityTest");
 
 	suite.addTest(new CppUnit::TestCaller<UtilityTest>(
-		"UtilityTest::TestTranslatePath", &UtilityTest::TestEmpty));
+		"UtilityTest::TestTranslatePath", &UtilityTest::TestTranslatePath));
 
 	parent.addTest("UtilityTest", &suite);
 }

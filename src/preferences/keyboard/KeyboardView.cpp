@@ -12,8 +12,7 @@
 #include <Bitmap.h>
 #include <Button.h>
 #include <Catalog.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Slider.h>
 #include <TextControl.h>
@@ -40,6 +39,7 @@ KeyboardView::KeyboardView()
 	fRepeatSlider->SetHashMarks(B_HASH_MARKS_BOTTOM);
 	fRepeatSlider->SetHashMarkCount(5);
 	fRepeatSlider->SetLimitLabels(B_TRANSLATE("Slow"),B_TRANSLATE("Fast"));
+	fRepeatSlider->SetExplicitMinSize(BSize(200, B_SIZE_UNSET));
 
 
 	// Create the "Delay until key repeat" slider...
@@ -60,14 +60,10 @@ KeyboardView::KeyboardView()
 		textcontrol->StringWidth(B_TRANSLATE("Typing test area")), B_SIZE_UNSET));
 
 	// Build the layout
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 10)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.Add(fRepeatSlider)
 		.Add(fDelaySlider)
-		.Add(textcontrol)
-		.SetInsets(10, 10, 10, 10)
-	);
+		.Add(textcontrol);
 }
 
 

@@ -7,7 +7,7 @@
 #include <driver_settings.h>
 #include "settings.h"
 
-#define DEFAULT_GOOGLE_SERVER "66.102.11.99"
+#define DEFAULT_GOOGLE_SERVER "74.125.136.105"
 #define DEFAULT_MAX_VNODES 5000
 char google_server[20] = DEFAULT_GOOGLE_SERVER;
 int google_server_port = 80;

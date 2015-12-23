@@ -27,8 +27,11 @@
 #include <AppMisc.h>
 #include <LaunchDaemonDefs.h>
 #include <LaunchRosterPrivate.h>
+#include <locks.h>
+#include <MessengerPrivate.h>
 #include <RosterPrivate.h>
 #include <syscalls.h>
+#include <system_info.h>
 
 #include "multiuser_utils.h"
 
@@ -42,6 +45,13 @@
 #include "Target.h"
 #include "Utility.h"
 #include "Worker.h"
+
+
+#ifdef DEBUG
+#	define TRACE(x, ...) debug_printf(x, __VA_ARGS__)
+#else
+#	define TRACE(x, ...) ;
+#endif
 
 
 using namespace ::BPrivate;
@@ -109,10 +119,11 @@ typedef std::map<BString, Job*> JobMap;
 typedef std::map<uid_t, Session*> SessionMap;
 typedef std::map<BString, Target*> TargetMap;
 typedef std::map<BString, ExternalEventSource*> EventMap;
+typedef std::map<team_id, Job*> TeamMap;
 
 
 class LaunchDaemon : public BServer, public Finder, public ConditionContext,
-	public EventRegistrator {
+	public EventRegistrator, public TeamRegistrator {
 public:
 								LaunchDaemon(bool userMode,
 									const EventMap& events, status_t& error);
@@ -133,18 +144,28 @@ public:
 	virtual	void				UnregisterExternalEvent(Event* event,
 									const char* name);
 
+	// TeamRegistrator
+	virtual	void				RegisterTeam(Job* job);
+
 	virtual	void				ReadyToRun();
 	virtual	void				MessageReceived(BMessage* message);
 
 private:
 			void				_HandleGetLaunchData(BMessage* message);
 			void				_HandleLaunchTarget(BMessage* message);
+			void				_HandleLaunchJob(BMessage* message);
+			void				_HandleStopLaunchJob(BMessage* message);
 			void				_HandleLaunchSession(BMessage* message);
 			void				_HandleRegisterSessionDaemon(BMessage* message);
 			void				_HandleRegisterLaunchEvent(BMessage* message);
 			void				_HandleUnregisterLaunchEvent(BMessage* message);
 			void				_HandleNotifyLaunchEvent(BMessage* message);
-
+			void				_HandleResetStickyLaunchEvent(
+									BMessage* message);
+			void				_HandleGetLaunchTargets(BMessage* message);
+			void				_HandleGetLaunchTargetInfo(BMessage* message);
+			void				_HandleGetLaunchJobs(BMessage* message);
+			void				_HandleGetLaunchJobInfo(BMessage* message);
 			uid_t				_GetUserID(BMessage* message);
 
 			void				_ReadPaths(const BStringList& paths);
@@ -163,7 +184,12 @@ private:
 			void				_InitJobs(Target* target);
 			void				_LaunchJobs(Target* target,
 									bool forceNow = false);
-			void				_LaunchJob(Job* job, uint32 options = 0);
+			bool				_CanLaunchJob(Job* job, uint32 options,
+									bool testOnly = false);
+			bool				_CanLaunchJobRequirements(Job* job,
+									uint32 options);
+			bool				_LaunchJob(Job* job, uint32 options = 0);
+			void				_StopJob(Job* job, bool force);
 			void				_AddTarget(Target* target);
 			void				_SetCondition(BaseJob* job,
 									const BMessage& message);
@@ -179,6 +205,7 @@ private:
 									ExternalEventSource* event,
 									const BString& name);
 			void				_ResolveExternalEvents(BaseJob* job);
+			void				_GetBaseJobInfo(BaseJob* job, BMessage& info);
 			void				_ForwardEventMessage(uid_t user,
 									BMessage* message);
 
@@ -198,6 +225,8 @@ private:
 			SessionMap			fSessions;
 			MainWorker*			fMainWorker;
 			Target*				fInitTarget;
+			TeamMap				fTeams;
+			mutex				fTeamsLock;
 			bool				fSafeMode;
 			bool				fReadOnlyBootVolume;
 			bool				fUserMode;
@@ -207,6 +236,9 @@ private:
 static const char*
 get_leaf(const char* signature)
 {
+	if (signature == NULL)
+		return NULL;
+
 	const char* separator = strrchr(signature, '/');
 	if (separator != NULL)
 		return separator + 1;
@@ -295,6 +327,8 @@ LaunchDaemon::LaunchDaemon(bool userMode, const EventMap& events,
 	fInitTarget(userMode ? NULL : new Target("init")),
 	fUserMode(userMode)
 {
+	mutex_init(&fTeamsLock, "teams lock");
+
 	fMainWorker = new MainWorker(fJobQueue);
 	fMainWorker->Init();
 
@@ -382,6 +416,14 @@ LaunchDaemon::UnregisterExternalEvent(Event* event, const char* name)
 
 
 void
+LaunchDaemon::RegisterTeam(Job* job)
+{
+	MutexLocker locker(fTeamsLock);
+	fTeams.insert(std::make_pair(job->Team(), job));
+}
+
+
+void
 LaunchDaemon::ReadyToRun()
 {
 	_RetrieveKernelOptions();
@@ -419,6 +461,12 @@ LaunchDaemon::ReadyToRun()
 		fUserMode ? B_FIND_PATHS_USER_ONLY : B_FIND_PATHS_SYSTEM_ONLY, paths);
 	_ReadPaths(paths);
 
+	BMessenger target(this);
+	BMessenger::Private messengerPrivate(target);
+	port_id port = messengerPrivate.Port();
+	int32 token = messengerPrivate.Token();
+	__start_watching_system(-1, B_WATCH_SYSTEM_TEAM_DELETION, port, token);
+
 	_InitJobs(NULL);
 	_LaunchJobs(NULL);
 
@@ -428,6 +476,9 @@ LaunchDaemon::ReadyToRun()
 		if (target != NULL)
 			_LaunchJobs(target);
 	}
+
+	if (fUserMode)
+		be_roster->StartWatching(this, B_REQUEST_LAUNCHED);
 }
 
 
@@ -435,6 +486,65 @@ void
 LaunchDaemon::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_SYSTEM_OBJECT_UPDATE:
+		{
+			int32 opcode = message->GetInt32("opcode", 0);
+			team_id team = (team_id)message->GetInt32("team", -1);
+			if (opcode != B_TEAM_DELETED || team < 0)
+				break;
+
+			MutexLocker locker(fTeamsLock);
+
+			TeamMap::iterator found = fTeams.find(team);
+			if (found != fTeams.end()) {
+				Job* job = found->second;
+				TRACE("Job %s ended!\n", job->Name());
+				job->TeamDeleted();
+
+				if (job->IsService()) {
+					// TODO: take restart throttle into account
+					// TODO: don't restart on shutdown
+					_LaunchJob(job);
+				}
+			}
+			break;
+		}
+		case B_SOME_APP_LAUNCHED:
+		{
+			team_id team = (team_id)message->GetInt32("be:team", -1);
+			Job* job = NULL;
+
+			MutexLocker locker(fTeamsLock);
+
+			TeamMap::iterator found = fTeams.find(team);
+			if (found != fTeams.end()) {
+				job = found->second;
+				locker.Unlock();
+			} else {
+				locker.Unlock();
+
+				// Find job by name instead
+				const char* signature = message->GetString("be:signature");
+				job = FindJob(get_leaf(signature));
+				if (job != NULL) {
+					TRACE("Updated default port of untracked team %d, %s\n",
+						(int)team, signature);
+				}
+			}
+
+			if (job != NULL) {
+				// Update port info
+				app_info info;
+				status_t status = be_roster->GetRunningAppInfo(team, &info);
+				if (status == B_OK && info.port != job->DefaultPort()) {
+					TRACE("Update default port for %s to %d\n", job->Name(),
+						(int)info.port);
+					job->SetDefaultPort(info.port);
+				}
+			}
+			break;
+		}
+
 		case B_GET_LAUNCH_DATA:
 			_HandleGetLaunchData(message);
 			break;
@@ -442,11 +552,16 @@ LaunchDaemon::MessageReceived(BMessage* message)
 		case B_LAUNCH_TARGET:
 			_HandleLaunchTarget(message);
 			break;
+		case B_LAUNCH_JOB:
+			_HandleLaunchJob(message);
+			break;
+		case B_STOP_LAUNCH_JOB:
+			_HandleStopLaunchJob(message);
+			break;
 
 		case B_LAUNCH_SESSION:
 			_HandleLaunchSession(message);
 			break;
-
 		case B_REGISTER_SESSION_DAEMON:
 			_HandleRegisterSessionDaemon(message);
 			break;
@@ -454,13 +569,27 @@ LaunchDaemon::MessageReceived(BMessage* message)
 		case B_REGISTER_LAUNCH_EVENT:
 			_HandleRegisterLaunchEvent(message);
 			break;
-
 		case B_UNREGISTER_LAUNCH_EVENT:
 			_HandleUnregisterLaunchEvent(message);
 			break;
-
 		case B_NOTIFY_LAUNCH_EVENT:
 			_HandleNotifyLaunchEvent(message);
+			break;
+		case B_RESET_STICKY_LAUNCH_EVENT:
+			_HandleResetStickyLaunchEvent(message);
+			break;
+
+		case B_GET_LAUNCH_TARGETS:
+			_HandleGetLaunchTargets(message);
+			break;
+		case B_GET_LAUNCH_TARGET_INFO:
+			_HandleGetLaunchTargetInfo(message);
+			break;
+		case B_GET_LAUNCH_JOBS:
+			_HandleGetLaunchJobs(message);
+			break;
+		case B_GET_LAUNCH_JOB_INFO:
+			_HandleGetLaunchJobInfo(message);
 			break;
 
 		case kMsgEventTriggered:
@@ -602,6 +731,67 @@ LaunchDaemon::_HandleLaunchTarget(BMessage* message)
 		target->AddData(data.GetString("name"), data);
 
 	_LaunchJobs(target);
+}
+
+
+void
+LaunchDaemon::_HandleLaunchJob(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	const char* name = message->GetString("name");
+
+	Job* job = FindJob(name);
+	if (job == NULL) {
+		Session* session = FindSession(user);
+		if (session != NULL) {
+			// Forward request to user launch_daemon
+			if (session->Daemon().SendMessage(message) == B_OK)
+				return;
+		}
+
+		BMessage reply(B_NAME_NOT_FOUND);
+		message->SendReply(&reply);
+		return;
+	}
+
+	job->SetEnabled(true);
+	_LaunchJob(job, FORCE_NOW);
+
+	BMessage reply((uint32)B_OK);
+	message->SendReply(&reply);
+}
+
+
+void
+LaunchDaemon::_HandleStopLaunchJob(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	const char* name = message->GetString("name");
+
+	Job* job = FindJob(name);
+	if (job == NULL) {
+		Session* session = FindSession(user);
+		if (session != NULL) {
+			// Forward request to user launch_daemon
+			if (session->Daemon().SendMessage(message) == B_OK)
+				return;
+		}
+
+		BMessage reply(B_NAME_NOT_FOUND);
+		message->SendReply(&reply);
+		return;
+	}
+
+	_StopJob(job, message->GetBool("force"));
+
+	BMessage reply((uint32)B_OK);
+	message->SendReply(&reply);
 }
 
 
@@ -762,6 +952,188 @@ LaunchDaemon::_HandleNotifyLaunchEvent(BMessage* message)
 }
 
 
+void
+LaunchDaemon::_HandleResetStickyLaunchEvent(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	if (user == 0 || fUserMode) {
+		// Reset sticky events
+		const char* name = message->GetString("name");
+		const char* ownerName = message->GetString("owner");
+		// TODO: support arguments (as selectors)
+
+		ExternalEventSource* event = _FindEvent(ownerName, name);
+		if (event != NULL) {
+			// Evaluate all of its jobs
+			int32 count = event->CountListeners();
+			for (int32 index = 0; index < count; index++) {
+				BaseJob* listener = event->ListenerAt(index);
+				Events::ResetStickyExternalEvent(listener->Event(), name);
+			}
+		}
+	}
+
+	_ForwardEventMessage(user, message);
+}
+
+
+void
+LaunchDaemon::_HandleGetLaunchTargets(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	BMessage reply;
+	status_t status = B_OK;
+
+	if (!fUserMode) {
+		// Request the data from the user's daemon, too
+		Session* session = FindSession(user);
+		if (session != NULL) {
+			BMessage request(B_GET_LAUNCH_TARGETS);
+			status = request.AddInt32("user", 0);
+			if (status == B_OK) {
+				status = session->Daemon().SendMessage(&request,
+					&reply);
+			}
+			if (status == B_OK)
+				status = reply.what;
+		} else
+			status = B_NAME_NOT_FOUND;
+	}
+
+	if (status == B_OK) {
+		TargetMap::const_iterator iterator = fTargets.begin();
+		for (; iterator != fTargets.end(); iterator++)
+			reply.AddString("target", iterator->first);
+	}
+
+	reply.what = status;
+	message->SendReply(&reply);
+}
+
+
+void
+LaunchDaemon::_HandleGetLaunchTargetInfo(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	const char* name = message->GetString("name");
+	Target* target = FindTarget(name);
+	if (target == NULL && !fUserMode) {
+		_ForwardEventMessage(user, message);
+		return;
+	}
+
+	BMessage info(uint32(target != NULL ? B_OK : B_NAME_NOT_FOUND));
+	if (target != NULL) {
+		_GetBaseJobInfo(target, info);
+
+		for (JobMap::iterator iterator = fJobs.begin(); iterator != fJobs.end();
+				iterator++) {
+			Job* job = iterator->second;
+			if (job->Target() == target)
+				info.AddString("job", job->Name());
+		}
+	}
+	message->SendReply(&info);
+}
+
+
+void
+LaunchDaemon::_HandleGetLaunchJobs(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	const char* targetName = message->GetString("target");
+
+	BMessage reply;
+	status_t status = B_OK;
+
+	if (!fUserMode) {
+		// Request the data from the user's daemon, too
+		Session* session = FindSession(user);
+		if (session != NULL) {
+			BMessage request(B_GET_LAUNCH_JOBS);
+			status = request.AddInt32("user", 0);
+			if (status == B_OK && targetName != NULL)
+				status = request.AddString("target", targetName);
+			if (status == B_OK) {
+				status = session->Daemon().SendMessage(&request,
+					&reply);
+			}
+			if (status == B_OK)
+				status = reply.what;
+		} else
+			status = B_NAME_NOT_FOUND;
+	}
+
+	if (status == B_OK) {
+		JobMap::const_iterator iterator = fJobs.begin();
+		for (; iterator != fJobs.end(); iterator++) {
+			Job* job = iterator->second;
+			if (targetName != NULL && (job->Target() == NULL
+					|| job->Target()->Title() != targetName)) {
+				continue;
+			}
+			reply.AddString("job", iterator->first);
+		}
+	}
+
+	reply.what = status;
+	message->SendReply(&reply);
+}
+
+
+void
+LaunchDaemon::_HandleGetLaunchJobInfo(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	const char* name = message->GetString("name");
+	Job* job = FindJob(name);
+	if (job == NULL && !fUserMode) {
+		_ForwardEventMessage(user, message);
+		return;
+	}
+
+	BMessage info(uint32(job != NULL ? B_OK : B_NAME_NOT_FOUND));
+	if (job != NULL) {
+		_GetBaseJobInfo(job, info);
+
+		info.SetInt32("team", job->Team());
+		info.SetBool("enabled", job->IsEnabled());
+		info.SetBool("running", job->IsRunning());
+		info.SetBool("launched", job->IsLaunched());
+		info.SetBool("service", job->IsService());
+
+		if (job->Target() != NULL)
+			info.SetString("target", job->Target()->Name());
+
+		for (int32 i = 0; i < job->Arguments().CountStrings(); i++)
+			info.AddString("launch", job->Arguments().StringAt(i));
+
+		for (int32 i = 0; i < job->Requirements().CountStrings(); i++)
+			info.AddString("requires", job->Requirements().StringAt(i));
+
+		PortMap::const_iterator iterator = job->Ports().begin();
+		for (; iterator != job->Ports().end(); iterator++)
+			info.AddMessage("port", &iterator->second);
+	}
+	message->SendReply(&info);
+}
+
+
 uid_t
 LaunchDaemon::_GetUserID(BMessage* message)
 {
@@ -821,6 +1193,7 @@ LaunchDaemon::_ReadFile(const char* context, BEntry& entry)
 	BMessage message;
 	status = parser.ParseFile(path.Path(), message);
 	if (status == B_OK) {
+		TRACE("launch_daemon: read file %s\n", path.Path());
 		_AddJobs(NULL, message);
 		_AddTargets(message);
 		_AddRunTargets(message);
@@ -944,14 +1317,18 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 
 	Job* job = FindJob(name);
 	if (job == NULL) {
+		TRACE("  add job \"%s\"\n", name.String());
+
 		job = new (std::nothrow) Job(name);
 		if (job == NULL)
 			return;
 
+		job->SetTeamRegistrator(this);
 		job->SetService(service);
 		job->SetCreateDefaultPort(service);
 		job->SetTarget(target);
-	}
+	} else
+		TRACE("  amend job \"%s\"\n", name.String());
 
 	if (message.HasBool("disabled"))
 		job->SetEnabled(!message.GetBool("disabled", !job->IsEnabled()));
@@ -969,15 +1346,8 @@ LaunchDaemon::_AddJob(Target* target, bool service, BMessage& message)
 		job->AddPort(portMessage);
 	}
 
-	if (message.HasString("launch")) {
-		job->Arguments().MakeEmpty();
-
-		const char* argument;
-		for (int32 index = 0; message.FindString("launch", index, &argument)
-				== B_OK; index++) {
-			job->AddArgument(Utility::TranslatePath(argument));
-		}
-	}
+	if (message.HasString("launch"))
+		message.FindStrings("launch", &job->Arguments());
 
 	const char* requirement;
 	for (int32 index = 0;
@@ -1062,6 +1432,46 @@ LaunchDaemon::_LaunchJobs(Target* target, bool forceNow)
 }
 
 
+/*!	Checks whether or not the specified \a job can be launched.
+	If \a testOnly is \c false, calling this method will trigger a demand
+	to the \a job.
+*/
+bool
+LaunchDaemon::_CanLaunchJob(Job* job, uint32 options, bool testOnly)
+{
+	if (job == NULL || !job->CanBeLaunched())
+		return false;
+
+	return (options & FORCE_NOW) != 0
+		|| (job->EventHasTriggered() && job->CheckCondition(*this)
+			&& ((options & TRIGGER_DEMAND) == 0
+				|| Events::TriggerDemand(job->Event(), testOnly)));
+}
+
+
+/*!	Checks recursively if the requirements of the specified job can be launched,
+	if they are not running already.
+	Calling this method will not trigger a demand for the requirements.
+*/
+bool
+LaunchDaemon::_CanLaunchJobRequirements(Job* job, uint32 options)
+{
+	int32 count = job->Requirements().CountStrings();
+	for (int32 index = 0; index < count; index++) {
+		Job* requirement = FindJob(job->Requirements().StringAt(index));
+		if (requirement != NULL
+			&& !requirement->IsRunning() && !requirement->IsLaunching()
+			&& (!_CanLaunchJob(requirement, options, true)
+				|| _CanLaunchJobRequirements(requirement, options))) {
+			requirement->AddPending(job->Name());
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
 /*!	Adds the specified \a job to the launch queue
 	queue, except those that are triggered by events.
 
@@ -1071,24 +1481,30 @@ LaunchDaemon::_LaunchJobs(Target* target, bool forceNow)
 	Calling this method will trigger a demand event if \c TRIGGER_DEMAND has
 	been set.
 */
-void
+bool
 LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 {
-	if (job == NULL || job->IsLaunching() || job->IsRunning()
-		|| ((options & FORCE_NOW) == 0
-			&& (!job->EventHasTriggered() || !job->CheckCondition(*this)
-				|| ((options & TRIGGER_DEMAND) != 0
-						&& Events::TriggerDemand(job->Event()))))) {
-		return;
-	}
+	if (job != NULL && (job->IsLaunching() || job->IsRunning()))
+		return true;
 
+	if (!_CanLaunchJob(job, options))
+		return false;
+
+	// Test if we can launch all requirements
+	if (!_CanLaunchJobRequirements(job, options | TRIGGER_DEMAND))
+		return false;
+
+	// Actually launch the requirements
 	int32 count = job->Requirements().CountStrings();
 	for (int32 index = 0; index < count; index++) {
 		Job* requirement = FindJob(job->Requirements().StringAt(index));
 		if (requirement != NULL) {
 			// TODO: For jobs that have their communication channels set up,
 			// we would not need to trigger demand at this point
-			_LaunchJob(requirement, TRIGGER_DEMAND);
+			if (!_LaunchJob(requirement, options | TRIGGER_DEMAND)) {
+				// Failed to put a requirement into the launch queue
+				return false;
+			}
 		}
 	}
 
@@ -1098,7 +1514,54 @@ LaunchDaemon::_LaunchJob(Job* job, uint32 options)
 		job->Event()->ResetTrigger();
 
 	job->SetLaunching(true);
-	fJobQueue.AddJob(job);
+
+	status_t status = fJobQueue.AddJob(job);
+	if (status != B_OK) {
+		debug_printf("Adding job %s to queue failed: %s\n", job->Name(),
+			strerror(status));
+		return false;
+	}
+
+	// Try to launch pending jobs as well
+	count = job->Pending().CountStrings();
+	for (int32 index = 0; index < count; index++) {
+		Job* pending = FindJob(job->Pending().StringAt(index));
+		if (pending != NULL && _LaunchJob(pending, 0)) {
+			// Remove the job from the pending list once its in the launch
+			// queue, so that is not being launched again next time.
+			index--;
+			count--;
+		}
+	}
+
+	return true;
+}
+
+
+void
+LaunchDaemon::_StopJob(Job* job, bool force)
+{
+	// TODO: find out which jobs require this job, and don't stop if any,
+	// unless force, and then stop them all.
+	job->SetEnabled(false);
+
+	if (!job->IsRunning())
+		return;
+
+	// Be nice first, and send a simple quit message
+	BMessenger messenger;
+	if (job->GetMessenger(messenger) == B_OK) {
+		BMessage request(B_QUIT_REQUESTED);
+		messenger.SendMessage(&request);
+
+		// TODO: wait a bit before going further
+		return;
+	}
+	// TODO: allow custom shutdown
+
+	send_signal(-job->Team(), SIGINT);
+	// TODO: this would be the next step, again, after a delay
+	//send_signal(job->Team(), SIGKILL);
 }
 
 
@@ -1149,6 +1612,7 @@ LaunchDaemon::_SetEvent(BaseJob* job, const BMessage& message)
 	}
 
 	if (updated) {
+		TRACE("    event: %s\n", event->ToString().String());
 		job->SetEvent(event);
 		_ResolveExternalEvents(job);
 	}
@@ -1221,6 +1685,19 @@ LaunchDaemon::_ResolveExternalEvents(BaseJob* job)
 
 
 void
+LaunchDaemon::_GetBaseJobInfo(BaseJob* job, BMessage& info)
+{
+	info.SetString("name", job->Name());
+
+	if (job->Event() != NULL)
+		info.SetString("event", job->Event()->ToString());
+
+	if (job->Condition() != NULL)
+		info.SetString("condition", job->Condition()->ToString());
+}
+
+
+void
 LaunchDaemon::_ForwardEventMessage(uid_t user, BMessage* message)
 {
 	if (fUserMode)
@@ -1283,7 +1760,11 @@ LaunchDaemon::_StartSession(const char* login)
 		// TODO: This leaks the parent application
 		be_app = NULL;
 
-		// TODO: take over system jobs, and reserve their names
+		// Reinitialize be_roster
+		BRoster::Private().DeleteBeRoster();
+		BRoster::Private().InitBeRoster();
+
+		// TODO: take over system jobs, and reserve their names (or ask parent)
 		status_t status;
 		LaunchDaemon* daemon = new LaunchDaemon(true, fEvents, status);
 		if (status == B_OK)
@@ -1352,7 +1833,11 @@ LaunchDaemon::_AddInitJob(BJob* job)
 static void
 open_stdio(int targetFD, int openMode)
 {
+#ifdef DEBUG
+	int fd = open("/dev/dprintf", openMode);
+#else
 	int fd = open("/dev/null", openMode);
+#endif
 	if (fd != targetFD) {
 		dup2(fd, targetFD);
 		close(fd);

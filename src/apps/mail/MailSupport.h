@@ -39,10 +39,8 @@ All rights reserved.
 
 
 #define MAX_DICTIONARIES	8
-#define	TITLE_BAR_HEIGHT	25
 #define	WIND_WIDTH			457
-#define WIND_HEIGHT			400
-#define RIGHT_BOUNDARY 		8191
+#define WIND_HEIGHT			500
 #define SEPARATOR_MARGIN	7
 #define QUOTE				"> "
 

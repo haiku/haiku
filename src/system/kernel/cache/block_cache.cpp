@@ -50,6 +50,8 @@ static const bigtime_t kTransactionIdleTime = 2000000LL;
 	// a transaction is considered idle after 2 seconds of inactivity
 
 
+namespace {
+
 struct cache_transaction;
 struct cached_block;
 struct block_cache;
@@ -321,6 +323,8 @@ public:
 };
 
 typedef AutoLocker<block_cache, TransactionLocking> TransactionLocker;
+
+} // namespace
 
 
 #if BLOCK_CACHE_BLOCK_TRACING && !defined(BUILDING_USERLAND_FS_SERVER)

@@ -12,13 +12,14 @@ UseHeaders [ FDirName $(HAIKU_TOP) src servers app drawing Painter drawing_modes
 UseBuildFeatureHeaders freetype ;
 
 SEARCH_SOURCE += [ FDirName $(SUBDIR) drawing_modes ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) bitmap_painter ] ;
 
 local PAINTER_ARCH_SOURCES ;
 if $(TARGET_ARCH) = x86 {
 	PAINTER_ARCH_SOURCES = painter_bilinear_scale.nasm ;
 }
 
-Includes [ FGristFiles AGGTextRenderer.cpp Painter.cpp ]
+Includes [ FGristFiles AGGTextRenderer.cpp BitmapPainter.cpp Painter.cpp ]
 	: [ BuildFeatureAttribute freetype : headers ] ;
 
 StaticLibrary libpainter.a :
@@ -28,6 +29,9 @@ StaticLibrary libpainter.a :
 
 	# drawing_modes
 	PixelFormat.cpp
+
+	# bitmap_painter
+	BitmapPainter.cpp
 
 	AGGTextRenderer.cpp
 

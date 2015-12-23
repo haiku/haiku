@@ -23,7 +23,14 @@ namespace BPrivate {
 extern const char* kRAppLooperPortName;
 
 
-#define B_REGISTRAR_SIGNATURE "application/x-vnd.haiku-registrar"
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+#	define B_REGISTRAR_SIGNATURE "application/x-vnd.haiku-registrar"
+#	define B_REGISTRAR_PORT_NAME "system:roster"
+#else
+#	define B_REGISTRAR_SIGNATURE "application/x-vnd.test-registrar"
+#	define B_REGISTRAR_PORT_NAME "haiku-test:roster"
+#endif
+
 #define B_REGISTRAR_AUTHENTICATION_PORT_NAME	"auth"
 
 

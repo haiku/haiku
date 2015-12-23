@@ -50,6 +50,8 @@
 #endif
 
 
+namespace {
+
 struct devfs_partition {
 	struct devfs_vnode*	raw_device;
 	partition_info		info;
@@ -158,11 +160,11 @@ enum {
 	ITERATION_STATE_BEGIN	= ITERATION_STATE_DOT,
 };
 
-// extern and in a private namespace only to make forward declaration possible
-namespace {
-	extern fs_volume_ops kVolumeOps;
-	extern fs_vnode_ops kVnodeOps;
-}
+// extern only to make forward declaration possible
+extern fs_volume_ops kVolumeOps;
+extern fs_vnode_ops kVnodeOps;
+
+} // namespace
 
 
 static status_t get_node_for_path(struct devfs* fs, const char* path,

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-WebPositive	3678460971
+1	polish	x-vnd.Haiku-WebPositive	1282126593
 Show home button	Settings Window		Pokaż przycisk domowy
 Username:	Authentication Panel		Nazwa użytkownika:
 Copy URL to clipboard	Download Window		Kopiuj adres URL do schowka
@@ -16,6 +16,7 @@ Start page:	Settings Window		Strona startowa:
 History	WebPositive Window		Historia
 Error opening downloads folder	Download Window		Błąd podczas otwierania katalogu pobierania
 Paste	WebPositive Window		Wklej
+Expiration	Cookie Manager		Data ważności
 Double-click or middle-click to open new tab.	Tab Manager		Dwuklik lub wciśnięcie środkowego przycisku myszy spowoduje otworzenie nowej karty.
 Proxy username:	Settings Window		Nazwa użytkownika serwera proxy:
 Save page as…	WebPositive Window		Zapisz stronę jako…
@@ -23,10 +24,12 @@ Over %days left	Download Window		Zostało ponad %days
 Settings	Settings Window		Ustawienia
 Confirmation	WebPositive Window		Potwierdzenie
 Window	WebPositive Window		Okno
+Cookie manager	Cookie Manager		Menedżer ciasteczek
 Decrease size	WebPositive Window		Zmniejsz wielkość
 Serif font:	Settings Window		Font szeryfowy:
 Loading %url	WebPositive Window		Ładowanie %url
 Download aborted	Download Window		Pobieranie przerwane
+Value	Cookie Manager		Wartość
 Page source	WebPositive Window		Źródło strony
 Next	WebPositive Window		Następna
 Find next	WebPositive Window		Znajdź następne
@@ -42,6 +45,7 @@ Auto-hide mouse pointer	Settings Window		Auto-ukrywanie wskaźnika myszy
 Quit	WebPositive Window		Zakończ
 Full screen	WebPositive Window		Pełny ekran
 Open download error	Download Window		Otwórz błąd pobierania
+The cookie jar is empty!	Cookie Manager		Słoik ciasteczek jest pusty!
 Standard font:	Settings Window		Font standardowy:
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Wyszukuje poprzednie wystąpienie tekstu
 Restart	Download Window		Uruchom ponownie
@@ -53,6 +57,7 @@ Open	Download Window		Otwórz
 Reload	WebPositive Window		Odśwież
 Downloads	Download Window		Pobierane
 Sans serif font:	Settings Window		Font bezszeryfowy:
+Delete	Cookie Manager		Usuń
 Forward	WebPositive Window		Dalej
 of	Download Window	...as in '12kB of 256kB'	z
 Revert	Settings Window		Cofnij
@@ -94,10 +99,12 @@ Find	WebPositive Window		Znajdź
 Find previous	WebPositive Window		Znajdź poprzednie
 Settings	WebPositive Window		Ustawienia
 Script console	WebPositive Window		Konsola skryptów
+Name	Cookie Manager		Nazwa
 Proxy server address:	Settings Window		Adres serwera proxy:
 Proxy server port:	Settings Window		Port serwera proxy:
 Bookmarks	WebPositive Window		Zakładki
 Paste	URL Bar		Wklej
+Cookie manager	WebPositive Window		Menedżer ciasteczek
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Ukryj tekst hasła
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Pchnąć w tę łódź jeża lub ośm skrzyń fig.
@@ -105,9 +112,11 @@ Over 1 minute left	Download Window		Została ponad 1 minuta
 Open start page	Settings Window		Otwórz stronę startową
 Continue downloads	WebPositive		Kontynuowanie pobierania
 Cancel	Download Window		Anuluj
+Flags	Cookie Manager		Znaczniki
 Open search page	Settings Window		Otwórz stronę wyszukiwania
 Clear	Console Window		Wyczyść
 Password:	Authentication Panel		Hasło:
+Path	Cookie Manager		Ścieżka
 Back	WebPositive Window		Wstecz
 New browser window	Download Window		Nowe okno
 Today	WebPositive Window		Dzisiaj
@@ -134,6 +143,7 @@ Open bookmarks confirmation	WebPositive Window		Potwierdzenie otwarcia zakładek
 Remove missing	Download Window		Usuń brakujące
 Clone current page	Settings Window		Sklonuj bieżącą stronę
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Czy naprawdę chcesz otworzyć wszystkie zakładki %addedCount na raz?
+Session cookie	Cookie Manager		Ciasteczko sesji
 OK	Authentication Panel		OK
 Copy	URL Bar		Kopiuj
 Download finished	Download Window		Pobieranie zakończone
@@ -141,6 +151,7 @@ Show bookmark bar	WebPositive Window		Pokaż pasek zakładek
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Zarządzanie zakładkami
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Zakładka dla tej strony (%bookmarkName) już istnieje.
+Cookies for %s	Cookie Manager		Ciasteczka dla %s
 New windows:	Settings Window		Nowe okna:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url załadowany
 Remove finished	Download Window		Usuń zakończone

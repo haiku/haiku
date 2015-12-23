@@ -63,9 +63,11 @@ enum {
 
 	B_FUNCTION_KEY		= 0x10,
 
-	// for Japanese keyboards
+	// for Japanese and Korean keyboards
 	B_KATAKANA_HIRAGANA	= 0xf2,
-	B_HANKAKU_ZENKAKU	= 0xf3
+	B_HANKAKU_ZENKAKU	= 0xf3,
+	B_HANGUL			= 0xf0,
+	B_HANGUL_HANJA		= 0xf1
 };
 
 enum {

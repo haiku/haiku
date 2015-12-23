@@ -199,7 +199,6 @@ Application Icon-O-Matic :
 	Selection.cpp
 
 	# generic/support
-	RWLocker.cpp
 	support.cpp
 	support_ui.cpp
 	support_settings.cpp
@@ -309,9 +308,9 @@ Application Icon-O-Matic :
 Includes [ FGristFiles SVGParser.cpp ]
 	: [ BuildFeatureAttribute expat : headers ] ;
 
-DoCatalogs Icon-O-Matic : 
+DoCatalogs Icon-O-Matic :
 	x-vnd.haiku-icon_o_matic
-	: 
+	:
 	MainWindow.cpp
 	IconEditorApp.cpp
 	SetPropertiesCommand.cpp

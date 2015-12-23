@@ -18,6 +18,7 @@
 
 
 using namespace BFS;
+using std::nothrow;
 
 
 class CachedBlock {

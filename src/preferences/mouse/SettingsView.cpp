@@ -17,9 +17,8 @@
 #include <Button.h>
 #include <Catalog.h>
 #include <Debug.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
 #include <InterfaceDefs.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuField.h>
 #include <MenuItem.h>
@@ -137,7 +136,7 @@ SettingsView::SettingsView(MouseSettings& settings)
 
 	BMenuField* focusField = new BMenuField(B_TRANSLATE("Focus mode:"),
 		fFocusMenu);
-	focusField->SetAlignment(B_ALIGN_RIGHT);
+	focusField->SetAlignment(B_ALIGN_LEFT);
 
 	// Add the "Focus follows mouse mode" pop up menu
 	fFocusFollowsMouseMenu = new BPopUpMenu(B_TRANSLATE("Normal"));
@@ -165,61 +164,49 @@ SettingsView::SettingsView(MouseSettings& settings)
 	fAcceptFirstClickBox = new BCheckBox(B_TRANSLATE("Accept first click"),
 		new BMessage(kMsgAcceptFirstClick));
 
-	// dividers
-	// This one is a vertical line for B_HORIZONTAL
-	BSeparatorView* hdivider = new BSeparatorView(B_VERTICAL, B_FANCY_BORDER);
-
-	// This one is a horizontal line for B_VERTICAL
-	BSeparatorView* vdivider = new BSeparatorView(B_HORIZONTAL, B_FANCY_BORDER);
-
 	// Build the layout
-	SetLayout(new BGroupLayout(B_VERTICAL));
 
 	// Layout is :
 	// A | B
 	// -----
 	//   C
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, B_USE_SMALL_SPACING)
-
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 		// Horizontal : A|B
-		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 
 			// Vertical block A: mouse type/view/test
-			.AddGroup(B_VERTICAL, 10)
+			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
 				.AddGroup(B_HORIZONTAL, 0)
 					.AddGlue()
 					.Add(typeField)
 					.AddGlue()
-				.End()
+					.End()
 				.AddGlue()
-
-				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+				.AddGroup(B_HORIZONTAL, 0)
 					.AddGlue()
 					.Add(fMouseView)
 					.AddGlue()
-				)
+					.End()
 				.AddGlue()
 				.Add(doubleClickTextControl)
-			.End()
-
-			.Add(hdivider)
+				.End()
+			.Add(new BSeparatorView(B_VERTICAL))
 
 			// Vertical block B: speed settings
 			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING, 3)
-				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+				.AddGroup(B_HORIZONTAL, 0)
 					.Add(fClickSpeedSlider)
-				)
-				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+					.End()
+				.AddGroup(B_HORIZONTAL, 0)
 					.Add(fMouseSpeedSlider)
-				)
-				.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+					.End()
+				.AddGroup(B_HORIZONTAL, 0)
 					.Add(fAccelerationSlider)
-				)
+					.End()
+				.End()
 			.End()
-		.End()
-
-		.Add(vdivider)
+		.AddStrut(B_USE_DEFAULT_SPACING)
 
 		// Horizontal Block C: focus mode
 		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)
@@ -227,11 +214,10 @@ SettingsView::SettingsView(MouseSettings& settings)
 			.AddGlue()
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fAcceptFirstClickBox)
-			.End()
-		.End()
-		.SetInsets(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING,
-			B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)
-	);
+				.End()
+			.End();
+
+	SetBorder(B_NO_BORDER);
 }
 
 

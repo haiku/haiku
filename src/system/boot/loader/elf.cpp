@@ -11,7 +11,7 @@
 #include <boot/platform.h>
 #include <boot/stage2.h>
 #include <driver_settings.h>
-#include <elf32.h>
+#include <elf_private.h>
 #include <kernel.h>
 #include <SupportDefs.h>
 
@@ -710,7 +710,7 @@ elf_relocate_image(preloaded_image* image)
 
 
 status_t
-boot_elf_resolve_symbol(preloaded_elf32_image* image, struct Elf32_Sym* symbol,
+boot_elf_resolve_symbol(preloaded_elf32_image* image, Elf32_Sym* symbol,
 	Elf32_Addr* symbolAddress)
 {
 	return ELF32Loader::Resolve(image, symbol, symbolAddress);
@@ -719,7 +719,7 @@ boot_elf_resolve_symbol(preloaded_elf32_image* image, struct Elf32_Sym* symbol,
 
 #ifdef BOOT_SUPPORT_ELF64
 status_t
-boot_elf_resolve_symbol(preloaded_elf64_image* image, struct Elf64_Sym* symbol,
+boot_elf_resolve_symbol(preloaded_elf64_image* image, Elf64_Sym* symbol,
 	Elf64_Addr* symbolAddress)
 {
 	return ELF64Loader::Resolve(image, symbol, symbolAddress);

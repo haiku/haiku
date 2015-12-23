@@ -2,7 +2,7 @@
  * Copyright 2005, Stephan Aßmus <superstippi@gmx.de>. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
- * DrawingMode implementing B_OP_ALPHA in "Constant Overlay" mode on B_RGBA32.
+ * DrawingMode implementing B_OP_ALPHA in "Pixel Overlay" mode on B_RGBA32.
  *
  */
 
@@ -27,7 +27,7 @@ blend_pixel_alpha_po_solid(int x, int y, const color_type& c, uint8 cover,
 
 // blend_hline_alpha_po_solid
 void
-blend_hline_alpha_po_solid(int x, int y, unsigned len, 
+blend_hline_alpha_po_solid(int x, int y, unsigned len,
 						   const color_type& c, uint8 cover,
 						   agg_buffer* buffer, const PatternHandler* pattern)
 {
@@ -64,7 +64,7 @@ blend_hline_alpha_po_solid(int x, int y, unsigned len,
 
 // blend_solid_hspan_alpha_po_solid
 void
-blend_solid_hspan_alpha_po_solid(int x, int y, unsigned len, 
+blend_solid_hspan_alpha_po_solid(int x, int y, unsigned len,
 								 const color_type& c, const uint8* covers,
 						 		 agg_buffer* buffer, const PatternHandler* pattern)
 {
@@ -88,7 +88,7 @@ blend_solid_hspan_alpha_po_solid(int x, int y, unsigned len,
 
 // blend_solid_vspan_alpha_po_solid
 void
-blend_solid_vspan_alpha_po_solid(int x, int y, unsigned len, 
+blend_solid_vspan_alpha_po_solid(int x, int y, unsigned len,
 								 const color_type& c, const uint8* covers,
 								 agg_buffer* buffer, const PatternHandler* pattern)
 {

@@ -83,7 +83,8 @@ enum {
 	WINDOW_CLOSED					= 'wndc',
 	SHOW_DOWNLOAD_WINDOW			= 'sdwd',
 	SHOW_SETTINGS_WINDOW			= 'sswd',
-	SHOW_CONSOLE_WINDOW				= 'scwd'
+	SHOW_CONSOLE_WINDOW				= 'scwd',
+	SHOW_COOKIE_WINDOW				= 'skwd'
 };
 
 #define INTEGRATE_MENU_INTO_TAB_BAR 0
@@ -103,6 +104,7 @@ public:
 	virtual	void				DispatchMessage(BMessage* message,
 									BHandler* target);
 	virtual	void				MessageReceived(BMessage* message);
+	virtual	status_t			Archive(BMessage* archive, bool deep =true) const;
 	virtual	bool				QuitRequested();
 	virtual	void				MenusBeginning();
 	virtual	void				MenusEnded();

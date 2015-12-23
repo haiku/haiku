@@ -22,6 +22,7 @@
 #include <MutableLocaleRoster.h>
 #include <Screen.h>
 #include <ScrollView.h>
+#include <SeparatorView.h>
 #include <StringView.h>
 #include <TabView.h>
 #include <UnicodeChar.h>
@@ -78,6 +79,8 @@ LocaleWindow::LocaleWindow()
 	float spacing = be_control_look->DefaultItemSpacing();
 
 	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_WIDEST);
+	tabView->SetBorder(B_NO_BORDER);
+
 	BGroupView* languageTab = new BGroupView(B_TRANSLATE("Language"),
 		B_HORIZONTAL, spacing);
 
@@ -165,15 +168,16 @@ LocaleWindow::LocaleWindow()
 		new BMessage(kMsgPreferredLanguageDragged));
 
 	BLayoutBuilder::Group<>(languageTab)
-		.AddGroup(B_VERTICAL, spacing)
+		.AddGroup(B_VERTICAL)
 			.Add(new BStringView("", B_TRANSLATE("Available languages")))
 			.Add(scrollView)
 			.End()
-		.AddGroup(B_VERTICAL, spacing)
+		.AddGroup(B_VERTICAL)
 			.Add(new BStringView("", B_TRANSLATE("Preferred languages")))
 			.Add(scrollViewEnabled)
 			.End()
-		.SetInsets(spacing, spacing, spacing, spacing);
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING);
 
 	BView* countryTab = new BView(B_TRANSLATE("Formatting"), B_WILL_DRAW);
 	countryTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
@@ -242,7 +246,8 @@ LocaleWindow::LocaleWindow()
 			.Add(scrollView)
 			.End()
 		.Add(fFormatView)
-		.SetInsets(spacing, spacing, spacing, spacing));
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING));
 
 	BView* optionsTab = new BView(B_TRANSLATE("Options"), B_WILL_DRAW);
 	optionsTab->SetLayout(new BGroupLayout(B_VERTICAL, 0));
@@ -254,10 +259,11 @@ LocaleWindow::LocaleWindow()
 	fFilesystemTranslationCheckbox->SetValue(
 		BLocaleRoster::Default()->IsFilesystemTranslationPreferred());
 
-	optionsTab->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, spacing)
+	optionsTab->AddChild(BLayoutBuilder::Group<>(B_VERTICAL)
 		.Add(fFilesystemTranslationCheckbox)
 		.AddGlue()
-		.SetInsets(spacing, spacing, spacing, spacing));
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING));
 
 	tabView->AddTab(languageTab);
 	tabView->AddTab(countryTab);
@@ -270,15 +276,16 @@ LocaleWindow::LocaleWindow()
 		= new BButton(B_TRANSLATE("Revert"), new BMessage(kMsgRevert));
 	fRevertButton->SetEnabled(false);
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL, spacing)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, B_USE_DEFAULT_SPACING, 0, B_USE_WINDOW_SPACING)
 		.Add(tabView)
-		.AddGroup(B_HORIZONTAL, spacing)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL)
 			.Add(button)
 			.Add(fRevertButton)
-			.AddGlue()
-			.End()
-		.SetInsets(spacing, spacing, spacing, spacing)
-		.End();
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, 0)
+			.AddGlue();
 
 	_Refresh(true);
 	_SettingsReverted();

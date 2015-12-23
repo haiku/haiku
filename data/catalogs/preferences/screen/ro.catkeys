@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Screen	1388881963
+1	romanian	x-vnd.Haiku-Screen	4090394050
 yes	Screen		da
 Use laptop panel:	Screen		Utilizează panou laptop:
 15 bits/pixel, 32768 colors	Screen		15 biți/pixel, 32768 culori
@@ -12,6 +12,7 @@ Set background…	Screen		Configurează fundal...
 Undo	Screen		Refă
 if needed	Screen		dacă este nevoie
 Screen preferences by the Haiku team	Screen		Preferințe de ecran de echipa Haiku
+Settings will revert in %seconds.	Screen		Configurările vor reveni în %seconds secunde.
 Screen	System name		Ecran
 OK	Screen		OK
 Workspaces	Screen		Spații de lucru
@@ -38,6 +39,7 @@ bits/pixel	Screen		biți/pixel
 Refresh rate:	Screen		Cotă de împrospătare:
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		Doriți să păstrați aceste configurări?
+Confirm changes	Screen		Confirmă schimbările
 Rows:	Screen		Rânduri:
 vertically	Screen		vertical
 Resolution:	Screen		Rezoluție:

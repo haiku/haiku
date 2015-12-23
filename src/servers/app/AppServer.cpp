@@ -48,7 +48,8 @@ uint32 gAppServerSIMDFlags = 0;
 */
 AppServer::AppServer(status_t* status)
 	:
-	BServer("application/x-vnd.Haiku-app_server", "picasso", -1, false, status),
+	SERVER_BASE("application/x-vnd.Haiku-app_server", "picasso", -1, false,
+		status),
 	fDesktopLock("AppServerDesktopLock")
 {
 	openlog("app_server", 0, LOG_DAEMON);
@@ -153,7 +154,10 @@ AppServer::QuitRequested()
 		wait_for_thread(thread, &status);
 	}
 
-	return BServer::QuitRequested();
+	delete this;
+	exit(0);
+
+	return SERVER_BASE::QuitRequested();
 #else
 	return false;
 #endif

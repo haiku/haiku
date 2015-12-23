@@ -411,8 +411,7 @@ MediaWindow::_InitWindow()
 
 	// Layout all views
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(scrollView, 0.0f)
 		.AddGroup(B_VERTICAL)
 			.SetInsets(0, 0, 0, 0)
@@ -657,7 +656,7 @@ status_t
 MediaWindow::_RestartMediaServices(void* data)
 {
 	MediaWindow* window = (MediaWindow*)data;
-	
+
 	shutdown_media_server();
 	launch_media_server();
 

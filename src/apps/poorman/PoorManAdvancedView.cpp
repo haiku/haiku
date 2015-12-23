@@ -37,7 +37,7 @@ PoorManAdvancedView::PoorManAdvancedView(const char* name)
 	// labels below the slider 1 and 200
 	fMaxConnections->SetLimitLabels("1", "200");
 	SetMaxSimutaneousConnections(win->MaxConnections());
-	
+
 
 	BGroupLayout* connectionOptionsLayout = new BGroupLayout(B_VERTICAL, 0);
 	connectionOptions->SetLayout(connectionOptionsLayout);
@@ -49,7 +49,8 @@ PoorManAdvancedView::PoorManAdvancedView(const char* name)
 			.Add(fMaxConnections)
 			.End()
 		.AddGlue()
-		.SetInsets(B_USE_ITEM_INSETS);
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 void

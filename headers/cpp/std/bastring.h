@@ -419,6 +419,8 @@ public:
 	{ return compare(str, pos, n); }
   int compare (size_type pos, size_type n, const charT* s) const
     { return compare(s, pos, n); }
+  int compare (size_type pos, size_type n, const charT* s, size_type n2) const
+    { if (n > n2) n = n2; return compare(s, pos, n); }
   int compare (const charT* s, size_type pos = 0) const
     { return compare (s, pos, traits::length (s)); }
 

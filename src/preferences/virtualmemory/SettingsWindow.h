@@ -83,6 +83,7 @@ private:
 			BMenuField*		fVolumeMenuField;
 			BStatusBar*		fSwapUsageBar;
 			Settings		fSettings;
+			bool			fSetupComplete;
 };
 
 #endif	/* SETTINGS_WINDOW_H */

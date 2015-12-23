@@ -1,6 +1,6 @@
 1	romanian	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		OK
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Scurtături nu a putut să salveze setul de taste.
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Shortcuts nu a putut să salveze setul de taste.
 Cancel	ShortcutsWindow		Anulează
 Append KeySet…	ShortcutsWindow		Adăugare set de taste...
 Control	ShortcutsSpec	Name for modifier on keyboard	Control
@@ -26,7 +26,7 @@ Save & apply	ShortcutsWindow		Salvează & aplică
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*TrimiteMesaj application/x-vnd.Be-TRAK 'Tfnd'
 Append	ShortcutsWindow		Adaugă
 File	ShortcutsWindow		Fișier
-Quit	ShortcutsWindow		Părăsește
+Quit	ShortcutsWindow		Închidere
 *MouseDown	ShortcutsWindow		*MausJos
 Don't save	ShortcutsWindow		Nu salva
 Application	ShortcutsWindow		Aplicație

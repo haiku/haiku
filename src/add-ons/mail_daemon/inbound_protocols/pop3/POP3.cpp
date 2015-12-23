@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2015, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -69,7 +69,7 @@ NotHere(BStringList& that, BStringList& otherList, BStringList* results)
 
 POP3Protocol::POP3Protocol(const BMailAccountSettings& settings)
 	:
-	BInboundMailProtocol(settings),
+	BInboundMailProtocol("POP3", settings),
 	fNumMessages(-1),
 	fMailDropSize(0),
 	fServerConnection(NULL)

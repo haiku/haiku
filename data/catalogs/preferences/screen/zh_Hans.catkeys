@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Screen	2339556848
+1	english	x-vnd.Haiku-Screen	4090394050
 yes	Screen		是
 Use laptop panel:	Screen		使用笔记本面板：
 15 bits/pixel, 32768 colors	Screen		15 位/像素l，32768 色
@@ -39,6 +39,7 @@ bits/pixel	Screen		位/像素
 Refresh rate:	Screen		刷新频率：
 Hz	Screen		Hz
 Do you wish to keep these settings?	Screen		是否保存设置?
+Confirm changes	Screen		确认修改
 Rows:	Screen		行：
 vertically	Screen		垂直
 Resolution:	Screen		分辨率

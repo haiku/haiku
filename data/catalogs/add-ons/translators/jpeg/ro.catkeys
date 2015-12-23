@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-JPEGTranslator	965709535
+1	romanian	x-vnd.Haiku-JPEGTranslator	3788699631
 Output quality	JPEGTranslator		Calitatea rezultatului
 JPEG images	JPEGTranslator		Imagini JPEG
 Prevent colors 'washing out'	JPEGTranslator		Previne „spălarea” culorilor
@@ -15,6 +15,7 @@ Output smoothing strength	JPEGTranslator		Produce putere de netezire
 High	JPEGTranslator		Sus
 Write	JPEGTranslator		Scrie
 Write black-and-white images as RGB24	JPEGTranslator		Scrie imaginile alb-negru ca RGB24
+Version %d.%d.%d	JPEGTranslator		Versiune %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		Citește imaginile cu scală de gri ca RGB32
 Read	JPEGTranslator		Citește
 JPEG Library Warning: %s\n	be_jerror		Avertisment bibliotecă JPEG: %s\n

@@ -48,6 +48,7 @@ public:
 	// codec buffer size.
 
 private:
+			void				_Init();
 			status_t			_Setup();
 
 			bool				_OpenCodecIfNeeded();

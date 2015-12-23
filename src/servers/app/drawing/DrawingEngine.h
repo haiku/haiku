@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm <bpmagic@columbus.rr.com>
  *		Gabe Yoder <gyoder@stny.rr.com>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 #ifndef DRAWING_ENGINE_H_
 #define DRAWING_ENGINE_H_
@@ -85,6 +86,7 @@ public:
 								alpha_function alphaFunc);
 	virtual	void			SetFont(const ServerFont& font);
 	virtual	void			SetFont(const DrawState* state);
+	virtual	void			SetTransform(const BAffineTransform& transform);
 
 			void			SuspendAutoSync();
 			void			Sync();
@@ -186,6 +188,8 @@ public:
 	// individual rects
 	virtual	BRect			CopyRect(BRect rect, int32 xOffset,
 								int32 yOffset) const;
+
+			void			SetRendererOffset(int32 offsetX, int32 offsetY);
 
 private:
 			void			_CopyRect(uint8* bits, uint32 width,

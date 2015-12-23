@@ -4,7 +4,7 @@
  *	Started: 5/07/2004
  *	Version: 0.1
  */
- 
+
 #include <Box.h>
 #include <LayoutBuilder.h>
 
@@ -38,24 +38,25 @@ PoorManSiteView::PoorManSiteView(const char* name)
 	// Web Directory Text Control
 	fWebDir = new BTextControl(STR_TXT_DIRECTORY, NULL, NULL);
 	SetWebDir(win->WebDir());
-	
+
 	// Select Web Directory Button
 	fSelectWebDir = new BButton("Select Web Dir", STR_BTN_DIRECTORY,
 		new BMessage(MSG_PREF_SITE_BTN_SELECT));
-	
+
 	// Index File Name Text Control
 	fIndexFileName = new BTextControl(STR_TXT_INDEX, NULL, NULL);
 	SetIndexFileName(win->IndexFileName());
-	
-	
+
+
 	BGroupLayout* webSiteLocationLayout = new BGroupLayout(B_VERTICAL, 0);
 	webSiteLocation->SetLayout(webSiteLocationLayout);
-	
+
 	BGroupLayout* webSiteOptionsLayout = new BGroupLayout(B_VERTICAL, 0);
 	webSiteOptions->SetLayout(webSiteOptionsLayout);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_ITEM_INSETS)
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 		.AddGroup(webSiteLocationLayout)
 			.SetInsets(B_USE_ITEM_INSETS)
 			.AddGrid(B_USE_SMALL_SPACING, B_USE_SMALL_SPACING)

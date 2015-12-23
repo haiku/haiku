@@ -42,6 +42,7 @@
 #include <Roster.h>
 #include <Screen.h>
 #include <ScrollView.h>
+#include <SeparatorView.h>
 #include <StringView.h>
 #include <TabView.h>
 #include <TextControl.h>
@@ -208,6 +209,7 @@ ConfigWindow::ConfigWindow()
 	fSaveSettings(false)
 {
 	BTabView* tabView = new BTabView("tab");
+	tabView->SetBorder(B_NO_BORDER);
 
 	// accounts listview
 
@@ -216,6 +218,8 @@ ConfigWindow::ConfigWindow()
 	tabView->TabAt(0)->SetLabel(B_TRANSLATE("Accounts"));
 
 	fAccountsListView = new AccountsListView(this);
+	fAccountsListView->SetExplicitPreferredSize(BSize(
+		fAccountsListView->StringWidth("W") * 22, B_SIZE_UNSET));
 
 	BButton* addButton = new BButton(NULL, B_TRANSLATE("Add"),
 		new BMessage(kMsgAddAccount));
@@ -231,7 +235,8 @@ ConfigWindow::ConfigWindow()
 		false, true);
 
 	BLayoutBuilder::Group<>(view, B_HORIZONTAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 		.AddGroup(B_VERTICAL)
 			.Add(scroller)
 			.AddGroup(B_HORIZONTAL)
@@ -287,11 +292,13 @@ ConfigWindow::ConfigWindow()
 		editMenuButton->SetEnabled(false);
 
 	BLayoutBuilder::Group<>(view, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
-		.AddGlue()
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
+//		.AddGlue()
 		.AddGroup(B_HORIZONTAL, 0.f)
 			.AddGlue()
 			.Add(fCheckMailCheckBox)
+			.AddStrut(be_control_look->DefaultLabelSpacing())
 			.Add(fIntervalControl->CreateTextViewLayoutItem())
 			.AddStrut(be_control_look->DefaultLabelSpacing())
 			.Add(fIntervalControl->CreateLabelLayoutItem())
@@ -313,19 +320,24 @@ ConfigWindow::ConfigWindow()
 	BButton* revertButton = new BButton("revert", B_TRANSLATE("Revert"),
 		new BMessage(kMsgRevertSettings));
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, B_USE_DEFAULT_SPACING, 0, B_USE_WINDOW_SPACING)
 		.Add(tabView)
-		.AddGroup(B_HORIZONTAL)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL, 0)
 			.Add(revertButton)
 			.AddGlue()
-			.Add(applyButton);
+			.Add(applyButton)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, 0);
 
 	_LoadSettings();
-		// this will also move our window to the stored position
 
 	fAccountsListView->SetSelectionMessage(new BMessage(kMsgAccountSelected));
 	fAccountsListView->MakeFocus(true);
+
+	ResizeToPreferred();
+	CenterOnScreen();
 }
 
 
@@ -366,6 +378,8 @@ ConfigWindow::_BuildHowToView()
 		"Select an item in the list to change its settings."));
 	text->MakeEditable(false);
 	text->MakeSelectable(false);
+	float fontFactor = be_plain_font->Size() / 12.0f;
+	text->SetExplicitPreferredSize(BSize(300 * fontFactor,400 * fontFactor));
 
 	BLayoutBuilder::Group<>(groupView, B_VERTICAL)
 		.AddGlue()
@@ -398,8 +412,6 @@ ConfigWindow::_LoadSettings()
 		fprintf(stderr, B_TRANSLATE("Error retrieving general settings: %s\n"),
 			strerror(status));
 	}
-
-	CenterOnScreen();
 }
 
 
@@ -499,7 +511,8 @@ ConfigWindow::QuitRequested()
 void
 ConfigWindow::MessageReceived(BMessage *msg)
 {
-	BRect autoConfigRect(0, 0, 400, 300);
+	float fontFactor = be_plain_font->Size() / 12.0f;
+	BRect autoConfigRect(0, 0, 400 * fontFactor, 300 * fontFactor);
 	BRect frame;
 
 	AutoConfigWindow *autoConfigWindow = NULL;

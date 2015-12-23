@@ -417,7 +417,7 @@ Hub::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 			int32 managerIndex = GetStack()->IndexOfBusManager(GetBusManager());
 			size_t totalBytes = snprintf(string + *index, bufferSize - *index,
 				"%" B_PRId32, managerIndex);
-			*index += std::min(totalBytes, bufferSize - *index - 1);
+			*index += std::min(totalBytes, (size_t)(bufferSize - *index - 1));
 		}
 	}
 
@@ -426,7 +426,7 @@ Hub::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 		if (*index < bufferSize) {
 			size_t totalBytes = snprintf(string + *index, bufferSize - *index,
 				"/hub");
-			*index += std::min(totalBytes, bufferSize - *index - 1);
+			*index += std::min(totalBytes, (size_t)(bufferSize - *index - 1));
 		}
 	} else {
 		// find out where the requested device sitts
@@ -435,7 +435,8 @@ Hub::BuildDeviceName(char *string, uint32 *index, size_t bufferSize,
 				if (*index < bufferSize) {
 					size_t totalBytes = snprintf(string + *index,
 						bufferSize - *index, "/%" B_PRId32, i);
-					*index += std::min(totalBytes, bufferSize - *index - 1);
+					*index += std::min(totalBytes,
+						(size_t)(bufferSize - *index - 1));
 				}
 				break;
 			}

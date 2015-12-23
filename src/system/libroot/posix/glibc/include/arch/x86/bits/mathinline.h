@@ -22,10 +22,10 @@
 # error "Never use <bits/mathinline.h> directly; include <math.h> instead."
 #endif
 
-#ifdef __cplusplus
+#ifndef __extern_always_inline
 # define __MATH_INLINE __inline
 #else
-# define __MATH_INLINE extern __inline
+# define __MATH_INLINE __extern_always_inline
 #endif
 
 
@@ -416,14 +416,21 @@ __inline_mathcodeNP (tan, __x, \
 #endif /* __FAST_MATH__ */
 
 
+#  if __GNUC_PREREQ (3, 4)
+__inline_mathcodeNP2_ (long double, __atan2l, __y, __x,
+		       return __builtin_atan2l (__y, __x))
+#  else
 #define __atan2_code \
   register long double __value;						      \
   __asm __volatile__							      \
     ("fpatan"								      \
      : "=t" (__value) : "0" (__x), "u" (__y) : "st(1)");		      \
   return __value
+# ifdef __FAST_MATH__
 __inline_mathcodeNP2 (atan2, __y, __x, __atan2_code)
+# endif
 __inline_mathcodeNP2_ (long double, __atan2l, __y, __x, __atan2_code)
+#  endif
 
 
 __inline_mathcodeNP2 (fmod, __x, __y, \
@@ -511,6 +518,7 @@ __inline_mathcodeNP (ceil, __x, \
   __asm __volatile ("fldcw %0" : : "m" (__cw));				      \
   return __value)
 
+#ifdef __FAST_MATH__
 #define __ldexp_code \
   register long double __value;						      \
   __asm __volatile__							      \
@@ -523,6 +531,7 @@ ldexp (double __x, int __y) __THROW
 {
   __ldexp_code;
 }
+#endif
 
 
 /* Optimized versions for some non-standardized functions.  */
@@ -530,7 +539,6 @@ ldexp (double __x, int __y) __THROW
 
 # ifdef __FAST_MATH__
 __inline_mathcodeNP (expm1, __x, __expm1_code)
-# endif
 
 /* We cannot rely on M_SQRT being defined.  So we do it for ourself
    here.  */
@@ -573,12 +581,12 @@ __inline_mathcodeNP(logb, __x, \
      : "=t" (__junk), "=u" (__value) : "0" (__x));			      \
   return __value)
 
+# endif
 #endif
 
 #ifdef __USE_ISOC99
 #ifdef __FAST_MATH__
 __inline_mathop_declNP (log2, "fld1; fxch; fyl2x", "0" (__x) : "st(1)")
-#endif /* __FAST_MATH__ */
 
 __MATH_INLINE float
 ldexpf (float __x, int __y) __THROW
@@ -592,7 +600,6 @@ ldexpl (long double __x, int __y) __THROW
   __ldexp_code;
 }
 
-#ifdef __FAST_MATH__
 __inline_mathcodeNP3 (fma, __x, __y, __z, return (__x * __y) + __z)
 
 __inline_mathopNP (rint, "frndint")

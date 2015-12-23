@@ -238,8 +238,6 @@ TimeZoneView::_InitView()
 	_ShowOrHidePreview();
 	fOldUseGmtTime = fUseGmtTime;
 
-	const float kIndentSpacing
-		= be_control_look->DefaultItemSpacing() * 2;
 	BLayoutBuilder::Group<>(this)
 		.Add(scrollList)
 		.AddGroup(B_VERTICAL, 0)
@@ -248,7 +246,7 @@ TimeZoneView::_InitView()
 			.AddGroup(B_VERTICAL, 0)
 				.Add(fLocalTime)
 				.Add(fGmtTime)
-				.SetInsets(kIndentSpacing, 0, 0, 0)
+				.SetInsets(B_USE_WINDOW_SPACING, 0, 0, 0)
 			.End()
 			.AddGlue()
 			.AddGroup(B_VERTICAL, B_USE_DEFAULT_SPACING)
@@ -257,8 +255,8 @@ TimeZoneView::_InitView()
 			.End()
 			.Add(fSetZone)
 		.End()
-		.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-			B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 

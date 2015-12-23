@@ -53,6 +53,8 @@
 #endif
 
 
+namespace {
+
 #define IMAGE_HASH_SIZE 16
 
 struct ImageHashDefinition {
@@ -76,6 +78,9 @@ struct ImageHashDefinition {
 };
 
 typedef BOpenHashTable<ImageHashDefinition> ImageHash;
+
+} // namespace
+
 
 static ImageHash *sImagesHash;
 
@@ -2230,6 +2235,12 @@ load_kernel_add_on(const char *path)
 				break;
 			case PT_DYNAMIC:
 				image->dynamic_section = programHeaders[i].p_vaddr;
+				continue;
+			case PT_INTERP:
+				// should check here for appropriate interpreter
+				continue;
+			case PT_PHDR:
+				// we don't use it
 				continue;
 			default:
 				dprintf("%s: unhandled pheader type %#" B_PRIx32 "\n", fileName,

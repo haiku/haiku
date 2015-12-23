@@ -1,9 +1,10 @@
 /*
- * Copyright 2012-2014, Adrien Destugues, pulkomandy@gmail.com
+ * Copyright 2012-2015, Adrien Destugues, pulkomandy@gmail.com
  * Distributed under the terms of the MIT licence.
  */
 
 
+#include <String.h>
 #include <View.h>
 
 extern "C" {
@@ -24,6 +25,7 @@ class TermView: public BView
 				void		GetPreferredSize(float* width, float* height);
 				void		KeyDown(const char* bytes, int32 numBytes);
 				void		MessageReceived(BMessage* message);
+				void		SetLineTerminator(BString bytes);
 
 				void		PushBytes(const char* bytes, const size_t length);
 
@@ -55,6 +57,8 @@ class TermView: public BView
 		BList fScrollBuffer;
 		int fFontWidth;
 		int fFontHeight;
+
+		BString fLineTerminator;
 
 		static const VTermScreenCallbacks sScreenCallbacks;
 

@@ -38,6 +38,7 @@ class Transformable : public BArchivable,
 			void				Reset();
 
 			bool				IsIdentity() const;
+			bool				IsDilation() const;
 //			bool				operator==(const Transformable& other) const;
 //			bool				operator!=(const Transformable& other) const;
 

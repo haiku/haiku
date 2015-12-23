@@ -5,7 +5,9 @@
 #ifndef HID_DATA_TYPES_H
 #define HID_DATA_TYPES_H
 
+
 #include <lendian_bitfield.h>
+
 
 #define ITEM_TYPE_MAIN						0x0
 #define ITEM_TYPE_GLOBAL					0x1
@@ -68,7 +70,7 @@
 
 
 typedef struct item_prefix {
-	LBITFIELD8_3(
+	B_LBITFIELD8_3(
 		size	: 2,
 		type	: 2,
 		tag		: 4
@@ -99,7 +101,7 @@ typedef struct long_item {
 
 
 typedef struct main_item_data {
-	LBITFIELD9(
+	B_LBITFIELD16_9(
 		data_constant	: 1,
 		array_variable	: 1,
 		relative		: 1,

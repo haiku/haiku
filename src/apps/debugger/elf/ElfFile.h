@@ -9,8 +9,7 @@
 
 #include <SupportDefs.h>
 
-#include <elf32.h>
-#include <elf64.h>
+#include <elf_private.h>
 #include <util/DoublyLinkedList.h>
 
 #include "Types.h"

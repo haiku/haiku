@@ -29,6 +29,7 @@
 #include "fat.h"
 #include "file.h"
 #include "iter.h"
+#include "mkdos.h"
 #include "util.h"
 #include "vcache.h"
 
@@ -1276,9 +1277,24 @@ dosfs_fsync(fs_volume *_vol, fs_vnode *_node)
 //	#pragma mark -
 
 
+static uint32
+dosfs_get_supported_operations(partition_data* partition, uint32 mask)
+{
+	dprintf("dosfs_get_supported_operations\n");
+	// TODO: We should at least check the partition size.
+	return B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+		| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
+		| B_DISK_SYSTEM_SUPPORTS_WRITING;
+}
+
+
+//	#pragma mark -
+
+
 static status_t
 dos_std_ops(int32 op, ...)
 {
+	dprintf("dos_std_ops()\n");
 	switch (op) {
 		case B_MODULE_INIT:
 			return B_OK;
@@ -1401,7 +1417,27 @@ static file_system_module_info sFATFileSystem = {
 
 	"fat",					// short_name
 	"FAT32 File System",	// pretty_name
-	B_DISK_SYSTEM_SUPPORTS_WRITING,	// DDM flags
+
+	// DDM flags
+	0
+//	| B_DISK_SYSTEM_SUPPORTS_CHECKING
+//	| B_DISK_SYSTEM_SUPPORTS_REPAIRING
+//	| B_DISK_SYSTEM_SUPPORTS_RESIZING
+//	| B_DISK_SYSTEM_SUPPORTS_MOVING
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS
+	| B_DISK_SYSTEM_SUPPORTS_INITIALIZING
+	| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
+//	| B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING
+//	| B_DISK_SYSTEM_SUPPORTS_DEFRAGMENTING_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_CHECKING_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_REPAIRING_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_RESIZING_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_MOVING_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME_WHILE_MOUNTED
+//	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS_WHILE_MOUNTED
+	| B_DISK_SYSTEM_SUPPORTS_WRITING
+	,
 
 	// scanning
 	dosfs_identify_partition,
@@ -1410,6 +1446,28 @@ static file_system_module_info sFATFileSystem = {
 	NULL,	// free_partition_content_cookie()
 
 	&dosfs_mount,
+
+	/* capability querying operations */
+	&dosfs_get_supported_operations,
+
+	NULL,	// validate_resize
+	NULL,	// validate_move
+	NULL,	// validate_set_content_name
+	NULL,	// validate_set_content_parameters
+	NULL,	// validate_initialize,
+
+	/* shadow partition modification */
+	NULL,	// shadow_changed
+
+	/* writing */
+	NULL,	// defragment
+	NULL,	// repair
+	NULL,	// resize
+	NULL,	// move
+	NULL,	// set_content_name
+	NULL,	// set_content_parameters
+	dosfs_initialize,
+	dosfs_uninitialize
 };
 
 module_info *modules[] = {

@@ -136,7 +136,7 @@ NetworkWindow::NetworkWindow()
 
 	// Build the layout
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING)
 
 #if ENABLE_PROFILES
 		.AddGroup(B_HORIZONTAL, B_USE_SMALL_SPACING)

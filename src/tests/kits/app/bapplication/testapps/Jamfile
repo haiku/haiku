@@ -42,6 +42,8 @@ rule CopyBAppTestApp
 	File $(target) : $(source) ;
 	MODE on $(target) = $(EXEMODE) ;
 	MimeSet $(target) ;
+
+	UnitTestDependency $(target) ;
 }
 
 # BApplication::BApplication() test apps

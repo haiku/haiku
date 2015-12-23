@@ -79,7 +79,6 @@ int opterr;
 int optind;
 int optopt;
 int re_syntax_options;
-int sbrk_hook;
 int signgam;
 int stderr;
 int stdin;

@@ -32,6 +32,7 @@ countries. Other brand product names are registered trademarks or trademarks
 of their respective holders. All rights reserved.
 */
 
+
 #include "Signature.h"
 
 #include <stdio.h>
@@ -39,9 +40,11 @@ of their respective holders. All rights reserved.
 #include <strings.h>
 
 #include <Clipboard.h>
-#include <InterfaceKit.h>
+#include <Directory.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
-#include <StorageKit.h>
+#include <ScrollView.h>
+#include <StringView.h>
 
 #include "MailApp.h"
 #include "MailPopUpMenu.h"
@@ -53,24 +56,24 @@ of their respective holders. All rights reserved.
 #define B_TRANSLATION_CONTEXT "Mail"
 
 
-extern BRect		signature_window;
-extern const char	*kUndoStrings[];
-extern const char	*kRedoStrings[];
+const float kSigHeight = 250;
+const float kSigWidth = 300;
+
+extern const char* kUndoStrings[];
+extern const char* kRedoStrings[];
 
 
 TSignatureWindow::TSignatureWindow(BRect rect)
 	:
-	BWindow (rect, B_TRANSLATE("Signatures"), B_TITLED_WINDOW, 0),
+	BWindow(rect, B_TRANSLATE("Signatures"), B_TITLED_WINDOW,
+		B_AUTO_UPDATE_SIZE_LIMITS),
 	fFile(NULL)
 {
-	BMenu		*menu;
-	BMenuBar	*menu_bar;
-	BMenuItem	*item;
+	BMenuItem* item;
 
-	BRect r = Bounds();
-	/*** Set up the menus ****/
-	menu_bar = new BMenuBar(r, "MenuBar");
-	menu = new BMenu(B_TRANSLATE("Signature"));
+	// Set up the menu
+	BMenuBar* menuBar = new BMenuBar("MenuBar");
+	BMenu* menu = new BMenu(B_TRANSLATE("Signature"));
 	menu->AddItem(fNew = new BMenuItem(B_TRANSLATE("New"),
 		new BMessage(M_NEW), 'N'));
 	fSignature = new TMenu(B_TRANSLATE("Open"), INDEX_SIGNATURE, M_SIGNATURE);
@@ -80,7 +83,7 @@ TSignatureWindow::TSignatureWindow(BRect rect)
 		new BMessage(M_SAVE), 'S'));
 	menu->AddItem(fDelete = new BMenuItem(B_TRANSLATE("Delete"),
 		new BMessage(M_DELETE), 'T'));
-	menu_bar->AddItem(menu);
+	menuBar->AddItem(menu);
 
 	menu = new BMenu(B_TRANSLATE("Edit"));
 	menu->AddItem(fUndo = new BMenuItem(B_TRANSLATE("Undo"),
@@ -100,22 +103,20 @@ TSignatureWindow::TSignatureWindow(BRect rect)
 	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Select all"),
 		new BMessage(M_SELECT), 'A'));
 	item->SetTarget(NULL, this);
-	menu_bar->AddItem(menu);
+	menuBar->AddItem(menu);
 
-	AddChild(menu_bar);
-	/**** Done with the menu set up *****/
+	fSigView = new TSignatureView();
 
-	/**** Add on the panel, giving it the width and at least one vertical pixel *****/
-	fSigView = new TSignatureView(BRect(0, menu_bar->Frame().bottom+1,
-										rect.Width(), menu_bar->Frame().bottom+2));
-	AddChild(fSigView);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.Add(menuBar)
+		.Add(fSigView);
 
-	/* resize the window to the correct height */
-	fSigView->SetResizingMode(B_FOLLOW_NONE);
-	ResizeTo(rect.Width()-2, fSigView->Frame().bottom-2);
-	fSigView->SetResizingMode(B_FOLLOW_ALL);
-
-	SetSizeLimits(kSigWidth, RIGHT_BOUNDARY, r.top + 100, RIGHT_BOUNDARY);
+	if (!rect.IsValid()) {
+		float fontFactor = be_plain_font->Size() / 12.0f;
+		ResizeTo(kSigWidth * fontFactor, kSigHeight * fontFactor);
+		// TODO: this should work, too, but doesn't
+		//ResizeToPreferred();
+	}
 }
 
 
@@ -127,37 +128,37 @@ TSignatureWindow::~TSignatureWindow()
 void
 TSignatureWindow::MenusBeginning()
 {
-	int32		finish = 0;
-	int32		start = 0;
-	BTextView	*text_view;
-
 	fDelete->SetEnabled(fFile);
 	fSave->SetEnabled(IsDirty());
 	fUndo->SetEnabled(false);		// ***TODO***
 
-	text_view = (BTextView *)fSigView->fName->ChildAt(0);
-	if (text_view->IsFocus())
-		text_view->GetSelection(&start, &finish);
+	BTextView* textView = fSigView->fName->TextView();
+	int32 finish = 0;
+	int32 start = 0;
+	if (textView->IsFocus())
+		textView->GetSelection(&start, &finish);
 	else
 		fSigView->fTextView->GetSelection(&start, &finish);
 
 	fCut->SetEnabled(start != finish);
 	fCopy->SetEnabled(start != finish);
 
-	fNew->SetEnabled(text_view->TextLength() | fSigView->fTextView->TextLength());
+	fNew->SetEnabled(textView->TextLength()
+		| fSigView->fTextView->TextLength());
 	be_clipboard->Lock();
-	fPaste->SetEnabled(be_clipboard->Data()->HasData("text/plain", B_MIME_TYPE));
+	fPaste->SetEnabled(be_clipboard->Data()->HasData("text/plain",
+		B_MIME_TYPE));
 	be_clipboard->Unlock();
 
 	// Undo stuff
-	bool		isRedo = false;
-	undo_state	undoState = B_UNDO_UNAVAILABLE;
+	bool isRedo = false;
+	undo_state undoState = B_UNDO_UNAVAILABLE;
 
 	BTextView *focusTextView = dynamic_cast<BTextView *>(CurrentFocus());
 	if (focusTextView != NULL)
 		undoState = focusTextView->UndoState(&isRedo);
 
-	fUndo->SetLabel((isRedo) ? kRedoStrings[undoState] : kUndoStrings[undoState]);
+	fUndo->SetLabel(isRedo ? kRedoStrings[undoState] : kUndoStrings[undoState]);
 	fUndo->SetEnabled(undoState != B_UNDO_UNAVAILABLE);
 }
 
@@ -165,24 +166,19 @@ TSignatureWindow::MenusBeginning()
 void
 TSignatureWindow::MessageReceived(BMessage* msg)
 {
-	char		*sig;
-	char		name[B_FILE_NAME_LENGTH];
-	BFont		*font;
-	BTextView	*text_view;
-	entry_ref	ref;
-	off_t		size;
-
-	switch(msg->what) {
+	switch (msg->what) {
 		case CHANGE_FONT:
+		{
+			BFont* font;
 			msg->FindPointer("font", (void **)&font);
 			fSigView->fTextView->SetFontAndColor(font);
 			fSigView->fTextView->Invalidate(fSigView->fTextView->Bounds());
 			break;
+		}
 
 		case M_NEW:
 			if (Clear()) {
 				fSigView->fName->SetText("");
-//				fSigView->fTextView->SetText(NULL, (int32)0);
 				fSigView->fTextView->SetText("");
 				fSigView->fName->MakeFocus(true);
 			}
@@ -201,7 +197,7 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 					NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
 			alert->SetShortcut(0, B_ESCAPE);
 			int32 choice = alert->Go();
-			
+
 			if (choice == 0)
 				break;
 
@@ -217,22 +213,29 @@ TSignatureWindow::MessageReceived(BMessage* msg)
 		}
 		case M_SIGNATURE:
 			if (Clear()) {
+				entry_ref ref;
 				msg->FindRef("ref", &ref);
 				fEntry.SetTo(&ref);
 				fFile = new BFile(&ref, O_RDWR);
-				if (fFile->InitCheck() == B_NO_ERROR) {
-					fFile->ReadAttr(INDEX_SIGNATURE, B_STRING_TYPE, 0, name, sizeof(name));
+				if (fFile->InitCheck() == B_OK) {
+					char name[B_FILE_NAME_LENGTH];
+					fFile->ReadAttr(INDEX_SIGNATURE, B_STRING_TYPE, 0, name,
+						sizeof(name));
 					fSigView->fName->SetText(name);
+
+					off_t size;
 					fFile->GetSize(&size);
-					sig = (char *)malloc(size);
+					char* sig = (char*)malloc(size);
+					if (sig == NULL)
+						break;
+
 					size = fFile->Read(sig, size);
 					fSigView->fTextView->SetText(sig, size);
 					fSigView->fName->MakeFocus(true);
-					text_view = (BTextView *)fSigView->fName->ChildAt(0);
-					text_view->Select(0, text_view->TextLength());
+					BTextView* textView = fSigView->fName->TextView();
+					textView->Select(0, textView->TextLength());
 					fSigView->fTextView->fDirty = false;
-				}
-				else {
+				} else {
 					fFile = NULL;
 					beep();
 					BAlert* alert = new BAlert("",
@@ -275,12 +278,10 @@ TSignatureWindow::FrameResized(float width, float height)
 void
 TSignatureWindow::Show()
 {
-	BTextView	*text_view;
-
 	Lock();
-	text_view = (BTextView *)fSigView->fName->TextView();
+	BTextView* textView = (BTextView *)fSigView->fName->TextView();
 	fSigView->fName->MakeFocus(true);
-	text_view->Select(0, text_view->TextLength());
+	textView->Select(0, textView->TextLength());
 	Unlock();
 
 	BWindow::Show();
@@ -290,8 +291,6 @@ TSignatureWindow::Show()
 bool
 TSignatureWindow::Clear()
 {
-	int32		result;
-
 	if (IsDirty()) {
 		beep();
 		BAlert *alert = new BAlert("",
@@ -303,7 +302,7 @@ TSignatureWindow::Clear()
 		alert->SetShortcut(0, B_ESCAPE);
 		alert->SetShortcut(1, 'd');
 		alert->SetShortcut(2, 's');
-		result = alert->Go();
+		int32 result = alert->Go();
 		if (result == 0)
 			return false;
 		if (result == 2)
@@ -320,17 +319,16 @@ TSignatureWindow::Clear()
 bool
 TSignatureWindow::IsDirty()
 {
-	char		name[B_FILE_NAME_LENGTH];
-
-	if (fFile) {
+	if (fFile != NULL) {
+		char name[B_FILE_NAME_LENGTH];
 		fFile->ReadAttr(INDEX_SIGNATURE, B_STRING_TYPE, 0, name, sizeof(name));
-		if ((strcmp(name, fSigView->fName->Text())) || (fSigView->fTextView->fDirty))
+		if (strcmp(name, fSigView->fName->Text()) != 0
+			|| fSigView->fTextView->fDirty) {
 			return true;
-	}
-	else {
-		if ((strlen(fSigView->fName->Text())) ||
-			(fSigView->fTextView->TextLength()))
-			return true;
+		}
+	} else if (fSigView->fName->Text()[0] != '\0'
+		|| fSigView->fTextView->TextLength() != 0) {
+		return true;
 	}
 	return false;
 }
@@ -400,83 +398,57 @@ err_exit:
 }
 
 
-//====================================================================
-//	#pragma mark -
+// #pragma mark -
 
 
-TSignatureView::TSignatureView(BRect rect)
-	: BBox(rect, "SigView", B_FOLLOW_ALL, B_WILL_DRAW)
+TSignatureView::TSignatureView()
+	:
+	BGridView("SigView")
 {
+	GridLayout()->SetInsets(B_USE_DEFAULT_SPACING);
+
+	BStringView* nameLabel = new BStringView("NameLabel",
+		B_TRANSLATE("Title:"));
+	nameLabel->SetAlignment(B_ALIGN_RIGHT);
+	GridLayout()->AddView(nameLabel, 0, 0);
+
+	fName = new TNameControl("", new BMessage(NAME_FIELD));
+	GridLayout()->AddItem(fName->CreateTextViewLayoutItem(), 1, 0);
+
+	BStringView* signatureLabel = new BStringView("SigLabel",
+		B_TRANSLATE("Signature:"));
+	signatureLabel->SetAlignment(B_ALIGN_RIGHT);
+	GridLayout()->AddView(signatureLabel, 0, 1);
+
+	fTextView = new TSigTextView();
+
+	font_height fontHeight;
+	fTextView->GetFontHeight(&fontHeight);
+	float lineHeight = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent);
+
+	BScrollView* scroller = new BScrollView("SigScroller", fTextView, 0,
+		false, true);
+	scroller->SetExplicitPreferredSize(
+		BSize(fTextView->StringWidth("W") * 30, lineHeight * 6));
+
+	GridLayout()->AddView(scroller, 1, 1, 1, 2);
+
+	GridLayout()->AddItem(BSpaceLayoutItem::CreateGlue(), 0, 2);
 }
 
 
 void
 TSignatureView::AttachedToWindow()
 {
-	BRect	rect = Bounds();
-	float	name_text_length = StringWidth(B_TRANSLATE("Title:"));
-	float	sig_text_length = StringWidth(B_TRANSLATE("Signature:"));
-	float	divide_length;
-
-	if (name_text_length > sig_text_length)
-		divide_length = name_text_length;
-	else
-		divide_length = sig_text_length;
-
-	rect.InsetBy(8,0);
-	rect.top+= 8;
-
-	fName = new TNameControl(rect, B_TRANSLATE("Title:"),
-		new BMessage(NAME_FIELD));
-	AddChild(fName);
-
-	fName->SetDivider(divide_length + 10);
-	fName->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
-
-	rect.OffsetBy(0,fName->Bounds().Height()+5);
-	rect.bottom = rect.top + kSigHeight;
-	rect.left = fName->TextView()->Frame().left;
-
-	BRect text = rect;
-	text.OffsetTo(10,0);
-	fTextView = new TSigTextView(rect, text);
-	BScrollView *scroller = new BScrollView("SigScroller", fTextView, B_FOLLOW_ALL, 0, false, true);
-	AddChild(scroller);
-	scroller->ResizeBy(-1 * scroller->ScrollBar(B_VERTICAL)->Frame().Width() - 9, 0);
-	scroller->MoveBy(7,0);
-
-	/* back up a bit to make room for the label */
-
-	rect = scroller->Frame();
-	BStringView *stringView = new BStringView(rect, "SigLabel",
-		B_TRANSLATE("Signature:"));
-	AddChild(stringView);
-
-	float tWidth, tHeight;
-	stringView->GetPreferredSize(&tWidth, &tHeight);
-
-	/* the 5 is for the spacer in the TextView */
-
-	rect.OffsetBy(-1 *(tWidth) - 5, 0);
-	rect.right = rect.left + tWidth;
-	rect.bottom = rect.top + tHeight;
-
-	stringView->MoveTo(rect.LeftTop());
-	stringView->ResizeTo(rect.Width(), rect.Height());
-
-	/* Resize the View to the correct height */
-	scroller->SetResizingMode(B_FOLLOW_NONE);
-	ResizeTo(Frame().Width(), scroller->Frame().bottom + 8);
-	scroller->SetResizingMode(B_FOLLOW_ALL);
 }
 
 
-//====================================================================
-//	#pragma mark -
+// #pragma mark -
 
 
-TNameControl::TNameControl(BRect rect, const char *label, BMessage *msg)
-			 :BTextControl(rect, "", label, "", msg, B_FOLLOW_LEFT_RIGHT)
+TNameControl::TNameControl(const char* label, BMessage* invocationMessage)
+	:
+	BTextControl("", label, "", invocationMessage)
 {
 	strcpy(fLabel, label);
 }
@@ -487,13 +459,12 @@ TNameControl::AttachedToWindow()
 {
 	BTextControl::AttachedToWindow();
 
-	SetDivider(StringWidth(fLabel) + 6);
 	TextView()->SetMaxBytes(B_FILE_NAME_LENGTH - 1);
 }
 
 
 void
-TNameControl::MessageReceived(BMessage *msg)
+TNameControl::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 		case M_SELECT:
@@ -506,24 +477,15 @@ TNameControl::MessageReceived(BMessage *msg)
 }
 
 
-//====================================================================
-//	#pragma mark -
+// #pragma mark -
 
 
-TSigTextView::TSigTextView(BRect frame, BRect text)
-			 :BTextView(frame, "SignatureView", text, B_FOLLOW_ALL, B_NAVIGABLE | B_WILL_DRAW)
+TSigTextView::TSigTextView()
+	:
+	BTextView("SignatureView", B_NAVIGABLE | B_WILL_DRAW)
 {
 	fDirty = false;
 	SetDoesUndo(true);
-}
-
-
-void
-TSigTextView::FrameResized(float /*width*/, float /*height*/)
-{
-	BRect r(Bounds());
-	r.InsetBy(3, 3);
-	SetTextRect(r);
 }
 
 

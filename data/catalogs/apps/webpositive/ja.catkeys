@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-WebPositive	98059607
+1	japanese	x-vnd.Haiku-WebPositive	1282126593
 Show home button	Settings Window		ホームボタンを表示する
 Username:	Authentication Panel		ユーザー名:
 Copy URL to clipboard	Download Window		URL をクリップボードにコピー
@@ -16,6 +16,7 @@ Start page:	Settings Window		スタートページ:
 History	WebPositive Window		履歴
 Error opening downloads folder	Download Window		ダウンロードフォルダーを開く際にエラーが発生しました
 Paste	WebPositive Window		貼り付け
+Expiration	Cookie Manager		有効期限
 Double-click or middle-click to open new tab.	Tab Manager		ダブルクリックまたは中央ボタンクリックで新しいタブを開く
 Proxy username:	Settings Window		ユーザー名:
 Save page as…	WebPositive Window		名前を付けてページを保存…
@@ -23,10 +24,12 @@ Over %days left	Download Window		残り %days 日超
 Settings	Settings Window		設定
 Confirmation	WebPositive Window		確認
 Window	WebPositive Window		ウィンドウ
+Cookie manager	Cookie Manager		Cookie マネージャー
 Decrease size	WebPositive Window		縮小
 Serif font:	Settings Window		セリフフォント:
 Loading %url	WebPositive Window		読み込み中 %url
 Download aborted	Download Window		ダウンロードを中止しました
+Value	Cookie Manager		値
 Page source	WebPositive Window		ページのソース
 Next	WebPositive Window		次へ
 Find next	WebPositive Window		次を検索
@@ -42,16 +45,19 @@ Auto-hide mouse pointer	Settings Window		自動的にマウスポインターを
 Quit	WebPositive Window		終了
 Full screen	WebPositive Window		全画面表示
 Open download error	Download Window		ダウンロードを開く際にエラー
+The cookie jar is empty!	Cookie Manager		Cookie jar は空です!
 Standard font:	Settings Window		標準フォント:
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	文字列を前方へ検索
 Restart	Download Window		再開
 Proxy server	Settings Window		プロキシサーバー
 Open containing folder	Download Window		保存先のフォルダーを開く
 New window	WebPositive Window		新規ウィンドウ
+WebPositive	Download Window		WebPositive
 Open	Download Window		開く
 Reload	WebPositive Window		再読み込み
 Downloads	Download Window		ダウンロード
 Sans serif font:	Settings Window		サンセリフフォント:
+Delete	Cookie Manager		削除
 Forward	WebPositive Window		進む
 of	Download Window	...as in '12kB of 256kB'	/
 Revert	Settings Window		元に戻す
@@ -93,10 +99,12 @@ Find	WebPositive Window		検索
 Find previous	WebPositive Window		前を検索
 Settings	WebPositive Window		設定
 Script console	WebPositive Window		スクリプトコンソール
+Name	Cookie Manager		名前
 Proxy server address:	Settings Window		プロキシサーバーアドレス:
 Proxy server port:	Settings Window		プロキシサーバーポート:
 Bookmarks	WebPositive Window		ブックマーク
 Paste	URL Bar		貼り付け
+Cookie manager	WebPositive Window		Cookie マネージャー
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		パスワードテキストを隠す
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	古池や A frog jumps in, 水の音。
@@ -104,9 +112,11 @@ Over 1 minute left	Download Window		残り 1 分超
 Open start page	Settings Window		スタートページを開く
 Continue downloads	WebPositive		ダウンロードを続ける
 Cancel	Download Window		中止
+Flags	Cookie Manager		フラグ
 Open search page	Settings Window		検索ページを開く
 Clear	Console Window		クリア
 Password:	Authentication Panel		パスワード:
+Path	Cookie Manager		パス
 Back	WebPositive Window		戻る
 New browser window	Download Window		新規ブラウザウィンドウ
 Today	WebPositive Window		今日
@@ -133,6 +143,7 @@ Open bookmarks confirmation	WebPositive Window		ブックマークを開く確�
 Remove missing	Download Window		Remove missing
 Clone current page	Settings Window		現在のページを複製
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	一度に %addedCount 個のブックマークを開きますか?
+Session cookie	Cookie Manager		セッション cookie
 OK	Authentication Panel		OK
 Copy	URL Bar		コピー
 Download finished	Download Window		ダウンロードが完了しました
@@ -140,6 +151,7 @@ Show bookmark bar	WebPositive Window		ブックマークバーを表示
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		ブックマークを管理
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	このページ (%bookmarkName) のブックマークはすでにあります。
+Cookies for %s	Cookie Manager		%s 用の cookie
 New windows:	Settings Window		新規ウィンドウ:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url 完了。
 Remove finished	Download Window		Remove finished

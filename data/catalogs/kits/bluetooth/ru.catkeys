@@ -9,7 +9,7 @@ Rendering	DeviceClass		Рендеринг
 Phone	DeviceClass		Телефон
 17-33% utilized	DeviceClass		Использовано 17-33%
 #ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady# Неправильное имя
-Combo keyboard/pointing device	DeviceClass		Клавиатура\указывающее устройство
+Combo keyboard/pointing device	DeviceClass		Комбинированная клавиатура/указывающее устройство
 Controller	DeviceClass		Контроллер
 No service available	DeviceClass		Сервисы не найдены
 Wearable	DeviceClass	A wearable computer	Переносной

@@ -6,7 +6,7 @@
 #define _KERNEL_ARCH_ELF_H
 
 
-#include <elf_common.h>
+#include <elf_private.h>
 
 
 struct elf_image_info;

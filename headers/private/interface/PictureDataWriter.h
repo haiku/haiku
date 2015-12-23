@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2007 Haiku, Inc. All rights reserved.
+ * Copyright 2006-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stefano Ceccherini, burton666@libero.it
+ *		Julian Harnath, <julian.harnath@rwth-achen.de>
  */
 #ifndef _PICTURE_DATA_WRITER_H
 #define _PICTURE_DATA_WRITER_H
@@ -17,6 +18,7 @@
 #include <stack>
 
 
+class Layer;
 class BPositionIO;
 class BRegion;
 
@@ -39,6 +41,9 @@ public:
 									const float& miterLimit);
 			status_t			WriteSetScale(const float& scale);
 			status_t			WriteSetTransform(BAffineTransform transform);
+			status_t			WriteTranslateBy(double x, double y);
+			status_t			WriteScaleBy(double x, double y);
+			status_t			WriteRotateBy(double angleRadians);
 			status_t			WriteSetPattern(const ::pattern& pattern);
 			status_t			WriteClipToPicture(int32 pictureToken,
 									const BPoint& origin, bool inverse);
@@ -92,6 +97,13 @@ public:
 
 			status_t			WriteDrawPicture(const BPoint& where,
 									const int32& token);
+
+			status_t			WriteBlendLayer(Layer* layer);
+			status_t			WriteClipToRect(const BRect& rect,
+									bool inverse);
+			status_t			WriteClipToShape(int32 opCount,
+									const void* opList, int32 ptCount,
+									const void* ptList, bool inverse);
 
 protected:
 	// throw a status_t on error

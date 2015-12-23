@@ -118,8 +118,8 @@ void
 WizardView::_BuildUI()
 {
 	fPageContainer = new BGroupView("page container");
-	fPageContainer->GroupLayout()->SetInsets(B_USE_DEFAULT_SPACING,
-		B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING);
+	fPageContainer->GroupLayout()->SetInsets(B_USE_WINDOW_SPACING,
+		B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING);
 	fPrevious = new BButton("previous",
 		B_TRANSLATE_COMMENT("Previous", "Button"),
 		new BMessage(kMessagePrevious));
@@ -132,8 +132,8 @@ WizardView::_BuildUI()
 		.Add(fPageContainer)
 		.Add(new BSeparatorView(B_HORIZONTAL))
 		.AddGroup(B_HORIZONTAL)
-			.SetInsets(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING)
 			.Add(quit)
 			.AddGlue()
 			.Add(fPrevious)

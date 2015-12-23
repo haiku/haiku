@@ -363,10 +363,98 @@ PlaylistListView::KeyDown(const char* bytes, int32 numBytes)
 	if (numBytes < 1)
 		return;
 
-	if ((bytes[0] == B_BACKSPACE) || (bytes[0] == B_DELETE))
-		RemoveSelected();
+	BMessage* msg = Window()->CurrentMessage();
+	uint32 modifier = msg->FindInt32("modifiers");
 
-	DragSortableListView::KeyDown(bytes, numBytes);
+	int32 count;
+	int32 index;
+
+	switch (bytes[0]) {
+		case B_SPACE:
+			fController->TogglePlaying();
+			break;
+
+		case B_BACKSPACE:
+		case B_DELETE:
+			RemoveSelected();
+			break;
+
+		case B_ENTER:
+			count = CountItems();
+			if (count == 0)
+				break;
+			index = CurrentSelection(0);
+			if (index < 0)
+				break;
+			fPlaylist->SetCurrentItemIndex(index, true);
+			fController->Play();
+			break;
+
+		case B_ESCAPE:
+			fController->Stop();
+			break;
+
+		case B_RIGHT_ARROW:
+			if ((modifier & B_SHIFT_KEY) != 0)
+				_Wind(30000000LL, 5);
+			else
+				_Wind(5000000LL, 1);
+			break;
+
+		case B_LEFT_ARROW:
+			if ((modifier & B_SHIFT_KEY) != 0)
+				_Wind(-30000000LL, -5);
+			else
+				_Wind(-5000000LL, -1);
+			break;
+		default:
+			DragSortableListView::KeyDown(bytes, numBytes);
+	}
+}
+
+
+void
+PlaylistListView::SkipBackward()
+{
+	BAutolock _(fPlaylist);
+	int32 index = fPlaylist->CurrentItemIndex() - 1;
+	if (index < 0)
+		index = 0;
+	fPlaylist->SetCurrentItemIndex(index, true);
+}
+
+
+void
+PlaylistListView::SkipForward()
+{
+	BAutolock _(fPlaylist);
+	int32 index = fPlaylist->CurrentItemIndex() + 1;
+	if (index >= fPlaylist->CountItems())
+		index = fPlaylist->CountItems() - 1;
+	fPlaylist->SetCurrentItemIndex(index, true);
+}
+
+
+void
+PlaylistListView::_Wind(bigtime_t howMuch, int64 frames)
+{
+	if (!fController->Lock())
+		return;
+
+	if (frames != 0 && !fController->IsPlaying()) {
+		int64 newFrame = fController->CurrentFrame() + frames;
+		fController->SetFramePosition(newFrame);
+	} else {
+		bigtime_t seekTime = fController->TimePosition() + howMuch;
+		if (seekTime < 0) {
+			SkipBackward();
+		} else if (seekTime > fController->TimeDuration()) {
+			SkipForward();
+		} else
+			fController->SetTimePosition(seekTime);
+	}
+
+	fController->Unlock();
 }
 
 

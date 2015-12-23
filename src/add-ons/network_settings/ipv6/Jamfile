@@ -6,6 +6,8 @@ UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] : false ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons network_settings ipv4 ] ;
 
+AddResources IPv6Interface : IPv6Interface.rdef ;
+
 Addon IPv6Interface :
 	IPv6InterfaceAddOn.cpp
 

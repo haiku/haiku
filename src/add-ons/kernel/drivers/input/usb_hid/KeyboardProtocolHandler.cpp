@@ -671,6 +671,12 @@ KeyboardProtocolHandler::_ReadReport(bigtime_t timeout, uint32 *cookie)
 		0x6a,	// Yen (macron key, japanese)
 		0x6d,	// Henkan, first key right to spacebar, japanese
 		0x6c,	// Muhenkan, key left to spacebar, japanese
+		0x00,	// Keyboard International6 unmapped
+		0x00,	// Keyboard International7 unmapped
+		0x00,	// Keyboard International8 unmapped
+		0x00,	// Keyboard International9 unmapped
+		0xf0,	// Hangul, korean, Kana, Mac japanese USB
+		0xf1,	// Hangul_Hanja, korean, Eisu, Mac japanese USB
 	};
 
 	static const size_t kKeyTableSize

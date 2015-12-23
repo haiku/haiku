@@ -49,10 +49,13 @@ public:
 			void				RemoveToTrash(int32 index);
 			void				RemoveItemList(const BList& indices,
 									bool intoTrash);
+	virtual	void				SkipBackward();
+	virtual	void				SkipForward();
 
 private:
 	class Item;
 
+			void				_Wind(bigtime_t howMuch, int64 frames);
 			void				_FullSync();
 			void				_AddItem(PlaylistItem* item, int32 index);
 			void				_RemoveItem(int32 index);

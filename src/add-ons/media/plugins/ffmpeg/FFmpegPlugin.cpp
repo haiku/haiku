@@ -156,6 +156,20 @@ FFmpegPlugin::NewEncoder(const media_codec_info& codecInfo)
 }
 
 
+Encoder*
+FFmpegPlugin::NewEncoder(const media_format& format)
+{
+	for (size_t i = 0; i < gEncoderCount; i++) {
+		if (format.type == gEncoderTable[i].output_type) {
+			return new(std::nothrow)AVCodecEncoder(
+				gEncoderTable[i].codec_info.sub_id,
+				gEncoderTable[i].bit_rate_scale);
+		}
+	}
+	return NULL;
+}
+
+
 status_t
 FFmpegPlugin::RegisterNextEncoder(int32* cookie, media_codec_info* _codecInfo,
 	media_format_family* _formatFamily, media_format* _inputFormat,

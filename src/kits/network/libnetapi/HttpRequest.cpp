@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 Haiku Inc. All rights reserved.
+ * Copyright 2010-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -23,6 +23,7 @@
 #include <Debug.h>
 #include <DynamicBuffer.h>
 #include <File.h>
+#include <ProxySecureSocket.h>
 #include <Socket.h>
 #include <SecureSocket.h>
 #include <StackOrHeapArray.h>
@@ -32,33 +33,66 @@
 static const int32 kHttpBufferSize = 4096;
 
 
-class CheckedSecureSocket: public BSecureSocket
-{
-public:
-					CheckedSecureSocket(BHttpRequest* request);
+namespace BPrivate {
 
-	bool			CertificateVerificationFailed(BCertificate& certificate,
-						const char* message);
+	class CheckedSecureSocket: public BSecureSocket
+	{
+		public:
+			CheckedSecureSocket(BHttpRequest* request);
 
-private:
-	BHttpRequest*	fRequest;
+			bool			CertificateVerificationFailed(BCertificate& certificate,
+					const char* message);
+
+		private:
+			BHttpRequest*	fRequest;
+	};
+
+
+	CheckedSecureSocket::CheckedSecureSocket(BHttpRequest* request)
+		:
+		BSecureSocket(),
+		fRequest(request)
+	{
+	}
+
+
+	bool
+	CheckedSecureSocket::CertificateVerificationFailed(BCertificate& certificate,
+		const char* message)
+	{
+		return fRequest->_CertificateVerificationFailed(certificate, message);
+	}
+
+
+	class CheckedProxySecureSocket: public BProxySecureSocket
+	{
+		public:
+			CheckedProxySecureSocket(const BNetworkAddress& proxy, BHttpRequest* request);
+
+			bool			CertificateVerificationFailed(BCertificate& certificate,
+					const char* message);
+
+		private:
+			BHttpRequest*	fRequest;
+	};
+
+
+	CheckedProxySecureSocket::CheckedProxySecureSocket(const BNetworkAddress& proxy,
+		BHttpRequest* request)
+		:
+		BProxySecureSocket(proxy),
+		fRequest(request)
+	{
+	}
+
+
+	bool
+	CheckedProxySecureSocket::CertificateVerificationFailed(BCertificate& certificate,
+		const char* message)
+	{
+		return fRequest->_CertificateVerificationFailed(certificate, message);
+	}
 };
-
-
-CheckedSecureSocket::CheckedSecureSocket(BHttpRequest* request)
-	:
-	BSecureSocket(),
-	fRequest(request)
-{
-}
-
-
-bool
-CheckedSecureSocket::CertificateVerificationFailed(BCertificate& certificate,
-	const char* message)
-{
-	return fRequest->_CertificateVerificationFailed(certificate, message);
-}
 
 
 BHttpRequest::BHttpRequest(const BUrl& url, bool ssl, const char* protocolName,
@@ -488,9 +522,13 @@ BHttpRequest::_MakeRequest()
 {
 	delete fSocket;
 
-	if (fSSL)
-		fSocket = new(std::nothrow) CheckedSecureSocket(this);
-	else
+	if (fSSL) {
+		if (fContext->UseProxy()) {
+			BNetworkAddress proxy(fContext->GetProxyHost(), fContext->GetProxyPort());
+			fSocket = new(std::nothrow) BPrivate::CheckedProxySecureSocket(proxy, this);
+		} else
+			fSocket = new(std::nothrow) BPrivate::CheckedSecureSocket(this);
+	} else
 		fSocket = new(std::nothrow) BSocket();
 
 	if (fSocket == NULL)
@@ -809,7 +847,7 @@ BHttpRequest::_SendRequest()
 			request << ':' << Url().Port();
 	}
 
-	if (Url().HasPath())
+	if (Url().HasPath() && Url().Path().Length() > 0)
 		request << Url().Path();
 	else
 		request << '/';
@@ -1083,9 +1121,14 @@ bool
 BHttpRequest::_CertificateVerificationFailed(BCertificate& certificate,
 	const char* message)
 {
-	if (fListener != NULL) {
-		return fListener->CertificateVerificationFailed(this, certificate,
-			message);
+	if (fContext->HasCertificateException(certificate))
+		return true;
+
+	if (fListener != NULL
+		&& fListener->CertificateVerificationFailed(this, certificate, message)) {
+		// User asked us to continue anyway, let's add a temporary exception for this certificate
+		fContext->AddCertificateException(certificate);
+		return true;
 	}
 
 	return false;

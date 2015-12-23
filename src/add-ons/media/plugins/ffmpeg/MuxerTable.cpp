@@ -175,6 +175,20 @@ const media_file_format gMuxerTable[] = {
 		{ 0 }
 	},
 	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_RAW_AUDIO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_QUICKTIME_FORMAT_FAMILY,
+		50,
+		{ 0 },
+		"audio/mp4",
+		"AAC in MPEG4 container",
+		"aac",
+		"aac",
+		{ 0 }
+	},
+	{
 		media_file_format::B_WRITABLE | media_file_format::B_READABLE
 			| media_file_format::B_KNOWS_ENCODED_VIDEO
 			| media_file_format::B_KNOWS_ENCODED_AUDIO,
@@ -242,9 +256,23 @@ const media_file_format gMuxerTable[] = {
 		100,
 		{ 0 },
 		"audio/ogg",
-		"Ogg (Xiph.Org Foundation)",
+		"Ogg Audio (Xiph.Org Foundation)",
 		"ogg",
 		"ogg",
+		{ 0 }
+	},
+	{
+		media_file_format::B_WRITABLE | media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MISC_FORMAT_FAMILY,
+		50,
+		{ 0 },
+		"video/ogg",
+		"Ogg Video (Xiph.Org Foundation)",
+		"ogv",
+		"ogv",
 		{ 0 }
 	},
 	{
@@ -314,6 +342,20 @@ const media_file_format gMuxerTable[] = {
 		{ 0 },
 		"video/webm",
 		"WebM movie",
+		"webm",
+		"webm",
+		{ 0 }
+	},
+	{
+		media_file_format::B_READABLE
+			| media_file_format::B_KNOWS_ENCODED_VIDEO
+			| media_file_format::B_KNOWS_ENCODED_AUDIO,
+		{ 0 },
+		B_MISC_FORMAT_FAMILY,
+		50,
+		{ 0 },
+		"audio/webm",
+		"WebM audio",
 		"webm",
 		"webm",
 		{ 0 }

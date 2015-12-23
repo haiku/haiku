@@ -73,6 +73,63 @@ __cxa_finalize(void* dsoHandle)
 
 // full C++ support in the kernel
 #if (defined(_KERNEL_MODE) || defined(_LOADER_MODE))
+void *
+operator new(size_t size) throw (std::bad_alloc)
+{
+	// we don't actually throw any exceptions, but we have to
+	// keep the prototype as specified in <new>, or else GCC 3
+	// won't like us
+	return malloc(size);
+}
+
+
+void *
+operator new[](size_t size) throw (std::bad_alloc)
+{
+	return malloc(size);
+}
+
+
+void *
+operator new(size_t size, const std::nothrow_t &) throw ()
+{
+	return malloc(size);
+}
+
+
+void *
+operator new[](size_t size, const std::nothrow_t &) throw ()
+{
+	return malloc(size);
+}
+
+
+void *
+operator new(size_t size, const mynothrow_t &) throw ()
+{
+	return malloc(size);
+}
+
+
+void *
+operator new[](size_t size, const mynothrow_t &) throw ()
+{
+	return malloc(size);
+}
+
+
+void
+operator delete(void *ptr) throw ()
+{
+	free(ptr);
+}
+
+
+void
+operator delete[](void *ptr) throw ()
+{
+	free(ptr);
+}
 
 #ifndef _BOOT_MODE
 

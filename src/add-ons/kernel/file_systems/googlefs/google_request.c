@@ -30,12 +30,12 @@
 
 #define TESTURL "http://www.google.com/search?hl=en&ie=UTF-8&num=50&q=beos"
 //#define BASEURL "http://www.google.com/search?hl=en&ie=UTF-8&num=50&q="
-#define BASEURL "/search?hl=en&ie=UTF-8&oe=UTF-8"
+#define BASEURL "/search?hl=en&ie=UTF-8&oe=UTF-8&gws_rd=cr"
 #define FMT_NUM "&num=%u"
 #define FMT_Q "&q=%s"
 
 /* parse_google_html.c */
-extern int google_parse_results(const char *html, size_t htmlsize, struct google_result **results);
+extern int google_parse_results(const char *html, size_t htmlsize, long *nextid, struct google_result **results);
 
 // move that to ksocket inlined
 static int kinet_aton(const char *in, struct in_addr *addr)
@@ -150,7 +150,7 @@ status_t google_request_process(struct google_request *req)
 		close(fd);
 	}
 #endif /* FAKE_INPUT */	
-	err = count = google_parse_results(req->cnx->data, req->cnx->datalen, &req->results);
+	err = count = google_parse_results(req->cnx->data, req->cnx->datalen, &req->nextid, &req->results);
 	if (err < 0)
 		goto err_get;
 #ifdef DO_PUBLISH

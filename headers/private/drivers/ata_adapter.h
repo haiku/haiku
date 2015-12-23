@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2005-2015, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2002-04, Thomas Kurschel. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -7,8 +7,8 @@
 #ifndef _ATA_PCI_H
 #define _ATA_PCI_H
 
-/*
-	ATA adapter library
+
+/*!	ATA adapter library
 
 	Module to simplify writing an ATA adapter driver.
 
@@ -29,7 +29,7 @@ typedef struct prd_entry {
 	uint32 address;				// physical address of block (must be even)
 	uint16 count;				// size of block, 0 stands for 65536 (must be even)
 	uint8 res6;
-	LBITFIELD8_2(
+	B_LBITFIELD8_2(
 		res7_0 : 7,
 		EOT : 1					// 1 for last entry
 	);

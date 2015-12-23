@@ -1062,7 +1062,7 @@ BPlusTree::_FindKey(const bplustree_node* node, const uint8* key,
 	for (int16 first = 0, last = node->NumKeys() - 1; first <= last;) {
 		uint16 i = (first + last) >> 1;
 
-		uint16 searchLength;
+		uint16 searchLength = 0;
 		uint8* searchKey = node->KeyAt(i, &searchLength);
 		if (searchKey + searchLength + sizeof(off_t) + sizeof(uint16)
 				> (uint8*)node + fNodeSize
@@ -2732,7 +2732,7 @@ TreeIterator::Traverse(int8 direction, void* key, uint16* keyLength,
 	if (node->all_key_count == 0)
 		RETURN_ERROR(B_ERROR);	// B_ENTRY_NOT_FOUND ?
 
-	uint16 length;
+	uint16 length = 0;
 	uint8* keyStart = node->KeyAt(fCurrentKey, &length);
 	if (keyStart + length + sizeof(off_t) + sizeof(uint16)
 			> (uint8*)node + fTree->fNodeSize
@@ -2991,7 +2991,7 @@ bplustree_node::CheckIntegrity(uint32 nodeSize) const
 		DEBUGGER(("invalid node: key/length count"));
 
 	for (int32 i = 0; i < NumKeys(); i++) {
-		uint16 length;
+		uint16 length = 0;
 		uint8* key = KeyAt(i, &length);
 		if (key + length + sizeof(off_t) + sizeof(uint16)
 				> (uint8*)this + nodeSize

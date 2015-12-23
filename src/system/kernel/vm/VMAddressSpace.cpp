@@ -42,6 +42,8 @@
 // #pragma mark - AddressSpaceHashDefinition
 
 
+namespace {
+
 struct AddressSpaceHashDefinition {
 	typedef team_id			KeyType;
 	typedef VMAddressSpace	ValueType;
@@ -68,6 +70,9 @@ struct AddressSpaceHashDefinition {
 };
 
 typedef BOpenHashTable<AddressSpaceHashDefinition> AddressSpaceTable;
+
+} // namespace
+
 
 static AddressSpaceTable	sAddressSpaceTable;
 static rw_lock				sAddressSpaceTableLock;

@@ -27,7 +27,7 @@ History	GrepWindow		Istoric
 New window	GrepWindow		Fereastră nouă
 Please select the files you wish to keep searching.	GrepWindow		Selectați fișierele pe care doriți să le căutați în continuare.
 TextSearch	GrepWindow		CăutareText
-Quit	GrepWindow		Părăsește
+Quit	GrepWindow		Închidere
 Show files in Tracker	GrepWindow		Afișează fișiere în Agentul de urmărire
 Case-sensitive	GrepWindow		Sensibil la majuscule
 Text files only	GrepWindow		Numai fișiere text

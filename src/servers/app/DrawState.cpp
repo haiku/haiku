@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
+ *		Julian Harnath <julian.harnath@rwth-aachen.de>
  */
 
 //!	Data classes for working with BView states and draw parameters
@@ -18,6 +19,7 @@
 #include <stdio.h>
 
 #include <Region.h>
+#include <ShapePrivate.h>
 
 #include "AlphaMask.h"
 #include "LinkReceiver.h"
@@ -46,6 +48,7 @@ DrawState::DrawState()
 	fDrawingMode(B_OP_COPY),
 	fAlphaSrcMode(B_PIXEL_ALPHA),
 	fAlphaFncMode(B_ALPHA_OVERLAY),
+	fDrawingModeLocked(false),
 
 	fPenLocation(0.0f, 0.0f),
 	fPenSize(1.0f),
@@ -80,6 +83,7 @@ DrawState::DrawState(const DrawState& other)
 	fDrawingMode(other.fDrawingMode),
 	fAlphaSrcMode(other.fAlphaSrcMode),
 	fAlphaFncMode(other.fAlphaFncMode),
+	fDrawingModeLocked(other.fDrawingModeLocked),
 
 	fPenLocation(other.fPenLocation),
 	fPenSize(other.fPenSize),
@@ -107,8 +111,6 @@ DrawState::~DrawState()
 {
 	delete fClippingRegion;
 	delete fPreviousState;
-	if (fAlphaMask != NULL)
-		fAlphaMask->ReleaseReference();
 }
 
 
@@ -211,7 +213,7 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 	ViewSetStateInfo info;
 
 	link.Read<ViewSetStateInfo>(&info);
-	
+
 	fPenLocation = info.penLocation;
 	fPenSize = info.penSize;
 	fHighColor = info.highColor;
@@ -369,6 +371,30 @@ DrawState::SetTransform(BAffineTransform transform)
 }
 
 
+/* Can be used to temporarily disable all BAffineTransforms in the state
+   stack, and later reenable them.
+*/
+void
+DrawState::SetTransformEnabled(bool enabled)
+{
+	if (enabled) {
+		BAffineTransform temp = fTransform;
+		SetTransform(BAffineTransform());
+		SetTransform(temp);
+	}
+	else
+		fCombinedTransform = BAffineTransform();
+}
+
+
+DrawState*
+DrawState::Squash() const
+{
+	DrawState* const squashedState = new(nothrow) DrawState(*this);
+	return squashedState->PushState();
+}
+
+
 void
 DrawState::SetClippingRegion(const BRegion* region)
 {
@@ -407,8 +433,9 @@ DrawState::GetCombinedClippingRegion(BRegion* region) const
 {
 	if (fClippingRegion != NULL) {
 		BRegion localTransformedClipping(*fClippingRegion);
-		Transform(&localTransformedClipping);
-
+		SimpleTransform penTransform;
+		Transform(penTransform);
+		penTransform.Apply(&localTransformedClipping);
 		if (fPreviousState != NULL
 			&& fPreviousState->GetCombinedClippingRegion(region)) {
 			localTransformedClipping.IntersectWith(region);
@@ -423,29 +450,93 @@ DrawState::GetCombinedClippingRegion(BRegion* region) const
 }
 
 
+bool
+DrawState::ClipToRect(BRect rect, bool inverse)
+{
+	if (!rect.IsValid())
+		return false;
+
+	if (!fCombinedTransform.IsIdentity()) {
+		if (fCombinedTransform.IsDilation()) {
+			BPoint points[2] = { rect.LeftTop(), rect.RightBottom() };
+			fCombinedTransform.Apply(&points[0], 2);
+			rect.Set(points[0].x, points[0].y, points[1].x, points[1].y);
+		} else {
+			uint32 ops[] = {
+				OP_MOVETO | OP_LINETO | 3,
+				OP_CLOSE
+			};
+			BPoint points[4] = {
+				BPoint(rect.left,  rect.top),
+				BPoint(rect.right, rect.top),
+				BPoint(rect.right, rect.bottom),
+				BPoint(rect.left,  rect.bottom)
+			};
+			shape_data rectShape;
+			rectShape.opList = &ops[0];
+			rectShape.opCount = 2;
+			rectShape.opSize = sizeof(uint32) * 2;
+			rectShape.ptList = &points[0];
+			rectShape.ptCount = 4;
+			rectShape.ptSize = sizeof(BPoint) * 4;
+
+			ClipToShape(&rectShape, inverse);
+			return true;
+		}
+	}
+
+	if (inverse) {
+		if (fClippingRegion == NULL) {
+			fClippingRegion = new(nothrow) BRegion(BRect(
+				-(1 << 16), -(1 << 16), (1 << 16), (1 << 16)));
+				// TODO: we should have a definition for a rect (or region)
+				// with "infinite" area. For now, this region size should do...
+		}
+		fClippingRegion->Exclude(rect);
+	} else {
+		if (fClippingRegion == NULL)
+			fClippingRegion = new(nothrow) BRegion(rect);
+		else {
+			BRegion rectRegion(rect);
+			fClippingRegion->IntersectWith(&rectRegion);
+		}
+	}
+
+	return false;
+}
+
+
+void
+DrawState::ClipToShape(shape_data* shape, bool inverse)
+{
+	if (shape->ptCount == 0)
+		return;
+
+	if (!fCombinedTransform.IsIdentity())
+		fCombinedTransform.Apply(shape->ptList, shape->ptCount);
+
+	AlphaMask* const mask = ShapeAlphaMask::Create(GetAlphaMask(), *shape,
+		BPoint(0, 0), inverse);
+
+	SetAlphaMask(mask);
+	if (mask != NULL)
+		mask->ReleaseReference();
+}
+
+
 void
 DrawState::SetAlphaMask(AlphaMask* mask)
 {
 	// NOTE: In BeOS, it wasn't possible to clip to a BPicture and keep
 	// regular custom clipping to a BRegion at the same time.
-	if (fAlphaMask == mask)
-		return;
-
-	if (mask != NULL)
-		mask->AcquireReference();
-	if (fAlphaMask != NULL)
-		fAlphaMask->ReleaseReference();
-	fAlphaMask = mask;
-	if (fAlphaMask != NULL && fPreviousState != NULL)
-		fAlphaMask->SetPrevious(fPreviousState->fAlphaMask);
-		
+	fAlphaMask.SetTo(mask);
 }
 
 
 AlphaMask*
 DrawState::GetAlphaMask() const
 {
-	return fAlphaMask;
+	return fAlphaMask.Get();
 }
 
 
@@ -453,83 +544,19 @@ DrawState::GetAlphaMask() const
 
 
 void
-DrawState::Transform(float* x, float* y) const
+DrawState::Transform(SimpleTransform& transform) const
 {
-	// scale relative to origin, therefore
-	// scale first then translate to
-	// origin
-	*x *= fCombinedScale;
-	*y *= fCombinedScale;
-	*x += fCombinedOrigin.x;
-	*y += fCombinedOrigin.y;
+	transform.AddOffset(fCombinedOrigin.x, fCombinedOrigin.y);
+	transform.SetScale(fCombinedScale);
 }
 
 
 void
-DrawState::InverseTransform(float* x, float* y) const
+DrawState::InverseTransform(SimpleTransform& transform) const
 {
-	*x -= fCombinedOrigin.x;
-	*y -= fCombinedOrigin.y;
-	if (fCombinedScale != 0.0) {
-		*x /= fCombinedScale;
-		*y /= fCombinedScale;
-	}
-}
-
-
-void
-DrawState::Transform(BPoint* point) const
-{
-	Transform(&(point->x), &(point->y));
-}
-
-
-void
-DrawState::Transform(BRect* rect) const
-{
-	Transform(&(rect->left), &(rect->top));
-	Transform(&(rect->right), &(rect->bottom));
-}
-
-
-void
-DrawState::Transform(BRegion* region) const
-{
-	if (fCombinedScale == 1.0) {
-		region->OffsetBy(fCombinedOrigin.x, fCombinedOrigin.y);
-	} else {
-		// TODO: optimize some more
-		BRegion converted;
-		int32 count = region->CountRects();
-		for (int32 i = 0; i < count; i++) {
-			BRect r = region->RectAt(i);
-			BPoint lt(r.LeftTop());
-			BPoint rb(r.RightBottom());
-			// offset to bottom right corner of pixel before transformation
-			rb.x++;
-			rb.y++;
-			// apply transformation
-			Transform(&lt.x, &lt.y);
-			Transform(&rb.x, &rb.y);
-			// reset bottom right to pixel "index"
-			rb.x--;
-			rb.y--;
-			// add rect to converted region
-			// NOTE/TODO: the rect would not have to go
-			// through the whole intersection test process,
-			// it is guaranteed not to overlap with any rect
-			// already contained in the region
-			converted.Include(BRect(lt, rb));
-		}
-		*region = converted;
-	}
-}
-
-
-void
-DrawState::InverseTransform(BPoint* point) const
-{
-	InverseTransform(&(point->x), &(point->y));
+	transform.AddOffset(-fCombinedOrigin.x, -fCombinedOrigin.y);
+	if (fCombinedScale != 0.0)
+		transform.SetScale(1.0 / fCombinedScale);
 }
 
 
@@ -557,19 +584,35 @@ DrawState::SetPattern(const Pattern& pattern)
 }
 
 
-void
+bool
 DrawState::SetDrawingMode(drawing_mode mode)
 {
-	fDrawingMode = mode;
+	if (!fDrawingModeLocked) {
+		fDrawingMode = mode;
+		return true;
+	}
+	return false;
+}
+
+
+bool
+DrawState::SetBlendingMode(source_alpha srcMode, alpha_function fncMode)
+{
+	if (!fDrawingModeLocked) {
+		fAlphaSrcMode = srcMode;
+		fAlphaFncMode = fncMode;
+		return true;
+	}
+	return false;
 }
 
 
 void
-DrawState::SetBlendingMode(source_alpha srcMode, alpha_function fncMode)
+DrawState::SetDrawingModeLocked(bool locked)
 {
-	fAlphaSrcMode = srcMode;
-	fAlphaFncMode = fncMode;
+	fDrawingModeLocked = locked;
 }
+
 
 
 void

@@ -61,6 +61,15 @@ SudokuView::SudokuView(BRect frame, const char* name,
 }
 
 
+SudokuView::SudokuView(const char* name, const BMessage& settings)
+	:
+	BView(name,
+		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
+{
+	_InitObject(&settings);
+}
+
+
 SudokuView::SudokuView(BMessage* archive)
 	:
 	BView(archive)

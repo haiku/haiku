@@ -1,0 +1,21 @@
+SubDir HAIKU_TOP src add-ons disk_systems fat ;
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders shared storage ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems fat ] ;
+
+AddResources <disk_system>fat : FATAddOn.rdef ;
+
+Addon <disk_system>fat :
+	FATAddOn.cpp
+	InitializeParameterEditor.cpp
+
+	: be localestub [ TargetLibsupc++ ] libshared.a
+;
+
+DoCatalogs <disk_system>fat :
+	x-vnd.Haiku-FATAddOn
+	:
+	InitializeParameterEditor.cpp
+;

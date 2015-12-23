@@ -176,6 +176,9 @@ is_app_showing_modal_window(team_id team)
 }
 
 
+#ifndef HAIKU_TARGET_PLATFORM_LIBBE_TEST
+
+
 /*!	Creates a connection with the desktop.
 */
 status_t
@@ -206,6 +209,63 @@ create_desktop_connection(ServerLink* link, const char* name, int32 capacity)
 	link->SetSenderPort(desktopPort);
 	return B_OK;
 }
+
+
+#else // HAIKU_TARGET_PLATFORM_LIBBE_TEST
+
+
+static port_id sServerPort = -1;
+
+
+port_id
+get_app_server_port()
+{
+	if (sServerPort < 0) {
+		// No need for synchronization - in the worst case, we'll call
+		// find_port() twice.
+		sServerPort = find_port(SERVER_PORT_NAME);
+	}
+
+	return sServerPort;
+}
+
+
+/*! Creates a connection with the desktop.
+*/
+status_t
+create_desktop_connection(ServerLink* link, const char* name, int32 capacity)
+{
+	port_id serverPort = get_app_server_port();
+	if (serverPort < 0)
+		return serverPort;
+
+	// Create the port so that the app_server knows where to send messages
+	port_id clientPort = create_port(capacity, name);
+	if (clientPort < 0)
+		return clientPort;
+
+	link->SetTo(serverPort, clientPort);
+
+	link->StartMessage(AS_GET_DESKTOP);
+	link->Attach<port_id>(clientPort);
+	link->Attach<int32>(getuid());
+	link->AttachString(getenv("TARGET_SCREEN"));
+	link->Attach<int32>(AS_PROTOCOL_VERSION);
+
+	int32 code;
+	if (link->FlushWithReply(code) != B_OK || code != B_OK) {
+		link->SetSenderPort(-1);
+		return B_ERROR;
+	}
+
+	link->Read<port_id>(&serverPort);
+	link->SetSenderPort(serverPort);
+
+	return B_OK;
+}
+
+
+#endif // HAIKU_TARGET_PLATFORM_LIBBE_TEST
 
 
 } // namespace BPrivate

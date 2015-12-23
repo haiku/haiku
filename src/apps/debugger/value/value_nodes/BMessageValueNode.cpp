@@ -504,9 +504,8 @@ BMessageValueNode::_GetTypeForTypeCode(TeamTypeInformation* info,
 
 		case B_POINTER_TYPE:
 		default:
-			typeName = "";
+			typeName = "void*";
 			constraints.SetTypeKind(TYPE_ADDRESS);
-			constraints.SetBaseTypeName("void");
 			break;
 	}
 

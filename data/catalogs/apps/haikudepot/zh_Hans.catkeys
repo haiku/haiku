@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	4261904725
+1	english	x-vnd.Haiku-HaikuDepot	2365524674
 Name	PackageListView		名称
 Available packages	MainWindow		可用软件包
 Open %DeskbarLink%	PackageManager		打开 %DeskbarLink%
@@ -84,7 +84,9 @@ Productivity	Model		生产力
 No, quit HaikuDepot	App		否，强制退出 HaikuDepot
 Authentication failed	UserLoginWindow		认证失败
 Logged in as %User%	MainWindow		登录 as %User%
+9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		语言
+Size	PackageListView		大小
 Failed to create or update rating: %s\n	RatePackageWindow		无法创建或更新评分: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		在对软件包进行评级之前，您需要进行账户登录。
  It responded with: 	RatePackageWindow		 回复内容为： 
@@ -135,6 +137,7 @@ Cancel	RatePackageWindow		取消
 Package action failed	PackageInfoView		软件包操作失败
 OK	UserLoginWindow		确定
 Send	RatePackageWindow		发送
+-	no package size		-
 Category:	FilterView		分类:
 Failed to create account	UserLoginWindow		账户创建失败
 There are problems with the data you entered:\n\n	UserLoginWindow		您所输入的数据存在问题：\n\n

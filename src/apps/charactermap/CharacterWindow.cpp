@@ -228,11 +228,10 @@ CharacterWindow::CharacterWindow()
 	fCharacterView->SetExplicitMinSize(BSize(viewFont.StringWidth("w") * 40,
 		B_SIZE_UNSET));
 
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(menuBar)
 		.AddGroup(B_HORIZONTAL)
-			.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING)
+			.SetInsets(B_USE_WINDOW_SPACING)
 			.AddGroup(B_VERTICAL)
 				.AddGroup(B_HORIZONTAL)
 					.Add(fFilterControl)

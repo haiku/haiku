@@ -4,6 +4,8 @@ UsePublicHeaders [ FDirName add-ons network_settings ] ;
 UsePrivateHeaders shared ;
 UseHeaders [ FDirName $(HAIKU_TOP) src preferences network ] : false ;
 
+AddResources IPv4Interface : IPv4Interface.rdef ;
+
 Addon IPv4Interface :
 	IPv4InterfaceAddOn.cpp
 

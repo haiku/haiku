@@ -26,11 +26,18 @@ namespace BPrivate {
 enum {
 	B_GET_LAUNCH_DATA			= 'lnda',
 	B_LAUNCH_TARGET				= 'lntg',
+	B_LAUNCH_JOB				= 'lnjo',
+	B_STOP_LAUNCH_JOB			= 'lnsj',
 	B_LAUNCH_SESSION			= 'lnse',
 	B_REGISTER_SESSION_DAEMON	= 'lnrs',
 	B_REGISTER_LAUNCH_EVENT		= 'lnre',
 	B_UNREGISTER_LAUNCH_EVENT	= 'lnue',
 	B_NOTIFY_LAUNCH_EVENT		= 'lnne',
+	B_RESET_STICKY_LAUNCH_EVENT	= 'lnRe',
+	B_GET_LAUNCH_TARGETS		= 'lngt',
+	B_GET_LAUNCH_JOBS			= 'lngj',
+	B_GET_LAUNCH_TARGET_INFO	= 'lntI',
+	B_GET_LAUNCH_JOB_INFO		= 'lnjI',
 };
 
 

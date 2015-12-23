@@ -16,6 +16,7 @@
 #include <string.h>
 
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <GridLayoutBuilder.h>
 #include <GroupLayoutBuilder.h>
 #include <Locale.h>
@@ -71,7 +72,7 @@ FontView::FontView(const char* name)
 	fMenuView = new FontSelectionView("menu", B_TRANSLATE("Menu font:"));
 
 	BGridLayout* layout = new BGridLayout(5, 5);
-	layout->SetInsets(10, 10, 10, 10);
+	layout->SetInsets(B_USE_WINDOW_SPACING);
 	SetLayout(layout);
 
 	int32 row = 0;

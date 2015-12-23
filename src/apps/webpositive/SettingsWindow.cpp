@@ -11,6 +11,7 @@
 #include <GridLayoutBuilder.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <MenuItem.h>
 #include <MenuField.h>
@@ -81,8 +82,6 @@ SettingsWindow::SettingsWindow(BRect frame, SettingsMessage* settings)
 			| B_ASYNCHRONOUS_CONTROLS | B_NOT_ZOOMABLE),
 	fSettings(settings)
 {
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	fApplyButton = new BButton(B_TRANSLATE("Apply"), new BMessage(MSG_APPLY));
 	fCancelButton = new BButton(B_TRANSLATE("Cancel"),
 		new BMessage(MSG_CANCEL));
@@ -92,17 +91,19 @@ SettingsWindow::SettingsWindow(BRect frame, SettingsMessage* settings)
 	float spacing = be_control_look->DefaultItemSpacing();
 
 	BTabView* tabView = new BTabView("settings pages", B_WIDTH_FROM_LABEL);
+	tabView->SetBorder(B_NO_BORDER);
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, spacing)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0, B_USE_DEFAULT_SPACING, 0, B_USE_WINDOW_SPACING)
 		.Add(tabView)
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL, spacing)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, 0)
 			.Add(fRevertButton)
 			.AddGlue()
 			.Add(fCancelButton)
-			.Add(fApplyButton)
-		)
-		.SetInsets(spacing, spacing, spacing, spacing)
-	);
+			.Add(fApplyButton);
 
 	tabView->AddTab(_CreateGeneralPage(spacing));
 	tabView->AddTab(_CreateFontsPage(spacing));
@@ -331,7 +332,7 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 		new BMessage(MSG_SHOW_HOME_BUTTON_CHANGED));
 	fShowHomeButton->SetValue(B_CONTROL_ON);
 
-	BView* view = BGroupLayoutBuilder(B_VERTICAL, spacing / 2)
+	BView* view = BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(BGridLayoutBuilder(spacing / 2, spacing / 2)
 			.Add(fStartPageControl->CreateLabelLayoutItem(), 0, 0)
 			.Add(fStartPageControl->CreateTextViewLayoutItem(), 1, 0)
@@ -355,10 +356,11 @@ SettingsWindow::_CreateGeneralPage(float spacing)
 		.Add(fAutoHideInterfaceInFullscreenMode)
 		.Add(fAutoHidePointer)
 		.Add(fShowHomeButton)
-		.Add(fDaysInHistory)
 		.Add(BSpaceLayoutItem::CreateHorizontalStrut(spacing))
+		.Add(fDaysInHistory)
 
-		.SetInsets(spacing, spacing, spacing, spacing)
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 
 		.TopView()
 	;
@@ -417,7 +419,8 @@ SettingsWindow::_CreateFontsPage(float spacing)
 		.Add(fFixedSizesMenu->CreateLabelLayoutItem(), 0, 13)
 		.Add(fFixedSizesMenu->CreateMenuBarLayoutItem(), 1, 13)
 
-		.SetInsets(spacing, spacing, spacing, spacing)
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 
 		.View()
 	;
@@ -449,7 +452,7 @@ SettingsWindow::_CreateProxyPage(float spacing)
 	fProxyPortControl->SetModificationMessage(
 		new BMessage(MSG_PROXY_PORT_CHANGED));
 	fProxyPortControl->SetText(
-		fSettings->GetValue(kSettingsKeyProxyAddress, ""));
+		fSettings->GetValue(kSettingsKeyProxyPort, ""));
 
 	fUseProxyAuthCheckBox = new BCheckBox("use authentication",
 		B_TRANSLATE("Proxy server requires authentication"),
@@ -473,7 +476,7 @@ SettingsWindow::_CreateProxyPage(float spacing)
 	fProxyPasswordControl->SetText(
 		fSettings->GetValue(kSettingsKeyProxyPassword, ""));
 
-	BView* view = BGroupLayoutBuilder(B_VERTICAL, spacing / 2)
+	BView* view = BGroupLayoutBuilder(B_VERTICAL, 0)
 		.Add(fUseProxyCheckBox)
 		.Add(BGridLayoutBuilder(spacing / 2, spacing / 2)
 			.Add(fProxyAddressControl->CreateLabelLayoutItem(), 0, 0)
@@ -482,6 +485,7 @@ SettingsWindow::_CreateProxyPage(float spacing)
 			.Add(fProxyPortControl->CreateLabelLayoutItem(), 0, 1)
 			.Add(fProxyPortControl->CreateTextViewLayoutItem(), 1, 1)
 		)
+		.Add(BSpaceLayoutItem::CreateVerticalStrut(spacing))
 		.Add(fUseProxyAuthCheckBox)
 		.Add(BGridLayoutBuilder(spacing / 2, spacing / 2)
 			.Add(fProxyUsernameControl->CreateLabelLayoutItem(), 0, 0)
@@ -492,7 +496,8 @@ SettingsWindow::_CreateProxyPage(float spacing)
 		)
 		.Add(BSpaceLayoutItem::CreateGlue())
 
-		.SetInsets(spacing, spacing, spacing, spacing)
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING)
 
 		.TopView()
 	;

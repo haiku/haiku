@@ -38,6 +38,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli commands ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui expression_eval_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui inspector_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_window ] ;
@@ -266,6 +267,9 @@ local sources =
 	# user_interface/gui/model
 	VariablesViewState.cpp
 	VariablesViewStateHistory.cpp
+
+	# user_interface/gui/expression_eval_window
+	ExpressionEvaluationWindow.cpp
 
 	# user_interface/gui/inspector_window
 	InspectorWindow.cpp

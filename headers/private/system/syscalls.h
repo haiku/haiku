@@ -8,7 +8,7 @@
 
 #include <arch_config.h>
 #include <DiskDeviceDefs.h>
-#include <elf_common.h>
+#include <elf_private.h>
 #include <image.h>
 #include <OS.h>
 

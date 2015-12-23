@@ -29,6 +29,8 @@ enum {
 	B_PIC_PUSH_STATE			= 0x0203,
 	B_PIC_POP_STATE				= 0x0204,
 	B_PIC_CLEAR_CLIPPING_RECTS	= 0x0205,
+	B_PIC_CLIP_TO_RECT			= 0x0206,
+	B_PIC_CLIP_TO_SHAPE			= 0x0207,
 
 	B_PIC_SET_ORIGIN			= 0x0300,
 	B_PIC_SET_PEN_LOCATION		= 0x0301,
@@ -52,10 +54,14 @@ enum {
 	B_PIC_SET_FONT_BPP			= 0x0388,
 	B_PIC_SET_FONT_FACE			= 0x0389,
 	B_PIC_SET_TRANSFORM			= 0x0390,
+	B_PIC_AFFINE_TRANSLATE      = 0x0391,
+	B_PIC_AFFINE_SCALE          = 0x0392,
+	B_PIC_AFFINE_ROTATE         = 0x0393,
+	B_PIC_BLEND_LAYER			= 0x0394
 };
 
 
-const static uint32 kOpsTableSize = 49;
+const static uint32 kOpsTableSize = 50;
 
 
 #endif

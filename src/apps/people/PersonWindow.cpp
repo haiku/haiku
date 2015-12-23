@@ -45,7 +45,7 @@ PersonWindow::PersonWindow(BRect frame, const char* title,
 		const char* nameAttribute, const char* categoryAttribute,
 		const entry_ref* ref)
 	:
-	BWindow(frame, title, B_TITLED_WINDOW, B_NOT_RESIZABLE | B_NOT_ZOOMABLE
+	BWindow(frame, title, B_TITLED_WINDOW, B_NOT_ZOOMABLE
 		| B_AUTO_UPDATE_SIZE_LIMITS),
 	fRef(NULL),
 	fPanel(NULL),
@@ -108,9 +108,11 @@ PersonWindow::PersonWindow(BRect frame, const char* title,
 	fView = new PersonView("PeopleView", categoryAttribute, fRef);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
-		.SetInsets(0, 0, 0, 0)
 		.Add(menuBar)
-		.Add(fView);
+		.AddGroup(B_VERTICAL, 0)
+			.Add(fView)
+			.SetInsets(B_USE_WINDOW_SPACING)
+			.End();
 
 	fRevert->SetTarget(fView);
 	selectAllItem->SetTarget(fView);

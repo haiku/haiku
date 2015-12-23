@@ -3,7 +3,6 @@ SubDir HAIKU_TOP src apps sudoku ;
 UsePrivateHeaders shared ;
 
 Application Sudoku :
-	CenteredViewContainer.cpp
 	ProgressWindow.cpp
 	Sudoku.cpp
 	SudokuField.cpp

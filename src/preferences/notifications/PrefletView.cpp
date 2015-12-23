@@ -8,17 +8,17 @@
  */
 
 #include <Catalog.h>
-#include <Message.h>
+#include <CardLayout.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
-#include <CardLayout.h>
 #include <LayoutItem.h>
+#include <Message.h>
 
-#include "SettingsHost.h"
-#include "PrefletView.h"
-#include "GeneralView.h"
 #include "DisplayView.h"
+#include "GeneralView.h"
 #include "NotificationsView.h"
+#include "PrefletView.h"
+#include "SettingsHost.h"
 
 
 #undef B_TRANSLATION_CONTEXT

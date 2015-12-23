@@ -36,11 +36,12 @@
 
 class BNetworkCookieJar;
 class BUrlContext;
+class ConsoleWindow;
+class CookieWindow;
 class DownloadWindow;
 class BrowserWindow;
 class SettingsMessage;
 class SettingsWindow;
-class ConsoleWindow;
 
 
 class BrowserApp : public BApplication {
@@ -78,11 +79,13 @@ private:
 
 			SettingsMessage*	fSettings;
 			SettingsMessage*	fCookies;
+			SettingsMessage*	fSession;
 			BUrlContext*		fContext;
 
 			DownloadWindow*		fDownloadWindow;
 			SettingsWindow*		fSettingsWindow;
 			ConsoleWindow*		fConsoleWindow;
+			CookieWindow*		fCookieWindow;
 };
 
 

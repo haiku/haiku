@@ -31,9 +31,11 @@ class BRoster::Private {
 		status_t Launch(const char* mimeType, const entry_ref* ref,
 					const BList* messageList, int argc, const char* const* args,
 					const char** environment, team_id* appTeam,
-					thread_id* appThread, bool launchSuspended)
+					thread_id* appThread, port_id* appPort, uint32* appToken,
+					bool launchSuspended)
 			{ return fRoster->_LaunchApp(mimeType, ref, messageList, argc,
-					args, environment, appTeam, appThread, launchSuspended); }
+					args, environment, appTeam, appThread, appPort, appToken,
+					launchSuspended); }
 
 		status_t ShutDown(bool reboot, bool confirm, bool synchronous)
 			{ return fRoster->_ShutDown(reboot, confirm, synchronous); }

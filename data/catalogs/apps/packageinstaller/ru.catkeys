@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PackageInstaller	1413270297
+1	russian	x-vnd.Haiku-PackageInstaller	591566249
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
@@ -50,6 +50,7 @@ Abort	PackageInstall		Прервать
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Продолжить
 Begin	PackageView		Установить
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Символьная ссылка с именем '%s' уже существует по данному пути.\nЗаменить ссылку на ту, что находится в этом пакете или пропустить ее?
 Replace	PackageView		Заменить
 Installation progress	PackageView		Прогресс установки
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакета не может быть прочитан.\nОдна из возможных причин этого может бы быть то, что требуемый файл не является корректным BeOS .pkg файлом.

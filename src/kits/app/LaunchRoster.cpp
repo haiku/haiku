@@ -11,6 +11,7 @@
 
 #include <Application.h>
 #include <String.h>
+#include <StringList.h>
 
 #include <launch.h>
 #include <LaunchDaemonDefs.h>
@@ -101,14 +102,7 @@ BLaunchRoster::GetData(const char* signature, BMessage& data)
 	if (status != B_OK)
 		return status;
 
-	// send the request
-	status = fMessenger.SendMessage(&request, &data);
-
-	// evaluate the reply
-	if (status == B_OK)
-		status = data.what;
-
-	return status;
+	return _SendRequest(request, data);
 }
 
 
@@ -168,15 +162,43 @@ BLaunchRoster::Target(const char* name, const BMessage* data,
 	if (status != B_OK)
 		return status;
 
-	// send the request
-	BMessage result;
-	status = fMessenger.SendMessage(&request, &result);
+	return _SendRequest(request);
+}
 
-	// evaluate the reply
+
+status_t
+BLaunchRoster::Start(const char* name)
+{
+	if (name == NULL)
+		return B_BAD_VALUE;
+
+	BMessage request(B_LAUNCH_JOB);
+	status_t status = request.AddInt32("user", getuid());
 	if (status == B_OK)
-		status = result.what;
+		status = request.AddString("name", name);
+	if (status != B_OK)
+		return status;
 
-	return status;
+	return _SendRequest(request);
+}
+
+
+status_t
+BLaunchRoster::Stop(const char* name, bool force)
+{
+	if (name == NULL)
+		return B_BAD_VALUE;
+
+	BMessage request(B_STOP_LAUNCH_JOB);
+	status_t status = request.AddInt32("user", getuid());
+	if (status == B_OK)
+		status = request.AddString("name", name);
+	if (status == B_OK)
+		status = request.AddBool("force", force);
+	if (status != B_OK)
+		return status;
+
+	return _SendRequest(request);
 }
 
 
@@ -193,15 +215,7 @@ BLaunchRoster::StartSession(const char* login)
 	if (status != B_OK)
 		return status;
 
-	// send the request
-	BMessage result;
-	status = fMessenger.SendMessage(&request, &result);
-
-	// evaluate the reply
-	if (status == B_OK)
-		status = result.what;
-
-	return status;
+	return _SendRequest(request);
 }
 
 
@@ -227,6 +241,65 @@ BLaunchRoster::NotifyEvent(const BMessenger& source, const char* name)
 }
 
 
+status_t
+BLaunchRoster::ResetStickyEvent(const BMessenger& source, const char* name)
+{
+	return _UpdateEvent(B_RESET_STICKY_LAUNCH_EVENT, source, name);
+}
+
+
+status_t
+BLaunchRoster::GetTargets(BStringList& targets)
+{
+	BMessage request(B_GET_LAUNCH_TARGETS);
+	status_t status = request.AddInt32("user", getuid());
+	if (status != B_OK)
+		return status;
+
+	// send the request
+	BMessage result;
+	status = _SendRequest(request, result);
+	if (status == B_OK)
+		status = result.FindStrings("target", &targets);
+
+	return status;
+}
+
+
+status_t
+BLaunchRoster::GetTargetInfo(const char* name, BMessage& info)
+{
+	return _GetInfo(B_GET_LAUNCH_TARGET_INFO, name, info);
+}
+
+
+status_t
+BLaunchRoster::GetJobs(const char* target, BStringList& jobs)
+{
+	BMessage request(B_GET_LAUNCH_JOBS);
+	status_t status = request.AddInt32("user", getuid());
+	if (status == B_OK && target != NULL)
+		status = request.AddString("target", target);
+	if (status != B_OK)
+		return status;
+
+	// send the request
+	BMessage result;
+	status = _SendRequest(request, result);
+	if (status == B_OK)
+		status = result.FindStrings("job", &jobs);
+
+	return status;
+}
+
+
+status_t
+BLaunchRoster::GetJobInfo(const char* name, BMessage& info)
+{
+	return _GetInfo(B_GET_LAUNCH_JOB_INFO, name, info);
+}
+
+
 void
 BLaunchRoster::_InitMessenger()
 {
@@ -237,6 +310,26 @@ BLaunchRoster::_InitMessenger()
 		BMessenger::Private(fMessenger).SetTo(info.team, daemonPort,
 			B_PREFERRED_TOKEN);
 	}
+}
+
+
+status_t
+BLaunchRoster::_SendRequest(BMessage& request)
+{
+	BMessage result;
+	return _SendRequest(request, result);
+}
+
+
+status_t
+BLaunchRoster::_SendRequest(BMessage& request, BMessage& result)
+{
+	// Send the request, and evaluate the reply
+	status_t status = fMessenger.SendMessage(&request, &result);
+	if (status == B_OK)
+		status = result.what;
+
+	return status;
 }
 
 
@@ -260,13 +353,22 @@ BLaunchRoster::_UpdateEvent(uint32 what, const BMessenger& source,
 	if (status != B_OK)
 		return status;
 
-	// send the request
-	BMessage result;
-	status = fMessenger.SendMessage(&request, &result);
+	return _SendRequest(request);
+}
 
-	// evaluate the reply
+
+status_t
+BLaunchRoster::_GetInfo(uint32 what, const char* name, BMessage& info)
+{
+	if (name == NULL || name[0] == '\0')
+		return B_BAD_VALUE;
+
+	BMessage request(what);
+	status_t status = request.AddInt32("user", getuid());
 	if (status == B_OK)
-		status = result.what;
+		status = request.AddString("name", name);
+	if (status != B_OK)
+		return status;
 
-	return status;
+	return _SendRequest(request, info);
 }

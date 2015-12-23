@@ -58,9 +58,9 @@ cppRules["Operator at line end"] = re.compile('([*=/+\-\|\&\?]|\&&|\|\|)(?=\n)')
 cppRules["Missing space"] = re.compile('\){')
 cppRules["Mixed tabs/spaces"] = re.compile('( \t]|\t )+')
 cppRules["Malformed else"] = re.compile('}[ \t]*\n[ \t]*else')
-cppRules["Lines between functions > 2"] \
+cppRules["Lines between functions &gt; 2"] \
     = re.compile('(?<=\n})([ \t]*\n){3,}(?=\n)')
-cppRules["Lines between functions < 2"] \
+cppRules["Lines between functions &lt; 2"] \
     = re.compile('(?<=\n})([ \t]*\n){0,2}(?=.)')
 cppRules["Windows Line Ending"] = re.compile('\r')
 cppRules["Bad pointer/reference style"] \

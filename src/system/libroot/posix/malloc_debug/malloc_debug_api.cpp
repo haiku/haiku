@@ -206,15 +206,6 @@ __heap_terminate_after()
 
 
 extern "C" void*
-sbrk_hook(long)
-{
-	debug_printf("sbrk not supported on malloc debug\n");
-	debugger("sbrk not supported on malloc debug");
-	return NULL;
-}
-
-
-extern "C" void*
 memalign(size_t alignment, size_t size)
 {
 	return sCurrentHeap->memalign(alignment, size);

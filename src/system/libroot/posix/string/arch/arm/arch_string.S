@@ -11,6 +11,7 @@
 
 .align 4
 FUNCTION(memcpy):
+FUNCTION(__aeabi_memcpy):
 	// check for zero length copy or the same pointer
 	cmp		r2, #0
 	cmpne	r1, r0
@@ -115,6 +116,18 @@ FUNCTION(memcpy):
 	msr		CPSR_f, r12				// move into NZCV fields in CPSR
 
 	// move as many bytes as necessary to get the dst aligned
+#ifdef __clang__
+	ldrbvs	r3, [r1], #1			// V set
+	ldrhcs	r4, [r1], #2			// C set
+	ldreq	r5, [r1], #4			// Z set
+
+	strbvs	r3, [r0], #1
+	strhcs	r4, [r0], #2
+	streq	r5, [r0], #4
+
+	ldmiami	r1!, {r3-r4}			// N set
+	stmiami	r0!, {r3-r4}
+#else
 	ldrvsb	r3, [r1], #1			// V set
 	ldrcsh	r4, [r1], #2			// C set
 	ldreq	r5, [r1], #4			// Z set
@@ -123,8 +136,9 @@ FUNCTION(memcpy):
 	strcsh	r4, [r0], #2
 	streq	r5, [r0], #4
 
-	ldmmiia	r1!, {r3-r4}			// N set
-	stmmiia	r0!, {r3-r4}
+	ldmmiia r1!, {r3-r4}			// N set
+	stmmiia r0!, {r3-r4}
+#endif
 
 	// fix the remaining len
 	sub		r2, r2, r12, lsr #28
@@ -152,4 +166,5 @@ FUNCTION(memcpy):
 	// check for zero length copy or the same pointer
 
 FUNCTION_END(memcpy)
+FUNCTION_END(__aeabi_memcpy)
 #endif

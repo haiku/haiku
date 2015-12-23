@@ -104,6 +104,7 @@ class TMailApp : public BApplication {
 	private:
 				void			_ClearPrintSettings();
 				void			_CheckForSpamFilterExistence();
+				TMailWindow*	_ActiveWindow();
 
 				status_t		GetSettingsPath(BPath &path);
 				status_t		LoadOldSettings();

@@ -5,7 +5,7 @@ OK	Status view		OK
 Set state	Status view		Stabilește stare
 Defaults	Pref Window		Implicite
 Install replicant into Deskbar	CPU Frequency View		Instalează copie pe Deskbar
-Quit	Status view		Părăsește
+Quit	Status view		Închidere
 High performance	Status view		Performanță înaltă
 Stepping policy	CPU Frequency View		Regulă de accelerare
 Dynamic performance	Status view		Performanță dinamică

@@ -1,0 +1,15 @@
+SubDir HAIKU_TOP src tests servers app unit_tests ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src servers app ] : true ;
+
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src servers app ] ;
+
+UnitTestLib app_server_unit_tests.so :
+	AppServerUnitTestAddOn.cpp
+
+	IntPoint.cpp
+	IntRect.cpp
+	SimpleTransformTest.cpp
+
+	: be [ TargetLibstdc++ ]
+	;

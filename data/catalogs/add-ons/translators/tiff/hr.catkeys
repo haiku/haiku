@@ -1,5 +1,6 @@
-1	croatian	x-vnd.Haiku-TIFFTranslator	1075335967
+1	croatian	x-vnd.Haiku-TIFFTranslator	3270030739
 LZW	TIFFView		LZW
+Version %d.%d.%d, %s	TIFFView		Verzija %d.%d.%d, %s
 TIFF image	TIFFTranslator		TIFF slika
 TIFF Library:	TIFFView		TIFF biblioteka:
 TIFF image translator	TIFFView		TIFF prevoditelj slika

@@ -45,16 +45,19 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	fOwnContext(avcodec_alloc_context3(NULL)),
 	fContext(fOwnContext),
 	fCodecInitStatus(CODEC_INIT_NEEDED),
-
 	fFrame(avcodec_alloc_frame()),
 	fSwsContext(NULL),
-
-	fFramesWritten(0),
-
-	fChunkBuffer(new(std::nothrow) uint8[kDefaultChunkBufferSize])
+	fFramesWritten(0)
 {
 	TRACE("AVCodecEncoder::AVCodecEncoder()\n");
+	_Init();
+}
 
+
+void
+AVCodecEncoder::_Init()
+{
+	fChunkBuffer = new(std::nothrow) uint8[kDefaultChunkBufferSize];
 	if (fCodecID > 0) {
 		fCodec = avcodec_find_encoder(fCodecID);
 		TRACE("  found AVCodec for %u: %p\n", fCodecID, fCodec);
@@ -298,11 +301,14 @@ AVCodecEncoder::_Setup()
 		fContext->width = fInputFormat.u.raw_video.display.line_width;
 		fContext->height = fInputFormat.u.raw_video.display.line_count;
 		fContext->gop_size = 12;
+
 		// TODO: Fix pixel format or setup conversion method...
-		for (int i = 0; fCodec->pix_fmts[i] != PIX_FMT_NONE; i++) {
-			// Use the last supported pixel format, which we hope is the
-			// one with the best quality.
-			fContext->pix_fmt = fCodec->pix_fmts[i];
+		if (fCodec->pix_fmts != NULL) {
+			for (int i = 0; fCodec->pix_fmts[i] != PIX_FMT_NONE; i++) {
+				// Use the last supported pixel format, which we hope is the
+				// one with the best quality.
+				fContext->pix_fmt = fCodec->pix_fmts[i];
+			}
 		}
 
 		// TODO: Setup rate control:

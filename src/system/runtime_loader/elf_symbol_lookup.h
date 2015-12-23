@@ -58,7 +58,7 @@ struct SymbolLookupInfo {
 struct SymbolLookupCache {
 	SymbolLookupCache(image_t* image)
 		:
-		fTableSize(image->symhash[1]),
+		fTableSize(image->symhash != NULL ? image->symhash[1] : 0),
 		fValues(NULL),
 		fDSOs(NULL),
 		fValuesResolved(NULL)

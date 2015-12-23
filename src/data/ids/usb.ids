@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.09.28
-# Date:    2015-09-28 20:34:09
+# Version: 2015.12.16
+# Date:    2015-12-16 23:50:16
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -174,7 +174,7 @@
 	0117  LaserJet 3200
 	011c  hn210w 802.11b Adapter
 	011d  Bluetooth 1.2 Interface [Broadcom BCM2035]
-	0121  HP49g+ Calculator
+	0121  HP 39g+ [F2224A], 39gs [F2223A], 40gs [F2225A], 48gII [F2226A], 49g+ [F2228A], 50g [F2229A, NW240AA]
 	0122  HID Internet Keyboard
 	0125  DAT72 Tape
 	0139  Barcode Scanner 4430
@@ -208,7 +208,7 @@
 	0417  LaserJet 1200 series
 	0423  HS-COMBO Cardreader
 	042a  LaserJet M1132 MFP
-	0441  HP Prime Calculator
+	0441  Prime [NW280AA, G8X92AA]
 	0504  DeskJet 885c
 	0505  ScanJet 2100c
 	0507  DVD+RW
@@ -230,6 +230,7 @@
 	0711  OfficeJet K80
 	0712  DeskJet 1180c
 	0714  Printing Support
+	0741  Prime Wireless Kit [FOK65AA]
 	0801  ScanJet 7400c
 	0804  DeskJet 816c
 	0805  HP4470C
@@ -297,6 +298,7 @@
 	1517  color LaserJet 3500
 	1524  Smart Card Keyboard - KR
 	1539  Mini Magnetic Stripe Reader
+	1541  Prime [G8X92AA]
 	1602  PhotoSmart 330 series
 	1604  DeskJet 940c
 	1605  ScanJet 5530C PhotoSmart
@@ -396,6 +398,7 @@
 	2917  LaserJet 2420
 	2a11  PSC 2150 series
 	2a17  LaserJet 2430
+	2a1d  Integrated Module with Bluetooth 2.1 Wireless technology
 	2b11  PSC 2170 series
 	2b17  LaserJet 1020
 	2c12  Officejet J4680
@@ -652,6 +655,7 @@
 	c702  PhotoSmart D7300 series
 	c802  PhotoSmart D5060 Printer
 	d104  Bluetooth Dongle
+	d507  39gII [NW249AA]
 	efbe  NEC Picty900
 	f0be  NEC Picty920
 	f1be  NEC Picty800
@@ -1259,6 +1263,7 @@
 	3061  SoundBlaster Audigy 2 ZS Video Editor
 	3090  Sound Blaster Digital Music SX
 	30d3  Sound Blaster Play!
+	3100  IR Receiver (SB0540)
 	3121  WoW tap chat
 	3220  Sound Blaster Tactic(3D) Sigma sound card
 	3f00  E-Mu Xboard 25 MIDI Controller
@@ -1895,6 +1900,7 @@
 	0072  Navigator 335
 	0083  Bluetooth Dongle
 	0087  Ergo 525V Laser Mouse
+	0089  Genius Traveler 350
 	00ca  Pen Mouse
 	0100  EasyPen Tablet
 	0101  CueCat
@@ -2363,6 +2369,7 @@
 	0080  eHealth Terminal ST 1503
 	0081  eHealth Keyboard G87 1504
 	0106  R-300 Wireless Mouse Receiver
+	010d  MX-Board 3.0 Keyboard
 046b  American Megatrends, Inc.
 	0001  Keyboard
 	0101  PS/2 Keyboard, Mouse & Joystick Ports
@@ -3985,7 +3992,7 @@
 	4427  Portable CD ROM
 	4482  Serial Converter
 	4484  SMSC USB20H04 3-Port Hub [ThinkPad X4 UltraBase, Wistron S Note-3 Media Slice]
-	4485  Serial Converter
+	4485  ThinkPad Dock Hub
 	4524  40 Character Vacuum Fluorescent Display
 	4525  Double sided CRT
 	4535  4610 Suremark Printer
@@ -4209,7 +4216,7 @@
 	0879  EP-904A/EP-904F [Artisan 837/Stylus Photo PX830FWD Series]
 	087b  EP-804A/EP-804AR/EP-804AW [Stylus Photo PX730WD/Artisan 730 Series]
 	087c  PX-1700F
-	087d  PX-B750F
+	087d  PX-B750F/WP-4525 Series
 	087f  PX-403A
 	0880  PX-434A [Stylus NX330 Series]
 	0881  PX-404A [ME OFFICE 535]
@@ -5043,6 +5050,7 @@
 	000a  Touchscreen
 	0103  ActiveJet K-2024 Multimedia Keyboard
 	01a4  Wireless Keyboard
+	0201  Touchscreen
 	0210  Optical Mouse
 	0212  Laser Mouse
 	0214  Lynx M9 Optical Mouse
@@ -5488,6 +5496,7 @@
 	035c  DCP-1610NW
 	035d  MFC-1910W
 	035e  MFC-1910NW
+	0360  DCP-1618W
 	0361  MFC-1919NW
 	0364  MFC-J5625DW
 	0365  MFC-J4520DW
@@ -6284,25 +6293,25 @@
 	0002  PenPartner 6x8
 	0003  PTU-600 [Cintiq Partner]
 	0010  ET-0405 [Graphire]
-	0011  Graphire 2 4x5
-	0012  Graphire 2 5x7
-	0013  Graphire 3 4x5
-	0014  Graphire 3 6x8
-	0015  Graphire 4 4x5
-	0016  Graphire 4 6x8
-	0017  CTE-450 [Bamboo Fun]
-	0018  Bamboo Fun 6x8
-	0019  Bamboo One Medium
-	0020  Intuos 4x5
-	0021  Intuos 6x8
-	0022  Intuos 9x12
-	0023  Intuos 12x12
-	0024  Intuos 12x18
-	0026  Intuos5 touch S
-	0027  Intuos5 touch M
-	0028  Intuos5 touch L
-	0029  Intuos5 S
-	002a  Intuos5 M
+	0011  ET-0405A [Graphire2 (4x5)]
+	0012  ET-0507A [Graphire2 (5x7)]
+	0013  CTE-430 [Graphire3 (4x5)]
+	0014  CTE-630 [Graphire3 (6x8)]
+	0015  CTE-440 [Graphire4 (4x5)]
+	0016  CTE-640 [Graphire4 (6x8)]
+	0017  CTE-450 [Bamboo Fun (small)]
+	0018  CTE-650 [Bamboo Fun (medium)]
+	0019  CTE-631 [Bamboo One]
+	0020  GD-0405 [Intuos (4x5)]
+	0021  GD-0608 [Intuos (6x8)]
+	0022  GD-0912 [Intuos (9x12)]
+	0023  GD-1212 [Intuos (12x12)]
+	0024  GD-1218 [Intuos (12x18)]
+	0026  PTH-450 [Intuos5 touch (S)]
+	0027  PTH-650 [Intuos5 touch (M)]
+	0028  PTH-850 [Intuos5 touch (L)]
+	0029  PTK-450 [Intuos5 (S)]
+	002a  PTK-650 [Intuos5 (M)]
 	0030  PL400
 	0031  PL500
 	0032  PL600
@@ -6312,58 +6321,105 @@
 	0037  PL700
 	0038  PL510
 	0039  DTU-710
-	003f  Cintiq 21UX (DTZ-2100)
-	0041  Intuos2 4x5
-	0042  Intuos2 6x8
-	0043  Intuos2 9x12
-	0044  Intuos2 12x12
-	0045  Intuos2 12x18
+	003f  DTZ-2100 [Cintiq 21UX]
+	0041  XD-0405-U [Intuos2 (4x5)]
+	0042  XD-0608-U [Intuos2 (6x8)]
+	0043  XD-0912-U [Intuos2 (9x12)]
+	0044  XD-1212-U [Intuos2 (12x12)]
+	0045  XD-1218-U [Intuos2 (12x18)]
 	0047  Intuos2 6x8
-	0060  Volito
-	0061  PenStation2
-	0062  Volito2 4x5
-	0063  Volito2 2x3
-	0064  PenPartner2
-	0065  Bamboo
-	0069  Bamboo One
-	0081  Graphire Wireless 6x8
+	0057  DTK-2241
+	0059  DTH-2242 tablet
+	005b  DTH-2200 [Cintiq 22HD Touch] tablet
+	005d  DTH-2242 touchscreen
+	005e  DTH-2200 [Cintiq 22HD Touch] touchscreen
+	0060  FT-0405 [Volito, PenPartner, PenStation (4x5)]
+	0061  FT-0203 [Volito, PenPartner, PenStation (2x3)]
+	0062  CTF-420 [Volito2]
+	0063  CTF-220 [BizTablet]
+	0064  CTF-221 [PenPartner2]
+	0065  MTE-450 [Bamboo]
+	0069  CTF-430 [Bamboo One]
+	006a  CTE-460 [Bamboo One Pen (S)]
+	006b  CTE-660 [Bamboo One Pen (M)]
+	0081  CTE-630BT [Graphire Wireless (6x8)]
 	0084  Wireless adapter for Bamboo tablets
 	0090  TPC90
 	0093  TPC93
+	0097  TPC97
 	009a  TPC9A
-	00b0  Intuos3 4x5
-	00b1  Intuos3 6x18
-	00b2  Intuos3 9x12
-	00b3  Intuos3 12x12
-	00b4  Intuos3 12x19
-	00b5  Intuos3 6x11 (PTZ-631W)
-	00b7  Intuos3 4x6
-	00b8  Intuos4 4x6
-	00b9  Intuos4 6x9
-	00ba  Intuos4 8x13
-	00bb  Intuos4 12x19
+	00b0  PTZ-430 [Intuos3 (4x5)]
+	00b1  PTZ-630 [Intuos3 (6x8)]
+	00b2  PTZ-930 [Intuos3 (9x12)]
+	00b3  PTZ-1230 [Intuos3 (12x12)]
+	00b4  PTZ-1231W [Intuos3 (12x19)]
+	00b5  PTZ-631W [Intuos3 (6x11)]
+	00b7  PTZ-431W [Intuos3 (4x6)]
+	00b8  PTK-440 [Intuos4 (4x6)]
+	00b9  PTK-640 [Intuos4 (6x9)]
+	00ba  PTK-840 [Intuos4 (8x13)]
+	00bb  PTK-1240 [Intuos4 (12x19)]
 	00c0  DTF-521
 	00c4  DTF-720
-	00c5  Cintiq 20WSX
-	00c6  Cintiq 12WX
+	00c5  DTZ-20WSX [Cintiq 20WSX]
+	00c6  DTZ-12WX [Cintiq 12WX]
 	00c7  DTU-1931
-	00cc  Cintiq 21UX (DTK-2100)
-	00d1  Bamboo Pen & Touch (CTH-460-DE)
-	00d3  Bamboo Fun (CTH-661)
-	00d4  Bamboo Pen (CTL-460)
-	00d6  Bamboo Pen & Touch (CTH-460)
-	00db  Bamboo Fun (CTH-661SE-NL)
-	00dd  Bamboo Pen (CTL-470)
+	00cc  DTK-2100 [Cintiq 21UX]
+	00ce  DTU-2231
+	00d0  CTT-460 [Bamboo Touch]
+	00d1  CTH-460 [Bamboo Pen & Touch]
+	00d2  CTH-461 [Bamboo Fun/Craft/Comic Pen & Touch (S)]
+	00d3  CTH-661 [Bamboo Fun/Comic Pen & Touch (M)]
+	00d4  CTL-460 [Bamboo Pen (S)]
+	00d5  CTL-660 [Bamboo Pen (M)]
+	00d6  CTH-460 [Bamboo Pen & Touch]
+	00d7  CTH-461 [Bamboo Fun/Craft/Comic Pen & Touch (S)]
+	00d8  CTH-661 [Bamboo Fun/Comic Pen & Touch (M)]
+	00d9  CTT-460 [Bamboo Touch]
+	00da  CTH-461SE [Bamboo Pen & Touch Special Edition (S)]
+	00db  CTH-661SE [Bamboo Pen & Touch Special Edition (M)]
+	00dc  CTT-470 [Bamboo Touch]
+	00dd  CTL-470 [Bamboo Connect]
 	00de  CTH-470 [Bamboo Fun Pen & Touch]
-	00f6  Cintiq 24HD touch (DTH-2400) touchscreen
-	00f8  Cintiq 24HD touch (DTH-2400) tablet
-	0302  Intuos CTH480S2 [Manga]
-	0307  Cintiq Companion Hybrid 13HD (DTH-A1300) tablet
-	0309  Cintiq Companion Hybrid 13HD (DTH-A1300) touchscreen
-	030e  Intuos Pen Small (CTL480)
+	00df  CTH-670 [Bamboo Create/Fun]
+	00e2  TPCE2
+	00e3  TPCE3
+	00e5  TPCE5
+	00e6  TPCE6
+	00ec  TPCEC
+	00ed  TPCED
+	00ef  TPCEF
+	00f4  DTK-2400 [Cintiq 24HD] tablet
+	00f6  DTH-2400 [Cintiq 24HD touch] touchscreen
+	00f8  DTH-2400 [Cintiq 24HD touch] tablet
+	00fa  DTK-2200 [Cintiq 22HD] tablet
+	00fb  DTU-1031
+	0100  TPC100
+	0101  TPC101
+	010d  TPC10D
+	010e  TPC10E
+	010f  TPC10F
+	0116  TPC116
+	012c  TPC12C
+	0300  CTL-471 [Bamboo Splash, One by Wacom (S)]
+	0301  CTL-671 [One by Wacom (M)]
+	0302  CTH-480 [Intuos Pen & Touch (S)]
+	0303  CTH-680 [Intuos Pen & Touch (M)]
+	0304  DTK-1300 [Cintiq 13HD]
+	0307  DTH-A1300 [Cintiq Companion Hybrid] tablet
+	0309  DTH-A1300 [Cintiq Companion Hybrid] touchscreen
+	030e  CTL-480 [Intuos Pen (S)]
+	0314  PTH-451 [Intuos pro (S)]
+	0315  PTH-651 [Intuos pro (M)]
+	0317  PTH-851 [Intuos pro (L)]
+	032f  DTU-1031X
 	0400  PenPartner 4x5
+	4001  TPC4001
+	4004  TPC4004
 	4850  PenPartner 6x8
-	5010  Thinkpad T550 touchscreen
+	5000  TPC5000
+	5002  TPC5002
+	5010  TPC5010
 056b  Decicon, Inc.
 056c  eTEK Labs
 	0006  KwikLink Host-Host Connector
@@ -6868,6 +6924,7 @@
 	6386  Memory Card
 	6387  Flash Drive
 	6390  USB 2.0-IDE bridge
+	6391  IDE Bridge
 	9213  MacAlly Kbd Hub
 	9215  AU9814 Hub
 	9254  Hub
@@ -6882,6 +6939,7 @@
 	9361  Multimedia Card Reader
 	9368  Multimedia Card Reader
 	9380  Flash Drive
+	9381  Flash Drive
 	9382  Acer/Sweex Flash drive
 	9384  qdi U2Disk T209M
 	9410  Keyboard
@@ -7207,6 +7265,7 @@
 	8242  Built-in IR Receiver
 	8281  Bluetooth Host Controller
 	8286  Bluetooth Host Controller
+	828c  Bluetooth Host Controller
 	8300  Built-in iSight (no firmware loaded)
 	8403  Internal Memory Card Reader
 	8404  Internal Memory Card Reader
@@ -7336,6 +7395,7 @@
 	1810  Pavilion Webcam [R5U870]
 	1812  Pavilion Webcam
 	1814  HD Webcam
+	1815  Dell Laptop Integrated Webcam
 	1820  Integrated Webcam
 	1830  Visual Communication Camera VGP-VCC2 [R5U870]
 	1832  Visual Communication Camera VGP-VCC3 [R5U870]
@@ -7475,6 +7535,7 @@
 	20e0  ScanMaker 9700XL
 	20ed  ScanMaker 4700
 	20ee  Micortek ScanMaker X12USL
+	2838  RT2832U
 	3008  Scanner
 	300a  4800 ICE Scanner
 	300b  4800 Scanner
@@ -11233,6 +11294,34 @@
 0a84  Maui Innovative Peripherals
 0a85  Idexx Labs
 0a86  NITGen Co., Ltd
+0a89  Aktiv
+	0001  Guardant Stealth/Net
+	0002  Guardant ID
+	0003  Guardant Stealth 2
+	0004  Rutoken
+	0005  Guardant Fidus
+	0006  Guardant Stealth 3
+	0007  Guardant Stealth 2
+	0008  Guardant Stealth 3 Sign/Time
+	0009  Guardant Code
+	000a  Guardant Sign Pro
+	000b  Guardant Sign Pro HID
+	000c  Guardant Stealth 3 Sign/Time
+	000d  Guardant Code HID
+	000f  Guardant System Firmware Update
+	0020  Rutoken S
+	0025  Rutoken lite
+	0026  Rutoken lite HID
+	002a  Rutoken Mass Storage
+	002b  Guardant Mass Storage
+	0030  Rutoken ECP
+	0040  Rutoken ECP HID
+	0060  Rutoken Magistra
+	0061  Rutoken Magistra
+	0069  Reader
+	0080  Rutoken PinPad Ex
+	0081  Rutoken PinPad In
+	0082  Rutoken PinPad 2
 0a8d  Picturetel
 0a8e  Japan Aviation Electronics Industry, Ltd
 	2011  Filter Driver For JAE XMC R/W

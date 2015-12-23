@@ -1,31 +1,48 @@
-1	polish	x-vnd.Haiku-Network	950262959
+1	polish	x-vnd.Haiku-Network	2512967175
 Static	IntefaceAddressView		Statyczny
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Usługi
+no link	InterfaceListItem		brak odnośnika
 WPA2	WPA2 protected network		WPA2
+Choose automatically	IntefaceView		Wybierz automatycznie
+connected	IntefaceView		połączone
+Ethernet device	InterfaceListItem		Urządzenie ethernetowe
 The netmask defines your local network	IntefaceAddressView		Maska sieci definiuje twoją sieć lokalną
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Sieć
 Show network status in Deskbar	NetworkWindow		Pokaż status interfejsów w Deskbarze
 The method for obtaining an IP address	IntefaceAddressView		Metoda uzyskiwania adresu IP
+connected	InterfaceListItem		połączone
+disabled	InterfaceListItem		wyłączone
 Dial Up	NetworkWindow		Wdzwaniane
 Apply	IntefaceAddressView		Zastosuj
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Instalacja NetworkStatus w Deskbarze nie powiodła się: %s
+MAC address:	IntefaceView		Adres MAC:
+Wireless device	InterfaceListItem		Urządzenie bezprzewodowe
 Disabled	IntefaceAddressView		Wyłączony
+Renegotiate	IntefaceView		Negocjuj ponownie
 Ok	NetworkWindow		OK
+Network:	IntefaceView		Sieć:
 launch error	NetworkWindow		błąd uruchamiania
 Other	NetworkWindow		Inne
 Automatic	IntefaceAddressView		Automatyczny
 Gateway:	IntefaceAddressView		Brama:
 Revert	NetworkWindow		Cofnij
 Enable	ServiceView		Włącz
+disconnected	IntefaceView		rozłączone
+Status:	IntefaceView		Stan:
+Link speed:	IntefaceView		Prędkość połączenia:
 Your gateway to the internet	IntefaceAddressView		Twoja brama do Internetu
 New…	NetworkWindow		Nowa…
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Tryb:
 WPA	WPA protected network		WPA
+Sent:	IntefaceView		Wysłane:
 open	Open network		otwarta
 IP Address:	IntefaceAddressView		Adres IP:
+Received:	IntefaceView		Otrzymane:
+Disable	IntefaceView		Wyłącz
+<no wireless networks found>	IntefaceView		<nie znaleziono sieci bezprzewodowych>
 Netmask:	IntefaceAddressView		Maska sieci:
 Disable	ServiceView		Wyłącz
 Your IP address	IntefaceAddressView		Twój adres IP

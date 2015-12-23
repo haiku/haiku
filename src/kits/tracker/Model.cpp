@@ -82,22 +82,22 @@ BObjectList<Model>* readOnlyOpenModelList = NULL;
 #endif
 
 
-namespace BPrivate {
-extern
-#ifdef _IMPEXP_BE
-_IMPEXP_BE
-#endif
-bool CheckNodeIconHintPrivate(const BNode*, bool);
-}	// namespace BPrivate
-
-
-
-
 static bool
-HasVectorIconHint(BNode* node)
+CheckNodeIconHint(BNode* node)
 {
+	if (node == NULL)
+		return false;
+
 	attr_info info;
-	return node->GetAttrInfo(kAttrIcon, &info) == B_OK;
+	if (node->GetAttrInfo(kAttrIcon, &info) == B_OK
+		// has a vector icon, or
+		|| (node->GetAttrInfo(kAttrMiniIcon, &info) == B_OK
+			&& node->GetAttrInfo(kAttrLargeIcon, &info) == B_OK)) {
+		// has a mini _and_ large icon
+		return true;
+	}
+
+	return false;
 }
 
 
@@ -614,24 +614,12 @@ Model::FinishSettingUpType()
 	char mimeString[B_MIME_TYPE_LENGTH];
 	BEntry entry;
 
-	// while we are reading the node, do a little
-	// snooping to see if it even makes sense to look for a node-based
-	// icon
-	// This serves as a hint to the icon cache, allowing it to not hit the
-	// disk again for models that do not have an icon defined by the node
-	if (IsNodeOpen()
-		&& fBaseType != kLinkNode
-		&& !CheckNodeIconHintPrivate(fNode,
-			dynamic_cast<TTracker*>(be_app) == NULL)
-		&& !HasVectorIconHint(fNode)) {
-			// when checking for the node icon hint, if we are libtracker,
-			// only check for small icons - checking for the large icons
-			// is a little more work for the filesystem and this will
-			// speed up the test. This makes node icons only work if there
-			// is a small and a large node icon on a file - for libtracker
-			// that is not a problem though
+	// While we are reading the node, do a little snooping to see if it even
+	// makes sense to look for a node-based icon. This serves as a hint to the
+	// icon cache, allowing it to not hit the disk again for models that do not
+	// have an icon defined by the node.
+	if (IsNodeOpen() && fBaseType != kLinkNode && !CheckNodeIconHint(fNode))
 		fIconFrom = kUnknownNotFromNode;
-	}
 
 	if (fBaseType != kDirectoryNode
 		&& fBaseType != kVolumeNode
@@ -761,8 +749,7 @@ Model::ResetIconFrom()
 	// mirror the logic from FinishSettingUpType
 	if ((fBaseType == kDirectoryNode || fBaseType == kVolumeNode
 			|| fBaseType == kTrashNode || fBaseType == kDesktopNode)
-		&& !CheckNodeIconHintPrivate(fNode,
-			dynamic_cast<TTracker*>(be_app) == NULL)) {
+		&& !CheckNodeIconHint(fNode)) {
 		BDirectory* directory = dynamic_cast<BDirectory*>(fNode);
 		if (WellKnowEntryList::Match(NodeRef()) > (directory_which)-1) {
 			fIconFrom = kTrackerSupplied;

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	2696855708
+1	finnish	x-vnd.Haiku-Terminal	2093402207
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -86,10 +86,12 @@ Text encoding	Terminal TermWindow		Tekstikoodaus
 size	Terminal TermView		koko
 Close window	Terminal TermWindow		Sulje ikkuna
 Copy absolute path	Terminal TermView		Kopioi absoluuttinen polku
+Save as default	Terminal TermWindow		Tallenna oletuksena
 Set tab title	Terminal TermWindow		Aseta välilehtiotsikko
 Settings…	Terminal TermWindow		Asetukset...
 Abort	Terminal Shell		Keskeytä
 Open link	Terminal TermView		Avaa linkki
+Solarized Light	Terminal colors scheme		Käänteisen vaalea
 Edit	Terminal TermWindow		Muokkaa
 Color:	Terminal AppearancePrefView		Väri:
 The pattern specifying the window title. The following placeholders\ncan be used:\n	Terminal TermWindow		Ikkunaotsikon määrittävä malli. Seuraavia paikanpitäjiä\nvoidaan käyttää:\n
@@ -109,6 +111,7 @@ Find next	Terminal TermWindow		Löydä seuraava
 Close active tab	Terminal TermWindow		Sulje käytössä oleva välilehti
 \t%%\t-\tThe character '%'.\n\t%<\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tafterwards is not empty.\n\t%>\t-\tStarts a section that will only be shown if a placeholder\n\t\t\tbetween a previous %< section and this one is not empty.\n\t%-\t-\tEnds a %< or %> section.\n\nAny non alpha numeric character between '%' and the format letter will insert a space only\nif the placeholder value is not empty. It will add to the %< section.	Terminal ToolTips		\t%%\t-\tMerkki ’%’.\n\t%<\t-\tAloittaa kappaleen, joka näytetään vain jos korvaaja\n\t\t\ton jälkeenpäin tyhjä.\n\t%>\t-\tAloittaa kappaleen, joka näytetään vain jos korvaaja\n\t\t\tedellisen  %< kappaleen ja tämän kappaleen välillä ei ole tyhjä.\n\t%-\t-\tLopettaa %<- tai %>-kappaleen.\n\nMikä tahansa ei-aakkosnumeerinen merkki ’%’:n ja muotokirjaimen välissä lisää välilyönnin vain\njos korvaaja-arvo ei ole tyhjä. Se lisätään %<-kappaleeseen.
 Paste	Terminal TermWindow		Liitä
+Solarized Dark	Terminal colors scheme		Käänteisen tumma
 Shell 	Terminal TermWindow		Komentoikkuna
 Cancel	Terminal TermView		Peru
 Use default	Terminal SetTitleWindow		Käytä oletusta

@@ -8,9 +8,9 @@ OK	Login View		OK
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	eroare %s\n
 Login:	Login View		Login:
 Error	Login App		Eroare
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Poți personaliza desktopul din spatele aplicației de Login dând drumul replicanților pe el.\n\nCând ai terminat ieși din aplicație (Alt-Q).
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Puteți personaliza desktopul afișat în spatele aplicației de Login adăugându-i replicanți.\n\nCând ați terminat puteți închide aplicația (Alt-Q).
 Unimplemented	Login App		Neimplementat
-Welcome to Haiku	Login Window		Bine ai venit în Haiku
+Welcome to Haiku	Login Window		Bine ați venit la Haiku
 Reboot	Login View		Restartează
 Login application for Haiku\nUsage:\n	Login App		Aplicație de login pentru Haiku\nUtilizare:\n
 Info	Login App		Info

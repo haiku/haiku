@@ -544,10 +544,12 @@ TRoster::HandleSetThreadAndTeam(BMessage* request)
 	PRINT("team: %" B_PRId32 ", thread: %" B_PRId32 ", token: %" B_PRIu32 "\n",
 		team, thread, token);
 
+	port_id port = -1;
+
 	// update the app_info
 	if (error == B_OK) {
 		RosterAppInfo* info = fEarlyPreRegisteredApps.InfoForToken(token);
-		if (info) {
+		if (info != NULL) {
 			// Set thread and team, create a port for the application and
 			// move the app_info from the list of the early pre-registered
 			// apps to the list of the (pre-)registered apps.
@@ -555,8 +557,8 @@ TRoster::HandleSetThreadAndTeam(BMessage* request)
 			info->team = team;
 			info->thread = thread;
 			// create and transfer the port
-			info->port = create_port(B_REG_APP_LOOPER_PORT_CAPACITY,
-									 kRAppLooperPortName);
+			info->port = port = create_port(B_REG_APP_LOOPER_PORT_CAPACITY,
+				kRAppLooperPortName);
 			if (info->port < 0)
 				SET_ERROR(error, info->port);
 			if (error == B_OK)
@@ -595,6 +597,7 @@ TRoster::HandleSetThreadAndTeam(BMessage* request)
 	// reply to the request
 	if (error == B_OK) {
 		BMessage reply(B_REG_SUCCESS);
+		reply.AddInt32("port", port);
 		request->SendReply(&reply);
 	} else {
 		BMessage reply(B_REG_ERROR);

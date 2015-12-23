@@ -238,7 +238,7 @@ if [ IsPackageAvailable mesa_devel ] {
 # FFmpeg
 if [ IsPackageAvailable ffmpeg_devel ] {
 	local ffmpegLibs = libavformat.so libavcodec.so libavdevice.so
-		libavfilter.so libswscale.so libavutil.so ;
+		libavfilter.so libswscale.so libavutil.so libswresample.so ;
 
 	ExtractBuildFeatureArchives ffmpeg :
 		file: base ffmpeg

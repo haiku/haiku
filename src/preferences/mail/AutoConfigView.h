@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2015, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -12,9 +12,12 @@
 
 #include <Box.h>
 #include <Entry.h>
+#include <GroupView.h>
 #include <MenuField.h>
 #include <String.h>
 #include <TextControl.h>
+
+class BPopUpMenu;
 
 
 const int32	kNameChangedMsg			=	'?nch';
@@ -45,23 +48,23 @@ struct account_info {
 
 class AutoConfigView : public BBox {
 public:
-								AutoConfigView(BRect rect, AutoConfig& config);
+								AutoConfigView(AutoConfig& config);
 
 	virtual	void				AttachedToWindow();
-	virtual	void				MessageReceived(BMessage *msg);
+	virtual	void				MessageReceived(BMessage* msg);
 
-			bool				GetBasicAccountInfo(account_info &info);
+			bool				GetBasicAccountInfo(account_info& info);
 			bool				IsValidMailAddress(BString email);
 
 private:
-			BMenuField*			_SetupProtocolView(BRect rect);
-			status_t			_GetSMTPAddonRef(entry_ref *ref);
+			BPopUpMenu*			_SetupProtocolMenu();
+			status_t			_GetSMTPAddOnRef(entry_ref* ref);
 
 			BString				_ExtractLocalPart(const char* email);
 			void				_ProposeUsername();
 
 private:
-			entry_ref			fSMTPAddonRef;
+			entry_ref			fSMTPAddOnRef;
 			BMenuField*			fInProtocolsField;
 			BTextControl*		fNameView;
 			BTextControl*		fAccountNameView;
@@ -74,18 +77,19 @@ private:
 };
 
 
-class ServerSettingsView : public BView {
+class ServerSettingsView : public BGroupView {
 public:
-								ServerSettingsView(BRect rect,
-									const account_info& info);
+								ServerSettingsView(const account_info& info);
 								~ServerSettingsView();
 			void				GetServerInfo(account_info& info);
 
 private:
 			void				_DetectMenuChanges();
+			bool				_HasMarkedChanged(BMenuField* field,
+									BMenuItem* originalItem);
 			void				_GetAuthEncrMenu(entry_ref protocol,
-									BMenuField** authField,
-									BMenuField** sslField);
+									BMenuField*& authField,
+									BMenuField*& sslField);
 
 private:
 			bool				fInboundAccount;
@@ -102,7 +106,7 @@ private:
 			BMenuItem*			fOutboundAuthItemStart;
 			BMenuItem*			fOutboundEncrItemStart;
 
-			image_id			fImageId;
+			image_id			fImageID;
 };
 
 

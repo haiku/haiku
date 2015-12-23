@@ -21,7 +21,7 @@ Save...	ImageWindow		Salvează...
 Info	ImageWindow		Info
 OK	ImageWindow		OK
 Window	ImageWindow		Fereastră
-Quit	ImageWindow		Părăsește
+Quit	ImageWindow		Închidere
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Documentul selectat: %1\n\nTraducător utilizat:\nNume: %2\nInfo: %3\nVersiune: %4\n
 Active Translators	ImageWindow		Traducători activi
 View	ImageWindow		Vizualizare

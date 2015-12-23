@@ -14,6 +14,7 @@ KernelAddon fat :
 	file.c
 	iter.c
 	mime_table.c
+	mkdos.cpp
 	util.c
 	vcache.c
 	version.c

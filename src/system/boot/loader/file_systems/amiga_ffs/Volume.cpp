@@ -18,6 +18,7 @@
 
 
 using namespace FFS;
+using std::nothrow;
 
 
 Volume::Volume(boot::Partition *partition)

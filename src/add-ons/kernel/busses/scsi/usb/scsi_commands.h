@@ -1,16 +1,19 @@
 /*
- * Copyright 2004-2007, Haiku, Inc. All RightsReserved.
+ * Copyright 2004-2015, Haiku, Inc. All RightsReserved.
  * Distributed under the terms of the MIT License.
  *
  * Author:
  *		Siarzhuk Zharski <imker@gmx.li>
  */
-#ifndef _SCSI_COMMANDS_H_ 
+#ifndef _SCSI_COMMANDS_H_
 #define _SCSI_COMMANDS_H_
+
+
+#include <lendian_bitfield.h>
+
 
 /*!	Definitions for SCSI commands, structures etc. */
 
-#include <lendian_bitfield.h>
 
 /* References:
  * http://www.t10.org/ftp/t10/drafts/rbc/rbc-r10a.pdf
@@ -27,16 +30,16 @@
 /* SCSI status defines */
 #define SCSI_STATUS_OK				0x00
 #define SCSI_STATUS_CHECK_CONDITION	0x02
-	
+
 /* SCSI command opcodes */
 #define READ_6			0x08
-#define WRITE_6			0x0a	
+#define WRITE_6			0x0a
 #define READ_10			0x28
-#define WRITE_10		0x2a	
+#define WRITE_10		0x2a
 #define MODE_SELECT_6	0x15
-#define MODE_SENSE_6	0x1a	
+#define MODE_SENSE_6	0x1a
 #define MODE_SELECT_10	0x55
-#define MODE_SENSE_10	0x5a	
+#define MODE_SENSE_10	0x5a
 #define READ_CAPACITY	0x25
 #define TEST_UNIT_READY	0x00
 #define START_STOP_UNIT	0x1b
@@ -77,7 +80,7 @@
 #define SEEK					0x2b
 #define START_STOP_UNIT	0x1b
 #define TEST_UNIT_READY	0x00
-#define VERIFY				0x2f 
+#define VERIFY				0x2f
 #define WRITE_10			0x2a
 #define WRITE_12			0xaa
 #define WRITE_AND_VEIRIFY 0x2e */
@@ -90,8 +93,8 @@
 /* end of ATAPI commands*/
 
 /* come from MMC2 specs */
-#define READ_BUFFER			0x3c 
-#define READ_SUBCHANNEL		0x42 
+#define READ_BUFFER			0x3c
+#define READ_SUBCHANNEL		0x42
 #define READ_TOC			0x43
 #define READ_HEADER			0x44
 #define READ_DISK_INFO		0x51
@@ -169,7 +172,7 @@ typedef struct{
 /* ten-bytes command*/
 typedef struct{
 	uint8 opcode;
-	uint8 byte2; 
+	uint8 byte2;
 	uint8 addr[4];
 	uint8 reserved;
 	uint8 len[2];
@@ -178,7 +181,7 @@ typedef struct{
 /* twelve-bytes command*/
 typedef struct{
 	uint8 opcode;
-	uint8 byte2; 
+	uint8 byte2;
 	uint8 addr[4];
 	uint8 len[4];
 	uint8 reserved;
@@ -190,7 +193,7 @@ typedef scsi_cmd_generic_6 scsi_cmd_rw_6;
 /* READ_10 / WRITE_10 */
 typedef struct {
 	uint8 opcode;
-	LBITFIELD8_5(
+	B_LBITFIELD8_5(
 		relative_address : 1,		// relative address
 		_res1_1 : 2,
 		force_unit_access : 1,		// force unit access (1 = safe, cacheless access)
@@ -255,8 +258,8 @@ typedef struct{
 	uint8 mode_data_len[2];
 	uint8 medium_type;
 	uint8 device_spec_params;
-	uint8 reserved1; 
-	uint8 reserved2; 
+	uint8 reserved1;
+	uint8 reserved2;
 	uint8 block_descr_len[2];
 }scsi_mode_param_header_10;
 /* TEST_UNIT_READY */
@@ -270,7 +273,7 @@ typedef struct{
 typedef struct{
 	uint8 opcode;
 	uint8 byte2;
-#define CMD_SSU_IMMED	0x01	
+#define CMD_SSU_IMMED	0x01
 	uint8 reserved[2];
 	uint8 start_loej;
 #define CMD_SSU_LOEJ	0x02
@@ -284,7 +287,7 @@ typedef struct _scsi_sense_data{
 #define SSD_ERRCODE			0x7F
 #define	SSD_CURRENT_ERROR	0x70
 #define	SSD_DEFERRED_ERROR	0x71
-#define	SSD_ERRCODE_VALID	0x80	
+#define	SSD_ERRCODE_VALID	0x80
 	uint8 segment;
 	uint8 flags;
 #define SSD_KEY					0x0F
@@ -299,11 +302,11 @@ typedef struct _scsi_sense_data{
 #define	SSD_KEY_BLANK_CHECK		0x08
 #define	SSD_KEY_Vendor_Specific 0x09
 #define	SSD_KEY_COPY_ABORTED	0x0a
-#define	SSD_KEY_ABORTED_COMMAND 0x0b		
+#define	SSD_KEY_ABORTED_COMMAND 0x0b
 #define	SSD_KEY_EQUAL			0x0c
 #define	SSD_KEY_VOLUME_OVERFLOW 0x0d
 #define	SSD_KEY_MISCOMPARE		0x0e
-#define	SSD_KEY_RESERVED		0x0f			
+#define	SSD_KEY_RESERVED		0x0f
 #define SSD_ILI					0x20
 #define SSD_EOM					0x40
 #define SSD_FILEMARK			0x80

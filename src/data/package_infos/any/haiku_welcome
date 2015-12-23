@@ -2,12 +2,18 @@ name			haiku_welcome
 version			%HAIKU_VERSION%
 architecture	any
 summary			"The Haiku welcome documentation"
-description		"The Haiku welcome documentation for new users."
+description		"The Haiku welcome documentation was put together especially \
+for new users. It provides information on how to report bugs and answers the \
+most pressing questions like how to find and install software, how to get in \
+contact and where to find more resources for programmers and endusers online.
+
+This package includes several translations of the welcome documentation. \
+Thanks to everyone who contributed!"
 
 packager		"The Haiku build system"
 vendor			"Haiku Project"
 
-copyrights		"2001-2013 Haiku, Inc. et al"
+copyrights		"2001-2015 Haiku, Inc. et al"
 licenses		"MIT"
 
 provides {

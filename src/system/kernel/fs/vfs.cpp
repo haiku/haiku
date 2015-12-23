@@ -111,11 +111,6 @@ const static size_t kMaxPathLength = 65536;
 	// on PATH_MAX
 
 
-struct vnode_hash_key {
-	dev_t	device;
-	ino_t	vnode;
-};
-
 typedef DoublyLinkedList<vnode> VnodeList;
 
 /*!	\brief Structure to manage a mounted file system
@@ -171,6 +166,9 @@ struct fs_mount {
 	bool			owns_file_device;
 };
 
+
+namespace {
+
 struct advisory_lock : public DoublyLinkedListLinkImpl<advisory_lock> {
 	list_link		link;
 	team_id			team;
@@ -181,6 +179,9 @@ struct advisory_lock : public DoublyLinkedListLinkImpl<advisory_lock> {
 };
 
 typedef DoublyLinkedList<advisory_lock> LockList;
+
+} // namespace
+
 
 struct advisory_locking {
 	sem_id			lock;
@@ -251,6 +252,13 @@ static rw_lock sVnodeLock = RW_LOCK_INITIALIZER("vfs_vnode_lock");
 static mutex sIOContextRootLock = MUTEX_INITIALIZER("io_context::root lock");
 
 
+namespace {
+
+struct vnode_hash_key {
+	dev_t	device;
+	ino_t	vnode;
+};
+
 struct VnodeHash {
 	typedef vnode_hash_key	KeyType;
 	typedef	struct vnode	ValueType;
@@ -310,6 +318,8 @@ struct MountHash {
 };
 
 typedef BOpenHashTable<MountHash> MountTable;
+
+} // namespace
 
 
 #define VNODE_HASH_TABLE_SIZE 1024
@@ -520,7 +530,8 @@ static struct fd_ops sQueryOps = {
 };
 
 
-// VNodePutter
+namespace {
+
 class VNodePutter {
 public:
 	VNodePutter(struct vnode* vnode = NULL) : fVNode(vnode) {}
@@ -596,6 +607,8 @@ private:
 	int		fFD;
 	bool	fKernel;
 };
+
+} // namespace
 
 
 #if VFS_PAGES_IO_TRACING
@@ -1955,51 +1968,6 @@ get_root_vnode(bool kernel)
 }
 
 
-/*!	\brief Resolves a vnode to the vnode it is covered by, if any.
-
-	Given an arbitrary vnode (identified by mount and node ID), the function
-	checks, whether the vnode is covered by another vnode. If it is, the
-	function returns the mount and node ID of the covering vnode. Otherwise
-	it simply returns the supplied mount and node ID.
-
-	In case of error (e.g. the supplied node could not be found) the variables
-	for storing the resolved mount and node ID remain untouched and an error
-	code is returned.
-
-	\param mountID The mount ID of the vnode in question.
-	\param nodeID The node ID of the vnode in question.
-	\param resolvedMountID Pointer to storage for the resolved mount ID.
-	\param resolvedNodeID Pointer to storage for the resolved node ID.
-	\return
-	- \c B_OK, if everything went fine,
-	- another error code, if something went wrong.
-*/
-status_t
-vfs_resolve_vnode_to_covering_vnode(dev_t mountID, ino_t nodeID,
-	dev_t* resolvedMountID, ino_t* resolvedNodeID)
-{
-	// get the node
-	struct vnode* node;
-	status_t error = get_vnode(mountID, nodeID, &node, true, false);
-	if (error != B_OK)
-		return error;
-
-	// resolve the node
-	if (Vnode* coveringNode = get_covering_vnode(node)) {
-		put_vnode(node);
-		node = coveringNode;
-	}
-
-	// set the return values
-	*resolvedMountID = node->device;
-	*resolvedNodeID = node->id;
-
-	put_vnode(node);
-
-	return B_OK;
-}
-
-
 /*!	\brief Gets the directory path and leaf name for a given path.
 
 	The supplied \a path is transformed to refer to the directory part of
@@ -2483,7 +2451,7 @@ get_vnode_name(struct vnode* vnode, struct vnode* parent, struct dirent* buffer,
 	if (bufferSize < sizeof(struct dirent))
 		return B_BAD_VALUE;
 
-	// See if the vnode is convering another vnode and move to the covered
+	// See if the vnode is covering another vnode and move to the covered
 	// vnode so we get the underlying file system
 	VNodePutter vnodePutter;
 	if (Vnode* coveredVnode = get_covered_vnode(vnode)) {
@@ -2528,8 +2496,8 @@ get_vnode_name(struct vnode* vnode, struct vnode* parent, struct dirent* buffer,
 			}
 		}
 
-		FS_CALL(vnode, close_dir, cookie);
-		FS_CALL(vnode, free_dir_cookie, cookie);
+		FS_CALL(parent, close_dir, cookie);
+		FS_CALL(parent, free_dir_cookie, cookie);
 	}
 	return status;
 }
@@ -3600,6 +3568,60 @@ is_user_in_group(gid_t gid)
 }
 
 
+static status_t
+free_io_context(io_context* context)
+{
+	uint32 i;
+
+	TIOC(FreeIOContext(context));
+
+	if (context->root)
+		put_vnode(context->root);
+
+	if (context->cwd)
+		put_vnode(context->cwd);
+
+	mutex_lock(&context->io_mutex);
+
+	for (i = 0; i < context->table_size; i++) {
+		if (struct file_descriptor* descriptor = context->fds[i]) {
+			close_fd(descriptor);
+			put_fd(descriptor);
+		}
+	}
+
+	mutex_destroy(&context->io_mutex);
+
+	remove_node_monitors(context);
+	free(context->fds);
+	free(context);
+
+	return B_OK;
+}
+
+
+static status_t
+resize_monitor_table(struct io_context* context, const int newSize)
+{
+	int	status = B_OK;
+
+	if (newSize <= 0 || newSize > MAX_NODE_MONITORS)
+		return B_BAD_VALUE;
+
+	mutex_lock(&context->io_mutex);
+
+	if ((size_t)newSize < context->num_monitors) {
+		status = B_BUSY;
+		goto out;
+	}
+	context->max_monitors = newSize;
+
+out:
+	mutex_unlock(&context->io_mutex);
+	return status;
+}
+
+
 //	#pragma mark - public API for file systems
 
 
@@ -4121,7 +4143,7 @@ vfs_get_vnode_from_path(const char* path, bool kernel, struct vnode** _vnode)
 extern "C" status_t
 vfs_get_vnode(dev_t mountID, ino_t vnodeID, bool canWait, struct vnode** _vnode)
 {
-	struct vnode* vnode;
+	struct vnode* vnode = NULL;
 
 	status_t status = get_vnode(mountID, vnodeID, &vnode, canWait, false);
 	if (status != B_OK)
@@ -4900,38 +4922,6 @@ vfs_new_io_context(io_context* parentContext, bool purgeCloseOnExec)
 }
 
 
-static status_t
-vfs_free_io_context(io_context* context)
-{
-	uint32 i;
-
-	TIOC(FreeIOContext(context));
-
-	if (context->root)
-		put_vnode(context->root);
-
-	if (context->cwd)
-		put_vnode(context->cwd);
-
-	mutex_lock(&context->io_mutex);
-
-	for (i = 0; i < context->table_size; i++) {
-		if (struct file_descriptor* descriptor = context->fds[i]) {
-			close_fd(descriptor);
-			put_fd(descriptor);
-		}
-	}
-
-	mutex_destroy(&context->io_mutex);
-
-	remove_node_monitors(context);
-	free(context->fds);
-	free(context);
-
-	return B_OK;
-}
-
-
 void
 vfs_get_io_context(io_context* context)
 {
@@ -4943,7 +4933,7 @@ void
 vfs_put_io_context(io_context* context)
 {
 	if (atomic_add(&context->ref_count, -1) == 1)
-		vfs_free_io_context(context);
+		free_io_context(context);
 }
 
 
@@ -5010,25 +5000,48 @@ vfs_resize_fd_table(struct io_context* context, uint32 newSize)
 }
 
 
-static status_t
-vfs_resize_monitor_table(struct io_context* context, const int newSize)
+/*!	\brief Resolves a vnode to the vnode it is covered by, if any.
+
+	Given an arbitrary vnode (identified by mount and node ID), the function
+	checks, whether the vnode is covered by another vnode. If it is, the
+	function returns the mount and node ID of the covering vnode. Otherwise
+	it simply returns the supplied mount and node ID.
+
+	In case of error (e.g. the supplied node could not be found) the variables
+	for storing the resolved mount and node ID remain untouched and an error
+	code is returned.
+
+	\param mountID The mount ID of the vnode in question.
+	\param nodeID The node ID of the vnode in question.
+	\param resolvedMountID Pointer to storage for the resolved mount ID.
+	\param resolvedNodeID Pointer to storage for the resolved node ID.
+	\return
+	- \c B_OK, if everything went fine,
+	- another error code, if something went wrong.
+*/
+status_t
+vfs_resolve_vnode_to_covering_vnode(dev_t mountID, ino_t nodeID,
+	dev_t* resolvedMountID, ino_t* resolvedNodeID)
 {
-	int	status = B_OK;
+	// get the node
+	struct vnode* node;
+	status_t error = get_vnode(mountID, nodeID, &node, true, false);
+	if (error != B_OK)
+		return error;
 
-	if (newSize <= 0 || newSize > MAX_NODE_MONITORS)
-		return B_BAD_VALUE;
-
-	mutex_lock(&context->io_mutex);
-
-	if ((size_t)newSize < context->num_monitors) {
-		status = B_BUSY;
-		goto out;
+	// resolve the node
+	if (Vnode* coveringNode = get_covering_vnode(node)) {
+		put_vnode(node);
+		node = coveringNode;
 	}
-	context->max_monitors = newSize;
 
-out:
-	mutex_unlock(&context->io_mutex);
-	return status;
+	// set the return values
+	*resolvedMountID = node->device;
+	*resolvedNodeID = node->id;
+
+	put_vnode(node);
+
+	return B_OK;
 }
 
 
@@ -5147,7 +5160,7 @@ vfs_setrlimit(int resource, const struct rlimit* rlp)
 				&& rlp->rlim_max != MAX_NODE_MONITORS)
 				return B_NOT_ALLOWED;
 
-			return vfs_resize_monitor_table(get_current_io_context(false),
+			return resize_monitor_table(get_current_io_context(false),
 				rlp->rlim_cur);
 
 		default:

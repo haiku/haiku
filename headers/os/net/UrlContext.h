@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014 Haiku Inc. All rights reserved.
+ * Copyright 2010-2015 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -8,6 +8,7 @@
 #define _B_URL_CONTEXT_H_
 
 
+#include <Certificate.h>
 #include <HttpAuthentication.h>
 #include <NetworkCookieJar.h>
 #include <Referenceable.h>
@@ -30,6 +31,7 @@ public:
 			void				AddAuthentication(const BUrl& url,
 									const BHttpAuthentication& authentication);
 			void				SetProxy(BString host, uint16 port);
+			void				AddCertificateException(const BCertificate& certificate);
 
 	// Context accessors
 			BNetworkCookieJar&	GetCookieJar();
@@ -37,12 +39,15 @@ public:
 			bool				UseProxy();
 			BString				GetProxyHost();
 			uint16				GetProxyPort();
+			bool				HasCertificateException(const BCertificate& certificate);
 
 private:
 			BNetworkCookieJar	fCookieJar;
 			typedef BPrivate::SynchronizedHashMap<BPrivate::HashString,
 				BHttpAuthentication*> BHttpAuthenticationMap;
 			BHttpAuthenticationMap* fAuthenticationMap;
+			typedef BObjectList<const BCertificate> BCertificateSet;
+			BCertificateSet		fCertificates;
 
 			BString				fProxyHost;
 			uint16				fProxyPort;

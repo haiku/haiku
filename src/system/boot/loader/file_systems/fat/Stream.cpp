@@ -386,7 +386,8 @@ Stream::WriteAt(off_t pos, const void* _buffer, size_t* _length,
 		size_t inBlockOffset = offset % fVolume.BlockSize();
 
 		// write
-		size_t toWrite = std::min(fVolume.BlockSize() - inBlockOffset, length);
+		size_t toWrite = std::min((size_t)fVolume.BlockSize() - inBlockOffset,
+			length);
 		if (toWrite == (size_t)fVolume.BlockSize()) {
 			// write the whole block
 			ssize_t written = write_pos(fVolume.Device(),

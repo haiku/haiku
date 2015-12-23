@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2010-2015, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2009, Michael Lotz, mmlr@mlotz.ch.
  * Distributed under the terms of the MIT License.
  */
@@ -18,7 +18,7 @@
 typedef struct ata_device_infoblock {
 	union {
 		struct {
-			LBITFIELD8(
+			B_LBITFIELD16_8(
 				word_0_bit_0_reserved			: 1,
 				word_0_bit_1_retired			: 1,
 				response_incomplete				: 1,
@@ -30,7 +30,7 @@ typedef struct ata_device_infoblock {
 			);
 		} ata;
 		struct {
-			LBITFIELD8(
+			B_LBITFIELD16_8(
 				packet_length					: 2,	// 0 = 12, 1 = 16 bytes
 				response_incomplete				: 1,
 				word_0_bit_3_4_reserved			: 2,
@@ -57,14 +57,14 @@ typedef struct ata_device_infoblock {
 	char	firmware_revision[8];
 	char	model_number[40];
 
-	LBITFIELD2(
+	B_LBITFIELD16_2(
 		max_sectors_per_interrupt				: 8,
 		word_47_bit_8_15_80h					: 8		// should be 0x80
 	);
 
 	uint16	word_48_reserved;
 
-	LBITFIELD9(
+	B_LBITFIELD16_9(
 		word_49_bit_0_7_retired					: 8,
 		dma_supported							: 1,
 		lba_supported							: 1,
@@ -76,7 +76,7 @@ typedef struct ata_device_infoblock {
 		atapi_interleaved_dma_supported			: 1
 	);
 
-	LBITFIELD5(
+	B_LBITFIELD16_5(
 		standby_timer_value_min					: 1,
 		word_50_bit_1_obsolete					: 1,
 		word_50_bit_2_13_reserved				: 12,
@@ -86,7 +86,7 @@ typedef struct ata_device_infoblock {
 
 	uint16	word_51_52_obsolete[2];
 
-	LBITFIELD4(
+	B_LBITFIELD16_4(
 		word_53_bit_0_obsolete					: 1,
 		word_64_70_valid						: 1,
 		word_88_valid							: 1,
@@ -95,7 +95,7 @@ typedef struct ata_device_infoblock {
 
 	uint16	word_54_58_obsolete[5];
 
-	LBITFIELD3(
+	B_LBITFIELD16_3(
 		current_sectors_per_interrupt			: 8,
 		multiple_sector_setting_valid			: 1,
 		word_59_bit_9_15_reserved				: 7
@@ -104,7 +104,7 @@ typedef struct ata_device_infoblock {
 	uint32	lba_sector_count;
 	uint16	word_62_obsolete;
 
-	LBITFIELD8(
+	B_LBITFIELD16_8(
 		multiword_dma_0_supported				: 1,
 		multiword_dma_1_supported				: 1,
 		multiword_dma_2_supported				: 1,
@@ -115,7 +115,7 @@ typedef struct ata_device_infoblock {
 		word_63_bit_11_15_reserved				: 5
 	);
 
-	LBITFIELD2(
+	B_LBITFIELD16_2(
 		pio_modes_supported						: 8,
 		word_64_bit_8_15_reserved				: 8
 	);
@@ -124,7 +124,7 @@ typedef struct ata_device_infoblock {
 	uint16	recommended_multiword_dma_cycle_time;
 	uint16	min_pio_cycle_time;
 	uint16	min_pio_cycle_time_io_ready;
-	LBITFIELD12(
+	B_LBITFIELD16_12(
 		word_69_bit_0_4_reserved				: 5,
 		supports_read_zero_after_trim			: 1,
 		supports_ata28_commands					: 1,
@@ -143,14 +143,14 @@ typedef struct ata_device_infoblock {
 	uint16	atapi_service_command_to_busy_clear_time_ns;
 	uint16	word_71_74_reserved[2];
 
-	LBITFIELD2(
+	B_LBITFIELD16_2(
 		max_queue_depth_minus_one				: 5,
 		word_75_bit_5_15_reserved				: 11
 	);
 
 	uint16	word_76_79_reserved[4];
 
-	LBITFIELD14(
+	B_LBITFIELD16_14(
 		word_80_bit_0_reserved					: 1,
 		word_80_bit_1_3_obsolete				: 3,
 		supports_ata_atapi_4					: 1,
@@ -169,7 +169,7 @@ typedef struct ata_device_infoblock {
 
 	uint16	minor_version;
 
-	LBITFIELD16(
+	B_LBITFIELD16_16(
 		smart_supported							: 1,
 		security_mode_supported					: 1,
 		removable_media_supported				: 1,
@@ -188,7 +188,7 @@ typedef struct ata_device_infoblock {
 		word_82_bit_15_obsolete					: 1
 	);
 
-	LBITFIELD16(
+	B_LBITFIELD16_16(
 		download_microcode_supported			: 1,
 		read_write_dma_queued_supported			: 1,
 		compact_flash_assoc_supported			: 1,
@@ -207,7 +207,7 @@ typedef struct ata_device_infoblock {
 		word_83_bit_15_zero						: 1
 	);
 
-	LBITFIELD9(
+	B_LBITFIELD16_9(
 		smart_error_logging_supported			: 1,
 		smart_self_test_supported				: 1,
 		media_serial_number_supported			: 1,
@@ -219,7 +219,7 @@ typedef struct ata_device_infoblock {
 		word_84_bit_15_zero						: 1
 	);
 
-	LBITFIELD16(
+	B_LBITFIELD16_16(
 		smart_enabled							: 1,
 		security_mode_enabled					: 1,
 		removable_media_enabled					: 1,
@@ -238,7 +238,7 @@ typedef struct ata_device_infoblock {
 		word_85_bit_15_obsolete					: 1
 	);
 
-	LBITFIELD15(
+	B_LBITFIELD16_15(
 		download_microcode_supported_2			: 1,
 		read_write_dma_queued_supported_2		: 1,
 		compact_flash_assoc_enabled				: 1,
@@ -256,7 +256,7 @@ typedef struct ata_device_infoblock {
 		word_86_bit_14_15_reserved				: 2
 	);
 
-	LBITFIELD9(
+	B_LBITFIELD16_9(
 		smart_error_logging_supported_2			: 1,
 		smart_self_test_supported_2				: 1,
 		media_serial_number_valid				: 1,
@@ -268,7 +268,7 @@ typedef struct ata_device_infoblock {
 		word_87_bit_15_zero						: 1
 	);
 
-	LBITFIELD16(
+	B_LBITFIELD16_16(
 		ultra_dma_0_supported					: 1,
 		ultra_dma_1_supported					: 1,
 		ultra_dma_2_supported					: 1,
@@ -292,7 +292,7 @@ typedef struct ata_device_infoblock {
 	uint16	current_advanced_power_management_value;
 	uint16	master_password_revision_code;
 
-	LBITFIELD5(
+	B_LBITFIELD16_5(
 		device_0_hardware_reset_result			: 8,
 		device_1_hardware_reset_result			: 5,
 		cable_id_detected						: 1,
@@ -300,7 +300,7 @@ typedef struct ata_device_infoblock {
 		word_93_bit_15_zero						: 1
 	);
 
-	LBITFIELD2(
+	B_LBITFIELD16_2(
 		current_acoustic_management_value		: 8,
 		recommended_acoustic_management_value	: 8
 	);
@@ -310,7 +310,7 @@ typedef struct ata_device_infoblock {
 	uint16	word_104_reserved;
 	uint16	max_data_set_management_lba_range_blocks;
 
-	LBITFIELD6(
+	B_LBITFIELD16_6(
 		logical_sectors_per_physical_sector		: 4,	// 2^x exponent
 		word_106_bit_4_11_reserved				: 8,
 		logical_sector_not_512_bytes			: 1,
@@ -325,12 +325,12 @@ typedef struct ata_device_infoblock {
 
 	uint16	word_119_126_reserved[8];
 
-	LBITFIELD2(
+	B_LBITFIELD16_2(
 		removable_media_status_supported_2		: 2,	// 1 = supported
 		word_127_bit_2_15_reserved				: 14
 	);
 
-	LBITFIELD9(
+	B_LBITFIELD16_9(
 		security_supported						: 1,
 		security_enabled						: 1,
 		security_locked							: 1,
@@ -344,7 +344,7 @@ typedef struct ata_device_infoblock {
 
 	uint16	word_129_159_vendor_specific[31];
 
-	LBITFIELD5(
+	B_LBITFIELD16_5(
 		cfa_max_current_milli_ampers			: 12,
 		cfa_power_mode_1_disabled				: 1,
 		cfa_power_mode_1_required				: 1,
@@ -353,11 +353,11 @@ typedef struct ata_device_infoblock {
 	);
 
 	uint16	word_161_167_reserved_compact_flash_assoc[7];
-	LBITFIELD2(
+	B_LBITFIELD16_2(
 		device_nominal_form_factor				: 4,
 		word_168_bits_4_15_reserved				: 12
 	);
-	LBITFIELD2(
+	B_LBITFIELD16_2(
 		data_set_management_support				: 1,
 		word_169_bits_1_15_reserved				: 15
 	);
@@ -366,7 +366,7 @@ typedef struct ata_device_infoblock {
 	uint16	current_media_serial_number[30];
 	uint16	word_206_208_reserved[3];
 
-	LBITFIELD3(
+	B_LBITFIELD16_3(
 		logical_sector_offset					: 14,
 		word_209_bit_14_one						: 1,
 		word_209_bit_15_zero					: 1
@@ -374,7 +374,7 @@ typedef struct ata_device_infoblock {
 
 	uint16	word_210_254_reserved[45];
 
-	LBITFIELD2(
+	B_LBITFIELD16_2(
 		signature								: 8,
 		checksum								: 8
 	);

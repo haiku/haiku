@@ -13,10 +13,12 @@
 #include <Message.h>
 #include <Roster.h>
 
+#include <MessagePrivate.h>
 #include <RosterPrivate.h>
 #include <user_group.h>
 
 #include "Target.h"
+#include "Utility.h"
 
 
 Job::Job(const char* name)
@@ -28,6 +30,8 @@ Job::Job(const char* name)
 	fLaunching(false),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
+	fDefaultPort(-1),
+	fToken((uint32)B_PREFERRED_TOKEN),
 	fLaunchStatus(B_NO_INIT),
 	fTarget(NULL),
 	fPendingLaunchDataReplies(0, false)
@@ -42,8 +46,11 @@ Job::Job(const Job& other)
 	fEnabled(other.IsEnabled()),
 	fService(other.IsService()),
 	fCreateDefaultPort(other.CreateDefaultPort()),
+	fLaunching(other.IsLaunching()),
 	fInitStatus(B_NO_INIT),
 	fTeam(-1),
+	fDefaultPort(-1),
+	fToken((uint32)B_PREFERRED_TOKEN),
 	fLaunchStatus(B_NO_INIT),
 	fTarget(other.Target()),
 	fPendingLaunchDataReplies(0, false)
@@ -77,6 +84,20 @@ Job::Job(const Job& other)
 Job::~Job()
 {
 	_DeletePorts();
+}
+
+
+::TeamRegistrator*
+Job::TeamRegistrator() const
+{
+	return fTeamRegistrator;
+}
+
+
+void
+Job::SetTeamRegistrator(::TeamRegistrator* registrator)
+{
+	fTeamRegistrator = registrator;
 }
 
 
@@ -186,6 +207,27 @@ Job::AddRequirement(const char* requirement)
 }
 
 
+const BStringList&
+Job::Pending() const
+{
+	return fPendingJobs;
+}
+
+
+BStringList&
+Job::Pending()
+{
+	return fPendingJobs;
+}
+
+
+void
+Job::AddPending(const char* pending)
+{
+	fPendingJobs.Add(pending);
+}
+
+
 bool
 Job::CheckCondition(ConditionContext& context) const
 {
@@ -281,6 +323,30 @@ Job::Port(const char* name) const
 }
 
 
+port_id
+Job::DefaultPort() const
+{
+	return fDefaultPort;
+}
+
+
+void
+Job::SetDefaultPort(port_id port)
+{
+	fDefaultPort = port;
+
+	PortMap::iterator iterator = fPortMap.begin();
+	for (; iterator != fPortMap.end(); iterator++) {
+		BString name;
+		if (iterator->second.HasString("name"))
+			continue;
+
+		iterator->second.SetInt32("port", (int32)port);
+		break;
+	}
+}
+
+
 status_t
 Job::Launch()
 {
@@ -314,18 +380,21 @@ Job::Launch()
 	// Build argument vector
 
 	entry_ref ref;
-	status_t status = get_ref_for_path(fArguments.StringAt(0).String(), &ref);
+	status_t status = get_ref_for_path(
+		Utility::TranslatePath(fArguments.StringAt(0).String()), &ref);
 	if (status != B_OK) {
 		_SetLaunchStatus(status);
 		return status;
 	}
 
+	std::vector<BString> strings;
 	std::vector<const char*> args;
 
 	size_t count = fArguments.CountStrings() - 1;
 	if (count > 0) {
 		for (int32 i = 1; i < fArguments.CountStrings(); i++) {
-			args.push_back(fArguments.StringAt(i));
+			strings.push_back(Utility::TranslatePath(fArguments.StringAt(i)));
+			args.push_back(strings.back());
 		}
 		args.push_back(NULL);
 	}
@@ -345,8 +414,29 @@ Job::IsLaunched() const
 bool
 Job::IsRunning() const
 {
-	// TODO: monitor team status; should jobs be allowed to run multiple times?
-	return State() == B_JOB_STATE_SUCCEEDED && IsLaunched() && IsService();
+	return fTeam >= 0;
+}
+
+
+void
+Job::TeamDeleted()
+{
+	fTeam = -1;
+	fDefaultPort = -1;
+
+	if (IsService())
+		SetState(B_JOB_STATE_WAITING_TO_RUN);
+
+	MutexLocker locker(fLaunchStatusLock);
+	fLaunchStatus = B_NO_INIT;
+}
+
+
+bool
+Job::CanBeLaunched() const
+{
+	// Services cannot be launched while they are running
+	return IsEnabled() && !IsLaunching() && (!IsService() || !IsRunning());
 }
 
 
@@ -376,11 +466,22 @@ Job::HandleGetLaunchData(BMessage* message)
 
 
 status_t
+Job::GetMessenger(BMessenger& messenger)
+{
+	if (fDefaultPort < 0)
+		return B_NAME_NOT_FOUND;
+
+	BMessenger::Private(messenger).SetTo(fTeam, fDefaultPort, fToken);
+	return B_OK;
+}
+
+
+status_t
 Job::Run()
 {
 	status_t status = BJob::Run();
 
-	// TODO: monitor team, don't just do this
+	// Jobs can be relaunched at any time
 	if (!IsService())
 		SetState(B_JOB_STATE_WAITING_TO_RUN);
 
@@ -392,8 +493,10 @@ status_t
 Job::Execute()
 {
 	status_t status = B_OK;
-	if (!IsLaunched() || !IsService())
+	if (!IsRunning() || !IsService())
 		status = Launch();
+	else
+		debug_printf("Ignore launching %s\n", Name());
 
 	fLaunching = false;
 	return status;
@@ -495,6 +598,10 @@ Job::_SendPendingLaunchDataReplies()
 }
 
 
+/*!	Creates the ports for a newly launched job. If the registrar already
+	pre-registered the application, \c fDefaultPort will already be set, and
+	honored when filling the ports message.
+*/
 status_t
 Job::_CreateAndTransferPorts()
 {
@@ -514,13 +621,16 @@ Job::_CreateAndTransferPorts()
 		const int32 capacity = iterator->second.GetInt32("capacity",
 			B_LOOPER_PORT_DEFAULT_CAPACITY);
 
-		port_id port = create_port(capacity, name.String());
-		if (port < 0)
-			return port;
+		port_id port = -1;
+		if (suffix != NULL || fDefaultPort < 0) {
+			port = _CreateAndTransferPort(name.String(), capacity);
+			if (port < 0)
+				return port;
 
-		status_t result = set_port_owner(port, fTeam);
-		if (result != B_OK)
-			return result;
+			if (suffix == NULL)
+				fDefaultPort = port;
+		} else if (suffix == NULL)
+			port = fDefaultPort;
 
 		iterator->second.SetInt32("port", port);
 
@@ -534,13 +644,16 @@ Job::_CreateAndTransferPorts()
 		BMessage data;
 		data.AddInt32("capacity", B_LOOPER_PORT_DEFAULT_CAPACITY);
 
-		port_id port = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, Name());
-		if (port < 0)
-			return port;
+		port_id port = -1;
+		if (fDefaultPort < 0) {
+			port = _CreateAndTransferPort(Name(),
+				B_LOOPER_PORT_DEFAULT_CAPACITY);
+			if (port < 0)
+				return port;
 
-		status_t result = set_port_owner(port, fTeam);
-		if (result != B_OK)
-			return result;
+			fDefaultPort = port;
+		} else
+			port = fDefaultPort;
 
 		data.SetInt32("port", port);
 		AddPort(data);
@@ -550,20 +663,39 @@ Job::_CreateAndTransferPorts()
 }
 
 
+port_id
+Job::_CreateAndTransferPort(const char* name, int32 capacity)
+{
+	port_id port = create_port(B_LOOPER_PORT_DEFAULT_CAPACITY, Name());
+	if (port < 0)
+		return port;
+
+	status_t status = set_port_owner(port, fTeam);
+	if (status != B_OK) {
+		delete_port(port);
+		return status;
+	}
+
+	return port;
+}
+
+
 status_t
 Job::_Launch(const char* signature, entry_ref* ref, int argCount,
 	const char* const* args, const char** environment)
 {
 	thread_id mainThread = -1;
 	status_t result = BRoster::Private().Launch(signature, ref, NULL, argCount,
-		args, environment, &fTeam, &mainThread, true);
-
+		args, environment, &fTeam, &mainThread, &fDefaultPort, &fToken, true);
 	if (result == B_OK) {
 		result = _CreateAndTransferPorts();
 
-		if (result == B_OK)
+		if (result == B_OK) {
 			resume_thread(mainThread);
-		else
+
+			if (fTeamRegistrator != NULL)
+				fTeamRegistrator->RegisterTeam(this);
+		} else
 			kill_thread(mainThread);
 	}
 

@@ -419,6 +419,8 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 		new BMessage(SHOW_DOWNLOAD_WINDOW), 'D'));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Settings"),
 		new BMessage(SHOW_SETTINGS_WINDOW)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Cookie manager"),
+		new BMessage(SHOW_COOKIE_WINDOW)));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Script console"),
 		new BMessage(SHOW_CONSOLE_WINDOW)));
 	BMenuItem* aboutItem = new BMenuItem(B_TRANSLATE("About"),
@@ -1087,6 +1089,7 @@ BrowserWindow::MessageReceived(BMessage* message)
 		case SHOW_DOWNLOAD_WINDOW:
 		case SHOW_SETTINGS_WINDOW:
 		case SHOW_CONSOLE_WINDOW:
+		case SHOW_COOKIE_WINDOW:
 			message->AddUInt32("workspaces", Workspaces());
 			be_app->PostMessage(message);
 			break;
@@ -1183,10 +1186,32 @@ BrowserWindow::MessageReceived(BMessage* message)
 }
 
 
+status_t
+BrowserWindow::Archive(BMessage* archive, bool deep) const
+{
+	status_t ret = archive->AddRect("window frame", Frame());
+
+	for (int i = 0; i < fTabManager->CountTabs(); i++) {
+		BWebView* view = dynamic_cast<BWebView*>(fTabManager->ViewForTab(i));
+		if (view == NULL) {
+			continue;
+		}
+
+		if (ret == B_OK)
+			ret = archive->AddString("tab", view->MainFrameURL());
+	}
+
+	return ret;
+}
+
+
 bool
 BrowserWindow::QuitRequested()
 {
 	// TODO: Check for modified form data and ask user for confirmation, etc.
+
+	BMessage message(WINDOW_CLOSED);
+	Archive(&message);
 
 	// Iterate over all tabs to delete all BWebViews.
 	// Do this here, so WebKit tear down happens earlier.
@@ -1194,7 +1219,6 @@ BrowserWindow::QuitRequested()
 	while (fTabManager->CountTabs() > 0)
 		_ShutdownTab(0);
 
-	BMessage message(WINDOW_CLOSED);
 	message.AddRect("window frame", WindowFrame());
 	be_app->PostMessage(&message);
 	return true;
@@ -1336,9 +1360,7 @@ BrowserWindow::CreateNewTab(const BString& _url, bool select,
 	bool applyNewPagePolicy = webView == NULL;
 	// Executed in app thread (new BWebPage needs to be created in app thread).
 	if (webView == NULL)
-		webView = new BWebView("web view");
-
-	webView->SetContext(fContext);
+		webView = new BWebView("web view", fContext);
 
 	bool isNewWindow = fTabManager->CountTabs() == 0;
 

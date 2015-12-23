@@ -98,11 +98,10 @@ KeymapWindow::KeymapWindow()
 		new BMessage(kMsgSwitchShortcuts));
 
 	// controls pane
-	BLayoutBuilder::Group<>(this, B_VERTICAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(_CreateMenu())
 		.AddGroup(B_HORIZONTAL)
-			.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
-				B_USE_DEFAULT_SPACING)
+			.SetInsets(B_USE_WINDOW_SPACING)
 			.Add(_CreateMapLists(), 0.25)
 			.AddGroup(B_VERTICAL)
 				.Add(fKeyboardLayoutView)
@@ -114,12 +113,12 @@ KeymapWindow::KeymapWindow()
 				.Add(fTextControl)
 				.AddGlue(0.0)
 				.AddGroup(B_HORIZONTAL)
+					.AddGlue()
 					.Add(fDefaultsButton = new BButton("defaultsButton",
 						B_TRANSLATE("Defaults"),
 							new BMessage(kMsgDefaultKeymap)))
 					.Add(fRevertButton = new BButton("revertButton",
 						B_TRANSLATE("Revert"), new BMessage(kMsgRevertKeymap)))
-					.AddGlue()
 					.End()
 				.End()
 			.End()

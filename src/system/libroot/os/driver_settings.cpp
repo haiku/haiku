@@ -282,7 +282,7 @@ parse_parameter(struct driver_parameter *parameter, char **_pos, int32 level)
 	status = get_word(&pos, &parameter->name, NO_ASSIGNMENT, true);
 	if (status == CONTINUE_PARAMETER) {
 		while (status == CONTINUE_PARAMETER) {
-			char **newArray, *value;
+			char **newArray, *value = NULL;
 			status = get_word(&pos, &value, parameter->value_count == 0
 				? ALLOW_ASSIGNMENT : IGNORE_ASSIGNMENT, false);
 			if (status < B_OK)

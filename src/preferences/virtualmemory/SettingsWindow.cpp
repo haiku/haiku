@@ -120,8 +120,16 @@ SettingsWindow::SettingsWindow()
 	:
 	BWindow(BRect(0, 0, 269, 172), B_TRANSLATE_SYSTEM_NAME("VirtualMemory"),
 		B_TITLED_WINDOW, B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS
-		| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
-
+		| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
+	fSwapEnabledCheckBox(NULL),
+	fSwapAutomaticCheckBox(NULL),
+	fSizeSlider(NULL),
+	fDefaultsButton(NULL),
+	fRevertButton(NULL),
+	fWarningStringView(NULL),
+	fVolumeMenuField(NULL),
+	fSwapUsageBar(NULL),
+	fSetupComplete(false)
 {
 	gBootDev = dev_for_path("/boot");
 	BAlignment align(B_ALIGN_LEFT, B_ALIGN_MIDDLE);
@@ -213,7 +221,7 @@ SettingsWindow::SettingsWindow()
 	fRevertButton->SetEnabled(false);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(box)
 		.AddGroup(B_HORIZONTAL)
 			.Add(fDefaultsButton)
@@ -252,6 +260,7 @@ SettingsWindow::SettingsWindow()
 
 	// TODO: We may want to run this at an interval
 	_UpdateSwapInfo();
+	fSetupComplete = true;
 }
 
 
@@ -341,8 +350,10 @@ SettingsWindow::MessageReceived(BMessage* message)
 bool
 SettingsWindow::QuitRequested()
 {
-	fSettings.SetWindowPosition(Frame().LeftTop());
+	if (!fSetupComplete)
+		return true;
 
+	fSettings.SetWindowPosition(Frame().LeftTop());
 	_RecordChoices();
 	fSettings.WriteWindowSettings();
 	fSettings.WriteSwapSettings();

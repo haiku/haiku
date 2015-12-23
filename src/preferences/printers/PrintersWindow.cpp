@@ -230,7 +230,7 @@ PrintersWindow::PrintTestPage(PrinterItem* printer)
 
 	BMessage* settings = job->Settings();
 	if (settings == NULL) {
-		delete job;	
+		delete job;
 		return;
 	}
 
@@ -376,7 +376,7 @@ PrintersWindow::_BuildGUI()
 			.AddGlue();
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
-		.SetInsets(B_USE_DEFAULT_SPACING)
+		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(printersBox)
 		.AddStrut(B_USE_DEFAULT_SPACING)
 		.Add(fJobsBox);

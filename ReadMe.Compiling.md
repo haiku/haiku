@@ -69,6 +69,7 @@ The following ports need to be installed:
  * `mpfr`
  * `gmp`
  * `libmpc`
+ * `bison` (updated to the latest version)
 
 More information about individual distributions of Linux and BSD can be found
 at <https://haiku-os.org/guides/building/pre-reqs>.

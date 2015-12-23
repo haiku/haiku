@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	4273323974
+1	japanese	x-vnd.Haiku-HaikuDepot	2365524674
 Name	PackageListView		名前
 Available packages	MainWindow		使用可能なパッケージ
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
@@ -84,6 +84,7 @@ Productivity	Model		ビジネス
 No, quit HaikuDepot	App		いいえ、HaikuDepot を終了します:
 Authentication failed	UserLoginWindow		認証に失敗しました
 Logged in as %User%	MainWindow		%User% としてログイン
+9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		言語
 Size	PackageListView		サイズ
 Failed to create or update rating: %s\n	RatePackageWindow		次の評価の作成または更新に失敗しました: %s\n

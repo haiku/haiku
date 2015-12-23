@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2013, Haiku Inc. All Rights Reserved.
+ * Copyright 2010-2015, Haiku Inc. All Rights Reserved.
  * Copyright 2010 Clemens Zeidler. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -152,22 +152,22 @@ Protocol::RemoveHandler(Handler& handler)
 status_t
 Protocol::GetFolders(FolderList& folders, BString& separator)
 {
-	StringList allFolders;
+	BStringList allFolders;
 	status_t status = _GetAllFolders(allFolders);
 	if (status != B_OK)
 		return status;
 
-	StringList subscribedFolders;
+	BStringList subscribedFolders;
 	status = GetSubscribedFolders(subscribedFolders, separator);
 	if (status != B_OK)
 		return status;
 
-	for (size_t i = 0; i < allFolders.size(); i++) {
+	for (int32 i = 0; i < allFolders.CountStrings(); i++) {
 		FolderEntry entry;
-		entry.folder = allFolders[i];
-		for (unsigned int a = 0; a < subscribedFolders.size(); a++) {
-			if (allFolders[i] == subscribedFolders[a]
-				|| allFolders[i].ICompare("INBOX") == 0) {
+		entry.folder = allFolders.StringAt(i);
+		for (int32 j = 0; j < subscribedFolders.CountStrings(); j++) {
+			if (entry.folder == subscribedFolders.StringAt(j)
+				|| entry.folder.ICompare("INBOX") == 0) {
 				entry.subscribed = true;
 				break;
 			}
@@ -176,10 +176,10 @@ Protocol::GetFolders(FolderList& folders, BString& separator)
 	}
 
 	// you could be subscribed to a folder which not exist currently, add them:
-	for (size_t a = 0; a < subscribedFolders.size(); a++) {
+	for (int32 i = 0; i < subscribedFolders.CountStrings(); i++) {
 		bool isInlist = false;
-		for (size_t i = 0; i < allFolders.size(); i++) {
-			if (subscribedFolders[a] == allFolders[i]) {
+		for (int32 j = 0; j < allFolders.CountStrings(); j++) {
+			if (subscribedFolders.StringAt(i) == allFolders.StringAt(j)) {
 				isInlist = true;
 				break;
 			}
@@ -188,7 +188,7 @@ Protocol::GetFolders(FolderList& folders, BString& separator)
 			continue;
 
 		FolderEntry entry;
-		entry.folder = subscribedFolders[a];
+		entry.folder = subscribedFolders.StringAt(i);
 		entry.subscribed = true;
 		folders.push_back(entry);
 	}
@@ -198,7 +198,7 @@ Protocol::GetFolders(FolderList& folders, BString& separator)
 
 
 status_t
-Protocol::GetSubscribedFolders(StringList& folders, BString& separator)
+Protocol::GetSubscribedFolders(BStringList& folders, BString& separator)
 {
 	ListCommand command(NULL, true);
 	status_t status = ProcessCommand(command);
@@ -391,7 +391,7 @@ Protocol::_Disconnect()
 
 
 status_t
-Protocol::_GetAllFolders(StringList& folders)
+Protocol::_GetAllFolders(BStringList& folders)
 {
 	ListCommand command(NULL, false);
 	status_t status = ProcessCommand(command);

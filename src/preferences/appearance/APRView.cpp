@@ -18,7 +18,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <Messenger.h>
 #include <Path.h>
@@ -96,18 +96,13 @@ APRView::APRView(const char* name)
 	fPicker = new BColorControl(B_ORIGIN, B_CELLS_32x8, 8.0,
 		"picker", new BMessage(UPDATE_COLOR));
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
-		.Add(fScrollView)
-		.Add(BSpaceLayoutItem::CreateVerticalStrut(5))
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.Add(fScrollView, 10.0)
+		.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 			.Add(fColorPreview)
-			.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
 			.Add(fPicker)
-		)
-		.SetInsets(10, 10, 10, 10)
-	);
+			.End()
+		.SetInsets(B_USE_WINDOW_SPACING);
 
 	fColorPreview->Parent()->SetExplicitMaxSize(
 		BSize(B_SIZE_UNSET, fPicker->Bounds().Height()));

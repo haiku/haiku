@@ -17,6 +17,7 @@
 
 #include "BaseJob.h"
 #include "LaunchDaemon.h"
+#include "NetworkWatcher.h"
 #include "Utility.h"
 #include "VolumeWatcher.h"
 
@@ -67,6 +68,16 @@ public:
 };
 
 
+class StickyEvent : public Event {
+public:
+								StickyEvent(Event* parent);
+	virtual						~StickyEvent();
+
+	virtual	void				ResetSticky();
+	virtual	void				ResetTrigger();
+};
+
+
 class DemandEvent : public Event {
 public:
 								DemandEvent(Event* parent);
@@ -86,6 +97,7 @@ public:
 			const BString&		Name() const;
 			bool				Resolve(uint32 flags);
 
+			void				ResetSticky();
 	virtual	void				ResetTrigger();
 
 	virtual	status_t			Register(EventRegistrator& registrator);
@@ -131,6 +143,20 @@ public:
 };
 
 
+class NetworkAvailableEvent : public StickyEvent, public NetworkListener {
+public:
+								NetworkAvailableEvent(Event* parent,
+									const BMessage& args);
+
+	virtual	status_t			Register(EventRegistrator& registrator);
+	virtual	void				Unregister(EventRegistrator& registrator);
+
+	virtual	BString				ToString() const;
+
+	virtual	void				NetworkAvailabilityChanged(bool available);
+};
+
+
 static Event*
 create_event(Event* parent, const char* name, const BMessenger* target,
 	const BMessage& args)
@@ -148,6 +174,8 @@ create_event(Event* parent, const char* name, const BMessenger* target,
 		return new FileCreatedEvent(parent, args);
 	if (strcmp(name, "volume_mounted") == 0)
 		return new VolumeMountedEvent(parent, args);
+	if (strcmp(name, "network_available") == 0)
+		return new NetworkAvailableEvent(parent, args);
 
 	return new ExternalEvent(parent, name, args);
 }
@@ -158,7 +186,8 @@ create_event(Event* parent, const char* name, const BMessenger* target,
 
 Event::Event(Event* parent)
 	:
-	fParent(parent)
+	fParent(parent),
+	fTriggered(false)
 {
 }
 
@@ -388,6 +417,35 @@ OrEvent::ToString() const
 }
 
 
+// #pragma mark - StickyEvent
+
+
+StickyEvent::StickyEvent(Event* parent)
+	:
+	Event(parent)
+{
+}
+
+
+StickyEvent::~StickyEvent()
+{
+}
+
+
+void
+StickyEvent::ResetSticky()
+{
+	Event::ResetTrigger();
+}
+
+
+void
+StickyEvent::ResetTrigger()
+{
+	// This is a sticky event; we don't reset the trigger here
+}
+
+
 // #pragma mark - demand
 
 
@@ -414,7 +472,7 @@ DemandEvent::Unregister(EventRegistrator& registrator)
 BString
 DemandEvent::ToString() const
 {
-	return "event";
+	return "demand";
 }
 
 
@@ -457,12 +515,18 @@ ExternalEvent::Resolve(uint32 flags)
 
 
 void
-ExternalEvent::ResetTrigger()
+ExternalEvent::ResetSticky()
 {
 	if ((fFlags & B_STICKY_EVENT) != 0)
-		return;
+		Event::ResetTrigger();
+}
 
-	Event::ResetTrigger();
+
+void
+ExternalEvent::ResetTrigger()
+{
+	if ((fFlags & B_STICKY_EVENT) == 0)
+		Event::ResetTrigger();
 }
 
 
@@ -569,6 +633,49 @@ VolumeMountedEvent::VolumeUnmounted(dev_t device)
 // #pragma mark -
 
 
+NetworkAvailableEvent::NetworkAvailableEvent(Event* parent,
+	const BMessage& args)
+	:
+	StickyEvent(parent)
+{
+}
+
+
+status_t
+NetworkAvailableEvent::Register(EventRegistrator& registrator)
+{
+	NetworkWatcher::Register(this);
+	return B_OK;
+}
+
+
+void
+NetworkAvailableEvent::Unregister(EventRegistrator& registrator)
+{
+	NetworkWatcher::Unregister(this);
+}
+
+
+BString
+NetworkAvailableEvent::ToString() const
+{
+	return "network_available";
+}
+
+
+void
+NetworkAvailableEvent::NetworkAvailabilityChanged(bool available)
+{
+	if (available)
+		Trigger();
+	else
+		ResetSticky();
+}
+
+
+// #pragma mark -
+
+
 /*static*/ Event*
 Events::FromMessage(const BMessenger& target, const BMessage& message)
 {
@@ -642,13 +749,39 @@ Events::TriggerExternalEvent(Event* event, const char* name)
 }
 
 
+/*static*/ void
+Events::ResetStickyExternalEvent(Event* event, const char* name)
+{
+	if (event == NULL)
+		return;
+
+	if (EventContainer* container = dynamic_cast<EventContainer*>(event)) {
+		for (int32 index = 0; index < container->Events().CountItems();
+				index++) {
+			Event* event = container->Events().ItemAt(index);
+			if (ExternalEvent* external = dynamic_cast<ExternalEvent*>(event)) {
+				if (external->Name() == name) {
+					external->ResetSticky();
+					return;
+				}
+			} else if (dynamic_cast<EventContainer*>(event) != NULL) {
+				ResetStickyExternalEvent(event, name);
+			}
+		}
+	}
+	return;
+}
+
+
 /*!	This will trigger a demand event, if it exists.
 
+	\param testOnly If \c true, the deman will not actually be triggered,
+			it will only be checked if it could.
 	\return \c true, if there is a demand event, and it has been
 			triggered by this call. \c false if not.
 */
 /*static*/ bool
-Events::TriggerDemand(Event* event)
+Events::TriggerDemand(Event* event, bool testOnly)
 {
 	if (event == NULL || event->Triggered())
 		return false;
@@ -658,11 +791,14 @@ Events::TriggerDemand(Event* event)
 				index++) {
 			Event* childEvent = container->Events().ItemAt(index);
 			if (dynamic_cast<DemandEvent*>(childEvent) != NULL) {
+				if (testOnly)
+					return true;
+
 				childEvent->Trigger();
 				break;
 			}
 			if (dynamic_cast<EventContainer*>(childEvent) != NULL) {
-				if (TriggerDemand(childEvent))
+				if (TriggerDemand(childEvent, testOnly))
 					break;
 			}
 		}

@@ -1,6 +1,7 @@
 /*
  * Copyright 2005-2007, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2008, Andrej Spielmann <andrej.spielmann@seh.ox.ac.uk>.
+ * Copyright 2015, Julian Harnath <julian.harnath@rwth-aachen.de>
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  * API to the Anti-Grain Geometry based "Painter" drawing backend. Manages
@@ -13,6 +14,7 @@
 
 #include "AGGTextRenderer.h"
 #include "FontManager.h"
+#include "PainterAggInterface.h"
 #include "PatternHandler.h"
 #include "ServerFont.h"
 #include "Transformable.h"
@@ -20,7 +22,6 @@
 #include "defines.h"
 
 #include <agg_conv_curve.h>
-#include <agg_path_storage.h>
 
 #include <AffineTransform.h>
 #include <Font.h>
@@ -40,6 +41,11 @@ class FontCacheReference;
 class RenderingBuffer;
 class ServerBitmap;
 class ServerFont;
+
+
+// Defines for SIMD support.
+#define APPSERVER_SIMD_MMX	(1 << 0)
+#define APPSERVER_SIMD_SSE	(1 << 1)
 
 
 class Painter {
@@ -67,6 +73,8 @@ public:
 
 	inline	bool				IsIdentityTransform() const
 									{ return fIdentityTransform; }
+			const Transformable& Transform() const
+									{ return fTransform; }
 
 			void				SetHighColor(const rgb_color& color);
 	inline	rgb_color			HighColor() const
@@ -243,6 +251,8 @@ public:
 	inline	BRect				AlignAndClipRect(BRect rect) const;
 	inline	BRect				AlignRect(BRect rect) const;
 
+			void				SetRendererOffset(int32 offsetX,
+									int32 offsetY);
 
 private:
 			float				_Align(float coord, bool round,
@@ -269,41 +279,6 @@ private:
 									const BPoint* points,
 									const BPoint& viewToScreenOffset,
 									float viewScale) const;
-
-			template<typename sourcePixel>
-			void				_TransparentMagicToAlpha(sourcePixel *buffer,
-									uint32 width, uint32 height,
-									uint32 sourceBytesPerRow,
-									sourcePixel transparentMagic,
-									BBitmap *output) const;
-
-			void				_DrawBitmap(agg::rendering_buffer& srcBuffer,
-									color_space format,
-									BRect actualBitmapRect,
-									BRect bitmapRect, BRect viewRect,
-									uint32 bitmapFlags) const;
-			template <class F>
-			void				_DrawBitmapNoScale32( F copyRowFunction,
-									uint32 bytesPerSourcePixel,
-									agg::rendering_buffer& srcBuffer,
-									int32 xOffset, int32 yOffset,
-									BRect viewRect) const;
-			void				_DrawBitmapNearestNeighborCopy32(
-									agg::rendering_buffer& srcBuffer,
-									double xOffset, double yOffset,
-									double xScale, double yScale,
-									BRect viewRect) const;
-			void				_DrawBitmapBilinearCopy32(
-									agg::rendering_buffer& srcBuffer,
-									double xOffset, double yOffset,
-									double xScale, double yScale,
-									BRect viewRect) const;
-			void				_DrawBitmapGeneric32(
-									agg::rendering_buffer& srcBuffer,
-									double xOffset, double yOffset,
-									double xScale, double yScale,
-									BRect viewRect,
-									uint32 bitmapFlags) const;
 
 			void				_InvertRect32(BRect r) const;
 			void				_BlendRect32(const BRect& r,
@@ -353,33 +328,12 @@ private:
 									int gradientStop = 100) const;
 
 private:
-	mutable	agg::rendering_buffer fBuffer;
+	class BitmapPainter;
 
-	// AGG rendering and rasterization classes
-			pixfmt				fPixelFormat;
-	mutable	renderer_base		fBaseRenderer;
+	friend class BitmapPainter; // needed only for gcc2
 
-	// Regular drawing mode: pixel-aligned, no alpha masking
-	mutable	scanline_unpacked_type fUnpackedScanline;
-	mutable	scanline_packed_type fPackedScanline;
-	mutable	rasterizer_type		fRasterizer;
-	mutable	renderer_type		fRenderer;
-
-	// Fast mode: no antialiasing needed (horizontal/vertical lines, ...)
-	mutable	renderer_bin_type	fRendererBin;
-
-	// Subpixel mode
-	mutable	scanline_packed_subpix_type fSubpixPackedScanline;
-	mutable	scanline_unpacked_subpix_type fSubpixUnpackedScanline;
-	mutable	rasterizer_subpix_type fSubpixRasterizer;
-	mutable	renderer_subpix_type fSubpixRenderer;
-
-	// Alpha-Masked mode: for ClipToPicture
-	// (this uses the standard rasterizer and renderer)
-	mutable	scanline_unpacked_masked_type* fMaskedUnpackedScanline;
-
-	mutable	agg::path_storage	fPath;
-	mutable	agg::conv_curve<agg::path_storage> fCurve;
+private:
+	mutable	PainterAggInterface	fInternal;
 
 	// for internal coordinate rounding/transformation
 			bool				fSubpixelPrecise : 1;

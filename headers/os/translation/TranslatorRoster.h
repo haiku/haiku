@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _TRANSLATOR_ROSTER_H
@@ -21,6 +21,17 @@ class BRect;
 class BTranslator;
 class BView;
 struct entry_ref;
+
+
+class BTranslatorReleaseDelegate {
+public:
+								BTranslatorReleaseDelegate(BTranslator* translator);
+
+			void				Release();
+
+private:
+			BTranslator*		fUnderlying;
+};
 
 
 class BTranslatorRoster : public BArchivable {
@@ -85,6 +96,8 @@ public:
 	virtual	status_t			GetConfigurationMessage(
 									translator_id translatorID,
 									BMessage* ioExtension);
+
+			BTranslatorReleaseDelegate*	AcquireTranslator(int32 translatorID);
 
 			status_t			GetRefFor(translator_id translatorID,
 									entry_ref* ref);

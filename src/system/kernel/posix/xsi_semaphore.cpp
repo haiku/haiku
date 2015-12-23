@@ -34,6 +34,9 @@
 #	define TRACE_ERROR(x)	dprintf x
 #endif
 
+
+namespace {
+
 // Queue for holding blocked threads
 struct queued_thread : DoublyLinkedListLinkImpl<queued_thread> {
 	queued_thread(Thread *thread, int32 count)
@@ -72,6 +75,10 @@ typedef DoublyLinkedList<sem_undo> UndoList;
 typedef DoublyLinkedList<sem_undo,
 	DoublyLinkedListMemberGetLink<sem_undo, &sem_undo::team_link> > TeamList;
 
+} // namespace
+
+
+// Forward declared in global namespace.
 struct xsi_sem_context {
 	xsi_sem_context()
 	{
@@ -86,6 +93,9 @@ struct xsi_sem_context {
 	TeamList	undo_list;
 	mutex		lock;
 };
+
+
+namespace {
 
 // Xsi semaphore definition
 class XsiSemaphore {
@@ -620,6 +630,9 @@ struct IpcHashTableDefinition {
 		return variable->Link();
 	}
 };
+
+} // namespace
+
 
 // Arbitrary limit
 #define MAX_XSI_SEMAPHORE		4096

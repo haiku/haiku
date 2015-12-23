@@ -1,4 +1,4 @@
-1	croatian	x-vnd.haiku-icon_o_matic	383371222
+1	croatian	x-vnd.haiku-icon_o_matic	1592365908
 Select All	Icon-O-Matic-PathManipulator		Odaberi sve
 Add Style	Icon-O-Matic-AddStylesCmd		Dodaj stil
 Color (#%02x%02x%02x)	Style name after dropping a color		Boja (#%02x%02x%02x)
@@ -14,6 +14,7 @@ Remove Path	Icon-O-Matic-RemovePathsCmd		Ukloni putanju
 Select	Icon-O-Matic-Properties		Odaberi
 Height	Icon-O-Matic-PropertyNames		Visina
 Width	Icon-O-Matic-PropertyNames		Širina
+Transformation	Icon-O-Matic-TransformationBoxStates		Pretvorba
 Duplicate	Icon-O-Matic-ShapesList		Udvostruči
 <unkown property>	Icon-O-Matic-PropertyNames		<nepoznato svojstvo>
 Assign Path	Icon-O-Matic-AddPathsCmd		Dodjeli putanju
@@ -43,6 +44,7 @@ Reverse	Icon-O-Matic-PathsList		Obrnuto
 HVIF Source Code	Icon-O-Matic-SavePanel		HVIF izvorni kod
 Settings	Icon-O-Matic-Menus		Postavke
 All	Icon-O-Matic-Properties		Sve
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Tekst koji pokušavate uvesti je dugačak, jeste li sigurni?
 Perspective	Transformation		Perspektiva
 Opacity	Icon-O-Matic-PropertyNames		Neprozirnost
 Add with path	Icon-O-Matic-ShapesList		Dodaj sa putanjom
@@ -75,6 +77,7 @@ Add shape with path & style	Icon-O-Matic-Menu-Shape		Dodaj sa putanjom & stilom
 Gradient	Icon-O-Matic-StyleTypes		Gradijent
 Invert selection	Icon-O-Matic-Properties		Obrnuti odabir
 Export as…	Icon-O-Matic-Menu-File		Izvezi kao...
+Transformation	Transformation		Pretvorba
 Move Styles	Icon-O-Matic-MoveStylesCmd		Ukloni stilove
 Split Control Points	Icon-O-Matic-SplitPointsCmd		Podijeli kontrolne točke
 Save	Icon-O-Matic-Menu-Settings		Spremi

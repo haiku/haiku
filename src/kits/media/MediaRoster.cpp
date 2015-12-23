@@ -42,8 +42,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 
 #include <MediaRoster.h>
 
-#include <new>
-
+#include <Application.h>
 #include <Autolock.h>
 #include <BufferConsumer.h>
 #include <BufferProducer.h>
@@ -58,8 +57,9 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002-2006 Marcus "
 #include <String.h>
 #include <TimeSource.h>
 
-#include <AppMisc.h>
+#include <new>
 
+#include <AppMisc.h>
 #include <DataExchange.h>
 #include <debug.h>
 #include <DormantNodeManager.h>
@@ -82,9 +82,31 @@ struct RosterNotification {
 	int32		what;
 };
 
+
+struct LocalNode {
+				LocalNode(BMediaNode* local_node)
+					:
+					node(local_node) {}
+
+				LocalNode()
+					:
+					node(NULL) {}
+
+	bool 		operator==(const LocalNode& a)
+				{
+					if (a.node == this->node)
+						return true;
+					return false;
+				}
+
+	BMediaNode* node;
+};
+
+
 static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
 static BLocker sInitLocker("BMediaRoster::Roster locker");
+static List<LocalNode> sRegisteredNodes;
 
 
 class MediaRosterUndertaker {
@@ -94,6 +116,22 @@ public:
 		BAutolock _(sInitLocker);
 		if (BMediaRoster::CurrentRoster() != NULL
 				&& BMediaRoster::CurrentRoster()->Lock()) {
+
+			// Detect any forgotten node
+			if (sRegisteredNodes.CountItems() > 0) {
+				for (int32 i = 0; i < sRegisteredNodes.CountItems(); i++) {
+					LocalNode* node = NULL;
+					sRegisteredNodes.Get(i, &node);
+					if (node != NULL) {
+						ERROR("BMediaRoster: Node with ID %" B_PRId32
+							" was not released correctly\n", node->node->ID());
+					}
+				}
+			}
+
+			if (be_app != NULL)
+				be_app->UnregisterLooper(BMediaRoster::CurrentRoster());
+
 			BMediaRoster::CurrentRoster()->Quit();
 		}
 	}
@@ -173,6 +211,22 @@ BMediaRosterEx::~BMediaRosterEx()
 		sizeof(reply));
 
 	BPrivate::SharedBufferList::Invalidate();
+}
+
+
+void
+BMediaRosterEx::RegisterLocalNode(BMediaNode* node)
+{
+	sRegisteredNodes.Insert(LocalNode(node));
+}
+
+
+void
+BMediaRosterEx::UnregisterLocalNode(BMediaNode* node)
+{
+	int32 index = sRegisteredNodes.Find(LocalNode(node));
+	if (index != -1)
+		sRegisteredNodes.Remove(index);
 }
 
 
@@ -2221,6 +2275,9 @@ BMediaRoster::Roster(status_t* out_error)
 {
 	BAutolock lock(sInitLocker);
 
+	if (be_app == NULL)
+		TRACE("Warning! You should have a valid BApplication.");
+
 	if (!lock.IsLocked())
 		return NULL;
 
@@ -2240,8 +2297,11 @@ BMediaRoster::Roster(status_t* out_error)
 			}
 			if (out_error)
 				*out_error = err;
+		} else if (be_app != NULL) {
+			be_app->RegisterLooper(sDefaultInstance);
 		}
 	}
+
 	return sDefaultInstance;
 }
 
@@ -3284,22 +3344,6 @@ BMediaRoster::IsRunning()
 }
 
 
-status_t
-BMediaRoster::SetRealtimeFlags(uint32 enabled)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-
-status_t
-BMediaRoster::GetRealtimeFlags(uint32* _enabled)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-
 ssize_t
 BMediaRoster::AudioBufferSizeFor(int32 channelCount, uint32 sampleFormat,
 	float frameRate, bus_type busKind)
@@ -3470,23 +3514,19 @@ BMediaRoster::MessageReceived(BMessage* message)
 
 		case NODE_FINAL_RELEASE:
 		{
-			// this function is called by a BMediaNode to delete
+			// This function is called by a BMediaNode to delete
 			// itself, as this needs to be done from another thread
 			// context, it is done here.
-			// TODO: If a node is released using BMediaRoster::ReleaseNode()
-			// TODO: instead of using BMediaNode::Release() / BMediaNode::Acquire()
-			// TODO: fRefCount of the BMediaNode will not be correct.
 
-			BMediaNode *node;
-			message->FindPointer("node", reinterpret_cast<void **>(&node));
-
-			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE saving "
-				"node %" B_PRId32 " configuration\n", node->ID());
-			MediaRosterEx(BMediaRoster::Roster())->SaveNodeConfiguration(node);
-
-			TRACE("BMediaRoster::MessageReceived NODE_FINAL_RELEASE releasing "
-				"node %" B_PRId32 "\n", node->ID());
-			node->DeleteHook(node); // we don't call Release(), see above!
+			BMediaNode* node = NULL;
+			status_t err = message->FindPointer("node",
+				reinterpret_cast<void **>(&node));
+			if (err == B_OK && node != NULL)
+				node->Release();
+			else {
+				TRACE("BMediaRoster::MessageReceived: CRITICAL! received"
+					"a release request but the node can't be found.");
+			}
 			return;
 		}
 
@@ -3529,20 +3569,7 @@ BMediaRoster::~BMediaRoster()
 	sDefaultInstance = NULL;
 }
 
-
 //	#pragma mark - private BMediaRoster
-
-
-//! Deprecated call.
-status_t
-BMediaRoster::SetOutputBuffersFor(const media_source& output,
-	BBufferGroup* group, bool willReclaim)
-{
-	UNIMPLEMENTED();
-	debugger("BMediaRoster::SetOutputBuffersFor missing\n");
-	return B_ERROR;
-}
-
 
 // FBC reserved virtuals
 status_t BMediaRoster::_Reserved_MediaRoster_0(void*) { return B_ERROR; }
@@ -3566,34 +3593,6 @@ BMediaRoster::BMediaRoster()
 	Run();
 }
 
-
-// TODO: Looks like these can be safely removed:
-/*static*/ status_t
-BMediaRoster::ParseCommand(BMessage& reply)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-
-status_t
-BMediaRoster::GetDefaultInfo(media_node_id forDefault, BMessage& config)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-
-status_t
-BMediaRoster::SetRunningDefault(media_node_id forDefault,
-	const media_node& node)
-{
-	UNIMPLEMENTED();
-	return B_ERROR;
-}
-
-
 // #pragma mark - static variables
-
 
 BMediaRoster* BMediaRoster::sDefaultInstance = NULL;

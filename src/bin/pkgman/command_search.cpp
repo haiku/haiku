@@ -53,6 +53,8 @@ static const char* const kLongUsage =
 	"    Only find installed packages.\n"
 	"  -u, --uninstalled-only\n"
 	"    Only find not installed packages.\n"
+	"  -r, --requirements\n"
+	"    Search packages with <search-string> as requirements.\n"
 	"\n"
 	"Status flags in non-detailed listings:\n"
 	"  S - installed in system with a matching version in a repository\n"
@@ -132,6 +134,7 @@ SearchCommand::Execute(int argc, const char* const* argv)
 	bool uninstalledOnly = false;
 	bool listAll = false;
 	bool details = false;
+	bool requirements = false;
 
 	while (true) {
 		static struct option sLongOptions[] = {
@@ -141,11 +144,12 @@ SearchCommand::Execute(int argc, const char* const* argv)
 			{ "help", no_argument, 0, 'h' },
 			{ "installed-only", no_argument, 0, 'i' },
 			{ "uninstalled-only", no_argument, 0, 'u' },
+			{ "requirements", no_argument, 0, 'r' },
 			{ 0, 0, 0, 0 }
 		};
 
 		opterr = 0; // don't print errors
-		int c = getopt_long(argc, (char**)argv, "aDhiu", sLongOptions, NULL);
+		int c = getopt_long(argc, (char**)argv, "aDhiur", sLongOptions, NULL);
 		if (c == -1)
 			break;
 
@@ -175,6 +179,10 @@ SearchCommand::Execute(int argc, const char* const* argv)
 				installedOnly = false;
 				break;
 
+			case 'r':
+				requirements = true;
+				break;
+
 			default:
 				PrintUsageAndExit(true);
 				break;
@@ -183,7 +191,7 @@ SearchCommand::Execute(int argc, const char* const* argv)
 
 	// The remaining argument is the search string. Ignored when --all has been
 	// specified.
-	if (!listAll && argc != optind + 1)
+	if ((!listAll && argc != optind + 1) || (listAll && requirements))
 		PrintUsageAndExit(true);
 
 	const char* searchString = listAll ? "" : argv[optind++];
@@ -195,13 +203,15 @@ SearchCommand::Execute(int argc, const char* const* argv)
 		(!uninstalledOnly ? PackageManager::B_ADD_INSTALLED_REPOSITORIES : 0)
 			| (!installedOnly ? PackageManager::B_ADD_REMOTE_REPOSITORIES : 0));
 
+	uint32 flags = BSolver::B_FIND_CASE_INSENSITIVE | BSolver::B_FIND_IN_NAME
+		| BSolver::B_FIND_IN_SUMMARY | BSolver::B_FIND_IN_DESCRIPTION
+		| BSolver::B_FIND_IN_PROVIDES;
+	if (requirements)
+		flags = BSolver::B_FIND_IN_REQUIRES;
 	// search
 	BObjectList<BSolverPackage> packages;
 	status_t error = packageManager.Solver()->FindPackages(searchString,
-		BSolver::B_FIND_CASE_INSENSITIVE | BSolver::B_FIND_IN_NAME
-			| BSolver::B_FIND_IN_SUMMARY | BSolver::B_FIND_IN_DESCRIPTION
-			| BSolver::B_FIND_IN_PROVIDES,
-		packages);
+		flags, packages);
 	if (error != B_OK)
 		DIE(error, "searching packages failed");
 

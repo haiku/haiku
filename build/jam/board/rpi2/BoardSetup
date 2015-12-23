@@ -58,7 +58,7 @@ HAIKU_BOARD_SDIMAGE_SIZE = 128 ;
 # gcc flags for the specific cpu
 #
 
-local flags = -mtune=arm1176jzf-s -march=armv7-a ;
+local flags = -march=armv7-a -mfloat-abi=hard ;
 
 HAIKU_ASFLAGS_$(HAIKU_PACKAGING_ARCH) += $(flags) ;
 HAIKU_CCFLAGS_$(HAIKU_PACKAGING_ARCH) += $(flags) ;

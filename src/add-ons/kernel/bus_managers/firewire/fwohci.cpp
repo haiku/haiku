@@ -87,7 +87,7 @@ char fwohcicode[32][0x20]={
 
 #define MAX_SPEED 3
 extern const char *const linkspeed[];
-uint32_t tagbit[4] = { 1 << 28, 1 << 29, 1 << 30, 1 << 31};
+uint32_t tagbit[4] = { 1u << 28, 1u << 29, 1u << 30, 1u << 31};
 
 static struct tcode_info tinfo[] = {
 /*		hdr_len block 	flag	valid_response */

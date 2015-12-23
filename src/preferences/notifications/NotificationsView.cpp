@@ -9,20 +9,19 @@
 
 #include <Alert.h>
 #include <Catalog.h>
-#include <Directory.h>
-#include <FindDirectory.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
-#include <Window.h>
 #include <CheckBox.h>
-#include <TextControl.h>
-#include <Path.h>
-#include <Notification.h>
-#include <notification/Notifications.h>
-#include <notification/NotificationReceived.h>
-
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
+#include <Directory.h>
+#include <FindDirectory.h>
+#include <LayoutBuilder.h>
+#include <Notification.h>
+#include <Path.h>
+#include <TextControl.h>
+#include <Window.h>
+
+#include <notification/Notifications.h>
+#include <notification/NotificationReceived.h>
 
 #include "NotificationsView.h"
 
@@ -59,23 +58,23 @@ NotificationsView::NotificationsView(SettingsHost* host)
 		new BMessage(kSettingChanged));
 
 	// Applications list
-	fApplications = new BColumnListView(rect, B_TRANSLATE("Applications"),
-		0, B_WILL_DRAW, B_FANCY_BORDER, true);
+	fApplications = new BColumnListView(B_TRANSLATE("Applications"),
+		0, B_FANCY_BORDER, true);
 	fApplications->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 
 	fAppCol = new BStringColumn(B_TRANSLATE("Application"), 200,
-		be_plain_font->StringWidth(B_TRANSLATE("Application")) + 
+		be_plain_font->StringWidth(B_TRANSLATE("Application")) +
 		(kCLVTitlePadding * 2), rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
 	fApplications->AddColumn(fAppCol, kAppIndex);
 
 	fAppEnabledCol = new BStringColumn(B_TRANSLATE("Enabled"), 10,
-		be_plain_font->StringWidth(B_TRANSLATE("Enabled")) + 
+		be_plain_font->StringWidth(B_TRANSLATE("Enabled")) +
 		(kCLVTitlePadding * 2), rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
 	fApplications->AddColumn(fAppEnabledCol, kAppEnabledIndex);
 
 	// Notifications list
-	fNotifications = new BColumnListView(rect, B_TRANSLATE("Notifications"),
-		0, B_WILL_DRAW, B_FANCY_BORDER, true);
+	fNotifications = new BColumnListView(B_TRANSLATE("Notifications"),
+		0, B_FANCY_BORDER, true);
 	fNotifications->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 
 	fTitleCol = new BStringColumn(B_TRANSLATE("Title"), 100,
@@ -98,22 +97,16 @@ NotificationsView::NotificationsView(SettingsHost* host)
 		(kCLVTitlePadding * 2), rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
 	fNotifications->AddColumn(fAllowCol, kAllowIndex);
 
-	// Calculate inset
-	float inset = ceilf(be_plain_font->Size() * 0.7f);
-
-	// Set layout
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	// Add views
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, inset)
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddGroup(B_HORIZONTAL)
 			.AddGlue()
 			.Add(fSearch)
 		.End()
 		.Add(fApplications)
 		.Add(fNotifications)
-		.SetInsets(inset, inset, inset, inset)
-	);
+		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
+			B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING);
 }
 
 

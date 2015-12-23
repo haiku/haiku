@@ -1,7 +1,8 @@
-1	finnish	x-vnd.Be-MAIL	4285843074
+1	finnish	x-vnd.Be-MAIL	1865394837
 View	Mail		Näkymä
 %d - Date	Mail		%d - Päivämäärä
 Attach attributes:	Mail		Liittämisattribuutit:
+Unknown	Mail		Tuntematon
 Inconsistency occurred in the undo/redo buffer.	Mail		Tapahtui epäjohdonmukaisuutta puskurin perumisen/uudelleentekemisen yhteydessä.
 An error occurred trying to save the attachment.	Mail		Tapahtui virhe yritettäessä tallentaa liitettä.
 Copy to new	Mail		Kopioi uuteen
@@ -146,6 +147,7 @@ sent	B_USER_DIRECTORY/mail/sent		lähetetty
 Put your favorite e-mail queries and query templates in this folder.	Mail		Laita suosikkisähköpostikyselysi ja kyselymallinteet tähän kansioon.
 Spam	Mail		Roskaposti
 Reply	Mail		Vastaa
+Encoding	Mail		Koodaus
 From:	Mail		Lähettäjä:
 Couldn't open this signature. Sorry.	Mail		Tämän allekirjoituksen avaus epäonnistui.
 Open draft	Mail		Avaa luonnos

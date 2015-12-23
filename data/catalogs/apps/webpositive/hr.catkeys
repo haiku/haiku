@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-WebPositive	3921227996
+1	croatian	x-vnd.Haiku-WebPositive	983015473
 Username:	Authentication Panel		Korisničko ime:
 Cancel	Settings Window		Otkaži
 Close window	WebPositive Window		Zatvori prozor
@@ -14,6 +14,7 @@ Start page:	Settings Window		Početna stranica
 History	WebPositive Window		Povijest
 Error opening downloads folder	Download Window		Greška pri otvaranju mape preuzimanja
 Paste	WebPositive Window		Zalijepi
+Over %days left	Download Window		Preostalo je više od %dana
 Settings	Settings Window		Postavke
 Confirmation	WebPositive Window		Potvrda
 Window	WebPositive Window		Prozor
@@ -33,6 +34,7 @@ Standard font:	Settings Window		Standardni font:
 Restart	Download Window		Ponovno pokreni
 Proxy server	Settings Window		Proxy poslužitelj
 New window	WebPositive Window		Novi prozor
+WebPositive	Download Window		WebPositive
 Open	Download Window		Otvori
 Reload	WebPositive Window		Ponovno učitaj
 Downloads	Download Window		Preuzimanja
@@ -73,10 +75,12 @@ Paste	URL Bar		Zalijepi
 Hide password text	Authentication Panel		Sakrij tekst lozinke
 Continue downloads	WebPositive		Nastavi s preuzimanjima
 Cancel	Download Window		Otkaži
+Clear	Console Window		Očisti
 Password:	Authentication Panel		Lozinka:
 Back	WebPositive Window		Nazad
 New browser window	Download Window		Novi prozor preglednika
 Today	WebPositive Window		Danas
+Over %hours left	Download Window		Preostalo je više od %sati
 Remember username and password for this site	Authentication Panel		Zapamti korisničko ime i lozinku za ovu stranicu
 Earlier	WebPositive Window		Ranije
 Use proxy server to connect to the internet	Settings Window		Koristi proxy poslužitelj za spajanje na internet

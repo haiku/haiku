@@ -14,9 +14,10 @@ UnitTestLib liblaunch_daemontest.so :
 	UtilityTest.cpp
 
 	# from the launch_daemon
+	NetworkWatcher.cpp
 	SettingsParser.cpp
 	Conditions.cpp
 	Utility.cpp
 
-	: be libshared.a [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	: be network bnetapi libshared.a [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2007, Haiku, Inc.
+ * Copyright 2002-2015, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -21,6 +21,9 @@
 #include "TranslatorListView.h"
 
 
+class BTranslatorReleaseDelegate;
+
+
 class DataTranslationsWindow : public BWindow {
 public:
 							DataTranslationsWindow();
@@ -39,6 +42,7 @@ private:
 			void			_SetupViews();
 
 			TranslatorListView*	fTranslatorListView;
+			BTranslatorReleaseDelegate*		fRelease;
 
 			BBox*			fRightBox;
 			BView*			fConfigView;

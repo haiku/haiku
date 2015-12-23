@@ -402,7 +402,6 @@ THeaderView::THeaderView(bool incoming, bool resending, int32 defaultAccount)
 
 	BGridLayout* layout = GridLayout();
 
-	layout->SetInsets(B_USE_DEFAULT_SPACING);
 	if (fIncoming)
 		layout->SetHorizontalSpacing(0);
 	layout->SetVerticalSpacing(B_USE_HALF_ITEM_SPACING);

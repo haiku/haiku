@@ -17,7 +17,7 @@ class Variable;
 class ValueNodeManager : public BReferenceable,
 	private ValueNodeContainer::Listener {
 public:
-								ValueNodeManager();
+								ValueNodeManager(bool addFrameNodes = true);
 	virtual						~ValueNodeManager();
 
 			status_t			SetStackFrame(Thread* thread,
@@ -45,6 +45,7 @@ private:
 			status_t			_CreateValueNode(ValueNodeChild* nodeChild);
 
 private:
+			bool				fAddFrameNodes;
 			ValueNodeContainer*	fContainer;
 			StackFrame*			fStackFrame;
 			Thread*				fThread;

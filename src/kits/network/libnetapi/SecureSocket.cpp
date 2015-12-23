@@ -183,6 +183,9 @@ BSecureSocket::Private::_CreateContext()
 	// Disable legacy protocols. They have known vulnerabilities.
 	SSL_CTX_set_options(sContext, SSL_OP_NO_SSLv2 | SSL_OP_NO_SSLv3);
 
+	// Don't bother us with ERROR_WANT_READ.
+	SSL_CTX_set_mode(sContext, SSL_MODE_AUTO_RETRY);
+
 	// Setup certificate verification
 	BPath certificateStore;
 	find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);
@@ -192,6 +195,18 @@ BSecureSocket::Private::_CreateContext()
 	// there)
 	SSL_CTX_load_verify_locations(sContext, certificateStore.Path(), NULL);
 	SSL_CTX_set_verify(sContext, SSL_VERIFY_PEER, VerifyCallback);
+
+	// OpenSSL 1.0.2 and later: use the alternate "trusted first" algorithm to validate certificate
+	// chains. This makes the validation stop as soon as a recognized certificate is found in the
+	// chain, instead of validating the whole chain, then seeing if the root certificate is known.
+#ifdef X509_V_FLAG_TRUSTED_FIRST
+	X509_VERIFY_PARAM* verifyParam = X509_VERIFY_PARAM_new();
+	X509_VERIFY_PARAM_set_flags(verifyParam, X509_V_FLAG_TRUSTED_FIRST);
+	SSL_CTX_set1_param(sContext, verifyParam);
+
+	// TODO we need to free this after freeing the SSL context (which we currently never do)
+	// X509_VERIFY_PARAM_free(verifyParam);
+#endif
 
 	// Get an unique index number for storing application data in SSL
 	// structs. We will store a pointer to the BSecureSocket class there.
@@ -244,42 +259,15 @@ BSecureSocket::~BSecureSocket()
 status_t
 BSecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 {
-	if (fPrivate == NULL)
-		return B_NO_MEMORY;
-
-	status_t state = fPrivate->InitCheck();
-	if (state != B_OK)
-		return state;
-
-	status_t status = BSocket::Connect(peer, timeout);
+	status_t status = InitCheck();
 	if (status != B_OK)
 		return status;
 
-	// Do this only after BSocket::Connect has checked wether we're already
-	// connected. We don't want to kill an existing SSL session, as that would
-	// likely crash the protocol loop for it.
-	if (fPrivate->fSSL != NULL) {
-		SSL_free(fPrivate->fSSL);
-	}
+	status = BSocket::Connect(peer, timeout);
+	if (status != B_OK)
+		return status;
 
-	fPrivate->fSSL = SSL_new(BSecureSocket::Private::Context());
-	if (fPrivate->fSSL == NULL) {
-		BSocket::Disconnect();
-		return B_NO_MEMORY;
-	}
-
-	BIO_set_fd(fPrivate->fBIO, fSocket, BIO_NOCLOSE);
-	SSL_set_bio(fPrivate->fSSL, fPrivate->fBIO, fPrivate->fBIO);
-	SSL_set_ex_data(fPrivate->fSSL, Private::sDataIndex, this);
-
-	int returnValue = SSL_connect(fPrivate->fSSL);
-	if (returnValue <= 0) {
-		TRACE("SSLConnection can't connect\n");
-		BSocket::Disconnect();
-		return fPrivate->ErrorCode(returnValue);
-	}
-
-	return B_OK;
+	return _Setup();
 }
 
 
@@ -307,6 +295,17 @@ BSecureSocket::WaitForReadable(bigtime_t timeout) const
 		return B_OK;
 
 	return BSocket::WaitForReadable(timeout);
+}
+
+
+status_t
+BSecureSocket::InitCheck()
+{
+	if (fPrivate == NULL)
+		return B_NO_MEMORY;
+
+	status_t state = fPrivate->InitCheck();
+	return state;
 }
 
 
@@ -348,6 +347,37 @@ BSecureSocket::Write(const void* buffer, size_t size)
 		return bytesWritten;
 
 	return fPrivate->ErrorCode(bytesWritten);
+}
+
+
+status_t
+BSecureSocket::_Setup()
+{
+	// Do this only after BSocket::Connect has checked wether we're already
+	// connected. We don't want to kill an existing SSL session, as that would
+	// likely crash the protocol loop for it.
+	if (fPrivate->fSSL != NULL) {
+		SSL_free(fPrivate->fSSL);
+	}
+
+	fPrivate->fSSL = SSL_new(BSecureSocket::Private::Context());
+	if (fPrivate->fSSL == NULL) {
+		BSocket::Disconnect();
+		return B_NO_MEMORY;
+	}
+
+	BIO_set_fd(fPrivate->fBIO, fSocket, BIO_NOCLOSE);
+	SSL_set_bio(fPrivate->fSSL, fPrivate->fBIO, fPrivate->fBIO);
+	SSL_set_ex_data(fPrivate->fSSL, Private::sDataIndex, this);
+
+	int returnValue = SSL_connect(fPrivate->fSSL);
+	if (returnValue <= 0) {
+		TRACE("SSLConnection can't connect\n");
+		BSocket::Disconnect();
+		return fPrivate->ErrorCode(returnValue);
+	}
+
+	return B_OK;
 }
 
 
@@ -420,6 +450,20 @@ BSecureSocket::Read(void* buffer, size_t size)
 
 ssize_t
 BSecureSocket::Write(const void* buffer, size_t size)
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
+BSecureSocket::InitCheck()
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
+BSecureSocket::_Setup()
 {
 	return B_UNSUPPORTED;
 }

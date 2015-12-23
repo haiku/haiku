@@ -11,6 +11,9 @@
 #include <unistd.h>
 
 
+using std::nothrow;
+
+
 namespace FFS {
 
 

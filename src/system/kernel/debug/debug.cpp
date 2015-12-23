@@ -1986,7 +1986,7 @@ debug_strlcpy(team_id teamID, char* to, const char* from, size_t size)
 		return B_BAD_ADDRESS;
 
 	// limit size to avoid address overflows
-	size_t maxSize = std::min(size,
+	size_t maxSize = std::min((addr_t)size,
 		~(addr_t)0 - std::max((addr_t)from, (addr_t)to) + 1);
 		// NOTE: Since strlcpy() determines the length of \a from, the source
 		// address might still overflow.

@@ -13,6 +13,7 @@ Server launch_daemon
 	Conditions.cpp
 	Events.cpp
 	Job.cpp
+	NetworkWatcher.cpp
 	SettingsParser.cpp
 	Target.cpp
 	Utility.cpp
@@ -25,7 +26,7 @@ Server launch_daemon
 	InitSharedMemoryDirectoryJob.cpp
 	InitTemporaryDirectoryJob.cpp
 	:
-	be libshared.a libmultiuser_utils.a [ TargetLibstdc++ ]
+	be network bnetapi libshared.a libmultiuser_utils.a [ TargetLibstdc++ ]
 	:
 	LaunchDaemon.rdef
 ;

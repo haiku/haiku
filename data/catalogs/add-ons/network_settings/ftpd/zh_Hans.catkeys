@@ -1,0 +1,3 @@
+1	english	x-vnd.Haiku-FTPService	4086152171
+FTP server	FTPServiceAddOn		FTP 服务器
+The FTP server allows you to remotely access the files on your machine using the FTP protocol.\n\nPlease note that it is an insecure and unencrypted connection.	FTPServiceAddOn		FTP 服务器允许您在您的设备上通过 FTP 协议来远程访问文件。\n\n请注意这是一种不安全、未加密的连接。

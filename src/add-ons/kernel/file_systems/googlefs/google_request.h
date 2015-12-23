@@ -12,6 +12,7 @@ struct google_request {
 	char *query_string;
 	struct http_cnx *cnx;
 	struct google_result *results;
+	long nextid;
 };
 
 /* those are quite arbitrary values */
