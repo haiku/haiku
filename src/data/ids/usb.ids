@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.12.16
-# Date:    2015-12-16 23:50:16
+# Version: 2015.12.17
+# Date:    2015-12-17 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -16265,6 +16265,7 @@
 	0001  iNexio Touchscreen controller
 1871  Aveo Technology Corp.
 	0101  UVC camera (Bresser microscope)
+	0141  Camera
 	0d01  USB2.0 Camera
 1873  Navilock
 	ee93  EasyLogger
@@ -16292,10 +16293,14 @@
 	0214  Portable Hard Drive
 	0216  External Hard Drive
 	0218  External Hard Drive
+	0224  Store 'n' Go Micro Plus
 	0227  Pocket Hard Drive
 	022b  Portable Hard Drive (Store'n'Go)
-	0237  Portable Harddrive (500 GB)
+	0237  Portable Harddrive
+	0243  Flash Drive (Store'n'Go)
 	0302  Flash Drive
+	0304  Store 'n' Go
+	4123  Store N Go
 18b1  Petalynx
 	0037  Maxter Remote Control
 18b4  e3C Technologies
@@ -16313,6 +16318,10 @@
 18cd  Ecamm
 	cafe  Pico iMage
 18d1  Google Inc.
+	0001  Onda V972 (storage access)
+	0003  Android-powered device using AllWinner Technology SoC
+	0006  Onda V972 MTP
+	0008  Onda V972 PTP (camera)
 	0d02  Celkon A88
 	2d00  Android-powered device in accessory mode
 	2d01  Android-powered device in accessory mode with ADB support
@@ -16323,16 +16332,23 @@
 	4e21  Nexus S
 	4e22  Nexus S (debug)
 	4e24  Nexus S (tether)
+	4e30  Galaxy Nexus (fastboot)
 	4e40  Nexus 7 (fastboot)
 	4e41  Nexus 7 (MTP)
 	4e42  Nexus 7 (debug)
 	4e43  Nexus 7 (PTP)
-	4ee1  Nexus 4 / 10
-	4ee2  Nexus 4 (debug)
-	4ee3  Nexus 4 (tether)
-	4ee4  Nexus 4 (debug + tether)
+	4e44  Nexus 7 2012 (PTP)
+	4ee0  Nexus 4 (bootloader)
+	4ee1  Nexus Device (MTP)
+	4ee2  Nexus Device (debug)
+	4ee3  Nexus 4/5/7/10 (tether)
+	4ee4  Nexus 4/5/7/10 (debug + tether)
+	4ee5  Nexus 4 (PTP)
+	4ee6  Nexus 4/5 (PTP + debug)
 	7102  Toshiba Thrive tablet
 	b004  Pandigital / B&N Novel 9" tablet
+	d001  Nexus 4 (fastboot)
+	d002  Nexus 4 (debug)
 	d109  LG G2x MTP
 	d10a  LG G2x MTP (debug)
 18d5  Starline International Group Limited
@@ -17562,6 +17578,8 @@
 	00dc  aes220 FPGA Mini-Module
 2478  Tripp-Lite
 	2008  U209-000-R Serial Port
+248a  Maxxter
+	8366  Wireless Optical Mouse ACT-MUSW-002
 249c  M2Tech s.r.l.
 24e1  Paratronic
 	3001  Adp-usb
