@@ -244,7 +244,7 @@ RemotePackageRepository HaikuPorts
 	openal-1.13.0-2
 	openal_devel-1.13.0-2
 	openjdk-1.7_2013_11_08-2
-	openssh-7.1p1-3
+	openssh-7.1p1-4
 	openssl-1.0.2e-1
 	openssl_devel-1.0.2e-1
 	p7zip-9.20.1-4

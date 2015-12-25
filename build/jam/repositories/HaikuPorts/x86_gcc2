@@ -379,7 +379,7 @@ RemotePackageRepository HaikuPorts
 	openjpeg-2.1.0-2
 	openjpeg_devel-2.1.0-2
 	opensound-4.2_git-2
-	openssh-7.1p1-1
+	openssh-7.1p1-4
 	openssl-1.0.2e-1
 	openssl_devel-1.0.2e-1
 	opus-1.1.1-1
