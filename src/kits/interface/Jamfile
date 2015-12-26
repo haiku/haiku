@@ -51,6 +51,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Box.cpp
 			Button.cpp
 			CardLayout.cpp
+			CardView.cpp
 			ChannelControl.cpp
 			ChannelSlider.cpp
 			CheckBox.cpp
