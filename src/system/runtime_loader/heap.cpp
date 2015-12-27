@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2007, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2013, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,192 +7,267 @@
 #include "runtime_loader_private.h"
 
 #include <syscalls.h>
-#include <util/kernel_cpp.h>
 
-#include <stdio.h>
+#ifdef HEAP_TEST
+#	include <stdio.h>
+#endif
 #include <stdlib.h>
 #include <string.h>
 
+#include <algorithm>
 
-static const size_t kInitialHeapSize = 65536;
-
-
-/* This is a very simple malloc()/free() implementation - it only
- * manages a free list.
- * After heap_init() is called, all free memory is contained in one
- * big chunk, the only entry in the free link list (which is a single
- * linked list).
- * When memory is allocated, the smallest free chunk that contains
- * the requested size is split (or taken as a whole if it can't be
- * splitted anymore), and it's lower half will be removed from the
- * free list.
- * The free list is ordered by size, starting with the smallest
- * free chunk available. When a chunk is freed, it will be joint
- * with its predecessor or successor, if possible.
- * To ease list handling, the list anchor itself is a free chunk with
- * size 0 that can't be allocated.
- */
+#include <util/SplayTree.h>
 
 
-struct free_chunk {
-	size_t		size;
-	free_chunk	*next;
+/*!	This is a very simple malloc()/free() implementation - it only
+	manages a free list.
+	After heap_init() is called, all free memory is contained in one
+	big chunk, the only entry in the free link list (which is a single
+	linked list).
+	When memory is allocated, the smallest free chunk that contains
+	the requested size is split (or taken as a whole if it can't be
+	splitted anymore), and it's lower half will be removed from the
+	free list.
+	The free list is ordered by size, starting with the smallest
+	free chunk available. When a chunk is freed, it will be joint
+	with its predecessor or successor, if possible.
+	To ease list handling, the list anchor itself is a free chunk with
+	size 0 that can't be allocated.
+*/
+const static size_t kAlignment = 8;
+	// all memory chunks will be a multiple of this
 
-	size_t Size() const;
-	free_chunk *Split(size_t splitSize);
-	bool IsTouching(free_chunk *link);
-	free_chunk *Join(free_chunk *link);
-	void Remove(free_chunk *previous = NULL);
-	void Enqueue();
+const static size_t kInitialHeapSize = 64 * 1024;
+const static size_t kHeapGrowthAlignment = 32 * 1024;
 
-	void *AllocatedAddress() const;
-	static free_chunk *SetToAllocated(void *allocated);
+
+class Chunk {
+public:
+	size_t CompleteSize() const
+	{
+		return fSize;
+	}
+
+protected:
+	union {
+		size_t	fSize;
+		char	fAlignment[kAlignment];
+	};
 };
 
 
+class FreeChunk;
+
+
+struct FreeChunkData : SplayTreeLink<FreeChunk> {
+
+	FreeChunk* Next() const
+	{
+		return fNext;
+	}
+
+	FreeChunk** NextLink()
+	{
+		return &fNext;
+	}
+
+protected:
+	FreeChunk*	fNext;
+};
+
+
+class FreeChunk : public Chunk, public FreeChunkData {
+public:
+			void				SetTo(size_t size);
+
+			size_t				Size() const;
+
+			FreeChunk*			Split(size_t splitSize);
+			bool				IsTouching(FreeChunk* link);
+			FreeChunk*			Join(FreeChunk* link);
+
+			void*				AllocatedAddress() const;
+	static	FreeChunk*			SetToAllocated(void* allocated);
+};
+
+
+struct FreeChunkKey {
+	FreeChunkKey(size_t size)
+		:
+		fSize(size),
+		fChunk(NULL)
+	{
+	}
+
+	FreeChunkKey(const FreeChunk* chunk)
+		:
+		fSize(chunk->Size()),
+		fChunk(chunk)
+	{
+	}
+
+	int Compare(const FreeChunk* chunk) const
+	{
+		size_t chunkSize = chunk->Size();
+		if (chunkSize != fSize)
+			return fSize < chunkSize ? -1 : 1;
+
+		if (fChunk == chunk)
+			return 0;
+		return fChunk < chunk ? -1 : 1;
+	}
+
+private:
+	size_t				fSize;
+	const FreeChunk*	fChunk;
+};
+
+
+struct FreeChunkTreeDefinition {
+	typedef FreeChunkKey	KeyType;
+	typedef FreeChunk		NodeType;
+
+	static FreeChunkKey GetKey(const FreeChunk* node)
+	{
+		return FreeChunkKey(node);
+	}
+
+	static SplayTreeLink<FreeChunk>* GetLink(FreeChunk* node)
+	{
+		return node;
+	}
+
+	static int Compare(const FreeChunkKey& key, const FreeChunk* node)
+	{
+		return key.Compare(node);
+	}
+
+	static FreeChunk** GetListLink(FreeChunk* node)
+	{
+		return node->NextLink();
+	}
+};
+
+
+typedef IteratableSplayTree<FreeChunkTreeDefinition> FreeChunkTree;
+
+
 static size_t sAvailable;
-static free_chunk sFreeAnchor;
+static FreeChunkTree sFreeChunkTree;
 
 
-/** Returns the amount of bytes that can be allocated
- *	in this chunk.
- */
-
-size_t
-free_chunk::Size() const
+static inline size_t
+align(size_t size, size_t alignment = kAlignment)
 {
-	return size - sizeof(size_t);
+	return (size + alignment - 1) & ~(alignment - 1);
 }
 
 
-/**	Splits the upper half at the requested location
- *	and returns it.
- */
-
-free_chunk *
-free_chunk::Split(size_t splitSize)
+void
+FreeChunk::SetTo(size_t size)
 {
-	free_chunk *chunk = (free_chunk *)((uint8 *)this + sizeof(size_t) + splitSize);
-	chunk->size = size - splitSize - sizeof(size_t);
-	chunk->next = next;
+	fSize = size;
+	fNext = NULL;
+}
 
-	size = splitSize + sizeof(size_t);
+
+/*!	Returns the amount of bytes that can be allocated
+	in this chunk.
+*/
+size_t
+FreeChunk::Size() const
+{
+	return (addr_t)this + fSize - (addr_t)AllocatedAddress();
+}
+
+
+/*!	Splits the upper half at the requested location and returns it. This chunk
+	will no longer be a valid FreeChunk object; only its fSize will be valid.
+ */
+FreeChunk*
+FreeChunk::Split(size_t splitSize)
+{
+	splitSize = align(splitSize);
+
+	FreeChunk* chunk = (FreeChunk*)((addr_t)AllocatedAddress() + splitSize);
+	size_t newSize = (addr_t)chunk - (addr_t)this;
+	chunk->fSize = fSize - newSize;
+	chunk->fNext = NULL;
+
+	fSize = newSize;
 
 	return chunk;
 }
 
 
-/**	Checks if the specified chunk touches this chunk, so
- *	that they could be joined.
- */
-
+/*!	Checks if the specified chunk touches this chunk, so
+	that they could be joined.
+*/
 bool
-free_chunk::IsTouching(free_chunk *chunk)
+FreeChunk::IsTouching(FreeChunk* chunk)
 {
 	return chunk
-		&& (((uint8 *)this + size == (uint8 *)chunk)
-			|| (uint8 *)chunk + chunk->size == (uint8 *)this);
+		&& (((uint8*)this + fSize == (uint8*)chunk)
+			|| (uint8*)chunk + chunk->fSize == (uint8*)this);
 }
 
 
-/**	Joins the chunk to this chunk and returns the pointer
- *	to the new chunk - which will either be one of the
- *	two chunks.
- *	Note, the chunks must be joinable, or else this method
- *	doesn't work correctly. Use free_chunk::IsTouching()
- *	to check if this method can be applied.
- */
-
-free_chunk *
-free_chunk::Join(free_chunk *chunk)
+/*!	Joins the chunk to this chunk and returns the pointer
+	to the new chunk - which will either be one of the
+	two chunks.
+	Note, the chunks must be joinable, or else this method
+	doesn't work correctly. Use FreeChunk::IsTouching()
+	to check if this method can be applied.
+*/
+FreeChunk*
+FreeChunk::Join(FreeChunk* chunk)
 {
 	if (chunk < this) {
-		chunk->size += size;
-		chunk->next = next;
+		chunk->fSize += fSize;
+		chunk->fNext = fNext;
 
 		return chunk;
 	}
 
-	size += chunk->size;
-	next = chunk->next;
+	fSize += chunk->fSize;
+	fNext = chunk->fNext;
 
 	return this;
 }
 
 
-void
-free_chunk::Remove(free_chunk *previous)
+void*
+FreeChunk::AllocatedAddress() const
 {
-	if (previous == NULL) {
-		// find the previous chunk in the list
-		free_chunk *chunk = sFreeAnchor.next;
-
-		while (chunk != NULL && chunk != this) {
-			previous = chunk;
-			chunk = chunk->next;
-		}
-
-		if (chunk == NULL) {
-			printf("runtime_loader: try to remove chunk that's not in list");
-			return;
-		}
-	}
-
-	previous->next = this->next;
-	this->next = NULL;
+	return (void*)static_cast<const FreeChunkData*>(this);
 }
 
 
-void
-free_chunk::Enqueue()
+FreeChunk*
+FreeChunk::SetToAllocated(void* allocated)
 {
-	free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
-	while (chunk && chunk->Size() < size) {
-		last = chunk;
-		chunk = chunk->next;
-	}
-
-	this->next = chunk;
-	last->next = this;
+	return static_cast<FreeChunk*>((FreeChunkData*)allocated);
 }
 
 
-void *
-free_chunk::AllocatedAddress() const
-{
-	return (void *)&next;
-}
-
-
-free_chunk *
-free_chunk::SetToAllocated(void *allocated)
-{
-	return (free_chunk *)((uint8 *)allocated - sizeof(size_t));
-}
-
-
-//	#pragma mark - private functions
+//	#pragma mark -
 
 
 static status_t
 add_area(size_t size)
 {
-	void *base;
+	void* base;
 	area_id area = _kern_create_area("rld heap", &base,
 		B_RANDOMIZED_ANY_ADDRESS, size, B_NO_LOCK, B_READ_AREA | B_WRITE_AREA);
-	if (area < B_OK)
+	if (area < 0)
 		return area;
 
-	sAvailable += size - sizeof(size_t);
+	// declare the whole area as one chunk, and add it to the free tree
+	FreeChunk* chunk = (FreeChunk*)base;
+	chunk->SetTo(size);
+	sFreeChunkTree.Insert(chunk);
 
-	// declare the whole heap as one chunk, and add it
-	// to the free list
-
-	free_chunk *chunk = (free_chunk *)base;
-	chunk->size = size;
-	chunk->next = sFreeAnchor.next;
-
-	sFreeAnchor.next = chunk;
+	sAvailable += chunk->Size();
 	return B_OK;
 }
 
@@ -200,24 +275,17 @@ add_area(size_t size)
 static status_t
 grow_heap(size_t bytes)
 {
-	// align the area size to an 32768 bytes boundary
-	bytes = (bytes + 32767) & ~32767;
-	return add_area(bytes + sizeof(size_t));
+	return add_area(align(align(sizeof(Chunk)) + bytes, kHeapGrowthAlignment));
 }
 
 
-//	#pragma mark - public API
+//	#pragma mark -
 
 
 status_t
 heap_init(void)
 {
-	status_t status = add_area(kInitialHeapSize);
-	if (status < B_OK)
-		return status;
-
-	sFreeAnchor.size = 0;
-	return B_OK;
+	return add_area(kInitialHeapSize);
 }
 
 
@@ -225,136 +293,136 @@ heap_init(void)
 void
 dump_chunks(void)
 {
-	free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
+	FreeChunk* chunk = sFreeChunkTree.FindMin();
 	while (chunk != NULL) {
-		last = chunk;
-
-		printf("\t%p: chunk size = %ld, end = %p, next = %p\n", chunk, chunk->size, (uint8 *)chunk + chunk->size, chunk->next);
-		chunk = chunk->next;
+		printf("\t%p: chunk size = %ld, end = %p, next = %p\n", chunk,
+			chunk->Size(), (uint8*)chunk + chunk->CompleteSize(),
+			chunk->Next());
+		chunk = chunk->Next();
 	}
 }
 #endif
 
 
-void *
-realloc(void *allocation, size_t newSize)
-{
-	// free, if new size is 0
-	if (newSize == 0) {
-		free(allocation);
-		return NULL;
-	}
-
-	// just malloc(), if no previous allocation
-	if (allocation == NULL)
-		return malloc(newSize);
-
-	// we're lazy and don't shrink allocations
-	free_chunk* chunk = free_chunk::SetToAllocated(allocation);
-	if (chunk->Size() >= newSize)
-		return allocation;
-
-	// the allocation needs to grow -- allocate a new one and memcpy()
-	void* newAllocation = malloc(newSize);
-	if (newAllocation != NULL) {
-		memcpy(newAllocation, allocation, chunk->Size());
-		free(allocation);
-	}
-
-	return newAllocation;
-}
-
-
-void *
+void*
 malloc(size_t size)
 {
 	if (size == 0)
 		return NULL;
 
-	// align the size requirement to an 8 bytes boundary
-	size = (size + 7) & ~7;
+	// align the size requirement to a kAlignment bytes boundary
+	if (size < sizeof(FreeChunkData))
+		size = sizeof(FreeChunkData);
+	size = align(size);
 
-restart:
 	if (size > sAvailable) {
 		// try to enlarge heap
-		if (grow_heap(size) < B_OK)
+		if (grow_heap(size) != B_OK)
 			return NULL;
 	}
 
-	free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
-	while (chunk && chunk->Size() < size) {
-		last = chunk;
-		chunk = chunk->next;
-	}
-
+	FreeChunkKey key(size);
+	FreeChunk* chunk = sFreeChunkTree.FindClosest(key, true, true);
 	if (chunk == NULL) {
 		// could not find a free chunk as large as needed
-		if (grow_heap(size) < B_OK)
+		if (grow_heap(size) != B_OK)
 			return NULL;
 
-		goto restart;
+		chunk = sFreeChunkTree.FindClosest(key, true, true);
+		if (chunk == NULL) {
+			TRACE(("no allocation chunk found after growing the heap\n"));
+			return NULL;
+		}
 	}
 
-	if (chunk->Size() > size + sizeof(free_chunk) + sizeof(size_t)) {
-		// if this chunk is bigger than the requested size,
-		// we split it to form two chunks (with a minimal
-		// size of sizeof(size_t) allocatable bytes).
+	sFreeChunkTree.Remove(chunk);
+	sAvailable -= chunk->Size();
 
-		free_chunk *freeChunk = chunk->Split(size);
-		last->next = freeChunk;
+	void* allocatedAddress = chunk->AllocatedAddress();
 
-		// re-enqueue the free chunk at the correct position
-		freeChunk->Remove(last);
-		freeChunk->Enqueue();
-	} else {
-		// remove the chunk from the free list
-
-		last->next = chunk->next;
+	// If this chunk is bigger than the requested size and there's enough space
+	// left over for a new chunk, we split it.
+	if (chunk->Size() >= size + align(sizeof(FreeChunk))) {
+		FreeChunk* freeChunk = chunk->Split(size);
+		sFreeChunkTree.Insert(freeChunk);
+		sAvailable += freeChunk->Size();
 	}
 
-	sAvailable -= size + sizeof(size_t);
+	TRACE(("malloc(%lu) -> %p\n", size, allocatedAddress));
+	return allocatedAddress;
+}
 
-	return chunk->AllocatedAddress();
+
+void*
+realloc(void* oldBuffer, size_t newSize)
+{
+	if (newSize == 0) {
+		TRACE(("realloc(%p, %lu) -> NULL\n", oldBuffer, newSize));
+		free(oldBuffer);
+		return NULL;
+	}
+
+	size_t oldSize = 0;
+	if (oldBuffer != NULL) {
+		FreeChunk* oldChunk = FreeChunk::SetToAllocated(oldBuffer);
+		oldSize = oldChunk->Size();
+
+		// Check if the old buffer still fits, and if it makes sense to keep it.
+		if (oldSize >= newSize
+			&& (oldSize < 128 || newSize > oldSize / 3)) {
+			TRACE(("realloc(%p, %lu) old buffer is large enough\n",
+				oldBuffer, newSize));
+			return oldBuffer;
+		}
+	}
+
+	void* newBuffer = malloc(newSize);
+	if (newBuffer == NULL)
+		return NULL;
+
+	if (oldBuffer != NULL) {
+		memcpy(newBuffer, oldBuffer, std::min(oldSize, newSize));
+		free(oldBuffer);
+	}
+
+	TRACE(("realloc(%p, %lu) -> %p\n", oldBuffer, newSize, newBuffer));
+	return newBuffer;
 }
 
 
 void
-free(void *allocated)
+free(void* allocated)
 {
 	if (allocated == NULL)
 		return;
 
-	free_chunk *freedChunk = free_chunk::SetToAllocated(allocated);
-	sAvailable += freedChunk->size;
+	TRACE(("free(%p)\n", allocated));
+
+
+	FreeChunk* freedChunk = FreeChunk::SetToAllocated(allocated);
 
 	// try to join the new free chunk with an existing one
 	// it may be joined with up to two chunks
 
-	free_chunk *chunk = sFreeAnchor.next, *last = &sFreeAnchor;
+	FreeChunk* chunk = sFreeChunkTree.FindMin();
 	int32 joinCount = 0;
 
 	while (chunk) {
-		if (chunk->IsTouching(freedChunk)) {
-			// almost "insert" it into the list before joining
-			// because the next pointer is inherited by the chunk
-			freedChunk->next = chunk->next;
-			freedChunk = chunk->Join(freedChunk);
+		FreeChunk* nextChunk = chunk->Next();
 
-			// remove the joined chunk from the list
-			last->next = freedChunk->next;
-			chunk = last;
+		if (chunk->IsTouching(freedChunk)) {
+			sFreeChunkTree.Remove(chunk);
+			sAvailable -= chunk->Size();
+
+			freedChunk = chunk->Join(freedChunk);
 
 			if (++joinCount == 2)
 				break;
 		}
 
-		last = chunk;
-		chunk = chunk->next;
+		chunk = nextChunk;
 	}
 
-	// enqueue the link at the right position; the
-	// free link queue is ordered by size
-
-	freedChunk->Enqueue();
+	sFreeChunkTree.Insert(freedChunk);
+	sAvailable += freedChunk->Size();
 }
-
