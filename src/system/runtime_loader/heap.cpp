@@ -202,7 +202,7 @@ grow_heap(size_t bytes)
 {
 	// align the area size to an 32768 bytes boundary
 	bytes = (bytes + 32767) & ~32767;
-	return add_area(bytes);
+	return add_area(bytes + sizeof(size_t));
 }
 
 
