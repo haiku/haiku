@@ -408,12 +408,14 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	if (fRawDecodedAudio->opaque == NULL)
 		return B_NO_MEMORY;
 
-	fResampleContext = swr_alloc_set_opts(NULL,
-		fContext->channel_layout, fContext->request_sample_fmt,
-		fContext->sample_rate,
-		fContext->channel_layout, fContext->sample_fmt, fContext->sample_rate,
-		0, NULL);
-	swr_init(fResampleContext);
+	if (AVSampleFormatIsPlanar(fContext->sample_fmt)) {
+		fResampleContext = swr_alloc_set_opts(NULL,
+			fContext->channel_layout, fContext->request_sample_fmt,
+			fContext->sample_rate,
+			fContext->channel_layout, fContext->sample_fmt, fContext->sample_rate,
+			0, NULL);
+		swr_init(fResampleContext);
+	}
 
 	TRACE("  bit_rate = %d, sample_rate = %d, channels = %d, "
 		"output frame size: %d, count: %ld, rate: %.2f\n",
@@ -923,23 +925,28 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 	// "planar" audio (each channel separated instead of interleaved samples).
 	// In that case, we use swresample to convert the data (and it is
 	// smart enough to do just a copy, when possible)
-	const uint8_t* ptr[8];
-	for (int i = 0; i < 8; i++) {
-		if (fDecodedDataBuffer->data[i] == NULL)
-			ptr[i] = NULL;
-		else
-			ptr[i] = fDecodedDataBuffer->data[i] + fDecodedDataBufferOffset;
-	}
+	if (AVSampleFormatIsPlanar(fContext->sample_fmt)) {
+		const uint8_t* ptr[8];
+		for (int i = 0; i < 8; i++) {
+			if (fDecodedDataBuffer->data[i] == NULL)
+				ptr[i] = NULL;
+			else
+				ptr[i] = fDecodedDataBuffer->data[i] + fDecodedDataBufferOffset;
+		}
 
-	int32 result = swr_convert(fResampleContext, fRawDecodedAudio->data,
-		outFrames, ptr, inFrames);
+		int32 result = swr_convert(fResampleContext, fRawDecodedAudio->data,
+			outFrames, ptr, inFrames);
+
+		if (result < 0)
+			debugger("resampling failed");
+	} else {
+		memcpy(fRawDecodedAudio->data[0], fDecodedDataBuffer->data[0]
+				+ fDecodedDataBufferOffset, frames * fOutputFrameSize);
+	}
 
 	size_t remainingSize = inFrames * fOutputFrameSize;
 	size_t decodedSize = outFrames * fOutputFrameSize;
 	fDecodedDataBufferSize -= inFrames;
-
-	if (result < 0)
-		debugger("resampling failed");
 
 	bool firstAudioFramesCopiedToRawDecodedAudio
 		= fRawDecodedAudio->data[0] != fDecodedData;
