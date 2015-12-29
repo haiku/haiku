@@ -27,7 +27,7 @@
 
 // Host Controller Capability Registers
 #define XHCI_HCI_CAPLENGTH	0x00		// HCI Capability Register Length
-#define HCI_CAPLENGTH(p)		(((p) >> 0) & 0xff)	
+#define HCI_CAPLENGTH(p)		(((p) >> 0) & 0xff)
 #define HCI_VERSION(p)		(((p) >> 16) & 0xffff)	// HCI Version
 #define XHCI_HCSPARAMS1		0x04		// Structural Parameters 1
 // HCSPARAMS1

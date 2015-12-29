@@ -201,23 +201,23 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 		eec = ReadCapReg32(eecp);
 		if (XECP_ID(eec) != XHCI_LEGSUP_CAPID)
 			continue;
-				
+
 		TRACE("eecp register: 0x%08" B_PRIx32 "\n", eecp);
 		if (eec & XHCI_LEGSUP_BIOSOWNED) {
 			TRACE_ALWAYS("the host controller is bios owned, claiming"
 				" ownership\n");
 			WriteCapReg32(eecp, eec | XHCI_LEGSUP_OSOWNED);
-	
+
 			for (int32 i = 0; i < 20; i++) {
 				eec = ReadCapReg32(eecp);
-	
+
 				if ((eec & XHCI_LEGSUP_BIOSOWNED) == 0)
 					break;
-	
+
 				TRACE_ALWAYS("controller is still bios owned, waiting\n");
 				snooze(50000);
 			}
-	
+
 			if (eec & XHCI_LEGSUP_BIOSOWNED) {
 				TRACE_ERROR("bios won't give up control over the host "
 					"controller (ignoring)\n");
@@ -225,7 +225,7 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 				TRACE_ALWAYS("successfully took ownership of the host "
 					"controller\n");
 			}
-	
+
 			// Force off the BIOS owned flag, and clear all SMIs. Some BIOSes
 			// do indicate a successful handover but do not remove their SMIs
 			// and then freeze the system when interrupts are generated.
@@ -238,7 +238,7 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	legctlsts |= XHCI_LEGCTLSTS_EVENTS_SMI;
 	WriteCapReg32(eecp + XHCI_LEGCTLSTS, legctlsts);
 
-	// On Intel's Panther Point and Lynx Point Chipset taking ownership 
+	// On Intel's Panther Point and Lynx Point Chipset taking ownership
 	// of EHCI owned ports, is what we do here.
 	if (fPCIInfo->vendor_id == PCI_VENDOR_INTEL) {
 		switch (fPCIInfo->device_id) {
@@ -383,7 +383,7 @@ XHCI::Start()
 	}
 
 	// read port count from capability register
-	uint32 capabilities = ReadCapReg32(XHCI_HCSPARAMS1);	
+	uint32 capabilities = ReadCapReg32(XHCI_HCSPARAMS1);
 	fPortCount = HCS_MAX_PORTS(capabilities);
 	if (fPortCount == 0) {
 		TRACE_ERROR("Invalid number of ports: %u\n", fPortCount);
@@ -513,9 +513,9 @@ XHCI::Start()
 	fCmdRing[XHCI_MAX_COMMANDS - 1].qwtrb0 = dmaAddress;
 
 	TRACE("setting interrupt rate\n");
-	
+
 	// Setting IMOD below 0x3F8 on Intel Lynx Point can cause IRQ lockups
-	if (fPCIInfo->vendor_id == PCI_VENDOR_INTEL 
+	if (fPCIInfo->vendor_id == PCI_VENDOR_INTEL
 		&& (fPCIInfo->device_id == PCI_DEVICE_INTEL_PANTHER_POINT_XHCI
 			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_XHCI
 			|| fPCIInfo->device_id == PCI_DEVICE_INTEL_LYNX_POINT_LP_XHCI
@@ -639,12 +639,12 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 
 	TRACE("SubmitControlRequest() request linked\n");
 
-	TRACE("Endpoint status 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 "\n", 
+	TRACE("Endpoint status 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 "\n",
 		endpoint->device->device_ctx->endpoints[id-1].dwendpoint0,
 		endpoint->device->device_ctx->endpoints[id-1].dwendpoint1,
 		endpoint->device->device_ctx->endpoints[id-1].qwendpoint2);
 	Ring(endpoint->device->slot, id);
-	TRACE("Endpoint status 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 "\n", 
+	TRACE("Endpoint status 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 "\n",
 		endpoint->device->device_ctx->endpoints[id-1].dwendpoint0,
 		endpoint->device->device_ctx->endpoints[id-1].dwendpoint1,
 		endpoint->device->device_ctx->endpoints[id-1].qwendpoint2);
@@ -696,7 +696,7 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 	TRACE("SubmitNormalRequest() request linked\n");
 
-	TRACE("Endpoint status 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 "\n", 
+	TRACE("Endpoint status 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 "\n",
 		endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0,
 		endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1,
 		endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2);
@@ -1133,7 +1133,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 
 	device->input_ctx->slot.dwslot1 = SLOT_1_RH_PORT(rhPort); // TODO enable power save
 	device->input_ctx->slot.dwslot2 = SLOT_2_IRQ_TARGET(0);
-	
+
 	// If LS/FS device connected to non-root HS device
 	if (route != 0 && parent->Speed() == USB_SPEED_HIGHSPEED
 		&& (speed == USB_SPEED_LOWSPEED || speed == USB_SPEED_FULLSPEED)) {
@@ -1156,7 +1156,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 		"XHCI device context");
 	if (device->device_ctx_area < B_OK) {
 		TRACE_ERROR("unable to create a device context area\n");
-		device->state = XHCI_STATE_DISABLED;		
+		device->state = XHCI_STATE_DISABLED;
 		delete_area(device->input_ctx_area);
 		return NULL;
 	}
@@ -1272,7 +1272,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	TRACE("device_class: %d device_subclass %d device_protocol %d\n",
 		deviceDescriptor.device_class, deviceDescriptor.device_subclass,
 		deviceDescriptor.device_protocol);
-		
+
 	if (speed == USB_SPEED_FULLSPEED && deviceDescriptor.max_packet_size_0 != 8) {
 		TRACE("Full speed device with different max packet size for Endpoint 0\n");
 		device->input_ctx->endpoints[0].dwendpoint1 &=
@@ -1299,7 +1299,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 			(void *)&hubDescriptor,								// buffer
 			sizeof(usb_hub_descriptor),							// buffer length
 			&actualLength);
-		
+
 		if (actualLength != sizeof(usb_hub_descriptor)) {
 			TRACE_ERROR("error while getting the hub descriptor\n");
 			device->state = XHCI_STATE_DISABLED;
@@ -1308,14 +1308,14 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 			delete_area(device->trb_area);
 			return NULL;
 		}
-		
+
 		device->input_ctx->slot.dwslot0 |= SLOT_0_HUB_BIT;
 		device->input_ctx->slot.dwslot1 |= SLOT_1_NUM_PORTS(hubDescriptor.num_ports);
 		if (speed == USB_SPEED_HIGHSPEED) {
 			device->input_ctx->slot.dwslot2 |=
-				SLOT_2_TT_TIME(HUB_TTT_GET(hubDescriptor.characteristics)); 
+				SLOT_2_TT_TIME(HUB_TTT_GET(hubDescriptor.characteristics));
 		}
-		
+
 		deviceObject = new(std::nothrow) Hub(parent, hubAddress, hubPort,
 			deviceDescriptor, device->address + 1, speed, false, device);
 	} else {
@@ -1356,7 +1356,7 @@ XHCI::FreeDevice(Device *device)
 status_t
 XHCI::_InsertEndpointForPipe(Pipe *pipe)
 {
-	TRACE("_InsertEndpointForPipe endpoint address %" B_PRId8 "\n", 
+	TRACE("_InsertEndpointForPipe endpoint address %" B_PRId8 "\n",
 		pipe->EndpointAddress());
 	if (pipe->ControllerCookie() != NULL
 		|| pipe->Parent()->Type() != USB_OBJECT_DEVICE) {
@@ -2258,11 +2258,11 @@ XHCI::FinishTransfers()
 			Unlock();
 
 			TRACE("finishing transfer td %p\n", td);
-			
+
 			Transfer* transfer = td->transfer;
 			bool directionIn = (transfer->TransferPipe()->Direction() != Pipe::Out);
 			usb_request_data *requestData = transfer->RequestData();
-			
+
 			status_t callbackStatus = B_OK;
 			switch (td->trb_completion_code) {
 				case COMP_SHORT_PACKET:
@@ -2287,15 +2287,15 @@ XHCI::FinishTransfers()
 					callbackStatus = B_DEV_STALLED;
 					break;
 			}
-			
+
 			size_t actualLength = 0;
 			if (callbackStatus == B_OK) {
 				actualLength = requestData ? requestData->Length
 					: transfer->DataLength();
-					
+
 				if (td->trb_completion_code == COMP_SHORT_PACKET)
 					actualLength -= td->trb_left;
-	
+
 				if (directionIn && actualLength > 0) {
 					if (requestData) {
 						TRACE("copying in data %d bytes\n", requestData->Length);
@@ -2310,7 +2310,7 @@ XHCI::FinishTransfers()
 					}
 				}
 			}
-			transfer->Finished(callbackStatus, actualLength);						
+			transfer->Finished(callbackStatus, actualLength);
 			delete transfer;
 			FreeDescriptor(td);
 			Lock();
