@@ -119,6 +119,7 @@
  * Option strings:
  *    "f"       - Option has no arguments
  *    "f:"      - Option requires an argument
+ *    "f+"      - Option has an optional argument
  *    "f^"      - Option has optional single-char sub-options
  *    "f|"      - Option has required single-char sub-options
  */
@@ -162,6 +163,7 @@ AcpiGetoptArgument (
     int                     argc,
     char                    **argv)
 {
+
     AcpiGbl_Optind--;
     CurrentCharPtr++;
 
@@ -254,7 +256,8 @@ AcpiGetopt(
         }
         else if (++AcpiGbl_Optind >= argc)
         {
-            ACPI_OPTION_ERROR ("Option requires an argument: -", CurrentChar);
+            ACPI_OPTION_ERROR (
+                "Option requires an argument: -", CurrentChar);
 
             CurrentCharPtr = 1;
             return ('?');
@@ -315,7 +318,9 @@ AcpiGetopt(
         }
         else
         {
-            ACPI_OPTION_ERROR ("Option requires a single-character suboption: -", CurrentChar);
+            ACPI_OPTION_ERROR (
+                "Option requires a single-character suboption: -",
+                CurrentChar);
 
             CurrentCharPtr = 1;
             return ('?');

@@ -947,6 +947,7 @@ AcpiDmDumpTable (
                 AcpiOsPrintf ("\n");
                 LastOutputBlankLine = TRUE;
             }
+
             ByteLength = sizeof (ACPI_GENERIC_ADDRESS);
             break;
 
@@ -957,6 +958,7 @@ AcpiDmDumpTable (
                 AcpiOsPrintf ("\n");
                 LastOutputBlankLine = TRUE;
             }
+
             ByteLength = sizeof (ACPI_HEST_NOTIFY);
             break;
 
@@ -966,6 +968,7 @@ AcpiDmDumpTable (
             {
                 LastOutputBlankLine = FALSE;
             }
+
             ByteLength = sizeof (ACPI_IORT_MEMORY_ACCESS);
             break;
 
@@ -1099,6 +1102,7 @@ AcpiDmDumpTable (
                     }
                 }
             }
+
             AcpiOsPrintf ("\n");
             break;
 
@@ -1122,6 +1126,7 @@ AcpiDmDumpTable (
 
             AcpiDmCheckAscii (Target, RepairedName, 4);
             AcpiOsPrintf ("\"%.4s\"    ", RepairedName);
+
             TableData = AcpiAhGetTableInfo (ACPI_CAST_PTR (char, Target));
             if (TableData)
             {
@@ -1167,6 +1172,7 @@ AcpiDmDumpTable (
                 AcpiOsPrintf (
                     "     /* Incorrect checksum, should be %2.2X */", Temp8);
             }
+
             AcpiOsPrintf ("\n");
             break;
 

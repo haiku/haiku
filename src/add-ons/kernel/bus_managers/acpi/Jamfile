@@ -77,6 +77,7 @@ local executer_src =
 	exstoren.c
 	exstorob.c
 	exsystem.c
+	extrace.c
 	exutils.c
 	;
 

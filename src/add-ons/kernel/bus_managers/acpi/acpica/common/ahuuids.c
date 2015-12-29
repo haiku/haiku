@@ -120,6 +120,7 @@
 #define _COMPONENT          ACPI_UTILITIES
         ACPI_MODULE_NAME    ("ahuuids")
 
+
 /*
  * Table of "known" (ACPI-related) UUIDs
  */

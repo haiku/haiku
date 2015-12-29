@@ -334,6 +334,7 @@ AcpiOsGetLine (
 
             ACPI_BACKUP_CURSOR (i, EndOfLine - CursorPosition + 1);
             EndOfLine--;
+
             if (CursorPosition > 0)
             {
                 CursorPosition--;
