@@ -28,13 +28,20 @@ print_usage(const char *app)
 	printf("usage:\t%s --listenOnly [-p <listenPort>]\n", app);
 	printf("\t%s <user@host> [-p <listenPort>] [-s <sshPort>] [-c <command>]\n",
 		app);
+	printf("\t%s --help\n\n", app);
+
+	printf("Connect to & run applications from a different computer\n\n");
+	printf("Arguments available for use:\n\n");
+	printf("\t-p\t\tspecify the port to communicate on\n");
+	printf("\t-c\t\tsend a command to the other computer\n");
+	printf("\t-s\t\tuse ssh & specify the ssh port to communicate on\n");
 }
 
 
 int
 main(int argc, char *argv[])
 {
-	if (argc < 2) {
+	if (argc < 2 || strcmp(argv[1], "--help") == 0) {
 		print_usage(argv[0]);
 		return 1;
 	}
