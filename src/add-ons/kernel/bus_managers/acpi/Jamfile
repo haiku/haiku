@@ -165,7 +165,6 @@ local utilities_src =
 	utalloc.c
 	utbuffer.c
 	utcache.c
-	utclib.c
 	utcopy.c
 	utdecode.c
 	utdebug.c
