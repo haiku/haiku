@@ -185,6 +185,7 @@ acpi_std_ops(int32 op,...)
 			void *settings;
 			bool acpiDisabled = false;
 			AcpiGbl_CopyDsdtLocally = true;
+			AcpiGbl_OverrideDefaultRegionHandlers = true;
 
 			settings = load_driver_settings("kernel");
 			if (settings != NULL) {
@@ -221,6 +222,25 @@ acpi_std_ops(int32 op,...)
 
 			if (checkAndLogFailure(AcpiInitializeSubsystem(),
 					"AcpiInitializeSubsystem failed"))
+				goto err;
+
+			/* Install the default address space handlers. */
+			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
+						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_MEMORY,
+						ACPI_DEFAULT_HANDLER, NULL, NULL),
+					"Could not initialise SystemMemory handler:"))
+				goto err;
+
+			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
+						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_IO,
+						ACPI_DEFAULT_HANDLER, NULL, NULL),
+					"Could not initialise SystemIO handler:"))
+				goto err;
+
+			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
+						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_PCI_CONFIG,
+						ACPI_DEFAULT_HANDLER, NULL, NULL),
+					"Could not initialise PciConfig handler:"))
 				goto err;
 
 			if (checkAndLogFailure(AcpiInitializeTables(NULL, 0, TRUE),
