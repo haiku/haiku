@@ -408,7 +408,7 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	if (fRawDecodedAudio->opaque == NULL)
 		return B_NO_MEMORY;
 
-	if (AVSampleFormatIsPlanar(fContext->sample_fmt)) {
+	if (av_sample_fmt_is_planar(fContext->sample_fmt)) {
 		fResampleContext = swr_alloc_set_opts(NULL,
 			fContext->channel_layout, fContext->request_sample_fmt,
 			fContext->sample_rate,
@@ -913,19 +913,10 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 	if (frames == 0)
 		debugger("fDecodedDataBufferSize not multiple of frame size!");
 
-	// The old version of libswresample available for gcc2 gets confused when
-	// the frame counts for inout and output don't match. So, we use it with
-	// equal frame counts (but it can still perform re-matrixing of the audio).
-#if LIBSWRESAMPLE_VERSION_INT <= AV_VERSION_INT(0, 6, 100)
-	outFrames = frames;
-	inFrames = frames;
-#endif
-
 	// Some decoders do not support format conversion on themselves, or use
 	// "planar" audio (each channel separated instead of interleaved samples).
-	// In that case, we use swresample to convert the data (and it is
-	// smart enough to do just a copy, when possible)
-	if (AVSampleFormatIsPlanar(fContext->sample_fmt)) {
+	// In that case, we use swresample to convert the data
+	if (av_sample_fmt_is_planar(fContext->sample_fmt)) {
 		const uint8_t* ptr[8];
 		for (int i = 0; i < 8; i++) {
 			if (fDecodedDataBuffer->data[i] == NULL)
@@ -942,6 +933,8 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 	} else {
 		memcpy(fRawDecodedAudio->data[0], fDecodedDataBuffer->data[0]
 				+ fDecodedDataBufferOffset, frames * fOutputFrameSize);
+		outFrames = frames;
+		inFrames = frames;
 	}
 
 	size_t remainingSize = inFrames * fOutputFrameSize;

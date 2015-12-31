@@ -317,20 +317,4 @@ ConvertAVSampleFormatToRawAudioFormat(AVSampleFormat sampleFormatIn,
 }
 
 
-inline bool
-AVSampleFormatIsPlanar(AVSampleFormat sampleFormat)
-{
-	switch (sampleFormat) {
-		case AV_SAMPLE_FMT_FLTP:
-		case AV_SAMPLE_FMT_DBLP:
-		case AV_SAMPLE_FMT_S32P:
-		case AV_SAMPLE_FMT_S16P:
-		case AV_SAMPLE_FMT_U8P:
-			return true;
-		default:
-			return false;
-	}
-}
-
-
 #endif // UTILITIES_H
