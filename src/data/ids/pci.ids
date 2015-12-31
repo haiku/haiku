@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2015.12.24
-#	Date:    2015-12-24 03:15:02
+#	Version: 2015.12.25
+#	Date:    2015-12-25 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -18041,8 +18041,10 @@
 		1a56 2000  Killer Wireless-N 1102 Half-size Mini PCIe Card [AR9382]
 		1a56 2001  Killer Wireless-N 1103 Half-size Mini PCIe Card [AR9380]
 	0032  AR9485 Wireless Network Adapter
+		1028 0208  Wireless 1506 WLAN Half Mini-Card
 		103c 1838  AR9485/HB125 802.11bgn 1×1 Wi-Fi Adapter
 		105b e044  Unex DHXA-225
+		1a3b 1186  AW-NE186H
 	0033  AR9580 Wireless Network Adapter
 	0034  AR9462 Wireless Network Adapter
 		1a56 2003  Killer Wireless-N 1202 Half-size Mini PCIe Card
