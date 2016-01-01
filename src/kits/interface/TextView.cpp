@@ -1098,13 +1098,14 @@ BTextView::SetText(BFile* file, int32 offset, int32 length,
 
 	_CancelInputMethod();
 
-	if (!file)
+	if (file == NULL)
 		return;
 
 	if (fText->Length() > 0)
 		DeleteText(0, fText->Length());
 
-	fText->InsertText(file, offset, length, 0);
+	if (!fText->InsertText(file, offset, length, 0))
+		return;
 
 	// update the start offsets of each line below offset
 	fLines->BumpOffset(length, _LineAt(offset) + 1);

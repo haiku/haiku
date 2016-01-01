@@ -72,7 +72,7 @@ TextGapBuffer::InsertText(const char* inText, int32 inNumItems, int32 inAtIndex)
 }
 
 
-void
+bool
 TextGapBuffer::InsertText(BFile* file, int32 fileOffset, int32 inNumItems,
 	int32 inAtIndex)
 {
@@ -80,7 +80,7 @@ TextGapBuffer::InsertText(BFile* file, int32 fileOffset, int32 inNumItems,
 
 	if (file->GetSize(&fileSize) != B_OK
 		|| !file->IsReadable())
-		return;
+		return false;
 
 	// Clamp the text length to the file size
 	fileSize -= fileOffset;
@@ -89,7 +89,7 @@ TextGapBuffer::InsertText(BFile* file, int32 fileOffset, int32 inNumItems,
 		inNumItems = fileSize;
 
 	if (inNumItems < 1)
-		return;
+		return false;
 
 	inAtIndex = (inAtIndex > fItemCount) ? fItemCount : inAtIndex;
 	inAtIndex = (inAtIndex < 0) ? 0 : inAtIndex;
@@ -106,6 +106,8 @@ TextGapBuffer::InsertText(BFile* file, int32 fileOffset, int32 inNumItems,
 		fGapIndex += inNumItems;
 		fItemCount += inNumItems;
 	}
+
+	return true;
 }
 
 
