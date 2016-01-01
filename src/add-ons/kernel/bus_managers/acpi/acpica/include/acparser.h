@@ -178,12 +178,7 @@ AcpiPsGetNextNamepath (
     ACPI_WALK_STATE         *WalkState,
     ACPI_PARSE_STATE        *ParserState,
     ACPI_PARSE_OBJECT       *Arg,
-    BOOLEAN                 PossibleMethodCall);
-
-/* Values for BOOLEAN above */
-
-#define ACPI_NOT_METHOD_CALL            FALSE
-#define ACPI_POSSIBLE_METHOD_CALL       TRUE
+    BOOLEAN                 MethodCall);
 
 ACPI_STATUS
 AcpiPsGetNextArg (

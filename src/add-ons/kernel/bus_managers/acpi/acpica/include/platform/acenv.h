@@ -369,7 +369,6 @@
 #define ACPI_INTERNAL_VAR_XFACE
 #endif
 
-
 /*
  * Debugger threading model
  * Use single threaded if the entire subsystem is contained in an application
@@ -379,11 +378,11 @@
  * multi-threaded if ACPI_APPLICATION is not set.
  */
 #ifndef DEBUGGER_THREADING
-#if !defined (ACPI_APPLICATION) || defined (ACPI_EXEC_APP)
-#define DEBUGGER_THREADING          DEBUGGER_MULTI_THREADED
+#ifdef ACPI_APPLICATION
+#define DEBUGGER_THREADING          DEBUGGER_SINGLE_THREADED
 
 #else
-#define DEBUGGER_THREADING          DEBUGGER_SINGLE_THREADED
+#define DEBUGGER_THREADING          DEBUGGER_MULTI_THREADED
 #endif
 #endif /* !DEBUGGER_THREADING */
 

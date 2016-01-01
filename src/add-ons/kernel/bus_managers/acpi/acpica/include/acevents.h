@@ -294,11 +294,6 @@ AcpiEvDeleteGpeHandlers (
 /*
  * evhandler - Address space handling
  */
-ACPI_OPERAND_OBJECT *
-AcpiEvFindRegionHandler (
-    ACPI_ADR_SPACE_TYPE     SpaceId,
-    ACPI_OPERAND_OBJECT     *HandlerObj);
-
 BOOLEAN
 AcpiEvHasDefaultHandler (
     ACPI_NAMESPACE_NODE     *Node,
@@ -341,22 +336,17 @@ AcpiEvAttachRegion (
 
 void
 AcpiEvDetachRegion (
-    ACPI_OPERAND_OBJECT     *RegionObj,
+    ACPI_OPERAND_OBJECT    *RegionObj,
     BOOLEAN                 AcpiNsIsLocked);
 
-void
-AcpiEvAssociateRegMethod (
-    ACPI_OPERAND_OBJECT     *RegionObj);
-
-void
+ACPI_STATUS
 AcpiEvExecuteRegMethods (
     ACPI_NAMESPACE_NODE     *Node,
-    ACPI_ADR_SPACE_TYPE     SpaceId,
-    UINT32                  Function);
+    ACPI_ADR_SPACE_TYPE     SpaceId);
 
 ACPI_STATUS
 AcpiEvExecuteRegMethod (
-    ACPI_OPERAND_OBJECT     *RegionObj,
+    ACPI_OPERAND_OBJECT    *RegionObj,
     UINT32                  Function);
 
 

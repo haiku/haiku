@@ -196,7 +196,7 @@ AcpiNsOneCompleteParse (
     }
 
     Status = AcpiDsInitAmlWalk (WalkState, ParseRoot, NULL,
-        AmlStart, AmlLength, NULL, (UINT8) PassNumber);
+                AmlStart, AmlLength, NULL, (UINT8) PassNumber);
     if (ACPI_FAILURE (Status))
     {
         AcpiDsDeleteWalkState (WalkState);
@@ -215,8 +215,7 @@ AcpiNsOneCompleteParse (
 
     if (StartNode && StartNode != AcpiGbl_RootNode)
     {
-        Status = AcpiDsScopeStackPush (
-            StartNode, ACPI_TYPE_METHOD, WalkState);
+        Status = AcpiDsScopeStackPush (StartNode, ACPI_TYPE_METHOD, WalkState);
         if (ACPI_FAILURE (Status))
         {
             AcpiDsDeleteWalkState (WalkState);
@@ -226,8 +225,7 @@ AcpiNsOneCompleteParse (
 
     /* Parse the AML */
 
-    ACPI_DEBUG_PRINT ((ACPI_DB_PARSE,
-        "*PARSE* pass %u parse\n", PassNumber));
+    ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "*PARSE* pass %u parse\n", PassNumber));
     Status = AcpiPsParseAml (WalkState);
 
 Cleanup:
@@ -271,9 +269,8 @@ AcpiNsParseTable (
      * performs another complete parse of the AML.
      */
     ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "**** Start pass 1\n"));
-
     Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS1,
-        TableIndex, StartNode);
+                TableIndex, StartNode);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);
@@ -290,7 +287,7 @@ AcpiNsParseTable (
      */
     ACPI_DEBUG_PRINT ((ACPI_DB_PARSE, "**** Start pass 2\n"));
     Status = AcpiNsOneCompleteParse (ACPI_IMODE_LOAD_PASS2,
-        TableIndex, StartNode);
+                TableIndex, StartNode);
     if (ACPI_FAILURE (Status))
     {
         return_ACPI_STATUS (Status);

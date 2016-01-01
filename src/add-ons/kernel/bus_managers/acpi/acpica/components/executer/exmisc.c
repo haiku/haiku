@@ -180,9 +180,9 @@ AcpiExGetObjectReference (
 
         default:
 
-            ACPI_ERROR ((AE_INFO, "Invalid Reference Class 0x%2.2X",
+            ACPI_ERROR ((AE_INFO, "Unknown Reference Class 0x%2.2X",
                 ObjDesc->Reference.Class));
-            return_ACPI_STATUS (AE_AML_OPERAND_TYPE);
+            return_ACPI_STATUS (AE_AML_INTERNAL);
         }
         break;
 
@@ -338,7 +338,6 @@ AcpiExDoConcatenate (
     ACPI_OPERAND_OBJECT     *LocalOperand1 = Operand1;
     ACPI_OPERAND_OBJECT     *ReturnDesc;
     char                    *NewBuf;
-    const char              *TypeString;
     ACPI_STATUS             Status;
 
 
@@ -360,42 +359,9 @@ AcpiExDoConcatenate (
         break;
 
     case ACPI_TYPE_STRING:
-        /*
-         * Per the ACPI spec, Concatenate only supports int/str/buf.
-         * However, we support all objects here as an extension.
-         * This improves the usefulness of the Printf() macro.
-         * 12/2015.
-         */
-        switch (Operand1->Common.Type)
-        {
-        case ACPI_TYPE_INTEGER:
-        case ACPI_TYPE_STRING:
-        case ACPI_TYPE_BUFFER:
 
-            Status = AcpiExConvertToString (
-                Operand1, &LocalOperand1, ACPI_IMPLICIT_CONVERT_HEX);
-            break;
-
-        default:
-            /*
-             * Just emit a string containing the object type.
-             */
-            TypeString = AcpiUtGetTypeName (Operand1->Common.Type);
-
-            LocalOperand1 = AcpiUtCreateStringObject (
-                ((ACPI_SIZE) strlen (TypeString) + 9)); /* 9 For "[Object]" */
-            if (!LocalOperand1)
-            {
-                Status = AE_NO_MEMORY;
-                goto Cleanup;
-            }
-
-            strcpy (LocalOperand1->String.Pointer, "[");
-            strcat (LocalOperand1->String.Pointer, TypeString);
-            strcat (LocalOperand1->String.Pointer, " Object]");
-            Status = AE_OK;
-            break;
-        }
+        Status = AcpiExConvertToString (Operand1, &LocalOperand1,
+                    ACPI_IMPLICIT_CONVERT_HEX);
         break;
 
     case ACPI_TYPE_BUFFER:
@@ -435,8 +401,8 @@ AcpiExDoConcatenate (
         /* Result of two Integers is a Buffer */
         /* Need enough buffer space for two integers */
 
-        ReturnDesc = AcpiUtCreateBufferObject (
-            (ACPI_SIZE) ACPI_MUL_2 (AcpiGbl_IntegerByteWidth));
+        ReturnDesc = AcpiUtCreateBufferObject ((ACPI_SIZE)
+                            ACPI_MUL_2 (AcpiGbl_IntegerByteWidth));
         if (!ReturnDesc)
         {
             Status = AE_NO_MEMORY;
@@ -448,12 +414,13 @@ AcpiExDoConcatenate (
         /* Copy the first integer, LSB first */
 
         memcpy (NewBuf, &Operand0->Integer.Value,
-            AcpiGbl_IntegerByteWidth);
+                        AcpiGbl_IntegerByteWidth);
 
         /* Copy the second integer (LSB first) after the first */
 
         memcpy (NewBuf + AcpiGbl_IntegerByteWidth,
-            &LocalOperand1->Integer.Value, AcpiGbl_IntegerByteWidth);
+                        &LocalOperand1->Integer.Value,
+                        AcpiGbl_IntegerByteWidth);
         break;
 
     case ACPI_TYPE_STRING:
@@ -461,8 +428,8 @@ AcpiExDoConcatenate (
         /* Result of two Strings is a String */
 
         ReturnDesc = AcpiUtCreateStringObject (
-            ((ACPI_SIZE) Operand0->String.Length +
-            LocalOperand1->String.Length));
+                        ((ACPI_SIZE) Operand0->String.Length +
+                        LocalOperand1->String.Length));
         if (!ReturnDesc)
         {
             Status = AE_NO_MEMORY;
@@ -474,7 +441,8 @@ AcpiExDoConcatenate (
         /* Concatenate the strings */
 
         strcpy (NewBuf, Operand0->String.Pointer);
-        strcat (NewBuf, LocalOperand1->String.Pointer);
+        strcpy (NewBuf + Operand0->String.Length,
+                        LocalOperand1->String.Pointer);
         break;
 
     case ACPI_TYPE_BUFFER:
@@ -482,8 +450,8 @@ AcpiExDoConcatenate (
         /* Result of two Buffers is a Buffer */
 
         ReturnDesc = AcpiUtCreateBufferObject (
-            ((ACPI_SIZE) Operand0->Buffer.Length +
-            LocalOperand1->Buffer.Length));
+                        ((ACPI_SIZE) Operand0->Buffer.Length +
+                        LocalOperand1->Buffer.Length));
         if (!ReturnDesc)
         {
             Status = AE_NO_MEMORY;
@@ -495,10 +463,10 @@ AcpiExDoConcatenate (
         /* Concatenate the buffers */
 
         memcpy (NewBuf, Operand0->Buffer.Pointer,
-            Operand0->Buffer.Length);
+                        Operand0->Buffer.Length);
         memcpy (NewBuf + Operand0->Buffer.Length,
-            LocalOperand1->Buffer.Pointer,
-            LocalOperand1->Buffer.Length);
+                        LocalOperand1->Buffer.Pointer,
+                        LocalOperand1->Buffer.Length);
         break;
 
     default:
@@ -740,8 +708,8 @@ AcpiExDoLogicalOp (
 
     case ACPI_TYPE_STRING:
 
-        Status = AcpiExConvertToString (
-            Operand1, &LocalOperand1, ACPI_IMPLICIT_CONVERT_HEX);
+        Status = AcpiExConvertToString (Operand1, &LocalOperand1,
+                    ACPI_IMPLICIT_CONVERT_HEX);
         break;
 
     case ACPI_TYPE_BUFFER:
@@ -818,8 +786,8 @@ AcpiExDoLogicalOp (
         /* Lexicographic compare: compare the data bytes */
 
         Compare = memcmp (Operand0->Buffer.Pointer,
-            LocalOperand1->Buffer.Pointer,
-            (Length0 > Length1) ? Length1 : Length0);
+                    LocalOperand1->Buffer.Pointer,
+                    (Length0 > Length1) ? Length1 : Length0);
 
         switch (Opcode)
         {

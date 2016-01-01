@@ -77,7 +77,6 @@ local executer_src =
 	exstoren.c
 	exstorob.c
 	exsystem.c
-	extrace.c
 	exutils.c
 	;
 
@@ -165,6 +164,7 @@ local utilities_src =
 	utalloc.c
 	utbuffer.c
 	utcache.c
+	utclib.c
 	utcopy.c
 	utdecode.c
 	utdebug.c

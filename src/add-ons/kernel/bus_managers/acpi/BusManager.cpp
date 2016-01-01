@@ -185,7 +185,6 @@ acpi_std_ops(int32 op,...)
 			void *settings;
 			bool acpiDisabled = false;
 			AcpiGbl_CopyDsdtLocally = true;
-			AcpiGbl_OverrideDefaultRegionHandlers = true;
 
 			settings = load_driver_settings("kernel");
 			if (settings != NULL) {
@@ -224,6 +223,14 @@ acpi_std_ops(int32 op,...)
 					"AcpiInitializeSubsystem failed"))
 				goto err;
 
+			if (checkAndLogFailure(AcpiInitializeTables(NULL, 0, TRUE),
+					"AcpiInitializeTables failed"))
+				goto err;
+
+			if (checkAndLogFailure(AcpiLoadTables(),
+					"AcpiLoadTables failed"))
+				goto err;
+
 			/* Install the default address space handlers. */
 			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
 						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_MEMORY,
@@ -241,14 +248,6 @@ acpi_std_ops(int32 op,...)
 						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_PCI_CONFIG,
 						ACPI_DEFAULT_HANDLER, NULL, NULL),
 					"Could not initialise PciConfig handler:"))
-				goto err;
-
-			if (checkAndLogFailure(AcpiInitializeTables(NULL, 0, TRUE),
-					"AcpiInitializeTables failed"))
-				goto err;
-
-			if (checkAndLogFailure(AcpiLoadTables(),
-					"AcpiLoadTables failed"))
 				goto err;
 
 			arg.Integer.Type = ACPI_TYPE_INTEGER;

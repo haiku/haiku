@@ -207,7 +207,6 @@ AcpiDmDumpTree (
     Info.Count = 0;
     Info.Level = 0;
     Info.WalkState = NULL;
-
     AcpiDmWalkParseTree (Origin, AcpiDmDumpDescending, NULL, &Info);
     AcpiOsPrintf ("*/\n\n");
 }
@@ -241,7 +240,6 @@ AcpiDmFindOrphanMethods (
     Info.Flags = 0;
     Info.Level = 0;
     Info.WalkState = NULL;
-
     AcpiDmWalkParseTree (Origin, AcpiDmFindOrphanDescending, NULL, &Info);
 }
 
@@ -285,8 +283,7 @@ AcpiDmFinishNamespaceLoad (
         return;
     }
 
-    Status = AcpiDsScopeStackPush (NamespaceRoot, NamespaceRoot->Type,
-        WalkState);
+    Status = AcpiDsScopeStackPush (NamespaceRoot, NamespaceRoot->Type, WalkState);
     if (ACPI_FAILURE (Status))
     {
         return;
@@ -295,7 +292,6 @@ AcpiDmFinishNamespaceLoad (
     Info.Flags = 0;
     Info.Level = 0;
     Info.WalkState = WalkState;
-
     AcpiDmWalkParseTree (ParseTreeRoot, AcpiDmLoadDescendingOp,
         AcpiDmCommonAscendingOp, &Info);
     ACPI_FREE (WalkState);
@@ -340,8 +336,7 @@ AcpiDmCrossReferenceNamespace (
         return;
     }
 
-    Status = AcpiDsScopeStackPush (NamespaceRoot, NamespaceRoot->Type,
-        WalkState);
+    Status = AcpiDsScopeStackPush (NamespaceRoot, NamespaceRoot->Type, WalkState);
     if (ACPI_FAILURE (Status))
     {
         return;
@@ -350,7 +345,6 @@ AcpiDmCrossReferenceNamespace (
     Info.Flags = 0;
     Info.Level = 0;
     Info.WalkState = WalkState;
-
     AcpiDmWalkParseTree (ParseTreeRoot, AcpiDmXrefDescendingOp,
         AcpiDmCommonAscendingOp, &Info);
     ACPI_FREE (WalkState);
@@ -395,8 +389,7 @@ AcpiDmConvertResourceIndexes (
         return;
     }
 
-    Status = AcpiDsScopeStackPush (NamespaceRoot, NamespaceRoot->Type,
-        WalkState);
+    Status = AcpiDsScopeStackPush (NamespaceRoot, NamespaceRoot->Type, WalkState);
     if (ACPI_FAILURE (Status))
     {
         return;
@@ -405,7 +398,6 @@ AcpiDmConvertResourceIndexes (
     Info.Flags = 0;
     Info.Level = 0;
     Info.WalkState = WalkState;
-
     AcpiDmWalkParseTree (ParseTreeRoot, AcpiDmResourceDescendingOp,
         AcpiDmCommonAscendingOp, &Info);
     ACPI_FREE (WalkState);
@@ -476,7 +468,7 @@ AcpiDmDumpDescending (
         if (Op->Common.Value.String)
         {
             AcpiNsExternalizeName (ACPI_UINT32_MAX, Op->Common.Value.String,
-                NULL, &Path);
+                            NULL, &Path);
             AcpiOsPrintf ("%s %p", Path, Op->Common.Node);
             ACPI_FREE (Path);
         }
@@ -735,7 +727,6 @@ AcpiDmLoadDescendingOp (
         {
             NextOp = NextOp->Common.Next;
         }
-
         Path = NextOp->Common.Value.String;
     }
 
@@ -747,8 +738,8 @@ AcpiDmLoadDescendingOp (
     /* Insert the name into the namespace */
 
     Status = AcpiNsLookup (WalkState->ScopeInfo, Path, ObjectType,
-        ACPI_IMODE_LOAD_PASS2, ACPI_NS_DONT_OPEN_SCOPE,
-        WalkState, &Node);
+                ACPI_IMODE_LOAD_PASS2, ACPI_NS_DONT_OPEN_SCOPE,
+                WalkState, &Node);
 
     Op->Common.Node = Node;
 
@@ -789,8 +780,7 @@ Exit:
     {
         if (Op->Common.Node)
         {
-            Status = AcpiDsScopeStackPush (Op->Common.Node, ObjectType,
-                WalkState);
+            Status = AcpiDsScopeStackPush (Op->Common.Node, ObjectType, WalkState);
             if (ACPI_FAILURE (Status))
             {
                 return (Status);
@@ -907,8 +897,8 @@ AcpiDmXrefDescendingOp (
      */
     Node = NULL;
     Status = AcpiNsLookup (WalkState->ScopeInfo, Path, ACPI_TYPE_ANY,
-        ACPI_IMODE_EXECUTE, ACPI_NS_SEARCH_PARENT | ACPI_NS_DONT_OPEN_SCOPE,
-        WalkState, &Node);
+                ACPI_IMODE_EXECUTE, ACPI_NS_SEARCH_PARENT | ACPI_NS_DONT_OPEN_SCOPE,
+                WalkState, &Node);
     if (ACPI_SUCCESS (Status) && (Node->Flags & ANOBJ_IS_EXTERNAL))
     {
         /* Node was created by an External() statement */
@@ -990,8 +980,7 @@ Exit:
     {
         if (Op->Common.Node)
         {
-            Status = AcpiDsScopeStackPush (Op->Common.Node, ObjectType,
-                WalkState);
+            Status = AcpiDsScopeStackPush (Op->Common.Node, ObjectType, WalkState);
             if (ACPI_FAILURE (Status))
             {
                 return (Status);
@@ -1039,8 +1028,7 @@ AcpiDmResourceDescendingOp (
         if (Op->Common.Node)
         {
 
-            Status = AcpiDsScopeStackPush (Op->Common.Node, ObjectType,
-                WalkState);
+            Status = AcpiDsScopeStackPush (Op->Common.Node, ObjectType, WalkState);
             if (ACPI_FAILURE (Status))
             {
                 return (Status);

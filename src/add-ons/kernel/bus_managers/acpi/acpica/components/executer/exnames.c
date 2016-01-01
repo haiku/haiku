@@ -232,7 +232,6 @@ AcpiExAllocateNameString (
     return_PTR (NameString);
 }
 
-
 /*******************************************************************************
  *
  * FUNCTION:    AcpiExNameSegment
@@ -262,8 +261,8 @@ AcpiExNameSegment (
 
 
     /*
-     * If first character is a digit, then we know that we aren't looking
-     * at a valid name segment
+     * If first character is a digit, then we know that we aren't looking at a
+     * valid name segment
      */
     CharBuf[0] = *AmlAddress;
 
@@ -467,8 +466,7 @@ AcpiExGetNameString (
             AmlAddress++;
             NumSegments = *AmlAddress;
 
-            NameString = AcpiExAllocateNameString (
-                PrefixCount, NumSegments);
+            NameString = AcpiExAllocateNameString (PrefixCount, NumSegments);
             if (!NameString)
             {
                 Status = AE_NO_MEMORY;

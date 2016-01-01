@@ -217,7 +217,7 @@ AcpiNsEvaluate (
 
     /* Get the full pathname to the object, for use in warning messages */
 
-    Info->FullPathname = AcpiNsGetNormalizedPathname (Info->Node, TRUE);
+    Info->FullPathname = AcpiNsGetExternalPathname (Info->Node);
     if (!Info->FullPathname)
     {
         return_ACPI_STATUS (AE_NO_MEMORY);
@@ -491,7 +491,7 @@ AcpiNsExecModuleCodeList (
  *
  * DESCRIPTION: Execute a control method containing a block of module-level
  *              executable AML code. The control method is temporarily
- *              installed to a local copy of the root node, then evaluated.
+ *              installed to the root node, then evaluated.
  *
  ******************************************************************************/
 
@@ -500,9 +500,10 @@ AcpiNsExecModuleCode (
     ACPI_OPERAND_OBJECT     *MethodObj,
     ACPI_EVALUATE_INFO      *Info)
 {
-    ACPI_STATUS             Status;
-    ACPI_NAMESPACE_NODE     *TempNode;
+    ACPI_OPERAND_OBJECT     *ParentObj;
     ACPI_NAMESPACE_NODE     *ParentNode;
+    ACPI_OBJECT_TYPE        Type;
+    ACPI_STATUS             Status;
 
 
     ACPI_FUNCTION_TRACE (NsExecModuleCode);
@@ -513,18 +514,21 @@ AcpiNsExecModuleCode (
      * of the method object descriptor.
      */
     ParentNode = ACPI_CAST_PTR (ACPI_NAMESPACE_NODE,
-        MethodObj->Method.NextObject);
+                    MethodObj->Method.NextObject);
+    Type = AcpiNsGetType (ParentNode);
 
-    /* Take a copy of the parent node to act as parent of this method */
-
-    TempNode = ACPI_ALLOCATE (sizeof (ACPI_NAMESPACE_NODE));
-    if (!TempNode)
+    /*
+     * Get the region handler and save it in the method object. We may need
+     * this if an operation region declaration causes a _REG method to be run.
+     *
+     * We can't do this in AcpiPsLinkModuleCode because
+     * AcpiGbl_RootNode->Object is NULL at PASS1.
+     */
+    if ((Type == ACPI_TYPE_DEVICE) && ParentNode->Object)
     {
-        return_VOID;
+        MethodObj->Method.Dispatch.Handler =
+            ParentNode->Object->Device.Handler;
     }
-
-    memcpy (TempNode, ParentNode, sizeof (ACPI_NAMESPACE_NODE));
-    TempNode->Object = NULL; /* Clear the subobject */
 
     /* Must clear NextObject (AcpiNsAttachObject needs the field) */
 
@@ -533,14 +537,26 @@ AcpiNsExecModuleCode (
     /* Initialize the evaluation information block */
 
     memset (Info, 0, sizeof (ACPI_EVALUATE_INFO));
-    Info->PrefixNode = TempNode;
+    Info->PrefixNode = ParentNode;
+
+    /*
+     * Get the currently attached parent object. Add a reference, because the
+     * ref count will be decreased when the method object is installed to
+     * the parent node.
+     */
+    ParentObj = AcpiNsGetAttachedObject (ParentNode);
+    if (ParentObj)
+    {
+        AcpiUtAddReference (ParentObj);
+    }
 
     /* Install the method (module-level code) in the parent node */
 
-    Status = AcpiNsAttachObject (TempNode, MethodObj, ACPI_TYPE_METHOD);
+    Status = AcpiNsAttachObject (ParentNode, MethodObj,
+                ACPI_TYPE_METHOD);
     if (ACPI_FAILURE (Status))
     {
-        goto Cleanup;
+        goto Exit;
     }
 
     /* Execute the parent node as a control method */
@@ -558,7 +574,25 @@ AcpiNsExecModuleCode (
         AcpiUtRemoveReference (Info->ReturnObject);
     }
 
-Cleanup:
-    ACPI_FREE (TempNode);
+    /* Detach the temporary method object */
+
+    AcpiNsDetachObject (ParentNode);
+
+    /* Restore the original parent object */
+
+    if (ParentObj)
+    {
+        Status = AcpiNsAttachObject (ParentNode, ParentObj, Type);
+    }
+    else
+    {
+        ParentNode->Type = (UINT8) Type;
+    }
+
+Exit:
+    if (ParentObj)
+    {
+        AcpiUtRemoveReference (ParentObj);
+    }
     return_VOID;
 }

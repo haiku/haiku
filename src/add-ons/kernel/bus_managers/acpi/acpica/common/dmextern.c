@@ -212,6 +212,7 @@ AcpiDmGetObjectTypeName (
     {
         Type = ACPI_TYPE_DEVICE;
     }
+
     else if (Type > ACPI_TYPE_LOCAL_INDEX_FIELD)
     {
         return ("");
@@ -481,7 +482,6 @@ AcpiDmGetExternalsFromFile (
         {
             continue;
         }
-
         if (strcmp (Token, "External"))
         {
             continue;
@@ -519,7 +519,6 @@ AcpiDmGetExternalsFromFile (
             fprintf (stderr, "Invalid argument count (%s)\n", Token);
             continue;
         }
-
         if (ArgCount > 7)
         {
             fprintf (stderr, "Invalid argument count (%u)\n", ArgCount);
@@ -538,8 +537,7 @@ AcpiDmGetExternalsFromFile (
 
     if (!ImportCount)
     {
-        fprintf (stderr,
-            "Did not find any external methods in reference file \"%s\"\n",
+        fprintf (stderr, "Did not find any external methods in reference file \"%s\"\n",
             Gbl_ExternalRefFilename);
     }
     else
@@ -889,8 +887,7 @@ AcpiDmCreateNewExternal (
                 (Value > 0))
             {
                 ACPI_ERROR ((AE_INFO,
-                    "External method arg count mismatch %s: "
-                    "Current %u, attempted %u",
+                    "External method arg count mismatch %s: Current %u, attempted %u",
                     NextExternal->Path, NextExternal->Value, Value));
             }
 
@@ -992,9 +989,9 @@ AcpiDmAddExternalsToNamespace (
         /* Add the external name (object) into the namespace */
 
         Status = AcpiNsLookup (NULL, External->InternalPath, External->Type,
-            ACPI_IMODE_LOAD_PASS1,
-            ACPI_NS_ERROR_IF_FOUND | ACPI_NS_EXTERNAL | ACPI_NS_DONT_OPEN_SCOPE,
-            NULL, &Node);
+                   ACPI_IMODE_LOAD_PASS1,
+                   ACPI_NS_ERROR_IF_FOUND | ACPI_NS_EXTERNAL | ACPI_NS_DONT_OPEN_SCOPE,
+                   NULL, &Node);
 
         if (ACPI_FAILURE (Status))
         {

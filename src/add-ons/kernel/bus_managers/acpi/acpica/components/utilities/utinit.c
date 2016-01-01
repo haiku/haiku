@@ -298,6 +298,7 @@ AcpiUtInitGlobals (
     AcpiGbl_NextOwnerIdOffset           = 0;
     AcpiGbl_DebuggerConfiguration       = DEBUGGER_THREADING;
     AcpiGbl_OsiMutex                    = NULL;
+    AcpiGbl_RegMethodsExecuted          = FALSE;
     AcpiGbl_MaxLoopIterations           = 0xFFFF;
 
     /* Hardware oriented */
@@ -332,6 +333,8 @@ AcpiUtInitGlobals (
     AcpiGbl_DisplayFinalMemStats        = FALSE;
     AcpiGbl_DisableMemTracking          = FALSE;
 #endif
+
+    ACPI_DEBUGGER_EXEC (AcpiGbl_DbTerminateThreads = FALSE);
 
     return_ACPI_STATUS (AE_OK);
 }
@@ -380,20 +383,6 @@ AcpiUtSubsystemShutdown (
 {
     ACPI_FUNCTION_TRACE (UtSubsystemShutdown);
 
-
-    /* Just exit if subsystem is already shutdown */
-
-    if (AcpiGbl_Shutdown)
-    {
-        ACPI_ERROR ((AE_INFO, "ACPI Subsystem is already terminated"));
-        return_VOID;
-    }
-
-    /* Subsystem appears active, go ahead and shut it down */
-
-    AcpiGbl_Shutdown = TRUE;
-    AcpiGbl_StartupFlags = 0;
-    ACPI_DEBUG_PRINT ((ACPI_DB_INFO, "Shutting down ACPI Subsystem\n"));
 
 #ifndef ACPI_ASL_COMPILER
 

@@ -187,7 +187,7 @@ AcpiTbSetTableLoadedFlag (
  */
 void
 AcpiTbParseFadt (
-    void);
+    UINT32                  TableIndex);
 
 void
 AcpiTbCreateLocalFadt (
@@ -277,6 +277,10 @@ AcpiTbGetOwnerId (
  */
 ACPI_STATUS
 AcpiTbInitializeFacs (
+    void);
+
+BOOLEAN
+AcpiTbTablesLoaded (
     void);
 
 void
