@@ -241,9 +241,7 @@ Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 
 	uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL | extraFlags;
 
-	if (gInfo->shared_info->device_type.Generation() >= 4
-		|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
-
+	if (gInfo->shared_info->device_type.Generation() >= 3) {
 		// post1 divisor << 1 , 1-8
 		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
 			pll |= ((1 << (divisors.post1 - 1))
@@ -269,6 +267,7 @@ Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 
 		pll |= DISPLAY_PLL_2X_CLOCK;
 
+		// TODO: Is this supposed to be DISPLAY_PLL_IGD_POST1_DIVISOR_MASK??
 		if (divisors.post1 > 2) {
 			pll |= ((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
 				& DISPLAY_PLL_POST1_DIVISOR_MASK;
