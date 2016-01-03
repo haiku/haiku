@@ -97,9 +97,8 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	get_pll_limits(&limits, false);
 		// TODO: Detect LVDS connector vs assume no
 
-	if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)
-		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
-		|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0)) {
+	if (gInfo->shared_info->device_type.Generation() >= 3) {
+
 		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
 			divisors.post1 = (pll & DISPLAY_PLL_IGD_POST1_DIVISOR_MASK)
 				>> DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
