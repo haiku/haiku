@@ -67,6 +67,8 @@ AlphaMask::AlphaMask(AlphaMask* previousMask, AlphaMask* other)
 	fMask(other->fMask),
 	fScanline(fMask)
 {
+	fMask.attach(fBuffer);
+
 	if (previousMask != NULL)
 		atomic_add(&previousMask->fNextMaskCount, 1);
 	fBits->AcquireReference();
