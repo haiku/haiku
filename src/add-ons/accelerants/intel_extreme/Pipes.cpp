@@ -52,26 +52,29 @@ program_pipe_color_modes(uint32 colorMode)
 
 Pipe::Pipe(pipe_index pipeIndex)
 	:
+	fHasTranscoder(false),
 	fFDILink(NULL),
 //	fPanelFitter(NULL),
 	fPipeIndex(pipeIndex),
-	fPipeBase(REGS_NORTH_PIPE_AND_PORT),
-	fPlaneBase(REGS_NORTH_PLANE_CONTROL)
+	fPipeOffset(0),
+	fPlaneOffset(0)
 {
 	if (pipeIndex == INTEL_PIPE_B) {
-		fPipeBase += INTEL_DISPLAY_OFFSET;
-		fPlaneBase += INTEL_PLANE_OFFSET;
+		fPipeOffset = INTEL_DISPLAY_OFFSET;
+		fPlaneOffset = INTEL_PLANE_OFFSET;
 	}
 
-	// Program FDILink if PCH
 	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
+		fHasTranscoder = true;
+
+		// Program FDILink if PCH
 		if (fFDILink == NULL)
 			fFDILink = new(std::nothrow) FDILink(pipeIndex);
 	}
 
 	TRACE("Pipe %s. Pipe Base: 0x%" B_PRIxADDR
 		" Plane Base: 0x% " B_PRIxADDR "\n", (pipeIndex == INTEL_PIPE_A)
-			? "A" : "B", fPipeBase, fPlaneBase);
+			? "A" : "B", fPipeOffset, fPlaneOffset);
 }
 
 
@@ -84,12 +87,47 @@ bool
 Pipe::IsEnabled()
 {
 	CALLED();
-	return (read32(fPlaneBase + INTEL_PIPE_CONTROL) & INTEL_PIPE_ENABLED) != 0;
+	return (read32(INTEL_DISPLAY_A_PIPE_CONTROL + fPlaneOffset)
+		& INTEL_PIPE_ENABLED) != 0;
 }
 
 
 void
-Pipe::Enable(display_mode* target, addr_t portAddress)
+Pipe::_EnableTranscoder(display_mode* target)
+{
+	// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
+	write32(INTEL_TRANSCODER_A_HTOTAL + fPipeOffset,
+		((uint32)(target->timing.h_total - 1) << 16)
+		| ((uint32)target->timing.h_display - 1));
+	write32(INTEL_TRANSCODER_A_HBLANK + fPipeOffset,
+		((uint32)(target->timing.h_total - 1) << 16)
+		| ((uint32)target->timing.h_display - 1));
+	write32(INTEL_TRANSCODER_A_HSYNC + fPipeOffset,
+		((uint32)(target->timing.h_sync_end - 1) << 16)
+		| ((uint32)target->timing.h_sync_start - 1));
+
+	write32(INTEL_TRANSCODER_A_VTOTAL + fPipeOffset,
+		((uint32)(target->timing.v_total - 1) << 16)
+		| ((uint32)target->timing.v_display - 1));
+	write32(INTEL_TRANSCODER_A_VBLANK + fPipeOffset,
+		((uint32)(target->timing.v_total - 1) << 16)
+		| ((uint32)target->timing.v_display - 1));
+	write32(INTEL_TRANSCODER_A_VSYNC + fPipeOffset,
+		((uint32)(target->timing.v_sync_end - 1) << 16)
+		| ((uint32)target->timing.v_sync_start - 1));
+
+	#if 0
+	// XXX: Is it ok to do these on non-digital?
+	write32(INTEL_TRANSCODER_A_POS + fPipeOffset, 0);
+	write32(INTEL_TRANSCODER_A_IMAGE_SIZE + fPipeOffset,
+		((uint32)(target->virtual_width - 1) << 16)
+			| ((uint32)target->virtual_height - 1));
+	#endif
+}
+
+
+void
+Pipe::Enable(display_mode* target)
 {
 	CALLED();
 
@@ -97,58 +135,48 @@ Pipe::Enable(display_mode* target, addr_t portAddress)
 		ERROR("%s: Invalid display mode!\n", __func__);
 		return;
 	}
-	if (portAddress == 0) {
-		ERROR("%s: Invalid port address!\n", __func__);
-		return;
-	}
 
-	// update timing (fPipeBase bumps the DISPLAY_A to B when needed)
-	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_HTOTAL),
+	// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
+	write32(INTEL_DISPLAY_A_HTOTAL + fPipeOffset,
 		((uint32)(target->timing.h_total - 1) << 16)
 		| ((uint32)target->timing.h_display - 1));
-	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_HBLANK),
+	write32(INTEL_DISPLAY_A_HBLANK + fPipeOffset,
 		((uint32)(target->timing.h_total - 1) << 16)
 		| ((uint32)target->timing.h_display - 1));
-	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_HSYNC),
+	write32(INTEL_DISPLAY_A_HSYNC + fPipeOffset,
 		((uint32)(target->timing.h_sync_end - 1) << 16)
 		| ((uint32)target->timing.h_sync_start - 1));
 
-	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_VTOTAL),
+	write32(INTEL_DISPLAY_A_VTOTAL + fPipeOffset,
 		((uint32)(target->timing.v_total - 1) << 16)
 		| ((uint32)target->timing.v_display - 1));
-	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_VBLANK),
+	write32(INTEL_DISPLAY_A_VBLANK + fPipeOffset,
 		((uint32)(target->timing.v_total - 1) << 16)
 		| ((uint32)target->timing.v_display - 1));
-	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_VSYNC),
+	write32(INTEL_DISPLAY_A_VSYNC + fPipeOffset,
 		((uint32)(target->timing.v_sync_end - 1) << 16)
 		| ((uint32)target->timing.v_sync_start - 1));
 
 	// XXX: Is it ok to do these on non-digital?
-	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_POS), 0);
-	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_IMAGE_SIZE),
+	write32(INTEL_DISPLAY_A_POS + fPipeOffset, 0);
+	write32(INTEL_DISPLAY_A_IMAGE_SIZE + fPipeOffset,
 		((uint32)(target->virtual_width - 1) << 16)
 			| ((uint32)target->virtual_height - 1));
 
-	write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_PIPE_SIZE),
+	write32(INTEL_DISPLAY_A_PIPE_SIZE + fPipeOffset,
 		((uint32)(target->timing.v_display - 1) << 16)
 			| ((uint32)target->timing.h_display - 1));
 
 	// This is useful for debugging: it sets the border to red, so you
 	// can see what is border and what is porch (black area around the
 	// sync)
-	//write32(fPipeBase + REGISTER_REGISTER(INTEL_DISPLAY_A_RED), 0x00FF0000);
+	//write32(INTEL_DISPLAY_A_RED + fPipeOffset, 0x00FF0000);
 
-	// XXX: Is it ok to do this on non-analog?
-	write32(portAddress, (read32(portAddress) & ~(DISPLAY_MONITOR_POLARITY_MASK
-			| DISPLAY_MONITOR_VGA_POLARITY))
-		| ((target->timing.flags & B_POSITIVE_HSYNC) != 0
-			? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
-		| ((target->timing.flags & B_POSITIVE_VSYNC) != 0
-			? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
+	if (fHasTranscoder)
+		_EnableTranscoder(target);
 
 	// Enable display pipe
 	_Enable(true);
-
 }
 
 
@@ -263,7 +291,7 @@ Pipe::_Enable(bool enable)
 {
 	CALLED();
 
-	addr_t targetRegister = fPlaneBase + INTEL_PIPE_CONTROL;
+	addr_t targetRegister = INTEL_DISPLAY_A_PIPE_CONTROL + fPlaneOffset;
 
 	write32(targetRegister, (read32(targetRegister) & ~INTEL_PIPE_ENABLED)
 		| (enable ? INTEL_PIPE_ENABLED : 0));

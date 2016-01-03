@@ -35,8 +35,7 @@ public:
 										{ return fPipeIndex; }
 
 		bool						IsEnabled();
-		void						Enable(display_mode* mode,
-										addr_t portRegister);
+		void						Enable(display_mode* mode);
 		void						Disable();
 
 		void						ConfigureTimings(
@@ -52,14 +51,17 @@ public:
 
 private:
 		void						_Enable(bool enable);
+		void						_EnableTranscoder(display_mode* mode);
+
+		bool						fHasTranscoder;
 
 		FDILink*					fFDILink;
 	//	PanelFitter*				fPanelFitter;
 
 		pipe_index					fPipeIndex;
 
-		addr_t						fPipeBase;
-		addr_t						fPlaneBase;
+		addr_t						fPipeOffset;
+		addr_t						fPlaneOffset;
 };
 
 

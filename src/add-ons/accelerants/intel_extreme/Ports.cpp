@@ -305,12 +305,19 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (gInfo->shared_info->device_type.Generation() >= 4)
 		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
 
+	write32(_PortRegister(), (read32(_PortRegister())
+		& ~(DISPLAY_MONITOR_POLARITY_MASK | DISPLAY_MONITOR_VGA_POLARITY))
+		| ((target->timing.flags & B_POSITIVE_HSYNC) != 0
+			? DISPLAY_MONITOR_POSITIVE_HSYNC : 0)
+		| ((target->timing.flags & B_POSITIVE_VSYNC) != 0
+			? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
+
 	// Program pipe PLL's
 	fPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
 		extraPLLFlags);
 
 	// Program target display mode
-	fPipe->Enable(target, _PortRegister());
+	fPipe->Enable(target);
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));
@@ -345,7 +352,7 @@ LVDSPort::IsConnected()
 		}
 	}
 
-	uint32 registerValue = read32(INTEL_DIGITAL_LVDS_PORT);
+	uint32 registerValue = read32(_PortRegister());
 	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
 		// there's a detection bit we can use
 		if ((registerValue & PCH_LVDS_DETECTED) == 0) {
@@ -524,11 +531,15 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	// Set the B0-B3 data pairs corresponding to whether we're going to
 	// set the DPLLs for dual-channel mode or not.
-	if (divisors.post2_high)
+	if (divisors.post2_high) {
+		TRACE("LVDS: dual channel\n");
 		lvds |= LVDS_B0B3_POWER_UP | LVDS_CLKB_POWER_UP;
-	else
+	} else {
+		TRACE("LVDS: single channel\n");
 		lvds &= ~(LVDS_B0B3_POWER_UP | LVDS_CLKB_POWER_UP);
+	}
 
+	// LVDS port control moves polarity bits because Intel hates you.
 	// Set LVDS sync polarity
 	lvds &= ~(LVDS_HSYNC_POLARITY | LVDS_VSYNC_POLARITY);
 
@@ -538,7 +549,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if ((target->timing.flags & B_POSITIVE_VSYNC) == 0)
 		lvds |= LVDS_VSYNC_POLARITY;
 
-	TRACE("%s: LVDS Control: 0x%" B_PRIx32 "\n", __func__, lvds);
+	TRACE("%s: LVDS Write: 0x%" B_PRIx32 "\n", __func__, lvds);
 	write32(_PortRegister(), lvds);
 	read32(_PortRegister());
 
@@ -560,7 +571,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		ERROR("%s: %s didn't power on within 1000ms!\n", __func__, PortName());
 
 	// Program target display mode
-	fPipe->Enable(target, _PortRegister());
+	fPipe->Enable(target);
 
 #if 0
 
@@ -732,7 +743,7 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		extraPLLFlags);
 
 	// Program target display mode
-	fPipe->Enable(target, _PortRegister());
+	fPipe->Enable(target);
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));
