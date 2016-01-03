@@ -556,7 +556,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	uint32 extraPLLFlags = 0;
 
 	// DPLL mode LVDS for i915+
-	if (gInfo->shared_info->device_type.Generation() >= 4)
+	if (gInfo->shared_info->device_type.Generation() >= 3)
 		extraPLLFlags |= DISPLAY_PLL_MODE_LVDS;
 
 	// Program pipe PLL's (pixel_clock is *always* the hardware pixel clock)
