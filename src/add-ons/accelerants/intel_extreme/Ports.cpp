@@ -302,7 +302,7 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	compute_pll_divisors(target, &divisors, false);
 
 	uint32 extraPLLFlags = 0;
-	if (gInfo->shared_info->device_type.Generation() >= 4)
+	if (gInfo->shared_info->device_type.Generation() >= 3)
 		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
 
 	write32(_PortRegister(), (read32(_PortRegister())
@@ -735,7 +735,7 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	compute_pll_divisors(target, &divisors, false);
 
 	uint32 extraPLLFlags = 0;
-	if (gInfo->shared_info->device_type.Generation() >= 4)
+	if (gInfo->shared_info->device_type.Generation() >= 3)
 		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
 
 	// Program pipe PLL's
