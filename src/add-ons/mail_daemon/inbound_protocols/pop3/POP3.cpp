@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2016, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -253,7 +253,7 @@ POP3Protocol::SyncMessages()
 
 
 status_t
-POP3Protocol::FetchBody(const entry_ref& ref)
+POP3Protocol::HandleFetchBody(const entry_ref& ref, const BMessenger& replyTo)
 {
 	ResetProgress("Fetch body");
 	SetTotalItems(1);
@@ -303,6 +303,7 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 
 	BMessage attributes;
 	NotifyBodyFetched(ref, file, attributes);
+	ReplyBodyFetched(replyTo, ref, B_OK);
 
 	if (!leaveOnServer)
 		Delete(toRetrieve);
@@ -316,7 +317,7 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 
 
 status_t
-POP3Protocol::DeleteMessage(const entry_ref& ref)
+POP3Protocol::HandleDeleteMessage(const entry_ref& ref)
 {
 	status_t error = Connect();
 	if (error < B_OK)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2004-2016, Haiku, Inc. All Rights Reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011 Clemens Zeidler. All rights reserved.
  *
@@ -136,13 +136,22 @@ public:
 	virtual void				MessageReceived(BMessage* message);
 
 	virtual	status_t			SyncMessages() = 0;
-	virtual status_t			FetchBody(const entry_ref& ref) = 0;
+	virtual status_t			FetchBody(const entry_ref& ref,
+									BMessenger* replyTo);
 	virtual	status_t			MarkMessageAsRead(const entry_ref& ref,
 									read_flags flags = B_READ);
-	virtual	status_t			DeleteMessage(const entry_ref& ref) = 0;
+	virtual	status_t			DeleteMessage(const entry_ref& ref);
 	virtual	status_t			AppendMessage(const entry_ref& ref);
 
+	static	void				ReplyBodyFetched(const BMessenger& replyTo,
+									const entry_ref& ref, status_t status);
+
 protected:
+	virtual status_t			HandleFetchBody(const entry_ref& ref,
+									const BMessenger& replyTo) = 0;
+
+	virtual	status_t			HandleDeleteMessage(const entry_ref& ref) = 0;
+
 			void				NotiyMailboxSynchronized(status_t status);
 };
 

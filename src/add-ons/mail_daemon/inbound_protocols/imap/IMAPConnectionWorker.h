@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef IMAP_CONNECTION_WORKER_H
@@ -9,7 +9,6 @@
 #include <Locker.h>
 #include <String.h>
 
-//#include "Commands.h"
 #include "Protocol.h"
 
 
@@ -19,7 +18,6 @@ class IMAPProtocol;
 class Settings;
 class WorkerCommand;
 class WorkerPrivate;
-
 
 typedef BObjectList<WorkerCommand> WorkerCommandList;
 
@@ -46,7 +44,10 @@ public:
 
 			status_t			EnqueueCheckSubscribedFolders();
 			status_t			EnqueueCheckMailboxes();
-			status_t			EnqueueRetrieveMail(entry_ref& ref);
+			status_t			EnqueueFetchBody(IMAPFolder& folder,
+									uint32 uid, const BMessenger& replyTo);
+			status_t			EnqueueUpdateFlags(IMAPFolder& folder,
+									uint32 uid, uint32 flags);
 
 	// Handler listener
 	virtual	void				MessageExistsReceived(uint32 index);

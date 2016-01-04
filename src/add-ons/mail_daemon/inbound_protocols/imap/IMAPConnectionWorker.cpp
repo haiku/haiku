@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,6 +7,7 @@
 #include "IMAPConnectionWorker.h"
 
 #include <Autolock.h>
+#include <Messenger.h>
 
 #include <AutoDeleter.h>
 
@@ -141,12 +142,13 @@ public:
 class FetchBodiesCommand : public SyncCommand, public IMAP::FetchListener {
 public:
 	FetchBodiesCommand(IMAPFolder& folder, IMAPMailbox& mailbox,
-		std::vector<uint32>& entries)
+		MessageUIDList& entries, const BMessenger* replyTo = NULL)
 		:
 		fFolder(folder),
 		fMailbox(mailbox),
 		fEntries(entries)
 	{
+		folder.RegisterPendingBodies(entries, replyTo);
 	}
 
 	virtual status_t Process(IMAPConnectionWorker& worker)
@@ -160,18 +162,23 @@ public:
 		fEntries.erase(fEntries.begin());
 
 		status_t status = WorkerPrivate(worker).SelectMailbox(fFolder);
+		if (status == B_OK) {
+			printf("IMAP: fetch body for %" B_PRIu32 "\n", fUID);
+			// Since RFC3501 does not specify whether the FETCH response may
+			// alter the order of the message data items we request, we cannot
+			// request more than a single UID at a time, or else we may not be
+			// able to assign the data to the correct message beforehand.
+			IMAP::FetchCommand fetch(fUID, fUID, IMAP::kFetchBody);
+			fetch.SetListener(this);
+
+			status = protocol.ProcessCommand(fetch);
+		}
+		if (status == B_OK)
+			status = fFetchStatus;
 		if (status != B_OK)
-			return status;
+			fFolder.StoringBodyFailed(fRef, fUID, status);
 
-		printf("IMAP: fetch body for %" B_PRIu32 "\n", fUID);
-		// Since RFC3501 does not specify whether the FETCH response may
-		// alter the order of the message data items we request, we cannot
-		// request more than a single UID at a time, or else we may not be
-		// able to assign the data to the correct message beforehand.
-		IMAP::FetchCommand fetch(fUID, fUID, IMAP::kFetchBody);
-		fetch.SetListener(this);
-
-		return protocol.ProcessCommand(fetch);
+		return status;
 	}
 
 	virtual bool IsDone() const
@@ -194,7 +201,7 @@ public:
 private:
 	IMAPFolder&				fFolder;
 	IMAPMailbox&			fMailbox;
-	std::vector<uint32>		fEntries;
+	MessageUIDList			fEntries;
 	uint32					fUID;
 	entry_ref				fRef;
 	BFile					fFile;
@@ -362,6 +369,9 @@ public:
 				if (entries[i].uid > fFolder->LastUID()) {
 					fTotalBytes += entries[i].size;
 					fUIDsToFetch.push_back(entries[i].uid);
+				} else {
+					fFolder->UpdateMessageFlags(entries[i].uid,
+						entries[i].flags);
 				}
 			}
 
@@ -410,6 +420,50 @@ private:
 	uint64					fTotalBytes;
 	WorkerCommandList		fFetchCommands;
 	MessageUIDList			fUIDsToFetch;
+};
+
+
+class UpdateFlagsCommand : public WorkerCommand {
+public:
+	UpdateFlagsCommand(IMAPFolder& folder, IMAPMailbox& mailbox,
+		MessageUIDList& entries, uint32 flags)
+		:
+		fFolder(folder),
+		fMailbox(mailbox),
+		fEntries(entries),
+		fFlags(flags)
+	{
+	}
+
+	virtual status_t Process(IMAPConnectionWorker& worker)
+	{
+		if (fEntries.empty())
+			return B_OK;
+
+		fUID = *fEntries.begin();
+		fEntries.erase(fEntries.begin());
+
+		status_t status = WorkerPrivate(worker).SelectMailbox(fFolder);
+		if (status == B_OK) {
+			IMAP::Protocol& protocol = WorkerPrivate(worker).Protocol();
+			IMAP::SetFlagsCommand set(fUID, fFlags);
+			status = protocol.ProcessCommand(set);
+		}
+
+		return status;
+	}
+
+	virtual bool IsDone() const
+	{
+		return fEntries.empty();
+	}
+
+private:
+	IMAPFolder&				fFolder;
+	IMAPMailbox&			fMailbox;
+	MessageUIDList			fEntries;
+	uint32					fUID;
+	uint32					fFlags;
 };
 
 
@@ -567,9 +621,34 @@ IMAPConnectionWorker::EnqueueCheckMailboxes()
 
 
 status_t
-IMAPConnectionWorker::EnqueueRetrieveMail(entry_ref& ref)
+IMAPConnectionWorker::EnqueueFetchBody(IMAPFolder& folder, uint32 uid,
+	const BMessenger& replyTo)
 {
-	return B_OK;
+	IMAPMailbox* mailbox = _MailboxFor(folder);
+	if (mailbox == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	std::vector<uint32> uids;
+	uids.push_back(uid);
+
+	return _EnqueueCommand(new FetchBodiesCommand(folder, *mailbox, uids,
+		&replyTo));
+}
+
+
+status_t
+IMAPConnectionWorker::EnqueueUpdateFlags(IMAPFolder& folder, uint32 uid,
+	uint32 flags)
+{
+	IMAPMailbox* mailbox = _MailboxFor(folder);
+	if (mailbox == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	std::vector<uint32> uids;
+	uids.push_back(uid);
+
+	return _EnqueueCommand(new UpdateFlagsCommand(folder, *mailbox, uids,
+		flags));
 }
 
 
@@ -594,6 +673,8 @@ IMAPConnectionWorker::MessageExpungeReceived(uint32 index)
 	printf("Message expunge: %" B_PRIu32 "\n", index);
 	if (fSelectedBox == NULL)
 		return;
+
+	BLocker locker(this);
 
 	IMAPMailbox* mailbox = _MailboxFor(*fSelectedBox);
 	if (mailbox != NULL) {

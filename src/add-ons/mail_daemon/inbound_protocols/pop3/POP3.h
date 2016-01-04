@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013, Haiku Inc. All Rights Reserved.
+ * Copyright 2007-2016, Haiku Inc. All Rights Reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -35,14 +35,16 @@ public:
 			status_t			Disconnect();
 
 			status_t			SyncMessages();
-			status_t			FetchBody(const entry_ref& ref);
-			status_t			DeleteMessage(const entry_ref& ref);
 
 			status_t			Retrieve(int32 message, BPositionIO* to);
 			status_t			GetHeader(int32 message, BPositionIO* to);
 			void				Delete(int32 index);
 
 protected:
+	virtual	status_t			HandleFetchBody(const entry_ref& ref,
+									const BMessenger& replyTo);
+	virtual	status_t			HandleDeleteMessage(const entry_ref& ref);
+
 			// pop3 methods
 			status_t			Open(const char* server, int port,
 									int protocol);

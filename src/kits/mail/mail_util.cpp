@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2016, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  */
 
@@ -159,13 +159,13 @@ write_read_attr(BNode& node, read_flags flag)
 			< 0)
 		return B_ERROR;
 
-	// manage the status string only if it currently has a "read" status
+	// Manage the status string only if it currently has a known state
 	BString currentStatus;
-	if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &currentStatus) == B_OK) {
-		if (currentStatus.ICompare("New") != 0
-			&& currentStatus.ICompare("Read") != 0
-			&& currentStatus.ICompare("Seen") != 0)
-			return B_OK;
+	if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &currentStatus) == B_OK
+		&& currentStatus.ICompare("New") != 0
+		&& currentStatus.ICompare("Read") != 0
+		&& currentStatus.ICompare("Seen") != 0) {
+		return B_OK;
 	}
 
 	const char* statusString = flag == B_READ ? "Read"

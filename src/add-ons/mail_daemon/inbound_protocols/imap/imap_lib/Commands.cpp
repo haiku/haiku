@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2016, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -473,7 +473,7 @@ SetFlagsCommand::SetFlagsCommand(uint32 uid, uint32 flags)
 BString
 SetFlagsCommand::CommandString()
 {
-	BString command = "STORE ";
+	BString command = "UID STORE ";
 	command << fUID << " FLAGS (" << GenerateFlagString(fFlags) << ")";
 
 	return command;

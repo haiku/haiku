@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2013-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -86,7 +86,7 @@ IMAPMailbox::MessageAdded(const MessageToken& fromToken, const entry_ref& ref)
 {
 	printf("IMAP: message added %s, uid %" B_PRIu32 "\n", ref.name,
 		fromToken.uid);
-	return 0;
+	return fromToken.uid;
 }
 
 

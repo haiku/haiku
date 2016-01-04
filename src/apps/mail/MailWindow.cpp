@@ -1036,6 +1036,7 @@ TMailWindow::MessageReceived(BMessage* msg)
 		{
 			status_t status = msg->FindInt32("status");
 			if (status != B_OK) {
+				fprintf(stderr, "Body could not be fetched: %s\n", strerror(status));
 				PostMessage(B_QUIT_REQUESTED);
 				break;
 			}
@@ -2862,7 +2863,9 @@ TMailWindow::OpenMessage(const entry_ref* ref, uint32 characterSetForDecoding)
 
 	if (strcmp(mimeType, B_PARTIAL_MAIL_TYPE) == 0) {
 		BMessenger listener(this);
-		BMailDaemon().FetchBody(*ref, &listener);
+		status_t status = BMailDaemon().FetchBody(*ref, &listener);
+		if (status != B_OK)
+			fprintf(stderr, "Could not fetch body: %s\n", strerror(status));
 		fileInfo.GetType(mimeType);
 		_SetDownloading(true);
 	} else

@@ -1,10 +1,9 @@
 /*
- * Copyright 2011-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2016, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  */
 
 
-//#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -415,17 +414,15 @@ BInboundMailProtocol::MessageReceived(BMessage* message)
 		case kMsgFetchBody:
 		{
 			entry_ref ref;
-			message->FindRef("ref", &ref);
-			status_t status = FetchBody(ref);
-
-			BMessenger target;
-			if (message->FindMessenger("target", &target) != B_OK)
+			if (message->FindRef("ref", &ref) != B_OK)
 				break;
 
-			BMessage message(B_MAIL_BODY_FETCHED);
-			message.AddInt32("status", status);
-			message.AddRef("ref", &ref);
-			target.SendMessage(&message);
+			BMessenger target;
+			message->FindMessenger("target", &target);
+
+			status_t status = HandleFetchBody(ref, target);
+			if (status != B_OK)
+				ReplyBodyFetched(target, ref, status);
 			break;
 		}
 
@@ -462,6 +459,18 @@ BInboundMailProtocol::MessageReceived(BMessage* message)
 
 
 status_t
+BInboundMailProtocol::FetchBody(const entry_ref& ref, BMessenger* replyTo)
+{
+	BMessage message(kMsgFetchBody);
+	message.AddRef("ref", &ref);
+	if (replyTo != NULL)
+		message.AddMessenger("target", *replyTo);
+
+	return BMessenger(this).SendMessage(&message);
+}
+
+
+status_t
 BInboundMailProtocol::MarkMessageAsRead(const entry_ref& ref, read_flags flag)
 {
 	BNode node(&ref);
@@ -470,9 +479,27 @@ BInboundMailProtocol::MarkMessageAsRead(const entry_ref& ref, read_flags flag)
 
 
 status_t
+BInboundMailProtocol::DeleteMessage(const entry_ref& ref)
+{
+	return B_ERROR;
+}
+
+
+status_t
 BInboundMailProtocol::AppendMessage(const entry_ref& ref)
 {
 	return B_OK;
+}
+
+
+/*static*/ void
+BInboundMailProtocol::ReplyBodyFetched(const BMessenger& replyTo,
+	const entry_ref& ref, status_t status)
+{
+	BMessage message(B_MAIL_BODY_FETCHED);
+	message.AddInt32("status", status);
+	message.AddRef("ref", &ref);
+	replyTo.SendMessage(&message);
 }
 
 
