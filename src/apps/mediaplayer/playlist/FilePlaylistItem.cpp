@@ -190,7 +190,13 @@ status_t
 FilePlaylistItem::SetAttribute(const Attribute& attribute,
 	const int64& value)
 {
-	return B_NOT_SUPPORTED;
+	switch (attribute) {
+		case ATTR_INT64_DURATION:
+			return _SetAttribute("Media:Length", B_INT64_TYPE, &value,
+				sizeof(int64));
+		default:
+			return B_NOT_SUPPORTED;
+	}
 }
 
 
@@ -198,7 +204,13 @@ status_t
 FilePlaylistItem::GetAttribute(const Attribute& attribute,
 	int64& value) const
 {
-	return B_NOT_SUPPORTED;
+	switch (attribute) {
+		case ATTR_INT64_DURATION:
+			return _GetAttribute("Media:Length", B_INT64_TYPE, &value,
+				sizeof(int64));
+		default:
+			return B_NOT_SUPPORTED;
+	}
 }
 
 
@@ -407,7 +419,7 @@ FilePlaylistItem::_SetAttribute(const char* attrName, type_code type,
 
 status_t
 FilePlaylistItem::_GetAttribute(const char* attrName, type_code type,
-	void* data, size_t size)
+	void* data, size_t size) const
 {
 	BEntry entry(&fRefs[0], true);
 	BNode node(&entry);

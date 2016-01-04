@@ -49,11 +49,12 @@ public:
 		ATTR_STRING_TITLE			= 'titl',
 		ATTR_STRING_AUDIO_BITRATE	= 'abtr',
 		ATTR_STRING_VIDEO_BITRATE	= 'vbtr',
-		ATTR_STRING_DURATION		= 'drtn',
 
 		ATTR_INT32_TRACK			= 'trck',
 		ATTR_INT32_YEAR				= 'year',
-		ATTR_INT32_RATING			= 'rtng'
+		ATTR_INT32_RATING			= 'rtng',
+
+		ATTR_INT64_DURATION			= 'drtn'
 	} Attribute;
 
 	virtual	status_t			SetAttribute(const Attribute& attribute,

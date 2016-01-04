@@ -67,7 +67,7 @@ private:
 									size_t size);
 			status_t			_GetAttribute(const char* attrName,
 									type_code type, void* data,
-									size_t size);
+									size_t size) const;
 			status_t			_MoveIntoTrash(vector<entry_ref>* refs,
 									vector<BString>* namesInTrash);
 			status_t			_RestoreFromTrash(vector<entry_ref>* refs,
