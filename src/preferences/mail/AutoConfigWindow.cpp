@@ -64,10 +64,6 @@ AutoConfigWindow::AutoConfigWindow(BRect rect, ConfigWindow *parent)
 			.Add(fBackButton)
 			.Add(fNextButton);
 
-	// determine the proper height
-	float newHeight = fMainView->Frame().bottom + buttonHeight + kSpacing * 2;
-	ResizeBy(0, newHeight - Bounds().Height());
-
 	// Add a shortcut to close the window using Command-W
 	AddShortcut('W', B_COMMAND_KEY, new BMessage(B_QUIT_REQUESTED));
 }
