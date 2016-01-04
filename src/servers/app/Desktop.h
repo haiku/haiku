@@ -13,7 +13,6 @@
  */
 #ifndef DESKTOP_H
 #define DESKTOP_H
-#include "RapidDebug.h"
 
 
 #include <Autolock.h>
