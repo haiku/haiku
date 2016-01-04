@@ -8,8 +8,6 @@
 
 #include <GroupView.h>
 
-extern "C" void printf(const char*, ...);
-
 
 BGroupView::BGroupView(orientation orientation, float spacing)
 	:
