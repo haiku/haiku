@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src preferences datatranslations ;
 
 UseLibraryHeaders lp_solve linprog alm ;
 
-UsePrivateHeaders interface shared ;
+UsePrivateHeaders shared ;
 
 Preference DataTranslations :
 	DataTranslations.cpp
