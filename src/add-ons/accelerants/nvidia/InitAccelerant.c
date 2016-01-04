@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-3/2009.
+	Rudolf Cornelissen 10/2002-12/2015.
 */
 
 #define MODULE_BIT 0x00800000
@@ -213,6 +213,10 @@ status_t INIT_ACCELERANT(int the_fd)
 	si->engine.threeD.mode_changing = true;
 	/* every 3D add-on will reset this bit-flag when it's done. */
 	si->engine.threeD.newmode = 0xffffffff;
+
+	/* we did not detect the Haiku ScreenPrefs app yet */
+	si->haiku_prefs_used = false;
+	si->Haiku_switch_head = false;
 
 	/* a winner! */
 	result = B_OK;
