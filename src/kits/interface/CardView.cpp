@@ -12,7 +12,7 @@ BCardView::BCardView()
 	:
 	BView(NULL, 0, new BCardLayout())
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AdoptSystemColors();
 }
 
 
@@ -20,7 +20,7 @@ BCardView::BCardView(const char* name)
 	:
 	BView(name, 0, new BCardLayout())
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AdoptSystemColors();
 }
 
 
@@ -28,6 +28,7 @@ BCardView::BCardView(BMessage* from)
 	:
 	BView(from)
 {
+	AdoptSystemColors();
 }
 
 
