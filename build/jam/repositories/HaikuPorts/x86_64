@@ -66,7 +66,7 @@ RemotePackageRepository HaikuPorts
 	cdrtools_devel-3.02~a04-1
 	clang-3.5.1-1
 	clang_analysis-3.5.1-1
-	clipdinger-0.4-1
+	clipdinger-0.5-1
 	cmake-3.3.2-3
 	coreutils-8.24-1
 	cpio-2.12-1
