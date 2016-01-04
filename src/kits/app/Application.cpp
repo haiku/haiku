@@ -1044,8 +1044,6 @@ BApplication::DispatchMessage(BMessage* message, BHandler* handler)
 		return;
 	}
 
-	message->PrintToStream();
-
 	switch (message->what) {
 		case B_ARGV_RECEIVED:
 			_ArgvReceived(message);
