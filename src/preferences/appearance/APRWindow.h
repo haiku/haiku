@@ -22,7 +22,7 @@ class AntialiasingSettingsView;
 class FontView;
 class LookAndFeelSettingsView;
 
-#include <stdio.h>
+
 class APRWindow : public BWindow {
 public:
 							APRWindow(BRect frame);
