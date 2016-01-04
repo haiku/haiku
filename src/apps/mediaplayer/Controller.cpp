@@ -302,7 +302,8 @@ Controller::SetTo(const PlaylistItemRef& item)
 	trackSupplierDeleter.Detach();
 
 	// prevent blocking the creation of new overlay buffers
-	fVideoView->DisableOverlay();
+	if (fVideoView)
+		fVideoView->DisableOverlay();
 
 	// get video properties (if there is video at all)
 	bool useOverlays = fVideoView ? fVideoView->UseOverlays() : true;
