@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-4/2006.
+	Rudolf Cornelissen 3/2002-1/2016.
 */
 
 /* standard kernel driver stuff */
@@ -418,7 +418,7 @@ static status_t map_device(device_info *di)
 
 		rom_area = map_physical_memory(
 			buffer,
-			(void *)di->pcii.u.h0.rom_base_pci,
+			di->pcii.u.h0.rom_base_pci,
 			di->pcii.u.h0.rom_size,
 			B_ANY_KERNEL_ADDRESS,
 			B_READ_AREA,
@@ -441,7 +441,7 @@ static status_t map_device(device_info *di)
 		/* ROM was not assigned an adress, fetch it from ISA legacy memory map! */
 		rom_area = map_physical_memory(
 			buffer,
-			(void *)0x000c0000,
+			0x000c0000,
 			65536,
 			B_ANY_KERNEL_ADDRESS,
 			B_READ_AREA,
@@ -477,7 +477,7 @@ static status_t map_device(device_info *di)
 	si->fb_area = map_physical_memory(
 		buffer,
 		/* WARNING: Nvidia needs to map framebuffer as viewed from PCI space! */
-		(void *) di->pcii.u.h0.base_registers_pci[frame_buffer],
+		di->pcii.u.h0.base_registers_pci[frame_buffer],
 		di->pcii.u.h0.base_register_sizes[frame_buffer],
 		B_ANY_KERNEL_BLOCK_ADDRESS | B_MTR_WC,
 		B_READ_AREA + B_WRITE_AREA,
@@ -488,7 +488,7 @@ static status_t map_device(device_info *di)
 		si->fb_area = map_physical_memory(
 			buffer,
 			/* WARNING: Nvidia needs to map framebuffer as viewed from PCI space! */
-			(void *) di->pcii.u.h0.base_registers_pci[frame_buffer],
+			di->pcii.u.h0.base_registers_pci[frame_buffer],
 			di->pcii.u.h0.base_register_sizes[frame_buffer],
 			B_ANY_KERNEL_BLOCK_ADDRESS,
 			B_READ_AREA + B_WRITE_AREA,
