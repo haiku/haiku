@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>head (Haiku repository 1.09, Rudolf)</h1></p>
+<p><h1>head (Haiku repository 1.10, Rudolf)</h1></p>
 <ul>
 <li>Fixed driver assuming enabling AGP mode succeeded on some occasions if it did not block it itself. Blocking AGP mode completely via the AGP busmanager (option 'block_agp') resulted in a crashing acceleration engine because it was setup for AGP transfers instead of using PCI transfers. Error was solved with help from user kraton.
 <li>Fixed shared_info struct problem occuring when 3D 'accelerant' is used (tested Alpha 4.1): the TVencoder type definition list apparantly gets some memory assigned these days when done inside the definition of shared_info. Moved encoder list outside the shared_info definition.
@@ -34,7 +34,8 @@
 <li>Added dithering for laptop panels (if they are connected to DAC1 only for now). Gradients should now display much more fluently on 18bit depth panels (no more 'colorbands');
 <li>Fixed black screen on (some?) NV44 cards like Geforce 6100, 6150 and 6200 types;
 <li>Modified 'force_ws' option to force aspect 16:9 instead of 16:10 so both aspect widescreen modes are settable;
-<li>Added basic support for Haiku's native ScreenPrefs panel for dualhead modes. No TVout currently, and switched dualhead mode is not remembered over reboots nor is it coupled with workspaces (so unlike as it is with Dualhead Setup).
+<li>Added basic support for Haiku's native ScreenPrefs panel for dualhead modes. No TVout currently, and switched dualhead mode is not remembered over reboots nor is it coupled with workspaces (so unlike as it is with Dualhead Setup);
+<li>Added new nv.setting called 'check_edid' that forces higher resolution modes to be available on monitors that don't report their EDID info correctly (if option is set to 'false'). Only use this new option if appropriate of course, too high resolution modes will not be liked by your monitor(s)!
 </ul>
 <p><h1>nv_driver 0.80 (Rudolf)</h1></p>
 <ul>

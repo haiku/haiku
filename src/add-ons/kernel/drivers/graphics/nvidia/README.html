@@ -254,10 +254,18 @@ The acceleration engine is disabled.
 <ul>
 <li>On Haiku the acceleration engine is not used at all.<br>
 </ul>
+<li><strong>check_edid:</strong><br>
+This option lets you disable adherence to your monitor's reported capabilities via EDID. It happens very rarely that especially older monitors report their capabilities in a non-correct way, making the driver believe it has less capabilities than it actually has.
+	<ul>
+		<li><strong>false:</strong><br>
+		<strong>check_edid false</strong> prevents the driver from blocking modes your monitor does not support according to the EDID information it returns to the driver. The driver still fetches the EDID information from your monitor, and still checks it's aspect ratio.
+		<li><strong>true:</strong> (default setting)<br>
+		Keep it set to <strong>check_edid true</strong>, unless you have determined that your monitor supports higher resolution modes than the modes the driver lets you choose from currently.
+	</ul>
 </ul>
 <hr>
 <br>
 Rudolf Cornelissen.<br>
-<p>(Page last updated on January 4, 2016)</p>
+<p>(Page last updated on January 5, 2016)</p>
 </body>
 </html>

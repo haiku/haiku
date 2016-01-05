@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-12/2015.
+	Rudolf Cornelissen 10/2002-1/2016.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -245,6 +245,7 @@ typedef struct { // apsed, see comments in nvidia.settings
 	bool   block_acc;
 	uint32 gpu_clk;
 	uint32 ram_clk;
+	bool   check_edid;
 } nv_settings;
 
 /* monitor info gathered via EDID */
