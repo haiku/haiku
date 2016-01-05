@@ -135,11 +135,9 @@ TTimeView::AttachedToWindow()
 	fCurrentTime = time(NULL);
 
 	SetFont(be_plain_font);
-	float tint = B_NO_TINT;
-
 	if (Parent()) {
 		fParent = Parent();
-		SetViewUIColor(Parent()->ViewUIColor(&tint), tint);
+		AdoptParentColors();
 	} else
 		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 

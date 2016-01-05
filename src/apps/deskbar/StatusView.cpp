@@ -167,10 +167,8 @@ TReplicantTray::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	float tint = B_NO_TINT;
-
 	if (be_control_look != NULL) {
-		SetViewUIColor(Parent()->ViewUIColor(&tint), tint);
+		AdoptParentColors();
 	} else {
 		SetViewUIColor(B_MENU_BACKGROUND_COLOR,	B_DARKEN_1_TINT);
 	}
