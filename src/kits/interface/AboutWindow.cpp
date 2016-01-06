@@ -48,6 +48,8 @@ using BPrivate::gSystemCatalog;
 #define B_TRANSLATION_CONTEXT "AboutWindow"
 
 
+namespace BPrivate {
+
 class StripeView : public BView {
 public:
 							StripeView(BBitmap* icon);
@@ -371,6 +373,8 @@ AboutView::SetVersion(const char* version)
 	return B_OK;
 }
 
+} // namespace BPrivate
+
 
 //	#pragma mark - BAboutWindow
 
@@ -390,7 +394,7 @@ BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 	title.ReplaceFirst("%app%", appName);
 	SetTitle(title.String());
 
-	fAboutView = new AboutView(appName, signature);
+	fAboutView = new BPrivate::AboutView(appName, signature);
 	AddChild(fAboutView);
 
 	MoveTo(AboutPosition(Frame().Width(), Frame().Height()));
