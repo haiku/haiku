@@ -3385,15 +3385,6 @@ void
 BMediaRoster::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case 'PING':
-		{
-			// media_server plays ping-pong with the BMediaRosters
-			// to detect dead teams. Normal communication uses ports.
-			static BMessage pong('PONG');
-			message->SendReply(&pong, static_cast<BHandler *>(NULL), 2000000);
-			return;
-		}
-
 		case MEDIA_ROSTER_REQUEST_NOTIFICATIONS:
 		{
 			RosterNotification notification;

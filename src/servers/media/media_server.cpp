@@ -43,7 +43,6 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 #include <Roster.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
-#include <MediaRoster.h>
 #include <Messenger.h>
 
 #include <syscalls.h>
@@ -114,13 +113,11 @@ ServerApp::ServerApp()
 		this);
 	resume_thread(fControlThread);
 
-	BMediaRoster* roster = BMediaRoster::Roster();
-	if (roster->StartWatching(BMessenger(this, this),
-			B_MEDIA_SERVER_QUIT) != B_OK) {
-		TRACE("ServerApp: can't watch for B_MEDIA_SERVER_QUIT");
+	if (be_roster->StartWatching(BMessenger(this, this),
+			B_REQUEST_QUIT) != B_OK) {
+		TRACE("ServerApp: Can't find the registrar.");
 	}
 }
-
 
 
 ServerApp::~ServerApp()
@@ -130,17 +127,14 @@ ServerApp::~ServerApp()
 	delete_port(fControlPort);
 	wait_for_thread(fControlThread, NULL);
 
+	if (be_roster->StopWatching(BMessenger(this, this)) != B_OK)
+		TRACE("ServerApp: Can't unregister roster notifications.");
+
 	delete gNotificationManager;
 	delete gBufferManager;
 	delete gAppManager;
 	delete gNodeManager;
 	delete gMediaFilesManager;
-
-	BMediaRoster* roster = BMediaRoster::CurrentRoster();
-	if (roster->StopWatching(BMessenger(this, this),
-			B_MEDIA_SERVER_QUIT) != B_OK) {
-		TRACE("ServerApp: can't unwatch for B_MEDIA_SERVER_QUIT");
-	}
 }
 
 
@@ -944,9 +938,22 @@ ServerApp::MessageReceived(BMessage* msg)
 			gMediaFilesManager->HandleAddSystemBeepEvent(msg);
 			break;
 
-		case B_MEDIA_SERVER_QUIT:
-			gNodeManager->CleanupDormantFlavorInfos();
+		case B_SOME_APP_QUIT:
+		{
+			BString mimeSig;
+			if (msg->FindString("be:signature", &mimeSig) != B_OK)
+				return;
+
+			if (mimeSig == B_MEDIA_ADDON_SERVER_SIGNATURE)
+				gNodeManager->CleanupDormantFlavorInfos();
+
+			team_id id;
+			if (msg->FindInt32("team", &id) == B_OK
+					&& gAppManager->HasTeam(id)) {
+				gAppManager->UnregisterTeam(id);
+			}
 			break;
+		}
 
 		default:
 			BApplication::MessageReceived(msg);
