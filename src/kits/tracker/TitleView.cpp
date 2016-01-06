@@ -56,7 +56,6 @@ All rights reserved.
 
 #define APP_SERVER_CLEARS_BACKGROUND 1
 
-
 static void
 _DrawLine(BPoseView* view, BPoint from, BPoint to)
 {
@@ -101,10 +100,10 @@ BTitleView::BTitleView(BPoseView* view)
 	fPreviousLeftClickTime(0),
 	fTrackingState(NULL)
 {
-	SetHighUIColor(B_PANEL_BACKGROUND_COLOR, 0.88f);
-	SetLowUIColor(B_PANEL_BACKGROUND_COLOR, 0.88f);
+	SetHighUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 #if APP_SERVER_CLEARS_BACKGROUND
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR, 0.88f);
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 #else
 	SetViewColor(B_TRANSPARENT_COLOR);
 #endif
@@ -229,7 +228,8 @@ BTitleView::Draw(BRect /*updateRect*/, bool useOffscreen, bool updateOnly,
 	view->StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
 	bounds.bottom--;
 
-	be_control_look->DrawButtonBackground(view, bounds, bounds, HighColor(), 0,
+	rgb_color baseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	be_control_look->DrawButtonBackground(view, bounds, bounds, baseColor, 0,
 		BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 
 	int32 count = fTitleList.CountItems();
@@ -470,15 +470,15 @@ BColumnTitle::Draw(BView* view, bool pressed)
 	font_height height;
 	view->GetFontHeight(&height);
 	BPoint loc(0, bounds.top + ceilf(height.ascent) + 2);
+	rgb_color baseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 	if (pressed) {
 		bounds.bottom--;
 		BRect rect(bounds);
 		rect.right--;
-		rgb_color base = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DARKEN_1_TINT);
+		baseColor = tint_color(baseColor, B_DARKEN_1_TINT);
 
-		be_control_look->DrawButtonBackground(view, rect, rect, base, 0,
+		be_control_look->DrawButtonBackground(view, rect, rect, baseColor, 0,
 			BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 	}
 
@@ -503,8 +503,8 @@ BColumnTitle::Draw(BView* view, bool pressed)
 			break;
 	}
 
-	view->SetHighUIColor(B_PANEL_TEXT_COLOR, 0.8f);
-	view->SetLowUIColor(B_PANEL_BACKGROUND_COLOR, pressed ? 1.1 : 1.0);
+	view->SetHighUIColor(B_PANEL_TEXT_COLOR, pressed ? B_DARKEN_1_TINT : 1.0f);
+	view->SetLowColor(baseColor);
 	view->DrawString(titleString.String(), loc);
 
 	// show sort columns
