@@ -2159,10 +2159,7 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			brightness * ((flags & B_DISABLED) != 0 ? 1.0 : 0.9), flags);
 
 		// draw default button indicator
-		view->SetHighColor(background);
-		view->FillRect(rect);
-		view->SetHighColor(base);
-		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
+		// Allow a 1-pixel border of the background to come through.
 		rect.InsetBy(1, 1);
 
 		view->SetHighColor(defaultIndicatorColor);

@@ -153,8 +153,10 @@ BControl::AttachedToWindow()
 {
 	AdoptParentColors();
 
-	if (ViewColor() == B_TRANSPARENT_COLOR)
-		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	if (ViewColor() == B_TRANSPARENT_COLOR
+		|| Parent() == NULL) {
+		AdoptSystemColors();
+	}
 
 	// Force view color as low color
 	if (Parent() != NULL) {

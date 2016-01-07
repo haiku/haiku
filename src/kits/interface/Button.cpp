@@ -132,14 +132,11 @@ BButton::Archive(BMessage* data, bool deep) const
 void
 BButton::Draw(BRect updateRect)
 {
-	// Allow improved customization & integration
-	float buttonTint = B_DARKEN_1_TINT;
-	if (ViewUIColor() != B_CONTROL_BACKGROUND_COLOR)
-		buttonTint = B_NO_TINT;
-
 	BRect rect(Bounds());
 	rgb_color background = LowColor();
-	rgb_color base = tint_color(ViewColor(), buttonTint);
+
+	// Darken default control color to match default panel color.
+	rgb_color base = tint_color(ui_color(B_CONTROL_BACKGROUND_COLOR), 1.115);
 	uint32 flags = be_control_look->Flags(this);
 	if (_Flag(FLAG_DEFAULT))
 		flags |= BControlLook::B_DEFAULT_BUTTON;
@@ -232,18 +229,6 @@ void
 BButton::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
-	SetViewUIColor(B_CONTROL_BACKGROUND_COLOR);
-
-	// Ensure BButton's low color is the parent's VIEW color.
-	// We don't want to adopt the standard control lowcolor.
-	if (Parent() != NULL) {
-		float tint = B_NO_TINT;
-		color_which which = ViewUIColor(&tint);
-		if (which != B_NO_COLOR)
-			SetLowUIColor(which, tint);
-		else
-			SetLowColor(ViewColor());
-	}
 
 	if (IsDefault())
 		Window()->SetDefaultButton(this);
