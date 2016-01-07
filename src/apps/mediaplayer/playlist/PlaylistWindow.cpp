@@ -115,6 +115,8 @@ PlaylistWindow::PlaylistWindow(BRect frame, Playlist* playlist,
 
 	fTotalDuration = new BStringView(frame, "fDuration", "",
 		B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT);
+	fTotalDuration->SetAlignment(B_ALIGN_RIGHT);
+	fTotalDuration->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(fTotalDuration);
 
 	_UpdateTotalDuration(0);
@@ -470,7 +472,7 @@ PlaylistWindow::_UpdateTotalDuration(bigtime_t duration)
 	duration_to_string(duration, buffer, sizeof(buffer));
 
 	BString text;
-	text.SetToFormat(B_TRANSLATE("Total duration : %s"), buffer);
+	text.SetToFormat(B_TRANSLATE("Total duration: %s"), buffer);
 
 	fTotalDuration->SetText(text.String());
 }
