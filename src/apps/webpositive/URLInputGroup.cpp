@@ -523,6 +523,7 @@ public:
 	{
 		SetDrawingMode(B_OP_ALPHA);
 		SetBlendingMode(B_PIXEL_ALPHA, B_ALPHA_OVERLAY);
+		SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 	}
 
 	~PageIconView()
