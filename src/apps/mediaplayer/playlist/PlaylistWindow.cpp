@@ -559,6 +559,9 @@ void
 PlaylistWindow::DurationListener::_HandleItemRemoved(int32 index)
 {
 	bigtime_t* deleted = fKnown.RemoveItemAt(index);
+	if (deleted == NULL)
+		return;
+
 	fTotalDuration -= *deleted;
 	fParent._UpdateTotalDuration(fTotalDuration);
 
