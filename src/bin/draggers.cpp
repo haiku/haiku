@@ -8,6 +8,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <Application.h>
 #include <Dragger.h>
@@ -27,11 +28,11 @@ int main(int argc, char **argv)
 	BApplication app("application/x-vnd.Haiku-draggers");
 	if (argc < 2) {
 		printf("%s\n", BDragger::AreDraggersDrawn()?"shown":"hidden");
-		return 0;
+		return EXIT_SUCCESS;
 	}
 	for (i = 1; i < argc; i++) {
 		if (!strncmp(argv[i], "-h", 2)) {
-			return usage(0);
+			return usage(EXIT_SUCCESS);
 		}
 		if (!strcmp(argv[i], "1")
 		 || !strncmp(argv[i], "en", 2)
@@ -44,7 +45,7 @@ int main(int argc, char **argv)
 		 || !strncmp(argv[i], "of", 2))
 			BDragger::HideAllDraggers();
 		else
-			return usage(1);
+			return usage(EXIT_FAILURE);
 	}
-	return 0;
+	return EXIT_SUCCESS;
 }
