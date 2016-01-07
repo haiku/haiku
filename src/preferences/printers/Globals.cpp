@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Haiku.
+ * Copyright 2001-2016, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -39,10 +39,6 @@ ActivePrinterName()
 status_t
 GetPrinterServerMessenger(BMessenger& msgr)
 {
-	// If print server is not yet running, start it
-	if (!be_roster->IsRunning(PSRV_SIGNATURE_TYPE))
-		be_roster->Launch(PSRV_SIGNATURE_TYPE);
-	
 	msgr = BMessenger(PSRV_SIGNATURE_TYPE);
 	return msgr.IsValid() ? B_OK : B_ERROR;
 }
