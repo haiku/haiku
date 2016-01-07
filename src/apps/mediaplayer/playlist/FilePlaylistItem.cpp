@@ -13,6 +13,7 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <MediaFile.h>
+#include <MediaTrack.h>
 #include <Path.h>
 #include <TranslationUtils.h>
 
@@ -395,6 +396,18 @@ FilePlaylistItem::ImageRef() const
 		return ref;
 	
 	return fImageRefs[0];
+}
+
+
+bigtime_t
+FilePlaylistItem::_CalculateDuration() const
+{
+	BMediaFile mediaFile(&Ref());
+
+	if (mediaFile.InitCheck() != B_OK || mediaFile.CountTracks() < 1)
+		return 0;
+
+	return mediaFile.TrackAt(0)->Duration();
 }
 
 

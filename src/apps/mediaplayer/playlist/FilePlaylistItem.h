@@ -61,6 +61,9 @@ public:
 			status_t			AddImageRef(const entry_ref& ref);
 			const entry_ref&	ImageRef() const;
 
+protected:
+	virtual	bigtime_t			_CalculateDuration() const;
+
 private:
 			status_t			_SetAttribute(const char* attrName,
 									type_code type, const void* data,

@@ -70,7 +70,6 @@ private:
 			void				_HandleItemAdded(PlaylistItem* item,
 									int32 index);
 			void				_HandleItemRemoved(int32 index);
-			bigtime_t			_DetermineItemDuration(PlaylistItem* item);
 
 			BObjectList<bigtime_t>
 								fKnown;

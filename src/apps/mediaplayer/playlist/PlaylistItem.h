@@ -80,6 +80,8 @@ public:
 
 			int32				TrackNumber() const;
 
+			bigtime_t			Duration();
+
 	// methods
 	virtual	BString				LocationURI() const = 0;
 	virtual	status_t			GetIcon(BBitmap* bitmap,
@@ -101,6 +103,7 @@ public:
 
 protected:
 			void				_NotifyListeners() const;
+	virtual	bigtime_t			_CalculateDuration() const;
 
 private:
 			BList				fListeners;

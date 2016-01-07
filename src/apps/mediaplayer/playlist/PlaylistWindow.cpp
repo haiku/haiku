@@ -22,8 +22,6 @@
 #include <File.h>
 #include <FilePanel.h>
 #include <Locale.h>
-#include <MediaFile.h>
-#include <MediaTrack.h>
 #include <Menu.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
@@ -35,14 +33,11 @@
 #include <String.h>
 #include <StringView.h>
 
-#include "AudioTrackSupplier.h"
 #include "CommandStack.h"
 #include "DurationToString.h"
 #include "MainApp.h"
 #include "PlaylistListView.h"
 #include "RWLocker.h"
-#include "TrackSupplier.h"
-#include "VideoTrackSupplier.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "MediaPlayer-PlaylistWindow"
@@ -548,7 +543,7 @@ void
 PlaylistWindow::DurationListener::_HandleItemAdded(PlaylistItem* item,
 	int32 index)
 {
-	bigtime_t duration = _DetermineItemDuration(item);
+	bigtime_t duration = item->Duration();
 	fTotalDuration += duration;
 	fParent._UpdateTotalDuration(fTotalDuration);
 	fKnown.AddItem(new bigtime_t(duration), index);
@@ -566,43 +561,5 @@ PlaylistWindow::DurationListener::_HandleItemRemoved(int32 index)
 	fParent._UpdateTotalDuration(fTotalDuration);
 
 	delete deleted;
-}
-
-
-bigtime_t
-PlaylistWindow::DurationListener::_DetermineItemDuration(PlaylistItem* item)
-{
-	bigtime_t duration;
-	if (item->GetAttribute(PlaylistItem::ATTR_INT64_DURATION, duration) == B_OK)
-		return duration;
-
-	// We have to find out the duration ourselves
-	if (FilePlaylistItem* file = dynamic_cast<FilePlaylistItem*>(item)) {
-		// We are dealing with a file
-		BMediaFile mediaFile(&file->Ref());
-
-		if (mediaFile.InitCheck() != B_OK || mediaFile.CountTracks() < 1)
-			return 0;
-
-		duration =  mediaFile.TrackAt(0)->Duration();
-	} else {
-		// Not a file, so fall back to the generic TrackSupplier solution
-		TrackSupplier* supplier = item->CreateTrackSupplier();
-
-		AudioTrackSupplier* au = supplier->CreateAudioTrackForIndex(0);
-		VideoTrackSupplier* vi = supplier->CreateVideoTrackForIndex(0);
-
-		duration = max_c(au == NULL ? 0 : au->Duration(),
-			vi == NULL ? 0 : vi->Duration());
-
-		delete vi;
-		delete au;
-		delete supplier;
-	}
-
-	// Store the duration for later use
-	item->SetAttribute(PlaylistItem::ATTR_INT64_DURATION, duration);
-
-	return duration;
 }
 
