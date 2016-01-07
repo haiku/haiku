@@ -1,6 +1,10 @@
 /*
+ * Copyright 2016, François Revol, <revol@free.fr>. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+
+/*
  * draggers - show/hide draggers from CLI
- * (c) 2004, François Revol - revol@free.fr
  */
 
 #include <stdio.h>
