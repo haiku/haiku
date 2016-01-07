@@ -13,6 +13,7 @@ SYSTEM_BIN += [ FFilterByBuildFeatures
 	play playfile playsound playwav
 	screenshot setdecor spamdbm
 	translate
+	WindowShade
 ] ;
 
 SYSTEM_APPS += [ FFilterByBuildFeatures
