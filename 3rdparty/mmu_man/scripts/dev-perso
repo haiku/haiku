@@ -131,9 +131,15 @@ dev() {
 		;;
 	esac
 
+	# check for a TODO list
+	for f in TODO TODO.org; do
+		test -e "$f" && grep '^* ' "$f" | grep --color=always ' TODO ' | head -5 && break
+	done
+
 	DEVUPCMD=""
 
 	# source the specific profile file
+	# (which will likely cd to the checkout directory)
 	test -f .profile && . .profile
 
 	# if no editor defined, set one
