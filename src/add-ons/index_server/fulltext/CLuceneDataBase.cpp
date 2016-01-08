@@ -35,9 +35,10 @@ wchar_t* to_wchar(const char *str)
 	int size = strlen(str) * sizeof(wchar_t) ;
 	wchar_t *wStr = new wchar_t[size] ;
 
-	if (mbstowcs(wStr, str, size) == -1)
+	if (mbstowcs(wStr, str, size) == -1) {
+		delete[] wStr ;
 		return NULL ;
-	else
+	} else
 		return wStr ;
 }
 
