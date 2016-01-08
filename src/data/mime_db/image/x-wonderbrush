@@ -1,10 +1,9 @@
+
 resource(0, "BEOS:TYPE") #'MIMS' "application/x-vnd.Be-meta-mime";
 
 resource(1, "META:TYPE") "image/x-wonderbrush";
 
-resource(2, "META:SNIFF_RULE") #'CSTR' array {
-	"0.9 ('HMF1' | '1BOF') ([0:364]"layer") ([8:375]'HMF1' | [8:375]'1BOF')"
-};
+resource(2, "META:SNIFF_RULE") "0.9 ('HMF1' | '1BOF') ([0:364]\"layer\") ([8:375]'HMF1' | [8:375]'1BOF')";
 
 resource(3, "META:S:DESC") #'MSDC' "WonderBrush image";
 
