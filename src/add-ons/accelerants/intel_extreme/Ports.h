@@ -60,6 +60,7 @@ virtual	bool						IsConnected() = 0;
 		::Pipe*						GetPipe()
 										{ return fPipe; };
 
+		status_t					Power(bool enabled);
 
 		bool						HasEDID();
 virtual	status_t					GetEDID(edid1_info* edid,

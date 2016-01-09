@@ -142,9 +142,18 @@ Port::SetPipe(Pipe* pipe)
 
 	// Disable display pipe until modesetting enables it
 	if (fPipe->IsEnabled())
-		fPipe->Disable();
+		fPipe->Enable(false);
 
 	read32(portRegister);
+
+	return B_OK;
+}
+
+
+status_t
+Port::Power(bool enabled)
+{
+	fPipe->Enable(enabled);
 
 	return B_OK;
 }
@@ -305,6 +314,9 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (gInfo->shared_info->device_type.Generation() >= 3)
 		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
 
+	// Program pipe PLL's
+	fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
+
 	write32(_PortRegister(), (read32(_PortRegister())
 		& ~(DISPLAY_MONITOR_POLARITY_MASK | DISPLAY_MONITOR_VGA_POLARITY))
 		| ((target->timing.flags & B_POSITIVE_HSYNC) != 0
@@ -312,12 +324,8 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		| ((target->timing.flags & B_POSITIVE_VSYNC) != 0
 			? DISPLAY_MONITOR_POSITIVE_VSYNC : 0));
 
-	// Program pipe PLL's
-	fPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
-		extraPLLFlags);
-
 	// Program target display mode
-	fPipe->Enable(target);
+	fPipe->ConfigureTimings(target);
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));
@@ -560,8 +568,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		extraPLLFlags |= DISPLAY_PLL_MODE_LVDS;
 
 	// Program pipe PLL's (pixel_clock is *always* the hardware pixel clock)
-	fPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
-		extraPLLFlags);
+	fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
 
 	// Power on Panel
 	write32(panelControl, read32(panelControl) | PANEL_CONTROL_POWER_TARGET_ON);
@@ -571,7 +578,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		ERROR("%s: %s didn't power on within 1000ms!\n", __func__, PortName());
 
 	// Program target display mode
-	fPipe->Enable(target);
+	fPipe->ConfigureTimings(target);
 
 #if 0
 
@@ -739,11 +746,10 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
 
 	// Program pipe PLL's
-	fPipe->ConfigureTimings(divisors, target->timing.pixel_clock,
-		extraPLLFlags);
+	fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
 
 	// Program target display mode
-	fPipe->Enable(target);
+	fPipe->ConfigureTimings(target);
 
 	// Set fCurrentMode to our set display mode
 	memcpy(&fCurrentMode, target, sizeof(display_mode));

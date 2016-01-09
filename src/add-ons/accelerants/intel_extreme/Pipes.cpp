@@ -87,13 +87,14 @@ bool
 Pipe::IsEnabled()
 {
 	CALLED();
-	return (read32(INTEL_DISPLAY_A_PIPE_CONTROL + fPlaneOffset)
+
+	return (read32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset)
 		& INTEL_PIPE_ENABLED) != 0;
 }
 
 
 void
-Pipe::_EnableTranscoder(display_mode* target)
+Pipe::_ConfigureTranscoder(display_mode* target)
 {
 	// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
 	write32(INTEL_TRANSCODER_A_HTOTAL + fPipeOffset,
@@ -127,7 +128,7 @@ Pipe::_EnableTranscoder(display_mode* target)
 
 
 void
-Pipe::Enable(display_mode* target)
+Pipe::ConfigureTimings(display_mode* target)
 {
 	CALLED();
 
@@ -173,22 +174,12 @@ Pipe::Enable(display_mode* target)
 	//write32(INTEL_DISPLAY_A_RED + fPipeOffset, 0x00FF0000);
 
 	if (fHasTranscoder)
-		_EnableTranscoder(target);
-
-	// Enable display pipe
-	_Enable(true);
+		_ConfigureTranscoder(target);
 }
 
 
 void
-Pipe::Disable()
-{
-	_Enable(false);
-}
-
-
-void
-Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
+Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 	uint32 extraFlags)
 {
 	CALLED();
@@ -286,13 +277,25 @@ Pipe::ConfigureTimings(const pll_divisors& divisors, uint32 pixelClock,
 
 
 void
-Pipe::_Enable(bool enable)
+Pipe::Enable(bool enable)
 {
 	CALLED();
 
-	addr_t targetRegister = INTEL_DISPLAY_A_PIPE_CONTROL + fPlaneOffset;
+	addr_t pipeReg = INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset;
+	addr_t planeReg = INTEL_DISPLAY_A_CONTROL + fPlaneOffset;
 
-	write32(targetRegister, (read32(targetRegister) & ~INTEL_PIPE_ENABLED)
-		| (enable ? INTEL_PIPE_ENABLED : 0));
-	read32(targetRegister);
+	// Planes always have to operate on an enabled pipe
+
+	if (enable) {
+		write32(pipeReg, read32(pipeReg) | INTEL_PIPE_ENABLED);
+		wait_for_vblank();
+		write32(planeReg, read32(planeReg) | DISPLAY_CONTROL_ENABLED);
+	} else {
+		write32(planeReg, read32(planeReg) & ~DISPLAY_CONTROL_ENABLED);
+		wait_for_vblank();
+		write32(pipeReg, read32(pipeReg) & ~INTEL_PIPE_ENABLED);
+	}
+
+	read32(INTEL_DISPLAY_A_BASE);
+		// flush the eventually cached PCI bus writes
 }

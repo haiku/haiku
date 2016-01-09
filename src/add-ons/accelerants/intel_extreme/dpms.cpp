@@ -23,75 +23,23 @@
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
-void
-enable_display_plane(bool enable)
-{
-	uint32 planeAControl = read32(INTEL_DISPLAY_A_CONTROL);
-	uint32 planeBControl = read32(INTEL_DISPLAY_B_CONTROL);
-
-	if (enable) {
-		// when enabling the display, the register values are updated
-		// automatically
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
-			write32(INTEL_DISPLAY_A_CONTROL,
-				planeAControl | DISPLAY_CONTROL_ENABLED);
-		}
-
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
-			write32(INTEL_DISPLAY_B_CONTROL,
-				planeBControl | DISPLAY_CONTROL_ENABLED);
-		}
-
-		read32(INTEL_DISPLAY_A_BASE);
-			// flush the eventually cached PCI bus writes
-	} else {
-		// when disabling it, we have to trigger the update using a write to
-		// the display base address
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
-			write32(INTEL_DISPLAY_A_CONTROL,
-				planeAControl & ~DISPLAY_CONTROL_ENABLED);
-		}
-
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
-			write32(INTEL_DISPLAY_B_CONTROL,
-				planeBControl & ~DISPLAY_CONTROL_ENABLED);
-		}
-
-		set_frame_buffer_base();
-	}
-}
-
-
 static void
-enable_display_pipe(bool enable)
+enable_all_pipes(bool enable)
 {
-	uint32 pipeAControl = read32(INTEL_DISPLAY_A_PIPE_CONTROL);
-	uint32 pipeBControl = read32(INTEL_DISPLAY_B_PIPE_CONTROL);
+	// Go over each port and enable pipe/plane
+	for (uint32 i = 0; i < gInfo->port_count; i++) {
+		if (gInfo->ports[i] == NULL)
+			continue;
+		if (!gInfo->ports[i]->IsConnected())
+			continue;
 
-	if (enable) {
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
-			write32(INTEL_DISPLAY_A_PIPE_CONTROL,
-				pipeAControl | INTEL_PIPE_ENABLED);
-		}
-
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
-			write32(INTEL_DISPLAY_B_PIPE_CONTROL,
-				pipeBControl | INTEL_PIPE_ENABLED);
-		}
-	} else {
-		if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
-			write32(INTEL_DISPLAY_A_PIPE_CONTROL,
-				pipeAControl & ~INTEL_PIPE_ENABLED);
-		}
-
-		if (gInfo->head_mode & HEAD_MODE_B_DIGITAL) {
-			write32(INTEL_DISPLAY_B_PIPE_CONTROL,
-				pipeBControl & ~INTEL_PIPE_ENABLED);
-		}
+		gInfo->ports[i]->Power(enable);
 	}
 
 	read32(INTEL_DISPLAY_A_BASE);
-		// flush the eventually cached PCI bus writes
+		// flush the possibly cached PCI bus writes
+
+	set_frame_buffer_base();
 }
 
 
@@ -162,8 +110,7 @@ set_display_power_mode(uint32 mode)
 			spin(150);
 		}
 
-		enable_display_pipe(true);
-		enable_display_plane(true);
+		enable_all_pipes(true);
 	}
 
 	wait_for_vblank();
@@ -197,11 +144,8 @@ set_display_power_mode(uint32 mode)
 			// TODO: monitorMode?
 	}
 
-	if (mode != B_DPMS_ON) {
-		enable_display_plane(false);
-		wait_for_vblank();
-		enable_display_pipe(false);
-	}
+	if (mode != B_DPMS_ON)
+		enable_all_pipes(false);
 
 	if (mode == B_DPMS_OFF) {
 		write32(INTEL_DISPLAY_A_PLL, read32(INTEL_DISPLAY_A_PLL)

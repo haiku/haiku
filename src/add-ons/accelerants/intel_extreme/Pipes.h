@@ -35,10 +35,11 @@ public:
 										{ return fPipeIndex; }
 
 		bool						IsEnabled();
-		void						Enable(display_mode* mode);
+		void						Enable(bool enable);
 		void						Disable();
 
-		void						ConfigureTimings(
+		void						ConfigureTimings(display_mode* mode);
+		void						ConfigureClocks(
 										const pll_divisors& divisors,
 										uint32 pixelClock,
 										uint32 extraFlags);
@@ -50,8 +51,7 @@ public:
 	//									{ return fPanelFitter; }
 
 private:
-		void						_Enable(bool enable);
-		void						_EnableTranscoder(display_mode* mode);
+		void						_ConfigureTranscoder(display_mode* mode);
 
 		bool						fHasTranscoder;
 
