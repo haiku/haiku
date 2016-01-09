@@ -67,6 +67,7 @@ ToolTipView::ToolTipView(BToolTip* tip)
 {
 	fToolTip->AcquireReference();
 	SetViewUIColor(B_TOOL_TIP_BACKGROUND_COLOR);
+	SetHighUIColor(B_TOOL_TIP_TEXT_COLOR);
 
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	layout->SetInsets(5, 5, 5, 5);

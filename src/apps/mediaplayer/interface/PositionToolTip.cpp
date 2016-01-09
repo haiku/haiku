@@ -30,6 +30,7 @@ public:
 	virtual void AttachedToWindow()
 	{
 		BStringView::AttachedToWindow();
+		AdoptParentColors();
 		Update(-1, -1);
 	}
 
