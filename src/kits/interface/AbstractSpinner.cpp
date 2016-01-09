@@ -545,7 +545,6 @@ SpinnerTextView::AttachedToWindow()
 {
 	fParent = static_cast<BAbstractSpinner*>(Parent());
 
-	AdoptParentColors();
 	BTextView::AttachedToWindow();
 }
 
@@ -1070,6 +1069,16 @@ BAbstractSpinner::ValueChanged()
 
 
 void
+BAbstractSpinner::MessageReceived(BMessage* message)
+{
+	if (!IsEnabled() && message->what == B_COLORS_UPDATED)
+		_UpdateTextViewColors(false);
+
+	BControl::MessageReceived(message);
+}
+
+
+void
 BAbstractSpinner::MakeFocus(bool focus)
 {
 	fTextView->MakeFocus(focus);
@@ -1585,36 +1594,24 @@ BAbstractSpinner::_UpdateFrame()
 void
 BAbstractSpinner::_UpdateTextViewColors(bool enable)
 {
-	rgb_color textColor;
-	BFont font;
-
-	fTextView->GetFontAndColor(0, &font);
-
-	if (enable)
-		textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
-	else {
-		textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DISABLED_LABEL_TINT);
-	}
-
-	fTextView->SetFontAndColor(&font, B_FONT_ALL, &textColor);
+	// Mimick BTextControl's appearance.
+	rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
 
 	if (enable) {
 		fTextView->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 		fTextView->SetLowUIColor(ViewUIColor());
 	} else {
-		color_which which = ViewUIColor();
+		rgb_color color = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+		color = disable_color(ViewColor(), color);
+		textColor = disable_color(textColor, ViewColor());
 
-		if (which != B_NO_COLOR) {
-			fTextView->SetViewUIColor(which, B_LIGHTEN_2_TINT);
-			fTextView->SetLowUIColor(which, B_LIGHTEN_2_TINT);
-		} else {
-			rgb_color color = tint_color(ViewColor(), B_LIGHTEN_2_TINT);
-			fTextView->SetViewColor(color);
-			fTextView->SetLowColor(color);
-		}
+		fTextView->SetViewColor(color);
+		fTextView->SetLowColor(color);
 	}
 
+	BFont font;
+	fTextView->GetFontAndColor(0, &font);
+	fTextView->SetFontAndColor(&font, B_FONT_ALL, &textColor);
 }
 
 

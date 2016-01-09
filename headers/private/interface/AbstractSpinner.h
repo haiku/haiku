@@ -59,6 +59,7 @@ public:
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				ValueChanged();
+	virtual void				MessageReceived(BMessage* message);
 
 	virtual	void				Decrement() = 0;
 	virtual	void				Increment() = 0;
