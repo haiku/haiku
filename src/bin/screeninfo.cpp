@@ -12,20 +12,16 @@
 #include <stdio.h>
 
 
-// screen_id currently locked to 1 screen
-// TODO: This should likely be provided by our API
-#define MAX_SCREENS 1
-
-
 int
 main()
 {
 	// BScreen usage requires BApplication for AppServerLink
 	BApplication app("application/x-vnd.Haiku-screen_info");
 
-	for (int id = 0; id < MAX_SCREENS; id++) {
-		screen_id screenIndex = {id};
-		BScreen screen(screenIndex);
+	BScreen screen(B_MAIN_SCREEN_ID);
+
+	do {
+		screen_id screenIndex = screen.ID();
 		accelerant_device_info info;
 
 		// At the moment, screen.ID() is always 0;
@@ -39,7 +35,7 @@ main()
 			printf("  chipset: %s\n", info.chipset);
 			printf("  serial:  %s\n", info.serial_no);
 		}
-	}
+	} while (screen.SetToNext() == B_OK);
 
 	return 0;
 }
