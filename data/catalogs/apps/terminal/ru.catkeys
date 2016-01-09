@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	2090807552
+1	russian	x-vnd.Haiku-Terminal	2977674067
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -83,7 +83,6 @@ Close	Terminal TermWindow		Закрыть
 Text	Terminal AppearancePrefView		Текста
 Clear all	Terminal TermWindow		Очистить всё
 Text encoding	Terminal TermWindow		Кодировка
-size	Terminal TermView		размер
 Close window	Terminal TermWindow		Закрыть окно
 Copy absolute path	Terminal TermView		Скопировать абсолютный адрес
 Set tab title	Terminal TermWindow		Переименовть вкладку

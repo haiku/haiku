@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	2093402207
+1	english	x-vnd.Haiku-Terminal	2980268722
 Not found.	Terminal TermWindow		未找到。  
 Switch Terminals	Terminal TermWindow		切换终端
 Change directory	Terminal TermView		更改目录
@@ -83,7 +83,6 @@ Close	Terminal TermWindow		关闭
 Text	Terminal AppearancePrefView		文本
 Clear all	Terminal TermWindow		清空
 Text encoding	Terminal TermWindow		文字编码
-size	Terminal TermView		大小
 Close window	Terminal TermWindow		关闭窗口
 Copy absolute path	Terminal TermView		复制绝对路径
 Save as default	Terminal TermWindow		默认保存

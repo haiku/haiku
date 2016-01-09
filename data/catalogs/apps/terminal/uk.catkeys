@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	3268992666
+1	ukrainian	x-vnd.Haiku-Terminal	4155859181
 Not found.	Terminal TermWindow		Не знайдено.
 Switch Terminals	Terminal TermWindow		Перемкнути термінали
 Change directory	Terminal TermView		Змінити каталог
@@ -74,7 +74,6 @@ Close	Terminal TermWindow		Закрити
 Text	Terminal AppearancePrefView		Текст
 Clear all	Terminal TermWindow		Очистити все
 Text encoding	Terminal TermWindow		Кодування тексту
-size	Terminal TermView		розмір
 Close window	Terminal TermWindow		Закрити вікно
 Copy absolute path	Terminal TermView		Зкопіювати абсолютну адресу
 Set tab title	Terminal TermWindow		Встановити ім'я вкладки

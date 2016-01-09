@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-Terminal	2500449006
+1	slovenian	x-vnd.Haiku-Terminal	3387315521
 Not found.	Terminal TermWindow		Ni mogoče najti.
 Change directory	Terminal TermView		Zamenjaj imenik
 Cursor	Terminal AppearancePrefView		Kurzor
@@ -38,7 +38,6 @@ Slate	Terminal colors scheme		Tabla
 Text under cursor	Terminal AppearancePrefView		Besedilo pod kurzorjem
 Use bright instead of bold text	Terminal AppearancePrefView		Uporabi svetlo besedilo namesto krepkega
 Text encoding	Terminal TermWindow		Kodiranje besedila
-size	Terminal TermView		velikost
 Close window	Terminal TermWindow		Zapri okno
 Copy absolute path	Terminal TermView		Kopiraj absolutno pot
 Set tab title	Terminal TermWindow		Nastavi naslov jezička

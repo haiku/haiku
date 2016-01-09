@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Terminal	2093402207
+1	japanese	x-vnd.Haiku-Terminal	2980268722
 Not found.	Terminal TermWindow		これ以上見つかりません。
 Switch Terminals	Terminal TermWindow		ターミナルを切替える
 Change directory	Terminal TermView		ディレクトリを変更
@@ -83,7 +83,6 @@ Close	Terminal TermWindow		閉じる
 Text	Terminal AppearancePrefView		テキスト
 Clear all	Terminal TermWindow		すべて消去
 Text encoding	Terminal TermWindow		テキストエンコーディング
-size	Terminal TermView		サイズ
 Close window	Terminal TermWindow		ウィンドウを閉じる
 Copy absolute path	Terminal TermView		絶対パスをコピー
 Save as default	Terminal TermWindow		デフォルトとして保存

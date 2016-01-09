@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Terminal	3268992666
+1	lithuanian	x-vnd.Haiku-Terminal	4155859181
 Not found.	Terminal TermWindow		Nerasta.
 Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
 Change directory	Terminal TermView		Keisti aplanką
@@ -74,7 +74,6 @@ Close	Terminal TermWindow		Užverti
 Text	Terminal AppearancePrefView		Teksto
 Clear all	Terminal TermWindow		Išvalyti viską
 Text encoding	Terminal TermWindow		Teksto koduotė
-size	Terminal TermView		dydis
 Close window	Terminal TermWindow		Užverti langą
 Copy absolute path	Terminal TermView		Kopijuoti absoliutųjį kelią
 Set tab title	Terminal TermWindow		Keisti kortelės antraštę

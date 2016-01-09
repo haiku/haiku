@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Terminal	2985977525
+1	slovak	x-vnd.Haiku-Terminal	3872844040
 Not found.	Terminal TermWindow		Nenájdené.
 Switch Terminals	Terminal TermWindow		Prepnúť terminály
 Change directory	Terminal TermView		Zmeniť adresár
@@ -72,7 +72,6 @@ Close	Terminal TermWindow		Zatvoriť
 Text	Terminal AppearancePrefView		Text
 Clear all	Terminal TermWindow		Vyčistiť všetko
 Text encoding	Terminal TermWindow		Kódovanie textu
-size	Terminal TermView		veľkosť
 Close window	Terminal TermWindow		Zatvoriť okno
 Set tab title	Terminal TermWindow		Nastaviť titulok okna
 Settings…	Terminal TermWindow		Nastavenia…

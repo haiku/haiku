@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	2696855708
+1	swedish	x-vnd.Haiku-Terminal	3583722223
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -83,7 +83,6 @@ Close	Terminal TermWindow		Stäng
 Text	Terminal AppearancePrefView		Text
 Clear all	Terminal TermWindow		Rensa allt
 Text encoding	Terminal TermWindow		Teckenuppsättning
-size	Terminal TermView		storlek
 Close window	Terminal TermWindow		Stäng fönster
 Copy absolute path	Terminal TermView		Kopiera absolut sökväg
 Set tab title	Terminal TermWindow		Ange fliktitel

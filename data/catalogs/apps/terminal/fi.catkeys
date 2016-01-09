@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	2093402207
+1	finnish	x-vnd.Haiku-Terminal	2980268722
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -83,7 +83,6 @@ Close	Terminal TermWindow		Sulje
 Text	Terminal AppearancePrefView		Teksti
 Clear all	Terminal TermWindow		Tyhjennä kaikki
 Text encoding	Terminal TermWindow		Tekstikoodaus
-size	Terminal TermView		koko
 Close window	Terminal TermWindow		Sulje ikkuna
 Copy absolute path	Terminal TermView		Kopioi absoluuttinen polku
 Save as default	Terminal TermWindow		Tallenna oletuksena
