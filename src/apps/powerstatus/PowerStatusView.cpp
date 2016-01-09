@@ -120,10 +120,13 @@ PowerStatusView::AttachedToWindow()
 	BView::AttachedToWindow();
 	AdoptParentColors();
 
-	if (ViewUIColor() == B_NO_COLOR)
+	float tint = B_NO_TINT;
+	color_which which = ViewUIColor(&tint);
+
+	if (which == B_NO_COLOR)
 		SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 	else
-		SetLowUIColor(ViewUIColor());
+		SetLowUIColor(which, tint);
 
 	Update();
 }
