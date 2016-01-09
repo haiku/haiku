@@ -30,7 +30,7 @@ main()
 			printf(" unavailable\n");
 		} else {
 			printf(" attached\n");
-			printf("  version: %u\n", info.version);
+			printf("  version: %" B_PRId32 "\n", info.version);
 			printf("  name:    %s\n", info.name);
 			printf("  chipset: %s\n", info.chipset);
 			printf("  serial:  %s\n", info.serial_no);
