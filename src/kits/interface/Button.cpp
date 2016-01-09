@@ -133,10 +133,10 @@ void
 BButton::Draw(BRect updateRect)
 {
 	BRect rect(Bounds());
-	rgb_color background = LowColor();
+	rgb_color background = ViewColor();
+	rgb_color base = LowColor();
+	rgb_color textColor = HighColor();
 
-	// Darken default control color to match default panel color.
-	rgb_color base = tint_color(ui_color(B_CONTROL_BACKGROUND_COLOR), 1.115);
 	uint32 flags = be_control_look->Flags(this);
 	if (_Flag(FLAG_DEFAULT))
 		flags |= BControlLook::B_DEFAULT_BUTTON;
@@ -163,8 +163,9 @@ BButton::Draw(BRect updateRect)
 		(Value() == B_CONTROL_OFF
 				? B_INACTIVE_ICON_BITMAP : B_ACTIVE_ICON_BITMAP)
 			| (IsEnabled() ? 0 : B_DISABLED_ICON_BITMAP));
-	be_control_look->DrawLabel(this, Label(), icon, rect, updateRect,
-		base, flags, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+
+	be_control_look->DrawLabel(this, Label(), icon, rect, updateRect, base,
+		flags, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE), &textColor);
 }
 
 
@@ -229,6 +230,10 @@ void
 BButton::AttachedToWindow()
 {
 	BControl::AttachedToWindow();
+
+	// Tint default control background color to match default panel background.
+	SetLowUIColor(B_CONTROL_BACKGROUND_COLOR, 1.115);
+	SetHighUIColor(B_CONTROL_TEXT_COLOR);
 
 	if (IsDefault())
 		Window()->SetDefaultButton(this);
