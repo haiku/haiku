@@ -1822,6 +1822,17 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 	drawing_mode oldMode = view->DrawingMode();
 
 	if (isDesktop) {
+		// Enforce proper use of desktop label colors.
+		if(low.Brightness() < 100) {
+			if (textColor == NULL)
+				color = make_color(255, 255, 255);
+			glowColor = make_color(0, 0, 0);
+		} else {
+			if (textColor == NULL)
+				color = make_color(0, 0, 0);
+			glowColor = make_color(255, 255, 255);
+		}
+
 		// drawing occurs on the desktop
 		if (fCachedWorkspace != current_workspace()) {
 			int8 indice = 0;
