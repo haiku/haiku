@@ -204,7 +204,7 @@ RemotePackageRepository HaikuPorts
 	keymapswitcher-1.2.7.11-1
 	lame-3.99.5-3
 	lame_devel-3.99.5-3
-	lbreakout2-2.6.4-2
+	lbreakout2-2.6.4-3
 	lcms-2.5-1
 	lcms_devel-2.5-1
 	less-451-4
@@ -468,7 +468,7 @@ RemotePackageRepository HaikuPorts
 	slang-2.2.4-1
 	slang_devel-2.2.4-1
 	slayer-0.9-2
-	slimevolley-2.4.2-3
+	slimevolley-2.4.2-4
 	smjpeg-0.2.1-1
 	smjpeg_devel-0.2.1-1
 	smpeg-0.4.5-3
