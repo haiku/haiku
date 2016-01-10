@@ -527,7 +527,7 @@ if [ IsPackageAvailable libwebp_devel ] {
 			runtime: lib
 		file: devel libwebp_devel
 			depends: base
-			library: $(developLibDir)/libwebp.so.5
+			library: $(developLibDir)/libwebp.so.6
 			headers: $(developHeadersDir) $(developHeadersDir)/webp
 		;
 

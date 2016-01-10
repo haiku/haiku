@@ -313,8 +313,10 @@ RemotePackageRepository HaikuPorts
 	libvorbis_devel-1.3.5-1
 	libvpx-1.0.0-2
 	libvpx_devel-1.0.0-2
-	libwebp-0.4.1-2
-	libwebp_devel-0.4.1-2
+	libwebp-0.5.0-1
+	libwebp_devel-0.5.0-1
+	libwebp5-0.4.4-1
+	libwebp5_devel-0.4.4-1
 	libxau-1.0.8-2
 	libxcb-1.6-2
 	libxml2-2.8.0-9
@@ -780,8 +782,10 @@ RemotePackageRepository HaikuPorts
 	libvorbis_x86_devel-1.3.5-2
 	libvpx_x86-1.0.0-2
 	libvpx_x86_devel-1.0.0-2
-	libwebp_x86-0.4.1-2
-	libwebp_x86_devel-0.4.1-2
+	libwebp_x86-0.5.0-1
+	libwebp_x86_devel-0.5.0-1
+	libwebp5_x86-0.4.4-1
+	libwebp5_x86_devel-0.4.4-1
 	libxml2_x86-2.9.2-1
 	libxml2_x86_devel-2.9.2-1
 	libxslt_x86-1.1.28-5
@@ -1208,6 +1212,7 @@ RemotePackageRepository HaikuPorts
 	libvorbis_x86
 	libvpx
 	libwebp
+	libwebp5
 	libxau
 	libxcb
 	libxml2
