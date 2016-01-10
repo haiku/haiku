@@ -576,6 +576,9 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 		drawView->GetFont(&font);
 
 		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+		if (view->IsDesktopWindow())
+			textColor = view->DeskTextColor();
+
 		if (textColor.Brightness() < 100) {
 			// dark text on light outline
 			rgb_color glowColor = ui_color(B_SHINE_COLOR);
