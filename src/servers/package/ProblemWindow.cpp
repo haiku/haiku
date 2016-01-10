@@ -210,25 +210,22 @@ ProblemWindow::_ClearProblemsGui()
 void
 ProblemWindow::_AddProblemsGui(BSolver* solver)
 {
-	rgb_color evenBackground = ui_color(B_LIST_BACKGROUND_COLOR);
-	rgb_color oddBackground = tint_color(evenBackground, 1.04);
-
 	int32 problemCount = solver->CountProblems();
 	for (int32 i = 0; i < problemCount; i++) {
 		_AddProblem(solver->ProblemAt(i),
-			(i & 1) == 0 ? evenBackground : oddBackground);
+			(i & 1) == 0 ? B_NO_TINT : 1.04);
 	}
 }
 
 
 void
 ProblemWindow::_AddProblem(BSolverProblem* problem,
-	const rgb_color& backgroundColor)
+	const float backgroundTint)
 {
 	BGroupView* problemGroup = new BGroupView(B_VERTICAL);
 	fContainerView->AddChild(problemGroup);
 	problemGroup->GroupLayout()->SetInsets(B_USE_SMALL_INSETS);
-	problemGroup->SetViewColor(backgroundColor);
+	problemGroup->SetViewUIColor(B_LIST_BACKGROUND_COLOR, backgroundTint);
 
 	BStringView* problemView = new BStringView(NULL, problem->ToString());
 	problemGroup->AddChild(problemView);
@@ -236,6 +233,7 @@ ProblemWindow::_AddProblem(BSolverProblem* problem,
 	problemView->GetFont(&problemFont);
 	problemFont.SetFace(B_BOLD_FACE);
 	problemView->SetFont(&problemFont);
+	problemView->AdoptParentColors();
 
 	int32 solutionCount = problem->CountSolutions();
 	for (int32 k = 0; k < solutionCount; k++) {
@@ -257,6 +255,7 @@ ProblemWindow::_AddProblem(BSolverProblem* problem,
 				BString().SetToFormat("- %s",
 					_SolutionElementText(element).String()));
 			elementsGroup->AddView(elementView);
+			elementView->AdoptParentColors();
 		}
 
 		fSolutions[solutionButton] = Solution(problem, solution);
