@@ -2609,7 +2609,7 @@ BView::AdoptSystemColors()
 void
 BView::AdoptViewColors(BView* view)
 {
-	if (view == NULL || !view->LockLooper())
+	if (view == NULL || (view->Window() != NULL && !view->LockLooper()))
 		return;
 
 	float tint = B_NO_TINT;
@@ -2638,7 +2638,8 @@ BView::AdoptViewColors(BView* view)
 	else
 		SetHighColor(view->HighColor());
 
-	view->UnlockLooper();
+	if (view->Window() != NULL)
+		view->UnlockLooper();
 }
 
 
