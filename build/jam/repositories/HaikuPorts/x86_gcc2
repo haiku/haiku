@@ -628,9 +628,6 @@ RemotePackageRepository HaikuPorts
 	gcc_x86-4.8.5_2015_07_11-2
 	gcc_x86_syslibs-4.8.5_2015_07_11-2
 	gcc_x86_syslibs_devel-4.8.5_2015_07_11-2
-	gcc5_x86-5.3.0_2015_07_27-1
-	gcc5_x86_syslibs-5.3.0_2015_07_27-1
-	gcc5_x86_syslibs_devel-5.3.0_2015_07_27-1
 	gcc6809_x86-4.6.1-2
 	gdk_pixbuf_x86-2.31.5-1
 	gdk_pixbuf_x86_devel-2.31.5-1
@@ -1062,7 +1059,6 @@ RemotePackageRepository HaikuPorts
 	gcal
 	gcc
 	gcc_x86
-	gcc5_x86
 	gcc6809_x86
 	getconf
 	getopt

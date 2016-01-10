@@ -100,9 +100,6 @@ RemotePackageRepository HaikuPorts
 	gcc-4.8.5_2015_07_11-2
 	gcc_syslibs-4.8.5_2015_07_11-2
 	gcc_syslibs_devel-4.8.5_2015_07_11-2
-	gcc5-5.3.0_2015_07_27-1
-	gcc5_syslibs-5.3.0_2015_07_27-1
-	gcc5_syslibs_devel-5.3.0_2015_07_27-1
 	gettext-0.19.4-1
 	gettext_libintl-0.19.4-1
 	giflib-5.1.1-1
@@ -449,7 +446,6 @@ RemotePackageRepository HaikuPorts
 	freetype
 	gawk
 	gcc
-	gcc5
 	gcc_x86_gcc2
 	gettext
 	giflib
