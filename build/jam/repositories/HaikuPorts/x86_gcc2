@@ -148,12 +148,12 @@ RemotePackageRepository HaikuPorts
 	giddy3-1.4-1
 	giflib-5.0.5-2
 	giflib_devel-5.0.5-2
-	git-2.2.2-2
-	git_arch-2.2.2-2
-	git_cvs-2.2.2-2
-	git_daemon-2.2.2-2
-	git_email-2.2.2-2
-	git_svn-2.2.2-2
+	git-2.7.0-2
+	git_arch-2.7.0-2
+	git_cvs-2.7.0-2
+	git_daemon-2.7.0-2
+	git_email-2.7.0-2
+	git_svn-2.7.0-2
 	glew-1.11.0-1
 	glew_devel-1.11.0-1
 	glew_util-1.11.0-1
@@ -403,7 +403,7 @@ RemotePackageRepository HaikuPorts
 	physfs-2.0.3-2
 	physfs_devel-2.0.3-2
 	pipepanic-0.1.3-3
-	pkgconfig-0.27.1-1
+	pkgconfig-0.29-1
 	popt-1.16-1
 	popt_devel-1.16-1
 	postgresql-9.3.5-2
