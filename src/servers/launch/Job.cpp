@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2015-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -686,7 +686,7 @@ Job::_Launch(const char* signature, entry_ref* ref, int argCount,
 {
 	thread_id mainThread = -1;
 	status_t result = BRoster::Private().Launch(signature, ref, NULL, argCount,
-		args, environment, &fTeam, &mainThread, &fDefaultPort, &fToken, true);
+		args, environment, &fTeam, &mainThread, &fDefaultPort, NULL, true);
 	if (result == B_OK) {
 		result = _CreateAndTransferPorts();
 
