@@ -149,11 +149,11 @@ dump_acpi_namespace(acpi_ns_device_info *device, char *root, int indenting)
 		RingBuffer &ringBuffer = *device->buffer;
 		size_t toWrite = strlen(output);
 
-		if (toWrite <= 0)
+		if (toWrite == 0)
 			break;
 
-		strlcat(output, "\n", sizeof(output));
-		toWrite++;
+		toWrite = strlcat(output, "\n", sizeof(output));
+
 		if (!ringBuffer.Lock())
 			break;
 
