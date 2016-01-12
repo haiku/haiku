@@ -102,8 +102,8 @@ RemotePackageRepository HaikuPorts
 	gcc_syslibs_devel-4.8.5_2015_07_11-2
 	gettext-0.19.4-1
 	gettext_libintl-0.19.4-1
-	giflib-5.1.1-1
-	giflib_devel-5.1.1-1
+	giflib-5.1.2-1
+	giflib_devel-5.1.2-1
 	giflib6-5.0.5-2
 	giflib6_devel-5.0.5-2
 	git-2.2.2-3
@@ -338,8 +338,8 @@ RemotePackageRepository HaikuPorts
 	gcc_x86_gcc2_syslibs_devel-2.95.3_2014_07_26-1
 	gettext_x86_gcc2-0.18.1.1-6
 	gettext_x86_gcc2_libintl-0.18.1.1-6
-	giflib_x86_gcc2-5.1.0-1
-	giflib_x86_gcc2_devel-5.1.0-1
+	giflib_x86_gcc2-5.1.2-1
+	giflib_x86_gcc2_devel-5.1.2-1
 	glew_x86_gcc2-1.11.0-1
 	glew_x86_gcc2_devel-1.11.0-1
 	glew_x86_gcc2_util-1.11.0-1
