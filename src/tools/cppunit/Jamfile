@@ -55,3 +55,11 @@ SharedLibrary libcppunit.so :
 if  $(OS) = BEOS && $(OSPLAT) != PPC {
 	LinkAgainst libcppunit.so : libelfsymbolpatcher.a ;
 }
+
+# To run the tests we need the cppunit library.
+{
+	local target = <src!tools!cppunit>libcppunit.so ;
+	MakeLocate $(target) : $(TARGET_UNIT_TEST_LIB_DIR) ;
+	RelSymLink $(target) : libcppunit.so ;
+	Depends libcppunit.so : $(target) ;
+}
