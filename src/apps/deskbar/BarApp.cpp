@@ -643,13 +643,6 @@ TBarApp::MessageReceived(BMessage* message)
 			run_be_about();
 			break;
 
-		case kRestartTracker:
-		{
-			BRoster roster;
-			roster.Launch(kTrackerSignature);
-			break;
-		}
-
 		case B_LOCALE_CHANGED:
 		{
 			BLocaleRoster::Default()->Refresh();

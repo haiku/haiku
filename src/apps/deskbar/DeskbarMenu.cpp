@@ -236,13 +236,6 @@ TDeskbarMenu::AddStandardDeskbarMenuItems()
 		dragging = fBarView->Dragging();
 
 	BMenuItem* item;
-	BRoster roster;
-	if (!roster.IsRunning(kTrackerSignature)) {
-		item = new BMenuItem(B_TRANSLATE("Restart Tracker"),
-			new BMessage(kRestartTracker));
-		AddItem(item);
-		AddSeparatorItem();
-	}
 
 // One of them is used if HAIKU_DISTRO_COMPATIBILITY_OFFICIAL, and the other if
 // not. However, we want both of them to end up in the catalog, so we have to
