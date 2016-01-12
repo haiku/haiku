@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2015-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -154,6 +154,7 @@ private:
 			void				_HandleGetLaunchData(BMessage* message);
 			void				_HandleLaunchTarget(BMessage* message);
 			void				_HandleLaunchJob(BMessage* message);
+			void				_HandleEnableLaunchJob(BMessage* message);
 			void				_HandleStopLaunchJob(BMessage* message);
 			void				_HandleLaunchSession(BMessage* message);
 			void				_HandleRegisterSessionDaemon(BMessage* message);
@@ -555,6 +556,9 @@ LaunchDaemon::MessageReceived(BMessage* message)
 		case B_LAUNCH_JOB:
 			_HandleLaunchJob(message);
 			break;
+		case B_ENABLE_LAUNCH_JOB:
+			_HandleEnableLaunchJob(message);
+			break;
 		case B_STOP_LAUNCH_JOB:
 			_HandleStopLaunchJob(message);
 			break;
@@ -759,6 +763,37 @@ LaunchDaemon::_HandleLaunchJob(BMessage* message)
 
 	job->SetEnabled(true);
 	_LaunchJob(job, FORCE_NOW);
+
+	BMessage reply((uint32)B_OK);
+	message->SendReply(&reply);
+}
+
+
+void
+LaunchDaemon::_HandleEnableLaunchJob(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	const char* name = message->GetString("name");
+	bool enable = message->GetBool("enable");
+
+	Job* job = FindJob(name);
+	if (job == NULL) {
+		Session* session = FindSession(user);
+		if (session != NULL) {
+			// Forward request to user launch_daemon
+			if (session->Daemon().SendMessage(message) == B_OK)
+				return;
+		}
+
+		BMessage reply(B_NAME_NOT_FOUND);
+		message->SendReply(&reply);
+		return;
+	}
+
+	job->SetEnabled(enable);
 
 	BMessage reply((uint32)B_OK);
 	message->SendReply(&reply);

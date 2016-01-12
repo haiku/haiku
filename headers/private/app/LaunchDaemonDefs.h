@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2015-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -27,6 +27,7 @@ enum {
 	B_GET_LAUNCH_DATA			= 'lnda',
 	B_LAUNCH_TARGET				= 'lntg',
 	B_LAUNCH_JOB				= 'lnjo',
+	B_ENABLE_LAUNCH_JOB			= 'lnje',
 	B_STOP_LAUNCH_JOB			= 'lnsj',
 	B_LAUNCH_SESSION			= 'lnse',
 	B_REGISTER_SESSION_DAEMON	= 'lnrs',

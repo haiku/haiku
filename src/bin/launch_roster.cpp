@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2015-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -114,6 +114,19 @@ stop_job(const char* name)
 
 
 static void
+enable_job(const char* name, bool enable)
+{
+	BLaunchRoster roster;
+	status_t status = roster.SetEnabled(name, enable);
+	if (status != B_OK) {
+		fprintf(stderr, "%s: %s job \"%s\" failed: %s\n", kProgramName,
+			enable ? "Enabling" : "Disabling", name, strerror(status));
+		exit(EXIT_FAILURE);
+	}
+}
+
+
+static void
 usage(int status)
 {
 	fprintf(stderr, "Usage: %s <command>\n"
@@ -160,10 +173,11 @@ main(int argc, char** argv)
 		list_jobs(verbose);
 	} else if (strcmp(command, "list-targets") == 0) {
 		list_targets(verbose);
+	} else if (argc == optind + 1) {
+		// For convenience (the "info" command can be omitted)
+		get_info(command);
 	} else {
 		// All commands that need a name following
-		if (argc == optind + 1)
-			usage(1);
 
 		const char* name = argv[argc - 1];
 
@@ -173,6 +187,10 @@ main(int argc, char** argv)
 			start_job(name);
 		} else if (strcmp(command, "stop") == 0) {
 			stop_job(name);
+		} else if (strcmp(command, "enable") == 0) {
+			enable_job(name, true);
+		} else if (strcmp(command, "disable") == 0) {
+			enable_job(name, false);
 		} else {
 			fprintf(stderr, "%s: Unknown command \"%s\".\n", kProgramName,
 				command);
