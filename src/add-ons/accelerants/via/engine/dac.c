@@ -1,6 +1,6 @@
 /* program the DAC */
 /* Author:
-   Rudolf Cornelissen 12/2003-7/2005
+   Rudolf Cornelissen 12/2003-1/2016
 */
 
 #define MODULE_BIT 0x00010000
@@ -8,6 +8,8 @@
 #include "std.h"
 
 static status_t cle266_km400_dac_pix_pll_find(
+	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
+static status_t k8m800_dac_pix_pll_find(
 	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test);
 
 /* see if an analog VGA monitor is connected to connector #1 */
@@ -195,9 +197,9 @@ status_t eng_dac_set_pix_pll(display_mode target)
 	else
 	{
 		/* fixme: preliminary, still needs to be confirmed */
-		SEQW(PPLL_N_OTH, (n & 0x7f));
-		SEQW(PPLL_M_OTH, (m & 0x3f));
-		SEQW(PPLL_P_OTH, (p & 0x03));
+		SEQW(PPLL_N_OTH, (n & 0xff));
+		SEQW(PPLL_M_OTH, (m & 0x1f));
+		SEQW(PPLL_P_OTH, (p & 0x03) << 2);
 	}
 
 	/* reset primary pixelPLL (playing it safe) */
@@ -237,8 +239,11 @@ status_t eng_dac_pix_pll_find
 	(display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
 {
 	//fixme: add K8M800 calcs if needed..
-	switch (si->ps.card_type) {
-		default:   return cle266_km400_dac_pix_pll_find(target, calc_pclk, m_result, n_result, p_result, test);
+	switch (si->ps.card_arch) {
+		case K8M800:
+			return k8m800_dac_pix_pll_find(target, calc_pclk, m_result, n_result, p_result, test);
+		default:
+			return cle266_km400_dac_pix_pll_find(target, calc_pclk, m_result, n_result, p_result, test);
 	}
 	return B_ERROR;
 }
@@ -366,6 +371,155 @@ static status_t cle266_km400_dac_pix_pll_find(
 	*calc_pclk = (f_vco / p);
 	*m_result = m;
 	*n_result = n;
+	switch(p)
+	{
+	case 1:
+		p = 0x00;
+		break;
+	case 2:
+		p = 0x01;
+		break;
+	case 4:
+		p = 0x02;
+		break;
+	case 8:
+		p = 0x03;
+		break;
+	}
+	*p_result = p;
+
+	/* display the found pixelclock values */
+	LOG(2,("DAC: pix PLL check: requested %fMHz got %fMHz, mnp 0x%02x 0x%02x 0x%02x\n",
+		req_pclk, *calc_pclk, *m_result, *n_result, *p_result));
+
+	return B_OK;
+}
+
+/* find nearest valid pixel PLL setting */
+static status_t k8m800_dac_pix_pll_find(
+	display_mode target,float * calc_pclk,uint8 * m_result,uint8 * n_result,uint8 * p_result, uint8 test)
+{
+	int m = 0, n = 0, p = 0/*, m_max*/;
+	float error, error_best = 999999999;
+	int best[3]; 
+	float f_vco, max_pclk;
+	float req_pclk = target.timing.pixel_clock/1000.0;
+
+	/* determine the max. reference-frequency postscaler setting for the 
+	 * current card (see G100, G200 and G400 specs). */
+/*	switch(si->ps.card_type)
+	{
+	case G100:
+		LOG(4,("DAC: G100 restrictions apply\n"));
+		m_max = 7;
+		break;
+	case G200:
+		LOG(4,("DAC: G200 restrictions apply\n"));
+		m_max = 7;
+		break;
+	default:
+		LOG(4,("DAC: G400/G400MAX restrictions apply\n"));
+		m_max = 32;
+		break;
+	}
+*/
+	LOG(4,("DAC: K8M800 restrictions apply\n"));
+
+	/* determine the max. pixelclock for the current videomode */
+	switch (target.space)
+	{
+		case B_CMAP8:
+			max_pclk = si->ps.max_dac1_clock_8;
+			break;
+		case B_RGB15_LITTLE:
+		case B_RGB16_LITTLE:
+			max_pclk = si->ps.max_dac1_clock_16;
+			break;
+		case B_RGB24_LITTLE:
+			max_pclk = si->ps.max_dac1_clock_24;
+			break;
+		case B_RGB32_LITTLE:
+			max_pclk = si->ps.max_dac1_clock_32;
+			break;
+		default:
+			/* use fail-safe value */
+			max_pclk = si->ps.max_dac1_clock_32;
+			break;
+	}
+	/* if some dualhead mode is active, an extra restriction might apply */
+	if ((target.flags & DUALHEAD_BITS) && (target.space == B_RGB32_LITTLE))
+		max_pclk = si->ps.max_dac1_clock_32dh;
+
+	/* Make sure the requested pixelclock is within the PLL's operational limits */
+	/* lower limit is min_pixel_vco divided by highest postscaler-factor */
+	if (req_pclk < (si->ps.min_pixel_vco / 8.0))
+	{
+		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
+										req_pclk, (float)(si->ps.min_pixel_vco / 8.0)));
+		req_pclk = (si->ps.min_pixel_vco / 8.0);
+	}
+	/* upper limit is given by pins in combination with current active mode */
+	if (req_pclk > max_pclk)
+	{
+		LOG(4,("DAC: clamping pixclock: requested %fMHz, set to %fMHz\n",
+														req_pclk, (float)max_pclk));
+		req_pclk = max_pclk;
+	}
+
+	/* iterate through all valid PLL postscaler settings */
+	for (p = 0x01; p < 0x10; p = p << 1)
+	{
+		/* calculate the needed VCO frequency for this postscaler setting */
+		f_vco = req_pclk * p;
+
+		/* check if this is within range of the VCO specs */
+		if ((f_vco >= si->ps.min_pixel_vco) && (f_vco <= si->ps.max_pixel_vco))
+		{
+			/* iterate trough all valid reference-frequency postscaler settings */
+			/* (checked agains xf86 unichrome driver) */
+			//fixme: 32 and 33 probably ok as well..
+			for (m = 2; m <= 31; m++)
+			{
+				/* check if phase-discriminator will be within operational limits */
+				//fixme: check specs, settings as is now seems safe btw..
+				if (((si->ps.f_ref / m) < 2.0) || ((si->ps.f_ref / m) > 3.6)) continue;
+
+				/* calculate VCO postscaler setting for current setup.. */
+				n = (int)(((f_vco * m) / si->ps.f_ref) + 0.5);
+
+				/* ..and check for validity */
+				/* (checked agains xf86 unichrome driver) */
+				if ((n < 2) || (n > 257)) continue;
+
+				/* find error in frequency this setting gives */
+				error = fabs(req_pclk - (((si->ps.f_ref / m) * n) / p));
+
+				/* note the setting if best yet */
+				if (error < error_best)
+				{
+					error_best = error;
+					best[0]=m;
+					best[1]=n;
+					best[2]=p;
+				}
+			}
+		}
+	}
+
+	/* setup the scalers programming values for found optimum setting */
+	m = best[0];
+	n = best[1];
+	p = best[2];
+
+	/* log the VCO frequency found */
+	f_vco = ((si->ps.f_ref / m) * n);
+
+	LOG(2,("DAC: pix VCO frequency found %fMhz\n", f_vco));
+
+	/* return the results */
+	*calc_pclk = (f_vco / p);
+	*m_result = m - 2;
+	*n_result = n - 2;
 	switch(p)
 	{
 	case 1:

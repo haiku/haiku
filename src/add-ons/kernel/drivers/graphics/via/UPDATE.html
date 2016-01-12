@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>via_driver (SVN 0.16, Rudolf)</h1></p>
+<p><h1>via_driver (Haiku repository 0.17, Rudolf)</h1></p>
 <ul>
 	<li>Initial setup based on nVidia driver 0.30;
 	<li>Kerneldriver uses MTR-WC mapping where available;
@@ -20,7 +20,9 @@
 	<li>Added primary head pixelPLL programming (refreshrate is now set);
 	<li>Added switch to 'enhanced mode' making the driver independant from a preset VESA mode;
 	<li>Added video overlay support;
-	<li>Finalized virtualscreen panning granularity constraints programming.
+	<li>Finalized virtualscreen panning granularity constraints programming;
+	<li>Added returning correct information in GET_ACCELERANT_DEVICE_INFO (displayed in Haiku screenprefs panel);
+	<li>Fixed wrong PLL registerdefines for K8M800 and added seperate pixelPLL calculation routine: K8M800 now works correctly whereas previously you'd have a black screen (tested different resolutions, refreshrates and colordepths).
 </ul>
 <p><h1>Still todo:</h1></p>
 <ul>
@@ -31,6 +33,6 @@
 <hr><br>
 <br>
 <a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on September 29, 2005)</p>
+<p>(Page last updated on January 13, 2016)</p>
 </body>
 </html>

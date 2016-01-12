@@ -653,13 +653,16 @@
 #define ENSEQX_MSIZE_CLE266	0x34
 #define ENSEQX_MSIZE_OTHER	0x39
 #define ENSEQX_PLL_RESET	0x40
-#define ENSEQX_0x44			0x44
-#define ENSEQX_0x45			0x45
-#define ENSEQX_PPLL_P_OTH	0x44
-#define ENSEQX_PPLL_M_OTH	0x45
-#define ENSEQX_PPLL_N_OTH	0x46
+#define ENSEQX_PPLL2_MP_CLE	0x44
+#define ENSEQX_PPLL2_N_CLE	0x45
+#define ENSEQX_PPLL_N_OTH	0x44
+#define ENSEQX_PPLL_P_OTH	0x45
+#define ENSEQX_PPLL_M_OTH	0x46
 #define ENSEQX_PPLL_MP_CLE	0x46
 #define ENSEQX_PPLL_N_CLE	0x47
+#define ENSEQX_PPLL2_N_OTH	0x4a
+#define ENSEQX_PPLL2_P_OTH	0x4b
+#define ENSEQX_PPLL2_M_OTH	0x4c
 
 /* VIA GRAPHICS indexed registers */
 /* VGA standard registers: */

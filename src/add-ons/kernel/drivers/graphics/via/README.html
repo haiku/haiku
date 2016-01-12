@@ -14,10 +14,9 @@ You use this software at your own risk! Although I don't expect it to damage you
 <ul>
 <li>KM400 Unichrome (VT3205)
 <li>KM400 Unichrome (VT7205)
-<li>CLE266 Unichrome Pro (CLE3022)
-<li>CLE266 Unichrome Pro (CLE3122)
-<li>K8M800 Unichrome Pro (VT3204)
-<li>K8M800 Unichrome Pro (VT7204)
+<li>CLE266 Unichrome Pro (VT3022)
+<li>CLE266 Unichrome Pro (VT3122)
+<li>K8M800 Unichrome Pro (VT3108)
 </ul>
 <br>
 <hr>
@@ -39,8 +38,8 @@ You use this software at your own risk! Although I don't expect it to damage you
 <hr>
 <h2>Installation:</h2>
 <br>
-In contrary to what I have said before you don't need to de-install official Be drivers for this driver to work correctly. This driver will install in the user part of the BeOS, so not in the system part where the official drivers are.<br>
-BeOS first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own drivers (if any). You can select which driver should be loaded by hitting the spacebar as soon as the BeOS 'icons' screen appears. If you select <strong>disable user addons</strong> the system will load it's own drivers. If you don't do anything, the system will load the Haiku VIA unichrome (pro) graphics driver.<br>
+You don't need to de-install official drivers for this driver to work correctly. This driver will install in the user part of Haiku, so not in the system part where the official drivers are.<br>
+Haiku first checks (during boot) if there are 'user-addons' that should be loaded for a device. If not, it loads it's own drivers (if any). You can select which driver should be loaded by hitting the spacebar just before the Haiku 'icons' screen appears. If you select <strong>disable user addons</strong> the system will load it's own drivers. If you don't do anything, the system will load the Haiku VIA unichrome (pro) graphics driver.<br>
 <br>
 <strong>Note:</strong> This might turn out to be handy if you run into trouble upon testing the driver, or if you are 'tweaking' the via.settings file...<br>
 <br><br>
@@ -58,10 +57,10 @@ Unzip the zip file that contains the driver to the root folder. Now reboot and y
 <br>
 Currently there's no uninstall script included. Just do it manually:<br>
 <br>
-Delete the <strong>via.accelerant</strong> file in <strong>home/config/add-ons/accelerants/</strong><br>
-Delete the <strong>via.driver</strong> file in <strong>home/config/add-ons/kernel/drivers/bin/</strong><br>
+Delete the <strong>via.accelerant</strong> file in <strong>home/config/non-packaged/add-ons/accelerants/</strong><br>
+Delete the <strong>via.driver</strong> file in <strong>home/config/non-packaged/add-ons/kernel/drivers/bin/</strong><br>
 Delete the <strong>via.settings</strong> file in <strong>home/config/settings/kernel/drivers/</strong><br>
-Delete the <strong>via.driver shortcut</strong> in <strong>home/config/add-ons/kernel/drivers/dev/graphics/</strong> which pointed to the file <strong>via.driver</strong>.<br>
+Delete the <strong>via.driver shortcut</strong> in <strong>home/config/non-packaged/add-ons/kernel/drivers/dev/graphics/</strong> which pointed to the file <strong>via.driver</strong>.<br>
 <br>
 You have to reboot in order to apply the original configuration.<br>
 <br>
@@ -155,7 +154,7 @@ With the <strong>pgm_panel true</strong> setting, the driver will fix your panel
 
 <hr>
 <br>
-<a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on September 29, 2005)</p>
+Rudolf Cornelissen.<br>
+<p>(Page last updated on January 13, 2016)</p>
 </body>
 </html>
