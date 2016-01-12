@@ -53,11 +53,11 @@ All rights reserved.
 #include <NodeMonitor.h>
 #include <Path.h>
 #include <PopUpMenu.h>
+#include <Roster.h>
 #include <Screen.h>
 #include <UnicodeChar.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
-#include <Roster.h>
 
 #include <fs_attr.h>
 #include <image.h>
@@ -1479,13 +1479,6 @@ BContainerWindow::MessageReceived(BMessage* message)
 		case kFindButton:
 			(new FindWindow())->Show();
 			break;
-
-		case kRestartDeskbar:
-		{
-			BRoster roster;
-			roster.Launch(kDeskbarSignature);
-			break;
-		}
 
 		case kQuitTracker:
 			be_app->PostMessage(B_QUIT_REQUESTED);
