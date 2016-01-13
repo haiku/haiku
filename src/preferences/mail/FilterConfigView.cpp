@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2016, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
@@ -211,7 +211,7 @@ private:
 
 FiltersConfigView::FiltersConfigView(BMailAccountSettings& account)
 	:
-	BBox("filters"),
+	BGroupView(B_VERTICAL),
 	fAccount(account),
 	fDirection(kIncoming),
 	fInboundFilters(kIncoming),
@@ -219,8 +219,11 @@ FiltersConfigView::FiltersConfigView(BMailAccountSettings& account)
 	fFilterView(NULL),
 	fCurrentIndex(-1)
 {
+	BBox* box = new BBox("filters");
+	AddChild(box);
+
 	BView* contents = new BView(NULL, 0);
-	AddChild(contents);
+	box->AddChild(contents);
 
 	BMessage* msg = new BMessage(kMsgChainSelected);
 	msg->AddInt32("direction", kIncoming);
@@ -236,7 +239,7 @@ FiltersConfigView::FiltersConfigView(BMailAccountSettings& account)
 
 	fChainsField = new BMenuField(NULL, NULL, menu);
 	fChainsField->ResizeToPreferred();
-	SetLabel(fChainsField);
+	box->SetLabel(fChainsField);
 
 	fListView = new DragListView(NULL, B_SINGLE_SELECTION_LIST,
 		new BMessage(kMsgFilterMoved));
@@ -264,18 +267,23 @@ FiltersConfigView::FiltersConfigView(BMailAccountSettings& account)
 
 FiltersConfigView::~FiltersConfigView()
 {
+	// We need to remove the filter manually, as their add-on
+	// is not available anymore in the parent destructor.
+	if (fFilterView != NULL) {
+		RemoveChild(fFilterView);
+		delete fFilterView;
+	}
 }
 
 
 void
 FiltersConfigView::_SelectFilter(int32 index)
 {
-	if (Parent())
-		Parent()->Hide();
+	Hide();
 
 	// remove old config view
-	if (fFilterView) {
-		Parent()->RemoveChild(fFilterView);
+	if (fFilterView != NULL) {
+		RemoveChild(fFilterView);
 		_SaveConfig(fCurrentIndex);
 		delete fFilterView;
 		fFilterView = NULL;
@@ -293,15 +301,13 @@ FiltersConfigView::_SelectFilter(int32 index)
 				fFilterView = new FilterSettingsView(
 					filters->DescriptiveName(filterSettings->AddOnRef(),
 						fAccount, NULL), view);
-				Parent()->AddChild(fFilterView);
+				AddChild(fFilterView);
 			}
 		}
 	}
 
 	fCurrentIndex = index;
-
-	if (Parent())
-		Parent()->Show();
+	Show();
 }
 
 
@@ -433,7 +439,7 @@ FiltersConfigView::MessageReceived(BMessage *msg)
 			if (!_MailSettings()->MoveFilterSettings(from, to)) {
 				BAlert* alert = new BAlert("E-mail",
 					B_TRANSLATE("The filter could not be moved. Deleting "
-					"filter."), B_TRANSLATE("OK"));
+						"filter."), B_TRANSLATE("OK"));
 				alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 				alert->Go();
 				fListView->RemoveItem(to);
