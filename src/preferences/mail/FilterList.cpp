@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2016, Haiku, Inc. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -11,7 +11,7 @@
 #include <stdio.h>
 
 #include <Directory.h>
-#include <FindDirectory.h>
+#include <PathFinder.h>
 #include <Path.h>
 
 
@@ -35,19 +35,14 @@ FilterList::Reload()
 
 	std::set<BString> knownNames;
 
-	directory_which which[] = {B_USER_ADDONS_DIRECTORY,
-		B_SYSTEM_ADDONS_DIRECTORY};
-	for (size_t i = 0; i < sizeof(which) / sizeof(which[0]); i++) {
-		BPath path;
-		status_t status = find_directory(which[i], &path);
-		if (status != B_OK)
-			continue;
+	BString subPath("mail_daemon/");
+	subPath << (fDirection == kIncoming
+		? "inbound_filters" : "outbound_filters");
 
-		path.Append("mail_daemon");
-		if (fDirection == kIncoming)
-			path.Append("inbound_filters");
-		else
-			path.Append("outbound_filters");
+	BStringList paths;
+	BPathFinder().FindPaths(B_FIND_PATH_ADD_ONS_DIRECTORY, subPath, paths);
+	for (int32 i = 0; i < paths.CountStrings(); i++) {
+		BPath path(paths.StringAt(i));
 
 		BDirectory dir(path.Path());
 		if (dir.InitCheck() != B_OK)
