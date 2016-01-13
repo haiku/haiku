@@ -148,6 +148,8 @@ RemotePackageRepository HaikuPorts
 	giddy3-1.4-1
 	giflib-5.1.2-1
 	giflib_devel-5.1.2-1
+	giflib6-5.0.5-2
+	giflib6_devel-5.0.5-2
 	git-2.7.0-2
 	git_arch-2.7.0-2
 	git_cvs-2.7.0-2
@@ -1075,6 +1077,7 @@ RemotePackageRepository HaikuPorts
 	gdb
 	gdk_pixbuf_x86
 	giflib
+	giflib6
 	git
 	glew
 	glib2
