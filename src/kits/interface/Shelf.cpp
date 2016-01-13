@@ -1500,7 +1500,7 @@ BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 				ReplicantAt(i, &view, &ID, &err);
 				if (err != B_OK || view == NULL)
 					continue;
-				if (BString(view->Name()) == name) {
+				if (view->Name() != NULL && strcmp(view->Name(), name) == 0) {
 					replicant = view;
 					break;
 				}
