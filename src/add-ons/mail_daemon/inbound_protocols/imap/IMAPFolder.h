@@ -7,6 +7,8 @@
 
 
 #include <hash_map>
+#include <hash_set>
+
 #include <sys/stat.h>
 
 #include <Entry.h>
@@ -69,8 +71,9 @@ public:
 									uint32& uid) const;
 			uint32				MessageFlags(uint32 uid);
 
-			void				UpdateMessageFlags(uint32 uid,
+			void				SyncMessageFlags(uint32 uid,
 									uint32 mailboxFlags);
+			void				MessageEntriesFetched();
 
 			status_t			StoreMessage(uint32 fetchFlags, BDataIO& stream,
 									size_t& length, entry_ref& ref,
@@ -101,6 +104,7 @@ private:
 									uint32 uid, status_t status);
 			status_t			_GetMessageEntryRef(uint32 uid,
 									entry_ref& ref) const;
+			status_t			_DeleteLocalMessage(uint32 uid);
 
 			void				_IMAPToMailFlags(uint32 flags,
 									BMessage& attributes);
@@ -130,10 +134,12 @@ private:
 	typedef __gnu_cxx::hash_map<uint32, uint32> UIDToFlagsMap;
 	typedef __gnu_cxx::hash_map<uint32, entry_ref> UIDToRefMap;
 	typedef __gnu_cxx::hash_map<uint32, MessengerList> MessengerMap;
+	typedef __gnu_cxx::hash_set<uint32> UIDSet;
 #else
 	typedef std::hash_map<uint32, uint32> UIDToFlagsMap;
 	typedef std::hash_map<uint32, entry_ref> UIDToRefMap;
 	typedef std::hash_map<uint32, MessengerList> MessengerMap;
+	typedef std::hash_set<uint32> UIDSet;
 #endif
 
 			IMAPProtocol&		fProtocol;
@@ -147,6 +153,7 @@ private:
 			bool				fInitializing;
 			UIDToRefMap			fRefMap;
 			UIDToFlagsMap		fFlagsMap;
+			UIDSet				fSynchronizedUIDsSet;
 			MessengerMap		fPendingBodies;
 };
 

@@ -370,8 +370,7 @@ public:
 					fTotalBytes += entries[i].size;
 					fUIDsToFetch.push_back(entries[i].uid);
 				} else {
-					fFolder->UpdateMessageFlags(entries[i].uid,
-						entries[i].flags);
+					fFolder->SyncMessageFlags(entries[i].uid, entries[i].flags);
 				}
 			}
 
@@ -379,6 +378,8 @@ public:
 			fLastIndex = from - 1;
 
 			if (from == 1) {
+				fFolder->MessageEntriesFetched();
+
 				if (fUIDsToFetch.size() > 0) {
 					// Add pending command to fetch the message headers
 					WorkerCommand* command = new FetchHeadersCommand(*fFolder,

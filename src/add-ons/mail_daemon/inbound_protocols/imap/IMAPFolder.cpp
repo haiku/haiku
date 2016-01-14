@@ -178,6 +178,7 @@ IMAPFolder::SetUIDValidity(uint32 uidValidity)
 	if (fUIDValidity == uidValidity)
 		return;
 
+	// TODO: delete all mails that have the same UID validity value we had
 	fUIDValidity = uidValidity;
 
 	BNode node(&fRef);
@@ -221,8 +222,11 @@ IMAPFolder::MessageFlags(uint32 uid)
 }
 
 
+/*!	Synchronizes the message flags/state from the server with the local
+	one.
+*/
 void
-IMAPFolder::UpdateMessageFlags(uint32 uid, uint32 mailboxFlags)
+IMAPFolder::SyncMessageFlags(uint32 uid, uint32 mailboxFlags)
 {
 	if (uid > LastUID())
 		return;
@@ -233,7 +237,8 @@ IMAPFolder::UpdateMessageFlags(uint32 uid, uint32 mailboxFlags)
 	while (true) {
 		status_t status = GetMessageEntryRef(uid, ref);
 		if (status == B_ENTRY_NOT_FOUND) {
-			// The message does not exist anymore locally, delete it on the server
+			// The message does not exist anymore locally, delete it on the
+			// server
 			// TODO: copy it to the trash directory first!
 			fProtocol.UpdateMessageFlags(*this, uid, IMAP::kDeleted);
 			return;
@@ -247,6 +252,7 @@ IMAPFolder::UpdateMessageFlags(uint32 uid, uint32 mailboxFlags)
 
 		break;
 	}
+	fSynchronizedUIDsSet.insert(uid);
 
 	uint32 previousFlags = MessageFlags(uid);
 	uint32 currentFlags = previousFlags;
@@ -276,6 +282,21 @@ IMAPFolder::UpdateMessageFlags(uint32 uid, uint32 mailboxFlags)
 		// Update server flags
 		fProtocol.UpdateMessageFlags(*this, uid, nextFlags);
 	}
+}
+
+
+void
+IMAPFolder::MessageEntriesFetched()
+{
+	// Delete all local messages that weren't synchronized with the server
+	UIDToRefMap::const_iterator iterator = fRefMap.begin();
+	for (; iterator != fRefMap.end(); iterator++) {
+		uint32 uid = iterator->first;
+		if (fSynchronizedUIDsSet.find(uid) == fSynchronizedUIDsSet.end())
+			_DeleteLocalMessage(uid);
+	}
+
+	fSynchronizedUIDsSet.clear();
 }
 
 
@@ -416,6 +437,9 @@ IMAPFolder::StoringBodyFailed(const entry_ref& ref, uint32 uid, status_t error)
 void
 IMAPFolder::DeleteMessage(uint32 uid)
 {
+	// TODO: move message to trash (server side)
+
+	_DeleteLocalMessage(uid);
 }
 
 
@@ -471,7 +495,6 @@ IMAPFolder::_InitializeFolderState()
 //			_WriteUniqueID(node, uid);
 //		}
 //
-		fRefMap.insert(std::make_pair(uid, ref));
 	}
 
 	fInitializing = false;
@@ -516,6 +539,22 @@ IMAPFolder::_GetMessageEntryRef(uint32 uid, entry_ref& ref) const
 
 	ref = found->second;
 	return B_OK;
+}
+
+
+status_t
+IMAPFolder::_DeleteLocalMessage(uint32 uid)
+{
+	entry_ref ref;
+	status_t status = GetMessageEntryRef(uid, ref);
+	if (status != B_OK)
+		return status;
+
+	fRefMap.erase(uid);
+	fFlagsMap.erase(uid);
+
+	BEntry entry(&ref);
+	return entry.Remove();
 }
 
 
