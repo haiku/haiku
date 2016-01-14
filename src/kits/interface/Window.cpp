@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015 Haiku, Inc. All rights reserved
+ * Copyright 2001-2016 Haiku, Inc. All rights reserved
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -3446,6 +3446,10 @@ BWindow::_UnpackMessage(unpack_cookie& cookie, BMessage** _message,
 			continue;
 
 		*_message = new BMessage(*cookie.message);
+		// the secondary copies of the message should not be treated as focus
+		// messages, otherwise there will be unintended side effects, i.e.
+		// keyboard shortcuts getting processed multiple times.
+		(*_message)->RemoveName("_feed_focus");
 		*_target = target;
 		cookie.index++;
 		return true;
