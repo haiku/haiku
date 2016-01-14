@@ -29,6 +29,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		StaticLibrary [ MultiArchDefaultGristFiles libshared.a ] :
 			AboutMenuItem.cpp
 			ArgumentVector.cpp
+			AttributeUtilities.cpp
 			CalendarView.cpp
 			ColorQuantizer.cpp
 			CommandPipe.cpp

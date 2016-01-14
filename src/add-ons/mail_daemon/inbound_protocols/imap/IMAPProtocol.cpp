@@ -13,6 +13,8 @@
 #include "IMAPFolder.h"
 #include "Utilities.h"
 
+#include <mail_util.h>
+
 
 IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 	:
@@ -279,6 +281,8 @@ IMAPProtocol::_CreateFolder(const BString& mailbox, const BString& separator)
 			strerror(status));
 		return NULL;
 	}
+
+	CopyMailFolderAttributes(path.Path());
 
 	entry_ref ref;
 	status = get_ref_for_path(path.Path(), &ref);

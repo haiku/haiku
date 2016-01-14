@@ -14,14 +14,17 @@
 #include <ctype.h>
 #include <errno.h>
 
+#include <FindDirectory.h>
 #include <List.h>
 #include <Locker.h>
 #include <parsedate.h>
+#include <Path.h>
 #include <String.h>
 #include <UTF8.h>
 
 #include <mail_encoding.h>
 
+#include <AttributeUtilities.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 
@@ -1547,3 +1550,20 @@ get_address_list(BList &list, const char *string,
 	}
 }
 
+
+status_t
+CopyMailFolderAttributes(const char* targetPath)
+{
+	BPath path;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+
+	path.Append("Tracker");
+	path.Append("DefaultQueryTemplates");
+	path.Append("text_x-email");
+
+	BNode source(path.Path());
+	BNode target(targetPath);
+	return BPrivate::CopyAttributes(source, target);
+}
