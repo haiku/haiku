@@ -58,7 +58,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		SharedLibrary $(libmail) :
 			$(sources)
 			:
-			be bnetapi textencoding tracker libshared.a
+			be bnetapi textencoding tracker 
+			[ MultiArchDefaultGristFiles libshared.a ]
 			[ TargetLibstdc++ ]
 			$(TARGET_NETWORK_LIBS)
 			$(TARGET_SELECT_UNAME_ETC_LIB)
