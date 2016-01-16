@@ -9,7 +9,7 @@ Application FirstBootPrompt :
 	BootPromptWindow.cpp
 	Keymap.cpp
 	KeymapListItem.cpp
-	: be translation libshared.a [ TargetLibstdc++ ] localestub
+	: be translation shared [ TargetLibstdc++ ] localestub
 	: BootPrompt.rdef
 ;
 

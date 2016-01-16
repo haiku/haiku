@@ -298,7 +298,7 @@ Application Icon-O-Matic :
 	MainWindow.cpp
 	Util.cpp
 
-	: be tracker translation libshared.a libagg.a
+	: be tracker translation shared libagg.a
 		[ BuildFeatureAttribute expat : library ]
 		[ TargetLibstdc++ ] localestub
 

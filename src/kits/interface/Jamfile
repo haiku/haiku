@@ -155,7 +155,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			OneElementLayouter.cpp
 			SimpleLayouter.cpp
 
-			: [ MultiArchDefaultGristFiles libshared.a ]
+			: <$(architecture)>libshared.a
 			;
 
 		StaticLibrary [ MultiArchDefaultGristFiles libcolumnlistview.a ] :

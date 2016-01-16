@@ -103,7 +103,7 @@ Server app_server :
 	libaslocal.a $(BROKEN_64)libasremote.a $(BROKEN_64)libashtml5.a
 	libasdrawing.a libpainter.a libagg.a
 	[ BuildFeatureAttribute freetype : library ]
-	libstackandtile.a liblinprog.a libtextencoding.so libshared.a
+	libstackandtile.a liblinprog.a libtextencoding.so shared
 	[ TargetLibstdc++ ]
 
 	: app_server.rdef

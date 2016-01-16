@@ -8,7 +8,7 @@ Preference VirtualMemory :
 	Settings.cpp
 	$(DRIVER_SETTINGS)
 
-	: be libshared.a [ TargetLibstdc++ ] localestub
+	: be shared [ TargetLibstdc++ ] localestub
 	: VirtualMemory.rdef
 ;
 

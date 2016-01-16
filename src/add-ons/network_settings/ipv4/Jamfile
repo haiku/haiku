@@ -9,7 +9,7 @@ AddResources IPv4Interface : IPv4Interface.rdef ;
 Addon IPv4Interface :
 	IPv4InterfaceAddOn.cpp
 
-	: be bnetapi libshared.a <nogrist>Network [ TargetLibsupc++ ]
+	: be bnetapi shared <nogrist>Network [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ] localestub
 ;
 

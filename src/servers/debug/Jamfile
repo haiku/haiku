@@ -14,7 +14,7 @@ Server debug_server
 	:
 	be
 	libdebug.so
-	libshared.a
+	shared
 	[ TargetLibstdc++ ]
 	localestub
 ;

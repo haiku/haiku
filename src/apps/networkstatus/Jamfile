@@ -17,7 +17,7 @@ Application NetworkStatus :
 	RadioView.cpp
 	WirelessNetworkMenuItem.cpp
 
-	: be libshared.a localestub $(icon_libs) $(TARGET_NETWORK_LIBS)
+	: be shared localestub $(icon_libs) $(TARGET_NETWORK_LIBS)
 		libbnetapi.so [ TargetLibstdc++ ]
 	: NetworkStatus.rdef NetworkStatusIcons.rdef
 ;

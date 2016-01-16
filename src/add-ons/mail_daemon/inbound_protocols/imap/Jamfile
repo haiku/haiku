@@ -45,7 +45,7 @@ Addon IMAP
 	$(sources)
 	:
 	be libmail.so localestub $(TARGET_NETWORK_LIBS) libbnetapi.so
-	libshared.a [ TargetLibsupc++ ] [ TargetLibstdc++ ]
+	shared [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 ;
 
 SEARCH on [ FGristFiles Commands.cpp Protocol.cpp Response.cpp ]

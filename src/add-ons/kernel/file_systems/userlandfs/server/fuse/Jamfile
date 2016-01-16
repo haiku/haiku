@@ -29,5 +29,5 @@ SharedLibrary libuserlandfs_fuse.so
 	FUSEVolume.cpp
 
 	:
-	<nogrist>userlandfs_server libshared.a be [ TargetLibsupc++ ]
+	<nogrist>userlandfs_server shared be [ TargetLibsupc++ ]
 ;

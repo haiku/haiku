@@ -20,6 +20,6 @@ BinCommand pkgman :
 	PackageManager.cpp
 	pkgman.cpp
 	:
-	libshared.a package be
+	shared package be
 	[ TargetLibsupc++ ] [ TargetLibstdc++ ]
 ;

@@ -415,7 +415,7 @@ Application Debugger :
 	libudis86.a
 	<bin>debug_utils.a
 	libcolumnlistview.a
-	libshared.a
+	shared
 
 	[ TargetLibstdc++ ]
 	be package tracker libbsd.so libdebug.so

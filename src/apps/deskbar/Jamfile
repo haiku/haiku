@@ -14,7 +14,7 @@ SubDirC++Flags -DDB_ADDONS
 local targetLib ;
 local targetSource ;
 
-targetLib = libshared.a ;
+targetLib = shared ;
 targetSource = CalendarMenuWindow.cpp ;
 SubDirC++Flags -D_SHOW_CALENDAR_MENU_WINDOW=1 -DMOUNT_MENU_IN_DESKBAR=1 ;
 

@@ -6,5 +6,5 @@ UsePrivateHeaders shared storage ;
 BinCommand keymap :
 	main.cpp
 	Keymap.cpp
-	: be libshared.a [ TargetLibsupc++ ]
+	: be shared [ TargetLibsupc++ ]
 	: keymap.rdef ;

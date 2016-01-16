@@ -26,7 +26,7 @@ Server launch_daemon
 	InitSharedMemoryDirectoryJob.cpp
 	InitTemporaryDirectoryJob.cpp
 	:
-	be network bnetapi libshared.a libmultiuser_utils.a [ TargetLibstdc++ ]
+	be network bnetapi shared libmultiuser_utils.a [ TargetLibstdc++ ]
 	:
 	LaunchDaemon.rdef
 ;

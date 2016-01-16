@@ -11,7 +11,7 @@ AddResources IPv6Interface : IPv6Interface.rdef ;
 Addon IPv6Interface :
 	IPv6InterfaceAddOn.cpp
 
-	: be bnetapi libshared.a <nogrist>Network [ TargetLibsupc++ ]
+	: be bnetapi shared <nogrist>Network [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ] localestub
 ;
 

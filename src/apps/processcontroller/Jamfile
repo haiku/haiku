@@ -21,7 +21,7 @@ Application ProcessController :
 	ThreadBarMenu.cpp
 	ThreadBarMenuItem.cpp
 	Utilities.cpp
-	: be libshared.a [ TargetLibsupc++ ] localestub
+	: be shared [ TargetLibsupc++ ] localestub
 	: ProcessController.rdef
 ;
 

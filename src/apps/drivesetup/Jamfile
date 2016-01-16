@@ -15,7 +15,7 @@ Preference DriveSetup :
 	PartitionList.cpp
 	Support.cpp
 
-	: be localestub libcolumnlistview.a libshared.a
+	: be localestub libcolumnlistview.a shared
 		[ TargetLibsupc++ ]
 	: DriveSetup.rdef
 ;
