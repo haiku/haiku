@@ -706,7 +706,7 @@ Response::Read(BDataIO& stream)
 	}
 
 	if (bytesRead == 0)
-		throw ParseException("Unexpected end of string");
+		throw ParseException("Unexpected end of stream");
 
 	throw StreamException(bytesRead);
 }
