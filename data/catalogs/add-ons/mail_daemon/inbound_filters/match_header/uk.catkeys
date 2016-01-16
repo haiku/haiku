@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-MatchHeader	3677427558
+1	ukrainian	x-vnd.Haiku-MatchHeader	1349121828
 <Choose action>	ConfigView		<Вибір дії>
 has	ConfigView		має
 Move to	ConfigView		Перемістити до
@@ -10,4 +10,3 @@ Set flags to	ConfigView		Встановити флаги для
 Set as read	ConfigView		Встановити як прочитані
 Reply with	ConfigView		Відповісти з
 If	ConfigView		Якщо
-header (e.g. Subject)	ConfigView		заголовок (e.g. Subject)

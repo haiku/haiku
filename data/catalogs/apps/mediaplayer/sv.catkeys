@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	2711018042
+1	swedish	x-vnd.Haiku-MediaPlayer	3805057997
 raw audio	MediaPlayer-InfoWin		raw-ljud
 Location	MediaPlayer-InfoWin		Plats
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
@@ -114,6 +114,7 @@ Error: 	MediaPlayer-Main		Fel:
 Large	MediaPlayer-SettingsWindow		Stor
 Bottom of video	MediaPlayer-SettingsWindow		Botten av videon
 DrawBitmap	MediaPlayer-InfoWin		Rita Bitmap
+Total duration: %s	MediaPlayer-PlaylistWindow		Totallängd: %s
 Stop	MediaPlayer-Main		Stopp
 <unnamed media>	MediaPlayer-InfoWin		<inget namn media>
 raw video	MediaPlayer-InfoWin		raw video

@@ -1,31 +1,48 @@
-1	swedish	x-vnd.Haiku-Network	950262959
+1	swedish	x-vnd.Haiku-Network	2512967175
 Static	IntefaceAddressView		Statisk
 EAP	EAP protected network		EAP
 Services	NetworkWindow		Tjänster
+no link	InterfaceListItem		Ingen länk
 WPA2	WPA2 protected network		WPA2
+Choose automatically	IntefaceView		Välj automatiskt
+connected	IntefaceView		ansluten
+Ethernet device	InterfaceListItem		Ethernetenhet
 The netmask defines your local network	IntefaceAddressView		Netmasken definierar ditt lokala nätverk
 %name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
 Network	NetworkWindow		Nätverk
 Show network status in Deskbar	NetworkWindow		Visa nätverksstatus i Deskbar
 The method for obtaining an IP address	IntefaceAddressView		Metoden för att få en IP adress
+connected	InterfaceListItem		ansluten
+disabled	InterfaceListItem		inaktiverad
 Dial Up	NetworkWindow		Uppringd
 Apply	IntefaceAddressView		Använd
 Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Installatera NetworkStatus i Deskbaren misslyckades: %s
+MAC address:	IntefaceView		MAC-adress
+Wireless device	InterfaceListItem		Trådlös enhet
 Disabled	IntefaceAddressView		Inaktiverad
+Renegotiate	IntefaceView		Omförhandla
 Ok	NetworkWindow		OK
+Network:	IntefaceView		Nätverk:
 launch error	NetworkWindow		Startfel
 Other	NetworkWindow		Andra
 Automatic	IntefaceAddressView		Automatisk
 Gateway:	IntefaceAddressView		Förmedlingsnod:
 Revert	NetworkWindow		Återställ
 Enable	ServiceView		Aktivera
+disconnected	IntefaceView		frånkopplad
+Status:	IntefaceView		Status:
+Link speed:	IntefaceView		Länkhastighet:
 Your gateway to the internet	IntefaceAddressView		Din förmedlingsnod till internet
 New…	NetworkWindow		Ny…
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Läge:
 WPA	WPA protected network		WPA
+Sent:	IntefaceView		Skickat:
 open	Open network		öppna
 IP Address:	IntefaceAddressView		IP-adress:
+Received:	IntefaceView		Mottaget:
+Disable	IntefaceView		Inaktivera
+<no wireless networks found>	IntefaceView		<Inget nätverk hittades>
 Netmask:	IntefaceAddressView		Nätmask:
 Disable	ServiceView		Inaktivera
 Your IP address	IntefaceAddressView		Din IP-adress

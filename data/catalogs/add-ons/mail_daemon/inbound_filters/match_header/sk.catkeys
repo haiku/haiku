@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MatchHeader	3677427558
+1	slovak	x-vnd.Haiku-MatchHeader	1349121828
 <Choose action>	ConfigView		<Vyberte operáciu>
 has	ConfigView		má
 Move to	ConfigView		Presunúť do
@@ -10,4 +10,3 @@ Set flags to	ConfigView		Nastaviť príznaky na
 Set as read	ConfigView		Nastaviť ako prečítané
 Reply with	ConfigView		Odpovedať pomocou
 If	ConfigView		ak
-header (e.g. Subject)	ConfigView		hlavička (napr. Predmet)

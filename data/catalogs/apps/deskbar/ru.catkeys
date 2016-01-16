@@ -1,4 +1,4 @@
-1	russian	x-vnd.Be-TSKB	2335730970
+1	russian	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Выключить компьютер
 Sort applications by name	PreferencesWindow		Сортировать приложения по имени
 Suspend	DeskbarMenu		Приостановить
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Крупные
 Auto-raise	PreferencesWindow		Всплывать при наведении
 Recent folders:	PreferencesWindow		Недавние папки:
 Show application expander	PreferencesWindow		Отображать список окон приложений
-Restart Tracker	DeskbarMenu		Перезапустить Tracker
 Close all	WindowMenu		Закрыть все
 Deskbar preferences	PreferencesWindow		Настройки Deskbar
 Mount	DeskbarMenu		Подключить

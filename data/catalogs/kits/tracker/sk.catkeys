@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	11653994
+1	slovak	x-vnd.Haiku-libtracker	1652028443
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Doplnky
 Desktop	Model		Plocha
@@ -416,7 +416,6 @@ Mount	DeskWindow		Pripojiť
 Mount	ContainerWindow		Pripojiť
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used využité -- %free voľné)
 Cancel	FSClipBoard		Zrušiť
-Restart Deskbar	DeskWindow		Reštartovať Panel
 Cut more	ContainerWindow		Vystrihnúť viac
 Deleting: 	StatusWindow		Maže sa: 
 Empty Trash	InfoWindow		Vyprázdniť Kôš

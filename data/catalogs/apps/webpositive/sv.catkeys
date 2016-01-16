@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-WebPositive	3678460971
+1	swedish	x-vnd.Haiku-WebPositive	1282126593
 Show home button	Settings Window		Visa hem-knappen
 Username:	Authentication Panel		Användarnamn:
 Copy URL to clipboard	Download Window		Kopiera URL till urklipp
@@ -16,6 +16,7 @@ Start page:	Settings Window		Start sida:
 History	WebPositive Window		Historik
 Error opening downloads folder	Download Window		Fel vid öppnande av nerladdnings foldern
 Paste	WebPositive Window		Klistra in
+Expiration	Cookie Manager		Utgångstid
 Double-click or middle-click to open new tab.	Tab Manager		Dubbelklicka eller klicka på mittersta musknappen för att öppna en ny tab.
 Proxy username:	Settings Window		Proxyanvändarnamn:
 Save page as…	WebPositive Window		Spara sida som...
@@ -23,10 +24,12 @@ Over %days left	Download Window		Över %days kvar
 Settings	Settings Window		Inställningar
 Confirmation	WebPositive Window		Bekräftelse
 Window	WebPositive Window		Fönster
+Cookie manager	Cookie Manager		Kakhanterare
 Decrease size	WebPositive Window		Minska storlek
 Serif font:	Settings Window		Serif-typsnitt:
 Loading %url	WebPositive Window		Läser in %url
 Download aborted	Download Window		Nedladdning avbruten
+Value	Cookie Manager		Värde
 Page source	WebPositive Window		Sidkälla
 Next	WebPositive Window		Nästa
 Find next	WebPositive Window		Sök nästa
@@ -42,6 +45,7 @@ Auto-hide mouse pointer	Settings Window		Automatisk göm musmarkören
 Quit	WebPositive Window		Avsluta
 Full screen	WebPositive Window		Helskärm
 Open download error	Download Window		Öppna nerladdnings error
+The cookie jar is empty!	Cookie Manager		Kakburken är tom!
 Standard font:	Settings Window		Standardtypsnitt:
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Sök föregående förekomst av söktermerna
 Restart	Download Window		Starta om
@@ -53,6 +57,7 @@ Open	Download Window		Öppna
 Reload	WebPositive Window		Läs om
 Downloads	Download Window		Hämtningar
 Sans serif font:	Settings Window		Sans serif-typsnitt:
+Delete	Cookie Manager		Ta bort
 Forward	WebPositive Window		Framåt
 of	Download Window	...as in '12kB of 256kB'	av
 Revert	Settings Window		Återgå
@@ -94,10 +99,12 @@ Find	WebPositive Window		Sök
 Find previous	WebPositive Window		Sök föregående
 Settings	WebPositive Window		Inställningar
 Script console	WebPositive Window		Skriptkonsol
+Name	Cookie Manager		Namn
 Proxy server address:	Settings Window		Proxyserveradress:
 Proxy server port:	Settings Window		Port för proxyserver
 Bookmarks	WebPositive Window		Bokmärken
 Paste	URL Bar		Klistra in
+Cookie manager	WebPositive Window		Kakhanterare
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		gjöm lösenordstext
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Flygande bäckasiner söka strax hwila på mjuka tuvor.
@@ -105,9 +112,11 @@ Over 1 minute left	Download Window		Över 1 minut kvar
 Open start page	Settings Window		Öppna startsida
 Continue downloads	WebPositive		Fortsätt ladda ner
 Cancel	Download Window		Avbryt
+Flags	Cookie Manager		Flaggor
 Open search page	Settings Window		Öppna sök sidan
 Clear	Console Window		Töm
 Password:	Authentication Panel		Lösenord:
+Path	Cookie Manager		Sökväg
 Back	WebPositive Window		Tillbaka
 New browser window	Download Window		Nytt fönster
 Today	WebPositive Window		Idag
@@ -134,6 +143,7 @@ Open bookmarks confirmation	WebPositive Window		Öppna bokmärkes godkännande
 Remove missing	Download Window		Ta bort saknade
 Clone current page	Settings Window		Kopiera aktuella sida
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Vill du öppna %addedCount bokmärken på en gång?
+Session cookie	Cookie Manager		Sessionskakor
 OK	Authentication Panel		OK
 Copy	URL Bar		Kopiera
 Download finished	Download Window		Nerladdning klar
@@ -141,6 +151,7 @@ Show bookmark bar	WebPositive Window		Visa bokmärkslistan
 OK	WebPositive Window		OK
 Manage bookmarks	WebPositive Window		Hantera bokmärken
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ett bokmärke (%bookmarkName) för denna sida finns redan.
+Cookies for %s	Cookie Manager		Kakor för %s
 New windows:	Settings Window		Nytt fönster:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url färdig
 Remove finished	Download Window		Ta bort färdiga

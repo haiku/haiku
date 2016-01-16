@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	4273323974
+1	swedish	x-vnd.Haiku-HaikuDepot	2365524674
 Name	PackageListView		Namn
 Available packages	MainWindow		Tillgängliga paket
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
@@ -84,6 +84,7 @@ Productivity	Model		Produktivitet
 No, quit HaikuDepot	App		Nej, avsluta HaikuDepot
 Authentication failed	UserLoginWindow		Autentisering misslyckades
 Logged in as %User%	MainWindow		Inloggad som %User%
+9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Språk
 Size	PackageListView		Storlek
 Failed to create or update rating: %s\n	RatePackageWindow		Gick inte att skapa eller uppdatera betyg: %s\n

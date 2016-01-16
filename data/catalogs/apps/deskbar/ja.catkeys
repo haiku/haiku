@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-TSKB	2335730970
+1	japanese	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		電源を切る
 Sort applications by name	PreferencesWindow		アプリケーションを名前順に並び替える
 Suspend	DeskbarMenu		サスペンド
@@ -27,7 +27,6 @@ Large	PreferencesWindow		大
 Auto-raise	PreferencesWindow		マウスオーバーで手前に
 Recent folders:	PreferencesWindow		最近開いたフォルダー
 Show application expander	PreferencesWindow		エキスパンダーを表示
-Restart Tracker	DeskbarMenu		Tracker を再起動
 Close all	WindowMenu		すべて閉じる
 Deskbar preferences	PreferencesWindow		Deskbar の設定
 Mount	DeskbarMenu		マウント

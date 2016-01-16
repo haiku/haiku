@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	2004221275
+1	english	x-vnd.Haiku-libtracker	3644595724
 OK	WidgetAttributeText		确定
 Add-ons	FilePanelPriv		附加组件
 Mount settings…	ContainerWindow		挂载设置...
@@ -434,7 +434,6 @@ Recent queries	FindPanel		最近查询
 Mount	ContainerWindow		挂载
 %capacity (%used used -- %free free)	InfoWindow		%capacity（已用 %used -- 空闲 %free）
 Cancel	FSClipBoard		取消
-Restart Deskbar	DeskWindow		重启桌面栏
 Cut more	ContainerWindow		更多剪切
 Deleting: 	StatusWindow		删除：
 Empty Trash	InfoWindow		清空垃圾箱

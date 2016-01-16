@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-MatchHeader	3677427558
+1	dutch; flemish	x-vnd.Haiku-MatchHeader	1349121828
 <Choose action>	ConfigView		<Kies actie>
 has	ConfigView		Heeft
 Move to	ConfigView		Verplaats naar
@@ -10,4 +10,3 @@ Set flags to	ConfigView		Markeer als
 Set as read	ConfigView		Als gelezen markeren
 Reply with	ConfigView		Antwoord met
 If	ConfigView		Als
-header (e.g. Subject)	ConfigView		rubiek (m.a.w. onderwerp)

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Be-TSKB	2335730970
+1	spanish; castilian	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Apagar
 Sort applications by name	PreferencesWindow		Ordenar aplicaciones por nombre
 Suspend	DeskbarMenu		Suspender
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Grande
 Auto-raise	PreferencesWindow		Redimensionar automáticamente
 Recent folders:	PreferencesWindow		Carpetas recientes:
 Show application expander	PreferencesWindow		Mostar expansor de aplicación
-Restart Tracker	DeskbarMenu		Reiniciar rastreador
 Close all	WindowMenu		Cerrar todo
 Deskbar preferences	PreferencesWindow		Preferencias de la barra de escritorio
 Mount	DeskbarMenu		Montar

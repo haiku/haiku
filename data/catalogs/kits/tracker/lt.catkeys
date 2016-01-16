@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	679062638
+1	lithuanian	x-vnd.Haiku-libtracker	2319437087
 OK	WidgetAttributeText		Gerai
 Add-ons	FilePanelPriv		Priedai
 Desktop	Model		Darbalaukis
@@ -425,7 +425,6 @@ Recent queries	FindPanel		Paskiausios užklausos
 Mount	ContainerWindow		Prijungti
 %capacity (%used used -- %free free)	InfoWindow		%capacity (užpildyta %used, laisva %free)
 Cancel	FSClipBoard		Atsisakyti
-Restart Deskbar	DeskWindow		Perleisti Užduočių juostą
 Cut more	ContainerWindow		Iškirpti dar
 Deleting: 	StatusWindow		Šalinama:
 Empty Trash	InfoWindow		Ištuštinti šiukšlinę

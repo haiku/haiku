@@ -1,4 +1,4 @@
-1	german	x-vnd.Be-TSKB	2335730970
+1	german	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Ausschalten
 Sort applications by name	PreferencesWindow		Laufende Anwendungen sortieren
 Suspend	DeskbarMenu		Ruhezustand
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Groß
 Auto-raise	PreferencesWindow		Automatisch nach vorn holen
 Recent folders:	PreferencesWindow		Letzte Ordner:
 Show application expander	PreferencesWindow		Expander anzeigen
-Restart Tracker	DeskbarMenu		Tracker neu starten
 Close all	WindowMenu		Alle schließen
 Deskbar preferences	PreferencesWindow		Deskbar-Einstellungen
 Mount	DeskbarMenu		Einhängen

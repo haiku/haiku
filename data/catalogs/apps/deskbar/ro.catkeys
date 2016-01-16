@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Be-TSKB	2335730970
+1	romanian	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Oprire
 Sort applications by name	PreferencesWindow		Sortează aplicații după nume
 Suspend	DeskbarMenu		Suspendare
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Mare
 Auto-raise	PreferencesWindow		Auto-montează
 Recent folders:	PreferencesWindow		Dosare recente:
 Show application expander	PreferencesWindow		Afișează extensorul de aplicație
-Restart Tracker	DeskbarMenu		Repornire Tracker
 Close all	WindowMenu		Închide tot
 Deskbar preferences	PreferencesWindow		Preferințe Deskbar
 Mount	DeskbarMenu		Montare

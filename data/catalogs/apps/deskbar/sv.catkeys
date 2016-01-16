@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Be-TSKB	2335730970
+1	swedish	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Stäng av
 Sort applications by name	PreferencesWindow		Sortera program efter namn
 Suspend	DeskbarMenu		Vänteläge
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Stor
 Auto-raise	PreferencesWindow		Höj vid närkontakt
 Recent folders:	PreferencesWindow		Senaste mappar:
 Show application expander	PreferencesWindow		Visa program-expanderare
-Restart Tracker	DeskbarMenu		Starta om Tracker
 Close all	WindowMenu		Stäng alla
 Deskbar preferences	PreferencesWindow		Deskbar inställningar
 Mount	DeskbarMenu		Montera

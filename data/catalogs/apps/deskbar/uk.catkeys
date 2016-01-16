@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-TSKB	2335730970
+1	ukrainian	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Вимкнути
 Sort applications by name	PreferencesWindow		Сортувати програми за назвою
 Suspend	DeskbarMenu		Призупинити
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Великі
 Auto-raise	PreferencesWindow		Автоспливання
 Recent folders:	PreferencesWindow		Недавні папки:
 Show application expander	PreferencesWindow		Показувати додаток expander
-Restart Tracker	DeskbarMenu		Перезавантажити Tracker
 Close all	WindowMenu		Закрити все
 Deskbar preferences	PreferencesWindow		Налаштування Deskbar
 Mount	DeskbarMenu		Приєднати

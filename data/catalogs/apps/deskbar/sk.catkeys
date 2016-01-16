@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-TSKB	1042823442
+1	slovak	x-vnd.Be-TSKB	1363745697
 Power off	DeskbarMenu		Vypnúť
 Suspend	DeskbarMenu		Režim spánku
 Hide clock	TimeView		Skryť hodiny
@@ -24,7 +24,6 @@ Large	PreferencesWindow		Veľké
 Auto-raise	PreferencesWindow		Automaticky aktivovať
 Recent folders:	PreferencesWindow		Nedávne priečinky:
 Show application expander	PreferencesWindow		Zobraziť výsuvný zoznam aplikácií
-Restart Tracker	DeskbarMenu		Reštartovať Tracker
 Close all	WindowMenu		Zatvoriť všetky
 Deskbar preferences	PreferencesWindow		Nastavenia Panelu
 Mount	DeskbarMenu		Pripojiť

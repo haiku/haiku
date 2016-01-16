@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-libtracker	4204393626
+1	italian	x-vnd.Haiku-libtracker	1549800779
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-on
 Mount settings…	ContainerWindow		Impostazioni di mount
@@ -433,7 +433,6 @@ Recent queries	FindPanel		Ricerche recenti
 Mount	ContainerWindow		Monta
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used usato -- %free libero)
 Cancel	FSClipBoard		Annulla
-Restart Deskbar	DeskWindow		Riavvia Deskbar
 Cut more	ContainerWindow		Taglia di più
 Deleting: 	StatusWindow		Eliminazione:
 Empty Trash	InfoWindow		Svuota Cestino

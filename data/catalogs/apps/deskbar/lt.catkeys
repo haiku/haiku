@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Be-TSKB	2335730970
+1	lithuanian	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Išjungti
 Sort applications by name	PreferencesWindow		Rikiuoti programas pagal pavadinimą
 Suspend	DeskbarMenu		Pristabdyti
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Didelės
 Auto-raise	PreferencesWindow		Automatiškai iškilti
 Recent folders:	PreferencesWindow		Paskiausi aplankai:
 Show application expander	PreferencesWindow		Rodyti programų skleistuką
-Restart Tracker	DeskbarMenu		Perleisti Pėdsekį
 Close all	WindowMenu		Užverti visus
 Deskbar preferences	PreferencesWindow		Užduočių juostos nuostatos
 Mount	DeskbarMenu		Prijungti diską

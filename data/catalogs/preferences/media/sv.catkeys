@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Media	3383826947
+1	swedish	x-vnd.Haiku-Media	4205337498
 Couldn't add volume control in Deskbar: %s\n	Media views		Kunde inte lägga till volymkontroll i Deskbar: %s\n
 Video input:	Media views		Videoingång:
 Warning!	Media Window		Varning!
@@ -12,6 +12,7 @@ Could not connect to the media server.\nWould you like to start it ?	Media Windo
 Restart media services	Media views		Starta om mediatjänsterna
 Couldn't remove volume control in Deskbar: %s\n	Media views		Kunde inte ta bort volymkontrollen från Deskbar: %s\n
 Media	System name		Media
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Avsluta Media nu kommer att starta om media servicen. Förmodligen kommer du att uppleva hispig/konstig eller otillgänglig media fuktionalitet.
 Audio mixer	Media Window		Ljudmixer
 This hardware has no controls.	Media Window		Hårdvaran saknar kontroller.
 Audio output:	Media views		Ljudutgång:

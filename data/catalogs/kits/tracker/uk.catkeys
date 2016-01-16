@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	679062638
+1	ukrainian	x-vnd.Haiku-libtracker	2319437087
 OK	WidgetAttributeText		Гаразд
 Add-ons	FilePanelPriv		Додатки
 Desktop	Model		Робочий стіл
@@ -425,7 +425,6 @@ Recent queries	FindPanel		Недавні запити
 Mount	ContainerWindow		Підмонтувати
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used викор. -- %free вільно)
 Cancel	FSClipBoard		Відмінити
-Restart Deskbar	DeskWindow		Перезапустити Deskbar
 Cut more	ContainerWindow		Вирізати ще
 Deleting: 	StatusWindow		Видалення: 
 Empty Trash	InfoWindow		Очистити Кошик

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	2004221275
+1	finnish	x-vnd.Haiku-libtracker	3644595724
 OK	WidgetAttributeText		Valmis
 Add-ons	FilePanelPriv		Lisäosat
 Mount settings…	ContainerWindow		Liittämisasetukset...
@@ -434,7 +434,6 @@ Recent queries	FindPanel		Äskettäiset kyselyt
 Mount	ContainerWindow		Liitä
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used käytetty -- %free vapaana)
 Cancel	FSClipBoard		Peru
-Restart Deskbar	DeskWindow		Käynnistä Työpöytäpalkki uudelleen
 Cut more	ContainerWindow		Leikkaa lisää
 Deleting: 	StatusWindow		Poistetaan: 
 Empty Trash	InfoWindow		Tyhjennä roskakori

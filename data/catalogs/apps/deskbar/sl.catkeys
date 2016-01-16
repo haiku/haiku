@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Be-TSKB	3867888028
+1	slovenian	x-vnd.Be-TSKB	4188810283
 Power off	DeskbarMenu		Ugasni
 Sort applications by name	PreferencesWindow		Razvrsti aplikacije po imenu
 Hide clock	TimeView		Skrij uro
@@ -22,7 +22,6 @@ Deskbar	System name		Deskbar
 Restart system	DeskbarMenu		Ponovno zaženi računalnik
 Auto-raise	PreferencesWindow		Samodejno dvigni
 Recent folders:	PreferencesWindow		Nedavne mape:
-Restart Tracker	DeskbarMenu		Ponovno zaženi Tracker
 Close all	WindowMenu		Zapri vse
 Mount	DeskbarMenu		Priklopi
 Revert	PreferencesWindow		Povrni

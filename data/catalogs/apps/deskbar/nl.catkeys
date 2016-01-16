@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-TSKB	2632170999
+1	dutch; flemish	x-vnd.Be-TSKB	2953093254
 Power off	DeskbarMenu		Uitzetten
 Suspend	DeskbarMenu		Opschorten
 Applications	PreferencesWindow		Toepassingen
@@ -22,7 +22,6 @@ Large	PreferencesWindow		Groot
 Auto-raise	PreferencesWindow		Automatisch naar boven
 Recent folders:	PreferencesWindow		Recente mappen:
 Show application expander	PreferencesWindow		Toon toepassing-expander
-Restart Tracker	DeskbarMenu		Tracker herstarten
 Close all	WindowMenu		Alles sluiten
 Deskbar preferences	PreferencesWindow		Deskbar-voorkeuren
 Mount	DeskbarMenu		Betrek
