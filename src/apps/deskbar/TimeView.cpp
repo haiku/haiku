@@ -152,7 +152,7 @@ TTimeView::Draw(BRect /*updateRect*/)
 	PushState();
 
 	SetHighColor(ViewColor());
-	SetLowUIColor(ViewUIColor());
+	SetLowColor(ViewColor());
 	FillRect(Bounds());
 	SetHighUIColor(B_MENU_ITEM_TEXT_COLOR);
 
