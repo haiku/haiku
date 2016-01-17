@@ -428,7 +428,20 @@ void
 BMenuField::AttachedToWindow()
 {
 	CALLED();
-	AdoptParentColors();
+
+	// Our low color must match the parent's view color.
+	if (Parent() != NULL) {
+		AdoptParentColors();
+
+		float tint = B_NO_TINT;
+		color_which which = ViewUIColor(&tint);
+
+		if (which == B_NO_COLOR)
+			SetLowColor(ViewColor());
+		else
+			SetLowUIColor(which, tint);
+	} else
+		AdoptSystemColors();
 }
 
 
@@ -1065,7 +1078,7 @@ BMenuField::_DrawLabel(BRect updateRect)
 		flags |= BControlLook::B_DISABLED;
 
 	// save the current low color
-	const rgb_color lowColor = LowColor();
+	PushState();
 	rgb_color textColor;
 
 	MenuPrivate menuPrivate(fMenuBar);
@@ -1082,7 +1095,7 @@ BMenuField::_DrawLabel(BRect updateRect)
 		BAlignment(fAlign, B_ALIGN_MIDDLE), &textColor);
 
 	// restore the previous low color
-	SetLowColor(lowColor);
+	PopState();
 }
 
 
