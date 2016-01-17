@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -160,6 +160,7 @@ AcpiTbFixString (
         {
             *String = '?';
         }
+
         String++;
         Length--;
     }
@@ -228,8 +229,8 @@ AcpiTbPrintTableHeader (
     {
         /* RSDP has no common fields */
 
-        memcpy (LocalHeader.OemId,
-            ACPI_CAST_PTR (ACPI_TABLE_RSDP, Header)->OemId, ACPI_OEM_ID_SIZE);
+        memcpy (LocalHeader.OemId, ACPI_CAST_PTR (ACPI_TABLE_RSDP,
+            Header)->OemId, ACPI_OEM_ID_SIZE);
         AcpiTbFixString (LocalHeader.OemId, ACPI_OEM_ID_SIZE);
 
         ACPI_INFO ((AE_INFO, "RSDP 0x%8.8X%8.8X %06X (v%.2d %-6.6s)",

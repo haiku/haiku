@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -489,7 +489,8 @@ AcpiExPciConfigSpaceHandler (
     PciRegister = (UINT16) (UINT32) Address;
 
     ACPI_DEBUG_PRINT ((ACPI_DB_INFO,
-        "Pci-Config %u (%u) Seg(%04x) Bus(%04x) Dev(%04x) Func(%04x) Reg(%04x)\n",
+        "Pci-Config %u (%u) Seg(%04x) Bus(%04x) "
+        "Dev(%04x) Func(%04x) Reg(%04x)\n",
         Function, BitWidth, PciId->Segment, PciId->Bus, PciId->Device,
         PciId->Function, PciRegister));
 
@@ -498,14 +499,14 @@ AcpiExPciConfigSpaceHandler (
     case ACPI_READ:
 
         *Value = 0;
-        Status = AcpiOsReadPciConfiguration (PciId, PciRegister,
-                    Value, BitWidth);
+        Status = AcpiOsReadPciConfiguration (
+            PciId, PciRegister, Value, BitWidth);
         break;
 
     case ACPI_WRITE:
 
-        Status = AcpiOsWritePciConfiguration (PciId, PciRegister,
-                    *Value, BitWidth);
+        Status = AcpiOsWritePciConfiguration (
+            PciId, PciRegister, *Value, BitWidth);
         break;
 
     default:

@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -291,7 +291,7 @@ AcpiEvInstallSciHandler (
 
 
     Status = AcpiOsInstallInterruptHandler ((UINT32) AcpiGbl_FADT.SciInterrupt,
-                AcpiEvSciXruptHandler, AcpiGbl_GpeXruptListHead);
+        AcpiEvSciXruptHandler, AcpiGbl_GpeXruptListHead);
     return_ACPI_STATUS (Status);
 }
 
@@ -330,7 +330,7 @@ AcpiEvRemoveAllSciHandlers (
     /* Just let the OS remove the handler and disable the level */
 
     Status = AcpiOsRemoveInterruptHandler ((UINT32) AcpiGbl_FADT.SciInterrupt,
-                AcpiEvSciXruptHandler);
+        AcpiEvSciXruptHandler);
 
     if (!AcpiGbl_SciHandlerList)
     {

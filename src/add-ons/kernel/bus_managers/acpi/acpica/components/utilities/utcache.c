@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -165,9 +165,9 @@ AcpiOsCreateCache (
     /* Populate the cache object and return it */
 
     memset (Cache, 0, sizeof (ACPI_MEMORY_LIST));
-    Cache->ListName   = CacheName;
+    Cache->ListName = CacheName;
     Cache->ObjectSize = ObjectSize;
-    Cache->MaxDepth   = MaxDepth;
+    Cache->MaxDepth = MaxDepth;
 
     *ReturnCache = Cache;
     return (AE_OK);

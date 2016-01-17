@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -326,8 +326,10 @@ AcpiUtMatchResourceName (
     const ACPI_PREDEFINED_INFO  *ThisName;
 
 
-    /* Quick check for a predefined name, first character must be underscore */
-
+    /*
+     * Quick check for a predefined name, first character must
+     * be underscore
+     */
     if (Name[0] != '_')
     {
         return (NULL);

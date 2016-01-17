@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -184,7 +184,7 @@ AcpiNsSearchOneScope (
     {
         char                *ScopeName;
 
-        ScopeName = AcpiNsGetExternalPathname (ParentNode);
+        ScopeName = AcpiNsGetNormalizedPathname (ParentNode, TRUE);
         if (ScopeName)
         {
             ACPI_DEBUG_PRINT ((ACPI_DB_NAMES,
@@ -320,7 +320,7 @@ AcpiNsSearchParentTree (
          * the actual name we are searching for. Typechecking comes later.
          */
         Status = AcpiNsSearchOneScope (
-                    TargetName, ParentNode, ACPI_TYPE_ANY, ReturnNode);
+            TargetName, ParentNode, ACPI_TYPE_ANY, ReturnNode);
         if (ACPI_SUCCESS (Status))
         {
             return_ACPI_STATUS (Status);

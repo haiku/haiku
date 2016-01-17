@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -316,8 +316,8 @@ AcpiUtNamespaceError (
     {
         /* Convert path to external format */
 
-        Status = AcpiNsExternalizeName (ACPI_UINT32_MAX,
-                    InternalName, NULL, &Name);
+        Status = AcpiNsExternalizeName (
+            ACPI_UINT32_MAX, InternalName, NULL, &Name);
 
         /* Print target name */
 
@@ -379,8 +379,8 @@ AcpiUtMethodError (
 
     if (Path)
     {
-        Status = AcpiNsGetNode (PrefixNode, Path, ACPI_NS_NO_UPSEARCH,
-                    &Node);
+        Status = AcpiNsGetNode (PrefixNode, Path,
+            ACPI_NS_NO_UPSEARCH, &Node);
         if (ACPI_FAILURE (Status))
         {
             AcpiOsPrintf ("[Could not get node by pathname]");
