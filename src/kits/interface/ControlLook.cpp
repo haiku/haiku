@@ -2149,18 +2149,17 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	rgb_color edgeShadowColor;
 
 	// default button frame color
-	// TODO: B_BLEND_FRAME
-	float defaultIndicatorTint = 1.2;
-	if ((flags & B_DISABLED) != 0)
-		defaultIndicatorTint = (B_NO_TINT + defaultIndicatorTint) / 2;
-
-	rgb_color defaultIndicatorColor = tint_color(base, defaultIndicatorTint);
+	rgb_color defaultIndicatorColor = ui_color(B_CONTROL_BORDER_COLOR);
 	rgb_color cornerBgColor;
+
+	if ((flags & B_DISABLED) != 0) {
+		defaultIndicatorColor = disable_color(defaultIndicatorColor,
+			background);
+	}
 
 	drawing_mode oldMode = view->DrawingMode();
 
 	if ((flags & B_DEFAULT_BUTTON) != 0) {
-		defaultIndicatorColor = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
 		cornerBgColor = defaultIndicatorColor;
 		edgeLightColor = _EdgeLightColor(defaultIndicatorColor,
 			contrast * ((flags & B_DISABLED) != 0 ? 0.3 : 0.8),
