@@ -321,7 +321,11 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 void
 AudioMixer::HandleInputBuffer(BBuffer* buffer, bigtime_t lateness)
 {
-	if (lateness > kMaxJitter && lateness > fLastLateness) {
+	bigtime_t variation = 0;
+	if (lateness > fLastLateness)
+		variation = lateness-fLastLateness;
+
+	if (variation > kMaxJitter) {
 		debug_printf("AudioMixer: Dequeued input buffer %" B_PRIdBIGTIME
 			" usec late\n", lateness);
 		if (RunMode() == B_DROP_DATA || RunMode() == B_DECREASE_PRECISION
@@ -333,7 +337,7 @@ AudioMixer::HandleInputBuffer(BBuffer* buffer, bigtime_t lateness)
 			source.port = buffer->Header()->source_port;
 			source.id = buffer->Header()->source;
 
-			NotifyLateProducer(source, lateness, TimeSource()->Now());
+			NotifyLateProducer(source, variation, TimeSource()->Now());
 
 			if (RunMode() == B_DROP_DATA) {
 				debug_printf("AudioMixer: dropping buffer\n");
@@ -341,6 +345,7 @@ AudioMixer::HandleInputBuffer(BBuffer* buffer, bigtime_t lateness)
 			}
 		}
 	}
+
 	fLastLateness = lateness;
 
 	fCore->Lock();
