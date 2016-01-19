@@ -9,7 +9,7 @@ SYSTEM_BIN += [ FFilterByBuildFeatures
 	dpms
 	FirstBootPrompt	fwcontrol@x86
 	installsound
-	mail2mbox mbox2mail mkdos mount_nfs
+	mail mail2mbox mbox2mail mkdos mount_nfs
 	play playfile playsound playwav
 	screenshot setdecor spamdbm
 	translate
