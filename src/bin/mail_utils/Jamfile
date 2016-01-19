@@ -9,6 +9,12 @@ if $(TARGET_PLATFORM) != haiku {
 UsePrivateHeaders mail ;
 
 StdBinCommands
+	mail.cpp
+	: be mail
+	: mail.rdef
+	;
+
+StdBinCommands
 	mail2mbox.cpp
 	: be
 	: mail2mbox.rdef

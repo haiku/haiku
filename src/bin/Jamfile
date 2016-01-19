@@ -205,11 +205,6 @@ StdBinCommands
 	setvolume.cpp
 	: be libmedia.so [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
-# standard commands that need libbe.so, libmail.so
-StdBinCommands
-	mail.cpp
-	: be libmail.so : $(haiku-utils_rsrc) ;
-
 # standard commands that need libbe.so, libpackage.so, libsupc++.so
 StdBinCommands
 	findpaths.cpp
