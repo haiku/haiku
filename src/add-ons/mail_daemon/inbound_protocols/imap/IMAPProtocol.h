@@ -47,14 +47,12 @@ public:
 	virtual	status_t			SyncMessages();
 	virtual	status_t			MarkMessageAsRead(const entry_ref& ref,
 									read_flags flags = B_READ);
-	virtual	status_t			AppendMessage(const entry_ref& ref);
 
 	virtual void				MessageReceived(BMessage* message);
 
 protected:
 	virtual status_t			HandleFetchBody(const entry_ref& ref,
 									const BMessenger& replyTo);
-	virtual	status_t			HandleDeleteMessage(const entry_ref& ref);
 
 			void				ReadyToRun();
 

@@ -200,14 +200,6 @@ IMAPProtocol::MarkMessageAsRead(const entry_ref& ref, read_flags flags)
 }
 
 
-status_t
-IMAPProtocol::AppendMessage(const entry_ref& ref)
-{
-	printf("IMAP: append message %s\n", ref.name);
-	return B_ERROR;
-}
-
-
 void
 IMAPProtocol::MessageReceived(BMessage* message)
 {
@@ -244,14 +236,6 @@ IMAPProtocol::HandleFetchBody(const entry_ref& ref, const BMessenger& replyTo)
 
 	IMAPConnectionWorker* worker = found->second;
 	return worker->EnqueueFetchBody(*folder, uid, replyTo);
-}
-
-
-status_t
-IMAPProtocol::HandleDeleteMessage(const entry_ref& ref)
-{
-	printf("IMAP: delete message %s\n", ref.name);
-	return B_ERROR;
 }
 
 

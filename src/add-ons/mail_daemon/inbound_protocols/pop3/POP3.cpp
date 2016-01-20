@@ -317,37 +317,6 @@ POP3Protocol::HandleFetchBody(const entry_ref& ref, const BMessenger& replyTo)
 
 
 status_t
-POP3Protocol::HandleDeleteMessage(const entry_ref& ref)
-{
-	status_t error = Connect();
-	if (error < B_OK)
-		return error;
-
-	error = _RetrieveUniqueIDs();
-	if (error < B_OK) {
-		Disconnect();
-		return error;
-	}
-
-	char uidString[256];
-	BNode node(&ref);
-	if (node.ReadAttr("MAIL:unique_id", B_STRING_TYPE, 0, uidString, 256) < 0) {
-		Disconnect();
-		return B_ERROR;
-	}
-
-	#if DEBUG
-	printf("DeleteMessage: ID is %d\n", (int)fUniqueIDs.IndexOf(uidString));
-		// What should we use for int32 instead of %d?
-	#endif
-	Delete(fUniqueIDs.IndexOf(uidString));
-
-	Disconnect();
-	return B_OK;
-}
-
-
-status_t
 POP3Protocol::Open(const char* server, int port, int)
 {
 	ReportProgress(0, 0, B_TRANSLATE("Connecting to POP3 server"

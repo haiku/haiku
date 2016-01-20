@@ -70,11 +70,6 @@ public:
 
 	virtual void				MessageReceived(BMessage* message);
 
-			// Mail storage operations
-	virtual	status_t			MoveMessage(const entry_ref& ref,
-									BDirectory& dir);
-	virtual	status_t			DeleteMessage(const entry_ref& ref);
-
 			// Convenience methods that call the BMailNotifier
 			void				ShowError(const char* error);
 			void				ShowMessage(const char* message);
@@ -140,8 +135,6 @@ public:
 									BMessenger* replyTo);
 	virtual	status_t			MarkMessageAsRead(const entry_ref& ref,
 									read_flags flags = B_READ);
-	virtual	status_t			DeleteMessage(const entry_ref& ref);
-	virtual	status_t			AppendMessage(const entry_ref& ref);
 
 	static	void				ReplyBodyFetched(const BMessenger& replyTo,
 									const entry_ref& ref, status_t status);
@@ -149,8 +142,6 @@ public:
 protected:
 	virtual status_t			HandleFetchBody(const entry_ref& ref,
 									const BMessenger& replyTo) = 0;
-
-	virtual	status_t			HandleDeleteMessage(const entry_ref& ref) = 0;
 
 			void				NotiyMailboxSynchronized(status_t status);
 };

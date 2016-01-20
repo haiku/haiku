@@ -39,10 +39,6 @@
 using namespace BPrivate;
 
 
-const uint32 kMsgDeleteMessage = '&DeM';
-const uint32 kMsgAppendMessage = '&ApM';
-
-
 BMailProtocol::BMailProtocol(const char* name,
 	const BMailAccountSettings& settings)
 	:
@@ -133,22 +129,6 @@ void
 BMailProtocol::MessageReceived(BMessage* message)
 {
 	BLooper::MessageReceived(message);
-}
-
-
-status_t
-BMailProtocol::MoveMessage(const entry_ref& ref, BDirectory& dir)
-{
-	BEntry entry(&ref);
-	return entry.MoveTo(&dir);
-}
-
-
-status_t
-BMailProtocol::DeleteMessage(const entry_ref& ref)
-{
-	BEntry entry(&ref);
-	return entry.Remove();
 }
 
 
@@ -435,22 +415,6 @@ BInboundMailProtocol::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case kMsgDeleteMessage:
-		{
-			entry_ref ref;
-			message->FindRef("ref", &ref);
-			DeleteMessage(ref);
-			break;
-		}
-
-		case kMsgAppendMessage:
-		{
-			entry_ref ref;
-			message->FindRef("ref", &ref);
-			AppendMessage(ref);
-			break;
-		}
-
 		default:
 			BMailProtocol::MessageReceived(message);
 			break;
@@ -475,20 +439,6 @@ BInboundMailProtocol::MarkMessageAsRead(const entry_ref& ref, read_flags flag)
 {
 	BNode node(&ref);
 	return write_read_attr(node, flag);
-}
-
-
-status_t
-BInboundMailProtocol::DeleteMessage(const entry_ref& ref)
-{
-	return B_ERROR;
-}
-
-
-status_t
-BInboundMailProtocol::AppendMessage(const entry_ref& ref)
-{
-	return B_OK;
 }
 
 

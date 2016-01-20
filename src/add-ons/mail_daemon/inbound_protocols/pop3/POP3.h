@@ -43,7 +43,6 @@ public:
 protected:
 	virtual	status_t			HandleFetchBody(const entry_ref& ref,
 									const BMessenger& replyTo);
-	virtual	status_t			HandleDeleteMessage(const entry_ref& ref);
 
 			// pop3 methods
 			status_t			Open(const char* server, int port,
