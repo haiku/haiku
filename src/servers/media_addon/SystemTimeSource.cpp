@@ -84,6 +84,6 @@ SystemTimeSource::ControlThread()
 	status_t err;
 	do {
 		err = WaitForMessage(B_INFINITE_TIMEOUT);
-	} while (err != B_BAD_PORT_ID);
+	} while (err == B_OK || err == B_ERROR);
 	TRACE("SystemTimeSource::ControlThread() exit\n");
 }
