@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.01.10
-#	Date:    2016-01-10 03:15:01
+#	Version: 2016.01.20
+#	Date:    2016-01-20 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -12186,6 +12186,7 @@
 		1137 00cd  VIC 1285 PCIe Management Controller
 		1137 00ce  VIC 1225T PCIe Management Controller
 		1137 012e  VIC 1227 PCIe Management Controller
+		1137 014d  VIC 1385 PCIe Management Controller
 	0043  VIC Ethernet NIC
 		1137 0047  VIC P81E PCIe Ethernet NIC
 		1137 0048  VIC M81KR Mezzanine Ethernet NIC
@@ -12211,6 +12212,7 @@
 		1137 012c  VIC 1340 MLOM Ethernet NIC Dynamic
 		1137 012e  VIC 1227 PCIe Ethernet NIC Dynamic
 		1137 0137  VIC 1380 Mezzanine Ethernet NIC Dynamic
+		1137 014d  VIC 1385 PCIe Ethernet NIC Dynamic
 	0045  VIC FCoE HBA
 		1137 0047  VIC P81E PCIe FCoE HBA
 		1137 0048  VIC M81KR Mezzanine FCoE HBA
@@ -12223,6 +12225,7 @@
 		1137 012c  VIC 1340 MLOM FCoE HBA
 		1137 012e  VIC 1227 PCIe FCoE HBA
 		1137 0137  VIC 1380 Mezzanine FCoE HBA
+		1137 014d  VIC 1385 PCIe FCoE HBA
 	0046  VIC SCSI Controller
 		1137 012a  VIC M4308 SCSI Controller
 	004e  VIC 82 PCIe Upstream Port
@@ -12231,6 +12234,7 @@
 		1137 012a  VIC M4308 Dual 40Gb
 		1137 012c  VIC 1340 Dual 40Gb MLOM
 		1137 0137  VIC 1380 Dual 40Gb Mezzanine
+		1137 014d  VIC 1385 Dual 40Gb PCIe
 	00cf  VIC Userspace NIC
 		1137 004f  VIC 1280 Mezzanine Userspace NIC
 		1137 0084  VIC 1240 MLOM Userspace NIC
@@ -15365,7 +15369,6 @@
 1412  VIA Technologies Inc.
 	1712  ICE1712 [Envy24] PCI Multi-Channel I/O Controller
 		1412 1712  Hoontech ST Audio DSP 24
-		1412 3632  M-Audio Delta Audiophile 192
 		1412 d630  M-Audio Delta 1010
 		1412 d631  M-Audio Delta DiO
 		1412 d632  M-Audio Delta 66
@@ -15390,6 +15393,7 @@
 		1412 1724  Albatron PX865PE 7.1
 		1412 3630  M-Audio Revolution 7.1
 		1412 3631  M-Audio Revolution 5.1
+		1412 3632  M-Audio Audiophile 192
 		153b 1145  Aureon 7.1 Space
 		153b 1147  Aureon 5.1 Sky
 		153b 1150  PHASE 22
@@ -16362,6 +16366,7 @@
 	1656  NetXtreme BCM5718 Gigabit Ethernet PCIe
 	1657  NetXtreme BCM5719 Gigabit Ethernet PCIe
 		103c 169d  Ethernet 1Gb 4-port 331FLR Adapter
+		103c 22be  Ethernet 1Gb 4-port 331i Adapter
 	1659  NetXtreme BCM5721 Gigabit Ethernet PCI Express
 		1014 02c6  eServer xSeries server mainboard
 		1028 01e6  PowerEdge 860
@@ -17535,6 +17540,7 @@
 	1007  MT27520 Family [ConnectX-3 Pro]
 		103c 22f3  InfiniBand FDR/Ethernet 10Gb/40Gb 2-port 544+QSFP Adapter
 		103c 22f4  InfiniBand FDR/Ethernet 10Gb/40Gb 2-port 544+FLR-QSFP Adapter
+		103c 801f  Ethernet 10G 2-port 546SFP+ Adapter
 		117c 0090  FastFrame NQ41
 		117c 0091  FastFrame NQ42
 		117c 0092  FastFrame NQ11
@@ -19564,6 +19570,8 @@
 1b85  OCZ Technology Group, Inc.
 	1041  RevoDrive 3 X2 PCI-Express SSD 240 GB (Marvell Controller)
 	8788  RevoDrive Hybrid
+1b94  Signatec / Dynamic Signals Corp
+	e400  PX14400 Dual Xilinx Virtex5 based Digitizer
 1b96  Western Digital
 1b9a  XAVi Technologies Corp.
 1bad  ReFLEX CES
@@ -22080,6 +22088,7 @@
 		8086 000d  Ethernet Controller X710 for 10GbE SFP+
 		8086 4005  Ethernet Controller XL710 for 10 Gigabit SFP+
 		8086 4006  Ethernet Controller X710 for 10GbE SFP+
+	1578  DSL6540 Thunderbolt [Alpine Ridge]
 	157b  I210 Gigabit Network Connection
 	157c  I210 Gigabit Backplane Connection
 	1580  Ethernet Controller XL710 for 40GbE backplane
@@ -22134,6 +22143,7 @@
 	15ac  Ethernet Connection X552 10 GbE SFP+
 	15ad  Ethernet Connection X552/X557-AT 10GBASE-T
 	15ae  Ethernet Connection X552 1000BASE-T
+	15b6  DSL6540 USB 3.1 Controller [Alpine Ridge]
 	15b7  Ethernet Connection (2) I219-LM
 	15b8  Ethernet Connection (2) I219-V
 	15b9  Ethernet Connection (3) I219-LM
@@ -26594,6 +26604,17 @@
 	9ce4  Wildcat Point-LP Serial IO UART Controller #1
 	9ce5  Wildcat Point-LP Serial IO GSPI Controller #0
 	9ce6  Wildcat Point-LP Serial IO GSPI Controller #1
+	9d03  Sunrise Point-LP SATA Controller [AHCI mode]
+	9d14  Sunrise Point-LP PCI Express Root Port #5
+	9d21  Sunrise Point-LP PMC
+	9d23  Sunrise Point-LP SMBus
+	9d27  Sunrise Point-LP LPSS UART #0
+	9d2d  Sunrise Point-LP Secure Digital IO Controller
+	9d2f  Sunrise Point-LP USB 3.0 xHCI Controller
+	9d31  Sunrise Point-LP Thermal subsystem
+	9d3a  Sunrise Point-LP CSME HECI #1
+	9d48  Sunrise Point-LP LPC Controller
+	9d70  Sunrise Point-LP HD Audio
 	a000  Atom Processor D4xx/D5xx/N4xx/N5xx DMI Bridge
 		1458 5000  GA-D525TUD
 		8086 4f4d  DeskTop Board D510MO
