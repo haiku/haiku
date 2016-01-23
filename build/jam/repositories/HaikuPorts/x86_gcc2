@@ -416,8 +416,8 @@ RemotePackageRepository HaikuPorts
 	postgresql_devel-9.3.5-2
 	psiconv-0.9.8-1
 	psiconv_devel-0.9.8-1
-	psqlodbc-09.03.0400-1
-	psqlodbc_devel-09.03.0400-1
+	psqlodbc-09.03.0400-2
+	psqlodbc_devel-09.03.0400-2
 	python-2.7.11-1
 	python_dateutil-1.5-2
 	python_imaging-1.1.7-2
