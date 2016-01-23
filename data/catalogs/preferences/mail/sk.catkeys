@@ -1,9 +1,10 @@
-1	slovak	x-vnd.Haiku-Mail	688530788
+1	slovak	x-vnd.Haiku-Mail	2750130554
 Settings	Config Window		Nastavenie
 Never	Config Window	show status window	Nikdy
 While sending and receiving	Config Window		Počas odosielania a prijímania
 Incoming	Config Window		Prichádzajúce
 Server name:	E-Mail		Názov servera:
+An error occurred while creating the config view: %error.	Config Views		Vyskytla sa chyba počas vytvárania zobrazenia len na čítanie: %error.
 OK	Config Window		OK
 E-mail address:	E-Mail		Emailová adresa:
 Account name:	E-Mail		Názov účtu:
@@ -18,8 +19,11 @@ Password:	E-Mail		Heslo:
 Accounts	Config Window		Účty
 Finish	AutoConfigWindow		Dokončiť
 Remove	Config Window		Odstrániť
+Create a new account with the Add button.\n\nRemove an account with the Remove button on the selected item.\n\nSelect an item in the list to change its settings.	Config Window		Vytvorte nový účet pomocou tlačidla Pridať.\n\nOdstráňte účet pomocou tlačidla Odstrániť na vybranej položke.\n\nVyberte položku v zozname ak chcete zmeniť jej nastavenie.
+Error!	Config Views		Chyba!
 Server Name:	E-Mail		Názov servera:
 While sending	Config Window		Počas odosielania
+Show notifications:	Config Window		Zobrazovať upozornenia:
 Enter a valid e-mail address.	AutoConfigWindow		Zadajte platnú emailovú adresu.
 Add	Config Window		Pridať
 Account settings	AutoConfigWindow		Nastavenie účtu

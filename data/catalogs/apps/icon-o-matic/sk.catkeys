@@ -1,4 +1,4 @@
-1	slovak	x-vnd.haiku-icon_o_matic	2373738110
+1	slovak	x-vnd.haiku-icon_o_matic	3554185674
 Select All	Icon-O-Matic-PathManipulator		Vybrať všetky
 Add Style	Icon-O-Matic-AddStylesCmd		Pridať štýl
 Color (#%02x%02x%02x)	Style name after dropping a color		Farba (#%02x%02x%02x)
@@ -42,6 +42,7 @@ Untitled	Icon-O-Matic-Main		Bez názvu
 Multi Set 	Multi Set (property name)		Multi množina 
 any of the other lists to	Empty property list - 2nd line		ľubovoľný z ostatných zoznamov na
 Save as…	Icon-O-Matic-Menu-File		Uložiť ako…
+Don't save	Icon-O-Matic-Menu-Settings		Neukladať
 Change Color	Icon-O-Matic-SetColorCmd		Zmeniť farbu
 Style	Icon-O-Matic-Menus		Štýl
 <modify path>	Icon-O-Matic-PathCmd		<zmeniť cestu>
@@ -66,16 +67,19 @@ HVIF Source Code	Icon-O-Matic-SavePanel		Zdrojový kód HVIF
 Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Obnoviť transformácie
 Settings	Icon-O-Matic-Menus		Nastavena
 All	Icon-O-Matic-Properties		Všetky
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Text, ktorý sa pokúšate importovať je dosť dlhý, ste si istý?
 Multi Paste Properties	Icon-O-Matic-Properties		Vlastnosti multi-vloženia
 Undo	Icon-O-Matic-Main		Vrátiť
 Click on a shape above	Empty transformers list - 1st line		Kliknite na tvar hore
 Add Shape	Icon-O-Matic-AddShapesCmd		Pridať tvar
 Contour	Transformation		Obrys
+Save changes to current icon before closing?	Icon-O-Matic-Menu-Settings		Uložiť zmeny v aktuálnej ikone pred zatvorením?
 <nothing to redo>	Icon-O-Matic-Menu-Edit		<niet čo opakovať>
 Perspective	Transformation		Perspektíva
 Move Transformer	Icon-O-Matic-MoveTransformersCmd		Transformátor pohybu
 Opacity	Icon-O-Matic-PropertyNames		Krytie
 Add with path	Icon-O-Matic-ShapesList		Pridať s cestou
+Export icon	Dialog title		Exportovať ikonu
 Gradient type	Icon-O-Matic-StyleTypes		Typ farebného prechodu
 Icon-O-Matic	System name		Icon-O-Matic
 Cancel	Icon-O-Matic-Menu-Settings		Zrušiť
@@ -183,9 +187,11 @@ Save	Icon-O-Matic-Menu-File		Uložiť
 Append…	Icon-O-Matic-Menu-File		Pripojiť…
 Move Path	Icon-O-Matic-MovePathsCmd		Presunúť cestu
 Overwrite	Icon-O-Matic-SVGExport		Prepísať
+Text too long	Icon-O-Matic-StyledTextImport		Text je príliš dlhý
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Zmraziť tvary
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Rozdeliť riadiaci bod
 Open…	Icon-O-Matic-Menu-File		Otvoriť…
+Save icon	Dialog title		Uložiť ikonu
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Farba (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Upraviť farebný prechod
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Vyčistiť cestu

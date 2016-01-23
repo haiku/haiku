@@ -1,6 +1,7 @@
-1	slovak	x-vnd.Haiku-JPEG2000Translator	547915409
+1	slovak	x-vnd.Haiku-JPEG2000Translator	3265915643
 Write	JPEG2000Translator		Zapísať
 JPEG2000 images	JPEG2000Translator		Obrázky JPEG2000
+Version %d.%d.%d	JPEG2000Translator		Verzia %d.%d.%d
 Output only codestream (.jpc)	JPEG2000Translator		Na výstup poslať iba kódový tok (.jpc)
 Write black-and-white images as RGB24	JPEG2000Translator		Zapísať čiernobiele obrázky ako RGB24
 Output quality	JPEG2000Translator		Kvalita výstupu

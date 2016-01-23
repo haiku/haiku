@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-LaunchBox	3016105370
+1	slovak	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Nový
 Set description…	LaunchBox		Nastaviť popis…
 Vertical layout	LaunchBox		Zvislé rozloženie
@@ -6,6 +6,7 @@ OK	LaunchBox		OK
 Pad 1	LaunchBox		Oblasť 1
 last chance	LaunchBox		posledná šanca
 Quit	LaunchBox		Ukončiť
+Open containing folder	LaunchBox		Otvoriť nadradený adresár
 Clear button	LaunchBox		Tlačidlo Vyčistiť
 LaunchBox	System name		Spúšťač
 Ignore double-click	LaunchBox		Ignorovať dvojité kliknutie

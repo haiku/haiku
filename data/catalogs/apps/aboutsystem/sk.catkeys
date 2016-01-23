@@ -1,10 +1,14 @@
-1	slovak	x-vnd.Haiku-About	2724473542
+1	slovak	x-vnd.Haiku-About	3251436090
 Copyright © 1999-2010 by the authors of Gutenprint. All rights reserved.	AboutView		Copyright © 1999-2010 autori Gutenprint. Všetky práva vyhradené.
+Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm and Werner Lemberg.	AboutView		Copyright © 1996-2002, 2006 David Turner, Robert Wilhelm a Werner Lemberg.
+Past website & marketing:\n	AboutView		Web a marketing v minulosti:\n
 Travis Geiselbrecht (and his NewOS kernel)\n	AboutView		Travis Geiselbrecht (a jeho jadro NewOS)\n
+Ralink (firmware)	AboutWindow		Ralink (firmvér)
 Copyright © 1996-2005 Julian R Seward. All rights reserved.	AboutView		Copyright © 1996-2005 Julian R Seward. Všetky práva vyhradené.
 %d MiB total	AboutView		%d MiB celkom
 Michael Phipps (project founder)\n\n	AboutView		Michael Phipps (zakladateľ projektu)\n\n
 %d MiB used (%d%%)	AboutView		%d MiB využitých (%d%%)
+Contains software from the GNU Project, released under the GPL and LGPL licenses:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.	AboutView		Obsahuje softvér z projektu GNU uvoľnený za podmienok licencií GPL alebo LGPL:\nGNU C Library, GNU coretools, diffutils, findutils, sharutils, gawk, bison, m4, make, wget, ncurses, termcap, Bourne Again Shell.\nCopyright © The Free Software Foundation.
 AboutSystem	System name		O systéme
 Copyright © 2003 Peter Hanappe and others.	AboutView		Copyright © 2003 Peter Hanappe a ďalší.
 Copyright © 1994-1997 Mark Kilgard. All rights reserved.	AboutView		Copyright © 1994-1997 Mark Kilgard. Všetky práva vyhradené.
@@ -13,21 +17,32 @@ Copyright © 2002-2005 Industrial Light & Magic, a division of Lucas Digital Ltd
 Be Inc. and its developer team, for having created BeOS!\n\n	AboutView		Be Inc. a jeho tímu vývojárov za vytvorenie BeOS!\n\n
 Copyright © 1999-2000 Y.Takagi. All rights reserved.	AboutView		Copyright © 1999-2000 Y.Takagi. Všetky práva vyhradené.
 Source Code: 	AboutView		Zdrojový kód: 
+{0, plural, one{Processor:} other{# Processors:}}	AboutView	\"Processor:\" or \"2 Processors:\"	{0, plural, one{Procesor} few{# procesory} other{# procesorov}}:
 Kernel:	AboutView		Jadro:
+BSD (4-clause)	AboutWindow		BSD (4-bodová)
 The copyright to the Haiku code is property of Haiku, Inc. or of the respective authors where expressly noted in the source. Haiku® and the HAIKU logo® are registered trademarks of Haiku, Inc.\n\n	AboutView		Autorské práva ku kódu Haiku sú vlastníctvom Haiku, Inc. alebo príslušných autorov, kde sú výslovne uvedení v zdrojovom kóde. Haiku® a logo HAIKU® sú registrovanými ochrannými známkami Haiku, Inc.\n\n
+Marvell (firmware)	AboutWindow		Marvell (firmvér)
 Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nAll rights reserved.	AboutView		Copyright © 1987-1988 Digital Equipment Corporation, Maynard, Massachusetts.\nVšetky práva vyhradené.
+GNU LGPL v2	AboutWindow		GNU LGPL v2
+The HaikuPorts team\n	AboutView		Tím Haiku-Ports\n
 %total MiB total, %inaccessible MiB inaccessible	AboutView		%total MiB celkom, %inaccessible MiB neprístupných
+Intel (2xxx firmware)	AboutWindow		Intel (2xxx firmvér)
 Contributors:\n	AboutView		Prispievatelia:\n
 Unknown	AboutView		Neznáme
 Copyright © 2001-2003 Expat maintainers.	AboutView		Copyright © 2001-2003 správci Expat.
 Copyright © 1999-2006 Brian Paul. Mesa3D Project. All rights reserved.	AboutView		Copyright © 1999-2006 Brian Paul. Mesa3D Project. Všetky práva vyhradené.
 Copyright © 2002-2004 Vivek Mohan. All rights reserved.	AboutView		Copyright © 2002-2004 Vivek Mohan. Všetky práva vyhradené.
+Public Domain	AboutWindow		Voľné dielo
+Intel (firmware)	AboutWindow		Intel (firmvér)
+BSD (2-clause)	AboutWindow		BSD (2-bodová)
 %.2f GHz	AboutView		%.2f GHz
 Memory:	AboutView		Pamäť:
 Copyright © 1996-1997 Jeff Prosise. All rights reserved.	AboutView		Copyright © 1996-1997 Jeff Prosise. Všetky práva vyhradené.
 Copyright © 2006-2012 Kentaro Fukuchi	AboutView		Copyright © 2006-2012 Kentaro Fukuchi
 Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. This software is based in part on the work of the Independent JPEG Group.	AboutView		Copyright © 1994-2009, Thomas G. Lane, Guido Vollbeding. Tento softvér je sčasti zaločený na práci Independent JPEG Group.
 Past maintainers:\n	AboutView		Minulí vývojári:\n
+Contains software from the FreeBSD Project, released under the BSD license:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. All rights reserved.	AboutView		Obsahuje softvér z projektu FreeBSD, uvoľnený za podmienok licencie BSD:\nftpd, ping, telnet, telnetd, traceroute\nCopyright © 1994-2008 The FreeBSD Project. Všetky práva vyhradené.
+GNU GPL v3	AboutWindow		GNU GPL v3
 \n\nSpecial thanks to:\n	AboutView		\n\nŠpecialne poďakovanie:\n
 \n…and probably some more we forgot to mention (sorry!)\n\n	AboutView		\n… a zrejme mnoho ďalších, ktorých sme zabudli uviesť (prepáčte!)\n\n
 Licenses: 	AboutView		Licencie: 
@@ -40,21 +55,25 @@ Copyright © 2006-2007 Intel Corporation. All rights reserved.	AboutView		Copyri
 The code that is unique to Haiku, especially the kernel and all code that applications may link against, is distributed under the terms of the <MIT license>. Some system libraries contain third party code distributed under the <LGPL license>. You can find the copyrights to third party code below.\n\n	AboutView	<MIT license> and <LGPL license> aren't variables and can be translated. However, please, don't remove < and > as they're needed as placeholders for proper hypertext functionality.	Kód, ktorý je jedinečný pre Haiku, obzvlášť jadro a všetok kód, voči ktorému sa linkujú aplikácie je šírený za podmienok <MIT license>. Niektoré knižnice systému môžu obsahovať kód tretích strán, ktorý je šírený za podmienok<LGPL license>. Informácie o autorských právach ku kódu tretích strán si môžete prečítať nižšie.\n\n
 Time running:	AboutView		Čas behu:
 Contains software developed by the NetBSD Foundation, Inc. and its contributors:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. All rights reserved.	AboutView		Obsahuje softvér, ktorý vyvinula NetBSD Foundation, Inc. a jej prispievatelia:\nftp, tput\nCopyright © 1996-2008 The NetBSD Foundation, Inc. Všetky práva vyhradené.
+GNU GPL v2	AboutWindow		GNU GPL v2
 Google and their Google Summer of Code and Google Code In programs\n	AboutView		Google a ich programy Google Summer of Code a Google Code-in
 The Haikuware team and their bounty program\n	AboutView		Tím Haikuware a ich program odmien\n
 Copyright © 1995, 1998-2001 Jef Poskanzer. All rights reserved.	AboutView		Copyright © 1995, 1998-2001 Jef Poskanzer. Všetky práva vyhradené.
 Copyright © 2010-2011 Google Inc. All rights reserved.	AboutView		Copyright © 2010-2011 Google Inc. Všetky práva vyhradené.
+Website & marketing:\n	AboutView		Web a marketing:\n
 About this system	AboutWindow		O tomto systéme
 Version:	AboutView		Verzia:
 Copyright © 1994-2008 Xiph.Org. All rights reserved.	AboutView		Copyright © 1994-2008 Xiph.Org. Všetky práva vyhradené.
 Copyright © 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper.	AboutView		Copyright © 1998-2000 Thai Open Source Software Center Ltd a Clark Cooper.
 Copyright © 2004-2005 Intel Corporation. All rights reserved.	AboutView		Copyright © 2004-2005 Intel Corporation. Všetky práva vyhradené.
 Copyright © 2002-2006 Maxim Shemanarev (McSeem).	AboutView		Copyright © 2002-2006 Maxim Shemanarev (McSeem).
+Copyright © 2000-2014 Fabrice Bellard, et al.	AboutView		Copyright © 2000-2014 Fabrice Bellard, et al.
 Copyright © 1999-2007 Michael C. Ring. All rights reserved.	AboutView		Copyright © 1999-2007 Michael C. Ring. Všetky práva vyhradené.
 The BeGeistert team\n	AboutView		Tím BeGeistert\n
 The University of Auckland and Christof Lutteroth\n\n	AboutView		University of Auckland a Christof Lutteroth\n\n
 Copyright © 1990-2003 Wada Laboratory, the University of Tokyo.	AboutView		Copyright © 1990-2003 Wada Laboratory, University of Tokyo.
 Copyright © 1995-2001 Lars Düning. All rights reserved.	AboutView		Copyright © 1995-2001 Lars Düning. Všetky práva vyhradené.
+GNU LGPL v2.1	AboutWindow		GNU LGPL v2.1
 Copyright © 2003-2006 Intel Corporation. All rights reserved.	AboutView		Copyright © 2003-2006 Intel Corporation. Všetky práva vyhradené.
 %ld MHz	AboutView		%ld MHz
 Copyright © 1997-2006 PDFlib GmbH and Thomas Merz. All rights reserved.\nPDFlib and PDFlib logo are registered trademarks of PDFlib GmbH.	AboutView		Copyright © 1997-2006 PDFlib GmbH a Thomas Merz. Všetky práva vyhradené.\nPDFlib a logo PDFlib sú registrované ochranné známky PDFlib GmbH.
@@ -63,6 +82,7 @@ Copyright © 1991-2000 Silicon Graphics, Inc. All rights reserved.	AboutView		Co
 MIT license. All rights reserved.	AboutView		Licencia MIT. Všetky práva vyhradené.
 [Click a license name to read the respective license.]\n\n	AboutView		[Kliknite na názov licencie a prečítajte si príslušnú licenciu.]\n\n
 Copyright © 2007 Ralink Technology Corporation. All rights reserved.	AboutView		Copyright © 2007 Ralink Technology Corporation. Všetky práva vyhradené.
+BSD (3-clause)	AboutWindow		BSD (3-bodová)
 Copyright © 1990-2002 Info-ZIP. All rights reserved.	AboutView		Copyright © 1990-2002 Info-ZIP. Všetky práva vyhradené.
 License: 	AboutView		Licencia: 
 2001 by Andy Ritger based on the Generalized Timing Formula	AboutView		2001, Andy Ritger, založené na Zovšeobecnenom časovacom vzorci

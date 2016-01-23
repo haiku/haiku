@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-BluetoothPrefs	1628593228
+1	slovak	x-vnd.Haiku-BluetoothPrefs	3212620536
 About Bluetooth…	Window		O aplikácii Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Predvolený čas zisťovania:
@@ -55,6 +55,7 @@ Always ask	Settings view		Vždy sa pýtať
 Retrieving name of %1	Inquiry panel		Zisťuje sa názov %1
 Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Zistiť, či sú schopnosti Bluetooth vášho vzdialeného zariadenia aktivované. Stlačením „Zistenie“ spustíte hľadanie. Potrebný čas na zistenie názvov nie je známy, ale nemal by byť dlhší ako 3 sekundy na zariadenie. Potom ich budete môcť pridať do svojho hlavného zoznamu, kde sa s nimi budete môcť spárovať.
 Authenticate	Extended local device view		Autentifikovať
+Pick device...	Settings view		Vybrať zariadenie...
 Retrieving names...	Inquiry panel		Získavajú sa názvy...
 Help	Window		Pomoc
 Add…	Remote devices		Pridať…

@@ -1,0 +1,10 @@
+1	slovak	x-vnd.Haiku-DNSClientService	2825577357
+DNS settings	DNSClientServiceAddOn		Nastavenie DNS
+Move down	DNSSettingsView		Presunúť dolu
+DNS settings	DNSSettingsView		Nastavenie DNS
+Remove	DNSSettingsView		Odstrániť
+Domain:	DNSSettingsView		Doména:
+Add	DNSSettingsView		Pridať
+Server:	DNSSettingsView		Server:
+Move up	DNSSettingsView		Presunúť hore
+Apply	DNSSettingsView		Použiť

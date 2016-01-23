@@ -1,5 +1,7 @@
-1	slovak	x-vnd.Haiku-DiskUsage	4268917316
+1	slovak	x-vnd.Haiku-DiskUsage	2951688400
+%size% in {0, plural, one{# file} other{# files}}	Info Window		%size% v {0, plural, one{# súbore} other{# súboroch}}
 Scanning %refName%	Scanner		Prehľadáva sa %refName%
+%d files	Status View	For UI layouting only, use the longest plural form for your language	%d súborov
 Size	Info Window		Veľkosť
 Rescan	Pie View		Znovu preskúmať
 Kind	Info Window		Druh
@@ -16,5 +18,6 @@ Modified	Info Window		Zmenené
 Abort	Status View		Zrušiť
 Open with	Pie View		Otvoriť pomocou
 Open	Pie View		Otvoriť
+{0, plural, one{# file} other{# files}}	Status View		{0, plural, one{# súbor} few{# súbory} other{# súborov}}
 %a, %d %b %Y, %r	Info Window		%a, %d %b %Y, %r
 Free on %refName%	Scanner		Voľné na %refName%

@@ -1,4 +1,5 @@
-1	slovak	x-vnd.Haiku-Installer	528139900
+1	slovak	x-vnd.Haiku-Installer	3421507633
+Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Správcu zavádzania, aplikáciu na nastavenie zavádzacieho menu Haku, sa nepodarilo spustiť.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Ste si istí, že chcete zrušiť inštaláciu a reštartovať systém?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Inštalátor\n\tnapísal Jérôme Duval a Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
 \t}\n\n	InstallerApp		\t}\n\n
@@ -16,12 +17,15 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		Ukončiť Správcu zavádzania
 Stop	InstallerWindow		Zastaviť
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Ak vám prístup založený na os-prober nevyhovuje, GRUB 2 používa ďalší konfiguračný súbor na pridanie vlastných položiek do zavádzacieho menu. Ak ich chcete pridať na vrch menu, musíte vytvoriť/upraviť súbor spustením vášho obľúbeného editora z terminálu, takto:\n\n
 OK	InstallerApp		OK
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		Zvoľte zdrojový a cieľový disk z roletových menu. Potom kliknite na „Začať“.
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku na /dev/sda7\n
+Failed to launch Boot Manager	InstallerWindow		Nepodarilo sa spustiť Správcu zavádzania
 Install from:	InstallerWindow		Inštalovať z:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld z %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		DÔLEŽITÉ INFORMÁCIE PRED INŠTALÁCIOU HAIKU\n\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		Konvencia pomenovania oblastí v GRUB je: (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Pokračovať
 Write boot sector to '%s'	InstallerWindow		Zapísať zavádzací sektor na „%s“
 Collecting copy information.	InstallProgress		Zhromažďujú sa informácie o kopírovaní.
@@ -42,6 +46,7 @@ README	InstallerApp		README
 The destination disk may not have enough space. Try choosing a different disk or choose to not install optional items.	InstallProgress		Cieľový disk nemusí mať dostatok miesta. Skúste zvoliť iný disk alebo zvoľte neinštalovať voliteľné položky.
 Please close the Boot Manager and DriveSetup windows before closing the Installer window.	InstallerWindow		Prosím, zatvorte okná Správcu zavádzania a Nastavenie diskových oblastí predtým, než zatvoríte okno Inštalátora.
 Scanning for disks…	InstallerWindow		Zisťujú sa disky…
+2.2) GRUB 2\n	InstallerApp		2.2) GRUB 2\n
 The disk can't be mounted. Please choose a different disk.	InstallProgress		Disk nie je možné pripojiť. Prosím, zvoľte iný disk.
 ?? of ??	InstallerWindow	Unknown progress	?? z ??
 \tmenuentry \"Haiku Alpha\" {\n	InstallerApp		\tmenuentry \"Haiku Alpha\" {\n
@@ -86,6 +91,7 @@ With GRUB 2 the first logical partition always has the number \"5\", regardless 
 Write boot sector	InstallerWindow		Zapísať zavádzací sektor
 Cancel	InstallerWindow		Zrušiť
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Nastavenie diskových oblastí, aplikáciu na konfiguráciu diskových oblastí, nebolo možné spustiť.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Cieľový zväzok nie je prázdny. Ste si istý, že napriek tomu chcete pokračovať v inštalácii?\n\nPozn.: Priečinok „system“ bude čistou kópiou zo zdrojového zväzku, ale zachová si priečinok nastavení, všetky ostatné priečinky budú zlúčené, zatiaľ čo súbory a odkazy existujúce zároveň na zdrojovom aj cieľovom zväzku budú prepísané verziou zo zdrojového zväzku.
 No optional packages available.	PackagesView		Nie sú dostupné žiadne voliteľné balíky.
 All hard disks start with \"hd\".\n	InstallerApp		Všetky pevné disky začínajú „hd“.\n
 Continue	InstallerApp		Pokračovať

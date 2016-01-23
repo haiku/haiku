@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Shortcuts	1755582132
+1	slovak	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		OK
 Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Aplikácia Skratky nedokázala uložiť vašu sadu kláves.
 Cancel	ShortcutsWindow		Zrušiť
@@ -6,6 +6,7 @@ Append KeySet…	ShortcutsWindow		Pridať SaduKláves…
 Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
 Key	ShortcutsWindow		Kláves
 Open KeySet…	ShortcutsWindow		Otvoriť SaduKláves…
+Error, NULL state description?	ShortcutsSpec		Chyba, NULL popis stavu?
 Revert to saved	ShortcutsWindow		Vrátiť spať uložené
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*VložiťReťazec \"Váš text sem\"
@@ -14,9 +15,11 @@ Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *LaunchHandler text/html	ShortcutsWindow		*SpustiťObsluhu text/html
 Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Aplikácia Skratky nedokázala otvoriť váš súbor SadaKláves!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Multi \"*PresunúťMyšNa 100% 0\" \"*TlačidloMyši 1\"
+Option	ShortcutsSpec	Name for modifier on keyboard	Možnosť
 Save	ShortcutsWindow		Uložiť
 *MouseButton 1	ShortcutsWindow		*TlačidloMyši 1
 *MoveMouse +20 +0	ShortcutsWindow		*PresunúťMyš +20 +0
+Save changes before closing?	ShortcutsWindow		Uložiť zmeny pred ukončením?
 Remove selected shortcut	ShortcutsWindow		Odstrániť vybranú skratku
 Add new shortcut	ShortcutsWindow		Prodať novú skratku
 Save & apply	ShortcutsWindow		Uložiť a použiť

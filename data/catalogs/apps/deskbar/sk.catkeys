@@ -1,16 +1,19 @@
-1	slovak	x-vnd.Be-TSKB	1363745697
+1	slovak	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Vypnúť
+Sort applications by name	PreferencesWindow		Zoradiť aplikácie podľa názvu
 Suspend	DeskbarMenu		Režim spánku
 Hide clock	TimeView		Skryť hodiny
 Applications	PreferencesWindow		Aplikácie
 Time preferences…	TimeView		Nastavenia času…
 About Haiku	DeskbarMenu		O Haiku
+Edit in Tracker…	PreferencesWindow		Upraviť v Trackeri…
 Recent documents:	PreferencesWindow		Nedávne dokumenty:
 Recent applications	DeskbarMenu		Nedávne aplikácie
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Aplikácie
 Find…	DeskbarMenu		Nájsť…
 Show clock	Tray		Zobraziť hodiny
 Window	PreferencesWindow		Okno
+Defaults	PreferencesWindow		Predvolené
 Menu	PreferencesWindow		Menu
 Recent documents	DeskbarMenu		Nedávne dokumenty
 Auto-hide	PreferencesWindow		Automaticky skrývať
@@ -27,6 +30,7 @@ Show application expander	PreferencesWindow		Zobraziť výsuvný zoznam aplikác
 Close all	WindowMenu		Zatvoriť všetky
 Deskbar preferences	PreferencesWindow		Nastavenia Panelu
 Mount	DeskbarMenu		Pripojiť
+Revert	PreferencesWindow		Vrátiť späť
 Small	PreferencesWindow		Malé
 Recent applications:	PreferencesWindow		Nedávne aplikácie:
 Shutdown…	DeskbarMenu		Vypnúť…

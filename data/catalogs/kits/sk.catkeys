@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libbe	3805079751
+1	slovak	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -12,11 +12,16 @@ Copy	TextView		Kopírovať
 alpha	AboutWindow		alfa
 Error	PrintJob		Chyba
 All Rights Reserved.	AboutWindow		Všetky práva vyhradené.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# bajt} few{# bajty} other{# bajtov}}
+About %app%	AboutWindow		O aplikácii %app%
+No pages to print!	PrintJob		Nie je čo tlačiť!
 OK	Dragger		OK
 OK	PrintJob		OK
 Green:	ColorControl		Zelená:
 Version history:	AboutWindow		História verzií:
 Remove replicant	Dragger		Odstrániť replikanta
+Select all	TextView		Vybrať všetko
+OK	AboutWindow		OK
 OK	ZombieReplicantView		OK
 Print Server is not responding.	PrintJob		Tlačový server neodpovedá.
 Paste	TextView		Vložiť

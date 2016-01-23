@@ -1,5 +1,7 @@
-1	slovak	x-vnd.Haiku-MatchHeader	1349121828
+1	slovak	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<Vyberte operáciu>
+Header field (e.g. Subject, From, ...)	ConfigView		Pole hlavičky (napr. Predmet, Od, ...)
+Account	ConfigView		Účet
 has	ConfigView		má
 Move to	ConfigView		Presunúť do
 Then	ConfigView		potom
@@ -8,5 +10,8 @@ Delete message	ConfigView		Zmazať správu
 <Choose account>	ConfigView		<Vyberte účet>
 Set flags to	ConfigView		Nastaviť príznaky na
 Set as read	ConfigView		Nastaviť ako prečítané
+Match header	RuleFilter		Zhoda hlavičky
 Reply with	ConfigView		Odpovedať pomocou
 If	ConfigView		ak
+Match \"%attribute\" against \"%regex\"	RuleFilter		Zhoda \"%attribute\" voči \"%regex\"
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Hodnota so zástupnými znakmi ako napr. „*spam*“.\nPoužite predponu „REGEX:“ ak chcete použiť regulárny výraz.

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaPlayer	2390862402
+1	slovak	x-vnd.Haiku-MediaPlayer	3805057997
 raw audio	MediaPlayer-InfoWin		nespracovaný zvuk
 Location	MediaPlayer-InfoWin		Umiestnenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (americký)
@@ -20,10 +20,12 @@ Subtitle placement:	MediaPlayer-SettingsWindow		Umiestnenie titulkov:
 Close	MediaPlayer-Main		Zatvoriť
 Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Niektoré súbory nebolo možné presunúť do Koša.
 <unknown>	MediaPlayer-InfoWin		<neznámy>
+Seek	MediaPlayer-Main		Posunúť
 Open	MediaPlayer-Main		Otvoriť
 Next	MediaPlayer-Main		Ďalší
 OK	MediaPlayer-SettingsWindow		OK
 Track %d	MediaPlayer-Main		Stopa %d
+Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Zistí/nastaví aktuálnu pozíciu prehrávania v mikrosekundách.
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Zobrazovací režim
 Medium	MediaPlayer-SettingsWindow		Stredná
@@ -66,6 +68,7 @@ Select all	MediaPlayer-PlaylistWindow		Vybrať všetky
 Move Entry	MediaPlayer-MovePLItemsCmd		Presunúť položku
 Open	MediaPlayer-PlaylistWindow		Otvoriť
 Stop playing.	MediaPlayer-Main		Zastaviť prehrávanie.
+Seek by the specified amounts of microseconds.	MediaPlayer-Main		Posunie o zadaný počet mikrosekúnd.
 The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Súbor „%filename“ nebolo možné otvoriť.\n\n
 Error: 	MediaPlayer-RemovePLItemsCmd		Chyba: 
 Audio	MediaPlayer-InfoWin		Zvuk
@@ -88,6 +91,7 @@ Automatically start playing	MediaPlayer-SettingsWindow		Automaticky spustiť pre
 Track	Video Track Menu		Stopa
 Internal error (locking failed). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vnútorná chyba (zamykanie zlyhalo). Ukladanie zoznamu stôp zlyhalo.
 View options	MediaPlayer-SettingsWindow		Možnosti zobrazenia
+none	MediaPlayer-Main		žiadne
 Play mode	MediaPlayer-SettingsWindow		Režim prehrávania
 Remove Entries	MediaPlayer-RemovePLItemsCmd		Odstrániť položky
 Video track	MediaPlayer-Main		Video stopa
@@ -97,6 +101,7 @@ All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Nie všet
 <untitled>	PlaylistItem-title		<bez názvu>
 Track	Audio Track Menu		Stopa
 unknown format	MediaPlayer-InfoWin		neznámy formát
+Position	MediaPlayer-Main		Pozícia
 <nothing to redo>	MediaPlayer-PlaylistWindow		<niet čo opakovať>
 Skip to the next track.	MediaPlayer-Main		Preskočiť na ďalšiu stopu.
 Play	MediaPlayer-Main		Prehrať
@@ -109,12 +114,14 @@ Error: 	MediaPlayer-Main		Chyba:
 Large	MediaPlayer-SettingsWindow		Veľká
 Bottom of video	MediaPlayer-SettingsWindow		Spodok videa
 DrawBitmap	MediaPlayer-InfoWin		Nakresliť bitmapu
+Total duration: %s	MediaPlayer-PlaylistWindow		Celkové trvanie: %s
 Stop	MediaPlayer-Main		Zastaviť
 <unnamed media>	MediaPlayer-InfoWin		<médium bez názvu>
 raw video	MediaPlayer-InfoWin		nespracované video
 Volume of background clips	MediaPlayer-SettingsWindow		Hlasitosť klipov na pozadí
 Internal error (out of memory). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Vnútorná chyba (nedostatok pamäte). Ukladanie zoznamu stôp zlyhalo.
 Hide interface	MediaPlayer-Main		Skryť rozhranie
+Open clips	MediaPlayer-Main		Otvoriť klipy
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopírovať položku
 none	Subtitles menu		žiadne
 Move file to Trash	MediaPlayer-PlaylistWindow		Presunúť súbor do Koša
@@ -131,11 +138,14 @@ Edit	MediaPlayer-PlaylistWindow		Upraviť
 Start media server	MediaPlayer-Main		Spustiť multimediálny server
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Prepnúť celoobrazovkový režim.
+Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Získa trvanie aktuálne prehrávanej položky v mikrosekundách.
 ToggleFullscreen	MediaPlayer-Main		Prepnúť celoobrazovkový režim
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# kanálov}}
 <unnamed>	PlaylistItem-name		<bez názvu>
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		žiadne
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Zistí/nastaví hlasitosť (0.0-2.0).
+Duration	MediaPlayer-Main		Trvanie
 Playlist…	MediaPlayer-Main		Zoznam stôp…
 <unknown>	PlaylistItem-author		<neznámy>
 Save as…	MediaPlayer-PlaylistWindow		Uložiť ako…

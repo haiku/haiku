@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Sudoku	2463385585
+1	slovak	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Obnoviť snímku
 Could not set Sudoku:\n%s\n	SudokuWindow		Nepodarilo sa nastaviť Sudoku:\n%s\n
 Export as…	SudokuWindow		Exportovať ako…
@@ -26,6 +26,7 @@ Text	SudokuWindow		Text
 Creating solvable field	SudokuGenerator		Vytvára sa vyriešiteľné pole
 View	SudokuWindow		Zobraziť
 Progress monitor	ProgressWindow		Monitor priebehu
+Set all hints	SudokuWindow		Nastaviť všetky rady
 Mark invalid values	SudokuWindow		Označiť neplatné hodnoty
 Blank	SudokuWindow		Prázdne
 Help	SudokuWindow		Pomoc

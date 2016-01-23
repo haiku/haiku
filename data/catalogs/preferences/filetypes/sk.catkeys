@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-FileTypes	4042259532
+1	slovak	x-vnd.Haiku-FileTypes	734679611
 Application types…	FileTypes Window		Typy aplikácií…
 Description:	Application Types Window		Popis:
 Args only	Application Type Window		Iba argumenty
@@ -49,7 +49,10 @@ Group name:	New File Type Window		Názov skupiny:
 Preferred application	FileType Window		Preferovaná aplikácia
 Progress	Application Types Window		Priebeh
 Set preferred application	Preferred App Menu		Nastaviť preferovanú aplikáciu
+Don't save	Application Type Window		Neukladať
+Save changes before closing?	Application Type Window		Uložiť zmeny pred ukončením?
 File	Application Type Window		Súbor
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# typ} few{# typy} other{# typov}} aplikácie nebolo možné odstrániť
 Version:	Application Type Window		Verzia:
 Select…	FileTypes Window		Vybrať…
 FileTypes request	FileTypes		Požiadavka Typy súborov

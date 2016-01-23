@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-JPEGTranslator	965709535
+1	slovak	x-vnd.Haiku-JPEGTranslator	3788699631
 Output quality	JPEGTranslator		Kvalita výstupu
 JPEG images	JPEGTranslator		Obrázky JPEG
 Prevent colors 'washing out'	JPEGTranslator		Zabrániť „vyblednutiu“ farieb
@@ -15,6 +15,7 @@ Output smoothing strength	JPEGTranslator		Sila vyhladzovania výstupu
 High	JPEGTranslator		Vysoká
 Write	JPEGTranslator		Zapísať
 Write black-and-white images as RGB24	JPEGTranslator		Zapísať čiernobiele obrázky ako RGB24
+Version %d.%d.%d	JPEGTranslator		Verzia %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		Čítať čiernobiele obrázky ako RGB32
 Read	JPEGTranslator		Čítať
 JPEG Library Warning: %s\n	be_jerror		Upozornenie knižnice JPEG: %s\n

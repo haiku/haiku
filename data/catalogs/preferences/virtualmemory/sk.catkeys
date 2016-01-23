@@ -1,5 +1,6 @@
-1	slovak	x-vnd.Haiku-VirtualMemory	4238590117
+1	slovak	x-vnd.Haiku-VirtualMemory	2090796060
 Quit	SettingsWindow		Ukončiť
+Automatic swap management	SettingsWindow		Automatická správa odkladacieho priestoru
 Turn off	SettingsWindow		Vypnúť
 Disabling virtual memory will have unwanted effects on system stability once the memory is used up.\nVirtual memory does not affect system performance until this point is reached.\n\nAre you really sure you want to turn it off?	SettingsWindow		Vypnutie virtuálnej pamäte bude mať nežiadúce účinky na stabilitu systému v prípade vyčerpania pamäte.\nVirtuálna pamäť nemá vplyv na výkon systému pred dosiahnutím tohto stavu.\n\nSte si naozaj istí, že ju chcete vypnúť?
 Requested swap file size:	SettingsWindow		Požadovaná veľkosť odkladacieho súboru:

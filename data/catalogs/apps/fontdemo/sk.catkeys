@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-FontDemo	1300625863
+1	slovak	x-vnd.Haiku-FontDemo	3522850500
 Outline:	ControlView		Obrys:
 Size: 50	ControlView		Veľkosť: 50
 Stop cycling	ControlView		Zastaviť opakovanie
@@ -14,6 +14,7 @@ Rotation: 0	ControlView		Otočenie: 0
 Drawing mode:	ControlView		Režim kreslenia:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Ovládacie prvky
+FontDemo	System name		Demo Písiem
 Outline: %d	ControlView		Obrys: %d
 Text:	ControlView		Text:
 Antialiased text	ControlView		Antialiasovaný text

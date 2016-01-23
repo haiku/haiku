@@ -1,5 +1,7 @@
-1	german	x-vnd.Haiku-MatchHeader	4262558281
+1	german	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<Aktion wählen>
+Header field (e.g. Subject, From, ...)	ConfigView		Kopfdaten (z.B. Betreff, Ansender, ...)
+Account	ConfigView		Email-Konto
 has	ConfigView		enthält
 Move to	ConfigView		Verschieben nach
 Then	ConfigView		Dann
@@ -12,3 +14,4 @@ Match header	RuleFilter		Kopfdaten filtern
 Reply with	ConfigView		Antworten von Konto
 If	ConfigView		Wenn
 Match \"%attribute\" against \"%regex\"	RuleFilter		\"%attribute\" mit \"%regex\" vergleichen
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Platzhalter wie \"*spam*\".\nFür reguläre Audrücke \"REGEX:\" voranstellen.

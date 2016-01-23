@@ -1,10 +1,12 @@
-1	slovak	x-vnd.Haiku-ActivityMonitor	234995750
+1	slovak	x-vnd.Haiku-ActivityMonitor	2455521641
 P-faults	DataSource		P-fault
 Media nodes	DataSource		Mediálne uzly
 Threads	DataSource		Vlákna
+Always on top	ActivityWindow		Vždy na vrchu
 Add graph	ActivityWindow		Pridať graf
 Teams	DataSource		Tímy
 Hide legend	ActivityView		Skryť legendu
+MiB	DataSource		MiB
 Network send	DataSource		Sieť - odoslané
 CPU usage (combined)	DataSource		Využitie CPU (kombinované)
 CPU	DataSource		CPU
@@ -31,6 +33,7 @@ Remove graph	ActivityView		Odstrániť graf
 CPU usage	DataSource		Využitie CPU
 Raw clipboard	DataSource		Schránka bez formátu
 Sems	DataSource		Semafory
+%.1f MiB	DataSource		%.1f MiB
 ActivityMonitor	System name		Monitor aktivity
 Running applications	DataSource		Bežiace aplikácie
 Semaphores	DataSource		Semafory
