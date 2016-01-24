@@ -593,14 +593,14 @@ BBox::DoLayout()
 
 	// layout the child
 	BView* child = _Child();
-	if (child) {
+	if (child != NULL) {
 		BRect frame(Bounds());
 		frame.left += fLayoutData->insets.left;
 		frame.top += fLayoutData->insets.top;
 		frame.right -= fLayoutData->insets.right;
 		frame.bottom -= fLayoutData->insets.bottom;
 
-		if (child->Flags() & B_SUPPORTS_LAYOUT)
+		if ((child->Flags() & B_SUPPORTS_LAYOUT) != 0)
 			BLayoutUtils::AlignInFrame(child, frame);
 		else
 			child->MoveTo(frame.LeftTop());
