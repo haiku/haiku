@@ -284,9 +284,6 @@ NotificationView::Draw(BRect updateRect)
 		DrawString(l->text.String(), l->text.Length(), l->location);
 	}
 
-	rgb_color detailCol = ui_color(B_CONTROL_BORDER_COLOR);
-	detailCol = tint_color(detailCol, B_LIGHTEN_2_TINT);
-
 	AppGroupView* groupView = dynamic_cast<AppGroupView*>(Parent());
 	if (groupView != NULL && groupView->ChildrenCount() > 1)
 		_DrawCloseButton(updateRect);
