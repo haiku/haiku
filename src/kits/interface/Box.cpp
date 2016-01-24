@@ -592,14 +592,18 @@ BBox::DoLayout()
 		return;
 
 	// layout the child
-	if (BView* child = _Child()) {
+	BView* child = _Child();
+	if (child) {
 		BRect frame(Bounds());
 		frame.left += fLayoutData->insets.left;
 		frame.top += fLayoutData->insets.top;
 		frame.right -= fLayoutData->insets.right;
 		frame.bottom -= fLayoutData->insets.bottom;
 
-		BLayoutUtils::AlignInFrame(child, frame);
+		if (child->Flags() & B_SUPPORTS_LAYOUT)
+			BLayoutUtils::AlignInFrame(child, frame);
+		else
+			child->MoveTo(frame.LeftTop());
 	}
 }
 
@@ -855,7 +859,7 @@ BBox::_ValidateLayoutData()
 
 	// finally consider the child constraints, if we shall support layout
 	BView* child = _Child();
-	if (child && (Flags() & B_SUPPORTS_LAYOUT)) {
+	if (child && (child->Flags() & B_SUPPORTS_LAYOUT)) {
 		BSize min = child->MinSize();
 		BSize max = child->MaxSize();
 		BSize preferred = child->PreferredSize();
