@@ -746,9 +746,10 @@ namespace agg
     {
         if(m_cur_face)
         {
-            m_last_error = FT_Select_Charmap(m_cur_face, m_char_map);
+            m_last_error = FT_Select_Charmap(m_cur_face, char_map);
             if(m_last_error == 0)
             {
+                m_char_map = char_map;
                 update_signature();
                 return true;
             }
