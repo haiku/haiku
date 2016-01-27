@@ -687,6 +687,14 @@ ListCommand::HandleUntagged(Response& response)
 		&& response.IsStringAt(3)) {
 		fSeparator = response.StringAt(2);
 
+		if (response.IsListAt(1)) {
+			// We're not supposed to select \Noselect mailboxes,
+			// so we'll just hide them
+			ArgumentList& attributes = response.ListAt(1);
+			if (attributes.Contains("\\Noselect"))
+				return true;
+		}
+
 		BString folder = response.StringAt(3);
 		if (folder == "")
 			return true;
