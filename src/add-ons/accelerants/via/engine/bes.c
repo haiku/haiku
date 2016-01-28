@@ -440,7 +440,7 @@ static void eng_bes_program_move_overlay(move_overlay_info moi)
 		 *   the sourcebitmap even if only to generate a tiny subpixel from it!
 		 * - the engine uses byte format instead of pixel format;
 		 * - the engine uses 16 bytes, so 8 pixels granularity. */
-		//BESW(VID1_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
+		BESW(V3A_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
 
 		/* setup output window position */
 		BESW(VID3_HVSTART, ((moi.hcoordv & 0xffff0000) | ((moi.vcoordv & 0xffff0000) >> 16)));
@@ -488,7 +488,7 @@ status_t eng_bes_init()
 	{
 		if (si->ps.chip_rev < 0x10)
 		{
-			/* select colorspace setup for B_YCbCr422 */
+			/* setup brightness, contrast and saturation to be 'neutral' */
 			BESW(VID1_COLSPAC1, 0x140020f2);
 			BESW(VID1_COLSPAC2, 0x0a0a2c00);
 			/* fifo depth is $20 (b0-5), threshold $10 (b8-13), prethreshold $1d (b24-29) */
@@ -496,7 +496,7 @@ status_t eng_bes_init()
 		}
 		else
 		{
-			/* select colorspace setup for B_YCbCr422 */
+			/* setup brightness, contrast and saturation to be 'neutral' */
 			BESW(VID1_COLSPAC1, 0x13000ded);
 			BESW(VID1_COLSPAC2, 0x13171000);
 			/* fifo depth is $40 (b0-5), threshold $38 (b8-13), prethreshold $38 (b24-29) */
@@ -505,22 +505,15 @@ status_t eng_bes_init()
 	}
 	else
 	{
-		/* select colorspace setup for B_YCbCr422 */
-		BESW(VID3_COLSPAC1, 0x140020f2);
-		BESW(VID3_COLSPAC2, 0x0a0a2c00);
-		/* fifo depth is $20 (b0-5), threshold $10 (b8-13), prethreshold $1d (b24-29) */
-		//BESW(VID1_FIFO, 0x1d00101f);
-	}
-
-		/* disable overlay ints (b0 = buffer 0, b4 = buffer 1) */
-//		BESW(NV04_INTE, 0x00000000);
-		/* shut off GeForce4MX MPEG2 decoder */
-//		BESW(DEC_GENCTRL, 0x00000000);
-		/* setup BES memory-range mask */
-//		BESW(NV10_0MEMMASK, (si->ps.memory_size - 1));
 		/* setup brightness, contrast and saturation to be 'neutral' */
-//		BESW(NV10_0BRICON, ((0x1000 << 16) | 0x1000));
-//		BESW(NV10_0SAT, ((0x0000 << 16) | 0x1000));
+		BESW(VID3_COLSPAC1, 0x13000ded);
+		BESW(VID3_COLSPAC2, 0x13171000);
+
+		/* fifo prethreshold 60 (b0-6) */
+		BESW(V3A_PREFIFO, (60 & 0x7f));
+		/* fifo depth-1 is 63 (b0-7), threshold 60 (b8-15) */
+		BESW(V3A_FIFO, ((63 & 0xff) | ((60 & 0xff) << 8)));
+	}
 
 	return B_OK;
 }
@@ -634,7 +627,6 @@ status_t eng_configure_bes
 	LOG(4,("Overlay: horizontal scaling factor is %f\n", (float)65536 / ifactor));
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	/* all cards have a upscaling limit of 8.0 (see official nVidia specsheets) */
 	//fixme: checkout...
 	if (hiscalv < 0x00002000)
 	{
@@ -740,7 +732,6 @@ status_t eng_configure_bes
 	si->overlay.v_ifactor = ifactor;
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	/* all cards have a upscaling limit of 8.0 (see official nVidia specsheets) */
 	//fixme: checkout...
 	if (viscalv < 0x00002000)
 	{
@@ -921,7 +912,7 @@ status_t eng_configure_bes
 		 *   the sourcebitmap even if only to generate a tiny subpixel from it!
 		 * - the engine uses byte format instead of pixel format;
 		 * - the engine uses 16 bytes, so 8 pixels granularity. */
-		//BESW(VID1_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
+		BESW(V3A_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
 
 		/* enable horizontal filtering if asked for */
 		if (ow->flags & B_OVERLAY_HORIZONTAL_FILTERING)
@@ -939,8 +930,8 @@ status_t eng_configure_bes
 		/* and program horizontal and vertical 'prescaling' for downscaling */
 		BESW(VID3_MINI_CTL, minictrl);
 
-		/* setup buffersize */
-		BESW(V3_SRC_WIDTH, ((ob->height << 16) | (ob->width))); //fixme >>>!<<< height??
+		/* setup buffersize (V3 does not need ob->height(?)) */
+		BESW(V3_SRC_WIDTH, (ob->width));
 
 		/* setup buffer source pitch including slopspace (in bytes) */
 		BESW(VID3_STRIDE, (ob->width * 2));
