@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.01.20
-#	Date:    2016-01-20 03:15:01
+#	Version: 2016.01.28
+#	Date:    2016-01-28 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10609,9 +10609,12 @@
 		1025 0813  Aspire R7-571
 		103c 194e  ProBook 455 G1 Notebook
 		103c 1985  Pavilion 17-e163sg Notebook PC
+	522a  RTS522A PCI Express Card Reader
 	5249  RTS5249 PCI Express Card Reader
 		103c 1909  ZBook 15
+	524a  RTS524A PCI Express Card Reader
 	5250  RTS5250 PCI Express Card Reader
+	525a  RTS525A PCI Express Card Reader
 	5286  RTS5286 PCI Express Card Reader
 	5288  RTS5288 PCI Express Card Reader
 	5289  RTL8411 PCI Express Card Reader
@@ -12179,6 +12182,7 @@
 		1137 012c  VIC 1340 Dual 40Gb MLOM
 		1137 012e  VIC 1227 Dual 10Gb SFP+ PCIe
 		1137 0137  VIC 1380 Dual 40Gb Mezzanine
+		1137 014d  VIC 1385 Dual 40Gb PCIe
 	0041  VIC PCIe Downstream Port
 	0042  VIC Management Controller
 		1137 0047  VIC P81E PCIe Management Controller
@@ -15950,6 +15954,7 @@
 144d  Samsung Electronics Co Ltd
 	1600  Apple PCIe SSD
 	a800  XP941 PCIe SSD
+	a802  NVMe SSD Controller
 	a820  NVMe SSD Controller 171X
 		1028 1f95  Express Flash NVMe XS1715 SSD 400GB
 		1028 1f96  Express Flash NVMe XS1715 SSD 800GB
@@ -22157,7 +22162,7 @@
 	1600  Broadwell-U Host Bridge -OPI
 	1601  Broadwell-U PCI Express x16 Controller
 	1602  Broadwell-U Integrated Graphics
-	1603  Broadwell-U Camarillo Device
+	1603  Broadwell-U Processor Thermal Subsystem
 	1604  Broadwell-U Host Bridge -OPI
 	1605  Broadwell-U PCI Express x8 Controller
 	1606  Broadwell-U Integrated Graphics
@@ -22192,8 +22197,9 @@
 	163b  Broadwell-U Integrated Graphics
 	163d  Broadwell-U Integrated Graphics
 	163e  Broadwell-U Integrated Graphics
-	1900  Sky Lake Host Bridge/DRAM Registers
+	1900  Skylake Host Bridge/DRAM Registers
 	1901  Sky Lake PCIe Controller (x16)
+	1903  Skylake Processor Thermal Subsystem
 	1904  Sky Lake Host Bridge/DRAM Registers
 	1905  Sky Lake PCIe Controller (x8)
 	1908  Sky Lake Host Bridge/DRAM Registers
@@ -22206,6 +22212,7 @@
 	1916  Sky Lake Integrated Graphics
 	1918  Sky Lake Host Bridge/DRAM Registers
 	1919  Sky Lake Imaging Unit
+	191b  Skylake Integrated Graphics
 	191e  Sky Lake Integrated Graphics
 	191f  Sky Lake Host Bridge/DRAM Registers
 	1926  Sky Lake Integrated Graphics
@@ -25167,6 +25174,8 @@
 		8086 4010  Dual Band Wireless AC 3165
 # Stone Peak 1x1
 		8086 4210  Dual Band Wireless AC 3165
+# Stone Peak 1x1
+	3166  Intel Dual Band Wireless-AC 3165 Plus Bluetooth
 	3200  GD31244 PCI-X SATA HBA
 		1775 c200  C2K onboard SATA host bus adapter
 	3310  IOP348 I/O Processor
