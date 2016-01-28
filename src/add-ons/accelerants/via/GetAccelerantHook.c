@@ -4,7 +4,7 @@
 	
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-7/2005
+	Rudolf Cornelissen 10/2002-1/2016
 */
 
 #define MODULE_BIT 0x08000000
@@ -171,12 +171,13 @@ status_t check_overlay_capability(uint32 feature)
 	}
 
 	/* all supported cards have a bes, but it can't always be used... */
-	if (eng_bes_chk_bandwidth())
+	if (eng_bes_chk_bandwidth()) {
 		LOG(4, ("Overlay: Exporting hook %s.\n", msg));
-	else
-		LOG(4, ("Overlay: Not exporting hook %s.\n", msg));
+		return B_OK;
+	}
 
-	return B_OK;
+	LOG(4, ("Overlay: Not exporting hook %s.\n", msg));
+	return B_ERROR;
 }
 
 status_t check_acc_capability(uint32 feature)
