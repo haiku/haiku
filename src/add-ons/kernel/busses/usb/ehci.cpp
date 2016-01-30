@@ -447,7 +447,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 			| (0xff << EHCI_QH_CAPS_ISM_SHIFT);
 
 		physicalBase += sizeof(interrupt_entry);
-		if ((physicalBase & 0x10) != 0) {
+		if ((physicalBase & 0x1f) != 0) {
 			panic("physical base for interrupt entry %" B_PRId32
 				" not aligned on 32, interrupt entry structure size %lu\n",
 					i, sizeof(interrupt_entry));
