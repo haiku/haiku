@@ -328,6 +328,35 @@ ControlPipe::~ControlPipe()
 }
 
 
+void
+ControlPipe::InitCommon(int8 deviceAddress, uint8 endpointAddress,
+	usb_speed speed, pipeDirection direction, size_t maxPacketSize,
+	uint8 interval, int8 hubAddress, uint8 hubPort)
+{
+	// The USB 2.0 spec section 5.5.3 gives fixed max packet sizes for the
+	// different speeds. The USB 3.1 specs defines the max packet size to a
+	// fixed 512 for control endpoints in 9.6.6. Some devices ignore these
+	// values and use bogus ones, so we restrict them here.
+	switch (speed) {
+		case USB_SPEED_LOWSPEED:
+			maxPacketSize = 8;
+			break;
+		case USB_SPEED_HIGHSPEED:
+			maxPacketSize = 64;
+			break;
+		case USB_SPEED_SUPER:
+			maxPacketSize = 512;
+			break;
+
+		default:
+			break;
+	}
+
+	Pipe::InitCommon(deviceAddress, endpointAddress, speed, direction,
+		maxPacketSize, interval, hubAddress, hubPort);
+}
+
+
 status_t
 ControlPipe::SendRequest(uint8 requestType, uint8 request, uint16 value,
 	uint16 index, uint16 length, void *data, size_t dataLength,

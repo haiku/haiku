@@ -355,6 +355,14 @@ public:
 										ControlPipe(Object *parent);
 virtual									~ControlPipe();
 
+virtual	void							InitCommon(int8 deviceAddress,
+											uint8 endpointAddress,
+											usb_speed speed,
+											pipeDirection direction,
+											size_t maxPacketSize,
+											uint8 interval,
+											int8 hubAddress, uint8 hubPort);
+
 virtual	uint32							Type() const { return USB_OBJECT_PIPE
 											| USB_OBJECT_CONTROL_PIPE; }
 virtual	const char *					TypeName() const
