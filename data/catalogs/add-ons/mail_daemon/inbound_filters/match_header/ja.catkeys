@@ -1,5 +1,7 @@
-1	japanese	x-vnd.Haiku-MatchHeader	4262558281
+1	japanese	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<動作を選択>
+Header field (e.g. Subject, From, ...)	ConfigView		ヘッダーフィールド (例. 件名, 差出人 ...)
+Account	ConfigView		アカウント
 has	ConfigView		が 
 Move to	ConfigView		に移動する
 Then	ConfigView		ならば
@@ -12,3 +14,4 @@ Match header	RuleFilter		ヘッダー一致条件
 Reply with	ConfigView		返事を書く
 If	ConfigView		条件:
 Match \"%attribute\" against \"%regex\"	RuleFilter		\"%regex\"  と一致する \"%attribute\" 
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		ワイルドカード値は \"*spam*\" のようなものです。\n正規表現を使用するには、先頭に \"REGEX:\" をつけてください。

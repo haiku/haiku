@@ -26,7 +26,7 @@ IP Address:	IntefaceAddressView		Adresa IP:
 Off	IntefaceAddressView		Vypnuté
 MAC address:	IntefaceHardwareView		Adresa MAC:
 Renegotiate	IntefaceHardwareView		Znovu vyjednať
-Netmask:	IntefaceAddressView		Sieťová maska:
+Netmask:	IntefaceAddressView		Maska siete:
 Your IP address	IntefaceAddressView		Vaša adresa IP
 disconnected	IntefaceHardwareView		odpojené
 Disable	IntefaceHardwareView		Zakázať
