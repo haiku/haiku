@@ -434,7 +434,7 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	for (int32 i = 0; i < EHCI_INTERRUPT_ENTRIES_COUNT; i++) {
 		ehci_qh *queueHead = &fInterruptEntries[i].queue_head;
 		queueHead->this_phy = physicalBase | EHCI_ITEM_TYPE_QH;
-		queueHead->current_qtd_phy = EHCI_ITEM_TERMINATE;
+		queueHead->current_qtd_phy = 0;
 		queueHead->overlay.next_phy = EHCI_ITEM_TERMINATE;
 		queueHead->overlay.alt_next_phy = EHCI_ITEM_TERMINATE;
 		queueHead->overlay.token = EHCI_QTD_STATUS_HALTED;
@@ -549,7 +549,6 @@ EHCI::EHCI(pci_info *info, Stack *stack)
 	fAsyncQueueHead->endpoint_chars = EHCI_QH_CHARS_EPS_HIGH
 		| EHCI_QH_CHARS_RECHEAD;
 	fAsyncQueueHead->endpoint_caps = 1 << EHCI_QH_CAPS_MULT_SHIFT;
-	fAsyncQueueHead->current_qtd_phy = EHCI_ITEM_TERMINATE;
 	fAsyncQueueHead->overlay.next_phy = EHCI_ITEM_TERMINATE;
 
 	WriteOpReg(EHCI_ASYNCLISTADDR, (uint32)fAsyncQueueHead->this_phy);
@@ -2138,7 +2137,7 @@ EHCI::CreateQueueHead()
 	descriptor->token &= ~EHCI_QTD_STATUS_ACTIVE;
 	result->stray_log = descriptor;
 	result->element_log = descriptor;
-	result->current_qtd_phy = EHCI_ITEM_TERMINATE;
+	result->current_qtd_phy = 0;
 	result->overlay.next_phy = descriptor->this_phy;
 	result->overlay.alt_next_phy = EHCI_ITEM_TERMINATE;
 	result->overlay.token = 0;
