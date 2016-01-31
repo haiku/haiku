@@ -241,12 +241,11 @@ BMediaEventLooper::ControlLoop()
 				err = fRealTimeQueue.RemoveFirstEvent(&event);
 
 			if (err == B_OK) {
-				// We are going to do this calculus in performance time
+				// We are going to do this calculus in real time
 				// because otherwise we could get erroneous values.
 				// This calculus allow us to detect both early and late
 				// buffers, this is the meaning of the lateness concept.
-				bigtime_t lateness = event.event_time - fEventLatency
-					- fSchedulingLatency - TimeSource()->Now();
+				bigtime_t lateness = waitUntil - TimeSource()->RealTime();
 				DispatchEvent(&event, -lateness, hasRealtime);
 			}
 		} else if (err != B_OK)
