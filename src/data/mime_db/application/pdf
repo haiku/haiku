@@ -9,12 +9,14 @@ resource(3, "META:PREF_APP") #'MSIG' "application/x-vnd.mp-xpdf";
 
 resource(4, "META:S:DESC") #'MSDC' "PDF document";
 
-resource(5, "META:EXTENS") message(234) {
+resource(5, "META:L:DESC") #'MLDC' "Portable Document Format (PDF)";
+
+resource(6, "META:EXTENS") message(234) {
 	"extensions" = "pdf",
 	"type" = "application/pdf"
 };
 
-resource(6, "META:ICON") #'VICN' array {
+resource(7, "META:ICON") #'VICN' array {
 	$"6E636966080200160338D2F73CD163BF82B23B84A94B88504870C900E7BDFFFF"
 	$"EB0501020106023E49240000000000003CAAAA4940004A3000FFF4F4F47CFFC0"
 	$"C0040192020016023A55A6BAC2293F0DA33E958646C2EB47A1D60001FF9E05FF"
@@ -35,16 +37,16 @@ resource(6, "META:ICON") #'VICN' array {
 	$"04"
 };
 
-resource(7, "META:ATTR_INFO") message(233) {
-	"attr:name" = "PDF:subject",
-	"attr:name" = "PDF:title",
-	"attr:name" = "PDF:creator",
-	"attr:name" = "PDF:author",
-	"attr:name" = "PDF:keywords",
+resource(8, "META:ATTR_INFO") message(233) {
+	"attr:name" = "META:subject",
+	"attr:name" = "META:title",
+	"attr:name" = "META:creator",
+	"attr:name" = "META:author",
+	"attr:name" = "META:keyw",
 	"attr:name" = "PDF:producer",
 	"attr:name" = "PDF:created",
 	"attr:name" = "PDF:modified",
-	"attr:name" = "PDF:pages",
+	"attr:name" = "META:pages",
 	"attr:name" = "PDF:version",
 	"attr:name" = "PDF:linearized",
 	"attr:public_name" = "Subject",
