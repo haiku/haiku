@@ -362,12 +362,6 @@ BMediaNode::WaitForMessage(bigtime_t waitUntil, uint32 flags,
 	int32 message;
 	ssize_t size;
 
-	// TODO: Investigate on this issue
-	if (waitUntil < 0) {
-		TRACE("BMediaNode::WaitForMessage: Negative timeout!\n");
-		waitUntil = 0;
-	}
-
 	while (true) {
 		size = read_port_etc(ControlPort(), &message, data,
 			sizeof(data), B_ABSOLUTE_TIMEOUT, waitUntil);

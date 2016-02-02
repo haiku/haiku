@@ -217,6 +217,7 @@ BMediaEventLooper::ControlLoop()
 	bigtime_t waitUntil = B_INFINITE_TIMEOUT;
 	bool hasRealtime = false;
 	bool hasEvent = false;
+	bool hasBooted = false;
 
 	// While there are no events or it is not time for the earliest event,
 	// process messages using WaitForMessages. Whenever this funtion times out,
@@ -262,6 +263,15 @@ BMediaEventLooper::ControlLoop()
 			waitUntil = TimeSource()->RealTimeFor(
 				fEventQueue.FirstEventTime(),
 				fEventLatency + fSchedulingLatency);
+
+			// The first event we handle will have
+			// a negative startup wait. In this case
+			// we just check the port and let the
+			// first event to be executed just now.
+			if (!hasBooted && waitUntil < 0) {
+				waitUntil = 0;
+				hasBooted = true;
+			}
 		} else if (!hasRealtime) {
 			waitUntil = B_INFINITE_TIMEOUT;
 			continue;
