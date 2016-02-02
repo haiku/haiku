@@ -1163,20 +1163,13 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 		return B_MEDIA_BAD_DESTINATION;
 	}
 
-	bigtime_t now = TimeSource()->Now();
-	bigtime_t performanceTime = buffer->Header()->start_time;
-
-	// the how_early calculate here doesn't include scheduling latency because
-	// we've already been scheduled to handle the buffer
-	bigtime_t howEarly = performanceTime - EventLatency() - now;
-
 	// if the buffer is late, we ignore it and report the fact to the producer
 	// who sent it to us
-	if (RunMode() != B_OFFLINE && RunMode() != B_RECORDING && howEarly < 0LL) {
+	if (RunMode() != B_OFFLINE && RunMode() != B_RECORDING && lateness > 0) {
 		// lateness doesn't matter in offline mode or in recording mode
 		//mLateBuffers++;
-		NotifyLateProducer(channel->fInput.source, -howEarly, performanceTime);
-		fprintf(stderr,"	<- LATE BUFFER : %" B_PRIdBIGTIME "\n", howEarly);
+		NotifyLateProducer(channel->fInput.source, lateness, event->event_time);
+		fprintf(stderr,"	<- LATE BUFFER : %" B_PRIdBIGTIME "\n", lateness);
 		buffer->Recycle();
 	} else {
 		//WriteBuffer(buffer, *channel);
@@ -1185,7 +1178,7 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 		if (channel->fBuffer != NULL) {
 			PRINT(("MultiAudioNode::HandleBuffer snoozing recycling channelId : %"
 					B_PRIi32 ", how_early:%" B_PRIdBIGTIME "\n",
-				channel->fChannelId, howEarly));
+				channel->fChannelId, lateness));
 			//channel->fBuffer->Recycle();
 			snooze(100);
 			if (channel->fBuffer != NULL)
