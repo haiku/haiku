@@ -242,11 +242,24 @@ BMediaEventLooper::ControlLoop()
 				err = fRealTimeQueue.RemoveFirstEvent(&event);
 
 			if (err == B_OK) {
-				// We are going to do this calculus in real time
-				// because otherwise we could get erroneous values.
-				// This calculus allow us to detect both early and late
-				// buffers, this is the meaning of the lateness concept.
-				bigtime_t lateness = waitUntil - TimeSource()->RealTime();
+				// The general idea of lateness is to allow
+				// the client code to detect when the buffer
+				// is handled late or early. What we add is
+				// that the code log the time at which the
+				// current event is added to the queue. This
+				// allow us to detect cyclic/stagnant latency
+				// in the meantime, so that the client can
+				// notify to the producer only the portion
+				// that might be attributable.
+				bigtime_t lateness = 0;
+				if (waitUntil > 0) {
+					lateness = waitUntil - TimeSource()->RealTime();
+					if (lateness > 0) {
+						bigtime_t enqueueLatency = event.enqueue_time - waitUntil;
+						if (enqueueLatency > 0)
+							lateness += enqueueLatency;
+					}
+				}
 				DispatchEvent(&event, -lateness, hasRealtime);
 			}
 		} else if (err != B_OK)
