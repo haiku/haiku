@@ -212,7 +212,7 @@ unmap_page(addr_t virtualAddress)
 		/ (B_PAGE_SIZE * 1024)] & 0xfffff000);
 	pageTable[(virtualAddress % (B_PAGE_SIZE * 1024)) / B_PAGE_SIZE] = 0;
 
-	asm volatile("invlpg (%0)" : : "r" (virtualAddress) : "memory");
+	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
 }
 
 
@@ -257,7 +257,7 @@ map_page(addr_t virtualAddress, addr_t physicalAddress, uint32 flags)
 
 	pageTable[tableEntry] = physicalAddress | flags;
 
-	asm volatile("invlpg (%0)" : : "r" (virtualAddress) : "memory");
+	asm volatile("invlpg (%0)" : : "r" (virtualAddress));
 
 	TRACE("map_page: done\n");
 }
