@@ -78,8 +78,8 @@ _event_queue_imp::AddEvent(const media_timed_event &event)
 		 return B_BAD_VALUE;
 	}
 
-	const_cast<media_timed_event&>(event).enqueue_time =
-		BTimeSource::RealTime();
+	const_cast<media_timed_event&>(event).enqueue_time
+		= BTimeSource::RealTime();
 
 	//create a new queue
 	if (fFirstEntry == NULL) {
