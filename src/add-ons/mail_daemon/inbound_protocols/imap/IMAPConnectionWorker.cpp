@@ -95,11 +95,35 @@ private:
 
 class WorkerCommand {
 public:
-								WorkerCommand() {}
-	virtual						~WorkerCommand() {}
+	WorkerCommand()
+		:
+		fContinuation(false)
+	{
+	}
 
-	virtual	status_t			Process(IMAPConnectionWorker& worker) = 0;
-	virtual bool				IsDone() const { return true; }
+	virtual ~WorkerCommand()
+	{
+	}
+
+	virtual	status_t Process(IMAPConnectionWorker& worker) = 0;
+
+	virtual bool IsDone() const
+	{
+		return true;
+	}
+
+	bool IsContinuation() const
+	{
+		return fContinuation;
+	}
+
+	void SetContinuation()
+	{
+		fContinuation = true;
+	}
+
+private:
+			bool				fContinuation;
 };
 
 
@@ -695,9 +719,11 @@ IMAPConnectionWorker::_Worker()
 		BAutolock locker(fLocker);
 
 		if (fPendingCommands.IsEmpty()) {
-			_Disconnect();
+			if (!fIdle)
+				_Disconnect();
 			locker.Unlock();
 
+			// TODO: in idle mode, we'd need to parse any incoming message here
 			_WaitForCommands();
 			continue;
 		}
@@ -718,6 +744,7 @@ IMAPConnectionWorker::_Worker()
 
 		if (!command->IsDone()) {
 			deleter.Detach();
+			command->SetContinuation();
 			_EnqueueCommand(command);
 		}
 	}
@@ -740,7 +767,8 @@ IMAPConnectionWorker::_EnqueueCommand(WorkerCommand* command)
 		return B_NO_MEMORY;
 	}
 
-	if (dynamic_cast<SyncCommand*>(command) != NULL)
+	if (dynamic_cast<SyncCommand*>(command) != NULL
+		&& !command->IsContinuation())
 		fSyncPending++;
 
 	locker.Unlock();
@@ -752,7 +780,13 @@ IMAPConnectionWorker::_EnqueueCommand(WorkerCommand* command)
 void
 IMAPConnectionWorker::_WaitForCommands()
 {
-	while (acquire_sem(fPendingCommandsSemaphore) == B_INTERRUPTED);
+	int32 count = 1;
+	get_sem_count(fPendingCommandsSemaphore, &count);
+	if (count < 1)
+		count = 1;
+
+	while (acquire_sem_etc(fPendingCommandsSemaphore, count, 0,
+			B_INFINITE_TIMEOUT) == B_INTERRUPTED);
 }
 
 
@@ -822,7 +856,9 @@ IMAPConnectionWorker::_Connect()
 	if (status != B_OK)
 		return status;
 
-	fIdle = fSettings.IdleMode() && fProtocol.Capabilities().Contains("IDLE");
+	//fIdle = fSettings.IdleMode() && fProtocol.Capabilities().Contains("IDLE");
+	// TODO: Idle mode is not yet implemented!
+	fIdle = false;
 	return B_OK;
 }
 
