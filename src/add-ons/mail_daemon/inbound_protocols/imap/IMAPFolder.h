@@ -98,7 +98,11 @@ public:
 	virtual void				MessageReceived(BMessage* message);
 
 private:
+			void				_WaitForFolderState();
 			void				_InitializeFolderState();
+			void				_ReadFolderState();
+	static	status_t			_ReadFolderState(void* self);
+
 			const MessageToken	_Token(uint32 uid) const;
 			void				_NotifyStoredBody(const entry_ref& ref,
 									uint32 uid, status_t status);
@@ -150,10 +154,14 @@ private:
 			uint32				fLastUID;
 			FolderListener*		fListener;
 			mutex				fLock;
-			bool				fInitializing;
+			mutex				fFolderStateLock;
+			thread_id			fReadFolderStateThread;
+			bool				fFolderStateInitialized;
+			bool				fQuitFolderState;
 			UIDToRefMap			fRefMap;
 			UIDToFlagsMap		fFlagsMap;
 			UIDSet				fSynchronizedUIDsSet;
+			UIDToFlagsMap		fPendingFlagsMap;
 			MessengerMap		fPendingBodies;
 };
 

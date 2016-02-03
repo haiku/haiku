@@ -93,14 +93,21 @@ IMAPFolder::IMAPFolder(IMAPProtocol& protocol, const BString& mailboxName,
 	fMailboxName(mailboxName),
 	fUIDValidity(UINT32_MAX),
 	fLastUID(0),
-	fListener(NULL)
+	fListener(NULL),
+	fFolderStateInitialized(false),
+	fQuitFolderState(false)
 {
 	mutex_init(&fLock, "imap folder lock");
+	mutex_init(&fFolderStateLock, "imap folder state lock");
 }
 
 
 IMAPFolder::~IMAPFolder()
 {
+	if (!fFolderStateInitialized) {
+		fQuitFolderState = true;
+		wait_for_thread(fReadFolderStateThread, NULL);
+	}
 }
 
 
@@ -245,8 +252,10 @@ IMAPFolder::SyncMessageFlags(uint32 uid, uint32 mailboxFlags)
 		}
 		if (status == B_OK)
 			status = node.SetTo(&ref);
-		if (status == B_TIMED_OUT)
-			continue;
+		if (status == B_TIMED_OUT) {
+			// We don't know the message state yet
+			fPendingFlagsMap.insert(std::make_pair(uid, mailboxFlags));
+		}
 		if (status != B_OK)
 			return;
 
@@ -288,15 +297,32 @@ IMAPFolder::SyncMessageFlags(uint32 uid, uint32 mailboxFlags)
 void
 IMAPFolder::MessageEntriesFetched()
 {
-	// Delete all local messages that weren't synchronized with the server
+	_WaitForFolderState();
+
+	// Synchronize all pending flags first
+	UIDToFlagsMap::const_iterator pendingIterator = fPendingFlagsMap.begin();
+	for (; pendingIterator != fPendingFlagsMap.end(); pendingIterator++)
+		SyncMessageFlags(pendingIterator->first, pendingIterator->second);
+
+	fPendingFlagsMap.clear();
+
+	// Delete all local messages that are no longer found on the server
+
+	MutexLocker locker(fLock);
+	UIDSet deleteUIDs;
 	UIDToRefMap::const_iterator iterator = fRefMap.begin();
 	for (; iterator != fRefMap.end(); iterator++) {
 		uint32 uid = iterator->first;
 		if (fSynchronizedUIDsSet.find(uid) == fSynchronizedUIDsSet.end())
-			_DeleteLocalMessage(uid);
+			deleteUIDs.insert(uid);
 	}
 
 	fSynchronizedUIDsSet.clear();
+	locker.Unlock();
+
+	UIDSet::const_iterator deleteIterator = deleteUIDs.begin();
+	for (; deleteIterator != deleteUIDs.end(); deleteIterator++)
+		_DeleteLocalMessage(*deleteIterator);
 }
 
 
@@ -446,14 +472,42 @@ IMAPFolder::DeleteMessage(uint32 uid)
 void
 IMAPFolder::MessageReceived(BMessage* message)
 {
+	switch (message->what) {
+		default:
+			BHandler::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
+IMAPFolder::_WaitForFolderState()
+{
+	while (true) {
+		MutexLocker locker(fFolderStateLock);
+		if (fFolderStateInitialized)
+			return;
+	}
 }
 
 
 void
 IMAPFolder::_InitializeFolderState()
 {
-	fInitializing = true;
+	mutex_lock(&fFolderStateLock);
 
+	fReadFolderStateThread = spawn_thread(&IMAPFolder::_ReadFolderState,
+		"IMAP folder state", B_NORMAL_PRIORITY, this);
+	if (fReadFolderStateThread >= 0)
+		resume_thread(fReadFolderStateThread);
+	else
+		mutex_unlock(&fFolderStateLock);
+}
+
+
+void
+IMAPFolder::_ReadFolderState()
+{
 	BDirectory directory(&fRef);
 	BEntry entry;
 	while (directory.GetNextEntry(&entry) == B_OK) {
@@ -472,6 +526,8 @@ IMAPFolder::_InitializeFolderState()
 		uint32 flags = _ReadFlags(node);
 
 		MutexLocker locker(fLock);
+		if (fQuitFolderState)
+			return;
 
 		fRefMap.insert(std::make_pair(uid, ref));
 		fFlagsMap.insert(std::make_pair(uid, flags));
@@ -497,7 +553,16 @@ IMAPFolder::_InitializeFolderState()
 //
 	}
 
-	fInitializing = false;
+	fFolderStateInitialized = true;
+	mutex_unlock(&fFolderStateLock);
+}
+
+
+/*static*/ status_t
+IMAPFolder::_ReadFolderState(void* self)
+{
+	((IMAPFolder*)self)->_ReadFolderState();
+	return B_OK;
 }
 
 
@@ -535,7 +600,7 @@ IMAPFolder::_GetMessageEntryRef(uint32 uid, entry_ref& ref) const
 {
 	UIDToRefMap::const_iterator found = fRefMap.find(uid);
 	if (found == fRefMap.end())
-		return fInitializing ? B_TIMED_OUT : B_ENTRY_NOT_FOUND;
+		return !fFolderStateInitialized ? B_TIMED_OUT : B_ENTRY_NOT_FOUND;
 
 	ref = found->second;
 	return B_OK;
