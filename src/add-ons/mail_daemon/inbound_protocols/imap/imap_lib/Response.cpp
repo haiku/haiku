@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2011-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -393,7 +393,7 @@ ParseException::ParseException(const char* format, ...)
 
 StreamException::StreamException(status_t status)
 	:
-	ParseException("Error from stream: %s", status)
+	fStatus(status)
 {
 }
 

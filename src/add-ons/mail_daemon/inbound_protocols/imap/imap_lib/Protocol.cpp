@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2015, Haiku Inc. All Rights Reserved.
+ * Copyright 2010-2016, Haiku Inc. All Rights Reserved.
  * Copyright 2010 Clemens Zeidler. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -355,6 +355,8 @@ Protocol::HandleResponse(Command* command, bigtime_t timeout,
 			}
 		} catch (ParseException& exception) {
 			printf("Error during parsing: %s\n", exception.Message());
+		} catch (StreamException& exception) {
+			return exception.Status();
 		}
 
 		if (fOngoingCommands.size() == 0)
