@@ -337,6 +337,10 @@ FDILink::_AutoTrain(uint32 lanes)
 
 			spin(31);
 		}
+
+		// If Trained, we fall out of autotraining
+		if (trained)
+			break;
 	}
 
 	if (!trained) {
