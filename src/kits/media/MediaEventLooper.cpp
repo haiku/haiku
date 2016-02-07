@@ -213,7 +213,7 @@ BMediaEventLooper::ControlLoop()
 {
 	CALLED();
 
-	status_t err;
+	status_t err = B_OK;
 	bigtime_t waitUntil = B_INFINITE_TIMEOUT;
 	bool hasRealtime = false;
 	bool hasEvent = false;
@@ -224,11 +224,7 @@ BMediaEventLooper::ControlLoop()
 	// we need to handle the next event
 
 	fSchedulingLatency = estimate_max_scheduling_latency(fControlThread);
-	while (true) {
-		if (RunState() == B_QUITTING)
-			return;
-
-		err = WaitForMessage(waitUntil);
+	while (RunState() != B_QUITTING) {
 		if (err == B_TIMED_OUT
 				|| err == B_WOULD_BLOCK) {
 			// NOTE: The reference for doing the lateness calculus this way can
@@ -255,7 +251,8 @@ BMediaEventLooper::ControlLoop()
 				if (waitUntil > 0) {
 					lateness = waitUntil - TimeSource()->RealTime();
 					if (lateness > 0) {
-						bigtime_t enqueueLatency = event.enqueue_time - waitUntil;
+						bigtime_t enqueueLatency
+							= event.enqueue_time - waitUntil;
 						if (enqueueLatency > 0)
 							lateness += enqueueLatency;
 					}
@@ -285,10 +282,8 @@ BMediaEventLooper::ControlLoop()
 				waitUntil = 0;
 				hasBooted = true;
 			}
-		} else if (!hasRealtime) {
+		} else if (!hasRealtime)
 			waitUntil = B_INFINITE_TIMEOUT;
-			continue;
-		}
 
 		if (hasRealtime) {
 			bigtime_t realtimeWait = fRealTimeQueue.FirstEventTime()
@@ -300,6 +295,7 @@ BMediaEventLooper::ControlLoop()
 			} else
 				hasRealtime = false;
 		}
+		err = WaitForMessage(waitUntil);
 	}
 }
 
