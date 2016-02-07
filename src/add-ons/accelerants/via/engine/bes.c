@@ -1,5 +1,5 @@
 /* VIA Unichrome Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-1/2016 */
+/* Written by Rudolf Cornelissen 05/2002-2/2016 */
 
 #define MODULE_BIT 0x00000200
 
@@ -49,13 +49,21 @@ bool eng_bes_chk_bandwidth()
 	switch (((CRTCR(MEMCLK)) & 0x70) >> 4)
 	{
 	case 0: /* SDR  66 */
-	case 1: /* SDR 100 */
-	case 2: /* SDR 133 */
-		/* memory is too slow, sorry. */
+		LOG(8,("Overlay: System memory is type SDR 66\n"));
 		return false;
 		break;
-	case 3: /* DDR 100 */
+	case 1: /* SDR 100 */
+		LOG(8,("Overlay: System memory is type SDR 100\n"));
+		return false;
+		break;
+	case 2: /* SDR 133 */
+		/* memory is too slow, sorry. */
+		LOG(8,("Overlay: System memory is type SDR 133\n"));
+		return false;
+		break;
+	case 3: /* DDR 100 (PC1600) */
 		/* DDR100's basic limit... */
+		LOG(8,("Overlay: System memory is type DDR 100\n"));
 		if (bandwidth > 921600000.0) return false;
 		/* ... but we have constraints at higher than 800x600 */
 		if (si->dm.timing.h_display > 800)
@@ -65,10 +73,20 @@ bool eng_bes_chk_bandwidth()
 			if (refresh > 60.2) return false;
 		}
 		break;
-	case 4: /* DDR 133 */
+	case 4: /* DDR 133 (PC2100) */
+		LOG(8,("Overlay: System memory is type DDR 133\n"));
 		if (bandwidth > 4045440000.0) return false;
 		break;
+	case 5: /* DDR 166 (PC2700) */
+		LOG(8,("Overlay: System memory is type DDR 166\n"));
+		if (bandwidth > 5210000000.0) return false;//fixme: set more correct limit?
+		break;
+	case 6: /* DDR 200 (PC3200) */
+		LOG(8,("Overlay: System memory is type DDR 200\n"));
+		if (bandwidth > 6170000000.0) return false;//fixme: set more correct limit?
+		break;
 	default: /* not (yet?) used */
+		LOG(8,("Overlay: System memory is (yet) unknown type!\n"));
 		return false;
 		break;
 	}

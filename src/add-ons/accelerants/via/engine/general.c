@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-1/2016
+   Rudolf Cornelissen 10/2002-2/2016
 */
 
 #define MODULE_BIT 0x00008000
@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku VIA Accelerant 0.18 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.19 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
