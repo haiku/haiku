@@ -413,13 +413,11 @@ BMediaRecorder::_Connect(const media_node& node,
 	if (ourOutput.source == media_source::null)
 		return B_MEDIA_BAD_SOURCE;
 
-	fOutputSource = ourOutput.source;
-
 	// find our Node's free input
 	media_input ourInput;
 	fNode->GetInput(&ourInput);
 
-	return BMediaRoster::CurrentRoster()->Connect(fOutputSource,
+	return BMediaRoster::CurrentRoster()->Connect(ourOutput.source,
 		ourInput.destination, &ourFormat, &ourOutput, &ourInput,
 		BMediaRoster::B_CONNECT_MUTED);
 }

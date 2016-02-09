@@ -104,6 +104,7 @@ BMediaRecorderNode::SetAcceptedFormat(const media_format& format)
 {
 	CALLED();
 
+	fInput.format = format;
 	fOKFormat = format;
 }
 
@@ -113,7 +114,7 @@ BMediaRecorderNode::AcceptedFormat() const
 {
 	CALLED();
 
-	return fOKFormat;
+	return fInput.format;
 }
 
 
