@@ -1,6 +1,6 @@
 /*
  * Copyright 2015, Hamish Morrison <hamishm53@gmail.com>
- * Copyright 2014, Dario Casalinuovo
+ * Copyright 2014-2016, Dario Casalinuovo
  * Copyright 1999, Be Incorporated
  * All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
@@ -388,7 +388,7 @@ BMediaRecorder::_Connect(const media_node& node,
 
 	fOutputNode = node;
 
-	// figure out the output provided
+	// Figure out the output provided
 	if (output != NULL) {
 		ourOutput = *output;
 	} else if (err == B_OK) {
@@ -413,9 +413,13 @@ BMediaRecorder::_Connect(const media_node& node,
 	if (ourOutput.source == media_source::null)
 		return B_MEDIA_BAD_SOURCE;
 
-	// find our Node's free input
+	// Find our Node's free input
 	media_input ourInput;
 	fNode->GetInput(&ourInput);
+
+	// Acknowledge the node that we already know
+	// who is our producer node.
+	fNode->ActivateInternalConnect(false);
 
 	return BMediaRoster::CurrentRoster()->Connect(ourOutput.source,
 		ourInput.destination, &ourFormat, &ourOutput, &ourInput,

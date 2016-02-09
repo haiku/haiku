@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Dario Casalinuovo
+ * Copyright 2014-2016, Dario Casalinuovo
  * Copyright 1999, Be Incorporated
  * All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
@@ -32,6 +32,7 @@ public:
 			void				GetInput(media_input* input);
 
 			void				SetDataEnabled(bool enabled);
+			void				ActivateInternalConnect(bool connectMode);
 
 protected:
 
@@ -106,6 +107,7 @@ protected:
 			media_format		fOKFormat;
 			media_input			fInput;
 			BString				fName;
+			bool				fConnectMode;
 };
 
 }

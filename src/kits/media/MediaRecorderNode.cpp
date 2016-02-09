@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Dario Casalinuovo
+ * Copyright 2014-2016, Dario Casalinuovo
  * Copyright 1999, Be Incorporated
  * All Rights Reserved.
  * This file may be used under the terms of the Be Sample Code License.
@@ -25,7 +25,8 @@ BMediaRecorderNode::BMediaRecorderNode(const char* name,
 	BMediaNode(name),
 	BMediaEventLooper(),
 	BBufferConsumer(type),
-	fRecorder(recorder)
+	fRecorder(recorder),
+	fConnectMode(true)
 {
 	CALLED();
 
@@ -137,6 +138,13 @@ BMediaRecorderNode::SetDataEnabled(bool enabled)
 
 	SetOutputEnabled(fInput.source,
 		fInput.destination, enabled, NULL, &tag);
+}
+
+
+void
+BMediaRecorderNode::ActivateInternalConnect(bool connectMode)
+{
+	fConnectMode = connectMode;
 }
 
 
@@ -298,16 +306,17 @@ BMediaRecorderNode::Connected(const media_source &producer,
 	fInput.format = withFormat;
 	*outInput = fInput;
 
-	// This is a workaround needed for us to get the node
-	// so that our owner class can do it's operations.
-	media_node node;
-	BMediaRosterEx* roster = MediaRosterEx(BMediaRoster::CurrentRoster());
-	if (roster->GetNodeFor(roster->NodeIDFor(producer.port), &node) != B_OK)
-		return B_MEDIA_BAD_NODE;
+	if (fConnectMode == true) {
+		// This is a workaround needed for us to get the node
+		// so that our owner class can do it's operations.
+		media_node node;
+		BMediaRosterEx* roster = MediaRosterEx(BMediaRoster::CurrentRoster());
+		if (roster->GetNodeFor(roster->NodeIDFor(producer.port), &node) != B_OK)
+			return B_MEDIA_BAD_NODE;
 
-	fRecorder->fOutputNode = node;
-	fRecorder->fReleaseOutputNode = true;
-
+		fRecorder->fOutputNode = node;
+		fRecorder->fReleaseOutputNode = true;
+	}
 	fRecorder->SetUpConnection(producer);
 	fRecorder->fConnected = true;
 
@@ -322,6 +331,8 @@ BMediaRecorderNode::Disconnected(const media_source& producer,
 	CALLED();
 
 	fInput.source = media_source::null;
+	// Reset the connection mode
+	fConnectMode = true;
 	fRecorder->fConnected = false;
 	fInput.format = fOKFormat;
 }
