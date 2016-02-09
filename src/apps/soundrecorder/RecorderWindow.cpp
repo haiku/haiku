@@ -125,6 +125,7 @@ RecorderWindow::RecorderWindow()
 	fInputField = NULL;
 	fRecorder = NULL;
 	fRecording = false;
+	fExternalConnection = false;
 	fTempCount = -1;
 	fButtonState = btnPaused;
 
@@ -693,7 +694,7 @@ RecorderWindow::Record(BMessage * message)
 
 	fRecFile.Seek(sizeof(struct wave_struct), SEEK_SET);
 
-	//	Hook up input
+	// Hook up input
 	err = MakeRecordConnection(fAudioInputNode);
 	if (err < B_OK) {
 		ErrorAlert(B_TRANSLATE("Cannot connect to the selected sound input"),
@@ -702,7 +703,6 @@ RecorderWindow::Record(BMessage * message)
 		fRecEntry.Unset();
 		return;
 	}
-
 	fRecorder->Start();
 }
 
@@ -892,15 +892,14 @@ RecorderWindow::MakeRecordConnection(const media_node & input)
 			return B_BUSY;
 		}
 
+		// Get a format, any format.
+		fRecordFormat.u.raw_audio = audioOutput.format.u.raw_audio;
+		fExternalConnection = false;
 	} else {
-		CONNECT((stderr, "RecorderWindow::MakeRecordConnection():"
-			" audio input node already connected\n"));
-
-		return B_BUSY;
+		fRecordFormat.u.raw_audio = fRecorder->AcceptedFormat().u.raw_audio;
+		fExternalConnection = true;
 	}
 
-	//	Get a format, any format.
-	fRecordFormat.u.raw_audio = audioOutput.format.u.raw_audio;
 	fRecordFormat.type = B_MEDIA_RAW_AUDIO;
 
 	//	Tell the consumer where we want data to go.
@@ -932,12 +931,6 @@ RecorderWindow::MakeRecordConnection(const media_node & input)
 status_t
 RecorderWindow::BreakRecordConnection()
 {
-	status_t err = B_OK;
-
-	err = fRecorder->Stop(true);
-	if (err < B_OK)
-		return err;
-
 	return fRecorder->Disconnect();
 }
 
@@ -949,7 +942,16 @@ RecorderWindow::StopRecording()
 		return B_OK;
 	fRecording = false;
 
-	BreakRecordConnection();
+	status_t err = B_OK;
+	err = fRecorder->Stop(true);
+	if (err < B_OK)
+		return err;
+
+	// We maintain the connection active
+	// if the user connected us from Cortex.
+	if (!fExternalConnection) {
+		BreakRecordConnection();
+	}
 
 	fRecorder->SetHooks(NULL, NULL, NULL);
 
