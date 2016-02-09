@@ -72,6 +72,15 @@ BMediaRecorder::SetAcceptedFormat(const media_format& format)
 }
 
 
+const media_format&
+BMediaRecorder::AcceptedFormat() const
+{
+	CALLED();
+
+	return fNode->AcceptedFormat();
+}
+
+
 status_t
 BMediaRecorder::SetHooks(ProcessFunc recordFunc, NotifyFunc notifyFunc,
 	void* cookie)
@@ -216,10 +225,13 @@ BMediaRecorder::Disconnect()
 	if (err != B_OK)
 		return err;
 
+	media_input ourInput;
+	fNode->GetInput(&ourInput);
+
 	// do the disconnect
 	err = BMediaRoster::CurrentRoster()->Disconnect(
-		fOutputNode.node, fOutput.source,
-			fNode->Node().node, fInput.destination);
+		fOutputNode.node, fOutputSource,
+			fNode->Node().node, ourInput.destination);
 
 	if (fReleaseOutputNode) {
 		BMediaRoster::Roster()->ReleaseNode(fOutputNode);
@@ -312,12 +324,12 @@ BMediaRecorder::IsConnected() const
 }
 
 
-const media_output&
-BMediaRecorder::MediaOutput() const
+const media_source&
+BMediaRecorder::MediaSource() const
 {
 	CALLED();
 
-	return fOutput;
+	return fOutputSource;
 }
 
 
@@ -326,7 +338,9 @@ BMediaRecorder::MediaInput() const
 {
 	CALLED();
 
-	return fInput;
+	media_input* input = NULL;
+	fNode->GetInput(input);
+	return *input;
 }
 
 
@@ -335,7 +349,25 @@ BMediaRecorder::Format() const
 {
 	CALLED();
 
-	return fOutput.format;
+	return fNode->AcceptedFormat();
+}
+
+
+status_t
+BMediaRecorder::SetUpConnection(media_input ourInput, media_source outputSource)
+{
+	fOutputSource = outputSource;
+
+	// Perform the connection
+	media_node timeSource;
+	if ((fOutputNode.kind & B_TIME_SOURCE) != 0)
+		timeSource = fOutputNode;
+	else
+		BMediaRoster::Roster()->GetTimeSource(&timeSource);
+
+	// Set time source
+	return BMediaRoster::Roster()->SetTimeSourceFor(fNode->Node().node,
+		timeSource.node);
 }
 
 
@@ -381,45 +413,15 @@ BMediaRecorder::_Connect(const media_node& node,
 	if (ourOutput.source == media_source::null)
 		return B_MEDIA_BAD_SOURCE;
 
+	fOutputSource = ourOutput.source;
+
 	// find our Node's free input
 	media_input ourInput;
-	err = fNode->GetInput(&ourInput);
-	if (err != B_OK)
-		return err;
+	fNode->GetInput(&ourInput);
 
-	media_node timeSource;
-	if ((node.kind & B_TIME_SOURCE) != 0)
-		timeSource = node;
-	else
-		BMediaRoster::Roster()->GetTimeSource(&timeSource);
-
-	// set time source
-	err = BMediaRoster::Roster()->SetTimeSourceFor(fNode->Node().node,
-		timeSource.node);
-
-	if (err != B_OK)
-		return err;
-
-	// start the recorder node (it's always running)
-	err = BMediaRoster::CurrentRoster()->StartNode(fOutputNode,
-		fNode->TimeSource()->Now());
-
-	if (err != B_OK)
-		return err;
-
-	// perform the connection
-	fOutput = ourOutput;
-	fInput = ourInput;
-
-	err = BMediaRoster::CurrentRoster()->Connect(fOutput.source,
-		fInput.destination, &ourFormat, &fOutput, &fInput,
+	return BMediaRoster::CurrentRoster()->Connect(fOutputSource,
+		ourInput.destination, &ourFormat, &ourOutput, &ourInput,
 		BMediaRoster::B_CONNECT_MUTED);
-
-	if (err != B_OK)
-		return err;
-
-	fConnected = true;
-	return B_OK;
 }
 
 

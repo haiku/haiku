@@ -10,6 +10,8 @@
 
 #include <Buffer.h>
 #include <scheduler.h>
+#include <MediaRoster.h>
+#include <MediaRosterEx.h>
 #include <TimedEventQueue.h>
 #include <TimeSource.h>
 
@@ -27,6 +29,7 @@ BMediaRecorderNode::BMediaRecorderNode(const char* name,
 {
 	CALLED();
 
+	fInput.node = Node();
 	fInput.destination.id = 1;
 	fInput.destination.port = ControlPort();
 
@@ -105,15 +108,22 @@ BMediaRecorderNode::SetAcceptedFormat(const media_format& format)
 }
 
 
-status_t
+const media_format&
+BMediaRecorderNode::AcceptedFormat() const
+{
+	CALLED();
+
+	return fOKFormat;
+}
+
+
+void
 BMediaRecorderNode::GetInput(media_input* outInput)
 {
 	CALLED();
 
 	fInput.node = Node();
 	*outInput = fInput;
-
-	return B_OK;
 }
 
 
@@ -287,8 +297,16 @@ BMediaRecorderNode::Connected(const media_source &producer,
 	fInput.format = withFormat;
 	*outInput = fInput;
 
+	// This is a workaround needed for us to get the node
+	// so that our owner class can do it's operations.
+	media_node node;
+	BMediaRosterEx* roster = MediaRosterEx(BMediaRoster::CurrentRoster());
+	roster->GetNodeFor(roster->NodeIDFor(producer.port), &node);
+	fRecorder->fOutputNode = node;
+	fRecorder->fReleaseOutputNode = true;
+
+	fRecorder->SetUpConnection(fInput, producer);
 	fRecorder->fConnected = true;
-	fRecorder->fInput = fInput;
 
 	return B_OK;
 }
@@ -301,10 +319,8 @@ BMediaRecorderNode::Disconnected(const media_source& producer,
 	CALLED();
 
 	fInput.source = media_source::null;
-
 	fRecorder->fConnected = false;
-
-	fRecorder->fInput.format = fOKFormat;
+	fInput.format = fOKFormat;
 }
 
 

@@ -46,6 +46,7 @@ public:
 
 			void				SetAcceptedFormat(
 									const media_format& format);
+			const media_format&	AcceptedFormat() const;
 
 	virtual status_t			Start(bool force = false);
 	virtual status_t			Stop(bool force = false);
@@ -66,13 +67,18 @@ public:
 
 			const media_format&	Format() const;
 
-			const media_output&	MediaOutput() const;
-			const media_input&	MediaInput() const;
-
 protected:
+			// Get the producer node source
+			const media_source&	MediaSource() const;
+			// This is the our own input
+			const media_input&	MediaInput() const;
 
 	virtual	void				BufferReceived(void* buffer, size_t size,
 									const media_header& header);
+
+			status_t			SetUpConnection(media_input ourInput,
+									media_source outputSource);
+
 private:
 
 			status_t			_Connect(const media_node& mediaNode,
@@ -98,10 +104,9 @@ private:
 			NotifyFunc			fNotifyHook;
 
 			media_node			fOutputNode;
-			media_output		fOutput;
+			media_source		fOutputSource;
 
 			BMediaRecorderNode*	fNode;
-			media_input			fInput;
 
 			void*				fBufferCookie;
 			uint32				fPadding[32];
