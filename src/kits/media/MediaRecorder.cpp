@@ -354,7 +354,7 @@ BMediaRecorder::Format() const
 
 
 status_t
-BMediaRecorder::SetUpConnection(media_input ourInput, media_source outputSource)
+BMediaRecorder::SetUpConnection(media_source outputSource)
 {
 	fOutputSource = outputSource;
 

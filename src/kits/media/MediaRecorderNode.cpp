@@ -301,11 +301,13 @@ BMediaRecorderNode::Connected(const media_source &producer,
 	// so that our owner class can do it's operations.
 	media_node node;
 	BMediaRosterEx* roster = MediaRosterEx(BMediaRoster::CurrentRoster());
-	roster->GetNodeFor(roster->NodeIDFor(producer.port), &node);
+	if (roster->GetNodeFor(roster->NodeIDFor(producer.port), &node) != B_OK)
+		return B_MEDIA_BAD_NODE;
+
 	fRecorder->fOutputNode = node;
 	fRecorder->fReleaseOutputNode = true;
 
-	fRecorder->SetUpConnection(fInput, producer);
+	fRecorder->SetUpConnection(producer);
 	fRecorder->fConnected = true;
 
 	return B_OK;

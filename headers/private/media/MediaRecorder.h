@@ -76,8 +76,7 @@ protected:
 	virtual	void				BufferReceived(void* buffer, size_t size,
 									const media_header& header);
 
-			status_t			SetUpConnection(media_input ourInput,
-									media_source outputSource);
+			status_t			SetUpConnection(media_source outputSource);
 
 private:
 
