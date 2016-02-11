@@ -68,10 +68,10 @@ ToneProducer::ToneProducer(BMediaAddOn* pAddOn)
 	// initialize our preferred format object
 	mPreferredFormat.type = B_MEDIA_RAW_AUDIO;
 	mPreferredFormat.u.raw_audio.format = media_raw_audio_format::B_AUDIO_FLOAT;
-	mPreferredFormat.u.raw_audio.frame_rate = 44100;		// measured in Hertz
 	mPreferredFormat.u.raw_audio.byte_order = (B_HOST_IS_BENDIAN) ? B_MEDIA_BIG_ENDIAN : B_MEDIA_LITTLE_ENDIAN;
 
-	// we'll use the consumer's preferred buffer size, if any
+	// we'll use the consumer's preferred buffer size and framerate, if any
+	mPreferredFormat.u.raw_audio.frame_rate = media_raw_audio_format::wildcard.frame_rate;
 	mPreferredFormat.u.raw_audio.buffer_size = media_raw_audio_format::wildcard.buffer_size;
 
 	// 20sep99: multiple-channel support
@@ -375,7 +375,7 @@ ToneProducer::PrepareToConnect(const media_source& what, const media_destination
 	//       Connect() doesn't take kindly to a frame_rate of 0.
 
 	if(format->u.raw_audio.frame_rate == media_raw_audio_format::wildcard.frame_rate) {
-		format->u.raw_audio.frame_rate = mPreferredFormat.u.raw_audio.frame_rate;
+		format->u.raw_audio.frame_rate = 44100.0f;
 		FPRINTF(stderr, "\tno frame rate provided, suggesting %.1f\n", format->u.raw_audio.frame_rate);
 	}
 	if(format->u.raw_audio.channel_count == media_raw_audio_format::wildcard.channel_count) {
