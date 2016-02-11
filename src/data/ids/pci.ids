@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.01.28
-#	Date:    2016-01-28 03:15:02
+#	Version: 2016.02.06
+#	Date:    2016-02-06 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -5234,6 +5234,7 @@
 		1395 2201  WL22-PC
 		16ab 8501  WL-8305 IEEE802.11b+ Wireless LAN PCI Adapter
 	8401  ACX 100 22Mbps Wireless Interface
+	8888  Multicore DSP+ARM KeyStone II SOC
 	9000  Wireless Interface (of unknown type)
 	9065  TMS320DM642
 	9066  ACX 111 54Mbps Wireless Interface
@@ -15670,6 +15671,7 @@
 	5098  T580-5098 Unified Wire Ethernet Controller
 	5099  T580-5099 Unified Wire Ethernet Controller
 	509a  T520-509A Unified Wire Ethernet Controller
+	509b  T540-509B Unified Wire Ethernet Controller
 	5401  T520-CR Unified Wire Ethernet Controller
 	5402  T522-CR Unified Wire Ethernet Controller
 	5403  T540-CR Unified Wire Ethernet Controller
@@ -15714,6 +15716,7 @@
 	5498  T580-5098 Unified Wire Ethernet Controller
 	5499  T580-5099 Unified Wire Ethernet Controller
 	549a  T520-509A Unified Wire Ethernet Controller
+	549b  T540-509B Unified Wire Ethernet Controller
 	5501  T520-CR Unified Wire Storage Controller
 	5502  T522-CR Unified Wire Storage Controller
 	5503  T540-CR Unified Wire Storage Controller
@@ -15758,6 +15761,7 @@
 	5598  T580-5098 Unified Wire Storage Controller
 	5599  T580-5099 Unified Wire Storage Controller
 	559a  T520-509A Unified Wire Storage Controller
+	559b  T540-509B Unified Wire Storage Controller
 	5601  T520-CR Unified Wire Storage Controller
 	5602  T522-CR Unified Wire Storage Controller
 	5603  T540-CR Unified Wire Storage Controller
@@ -15802,6 +15806,7 @@
 	5698  T580-5098 Unified Wire Storage Controller
 	5699  T580-5099 Unified Wire Storage Controller
 	569a  T520-509A Unified Wire Storage Controller
+	569b  T540-509B Unified Wire Storage Controller
 	5701  T520-CR Unified Wire Ethernet Controller
 	5702  T522-CR Unified Wire Ethernet Controller
 	5703  T540-CR Unified Wire Ethernet Controller
@@ -15885,6 +15890,7 @@
 	5898  T580-5098 Unified Wire Ethernet Controller [VF]
 	5899  T580-5099 Unified Wire Ethernet Controller [VF]
 	589a  T520-509A Unified Wire Ethernet Controller [VF]
+	589b  T540-509B Unified Wire Ethernet Controller [VF]
 	a000  PE10K Unified Wire Ethernet Controller
 1426  Storage Technology Corp.
 1427  Better On-Line Solutions
@@ -18421,6 +18427,8 @@
 	6816  TW6816 multimedia video controller
 # channel 8 of 8
 	6817  TW6816 multimedia video controller
+# Example MuniPCI-E card: http://www.commell.com.tw/product/surveillance/MPX-6864.htm
+	6864  TW6864 multimedia video controller
 1799  Belkin
 	6001  F5D6001 Wireless PCI Card [Realtek RTL8180]
 	6020  F5D6020 v3000 Wireless PCMCIA Card [Realtek RTL8180]
@@ -19681,6 +19689,8 @@
 	0001  ExaNIC X4
 	0002  ExaNIC X2
 	0003  ExaNIC X10
+	0004  ExaNIC X10-GM
+	0005  ExaNIC X40
 1cf7  Subspace Dynamics
 1d00  Pure Storage
 1d1d  CNEX Labs
@@ -19755,6 +19765,7 @@
 		1186 2900  DXE-810T 10GBase-T Ethernet Adapter
 		1fc9 3015  Ethernet Adapter
 	4026  TN9610 10GbE SFP+ Ethernet Adapter
+	4027  TN9710 10GBase-T/NBASE-T Ethernet Adapter
 1fcc  StreamLabs
 	f416  MS416
 	fb01  MH4LM
@@ -22198,26 +22209,26 @@
 	163d  Broadwell-U Integrated Graphics
 	163e  Broadwell-U Integrated Graphics
 	1900  Skylake Host Bridge/DRAM Registers
-	1901  Sky Lake PCIe Controller (x16)
+	1901  Skylake PCIe Controller (x16)
 	1903  Skylake Processor Thermal Subsystem
-	1904  Sky Lake Host Bridge/DRAM Registers
-	1905  Sky Lake PCIe Controller (x8)
-	1908  Sky Lake Host Bridge/DRAM Registers
-	1909  Sky Lake PCIe Controller (x4)
-	190c  Sky Lake Host Bridge/DRAM Registers
-	190f  Sky Lake Host Bridge/DRAM Registers
-	1910  Sky Lake Host Bridge/DRAM Registers
-	1911  Sky Lake Gaussian Mixture Model
-	1912  Sky Lake Integrated Graphics
-	1916  Sky Lake Integrated Graphics
-	1918  Sky Lake Host Bridge/DRAM Registers
-	1919  Sky Lake Imaging Unit
+	1904  Skylake Host Bridge/DRAM Registers
+	1905  Skylake PCIe Controller (x8)
+	1908  Skylake Host Bridge/DRAM Registers
+	1909  Skylake PCIe Controller (x4)
+	190c  Skylake Host Bridge/DRAM Registers
+	190f  Skylake Host Bridge/DRAM Registers
+	1910  Skylake Host Bridge/DRAM Registers
+	1911  Skylake Gaussian Mixture Model
+	1912  Skylake Integrated Graphics
+	1916  Skylake Integrated Graphics
+	1918  Skylake Host Bridge/DRAM Registers
+	1919  Skylake Imaging Unit
 	191b  Skylake Integrated Graphics
-	191e  Sky Lake Integrated Graphics
-	191f  Sky Lake Host Bridge/DRAM Registers
-	1926  Sky Lake Integrated Graphics
-	1932  Sky Lake Integrated Graphics
-	193b  Sky Lake Integrated Graphics
+	191e  Skylake Integrated Graphics
+	191f  Skylake Host Bridge/DRAM Registers
+	1926  Skylake Integrated Graphics
+	1932  Skylake Integrated Graphics
+	193b  Skylake Integrated Graphics
 	1960  80960RP (i960RP) Microprocessor
 		101e 0431  MegaRAID 431 RAID Controller
 		101e 0438  MegaRAID 438 Ultra2 LVD RAID Controller
@@ -26615,14 +26626,26 @@
 	9ce6  Wildcat Point-LP Serial IO GSPI Controller #1
 	9d03  Sunrise Point-LP SATA Controller [AHCI mode]
 	9d14  Sunrise Point-LP PCI Express Root Port #5
+	9d15  Sunrise Point-LP PCI Express Root Port #6
 	9d21  Sunrise Point-LP PMC
 	9d23  Sunrise Point-LP SMBus
-	9d27  Sunrise Point-LP LPSS UART #0
+	9d27  Sunrise Point-LP Serial IO UART Controller #0
+	9d28  Sunrise Point-LP Serial IO UART Controller #1
+	9d29  Sunrise Point-LP Serial IO SPI Controller #0
+	9d2a  Sunrise Point-LP Serial IO SPI Controller #1
 	9d2d  Sunrise Point-LP Secure Digital IO Controller
 	9d2f  Sunrise Point-LP USB 3.0 xHCI Controller
 	9d31  Sunrise Point-LP Thermal subsystem
 	9d3a  Sunrise Point-LP CSME HECI #1
 	9d48  Sunrise Point-LP LPC Controller
+	9d60  Sunrise Point-LP Serial IO I2C Controller #0
+		8086 9d60  100 Series PCH/Sunrise Point PCH I2C0 [Skylake/Kaby Lake LPSS I2C]
+	9d61  Sunrise Point-LP Serial IO I2C Controller #1
+	9d62  Sunrise Point-LP Serial IO I2C Controller #2
+	9d63  Sunrise Point-LP Serial IO I2C Controller #3
+	9d64  Sunrise Point-LP Serial IO I2C Controller #4
+	9d65  Sunrise Point-LP Serial IO I2C Controller #5
+	9d66  Sunrise Point-LP Serial IO UART Controller #2
 	9d70  Sunrise Point-LP HD Audio
 	a000  Atom Processor D4xx/D5xx/N4xx/N5xx DMI Bridge
 		1458 5000  GA-D525TUD
@@ -26669,10 +26692,10 @@
 	a124  Sunrise Point-H SPI Controller
 	a125  Sunrise Point-H Gigabit Ethernet Controller
 	a126  Sunrise Point-H Northpeak
-	a127  Sunrise Point-H LPSS UART #0
-	a128  Sunrise Point-H LPSS UART #1
-	a129  Sunrise Point-H LPSS SPI #0
-	a12a  Sunrise Point-H LPSS SPI #1
+	a127  Sunrise Point-H Serial IO UART #0
+	a128  Sunrise Point-H Serial IO UART #1
+	a129  Sunrise Point-H Serial IO SPI #0
+	a12a  Sunrise Point-H Serial IO SPI #1
 	a12f  Sunrise Point-H USB 3.0 xHCI Controller
 	a130  Sunrise Point-H USB Device Controller (OTG)
 	a131  Sunrise Point-H Thermal subsystem
@@ -26715,9 +26738,9 @@
 	a15d  Sunrise Point-H LPC Controller
 	a15e  Sunrise Point-H LPC Controller
 	a15f  Sunrise Point-H LPC Controller
-	a160  Sunrise Point-H LPSS I2C Controller #0
-	a161  Sunrise Point-H LPSS I2C Controller #1
-	a166  Sunrise Point-H LPSS UART Controller #2
+	a160  Sunrise Point-H Serial IO I2C Controller #0
+	a161  Sunrise Point-H Serial IO I2C Controller #1
+	a166  Sunrise Point-H Serial IO UART Controller #2
 	a167  Sunrise Point-H PCI Root Port #17
 	a168  Sunrise Point-H PCI Root Port #18
 	a169  Sunrise Point-H PCI Root Port #19
