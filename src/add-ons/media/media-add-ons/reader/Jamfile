@@ -8,11 +8,11 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		Application [ MultiArchDefaultGristFiles reader.media_addon ] :
-			AbstractFileInterfaceNode.cpp
-			AbstractFileInterfaceAddOn.cpp
+			../AbstractFileInterfaceNode.cpp
+			../AbstractFileInterfaceAddOn.cpp
 			MediaReader.cpp
 			MediaReaderAddOn.cpp
-			misc.cpp
+			../misc.cpp
 			: be media [ TargetLibsupc++ ]
 		;
 	}

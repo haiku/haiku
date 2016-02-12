@@ -25,7 +25,8 @@ void print_multistream_format(media_multistream_format * format) {
 	}
 	fprintf(stderr," avg_bit_rate(%f) max_bit_rate(%f)",
 			format->avg_bit_rate,format->max_bit_rate);
-	fprintf(stderr," avg_chunk_size(%i) max_chunk_size(%i)",
+	fprintf(stderr," avg_chunk_size(%" B_PRId32
+			") max_chunk_size(%"  B_PRId32 ")",
 			format->avg_chunk_size,format->max_chunk_size);
 }	
 	

@@ -45,6 +45,9 @@ virtual	status_t GetFileFormatList(
 				int32 in_read_items,		//	this many slots in out_readable_formats
 				int32 * out_read_items,		//	set this to actual # available, even if bigger than in count
 				void * _reserved);			//	ignore until further notice
+
+using AbstractFileInterfaceAddOn::SniffTypeKind;
+
 virtual	status_t SniffTypeKind(				//	Like SniffType, but for the specific kind(s)
 				const BMimeType & type,
 				uint64 in_kinds,
