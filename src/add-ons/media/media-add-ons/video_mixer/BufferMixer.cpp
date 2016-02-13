@@ -63,10 +63,10 @@ BufferMixer::Merge(BBuffer *input, BBuffer *output) {
 		c2    = *source++;
 		c3    = *source++;
 		alpha = *source++;
-		*(destination) = ALPHABLEND(c1, *destination, alpha);
-		*(destination+1) = ALPHABLEND(c2, *destination, alpha);
-		*(destination+2) = ALPHABLEND(c3, *destination, alpha);
-		*(destination+3) = 0x00;
+		destination[0] = ALPHABLEND(c1, destination[0], alpha);
+		destination[1] = ALPHABLEND(c2, destination[1], alpha);
+		destination[2] = ALPHABLEND(c3, destination[2], alpha);
+		destination[3] = 0x00;
 		destination += 4;
 	}
 }
