@@ -14,7 +14,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			CpuCapabilities.cpp
 			BufferMixer.cpp
 			yuvrgb.nasm
-			: be media
+			: be media [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 		;
 	}
 }

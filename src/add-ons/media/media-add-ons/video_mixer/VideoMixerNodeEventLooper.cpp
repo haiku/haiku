@@ -12,6 +12,9 @@
 
 #include "VideoMixerNode.h"
 
+#include <stdio.h>
+
+
 // -------------------------------------------------------- //
 // implementation for BMediaEventLooper
 // -------------------------------------------------------- //
@@ -19,7 +22,7 @@
 void VideoMixerNode::HandleEvent(
 				const media_timed_event *event,
 				bigtime_t lateness,
-				bool realTimeEvent = false)
+				bool realTimeEvent)
 {
 	switch (event->type) {
 		case BTimedEventQueue::B_START:
@@ -80,7 +83,7 @@ void VideoMixerNode::ControlLoop() {
 status_t VideoMixerNode::HandleStart(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleStart()\n");
 	if (RunState() != B_STARTED) {
@@ -94,7 +97,7 @@ status_t VideoMixerNode::HandleStart(
 status_t VideoMixerNode::HandleSeek(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleSeek(t=%lld,d=%ld,bd=%lld)\n",event->event_time, event->data, event->bigdata);
 	return B_OK;
@@ -103,7 +106,7 @@ status_t VideoMixerNode::HandleSeek(
 status_t VideoMixerNode::HandleWarp(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleWarp\n");
 	return B_OK;
@@ -112,7 +115,7 @@ status_t VideoMixerNode::HandleWarp(
 status_t VideoMixerNode::HandleStop(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleStop\n");
 	// flush the queue so downstreamers don't get any more
@@ -123,7 +126,7 @@ status_t VideoMixerNode::HandleStop(
 status_t VideoMixerNode::HandleBuffer(
 				const media_timed_event *event,
 				bigtime_t lateness,
-				bool realTimeEvent = false)
+				bool realTimeEvent)
 {	
 	if (event->type != BTimedEventQueue::B_HANDLE_BUFFER) {
 		fprintf(stderr,"HandleBuffer called on non buffer event type\n");
@@ -165,7 +168,7 @@ status_t VideoMixerNode::HandleBuffer(
 status_t VideoMixerNode::HandleDataStatus(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvent)
 {
 	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleDataStatus");
 	SendDataStatus(event->data, fOutput.destination, event->event_time);
@@ -175,7 +178,7 @@ status_t VideoMixerNode::HandleDataStatus(
 status_t VideoMixerNode::HandleParameter(
 				const media_timed_event *event,
 				bigtime_t lateness,
-				bool realTimeEvent = false)
+				bool realTimeEvent)
 {
 	fprintf(stderr,"VideoMixerNode(BMediaEventLooper)::HandleParameter");
 	return B_OK;

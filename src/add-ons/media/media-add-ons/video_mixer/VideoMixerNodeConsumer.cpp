@@ -12,6 +12,8 @@
 
 #include "VideoMixerNode.h"
 
+#include <stdio.h>
+
 
 // -------------------------------------------------------- //
 // implemention of BBufferConsumer
@@ -46,7 +48,7 @@ status_t VideoMixerNode::GetNextInput(
 	fprintf(stderr,"VideoMixerNode(BBufferConsumer)::GetNextInput (%ld)\n",*cookie);
 	
 	// Cookie 0 is the connecting input, all others are connected inputs
-	if (*cookie == fConnectedInputs.size()) {
+	if (uint32(*cookie) == fConnectedInputs.size()) {
 		*out_input = fInitialInput;
 	} else {
 		out_input = GetInput(*cookie);
