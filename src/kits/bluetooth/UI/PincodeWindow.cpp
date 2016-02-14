@@ -187,7 +187,7 @@ bool PincodeWindow::QuitRequested()
 }
 
 
-void PincodeWindow::SetBDaddr(const char* address)
+void PincodeWindow::SetBDaddr(BString address)
 {
 	BString label;
 
