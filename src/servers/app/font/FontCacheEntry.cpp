@@ -304,7 +304,8 @@ FontCacheEntry::CreateGlyph(uint32 glyphCode, FontCacheEntry* fallbackEntry)
 			// get the normal space glyph
 			glyphIndex = engine->GlyphIndexForGlyphCode(0x20 /* space */);
 		} else {
-			// render the "missing glyph box" (by simply keeping glyphIndex 0)
+			// The glyph was not found anywhere.
+			return NULL;
 		}
 	}
 
