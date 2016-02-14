@@ -111,8 +111,6 @@ LocaleWindow::LocaleWindow()
 			BLanguage currentLanguage(currentID.String());
 			currentLanguage.GetNativeName(name);
 
-			// TODO: the following block fails to detect a couple of language
-			// names as containing glyphs we can't render. Why's that?
 			int nameLength = name.CountChars();
 			bool hasGlyphs[nameLength];
 			font.GetHasGlyphs(name.String(), nameLength, hasGlyphs);
