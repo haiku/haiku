@@ -410,6 +410,7 @@ RemotePackageRepository HaikuPorts
 	physfs_devel-2.0.3-2
 	pipepanic-0.1.3-3
 	pkgconfig-0.29-1
+	ponpokodiff-0.2.0-2
 	popt-1.16-1
 	popt_devel-1.16-1
 	postgresql-9.3.5-2
@@ -1312,6 +1313,7 @@ RemotePackageRepository HaikuPorts
 	pipepanic
 	pixman_x86
 	pkgconfig
+	ponpokodiff
 	popt
 	popt_x86
 	postgresql
