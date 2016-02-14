@@ -61,8 +61,8 @@ RemotePackageRepository HaikuPorts
 	burnitnow-0.1.0-1
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
-	cdrtools-3.01~a27-1
-	cdrtools_devel-3.01~a27-1
+	cdrtools-3.02~a06-1
+	cdrtools_devel-3.02~a06-1
 	clang-3.4-3
 	clang_analysis-3.4-3
 	clipdinger-0.5.2-1

@@ -74,8 +74,8 @@ RemotePackageRepository HaikuPorts
 	catkeyseditor-0.1.1-1
 	caya-0.0.3-3
 	ccache-3.1.9-1
-	cdrtools-3.02~a04-1
-	cdrtools_devel-3.02~a04-1
+	cdrtools-3.02~a06-1
+	cdrtools_devel-3.02~a06-1
 	chat-20100903-2
 	clipdinger-0.5.2-1
 	clockwerk-git-3

@@ -62,8 +62,8 @@ RemotePackageRepository HaikuPorts
 	buildbot_slave-0.8.8-2
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
-	cdrtools-3.02~a04-1
-	cdrtools_devel-3.02~a04-1
+	cdrtools-3.02~a06-1
+	cdrtools_devel-3.02~a06-1
 	clang-3.5.1-1
 	clang_analysis-3.5.1-1
 	clipdinger-0.5.2-1
