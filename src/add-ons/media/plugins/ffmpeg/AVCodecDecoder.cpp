@@ -112,6 +112,7 @@ AVCodecDecoder::AVCodecDecoder()
 	fOutputFrameCount(0),
 	fOutputFrameRate(1.0),
 	fOutputFrameSize(0),
+	fInputFrameSize(0),
 
 	fChunkBuffer(NULL),
 	fChunkBufferSize(0),
@@ -403,6 +404,11 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fOutputFrameSize = sampleSize * outputAudioFormat.channel_count;
 	fOutputFrameCount = outputAudioFormat.buffer_size / fOutputFrameSize;
 	fOutputFrameRate = outputAudioFormat.frame_rate;
+	if (av_sample_fmt_is_planar(fContext->sample_fmt))
+		fInputFrameSize = sampleSize;
+	else
+		fInputFrameSize = fOutputFrameSize;
+
 	fRawDecodedAudio->opaque
 		= av_realloc(fRawDecodedAudio->opaque, sizeof(avformat_codec_context));
 	if (fRawDecodedAudio->opaque == NULL)
@@ -925,10 +931,19 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 				ptr[i] = fDecodedDataBuffer->data[i] + fDecodedDataBufferOffset;
 		}
 
-		int32 result = swr_convert(fResampleContext, fRawDecodedAudio->data,
+		// When there are more input frames than space in the output buffer,
+		// we could feed everything to swr and it would buffer the extra data.
+		// However, there is no easy way to flush that data without feeding more
+		// input, and it makes our timestamp computations fail.
+		// So, we feed only as much frames as we can get out, and handle the
+		// buffering ourselves.
+		// TODO Ideally, we should try to size our output buffer so that it can
+		// always hold all the output (swr provides helper functions for this)
+		inFrames = frames;
+		frames = swr_convert(fResampleContext, fRawDecodedAudio->data,
 			outFrames, ptr, inFrames);
 
-		if (result < 0)
+		if (frames < 0)
 			debugger("resampling failed");
 	} else {
 		memcpy(fRawDecodedAudio->data[0], fDecodedDataBuffer->data[0]
@@ -937,7 +952,7 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 		inFrames = frames;
 	}
 
-	size_t remainingSize = inFrames * fOutputFrameSize;
+	size_t remainingSize = inFrames * fInputFrameSize;
 	size_t decodedSize = outFrames * fOutputFrameSize;
 	fDecodedDataBufferSize -= inFrames;
 
