@@ -101,6 +101,7 @@ SharedLibrary libtestappserver.so :
 	CursorData.cpp
 	CursorManager.cpp
 	CursorSet.cpp
+	DelayedMessage.cpp
 	DesktopListener.cpp
 	DirectWindowInfo.cpp
 	DrawingEngine.cpp

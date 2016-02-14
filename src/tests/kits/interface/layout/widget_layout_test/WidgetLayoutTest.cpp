@@ -79,7 +79,7 @@ public:
 		  fTest(test)
 	{
 		fViewContainer = new ViewContainer(Bounds());
-		fViewContainer->View::SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+		fViewContainer->View::SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		AddChild(fViewContainer);
 
 		// container view for the tested BView
@@ -90,7 +90,7 @@ public:
 
 		// container for the test's controls
 		fTestControlsView = new View(BRect(410, 10, 690, 400));
-		fTestControlsView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+		fTestControlsView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 		fViewContainer->View::AddChild(fTestControlsView);
 
 		// wrapper view

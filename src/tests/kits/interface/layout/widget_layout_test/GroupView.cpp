@@ -59,7 +59,7 @@ GroupView::GroupView(enum orientation orientation, int32 lineCount)
 	  fColumnInfos(NULL),
 	  fRowInfos(NULL)
 {
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	if (fLineCount < 1)
 		fLineCount = 1;
@@ -377,7 +377,7 @@ GroupView::_ChildAt(int32 column, int32 row) const
 Glue::Glue()
 	: View()
 {
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 
@@ -389,7 +389,7 @@ Strut::Strut(float pixelWidth, float pixelHeight)
 	  fSize(pixelWidth >= 0 ? pixelWidth - 1 : B_SIZE_UNSET,
 	  	pixelHeight >= 0 ? pixelHeight - 1 : B_SIZE_UNSET)
 {
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 
