@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src apps charactermap ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders shared system ;
 
@@ -23,3 +24,8 @@ DoCatalogs CharacterMap :
 	CharacterWindow.cpp
 	UnicodeBlocks.cpp
 ;
+
+if $(TARGET_PLATFORM) = libbe_test {
+	HaikuInstall install-test-apps : $(HAIKU_APP_TEST_DIR) : CharacterMap
+		: tests!apps ;
+}
