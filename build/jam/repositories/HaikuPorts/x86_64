@@ -143,8 +143,8 @@ RemotePackageRepository HaikuPorts
 	gutenprint-5.2.11-1
 	gutenprint_devel-5.2.11-1
 	gzip-1.6-2
-	haikuwebkit-1.5.1-1
-	haikuwebkit_devel-1.5.1-1
+	haikuwebkit-1.5.2-1
+	haikuwebkit_devel-1.5.2-1
 	handbrake-0.10.1-1
 	harfbuzz-1.1.1-1
 	harfbuzz_devel-1.1.1-1
