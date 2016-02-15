@@ -215,8 +215,8 @@ RemotePackageRepository HaikuPorts
 	libmikmod_devel-3.3.7-1
 	libmkv-0.6.5.1-3
 	libmkv_devel-0.6.5.1-3
-	libmodplug-0.8.8.5-1
-	libmodplug_devel-0.8.8.5-1
+	libmodplug-0.8.8.5-2
+	libmodplug_devel-0.8.8.5-2
 	libmp4v2-2.0.0-2
 	libmp4v2_devel-2.0.0-2
 	libmpeg2-0.5.1-3
