@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.02.06
-#	Date:    2016-02-06 03:15:02
+#	Version: 2016.02.17
+#	Date:    2016-02-17 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -5860,11 +5860,19 @@
 		103c 1939  HP QMH2672 16Gb Dual Port Fibre Channel Adapter
 		103c 8002  3830C 16G Fibre Channel Host Bus Adapter
 	2071  ISP2714-based 16/32Gb Fibre Channel to PCIe Adapter
+		1077 0283  QLE2764 Quad Port 32Gb Fibre Channel to PCIe Adapter
+		1077 029e  QLE2694 Quad Port 16Gb Fibre Channel to PCIe Adapter
+		1077 02a2  QLE2694L Quad Port 16Gb Fibre Channel to PCIe Adapter
+		1077 02ad  QLE2694U Quad Port 16/32Gb Fibre Channel to PCIe Adapter
 	2100  QLA2100 64-bit Fibre Channel Adapter
 		1077 0001  QLA2100 64-bit Fibre Channel Adapter
 	2200  QLA2200 64-bit Fibre Channel Adapter
 		1077 0002  QLA2200
 	2261  ISP2722-based 16/32Gb Fibre Channel to PCIe Adapter
+		1077 0299  QLE2740 Single Port 32Gb Fibre Channel to PCIe Adapter
+		1077 029a  QLE2742 Dual Port 32Gb Fibre Channel to PCIe Adapter
+		1077 029b  QLE2690 Single Port 16Gb Fibre Channel to PCIe Adapter
+		1077 029c  QLE2692 Dual Port 16Gb Fibre Channel to PCIe Adapter
 		1590 00f9  HPE StoreFabric SN1100Q 16Gb Single Port Fibre Channel Host Bus Adapter
 		1590 00fa  HPE StoreFabric SN1100Q 16Gb Dual Port Fibre Channel Host Bus Adapter
 	2300  QLA2300 64-bit Fibre Channel Adapter
@@ -10354,6 +10362,7 @@
 	1287  GK208 [GeForce GT 730]
 	1288  GK208 [GeForce GT 720]
 	1289  GK208 [GeForce GT 710]
+	128b  GK208 [GeForce GT 710]
 	1290  GK208M [GeForce GT 730M]
 		103c 2afa  GeForce GT 730A
 		103c 2b04  GeForce GT 730A
@@ -10391,6 +10400,8 @@
 	1344  GM108M [GeForce 845M]
 	1346  GM108M [GeForce 930M]
 	1347  GM108M [GeForce 940M]
+	1348  GM108M [GeForce 945A]
+	1349  GM108M [GeForce 930M]
 	134d  GM108M [GeForce 940MX]
 	137a  GM108GLM [Quadro K620M]
 	137d  GM108M [GeForce 940A]
@@ -10435,6 +10446,7 @@
 	13f0  GM204GL [Quadro M5000]
 	13f1  GM204GL [Quadro M4000]
 	13f2  GM204GL [Tesla M60]
+	13f3  GM204GL [Tesla M6]
 	13f8  GM204GLM [Quadro M5000M]
 	13f9  GM204GLM [Quadro M4000M]
 	13fa  GM204GLM [Quadro M3000M]
@@ -10442,10 +10454,12 @@
 	1402  GM206 [GeForce GTX 950]
 	1407  GM206 [GeForce GTX 750 v2]
 	1427  GM206M [GeForce GTX 965M]
+	1431  GM206GL [Tesla M4]
 	1617  GM204M [GeForce GTX 980M]
 	1618  GM204M [GeForce GTX 970M]
 	1619  GM204M [GeForce GTX 965M]
 	161a  GM204M [GeForce GTX 980]
+	1667  GM204M [GeForce GTX 965M]
 	17c2  GM200 [GeForce GTX TITAN X]
 	17c8  GM200 [GeForce GTX 980 Ti]
 	17f0  GM200GL [Quadro M6000]
@@ -11204,6 +11218,7 @@
 		1043 8095  A7V8X Motherboard (Realtek ALC650 codec)
 		1043 80a1  A7V8X-X Motherboard
 		1043 80b0  A7V600/K8V-X/K8V Deluxe motherboard (ADI AD1980 codec [SoundMAX])
+		1043 80f3  ASUSTek SK8V motherboard
 		1043 810d  Asus P5VD1-X (AD1888 codec [SoundMax])
 		1043 812a  A8V Deluxe motherboard (Realtek ALC850 codec)
 		10ec 8168  High Definition Audio
@@ -12667,6 +12682,7 @@
 		144d c006  vpr Matrix 170B4 CardBus bridge
 	0476  RL5c476 II
 		1014 0185  ThinkPad A/T/X Series
+		1014 0555  ThinkPad X41
 		1014 056c  ThinkPad Z60t
 		1028 014f  Latitude X300 laptop
 		1028 0188  Inspiron 6000 laptop
@@ -12720,7 +12736,7 @@
 		17aa 20ca  ThinkPad T61
 	0811  R5C811
 	0822  R5C822 SD/SDIO/MMC/MS/MSPro Host Adapter
-		1014 0556  ThinkPad X60s / Z60t
+		1014 0556  ThinkPad X40 / X41 / X60s / Z60t
 		1014 0598  ThinkPad Z60m
 		1025 0121  Aspire 5920G
 		1028 0188  Inspiron 6000 laptop
@@ -15954,6 +15970,8 @@
 	9111  PCI-9111
 	9113  PCI-9113
 	9114  PCI-9114
+# 2-16 MB SRAM, 4x UART, I2C, misc I/O
+	a001  ADi-BSEC
 # nee Loronix Information Systems Inc.
 144b  Verint Systems Inc.
 144c  Catalina Research Inc
@@ -16446,7 +16464,7 @@
 	167b  NetXtreme BCM5755 Gigabit Ethernet PCI Express
 		103c 280a  DC5750 Microtower
 	167d  NetXtreme BCM5751M Gigabit Ethernet PCI Express
-		1014 0577  ThinkPad Z60t
+		1014 0577  ThinkPad X41 / Z60t
 		103c 0934  nx8220
 		103c 0940  Compaq nw8240 Mobile Workstation
 		17aa 2081  ThinkPad R60e
@@ -18078,6 +18096,7 @@
 		0777 4005  SR71-15 802.11an Mini PCI Adapter
 		1186 3a7a  DWA-552 802.11n Xtreme N Desktop Adapter (rev A2)
 		1186 3a7d  DWA-552 802.11n Xtreme N Desktop Adapter (rev A3)
+		168c 2096  Compex WLM200NX / Wistron DNMA-92
 	002a  AR928X Wireless Network Adapter (PCI-Express)
 		0777 4f05  SR71-X 802.11abgn Wireless ExpressCard Adapter [AR9280]
 		103c 3041  AR5BHB92-H 802.11abgn Wireless Half-size Mini PCIe Card [AR9280]
@@ -19670,6 +19689,10 @@
 	0003  Ultrastar SN100 Series NVMe SSD
 		1014 04f5  PCIe3 1.6TB NVMe Adapter
 		1014 04f6  PCIe3 3.2TB NVMe Adapter
+# http://www.nicevt.ru/ (in Russian)
+1c63  Science and Research Centre of Computer Technology (JSC "NICEVT")
+# http://www.radiotec.ru/catalog.php?cat=jr8&art=14109
+	0008  K1927BB1Ya [EC8430] Angara Interconnection Network Adapter
 1c7e  TTTech Computertechnik AG
 	0200  zFAS Debug Port
 1c7f  Elektrobit Austria GmbH
@@ -19707,6 +19730,7 @@
 1d49  Lenovo
 1d5c  Fantasia Trading LLC
 1d61  Technobox, Inc.
+1d62  Nebbiolo Technologies
 1d65  Imagine Communications Corp.
 	04de  Taurus/McKinley
 1d6c  Atomic Rules LLC
@@ -22507,6 +22531,7 @@
 	1e1e  7 Series/C210 Series Chipset Family PCI Express Root Port 8
 		1849 1e1e  Motherboard
 	1e20  7 Series/C210 Series Chipset Family High Definition Audio Controller
+		1028 054b  Dell XPS One 2710
 		1043 108d  VivoBook X202EV
 		1043 1477  N56VZ
 		1043 1517  Zenbook Prime UX31A
@@ -23457,7 +23482,7 @@
 	2589  E7220/E7221 PCI Express Root Port
 	258a  E7221 Integrated Graphics Controller
 	2590  Mobile 915GM/PM/GMS/910GML Express Processor to DRAM Controller
-		1014 0575  ThinkPad Z60t
+		1014 0575  ThinkPad X41 / Z60t
 		1028 0182  Dell Latitude C610
 		103c 0934  Compaq nw8240/nx8220
 		103c 099c  NX6110/NC6120
@@ -23469,6 +23494,7 @@
 	2591  Mobile 915GM/PM Express PCI Express Root Port
 		103c 0934  Compaq nw8240 Mobile Workstation
 	2592  Mobile 915GM/GMS/910GML Express Graphics Controller
+		1014 0582  ThinkPad X41
 		103c 099c  NX6110/NC6120
 		103c 308a  NC6220
 		1043 1881  GMA 900 915GM Integrated Graphics
@@ -23641,6 +23667,7 @@
 		e4bf 0cd3  CD3-JIVE
 		e4bf 58b1  XB1
 	2641  82801FBM (ICH6M) LPC Interface Bridge
+		1014 0568  ThinkPad X41
 		103c 0934  Compaq nw8240/nx8220
 		103c 099c  NX6110/NC6120
 	2642  82801FW/FRW (ICH6W/ICH6RW) LPC Interface Bridge
@@ -23656,7 +23683,9 @@
 		1028 0177  Dimension 8400
 		1462 7028  915P/G Neo2
 	2653  82801FBM (ICH6M) SATA Controller
+		1014 056a  ThinkPad X41
 	2658  82801FB/FBM/FR/FW/FRW (ICH6 Family) USB UHCI #1
+		1014 0565  ThinkPad X41
 		1028 0177  Dimension 8400
 		1028 0179  Optiplex GX280
 		103c 0934  Compaq nw8240/nx8220
@@ -23669,6 +23698,7 @@
 		e4bf 0cd3  CD3-JIVE
 		e4bf 58b1  XB1
 	2659  82801FB/FBM/FR/FW/FRW (ICH6 Family) USB UHCI #2
+		1014 0565  ThinkPad X41
 		1028 0177  Dimension 8400
 		1028 0179  Optiplex GX280
 		103c 0934  Compaq nw8240/nx8220
@@ -23681,6 +23711,7 @@
 		e4bf 0cd3  CD3-JIVE
 		e4bf 58b1  XB1
 	265a  82801FB/FBM/FR/FW/FRW (ICH6 Family) USB UHCI #3
+		1014 0565  ThinkPad X41
 		1028 0177  Dimension 8400
 		1028 0179  Optiplex GX280
 		103c 0934  Compaq nw8240/nx8220
@@ -23693,6 +23724,7 @@
 		e4bf 0cd3  CD3-JIVE
 		e4bf 58b1  XB1
 	265b  82801FB/FBM/FR/FW/FRW (ICH6 Family) USB UHCI #4
+		1014 0565  ThinkPad X41
 		1028 0177  Dimension 8400
 		1028 0179  Optiplex GX280
 		103c 099c  NX6110/NC6120
@@ -23704,6 +23736,7 @@
 		e4bf 0cd3  CD3-JIVE
 		e4bf 58b1  XB1
 	265c  82801FB/FBM/FR/FW/FRW (ICH6 Family) USB2 EHCI Controller
+		1014 0566  ThinkPad X41
 		1028 0177  Dimension 8400
 		1028 0179  Optiplex GX280
 		103c 0934  Compaq nw8240/nx8220
@@ -23744,6 +23777,7 @@
 		1462 7028  915P/G Neo2
 		1af4 1100  QEMU Virtual Machine
 	266a  82801FB/FBM/FR/FW/FRW (ICH6 Family) SMBus Controller
+		1014 056b  ThinkPad X41
 		1028 0177  Dimension 8400
 		1028 0179  Optiplex GX280
 		1043 80a6  P5GD1-VW Mainboard
@@ -23759,6 +23793,7 @@
 		103c 0934  Compaq nw8240/nx8220
 		103c 099c  NX6110/NC6120
 	266e  82801FB/FBM/FR/FW/FRW (ICH6 Family) AC'97 Audio Controller
+		1014 0581  ThinkPad X41
 		1025 006a  Realtek ALC 655 codec (in Acer TravelMate 2410 serie laptop)
 		1028 0177  Dimension 8400
 		1028 0179  Optiplex GX280
@@ -23875,6 +23910,7 @@
 		1043 2582  P5GD1-VW Mainboard
 		1734 105b  Scenic W620
 	2792  Mobile 915GM/GMS/910GML Express Graphics Controller
+		1014 0582  ThinkPad X41
 		103c 099c  NX6110/NC6120
 		1043 1881  GMA 900 915GM Integrated Graphics
 		e4bf 0ccd  CCD-CALYPSO
@@ -25722,6 +25758,7 @@
 		1028 02da  OptiPlex 980
 		1028 040a  Latitude E6410
 		1028 040b  Latitude E6510
+		1043 1373  ASUSTek G73-series gaming laptop
 		144d c06a  R730 Laptop
 		15d9 060d  C7SIM-Q Motherboard
 		17c0 10d2  Medion Akoya E7214 Notebook PC [MD98410]
