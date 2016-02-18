@@ -307,8 +307,8 @@ RemotePackageRepository HaikuPorts
 	libunistring_devel-0.9.6-1
 	libusb-1.0.20-2
 	libusb_devel-1.0.20-2
-	libusb_compat-0.1.5-2
-	libusb_compat_devel-0.1.5-2
+	libusb_compat-0.1.5-3
+	libusb_compat_devel-0.1.5-3
 	libutf8proc-1.1.6-1
 	libutf8proc_devel-1.1.6-1
 	libuuid-1.0.3-2
@@ -440,8 +440,8 @@ RemotePackageRepository HaikuPorts
 	readline_devel-6.3.8-1
 	roadfighter-1.0.1269-1
 	rsync-3.1.0-1
-	sane_backends-1.0.25-1
-	sane_backends_devel-1.0.25-1
+	sane_backends-1.0.25-2
+	sane_backends_devel-1.0.25-2
 	sanity-0.5a-1
 	samba-3.6.25-1
 	samba_devel-3.6.25-1
