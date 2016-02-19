@@ -42,6 +42,11 @@ extern "C" {
 
 #define ERROR(a...) fprintf(stderr, a)
 
+#if LIBAVCODEC_VERSION_INT < ((54 << 16) | (50 << 8))
+#define AV_CODEC_ID_NONE CODEC_ID_NONE
+#define AV_PIX_FMT_YUV420P PIX_FMT_YUV420P
+#endif
+
 
 static const size_t kIOBufferSize = 64 * 1024;
 	// TODO: This could depend on the BMediaFile creation flags, IIRC,
@@ -124,7 +129,7 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 	// TODO: This is a hack for now! Use avcodec_find_encoder_by_name()
 	// or something similar...
 	fStream->codec->codec_id = (CodecID)codecInfo->sub_id;
-	if (fStream->codec->codec_id == CODEC_ID_NONE)
+	if (fStream->codec->codec_id == AV_CODEC_ID_NONE)
 		fStream->codec->codec_id = raw_audio_codec_id_for(*format);
 
 	// Setup the stream according to the media format...
@@ -162,7 +167,7 @@ AVFormatWriter::StreamCookie::Init(media_format* format,
 //		AVCodec* codec = fStream->codec->codec;
 //		for (int i = 0; codec->pix_fmts[i] != PIX_FMT_NONE; i++)
 //			fStream->codec->pix_fmt = codec->pix_fmts[i];
-		fStream->codec->pix_fmt = PIX_FMT_YUV420P;
+		fStream->codec->pix_fmt = AV_PIX_FMT_YUV420P;
 
 	} else if (format->type == B_MEDIA_RAW_AUDIO) {
 		fStream->codec->codec_type = AVMEDIA_TYPE_AUDIO;

@@ -14,6 +14,12 @@ extern "C" {
 
 #if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
 typedef AVCodecID CodecID;
+#else
+#define AV_CODEC_ID_NONE CODEC_ID_NONE
+#define AV_CODEC_ID_PCM_S16LE CODEC_ID_PCM_S16LE
+#define AV_CODEC_ID_RAWVIDEO CODEC_ID_RAWVIDEO
+#define AV_CODEC_ID_DVD_SUBTITLE CODEC_ID_DVD_SUBTITLE
+#define AV_CODEC_ID_ADPCM_IMA_QT CODEC_ID_ADPCM_IMA_QT
 #endif
 
 
@@ -52,13 +58,13 @@ register_avcodec_tags(media_format_family family, const char *avname, int &index
 		if (tags == NULL)
 			continue;
 
-		for (; tags->id != CODEC_ID_NONE; tags++) {
+		for (; tags->id != AV_CODEC_ID_NONE; tags++) {
 			// XXX: we might want to keep some strange PCM codecs too...
 			// skip unwanted codec tags
-			if (tags->tag == CODEC_ID_RAWVIDEO
-				|| (tags->tag >= CODEC_ID_PCM_S16LE
-					&& tags->tag < CODEC_ID_ADPCM_IMA_QT)
-				|| tags->tag >= CODEC_ID_DVD_SUBTITLE)
+			if (tags->tag == AV_CODEC_ID_RAWVIDEO
+				|| (tags->tag >= AV_CODEC_ID_PCM_S16LE
+					&& tags->tag < AV_CODEC_ID_ADPCM_IMA_QT)
+				|| tags->tag >= AV_CODEC_ID_DVD_SUBTITLE)
 				continue;
 
 			if (index >= sMaxFormatCount) {
@@ -70,7 +76,7 @@ register_avcodec_tags(media_format_family family, const char *avname, int &index
 
 			media_format format;
 			// Determine media type
-			if (tags->tag < CODEC_ID_PCM_S16LE)
+			if (tags->tag < AV_CODEC_ID_PCM_S16LE)
 				format.type = B_MEDIA_ENCODED_VIDEO;
 			else
 				format.type = B_MEDIA_ENCODED_AUDIO;

@@ -54,6 +54,11 @@
 #if LIBAVCODEC_VERSION_INT > ((54 << 16) | (50 << 8))
 typedef AVCodecID CodecID;
 #endif
+#if LIBAVCODEC_VERSION_INT < ((55 << 16) | (45 << 8))
+#define av_frame_alloc avcodec_alloc_frame
+#define av_frame_unref avcodec_get_frame_defaults
+#define av_frame_free avcodec_free_frame
+#endif
 
 
 struct wave_format_ex {
@@ -92,9 +97,9 @@ AVCodecDecoder::AVCodecDecoder()
 	fResampleContext(NULL),
 	fDecodedData(NULL),
 	fDecodedDataSizeInBytes(0),
-	fPostProcessedDecodedPicture(avcodec_alloc_frame()),
-	fRawDecodedPicture(avcodec_alloc_frame()),
-	fRawDecodedAudio(avcodec_alloc_frame()),
+	fPostProcessedDecodedPicture(av_frame_alloc()),
+	fRawDecodedPicture(av_frame_alloc()),
+	fRawDecodedAudio(av_frame_alloc()),
 
 	fCodecInitDone(false),
 
@@ -118,7 +123,7 @@ AVCodecDecoder::AVCodecDecoder()
 	fChunkBufferSize(0),
 	fAudioDecodeError(false),
 
-	fDecodedDataBuffer(avcodec_alloc_frame()),
+	fDecodedDataBuffer(av_frame_alloc()),
 	fDecodedDataBufferOffset(0),
 	fDecodedDataBufferSize(0)
 {
@@ -1091,7 +1096,8 @@ AVCodecDecoder::_DecodeSomeAudioFramesIntoEmptyDecodedDataBuffer()
 	assert(fDecodedDataBufferSize == 0);
 	assert(fTempPacket.size > 0);
 
-	avcodec_get_frame_defaults(fDecodedDataBuffer);
+	memset(fDecodedDataBuffer, 0, sizeof(AVFrame));
+    av_frame_unref(fDecodedDataBuffer);
 	fDecodedDataBufferOffset = 0;
 	int gotAudioFrame = 0;
 
@@ -1618,11 +1624,16 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 		avpicture_alloc(&deinterlacedPicture, fContext->pix_fmt, displayWidth,
 			displayHeight);
 
+#if LIBAVCODEC_VERSION_INT < ((57 << 16) | (0 << 8))
 		if (avpicture_deinterlace(&deinterlacedPicture, &rawPicture,
 				fContext->pix_fmt, displayWidth, displayHeight) < 0) {
 			TRACE("[v] avpicture_deinterlace() - error\n");
 		} else
 			useDeinterlacedPicture = true;
+#else
+		// avpicture_deinterlace is gone
+		TRACE("[v] avpicture_deinterlace() - not implemented\n");
+#endif
 	}
 
 	// Some decoders do not set pix_fmt until they have decoded 1 frame

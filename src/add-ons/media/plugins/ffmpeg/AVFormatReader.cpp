@@ -46,6 +46,14 @@ extern "C" {
 
 #define ERROR(a...) fprintf(stderr, a)
 
+#if LIBAVCODEC_VERSION_INT < ((54 << 16) | (50 << 8))
+#define AV_CODEC_ID_PCM_S16BE CODEC_ID_PCM_S16BE
+#define AV_CODEC_ID_PCM_S16LE CODEC_ID_PCM_S16LE
+#define AV_CODEC_ID_PCM_U16BE CODEC_ID_PCM_U16BE
+#define AV_CODEC_ID_PCM_U16LE CODEC_ID_PCM_U16LE
+#define AV_CODEC_ID_PCM_S8 CODEC_ID_PCM_S8
+#define AV_CODEC_ID_PCM_U8 CODEC_ID_PCM_U8
+#endif
 
 static const int64 kNoPTSValue = AV_NOPTS_VALUE;
 
@@ -980,8 +988,8 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 	// Set format family and type depending on codec_type of the stream.
 	switch (codecContext->codec_type) {
 		case AVMEDIA_TYPE_AUDIO:
-			if ((codecContext->codec_id >= CODEC_ID_PCM_S16LE)
-				&& (codecContext->codec_id <= CODEC_ID_PCM_U8)) {
+			if ((codecContext->codec_id >= AV_CODEC_ID_PCM_S16LE)
+				&& (codecContext->codec_id <= AV_CODEC_ID_PCM_U8)) {
 				TRACE("  raw audio\n");
 				format->type = B_MEDIA_RAW_AUDIO;
 				description.family = B_ANY_FORMAT_FAMILY;
@@ -1010,37 +1018,37 @@ AVFormatReader::Stream::Init(int32 virtualIndex)
 	if (format->type == B_MEDIA_RAW_AUDIO) {
 		// We cannot describe all raw-audio formats, some are unsupported.
 		switch (codecContext->codec_id) {
-			case CODEC_ID_PCM_S16LE:
+			case AV_CODEC_ID_PCM_S16LE:
 				format->u.raw_audio.format
 					= media_raw_audio_format::B_AUDIO_SHORT;
 				format->u.raw_audio.byte_order
 					= B_MEDIA_LITTLE_ENDIAN;
 				break;
-			case CODEC_ID_PCM_S16BE:
+			case AV_CODEC_ID_PCM_S16BE:
 				format->u.raw_audio.format
 					= media_raw_audio_format::B_AUDIO_SHORT;
 				format->u.raw_audio.byte_order
 					= B_MEDIA_BIG_ENDIAN;
 				break;
-			case CODEC_ID_PCM_U16LE:
+			case AV_CODEC_ID_PCM_U16LE:
 //				format->u.raw_audio.format
 //					= media_raw_audio_format::B_AUDIO_USHORT;
 //				format->u.raw_audio.byte_order
 //					= B_MEDIA_LITTLE_ENDIAN;
 				return B_NOT_SUPPORTED;
 				break;
-			case CODEC_ID_PCM_U16BE:
+			case AV_CODEC_ID_PCM_U16BE:
 //				format->u.raw_audio.format
 //					= media_raw_audio_format::B_AUDIO_USHORT;
 //				format->u.raw_audio.byte_order
 //					= B_MEDIA_BIG_ENDIAN;
 				return B_NOT_SUPPORTED;
 				break;
-			case CODEC_ID_PCM_S8:
+			case AV_CODEC_ID_PCM_S8:
 				format->u.raw_audio.format
 					= media_raw_audio_format::B_AUDIO_CHAR;
 				break;
-			case CODEC_ID_PCM_U8:
+			case AV_CODEC_ID_PCM_U8:
 				format->u.raw_audio.format
 					= media_raw_audio_format::B_AUDIO_UCHAR;
 				break;
