@@ -97,6 +97,73 @@ typedef struct settings {  // apsed, see comments in skel.settings
 	bool   pgm_panel;
 } settings;
 
+/* card info - information gathered from PINS (and other sources) */
+enum
+{	// card_type in order of date of VIA chip design (fixme: check order)
+	VT3122 = 0,
+	VT3022,
+	VT7205,
+	VT3205,
+	VT3108,
+	VT3204NC,
+	NV04,
+	NV05,
+	NV05M64,
+	NV06,
+	NV10,
+	NV11,
+	NV11M,
+	NV15,
+	NV17,
+	NV17M,
+	NV18,
+	NV18M,
+	NV20,
+	NV25,
+	NV28,
+	NV30,
+	NV31,
+	NV34,
+	NV35,
+	NV36,
+	NV38,
+	NV40,
+	NV41,
+	NV43,
+	NV45
+};
+enum
+{	// card_arch in order of date of VIA chip design
+	CLE266 = 0,
+	KM400,
+	K8M800,
+	NV04A,
+	NV10A,
+	NV20A,
+	NV30A,
+	NV40A
+};
+enum
+{	// tvout_chip_type in order of capability (more or less)
+	NONE = 0,
+	CH7003,
+	CH7004,
+	CH7005,
+	CH7006,
+	CH7007,
+	CH7008,
+	SAA7102,
+	SAA7103,
+	SAA7104,
+	SAA7105,
+	BT868,
+	BT869,
+	CX25870,
+	CX25871,
+	NVIDIA
+};
+
+
 /*shared info*/
 typedef struct {
   /*a few ID things*/
@@ -170,72 +237,6 @@ typedef struct {
 		uint32		last_idle;	/* last dwgsync slot we *know* the engine was idle after */ 
 		benaphore	lock;		/* for serializing access to the acceleration engine */
 	} engine;
-
-  /* card info - information gathered from PINS (and other sources) */
-	enum
-	{	// card_type in order of date of VIA chip design (fixme: check order)
-		VT3122 = 0,
-		VT3022,
-		VT7205,
-		VT3205,
-		VT3108,
-		VT3204NC,
-		NV04,
-		NV05,
-		NV05M64,
-		NV06,
-		NV10,
-		NV11,
-		NV11M,
-		NV15,
-		NV17,
-		NV17M,
-		NV18,
-		NV18M,
-		NV20,
-		NV25,
-		NV28,
-		NV30,
-		NV31,
-		NV34,
-		NV35,
-		NV36,
-		NV38,
-		NV40,
-		NV41,
-		NV43,
-		NV45
-	};
-	enum
-	{	// card_arch in order of date of VIA chip design
-		CLE266 = 0,
-		KM400,
-		K8M800,
-		NV04A,
-		NV10A,
-		NV20A,
-		NV30A,
-		NV40A
-	};
-	enum
-	{	// tvout_chip_type in order of capability (more or less)
-		NONE = 0,
-		CH7003,
-		CH7004,
-		CH7005,
-		CH7006,
-		CH7007,
-		CH7008,
-		SAA7102,
-		SAA7103,
-		SAA7104,
-		SAA7105,
-		BT868,
-		BT869,
-		CX25870,
-		CX25871,
-		NVIDIA
-	};
 
 	struct
 	{
