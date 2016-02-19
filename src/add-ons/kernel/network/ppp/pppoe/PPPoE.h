@@ -8,10 +8,15 @@
 
 #include <SupportDefs.h>
 #include <net/if.h>
-#include <netinet/if_ether.h>
+
+#include <ethernet.h>
+#include <ether_driver.h>
+#include <net_stack.h>
 
 class PPPoEDevice;
 
+#define B_NET_FRAME_TYPE_PPPOE	B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_PPPOE)
+#define B_NET_FRAME_TYPE_PPPOE_DISCOVERY B_NET_FRAME_TYPE(IFT_ETHER, ETHER_TYPE_PPPOE_DISCOVERY)
 
 #define PPPoE_QUERY_REPORT_SIZE	2048
 #define PPPoE_QUERY_REPORT		'PoEQ'
@@ -60,14 +65,14 @@ typedef struct complete_pppoe_header {
 
 
 // defined in pppoe.cpp
-extern ifnet *FindPPPoEInterface(const char *name);
+extern net_device *FindPPPoEInterface(const char *name);
 extern uint32 NewHostUniq();
 extern void add_device(PPPoEDevice *device);
 extern void remove_device(PPPoEDevice *device);
 
 #if DEBUG
 // defined in PPPoEDevice.cpp
-extern void dump_packet(struct mbuf *packet);
+extern void dump_packet(net_buffer *packet);
 #endif // DEBUG
 
 

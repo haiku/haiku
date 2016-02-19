@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -132,6 +132,17 @@ AccelerantHWInterface::AccelerantHWInterface()
 	fAccDPMSCapabilities(NULL),
 	fAccDPMSMode(NULL),
 	fAccSetDPMSMode(NULL),
+
+	// overlay hooks
+	fAccOverlayCount(NULL),
+	fAccOverlaySupportedSpaces(NULL),
+	fAccOverlaySupportedFeatures(NULL),
+	fAccAllocateOverlayBuffer(NULL),
+	fAccReleaseOverlayBuffer(NULL),
+	fAccGetOverlayConstraints(NULL),
+	fAccAllocateOverlay(NULL),
+	fAccReleaseOverlay(NULL),
+	fAccConfigureOverlay(NULL),
 
 	fModeCount(0),
 	fModeList(NULL),
@@ -390,6 +401,27 @@ AccelerantHWInterface::_SetupDefaultHooks()
 	fAccDPMSMode = (dpms_mode)fAccelerantHook(B_DPMS_MODE, NULL);
 	fAccSetDPMSMode = (set_dpms_mode)fAccelerantHook(B_SET_DPMS_MODE, NULL);
 
+	return B_OK;
+}
+
+
+void
+AccelerantHWInterface::_UpdateHooksAfterModeChange()
+{
+	// update acceleration hooks
+#if USE_ACCELERATION
+	fAccFillRect = (fill_rectangle)fAccelerantHook(B_FILL_RECTANGLE,
+		(void *)&fDisplayMode);
+	fAccInvertRect = (invert_rectangle)fAccelerantHook(B_INVERT_RECTANGLE,
+		(void *)&fDisplayMode);
+	fAccScreenBlit = (screen_to_screen_blit)fAccelerantHook(
+		B_SCREEN_TO_SCREEN_BLIT, (void *)&fDisplayMode);
+#else
+	fAccFillRect = NULL;
+	fAccInvertRect = NULL;
+	fAccScreenBlit = NULL;
+#endif
+
 	// overlay
 	fAccOverlayCount = (overlay_count)fAccelerantHook(B_OVERLAY_COUNT, NULL);
 	fAccOverlaySupportedSpaces = (overlay_supported_spaces)fAccelerantHook(
@@ -408,8 +440,6 @@ AccelerantHWInterface::_SetupDefaultHooks()
 		= (release_overlay)fAccelerantHook(B_RELEASE_OVERLAY, NULL);
 	fAccConfigureOverlay
 		= (configure_overlay)fAccelerantHook(B_CONFIGURE_OVERLAY, NULL);
-
-	return B_OK;
 }
 
 
@@ -637,19 +667,7 @@ AccelerantHWInterface::SetMode(const display_mode& mode)
 		depth, fFrameBufferConfig.bytes_per_row);
 #endif
 
-	// update acceleration hooks
-#if USE_ACCELERATION
-	fAccFillRect = (fill_rectangle)fAccelerantHook(B_FILL_RECTANGLE,
-		(void *)&fDisplayMode);
-	fAccInvertRect = (invert_rectangle)fAccelerantHook(B_INVERT_RECTANGLE,
-		(void *)&fDisplayMode);
-	fAccScreenBlit = (screen_to_screen_blit)fAccelerantHook(
-		B_SCREEN_TO_SCREEN_BLIT, (void *)&fDisplayMode);
-#else
-	fAccFillRect = NULL;
-	fAccInvertRect = NULL;
-	fAccScreenBlit = NULL;
-#endif
+	_UpdateHooksAfterModeChange();
 
 	// in case there is no accelerated blit function, using
 	// an offscreen located backbuffer will not be beneficial!

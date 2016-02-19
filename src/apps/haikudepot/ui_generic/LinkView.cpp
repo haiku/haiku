@@ -10,18 +10,21 @@
 #include <String.h>
 
 
-LinkView::LinkView(const char* name, const char* string, BMessage* message,
-	rgb_color color)
+LinkView::LinkView(const char* name, const char* string, BMessage* message)
 	:
 	BStringView(name, string),
 	BInvoker(message, NULL),
-	fNormalColor(color),
-	fHoverColor(make_color(1, 141, 211)),
 	fEnabled(true),
 	fMouseInside(false)
 {
 	SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	SetExplicitMinSize(BSize(120, B_SIZE_UNSET));
+}
+
+
+void
+LinkView::AttachedToWindow()
+{
 	_UpdateLinkColor();
 }
 
@@ -55,7 +58,7 @@ LinkView::Draw(BRect updateRect)
 	if (Text() == NULL)
 		return;
 
-	SetLowColor(ViewColor());
+	SetDrawingMode(B_OP_ALPHA);
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
@@ -83,17 +86,33 @@ LinkView::SetEnabled(bool enabled)
 
 
 void
+LinkView::MessageReceived(BMessage* message)
+{
+	if (message->what == B_COLORS_UPDATED)
+		_UpdateLinkColor();
+
+	BStringView::MessageReceived(message);
+}
+
+
+void
 LinkView::_UpdateLinkColor()
 {
-	if (fEnabled && fMouseInside) {
-		SetHighColor(fHoverColor);
-		BCursor cursor(B_CURSOR_ID_FOLLOW_LINK);
-		SetViewCursor(&cursor, true);
-		Invalidate();
-	} else {
-		SetHighColor(fNormalColor);
-		BCursor cursor(B_CURSOR_SYSTEM_DEFAULT);
-		SetViewCursor(&cursor, true);
-		Invalidate();
-	}
+	BCursorID cursorID = B_CURSOR_ID_SYSTEM_DEFAULT;
+
+	float tint = B_DARKEN_1_TINT;
+	ViewUIColor(&tint);
+
+	if (fEnabled) {
+		if (fMouseInside) {
+			cursorID = B_CURSOR_ID_FOLLOW_LINK;
+			SetHighUIColor(B_LINK_HOVER_COLOR, tint);
+		} else
+			SetHighUIColor(B_LINK_TEXT_COLOR, tint);
+	} else
+		SetHighColor(disable_color(ui_color(B_LINK_TEXT_COLOR), ViewColor()));
+
+	BCursor cursor(cursorID);
+	SetViewCursor(&cursor, true);
+	Invalidate();
 }

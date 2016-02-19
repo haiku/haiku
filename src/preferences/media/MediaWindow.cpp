@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2012, Haiku, Inc.
+ * Copyright 2003-2015, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -397,7 +397,7 @@ MediaWindow::_InitWindow()
 
 	fContentLayout = new BCardLayout();
 	new BView("content view", 0, fContentLayout);
-	fContentLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fContentLayout->Owner()->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fContentLayout->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fAudioView = new AudioSettingsView();

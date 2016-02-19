@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2015-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -137,9 +137,8 @@ PersonList::EntryRemoved(QueryList& source, const node_ref& nodeRef)
 	PersonMap::iterator found = fPersonMap.find(nodeRef);
 	if (found != fPersonMap.end()) {
 		Person* person = found->second;
-		fPersons.RemoveItem(person);
 		fPersonMap.erase(found);
-		delete person;
+		fPersons.RemoveItem(person);
 	}
 }
 

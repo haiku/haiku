@@ -243,6 +243,7 @@ public:
 			void				HighlightDecorator(bool active);
 
 			void				FontsChanged(BRegion* updateRegion);
+			void				ColorsChanged(BRegion* updateRegion);
 
 			void				SetLook(window_look look,
 									BRegion* updateRegion);

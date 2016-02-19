@@ -149,10 +149,7 @@ BChannelSlider::Archive(BMessage* into, bool deep) const
 void
 BChannelSlider::AttachedToWindow()
 {
-	BView* parent = Parent();
-	if (parent != NULL)
-		SetViewColor(parent->ViewColor());
-
+	AdoptParentColors();
 	BChannelControl::AttachedToWindow();
 }
 
@@ -181,6 +178,21 @@ BChannelSlider::AllDetached()
 void
 BChannelSlider::MessageReceived(BMessage* message)
 {
+	if (message->what == B_COLORS_UPDATED
+		&& fBacking != NULL && fBackingView != NULL) {
+		rgb_color color;
+		if (message->FindColor(ui_color_name(B_PANEL_BACKGROUND_COLOR), &color)
+				== B_OK
+			&& fBacking->Lock()) {
+
+			if (fBackingView->LockLooper()) {
+				fBackingView->SetLowColor(color);
+				fBackingView->UnlockLooper();
+			}
+			fBacking->Unlock();
+		}
+	}
+
 	switch (message->what) {
 		case B_SET_PROPERTY: {
 		case B_GET_PROPERTY:
@@ -230,6 +242,7 @@ BChannelSlider::Draw(BRect updateRect)
 	_UpdateFontDimens();
 	_DrawThumbs();
 
+	SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 	BRect bounds(Bounds());
 	if (Label()) {
 		float labelWidth = StringWidth(Label());
@@ -709,8 +722,6 @@ BChannelSlider::_InitData()
 	fInitialValues = NULL;
 	fMinPoint = 0;
 	fFocusChannel = -1;
-
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 

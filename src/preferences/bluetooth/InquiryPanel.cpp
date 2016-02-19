@@ -111,7 +111,7 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 		fLocalDevice = LocalDevice::GetLocalDevice();
 
 	fMessage = new BTextView("description", B_WILL_DRAW);
-	fMessage->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fMessage->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fMessage->SetLowColor(fMessage->ViewColor());
 	fMessage->MakeEditable(false);
 	fMessage->MakeSelectable(false);
@@ -127,7 +127,7 @@ InquiryPanel::InquiryPanel(BRect frame, LocalDevice* lDevice)
 	fRemoteList->SetSelectionMessage(new BMessage(kMsgSelected));
 
 	fScrollView = new BScrollView("ScrollView", fRemoteList, 0, false, true);
-	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fScrollView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	if (fLocalDevice != NULL) {
 		fMessage->SetText(B_TRANSLATE(

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2004-2016, Haiku, Inc. All rights reserved.
  * Copyright 2001 Dr. Zoidberg Enterprises. All rights reserved.
  *
  * Distributed under the terms of the MIT License.
@@ -65,18 +65,19 @@ RuleFilterConfig::RuleFilterConfig(const BMailAddOnSettings& addOnSettings)
 	BMailSettingsView("rulefilter_config"),
 	fActionMenu(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	MatchHeaderSettings settings(addOnSettings);
 	fAction = settings.Action();
 
-	fAttributeControl = new BTextControl("attr", B_TRANSLATE("If"),
-		B_TRANSLATE("header (e.g. Subject)"), NULL);
+	fAttributeControl = new BTextControl("attr", B_TRANSLATE("If"), NULL, NULL);
+	fAttributeControl->SetToolTip(
+		B_TRANSLATE("Header field (e.g. Subject, From, ...)"));
 	fAttributeControl->SetText(settings.Attribute());
 
-	fRegexControl = new BTextControl("regex", B_TRANSLATE("has"),
-		B_TRANSLATE("value (use REGEX: in front of regular expressions like "
-			"*spam*)"), NULL);
+	fRegexControl = new BTextControl("regex", B_TRANSLATE("has"), NULL, NULL);
+	fRegexControl->SetToolTip(B_TRANSLATE("Wildcard value like \"*spam*\".\n"
+		"Prefix with \"REGEX:\" in order to use regular expressions."));
 	fRegexControl->SetText(settings.Expression());
 
 	fFileControl = new FileControl("arg", NULL,
@@ -108,14 +109,8 @@ RuleFilterConfig::RuleFilterConfig(const BMailAddOnSettings& addOnSettings)
 			item->SetMarked(true);
 	}
 
-	fAccountField = new BMenuField("reply", "Foo", fAccountMenu);
-	if (fAction >= 0) {
-		BMenuItem* item = fActionMenu->ItemAt(fAction);
-		if (item != NULL) {
-			item->SetMarked(true);
-			MessageReceived(item->Message());
-		}
-	}
+	fAccountField = new BMenuField("reply", B_TRANSLATE("Account"),
+		fAccountMenu);
 
 	// Popuplate action menu
 
@@ -140,6 +135,13 @@ RuleFilterConfig::RuleFilterConfig(const BMailAddOnSettings& addOnSettings)
 
 	BMenuField* actionField = new BMenuField("action", B_TRANSLATE("Then"),
 		fActionMenu);
+	if (fAction >= 0) {
+		BMenuItem* item = fActionMenu->ItemAt(fAction);
+		if (item != NULL) {
+			item->SetMarked(true);
+			MessageReceived(item->Message());
+		}
+	}
 
 	// Build layout
 

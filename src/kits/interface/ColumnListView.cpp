@@ -68,7 +68,6 @@ All rights reserved.
 
 #include <ObjectListPrivate.h>
 
-#include "ColorTools.h"
 #include "ObjectList.h"
 
 
@@ -1423,6 +1422,16 @@ BColumnListView::SetColor(ColumnListViewColor colorIndex, const rgb_color color)
 	}
 
 	fColorList[colorIndex] = color;
+	fCustomColors = true;
+}
+
+
+void
+BColumnListView::ResetColors()
+{
+	fCustomColors = false;
+	_UpdateColors();
+	Invalidate();
 }
 
 
@@ -1458,6 +1467,7 @@ void
 BColumnListView::SetSelectionColor(rgb_color color)
 {
 	fColorList[B_COLOR_SELECTION] = color;
+	fCustomColors = true;
 }
 
 
@@ -1465,6 +1475,7 @@ void
 BColumnListView::SetBackgroundColor(rgb_color color)
 {
 	fColorList[B_COLOR_BACKGROUND] = color;
+	fCustomColors = true;
 	fOutlineView->Invalidate();
 		// repaint with new color
 }
@@ -1474,6 +1485,7 @@ void
 BColumnListView::SetEditColor(rgb_color color)
 {
 	fColorList[B_COLOR_EDIT_BACKGROUND] = color;
+	fCustomColors = true;
 }
 
 
@@ -1662,6 +1674,9 @@ BColumnListView::MessageReceived(BMessage* message)
 			fOutlineView->MessageReceived(message);
 			return;
 		}
+	} else if (message->what == B_COLORS_UPDATED) {
+		// Todo: Is it worthwhile to optimize this?
+		_UpdateColors();
 	}
 
 	BView::MessageReceived(message);
@@ -2045,32 +2060,8 @@ BColumnListView::_Init()
 	if (bounds.Height() <= 0)
 		bounds.bottom = 100;
 
-	fColorList[B_COLOR_BACKGROUND] = ui_color(B_LIST_BACKGROUND_COLOR);
-	fColorList[B_COLOR_TEXT] = ui_color(B_LIST_ITEM_TEXT_COLOR);
-	fColorList[B_COLOR_ROW_DIVIDER] = tint_color(
-		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR), B_DARKEN_2_TINT);
-	fColorList[B_COLOR_SELECTION] = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
-	fColorList[B_COLOR_SELECTION_TEXT] =
-		ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
-
-	// For non focus selection uses the selection color as BListView
-	fColorList[B_COLOR_NON_FOCUS_SELECTION] =
-		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
-
-	// edit mode doesn't work very well
-	fColorList[B_COLOR_EDIT_BACKGROUND] = tint_color(
-		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR), B_DARKEN_1_TINT);
-	fColorList[B_COLOR_EDIT_BACKGROUND].alpha = 180;
-
-	// Unused color
-	fColorList[B_COLOR_EDIT_TEXT] = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
-
-	fColorList[B_COLOR_HEADER_BACKGROUND] = ui_color(B_PANEL_BACKGROUND_COLOR);
-	fColorList[B_COLOR_HEADER_TEXT] = ui_color(B_PANEL_TEXT_COLOR);
-
-	// Unused colors
-	fColorList[B_COLOR_SEPARATOR_LINE] = ui_color(B_LIST_ITEM_TEXT_COLOR);
-	fColorList[B_COLOR_SEPARATOR_BORDER] = ui_color(B_LIST_ITEM_TEXT_COLOR);
+	fCustomColors = false;
+	_UpdateColors();
 
 	BRect titleRect;
 	BRect outlineRect;
@@ -2099,6 +2090,41 @@ BColumnListView::_Init()
 		fHorizontalScrollBar->Hide();
 
 	fOutlineView->FixScrollBar(true);
+}
+
+
+void
+BColumnListView::_UpdateColors()
+{
+	if (fCustomColors)
+		return;
+
+	fColorList[B_COLOR_BACKGROUND] = ui_color(B_LIST_BACKGROUND_COLOR);
+	fColorList[B_COLOR_TEXT] = ui_color(B_LIST_ITEM_TEXT_COLOR);
+	fColorList[B_COLOR_ROW_DIVIDER] = tint_color(
+		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR), B_DARKEN_2_TINT);
+	fColorList[B_COLOR_SELECTION] = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+	fColorList[B_COLOR_SELECTION_TEXT] =
+		ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+
+	// For non focus selection uses the selection color as BListView
+	fColorList[B_COLOR_NON_FOCUS_SELECTION] =
+		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
+
+	// edit mode doesn't work very well
+	fColorList[B_COLOR_EDIT_BACKGROUND] = tint_color(
+		ui_color(B_LIST_SELECTED_BACKGROUND_COLOR), B_DARKEN_1_TINT);
+	fColorList[B_COLOR_EDIT_BACKGROUND].alpha = 180;
+
+	// Unused color
+	fColorList[B_COLOR_EDIT_TEXT] = ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR);
+
+	fColorList[B_COLOR_HEADER_BACKGROUND] = ui_color(B_PANEL_BACKGROUND_COLOR);
+	fColorList[B_COLOR_HEADER_TEXT] = ui_color(B_PANEL_TEXT_COLOR);
+
+	// Unused colors
+	fColorList[B_COLOR_SEPARATOR_LINE] = ui_color(B_LIST_ITEM_TEXT_COLOR);
+	fColorList[B_COLOR_SEPARATOR_BORDER] = ui_color(B_LIST_ITEM_TEXT_COLOR);
 }
 
 

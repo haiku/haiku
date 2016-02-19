@@ -176,7 +176,7 @@ DynamicScrollView::DynamicScrollView(const char *name, BView *target)
 	fIsDocumentScroller(false)
 {
 	fContentBounds.Set(-1, -1, -1, -1);
-	SetViewColor(fTarget->ViewColor());
+	AdoptViewColors(fTarget);
 	target->MoveTo(B_ORIGIN);
 	AddChild(target);
 }
@@ -359,7 +359,7 @@ DynamicScrollView::UpdateBars()
 GroupView::GroupView(BRect frame, const char *name)
 	: BView(frame, name, B_FOLLOW_NONE, B_WILL_DRAW)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -513,8 +513,7 @@ TitleView::TitleView(BRect frame, const char *title)
 	: BView(frame, title, B_FOLLOW_LEFT_RIGHT, B_WILL_DRAW)
 {
 	fTitle = strdup(title);
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ViewColor());
+	AdoptSystemColors();
 }
 
 
@@ -530,7 +529,7 @@ TitleView::Draw(BRect updateRect)
 	BRect rect(Bounds());
 
 	SetDrawingMode(B_OP_COPY);
-	SetHighColor(240, 240, 240);
+	SetHighColor(tint_color(ViewColor(), B_LIGHTEN_2_TINT));
 	DrawString(fTitle, BPoint(rect.left + 1, rect.bottom - 8));
 
 	SetDrawingMode(B_OP_OVER);
@@ -897,7 +896,7 @@ DefaultMediaTheme::MakeViewFor(BParameterGroup& group, const BRect* hintRect)
 		if (parameterView == NULL)
 			continue;
 
-		parameterView->SetViewColor(view->ViewColor());
+		parameterView->AdoptViewColors(view);
 			// ToDo: dunno why this is needed, but the controls
 			// sometimes (!) have a white background without it
 

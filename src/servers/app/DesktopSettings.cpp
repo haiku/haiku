@@ -1,11 +1,12 @@
 /*
- * Copyright 2005-2013, Haiku.
+ * Copyright 2005-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Stephan Aßmus <superstippi@gmx.de>
  *		Axel Dörfler, axeld@pinc-software.de
  *		Andrej Spielmann, <andrej.spielmann@seh.ox.ac.uk>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 
@@ -297,7 +298,10 @@ DesktopSettingsPrivate::_Load()
 				snprintf(colorName, sizeof(colorName), "color%" B_PRId32,
 					(int32)index_to_color_which(i));
 
-				settings.FindInt32(colorName, (int32*)&fShared.colors[i]);
+				if (settings.FindInt32(colorName, (int32*)&fShared.colors[i]) != B_OK) {
+					// Set obviously bad value so the Appearance app can detect it
+					fShared.colors[i] = B_TRANSPARENT_COLOR;
+				}
 			}
 		}
 	}
@@ -647,17 +651,62 @@ DesktopSettingsPrivate::WorkspacesMessage(int32 index) const
 
 
 void
-DesktopSettingsPrivate::SetUIColor(color_which which, const rgb_color color)
+DesktopSettingsPrivate::SetUIColor(color_which which, const rgb_color color,
+									bool* changed)
 {
 	int32 index = color_which_to_index(which);
 	if (index < 0 || index >= kColorWhichCount)
 		return;
+
+	if (changed != NULL)
+		*changed = fShared.colors[index] != color;
 
 	fShared.colors[index] = color;
 	// TODO: deprecate the background_color member of the menu_info struct,
 	// otherwise we have to keep this duplication...
 	if (which == B_MENU_BACKGROUND_COLOR)
 		fMenuInfo.background_color = color;
+
+	Save(kAppearanceSettings);
+}
+
+
+void
+DesktopSettingsPrivate::SetUIColors(const BMessage& colors, bool* changed)
+{
+	int32 count = colors.CountNames(B_RGB_32_BIT_TYPE);
+	if (count <= 0)
+		return;
+
+	int32 index = 0;
+	int32 colorIndex = 0;
+	char* name = NULL;
+	type_code type;
+	rgb_color color;
+	color_which which = B_NO_COLOR;
+
+	while (colors.GetInfo(B_RGB_32_BIT_TYPE, index, &name, &type) == B_OK) {
+		which = which_ui_color(name);
+		colorIndex = color_which_to_index(which);
+		if (colorIndex < 0 || colorIndex >= kColorWhichCount
+			|| colors.FindColor(name, &color) != B_OK) {
+			if (changed != NULL)
+				changed[index] = false;
+
+			++index;
+			continue;
+		}
+
+		if (changed != NULL)
+			changed[index] = fShared.colors[colorIndex] != color;
+
+		fShared.colors[colorIndex] = color;
+
+		if (which == (int32)B_MENU_BACKGROUND_COLOR)
+			fMenuInfo.background_color = color;
+
+		++index;
+	}
 
 	Save(kAppearanceSettings);
 }
@@ -977,9 +1026,9 @@ LockedDesktopSettings::SetShowAllDraggers(bool show)
 
 
 void
-LockedDesktopSettings::SetUIColor(color_which which, const rgb_color color)
+LockedDesktopSettings::SetUIColors(const BMessage& colors, bool* changed)
 {
-	fSettings->SetUIColor(which, color);
+	fSettings->SetUIColors(colors, &changed[0]);
 }
 
 

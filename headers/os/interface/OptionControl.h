@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _OPTION_CONTROL_H
@@ -18,8 +18,7 @@ class BOptionControl : public BControl {
 public:
 								BOptionControl(BRect frame, const char* name,
 									const char* label, BMessage* message,
-									uint32 resizeMask = B_FOLLOW_LEFT
-										| B_FOLLOW_TOP,
+									uint32 resizeMask = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW);
 								BOptionControl(const char* name,
 									const char* label, BMessage* message,

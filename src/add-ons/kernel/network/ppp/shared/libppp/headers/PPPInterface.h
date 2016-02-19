@@ -39,6 +39,12 @@ class PPPInterface {
 		bool GetInterfaceInfo(ppp_interface_info_t *info) const;
 		bool GetStatistics(ppp_statistics *statistics) const;
 		bool HasSettings(const driver_settings *settings) const;
+
+		bool ControlDevice(ppp_device_info_t *info) const;
+		bool ControlProtocol(ppp_protocol_info_t *info, uint32 protocolindex, uint32 procotolOP) const;
+		bool ControlOptionHandler(ppp_simple_handler_info_t *info, uint32 handlerindex, uint32 handlerOP) const;
+		bool ControlLCPExtension(ppp_simple_handler_info_t *info, uint32 LCPExtensionindex, uint32 LCPExtensionOP) const;
+		bool ControlChild(void *info, uint32 childindex, uint32 childOP) const;
 		
 		bool Up() const;
 		bool Down() const;

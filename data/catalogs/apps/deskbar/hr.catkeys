@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Be-TSKB	2471778709
+1	croatian	x-vnd.Be-TSKB	2792700964
 Power off	DeskbarMenu		Isključi
 Sort applications by name	PreferencesWindow		Sortiraj programe po imenu
 Suspend	DeskbarMenu		Suspendiraj
@@ -26,7 +26,6 @@ Large	PreferencesWindow		Veliko
 Auto-raise	PreferencesWindow		Samopodizanje
 Recent folders:	PreferencesWindow		Nedavne mape:
 Show application expander	PreferencesWindow		Pokaži proširivač programa
-Restart Tracker	DeskbarMenu		Ponovno pokreni Tracker
 Close all	WindowMenu		Zatvori sve
 Deskbar preferences	PreferencesWindow		Deskbar osobitosti
 Mount	DeskbarMenu		Montiraj

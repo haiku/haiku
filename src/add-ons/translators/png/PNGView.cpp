@@ -32,7 +32,7 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 	: BView(frame, name, resizeMode, flags | B_FRAME_EVENTS)
 {
 	fSettings = settings;
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BStringView *titleView  = new BStringView("title",
 		B_TRANSLATE("PNG image translator"));
@@ -70,7 +70,7 @@ PNGView::PNGView(const BRect &frame, const char *name, uint32 resizeMode,
 	menuField->ResizeToPreferred();
 
 	fCopyrightView = new BTextView("PNG copyright");
-	fCopyrightView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fCopyrightView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fCopyrightView->SetLowColor(fCopyrightView->ViewColor());
 	fCopyrightView->MakeEditable(false);
 	fCopyrightView->SetWordWrap(false);

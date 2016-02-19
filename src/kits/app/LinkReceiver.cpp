@@ -180,7 +180,7 @@ LinkReceiver::AdjustReplyBuffer(bigtime_t timeout)
 		ssize_t bufferSize;
 		do {
 			bufferSize = port_buffer_size_etc(fReceivePort,
-				timeout == B_INFINITE_TIMEOUT ? B_RELATIVE_TIMEOUT : 0,
+				timeout == B_INFINITE_TIMEOUT ? 0 : B_RELATIVE_TIMEOUT,
 				timeout);
 		} while (bufferSize == B_INTERRUPTED);
 

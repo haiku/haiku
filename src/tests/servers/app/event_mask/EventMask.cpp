@@ -168,7 +168,7 @@ Window::Window()
 			B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE | B_NOT_ZOOMABLE)
 {
 	BView* view = new BView(Bounds(), NULL, B_FOLLOW_ALL, B_WILL_DRAW);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(view);
 
 	BTextControl* textControl = new BTextControl(BRect(10, 10, 290, 30),

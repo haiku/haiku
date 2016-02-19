@@ -36,6 +36,7 @@
 #include <TranslationDefs.h>
 #include <TranslatorRoster.h>
 
+
 #include "DataTranslations.h"
 #include "DataTranslationsSettings.h"
 #include "TranslatorListView.h"
@@ -166,7 +167,7 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 	if (ret != B_OK)
 		return ret;
 
-	fConfigView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fConfigView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		// force config views to all have the same color
 	fRightBox->AddChild(fConfigView);
 
@@ -192,17 +193,18 @@ DataTranslationsWindow::_ShowInfoView()
 
 	}
 
-	BTextView* view = new BTextView("info text");
-	view->MakeEditable(false);
-	view->MakeSelectable(false);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	view->SetText(B_TRANSLATE(
+	fInfoText = new BTextView("info text");
+	fInfoText->MakeEditable(false);
+	fInfoText->MakeSelectable(false);
+	fInfoText->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fInfoText->SetText(B_TRANSLATE(
 		"Use this control panel to set default values for translators, "
 		"to be used when no other settings are specified by an application."));
+	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+	fInfoText->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 
 	BGroupView* group = new BGroupView(B_VERTICAL);
-	group->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	group->AddChild(view);
+	group->AddChild(fInfoText);
 	float spacing = be_control_look->DefaultItemSpacing();
 	group->GroupLayout()->SetInsets(spacing, spacing, spacing, spacing);
 	fRightBox->AddChild(group);
@@ -213,6 +215,7 @@ DataTranslationsWindow::_ShowInfoView()
 void
 DataTranslationsWindow::_SetupViews()
 {
+	fInfoText = NULL;
 	fConfigView = NULL;
 	// This is NULL until a translator is
 	// selected from the listview
@@ -353,6 +356,18 @@ DataTranslationsWindow::MessageReceived(BMessage* message)
 			_GetTranslatorInfo(item->ID(), name, info, version, path);
 			fIconView->SetIcon(path);
 			fButton->SetEnabled(true);
+			break;
+		}
+
+		case B_COLORS_UPDATED:
+		{
+			if (fInfoText == NULL
+				|| fInfoText->Parent() == NULL)
+				break;
+
+			rgb_color color;
+			if (message->FindColor(ui_color_name(B_PANEL_TEXT_COLOR), &color) == B_OK)
+				fInfoText->SetFontAndColor(be_plain_font, B_FONT_ALL, &color);
 			break;
 		}
 

@@ -149,7 +149,7 @@ void
 MemoryView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 	SetFont(be_fixed_font);
 	fCharWidth = be_fixed_font->StringWidth("a");
 	font_height fontHeight;
@@ -689,7 +689,7 @@ MemoryView::MaxSize()
 void
 MemoryView::_Init()
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

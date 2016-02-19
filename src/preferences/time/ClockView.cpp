@@ -80,8 +80,7 @@ ClockView::~ClockView()
 void
 ClockView::AttachedToWindow()
 {
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
+	AdoptParentColors();
 
 	fShowClock->SetTarget(this);
 	fShowSeconds->SetTarget(this);

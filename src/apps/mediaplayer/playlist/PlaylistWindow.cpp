@@ -31,12 +31,13 @@
 #include <ScrollBar.h>
 #include <ScrollView.h>
 #include <String.h>
+#include <StringView.h>
 
 #include "CommandStack.h"
+#include "DurationToString.h"
 #include "MainApp.h"
 #include "PlaylistListView.h"
 #include "RWLocker.h"
-
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "MediaPlayer-PlaylistWindow"
@@ -82,7 +83,8 @@ PlaylistWindow::PlaylistWindow(BRect frame, Playlist* playlist,
 	fPlaylist(playlist),
 	fLocker(new RWLocker("command stack lock")),
 	fCommandStack(new CommandStack(fLocker)),
-	fCommandStackListener(this)
+	fCommandStackListener(this),
+	fDurationListener(new DurationListener(*this))
 {
 	frame = Bounds();
 
@@ -90,6 +92,7 @@ PlaylistWindow::PlaylistWindow(BRect frame, Playlist* playlist,
 		// will adjust frame to account for menubar
 
 	frame.right -= B_V_SCROLL_BAR_WIDTH;
+	frame.bottom -= B_H_SCROLL_BAR_HEIGHT;
 	fListView = new PlaylistListView(frame, playlist, controller,
 		fCommandStack);
 
@@ -104,7 +107,25 @@ PlaylistWindow::PlaylistWindow(BRect frame, Playlist* playlist,
 		// make it so the frame of the menubar is also the frame of
 		// the scroll bar (appears to be)
 		scrollBar->MoveBy(0, -1);
-		scrollBar->ResizeBy(0, -(B_H_SCROLL_BAR_HEIGHT - 2));
+		scrollBar->ResizeBy(0, 2);
+	}
+
+	frame.top += frame.Height();
+	frame.bottom += B_H_SCROLL_BAR_HEIGHT;
+
+	fTotalDuration = new BStringView(frame, "fDuration", "",
+		B_FOLLOW_BOTTOM | B_FOLLOW_LEFT_RIGHT);
+	fTotalDuration->SetAlignment(B_ALIGN_RIGHT);
+	fTotalDuration->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	AddChild(fTotalDuration);
+
+	_UpdateTotalDuration(0);
+
+	{
+		BAutolock _(fPlaylist);
+
+		_QueryInitialDurations();
+		fPlaylist->AddListener(fDurationListener);
 	}
 
 	fCommandStack->AddListener(&fCommandStackListener);
@@ -121,6 +142,9 @@ PlaylistWindow::~PlaylistWindow()
 	fCommandStack->RemoveListener(&fCommandStackListener);
 	delete fCommandStack;
 	delete fLocker;
+
+	fPlaylist->RemoveListener(fDurationListener);
+	BMessenger(fDurationListener).SendMessage(B_QUIT_REQUESTED);
 }
 
 
@@ -420,5 +444,124 @@ PlaylistWindow::_SavePlaylist(BEntry& origEntry, BEntry& tempEntry,
 
 	BNodeInfo info(&file);
 	info.SetType("application/x-vnd.haiku-playlist");
+}
+
+
+void
+PlaylistWindow::_QueryInitialDurations()
+{
+	BAutolock lock(fPlaylist);
+
+	BMessage addMessage(MSG_PLAYLIST_ITEM_ADDED);
+	for (int32 i = 0; i < fPlaylist->CountItems(); i++) {
+		addMessage.AddPointer("item", fPlaylist->ItemAt(i));
+		addMessage.AddInt32("index", i);
+	}
+
+	BMessenger(fDurationListener).SendMessage(&addMessage);
+}
+
+
+void
+PlaylistWindow::_UpdateTotalDuration(bigtime_t duration)
+{
+	BAutolock lock(this);
+
+	char buffer[64];
+	duration /= 1000000;
+	duration_to_string(duration, buffer, sizeof(buffer));
+
+	BString text;
+	text.SetToFormat(B_TRANSLATE("Total duration: %s"), buffer);
+
+	fTotalDuration->SetText(text.String());
+}
+
+
+// #pragma mark -
+
+
+PlaylistWindow::DurationListener::DurationListener(PlaylistWindow& parent)
+	:
+	PlaylistObserver(this),
+	fKnown(20, true),
+	fTotalDuration(0),
+	fParent(parent)
+{
+	Run();
+}
+
+
+PlaylistWindow::DurationListener::~DurationListener()
+{
+}
+
+
+void
+PlaylistWindow::DurationListener::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case MSG_PLAYLIST_ITEM_ADDED:
+		{
+			void* item;
+			int32 index;
+
+			int32 currentItem = 0;
+			while (message->FindPointer("item", currentItem, &item) == B_OK
+				&& message->FindInt32("index", currentItem, &index) == B_OK) {
+				_HandleItemAdded(static_cast<PlaylistItem*>(item), index);
+				++currentItem;
+			}
+
+			break;
+		}
+
+		case MSG_PLAYLIST_ITEM_REMOVED:
+		{
+			int32 index;
+
+			if (message->FindInt32("index", &index) == B_OK) {
+				_HandleItemRemoved(index);
+			}
+
+			break;
+		}
+
+		default:
+			BLooper::MessageReceived(message);
+			break;
+	}
+}
+
+
+bigtime_t
+PlaylistWindow::DurationListener::TotalDuration()
+{
+	return fTotalDuration;
+}
+
+
+void
+PlaylistWindow::DurationListener::_HandleItemAdded(PlaylistItem* item,
+	int32 index)
+{
+	bigtime_t duration = item->Duration();
+	fTotalDuration += duration;
+	fParent._UpdateTotalDuration(fTotalDuration);
+	fKnown.AddItem(new bigtime_t(duration), index);
+}
+
+
+void
+PlaylistWindow::DurationListener::_HandleItemRemoved(int32 index)
+{
+	bigtime_t* deleted = fKnown.RemoveItemAt(index);
+	if (deleted == NULL)
+		return;
+
+	fTotalDuration -= *deleted;
+	fParent._UpdateTotalDuration(fTotalDuration);
+
+	delete deleted;
 }
 

@@ -497,7 +497,7 @@ BAlert::_Init(const char* text, const char* button0, const char* button1,
 	fIconView = new TAlertView();
 
 	fTextView = new BTextView("_tv_");
-	fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fTextView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
 	fTextView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 	fTextView->MakeEditable(false);
@@ -718,7 +718,7 @@ TAlertView::TAlertView()
 	BView("TAlertView", B_WILL_DRAW),
 	fIconBitmap(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

@@ -248,8 +248,6 @@ AHCIPort::SoftReset()
 	// start port
 	Enable();
 
-	// TODO: If FBS Enable, clear PxFBS.EN prior to issuing sw reset
-
 	if (wait_until_clear(&fRegs->tfd, ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST,
 		1000000) < B_OK) {
 		ERROR("%s: port %d still busy. Moving on to port reset.\n",
@@ -259,6 +257,16 @@ AHCIPort::SoftReset()
 
 	// TODO: Just can't get AHCI software reset issued properly.
 	#if 0
+	// Spec v1.2.0, §9.3.9
+	// If FBS supported + enabled, disable
+	bool fbsDisabled = false;
+	if ((fRegs->cap & CAP_FBSS) != 0) {
+		if ((fRegs->fbs & PORT_FBS_EN) != 0) {
+			fbsDisabled = true;
+			fRegs->fbs &= ~PORT_FBS_EN;
+		}
+	}
+
 	// set command table soft reset bit
 	fCommandTable->cfis[2] |= ATA_DEVICE_CONTROL_SOFT_RESET;
 
@@ -281,10 +289,17 @@ AHCIPort::SoftReset()
 
 	if (wait_until_clear(&fRegs->ci, 0, 1000000) < B_OK) {
 		TRACE("%s: port %d: device is busy\n", __func__, fIndex);
+
+		// Before we bail-out. Re-enable FBS if we disabled it
+		if (fbsDisabled)
+			fRegs->fbs |= PORT_FBS_EN;
 		return PortReset();
     }
 
 	fCommandTable->cfis[2] &= ~ATA_DEVICE_CONTROL_SOFT_RESET;
+
+	if (fbsDisabled)
+		fRegs->fbs |= PORT_FBS_EN;
 
 	if (wait_until_clear(&fRegs->tfd, ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST,
 		1000000) < B_OK) {

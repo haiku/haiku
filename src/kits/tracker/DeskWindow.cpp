@@ -46,12 +46,10 @@ All rights reserved.
 #include <PathMonitor.h>
 #include <PopUpMenu.h>
 #include <Resources.h>
-#include <Roster.h>
 #include <Screen.h>
 #include <String.h>
 #include <StringList.h>
 #include <Volume.h>
-#include <VolumeRoster.h>
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -440,13 +438,6 @@ BDeskWindow::CreatePoseView(Model* model)
 void
 BDeskWindow::AddWindowContextMenus(BMenu* menu)
 {
-	BRoster roster;
-	if (!roster.IsRunning(kDeskbarSignature)) {
-		menu->AddItem(new BMenuItem(B_TRANSLATE("Restart Deskbar"),
-			new BMessage(kRestartDeskbar)));
-		menu->AddSeparatorItem();
-	}
-
 	TemplatesMenu* tempateMenu = new TemplatesMenu(PoseView(),
 		B_TRANSLATE("New"));
 

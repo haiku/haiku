@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -165,11 +165,11 @@ AcpiUtConvertStringToUuid (
 
     for (i = 0; i < UUID_BUFFER_LENGTH; i++)
     {
-        UuidBuffer[i] =
-            (AcpiUtAsciiCharToHex (InString[AcpiGbl_MapToUuidOffset[i]]) << 4);
+        UuidBuffer[i] = (AcpiUtAsciiCharToHex (
+            InString[AcpiGbl_MapToUuidOffset[i]]) << 4);
 
-        UuidBuffer[i] |=
-            AcpiUtAsciiCharToHex (InString[AcpiGbl_MapToUuidOffset[i] + 1]);
+        UuidBuffer[i] |= AcpiUtAsciiCharToHex (
+            InString[AcpiGbl_MapToUuidOffset[i] + 1]);
     }
 }
 #endif

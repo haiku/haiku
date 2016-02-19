@@ -136,7 +136,7 @@ private:
 	BView* _MakeALMView(BALMLayout* layout)
 	{
 		BView* view = new BView(NULL, 0, layout);
-		view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		return view;
 	}
 	

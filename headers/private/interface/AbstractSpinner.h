@@ -39,7 +39,7 @@ class BAbstractSpinner : public BControl {
 public:
 								BAbstractSpinner(BRect frame, const char* name,
 									const char* label, BMessage* message,
-									uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BAbstractSpinner(const char* name, const char* label,
 									BMessage* message,
@@ -59,6 +59,7 @@ public:
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				FrameResized(float width, float height);
 	virtual	void				ValueChanged();
+	virtual void				MessageReceived(BMessage* message);
 
 	virtual	void				Decrement() = 0;
 	virtual	void				Increment() = 0;

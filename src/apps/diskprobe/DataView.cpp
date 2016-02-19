@@ -141,6 +141,10 @@ DataView::AttachedToWindow()
 	MakeFocus(true);
 		// this seems to be necessary - if we don't do this here,
 		// the view is sometimes focus, but IsFocus() returns false...
+
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
+	SetHighUIColor(B_DOCUMENT_TEXT_COLOR);
 }
 
 

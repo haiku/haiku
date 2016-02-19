@@ -60,6 +60,7 @@ KPPPOptionHandler::InitCheck() const
 status_t
 KPPPOptionHandler::Control(uint32 op, void *data, size_t length)
 {
+	dprintf("KPPPOptionHandler::Control\n");
 	switch (op) {
 		case PPPC_GET_SIMPLE_HANDLER_INFO:
 		{

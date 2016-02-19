@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2015, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -34,6 +34,58 @@ const uint32 B_TRANSPARENT_MAGIC_RGBA32_BIG = 0x77747700;
 
 // misc.
 const struct screen_id B_MAIN_SCREEN_ID = {0};
+
+
+// rgb_color
+int32
+rgb_color::Brightness() const
+{
+	return ((int32)red * 41 + (int32)green * 187 + (int32)blue * 28) >> 8;
+}
+
+
+// Mix two colors without respect for their alpha values
+rgb_color
+mix_color(rgb_color color1, rgb_color color2, uint8 amount)
+{
+	color1.red = (uint8)(((int16(color2.red) - int16(color1.red)) * amount)
+		/ 255 + color1.red);
+	color1.green = (uint8)(((int16(color2.green) - int16(color1.green))
+		* amount) / 255 + color1.green);
+	color1.blue = (uint8)(((int16(color2.blue) - int16(color1.blue)) * amount)
+		/ 255 + color1.blue );
+	color1.alpha = (uint8)(((int16(color2.alpha) - int16(color1.alpha))
+		* amount) / 255 + color1.alpha );
+
+	return color1;
+}
+
+
+// Mix two colors, respecting their alpha values.
+rgb_color
+blend_color(rgb_color color1, rgb_color color2, uint8 amount)
+{
+	const uint8 alphaMix = (uint8)(((int16(color2.alpha) - int16(255
+		- color1.alpha)) * amount) / 255 + (255 - color1.alpha));
+
+	color1.red = (uint8)(((int16(color2.red) - int16(color1.red)) * alphaMix)
+		/ 255 + color1.red );
+	color1.green = (uint8)(((int16(color2.green) - int16(color1.green))
+		* alphaMix) / 255 + color1.green);
+	color1.blue = (uint8)(((int16(color2.blue) - int16(color1.blue))
+		* alphaMix) / 255 + color1.blue);
+	color1.alpha = (uint8)(((int16(color2.alpha) - int16(color1.alpha))
+		* amount) / 255 + color1.alpha);
+
+	return color1;
+}
+
+
+rgb_color
+disable_color(rgb_color color, rgb_color background)
+{
+	return mix_color(color, background, 185);
+}
 
 
 status_t

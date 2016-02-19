@@ -5,7 +5,7 @@
 
 /*!	\class KPPPLCP
 	\brief The LCP protocol.
-	
+
 	Every PPP interface \e must have an LCP protocol. It is used for establishing
 	and terminating connections. \n
 	When establishing a connecition the LCP protocol determines connection-specific
@@ -20,8 +20,11 @@
 #include <KPPPOptionHandler.h>
 
 #include <netinet/in.h>
-#include <core_funcs.h>
+
+#include <net_buffer.h>
 #include <sys/socket.h>
+
+extern net_buffer_module_info *gBufferModule;
 
 
 //!	Creates a new LCP protocol for the given interface.
@@ -48,7 +51,7 @@ KPPPLCP::~KPPPLCP()
 
 
 /*!	\brief Adds a new option handler.
-	
+
 	NOTE: You can only add option handlers in \c PPP_DOWN_PHASE. \n
 	There may only be one handler per option type!
 */
@@ -57,19 +60,19 @@ KPPPLCP::AddOptionHandler(KPPPOptionHandler *optionHandler)
 {
 	if (!optionHandler || &optionHandler->Interface() != &Interface())
 		return false;
-	
+
 	if (Interface().Phase() != PPP_DOWN_PHASE
 			|| OptionHandlerFor(optionHandler->Type()))
 		return false;
 			// a running connection may not change and there may only be
 			// one handler per option type
-	
+
 	return fOptionHandlers.AddItem(optionHandler);
 }
 
 
 /*!	\brief Removes an option handler, but does not delete it.
-	
+
 	NOTE: You can only remove option handlers in \c PPP_DOWN_PHASE.
 */
 bool
@@ -78,7 +81,7 @@ KPPPLCP::RemoveOptionHandler(KPPPOptionHandler *optionHandler)
 	if (Interface().Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
-	
+
 	return fOptionHandlers.RemoveItem(optionHandler);
 }
 
@@ -87,11 +90,12 @@ KPPPLCP::RemoveOptionHandler(KPPPOptionHandler *optionHandler)
 KPPPOptionHandler*
 KPPPLCP::OptionHandlerAt(int32 index) const
 {
+	dprintf("total optionhandler count %ld\n", CountOptionHandlers());
 	KPPPOptionHandler *optionHandler = fOptionHandlers.ItemAt(index);
-	
+
 	if (optionHandler == fOptionHandlers.GetDefaultItem())
 		return NULL;
-	
+
 	return optionHandler;
 }
 
@@ -103,14 +107,14 @@ KPPPLCP::OptionHandlerFor(uint8 type, int32 *start) const
 	// The iteration style in this method is strange C/C++.
 	// Explanation: I use this style because it makes extending all XXXFor
 	// methods simpler as that they look very similar, now.
-	
+
 	int32 index = start ? *start : 0;
-	
+
 	if (index < 0)
 		return NULL;
-	
+
 	KPPPOptionHandler *current = OptionHandlerAt(index);
-	
+
 	for (; current; current = OptionHandlerAt(++index)) {
 		if (current->Type() == type) {
 			if (start)
@@ -118,13 +122,13 @@ KPPPLCP::OptionHandlerFor(uint8 type, int32 *start) const
 			return current;
 		}
 	}
-	
+
 	return NULL;
 }
 
 
 /*!	\brief Adds a new LCP extension.
-	
+
 	NOTE: You can only add LCP extensions in \c PPP_DOWN_PHASE.
 */
 bool
@@ -132,17 +136,17 @@ KPPPLCP::AddLCPExtension(KPPPLCPExtension *lcpExtension)
 {
 	if (!lcpExtension || &lcpExtension->Interface() != &Interface())
 		return false;
-	
+
 	if (Interface().Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
-	
+
 	return fLCPExtensions.AddItem(lcpExtension);
 }
 
 
 /*!	\brief Removes an LCP extension, but does not delete it.
-	
+
 	NOTE: You can only remove LCP extensions in \c PPP_DOWN_PHASE.
 */
 bool
@@ -151,7 +155,7 @@ KPPPLCP::RemoveLCPExtension(KPPPLCPExtension *lcpExtension)
 	if (Interface().Phase() != PPP_DOWN_PHASE)
 		return false;
 			// a running connection may not change
-	
+
 	return fLCPExtensions.RemoveItem(lcpExtension);
 }
 
@@ -160,11 +164,12 @@ KPPPLCP::RemoveLCPExtension(KPPPLCPExtension *lcpExtension)
 KPPPLCPExtension*
 KPPPLCP::LCPExtensionAt(int32 index) const
 {
+	dprintf("LCPExtension count %ld\n", CountLCPExtensions());
 	KPPPLCPExtension *lcpExtension = fLCPExtensions.ItemAt(index);
-	
+
 	if (lcpExtension == fLCPExtensions.GetDefaultItem())
 		return NULL;
-	
+
 	return lcpExtension;
 }
 
@@ -176,14 +181,14 @@ KPPPLCP::LCPExtensionFor(uint8 code, int32 *start) const
 	// The iteration style in this method is strange C/C++.
 	// Explanation: I use this style because it makes extending all XXXFor
 	// methods simpler as that they look very similar, now.
-	
+
 	int32 index = start ? *start : 0;
-	
+
 	if (index < 0)
 		return NULL;
-	
+
 	KPPPLCPExtension *current = LCPExtensionAt(index);
-	
+
 	for (; current; current = LCPExtensionAt(++index)) {
 		if (current->Code() == code) {
 			if (start)
@@ -191,24 +196,8 @@ KPPPLCP::LCPExtensionFor(uint8 code, int32 *start) const
 			return current;
 		}
 	}
-	
+
 	return NULL;
-}
-
-
-//!	Returns the interface, target, and device overhead.
-uint32
-KPPPLCP::AdditionalOverhead() const
-{
-	uint32 overhead = Interface().Overhead();
-	
-	if (Target())
-		overhead += Target()->Overhead();
-	
-	if (Interface().Device())
-		overhead += Interface().Device()->Overhead();
-	
-	return overhead;
 }
 
 
@@ -230,7 +219,7 @@ KPPPLCP::Down()
 
 //!	Sends a packet to the target (if there is one) or to the interface.
 status_t
-KPPPLCP::Send(struct mbuf *packet, uint16 protocolNumber)
+KPPPLCP::Send(net_buffer *packet, uint16 protocolNumber)
 {
 	if (Target())
 		return Target()->Send(packet, PPP_LCP_PROTOCOL);
@@ -241,39 +230,32 @@ KPPPLCP::Send(struct mbuf *packet, uint16 protocolNumber)
 
 //!	Decodes the LCP packet and passes it to the KPPPStateMachine or an LCP extension.
 status_t
-KPPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
+KPPPLCP::Receive(net_buffer *packet, uint16 protocolNumber)
 {
 	if (!packet)
 		return B_ERROR;
-	
+
 	if (protocolNumber != PPP_LCP_PROTOCOL) {
 		ERROR("KPPPLCP::Receive(): wrong protocol number!\n");
 		return PPP_UNHANDLED;
 	}
-	
-	ppp_lcp_packet *data = mtod(packet, ppp_lcp_packet*);
-	
+
+	NetBufferHeaderReader<ppp_lcp_packet> bufferHeader(packet);
+	if (bufferHeader.Status() < B_OK)
+		return bufferHeader.Status();
+
+	ppp_lcp_packet &data = bufferHeader.Data();
+
 	// remove padding
-	int32 length = packet->m_len;
-	if (packet->m_flags & M_PKTHDR)
-		length = packet->m_pkthdr.len;
-	length -= ntohs(data->length);
-	if (length)
-		m_adj(packet, -length);
-	
-	struct mbuf *copy = m_gethdr(MT_DATA);
-	if (copy) {
-		copy->m_data += AdditionalOverhead();
-		copy->m_pkthdr.len = copy->m_len = packet->m_len;
-		memcpy(copy->m_data, packet->m_data, copy->m_len);
-	}
-	
-	if (ntohs(data->length) < 4)
+
+	net_buffer *copy = gBufferModule->duplicate(packet);
+
+	if (ntohs(data.length) < 4)
 		return B_ERROR;
 
 	bool handled = true;
 
-	switch (data->code) {
+	switch (data.code) {
 		case PPP_CONFIGURE_REQUEST:
 			StateMachine().RCREvent(packet);
 			break;
@@ -310,43 +292,43 @@ KPPPLCP::Receive(struct mbuf *packet, uint16 protocolNumber)
 			break;
 
 		default:
-			m_freem(packet);
+			// gBufferModule->free(packet);
 			handled = false;
 	}
-	
+
 	packet = copy;
-	
+
 	if (!packet)
 		return handled ? B_OK : B_ERROR;
-	
+
 	status_t result = B_OK;
-	
+
 	// Try to find LCP extensions that can handle this code.
 	// We must duplicate the packet in order to ask all handlers.
 	int32 index = 0;
-	KPPPLCPExtension *lcpExtension = LCPExtensionFor(data->code, &index);
-	for (; lcpExtension; lcpExtension = LCPExtensionFor(data->code, &(++index))) {
+	KPPPLCPExtension *lcpExtension = LCPExtensionFor(data.code, &index);
+	for (; lcpExtension; lcpExtension = LCPExtensionFor(data.code, &(++index))) {
 		if (!lcpExtension->IsEnabled())
 			continue;
-		
-		result = lcpExtension->Receive(packet, data->code);
-		
+
+		result = lcpExtension->Receive(packet, data.code);
+
 		// check return value and return it on error
 		if (result == B_OK)
 			handled = true;
 		else if (result != PPP_UNHANDLED) {
-			m_freem(packet);
+			gBufferModule->free(packet);
 			return result;
 		}
 	}
-	
+
 	if (!handled) {
 		StateMachine().RUCEvent(packet, PPP_LCP_PROTOCOL, PPP_CODE_REJECT);
 		return PPP_REJECTED;
 	}
-	
-	m_freem(packet);
-	
+
+	gBufferModule->free(packet);
+
 	return result;
 }
 
@@ -356,7 +338,7 @@ void
 KPPPLCP::Pulse()
 {
 	StateMachine().TimerEvent();
-	
+
 	for (int32 index = 0; index < CountLCPExtensions(); index++)
 		LCPExtensionAt(index)->Pulse();
 }

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-libtracker	679062638
+1	belarusian	x-vnd.Haiku-libtracker	2319437087
 OK	WidgetAttributeText		ОК
 Add-ons	FilePanelPriv		Дапаўненні
 Desktop	Model		Дэсктоп
@@ -425,7 +425,6 @@ Recent queries	FindPanel		Папярэднія запыты
 Mount	ContainerWindow		Змантаваць
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used выкарыстана -- %free свабодна)
 Cancel	FSClipBoard		Адмена
-Restart Deskbar	DeskWindow		Перазапусціць Дэсктоп
 Cut more	ContainerWindow		Выразаць яшчэ
 Deleting: 	StatusWindow		Выдаляецца: 
 Empty Trash	InfoWindow		Ачысціць сметніцу

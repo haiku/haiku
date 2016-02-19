@@ -34,7 +34,13 @@ BootManagerWindow::BootManagerWindow()
 {
 	float minWidth, maxWidth, minHeight, maxHeight;
 	GetSizeLimits(&minWidth, &maxWidth, &minHeight, &maxHeight);
-	SetSizeLimits(250, maxWidth, 250, maxHeight);
+
+	// Use font to determine necessary size of window:
+	const BFont* font = be_plain_font;
+	minWidth = 400 * (double)font->Size() / 12.0f;
+	minHeight = 250 * (double)font->Size() / 12.0f;
+
+	SetSizeLimits(minWidth, maxWidth, minHeight, maxHeight);
 
 	fWizardView = new WizardView("wizard");
 	BLayoutBuilder::Group<>(this)

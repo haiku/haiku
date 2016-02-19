@@ -23,7 +23,7 @@ IconView::IconView(icon_size iconSize)
 	fIconBitmap(new BBitmap(BRect(iconSize), B_RGBA32)),
 	fDrawIcon(false)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

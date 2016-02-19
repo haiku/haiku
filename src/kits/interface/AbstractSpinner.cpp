@@ -311,9 +311,6 @@ SpinnerButton::SpinnerButton(BRect frame, const char* name,
 	fIsMouseOver(false),
 	fRepeatDelay(100000)
 {
-	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetViewColor(bgColor);
-	SetLowColor(bgColor);
 }
 
 
@@ -327,6 +324,7 @@ SpinnerButton::AttachedToWindow()
 {
 	fParent = static_cast<BAbstractSpinner*>(Parent());
 
+	AdoptParentColors();
 	BView::AttachedToWindow();
 }
 
@@ -534,9 +532,6 @@ SpinnerTextView::SpinnerTextView(BRect rect, BRect textRect)
 		B_WILL_DRAW | B_NAVIGABLE),
 	fParent(NULL)
 {
-	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetViewColor(bgColor);
-	SetLowColor(bgColor);
 }
 
 
@@ -1074,6 +1069,16 @@ BAbstractSpinner::ValueChanged()
 
 
 void
+BAbstractSpinner::MessageReceived(BMessage* message)
+{
+	if (!IsEnabled() && message->what == B_COLORS_UPDATED)
+		_UpdateTextViewColors(false);
+
+	BControl::MessageReceived(message);
+}
+
+
+void
 BAbstractSpinner::MakeFocus(bool focus)
 {
 	fTextView->MakeFocus(focus);
@@ -1480,10 +1485,6 @@ BAbstractSpinner::_DrawTextView(BRect updateRect)
 void
 BAbstractSpinner::_InitObject()
 {
-	rgb_color bgColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-	SetViewColor(bgColor);
-	SetLowColor(bgColor);
-
 	fAlignment = B_ALIGN_LEFT;
 	fButtonStyle = SPINNER_BUTTON_PLUS_MINUS;
 
@@ -1593,30 +1594,24 @@ BAbstractSpinner::_UpdateFrame()
 void
 BAbstractSpinner::_UpdateTextViewColors(bool enable)
 {
-	rgb_color textColor;
-	rgb_color bgColor;
+	// Mimick BTextControl's appearance.
+	rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+
+	if (enable) {
+		fTextView->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+		fTextView->SetLowUIColor(ViewUIColor());
+	} else {
+		rgb_color color = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+		color = disable_color(ViewColor(), color);
+		textColor = disable_color(textColor, ViewColor());
+
+		fTextView->SetViewColor(color);
+		fTextView->SetLowColor(color);
+	}
+
 	BFont font;
-
 	fTextView->GetFontAndColor(0, &font);
-
-	if (enable)
-		textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
-	else {
-		textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DISABLED_LABEL_TINT);
-	}
-
 	fTextView->SetFontAndColor(&font, B_FONT_ALL, &textColor);
-
-	if (enable)
-		bgColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-	else {
-		bgColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_LIGHTEN_2_TINT);
-	}
-
-	fTextView->SetViewColor(bgColor);
-	fTextView->SetLowColor(bgColor);
 }
 
 

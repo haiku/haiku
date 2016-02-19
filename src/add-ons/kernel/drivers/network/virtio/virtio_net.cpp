@@ -160,7 +160,7 @@ virtio_net_init_device(void* _info, void** _cookie)
 
 	info->receive_queues = new(std::nothrow) virtio_queue[info->pairs_count];
 	info->send_queues = new(std::nothrow) virtio_queue[info->pairs_count];
-	if (info->receive_queues == NULL || info->receive_queues == NULL)
+	if (info->receive_queues == NULL || info->send_queues == NULL)
 		return B_NO_MEMORY;
 	for (uint32 i = 0; i < info->pairs_count; i++) {
 		info->receive_queues[i] = virtioQueues[i * 2];

@@ -17,6 +17,8 @@
 #include <Shape.h>
 #include <SpaceLayoutItem.h>
 #include <String.h>
+#include <ToolTipManager.h>
+#include <Window.h>
 
 #include "DurationView.h"
 #include "PeakView.h"
@@ -37,6 +39,7 @@ enum {
 	MSG_SKIP_FORWARD		= 'skpf',
 	MSG_SET_VOLUME			= 'stvl',
 	MSG_SET_MUTE			= 'stmt',
+	MSG_DURATION_TOOLTIP	= 'msdt'
 };
 
 // the range of the volume sliders (in dB)
@@ -271,6 +274,15 @@ TransportControlGroup::MessageReceived(BMessage* message)
 		case MSG_SEEK:
 			_UpdatePosition();
 			break;
+
+		case MSG_DURATION_TOOLTIP:
+		{
+			BToolTipManager* manager = BToolTipManager::Manager();
+			BPoint tipPoint;
+			GetMouse(&tipPoint, NULL, false);
+			manager->ShowTip(fPositionToolTip, tipPoint, this);
+			break;
+		}
 
 		default:
 		    BView::MessageReceived(message);
@@ -624,6 +636,9 @@ void
 TransportControlGroup::_UpdatePosition()
 {
 	PositionChanged(fSeekSlider->Value() / (float)kPositionFactor);
+
+	BMessage msg(MSG_DURATION_TOOLTIP);
+	Window()->PostMessage(&msg, this);
 }
 
 
@@ -845,4 +860,3 @@ TransportControlGroup::_CreateSpeakerShape(float height) const
 
 	return shape;
 }
-

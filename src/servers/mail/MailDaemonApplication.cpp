@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2016, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
@@ -65,16 +65,6 @@ public:
 		:
 		BMessenger(protocol)
 	{
-	}
-
-	status_t FetchBody(const entry_ref& ref, BMessenger* replyTo)
-	{
-		BMessage message(kMsgFetchBody);
-		message.AddRef("ref", &ref);
-		if (replyTo != NULL)
-			message.AddMessenger("target", *replyTo);
-
-		return SendMessage(&message);
 	}
 
 	status_t MarkAsRead(const entry_ref& ref, read_flags flag)
@@ -248,7 +238,7 @@ MailDaemonApplication::RefsReceived(BMessage* message)
 		if (message->FindMessenger("target", &target) != B_OK)
 			replyTo = NULL;
 
-		InboundMessenger(protocol).FetchBody(ref, replyTo);
+		protocol->FetchBody(ref, replyTo);
 	}
 }
 

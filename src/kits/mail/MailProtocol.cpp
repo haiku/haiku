@@ -1,10 +1,9 @@
 /*
- * Copyright 2011-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2016, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  */
 
 
-//#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -38,10 +37,6 @@
 
 
 using namespace BPrivate;
-
-
-const uint32 kMsgDeleteMessage = '&DeM';
-const uint32 kMsgAppendMessage = '&ApM';
 
 
 BMailProtocol::BMailProtocol(const char* name,
@@ -134,22 +129,6 @@ void
 BMailProtocol::MessageReceived(BMessage* message)
 {
 	BLooper::MessageReceived(message);
-}
-
-
-status_t
-BMailProtocol::MoveMessage(const entry_ref& ref, BDirectory& dir)
-{
-	BEntry entry(&ref);
-	return entry.MoveTo(&dir);
-}
-
-
-status_t
-BMailProtocol::DeleteMessage(const entry_ref& ref)
-{
-	BEntry entry(&ref);
-	return entry.Remove();
 }
 
 
@@ -415,17 +394,15 @@ BInboundMailProtocol::MessageReceived(BMessage* message)
 		case kMsgFetchBody:
 		{
 			entry_ref ref;
-			message->FindRef("ref", &ref);
-			status_t status = FetchBody(ref);
-
-			BMessenger target;
-			if (message->FindMessenger("target", &target) != B_OK)
+			if (message->FindRef("ref", &ref) != B_OK)
 				break;
 
-			BMessage message(B_MAIL_BODY_FETCHED);
-			message.AddInt32("status", status);
-			message.AddRef("ref", &ref);
-			target.SendMessage(&message);
+			BMessenger target;
+			message->FindMessenger("target", &target);
+
+			status_t status = HandleFetchBody(ref, target);
+			if (status != B_OK)
+				ReplyBodyFetched(target, ref, status);
 			break;
 		}
 
@@ -438,26 +415,22 @@ BInboundMailProtocol::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case kMsgDeleteMessage:
-		{
-			entry_ref ref;
-			message->FindRef("ref", &ref);
-			DeleteMessage(ref);
-			break;
-		}
-
-		case kMsgAppendMessage:
-		{
-			entry_ref ref;
-			message->FindRef("ref", &ref);
-			AppendMessage(ref);
-			break;
-		}
-
 		default:
 			BMailProtocol::MessageReceived(message);
 			break;
 	}
+}
+
+
+status_t
+BInboundMailProtocol::FetchBody(const entry_ref& ref, BMessenger* replyTo)
+{
+	BMessage message(kMsgFetchBody);
+	message.AddRef("ref", &ref);
+	if (replyTo != NULL)
+		message.AddMessenger("target", *replyTo);
+
+	return BMessenger(this).SendMessage(&message);
 }
 
 
@@ -469,10 +442,14 @@ BInboundMailProtocol::MarkMessageAsRead(const entry_ref& ref, read_flags flag)
 }
 
 
-status_t
-BInboundMailProtocol::AppendMessage(const entry_ref& ref)
+/*static*/ void
+BInboundMailProtocol::ReplyBodyFetched(const BMessenger& replyTo,
+	const entry_ref& ref, status_t status)
 {
-	return B_OK;
+	BMessage message(B_MAIL_BODY_FETCHED);
+	message.AddInt32("status", status);
+	message.AddRef("ref", &ref);
+	replyTo.SendMessage(&message);
 }
 
 

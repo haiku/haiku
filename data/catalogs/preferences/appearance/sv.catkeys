@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Appearance	727801787
+1	swedish	x-vnd.Haiku-Appearance	1140137500
 Plain font:	Font view		Vanlig font:
 Control highlight	Colors tab		Framhävd kontroll
 Control border	Colors tab		Kontrollkant
@@ -6,11 +6,14 @@ Antialiasing type:	AntialiasingSettingsView		Kantutjämningstyp:
 Shadow	Colors tab		Skugga
 On	AntialiasingSettingsView		På
 Defaults	APRWindow		Förval
+Link hover	Colors tab		Hovrande länk
 Grayscale	AntialiasingSettingsView		Gråskala
 Shine	Colors tab		Ljusstyrka
 About	DecorSettingsView		Om
 About decorator	DecorSettingsView		Om decorator
 Off	AntialiasingSettingsView		Av
+Link text	Colors tab		Länktext
+Link active	Colors tab		Aktiv länk
 Choose Decorator	DecorSettingsView		Välj dekor
 Success	Colors tab		Framgång
 Inactive window tab text	Colors tab		Fliktext för inaktiva fönster
@@ -36,6 +39,7 @@ List background	Colors tab		Lista bakgrund
 OK	DecorSettingsView		OK
 Control mark	Colors tab		Kontroll märke
 Size:	Font Selection view		Storlek:
+Link visited	Colors tab		Besök länk
 Decorator:	DecorSettingsView		Dekor:
 Selected list item background	Colors tab		Bakgrund för valt menyalternativ
 Panel background	Colors tab		Panelbakgrund

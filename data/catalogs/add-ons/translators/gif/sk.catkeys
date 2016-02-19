@@ -1,12 +1,17 @@
-1	slovak	x-vnd.Haiku-GIFTranslator	2250422222
+1	slovak	x-vnd.Haiku-GIFTranslator	2201651797
 Websafe	GIFView		Farby pre web
 Write interlaced images	GIFView		Zapisovať obrázky s prekladanými riadkami
 Optimal	GIFView		Optimálne
 Greyscale	GIFView		Odtiene šedej
+Colors:	GIFView		Farby:
+GIF image translator	GIFTranslator		Prekladač obrázkov GIF
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Be Bitmap Format (GIFTranslator)
 GIF image translator	GIFView		Prekladač obrázkov GIF
+Palette:	GIFView		Paleta:
 GIF image	GIFTranslator		Obrázok GIF
 Write transparent images	GIFView		Zapisovať priesvitné obrázky
+GIF images	GIFTranslator		Obrázky GIF
+Version %d.%d.%d, %s	GIFView		Verzia %d.%d.%d, %s
 Use RGB color	GIFView		Použiť farby RGB
 Use dithering	GIFView		Použiť dithering
 GIF Settings	GIFTranslator		Nastavenia GIF

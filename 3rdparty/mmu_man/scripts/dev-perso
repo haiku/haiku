@@ -23,10 +23,6 @@
 # - edit DRLIST below to include your own possible devroots
 # (ie. where you have subfolders for your own projects)
 # or export DEVROOT before sourcing dev-perso.
-# - optionally edit PWLIST below to where you possibly have a
-# PASSWDS/ folder with passwords stored as plain text.
-# (not really a good idea though :) It's exported
-# for use by project's .profile
 # - optionally force EDITOR globally (for all projects)
 # - for each project create a .profile in the subfolder,
 # which might include commands like the following, but can remain empty.
@@ -37,9 +33,6 @@
 #
 #	# force CVSROOT for this project
 #	export CVSROOT='...'
-#
-#	# shortcut to display password file for this svn
-#	alias pass="cat $PASSWDS/myself.developer.berlios.de.pass"
 #
 #	# change to the source tree
 #	cd trunk
@@ -60,13 +53,6 @@ if [ -z "$DEVROOT" ]; then
 	done
 fi
 export DEVROOT
-
-# automagically find password files
-PWLIST="/Data /fat32 $HOME"
-for d in $PWLIST; do
-	test -d "$d/PASSWDS" && PASSWDS="$d/PASSWDS" && break;
-done
-export PASSWDS
 
 # svn sometimes forgets about vi and wants me to use nano...
 #export EDITOR=vim
@@ -145,19 +131,25 @@ dev() {
 		;;
 	esac
 
+	# check for a TODO list
+	for f in TODO TODO.org; do
+		test -e "$f" && grep '^* ' "$f" | grep --color=always ' TODO ' | head -5 && break
+	done
+
 	DEVUPCMD=""
 
 	# source the specific profile file
+	# (which will likely cd to the checkout directory)
 	test -f .profile && . .profile
 
 	# if no editor defined, set one
 	test -z "$EDITOR" -a -z "$SVN_EDITOR" && export EDITOR=vim
 	
 	# make sure the update action is the first found in history.
+	test -z "$DEVUPCMD" -a -d .git && DEVUPCMD="git pull"
 	test -z "$DEVUPCMD" -a -d .svn && DEVUPCMD="svn up"
 	test -z "$DEVUPCMD" -a -d .bzr && DEVUPCMD="bzr update"
 	test -z "$DEVUPCMD" -a -d .hg && DEVUPCMD="hg pull"
-	test -z "$DEVUPCMD" -a -d .git && DEVUPCMD="git pull"
 	test -z "$DEVUPCMD" -a -d CVS && DEVUPCMD="cvs up -d"
 	test -z "$DEVUPCMD" -a \( -f _FOSSIL_ -o -f .fslckout \) && DEVUPCMD="fossil update"
 	test -z "$DEVUPCMD" -a -n "$P4PORT" && DEVUPCMD="p4 sync"

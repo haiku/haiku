@@ -30,17 +30,11 @@ public:
 
 private:
 			void				_CleanupTeam(team_id team);
-			void				_TeamDied(team_id team);
-
-	static	status_t			_BigBrotherEntry(void* self);
-			void				_BigBrother();
 
 private:
 			typedef std::map<team_id, BMessenger> AppMap;
 
 			AppMap				fMap;
-			thread_id			fBigBrother;
-			sem_id				fQuit;
 };
 
 

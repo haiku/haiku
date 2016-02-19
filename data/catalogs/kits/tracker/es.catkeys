@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libtracker	1032311269
+1	spanish; castilian	x-vnd.Haiku-libtracker	2672685718
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Añadidos
 Mount settings…	ContainerWindow		Opciones de montaje
@@ -424,7 +424,6 @@ Recent queries	FindPanel		Consultas recientes
 Mount	ContainerWindow		Montar
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used usado -- %free libre)
 Cancel	FSClipBoard		Cancelar
-Restart Deskbar	DeskWindow		Reiniciar barra de escritorio
 Cut more	ContainerWindow		Cortar más
 Deleting: 	StatusWindow		Eliminando:
 Empty Trash	InfoWindow		Papelera Vacía

@@ -57,7 +57,7 @@ ConnectionView::ConnectionView(BRect rect, const BString& interfaceName)
 	fInterfaceName(interfaceName),
 	fKeepLabel(false)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	
 	rect = Bounds();
 	rect.InsetBy(5, 5);

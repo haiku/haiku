@@ -1,0 +1,13 @@
+resource app_flags B_MULTIPLE_LAUNCH | B_ARGV_ONLY;
+
+resource app_signature "application/x-vnd.Haiku-mail_utils-mail";
+
+resource app_version {
+	major  = 1,
+	middle = 0,
+	minor  = 0,
+	variety = B_APPV_FINAL,
+	internal = 1,
+	short_info = "mail",
+	long_info = "mail"
+};

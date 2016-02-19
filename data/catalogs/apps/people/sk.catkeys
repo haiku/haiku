@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Be-PEPL	3273435274
+1	slovak	x-vnd.Be-PEPL	2332202134
 Edit	People		Upraviť
 Error	People		Chyba
 City	People		Mesto
@@ -21,6 +21,7 @@ Nickname	People		Prezývka
 Quit	People		Ukončiť
 Name	People		Meno
 Revert	People		Vrátiť
+Don't save	People		Neukladať
 Undo	People		Späť
 E-mail	People		E-mail
 Load image…	People		Načítať obrázok…
@@ -30,6 +31,7 @@ Launching the FileTypes preflet to configure Person attributes has failed.\n\nEr
 Home phone	People		Telefón domov
 Save as…	People		Uložiť ako…
 Redo	People		Opakovať
+Save changes before closing?	People		Uložiť zmeny pred ukončením?
 Paste	People		Vložiť
 Drop an image here,\nor use the contextual menu.	People		Sem pretiahnite obrázok\nalebo použite kontextové menu.
 Save	People		Uložiť

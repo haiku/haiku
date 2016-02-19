@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Be-TSKB	2335730970
+1	belarusian	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Выключыць
 Sort applications by name	PreferencesWindow		Сартаваць прагамы па назвах
 Suspend	DeskbarMenu		Прыпыніць
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Вялікі
 Auto-raise	PreferencesWindow		Узнікаць аўтаматычна
 Recent folders:	PreferencesWindow		Нядаўнія каталёгі:
 Show application expander	PreferencesWindow		Паказваць кнопку спісу праграм
-Restart Tracker	DeskbarMenu		Перазапусціць Tracker
 Close all	WindowMenu		Закрыць усё
 Deskbar preferences	PreferencesWindow		Наладкі Deskbar
 Mount	DeskbarMenu		Прымацаваць

@@ -1,13 +1,14 @@
 /*
- * Copyright 2011-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
+ *		Joseph Groover, looncraz@looncraz.net
  *
  * Corresponds to:
- *		headers/os/interface/Window.h	 hrev45799
- *		src/kits/interface/Window.cpp	 hrev45799
+ *		headers/os/interface/Window.h	 hrev497**
+ *		src/kits/interface/Window.cpp	 hrev497**
  */
 
 
@@ -1962,6 +1963,17 @@
 /*!
 	\fn void BWindow::CenterOnScreen(screen_id id)
 	\brief Centers the window on the screen with the passed in \a id.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BWindow::IsOffscreenWindow() const
+	\brief Tests if window is used for drawing into a BBitmap.
+	       This is mostly used by the Interface Kit itself.
+
+	\return True if the window is used for drawing into a BBitmap.
 
 	\since Haiku R1
 */

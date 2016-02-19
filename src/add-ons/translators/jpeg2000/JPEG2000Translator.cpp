@@ -725,7 +725,7 @@ TranslatorAboutView::TranslatorAboutView(const char* name)
 
 	BTextView* infoView = new BTextView("info");
 	infoView->SetText(sTranslatorInfo);
-	infoView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	infoView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	infoView->MakeEditable(false);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)

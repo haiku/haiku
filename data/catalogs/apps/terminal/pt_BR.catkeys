@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-Terminal	2093402207
+1	portuguese (brazil)	x-vnd.Haiku-Terminal	2980268722
 Not found.	Terminal TermWindow		Não localizado.
 Switch Terminals	Terminal TermWindow		Alternar Terminais
 Change directory	Terminal TermView		Mudar de pasta
@@ -83,7 +83,6 @@ Close	Terminal TermWindow		Fechar
 Text	Terminal AppearancePrefView		Texto
 Clear all	Terminal TermWindow		Limpar tudo
 Text encoding	Terminal TermWindow		Codificação de texto
-size	Terminal TermView		tamanho
 Close window	Terminal TermWindow		Fechar janela
 Copy absolute path	Terminal TermView		Copiar caminho absoluto
 Save as default	Terminal TermWindow		Salvar como padrão

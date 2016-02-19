@@ -1102,6 +1102,23 @@ BApplication::DispatchMessage(BMessage* message, BHandler* handler)
 			break;
 		}
 
+		case B_COLORS_UPDATED:
+		{
+			AutoLocker<BLooperList> listLock(gLooperList);
+			if (!listLock.IsLocked())
+				break;
+
+			BWindow* window = NULL;
+			uint32 count = gLooperList.CountLoopers();
+			for (uint32 index = 0; index < count; ++index) {
+				window = dynamic_cast<BWindow*>(gLooperList.LooperAt(index));
+				if (window == NULL || (window != NULL && window->fOffscreen))
+					continue;
+				window->PostMessage(message);
+			}
+			break;
+		}
+
 		case _SHOW_DRAG_HANDLES_:
 		{
 			bool show;

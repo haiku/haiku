@@ -202,11 +202,7 @@ DialogPane::SetMode(int32 mode, bool initialSetup)
 void
 DialogPane::AttachedToWindow()
 {
-	BView* parent = Parent();
-	if (parent != NULL) {
-		SetViewColor(parent->ViewColor());
-		SetLowColor(parent->LowColor());
-	}
+	AdoptParentColors();
 }
 
 
@@ -370,6 +366,7 @@ PaneSwitch::Draw(BRect)
 		else
 			point.x = bounds.right - labelDist - StringWidth(label);
 
+		SetHighUIColor(B_PANEL_TEXT_COLOR);
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 		point.y = (bounds.top + bounds.bottom

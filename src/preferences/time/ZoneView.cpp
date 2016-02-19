@@ -116,8 +116,7 @@ void
 TimeZoneView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
+	AdoptParentColors();
 
 	if (!fInitialized) {
 		fInitialized = true;

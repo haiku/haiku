@@ -1,5 +1,6 @@
-1	slovak	x-vnd.Haiku-StyledEdit	1954793944
+1	slovak	x-vnd.Haiku-StyledEdit	727465241
 StyledEdit	System name		StyledEdit
+This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Tento súbor je označený iba na čítanie. Uložiť zmeny v dokumente „%s“? 
 Paste	Menus		Vložiť
 OK	LoadAlert		OK
 File	Menus		Súbor
@@ -16,6 +17,7 @@ Page setup…	Menus		Nastavenie stránky…
 Print…	Menus		Tlačiť…
 Can't undo	Menus		Nie je možné vrátiť späť
 Save	Menus		Uložiť
+Default	Menus		Predvolené
 Replace with:	FindandReplaceWindow		Nahradiť čím:
 Cancel	SaveAlert		Zrušiť
 Cannot revert, file not found: \"%s\".	RevertToSavedAlert		Nie je možné vrátiť späť, súbor nebol nájdený: „%s“.

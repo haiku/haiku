@@ -6,8 +6,9 @@
 #ifndef STATUS_VIEW__H
 #define STATUS_VIEW__H
 
-#include <View.h>
+#include <Button.h>
 #include <PPPInterface.h>
+#include <StringView.h>
 
 
 class PPPStatusView : public BView {

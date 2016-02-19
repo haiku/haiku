@@ -149,19 +149,19 @@ int main(int argc, char *argv[])
 // stuffing
 // -------------------------------------------------------- //
 
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_0(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_1(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_2(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_3(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_4(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_5(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_6(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_7(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_8(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_9(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_10(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_11(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_12(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_13(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_14(void *) {};
-status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_15(void *) {};
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_0(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_1(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_2(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_3(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_4(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_5(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_6(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_7(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_8(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_9(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_10(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_11(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_12(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_13(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_14(void *) { return B_ERROR; };
+status_t MediaWriterAddOn::_Reserved_MediaWriterAddOn_15(void *) { return B_ERROR; };

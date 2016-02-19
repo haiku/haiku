@@ -14,7 +14,7 @@ Application DiskUsage :
 	Snapshot.cpp
 	StatusView.cpp
 	VolumeView.cpp
-	: be libshared.a localestub [ TargetLibstdc++ ]
+	: be shared localestub [ TargetLibstdc++ ]
 	: DiskUsage.rdef
 ;
 

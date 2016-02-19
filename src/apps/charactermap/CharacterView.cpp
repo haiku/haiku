@@ -237,6 +237,8 @@ CharacterView::AttachedToWindow()
 {
 	Window()->AddShortcut('C', B_SHIFT_KEY,
 		new BMessage(kMsgCopyAsEscapedString), this);
+	SetViewColor(255, 255, 255, 255);
+	SetLowColor(ViewColor());
 }
 
 
@@ -402,6 +404,11 @@ CharacterView::Draw(BRect updateRect)
 	BFont font;
 	GetFont(&font);
 
+	rgb_color color = (rgb_color){0, 0, 0, 255};
+	rgb_color highlight = (rgb_color){220, 220, 220, 255};
+	rgb_color enclose = mix_color(highlight,
+		ui_color(B_CONTROL_HIGHLIGHT_COLOR), 128);
+
 	for (int32 i = _BlockAt(updateRect.LeftTop()); i < (int32)kNumUnicodeBlocks;
 			i++) {
 		if (!IsShowingBlock(i))
@@ -411,7 +418,7 @@ CharacterView::Draw(BRect updateRect)
 		if (y > updateRect.bottom)
 			break;
 
- 		SetHighColor(0, 0, 0);
+		SetHighColor(color);
 		DrawString(kUnicodeBlocks[i].name, BPoint(3, y + fTitleBase));
 
 		y += fTitleHeight;
@@ -424,11 +431,14 @@ CharacterView::Draw(BRect updateRect)
 				&& y < updateRect.bottom) {
 				// Stroke frame around the active character
 				if (fHasCharacter && fCurrentCharacter == c) {
-					SetHighColor(tint_color(ViewColor(), 1.05f));
+					SetHighColor(highlight);
 					FillRect(BRect(x, y, x + fCharacterWidth,
 						y + fCharacterHeight - fGap));
+					SetHighColor(enclose);
+					StrokeRect(BRect(x, y, x + fCharacterWidth,
+						y + fCharacterHeight - fGap));
 
-					SetHighColor(0, 0, 0);
+					SetHighColor(color);
 				}
 
 				// Draw character

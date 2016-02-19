@@ -1,7 +1,10 @@
-1	slovak	x-vnd.Haiku-Media	2605101563
+1	slovak	x-vnd.Haiku-Media	4205337498
 Couldn't add volume control in Deskbar: %s\n	Media views		Nepodarilo sa pridať ovládanie hlasitosti do Panela: %s\n
 Video input:	Media views		Video vstup:
+Warning!	Media Window		Upozornenie!
+Quit anyway	Media Window		Ukončiť napriek tomu
 Defaults	Media views		Predvolené
+MIDI Settings	Media Window		Nastavenia MIDI
 Quit	Media Window		Ukončiť
 Video settings	Media Window		Video nastavenia
 Video output:	Media views		Video výstup:
@@ -9,6 +12,7 @@ Could not connect to the media server.\nWould you like to start it ?	Media Windo
 Restart media services	Media views		Reštartovať multimediálne služby
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nepodarilo sa odstrániť ovládanie hlasitosti z Panela: %s\n
 Media	System name		Multimédiá
+Quitting Media now will stop the restarting of the media services. Flaky or unavailable media functionality is the likely result.	Media Window		Ak Media teraz ukončíte, zastavíte reštartovanie multimediálnych služieb. To bude mať pravdepodobne za náseldok nefunkčné alebo nedostupné multimediálne funkcie.
 Audio mixer	Media Window		Zmiešavač zvuku
 This hardware has no controls.	Media Window		Tento hardvér nemá žiadne ovládacie prvky.
 Audio output:	Media views		Zvukový výstup:

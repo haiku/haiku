@@ -66,6 +66,9 @@ virtual		void NodeRegistered(void);	/* reserved 2 */
 /*****************************/
 /* begin from BFileInterface */
 protected:
+
+using AbstractFileInterfaceNode::SetRef;
+
 virtual	status_t SetRef(
 				const entry_ref & file,
 				bool create,

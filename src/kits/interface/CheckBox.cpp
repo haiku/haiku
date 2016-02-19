@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -111,7 +111,7 @@ BCheckBox::Draw(BRect updateRect)
 
 	BRect checkBoxRect(_CheckBoxFrame());
 	BRect rect(checkBoxRect);
-	be_control_look->DrawCheckBox(this, rect, updateRect,base, flags);
+	be_control_look->DrawCheckBox(this, rect, updateRect, base, flags);
 
 	BRect labelRect(Bounds());
 	labelRect.left = checkBoxRect.right + 1

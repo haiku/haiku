@@ -92,7 +92,7 @@ BControlLook::ComposeSpacing(float spacing)
 uint32
 BControlLook::Flags(BControl* control) const
 {
-	uint32 flags = 0;
+	uint32 flags = B_IS_CONTROL;
 
 	if (!control->IsEnabled())
 		flags |= B_DISABLED;
@@ -1763,29 +1763,29 @@ BControlLook::DrawGroupFrame(BView* view, BRect& rect, const BRect& updateRect,
 
 void
 BControlLook::DrawLabel(BView* view, const char* label, BRect rect,
-	const BRect& updateRect, const rgb_color& base, uint32 flags)
+	const BRect& updateRect, const rgb_color& base, uint32 flags,
+	const rgb_color* textColor)
 {
 	DrawLabel(view, label, NULL, rect, updateRect, base, flags,
-		DefaultLabelAlignment());
+		DefaultLabelAlignment(), textColor);
 }
 
 
 void
 BControlLook::DrawLabel(BView* view, const char* label, BRect rect,
 	const BRect& updateRect, const rgb_color& base, uint32 flags,
-	const BAlignment& alignment)
+	const BAlignment& alignment, const rgb_color* textColor)
 {
-	DrawLabel(view, label, NULL, rect, updateRect, base, flags, alignment);
+	DrawLabel(view, label, NULL, rect, updateRect, base, flags, alignment,
+			textColor);
 }
 
 
 void
 BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
-	uint32 flags, const BPoint& where)
+	uint32 flags, const BPoint& where, const rgb_color* textColor)
 {
 	// setup the text color
-	// TODO: Should either use the ui_color(B_CONTROL_TEXT_COLOR) here,
-	// or elliminate that constant alltogether (stippi: +1).
 
 	BWindow* window = view->Window();
 	bool isDesktop = window
@@ -1799,18 +1799,19 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 	rgb_color	color;
 	rgb_color	glowColor;
 
+	if (textColor != NULL)
+		glowColor = *textColor;
+	else if ((flags & B_IS_CONTROL) != 0)
+		glowColor = ui_color(B_CONTROL_TEXT_COLOR);
+	else
+		glowColor = ui_color(B_PANEL_TEXT_COLOR);
+
+	color = glowColor;
+
 	if (isDesktop)
 		low = view->Parent()->ViewColor();
 	else
 		low = base;
-
-	if (low.red + low.green + low.blue > 128 * 3) {
-		color = tint_color(low, B_DARKEN_MAX_TINT);
-		glowColor = kWhite;
-	} else {
-		color = tint_color(low, B_LIGHTEN_MAX_TINT);
-		glowColor = kBlack;
-	}
 
 	if ((flags & B_DISABLED) != 0) {
 		color.red = (uint8)(((int32)low.red + color.red + 1) / 2);
@@ -1821,6 +1822,17 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 	drawing_mode oldMode = view->DrawingMode();
 
 	if (isDesktop) {
+		// Enforce proper use of desktop label colors.
+		if(low.Brightness() < 100) {
+			if (textColor == NULL)
+				color = make_color(255, 255, 255);
+			glowColor = make_color(0, 0, 0);
+		} else {
+			if (textColor == NULL)
+				color = make_color(0, 0, 0);
+			glowColor = make_color(255, 255, 255);
+		}
+
 		// drawing occurs on the desktop
 		if (fCachedWorkspace != current_workspace()) {
 			int8 indice = 0;
@@ -1847,7 +1859,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 			view->SetDrawingMode(B_OP_ALPHA);
 			view->SetBlendingMode(B_CONSTANT_ALPHA, B_ALPHA_OVERLAY);
 			// Draw glow or outline
-			if (glowColor == kWhite) {
+			if (glowColor.Brightness() > 128) {
 				font.SetFalseBoldWidth(2.0);
 				view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 
@@ -1864,7 +1876,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 
 				font.SetFalseBoldWidth(0.0);
 				view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
-			} else if (glowColor == kBlack) {
+			} else {
 				font.SetFalseBoldWidth(1.0);
 				view->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);
 
@@ -1891,17 +1903,18 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 
 void
 BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
-	BRect rect, const BRect& updateRect, const rgb_color& base, uint32 flags)
+	BRect rect, const BRect& updateRect, const rgb_color& base, uint32 flags,
+	const rgb_color* textColor)
 {
 	DrawLabel(view, label, icon, rect, updateRect, base, flags,
-		DefaultLabelAlignment());
+		DefaultLabelAlignment(), textColor);
 }
 
 
 void
 BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 	BRect rect, const BRect& updateRect, const rgb_color& base, uint32 flags,
-	const BAlignment& alignment)
+	const BAlignment& alignment, const rgb_color* textColor)
 {
 	if (!rect.Intersects(updateRect))
 		return;
@@ -1967,7 +1980,7 @@ BControlLook::DrawLabel(BView* view, const char* label, const BBitmap* icon,
 	if (textHeight < height)
 		location.y += ceilf((height - textHeight) / 2);
 
-	DrawLabel(view, truncatedLabel.String(), base, flags, location);
+	DrawLabel(view, truncatedLabel.String(), base, flags, location, textColor);
 }
 
 
@@ -2136,13 +2149,13 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 	rgb_color edgeShadowColor;
 
 	// default button frame color
-	// TODO: B_BLEND_FRAME
-	float defaultIndicatorTint = 1.2;
-	if ((flags & B_DISABLED) != 0)
-		defaultIndicatorTint = (B_NO_TINT + defaultIndicatorTint) / 2;
-
-	rgb_color defaultIndicatorColor = tint_color(base, defaultIndicatorTint);
+	rgb_color defaultIndicatorColor = ui_color(B_CONTROL_BORDER_COLOR);
 	rgb_color cornerBgColor;
+
+	if ((flags & B_DISABLED) != 0) {
+		defaultIndicatorColor = disable_color(defaultIndicatorColor,
+			background);
+	}
 
 	drawing_mode oldMode = view->DrawingMode();
 
@@ -2156,10 +2169,7 @@ BControlLook::_DrawButtonFrame(BView* view, BRect& rect,
 			brightness * ((flags & B_DISABLED) != 0 ? 1.0 : 0.9), flags);
 
 		// draw default button indicator
-		view->SetHighColor(background);
-		view->FillRect(rect);
-		view->SetHighColor(base);
-		view->StrokeRoundRect(rect, leftTopRadius, leftTopRadius);
+		// Allow a 1-pixel border of the background to come through.
 		rect.InsetBy(1, 1);
 
 		view->SetHighColor(defaultIndicatorColor);

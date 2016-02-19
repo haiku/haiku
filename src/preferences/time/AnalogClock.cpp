@@ -250,7 +250,7 @@ TAnalogClock::DrawClock()
 
 	BRect bounds = Bounds();
 	// clear background
-	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color background = ViewColor();
 	SetHighColor(background);
 	FillRect(bounds);
 

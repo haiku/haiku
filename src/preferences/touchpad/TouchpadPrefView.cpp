@@ -60,7 +60,6 @@ TouchpadView::TouchpadView(BRect frame)
 
 TouchpadView::~TouchpadView()
 {
-puts("GONE!");
 	delete fOffScreenBitmap;
 }
 

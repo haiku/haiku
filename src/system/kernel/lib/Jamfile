@@ -123,6 +123,7 @@ KernelMergeObject kernel_lib_posix.o :
 	strstr.c
 	strtok.c
 	strupr.c
+	stpcpy.c
 
 	: $(TARGET_KERNEL_PIC_CCFLAGS)
 ;

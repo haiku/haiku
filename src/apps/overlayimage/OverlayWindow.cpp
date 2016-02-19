@@ -32,7 +32,7 @@ OverlayWindow::OverlayWindow()
 	AddChild(replView);
 
 	BView *bgView = new BView(Bounds(), "bgView", B_FOLLOW_ALL, B_WILL_DRAW);
-	bgView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	bgView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(bgView);
 }
 

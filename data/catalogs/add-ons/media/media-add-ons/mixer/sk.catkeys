@@ -6,7 +6,7 @@ Refuse output format changes	AudioMixer		Odmietnuť zmeny výstupného formátu
 Output mapping	AudioMixer		Mapovanie výstupu
 Allow input channel remapping	AudioMixer		Povoliť premapovanie vstupného kanála
 Resampling algorithm	AudioMixer		Algoritmus prevzorkovania
-Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Utlmiť výstup zmiešavačao 3dB (ako BeOS R5)
+Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Utlmiť výstup zmiešavača o 3dB (ako BeOS R5)
 Display balance control for stereo connections	AudioMixer		Zobraziť ovládanie vyváženia pri stereo spojeniach
 To output	AudioMixer		Na výstup
 not connected	AudioMixer		nepripojené

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1787267522
+1	german	x-vnd.Haiku-libtracker	3427641971
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-ons
 Mount settings…	ContainerWindow		Einhänge-Einstellungen…
@@ -427,7 +427,6 @@ Recent queries	FindPanel		Letzte Queries
 Mount	ContainerWindow		Einhängen
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used benutzt -- %free frei)
 Cancel	FSClipBoard		Abbrechen
-Restart Deskbar	DeskWindow		Deskbar neu starten
 Cut more	ContainerWindow		Mehr ausschneiden
 Deleting: 	StatusWindow		Löschen:
 Empty Trash	InfoWindow		Papierkorb leeren

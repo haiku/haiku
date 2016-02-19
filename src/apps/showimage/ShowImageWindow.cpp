@@ -94,6 +94,7 @@ enum {
 	MSG_SHOW_CAPTION			= 'mSCP',
 	MSG_PAGE_SETUP				= 'mPSU',
 	MSG_PREPARE_PRINT			= 'mPPT',
+	MSG_GET_INFO				= 'mGFI',
 	MSG_SET_RATING				= 'mSRT',
 	kMsgFitToWindow				= 'mFtW',
 	kMsgOriginalSize			= 'mOSZ',
@@ -164,7 +165,7 @@ ShowImageWindow::ShowImageWindow(BRect frame, const entry_ref& ref,
 	// visible portion without colliding with the menu bar.
 
 	BView* contentView = new BView(BRect(), "content", B_FOLLOW_NONE, 0);
-	contentView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	contentView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	contentView->SetExplicitMinSize(BSize(250, 100));
 	AddChild(contentView);
 
@@ -392,6 +393,8 @@ ShowImageWindow::_AddMenus(BMenuBar* bar)
 	menu->AddItem(menuSaveAs);
 	_AddItemMenu(menu, B_TRANSLATE("Close"), B_QUIT_REQUESTED, 'W', 0, this);
 	_AddItemMenu(menu, B_TRANSLATE("Move to Trash"), kMsgDeleteCurrentFile, 'T', 0, this);
+	_AddItemMenu(menu, B_TRANSLATE("Get info" B_UTF8_ELLIPSIS),
+		MSG_GET_INFO, 'I', 0, this);
 	menu->AddSeparatorItem();
 	_AddItemMenu(menu, B_TRANSLATE("Page setup" B_UTF8_ELLIPSIS),
 		MSG_PAGE_SETUP, 0, 0, this);
@@ -872,6 +875,10 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			fImageView->Flip(false);
 			break;
 
+		case MSG_GET_INFO:
+			_GetFileInfo(fNavigator.CurrentRef());
+			break;
+
 		case MSG_SLIDE_SHOW:
 		{
 			bool fullScreen = false;
@@ -1058,6 +1065,16 @@ ShowImageWindow::MessageReceived(BMessage* message)
 			BWindow::MessageReceived(message);
 			break;
 	}
+}
+
+
+void
+ShowImageWindow::_GetFileInfo(const entry_ref& ref)
+{
+	BMessage message('Tinf');
+	BMessenger tracker("application/x-vnd.Be-TRAK");
+	message.AddRef("refs", &ref);
+	tracker.SendMessage(&message);
 }
 
 

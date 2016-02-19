@@ -24,12 +24,11 @@ public:
 		return (linkkey_t){{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}};
 	}
 	
-	static char* ToString(const linkkey_t lk) 
+	static BString ToString(const linkkey_t lk) 
 	{
-		// TODO: not safe
-		static char str[50];
+		BString str;
 
-		sprintf(str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:"
+		str.SetToFormat("%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:"
 				"%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X", 
 				lk.l[0], lk.l[1], lk.l[2], lk.l[3], lk.l[4], lk.l[5],
 				lk.l[6], lk.l[7], lk.l[8], lk.l[9], lk.l[10], lk.l[11],

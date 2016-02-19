@@ -54,7 +54,7 @@ PairsView::PairsView(BRect frame, const char* name, uint8 rows, uint8 cols,
 	fPositionX(new int32[fButtonsCount]),
 	fPositionY(new int32[fButtonsCount])
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	CreateGameBoard();
 	_SetPairsBoard();
 }

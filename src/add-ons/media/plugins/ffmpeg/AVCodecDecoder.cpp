@@ -112,6 +112,7 @@ AVCodecDecoder::AVCodecDecoder()
 	fOutputFrameCount(0),
 	fOutputFrameRate(1.0),
 	fOutputFrameSize(0),
+	fInputFrameSize(0),
 
 	fChunkBuffer(NULL),
 	fChunkBufferSize(0),
@@ -403,17 +404,24 @@ AVCodecDecoder::_NegotiateAudioOutputFormat(media_format* inOutFormat)
 	fOutputFrameSize = sampleSize * outputAudioFormat.channel_count;
 	fOutputFrameCount = outputAudioFormat.buffer_size / fOutputFrameSize;
 	fOutputFrameRate = outputAudioFormat.frame_rate;
+	if (av_sample_fmt_is_planar(fContext->sample_fmt))
+		fInputFrameSize = sampleSize;
+	else
+		fInputFrameSize = fOutputFrameSize;
+
 	fRawDecodedAudio->opaque
 		= av_realloc(fRawDecodedAudio->opaque, sizeof(avformat_codec_context));
 	if (fRawDecodedAudio->opaque == NULL)
 		return B_NO_MEMORY;
 
-	fResampleContext = swr_alloc_set_opts(NULL,
-		fContext->channel_layout, fContext->request_sample_fmt,
-		fContext->sample_rate,
-		fContext->channel_layout, fContext->sample_fmt, fContext->sample_rate,
-		0, NULL);
-	swr_init(fResampleContext);
+	if (av_sample_fmt_is_planar(fContext->sample_fmt)) {
+		fResampleContext = swr_alloc_set_opts(NULL,
+			fContext->channel_layout, fContext->request_sample_fmt,
+			fContext->sample_rate,
+			fContext->channel_layout, fContext->sample_fmt, fContext->sample_rate,
+			0, NULL);
+		swr_init(fResampleContext);
+	}
 
 	TRACE("  bit_rate = %d, sample_rate = %d, channels = %d, "
 		"output frame size: %d, count: %ld, rate: %.2f\n",
@@ -911,35 +919,42 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 	if (frames == 0)
 		debugger("fDecodedDataBufferSize not multiple of frame size!");
 
-	// The old version of libswresample available for gcc2 gets confused when
-	// the frame counts for inout and output don't match. So, we use it with
-	// equal frame counts (but it can still perform re-matrixing of the audio).
-#if LIBSWRESAMPLE_VERSION_INT <= AV_VERSION_INT(0, 6, 100)
-	outFrames = frames;
-	inFrames = frames;
-#endif
-
 	// Some decoders do not support format conversion on themselves, or use
 	// "planar" audio (each channel separated instead of interleaved samples).
-	// In that case, we use swresample to convert the data (and it is
-	// smart enough to do just a copy, when possible)
-	const uint8_t* ptr[8];
-	for (int i = 0; i < 8; i++) {
-		if (fDecodedDataBuffer->data[i] == NULL)
-			ptr[i] = NULL;
-		else
-			ptr[i] = fDecodedDataBuffer->data[i] + fDecodedDataBufferOffset;
+	// In that case, we use swresample to convert the data
+	if (av_sample_fmt_is_planar(fContext->sample_fmt)) {
+		const uint8_t* ptr[8];
+		for (int i = 0; i < 8; i++) {
+			if (fDecodedDataBuffer->data[i] == NULL)
+				ptr[i] = NULL;
+			else
+				ptr[i] = fDecodedDataBuffer->data[i] + fDecodedDataBufferOffset;
+		}
+
+		// When there are more input frames than space in the output buffer,
+		// we could feed everything to swr and it would buffer the extra data.
+		// However, there is no easy way to flush that data without feeding more
+		// input, and it makes our timestamp computations fail.
+		// So, we feed only as much frames as we can get out, and handle the
+		// buffering ourselves.
+		// TODO Ideally, we should try to size our output buffer so that it can
+		// always hold all the output (swr provides helper functions for this)
+		inFrames = frames;
+		frames = swr_convert(fResampleContext, fRawDecodedAudio->data,
+			outFrames, ptr, inFrames);
+
+		if (frames < 0)
+			debugger("resampling failed");
+	} else {
+		memcpy(fRawDecodedAudio->data[0], fDecodedDataBuffer->data[0]
+				+ fDecodedDataBufferOffset, frames * fOutputFrameSize);
+		outFrames = frames;
+		inFrames = frames;
 	}
 
-	int32 result = swr_convert(fResampleContext, fRawDecodedAudio->data,
-		outFrames, ptr, inFrames);
-
-	size_t remainingSize = inFrames * fOutputFrameSize;
+	size_t remainingSize = inFrames * fInputFrameSize;
 	size_t decodedSize = outFrames * fOutputFrameSize;
 	fDecodedDataBufferSize -= inFrames;
-
-	if (result < 0)
-		debugger("resampling failed");
 
 	bool firstAudioFramesCopiedToRawDecodedAudio
 		= fRawDecodedAudio->data[0] != fDecodedData;

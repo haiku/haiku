@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -162,10 +162,15 @@ _BMCMenuBar_::AttachedToWindow()
 	if (fFixedSize && (Flags() & B_SUPPORTS_LAYOUT) == 0)
 		SetResizingMode(B_FOLLOW_LEFT_RIGHT | B_FOLLOW_TOP);
 
-	if (Parent() != NULL)
-		SetLowColor(Parent()->LowColor());
-	else
-		SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	if (Parent() != NULL) {
+		color_which which = Parent()->LowUIColor();
+		if (which == B_NO_COLOR)
+			SetLowColor(Parent()->LowColor());
+		else
+			SetLowUIColor(which);
+
+	} else
+		SetLowUIColor(B_MENU_BACKGROUND_COLOR);
 
 	fPreviousWidth = Bounds().Width();
 }

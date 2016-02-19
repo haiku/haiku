@@ -954,6 +954,10 @@ BPoseView::AttachedToWindow()
 	fIsDesktopWindow = dynamic_cast<BDeskWindow*>(Window()) != NULL;
 	if (fIsDesktopWindow)
 		AddFilter(new TPoseViewFilter(this));
+	else {
+		SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+		SetLowUIColor(ViewUIColor());
+	}
 
 	AddFilter(new ShortcutFilter(B_RETURN, B_OPTION_KEY, kOpenSelection,
 		this));
@@ -9051,7 +9055,9 @@ BPoseView::DrawAfterChildren(BRect updateRect)
 {
 	if (fTransparentSelection && fSelectionRectInfo.rect.IsValid()) {
 		SetDrawingMode(B_OP_ALPHA);
-		SetHighColor(255, 255, 255, 128);
+		rgb_color color = ui_color(B_NAVIGATION_BASE_COLOR);
+		color.alpha = 128;
+		SetHighColor(color);
 		if (fSelectionRectInfo.rect.Width() == 0
 			|| fSelectionRectInfo.rect.Height() == 0) {
 			StrokeLine(fSelectionRectInfo.rect.LeftTop(),
@@ -9061,7 +9067,9 @@ BPoseView::DrawAfterChildren(BRect updateRect)
 			BRect interior = fSelectionRectInfo.rect;
 			interior.InsetBy(1, 1);
 			if (interior.IsValid()) {
-				SetHighColor(80, 80, 80, 90);
+				color = ui_color(B_CONTROL_HIGHLIGHT_COLOR);
+				color.alpha = 90;
+				SetHighColor(color);
 				FillRect(interior);
 			}
 		}

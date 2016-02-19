@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc.
+ * Copyright 2010-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -15,6 +15,9 @@
 #include "StackAndTile.h"
 
 
+class Desktop;
+
+
 class SATDecorator : public DefaultDecorator {
 public:
 			enum {
@@ -23,18 +26,19 @@ public:
 
 public:
 								SATDecorator(DesktopSettings& settings,
-									BRect frame);
+									BRect frame, Desktop* desktop);
 
 protected:
+	virtual	void				UpdateColors(DesktopSettings& settings);
 	virtual	void				GetComponentColors(Component component,
 									uint8 highlight, ComponentColors _colors,
 									Decorator::Tab* tab = NULL);
 
 private:
-			const rgb_color		kHighlightTabColor;
-			const rgb_color		kHighlightTabColorLight;
-			const rgb_color		kHighlightTabColorBevel;
-			const rgb_color		kHighlightTabColorShadow;
+				rgb_color		fHighlightTabColor;
+				rgb_color		fHighlightTabColorLight;
+				rgb_color		fHighlightTabColorBevel;
+				rgb_color		fHighlightTabColorShadow;
 };
 
 

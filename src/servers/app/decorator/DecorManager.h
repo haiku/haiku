@@ -53,7 +53,7 @@ public:
 
 protected:
 	virtual	Decorator*			_AllocateDecorator(DesktopSettings& settings,
-									BRect rect);
+									BRect rect, Desktop* desktop);
 
 			DesktopListenerList	fDesktopListeners;
 

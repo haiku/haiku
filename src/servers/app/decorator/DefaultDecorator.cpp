@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc.
+ * Copyright 2001-2015 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,6 +10,7 @@
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 
@@ -72,9 +73,10 @@ blend_color_value(uint8 a, uint8 b, float position)
 
 // TODO: get rid of DesktopSettings here, and introduce private accessor
 //	methods to the Decorator base class
-DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect)
+DefaultDecorator::DefaultDecorator(DesktopSettings& settings, BRect rect,
+	Desktop* desktop)
 	:
-	TabDecorator(settings, rect)
+	TabDecorator(settings, rect, desktop)
 {
 	// TODO: If the decorator was created with a frame too small, it should
 	// resize itself!
@@ -112,35 +114,35 @@ DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
 		case COMPONENT_TAB:
 			if (tab && tab->buttonFocus) {
 				_colors[COLOR_TAB_FRAME_LIGHT]
-					= tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
+					= tint_color(fFocusFrameColor, B_DARKEN_2_TINT);
 				_colors[COLOR_TAB_FRAME_DARK]
-					= tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
-				_colors[COLOR_TAB] = kFocusTabColor;
-				_colors[COLOR_TAB_LIGHT] = kFocusTabColorLight;
-				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = kFocusTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
+					= tint_color(fFocusFrameColor, B_DARKEN_3_TINT);
+				_colors[COLOR_TAB] = fFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = fFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = fFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = fFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = fFocusTextColor;
 			} else {
 				_colors[COLOR_TAB_FRAME_LIGHT]
-					= tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
+					= tint_color(fNonFocusFrameColor, B_DARKEN_2_TINT);
 				_colors[COLOR_TAB_FRAME_DARK]
-					= tint_color(kNonFocusFrameColor, B_DARKEN_3_TINT);
-				_colors[COLOR_TAB] = kNonFocusTabColor;
-				_colors[COLOR_TAB_LIGHT] = kNonFocusTabColorLight;
-				_colors[COLOR_TAB_BEVEL] = kNonFocusTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = kNonFocusTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = kNonFocusTextColor;
+					= tint_color(fNonFocusFrameColor, B_DARKEN_3_TINT);
+				_colors[COLOR_TAB] = fNonFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = fNonFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = fNonFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = fNonFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = fNonFocusTextColor;
 			}
 			break;
 
 		case COMPONENT_CLOSE_BUTTON:
 		case COMPONENT_ZOOM_BUTTON:
 			if (tab && tab->buttonFocus) {
-				_colors[COLOR_BUTTON] = kFocusTabColor;
-				_colors[COLOR_BUTTON_LIGHT] = kFocusTabColorLight;
+				_colors[COLOR_BUTTON] = fFocusTabColor;
+				_colors[COLOR_BUTTON_LIGHT] = fFocusTabColorLight;
 			} else {
-				_colors[COLOR_BUTTON] = kNonFocusTabColor;
-				_colors[COLOR_BUTTON_LIGHT] = kNonFocusTabColorLight;
+				_colors[COLOR_BUTTON] = fNonFocusTabColor;
+				_colors[COLOR_BUTTON_LIGHT] = fNonFocusTabColorLight;
 			}
 			break;
 
@@ -151,21 +153,21 @@ DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
 		case COMPONENT_RESIZE_CORNER:
 		default:
 			if (tab && tab->buttonFocus) {
-				_colors[0] = tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
-				_colors[1] = tint_color(kFocusFrameColor, B_LIGHTEN_2_TINT);
-				_colors[2] = kFocusFrameColor;
-				_colors[3] = tint_color(kFocusFrameColor,
+				_colors[0] = tint_color(fFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[1] = tint_color(fFocusFrameColor, B_LIGHTEN_2_TINT);
+				_colors[2] = fFocusFrameColor;
+				_colors[3] = tint_color(fFocusFrameColor,
 					(B_DARKEN_1_TINT + B_NO_TINT) / 2);
-				_colors[4] = tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
-				_colors[5] = tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
+				_colors[4] = tint_color(fFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[5] = tint_color(fFocusFrameColor, B_DARKEN_3_TINT);
 			} else {
-				_colors[0] = tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
-				_colors[1] = tint_color(kNonFocusFrameColor, B_LIGHTEN_2_TINT);
-				_colors[2] = kNonFocusFrameColor;
-				_colors[3] = tint_color(kNonFocusFrameColor,
+				_colors[0] = tint_color(fNonFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[1] = tint_color(fNonFocusFrameColor, B_LIGHTEN_2_TINT);
+				_colors[2] = fNonFocusFrameColor;
+				_colors[3] = tint_color(fNonFocusFrameColor,
 					(B_DARKEN_1_TINT + B_NO_TINT) / 2);
-				_colors[4] = tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
-				_colors[5] = tint_color(kNonFocusFrameColor, B_DARKEN_3_TINT);
+				_colors[4] = tint_color(fNonFocusFrameColor, B_DARKEN_2_TINT);
+				_colors[5] = tint_color(fNonFocusFrameColor, B_DARKEN_3_TINT);
 			}
 
 			// for the resize-border highlight dye everything bluish.
@@ -178,6 +180,13 @@ DefaultDecorator::GetComponentColors(Component component, uint8 highlight,
 			}
 			break;
 	}
+}
+
+
+void
+DefaultDecorator::UpdateColors(DesktopSettings& settings)
+{
+	TabDecorator::UpdateColors(settings);
 }
 
 

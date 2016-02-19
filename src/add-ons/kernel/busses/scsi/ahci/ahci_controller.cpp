@@ -178,6 +178,9 @@ AHCIController::Init()
 	TRACE("cap: Enclosure Management Supported: %s\n",
 		(fRegs->cap & CAP_EMS) ? "yes" : "no");
 
+	TRACE("cap: FIS-based Switching Control: %s\n",
+		(fRegs->cap & CAP_FBSS) ? "yes" : "no");
+
 	TRACE("cap: Supports Command List Override: %s\n",
 		(fRegs->cap & CAP_SCLO) ? "yes" : "no");
 	TRACE("cap: Supports Staggered Spin-up: %s\n",

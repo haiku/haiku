@@ -10,6 +10,7 @@
  *		Brecht Machiels <brecht@mos6581.org>
  *		Clemens Zeidler <haiku@clemens-zeidler.de>
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 
@@ -575,12 +576,40 @@ Desktop::BroadcastToAllApps(int32 code)
 void
 Desktop::BroadcastToAllWindows(int32 code)
 {
-	AutoWriteLocker _(fWindowLock);
+	AutoReadLocker _(fWindowLock);
 
 	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
 			window = window->NextWindow(kAllWindowList)) {
 		window->ServerWindow()->PostMessage(code);
 	}
+}
+
+
+int32
+Desktop::GetAllWindowTargets(DelayedMessage& message)
+{
+	AutoReadLocker _(fWindowLock);
+	int32 count = 0;
+
+	for (Window* window = fAllWindows.FirstWindow(); window != NULL;
+			window = window->NextWindow(kAllWindowList)) {
+		message.AddTarget(window->ServerWindow()->MessagePort());
+		++count;
+	}
+
+	return count;
+}
+
+
+int32
+Desktop::GetAllAppTargets(DelayedMessage& message)
+{
+	BAutolock _(fApplicationsLock);
+
+	for (int32 index = 0; index < fApplications.CountItems(); ++index)
+		message.AddTarget(fApplications.ItemAt(index)->MessagePort());
+
+	return fApplications.CountItems();
 }
 
 
@@ -1649,6 +1678,31 @@ Desktop::FontsChanged(Window* window)
 
 
 void
+Desktop::ColorUpdated(Window* window, color_which which, rgb_color color)
+{
+	AutoWriteLocker _(fWindowLock);
+
+	window->TopView()->ColorUpdated(which, color);
+
+	switch (which) {
+		case B_WINDOW_TAB_COLOR:
+		case B_WINDOW_TEXT_COLOR:
+		case B_WINDOW_INACTIVE_TAB_COLOR:
+		case B_WINDOW_INACTIVE_TEXT_COLOR:
+		case B_WINDOW_BORDER_COLOR:
+		case B_WINDOW_INACTIVE_BORDER_COLOR:
+			break;
+		default:
+			return;
+	}
+
+	BRegion dirty;
+	window->ColorsChanged(&dirty);
+	RebuildAndRedrawAfterWindowChange(window, dirty);
+}
+
+
+void
 Desktop::SetWindowLook(Window* window, window_look newLook)
 {
 	if (window->Look() == newLook)
@@ -2655,6 +2709,56 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_SET_UI_COLOR:
+		{
+			color_which which;
+			rgb_color color;
+
+			if (link.Read<color_which>(&which) == B_OK
+					&& link.Read<rgb_color>(&color) == B_OK) {
+
+				const char* colorName = ui_color_name(which);
+				fPendingColors.SetColor(colorName, color);
+
+				DelayedMessage delayed(AS_SET_UI_COLORS, DM_60HZ_DELAY);
+				delayed.AddTarget(MessagePort());
+				delayed.SetMerge(DM_MERGE_CANCEL);
+
+				delayed.Attach<bool>(true);
+				delayed.Flush();
+			}
+
+			break;
+		}
+
+		case AS_SET_UI_COLORS:
+		{
+			bool flushPendingOnly = false;
+
+			if (link.Read<bool>(&flushPendingOnly) != B_OK
+				|| (flushPendingOnly &&
+						fPendingColors.CountNames(B_RGB_32_BIT_TYPE) == 0)) {
+				break;
+			}
+
+			if (!flushPendingOnly) {
+				// Client wants to set a color map
+				color_which which = B_NO_COLOR;
+				rgb_color color;
+
+				do {
+					if (link.Read<color_which>(&which) != B_OK
+						|| link.Read<rgb_color>(&color) != B_OK)
+						break;
+
+					fPendingColors.SetColor(ui_color_name(which), color);
+				} while (which != B_NO_COLOR);
+			}
+
+			_FlushPendingColors();
+			break;
+		}
+
 		// ToDo: Remove this again. It is a message sent by the
 		// invalidate_on_exit kernel debugger add-on to trigger a redraw
 		// after exiting a kernel debugger session.
@@ -2713,6 +2817,54 @@ Desktop::_Windows(int32 index)
 {
 	ASSERT(index >= 0 && index < kMaxWorkspaces);
 	return fWorkspaces[index].Windows();
+}
+
+
+void
+Desktop::_FlushPendingColors()
+{
+	// Update all windows while we are holding the write lock.
+
+	int32 count = fPendingColors.CountNames(B_RGB_32_BIT_TYPE);
+	if (count == 0)
+		return;
+
+	bool changed[count];
+	LockedDesktopSettings settings(this);
+	settings.SetUIColors(fPendingColors, &changed[0]);
+
+	int32 index = 0;
+	char* name = NULL;
+	type_code type = B_RGB_32_BIT_TYPE;
+	rgb_color color;
+	color_which which = B_NO_COLOR;
+	BMessage clientMessage(B_COLORS_UPDATED);
+
+	while (fPendingColors.GetInfo(type, index, &name, &type) == B_OK) {
+		which = which_ui_color(name);
+		if (which == B_NO_COLOR || fPendingColors.FindColor(name,
+				&color) != B_OK || !changed[index]) {
+			++index;
+			continue;
+		}
+
+		for (Window* window = fAllWindows.FirstWindow(); window != NULL;
+				window = window->NextWindow(kAllWindowList)) {
+			ColorUpdated(window, which, color);
+		}
+
+		// Ensure client only gets list of changed colors
+		clientMessage.AddColor(name, color);
+		++index;
+	}
+
+	// Notify client applications
+	BAutolock appListLock(fApplicationsLock);
+	for (int32 index = 0; index < fApplications.CountItems(); ++index) {
+		fApplications.ItemAt(index)->SendMessageToClient(&clientMessage);
+	}
+
+	fPendingColors.MakeEmpty();
 }
 
 

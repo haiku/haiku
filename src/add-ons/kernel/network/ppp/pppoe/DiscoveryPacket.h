@@ -10,6 +10,7 @@
 
 #include <TemplateList.h>
 
+#define ETHER_HDR_LEN 14
 
 enum PPPoE_TAG_TYPE {
 	END_OF_LIST = 0x0000,
@@ -37,13 +38,13 @@ typedef struct pppoe_tag {
 	uint16 type;
 	uint16 length;
 	uint8 data[0];
-};
+} pppoe_tag;
 
 
 class DiscoveryPacket {
 	public:
 		DiscoveryPacket(uint8 code, uint16 sessionID = 0x0000);
-		DiscoveryPacket(struct mbuf *packet, uint32 start = 0);
+		DiscoveryPacket(net_buffer *packet, uint32 start = 0);
 		~DiscoveryPacket();
 		
 		status_t InitCheck() const
@@ -66,8 +67,8 @@ class DiscoveryPacket {
 		pppoe_tag *TagAt(int32 index) const;
 		pppoe_tag *TagWithType(uint16 type) const;
 		
-		struct mbuf *ToMbuf(uint32 MTU, uint32 reserve = ETHER_HDR_LEN);
-			// the user is responsible for freeing the mbuf
+		net_buffer *ToNetBuffer(uint32 MTU);
+			// the user is responsible for freeing the net_buffer
 
 	private:
 		uint8 fCode;

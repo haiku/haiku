@@ -1,4 +1,5 @@
-1	slovak	x-vnd.Haiku-TGATranslator	77519970
+1	slovak	x-vnd.Haiku-TGATranslator	3075011211
+Save with RLE compression	TGAView		Uložiť s kompresiou RLE
 Targa image (%d bits truecolor)	TGATranslator		Obrázok Targa (%d-bitový truecolor)
 Ignore TGA alpha channel	TGAView		Ignorovať alfa kanál TGA
 Targa image (%d bits colormap)	TGATranslator		Obrázok Targa (%d-bitová farebná mapa)
@@ -8,6 +9,7 @@ Targa image (%d bits gray)	TGATranslator		Obrázok Targa (%d bitov šedej)
 Written by the Haiku Translation Kit Team	TGAView		Napísal Haiku Translation Kit Team
 Targa image (%d bits RLE truecolor)	TGATranslator		Obrázok Targa (%d-bitový truecolor RLE)
 TGA images	TGATranslator		Obrázky TGA
+Version %d.%d.%d, %s	TGAView		Verzia %d.%d.%d, %s
 TGATranslator Settings	TGATranslator		Nastavenia TGATranslator
 TGA image translator	TGATranslator		Prekladač obrázkov TGA
 Targa image (%d bits RLE gray)	TGATranslator		Obrázok Targa (%d-bitov šedej RLE)

@@ -13,7 +13,9 @@
 class LinkView : public BStringView, public BInvoker {
 public:
 								LinkView(const char* name, const char* string,
-									BMessage* message, rgb_color color);
+									BMessage* message);
+
+	virtual void				AttachedToWindow();
 
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
@@ -21,14 +23,13 @@ public:
 
 	virtual	void				Draw(BRect updateRect);
 
+	virtual	void				MessageReceived(BMessage* message);
 			void				SetEnabled(bool enabled);
 
 private:
 			void				_UpdateLinkColor();
 
 private:
-			rgb_color			fNormalColor;
-			rgb_color			fHoverColor;
 
 			bool				fEnabled;
 			bool				fMouseInside;

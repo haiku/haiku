@@ -32,6 +32,7 @@
 #include <MessageFormat.h>
 #include <MessageRunner.h>
 #include <Messenger.h>
+#include <ObjectList.h>
 #include <OS.h>
 #include <Path.h>
 #include <PathFinder.h>
@@ -143,11 +144,15 @@ public:
 };
 
 
+class AboutView;
+
 class AboutWindow : public BWindow {
 public:
 							AboutWindow();
 
 	virtual	bool			QuitRequested();
+
+			AboutView*		fAboutView;
 };
 
 
@@ -192,6 +197,7 @@ public:
 							~AboutView();
 
 	virtual void			AttachedToWindow();
+	virtual	void			AllAttached();
 	virtual void			Pulse();
 
 	virtual void			MessageReceived(BMessage* msg);
@@ -207,6 +213,7 @@ public:
 			void			PickRandomHaiku();
 
 
+			void			_AdjustTextColors();
 private:
 	typedef std::map<std::string, PackageCredit*> PackageCreditMap;
 
@@ -220,9 +227,12 @@ private:
 			void			_AddPackageCreditEntries();
 
 			BStringView*	fMemView;
-			BTextView*		fUptimeView;
+			BStringView*	fUptimeView;
 			BView*			fInfoView;
 			HyperTextView*	fCreditsView;
+
+			BObjectList<BView> fTextViews;
+			BObjectList<BView> fSubTextViews;
 
 			BBitmap*		fLogo;
 
@@ -267,7 +277,8 @@ AboutWindow::AboutWindow()
 		B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE)
 {
 	SetLayout(new BGroupLayout(B_VERTICAL));
-	AddChild(new AboutView());
+	fAboutView = new AboutView();
+	AddChild(fAboutView);
 
 	// Make sure we take the minimal window size into account when centering
 	BSize size = GetLayout()->MinSize();
@@ -411,7 +422,6 @@ AboutView::AboutView()
 	fScrollRunner(NULL)
 {
 	// Begin Construction of System Information controls
-
 	system_info systemInfo;
 	get_system_info(&systemInfo);
 
@@ -449,10 +459,12 @@ AboutView::AboutView()
 	}
 
 	BStringView* versionView = new BStringView("ostext", string);
+	fSubTextViews.AddItem(versionView);
 	versionView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
 	BStringView* abiView = new BStringView("abitext", B_HAIKU_ABI_NAME);
+	fSubTextViews.AddItem(abiView);
 	abiView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
@@ -500,6 +512,7 @@ AboutView::AboutView()
 		<< " " << get_cpu_model_string(platform, cpuVendor, cpuModel);
 
 	BStringView* cpuView = new BStringView("cputext", cpuType.String());
+	fSubTextViews.AddItem(cpuView);
 	cpuView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
@@ -511,16 +524,20 @@ AboutView::AboutView()
 			clockSpeed / 1000.0f);
 
 	BStringView* frequencyView = new BStringView("frequencytext", string);
+	fSubTextViews.AddItem(frequencyView);
 	frequencyView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
 	// RAM
 	BStringView *memSizeView = new BStringView("ramsizetext",
 		MemSizeToString(string, sizeof(string), &systemInfo));
+	fSubTextViews.AddItem(memSizeView);
 	memSizeView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
+
 	fMemView = new BStringView("ramtext",
 		MemUsageToString(string, sizeof(string), &systemInfo));
+	fSubTextViews.AddItem(fMemView);
 	fMemView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
@@ -539,22 +556,19 @@ AboutView::AboutView()
 		buildTimeDate.SetTo(kernelTimeDate);
 
 	BStringView* kernelView = new BStringView("kerneltext", buildTimeDate);
+	fSubTextViews.AddItem(kernelView);
 	kernelView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 
 	// Uptime
-	fUptimeView = new BTextView("uptimetext");
-	fUptimeView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fUptimeView->MakeEditable(false);
-	fUptimeView->MakeSelectable(false);
-	fUptimeView->SetWordWrap(true);
-
+	fUptimeView = new BStringView("uptimetext", "...");
+	fSubTextViews.AddItem(fUptimeView);
 	fUptimeView->SetText(UptimeToString(string, sizeof(string)));
 
 	const float offset = 5;
 
 	SetLayout(new BGroupLayout(B_HORIZONTAL, 0));
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BLayoutBuilder::Group<>((BGroupLayout*)GetLayout())
 		.AddGroup(B_VERTICAL, 0)
@@ -608,6 +622,14 @@ AboutView::AttachedToWindow()
 	BView::AttachedToWindow();
 	Window()->SetPulseRate(500000);
 	SetEventMask(B_POINTER_EVENTS);
+	DoLayout();
+}
+
+
+void
+AboutView::AllAttached()
+{
+	_AdjustTextColors();
 }
 
 
@@ -647,6 +669,13 @@ void
 AboutView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
+		case B_COLORS_UPDATED:
+		{
+			if (msg->HasColor(ui_color_name(B_PANEL_TEXT_COLOR)))
+				_AdjustTextColors();
+
+			break;
+		}
 		case SCROLL_CREDITS_VIEW:
 		{
 			BScrollBar* scrollBar =
@@ -816,6 +845,28 @@ AboutView::PickRandomHaiku()
 }
 
 
+void
+AboutView::_AdjustTextColors()
+{
+	rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+	rgb_color color = mix_color(ViewColor(), textColor, 192);
+
+	BView* view = NULL;
+	for (int32 index = 0; index < fSubTextViews.CountItems(); ++index) {
+		view = fSubTextViews.ItemAt(index);
+		view->SetHighColor(color);
+		view->Invalidate();
+	}
+
+	// Labels
+	for (int32 index = 0; index < fTextViews.CountItems(); ++index) {
+		view = fTextViews.ItemAt(index);
+		view->SetHighColor(textColor);
+		view->Invalidate();
+	}
+}
+
+
 BView*
 AboutView::_CreateLabel(const char* name, const char* label)
 {
@@ -823,6 +874,7 @@ AboutView::_CreateLabel(const char* name, const char* label)
 	labelView->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_VERTICAL_UNSET));
 	labelView->SetFont(be_bold_font);
+	fTextViews.AddItem(labelView);
 	return labelView;
 }
 
@@ -837,7 +889,7 @@ AboutView::_CreateCreditsView()
 	fCreditsView->MakeEditable(false);
 	fCreditsView->SetWordWrap(true);
 	fCreditsView->SetInsets(5, 5, 5, 5);
-	fCreditsView->SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
+	fCreditsView->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 
 	BScrollView* creditsScroller = new BScrollView("creditsScroller",
 		fCreditsView, B_WILL_DRAW | B_FRAME_EVENTS, false, true,

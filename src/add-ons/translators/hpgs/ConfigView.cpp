@@ -22,7 +22,7 @@
 ConfigView::ConfigView(const BRect &frame, uint32 resize, uint32 flags)
 	: BView(frame, B_TRANSLATE("HPGSTranslator Settings"), resize, flags)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	font_height fontHeight;
 	be_bold_font->GetHeight(&fontHeight);

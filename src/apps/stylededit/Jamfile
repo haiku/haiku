@@ -22,7 +22,7 @@ Application StyledEdit :
 	StyledEditApp.cpp
 	StyledEditView.cpp
 	StyledEditWindow.cpp
-	: libshared.a be translation tracker libtextencoding.so localestub
+	: shared be translation tracker libtextencoding.so localestub
 		[ TargetLibsupc++ ]
 	: $(styled_edit_rsrc)
 	;

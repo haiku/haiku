@@ -87,7 +87,7 @@ TStatusWindow::TStatusWindow(BRect rect, BMessenger target, const char* status)
 	fTarget(target)
 {
 	BView* view = new BView(Bounds(), "", B_FOLLOW_ALL, B_WILL_DRAW);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(view);
 
 	BRect r(STATUS_FIELD_H, STATUS_FIELD_V,

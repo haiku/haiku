@@ -1,0 +1,26 @@
+SubDir HAIKU_TOP src add-ons kernel network ppp ppp_frame ;
+
+SetSubDirSupportedPlatformsBeOSCompatible ;
+SubDirC++Flags -fno-rtti ;
+
+if $(TARGET_PLATFORM) != haiku {
+	UseHeaders [ FStandardOSHeaders ] : true ;
+	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
+		# We need the public network headers also when not compiling for Haiku.
+		# Unfortunately we get more than we want, namely all POSIX headers.
+}
+
+UsePrivateKernelHeaders ;
+UsePrivateHeaders kernel net ;
+UsePrivateHeaders [ FDirName kernel util ] ;
+
+UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
+	libkernelppp headers ] : true ;
+
+KernelAddon ppp_frame :
+	ppp_frame.cpp
+;
+
+# Installation
+HaikuInstall install-networking : /boot/home/config/add-ons/kernel/haiku_network/ppp
+	: ppp_frame ;

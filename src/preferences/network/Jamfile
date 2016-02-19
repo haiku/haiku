@@ -27,7 +27,7 @@ Preference Network :
 	# from ifconfig
 	MediaTypes.cpp
 
-	: be bnetapi libshared.a [ TargetLibstdc++ ] localestub
+	: be bnetapi shared [ TargetLibstdc++ ] localestub
 	: Network.rdef InterfaceIcons.rdef
 ;
 

@@ -1,6 +1,7 @@
-1	slovak	x-vnd.Haiku-SpamFilter	160316705
+1	slovak	x-vnd.Haiku-SpamFilter	468104950
 or empty e-mail	SpamFilterConfig		alebo prázdny email
 Genuine below and uncertain above:	SpamFilterConfig		Originálny pod a neistý nad:
 Spam above:	SpamFilterConfig		Spam nad:
 Add spam rating to start of subject	SpamFilterConfig		Pridať ohodnotenie ako spam na začiatok predmetu
+Bayesian Spam Filter	SpamFilter		Bayesovo filtrovanie spamu
 Learn from all incoming e-mail	SpamFilterConfig		Učiť sa na základe všetkej prichádzajúcej pošty

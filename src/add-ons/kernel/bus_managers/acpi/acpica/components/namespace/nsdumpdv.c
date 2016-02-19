@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -222,8 +222,8 @@ AcpiNsDumpRootDevices (
         "Display of all devices in the namespace:\n"));
 
     Status = AcpiNsWalkNamespace (ACPI_TYPE_DEVICE, SysBusHandle,
-                ACPI_UINT32_MAX, ACPI_NS_WALK_NO_UNLOCK,
-                AcpiNsDumpOneDevice, NULL, NULL, NULL);
+        ACPI_UINT32_MAX, ACPI_NS_WALK_NO_UNLOCK,
+        AcpiNsDumpOneDevice, NULL, NULL, NULL);
 }
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc. All rights resrerved.
+ * Copyright 2001-2015 Haiku, Inc. All rights resrerved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -1449,9 +1449,8 @@ BListView::_InitObject(list_view_type type)
 	fTrack = new track_data;
 	fTrack->try_drag = false;
 	fTrack->item_index = -1;
-
-	SetViewColor(ui_color(B_LIST_BACKGROUND_COLOR));
-	SetLowColor(ui_color(B_LIST_BACKGROUND_COLOR));
+	SetViewUIColor(B_LIST_BACKGROUND_COLOR);
+	SetLowUIColor(B_LIST_BACKGROUND_COLOR);
 }
 
 

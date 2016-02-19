@@ -9,7 +9,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -196,14 +196,15 @@ AcpiExResolveObject (
             (SourceDesc->Common.Type != ACPI_TYPE_BUFFER)     &&
             (SourceDesc->Common.Type != ACPI_TYPE_STRING)     &&
             !((SourceDesc->Common.Type == ACPI_TYPE_LOCAL_REFERENCE) &&
-                    (SourceDesc->Reference.Class== ACPI_REFCLASS_TABLE)))
+                (SourceDesc->Reference.Class== ACPI_REFCLASS_TABLE)))
         {
             /* Conversion successful but still not a valid type */
 
             ACPI_ERROR ((AE_INFO,
-                "Cannot assign type %s to %s (must be type Int/Str/Buf)",
+                "Cannot assign type [%s] to [%s] (must be type Int/Str/Buf)",
                 AcpiUtGetObjectTypeName (SourceDesc),
                 AcpiUtGetTypeName (TargetType)));
+
             Status = AE_AML_OPERAND_TYPE;
         }
         break;
@@ -304,7 +305,7 @@ AcpiExStoreObjectToObject (
          * converted object.
          */
         Status = AcpiExConvertToTargetType (DestDesc->Common.Type,
-                        SourceDesc, &ActualSrcDesc, WalkState);
+            SourceDesc, &ActualSrcDesc, WalkState);
         if (ACPI_FAILURE (Status))
         {
             return_ACPI_STATUS (Status);
@@ -356,7 +357,7 @@ AcpiExStoreObjectToObject (
         /*
          * All other types come here.
          */
-        ACPI_WARNING ((AE_INFO, "Store into type %s not implemented",
+        ACPI_WARNING ((AE_INFO, "Store into type [%s] not implemented",
             AcpiUtGetObjectTypeName (DestDesc)));
 
         Status = AE_NOT_IMPLEMENTED;

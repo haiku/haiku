@@ -128,7 +128,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			SolverRepository.cpp
 			SolverResult.cpp
 			:
-			[ MultiArchDefaultGristFiles libshared.a ]
+			shared
 			be
 			[ BuildFeatureAttribute curl : library ]
 			[ TargetLibstdc++ ]

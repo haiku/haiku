@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2016, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  */
 
@@ -14,14 +14,17 @@
 #include <ctype.h>
 #include <errno.h>
 
+#include <FindDirectory.h>
 #include <List.h>
 #include <Locker.h>
 #include <parsedate.h>
+#include <Path.h>
 #include <String.h>
 #include <UTF8.h>
 
 #include <mail_encoding.h>
 
+#include <AttributeUtilities.h>
 #include <CharacterSet.h>
 #include <CharacterSetRoster.h>
 
@@ -159,13 +162,13 @@ write_read_attr(BNode& node, read_flags flag)
 			< 0)
 		return B_ERROR;
 
-	// manage the status string only if it currently has a "read" status
+	// Manage the status string only if it currently has a known state
 	BString currentStatus;
-	if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &currentStatus) == B_OK) {
-		if (currentStatus.ICompare("New") != 0
-			&& currentStatus.ICompare("Read") != 0
-			&& currentStatus.ICompare("Seen") != 0)
-			return B_OK;
+	if (node.ReadAttrString(B_MAIL_ATTR_STATUS, &currentStatus) == B_OK
+		&& currentStatus.ICompare("New") != 0
+		&& currentStatus.ICompare("Read") != 0
+		&& currentStatus.ICompare("Seen") != 0) {
+		return B_OK;
 	}
 
 	const char* statusString = flag == B_READ ? "Read"
@@ -1547,3 +1550,20 @@ get_address_list(BList &list, const char *string,
 	}
 }
 
+
+status_t
+CopyMailFolderAttributes(const char* targetPath)
+{
+	BPath path;
+	status_t status = find_directory(B_USER_SETTINGS_DIRECTORY, &path);
+	if (status != B_OK)
+		return status;
+
+	path.Append("Tracker");
+	path.Append("DefaultQueryTemplates");
+	path.Append("text_x-email");
+
+	BNode source(path.Path());
+	BNode target(targetPath);
+	return BPrivate::CopyAttributes(source, target);
+}

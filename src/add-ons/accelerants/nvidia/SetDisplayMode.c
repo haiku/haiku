@@ -6,7 +6,7 @@
 	Other authors:
 	Mark Watson,
 	Apsed,
-	Rudolf Cornelissen 11/2002-3/2009
+	Rudolf Cornelissen 11/2002-12/2015
 */
 
 #define MODULE_BIT 0x00200000
@@ -41,8 +41,8 @@ status_t SET_DISPLAY_MODE(display_mode *mode_to_set)
 	target /*= bounds*/ = *mode_to_set;
 	/* show the mode bits */
 	LOG(1, ("SETMODE: (ENTER) initial modeflags: $%08x\n", target.flags));
-	LOG(1, ("SETMODE: requested target pixelclock %dkHz\n",  target.timing.pixel_clock));
-	LOG(1, ("SETMODE: requested virtual_width %d, virtual_height %d\n",
+	LOG(1, ("SETMODE: requested target pixelclock %ukHz\n",  target.timing.pixel_clock));
+	LOG(1, ("SETMODE: requested virtual_width %u, virtual_height %u\n",
 										target.virtual_width, target.virtual_height));
 
 	/* See BOUNDS WARNING above... */

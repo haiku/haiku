@@ -333,12 +333,9 @@ BColorControl::SetEnabled(bool enabled)
 void
 BColorControl::AttachedToWindow()
 {
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
 	BControl::AttachedToWindow();
+
+	AdoptParentColors();
 
 	fRedText->SetTarget(this);
 	fGreenText->SetTarget(this);

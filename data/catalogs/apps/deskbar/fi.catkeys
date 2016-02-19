@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-TSKB	2335730970
+1	finnish	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Sammuta virta
 Sort applications by name	PreferencesWindow		Lajittele sovellukset nimen perusteella
 Suspend	DeskbarMenu		Keskeytystila
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Suuri
 Auto-raise	PreferencesWindow		Nosta automaattisesti
 Recent folders:	PreferencesWindow		Äskettäiset kansiot:
 Show application expander	PreferencesWindow		Näytä sovelluslaajentaja
-Restart Tracker	DeskbarMenu		Käynnistä Seuraaja uudelleen
 Close all	WindowMenu		Sulje kaikki
 Deskbar preferences	PreferencesWindow		Työpöytäpalkin asetukset
 Mount	DeskbarMenu		Liitä

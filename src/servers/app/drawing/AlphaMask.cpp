@@ -67,6 +67,8 @@ AlphaMask::AlphaMask(AlphaMask* previousMask, AlphaMask* other)
 	fMask(other->fMask),
 	fScanline(fMask)
 {
+	fMask.attach(fBuffer);
+
 	if (previousMask != NULL)
 		atomic_add(&previousMask->fNextMaskCount, 1);
 	fBits->AcquireReference();
@@ -116,6 +118,9 @@ AlphaMask::SetCanvasGeometry(IntPoint origin, IntRect bounds)
 	IntRect oldBounds = fCanvasBounds;
 	fCanvasBounds = IntRect(0, 0, bounds.Width(), bounds.Height());
 
+	if (fPreviousMask != NULL)
+		fPreviousMask->SetCanvasGeometry(origin, bounds);
+
 	if (fClippedToCanvas && (fCanvasBounds.Width() > oldBounds.Width()
 		|| fCanvasBounds.Height() > oldBounds.Height())) {
 		// The canvas is now larger than before and we previously
@@ -126,9 +131,6 @@ AlphaMask::SetCanvasGeometry(IntPoint origin, IntRect bounds)
 	}
 
 	_AttachMaskToBuffer();
-
-	if (fPreviousMask != NULL)
-		fPreviousMask->SetCanvasGeometry(origin, bounds);
 
 	return oldOrigin;
 }
@@ -164,6 +166,9 @@ void
 AlphaMask::_Generate()
 {
 	AutoLocker<BLocker> locker(fLock);
+	AutoLocker<BLocker> previousLocker;
+	if (fPreviousMask != NULL)
+		previousLocker.SetTo(fPreviousMask->fLock, false);
 
 	ServerBitmap* const bitmap = _RenderSource(fCanvasBounds);
 	BReference<ServerBitmap> bitmapRef(bitmap, true);

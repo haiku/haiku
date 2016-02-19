@@ -51,7 +51,7 @@ class KPPPLCPExtension {
 			// called by netstack (forwarded by KPPPInterface)
 		
 		//!	Must be overridden. Called when an LCP packet with your code is received.
-		virtual status_t Receive(struct mbuf *packet, uint8 code) = 0;
+		virtual status_t Receive(net_buffer *packet, uint8 code) = 0;
 		
 		virtual void Reset();
 		virtual void Pulse();

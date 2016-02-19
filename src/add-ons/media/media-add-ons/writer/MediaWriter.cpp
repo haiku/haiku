@@ -28,7 +28,7 @@
 
 #include "../AbstractFileInterfaceNode.h"
 #include "MediaWriter.h"
-#include "misc.h"
+#include "../misc.h"
 
 #include <stdio.h>
 #include <string.h>
@@ -48,14 +48,14 @@ MediaWriter::~MediaWriter(void)
 }
 
 MediaWriter::MediaWriter(
-				size_t defaultChunkSize = 8192,
-				float defaultBitRate = 800000,
-				const flavor_info * info = 0,
-				BMessage * config = 0,
-				BMediaAddOn * addOn = 0)
+				size_t defaultChunkSize,
+				float defaultBitRate,
+				const flavor_info * info,
+				BMessage * config,
+				BMediaAddOn * addOn)
 	: BMediaNode("MediaWriter"),
-	  AbstractFileInterfaceNode(defaultChunkSize,defaultBitRate,info,config,addOn),
-	  BBufferConsumer(B_MEDIA_MULTISTREAM)
+	  BBufferConsumer(B_MEDIA_MULTISTREAM),
+	  AbstractFileInterfaceNode(defaultChunkSize,defaultBitRate,info,config,addOn)
 {
 	fprintf(stderr,"MediaWriter::MediaWriter\n");
 	// null some fields
@@ -459,7 +459,7 @@ status_t MediaWriter::SeekTagRequested(
 status_t MediaWriter::HandleBuffer(
 				const media_timed_event *event,
 				bigtime_t lateness,
-				bool realTimeEvent = false)
+				bool realTimeEvent)
 {
 	fprintf(stderr,"MediaWriter::HandleBuffer\n");
 	BBuffer * buffer = const_cast<BBuffer*>((BBuffer*)event->pointer);
@@ -479,7 +479,7 @@ status_t MediaWriter::HandleBuffer(
 status_t MediaWriter::HandleDataStatus(
 						const media_timed_event *event,
 						bigtime_t lateness,
-						bool realTimeEvent = false)
+						bool realTimeEvents)
 {
 	fprintf(stderr,"MediaWriter::HandleDataStatus");
 	// we have no where to send a data status to.
@@ -500,8 +500,8 @@ void MediaWriter::GetFlavor(flavor_info * outInfo, int32 id)
 		return;
 	}
 	AbstractFileInterfaceNode::GetFlavor(outInfo,id);
-	outInfo->name = "OpenBeOS Media Writer";
-	outInfo->info = "The OpenBeOS Media Writer consumes a multistream and writes a file.";
+	strcpy(outInfo->name, "OpenBeOS Media Writer");
+	strcpy(outInfo->info, "The OpenBeOS Media Writer consumes a multistream and writes a file.");
 	outInfo->kinds |= B_BUFFER_CONSUMER;
 	outInfo->in_format_count = 1; // 1 input
 	media_format * formats = new media_format[outInfo->in_format_count];
@@ -541,7 +541,7 @@ status_t MediaWriter::WriteFileBuffer(
 		fprintf(stderr,"<- B_NO_INIT\n");
 		return B_NO_INIT;
 	}
-	fprintf(stderr,"  writing %i bytes at %i\n",
+	fprintf(stderr,"  writing %" B_PRId32 " bytes at %lld\n",
 			buffer->SizeUsed(),GetCurrentFile()->Position());
 	ssize_t bytesWriten = GetCurrentFile()->Write(buffer->Data(),buffer->SizeUsed());
 	if (bytesWriten < 0) {
@@ -556,19 +556,19 @@ status_t MediaWriter::WriteFileBuffer(
 // stuffing
 // -------------------------------------------------------- //
 
-status_t MediaWriter::_Reserved_MediaWriter_0(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_1(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_2(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_3(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_4(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_5(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_6(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_7(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_8(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_9(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_10(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_11(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_12(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_13(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_14(void *) {}
-status_t MediaWriter::_Reserved_MediaWriter_15(void *) {}
+status_t MediaWriter::_Reserved_MediaWriter_0(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_1(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_2(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_3(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_4(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_5(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_6(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_7(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_8(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_9(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_10(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_11(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_12(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_13(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_14(void *) { return B_ERROR; }
+status_t MediaWriter::_Reserved_MediaWriter_15(void *) { return B_ERROR; }

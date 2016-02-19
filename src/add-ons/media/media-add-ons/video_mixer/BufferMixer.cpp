@@ -57,16 +57,17 @@ BufferMixer::Merge(BBuffer *input, BBuffer *output) {
 	uint32 size = input->Header()->size_used / 4;	
 	uint8 alpha = 0;
 	uint8 c1, c2, c3;
-	
+
 	for (uint32 i=0; i<size; i++) {
 		c1    = *source++;
 		c2    = *source++;
 		c3    = *source++;
 		alpha = *source++;
-		*destination++ = ALPHABLEND(c1, *destination, alpha);
-		*destination++ = ALPHABLEND(c2, *destination, alpha);
-		*destination++ = ALPHABLEND(c3, *destination, alpha);
-		*destination++ = 0x00;
+		destination[0] = ALPHABLEND(c1, destination[0], alpha);
+		destination[1] = ALPHABLEND(c2, destination[1], alpha);
+		destination[2] = ALPHABLEND(c3, destination[2], alpha);
+		destination[3] = 0x00;
+		destination += 4;
 	}
 }
 
@@ -91,7 +92,7 @@ void
 BufferMixer::RemoveBuffer(int32 id) {
 	BBuffer *oldBuffer;
 
-	if (id < groupedBuffers.size()) {
+	if (uint32(id) < groupedBuffers.size()) {
 		oldBuffer = groupedBuffers[id];
 		groupedBuffers[id] = NULL;
 	

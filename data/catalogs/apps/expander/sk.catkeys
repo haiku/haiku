@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Expander	3431738656
+1	slovak	x-vnd.Haiku-Expander	2177073262
 Expand	ExpanderMenu		Rozbaliť
 Close window when done expanding	ExpanderPreferences		Zatvoriť okno po dokončení rozbaľovania
 Set destination…	ExpanderMenu		Nastaviť cieľ…
@@ -34,6 +34,7 @@ Automatically show contents listing	ExpanderPreferences		Automaticky zobrazovať
 OK	ExpanderPreferences		OK
 Leave destination folder path empty	ExpanderPreferences		Ponechať cestu k cieľovému priečinku prázdnu
 Failed to create the destination folder.	ExpanderWindow		Nepodarilo sa vytvoriť cieľový priečinok.
+Select '%s'…	DirectoryFilePanel		Vybrať „%s“…
 Create	ExpanderWindow		Vytvoriť
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Priečinok bol presunutý, premenovaný\nalebo nie je podporovaný.
 The file doesn't exist	ExpanderWindow		Súbor neexistuje

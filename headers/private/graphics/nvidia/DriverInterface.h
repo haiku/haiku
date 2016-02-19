@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-10/2009.
+	Rudolf Cornelissen 10/2002-1/2016.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -62,6 +62,20 @@ typedef struct {
 #define TV_CAPABLE (1<<11)
 #define TV_VIDEO (1<<12)
 #define TV_PRIMARY (1<<13)
+
+/* additional timing flags for GetMode/SetMode for Haiku ScreenPrefs panel */
+enum {
+	RADEON_MODE_MULTIMON_REQUEST = 1 << 25,
+	RADEON_MODE_MULTIMON_REPLY = 1 << 26
+};
+
+/* operation codes tunneled via ProposeDisplayMode for Haiku ScreenPrefs panel */
+typedef enum {
+	ms_swap 			= 'sw',
+	ms_use_laptop_panel	= 'up',
+	ms_tv_standard		= 'tv'
+} multi_mon_settings;
+
 
 #define SKD_MOVE_CURSOR    0x00000001
 #define SKD_PROGRAM_CLUT   0x00000002
@@ -231,6 +245,7 @@ typedef struct { // apsed, see comments in nvidia.settings
 	bool   block_acc;
 	uint32 gpu_clk;
 	uint32 ram_clk;
+	bool   check_edid;
 } nv_settings;
 
 /* monitor info gathered via EDID */
@@ -306,6 +321,8 @@ typedef struct {
 	bool acc_mode;			/* signals (non)accelerated mode */
 	bool interlaced_tv_mode;/* signals interlaced CRTC TV output mode */
 	bool crtc_switch_mode;	/* signals dualhead switch mode if panels are used */
+	bool haiku_prefs_used;	/* signals use of Haiku ScreenPrefs app for special modes */
+	bool Haiku_switch_head;	/* signals Haiku ScreenPrefs panel want inverted mode later on */
 
   /*frame buffer config - for BDirectScreen*/
 	frame_buffer_config fbc;	/* bytes_per_row and start of frame buffer: head1 */

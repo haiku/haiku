@@ -192,7 +192,7 @@ TBarView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
 
-	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	SetViewUIColor(B_MENU_BACKGROUND_COLOR);
 	SetFont(be_plain_font);
 
 	fMouseFilter = new BarViewMessageFilter(this);

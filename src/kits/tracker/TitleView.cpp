@@ -56,22 +56,14 @@ All rights reserved.
 
 #define APP_SERVER_CLEARS_BACKGROUND 1
 
-
-static rgb_color sTitleBackground;
-static rgb_color sDarkTitleBackground;
-static rgb_color sShineColor;
-static rgb_color sLightShadowColor;
-static rgb_color sShadowColor;
-static rgb_color sDarkShadowColor;
-
-
 static void
 _DrawLine(BPoseView* view, BPoint from, BPoint to)
 {
-	rgb_color highColor = view->HighColor();
-	view->SetHighColor(tint_color(view->LowColor(), B_DARKEN_1_TINT));
+	float tint = B_NO_TINT;
+	color_which highColor = view->HighUIColor(&tint);
+	view->SetHighUIColor(view->LowUIColor(), B_DARKEN_1_TINT);
 	view->StrokeLine(from, to);
-	view->SetHighColor(highColor);
+	view->SetHighUIColor(highColor, tint);
 }
 
 
@@ -87,10 +79,11 @@ _DrawOutline(BView* view, BRect where)
 {
 	where.right++;
 	where.bottom--;
-	rgb_color highColor = view->HighColor();
-	view->SetHighColor(ui_color(B_CONTROL_HIGHLIGHT_COLOR));
+	float tint = B_NO_TINT;
+	color_which highColor = view->HighUIColor(&tint);
+	view->SetHighUIColor(B_CONTROL_HIGHLIGHT_COLOR);
 	view->StrokeRect(where);
-	view->SetHighColor(highColor);
+	view->SetHighUIColor(highColor, tint);
 }
 
 
@@ -107,18 +100,10 @@ BTitleView::BTitleView(BPoseView* view)
 	fPreviousLeftClickTime(0),
 	fTrackingState(NULL)
 {
-	sTitleBackground = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 0.88f);
-		// 216 -> 220
-	sDarkTitleBackground = tint_color(sTitleBackground, B_DARKEN_1_TINT);
-	sShineColor = tint_color(sTitleBackground, B_LIGHTEN_MAX_TINT);
-	sLightShadowColor = tint_color(sTitleBackground, B_DARKEN_2_TINT);
-	sShadowColor = tint_color(sTitleBackground, B_DARKEN_4_TINT);
-	sDarkShadowColor = tint_color(sShadowColor, B_DARKEN_2_TINT);
-
-	SetHighColor(sTitleBackground);
-	SetLowColor(sTitleBackground);
+	SetHighUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 #if APP_SERVER_CLEARS_BACKGROUND
-	SetViewColor(sTitleBackground);
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 #else
 	SetViewColor(B_TRANSPARENT_COLOR);
 #endif
@@ -239,12 +224,12 @@ BTitleView::Draw(BRect /*updateRect*/, bool useOffscreen, bool updateOnly,
 	} else
 		view = this;
 
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	view->SetHighColor(tint_color(base, B_DARKEN_2_TINT));
+	view->SetHighUIColor(B_PANEL_BACKGROUND_COLOR, B_DARKEN_2_TINT);
 	view->StrokeLine(bounds.LeftBottom(), bounds.RightBottom());
 	bounds.bottom--;
 
-	be_control_look->DrawButtonBackground(view, bounds, bounds, base, 0,
+	rgb_color baseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	be_control_look->DrawButtonBackground(view, bounds, bounds, baseColor, 0,
 		BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 
 	int32 count = fTitleList.CountItems();
@@ -262,7 +247,7 @@ BTitleView::Draw(BRect /*updateRect*/, bool useOffscreen, bool updateOnly,
 
 	bounds = Bounds();
 	minx--;
-	view->SetHighColor(sLightShadowColor);
+	view->SetHighUIColor(B_PANEL_BACKGROUND_COLOR, B_DARKEN_1_TINT);
 	view->StrokeLine(BPoint(minx, bounds.top),
 		BPoint(minx, bounds.bottom - 1));
 
@@ -485,15 +470,15 @@ BColumnTitle::Draw(BView* view, bool pressed)
 	font_height height;
 	view->GetFontHeight(&height);
 	BPoint loc(0, bounds.top + ceilf(height.ascent) + 2);
+	rgb_color baseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 	if (pressed) {
 		bounds.bottom--;
 		BRect rect(bounds);
 		rect.right--;
-		rgb_color base = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DARKEN_1_TINT);
+		baseColor = tint_color(baseColor, B_DARKEN_1_TINT);
 
-		be_control_look->DrawButtonBackground(view, rect, rect, base, 0,
+		be_control_look->DrawButtonBackground(view, rect, rect, baseColor, 0,
 			BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 	}
 
@@ -518,8 +503,8 @@ BColumnTitle::Draw(BView* view, bool pressed)
 			break;
 	}
 
-	view->SetLowColor(pressed ? sDarkTitleBackground : sTitleBackground);
-	view->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), 1.75));
+	view->SetHighUIColor(B_PANEL_TEXT_COLOR, pressed ? B_DARKEN_1_TINT : 1.0f);
+	view->SetLowColor(baseColor);
 	view->DrawString(titleString.String(), loc);
 
 	// show sort columns
@@ -544,19 +529,17 @@ BColumnTitle::Draw(BView* view, bool pressed)
 		view->SetFlags(flags | B_SUBPIXEL_PRECISE);
 
 		if (secondary) {
-			view->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-				1.3));
+			view->SetHighUIColor(B_PANEL_BACKGROUND_COLOR, 1.3);
 			view->FillTriangle(triangle[0], triangle[1], triangle[2]);
 		} else {
-			view->SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-				1.6));
+			view->SetHighUIColor(B_PANEL_BACKGROUND_COLOR, 1.6);
 			view->FillTriangle(triangle[0], triangle[1], triangle[2]);
 		}
 
 		view->SetFlags(flags);
 	}
 
-	view->SetHighColor(sLightShadowColor);
+	view->SetHighUIColor(B_PANEL_BACKGROUND_COLOR, B_DARKEN_1_TINT);
 	view->StrokeLine(bounds.RightTop(), bounds.RightBottom());
 }
 

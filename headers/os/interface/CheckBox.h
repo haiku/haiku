@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CHECK_BOX_H
@@ -13,8 +13,7 @@ class BCheckBox : public BControl {
 public:
 								BCheckBox(BRect frame, const char* name,
 									const char* label, BMessage* message,
-									uint32 resizingMode
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE);
 								BCheckBox(const char* name, const char* label,
 									BMessage* message, uint32 flags

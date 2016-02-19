@@ -34,7 +34,7 @@ PPPStatusView::PPPStatusView(BRect rect, ppp_interface_id id)
 	: BView(rect, "PPPStatusView", B_FOLLOW_NONE, B_PULSE_NEEDED),
 	fInterface(id)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	
 	rect = Bounds();
 	rect.InsetBy(5, 5);

@@ -41,7 +41,7 @@ Application Mail :
 	AutoCompleterDefaultImpl.cpp
 	TextViewCompleter.cpp
 
-	: libshared.a be tracker [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	: shared be tracker [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 		localestub libmail.so libtextencoding.so
 	: Mail.rdef
 ;

@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	3268992666
+1	belarusian	x-vnd.Haiku-Terminal	4155859181
 Not found.	Terminal TermWindow		Не знойдзена.
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Change directory	Terminal TermView		Змяніць дырэкторыю
@@ -74,7 +74,6 @@ Close	Terminal TermWindow		Закрыць
 Text	Terminal AppearancePrefView		Тэкст
 Clear all	Terminal TermWindow		Ачысціць усё
 Text encoding	Terminal TermWindow		Кадоўка тэксту
-size	Terminal TermView		памер
 Close window	Terminal TermWindow		Закрыць вакно
 Copy absolute path	Terminal TermView		Капіяваць абсалютны шлях
 Set tab title	Terminal TermWindow		Прызначыць імя ўкладкі

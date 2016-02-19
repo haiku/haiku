@@ -232,23 +232,6 @@ acpi_std_ops(int32 op,...)
 				goto err;
 
 			/* Install the default address space handlers. */
-			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
-						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_MEMORY,
-						ACPI_DEFAULT_HANDLER, NULL, NULL),
-					"Could not initialise SystemMemory handler:"))
-				goto err;
-
-			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
-						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_SYSTEM_IO,
-						ACPI_DEFAULT_HANDLER, NULL, NULL),
-					"Could not initialise SystemIO handler:"))
-				goto err;
-
-			if (checkAndLogFailure(AcpiInstallAddressSpaceHandler(
-						ACPI_ROOT_OBJECT, ACPI_ADR_SPACE_PCI_CONFIG,
-						ACPI_DEFAULT_HANDLER, NULL, NULL),
-					"Could not initialise PciConfig handler:"))
-				goto err;
 
 			arg.Integer.Type = ACPI_TYPE_INTEGER;
 			arg.Integer.Value = apic_available() ? APIC_MODE : PIC_MODE;

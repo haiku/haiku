@@ -21,7 +21,7 @@ Application Installer :
 	# From launch_daemon
 	Utility.cpp
 
-	: be tracker translation libshared.a [ TargetLibstdc++ ]
+	: be tracker translation shared [ TargetLibstdc++ ]
 		localestub
 	: Installer.rdef
 ;

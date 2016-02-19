@@ -118,10 +118,15 @@ void
 PowerStatusView::AttachedToWindow()
 {
 	BView::AttachedToWindow();
-	if (Parent())
-		SetLowColor(Parent()->ViewColor());
+	AdoptParentColors();
+
+	float tint = B_NO_TINT;
+	color_which which = ViewUIColor(&tint);
+
+	if (which == B_NO_COLOR)
+		SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 	else
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetLowUIColor(which, tint);
 
 	Update();
 }
@@ -159,7 +164,10 @@ PowerStatusView::_DrawBattery(BRect rect)
 	float left = rect.left;
 	rect.left += rect.Width() / 11;
 
-	SetHighColor(0, 0, 0);
+	if (LowColor().Brightness() > 100)
+		SetHighColor(0, 0, 0);
+	else
+		SetHighColor(128, 128, 128);
 
 	float gap = 1;
 	if (rect.Height() > 8) {
@@ -190,7 +198,10 @@ PowerStatusView::_DrawBattery(BRect rect)
 
 	if (percent > 0) {
 		rect.InsetBy(gap, gap);
-		rgb_color base = {84, 84, 84, 255};
+		rgb_color base = (rgb_color){84, 84, 84, 255};
+		if (LowColor().Brightness() < 128)
+			base = (rgb_color){172, 172, 172, 255};
+
 		if (be_control_look != NULL) {
 			BRect empty = rect;
 			if (fHasBattery && percent > 0)
@@ -313,8 +324,7 @@ PowerStatusView::Draw(BRect updateRect)
 			SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
 		else {
 			SetDrawingMode(B_OP_OVER);
-			rgb_color c = Parent()->LowColor();
-			if (c.red + c.green + c.blue > 128 * 3)
+			if (LowColor().Brightness() > 100)
 				SetHighColor(0, 0, 0);
 			else
 				SetHighColor(255, 255, 255);

@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-Appearance	727801787
+1	polish	x-vnd.Haiku-Appearance	1140137500
 Plain font:	Font view		Font zwykły:
 Control highlight	Colors tab		Podkreślenie kontrolki
 Control border	Colors tab		Obramowanie kontrolki
@@ -6,11 +6,14 @@ Antialiasing type:	AntialiasingSettingsView		Typ antyaliasingu:
 Shadow	Colors tab		Cień
 On	AntialiasingSettingsView		Włącz
 Defaults	APRWindow		Przywróć domyślne
+Link hover	Colors tab		Zaznaczony odnośnik
 Grayscale	AntialiasingSettingsView		Skala odcieni szarości
 Shine	Colors tab		Połysk
 About	DecorSettingsView		Informacje
 About decorator	DecorSettingsView		O dekoratorze
 Off	AntialiasingSettingsView		Wyłącz
+Link text	Colors tab		Tekst odnośnika
+Link active	Colors tab		Aktywny odnośnik
 Choose Decorator	DecorSettingsView		Wybierz Dekorator
 Success	Colors tab		Sukces
 Inactive window tab text	Colors tab		Tekst nieaktywnej zakładki okna
@@ -36,6 +39,7 @@ List background	Colors tab		Tło listy
 OK	DecorSettingsView		OK
 Control mark	Colors tab		Znak sterujący
 Size:	Font Selection view		Rozmiar:
+Link visited	Colors tab		Odwiedzony odnośnik
 Decorator:	DecorSettingsView		Dekorator:
 Selected list item background	Colors tab		Tło zaznaczonego elementu listy
 Panel background	Colors tab		Tło panelu

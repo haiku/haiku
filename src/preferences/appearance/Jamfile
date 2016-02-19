@@ -18,7 +18,7 @@ Preference Appearance :
 	APRView.cpp
 	APRWindow.cpp
 	ColorPreview.cpp
-	ColorSet.cpp
+	Colors.cpp
 	ColorWhichItem.cpp
 
 	# These are currently disabled while everything else is being worked on
@@ -41,7 +41,7 @@ DoCatalogs Appearance :
 	APRView.cpp
 	APRWindow.cpp
 	ColorPreview.cpp
-	ColorSet.cpp
+	Colors.cpp
 	ColorWhichItem.cpp
 	LookAndFeelSettingsView.cpp
 	FontView.cpp

@@ -1,8 +1,10 @@
-1	slovak	x-vnd.Haiku-PowerStatus	3224068645
+1	slovak	x-vnd.Haiku-PowerStatus	3969330583
 Design capacity low warning: 	PowerStatus		Upozornenie na nízku navrhnutú kapacitu: 
 Show percent	PowerStatus		Zobrazovať percentá
 Design capacity: 	PowerStatus		Navrhnutá kapacita: 
  mW	PowerStatus		 mW
+The battery level is getting low, please plug in the device.	PowerStatus		Úroveň nabitia batérie je nízka. Prosím, pripojte zariadenie do elektrickej siete.
+Battery low	PowerStatus		Nízka úroveň batérie
 Type: 	PowerStatus		Typ: 
 non-rechargeable	PowerStatus		nedobíjateľná
 Empty battery slot	PowerStatus		Prázdne miesto na batériu
@@ -27,10 +29,12 @@ Install in Deskbar	PowerStatus		Nainštalovať do Panelu
 Capacity: 	PowerStatus		Kapacita: 
 Battery discharging	PowerStatus		Batéria sa vybíja
 Serial number: 	PowerStatus		Sériové číslo: 
+Battery critical	PowerStatus		Kritická úroveň batérie
 Capacity granularity 1: 	PowerStatus		Granularita kapacity 1: 
 OEM info: 	PowerStatus		Info OEM: 
 Design voltage: 	PowerStatus		Návrhové napätie: 
 Battery charging	PowerStatus		Batéria sa nabíja
+The battery level is critical, please plug in the device immediately.	PowerStatus		Úroveň nabitia batérie je kritická. Prosím, ihneď pripojte zariadenie do elektrickej siete.
 Design capacity warning: 	PowerStatus		Upozornenie navrhnutej kapacity: 
 Battery info	PowerStatus		Info o batérii
 Quit	PowerStatus		Ukončiť

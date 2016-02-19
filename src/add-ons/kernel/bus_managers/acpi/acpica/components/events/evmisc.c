@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -147,6 +147,7 @@ BOOLEAN
 AcpiEvIsNotifyObject (
     ACPI_NAMESPACE_NODE     *Node)
 {
+
     switch (Node->Type)
     {
     case ACPI_TYPE_DEVICE:
@@ -255,8 +256,8 @@ AcpiEvQueueNotifyRequest (
         AcpiUtGetNodeName (Node), AcpiUtGetTypeName (Node->Type),
         NotifyValue, AcpiUtGetNotifyName (NotifyValue, ACPI_TYPE_ANY), Node));
 
-    Status = AcpiOsExecute (OSL_NOTIFY_HANDLER, AcpiEvNotifyDispatch,
-        Info);
+    Status = AcpiOsExecute (OSL_NOTIFY_HANDLER,
+        AcpiEvNotifyDispatch, Info);
     if (ACPI_FAILURE (Status))
     {
         AcpiUtDeleteGenericState (Info);

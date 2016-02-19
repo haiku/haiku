@@ -10,8 +10,6 @@
 
 #include <directories.h>
 
-#include "net_module.h"
-
 
 typedef uint32 ppp_interface_id;
 
@@ -37,7 +35,8 @@ typedef uint32 ppp_interface_id;
 #define PPP_SERVER_MODE_VALUE				"Server"
 
 // path defines
-#define PPP_MODULES_PATH					NETWORK_MODULES_ROOT "ppp"
+#define NETWORK_MODULES_ROOT "network"
+#define PPP_MODULES_PATH			NETWORK_MODULES_ROOT "/ppp"
 #define PTP_INTERFACE_SETTINGS_PATH	\
 	kUserSettingsDirectory "/kernel/drivers/ptpnet"
 		// TODO: should be: /etc/ptpnet

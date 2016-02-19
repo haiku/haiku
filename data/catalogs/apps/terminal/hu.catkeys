@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Terminal	1112752202
+1	hungarian	x-vnd.Haiku-Terminal	1999618717
 Not found.	Terminal TermWindow		Nem található.
 Switch Terminals	Terminal TermWindow		Terminálok közti váltás
 Change directory	Terminal TermView		Mappa váltása
@@ -83,7 +83,6 @@ Close	Terminal TermWindow		Bezárás
 Text	Terminal AppearancePrefView		Szöveg
 Clear all	Terminal TermWindow		Összes törlése
 Text encoding	Terminal TermWindow		Szöveg kódolása
-size	Terminal TermView		méret
 Close window	Terminal TermWindow		Ablak bezárása
 Copy absolute path	Terminal TermView		Teljes útvonal másolása
 Save as default	Terminal TermWindow		Beállítás alapértelmezettként

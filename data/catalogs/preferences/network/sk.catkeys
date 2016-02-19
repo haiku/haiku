@@ -1,20 +1,50 @@
-1	slovak	x-vnd.Haiku-Network	2106277099
-Choose automatically	EthernetSettingsView		Zvoliť automaticky
-Gateway:	EthernetSettingsView		Brána:
-Netmask:	EthernetSettingsView		Maska siete:
-DHCP	EthernetSettingsView		DHCP
-Apply	EthernetSettingsView		Použiť
-OK	EthernetSettingsView		OK
-IP address:	EthernetSettingsView		IP adresa:
-Adapter:	EthernetSettingsView		Adaptér:
-Domain:	EthernetSettingsView		Doména:
-Revert	EthernetSettingsView		Vrátiť
-<no wireless networks found>	EthernetSettingsView		<nenájdené žiadne bezdrôtové siete>
-Network	System name		Sieť
-Mode:	EthernetSettingsView		Režim:
-Network:	EthernetSettingsView		Sieť:
-The net_server needs to run for the auto configuration!	EthernetSettingsView		Aby bola možná automatická konfigurácia, musí bežať net_server!
-Disabled	EthernetSettingsView		Vypnuté
-Auto-configuring failed: 	EthernetSettingsView		Automatická konfigurácia sa nepodarila: 
-Static	EthernetSettingsView		Statická
-<no adapter>	EthernetSettingsView		<žiaden adaptér>
+1	slovak	x-vnd.Haiku-Network	2512967175
+Static	IntefaceAddressView		Statická
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Služby
+no link	InterfaceListItem		bez spojenia
+WPA2	WPA2 protected network		WPA2
+Choose automatically	IntefaceView		Vybrať automaticky
+connected	IntefaceView		pripojené
+Ethernet device	InterfaceListItem		Ethernetové zariadenie
+The netmask defines your local network	IntefaceAddressView		Sieťová maska definuje vašu lokálnu sieť
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+Network	NetworkWindow		Sieť
+Show network status in Deskbar	NetworkWindow		Zobraziť stav siete v Paneli
+The method for obtaining an IP address	IntefaceAddressView		Spôsob získania adresy IP
+connected	InterfaceListItem		pripojené
+disabled	InterfaceListItem		zakázané
+Dial Up	NetworkWindow		Vytáčané pripojenie Dial-Up
+Apply	IntefaceAddressView		Použiť
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Inštalácia Stavu siete do Panelu zlyhala: %s
+MAC address:	IntefaceView		Adresa MAC:
+Wireless device	InterfaceListItem		Bezdrôtové zariadenie
+Disabled	IntefaceAddressView		Zakázané
+Renegotiate	IntefaceView		Znovu vyjednať
+Ok	NetworkWindow		OK
+Network:	IntefaceView		Sieť:
+launch error	NetworkWindow		chyba pri spustení
+Other	NetworkWindow		Iné
+Automatic	IntefaceAddressView		Automaticky
+Gateway:	IntefaceAddressView		Brána:
+Revert	NetworkWindow		Vrátiť
+Enable	ServiceView		Povoliť
+disconnected	IntefaceView		odpojené
+Status:	IntefaceView		Stav:
+Link speed:	IntefaceView		Rýchlosť linky:
+Your gateway to the internet	IntefaceAddressView		Vaša brána do internetu
+New…	NetworkWindow		Nová…
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Režim:
+WPA	WPA protected network		WPA
+Sent:	IntefaceView		Odoslaných:
+open	Open network		otvorená
+IP Address:	IntefaceAddressView		Adresa IP:
+Received:	IntefaceView		Prijatých:
+Disable	IntefaceView		Zakázať
+<no wireless networks found>	IntefaceView		<neboli nájdené žiadne bezdrôtové siete>
+Netmask:	IntefaceAddressView		Sieťová maska:
+Disable	ServiceView		Zakázať
+Your IP address	IntefaceAddressView		Vaša adresa IP
+Manage…	NetworkWindow		Spravovať…
+WEP	WEP protected network		WEP

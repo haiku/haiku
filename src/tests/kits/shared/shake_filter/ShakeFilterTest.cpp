@@ -29,7 +29,7 @@ View::View(BRect rect, const char* name, uint32 followMode)
 	:
 	BView(rect, name, followMode, B_WILL_DRAW)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetHighColor(255, 0, 0);
 }
 

@@ -1,13 +1,15 @@
-1	slovak	x-vnd.Haiku-SoundRecorder	3982150268
+1	slovak	x-vnd.Haiku-SoundRecorder	24440888
 Loop	RecorderWindow		Opakovať
 Cannot find default audio hardware	RecorderWindow		Štandardný zvukový hardvér nenájdený
 Cannot find the temporary file created to hold the new recording	RecorderWindow		Nebol nájdený dočasný súbor obsahujúci nový záznam
 Sample size:	RecorderWindow		Veľkosť vzorky:
 Nothing to play	RecorderWindow		Niet čo prehrať
+None of the files appear to be audio files.	RecorderWindow		Zdá sa, že žiadne z týchto súborov nie sú zvukové súbory.
 Duration: 	RecorderWindow		Trvanie: 
 File info	RecorderWindow		Info súboru
 Drop files here	SoundListView		Pretiahnite súbory sem
 Input	RecorderWindow		Vstup
+Some of the files don't appear to be audio files.	RecorderWindow		Zdá sa, že niektoré súbory nie sú zvukové súbory.
 Stop	RecorderWindow		Zastaviť
 Format:	RecorderWindow		Formát:
 Sound List	RecorderWindow		Zoznam zvukov
@@ -40,4 +42,5 @@ Channels: 	RecorderWindow		Kanály:
 Save	RecorderWindow		Uložiť
 Sample rate: 	RecorderWindow		Vzorkovacia frekvencia: 
 Cannot connect to media server	RecorderWindow		Nie je možné pripojiť sa k multimediálnemu serveru
+The file doesn't appear to be an audio file.	RecorderWindow		Tento súbor nevyzerá ako zvukový súbor.
 File name:	RecorderWindow		Názov súboru:

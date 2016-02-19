@@ -15,8 +15,7 @@
 class BScrollView : public BView {
 public:
 								BScrollView(const char* name, BView* target,
-									uint32 resizingMode
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT_TOP,
 									uint32 flags = 0, bool horizontal = false,
 									bool vertical = false,
 									border_style border = B_FANCY_BORDER);

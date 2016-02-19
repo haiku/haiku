@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtextencoding	3062073902
+1	slovak	x-vnd.Haiku-libtextencoding	1525027211
 ISO Greek	textencodings		ISO grécke
 ISO South European	textencodings		ISO juhoeurópske
 Chinese Big5	textencodings		Čínske Big5
@@ -7,6 +7,7 @@ ISO Arabic	textencodings		ISO arabské
 ISO Latin 9	textencodings		ISO Latin 9
 Japanese Shift JIS	textencodings		Japonské Shift JIS
 DOS Cyrillic	textencodings		DOS cyrilika
+Windows Central European (CP 1250)	textencodings		Windows stredoeurópske (CP 1250)
 Windows Cyrillic (CP 1251)	textencodings		Windows cyrilika (CP 1251)
 Japanese EUC	textencodings		Japonské EUC
 Unicode	textencodings		Unicode

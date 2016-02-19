@@ -51,7 +51,7 @@
 CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags)
 	:BView(frame,name,resize,flags), settings(B_SIMPLE_DATA)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	
 	
 	cursorset=new CursorSet("Default");
@@ -110,7 +110,7 @@ CurView::CurView(const BRect &frame, const char *name, int32 resize, int32 flags
 	scrollview=new BScrollView("ScrollView",attrlist, B_FOLLOW_LEFT |
 		B_FOLLOW_TOP, 0, false, true);
 	AddChild(scrollview);
-	scrollview->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	scrollview->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	
 	attrlist->SetSelectionMessage(new BMessage(ATTRIBUTE_CHOSEN));
 
@@ -413,7 +413,7 @@ BitmapView::BitmapView(const BPoint &pt,BMessage *message, const BHandler *handl
 {
 	SetFont(be_plain_font);
 	bitmap=NULL;
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetDrawingMode(B_OP_ALPHA);
 	drawrect=Bounds().InsetByCopy(5,5);
 }

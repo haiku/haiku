@@ -21,6 +21,8 @@
 
 #include "VideoMixerNode.h"
 
+using std::vector;
+
 VideoMixerNode::~VideoMixerNode(void)
 {
 	fprintf(stderr,"VideoMixerNode::~VideoMixerNode\n");
@@ -29,9 +31,9 @@ VideoMixerNode::~VideoMixerNode(void)
 }
 
 VideoMixerNode::VideoMixerNode(
-				const flavor_info *info = 0,
-				BMessage *config = 0,
-				BMediaAddOn *addOn = 0)
+				const flavor_info *info,
+				BMessage *config,
+				BMediaAddOn *addOn)
 	: BMediaNode("VideoMixerNode"),
   	  BBufferConsumer(B_MEDIA_RAW_VIDEO),	// Raw video buffers in
   	  BBufferProducer(B_MEDIA_RAW_VIDEO),	// Raw video buffers out
@@ -303,8 +305,9 @@ void VideoMixerNode::GetFlavor(flavor_info *outInfo, int32 id)
 
 	if (outInfo != NULL) {
 		outInfo->internal_id = id;
-		outInfo->name = "Haiku VideoMixer";
-		outInfo->info = "A VideoMixerNode node mixes multiple video streams into a single stream.";
+		strcpy(outInfo->name, "Haiku VideoMixer");
+		strcpy(outInfo->info, "A VideoMixerNode node mixes multiple video"
+			" streams into a single stream.");
 		outInfo->kinds = B_BUFFER_CONSUMER | B_BUFFER_PRODUCER;
 		outInfo->flavor_flags = B_FLAVOR_IS_LOCAL;
 		outInfo->possible_count = INT_MAX;	// no limit

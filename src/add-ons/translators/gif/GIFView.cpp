@@ -49,7 +49,7 @@ GIFView::GIFView(TranslatorSettings* settings)
 	BGroupView("GIFView", B_VERTICAL),
 	fSettings(settings)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fTitle = new BStringView("Title", B_TRANSLATE("GIF image translator"));
 	fTitle->SetFont(be_bold_font);

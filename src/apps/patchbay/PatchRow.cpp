@@ -164,7 +164,7 @@ void
 PatchRow::AttachedToWindow()
 {
 	Window()->SetPulseRate(200000);
-	SetViewColor(Parent()->ViewColor());
+	AdoptParentColors();
 	int32 numChildren = CountChildren();
 	for (int32 i = 0; i < numChildren; i++) {
 		PatchCheckBox* box = dynamic_cast<PatchCheckBox*>(ChildAt(i));

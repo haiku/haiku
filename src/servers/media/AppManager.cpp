@@ -50,17 +50,11 @@ AppManager::AppManager()
 	:
 	BLocker("media app manager")
 {
-	fQuit = create_sem(0, "big brother waits");
-	fBigBrother = spawn_thread(_BigBrotherEntry, "big brother is watching you",
-		B_NORMAL_PRIORITY, this);
-	resume_thread(fBigBrother);
 }
 
 
 AppManager::~AppManager()
 {
-	delete_sem(fQuit);
-	wait_for_thread(fBigBrother, NULL);
 }
 
 
@@ -166,65 +160,4 @@ AppManager::_CleanupTeam(team_id team)
 	gNodeManager->CleanupTeam(team);
 	gBufferManager->CleanupTeam(team);
 	gNotificationManager->CleanupTeam(team);
-}
-
-
-void
-AppManager::_TeamDied(team_id team)
-{
-	UnregisterTeam(team);
-}
-
-
-status_t
-AppManager::_BigBrotherEntry(void* self)
-{
-	static_cast<AppManager*>(self)->_BigBrother();
-	return 0;
-}
-
-
-/*!	The BigBrother thread send ping messages to the BMediaRoster of
-	all currently running teams. If the reply times out or is wrong,
-	the team cleanup function _TeamDied() will be called.
-*/
-void
-AppManager::_BigBrother()
-{
-	status_t status = B_TIMED_OUT;
-
-	do {
-		if (!Lock())
-			break;
-
-		bool startOver = false;
-		AppMap::iterator iterator = fMap.begin();
-		for (; iterator != fMap.end(); iterator++) {
-			// No need to send the alive message
-			// if the team died.
-			if (iterator->second.IsValid() == true) {
-				BMessage ping('PING');
-				BMessage reply;
-				reply.what = 0;
-				status = iterator->second.SendMessage(&ping, &reply, 5000000,
-					2000000);
-				if (status != B_OK || reply.what != 'PONG') {
-					startOver = true;
-					break;
-				}
-			} else {
-				startOver = true;
-				break;
-			}
-		}
-
-		if (startOver == true) {
-			Unlock();
-			_TeamDied(iterator->first);
-			continue;
-		}
-
-		Unlock();
-		status = acquire_sem_etc(fQuit, 1, B_RELATIVE_TIMEOUT, 2000000);
-	} while (status == B_TIMED_OUT || status == B_INTERRUPTED);
 }

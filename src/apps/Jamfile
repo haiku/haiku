@@ -4,7 +4,6 @@ HaikuSubInclude 3dmov ;
 HaikuSubInclude aboutsystem ;
 HaikuSubInclude activitymonitor ;
 HaikuSubInclude autoraise ;
-HaikuSubInclude bsnow ;
 HaikuSubInclude bootmanager ;
 HaikuSubInclude charactermap ;
 HaikuSubInclude clock ;

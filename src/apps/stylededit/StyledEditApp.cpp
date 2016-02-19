@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2002-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -32,7 +32,9 @@
 using namespace BPrivate;
 
 
-BRect gWindowRect(7 - 15, 26 - 15, 507, 426);
+static BRect sWindowRect(7, 26, 507, 426);
+static float sCascadeOffset = 15;
+static BPoint sTopLeft = BPoint(7, 26);
 
 
 namespace
@@ -42,15 +44,15 @@ namespace
 	{
 		BScreen screen;
 		BRect screenBorder = screen.Frame();
-		float left = gWindowRect.left + 15;
-		if (left + gWindowRect.Width() > screenBorder.right)
-			left = 7;
+		float left = sWindowRect.left + sCascadeOffset;
+		if (left + sWindowRect.Width() > screenBorder.right)
+			left = sTopLeft.x;
 
-		float top = gWindowRect.top + 15;
-		if (top + gWindowRect.Height() > screenBorder.bottom)
-			top = 26;
+		float top = sWindowRect.top + sCascadeOffset;
+		if (top + sWindowRect.Height() > screenBorder.bottom)
+			top = sTopLeft.y;
 
-		gWindowRect.OffsetTo(BPoint(left, top));
+		sWindowRect.OffsetTo(BPoint(left, top));
 	}
 
 
@@ -60,19 +62,19 @@ namespace
 		BScreen screen;
 		BRect screenBorder = screen.Frame();
 
-		float left = gWindowRect.left - 15;
-		if (left < 7) {
-			left = screenBorder.right - gWindowRect.Width() - 7;
-			left = left - ((int)left % 15) + 7;
+		float left = sWindowRect.left - sCascadeOffset;
+		if (left < sTopLeft.x) {
+			left = screenBorder.right - sWindowRect.Width() - sTopLeft.x;
+			left = left - ((int)left % (int)sCascadeOffset) + sTopLeft.x;
 		}
 
-		float top = gWindowRect.top - 15;
-		if (top < 26) {
-			top = screenBorder.bottom - gWindowRect.Height() - 26;
-			top = top - ((int)left % 15) + 26;
+		float top = sWindowRect.top - sCascadeOffset;
+		if (top < sTopLeft.y) {
+			top = screenBorder.bottom - sWindowRect.Height() - sTopLeft.y;
+			top = top - ((int)left % (int)sCascadeOffset) + sTopLeft.y;
 		}
 
-		gWindowRect.OffsetTo(BPoint(left, top));
+		sWindowRect.OffsetTo(BPoint(left, top));
 	}
 }
 
@@ -130,6 +132,16 @@ StyledEditApp::StyledEditApp()
 	fWindowCount = 0;
 	fNextUntitledWindow = 1;
 	fBadArguments = false;
+
+	float factor = be_plain_font->Size() / 12.0f;
+	sCascadeOffset *= factor;
+	sTopLeft.x *= factor;
+	sTopLeft.y *= factor;
+	sWindowRect.left *= factor;
+	sWindowRect.top *= factor;
+	sWindowRect.right *= factor;
+	sWindowRect.bottom *= factor;
+	sWindowRect.PrintToStream();
 }
 
 
@@ -171,8 +183,8 @@ StyledEditApp::MessageReceived(BMessage* message)
 void
 StyledEditApp::OpenDocument()
 {
+	new StyledEditWindow(sWindowRect, fNextUntitledWindow++, fOpenAsEncoding);
 	cascade();
-	new StyledEditWindow(gWindowRect, fNextUntitledWindow++, fOpenAsEncoding);
 	fWindowCount++;
 }
 
@@ -224,8 +236,8 @@ StyledEditApp::OpenDocument(entry_ref* ref, BMessage* message)
 		}
 	}
 
+	document = new StyledEditWindow(sWindowRect, ref, fOpenAsEncoding);
 	cascade();
-	document = new StyledEditWindow(gWindowRect, ref, fOpenAsEncoding);
 
 	if (message != NULL)
 		document->PostMessage(message);

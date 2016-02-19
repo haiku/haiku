@@ -19,5 +19,5 @@ UnitTestLib liblaunch_daemontest.so :
 	Conditions.cpp
 	Utility.cpp
 
-	: be network bnetapi libshared.a [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	: be network bnetapi shared [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;

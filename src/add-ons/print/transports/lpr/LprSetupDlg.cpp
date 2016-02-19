@@ -91,7 +91,7 @@ LprSetupView::LprSetupView(BRect frame, BDirectory *d)
 	:
 	BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW), fDir(d)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 

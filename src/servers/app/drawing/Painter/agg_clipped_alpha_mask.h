@@ -34,6 +34,11 @@ namespace agg
 			clipped_alpha_mask(rendering_buffer& rbuf)
 				: m_xOffset(0), m_yOffset(0), m_rbuf(&rbuf), m_outside(0) {}
 
+			void attach(rendering_buffer& rbuf)
+			{
+				m_rbuf = &rbuf;
+			}
+
 			void attach(rendering_buffer& rbuf, int x, int y, int8u outside)
 			{
 				m_rbuf = &rbuf;

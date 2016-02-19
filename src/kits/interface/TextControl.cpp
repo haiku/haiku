@@ -357,7 +357,7 @@ BTextControl::Draw(BRect updateRect)
 	BRect rect = fText->Frame();
 	rect.InsetBy(-2, -2);
 
-	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color base = ViewColor();
 	uint32 flags = fLook;
 	if (!enabled)
 		flags |= BControlLook::B_DISABLED;
@@ -464,6 +464,16 @@ BTextControl::LayoutInvalidated(bool descendants)
 void
 BTextControl::MessageReceived(BMessage* message)
 {
+	if (message->what == B_COLORS_UPDATED) {
+
+		if (message->HasColor(ui_color_name(B_PANEL_BACKGROUND_COLOR))
+			|| message->HasColor(ui_color_name(B_PANEL_TEXT_COLOR))
+			|| message->HasColor(ui_color_name(B_DOCUMENT_BACKGROUND_COLOR))
+			|| message->HasColor(ui_color_name(B_DOCUMENT_TEXT_COLOR))) {
+			_UpdateTextViewColors(IsEnabled());
+		}
+	}
+
 	if (message->what == B_GET_PROPERTY || message->what == B_SET_PROPERTY) {
 		BMessage reply(B_REPLY);
 		bool handled = false;
@@ -1025,30 +1035,20 @@ BTextControl::operator=(const BTextControl&)
 void
 BTextControl::_UpdateTextViewColors(bool enable)
 {
-	rgb_color textColor;
-	rgb_color color;
+	rgb_color textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+	rgb_color viewColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 	BFont font;
 
 	fText->GetFontAndColor(0, &font);
 
-	if (enable)
-		textColor = ui_color(B_DOCUMENT_TEXT_COLOR);
-	else {
-		textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DISABLED_LABEL_TINT);
+	if (!enable) {
+		textColor = disable_color(textColor, ViewColor());
+		viewColor = disable_color(ViewColor(), viewColor);
 	}
 
 	fText->SetFontAndColor(&font, B_FONT_ALL, &textColor);
-
-	if (enable)
-		color = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
-	else {
-		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_LIGHTEN_2_TINT);
-	}
-
-	fText->SetViewColor(color);
-	fText->SetLowColor(color);
+	fText->SetViewColor(viewColor);
+	fText->SetLowColor(viewColor);
 }
 
 

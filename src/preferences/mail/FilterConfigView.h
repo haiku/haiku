@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2016, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
@@ -10,8 +10,8 @@
 
 #include <vector>
 
-#include <Box.h>
 #include <Button.h>
+#include <GroupView.h>
 #include <ListView.h>
 #include <MailSettings.h>
 #include <Message.h>
@@ -23,7 +23,7 @@
 class FilterSettingsView;
 
 
-class FiltersConfigView : public BBox {
+class FiltersConfigView : public BGroupView {
 public:
 								FiltersConfigView(
 									BMailAccountSettings& account);

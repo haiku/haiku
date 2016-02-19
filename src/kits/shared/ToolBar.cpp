@@ -14,7 +14,38 @@
 namespace BPrivate {
 
 
-class LockableButton: public BButton {
+
+// Button to adopt backgrond color of toolbar
+class ToolBarButton : public BButton {
+public:
+			ToolBarButton(const char* name, const char* label,
+				BMessage* message);
+
+	void	AttachedToWindow();
+};
+
+
+ToolBarButton::ToolBarButton(const char* name, const char* label,
+				BMessage* message)
+	:
+	BButton(name, label, message)
+	{}
+
+
+void
+ToolBarButton::AttachedToWindow()
+{
+	BButton::AttachedToWindow();
+	SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+		// have to remove the darkening caused by BButton's drawing
+}
+
+
+//# pragma mark -
+
+
+class LockableButton: public ToolBarButton {
 public:
 			LockableButton(const char* name, const char* label,
 				BMessage* message);
@@ -26,7 +57,7 @@ public:
 LockableButton::LockableButton(const char* name, const char* label,
 	BMessage* message)
 	:
-	BButton(name, label, message)
+	ToolBarButton(name, label, message)
 {
 }
 
@@ -40,8 +71,11 @@ LockableButton::MouseDown(BPoint point)
 		SetBehavior(B_BUTTON_BEHAVIOR);
 
 	Message()->SetInt32("behavior", Behavior());
-	BButton::MouseDown(point);
+	ToolBarButton::MouseDown(point);
 }
+
+
+//#pragma mark  -
 
 
 BToolBar::BToolBar(BRect frame, orientation ont)
@@ -94,11 +128,11 @@ BToolBar::AddAction(BMessage* message, BHandler* target,
 	const BBitmap* icon, const char* toolTipText, const char* text,
 	bool lockable)
 {
-	BButton* button;
+	ToolBarButton* button;
 	if (lockable)
 		button = new LockableButton(NULL, NULL, message);
 	else
-		button = new BButton(NULL, NULL, message);
+		button = new ToolBarButton(NULL, NULL, message);
 	button->SetIcon(icon);
 	button->SetFlat(true);
 	if (toolTipText != NULL)
@@ -185,7 +219,6 @@ BToolBar::FindButton(uint32 command) const
 
 
 // #pragma mark - Private methods
-
 
 void
 BToolBar::Pulse()

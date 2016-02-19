@@ -5,7 +5,7 @@
 
 /*!	\class KPPPLayer
 	\brief An abstract layer that can encapsulate/send and receive packets.
-	
+
 	All packet handlers should derive from this class. It does not define a protocol
 	number like KPPPProtocol does. It only has a header overhead and an encapsulation
 	level that is used to determine the order at which the packets get encapsulated
@@ -19,13 +19,15 @@
 
 #include <KPPPLayer.h>
 
+#include <net_buffer.h>
+
 #include <cstdlib>
 #include <cstring>
-#include <core_funcs.h>
 
+extern net_buffer_module_info *gBufferModule;
 
 /*!	\brief Creates a new layer.
-	
+
 	If an error occurs in the constructor you should set \c fInitStatus.
 */
 KPPPLayer::KPPPLayer(const char *name, ppp_level level, uint32 overhead)
@@ -56,11 +58,11 @@ KPPPLayer::InitCheck() const
 
 //!	Sends a packet to the next layer in the chain.
 status_t
-KPPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
+KPPPLayer::SendToNext(net_buffer *packet, uint16 protocolNumber) const
 {
 	if (!packet)
 		return B_ERROR;
-	
+
 	// Find the next possible handler for this packet.
 	// Normal protocols (Level() >= PPP_PROTOCOL_LEVEL) do not encapsulate anything.
 	if (Next()) {
@@ -70,14 +72,14 @@ KPPPLayer::SendToNext(struct mbuf *packet, uint16 protocolNumber) const
 			return Next()->SendToNext(packet, protocolNumber);
 	} else {
 		ERROR("KPPPLayer: SendToNext() failed because there is no next handler!\n");
-		m_freem(packet);
+		gBufferModule->free(packet);
 		return B_ERROR;
 	}
 }
 
 
 /*!	\brief You may override this for periodic tasks.
-	
+
 	This method gets called every \c PPP_PULSE_RATE microseconds.
 */
 void
@@ -92,7 +94,7 @@ void
 KPPPLayer::SetName(const char *name)
 {
 	free(fName);
-	
+
 	if (name)
 		fName = strdup(name);
 	else

@@ -20,6 +20,13 @@ LinkedBitmapView::LinkedBitmapView(const char* name, BMessage* message)
 
 
 void
+LinkedBitmapView::AllAttached()
+{
+	//  We don't want to use BitmapView's default behavior here.
+}
+
+
+void
 LinkedBitmapView::MouseMoved(BPoint where, uint32 transit,
 	const BMessage* dragMessage)
 {

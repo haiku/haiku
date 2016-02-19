@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -335,7 +335,7 @@ AcpiUtCheckAddressRange (
             OverlapCount++;
             if (Warn)   /* Optional warning message */
             {
-                Pathname = AcpiNsGetExternalPathname (RangeInfo->RegionNode);
+                Pathname = AcpiNsGetNormalizedPathname (RangeInfo->RegionNode, TRUE);
 
                 ACPI_WARNING ((AE_INFO,
                     "%s range 0x%8.8X%8.8X-0x%8.8X%8.8X conflicts with OpRegion 0x%8.8X%8.8X-0x%8.8X%8.8X (%s)",

@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel network ppp pap ;
 
 SetSubDirSupportedPlatformsBeOSCompatible ;
+SubDirC++Flags -fno-rtti ;
 
 if $(TARGET_PLATFORM) != haiku {
 	UseHeaders [ FDirName $(HAIKU_TOP) headers posix ] : true ;
@@ -8,19 +9,12 @@ if $(TARGET_PLATFORM) != haiku {
 		# Unfortunately we get more than we want, namely all POSIX headers.
 }
 
-# for kernel_cpp.h and BLocker
-UseHeaders [ FDirName $(HAIKU_TOP) headers cpp ] : true ;
+UsePrivateKernelHeaders ;
 UsePrivateHeaders net ;
 UsePrivateHeaders [ FDirName kernel ] ;
 UsePrivateHeaders [ FDirName kernel util ] ;
 UseHeaders [ FDirName $(HAIKU_TOP) src add-ons kernel network ppp shared
 	libkernelppp headers ] : true ;
-
-
-{
-	SubDirC++Flags -fno-rtti ;
-}
-
 
 KernelAddon pap :
 	pap.cpp
@@ -31,5 +25,5 @@ LinkAgainst pap : libkernelppp.a ;
 
 # Installation
 HaikuInstall install-networking
-	: /boot/home/config/add-ons/kernel/obos_network/ppp
+	: /boot/home/config/add-ons/kernel/haiku_network/ppp
 	: pap ;

@@ -36,7 +36,7 @@ BALMLayoutBuilder::BALMLayoutBuilder(BWindow* window, float hSpacing,
 	fLayout = new BALMLayout(hSpacing, vSpacing, friendLayout);
 	window->SetLayout(fLayout);
 
-	fLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fLayout->Owner()->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		// TODO: we get a white background if we don't do this
 }
 
@@ -46,7 +46,7 @@ BALMLayoutBuilder::BALMLayoutBuilder(BWindow* window, BALMLayout* layout)
 	fLayout = layout;
 	window->SetLayout(fLayout);
 
-	fLayout->Owner()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fLayout->Owner()->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		// TODO: we get a white background if we don't do this
 }
 

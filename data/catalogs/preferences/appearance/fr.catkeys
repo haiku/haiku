@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	727801787
+1	french	x-vnd.Haiku-Appearance	1140137500
 Plain font:	Font view		Police simple :
 Control highlight	Colors tab		Mise en valeur de contrôle
 Control border	Colors tab		Bordure des contrôles
@@ -6,11 +6,14 @@ Antialiasing type:	AntialiasingSettingsView		Type de lissage :
 Shadow	Colors tab		Ombre
 On	AntialiasingSettingsView		Activé
 Defaults	APRWindow		Défaut
+Link hover	Colors tab		Lien survolé
 Grayscale	AntialiasingSettingsView		Niveaux de gris
 Shine	Colors tab		Lumière
 About	DecorSettingsView		À propos
 About decorator	DecorSettingsView		À propos du décorateur
 Off	AntialiasingSettingsView		Désactivé
+Link text	Colors tab		Texte du lien
+Link active	Colors tab		Lien actif
 Choose Decorator	DecorSettingsView		Choisir un décorateur
 Success	Colors tab		Réussite
 Inactive window tab text	Colors tab		Texte des titres de fenêtres inactives
@@ -36,6 +39,7 @@ List background	Colors tab		Arrière-plan de la liste
 OK	DecorSettingsView		OK
 Control mark	Colors tab		Point de contrôle
 Size:	Font Selection view		Taille :
+Link visited	Colors tab		Lien visité
 Decorator:	DecorSettingsView		Décorateur :
 Selected list item background	Colors tab		Arrière plan de l’élément sélectionnée dans la liste
 Panel background	Colors tab		Arrière plan des panneaux

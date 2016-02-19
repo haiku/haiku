@@ -24,7 +24,7 @@
 ConfigView::ConfigView(uint32 flags)
 	: BView("EXRTranslator Settings", flags)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BStringView *titleView = new BStringView("title",
 		B_TRANSLATE("EXR image translator"));

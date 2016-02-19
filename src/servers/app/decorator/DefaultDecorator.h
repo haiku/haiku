@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc.
+ * Copyright 2001-2015 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,6 +10,7 @@
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 #ifndef DEFAULT_DECORATOR_H
 #define DEFAULT_DECORATOR_H
@@ -25,12 +26,14 @@ class ServerBitmap;
 class DefaultDecorator: public TabDecorator {
 public:
 								DefaultDecorator(DesktopSettings& settings,
-									BRect frame);
+									BRect frame, Desktop* desktop);
 	virtual						~DefaultDecorator();
 
 	virtual	void				GetComponentColors(Component component,
 									uint8 highlight, ComponentColors _colors,
 									Decorator::Tab* tab = NULL);
+
+	virtual void				UpdateColors(DesktopSettings& settings);
 
 protected:
 	virtual	void				_DrawFrame(BRect rect);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All rights reserved.
+ * Copyright 2011-2016, Haiku, Inc. All rights reserved.
  * Copyright 2001-2003 Dr. Zoidberg Enterprises. All rights reserved.
  */
 #ifndef ZOIDBERG_GARGOYLE_MAIL_UTIL_H
@@ -101,6 +101,8 @@ void extract_address_name(BString &address);
 
 void get_address_list(BList &list, const char *string,
 	void (*cleanupFunc)(BString &) = NULL);
+
+status_t CopyMailFolderAttributes(const char* targetPath);
 
 
 #endif	/* ZOIDBERG_GARGOYLE_MAIL_UTIL_H */

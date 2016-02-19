@@ -1,4 +1,4 @@
-1	italian	x-vnd.Be-TSKB	2335730970
+1	italian	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Spegni
 Sort applications by name	PreferencesWindow		Ordina per nome
 Suspend	DeskbarMenu		Sospendi
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Grandi
 Auto-raise	PreferencesWindow		Automaticamente in primo piano
 Recent folders:	PreferencesWindow		Cartelle recenti:
 Show application expander	PreferencesWindow		Mostra espansore applicazione
-Restart Tracker	DeskbarMenu		Riavvia il Tracker
 Close all	WindowMenu		Chiudi tutto
 Deskbar preferences	PreferencesWindow		Preferenze di Deskbar
 Mount	DeskbarMenu		Monta

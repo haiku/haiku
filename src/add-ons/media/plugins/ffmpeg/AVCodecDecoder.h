@@ -131,6 +131,9 @@ private:
 			float				fOutputFrameRate;
 			int					fOutputFrameSize;
 									// sample size * channel count
+			int					fInputFrameSize;
+									// sample size * channel count
+									// or just sample size for planar formats
 
 			uint8_t*			fChunkBuffer;
 			size_t				fChunkBufferSize;

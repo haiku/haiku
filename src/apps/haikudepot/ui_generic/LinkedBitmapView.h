@@ -16,6 +16,8 @@ public:
 								LinkedBitmapView(const char* name,
 									BMessage* message);
 
+	virtual void				AllAttached();
+
 	virtual	void				MouseMoved(BPoint where, uint32 transit,
 									const BMessage* dragMessage);
 	virtual	void				MouseDown(BPoint where);

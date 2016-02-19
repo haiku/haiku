@@ -544,10 +544,7 @@ IconView::~IconView()
 void
 IconView::AttachedToWindow()
 {
-	if (Parent())
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AdoptParentColors();
 
 	fTarget = this;
 

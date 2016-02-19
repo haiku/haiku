@@ -13,7 +13,7 @@ class BStringView : public BView {
 public:
 								BStringView(BRect frame, const char* name,
 									const char* text, uint32 resizingMode
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+										= B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW);
 								BStringView(const char* name, const char* text,
 									uint32 flags = B_WILL_DRAW);

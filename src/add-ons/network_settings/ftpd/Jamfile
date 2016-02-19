@@ -9,7 +9,7 @@ AddResources FTPService : FTPService.rdef ;
 Addon FTPService :
 	FTPServiceAddOn.cpp
 
-	: be bnetapi libshared.a <nogrist>Network [ TargetLibsupc++ ]
+	: be bnetapi shared <nogrist>Network [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ] localestub
 ;
 

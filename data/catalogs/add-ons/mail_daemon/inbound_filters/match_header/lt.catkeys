@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-MatchHeader	3677427558
+1	lithuanian	x-vnd.Haiku-MatchHeader	1349121828
 <Choose action>	ConfigView		<parinkite veiksmą>
 has	ConfigView		turi
 Move to	ConfigView		perkelti į
@@ -10,4 +10,3 @@ Set flags to	ConfigView		nustatyti požymius į
 Set as read	ConfigView		pažymėti kaip skaitytą
 Reply with	ConfigView		atsakyti naudojant
 If	ConfigView		Kai
-header (e.g. Subject)	ConfigView		antraštė (pvz., Subject)

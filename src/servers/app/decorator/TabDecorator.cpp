@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc.
+ * Copyright 2001-2015 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,6 +10,7 @@
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 
@@ -63,28 +64,11 @@ static const float kResizeKnobSize = 18.0;
 
 // TODO: get rid of DesktopSettings here, and introduce private accessor
 //	methods to the Decorator base class
-TabDecorator::TabDecorator(DesktopSettings& settings, BRect frame)
+TabDecorator::TabDecorator(DesktopSettings& settings, BRect frame,
+							Desktop* desktop)
 	:
-	Decorator(settings, frame),
-	fOldMovingTab(0, 0, -1, -1),
-	// focus color constants
-	kFocusFrameColor(settings.UIColor(B_WINDOW_BORDER_COLOR)),
-	kFocusTabColor(settings.UIColor(B_WINDOW_TAB_COLOR)),
-	kFocusTabColorLight(tint_color(kFocusTabColor,
-		(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2)),
-	kFocusTabColorBevel(tint_color(kFocusTabColor, B_LIGHTEN_2_TINT)),
-	kFocusTabColorShadow(tint_color(kFocusTabColor,
-		(B_DARKEN_1_TINT + B_NO_TINT) / 2)),
-	kFocusTextColor(settings.UIColor(B_WINDOW_TEXT_COLOR)),
-	// non-focus color constants
-	kNonFocusFrameColor(settings.UIColor(B_WINDOW_INACTIVE_BORDER_COLOR)),
-	kNonFocusTabColor(settings.UIColor(B_WINDOW_INACTIVE_TAB_COLOR)),
-	kNonFocusTabColorLight(tint_color(kNonFocusTabColor,
-		(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2)),
-	kNonFocusTabColorBevel(tint_color(kNonFocusTabColor, B_LIGHTEN_2_TINT)),
-	kNonFocusTabColorShadow(tint_color(kNonFocusTabColor,
-		(B_DARKEN_1_TINT + B_NO_TINT) / 2)),
-	kNonFocusTextColor(settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR))
+	Decorator(settings, frame, desktop),
+	fOldMovingTab(0, 0, -1, -1)
 {
 	STRACE(("TabDecorator:\n"));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
@@ -206,6 +190,30 @@ TabDecorator::SetRegionHighlight(Region region, uint8 highlight,
 	}
 
 	return Decorator::SetRegionHighlight(region, highlight, dirty, tabIndex);
+}
+
+
+void
+TabDecorator::UpdateColors(DesktopSettings& settings)
+{
+	// Desktop is write locked, so be quick about it.
+	fFocusFrameColor		= settings.UIColor(B_WINDOW_BORDER_COLOR);
+	fFocusTabColor			= settings.UIColor(B_WINDOW_TAB_COLOR);
+	fFocusTabColorLight		= tint_color(fFocusTabColor,
+								(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2);
+	fFocusTabColorBevel		= tint_color(fFocusTabColor, B_LIGHTEN_2_TINT);
+	fFocusTabColorShadow	= tint_color(fFocusTabColor,
+								(B_DARKEN_1_TINT + B_NO_TINT) / 2);
+	fFocusTextColor			= settings.UIColor(B_WINDOW_TEXT_COLOR);
+
+	fNonFocusFrameColor		= settings.UIColor(B_WINDOW_INACTIVE_BORDER_COLOR);
+	fNonFocusTabColor		= settings.UIColor(B_WINDOW_INACTIVE_TAB_COLOR);
+	fNonFocusTabColorLight	= tint_color(fNonFocusTabColor,
+								(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2);
+	fNonFocusTabColorBevel	= tint_color(fNonFocusTabColor, B_LIGHTEN_2_TINT);
+	fNonFocusTabColorShadow	= tint_color(fNonFocusTabColor,
+								(B_DARKEN_1_TINT + B_NO_TINT) / 2);
+	fNonFocusTextColor = settings.UIColor(B_WINDOW_INACTIVE_TEXT_COLOR);
 }
 
 

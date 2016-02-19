@@ -4,7 +4,7 @@
 </head>
 <body>
 <p><h2>Changes done for each driverversion:</h2></p>
-<p><h1>via_driver (SVN 0.16, Rudolf)</h1></p>
+<p><h1>via_driver (Haiku repository 0.19, Rudolf)</h1></p>
 <ul>
 	<li>Initial setup based on nVidia driver 0.30;
 	<li>Kerneldriver uses MTR-WC mapping where available;
@@ -20,7 +20,12 @@
 	<li>Added primary head pixelPLL programming (refreshrate is now set);
 	<li>Added switch to 'enhanced mode' making the driver independant from a preset VESA mode;
 	<li>Added video overlay support;
-	<li>Finalized virtualscreen panning granularity constraints programming.
+	<li>Finalized virtualscreen panning granularity constraints programming;
+	<li>Added returning correct information in GET_ACCELERANT_DEVICE_INFO (displayed in Haiku screenprefs panel);
+	<li>Fixed wrong PLL registerdefines for K8M800 and added seperate pixelPLL calculation routine: K8M800 now works correctly whereas previously you'd have a black screen (tested different resolutions, refreshrates and colordepths);
+	<li>Fixed blocking overlay hooks if current videomode is not supported (before overlay could kick in while it should not, resulting in bad video or desktop pictures);
+	<li>Fixed K8M800 video overlay: apparantly the engine was modified for this revision of the Unichrome video chipset: at least the 'V1' engine doesn't work here, while ' V3' does (using V3 now on K8M800);
+	<li>Added overlay support on system memory types DDR 166 and DDR 200. Before on these memory types overlay would block.
 </ul>
 <p><h1>Still todo:</h1></p>
 <ul>
@@ -30,7 +35,7 @@
 </p>
 <hr><br>
 <br>
-<a href="mailto:info.be-hold@inter.nl.net">Rudolf Cornelissen.</a>
-<p>(Page last updated on September 29, 2005)</p>
+Rudolf Cornelissen.<br>
+<p>(Page last updated on February 7, 2016)</p>
 </body>
 </html>

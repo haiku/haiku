@@ -6,12 +6,12 @@
 #ifndef _K_PPP_MANAGER__H
 #define _K_PPP_MANAGER__H
 
-#include "net_module.h"
+#include <module.h>
+#include <net_device.h>
 #include <PPPControl.h>
 #include <PPPReportDefs.h>
 
-
-#define PPP_INTERFACE_MODULE_NAME		 NETWORK_MODULES_ROOT "interfaces/ppp"
+#define PPP_INTERFACE_MODULE_NAME	NETWORK_MODULES_ROOT	"/ppp/KPPPManager/v1"
 
 #define PPP_UNDEFINED_INTERFACE_ID	0
 	// CreateInterface() returns this value on failure
@@ -34,8 +34,7 @@ typedef struct ppp_interface_entry {
 	deletes them when they are not needed anymore.
 */
 typedef struct ppp_interface_module_info {
-	kernel_net_module_info knminfo;
-		//!< Exports needed network module functions.
+        struct module_info info;
 	
 	ppp_interface_id (*CreateInterface)(const driver_settings *settings,
 		ppp_interface_id parentID);
@@ -46,7 +45,9 @@ typedef struct ppp_interface_module_info {
 	bool (*RemoveInterface)(ppp_interface_id ID);
 		// remove the interface from database (make sure you can delete it yourself!)
 	
-	ifnet *(*RegisterInterface)(ppp_interface_id ID);
+	net_device *(*RegisterInterface)(ppp_interface_id ID);
+	KPPPInterface *(*GetInterface)(ppp_interface_id ID);
+		// for accessing KPPPInterface directly
 	bool (*UnregisterInterface)(ppp_interface_id ID);
 	
 	status_t (*ControlInterface)(ppp_interface_id ID, uint32 op, void *data,

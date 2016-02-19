@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -275,8 +275,8 @@ AcpiEvFixedEventInitialize (
         if (AcpiGbl_FixedEventInfo[i].EnableRegisterId != 0xFF)
         {
             Status = AcpiWriteBitRegister (
-                        AcpiGbl_FixedEventInfo[i].EnableRegisterId,
-                        ACPI_DISABLE_EVENT);
+                AcpiGbl_FixedEventInfo[i].EnableRegisterId,
+                ACPI_DISABLE_EVENT);
             if (ACPI_FAILURE (Status))
             {
                 return (Status);
@@ -379,8 +379,8 @@ AcpiEvFixedEventDispatch (
     /* Clear the status bit */
 
     (void) AcpiWriteBitRegister (
-            AcpiGbl_FixedEventInfo[Event].StatusRegisterId,
-            ACPI_CLEAR_STATUS);
+        AcpiGbl_FixedEventInfo[Event].StatusRegisterId,
+        ACPI_CLEAR_STATUS);
 
     /*
      * Make sure that a handler exists. If not, report an error
@@ -389,8 +389,8 @@ AcpiEvFixedEventDispatch (
     if (!AcpiGbl_FixedEventHandlers[Event].Handler)
     {
         (void) AcpiWriteBitRegister (
-                AcpiGbl_FixedEventInfo[Event].EnableRegisterId,
-                ACPI_DISABLE_EVENT);
+            AcpiGbl_FixedEventInfo[Event].EnableRegisterId,
+            ACPI_DISABLE_EVENT);
 
         ACPI_ERROR ((AE_INFO,
             "No installed handler for fixed event - %s (%u), disabling",
@@ -402,7 +402,7 @@ AcpiEvFixedEventDispatch (
     /* Invoke the Fixed Event handler */
 
     return ((AcpiGbl_FixedEventHandlers[Event].Handler)(
-                AcpiGbl_FixedEventHandlers[Event].Context));
+        AcpiGbl_FixedEventHandlers[Event].Context));
 }
 
 #endif /* !ACPI_REDUCED_HARDWARE */

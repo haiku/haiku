@@ -141,10 +141,7 @@ MouseView::GetPreferredSize(float* _width, float* _height)
 void
 MouseView::AttachedToWindow()
 {
-	if (Parent() != NULL)
-		SetViewColor(Parent()->ViewColor());
-	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AdoptParentColors();
 
 	UpdateFromSettings();
 	_CreateButtonsPicture();

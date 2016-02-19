@@ -17,6 +17,7 @@ public:
 	// BStringView interface
 	virtual	void				AttachedToWindow();
 	virtual	void				MouseDown(BPoint where);
+	virtual	void				MessageReceived(BMessage* message);
 	virtual	BSize				MinSize();
 	virtual	BSize				MaxSize();
 
@@ -39,6 +40,7 @@ public:
 
 private:
 			void				_Update();
+			void				_UpdateTextColor();
 			void				_GenerateString(bigtime_t duration);
 
 private:

@@ -56,7 +56,7 @@ private:
 			void				_ClearProblemsGui();
 			void				_AddProblemsGui(BSolver* solver);
 			void				_AddProblem(BSolverProblem* problem,
-									const rgb_color& backgroundColor);
+									const float backgroundTint);
 			BString				_SolutionElementText(
 									const BSolverProblemSolutionElement*
 										element) const;

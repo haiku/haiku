@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -180,7 +180,7 @@ AcpiTbFindTable (
     for (i = 0; i < AcpiGbl_RootTableList.CurrentTableCount; ++i)
     {
         if (memcmp (&(AcpiGbl_RootTableList.Tables[i].Signature),
-                            Header.Signature, ACPI_NAME_SIZE))
+            Header.Signature, ACPI_NAME_SIZE))
         {
             /* Not the requested table */
 
@@ -208,13 +208,13 @@ AcpiTbFindTable (
         /* Check for table match on all IDs */
 
         if (!memcmp (AcpiGbl_RootTableList.Tables[i].Pointer->Signature,
-                            Header.Signature, ACPI_NAME_SIZE) &&
+                Header.Signature, ACPI_NAME_SIZE) &&
             (!OemId[0] ||
              !memcmp (AcpiGbl_RootTableList.Tables[i].Pointer->OemId,
-                             Header.OemId, ACPI_OEM_ID_SIZE)) &&
+                 Header.OemId, ACPI_OEM_ID_SIZE)) &&
             (!OemTableId[0] ||
              !memcmp (AcpiGbl_RootTableList.Tables[i].Pointer->OemTableId,
-                             Header.OemTableId, ACPI_OEM_TABLE_ID_SIZE)))
+                 Header.OemTableId, ACPI_OEM_TABLE_ID_SIZE)))
         {
             *TableIndex = i;
 

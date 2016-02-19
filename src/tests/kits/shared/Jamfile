@@ -13,7 +13,7 @@ UnitTestLib libsharedtest.so :
 	GeolocationTest.cpp
 	NaturalCompareTest.cpp
 
-	: be libshared.a bnetapi [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+	: be shared bnetapi [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 
 SubInclude HAIKU_TOP src tests kits shared shake_filter ;

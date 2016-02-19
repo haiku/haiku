@@ -7,7 +7,7 @@ UsePrivateHeaders app interface shared ;
 
 Application Workspaces :
 	Workspaces.cpp 
-	: be libshared.a localestub [ TargetLibsupc++ ]
+	: be shared localestub [ TargetLibsupc++ ]
 	: Workspaces.rdef 
 	;
 

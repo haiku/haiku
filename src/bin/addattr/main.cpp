@@ -90,12 +90,14 @@ typeForString(const char* string, type_code* _result)
 		}
 	}
 
-	// type didn't show up - in this case, we parse the string
-	// as number and use it directly as type code
+	// type didn't show up - in this case, we try to parse
+	// the string as number and use it directly as type code
 
-	if (sscanf(string, "%" B_SCNu32, _result) == 1)
+	if (sscanf(string, "%" B_SCNi32, _result) == 1)
 		return B_OK;
 
+	// if that didn't work, try the string as a char-type-code
+	// enclosed in single quotes
 	uchar type[4];
 	if (sscanf(string, "'%c%c%c%c'", &type[0], &type[1], &type[2], &type[3]) == 4) {
 		*_result = (type[0] << 24) | (type[1] << 16) | (type[2] << 8) | type[3];
@@ -109,13 +111,17 @@ typeForString(const char* string, type_code* _result)
 void
 usage(int returnValue)
 {
-	fprintf(stderr, "usage: %s [-t type] [ -P ] attr value file1 [file2...]\n"
-		"   or: %s [-f value-from-file] [-t type] [ -P ] attr file1 [file2...]\n\n"
+	fprintf(stderr, "usage: %s [-t type|-c code] [ -P ] attr value file1 [file2...]\n"
+		"   or: %s [-f value-from-file] [-t type|-c code] [ -P ] attr file1 [file2...]\n\n"
 		"\t-P : Don't resolve links\n"
-		"\tType is one of:\n"
-		"\t\tstring, mime, int, llong, float, double, bool, time, icon, raw\n"
-		"\t\tor a numeric value (ie. 0x1234, 42, 'ABCD', ...)\n"
-		"\tThe default is \"string\"\n", kProgramName, kProgramName);
+		"\tThe '-t' and '-c' options are alternatives; use one or the other.\n"
+		"\ttype is one of:\n"
+		"\t\tstring, mime, int, int32, uint32, llong, int64, uint64,\n"
+		"\t\tfloat, double, bool, icon, time, raw\n"
+		"\t\tor a numeric value (ie. 0x1234, 42, ...),\n"
+		"\t\tor an escape-quoted type code, eg. \\'MICN\\'\n"
+		"\tThe default is \"string\"\n"
+		"\tcode is a four-char type ID (eg. MICN)\n", kProgramName, kProgramName);
 
 	exit(returnValue);
 }
@@ -126,9 +132,21 @@ invalidAttrType(const char* attrTypeName)
 {
 	fprintf(stderr, "%s: attribute type \"%s\" is not valid\n", kProgramName,
 		attrTypeName);
-	fprintf(stderr, "\tTry one of: string, mime, int, llong, float, double,\n");
-	fprintf(stderr, "\t\tbool, time, icon, raw, or a numeric value (ie. 0x1234, 42, 'ABCD'"
-		", ...)\n");
+	fprintf(stderr, "\tTry one of: string, mime, int, llong, float, double,\n"
+		"\t\tbool, icon, time, raw, or a numeric value (ie. 0x1234, 42, ...),\n"
+		"\t\tor a quoted type code, eg.: \\'MICN\\'\n"
+		"\t\tOr enter the actual type code with the '-c' option\n");
+
+	exit(1);
+}
+
+
+void
+invalidTypeCode(const char* attrTypeName)
+{
+	fprintf(stderr, "%s: attribute type code \"%s\" is not valid\n", kProgramName,
+		attrTypeName);
+	fprintf(stderr, "\tIt must be exactly four characters\n");
 
 	exit(1);
 }
@@ -139,8 +157,8 @@ invalidBoolValue(const char* value)
 {
 	fprintf(stderr, "%s: attribute value \"%s\" is not valid\n", kProgramName,
 		value);
-	fprintf(stderr, "\tBool accepts: 0, f, false, disabled, off,\n");
-	fprintf(stderr, "\t\t1, t, true, enabled, on\n");
+	fprintf(stderr, "\tBool accepts: 0, f, false, disabled, off,\n"
+		"\t\t1, t, true, enabled, on\n");
 
 	exit(1);
 }
@@ -155,7 +173,7 @@ main(int argc, char* argv[])
 	bool resolveLinks = true;
 
 	int c;
-	while ((c = getopt_long(argc, argv, "hf:t:P", kLongOptions, NULL)) != -1) {
+	while ((c = getopt_long(argc, argv, "hf:t:c:P", kLongOptions, NULL)) != -1) {
 		switch (c) {
 			case 0:
 				break;
@@ -170,7 +188,7 @@ main(int argc, char* argv[])
 						optarg, strerror(status));
 					return 1;
 				}
-		
+
 				status = file.GetSize(&size);
 				if (status == B_OK) {
 					if (size == 0) {
@@ -188,12 +206,12 @@ main(int argc, char* argv[])
 					else
 						status = B_NO_MEMORY;
 				}
-		
+
 				if (status < B_OK) {
 					ERR("can't read attribute value: %s\n", strerror(status));
 					return 1;
 				}
-		
+
 				valueFileLength = (size_t)size;
 				break;
 			}
@@ -202,6 +220,15 @@ main(int argc, char* argv[])
 				if (typeForString(optarg, &attrType) != B_OK)
 					invalidAttrType(optarg);
 				break;
+			case 'c':
+				if (strlen(optarg) == 4) {
+					// Get the type code directly
+					char code[] = "'    '";
+					strncpy(code + 1, optarg, 4);
+					if (typeForString(code, &attrType) == B_OK)
+						break;
+				}
+				invalidTypeCode(optarg);
 			case 'P':
 				resolveLinks = false;
 				break;
@@ -213,7 +240,7 @@ main(int argc, char* argv[])
 				break;
 		}
 	}
-	
+
 	if (argc - optind < 1)
 		usage(1);
 	const char* attrName = argv[optind++];

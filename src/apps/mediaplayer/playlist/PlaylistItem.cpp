@@ -10,6 +10,9 @@
 #include <Catalog.h>
 #include <Locale.h>
 
+#include "AudioTrackSupplier.h"
+#include "TrackSupplier.h"
+#include "VideoTrackSupplier.h"
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "MediaPlayer-PlaylistItem"
@@ -107,6 +110,19 @@ PlaylistItem::TrackNumber() const
 }
 
 
+bigtime_t
+PlaylistItem::Duration()
+{
+	bigtime_t duration;
+	if (GetAttribute(ATTR_INT64_DURATION, duration) != B_OK) {
+		duration = this->_CalculateDuration();
+		SetAttribute(ATTR_INT64_DURATION, duration);
+	}
+
+	return duration;
+}
+
+
 void
 PlaylistItem::SetPlaybackFailed()
 {
@@ -141,5 +157,24 @@ PlaylistItem::_NotifyListeners() const
 		Listener* listener = (Listener*)listeners.ItemAtFast(i);
 		listener->ItemChanged(this);
 	}
+}
+
+
+bigtime_t PlaylistItem::_CalculateDuration() const
+{
+	// To be overridden in subclasses with more efficient methods
+	TrackSupplier* supplier = CreateTrackSupplier();
+
+	AudioTrackSupplier* au = supplier->CreateAudioTrackForIndex(0);
+	VideoTrackSupplier* vi = supplier->CreateVideoTrackForIndex(0);
+
+	bigtime_t duration = max_c(au == NULL ? 0 : au->Duration(),
+		vi == NULL ? 0 : vi->Duration());
+
+	delete vi;
+	delete au;
+	delete supplier;
+
+	return duration;
 }
 

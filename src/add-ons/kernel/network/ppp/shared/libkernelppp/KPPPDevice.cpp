@@ -5,7 +5,7 @@
 
 /*!	\class KPPPDevice
 	\brief Represents a device at the lowest level of the communcation stack.
-	
+
 	A device may be, for example: Modem, PPPoE, PPTP. \n
 	It encapsulates the packet and sends it over a line to the other end.
 	The device is the first layer that receives a packet.
@@ -14,13 +14,12 @@
 #include <KPPPDevice.h>
 
 #include <net/if.h>
-#include <core_funcs.h>
 
 #include <PPPControl.h>
 
 
 /*!	\brief Initializes the device.
-	
+
 	\param name The device's type name (e.g.: PPPoE).
 	\param overhead Length of the header that is prepended to each packet.
 	\param interface Owning interface.
@@ -46,12 +45,13 @@ KPPPDevice::~KPPPDevice()
 
 
 /*!	\brief Allows private extensions.
-	
+
 	If you override this method you must call the parent's method for unknown ops.
 */
 status_t
 KPPPDevice::Control(uint32 op, void *data, size_t length)
 {
+	dprintf("KPPPDevice::Control\n");
 	switch (op) {
 		case PPPC_GET_DEVICE_INFO:
 		{
@@ -89,7 +89,7 @@ KPPPDevice::IsAllowedToSend() const
 
 //!	This method is never used.
 status_t
-KPPPDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
+KPPPDevice::Receive(net_buffer *packet, uint16 protocolNumber)
 {
 	// let the interface handle the packet
 	if (protocolNumber == 0)
@@ -100,10 +100,10 @@ KPPPDevice::Receive(struct mbuf *packet, uint16 protocolNumber)
 
 
 /*!	\brief Report that device is going up.
-	
+
 	Called by Up(). \n
 	From now on, the connection attempt can may be aborted by calling Down().
-	
+
 	\return
 		- \c true: You are allowed to connect.
 		- \c false: You should abort immediately. Down() will \e not be called!
@@ -112,15 +112,15 @@ bool
 KPPPDevice::UpStarted()
 {
 	fConnectionPhase = PPP_ESTABLISHMENT_PHASE;
-	
+
 	return Interface().StateMachine().TLSNotify();
 }
 
 
 /*!	\brief Report that device is going down.
-	
+
 	Called by Down().
-	
+
 	\return
 		- \c true: You are allowed to disconnect.
 		- \c false: You must not disconnect!
@@ -129,7 +129,7 @@ bool
 KPPPDevice::DownStarted()
 {
 	fConnectionPhase = PPP_TERMINATION_PHASE;
-	
+
 	return Interface().StateMachine().TLFNotify();
 }
 
@@ -139,7 +139,7 @@ void
 KPPPDevice::UpFailedEvent()
 {
 	fConnectionPhase = PPP_DOWN_PHASE;
-	
+
 	Interface().StateMachine().UpFailedEvent();
 }
 
@@ -149,7 +149,7 @@ void
 KPPPDevice::UpEvent()
 {
 	fConnectionPhase = PPP_ESTABLISHED_PHASE;
-	
+
 	Interface().StateMachine().UpEvent();
 }
 
@@ -159,6 +159,6 @@ void
 KPPPDevice::DownEvent()
 {
 	fConnectionPhase = PPP_DOWN_PHASE;
-	
+
 	Interface().StateMachine().DownEvent();
 }

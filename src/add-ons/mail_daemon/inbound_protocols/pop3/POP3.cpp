@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2016, Haiku, Inc. All rights reserved.
  * Copyright 2001-2002 Dr. Zoidberg Enterprises. All rights reserved.
  * Copyright 2011, Clemens Zeidler <haiku@clemens-zeidler.de>
  *
@@ -253,7 +253,7 @@ POP3Protocol::SyncMessages()
 
 
 status_t
-POP3Protocol::FetchBody(const entry_ref& ref)
+POP3Protocol::HandleFetchBody(const entry_ref& ref, const BMessenger& replyTo)
 {
 	ResetProgress("Fetch body");
 	SetTotalItems(1);
@@ -303,43 +303,13 @@ POP3Protocol::FetchBody(const entry_ref& ref)
 
 	BMessage attributes;
 	NotifyBodyFetched(ref, file, attributes);
+	ReplyBodyFetched(replyTo, ref, B_OK);
 
 	if (!leaveOnServer)
 		Delete(toRetrieve);
 
 	ReportProgress(1, 0);
 	ResetProgress();
-
-	Disconnect();
-	return B_OK;
-}
-
-
-status_t
-POP3Protocol::DeleteMessage(const entry_ref& ref)
-{
-	status_t error = Connect();
-	if (error < B_OK)
-		return error;
-
-	error = _RetrieveUniqueIDs();
-	if (error < B_OK) {
-		Disconnect();
-		return error;
-	}
-
-	char uidString[256];
-	BNode node(&ref);
-	if (node.ReadAttr("MAIL:unique_id", B_STRING_TYPE, 0, uidString, 256) < 0) {
-		Disconnect();
-		return B_ERROR;
-	}
-
-	#if DEBUG
-	printf("DeleteMessage: ID is %d\n", (int)fUniqueIDs.IndexOf(uidString));
-		// What should we use for int32 instead of %d?
-	#endif
-	Delete(fUniqueIDs.IndexOf(uidString));
 
 	Disconnect();
 	return B_OK;

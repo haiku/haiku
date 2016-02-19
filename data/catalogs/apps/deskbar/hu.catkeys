@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-TSKB	2335730970
+1	hungarian	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Kikapcsolás
 Sort applications by name	PreferencesWindow		Rendezés a program neve szerint
 Suspend	DeskbarMenu		Felfüggesztés
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Nagy
 Auto-raise	PreferencesWindow		Automatikus előrehozás
 Recent folders:	PreferencesWindow		Utolsó mappák:
 Show application expander	PreferencesWindow		Programkibontó mutatása
-Restart Tracker	DeskbarMenu		Nyomkövető újraindítása
 Close all	WindowMenu		Összes bezárása
 Deskbar preferences	PreferencesWindow		Asztalsáv-beállítások
 Mount	DeskbarMenu		Csatolás

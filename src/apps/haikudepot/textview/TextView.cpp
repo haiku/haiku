@@ -10,9 +10,6 @@ TextView::TextView(const char* name)
 	:
 	BView(name, B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_FRAME_EVENTS)
 {
-	SetViewColor(B_TRANSPARENT_COLOR);
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
 	BFont font;
 	GetFont(&font);
 
@@ -41,9 +38,7 @@ TextView::Draw(BRect updateRect)
 void
 TextView::AttachedToWindow()
 {
-	BView* parent = Parent();
-	if (parent != NULL)
-		SetLowColor(parent->ViewColor());
+	AdoptParentColors();
 }
 
 

@@ -81,7 +81,7 @@ Application HaikuDepot :
 	# text view stuff
 	$(textDocumentSources)
 
-	: be package bnetapi translation libcolumnlistview.a libshared.a
+	: be package bnetapi translation libcolumnlistview.a shared
 		[ TargetLibstdc++ ] [ TargetLibsupc++ ] localestub
 	: HaikuDepot.rdef
 ;
@@ -107,5 +107,5 @@ Application TextDocumentTest :
 	TextDocumentTest.cpp
 	$(textDocumentSources)
 
-	: be translation libshared.a [ TargetLibsupc++ ]
+	: be translation shared [ TargetLibsupc++ ]
 ;

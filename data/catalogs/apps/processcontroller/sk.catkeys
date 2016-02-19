@@ -1,12 +1,15 @@
-1	slovak	x-vnd.Haiku-ProcessController	2886374724
+1	slovak	x-vnd.Haiku-ProcessController	1761882987
 Memory usage	ProcessController		Využitie pamäte
+Kill this team!	ProcessController		Ukončiť tento tím!
 Idle priority	ProcessController		Priorita nečinný
 Restart Deskbar	ProcessController		Reštartovať Panel
 Custom priority	ProcessController		Vlastná priorita
 This team is already gone…	ProcessController		Tento tím už je preč…
 Error saving file	ProcessController		Chyba pri ukladaní súboru
 Real-time priority	ProcessController		Priorita v reálnom čase
+Power saving	ProcessController		Šetrenie energie
 Your setting file could not be saved!\n(%s)	ProcessController		Váš súbor s nastavením nebolo možné uložiť!\n(%s)
+What do you want to do with the team \"%s\"?	ProcessController		Čo chcete robiť s tímom „%s“?
 This thread is already gone…	ProcessController		Toto vlákno už je preč…
 Cancel	ProcessController		Zrušiť
 Display priority	ProcessController		Priorita zobrazenie
@@ -34,8 +37,10 @@ Quit an application	ProcessController		Ukončiť aplikáciu
 Install in Deskbar	ProcessController		Nainštalovať do Panelu
 Threads and CPU usage	ProcessController		Vlákna a využitie CPU
 Urgent display priority	ProcessController		Priorita naliehavé zobrazenie
+Low latency	ProcessController		Nízka latencia
 OK	ProcessController		OK
 Damned!	ProcessController		Sakra!
+Debug this team!	ProcessController		Ladiť tento tím!
 Usage: %s [-deskbar]\n	ProcessController		Použitie: %s [-deskbar]\n
 ProcessController	System name		Správca procesov
 Real-time display priority	ProcessController		Priorita zobrazenie v reálnom čase

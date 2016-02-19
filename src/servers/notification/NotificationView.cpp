@@ -74,7 +74,7 @@ NotificationView::NotificationView(NotificationWindow* win,
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	SetLayout(layout);
 
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	switch (fNotification->Type()) {
@@ -283,9 +283,6 @@ NotificationView::Draw(BRect updateRect)
 			Bounds().Width() - l->location.x);
 		DrawString(l->text.String(), l->text.Length(), l->location);
 	}
-
-	rgb_color detailCol = ui_color(B_CONTROL_BORDER_COLOR);
-	detailCol = tint_color(detailCol, B_LIGHTEN_2_TINT);
 
 	AppGroupView* groupView = dynamic_cast<AppGroupView*>(Parent());
 	if (groupView != NULL && groupView->ChildrenCount() > 1)

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-libtracker	2004221275
+1	romanian	x-vnd.Haiku-libtracker	3644595724
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Module
 Mount settings…	ContainerWindow		Configurări montare...
@@ -434,7 +434,6 @@ Recent queries	FindPanel		Interogări recente
 Mount	ContainerWindow		Montează
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilizat -- %free liber)
 Cancel	FSClipBoard		Anulează
-Restart Deskbar	DeskWindow		Repornește Deskbar
 Cut more	ContainerWindow		Taie mai mult
 Deleting: 	StatusWindow		Se șterge:
 Empty Trash	InfoWindow		Gunoi vid

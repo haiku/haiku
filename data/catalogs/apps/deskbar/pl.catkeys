@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-TSKB	2335730970
+1	polish	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Wyłącz
 Sort applications by name	PreferencesWindow		Sortuj aplikacje po nazwie
 Suspend	DeskbarMenu		Uśpij
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Duże
 Auto-raise	PreferencesWindow		Autoaktywacja
 Recent folders:	PreferencesWindow		Ostatnio przeglądane katalogi:
 Show application expander	PreferencesWindow		Aplikacje jako lista rozwijalna
-Restart Tracker	DeskbarMenu		Uruchom ponownie Trackera
 Close all	WindowMenu		Zamknij wszystkie
 Deskbar preferences	PreferencesWindow		Ustawienia Deskbara
 Mount	DeskbarMenu		Zamontuj

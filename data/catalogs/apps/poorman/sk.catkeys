@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-PoorMan	3296382959
+1	slovak	x-vnd.Haiku-PoorMan	1829050509
 Website location	PoorMan		Umiestnenie webstránky
 Error Server	PoorMan		Chybový server
 Settings…	PoorMan		Nastavenia…
@@ -12,6 +12,7 @@ PoorMan settings	PoorMan		Nastavenia PoorMan
 Clear hit counter	PoorMan		Vyčistiť počítadlo zásahov
 Copy	PoorMan		Kopírovať
 Max. simultaneous connections:	PoorMan		Max. súčasných spojení:
+Create public_html	PoorMan		Vytvoriť public_html
 Start page:	PoorMan		Úvodná stránka:
 done.\n	PoorMan		hotovo.\n
 Create	PoorMan		Vytvoriť
@@ -33,6 +34,7 @@ Log to console	PoorMan		Posielať záznam na konzolu
 Directory: (none)	PoorMan		Adresár: (žiaden)
 Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Prosím, vyberte priečinok, ktorý chcete zverejniť na webe.\n\nPoorMan môže pre vás vytvoriť predvolený priečinok „public_html“ vo vašom domovskom priečinku.\nAlebo namiesto toho vyberte jeden z vašich vlastných priečinkov.
 Log To Console	PoorMan		Záznam na konzolu
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# spojenie} few{# spojenia} other{# spojení}}
 Connections	PoorMan		Spojenia
 Status: Running	PoorMan		Stav: Beží
 Controls	PoorMan		Ovládacie prvky

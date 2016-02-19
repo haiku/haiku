@@ -22,6 +22,7 @@
 #include <AppMisc.h>
 #include <BlockCache.h>
 #include <Entry.h>
+#include <GraphicsDefs.h>
 #include <MessageQueue.h>
 #include <Messenger.h>
 #include <Path.h>
@@ -733,6 +734,14 @@ BMessage::_PrintToStream(const char* indent) const
 					message._PrintToStream(buffer);
 					printf("%s        }\n", indent);
 					break;
+				}
+
+				case B_RGB_32_BIT_TYPE:
+				{
+					rgb_color* color = (rgb_color*)pointer;
+					printf("rgb_color(%u, %u, %u, %u)\n", color->red,
+						color->green, color->blue, color->alpha);
+					break;	
 				}
 
 				default:
@@ -2494,6 +2503,7 @@ DEFINE_FUNCTIONS(uint64, UInt64, B_UINT64_TYPE);
 DEFINE_FUNCTIONS(bool, Bool, B_BOOL_TYPE);
 DEFINE_FUNCTIONS(float, Float, B_FLOAT_TYPE);
 DEFINE_FUNCTIONS(double, Double, B_DOUBLE_TYPE);
+DEFINE_FUNCTIONS(rgb_color, Color, B_RGB_32_BIT_TYPE);
 
 #undef DEFINE_FUNCTIONS
 
@@ -2577,6 +2587,7 @@ DEFINE_SET_GET_FUNCTIONS(uint64, UInt64, B_UINT64_TYPE);
 DEFINE_SET_GET_FUNCTIONS(bool, Bool, B_BOOL_TYPE);
 DEFINE_SET_GET_FUNCTIONS(float, Float, B_FLOAT_TYPE);
 DEFINE_SET_GET_FUNCTIONS(double, Double, B_DOUBLE_TYPE);
+DEFINE_SET_GET_FUNCTIONS(rgb_color, Color, B_RGB_32_BIT_TYPE);
 
 #undef DEFINE_SET_GET_FUNCTION
 

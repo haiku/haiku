@@ -89,15 +89,16 @@ ResultWindow::AddLocationChanges(const char* location,
 
 	locationGroup->GroupLayout()->SetInsets(B_USE_SMALL_INSETS);
 
-	rgb_color background = ui_color(B_LIST_BACKGROUND_COLOR);
+	float backgroundTint = B_NO_TINT;
 	if ((fContainerView->CountChildren() & 1) != 0)
-		background = tint_color(background, 1.04);
-	locationGroup->SetViewColor(background);
+		backgroundTint = 1.04;
+	locationGroup->SetViewUIColor(B_LIST_BACKGROUND_COLOR, backgroundTint);
 
 	BStringView* locationView = new BStringView(NULL,
 		BString().SetToFormat("in %s:", location));
 	locationGroup->AddChild(locationView);
 	locationView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+	locationView->AdoptParentColors();
 	BFont locationFont;
 	locationView->GetFont(&locationFont);
 	locationFont.SetFace(B_BOLD_FACE);
@@ -207,6 +208,7 @@ ResultWindow::_AddPackages(BGroupLayout* packagesGroup,
 		BStringView* packageView = new BStringView(NULL, text);
 		packagesGroup->AddView(packageView);
 		packageView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
+		packageView->AdoptParentColors();
 
 		packagesAdded = true;
 	}

@@ -327,7 +327,7 @@ main(int argc, char** argv)
 
 	tabView->AddTab(content);
 	BView* tab2 = new BView("Tab 2", 0);
-	tab2->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	tab2->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	tabView->AddTab(tab2);
 	tabView->AddTab(new BView("Tab 3", 0));
 

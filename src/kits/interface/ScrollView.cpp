@@ -738,7 +738,7 @@ BScrollView::_Init(bool horizontal, bool vertical)
 	fBorders = BControlLook::B_ALL_BORDERS;
 
 	if (be_control_look != NULL)
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	if (horizontal) {
 		fHorizontalScrollBar = new BScrollBar(BRect(0, 0, 14, 14), "_HSB_",

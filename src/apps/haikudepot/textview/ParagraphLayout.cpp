@@ -261,7 +261,7 @@ ParagraphLayout::Draw(BView* view, const BPoint& offset)
 	const Bullet& bullet = fParagraphStyle.Bullet();
 	if (bullet.Spacing() > 0.0f && bullet.String().Length() > 0) {
 		// Draw bullet at offset
-		view->SetHighColor(0, 0, 0, 255);
+		view->SetHighUIColor(B_PANEL_TEXT_COLOR);
 		BPoint bulletPos(offset);
 		bulletPos.x += fParagraphStyle.FirstLineInset()
 			+ fParagraphStyle.LineInset();
@@ -934,7 +934,11 @@ ParagraphLayout::_DrawSpan(BView* view, BPoint offset,
 	const CharacterStyle& style = span.Style();
 
 	view->SetFont(&style.Font());
-	view->SetHighColor(style.ForegroundColor());
+
+	if (style.WhichForegroundColor() != B_NO_COLOR)
+		view->SetHighUIColor(style.WhichForegroundColor());
+	else
+		view->SetHighColor(style.ForegroundColor());
 
 	// TODO: Implement other style properties
 

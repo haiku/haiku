@@ -176,7 +176,7 @@ public:
 		:
 		BView(frame, "BackView", B_FOLLOW_ALL, B_WILL_DRAW | B_PULSE_NEEDED)
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	}
 
 	virtual void Pulse()
@@ -444,8 +444,8 @@ BStatusView::BStatusView(BRect bounds, thread_id thread, StatusWindowState type)
 {
 	Init();
 
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ViewColor());
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
 	SetHighColor(20, 20, 20);
 	SetDrawingMode(B_OP_ALPHA);
 

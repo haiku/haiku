@@ -41,7 +41,7 @@ public:
 		:
 		BView("AppAccessRequestView", B_WILL_DRAW)
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 		BGroupLayout* rootLayout = new(std::nothrow) BGroupLayout(B_VERTICAL);
 		if (rootLayout == NULL)
@@ -87,7 +87,7 @@ public:
 		}
 
 		message->SetText(details);
-		message->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		message->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
 		message->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 		message->MakeEditable(false);

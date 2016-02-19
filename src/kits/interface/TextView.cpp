@@ -1098,13 +1098,14 @@ BTextView::SetText(BFile* file, int32 offset, int32 length,
 
 	_CancelInputMethod();
 
-	if (!file)
+	if (file == NULL)
 		return;
 
 	if (fText->Length() > 0)
 		DeleteText(0, fText->Length());
 
-	fText->InsertText(file, offset, length, 0);
+	if (!fText->InsertText(file, offset, length, 0))
+		return;
 
 	// update the start offsets of each line below offset
 	fLines->BumpOffset(length, _LineAt(offset) + 1);
@@ -3050,8 +3051,10 @@ BTextView::_InitObject(BRect textRect, const BFont* initialFont,
 
 	_NormalizeFont(&font);
 
+	rgb_color documentTextColor = ui_color(B_DOCUMENT_TEXT_COLOR);
+
 	if (initialColor == NULL)
-		initialColor = &kBlackColor;
+		initialColor = &documentTextColor;
 
 	fText = new BPrivate::TextGapBuffer;
 	fLines = new LineBuffer;
@@ -3112,6 +3115,7 @@ BTextView::_InitObject(BRect textRect, const BFont* initialFont,
 	fLastClickOffset = -1;
 
 	SetDoesUndo(true);
+	SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 }
 
 

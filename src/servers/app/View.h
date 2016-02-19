@@ -10,6 +10,7 @@
  *		Marcus Overhagen <marcus@overhagen.de>
  *		Adrien Destugues <pulkomandy@pulkomandy.tk>
  *		Julian Harnath <julian.harnath@rwth-aachen.de>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 #ifndef	VIEW_H
 #define VIEW_H
@@ -19,6 +20,7 @@
 #include "IntRect.h"
 
 #include <GraphicsDefs.h>
+#include <InterfaceDefs.h>
 #include <ObjectList.h>
 #include <Region.h>
 #include <String.h>
@@ -110,6 +112,7 @@ public:
 			void			FindViews(uint32 flags, BObjectList<View>& list,
 								int32& left);
 
+			bool			HasView(View* view);
 			View*			ViewAt(const BPoint& where);
 
 public:
@@ -134,6 +137,10 @@ public:
 								{ return fViewColor; }
 			void			SetViewColor(const rgb_color& color)
 								{ fViewColor = color; }
+
+			void			ColorUpdated(color_which which, rgb_color color);
+			void			SetViewUIColor(color_which which, float tint);
+			color_which		ViewUIColor(float* tint);
 
 			ServerBitmap*	ViewBitmap() const
 								{ return fViewBitmap; }
@@ -234,6 +241,8 @@ protected:
 			IntPoint		fScrollingOffset;
 
 			rgb_color		fViewColor;
+			color_which		fWhichViewColor;
+			float			fWhichViewColorTint;
 			ServerBitmap*	fViewBitmap;
 			IntRect			fBitmapSource;
 			IntRect			fBitmapDestination;

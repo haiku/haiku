@@ -765,6 +765,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 {
 	rgb_color base = key->dark ? kDarkColor : kBrightColor;
 	rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color keyLabelColor = make_color(0, 0, 0, 255);
 	key_kind keyKind = kNormalKey;
 	int32 deadKey = 0;
 	bool secondDeadKey = false;
@@ -795,7 +796,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 
 		_GetAbbreviatedKeyLabelIfNeeded(view, rect, key, text, sizeof(text));
 		be_control_look->DrawLabel(view, text, rect, updateRect,
-			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE), &keyLabelColor);
 	} else if (key->shape == kEnterKeyShape) {
 		BRect topLeft = rect;
 		BRect topRight = rect;
@@ -875,7 +876,7 @@ KeyboardLayoutView::_DrawKey(BView* view, BRect updateRect, const Key* key,
 
 		// draw the button label
 		be_control_look->DrawLabel(view, text, rect, updateRect,
-			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE));
+			base, 0, BAlignment(B_ALIGN_CENTER, B_ALIGN_MIDDLE), &keyLabelColor);
 
 		// reset the clipping region
 		view->ConstrainClippingRegion(NULL);

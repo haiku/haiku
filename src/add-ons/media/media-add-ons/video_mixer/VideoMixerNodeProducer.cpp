@@ -12,6 +12,10 @@
 
 #include "VideoMixerNode.h"
 
+#include <stdio.h>
+#include <string.h>
+
+
 // -------------------------------------------------------- //
 // implemention of BBufferProducer
 // -------------------------------------------------------- //

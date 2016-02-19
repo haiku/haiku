@@ -143,8 +143,17 @@ cleanup:
 	// We do not call BMediaRoster::ReleaseNode(), since
 	// the player was created by using "new". We could
 	// call BMediaRoster::UnregisterNode(), but this is
-	// supposed to be done by BMediaNode destructor automatically
-	delete fPlayerNode;
+	// supposed to be done by BMediaNode destructor automatically.
+
+	// The node is deleted by the Release() when ref count reach 0.
+	// Since we are the sole owners, and no one acquired it
+	// this should be the case. The Quit() synchronization
+	// is handled by the DeleteHook inheritance.
+	// NOTE: this might be crucial when using a BMediaEventLooper.
+	if (fPlayerNode->Release() != NULL) {
+		TRACE("BSoundPlayer::~BSoundPlayer: Error the producer node "
+			"appears to be acquired by someone else than us!");
+	}
 
 	// do not delete fVolumeSlider, it belongs to the parameter web
 	delete fParameterWeb;

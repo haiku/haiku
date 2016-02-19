@@ -538,11 +538,11 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 		rgb_color highColor;
 		if (view->IsDesktopWindow()) {
 			if (selected)
-				highColor = kWhite;
+				highColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 			else
 				highColor = view->DeskTextColor();
 		} else if (selected && view->Window()->IsActive()) {
-			highColor = kWhite;
+			highColor = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
 		} else
 			highColor = kBlack;
 
@@ -575,10 +575,13 @@ BTextWidget::Draw(BRect eraseRect, BRect textRect, float, BPoseView* view,
 		BFont font;
 		drawView->GetFont(&font);
 
-		rgb_color textColor = drawView->HighColor();
-		if (textColor.red + textColor.green + textColor.blue < 128 * 3) {
+		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+		if (view->IsDesktopWindow())
+			textColor = view->DeskTextColor();
+
+		if (textColor.Brightness() < 100) {
 			// dark text on light outline
-			rgb_color glowColor = kWhite;
+			rgb_color glowColor = ui_color(B_SHINE_COLOR);
 
 			font.SetFalseBoldWidth(2.0);
 			drawView->SetFont(&font, B_FONT_FALSE_BOLD_WIDTH);

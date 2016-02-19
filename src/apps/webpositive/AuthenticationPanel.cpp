@@ -120,7 +120,7 @@ bool AuthenticationPanel::getAuthentication(const BString& text,
 	BTextView* textView = new BTextView(textBounds, "text", textBounds,
 		be_plain_font, &infoColor, B_FOLLOW_NONE, B_WILL_DRAW
 			| B_SUPPORTS_LAYOUT);
-	textView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	textView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	textView->SetText(text.String());
 	textView->MakeEditable(false);
 	textView->MakeSelectable(false);

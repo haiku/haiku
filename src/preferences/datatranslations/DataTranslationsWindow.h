@@ -22,6 +22,7 @@
 
 
 class BTranslatorReleaseDelegate;
+class BTextView;
 
 
 class DataTranslationsWindow : public BWindow {
@@ -48,6 +49,7 @@ private:
 			BView*			fConfigView;
 			IconView*		fIconView;
 			BButton*		fButton;
+			BTextView*		fInfoText;
 };
 
 

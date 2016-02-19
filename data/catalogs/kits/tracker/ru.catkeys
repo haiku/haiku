@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	2004221275
+1	russian	x-vnd.Haiku-libtracker	3644595724
 OK	WidgetAttributeText		ОК
 Add-ons	FilePanelPriv		Дополнения
 Mount settings…	ContainerWindow		Настройка подключения дисков…
@@ -434,7 +434,6 @@ Recent queries	FindPanel		Недавние запросы
 Mount	ContainerWindow		Подключить
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used занято -- %free свободно)
 Cancel	FSClipBoard		Отмена
-Restart Deskbar	DeskWindow		Перезапустить Deskbar
 Cut more	ContainerWindow		Вырезать ещё
 Deleting: 	StatusWindow		Удаление: 
 Empty Trash	InfoWindow		Очистить корзину

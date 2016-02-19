@@ -4,7 +4,7 @@
 
 	Other authors for NV driver:
 	Mark Watson,
-	Rudolf Cornelissen 9/2002-9/2009
+	Rudolf Cornelissen 9/2002-1/2016
 */
 
 #define MODULE_BIT 0x00400000
@@ -96,6 +96,114 @@ static const display_mode mode_list[] = {
 };
 
 
+// transform official mode to internal, multi-screen mode enhanced mode
+static void Haiku_DetectTranslateMultiMode(display_mode *mode)
+{
+	mode->flags &= ~DUALHEAD_BITS;
+
+	if( mode->virtual_width == 2 * mode->timing.h_display ) {
+		LOG(4, ("Haiku: horizontal combine mode\n"));
+		if (si->Haiku_switch_head)
+			mode->flags |= DUALHEAD_SWITCH;
+		else
+			mode->flags |= DUALHEAD_ON;
+	} else if( mode->virtual_height == 2 * mode->timing.v_display ) {
+		LOG(4, ("Haiku: vertical combine mode not supported\n"));
+	} else {
+		/* unfortunately Haiku's screenprefs panel does not support single head output explicitly, so we'd better
+		   activate both heads always to (probably) mimic Radeon driver behaviour (for which this app was adapted) */
+		/* note please:
+		   - this will have a big downside on hardware for which both heads have different resolution cababilities (i.e. Matrox);
+		   - also (on laptops) this will shorten battery life a bit of course.. */
+		mode->flags |= DUALHEAD_CLONE;
+	}
+}
+
+
+// check and execute tunnel settings command
+static status_t Haiku_CheckMultiMonTunnel(display_mode *mode, const display_mode *low, const display_mode *high, bool *isTunneled )
+{
+	if( (mode->timing.flags & RADEON_MODE_MULTIMON_REQUEST) != 0 &&
+		(mode->timing.flags & RADEON_MODE_MULTIMON_REPLY) == 0 )
+	{
+		mode->timing.flags &= ~RADEON_MODE_MULTIMON_REQUEST;
+		mode->timing.flags |= RADEON_MODE_MULTIMON_REPLY;
+		
+		// still process request, just in case someone set this flag
+		// combination by mistake
+		
+		*isTunneled = true;
+		return B_OK;
+	}
+
+	// check magic params
+	if( mode->space != 0 || low->space != 0 || high->space != 0 
+		|| low->virtual_width != 0xffff || low->virtual_height != 0xffff
+		|| high->virtual_width != 0 || high->virtual_height != 0
+		|| mode->timing.pixel_clock != 0 
+		|| low->timing.pixel_clock != 'TKTK' || high->timing.pixel_clock != 'KTKT' )
+	{
+		*isTunneled = false;
+		return B_OK;
+	}
+
+	*isTunneled = true;
+
+	/* enable Haiku special handling */
+	if (!si->haiku_prefs_used)
+		LOG(4, ("PROPOSEMODE: Haiku screenprefs tunnel detected.\n"));
+	si->haiku_prefs_used = true;
+
+	/* note please:
+	   Haiku ScreenPrefs does not issue a SetMode command after changing these settings (per se), but relies on
+	   driver switching outputs directly. These settings are not dependant on workspace there, and are not part of 
+	   the mode in the Radeon driver. In the Matrox and nVidia drivers they are though. So we need SetMode
+	   to be issued. (yes: sometimes I switch monitors when I switch workspace.. ;-)
+	   Also the RADEON driver saves these settings to a file so it remembers these after reboots. We don't atm.
+	   If the mode as proposed by the driver would be saved by the ScreenPrefs panel, we would 'remember' it over
+	   reboots though (via app_server settings).. */
+
+	switch( mode->h_display_start ) {
+	case ms_swap:
+		switch( mode->v_display_start ) {
+		case 0:
+			if (si->Haiku_switch_head)
+				mode->timing.flags = 1;
+			else
+				mode->timing.flags = 0;
+			LOG(4, ("Haiku: tunnel access target=swap, command=get, value=%u\n", mode->timing.flags));
+			return B_OK;
+		case 1:
+			si->Haiku_switch_head = mode->timing.flags != 0;
+			LOG(4, ("Haiku: tunnel access target=swap, command=set, value=%u\n", mode->timing.flags));
+			/* Haiku's screenprefs panel expects us to directly set the mode.. (but it should do that itself) */
+			SET_DISPLAY_MODE(&si->dm);
+			return B_OK;
+		}
+		break;
+
+	case ms_use_laptop_panel:
+		LOG(4, ("Haiku: tunnel access target=usepanel, command=%s, value=%u\n",
+			(mode->v_display_start == 1) ? "set" : "get", mode->timing.flags));
+		// we refuse this setting (makes no sense for us: laptop panel is treated as normal screen)
+		return B_ERROR;
+		break;
+
+	case ms_tv_standard:
+		LOG(4, ("Haiku: tunnel access target=tvstandard, command=%s, value=%u\n",
+			(mode->v_display_start == 1) ? "set" : "get", mode->timing.flags));
+		// let's forget about this for now..
+		return B_ERROR;
+		break;
+	}
+
+	LOG(4, ("Haiku: unhandled tunnel access target=$%x, command=%u, value=%u\n",
+		mode->h_display_start, mode->v_display_start, mode->timing.flags));
+
+	return B_ERROR;
+}
+
+
 /*!
 	Check mode is between low and high limits.
 	Returns:
@@ -128,6 +236,25 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 		/ ((double)target->timing.h_total * (double)target->timing.v_total);
 	bool want_same_width = target->timing.h_display == target->virtual_width;
 	bool want_same_height = target->timing.v_display == target->virtual_height;
+	bool isTunneled = false;
+	// check whether we got a tunneled settings command
+	result = Haiku_CheckMultiMonTunnel(target, low, high, &isTunneled);
+	if (isTunneled)
+		return result;
+
+	/* since we (might be) called by the Haiku ScreenPrefs panel, check for special modes and translate
+	   them from (for us) non-native modes to native modes (as used in DualheadSetup by Mark Watson).
+	   These 'native modes' survive system reboots by the way, at least when set using DualheadSetup. */
+
+	/* note please: apparantly Haiku Screenprefs does not save the modes as set by the driver, but as originally requested
+	   by the ScreenPrefs panel. Modifications done by the driver are therefore not saved.
+	   It would be nice if the screenprefs panel in Haiku would save the modified modeflags (after proposemode or setmode),
+	   that would also make the driver remember switched heads (now it's a temporary setting). */
+
+	if (si->haiku_prefs_used) {
+		// check how many heads are needed by target mode
+		Haiku_DetectTranslateMultiMode(target);
+	}
 
 	LOG(1, ("PROPOSEMODE: (ENTER) requested virtual_width %d, virtual_height %d\n",
 		target->virtual_width, target->virtual_height));
@@ -189,22 +316,26 @@ PROPOSE_DISPLAY_MODE(display_mode *target, const display_mode *low, const displa
 		}
 	}
 
-	/* check if screen(s) can display the requested resolution (if we have it's EDID info)
-	   note:
-	   allowing 2 pixels more for horizontal display for the 1366 mode, since multiples of 8
-	   are required for the CRTCs horizontal timing programming) */
-	if (si->ps.crtc1_screen.have_native_edid) {
-		if ((target->timing.h_display - 2) > si->ps.crtc1_screen.timing.h_display
-			|| target->timing.v_display > si->ps.crtc1_screen.timing.v_display) {
-			LOG(4, ("PROPOSEMODE: screen at crtc1 can't display requested resolution, aborted.\n"));
-			return B_ERROR;
+	/* only limit modelist if user did not explicitly block this via nv.settings
+	   (because of errors in monitor's EDID information returned) */
+	if (si->settings.check_edid) {
+		/* check if screen(s) can display the requested resolution (if we have it's EDID info)
+		   note:
+		   allowing 2 pixels more for horizontal display for the 1366 mode, since multiples of 8
+		   are required for the CRTCs horizontal timing programming) */
+		if (si->ps.crtc1_screen.have_native_edid) {
+			if ((target->timing.h_display - 2) > si->ps.crtc1_screen.timing.h_display
+				|| target->timing.v_display > si->ps.crtc1_screen.timing.v_display) {
+				LOG(4, ("PROPOSEMODE: screen at crtc1 can't display requested resolution, aborted.\n"));
+				return B_ERROR;
+			}
 		}
-	}
-	if (si->ps.crtc2_screen.have_native_edid) {
-		if ((target->timing.h_display - 2) > si->ps.crtc2_screen.timing.h_display
-			|| target->timing.v_display > si->ps.crtc2_screen.timing.v_display) {
-			LOG(4, ("PROPOSEMODE: screen at crtc2 can't display requested resolution, aborted.\n"));
-			return B_ERROR;
+		if (si->ps.crtc2_screen.have_native_edid) {
+			if ((target->timing.h_display - 2) > si->ps.crtc2_screen.timing.h_display
+				|| target->timing.v_display > si->ps.crtc2_screen.timing.v_display) {
+				LOG(4, ("PROPOSEMODE: screen at crtc2 can't display requested resolution, aborted.\n"));
+				return B_ERROR;
+			}
 		}
 	}
 
@@ -447,19 +578,56 @@ GET_MODE_LIST(display_mode *dm)
 }
 
 
+static void checkAndAddMode(const display_mode *src, display_mode *dst)
+{
+	uint32 j, pix_clk_range;
+	display_mode low, high;
+	color_space spaces[4] = {B_RGB32_LITTLE, B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
+
+	/* set ranges for acceptable values */
+	low = high = *src;
+	/* range is 6.25% of default clock: arbitrarily picked */ 
+	pix_clk_range = low.timing.pixel_clock >> 5;
+	low.timing.pixel_clock -= pix_clk_range;
+	high.timing.pixel_clock += pix_clk_range;
+	/* 'some cards need wider virtual widths for certain modes':
+	 * Not true. They might need a wider pitch, but this is _not_ reflected in
+	 * virtual_width, but in fbc.bytes_per_row. */
+	//So disable next line: 
+	//high.virtual_width = 4096;
+	/* do it once for each depth we want to support */
+	for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) {
+		/* set target values */
+		dst[si->mode_count] = *src;
+		/* poke the specific space */
+		dst[si->mode_count].space = low.space = high.space = spaces[j];
+		/* ask for a compatible mode */
+		/* We have to check for B_OK, because otherwise the pix_clk_range
+		 * won't be taken into account!! */
+		//So don't do this: 
+		//if (PROPOSE_DISPLAY_MODE(dst, &low, &high) != B_ERROR) {
+		//Instead, do this:
+		if (PROPOSE_DISPLAY_MODE(&dst[si->mode_count], &low, &high) == B_OK) {
+			/* count it, so move on to next mode */
+			si->mode_count++;
+		}
+	}
+}
+
+
 /*! Create a list of display_modes to pass back to the caller.
 */
 status_t
 create_mode_list(void)
 {
 	size_t max_size;
-	uint32 i, j, pix_clk_range;
+	uint32 i;
 	const display_mode *src;
-	display_mode *dst, low, high;
-	color_space spaces[4] = {B_RGB32_LITTLE, B_RGB16_LITTLE, B_RGB15_LITTLE, B_CMAP8};
+	display_mode *dst;
+	display_mode custom_mode;
 
-	/* figure out how big the list could be, and adjust up to nearest multiple of B_PAGE_SIZE */
-	max_size = (((MODE_COUNT * 4) * sizeof(display_mode)) + (B_PAGE_SIZE-1)) & ~(B_PAGE_SIZE-1);
+	/* figure out how big the list could be (4 colorspaces, 3 virtual types per mode), and adjust up to nearest multiple of B_PAGE_SIZE */
+	max_size = (((MODE_COUNT * 4 * 3) * sizeof(display_mode)) + (B_PAGE_SIZE-1)) & ~(B_PAGE_SIZE-1);
 
 	/* create an area to hold the info */
 	si->mode_area = my_mode_list_area = create_area("NV accelerant mode info",
@@ -473,35 +641,26 @@ create_mode_list(void)
 	dst = my_mode_list;
 	si->mode_count = 0;
 	for (i = 0; i < MODE_COUNT; i++) {
-		/* set ranges for acceptable values */
-		low = high = *src;
-		/* range is 6.25% of default clock: arbitrarily picked */ 
-		pix_clk_range = low.timing.pixel_clock >> 5;
-		low.timing.pixel_clock -= pix_clk_range;
-		high.timing.pixel_clock += pix_clk_range;
-		/* 'some cards need wider virtual widths for certain modes':
-		 * Not true. They might need a wider pitch, but this is _not_ reflected in
-		 * virtual_width, but in fbc.bytes_per_row. */
-		//So disable next line: 
-		//high.virtual_width = 4096;
-		/* do it once for each depth we want to support */
-		for (j = 0; j < (sizeof(spaces) / sizeof(color_space)); j++) {
-			/* set target values */
-			*dst = *src;
-			/* poke the specific space */
-			dst->space = low.space = high.space = spaces[j];
-			/* ask for a compatible mode */
-			/* We have to check for B_OK, because otherwise the pix_clk_range
-			 * won't be taken into account!! */
-			//So don't do this: 
-			//if (PROPOSE_DISPLAY_MODE(dst, &low, &high) != B_ERROR) {
-			//Instead, do this:
-			if (PROPOSE_DISPLAY_MODE(dst, &low, &high) == B_OK) {
-				/* count it, and move on to next mode */
-				dst++;
-				si->mode_count++;
-			}
-		}
+		// standard mode
+		/* unfortunately Haiku's screenprefs panel does not support single head output explicitly, so we'd better
+		   activate both heads always to (probably) mimic Radeon driver behaviour (for which this app was adapted) */
+		/* note please:
+		   - this will have a big downside on hardware for which both heads have different resolution cababilities (i.e. Matrox);
+		   - also (on laptops) this will shorten battery life a bit of course.. */
+		custom_mode = *src;
+		custom_mode.flags |= DUALHEAD_CLONE;
+		checkAndAddMode(&custom_mode, dst);
+		// double width mode for Haiku ScreenPrefs panel
+		/* note please: These modes should not be added. Instead the mode.flags should be used during setting screen as these will
+		   automatically generate the needed other properties of the mode. Besides, virtual size is meant to be used for
+		   pan&scan modes (viewports), i.e. for certain games.
+		   The currently used method will fail programs that are meant to work pan@scan if the virtual width (or height) are
+		   exactly twice the view area. */
+		custom_mode = *src;
+		custom_mode.virtual_width *= 2;
+		custom_mode.flags |= DUALHEAD_ON;
+		checkAndAddMode(&custom_mode, dst);
+		// we don't support double height modes
 		/* advance to next mode */
 		src++;
 	}

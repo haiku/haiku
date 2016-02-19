@@ -967,7 +967,7 @@ MainWindow::_CreateGUI()
 	layout->SetSpacing(0, 0);
 	BView* rootView = new BView("root view", 0, layout);
 	AddChild(rootView);
-	rootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	rootView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BGroupView* leftTopView = new BGroupView(B_VERTICAL, 0);
 	layout->AddView(leftTopView, 0, 0);
@@ -982,7 +982,7 @@ MainWindow::_CreateGUI()
 	leftTopView->SetExplicitMinSize(BSize(splitWidth, B_SIZE_UNSET));
 
 	BGroupView* iconPreviews = new BGroupView(B_HORIZONTAL);
-	iconPreviews->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	iconPreviews->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	iconPreviews->GroupLayout()->SetSpacing(5);
 
 	// icon previews
@@ -1003,14 +1003,14 @@ MainWindow::_CreateGUI()
 
 
 	BGroupView* smallPreviews = new BGroupView(B_VERTICAL);
-	smallPreviews->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	smallPreviews->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	smallPreviews->GroupLayout()->SetSpacing(5);
 
 	smallPreviews->AddChild(fIconPreview16Folder);
 	smallPreviews->AddChild(fIconPreview16Menu);
 
 	BGroupView* mediumPreviews = new BGroupView(B_VERTICAL);
-	mediumPreviews->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	mediumPreviews->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	mediumPreviews->GroupLayout()->SetSpacing(5);
 
 	mediumPreviews->AddChild(fIconPreview32Folder);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _STATUS_BAR_H
@@ -110,8 +110,9 @@ private:
 			float				fTextDivider;
 			rgb_color			fBarColor;
 			bool				fCustomBarHeight;
+			uint32				fInternalFlags;
 
-			uint32				_reserved[5];
+			uint32				_reserved[4];
 };
 
 #endif	// _STATUS_BAR_H

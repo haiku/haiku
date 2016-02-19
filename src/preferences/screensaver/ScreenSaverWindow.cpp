@@ -119,6 +119,7 @@ public:
 			void				UpdateStatus();
 
 private:
+			void				_UpdateColors();
 			ScreenSaverSettings&	fSettings;
 			uint32				fTurnOffScreenFlags;
 
@@ -128,6 +129,9 @@ private:
 			BTextView*			fTurnOffNotSupported;
 			BCheckBox*			fTurnOffCheckBox;
 			TimeSlider*			fTurnOffSlider;
+
+			BTextView*			fFadeNeverText;
+			BTextView*			fFadeNowText;
 
 			BCheckBox*			fPasswordCheckBox;
 			TimeSlider*			fPasswordSlider;
@@ -208,7 +212,7 @@ TimeSlider::TimeSlider(const char* name, uint32 changedMessage,
 	BSlider(name, B_TRANSLATE("30 seconds"), new BMessage(changedMessage),
 		0, kTimeUnitCount - 1, B_HORIZONTAL, B_TRIANGLE_THUMB)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	SetModificationMessage(new BMessage(updateMessage));
 	SetBarThickness(10);
 }
@@ -268,7 +272,7 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 	BView(name, B_WILL_DRAW),
 	fSettings(settings)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
@@ -290,13 +294,14 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 		kMsgRunSliderUpdate);
 
 	// Turn Off
-	rgb_color textColor = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-		B_DISABLED_LABEL_TINT);
+	rgb_color textColor = disable_color(ui_color(B_PANEL_TEXT_COLOR),
+		ViewColor());
+
 	fTurnOffNotSupported = new BTextView("not_supported", be_plain_font,
 		&textColor, B_WILL_DRAW);
 	fTurnOffNotSupported->SetExplicitMinSize(BSize(B_SIZE_UNSET,
 		3 + textHeight * 3));
-	fTurnOffNotSupported->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fTurnOffNotSupported->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fTurnOffNotSupported->MakeEditable(false);
 	fTurnOffNotSupported->MakeSelectable(false);
 	fTurnOffNotSupported->SetText(
@@ -331,23 +336,23 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 
 	fFadeNow = new ScreenCornerSelector(monitorRect, "FadeNow",
 		new BMessage(kMsgFadeCornerChanged), B_FOLLOW_NONE);
-	BTextView* fadeNowText = new BTextView("FadeNowText", B_WILL_DRAW);
-	fadeNowText->SetExplicitMinSize(BSize(B_SIZE_UNSET,
+	fFadeNowText = new BTextView("FadeNowText", B_WILL_DRAW);
+	fFadeNowText->SetExplicitMinSize(BSize(B_SIZE_UNSET,
 		4 + textHeight * 4));
-	fadeNowText->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fadeNowText->MakeEditable(false);
-	fadeNowText->MakeSelectable(false);
-	fadeNowText->SetText(B_TRANSLATE("Fade now when mouse is here"));
+	fFadeNowText->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fFadeNowText->MakeEditable(false);
+	fFadeNowText->MakeSelectable(false);
+	fFadeNowText->SetText(B_TRANSLATE("Fade now when mouse is here"));
 
 	fFadeNever = new ScreenCornerSelector(monitorRect, "FadeNever",
 		new BMessage(kMsgNeverFadeCornerChanged), B_FOLLOW_NONE);
-	BTextView* fadeNeverText = new BTextView("FadeNeverText", B_WILL_DRAW);
-	fadeNeverText->SetExplicitMinSize(BSize(B_SIZE_UNSET,
+	fFadeNeverText = new BTextView("FadeNeverText", B_WILL_DRAW);
+	fFadeNeverText->SetExplicitMinSize(BSize(B_SIZE_UNSET,
 		4 + textHeight * 4));
-	fadeNeverText->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	fadeNeverText->MakeEditable(false);
-	fadeNeverText->MakeSelectable(false);
-	fadeNeverText->SetText(B_TRANSLATE("Don't fade when mouse is here"));
+	fFadeNeverText->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fFadeNeverText->MakeEditable(false);
+	fFadeNeverText->MakeSelectable(false);
+	fFadeNeverText->SetText(B_TRANSLATE("Don't fade when mouse is here"));
 
 	box->AddChild(BLayoutBuilder::Group<>(B_VERTICAL, 0)
 		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
@@ -371,12 +376,12 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 		.AddGroup(B_HORIZONTAL)
 			.Add(fFadeNow)
 			.AddGroup(B_VERTICAL, 0)
-				.Add(fadeNowText)
+				.Add(fFadeNowText)
 				.AddGlue()
 				.End()
 			.Add(fFadeNever)
 			.AddGroup(B_VERTICAL, 0)
-				.Add(fadeNeverText)
+				.Add(fFadeNeverText)
 				.AddGlue()
 				.End()
 			.End()
@@ -388,6 +393,7 @@ FadeView::FadeView(const char* name, ScreenSaverSettings& settings)
 			B_USE_WINDOW_SPACING, 0)
 		.Add(box)
 		.End();
+
 }
 
 
@@ -412,6 +418,7 @@ FadeView::AttachedToWindow()
 	fPasswordCheckBox->SetValue(fSettings.LockEnable());
 	fPasswordSlider->SetTime(fSettings.PasswordTime());
 
+	_UpdateColors();
 	UpdateTurnOffScreen();
 	UpdateStatus();
 }
@@ -421,6 +428,9 @@ void
 FadeView::MessageReceived(BMessage *message)
 {
 	switch (message->what) {
+		case B_COLORS_UPDATED:
+			_UpdateColors();
+			break;
 		case kMsgRunSliderChanged:
 		case kMsgRunSliderUpdate:
 			if (fRunSlider->Value() > fTurnOffSlider->Value())
@@ -530,6 +540,15 @@ FadeView::UpdateStatus()
 }
 
 
+void
+FadeView::_UpdateColors()
+{
+	rgb_color color = ui_color(B_PANEL_TEXT_COLOR);
+	fFadeNeverText->SetFontAndColor(be_plain_font, 0, &color);
+	fFadeNowText->SetFontAndColor(be_plain_font, 0, &color);
+}
+
+
 //	#pragma mark - ModulesView
 
 
@@ -546,7 +565,7 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 	fPreviewView(new PreviewView("preview")),
 	fScreenSaverTestTeam(-1)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fScreenSaversListView->SetSelectionMessage(
 		new BMessage(kMsgSaverSelected));
@@ -825,7 +844,7 @@ ModulesView::_OpenSaver()
 #endif
 	fSettingsView = new BView(rect, "SettingsView", B_FOLLOW_ALL, B_WILL_DRAW);
 
-	fSettingsView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fSettingsView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fSettingsBox->AddChild(fSettingsView);
 
 	BScreenSaver* saver = ScreenSaver();
@@ -928,7 +947,7 @@ ScreenSaverWindow::ScreenSaverWindow()
 
 	// Create the topmost background view
 	BView* topView = new BView("topView", B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	topView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	topView->SetExplicitAlignment(BAlignment(B_ALIGN_USE_FULL_WIDTH,
 		B_ALIGN_USE_FULL_HEIGHT));
 	topView->SetExplicitMinSize(BSize(fMinWidth, fMinHeight));

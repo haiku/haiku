@@ -40,7 +40,7 @@ ConfigView::ConfigView(BRect frame, Gravity* parent)
 		B_WILL_DRAW | B_NAVIGABLE))
 {
 	SetLayout(new BGroupLayout(B_HORIZONTAL));
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fShadeList->SetSelectionMessage(new BMessage(kMsgShade));
 

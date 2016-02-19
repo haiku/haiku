@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Terminal	2336803971
+1	dutch; flemish	x-vnd.Haiku-Terminal	3223670486
 Not found.	Terminal TermWindow		Niet gevonden.
 Switch Terminals	Terminal TermWindow		Wissel van Terminal
 Change directory	Terminal TermView		Directory veranderen
@@ -60,7 +60,6 @@ Close	Terminal TermWindow		Sluiten
 Text	Terminal AppearancePrefView		Tekst
 Clear all	Terminal TermWindow		Alles wissen
 Text encoding	Terminal TermWindow		Tekstcodering
-size	Terminal TermView		grootte
 Close window	Terminal TermWindow		Venster sluiten
 Set tab title	Terminal TermWindow		De tabtitel instellen
 Settings…	Terminal TermWindow		Instellingen...

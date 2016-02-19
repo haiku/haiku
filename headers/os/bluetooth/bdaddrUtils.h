@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <String.h>
+
 #include <bluetooth/bluetooth.h>
 
 namespace Bluetooth {
@@ -45,12 +47,11 @@ public:
 		memcpy(&dst, &src, sizeof(bdaddr_t));
 	}
 
-	static char* ToString(const bdaddr_t bdaddr)
+	static BString ToString(const bdaddr_t bdaddr)
 	{
-		// TODO: not safe
-		static char str[18];
+		BString str;
 
-		sprintf(str,"%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",bdaddr.b[5],
+		str.SetToFormat("%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",bdaddr.b[5],
 				bdaddr.b[4], bdaddr.b[3], bdaddr.b[2], bdaddr.b[1],
 				bdaddr.b[0]);
 		return str;

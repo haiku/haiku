@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-TSKB	2335730970
+1	portuguese (brazil)	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Desligar
 Sort applications by name	PreferencesWindow		Ordenar aplicativos pelo nome
 Suspend	DeskbarMenu		Suspender
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Grande
 Auto-raise	PreferencesWindow		Auto-levantar
 Recent folders:	PreferencesWindow		Pastas recentes:
 Show application expander	PreferencesWindow		Mostrar expansor de aplicativo
-Restart Tracker	DeskbarMenu		Reiniciar Rastreador
 Close all	WindowMenu		Fechar tudo
 Deskbar preferences	PreferencesWindow		Preferências da Deskbar
 Mount	DeskbarMenu		Montar

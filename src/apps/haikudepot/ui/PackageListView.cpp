@@ -632,10 +632,9 @@ public:
 		font.SetSize(9.0f);
 		SetFont(&font);
 
-		SetViewColor(B_TRANSPARENT_COLOR);
-		SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
-		SetHighColor(tint_color(LowColor(), B_DARKEN_4_TINT));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+		SetLowUIColor(ViewUIColor());
+		SetHighUIColor(LowUIColor(), B_DARKEN_4_TINT);
 	}
 
 	virtual BSize MinSize()

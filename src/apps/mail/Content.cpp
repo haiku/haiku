@@ -646,7 +646,7 @@ TContentView::TContentView(bool incoming, BFont* font,
 	fFocus(false),
 	fIncoming(incoming)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL, 0);
 	SetLayout(layout);

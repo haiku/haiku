@@ -95,9 +95,12 @@ TTimeEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 {
 	if (fFieldPositions == NULL || index * 2 + 1 >= (uint32)fFieldPosCount)
 		return;
-	SetLowColor(ViewColor());
+
 	if (hasFocus)
-		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+		SetLowColor(mix_color(ui_color(B_CONTROL_HIGHLIGHT_COLOR),
+			ViewColor(), 192));
+	else
+		SetLowColor(ViewColor());
 
 	BString field;
 	fText.CopyCharsInto(field, fFieldPositions[index * 2],
@@ -106,7 +109,7 @@ TTimeEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 	BPoint point(bounds.LeftBottom());
 	point.y -= bounds.Height() / 2.0 - 6.0;
 	point.x += (bounds.Width() - StringWidth(field)) / 2;
-	SetHighColor(0, 0, 0, 255);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
 	FillRect(bounds, B_SOLID_LOW);
 	DrawString(field, point);
 }
@@ -125,7 +128,7 @@ TTimeEdit::DrawSeparator(uint32 index, BRect bounds)
 	BPoint point(bounds.LeftBottom());
 	point.y -= bounds.Height() / 2.0 - 6.0;
 	point.x += (bounds.Width() - StringWidth(field)) / 2;
-	SetHighColor(0, 0, 0, 255);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
 	DrawString(field, point);
 }
 
@@ -471,9 +474,11 @@ TDateEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 	if (fFieldPositions == NULL || index * 2 + 1 >= (uint32)fFieldPosCount)
 		return;
 
-	SetLowColor(ViewColor());
 	if (hasFocus)
-		SetLowColor(tint_color(ViewColor(), B_DARKEN_1_TINT));
+		SetLowColor(mix_color(ui_color(B_CONTROL_HIGHLIGHT_COLOR),
+			ViewColor(), 192));
+	else
+		SetLowColor(ViewColor());
 
 	BString field;
 	fText.CopyCharsInto(field, fFieldPositions[index * 2],
@@ -482,7 +487,7 @@ TDateEdit::DrawSection(uint32 index, BRect bounds, bool hasFocus)
 	BPoint point(bounds.LeftBottom());
 	point.y -= bounds.Height() / 2.0 - 6.0;
 	point.x += (bounds.Width() - StringWidth(field)) / 2;
-	SetHighColor(0, 0, 0, 255);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
 	FillRect(bounds, B_SOLID_LOW);
 	DrawString(field, point);
 }
@@ -504,7 +509,7 @@ TDateEdit::DrawSeparator(uint32 index, BRect bounds)
 	BPoint point(bounds.LeftBottom());
 	point.y -= bounds.Height() / 2.0 - 6.0;
 	point.x += (bounds.Width() - StringWidth(field)) / 2;
-	SetHighColor(0, 0, 0, 255);
+	SetHighUIColor(B_PANEL_TEXT_COLOR);
 	DrawString(field, point);
 }
 

@@ -7,6 +7,7 @@
  */
 
 #include "NetReceiver.h"
+#include "RemoteMessage.h"
 
 #include "StreamingRingBuffer.h"
 
@@ -59,16 +60,21 @@ NetReceiver::_NetworkReceiverEntry(void *data)
 status_t
 NetReceiver::_NetworkReceiver()
 {
+	static const uint16_t shutdown_message[] = { RP_CLOSE_CONNECTION, 0, 0 };
+
 	status_t result = fListener->Listen();
 	if (result != B_OK) {
 		TRACE_ERROR("failed to listen on port: %s\n", strerror(result));
+		fTarget->Write(shutdown_message, sizeof(shutdown_message));
 		return result;
 	}
 
 	while (!fStopThread) {
-		fEndpoint = fListener->Accept(1000);
-		if (fEndpoint == NULL)
-			continue;
+		fEndpoint = fListener->Accept(5000);
+		if (fEndpoint == NULL) {
+			fTarget->Write(shutdown_message, sizeof(shutdown_message));
+			return B_ERROR;
+		}
 
 		int32 errorCount = 0;
 		TRACE("new endpoint connection: %p\n", fEndpoint);
@@ -81,6 +87,7 @@ NetReceiver::_NetworkReceiver()
 				BNetEndpoint *endpoint = fEndpoint;
 				fEndpoint = NULL;
 				delete endpoint;
+				fTarget->Write(shutdown_message, sizeof(shutdown_message));
 				return readSize;
 			}
 
@@ -101,6 +108,7 @@ NetReceiver::_NetworkReceiver()
 			if (result != B_OK) {
 				TRACE_ERROR("writing to ring buffer failed: %s\n",
 					strerror(result));
+				fTarget->Write(shutdown_message, sizeof(shutdown_message));
 				return result;
 			}
 		}

@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Terminal	1506238602
+1	italian	x-vnd.Haiku-Terminal	2393105117
 Not found.	Terminal TermWindow		Non trovato.
 Switch Terminals	Terminal TermWindow		Scambia Terminali
 Change directory	Terminal TermView		Cambia directory
@@ -56,7 +56,6 @@ Close	Terminal TermWindow		Chiudi
 Text	Terminal AppearancePrefView		Testo
 Clear all	Terminal TermWindow		Ripulisci tutto
 Text encoding	Terminal TermWindow		Codifica del testo
-size	Terminal TermView		dimensione
 Close window	Terminal TermWindow		chiudi finestra
 Set tab title	Terminal TermWindow		Imposta titolo scheda
 Settings…	Terminal TermWindow		Impostazioni…

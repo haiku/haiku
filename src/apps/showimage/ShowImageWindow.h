@@ -104,6 +104,8 @@ private:
 
 			void				_UpdateRatingMenu();
 
+			void				_GetFileInfo(const entry_ref& ref);
+
 			void				_SetToolBarVisible(bool visible,
 									bool animate = false);
 			void				_SetToolBarBorder(bool visible);

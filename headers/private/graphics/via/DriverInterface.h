@@ -5,7 +5,7 @@
 	Other authors:
 	Mark Watson;
 	Apsed;
-	Rudolf Cornelissen 10/2002-9/2005.
+	Rudolf Cornelissen 10/2002-1/2016.
 */
 
 #ifndef DRIVERINTERFACE_H
@@ -174,12 +174,12 @@ typedef struct {
   /* card info - information gathered from PINS (and other sources) */
 	enum
 	{	// card_type in order of date of VIA chip design (fixme: check order)
-		CLE3122 = 0,
-		CLE3022,
+		VT3122 = 0,
+		VT3022,
 		VT7205,
 		VT3205,
-		VT7204,
-		VT3204,
+		VT3108,
+		VT3204NC,
 		NV04,
 		NV05,
 		NV05M64,

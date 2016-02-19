@@ -27,7 +27,7 @@ public:
 							PincodeWindow(RemoteDevice* rDevice);
 	virtual void			MessageReceived(BMessage *msg);
 	virtual bool			QuitRequested();
-			void			SetBDaddr(const char* address);
+			void			SetBDaddr(BString address);
 
 private:
 			void			InitUI();

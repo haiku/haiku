@@ -147,7 +147,7 @@ ObjectWindow::ObjectWindow(BRect frame, const char* name)
 		B_PLAIN_BORDER);
 
 	AddChild(bg);
-	bg->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	bg->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	// object view occupies the right side of the window
 	b.left = b.right + 1.0;

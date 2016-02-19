@@ -218,7 +218,7 @@ ApplicationTypesWindow::ApplicationTypesWindow(const BMessage& settings)
 	fDescriptionLabel = new StringView(B_TRANSLATE("Description:"), NULL);
 	fDescriptionLabel->LabelView()->SetExplicitAlignment(labelAlignment);
 	fDescriptionView = new BTextView("description");
-	fDescriptionView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fDescriptionView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fDescriptionView->SetLowColor(fDescriptionView->ViewColor());
 	fDescriptionView->MakeEditable(false);
 

@@ -294,11 +294,11 @@ replicant_data::Archive(BMessage* msg)
 {
 	status_t result = B_OK;
 	BMessage archive;
-	if (view) 
+	if (view)
 		result = view->Archive(&archive);
 	else if (zombie_view)
 		result = zombie_view->Archive(&archive);
-		
+
 	if (result != B_OK)
 		return result;
 
@@ -307,7 +307,7 @@ replicant_data::Archive(BMessage* msg)
 	msg->AddMessage("message", &archive);
 	if (view)
 		pos = view->Frame().LeftTop();
-	else if (zombie_view) 
+	else if (zombie_view)
 		pos = zombie_view->Frame().LeftTop();
 	msg->AddPoint("position", pos);
 
@@ -1298,16 +1298,16 @@ BShelf::_AddReplicant(BMessage *data, BPoint *location, uint32 uniqueID)
 	// Instantiate the object, if this fails we have a zombie
 	image_id image = -1;
 	BArchivable *archivable = _InstantiateObject(data, &image);
-	
+
 	BView *view = NULL;
-	
+
 	if (archivable != NULL) {
 		view = dynamic_cast<BView*>(archivable);
-		
+
 		if (view == NULL)
 			return send_reply(data, B_ERROR, uniqueID);
 	}
-	
+
 	BDragger* dragger = NULL;
 	BView* replicant = NULL;
 	BDragger::relation relation = BDragger::TARGET_UNKNOWN;
@@ -1448,7 +1448,7 @@ BShelf::_CreateZombie(BMessage *data, BDragger *&dragger)
 	if (data->WasDropped()) {
 		BPoint offset;
 		BPoint dropPoint = data->DropPoint(&offset);
-		
+
 		frame.OffsetTo(fContainerView->ConvertFromScreen(dropPoint) - offset);
 
 		zombie = new _BZombieReplicantView_(frame, B_ERROR);
@@ -1498,14 +1498,13 @@ BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 			for (int32 i = 0; i < CountReplicants(); i++) {
 				BView *view = NULL;
 				ReplicantAt(i, &view, &ID, &err);
-				if (err == B_OK) {
-					if (view->Name() != NULL &&
-						strlen(view->Name()) == strlen(name) && !strcmp(view->Name(), name)) {
-						replicant = view;
-						break;
-					}
-					err = B_NAME_NOT_FOUND;
+				if (err != B_OK || view == NULL)
+					continue;
+				if (view->Name() != NULL && strcmp(view->Name(), name) == 0) {
+					replicant = view;
+					break;
 				}
+				err = B_NAME_NOT_FOUND;
 			}
 			break;
 		}
@@ -1516,13 +1515,13 @@ BShelf::_GetProperty(BMessage *msg, BMessage *reply)
 			for (int32 i = 0; i < CountReplicants(); i++) {
 				BView *view = NULL;
 				ReplicantAt(i, &view, &ID, &err);
-				if (err == B_OK) {
-					if (ID == id) {
-						replicant = view;
-						break;
-					}
-					err = B_NAME_NOT_FOUND;
+				if (err != B_OK || view == NULL)
+					continue;
+				if (ID == id) {
+					replicant = view;
+					break;
 				}
+				err = B_NAME_NOT_FOUND;
 			}
 			break;
 		}

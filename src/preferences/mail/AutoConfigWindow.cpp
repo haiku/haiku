@@ -28,6 +28,9 @@
 #define B_TRANSLATION_CONTEXT "AutoConfigWindow"
 
 
+const float kSpacing = 10;
+
+
 AutoConfigWindow::AutoConfigWindow(BRect rect, ConfigWindow *parent)
 	:
 	BWindow(rect, B_TRANSLATE("Create new account"), B_TITLED_WINDOW_LOOK,

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-libtracker	2004221275
+1	hungarian	x-vnd.Haiku-libtracker	3644595724
 OK	WidgetAttributeText		Rendben
 Add-ons	FilePanelPriv		Kiegészítők
 Mount settings…	ContainerWindow		Csatolási beállítások…
@@ -434,7 +434,6 @@ Recent queries	FindPanel		Előző keresések
 Mount	ContainerWindow		Csatolás
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used használt -- %free szabad)
 Cancel	FSClipBoard		Mégse
-Restart Deskbar	DeskWindow		Asztalsáv újraindítása
 Cut more	ContainerWindow		Több kivágása
 Deleting: 	StatusWindow		Törlés:
 Empty Trash	InfoWindow		Szemetes ürítése

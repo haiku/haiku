@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc.
+ * Copyright 2001-2015 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -8,6 +8,7 @@
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 
@@ -20,6 +21,8 @@
 
 #include <Region.h>
 
+#include "Desktop.h"
+#include "DesktopSettings.h"
 #include "DrawingEngine.h"
 
 
@@ -68,7 +71,8 @@ Decorator::Tab::Tab()
 	\param settings DesktopSettings pointer.
 	\param frame Decorator frame rectangle
 */
-Decorator::Decorator(DesktopSettings& settings, BRect frame)
+Decorator::Decorator(DesktopSettings& settings, BRect frame,
+					Desktop* desktop)
 	:
 	fDrawingEngine(NULL),
 	fDrawState(),
@@ -87,6 +91,7 @@ Decorator::Decorator(DesktopSettings& settings, BRect frame)
 
 	fTopTab(NULL),
 
+	fDesktop(desktop),
 	fFootprintValid(false)
 {
 	memset(&fRegionHighlights, HIGHLIGHT_NONE, sizeof(fRegionHighlights));
@@ -234,8 +239,23 @@ Decorator::SetFlags(int32 tab, uint32 flags, BRegion* updateRegion)
 void
 Decorator::FontsChanged(DesktopSettings& settings, BRegion* updateRegion)
 {
+
 	_FontsChanged(settings, updateRegion);
 	_InvalidateFootprint();
+}
+
+
+/*!	\brief Called when a system colors change.
+*/
+void
+Decorator::ColorsChanged(DesktopSettings& settings, BRegion* updateRegion)
+{
+	UpdateColors(settings);
+
+	if (updateRegion != NULL)
+		updateRegion->Include(&GetFootprint());
+
+	_InvalidateBitmaps();
 }
 
 
@@ -249,6 +269,7 @@ Decorator::SetLook(int32 tab, DesktopSettings& settings, window_look look,
 	Decorator::Tab* decoratorTab = fTabList.ItemAt(tab);
 	if (decoratorTab == NULL)
 		return;
+
 	_SetLook(decoratorTab, settings, look, updateRect);
 	_InvalidateFootprint();
 		// the border very likely changed
@@ -493,6 +514,15 @@ Decorator::GetFootprint()
 		fFootprintValid = true;
 	}
 	return fFootprint;
+}
+
+
+/*!	\brief Returns our Desktop object pointer
+*/
+::Desktop*
+Decorator::GetDesktop()
+{
+	return fDesktop;
 }
 
 
@@ -821,9 +851,8 @@ Decorator::DrawZoom(int32 tab)
 rgb_color
 Decorator::UIColor(color_which which)
 {
-	// TODO: for now - calling ui_color() from within the app_server
-	//	will always return the default colors (as there is no be_app)
-	return ui_color(which);
+	DesktopSettings settings(fDesktop);
+	return settings.UIColor(which);
 }
 
 

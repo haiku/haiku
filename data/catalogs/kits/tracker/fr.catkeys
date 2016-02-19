@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	2004221275
+1	french	x-vnd.Haiku-libtracker	3644595724
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Extensions
 Mount settings…	ContainerWindow		Réglages du montage…
@@ -434,7 +434,6 @@ Recent queries	FindPanel		Requêtes récentes
 Mount	ContainerWindow		Monter
 %capacity (%used used -- %free free)	InfoWindow		%capacity (%used utilisés -- %free libres)
 Cancel	FSClipBoard		Annuler
-Restart Deskbar	DeskWindow		Redémarrer la Deskbar
 Cut more	ContainerWindow		Couper plus
 Deleting: 	StatusWindow		Suppression : 
 Empty Trash	InfoWindow		Vider la corbeille

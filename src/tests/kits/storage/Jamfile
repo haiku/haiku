@@ -30,9 +30,9 @@ UnitTestLib libstoragetest.so
 
 # To run the tests some test files must be around.
 {
-	local resdir = <storage!kit!test!files>resources ;
+	local resdir = <src!tests!kits!storage>resources ;
 	MakeLocate $(resdir) : $(TARGET_UNIT_TEST_DIR) ;
-	RelSymLink $(resdir) : [ FDirName $(SUBDIR) resources ] : false ;
+	RelSymLink $(resdir) : [ FDirName $(HAIKU_TOP) src tests kits storage resources ] : false ;
 	Depends libstoragetest.so : $(resdir) ;
 }
 

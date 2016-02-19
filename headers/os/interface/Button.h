@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _BUTTON_H
@@ -20,8 +20,7 @@ public:
 public:
 								BButton(BRect frame, const char* name,
 									const char* label, BMessage* message,
-									uint32 resizingMode
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW | B_NAVIGABLE
 										| B_FULL_UPDATE_ON_RESIZE); 
 								BButton(const char* name, const char* label,

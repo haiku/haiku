@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2013, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _OUTLINE_LIST_VIEW_H
@@ -14,8 +14,7 @@ public:
 								BOutlineListView(BRect frame, const char* name,
 									list_view_type type
 										= B_SINGLE_SELECTION_LIST,
-									uint32 resizingMode
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW
 										| B_FRAME_EVENTS | B_NAVIGABLE);
 								BOutlineListView(const char* name,

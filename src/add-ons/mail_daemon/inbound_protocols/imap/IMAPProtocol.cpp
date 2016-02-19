@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2013-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -7,10 +7,13 @@
 #include "IMAPProtocol.h"
 
 #include <Directory.h>
+#include <Messenger.h>
 
 #include "IMAPConnectionWorker.h"
 #include "IMAPFolder.h"
 #include "Utilities.h"
+
+#include <mail_util.h>
 
 
 IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
@@ -26,6 +29,8 @@ IMAPProtocol::IMAPProtocol(const BMailAccountSettings& settings)
 		fprintf(stderr, "IMAP: Could not create destination directory %s: %s\n",
 			destination.Path(), strerror(status));
 	}
+
+	mutex_init(&fWorkerLock, "imap worker lock");
 
 	PostMessage(B_READY_TO_RUN);
 }
@@ -61,6 +66,8 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 	if (idle)
 		workersWanted = std::min(fSettings.MaxConnections(), totalMailboxes);
 
+	MutexLocker locker(fWorkerLock);
+
 	if (newFolders.IsEmpty() && fWorkers.CountItems() == workersWanted) {
 		// Nothing to do - we've already distributed everything
 		return B_OK;
@@ -70,6 +77,7 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 	for (int32 i = 0; i < fWorkers.CountItems(); i++) {
 		fWorkers.ItemAt(i)->RemoveAllMailboxes();
 	}
+	fWorkerMap.clear();
 
 	// Create/remove connection workers as allowed and needed
 	while (fWorkers.CountItems() < workersWanted) {
@@ -104,7 +112,11 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 	FolderMap::iterator iterator = fFolders.begin();
 	int32 index = 0;
 	for (; iterator != fFolders.end(); iterator++) {
-		fWorkers.ItemAt(index)->AddMailbox(iterator->second);
+		IMAPConnectionWorker* worker = fWorkers.ItemAt(index);
+		IMAPFolder* folder = iterator->second;
+		worker->AddMailbox(folder);
+		fWorkerMap.insert(std::make_pair(folder, worker));
+
 		index = (index + 1) % fWorkers.CountItems();
 	}
 
@@ -116,13 +128,21 @@ IMAPProtocol::CheckSubscribedFolders(IMAP::Protocol& protocol, bool idle)
 void
 IMAPProtocol::WorkerQuit(IMAPConnectionWorker* worker)
 {
+	MutexLocker locker(fWorkerLock);
 	fWorkers.RemoveItem(worker);
+
+	WorkerMap::iterator iterator = fWorkerMap.begin();
+	while (iterator != fWorkerMap.end()) {
+		WorkerMap::iterator removed = iterator++;
+		if (removed->second == worker)
+			fWorkerMap.erase(removed);
+	}
 }
 
 
 void
-IMAPProtocol::MessageStored(IMAPFolder& folder, entry_ref& ref, BFile& stream,
-	uint32 fetchFlags, BMessage& attributes)
+IMAPProtocol::MessageStored(IMAPFolder& folder, entry_ref& ref,
+	BFile& stream, uint32 fetchFlags, BMessage& attributes)
 {
 	if ((fetchFlags & (IMAP::kFetchHeader | IMAP::kFetchBody))
 			== (IMAP::kFetchHeader | IMAP::kFetchBody)) {
@@ -136,10 +156,25 @@ IMAPProtocol::MessageStored(IMAPFolder& folder, entry_ref& ref, BFile& stream,
 
 
 status_t
+IMAPProtocol::UpdateMessageFlags(IMAPFolder& folder, uint32 uid, uint32 flags)
+{
+	MutexLocker locker(fWorkerLock);
+
+	WorkerMap::const_iterator found = fWorkerMap.find(&folder);
+	if (found == fWorkerMap.end())
+		return B_ERROR;
+
+	IMAPConnectionWorker* worker = found->second;
+	return worker->EnqueueUpdateFlags(folder, uid, flags);
+}
+
+
+status_t
 IMAPProtocol::SyncMessages()
 {
 	puts("IMAP: sync");
 
+	MutexLocker locker(fWorkerLock);
 	if (fWorkers.IsEmpty()) {
 		// Create main (and possibly initial) connection worker
 		IMAPConnectionWorker* worker = new IMAPConnectionWorker(*this,
@@ -158,33 +193,9 @@ IMAPProtocol::SyncMessages()
 
 
 status_t
-IMAPProtocol::FetchBody(const entry_ref& ref)
-{
-	printf("IMAP: fetch body %s\n", ref.name);
-	return B_ERROR;
-}
-
-
-status_t
 IMAPProtocol::MarkMessageAsRead(const entry_ref& ref, read_flags flags)
 {
 	printf("IMAP: mark as read %s: %d\n", ref.name, flags);
-	return B_ERROR;
-}
-
-
-status_t
-IMAPProtocol::DeleteMessage(const entry_ref& ref)
-{
-	printf("IMAP: delete message %s\n", ref.name);
-	return B_ERROR;
-}
-
-
-status_t
-IMAPProtocol::AppendMessage(const entry_ref& ref)
-{
-	printf("IMAP: append message %s\n", ref.name);
 	return B_ERROR;
 }
 
@@ -201,6 +212,30 @@ IMAPProtocol::MessageReceived(BMessage* message)
 			BInboundMailProtocol::MessageReceived(message);
 			break;
 	}
+}
+
+
+status_t
+IMAPProtocol::HandleFetchBody(const entry_ref& ref, const BMessenger& replyTo)
+{
+	printf("IMAP: fetch body %s\n", ref.name);
+	MutexLocker locker(fWorkerLock);
+
+	IMAPFolder* folder = _FolderFor(ref.directory);
+	if (folder == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	uint32 uid;
+	status_t status = folder->GetMessageUID(ref, uid);
+	if (status != B_OK)
+		return status;
+
+	WorkerMap::const_iterator found = fWorkerMap.find(folder);
+	if (found == fWorkerMap.end())
+		return B_ERROR;
+
+	IMAPConnectionWorker* worker = found->second;
+	return worker->EnqueueFetchBody(*folder, uid, replyTo);
 }
 
 
@@ -231,6 +266,8 @@ IMAPProtocol::_CreateFolder(const BString& mailbox, const BString& separator)
 		return NULL;
 	}
 
+	CopyMailFolderAttributes(path.Path());
+
 	entry_ref ref;
 	status = get_ref_for_path(path.Path(), &ref);
 	if (status != B_OK) {
@@ -239,7 +276,27 @@ IMAPProtocol::_CreateFolder(const BString& mailbox, const BString& separator)
 		return NULL;
 	}
 
-	return new IMAPFolder(*this, mailbox, ref);
+	IMAPFolder* folder = new IMAPFolder(*this, mailbox, ref);
+	status = folder->Init();
+	if (status != B_OK) {
+		fprintf(stderr, "Initializing folder %s failed: %s\n", path.Path(),
+			strerror(status));
+		return NULL;
+	}
+
+	fFolderNodeMap.insert(std::make_pair(folder->NodeID(), folder));
+	return folder;
+}
+
+
+IMAPFolder*
+IMAPProtocol::_FolderFor(ino_t directory)
+{
+	FolderNodeMap::const_iterator found = fFolderNodeMap.find(directory);
+	if (found != fFolderNodeMap.end())
+		return found->second;
+
+	return NULL;
 }
 
 

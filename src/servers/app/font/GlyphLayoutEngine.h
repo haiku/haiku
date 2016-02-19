@@ -309,9 +309,15 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 	// glyphs from it. We need to obtain the fallback font while we have not
 	// locked anything, since locking the FontManager with the write-lock held
 	// can obvisouly lead to a deadlock.
+	
+	bool writeLocked = entry->IsWriteLocked();
 
-	cacheReference.SetTo(NULL, false);
-	entry->ReadUnlock();
+	if (writeLocked) {
+		entry->WriteUnlock();
+	} else {
+		cacheReference.SetTo(NULL, false);
+		entry->ReadUnlock();
+	}
 
 	if (gFontManager->Lock()) {
 		// TODO: We always get the fallback glyphs from VL Gothic at the
@@ -342,8 +348,10 @@ GlyphLayoutEngine::_WriteLockAndAcquireFallbackEntry(
 		return false;
 	}
 
-	// Update the FontCacheReference, since the locking kind changed.
-	cacheReference.SetTo(entry, true);
+	if (!writeLocked) {
+		// Update the FontCacheReference, since the locking kind changed.
+		cacheReference.SetTo(entry, true);
+	}
 	return true;
 }
 

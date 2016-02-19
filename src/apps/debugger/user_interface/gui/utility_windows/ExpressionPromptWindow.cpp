@@ -57,7 +57,7 @@ ExpressionPromptWindow::_Init()
 	BLayoutItem* inputItem = fExpressionInput->CreateTextViewLayoutItem();
 	inputItem->SetExplicitMinSize(BSize(200.0, B_SIZE_UNSET));
 	inputItem->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
-	labelItem->View()->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	labelItem->View()->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.SetInsets(B_USE_DEFAULT_SPACING)

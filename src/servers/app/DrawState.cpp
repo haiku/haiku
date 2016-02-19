@@ -9,6 +9,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Pfeiffer <laplace@users.sourceforge.net>
  *		Julian Harnath <julian.harnath@rwth-aachen.de>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 //!	Data classes for working with BView states and draw parameters
@@ -43,6 +44,10 @@ DrawState::DrawState()
 
 	fHighColor((rgb_color){ 0, 0, 0, 255 }),
 	fLowColor((rgb_color){ 255, 255, 255, 255 }),
+	fWhichHighColor(B_NO_COLOR),
+	fWhichLowColor(B_NO_COLOR),
+	fWhichHighColorTint(B_NO_TINT),
+	fWhichLowColorTint(B_NO_TINT),
 	fPattern(kSolidHigh),
 
 	fDrawingMode(B_OP_COPY),
@@ -78,6 +83,10 @@ DrawState::DrawState(const DrawState& other)
 
 	fHighColor(other.fHighColor),
 	fLowColor(other.fLowColor),
+	fWhichHighColor(other.fWhichHighColor),
+	fWhichLowColor(other.fWhichLowColor),
+	fWhichHighColorTint(other.fWhichHighColorTint),
+	fWhichLowColorTint(other.fWhichLowColorTint),
 	fPattern(other.fPattern),
 
 	fDrawingMode(other.fDrawingMode),
@@ -218,6 +227,10 @@ DrawState::ReadFromLink(BPrivate::LinkReceiver& link)
 	fPenSize = info.penSize;
 	fHighColor = info.highColor;
 	fLowColor = info.lowColor;
+	fWhichHighColor = info.whichHighColor;
+	fWhichLowColor = info.whichLowColor;
+	fWhichHighColorTint = info.whichHighColorTint;
+	fWhichLowColorTint = info.whichLowColorTint;
 	fPattern = info.pattern;
 	fDrawingMode = info.drawingMode;
 	fOrigin = info.origin;
@@ -283,6 +296,10 @@ DrawState::WriteToLink(BPrivate::LinkSender& link) const
 	info.viewStateInfo.penSize = fPenSize;
 	info.viewStateInfo.highColor = fHighColor;
 	info.viewStateInfo.lowColor = fLowColor;
+	info.viewStateInfo.whichHighColor = fWhichHighColor;
+	info.viewStateInfo.whichLowColor = fWhichLowColor;
+	info.viewStateInfo.whichHighColorTint = fWhichHighColorTint;
+	info.viewStateInfo.whichLowColorTint = fWhichLowColorTint;
 	info.viewStateInfo.pattern = (::pattern)fPattern.GetPattern();
 	info.viewStateInfo.drawingMode = fDrawingMode;
 	info.viewStateInfo.origin = fOrigin;
@@ -578,6 +595,42 @@ DrawState::SetLowColor(rgb_color color)
 
 
 void
+DrawState::SetHighUIColor(color_which which, float tint)
+{
+	fWhichHighColor = which;
+	fWhichHighColorTint = tint;
+}
+
+
+color_which
+DrawState::HighUIColor(float* tint) const
+{
+	if (tint != NULL)
+		*tint = fWhichHighColorTint;
+
+	return fWhichHighColor;
+}
+
+
+void
+DrawState::SetLowUIColor(color_which which, float tint)
+{
+	fWhichLowColor = which;
+	fWhichLowColorTint = tint;
+}
+
+
+color_which
+DrawState::LowUIColor(float* tint) const
+{
+	if (tint != NULL)
+		*tint = fWhichLowColorTint;
+
+	return fWhichLowColor;
+}
+
+
+void
 DrawState::SetPattern(const Pattern& pattern)
 {
 	fPattern = pattern;
@@ -760,6 +813,10 @@ DrawState::PrintToStream() const
 		fHighColor.red, fHighColor.green, fHighColor.blue, fHighColor.alpha);
 	printf("\t LowColor: r=%d g=%d b=%d a=%d\n",
 		fLowColor.red, fLowColor.green, fLowColor.blue, fLowColor.alpha);
+	printf("\t WhichHighColor: %i\n", fWhichHighColor);
+	printf("\t WhichLowColor: %i\n", fWhichLowColor);
+	printf("\t WhichHighColorTint: %.3f\n", fWhichHighColorTint);
+	printf("\t WhichLowColorTint: %.3f\n", fWhichLowColorTint);
 	printf("\t Pattern: %" B_PRIu64 "\n", fPattern.GetInt64());
 
 	printf("\t DrawMode: %" B_PRIu32 "\n", (uint32)fDrawingMode);

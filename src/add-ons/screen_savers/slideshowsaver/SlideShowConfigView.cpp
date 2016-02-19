@@ -60,7 +60,7 @@ SlideShowConfigView::SlideShowConfigView(const BRect &frame, const char *name,
 {
 	fSettings = settings;
 
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BMessage *pMsg;
 	int32 val;

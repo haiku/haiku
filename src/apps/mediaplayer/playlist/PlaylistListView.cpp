@@ -21,6 +21,7 @@
 #include "Controller.h"
 #include "ControllerObserver.h"
 #include "CopyPLItemsCommand.h"
+#include "DurationToString.h"
 #include "ImportPLItemsCommand.h"
 #include "ListViews.h"
 #include "MovePLItemsCommand.h"
@@ -132,9 +133,22 @@ PlaylistListView::Item::Draw(BView* owner, BRect frame, const font_height& fh,
 	float playbackMarkSize = playback_mark_size(fh);
 	float textOffset = text_offset(fh);
 
+	char buffer[64];
+	bigtime_t duration = fItem->Duration();
+	duration /= 1000000;
+	duration_to_string(duration, buffer, sizeof(buffer));
+
+	BString truncatedDuration(buffer);
+	owner->TruncateString(&truncatedDuration, B_TRUNCATE_END,
+		frame.Width() - playbackMarkSize - textOffset);
+	float truncatedWidth = owner->StringWidth(truncatedDuration.String());
+	owner->DrawString(truncatedDuration.String(),
+		BPoint(frame.right - truncatedWidth,
+			floorf(frame.top + frame.bottom + fh.ascent) / 2 - 1));
+
 	BString truncatedString(text);
 	owner->TruncateString(&truncatedString, B_TRUNCATE_MIDDLE,
-		frame.Width() - playbackMarkSize - textOffset);
+		frame.Width() - playbackMarkSize - textOffset - truncatedWidth);
 	owner->DrawString(truncatedString.String(),
 		BPoint(frame.left + playbackMarkSize + textOffset,
 			floorf(frame.top + frame.bottom + fh.ascent) / 2 - 1));

@@ -13,7 +13,7 @@ class TestView1 : public BView {
 	TestView1(BRect frame, const char* name, uint32 resizeFlags, uint32 flags)
 		: BView(frame, name, resizeFlags, flags)
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		SetHighColor(ViewColor());
 	}
 
@@ -40,7 +40,7 @@ class TestView2 : public BView {
 	TestView2(BRect frame, const char* name, uint32 resizeFlags, uint32 flags)
 		: BView(frame, name, resizeFlags, flags)
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		SetHighColor(ViewColor());
 	}
 
@@ -74,7 +74,7 @@ class TestView3 : public BView {
 	TestView3(BRect frame, const char* name, uint32 resizeFlags, uint32 flags)
 		: BView(frame, name, resizeFlags, flags)
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		SetHighColor(ViewColor());
 	}
 
@@ -120,7 +120,7 @@ class TestView4 : public BView {
 	TestView4(BRect frame, const char* name, uint32 resizeFlags, uint32 flags)
 		: BView(frame, name, resizeFlags, flags)
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		SetHighColor(ViewColor());
 	}
 
@@ -175,7 +175,7 @@ class TestView5 : public BView {
 	TestView5(BRect frame, const char* name, uint32 resizeFlags, uint32 flags)
 		: BView(frame, name, resizeFlags, flags)
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		SetHighColor(ViewColor());
 	}
 
@@ -213,7 +213,7 @@ class TestView6 : public BView {
 	TestView6(BRect frame, const char* name, uint32 resizeFlags, uint32 flags)
 		: BView(frame, name, resizeFlags, flags)
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		SetHighColor(ViewColor());
 	}
 

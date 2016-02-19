@@ -198,11 +198,15 @@ BCountView::Draw(BRect updateRect)
 {
 	BRect bounds(Bounds());
 
-	be_control_look->DrawBorder(this, bounds, updateRect, ViewColor(),
-		B_PLAIN_BORDER, 0,
+	rgb_color color = ViewColor();
+	if (IsTypingAhead())
+		color = ui_color(B_DOCUMENT_BACKGROUND_COLOR);
+
+	SetLowColor(color);
+	be_control_look->DrawBorder(this, bounds, updateRect,
+		ui_color(B_NAVIGATION_BASE_COLOR), B_PLAIN_BORDER, 0,
 		BControlLook::B_BOTTOM_BORDER | BControlLook::B_LEFT_BORDER);
-	be_control_look->DrawMenuBarBackground(this, bounds, updateRect,
-		ViewColor());
+	be_control_look->DrawMenuBarBackground(this, bounds, updateRect, color);
 
 	BString itemString;
 	if (IsTypingAhead())
@@ -228,10 +232,9 @@ BCountView::Draw(BRect updateRect)
 
 	if (IsTypingAhead()) {
 		// use a muted gray for the typeahead
-		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DARKEN_4_TINT));
+		SetHighColor(ui_color(B_DOCUMENT_TEXT_COLOR));
 	} else
-		SetHighColor(0, 0, 0);
+		SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 
 	MovePenTo(textRect.LeftBottom());
 	DrawString(itemString.String());
@@ -313,8 +316,8 @@ BCountView::AttachedToWindow()
 	SetFont(be_plain_font);
 	SetFontSize(9);
 
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ViewColor());
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
 
 	CheckCount();
 }

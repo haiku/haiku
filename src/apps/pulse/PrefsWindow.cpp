@@ -36,7 +36,7 @@ PrefsWindow::PrefsWindow(BRect frame, const char *name,
 	// This gives a nice look, and sets the background color correctly
 	BRect bounds = Bounds();
 	BView* topView = new BView(bounds, "ParentView", B_FOLLOW_ALL, B_WILL_DRAW);
-	topView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	topView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(topView);
 
 	bounds.top += 10;

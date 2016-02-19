@@ -236,7 +236,7 @@ PreviewWindow::PreviewWindow(BFile* jobFile)
 	r.top = top;
 	fPreview = new PreviewView(jobFile, r);
 	fPreviewScroller = new BScrollView("PreviewScroller", fPreview, B_FOLLOW_ALL, 0, true, true, B_FANCY_BORDER);
-	fPreviewScroller->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fPreviewScroller->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(fPreviewScroller);
 	
 	if (fPreview->InitCheck() == B_OK) {

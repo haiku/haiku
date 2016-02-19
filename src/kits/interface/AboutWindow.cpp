@@ -1,10 +1,11 @@
 /*
- * Copyright 2007-2012 Haiku, Inc.
+ * Copyright 2007-2015 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ryan Leavengood <leavengood@gmail.com>
  *		John Scipione <jscipione@gmail.com>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 
@@ -47,6 +48,8 @@ using BPrivate::gSystemCatalog;
 #define B_TRANSLATION_CONTEXT "AboutWindow"
 
 
+namespace BPrivate {
+
 class StripeView : public BView {
 public:
 							StripeView(BBitmap* icon);
@@ -67,6 +70,8 @@ public:
 							AboutView(const char* name,
 								const char* signature);
 	virtual					~AboutView();
+
+	virtual	void			AllAttached();
 
 			BTextView*		InfoView() const { return fInfoView; };
 
@@ -99,7 +104,7 @@ StripeView::StripeView(BBitmap* icon)
 	BView("StripeView", B_WILL_DRAW),
 	fIcon(icon)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	float width = 0.0f;
 	if (icon != NULL)
@@ -159,6 +164,7 @@ AboutView::AboutView(const char* appName, const char* signature)
 	:
 	BGroupView("AboutView", B_VERTICAL)
 {
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fNameView = new BStringView("name", appName);
 	BFont font;
 	fNameView->GetFont(&font);
@@ -176,7 +182,6 @@ AboutView::AboutView(const char* appName, const char* signature)
 	fInfoView->MakeEditable(false);
 	fInfoView->SetWordWrap(true);
 	fInfoView->SetInsets(5.0, 5.0, 5.0, 5.0);
-	fInfoView->SetViewColor(ui_color(B_DOCUMENT_BACKGROUND_COLOR));
 	fInfoView->SetStylable(true);
 
 	BScrollView* infoViewScroller = new BScrollView(
@@ -205,12 +210,22 @@ AboutView::AboutView(const char* appName, const char* signature)
 				.End()
 			.End()
 		.AddGlue()
-		.End();
+		.View()->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+
 }
 
 
 AboutView::~AboutView()
 {
+}
+
+
+void
+AboutView::AllAttached()
+{
+	fNameView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	fInfoView->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
+	fVersionView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -358,6 +373,8 @@ AboutView::SetVersion(const char* version)
 	return B_OK;
 }
 
+} // namespace BPrivate
+
 
 //	#pragma mark - BAboutWindow
 
@@ -377,7 +394,7 @@ BAboutWindow::BAboutWindow(const char* appName, const char* signature)
 	title.ReplaceFirst("%app%", appName);
 	SetTitle(title.String());
 
-	fAboutView = new AboutView(appName, signature);
+	fAboutView = new BPrivate::AboutView(appName, signature);
 	AddChild(fAboutView);
 
 	MoveTo(AboutPosition(Frame().Width(), Frame().Height()));

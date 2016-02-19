@@ -1,0 +1,22 @@
+1	slovak	x-vnd.Haiku-PSDTranslator	3654055550
+Lab	PSDLoader		Laboratórium
+Uncompressed	PSDConfig		Nekomprimovaný
+Indexed	PSDLoader		Indexovaný
+Grayscale	PSDLoader		Odtiene šedej
+Photoshop image translator	PSDConfig		Prekladač obrázkov Photoshopu
+Photoshop image translator	PSDTranslator		Prekladač obrázkov Photoshopu
+Version %d.%d.%d, %s	PSDConfig		Verzia %d.%d.%d, %s
+Photoshop Document (PSD file)	PSDConfig		Dokument Photoshop (súbor PSD)
+Photoshop image	PSDTranslator		Obrázok Photoshop
+RLE	PSDConfig		RLE
+Photoshop Big Document (PSB file)	PSDConfig		Photoshop Big Document (súbor PSB)
+RGBA	PSDLoader		RGBA
+Photoshop image (%s)	PSDTranslator		Obrázok Photoshop (%s)
+PSDTranslator Settings	PSDConfig		Nastavenia PSDTranslator
+RGB	PSDLoader		RGB
+Bitmap	PSDLoader		Bitová mapa
+CMYK	PSDLoader		CMYK
+Compression: 	PSDConfig		Kompresia: 
+Format: 	PSDConfig		Formát: 
+Multichannel	PSDLoader		Viackanálový
+Duotone	PSDLoader		Dvojtónový

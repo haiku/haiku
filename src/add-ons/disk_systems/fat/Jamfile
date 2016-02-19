@@ -11,7 +11,7 @@ Addon <disk_system>fat :
 	FATAddOn.cpp
 	InitializeParameterEditor.cpp
 
-	: be localestub [ TargetLibsupc++ ] libshared.a
+	: be localestub [ TargetLibsupc++ ] shared
 ;
 
 DoCatalogs <disk_system>fat :

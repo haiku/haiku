@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson,
-	Rudolf Cornelissen 10/2002-3/2009.
+	Rudolf Cornelissen 10/2002-1/2016.
 */
 
 #define MODULE_BIT 0x00800000
@@ -42,8 +42,8 @@ static status_t init_common(int the_fd) {
 		si->settings.logmask, si->settings.memory, si->settings.hardcursor, si->settings.usebios, si->settings.switchhead, si->settings.force_pci));
 	LOG(4,("init_common: dumprom %d, unhide_fw %d, pgm_panel %d, dma_acc %d, tv_output %d, vga_on_tv %d\n",
 		si->settings.dumprom, si->settings.unhide_fw, si->settings.pgm_panel, si->settings.dma_acc, si->settings.tv_output, si->settings.vga_on_tv));
-	LOG(4,("init_common: force_sync %d, gpu_clk %dMhz, ram_clk %dMhz, force_ws %d, block_acc %d\n",
-		si->settings.force_sync, si->settings.gpu_clk, si->settings.ram_clk, si->settings.force_ws, si->settings.block_acc));
+	LOG(4,("init_common: force_sync %d, gpu_clk %dMhz, ram_clk %dMhz, force_ws %d, block_acc %d, check_edid %d\n",
+		si->settings.force_sync, si->settings.gpu_clk, si->settings.ram_clk, si->settings.force_ws, si->settings.block_acc, si->settings.check_edid));
 
  	/*Check for R4.5.0 and if it is running, use work around*/
  	{
@@ -213,6 +213,10 @@ status_t INIT_ACCELERANT(int the_fd)
 	si->engine.threeD.mode_changing = true;
 	/* every 3D add-on will reset this bit-flag when it's done. */
 	si->engine.threeD.newmode = 0xffffffff;
+
+	/* we did not detect the Haiku ScreenPrefs app yet */
+	si->haiku_prefs_used = false;
+	si->Haiku_switch_head = false;
 
 	/* a winner! */
 	result = B_OK;

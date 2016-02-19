@@ -510,7 +510,10 @@ Painter::StrokeLine(BPoint a, BPoint b)
 		// special case dots
 		if (fPenSize == 1.0 && !fSubpixelPrecise && fIdentityTransform) {
 			if (fClippingRegion->Contains(a)) {
-				fPixelFormat.blend_pixel((int)a.x, (int)a.y, fRenderer.color(),
+				int dotX = (int)a.x;
+				int dotY = (int)a.y;
+				fBaseRenderer.translate_to_base_ren(dotX, dotY);
+				fPixelFormat.blend_pixel(dotX, dotY, fRenderer.color(),
 					255);
 			}
 		} else {

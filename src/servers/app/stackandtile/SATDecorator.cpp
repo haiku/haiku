@@ -1,5 +1,5 @@
 /*
- * Copyright 2010, Haiku, Inc.
+ * Copyright 2010-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -46,16 +46,26 @@ static const rgb_color kHighlightFrameColors[6] = {
 	{ 8, 8, 8, 255 }
 };
 
-SATDecorator::SATDecorator(DesktopSettings& settings, BRect frame)
+SATDecorator::SATDecorator(DesktopSettings& settings, BRect frame,
+							Desktop* desktop)
 	:
-	DefaultDecorator(settings, frame),
-	kHighlightTabColor(tint_color(kFocusTabColor, B_DARKEN_2_TINT)),
-	kHighlightTabColorLight(tint_color(kHighlightTabColor,
-		(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2)),
-	kHighlightTabColorBevel(tint_color(kHighlightTabColor, B_LIGHTEN_2_TINT)),
-	kHighlightTabColorShadow(tint_color(kHighlightTabColor,
-		(B_DARKEN_1_TINT + B_NO_TINT) / 2))
+	DefaultDecorator(settings, frame, desktop)
 {
+}
+
+
+void
+SATDecorator::UpdateColors(DesktopSettings& settings)
+{
+	DefaultDecorator::UpdateColors(settings);
+
+	// Called during construction, and during any changes
+	fHighlightTabColor		= tint_color(fFocusTabColor, B_DARKEN_2_TINT);
+	fHighlightTabColorLight	= tint_color(fHighlightTabColor,
+								(B_LIGHTEN_MAX_TINT + B_LIGHTEN_2_TINT) / 2);
+	fHighlightTabColorBevel	= tint_color(fHighlightTabColor, B_LIGHTEN_2_TINT);
+	fHighlightTabColorShadow= tint_color(fHighlightTabColor,
+								(B_DARKEN_1_TINT + B_NO_TINT) / 2);
 }
 
 
@@ -82,17 +92,17 @@ SATDecorator::GetComponentColors(Component component, uint8 highlight,
 		case COMPONENT_TAB:
 			_colors[COLOR_TAB_FRAME_LIGHT] = kFrameColors[0];
 			_colors[COLOR_TAB_FRAME_DARK] = kFrameColors[3];
-			_colors[COLOR_TAB] = kHighlightTabColor;
-			_colors[COLOR_TAB_LIGHT] = kHighlightTabColorLight;
-			_colors[COLOR_TAB_BEVEL] = kHighlightTabColorBevel;
-			_colors[COLOR_TAB_SHADOW] = kHighlightTabColorShadow;
-			_colors[COLOR_TAB_TEXT] = kFocusTextColor;
+			_colors[COLOR_TAB] = fHighlightTabColor;
+			_colors[COLOR_TAB_LIGHT] = fHighlightTabColorLight;
+			_colors[COLOR_TAB_BEVEL] = fHighlightTabColorBevel;
+			_colors[COLOR_TAB_SHADOW] = fHighlightTabColorShadow;
+			_colors[COLOR_TAB_TEXT] = fFocusTextColor;
 			break;
 
 		case COMPONENT_CLOSE_BUTTON:
 		case COMPONENT_ZOOM_BUTTON:
-			_colors[COLOR_BUTTON] = kHighlightTabColor;
-			_colors[COLOR_BUTTON_LIGHT] = kHighlightTabColorLight;
+			_colors[COLOR_BUTTON] = fHighlightTabColor;
+			_colors[COLOR_BUTTON_LIGHT] = fHighlightTabColorLight;
 			break;
 
 		case COMPONENT_LEFT_BORDER:

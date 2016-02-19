@@ -270,7 +270,7 @@ UninstallView::MessageReceived(BMessage* msg)
 void
 UninstallView::_InitView()
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fAppList = new BListView("pkg_list", B_SINGLE_SELECTION_LIST);
 	fAppList->SetSelectionMessage(new BMessage(P_MSG_SELECT));
@@ -284,7 +284,7 @@ UninstallView::_InitView()
 	fDescription = new BTextView("description", B_WILL_DRAW);
 	fDescription->MakeSelectable(false);
 	fDescription->MakeEditable(false);
-	fDescription->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fDescription->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fDescription->SetText(fNoPackageSelectedString);
 
 	fButton = new BButton("removal", B_TRANSLATE("Remove"),

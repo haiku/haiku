@@ -1,10 +1,11 @@
 /*
- * Copyright 2005-2012, Haiku.
+ * Copyright 2005-2016, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		Michael Lotz <mmlr@mlotz.ch>
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Axel Dörfler, axeld@pinc-software.de
+ *		Michael Lotz <mmlr@mlotz.ch>
  */
 #ifndef ACCELERANT_HW_INTERFACE_H
 #define ACCELERANT_HW_INTERFACE_H
@@ -104,6 +105,7 @@ private:
 			int					_OpenGraphicsDevice(int deviceNumber);
 			status_t			_OpenAccelerant(int device);
 			status_t			_SetupDefaultHooks();
+			void				_UpdateHooksAfterModeChange();
 			status_t			_UpdateModeList();
 			status_t			_UpdateFrameBufferConfig();
 			void				_RegionToRectParams(/*const*/ BRegion* region,

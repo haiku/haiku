@@ -130,7 +130,7 @@ NetworkWindow::NetworkWindow()
 
 	fAddOnShellView = new BView("add-on shell", 0,
 		new BGroupLayout(B_VERTICAL));
-	fAddOnShellView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fAddOnShellView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fInterfaceView = new InterfaceView();
 

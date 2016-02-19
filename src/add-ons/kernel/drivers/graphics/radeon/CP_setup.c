@@ -700,7 +700,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 				R300_PIXCLK_TRANS_ALWAYS_ONb      |
 				R300_PIXCLK_TVO_ALWAYS_ONb        |
 				R300_P2G2CLK_ALWAYS_ONb            |
-				R300_P2G2CLK_ALWAYS_ONb           |
+				R300_P2G2CLK_DAC_ALWAYS_ONb           |
 				R300_DISP_DAC_PIXCLK_DAC2_BLANK_OFF);
 			Radeon_OUTPLL(regs, asic, RADEON_PIXCLKS_CNTL, tmp);
 		}  else {
@@ -826,7 +826,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 
 				tmp = Radeon_INPLL(regs, asic, RADEON_PIXCLKS_CNTL);
 				tmp |= (RADEON_PIX2CLK_ALWAYS_ONb         |
-				RADEON_PIX2CLK_DAC_ALWAYS_ONb     |
+					RADEON_PIX2CLK_DAC_ALWAYS_ONb     |
 					RADEON_DISP_TVOUT_PIXCLK_TV_ALWAYS_ONb |
 					R300_DVOCLK_ALWAYS_ONb            |
 					RADEON_PIXCLK_BLEND_ALWAYS_ONb    |
@@ -837,7 +837,7 @@ void Radeon_SetDynamicClock( device_info *di, int mode)
 					R300_PIXCLK_TRANS_ALWAYS_ONb      |
 					R300_PIXCLK_TVO_ALWAYS_ONb        |
 					R300_P2G2CLK_ALWAYS_ONb           |
-					R300_P2G2CLK_ALWAYS_ONb);
+					R300_P2G2CLK_DAC_ALWAYS_ONb);
 				Radeon_OUTPLL(regs, asic, RADEON_PIXCLKS_CNTL, tmp);
 
 				tmp = Radeon_INPLL(regs, asic, RADEON_MCLK_MISC);

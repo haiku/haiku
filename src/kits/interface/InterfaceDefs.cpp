@@ -8,6 +8,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Michael Lotz <mmlr@mlotz.ch>
  *		Wim van der Meer <WPJvanderMeer@gmail.com>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 
@@ -39,6 +40,7 @@
 #include <ColorConversion.h>
 #include <DecorInfo.h>
 #include <DefaultColors.h>
+#include <DesktopLink.h>
 #include <InputServerTypes.h>
 #include <input_globals.h>
 #include <InterfacePrivate.h>
@@ -84,7 +86,7 @@ static const rgb_color _kDefaultColors[kColorWhichCount] = {
 	{0, 0, 0, 255},			// B_DOCUMENT_TEXT_COLOR
 	{245, 245, 245, 255},	// B_CONTROL_BACKGROUND_COLOR
 	{0, 0, 0, 255},			// B_CONTROL_TEXT_COLOR
-	{0, 0, 0, 255},			// B_CONTROL_BORDER_COLOR
+	{172, 172, 172, 255},	// B_CONTROL_BORDER_COLOR
 	{102, 152, 203, 255},	// B_CONTROL_HIGHLIGHT_COLOR
 	{0, 0, 0, 255},			// B_NAVIGATION_PULSE_COLOR
 	{255, 255, 255, 255},	// B_SHINE_COLOR
@@ -102,12 +104,60 @@ static const rgb_color _kDefaultColors[kColorWhichCount] = {
 	{0, 0, 0, 255},			// B_LIST_ITEM_TEXT_COLOR
 	{0, 0, 0, 255},			// B_LIST_SELECTED_ITEM_TEXT_COLOR
 	{216, 216, 216, 255},	// B_SCROLL_BAR_THUMB_COLOR
+	{51, 102, 187, 255},	// B_LINK_TEXT_COLOR
+	{102, 152, 203, 255},	// B_LINK_HOVER_COLOR
+	{145, 112, 155, 255},	// B_LINK_VISITED_COLOR
+	{121, 142, 203, 255},	// B_LINK_ACTIVE_COLOR
 	// 100...
 	{46, 204, 64, 255},		// B_SUCCESS_COLOR
 	{255, 65, 54, 255},		// B_FAILURE_COLOR
 	{}
 };
 const rgb_color* BPrivate::kDefaultColors = &_kDefaultColors[0];
+
+
+static const char* kColorNames[kColorWhichCount] = {
+	"B_PANEL_BACKGROUND_COLOR",
+	"B_MENU_BACKGROUND_COLOR",
+	"B_WINDOW_TAB_COLOR",
+	"B_KEYBOARD_NAVIGATION_COLOR",
+	"B_DESKTOP_COLOR",
+	"B_MENU_SELECTED_BACKGROUND_COLOR",
+	"B_MENU_ITEM_TEXT_COLOR",
+	"B_MENU_SELECTED_ITEM_TEXT_COLOR",
+	"B_MENU_SELECTED_BORDER_COLOR",
+	"B_PANEL_TEXT_COLOR",
+	"B_DOCUMENT_BACKGROUND_COLOR",
+	"B_DOCUMENT_TEXT_COLOR",
+	"B_CONTROL_BACKGROUND_COLOR",
+	"B_CONTROL_TEXT_COLOR",
+	"B_CONTROL_BORDER_COLOR",
+	"B_CONTROL_HIGHLIGHT_COLOR",
+	"B_NAVIGATION_PULSE_COLOR",
+	"B_SHINE_COLOR",
+	"B_SHADOW_COLOR",
+	"B_TOOLTIP_BACKGROUND_COLOR",
+	"B_TOOLTIP_TEXT_COLOR",
+	"B_WINDOW_TEXT_COLOR",
+	"B_WINDOW_INACTIVE_TAB_COLOR",
+	"B_WINDOW_INACTIVE_TEXT_COLOR",
+	"B_WINDOW_BORDER_COLOR",
+	"B_WINDOW_INACTIVE_BORDER_COLOR",
+	"B_CONTROL_MARK_COLOR",
+	"B_LIST_BACKGROUND_COLOR",
+	"B_LIST_SELECTED_BACKGROUND_COLOR",
+	"B_LIST_ITEM_TEXT_COLOR",
+	"B_LIST_SELECTED_ITEM_TEXT_COLOR",
+	"B_SCROLL_BAR_THUMB_COLOR",
+	"B_LINK_TEXT_COLOR",
+	"B_LINK_HOVER_COLOR",
+	"B_LINK_VISITED_COLOR",
+	"B_LINK_ACTIVE_COLOR",
+	// 100...
+	"B_SUCCESS_COLOR",
+	"B_FAILURE_COLOR",
+	NULL
+};
 
 
 namespace BPrivate {
@@ -1079,11 +1129,48 @@ ui_color(color_which which)
 	if (be_app != NULL) {
 		server_read_only_memory* shared
 			= BApplication::Private::ServerReadOnlyMemory();
-		if (shared != NULL)
+		if (shared != NULL) {
+			// check for unset colors
+			if (shared->colors[index] == B_TRANSPARENT_COLOR)
+				shared->colors[index] = kDefaultColors[index];
+
 			return shared->colors[index];
+		}
 	}
 
 	return kDefaultColors[index];
+}
+
+
+const char*
+ui_color_name(color_which which)
+{
+	// Suppress warnings for B_NO_COLOR.
+	if (which == B_NO_COLOR)
+		return NULL;
+
+	int32 index = color_which_to_index(which);
+	if (index < 0 || index >= kColorWhichCount) {
+		fprintf(stderr, "ui_color_name(): unknown color_which %d\n", which);
+		return NULL;
+	}
+
+	return kColorNames[index];
+}
+
+
+color_which
+which_ui_color(const char* name)
+{
+	if (name == NULL)
+		return B_NO_COLOR;
+
+	for (int32 index = 0; index < kColorWhichCount; ++index) {
+		if (!strcmp(kColorNames[index], name))
+			return index_to_color_which(index);
+	}
+
+	return B_NO_COLOR;
 }
 
 
@@ -1096,11 +1183,56 @@ set_ui_color(const color_which &which, const rgb_color &color)
 		return;
 	}
 
-	BPrivate::AppServerLink link;
+	if (ui_color(which) == color)
+		return;
+
+	BPrivate::DesktopLink link;
 	link.StartMessage(AS_SET_UI_COLOR);
 	link.Attach<color_which>(which);
 	link.Attach<rgb_color>(color);
 	link.Flush();
+}
+
+
+void
+set_ui_colors(const BMessage* colors)
+{
+	if (colors == NULL)
+		return;
+
+	int32 count = 0;
+	int32 index = 0;
+	char* name = NULL;
+	type_code type;
+	rgb_color color;
+	color_which which = B_NO_COLOR;
+
+	BPrivate::DesktopLink desktop;
+	if (desktop.InitCheck() != B_OK)
+		return;
+
+	desktop.StartMessage(AS_SET_UI_COLORS);
+	desktop.Attach<bool>(false);
+
+	// Only colors with names that map to system colors will get through.
+	while (colors->GetInfo(B_RGB_32_BIT_TYPE, index, &name, &type) == B_OK) {
+
+		which = which_ui_color(name);
+		++index;
+
+		if (which == B_NO_COLOR || colors->FindColor(name, &color) != B_OK)
+			continue;
+
+		desktop.Attach<color_which>(which);
+		desktop.Attach<rgb_color>(color);
+		++count;
+	}
+
+	if (count == 0)
+		return;
+
+	desktop.Attach<color_which>(B_NO_COLOR);
+	desktop.Flush();
 }
 
 

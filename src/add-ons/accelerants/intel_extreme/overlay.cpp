@@ -573,7 +573,7 @@ intel_configure_overlay(overlay_token overlayToken,
 	}
 
 	if (!gInfo->shared_info->overlay_active
-		|| memcmp(&gInfo->last_overlay_view, view, sizeof(overlay_view) != 0)
+		|| memcmp(&gInfo->last_overlay_view, view, sizeof(overlay_view)) != 0
 		|| memcmp(&gInfo->last_overlay_frame, window, sizeof(overlay_frame)) != 0) {
 		// scaling has changed, program window and scaling factor
 

@@ -96,6 +96,7 @@ private:
 		BMediaRecorder * fRecorder;
 		BSoundPlayer * fPlayer;
 		bool fRecording;
+		bool fExternalConnection;
 		SoundListView * fSoundList;
 		BDirectory fTempDir;
 		int fTempCount;

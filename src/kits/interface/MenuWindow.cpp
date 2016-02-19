@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku, Inc.
+ * Copyright 2001-2015, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -79,7 +79,7 @@ BMenuScroller::BMenuScroller(BRect frame)
 	BView(frame, "menu scroller", 0, B_WILL_DRAW | B_FRAME_EVENTS),
 	fEnabled(false)
 {
-	SetViewColor(ui_color(B_MENU_BACKGROUND_COLOR));
+	SetViewUIColor(B_MENU_BACKGROUND_COLOR);
 }
 
 

@@ -8,7 +8,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -191,8 +191,8 @@ AcpiExResolveToValue (
     if (ACPI_GET_DESCRIPTOR_TYPE (*StackPtr) == ACPI_DESC_TYPE_NAMED)
     {
         Status = AcpiExResolveNodeToValue (
-                        ACPI_CAST_INDIRECT_PTR (ACPI_NAMESPACE_NODE, StackPtr),
-                        WalkState);
+            ACPI_CAST_INDIRECT_PTR (ACPI_NAMESPACE_NODE, StackPtr),
+            WalkState);
         if (ACPI_FAILURE (Status))
         {
             return_ACPI_STATUS (Status);
@@ -251,7 +251,7 @@ AcpiExResolveObjectToValue (
              * Note: this increments the local's object reference count
              */
             Status = AcpiDsMethodDataGetValue (RefType,
-                            StackDesc->Reference.Value, WalkState, &ObjDesc);
+                StackDesc->Reference.Value, WalkState, &ObjDesc);
             if (ACPI_FAILURE (Status))
             {
                 return_ACPI_STATUS (Status);
@@ -297,7 +297,6 @@ AcpiExResolveObjectToValue (
                      * (i.e., dereference the package index)
                      * Delete the ref object, increment the returned object
                      */
-                    AcpiUtRemoveReference (StackDesc);
                     AcpiUtAddReference (ObjDesc);
                     *StackPtr = ObjDesc;
                 }
@@ -308,7 +307,8 @@ AcpiExResolveObjectToValue (
                      * the package, can't dereference it
                      */
                     ACPI_ERROR ((AE_INFO,
-                        "Attempt to dereference an Index to NULL package element Idx=%p",
+                        "Attempt to dereference an Index to "
+                        "NULL package element Idx=%p",
                         StackDesc));
                     Status = AE_AML_UNINITIALIZED_ELEMENT;
                 }
@@ -359,7 +359,8 @@ AcpiExResolveObjectToValue (
         default:
 
             ACPI_ERROR ((AE_INFO,
-                "Unknown Reference type 0x%X in %p", RefType, StackDesc));
+                "Unknown Reference type 0x%X in %p",
+                RefType, StackDesc));
             Status = AE_AML_INTERNAL;
             break;
         }
@@ -380,7 +381,8 @@ AcpiExResolveObjectToValue (
     case ACPI_TYPE_LOCAL_BANK_FIELD:
     case ACPI_TYPE_LOCAL_INDEX_FIELD:
 
-        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC, "FieldRead SourceDesc=%p Type=%X\n",
+        ACPI_DEBUG_PRINT ((ACPI_DB_EXEC,
+            "FieldRead SourceDesc=%p Type=%X\n",
             StackDesc, StackDesc->Common.Type));
 
         Status = AcpiExReadDataFromField (WalkState, StackDesc, &ObjDesc);
@@ -451,7 +453,8 @@ AcpiExResolveMultiple (
         if (Type == ACPI_TYPE_LOCAL_ALIAS)
         {
             Type = ((ACPI_NAMESPACE_NODE *) ObjDesc)->Type;
-            ObjDesc = AcpiNsGetAttachedObject ((ACPI_NAMESPACE_NODE *) ObjDesc);
+            ObjDesc = AcpiNsGetAttachedObject (
+                (ACPI_NAMESPACE_NODE *) ObjDesc);
         }
 
         if (!ObjDesc)
@@ -565,7 +568,7 @@ AcpiExResolveMultiple (
             if (ReturnDesc)
             {
                 Status = AcpiDsMethodDataGetValue (ObjDesc->Reference.Class,
-                            ObjDesc->Reference.Value, WalkState, &ObjDesc);
+                    ObjDesc->Reference.Value, WalkState, &ObjDesc);
                 if (ACPI_FAILURE (Status))
                 {
                     return_ACPI_STATUS (Status);
@@ -575,7 +578,7 @@ AcpiExResolveMultiple (
             else
             {
                 Status = AcpiDsMethodDataGetNode (ObjDesc->Reference.Class,
-                            ObjDesc->Reference.Value, WalkState, &Node);
+                    ObjDesc->Reference.Value, WalkState, &Node);
                 if (ACPI_FAILURE (Status))
                 {
                     return_ACPI_STATUS (Status);
@@ -600,7 +603,8 @@ AcpiExResolveMultiple (
         default:
 
             ACPI_ERROR ((AE_INFO,
-                "Unknown Reference Class 0x%2.2X", ObjDesc->Reference.Class));
+                "Unknown Reference Class 0x%2.2X",
+                ObjDesc->Reference.Class));
             return_ACPI_STATUS (AE_AML_INTERNAL);
         }
     }

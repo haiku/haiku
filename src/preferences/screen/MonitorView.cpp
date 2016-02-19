@@ -47,10 +47,7 @@ void
 MonitorView::AttachedToWindow()
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
-	if (Parent())
-		fBackgroundColor = Parent()->ViewColor();
-	else
-		fBackgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
+	fBackgroundColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 
 	_UpdateDPI();
 }
@@ -156,6 +153,12 @@ void
 MonitorView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_COLORS_UPDATED:
+		{
+			message->FindColor(ui_color_name(B_PANEL_BACKGROUND_COLOR),
+				&fBackgroundColor);
+			break;
+		}
 		case UPDATE_DESKTOP_MSG:
 		{
 			int32 width, height;

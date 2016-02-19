@@ -1,5 +1,6 @@
 /*
  * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
+ * Copyright 2015, Haiku, Inc.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -20,7 +21,6 @@ BSplitView::BSplitView(orientation orientation, float spacing)
 		B_WILL_DRAW | B_FULL_UPDATE_ON_RESIZE | B_INVALIDATE_AFTER_LAYOUT,
 		fSplitLayout = new BSplitLayout(orientation, spacing))
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 }
 
 
@@ -233,6 +233,13 @@ bool
 BSplitView::AddChild(int32 index, BLayoutItem* child, float weight)
 {
 	return fSplitLayout->AddItem(index, child, weight);
+}
+
+
+void
+BSplitView::AttachedToWindow()
+{
+	AdoptParentColors();
 }
 
 

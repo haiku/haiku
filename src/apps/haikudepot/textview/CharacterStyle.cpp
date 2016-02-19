@@ -239,6 +239,18 @@ CharacterStyle::SetForegroundColor(uint8 r, uint8 g, uint8 b, uint8 a)
 
 
 bool
+CharacterStyle::SetForegroundColor(color_which which)
+{
+	CharacterStyleDataRef data = fStyleData->SetForegroundColor(which);
+	if (data == fStyleData)
+		return data->WhichForegroundColor() == which;
+
+	fStyleData = data;
+	return true;
+}
+
+
+bool
 CharacterStyle::SetForegroundColor(rgb_color color)
 {
 	CharacterStyleDataRef data = fStyleData->SetForegroundColor(color);
@@ -257,10 +269,29 @@ CharacterStyle::ForegroundColor() const
 }
 
 
+color_which
+CharacterStyle::WhichForegroundColor() const
+{
+	return fStyleData->WhichForegroundColor();
+}
+
+
 bool
 CharacterStyle::SetBackgroundColor(uint8 r, uint8 g, uint8 b, uint8 a)
 {
 	return SetBackgroundColor((rgb_color){ r, g, b, a });
+}
+
+
+bool
+CharacterStyle::SetBackgroundColor(color_which which)
+{
+	CharacterStyleDataRef data = fStyleData->SetBackgroundColor(which);
+	if (data == fStyleData)
+		return data->WhichBackgroundColor() == which;
+
+	fStyleData = data;
+	return true;
 }
 
 
@@ -283,6 +314,25 @@ CharacterStyle::BackgroundColor() const
 }
 
 
+color_which
+CharacterStyle::WhichBackgroundColor() const
+{
+	return fStyleData->WhichBackgroundColor();
+}
+
+
+bool
+CharacterStyle::SetStrikeOutColor(color_which which)
+{
+	CharacterStyleDataRef data = fStyleData->SetStrikeOutColor(which);
+	if (data == fStyleData)
+		return data->WhichStrikeOutColor() == which;
+
+	fStyleData = data;
+	return true;
+}
+
+
 bool
 CharacterStyle::SetStrikeOutColor(rgb_color color)
 {
@@ -302,6 +352,25 @@ CharacterStyle::StrikeOutColor() const
 }
 
 
+color_which
+CharacterStyle::WhichStrikeOutColor() const
+{
+	return fStyleData->WhichStrikeOutColor();
+}
+
+
+bool
+CharacterStyle::SetUnderlineColor(color_which which)
+{
+	CharacterStyleDataRef data = fStyleData->SetUnderlineColor(which);
+	if (data == fStyleData)
+		return data->WhichUnderlineColor() == which;
+
+	fStyleData = data;
+	return true;
+}
+
+
 bool
 CharacterStyle::SetUnderlineColor(rgb_color color)
 {
@@ -318,6 +387,13 @@ rgb_color
 CharacterStyle::UnderlineColor() const
 {
 	return fStyleData->UnderlineColor();
+}
+
+
+color_which
+CharacterStyle::WhichUnderlineColor() const
+{
+	return fStyleData->WhichUnderlineColor();
 }
 
 

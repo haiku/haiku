@@ -13,7 +13,7 @@ BGridView::BGridView(float horizontalSpacing, float verticalSpacing)
 	:
 	BView(NULL, 0, new BGridLayout(horizontalSpacing, verticalSpacing))
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AdoptSystemColors();
 }
 
 
@@ -22,7 +22,7 @@ BGridView::BGridView(const char* name, float horizontalSpacing,
 	:
 	BView(name, 0, new BGridLayout(horizontalSpacing, verticalSpacing))
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AdoptSystemColors();
 }
 
 

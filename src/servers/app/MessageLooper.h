@@ -22,7 +22,9 @@ class MessageLooper : public BLocker {
 		virtual	bool	Run();
 		virtual	void	Quit();
 
-		status_t		PostMessage(int32 code, bigtime_t timeout = B_INFINITE_TIMEOUT);
+		status_t		PostMessage(int32 code,
+							bigtime_t timeout = B_INFINITE_TIMEOUT);
+
 		thread_id		Thread() const { return fThread; }
 		bool			IsQuitting() const { return fQuitting; }
 		sem_id			DeathSemaphore() const { return fDeathSemaphore; }

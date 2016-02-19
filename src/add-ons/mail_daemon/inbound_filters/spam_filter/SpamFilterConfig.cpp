@@ -77,7 +77,7 @@ SpamFilterConfig::SpamFilterConfig(const BMessage* settings)
 	if (settings->FindFloat("SpamCutoffRatio", &fSpamCutoffRatio) != B_OK)
 		fSpamCutoffRatio = 0.99f;
 
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fSubjectHintCheckBox = new BCheckBox("AddToSubject",
 		B_TRANSLATE("Add spam rating to start of subject"), NULL);

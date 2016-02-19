@@ -19,6 +19,7 @@
 #include <String.h>
 #include <TextView.h>
 
+
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Main view"
 
@@ -40,7 +41,9 @@ OverlayView::OverlayView(BRect frame)
 	SetViewColor(B_TRANSPARENT_COLOR);
 	
 	fText = new BTextView(Bounds(), "bgView", Bounds(), B_FOLLOW_ALL, B_WILL_DRAW);
-	fText->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fText->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	rgb_color color = ui_color(B_PANEL_TEXT_COLOR);
+	fText->SetFontAndColor(be_plain_font, B_FONT_ALL, &color);
 	AddChild(fText);
 	BString text;
 	text << B_TRANSLATE(
@@ -117,7 +120,14 @@ OverlayView::MessageReceived(BMessage *msg)
 	    case B_ABOUT_REQUESTED:
 	      	OverlayAboutRequested(); 
     		break; 
-	
+		case B_COLORS_UPDATED:
+		{
+			rgb_color color;
+			if (msg->FindColor(ui_color_name(B_PANEL_TEXT_COLOR), &color)
+					== B_OK)
+				fText->SetFontAndColor(be_plain_font, B_FONT_ALL, &color);
+			break;
+		}
 		default:
 			BView::MessageReceived(msg);
 			break;

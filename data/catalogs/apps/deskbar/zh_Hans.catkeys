@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-TSKB	2335730970
+1	english	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		关闭电源
 Sort applications by name	PreferencesWindow		按名称排序
 Suspend	DeskbarMenu		挂起
@@ -27,7 +27,6 @@ Large	PreferencesWindow		大
 Auto-raise	PreferencesWindow		自动
 Recent folders:	PreferencesWindow		最近文件夹：
 Show application expander	PreferencesWindow		显示程序扩展
-Restart Tracker	DeskbarMenu		重启文件浏览器
 Close all	WindowMenu		关闭所有
 Deskbar preferences	PreferencesWindow		桌面栏首选项
 Mount	DeskbarMenu		挂载

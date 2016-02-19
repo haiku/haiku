@@ -61,13 +61,16 @@ public:
 			status_t			AddImageRef(const entry_ref& ref);
 			const entry_ref&	ImageRef() const;
 
+protected:
+	virtual	bigtime_t			_CalculateDuration() const;
+
 private:
 			status_t			_SetAttribute(const char* attrName,
 									type_code type, const void* data,
 									size_t size);
 			status_t			_GetAttribute(const char* attrName,
 									type_code type, void* data,
-									size_t size);
+									size_t size) const;
 			status_t			_MoveIntoTrash(vector<entry_ref>* refs,
 									vector<BString>* namesInTrash);
 			status_t			_RestoreFromTrash(vector<entry_ref>* refs,

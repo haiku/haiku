@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc.
+ * Copyright 2001-2015 Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,6 +10,7 @@
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, ingo_weinhold@gmx.de
  *		Clemens Zeidler, haiku@clemens-zeidler.de
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 #ifndef TAB_DECORATOR_H
 #define TAB_DECORATOR_H
@@ -26,7 +27,7 @@ class Desktop;
 class TabDecorator: public Decorator {
 public:
 								TabDecorator(DesktopSettings& settings,
-									BRect frame);
+									BRect frame, Desktop* desktop);
 	virtual						~TabDecorator();
 
 protected:
@@ -70,6 +71,8 @@ public:
 	virtual	bool				SetRegionHighlight(Region region,
 									uint8 highlight, BRegion* dirty,
 									int32 tab = -1);
+
+	virtual void				UpdateColors(DesktopSettings& settings);
 
 protected:
 	virtual	void				_DoLayout();
@@ -132,21 +135,21 @@ protected:
 			BRegion				fTabsRegion;
 			BRect				fOldMovingTab;
 
-			const rgb_color		kFocusFrameColor;
+			rgb_color			fFocusFrameColor;
 
-			const rgb_color		kFocusTabColor;
-			const rgb_color		kFocusTabColorLight;
-			const rgb_color		kFocusTabColorBevel;
-			const rgb_color		kFocusTabColorShadow;
-			const rgb_color		kFocusTextColor;
+			rgb_color			fFocusTabColor;
+			rgb_color			fFocusTabColorLight;
+			rgb_color			fFocusTabColorBevel;
+			rgb_color			fFocusTabColorShadow;
+			rgb_color			fFocusTextColor;
 
-			const rgb_color		kNonFocusFrameColor;
+			rgb_color			fNonFocusFrameColor;
 
-			const rgb_color		kNonFocusTabColor;
-			const rgb_color		kNonFocusTabColorLight;
-			const rgb_color		kNonFocusTabColorBevel;
-			const rgb_color		kNonFocusTabColorShadow;
-			const rgb_color		kNonFocusTextColor;
+			rgb_color			fNonFocusTabColor;
+			rgb_color			fNonFocusTabColorLight;
+			rgb_color			fNonFocusTabColorBevel;
+			rgb_color			fNonFocusTabColorShadow;
+			rgb_color			fNonFocusTextColor;
 };
 
 

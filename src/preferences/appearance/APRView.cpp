@@ -1,11 +1,12 @@
 /*
- * Copyright 2002-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, darkwyrm@earthlink.net
  *		Rene Gollent, rene@gollent.com
  *		John Scipione, jscipione@gmail.com
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 
@@ -27,7 +28,7 @@
 #include "APRWindow.h"
 #include "defs.h"
 #include "ColorPreview.h"
-#include "ColorSet.h"
+#include "Colors.h"
 #include "ColorWhichItem.h"
 
 
@@ -40,10 +41,9 @@
 
 APRView::APRView(const char* name)
 	:
-	BView(name, B_WILL_DRAW),
-	fDefaultSet(ColorSet::DefaultColorSet())
+	BView(name, B_WILL_DRAW)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 #if 0
 	fDecorMenu = new BMenu("Window Style");
@@ -77,15 +77,14 @@ APRView::APRView(const char* name)
 	fAttrList = new BListView("AttributeList", B_SINGLE_SELECTION_LIST);
 
 	fScrollView = new BScrollView("ScrollView", fAttrList, 0, false, true);
-	fScrollView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	fScrollView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	int32 count = color_description_count();
 	for (int32 i = 0; i < count; i++) {
 		const ColorDescription& description = *get_color_description(i);
 		const char* text = B_TRANSLATE_NOCOLLECT(description.text);
 		color_which which = description.which;
-		fAttrList->AddItem(new ColorWhichItem(text, which,
-			fCurrentSet.GetColor(which)));
+		fAttrList->AddItem(new ColorWhichItem(text, which, ui_color(which)));
 	}
 
 	BRect wellrect(0, 0, 50, 50);
@@ -123,6 +122,7 @@ APRView::AttachedToWindow()
 	fColorPreview->SetTarget(this);
 
 	fAttrList->Select(0);
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -162,7 +162,7 @@ APRView::MessageReceived(BMessage *msg)
 				break;
 
 			fWhich = item->ColorWhich();
-			rgb_color color = fCurrentSet.GetColor(fWhich);
+			rgb_color color = ui_color(fWhich);
 			_SetCurrentColor(color);
 			break;
 		}
@@ -177,24 +177,22 @@ APRView::MessageReceived(BMessage *msg)
 void
 APRView::LoadSettings()
 {
-	int32 count = color_description_count();
-	for (int32 i = 0; i < count; i++) {
-		color_which which = get_color_description(i)->which;
-		fCurrentSet.SetColor(which, ui_color(which));
-	}
-
-	fPrevSet = fCurrentSet;
+	get_default_colors(&fDefaultColors);
+	get_current_colors(&fCurrentColors);
+	fPrevColors = fCurrentColors;
 }
 
 
 void
 APRView::SetDefaults()
 {
-	fCurrentSet = ColorSet::DefaultColorSet();
+	_SetUIColors(fDefaultColors);
+	_UpdatePreviews(fDefaultColors);
 
-	_UpdateAllColors();
+	// Use a default color that stands out to show errors clearly
+	rgb_color color = fDefaultColors.GetColor(ui_color_name(fWhich),
+		make_color(255, 0, 255));
 
-	rgb_color color = fCurrentSet.GetColor(fWhich);
 	fPicker->SetValue(color);
 	fColorPreview->SetColor(color);
 	fColorPreview->Invalidate();
@@ -206,11 +204,11 @@ APRView::SetDefaults()
 void
 APRView::Revert()
 {
-	fCurrentSet = fPrevSet;
+	_SetUIColors(fPrevColors);
+	_UpdatePreviews(fPrevColors);
 
-	_UpdateAllColors();
-
-	rgb_color color = fCurrentSet.GetColor(fWhich);
+	rgb_color color = fPrevColors.GetColor(ui_color_name(fWhich),
+		make_color(255, 0, 255));
 	fPicker->SetValue(color);
 	fColorPreview->SetColor(color);
 	fColorPreview->Invalidate();
@@ -222,34 +220,22 @@ APRView::Revert()
 bool
 APRView::IsDefaultable()
 {
-	for (int32 i = color_description_count() - 1; i >= 0; i--) {
-		color_which which = get_color_description(i)->which;
-		if (fCurrentSet.GetColor(which) != fDefaultSet.GetColor(which))
-			return true;
-	}
-
-	return false;
+	return !fDefaultColors.HasSameData(fCurrentColors);
 }
 
 
 bool
 APRView::IsRevertable()
 {
-	for (int32 i = color_description_count() - 1; i >= 0; i--) {
-		color_which which = get_color_description(i)->which;
-		if (fCurrentSet.GetColor(which) != fPrevSet.GetColor(which))
-			return true;
-	}
-
-	return false;
+	return !fPrevColors.HasSameData(fCurrentColors);
 }
 
 
 void
 APRView::_SetCurrentColor(rgb_color color)
 {
-	fCurrentSet.SetColor(fWhich, color);
 	set_ui_color(fWhich, color);
+	fCurrentColors.SetColor(ui_color_name(fWhich), color);
 
 	int32 currentIndex = fAttrList->CurrentSelection();
 	ColorWhichItem* item = (ColorWhichItem*)fAttrList->ItemAt(currentIndex);
@@ -265,13 +251,26 @@ APRView::_SetCurrentColor(rgb_color color)
 
 
 void
-APRView::_UpdateAllColors()
+APRView::_SetUIColors(const BMessage& colors)
 {
+	set_ui_colors(&colors);
+	fCurrentColors = colors;
+}
+
+
+void
+APRView::_UpdatePreviews(const BMessage& colors)
+{
+	rgb_color color;
 	for (int32 i = color_description_count() - 1; i >= 0; i--) {
-		color_which which = get_color_description(i)->which;
-		rgb_color color = fCurrentSet.GetColor(which);
-		set_ui_color(which, color);
-		static_cast<ColorWhichItem*>(fAttrList->ItemAt(i))->SetColor(color);
+		ColorWhichItem* item = static_cast<ColorWhichItem*>(fAttrList->ItemAt(i));
+		if (item == NULL)
+			continue;
+
+		color = colors.GetColor(ui_color_name(get_color_description(i)->which),
+			make_color(255, 0, 255));
+
+		item->SetColor(color);
 		fAttrList->InvalidateItem(i);
 	}
 }

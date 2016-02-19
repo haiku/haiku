@@ -297,7 +297,8 @@ TrackerSettingsWindow::_HandleChangedSettingsView()
 		fSettingsContainerBox->SetLabel(selectedItem->Text());
 
 		BView* view = selectedItem->View();
-		view->SetViewColor(fSettingsContainerBox->ViewColor());
+		float tint = B_NO_TINT;
+		view->SetViewUIColor(fSettingsContainerBox->ViewUIColor(&tint), tint);
 		view->Hide();
 		fSettingsContainerBox->AddChild(view);
 

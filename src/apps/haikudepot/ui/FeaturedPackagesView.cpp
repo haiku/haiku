@@ -44,7 +44,8 @@ public:
 			new(std::nothrow) OnePackageMessagePackageListener(this)),
 		fSelected(false)
 	{
-		SetViewColor(255, 255, 255);
+		SetViewUIColor(B_LIST_BACKGROUND_COLOR);
+		SetHighUIColor(B_LIST_ITEM_TEXT_COLOR);
 		SetEventMask(B_POINTER_EVENTS);
 
 		fIconView = new BitmapView("package icon view");
@@ -67,25 +68,27 @@ public:
 		font.SetSize(std::max(9.0f, floorf(font.Size() * 0.92f)));
 		font.SetFamilyAndStyle(family, "Italic");
 		fPublisherView->SetFont(&font);
-		fPublisherView->SetHighColor(kLightBlack);
 
 		// Summary text view
-		fSummaryView = new MarkupTextView("package summary");
-		fSummaryView->SetSelectionEnabled(false);
+		fSummaryView = new BTextView("package summary");
+		fSummaryView->MakeSelectable(false);
+		fSummaryView->MakeEditable(false);
+		font = BFont(be_plain_font);
+		rgb_color color = HighColor();
+		fSummaryView->SetFontAndColor(&font, B_FONT_ALL, &color);
 
 		// Rating view
 		fRatingView = new RatingView("package rating view");
 
 		fAvgRating = new BStringView("package average rating", "");
 		fAvgRating->SetFont(&font);
-		fAvgRating->SetHighColor(kLightBlack);
 
 		fVoteInfo = new BStringView("package vote info", "");
 		// small font
 		GetFont(&font);
 		font.SetSize(std::max(9.0f, floorf(font.Size() * 0.85f)));
 		fVoteInfo->SetFont(&font);
-		fVoteInfo->SetHighColor(kLightBlack);
+		fVoteInfo->SetHighUIColor(HighUIColor());
 
 		BLayoutBuilder::Group<>(this)
 			.Add(fIconView)
@@ -119,6 +122,15 @@ public:
 		delete fPackageListener;
 	}
 
+	virtual void AllAttached()
+	{
+		for (int32 index = 0; index < CountChildren(); ++index) {
+			ChildAt(index)->SetViewUIColor(ViewUIColor());
+			ChildAt(index)->SetLowUIColor(ViewUIColor());
+			ChildAt(index)->SetHighUIColor(HighUIColor());
+		}
+	}
+
 	virtual void MessageReceived(BMessage* message)
 	{
 		switch (message->what) {
@@ -129,6 +141,13 @@ public:
 			case MSG_UPDATE_PACKAGE:
 				SetPackage(fPackageListener->Package());
 				break;
+
+			case B_COLORS_UPDATED:
+			{
+				if (message->HasColor(ui_color_name(B_LIST_ITEM_TEXT_COLOR)))
+					_UpdateColors();
+				break;
+			}
 		}
 	}
 
@@ -227,11 +246,18 @@ public:
 			return;
 		fSelected = selected;
 
-		rgb_color bgColor;
-		if (fSelected)
-			bgColor = ui_color(B_LIST_SELECTED_BACKGROUND_COLOR);
-		else
-			bgColor = (rgb_color){ 255, 255, 255, 255 };
+		_UpdateColors();
+	}
+
+	void _UpdateColors()
+	{
+		color_which bgColor = B_LIST_BACKGROUND_COLOR;
+		color_which textColor = B_LIST_ITEM_TEXT_COLOR;
+
+		if (fSelected) {
+			bgColor = B_LIST_SELECTED_BACKGROUND_COLOR;
+			textColor = B_LIST_SELECTED_ITEM_TEXT_COLOR;
+		}
 
 		List<BView*, true> views;
 
@@ -248,10 +274,15 @@ public:
 		for (int32 i = 0; i < views.CountItems(); i++) {
 			BView* view = views.ItemAtFast(i);
 
-			view->SetViewColor(bgColor);
-			view->SetLowColor(bgColor);
+			view->SetViewUIColor(bgColor);
+			view->SetLowUIColor(bgColor);
+			view->SetHighUIColor(textColor);
 			view->Invalidate();
 		}
+
+		BFont font(be_plain_font);
+		rgb_color color = HighColor();
+		fSummaryView->SetFontAndColor(&font, B_FONT_ALL, &color);
 	}
 
 private:
@@ -263,7 +294,7 @@ private:
 	BStringView*					fTitleView;
 	BStringView*					fPublisherView;
 
-	MarkupTextView*					fSummaryView;
+	BTextView*						fSummaryView;
 
 	RatingView*						fRatingView;
 	BStringView*					fAvgRating;
@@ -286,7 +317,7 @@ FeaturedPackagesView::FeaturedPackagesView()
 	SetLayout(layout);
 
 	ScrollableGroupView* containerView = new ScrollableGroupView();
-	containerView->SetViewColor(255, 255, 255);
+	containerView->SetViewUIColor(B_LIST_BACKGROUND_COLOR);
 	fPackageListLayout = containerView->GroupLayout();
 
 	BScrollView* scrollView = new BScrollView(

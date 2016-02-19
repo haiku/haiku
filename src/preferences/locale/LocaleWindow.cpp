@@ -111,11 +111,10 @@ LocaleWindow::LocaleWindow()
 			BLanguage currentLanguage(currentID.String());
 			currentLanguage.GetNativeName(name);
 
-			// TODO: the following block fails to detect a couple of language
-			// names as containing glyphs we can't render. Why's that?
-			bool hasGlyphs[name.CountChars()];
-			font.GetHasGlyphs(name.String(), name.CountChars(), hasGlyphs);
-			for (int32 i = 0; i < name.CountChars(); ++i) {
+			int nameLength = name.CountChars();
+			bool hasGlyphs[nameLength];
+			font.GetHasGlyphs(name.String(), nameLength, hasGlyphs);
+			for (int32 i = 0; i < nameLength; ++i) {
 				if (!hasGlyphs[i]) {
 					// replace by name translated to current language
 					currentLanguage.GetName(name);
@@ -131,10 +130,17 @@ LocaleWindow::LocaleWindow()
 				item = new LanguageListItem(name, currentID.String(),
 					currentLanguage.Code());
 			}
+
 			if (currentLanguage.IsCountrySpecific()
 				&& currentToplevelItem != NULL
 				&& currentToplevelItem->Code() == item->Code()) {
 				fLanguageListView->AddUnder(item, currentToplevelItem);
+			} else if (currentLanguage.ScriptCode() != NULL
+				&& currentToplevelItem != NULL
+				&& currentToplevelItem->Code() == item->Code()) {
+				// This is a script for some language, skip it and add the
+				// country-specific variants to the parent directly
+				delete item;
 			} else {
 				// This is a generic language, add it at top-level
 				fLanguageListView->AddItem(item);

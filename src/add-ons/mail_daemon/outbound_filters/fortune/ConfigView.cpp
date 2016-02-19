@@ -26,7 +26,7 @@ ConfigView::ConfigView()
 	:
 	BMailSettingsView("fortune_filter")
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fFileView = new MailFileConfigView(B_TRANSLATE("Fortune file:"),
 		"fortune_file", false, "", B_FILE_NODE);

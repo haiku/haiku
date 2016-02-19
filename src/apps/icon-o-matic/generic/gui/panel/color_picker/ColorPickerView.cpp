@@ -47,7 +47,7 @@ ColorPickerView::ColorPickerView(const char* name, rgb_color color,
 	b((float)color.blue / 255.0),
 	fRequiresUpdate(false)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	RGB_to_HSV(r, g, b, h, s, v);
 

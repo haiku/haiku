@@ -10,6 +10,8 @@
 #define PROPERTY_LIST_PLAIN_H
 
 
+#include <ObjectList.h>
+#include <TextView.h>
 #include <View.h>
 
 #include "Device.h"
@@ -28,6 +30,7 @@ public:
 	virtual	void	DetachedFromWindow();
 private:
 	BView*			rootView;
+	BObjectList<BTextView> fAttributeViews;
 };
 
 #endif /* PROPERTY_LIST_PLAIN_H */

@@ -272,7 +272,7 @@ public:
 
 			void				InvalidateLayout(bool descendants = false);
 			void				Layout(bool force);
-
+			bool				IsOffscreenWindow() const;
 private:
 	// FBC padding and forbidden methods
 	virtual	void				_ReservedWindow2();

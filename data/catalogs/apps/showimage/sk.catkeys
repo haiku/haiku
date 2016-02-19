@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-ShowImage	466377502
+1	slovak	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Použiť ako pozadie…
 File	Menus		Súbor
 Slide delay	Menus		Oneskorenie snímku
@@ -52,6 +52,7 @@ Select all	Menus		Vybrať všetky
 Zoom factor in %:	PrintOptionsWindow		Priblíženie v %:
 Width:	PrintOptionsWindow		Šírka:
 Image	Menus		Obrázok
+Move to Trash	Menus		Presunúť do Koša
 OK	Alerts		OK
 Rotate clockwise	Menus		Otočiť v smere hodinových ručičiek
 Job setup	PrintOptionsWindow		Nastavenie úlohy

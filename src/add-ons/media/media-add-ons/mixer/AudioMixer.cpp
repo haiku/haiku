@@ -321,26 +321,31 @@ AudioMixer::BufferReceived(BBuffer *buffer)
 void
 AudioMixer::HandleInputBuffer(BBuffer* buffer, bigtime_t lateness)
 {
-	if (lateness > kMaxJitter && lateness > fLastLateness) {
-		debug_printf("AudioMixer: Dequeued input buffer %" B_PRIdBIGTIME
+	bigtime_t variation = 0;
+	if (lateness > fLastLateness)
+		variation = lateness-fLastLateness;
+
+	if (variation > kMaxJitter) {
+		TRACE("AudioMixer: Dequeued input buffer %" B_PRIdBIGTIME
 			" usec late\n", lateness);
 		if (RunMode() == B_DROP_DATA || RunMode() == B_DECREASE_PRECISION
 			|| RunMode() == B_INCREASE_LATENCY) {
-			debug_printf("AudioMixer: sending notify\n");
+			TRACE("AudioMixer: sending notify\n");
 
 			// Build a media_source out of the header data
 			media_source source = media_source::null;
 			source.port = buffer->Header()->source_port;
 			source.id = buffer->Header()->source;
 
-			NotifyLateProducer(source, lateness, TimeSource()->Now());
+			NotifyLateProducer(source, variation, TimeSource()->Now());
 
 			if (RunMode() == B_DROP_DATA) {
-				debug_printf("AudioMixer: dropping buffer\n");
+				TRACE("AudioMixer: dropping buffer\n");
 				return;
 			}
 		}
 	}
+
 	fLastLateness = lateness;
 
 	fCore->Lock();
@@ -1038,7 +1043,7 @@ AudioMixer::LateNoticeReceived(const media_source& what, bigtime_t howMuch,
 
 		fLastLateNotification = TimeSource()->Now() + howMuch;
 
-		debug_printf("AudioMixer: increasing internal latency to %"
+		TRACE("AudioMixer: increasing internal latency to %"
 			B_PRIdBIGTIME " usec\n", fInternalLatency);
 		SetEventLatency(fDownstreamLatency + fInternalLatency);
 

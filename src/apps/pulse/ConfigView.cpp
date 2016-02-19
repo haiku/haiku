@@ -198,10 +198,10 @@ ConfigView::AttachedToWindow()
 	// AttachedToWindow() gets called every time this tab is brought
 	// to the front, but we only want this initialization to happen once
 	if (fFirstTimeAttached) {
-		if (Parent() != NULL)
-			SetViewColor(Parent()->ViewColor());
-		else
-			SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		AdoptParentColors();
+
+		if (Parent() == NULL)
+			SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 		BMessenger messenger(this);
 		fColorControl->SetTarget(messenger);

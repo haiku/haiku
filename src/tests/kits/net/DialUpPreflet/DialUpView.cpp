@@ -85,7 +85,7 @@ DialUpView::DialUpView(BRect frame)
 {
 	BRect bounds = Bounds();
 		// for caching
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	
 	// add messenger to us so add-ons can contact us
 	BMessenger messenger(this);

@@ -51,12 +51,12 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Box.cpp
 			Button.cpp
 			CardLayout.cpp
+			CardView.cpp
 			ChannelControl.cpp
 			ChannelSlider.cpp
 			CheckBox.cpp
 			ColorConversion.cpp
 			ColorControl.cpp
-			ColorTools.cpp
 			Control.cpp
 			ControlLook.cpp
 			DecorInfo.cpp
@@ -155,7 +155,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			OneElementLayouter.cpp
 			SimpleLayouter.cpp
 
-			: [ MultiArchDefaultGristFiles libshared.a ]
+			: <$(architecture)>libshared.a
 			;
 
 		StaticLibrary [ MultiArchDefaultGristFiles libcolumnlistview.a ] :

@@ -576,7 +576,7 @@ ActivityView::ActivityView(const char* name, const BMessage* settings)
 #endif
 	fSourcesLock("data sources")
 {
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	_Init(settings);
 
@@ -1121,7 +1121,6 @@ ActivityView::MessageReceived(BMessage* message)
 
 			break;
 		}
-
 		case kMsgUpdateResolution:
 		{
 			int32 resolution;
@@ -1479,7 +1478,9 @@ ActivityView::Draw(BRect updateRect)
 
 	// draw legend
 	BRect legendFrame = _LegendFrame();
-	SetLowColor(fLegendBackgroundColor);
+	if (LowUIColor() == B_NO_COLOR)
+		SetLowColor(fLegendBackgroundColor);
+
 	if (drawBackground) {
 		BRect backgroundFrame(legendFrame);
 		backgroundFrame.bottom += kDraggerSize;
@@ -1520,7 +1521,7 @@ ActivityView::Draw(BRect updateRect)
 		TruncateString(&label, B_TRUNCATE_MIDDLE, possibleLabelWidth);
 
 		if (drawBackground)
-			SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
+			SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 
 		if (be_control_look == NULL) {
 			DrawString(label.String(), BPoint(6 + colorBox.right, y));

@@ -30,6 +30,7 @@ pgm_panel	false		# if false don't program DVI and laptop panel pixelclocks (refr
 vga_on_tv	false		# if true enables VGA output on the head outputting to TV
 #gpu_clk	150			# in Mhz, (tries to) override default GPU clockspeed (be carefull!!!)
 #ram_clk	150			# in Mhz, (tries to) override default cardRAM clockspeed (be carefull!!!)
+check_edid	true			# if true blocks resolutions beyond monitor(s) capabilities
 
 #--------- that's all.
 

@@ -42,7 +42,7 @@ public:
 		BView("KeyRequestView", B_WILL_DRAW),
 		fPassword(NULL)
 	{
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 		BGroupLayout* rootLayout = new(std::nothrow) BGroupLayout(B_VERTICAL);
 		if (rootLayout == NULL)
@@ -108,7 +108,7 @@ public:
 			"If you unlock the keyring, it stays unlocked until the system is "
 			"shut down or the keyring is manually locked again.\n"
 			"If you cancel this dialog the keyring will remain locked."));
-		message->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		message->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
 		message->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 		message->MakeEditable(false);

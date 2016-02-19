@@ -32,7 +32,7 @@ NotifierConfigView::NotifierConfigView()
 	:
 	BMailSettingsView("notifier_config")
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
 

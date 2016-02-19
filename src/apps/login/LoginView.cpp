@@ -48,8 +48,8 @@ LoginView::LoginView(BRect frame)
 {
 	// TODO: when I don't need to test in BeOS anymore,
 	// rewrite to use layout engine.
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ViewColor());
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(ViewUIColor());
 	BRect r;
 	r.Set(CSEP, CSEP, LW, Bounds().Height() - 3 * CSEP - BH);
 	fUserList = new BListView(r, "users");
@@ -85,20 +85,24 @@ LoginView::LoginView(BRect frame)
 
 	fHaltButton = new BButton(buttonRect, "halt", B_TRANSLATE("Halt"),
 		new BMessage(kHaltAction));
+	fHaltButton->ResizeToPreferred();
 	AddChild(fHaltButton);
 
-	buttonRect.OffsetBySelf(CSEP + buttonWidth, 0);
+	buttonRect.OffsetBySelf(CSEP + fHaltButton->Frame().Width(), 0);
 	fRebootButton = new BButton(buttonRect, "reboot", B_TRANSLATE("Reboot"),
 		new BMessage(kRebootAction));
+
+	fRebootButton->ResizeToPreferred();
 	AddChild(fRebootButton);
 
 	BRect infoRect(buttonRect);
-	infoRect.OffsetBySelf(buttonWidth + CSEP, 0);
+	infoRect.OffsetBySelf(fRebootButton->Frame().Width() + CSEP, 0);
 
 	buttonRect.OffsetToSelf(Bounds().Width() - CSEP - buttonWidth,
 		Bounds().Height() - CSEP - BH);
 	fLoginButton = new BButton(buttonRect, "ok", B_TRANSLATE("OK"),
 		new BMessage(kAttemptLogin));
+	fLoginButton->ResizeToPreferred();
 	AddChild(fLoginButton);
 
 	infoRect.right = buttonRect.left - CSEP + 5;
@@ -128,6 +132,19 @@ LoginView::AttachedToWindow()
 	fUserList->MakeFocus();
 	// populate user list
 	BMessenger(this).SendMessage(kAddNextUser);
+
+	// size window relative to buttons
+	BRect bounds = Window()->Bounds();
+	float spacing = fHaltButton->Frame().left;
+	bounds.bottom = fLoginButton->Frame().bottom + spacing;
+	bounds.right = fLoginButton->Frame().right + spacing;
+	Window()->ResizeTo(bounds.Width(), bounds.Height());
+
+	// Center info view
+	BPoint leftTop = fInfoView->Frame().LeftTop();
+	leftTop.y += fHaltButton->Frame().Height() / 2;
+	leftTop.y -= fInfoView->Bounds().Height() / 2;
+	fInfoView->MoveTo(leftTop);
 }
 
 

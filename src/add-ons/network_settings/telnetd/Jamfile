@@ -9,7 +9,7 @@ AddResources TelnetService : TelnetService.rdef ;
 Addon TelnetService :
 	TelnetServiceAddOn.cpp
 
-	: be bnetapi libshared.a <nogrist>Network [ TargetLibsupc++ ]
+	: be bnetapi shared <nogrist>Network [ TargetLibsupc++ ]
 		[ TargetLibstdc++ ] localestub
 ;
 

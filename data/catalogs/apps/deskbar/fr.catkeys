@@ -1,4 +1,4 @@
-1	french	x-vnd.Be-TSKB	2335730970
+1	french	x-vnd.Be-TSKB	2656653225
 Power off	DeskbarMenu		Éteindre
 Sort applications by name	PreferencesWindow		Trier les applications par nom
 Suspend	DeskbarMenu		Mettre en veille
@@ -27,7 +27,6 @@ Large	PreferencesWindow		Grande
 Auto-raise	PreferencesWindow		Rehausser automatiquement
 Recent folders:	PreferencesWindow		Dossiers récents :
 Show application expander	PreferencesWindow		Montrer le dérouleur d’application
-Restart Tracker	DeskbarMenu		Redémarrer le Tracker
 Close all	WindowMenu		Tout fermer
 Deskbar preferences	PreferencesWindow		Réglages de la Deskbar
 Mount	DeskbarMenu		Monter

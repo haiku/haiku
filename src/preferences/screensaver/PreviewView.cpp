@@ -61,7 +61,7 @@ PreviewView::PreviewView(const char* name)
 	fSaverView(NULL),
 	fNoPreview(NULL)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
 	// We draw the "monitor" around the preview, hence the strange insets.

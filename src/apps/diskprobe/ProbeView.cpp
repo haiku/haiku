@@ -251,7 +251,7 @@ IconView::AttachedToWindow()
 	if (Parent() != NULL)
 		SetViewColor(Parent()->ViewColor());
 	else
-		SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -480,7 +480,7 @@ HeaderView::HeaderView(const entry_ref *ref, DataEditor &editor)
 	fPosition(0),
 	fLastPosition(0)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	GridLayout()->SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
 		B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING);
 
@@ -1102,7 +1102,7 @@ TypeView::TypeView(BRect rect, const char* name, int32 index,
 		DataEditor& editor, int32 resizingMode)
 	: BView(rect, name, resizingMode, B_FRAME_EVENTS)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fTypeEditorView = GetTypeEditorAt(index, Frame(), editor);
 	if (fTypeEditorView == NULL) {

@@ -4,7 +4,7 @@
 
 	Other authors:
 	Mark Watson;
-	Rudolf Cornelissen 3/2002-6/2010.
+	Rudolf Cornelissen 3/2002-1/2016.
 */
 
 
@@ -391,6 +391,7 @@ static nv_settings sSettings = { // see comments in nvidia.settings
 	false,					// block_acc
 	0,						// gpu_clk
 	0,						// ram_clk
+	true,					// check_edid
 };
 
 
@@ -1460,6 +1461,8 @@ init_driver(void)
 			"force_ws", false, false);
 		sSettings.block_acc = get_driver_boolean_parameter(settings,
 			"block_acc", false, false);
+		sSettings.check_edid = get_driver_boolean_parameter(settings,
+			"check_edid", true, true);
 
 		item = get_driver_parameter(settings, "gpu_clk", "0", "0");
 		value = strtoul(item, &end, 0);

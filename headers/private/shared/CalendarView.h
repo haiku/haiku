@@ -26,8 +26,7 @@ namespace BPrivate {
 class BCalendarView : public BView, public BInvoker {
 public:
 								BCalendarView(BRect frame, const char* name,
-									uint32 resizeMask = B_FOLLOW_LEFT
-										| B_FOLLOW_TOP,
+									uint32 resizeMask = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW | B_FRAME_EVENTS
 										| B_NAVIGABLE);
 

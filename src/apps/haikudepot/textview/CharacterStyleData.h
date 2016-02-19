@@ -68,21 +68,33 @@ public:
 	inline	float				GlyphSpacing() const
 									{ return fGlyphSpacing; }
 
+			CharacterStyleDataRef SetForegroundColor(color_which which);
 			CharacterStyleDataRef SetForegroundColor(rgb_color color);
 	inline	rgb_color			ForegroundColor() const
 									{ return fFgColor; }
+	inline	color_which			WhichForegroundColor() const
+									{ return fWhichFgColor; }
 
+			CharacterStyleDataRef SetBackgroundColor(color_which which);
 			CharacterStyleDataRef SetBackgroundColor(rgb_color color);
 	inline	rgb_color			BackgroundColor() const
 									{ return fBgColor; }
+	inline	color_which			WhichBackgroundColor() const
+									{ return fWhichBgColor; }
 
+			CharacterStyleDataRef SetStrikeOutColor(color_which which);
 			CharacterStyleDataRef SetStrikeOutColor(rgb_color color);
 	inline	rgb_color			StrikeOutColor() const
 									{ return fStrikeOutColor; }
+	inline	color_which			WhichStrikeOutColor() const
+									{ return fWhichStrikeOutColor; }
 
+			CharacterStyleDataRef SetUnderlineColor(color_which which);
 			CharacterStyleDataRef SetUnderlineColor(rgb_color color);
 	inline	rgb_color			UnderlineColor() const
 									{ return fUnderlineColor; }
+	inline	color_which			WhichUnderlineColor() const
+									{ return fWhichUnderlineColor; }
 
 			CharacterStyleDataRef SetStrikeOut(uint8 strikeOut);
 	inline	uint8				StrikeOut() const
@@ -91,6 +103,7 @@ public:
 			CharacterStyleDataRef SetUnderline(uint8 underline);
 	inline	uint8				Underline() const
 									{ return fUnderlineStyle; }
+
 
 private:
 			CharacterStyleData&	operator=(const CharacterStyleData& other);
@@ -112,6 +125,12 @@ private:
 			// Additional spacing to be applied between glyphs.
 			float				fGlyphSpacing;
 
+			color_which			fWhichFgColor;
+			color_which			fWhichBgColor;
+
+			color_which			fWhichStrikeOutColor;
+			color_which			fWhichUnderlineColor;
+
 			rgb_color			fFgColor;
 			rgb_color			fBgColor;
 
@@ -121,7 +140,6 @@ private:
 			uint8				fStrikeOutStyle;
 			uint8				fUnderlineStyle;
 };
-
 
 
 #endif // CHARACTER_STYLE_DATA_H

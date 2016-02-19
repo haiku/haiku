@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-MatchHeader	3677427558
+1	belarusian	x-vnd.Haiku-MatchHeader	1349121828
 <Choose action>	ConfigView		<Абярыце аперацыю>
 has	ConfigView		меў
 Move to	ConfigView		Перасунуць у
@@ -10,4 +10,3 @@ Set flags to	ConfigView		Меткі паведамлення ў
 Set as read	ConfigView		Пазначыць як прагледжанае
 Reply with	ConfigView		Адказаць з
 If	ConfigView		Калі
-header (e.g. Subject)	ConfigView		загаловак (Subject)

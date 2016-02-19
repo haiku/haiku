@@ -10,6 +10,9 @@
 
 #include <KPPPDevice.h>
 
+#include <net/if_types.h>
+#include <net_stack.h>
+
 
 enum pppoe_state {
 	INITIAL,
@@ -25,7 +28,7 @@ class PPPoEDevice : public KPPPDevice {
 	public:
 		PPPoEDevice(KPPPInterface& interface, driver_parameter *settings);
 		
-		ifnet *EthernetIfnet() const
+		net_device *EthernetIfnet() const
 			{ return fEthernetIfnet; }
 		
 		const uint8 *Peer() const
@@ -50,17 +53,19 @@ class PPPoEDevice : public KPPPDevice {
 		
 		virtual uint32 CountOutputBytes() const;
 		
-		virtual status_t Send(struct mbuf *packet, uint16 protocolNumber = 0);
-		virtual status_t Receive(struct mbuf *packet, uint16 protocolNumber = 0);
+		virtual status_t Send(net_buffer *packet, uint16 protocolNumber = 0);
+		virtual status_t Receive(net_buffer *packet, uint16 protocolNumber = 0);
 		
 		virtual void Pulse();
 
 	private:
-		ifnet *fEthernetIfnet;
+		net_device *fEthernetIfnet;
 		uint8 fPeer[6];
+		uint8 fEtherAddr[6];
 		uint16 fSessionID;
 		uint32 fHostUniq;
 		const char *fACName, *fServiceName;
+		const char *finterfaceName;
 		
 		uint32 fAttempts;
 		bigtime_t fNextTimeout;

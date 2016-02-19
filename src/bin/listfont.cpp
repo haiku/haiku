@@ -133,10 +133,6 @@ main(int argc, char **argv)
 			if ((flags & B_IS_FIXED) != 0)
 				printf("fixed");
 
-#if B_BEOS_VERSION == B_BEOS_VERSION_5
-			/* seems R5 is broken there :-( locks up on 'a> recv' */
-			printf("\t%s", (flags & B_HAS_TUNED_FONT) != 0 ? "hastuned " : "");
-#else
 			if ((flags & B_HAS_TUNED_FONT) != 0) {
 				if (displayTuned)
 					printf("\n    ");
@@ -157,7 +153,6 @@ main(int argc, char **argv)
 					}
 				}
 			}
-#endif
 			putchar('\n');
 		}
 	}

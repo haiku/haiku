@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2012-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,10 +13,11 @@
 #include <Directory.h>
 #include <File.h>
 #include <fs_attr.h>
+#include <Messenger.h>
 #include <Node.h>
 #include <Path.h>
 
-#include "Commands.h"
+#include <NodeMessage.h>
 
 #include "IMAPProtocol.h"
 
@@ -91,16 +92,44 @@ IMAPFolder::IMAPFolder(IMAPProtocol& protocol, const BString& mailboxName,
 	fRef(ref),
 	fMailboxName(mailboxName),
 	fUIDValidity(UINT32_MAX),
-	fLastUID(0)
+	fLastUID(0),
+	fListener(NULL),
+	fFolderStateInitialized(false),
+	fQuitFolderState(false)
+{
+	mutex_init(&fLock, "imap folder lock");
+	mutex_init(&fFolderStateLock, "imap folder state lock");
+}
+
+
+IMAPFolder::~IMAPFolder()
+{
+	if (!fFolderStateInitialized) {
+		fQuitFolderState = true;
+		wait_for_thread(fReadFolderStateThread, NULL);
+	}
+}
+
+
+status_t
+IMAPFolder::Init()
 {
 	// Initialize from folder attributes
-	BNode node(&ref);
-	if (node.InitCheck() != B_OK)
-		return;
+	BNode node(&fRef);
+	status_t status = node.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	node_ref nodeRef;
+	status = node.GetNodeRef(&nodeRef);
+	if (status != B_OK)
+		return status;
+
+	fNodeID = nodeRef.node;
 
 	BString originalMailboxName;
 	if (node.ReadAttrString(kMailboxNameAttribute, &originalMailboxName) == B_OK
-		&& originalMailboxName != mailboxName) {
+		&& originalMailboxName != fMailboxName) {
 		// TODO: mailbox name has changed
 	}
 
@@ -110,24 +139,20 @@ IMAPFolder::IMAPFolder(IMAPProtocol& protocol, const BString& mailboxName,
 		fLastUID);
 
 	attr_info info;
-	status_t status = node.GetAttrInfo(kStateAttribute, &info);
+	status = node.GetAttrInfo(kStateAttribute, &info);
 	if (status == B_OK) {
 		struct entry {
 			uint32	uid;
 			uint32	flags;
 		} _PACKED;
 		struct entry* entries = (struct entry*)malloc(info.size);
-		if (entries == NULL) {
-			// TODO: indicate B_NO_MEMORY
-			return;
-		}
+		if (entries == NULL)
+			return B_NO_MEMORY;
 
 		ssize_t bytesRead = node.ReadAttr(kStateAttribute, B_RAW_TYPE, 0,
 			entries, info.size);
-		if (bytesRead != info.size) {
-			// TODO: indicate read error resp. corrupted data
-			return;
-		}
+		if (bytesRead != info.size)
+			return B_BAD_DATA;
 
 		for (size_t i = 0; i < info.size / sizeof(entry); i++) {
 			uint32 uid = B_BENDIAN_TO_HOST_INT32(entries[i].uid);
@@ -137,21 +162,20 @@ IMAPFolder::IMAPFolder(IMAPProtocol& protocol, const BString& mailboxName,
 		}
 	}
 
-	// Initialize current state from actual folder
-	// TODO: this should be done in another thread
-	//_InitializeFolderState();
-}
-
-
-IMAPFolder::~IMAPFolder()
-{
+	return B_OK;
 }
 
 
 void
 IMAPFolder::SetListener(FolderListener* listener)
 {
+	ASSERT(fListener == NULL);
+
 	fListener = listener;
+
+	// Initialize current state from actual folder
+	// TODO: this should be done in another thread
+	_InitializeFolderState();
 }
 
 
@@ -161,6 +185,7 @@ IMAPFolder::SetUIDValidity(uint32 uidValidity)
 	if (fUIDValidity == uidValidity)
 		return;
 
+	// TODO: delete all mails that have the same UID validity value we had
 	fUIDValidity = uidValidity;
 
 	BNode node(&fRef);
@@ -169,25 +194,135 @@ IMAPFolder::SetUIDValidity(uint32 uidValidity)
 
 
 status_t
-IMAPFolder::GetMessageEntryRef(uint32 uid, entry_ref& ref) const
+IMAPFolder::GetMessageEntryRef(uint32 uid, entry_ref& ref)
 {
-	UIDToRefMap::const_iterator found = fRefMap.find(uid);
-	if (found == fRefMap.end())
+	MutexLocker locker(fLock);
+	return _GetMessageEntryRef(uid, ref);
+}
+
+
+status_t
+IMAPFolder::GetMessageUID(const entry_ref& ref, uint32& uid) const
+{
+	BNode node(&ref);
+	status_t status = node.InitCheck();
+	if (status != B_OK)
+		return status;
+
+	uid = _ReadUniqueID(node);
+	if (uid == 0)
 		return B_ENTRY_NOT_FOUND;
 
-	ref = found->second;
 	return B_OK;
 }
 
 
 uint32
-IMAPFolder::MessageFlags(uint32 uid) const
+IMAPFolder::MessageFlags(uint32 uid)
 {
+	MutexLocker locker(fLock);
 	UIDToFlagsMap::const_iterator found = fFlagsMap.find(uid);
 	if (found == fFlagsMap.end())
 		return 0;
 
 	return found->second;
+}
+
+
+/*!	Synchronizes the message flags/state from the server with the local
+	one.
+*/
+void
+IMAPFolder::SyncMessageFlags(uint32 uid, uint32 mailboxFlags)
+{
+	if (uid > LastUID())
+		return;
+
+	entry_ref ref;
+	BNode node;
+
+	while (true) {
+		status_t status = GetMessageEntryRef(uid, ref);
+		if (status == B_ENTRY_NOT_FOUND) {
+			// The message does not exist anymore locally, delete it on the
+			// server
+			// TODO: copy it to the trash directory first!
+			fProtocol.UpdateMessageFlags(*this, uid, IMAP::kDeleted);
+			return;
+		}
+		if (status == B_OK)
+			status = node.SetTo(&ref);
+		if (status == B_TIMED_OUT) {
+			// We don't know the message state yet
+			fPendingFlagsMap.insert(std::make_pair(uid, mailboxFlags));
+		}
+		if (status != B_OK)
+			return;
+
+		break;
+	}
+	fSynchronizedUIDsSet.insert(uid);
+
+	uint32 previousFlags = MessageFlags(uid);
+	uint32 currentFlags = previousFlags;
+	if (_MailToIMAPFlags(node, currentFlags) != B_OK)
+		return;
+
+	// Compare flags to previous/current flags, and update either the
+	// message on the server, or the message locally (or even both)
+
+	uint32 nextFlags = mailboxFlags;
+	_TestMessageFlags(previousFlags, mailboxFlags, currentFlags,
+		IMAP::kSeen, nextFlags);
+	_TestMessageFlags(previousFlags, mailboxFlags, currentFlags,
+		IMAP::kAnswered, nextFlags);
+
+	if (nextFlags != previousFlags)
+		_WriteFlags(node, nextFlags);
+	if (currentFlags != nextFlags) {
+		// Update mail message attributes
+		BMessage attributes;
+		_IMAPToMailFlags(nextFlags, attributes);
+		node << attributes;
+
+		fFlagsMap[uid] = nextFlags;
+	}
+	if (mailboxFlags != nextFlags) {
+		// Update server flags
+		fProtocol.UpdateMessageFlags(*this, uid, nextFlags);
+	}
+}
+
+
+void
+IMAPFolder::MessageEntriesFetched()
+{
+	_WaitForFolderState();
+
+	// Synchronize all pending flags first
+	UIDToFlagsMap::const_iterator pendingIterator = fPendingFlagsMap.begin();
+	for (; pendingIterator != fPendingFlagsMap.end(); pendingIterator++)
+		SyncMessageFlags(pendingIterator->first, pendingIterator->second);
+
+	fPendingFlagsMap.clear();
+
+	// Delete all local messages that are no longer found on the server
+
+	MutexLocker locker(fLock);
+	UIDSet deleteUIDs;
+	UIDToRefMap::const_iterator iterator = fRefMap.begin();
+	for (; iterator != fRefMap.end(); iterator++) {
+		uint32 uid = iterator->first;
+		if (fSynchronizedUIDsSet.find(uid) == fSynchronizedUIDsSet.end())
+			deleteUIDs.insert(uid);
+	}
+
+	fSynchronizedUIDsSet.clear();
+	locker.Unlock();
+
+	UIDSet::const_iterator deleteIterator = deleteUIDs.begin();
+	for (; deleteIterator != deleteUIDs.end(); deleteIterator++)
+		_DeleteLocalMessage(*deleteIterator);
 }
 
 
@@ -197,7 +332,7 @@ IMAPFolder::MessageFlags(uint32 uid) const
 	an error.
 
 	\a length will reflect how many bytes are left to read in case there
-	were an error.
+	was an error.
 */
 status_t
 IMAPFolder::StoreMessage(uint32 fetchFlags, BDataIO& stream,
@@ -228,16 +363,13 @@ void
 IMAPFolder::MessageStored(entry_ref& ref, BFile& file, uint32 fetchFlags,
 	uint32 uid, uint32 flags)
 {
+	_WriteUniqueIDValidity(file);
 	_WriteUniqueID(file, uid);
 	if ((fetchFlags & IMAP::kFetchFlags) != 0)
 		_WriteFlags(file, flags);
 
-	// TODO: add some utility function for this in libmail.so
 	BMessage attributes;
-	if ((flags & IMAP::kAnswered) != 0)
-		attributes.AddString(B_MAIL_ATTR_STATUS, "Answered");
-	else if ((flags & IMAP::kSeen) != 0)
-		attributes.AddString(B_MAIL_ATTR_STATUS, "Read");
+	_IMAPToMailFlags(flags, attributes);
 
 	fProtocol.MessageStored(*this, ref, file, fetchFlags, attributes);
 	file.Unset();
@@ -254,6 +386,29 @@ IMAPFolder::MessageStored(entry_ref& ref, BFile& file, uint32 fetchFlags,
 			fprintf(stderr, "IMAP: Could not write last UID for mailbox "
 				"%s: %s\n", fMailboxName.String(), strerror(status));
 		}
+	}
+}
+
+
+/*!	Pushes the refs for the pending bodies to the pending bodies list.
+	This allows to prevent retrieving bodies more than once.
+*/
+void
+IMAPFolder::RegisterPendingBodies(IMAP::MessageUIDList& uids,
+	const BMessenger* replyTo)
+{
+	MutexLocker locker(fLock);
+
+	MessengerList messengers;
+	if (replyTo != NULL)
+		messengers.push_back(*replyTo);
+
+	IMAP::MessageUIDList::const_iterator iterator = uids.begin();
+	for (; iterator != uids.end(); iterator++) {
+		if (replyTo != NULL)
+			fPendingBodies[*iterator].push_back(*replyTo);
+		else
+			fPendingBodies[*iterator].begin();
 	}
 }
 
@@ -293,40 +448,66 @@ IMAPFolder::BodyStored(entry_ref& ref, BFile& file, uint32 uid)
 	BMessage attributes;
 	fProtocol.MessageStored(*this, ref, file, IMAP::kFetchBody, attributes);
 	file.Unset();
+
+	_NotifyStoredBody(ref, uid, B_OK);
+}
+
+
+void
+IMAPFolder::StoringBodyFailed(const entry_ref& ref, uint32 uid, status_t error)
+{
+	_NotifyStoredBody(ref, uid, error);
 }
 
 
 void
 IMAPFolder::DeleteMessage(uint32 uid)
 {
-}
+	// TODO: move message to trash (server side)
 
-
-/*!	Called when the flags of a message changed on the server. This will update
-	the flags for the local file.
-*/
-void
-IMAPFolder::SetMessageFlags(uint32 uid, uint32 flags)
-{
+	_DeleteLocalMessage(uid);
 }
 
 
 void
 IMAPFolder::MessageReceived(BMessage* message)
 {
+	switch (message->what) {
+		default:
+			BHandler::MessageReceived(message);
+			break;
+	}
+}
+
+
+void
+IMAPFolder::_WaitForFolderState()
+{
+	while (true) {
+		MutexLocker locker(fFolderStateLock);
+		if (fFolderStateInitialized)
+			return;
+	}
 }
 
 
 void
 IMAPFolder::_InitializeFolderState()
 {
-	// Create set of the last known UID state - if an entry is found, it
-	// is being removed from the list. The remaining entries were deleted.
-	std::set<uint32> lastUIDs;
-	UIDToFlagsMap::iterator iterator = fFlagsMap.begin();
-	for (; iterator != fFlagsMap.end(); iterator++)
-		lastUIDs.insert(iterator->first);
+	mutex_lock(&fFolderStateLock);
 
+	fReadFolderStateThread = spawn_thread(&IMAPFolder::_ReadFolderState,
+		"IMAP folder state", B_NORMAL_PRIORITY, this);
+	if (fReadFolderStateThread >= 0)
+		resume_thread(fReadFolderStateThread);
+	else
+		mutex_unlock(&fFolderStateLock);
+}
+
+
+void
+IMAPFolder::_ReadFolderState()
+{
 	BDirectory directory(&fRef);
 	BEntry entry;
 	while (directory.GetNextEntry(&entry) == B_OK) {
@@ -336,30 +517,52 @@ IMAPFolder::_InitializeFolderState()
 			|| node.SetTo(&entry) != B_OK)
 			continue;
 
+		uint32 uidValidity = _ReadUniqueIDValidity(node);
+		if (uidValidity != fUIDValidity) {
+			// TODO: add file to mailbox
+			continue;
+		}
 		uint32 uid = _ReadUniqueID(node);
 		uint32 flags = _ReadFlags(node);
 
-		// TODO: make sure a listener exists at this point!
-		std::set<uint32>::iterator found = lastUIDs.find(uid);
-		if (found != lastUIDs.end()) {
-			// The message is still around
-			lastUIDs.erase(found);
-
-			uint32 flagsFound = MessageFlags(uid);
-			if (flagsFound != flags) {
-				// Its flags have changed locally, and need to be updated
-				fListener->MessageFlagsChanged(_Token(uid), ref,
-					flagsFound, flags);
-			}
-		} else {
-			// This is a new message
-			// TODO: the token must be the originating token!
-			uid = fListener->MessageAdded(_Token(uid), ref);
-			_WriteUniqueID(node, uid);
-		}
+		MutexLocker locker(fLock);
+		if (fQuitFolderState)
+			return;
 
 		fRefMap.insert(std::make_pair(uid, ref));
+		fFlagsMap.insert(std::make_pair(uid, flags));
+
+//		// TODO: make sure a listener exists at this point!
+//		std::set<uint32>::iterator found = lastUIDs.find(uid);
+//		if (found != lastUIDs.end()) {
+//			// The message is still around
+//			lastUIDs.erase(found);
+//
+//			uint32 flagsFound = MessageFlags(uid);
+//			if (flagsFound != flags) {
+//				// Its flags have changed locally, and need to be updated
+//				fListener->MessageFlagsChanged(_Token(uid), ref,
+//					flagsFound, flags);
+//			}
+//		} else {
+//			// This is a new message
+//			// TODO: the token must be the originating token!
+//			uid = fListener->MessageAdded(_Token(uid), ref);
+//			_WriteUniqueID(node, uid);
+//		}
+//
 	}
+
+	fFolderStateInitialized = true;
+	mutex_unlock(&fFolderStateLock);
+}
+
+
+/*static*/ status_t
+IMAPFolder::_ReadFolderState(void* self)
+{
+	((IMAPFolder*)self)->_ReadFolderState();
+	return B_OK;
 }
 
 
@@ -375,8 +578,115 @@ IMAPFolder::_Token(uint32 uid) const
 }
 
 
+void
+IMAPFolder::_NotifyStoredBody(const entry_ref& ref, uint32 uid, status_t status)
+{
+	MutexLocker locker(fLock);
+	MessengerMap::iterator found = fPendingBodies.find(uid);
+	if (found != fPendingBodies.end()) {
+		MessengerList messengers = found->second;
+		fPendingBodies.erase(found);
+		locker.Unlock();
+
+		MessengerList::iterator iterator = messengers.begin();
+		for (; iterator != messengers.end(); iterator++)
+			BInboundMailProtocol::ReplyBodyFetched(*iterator, ref, status);
+	}
+}
+
+
+status_t
+IMAPFolder::_GetMessageEntryRef(uint32 uid, entry_ref& ref) const
+{
+	UIDToRefMap::const_iterator found = fRefMap.find(uid);
+	if (found == fRefMap.end())
+		return !fFolderStateInitialized ? B_TIMED_OUT : B_ENTRY_NOT_FOUND;
+
+	ref = found->second;
+	return B_OK;
+}
+
+
+status_t
+IMAPFolder::_DeleteLocalMessage(uint32 uid)
+{
+	entry_ref ref;
+	status_t status = GetMessageEntryRef(uid, ref);
+	if (status != B_OK)
+		return status;
+
+	fRefMap.erase(uid);
+	fFlagsMap.erase(uid);
+
+	BEntry entry(&ref);
+	return entry.Remove();
+}
+
+
+void
+IMAPFolder::_IMAPToMailFlags(uint32 flags, BMessage& attributes)
+{
+	// TODO: add some utility function for this in libmail.so
+	if ((flags & IMAP::kAnswered) != 0)
+		attributes.AddString(B_MAIL_ATTR_STATUS, "Answered");
+	else if ((flags & IMAP::kFlagged) != 0)
+		attributes.AddString(B_MAIL_ATTR_STATUS, "Starred");
+	else if ((flags & IMAP::kSeen) != 0)
+		attributes.AddString(B_MAIL_ATTR_STATUS, "Read");
+}
+
+
+status_t
+IMAPFolder::_MailToIMAPFlags(BNode& node, uint32& flags)
+{
+	BString mailStatus;
+	status_t status = node.ReadAttrString(B_MAIL_ATTR_STATUS, &mailStatus);
+	if (status != B_OK)
+		return status;
+
+	flags &= ~(IMAP::kAnswered | IMAP::kSeen);
+
+	// TODO: add some utility function for this in libmail.so
+	if (mailStatus == "Answered")
+		flags |= IMAP::kAnswered | IMAP::kSeen;
+	else if (mailStatus == "Read")
+		flags |= IMAP::kSeen;
+	else if (mailStatus == "Starred")
+		flags |= IMAP::kFlagged | IMAP::kSeen;
+
+	return B_OK;
+}
+
+
+void
+IMAPFolder::_TestMessageFlags(uint32 previousFlags, uint32 mailboxFlags,
+	uint32 currentFlags, uint32 testFlag, uint32& nextFlags)
+{
+	if ((previousFlags & testFlag) != (mailboxFlags & testFlag)) {
+		if ((previousFlags & testFlag) == (currentFlags & testFlag)) {
+			// The flags on the mailbox changed, update local flags
+			nextFlags &= ~testFlag;
+			nextFlags |= mailboxFlags & testFlag;
+		} else {
+			// Both flags changed. Since we don't have the means to do
+			// conflict resolution, we use a best effort mechanism
+			nextFlags |= testFlag;
+		}
+		return;
+	}
+
+	// Previous message flags, and mailbox flags are identical, see
+	// if the user changed the flag locally
+	if ((currentFlags & testFlag) != (previousFlags & testFlag)) {
+		// Flag changed, update mailbox
+		nextFlags &= ~testFlag;
+		nextFlags |= currentFlags & testFlag;
+	}
+}
+
+
 uint32
-IMAPFolder::_ReadUniqueID(BNode& node)
+IMAPFolder::_ReadUniqueID(BNode& node) const
 {
 	// For compatibility we must assume that the UID is stored as a string
 	BString string;
@@ -388,8 +698,9 @@ IMAPFolder::_ReadUniqueID(BNode& node)
 
 
 status_t
-IMAPFolder::_WriteUniqueID(BNode& node, uint32 uid)
+IMAPFolder::_WriteUniqueID(BNode& node, uint32 uid) const
 {
+	// For compatibility we must assume that the UID is stored as a string
 	BString string;
 	string << uid;
 
@@ -398,21 +709,36 @@ IMAPFolder::_WriteUniqueID(BNode& node, uint32 uid)
 
 
 uint32
-IMAPFolder::_ReadFlags(BNode& node)
+IMAPFolder::_ReadUniqueIDValidity(BNode& node) const
+{
+
+	return _ReadUInt32(node, kUIDValidityAttribute);
+}
+
+
+status_t
+IMAPFolder::_WriteUniqueIDValidity(BNode& node) const
+{
+	return _WriteUInt32(node, kUIDValidityAttribute, fUIDValidity);
+}
+
+
+uint32
+IMAPFolder::_ReadFlags(BNode& node) const
 {
 	return _ReadUInt32(node, kFlagsAttribute);
 }
 
 
 status_t
-IMAPFolder::_WriteFlags(BNode& node, uint32 flags)
+IMAPFolder::_WriteFlags(BNode& node, uint32 flags) const
 {
 	return _WriteUInt32(node, kFlagsAttribute, flags);
 }
 
 
 uint32
-IMAPFolder::_ReadUInt32(BNode& node, const char* attribute)
+IMAPFolder::_ReadUInt32(BNode& node, const char* attribute) const
 {
 	uint32 value;
 	ssize_t bytesRead = node.ReadAttr(attribute, B_UINT32_TYPE, 0,
@@ -425,7 +751,7 @@ IMAPFolder::_ReadUInt32(BNode& node, const char* attribute)
 
 
 status_t
-IMAPFolder::_WriteUInt32(BNode& node, const char* attribute, uint32 value)
+IMAPFolder::_WriteUInt32(BNode& node, const char* attribute, uint32 value) const
 {
 	ssize_t bytesWritten = node.WriteAttr(attribute, B_UINT32_TYPE, 0,
 		&value, sizeof(uint32));
@@ -437,7 +763,7 @@ IMAPFolder::_WriteUInt32(BNode& node, const char* attribute, uint32 value)
 
 
 status_t
-IMAPFolder::_WriteStream(BFile& file, BDataIO& stream, size_t& length)
+IMAPFolder::_WriteStream(BFile& file, BDataIO& stream, size_t& length) const
 {
 	char buffer[65535];
 	while (length > 0) {

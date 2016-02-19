@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku, Inc. All rights reserved.
+ * Copyright 2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MULTI_CHANNEL_CONTROL_H
@@ -14,8 +14,7 @@ public:
 								BMultiChannelControl(BRect frame,
 									const char* name, const char* label,
 									BMessage* message, int32 channelCount = 1,
-									uint32 resize = B_FOLLOW_LEFT
-										| B_FOLLOW_TOP,
+									uint32 resize = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW);
 								BMultiChannelControl(BMessage* archive);
 	virtual						~BMultiChannelControl();

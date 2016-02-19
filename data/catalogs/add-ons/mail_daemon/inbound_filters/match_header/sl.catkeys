@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-MatchHeader	538909502
+1	slovenian	x-vnd.Haiku-MatchHeader	2505571068
 has	ConfigView		ima
 Move to	ConfigView		Premakni v
 Then	ConfigView		potem
@@ -7,4 +7,3 @@ Set flags to	ConfigView		Nastavi zastavice na
 Set as read	ConfigView		Označi kot prebrano
 Reply with	ConfigView		Odgovori z
 If	ConfigView		Če
-header (e.g. Subject)	ConfigView		glava (npr. Zadeva)

@@ -1,7 +1,7 @@
 /* Authors:
    Mark Watson 12/1999,
    Apsed,
-   Rudolf Cornelissen 10/2002-4/2006
+   Rudolf Cornelissen 10/2002-2/2016
 */
 
 #define MODULE_BIT 0x00008000
@@ -90,7 +90,7 @@ status_t eng_general_powerup()
 {
 	status_t status;
 
-	LOG(1,("POWERUP: Haiku VIA Accelerant 0.16 running.\n"));
+	LOG(1,("POWERUP: Haiku VIA Accelerant 0.19 running.\n"));
 
 	/* preset no laptop */
 	si->ps.laptop = false;
@@ -100,22 +100,21 @@ status_t eng_general_powerup()
 	{
 	/* Vendor Via */
 	case 0x30221106:
-		si->ps.card_type = CLE3022;
+		si->ps.card_type = VT3022;
 		si->ps.card_arch = CLE266;
-		LOG(4,("POWERUP: Detected VIA CLE266 Unichrome Pro (CLE3022)\n"));
+		LOG(4,("POWERUP: Detected VIA CLE266 Unichrome Pro (VT3022)\n"));
 		status = engxx_general_powerup();
 		break;
 	case 0x31081106:
-		//fixme: card_type unknown..
-		si->ps.card_type = VT3204;
+		si->ps.card_type = VT3108;
 		si->ps.card_arch = K8M800;
-		LOG(4,("POWERUP: Detected VIA K8M800 Unichrome Pro (unknown chiptype)\n"));
+		LOG(4,("POWERUP: Detected VIA K8M800 Unichrome Pro (VT3108)\n"));
 		status = engxx_general_powerup();
 		break;
 	case 0x31221106:
-		si->ps.card_type = CLE3122;
+		si->ps.card_type = VT3122;
 		si->ps.card_arch = CLE266;
-		LOG(4,("POWERUP: Detected VIA CLE266 Unichrome Pro (CLE3122)\n"));
+		LOG(4,("POWERUP: Detected VIA CLE266 Unichrome Pro (VT3122)\n"));
 		status = engxx_general_powerup();
 		break;
 	case 0x32051106:

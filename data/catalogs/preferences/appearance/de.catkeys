@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Appearance	727801787
+1	german	x-vnd.Haiku-Appearance	1140137500
 Plain font:	Font view		Normal:
 Control highlight	Colors tab		Steuerelement - Ausgewählt
 Control border	Colors tab		Steuerelement - Rahmen
@@ -6,11 +6,14 @@ Antialiasing type:	AntialiasingSettingsView		Kantenglättungstyp:
 Shadow	Colors tab		Schatten
 On	AntialiasingSettingsView		Ein
 Defaults	APRWindow		Standardwerte
+Link hover	Colors tab		Link (unter Mauszeiger)
 Grayscale	AntialiasingSettingsView		Graustufen
 Shine	Colors tab		Glanz
 About	DecorSettingsView		Über
 About decorator	DecorSettingsView		Dekorator Info
 Off	AntialiasingSettingsView		Aus
+Link text	Colors tab		Link Text
+Link active	Colors tab		Link (geklickt)
 Choose Decorator	DecorSettingsView		Dekorator wählen
 Success	Colors tab		Erfolg
 Inactive window tab text	Colors tab		Reiter - Text (inaktiv)
@@ -36,6 +39,7 @@ List background	Colors tab		Liste - Hintergrund
 OK	DecorSettingsView		OK
 Control mark	Colors tab		Steuerelement - Markierung
 Size:	Font Selection view		Größe:
+Link visited	Colors tab		Link (besucht)
 Decorator:	DecorSettingsView		Dekorator:
 Selected list item background	Colors tab		Liste - Hintergrund (ausgewählt)
 Panel background	Colors tab		Oberfläche - Hintergrund

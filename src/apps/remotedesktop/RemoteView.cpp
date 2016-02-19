@@ -75,6 +75,7 @@ RemoteView::RemoteView(BRect frame, uint16 listenPort)
 	fReceiveBuffer = new(std::nothrow) StreamingRingBuffer(16 * 1024);
 	if (fReceiveBuffer == NULL) {
 		fInitStatus = B_NO_MEMORY;
+		TRACE_ERROR("no memory available\n");
 		return;
 	}
 
@@ -85,6 +86,7 @@ RemoteView::RemoteView(BRect frame, uint16 listenPort)
 	fSendBuffer = new(std::nothrow) StreamingRingBuffer(16 * 1024);
 	if (fSendBuffer == NULL) {
 		fInitStatus = B_NO_MEMORY;
+		TRACE_ERROR("no memory available\n");
 		return;
 	}
 
@@ -95,6 +97,7 @@ RemoteView::RemoteView(BRect frame, uint16 listenPort)
 	fReceiveEndpoint = new(std::nothrow) BNetEndpoint();
 	if (fReceiveEndpoint == NULL) {
 		fInitStatus = B_NO_MEMORY;
+		TRACE_ERROR("no memory available\n");
 		return;
 	}
 
@@ -105,18 +108,21 @@ RemoteView::RemoteView(BRect frame, uint16 listenPort)
 	fReceiver = new(std::nothrow) NetReceiver(fReceiveEndpoint, fReceiveBuffer);
 	if (fReceiver == NULL) {
 		fInitStatus = B_NO_MEMORY;
+		TRACE_ERROR("no memory available\n");
 		return;
 	}
 
 	fSendEndpoint = new(std::nothrow) BNetEndpoint();
 	if (fSendEndpoint == NULL) {
 		fInitStatus = B_NO_MEMORY;
+		TRACE_ERROR("no memory available\n");
 		return;
 	}
 
 	fSender = new(std::nothrow) NetSender(fSendEndpoint, fSendBuffer);
 	if (fSender == NULL) {
 		fInitStatus = B_NO_MEMORY;
+		TRACE_ERROR("no memory available\n");
 		return;
 	}
 
@@ -125,6 +131,7 @@ RemoteView::RemoteView(BRect frame, uint16 listenPort)
 		B_RGB32);
 	if (fOffscreenBitmap == NULL) {
 		fInitStatus = B_NO_MEMORY;
+		TRACE_ERROR("no memory available\n");
 		return;
 	}
 
@@ -132,6 +139,7 @@ RemoteView::RemoteView(BRect frame, uint16 listenPort)
 		B_FOLLOW_NONE, B_WILL_DRAW);
 	if (fOffscreen == NULL) {
 		fInitStatus = B_NO_MEMORY;
+		TRACE_ERROR("no memory available\n");
 		return;
 	}
 
@@ -142,6 +150,10 @@ RemoteView::RemoteView(BRect frame, uint16 listenPort)
 		this);
 	if (fDrawThread < 0) {
 		fInitStatus = fDrawThread;
+
+		TRACE_ERROR("failed to start _DrawThread()\n");
+		TRACE_ERROR("status = %" B_PRIx32 "\n", fInitStatus);
+
 		return;
 	}
 
@@ -438,9 +450,14 @@ RemoteView::_DrawThread()
 	while (!fStopThread) {
 		uint16 code;
 		status_t status = message.NextMessage(code);
+
 		if (status != B_OK) {
-			TRACE_ERROR("failed to read message from receiver\n");
-			break;
+			if (status == B_TIMED_OUT || status == -1) {
+				TRACE_ERROR("could not connect to device\n");
+			} else {
+				TRACE_ERROR("failed to read message from receiver\n");
+				break;
+			}
 		}
 
 		TRACE("code %u with %ld bytes data\n", code, message.DataLeft());

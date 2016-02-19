@@ -15,7 +15,7 @@ RemotePackageRepository HaikuPorts
 	timgmsoundfont-fixed-5
 	unknown_horizons-2014.1-1
 	vl_gothic-20141206-1
-	youtube_dl-2015.06.15-1
+	youtube_dl-2016.01.29-1
 	wqy_microhei-0.2.0~beta-3
 	:
 	# repository architecture packages
@@ -62,11 +62,11 @@ RemotePackageRepository HaikuPorts
 	buildbot_slave-0.8.8-2
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
-	cdrtools-3.02~a04-1
-	cdrtools_devel-3.02~a04-1
+	cdrtools-3.02~a06-1
+	cdrtools_devel-3.02~a06-1
 	clang-3.5.1-1
 	clang_analysis-3.5.1-1
-	clipdinger-0.4-1
+	clipdinger-0.5.2-1
 	cmake-3.3.2-3
 	coreutils-8.24-1
 	cpio-2.12-1
@@ -111,13 +111,10 @@ RemotePackageRepository HaikuPorts
 	gcc-4.8.5_2015_07_11-1
 	gcc_syslibs-4.8.5_2015_07_11-1
 	gcc_syslibs_devel-4.8.5_2015_07_11-1
-	gcc5-5.3.0_2015_07_27-1
-	gcc5_syslibs-5.3.0_2015_07_27-1
-	gcc5_syslibs_devel-5.3.0_2015_07_27-1
 	gettext-0.19.6-2
 	gettext_libintl-0.19.6-2
-	giflib-5.1.0-1
-	giflib_devel-5.1.0-1
+	giflib-5.1.2-1
+	giflib_devel-5.1.2-1
 	git-2.2.2-2
 	git_arch-2.2.2-2
 	git_cvs-2.2.2-2
@@ -143,20 +140,22 @@ RemotePackageRepository HaikuPorts
 	grep_debuginfo-2.21-1
 	groff-1.20.1-3
 	gtk_doc-1.20-1
-	gutenprint-5.2.10-1
-	gutenprint_devel-5.2.10-1
+	gutenprint-5.2.11-1
+	gutenprint_devel-5.2.11-1
 	gzip-1.6-2
-	haikuwebkit-1.5.1-1
-	haikuwebkit_devel-1.5.1-1
+	haikuwebkit-1.5.2-1
+	haikuwebkit_devel-1.5.2-1
 	handbrake-0.10.1-1
 	harfbuzz-1.1.1-1
 	harfbuzz_devel-1.1.1-1
 	help2man-1.46.6-1
 	htmldoc-1.8.27-3
-	icu-55.1-6
-	icu_devel-55.1-6
+	icu-56.1-1
+	icu_devel-56.1-1
 	icu54-54.1-2
 	icu54_devel-54.1-2
+	icu55-55.1-1
+	icu55_devel-55.1-1
 	intltool-0.40.6-4
 	itstool-2.0.2-1
 	jam-2.5_2012_10_12-2
@@ -216,8 +215,8 @@ RemotePackageRepository HaikuPorts
 	libmikmod_devel-3.3.7-1
 	libmkv-0.6.5.1-3
 	libmkv_devel-0.6.5.1-3
-	libmodplug-0.8.8.5-1
-	libmodplug_devel-0.8.8.5-1
+	libmodplug-0.8.8.5-2
+	libmodplug_devel-0.8.8.5-2
 	libmp4v2-2.0.0-2
 	libmp4v2_devel-2.0.0-2
 	libmpeg2-0.5.1-3
@@ -265,8 +264,10 @@ RemotePackageRepository HaikuPorts
 	libvorbis_devel-1.3.5-2
 	libvpx-1.0.0-2
 	libvpx_devel-1.0.0-2
-	libwebp-0.4.1-2
-	libwebp_devel-0.4.1-2
+	libwebp-0.5.0-1
+	libwebp_devel-0.5.0-1
+	libwebp5-0.4.4-1
+	libwebp5_devel-0.4.4-1
 	libxml2-2.9.3-1
 	libxml2_devel-2.9.3-1
 	libxml2_python-2.9.3-1
@@ -311,7 +312,7 @@ RemotePackageRepository HaikuPorts
 	nss_devel-3.20-1
 	openal-1.13.0-2
 	openal_devel-1.13.0-2
-	openssh-7.1p1-3
+	openssh-7.1p1-4
 	openssl-1.0.2e-1
 	openssl_devel-1.0.2e-1
 	p7zip-9.20.1-5
@@ -380,7 +381,7 @@ RemotePackageRepository HaikuPorts
 	ubertuber-0.9.11-1
 	unrar-5.3.4-1
 	unzip-6.0-2
-	vim-7.4-3
+	vim-7.4-5
 	vision-0.9.7.r949-3
 	wget-1.17.1-1
 	which-2.21-1
@@ -442,7 +443,6 @@ RemotePackageRepository HaikuPorts
 	fribidi
 	gawk
 	gcc
-	gcc5
 	gettext
 	giflib
 	git
@@ -465,6 +465,7 @@ RemotePackageRepository HaikuPorts
 	htmldoc
 	icu
 	icu54
+	icu55
 	intltool
 	itstool
 	jam
@@ -522,6 +523,7 @@ RemotePackageRepository HaikuPorts
 	libusb
 	libusb_compat
 	libwebp
+	libwebp5
 	libxml2
 	libxslt
 	llvm

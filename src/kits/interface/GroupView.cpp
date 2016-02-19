@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Haiku, Inc. All rights reserved.
+ * Copyright 2010-2015 Haiku, Inc. All rights reserved.
  * Copyright 2006, Ingo Weinhold <bonefish@cs.tu-berlin.de>.
  *
  * Distributed under the terms of the MIT License.
@@ -13,7 +13,7 @@ BGroupView::BGroupView(orientation orientation, float spacing)
 	:
 	BView(NULL, 0, new BGroupLayout(orientation, spacing))
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AdoptSystemColors();
 }
 
 
@@ -22,7 +22,7 @@ BGroupView::BGroupView(const char* name, orientation orientation,
 	:
 	BView(name, 0, new BGroupLayout(orientation, spacing))
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	AdoptSystemColors();
 }
 
 
@@ -30,6 +30,7 @@ BGroupView::BGroupView(BMessage* from)
 	:
 	BView(from)
 {
+	AdoptSystemColors();
 }
 
 

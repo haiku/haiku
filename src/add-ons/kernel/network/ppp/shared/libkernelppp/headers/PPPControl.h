@@ -11,6 +11,76 @@
 #include <PPPDefs.h>
 
 
+#define IF_NAMESIZE     32
+	// copied from if.h
+
+struct control_net_module_args {
+	char                    ifr_name[IF_NAMESIZE];
+	const char*		name;
+	uint32			op;
+	void*			data;
+	size_t			length;
+//	union {
+//                struct sockaddr ifr_addr;
+//                struct sockaddr ifr_dstaddr;
+//                struct sockaddr ifr_broadaddr;
+//                struct sockaddr ifr_mask;
+//                struct ifreq_stats ifr_stats;
+//                struct route_entry ifr_route;
+//                int                     ifr_flags;
+//                int                     ifr_index;
+//                int                     ifr_metric;
+//                int                     ifr_mtu;
+//                int                     ifr_media;
+//                int                     ifr_type;
+//                int                     ifr_reqcap;
+//                int                     ifr_count;
+//                uint8_t*        ifr_data;
+//	};
+};
+	// copied from libppp
+
+
+enum {
+	// Paranoia mode: be far away of B_DEVICE_OP_CODES_END opcodes!!!
+	// You never know what another device driver ioctl() will do
+	// if think our NET_STACK_* is in fact his DO_RISKY_BUSINESS opcode, or whatever...
+	NET_IOCTL_BASE = 0xbe230000,
+	NET_STACK_IOCTL_BASE = NET_IOCTL_BASE + 0x200
+};
+
+enum {
+	NET_STACK_SOCKET = NET_STACK_IOCTL_BASE,	// socket_args *
+	NET_STACK_BIND,								// sockaddr_args *
+	NET_STACK_RECVFROM,							// struct msghdr *
+	NET_STACK_RECV,								// transfer_args *
+	NET_STACK_SENDTO,							// struct msghdr *
+	NET_STACK_SEND,								// transfer_args *
+	NET_STACK_LISTEN,							// int_args * (value = backlog)
+	NET_STACK_ACCEPT,							// sockaddr_args *
+	NET_STACK_CONNECT,							// sockaddr_args *
+	NET_STACK_SHUTDOWN,							// int_args * (value = how)
+	NET_STACK_GETSOCKOPT,						// sockopt_args *
+	NET_STACK_SETSOCKOPT,						// sockopt_args *
+	NET_STACK_GETSOCKNAME,						// sockaddr_args *
+	NET_STACK_GETPEERNAME,						// sockaddr_args *
+
+	NET_STACK_SYSCTL,							// sysctl_args *
+	NET_STACK_SELECT,							// select_args *
+	NET_STACK_DESELECT,							// select_args *
+
+	NET_STACK_GET_COOKIE,                       // void **
+
+	NET_STACK_STOP,
+
+	NET_STACK_NOTIFY_SOCKET_EVENT,				// notify_socket_event_args * (userland stack only)
+
+	NET_STACK_CONTROL_NET_MODULE,
+
+	NET_STACK_IOCTL_MAX
+};
+
+
 // various constants
 #define PPP_HANDLER_NAME_LENGTH_LIMIT		63
 	// if the name is longer than this value it will be truncated to fit the structure

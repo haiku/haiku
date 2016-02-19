@@ -472,7 +472,7 @@ void MediaReader::Connect(
 	FindLatencyFor(output.destination, &fDownstreamLatency, &id);
 
 	// compute the buffer period (must be done before setbuffergroup)
-	fBufferPeriod = bigtime_t(1000 * 8000000 / 1024
+	fBufferPeriod = bigtime_t(1000u * 8000000u / 1024u
 	                     * output.format.u.multistream.max_chunk_size
 			             / output.format.u.multistream.max_bit_rate);
 
@@ -645,7 +645,7 @@ void MediaReader::AdditionalBufferRequested(			//	used to be Reserved 0
 			PRINT("MediaReader::AdditionalBufferRequested got an error from GetFilledBuffer.\n");
 			return; // don't send the buffer
 		}
-		SendBuffer(buffer,output.destination);
+		SendBuffer(buffer, output.source, output.destination);
 	}
 }
 
@@ -689,7 +689,7 @@ status_t MediaReader::HandleBuffer(
 			buffer->Recycle();
 		} else {
 			if (fOutputEnabled) {
-				status = SendBuffer(buffer,output.destination);
+				status = SendBuffer(buffer, output.source, output.destination);
 				if (status != B_OK) {
 					PRINT("MediaReader::HandleEvent got an error from SendBuffer.\n");
 					buffer->Recycle();

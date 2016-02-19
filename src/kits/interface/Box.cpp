@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2015 Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -49,9 +49,6 @@ BBox::BBox(BRect frame, const char* name, uint32 resizingMode, uint32 flags,
 	BView(frame, name, resizingMode, flags  | B_WILL_DRAW | B_FRAME_EVENTS),
 	  fStyle(border)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
 	_InitObject();
 }
 
@@ -61,9 +58,6 @@ BBox::BBox(const char* name, uint32 flags, border_style border, BView* child)
 	BView(name, flags | B_WILL_DRAW | B_FRAME_EVENTS),
 	fStyle(border)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
 	_InitObject();
 
 	if (child)
@@ -76,9 +70,6 @@ BBox::BBox(border_style border, BView* child)
 	BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS | B_NAVIGABLE_JUMP),
 	fStyle(border)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-	SetLowColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-
 	_InitObject();
 
 	if (child)
@@ -269,7 +260,7 @@ BBox::Draw(BRect updateRect)
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
 
-		SetHighColor(0, 0, 0);
+		SetHighColor(ui_color(B_PANEL_TEXT_COLOR));
 		DrawString(fLabel, BPoint(10.0f, ceilf(fontHeight.ascent)));
 	}
 
@@ -280,15 +271,12 @@ BBox::Draw(BRect updateRect)
 void
 BBox::AttachedToWindow()
 {
-	BView* parent = Parent();
-	if (parent != NULL) {
-		// inherit the color from parent
-		rgb_color color = parent->ViewColor();
-		if (color == B_TRANSPARENT_COLOR)
-			color = ui_color(B_PANEL_BACKGROUND_COLOR);
+	AdoptParentColors();
 
-		SetViewColor(color);
-		SetLowColor(color);
+	if (ViewColor() == B_TRANSPARENT_COLOR) {
+		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+		SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
+		SetHighUIColor(B_PANEL_TEXT_COLOR);
 	}
 
 	// The box could have been resized in the mean time
@@ -604,14 +592,18 @@ BBox::DoLayout()
 		return;
 
 	// layout the child
-	if (BView* child = _Child()) {
+	BView* child = _Child();
+	if (child != NULL) {
 		BRect frame(Bounds());
 		frame.left += fLayoutData->insets.left;
 		frame.top += fLayoutData->insets.top;
 		frame.right -= fLayoutData->insets.right;
 		frame.bottom -= fLayoutData->insets.bottom;
 
-		BLayoutUtils::AlignInFrame(child, frame);
+		if ((child->Flags() & B_SUPPORTS_LAYOUT) != 0)
+			BLayoutUtils::AlignInFrame(child, frame);
+		else
+			child->MoveTo(frame.LeftTop());
 	}
 }
 
@@ -666,6 +658,8 @@ BBox::_InitObject(BMessage* archive)
 		if (archive->FindBool("_lblview", &hasLabelView) == B_OK)
 			fLabelView = ChildAt(0);
 	}
+
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -865,7 +859,7 @@ BBox::_ValidateLayoutData()
 
 	// finally consider the child constraints, if we shall support layout
 	BView* child = _Child();
-	if (child && (Flags() & B_SUPPORTS_LAYOUT)) {
+	if (child && (child->Flags() & B_SUPPORTS_LAYOUT)) {
 		BSize min = child->MinSize();
 		BSize max = child->MaxSize();
 		BSize preferred = child->PreferredSize();

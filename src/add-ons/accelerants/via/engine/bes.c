@@ -1,5 +1,5 @@
 /* VIA Unichrome Back End Scaler functions */
-/* Written by Rudolf Cornelissen 05/2002-1/2006 */
+/* Written by Rudolf Cornelissen 05/2002-2/2016 */
 
 #define MODULE_BIT 0x00000200
 
@@ -49,13 +49,21 @@ bool eng_bes_chk_bandwidth()
 	switch (((CRTCR(MEMCLK)) & 0x70) >> 4)
 	{
 	case 0: /* SDR  66 */
-	case 1: /* SDR 100 */
-	case 2: /* SDR 133 */
-		/* memory is too slow, sorry. */
+		LOG(8,("Overlay: System memory is type SDR 66\n"));
 		return false;
 		break;
-	case 3: /* DDR 100 */
+	case 1: /* SDR 100 */
+		LOG(8,("Overlay: System memory is type SDR 100\n"));
+		return false;
+		break;
+	case 2: /* SDR 133 */
+		/* memory is too slow, sorry. */
+		LOG(8,("Overlay: System memory is type SDR 133\n"));
+		return false;
+		break;
+	case 3: /* DDR 100 (PC1600) */
 		/* DDR100's basic limit... */
+		LOG(8,("Overlay: System memory is type DDR 100\n"));
 		if (bandwidth > 921600000.0) return false;
 		/* ... but we have constraints at higher than 800x600 */
 		if (si->dm.timing.h_display > 800)
@@ -65,10 +73,20 @@ bool eng_bes_chk_bandwidth()
 			if (refresh > 60.2) return false;
 		}
 		break;
-	case 4: /* DDR 133 */
+	case 4: /* DDR 133 (PC2100) */
+		LOG(8,("Overlay: System memory is type DDR 133\n"));
 		if (bandwidth > 4045440000.0) return false;
 		break;
+	case 5: /* DDR 166 (PC2700) */
+		LOG(8,("Overlay: System memory is type DDR 166\n"));
+		if (bandwidth > 5210000000.0) return false;//fixme: set more correct limit?
+		break;
+	case 6: /* DDR 200 (PC3200) */
+		LOG(8,("Overlay: System memory is type DDR 200\n"));
+		if (bandwidth > 6170000000.0) return false;//fixme: set more correct limit?
+		break;
 	default: /* not (yet?) used */
+		LOG(8,("Overlay: System memory is (yet) unknown type!\n"));
 		return false;
 		break;
 	}
@@ -396,31 +414,62 @@ static void eng_bes_program_move_overlay(move_overlay_info moi)
 	 *** actually program the registers ***
 	 **************************************/
 
-	/* setup clipped(!) buffer startadress in RAM */
-	/* VIA bes doesn't have clipping registers, so no subpixelprecise clipping
-	 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
-	/* first include 'pixel precise' left clipping... (top clipping was already included) */
-	moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
-	/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
-	BESW(VID1Y_ADDR0, (moi.a1orgv & 0x07fffffc));
+	if (si->ps.card_arch < K8M800)
+	{
+		/* setup clipped(!) buffer startadress in RAM */
+		/* VIA bes doesn't have clipping registers, so no subpixelprecise clipping
+		 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
+		/* first include 'pixel precise' left clipping... (top clipping was already included) */
+		moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
+		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
+		BESW(VID1Y_ADDR0, (moi.a1orgv & 0x07fffffc));
 
-	/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
-	/* notes:
-	 * - make absolutely sure the engine can fetch the last pixel needed from
-	 *   the sourcebitmap even if only to generate a tiny subpixel from it!
-	 * - the engine uses byte format instead of pixel format;
-	 * - the engine uses 16 bytes, so 8 pixels granularity. */
-	BESW(VID1_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
+		/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
+		/* notes:
+		 * - make absolutely sure the engine can fetch the last pixel needed from
+		 *   the sourcebitmap even if only to generate a tiny subpixel from it!
+		 * - the engine uses byte format instead of pixel format;
+		 * - the engine uses 16 bytes, so 8 pixels granularity. */
+		BESW(VID1_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
 
-	/* setup output window position */
-	BESW(VID1_HVSTART, ((moi.hcoordv & 0xffff0000) | ((moi.vcoordv & 0xffff0000) >> 16)));
+		/* setup output window position */
+		BESW(VID1_HVSTART, ((moi.hcoordv & 0xffff0000) | ((moi.vcoordv & 0xffff0000) >> 16)));
 
-	/* setup output window size */
-	BESW(VID1_SIZE, (((moi.hcoordv & 0x0000ffff) << 16) | (moi.vcoordv & 0x0000ffff)));
+		/* setup output window size */
+		BESW(VID1_SIZE, (((moi.hcoordv & 0x0000ffff) << 16) | (moi.vcoordv & 0x0000ffff)));
 
-	/* enable colorkeying (b0 = 1), disable chromakeying (b1 = 0), Vid1 on top of Vid3 (b20 = 0),
-	 * all registers are loaded during the next 'BES-'VBI (b28 = 1), Vid1 cmds fire (b31 = 1) */
-	BESW(COMPOSE, 0x90000001);
+		/* enable colorkeying (b0 = 1), disable chromakeying (b1 = 0), Vid1 on top of Vid3 (b20 = 0),
+		 * all registers are loaded during the next 'BES-'VBI (b28 = 1), Vid1 cmds fire (b31 = 1) */
+		BESW(COMPOSE, 0x90000001);//fixme: >>>!<<< don't touch colorkey enable bit!
+	}
+	else
+	{
+		/* setup clipped(!) buffer startadress in RAM */
+		/* VIA bes doesn't have clipping registers, so no subpixelprecise clipping
+		 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
+		/* first include 'pixel precise' left clipping... (top clipping was already included) */
+		moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
+		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
+		BESW(VID3_ADDR0, (moi.a1orgv & 0x07fffffc));
+
+		/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
+		/* notes:
+		 * - make absolutely sure the engine can fetch the last pixel needed from
+		 *   the sourcebitmap even if only to generate a tiny subpixel from it!
+		 * - the engine uses byte format instead of pixel format;
+		 * - the engine uses 16 bytes, so 8 pixels granularity. */
+		BESW(V3A_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
+
+		/* setup output window position */
+		BESW(VID3_HVSTART, ((moi.hcoordv & 0xffff0000) | ((moi.vcoordv & 0xffff0000) >> 16)));
+
+		/* setup output window size */
+		BESW(VID3_SIZE, (((moi.hcoordv & 0x0000ffff) << 16) | (moi.vcoordv & 0x0000ffff)));
+
+		/* enable colorkeying (b0 = 1), disable chromakeying (b1 = 0), Vid3 on top of Vid1 (b20 = 1),
+		 * all registers are loaded during the next 'BES-'VBI (b8 = 1), Vid3 cmds fire (b30 = 1) */
+		BESW(COMPOSE, 0x40100101);//fixme: >>>!<<< don't touch colorkey enable bit!
+	}
 }
 
 status_t eng_bes_to_crtc(bool crtc)
@@ -453,32 +502,36 @@ status_t eng_bes_to_crtc(bool crtc)
 
 status_t eng_bes_init()
 {
-	if (si->ps.chip_rev < 0x10)
+	if (si->ps.card_arch < K8M800)
 	{
-		/* select colorspace setup for B_YCbCr422 */
-		BESW(VID1_COLSPAC1, 0x140020f2);
-		BESW(VID1_COLSPAC2, 0x0a0a2c00);
-		/* fifo depth is $20 (b0-5), threshold $10 (b8-13), prethreshold $1d (b24-29) */
-		BESW(VID1_FIFO, 0x1d00101f);
+		if (si->ps.chip_rev < 0x10)
+		{
+			/* setup brightness, contrast and saturation to be 'neutral' */
+			BESW(VID1_COLSPAC1, 0x140020f2);
+			BESW(VID1_COLSPAC2, 0x0a0a2c00);
+			/* fifo depth is $20 (b0-5), threshold $10 (b8-13), prethreshold $1d (b24-29) */
+			BESW(VID1_FIFO, 0x1d00101f);
+		}
+		else
+		{
+			/* setup brightness, contrast and saturation to be 'neutral' */
+			BESW(VID1_COLSPAC1, 0x13000ded);
+			BESW(VID1_COLSPAC2, 0x13171000);
+			/* fifo depth is $40 (b0-5), threshold $38 (b8-13), prethreshold $38 (b24-29) */
+			BESW(VID1_FIFO, 0x3800383f);
+		}
 	}
 	else
 	{
-		/* select colorspace setup for B_YCbCr422 */
-		BESW(VID1_COLSPAC1, 0x13000ded);
-		BESW(VID1_COLSPAC2, 0x13171000);
-		/* fifo depth is $40 (b0-5), threshold $38 (b8-13), prethreshold $38 (b24-29) */
-		BESW(VID1_FIFO, 0x3800383f);
-	}
-
-		/* disable overlay ints (b0 = buffer 0, b4 = buffer 1) */
-//		BESW(NV04_INTE, 0x00000000);
-		/* shut off GeForce4MX MPEG2 decoder */
-//		BESW(DEC_GENCTRL, 0x00000000);
-		/* setup BES memory-range mask */
-//		BESW(NV10_0MEMMASK, (si->ps.memory_size - 1));
 		/* setup brightness, contrast and saturation to be 'neutral' */
-//		BESW(NV10_0BRICON, ((0x1000 << 16) | 0x1000));
-//		BESW(NV10_0SAT, ((0x0000 << 16) | 0x1000));
+		BESW(VID3_COLSPAC1, 0x13000ded);
+		BESW(VID3_COLSPAC2, 0x13171000);
+
+		/* fifo prethreshold 60 (b0-6) */
+		BESW(V3A_PREFIFO, (60 & 0x7f));
+		/* fifo depth-1 is 63 (b0-7), threshold 60 (b8-15) */
+		BESW(V3A_FIFO, ((63 & 0xff) | ((60 & 0xff) << 8)));
+	}
 
 	return B_OK;
 }
@@ -592,7 +645,6 @@ status_t eng_configure_bes
 	LOG(4,("Overlay: horizontal scaling factor is %f\n", (float)65536 / ifactor));
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	/* all cards have a upscaling limit of 8.0 (see official nVidia specsheets) */
 	//fixme: checkout...
 	if (hiscalv < 0x00002000)
 	{
@@ -698,7 +750,6 @@ status_t eng_configure_bes
 	si->overlay.v_ifactor = ifactor;
 
 	/* check scaling factor (and modify if needed) to be within scaling limits */
-	/* all cards have a upscaling limit of 8.0 (see official nVidia specsheets) */
 	//fixme: checkout...
 	if (viscalv < 0x00002000)
 	{
@@ -793,72 +844,135 @@ status_t eng_configure_bes
 	 *** actually program the registers ***
 	 **************************************/
 
-	/* setup clipped(!) buffer startadress in RAM */
-	/* VIA bes doesn't have clipping registers, so no subpixelprecise clipping
-	 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
-	/* first include 'pixel precise' left clipping... (top clipping was already included) */
-	moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
-	/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
-	BESW(VID1Y_ADDR0, (moi.a1orgv & 0x07fffffc));
-
-	/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
-	/* notes:
-	 * - make absolutely sure the engine can fetch the last pixel needed from
-	 *   the sourcebitmap even if only to generate a tiny subpixel from it!
-	 * - the engine uses byte format instead of pixel format;
-	 * - the engine uses 16 bytes, so 8 pixels granularity. */
-	BESW(VID1_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
-
-	/* enable horizontal filtering if asked for */
-	if (ow->flags & B_OVERLAY_HORIZONTAL_FILTERING)
+	if (si->ps.card_arch < K8M800)
 	{
-		minictrl |= (1 << 1);
-		LOG(4,("Overlay: using horizontal interpolation on scaling\n"));
-	}
-	/* enable vertical filtering if asked for */
-	if (ow->flags & B_OVERLAY_VERTICAL_FILTERING)
-	{
-		/* vertical interpolation b0, interpolation on Y, Cb and Cr all (b2) */
-		minictrl |= ((1 << 2) | (1 << 0));
-		LOG(4,("Overlay: using vertical interpolation on scaling\n"));
-	}
-	/* and program horizontal and vertical 'prescaling' for downscaling */
-	BESW(VID1_MINI_CTL, minictrl);
+		/* setup clipped(!) buffer startadress in RAM */
+		/* VIA bes doesn't have clipping registers, so no subpixelprecise clipping
+		 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
+		/* first include 'pixel precise' left clipping... (top clipping was already included) */
+		moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
+		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
+		BESW(VID1Y_ADDR0, (moi.a1orgv & 0x07fffffc));
 
-	/* setup buffersize */
-	BESW(V1_SOURCE_WH, ((ob->height << 16) | (ob->width)));
+		/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
+		/* notes:
+		 * - make absolutely sure the engine can fetch the last pixel needed from
+		 *   the sourcebitmap even if only to generate a tiny subpixel from it!
+		 * - the engine uses byte format instead of pixel format;
+		 * - the engine uses 16 bytes, so 8 pixels granularity. */
+		BESW(VID1_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
 
-	/* setup buffer source pitch including slopspace (in bytes) */
-	BESW(VID1_STRIDE, (ob->width * 2));
+		/* enable horizontal filtering if asked for */
+		if (ow->flags & B_OVERLAY_HORIZONTAL_FILTERING)
+		{
+			minictrl |= (1 << 1);
+			LOG(4,("Overlay: using horizontal interpolation on scaling\n"));
+		}
+		/* enable vertical filtering if asked for */
+		if (ow->flags & B_OVERLAY_VERTICAL_FILTERING)
+		{
+			/* vertical interpolation b0, interpolation on Y, Cb and Cr all (b2) */
+			minictrl |= ((1 << 2) | (1 << 0));
+			LOG(4,("Overlay: using vertical interpolation on scaling\n"));
+		}
+		/* and program horizontal and vertical 'prescaling' for downscaling */
+		BESW(VID1_MINI_CTL, minictrl);
 
-	/* setup output window position */
-	BESW(VID1_HVSTART, ((moi.hcoordv & 0xffff0000) | ((moi.vcoordv & 0xffff0000) >> 16)));
+		/* setup buffersize */
+		BESW(V1_SOURCE_WH, ((ob->height << 16) | (ob->width)));
 
-	/* setup output window size */
-	BESW(VID1_SIZE, (((moi.hcoordv & 0x0000ffff) << 16) | (moi.vcoordv & 0x0000ffff)));
+		/* setup buffer source pitch including slopspace (in bytes) */
+		BESW(VID1_STRIDE, (ob->width * 2));
 
-	/* setup horizontal and vertical scaling:
-	 * setup horizontal scaling enable (b31), setup vertical scaling enable (b15).
-	 * Note:
-	 * Vertical scaling has a different resolution than horizontal scaling(!).  */
-	scaleval = 0x00000000;
-	if (scale_x) scaleval |= 0x80000000;
-	if (scale_y) scaleval |= 0x00008000;
-	BESW(VID1_ZOOM, (scaleval | ((hiscalv << 16) >> 5) | (viscalv >> 6)));
+		/* setup output window position */
+		BESW(VID1_HVSTART, ((moi.hcoordv & 0xffff0000) | ((moi.vcoordv & 0xffff0000) >> 16)));
 
-	if (si->ps.chip_rev < 0x10)
-	{
-		/* enable BES (b0), format yuv422 (b2-4 = %000), set colorspace sign (b7 = 1),
-		 * input is frame (not field) picture (b9 = 0), expire = $5 (b16-19),
-		 * select field (not frame)(!) base (b24 = 0) */
-		BESW(VID1_CTL, 0x00050081);
+		/* setup output window size */
+		BESW(VID1_SIZE, (((moi.hcoordv & 0x0000ffff) << 16) | (moi.vcoordv & 0x0000ffff)));
+
+		/* setup horizontal and vertical scaling:
+		 * setup horizontal scaling enable (b31), setup vertical scaling enable (b15).
+		 * Note:
+		 * Vertical scaling has a different resolution than horizontal scaling(!).  */
+		scaleval = 0x00000000;
+		if (scale_x) scaleval |= 0x80000000;
+		if (scale_y) scaleval |= 0x00008000;
+		BESW(VID1_ZOOM, (scaleval | ((hiscalv << 16) >> 5) | (viscalv >> 6)));
+
+		if (si->ps.chip_rev < 0x10)
+		{
+			/* enable BES (b0), format yuv422 (b2-4 = %000), set colorspace sign (b7 = 1),
+			 * input is frame (not field) picture (b9 = 0), expire = $5 (b16-19),
+			 * select field (not frame)(!) base (b24 = 0) */
+			BESW(VID1_CTL, 0x00050081);
+		}
+		else
+		{
+			/* enable BES (b0), format yuv422 (b2-4 = %000), set colorspace sign (b7 = 1),
+			 * input is frame (not field) picture (b9 = 0), expire = $f (b16-19),
+			 * select field (not frame)(!) base (b24 = 0) */
+			BESW(VID1_CTL, 0x000f0081);
+		}
 	}
 	else
 	{
-		/* enable BES (b0), format yuv422 (b2-4 = %000), set colorspace sign (b7 = 1),
-		 * input is frame (not field) picture (b9 = 0), expire = $f (b16-19),
-		 * select field (not frame)(!) base (b24 = 0) */
-		BESW(VID1_CTL, 0x000f0081);
+		/* setup clipped(!) buffer startadress in RAM */
+		/* VIA bes doesn't have clipping registers, so no subpixelprecise clipping
+		 * either. We do pixelprecise vertical and 'two pixel' precise horizontal clipping here. */
+		/* first include 'pixel precise' left clipping... (top clipping was already included) */
+		moi.a1orgv += ((moi.hsrcstv >> 16) * 2);
+		/* we need to step in 4-byte (2 pixel) granularity due to the nature of yuy2 */
+		BESW(VID3_ADDR0, (moi.a1orgv & 0x07fffffc));
+
+		/* horizontal source end does not use subpixelprecision: granularity is 8 pixels */
+		/* notes:
+		 * - make absolutely sure the engine can fetch the last pixel needed from
+		 *   the sourcebitmap even if only to generate a tiny subpixel from it!
+		 * - the engine uses byte format instead of pixel format;
+		 * - the engine uses 16 bytes, so 8 pixels granularity. */
+		BESW(V3A_FETCH, (((((moi.hsrcendv >> 16) + 1 + 0x0007) & ~0x0007) * 2) << (20 - 4)));
+
+		/* enable horizontal filtering if asked for */
+		if (ow->flags & B_OVERLAY_HORIZONTAL_FILTERING)
+		{
+			minictrl |= (1 << 1);
+			LOG(4,("Overlay: using horizontal interpolation on scaling\n"));
+		}
+		/* enable vertical filtering if asked for */
+		if (ow->flags & B_OVERLAY_VERTICAL_FILTERING)
+		{
+			/* vertical interpolation b0, interpolation on Y, Cb and Cr all (b2) */
+			minictrl |= ((1 << 2) | (1 << 0));
+			LOG(4,("Overlay: using vertical interpolation on scaling\n"));
+		}
+		/* and program horizontal and vertical 'prescaling' for downscaling */
+		BESW(VID3_MINI_CTL, minictrl);
+
+		/* setup buffersize (V3 does not need ob->height(?)) */
+		BESW(V3_SRC_WIDTH, (ob->width));
+
+		/* setup buffer source pitch including slopspace (in bytes) */
+		BESW(VID3_STRIDE, (ob->width * 2));
+
+		/* setup output window position */
+		BESW(VID3_HVSTART, ((moi.hcoordv & 0xffff0000) | ((moi.vcoordv & 0xffff0000) >> 16)));
+
+		/* setup output window size */
+		BESW(VID3_SIZE, (((moi.hcoordv & 0x0000ffff) << 16) | (moi.vcoordv & 0x0000ffff)));
+
+		/* setup horizontal and vertical scaling:
+		 * setup horizontal scaling enable (b31), setup vertical scaling enable (b15).
+		 * Note:
+		 * Vertical scaling has a different resolution than horizontal scaling(!).  */
+		scaleval = 0x00000000;
+		if (scale_x) scaleval |= 0x80000000;
+		if (scale_y) scaleval |= 0x00008000;
+		BESW(VID3_ZOOM, (scaleval | ((hiscalv << 16) >> 5) | (viscalv >> 6)));
+
+		/* enable BES (b0), format yuv422 (b2-3 = %00), set colorspace sign (b7 = 1),
+		 * expire = $8 (b16-19), select field (not frame)(!) base (b24 = 0),
+		 * enable prefetch (b30 = 1) */
+		BESW(VID3_CTL, 0x40080081);
 	}
 
 
@@ -926,17 +1040,35 @@ status_t eng_configure_bes
 		break;
 	}
 
-	/* disable chromakeying (b1 = 0), Vid1 on top of Vid3 (b20 = 0),
-	 * all registers are loaded during the next 'BES-'VBI (b28 = 1), Vid1 cmds fire (b31 = 1) */
-	if (ow->flags & B_OVERLAY_COLOR_KEY)
+	if (si->ps.card_arch < K8M800)
 	{
-		/* enable colorkeying (b0 = 1) */
-		BESW(COMPOSE, 0x90000001);
+		/* disable chromakeying (b1 = 0), Vid1 on top of Vid3 (b20 = 0),
+		 * all registers are loaded during the next 'BES-'VBI (b28 = 1), Vid1 cmds fire (b31 = 1) */
+		if (ow->flags & B_OVERLAY_COLOR_KEY)
+		{
+			/* enable colorkeying (b0 = 1) */
+			BESW(COMPOSE, 0x90000001);
+		}
+		else
+		{
+			/* disable colorkeying (b0 = 0) */
+			BESW(COMPOSE, 0x90000000);
+		}
 	}
 	else
 	{
-		/* disable colorkeying (b0 = 0) */
-		BESW(COMPOSE, 0x90000000);
+		/* disable chromakeying (b1 = 0), Vid3 on top of Vid1 (b20 = 1),
+		 * all registers are loaded during the next 'BES-'VBI (b8 = 1), Vid3 cmds fire (b30 = 1) */
+		if (ow->flags & B_OVERLAY_COLOR_KEY)
+		{
+			/* enable colorkeying (b0 = 1) */
+			BESW(COMPOSE, 0x40100101);
+		}
+		else
+		{
+			/* disable colorkeying (b0 = 0) */
+			BESW(COMPOSE, 0x40100100);
+		}
 	}
 
 	/* note that overlay is in use (for eng_bes_move_overlay()) */
@@ -947,12 +1079,24 @@ status_t eng_configure_bes
 
 status_t eng_release_bes()
 {
-	/* setup BES control: disable scaler (b0 = 0) */
-	BESW(VID1_CTL, 0x00000000);
+	if (si->ps.card_arch < K8M800)
+	{
+		/* setup BES control: disable scaler (b0 = 0) */
+		BESW(VID1_CTL, 0x00000000);
 
-	/* make sure the 'disable' command really gets executed: (no 'VBI' anymore if BES disabled) */
-	/* all registers are loaded immediately (b29 = 1), Vid1 cmds fire (b31 = 1) */
-	BESW(COMPOSE, 0xa0000000);
+		/* make sure the 'disable' command really gets executed: (no 'VBI' anymore if BES disabled) */
+		/* all registers are loaded immediately (b29 = 1), Vid1 cmds fire (b31 = 1) */
+		BESW(COMPOSE, 0xa0000000);
+	}
+	else
+	{
+		/* setup BES control: disable scaler (b0 = 0) */
+		BESW(VID3_CTL, 0x00000000);
+
+		/* make sure the 'disable' command really gets executed: (no 'VBI' anymore if BES disabled) */
+		/* all registers are loaded immediately (b29 = 1), Vid3 cmds fire (b30 = 1) */
+		BESW(COMPOSE, 0x60000000);//fixme >>>!<<< test b29, should that be b27??
+	}
 
 	/* note that overlay is not in use (for eng_bes_move_overlay()) */
 	si->overlay.active = false;

@@ -37,7 +37,7 @@ BatteryInfoView::BatteryInfoView()
 	fPreferredSize(200, 200),
 	fMaxStringSize(0, 0)
 {
-	SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 }
 
 
@@ -346,7 +346,7 @@ ExtendedInfoWindow::ExtendedInfoWindow(PowerStatusDriverInterface* interface)
 	fDriverInterface->AcquireReference();
 
 	BView *view = new BView(Bounds(), "view", B_FOLLOW_ALL, 0);
-	view->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	AddChild(view);
 
 	BGroupLayout* mainLayout = new BGroupLayout(B_VERTICAL);

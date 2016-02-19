@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef	_SPLIT_VIEW_H
@@ -61,6 +61,7 @@ public:
 			bool				AddChild(int32 index, BLayoutItem* child,
 									float weight);
 
+	virtual void				AttachedToWindow();
 	virtual	void				Draw(BRect updateRect);
 	virtual	void				DrawAfterChildren(BRect updateRect);
 	virtual	void				MouseDown(BPoint where);

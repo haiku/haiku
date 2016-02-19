@@ -68,8 +68,8 @@ ActivityWindow::ActivityWindow()
 	fLayout->SetSpacing(inset);
 
 	BView* top = new BView("top", 0, fLayout);
-	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	layout->AddView(top);
+	top->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	BMessage viewState;
 	int32 count = 0;
@@ -99,7 +99,6 @@ ActivityWindow::ActivityWindow()
 	topRect.top = menuBar->Bounds().bottom + 1;
 
 	BView* top = new BView(topRect, "top", B_FOLLOW_ALL, 0);
-	top->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 	layout->AddChild(top);
 
 	BMessage viewState;

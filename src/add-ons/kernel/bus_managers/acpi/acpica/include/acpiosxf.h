@@ -10,7 +10,7 @@
  *
  * 1. Copyright Notice
  *
- * Some or all of this work - Copyright (c) 1999 - 2015, Intel Corp.
+ * Some or all of this work - Copyright (c) 1999 - 2016, Intel Corp.
  * All rights reserved.
  *
  * 2. License
@@ -129,7 +129,8 @@ typedef enum
     OSL_GLOBAL_LOCK_HANDLER,
     OSL_NOTIFY_HANDLER,
     OSL_GPE_HANDLER,
-    OSL_DEBUGGER_THREAD,
+    OSL_DEBUGGER_MAIN_THREAD,
+    OSL_DEBUGGER_EXEC_THREAD,
     OSL_EC_POLL_HANDLER,
     OSL_EC_BURST_HANDLER
 

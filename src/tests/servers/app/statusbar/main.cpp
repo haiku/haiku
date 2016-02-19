@@ -24,7 +24,7 @@ public:
 	{
 		frame = Bounds();
 		BView* background = new BView(frame, "bg", B_FOLLOW_ALL, 0);
-		background->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		background->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		AddChild(background);
 
 		frame = background->Bounds();

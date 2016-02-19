@@ -1407,7 +1407,7 @@ void
 BMenu::DrawBackground(BRect updateRect)
 {
 	if (be_control_look != NULL) {
-		rgb_color base = sMenuInfo.background_color;
+		rgb_color base = ui_color(B_MENU_BACKGROUND_COLOR);
 		uint32 flags = 0;
 		if (!IsEnabled())
 			flags |= BControlLook::B_DISABLED;
@@ -1435,7 +1435,7 @@ BMenu::DrawBackground(BRect updateRect)
 	}
 
 	rgb_color oldColor = HighColor();
-	SetHighColor(sMenuInfo.background_color);
+	SetHighColor(ui_color(B_MENU_BACKGROUND_COLOR));
 	FillRect(Bounds() & updateRect, B_SOLID_HIGH);
 	SetHighColor(oldColor);
 }
@@ -1469,7 +1469,7 @@ BMenu::_InitData(BMessage* archive)
 	fLayoutData = new LayoutData;
 	fLayoutData->lastResizingMode = ResizingMode();
 
-	SetLowColor(sMenuInfo.background_color);
+	SetLowUIColor(B_MENU_BACKGROUND_COLOR);
 	SetViewColor(B_TRANSPARENT_COLOR);
 
 	fTriggerEnabled = sMenuInfo.triggers_always_shown;

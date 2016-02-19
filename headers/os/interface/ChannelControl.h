@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2009, Haiku, Inc. All rights reserved.
+ * Copyright 2008-2015, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _CHANNEL_CONTROL_H
@@ -18,8 +18,7 @@ public:
 								BChannelControl(BRect frame, const char* name,
 									const char* label, BMessage* model,
 									int32 channelCount = 1,
-									uint32 resizingMode
-										= B_FOLLOW_LEFT | B_FOLLOW_TOP,
+									uint32 resizingMode = B_FOLLOW_LEFT_TOP,
 									uint32 flags = B_WILL_DRAW);
 								BChannelControl(const char* name,
 									const char* label, BMessage* model,

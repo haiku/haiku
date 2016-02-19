@@ -180,7 +180,7 @@ TTeamMenuItem::Draw()
 
 	menu->PushState();
 
-	rgb_color menuColor = menu->LowColor();
+	rgb_color menuColor = ui_color(B_MENU_BACKGROUND_COLOR);
 	bool canHandle = !fBarView->Dragging()
 		|| fBarView->AppCanHandleTypes(Signature());
 	uint32 flags = 0;
@@ -274,10 +274,10 @@ TTeamMenuItem::DrawContent()
 	bool canHandle = !fBarView->Dragging()
 		|| fBarView->AppCanHandleTypes(Signature());
 	if (_IsSelected() && IsEnabled() && canHandle)
-		menu->SetLowColor(tint_color(menu->LowColor(),
+		menu->SetLowColor(tint_color(ui_color(B_MENU_BACKGROUND_COLOR),
 			B_HIGHLIGHT_BACKGROUND_TINT));
 	else
-		menu->SetLowColor(menu->LowColor());
+		menu->SetLowColor(ui_color(B_MENU_BACKGROUND_COLOR));
 
 	if (IsSelected())
 		menu->SetHighColor(ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR));
@@ -308,8 +308,9 @@ TTeamMenuItem::DrawExpanderArrow()
 
 	rect.OffsetTo(BPoint(frame.right - rect.Width(),
 		ContentLocation().y + ((frame.Height() - rect.Height()) / 2)));
-	be_control_look->DrawArrowShape(menu, rect, rect, menu->LowColor(),
-		fArrowDirection, 0, B_DARKEN_3_TINT);
+	be_control_look->DrawArrowShape(menu, rect, rect,
+		ui_color(B_MENU_BACKGROUND_COLOR), fArrowDirection, 0,
+		B_DARKEN_3_TINT);
 }
 
 

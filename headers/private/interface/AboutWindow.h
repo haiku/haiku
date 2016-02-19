@@ -15,7 +15,9 @@
 #include <View.h>
 
 
+namespace BPrivate {
 class AboutView;
+}
 class BBitmap;
 class BPoint;
 
@@ -72,7 +74,7 @@ private:
 	virtual	void			_ReservedAboutWindow1();
 
 private:
-			AboutView*		fAboutView;
+			BPrivate::AboutView* fAboutView;
 
 			// FBC Padding
 			uint32			_reserved[20];

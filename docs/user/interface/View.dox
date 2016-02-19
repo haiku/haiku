@@ -1,13 +1,14 @@
 /*
- * Copyright 2011-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2011-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
+ *		Joseph Groover, looncraz@looncraz.net
  *
  * Corresponds to:
- *		headers/os/interface/View.h	 hrev47274
- *		src/kits/interface/View.cpp	 hrev47274
+ *		headers/os/interface/View.h	 hrev497**
+ *		src/kits/interface/View.cpp	 hrev497**
  */
 
 
@@ -524,6 +525,15 @@
 
 
 /*!
+	\var B_FOLLOW_LEFT_TOP
+	\brief The margins between the left and top sides of the view and the left
+	       and top sides of its parent remain constant.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\class BView
 	\ingroup interface
 	\ingroup libbe
@@ -596,12 +606,13 @@ if (Window()->LockLooper()) {
 
 	Each view has a ViewColor() that fills the frame rectangle before the
 	view does any drawing of its own. The default view color is white, you may
-	change the view color by calling SetViewColor(). A commonly used view color
-	is \c B_PANEL_BACKGROUND_COLOR which is a grey color used as the view color
-	of many Interface Kit classes. If you set the view color to
-	\c B_TRANSPARENT_COLOR then the Application Server won't erase the clipping
-	region of the view before updating, this should only be used if the view
-	erases itself by drawing on every pixel in the clipping region.
+	change the view color by calling SetViewColor() or, as of Haiku R1,
+	SetViewUIColor(). A commonly used view color is \c B_PANEL_BACKGROUND_COLOR
+	which is a user-defined color used as the view color of most applications.
+	If you set the view color to \c B_TRANSPARENT_COLOR then the Application Server
+	won't erase the clipping region of the view before updating, this should only
+	be used if the view erases itself by drawing on every pixel in the clipping
+	region.
 
 	If you want to set the view color of a view to be the same as its parent you
 	need to set it within the AttachedToWindow() method of the view like so:
@@ -612,6 +623,7 @@ SetViewColor(Parent()->ViewColor());
 
 	\since BeOS R3
 */
+
 
 
 /*!
@@ -2058,6 +2070,59 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
+	\fn bool BView::HasDefaultColors() const
+	\brief Tests if the view has any colors set.
+
+	\return Boolean value, true if colors are not set.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BView::HasSystemColors() const
+	\brief Tests if the view is using system "panel" colors.
+		   B_PANEL_BACKGROUND_COLOR for ViewUIColor()
+		   B_PANEL_BACKGROUND_COLOR for LowUIColor()
+		   B_PANEL_TEXT_COLOR for HighUIColor()
+
+	\return Boolean value, true if colors are as described.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BView::AdoptParentColors()
+	\brief Attempts to use the colors of any parent view.
+		   Will adopt view, low, and high colors.
+		   Should be called in AttachedToWindow() or AllAttached().
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BView::AdoptSystemColors()
+	\brief Instructs view to use standard system "panel" colors.
+		   B_PANEL_BACKGROUND_COLOR for ViewUIColor()
+		   B_PANEL_BACKGROUND_COLOR for LowUIColor()
+		   B_PANEL_TEXT_COLOR for HighUIColor()
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BView::AdoptViewColors(BView* view)
+	\brief Attempts to use the colors of a given view.
+		   Will adopt view, low, and high colors.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn void BView::SetHighColor(rgb_color color)
 	\brief Set the high color of the view.
 
@@ -2082,6 +2147,18 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
+	\fn void BView::SetHighUIColor(color_which which, float tint)
+	\brief Set the high color of the view to a system constant.
+	       The color will update live with user changes.
+
+	\param which The color_which constant to set.
+	\param tint Optional tint value to use.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn rgb_color BView::HighColor() const
 	\brief Return the current high color.
 
@@ -2091,6 +2168,20 @@ SetViewColor(Parent()->ViewColor());
 	\sa SetHighColor(uchar, uchar, uchar, uchar)
 
 	\since BeOS R3
+*/
+
+
+/*!
+	\fn color_which BView::HighUIColor(float* tint) const
+	\brief Return the current high color constant being used.
+
+	\param tint Optional float pointer in which to store the tint
+				value used to modify the system color constant.
+	\return The current high color constant.
+
+	\sa SetHighUIColor(color_which, float)
+
+	\since Haiku R1
 */
 
 
@@ -2118,6 +2209,18 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
+	\fn void BView::SetLowUIColor(color_which which, float tint)
+	\brief Set the low color of the view to a system constant.
+	       The color will update live with user changes.
+
+	\param which The color_which constant to set.
+	\param tint Optional tint value to use.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn rgb_color BView::LowColor() const
 	\brief Return the current low color.
 
@@ -2127,6 +2230,20 @@ SetViewColor(Parent()->ViewColor());
 	\sa SetLowColor(uchar, uchar, uchar, uchar)
 
 	\since BeOS R3
+*/
+
+
+/*!
+	\fn color_which BView::LowUIColor(float* tint) const
+	\brief Return the current low color constant being used.
+
+	\param tint Optional float pointer in which to store the tint
+				value used to modify the system color constant.
+	\return The current low color constant.
+
+	\sa SetLowUIColor(color_which, float)
+
+	\since Haiku R1
 */
 
 
@@ -2155,6 +2272,18 @@ SetViewColor(Parent()->ViewColor());
 
 
 /*!
+	\fn void BView::SetViewUIColor(color_which which, float tint)
+	\brief Set the view color of the view to a system constant.
+	       The color will update live with user changes.
+
+	\param which The color_which constant to set.
+	\param tint Optional tint value to use.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn rgb_color BView::ViewColor() const
 	\brief Return the current view color.
 
@@ -2164,6 +2293,20 @@ SetViewColor(Parent()->ViewColor());
 	\sa SetViewColor(uchar, uchar, uchar, uchar)
 
 	\since BeOS R3
+*/
+
+
+/*!
+	\fn color_which BView::ViewUIColor(float* tint) const
+	\brief Return the current view color constant being used.
+
+	\param tint Optional float pointer in which to store the tint
+				value used to modify the system color constant.
+	\return The current view color constant.
+
+	\sa SetViewUIColor(color_which, float)
+
+	\since Haiku R1
 */
 
 
@@ -3693,6 +3836,34 @@ SetViewColor(Parent()->ViewColor());
 	\brief Sends a message to App Server to redraw the view.
 
 	\since BeOS R3
+*/
+
+
+/*!
+	\fn void BView::DelayedInvalidate(bigtime_t delay)
+	\brief Sends a message to App Server to redraw the entire view after
+	       a certain, minimum, delay. Repeated calls to this method may be
+	       merged, but the view is guaranteed to be redrawn after the delay
+	       given in the first call of this method.
+
+	\param delay The time, in microseconds, to wait until redrawing the view.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BView::DelayedInvalidate(bigtime_t delay, BRect invalRect)
+	\brief Sends a message to App Server to redraw the portion of the view
+	       specified by \a invalRect after a certain, minimum, delay.
+	       Repeated calls to this method may be merged, but the invalidated
+	       rect is guaranteed to be redrawn after the minimum delay given
+	       by the first call of this method.
+
+	\param delay The time, in microseconds, to wait until redrawing the view.
+	\param invalRect The rectangular area of the view to redraw.
+
+	\since Haiku R1
 */
 
 

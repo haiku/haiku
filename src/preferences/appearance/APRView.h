@@ -1,11 +1,12 @@
 /*
- * Copyright 2002-2012, Haiku. All rights reserved.
+ * Copyright 2002-2015, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm (darkwyrm@earthlink.net)
  *		Rene Gollent (rene@gollent.com)
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 #ifndef APR_VIEW_H_
 #define APR_VIEW_H_
@@ -27,8 +28,6 @@
 #include <View.h>
 
 #include <DecorInfo.h>
-
-#include "ColorSet.h"
 
 
 class APRWindow;
@@ -52,7 +51,8 @@ public:
 
 private:
 			void				_SetCurrentColor(rgb_color color);
-			void				_UpdateAllColors();
+			void				_SetUIColors(const BMessage& colors);
+			void				_UpdatePreviews(const BMessage& colors);
 
 private:
 			BColorControl*		fPicker;
@@ -65,9 +65,9 @@ private:
 
 			ColorPreview*		fColorPreview;
 
-			ColorSet			fCurrentSet;
-			ColorSet			fPrevSet;
-			ColorSet			fDefaultSet;
+			BMessage			fPrevColors;
+			BMessage			fDefaultColors;
+			BMessage			fCurrentColors;
 };
 
 #endif	// APR_VIEW_H_

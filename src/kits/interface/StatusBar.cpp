@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2008, Haiku, Inc. All Rights Reserved.
+ * Copyright 2001-2015, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marc Flerackers (mflerackers@androme.be)
  *		Axel Dörfler, axeld@pinc-software.de
  *		Stephan Aßmus <superstippi@gmx.de>
+ *		Joseph Groover <looncraz@looncraz.net>
  */
 
 /*! BStatusBar displays a "percentage-of-completion" gauge. */
@@ -23,8 +24,9 @@
 
 #include <binary_compatibility/Interface.h>
 
-
-static const rgb_color kDefaultBarColor = {50, 150, 255, 255};
+enum internalFlags {
+	kCustomBarColor = 1
+};
 
 
 BStatusBar::BStatusBar(BRect frame, const char *name, const char *label,
@@ -69,8 +71,10 @@ BStatusBar::BStatusBar(BMessage *archive)
 	}
 
 	int32 color;
-	if (archive->FindInt32("_bcolor", (int32 *)&color) == B_OK)
+	if (archive->FindInt32("_bcolor", (int32 *)&color) == B_OK) {
 		fBarColor = *(rgb_color *)&color;
+		fInternalFlags |= kCustomBarColor;
+	}
 
 	if (archive->FindFloat("_val", &floatValue) == B_OK)
 		fCurrent = floatValue;
@@ -104,7 +108,7 @@ BStatusBar::Archive(BMessage *archive, bool deep) const
 	if (fCustomBarHeight)
 		err = archive->AddFloat("_high", fBarHeight);
 
-	if (err == B_OK && fBarColor != kDefaultBarColor)
+	if (err == B_OK && fInternalFlags & kCustomBarColor)
 		err = archive->AddInt32("_bcolor", (const uint32 &)fBarColor);
 
 	if (err == B_OK && fCurrent != 0)
@@ -138,18 +142,13 @@ BStatusBar::AttachedToWindow()
 	ResizeTo(Bounds().Width(), height);
 
 	SetViewColor(B_TRANSPARENT_COLOR);
-	rgb_color lowColor = B_TRANSPARENT_COLOR;
 
-	BView* parent = Parent();
-	if (parent != NULL)
-		lowColor = parent->ViewColor();
-
-	if (lowColor == B_TRANSPARENT_COLOR)
-		lowColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-
-	SetLowColor(lowColor);
+	AdoptParentColors();
 
 	fTextDivider = Bounds().Width();
+
+	if ((fInternalFlags & kCustomBarColor) == 0)
+		fBarColor = ui_color(B_CONTROL_MARK_COLOR);
 }
 
 
@@ -311,7 +310,8 @@ BStatusBar::Draw(BRect updateRect)
 		GetFont(&font);
 
 		if (rightText.Length()) {
-			font.TruncateString(&rightText, B_TRUNCATE_BEGINNING, rect.Width());
+			font.TruncateString(&rightText, B_TRUNCATE_BEGINNING,
+				rect.Width());
 			fTextDivider -= StringWidth(rightText.String());
 		}
 
@@ -320,14 +320,22 @@ BStatusBar::Draw(BRect updateRect)
 			font.TruncateString(&leftText, B_TRUNCATE_END, width);
 		}
 
-		SetHighColor(ui_color(B_CONTROL_TEXT_COLOR));
+		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
+
+		if (backgroundColor != ui_color(B_PANEL_BACKGROUND_COLOR)) {
+			if (backgroundColor.Brightness() > 100)
+				textColor = make_color(0, 0, 0, 255);
+			else
+				textColor = make_color(255, 255, 255, 255);
+		}
+
+		SetHighColor(textColor);
 
 		if (leftText.Length())
 			DrawString(leftText.String(), BPoint(rect.left, baseLine));
 
 		if (rightText.Length())
 			DrawString(rightText.String(), BPoint(fTextDivider, baseLine));
-
 	}
 
 	// Draw bar
@@ -344,22 +352,22 @@ BStatusBar::Draw(BRect updateRect)
 	}
 
 	// First bevel
-	SetHighColor(tint_color(ui_color ( B_PANEL_BACKGROUND_COLOR ), B_DARKEN_1_TINT));
+	SetHighColor(tint_color(backgroundColor, B_DARKEN_1_TINT));
 	StrokeLine(rect.LeftBottom(), rect.LeftTop());
 	StrokeLine(rect.RightTop());
 
-	SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_2_TINT));
+	SetHighColor(tint_color(backgroundColor, B_LIGHTEN_2_TINT));
 	StrokeLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom());
 	StrokeLine(BPoint(rect.right, rect.top + 1));
 
 	rect.InsetBy(1, 1);
 
 	// Second bevel
-	SetHighColor(tint_color(ui_color ( B_PANEL_BACKGROUND_COLOR ), B_DARKEN_4_TINT));
+	SetHighColor(tint_color(backgroundColor, B_DARKEN_4_TINT));
 	StrokeLine(rect.LeftBottom(), rect.LeftTop());
 	StrokeLine(rect.RightTop());
 
-	SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+	SetHighColor(backgroundColor);
 	StrokeLine(BPoint(rect.left + 1, rect.bottom), rect.RightBottom());
 	StrokeLine(BPoint(rect.right, rect.top + 1));
 
@@ -387,7 +395,7 @@ BStatusBar::Draw(BRect updateRect)
 		// empty space
 		rect.left = rect.right + 1;
 		rect.right = barFrame.right;
-		SetHighColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_LIGHTEN_MAX_TINT));
+		SetHighColor(tint_color(backgroundColor, B_LIGHTEN_MAX_TINT));
 		FillRect(rect);
 	}
 }
@@ -419,6 +427,17 @@ BStatusBar::MessageReceived(BMessage *message)
 			message->FindString("trailing_label", &trailing_label);
 
 			Reset(label, trailing_label);
+
+			break;
+		}
+
+		case B_COLORS_UPDATED:
+		{
+			// Change the bar color IF we don't have an application-set color.
+			if ((fInternalFlags & kCustomBarColor) == 0) {
+				message->FindColor(ui_color_name(B_CONTROL_MARK_COLOR),
+					&fBarColor);
+			}
 
 			break;
 		}
@@ -457,6 +476,7 @@ BStatusBar::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
 void
 BStatusBar::SetBarColor(rgb_color color)
 {
+	fInternalFlags |= kCustomBarColor;
 	fBarColor = color;
 
 	Invalidate();
@@ -755,8 +775,8 @@ BStatusBar::_InitObject()
 	fBarHeight = -1.0;
 	fTextDivider = Bounds().Width();
 
-	fBarColor = kDefaultBarColor;
 	fCustomBarHeight = false;
+	fInternalFlags = 0;
 
 	SetFlags(Flags() | B_FRAME_EVENTS);
 }

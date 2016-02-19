@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2015 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1224,10 +1224,8 @@ BTabView::_InitObject(bool layouted, button_width width)
 	fTabOffset = 0.0f;
 	fBorderStyle = B_FANCY_BORDER;
 
-	rgb_color color = ui_color(B_PANEL_BACKGROUND_COLOR);
-
-	SetViewColor(color);
-	SetLowColor(color);
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	font_height fh;
 	GetFontHeight(&fh);
@@ -1264,8 +1262,8 @@ BTabView::_InitContainerView(bool layouted)
 		_LayoutContainerView(layouted);
 
 	if (createdContainer) {
-		fContainerView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		fContainerView->SetLowColor(fContainerView->ViewColor());
+		fContainerView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+		fContainerView->SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
 		AddChild(fContainerView);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2013-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 #ifndef IMAP_PROTOCOL_H
@@ -11,6 +11,9 @@
 #include <MailProtocol.h>
 #include <ObjectList.h>
 
+#include <locks.h>
+
+#include "Commands.h"
 #include "Settings.h"
 
 
@@ -38,27 +41,37 @@ public:
 									entry_ref& ref, BFile& stream,
 									uint32 fetchFlags, BMessage& attributes);
 
+			status_t			UpdateMessageFlags(IMAPFolder& folder,
+									uint32 uid, uint32 flags);
+
 	virtual	status_t			SyncMessages();
-	virtual status_t			FetchBody(const entry_ref& ref);
 	virtual	status_t			MarkMessageAsRead(const entry_ref& ref,
 									read_flags flags = B_READ);
-	virtual	status_t			DeleteMessage(const entry_ref& ref);
-	virtual	status_t			AppendMessage(const entry_ref& ref);
 
 	virtual void				MessageReceived(BMessage* message);
 
 protected:
+	virtual status_t			HandleFetchBody(const entry_ref& ref,
+									const BMessenger& replyTo);
+
 			void				ReadyToRun();
 
 private:
 			IMAPFolder*			_CreateFolder(const BString& mailbox,
 									const BString& separator);
+			IMAPFolder*			_FolderFor(ino_t directory);
 			status_t			_EnqueueCheckMailboxes();
 
 protected:
+	typedef std::map<IMAPFolder*, IMAPConnectionWorker*> WorkerMap;
+	typedef std::map<ino_t, IMAPFolder*> FolderNodeMap;
+
 			Settings			fSettings;
+			mutex				fWorkerLock;
 			BObjectList<IMAPConnectionWorker> fWorkers;
+			WorkerMap			fWorkerMap;
 			FolderMap			fFolders;
+			FolderNodeMap		fFolderNodeMap;
 };
 
 

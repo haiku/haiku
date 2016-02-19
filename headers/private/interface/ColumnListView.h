@@ -63,10 +63,10 @@ class RecursiveOutlineIterator;
 
 }	// ns BPrivate
 
-class BField;
-class BRow;
 class BColumn;
 class BColumnListView;
+class BField;
+class BRow;
 
 enum LatchType {
 	B_NO_LATCH					= 0,
@@ -353,6 +353,7 @@ public:
 	// Appearance (NEW STYLE)
 			void				SetColor(ColumnListViewColor colorIndex,
 									rgb_color color);
+			void				ResetColors();
 			void				SetFont(ColumnListViewFont fontIndex,
 									const BFont* font,
 									uint32 mask = B_FONT_ALL);
@@ -396,12 +397,14 @@ protected:
 
 private:
 			void				_Init();
+			void				_UpdateColors();
 			void				_GetChildViewRects(const BRect& bounds,
 									BRect& titleRect, BRect& outlineRect,
 									BRect& vScrollBarRect,
 									BRect& hScrollBarRect);
 
 			rgb_color 			fColorList[B_COLOR_TOTAL];
+			bool				fCustomColors;
 			BPrivate::TitleView* fTitleView;
 			BPrivate::OutlineView* fOutlineView;
 			BList 				fColumns;

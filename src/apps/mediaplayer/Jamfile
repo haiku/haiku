@@ -114,7 +114,7 @@ Application MediaPlayer :
 	VideoView.cpp
 
 	: be game media tracker translation textencoding [ TargetLibstdc++ ]
-		localestub libshared.a
+		localestub shared
 	: MediaPlayer.rdef
 ;
 

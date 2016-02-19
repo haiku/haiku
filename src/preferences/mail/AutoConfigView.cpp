@@ -85,6 +85,13 @@ AutoConfigView::AutoConfigView(AutoConfig &config)
 void
 AutoConfigView::AttachedToWindow()
 {
+	// Resize the view to fit the contents properly
+	BRect rect = Bounds();
+	float newHeight = fNameView->Frame().bottom + 20 + 2;
+	newHeight += InnerFrame().top;
+	ResizeTo(rect.Width(), newHeight);
+
+	AdoptParentColors();
 	fEmailView->SetTarget(this);
 	fEmailView->MakeFocus(true);
 }
@@ -275,6 +282,8 @@ ServerSettingsView::ServerSettingsView(const account_info &info)
 	fOutboundEncrItemStart(NULL),
 	fImageID(-1)
 {
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+
 	fInboundAccount = true;
 	fOutboundAccount = true;
 

@@ -261,7 +261,7 @@ public:
 			B_FOLLOW_NONE, 0);
 		if (!fRootView)
 			return B_NO_MEMORY;
-		fRootView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fRootView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		AddChild(fRootView);
 
 		// text view
@@ -269,7 +269,7 @@ public:
 			BRect(0, 0, 10, 10), B_FOLLOW_NONE);
 		if (!fTextView)
 			return B_NO_MEMORY;
-		fTextView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
+		fTextView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 		rgb_color textColor = ui_color(B_PANEL_TEXT_COLOR);
 		fTextView->SetFontAndColor(be_plain_font, B_FONT_ALL, &textColor);
 		fTextView->MakeEditable(false);

@@ -1243,6 +1243,17 @@ Window::FontsChanged(BRegion* updateRegion)
 
 
 void
+Window::ColorsChanged(BRegion* updateRegion)
+{
+	::Decorator* decorator = Decorator();
+	if (decorator != NULL) {
+		DesktopSettings settings(fDesktop);
+		decorator->ColorsChanged(settings, updateRegion);
+	}
+}
+
+
+void
 Window::SetLook(window_look look, BRegion* updateRegion)
 {
 	fLook = look;

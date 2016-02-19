@@ -1,0 +1,153 @@
+1	slovak	x-vnd.Haiku-HaikuDepot	2365524674
+Name	PackageListView		Názov
+Available packages	MainWindow		Dostupné balíky
+Open %DeskbarLink%	PackageManager		Otvoriť %DeskbarLink%
+Close	RatePackageWindow		Zatvoriť
+The captcha puzzle needs to be solved.	UserLoginWindow		Je potrebné vyriešiť captcha.
+Changelog	PackageInfoView		Záznam zmien
+Your rating:	RatePackageWindow		Vaše hodnotenie:
+The passwords do not match.	UserLoginWindow		Heslá sa nezhodujú.
+Log in…	MainWindow		Prihlásiť sa…
+Rate %Package%	RatePackageWindow		Ohodnotiť %Package%
+Stability:	RatePackageWindow		Stabilita:
+Click a package to view information	PackageInfoView		Informácie zobrazíte kliknutím na balík
+Other users can see this rating	RatePackageWindow		Toto hodnotenie uvidia aj iní používatelia
+Stability	RatePackageWindow		Stabilita
+for %Version%	PackageInfoView		%Version%
+No changelog available.	PackageInfoView		Záznam zmien nie je dostupný.
+Depot:	FilterView		Zdroj:
+Description	PackageListView		Popis
+Install	PackageManager		Nainštalovať
+Source packages	MainWindow		Zdrojové balíky
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Overenie zlyhalo. Používateľ neexistuje alebo bolo zadané chybné heslo.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Účet bol úspešne vytvorený. Teraz môžete hodnotiť balíky a robiť ďalšie užitočné veci.
+Tools	MainWindow		Nástroje
+HaikuDepot	System name		HaikuDepot
+Close	UserLoginWindow		Zatvoriť
+Rate package…	PackageInfoView		Ohodnotiť balík…
+Category	FilterView		Kategória
+Uninstall	PackageManager		Odinštalovať
+An error occurred while obtaining the package list: %message%	MainWindow		Vyskytla sa chyba pri získavaní zoznamu balíkov: %message%
+Your rating was updated successfully.	RatePackageWindow		Vaše hodnotenie bolo úspešne aktualizované.
+<no info>	PackageInfoView		<žiadne info>
+Starting the package daemon failed:\n\n%Error%	App		Spustenie démona balíkov zlyhalo:\n\n%Error%
+An error occurred while initializing the package manager: %message%	MainWindow		Vyskytla sa chyba pri inicializovaní správcu balíkov: %message%
+Email address:	UserLoginWindow		Emailová adresa:
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Vaše hodnotenie bolo úspešne nahrané. Môžete ho kedykoľvek aktualizovať alebo odstrániť tým, že balík znova ohodnotíte.
+Very unstable	RatePackageWindow		Veľmi nestabilný
+<Package contents not available for remote packages>	PackageContentsView		<Pri vzdialených balíkoch obsah balíka nie je k dispozícii>
+The username is already taken. Please choose another.	UserLoginWindow		Toto používateľské meno už niekto používa. Prosím, vyberte si iné.
+Close	PackageManager		Zatvoriť
+Not logged in	MainWindow		Neprihlásený
+The authentication was successful.	UserLoginWindow		Overenie prebehlo úspešne.
+Installed packages	MainWindow		Nainštalované balíky
+Status	PackageListView		Stav
+Switch account…	MainWindow		Prepnúť účet…
+Ignore	UserLoginWindow		Ignorovať
+Language	UserLoginWindow		Jazyk
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Heslo je príliš slabé alebo je neplatné. Použite najmenej 8 znakov s aspoň 2 číslami a 2 veľkými písmenami.
+Rate package	RatePackageWindow		Ohodnotiť balík
+Development	Model		Vývoj
+Fatal error	PackageManager		Kritická chyba
+The user name needs to be at least 3 letters long.	UserLoginWindow		Meno používateľa musí byť aspoň 3 písmená dlhé.
+Log in	UserLoginWindow		Prihlásiť sa
+Repeat pass phrase:	UserLoginWindow		Zopakujte heslo:
+Ratings	PackageInfoView		Hodnotenia
+But none could be listed here, sorry.	UserLoginWindow		Ale žiadne tu nebolo možné uviesť, ľutujeme.
+System & Utilities	Model		Systém a nástroje
+Inactive	PackageListView		Neaktívne
+Refresh depots	MainWindow		Obnoviť zdroje
+The package action could not be scheduled: %Error%	PackageInfoView		Operáciu s balíkom nebolo možné naplánovať: %Error%
+Science & Mathematics	Model		Veda a matematika
+Main Menu	MainWindow		Hlavné menu
+(%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Nevyriešili ste správne captcha.
+Success	UserLoginWindow		Úspech
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot vyžaduje funkčný démon balíkov. Zdá sa, že nebeží.\nChcete ho teraz spustiť?
+Downloading:	PackageInfoView		Sťahuje sa:
+Mostly stable	RatePackageWindow		Prevažne stabilný
+There was a puzzling response from the web service.	RatePackageWindow		Webová služba poslala neočakávanú odpoveď.
+Log out	MainWindow		Odhlásiť sa
+Education	Model		Vzdelávanie
+Search terms:	FilterView		Hľadaný výraz:
+%Version%	PackageInfoView		%Version%
+No user ratings available.	PackageInfoView		Používateľské hodnotenie nie je dostupné.
+Failed to update rating	RatePackageWindow		Nepodarilo sa aktualizovať hodnotenie
+Does not start	RatePackageWindow		Nespúšťa sa
+An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Vyskytla sa chyba pri obnovovaní zdroja: %error% (%details%)
+It was not possible to contact the web service.	RatePackageWindow		Nepodarilo sa kontaktovať webovú službu.
+Only featured packages	MainWindow		Iba odporúčané balíky
+There are problems in the form:\n\n	UserLoginWindow		Vyskytli sa problémy s formulárom:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Webová služba nenašla balík. To pravdepodobne znamená, že to pochádza zo zdroja, ktorý tu nie je uvedený. Hodnotenie takých balíkov bohužiaľ nie je podporované.
+Create account	UserLoginWindow		Vytvoriť účet
+Productivity	Model		Kancelária
+No, quit HaikuDepot	App		Nie, ukončiť HaikuDepot
+Authentication failed	UserLoginWindow		Overenie totožnosti zlyhalo
+Logged in as %User%	MainWindow		Prihlásený ako %User%
+9999.99 KiB	PackageListView		9999.99 KiB
+Language	RatePackageWindow		Jazyk
+Size	PackageListView		Veľkosť
+Failed to create or update rating: %s\n	RatePackageWindow		Nepodarilo sa vytvoriť alebo aktualizovať hodnotenie: %s\n
+You need to be logged into an account before you can rate packages.	MainWindow		Musíte byť prihlásení do účtu predtým, než budete môcť hodnotiť balíky.
+ It responded with: 	RatePackageWindow		 Prišla odpoveď: 
+User name:	UserLoginWindow		Používateľské meno:
+User Menu	MainWindow		Používateľské menu
+Unstable but usable	RatePackageWindow		Nestabilný, ale použiteľný
+The email address appears to be malformed.	UserLoginWindow		Zdá sa, že formát emailovej adresy je chybný.
+Games	Model		Hry
+Rating	PackageListView		Hodnotenie
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+There was a puzzling response from the web service.	UserLoginWindow		Od webovej služby prišla neočakávaná odpoveď.
+Graphics	Model		Grafika
+Local	MainWindow		Miestne
+Close	MainWindow		Zatvoriť
+Preferred language:	UserLoginWindow		Preferovaný jazyk:
+Failed to rate package	RatePackageWindow		Nepodarilo sa ohodnotiť balík
+Internet & Network	Model		Internet a siete
+Cancel	MainWindow		Zrušiť
+Quit HaikuDepot	App		Ukončiť HaikuDepot
+Input validation	UserLoginWindow		Overenie platnosti vstupu
+Update	RatePackageWindow		Aktualizovať
+Video	Model		Video
+All categories	FilterView		Všetky kategórie
+Contents	PackageInfoView		Obsah
+An error occurred while refreshing the repository: %error%	MainWindow		Vyskytla sa chyba pri obnovovaní repozitára: %error%
+Try again	App		Skúsiť znova
+Login or Create account	MainWindow		Prihlásiť sa alebo Vytvoriť účet
+Pending…	PackageListView		Čaká sa…
+Depot	FilterView		Zdroj
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# položka} few{# položky} other{# položiek}}
+OK	PackageInfoView		OK
+Uninstalled	PackageListView		Odinštalované
+Show	MainWindow		Zobraziť
+Stable	RatePackageWindow		Stabilný
+Unknown	PackageListView		Neznámy
+All depots	FilterView		Všetky repozitáre
+Comment language:	RatePackageWindow		Jazyk komentára:
+Pass phrase:	UserLoginWindow		Heslo:
+Screenshot	ScreenshotWindow		Snímka obrazovky
+Not specified	RatePackageWindow		Neuvedené
+Available	PackageListView		Dostupné
+Develop packages	MainWindow		Vývoj balíkov
+n/a	PackageInfoView		n/a
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Ak nezadáte emailovú adresu, nebudete môcť obnoviť svoje heslo, ak ho zabudnete.
+ It responded with: 	UserLoginWindow		 Prišla odpoveď: 
+Authentication failed. Connection to the service failed.	UserLoginWindow		Overenie totožnosti zlyhalo. Pripojenie k službe zlyhalo.
+Cancel	RatePackageWindow		Zrušiť
+Package action failed	PackageInfoView		Operácia s balíkom zlyhala
+OK	UserLoginWindow		OK
+Send	RatePackageWindow		Poslať
+-	no package size		-
+Category:	FilterView		Kategória:
+Failed to create account	UserLoginWindow		Nepodarilo sa vytvoriť účet
+There are problems with the data you entered:\n\n	UserLoginWindow		Vyskytli sa problémy v údajoch, ktoré ste zadali:\n\n
+Featured packages	MainWindow		Odporúčané balíky
+Start package daemon	App		Spustiť démona balíkov
+Success	RatePackageWindow		Úspešné
+Business	Model		Obchod
+Audio	Model		Zvuk
+About	PackageInfoView		O aplikácii
+Active	PackageListView		Aktívny
+It was not possible to contact the web service.	UserLoginWindow		Nepodarilo sa kontaktovať webovú službu.
+Failed to create account: %s\n	UserLoginWindow		Nepodarilo sa vytvoriť účet: %s\n
+Cancel	UserLoginWindow		Zrušiť
