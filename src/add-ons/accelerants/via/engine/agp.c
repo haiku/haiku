@@ -16,6 +16,7 @@ eng_agp_setup(void)
 	uint8 index;
 	agp_info eng_ai;
 	bool agp = false;
+	eng_ai.interface.status = 0;
 
 	/* set the magic number so the via kerneldriver knows we're for real */
 	nca.magic = nai.magic = VIA_PRIVATE_DATA_MAGIC;

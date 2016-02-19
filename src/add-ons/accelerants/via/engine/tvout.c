@@ -39,7 +39,7 @@ status_t g100_g400max_maventv_vid_pll_find(
 {
 	int m = 0, n = 0, p = 0, m_max;
 	float diff, diff_smallest = 999999999;
-	int best[5], h_total_mod; 
+	int best[5] = {0}, h_total_mod;
 	float fields_sec, f_vco;
 	/* We need to be exact, so work with clockperiods per field instead of with frequency.
 	 * Make sure however we truncate these clocks to be integers!

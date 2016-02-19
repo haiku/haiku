@@ -230,7 +230,7 @@ static status_t nv10_nv20_dac2_pix_pll_find(
 {
 	int m = 0, n = 0, p = 0/*, m_max*/;
 	float error, error_best = 999999999;
-	int best[3]; 
+	int best[3] = {0};
 	float f_vco, max_pclk;
 	float req_pclk = target.timing.pixel_clock/1000.0;
 
