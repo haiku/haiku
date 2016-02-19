@@ -314,6 +314,9 @@ AnalogPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (gInfo->shared_info->device_type.Generation() >= 3)
 		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
 
+	// Program general pipe config
+	fPipe->Configure(target);
+
 	// Program pipe PLL's
 	fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
 
@@ -567,6 +570,9 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (gInfo->shared_info->device_type.Generation() >= 3)
 		extraPLLFlags |= DISPLAY_PLL_MODE_LVDS;
 
+	// Program general pipe config
+	fPipe->Configure(target);
+
 	// Program pipe PLL's (pixel_clock is *always* the hardware pixel clock)
 	fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
 
@@ -744,6 +750,9 @@ DigitalPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	uint32 extraPLLFlags = 0;
 	if (gInfo->shared_info->device_type.Generation() >= 3)
 		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
+
+	// Program general pipe config
+	fPipe->Configure(target);
 
 	// Program pipe PLL's
 	fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);

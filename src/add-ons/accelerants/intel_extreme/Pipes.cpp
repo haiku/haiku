@@ -94,6 +94,40 @@ Pipe::IsEnabled()
 
 
 void
+Pipe::Configure(display_mode* mode)
+{
+	uint32 pipeControl = read32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset);
+
+	// TODO: Haswell+ dithering changes.
+	if (gInfo->shared_info->device_type.Generation() >= 4) {
+		pipeControl |= (INTEL_PIPE_DITHER_EN | INTEL_PIPE_DITHER_TYPE_SP);
+		switch (mode->space) {
+			case B_CMAP8:
+			case B_RGB15_LITTLE:
+			case B_RGB16_LITTLE:
+				pipeControl |= INTEL_PIPE_6BPC;
+				break;
+			case B_RGB24_LITTLE:
+				pipeControl |= INTEL_PIPE_8BPC;
+				break;
+			case B_RGB32_LITTLE:
+			default:
+				pipeControl |= INTEL_PIPE_10BPC;
+				break;
+		}
+	}
+
+	// TODO: CxSR downclocking?
+
+	// TODO: Interlaced modes
+	pipeControl |= INTEL_PIPE_PROGRESSIVE;
+
+	write32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset, pipeControl);
+	read32(INTEL_DISPLAY_A_PIPE_CONTROL + fPipeOffset);
+}
+
+
+void
 Pipe::_ConfigureTranscoder(display_mode* target)
 {
 	// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)

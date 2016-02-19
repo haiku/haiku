@@ -585,6 +585,7 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_B_SURFACE			(0x119c | REGS_NORTH_PLANE_CONTROL)
 	// i965 and up only
 
+// INTEL_DISPLAY_A_CONTROL source pixel format
 #define DISPLAY_CONTROL_ENABLED			(1UL << 31)
 #define DISPLAY_CONTROL_GAMMA			(1UL << 30)
 #define DISPLAY_CONTROL_COLOR_MASK		(0x0fUL << 26)
@@ -592,6 +593,19 @@ struct intel_free_graphics_memory {
 #define DISPLAY_CONTROL_RGB15			(4UL << 26)
 #define DISPLAY_CONTROL_RGB16			(5UL << 26)
 #define DISPLAY_CONTROL_RGB32			(6UL << 26)
+
+// INTEL_DISPLAY_A_PIPE_CONTROL ILK+
+#define INTEL_PIPE_DITHER_TYPE_MASK		(0x0000000c)
+#define INTEL_PIPE_DITHER_TYPE_SP		(0 << 2)
+#define INTEL_PIPE_DITHER_TYPE_ST1		(1 << 2)
+#define INTEL_PIPE_DITHER_TYPE_ST2		(2 << 2)
+#define INTEL_PIPE_DITHER_TYPE_TEMP		(3 << 2)
+#define INTEL_PIPE_DITHER_EN			(1 << 4)
+#define INTEL_PIPE_8BPC					(0 << 5)
+#define INTEL_PIPE_10BPC				(1 << 5)
+#define INTEL_PIPE_6BPC					(2 << 5)
+#define INTEL_PIPE_12BPC				(3 << 5)
+#define INTEL_PIPE_PROGRESSIVE			(0 << 21)
 
 // cursors
 #define INTEL_CURSOR_CONTROL			(0x0080 | REGS_NORTH_PLANE_CONTROL)
