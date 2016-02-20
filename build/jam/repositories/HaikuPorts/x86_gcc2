@@ -142,8 +142,8 @@ RemotePackageRepository HaikuPorts
 	genesis_commander-0.42-2
 	getconf-r260000-1
 	getopt-1.1.5-1
-	gettext-0.18.1.1-6
-	gettext_libintl-0.18.1.1-6
+	gettext-0.19.6-2
+	gettext_libintl-0.19.6-2
 	gdb-6.3-1
 	giddy3-1.4-1
 	giflib-5.1.2-1
@@ -369,7 +369,7 @@ RemotePackageRepository HaikuPorts
 	mupdf_devel-1.7-1
 	musepack_tools-r475-1
 	musepack_tools_devel-r475-1
-	nano-2.4.2-1
+	nano-2.5.2-1
 	nanosvgtranslator-1.0.1-1
 	nasm-2.11.08-1
 	ncurses-5.9-9
@@ -590,7 +590,7 @@ RemotePackageRepository HaikuPorts
 	cairo_x86_devel-1.12.18-1
 	capstone_x86-3.0.4-1
 	capstone_x86_devel-3.0.4-1
-	cmake_x86-3.3.1-1
+	cmake_x86-3.4.3-1
 	confuse_x86-2.7-2
 	confuse_x86_devel-2.7-2
 	copynametoclipboard-1.0.1-2
@@ -638,8 +638,8 @@ RemotePackageRepository HaikuPorts
 	gcc6809_x86-4.6.1-2
 	gdk_pixbuf_x86-2.31.5-1
 	gdk_pixbuf_x86_devel-2.31.5-1
-	gettext_x86-0.18.1.1-6
-	gettext_x86_libintl-0.18.1.1-6
+	gettext_x86-0.19.6-2
+	gettext_x86_libintl-0.19.6-2
 	giflib_x86-5.1.2-1
 	giflib_x86_devel-5.1.2-1
 	glew_x86-1.11.0-1
