@@ -10,7 +10,6 @@
 float floorf(float x);
 float ceilf(float x);
 float sqrtf(float x);
-int32 make_small(float value);
 
 
 struct touch_event {
@@ -58,8 +57,8 @@ public:
 			void				SetSettings(touchpad_settings* settings);
 			void				SetSpecs(hardware_specs* specs);
 
-			int32				xDelta;
-			int32				yDelta;
+			float				xDelta;
+			float				yDelta;
 
 			float				scrolling_x;
 			float				scrolling_y;
@@ -85,8 +84,8 @@ private:
 
 			uint32				fPreviousX;
 			uint32				fPreviousY;
-			int32				fDeltaSumX;
-			int32				fDeltaSumY;
+			float				fDeltaSumX;
+			float				fDeltaSumY;
 
 			int8				fSmallMovement;
 };

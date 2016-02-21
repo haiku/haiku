@@ -210,7 +210,6 @@ default_settings(touchpad_settings *set)
 static status_t
 synaptics_dev_send_command(ps2_dev* dev, uint8 cmd, uint8 *in, int in_count)
 {
-	uint8 val;
 	if (ps2_dev_sliced_command(dev, cmd) != B_OK
 		|| ps2_dev_command(dev, PS2_CMD_MOUSE_GET_INFO, NULL, 0, in, in_count)
 		!= B_OK) {
@@ -224,7 +223,6 @@ synaptics_dev_send_command(ps2_dev* dev, uint8 cmd, uint8 *in, int in_count)
 static status_t
 elantech_dev_send_command(ps2_dev* dev, uint8 cmd, uint8 *in, int in_count)
 {
-	uint8 val;
 	if (ps2_dev_command(dev, ELANTECH_CMD_PS2_CUSTOM_CMD) != B_OK
 		|| ps2_dev_command(dev, cmd) != B_OK
 		|| ps2_dev_command(dev, PS2_CMD_MOUSE_GET_INFO, NULL, 0, in, in_count)
@@ -239,7 +237,6 @@ elantech_dev_send_command(ps2_dev* dev, uint8 cmd, uint8 *in, int in_count)
 status_t
 probe_elantech(ps2_dev* dev)
 {
-	int i;
 	uint8 val[3];
 	TRACE("ELANTECH: probe\n");
 
@@ -388,27 +385,6 @@ elantech_read_reg(elantech_cookie* cookie, uint8 reg, uint8 *value)
 }
 
 
-
-static status_t
-switch_hardware_tab(ps2_dev* dev, bool on)
-{
-	uint8 val[3];
-	uint8 arg = 0x00;
-	uint8 command = PS2_CMD_MOUSE_SET_RES;
-	if (on) {
-		arg = 0x0A;
-		command = PS2_CMD_SET_SAMPLE_RATE;
-	}
-	if (ps2_dev_command(dev, PS2_CMD_MOUSE_GET_INFO, NULL, 0, val, 3) != B_OK
-		|| ps2_dev_command(dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0) != B_OK
-		|| ps2_dev_command(dev, PS2_CMD_DISABLE, NULL, 0, NULL, 0) != B_OK
-		|| ps2_dev_command(dev, command, &arg, 1, NULL, 0) != B_OK)
-		return B_ERROR;
-
-	return B_OK;
-}
-
-
 static status_t
 get_resolution_v4(elantech_cookie* cookie, uint32* x, uint32* y)
 {
@@ -426,7 +402,6 @@ static status_t
 get_range(elantech_cookie* cookie, uint32* x_min, uint32* y_min, uint32* x_max,
 	uint32* y_max, uint32 *width)
 {
-	status_t status = B_OK;
 	uint8 val[3];
 	switch (cookie->version) {
 		case 1:

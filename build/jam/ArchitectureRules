@@ -504,7 +504,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src add-ons kernel bus_managers ide ;
 	EnableWerror src add-ons kernel bus_managers isa ;
 	EnableWerror src add-ons kernel bus_managers pci ;
-#	EnableWerror src add-ons kernel bus_managers ps2 ; # gcc2
+	EnableWerror src add-ons kernel bus_managers ps2 ;
 	EnableWerror src add-ons kernel bus_managers random ;
 	EnableWerror src add-ons kernel bus_managers scsi ;
 	EnableWerror src add-ons kernel bus_managers tty ;
