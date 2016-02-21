@@ -1632,6 +1632,7 @@ AVCodecDecoder::_DeinterlaceAndColorConvertVideoFrame()
 			useDeinterlacedPicture = true;
 #else
 		// avpicture_deinterlace is gone
+		// TODO: implement alternate deinterlace using avfilter
 		TRACE("[v] avpicture_deinterlace() - not implemented\n");
 #endif
 	}
