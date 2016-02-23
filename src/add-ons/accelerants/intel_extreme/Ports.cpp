@@ -834,7 +834,7 @@ HDMIPort::_PortRegister()
 
 DisplayPort::DisplayPort(port_index index, const char* baseName)
 	:
-	DigitalPort(index, baseName)
+	Port(index, baseName)
 {
 }
 
@@ -854,6 +854,35 @@ DisplayPort::IsConnected()
 
 
 addr_t
+DisplayPort::_DDCRegister()
+{
+	// TODO: Do VLV + CHV use the VLV_DP_AUX_CTL_B + VLV_DP_AUX_CTL_C?
+	switch (PortIndex()) {
+		case INTEL_PORT_A:
+			return INTEL_DP_AUX_CTL_A;
+		case INTEL_PORT_B:
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
+				return VLV_DP_AUX_CTL_B;
+			return INTEL_DP_AUX_CTL_B;
+		case INTEL_PORT_C:
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
+				return VLV_DP_AUX_CTL_C;
+			return INTEL_DP_AUX_CTL_C;
+		case INTEL_PORT_D:
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV))
+				return CHV_DP_AUX_CTL_D;
+			else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV))
+				return 0;
+			return INTEL_DP_AUX_CTL_D;
+		default:
+			return 0;
+	}
+
+	return 0;
+}
+
+
+addr_t
 DisplayPort::_PortRegister()
 {
 	// There are 6000 lines of intel linux code probing DP registers
@@ -862,8 +891,10 @@ DisplayPort::_PortRegister()
 	// ignore DisplayPort on ValleyView / CherryView
 
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV)
-		|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV))
+		|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV)) {
+		ERROR("TODO: DisplayPort on ValleyView / CherryView");
 		return 0;
+	}
 
 	// Intel, are humans even involved anymore?
 	// This is a lot more complex than this code makes it look. (see defines)
@@ -891,6 +922,17 @@ DisplayPort::_PortRegister()
 	}
 
 	return 0;
+}
+
+
+status_t
+DisplayPort::SetDisplayMode(display_mode* target, uint32 colorMode)
+{
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
+		target->virtual_height);
+
+	ERROR("TODO: DisplayPort\n");
+	return B_ERROR;
 }
 
 

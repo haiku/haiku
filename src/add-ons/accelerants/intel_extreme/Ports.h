@@ -170,7 +170,7 @@ virtual addr_t						_PortRegister();
 };
 
 
-class DisplayPort : public DigitalPort {
+class DisplayPort : public Port {
 public:
 									DisplayPort(port_index index,
 										const char* baseName = "DisplayPort");
@@ -180,7 +180,11 @@ virtual	uint32						Type() const
 
 virtual	bool						IsConnected();
 
+virtual status_t					SetDisplayMode(display_mode* mode,
+										uint32 colorMode);
+
 protected:
+virtual	addr_t						_DDCRegister();
 virtual	addr_t						_PortRegister();
 };
 
