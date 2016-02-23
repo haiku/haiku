@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -552,6 +552,34 @@ struct intel_free_graphics_memory {
 #define VLV_DISPLAY_PORT_B				(VLV_DISPLAY_BASE + 0x64100)
 #define VLV_DISPLAY_PORT_C				(VLV_DISPLAY_BASE + 0x64200)
 #define CHV_DISPLAY_PORT_D				(VLV_DISPLAY_BASE + 0x64300)
+
+// DP AUX channels
+#define INTEL_DPA_AUX_CTL				(0x4010 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DPB_AUX_CTL				(0x4110 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DPC_AUX_CTL				(0x4210 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DPD_AUX_CTL				(0x4310 | REGS_SOUTH_TRANSCODER_PORT)
+
+#define VLV_DPB_AUX_CTL					(VLV_DISPLAY_BASE + 0x64110)
+#define VLV_DPC_AUX_CTL					(VLV_DISPLAY_BASE + 0x64210)
+#define CHV_DPC_AUX_CTL					(VLV_DISPLAY_BASE + 0x64310)
+
+#define INTEL_DP_AUX_CTL_BUSY			(1 << 31)
+#define INTEL_DP_AUX_CTL_DONE			(1 << 30)
+#define INTEL_DP_AUX_CTL_INTERRUPT		(1 << 29)
+#define INTEL_DP_AUX_CTL_TIMEOUT_ERROR	(1 << 28)
+#define INTEL_DP_AUX_CTL_TIMEOUT_400us	(0 << 26)
+#define INTEL_DP_AUX_CTL_TIMEOUT_600us	(1 << 26)
+#define INTEL_DP_AUX_CTL_TIMEOUT_800us	(2 << 26)
+#define INTEL_DP_AUX_CTL_TIMEOUT_1600us (3 << 26)
+#define INTEL_DP_AUX_CTL_TIMEOUT_MASK	(3 << 26)
+#define INTEL_DP_AUX_CTL_RECEIVE_ERROR	(1 << 25)
+#define INTEL_DP_AUX_CTL_MSG_SIZE_MASK	(0x1f << 20)
+#define INTEL_DP_AUX_CTL_MSG_SIZE_SHIFT 20
+#define INTEL_DP_AUX_CTL_PRECHARGE_2US_MASK (0xf << 16)
+#define INTEL_DP_AUX_CTL_PRECHARGE_2US_SHIFT 16
+#define INTEL_DP_AUX_CTL_BIT_CLOCK_2X_MASK (0x7ff)
+#define INTEL_DP_AUX_CTL_BIT_CLOCK_2X_SHIFT 0
+#define INTEL_DP_AUX_CTL_SYNC_PULSE_SKL(c)   ((c) - 1)
 
 // planes
 #define INTEL_PIPE_ENABLED				(1UL << 31)
