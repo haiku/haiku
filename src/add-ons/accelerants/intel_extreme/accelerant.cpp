@@ -295,7 +295,7 @@ probe_ports()
 	TRACE("lvds: %08" B_PRIx32 "\n", read32(INTEL_DIGITAL_LVDS_PORT));
 
 	gInfo->port_count = 0;
-	for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {
+	for (int i = INTEL_PORT_A; i <= INTEL_PORT_D; i++) {
 		Port* displayPort = new(std::nothrow) DisplayPort((port_index)i);
 		if (displayPort == NULL)
 			return B_NO_MEMORY;

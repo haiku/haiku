@@ -271,6 +271,8 @@ AnalogPort::AnalogPort()
 bool
 AnalogPort::IsConnected()
 {
+	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
+		_PortRegister());
 	return HasEDID();
 }
 
@@ -355,6 +357,9 @@ LVDSPort::LVDSPort()
 bool
 LVDSPort::IsConnected()
 {
+	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
+		_PortRegister());
+
 	// Older generations don't have LVDS detection. If not mobile skip.
 	if (gInfo->shared_info->device_type.Generation() <= 4) {
 		if (!gInfo->shared_info->device_type.IsMobile()) {
@@ -686,6 +691,9 @@ DigitalPort::DigitalPort(port_index index, const char* baseName)
 bool
 DigitalPort::IsConnected()
 {
+	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
+		_PortRegister());
+
 	// As this port overlaps with pretty much everything, this must be called
 	// after having ruled out all other port types.
 	return HasEDID();
@@ -843,11 +851,17 @@ bool
 DisplayPort::IsConnected()
 {
 	addr_t portRegister = _PortRegister();
+
+	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
+		portRegister);
+
 	if (portRegister == 0)
 		return false;
 
-	if ((read32(portRegister) & DISPLAY_MONITOR_PORT_DETECTED) == 0)
+	if ((read32(portRegister) & DISPLAY_MONITOR_PORT_DETECTED) == 0) {
+		TRACE("%s: %s link not detected\n", __func__, PortName());
 		return false;
+	}
 
 	return HasEDID();
 }
