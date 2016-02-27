@@ -105,6 +105,11 @@ tcsendbreak(int fd, int duration)
 speed_t
 cfgetispeed(const struct termios *termios)
 {
+	if (termios->c_cflag & CBAUD == CBAUD)
+	{
+		return termios->c_ispeed;
+	}
+
 	return termios->c_cflag & CBAUD;
 }
 
@@ -112,14 +117,14 @@ cfgetispeed(const struct termios *termios)
 int
 cfsetispeed(struct termios *termios, speed_t speed)
 {
-	/*	Check for values that the system cannot handle:
-	greater values than B230400 which is
-	the maximum value defined in termios.h
-	Note that errors from hardware device are detected only
-	until the tcsetattr() function is called */
-	if (speed > B230400 || (speed & CBAUD) != speed) {
-		__set_errno(EINVAL);
-		return -1;
+	/*	Check for custom baudrates, which must be stored in the c_ispeed
+	field instead of inlined in the flags.
+	Note that errors from hardware device (unsupported baudrates, etc) are
+	detected only when the tcsetattr() function is called */
+	if (speed > B31250) {
+		termios->c_cflag |= CBAUD;
+		termios->c_ispeed = speed;
+		return 0;
 	}
 
 	termios->c_cflag &= ~CBAUD;
@@ -131,6 +136,11 @@ cfsetispeed(struct termios *termios, speed_t speed)
 speed_t
 cfgetospeed(const struct termios *termios)
 {
+	if (termios->c_cflag & CBAUD == CBAUD)
+	{
+		return termios->c_ospeed;
+	}
+
 	return termios->c_cflag & CBAUD;
 }
 
@@ -138,10 +148,11 @@ cfgetospeed(const struct termios *termios)
 int
 cfsetospeed(struct termios *termios, speed_t speed)
 {
-	/* Check for unaccepted speed values (see above) */
-	if (speed > B230400 || (speed & CBAUD) != speed) {
-		__set_errno(EINVAL);
-		return -1;
+	/* Check for custom speed values (see above) */
+	if (speed > B31250) {
+		termios->c_cflag |= CBAUD;
+		termios->c_ospeed = speed;
+		return 0;
 	}
 
 	termios->c_cflag &= ~CBAUD;

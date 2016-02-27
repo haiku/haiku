@@ -21,8 +21,8 @@ struct termios {
 	tcflag_t	c_cflag;	/* control modes */
 	tcflag_t	c_lflag;	/* local modes */
 	char		c_line;		/* line discipline */
-	speed_t		c_ispeed;	/* (unused) */
-	speed_t		c_ospeed;	/* (unused) */
+	speed_t		c_ispeed;	/* custom input baudrate */
+	speed_t		c_ospeed;	/* custom output baudrate */
 	cc_t		c_cc[NCCS];	/* control characters */
 };
 
