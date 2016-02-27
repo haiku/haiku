@@ -285,7 +285,7 @@ RemotePackageRepository HaikuPorts
 	lzo-2.09-1
 	lzo_devel-2.09-1
 	m4-1.4.17-1
-	make-3.82-5
+	make-4.1-1
 	man-1.6g-4
 	mercurial-2.9.2-1
 	mesa-10.5.2-1
