@@ -106,9 +106,7 @@ speed_t
 cfgetispeed(const struct termios *termios)
 {
 	if (termios->c_cflag & CBAUD == CBAUD)
-	{
 		return termios->c_ispeed;
-	}
 
 	return termios->c_cflag & CBAUD;
 }
@@ -137,9 +135,7 @@ speed_t
 cfgetospeed(const struct termios *termios)
 {
 	if (termios->c_cflag & CBAUD == CBAUD)
-	{
 		return termios->c_ospeed;
-	}
 
 	return termios->c_cflag & CBAUD;
 }
