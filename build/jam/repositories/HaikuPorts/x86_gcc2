@@ -557,7 +557,7 @@ RemotePackageRepository HaikuPorts
 	avr_gcc_x86-4.8.2_2014_03_20-1
 	avrdude_x86-6.0.1-2
 	beshare_x86-2.31-1
-	binutils_x86-2.25_12015_07_31-1
+	binutils_x86-2.26.0_2016_02_29-1
 	bison_x86-2.5-1
 	boost_x86-1.55.0-6
 	boost_x86_atomic-1.55.0-6

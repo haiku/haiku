@@ -33,7 +33,7 @@ RemotePackageRepository HaikuPorts
 	automake113-1.13.1-1
 	bash-4.3.42-2
 #	bepdf-1.1.1~beta5_2013_04_28-1
-	binutils-2.25_12015_07_31-1
+	binutils-2.26.0_2016_02_29-1
 	bison-2.6.5-1
 	boost-1.55.0-6
 	boost_atomic-1.55.0-6
