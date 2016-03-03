@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.02.17
-#	Date:    2016-02-17 03:15:02
+#	Version: 2016.02.27
+#	Date:    2016-02-27 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -486,6 +486,8 @@
 	0085  SAS2208 PCI-Express Fusion-MPT SAS-2
 	0086  SAS2308 PCI-Express Fusion-MPT SAS-2
 	0087  SAS2308 PCI-Express Fusion-MPT SAS-2
+		1000 3020  9207-8i SAS2.1 HBA
+		1000 3040  9207-8e SAS2.1 HBA
 		1590 0044  H220i
 	008f  53c875J
 		1092 8000  FirePort 40 SCSI Controller
@@ -2129,7 +2131,7 @@
 		1002 0310  FirePro S7000
 		1002 0420  Radeon Sky 500
 	6809  Pitcairn LE GL [FirePro W5000]
-	6810  Curacao XT [Radeon R7 370 / R9 270X/370 OEM]
+	6810  Curacao XT / Trinidad XT [Radeon R7 370 / R9 270X/370X]
 		148c 0908  Radeon R9 370 OEM
 		1682 7370  Radeon R7 370
 	6811  Curacao PRO [Radeon R7 370 / R9 270/370 OEM]
@@ -2769,13 +2771,32 @@
 		174b e180  Radeon HD 7350
 		17af 3015  Radeon HD 7350
 	68fe  Cedar LE
-	6900  Topaz XT [Radeon R7 M260/M265]
-		1028 0640  Radeon R7 M265
+	6900  Topaz XT [Radeon R7 M260/M265 / M340/M360]
+		1025 1056  Radeon R7 M360 / R8 M365DX
+		1028 0640  Radeon R7 M260/M265
+		1028 0643  Radeon R7 M260/M265
+		1028 067f  Radeon R7 M260
+		1028 130a  Radeon R7 M260
+		103c 2263  Radeon R7 M260
 		103c 2269  Radeon R7 M260
+		103c 22c6  Radeon R7 M260
 		103c 22c8  Radeon R7 M260
+		103c 808c  Radeon R7 M260
+		103c 8099  Radeon R7 M360
+		103c 80b5  Radeon R7 M360
+		103c 80b9  Radeon R7 M360
+		103c 811c  Radeon R7 M340
+		10cf 1906  Radeon R7 M260
+		1170 9979  Radeon R7 M360
 		1179 f903  Radeon R7 M260
+		1179 f922  Radeon R7 M260
+		1179 f923  Radeon R7 M260
 		1179 f934  Radeon R7 M260
+		17aa 3822  Radeon R7 M360
+		17aa 3824  Radeon R7 M360
+		17aa 5021  Radeon R7 M260
 	6901  Topaz PRO [Radeon R5 M255]
+		103c 1318  Radeon R6 M255DX
 	6921  Amethyst XT [Radeon R9 M295X]
 	6929  Tonga XT GL [FirePro S7150]
 	692b  Tonga PRO GL [FirePro W7100]
@@ -10508,6 +10529,7 @@
 	f0e5  Zephyr LightPulse Fibre Channel Host Adapter
 	f0f5  Neptune LightPulse Fibre Channel Host Adapter
 	f100  Saturn-X: LightPulse Fibre Channel Host Adapter
+		103c 3282  8Gb Dual-port PCI-e FC HBA
 	f111  Saturn-X LightPulse Fibre Channel Host Adapter
 	f112  Saturn-X LightPulse Fibre Channel Host Adapter
 	f180  LPSe12002 EmulexSecure Fibre Channel Adapter
@@ -17588,8 +17610,17 @@
 	1014  MT27700 Family [ConnectX-4 Virtual Function]
 	1015  MT27710 Family [ConnectX-4 Lx]
 	1016  MT27710 Family [ConnectX-4 Lx Virtual Function]
-	1017  MT28800 Family [ConnectX-5]
+	1017  MT27800 Family [ConnectX-5, PCIe 3.0]
 	1018  MT28800 Family [ConnectX-5 Virtual Function]
+	1019  MT28800 Family [ConnectX-5, PCIe 4.0]
+	101a  MT28830
+	101b  MT28831
+	101c  MT28840
+	101d  MT28841
+	101e  MT28850
+	101f  MT28851
+	1020  MT28860
+	1021  MT28861
 	5274  MT21108 InfiniBridge
 	5a44  MT23108 InfiniHost
 	5a45  MT23108 [Infinihost HCA Flash Recovery]
@@ -17618,6 +17649,12 @@
 		103c 3313  NC542m Dual Port Flex-10 10GbE BLc Adapter
 	676e  MT26478 [ConnectX EN 40GigE, PCIe 2.0 5GT/s]
 	6778  MT26488 [ConnectX VPI PCIe 2.0 5GT/s - IB DDR / 10GigE Virtualization+]
+	7101  NPS-400 configuration and management interface
+	7102  NPS-400 network interface PF
+	7103  NPS-400 network interface VF
+	7121  NPS-600 configuration and management interface
+	7122  NPS-600 network interface PF
+	7123  NPS-600 network interface VF
 # SwitchX-2, 40GbE switch
 	c738  MT51136
 	caf1  ConnectX-4 CAPI Function
@@ -18635,6 +18672,7 @@
 		13d1 abe3  miniPCI Pluscom 802.11 a/b/g
 		1458 e933  GN-WI01GS
 		1458 e934  GN-WP01GS
+		1462 b833  MP54G5 (MS-6833B)
 		1737 0055  WMP54G v4.1
 		1799 700e  F5D7000 v6000 Wireless G Desktop Card
 		1799 701e  F5D7010 v6000 Wireless G Notebook Card
@@ -18874,6 +18912,7 @@
 	0135  NT20E2-PTP Network Adapter 2x10Gb
 	0145  NT40E3-4-PTP Network Adapter 4x10Gb
 	0155  NT100E3-1-PTP Network Adapter 1x100Gb
+	0165  NT80E3-2-PTP Network Adapter 2x40Gb
 	0175  NT20E3-2-PTP Network Adapter 2x10Gb
 18f6  NextIO
 	1000  [Nexsis] Switch Virtual P2P PCIe Bridge
@@ -21967,6 +22006,7 @@
 	150f  82580 Gigabit Fiber Network Connection
 	1510  82580 Gigabit Backplane Connection
 	1511  82580 Gigabit SFP Connection
+	1513  CV82524 Thunderbolt Controller [Light Ridge 4C 2010]
 	1514  Ethernet X520 10GbE Dual Port KX4 Mezz
 		8086 000b  Ethernet X520 10GbE Dual Port KX4 Mezz
 	1515  X540 Ethernet Controller Virtual Function
@@ -21976,6 +22016,8 @@
 	1517  82599ES 10 Gigabit Network Connection
 		1137 006a  UCS CNA M61KR-I Intel Converged Network Adapter
 	1518  82576NS SerDes Gigabit Network Connection
+	151a  DSL2310 Thunderbolt Controller [Eagle Ridge 2C 2011]
+	151b  CVL2510 Thunderbolt Controller [Light Peak 2C 2010]
 	151c  82599 10 Gigabit TN Network Connection
 		108e 7b13  Dual 10GBASE-T LP
 	1520  I350 Ethernet Controller Virtual Function
@@ -22071,8 +22113,9 @@
 		103c 1909  ZBook 15
 		17aa 220e  ThinkPad T440p
 	153b  Ethernet Connection I217-V
-	1547  DSL3510 Thunderbolt Port [Cactus Ridge]
-	1549  DSL3510 Thunderbolt Controller [Cactus Ridge]
+	1547  DSL3510 Thunderbolt Controller [Cactus Ridge 4C 2012]
+	1548  DSL3310 Thunderbolt Controller [Cactus Ridge 2C 2012]
+	1549  DSL2210 Thunderbolt Controller [Port Ridge 1C 2011]
 	154a  Ethernet Server Adapter X520-4
 		8086 011a  Ethernet Converged Network Adapter X520-4
 		8086 011b  Ethernet Converged Network Adapter X520-4
@@ -22098,8 +22141,14 @@
 	1563  Ethernet Controller 10G X550T
 		8086 0001  Ethernet Converged Network Adapter X550-T2
 		8086 001a  Ethernet Converged Network Adapter X550-T2
-	156c  DSL5520 Thunderbolt [Falcon Ridge]
-	156d  DSL5520 Thunderbolt [Falcon Ridge]
+	1566  DSL4410 Thunderbolt NHI [Redwood Ridge 2C 2013]
+	1567  DSL4410 Thunderbolt Bridge [Redwood Ridge 2C 2013]
+	1568  DSL4510 Thunderbolt NHI [Redwood Ridge 4C 2013]
+	1569  DSL4510 Thunderbolt Bridge [Redwood Ridge 4C 2013]
+	156a  DSL5320 Thunderbolt 2 NHI [Falcon Ridge 2C 2013]
+	156b  DSL5320 Thunderbolt 2 Bridge [Falcon Ridge 2C 2013]
+	156c  DSL5520 Thunderbolt 2 NHI [Falcon Ridge 4C 2013]
+	156d  DSL5520 Thunderbolt 2 Bridge [Falcon Ridge 4C 2013]
 	156f  Ethernet Connection I219-LM
 	1570  Ethernet Connection I219-V
 	1571  XL710/X710 Virtual Function
@@ -22128,9 +22177,14 @@
 		8086 000d  Ethernet Controller X710 for 10GbE SFP+
 		8086 4005  Ethernet Controller XL710 for 10 Gigabit SFP+
 		8086 4006  Ethernet Controller X710 for 10GbE SFP+
-	1578  DSL6540 Thunderbolt [Alpine Ridge]
+	1575  DSL5110 Thunderbolt NHI [Falcon Ridge LP 2014]
+	1576  DSL5110 Thunderbolt Bridge [Falcon Ridge LP 2014]
+	1577  DSL6540 Thunderbolt 3 NHI [Alpine Ridge 4C 2015]
+	1578  DSL6540 Thunderbolt 3 Bridge [Alpine Ridge 4C 2015]
 	157b  I210 Gigabit Network Connection
 	157c  I210 Gigabit Backplane Connection
+	157d  DSL6340 Thunderbolt 3 NHI [Alpine Ridge 2C 2015]
+	157e  DSL6340 Thunderbolt 3 Bridge [Alpine Ridge 2C 2015]
 	1580  Ethernet Controller XL710 for 40GbE backplane
 	1581  Ethernet Controller X710 for 10GbE backplane
 		1028 0000  Ethernet 10G X710-k bNDC
@@ -26598,6 +26652,7 @@
 	9c23  8 Series CHAP Counters
 	9c24  8 Series Thermal
 	9c26  8 Series USB EHCI #1
+		17aa 220c  T440s
 		17aa 2214  ThinkPad X240
 	9c2d  8 Series USB EHCI #2
 	9c31  8 Series USB xHCI HC
