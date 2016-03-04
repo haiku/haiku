@@ -622,6 +622,32 @@ atom_op_div(atom_exec_context *ctx, int *ptr, int arg)
 
 
 static void
+atom_op_div32(atom_exec_context *ctx, int *ptr, int arg)
+{
+	uint64 val64;
+	uint8 attr = U8((*ptr)++);
+	uint32 dst, src;
+	dst = atom_get_dst(ctx, arg, attr, ptr, NULL, 1);
+	src = atom_get_src(ctx, attr, ptr);
+	if (src != 0) {
+		val64 = dst;
+		val64 |= ((uint64)ctx->ctx->divmul[1]) << 32;
+		do_div(val64, src);
+		ctx->ctx->divmul[0] = lower_32_bits(val64);
+		ctx->ctx->divmul[1] = upper_32_bits(val64);
+	} else {
+		ctx->ctx->divmul[0] = 0;
+		ctx->ctx->divmul[1] = 0;
+	}
+	#ifdef ATOM_TRACE
+	TRACE("%s: 0x%" B_PRIX32 " / 0x%" B_PRIX32 " is"
+		" 0x%" B_PRIX32 " + 0x%" B_PRIX32 "\n", __func__, dst, src,
+		ctx->ctx->divmul[0], ctx->ctx->divmul[1]);
+	#endif
+}
+
+
+static void
 atom_op_eot(atom_exec_context *ctx, int *ptr, int arg)
 {
 	/* functionally, a nop */
@@ -726,6 +752,25 @@ atom_op_mul(atom_exec_context *ctx, int *ptr, int arg)
 	ctx->ctx->divmul[0] = dst * src;
 	TRACE("%s: 0x%" B_PRIX32 " * 0x%" B_PRIX32 " is 0x%" B_PRIX32 "\n",
 		__func__, dst, src, ctx->ctx->divmul[0]);
+}
+
+
+static void
+atom_op_mul32(atom_exec_context *ctx, int *ptr, int arg)
+{
+	uint64 val64;
+	uint8 attr = U8((*ptr)++);
+	uint32 dst, src;
+	dst = atom_get_dst(ctx, arg, attr, ptr, NULL, 1);
+	src = atom_get_src(ctx, attr, ptr);
+	val64 = (uint64)dst * (uint64)src;
+	ctx->ctx->divmul[0] = lower_32_bits(val64);
+	ctx->ctx->divmul[1] = upper_32_bits(val64);
+	#ifdef ATOM_TRACE
+	TRACE("%s: 0x%" B_PRIX32 " * 0x%" B_PRIX32 " is"
+		" 0x%" B_PRIX32 " + 0x%" B_PRIX32 "\n", __func__, dst, src,
+		ctx->ctx->divmul[0], ctx->ctx->divmul[1]);
+	#endif
 }
 
 
@@ -1004,6 +1049,15 @@ atom_op_debug(atom_exec_context *ctx, int *ptr, int arg)
 }
 
 
+static void
+atom_op_processds(atom_exec_context *ctx, int *ptr, int arg)
+{
+	uint16 val = U16(*ptr);
+	(*ptr) += val + 2;
+	TRACE("%s: Processds output: 0x%02X\n", __func__, val);
+}
+
+
 static struct {
 	void (*func)(atom_exec_context *, int *, int);
 	int arg;
@@ -1130,6 +1184,11 @@ static struct {
 	{ atom_op_shr, ATOM_ARG_PLL },
 	{ atom_op_shr, ATOM_ARG_MC },
 	{ atom_op_debug, 0 },
+	{ atom_op_processds, 0},
+	{ atom_op_mul32, ATOM_ARG_PS},
+	{ atom_op_mul32, ATOM_ARG_WS},
+	{ atom_op_div32, ATOM_ARG_PS},
+	{ atom_op_div32, ATOM_ARG_WS}
 };
 
 
