@@ -40,9 +40,9 @@ arm-*)
 	# Multilib creates a lot of confusion as the wrong libs end up being linked.
 	# For now, target Cortex-A8 devices.
 	binutilsConfigureArgs="--disable-multilib --with-float=hard
-		--with-cpu=cortex-a8 --with-arch=armv7-a --with-fpu=vfpv3"
+		--with-cpu=cortex-a8 --with-fpu=vfpv3"
 	gccConfigureArgs="--disable-multilib --with-float=hard
-		--with-cpu=cortex-a8 --with-arch=armv7-a --with-fpu=vfpv3"
+		--with-cpu=cortex-a8 --with-fpu=vfpv3"
 
 	# TODO: Disable building with TLS support for ARM until implemented.
 	binutilsConfigureArgs="$binutilsConfigureArgs --disable-tls"
