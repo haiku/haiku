@@ -632,9 +632,9 @@ RemotePackageRepository HaikuPorts
 	freetype_x86_devel-2.6.3-1
 	fribidi_x86-0.19.6-2
 	fribidi_x86_devel-0.19.6-2
-	gcc_x86-4.8.5_2015_07_11-2
-	gcc_x86_syslibs-4.8.5_2015_07_11-2
-	gcc_x86_syslibs_devel-4.8.5_2015_07_11-2
+	gcc_x86-5.3.0_2016_02_29-1
+	gcc_x86_syslibs-5.3.0_2016_02_29-1
+	gcc_x86_syslibs_devel-5.3.0_2016_02_29-1
 	gcc6809_x86-4.6.1-2
 	gdk_pixbuf_x86-2.31.5-1
 	gdk_pixbuf_x86_devel-2.31.5-1
