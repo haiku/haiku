@@ -675,7 +675,8 @@ WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
 	:
 	BWindow(settings->WindowFrame(), B_TRANSLATE_SYSTEM_NAME("Workspaces"), 
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
-		B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK, B_ALL_WORKSPACES),
+		B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK | B_CLOSE_ON_ESCAPE,
+		B_ALL_WORKSPACES),
 	fSettings(settings),
 	fAutoRaising(false),
 	fSwitchOnWheel(false)
