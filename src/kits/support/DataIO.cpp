@@ -602,3 +602,26 @@ BMallocIO::operator=(const BMallocIO &)
 void BMallocIO::_ReservedMallocIO1() {}
 void BMallocIO::_ReservedMallocIO2() {}
 
+
+BMediaIO::BMediaIO()
+{
+}
+
+
+BMediaIO::BMediaIO(const BMediaIO &)
+{
+	// copying not allowed...
+}
+
+
+BMediaIO::~BMediaIO()
+{
+}
+
+
+// FBC
+void BMediaIO::_ReservedMediaIO1() {}
+void BMediaIO::_ReservedMediaIO2() {}
+void BMediaIO::_ReservedMediaIO3() {}
+void BMediaIO::_ReservedMediaIO4() {}
+void BMediaIO::_ReservedMediaIO5() {}

@@ -163,4 +163,29 @@ private:
 };
 
 
+class BMediaIO : public BPositionIO {
+public:
+								BMediaIO();
+	virtual						~BMediaIO();
+
+	virtual bool				IsSeekable() const = 0;
+	virtual bool				IsFile() const = 0;
+
+	virtual	bool				IsEndless() const = 0;
+	virtual bool				IsCached() const = 0;
+	virtual size_t				CacheSize() const = 0;
+
+private:
+								BMediaIO(const BMediaIO&);
+			BMallocIO&			operator=(const BMediaIO&);
+
+	virtual	void				_ReservedMediaIO1();
+	virtual void				_ReservedMediaIO2();
+	virtual void				_ReservedMediaIO3();
+	virtual void				_ReservedMediaIO4();
+	virtual void				_ReservedMediaIO5();
+
+			uint32				_reserved[1];
+};
+
 #endif	// _DATA_IO_H
