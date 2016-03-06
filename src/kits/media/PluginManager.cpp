@@ -4,6 +4,8 @@
  */
 
 #include <Path.h>
+#include <DataIO.h>
+#include <File.h>
 #include <image.h>
 #include <string.h>
 
@@ -16,6 +18,163 @@
 PluginManager gPluginManager;
 
 
+class BMediaIOWrapper : public BMediaIO {
+public:
+	BMediaIOWrapper(BDataIO* source)
+		:
+		fData(NULL),
+		fPosition(NULL),
+		fMedia(NULL),
+		fFile(NULL)
+	{
+		fData = dynamic_cast<BDataIO*>(source);
+		fPosition = dynamic_cast<BPositionIO*>(source);
+		fMedia = dynamic_cast<BMediaIO*>(source);
+		fFile = dynamic_cast<BFile*>(source);
+	}
+
+	virtual	~BMediaIOWrapper()
+	{
+	}
+
+	virtual	ssize_t				Read(void* buffer, size_t size)
+	{
+		return fData->Read(buffer, size);
+	}
+
+	virtual	ssize_t				Write(const void* buffer, size_t size)
+	{
+		return fData->Write(buffer, size);
+	}
+
+	virtual	status_t			Flush()
+	{
+		return fData->Flush();
+	}
+
+	virtual	ssize_t				ReadAt(off_t position, void* buffer,
+									size_t size)
+	{
+		if (IsSeekable())
+			return fPosition->ReadAt(position, buffer, size);
+
+		// if (IsCached()) {
+		//
+		// }
+
+		return B_NOT_SUPPORTED;
+	}
+
+	virtual	ssize_t				WriteAt(off_t position, const void* buffer,
+									size_t size)
+	{
+		if (IsSeekable())
+			return fPosition->WriteAt(position, buffer, size);
+
+		return B_NOT_SUPPORTED;
+	}
+
+	virtual	off_t				Seek(off_t position, uint32 seekMode)
+	{
+		if (IsSeekable())
+			return fPosition->Seek(position, seekMode);
+
+		// if (IsCached()) {
+		//
+		// }
+
+		return B_NOT_SUPPORTED;
+	}
+
+	virtual off_t				Position() const
+	{
+		if (!IsEndless())
+			return fPosition->Position();
+
+		// TODO: buffering
+
+		return 0;
+	}
+
+	virtual	status_t		SetSize(off_t size)
+	{
+		if (IsEndless())
+			return B_NOT_SUPPORTED;
+
+		return fPosition->SetSize(size);
+	}
+
+	virtual	status_t		GetSize(off_t* size) const
+	{
+		if (IsEndless())
+			return B_NOT_SUPPORTED;
+
+		return fPosition->GetSize(size);
+	}
+
+	virtual bool				IsSeekable() const
+	{
+		if (IsMedia())
+			return fMedia->IsSeekable();
+
+		return IsPosition();
+	}
+
+	virtual bool				IsFile() const
+	{
+		return fFile != NULL;
+	}
+
+	virtual	bool				IsEndless() const
+	{
+		if (IsMedia())
+			return fMedia->IsEndless();
+		if (IsPosition())
+			return false;
+
+		return true;
+	}
+
+	virtual bool				IsCached() const
+	{
+		return true;
+	}
+
+	virtual size_t				CacheSize() const
+	{
+		// TODO: it should be another buffering level
+		// but we might to optimize with the underlying level
+		//if (IsMedia() && IsCached())
+		//	return CacheSize();
+
+		return B_NOT_SUPPORTED;
+	}
+
+protected:
+	// Utility methods
+	bool						IsData() const
+	{
+		return fData != NULL;
+	}
+
+	bool						IsPosition() const
+	{
+		return fPosition != NULL;
+	}
+
+	bool						IsMedia() const
+	{
+		return fMedia != NULL;
+	}
+
+private:
+	BDataIO*					fData;
+	BPositionIO*				fPosition;
+	BMediaIO*					fMedia;
+	BFile*						fFile;
+};
+
+
 // #pragma mark - Readers/Decoders
 
 
@@ -25,12 +184,10 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 {
 	TRACE("PluginManager::CreateReader enter\n");
 
-	BPositionIO *seekable_source = dynamic_cast<BPositionIO *>(source);
-	if (seekable_source == 0) {
-		printf("PluginManager::CreateReader: non-seekable sources not "
-			"supported yet\n");
-		return B_ERROR;
-	}
+	// The wrapper class will present our source in a more useful
+	// way, we create an instance which is buffering our reads and
+	// writes.
+	BMediaIOWrapper* buffered_source = new BMediaIOWrapper(source);
 
 	// get list of available readers from the server
 	entry_ref refs[MAX_READERS];
@@ -67,8 +224,8 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 			return B_ERROR;
 		}
 
-		seekable_source->Seek(0, SEEK_SET);
-		(*reader)->Setup(seekable_source);
+		buffered_source->Seek(0, SEEK_SET);
+		(*reader)->Setup(buffered_source);
 		(*reader)->fMediaPlugin = plugin;
 
 		if ((*reader)->Sniff(streamCount) == B_OK) {
