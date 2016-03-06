@@ -322,6 +322,7 @@ RemotePackageRepository HaikuPorts
 	openssl-1.0.2e-1
 	openssl_devel-1.0.2e-1
 	p7zip-9.20.1-5
+	padblocker-1.0-1
 	patch-2.7.5-1
 	pe-2.4.5-2
 	perl-5.18.2-2
@@ -563,6 +564,7 @@ RemotePackageRepository HaikuPorts
 	openssh
 	openssl
 	p7zip
+	padblocker
 	patch
 	pe
 	perl

@@ -394,6 +394,7 @@ RemotePackageRepository HaikuPorts
 	opusfile_devel-0.6-1
 	opus_tools-0.1.9-1
 	p7zip-9.20.1-4
+	padblocker-1.0-1
 	paladin-git-6
 	paragui-1.1.8-1
 	paragui_devel-1.1.8-1
@@ -1298,6 +1299,7 @@ RemotePackageRepository HaikuPorts
 	opusfile
 	opus_tools
 	p7zip
+	padblocker
 	paladin
 	pango_x86
 	paragui
