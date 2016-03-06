@@ -3,10 +3,12 @@
  * Distributed under the terms of the OpenBeOS License.
  */
 
-#include <Path.h>
+#include <BufferIO.h>
 #include <DataIO.h>
 #include <File.h>
 #include <image.h>
+#include <Path.h>
+
 #include <string.h>
 
 #include "AddOnManager.h"
@@ -25,11 +27,32 @@ public:
 		fData(NULL),
 		fPosition(NULL),
 		fMedia(NULL),
-		fFile(NULL)
+		fFile(NULL),
+		fErr(B_NO_ERROR)
 	{
-		fData = dynamic_cast<BDataIO*>(source);
 		fPosition = dynamic_cast<BPositionIO*>(source);
 		fMedia = dynamic_cast<BMediaIO*>(source);
+
+		// No need to do additional buffering if we have
+		// a BBufferIO or a BMediaIO.
+		if (dynamic_cast<BBufferIO *>(source) == NULL
+				&& fMedia == NULL) {
+			// Source needs to be at least a BPositionIO to wrap with a BBufferIO
+			if (fPosition != NULL) {
+				fPosition = new(std::nothrow) BBufferIO(fPosition, 65536, true);
+				// We have to reset our BDataIO reference
+				fData = dynamic_cast<BDataIO*>(fPosition);
+				if (fPosition == NULL) {
+					fErr = B_NO_MEMORY;
+					return;
+				}
+			} else {
+				TRACE("Unable to improve performance with a BufferIO\n");
+				// TODO: fallback buffering
+			}
+		} else {
+			fData = source;
+		}
 		fFile = dynamic_cast<BFile*>(source);
 	}
 
@@ -150,6 +173,11 @@ public:
 		return B_NOT_SUPPORTED;
 	}
 
+	status_t					InitCheck() const
+	{
+		return fErr;
+	}
+
 protected:
 	// Utility methods
 	bool						IsData() const
@@ -172,6 +200,8 @@ private:
 	BPositionIO*				fPosition;
 	BMediaIO*					fMedia;
 	BFile*						fFile;
+
+	status_t					fErr;
 };
 
 
@@ -188,12 +218,15 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 	// way, we create an instance which is buffering our reads and
 	// writes.
 	BMediaIOWrapper* buffered_source = new BMediaIOWrapper(source);
+	status_t ret = buffered_source->InitCheck();
+	if (ret != B_OK)
+		return ret;
 
 	// get list of available readers from the server
 	entry_ref refs[MAX_READERS];
 	int32 count;
 
-	status_t ret = AddOnManager::GetInstance()->GetReaders(refs, &count,
+	ret = AddOnManager::GetInstance()->GetReaders(refs, &count,
 		MAX_READERS);
 	if (ret != B_OK) {
 		printf("PluginManager::CreateReader: can't get list of readers: %s\n",
