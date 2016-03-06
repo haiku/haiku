@@ -126,7 +126,7 @@ avdictionary_to_message(AVDictionary* dictionary, BMessage* message)
 
 class StreamBase {
 public:
-								StreamBase(BPositionIO* source,
+								StreamBase(BMediaIO* source,
 									BLocker* sourceLock, BLocker* streamLock);
 	virtual						~StreamBase();
 
@@ -156,17 +156,9 @@ public:
 
 protected:
 	// I/O hooks for libavformat, cookie will be a Stream instance.
-	// Since multiple StreamCookies use the same BPositionIO source, they
+	// Since multiple StreamCookies use the same BMediaIO source, they
 	// maintain the position individually, and may need to seek the source
 	// if it does not match anymore in _Read().
-	// TODO: This concept prevents the use of a plain BDataIO that is not
-	// seekable. There is a version of AVFormatReader in the SVN history
-	// which implements packet buffering for other streams when reading
-	// packets. To support non-seekable network streams for example, this
-	// code should be resurrected. It will make handling seekable streams,
-	// especially from different threads that read from totally independent
-	// positions in the stream (aggressive pre-buffering perhaps), a lot
-	// more difficult with potentially large memory overhead.
 	static	int					_Read(void* cookie, uint8* buffer,
 									int bufferSize);
 	static	off_t				_Seek(void* cookie, off_t offset, int whence);
@@ -177,7 +169,7 @@ protected:
 			bigtime_t			_ConvertFromStreamTimeBase(int64_t time) const;
 
 protected:
-			BPositionIO*		fSource;
+			BMediaIO*			fSource;
 			off_t				fPosition;
 			// Since different threads may read from the source,
 			// we need to protect the file position and I/O by a lock.
@@ -201,7 +193,7 @@ protected:
 };
 
 
-StreamBase::StreamBase(BPositionIO* source, BLocker* sourceLock,
+StreamBase::StreamBase(BMediaIO* source, BLocker* sourceLock,
 		BLocker* streamLock)
 	:
 	fSource(source),
@@ -474,8 +466,10 @@ StreamBase::Seek(uint32 flags, int64* frame, bigtime_t* time)
 
 		BAutolock _(fSourceLock);
 		int64_t fileSize;
+
 		if (fSource->GetSize(&fileSize) != B_OK)
 			return B_NOT_SUPPORTED;
+
 		int64_t duration = Duration();
 		if (duration == 0)
 			return B_NOT_SUPPORTED;
@@ -762,11 +756,13 @@ StreamBase::_Read(void* cookie, uint8* buffer, int bufferSize)
 
 	BAutolock _(stream->fSourceLock);
 
-	TRACE_IO("StreamBase::_Read(%p, %p, %d) position: %lld/%lld\n",
-		cookie, buffer, bufferSize, stream->fPosition,
-		stream->fSource->Position());
+	TRACE_IO("StreamBase::_Read(%p, %p, %d) position: %lld\n",
+		cookie, buffer, bufferSize, stream->fPosition);
 
 	if (stream->fPosition != stream->fSource->Position()) {
+		TRACE_IO("StreamBase::_Read fSource position: %lld\n",
+			stream->fSource->Position());
+
 		off_t position
 			= stream->fSource->Seek(stream->fPosition, SEEK_SET);
 		if (position != stream->fPosition)
@@ -887,7 +883,7 @@ StreamBase::_ConvertFromStreamTimeBase(int64_t time) const
 
 class AVFormatReader::Stream : public StreamBase {
 public:
-								Stream(BPositionIO* source,
+								Stream(BMediaIO* source,
 									BLocker* streamLock);
 	virtual						~Stream();
 
@@ -924,7 +920,7 @@ private:
 
 
 
-AVFormatReader::Stream::Stream(BPositionIO* source, BLocker* streamLock)
+AVFormatReader::Stream::Stream(BMediaIO* source, BLocker* streamLock)
 	:
 	StreamBase(source, streamLock, &fLock),
 	fLock("stream lock"),
@@ -1472,9 +1468,9 @@ AVFormatReader::Sniff(int32* _streamCount)
 {
 	TRACE("AVFormatReader::Sniff\n");
 
-	BPositionIO* source = dynamic_cast<BPositionIO*>(Source());
+	BMediaIO* source = dynamic_cast<BMediaIO*>(Source());
 	if (source == NULL) {
-		TRACE("  not a BPositionIO, but we need it to be one.\n");
+		TRACE("  not a BMediaIO, but we need it to be one.\n");
 		return B_NOT_SUPPORTED;
 	}
 
@@ -1647,9 +1643,9 @@ AVFormatReader::AllocateCookie(int32 streamIndex, void** _cookie)
 	Stream* cookie = fStreams[streamIndex];
 	if (cookie == NULL) {
 		// Allocate the cookie
-		BPositionIO* source = dynamic_cast<BPositionIO*>(Source());
+		BMediaIO* source = dynamic_cast<BMediaIO*>(Source());
 		if (source == NULL) {
-			TRACE("  not a BPositionIO, but we need it to be one.\n");
+			TRACE("  not a BMediaIO, but we need it to be one.\n");
 			return B_NOT_SUPPORTED;
 		}
 
