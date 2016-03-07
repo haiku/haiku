@@ -22,8 +22,7 @@
 #include <File.h>
 #include <FilePanel.h>
 #include <FindDirectory.h>
-#include <GroupLayout.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <ListView.h>
 #include <Locale.h>
 #include <NodeMonitor.h>
@@ -314,28 +313,28 @@ UninstallView::_InitView()
 
 	const float spacing = be_control_look->DefaultItemSpacing();
 
-	BGroupLayoutBuilder builder(GroupLayout());
-	builder.Add(scrollView)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.Add(scrollView, 10)
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-		.Add(BGroupLayoutBuilder(B_VERTICAL)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+		.AddGroup(B_VERTICAL)
+			.SetInsets(spacing)
+			.AddGroup(B_HORIZONTAL, 0)
 				.Add(descriptionLabel)
 				.AddGlue()
-			)
-			.Add(BGroupLayoutBuilder(B_HORIZONTAL, 0)
+			.End()
+			.AddGroup(B_HORIZONTAL, 0)
 				.Add(BSpaceLayoutItem::CreateHorizontalStrut(10))
 				.Add(fDescription)
-			)
-			.SetInsets(spacing, spacing, spacing, spacing)
-		)
+			.End()
+		.End()
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(spacing)
 			.AddGlue()
 			.Add(fInstallButton)
 			.Add(fRemoveButton)
-			.SetInsets(spacing, spacing, spacing, spacing)
-		)
-	;
+		.End()
+	.End();
 }
 
 
