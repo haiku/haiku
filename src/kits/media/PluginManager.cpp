@@ -121,7 +121,9 @@ public:
 		if (IsSeekable())
 			return fPosition->Seek(position, seekMode);
 
-		if (IsEndless())
+		off_t bufSize = 0;
+		fFallbackBuffer->GetSize(&bufSize);
+		if (IsEndless() && position <= bufSize)
 			return fFallbackBuffer->Seek(position, seekMode);
 
 		return B_NOT_SUPPORTED;
