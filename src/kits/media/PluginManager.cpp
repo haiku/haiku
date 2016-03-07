@@ -31,7 +31,6 @@ public:
 		fMedia(NULL),
 		fFile(NULL),
 		fFallbackBuffer(NULL),
-		fFallbackPosition(0),
 		fErr(B_NO_ERROR)
 	{
 		fPosition = dynamic_cast<BPositionIO*>(source);
@@ -77,19 +76,20 @@ public:
 			return fPosition->ReadAt(position, buffer, size);
 
 		if (IsEndless()) {
-			off_t nextPos = position+size;
 			off_t bufSize = 0;
+			ssize_t ret = 0;
 			fFallbackBuffer->GetSize(&bufSize);
 
-			if (fFallbackPosition == position
-					&& nextPos > bufSize) {
-				fData->Read(buffer, size);
-				fFallbackBuffer->WriteAt(fFallbackPosition, buffer, size);
-				fFallbackPosition = nextPos;
-				return size;
-			} else if (nextPos <= bufSize) {
-				fFallbackPosition = nextPos;
-				return fFallbackBuffer->ReadAt(position, buffer, size);
+			if (fFallbackBuffer->Position() == position
+					&& position+size > bufSize) {
+				ret = fData->Read(buffer, size);
+				fFallbackBuffer->Write(buffer, ret);
+				return ret;
+			}
+
+			if (position+size <= bufSize) {
+				ret = fFallbackBuffer->ReadAt(position, buffer, size);
+				return ret;
 			}
 		}
 
@@ -102,9 +102,13 @@ public:
 		if (IsSeekable())
 			return fPosition->WriteAt(position, buffer, size);
 
-		if (IsEndless() && position == fFallbackPosition) {
-			fData->Write(buffer, size);
-			fFallbackPosition = position+size;
+		if (IsEndless()) {
+			off_t bufSize = 0;
+			fFallbackBuffer->GetSize(&bufSize);
+			if (position == bufSize) {
+				fData->Write(buffer, size);
+				fFallbackBuffer->WriteAt(bufSize, buffer, size);
+			}
 		}
 
 		return B_NOT_SUPPORTED;
@@ -202,7 +206,6 @@ private:
 	BFile*						fFile;
 
 	BMallocIO*					fFallbackBuffer;
-	off_t						fFallbackPosition;
 	status_t					fErr;
 };
 
