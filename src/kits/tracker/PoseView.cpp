@@ -219,7 +219,7 @@ CopySelectionListToEntryRefList(const PoseList* original,
 
 BPoseView::BPoseView(Model* model, uint32 viewMode)
 	:
-	BView("BPoseView", B_WILL_DRAW | B_PULSE_NEEDED),
+	BView("PoseView", B_WILL_DRAW | B_PULSE_NEEDED),
 	fIsDrawingSelectionRect(false),
 	fHScrollBar(NULL),
 	fVScrollBar(NULL),

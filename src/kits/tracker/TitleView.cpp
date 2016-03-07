@@ -92,7 +92,7 @@ _DrawOutline(BView* view, BRect where)
 
 BTitleView::BTitleView(BPoseView* view)
 	:
-	BView("BTitleView", B_WILL_DRAW),
+	BView("TitleView", B_WILL_DRAW),
 	fPoseView(view),
 	fTitleList(10, true),
 	fHorizontalResizeCursor(B_CURSOR_ID_RESIZE_EAST_WEST),
