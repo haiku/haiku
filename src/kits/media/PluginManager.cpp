@@ -52,7 +52,6 @@ public:
 				// We have to reset our BDataIO reference too
 				fData = dynamic_cast<BDataIO*>(fPosition);
 			} else {
-				// TODO: fallback buffering
 				// In this case we have to supply our own form
 				// of pseudo-seekable object from a non-seekable
 				// BDataIO.
@@ -144,8 +143,6 @@ public:
 	{
 		if (IsEndless())
 			return B_NOT_SUPPORTED;
-
-		// TODO: What a non seekable stream should do here?
 
 		return fPosition->SetSize(size);
 	}
