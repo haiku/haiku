@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="docbook-css/driver.css" type="text/css" ?>
+<?xml-stylesheet href="haiku.css" type="text/css" ?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.2//EN"
   "http://www.oasis-open.org/docbook/xml/4.2/docbookx.dtd" >
 <book>
