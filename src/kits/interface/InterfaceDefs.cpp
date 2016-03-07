@@ -108,6 +108,7 @@ static const rgb_color _kDefaultColors[kColorWhichCount] = {
 	{102, 152, 203, 255},	// B_LINK_HOVER_COLOR
 	{145, 112, 155, 255},	// B_LINK_VISITED_COLOR
 	{121, 142, 203, 255},	// B_LINK_ACTIVE_COLOR
+	{50, 150, 255, 255},	// B_STATUS_BAR_COLOR
 	// 100...
 	{46, 204, 64, 255},		// B_SUCCESS_COLOR
 	{255, 65, 54, 255},		// B_FAILURE_COLOR
@@ -153,6 +154,7 @@ static const char* kColorNames[kColorWhichCount] = {
 	"B_LINK_HOVER_COLOR",
 	"B_LINK_VISITED_COLOR",
 	"B_LINK_ACTIVE_COLOR",
+	"B_STATUS_BAR_COLOR",
 	// 100...
 	"B_SUCCESS_COLOR",
 	"B_FAILURE_COLOR",
