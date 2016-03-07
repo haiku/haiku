@@ -377,7 +377,7 @@ UninstallView::_ReloadAppList()
 void
 UninstallView::_ClearAppList()
 {
-	while (BListItem* item = fAppList->RemoveItem(0))
+	while (BListItem* item = fAppList->RemoveItem(0L))
 		delete item;
 }
 
