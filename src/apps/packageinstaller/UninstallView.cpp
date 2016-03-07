@@ -20,6 +20,7 @@
 #include <Directory.h>
 #include <Entry.h>
 #include <File.h>
+#include <FilePanel.h>
 #include <FindDirectory.h>
 #include <GroupLayout.h>
 #include <GroupLayoutBuilder.h>
@@ -33,12 +34,15 @@
 #include <SpaceLayoutItem.h>
 #include <TextView.h>
 
+#include "main.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "UninstallView"
 
 
 enum {
+	P_MSG_INSTALL = 'umin',
 	P_MSG_REMOVE = 'umrm',
 	P_MSG_SELECT
 };
@@ -80,7 +84,8 @@ private:
 
 UninstallView::UninstallView()
 	:
-	BGroupView(B_VERTICAL)
+	BGroupView(B_VERTICAL),
+	fOpenPanel(new BFilePanel(B_OPEN_PANEL))
 {
 	fNoPackageSelectedString = B_TRANSLATE("No package selected.");
 	_InitView();
@@ -98,7 +103,8 @@ void
 UninstallView::AttachedToWindow()
 {
 	fAppList->SetTarget(this);
-	fButton->SetTarget(this);
+	fInstallButton->SetTarget(this);
+	fRemoveButton->SetTarget(this);
 
 	_ReloadAppList();
 
@@ -205,7 +211,7 @@ UninstallView::MessageReceived(BMessage* msg)
 		}
 		case P_MSG_SELECT:
 		{
-			fButton->SetEnabled(false);
+			fRemoveButton->SetEnabled(false);
 			fDescription->SetText(fNoPackageSelectedString);
 
 			int32 index = fAppList->CurrentSelection();
@@ -225,8 +231,13 @@ UninstallView::MessageReceived(BMessage* msg)
 					item->GetVersion()) != B_OK)
 				break;
 
-			fButton->SetEnabled(true);
+			fRemoveButton->SetEnabled(true);
 			fDescription->SetText(fCurrentSelection.Description());
+			break;
+		}
+		case P_MSG_INSTALL:
+		{
+			fOpenPanel->Show();
 			break;
 		}
 		case P_MSG_REMOVE:
@@ -259,11 +270,19 @@ UninstallView::MessageReceived(BMessage* msg)
 			}
 			notify->SetFlags(notify->Flags() | B_CLOSE_ON_ESCAPE);
 			notify->Go();
+			break;
 		}
 		default:
 			BView::MessageReceived(msg);
 			break;
 	}
+}
+
+
+void
+UninstallView::RefsReceived(BMessage* message)
+{
+	static_cast<PackageInstaller*>(be_app)->RefsReceived(message);
 }
 
 
@@ -287,9 +306,11 @@ UninstallView::_InitView()
 	fDescription->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 	fDescription->SetText(fNoPackageSelectedString);
 
-	fButton = new BButton("removal", B_TRANSLATE("Remove"),
+	fInstallButton = new BButton("install", B_TRANSLATE("Install" B_UTF8_ELLIPSIS),
+		new BMessage(P_MSG_INSTALL));
+	fRemoveButton = new BButton("removal", B_TRANSLATE("Remove"),
 		new BMessage(P_MSG_REMOVE));
-	fButton->SetEnabled(false);
+	fRemoveButton->SetEnabled(false);
 
 	const float spacing = be_control_look->DefaultItemSpacing();
 
@@ -310,7 +331,8 @@ UninstallView::_InitView()
 		.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
 		.Add(BGroupLayoutBuilder(B_HORIZONTAL)
 			.AddGlue()
-			.Add(fButton)
+			.Add(fInstallButton)
+			.Add(fRemoveButton)
 			.SetInsets(spacing, spacing, spacing, spacing)
 		)
 	;

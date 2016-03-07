@@ -16,6 +16,7 @@
 class UninstallWindow : public BWindow {
 public:
 								UninstallWindow();
+	virtual	void				Quit();
 };
 
 #endif // UNINSTALLWINDOW_H

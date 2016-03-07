@@ -6,15 +6,16 @@
  *		Łukasz 'Sil2100' Zemczak <sil2100@vexillium.org>
  */
 
+#include "main.h"
 
 #include "PackageWindow.h"
+#include "UninstallWindow.h"
 
 #include <Alert.h>
 #include <Application.h>
 #include <Autolock.h>
 #include <Catalog.h>
 #include <Entry.h>
-#include <FilePanel.h>
 #include <List.h>
 #include <Locale.h>
 #include <Path.h>
@@ -30,30 +31,9 @@
 bool gVerbose = false;
 
 
-class PackageInstaller : public BApplication {
-public:
-								PackageInstaller();
-	virtual						~PackageInstaller();
-
-	virtual void				RefsReceived(BMessage* message);
-	virtual void				ArgvReceived(int32 argc, char** argv);
-	virtual void				ReadyToRun();
-
-	virtual void				MessageReceived(BMessage* message);
-
-private:
-			void				_NewWindow(const entry_ref* ref);
-
-private:
-			BFilePanel*			fOpenPanel;
-			uint32				fWindowCount;
-};
-
-
 PackageInstaller::PackageInstaller()
 	:
 	BApplication("application/x-vnd.Haiku-PackageInstaller"),
-	fOpenPanel(new BFilePanel(B_OPEN_PANEL)),
 	fWindowCount(0)
 {
 }
@@ -68,9 +48,11 @@ void
 PackageInstaller::ReadyToRun()
 {
 	// We're ready to run - if no windows are yet visible, this means that
-	// we should show a open panel
-	if (fWindowCount == 0)
-		fOpenPanel->Show();
+	// we should show the UninstallWindow
+	if (fWindowCount == 0) {
+		(new UninstallWindow)->Show();
+		fWindowCount++;
+	}
 }
 
 
@@ -91,7 +73,7 @@ PackageInstaller::ArgvReceived(int32 argc, char** argv)
 			gVerbose = true;
 			continue;
 		}
-		
+
 		BPath path;
 		if (path.SetTo(argv[i]) != B_OK) {
 			fprintf(stderr, B_TRANSLATE("Error! \"%s\" is not a valid path.\n"),
