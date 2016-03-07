@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2014, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2016, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FS_INTERFACE_H
@@ -358,10 +358,10 @@ extern status_t notify_entry_removed(dev_t device, ino_t directory,
 extern status_t notify_entry_moved(dev_t device, ino_t fromDirectory,
 					const char* fromName, ino_t toDirectory,
 					const char* toName, ino_t node);
-extern status_t notify_stat_changed(dev_t device, ino_t node,
+extern status_t notify_stat_changed(dev_t device, ino_t directory, ino_t node,
 					uint32 statFields);
-extern status_t notify_attribute_changed(dev_t device, ino_t node,
-					const char* attribute, int32 cause);
+extern status_t notify_attribute_changed(dev_t device, ino_t directory,
+					ino_t node, const char* attribute, int32 cause);
 
 extern status_t notify_query_entry_created(port_id port, int32 token,
 					dev_t device, ino_t directory, const char* name,

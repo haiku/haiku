@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Haiku Inc. All rights reserved.
+ * Copyright 2009-2016, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -74,8 +74,8 @@ struct overlay_dirent {
 
 	void			dispose_attribute(fs_volume *volume, ino_t fileInode)
 					{
-						notify_attribute_changed(volume->id, fileInode, name,
-							B_ATTR_REMOVED);
+						notify_attribute_changed(volume->id, -1, fileInode,
+							name, B_ATTR_REMOVED);
 						free(name);
 						free(this);
 					}
@@ -547,7 +547,7 @@ OverlayInode::WriteStat(const struct stat *stat, uint32 statMask)
 	if (!fIsModified)
 		SetModified();
 
-	notify_stat_changed(SuperVolume()->id, fInodeNumber, statMask);
+	notify_stat_changed(SuperVolume()->id, -1, fInodeNumber, statMask);
 	return B_OK;
 }
 
@@ -843,10 +843,10 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 
 				fStat.st_mtime = time(NULL);
 				if (fIsAttribute) {
-					notify_attribute_changed(SuperVolume()->id, fInodeNumber,
-						fName, B_ATTR_CHANGED);
+					notify_attribute_changed(SuperVolume()->id, -1,
+						fInodeNumber, fName, B_ATTR_CHANGED);
 				} else {
-					notify_stat_changed(SuperVolume()->id, fInodeNumber,
+					notify_stat_changed(SuperVolume()->id, -1, fInodeNumber,
 						B_STAT_MODIFICATION_TIME);
 				}
 				return B_OK;
@@ -903,10 +903,10 @@ OverlayInode::Write(void *_cookie, off_t position, const void *buffer,
 	fStat.st_mtime = time(NULL);
 
 	if (fIsAttribute) {
-		notify_attribute_changed(SuperVolume()->id, fInodeNumber, fName,
+		notify_attribute_changed(SuperVolume()->id, -1, fInodeNumber, fName,
 			B_ATTR_CHANGED);
 	} else {
-		notify_stat_changed(SuperVolume()->id, fInodeNumber,
+		notify_stat_changed(SuperVolume()->id, -1, fInodeNumber,
 			B_STAT_MODIFICATION_TIME | (sizeChanged ? B_STAT_SIZE : 0));
 	}
 
@@ -1219,7 +1219,7 @@ OverlayInode::_PopulateStat()
 {
 	if (fHasStat)
 		return B_OK;
- 
+
  	fHasStat = true;
 	if (fIsAttribute) {
 		if (fName == NULL || fSuperVnode.ops->open_attr == NULL
@@ -1503,8 +1503,8 @@ OverlayInode::_CreateCommon(const char *name, int type, int perms,
 		*_node = node;
 
 	if (attribute) {
-		notify_attribute_changed(SuperVolume()->id, fInodeNumber, entry->name,
-			B_ATTR_CREATED);
+		notify_attribute_changed(SuperVolume()->id, -1, fInodeNumber,
+			entry->name, B_ATTR_CREATED);
 	} else {
 		notify_entry_created(SuperVolume()->id, fInodeNumber, entry->name,
 			entry->inode_number);
@@ -2164,9 +2164,9 @@ overlay_rename_attr(fs_volume *volume, fs_vnode *vnode,
 	node->SetSuperVnode(toNode->SuperVnode());
 	node->SetInodeNumber(toNode->InodeNumber());
 
-	notify_attribute_changed(volume->id, fromNode->InodeNumber(), fromName,
+	notify_attribute_changed(volume->id, -1, fromNode->InodeNumber(), fromName,
 		B_ATTR_REMOVED);
-	notify_attribute_changed(volume->id, toNode->InodeNumber(), toName,
+	notify_attribute_changed(volume->id, -1, toNode->InodeNumber(), toName,
 		B_ATTR_CREATED);
 
 	free(oldName);
@@ -2183,7 +2183,7 @@ overlay_remove_attr(fs_volume *volume, fs_vnode *vnode, const char *name)
 	if (result != B_OK)
 		return result;
 
-	notify_attribute_changed(volume->id, node->InodeNumber(), name,
+	notify_attribute_changed(volume->id, -1, node->InodeNumber(), name,
 		B_ATTR_REMOVED);
 	return result;
 }

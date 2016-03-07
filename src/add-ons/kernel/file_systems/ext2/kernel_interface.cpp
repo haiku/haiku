@@ -710,7 +710,7 @@ ext2_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 	if (status == B_OK)
 		status = transaction.Done();
 	if (status == B_OK)
-		notify_stat_changed(volume->ID(), inode->ID(), mask);
+		notify_stat_changed(volume->ID(), -1, inode->ID(), mask);
 
 	return status;
 }
@@ -1219,7 +1219,7 @@ ext2_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 		if (cookie->last_size != inode->Size()
 			&& system_time() > cookie->last_notification
 				+ INODE_NOTIFICATION_INTERVAL) {
-			notify_stat_changed(volume->ID(), inode->ID(),
+			notify_stat_changed(volume->ID(), -1, inode->ID(),
 				B_STAT_MODIFICATION_TIME | B_STAT_SIZE | B_STAT_INTERIM_UPDATE);
 			cookie->last_size = inode->Size();
 			cookie->last_notification = system_time();
@@ -1247,7 +1247,7 @@ ext2_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 	Inode* inode = (Inode*)_node->private_node;
 
 	if (inode->Size() != cookie->last_size)
-		notify_stat_changed(volume->ID(), inode->ID(), B_STAT_SIZE);
+		notify_stat_changed(volume->ID(), -1, inode->ID(), B_STAT_SIZE);
 
 	if ((cookie->open_mode & O_NOCACHE) != 0)
 		inode->EnableFileCache();
@@ -1449,7 +1449,7 @@ ext2_read_dir(fs_volume *_volume, fs_vnode *_node, void *_cookie,
 		status = iterator->Next();
 		if (status != B_OK && status != B_ENTRY_NOT_FOUND)
 			return status;
-		
+
 		dirent->d_dev = volume->ID();
 		dirent->d_ino = id;
 		dirent->d_reclen = sizeof(struct dirent) + length;

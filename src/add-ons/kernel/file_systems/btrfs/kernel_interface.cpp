@@ -353,7 +353,7 @@ btrfs_lookup(fs_volume* _volume, fs_vnode* _directory, const char* name,
 	status = DirectoryIterator(directory).Lookup(name, strlen(name), _vnodeID);
 	if (status != B_OK)
 		return status;
-	
+
 	return get_vnode(volume->FSVolume(), *_vnodeID, NULL);
 }
 
@@ -373,7 +373,7 @@ static status_t
 btrfs_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 {
 	Inode* inode = (Inode*)_node->private_node;
-	
+
 	stat->st_dev = inode->GetVolume()->ID();
 	stat->st_ino = inode->ID();
 	stat->st_nlink = 1;
@@ -466,7 +466,7 @@ btrfs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 	Inode* inode = (Inode*)_node->private_node;
 
 	if (inode->Size() != cookie->last_size)
-		notify_stat_changed(volume->ID(), inode->ID(), B_STAT_SIZE);
+		notify_stat_changed(volume->ID(), -1, inode->ID(), B_STAT_SIZE);
 
 	delete cookie;
 	return B_OK;

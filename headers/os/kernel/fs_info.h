@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2003, Haiku Inc. All Rights Reserved.
+ * Copyright 2002-2016, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FS_INFO_H
@@ -20,6 +20,7 @@
 #define B_FS_HAS_SELF_HEALING_LINKS		0x00080000
 #define B_FS_HAS_ALIASES				0x00100000
 #define B_FS_SUPPORTS_NODE_MONITORING	0x00200000
+#define B_FS_SUPPORTS_MONITOR_CHILDREN	0x00400000
 
 typedef struct fs_info {
 	dev_t	dev;								/* volume dev_t */

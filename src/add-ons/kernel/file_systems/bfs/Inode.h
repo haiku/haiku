@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2010, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2016, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INODE_H
@@ -95,6 +95,9 @@ public:
 			const block_run&	BlockRun() const
 									{ return fNode.inode_num; }
 			block_run&			Parent() { return fNode.parent; }
+			const block_run&	Parent() const { return fNode.parent; }
+			ino_t				ParentID() const
+									{ return fVolume->ToVnode(Parent()); }
 			block_run&			Attributes() { return fNode.attributes; }
 
 			Volume*				GetVolume() const { return fVolume; }

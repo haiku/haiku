@@ -421,7 +421,7 @@ static status_t
 exfat_read_stat(fs_volume* _volume, fs_vnode* _node, struct stat* stat)
 {
 	Inode* inode = (Inode*)_node->private_node;
-	
+
 	stat->st_dev = inode->GetVolume()->ID();
 	stat->st_ino = inode->ID();
 	stat->st_nlink = 1;
@@ -514,7 +514,7 @@ exfat_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 	Inode* inode = (Inode*)_node->private_node;
 
 	if (inode->Size() != cookie->last_size)
-		notify_stat_changed(volume->ID(), inode->ID(), B_STAT_SIZE);
+		notify_stat_changed(volume->ID(), -1, inode->ID(), B_STAT_SIZE);
 
 	delete cookie;
 	return B_OK;

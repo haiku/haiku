@@ -96,23 +96,24 @@ notify_entry_moved(dev_t device, ino_t fromDirectory,
 
 // notify_stat_changed
 status_t
-notify_stat_changed(dev_t device, ino_t node, uint32 statFields)
+notify_stat_changed(dev_t device, ino_t directory, ino_t node,
+	uint32 statFields)
 {
 	return UserlandFS::KernelEmu::notify_listener(B_STAT_CHANGED, statFields,
-		device, 0, 0, node, NULL, NULL);
+		device, 0, directory, node, NULL, NULL);
 }
 
 
 // notify_attribute_changed
 status_t
-notify_attribute_changed(dev_t device, ino_t node, const char *attribute,
-	int32 cause)
+notify_attribute_changed(dev_t device, ino_t directory, ino_t node,
+	const char *attribute, int32 cause)
 {
 	if (!attribute)
 		return B_BAD_VALUE;
 
 	return UserlandFS::KernelEmu::notify_listener(B_ATTR_CHANGED, cause,
-		device, 0, 0, node, NULL, attribute);
+		device, 0, directory, node, NULL, attribute);
 }
 
 

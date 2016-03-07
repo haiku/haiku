@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2010 Haiku Inc. All rights reserved.
+ * Copyright 2003-2016 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _NODE_MONITOR_H
@@ -23,7 +23,8 @@ enum {
 	B_WATCH_ALL				= 0x000f,
 
 	B_WATCH_MOUNT			= 0x0010,
-	B_WATCH_INTERIM_STAT	= 0x0020
+	B_WATCH_INTERIM_STAT	= 0x0020,
+	B_WATCH_CHILDREN		= 0x0040
 };
 
 

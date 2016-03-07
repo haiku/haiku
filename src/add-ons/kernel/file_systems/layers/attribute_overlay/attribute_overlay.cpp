@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2010, Haiku Inc. All rights reserved.
+ * Copyright 2009-2016, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -853,7 +853,7 @@ AttributeFile::RemoveAttribute(const char *name, AttributeEntry **_entry)
 	else
 		delete entry;
 
-	notify_attribute_changed(fVolumeID, fFileInode, name, B_ATTR_REMOVED);
+	notify_attribute_changed(fVolumeID, -1, fFileInode, name, B_ATTR_REMOVED);
 	return B_OK;
 }
 
@@ -876,7 +876,7 @@ AttributeFile::AddAttribute(AttributeEntry *entry)
 	fEntries = newEntries;
 	fEntries[fFile->entry_count++] = entry;
 
-	notify_attribute_changed(fVolumeID, fFileInode, entry->Name(),
+	notify_attribute_changed(fVolumeID, -1, fFileInode, entry->Name(),
 		B_ATTR_CREATED);
 
 	return B_OK;
@@ -1068,7 +1068,7 @@ AttributeEntry::Write(off_t position, const void *buffer, size_t *length)
 	}
 
 	memcpy(fData + position, buffer, *length);
-	notify_attribute_changed(fParent->VolumeID(), fParent->FileInode(),
+	notify_attribute_changed(fParent->VolumeID(), -1, fParent->FileInode(),
 		fEntry->name, B_ATTR_CHANGED);
 	return B_OK;
 }
@@ -1752,6 +1752,7 @@ overlay_read_fs_info(fs_volume *volume, struct fs_info *info)
 		if (result != B_OK)
 			return result;
 
+		info->flags &= B_FS_SUPPORTS_MONITOR_CHILDREN;
 		info->flags |= B_FS_HAS_MIME | B_FS_HAS_ATTR /*| B_FS_HAS_QUERY*/;
 		return B_OK;
 	}

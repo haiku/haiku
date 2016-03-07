@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -149,6 +149,15 @@ current_timespec()
 }
 
 
+static ino_t
+get_parent_id(struct rootfs_vnode* vnode)
+{
+	if (vnode->parent != NULL)
+		return vnode->parent->id;
+	return -1;
+}
+
+
 static struct rootfs_vnode*
 rootfs_create_vnode(struct rootfs* fs, struct rootfs_vnode* parent,
 	const char* name, int type)
@@ -264,7 +273,8 @@ rootfs_insert_in_dir(struct rootfs* fs, struct rootfs_vnode* dir,
 	vnode->parent = dir;
 	dir->modification_time = current_timespec();
 
-	notify_stat_changed(fs->id, dir->id, B_STAT_MODIFICATION_TIME);
+	notify_stat_changed(fs->id, get_parent_id(dir), dir->id,
+		B_STAT_MODIFICATION_TIME);
 	return B_OK;
 }
 
@@ -289,7 +299,8 @@ rootfs_remove_from_dir(struct rootfs* fs, struct rootfs_vnode* dir,
 			vnode->dir_next = NULL;
 
 			dir->modification_time = current_timespec();
-			notify_stat_changed(fs->id, dir->id, B_STAT_MODIFICATION_TIME);
+			notify_stat_changed(fs->id, get_parent_id(dir), dir->id,
+				B_STAT_MODIFICATION_TIME);
 			return B_OK;
 		}
 	}
@@ -1057,7 +1068,7 @@ rootfs_write_stat(fs_volume* _volume, fs_vnode* _vnode, const struct stat* stat,
 
 	locker.Unlock();
 
-	notify_stat_changed(fs->id, vnode->id, statMask);
+	notify_stat_changed(fs->id, get_parent_id(vnode), vnode->id, statMask);
 	return B_OK;
 }
 

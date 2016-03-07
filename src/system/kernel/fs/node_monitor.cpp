@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2008, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+ * Copyright 2003-2016, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
  * Copyright 2005-2008, Ingo Weinhold, bonefish@users.sf.net.
  * Copyright 2010, Clemens Zeidler, haiku@clemens-zeidler.de.
  *
@@ -97,9 +97,10 @@ class NodeMonitorService : public NotificationService {
 		status_t NotifyEntryMoved(dev_t device, ino_t fromDirectory,
 			const char *fromName, ino_t toDirectory, const char *toName,
 			ino_t node);
-		status_t NotifyStatChanged(dev_t device, ino_t node, uint32 statFields);
-		status_t NotifyAttributeChanged(dev_t device, ino_t node,
-			const char *attribute, int32 cause);
+		status_t NotifyStatChanged(dev_t device, ino_t directory, ino_t node,
+			uint32 statFields);
+		status_t NotifyAttributeChanged(dev_t device, ino_t directory,
+			ino_t node, const char *attribute, int32 cause);
 		status_t NotifyUnmount(dev_t device);
 		status_t NotifyMount(dev_t device, dev_t parentDevice,
 			ino_t parentDirectory);
@@ -547,7 +548,7 @@ NodeMonitorService::_GetInterestedMonitorListeners(dev_t device, ino_t node,
 	// iterate through the listeners until we find one with matching flags
 	MonitorListenerList::Iterator iterator = monitor->listeners.GetIterator();
 	while (monitor_listener *listener = iterator.Next()) {
-		if (listener->flags & flags) {
+		if ((listener->flags & flags) == flags) {
 			interested_monitor_listener_list &list
 				= interestedListeners[interestedListenerCount++];
 			list.iterator = iterator;
@@ -571,7 +572,7 @@ NodeMonitorService::_GetInterestedVolumeListeners(dev_t device, uint32 flags,
 	// iterate through the listeners until we find one with matching flags
 	MonitorListenerList::Iterator iterator = monitor->listeners.GetIterator();
 	while (monitor_listener *listener = iterator.Next()) {
-		if (listener->flags & flags) {
+		if ((listener->flags & flags) == flags) {
 			interested_monitor_listener_list &list
 				= interestedListeners[interestedListenerCount++];
 			list.iterator = iterator;
@@ -730,21 +731,29 @@ NodeMonitorService::NotifyEntryMoved(dev_t device, ino_t fromDirectory,
 
 
 inline status_t
-NodeMonitorService::NotifyStatChanged(dev_t device, ino_t node,
+NodeMonitorService::NotifyStatChanged(dev_t device, ino_t directory, ino_t node,
 	uint32 statFields)
 {
 	RecursiveLocker locker(fRecursiveLock);
 
-	// get the lists of all interested listeners
+	// get the lists of all interested listeners depending on whether its an
+	// interim update or not
 	interested_monitor_listener_list interestedListeners[3];
 	int32 interestedListenerCount = 0;
+	uint32 watchFlag = (statFields & B_STAT_INTERIM_UPDATE) != 0
+		? B_WATCH_INTERIM_STAT : B_WATCH_STAT;
+
 	// ... for the volume
-	_GetInterestedVolumeListeners(device, B_WATCH_STAT,
-		interestedListeners, interestedListenerCount);
-	// ... for the node, depending on whether its an interim update or not
-	_GetInterestedMonitorListeners(device, node,
-		(statFields & B_STAT_INTERIM_UPDATE) != 0
-			? B_WATCH_INTERIM_STAT : B_WATCH_STAT,
+	_GetInterestedVolumeListeners(device, watchFlag, interestedListeners,
+		interestedListenerCount);
+	// ... for the directory
+	if (directory >= 0) {
+		_GetInterestedMonitorListeners(device, directory,
+			B_WATCH_CHILDREN | watchFlag,
+			interestedListeners, interestedListenerCount);
+	}
+	// ... and for the node
+	_GetInterestedMonitorListeners(device, node, watchFlag,
 		interestedListeners, interestedListenerCount);
 
 	if (interestedListenerCount == 0)
@@ -775,8 +784,8 @@ NodeMonitorService::NotifyStatChanged(dev_t device, ino_t node,
 	- another error code otherwise.
 */
 status_t
-NodeMonitorService::NotifyAttributeChanged(dev_t device, ino_t node,
-	const char *attribute, int32 cause)
+NodeMonitorService::NotifyAttributeChanged(dev_t device, ino_t directory,
+	ino_t node, const char *attribute, int32 cause)
 {
 	if (!attribute)
 		return B_BAD_VALUE;
@@ -789,6 +798,12 @@ NodeMonitorService::NotifyAttributeChanged(dev_t device, ino_t node,
 	// ... for the volume
 	_GetInterestedVolumeListeners(device, B_WATCH_ATTR,
 		interestedListeners, interestedListenerCount);
+	// ... for the directory
+	if (directory >= 0) {
+		_GetInterestedMonitorListeners(device, directory,
+			B_WATCH_CHILDREN | B_WATCH_ATTR,
+			interestedListeners, interestedListenerCount);
+	}
 	// ... for the node
 	_GetInterestedMonitorListeners(device, node, B_WATCH_ATTR,
 		interestedListeners, interestedListenerCount);
@@ -802,6 +817,8 @@ NodeMonitorService::NotifyAttributeChanged(dev_t device, ino_t node,
 	message.SetTo(messageBuffer, sizeof(messageBuffer), B_NODE_MONITOR);
 	message.AddInt32("opcode", B_ATTR_CHANGED);
 	message.AddInt32("device", device);
+	if (directory >= 0)
+		message.AddInt64("directory", directory);
 	message.AddInt64("node", node);
 	message.AddString("attr", attribute);
 	message.AddInt32("cause", cause);		// Haiku only
@@ -1155,9 +1172,11 @@ notify_entry_moved(dev_t device, ino_t fromDirectory,
   	- another error code otherwise.
 */
 status_t
-notify_stat_changed(dev_t device, ino_t node, uint32 statFields)
+notify_stat_changed(dev_t device, ino_t directory, ino_t node,
+	uint32 statFields)
 {
-	return sNodeMonitorService.NotifyStatChanged(device, node, statFields);
+	return sNodeMonitorService.NotifyStatChanged(device, directory, node,
+		statFields);
 }
 
 
@@ -1172,11 +1191,11 @@ notify_stat_changed(dev_t device, ino_t node, uint32 statFields)
   	- another error code otherwise.
 */
 status_t
-notify_attribute_changed(dev_t device, ino_t node, const char *attribute,
-	int32 cause)
+notify_attribute_changed(dev_t device, ino_t directory, ino_t node,
+	const char *attribute, int32 cause)
 {
-	return sNodeMonitorService.NotifyAttributeChanged(device, node, attribute,
-		cause);
+	return sNodeMonitorService.NotifyAttributeChanged(device, directory, node,
+		attribute, cause);
 }
 
 

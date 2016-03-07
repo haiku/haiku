@@ -116,7 +116,7 @@ status_t write_vnode_entry(nspace *vol, vnode *node)
 	diri_free(&diri);
 
 	// TODO: figure out which stats have actually changed
-	notify_stat_changed(vol->id, node->vnid, B_STAT_MODE | B_STAT_UID
+	notify_stat_changed(vol->id, -1, node->vnid, B_STAT_MODE | B_STAT_UID
 		| B_STAT_GID | B_STAT_SIZE | B_STAT_ACCESS_TIME
 		| B_STAT_MODIFICATION_TIME | B_STAT_CREATION_TIME
 		| B_STAT_CHANGE_TIME);
@@ -1025,7 +1025,7 @@ dosfs_rename(fs_volume *_vol, fs_vnode *_odir, const char *oldname,
 	// update MIME information
 	if(!(file->mode & FAT_SUBDIR)) {
 		set_mime_type(file, newname);
-		notify_attribute_changed(vol->id, file->vnid, "BEOS:TYPE",
+		notify_attribute_changed(vol->id, -1, file->vnid, "BEOS:TYPE",
 			B_ATTR_CHANGED);
 	}
 

@@ -63,18 +63,18 @@ fs_open_attrib_dir(fs_volume *_vol, fs_vnode *_node, void **_cookie)
 	ni = NULL;
 	ctx = NULL;
 	*_cookie = cookie;
-	
+
 exit:
 
 	if (ctx != NULL)
 		ntfs_attr_put_search_ctx(ctx);
 	if (ni != NULL)
 		ntfs_inode_close(ni);
-	
+
 	TRACE("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
-	
+
 	UNLOCK_VOL(ns);
-	
+
 	return result;
 }
 
@@ -130,7 +130,7 @@ fs_rewind_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 	TRACE("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
 
 	UNLOCK_VOL(ns);
-	
+
 	return result;
 }
 
@@ -160,18 +160,18 @@ fs_read_attrib_dir(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 			// it's the actual file body
 			if (attr->name_length == 0)
 				continue;
-			
+
 			name = ntfs_attr_name_get((const ntfschar *)(((char *)attr)
 				+ attr->name_offset), attr->name_length);
-			
+
 			if(strncmp(name, kHaikuAttrPrefix, strlen(kHaikuAttrPrefix)) !=0 ) {
 				TRACE("found AT_DATA '%s' - Skip\n", name);
 				continue;
 			}
 			TRACE("found AT_DATA '%s' - Found\n", name);
-				
+
 			real_name = name + strlen(kHaikuAttrPrefix);
-			
+
 			bufsize = MIN(bufsize, sizeof(struct dirent) + strlen(real_name) + 1);
 			entry->d_ino = node->vnid;
 			entry->d_dev = ns->id;
@@ -197,7 +197,7 @@ exit:
 		strerror(result), *num);
 
 	UNLOCK_VOL(ns);
-	
+
 	if (result)
 		*num = 0;
 	else
@@ -218,9 +218,9 @@ fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
 	int ulen;
 	ntfs_inode *ni = NULL;
 	ntfs_attr *na = NULL;
-	status_t result = B_NO_ERROR;	
+	status_t result = B_NO_ERROR;
 
-	if (ns->flags & B_FS_IS_READONLY) {		
+	if (ns->flags & B_FS_IS_READONLY) {
 		return B_READ_ONLY_DEVICE;
 	}
 
@@ -250,7 +250,7 @@ fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
 		char ntfs_attr_name[MAX_PATH] = {0};
 		strcat(ntfs_attr_name, kHaikuAttrPrefix);
 		strcat(ntfs_attr_name,name);
-		
+
 		uname = ntfs_calloc(MAX_PATH);
 		ulen = ntfs_mbstoucs(ntfs_attr_name, &uname);
 		if (ulen < 0) {
@@ -261,7 +261,7 @@ fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
 
 		na = ntfs_attr_open(ni, AT_DATA, uname, ulen);
 		if (na != NULL) {
-			if (ntfs_attr_truncate(na, 0)) {				
+			if (ntfs_attr_truncate(na, 0)) {
 				result = errno;
 				goto exit;
 			}
@@ -278,7 +278,7 @@ fs_create_attrib(fs_volume *_vol, fs_vnode *_node, const char* name,
 				TRACE("%s - ntfs_attr_open: %s\n", __FUNCTION__,
 					strerror(result));
 				goto exit;
-			}			
+			}
 		}
 		if(ntfs_attr_pwrite(na, 0, sizeof(uint32), &type) < 0 ) {
 			result = errno;
@@ -356,7 +356,7 @@ fs_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name,
 		char ntfs_attr_name[MAX_PATH] = {0};
 		strcat(ntfs_attr_name, kHaikuAttrPrefix);
 		strcat(ntfs_attr_name, name);
-		
+
 		uname = ntfs_calloc(MAX_PATH);
 		ulen = ntfs_mbstoucs(ntfs_attr_name, &uname);
 		if (ulen < 0) {
@@ -367,7 +367,7 @@ fs_open_attrib(fs_volume *_vol, fs_vnode *_node, const char *name,
 		na = ntfs_attr_open(ni, AT_DATA, uname, ulen);
 		if (na != NULL) {
 			if (openMode & O_TRUNC) {
-				if (ns->flags & B_FS_IS_READONLY) {		
+				if (ns->flags & B_FS_IS_READONLY) {
 					result = B_READ_ONLY_DEVICE;
 					goto exit;
 				} else {
@@ -445,7 +445,7 @@ fs_free_attrib_cookie(fs_volume *_vol, fs_vnode *_node, void *_cookie)
 }
 
 
-status_t 
+status_t
 fs_read_attrib_stat(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	struct stat *stat)
 {
@@ -453,8 +453,8 @@ fs_read_attrib_stat(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	vnode *node = (vnode *)_node->private_node;
 	attrcookie *cookie = (attrcookie *)_cookie;
 	ntfs_inode *ni = NULL;
-	ntfs_attr *na = NULL;	
-	status_t result = B_NO_ERROR;	
+	ntfs_attr *na = NULL;
+	status_t result = B_NO_ERROR;
 
 	LOCK_VOL(ns);
 
@@ -466,7 +466,7 @@ fs_read_attrib_stat(fs_volume *_vol, fs_vnode *_node, void *_cookie,
 	na = ntfs_attr_open(ni, AT_DATA, cookie->uname, cookie->uname_len);
 	if (na == NULL) {
 		result = errno;
-		goto exit;		
+		goto exit;
 	}
 
 	stat->st_type = cookie->type;
@@ -476,15 +476,15 @@ exit:
 	if (na != NULL)
 		ntfs_attr_close(na);
 	if (ni != NULL)
-		ntfs_inode_close(ni);	
+		ntfs_inode_close(ni);
 
 	UNLOCK_VOL(ns);
-	
+
 	return B_NO_ERROR;
 }
 
 
-status_t 
+status_t
 fs_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	void *buffer, size_t *len)
 {
@@ -505,7 +505,7 @@ fs_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	LOCK_VOL(ns);
 
 	TRACE("%s - ENTER  vnid: %d\n", __FUNCTION__, node->vnid);
-	
+
 	ni = ntfs_inode_open(ns->ntvol, node->vnid);
 	if (ni == NULL) {
 		result = errno;
@@ -514,9 +514,9 @@ fs_read_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	na = ntfs_attr_open(ni, AT_DATA, cookie->uname, cookie->uname_len);
 	if (na == NULL) {
 		result = errno;
-		goto exit;		
-	}	
-	
+		goto exit;
+	}
+
 	pos += sizeof(uint32);
 
 	// it is a named stream
@@ -551,11 +551,11 @@ exit:
 		ntfs_attr_close(na);
 	if (ni != NULL)
 		ntfs_inode_close(ni);
-			
+
 	TRACE("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
 
 	UNLOCK_VOL(ns);
-	
+
 	return result;
 }
 
@@ -576,8 +576,8 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	status_t result = B_NO_ERROR;
 
 	TRACE("%s - ENTER  vnode: %d\n", __FUNCTION__, node->vnid);
-	
-	if (ns->flags & B_FS_IS_READONLY) {		
+
+	if (ns->flags & B_FS_IS_READONLY) {
 		return B_READ_ONLY_DEVICE;
 	}
 
@@ -596,8 +596,8 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 	na = ntfs_attr_open(ni, AT_DATA, cookie->uname, cookie->uname_len);
 	if (na == NULL) {
 		result = errno;
-		goto exit;		
-	}		
+		goto exit;
+	}
 
 	pos += sizeof(uint32);
 
@@ -611,7 +611,7 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 			if (ntfs_attr_truncate(na, pos + size))
 				size = na->data_size - pos;
 			else
-				notify_stat_changed(ns->id, MREF(ni->mft_no), B_STAT_SIZE);
+				notify_stat_changed(ns->id, -1, MREF(ni->mft_no), B_STAT_SIZE);
 		}
 
 		while (size) {
@@ -636,28 +636,28 @@ fs_write_attrib(fs_volume *_vol, fs_vnode *_node, void *_cookie, off_t pos,
 		result =  EINVAL;
 		goto exit;
 	}
-	
+
 	if (ntfs_ucstombs(na->name, na->name_len, &attr_name, 0) >= 0) {
 		if (attr_name != NULL) {
 			if(strncmp(attr_name, kHaikuAttrPrefix, strlen(kHaikuAttrPrefix)) !=0 )
 				goto exit;
-			real_name = attr_name + strlen(kHaikuAttrPrefix);						
-			notify_attribute_changed(ns->id, MREF(ni->mft_no),
+			real_name = attr_name + strlen(kHaikuAttrPrefix);
+			notify_attribute_changed(ns->id, -1, MREF(ni->mft_no),
 				real_name, B_ATTR_CHANGED);
 			free(attr_name);
 		}
 	}
-		
-exit:	
+
+exit:
 	if (na != NULL)
 		ntfs_attr_close(na);
 	if (ni != NULL)
 		ntfs_inode_close(ni);
-		
+
 	TRACE("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
 
 	UNLOCK_VOL(ns);
-	
+
 	return result;
 }
 
@@ -670,18 +670,18 @@ fs_remove_attrib(fs_volume *_vol, fs_vnode *_node, const char* name)
 	char ntfs_attr_name[MAX_PATH]={0};
 	ntfschar *uname = NULL;
 	int ulen;
-	ntfs_inode *ni = NULL;		
+	ntfs_inode *ni = NULL;
 	status_t result = B_NO_ERROR;
 
 	TRACE("%s - ENTER - name: [%s]\n", __FUNCTION__, name);
-	
+
 	if (ns->flags & B_FS_IS_READONLY) {
 		ERROR("ntfs is read-only\n");
 		return B_READ_ONLY_DEVICE;
 	}
 
 	LOCK_VOL(ns);
-	
+
 	if (node == NULL) {
 		result = EINVAL;
 		goto exit;
@@ -691,18 +691,18 @@ fs_remove_attrib(fs_volume *_vol, fs_vnode *_node, const char* name)
 	if (ni == NULL) {
 		result = errno;
 		goto exit;
-	}		
-	
+	}
+
 	strcat(ntfs_attr_name, kHaikuAttrPrefix);
 	strcat(ntfs_attr_name, name);
-	
+
 	uname = ntfs_calloc(MAX_PATH);
 	ulen = ntfs_mbstoucs(ntfs_attr_name, &uname);
 	if (ulen < 0) {
 		result = EILSEQ;
 		goto exit;
-	}	
-	
+	}
+
 	if (ntfs_attr_remove(ni, AT_DATA, uname, ulen)) {
 		result = ENOENT;
 		goto exit;
@@ -712,17 +712,18 @@ fs_remove_attrib(fs_volume *_vol, fs_vnode *_node, const char* name)
 		ni->flags |= FILE_ATTR_ARCHIVE;
 		NInoFileNameSetDirty(ni);
 	}
-	notify_attribute_changed(ns->id, MREF(ni->mft_no), name, B_ATTR_REMOVED);
-exit:	
+	notify_attribute_changed(ns->id, -1, MREF(ni->mft_no), name,
+		B_ATTR_REMOVED);
+exit:
 	if (uname != NULL)
 		free(uname);
 
 	if (ni != NULL)
 		ntfs_inode_close(ni);
-		
+
 	TRACE("%s - EXIT, result is %s\n", __FUNCTION__, strerror(result));
 
 	UNLOCK_VOL(ns);
-	
+
 	return result;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2016, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -208,7 +208,8 @@ bfs_read_fs_stat(fs_volume* _volume, struct fs_info* info)
 	// File system flags.
 	info->flags = B_FS_IS_PERSISTENT | B_FS_HAS_ATTR | B_FS_HAS_MIME
 		| (volume->IndicesNode() != NULL ? B_FS_HAS_QUERY : 0)
-		| (volume->IsReadOnly() ? B_FS_IS_READONLY : 0);
+		| (volume->IsReadOnly() ? B_FS_IS_READONLY : 0)
+		| B_FS_SUPPORTS_MONITOR_CHILDREN;
 
 	info->io_size = BFS_IO_SIZE;
 		// whatever is appropriate here?
@@ -923,7 +924,7 @@ bfs_write_stat(fs_volume* _volume, fs_vnode* _node, const struct stat* stat,
 	if (status == B_OK)
 		status = transaction.Done();
 	if (status == B_OK)
-		notify_stat_changed(volume->ID(), inode->ID(), mask);
+		notify_stat_changed(volume->ID(), inode->ParentID(), inode->ID(), mask);
 
 	return status;
 }
@@ -1397,7 +1398,7 @@ bfs_write(fs_volume* _volume, fs_vnode* _node, void* _cookie, off_t pos,
 		if (!inode->IsDeleted() && cookie->last_size != inode->Size()
 			&& system_time() > cookie->last_notification
 					+ INODE_NOTIFICATION_INTERVAL) {
-			notify_stat_changed(volume->ID(), inode->ID(),
+			notify_stat_changed(volume->ID(), inode->ParentID(), inode->ID(),
 				B_STAT_MODIFICATION_TIME | B_STAT_SIZE | B_STAT_INTERIM_UPDATE);
 			cookie->last_size = inode->Size();
 			cookie->last_notification = system_time();
@@ -1483,7 +1484,7 @@ bfs_free_cookie(fs_volume* _volume, fs_vnode* _node, void* _cookie)
 		}
 
 		if (changedSize || changedTime) {
-			notify_stat_changed(volume->ID(), inode->ID(),
+			notify_stat_changed(volume->ID(), inode->ParentID(), inode->ID(),
 				(changedTime ? B_STAT_MODIFICATION_TIME : 0)
 				| (changedSize ? B_STAT_SIZE : 0));
 		}
@@ -1890,9 +1891,11 @@ bfs_write_attr(fs_volume* _volume, fs_vnode* _file, void* _cookie,
 	if (status == B_OK) {
 		status = transaction.Done();
 		if (status == B_OK) {
-			notify_attribute_changed(volume->ID(), inode->ID(), cookie->name,
+			notify_attribute_changed(volume->ID(), inode->ParentID(),
+				inode->ID(), cookie->name,
 				created ? B_ATTR_CREATED : B_ATTR_CHANGED);
-			notify_stat_changed(volume->ID(), inode->ID(), B_STAT_CHANGE_TIME);
+			notify_stat_changed(volume->ID(), inode->ParentID(), inode->ID(),
+				B_STAT_CHANGE_TIME);
 		}
 	}
 
@@ -1956,8 +1959,8 @@ bfs_remove_attr(fs_volume* _volume, fs_vnode* _node, const char* name)
 	if (status == B_OK)
 		status = transaction.Done();
 	if (status == B_OK) {
-		notify_attribute_changed(volume->ID(), inode->ID(), name,
-			B_ATTR_REMOVED);
+		notify_attribute_changed(volume->ID(), inode->ParentID(), inode->ID(),
+			name, B_ATTR_REMOVED);
 	}
 
 	return status;

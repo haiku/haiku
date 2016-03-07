@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -196,6 +196,15 @@ current_timespec()
 }
 
 
+static ino_t
+get_parent_id(struct devfs_vnode* vnode)
+{
+	if (vnode->parent != NULL)
+		return vnode->parent->id;
+	return -1;
+}
+
+
 static int32
 scan_mode(void)
 {
@@ -378,7 +387,7 @@ devfs_insert_in_dir(struct devfs_vnode* dir, struct devfs_vnode* vnode,
 	if (notify) {
 		notify_entry_created(sDeviceFileSystem->id, dir->id, vnode->name,
 			vnode->id);
-		notify_stat_changed(sDeviceFileSystem->id, dir->id,
+		notify_stat_changed(sDeviceFileSystem->id, get_parent_id(dir), dir->id,
 			B_STAT_MODIFICATION_TIME);
 	}
 	return B_OK;
@@ -407,8 +416,8 @@ devfs_remove_from_dir(struct devfs_vnode* dir, struct devfs_vnode* removeNode,
 			if (notify) {
 				notify_entry_removed(sDeviceFileSystem->id, dir->id, vnode->name,
 					vnode->id);
-				notify_stat_changed(sDeviceFileSystem->id, dir->id,
-					B_STAT_MODIFICATION_TIME);
+				notify_stat_changed(sDeviceFileSystem->id, get_parent_id(dir),
+					dir->id, B_STAT_MODIFICATION_TIME);
 			}
 			return B_OK;
 		}
@@ -1833,7 +1842,7 @@ devfs_write_stat(fs_volume* _volume, fs_vnode* _vnode, const struct stat* stat,
 	if (statMask & B_STAT_CREATION_TIME)
 		vnode->creation_time = stat->st_crtim;
 
-	notify_stat_changed(fs->id, vnode->id, statMask);
+	notify_stat_changed(fs->id, get_parent_id(vnode), vnode->id, statMask);
 	return B_OK;
 }
 
@@ -2081,8 +2090,8 @@ devfs_rename_partition(const char* devicePath, const char* oldName,
 
 	notify_entry_moved(sDeviceFileSystem->id, device->parent->id, oldName,
 		device->parent->id, newName, node->id);
-	notify_stat_changed(sDeviceFileSystem->id, device->parent->id,
-		B_STAT_MODIFICATION_TIME);
+	notify_stat_changed(sDeviceFileSystem->id, get_parent_id(device->parent),
+		device->parent->id, B_STAT_MODIFICATION_TIME);
 
 	return B_OK;
 }

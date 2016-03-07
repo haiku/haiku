@@ -1694,7 +1694,7 @@ fs_wstat(fs_volume *_volume, fs_vnode *_node, const struct stat *st, uint32 mask
 	XDRInPacketDestroy(&reply);
 	XDROutPacketDestroy(&call);
 
-	return notify_stat_changed(_volume->id, node->vnid, mask);
+	return notify_stat_changed(_volume->id, -1, node->vnid, mask);
 }
 
 static status_t

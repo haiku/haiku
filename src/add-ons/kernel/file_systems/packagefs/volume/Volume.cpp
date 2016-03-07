@@ -680,7 +680,9 @@ void
 Volume::PackageLinkNodeChanged(Node* node, uint32 statFields,
 	const OldNodeAttributes& oldAttributes)
 {
-	notify_stat_changed(ID(), node->ID(), statFields);
+	Directory* parent = node->Parent();
+	notify_stat_changed(ID(), parent != NULL ? parent->ID() : -1, node->ID(),
+		statFields);
 	_NotifyNodeChanged(node, statFields, oldAttributes);
 }
 
@@ -1261,7 +1263,8 @@ Volume::_AddPackageNode(Directory* directory, PackageNode* packageNode,
 			// The new package node has become the one representing the node.
 			// Send stat changed notification for directories and entry
 			// removed + created notifications for files and symlinks.
-			notify_stat_changed(ID(), node->ID(), kAllStatFields);
+			notify_stat_changed(ID(), directory->ID(), node->ID(),
+				kAllStatFields);
 			// TODO: Actually the attributes might change, too!
 		}
 	}
@@ -1356,7 +1359,8 @@ Volume::_RemovePackageNode(Directory* directory, PackageNode* packageNode,
 		// Send stat changed notification for directories and entry
 		// removed + created notifications for files and symlinks.
 		if (S_ISDIR(packageNode->Mode())) {
-			notify_stat_changed(ID(), node->ID(), kAllStatFields);
+			notify_stat_changed(ID(), directory->ID(), node->ID(),
+				kAllStatFields);
 			// TODO: Actually the attributes might change, too!
 		} else {
 			notify_entry_removed(ID(), directory->ID(), node->Name(),

@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2008, Haiku Inc. All Rights Reserved.
+ * Copyright 2004-2016, Haiku Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FSSH_FS_INTERFACE_H
@@ -395,9 +395,10 @@ extern fssh_status_t fssh_notify_entry_moved(fssh_mount_id device,
 				fssh_vnode_id toDirectory, const char *toName,
 				fssh_vnode_id node);
 extern fssh_status_t fssh_notify_stat_changed(fssh_mount_id device,
-				fssh_vnode_id node, uint32_t statFields);
+				fssh_vnode_id dir, fssh_vnode_id node, uint32_t statFields);
 extern fssh_status_t fssh_notify_attribute_changed(fssh_mount_id device,
-				fssh_vnode_id node, const char *attribute, int32_t cause);
+				fssh_vnode_id dir, fssh_vnode_id node, const char *attribute,
+				int32_t cause);
 
 extern fssh_status_t fssh_notify_query_entry_created(fssh_port_id port,
 				int32_t token, fssh_mount_id device,

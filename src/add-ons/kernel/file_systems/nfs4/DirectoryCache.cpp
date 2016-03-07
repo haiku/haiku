@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Copyright 2012-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -304,7 +304,7 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 		if (!found) {
 			if (fAttrDir) {
 				notify_attribute_changed(fInode->GetFileSystem()->DevId(),
-					fInode->ID(), newCurrent->fName, B_ATTR_CREATED);
+					-1, fInode->ID(), newCurrent->fName, B_ATTR_CREATED);
 			} else {
 				notify_entry_created(fInode->GetFileSystem()->DevId(),
 					fInode->ID(), newCurrent->fName, newCurrent->fNode);
@@ -321,7 +321,7 @@ DirectoryCache::NotifyChanges(DirectoryCacheSnapshot* oldSnapshot,
 	while (oldCurrent != NULL) {
 		if (fAttrDir) {
 			notify_attribute_changed(fInode->GetFileSystem()->DevId(),
-				fInode->ID(), oldCurrent->fName, B_ATTR_REMOVED);
+				-1, fInode->ID(), oldCurrent->fName, B_ATTR_REMOVED);
 		} else {
 			notify_entry_removed(fInode->GetFileSystem()->DevId(), fInode->ID(),
 				oldCurrent->fName, oldCurrent->fNode);

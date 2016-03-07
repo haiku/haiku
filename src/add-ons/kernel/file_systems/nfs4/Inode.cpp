@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Haiku, Inc. All rights reserved.
+ * Copyright 2012-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -293,7 +293,7 @@ Inode::Remove(const char* name, FileType type, ino_t* id)
 		*id = FileIdToInoT(fileID);
 
 	if (type == NF4NAMEDATTR) {
-		notify_attribute_changed(fFileSystem->DevId(), ID(), name,
+		notify_attribute_changed(fFileSystem->DevId(), -1, ID(), name,
 			B_ATTR_REMOVED);
 	} else {
 		notify_entry_removed(fFileSystem->DevId(), ID(), name,
@@ -382,9 +382,9 @@ Inode::Rename(Inode* from, Inode* to, const char* fromName, const char* toName,
 	}
 
 	if (attribute) {
-		notify_attribute_changed(from->fFileSystem->DevId(), from->ID(),
+		notify_attribute_changed(from->fFileSystem->DevId(), -1, from->ID(),
 			fromName, B_ATTR_REMOVED);
-		notify_attribute_changed(to->fFileSystem->DevId(), to->ID(), toName,
+		notify_attribute_changed(to->fFileSystem->DevId(), -1, to->ID(), toName,
 			B_ATTR_CREATED);
 	} else {
 		notify_entry_moved(from->fFileSystem->DevId(), from->ID(), fromName,
@@ -898,7 +898,7 @@ Inode::SetDelegation(Delegation* delegation)
 	fMetaCache.InvalidateStat();
 	struct stat st;
 	Stat(&st);
-	fMetaCache.LockValid();	
+	fMetaCache.LockValid();
 
 	fDelegation = delegation;
 	fOpenState->AcquireReference();

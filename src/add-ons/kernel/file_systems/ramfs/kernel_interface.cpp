@@ -70,7 +70,7 @@ notify_if_stat_changed(Volume *volume, Node *node)
 {
 	if (volume && node && node->IsModified()) {
 		uint32 statFields = node->MarkUnmodified();
-		notify_stat_changed(volume->GetID(), node->GetID(), statFields);
+		notify_stat_changed(volume->GetID(), -1, node->GetID(), statFields);
 	}
 }
 
@@ -1093,11 +1093,11 @@ private:
 	// debugging
 	int32			fIteratorID;
 	int32			fGetNextCounter;
-	static vint32	fNextIteratorID;
+	static int32	fNextIteratorID;
 };
 
 
-vint32 DirectoryCookie::fNextIteratorID = 0;
+int32 DirectoryCookie::fNextIteratorID = 0;
 
 
 // ramfs_create_dir
@@ -1531,7 +1531,7 @@ ramfs_create_attr(fs_volume* _volume, fs_vnode* _node, const char *name,
 
 			attribute->SetType(type);
 
-			notify_attribute_changed(volume->GetID(), node->GetID(), name,
+			notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
 				B_ATTR_CREATED);
 
 		// else truncate if requested
@@ -1540,7 +1540,7 @@ ramfs_create_attr(fs_volume* _volume, fs_vnode* _node, const char *name,
 			if (error != B_OK)
 				return error;
 
-			notify_attribute_changed(volume->GetID(), node->GetID(), name,
+			notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
 				B_ATTR_CHANGED);
 		}
 		NodeMTimeUpdater mTimeUpdater(node);
@@ -1598,8 +1598,8 @@ ramfs_open_attr(fs_volume* _volume, fs_vnode* _node, const char *name,
 			error = attribute->SetSize(0);
 
 			if (error == B_OK) {
-				notify_attribute_changed(volume->GetID(), node->GetID(), name,
-					B_ATTR_CHANGED);
+				notify_attribute_changed(volume->GetID(), -1, node->GetID(),
+					name, B_ATTR_CHANGED);
 			}
 		}
 		NodeMTimeUpdater mTimeUpdater(node);
@@ -1718,7 +1718,7 @@ ramfs_write_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 		// notify listeners
 		if (error == B_OK) {
-			notify_attribute_changed(volume->GetID(), node->GetID(), name,
+			notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
 				B_ATTR_CHANGED);
 		}
 	} else
@@ -1797,7 +1797,7 @@ ramfs_remove_attr(fs_volume* _volume, fs_vnode* _node, const char *name)
 
 		// notify listeners
 		if (error == B_OK) {
-			notify_attribute_changed(volume->GetID(), node->GetID(), name,
+			notify_attribute_changed(volume->GetID(), -1, node->GetID(), name,
 				B_ATTR_REMOVED);
 		}
 	} else

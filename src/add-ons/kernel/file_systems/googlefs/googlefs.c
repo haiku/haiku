@@ -95,14 +95,14 @@ static int googlefs_publish_static_entries(fs_volume *_volume)
 	if (err)
 		return err;
 	n->is_perm = 1;
-	
+
 	err = googlefs_create_gen(_volume, dir, "README", 0, 0444, NULL, &n, text_attrs, false, true);
 	if (err)
 		return err;
 	n->is_perm = 1;
 	n->data = readmestr;
 	n->data_size = strlen(n->data);// + 1;
-	
+
 	err = googlefs_create_gen(_volume, dir, "Author", 0, 0444, NULL, &n, mailto_me_bookmark_attrs, false, true);
 	if (err)
 		return err;
@@ -126,9 +126,9 @@ int googlefs_mount(fs_volume *_vol, const char *devname, uint32 flags,
 	/* only allow a single mount */
 	if (atomic_add(&refcount, 1))
 		return EALREADY;
-	
+
 	err = load_settings();
-	
+
 	err = google_request_init();
 	if (err)
 		goto err_http;
@@ -150,7 +150,7 @@ int googlefs_mount(fs_volume *_vol, const char *devname, uint32 flags,
 	new_lock(&(ns->l), "googlefs main lock");
 
 	ns->nodes = NULL;
-	
+
 	/* create root dir */
 	err = B_NO_MEMORY;
 	root = malloc(sizeof(fs_node));
@@ -164,7 +164,7 @@ int googlefs_mount(fs_volume *_vol, const char *devname, uint32 flags,
 		root->attrs_indirect = root_folder_attrs;
 		new_lock(&(root->l), "googlefs root dir");
 		TRACE((PFS "mount: root->l @ %p\n", &root->l));
-		
+
 		_vol->private_volume = ns;
 		_vol->ops = &sGoogleFSVolumeOps;
 		*vnid = ns->rootid;
@@ -199,10 +199,10 @@ status_t googlefs_unmount(fs_volume *_volume)
 		ns->nodes = node->nlnext; /* better cache that before we free node */
 		googlefs_free_vnode(_volume, node);
 	}
-	
+
 	// Unlike in BeOS, we need to put the reference to our root node ourselves
 	put_vnode(_volume, ns->rootid);
-	
+
 	free_lock(&ns->l);
 	vnidpool_free(ns->vnids);
 	free(ns);
@@ -338,7 +338,7 @@ int googlefs_walk(fs_volume *_volume, fs_vnode *_base, const char *file, ino_t *
 		} else
 			err = EINVAL;
 	} else if (base) { /* child of dir */
-		n = (fs_node *)SLL_FIND(base->children, next, 
+		n = (fs_node *)SLL_FIND(base->children, next,
 								(sll_compare_func)compare_fs_node_by_name, (void *)file);
 		if (n) {
 			*vnid = n->vnid;
@@ -397,7 +397,7 @@ int googlefs_closedir(fs_volume *_volume, fs_vnode *_node, fs_dir_cookie *cookie
 	err = LOCK(&node->l);
 	if (err)
 		return err;
-	
+
 	SLL_REMOVE(node->opened, next, cookie);
 	UNLOCK(&node->l);
 
@@ -532,7 +532,7 @@ int googlefs_open(fs_volume *_volume, fs_vnode *_node, int omode, fs_file_cookie
 	TRACE((PFS"open(%ld, %Ld, 0x%x)\n", ns->nsid, node->vnid, omode));
 	if (!node || !cookie)
 		return EINVAL;
-	
+
 //	err = LOCK(&ns->l);
 //	if (err)
 //		return err;
@@ -589,7 +589,7 @@ int googlefs_close(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cookie)
 	if (err)
 		return err;
 	SLL_REMOVE(node->opened, next, cookie);
-	
+
 all_ok:
 err_n_l:
 	UNLOCK(&node->l);
@@ -680,7 +680,7 @@ static int googlefs_create_gen(fs_volume *_volume, fs_node *dir, const char *nam
 	fs_node *n;
 	int i;
 	TRACE((PFS"create_gen(%ld, %Ld, '%s', 0x%08lx, %c, %c)\n", ns->nsid, dir->vnid, name, omode, mkdir?'t':'f', uniq?'t':'f'));
-	
+
 	if (strlen(name) > GOOGLEFS_NAME_LEN-1)
 		return ENAMETOOLONG;
 	err = LOCK(&dir->l);
@@ -689,7 +689,7 @@ static int googlefs_create_gen(fs_volume *_volume, fs_node *dir, const char *nam
 	err = ENOTDIR;
 	if (!S_ISDIR(dir->st.st_mode))
 		goto err_l;
-	n = (fs_node *)SLL_FIND(dir->children, next, 
+	n = (fs_node *)SLL_FIND(dir->children, next,
 							(sll_compare_func)compare_fs_node_by_name, (void *)name);
 	err = EEXIST;
 	if (n && (omode & O_EXCL) && !uniq) /* already existing entry in there! */
@@ -703,13 +703,13 @@ static int googlefs_create_gen(fs_volume *_volume, fs_node *dir, const char *nam
 		strncpy(newname, name, 56);
 		newname[56] = '\0';
 		sprintf(newname+strlen(newname), " %05d", i);
-		n = (fs_node *)SLL_FIND(dir->children, next, 
+		n = (fs_node *)SLL_FIND(dir->children, next,
 								(sll_compare_func)compare_fs_node_by_name, (void *)newname);
 	}
 	if (n && (uniq || mkdir)) /* still there! */
 		goto err_l;
 	name = newname;
-	
+
 	if (n) { /* already exists, so return it */
 		if (node)
 			*node = n;
@@ -730,9 +730,9 @@ static int googlefs_create_gen(fs_volume *_volume, fs_node *dir, const char *nam
 	strcpy(n->name, name);
 	//n->is_perm = 1;
 	fill_default_stat(&n->st, ns->nsid, n->vnid, (perms & ~S_IFMT) | (mkdir?S_IFDIR:S_IFREG));
-	
+
 	new_lock(&(n->l), mkdir?"googlefs dir":"googlefs file");
-	
+
 	err = LOCK(&ns->l);
 	if (err)
 		goto err_nl;
@@ -752,14 +752,14 @@ static int googlefs_create_gen(fs_volume *_volume, fs_node *dir, const char *nam
 	n->attrs_indirect = iattrs;
 	notify_entry_created(ns->nsid, dir->vnid, name, n->vnid);
 	/* dosfs doesn't do that one but I believe it should */
-	notify_stat_changed(B_STAT_CHANGED, ns->nsid, -1);
+	notify_stat_changed(B_STAT_CHANGED, -1, ns->nsid, -1);
 	/* give node to caller if it wants it */
 	if (node)
 		*node = n;
 	if (vnid)
 		*vnid = n->vnid;
 	goto done;
-	
+
 err_insnl:
 	SLL_REMOVE(ns->nodes, nlnext, n);
 err_lns:
@@ -784,7 +784,7 @@ int googlefs_create(fs_volume *_volume, fs_vnode *_dir, const char *name, int om
 	TRACE((PFS"create(%ld, %Ld, '%s', 0x%08lx)\n", ns->nsid, dir->vnid, name, omode));
 	/* don't let ppl mess our fs up */
 	return ENOSYS;
-	
+
 	err = googlefs_create_gen(_volume, dir, name, omode, perms, vnid, &n, NULL, false, false);
 	if (err)
 		return err;
@@ -804,7 +804,7 @@ static int googlefs_unlink_gen(fs_volume *_volume, fs_node *dir, const char *nam
 		return err;
 	err = ENOENT;
 	/* no need to check for S_ISDIR */
-	n = (fs_node *)SLL_FIND(dir->children, next, 
+	n = (fs_node *)SLL_FIND(dir->children, next,
 							(sll_compare_func)compare_fs_node_by_name, (void *)name);
 	if (n) {
 		if (n->children)
@@ -887,7 +887,7 @@ static int googlefs_mkdir_gen(fs_volume *_volume, fs_vnode *_dir, const char *na
 	fs_node *n;
 	int i;
 	TRACE((PFS"mkdir_gen(%ld, %Ld, '%s', 0x%08lx, %c)\n", ns->nsid, dir->vnid, name, perms, uniq?'t':'f'));
-	
+
 	if (strlen(name) > GOOGLEFS_NAME_LEN-1)
 		return ENAMETOOLONG;
 	err = LOCK(&dir->l);
@@ -896,24 +896,24 @@ static int googlefs_mkdir_gen(fs_volume *_volume, fs_vnode *_dir, const char *na
 	err = ENOTDIR;
 	if (!S_ISDIR(dir->st.st_mode))
 		goto err_l;
-	n = (fs_node *)SLL_FIND(dir->children, next, 
+	n = (fs_node *)SLL_FIND(dir->children, next,
 							(sll_compare_func)compare_fs_node_by_name, (void *)name);
 	err = EEXIST;
 	if (n && !uniq) /* already existing entry in there! */
 		goto err_l;
-	
+
 	strncpy(newname, name, GOOGLEFS_NAME_LEN);
 	newname[GOOGLEFS_NAME_LEN-1] = '\0';
 	for (i = 1; n && i < 5000; i++) { /* uniquify the name */
 		//sprintf("%"#(GOOGLEFS_NAME_LEN-8)"s %05d", name, i);
 		sprintf("%56s %05d", name, i);
-		n = (fs_node *)SLL_FIND(dir->children, next, 
+		n = (fs_node *)SLL_FIND(dir->children, next,
 								(sll_compare_func)compare_fs_node_by_name, (void *)newname);
 	}
 	if (n) /* still there! */
 		goto err_l;
 	name = newname;
-	
+
 	err = ENOMEM;
 	n = malloc(sizeof(fs_node));
 	if (!n)
@@ -952,7 +952,7 @@ static int googlefs_mkdir_gen(fs_volume *_volume, fs_vnode *_dir, const char *na
 	if (node)
 		*node = n;
 	goto done;
-	
+
 err_insnl:
 	SLL_REMOVE(ns->nodes, nlnext, n);
 err_lns:
@@ -1066,7 +1066,7 @@ int googlefs_read_attrdir(fs_volume *_volume, fs_vnode *_node, fs_attr_dir_cooki
 	for (i = 0; !ae && i < 10 && node->attrs[i].name; i++)
 		if (i + count_indirect == cookie->dir_current)
 			ae = &node->attrs[i];
-	
+
 	if (ae) {
 		TRACE((PFS "read_attrdir: giving %s\n", ae->name));
 		buf->d_dev = ns->nsid;
@@ -1079,12 +1079,12 @@ int googlefs_read_attrdir(fs_volume *_volume, fs_vnode *_node, fs_attr_dir_cooki
 		*num = 1;
 	} else
 		*num = 0;
-	
+
 	UNLOCK(&node->l);
 	return B_OK;
 }
 
-/* Haiku and BeOs differ in the way the handle attributes at the vfs layer. 
+/* Haiku and BeOs differ in the way the handle attributes at the vfs layer.
    BeOS uses atomic calls on the vnode,
    Haiku retains the open/close/read/write semantics for attributes (loosing atomicity).
    Here we don't care much though, open is used for both to factorize attribute lookup. <- TODO
@@ -1135,7 +1135,7 @@ int googlefs_open_attr_h(fs_volume *_volume, fs_vnode *_node, const char *name, 
 	err = SLL_INSERT(node->opened, next, fc);
 	if (err)
 		goto err_linsert;
-	
+
 	*cookie = fc;
 	err = B_OK;
 	goto all_ok;
@@ -1165,7 +1165,7 @@ int googlefs_close_attr_h(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *c
 	if (err)
 		return err;
 	SLL_REMOVE(node->opened, next, cookie);
-	
+
 all_ok:
 err_n_l:
 	UNLOCK(&node->l);
@@ -1218,7 +1218,7 @@ int	googlefs_read_attr(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cook
 		return EINVAL;
 
 	err = LOCK(&node->l);
-	
+
 	if (ae && pos < ae->size) {
 		memcpy(buf, (char *)ae->value + pos, MIN(*len, ae->size-pos));
 		*len = MIN(*len, ae->size-pos);
@@ -1227,7 +1227,7 @@ int	googlefs_read_attr(fs_volume *_volume, fs_vnode *_node, fs_file_cookie *cook
 		*len = 0;
 		err = ENOENT;
 	}
-	
+
 	UNLOCK(&node->l);
 	return err;
 }
@@ -1270,7 +1270,7 @@ int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
 		return EINVAL;
 
 	// filter out queries that aren't for us, we don't want to trigger google searches when apps check for mails, ... :)
-	
+
 	err = B_NO_MEMORY;
 	c = malloc(sizeof(fs_query_cookie));
 	if (!c)
@@ -1300,7 +1300,7 @@ int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
 				goto err_qs;
 		}
 	}
-	
+
 	if (!accepted) {
 		free(qstring);
 		/* return an empty cookie */
@@ -1310,7 +1310,7 @@ int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
 	TRACE((PFS"open_query: QUERY: '%s'\n", qstring));
 	/* reuse query if it's not too old */
 	LOCK(&ns->l);
-	qn = SLL_FIND(ns->queries, qnext, 
+	qn = SLL_FIND(ns->queries, qnext,
 				(sll_compare_func)compare_fs_node_by_recent_query_string, (void *)qstring);
 	UNLOCK(&ns->l);
 	reused = (qn != NULL);
@@ -1349,14 +1349,14 @@ int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
 	err = google_request_open(qstring, _volume, qn, &qn->request);
 	if (err)
 		goto err_gn;
-	
+
 	TRACE((PFS"open_query: request_open done\n"));
 #ifndef NO_SEARCH
 	err = google_request_process(qn->request);
 	if (err)
 		goto err_gro;
 	TRACE((PFS"open_query: request_process done\n"));
-	
+
 #else
 	/* fake entries */
 	for (i = 0; i < 10; i++) {
@@ -1367,11 +1367,11 @@ int	googlefs_open_query(fs_volume *_volume, const char *query, ulong flags,
 		n->attrs[0].value = &n->attrs[1].value;
 		n->attrs[0].size = sizeof(int32);
 		n->attrs[0].name = "GOOGLE:order";
-		notify_attribute_changed(ns->nsid, n->vnid, n->attrs[0].name, B_ATTR_CHANGED);
+		notify_attribute_changed(ns->nsid, -1, n->vnid, n->attrs[0].name, B_ATTR_CHANGED);
 		if (err)
 			goto err_gn;
 	}
-#endif /*NO_SEARCH*/	
+#endif /*NO_SEARCH*/
 	//
 	//err = google_request_close(q->request);
 
@@ -1509,7 +1509,7 @@ int googlefs_push_result_to_query(struct google_request *request, struct google_
 		return EINVAL;
 
 	// filter out queries that aren't for us, we don't want to trigger google searches when apps check for mails, ... :)
-	
+
 	/* stripped name for folder */
 	strncpy(ename, result->name, GOOGLEFS_NAME_LEN);
 	ename[GOOGLEFS_NAME_LEN-1] = '\0';
@@ -1517,7 +1517,7 @@ int googlefs_push_result_to_query(struct google_request *request, struct google_
 	p = ename;
 	while ((p = strchr(p, '/')))
 		*p++ = '_';
-	
+
 	err = googlefs_create_gen(_volume, qn, ename, 0, 0644, NULL, &n, bookmark_attrs, false, true);
 	if (err)
 		return err;
@@ -1528,32 +1528,32 @@ int googlefs_push_result_to_query(struct google_request *request, struct google_
 	n->attrs[i].value = result->name;
 	n->attrs[i].size = strlen(result->name)+1;
 	n->attrs[i].name = "META:title";
-	notify_attribute_changed(ns->nsid, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
+	notify_attribute_changed(ns->nsid, -1, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
 	i++;
 	n->attrs[i].type = 'CSTR';
 	n->attrs[i].value = result->url;
 	n->attrs[i].size = strlen(result->url)+1;
 	n->attrs[i].name = "META:url";
-	notify_attribute_changed(ns->nsid, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
+	notify_attribute_changed(ns->nsid, -1, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
 	i++;
 	n->attrs[i].type = 'CSTR';
 	n->attrs[i].value = request->query_string;
 	n->attrs[i].size = strlen(request->query_string)+1;
 	n->attrs[i].name = "META:keyw";
-	notify_attribute_changed(ns->nsid, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
+	notify_attribute_changed(ns->nsid, -1, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
 	i++;
 	n->attrs[i].type = 'LONG';
 	n->attrs[i].value = &result->id;
 	n->attrs[i].size = sizeof(int32);
 	n->attrs[i].name = "GOOGLE:order";
-	notify_attribute_changed(ns->nsid, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
+	notify_attribute_changed(ns->nsid, -1, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
 	i++;
 	if (result->snipset[0]) {
 		n->attrs[i].type = 'CSTR';
 		n->attrs[i].value = result->snipset;
 		n->attrs[i].size = strlen(result->snipset)+1;
 		n->attrs[i].name = "GOOGLE:excerpt";
-		notify_attribute_changed(ns->nsid, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
+		notify_attribute_changed(ns->nsid, -1, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
 		i++;
 	}
 	if (result->cache_url[0]) {
@@ -1561,7 +1561,7 @@ int googlefs_push_result_to_query(struct google_request *request, struct google_
 		n->attrs[i].value = result->cache_url;
 		n->attrs[i].size = strlen(result->cache_url)+1;
 		n->attrs[i].name = "GOOGLE:cache_url";
-		notify_attribute_changed(ns->nsid, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
+		notify_attribute_changed(ns->nsid, -1, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
 		i++;
 	}
 	if (result->similar_url[0]) {
@@ -1569,7 +1569,7 @@ int googlefs_push_result_to_query(struct google_request *request, struct google_
 		n->attrs[i].value = result->similar_url;
 		n->attrs[i].size = strlen(result->similar_url)+1;
 		n->attrs[i].name = "GOOGLE:similar_url";
-		notify_attribute_changed(ns->nsid, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
+		notify_attribute_changed(ns->nsid, -1, n->vnid, n->attrs[i].name, B_ATTR_CREATED);
 		i++;
 	}
 	UNLOCK(&n->l);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2013, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2007-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -2067,7 +2067,7 @@ cdda_create_attr(fs_volume* _volume, fs_vnode* _node, const char* name,
 		if (status != B_OK)
 			return status;
 
-		notify_attribute_changed(volume->ID(), inode->ID(), name,
+		notify_attribute_changed(volume->ID(), -1, inode->ID(), name,
 			B_ATTR_CREATED);
 	} else if ((openMode & O_EXCL) == 0) {
 		if (attribute->IsProtectedNamespace())
@@ -2157,8 +2157,8 @@ cdda_write_attr(fs_volume* _volume, fs_vnode* _node, void* _cookie,
 
 	status_t status = attribute->WriteAt(offset, (uint8*)buffer, _length);
 	if (status == B_OK) {
-		notify_attribute_changed(volume->ID(), inode->ID(), attribute->Name(),
-			B_ATTR_CHANGED);
+		notify_attribute_changed(volume->ID(), -1, inode->ID(),
+			attribute->Name(), B_ATTR_CHANGED);
 	}
 	return status;
 }
@@ -2203,7 +2203,7 @@ cdda_remove_attr(fs_volume* _volume, fs_vnode* _node, const char* name)
 
 	status_t status = inode->RemoveAttribute(name, true);
 	if (status == B_OK) {
-		notify_attribute_changed(volume->ID(), inode->ID(), name,
+		notify_attribute_changed(volume->ID(), -1, inode->ID(), name,
 			B_ATTR_REMOVED);
 	}
 

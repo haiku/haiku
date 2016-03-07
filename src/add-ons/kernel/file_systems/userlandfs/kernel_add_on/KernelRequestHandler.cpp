@@ -211,8 +211,8 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 				PRINT(("notify_stat_changed(%" B_PRId32 ", %" B_PRId64 ", "
 					"0x%" B_PRIx32 ")\n", request->device, request->node,
 					request->details));
-				result = notify_stat_changed(request->device, request->node,
-					request->details);
+				result = notify_stat_changed(request->device,
+					request->directory, request->node, request->details);
 				break;
 
 			case B_ATTR_CHANGED:
@@ -220,7 +220,8 @@ KernelRequestHandler::_HandleRequest(NotifyListenerRequest* request)
 					"\"%s\", 0x%" B_PRIx32 ")\n", request->device,
 					request->node, name, (int32)request->details));
 				result = notify_attribute_changed(request->device,
-					request->node, name, (int32)request->details);
+					request->directory, request->node, name,
+					(int32)request->details);
 				break;
 
 			default:

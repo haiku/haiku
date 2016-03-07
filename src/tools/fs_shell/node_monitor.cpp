@@ -33,16 +33,16 @@ fssh_notify_entry_moved(fssh_mount_id device, fssh_vnode_id fromDirectory,
 
 
 fssh_status_t
-fssh_notify_stat_changed(fssh_mount_id device, fssh_vnode_id node,
-	uint32_t statFields)
+fssh_notify_stat_changed(fssh_mount_id device, fssh_vnode_id dir,
+	fssh_vnode_id node, uint32_t statFields)
 {
 	return FSSH_B_OK;
 }
 
 
 fssh_status_t
-fssh_notify_attribute_changed(fssh_mount_id device, fssh_vnode_id node,
-	const char *attribute, int32_t cause)
+fssh_notify_attribute_changed(fssh_mount_id device, fssh_vnode_id dir,
+	fssh_vnode_id node, const char *attribute, int32_t cause)
 {
 	return FSSH_B_OK;
 }
