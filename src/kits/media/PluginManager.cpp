@@ -65,6 +65,8 @@ public:
 
 	virtual	~BMediaIOWrapper()
 	{
+		delete fData;
+		delete fFallbackBuffer;
 	}
 
 	// BPositionIO interface
