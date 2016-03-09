@@ -18,6 +18,7 @@ class BButton;
 class BListView;
 class BTextView;
 class BScrollView;
+class BFilePanel;
 
 
 class UninstallView : public BGroupView {
@@ -27,6 +28,7 @@ public:
 
 	virtual	void				AttachedToWindow();
 	virtual	void				MessageReceived(BMessage* message);
+	virtual void				RefsReceived(BMessage* message);
 
 private:
 			void				_InitView();
@@ -42,7 +44,9 @@ private:
 			BPath				fToPackages;
 			BListView*			fAppList;
 			BTextView*			fDescription;
-			BButton*			fButton;
+			BButton*			fInstallButton;
+			BFilePanel*			fOpenPanel;
+			BButton*			fRemoveButton;
 			BScrollView*		fDescScroll;
 			InstalledPackageInfo fCurrentSelection;
 			bool				fWatcherRunning;

@@ -25,7 +25,6 @@ HaikuSubInclude gradients ;
 HaikuSubInclude haiku3d ;
 HaikuSubInclude haikudepot ;
 HaikuSubInclude icon-o-matic ;
-HaikuSubInclude installedpackages ;
 HaikuSubInclude installer ;
 HaikuSubInclude launchbox ;
 HaikuSubInclude login ;

@@ -1,0 +1,51 @@
+/*
+ * Copyright 2016 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Augustin Cavalier <waddlesplash>
+ */
+
+*, title {
+  font-family: "DejaVu Sans", Arial, sans-serif;
+  color: #333333;
+}
+cmdsynopsis, code, command, computeroutput, envar, filename, keycode, keysym,
+literal, option, parameter, sgmltag, systemitem {
+	font-family: "Deja Vu Mono", Courier, "Courier New", monospace, fixed;
+}
+term {
+  font-weight: bold;
+}
+
+chapter, appendix {
+  max-width: 849.6px;
+  margin: 10px auto;
+  align-content: center !important;
+}
+chapter:first-of-type {
+  margin-top: 0 !important;
+}
+chapter title, appendix title {
+  font-size: 22px !important;
+}
+sect1 title {
+  font-size: 18px !important;
+  font-weight: unset;
+}
+title {
+  color: #0c3762;
+  font-weight: bold;
+  border-bottom: dotted thin #c0c0c0;
+  margin-top: 13px !important;
+  margin-bottom: 13px !important;
+  text-align: left !important;
+}
+para {
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  font-size: 14.4px;
+  line-height: 21.6px !important;
+}

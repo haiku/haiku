@@ -716,6 +716,7 @@ TFilePanel::Init(const BMessage*)
 		fButtonText.SetTo(B_TRANSLATE("Open"));
 
 	// Add PoseView
+	PoseView()->SetName("ActualPoseView");
 	fBorderedView->SetName("PoseView");
 	fBorderedView->SetResizingMode(B_FOLLOW_ALL);
 	fBorderedView->EnableBorderHighlight(true);
@@ -918,6 +919,7 @@ TFilePanel::RestoreState()
 	// They don't need to, because resizing "PoseView" (really the BorderedView)
 	// will resize the BTitleView as well. So just create a dummy view here
 	// so that they don't get NULL when trying to find the view.
+	fPoseView->TitleView()->SetName("ActualTitleView");
 	BView* dummyTitleView = new BView(BRect(), "TitleView", B_FOLLOW_NONE, 0);
 	fBackView->AddChild(dummyTitleView);
 	dummyTitleView->Hide();

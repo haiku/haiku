@@ -161,8 +161,8 @@ SerialDevice::SetModes(struct termios *tios)
 	uint8 baud = tios->c_cflag & CBAUD;
 	int32 speed = baud_index_to_speed(baud);
 	if (speed < 0) {
-		baud = B19200;
-		speed = 19200;
+		baud = CBAUD;
+		speed = tios->c_ospeed;
 	}
 
 	// update our master config in full

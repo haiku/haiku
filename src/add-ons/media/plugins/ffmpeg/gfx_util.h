@@ -28,6 +28,11 @@ extern "C" {
 	#include "libavcodec/avcodec.h"
 }
 
+#if LIBAVCODEC_VERSION_INT < ((54 << 16) | (50 << 8))
+typedef PixelFormat AVPixelFormat;
+#endif
+
+
 // this function will be used by the wrapper to write into
 // the Media Kit provided buffer from the self-allocated ffmpeg codec buffer
 // it also will do some colorspace and planar/chunky conversions.
@@ -38,12 +43,12 @@ typedef void (*gfx_convert_func) (AVFrame *in, AVFrame *out, int width, int heig
 
 // this function will try to find the best colorspaces for both the ff-codec and
 // the Media Kit sides.
-gfx_convert_func resolve_colorspace(color_space cs, PixelFormat pixelFormat, int width, int height);
+gfx_convert_func resolve_colorspace(color_space cs, AVPixelFormat pixelFormat, int width, int height);
 
 const char *pixfmt_to_string(int format);
 
 color_space pixfmt_to_colorspace(int format);
-PixelFormat colorspace_to_pixfmt(color_space format);
+AVPixelFormat colorspace_to_pixfmt(color_space format);
 
 void dump_ffframe_audio(AVFrame *frame, const char *name);
 void dump_ffframe_video(AVFrame *frame, const char *name);

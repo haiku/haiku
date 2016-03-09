@@ -52,11 +52,12 @@ class SerialApp: public BApplication
 
 
 enum messageConstants {
-	kMsgDataRead  = 'dare',
-	kMsgDataWrite = 'dawr',
-	kMsgLogfile   = 'logf',
-	kMsgOpenPort  = 'open',
-	kMsgSettings  = 'stty',
+	kMsgCustomBaudrate  = 'cust',
+	kMsgDataRead        = 'dard',
+	kMsgDataWrite       = 'dawr',
+	kMsgLogfile         = 'logf',
+	kMsgOpenPort        = 'open',
+	kMsgSettings        = 'stty',
 };
 
 #endif

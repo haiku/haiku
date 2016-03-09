@@ -174,6 +174,10 @@ SerialWindow::SerialWindow()
 		fBaudrateMenu->AddItem(item);
 	}
 
+	message = new BMessage(kMsgCustomBaudrate);
+	BMenuItem* custom = new BMenuItem("custom" B_UTF8_ELLIPSIS, message);
+	fBaudrateMenu->AddItem(custom);
+
 	fBaudrateMenu->SetTargetForItems(be_app);
 
 	message = new BMessage(kMsgSettings);
@@ -351,13 +355,25 @@ void SerialWindow::MessageReceived(BMessage* message)
 			}
 
 			if (message->FindInt32("baudrate", &baudrate) == B_OK) {
-				for (int i = 0; i < fBaudrateMenu->CountItems(); i++) {
-					BMenuItem* item = fBaudrateMenu->ItemAt(i);
-					int32 code;
+				int i;
+				BMenuItem* item = NULL;
+				for (i = 0; i < fBaudrateMenu->CountItems(); i++) {
+					item = fBaudrateMenu->ItemAt(i);
+					int32 code = 0;
 					item->Message()->FindInt32("baudrate", &code);
 
-					if (baudrate == code)
+					if (baudrate == code) {
 						item->SetMarked(true);
+						break;
+					}
+				}
+
+				if (i == fBaudrateMenu->CountItems() && item != NULL) {
+					// Rate was not found, mark it as "custom".
+					// Since that is the last item in the menu, we still point
+					// to it.
+					item->SetMarked(true);
+					item->Message()->SetInt32("baudrate", baudrate);
 				}
 			}
 

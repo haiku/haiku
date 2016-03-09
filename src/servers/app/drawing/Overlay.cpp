@@ -67,7 +67,7 @@ Overlay::Overlay(HWInterface& interface, ServerBitmap* bitmap,
 	fOverlayToken(token)
 {
 	fSemaphore = create_sem(1, "overlay lock");
-	fColor = (rgb_color){ 21, 16, 21, 16 };
+	fColor = (rgb_color){ 0, 80, 0, 0 };
 		// TODO: whatever fine color we want to use here...
 
 	fWindow.offset_top = 0;
@@ -237,12 +237,6 @@ Overlay::SetColorSpace(uint32 colorSpace)
 	rgb_color colorKey = fColor;
 
 	switch (colorSpace) {
-		case B_CMAP8:
-			colorKey.red = 0xff;
-			colorKey.green = 0xff;
-			colorKey.blue = 0xff;
-			colorKey.alpha = 0xff;
-			break;
 		case B_RGB15:
 			greenShift = colorShift = 3;
 			alphaShift = 7;

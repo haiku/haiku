@@ -13,7 +13,7 @@ RemotePackageRepository HaikuPorts
 	unknown_horizons-2014.1-1
 	vl_gothic-20141206-1
 	wqy_microhei-0.2.0~beta-3
-	youtube_dl-2016.01.29-1
+	youtube_dl-2016.01.29-2
 	:
 	# repository architecture packages
 	# primary architecture (x86)
@@ -31,7 +31,7 @@ RemotePackageRepository HaikuPorts
 	beam-1.2-2
 	bepdf-1.2.0-1
 	bescreencapture-1.9.4-1
-	binutils-2.25_12015_07_31-1
+	binutils-2.26.0_2016_02_29-1
 	bison-2.6.5-1
 	boost-1.55.0-6
 	boost_atomic-1.55.0-6
@@ -61,12 +61,12 @@ RemotePackageRepository HaikuPorts
 	burnitnow-0.1.0-1
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
-	cdrtools-3.02~a06-1
-	cdrtools_devel-3.02~a06-1
+	cdrtools-3.02~a06-2
+	cdrtools_devel-3.02~a06-2
 	clang-3.4-3
 	clang_analysis-3.4-3
 	clipdinger-0.5.2-1
-	cmake-3.3.1-1
+	cmake-3.4.3-1
 	coreutils-8.24-1
 	cpio-2.10-1
 	ctags-5.8-3
@@ -95,14 +95,14 @@ RemotePackageRepository HaikuPorts
 	flac_devel-1.3.1-1
 	flex-2.5.39-2
 	fossil-1.34-2
-	freetype-2.6-1
-	freetype_devel-2.6-1
+	freetype-2.6.3-1
+	freetype_devel-2.6.3-1
 	gawk-4.1.3-1
-	gcc-4.8.5_2015_07_11-2
-	gcc_syslibs-4.8.5_2015_07_11-2
-	gcc_syslibs_devel-4.8.5_2015_07_11-2
-	gettext-0.19.4-1
-	gettext_libintl-0.19.4-1
+	gcc-5.3.0_2016_02_29-1
+	gcc_syslibs-5.3.0_2016_02_29-1
+	gcc_syslibs_devel-5.3.0_2016_02_29-1
+	gettext-0.19.6-2
+	gettext_libintl-0.19.6-2
 	giflib-5.1.2-1
 	giflib_devel-5.1.2-1
 	giflib6-5.0.5-2
@@ -126,8 +126,8 @@ RemotePackageRepository HaikuPorts
 	gperf-3.0.4-1
 	grep-2.21-1
 	groff-1.20.1-3
-	gutenprint-5.2.11-1
-	gutenprint_devel-5.2.11-1
+	gutenprint-5.2.11-2
+	gutenprint_devel-5.2.11-2
 	gzip-1.6-2
 	haikuwebkit-1.5.1-1
 	haikuwebkit_devel-1.5.1-1
@@ -148,7 +148,7 @@ RemotePackageRepository HaikuPorts
 	jpeg_devel-9a-1
 	jpeg_tools-9a-1
 	keymapswitcher-1.2.7.10-1
-	less-458-1
+	less-481-1
 	libedit-2015_03_21_3.1-2
 	libedit_devel-2015_03_21_3.1-2
 	libevent-2.0.21-8
@@ -219,7 +219,7 @@ RemotePackageRepository HaikuPorts
 	lzo-2.09-1
 	lzo_devel-2.09-1
 	m4-1.4.16-5
-	make-3.82-5
+	make-4.1-1
 	man-1.6g-4
 	mercurial-2.9.2-1
 	mesa-10.1.1-1
@@ -233,7 +233,7 @@ RemotePackageRepository HaikuPorts
 	mpfr_devel-3.1.3-1
 	mpg123-1.22.4-1
 	mpg123_devel-1.22.4-1
-	nano-2.4.2-1
+	nano-2.5.3-1
 	nasm-2.11.08-1
 	ncurses-5.9-10
 	ncurses_devel-5.9-10
@@ -250,6 +250,7 @@ RemotePackageRepository HaikuPorts
 	openssl-1.0.2e-1
 	openssl_devel-1.0.2e-1
 	p7zip-9.20.1-4
+	padblocker-1.0-1
 	patch-2.7.5-1
 	pe-2.4.5-2
 	perl-5.18.2-2
@@ -335,12 +336,12 @@ RemotePackageRepository HaikuPorts
 	expat_x86_gcc2_devel-2.1.0-1
 	ffmpeg_x86_gcc2-0.10.2-4
 	ffmpeg_x86_gcc2_devel-0.10.2-4
-	freetype_x86_gcc2-2.6-1
-	freetype_x86_gcc2_devel-2.6-1
+	freetype_x86_gcc2-2.6.3-1
+	freetype_x86_gcc2_devel-2.6.3-1
 	gcc_x86_gcc2-2.95.3_2014_07_26-1
 	gcc_x86_gcc2_syslibs_devel-2.95.3_2014_07_26-1
-	gettext_x86_gcc2-0.18.1.1-6
-	gettext_x86_gcc2_libintl-0.18.1.1-6
+	gettext_x86_gcc2-0.19.6-2
+	gettext_x86_gcc2_libintl-0.19.6-2
 	giflib_x86_gcc2-5.1.2-1
 	giflib_x86_gcc2_devel-5.1.2-1
 	glew_x86_gcc2-1.11.0-1
@@ -536,6 +537,7 @@ RemotePackageRepository HaikuPorts
 	openssh
 	openssl
 	p7zip
+	padblocker
 	patch
 	pe
 	perl

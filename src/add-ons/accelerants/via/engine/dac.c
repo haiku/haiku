@@ -254,7 +254,7 @@ static status_t cle266_km400_dac_pix_pll_find(
 {
 	int m = 0, n = 0, p = 0/*, m_max*/;
 	float error, error_best = 999999999;
-	int best[3]; 
+	int best[3] = {0};
 	float f_vco, max_pclk;
 	float req_pclk = target.timing.pixel_clock/1000.0;
 
@@ -401,7 +401,7 @@ static status_t k8m800_dac_pix_pll_find(
 {
 	int m = 0, n = 0, p = 0/*, m_max*/;
 	float error, error_best = 999999999;
-	int best[3]; 
+	int best[3] = {0};
 	float f_vco, max_pclk;
 	float req_pclk = target.timing.pixel_clock/1000.0;
 
@@ -550,7 +550,7 @@ status_t eng_dac_sys_pll_find(
 {
 	int m = 0, n = 0, p = 0, m_max, p_max;
 	float error, error_best = 999999999;
-	int best[3];
+	int best[3] = {0};
 	float f_vco, discr_low, discr_high;
 
 	/* determine the max. reference-frequency postscaler setting for the 

@@ -11,6 +11,8 @@
 
 #include "acc_std.h"
 
+#include <string.h>
+
 #define	T_POSITIVE_SYNC	(B_POSITIVE_HSYNC | B_POSITIVE_VSYNC)
 /* mode flags will be setup as status info by PROPOSEMODE! */
 #define MODE_FLAGS 0

@@ -43,7 +43,7 @@ BStatusBar::BStatusBar(BRect frame, const char *name, const char *label,
 BStatusBar::BStatusBar(const char *name, const char *label,
 		const char *trailingLabel)
 	:
-	BView(BRect(0, 0, -1, -1), name, B_FOLLOW_LEFT | B_FOLLOW_TOP, 
+	BView(BRect(0, 0, -1, -1), name, B_FOLLOW_LEFT | B_FOLLOW_TOP,
 		B_WILL_DRAW | B_SUPPORTS_LAYOUT),
 	fLabel(label),
 	fTrailingLabel(trailingLabel)
@@ -148,7 +148,7 @@ BStatusBar::AttachedToWindow()
 	fTextDivider = Bounds().Width();
 
 	if ((fInternalFlags & kCustomBarColor) == 0)
-		fBarColor = ui_color(B_CONTROL_MARK_COLOR);
+		fBarColor = ui_color(B_STATUS_BAR_COLOR);
 }
 
 
@@ -234,7 +234,7 @@ BStatusBar::MaxSize()
 	float width, height;
 	GetPreferredSize(&width, &height);
 
-	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), 
+	return BLayoutUtils::ComposeSize(ExplicitMaxSize(),
 		BSize(B_SIZE_UNLIMITED, height));
 }
 
@@ -419,7 +419,7 @@ BStatusBar::MessageReceived(BMessage *message)
 			break;
 		}
 
-		case B_RESET_STATUS_BAR: 
+		case B_RESET_STATUS_BAR:
 		{
 			const char *label = NULL, *trailing_label = NULL;
 
@@ -435,7 +435,7 @@ BStatusBar::MessageReceived(BMessage *message)
 		{
 			// Change the bar color IF we don't have an application-set color.
 			if ((fInternalFlags & kCustomBarColor) == 0) {
-				message->FindColor(ui_color_name(B_CONTROL_MARK_COLOR),
+				message->FindColor(ui_color_name(B_STATUS_BAR_COLOR),
 					&fBarColor);
 			}
 
@@ -523,7 +523,7 @@ void
 BStatusBar::SetMaxValue(float max)
 {
 	// R5 and/or Zeta's SetMaxValue does not trigger an invalidate here.
-	// this is probably not ideal behavior, but it does break apps in some cases 
+	// this is probably not ideal behavior, but it does break apps in some cases
 	// as observed with SpaceMonitor.
 	// TODO: revisit this when we break binary compatibility
 	fMax = max;

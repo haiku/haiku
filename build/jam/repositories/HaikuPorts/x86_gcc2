@@ -25,7 +25,7 @@ RemotePackageRepository HaikuPorts
 	timgmsoundfont-fixed-5
 	vl_gothic-20141206-1
 	wqy_microhei-0.2.0~beta-3
-	youtube_dl-2016.01.29-1
+	youtube_dl-2016.01.29-2
 	:
 	# repository architecture packages
 	# primary architecture (x86_gcc2)
@@ -74,8 +74,8 @@ RemotePackageRepository HaikuPorts
 	catkeyseditor-0.1.1-1
 	caya-0.0.3-3
 	ccache-3.1.9-1
-	cdrtools-3.02~a06-1
-	cdrtools_devel-3.02~a06-1
+	cdrtools-3.02~a06-2
+	cdrtools_devel-3.02~a06-2
 	chat-20100903-2
 	clipdinger-0.5.2-1
 	clockwerk-git-3
@@ -130,8 +130,8 @@ RemotePackageRepository HaikuPorts
 	fontconfig-2.11.1-3
 	fontconfig_devel-2.11.1-3
 	fossil-1.34-2
-	freetype-2.6-1
-	freetype_devel-2.6-1
+	freetype-2.6.3-1
+	freetype_devel-2.6.3-1
 	fribidi-0.19.6-2
 	fribidi_devel-0.19.6-2
 	friss-0.8.0-1
@@ -142,8 +142,8 @@ RemotePackageRepository HaikuPorts
 	genesis_commander-0.42-2
 	getconf-r260000-1
 	getopt-1.1.5-1
-	gettext-0.18.1.1-6
-	gettext_libintl-0.18.1.1-6
+	gettext-0.19.6-2
+	gettext_libintl-0.19.6-2
 	gdb-6.3-1
 	giddy3-1.4-1
 	giflib-5.1.2-1
@@ -177,8 +177,8 @@ RemotePackageRepository HaikuPorts
 	gtk_doc-1.20-1
 	guilib-1.2.1-1
 	guilib_devel-1.2.1-1
-	gutenprint-5.2.11-1
-	gutenprint_devel-5.2.11-1
+	gutenprint-5.2.11-2
+	gutenprint_devel-5.2.11-2
 	gyp-r1948-2
 	gzip-1.6-2
 	hdialog-0.2-2
@@ -211,7 +211,7 @@ RemotePackageRepository HaikuPorts
 	lbreakout2-2.6.4-3
 	lcms-2.5-1
 	lcms_devel-2.5-1
-	less-451-4
+	less-481-1
 	lha-1.14i-1
 	libao-1.1.0-1
 	libao_devel-1.1.0-1
@@ -307,8 +307,8 @@ RemotePackageRepository HaikuPorts
 	libunistring_devel-0.9.6-1
 	libusb-1.0.20-2
 	libusb_devel-1.0.20-2
-	libusb_compat-0.1.5-3
-	libusb_compat_devel-0.1.5-3
+	libusb_compat-0.1.5-4
+	libusb_compat_devel-0.1.5-4
 	libutf8proc-1.1.6-1
 	libutf8proc_devel-1.1.6-1
 	libuuid-1.0.3-2
@@ -345,7 +345,7 @@ RemotePackageRepository HaikuPorts
 	lzo_devel-2.09-1
 	m4-1.4.16-5
 	mailnews-2.0.0.25-1
-	make-3.82-5
+	make-4.1-1
 	man-1.6g-4
 	mc-4.8.15-1
 	mda_vst-20100214-1
@@ -369,7 +369,7 @@ RemotePackageRepository HaikuPorts
 	mupdf_devel-1.7-1
 	musepack_tools-r475-1
 	musepack_tools_devel-r475-1
-	nano-2.4.2-1
+	nano-2.5.3-1
 	nanosvgtranslator-1.0.1-1
 	nasm-2.11.08-1
 	ncurses-5.9-9
@@ -394,6 +394,7 @@ RemotePackageRepository HaikuPorts
 	opusfile_devel-0.6-1
 	opus_tools-0.1.9-1
 	p7zip-9.20.1-4
+	padblocker-1.0-1
 	paladin-git-6
 	paragui-1.1.8-1
 	paragui_devel-1.1.8-1
@@ -410,7 +411,7 @@ RemotePackageRepository HaikuPorts
 	physfs_devel-2.0.3-2
 	pipepanic-0.1.3-3
 	pkgconfig-0.29-1
-	ponpokodiff-0.2.0-2
+	ponpokodiff-0.2.0-3
 	popt-1.16-1
 	popt_devel-1.16-1
 	postgresql-9.3.5-2
@@ -440,8 +441,8 @@ RemotePackageRepository HaikuPorts
 	readline_devel-6.3.8-1
 	roadfighter-1.0.1269-1
 	rsync-3.1.0-1
-	sane_backends-1.0.25-2
-	sane_backends_devel-1.0.25-2
+	sane_backends-1.0.25-3
+	sane_backends_devel-1.0.25-3
 	sanity-0.5a-1
 	samba-3.6.25-1
 	samba_devel-3.6.25-1
@@ -557,7 +558,7 @@ RemotePackageRepository HaikuPorts
 	avr_gcc_x86-4.8.2_2014_03_20-1
 	avrdude_x86-6.0.1-2
 	beshare_x86-2.31-1
-	binutils_x86-2.25_12015_07_31-1
+	binutils_x86-2.26.0_2016_02_29-1
 	bison_x86-2.5-1
 	boost_x86-1.55.0-6
 	boost_x86_atomic-1.55.0-6
@@ -590,7 +591,7 @@ RemotePackageRepository HaikuPorts
 	cairo_x86_devel-1.12.18-1
 	capstone_x86-3.0.4-1
 	capstone_x86_devel-3.0.4-1
-	cmake_x86-3.3.1-1
+	cmake_x86-3.4.3-1
 	confuse_x86-2.7-2
 	confuse_x86_devel-2.7-2
 	copynametoclipboard-1.0.1-2
@@ -628,18 +629,18 @@ RemotePackageRepository HaikuPorts
 	fontconfig_x86-2.11.1-3
 	fontconfig_x86_devel-2.11.1-3
 	freedroidrpg_x86-0.15.1-1
-	freetype_x86-2.6-1
-	freetype_x86_devel-2.6-1
+	freetype_x86-2.6.3-1
+	freetype_x86_devel-2.6.3-1
 	fribidi_x86-0.19.6-2
 	fribidi_x86_devel-0.19.6-2
-	gcc_x86-4.8.5_2015_07_11-2
-	gcc_x86_syslibs-4.8.5_2015_07_11-2
-	gcc_x86_syslibs_devel-4.8.5_2015_07_11-2
+	gcc_x86-5.3.0_2016_02_29-1
+	gcc_x86_syslibs-5.3.0_2016_02_29-1
+	gcc_x86_syslibs_devel-5.3.0_2016_02_29-1
 	gcc6809_x86-4.6.1-2
 	gdk_pixbuf_x86-2.31.5-1
 	gdk_pixbuf_x86_devel-2.31.5-1
-	gettext_x86-0.18.1.1-6
-	gettext_x86_libintl-0.18.1.1-6
+	gettext_x86-0.19.6-2
+	gettext_x86_libintl-0.19.6-2
 	giflib_x86-5.1.2-1
 	giflib_x86_devel-5.1.2-1
 	glew_x86-1.11.0-1
@@ -1298,6 +1299,7 @@ RemotePackageRepository HaikuPorts
 	opusfile
 	opus_tools
 	p7zip
+	padblocker
 	paladin
 	pango_x86
 	paragui

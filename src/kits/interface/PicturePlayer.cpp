@@ -675,7 +675,7 @@ PicturePlayer::_Play(const picture_player_callbacks& callbacks, void* userData,
 
 	while (pictureReader.Remaining() > 0) {
 		const picture_data_entry_header* header;
-		const uint8* opData;
+		const uint8* opData = NULL;
 		if (!pictureReader.Get(header)
 			|| !pictureReader.Get(opData, header->size)) {
 			return B_BAD_DATA;

@@ -212,16 +212,26 @@ fdt_get_cell_count(const void* fdt, int node,
 
 
 phys_addr_t
-fdt_get_device_reg(const void* fdt, int node)
+fdt_get_device_reg(const void* fdt, int node, bool physical)
 {
-	const void *prop;
+	const void *prop = NULL;
 	int len;
+	uint64 baseDevice = 0x0;
 
 	int32 regAddressCells = 1;
 	int32 regSizeCells = 1;
 	fdt_get_cell_count(fdt, node, regAddressCells, regSizeCells);
 
 	// TODO: check for virtual-reg, and don't -= fdt_get_range_offset?
+
+	// XXX: not sure #address-cells & #size-cells actually apply to virtual-reg
+	if (!physical) {
+		prop = fdt_getprop(fdt, node, "virtual-reg", &len);
+		if (prop != NULL) {
+			baseDevice = fdt32_to_cpu(*(uint32_t *)prop);
+			return baseDevice;
+		}
+	}
 
 	prop = fdt_getprop(fdt, node, "reg", &len);
 
@@ -231,7 +241,6 @@ fdt_get_device_reg(const void* fdt, int node)
 	}
 
 	const uint32 *p = (const uint32 *)prop;
-	uint64 baseDevice = 0x0;
 
 	// soc base address cells
 	if (regAddressCells == 2)

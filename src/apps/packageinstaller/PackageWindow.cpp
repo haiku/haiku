@@ -15,6 +15,7 @@
 #include <LayoutBuilder.h>
 
 #include "PackageView.h"
+#include "main.h"
 
 
 #undef B_TRANSLATION_CONTEXT

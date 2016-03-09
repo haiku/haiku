@@ -30,6 +30,14 @@ extern "C" {
 #include "fdt_support.h"
 
 
+//#define TRACE_SERIAL
+#ifdef TRACE_SERIAL
+#	define TRACE(x...) dprintf("INIT: " x)
+#else
+#	define TRACE(x...) ;
+#endif
+
+
 // If we dprintf before the UART is initalized there will be no output
 
 
@@ -65,38 +73,38 @@ debug_uart_from_fdt(const void *fdt)
 		return NULL;
 
 	// determine the MMIO address
-	regs = fdt_get_device_reg(fdt, node);
+	regs = fdt_get_device_reg(fdt, node, false);
 
 	if (regs == 0)
 		return NULL;
 
-	dprintf("serial: using '%s', node %d @ %" B_PRIxPHYSADDR "\n",
-		name, node, regs);
+	TRACE(("serial: using '%s', node %d @ %" B_PRIxPHYSADDR "\n",
+		name, node, regs));
 
 	// get the UART clock rate
 	prop = fdt_getprop(fdt, node, "clock-frequency", &len);
 	if (prop && len == 4) {
 		clock = fdt32_to_cpu(*(uint32_t *)prop);
-		dprintf("serial: clock %ld\n", clock);
+		TRACE(("serial: clock %ld\n", clock));
 	}
 
 	// get current speed (XXX: not yet passed over)
 	prop = fdt_getprop(fdt, node, "current-speed", &len);
 	if (prop && len == 4) {
 		speed = fdt32_to_cpu(*(uint32_t *)prop);
-		dprintf("serial: speed %ld\n", speed);
+		TRACE(("serial: speed %ld\n", speed));
 	}
 
 	// fdt_node_check_compatible returns 0 on match.
 
 	if (fdt_node_check_compatible(fdt, node, "ns16550a") == 0
 		|| fdt_node_check_compatible(fdt, node, "ns16550") == 0) {
-		dprintf("serial: Found 8250 serial UART!\n");
+		TRACE(("serial: Found 8250 serial UART!\n"));
 		uart = arch_get_uart_8250(regs, clock);
 	#ifdef __ARM__
 	} else if (fdt_node_check_compatible(fdt, node, "arm,pl011") == 0
 		|| fdt_node_check_compatible(fdt, node, "arm,primecell") == 0) {
-		dprintf("serial: Found pl011 serial UART!\n");
+		TRACE(("serial: Found pl011 serial UART!\n"));
 		uart = arch_get_uart_pl011(regs, clock);
 	#endif
 	} else {

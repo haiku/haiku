@@ -64,6 +64,7 @@ static ColorDescription sColorDescriptionTable[] = {
 		B_TRANSLATE_MARK("Scroll bar thumb") },
 	{ B_TOOL_TIP_BACKGROUND_COLOR, B_TRANSLATE_MARK("Tooltip background") },
 	{ B_TOOL_TIP_TEXT_COLOR, B_TRANSLATE_MARK("Tooltip text") },
+	{ B_STATUS_BAR_COLOR, B_TRANSLATE_MARK("Status bar") },
 	{ B_SUCCESS_COLOR, B_TRANSLATE_MARK("Success") },
 	{ B_FAILURE_COLOR, B_TRANSLATE_MARK("Failure") },
 	{ B_WINDOW_TAB_COLOR, B_TRANSLATE_MARK("Window tab") },

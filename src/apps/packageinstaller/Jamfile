@@ -20,6 +20,8 @@ Application LegacyPackageInstaller :
 	PackageTextViewer.cpp
 	PackageImageViewer.cpp
 	InstalledPackageInfo.cpp
+	UninstallWindow.cpp
+	UninstallView.cpp
 	: be localestub tracker translation
 		[ BuildFeatureAttribute zlib : library ]
 		[ TargetLibsupc++ ]
@@ -38,4 +40,6 @@ DoCatalogs LegacyPackageInstaller :
 	PackageTextViewer.cpp
 	PackageView.cpp
 	PackageWindow.cpp
+	UninstallWindow.cpp
+	UninstallView.cpp
 ;

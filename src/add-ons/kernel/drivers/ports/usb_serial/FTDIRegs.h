@@ -101,20 +101,17 @@ enum {
 	ftdi_sio_b115200 = 9
 };
 
-enum {
-	ftdi_8u232am_b300 = 0x2710,
-	ftdi_8u232am_b600 = 0x1388,
-	ftdi_8u232am_b1200 = 0x09c4,
-	ftdi_8u232am_b2400 = 0x04e2,
-	ftdi_8u232am_b4800 = 0x0271,
-	ftdi_8u232am_b9600 = 0x4138,
-	ftdi_8u232am_b19200 = 0x809c,
-	ftdi_8u232am_b38400 = 0xc04e,
-	ftdi_8u232am_b57600 = 0x0034,
-	ftdi_8u232am_b115200 = 0x001a,
-	ftdi_8u232am_b230400 = 0x000d,
-	ftdi_8u232am_b460800 = 0x4006,
-	ftdi_8u232am_b921600 = 0x8003
+
+/* Fractional divider values for FT232A/B devices */
+static const int ftdi_8u232am_frac[8] = {
+	0x0 << 14, /* .0   */
+	0x3 << 14, /* .125 */
+	0x2 << 14, /* .25  */
+	0x4 << 14, /* .375 */
+	0x1 << 14, /* .5   */
+	0x5 << 14, /* .625 */
+	0x6 << 14, /* .75  */
+	0x7 << 14 /* .875 */
 };
 
 /*

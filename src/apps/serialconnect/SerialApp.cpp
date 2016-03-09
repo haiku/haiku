@@ -15,6 +15,7 @@
 #include <FindDirectory.h>
 #include <Path.h>
 
+#include "CustomRateWindow.h"
 #include "SerialWindow.h"
 
 
@@ -144,6 +145,13 @@ void SerialApp::MessageReceived(BMessage* message)
 					puts(strerror(error));
 			} else
 				debugger("Invalid BMessage received");
+			return;
+		}
+		case kMsgCustomBaudrate:
+		{
+			// open the custom baudrate selector window
+			CustomRateWindow* window = new CustomRateWindow(fSerialPort.DataRate());
+			window->Show();
 			return;
 		}
 		case kMsgSettings:

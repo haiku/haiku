@@ -20,7 +20,8 @@
 
 const usb_serial_device kFTDIDevices[] = {
 	{VENDOR_FTDI, 0x8372, "FTDI 8U100AX serial converter"},
-	{VENDOR_FTDI, 0x6001, "FTDI 8U232AM serial converter"}
+	{VENDOR_FTDI, 0x6001, "FTDI 8U232AM serial converter"},
+	{VENDOR_FTDI, 0x6015, "FTDI FT231X serial converter"}
 };
 
 #define FTDI_BUFFER_SIZE		64

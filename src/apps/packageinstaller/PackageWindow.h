@@ -14,14 +14,12 @@
 
 struct entry_ref;
 
-const uint32 P_WINDOW_QUIT		=	'PiWq';
-
 
 class PackageWindow : public BWindow {
 public:
 								PackageWindow(const entry_ref* ref);
 	virtual						~PackageWindow();
-		
+
 	virtual	void				Quit();
 };
 

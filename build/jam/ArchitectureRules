@@ -125,7 +125,8 @@ rule ArchitectureSetup architecture
 
 	if $(gccVersion[1]) >= 4 {
 		# -Wuninitialized gives too many false positives.
-		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=uninitialized ;
+		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-error=uninitialized
+			-Wno-error=maybe-uninitialized ;
 
 		# TODO: remove the -Wno-unused-but-set-variable option
 		HAIKU_WERROR_FLAGS_$(architecture) += -Wno-unused-but-set-variable ;
@@ -634,7 +635,7 @@ rule ArchitectureSetupWarnings architecture
 	EnableWerror src preferences ;
 	EnableWerror src servers ;
 	EnableWerror src system boot ;
-	EnableWerror src system kernel ;
+#	EnableWerror src system kernel ;
 	EnableWerror src system libroot add-ons ;
 	EnableWerror src system libroot os ;
 	EnableWerror src system libroot posix locale ;

@@ -35,6 +35,18 @@ extern "C" {
 
 static const size_t kDefaultChunkBufferSize = 2 * 1024 * 1024;
 
+#if LIBAVCODEC_VERSION_INT < ((54 << 16) | (50 << 8))
+#define AV_PIX_FMT_NONE PIX_FMT_NONE
+#define AV_CODEC_ID_NONE CODEC_ID_NONE
+#define AV_CODEC_ID_MPEG1VIDEO CODEC_ID_MPEG1VIDEO
+#define AV_CODEC_ID_MPEG2VIDEO CODEC_ID_MPEG2VIDEO
+#endif
+#if LIBAVCODEC_VERSION_INT < ((55 << 16) | (45 << 8))
+#define av_frame_alloc avcodec_alloc_frame
+#define av_frame_unref avcodec_get_frame_defaults
+#define av_frame_free avcodec_free_frame
+#endif
+
 
 AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	:
@@ -45,7 +57,7 @@ AVCodecEncoder::AVCodecEncoder(uint32 codecID, int bitRateScale)
 	fOwnContext(avcodec_alloc_context3(NULL)),
 	fContext(fOwnContext),
 	fCodecInitStatus(CODEC_INIT_NEEDED),
-	fFrame(avcodec_alloc_frame()),
+	fFrame(av_frame_alloc()),
 	fSwsContext(NULL),
 	fFramesWritten(0)
 {
@@ -149,9 +161,9 @@ AVCodecEncoder::SetUp(const media_format* inputFormat)
 		return B_BAD_VALUE;
 
 	// Codec IDs for raw-formats may need to be figured out here.
-	if (fCodec == NULL && fCodecID == CODEC_ID_NONE) {
+	if (fCodec == NULL && fCodecID == AV_CODEC_ID_NONE) {
 		fCodecID = raw_audio_codec_id_for(*inputFormat);
-		if (fCodecID != CODEC_ID_NONE)
+		if (fCodecID != AV_CODEC_ID_NONE)
 			fCodec = avcodec_find_encoder(fCodecID);
 	}
 	if (fCodec == NULL) {
@@ -304,7 +316,7 @@ AVCodecEncoder::_Setup()
 
 		// TODO: Fix pixel format or setup conversion method...
 		if (fCodec->pix_fmts != NULL) {
-			for (int i = 0; fCodec->pix_fmts[i] != PIX_FMT_NONE; i++) {
+			for (int i = 0; fCodec->pix_fmts[i] != AV_PIX_FMT_NONE; i++) {
 				// Use the last supported pixel format, which we hope is the
 				// one with the best quality.
 				fContext->pix_fmt = fCodec->pix_fmts[i];
@@ -465,10 +477,10 @@ AVCodecEncoder::_Setup()
 		fEncodeParameters.quality, fContext->bit_rate);
 
 	// Add some known fixes from the FFmpeg API example:
-	if (fContext->codec_id == CODEC_ID_MPEG2VIDEO) {
+	if (fContext->codec_id == AV_CODEC_ID_MPEG2VIDEO) {
 		// Just for testing, we also add B frames */
 		fContext->max_b_frames = 2;
-	} else if (fContext->codec_id == CODEC_ID_MPEG1VIDEO) {
+	} else if (fContext->codec_id == AV_CODEC_ID_MPEG1VIDEO) {
 		// Needed to avoid using macroblocks in which some coeffs overflow.
 		// This does not happen with normal video, it just happens here as
 		// the motion of the chroma plane does not match the luma plane.
@@ -612,7 +624,7 @@ AVCodecEncoder::_EncodeAudio(const uint8* buffer, size_t bufferSize,
 	int gotPacket = 0;
 
 	if (buffer) {
-		avcodec_get_frame_defaults(&frame);
+		av_frame_unref(&frame);
 
 		frame.nb_samples = frameCount;
 
@@ -699,9 +711,17 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			fDstFrame.linesize);
 
 		// Encode one video chunk/frame.
+#if LIBAVCODEC_VERSION_INT < ((55 << 16) | (45 << 8))
 		int usedBytes = avcodec_encode_video(fContext, fChunkBuffer,
 			kDefaultChunkBufferSize, fFrame);
-
+#else
+		int gotPacket;
+		AVPacket pkt;
+		pkt.data = NULL;
+		pkt.size = 0;
+		av_init_packet(&pkt);
+		int usedBytes = avcodec_encode_video2(fContext, &pkt, fFrame, &gotPacket);
+#endif
 		// avcodec.h says we need to set it.
 		fFrame->pts++;
 
@@ -710,6 +730,7 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			return B_ERROR;
 		}
 
+#if LIBAVCODEC_VERSION_INT < ((55 << 16) | (45 << 8))
 		// Maybe we need to use this PTS to calculate start_time:
 		if (fContext->coded_frame->pts != kNoPTSValue) {
 			TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
@@ -719,6 +740,17 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
 				fContext->time_base.num, fContext->time_base.den);
 		}
+#else
+		// Maybe we need to use this PTS to calculate start_time:
+		if (pkt.pts != AV_NOPTS_VALUE) {
+			TRACE("  codec frame PTS: %lld (codec time_base: %d/%d)\n",
+				pkt.pts, fContext->time_base.num,
+				fContext->time_base.den);
+		} else {
+			TRACE("  codec frame PTS: N/A (codec time_base: %d/%d)\n",
+				fContext->time_base.num, fContext->time_base.den);
+		}
+#endif
 
 		// Setup media_encode_info, most important is the time stamp.
 		info->start_time = (bigtime_t)(fFramesWritten * 1000000LL
@@ -729,7 +761,11 @@ AVCodecEncoder::_EncodeVideo(const void* buffer, int64 frameCount,
 			info->flags |= B_MEDIA_KEY_FRAME;
 
 		// Write the chunk
+#if LIBAVCODEC_VERSION_INT < ((55 << 16) | (45 << 8))
 		ret = WriteChunk(fChunkBuffer, usedBytes, info);
+#else
+		ret = WriteChunk(pkt.data, pkt.size, info);
+#endif
 		if (ret != B_OK) {
 			TRACE("  error writing chunk: %s\n", strerror(ret));
 			break;

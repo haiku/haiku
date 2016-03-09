@@ -709,7 +709,40 @@ ExpressionParser::_ParseFactorial(MAPM value)
 	if (fTokenizer->NextToken().type == TOKEN_FACTORIAL) {
 		fTokenizer->RewindToken();
 		_EatToken(TOKEN_FACTORIAL);
-		return value.factorial();
+		if (value < 1000)
+			return value.factorial();
+		else {
+			// Use Stirling's approximation (9 term expansion)
+			// http://en.wikipedia.org/wiki/Stirling%27s_approximation
+			// http://www.wolframalpha.com/input/?i=stirling%27s+series
+			// all constants must fit in a signed long for MAPM
+			// (LONG_MAX = 2147483647)
+			return value.pow(value) / value.exp()
+				* (MAPM(2) * MAPM(MM_PI) * value).sqrt()
+				* (MAPM(1) + (MAPM(1) / (MAPM(12) * value))
+					+ (MAPM(1) / (MAPM(288) * value.pow(2)))
+					- (MAPM(139) / (MAPM(51840) * value.pow(3)))
+					- (MAPM(571) / (MAPM(2488320) * value.pow(4)))
+					+ (MAPM(163879) / (MAPM(209018880) * value.pow(5)))
+						// 2147483647 * 35 + 84869155 = 75246796800
+					+ (MAPM(5246819) / ((MAPM(2147483647) * MAPM(35)
+						+ MAPM(84869155)) * value.pow(6)))
+						// 2147483647 * 420 + 1018429860 = 902961561600
+					- (MAPM(534703531) / ((MAPM(2147483647) * MAPM(420)
+						+ MAPM(1018429860)) * value.pow(7)))
+						// 2147483647 * 2 + 188163965 = 4483131259
+						// 2147483647 * 40366 + 985018798 = 86686309913600
+					- ((MAPM(2147483647) * MAPM(2) + MAPM(188163965))
+						/ ((MAPM(2147483647) * MAPM(40366) + MAPM(985018798))
+							* value.pow(8)))
+						// 2147483647 * 201287 + 1380758682 = 432261921612371
+						// 2147483647 * 239771232 + 1145740896
+						// = 514904800886784000
+					+ ((MAPM(2147483647) * MAPM(201287) + MAPM(1380758682))
+						/ ((MAPM(2147483647) * MAPM(239771232)
+								+ MAPM(1145740896))
+							* value.pow(9))));
+		}
 	}
 
 	fTokenizer->RewindToken();

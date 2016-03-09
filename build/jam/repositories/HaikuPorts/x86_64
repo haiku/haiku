@@ -15,7 +15,7 @@ RemotePackageRepository HaikuPorts
 	timgmsoundfont-fixed-5
 	unknown_horizons-2014.1-1
 	vl_gothic-20141206-1
-	youtube_dl-2016.01.29-1
+	youtube_dl-2016.01.29-2
 	wqy_microhei-0.2.0~beta-3
 	:
 	# repository architecture packages
@@ -33,7 +33,7 @@ RemotePackageRepository HaikuPorts
 	automake113-1.13.1-1
 	bash-4.3.42-2
 #	bepdf-1.1.1~beta5_2013_04_28-1
-	binutils-2.25_12015_07_31-1
+	binutils-2.26.0_2016_02_29-1
 	bison-2.6.5-1
 	boost-1.55.0-6
 	boost_atomic-1.55.0-6
@@ -62,12 +62,12 @@ RemotePackageRepository HaikuPorts
 	buildbot_slave-0.8.8-2
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
-	cdrtools-3.02~a06-1
-	cdrtools_devel-3.02~a06-1
+	cdrtools-3.02~a06-2
+	cdrtools_devel-3.02~a06-2
 	clang-3.5.1-1
 	clang_analysis-3.5.1-1
 	clipdinger-0.5.2-1
-	cmake-3.3.2-3
+	cmake-3.4.3-1
 	coreutils-8.24-1
 	cpio-2.12-1
 	cppunit-1.12.1-2
@@ -84,8 +84,8 @@ RemotePackageRepository HaikuPorts
 	dos2unix-7.3.1-1
 	doxygen-1.6.3-4
 	dtc-1.4.1-1
-	enca-1.15-1
-	enca_devel-1.15-1
+	enca-1.18-1
+	enca_devel-1.18-1
 	expat-2.1.0-1
 	expat_devel-2.1.0-1
 	fife-0.4.0~20150801-1
@@ -94,8 +94,10 @@ RemotePackageRepository HaikuPorts
 	file-5.25-1
 	file_devel-5.25-1
 	findutils-4.4.2-1
-	ffmpeg-2.8.3-1
-	ffmpeg_devel-2.8.3-1
+	ffmpeg-3.0-1
+	ffmpeg_devel-3.0-1
+	ffmpeg2-2.8.6-1
+	ffmpeg2_devel-2.8.6-1
 	flac-1.3.1-1
 	flac_devel-1.3.1-1
 	flex-2.5.39-1
@@ -103,14 +105,14 @@ RemotePackageRepository HaikuPorts
 	fontconfig_devel-2.11.94-1
 	fossil-1.34-2
 	freeciv-2.5.1-2
-	freetype-2.6.2-1
-	freetype_devel-2.6.2-1
+	freetype-2.6.3-1
+	freetype_devel-2.6.3-1
 	fribidi-0.19.6-2
 	fribidi_devel-0.19.6-2
 	gawk-4.1.0-2
-	gcc-4.8.5_2015_07_11-1
-	gcc_syslibs-4.8.5_2015_07_11-1
-	gcc_syslibs_devel-4.8.5_2015_07_11-1
+	gcc-5.3.0_2016_02_29-1
+	gcc_syslibs-5.3.0_2016_02_29-1
+	gcc_syslibs_devel-5.3.0_2016_02_29-1
 	gettext-0.19.6-2
 	gettext_libintl-0.19.6-2
 	giflib-5.1.2-1
@@ -131,17 +133,19 @@ RemotePackageRepository HaikuPorts
 	gmp-6.1.0-1
 	gmp_devel-6.1.0-1
 	gnupg-1.4.16-1
+	gnutls-3.4.9-1
+	gnutls_devel-3.4.9-1
 	gperf-3.0.4-1
-	gpgme-1.5.4-1
-	gpgme_devel-1.5.4-1
+	gpgme-1.6.0-1
+	gpgme_devel-1.6.0-1
 	graphite2-1.2.4-1
 	graphite2_devel-1.2.4-1
 	grep-2.21-1
 	grep_debuginfo-2.21-1
 	groff-1.20.1-3
 	gtk_doc-1.20-1
-	gutenprint-5.2.11-1
-	gutenprint_devel-5.2.11-1
+	gutenprint-5.2.11-2
+	gutenprint_devel-5.2.11-2
 	gzip-1.6-2
 	haikuwebkit-1.5.2-1
 	haikuwebkit_devel-1.5.2-1
@@ -172,7 +176,7 @@ RemotePackageRepository HaikuPorts
 	lcms_devel-2.7-1
 	lensfun-0.3.2-1
 	lensfun_devel-0.3.2-1
-	less-458-2
+	less-481-1
 	libaacs-0.8.1-1
 	libaacs_devel-0.8.1-1
 	libasr-1.0.2-2
@@ -195,8 +199,8 @@ RemotePackageRepository HaikuPorts
 	libexecinfo_devel-1.1-2
 	libffi-3.2.1-2
 	libffi_devel-3.2.1-2
-	libgcrypt-1.6.4-1
-	libgcrypt_devel-1.6.4-1
+	libgcrypt-1.6.5-2
+	libgcrypt_devel-1.6.5-2
 	libgsasl-1.8.0-1
 	libgsasl_devel-1.8.0-1
 	libgpg_error-1.20-1
@@ -215,8 +219,8 @@ RemotePackageRepository HaikuPorts
 	libmikmod_devel-3.3.7-1
 	libmkv-0.6.5.1-3
 	libmkv_devel-0.6.5.1-3
-	libmodplug-0.8.8.5-2
-	libmodplug_devel-0.8.8.5-2
+	libmodplug-0.8.8.5-3
+	libmodplug_devel-0.8.8.5-3
 	libmp4v2-2.0.0-2
 	libmp4v2_devel-2.0.0-2
 	libmpeg2-0.5.1-3
@@ -258,8 +262,8 @@ RemotePackageRepository HaikuPorts
 	libunistring_devel-0.9.6-1
 	libusb-1.0.20-1
 	libusb_devel-1.0.20-1
-	libusb_compat-0.1.5-2
-	libusb_compat_devel-0.1.5-2
+	libusb_compat-0.1.5-3
+	libusb_compat_devel-0.1.5-3
 	libvorbis-1.3.5-2
 	libvorbis_devel-1.3.5-2
 	libvpx-1.0.0-2
@@ -281,7 +285,7 @@ RemotePackageRepository HaikuPorts
 	lzo-2.09-1
 	lzo_devel-2.09-1
 	m4-1.4.17-1
-	make-3.82-5
+	make-4.1-1
 	man-1.6g-4
 	mercurial-2.9.2-1
 	mesa-10.5.2-1
@@ -295,7 +299,7 @@ RemotePackageRepository HaikuPorts
 	mpfr_devel-3.1.3-1
 	mpg123-1.22.4-1
 	mpg123_devel-1.22.4-1
-	nano-2.4.2-2
+	nano-2.5.3-1
 	nasm-2.11.08-1
 	ncurses-5.9-10
 	ncurses_devel-5.9-10
@@ -305,6 +309,8 @@ RemotePackageRepository HaikuPorts
 	neon_devel-0.30.1-2
 	netcat-1.10-1
 	netpulse-0.2.3-5
+	nettle-3.2-1
+	nettle_devel-3.2-1
 	ninja-1.5.1-2
 	nspr-4.10.9-1
 	nspr_devel-4.10.9-1
@@ -316,6 +322,7 @@ RemotePackageRepository HaikuPorts
 	openssl-1.0.2e-1
 	openssl_devel-1.0.2e-1
 	p7zip-9.20.1-5
+	padblocker-1.0-1
 	patch-2.7.5-1
 	pe-2.4.5-2
 	perl-5.18.2-2
@@ -361,8 +368,8 @@ RemotePackageRepository HaikuPorts
 	snappy_devel-1.1.3-1
 	speex-1.2~rc1-2
 	speex_devel-1.2~rc1-2
-	sqlite-3.9.0.0-1
-	sqlite_devel-3.9.0.0-1
+	sqlite-3.11.0.0-1
+	sqlite_devel-3.11.0.0-1
 	subversion-1.8.11-6
 	subversion_devel-1.8.11-6
 	tar-1.28-1
@@ -383,6 +390,7 @@ RemotePackageRepository HaikuPorts
 	unzip-6.0-2
 	vim-7.4-5
 	vision-0.9.7.r949-3
+	weather-0.1.1_git-2
 	wget-1.17.1-1
 	which-2.21-1
 	wpa_supplicant-2.0-4
@@ -434,6 +442,7 @@ RemotePackageRepository HaikuPorts
 	file
 	findutils
 	ffmpeg
+	ffmpeg2
 	flac
 	flex
 	fontconfig
@@ -451,6 +460,7 @@ RemotePackageRepository HaikuPorts
 	glu
 	gmp
 	gnupg
+	gnutls
 	gperf
 	gpgme
 	graphite2
@@ -546,6 +556,7 @@ RemotePackageRepository HaikuPorts
 	neon
 	netcat
 	netpulse
+	nettle
 	ninja
 	nspr
 	nss
@@ -553,6 +564,7 @@ RemotePackageRepository HaikuPorts
 	openssh
 	openssl
 	p7zip
+	padblocker
 	patch
 	pe
 	perl
@@ -597,6 +609,7 @@ RemotePackageRepository HaikuPorts
 	unzip
 	vim
 	vision
+	weather
 	wget
 	which
 	wpa_supplicant

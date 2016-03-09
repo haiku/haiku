@@ -6,17 +6,18 @@
  *		Santiago (Jacques) Lema
  *		Jérôme Duval, jerome.duval@gmail.com
  *		Augustin Cavalier, <waddlesplash>
+ *		Alexander G. M. Smith <agmsmith@ncf.ca>
  */
 
 
-#include <Application.h>
-#include <String.h>
-#include <E-mail.h>
-
 #include <stdio.h>
+#include <unistd.h>
 
+#include <Application.h>
+#include <E-mail.h>
+#include <String.h>
 
-#define APP_SIG				"application/x-vnd.Haiku-mail_utils-mail"
+#define APP_SIG "application/x-vnd.Haiku-mail_utils-mail"
 
 
 int main(int argc, char* argv[])
@@ -28,17 +29,15 @@ int main(int argc, char* argv[])
 		fprintf(stdout,"This program can only send mail, not read it.\n");
 		fprintf(stdout,"usage: %s [-v] [-s subject] [-c cc-addr] "
 			"[-b bcc-addr] to-addr ...\n", argv[0]);
-		fflush(stdout);
 		return 0;
 	}
 
-	char *subject = "No title";
+	char *subject = "No subject";
 	char *cc = "";
 	char *bcc = "";
-	BString to = "";
-	BString body = "";
+	BString to;
+	bool verbose = false;
 
-	bool verbose =false;
 	// Parse arguments
 	for (int i = 1; i < argc; i++) {
 		if (strcmp(argv[i], "-v") == 0)
@@ -53,51 +52,60 @@ int main(int argc, char* argv[])
  			bcc = argv[i+1];
  			i++;
 		} else {
+			if (to.Length() > 0)
+				to.Append(", ");
 			to.Append(argv[i]);
-			if (i < argc - 1)
-				to.Append(" ");
-  		}
+		}
 	}
 
 	if (verbose) {
 		fprintf(stdout, "\n");
-		fprintf(stdout, "To:\t<%s> \n", to.String());
-		fprintf(stdout, "Cc:\t<%s> \n", cc);
-		fprintf(stdout, "Bcc:\t<%s> \n", bcc);
-		fprintf(stdout, "Subj:\t<%s> \n", subject);
-		fprintf(stdout, "Body:\t<%s> \n", body.String());
-    	fprintf(stdout, "\n");
+		fprintf(stdout, "To:\t%s\n", to.String());
+		fprintf(stdout, "Cc:\t%s\n", cc);
+		fprintf(stdout, "Bcc:\t%s\n", bcc);
+		fprintf(stdout, "Subj:\t%s\n", subject);
+		fprintf(stdout, "\n");
 	}
 
 	// Check if recipients are valid
-    if (strcmp(to.String(), "") == 0 &&
-    	strcmp(cc, "") == 0 &&
-    	strcmp(bcc, "") == 0) {
+	if (strcmp(to.String(), "") == 0 &&
+		strcmp(cc, "") == 0 &&
+		strcmp(bcc, "") == 0) {
 
-		fprintf(stdout, "[Error]: You must specify at least one recipient "
+		fprintf(stderr, "[Error]: You must specify at least one recipient "
 			"in to, cc or bcc fields.\n");
 		return -1;
 	}
 
-	// Read each line until we get a single dot "." on a line
+	bool isTerminal = isatty(STDIN_FILENO) != 0;
+	if (isTerminal) {
+		fprintf(stderr, "Now type your message.\n"
+			"Type '.' alone on a line to end your text and send it.\n");
+	}
+
+	BString body;
 	char line[32768] = "";
 
-	printf("Now type your message.\nType '.' alone on a line to send it.\n");
+	// Read each line and collect the body text until we get an end of text
+	// marker.  That's a single dot "." on a line typed in by the user,
+	// or end of file when reading a file.
 	do {
-	    gets(line);
-
-	    if (strcmp(line, ".") != 0) {
-	    	body.Append(line).Append("\n");
+		if (fgets(line, sizeof(line), stdin) == NULL) {
+			// End of file or an error happened, just send collected body text.
+			break;
 		}
-	    // fprintf(stdout,"Line: %s \n",line);
-	} while (strcmp(line, ".") != 0);
 
+		if (isTerminal && strcmp(line, ".\n") == 0)
+			break;
+
+		body.Append(line);
+	} while (true);
 
 	if (verbose)
-   		fprintf(stdout, "\nBody:\n%s\n", body.String());
+		fprintf(stdout, "\nBody:\n%s\n", body.String());
 
 	if (verbose)
-   		fprintf(stdout, "\nSending E-mail...\n");
+		fprintf(stderr, "Sending E-mail...\n");
 	fflush(stdout);
 
 	BMailMessage mail;
@@ -105,14 +113,15 @@ int main(int argc, char* argv[])
 	mail.AddHeaderField(B_MAIL_CC, cc);
 	mail.AddHeaderField(B_MAIL_BCC, bcc);
 	mail.AddHeaderField(B_MAIL_SUBJECT, subject);
-	mail.AddContent(body.String(), strlen(body.String()));
+	mail.AddContent(body.String(), body.Length());
 	status_t result = mail.Send();
 
 	if (result == B_OK) {
-		fprintf(stdout, "\nMessage was sent successfully.\n");
+		if (verbose)
+			fprintf(stderr, "Message was sent successfully.\n");
 		return 0;
 	}
 
-	fprintf(stdout, "Message failed to send: %s", strerror(result));
+	fprintf(stderr, "Message failed to send: %s\n", strerror(result));
 	return result;
 }
