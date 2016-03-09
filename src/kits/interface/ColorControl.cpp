@@ -52,7 +52,12 @@ BColorControl::BColorControl(BPoint leftTop, color_control_layout layout,
 	float cellSize, const char* name, BMessage* message, bool useOffscreen)
 	:
 	BControl(BRect(leftTop, leftTop), name, NULL, message,
-		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE)
+		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE),
+	fRedText(NULL),
+	fGreenText(NULL),
+	fBlueText(NULL),
+	fBitmap(NULL),
+	fOffscreenView(NULL)
 {
 	_InitData(layout, cellSize, useOffscreen, NULL);
 }
@@ -60,7 +65,12 @@ BColorControl::BColorControl(BPoint leftTop, color_control_layout layout,
 
 BColorControl::BColorControl(BMessage* data)
 	:
-	BControl(data)
+	BControl(data),
+	fRedText(NULL),
+	fGreenText(NULL),
+	fBlueText(NULL),
+	fBitmap(NULL),
+	fOffscreenView(NULL)
 {
 	int32 layout;
 	float cellSize;
@@ -174,13 +184,15 @@ BColorControl::_InitData(color_control_layout layout, float size,
 	ResizeToPreferred();
 
 	if (useOffscreen) {
-		BRect bounds = _PaletteFrame();
-		fBitmap = new BBitmap(bounds, B_RGB32, true, false);
-		fOffscreenView = new BView(bounds, "off_view", 0, 0);
+		if (fOffscreenView != NULL) {
+			BRect bounds = _PaletteFrame();
+			fBitmap = new BBitmap(bounds, B_RGB32, true, false);
+			fOffscreenView = new BView(bounds, "off_view", 0, 0);
 
-		fBitmap->Lock();
-		fBitmap->AddChild(fOffscreenView);
-		fBitmap->Unlock();
+			fBitmap->Lock();
+			fBitmap->AddChild(fOffscreenView);
+			fBitmap->Unlock();
+		}
 	} else {
 		fBitmap = NULL;
 		fOffscreenView = NULL;
@@ -363,6 +375,36 @@ BColorControl::MessageReceived(BMessage* message)
 			Invoke();
 			break;
 		}
+
+		case B_SCREEN_CHANGED:
+		{
+			BRect frame;
+			uint32 mode;
+			if (message->FindRect("frame", &frame) == B_OK
+				&& message->FindInt32("mode", (int32*)&mode) == B_OK) {
+				if ((fPaletteMode && mode == B_CMAP8)
+					|| (!fPaletteMode && mode != B_CMAP8)) {
+					// not switching to or from B_CMAP8, break
+					break;
+				}
+
+				// fake an archive message (so we don't rebuild views)
+				BMessage* data = new BMessage();
+				data->AddInt32("_val", Value());
+
+				// reinititialize
+				bool useOffscreen = fOffscreenView != NULL;
+				_InitData((color_control_layout)fColumns, fCellSize,
+					useOffscreen, data);
+				if (useOffscreen)
+					_InitOffscreen();
+
+				// cleanup
+				delete data;
+			}
+			break;
+		}
+
 		default:
 			BControl::MessageReceived(message);
 	}

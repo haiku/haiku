@@ -4955,6 +4955,18 @@ BView::MessageReceived(BMessage* message)
 			case B_FONTS_UPDATED:
 				break;
 
+			case B_SCREEN_CHANGED:
+			{
+				// propegate message to child views
+				int32 childCount = CountChildren();
+				for (int32 i = 0; i < childCount; i++) {
+					BView* view = ChildAt(i);
+					if (view != NULL)
+						view->MessageReceived(message);
+				}
+				break;
+			}
+
 			default:
 				BHandler::MessageReceived(message);
 				break;
