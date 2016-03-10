@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2015.12.17
-# Date:    2015-12-17 20:34:05
+# Version: 2016.03.03
+# Date:    2016-03-03 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -13999,7 +13999,7 @@
 	0008  Infinity CryptoKey
 	0009  RE-BL PlayStation 3 IR-to-Bluetooth converter
 1050  Yubico.com
-	0010  Yubikey
+	0010  Yubikey (v1 or v2)
 	0110  Yubikey NEO(-N) OTP
 	0111  Yubikey NEO(-N) OTP+CCID
 	0112  Yubikey NEO(-N) CCID
@@ -14008,8 +14008,16 @@
 	0115  Yubikey NEO(-N) U2F+CCID
 	0116  Yubikey NEO(-N) OTP+U2F+CCID
 	0120  Yubikey Touch U2F Security Key
-	0200  U2F Gnubby
+	0200  Gnubby U2F
 	0211  Gnubby
+	0401  Yubikey 4 OTP
+	0402  Yubikey 4 U2F
+	0403  Yubikey 4 OTP+U2F
+	0404  Yubikey 4 CCID
+	0405  Yubikey 4 OTP+CCID
+	0406  Yubikey 4 U2F+CCID
+	0407  Yubikey 4 OTP+U2F+CCID
+	0410  Yubikey plus OTP+U2F
 1053  Immanuel Electronics Co., Ltd
 1054  BMS International Beheer N.V.
 	5004  DSL 7420 Loader
