@@ -247,8 +247,8 @@ RemotePackageRepository HaikuPorts
 	openal_devel-1.13.0-2
 	openjdk-1.7_2013_11_08-2
 	openssh-7.1p1-4
-	openssl-1.0.2e-1
-	openssl_devel-1.0.2e-1
+	openssl-1.0.2g-1
+	openssl_devel-1.0.2g-1
 	p7zip-9.20.1-4
 	padblocker-1.0-1
 	patch-2.7.5-1
@@ -394,8 +394,8 @@ RemotePackageRepository HaikuPorts
 	ncurses_x86_gcc2_devel-5.9-10
 	ncurses6_x86_gcc2-6.0-1
 	ncurses6_x86_gcc2_devel-6.0-1
-	openssl_x86_gcc2-1.0.2e-1
-	openssl_x86_gcc2_devel-1.0.2e-1
+	openssl_x86_gcc2-1.0.2g-1
+	openssl_x86_gcc2_devel-1.0.2g-1
 	pkgconfig_x86_gcc2-0.27.1-2
 	speex_x86_gcc2-1.2~rc1-2
 	speex_x86_gcc2_devel-1.2~rc1-2
