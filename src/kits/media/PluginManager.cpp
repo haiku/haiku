@@ -40,10 +40,9 @@ public:
 
 		// No need to do additional buffering if we have
 		// a BBufferIO or a BMediaIO.
-		if (dynamic_cast<BBufferIO *>(source) == NULL
-				&& fMedia == NULL) {
+		if (dynamic_cast<BBufferIO *>(source) == NULL) {
 			// Source needs to be at least a BPositionIO to wrap with a BBufferIO
-			if (fPosition != NULL) {
+			if (IsSeekable() && (IsMedia() && !fMedia->IsCached())) {
 				fPosition = new(std::nothrow) BBufferIO(fPosition, 65536, true);
 				if (fPosition == NULL) {
 					fErr = B_NO_MEMORY;
@@ -51,7 +50,7 @@ public:
 				}
 				// We have to reset our BDataIO reference too
 				fData = dynamic_cast<BDataIO*>(fPosition);
-			} else {
+			} else if (!IsMedia()) {
 				// In this case we have to supply our own form
 				// of pseudo-seekable object from a non-seekable
 				// BDataIO.
@@ -83,6 +82,8 @@ public:
 
 			if (fFallbackBuffer->Position() == position
 					&& position+size > bufSize) {
+				// TODO: Possibly part of the data we have
+				// to supply is cached.
 				ret = fData->Read(buffer, size);
 				fFallbackBuffer->Write(buffer, ret);
 				return ret;
@@ -120,11 +121,12 @@ public:
 		if (IsSeekable())
 			return fPosition->Seek(position, seekMode);
 
-		off_t bufSize = 0;
-		fFallbackBuffer->GetSize(&bufSize);
-		if (IsEndless() && position <= bufSize)
-			return fFallbackBuffer->Seek(position, seekMode);
-
+		if (IsEndless()) {
+			off_t bufSize = 0;
+			fFallbackBuffer->GetSize(&bufSize);
+			if (position <= bufSize)
+				return fFallbackBuffer->Seek(position, seekMode);
+		}
 		return B_NOT_SUPPORTED;
 	}
 
@@ -162,12 +164,13 @@ public:
 		if (IsMedia())
 			return fMedia->IsSeekable();
 
-		return IsPosition();
+		return fPosition != NULL;
 	}
 
-	virtual bool				IsFile() const
+	virtual bool				IsCached() const
 	{
-		return fFile != NULL;
+		// Our wrapper class is always cached
+		return true;
 	}
 
 	virtual	bool				IsEndless() const
@@ -175,7 +178,7 @@ public:
 		if (IsMedia())
 			return fMedia->IsEndless();
 
-		if (IsPosition())
+		if (IsSeekable())
 			return false;
 
 		return true;
@@ -189,11 +192,6 @@ public:
 	}
 
 protected:
-
-	bool						IsPosition() const
-	{
-		return fPosition != NULL;
-	}
 
 	bool						IsMedia() const
 	{
