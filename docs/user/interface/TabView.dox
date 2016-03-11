@@ -416,10 +416,10 @@
 
 
 /*!
-	\fn void BTabView::DrawBox(BRect selTabRect)
+	\fn void BTabView::DrawBox(BRect selectedTabRect)
 	\brief Draws the box that encloses the container view.
 
-	\param selTabRect The frame rectangle of the currently selected tab.
+	\param selectedTabRect The frame rectangle of the currently selected tab.
 
 	\since BeOS R3
 */
@@ -736,4 +736,3 @@
 
 	\since Haiku R1
 */
-

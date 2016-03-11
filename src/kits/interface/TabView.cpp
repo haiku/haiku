@@ -47,7 +47,6 @@ static property_info sPropertyList[] = {
 };
 
 
-
 BTab::BTab(BView* contentsView)
 	:
 	fEnabled(true),
@@ -698,6 +697,7 @@ BTabView::Select(int32 index)
 	if (tab != NULL && fContainerView != NULL) {
 		if (index == 0)
 			fTabOffset = 0.0f;
+
 		tab->Select(fContainerView);
 		fSelection = index;
 
@@ -840,14 +840,14 @@ BTabView::DrawTabs()
 
 
 void
-BTabView::DrawBox(BRect selTabRect)
+BTabView::DrawBox(BRect selectedTabRect)
 {
 	BRect rect(Bounds());
-	rect.top = selTabRect.bottom;
+	rect.top = selectedTabRect.bottom;
 	if (fBorderStyle != B_FANCY_BORDER)
 		rect.top += 1.0f;
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	if (fBorderStyle == B_FANCY_BORDER)
 		be_control_look->DrawGroupFrame(this, rect, rect, base);
 	else {
