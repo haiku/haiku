@@ -14,6 +14,7 @@
 #include "DecoderPlugin.h"
 #include "EncoderPlugin.h"
 #include "ReaderPlugin.h"
+#include "StreamerPlugin.h"
 #include "WriterPlugin.h"
 
 #include <TList.h>
@@ -58,7 +59,11 @@ public:
 									const media_format& format);
 
 			void				DestroyEncoder(Encoder* encoder);
-	
+
+			status_t			CreateStreamer(Streamer** streamer,
+									BUrl* url, BDataIO** source);
+			void				DestroyStreamer(Streamer* streamer);
+
 private:
 			status_t			_LoadPlugin(const entry_ref& ref,
 									MediaPlugin** plugin, image_id* image);

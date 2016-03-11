@@ -20,6 +20,7 @@
 PluginManager gPluginManager;
 
 #define BLOCK_SIZE 4096
+#define MAX_STREAMERS 40
 
 
 class BMediaIOWrapper : public BMediaIO {
@@ -575,6 +576,79 @@ PluginManager::DestroyEncoder(Encoder* encoder)
 		// destructor...
 		MediaPlugin* plugin = encoder->fMediaPlugin;
 		delete encoder;
+		PutPlugin(plugin);
+	}
+}
+
+
+status_t
+PluginManager::CreateStreamer(Streamer** streamer, BUrl* url, BDataIO** source)
+{
+	TRACE("PluginManager::CreateStreamer enter\n");
+
+	entry_ref refs[MAX_STREAMERS];
+	int32 count;
+
+	status_t ret = AddOnManager::GetInstance()->GetStreamers(refs, &count,
+		MAX_STREAMERS);
+	if (ret != B_OK) {
+		printf("PluginManager::CreateStreamer: can't get list of readers: %s\n",
+			strerror(ret));
+		return ret;
+	}
+
+	// try each reader by calling it's Sniff function...
+	for (int32 i = 0; i < count; i++) {
+		entry_ref ref = refs[i];
+		MediaPlugin* plugin = GetPlugin(ref);
+		if (plugin == NULL) {
+			printf("PluginManager::CreateStreamer: GetPlugin failed\n");
+			return B_ERROR;
+		}
+
+		StreamerPlugin* streamerPlugin = dynamic_cast<StreamerPlugin*>(plugin);
+		if (streamerPlugin == NULL) {
+			printf("PluginManager::CreateStreamer: dynamic_cast failed\n");
+			PutPlugin(plugin);
+			return B_ERROR;
+		}
+
+		*streamer = streamerPlugin->NewStreamer();
+		if (*streamer == NULL) {
+			printf("PluginManager::CreateStreamer: NewReader failed\n");
+			PutPlugin(plugin);
+			return B_ERROR;
+		}
+
+		(*streamer)->fMediaPlugin = plugin;
+
+		BMediaIO* streamSource = NULL;
+		if ((*streamer)->Sniff(url, &streamSource) == B_OK) {
+			TRACE("PluginManager::CreateStreamer: Sniff success ");
+			*source = streamSource;
+			return B_OK;
+		}
+
+		DestroyStreamer(*streamer);
+		*streamer = NULL;
+	}
+
+	TRACE("PluginManager::CreateStreamer leave\n");
+	return B_MEDIA_NO_HANDLER;
+}
+
+
+void
+PluginManager::DestroyStreamer(Streamer* streamer)
+{
+	if (streamer != NULL) {
+		TRACE("PluginManager::DestroyStreamer(%p, plugin: %p)\n", streamer,
+			streamer->fMediaPlugin);
+		// NOTE: We have to put the plug-in after deleting the encoder,
+		// since otherwise we may actually unload the code for the
+		// destructor...
+		MediaPlugin* plugin = streamer->fMediaPlugin;
+		delete streamer;
 		PutPlugin(plugin);
 	}
 }

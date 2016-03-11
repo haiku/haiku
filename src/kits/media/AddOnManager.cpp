@@ -204,6 +204,23 @@ AddOnManager::GetReaders(entry_ref* outRefs, int32* outCount,
 
 
 status_t
+AddOnManager::GetStreamers(entry_ref* outRefs, int32* outCount,
+	int32 maxCount)
+{
+	BAutolock locker(fLock);
+	RegisterAddOns();
+
+	streamer_info* info;
+	for (fStreamerList.Rewind(); fStreamerList.GetNext(&info);) {
+			*outRefs = info->ref;
+			outRefs++;
+	}
+
+	return B_ERROR;
+}
+
+
+status_t
 AddOnManager::GetEncoder(entry_ref* _encoderRef, int32 id)
 {
 	BAutolock locker(fLock);

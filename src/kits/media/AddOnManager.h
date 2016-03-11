@@ -45,6 +45,9 @@ public:
 			status_t			GetReaders(entry_ref* _ref,
 									int32* _count, int32 maxCount);
 
+			status_t			GetStreamers(entry_ref* _ref,
+									int32* _count, int32 maxCount);
+
 			status_t			GetEncoder(entry_ref* _ref, int32 id);
 
 			status_t			GetWriter(entry_ref* _ref,
