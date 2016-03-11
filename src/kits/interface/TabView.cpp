@@ -276,7 +276,7 @@ BTab::DrawTab(BView* owner, BRect frame, tab_position position, bool full)
 		borders |= BControlLook::B_RIGHT_BORDER;
 
 	if (position == B_TAB_FRONT) {
-		frame.bottom += 1;
+		frame.bottom += 1.0f;
 		be_control_look->DrawActiveTab(owner, frame, frame, no_tint, 0,
 			borders);
 	} else {
@@ -433,8 +433,10 @@ BTabView::Archive(BMessage* archive, bool deep) const
 		for (int32 i = 0; i < CountTabs(); i++) {
 			BTab* tab = TabAt(i);
 
-			if ((result = archiver.AddArchivable("_l_items", tab, deep)) != B_OK)
+			if ((result = archiver.AddArchivable("_l_items", tab, deep))
+					!= B_OK) {
 				break;
+			}
 			result = archiver.AddArchivable("_view_list", tab->View(), deep);
 		}
 	}
@@ -544,7 +546,8 @@ BTabView::MessageReceived(BMessage* message)
 			int32 index;
 			int32 form;
 			const char* property;
-			if (message->GetCurrentSpecifier(&index, &specifier, &form, &property) == B_OK) {
+			if (message->GetCurrentSpecifier(&index, &specifier, &form,
+					&property) == B_OK) {
 				if (strcmp(property, "Selection") == 0) {
 					if (message->what == B_GET_PROPERTY) {
 						reply.AddInt32("result", fSelection);
@@ -856,11 +859,9 @@ BTabView::DrawBox(BRect selTabRect)
 	if (fBorderStyle == B_FANCY_BORDER)
 		be_control_look->DrawGroupFrame(this, rect, rect, base);
 	else {
-		uint32 borders = BControlLook::B_TOP_BORDER;
-		if (fBorderStyle == B_PLAIN_BORDER)
-			borders = BControlLook::B_ALL_BORDERS;
 		be_control_look->DrawBorder(this, rect, rect, base, B_PLAIN_BORDER,
-			0, borders);
+			0, fBorderStyle == B_PLAIN_BORDER ? BControlLook::B_ALL_BORDERS
+				: BControlLook::B_TOP_BORDER);
 	}
 }
 
@@ -878,6 +879,7 @@ BTabView::TabFrame(int32 index) const
 	// again (handled in DrawTabs()).
 	if (fBorderStyle == B_PLAIN_BORDER)
 		borderOffset = 1.0f;
+
 	switch (fTabWidthSetting) {
 		case B_WIDTH_FROM_LABEL:
 		{
@@ -1295,8 +1297,10 @@ BTabView::_BorderWidth() const
 		default:
 		case B_FANCY_BORDER:
 			return 3.0f;
+
 		case B_PLAIN_BORDER:
 			return 1.0f;
+
 		case B_NO_BORDER:
 			return 0.0f;
 	}
@@ -1314,9 +1318,11 @@ BTabView::_LayoutContainerView(bool layouted)
 			case B_FANCY_BORDER:
 				topBorderOffset = 1.0f;
 				break;
+
 			case B_PLAIN_BORDER:
 				topBorderOffset = 0.0f;
 				break;
+
 			case B_NO_BORDER:
 				topBorderOffset = -1.0f;
 				break;
