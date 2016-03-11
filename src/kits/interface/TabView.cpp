@@ -801,49 +801,41 @@ BTabView::Draw(BRect updateRect)
 BRect
 BTabView::DrawTabs()
 {
-	float left = 0;
+	// draw an inactive tab frame behind all tabs
+	BRect frame(Bounds());
+	frame.bottom = fTabHeight;
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 borders = BControlLook::B_TOP_BORDER
+		| BControlLook::B_BOTTOM_BORDER;
+	if (fBorderStyle == B_NO_BORDER) {
+		// removes left border that is an artifact of DrawInactiveTab()
+		frame.left -= 1.0f;
+	} else
+		borders |= BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER;
 
-	for (int32 i = 0; i < CountTabs(); i++) {
+	be_control_look->DrawInactiveTab(this, frame, frame, base, 0, borders);
+
+	// draw the tabs on top of the inactive tab frame
+	float right = 0.0f;
+	int32 tabCount = CountTabs();
+	for (int32 i = 0; i < tabCount; i++) {
 		BRect tabFrame = TabFrame(i);
 		TabAt(i)->DrawTab(this, tabFrame,
 			i == fSelection ? B_TAB_FRONT : (i == 0) ? B_TAB_FIRST : B_TAB_ANY,
 			i + 1 != fSelection);
-		left = tabFrame.right;
+		right = tabFrame.right;
 	}
 
-	BRect frame(Bounds());
-	if (fBorderStyle == B_PLAIN_BORDER)
-		frame.right += 1;
-	else if (fBorderStyle == B_NO_BORDER)
-		frame.right += 2;
-	if (left < frame.right) {
-		frame.left = left;
-		frame.bottom = fTabHeight;
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 borders = BControlLook::B_TOP_BORDER
-			| BControlLook::B_BOTTOM_BORDER | BControlLook::B_RIGHT_BORDER;
-		if (left == 0)
-			borders |= BControlLook::B_LEFT_BORDER;
-		be_control_look->DrawInactiveTab(this, frame, frame, base, 0,
-			borders);
-	}
-	if (fBorderStyle == B_NO_BORDER) {
-		// Draw a small inactive area before first tab.
+	if (tabCount > 1 && right < frame.right) {
+		// draw a 1px right border on the last tab
 		frame = Bounds();
-		frame.right = 0.0f;
-			// one pixel wide
+		frame.left = frame.right = right;
 		frame.bottom = fTabHeight;
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 borders = BControlLook::B_TOP_BORDER
-			| BControlLook::B_BOTTOM_BORDER;
 		be_control_look->DrawInactiveTab(this, frame, frame, base, 0,
-			borders);
+			BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 	}
 
-	if (fSelection < CountTabs())
-		return TabFrame(fSelection);
-
-	return BRect();
+	return fSelection < CountTabs() ? TabFrame(fSelection) : BRect();
 }
 
 
@@ -875,6 +867,8 @@ BTabView::TabFrame(int32 index) const
 	float width = 100.0f;
 	float height = fTabHeight;
 	float borderOffset = 0.0f;
+	float offset = BControlLook::ComposeSpacing(B_USE_WINDOW_SPACING);
+
 	// Do not use 2.0f for B_NO_BORDER, that will look yet different
 	// again (handled in DrawTabs()).
 	if (fBorderStyle == B_PLAIN_BORDER)
@@ -888,8 +882,8 @@ BTabView::TabFrame(int32 index) const
 				x += StringWidth(TabAt(i)->Label()) + 20.0f;
 			}
 
-			return BRect(x - borderOffset, 0.0f,
-				x + StringWidth(TabAt(index)->Label()) + 20.0f
+			return BRect(offset + x - borderOffset, 0.0f,
+				offset + x + StringWidth(TabAt(index)->Label()) + 20.0f
 					- borderOffset,
 				height);
 		}
@@ -905,8 +899,8 @@ BTabView::TabFrame(int32 index) const
 
 		case B_WIDTH_AS_USUAL:
 		default:
-			return BRect(index * width - borderOffset, 0.0f,
-				index * width + width - borderOffset, height);
+			return BRect(offset + index * width - borderOffset, 0.0f,
+				offset + index * width + width - borderOffset, height);
 	}
 
 	// TODO: fix to remove "offset" in DrawTab and DrawLabel ...
