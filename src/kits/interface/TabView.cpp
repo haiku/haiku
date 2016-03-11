@@ -826,7 +826,7 @@ BTabView::DrawTabs()
 		right = tabFrame.right;
 	}
 
-	if (tabCount > 1 && right < frame.right) {
+	if (right < frame.right) {
 		// draw a 1px right border on the last tab
 		frame = Bounds();
 		frame.left = frame.right = right;
