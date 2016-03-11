@@ -32,14 +32,26 @@ local font_src =
 	;
 
 UseBuildFeatureHeaders freetype ;
-Includes [ FGristFiles AppServer.cpp BitmapManager.cpp Canvas.cpp
+if [ FIsBuildFeatureEnabled fontconfig ] {
+	SubDirC++Flags -DFONTCONFIG_ENABLED ;
+	UseBuildFeatureHeaders fontconfig ;
+	Includes [ FGristFiles AppServer.cpp BitmapManager.cpp Canvas.cpp
+	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp
+	DrawState.cpp DrawingEngine.cpp Layer.cpp PictureBoundingBoxPlayer.cpp
+	ServerApp.cpp ServerBitmap.cpp ServerCursor.cpp ServerFont.cpp
+	ServerPicture.cpp ServerWindow.cpp View.cpp Window.cpp WorkspacesView.cpp
+	$(decorator_src) $(font_src) ]
+	: [ BuildFeatureAttribute freetype : headers ]
+	  [ BuildFeatureAttribute fontconfig : headers ] ;
+} else {
+	Includes [ FGristFiles AppServer.cpp BitmapManager.cpp Canvas.cpp
 	ClientMemoryAllocator.cpp Desktop.cpp DesktopSettings.cpp
 	DrawState.cpp DrawingEngine.cpp Layer.cpp PictureBoundingBoxPlayer.cpp
 	ServerApp.cpp ServerBitmap.cpp ServerCursor.cpp ServerFont.cpp
 	ServerPicture.cpp ServerWindow.cpp View.cpp Window.cpp WorkspacesView.cpp
 	$(decorator_src) $(font_src) ]
 	: [ BuildFeatureAttribute freetype : headers ] ;
-
+}
 
 local BROKEN_64 = ;
 if $(TARGET_ARCH) != x86_64 {
@@ -103,6 +115,7 @@ Server app_server :
 	libaslocal.a $(BROKEN_64)libasremote.a $(BROKEN_64)libashtml5.a
 	libasdrawing.a libpainter.a libagg.a
 	[ BuildFeatureAttribute freetype : library ]
+	[ BuildFeatureAttribute fontconfig : library ]
 	libstackandtile.a liblinprog.a libtextencoding.so shared
 	[ TargetLibstdc++ ]
 

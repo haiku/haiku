@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2016, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -143,6 +143,8 @@ enum {
 	AS_GET_HAS_GLYPHS,
 	AS_GET_GLYPH_SHAPES,
 	AS_GET_TRUNCATED_STRINGS,
+	AS_GET_UNICODE_BLOCKS,
+	AS_GET_HAS_UNICODE_BLOCK,
 
 	// Screen methods
 	AS_VALID_SCREEN_ID,

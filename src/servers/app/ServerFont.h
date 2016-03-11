@@ -163,6 +163,8 @@ class ServerFont {
 											   float width) const;
 
 			Transformable		EmbeddedTransformation() const;
+			status_t 			GetUnicodeBlocks(unicode_block &blocksForFont);
+			status_t			IncludesUnicodeBlock(uint32 start, uint32 end, bool &hasBlock);
 
 protected:
 	friend class FontStyle;

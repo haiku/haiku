@@ -839,8 +839,43 @@ BFont::BoundingBox() const
 unicode_block
 BFont::Blocks() const
 {
-	// TODO: Add Block support
-	return unicode_block(~0LL, ~0LL);
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_UNICODE_BLOCKS);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+
+	int32 status;
+	if (link.FlushWithReply(status) != B_OK
+		|| status != B_OK) {
+		return unicode_block(~0LL, ~0LL);
+	}
+
+	unicode_block blocksForFont;
+	link.Read<unicode_block>(&blocksForFont);
+
+	return blocksForFont;
+}
+
+bool
+BFont::IncludesBlock(uint32 start, uint32 end) const
+{
+	BPrivate::AppServerLink link;
+	link.StartMessage(AS_GET_HAS_UNICODE_BLOCK);
+	link.Attach<uint16>(fFamilyID);
+	link.Attach<uint16>(fStyleID);
+	link.Attach<uint32>(start);
+	link.Attach<uint32>(end);
+
+	int32 status;
+	if (link.FlushWithReply(status) != B_OK
+		|| status != B_OK) {
+		return false;
+	}
+
+	bool hasBlock;
+	link.Read<bool>(&hasBlock);
+
+	return hasBlock;
 }
 
 

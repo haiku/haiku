@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2005-2016, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _FONT_H_
@@ -120,6 +120,15 @@ private:
 };
 
 
+struct unicode_block_range {
+	uint32					start;
+	uint32					end;
+	const unicode_block&	block;
+
+	uint32 Count() const { return end + 1 - start; }
+};
+
+
 struct edge_info {
 	float	left;
 	float	right;
@@ -201,6 +210,7 @@ public:
 			bool				IsFullAndHalfFixed() const;
 			BRect				BoundingBox() const;
 			unicode_block		Blocks() const;
+			bool				IncludesBlock(uint32 start, uint32 end) const;
 			font_file_format	FileFormat() const;
 
 			int32				CountTuned() const;
@@ -371,6 +381,7 @@ unicode_block::operator=(const unicode_block& block)
 {
 	fData[0] = block.fData[0];
 	fData[1] = block.fData[1];
+
 	return *this;
 }
 

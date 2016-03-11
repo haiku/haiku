@@ -303,6 +303,21 @@ if [ IsPackageAvailable freetype_devel ] {
 	Echo "Freetype support not available on $(TARGET_PACKAGING_ARCH)" ;
 }
 
+# fontconfig
+if [ IsPackageAvailable fontconfig_devel ] {
+	ExtractBuildFeatureArchives fontconfig :
+		file: base fontconfig
+			runtime: lib
+		file: devel fontconfig_devel
+			depends: base
+			library: $(developLibDir)/libfontconfig.so
+			headers: $(developHeadersDir) $(developHeadersDir)/fontconfig
+		;
+
+	EnableBuildFeatures fontconfig ;
+} else {
+	Echo "fontconfig support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
 
 # Gutenprint
 if [ IsPackageAvailable gutenprint_devel ] {

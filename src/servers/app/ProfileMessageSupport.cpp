@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2009, Haiku Inc. All rights reserved.
+ * Copyright 2007-2016, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -125,6 +125,8 @@ string_for_message_code(uint32 code, BString& string)
 		CODE(AS_GET_HAS_GLYPHS);
 		CODE(AS_GET_GLYPH_SHAPES);
 		CODE(AS_GET_TRUNCATED_STRINGS);
+		CODE(AS_GET_UNICODE_BLOCKS);
+		CODE(AS_GET_HAS_UNICODE_BLOCK);
 
 		// Screen methods
 		CODE(AS_VALID_SCREEN_ID);

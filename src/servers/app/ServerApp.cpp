@@ -2028,6 +2028,71 @@ ServerApp::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			break;
 		}
 
+		case AS_GET_UNICODE_BLOCKS:
+		{
+			FTRACE(("ServerApp %s: AS_GET_UNICODE_BLOCKS\n", Signature()));
+
+			// Attached Data:
+			// 1) uint16 family ID
+			// 2) uint16 style ID
+
+			// Returns:
+			// 1) unicode_block - bitfield of Unicode blocks in font
+
+			uint16 familyID, styleID;
+			link.Read<uint16>(&familyID);
+			link.Read<uint16>(&styleID);
+
+			ServerFont font;
+			status_t status = font.SetFamilyAndStyle(familyID, styleID);
+			if (status == B_OK) {
+				unicode_block blocksForFont;
+				font.GetUnicodeBlocks(blocksForFont);
+
+				fLink.StartMessage(B_OK);
+				fLink.Attach<unicode_block>(blocksForFont);
+			} else
+				fLink.StartMessage(status);
+
+			fLink.Flush();
+			break;
+		}
+
+		case AS_GET_HAS_UNICODE_BLOCK:
+		{
+			FTRACE(("ServerApp %s: AS_INCLUDES_UNICODE_BLOCK\n", Signature()));
+
+			// Attached Data:
+			// 1) uint16 family ID
+			// 2) uint16 style ID
+			// 3 uint32 start of unicode block
+			// 4) uint32 end of unicode block
+
+			// Returns:
+			// 1) bool - whether or not font includes specified block range
+
+			uint16 familyID, styleID;
+			uint32 start, end;
+			link.Read<uint16>(&familyID);
+			link.Read<uint16>(&styleID);
+			link.Read<uint32>(&start);
+			link.Read<uint32>(&end);
+
+			ServerFont font;
+			status_t status = font.SetFamilyAndStyle(familyID, styleID);
+			if (status == B_OK) {
+				bool hasBlock;
+
+				status = font.IncludesUnicodeBlock(start, end, hasBlock);
+				fLink.StartMessage(status);
+				fLink.Attach<bool>(hasBlock);
+			} else
+				fLink.StartMessage(status);
+
+			fLink.Flush();
+			break;
+		}
+
 		case AS_GET_GLYPH_SHAPES:
 		{
 			FTRACE(("ServerApp %s: AS_GET_GLYPH_SHAPES\n", Signature()));
