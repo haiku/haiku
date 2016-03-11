@@ -354,6 +354,10 @@ AddOnManager::_RegisterAddOn(const entry_ref& ref)
 	if (encoder != NULL)
 		_RegisterEncoder(encoder, ref);
 
+	StreamerPlugin* streamer = dynamic_cast<StreamerPlugin*>(plugin);
+	if (streamer != NULL)
+		_RegisterStreamer(streamer, ref);
+
 	delete plugin;
 
 	return B_OK;
@@ -546,6 +550,25 @@ AddOnManager::_RegisterEncoder(EncoderPlugin* plugin, const entry_ref& ref)
 		if (!fEncoderList.Insert(info))
 			break;
 	}
+}
+
+
+void
+AddOnManager::_RegisterStreamer(StreamerPlugin* streamer, const entry_ref& ref)
+{
+	BAutolock locker(fLock);
+
+	streamer_info* pInfo;
+	for (fStreamerList.Rewind(); fStreamerList.GetNext(&pInfo);) {
+		if (!strcmp(pInfo->ref.name, ref.name)) {
+			// We already know this streamer
+			return;
+		}
+	}
+
+	streamer_info info;
+	info.ref = ref;
+	fStreamerList.Insert(info);
 }
 
 
