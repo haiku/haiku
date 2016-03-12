@@ -59,7 +59,7 @@
 #define IO_APIC_DESTINATION_FIELD_SHIFT		56
 #define IO_APIC_DESTINATION_FIELD_MASK		0xff
 #define IO_APIC_INTERRUPT_MASKED			(1 << 16)
-#define IO_APIC_TRIGGER_MODE_EDGE			(0 << 16)
+#define IO_APIC_TRIGGER_MODE_EDGE			(0 << 15)
 #define IO_APIC_TRIGGER_MODE_LEVEL			(1 << 15)
 #define IO_APIC_TRIGGER_MODE_MASK			(1 << 15)
 #define IO_APIC_REMOTE_IRR					(1 << 14)
@@ -256,8 +256,9 @@ ioapic_assign_interrupt_to_cpu(int32 gsi, int32 cpu)
 	uint32 apicid = x86_get_cpu_apic_id(cpu);
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
-	TRACE("ioapic_assign_interrupt_to_cpu: gsi %ld (io-apic %u pin %u) to"
-		" cpu %ld (apic_id %lu)\n", gsi, ioapic->number, pin, cpu, apicid);
+	TRACE("ioapic_assign_interrupt_to_cpu: gsi %" B_PRId32
+		" (io-apic %u pin %u) to cpu %" B_PRId32 " (apic_id %" B_PRIx32 ")\n",
+		gsi, ioapic->number, pin, cpu, apicid);
 
 	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~(uint64(IO_APIC_DESTINATION_FIELD_MASK)
@@ -283,8 +284,8 @@ ioapic_enable_io_interrupt(int32 gsi)
 	x86_set_irq_source(gsi, IRQ_SOURCE_IOAPIC);
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
-	TRACE("ioapic_enable_io_interrupt: gsi %ld -> io-apic %u pin %u\n",
-		gsi, ioapic->number, pin);
+	TRACE("ioapic_enable_io_interrupt: gsi %" B_PRId32
+		" -> io-apic %u pin %u\n", gsi, ioapic->number, pin);
 
 	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry &= ~IO_APIC_INTERRUPT_MASKED;
@@ -300,8 +301,8 @@ ioapic_disable_io_interrupt(int32 gsi)
 		return;
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
-	TRACE("ioapic_disable_io_interrupt: gsi %ld -> io-apic %u pin %u\n",
-		gsi, ioapic->number, pin);
+	TRACE("ioapic_disable_io_interrupt: gsi %" B_PRId32
+		" -> io-apic %u pin %u\n", gsi, ioapic->number, pin);
 
 	uint64 entry = ioapic_read_64(*ioapic, IO_APIC_REDIRECTION_TABLE + pin * 2);
 	entry |= IO_APIC_INTERRUPT_MASKED;
@@ -317,8 +318,9 @@ ioapic_configure_io_interrupt(int32 gsi, uint32 config)
 		return;
 
 	uint8 pin = gsi - ioapic->global_interrupt_base;
-	TRACE("ioapic_configure_io_interrupt: gsi %ld -> io-apic %u pin %u; "
-		"config 0x%08lx\n", gsi, ioapic->number, pin, config);
+	TRACE("ioapic_configure_io_interrupt: gsi %" B_PRId32
+		" -> io-apic %u pin %u; config 0x%08" B_PRIx32 "\n", gsi,
+		ioapic->number, pin, config);
 
 	ioapic_configure_pin(*ioapic, pin, gsi, config,
 		IO_APIC_DELIVERY_MODE_FIXED);
@@ -595,7 +597,7 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 				// purely informational
 				acpi_madt_local_apic* info = (acpi_madt_local_apic*)apicEntry;
 				dprintf("found local apic with id %u, processor id %u, "
-					"flags 0x%08lx\n", info->Id, info->ProcessorId,
+					"flags 0x%08" B_PRIx32 "\n", info->Id, info->ProcessorId,
 					(uint32)info->LapicFlags);
 				break;
 			}
@@ -616,8 +618,8 @@ acpi_configure_source_overrides(acpi_table_madt* madt)
 				// TODO: take these into account, but at apic.cpp
 				acpi_madt_local_apic_override* info
 					= (acpi_madt_local_apic_override*)apicEntry;
-				dprintf("found local apic override with address 0x%016llx\n",
-					(uint64)info->Address);
+				dprintf("found local apic override with address 0x%016" B_PRIx64
+					"\n", (uint64)info->Address);
 				break;
 			}
 
@@ -646,9 +648,9 @@ acpi_set_interrupt_model(acpi_module_info* acpiModule, uint32 interruptModel)
 	parameter.pointer = &model;
 
 	dprintf("setting ACPI interrupt model to %s\n",
-		interruptModel == 0 ? "PIC"
-		: (interruptModel == 1 ? "APIC"
-		: (interruptModel == 2 ? "SAPIC"
+		interruptModel == ACPI_INTERRUPT_MODEL_PIC ? "PIC"
+		: (interruptModel == ACPI_INTERRUPT_MODEL_APIC ? "APIC"
+		: (interruptModel == ACPI_INTERRUPT_MODEL_SAPIC ? "SAPIC"
 		: "unknown")));
 
 	return acpiModule->evaluate_method(NULL, "\\_PIC", &parameter, NULL);
