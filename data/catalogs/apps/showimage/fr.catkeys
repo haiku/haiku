@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-ShowImage	575555985
+1	french	x-vnd.Haiku-ShowImage	3998703664
 Use as background…	Menus		Utiliser comme fond d’écran…
 File	Menus		Fichier
 Slide delay	Menus		Délai de diaporama
@@ -7,6 +7,7 @@ Zoom in	Menus		Zoom avant
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Le document « %s » a été modifié. Êtes-vous sûr de vouloir le fermer ?
 Page setup…	Menus		Mise en page…
 Print…	Menus		Imprimer…
+Get info…	Menus		Obtenir les informations…
 OK	SaveToFile		OK
 Previous page	Menus		Page précédente
 View	Menus		Vue
