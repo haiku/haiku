@@ -103,18 +103,18 @@ ECMDevice::Open()
 	// reset the device by switching the data interface to the disabled first
 	// interface and then enable it by setting the second actual data interface
 	const usb_configuration_info *config
-		= gUSBModule->get_nth_configuration(fDevice, 0);
+		= gUSBModule->get_configuration(fDevice);
 
 	gUSBModule->set_alt_interface(fDevice,
 		&config->interface[fDataInterfaceIndex].alt[0]);
 
 	// update to the changed config
-	config = gUSBModule->get_nth_configuration(fDevice, 0);
+	config = gUSBModule->get_configuration(fDevice);
 	gUSBModule->set_alt_interface(fDevice,
 		&config->interface[fDataInterfaceIndex].alt[1]);
 
 	// update again
-	config = gUSBModule->get_nth_configuration(fDevice, 0);
+	config = gUSBModule->get_configuration(fDevice);
 	usb_interface_info *interface = config->interface[fDataInterfaceIndex].active;
 	if (interface->endpoint_count < 2) {
 		TRACE_ALWAYS("setting the data alternate interface failed\n");
@@ -156,7 +156,7 @@ ECMDevice::Close()
 	// put the device into non-connected mode again by switching the data
 	// interface to the disabled alternate
 	const usb_configuration_info *config
-		= gUSBModule->get_nth_configuration(fDevice, 0);
+		= gUSBModule->get_configuration(fDevice);
 
 	gUSBModule->set_alt_interface(fDevice,
 		&config->interface[fDataInterfaceIndex].alt[0]);
@@ -368,7 +368,7 @@ status_t
 ECMDevice::_SetupDevice()
 {
 	const usb_configuration_info *config
-		= gUSBModule->get_nth_configuration(fDevice, 0);
+		= gUSBModule->get_configuration(fDevice);
 
 	if (config == NULL) {
 		TRACE_ALWAYS("failed to get device configuration\n");
