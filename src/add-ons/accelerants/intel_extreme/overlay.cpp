@@ -207,7 +207,7 @@ set_color_key(uint8 red, uint8 green, uint8 blue, uint8 redMask,
 static void
 set_color_key(const overlay_window* window)
 {
-	switch (gInfo->shared_info->current_mode.space) {
+	switch (gInfo->current_mode.space) {
 		case B_CMAP8:
 			set_color_key(0, 0, window->blue.value, 0x0, 0x0, 0xff);
 			break;
@@ -589,10 +589,10 @@ intel_configure_overlay(overlay_token overlayToken,
 			left = 0;
 		if (top < 0)
 			top = 0;
-		if (right > gInfo->shared_info->current_mode.timing.h_display)
-			right = gInfo->shared_info->current_mode.timing.h_display;
-		if (bottom > gInfo->shared_info->current_mode.timing.v_display)
-			bottom = gInfo->shared_info->current_mode.timing.v_display;
+		if (right > gInfo->current_mode.timing.h_display)
+			right = gInfo->current_mode.timing.h_display;
+		if (bottom > gInfo->current_mode.timing.v_display)
+			bottom = gInfo->current_mode.timing.v_display;
 		if (left >= right || top >= bottom) {
 			// overlay is not within visible bounds
 			hide_overlay();

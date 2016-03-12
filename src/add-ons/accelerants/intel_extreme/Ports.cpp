@@ -963,8 +963,24 @@ EmbeddedDisplayPort::EmbeddedDisplayPort()
 bool
 EmbeddedDisplayPort::IsConnected()
 {
-	if (!gInfo->shared_info->device_type.IsMobile())
-		return false;
+	addr_t portRegister = _PortRegister();
 
-	return DisplayPort::IsConnected();
+	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
+		portRegister);
+
+	if (!gInfo->shared_info->device_type.IsMobile()) {
+		TRACE("%s: skipping eDP on non-mobile GPU\n", __func__);
+		return false;
+	}
+
+	if ((read32(portRegister) & DISPLAY_MONITOR_PORT_DETECTED) == 0) {
+		TRACE("%s: %s link not detected\n", __func__, PortName());
+		return false;
+	}
+
+	HasEDID();
+
+	// If eDP has EDID, awesome. We use it.
+	// No EDID? The modesetting code falls back to VBIOS panel_mode
+	return true;
 }

@@ -40,6 +40,8 @@ struct accelerant_info {
 	intel_shared_info* shared_info;
 	area_id			shared_info_area;
 
+	display_mode	current_mode;	// pretty much a hack until per-display modes
+
 	display_mode*	mode_list;		// cloned list of standard display modes
 	area_id			mode_list_area;
 
@@ -68,9 +70,6 @@ struct accelerant_info {
 	int				device;
 	uint8			head_mode;
 	bool			is_clone;
-
-	// LVDS panel mode passed from the bios/startup.
-	display_mode	lvds_panel_mode;
 };
 
 
@@ -114,7 +113,6 @@ extern void setup_ring_buffer(ring_buffer &ringBuffer, const char* name);
 // modes.cpp
 extern void wait_for_vblank(void);
 extern void set_frame_buffer_base(void);
-extern void save_lvds_mode(void);
 extern status_t create_mode_list(void);
 
 // memory.cpp

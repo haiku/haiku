@@ -213,12 +213,12 @@ struct intel_shared_info {
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
 
-	display_mode	current_mode;
+	display_mode	panel_mode;			// VBIOS VBT panel mode
 	uint32			bytes_per_row;
 	uint32			bits_per_pixel;
 	uint32			dpms_mode;
 
-	area_id			registers_area;			// area of memory mapped registers
+	area_id			registers_area;		// area of memory mapped registers
 	uint32			register_blocks[REGISTER_BLOCK_COUNT];
 
 	uint8*			status_page;

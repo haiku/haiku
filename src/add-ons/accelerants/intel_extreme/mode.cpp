@@ -40,6 +40,9 @@
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
+#if 0
+// This hack needs to die. Leaving in for a little while
+// incase we *really* need it.
 static void
 retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 {
@@ -193,6 +196,7 @@ retrieve_current_mode(display_mode& mode, uint32 pllRegister)
 	mode.flags = B_8_BIT_DAC | B_HARDWARE_CURSOR | B_PARALLEL_ACCESS
 		| B_DPMS | B_SUPPORTS_OVERLAYS;
 }
+#endif
 
 
 static void
@@ -274,7 +278,8 @@ void
 set_frame_buffer_base()
 {
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
-	display_mode &mode = sharedInfo.current_mode;
+	display_mode &mode = gInfo->current_mode;
+
 	uint32 baseRegister;
 	uint32 surfaceRegister;
 
@@ -320,30 +325,29 @@ create_mode_list(void)
 			gInfo->has_edid = true;
 	}
 
-	if (!gInfo->has_edid) {
+	// If no EDID, but have vbt from driver, use that mode
+	if (!gInfo->has_edid && gInfo->shared_info->got_vbt) {
 		// We could not read any EDID info. Fallback to creating a list with
 		// only the mode set up by the BIOS.
+
 		// TODO: support lower modes via scaling and windowing
-		if ((gInfo->head_mode & HEAD_MODE_LVDS_PANEL) != 0
-			&& (gInfo->head_mode & HEAD_MODE_A_ANALOG) == 0) {
-			size_t size = (sizeof(display_mode) + B_PAGE_SIZE - 1)
-				& ~(B_PAGE_SIZE - 1);
+		size_t size = (sizeof(display_mode) + B_PAGE_SIZE - 1)
+			& ~(B_PAGE_SIZE - 1);
 
-			display_mode* list;
-			area_id area = create_area("intel extreme modes",
-				(void**)&list, B_ANY_ADDRESS, size, B_NO_LOCK,
-				B_READ_AREA | B_WRITE_AREA);
-			if (area < 0)
-				return area;
+		display_mode* list;
+		area_id area = create_area("intel extreme modes",
+			(void**)&list, B_ANY_ADDRESS, size, B_NO_LOCK,
+			B_READ_AREA | B_WRITE_AREA);
+		if (area < 0)
+			return area;
 
-			memcpy(list, &gInfo->lvds_panel_mode, sizeof(display_mode));
+		memcpy(list, &gInfo->shared_info->panel_mode, sizeof(display_mode));
 
-			gInfo->mode_list_area = area;
-			gInfo->mode_list = list;
-			gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
-			gInfo->shared_info->mode_count = 1;
-			return B_OK;
-		}
+		gInfo->mode_list_area = area;
+		gInfo->mode_list = list;
+		gInfo->shared_info->mode_list_area = gInfo->mode_list_area;
+		gInfo->shared_info->mode_count = 1;
+		return B_OK;
 	}
 
 	// Otherwise return the 'real' list of modes
@@ -370,24 +374,6 @@ wait_for_vblank(void)
 		25000);
 		// With the output turned off via DPMS, we might not get any interrupts
 		// anymore that's why we don't wait forever for it.
-}
-
-
-/*! Store away panel information if identified on startup
-	(used for pipe B->lvds).
-*/
-void
-save_lvds_mode(void)
-{
-	// dump currently programmed mode.
-	display_mode biosMode;
-	retrieve_current_mode(biosMode, INTEL_DISPLAY_B_PLL);
-
-	sanitize_display_mode(biosMode);
-		// The BIOS mode may not be a valid mode, as LVDS output does not
-		// really care about the sync values
-
-	gInfo->lvds_panel_mode = biosMode;
 }
 
 
@@ -488,7 +474,7 @@ intel_set_display_mode(display_mode* mode)
 			base) < B_OK) {
 		// oh, how did that happen? Unfortunately, there is no really good way
 		// back
-		if (intel_allocate_memory(sharedInfo.current_mode.virtual_height
+		if (intel_allocate_memory(gInfo->current_mode.virtual_height
 				* sharedInfo.bytes_per_row, 0, base) == B_OK) {
 			sharedInfo.frame_buffer = base;
 			sharedInfo.frame_buffer_offset = base
@@ -618,8 +604,10 @@ intel_set_display_mode(display_mode* mode)
 		write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
 
 	// update shared info
+	gInfo->current_mode = target;
+
+	// TODO: move to gInfo
 	sharedInfo.bytes_per_row = bytesPerRow;
-	sharedInfo.current_mode = target;
 	sharedInfo.bits_per_pixel = bitsPerPixel;
 
 	set_frame_buffer_base();
@@ -637,7 +625,7 @@ intel_get_display_mode(display_mode* _currentMode)
 {
 	CALLED();
 
-	*_currentMode = gInfo->shared_info->current_mode;
+	*_currentMode = gInfo->current_mode;
 
 	// This seems unreliable. We should always know the current_mode
 	//retrieve_current_mode(*_currentMode, INTEL_DISPLAY_A_PLL);
@@ -710,7 +698,7 @@ intel_move_display(uint16 horizontalStart, uint16 verticalStart)
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	Autolock locker(sharedInfo.accelerant_lock);
 
-	display_mode &mode = sharedInfo.current_mode;
+	display_mode &mode = gInfo->current_mode;
 
 	if (horizontalStart + mode.timing.h_display > mode.virtual_width
 		|| verticalStart + mode.timing.v_display > mode.virtual_height)
