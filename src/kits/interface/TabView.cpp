@@ -863,13 +863,7 @@ BTabView::TabFrame(int32 index) const
 
 	float width = 100.0f;
 	float height = fTabHeight;
-	float borderOffset = 0.0f;
 	float offset = BControlLook::ComposeSpacing(B_USE_WINDOW_SPACING);
-
-	// Do not use 2.0f for B_NO_BORDER, that will look yet different
-	// again (handled in DrawTabs()).
-	if (fBorderStyle == B_PLAIN_BORDER)
-		borderOffset = 1.0f;
 
 	switch (fTabWidthSetting) {
 		case B_WIDTH_FROM_LABEL:
@@ -879,9 +873,8 @@ BTabView::TabFrame(int32 index) const
 				x += StringWidth(TabAt(i)->Label()) + 20.0f;
 			}
 
-			return BRect(offset + x - borderOffset, 0.0f,
-				offset + x + StringWidth(TabAt(index)->Label()) + 20.0f
-					- borderOffset,
+			return BRect(offset + x, 0.0f,
+				offset + x + StringWidth(TabAt(index)->Label()) + 20.0f,
 				height);
 		}
 
@@ -896,8 +889,8 @@ BTabView::TabFrame(int32 index) const
 
 		case B_WIDTH_AS_USUAL:
 		default:
-			return BRect(offset + index * width - borderOffset, 0.0f,
-				offset + index * width + width - borderOffset, height);
+			return BRect(offset + index * width, 0.0f,
+				offset + index * width + width, height);
 	}
 
 	// TODO: fix to remove "offset" in DrawTab and DrawLabel ...
