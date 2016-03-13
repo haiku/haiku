@@ -269,7 +269,8 @@ BColorControl::SetValue(int32 value)
 
 	if (fPaletteMode) {
 		//workaround when two indexes have the same color
-		rgb_color c = BScreen(Window()).ColorForIndex(fSelectedPaletteColorIndex);
+		rgb_color c
+			= BScreen(Window()).ColorForIndex(fSelectedPaletteColorIndex);
 		c.alpha = 255;
 		if (fSelectedPaletteColorIndex == -1 || c != c2) {
 				//here SetValue hasn't been called by mouse tracking
@@ -341,7 +342,7 @@ BColorControl::AttachedToWindow()
 	fGreenText->SetTarget(this);
 	fBlueText->SetTarget(this);
 
-	if (fBitmap)
+	if (fBitmap != NULL)
 		_InitOffscreen();
 }
 
@@ -491,7 +492,8 @@ BColorControl::_DrawSelectors(BView* target)
 	if (fPaletteMode) {
 		if (fSelectedPaletteColorIndex != -1) {
 			target->SetHighColor(lightenmax);
-			target->StrokeRect(_PaletteSelectorFrame(fSelectedPaletteColorIndex));
+			target->StrokeRect(
+				_PaletteSelectorFrame(fSelectedPaletteColorIndex));
 		}
 	} else {
 		rgb_color color = ValueAsColor();
@@ -666,18 +668,22 @@ BColorControl::SetLayout(color_control_layout layout)
 			fColumns = 4;
 			fRows = 64;
 			break;
+
 		case B_CELLS_8x32:
 			fColumns = 8;
 			fRows = 32;
 			break;
+
 		case B_CELLS_16x16:
 			fColumns = 16;
 			fRows = 16;
 			break;
+
 		case B_CELLS_32x8:
 			fColumns = 32;
 			fRows = 8;
 			break;
+
 		case B_CELLS_64x4:
 			fColumns = 64;
 			fRows = 4;
@@ -694,12 +700,16 @@ BColorControl::Layout() const
 {
 	if (fColumns == 4 && fRows == 64)
 		return B_CELLS_4x64;
+
 	if (fColumns == 8 && fRows == 32)
 		return B_CELLS_8x32;
+
 	if (fColumns == 16 && fRows == 16)
 		return B_CELLS_16x16;
+
 	if (fColumns == 32 && fRows == 8)
 		return B_CELLS_32x8;
+
 	if (fColumns == 64 && fRows == 4)
 		return B_CELLS_64x4;
 
@@ -1029,22 +1039,27 @@ BColorControl::Perform(perform_code code, void* _data)
 			((perform_data_min_size*)_data)->return_value
 				= BColorControl::MinSize();
 			return B_OK;
+
 		case PERFORM_CODE_MAX_SIZE:
 			((perform_data_max_size*)_data)->return_value
 				= BColorControl::MaxSize();
 			return B_OK;
+
 		case PERFORM_CODE_PREFERRED_SIZE:
 			((perform_data_preferred_size*)_data)->return_value
 				= BColorControl::PreferredSize();
 			return B_OK;
+
 		case PERFORM_CODE_LAYOUT_ALIGNMENT:
 			((perform_data_layout_alignment*)_data)->return_value
 				= BColorControl::LayoutAlignment();
 			return B_OK;
+
 		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
 			((perform_data_has_height_for_width*)_data)->return_value
 				= BColorControl::HasHeightForWidth();
 			return B_OK;
+
 		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
 		{
 			perform_data_get_height_for_width* data
@@ -1053,12 +1068,14 @@ BColorControl::Perform(perform_code code, void* _data)
 				&data->max, &data->preferred);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
 			BColorControl::SetLayout(data->layout);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
 			perform_data_layout_invalidated* data
@@ -1066,11 +1083,13 @@ BColorControl::Perform(perform_code code, void* _data)
 			BColorControl::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_DO_LAYOUT:
 		{
 			BColorControl::DoLayout();
 			return B_OK;
 		}
+
 		case PERFORM_CODE_SET_ICON:
 		{
 			perform_data_set_icon* data = (perform_data_set_icon*)_data;
