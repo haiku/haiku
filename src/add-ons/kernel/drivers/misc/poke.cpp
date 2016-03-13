@@ -41,8 +41,6 @@ int32 api_version = B_CUR_DRIVER_API_VERSION;
 isa_module_info* isa;
 pci_module_info* pci;
 
-static int32 open_count;
-
 
 status_t
 init_hardware(void)
@@ -54,8 +52,6 @@ init_hardware(void)
 status_t
 init_driver(void)
 {
-	open_count = 0;
-
 	if (get_module(B_ISA_MODULE_NAME, (module_info**)&isa) < B_OK)
 		return ENOSYS;
 
@@ -101,11 +97,6 @@ poke_open(const char* name, uint32 flags, void** cookie)
 	if (getuid() != 0 && geteuid() != 0)
 		return EPERM;
 
-	if (atomic_add(&open_count, 1) != 0) {
-		atomic_add(&open_count, -1);
-		return B_BUSY;
-	}
-
 	return B_OK;
 }
 
@@ -120,7 +111,6 @@ poke_close(void* cookie)
 status_t
 poke_free(void* cookie)
 {
-	atomic_add(&open_count, -1);
 	return B_OK;
 }
 
