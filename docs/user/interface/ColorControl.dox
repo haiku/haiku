@@ -119,7 +119,7 @@ colorControl->SetValue(0x336698);
 /*!
 	\fn BColorControl::BColorControl(BPoint leftTop,
 		color_control_layout layout, float cellSize, const char *name,
-		BMessage *message = NULL, bool bufferedDrawing = false)
+		BMessage *message = NULL, bool useOffscreen = false)
 	\brief Constructs a new color control object.
 
 	\param leftTop location of the left top corner of the frame rectangle
@@ -136,10 +136,9 @@ colorControl->SetValue(0x336698);
 	\param name The name of the color control.
 	\param message The optional \a message to send to a target in response
 		to a change in color value.
-	\param bufferedDrawing If \c true, all on-screen changes are first
+	\param useOffscreen If \c true, all on-screen changes are first
 		made to an off-screen bitmap and then copied to the screen
-		making the drawing smoother, but requiring more memory
-		(currently unused).
+		making the drawing smoother, but requiring more memory.
 
 	\since BeOS R3
 */

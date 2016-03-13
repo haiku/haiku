@@ -49,12 +49,12 @@ static const uint32 kRampCount = 4;
 
 
 BColorControl::BColorControl(BPoint leftTop, color_control_layout layout,
-	float cellSize, const char* name, BMessage* message, bool bufferedDrawing)
+	float cellSize, const char* name, BMessage* message, bool useOffscreen)
 	:
 	BControl(BRect(leftTop, leftTop), name, NULL, message,
 		B_FOLLOW_LEFT | B_FOLLOW_TOP, B_WILL_DRAW | B_NAVIGABLE)
 {
-	_InitData(layout, cellSize, bufferedDrawing, NULL);
+	_InitData(layout, cellSize, useOffscreen, NULL);
 }
 
 
