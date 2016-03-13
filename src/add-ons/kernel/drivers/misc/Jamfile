@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons kernel drivers misc ;
 
 UsePrivateHeaders drivers ;
+UsePrivateKernelHeaders ;
 
 KernelAddon <driver>mem :
 	mem.c
