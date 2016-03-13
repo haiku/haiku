@@ -125,12 +125,11 @@ private:
 			BTextControl*		fGreenText;
 			BTextControl*		fBlueText;
 
-			BBitmap*			fBitmap;
-			BView*				fOffscreenView;
+			BBitmap*			fOffscreenBitmap;
 
 			int16				fFocusedRamp;
 			int16				fClickedRamp;
-			uint32				_reserved[2];
+			uint32				_reserved[3];
 };
 
 inline void
