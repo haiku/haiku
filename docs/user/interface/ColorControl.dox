@@ -119,7 +119,7 @@ colorControl->SetValue(0x336698);
 /*!
 	\fn BColorControl::BColorControl(BPoint leftTop,
 		color_control_layout layout, float cellSize, const char *name,
-		BMessage *message = NULL, bool useOffscreen = false)
+		BMessage* message = NULL, bool useOffscreen = false)
 	\brief Constructs a new color control object.
 
 	\param leftTop location of the left top corner of the frame rectangle
