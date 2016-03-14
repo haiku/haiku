@@ -70,6 +70,7 @@ Application MediaPlayer :
 	PLItemsCommand.cpp
 	RandomizePLItemsCommand.cpp
 	RemovePLItemsCommand.cpp
+	UrlPlaylistItem.cpp
 
 	# settings
 	Settings.cpp
@@ -114,7 +115,7 @@ Application MediaPlayer :
 	VideoView.cpp
 
 	: be game media tracker translation textencoding [ TargetLibstdc++ ]
-		localestub shared
+		localestub shared bnetapi
 	: MediaPlayer.rdef
 ;
 
