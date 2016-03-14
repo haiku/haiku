@@ -464,7 +464,7 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 			if (_IsQuery(type))
 				AppendQueryToPlaylist(ref, &subPlaylist);
 			else {
-				if (!ExtraMediaExists(this, ref)) {
+				if (!_ExtraMediaExists(this, ref)) {
 					AppendToPlaylistRecursive(ref, &subPlaylist);
 				}
 			}
@@ -520,7 +520,7 @@ Playlist::AppendToPlaylistRecursive(const entry_ref& ref, Playlist* playlist)
 		BString mimeString = _MIMEString(&ref);
 		if (_IsMediaFile(mimeString)) {
 			PlaylistItem* item = new (std::nothrow) FilePlaylistItem(ref);
-			if (!ExtraMediaExists(playlist, ref)) {
+			if (!_ExtraMediaExists(playlist, ref)) {
 				_BindExtraMedia(item);
 				if (item != NULL && !playlist->AddItem(item))
 					delete item;
@@ -601,7 +601,26 @@ Playlist::NotifyImportFailed()
 
 
 /*static*/ bool
-Playlist::ExtraMediaExists(Playlist* playlist, const entry_ref& ref)
+Playlist::ExtraMediaExists(Playlist* playlist, PlaylistItem* item)
+{
+	FilePlaylistItem* fileItem = dynamic_cast<FilePlaylistItem*>(item);
+	if (fileItem != NULL)
+		return _ExtraMediaExists(playlist, fileItem->Ref());
+
+	// If we are here let's see if it is an url
+	UrlPlaylistItem* urlItem = dynamic_cast<UrlPlaylistItem*>(item);
+	if (urlItem == NULL)
+		return true;
+
+	return _ExtraMediaExists(playlist, urlItem->Url());
+}
+
+
+// #pragma mark - private
+
+
+/*static*/ bool
+Playlist::_ExtraMediaExists(Playlist* playlist, const entry_ref& ref)
 {
 	BString exceptExtension = _GetExceptExtension(BPath(&ref).Path());
 	
@@ -617,7 +636,18 @@ Playlist::ExtraMediaExists(Playlist* playlist, const entry_ref& ref)
 }
 
 
-// #pragma mark - private
+/*static*/ bool
+Playlist::_ExtraMediaExists(Playlist* playlist, BUrl* url)
+{
+	for (int32 i = 0; i < playlist->CountItems(); i++) {
+		UrlPlaylistItem* compare = dynamic_cast<UrlPlaylistItem*>(playlist->ItemAt(i));
+		if (compare == NULL)
+			continue;
+		if (compare->Url() != url)
+			return true;
+	}
+	return false;
+}
 
 
 /*static*/ bool
