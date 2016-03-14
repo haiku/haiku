@@ -216,7 +216,7 @@ AddOnManager::GetStreamers(entry_ref* outRefs, int32* outCount,
 			outRefs++;
 	}
 
-	return B_ERROR;
+	return B_OK;
 }
 
 
