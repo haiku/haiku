@@ -82,6 +82,24 @@ do_request(T& request, const char* name, int option)
 }
 
 
+template<> status_t
+do_request<ieee80211req>(ieee80211req& request, const char* name, int option)
+{
+	int socket = ::socket(AF_INET, SOCK_DGRAM, 0);
+	if (socket < 0)
+		return errno;
+
+	FileDescriptorCloser closer(socket);
+
+	strlcpy(((struct ieee80211req&)request).i_name, name, IFNAMSIZ);
+
+	if (ioctl(socket, option, &request, sizeof(request)) < 0)
+		return errno;
+
+	return B_OK;
+}
+
+
 //! Read a 16 bit little endian value
 static uint16
 read_le16(uint8*& data, int32& length)
@@ -643,6 +661,24 @@ bool
 BNetworkDevice::IsWireless()
 {
 	return IFM_TYPE(Media()) == IFM_IEEE80211;
+}
+
+
+status_t
+BNetworkDevice::Control(int option, void* request)
+{
+	switch (IFM_TYPE(Media())) {
+		case IFM_ETHER:
+			return do_request(*reinterpret_cast<ifreq*>(request),
+				&fName[0], option);
+
+		case IFM_IEEE80211:
+			return do_request(*reinterpret_cast<ieee80211req*>(request),
+				&fName[0], option);
+
+		default:
+			return B_ERROR;
+	}
 }
 
 

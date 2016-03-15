@@ -96,6 +96,8 @@ public:
 			bool				IsEthernet();
 			bool				IsWireless();
 
+			status_t			Control(int option, void* request);
+
 			status_t			Scan(bool wait = true,
 									bool forceRescan = true);
 
