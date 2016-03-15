@@ -784,6 +784,8 @@ RemotePackageRepository HaikuPorts
 	libtorrent_rasterbar_x86_devel-1.0.6-2
 	libusb_x86-1.0.20-2
 	libusb_x86_devel-1.0.20-2
+	libusb_compat_x86-0.1.5-4
+	libusb_compat_x86_devel-0.1.5-4
 	libuuid_x86-1.0.3-2
 	libuuid_x86_devel-1.0.3-2
 	libvorbis_x86-1.3.5-2
@@ -1215,6 +1217,7 @@ RemotePackageRepository HaikuPorts
 	libusb
 	libusb_x86
 	libusb_compat
+	libusb_compat_x86
 	libutf8proc
 	libuuid
 	libuuid_x86
