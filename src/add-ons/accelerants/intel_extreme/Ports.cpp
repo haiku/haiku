@@ -984,3 +984,100 @@ EmbeddedDisplayPort::IsConnected()
 	// No EDID? The modesetting code falls back to VBIOS panel_mode
 	return true;
 }
+
+
+// #pragma mark - Digital Display Port
+
+
+DigitalDisplayInterface::DigitalDisplayInterface(port_index index,
+		const char* baseName)
+    :
+    Port(index, baseName)
+{
+	// As of Haswell, Intel decided to change eDP ports to a "DDI" bus...
+	// on a dare because the hardware engineers were drunk one night.
+}
+
+
+addr_t
+DigitalDisplayInterface::_PortRegister()
+{
+	switch (PortIndex()) {
+		case INTEL_PORT_A:
+			return DDI_BUF_CTL_A;
+		case INTEL_PORT_B:
+			return DDI_BUF_CTL_B;
+		default:
+			return 0;
+	}
+	return 0;
+}
+
+
+addr_t
+DigitalDisplayInterface::_DDCRegister()
+{
+	// TODO: No idea, does DDI have DDC?
+	return 0;
+}
+
+
+bool
+DigitalDisplayInterface::IsConnected()
+{
+	addr_t portRegister = _PortRegister();
+
+	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
+		portRegister);
+
+	if (portRegister == 0)
+		return false;
+
+	if ((read32(portRegister) & DDI_INIT_DISPLAY_DETECTED) == 0) {
+		TRACE("%s: %s link not detected\n", __func__, PortName());
+		return false;
+	}
+
+	HasEDID();
+
+	return true;
+}
+
+
+status_t
+DigitalDisplayInterface::SetDisplayMode(display_mode* target, uint32 colorMode)
+{
+	TRACE("%s: %s %dx%d\n", __func__, PortName(), target->virtual_width,
+		target->virtual_height);
+
+	if (fPipe == NULL) {
+		ERROR("%s: Setting display mode without assigned pipe!\n", __func__);
+		return B_ERROR;
+	}
+
+	// Train FDI if it exists
+	FDILink* link = fPipe->FDI();
+	if (link != NULL)
+		link->Train(target);
+
+	pll_divisors divisors;
+	compute_pll_divisors(target, &divisors, false);
+
+	uint32 extraPLLFlags = 0;
+	if (gInfo->shared_info->device_type.Generation() >= 3)
+		extraPLLFlags |= DISPLAY_PLL_MODE_NORMAL;
+
+	// Program general pipe config
+	fPipe->Configure(target);
+
+	// Program pipe PLL's
+	fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
+
+	// Program target display mode
+	fPipe->ConfigureTimings(target);
+
+	// Set fCurrentMode to our set display mode
+	memcpy(&fCurrentMode, target, sizeof(display_mode));
+
+	return B_OK;
+}

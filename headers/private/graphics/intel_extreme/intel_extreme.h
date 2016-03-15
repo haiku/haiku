@@ -162,6 +162,12 @@ struct DeviceType {
 		return InFamily(INTEL_FAMILY_SER5);
 	}
 
+	bool HasDDI() const
+	{
+		// Intel Digital Display Interface
+		return InGroup(INTEL_GROUP_HAS) || (Generation() >= 8);
+	}
+
 	int Generation() const
 	{
 		if (InFamily(INTEL_FAMILY_7xx))
@@ -541,6 +547,18 @@ struct intel_free_graphics_memory {
 #define GEN4_HDMI_PORT_B				(0x1140 | REGS_SOUTH_TRANSCODER_PORT)
 #define GEN4_HDMI_PORT_C				(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
 #define CHV_HDMI_PORT_D					(0x116C | REGS_SOUTH_TRANSCODER_PORT)
+
+// DDI Buffer Control (This replaces DP on Haswell+)
+#define DDI_BUF_CTL_A					(0x4000 | REGS_NORTH_PIPE_AND_PORT)
+#define DDI_BUF_CTL_B					(0x4100 | REGS_NORTH_PIPE_AND_PORT)
+#define 	DDI_BUF_CTL_ENABLE			(1 << 31)
+#define 	DDI_BUF_TRANS_SELECT(n)		((n) << 24)
+#define 	DDI_BUF_EMP_MASK			(0xf << 24)
+#define 	DDI_BUF_PORT_REVERSAL		(1 << 16)
+#define 	DDI_BUF_IS_IDLE				(1 << 7)
+#define 	DDI_A_4_LANES				(1 << 4)
+#define 	DDI_PORT_WIDTH(width)		(((width) - 1) << 1)
+#define 	DDI_INIT_DISPLAY_DETECTED	(1 << 0)
 
 // DP_A always @ 6xxxx, DP_B-DP_D move with PCH
 #define INTEL_DISPLAY_PORT_A			(0x4000 | REGS_NORTH_PIPE_AND_PORT)

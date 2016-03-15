@@ -199,4 +199,25 @@ virtual	uint32						Type() const
 virtual	bool						IsConnected();
 };
 
+
+class DigitalDisplayInterface : public Port {
+public:
+									DigitalDisplayInterface(
+										port_index index = INTEL_PORT_A,
+										const char* baseName = "Digital Display Interface");
+
+virtual	uint32						Type() const
+										{ return INTEL_PORT_TYPE_DVI; }
+
+virtual	bool						IsConnected();
+
+virtual status_t					SetDisplayMode(display_mode* mode,
+										uint32 colorMode);
+
+protected:
+virtual	addr_t						_DDCRegister();
+virtual addr_t						_PortRegister();
+};
+
+
 #endif // INTEL_PORTS_H

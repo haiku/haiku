@@ -306,9 +306,37 @@ probe_ports()
 			delete displayPort;
 	}
 
+	// Digital Display Interface
+	if (gInfo->shared_info->device_type.HasDDI()) {
+		for (int i = INTEL_PORT_A; i <= INTEL_PORT_B; i++) {
+			Port* ddiPort
+				= new(std::nothrow) DigitalDisplayInterface((port_index)i);
+
+			if (ddiPort == NULL)
+				return B_NO_MEMORY;
+
+			if (ddiPort->IsConnected())
+				gInfo->ports[gInfo->port_count++] = ddiPort;
+			else
+				delete ddiPort;
+		}
+	}
+
+	// Ensure DP_A isn't already taken (or DDI)
+	if (!has_connected_port((port_index)INTEL_PORT_A, INTEL_PORT_TYPE_ANY)) {
+		// also always try eDP, it'll also just fail if not applicable
+		Port* eDPPort = new(std::nothrow) EmbeddedDisplayPort();
+		if (eDPPort == NULL)
+			return B_NO_MEMORY;
+		if (eDPPort->IsConnected())
+			gInfo->ports[gInfo->port_count++] = eDPPort;
+		else
+			delete eDPPort;
+	}
+
 	for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {
 		if (has_connected_port((port_index)i, INTEL_PORT_TYPE_ANY)) {
-			// we overlap with a DisplayPort, this is not HDMI
+			// Ensure port not already claimed by something like DDI
 			continue;
 		}
 
@@ -345,15 +373,6 @@ probe_ports()
 		gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
 	} else
 		delete lvdsPort;
-
-	// also always try eDP, it'll also just fail if not applicable
-	Port* eDPPort = new(std::nothrow) EmbeddedDisplayPort();
-	if (eDPPort == NULL)
-		return B_NO_MEMORY;
-	if (eDPPort->IsConnected())
-		gInfo->ports[gInfo->port_count++] = eDPPort;
-	else
-		delete eDPPort;
 
 	// then finally always try the analog port
 	Port* analogPort = new(std::nothrow) AnalogPort();
