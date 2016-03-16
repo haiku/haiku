@@ -63,8 +63,6 @@ RemotePackageRepository HaikuPorts
 	bzip2_devel-1.0.6-5
 	cdrtools-3.02~a06-2
 	cdrtools_devel-3.02~a06-2
-	clang-3.4-3
-	clang_analysis-3.4-3
 	clipdinger-0.5.2-1
 	cmake-3.4.3-1
 	coreutils-8.24-1
@@ -213,7 +211,7 @@ RemotePackageRepository HaikuPorts
 	libxml2_python-2.9.3-2
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
-	llvm-3.5.2-1
+	llvm-3.8.0-2
 	lz4-r131-1
 	lz4_devel-r131-1
 	lzo-2.09-1
@@ -429,7 +427,6 @@ RemotePackageRepository HaikuPorts
 	burnitnow
 	bzip2
 	cdrtools
-	clang
 	cmake
 	clipdinger
 	coreutils
