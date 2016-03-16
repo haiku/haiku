@@ -212,6 +212,8 @@ RemotePackageRepository HaikuPorts
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
 	llvm-3.8.0-2
+	llvm_clang-3.8.0-2
+	llvm_clang_analysis-3.8.0-2
 	lz4-r131-1
 	lz4_devel-r131-1
 	lzo-2.09-1
