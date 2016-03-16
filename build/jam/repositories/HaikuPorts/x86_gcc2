@@ -802,7 +802,9 @@ RemotePackageRepository HaikuPorts
 	libxslt_x86_devel-1.1.28-5
 	libzip_x86-0.11.2-1
 	libzip_x86_devel-0.11.2-1
-	llvm_x86-3.5.2-1
+	llvm_x86-3.8.0-2
+	llvm_x86_clang-3.8.0-2
+	llvm_x86_clang_analysis-3.8.0-2
 	lmms_x86-1.2.0_git-1
 	lua_x86-5.2.3-2
 	lua_x86_devel-5.2.3-2
