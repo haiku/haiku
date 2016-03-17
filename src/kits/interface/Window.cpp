@@ -18,41 +18,41 @@
 #include <stdlib.h>
 
 #include <Application.h>
+#include <AppMisc.h>
+#include <AppServerLink.h>
+#include <ApplicationPrivate.h>
 #include <Autolock.h>
 #include <Bitmap.h>
 #include <Button.h>
+#include <DirectMessageTarget.h>
 #include <FindDirectory.h>
+#include <InputServerTypes.h>
 #include <Layout.h>
 #include <LayoutUtils.h>
 #include <MenuBar.h>
 #include <MenuItem.h>
+#include <MenuPrivate.h>
+#include <MessagePrivate.h>
 #include <MessageQueue.h>
 #include <MessageRunner.h>
 #include <Path.h>
+#include <PortLink.h>
 #include <PropertyInfo.h>
 #include <Roster.h>
-#include <Screen.h>
-#include <String.h>
-#include <UnicodeChar.h>
-
-#include <AppMisc.h>
-#include <AppServerLink.h>
-#include <ApplicationPrivate.h>
-#include <binary_compatibility/Interface.h>
-#include <DirectMessageTarget.h>
-#include <input_globals.h>
-#include <InputServerTypes.h>
-#include <MenuPrivate.h>
-#include <MessagePrivate.h>
-#include <PortLink.h>
 #include <RosterPrivate.h>
+#include <Screen.h>
 #include <ServerProtocol.h>
-#include <ServerProtocolStructs.h>
+#include <String.h>
+#include <TextView.h>
 #include <TokenSpace.h>
 #include <ToolTipManager.h>
 #include <ToolTipWindow.h>
-#include <tracker_private.h>
+#include <UnicodeChar.h>
 #include <WindowPrivate.h>
+
+#include <binary_compatibility/Interface.h>
+#include <input_globals.h>
+#include <tracker_private.h>
 
 
 //#define DEBUG_WIN
