@@ -729,9 +729,11 @@ BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 					case B_F5_KEY:
 						PostMessage(RELOAD);
 						break;
+
 					case B_F11_KEY:
 						PostMessage(TOGGLE_FULLSCREEN);
 						break;
+
 					default:
 						break;
 				}
