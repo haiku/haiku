@@ -43,7 +43,7 @@ public:
 		// a BBufferIO or a BMediaIO.
 		if (dynamic_cast<BBufferIO *>(source) == NULL) {
 			// Source needs to be at least a BPositionIO to wrap with a BBufferIO
-			if (IsSeekable() && (IsMedia() && !fMedia->IsCached())) {
+			if (IsSeekable()) {
 				fPosition = new(std::nothrow) BBufferIO(fPosition, 65536, true);
 				if (fPosition == NULL) {
 					fErr = B_NO_MEMORY;
@@ -51,7 +51,7 @@ public:
 				}
 				// We have to reset our BDataIO reference too
 				fData = dynamic_cast<BDataIO*>(fPosition);
-			} else if (!IsMedia()) {
+			} else {
 				// In this case we have to supply our own form
 				// of pseudo-seekable object from a non-seekable
 				// BDataIO.
@@ -76,27 +76,25 @@ public:
 		if (IsSeekable())
 			return fPosition->ReadAt(position, buffer, size);
 
-		if (IsEndless()) {
-			off_t bufSize = 0;
-			ssize_t ret = 0;
-			fFallbackBuffer->GetSize(&bufSize);
+		off_t bufSize = 0;
+		ssize_t ret = B_NOT_SUPPORTED;
+		fFallbackBuffer->GetSize(&bufSize);
 
-			if (fFallbackBuffer->Position() == position
-					&& position+size > bufSize) {
-				// TODO: Possibly part of the data we have
-				// to supply is cached.
-				ret = fData->Read(buffer, size);
+		if (fFallbackBuffer->Position() == position
+				&& position+size > bufSize) {
+			// TODO: Possibly part of the data we have
+			// to supply is cached.
+			ret = fData->Read(buffer, size);
+			if (ret > 0)
 				fFallbackBuffer->Write(buffer, ret);
-				return ret;
-			}
 
-			if (position+size <= bufSize) {
-				ret = fFallbackBuffer->ReadAt(position, buffer, size);
-				return ret;
-			}
+			return ret;
 		}
 
-		return B_NOT_SUPPORTED;
+		if (position+size <= bufSize)
+			return fFallbackBuffer->ReadAt(position, buffer, size);
+
+		return ret;
 	}
 
 	virtual	ssize_t				WriteAt(off_t position, const void* buffer,
@@ -105,13 +103,12 @@ public:
 		if (IsSeekable())
 			return fPosition->WriteAt(position, buffer, size);
 
-		if (IsEndless()) {
-			off_t bufSize = 0;
-			fFallbackBuffer->GetSize(&bufSize);
-			if (position == bufSize) {
-				fData->Write(buffer, size);
-				fFallbackBuffer->WriteAt(bufSize, buffer, size);
-			}
+		off_t bufSize = 0;
+		fFallbackBuffer->GetSize(&bufSize);
+		if (position == bufSize) {
+			ssize_t ret = fData->Write(buffer, size);
+			fFallbackBuffer->WriteAt(bufSize, buffer, size);
+			return ret;
 		}
 
 		return B_NOT_SUPPORTED;
@@ -122,12 +119,11 @@ public:
 		if (IsSeekable())
 			return fPosition->Seek(position, seekMode);
 
-		if (IsEndless()) {
-			off_t bufSize = 0;
-			fFallbackBuffer->GetSize(&bufSize);
-			if (position <= bufSize)
-				return fFallbackBuffer->Seek(position, seekMode);
-		}
+		off_t bufSize = 0;
+		fFallbackBuffer->GetSize(&bufSize);
+		if (position <= bufSize)
+			return fFallbackBuffer->Seek(position, seekMode);
+
 		return B_NOT_SUPPORTED;
 	}
 
@@ -136,10 +132,7 @@ public:
 		if (IsSeekable())
 			return fPosition->Position();
 
-		if (IsEndless())
-			return fFallbackBuffer->Position();
-
-		return B_NOT_SUPPORTED;
+		return fFallbackBuffer->Position();
 	}
 
 	virtual	status_t			SetSize(off_t size)
@@ -166,12 +159,6 @@ public:
 			return fMedia->IsSeekable();
 
 		return fPosition != NULL;
-	}
-
-	virtual bool				IsCached() const
-	{
-		// Our wrapper class is always cached
-		return true;
 	}
 
 	virtual	bool				IsEndless() const
@@ -592,8 +579,8 @@ PluginManager::CreateStreamer(Streamer** streamer, BUrl* url, BDataIO** source)
 	status_t ret = AddOnManager::GetInstance()->GetStreamers(refs, &count,
 		MAX_STREAMERS);
 	if (ret != B_OK) {
-		printf("PluginManager::CreateStreamer: can't get list of readers: %s\n",
-			strerror(ret));
+		printf("PluginManager::CreateStreamer: can't get list of streamers:"
+			" %s\n", strerror(ret));
 		return ret;
 	}
 
