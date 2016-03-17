@@ -3803,6 +3803,17 @@ BWindow::_HandleKeyDown(BMessage* event)
 			return true;
 		}
 
+		// Send Command+Left and Command+Right to textview if it has focus
+		if (key == B_LEFT_ARROW || key == B_RIGHT_ARROW) {
+			// check key before doing expensive dynamic_cast
+			BTextView* textView = dynamic_cast<BTextView*>(CurrentFocus());
+			if (textView != NULL) {
+				textView->KeyDown(bytes, modifiers);
+				// eat the event
+				return true;
+			}
+		}
+
 		// Pretend that the user opened a menu, to give the subclass a
 		// chance to update it's menus. This may install new shortcuts,
 		// which is why we have to call it here, before trying to find

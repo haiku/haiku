@@ -707,21 +707,7 @@ BrowserWindow::DispatchMessage(BMessage* message, BHandler* target)
 	if ((message->what == B_KEY_DOWN || message->what == B_UNMAPPED_KEY_DOWN)
 		&& message->FindString("bytes", &bytes) == B_OK
 		&& message->FindInt32("modifiers", &modifierKeys) == B_OK) {
-		modifierKeys = (int32)((uint32)modifierKeys & kModifiers);
-		BTextView* textView = dynamic_cast<BTextView*>(CurrentFocus());
-		if (bytes[0] == B_LEFT_ARROW && modifierKeys == B_COMMAND_KEY) {
-			if (textView != NULL)
-				textView->KeyDown(bytes, modifierKeys);
-			else
-				PostMessage(GO_BACK);
-			return;
-		} else if (bytes[0] == B_RIGHT_ARROW && modifierKeys == B_COMMAND_KEY) {
-			if (textView != NULL)
-				textView->KeyDown(bytes, modifierKeys);
-			else
-				PostMessage(GO_FORWARD);
-			return;
-		} else if (bytes[0] == B_FUNCTION_KEY) {
+		if (bytes[0] == B_FUNCTION_KEY) {
 			// Some function key Firefox compatibility
 			int32 key;
 			if (message->FindInt32("key", &key) == B_OK) {
