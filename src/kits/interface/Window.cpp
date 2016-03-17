@@ -3720,11 +3720,11 @@ BWindow::_HandleKeyDown(BMessage* event)
 	if (!_IsFocusMessage(event))
 		return false;
 
-	const char* string = NULL;
-	if (event->FindString("bytes", &string) != B_OK)
+	const char* bytes = NULL;
+	if (event->FindString("bytes", &bytes) != B_OK)
 		return false;
 
-	char key = string[0];
+	char key = bytes[0];
 
 	uint32 modifiers;
 	if (event->FindInt32("modifiers", (int32*)&modifiers) != B_OK)
