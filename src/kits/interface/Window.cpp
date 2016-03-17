@@ -3731,7 +3731,8 @@ BWindow::_HandleKeyDown(BMessage* event)
 		modifiers = 0;
 
 	// handle BMenuBar key
-	if (key == B_ESCAPE && (modifiers & B_COMMAND_KEY) != 0 && fKeyMenuBar) {
+	if (key == B_ESCAPE && (modifiers & B_COMMAND_KEY) != 0
+		&& fKeyMenuBar != NULL) {
 		fKeyMenuBar->StartMenuBar(0, true, false, NULL);
 		return true;
 	}
@@ -3883,8 +3884,7 @@ BWindow::_KeyboardNavigation()
 
 	const char* bytes;
 	uint32 modifiers;
-	if (message->FindString("bytes", &bytes) != B_OK
-		|| bytes[0] != B_TAB)
+	if (message->FindString("bytes", &bytes) != B_OK || bytes[0] != B_TAB)
 		return;
 
 	message->FindInt32("modifiers", (int32*)&modifiers);
@@ -3897,9 +3897,8 @@ BWindow::_KeyboardNavigation()
 	else
 		nextFocus = _FindNextNavigable(fFocus, jumpGroups);
 
-	if (nextFocus && nextFocus != fFocus) {
+	if (nextFocus != NULL && nextFocus != fFocus)
 		nextFocus->MakeFocus(true);
-	}
 }
 
 
