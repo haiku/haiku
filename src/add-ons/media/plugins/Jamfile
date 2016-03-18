@@ -8,6 +8,7 @@ SubInclude HAIKU_TOP src add-ons media plugins asf_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins au_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins avi_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins ffmpeg ;
+SubInclude HAIKU_TOP src add-ons media plugins http_streamer ;
 SubInclude HAIKU_TOP src add-ons media plugins matroska ;
 SubInclude HAIKU_TOP src add-ons media plugins mov_reader ;
 SubInclude HAIKU_TOP src add-ons media plugins mp4_reader ;
