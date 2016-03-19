@@ -2,6 +2,7 @@
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, François Revol, revol@free.fr
+ * Copyright 2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -196,34 +197,35 @@ DisassemblerX8664::GetInstructionTargetAddress(CpuState* state) const
 		return 0;
 
 	target_addr_t targetAddress = 0;
-	switch (fUdisData->operand[0].type) {
+	const struct ud_operand* op = ud_insn_opr(fUdisData, 0);
+	switch (op->type) {
 		case UD_OP_REG:
 		{
 			targetAddress = x64State->IntRegisterValue(
-				RegisterNumberFromUdisIndex(fUdisData->operand[0].base));
-			targetAddress += fUdisData->operand[0].offset;
+				RegisterNumberFromUdisIndex(op->base));
+			targetAddress += op->offset;
 		}
 		break;
 		case UD_OP_MEM:
 		{
 			targetAddress = x64State->IntRegisterValue(
-				RegisterNumberFromUdisIndex(fUdisData->operand[0].base));
+				RegisterNumberFromUdisIndex(op->base));
 			targetAddress += x64State->IntRegisterValue(
-				RegisterNumberFromUdisIndex(fUdisData->operand[0].index))
-				* fUdisData->operand[0].scale;
+				RegisterNumberFromUdisIndex(op->index))
+				* op->scale;
 			off_t offset = 0;
-			switch (fUdisData->operand[0].offset) {
+			switch (op->offset) {
 				case 8:
-					offset = fUdisData->operand[0].lval.sbyte;
+					offset = op->lval.sbyte;
 					break;
 				case 16:
-					offset = fUdisData->operand[0].lval.sword;
+					offset = op->lval.sword;
 					break;
 				case 32:
-					offset = fUdisData->operand[0].lval.sdword;
+					offset = op->lval.sdword;
 					break;
 				case 64:
-					offset = fUdisData->operand[0].lval.sqword;
+					offset = op->lval.sqword;
 					break;
 			}
 			targetAddress += offset;
@@ -232,20 +234,20 @@ DisassemblerX8664::GetInstructionTargetAddress(CpuState* state) const
 		case UD_OP_JIMM:
 		{
 			targetAddress = ud_insn_off(fUdisData) + ud_insn_len(fUdisData);
-			if (fUdisData->operand[0].size == 32)
-				targetAddress += fUdisData->operand[0].lval.sdword;
+			if (op->size == 32)
+				targetAddress += op->lval.sdword;
 			else
-				targetAddress += fUdisData->operand[0].lval.sqword;
+				targetAddress += op->lval.sqword;
 		}
 		break;
 
 		case UD_OP_IMM:
 		case UD_OP_CONST:
 		{
-			if (fUdisData->operand[0].size == 32)
-				targetAddress = fUdisData->operand[0].lval.udword;
-			else if (fUdisData->operand[0].size == 64)
-				targetAddress = fUdisData->operand[0].lval.uqword;
+			if (op->size == 32)
+				targetAddress = op->lval.udword;
+			else if (op->size == 64)
+				targetAddress = op->lval.uqword;
 		}
 		break;
 

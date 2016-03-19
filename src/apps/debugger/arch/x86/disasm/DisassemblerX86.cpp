@@ -1,6 +1,7 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2008, François Revol, revol@free.fr
+ * Copyright 2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -185,36 +186,37 @@ DisassemblerX86::GetInstructionTargetAddress(CpuState* state) const
 		return 0;
 
 	target_addr_t targetAddress = 0;
-	switch (fUdisData->operand[0].type) {
+	const struct ud_operand* op = ud_insn_opr(fUdisData, 0);
+	switch (op->type) {
 		case UD_OP_REG:
 		{
 			targetAddress = x86State->IntRegisterValue(
-				RegisterNumberFromUdisIndex(fUdisData->operand[0].base));
-			targetAddress += fUdisData->operand[0].offset;
+				RegisterNumberFromUdisIndex(op->base));
+			targetAddress += op->offset;
 		}
 		break;
 		case UD_OP_MEM:
 		{
 			targetAddress = x86State->IntRegisterValue(
-				RegisterNumberFromUdisIndex(fUdisData->operand[0].base));
+				RegisterNumberFromUdisIndex(op->base));
 			targetAddress += x86State->IntRegisterValue(
-				RegisterNumberFromUdisIndex(fUdisData->operand[0].index))
-				* fUdisData->operand[0].scale;
-			if (fUdisData->operand[0].offset != 0)
-				targetAddress += fUdisData->operand[0].lval.sdword;
+				RegisterNumberFromUdisIndex(op->index))
+				* op->scale;
+			if (op->offset != 0)
+				targetAddress += op->lval.sdword;
 		}
 		break;
 		case UD_OP_JIMM:
 		{
 			targetAddress = ud_insn_off(fUdisData)
-				+ fUdisData->operand[0].lval.sdword + ud_insn_len(fUdisData);
+				+ op->lval.sdword + ud_insn_len(fUdisData);
 		}
 		break;
 
 		case UD_OP_IMM:
 		case UD_OP_CONST:
 		{
-			targetAddress = fUdisData->operand[0].lval.udword;
+			targetAddress = op->lval.udword;
 		}
 		break;
 
