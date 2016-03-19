@@ -20,7 +20,7 @@ SYSTEM_APPS += [ FFilterByBuildFeatures
 	CodyCam
 	GLInfo@mesa
 	HaikuDepot
-	Icon-O-Matic@expat Installer LaunchBox LegacyPackageInstaller@x86
+	Icon-O-Matic@expat Installer LaunchBox LegacyPackageInstaller
 	Magnify Mail MediaConverter MediaPlayer MidiPlayer
 	People PoorMan PowerStatus
 	RemoteDesktop
