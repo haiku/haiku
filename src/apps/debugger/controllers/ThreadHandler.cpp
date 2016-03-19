@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -720,8 +720,8 @@ ThreadHandler::_HandleBreakpointHitStep(CpuState* cpuState)
 				}
 			}
 
-			if (fPreviousFrameAddress != 0 && fSteppedOverFunctionAddress
-					!= cpuState->InstructionPointer()) {
+			if (fPreviousFrameAddress != 0 && fSteppedOverFunctionAddress != 0
+					&& fSteppedOverFunctionAddress != cpuState->InstructionPointer()) {
 				TRACE_CONTROL("STEP_OVER: called function address %#" B_PRIx64
 					", previous frame address: %#" B_PRIx64 ", frame address: %#"
 					B_PRIx64 ", adding return info\n", fSteppedOverFunctionAddress,
