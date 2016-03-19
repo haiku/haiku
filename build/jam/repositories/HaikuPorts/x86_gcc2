@@ -656,7 +656,7 @@ RemotePackageRepository HaikuPorts
 	goonies_x86-1.4.1528-2
 	gpgme_x86-1.5.2-2
 	gpgme_x86_devel-1.5.2-2
-	gphoto2_x86-2.5.8-1
+	gphoto2_x86-2.5.9-1
 	graphite2_x86-1.2.4-1
 	graphite2_x86_devel-1.2.4-1
 	guilib_x86-1.2.1-1
@@ -725,8 +725,8 @@ RemotePackageRepository HaikuPorts
 	libgcrypt_x86_devel-1.6.3-1
 	libgpg_error_x86-1.21-1
 	libgpg_error_x86_devel-1.21-1
-	libgphoto2_x86-2.5.8-1
-	libgphoto2_x86_devel-2.5.8-1
+	libgphoto2_x86-2.5.9-1
+	libgphoto2_x86_devel-2.5.9-1
 	libgsasl_x86-1.8.0-1
 	libgsasl_x86_devel-1.8.0-1
 	libicns_x86-0.8.1-3
