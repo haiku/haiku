@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Appearance	1140137500
+1	french	x-vnd.Haiku-Appearance	2499598353
 Plain font:	Font view		Police simple :
 Control highlight	Colors tab		Mise en valeur de contrôle
 Control border	Colors tab		Bordure des contrôles
@@ -21,6 +21,7 @@ Failure	Colors tab		Échec
 Hinting menu	AntialiasingSettingsView		Menu ajustement
 Scroll bar:	DecorSettingsView		Barre de défilement :
 Document background	Colors tab		Arrière plan du document
+Status bar	Colors tab		Barre d'état
 Revert	APRWindow		Rétablir
 Window tab	Colors tab		Titre des fenêtres
 Tooltip background	Colors tab		Arrière plan des bulles d’aide

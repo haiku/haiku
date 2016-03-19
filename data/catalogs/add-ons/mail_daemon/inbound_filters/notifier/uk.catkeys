@@ -1,12 +1,14 @@
-1	ukrainian	x-vnd.Haiku-NewMailNotification	583443025
-Keyboard LEDs	ConfigView		Світлодіоди клавіатури
-Log window	ConfigView		Вікно логів
-Central beep	ConfigView		Головний сигнал
-Beep	ConfigView		Сигнал
-Method:	ConfigView		Метод:
-Central alert	ConfigView		Головне попередження
-Alert	ConfigView		Попередження
-none	ConfigView		жодного
-New messages	filter		Нові повідомлення
-New mails notification	ConfigView		Нові оголошення пошти
-OK	filter		Гаразд
+1	ukrainian	x-vnd.Haiku-NewMailNotification	73789504
+You have {0, plural, one{One new message} other{# new messages}} for %account.	NotifierFilter		Маєш {0, plural, one{нове повідомлення} other{# нові повідомлення}} для облікового запису %account.
+none	NotifierConfigView		жодного
+Method:	NotifierConfigView		Метод:
+Beep	NotifierConfigView		Сигнал
+{0, plural, one{One new message} other{# new messages}}	NotifierFilter		{0, plural, one{нове повідомлення} other{# нові повідомлення}}
+New mails notification	NotifierFilter		Нові оголошення пошти
+Central alert	NotifierConfigView		Головне попередження
+OK	NotifierFilter		Гаразд
+New messages	NotifierFilter		Нові повідомлення
+Log window	NotifierConfigView		Вікно логів
+Keyboard LEDs	NotifierConfigView		Світлодіоди клавіатури
+Central beep	NotifierConfigView		Головний сигнал
+Alert	NotifierConfigView		Попередження
