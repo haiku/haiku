@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1209,6 +1209,16 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 				subroutineAddress, subroutineState, subroutineAddress);
 			if (result != B_OK)
 				continue;
+			if (!targetImage->ContainsAddress(subroutineAddress)) {
+				// the PLT entry doesn't necessarily point to a function
+				// in the same image; as such we may need to try to
+				// resolve the target address again.
+				targetImage = image->GetTeam()->ImageByAddress(
+					subroutineAddress);
+				if (targetImage == NULL)
+					continue;
+				imageInfo = targetImage->GetImageDebugInfo();
+			}
 		}
 
 		targetFunction = imageInfo->FunctionAtAddress(subroutineAddress);
