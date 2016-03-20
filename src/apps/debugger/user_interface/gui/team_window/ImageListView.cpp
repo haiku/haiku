@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,6 +18,7 @@
 
 #include "GuiSettingsUtils.h"
 #include "table/TableColumns.h"
+#include "TargetAddressTableColumn.h"
 #include "Tracing.h"
 
 
@@ -92,7 +93,7 @@ public:
 
 	virtual int32 CountColumns() const
 	{
-		return 2;
+		return 6;
 	}
 
 	virtual int32 CountRows() const
@@ -106,12 +107,25 @@ public:
 		if (image == NULL)
 			return false;
 
+		const ImageInfo& info = image->Info();
 		switch (columnIndex) {
 			case 0:
 				value.SetTo(image->ID());
 				return true;
 			case 1:
 				value.SetTo(image->Name(), B_VARIANT_DONT_COPY_DATA);
+				return true;
+			case 2:
+				value.SetTo(info.TextBase());
+				return true;
+			case 3:
+				value.SetTo(info.TextBase() + info.TextSize());
+				return true;
+			case 4:
+				value.SetTo(info.DataBase());
+				return true;
+			case 5:
+				value.SetTo(info.DataBase() + info.DataSize());
 				return true;
 			default:
 				return false;
@@ -293,6 +307,14 @@ ImageListView::_Init()
 		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 	fImagesTable->AddColumn(new StringTableColumn(1, "Name", 80, 40, 1000,
 		B_TRUNCATE_BEGINNING, B_ALIGN_LEFT));
+	fImagesTable->AddColumn(new TargetAddressTableColumn(2, "Text Base", 80,
+		40, 1000, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
+	fImagesTable->AddColumn(new TargetAddressTableColumn(3, "Text End", 80, 40,
+		1000, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
+	fImagesTable->AddColumn(new TargetAddressTableColumn(4, "Data Base", 80,
+		40, 1000, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
+	fImagesTable->AddColumn(new TargetAddressTableColumn(5, "Data End", 80, 40,
+		1000, B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT));
 
 	fImagesTable->AddTableListener(this);
 
