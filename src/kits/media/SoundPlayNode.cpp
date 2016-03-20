@@ -624,7 +624,7 @@ SoundPlayNode::SendNewBuffer(const media_timed_event* event,
 	bigtime_t lateness, bool realTimeEvent)
 {
 	CALLED();
-	// printf("latency = %12Ld, event = %12Ld, sched = %5Ld, arrive at %12Ld, now %12Ld, current lateness %12Ld\n", EventLatency() + SchedulingLatency(), EventLatency(), SchedulingLatency(), event->event_time, TimeSource()->Now(), lateness);
+	// TRACE("latency = %12Ld, event = %12Ld, sched = %5Ld, arrive at %12Ld, now %12Ld, current lateness %12Ld\n", EventLatency() + SchedulingLatency(), EventLatency(), SchedulingLatency(), event->event_time, TimeSource()->Now(), lateness);
 
 	// make sure we're both started *and* connected before delivering a buffer
 	if (RunState() != BMediaEventLooper::B_STARTED
@@ -638,7 +638,7 @@ SoundPlayNode::SendNewBuffer(const media_timed_event* event,
 	// lateness is independent of EventLatency()!
 
 	if (lateness > (BufferDuration() / 3) ) {
-		printf("SoundPlayNode::SendNewBuffer, event scheduled much too late, "
+		TRACE("SoundPlayNode::SendNewBuffer, event scheduled much too late, "
 			"lateness is %" B_PRId64 "\n", lateness);
 	}
 
@@ -655,13 +655,13 @@ SoundPlayNode::SendNewBuffer(const media_timed_event* event,
 			bigtime_t how_early = event->event_time - TimeSource()->Now() - fLatency - fInternalLatency;
 			if (how_early > 5000) {
 
-				printf("SoundPlayNode::SendNewBuffer, event scheduled too early, how_early is %Ld\n", how_early);
+				TRACE("SoundPlayNode::SendNewBuffer, event scheduled too early, how_early is %Ld\n", how_early);
 
 				if (fTooEarlyCount++ == 5) {
 					fInternalLatency -= how_early;
 					if (fInternalLatency < 500)
 						fInternalLatency = 500;
-					printf("SoundPlayNode::SendNewBuffer setting internal latency to %Ld\n", fInternalLatency);
+					TRACE("SoundPlayNode::SendNewBuffer setting internal latency to %Ld\n", fInternalLatency);
 					SetEventLatency(fLatency + fInternalLatency);
 					fTooEarlyCount = 0;
 				}
@@ -672,7 +672,7 @@ SoundPlayNode::SendNewBuffer(const media_timed_event* event,
 					!= B_OK) {
 				// we need to recycle the buffer
 				// if the call to SendBuffer() fails
-				printf("SoundPlayNode::SendNewBuffer: Buffer sending "
+				TRACE("SoundPlayNode::SendNewBuffer: Buffer sending "
 					"failed\n");
 				buffer->Recycle();
 			}
