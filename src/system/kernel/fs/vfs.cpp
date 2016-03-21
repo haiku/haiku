@@ -1,6 +1,6 @@
 /*
  * Copyright 2005-2013, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -2914,6 +2914,34 @@ normalize_path(char* path, size_t pathSize, bool traverseLink, bool kernel)
 }
 
 
+static status_t
+resolve_covered_parent(struct vnode* parent, dev_t* _device, ino_t* _node,
+	struct io_context* ioContext)
+{
+	// Make sure the IO context root is not bypassed.
+	if (parent == ioContext->root) {
+		*_device = parent->device;
+		*_node = parent->id;
+		return B_OK;
+	}
+
+	inc_vnode_ref_count(parent);
+		// vnode_path_to_vnode() puts the node
+
+	// ".." is guaranteed not to be clobbered by this call
+	struct vnode* vnode;
+	status_t status = vnode_path_to_vnode(parent, (char*)"..", false, 0,
+		ioContext, &vnode, NULL);
+	if (status == B_OK) {
+		*_device = vnode->device;
+		*_node = vnode->id;
+		put_vnode(vnode);
+	}
+
+	return status;
+}
+
+
 #ifdef ADD_DEBUGGER_COMMANDS
 
 
@@ -4425,6 +4453,19 @@ vfs_normalize_path(const char* path, char* buffer, size_t bufferSize,
 }
 
 
+/*!	\brief Gets the parent of the passed in node.
+
+	Gets the parent of the passed in node, and correctly resolves covered
+	nodes.
+*/
+extern "C" status_t
+vfs_resolve_parent(struct vnode* parent, dev_t* device, ino_t* node)
+{
+	return resolve_covered_parent(parent, device, node,
+		get_current_io_context(true));
+}
+
+
 /*!	\brief Creates a special node in the file system.
 
 	The caller gets a reference to the newly created node (which is passed
@@ -5863,38 +5904,21 @@ fix_dirent(struct vnode* parent, struct dirent* entry,
 	// If this is the ".." entry and the directory covering another vnode,
 	// we need to replace d_dev and d_ino with the actual values.
 	if (strcmp(entry->d_name, "..") == 0 && parent->IsCovering()) {
-		// Make sure the IO context root is not bypassed.
-		if (parent == ioContext->root) {
-			entry->d_dev = parent->device;
-			entry->d_ino = parent->id;
-		} else {
-			inc_vnode_ref_count(parent);
-				// vnode_path_to_vnode() puts the node
+		return resolve_covered_parent(parent, &entry->d_dev, &entry->d_ino,
+			ioContext);
+	}
 
-			// ".." is guaranteed not to be clobbered by this call
-			struct vnode* vnode;
-			status_t status = vnode_path_to_vnode(parent, (char*)"..", false, 0,
-				ioContext, &vnode, NULL);
+	// resolve covered vnodes
+	ReadLocker _(&sVnodeLock);
 
-			if (status == B_OK) {
-				entry->d_dev = vnode->device;
-				entry->d_ino = vnode->id;
-				put_vnode(vnode);
-			}
-		}
-	} else {
-		// resolve covered vnodes
-		ReadLocker _(&sVnodeLock);
+	struct vnode* vnode = lookup_vnode(entry->d_dev, entry->d_ino);
+	if (vnode != NULL && vnode->covered_by != NULL) {
+		do {
+			vnode = vnode->covered_by;
+		} while (vnode->covered_by != NULL);
 
-		struct vnode* vnode = lookup_vnode(entry->d_dev, entry->d_ino);
-		if (vnode != NULL && vnode->covered_by != NULL) {
-			do {
-				vnode = vnode->covered_by;
-			} while (vnode->covered_by != NULL);
-
-			entry->d_dev = vnode->device;
-			entry->d_ino = vnode->id;
-		}
+		entry->d_dev = vnode->device;
+		entry->d_ino = vnode->id;
 	}
 
 	return B_OK;

@@ -26,6 +26,7 @@
 #include <util/list.h>
 
 #include "node_monitor_private.h"
+#include "Vnode.h"
 
 
 //#define TRACE_MONITOR
@@ -153,6 +154,8 @@ class NodeMonitorService : public NotificationService {
 		status_t _SendNotificationMessage(KMessage &message,
 			interested_monitor_listener_list *interestedListeners,
 			int32 interestedListenerCount);
+		void _ResolveMountPoint(dev_t device, ino_t directory,
+			dev_t& parentDevice, ino_t& parentDirectory);
 
 		struct monitor_hash_key {
 			dev_t	device;
@@ -623,6 +626,25 @@ NodeMonitorService::_SendNotificationMessage(KMessage &message,
 }
 
 
+/*!	\brief Resolves the device/directory node pair to the node it's covered
+	by, if any.
+*/
+void
+NodeMonitorService::_ResolveMountPoint(dev_t device, ino_t directory,
+	dev_t& parentDevice, ino_t& parentDirectory)
+{
+	struct vnode* vnode;
+	status_t status = vfs_get_vnode(device, directory, true, &vnode);
+	if (status == B_OK) {
+		if (vnode->covers != NULL)
+			status = vfs_resolve_parent(vnode, &parentDevice, &parentDirectory);
+		vfs_put_vnode(vnode);
+	}
+	if (status != B_OK)
+		dprintf("Resolving mount point %ld:%lld failed!\n", device, directory);
+}
+
+
 /*!	\brief Notifies all interested listeners that an entry has been created
 		   or removed.
 	\param opcode \c B_ENTRY_CREATED or \c B_ENTRY_REMOVED.
@@ -747,8 +769,15 @@ NodeMonitorService::NotifyStatChanged(dev_t device, ino_t directory, ino_t node,
 	_GetInterestedVolumeListeners(device, watchFlag, interestedListeners,
 		interestedListenerCount);
 	// ... for the directory
-	if (directory >= 0) {
-		_GetInterestedMonitorListeners(device, directory,
+	if (directory > 0) {
+		dev_t parentDevice = device;
+		ino_t parentDirectory = directory;
+		if (directory == node) {
+			// This is a mount point -- get its file system parent
+			_ResolveMountPoint(device, directory, parentDevice,
+				parentDirectory);
+		}
+		_GetInterestedMonitorListeners(parentDevice, parentDirectory,
 			B_WATCH_CHILDREN | watchFlag,
 			interestedListeners, interestedListenerCount);
 	}
@@ -799,8 +828,15 @@ NodeMonitorService::NotifyAttributeChanged(dev_t device, ino_t directory,
 	_GetInterestedVolumeListeners(device, B_WATCH_ATTR,
 		interestedListeners, interestedListenerCount);
 	// ... for the directory
-	if (directory >= 0) {
-		_GetInterestedMonitorListeners(device, directory,
+	if (directory > 0) {
+		dev_t parentDevice = device;
+		ino_t parentDirectory = directory;
+		if (directory == node) {
+			// This is a mount point -- get its file system parent
+			_ResolveMountPoint(device, directory, parentDevice,
+				parentDirectory);
+		}
+		_GetInterestedMonitorListeners(parentDevice, parentDirectory,
 			B_WATCH_CHILDREN | B_WATCH_ATTR,
 			interestedListeners, interestedListenerCount);
 	}

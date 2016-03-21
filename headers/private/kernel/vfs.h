@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2002-2016, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -126,6 +126,8 @@ status_t	vfs_get_cwd(dev_t *_mountID, ino_t *_vnodeID);
 void		vfs_unlock_vnode_if_locked(struct file_descriptor *descriptor);
 status_t	vfs_unmount(dev_t mountID, uint32 flags);
 status_t	vfs_disconnect_vnode(dev_t mountID, ino_t vnodeID);
+status_t	vfs_resolve_parent(struct vnode* parent, dev_t* device,
+				ino_t* node);
 void		vfs_free_unused_vnodes(int32 level);
 
 status_t	vfs_read_stat(int fd, const char *path, bool traverseLeafLink,
