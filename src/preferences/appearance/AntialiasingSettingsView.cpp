@@ -221,8 +221,10 @@ AntialiasingSettingsView::MessageReceived(BMessage *msg)
 		}
 		case B_COLORS_UPDATED:
 		{
-			if (msg->HasColor(ui_color_name(B_PANEL_BACKGROUND_COLOR)))
+			if (msg->HasColor(ui_color_name(B_PANEL_BACKGROUND_COLOR))
+				|| msg->HasColor(ui_color_name(B_PANEL_TEXT_COLOR))) {
 				_UpdateColors();
+			}
 			break;
 		}
 		default:
