@@ -11,6 +11,8 @@
 
 #include <Slider.h>
 
+#include <algorithm>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1062,7 +1064,7 @@ BSlider::DrawHashMarks()
 	}
 
 	float pos = _MinPosition();
-	int32 hashMarkCount = max_c(fHashMarkCount, 2);
+	int32 hashMarkCount = std::max(fHashMarkCount, (int32)2);
 		// draw at least two hashmarks at min/max if
 		// fHashMarks != B_HASH_MARKS_NONE
 	float factor = (_MaxPosition() - pos) / (hashMarkCount - 1);
@@ -1311,7 +1313,7 @@ BSlider::UpdateTextChanged()
 	if (fUpdateText != NULL)
 		newWidth = StringWidth(fUpdateText);
 
-	float width = ceilf(max_c(newWidth, oldWidth)) + 2.0f;
+	float width = ceilf(std::max(newWidth, oldWidth)) + 2.0f;
 	if (width != 0) {
 		font_height fontHeight;
 		GetFontHeight(&fontHeight);
@@ -1480,7 +1482,7 @@ BSlider::GetPreferredSize(float* _width, float* _height)
 			// NOTE: For compatibility reasons, a horizontal BSlider
 			// never shrinks horizontally. This only affects applications
 			// which do not use the new layout system.
-			*_width = max_c(Bounds().Width(), preferredSize.width);
+			*_width = std::max(Bounds().Width(), preferredSize.width);
 		}
 
 		if (_height != NULL)
@@ -1493,7 +1495,7 @@ BSlider::GetPreferredSize(float* _width, float* _height)
 			// NOTE: Similarly, a vertical BSlider never shrinks
 			// vertically. This only affects applications which do not
 			// use the new layout system.
-			*_height = max_c(Bounds().Height(), preferredSize.height);
+			*_height = std::max(Bounds().Height(), preferredSize.height);
 		}
 	}
 }
@@ -1753,8 +1755,8 @@ BSlider::SetLimits(int32 minimum, int32 maximum)
 		fMaxValue = maximum;
 
 		int32 value = Value();
-		value = max_c(minimum, value);
-		value = min_c(maximum, value);
+		value = std::max(minimum, value);
+		value = std::min(maximum, value);
 
 		if (value != Value())
 			SetValue(value);
@@ -1807,9 +1809,10 @@ BSlider::PreferredSize()
 {
 	BSize preferredSize = _ValidateMinSize();
 	if (fOrientation == B_HORIZONTAL)
-		preferredSize.width = max_c(100.0, preferredSize.width);
+		preferredSize.width = std::max(100.0f, preferredSize.width);
 	else
-		preferredSize.height = max_c(100.0, preferredSize.height);
+		preferredSize.height = std::max(100.0f, preferredSize.height);
+
 	return BLayoutUtils::ComposeSize(ExplicitPreferredSize(), preferredSize);
 }
 
@@ -2199,19 +2202,19 @@ BSlider::_ValidateMinSize()
 			height += lineHeightNoLeading;
 		}
 		if (MaxLimitLabel() != NULL) {
-			labelWidth = max_c(labelWidth, StringWidth(MaxLimitLabel()));
+			labelWidth = std::max(labelWidth, StringWidth(MaxLimitLabel()));
 			height += Label() ? lineHeight : lineHeightNoLeading;
 		}
 		if (MinLimitLabel() != NULL) {
-			labelWidth = max_c(labelWidth, StringWidth(MinLimitLabel()));
+			labelWidth = std::max(labelWidth, StringWidth(MinLimitLabel()));
 			height += lineHeightNoLeading;
 		}
 		if (fMaxUpdateTextWidth > 0.0f) {
-			labelWidth = max_c(labelWidth, fMaxUpdateTextWidth);
+			labelWidth = std::max(labelWidth, fMaxUpdateTextWidth);
 			height += MinLimitLabel() ? lineHeight : lineHeightNoLeading;
 		}
 
-		width = max_c(labelWidth, width);
+		width = std::max(labelWidth, width);
 	}
 
 	fMinSize.width = width;
