@@ -1089,7 +1089,7 @@ BMenuField::_DrawLabel(BRect updateRect)
 		FillRect(fillRect, B_SOLID_LOW);
 		textColor = ui_color(B_MENU_SELECTED_ITEM_TEXT_COLOR);
 	} else
-		textColor = ui_color(B_MENU_ITEM_TEXT_COLOR);
+		textColor = ui_color(B_PANEL_TEXT_COLOR);
 
 	be_control_look->DrawLabel(this, label, rect, updateRect, LowColor(), flags,
 		BAlignment(fAlign, B_ALIGN_MIDDLE), &textColor);
