@@ -1777,7 +1777,7 @@ BControlLook::DrawLabel(BView* view, const char* label, BRect rect,
 	const BAlignment& alignment, const rgb_color* textColor)
 {
 	DrawLabel(view, label, NULL, rect, updateRect, base, flags, alignment,
-			textColor);
+		textColor);
 }
 
 
@@ -1795,9 +1795,9 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 		&& view->Parent()->Parent() == NULL
 		&& (flags & B_IGNORE_OUTLINE) == 0;
 
-	rgb_color	low;
-	rgb_color	color;
-	rgb_color	glowColor;
+	rgb_color low;
+	rgb_color color;
+	rgb_color glowColor;
 
 	if (textColor != NULL)
 		glowColor = *textColor;
@@ -1822,14 +1822,16 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 	drawing_mode oldMode = view->DrawingMode();
 
 	if (isDesktop) {
-		// Enforce proper use of desktop label colors.
-		if(low.Brightness() < 100) {
+		// enforce proper use of desktop label colors
+		if (low.Brightness() < 100) {
 			if (textColor == NULL)
 				color = make_color(255, 255, 255);
+
 			glowColor = make_color(0, 0, 0);
 		} else {
 			if (textColor == NULL)
 				color = make_color(0, 0, 0);
+
 			glowColor = make_color(255, 255, 255);
 		}
 
