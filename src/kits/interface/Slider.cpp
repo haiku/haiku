@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015 Haiku, Inc.
+ * Copyright 2001-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,10 +30,12 @@
 #define USE_OFF_SCREEN_VIEW 0
 
 
-BSlider::BSlider(BRect frame, const char* name, const char* label,
-			BMessage* message, int32 minValue, int32 maxValue,
-			thumb_style thumbType, uint32 resizingMode, uint32 flags)
-	: BControl(frame, name, label, message, resizingMode, flags),
+BSlider::BSlider(
+	BRect frame, const char* name, const char* label, BMessage* message,
+	int32 minValue, int32 maxValue, thumb_style thumbType, uint32 resizingMode,
+	uint32 flags)
+	:
+	BControl(frame, name, label, message, resizingMode, flags),
 	fModificationMessage(NULL),
 	fSnoozeAmount(20000),
 
@@ -59,11 +61,11 @@ BSlider::BSlider(BRect frame, const char* name, const char* label,
 }
 
 
-BSlider::BSlider(BRect frame, const char *name, const char *label,
-			BMessage *message, int32 minValue, int32 maxValue,
-			orientation posture, thumb_style thumbType, uint32 resizingMode,
-			uint32 flags)
-	: BControl(frame, name, label, message, resizingMode, flags),
+BSlider::BSlider(BRect frame, const char* name, const char* label,
+	BMessage* message, int32 minValue, int32 maxValue, orientation posture,
+	thumb_style thumbType, uint32 resizingMode, uint32 flags)
+	:
+	BControl(frame, name, label, message, resizingMode, flags),
 	fModificationMessage(NULL),
 	fSnoozeAmount(20000),
 
@@ -89,10 +91,11 @@ BSlider::BSlider(BRect frame, const char *name, const char *label,
 }
 
 
-BSlider::BSlider(const char *name, const char *label, BMessage *message,
-			int32 minValue, int32 maxValue, orientation posture,
-			thumb_style thumbType, uint32 flags)
-	: BControl(name, label, message, flags),
+BSlider::BSlider(const char* name, const char* label, BMessage* message,
+	int32 minValue, int32 maxValue, orientation posture, thumb_style thumbType,
+	uint32 flags)
+	:
+	BControl(name, label, message, flags),
 	fModificationMessage(NULL),
 	fSnoozeAmount(20000),
 
@@ -118,8 +121,9 @@ BSlider::BSlider(const char *name, const char *label, BMessage *message,
 }
 
 
-BSlider::BSlider(BMessage *archive)
-	: BControl(archive)
+BSlider::BSlider(BMessage* archive)
+	:
+	BControl(archive)
 {
 	fModificationMessage = NULL;
 
@@ -135,7 +139,7 @@ BSlider::BSlider(BMessage *archive)
 		SetSnoozeAmount(20000);
 
 	rgb_color color;
-	if (archive->FindInt32("_fcolor", (int32 *)&color) == B_OK)
+	if (archive->FindInt32("_fcolor", (int32*)&color) == B_OK)
 		UseFillColor(true, &color);
 	else
 		UseFillColor(false);
@@ -181,7 +185,7 @@ BSlider::BSlider(BMessage *archive)
 	else
 		fStyle = B_BLOCK_THUMB;
 
-	if (archive->FindInt32("_bcolor", (int32 *)&color) != B_OK)
+	if (archive->FindInt32("_bcolor", (int32*)&color) != B_OK)
 		color = tint_color(ui_color(B_PANEL_BACKGROUND_COLOR), B_DARKEN_4_TINT);
 	SetBarColor(color);
 
@@ -242,7 +246,7 @@ BSlider::_InitObject()
 
 
 BArchivable*
-BSlider::Instantiate(BMessage *archive)
+BSlider::Instantiate(BMessage* archive)
 {
 	if (validate_instantiation(archive, "BSlider"))
 		return new BSlider(archive);
@@ -252,7 +256,7 @@ BSlider::Instantiate(BMessage *archive)
 
 
 status_t
-BSlider::Archive(BMessage *archive, bool deep) const
+BSlider::Archive(BMessage* archive, bool deep) const
 {
 	status_t ret = BControl::Archive(archive, deep);
 
@@ -261,33 +265,40 @@ BSlider::Archive(BMessage *archive, bool deep) const
 
 	if (ret == B_OK)
 		ret = archive->AddInt32("_sdelay", fSnoozeAmount);
+
 	if (ret == B_OK)
-		ret = archive->AddInt32("_bcolor", (const uint32 &)fBarColor);
+		ret = archive->AddInt32("_bcolor", (const uint32&)fBarColor);
 
 	if (FillColor(NULL) && ret == B_OK)
-		ret = archive->AddInt32("_fcolor", (const uint32 &)fFillColor);
+		ret = archive->AddInt32("_fcolor", (const uint32&)fFillColor);
 
-	if (ret == B_OK && fMinLimitLabel)
+	if (ret == B_OK && fMinLimitLabel != NULL)
 		ret = archive->AddString("_minlbl", fMinLimitLabel);
 
-	if (ret == B_OK && fMaxLimitLabel)
+	if (ret == B_OK && fMaxLimitLabel != NULL)
 		ret = archive->AddString("_maxlbl", fMaxLimitLabel);
 
 	if (ret == B_OK)
 		ret = archive->AddInt32("_min", fMinValue);
+
 	if (ret == B_OK)
 		ret = archive->AddInt32("_max", fMaxValue);
 
 	if (ret == B_OK)
 		ret = archive->AddInt32("_incrementvalue", fKeyIncrementValue);
+
 	if (ret == B_OK)
 		ret = archive->AddInt32("_hashcount", fHashMarkCount);
+
 	if (ret == B_OK)
 		ret = archive->AddInt16("_hashloc", fHashMarks);
+
 	if (ret == B_OK)
 		ret = archive->AddInt16("_sstyle", fStyle);
+
 	if (ret == B_OK)
 		ret = archive->AddInt32("_orient", fOrientation);
+
 	if (ret == B_OK)
 		ret = archive->AddFloat("_bthickness", fBarThickness);
 
@@ -300,25 +311,28 @@ BSlider::Perform(perform_code code, void* _data)
 {
 	switch (code) {
 		case PERFORM_CODE_MIN_SIZE:
-			((perform_data_min_size*)_data)->return_value
-				= BSlider::MinSize();
+			((perform_data_min_size*)_data)->return_value = BSlider::MinSize();
 			return B_OK;
+
 		case PERFORM_CODE_MAX_SIZE:
-			((perform_data_max_size*)_data)->return_value
-				= BSlider::MaxSize();
+			((perform_data_max_size*)_data)->return_value = BSlider::MaxSize();
 			return B_OK;
+
 		case PERFORM_CODE_PREFERRED_SIZE:
 			((perform_data_preferred_size*)_data)->return_value
 				= BSlider::PreferredSize();
 			return B_OK;
+
 		case PERFORM_CODE_LAYOUT_ALIGNMENT:
 			((perform_data_layout_alignment*)_data)->return_value
 				= BSlider::LayoutAlignment();
 			return B_OK;
+
 		case PERFORM_CODE_HAS_HEIGHT_FOR_WIDTH:
 			((perform_data_has_height_for_width*)_data)->return_value
 				= BSlider::HasHeightForWidth();
 			return B_OK;
+
 		case PERFORM_CODE_GET_HEIGHT_FOR_WIDTH:
 		{
 			perform_data_get_height_for_width* data
@@ -327,12 +341,14 @@ BSlider::Perform(perform_code code, void* _data)
 				&data->preferred);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_SET_LAYOUT:
 		{
 			perform_data_set_layout* data = (perform_data_set_layout*)_data;
 			BSlider::SetLayout(data->layout);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_LAYOUT_INVALIDATED:
 		{
 			perform_data_layout_invalidated* data
@@ -340,11 +356,13 @@ BSlider::Perform(perform_code code, void* _data)
 			BSlider::LayoutInvalidated(data->descendants);
 			return B_OK;
 		}
+
 		case PERFORM_CODE_DO_LAYOUT:
 		{
 			BSlider::DoLayout();
 			return B_OK;
 		}
+
 		case PERFORM_CODE_SET_ICON:
 		{
 			perform_data_set_icon* data = (perform_data_set_icon*)_data;
@@ -392,12 +410,13 @@ BSlider::AttachedToWindow()
 	BControl::AttachedToWindow();
 
 	BView* view = OffscreenView();
-	if (view && view->LockLooper()) {
+	if (view != NULL && view->LockLooper()) {
 		view->SetViewColor(B_TRANSPARENT_COLOR);
 		if (LowUIColor() != B_NO_COLOR)
 			view->SetLowUIColor(LowUIColor());
 		else
 			view->SetLowColor(LowColor());
+
 		view->UnlockLooper();
 	}
 
@@ -446,9 +465,9 @@ BSlider::DetachedFromWindow()
 
 
 void
-BSlider::MessageReceived(BMessage *msg)
+BSlider::MessageReceived(BMessage* message)
 {
-	BControl::MessageReceived(msg);
+	BControl::MessageReceived(message);
 }
 
 
@@ -486,7 +505,7 @@ BSlider::FrameResized(float w,float h)
 
 
 void
-BSlider::KeyDown(const char *bytes, int32 numBytes)
+BSlider::KeyDown(const char* bytes, int32 numBytes)
 {
 	if (!IsEnabled() || IsHidden())
 		return;
@@ -507,6 +526,7 @@ BSlider::KeyDown(const char *bytes, int32 numBytes)
 		case B_HOME:
 			newValue = fMinValue;
 			break;
+
 		case B_END:
 			newValue = fMaxValue;
 			break;
@@ -518,6 +538,7 @@ BSlider::KeyDown(const char *bytes, int32 numBytes)
 
 	if (newValue < fMinValue)
 		newValue = fMinValue;
+
 	if (newValue > fMaxValue)
 		newValue = fMaxValue;
 
@@ -529,7 +550,7 @@ BSlider::KeyDown(const char *bytes, int32 numBytes)
 }
 
 void
-BSlider::KeyUp(const char *bytes, int32 numBytes)
+BSlider::KeyUp(const char* bytes, int32 numBytes)
 {
 	if (fInitialLocation != _Location()) {
 		// The last KeyDown event triggered the modification message or no
@@ -594,7 +615,8 @@ BSlider::MouseDown(BPoint point)
 
 	if (Window()->Flags() & B_ASYNCHRONOUS_CONTROLS) {
 		SetTracking(true);
-		SetMouseEventMask(B_POINTER_EVENTS, B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
+		SetMouseEventMask(B_POINTER_EVENTS,
+			B_LOCK_WINDOW_FOCUS | B_NO_POINTER_HISTORY);
 	} else {
 		// synchronous mouse tracking
 		BPoint prevPoint;
@@ -633,7 +655,7 @@ BSlider::MouseUp(BPoint point)
 
 
 void
-BSlider::MouseMoved(BPoint point, uint32 transit, const BMessage *message)
+BSlider::MouseMoved(BPoint point, uint32 transit, const BMessage* message)
 {
 	if (IsTracking()) {
 		if (_ConstrainPoint(point, _Location())) {
@@ -656,14 +678,14 @@ BSlider::Pulse()
 
 
 void
-BSlider::SetLabel(const char *label)
+BSlider::SetLabel(const char* label)
 {
 	BControl::SetLabel(label);
 }
 
 
 void
-BSlider::SetLimitLabels(const char *minLabel, const char *maxLabel)
+BSlider::SetLimitLabels(const char* minLabel, const char* maxLabel)
 {
 	free(fMinLimitLabel);
 	fMinLimitLabel = minLabel ? strdup(minLabel) : NULL;
@@ -702,6 +724,7 @@ BSlider::SetValue(int32 value)
 {
 	if (value < fMinValue)
 		value = fMinValue;
+
 	if (value > fMaxValue)
 		value = fMaxValue;
 
@@ -761,10 +784,12 @@ BSlider::ValueForPoint(BPoint location) const
 
 	if (position < min)
 		position = min;
+
 	if (position > max)
 		position = max;
 
-	return (int32)roundf(((position - min) * (fMaxValue - fMinValue) / (max - min)) + fMinValue);
+	return (int32)roundf(((position - min) * (fMaxValue - fMinValue)
+		/ (max - min)) + fMinValue);
 }
 
 
@@ -799,10 +824,11 @@ BSlider::SetEnabled(bool on)
 
 
 void
-BSlider::GetLimits(int32 *minimum, int32 *maximum) const
+BSlider::GetLimits(int32* minimum, int32* maximum) const
 {
 	if (minimum != NULL)
 		*minimum = fMinValue;
+
 	if (maximum != NULL)
 		*maximum = fMaxValue;
 }
@@ -818,7 +844,7 @@ BSlider::Draw(BRect updateRect)
 	BRegion background(updateRect);
 	background.Exclude(BarFrame());
 	bool drawBackground = true;
-	if (Parent() && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
+	if (Parent() != NULL && (Parent()->Flags() & B_DRAW_ON_CHILDREN) != 0) {
 		// This view is embedded somewhere, most likely the Tracker Desktop
 		// shelf.
 		drawBackground = false;
@@ -851,8 +877,9 @@ BSlider::DrawSlider()
 {
 	if (LockLooper()) {
 #if USE_OFF_SCREEN_VIEW
-		if (!fOffScreenBits)
+		if (fOffScreenBits == NULL)
 			return;
+
 		if (fOffScreenBits->Lock()) {
 #endif
 			DrawBar();
@@ -877,7 +904,7 @@ void
 BSlider::DrawBar()
 {
 	BRect frame = BarFrame();
-	BView *view = OffscreenView();
+	BView* view = OffscreenView();
 
 	if (be_control_look != NULL) {
 		uint32 flags = be_control_look->Flags(this);
@@ -974,31 +1001,31 @@ BSlider::DrawBar()
 
 	view->SetHighColor(darken1);
 	view->StrokeLine(BPoint(frame.left, frame.top),
-					 BPoint(frame.left + 1.0f, frame.top));
+		BPoint(frame.left + 1.0f, frame.top));
 	view->StrokeLine(BPoint(frame.left, frame.bottom),
-					 BPoint(frame.left + 1.0f, frame.bottom));
+		BPoint(frame.left + 1.0f, frame.bottom));
 	view->StrokeLine(BPoint(frame.right - 1.0f, frame.top),
-					 BPoint(frame.right, frame.top));
+		BPoint(frame.right, frame.top));
 
 	view->SetHighColor(darken2);
 	view->StrokeLine(BPoint(frame.left + 1.0f, frame.top),
-					 BPoint(frame.right - 1.0f, frame.top));
+		BPoint(frame.right - 1.0f, frame.top));
 	view->StrokeLine(BPoint(frame.left, frame.bottom - 1.0f),
-					 BPoint(frame.left, frame.top + 1.0f));
+		BPoint(frame.left, frame.top + 1.0f));
 
 	view->SetHighColor(lightenmax);
 	view->StrokeLine(BPoint(frame.left + 1.0f, frame.bottom),
-					 BPoint(frame.right, frame.bottom));
+		BPoint(frame.right, frame.bottom));
 	view->StrokeLine(BPoint(frame.right, frame.bottom - 1.0f),
-					 BPoint(frame.right, frame.top + 1.0f));
+		BPoint(frame.right, frame.top + 1.0f));
 
 	frame.InsetBy(1.0f, 1.0f);
 
 	view->SetHighColor(darkenmax);
 	view->StrokeLine(BPoint(frame.left, frame.bottom),
-					 BPoint(frame.left, frame.top));
+		BPoint(frame.left, frame.top));
 	view->StrokeLine(BPoint(frame.left + 1.0f, frame.top),
-					 BPoint(frame.right, frame.top));
+		BPoint(frame.right, frame.top));
 
 	if (Style() == B_BLOCK_THUMB)
 		PopState();
@@ -1040,8 +1067,7 @@ BSlider::DrawHashMarks()
 		// fHashMarks != B_HASH_MARKS_NONE
 	float factor = (_MaxPosition() - pos) / (hashMarkCount - 1);
 
-	if (fHashMarks & B_HASH_MARKS_TOP) {
-
+	if ((fHashMarks & B_HASH_MARKS_TOP) != 0) {
 		view->BeginLineArray(hashMarkCount * 2);
 
 		if (fOrientation == B_HORIZONTAL) {
@@ -1069,8 +1095,7 @@ BSlider::DrawHashMarks()
 
 	pos = _MinPosition();
 
-	if (fHashMarks & B_HASH_MARKS_BOTTOM) {
-
+	if ((fHashMarks & B_HASH_MARKS_BOTTOM) != 0) {
 		view->BeginLineArray(hashMarkCount * 2);
 
 		if (fOrientation == B_HORIZONTAL) {
@@ -1140,16 +1165,15 @@ void
 BSlider::DrawText()
 {
 	BRect bounds(Bounds());
-	BView *view = OffscreenView();
+	BView* view = OffscreenView();
 
 	rgb_color base = LowColor();
 	uint32 flags = 0;
 	if (be_control_look == NULL) {
-		if (IsEnabled()) {
+		if (IsEnabled())
 			view->SetHighColor(0, 0, 0);
-		} else {
+		else
 			view->SetHighColor(tint_color(LowColor(), B_DISABLED_LABEL_TINT));
-		}
 	} else {
 		flags = be_control_look->Flags(this);
 
@@ -1161,7 +1185,7 @@ BSlider::DrawText()
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	if (Orientation() == B_HORIZONTAL) {
-		if (Label()) {
+		if (Label() != NULL) {
 			if (be_control_look == NULL) {
 				view->DrawString(Label(),
 					BPoint(0.0, ceilf(fontHeight.ascent)));
@@ -1183,7 +1207,7 @@ BSlider::DrawText()
 			}
 		}
 
-		if (fMinLimitLabel) {
+		if (fMinLimitLabel != NULL) {
 			if (be_control_look == NULL) {
 				view->DrawString(fMinLimitLabel, BPoint(0.0, bounds.bottom
 					- fontHeight.descent));
@@ -1193,7 +1217,7 @@ BSlider::DrawText()
 			}
 		}
 
-		if (fMaxLimitLabel) {
+		if (fMaxLimitLabel != NULL) {
 			if (be_control_look == NULL) {
 				view->DrawString(fMaxLimitLabel, BPoint(bounds.right
 					- StringWidth(fMaxLimitLabel), bounds.bottom
@@ -1209,7 +1233,7 @@ BSlider::DrawText()
 			+ ceilf(fontHeight.leading);
 		float baseLine = ceilf(fontHeight.ascent);
 
-		if (Label()) {
+		if (Label() != NULL) {
 			if (be_control_look == NULL) {
 				view->DrawString(Label(), BPoint((bounds.Width()
 					- StringWidth(Label())) / 2.0, baseLine));
@@ -1221,7 +1245,7 @@ BSlider::DrawText()
 			baseLine += lineHeight;
 		}
 
-		if (fMaxLimitLabel) {
+		if (fMaxLimitLabel != NULL) {
 			if (be_control_look == NULL) {
 				view->DrawString(fMaxLimitLabel, BPoint((bounds.Width()
 					- StringWidth(fMaxLimitLabel)) / 2.0, baseLine));
@@ -1234,7 +1258,7 @@ BSlider::DrawText()
 
 		baseLine = bounds.bottom - ceilf(fontHeight.descent);
 
-		if (fMinLimitLabel) {
+		if (fMinLimitLabel != NULL) {
 			if (be_control_look == NULL) {
 				view->DrawString(fMinLimitLabel, BPoint((bounds.Width()
 					- StringWidth(fMinLimitLabel)) / 2.0, baseLine));
@@ -1301,8 +1325,9 @@ BSlider::UpdateTextChanged()
 			if (!updateTextOnOff) {
 				invalid.left = (invalid.left + invalid.right - width) / 2;
 				invalid.right = invalid.left + width;
-				if (fMinLimitLabel)
+				if (fMinLimitLabel != NULL)
 					invalid.bottom -= lineHeight;
+
 				invalid.top = invalid.bottom - height;
 			}
 		}
@@ -1341,9 +1366,10 @@ BSlider::BarFrame() const
 	} else {
 		frame.left = floorf((frame.Width() - fBarThickness) / 2.0);
 		frame.top = thumbInset;
-		if (Label())
+		if (Label() != NULL)
 			frame.top += textHeight;
-		if (fMaxLimitLabel) {
+
+		if (fMaxLimitLabel != NULL) {
 			frame.top += textHeight;
 			if (Label())
 				frame.top += leading;
@@ -1351,11 +1377,12 @@ BSlider::BarFrame() const
 
 		frame.right = frame.left + fBarThickness;
 		frame.bottom = frame.bottom - thumbInset;
-		if (fMinLimitLabel)
+		if (fMinLimitLabel != NULL)
 			frame.bottom -= textHeight;
-		if (fUpdateText) {
+
+		if (fUpdateText != NULL) {
 			frame.bottom -= textHeight;
-			if (fMinLimitLabel)
+			if (fMinLimitLabel != NULL)
 				frame.bottom -= leading;
 		}
 	}
@@ -1488,7 +1515,7 @@ BSlider::Invoke(BMessage* message)
 
 BHandler*
 BSlider::ResolveSpecifier(BMessage* message, int32 index, BMessage* specifier,
-	int32 command, const char *property)
+	int32 command, const char* property)
 {
 	return BControl::ResolveSpecifier(message, index, specifier, command,
 		property);
@@ -1701,7 +1728,7 @@ BSlider::SetBarThickness(float thickness)
 
 
 void
-BSlider::SetFont(const BFont *font, uint32 properties)
+BSlider::SetFont(const BFont* font, uint32 properties)
 {
 	BControl::SetFont(font, properties);
 
@@ -1729,9 +1756,8 @@ BSlider::SetLimits(int32 minimum, int32 maximum)
 		value = max_c(minimum, value);
 		value = min_c(maximum, value);
 
-		if (value != Value()) {
+		if (value != Value())
 			SetValue(value);
-		}
 	}
 }
 
@@ -1748,6 +1774,7 @@ BSlider::MaxUpdateTextWidth()
 	// in case the derived class uses a fixed buffer, the contents
 	// should be reset for the old value
 	UpdateText();
+
 	return width;
 }
 
@@ -1758,8 +1785,7 @@ BSlider::MaxUpdateTextWidth()
 BSize
 BSlider::MinSize()
 {
-	return BLayoutUtils::ComposeSize(ExplicitMinSize(),
-		_ValidateMinSize());
+	return BLayoutUtils::ComposeSize(ExplicitMinSize(), _ValidateMinSize());
 }
 
 
@@ -1771,6 +1797,7 @@ BSlider::MaxSize()
 		maxSize.width = B_SIZE_UNLIMITED;
 	else
 		maxSize.height = B_SIZE_UNLIMITED;
+
 	return BLayoutUtils::ComposeSize(ExplicitMaxSize(), maxSize);
 }
 
@@ -1804,11 +1831,12 @@ BSlider::LayoutInvalidated(bool descendants)
 
 // #pragma mark - private
 
+
 void
 BSlider::_DrawBlockThumb()
 {
 	BRect frame = ThumbFrame();
-	BView *view = OffscreenView();
+	BView* view = OffscreenView();
 
 	if (be_control_look != NULL) {
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
@@ -1840,101 +1868,102 @@ BSlider::_DrawBlockThumb()
 	}
 
 	// blank background for shadow
-	// ToDo: this also draws over the hash marks (though it's not *that* noticeable)
+	// ToDo: this also draws over the hash marks
+	//       (though it's not *that* noticeable)
 	view->SetHighColor(no_tint);
 	view->StrokeLine(BPoint(frame.left, frame.top),
-					 BPoint(frame.left, frame.top));
+		BPoint(frame.left, frame.top));
 
 	BRect barFrame = BarFrame();
 	if (barFrame.right >= frame.right) {
 		// leave out barFrame from shadow background clearing
 		view->StrokeLine(BPoint(frame.right, frame.top),
-						 BPoint(frame.right, barFrame.top - 1.0f));
+			BPoint(frame.right, barFrame.top - 1.0f));
 		view->StrokeLine(BPoint(frame.right, barFrame.bottom + 1.0f),
-						 BPoint(frame.right, frame.bottom));
+			BPoint(frame.right, frame.bottom));
 	} else {
 		view->StrokeLine(BPoint(frame.right, frame.top),
-						 BPoint(frame.right, frame.bottom));
+			BPoint(frame.right, frame.bottom));
 	}
 
 	view->StrokeLine(BPoint(frame.left, frame.bottom),
-					 BPoint(frame.right - 1.0f, frame.bottom));
+		BPoint(frame.right - 1.0f, frame.bottom));
 	view->StrokeLine(BPoint(frame.left, frame.bottom - 1.0f),
-					 BPoint(frame.left, frame.bottom - 1.0f));
+		BPoint(frame.left, frame.bottom - 1.0f));
 	view->StrokeLine(BPoint(frame.right - 1.0f, frame.top),
-					 BPoint(frame.right - 1.0f, frame.top));
+		BPoint(frame.right - 1.0f, frame.top));
 
-	// Outline (top, left)
+	// outline (top, left)
 	view->SetHighColor(darken3);
 	view->StrokeLine(BPoint(frame.left, frame.bottom - 2.0f),
-					 BPoint(frame.left, frame.top + 1.0f));
+		BPoint(frame.left, frame.top + 1.0f));
 	view->StrokeLine(BPoint(frame.left + 1.0f, frame.top),
-					 BPoint(frame.right - 2.0f, frame.top));
+		BPoint(frame.right - 2.0f, frame.top));
 
-	// Shadow
+	// shadow
 	view->SetHighColor(0, 0, 0, IsEnabled() ? 100 : 50);
 	view->SetDrawingMode(B_OP_ALPHA);
 	view->StrokeLine(BPoint(frame.right, frame.top + 2.0f),
-					 BPoint(frame.right, frame.bottom - 1.0f));
+		BPoint(frame.right, frame.bottom - 1.0f));
 	view->StrokeLine(BPoint(frame.left + 2.0f, frame.bottom),
-					 BPoint(frame.right - 1.0f, frame.bottom));
+		BPoint(frame.right - 1.0f, frame.bottom));
 
 	view->SetDrawingMode(B_OP_COPY);
 	view->SetHighColor(darken3);
 	view->StrokeLine(BPoint(frame.right - 1.0f, frame.bottom - 1.0f),
-					 BPoint(frame.right - 1.0f, frame.bottom - 1.0f));
+		BPoint(frame.right - 1.0f, frame.bottom - 1.0f));
 
-
-	// First bevel
+	// first bevel
 	frame.InsetBy(1.0f, 1.0f);
 
 	view->SetHighColor(darkenmax);
 	view->StrokeLine(BPoint(frame.left, frame.bottom),
-					 BPoint(frame.right - 1.0f, frame.bottom));
+		BPoint(frame.right - 1.0f, frame.bottom));
 	view->StrokeLine(BPoint(frame.right, frame.bottom - 1.0f),
-					 BPoint(frame.right, frame.top));
+		BPoint(frame.right, frame.top));
 
 	view->SetHighColor(lighten2);
 	view->StrokeLine(BPoint(frame.left, frame.top),
-					 BPoint(frame.left, frame.bottom - 1.0f));
+		BPoint(frame.left, frame.bottom - 1.0f));
 	view->StrokeLine(BPoint(frame.left + 1.0f, frame.top),
-					 BPoint(frame.right - 1.0f, frame.top));
+		BPoint(frame.right - 1.0f, frame.top));
 
 	frame.InsetBy(1.0f, 1.0f);
 
-	view->FillRect(BRect(frame.left, frame.top, frame.right - 1.0f, frame.bottom - 1.0f));
+	view->FillRect(BRect(frame.left, frame.top, frame.right - 1.0f,
+		frame.bottom - 1.0f));
 
-	// Second bevel and center dots
+	// second bevel and center dots
 	view->SetHighColor(darken2);
 	view->StrokeLine(BPoint(frame.left, frame.bottom),
-					 BPoint(frame.right, frame.bottom));
+		Point(frame.right, frame.bottom));
 	view->StrokeLine(BPoint(frame.right, frame.bottom - 1.0f),
-					 BPoint(frame.right, frame.top));
+		Point(frame.right, frame.top));
 
 	if (Orientation() == B_HORIZONTAL) {
 		view->StrokeLine(BPoint(frame.left + 6.0f, frame.top + 2.0f),
-						 BPoint(frame.left + 6.0f, frame.top + 2.0f));
+			Point(frame.left + 6.0f, frame.top + 2.0f));
 		view->StrokeLine(BPoint(frame.left + 6.0f, frame.top + 4.0f),
-						 BPoint(frame.left + 6.0f, frame.top + 4.0f));
+			Point(frame.left + 6.0f, frame.top + 4.0f));
 		view->StrokeLine(BPoint(frame.left + 6.0f, frame.top + 6.0f),
-						 BPoint(frame.left + 6.0f, frame.top + 6.0f));
+			BPoint(frame.left + 6.0f, frame.top + 6.0f));
 	} else {
 		view->StrokeLine(BPoint(frame.left + 2.0f, frame.top + 6.0f),
-						 BPoint(frame.left + 2.0f, frame.top + 6.0f));
+			BPoint(frame.left + 2.0f, frame.top + 6.0f));
 		view->StrokeLine(BPoint(frame.left + 4.0f, frame.top + 6.0f),
-						 BPoint(frame.left + 4.0f, frame.top + 6.0f));
+			BPoint(frame.left + 4.0f, frame.top + 6.0f));
 		view->StrokeLine(BPoint(frame.left + 6.0f, frame.top + 6.0f),
-						 BPoint(frame.left + 6.0f, frame.top + 6.0f));
+			BPoint(frame.left + 6.0f, frame.top + 6.0f));
 	}
 
 	frame.InsetBy(1.0f, 1.0f);
 
-	// Third bevel
+	// third bevel
 	view->SetHighColor(lighten1);
 	view->StrokeLine(BPoint(frame.left, frame.bottom),
-					 BPoint(frame.right, frame.bottom));
+		BPoint(frame.right, frame.bottom));
 	view->StrokeLine(BPoint(frame.right, frame.bottom - 1.0f),
-					 BPoint(frame.right, frame.top));
+		BPoint(frame.right, frame.top));
 }
 
 
@@ -1942,7 +1971,7 @@ void
 BSlider::_DrawTriangleThumb()
 {
 	BRect frame = ThumbFrame();
-	BView *view = OffscreenView();
+	BView* view = OffscreenView();
 
 	if (be_control_look != NULL) {
 		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
@@ -2106,36 +2135,38 @@ BSlider::_ValidateMinSize()
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 
-	float width = 0.0;
-	float height = 0.0;
+	float width = 0.0f;
+	float height = 0.0f;
 
-	if (fMaxUpdateTextWidth < 0.0)
+	if (fMaxUpdateTextWidth < 0.0f)
 		fMaxUpdateTextWidth = MaxUpdateTextWidth();
 
 	if (Orientation() == B_HORIZONTAL) {
-		height = 12.0 + fBarThickness;
+		height = 12.0f + fBarThickness;
 		int32 rows = 0;
 
 		float labelWidth = 0;
 		int32 labelRows = 0;
 		float labelSpacing = StringWidth("M") * 2;
-		if (Label()) {
+		if (Label() != NULL) {
 			labelWidth = StringWidth(Label());
 			labelRows = 1;
 		}
-		if (fMaxUpdateTextWidth > 0.0) {
+		if (fMaxUpdateTextWidth > 0.0f) {
 			if (labelWidth > 0)
 				labelWidth += labelSpacing;
+
 			labelWidth += fMaxUpdateTextWidth;
 			labelRows = 1;
 		}
 		rows += labelRows;
 
-		if (MinLimitLabel())
+		if (MinLimitLabel() != NULL)
 			width = StringWidth(MinLimitLabel());
-		if (MaxLimitLabel()) {
+
+		if (MaxLimitLabel() != NULL) {
 			// some space between the labels
-			if (MinLimitLabel())
+			if (MinLimitLabel() != NULL)
 				width += labelSpacing;
 
 			width += StringWidth(MaxLimitLabel());
@@ -2143,8 +2174,9 @@ BSlider::_ValidateMinSize()
 
 		if (labelWidth > width)
 			width = labelWidth;
-		if (width < 32.0)
-			width = 32.0;
+
+		if (width < 32.0f)
+			width = 32.0f;
 
 		if (MinLimitLabel() || MaxLimitLabel())
 			rows++;
@@ -2153,8 +2185,8 @@ BSlider::_ValidateMinSize()
 			+ ceilf(fontHeight.descent) + 4.0);
 	} else {
 		// B_VERTICAL
-		width = 12.0 + fBarThickness;
-		height = 32.0;
+		width = 12.0f + fBarThickness;
+		height = 32.0f;
 
 		float lineHeightNoLeading = ceilf(fontHeight.ascent)
 			+ ceilf(fontHeight.descent);
@@ -2162,19 +2194,19 @@ BSlider::_ValidateMinSize()
 
 		// find largest label
 		float labelWidth = 0;
-		if (Label()) {
+		if (Label() != NULL) {
 			labelWidth = StringWidth(Label());
 			height += lineHeightNoLeading;
 		}
-		if (MaxLimitLabel()) {
+		if (MaxLimitLabel() != NULL) {
 			labelWidth = max_c(labelWidth, StringWidth(MaxLimitLabel()));
 			height += Label() ? lineHeight : lineHeightNoLeading;
 		}
-		if (MinLimitLabel()) {
+		if (MinLimitLabel() != NULL) {
 			labelWidth = max_c(labelWidth, StringWidth(MinLimitLabel()));
 			height += lineHeightNoLeading;
 		}
-		if (fMaxUpdateTextWidth > 0.0) {
+		if (fMaxUpdateTextWidth > 0.0f) {
 			labelWidth = max_c(labelWidth, fMaxUpdateTextWidth);
 			height += MinLimitLabel() ? lineHeight : lineHeightNoLeading;
 		}
@@ -2202,8 +2234,8 @@ void BSlider::_ReservedSlider11() {}
 void BSlider::_ReservedSlider12() {}
 
 
-BSlider &
-BSlider::operator=(const BSlider &)
+BSlider&
+BSlider::operator=(const BSlider&)
 {
 	return *this;
 }
@@ -2222,13 +2254,13 @@ GetLimits__7BSliderPlT1(BSlider* slider, int32* minimum, int32* maximum)
 
 
 extern "C" void
-_ReservedSlider4__7BSlider(BSlider *slider, int32 minimum, int32 maximum)
+_ReservedSlider4__7BSlider(BSlider* slider, int32 minimum, int32 maximum)
 {
 	slider->BSlider::SetLimits(minimum, maximum);
 }
 
 extern "C" float
-_ReservedSlider5__7BSlider(BSlider *slider)
+_ReservedSlider5__7BSlider(BSlider* slider)
 {
 	return slider->BSlider::MaxUpdateTextWidth();
 }
@@ -2268,4 +2300,3 @@ B_IF_GCC_2(InvalidateLayout__7BSliderb, _ZN7BSlider16InvalidateLayoutEb)(
 
 	view->Perform(PERFORM_CODE_LAYOUT_INVALIDATED, &data);
 }
-
