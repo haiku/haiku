@@ -216,14 +216,8 @@ BSlider::~BSlider()
 void
 BSlider::_InitBarColor()
 {
-	if (be_control_look != NULL) {
-		SetBarColor(be_control_look->SliderBarColor(
-			ui_color(B_PANEL_BACKGROUND_COLOR)));
-	} else {
-		SetBarColor(tint_color(ui_color(B_PANEL_BACKGROUND_COLOR),
-			B_DARKEN_4_TINT));
-	}
-
+	SetBarColor(be_control_look->SliderBarColor(
+		ui_color(B_PANEL_BACKGROUND_COLOR)));
 	UseFillColor(false, NULL);
 }
 
@@ -908,129 +902,12 @@ BSlider::DrawBar()
 	BRect frame = BarFrame();
 	BView* view = OffscreenView();
 
-	if (be_control_look != NULL) {
-		uint32 flags = be_control_look->Flags(this);
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		rgb_color rightFillColor = fBarColor;
-		rgb_color leftFillColor = fUseFillColor ? fFillColor : fBarColor;
-		be_control_look->DrawSliderBar(view, frame, frame, base, leftFillColor,
-			rightFillColor, Position(), flags, fOrientation);
-		return;
-	}
-
-	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color lightenmax;
-	rgb_color darken1;
-	rgb_color darken2;
-	rgb_color darkenmax;
-
-	rgb_color barColor;
-	rgb_color fillColor;
-
-	if (IsEnabled()) {
-		lightenmax	= tint_color(no_tint, B_LIGHTEN_MAX_TINT);
-		darken1		= tint_color(no_tint, B_DARKEN_1_TINT);
-		darken2		= tint_color(no_tint, B_DARKEN_2_TINT);
-		darkenmax	= tint_color(no_tint, B_DARKEN_MAX_TINT);
-		barColor	= fBarColor;
-		fillColor	= fFillColor;
-	} else {
-		lightenmax	= tint_color(no_tint, B_LIGHTEN_MAX_TINT);
-		darken1		= no_tint;
-		darken2		= tint_color(no_tint, B_DARKEN_1_TINT);
-		darkenmax	= tint_color(no_tint, B_DARKEN_3_TINT);
-
-		barColor.red	= (fBarColor.red + no_tint.red) / 2;
-		barColor.green	= (fBarColor.green + no_tint.green) / 2;
-		barColor.blue	= (fBarColor.blue + no_tint.blue) / 2;
-		barColor.alpha	= 255;
-
-		fillColor.red	= (fFillColor.red + no_tint.red) / 2;
-		fillColor.green	= (fFillColor.green + no_tint.green) / 2;
-		fillColor.blue	= (fFillColor.blue + no_tint.blue) / 2;
-		fillColor.alpha	= 255;
-	}
-
-	// exclude the block thumb from the bar filling
-
-	BRect lowerFrame = frame.InsetByCopy(1, 1);
-	lowerFrame.top++;
-	lowerFrame.left++;
-	BRect upperFrame = lowerFrame;
-	BRect thumbFrame;
-
-	if (Style() == B_BLOCK_THUMB) {
-		thumbFrame = ThumbFrame();
-
-		if (fOrientation == B_HORIZONTAL) {
-			lowerFrame.right = thumbFrame.left;
-			upperFrame.left = thumbFrame.right;
-		} else {
-			lowerFrame.top = thumbFrame.bottom;
-			upperFrame.bottom = thumbFrame.top;
-		}
-	} else if (fUseFillColor) {
-		if (fOrientation == B_HORIZONTAL) {
-			lowerFrame.right = floor(lowerFrame.left - 1 + Position()
-				* (lowerFrame.Width() + 1));
-			upperFrame.left = lowerFrame.right;
-		} else {
-			lowerFrame.top = floor(lowerFrame.bottom + 1 - Position()
-				* (lowerFrame.Height() + 1));
-			upperFrame.bottom = lowerFrame.top;
-		}
-	}
-
-	view->SetHighColor(barColor);
-	view->FillRect(upperFrame);
-
-	if (Style() == B_BLOCK_THUMB || fUseFillColor) {
-		if (fUseFillColor)
-			view->SetHighColor(fillColor);
-		view->FillRect(lowerFrame);
-	}
-
-	if (Style() == B_BLOCK_THUMB) {
-		// We don't want to stroke the lines over the thumb
-
-		PushState();
-
-		BRegion region;
-		GetClippingRegion(&region);
-		region.Exclude(thumbFrame);
-		ConstrainClippingRegion(&region);
-	}
-
-	view->SetHighColor(darken1);
-	view->StrokeLine(BPoint(frame.left, frame.top),
-		BPoint(frame.left + 1.0f, frame.top));
-	view->StrokeLine(BPoint(frame.left, frame.bottom),
-		BPoint(frame.left + 1.0f, frame.bottom));
-	view->StrokeLine(BPoint(frame.right - 1.0f, frame.top),
-		BPoint(frame.right, frame.top));
-
-	view->SetHighColor(darken2);
-	view->StrokeLine(BPoint(frame.left + 1.0f, frame.top),
-		BPoint(frame.right - 1.0f, frame.top));
-	view->StrokeLine(BPoint(frame.left, frame.bottom - 1.0f),
-		BPoint(frame.left, frame.top + 1.0f));
-
-	view->SetHighColor(lightenmax);
-	view->StrokeLine(BPoint(frame.left + 1.0f, frame.bottom),
-		BPoint(frame.right, frame.bottom));
-	view->StrokeLine(BPoint(frame.right, frame.bottom - 1.0f),
-		BPoint(frame.right, frame.top + 1.0f));
-
-	frame.InsetBy(1.0f, 1.0f);
-
-	view->SetHighColor(darkenmax);
-	view->StrokeLine(BPoint(frame.left, frame.bottom),
-		BPoint(frame.left, frame.top));
-	view->StrokeLine(BPoint(frame.left + 1.0f, frame.top),
-		BPoint(frame.right, frame.top));
-
-	if (Style() == B_BLOCK_THUMB)
-		PopState();
+	uint32 flags = be_control_look->Flags(this);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	rgb_color rightFillColor = fBarColor;
+	rgb_color leftFillColor = fUseFillColor ? fFillColor : fBarColor;
+	be_control_look->DrawSliderBar(view, frame, frame, base, leftFillColor,
+		rightFillColor, Position(), flags, fOrientation);
 }
 
 
@@ -1043,85 +920,10 @@ BSlider::DrawHashMarks()
 	BRect frame = HashMarksFrame();
 	BView* view = OffscreenView();
 
-	if (be_control_look != NULL) {
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 flags = be_control_look->Flags(this);
-		be_control_look->DrawSliderHashMarks(view, frame, frame, base,
-			fHashMarkCount, fHashMarks, flags, fOrientation);
-		return;
-	}
-
-	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color lightenmax;
-	rgb_color darken2;
-
-	if (IsEnabled()) {
-		lightenmax = tint_color(no_tint, B_LIGHTEN_MAX_TINT);
-		darken2 = tint_color(no_tint, B_DARKEN_2_TINT);
-	} else {
-		lightenmax = tint_color(no_tint, B_LIGHTEN_2_TINT);
-		darken2 = tint_color(no_tint, B_DARKEN_1_TINT);
-	}
-
-	float pos = _MinPosition();
-	int32 hashMarkCount = std::max(fHashMarkCount, (int32)2);
-		// draw at least two hashmarks at min/max if
-		// fHashMarks != B_HASH_MARKS_NONE
-	float factor = (_MaxPosition() - pos) / (hashMarkCount - 1);
-
-	if ((fHashMarks & B_HASH_MARKS_TOP) != 0) {
-		view->BeginLineArray(hashMarkCount * 2);
-
-		if (fOrientation == B_HORIZONTAL) {
-			for (int32 i = 0; i < hashMarkCount; i++) {
-				view->AddLine(BPoint(pos, frame.top),
-							  BPoint(pos, frame.top + 5), darken2);
-				view->AddLine(BPoint(pos + 1, frame.top),
-							  BPoint(pos + 1, frame.top + 5), lightenmax);
-
-				pos += factor;
-			}
-		} else {
-			for (int32 i = 0; i < hashMarkCount; i++) {
-				view->AddLine(BPoint(frame.left, pos),
-							  BPoint(frame.left + 5, pos), darken2);
-				view->AddLine(BPoint(frame.left, pos + 1),
-							  BPoint(frame.left + 5, pos + 1), lightenmax);
-
-				pos += factor;
-			}
-		}
-
-		view->EndLineArray();
-	}
-
-	pos = _MinPosition();
-
-	if ((fHashMarks & B_HASH_MARKS_BOTTOM) != 0) {
-		view->BeginLineArray(hashMarkCount * 2);
-
-		if (fOrientation == B_HORIZONTAL) {
-			for (int32 i = 0; i < hashMarkCount; i++) {
-				view->AddLine(BPoint(pos, frame.bottom - 5),
-							  BPoint(pos, frame.bottom), darken2);
-				view->AddLine(BPoint(pos + 1, frame.bottom - 5),
-							  BPoint(pos + 1, frame.bottom), lightenmax);
-
-				pos += factor;
-			}
-		} else {
-			for (int32 i = 0; i < hashMarkCount; i++) {
-				view->AddLine(BPoint(frame.right - 5, pos),
-							  BPoint(frame.right, pos), darken2);
-				view->AddLine(BPoint(frame.right - 5, pos + 1),
-							  BPoint(frame.right, pos + 1), lightenmax);
-
-				pos += factor;
-			}
-		}
-
-		view->EndLineArray();
-	}
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 flags = be_control_look->Flags(this);
+	be_control_look->DrawSliderHashMarks(view, frame, frame, base,
+		fHashMarkCount, fHashMarks, flags, fOrientation);
 }
 
 
@@ -1170,65 +972,36 @@ BSlider::DrawText()
 	BView* view = OffscreenView();
 
 	rgb_color base = LowColor();
-	uint32 flags = 0;
-	if (be_control_look == NULL) {
-		if (IsEnabled())
-			view->SetHighColor(0, 0, 0);
-		else
-			view->SetHighColor(tint_color(LowColor(), B_DISABLED_LABEL_TINT));
-	} else {
-		flags = be_control_look->Flags(this);
+	uint32 flags = be_control_look->Flags(this);
 
-		// erase the is control flag before drawing the label so that the label
-		// will get drawn using B_PANEL_TEXT_COLOR
-		flags &= ~BControlLook::B_IS_CONTROL;
-	}
+	// erase the is control flag before drawing the label so that the label
+	// will get drawn using B_PANEL_TEXT_COLOR
+	flags &= ~BControlLook::B_IS_CONTROL;
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);
 	if (Orientation() == B_HORIZONTAL) {
 		if (Label() != NULL) {
-			if (be_control_look == NULL) {
-				view->DrawString(Label(),
-					BPoint(0.0, ceilf(fontHeight.ascent)));
-			} else {
-				be_control_look->DrawLabel(view, Label(), base, flags,
-					BPoint(0.0, ceilf(fontHeight.ascent)));
-			}
+			be_control_look->DrawLabel(view, Label(), base, flags,
+				BPoint(0.0f, ceilf(fontHeight.ascent)));
 		}
 
 		// the update text is updated in SetValue() only
 		if (fUpdateText != NULL) {
-			if (be_control_look == NULL) {
-				view->DrawString(fUpdateText, BPoint(bounds.right
-					- StringWidth(fUpdateText), ceilf(fontHeight.ascent)));
-			} else {
-				be_control_look->DrawLabel(view, fUpdateText, base, flags,
-					BPoint(bounds.right - StringWidth(fUpdateText),
-						ceilf(fontHeight.ascent)));
-			}
+			be_control_look->DrawLabel(view, fUpdateText, base, flags,
+				BPoint(bounds.right - StringWidth(fUpdateText),
+					ceilf(fontHeight.ascent)));
 		}
 
 		if (fMinLimitLabel != NULL) {
-			if (be_control_look == NULL) {
-				view->DrawString(fMinLimitLabel, BPoint(0.0, bounds.bottom
-					- fontHeight.descent));
-			} else {
-				be_control_look->DrawLabel(view, fMinLimitLabel, base, flags,
-					BPoint(0.0, bounds.bottom - fontHeight.descent));
-			}
+			be_control_look->DrawLabel(view, fMinLimitLabel, base, flags,
+				BPoint(0.0f, bounds.bottom - fontHeight.descent));
 		}
 
 		if (fMaxLimitLabel != NULL) {
-			if (be_control_look == NULL) {
-				view->DrawString(fMaxLimitLabel, BPoint(bounds.right
-					- StringWidth(fMaxLimitLabel), bounds.bottom
-					- fontHeight.descent));
-			} else {
-				be_control_look->DrawLabel(view, fMaxLimitLabel, base, flags,
-					BPoint(bounds.right - StringWidth(fMaxLimitLabel),
-						bounds.bottom - fontHeight.descent));
-			}
+			be_control_look->DrawLabel(view, fMaxLimitLabel, base, flags,
+				BPoint(bounds.right - StringWidth(fMaxLimitLabel),
+					bounds.bottom - fontHeight.descent));
 		}
 	} else {
 		float lineHeight = ceilf(fontHeight.ascent) + ceilf(fontHeight.descent)
@@ -1236,51 +1009,31 @@ BSlider::DrawText()
 		float baseLine = ceilf(fontHeight.ascent);
 
 		if (Label() != NULL) {
-			if (be_control_look == NULL) {
-				view->DrawString(Label(), BPoint((bounds.Width()
-					- StringWidth(Label())) / 2.0, baseLine));
-			} else {
-				be_control_look->DrawLabel(view, Label(), base, flags,
-					BPoint((bounds.Width() - StringWidth(Label())) / 2.0,
-						baseLine));
-			}
+			be_control_look->DrawLabel(view, Label(), base, flags,
+				BPoint((bounds.Width() - StringWidth(Label())) / 2.0,
+					baseLine));
 			baseLine += lineHeight;
 		}
 
 		if (fMaxLimitLabel != NULL) {
-			if (be_control_look == NULL) {
-				view->DrawString(fMaxLimitLabel, BPoint((bounds.Width()
-					- StringWidth(fMaxLimitLabel)) / 2.0, baseLine));
-			} else {
-				be_control_look->DrawLabel(view, fMaxLimitLabel, base, flags,
-					BPoint((bounds.Width()
-						- StringWidth(fMaxLimitLabel)) / 2.0, baseLine));
-			}
+			be_control_look->DrawLabel(view, fMaxLimitLabel, base, flags,
+				BPoint((bounds.Width() - StringWidth(fMaxLimitLabel)) / 2.0,
+					baseLine));
 		}
 
 		baseLine = bounds.bottom - ceilf(fontHeight.descent);
 
 		if (fMinLimitLabel != NULL) {
-			if (be_control_look == NULL) {
-				view->DrawString(fMinLimitLabel, BPoint((bounds.Width()
-					- StringWidth(fMinLimitLabel)) / 2.0, baseLine));
-			} else {
-				be_control_look->DrawLabel(view, fMinLimitLabel, base, flags,
-					BPoint((bounds.Width()
-						- StringWidth(fMinLimitLabel)) / 2.0, baseLine));
-			}
-			baseLine -= lineHeight;
+			be_control_look->DrawLabel(view, fMinLimitLabel, base, flags,
+				BPoint((bounds.Width() - StringWidth(fMinLimitLabel)) / 2.0,
+					baseLine));
+				baseLine -= lineHeight;
 		}
 
 		if (fUpdateText != NULL) {
-			if (be_control_look == NULL) {
-				view->DrawString(fUpdateText, BPoint((bounds.Width()
-					- StringWidth(fUpdateText)) / 2.0, baseLine));
-			} else {
-				be_control_look->DrawLabel(view, fUpdateText, base, flags,
-					BPoint((bounds.Width()
-						- StringWidth(fUpdateText)) / 2.0, baseLine));
-			}
+			be_control_look->DrawLabel(view, fUpdateText, base, flags,
+				BPoint((bounds.Width() - StringWidth(fUpdateText)) / 2.0,
+					baseLine));
 		}
 	}
 }
@@ -1841,132 +1594,10 @@ BSlider::_DrawBlockThumb()
 	BRect frame = ThumbFrame();
 	BView* view = OffscreenView();
 
-	if (be_control_look != NULL) {
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 flags = be_control_look->Flags(this);
-		be_control_look->DrawSliderThumb(view, frame, frame, base, flags,
-			fOrientation);
-		return;
-	}
-
-	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color lighten2;
-	rgb_color lighten1;
-	rgb_color darken2;
-	rgb_color darken3;
-	rgb_color darkenmax;
-
-	if (IsEnabled()) {
-		lighten2	= tint_color(no_tint, B_LIGHTEN_2_TINT);
-		lighten1	= no_tint;
-		darken2		= tint_color(no_tint, B_DARKEN_2_TINT);
-		darken3		= tint_color(no_tint, B_DARKEN_3_TINT);
-		darkenmax	= tint_color(no_tint, B_DARKEN_MAX_TINT);
-	} else {
-		lighten2	= tint_color(no_tint, B_LIGHTEN_2_TINT);
-		lighten1	= tint_color(no_tint, B_LIGHTEN_1_TINT);
-		darken2		= tint_color(no_tint, (B_NO_TINT + B_DARKEN_1_TINT) / 2.0);
-		darken3		= tint_color(no_tint, B_DARKEN_1_TINT);
-		darkenmax	= tint_color(no_tint, B_DARKEN_3_TINT);
-	}
-
-	// blank background for shadow
-	// ToDo: this also draws over the hash marks
-	//       (though it's not *that* noticeable)
-	view->SetHighColor(no_tint);
-	view->StrokeLine(BPoint(frame.left, frame.top),
-		BPoint(frame.left, frame.top));
-
-	BRect barFrame = BarFrame();
-	if (barFrame.right >= frame.right) {
-		// leave out barFrame from shadow background clearing
-		view->StrokeLine(BPoint(frame.right, frame.top),
-			BPoint(frame.right, barFrame.top - 1.0f));
-		view->StrokeLine(BPoint(frame.right, barFrame.bottom + 1.0f),
-			BPoint(frame.right, frame.bottom));
-	} else {
-		view->StrokeLine(BPoint(frame.right, frame.top),
-			BPoint(frame.right, frame.bottom));
-	}
-
-	view->StrokeLine(BPoint(frame.left, frame.bottom),
-		BPoint(frame.right - 1.0f, frame.bottom));
-	view->StrokeLine(BPoint(frame.left, frame.bottom - 1.0f),
-		BPoint(frame.left, frame.bottom - 1.0f));
-	view->StrokeLine(BPoint(frame.right - 1.0f, frame.top),
-		BPoint(frame.right - 1.0f, frame.top));
-
-	// outline (top, left)
-	view->SetHighColor(darken3);
-	view->StrokeLine(BPoint(frame.left, frame.bottom - 2.0f),
-		BPoint(frame.left, frame.top + 1.0f));
-	view->StrokeLine(BPoint(frame.left + 1.0f, frame.top),
-		BPoint(frame.right - 2.0f, frame.top));
-
-	// shadow
-	view->SetHighColor(0, 0, 0, IsEnabled() ? 100 : 50);
-	view->SetDrawingMode(B_OP_ALPHA);
-	view->StrokeLine(BPoint(frame.right, frame.top + 2.0f),
-		BPoint(frame.right, frame.bottom - 1.0f));
-	view->StrokeLine(BPoint(frame.left + 2.0f, frame.bottom),
-		BPoint(frame.right - 1.0f, frame.bottom));
-
-	view->SetDrawingMode(B_OP_COPY);
-	view->SetHighColor(darken3);
-	view->StrokeLine(BPoint(frame.right - 1.0f, frame.bottom - 1.0f),
-		BPoint(frame.right - 1.0f, frame.bottom - 1.0f));
-
-	// first bevel
-	frame.InsetBy(1.0f, 1.0f);
-
-	view->SetHighColor(darkenmax);
-	view->StrokeLine(BPoint(frame.left, frame.bottom),
-		BPoint(frame.right - 1.0f, frame.bottom));
-	view->StrokeLine(BPoint(frame.right, frame.bottom - 1.0f),
-		BPoint(frame.right, frame.top));
-
-	view->SetHighColor(lighten2);
-	view->StrokeLine(BPoint(frame.left, frame.top),
-		BPoint(frame.left, frame.bottom - 1.0f));
-	view->StrokeLine(BPoint(frame.left + 1.0f, frame.top),
-		BPoint(frame.right - 1.0f, frame.top));
-
-	frame.InsetBy(1.0f, 1.0f);
-
-	view->FillRect(BRect(frame.left, frame.top, frame.right - 1.0f,
-		frame.bottom - 1.0f));
-
-	// second bevel and center dots
-	view->SetHighColor(darken2);
-	view->StrokeLine(BPoint(frame.left, frame.bottom),
-		Point(frame.right, frame.bottom));
-	view->StrokeLine(BPoint(frame.right, frame.bottom - 1.0f),
-		Point(frame.right, frame.top));
-
-	if (Orientation() == B_HORIZONTAL) {
-		view->StrokeLine(BPoint(frame.left + 6.0f, frame.top + 2.0f),
-			Point(frame.left + 6.0f, frame.top + 2.0f));
-		view->StrokeLine(BPoint(frame.left + 6.0f, frame.top + 4.0f),
-			Point(frame.left + 6.0f, frame.top + 4.0f));
-		view->StrokeLine(BPoint(frame.left + 6.0f, frame.top + 6.0f),
-			BPoint(frame.left + 6.0f, frame.top + 6.0f));
-	} else {
-		view->StrokeLine(BPoint(frame.left + 2.0f, frame.top + 6.0f),
-			BPoint(frame.left + 2.0f, frame.top + 6.0f));
-		view->StrokeLine(BPoint(frame.left + 4.0f, frame.top + 6.0f),
-			BPoint(frame.left + 4.0f, frame.top + 6.0f));
-		view->StrokeLine(BPoint(frame.left + 6.0f, frame.top + 6.0f),
-			BPoint(frame.left + 6.0f, frame.top + 6.0f));
-	}
-
-	frame.InsetBy(1.0f, 1.0f);
-
-	// third bevel
-	view->SetHighColor(lighten1);
-	view->StrokeLine(BPoint(frame.left, frame.bottom),
-		BPoint(frame.right, frame.bottom));
-	view->StrokeLine(BPoint(frame.right, frame.bottom - 1.0f),
-		BPoint(frame.right, frame.top));
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 flags = be_control_look->Flags(this);
+	be_control_look->DrawSliderThumb(view, frame, frame, base, flags,
+		fOrientation);
 }
 
 
@@ -1975,106 +1606,10 @@ BSlider::_DrawTriangleThumb()
 {
 	BRect frame = ThumbFrame();
 	BView* view = OffscreenView();
-
-	if (be_control_look != NULL) {
-		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-		uint32 flags = be_control_look->Flags(this);
-		be_control_look->DrawSliderTriangle(view, frame, frame, base, flags,
-			fOrientation);
-		return;
-	}
-
-	rgb_color no_tint = ui_color(B_PANEL_BACKGROUND_COLOR);
-	rgb_color lightenmax;
-	rgb_color lighten1;
-	rgb_color darken2;
-	rgb_color darken3;
-	rgb_color darkenmax;
-
-	if (IsEnabled()) {
-		lightenmax	= tint_color(no_tint, B_LIGHTEN_MAX_TINT);
-		lighten1	= no_tint;
-		darken2		= tint_color(no_tint, B_DARKEN_2_TINT);
-		darken3		= tint_color(no_tint, B_DARKEN_3_TINT);
-		darkenmax	= tint_color(no_tint, B_DARKEN_MAX_TINT);
-	} else {
-		lightenmax	= tint_color(no_tint, B_LIGHTEN_2_TINT);
-		lighten1	= tint_color(no_tint, B_LIGHTEN_1_TINT);
-		darken2		= tint_color(no_tint, (B_NO_TINT + B_DARKEN_1_TINT) / 2);
-		darken3		= tint_color(no_tint, B_DARKEN_1_TINT);
-		darkenmax	= tint_color(no_tint, B_DARKEN_3_TINT);
-	}
-
-	if (Orientation() == B_HORIZONTAL) {
-		view->SetHighColor(lighten1);
-		view->FillTriangle(
-			BPoint(frame.left + 1, frame.bottom - 3),
-			BPoint((frame.left + frame.right) / 2, frame.top + 1),
-			BPoint(frame.right - 1, frame.bottom - 3));
-
-		view->SetHighColor(no_tint);
-		view->StrokeLine(BPoint(frame.right - 2, frame.bottom - 3),
-			BPoint(frame.left + 3, frame.bottom - 3));
-
-		view->SetHighColor(darkenmax);
-		view->StrokeLine(BPoint(frame.left, frame.bottom - 1),
-			BPoint(frame.right, frame.bottom - 1));
-		view->StrokeLine(BPoint(frame.right, frame.bottom - 2),
-			BPoint((frame.left + frame.right) / 2, frame.top));
-
-		view->SetHighColor(darken2);
-		view->StrokeLine(BPoint(frame.right - 1, frame.bottom - 2),
-			BPoint(frame.left + 1, frame.bottom - 2));
-		view->SetHighColor(darken3);
-		view->StrokeLine(BPoint(frame.left, frame.bottom - 2),
-			BPoint((frame.left + frame.right) / 2 - 1, frame.top + 1));
-
-		view->SetHighColor(lightenmax);
-		view->StrokeLine(BPoint(frame.left + 2, frame.bottom - 3),
-			BPoint((frame.left + frame.right) / 2, frame.top + 1));
-
-		// Shadow
-		view->SetHighColor(0, 0, 0, IsEnabled() ? 80 : 40);
-		view->SetDrawingMode(B_OP_ALPHA);
-		view->StrokeLine(BPoint(frame.left + 1, frame.bottom),
-			BPoint(frame.right, frame.bottom));
-	} else {
-		view->SetHighColor(lighten1);
-		view->FillTriangle(
-			BPoint(frame.left, (frame.top + frame.bottom) / 2),
-			BPoint(frame.right - 1, frame.top + 1),
-			BPoint(frame.right - 1, frame.bottom - 1));
-
-		view->SetHighColor(darkenmax);
-		view->StrokeLine(BPoint(frame.right - 1, frame.top),
-			BPoint(frame.right - 1, frame.bottom));
-		view->StrokeLine(BPoint(frame.right - 1, frame.bottom),
-			BPoint(frame.right - 2, frame.bottom));
-
-		view->SetHighColor(darken2);
-		view->StrokeLine(BPoint(frame.right - 2, frame.top + 2),
-			BPoint(frame.right - 2, frame.bottom - 1));
-		view->StrokeLine(
-			BPoint(frame.left, (frame.top + frame.bottom) / 2),
-			BPoint(frame.right - 2, frame.top));
-		view->SetHighColor(darken3);
-		view->StrokeLine(
-			BPoint(frame.left + 1, (frame.top + frame.bottom) / 2 + 1),
-			BPoint(frame.right - 3, frame.bottom - 1));
-
-		view->SetHighColor(lightenmax);
-		view->StrokeLine(
-			BPoint(frame.left + 1, (frame.top + frame.bottom) / 2),
-			BPoint(frame.right - 2, frame.top + 1));
-
-		// Shadow
-		view->SetHighColor(0, 0, 0, IsEnabled() ? 80 : 40);
-		view->SetDrawingMode(B_OP_ALPHA);
-		view->StrokeLine(BPoint(frame.right, frame.top + 1),
-			BPoint(frame.right, frame.bottom));
-	}
-
-	view->SetDrawingMode(B_OP_COPY);
+	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+	uint32 flags = be_control_look->Flags(this);
+	be_control_look->DrawSliderTriangle(view, frame, frame, base, flags,
+		fOrientation);
 }
 
 
