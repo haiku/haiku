@@ -113,6 +113,10 @@ BCheckBox::Draw(BRect updateRect)
 	BRect rect(checkBoxRect);
 	be_control_look->DrawCheckBox(this, rect, updateRect, base, flags);
 
+	// erase the is control flag before drawing the label so that the label
+	// will get drawn using B_PANEL_TEXT_COLOR
+	flags &= ~BControlLook::B_IS_CONTROL;
+
 	BRect labelRect(Bounds());
 	labelRect.left = checkBoxRect.right + 1
 		+ be_control_look->DefaultLabelSpacing();

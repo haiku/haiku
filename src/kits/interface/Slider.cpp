@@ -1150,8 +1150,13 @@ BSlider::DrawText()
 		} else {
 			view->SetHighColor(tint_color(LowColor(), B_DISABLED_LABEL_TINT));
 		}
-	} else
+	} else {
 		flags = be_control_look->Flags(this);
+
+		// erase the is control flag before drawing the label so that the label
+		// will get drawn using B_PANEL_TEXT_COLOR
+		flags &= ~BControlLook::B_IS_CONTROL;
+	}
 
 	font_height fontHeight;
 	GetFontHeight(&fontHeight);

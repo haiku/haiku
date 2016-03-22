@@ -99,6 +99,10 @@ BRadioButton::Draw(BRect updateRect)
 	BRect rect(knobRect);
 	be_control_look->DrawRadioButton(this, rect, updateRect, base, flags);
 
+	// erase the is control flag before drawing the label so that the label
+	// will get drawn using B_PANEL_TEXT_COLOR.
+	flags &= ~BControlLook::B_IS_CONTROL;
+
 	BRect labelRect(Bounds());
 	labelRect.left = knobRect.right + 1
 		+ be_control_look->DefaultLabelSpacing();

@@ -376,6 +376,10 @@ BTextControl::Draw(BRect updateRect)
 			rect.right = fDivider - kLabelInputSpacing;
 		}
 
+		// erase the is control flag before drawing the label so that the label
+		// will get drawn using B_PANEL_TEXT_COLOR
+		flags &= ~BControlLook::B_IS_CONTROL;
+
 		be_control_look->DrawLabel(this, Label(), rect, updateRect,
 			base, flags, BAlignment(fLabelAlign, B_ALIGN_MIDDLE));
 	}
