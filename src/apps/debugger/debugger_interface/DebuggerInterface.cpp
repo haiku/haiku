@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -292,7 +292,6 @@ DebuggerInterface::Init()
 		fDebuggerPort, 0);
 	if (error != B_OK)
 		return error;
-// TODO: Stop watching in Close()!
 
 	// create debug context pool
 	fDebugContextPool = new(std::nothrow) DebugContextPool(fTeamID, fNubPort);
@@ -315,8 +314,11 @@ DebuggerInterface::Close(bool killTeam)
 	else if (fNubPort >= 0)
 		remove_team_debugger(fTeamID);
 
-	if (fDebuggerPort >= 0)
+	if (fDebuggerPort >= 0) {
+		__stop_watching_system(fTeamID, B_WATCH_SYSTEM_THREAD_PROPERTIES,
+			fDebuggerPort, 0);
 		delete_port(fDebuggerPort);
+	}
 
 	fNubPort = -1;
 	fDebuggerPort = -1;
