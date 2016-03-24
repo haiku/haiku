@@ -110,13 +110,14 @@ const uint32 kNumDefaultSettings = sizeof(sDefaultSettings) /
 
 
 WebPTranslator::WebPTranslator()
-	: BaseTranslator(B_TRANSLATE("WebP images"),
-		B_TRANSLATE("WebP image translator"),
-		WEBP_TRANSLATOR_VERSION,
-		sInputFormats, kNumInputFormats,
-		sOutputFormats, kNumOutputFormats,
-		"WebPTranslator_Settings", sDefaultSettings, kNumDefaultSettings,
-		B_TRANSLATOR_BITMAP, WEBP_IMAGE_FORMAT)
+	:
+	BaseTranslator(B_TRANSLATE("WebP images"),
+	B_TRANSLATE("WebP image translator"),
+	WEBP_TRANSLATOR_VERSION,
+	sInputFormats, kNumInputFormats,
+	sOutputFormats, kNumOutputFormats,
+	"WebPTranslator_Settings", sDefaultSettings, kNumDefaultSettings,
+	B_TRANSLATOR_BITMAP, WEBP_IMAGE_FORMAT)
 {
 }
 
@@ -161,8 +162,8 @@ WebPTranslator::DerivedIdentify(BPositionIO* stream,
 
 status_t
 WebPTranslator::DerivedTranslate(BPositionIO* stream,
-		const translator_info* info, BMessage* ioExtension,
-		uint32 outType, BPositionIO* target, int32 baseType)
+	const translator_info* info, BMessage* ioExtension, uint32 outType,
+	BPositionIO* target, int32 baseType)
 {
 	if (baseType == 1)
 		// if stream is in bits format
@@ -186,7 +187,7 @@ WebPTranslator::NewConfigView(TranslatorSettings* settings)
 
 status_t
 WebPTranslator::_TranslateFromBits(BPositionIO* stream, BMessage* ioExtension,
-		uint32 outType, BPositionIO* target)
+	uint32 outType, BPositionIO* target)
 {
 	if (!outType)
 		outType = WEBP_IMAGE_FORMAT;
@@ -309,7 +310,7 @@ WebPTranslator::_TranslateFromBits(BPositionIO* stream, BMessage* ioExtension,
 
 status_t
 WebPTranslator::_TranslateFromWebP(BPositionIO* stream, BMessage* ioExtension,
-		uint32 outType, BPositionIO* target)
+	uint32 outType, BPositionIO* target)
 {
 	if (!outType)
 		outType = B_TRANSLATOR_BITMAP;

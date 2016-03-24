@@ -52,7 +52,8 @@ static const struct preset_name {
 
 
 ConfigView::ConfigView(TranslatorSettings* settings)
-	: BGroupView(B_TRANSLATE("WebPTranslator Settings"), B_VERTICAL),
+	:
+	BGroupView(B_TRANSLATE("WebPTranslator Settings"), B_VERTICAL),
 	fSettings(settings)
 {
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
@@ -140,8 +141,8 @@ ConfigView::ConfigView(TranslatorSettings* settings)
 
 	BFont font;
 	GetFont(&font);
-	SetExplicitPreferredSize(BSize((font.Size() * 250)/12, (font.Size() * 350)/12));
-
+	SetExplicitPreferredSize(BSize((font.Size() * 250) / 12,
+		(font.Size() * 350) / 12));
 }
 
 
