@@ -252,7 +252,7 @@ WebPTranslator::_TranslateFromBits(BPositionIO* stream, BMessage* ioExtension,
 
 	if (!WebPPictureInit(&picture) || !WebPConfigInit(&config)) {
 		printf("Error! Version mismatch!\n");
-  		return B_ERROR;
+		return B_ERROR;
 	}
 
 	WebPPreset preset = (WebPPreset)fSettings->SetGetInt32(WEBP_SETTING_PRESET);
@@ -268,7 +268,7 @@ WebPTranslator::_TranslateFromBits(BPositionIO* stream, BMessage* ioExtension,
 
 	if (!WebPValidateConfig(&config)) {
 		printf("Error! Invalid configuration.\n");
- 		return B_ERROR;
+		return B_ERROR;
 	}
 
 	picture.width = bitsHeader.bounds.IntegerWidth() + 1;
