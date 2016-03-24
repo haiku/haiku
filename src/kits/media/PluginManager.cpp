@@ -34,6 +34,8 @@ public:
 		fFallbackBuffer(NULL),
 		fErr(B_NO_ERROR)
 	{
+		CALLED();
+
 		fPosition = dynamic_cast<BPositionIO*>(source);
 		fMedia = dynamic_cast<BMediaIO*>(source);
 		fFile = dynamic_cast<BFile*>(source);
@@ -73,6 +75,8 @@ public:
 	virtual	ssize_t				ReadAt(off_t position, void* buffer,
 									size_t size)
 	{
+		CALLED();
+
 		if (IsSeekable())
 			return fPosition->ReadAt(position, buffer, size);
 
@@ -100,6 +104,8 @@ public:
 	virtual	ssize_t				WriteAt(off_t position, const void* buffer,
 									size_t size)
 	{
+		CALLED();
+
 		if (IsSeekable())
 			return fPosition->WriteAt(position, buffer, size);
 
@@ -116,6 +122,8 @@ public:
 
 	virtual	off_t				Seek(off_t position, uint32 seekMode)
 	{
+		CALLED();
+
 		if (IsSeekable())
 			return fPosition->Seek(position, seekMode);
 
@@ -129,6 +137,8 @@ public:
 
 	virtual off_t				Position() const
 	{
+		CALLED();
+
 		if (IsSeekable())
 			return fPosition->Position();
 
@@ -137,6 +147,8 @@ public:
 
 	virtual	status_t			SetSize(off_t size)
 	{
+		CALLED();
+
 		if (IsEndless())
 			return B_NOT_SUPPORTED;
 
@@ -145,6 +157,8 @@ public:
 
 	virtual	status_t			GetSize(off_t* size) const
 	{
+		CALLED();
+
 		if (IsEndless())
 			return B_NOT_SUPPORTED;
 
