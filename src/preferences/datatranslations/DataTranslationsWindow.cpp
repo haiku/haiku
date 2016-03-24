@@ -13,6 +13,8 @@
 #include "DataTranslationsWindow.h"
 
 #include <algorithm>
+
+#include <math.h>
 #include <stdio.h>
 
 #include <Alert.h>
@@ -52,7 +54,7 @@ const uint32 kMsgSelectedTranslator = 'trsl';
 
 DataTranslationsWindow::DataTranslationsWindow()
 	:
-	BWindow(BRect(0.0f, 0.0f, 550.0f, 350.0f),
+	BWindow(BRect(0.0f, 0.0f, 597.0f, 368.0f),
 		B_TRANSLATE_SYSTEM_NAME("DataTranslations"),
 		B_TITLED_WINDOW, B_ASYNCHRONOUS_CONTROLS | B_NOT_RESIZABLE
 			| B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS),
@@ -172,6 +174,11 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 		// force config views to all have the same color
 	fRightBox->AddChild(fConfigView);
 
+	// for default 12pt font size: 597 ≈ (0.85 * 12 * 49)
+	fConfigView->SetExplicitMinSize(
+		BSize(ceilf(be_control_look->DefaultItemSpacing() * 49)
+			- fTranslatorListView->Frame().Width(), B_SIZE_UNSET));
+
 	// Make sure the translator's image doesn't get unloaded while we are still
 	// showing a config view whose code is in the image
 	fRelease = roster->AcquireTranslator(id);
@@ -250,11 +257,15 @@ DataTranslationsWindow::_SetupViews()
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
 		.SetInsets(B_USE_WINDOW_SPACING)
 		.Add(scrollView, 3)
-		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING, 6)
-			.SetInsets(0, 0, 0, 0)
-			.Add(fRightBox, 0, 0, 3, 1)
-			.Add(fIconView, 0, 1)
-			.Add(fButton, 2, 1);
+		.AddGroup(B_VERTICAL)
+			.Add(fRightBox)
+			.AddGroup(B_HORIZONTAL)
+				.Add(fIconView)
+				.AddGlue()
+				.Add(fButton)
+				.End()
+			.End()
+		.End();
 
 	fTranslatorListView->MakeFocus();
 	_ShowInfoView();
