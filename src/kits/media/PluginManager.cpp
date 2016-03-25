@@ -19,6 +19,8 @@
 
 PluginManager gPluginManager;
 
+#define BLOCK_SIZE 4096
+
 
 class BMediaIOWrapper : public BMediaIO {
 public:
@@ -28,10 +30,14 @@ public:
 		fPosition(NULL),
 		fMedia(NULL),
 		fFile(NULL),
+		fFallbackBuffer(NULL),
+		fFallbackPosition(0),
 		fErr(B_NO_ERROR)
 	{
 		fPosition = dynamic_cast<BPositionIO*>(source);
 		fMedia = dynamic_cast<BMediaIO*>(source);
+		fFile = dynamic_cast<BFile*>(source);
+		fData = source;
 
 		// No need to do additional buffering if we have
 		// a BBufferIO or a BMediaIO.
@@ -40,40 +46,29 @@ public:
 			// Source needs to be at least a BPositionIO to wrap with a BBufferIO
 			if (fPosition != NULL) {
 				fPosition = new(std::nothrow) BBufferIO(fPosition, 65536, true);
-				// We have to reset our BDataIO reference
-				fData = dynamic_cast<BDataIO*>(fPosition);
 				if (fPosition == NULL) {
 					fErr = B_NO_MEMORY;
 					return;
 				}
+				// We have to reset our BDataIO reference too
+				fData = dynamic_cast<BDataIO*>(fPosition);
 			} else {
-				TRACE("Unable to improve performance with a BufferIO\n");
 				// TODO: fallback buffering
+				// In this case we have to supply our own form
+				// of pseudo-seekable object from a non-seekable
+				// BDataIO.
+				fFallbackBuffer = new BMallocIO();
+				fFallbackBuffer->SetBlockSize(BLOCK_SIZE);
+				TRACE("Unable to improve performance with a BufferIO\n");
 			}
-		} else {
-			fData = source;
 		}
-		fFile = dynamic_cast<BFile*>(source);
 	}
 
 	virtual	~BMediaIOWrapper()
 	{
 	}
 
-	virtual	ssize_t				Read(void* buffer, size_t size)
-	{
-		return fData->Read(buffer, size);
-	}
-
-	virtual	ssize_t				Write(const void* buffer, size_t size)
-	{
-		return fData->Write(buffer, size);
-	}
-
-	virtual	status_t			Flush()
-	{
-		return fData->Flush();
-	}
+	// BPositionIO interface
 
 	virtual	ssize_t				ReadAt(off_t position, void* buffer,
 									size_t size)
@@ -81,9 +76,22 @@ public:
 		if (IsSeekable())
 			return fPosition->ReadAt(position, buffer, size);
 
-		// if (IsCached()) {
-		//
-		// }
+		if (IsEndless()) {
+			off_t nextPos = position+size;
+			off_t bufSize = 0;
+			fFallbackBuffer->GetSize(&bufSize);
+
+			if (fFallbackPosition == position
+					&& nextPos > bufSize) {
+				fData->Read(buffer, size);
+				fFallbackBuffer->WriteAt(fFallbackPosition, buffer, size);
+				fFallbackPosition = nextPos;
+				return size;
+			} else if (nextPos <= bufSize) {
+				fFallbackPosition = nextPos;
+				return fFallbackBuffer->ReadAt(position, buffer, size);
+			}
+		}
 
 		return B_NOT_SUPPORTED;
 	}
@@ -94,6 +102,11 @@ public:
 		if (IsSeekable())
 			return fPosition->WriteAt(position, buffer, size);
 
+		if (IsEndless() && position == fFallbackPosition) {
+			fData->Write(buffer, size);
+			fFallbackPosition = position+size;
+		}
+
 		return B_NOT_SUPPORTED;
 	}
 
@@ -102,38 +115,42 @@ public:
 		if (IsSeekable())
 			return fPosition->Seek(position, seekMode);
 
-		// if (IsCached()) {
-		//
-		// }
+		if (IsEndless())
+			return fFallbackBuffer->Seek(position, seekMode);
 
 		return B_NOT_SUPPORTED;
 	}
 
 	virtual off_t				Position() const
 	{
-		if (!IsEndless())
+		if (IsSeekable())
 			return fPosition->Position();
 
-		// TODO: buffering
+		if (IsEndless())
+			return fFallbackBuffer->Position();
 
-		return 0;
+		return B_NOT_SUPPORTED;
 	}
 
-	virtual	status_t		SetSize(off_t size)
+	virtual	status_t			SetSize(off_t size)
 	{
 		if (IsEndless())
 			return B_NOT_SUPPORTED;
 
+		// TODO: What a non seekable stream should do here?
+
 		return fPosition->SetSize(size);
 	}
 
-	virtual	status_t		GetSize(off_t* size) const
+	virtual	status_t			GetSize(off_t* size) const
 	{
 		if (IsEndless())
 			return B_NOT_SUPPORTED;
 
 		return fPosition->GetSize(size);
 	}
+
+	// BMediaIO interface
 
 	virtual bool				IsSeekable() const
 	{
@@ -152,26 +169,14 @@ public:
 	{
 		if (IsMedia())
 			return fMedia->IsEndless();
+
 		if (IsPosition())
 			return false;
 
 		return true;
 	}
 
-	virtual bool				IsCached() const
-	{
-		return true;
-	}
-
-	virtual size_t				CacheSize() const
-	{
-		// TODO: it should be another buffering level
-		// but we might to optimize with the underlying level
-		//if (IsMedia() && IsCached())
-		//	return CacheSize();
-
-		return B_NOT_SUPPORTED;
-	}
+	// Utility methods
 
 	status_t					InitCheck() const
 	{
@@ -179,11 +184,6 @@ public:
 	}
 
 protected:
-	// Utility methods
-	bool						IsData() const
-	{
-		return fData != NULL;
-	}
 
 	bool						IsPosition() const
 	{
@@ -201,6 +201,8 @@ private:
 	BMediaIO*					fMedia;
 	BFile*						fFile;
 
+	BMallocIO*					fFallbackBuffer;
+	off_t						fFallbackPosition;
 	status_t					fErr;
 };
 
