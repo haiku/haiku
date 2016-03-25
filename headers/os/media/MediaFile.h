@@ -26,6 +26,7 @@ namespace BPrivate {
 class BMediaTrack;
 class BMessage;
 class BParameterWeb;
+class BUrl;
 class BView;
 
 
@@ -69,10 +70,21 @@ public:
 								   	int32 flags = 0);
 									// set file later using SetTo()
 
+	// Additional constructors used to stream data from protocols
+	// supported by the Streamer API
+								BMediaFile(BUrl* url);
+								BMediaFile(BUrl* url, int32 flags);
+	// Read-Write streaming constructor
+								BMediaFile(BUrl* destination,
+								   const media_file_format* mfi,
+								   int32 flags = 0);
+
 	virtual						~BMediaFile();
 
 			status_t			SetTo(const entry_ref* ref);
 			status_t			SetTo(BDataIO* destination);
+	// The streaming equivalent of SetTo
+			status_t			SetTo(BUrl* url);
 
 			status_t			InitCheck() const;
 
@@ -167,8 +179,9 @@ private:
 
 			void				_Init();
 			void				_UnInit();
-			void				_InitReader(BDataIO* source, int32 flags = 0);
-			void				_InitWriter(BDataIO* target,
+			void				_InitReader(BDataIO* source, BUrl* url = NULL,
+									int32 flags = 0);
+			void				_InitWriter(BDataIO* target, BUrl* url,
 									const media_file_format* fileFormat,
 									int32 flags);
 

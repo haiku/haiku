@@ -13,6 +13,7 @@
 
 #include <File.h>
 #include <MediaTrack.h>
+#include <Url.h>
 
 #include "debug.h"
 
@@ -42,7 +43,7 @@ BMediaFile::BMediaFile(const entry_ref* ref, int32 flags)
 	CALLED();
 	_Init();
 	fDeleteSource = true;
-	_InitReader(new(std::nothrow) BFile(ref, O_RDONLY), flags);
+	_InitReader(new(std::nothrow) BFile(ref, O_RDONLY), NULL, flags);
 }
 
 
@@ -50,7 +51,7 @@ BMediaFile::BMediaFile(BDataIO* source, int32 flags)
 {
 	CALLED();
 	_Init();
-	_InitReader(source, flags);
+	_InitReader(source, NULL, flags);
 }
 
 
@@ -61,7 +62,7 @@ BMediaFile::BMediaFile(const entry_ref* ref, const media_file_format* mfi,
 	_Init();
 	fDeleteSource = true;
 	_InitWriter(new(std::nothrow) BFile(ref, B_CREATE_FILE | B_ERASE_FILE
-		| B_WRITE_ONLY), mfi, flags);
+		| B_WRITE_ONLY), NULL, mfi, flags);
 }
 
 
@@ -70,7 +71,7 @@ BMediaFile::BMediaFile(BDataIO* destination, const media_file_format* mfi,
 {
 	CALLED();
 	_Init();
-	_InitWriter(destination, mfi, flags);
+	_InitWriter(destination, NULL, mfi, flags);
 }
 
 
@@ -78,6 +79,31 @@ BMediaFile::BMediaFile(BDataIO* destination, const media_file_format* mfi,
 BMediaFile::BMediaFile(const media_file_format* mfi, int32 flags)
 {
 	debugger("BMediaFile::BMediaFile not implemented");
+}
+
+
+BMediaFile::BMediaFile(BUrl* url)
+{
+	CALLED();
+	_Init();
+	_InitReader(NULL, url);
+}
+
+
+BMediaFile::BMediaFile(BUrl* url, int32 flags)
+{
+	CALLED();
+	_Init();
+	_InitReader(NULL, url, flags);
+}
+
+
+BMediaFile::BMediaFile(BUrl* destination, const media_file_format* mfi,
+	int32 flags)
+{
+	CALLED();
+	_Init();
+	_InitWriter(NULL, destination, mfi, flags);
 }
 
 
@@ -436,30 +462,34 @@ BMediaFile::_UnInit()
 
 
 void
-BMediaFile::_InitReader(BDataIO* source, int32 flags)
+BMediaFile::_InitReader(BDataIO* source, BUrl* url, int32 flags)
 {
 	CALLED();
 
-	if (source == NULL) {
+	if (source == NULL && url == NULL) {
 		fErr = B_NO_MEMORY;
 		return;
 	}
 
-	fSource = source;
+	if (source != NULL) {
+		if (BFile* file = dynamic_cast<BFile*>(source)) {
+			fErr = file->InitCheck();
+			if (fErr != B_OK)
+				return;
+		}
+		fExtractor = new(std::nothrow) MediaExtractor(source, flags);
+	} else
+		fExtractor = new(std::nothrow) MediaExtractor(url, flags);
 
-	if (BFile* file = dynamic_cast<BFile*>(source)) {
-		fErr = file->InitCheck();
-		if (fErr != B_OK)
-			return;
-	}
-
-	fExtractor = new(std::nothrow) MediaExtractor(fSource, flags);
 	if (fExtractor == NULL)
 		fErr = B_NO_MEMORY;
 	else
 		fErr = fExtractor->InitCheck();
 	if (fErr != B_OK)
 		return;
+
+	// Get the actual source from the extractor
+	fSource = fExtractor->Source();
 
 	fExtractor->GetFileFormatInfo(&fMFI);
 	fTrackNum = fExtractor->StreamCount();
@@ -473,8 +503,8 @@ BMediaFile::_InitReader(BDataIO* source, int32 flags)
 
 
 void
-BMediaFile::_InitWriter(BDataIO* target, const media_file_format* fileFormat,
-	int32 flags)
+BMediaFile::_InitWriter(BDataIO* target, BUrl* url,
+	const media_file_format* fileFormat, int32 flags)
 {
 	CALLED();
 
@@ -483,15 +513,18 @@ BMediaFile::_InitWriter(BDataIO* target, const media_file_format* fileFormat,
 		return;
 	}
 
-	if (target == NULL) {
+	if (target == NULL && url == NULL) {
 		fErr = B_NO_MEMORY;
 		return;
 	}
 
 	fMFI = *fileFormat;
-	fSource = target;
 
-	fWriter = new(std::nothrow) MediaWriter(fSource, fMFI);
+	if (target != NULL)
+		fWriter = new(std::nothrow) MediaWriter(target, fMFI);
+	else
+		fWriter = new(std::nothrow) MediaWriter(url, fMFI);
+
 	if (fWriter == NULL)
 		fErr = B_NO_MEMORY;
 	else
@@ -499,6 +532,8 @@ BMediaFile::_InitWriter(BDataIO* target, const media_file_format* fileFormat,
 	if (fErr != B_OK)
 		return;
 
+	// Get the actual source from the writer
+	fSource = fWriter->Target();
 	fTrackNum = 0;
 }
 
