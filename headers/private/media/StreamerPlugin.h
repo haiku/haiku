@@ -1,6 +1,7 @@
 #ifndef _STREAMER_PLUGIN_H
 #define _STREAMER_PLUGIN_H
 
+#include <DataIO.h>
 #include <MediaTrack.h>
 #include <Url.h>
 
@@ -15,7 +16,7 @@ public:
 								Streamer();
 	virtual						~Streamer();
 
-			status_t			Sniff(BUrl* url, BMediaIO** source) = 0;
+	virtual status_t			Sniff(BUrl* url, BMediaIO** source) = 0;
 private:
 	virtual void				_ReservedStreamer1();
 	virtual void				_ReservedStreamer2();

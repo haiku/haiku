@@ -88,6 +88,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			MediaWriter.cpp
 			PluginManager.cpp
 			ReaderPlugin.cpp
+			StreamerPlugin.cpp
 			WriterPlugin.cpp
 			:
 			be localestub [ TargetLibsupc++ ] [ TargetLibstdc++ ]
