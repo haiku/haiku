@@ -6,7 +6,10 @@
 #define _MEDIA_WRITER_H
 
 
+#include <Url.h>
+
 #include "EncoderPlugin.h"
+#include "StreamerPlugin.h"
 #include "TList.h"
 #include "WriterPlugin.h"
 
@@ -19,9 +22,13 @@ class MediaWriter {
 public:
 								MediaWriter(BDataIO* target,
 									const media_file_format& fileFormat);
+								MediaWriter(BUrl* url,
+									const media_file_format& fileFormat);
 								~MediaWriter();
 
 			status_t			InitCheck();
+
+			BDataIO*			Target() const;
 
 			void				GetFileFormatInfo(media_file_format* mfi) const;
 
@@ -52,6 +59,7 @@ private:
 private:
 			BDataIO*			fTarget;
 			Writer*				fWriter;
+			Streamer*			fStreamer;
 
 			List<StreamInfo>	fStreamInfos;
 
