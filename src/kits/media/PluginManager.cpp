@@ -85,7 +85,7 @@ public:
 		fFallbackBuffer->GetSize(&bufSize);
 
 		if (fFallbackBuffer->Position() == position
-				&& position+size > bufSize) {
+				&& position+size > (size_t)bufSize) {
 			// TODO: Possibly part of the data we have
 			// to supply is cached.
 			ret = fData->Read(buffer, size);
@@ -95,7 +95,7 @@ public:
 			return ret;
 		}
 
-		if (position+size <= bufSize)
+		if (position+size <= (size_t)bufSize)
 			return fFallbackBuffer->ReadAt(position, buffer, size);
 
 		return ret;
