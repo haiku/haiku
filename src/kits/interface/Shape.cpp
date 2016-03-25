@@ -183,11 +183,12 @@ BShape::BShape(BMessage* archive)
 BShape::~BShape()
 {
 	shape_data* data = (shape_data*)fPrivateData;
+	if (!data->fOwnsMemory) {
+		free(data->opList);
+		free(data->ptList);
+	}
 
-	free(data->opList);
-	free(data->ptList);
-
-	delete (shape_data*)fPrivateData;
+	data->ReleaseReference();
 }
 
 
