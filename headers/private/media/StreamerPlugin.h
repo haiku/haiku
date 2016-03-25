@@ -1,11 +1,13 @@
 #ifndef _STREAMER_PLUGIN_H
 #define _STREAMER_PLUGIN_H
 
-#include <DataIO.h>
+
+#include <MediaIO.h>
 #include <MediaTrack.h>
 #include <Url.h>
 
 #include "MediaPlugin.h"
+
 
 namespace BPrivate { namespace media {
 
@@ -40,5 +42,6 @@ public:
 } } // namespace BPrivate::media
 
 using namespace BPrivate::media;
+
 
 #endif // _STREAMER_PLUGIN_H

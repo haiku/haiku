@@ -15,7 +15,7 @@
 #include <AutoDeleter.h>
 #include <Autolock.h>
 #include <ByteOrder.h>
-#include <DataIO.h>
+#include <MediaIO.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
 

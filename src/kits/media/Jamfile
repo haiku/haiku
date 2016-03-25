@@ -24,6 +24,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			!missing_symbols.cpp
 			Deprecated.cpp
 			MediaRecorder.cpp
+			MediaIO.cpp
 
 			# Public Media Kit
 			Buffer.cpp
