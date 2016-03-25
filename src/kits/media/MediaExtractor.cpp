@@ -55,12 +55,38 @@ private:
 MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 	:
 	fExtractorThread(-1),
-	fSource(source),
 	fReader(NULL),
+	fStreamer(NULL),
 	fStreamInfo(NULL),
 	fStreamCount(0)
 {
+	_Init(source, flags);
+}
+
+
+MediaExtractor::MediaExtractor(BUrl* url, int32 flags)
+	:
+	fExtractorThread(-1),
+	fReader(NULL),
+	fStreamer(NULL),
+	fStreamInfo(NULL),
+	fStreamCount(0)
+{
+	BDataIO* source = NULL;
+	fInitStatus = gPluginManager.CreateStreamer(&fStreamer, url, &source);
+	if (fInitStatus != B_OK)
+		return;
+
+	_Init(source, flags);
+}
+
+
+void
+MediaExtractor::_Init(BDataIO* source, int32 flags)
+{
 	CALLED();
+
+	fSource = source;
 
 #if !DISABLE_CHUNK_CACHE
 	// start extractor thread
@@ -168,6 +194,13 @@ MediaExtractor::InitCheck()
 {
 	CALLED();
 	return fInitStatus;
+}
+
+
+BDataIO*
+MediaExtractor::Source() const
+{
+	return fSource;
 }
 
 

@@ -10,7 +10,10 @@
 #define _MEDIA_EXTRACTOR_H
 
 
+#include <Url.h>
+
 #include "ReaderPlugin.h"
+#include "StreamerPlugin.h"
 #include "DecoderPlugin.h"
 
 
@@ -37,9 +40,13 @@ struct stream_info {
 class MediaExtractor {
 public:
 								MediaExtractor(BDataIO* source, int32 flags);
+								MediaExtractor(BUrl* url, int32 flags);
+
 								~MediaExtractor();
 
 			status_t			InitCheck();
+
+			BDataIO*			Source() const;
 
 			void				GetFileFormatInfo(
 									media_file_format* fileFormat) const;
@@ -70,6 +77,8 @@ public:
 									BMessage* _data) const;
 
 private:
+			void				_Init(BDataIO* source, int32 flags);
+
 			void				_RecycleLastChunk(stream_info& info);
 	static	int32				_ExtractorEntry(void* arg);
 			void				_ExtractorThread();
@@ -82,6 +91,7 @@ private:
 
 			BDataIO*			fSource;
 			Reader*				fReader;
+			Streamer*			fStreamer;
 
 			stream_info*		fStreamInfo;
 			int32				fStreamCount;
