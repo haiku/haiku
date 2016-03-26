@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Appearance	1140137500
+1	german	x-vnd.Haiku-Appearance	2499598353
 Plain font:	Font view		Normal:
 Control highlight	Colors tab		Steuerelement - Ausgewählt
 Control border	Colors tab		Steuerelement - Rahmen
@@ -21,6 +21,7 @@ Failure	Colors tab		Fehler
 Hinting menu	AntialiasingSettingsView		Hinting-Menü
 Scroll bar:	DecorSettingsView		Scroll-Leiste:
 Document background	Colors tab		Dokument - Hintergrund
+Status bar	Colors tab		Statusleiste
 Revert	APRWindow		Anfangswerte
 Window tab	Colors tab		Reiter
 Tooltip background	Colors tab		Tooltip - Hintergrund

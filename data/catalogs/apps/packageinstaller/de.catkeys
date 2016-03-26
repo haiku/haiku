@@ -1,13 +1,16 @@
-1	german	x-vnd.Haiku-PackageInstaller	591566249
+1	german	x-vnd.Haiku-PackageInstaller	252728737
 Install to:	PackageView		Installieren nach:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akzeptieren
+No package selected.	UninstallView		Kein Paket ausgewählt.
 Continue	PackageInstall		Weiter
+Remove	UninstallView		Entfernen
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Das ausgewählte Paket konnte nicht installiert werden. Es könnte an einem Fehler in der Paket-Datei liegen. Das Problem sollte dem Ersteller des Pakets mitgeteilt werden.
 Image not loaded correctly	PackageImageViewer		Bild wurde nicht korrekt geladen
 No package selected.	PackageInfo		Kein Paket ausgewählt.
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Das angegebene Paket scheint bereits installiert zu sein. Soll das bereits existierende deinstalliert und die Installation fortgesetzt werden?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Soll diese Entscheidung für den Rest der Installation gelten?\n
+Installed packages	UninstallWindow		Installierte Pakete
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		In der Paket-Datei scheinen die Dateigrößen nicht übereinzustimmen. Das Paket könnte beschädigt oder nach seiner Erstellung verändert worden sein. Soll die Installation trotzdem fortgesetzt werden?
 Error while installing the package\n	PackageView		Fehler beim Installieren des Pakets\n
 Disclaimer	PackageTextViewer		Haftungsausschluss
@@ -24,6 +27,7 @@ Other…	PackageView		Andere…
 No installation type selected	PackageView		Es wurde kein Installationstyp gewählt
 Installing files and folders	PackageInstall		Dateien und Ordner werden installiert
 Package installer	PackageView		PackageInstaller
+Install…	UninstallView		Installieren…
 Skip all	PackageView		Alles überspringen
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Das Objekt '%s' existiert bereits im Zielort.\nSoll es mit dem aus dem Paket ersetzt, oder übersprungen werden?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Das Skript '%s' existiert bereits im Zielort.\nSoll es mit dem aus dem Paket ersetzt, oder übersprungen werden?
@@ -39,18 +43,22 @@ Installing package	PackageStatus		Paket wird installiert
 Ask again	PackageView		Weiter nachfragen
 Abort	PackageView		Abbrechen
 Replace all	PackageView		Alles ersetzen
+Package description	UninstallView		Paketbeschreibung
 Decline	PackageTextViewer		Ablehnen
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Die Datei '%s' existiert bereits im Zielort.\nSoll sie mit der aus dem Paket ersetzt, oder übersprungen werden?
 All existing files will be skipped?	PackageView		Alle existierenden Dateien werden übersprungen?
 Continue	PackageInfo		Weiter
 %index% of %total%	PackageInstall		%index% von %total%
+The package you selected has been successfully removed from your system.	UninstallView		Das ausgewählte Paket wurde erfolgreich aus dem System entfernt.
 Abort	PackageInfo		Abbrechen
 PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Abbrechen
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Weiter
 Begin	PackageView		Start
+OK	UninstallView		OK
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Im benutzten Pfad existiert bereits ein symbolische Verknüpfung '%s'.\nSoll diese Verknüpfung mit der aus dem Paket ersetzt werden, oder soll dieser Schritt übersprungen werden?
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Das ausgewählte Paket konnte nicht entfernt werden. Die Infodatei der installierten Pakete könnte beschädigt sein.
 Replace	PackageView		Ersetzen
 Installation progress	PackageView		Installationsverlauf
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Das Paket ist nicht lesbar.\nDas ausgewählte Paket ist möglicherweise keine gültige BeOS .pkg Datei.
