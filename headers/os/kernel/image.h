@@ -34,44 +34,42 @@ typedef struct {
 	int32		text_size;
 	int32		data_size;
 
-	// Haiku R1 extensions
-	int32		api_version;	// the Haiku API version used by the image
-	int32		abi;			// the Haiku ABI used by the image
+	/* Haiku R1 extensions */
+	int32		api_version;	/* the Haiku API version used by the image */
+	int32		abi;			/* the Haiku ABI used by the image */
 } image_info;
 
-// flags for clear_caches()
+/* flags for clear_caches() */
 #define B_FLUSH_DCACHE				0x0001	/* data cache */
 #define B_FLUSH_ICACHE				0x0004	/* instruction cache */
 #define B_INVALIDATE_DCACHE			0x0002
 #define B_INVALIDATE_ICACHE			0x0008
 
-// symbol types
+/* symbol types */
 #define	B_SYMBOL_TYPE_DATA			0x1
 #define	B_SYMBOL_TYPE_TEXT			0x2
 #define B_SYMBOL_TYPE_ANY			0x5
 
-// initialization/termination functions of shared objects
+/* initialization/termination functions of shared objects */
 #define	B_INIT_BEFORE_FUNCTION_NAME	"initialize_before"
 #define B_INIT_AFTER_FUNCTION_NAME	"initialize_after"
 #define	B_TERM_BEFORE_FUNCTION_NAME	"terminate_before"
 #define B_TERM_AFTER_FUNCTION_NAME	"terminate_after"
 
 #define B_APP_IMAGE_SYMBOL		((void*)(addr_t)0)
-	// value that can be used instead of a pointer to a symbol in the program
-	// image.
+	/* value that can be used instead of a pointer to a symbol in the program
+	   image. */
 #define B_CURRENT_IMAGE_SYMBOL	((void*)&__haiku_init_before)
-	// pointer to a symbol in the callers image
+	/* pointer to a symbol in the callers image */
 
-// flags for _kern_load_image() (private API)
+/* flags for _kern_load_image() (private API) */
 enum {
 	B_WAIT_TILL_LOADED	= 0x01,
-		// Wait till the loader has loaded and relocated
-		// (but not yet initialized) the application
-		// image and all dependencies. If not supplied,
-		// the function returns before the loader
-		// started to do anything at all, i.e. it
-		// returns success, even if the executable
-		// doesn't exist.
+		/* Wait till the loader has loaded and relocated (but not yet
+		   initialized) the application image and all dependencies. If not
+		   supplied, the function returns before the loader started to do
+		   anything at all, i.e. it returns success, even if the executable
+		   doesn't exist. */
 };
 
 #ifdef __cplusplus

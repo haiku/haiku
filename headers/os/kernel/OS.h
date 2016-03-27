@@ -5,7 +5,7 @@
 #ifndef _OS_H
 #define _OS_H
 
-//! Kernel specific structures and functions
+/** Kernel specific structures and functions */
 
 #include <pthread.h>
 #include <stdarg.h>
@@ -87,9 +87,9 @@ typedef struct area_info {
 #define B_WRITE_AREA			2
 #define B_EXECUTE_AREA			4
 #define B_STACK_AREA			8
-	// "stack" protection is not available on most platforms - it's used
-	// to only commit memory as needed, and have guard pages at the
-	// bottom of the stack.
+	/* "stack" protection is not available on most platforms - it's used
+	   to only commit memory as needed, and have guard pages at the
+	   bottom of the stack. */
 
 extern area_id		create_area(const char *name, void **startAddress,
 						uint32 addressSpec, size_t size, uint32 lock,
@@ -381,7 +381,7 @@ extern bigtime_t	system_time(void);
 extern nanotime_t	system_time_nsecs(void);
 						/* time since booting in nanoseconds */
 
-					// deprecated (is no-op)
+					/* deprecated (is no-op) */
 extern status_t		set_timezone(const char *timezone);
 
 /* Alarm */
