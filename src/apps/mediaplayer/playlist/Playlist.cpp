@@ -640,10 +640,11 @@ Playlist::_ExtraMediaExists(Playlist* playlist, const entry_ref& ref)
 Playlist::_ExtraMediaExists(Playlist* playlist, BUrl* url)
 {
 	for (int32 i = 0; i < playlist->CountItems(); i++) {
-		UrlPlaylistItem* compare = dynamic_cast<UrlPlaylistItem*>(playlist->ItemAt(i));
+		UrlPlaylistItem* compare
+			= dynamic_cast<UrlPlaylistItem*>(playlist->ItemAt(i));
 		if (compare == NULL)
 			continue;
-		if (compare->Url() != url)
+		if (compare->Url() == url)
 			return true;
 	}
 	return false;
