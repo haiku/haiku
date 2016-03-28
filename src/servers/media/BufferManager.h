@@ -60,47 +60,9 @@ private:
 		std::set<team_id>	teams;
 	};
 
-	template<typename Type> struct id_hash {
-		id_hash()
-			:
-			fID(0)
-		{
-		}
-
-		id_hash(Type id)
-			:
-			fID(id)
-		{
-		}
-
-		id_hash(const id_hash& other)
-		{
-			fID = other.fID;
-		}
-
-		uint32 GetHashCode() const
-		{
-			return fID;
-		}
-
-		operator Type() const
-		{
-			return fID;
-		}
-
-		id_hash& operator=(const id_hash& other)
-		{
-			fID = other.fID;
-			return *this;
-		}
-
-	private:
-		Type	fID;
-	};
-
-	typedef HashMap<id_hash<media_buffer_id>, buffer_info> BufferInfoMap;
-	typedef HashMap<id_hash<area_id>, clone_info> CloneInfoMap;
-	typedef HashMap<id_hash<area_id>, area_id> SourceInfoMap;
+	typedef HashMap<HashKey32<media_buffer_id>, buffer_info> BufferInfoMap;
+	typedef HashMap<HashKey32<area_id>, clone_info> CloneInfoMap;
+	typedef HashMap<HashKey32<area_id>, area_id> SourceInfoMap;
 
 			BPrivate::SharedBufferList* fSharedBufferList;
 			area_id			fSharedBufferListArea;
