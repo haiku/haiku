@@ -16,7 +16,7 @@ SYSTEM_ADD_ONS_DRIVERS_NET = [ FFilterByBuildFeatures
 		attansic_l2 ar81xx
 	}@ # x86
 
-	etherpci pegasus rtl8169 sis900 usb_ecm wb840
+	etherpci pegasus sis900 usb_ecm wb840
 	#vlance
 ] ;
 SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
