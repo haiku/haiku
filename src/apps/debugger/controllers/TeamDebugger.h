@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_DEBUGGER_H
@@ -42,8 +42,8 @@ public:
 									SettingsManager* settingsManager);
 								~TeamDebugger();
 
-			status_t			Init(team_id teamID, thread_id threadID,
-									int argc,
+			status_t			Init(DebuggerInterface* interface,
+									thread_id threadID, int argc,
 									const char* const* argv,
 									bool stopInMain);
 

@@ -41,6 +41,9 @@ public:
 			bool				Connected() const
 									{ return fNubPort >= 0; }
 
+			team_id				TeamID() const
+									{ return fTeamID; }
+
 			Architecture*		GetArchitecture() const
 									{ return fArchitecture; }
 

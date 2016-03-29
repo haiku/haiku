@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,6 +23,7 @@
 #include "debug_utils.h"
 
 #include "CommandLineUserInterface.h"
+#include "DebuggerInterface.h"
 #include "GraphicalUserInterface.h"
 #include "ImageDebugLoadingStateHandlerRoster.h"
 #include "MessageCodes.h"
@@ -310,12 +311,22 @@ start_team_debugger(team_id teamID, SettingsManager* settingsManager,
 		userInterfaceReference.SetTo(userInterface, true);
 	}
 
+	BReference<DebuggerInterface> interfaceReference;
+	DebuggerInterface* debuggerInterface
+		= new(std::nothrow) DebuggerInterface(teamID);
+	if (debuggerInterface == NULL)
+		return NULL;
+	interfaceReference.SetTo(debuggerInterface, true);
+
+	if (debuggerInterface->Init() != B_OK)
+		return NULL;
+
 	status_t error = B_NO_MEMORY;
 
 	TeamDebugger* debugger = new(std::nothrow) TeamDebugger(listener,
 		userInterface, settingsManager);
-	if (debugger) {
-		error = debugger->Init(teamID, threadID, commandLineArgc,
+	if (debugger != NULL) {
+		error = debugger->Init(debuggerInterface, threadID, commandLineArgc,
 			commandLineArgv, stopInMain);
 	}
 

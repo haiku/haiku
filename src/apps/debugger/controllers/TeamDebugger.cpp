@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -321,7 +321,7 @@ TeamDebugger::~TeamDebugger()
 
 
 status_t
-TeamDebugger::Init(team_id teamID, thread_id threadID, int argc,
+TeamDebugger::Init(DebuggerInterface* interface, thread_id threadID, int argc,
 	const char* const* argv, bool stopInMain)
 {
 	bool targetIsLocal = true;
@@ -330,20 +330,14 @@ TeamDebugger::Init(team_id teamID, thread_id threadID, int argc,
 	// the first thing we want to do when running
 	PostMessage(MSG_LOAD_SETTINGS);
 
-	fTeamID = teamID;
-
 	status_t error = _HandleSetArguments(argc, argv);
 	if (error != B_OK)
 		return error;
 
-	// create debugger interface
-	fDebuggerInterface = new(std::nothrow) DebuggerInterface(fTeamID);
-	if (fDebuggerInterface == NULL)
-		return B_NO_MEMORY;
+	fDebuggerInterface = interface;
+	fDebuggerInterface->AcquireReference();
+	fTeamID = interface->TeamID();
 
-	error = fDebuggerInterface->Init();
-	if (error != B_OK)
-		return error;
 
 	// create file manager
 	fFileManager = new(std::nothrow) FileManager;
