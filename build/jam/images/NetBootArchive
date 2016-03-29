@@ -93,6 +93,7 @@ AddBootModuleSymlinksToNetBootArchive
 	openpic@ppc
 	generic_x86@x86
 #	nbd
+	<net>notifications
 	remote_disk
 	$(SYSTEM_ADD_ONS_DRIVERS_NET)
 	stack
