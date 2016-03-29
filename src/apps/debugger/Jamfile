@@ -23,6 +23,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info loading_state_handlers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_managers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface interfaces ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
@@ -136,6 +137,9 @@ local sources =
 	# debugger_interface
 	DebugEvent.cpp
 	DebuggerInterface.cpp
+
+	# debugger_interface/interfaces
+	LocalDebuggerInterface.cpp
 
 	# elf
 	ElfFile.cpp

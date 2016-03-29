@@ -32,90 +32,69 @@ class KMessage;
 
 class DebuggerInterface : public TeamMemory {
 public:
-								DebuggerInterface(team_id teamID);
 	virtual						~DebuggerInterface();
 
-			status_t			Init();
-			void				Close(bool killTeam);
+	virtual	status_t			Init()
+									= 0;
+	virtual	void				Close(bool killTeam) = 0;
 
-			bool				Connected() const
-									{ return fNubPort >= 0; }
+	virtual	bool				Connected() const = 0;
 
-			team_id				TeamID() const
-									{ return fTeamID; }
+	virtual	team_id				TeamID() const = 0;
 
-			Architecture*		GetArchitecture() const
-									{ return fArchitecture; }
+	virtual	Architecture*		GetArchitecture() const = 0;
 
-	virtual	status_t			GetNextDebugEvent(DebugEvent*& _event);
+	virtual	status_t			GetNextDebugEvent(DebugEvent*& _event) = 0;
 
-	virtual	status_t			SetTeamDebuggingFlags(uint32 flags);
+	virtual	status_t			SetTeamDebuggingFlags(uint32 flags) = 0;
 
-	virtual	status_t			ContinueThread(thread_id thread);
-	virtual	status_t			StopThread(thread_id thread);
-	virtual	status_t			SingleStepThread(thread_id thread);
+	virtual	status_t			ContinueThread(thread_id thread) = 0;
+	virtual	status_t			StopThread(thread_id thread) = 0;
+	virtual	status_t			SingleStepThread(thread_id thread) = 0;
 
-	virtual	status_t			InstallBreakpoint(target_addr_t address);
-	virtual	status_t			UninstallBreakpoint(target_addr_t address);
+	virtual	status_t			InstallBreakpoint(target_addr_t address) = 0;
+	virtual	status_t			UninstallBreakpoint(target_addr_t address) = 0;
 
 	virtual status_t			InstallWatchpoint(target_addr_t address,
-									uint32 type, int32 length);
-	virtual status_t			UninstallWatchpoint(target_addr_t address);
+									uint32 type, int32 length) = 0;
+	virtual status_t			UninstallWatchpoint(target_addr_t address) = 0;
 
-	virtual	status_t			GetSystemInfo(SystemInfo& info);
-	virtual	status_t			GetTeamInfo(TeamInfo& info);
-	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo>& infos);
-	virtual	status_t			GetImageInfos(BObjectList<ImageInfo>& infos);
-	virtual status_t			GetAreaInfos(BObjectList<AreaInfo>& infos);
+	virtual	status_t			GetSystemInfo(SystemInfo& info) = 0;
+	virtual	status_t			GetTeamInfo(TeamInfo& info) = 0;
+	virtual	status_t			GetThreadInfos(BObjectList<ThreadInfo>& infos)
+									= 0;
+	virtual	status_t			GetImageInfos(BObjectList<ImageInfo>& infos)
+									= 0;
+	virtual status_t			GetAreaInfos(BObjectList<AreaInfo>& infos)
+									= 0;
 	virtual status_t			GetSemaphoreInfos(
-									BObjectList<SemaphoreInfo>& infos);
+									BObjectList<SemaphoreInfo>& infos)
+									= 0;
+
 	virtual	status_t			GetSymbolInfos(team_id team, image_id image,
-									BObjectList<SymbolInfo>& infos);
+									BObjectList<SymbolInfo>& infos) = 0;
 	virtual	status_t			GetSymbolInfo(team_id team, image_id image,
 									const char* name, int32 symbolType,
-									SymbolInfo& info);
+									SymbolInfo& info) = 0;
 
 	virtual	status_t			GetThreadInfo(thread_id thread,
-									ThreadInfo& info);
+									ThreadInfo& info) = 0;
 	virtual	status_t			GetCpuState(thread_id thread,
-									CpuState*& _state);
+									CpuState*& _state) = 0;
 										// returns a reference to the caller
 	virtual	status_t			SetCpuState(thread_id thread,
-									const CpuState* state);
+									const CpuState* state) = 0;
 
-	virtual	status_t			GetCpuFeatures(uint32& flags);
+	virtual	status_t			GetCpuFeatures(uint32& flags) = 0;
 
 	// TeamMemory
 	virtual	status_t			GetMemoryProperties(target_addr_t address,
-									uint32& protection, uint32& locking);
+									uint32& protection, uint32& locking) = 0;
 
 	virtual	ssize_t				ReadMemory(target_addr_t address, void* buffer,
-									size_t size);
+									size_t size) = 0;
 	virtual	ssize_t				WriteMemory(target_addr_t address,
-									void* buffer, size_t size);
-
-private:
-	struct DebugContext;
-	struct DebugContextPool;
-	struct DebugContextGetter;
-
-private:
-			status_t			_CreateDebugEvent(int32 messageCode,
-									const debug_debugger_message_data& message,
-									bool& _ignore, DebugEvent*& _event);
-
-			status_t			_GetNextSystemWatchEvent(DebugEvent*& _event,
-									BPrivate::KMessage& message);
-
-			status_t			_GetDebugCpuState(thread_id thread,
-									debug_cpu_state& _state);
-
-private:
-			team_id				fTeamID;
-			port_id				fDebuggerPort;
-			port_id				fNubPort;
-			DebugContextPool*	fDebugContextPool;
-			Architecture*		fArchitecture;
+									void* buffer, size_t size) = 0;
 };
 
 #endif	// DEBUGGER_INTERFACE_H

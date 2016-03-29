@@ -23,7 +23,7 @@
 #include "debug_utils.h"
 
 #include "CommandLineUserInterface.h"
-#include "DebuggerInterface.h"
+#include "LocalDebuggerInterface.h"
 #include "GraphicalUserInterface.h"
 #include "ImageDebugLoadingStateHandlerRoster.h"
 #include "MessageCodes.h"
@@ -313,7 +313,7 @@ start_team_debugger(team_id teamID, SettingsManager* settingsManager,
 
 	BReference<DebuggerInterface> interfaceReference;
 	DebuggerInterface* debuggerInterface
-		= new(std::nothrow) DebuggerInterface(teamID);
+		= new(std::nothrow) LocalDebuggerInterface(teamID);
 	if (debuggerInterface == NULL)
 		return NULL;
 	interfaceReference.SetTo(debuggerInterface, true);
