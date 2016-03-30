@@ -156,6 +156,7 @@ DataTranslationsWindow::_ShowConfigView(int32 id)
 		fRightBox->RemoveChild(fConfigView);
 		delete fConfigView;
 		fConfigView = NULL;
+		fInfoText = NULL;
 		if (fRelease != NULL) {
 			fRelease->Release();
 			fRelease = NULL;
@@ -194,6 +195,7 @@ DataTranslationsWindow::_ShowInfoView()
 		fRightBox->RemoveChild(fConfigView);
 		delete fConfigView;
 		fConfigView = NULL;
+		fInfoText = NULL;
 		if (fRelease != NULL) {
 			fRelease->Release();
 			fRelease = NULL;
