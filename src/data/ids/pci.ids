@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.02.27
-#	Date:    2016-02-27 03:15:01
+#	Version: 2016.03.30
+#	Date:    2016-03-30 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -5858,6 +5858,7 @@
 	1644  FastLinQ QL45000 Series 100GbE Controller
 		1077 e4f8  FastLinQ QL45611H 100GbE Adapter
 	1656  FastLinQ QL45000 Series 25GbE Controller
+		1077 02a7  QL45212-DE 25GbE Adapter
 		1077 e4f6  FastLinQ QL45211H 25GbE Adapter
 		1077 e4f7  FastLinQ QL45212H 25GbE Adapter
 	165c  FastLinQ QL45000 Series 40GbE Controller (FCoE)
@@ -5908,6 +5909,7 @@
 		103c 7040  FC1142SR 4Gb 1-port PCIe Fibre Channel Host Bus Adapter [HPAE311A]
 	2532  ISP2532-based 8Gb Fibre Channel to PCI Express HBA
 		103c 3262  StorageWorks 81Q
+		103c 3263  StorageWorks 82Q
 		1077 0167  QME2572 Dual Port FC8 HBA Mezzanine
 		1590 00fc  HPE StoreFabric 84Q 8Gb Quad Port Fibre Channel Host Bus Adapter
 	3022  ISP4022-based Ethernet NIC
@@ -8077,7 +8079,7 @@
 		1043 0c11  A7N8X Mainboard
 		a0a0 03b4  UK79G-1394 motherboard
 	006a  nForce2 AC97 Audio Controler (MCP)
-		1043 8095  nForce2 AC97 Audio Controler (MCP)
+		1043 8095  nForce2 AC97 Audio Controller (MCP)
 		a0a0 0304  UK79G-1394 motherboard
 	006b  nForce Audio Processing Unit
 		10de 006b  nForce2 MCP Audio Processing Unit
@@ -9905,6 +9907,7 @@
 		103c 2afb  GeForce 705A
 		17aa 309d  GeForce 705A
 		17aa 30b1  GeForce 800A
+		17aa 30f3  GeForce 705A
 		17aa 36a1  GeForce 800A
 	107c  GF119 [NVS 315]
 	107d  GF119 [NVS 310]
@@ -10408,6 +10411,9 @@
 	1296  GK208M [GeForce 825M]
 	1298  GK208M [GeForce GT 720M]
 	1299  GK208M [GeForce 920M]
+		17aa 30bb  GeForce 920A
+		17aa 36a7  GeForce 920A
+		17aa 36af  GeForce 920M
 	129a  GK208M [GeForce 910M]
 	12a0  GK208
 	12b9  GK208GLM [Quadro K610M]
@@ -10424,6 +10430,8 @@
 	1348  GM108M [GeForce 945A]
 	1349  GM108M [GeForce 930M]
 	134d  GM108M [GeForce 940MX]
+	134e  GM108M [GeForce 930MX]
+	134f  GM108M [GeForce 920MX]
 	137a  GM108GLM [Quadro K620M]
 	137d  GM108M [GeForce 940A]
 	1380  GM107 [GeForce GTX 750 Ti]
@@ -10442,6 +10450,7 @@
 		17aa 362f  GeForce GTX 950A
 		17aa 363f  GeForce GTX 950A
 		17aa 3640  GeForce GTX 950A
+		17aa 3647  GeForce GTX 950A
 		17aa 36b9  GeForce GTX 950A
 	139b  GM107M [GeForce GTX 960M]
 		103c 2b4c  GeForce GTX 960A
@@ -10484,6 +10493,7 @@
 	17c2  GM200 [GeForce GTX TITAN X]
 	17c8  GM200 [GeForce GTX 980 Ti]
 	17f0  GM200GL [Quadro M6000]
+	17f1  GM200GL [Quadro M6000 24GB]
 	17fd  GM200GL [Tesla M40]
 10df  Emulex Corporation
 	0720  OneConnect NIC (Skyhawk)
@@ -10737,7 +10747,6 @@
 		103c 1611  Pavilion DM1Z-3000
 		103c 1950  ProBook 450/455
 		103c 2a6f  Asus IPIBL-LB Motherboard
-		1043 11f5  A6J-Q008
 		1043 16d5  U6V/U31J laptop
 		1043 81aa  P5B
 		1043 82c6  M3A78 Series Motherboard
@@ -15710,6 +15719,7 @@
 	5099  T580-5099 Unified Wire Ethernet Controller
 	509a  T520-509A Unified Wire Ethernet Controller
 	509b  T540-509B Unified Wire Ethernet Controller
+	509c  T520-509C Unified Wire Ethernet Controller
 	5401  T520-CR Unified Wire Ethernet Controller
 	5402  T522-CR Unified Wire Ethernet Controller
 	5403  T540-CR Unified Wire Ethernet Controller
@@ -15755,6 +15765,7 @@
 	5499  T580-5099 Unified Wire Ethernet Controller
 	549a  T520-509A Unified Wire Ethernet Controller
 	549b  T540-509B Unified Wire Ethernet Controller
+	549c  T520-509C Unified Wire Ethernet Controller
 	5501  T520-CR Unified Wire Storage Controller
 	5502  T522-CR Unified Wire Storage Controller
 	5503  T540-CR Unified Wire Storage Controller
@@ -15800,6 +15811,7 @@
 	5599  T580-5099 Unified Wire Storage Controller
 	559a  T520-509A Unified Wire Storage Controller
 	559b  T540-509B Unified Wire Storage Controller
+	559c  T520-509C Unified Wire Storage Controller
 	5601  T520-CR Unified Wire Storage Controller
 	5602  T522-CR Unified Wire Storage Controller
 	5603  T540-CR Unified Wire Storage Controller
@@ -15845,6 +15857,7 @@
 	5699  T580-5099 Unified Wire Storage Controller
 	569a  T520-509A Unified Wire Storage Controller
 	569b  T540-509B Unified Wire Storage Controller
+	569c  T520-509C Unified Wire Storage Controller
 	5701  T520-CR Unified Wire Ethernet Controller
 	5702  T522-CR Unified Wire Ethernet Controller
 	5703  T540-CR Unified Wire Ethernet Controller
@@ -15929,6 +15942,7 @@
 	5899  T580-5099 Unified Wire Ethernet Controller [VF]
 	589a  T520-509A Unified Wire Ethernet Controller [VF]
 	589b  T540-509B Unified Wire Ethernet Controller [VF]
+	589c  T520-509C Unified Wire Ethernet Controller [VF]
 	a000  PE10K Unified Wire Ethernet Controller
 1426  Storage Technology Corp.
 1427  Better On-Line Solutions
@@ -16418,6 +16432,7 @@
 	1657  NetXtreme BCM5719 Gigabit Ethernet PCIe
 		103c 169d  Ethernet 1Gb 4-port 331FLR Adapter
 		103c 22be  Ethernet 1Gb 4-port 331i Adapter
+		103c 3383  Ethernet 1Gb 4-port 331T Adapter
 	1659  NetXtreme BCM5721 Gigabit Ethernet PCI Express
 		1014 02c6  eServer xSeries server mainboard
 		1028 01e6  PowerEdge 860
@@ -16859,6 +16874,7 @@
 	43a3  BCM4350 802.11ac Wireless Network Adapter
 	43a9  BCM43217 802.11b/g/n
 	43aa  BCM43131 802.11b/g/n
+	43ae  BCM43162 802.11ac Wireless Network Adapter
 	43b1  BCM4352 802.11ac Wireless Network Adapter
 	43ba  BCM43602 802.11ac Wireless LAN SoC
 	43bb  BCM43602 802.11ac Wireless LAN SoC
@@ -17215,6 +17231,7 @@
 		4254 980c  T980C
 	8880  CX23887/8 PCIe Broadcast Audio and Video Decoder with 3D Comb
 		0070 2259  WinTV HVR-1250
+		0070 6a18  WinTV-quadHD
 		0070 c108  WinTV-HVR-4400-HD model 1278
 		5654 2389  GoTView X5 DVD Hybrid PCI-E
 		5654 2390  GoTView X5 3D HYBRID PCI-E
@@ -19101,6 +19118,8 @@
 	0364  AHA364-PCIe
 	0367  AHA367-PCIe
 	0370  AHA370-PCIe
+	0604  AHA604
+	0605  AHA605
 	3641  AHA3641
 	3642  AHA3642
 1942  ClearSpeed Technology plc
@@ -19186,6 +19205,7 @@
 	0401  P4080
 	0408  P4040E
 	0409  P4040
+	041f  P3041
 	0440  T4240 with security
 	0441  T4240 without security
 	0446  T4160 with security
@@ -19479,6 +19499,9 @@
 	9100  TPRO-PCI-66U Timecode Reader/Generator
 1ade  Spin Master Ltd.
 	1501  Swipetech barcode scanner
+	3038  PCIe Video Bridge
+		13c2 3016  TT-budget S2-4200 Twin
+		4254 0552  S952 v3
 1ae0  Google, Inc.
 1ae7  First Wise Media GmbH
 	0520  HFC-S PCI A [X-TENSIONS XC-520]
@@ -19525,8 +19548,24 @@
 	1004  Virtio SCSI
 	1005  Virtio RNG
 	1009  Virtio filesystem
-	1010  Virtio GPU
-	1012  Virtio input device
+# virtio 1.0
+	1041  Virtio network device
+# virtio 1.0
+	1042  Virtio block device
+# virtio 1.0
+	1043  Virtio console
+# virtio 1.0
+	1044  Virtio RNG
+# virtio 1.0
+	1045  Virtio memory balloon
+# virtio 1.0
+	1048  Virtio SCSI
+# virtio 1.0
+	1049  Virtio filesystem
+# virtio 1.0
+	1050  Virtio GPU
+# virtio 1.0
+	1052  Virtio input
 	1110  Inter-VM shared memory
 		1af4 1100  QEMU Virtual Machine
 1af5  Netezza Corp.
@@ -19780,6 +19819,11 @@
 	1005  ZC706-Z045
 	1006  KCU105-KU040
 	1007  XUSP3S-VU095 [Jasper]
+	1008  XUSPL4-VU065 [Mustang UltraScale]
+	1009  XUSPL4-VU3P [Mustang UltraScale+]
+	100a  A10PL4-A10GX115
+	100b  K35-2SFP
+	100c  K35-4SFP
 	4200  A5PL-E1-10GETI [10 GbE Ethernet Traffic Instrument]
 1de1  Tekram Technology Co.,Ltd.
 	0391  TRM-S1040 [DC-315 / DC-395 series]
@@ -19821,6 +19865,7 @@
 	4010  TN4010 Clean SROM
 	4020  TN9030 10GbE CX4 Ethernet Adapter
 	4022  TN9310 10GbE SFP+ Ethernet Adapter
+		1043 8709  XG-C100F 10GbE SFP+ Ethernet Adapter
 		1186 4d00  DXE-810S 10GbE SFP+ Ethernet Adapter
 		1fc9 3015  Ethernet Adapter
 	4024  TN9210 10GBase-T Ethernet Adapter
@@ -22141,6 +22186,7 @@
 	1563  Ethernet Controller 10G X550T
 		8086 0001  Ethernet Converged Network Adapter X550-T2
 		8086 001a  Ethernet Converged Network Adapter X550-T2
+		8086 0022  Ethernet Converged Network Adapter X550-T2
 	1566  DSL4410 Thunderbolt NHI [Redwood Ridge 2C 2013]
 	1567  DSL4410 Thunderbolt Bridge [Redwood Ridge 2C 2013]
 	1568  DSL4510 Thunderbolt NHI [Redwood Ridge 4C 2013]
@@ -22221,6 +22267,8 @@
 		103c 0000  HP Flex-20 20Gb 2-port 660M Adapter
 		103c 22ff  HP Flex-20 20Gb 2-port 660M Adapter
 	1589  Ethernet Controller X710/X557-AT 10GBASE-T
+		108e 0000  Quad Port 10GBase-T Adapter
+		108e 7b1c  Quad Port 10GBase-T Adapter
 		8086 0000  Ethernet Converged Network Adapter X710-T
 		8086 0001  Ethernet Converged Network Adapter X710-T4
 		8086 0002  Ethernet Converged Network Adapter X710-T4
@@ -22241,9 +22289,12 @@
 	15b7  Ethernet Connection (2) I219-LM
 	15b8  Ethernet Connection (2) I219-V
 	15b9  Ethernet Connection (3) I219-LM
+	15d0  Ethernet SDI Adapter FM10420-100GbE-QDA2
 	15d1  Ethernet Controller 10G X550T
 		8086 0002  Ethernet Converged Network Adapter X550-T1
+		8086 0021  Ethernet Converged Network Adapter X550-T1
 		8086 00a2  Ethernet Converged Network Adapter X550-T1
+	15d5  Ethernet SDI Adapter FM10420-25GbE-DA2
 	15d6  Ethernet Connection (5) I219-V
 	15d7  Ethernet Connection (4) I219-LM
 	15d8  Ethernet Connection (4) I219-V
@@ -25544,6 +25595,14 @@
 	372b  Xeon C5500/C3500 Core
 	372c  Xeon C5500/C3500 Reserved
 	373f  Xeon C5500/C3500 IOxAPIC
+	37cd  X722 Virtual Function
+	37ce  Ethernet Connection X722 for 10GbE backplane
+	37cf  Ethernet Connection X722 for 10GbE QSFP+
+	37d0  Ethernet Connection X722 for 10GbE SFP+
+	37d1  Ethernet Connection X722 for 1GbE
+	37d2  Ethernet Connection X722 for 10GBASE-T
+	37d3  Ethernet Connection X722 for 10GbE SFP+
+	37d4  Ethernet Connection X722 for 10GbE QSFP+
 	3a00  82801JD/DO (ICH10 Family) 4-port SATA IDE Controller
 	3a02  82801JD/DO (ICH10 Family) SATA AHCI Controller
 	3a05  82801JD/DO (ICH10 Family) SATA RAID Controller
@@ -27434,6 +27493,10 @@ bdbd  Blackmagic Design
 	a137  DeckLink Studio 4K
 	a138  Decklink SDI 4K
 	a139  Intensity Pro 4K
+	a13b  DeckLink Micro Recorder
+	a13d  DeckLink 4K Pro
+	a13e  UltraStudio 4K Extreme
+	a13f  DeckLink Quad 2
 c001  TSI Telsys
 c0a9  Micron/Crucial Technology
 c0de  Motorola
