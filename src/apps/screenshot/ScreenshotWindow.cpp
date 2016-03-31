@@ -140,7 +140,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 
 	// Check if fUtility contains valid data
 	if (fUtility.wholeScreen == NULL) {
-		_NewScreenshot(silent, clipboard);
+		_NewScreenshot(silent, clipboard, true);
 		return;
 	}
 
@@ -391,15 +391,18 @@ ScreenshotWindow::Quit()
 
 
 void
-ScreenshotWindow::_NewScreenshot(bool silent, bool clipboard)
+ScreenshotWindow::_NewScreenshot(bool silent, bool clipboard, bool ignoreDelay)
 {
 	BMessage message(B_ARGV_RECEIVED);
 	int32 argc = 3;
-	BString delay;
-	delay << fDelay / 1000000;
 	message.AddString("argv", "screenshot");
-	message.AddString("argv", "--delay");
-	message.AddString("argv", delay);
+
+	if (!ignoreDelay) {
+		BString delay;
+		delay << fDelay / 1000000;
+		message.AddString("argv", "--delay");
+		message.AddString("argv", delay);
+	}
 
 	if (silent || clipboard) {
 		if (silent) {

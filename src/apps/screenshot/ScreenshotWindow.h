@@ -40,7 +40,8 @@ public:
 
 private:
 			void			_NewScreenshot(bool silent = false,
-								bool clipboard = false);
+								bool clipboard = false,
+								bool ignoreDelay = false);
 			void			_UpdatePreviewPanel();
 			void			_DisallowChar(BTextView* textView);
 			void			_SetupOutputPathMenu(const BMessage& settings);
