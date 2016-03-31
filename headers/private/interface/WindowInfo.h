@@ -14,7 +14,7 @@
 
 struct window_info {
 	team_id		team;
-    int32   	server_token;
+	int32		server_token;
 
 	int32		thread;
 	int32		client_token;
@@ -22,8 +22,8 @@ struct window_info {
 	uint32		workspaces;
 
 	int32		layer;	// see ServerWindow::GetInfo()
-    uint32	  	feel;
-    uint32      flags;
+	uint32		feel;
+	uint32		flags;
 	int32		window_left;
 	int32		window_top;
 	int32		window_right;
