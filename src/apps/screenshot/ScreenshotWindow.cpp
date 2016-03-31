@@ -229,7 +229,7 @@ ScreenshotWindow::ScreenshotWindow(const Utility& utility, bool silent,
 			.End()
 		.End()
 		.Add(new BSeparatorView(B_HORIZONTAL))
-		.AddGroup(B_HORIZONTAL, 0)
+		.AddGroup(B_HORIZONTAL)
 			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING)
 			.Add(new BButton("", B_TRANSLATE("Copy to clipboard"),
