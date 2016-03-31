@@ -151,7 +151,6 @@ NodeManager::RegisterNode(media_addon_id addOnID, int32 flavorID,
 	BAutolock _(this);
 
 	registered_node node;
-	node.node_id = fNextNodeID;
 	node.timesource_id = timesource;
 	node.add_on_id = addOnID;
 	node.flavor_id = flavorID;
@@ -162,15 +161,30 @@ NodeManager::RegisterNode(media_addon_id addOnID, int32 flavorID,
 	node.creator = -1; // will be set later
 	node.ref_count = 1;
 
+	if (node.kinds & B_TIME_SOURCE
+			&& strcmp(node.name, "System clock") == 0) {
+		// This may happen when media_addon_server crash,
+		// we will replace the old timesource.
+		node.node_id = NODE_SYSTEM_TIMESOURCE_ID;
+
+		NodeMap::iterator found = fNodeMap.find(node.node_id);
+		if (found != fNodeMap.end())
+			fNodeMap.erase(node.node_id);
+
+		*_nodeID = node.node_id;
+	} else {
+		node.node_id = fNextNodeID;
+		*_nodeID = node.node_id;
+	}
+
 	try {
 		node.team_ref_count.insert(std::make_pair(team, 1));
-
-		fNodeMap.insert(std::make_pair(fNextNodeID, node));
+		fNodeMap.insert(std::make_pair(node.node_id, node));
 	} catch (std::bad_alloc& exception) {
 		return B_NO_MEMORY;
 	}
 
-	*_nodeID = fNextNodeID++;
+	fNextNodeID++;
 
 	TRACE("NodeManager::RegisterNode: node %" B_PRId32 ", addon_id %" B_PRId32
 		", flavor_id %" B_PRId32 ", name \"%s\", kinds %#Lx, port %" B_PRId32
@@ -211,8 +225,11 @@ NodeManager::UnregisterNode(media_node_id id, team_id team,
 		//return B_ERROR;
 	}
 
-	*_addOnID = node.add_on_id;
-	*_flavorID = node.flavor_id;
+	if (_addOnID != NULL)
+		*_addOnID = node.add_on_id;
+
+	if (_flavorID != NULL)
+		*_flavorID = node.flavor_id;
 
 	fNodeMap.erase(found);
 
