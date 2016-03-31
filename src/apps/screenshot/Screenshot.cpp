@@ -26,6 +26,7 @@
 #include <TranslatorFormats.h>
 
 #include <WindowInfo.h>
+#include <WindowPrivate.h>
 
 #include "Utility.h"
 
@@ -307,8 +308,10 @@ Screenshot::_GetActiveWindowFrame()
 			for (int i = 0; i < tokenCount; i++) {
 				token = tokens[i];
 				windowInfo = get_window_info(token);
-				if (windowInfo && !windowInfo->is_mini
-						&& !(windowInfo->show_hide_level > 0)) {
+				if (windowInfo != NULL
+					&& windowInfo->feel != kMenuWindowFeel
+					&& !windowInfo->is_mini
+					&& !(windowInfo->show_hide_level > 0)) {
 					foundActiveWindow = true;
 					break;
 				}
