@@ -623,7 +623,7 @@ PluginManager::CreateStreamer(Streamer** streamer, BUrl* url, BDataIO** source)
 
 		(*streamer)->fMediaPlugin = plugin;
 
-		BMediaIO* streamSource = NULL;
+		BDataIO* streamSource = NULL;
 		if ((*streamer)->Sniff(url, &streamSource) == B_OK) {
 			TRACE("PluginManager::CreateStreamer: Sniff success ");
 			*source = streamSource;
