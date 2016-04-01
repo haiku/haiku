@@ -394,10 +394,11 @@ void
 ScreenshotWindow::_NewScreenshot(bool silent, bool clipboard, bool ignoreDelay)
 {
 	BMessage message(B_ARGV_RECEIVED);
-	int32 argc = 3;
+	int32 argc = 1;
 	message.AddString("argv", "screenshot");
 
 	if (!ignoreDelay) {
+		argc += 2;
 		BString delay;
 		delay << fDelay / 1000000;
 		message.AddString("argv", "--delay");
