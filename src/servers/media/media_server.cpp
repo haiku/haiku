@@ -37,7 +37,7 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 #include <string.h>
 
 #include <Alert.h>
-#include <Application.h>
+#include <Server.h>
 #include <Autolock.h>
 #include <Directory.h>
 #include <Roster.h>
@@ -69,10 +69,10 @@ NotificationManager* gNotificationManager;
 #define REPLY_TIMEOUT ((bigtime_t)500000)
 
 
-class ServerApp : BApplication {
+class ServerApp : public BServer {
 public:
-	ServerApp();
-	~ServerApp();
+								ServerApp(status_t& error);
+	virtual						~ServerApp();
 
 protected:
 	virtual void				ArgvReceived(int32 argc, char** argv);
@@ -89,7 +89,7 @@ private:
 private:
 			port_id				_ControlPort() const { return fControlPort; }
 
-	static	int32				_ControlThread(void* arg);
+			static	int32		_ControlThread(void* arg);
 
 			BLocker				fLocker;
 			port_id				fControlPort;
@@ -97,9 +97,9 @@ private:
 };
 
 
-ServerApp::ServerApp()
+ServerApp::ServerApp(status_t& error)
  	:
- 	BApplication(B_MEDIA_SERVER_SIGNATURE),
+	BServer(B_MEDIA_SERVER_SIGNATURE, true, &error),
 	fLocker("media server locker")
 {
  	gNotificationManager = new NotificationManager;
@@ -971,8 +971,11 @@ ServerApp::MessageReceived(BMessage* msg)
 int
 main()
 {
-	new ServerApp;
-	be_app->Run();
-	delete be_app;
-	return 0;
+	status_t status;
+	ServerApp app(status);
+
+	if (status == B_OK)
+		app.Run();
+
+	return status == B_OK ? EXIT_SUCCESS : EXIT_FAILURE;
 }
