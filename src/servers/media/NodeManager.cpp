@@ -161,7 +161,7 @@ NodeManager::RegisterNode(media_addon_id addOnID, int32 flavorID,
 	node.creator = -1; // will be set later
 	node.ref_count = 1;
 
-	if (node.kinds & B_TIME_SOURCE
+	if ((node.kinds & B_TIME_SOURCE) != 0
 			&& strcmp(node.name, "System clock") == 0) {
 		// This may happen when media_addon_server crash,
 		// we will replace the old timesource.
