@@ -305,7 +305,7 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 			server_register_app_reply reply;
 
 			status_t status = gAppManager->RegisterTeam(request.team,
-				request.messenger);
+				request.messenger, &reply.global_synchro);
 			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
@@ -937,6 +937,12 @@ ServerApp::MessageReceived(BMessage* msg)
 		case MEDIA_SERVER_ADD_SYSTEM_BEEP_EVENT:
 			gMediaFilesManager->HandleAddSystemBeepEvent(msg);
 			break;
+
+		case MEDIA_SERVER_RESCAN_COMPLETED:
+		{
+			gAppManager->UnlockGlobalSynchro();
+			break;
+		}
 
 		case B_SOME_APP_QUIT:
 		{

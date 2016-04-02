@@ -18,7 +18,7 @@ public:
 								~AppManager();
 
 			status_t			RegisterTeam(team_id team,
-									const BMessenger& messenger);
+									const BMessenger& messenger, sem_id* sync);
 			status_t			UnregisterTeam(team_id team);
 			bool				HasTeam(team_id team);
 
@@ -28,6 +28,8 @@ public:
 
 			void				Dump();
 
+			void				UnlockGlobalSynchro();
+
 private:
 			void				_CleanupTeam(team_id team);
 
@@ -35,6 +37,7 @@ private:
 			typedef std::map<team_id, BMessenger> AppMap;
 
 			AppMap				fMap;
+			sem_id				fGlobalSynchro;
 };
 
 

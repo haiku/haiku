@@ -16,9 +16,11 @@
 #include <TimeSource.h>
 #include <string.h>
 
-#include "DormantNodeManager.h"
-#include "NodeManager.h"
 #include "debug.h"
+#include "DormantNodeManager.h"
+#include "media_server.h"
+#include "NodeManager.h"
+
 
 /* no locking used in this file, we assume that the caller (NodeManager) does it.
  */
@@ -411,6 +413,9 @@ DefaultManager::_RescanThread()
 			add_on_server_rescan_finished_notify_command cmd;
 			SendToAddOnServer(ADD_ON_SERVER_RESCAN_FINISHED_NOTIFY, &cmd,
 				sizeof(cmd));
+
+			BMessage msg(MEDIA_SERVER_RESCAN_COMPLETED);
+			be_app->PostMessage(&msg);
 		}
 
 		locker.Lock();

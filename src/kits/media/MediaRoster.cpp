@@ -107,6 +107,7 @@ static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
 static BLocker sInitLocker("BMediaRoster::Roster locker");
 static List<LocalNode> sRegisteredNodes;
+static sem_id sGlobalSynchro = -1;
 
 
 class MediaRosterUndertaker {
@@ -3344,6 +3345,27 @@ BMediaRoster::IsRunning()
 }
 
 
+status_t
+BMediaRoster::SyncToServices(bigtime_t timeout)
+{
+	if (!IsRunning())
+		return B_ERROR;
+
+	TRACE("BMediaRoster::SyncToServer: Syncing to the media server");
+
+	// This sem is valid only when the server started
+	// but it's not ready to supply the services.
+	if (sGlobalSynchro > -1)
+		acquire_sem_etc(sGlobalSynchro, 1, B_RELATIVE_TIMEOUT, timeout);
+
+	// TODO: Ideally this function should take into account
+	// the startup latencies of the system nodes and sleep
+	// for the resulting sum.
+
+	return B_OK;
+}
+
+
 ssize_t
 BMediaRoster::AudioBufferSizeFor(int32 channelCount, uint32 sampleFormat,
 	float frameRate, bus_type busKind)
@@ -3445,7 +3467,9 @@ BMediaRoster::MessageReceived(BMessage* message)
 
 			// Send the notification to our subscribers
 			if (BMediaRoster::IsRunning()) {
+				SyncToServices();
 				sServerIsUp = true;
+				sGlobalSynchro = -1;
 				// Wait for media services to wake up
 				// TODO: This should be solved so that the server
 				// have a way to notify us when the system is really
