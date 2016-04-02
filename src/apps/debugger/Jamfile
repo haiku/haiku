@@ -34,6 +34,8 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) settings generic ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language c_family ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language x86 ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) target_host_interface ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) target_host_interface interfaces ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli ] ;
@@ -193,6 +195,7 @@ local sources =
 	SyntheticPrimitiveType.cpp
 	SyscallInfo.cpp
 	SystemInfo.cpp
+	TargetHost.cpp
 	Team.cpp
 	TeamInfo.cpp
 	TeamMemory.cpp
@@ -238,6 +241,12 @@ local sources =
 
 	# source_language/x86
 	X86AssemblyLanguage.cpp
+
+	# target_host_interface
+	TargetHostInterface.cpp
+
+	# target_host_interface/interfaces
+	LocalTargetHostInterface.cpp
 
 	# types
 	ArrayIndexPath.cpp

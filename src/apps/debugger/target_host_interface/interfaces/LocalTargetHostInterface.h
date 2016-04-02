@@ -1,0 +1,41 @@
+/*
+ * Copyright 2016, Rene Gollent, rene@gollent.com.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef LOCAL_TARGET_HOST_INTERFACE_H
+#define LOCAL_TARGET_HOST_INTERFACE_H
+
+#include "TargetHostInterface.h"
+
+#include <Looper.h>
+
+
+class LocalTargetHostInterface : public TargetHostInterface {
+public:
+								LocalTargetHostInterface();
+	virtual						~LocalTargetHostInterface();
+
+	virtual	status_t			Init();
+	virtual	void				Close();
+
+	virtual	bool				Connected() const;
+
+	virtual	TargetHost*			GetTargetHost();
+
+	virtual	status_t			Attach(team_id id, thread_id threadID,
+									DebuggerInterface*& _interface);
+
+	virtual	status_t			CreateTeam(int commandLineArgc,
+									const char* const* arguments,
+									DebuggerInterface*& _interface);
+
+private:
+	static	status_t			PortLoop(void* arg);
+
+private:
+			TargetHost*			fTargetHost;
+			port_id				fDataPort;
+			thread_id			fPortWorker;
+};
+
+#endif	// LOCAL_TARGET_HOST_INTERFACE_H
