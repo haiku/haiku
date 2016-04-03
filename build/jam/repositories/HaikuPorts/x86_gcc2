@@ -493,6 +493,7 @@ RemotePackageRepository HaikuPorts
 	super_transball-2.1.5-1
 	taglib-1.7.2-1
 	taglib_devel-1.7.2-1
+	takenotes-1.0.0-5
 	tar-1.26-6
 	taskmanager-0.1.7-3
 	tcl-8.5.18-1
@@ -1399,6 +1400,7 @@ RemotePackageRepository HaikuPorts
 	swig_x86
 	taglib
 	taglib_x86
+	takenotes
 	tar
 	taskmanager
 	tcl
