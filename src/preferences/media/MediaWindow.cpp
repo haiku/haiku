@@ -658,7 +658,6 @@ MediaWindow::_RestartMediaServices(void* data)
 	MediaWindow* window = (MediaWindow*)data;
 
 	shutdown_media_server();
-	launch_media_server();
 
 	if (window->fRestartAlert != NULL
 			&& window->fRestartAlert->Lock()) {
