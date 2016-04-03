@@ -1414,8 +1414,6 @@ launch_media_server(bigtime_t timeout,
 		snooze(1000000);
 	}
 
-	progress_startup(50, progress, cookie);
-
 	status_t err = be_roster->Launch(B_MEDIA_SERVER_SIGNATURE);
 	if (err != B_OK)
 		return err;
@@ -1431,7 +1429,6 @@ launch_media_server(bigtime_t timeout,
 		if (messenger.IsValid()) {
 			messenger.SendMessage(&msg, &reply, 2000000, 2000000);
 			err = B_OK;
-			progress_startup(100, progress, cookie);
 			break;
 		}
 	}
