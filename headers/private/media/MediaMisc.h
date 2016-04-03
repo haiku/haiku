@@ -7,6 +7,19 @@
 #ifndef _MEDIA_MISC_H_
 #define _MEDIA_MISC_H_
 
+
+// Used by Haiku apps to make media services notifications
+void
+progress_startup(int stage,
+	bool (*progress)(int stage, const char* message, void* cookie),
+	void* cookie);
+
+void
+progress_shutdown(int stage,
+	bool (*progress)(int stage, const char* message, void* cookie),
+	void* cookie);
+
+
 #define IS_INVALID_NODE(_node) 			((_node).node <= 0 || (_node).port <= 0)
 #define IS_INVALID_NODEID(_id) 			((_id) <= 0)
 #define IS_INVALID_SOURCE(_src)			((_src).port <= 0)
