@@ -207,8 +207,8 @@ VideoNode::AcceptFormat(const media_destination &dst, media_format *format)
 	// or the requested colorspace if not B_YCbCr422
 	// and we need to tell the node upstream of our choice
 
-	BRect frame(0, 0, format->u.raw_video.display.line_width - 1,
-		format->u.raw_video.display.line_count - 1);
+	BRect frame(0, 0, format->u.raw_video.display.line_width,
+		format->u.raw_video.display.line_count);
 
 	DeleteBuffers();
 	status_t err;
