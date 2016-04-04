@@ -413,15 +413,15 @@ DefaultManager::_RescanThread()
 			add_on_server_rescan_finished_notify_command cmd;
 			SendToAddOnServer(ADD_ON_SERVER_RESCAN_FINISHED_NOTIFY, &cmd,
 				sizeof(cmd));
-
-			BMessage msg(MEDIA_SERVER_RESCAN_COMPLETED);
-			be_app->PostMessage(&msg);
 		}
 
 		locker.Lock();
 	}
 
 	fRescanThread = -1;
+
+	BMessage msg(MEDIA_SERVER_RESCAN_COMPLETED);
+	be_app->PostMessage(&msg);
 
 	TRACE("DefaultManager::_RescanThread() leave\n");
 }

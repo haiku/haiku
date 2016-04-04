@@ -50,14 +50,11 @@ AppManager::AppManager()
 	:
 	BLocker("media app manager")
 {
-	fGlobalSynchro = create_sem(0, "media server global synchro");
 }
 
 
 AppManager::~AppManager()
 {
-	if (fGlobalSynchro != -1)
-		delete_sem(fGlobalSynchro);
 }
 
 
@@ -70,8 +67,7 @@ AppManager::HasTeam(team_id team)
 
 
 status_t
-AppManager::RegisterTeam(team_id team, const BMessenger& messenger,
-	sem_id* sync)
+AppManager::RegisterTeam(team_id team, const BMessenger& messenger)
 {
 	BAutolock lock(this);
 
@@ -87,8 +83,6 @@ AppManager::RegisterTeam(team_id team, const BMessenger& messenger,
 	} catch (std::bad_alloc& exception) {
 		return B_NO_MEMORY;
 	}
-
-	*sync = fGlobalSynchro;
 
 	return B_OK;
 }
@@ -157,9 +151,13 @@ AppManager::Dump()
 
 
 void
-AppManager::UnlockGlobalSynchro()
+AppManager::NotifyRosters()
 {
-	delete_sem(fGlobalSynchro);
+	BAutolock lock(this);
+
+	AppMap::iterator iterator = fMap.begin();
+	for (; iterator != fMap.end(); iterator++)
+		iterator->second.SendMessage(MEDIA_SERVER_ALIVE);
 }
 
 

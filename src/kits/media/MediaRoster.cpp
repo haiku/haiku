@@ -107,7 +107,6 @@ static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
 static BLocker sInitLocker("BMediaRoster::Roster locker");
 static List<LocalNode> sRegisteredNodes;
-static sem_id sGlobalSynchro = -1;
 
 
 class MediaRosterUndertaker {
@@ -3345,27 +3344,6 @@ BMediaRoster::IsRunning()
 }
 
 
-status_t
-BMediaRoster::SyncToServices(bigtime_t timeout)
-{
-	if (!IsRunning())
-		return B_ERROR;
-
-	TRACE("BMediaRoster::SyncToServer: Syncing to the media server");
-
-	// This sem is valid only when the server started
-	// but it's not ready to supply the services.
-	if (sGlobalSynchro > -1)
-		acquire_sem_etc(sGlobalSynchro, 1, B_RELATIVE_TIMEOUT, timeout);
-
-	// TODO: Ideally this function should take into account
-	// the startup latencies of the system nodes and sleep
-	// for the resulting sum.
-
-	return B_OK;
-}
-
-
 ssize_t
 BMediaRoster::AudioBufferSizeFor(int32 channelCount, uint32 sampleFormat,
 	float frameRate, bus_type busKind)
@@ -3465,33 +3443,11 @@ BMediaRoster::MessageReceived(BMessage* message)
 
 			TRACE("BMediaRoster::MessageReceived media services are going up.");
 
-			// Send the notification to our subscribers
 			if (BMediaRoster::IsRunning()) {
-				SyncToServices();
-				sServerIsUp = true;
-				sGlobalSynchro = -1;
-				// Wait for media services to wake up
-				// TODO: This should be solved so that the server
-				// have a way to notify us when the system is really
-				// ready to run and we avoid sleeping.
-				snooze(2000000);
-				// Restore our friendship with the media servers
+				// Wait for media services to wake up and restore our friendship
 				if (MediaRosterEx(this)->BuildConnections() != B_OK) {
 					TRACE("BMediaRoster::MessageReceived can't reconnect"
 						"to media_server.");
-				}
-
-				for (int32 i = 0; i < sNotificationList.CountItems(); i++) {
-					RosterNotification* current;
-					if (sNotificationList.Get(i, &current) != true)
-						return;
-					if (current->what == B_MEDIA_SERVER_STARTED) {
-						if (current->messenger.SendMessage(
-								B_MEDIA_SERVER_STARTED) != B_OK) {
-							if(!current->messenger.IsValid())
-								sNotificationList.Remove(i);
-						}
-					}
 				}
 			}
 			return;
@@ -3525,6 +3481,31 @@ BMediaRoster::MessageReceived(BMessage* message)
 				}
 			}
 			return;
+		}
+
+		case MEDIA_SERVER_ALIVE:
+		{
+			if (!BMediaRoster::IsRunning())
+				return;
+
+			sServerIsUp = true;
+
+			TRACE("BMediaRoster::MessageReceived media services are"
+				" finally up.");
+
+			// Send the notification to our subscribers
+			for (int32 i = 0; i < sNotificationList.CountItems(); i++) {
+				RosterNotification* current;
+				if (sNotificationList.Get(i, &current) != true)
+					return;
+				if (current->what == B_MEDIA_SERVER_STARTED) {
+					if (current->messenger.SendMessage(
+							B_MEDIA_SERVER_STARTED) != B_OK) {
+						if(!current->messenger.IsValid())
+							sNotificationList.Remove(i);
+					}
+				}
+			}
 		}
 
 		case NODE_FINAL_RELEASE:

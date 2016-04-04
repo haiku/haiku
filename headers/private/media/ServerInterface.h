@@ -30,6 +30,8 @@ enum {
 
 	// sent by the rescan thread
 	MEDIA_SERVER_RESCAN_COMPLETED,
+	// sent to rosters when rescan is completed
+	MEDIA_SERVER_ALIVE,
 
 	// media add-on server
 	MEDIA_ADD_ON_SERVER_PLAY_MEDIA = '_TRU'
@@ -373,7 +375,6 @@ struct server_register_app_request : request_data {
 };
 
 struct server_register_app_reply : reply_data {
-	sem_id					global_synchro;
 };
 
 struct server_unregister_app_request : request_data {

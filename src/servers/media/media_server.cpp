@@ -37,13 +37,13 @@ char __dont_remove_copyright_from_binary[] = "Copyright (c) 2002, 2003 "
 #include <string.h>
 
 #include <Alert.h>
-#include <Server.h>
 #include <Autolock.h>
 #include <Directory.h>
 #include <Roster.h>
 #include <MediaDefs.h>
 #include <MediaFormats.h>
 #include <Messenger.h>
+#include <Server.h>
 
 #include <syscalls.h>
 
@@ -307,7 +307,7 @@ ServerApp::_HandleMessage(int32 code, const void* data, size_t size)
 			server_register_app_reply reply;
 
 			status_t status = gAppManager->RegisterTeam(request.team,
-				request.messenger, &reply.global_synchro);
+				request.messenger);
 			request.SendReply(status, &reply, sizeof(reply));
 			break;
 		}
@@ -942,7 +942,7 @@ ServerApp::MessageReceived(BMessage* msg)
 
 		case MEDIA_SERVER_RESCAN_COMPLETED:
 		{
-			gAppManager->UnlockGlobalSynchro();
+			gAppManager->NotifyRosters();
 			progress_startup(100, NULL, NULL);
 			break;
 		}
