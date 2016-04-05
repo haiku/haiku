@@ -53,6 +53,7 @@ private:
 
 			AVFormatContext*	fContext;
 			bool				fHeaderWritten;
+			int					fHeaderError;
 
 			AVIOContext*		fIOContext;
 

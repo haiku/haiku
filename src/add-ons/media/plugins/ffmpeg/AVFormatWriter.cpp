@@ -381,6 +381,7 @@ AVFormatWriter::AVFormatWriter()
 	:
 	fContext(avformat_alloc_context()),
 	fHeaderWritten(false),
+	fHeaderError(-1),
 	fIOContext(NULL),
 	fStreamLock("stream lock")
 {
@@ -488,9 +489,9 @@ AVFormatWriter::CommitHeader()
 	}
 #endif
 
-	int result = avformat_write_header(fContext, NULL);
-	if (result < 0)
-		TRACE("  avformat_write_header(): %d\n", result);
+	fHeaderError = avformat_write_header(fContext, NULL);
+	if (fHeaderError < 0)
+		TRACE("  avformat_write_header(): %d\n", fHeaderError);
 
 	// We need to close the codecs we opened, even in case of failure.
 	fHeaderWritten = true;
@@ -505,7 +506,7 @@ AVFormatWriter::CommitHeader()
 	}
 	#endif // TRACE_AVFORMAT_WRITER
 
-	return result == 0 ? B_OK : B_ERROR;
+	return fHeaderError == 0 ? B_OK : B_ERROR;
 }
 
 
@@ -529,10 +530,14 @@ AVFormatWriter::Close()
 	if (!fHeaderWritten)
 		return B_NOT_ALLOWED;
 
-	int result = av_write_trailer(fContext);
-	if (result < 0)
-		TRACE("  av_write_trailer(): %d\n", result);
-
+	int result = -1;
+	// From ffmpeg documentation: [av_write_trailer] may only be called
+	// after a successful call to avformat_write_header.
+	if (fHeaderError > 0) {
+		result = av_write_trailer(fContext);
+		if (result < 0)
+			TRACE("  av_write_trailer(): %d\n", result);
+	}
 	return result == 0 ? B_OK : B_ERROR;
 }
 
