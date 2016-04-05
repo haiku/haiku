@@ -10,6 +10,7 @@
 #include "SpiderView.h"
 
 #include <Catalog.h>
+#include <ControlLook.h>
 #include <Message.h>
 #include <Menu.h>
 #include <MenuField.h>
@@ -164,7 +165,7 @@ SpiderView::SpiderView(BRect frame, SpiderSaver* saver, uint32 queueNumber,
 	fColorMenuField = new BMenuField(frame, "color", B_TRANSLATE("Color"),
 		menu);
 	fColorMenuField->SetDivider(fColorMenuField->StringWidth(
-		B_TRANSLATE("Color")) + 5.0f);
+		B_TRANSLATE("Color")) + be_control_look->DefaultItemSpacing());
 	AddChild(fColorMenuField);
 }
 
