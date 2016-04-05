@@ -30,7 +30,9 @@ public:
 									DebuggerInterface*& _interface);
 
 private:
-	static	status_t			PortLoop(void* arg);
+	static	status_t			_PortLoop(void* arg);
+			status_t			_HandleTeamEvent(team_id team, int32 opcode,
+									bool& addToWaiters);
 
 private:
 			TargetHost*			fTargetHost;

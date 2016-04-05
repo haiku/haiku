@@ -5,6 +5,8 @@
 
 #include "LocalTargetHostInterface.h"
 
+#include <set>
+
 #include <stdio.h>
 #include <unistd.h>
 
@@ -14,6 +16,7 @@
 
 #include "TargetHost.h"
 
+using std::set;
 
 LocalTargetHostInterface::LocalTargetHostInterface()
 	:
@@ -59,7 +62,7 @@ LocalTargetHostInterface::Init()
 	if (fDataPort < 0)
 		return fDataPort;
 
-	fPortWorker = spawn_thread(PortLoop, "Local Target Host Loop",
+	fPortWorker = spawn_thread(_PortLoop, "Local Target Host Loop",
 		B_NORMAL_PRIORITY, this);
 	if (fPortWorker < 0)
 		return fPortWorker;
@@ -135,24 +138,46 @@ LocalTargetHostInterface::CreateTeam(int commandLineArgc,
 
 
 status_t
-LocalTargetHostInterface::PortLoop(void* arg)
+LocalTargetHostInterface::_PortLoop(void* arg)
 {
 	LocalTargetHostInterface* interface = (LocalTargetHostInterface*)arg;
+	set<team_id> waitingTeams;
 
 	for (;;) {
+		status_t error;
+		bool addToWaiters;
 		char buffer[2048];
 		int32 messageCode;
-		ssize_t size = read_port(interface->fDataPort, &messageCode, buffer,
-			sizeof(buffer));
+		team_id team;
+
+		ssize_t size = read_port_etc(interface->fDataPort, &messageCode,
+			buffer, sizeof(buffer), B_TIMEOUT, waitingTeams.empty()
+				? B_INFINITE_TIMEOUT : 20000);
 		if (size == B_INTERRUPTED)
 			continue;
-		else if (size < 0)
+		else if (size == B_TIMED_OUT && !waitingTeams.empty()) {
+			for (set<team_id>::iterator it = waitingTeams.begin();
+				it != waitingTeams.end(); ++it) {
+				team = *it;
+				error = interface->_HandleTeamEvent(team,
+					B_TEAM_CREATED, addToWaiters);
+				if (error != B_OK)
+					continue;
+				else if (!addToWaiters) {
+					waitingTeams.erase(it);
+					if (waitingTeams.empty())
+						break;
+					it = waitingTeams.begin();
+				}
+			}
+			continue;
+		} else if (size < 0)
 			return size;
 
 		KMessage message;
 		size = message.SetTo(buffer);
 		if (size != B_OK)
-			return size;
+			continue;
 
 		if (message.What() != B_SYSTEM_OBJECT_UPDATE)
 			continue;
@@ -161,37 +186,75 @@ LocalTargetHostInterface::PortLoop(void* arg)
 		if (message.FindInt32("opcode", &opcode) != B_OK)
 			continue;
 
-		team_id team = -1;
+		team = -1;
 		if (message.FindInt32("team", &team) != B_OK)
 			continue;
 
-		AutoLocker<TargetHost> locker(interface->fTargetHost);
-		switch (opcode) {
-			case B_TEAM_CREATED:
-			case B_TEAM_EXEC:
-			{
-				team_info info;
-				status_t error = get_team_info(team, &info);
-				if (error != B_OK)
-					continue;
+		error = interface->_HandleTeamEvent(team, opcode,
+			addToWaiters);
+		if (error != B_OK)
+			continue;
+		if (opcode == B_TEAM_CREATED && addToWaiters) {
+			try {
+				waitingTeams.insert(team);
+			} catch (...) {
+				continue;
+			}
+		}
+	}
 
-				if (opcode == B_TEAM_CREATED)
-					interface->fTargetHost->AddTeam(info);
-				else
-					interface->fTargetHost->UpdateTeam(info);
-				break;
+	return B_OK;
+}
+
+
+status_t
+LocalTargetHostInterface::_HandleTeamEvent(team_id team, int32 opcode,
+	bool& addToWaiters)
+{
+	addToWaiters = false;
+	AutoLocker<TargetHost> locker(fTargetHost);
+	switch (opcode) {
+		case B_TEAM_CREATED:
+		case B_TEAM_EXEC:
+		{
+			team_info info;
+			status_t error = get_team_info(team, &info);
+			// this team is already gone, no point in sending a notification
+			if (error == B_BAD_TEAM_ID)
+				return B_OK;
+			else if (error != B_OK)
+				return error;
+			else {
+				int32 cookie = 0;
+				image_info imageInfo;
+				addToWaiters = true;
+				while (get_next_image_info(team, &cookie, &imageInfo)
+					== B_OK) {
+					if (imageInfo.type == B_APP_IMAGE) {
+						addToWaiters = false;
+						break;
+					}
+				}
+				if (addToWaiters)
+					return B_OK;
 			}
 
-			case B_TEAM_DELETED:
-			{
-				interface->fTargetHost->RemoveTeam(team);
-				break;
-			}
+			if (opcode == B_TEAM_CREATED)
+				fTargetHost->AddTeam(info);
+			else
+				fTargetHost->UpdateTeam(info);
+			break;
+		}
 
-			default:
-			{
-				break;
-			}
+		case B_TEAM_DELETED:
+		{
+			fTargetHost->RemoveTeam(team);
+			break;
+		}
+
+		default:
+		{
+			break;
 		}
 	}
 
