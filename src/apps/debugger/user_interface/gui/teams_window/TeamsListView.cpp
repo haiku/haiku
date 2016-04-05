@@ -4,6 +4,8 @@
  * Distributed under the terms of the MIT License.
  */
 
+#include "TeamsListView.h"
+
 #include <algorithm>
 #include <new>
 
@@ -21,11 +23,15 @@
 #include <Roster.h>
 #include <String.h>
 
-#include "TeamsListView.h"
+#include <AutoLocker.h>
+
+#include "TargetHostInterface.h"
 
 
 enum {
-	MSG_UPDATE_TEAMS_LIST = 'uptl'
+	MSG_TEAM_ADDED = 'tead',
+	MSG_TEAM_REMOVED = 'tere',
+	MSG_TEAM_RENAMED = 'tern'
 };
 
 
@@ -186,35 +192,24 @@ TeamsColumn::InitTextMargin(BView* parent)
 
 enum {
 	kNameColumn,
-	kIDColumn,
-	kThreadCountColumn,
+	kIDColumn
 };
 
 
-TeamRow::TeamRow(team_info& info)
+TeamRow::TeamRow(TeamInfo* info)
 	: BRow(std::max(20.0f, ceilf(be_plain_font->Size() * 1.4)))
 {
-	_SetTo(info);
-}
-
-
-TeamRow::TeamRow(team_id team)
-	: BRow(std::max(20.0f, ceilf(be_plain_font->Size() * 1.4)))
-{
-	team_info info;
-	get_team_info(team, &info);
 	_SetTo(info);
 }
 
 
 bool
-TeamRow::NeedsUpdate(team_info& info)
+TeamRow::NeedsUpdate(TeamInfo* info)
 {
 	// Check if we need to rebuilt the row's fields because the team critical
 	// info (basically, app image running under that team ID) has changed
 
-	if (info.argc != fTeamInfo.argc
-		|| strncmp(info.args, fTeamInfo.args, sizeof(fTeamInfo.args)) != 0) {
+	if (info->Arguments() != fTeamInfo.Arguments()) {
 		_SetTo(info);
 		return true;
 	}
@@ -224,22 +219,17 @@ TeamRow::NeedsUpdate(team_info& info)
 
 
 status_t
-TeamRow::_SetTo(team_info& info)
+TeamRow::_SetTo(TeamInfo* info)
 {
-	team_info teamInfo = fTeamInfo = info;
-
-	// strip any trailing space(s)...
-	for (int len = strlen(teamInfo.args) - 1;
-			len >= 0 && teamInfo.args[len] == ' '; len--) {
-		teamInfo.args[len] = 0;
-	}
+	fTeamInfo = *info;
 
 	app_info appInfo;
-	status_t status = be_roster->GetRunningAppInfo(teamInfo.team, &appInfo);
+	status_t status = be_roster->GetRunningAppInfo(fTeamInfo.TeamID(),
+		&appInfo);
 	if (status != B_OK) {
 		// Not an application known to be_roster
 
-		if (teamInfo.team == B_SYSTEM_TEAM) {
+		if (fTeamInfo.TeamID() == B_SYSTEM_TEAM) {
 			// Get icon and name from kernel image
 			system_info	systemInfo;
 			get_system_info(&systemInfo);
@@ -251,10 +241,11 @@ TeamRow::_SetTo(team_info& info)
 			get_ref_for_path(kernelPath.Path(), &appInfo.ref);
 
 		} else
-			BPrivate::get_app_ref(teamInfo.team, &appInfo.ref);
+			BPrivate::get_app_ref(fTeamInfo.TeamID(), &appInfo.ref);
 	}
 
-	BBitmap* icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1), B_RGBA32);
+	BBitmap* icon = new BBitmap(BRect(0, 0, B_MINI_ICON - 1, B_MINI_ICON - 1),
+		B_RGBA32);
 
 	status = BNodeInfo::GetTrackerIcon(&appInfo.ref, icon, B_MINI_ICON);
 	if (status != B_OK) {
@@ -268,15 +259,10 @@ TeamRow::_SetTo(team_info& info)
 	}
 
 	BString tmp;
-	tmp << teamInfo.team;
+	tmp << fTeamInfo.TeamID();
 
-	SetField(new BBitmapStringField(icon, teamInfo.args), kNameColumn);
+	SetField(new BBitmapStringField(icon, fTeamInfo.Arguments()), kNameColumn);
 	SetField(new BStringField(tmp), kIDColumn);
-
-	tmp = "";
-	tmp << teamInfo.thread_count;
-
-	SetField(new BStringField(tmp), kThreadCountColumn);
 
 	return status;
 }
@@ -285,34 +271,26 @@ TeamRow::_SetTo(team_info& info)
 //	#pragma mark - TeamsListView
 
 
-TeamsListView::TeamsListView(const char* name, team_id currentTeam)
+TeamsListView::TeamsListView(const char* name, team_id currentTeam,
+	TargetHostInterface* interface)
 	:
 	Inherited(name, B_NAVIGABLE, B_PLAIN_BORDER),
-	fUpdateRunner(NULL),
-	fCurrentTeam(currentTeam)
+	TargetHost::Listener(),
+	fCurrentTeam(currentTeam),
+	fInterface(interface)
 {
+	fInterface->AcquireReference();
 	AddColumn(new TeamsColumn("Name", 400, 100, 600,
 		B_TRUNCATE_BEGINNING), kNameColumn);
 	AddColumn(new TeamsColumn("ID", 80, 40, 100,
 		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT), kIDColumn);
-
-/*
-	AddColumn(new TeamsColumn("Thread count", 100, 50, 500,
-		B_TRUNCATE_MIDDLE, B_ALIGN_RIGHT), kThreadCountColumn);
-*/
 	SetSortingEnabled(false);
-
-/*
-#ifdef __HAIKU__
-	SetFlags(Flags() | B_SUBPIXEL_PRECISE);
-#endif
-*/
 }
 
 
 TeamsListView::~TeamsListView()
 {
-	delete fUpdateRunner;
+	fInterface->ReleaseReference();
 }
 
 
@@ -322,12 +300,9 @@ TeamsListView::AttachedToWindow()
 	Inherited::AttachedToWindow();
 	TeamsColumn::InitTextMargin(ScrollView());
 
+	fInterface->GetTargetHost()->AddListener(this);
+
 	_InitList();
-
-	be_roster->StartWatching(this, B_REQUEST_LAUNCHED | B_REQUEST_QUIT);
-
-	BMessage msg(MSG_UPDATE_TEAMS_LIST);
-	fUpdateRunner = new BMessageRunner(this, &msg, 100000L);	// 10Hz
 }
 
 
@@ -336,12 +311,9 @@ TeamsListView::DetachedFromWindow()
 {
 	Inherited::DetachedFromWindow();
 
-	be_roster->StopWatching(this);
+	fInterface->GetTargetHost()->RemoveListener(this);
 
-	delete fUpdateRunner;
-	fUpdateRunner = NULL;
-
-	Clear(); // MakeEmpty();
+	Clear();
 }
 
 
@@ -349,30 +321,28 @@ void
 TeamsListView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case MSG_UPDATE_TEAMS_LIST:
-			_UpdateList();
-			break;
-
-		case B_SOME_APP_LAUNCHED:
+		case MSG_TEAM_ADDED:
 		{
-			team_id	team;
-			if (message->FindInt32("be:team", &team) != B_OK)
+			TeamInfo* info;
+			team_id team;
+			if (message->FindInt32("team", &team) != B_OK)
 				break;
 
-			TeamRow* row = new(std::nothrow) TeamRow(team);
-			if (row != NULL) {
-				AddRow(row);
-				/*else
-					SortItems(&TeamListItem::Compare);
-				*/
-			}
+			TargetHost* host = fInterface->GetTargetHost();
+			AutoLocker<TargetHost> hostLocker(host);
+			info = host->TeamInfoByID(team);
+			if (info == NULL)
+				break;
+
+			TeamRow* row = new TeamRow(info);
+			AddRow(row);
 			break;
 		}
 
-		case B_SOME_APP_QUIT:
+		case MSG_TEAM_REMOVED:
 		{
-			team_id	team;
-			if (message->FindInt32("be:team", &team) != B_OK)
+			team_id team;
+			if (message->FindInt32("team", &team) != B_OK)
 				break;
 
 			TeamRow* row = FindTeamRow(team);
@@ -380,6 +350,26 @@ TeamsListView::MessageReceived(BMessage* message)
 				RemoveRow(row);
 				delete row;
 			}
+			break;
+		}
+
+		case MSG_TEAM_RENAMED:
+		{
+			TeamInfo* info;
+			team_id team;
+			if (message->FindInt32("team", &team) != B_OK)
+				break;
+
+			TargetHost* host = fInterface->GetTargetHost();
+			AutoLocker<TargetHost> hostLocker(host);
+			info = host->TeamInfoByID(team);
+			if (info == NULL)
+				break;
+
+			TeamRow* row = FindTeamRow(info->TeamID());
+			if (row != NULL && row->NeedsUpdate(info))
+				UpdateRow(row);
+
 			break;
 		}
 
@@ -406,69 +396,40 @@ TeamsListView::FindTeamRow(team_id teamId)
 
 
 void
-TeamsListView::_InitList()
+TeamsListView::TeamAdded(TeamInfo* info)
 {
-	int32 tmi_cookie = 0;
-	team_info tmi;
-
-	while (get_next_team_info(&tmi_cookie, &tmi) == B_OK) {
-		TeamRow* row = new(std::nothrow)  TeamRow(tmi);
-		if (row == NULL) {
-			// Memory issue. Bail out.
-			break;
-		}
-
-		if (tmi.team == B_SYSTEM_TEAM ||
-			tmi.team == fCurrentTeam) {
-			// We don't support debugging kernel and... ourself!
-			row->SetEnabled(false);
-		}
-
-		AddRow(row);
-	}
+	BMessage message(MSG_TEAM_ADDED);
+	message.AddInt32("team", info->TeamID());
+	BMessenger(this).SendMessage(&message);
 }
 
 
 void
-TeamsListView::_UpdateList()
+TeamsListView::TeamRemoved(team_id team)
 {
-	int32 tmi_cookie = 0;
-	team_info tmi;
-	TeamRow* row;
-	int32 index = 0;
+	BMessage message(MSG_TEAM_REMOVED);
+	message.AddInt32("team", team);
+	BMessenger(this).SendMessage(&message);
+}
 
-	// NOTA: assuming get_next_team_info() returns teams ordered by team ID...
-	while (get_next_team_info(&tmi_cookie, &tmi) == B_OK) {
 
-		row = dynamic_cast<TeamRow*>(RowAt(index));
-		while (row && tmi.team > row->TeamID()) {
-				RemoveRow(row);
-				delete row;
-				row = dynamic_cast<TeamRow*>(RowAt(index));
-		}
+void
+TeamsListView::TeamRenamed(TeamInfo* info)
+{
+	BMessage message(MSG_TEAM_RENAMED);
+	message.AddInt32("team", info->TeamID());
+	BMessenger(this).SendMessage(&message);
+}
 
-		if (row != NULL && tmi.team == row->TeamID()
-			&& row->NeedsUpdate(tmi)) {
-			// The team image app could have change due after an exec*() call,
-			UpdateRow(row);
-		} else if (row == NULL || tmi.team != row->TeamID()) {
-			// Team not found in previously known teams list: insert a new row
-			TeamRow* newRow = new(std::nothrow) TeamRow(tmi);
-			if (newRow != NULL) {
-				if (row == NULL) {
-					// No row found with bigger team id: append at list end
-					AddRow(newRow);
-				} else
-					AddRow(newRow, index);
-			}
-		}
-		index++;	// Move list sync head.
-	}
 
-	// Remove tail list rows, if we don't walk list thru the end
-	while ((row = dynamic_cast<TeamRow*>(RowAt(index))) != NULL) {
-		RemoveRow(row);
-		delete row;
-		row = dynamic_cast<TeamRow*>(RowAt(++index));
+void
+TeamsListView::_InitList()
+{
+	TargetHost* host = fInterface->GetTargetHost();
+	AutoLocker<TargetHost> hostLocker(host);
+	for (int32 i = 0; i < host->CountTeams(); i++) {
+		TeamInfo* info = host->TeamInfoAt(i);
+		BRow* row = new TeamRow(info);
+		AddRow(row);
 	}
 }

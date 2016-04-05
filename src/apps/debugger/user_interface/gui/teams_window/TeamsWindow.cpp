@@ -1,8 +1,9 @@
 /*
  * Copyright 2009-2010, Philippe Houdoin, phoudoin@haiku-os.org. All rights reserved.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
+#include "TeamsWindow.h"
 
 
 #include <new>
@@ -23,7 +24,7 @@
 
 #include "MessageCodes.h"
 #include "SettingsManager.h"
-#include "TeamsWindow.h"
+#include "LocalTargetHostInterface.h"
 #include "TeamsListView.h"
 
 
@@ -36,6 +37,7 @@ TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 	:
 	BWindow(BRect(100, 100, 500, 250), "Teams", B_DOCUMENT_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS),
+	fTargetHostInterface(NULL),
 	fTeamsListView(NULL),
 	fAttachTeamButton(NULL),
 	fCreateTeamButton(NULL),
@@ -49,6 +51,8 @@ TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 
 TeamsWindow::~TeamsWindow()
 {
+	if (fTargetHostInterface != NULL)
+		fTargetHostInterface->ReleaseReference();
 }
 
 
@@ -142,6 +146,11 @@ TeamsWindow::_Init()
 	BMessage settings;
 	_LoadSettings(settings);
 
+	fTargetHostInterface = new LocalTargetHostInterface();
+
+	if (fTargetHostInterface->Init() != B_OK)
+		throw std::bad_alloc();
+
 	BRect frame;
 	if (settings.FindRect("teams window frame", &frame) == B_OK) {
 		MoveTo(frame.LeftTop());
@@ -149,7 +158,8 @@ TeamsWindow::_Init()
 	}
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.Add(fTeamsListView = new TeamsListView("TeamsList", fCurrentTeam))
+		.Add(fTeamsListView = new TeamsListView("TeamsList", fCurrentTeam,
+			fTargetHostInterface))
 		.SetInsets(1.0f, 1.0f, 1.0f, 1.0f)
 		.AddGroup(B_HORIZONTAL)
 			.SetInsets(B_USE_DEFAULT_SPACING)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2013 Haiku Inc. All rights reserved.
+ * Copyright 2009-2016, Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -9,13 +9,16 @@
 #ifndef TEAMS_LIST_ITEM_H
 #define TEAMS_LIST_ITEM_H
 
-
 #include <ColumnListView.h>
 #include <ColumnTypes.h>
 #include <OS.h>
 
+#include "TargetHost.h"
+#include "TeamInfo.h"
+
+
 class BBitmap;
-class BMessageRunner;
+class TargetHostInterface;
 
 
 // A field type displaying both a bitmap and a string so that the
@@ -64,34 +67,42 @@ private:
 class TeamRow : public BRow {
 	typedef BRow Inherited;
 public:
-								TeamRow(team_info& teamInfo);
-								TeamRow(team_id teamId);
+								TeamRow(TeamInfo* teamInfo);
 
 public:
-			team_id				TeamID() const 				{ return fTeamInfo.team; }
+			team_id				TeamID() const
+									{ return fTeamInfo.TeamID(); }
 
-			bool				NeedsUpdate(team_info& info);
+			bool				NeedsUpdate(TeamInfo* info);
 
-	virtual	void				SetEnabled(bool enabled) 	{ fEnabled = enabled; }
-			bool				IsEnabled() const			{ return fEnabled; }
+	virtual	void				SetEnabled(bool enabled)
+									{ fEnabled = enabled; }
+			bool				IsEnabled() const
+									{ return fEnabled; }
 
 private:
-			status_t			_SetTo(team_info& info);
+			status_t			_SetTo(TeamInfo* info);
 
 private:
 			bool				fEnabled;
-			team_info			fTeamInfo;
+			TeamInfo			fTeamInfo;
 };
 
 
-class TeamsListView : public BColumnListView {
+class TeamsListView : public BColumnListView, public TargetHost::Listener {
 	typedef BColumnListView Inherited;
 public:
 								TeamsListView(const char* name,
-									team_id currentTeam);
+									team_id currentTeam,
+									TargetHostInterface* interface);
 	virtual 					~TeamsListView();
 
 			TeamRow* 			FindTeamRow(team_id teamId);
+
+			// TargetHost::Listener
+	virtual	void				TeamAdded(TeamInfo* info);
+	virtual	void				TeamRemoved(team_id team);
+	virtual	void				TeamRenamed(TeamInfo* info);
 
 protected:
 	virtual void 				AttachedToWindow();
@@ -101,11 +112,10 @@ protected:
 
 private:
 			void 				_InitList();
-			void 				_UpdateList();
 
 private:
-			BMessageRunner*		fUpdateRunner;
 			team_id				fCurrentTeam;
+			TargetHostInterface* fInterface;
 };
 
 

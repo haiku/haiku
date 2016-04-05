@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2010, Philippe Houdoin, phoudoin@haiku-os.org. All rights reserved.
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAMS_WINDOW_H
@@ -14,6 +14,7 @@ class BListView;
 class BFile;
 class BMessage;
 class SettingsManager;
+class TargetHostInterface;
 class TeamsListView;
 
 class TeamsWindow : public BWindow {
@@ -36,6 +37,7 @@ private:
 
 private:
 			team_id				fCurrentTeam;
+			TargetHostInterface* fTargetHostInterface;
 			TeamsListView*		fTeamsListView;
 			BButton*			fAttachTeamButton;
 			BButton*			fCreateTeamButton;
