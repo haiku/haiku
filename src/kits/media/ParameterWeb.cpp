@@ -199,6 +199,8 @@ read_string_from_buffer(const void **_buffer, char **_string, ssize_t size)
 	memcpy(string, buffer, length);
 	string[length] = '\0';
 
+	free(*_string);
+
 	*_buffer = static_cast<const void *>(buffer + length);
 	*_string = string;
 	return B_OK;
@@ -2204,7 +2206,7 @@ BDiscreteParameter::Unflatten(type_code code, const void* buffer, ssize_t size)
 	MakeEmpty();
 
 	for (int32 i = 0; i < count; i++) {
-		char* name;
+		char* name = NULL;
 		if (read_string_from_buffer(&buffer, &name, size_left(size, bufferStart,
 				buffer)) < B_OK)
 			return B_BAD_DATA;
