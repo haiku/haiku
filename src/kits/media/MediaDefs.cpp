@@ -1268,13 +1268,13 @@ progress_shutdown(int stage,
 			string = B_TRANSLATE("Stopping media server" B_UTF8_ELLIPSIS);
 			break;
 		case 20:
-			string = B_TRANSLATE("Telling media_addon_server to quit.");
+			string = B_TRANSLATE("Waiting for media_server to quit.");
 			break;
 		case 40:
-			string = B_TRANSLATE("Waiting for media_server to quit.");
+			string = B_TRANSLATE("Telling media_addon_server to quit.");
 			break;
 		case 50:
-			string = B_TRANSLATE("Waiting for media_server to quit.");
+			string = B_TRANSLATE("Waiting for media_addon_server to quit.");
 			break;
 		case 70:
 			string = B_TRANSLATE("Cleaning up.");
@@ -1299,6 +1299,7 @@ shutdown_media_server(bigtime_t timeout,
 	BMessage msg(B_QUIT_REQUESTED);
 	BMessage reply;
 	status_t err;
+	bool shutdown = false;
 
 	if ((err = msg.AddBool("be:_user_request", true)) != B_OK)
 		return err;
@@ -1308,51 +1309,41 @@ shutdown_media_server(bigtime_t timeout,
 		progress_shutdown(10, progress, cookie);
 
 		err = messenger.SendMessage(&msg, &reply, 2000000, 2000000);
-		if (err != B_OK)
+		reply.FindBool("_shutdown", &shutdown);
+		if (err == B_TIMED_OUT || shutdown == false) {
+			if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE))
+				kill_team(be_roster->TeamFor(B_MEDIA_SERVER_SIGNATURE));
+		} else if (err != B_OK)
 			return err;
 
-		int32 rv;
-		if (reply.FindInt32("error", &rv) == B_OK && rv != B_OK)
-			return rv;
-	}
-
-	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
-		BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);
 		progress_shutdown(20, progress, cookie);
 
-		err = messenger.SendMessage(&msg, &reply, 2000000, 2000000);
-		if (err != B_OK)
-			return err;
-
 		int32 rv;
 		if (reply.FindInt32("error", &rv) == B_OK && rv != B_OK)
 			return rv;
 	}
 
-	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
+	shutdown = false;
+	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
+		BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);
 		progress_shutdown(40, progress, cookie);
-		snooze(200000);
-	}
 
-	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
+		err = messenger.SendMessage(&msg, &reply, 2000000, 2000000);
+		reply.FindBool("_shutdown", &shutdown);
+		if (err == B_TIMED_OUT || shutdown == false) {
+			if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE))
+				kill_team(be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE));
+		} else if (err != B_OK)
+			return err;
+
 		progress_shutdown(50, progress, cookie);
-		snooze(200000);
-	}
 
-	progress_shutdown(70, progress, cookie);
-	snooze(1000000);
-
-	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
-		kill_team(be_roster->TeamFor(B_MEDIA_SERVER_SIGNATURE));
-	}
-
-	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
-		kill_team(be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE));
+		int32 rv;
+		if (reply.FindInt32("error", &rv) == B_OK && rv != B_OK)
+			return rv;
 	}
 
 	progress_shutdown(100, progress, cookie);
-	snooze(1000000);
-
 	return B_OK;
 }
 
