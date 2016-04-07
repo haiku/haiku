@@ -13,6 +13,7 @@
 
 
 class DebuggerInterface;
+class Settings;
 class TargetHost;
 class TeamDebugger;
 
@@ -32,7 +33,7 @@ public:
 			status_t			AddTeamDebugger(TeamDebugger* debugger);
 			void				RemoveTeamDebugger(TeamDebugger* debugger);
 
-	virtual	status_t			Init() = 0;
+	virtual	status_t			Init(Settings* settings) = 0;
 	virtual	void				Close() = 0;
 
 	virtual	bool				Connected() const = 0;

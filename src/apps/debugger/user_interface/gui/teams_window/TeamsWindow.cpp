@@ -148,7 +148,7 @@ TeamsWindow::_Init()
 
 	fTargetHostInterface = new LocalTargetHostInterface();
 
-	if (fTargetHostInterface->Init() != B_OK)
+	if (fTargetHostInterface->Init(NULL) != B_OK)
 		throw std::bad_alloc();
 
 	BRect frame;

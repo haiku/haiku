@@ -13,7 +13,7 @@ public:
 								LocalTargetHostInterface();
 	virtual						~LocalTargetHostInterface();
 
-	virtual	status_t			Init();
+	virtual	status_t			Init(Settings* settings);
 	virtual	void				Close();
 
 	virtual	bool				Connected() const;

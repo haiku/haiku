@@ -35,7 +35,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language c_family ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language x86 ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) target_host_interface ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) target_host_interface interfaces ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) target_host_interface local ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli ] ;
@@ -244,9 +244,12 @@ local sources =
 
 	# target_host_interface
 	TargetHostInterface.cpp
+	TargetHostInterfaceInfo.cpp
+	TargetHostInterfaceRoster.cpp
 
-	# target_host_interface/interfaces
+	# target_host_interface/local
 	LocalTargetHostInterface.cpp
+	LocalTargetHostInterfaceInfo.cpp
 
 	# types
 	ArrayIndexPath.cpp
