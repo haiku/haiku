@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.03.30
-#	Date:    2016-03-30 03:15:02
+#	Version: 2016.04.04
+#	Date:    2016-04-04 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -2116,6 +2116,14 @@
 	67b1  Hawaii PRO [Radeon R9 290]
 	67b9  Vesuvius [Radeon R9 295X2]
 	67be  Hawaii LE
+	67c0  Ellesmere [Polaris10]
+	67df  Ellesmere [Polaris10]
+	67e0  Baffin [Polaris11]
+	67e1  Baffin [Polaris11]
+	67e8  Baffin [Polaris11]
+	67e9  Baffin [Polaris11]
+	67eb  Baffin [Polaris11]
+	67ff  Baffin [Polaris11]
 	6800  Wimbledon XT [Radeon HD 7970M]
 		1002 0124  Radeon HD 7970M
 		8086 2110  Radeon HD 7970M
@@ -3277,6 +3285,7 @@
 # I have a Tonga card and this is the HDMI Audio part
 	aad8  Tonga HDMI Audio [Radeon R9 285/380]
 		174b aad8  Radeon R9 285/380 HDMI Audio
+	aae8  Fiji HDMI/DP Audio Controller
 	ac00  Theater 600 Pro
 	ac02  TV Wonder HD 600 PCIe
 	ac12  Theater HD T507 (DVB-T) TV tuner/capture device
@@ -7383,7 +7392,7 @@
 		10b5 1123  Sectra KK631 encryption board
 		10b5 9080  9080 [real subsystem ID not set]
 		12d9 0002  PCI Prosody Card
-		12df 4422  4422PCI ["Do-All" Telemetry Data Aquisition System]
+		12df 4422  4422PCI ["Do-All" Telemetry Data Acquisition System]
 		1369 9601  PCX822np
 		1369 a102  PCX822v2
 		1369 a201  PCX442
@@ -16127,6 +16136,7 @@
 	3064  TPCI100 (2 Slot IndustryPack PCI Carrier)
 	30c8  TPCI200 4 Slot IndustryPack PCI Carrier
 	70c8  TPCE200 4 Slot IndustryPack PCIe Carrier
+	9177  TXMC375 8 channel RS232/RS422/RS485 programmable serial interface
 1499  EMTEC CO., Ltd
 149a  ANDOR Technology Ltd
 149b  SEIKO Instruments Inc
@@ -17674,6 +17684,9 @@
 	7123  NPS-600 network interface VF
 # SwitchX-2, 40GbE switch
 	c738  MT51136
+	c739  MT51136 GW
+	c838  MT52236
+	c839  MT52236 router
 	caf1  ConnectX-4 CAPI Function
 # Spectrum, 100GbE Switch
 	cb84  MT52100
@@ -19677,6 +19690,7 @@
 	d230  D230 Dual-port E1/T1 card (2nd generation)
 	d410  D410/430 Quad-port E1/T1 card
 	d430  D410/430 Quad-port E1/T1 card
+1b79  Absolute Analysis
 1b85  OCZ Technology Group, Inc.
 	1041  RevoDrive 3 X2 PCI-Express SSD 240 GB (Marvell Controller)
 	8788  RevoDrive Hybrid
@@ -19765,8 +19779,8 @@
 # A Western Digital Subsidiary
 1c58  HGST, Inc.
 	0003  Ultrastar SN100 Series NVMe SSD
-		1014 04f5  PCIe3 1.6TB NVMe Adapter
-		1014 04f6  PCIe3 3.2TB NVMe Adapter
+		1014 04f5  PCIe3 1.6TB NVMe Flash Adapter
+		1014 04f6  PCIe3 3.2TB NVMe Flash Adapter
 # http://www.nicevt.ru/ (in Russian)
 1c63  Science and Research Centre of Computer Technology (JSC "NICEVT")
 # http://www.radiotec.ru/catalog.php?cat=jr8&art=14109
@@ -23898,7 +23912,7 @@
 		103c 0934  Compaq nw8240/nx8220
 		103c 099c  NX6110/NC6120
 	266e  82801FB/FBM/FR/FW/FRW (ICH6 Family) AC'97 Audio Controller
-		1014 0581  ThinkPad X41
+		1014 0581  ThinkPad X41 (Analog Devices AD1981B codec)
 		1025 006a  Realtek ALC 655 codec (in Acer TravelMate 2410 serie laptop)
 		1028 0177  Dimension 8400
 		1028 0179  Optiplex GX280
