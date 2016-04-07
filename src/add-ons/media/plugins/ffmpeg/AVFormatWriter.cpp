@@ -380,7 +380,7 @@ AVFormatWriter::StreamCookie::AddTrackInfo(uint32 code,
 AVFormatWriter::AVFormatWriter()
 	:
 	fContext(avformat_alloc_context()),
-	fHeaderWritten(false),
+	fCodecOpened(false),
 	fHeaderError(-1),
 	fIOContext(NULL),
 	fStreamLock("stream lock")
@@ -398,7 +398,7 @@ AVFormatWriter::~AVFormatWriter()
 #if OPEN_CODEC_CONTEXT
 		// We only need to close the AVCodecContext when we opened it.
 		// This is experimental, see CommitHeader().
-		if (fHeaderWritten)
+		if (fCodecOpened)
 			avcodec_close(fContext->streams[i]->codec);
 #endif
 		av_freep(&fContext->streams[i]->codec);
@@ -468,7 +468,7 @@ AVFormatWriter::CommitHeader()
 	if (fContext == NULL)
 		return B_NO_INIT;
 
-	if (fHeaderWritten)
+	if (fCodecOpened)
 		return B_NOT_ALLOWED;
 
 #if OPEN_CODEC_CONTEXT
@@ -489,12 +489,12 @@ AVFormatWriter::CommitHeader()
 	}
 #endif
 
+	// We need to close the codecs we opened, even in case of failure.
+	fCodecOpened = true;
+
 	fHeaderError = avformat_write_header(fContext, NULL);
 	if (fHeaderError < 0)
 		TRACE("  avformat_write_header(): %d\n", fHeaderError);
-
-	// We need to close the codecs we opened, even in case of failure.
-	fHeaderWritten = true;
 
 	#ifdef TRACE_AVFORMAT_WRITER
 	TRACE("  wrote header\n");
@@ -527,17 +527,17 @@ AVFormatWriter::Close()
 	if (fContext == NULL)
 		return B_NO_INIT;
 
-	if (!fHeaderWritten)
+	if (!fCodecOpened)
 		return B_NOT_ALLOWED;
 
-	int result = -1;
 	// From ffmpeg documentation: [av_write_trailer] may only be called
 	// after a successful call to avformat_write_header.
-	if (fHeaderError > 0) {
-		result = av_write_trailer(fContext);
-		if (result < 0)
-			TRACE("  av_write_trailer(): %d\n", result);
-	}
+	if (fHeaderError != 0)
+		return B_ERROR;
+
+	int result = av_write_trailer(fContext);
+	if (result < 0)
+		TRACE("  av_write_trailer(): %d\n", result);
 	return result == 0 ? B_OK : B_ERROR;
 }
 
@@ -548,7 +548,7 @@ AVFormatWriter::AllocateCookie(void** _cookie, media_format* format,
 {
 	TRACE("AVFormatWriter::AllocateCookie()\n");
 
-	if (fHeaderWritten)
+	if (fCodecOpened)
 		return B_NOT_ALLOWED;
 
 	BAutolock _(fStreamLock);
