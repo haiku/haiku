@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include <image.h>
+
 #include <AutoLocker.h>
 #include <system_info.h>
 #include <util/KMessage.h>

@@ -8,22 +8,32 @@
 #include <OS.h>
 #include <String.h>
 
+#include <ObjectList.h>
 #include <Referenceable.h>
 
 
 class DebuggerInterface;
 class TargetHost;
+class TeamDebugger;
 
 
 class TargetHostInterface : public BReferenceable {
 public:
+								TargetHostInterface();
 	virtual						~TargetHostInterface();
-
-	virtual	status_t			Init() = 0;
-	virtual	void				Close() = 0;
 
 			const BString&		Name() const { return fName; }
 			void				SetName(const BString& name);
+
+
+			int32				CountTeamDebuggers() const;
+			TeamDebugger*		TeamDebuggerAt(int32 index) const;
+			TeamDebugger*		FindTeamDebugger(team_id team) const;
+			status_t			AddTeamDebugger(TeamDebugger* debugger);
+			void				RemoveTeamDebugger(TeamDebugger* debugger);
+
+	virtual	status_t			Init() = 0;
+	virtual	void				Close() = 0;
 
 	virtual	bool				Connected() const = 0;
 
@@ -37,7 +47,16 @@ public:
 									DebuggerInterface*& _interface) = 0;
 
 private:
+	static	int					_CompareDebuggers(const TeamDebugger* a,
+									const TeamDebugger* b);
+	static	int					_FindDebuggerByKey(const team_id* team,
+									const TeamDebugger* debugger);
+private:
+			typedef BObjectList<TeamDebugger> TeamDebuggerList;
+
+private:
 			BString				fName;
+			TeamDebuggerList	fTeamDebuggers;
 };
 
 

@@ -7,8 +7,6 @@
 
 #include "TargetHostInterface.h"
 
-#include <Looper.h>
-
 
 class LocalTargetHostInterface : public TargetHostInterface {
 public:
