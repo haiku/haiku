@@ -39,6 +39,7 @@
 #include <OS.h>
 #include <ParameterWeb.h>
 #include <Roster.h>
+#include <TimeSource.h>
 
 #include <debug.h>
 #include <DataExchange.h>
@@ -233,7 +234,16 @@ BControllable::HandleMessage(int32 message, const void* data, size_t size)
 				return B_OK;
 			}
 
-			SetParameterValue(request.parameter_id, request.when,
+			// NOTE: This is not very fair, but the alternative
+			// would have been to mess with friends classes and
+			// member variables.
+			bigtime_t perfTime = 0;
+			if (request.when == -1)
+				perfTime = TimeSource()->Now();
+			else
+				perfTime = request.when;
+
+			SetParameterValue(request.parameter_id, perfTime,
 				transfer.Data(), request.size);
 			request.SendReply(B_OK, &reply, sizeof(reply));
 			return B_OK;

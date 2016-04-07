@@ -650,7 +650,7 @@ ContinuousMessageFilter::Filter(BMessage *message, BHandler **target)
 			"channels\n", fControl->Name(), fParameter.CountChannels());
 
 		if (fParameter.SetValue((void *)value, sizeof(value),
-				system_time()) < B_OK) {
+				-1) < B_OK) {
 			ERROR("ContinuousMessageFilter::Filter: Could not set parameter "
 				"value for %p\n", &fParameter);
 			return B_DISPATCH_MESSAGE;
@@ -760,7 +760,7 @@ DiscreteMessageFilter::Filter(BMessage *message, BHandler **target)
 
 	TRACE("DiscreteMessageFilter::Filter: update view %s, value = %ld\n", control->Name(), value);
 
-	if (fParameter.SetValue((void *)&value, sizeof(value), system_time()) < B_OK) {
+	if (fParameter.SetValue((void *)&value, sizeof(value), -1) < B_OK) {
 		ERROR("DiscreteMessageFilter::Filter: Could not set parameter value for %p\n", &fParameter);
 		return B_DISPATCH_MESSAGE;
 	}
