@@ -48,7 +48,6 @@ private:
 	void		ExecuteSataRequest(sata_request *request, bool isWrite = false);
 
 	void		ResetDevice();
-	status_t	SoftReset();
 	status_t	PortReset();
 	status_t	Probe();
 
@@ -84,7 +83,7 @@ private:
 	uint64							fSectorCount;
 	bool							fIsATAPI;
 	bool							fTestUnitReadyActive;
-	bool							fSoftReset;
+	bool							fPortReset;
 	bool							fError;
 	bool							fTrimSupported;
 	uint32							fMaxTrimRangeBlocks;

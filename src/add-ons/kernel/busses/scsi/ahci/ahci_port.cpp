@@ -59,7 +59,7 @@ AHCIPort::AHCIPort(AHCIController* controller, int index)
 	fSectorCount(0),
 	fIsATAPI(false),
 	fTestUnitReadyActive(false),
-	fSoftReset(false),
+	fPortReset(false),
 	fError(false),
 	fTrimSupported(false)
 {
@@ -158,7 +158,7 @@ AHCIPort::Init2()
 	FlushPostedWrites();
 
 	// reset port and probe info
-	SoftReset();
+	ResetDevice();
 
 	DumpHBAState();
 
@@ -230,92 +230,6 @@ AHCIPort::ResetDevice()
 
 
 status_t
-AHCIPort::SoftReset()
-{
-	TRACE("AHCIPort::SoftReset port %d\n", fIndex);
-
-	// Spec v1.3.1, §10.4.1 Software Reset
-	// A single device on one port is reset, HBA and phy comm remain intact.
-
-	// stop port, flush transactions
-	if (!Disable()) {
-		// If the port doesn't power off, move on to a stronger reset.
-		ERROR("%s: port %d soft reset failed. Moving on to port reset.\n",
-			__func__, fIndex);
-		return PortReset();
-	}
-
-	// start port
-	Enable();
-
-	if (wait_until_clear(&fRegs->tfd, ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST,
-		1000000) < B_OK) {
-		ERROR("%s: port %d still busy. Moving on to port reset.\n",
-			__func__, fIndex);
-		return PortReset();
-	}
-
-	// TODO: Just can't get AHCI software reset issued properly.
-	#if 0
-	// Spec v1.2.0, §9.3.9
-	// If FBS supported + enabled, disable
-	bool fbsDisabled = false;
-	if ((fRegs->cap & CAP_FBSS) != 0) {
-		if ((fRegs->fbs & PORT_FBS_EN) != 0) {
-			fbsDisabled = true;
-			fRegs->fbs &= ~PORT_FBS_EN;
-		}
-	}
-
-	// set command table soft reset bit
-	fCommandTable->cfis[2] |= ATA_DEVICE_CONTROL_SOFT_RESET;
-
-	// TODO: We could use a low level ahci command call (~ahci_exec_polled_cmd)
-	cpu_status cpu = disable_interrupts();
-	acquire_spinlock(&fSpinlock);
-
-	// FIS ATA set Reset + clear busy
-	fCommandList[0].r = 1;
-	fCommandList[0].c = 1;
-	// FIS ATA clear Reset + clear busy
-	fCommandList[1].r = 0;
-	fCommandList[1].c = 0;
-
-	// Issue Command
-	fRegs->ci = 1;
-	FlushPostedWrites();
-	release_spinlock(&fSpinlock);
-	restore_interrupts(cpu);
-
-	if (wait_until_clear(&fRegs->ci, 0, 1000000) < B_OK) {
-		TRACE("%s: port %d: device is busy\n", __func__, fIndex);
-
-		// Before we bail-out. Re-enable FBS if we disabled it
-		if (fbsDisabled)
-			fRegs->fbs |= PORT_FBS_EN;
-		return PortReset();
-    }
-
-	fCommandTable->cfis[2] &= ~ATA_DEVICE_CONTROL_SOFT_RESET;
-
-	if (fbsDisabled)
-		fRegs->fbs |= PORT_FBS_EN;
-
-	if (wait_until_clear(&fRegs->tfd, ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST,
-		1000000) < B_OK) {
-		ERROR("%s: port %d software reset failed. Doing port reset...\n",
-			__func__, fIndex);
-		return PortReset();
-	}
-	#else
-	return PortReset();
-	#endif
-
-	return Probe();
-}
-
-
-status_t
 AHCIPort::PortReset()
 {
 	TRACE("AHCIPort::PortReset port %d\n", fIndex);
@@ -327,21 +241,27 @@ AHCIPort::PortReset()
 		return B_ERROR;
 	}
 
-	fRegs->sctl |= SCTL_PORT_DET_INIT;
+	_ClearErrorRegister();
+
+	// Wait for BSY and DRQ to clear (idle port)
+	wait_until_clear(&fRegs->tfd, ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST,
+		1000000);
+
+	// comreset. Notice we're throwing out all other control flags.
+	fRegs->sctl = (SSTS_PORT_IPM_ACTIVE | SSTS_PORT_IPM_PARTIAL
+		| SCTL_PORT_DET_INIT);
 	FlushPostedWrites();
 	spin(1100);
 		// You must wait 1ms at minimum
 	fRegs->sctl = (fRegs->sctl & ~HBA_PORT_DET_MASK) | SCTL_PORT_DET_NOINIT;
-
-	FlushPostedWrites();
+	// Enable also flushes above write
+	Enable();
 
 	if (wait_until_set(&fRegs->ssts, SSTS_PORT_DET_PRESENT, 500000) < B_OK) {
 		TRACE("%s: port %d: no device detected\n", __func__, fIndex);
 		fDevicePresent = false;
 		return B_OK;
 	}
-
-	Enable();
 
 	return Probe();
 }
@@ -390,8 +310,6 @@ AHCIPort::Probe()
 			fRegs->sig == SATA_SIG_ATAPI ? "ATAPI" : fRegs->sig == SATA_SIG_ATA
 				? "ATA" : "unknown");
 	}
-
-	_ClearErrorRegister();
 
 	return B_OK;
 }
@@ -477,22 +395,22 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 		if (!fTestUnitReadyActive)
 			TRACE("Task File Error\n");
 
-		fSoftReset = true;
+		fPortReset = true;
 		fError = true;
 	}
 	if (is & PORT_INT_HBF) {
 		TRACE("Host Bus Fatal Error\n");
-		fSoftReset = true;
+		fPortReset = true;
 		fError = true;
 	}
 	if (is & PORT_INT_HBD) {
 		TRACE("Host Bus Data Error\n");
-		fSoftReset = true;
+		fPortReset = true;
 		fError = true;
 	}
 	if (is & PORT_INT_IF) {
 		TRACE("Interface Fatal Error\n");
-		fSoftReset = true;
+		fPortReset = true;
 		fError = true;
 	}
 	if (is & PORT_INT_INF) {
@@ -500,7 +418,7 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 	}
 	if (is & PORT_INT_OF) {
 		TRACE("Overflow\n");
-		fSoftReset = true;
+		fPortReset = true;
 		fError = true;
 	}
 	if (is & PORT_INT_IPM) {
@@ -508,26 +426,19 @@ AHCIPort::InterruptErrorHandler(uint32 is)
 	}
 	if (is & PORT_INT_PRC) {
 		TRACE("PhyReady Change\n");
-		//fSoftReset = true;
+		//fPortReset = true;
 	}
 	if (is & PORT_INT_PC) {
 		TRACE("Port Connect Change\n");
 		// Unsolicited when we had a port connect change without us requesting
 		// Spec v1.3, §6.2.2.3 Recovery of Unsolicited COMINIT
 
-		// TODO: This isn't enough
-		//if ((fRegs->sctl & SCTL_PORT_DET_INIT) == 0) {
-		//	TRACE("%s: unsolicited port connect change\n", __func__);
-		//	fSoftReset = true;
-		//	fError = true;
-		//}
-
 		// XXX: This shouldn't be needed here... but we can loop without it
-		_ClearErrorRegister();
+		//_ClearErrorRegister();
 	}
 	if (is & PORT_INT_UF) {
 		TRACE("Unknown FIS\n");
-		fSoftReset = true;
+		fPortReset = true;
 	}
 
 	if (fError) {
@@ -1159,7 +1070,7 @@ AHCIPort::ExecuteSataRequest(sata_request* request, bool isWrite)
 	if (wait_until_clear(&fRegs->tfd, ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST,
 			1000000) < B_OK) {
 		TRACE("ExecuteAtaRequest port %d: device is busy\n", fIndex);
-		SoftReset();
+		PortReset();
 		FinishTransfer();
 		request->Abort();
 		return;
@@ -1195,9 +1106,9 @@ AHCIPort::ExecuteSataRequest(sata_request* request, bool isWrite)
 	TRACE("tfd  0x%08" B_PRIx32 "\n", fRegs->tfd);
 */
 
-	if (fSoftReset || status == B_TIMED_OUT) {
-		fSoftReset = false;
-		SoftReset();
+	if (fPortReset || status == B_TIMED_OUT) {
+		fPortReset = false;
+		PortReset();
 	}
 
 	size_t bytesTransfered = fCommandList->prdbc;
