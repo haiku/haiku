@@ -966,8 +966,7 @@ ServerApp::MessageReceived(BMessage* msg)
 
 		default:
 			BApplication::MessageReceived(msg);
-			printf("\nmedia_server: unknown message received:\n");
-			msg->PrintToStream();
+			TRACE("\nmedia_server: unknown message received!\n");
 			break;
 	}
 	TRACE("ServerApp::MessageReceived %lx leave\n", msg->what);
