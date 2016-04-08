@@ -632,9 +632,11 @@ atom_op_div32(atom_exec_context *ctx, int *ptr, int arg)
 	if (src != 0) {
 		val64 = dst;
 		val64 |= ((uint64)ctx->ctx->divmul[1]) << 32;
-		do_div(val64, src);
-		ctx->ctx->divmul[0] = lower_32_bits(val64);
-		ctx->ctx->divmul[1] = upper_32_bits(val64);
+		val64 /= (uint64)src;
+		// Lower 32
+		ctx->ctx->divmul[0] = (uint32)val64;
+		// Upper 32
+		ctx->ctx->divmul[1] = (uint32)(((val64) >> 16) >> 16);
 	} else {
 		ctx->ctx->divmul[0] = 0;
 		ctx->ctx->divmul[1] = 0;
@@ -764,8 +766,10 @@ atom_op_mul32(atom_exec_context *ctx, int *ptr, int arg)
 	dst = atom_get_dst(ctx, arg, attr, ptr, NULL, 1);
 	src = atom_get_src(ctx, attr, ptr);
 	val64 = (uint64)dst * (uint64)src;
-	ctx->ctx->divmul[0] = lower_32_bits(val64);
-	ctx->ctx->divmul[1] = upper_32_bits(val64);
+	// Lower 32
+	ctx->ctx->divmul[0] = (uint32)val64;
+	// Upper 32
+	ctx->ctx->divmul[1] = (uint32)(((val64) >> 16) >> 16);
 	#ifdef ATOM_TRACE
 	TRACE("%s: 0x%" B_PRIX32 " * 0x%" B_PRIX32 " is"
 		" 0x%" B_PRIX32 " + 0x%" B_PRIX32 "\n", __func__, dst, src,
