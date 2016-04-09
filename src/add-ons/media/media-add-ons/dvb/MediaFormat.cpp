@@ -38,6 +38,14 @@ extern "C" {
 
 }  // extern "C"
 
+
+#if LIBAVCODEC_VERSION_INT <= ((54 << 16) | (50 << 8))
+#define AV_CODEC_ID_AC3 CODEC_ID_AC3
+#define AV_CODEC_ID_MP3 CODEC_ID_MP3
+#define AV_CODEC_ID_MPEG2VIDEO CODEC_ID_MPEG2VIDEO
+#endif
+
+
 void
 PrintFormat(const media_format &format)
 {
@@ -65,7 +73,7 @@ GetHeaderFormatAc3Audio(media_format *out_format, const uint8 *header, size_t si
 //	desc.u.wav.codec = 0x2000;
 	desc.family = B_MISC_FORMAT_FAMILY;
 	desc.u.misc.file_format = 'ffmp';
-	desc.u.misc.codec = CODEC_ID_AC3;
+	desc.u.misc.codec = AV_CODEC_ID_AC3;
 
 	BMediaFormats formats;	
 	status = formats.InitCheck();
@@ -120,7 +128,7 @@ GetHeaderFormatMpegAudio(media_format *out_format, const uint8 *header, size_t s
 //	desc.u.mpeg.id = B_MPEG_2_AUDIO_LAYER_2;
 	desc.family = B_MISC_FORMAT_FAMILY;
 	desc.u.misc.file_format = 'ffmp';
-	desc.u.misc.codec = CODEC_ID_MP3;
+	desc.u.misc.codec = AV_CODEC_ID_MP3;
 	
 	
 	BMediaFormats formats;	
@@ -154,7 +162,7 @@ GetHeaderFormatMpegVideo(media_format *out_format, const uint8 *header, size_t s
 //	desc.u.mpeg.id = B_MPEG_2_VIDEO;
 	desc.family = B_MISC_FORMAT_FAMILY;
 	desc.u.misc.file_format = 'ffmp';
-	desc.u.misc.codec = CODEC_ID_MPEG2VIDEO;
+	desc.u.misc.codec = AV_CODEC_ID_MPEG2VIDEO;
 
 	BMediaFormats formats;
 	status = formats.InitCheck();
