@@ -1,7 +1,8 @@
-1	russian	x-vnd.Haiku-PackageInstaller	591566249
+1	russian	x-vnd.Haiku-PackageInstaller	600665259
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
+No package selected.	UninstallView		Ни один пакет не выбран.
 Continue	PackageInstall		Продолжить
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Не удалось установить запрошенный пакет. Возможно это случилось из-за проблем файлами данного пакета. Пожалуйста, обратитесь к поставщику пакета.
 Image not loaded correctly	PackageImageViewer		Изображение некорректно загружено
@@ -50,6 +51,7 @@ Abort	PackageInstall		Прервать
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Продолжить
 Begin	PackageView		Установить
+OK	UninstallView		ОК
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Символьная ссылка с именем '%s' уже существует по данному пути.\nЗаменить ссылку на ту, что находится в этом пакете или пропустить ее?
 Replace	PackageView		Заменить
 Installation progress	PackageView		Прогресс установки
