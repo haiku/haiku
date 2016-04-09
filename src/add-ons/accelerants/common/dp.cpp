@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Haiku, Inc. All Rights Reserved.
+ * Copyright 2012-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,12 +13,12 @@
 #define TRACE_DISPLAY
 #ifdef TRACE_DISPLAY
 extern "C" void _sPrintf(const char* format, ...);
-#   define TRACE(x...) _sPrintf("radeon_hd: " x)
+#   define TRACE(x...) _sPrintf("dp_common: " x)
 #else
 #   define TRACE(x...) ;
 #endif
 
-#define ERROR(x...) _sPrintf("radeon_hd: " x)
+#define ERROR(x...) _sPrintf("dp_common: " x)
 
 
 uint32

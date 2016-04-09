@@ -14,6 +14,9 @@
 #include <edid.h>
 #include <video_overlay.h>
 
+#include "Ports.h"
+#include "Pipes.h"
+
 
 struct overlay {
 	overlay_buffer	buffer;
@@ -37,6 +40,8 @@ struct accelerant_info {
 	intel_shared_info* shared_info;
 	area_id			shared_info_area;
 
+	display_mode	current_mode;	// pretty much a hack until per-display modes
+
 	display_mode*	mode_list;		// cloned list of standard display modes
 	area_id			mode_list_area;
 
@@ -47,6 +52,12 @@ struct accelerant_info {
 	uint32			last_horizontal_overlay_scale;
 	uint32			last_vertical_overlay_scale;
 	uint32			overlay_position_buffer_offset;
+
+	uint32			port_count;
+	Port*			ports[MAX_PORTS];
+
+	uint32			pipe_count;
+	Pipe*			pipes[MAX_PIPES];
 
 	edid1_info		edid_info;
 	bool			has_edid;
@@ -59,15 +70,15 @@ struct accelerant_info {
 	int				device;
 	uint8			head_mode;
 	bool			is_clone;
-
-	// LVDS panel mode passed from the bios/startup.
-	display_mode	lvds_panel_mode;
 };
 
-#define HEAD_MODE_A_ANALOG		0x01
-#define HEAD_MODE_B_DIGITAL		0x02
-#define HEAD_MODE_CLONE			0x03
-#define HEAD_MODE_LVDS_PANEL	0x08
+
+#define HEAD_MODE_A_ANALOG		0x0001
+#define HEAD_MODE_B_DIGITAL		0x0002
+#define HEAD_MODE_CLONE			0x0003
+#define HEAD_MODE_LVDS_PANEL	0x0008
+#define HEAD_MODE_TESTING		0x1000
+#define HEAD_MODE_STIPPI		0x2000
 
 extern accelerant_info* gInfo;
 
@@ -89,6 +100,7 @@ write32(uint32 encodedRegister, uint32 value)
 		+ REGISTER_REGISTER(encodedRegister)) = value;
 }
 
+void dump_registers(void);
 
 // dpms.cpp
 extern void enable_display_plane(bool enable);
@@ -101,7 +113,6 @@ extern void setup_ring_buffer(ring_buffer &ringBuffer, const char* name);
 // modes.cpp
 extern void wait_for_vblank(void);
 extern void set_frame_buffer_base(void);
-extern void save_lvds_mode(void);
 extern status_t create_mode_list(void);
 
 // memory.cpp

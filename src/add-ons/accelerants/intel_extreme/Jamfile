@@ -16,5 +16,11 @@ Addon intel_extreme.accelerant :
 	mode.cpp
 	overlay.cpp
 #	overlay_3d_i965.cpp
-	: be libaccelerantscommon.a
+	pll.cpp
+	# classes
+	FlexibleDisplayInterface.cpp
+#	PanelFitter.cpp
+	Ports.cpp
+	Pipes.cpp
+	: be $(TARGET_LIBSTDC++) libaccelerantscommon.a
 ;

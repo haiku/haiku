@@ -111,15 +111,15 @@ get_accelerant_hook(uint32 feature, void* data)
 			return (void*)intel_overlay_supported_features;
 		case B_ALLOCATE_OVERLAY_BUFFER:
 			// TODO: overlay doesn't seem to work on these chips
-			if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_91x)
-				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_94x)
-				|| gInfo->shared_info->device_type.IsModel(INTEL_TYPE_965M)
-				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_G4x)
-				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IGD)
-				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_ILK)
-				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_SNB)
-				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_IVB)
-				|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_VLV))
+			if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_91x)
+				|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_94x)
+				|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_965M)
+				|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_G4x)
+				|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)
+				|| gInfo->shared_info->device_type.InGroup(INTEL_GROUP_ILK)
+				|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)
+				|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_POVR)
+				|| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SOC0))
 				return NULL;
 
 			return (void*)intel_allocate_overlay_buffer;

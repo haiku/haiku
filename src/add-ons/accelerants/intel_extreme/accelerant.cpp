@@ -19,22 +19,25 @@
 #include <unistd.h>
 #include <syslog.h>
 
+#include <new>
+
 #include <AGP.h>
 
 
 #undef TRACE
 #define TRACE_ACCELERANT
 #ifdef TRACE_ACCELERANT
-#	define TRACE(x...) _sPrintf("intel_extreme accelerant:" x)
+#	define TRACE(x...) _sPrintf("intel_extreme: " x)
 #else
 #	define TRACE(x...)
 #endif
 
-#define ERROR(x...) _sPrintf("intel_extreme accelerant: " x)
+#define ERROR(x...) _sPrintf("intel_extreme: " x)
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
 struct accelerant_info* gInfo;
+uint32 gDumpCount;
 
 
 class AreaCloner {
@@ -87,6 +90,36 @@ AreaCloner::Keep()
 //	#pragma mark -
 
 
+// intel_reg --mmio=ie-0001.bin --devid=27a2 dump
+void
+dump_registers()
+{
+	char filename[255];
+
+	sprintf(filename, "/boot/system/cache/tmp/ie-%04" B_PRId32 ".bin",
+		gDumpCount);
+
+	ERROR("%s: Taking register dump #%" B_PRId32 "\n", __func__, gDumpCount);
+
+	int fd = open(filename, O_CREAT | O_WRONLY, 0644);
+	uint32 data = 0;
+	if (fd >= 0) {
+		for (int32 i = 0; i < 0x80000; i += sizeof(data)) {
+			//char line[512];
+			//int length = sprintf(line, "%05" B_PRIx32 ": "
+			//	"%08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32 " %08" B_PRIx32 "\n",
+			//	i, read32(i), read32(i + 4), read32(i + 8), read32(i + 12));
+			data = read32(i);
+			write(fd, &data, sizeof(data));
+		}
+		close(fd);
+		sync();
+	}
+
+	gDumpCount++;
+}
+
+
 /*! This is the common accelerant_info initializer. It is called by
 	both, the first accelerant and all clones.
 */
@@ -94,6 +127,9 @@ static status_t
 init_common(int device, bool isClone)
 {
 	// initialize global accelerant info structure
+
+	// Number of register dumps we have... taken.
+	gDumpCount = 0;
 
 	gInfo = (accelerant_info*)malloc(sizeof(accelerant_info));
 	if (gInfo == NULL)
@@ -147,13 +183,33 @@ init_common(int device, bool isClone)
 			+ gInfo->shared_info->overlay_offset);
 	}
 
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_96x)) {
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)) {
 		// allocate some extra memory for the 3D context
 		if (intel_allocate_memory(INTEL_i965_3D_CONTEXT_SIZE,
 				B_APERTURE_NON_RESERVED, gInfo->context_base) == B_OK) {
 			gInfo->context_offset = gInfo->context_base
 				- (addr_t)gInfo->shared_info->graphics_memory;
 		}
+	}
+
+	gInfo->pipe_count = 0;
+
+	// Allocate all of our pipes
+	for (int i = 0; i < MAX_PIPES; i++) {
+		switch (i) {
+			case 0:
+				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_A);
+				break;
+			case 1:
+				gInfo->pipes[i] = new(std::nothrow) Pipe(INTEL_PIPE_B);
+				break;
+			default:
+				ERROR("%s: Unknown pipe %d\n", __func__, i);
+		}
+		if (gInfo->pipes[i] == NULL)
+			ERROR("%s: Error allocating pipe %d\n", __func__, i);
+		else
+			gInfo->pipe_count++;
 	}
 
 	return B_OK;
@@ -179,6 +235,200 @@ uninit_common(void)
 }
 
 
+static void
+dump_ports()
+{
+	if (gInfo->port_count == 0) {
+		TRACE("%s: No ports connected\n", __func__);
+		return;
+	}
+
+	TRACE("%s: Connected ports: (port_count: %" B_PRIu32 ")\n", __func__,
+		gInfo->port_count);
+
+	for (uint32 i = 0; i < gInfo->port_count; i++) {
+		Port* port = gInfo->ports[i];
+		if (!port) {
+			TRACE("port %" B_PRIu32 ":: INVALID ALLOC!\n", i);
+			continue;
+		}
+		TRACE("port %" B_PRIu32 ": %s %s\n", i, port->PortName(),
+			port->IsConnected() ? "connected" : "disconnected");
+	}
+}
+
+
+static bool
+has_connected_port(port_index portIndex, uint32 type)
+{
+	for (uint32 i = 0; i < gInfo->port_count; i++) {
+		Port* port = gInfo->ports[i];
+		if (type != INTEL_PORT_TYPE_ANY && port->Type() != type)
+			continue;
+		if (portIndex != INTEL_PORT_ANY && port->PortIndex() != portIndex)
+			continue;
+
+		return true;
+	}
+
+	return false;
+}
+
+
+static status_t
+probe_ports()
+{
+	// Try to determine what ports to use. We use the following heuristic:
+	// * Check for DisplayPort, these can be more or less detected reliably.
+	// * Check for HDMI, it'll fail on devices not having HDMI for us to fall
+	//   back to DVI.
+	// * Assume DVI B if no HDMI and no DisplayPort is present, confirmed by
+	//   reading EDID in the IsConnected() call.
+	// * Check for analog if possible (there's a detection bit on PCH),
+	//   otherwise the assumed presence is confirmed by reading EDID in
+	//   IsConnected().
+
+	TRACE("adpa: %08" B_PRIx32 "\n", read32(INTEL_ANALOG_PORT));
+	TRACE("dova: %08" B_PRIx32 ", dovb: %08" B_PRIx32
+		", dovc: %08" B_PRIx32 "\n", read32(INTEL_DIGITAL_PORT_A),
+		read32(INTEL_DIGITAL_PORT_B), read32(INTEL_DIGITAL_PORT_C));
+	TRACE("lvds: %08" B_PRIx32 "\n", read32(INTEL_DIGITAL_LVDS_PORT));
+
+	gInfo->port_count = 0;
+	for (int i = INTEL_PORT_A; i <= INTEL_PORT_D; i++) {
+		Port* displayPort = new(std::nothrow) DisplayPort((port_index)i);
+		if (displayPort == NULL)
+			return B_NO_MEMORY;
+
+		if (displayPort->IsConnected())
+			gInfo->ports[gInfo->port_count++] = displayPort;
+		else
+			delete displayPort;
+	}
+
+	// Digital Display Interface
+	if (gInfo->shared_info->device_type.HasDDI()) {
+		for (int i = INTEL_PORT_A; i <= INTEL_PORT_B; i++) {
+			Port* ddiPort
+				= new(std::nothrow) DigitalDisplayInterface((port_index)i);
+
+			if (ddiPort == NULL)
+				return B_NO_MEMORY;
+
+			if (ddiPort->IsConnected())
+				gInfo->ports[gInfo->port_count++] = ddiPort;
+			else
+				delete ddiPort;
+		}
+	}
+
+	// Ensure DP_A isn't already taken (or DDI)
+	if (!has_connected_port((port_index)INTEL_PORT_A, INTEL_PORT_TYPE_ANY)) {
+		// also always try eDP, it'll also just fail if not applicable
+		Port* eDPPort = new(std::nothrow) EmbeddedDisplayPort();
+		if (eDPPort == NULL)
+			return B_NO_MEMORY;
+		if (eDPPort->IsConnected())
+			gInfo->ports[gInfo->port_count++] = eDPPort;
+		else
+			delete eDPPort;
+	}
+
+	for (int i = INTEL_PORT_B; i <= INTEL_PORT_D; i++) {
+		if (has_connected_port((port_index)i, INTEL_PORT_TYPE_ANY)) {
+			// Ensure port not already claimed by something like DDI
+			continue;
+		}
+
+		Port* hdmiPort = new(std::nothrow) HDMIPort((port_index)i);
+		if (hdmiPort == NULL)
+			return B_NO_MEMORY;
+
+		if (hdmiPort->IsConnected())
+			gInfo->ports[gInfo->port_count++] = hdmiPort;
+		else
+			delete hdmiPort;
+	}
+
+	if (!has_connected_port(INTEL_PORT_ANY, INTEL_PORT_TYPE_ANY)) {
+		// there's neither DisplayPort nor HDMI so far, assume DVI B
+		Port* dviPort = new(std::nothrow) DigitalPort(INTEL_PORT_B);
+		if (dviPort == NULL)
+			return B_NO_MEMORY;
+
+		if (dviPort->IsConnected()) {
+			gInfo->ports[gInfo->port_count++] = dviPort;
+			gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
+		} else
+			delete dviPort;
+	}
+
+	// always try the LVDS port, it'll simply fail if not applicable
+	Port* lvdsPort = new(std::nothrow) LVDSPort();
+	if (lvdsPort == NULL)
+		return B_NO_MEMORY;
+	if (lvdsPort->IsConnected()) {
+		gInfo->ports[gInfo->port_count++] = lvdsPort;
+		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
+		gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
+	} else
+		delete lvdsPort;
+
+	// then finally always try the analog port
+	Port* analogPort = new(std::nothrow) AnalogPort();
+	if (analogPort == NULL)
+		return B_NO_MEMORY;
+	if (analogPort->IsConnected()) {
+		gInfo->ports[gInfo->port_count++] = analogPort;
+		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
+	} else
+		delete analogPort;
+
+	if (gInfo->port_count == 0)
+		return B_ERROR;
+
+	return B_OK;
+}
+
+
+static status_t
+assign_pipes()
+{
+	// TODO: At some point we should "group" ports to pipes with the same mode.
+	// You can drive multiple ports from a single pipe as long as the mode is
+	// the same. For the moment we could get displays with the wrong pipes
+	// assigned when the count is > 1;
+
+	uint32 current = 0;
+	for (uint32 i = 0; i < gInfo->port_count; i++) {
+		if (gInfo->ports[i] == NULL)
+			continue;
+
+		pipe_index preference = gInfo->ports[i]->PipePreference();
+		if (preference != INTEL_PIPE_ANY) {
+			// Some ports *really* need to be assigned a pipe due to
+			// implementation bugs.
+			int index = (preference == INTEL_PIPE_B) ? 1 : 0;
+			gInfo->ports[i]->SetPipe(gInfo->pipes[index]);
+			continue;
+		}
+
+		if (gInfo->ports[i]->IsConnected()) {
+			if (current >= gInfo->pipe_count) {
+				ERROR("%s: No pipes left to assign to port %s!\n", __func__,
+					gInfo->ports[i]->PortName());
+				continue;
+			}
+	
+			gInfo->ports[i]->SetPipe(gInfo->pipes[current]);
+			current++;
+		}
+	}
+
+	return B_OK;
+}
+
+
 //	#pragma mark - public accelerant functions
 
 
@@ -199,36 +449,22 @@ intel_init_accelerant(int device)
 
 	setup_ring_buffer(info.primary_ring_buffer, "intel primary ring buffer");
 
-	// determine head depending on what's already enabled from the BIOS
-	// TODO: it would be nicer to retrieve this data via DDC - else the
-	//	display is gone for good if the BIOS decides to only show the
-	//	picture on the connected analog monitor!
-	gInfo->head_mode = 0;
-	if (read32(INTEL_DISPLAY_B_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
-		gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
-	if (read32(INTEL_DISPLAY_A_PIPE_CONTROL) & DISPLAY_PIPE_ENABLED)
-		gInfo->head_mode |= HEAD_MODE_A_ANALOG;
+	TRACE("pipe control for: 0x%" B_PRIx32 " 0x%" B_PRIx32 "\n",
+		read32(INTEL_PIPE_CONTROL), read32(INTEL_PIPE_CONTROL));
 
-	uint32 lvds = read32(INTEL_DISPLAY_LVDS_PORT);
+	// Probe all ports
+	status = probe_ports();
 
-	// If we have an enabled display pipe we save the passed information and
-	// assume it is the valid panel size..
-	// Later we query for proper EDID info if it exists, or figure something
-	// else out. (Default modes, etc.)
-	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
-	if ((hasPCH && (lvds & PCH_LVDS_DETECTED) != 0)
-		|| (!hasPCH && (lvds & DISPLAY_PIPE_ENABLED) != 0)) {
-		save_lvds_mode();
-		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
-	}
+	// On TRACE, dump ports and states
+	dump_ports();
 
-	TRACE("head detected: %#x\n", gInfo->head_mode);
-	TRACE("adpa: %08" B_PRIx32 ", dova: %08" B_PRIx32 ", dovb: %08" B_PRIx32
-		", lvds: %08" B_PRIx32 "\n",
-		read32(INTEL_DISPLAY_A_ANALOG_PORT),
-		read32(INTEL_DISPLAY_A_DIGITAL_PORT),
-		read32(INTEL_DISPLAY_B_DIGITAL_PORT),
-		read32(INTEL_DISPLAY_LVDS_PORT));
+	if (status != B_OK)
+		ERROR("Warning: zero active displays were found!\n");
+
+	status = assign_pipes();
+
+	if (status != B_OK)
+		ERROR("Warning: error while assigning pipes!\n");
 
 	status = create_mode_list();
 	if (status != B_OK) {
@@ -325,8 +561,22 @@ intel_get_accelerant_device_info(accelerant_device_info* info)
 	CALLED();
 
 	info->version = B_ACCELERANT_VERSION;
-	strcpy(info->name, gInfo->shared_info->device_type.InFamily(INTEL_TYPE_7xx)
-		? "Intel Extreme Graphics 1" : "Intel Extreme Graphics 2");
+
+	DeviceType* type = &gInfo->shared_info->device_type;
+
+	if (type->InFamily(INTEL_FAMILY_7xx))
+		strcpy(info->name, "Intel Extreme Graphics");
+	else if (type->InFamily(INTEL_FAMILY_8xx))
+		strcpy(info->name, "Intel Extreme Graphics 2");
+	else if (type->InFamily(INTEL_FAMILY_9xx))
+		strcpy(info->name, "Intel Graphics Media Accelerator");
+	else if (type->InFamily(INTEL_FAMILY_SER5))
+		strcpy(info->name, "Intel HD/Iris Graphics");
+	else if (type->InFamily(INTEL_FAMILY_POVR))
+		strcpy(info->name, "Intel PowerVR Graphics");
+	else if (type->InFamily(INTEL_FAMILY_SOC0))
+		strcpy(info->name, "Intel Atom Graphics");
+
 	strcpy(info->chipset, gInfo->shared_info->device_identifier);
 	strcpy(info->serial_no, "None");
 

@@ -31,19 +31,19 @@ intel_en_gating(intel_info &info)
 	if (info.pci->device_id == 0x2a02 || info.pci->device_id == 0x2a12) {
 		TRACE("i965GM/i965GME quirk\n");
 		write32(info, 0x6204, (1L << 29));
-	} else if (info.device_type.InGroup(INTEL_TYPE_SNB)) {
+	} else if (info.device_type.InGroup(INTEL_GROUP_SNB)) {
 		TRACE("SandyBridge clock gating\n");
 		write32(info, 0x42020, (1L << 28) | (1L << 7) | (1L << 5));
-	} else if (info.device_type.InGroup(INTEL_TYPE_IVB)) {
+	} else if (info.device_type.InGroup(INTEL_GROUP_IVB)) {
 		TRACE("IvyBridge clock gating\n");
 		write32(info, 0x42020, (1L << 28));
-	} else if (info.device_type.InGroup(INTEL_TYPE_VLV)) {
+	} else if (info.device_type.InGroup(INTEL_GROUP_VLV)) {
 		TRACE("ValleyView clock gating\n");
 		write32(info, VLV_DISPLAY_BASE + 0x6200, (1L << 28));
-	} else if (info.device_type.InGroup(INTEL_TYPE_ILK)) {
+	} else if (info.device_type.InGroup(INTEL_GROUP_ILK)) {
 		TRACE("IronLake clock gating\n");
 		write32(info, 0x42020, (1L << 7) | (1L << 5));
-	} else if (info.device_type.InGroup(INTEL_TYPE_G4x)) {
+	} else if (info.device_type.InGroup(INTEL_GROUP_G4x)) {
 		TRACE("G4x clock gating\n");
 		write32(info, 0x6204, 0);
 		write32(info, 0x6208, (1L << 9) | (1L << 7) | (1L << 6));
@@ -70,8 +70,8 @@ intel_en_downclock(intel_info &info)
 {
 	CALLED();
 
-	if (!info.device_type.InGroup(INTEL_TYPE_SNB)
-		&& !info.device_type.InGroup(INTEL_TYPE_IVB)) {
+	if (!info.device_type.InGroup(INTEL_GROUP_SNB)
+		&& !info.device_type.InGroup(INTEL_GROUP_IVB)) {
 		TRACE("%s: Downclocking not supported on this chipset.\n", __func__);
 		return B_NOT_ALLOWED;
 	}

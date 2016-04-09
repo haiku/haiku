@@ -21,13 +21,16 @@
 #include <KernelExport.h>
 #include <PCI.h>
 
+#include <new>
 
-//#define TRACE_INTEL
+
+#define TRACE_INTEL
 #ifdef TRACE_INTEL
-#	define TRACE(x...) dprintf("\33[33magp-intel:\33[0m " x)
+#	define TRACE(x...) dprintf("intel_gart: " x)
 #else
 #	define TRACE(x...) ;
 #endif
+#define ERROR(x...) dprintf("intel_gart: " x)
 
 #ifndef __HAIKU__
 #	define B_KERNEL_READ_AREA	0
@@ -47,93 +50,95 @@
 	(*((volatile uint32*)(address)))
 
 
+// PCI "Host bridge" is most cases :-)
 const struct supported_device {
 	uint32		bridge_id;
 	uint32		display_id;
-	uint32		type;
+	int32		type;
 	const char	*name;
 } kSupportedDevices[] = {
-	{0x3575, 0x3577, INTEL_TYPE_83x, "i830GM"},
-	{0x2560, 0x2562, INTEL_TYPE_83x, "i845G"},
-	{0x3580, 0x3582, INTEL_TYPE_85x, "i855G"},
-	{0x358c, 0x358e, INTEL_TYPE_85x, "i855G"},
-	{0x2570, 0x2572, INTEL_TYPE_85x, "i865G"},
+	{0x3575, 0x3577, INTEL_GROUP_83x, "i830GM"},
+	{0x2560, 0x2562, INTEL_GROUP_83x, "i845G"},
+	{0x3580, 0x3582, INTEL_GROUP_85x, "i855G"},
+	{0x358c, 0x358e, INTEL_GROUP_85x, "i855G"},
+	{0x2570, 0x2572, INTEL_GROUP_85x, "i865G"},
 
-//	{0x2792, INTEL_TYPE_91x, "i910"},
-//	{0x258a, INTEL_TYPE_91x, "i915"},
-	{0x2580, 0x2582, INTEL_TYPE_915, "i915G"},
-	{0x2590, 0x2592, INTEL_TYPE_915M, "i915GM"},
-	{0x2770, 0x2772, INTEL_TYPE_945, "i945G"},
-	{0x27a0, 0x27a2, INTEL_TYPE_945M, "i945GM"},
-	{0x27ac, 0x27ae, INTEL_TYPE_945M, "i945GME"},
+//	{0x2792, INTEL_GROUP_91x, "i910"},
+//	{0x258a, INTEL_GROUP_91x, "i915"},
+	{0x2580, 0x2582, INTEL_MODEL_915, "i915G"},
+	{0x2590, 0x2592, INTEL_MODEL_915M, "i915GM"},
+	{0x2770, 0x2772, INTEL_MODEL_945, "i945G"},
+	{0x27a0, 0x27a2, INTEL_MODEL_945M, "i945GM"},
+	{0x27ac, 0x27ae, INTEL_MODEL_945M, "i945GME"},
 
-	{0x2970, 0x2972, INTEL_TYPE_965, "i946GZ"},
-	{0x2980, 0x2982, INTEL_TYPE_965, "G35"},
-	{0x2990, 0x2992, INTEL_TYPE_965, "i965Q"},
-	{0x29a0, 0x29a2, INTEL_TYPE_965, "i965G"},
-	{0x2a00, 0x2a02, INTEL_TYPE_965, "i965GM"},
-	{0x2a10, 0x2a12, INTEL_TYPE_965, "i965GME"},
+	{0x2970, 0x2972, INTEL_MODEL_965, "i946GZ"},
+	{0x2980, 0x2982, INTEL_MODEL_965, "G35"},
+	{0x2990, 0x2992, INTEL_MODEL_965, "i965Q"},
+	{0x29a0, 0x29a2, INTEL_MODEL_965, "i965G"},
+	{0x2a00, 0x2a02, INTEL_MODEL_965, "i965GM"},
+	{0x2a10, 0x2a12, INTEL_MODEL_965, "i965GME"},
 
-	{0x29b0, 0x29b2, INTEL_TYPE_G33, "G33"},
-	{0x29c0, 0x29c2, INTEL_TYPE_G33, "Q35"},
-	{0x29d0, 0x29d2, INTEL_TYPE_G33, "Q33"},
+	{0x29b0, 0x29b2, INTEL_MODEL_G33, "G33"},
+	{0x29c0, 0x29c2, INTEL_MODEL_G33, "Q35"},
+	{0x29d0, 0x29d2, INTEL_MODEL_G33, "Q33"},
 
-	{0x2a40, 0x2a42, INTEL_TYPE_GM45, "GM45"},
-	{0x2e00, 0x2e02, INTEL_TYPE_G45, "IGD"},
-	{0x2e10, 0x2e12, INTEL_TYPE_G45, "Q45"},
-	{0x2e20, 0x2e22, INTEL_TYPE_G45, "G45"},
-	{0x2e30, 0x2e32, INTEL_TYPE_G45, "G41"},
-	{0x2e40, 0x2e42, INTEL_TYPE_G45, "B43"},
-	{0x2e90, 0x2e92, INTEL_TYPE_G45, "B43"},
+	{0x2a40, 0x2a42, INTEL_MODEL_GM45, "GM45"},
+	{0x2e00, 0x2e02, INTEL_MODEL_G45, "IGD"},
+	{0x2e10, 0x2e12, INTEL_MODEL_G45, "Q45"},
+	{0x2e20, 0x2e22, INTEL_MODEL_G45, "G45"},
+	{0x2e30, 0x2e32, INTEL_MODEL_G45, "G41"},
+	{0x2e40, 0x2e42, INTEL_MODEL_G45, "B43"},
+	{0x2e90, 0x2e92, INTEL_MODEL_G45, "B43"},
 
-	{0xa000, 0xa001, INTEL_TYPE_IGDG, "Atom_Dx10"},
-	{0xa010, 0xa011, INTEL_TYPE_IGDGM, "Atom_N4x0"},
+	{0xa000, 0xa001, INTEL_MODEL_PINE, "Atom_Dx10"},
+	{0xa010, 0xa011, INTEL_MODEL_PINEM, "Atom_N4x0"},
 
-	{0x0040, 0x0042, INTEL_TYPE_ILKG, "IronLake Desktop"},
-	{0x0044, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
-	{0x0062, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
-	{0x006a, 0x0046, INTEL_TYPE_ILKGM, "IronLake Mobile"},
+	{0x0040, 0x0042, INTEL_MODEL_ILKG, "IronLake Desktop"},
+	{0x0044, 0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
+	{0x0062, 0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
+	{0x006a, 0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
 
-	{0x0100, 0x0102, INTEL_TYPE_SNBG, "SandyBridge Desktop GT1"},
-	{0x0100, 0x0112, INTEL_TYPE_SNBG, "SandyBridge Desktop GT2"},
-	{0x0100, 0x0122, INTEL_TYPE_SNBG, "SandyBridge Desktop GT2+"},
-	{0x0104, 0x0106, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT1"},
-	{0x0104, 0x0116, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2"},
-	{0x0104, 0x0126, INTEL_TYPE_SNBGM, "SandyBridge Mobile GT2+"},
-	{0x0108, 0x010a, INTEL_TYPE_SNBGS, "SandyBridge Server"},
+	{0x0100, 0x0102, INTEL_MODEL_SNBG, "SandyBridge Desktop GT1"},
+	{0x0100, 0x0112, INTEL_MODEL_SNBG, "SandyBridge Desktop GT2"},
+	{0x0100, 0x0122, INTEL_MODEL_SNBG, "SandyBridge Desktop GT2+"},
+	{0x0104, 0x0106, INTEL_MODEL_SNBGM, "SandyBridge Mobile GT1"},
+	{0x0104, 0x0116, INTEL_MODEL_SNBGM, "SandyBridge Mobile GT2"},
+	{0x0104, 0x0126, INTEL_MODEL_SNBGM, "SandyBridge Mobile GT2+"},
+	{0x0108, 0x010a, INTEL_MODEL_SNBGS, "SandyBridge Server"},
 
-	{0x0150, 0x0152, INTEL_TYPE_IVBG, "IvyBridge Desktop GT1"},
-	{0x0150, 0x0162, INTEL_TYPE_IVBG, "IvyBridge Desktop GT2"},
-	{0x0154, 0x0156, INTEL_TYPE_IVBGM, "IvyBridge Mobile GT1"},
-	{0x0154, 0x0166, INTEL_TYPE_IVBGM, "IvyBridge Mobile GT2"},
-	{0x0158, 0x015a, INTEL_TYPE_IVBGS, "IvyBridge Server GT1"},
-	{0x0158, 0x016a, INTEL_TYPE_IVBGS, "IvyBridge Server GT2"},
+	{0x0150, 0x0152, INTEL_MODEL_IVBG, "IvyBridge Desktop GT1"},
+	{0x0150, 0x0162, INTEL_MODEL_IVBG, "IvyBridge Desktop GT2"},
+	{0x0154, 0x0156, INTEL_MODEL_IVBGM, "IvyBridge Mobile GT1"},
+	{0x0154, 0x0166, INTEL_MODEL_IVBGM, "IvyBridge Mobile GT2"},
+	{0x0158, 0x015a, INTEL_MODEL_IVBGS, "IvyBridge Server GT1"},
+	{0x0158, 0x016a, INTEL_MODEL_IVBGS, "IvyBridge Server GT2"},
 
-	{0x0c00, 0x0412, INTEL_TYPE_IVBG, "Haswell Desktop"},
-	{0x0c04, 0x0416, INTEL_TYPE_IVBGM, "Haswell Mobile"},
-	{0x0d04, 0x0d26, INTEL_TYPE_IVBGM, "Haswell Mobile"},
+	{0x0c00, 0x0412, INTEL_MODEL_HAS, "Haswell Desktop"},
+	{0x0c04, 0x0416, INTEL_MODEL_HASM, "Haswell Mobile"},
+	{0x0d04, 0x0d26, INTEL_MODEL_HASM, "Haswell Mobile"},
+	{0x0a04, 0x0a16, INTEL_MODEL_HASM, "Haswell Mobile"},
 
 	// XXX: 0x0f00 only confirmed on 0x0f30, 0x0f31
-	{0x0f00, 0x0155, INTEL_TYPE_VLVG, "ValleyView Desktop"},
-	{0x0f00, 0x0f30, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
-	{0x0f00, 0x0f31, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
-	{0x0f00, 0x0f32, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
-	{0x0f00, 0x0f33, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
-	{0x0f00, 0x0157, INTEL_TYPE_VLVGM, "ValleyView Mobile"},
+	{0x0f00, 0x0155, INTEL_MODEL_VLV, "ValleyView Desktop"},
+	{0x0f00, 0x0f30, INTEL_MODEL_VLVM, "ValleyView Mobile"},
+	{0x0f00, 0x0f31, INTEL_MODEL_VLVM, "ValleyView Mobile"},
+	{0x0f00, 0x0f32, INTEL_MODEL_VLVM, "ValleyView Mobile"},
+	{0x0f00, 0x0f33, INTEL_MODEL_VLVM, "ValleyView Mobile"},
+	{0x0f00, 0x0157, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 };
 
 struct intel_info {
 	pci_info	bridge;
 	pci_info	display;
-	uint32		type;
+	DeviceType*	type;
 
-	uint32		*gtt_base;
+	uint32*		gtt_base;
 	phys_addr_t	gtt_physical_base;
 	area_id		gtt_area;
 	size_t		gtt_entries;
 	size_t		gtt_stolen_entries;
 
-	vuint32		*registers;
+	vuint32*	registers;
 	area_id		registers_area;
 
 	addr_t		aperture_base;
@@ -167,99 +172,29 @@ has_display_device(pci_info &info, uint32 deviceID)
 }
 
 
-static void
-determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
+static uint16
+gtt_memory_config(intel_info &info)
 {
-	// read stolen memory from the PCI configuration of the PCI bridge
 	uint8 controlRegister = INTEL_GRAPHICS_MEMORY_CONTROL;
-	if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB)
+	if (info.type->InGroup(INTEL_GROUP_SNB))
 		controlRegister = SNB_GRAPHICS_MEMORY_CONTROL;
 
-	uint16 memoryConfig = get_pci_config(info.bridge, controlRegister, 2);
+	return get_pci_config(info.bridge, controlRegister, 2);
+}
+
+
+static size_t
+determine_gtt_stolen(intel_info &info)
+{
+	uint16 memoryConfig = gtt_memory_config(info);
 	size_t memorySize = 1 << 20; // 1 MB
-	gttSize = 0;
-	stolenSize = 0;
 
-	if (info.type == INTEL_TYPE_965) {
-		switch (memoryConfig & i965_GTT_MASK) {
-			case i965_GTT_128K:
-				gttSize = 128 << 10;
-				break;
-			case i965_GTT_256K:
-				gttSize = 256 << 10;
-				break;
-			case i965_GTT_512K:
-				gttSize = 512 << 10;
-				break;
-		}
-	} else if (info.type == INTEL_TYPE_G33
-	           || (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_IGD) {
-		switch (memoryConfig & G33_GTT_MASK) {
-			case G33_GTT_1M:
-				gttSize = 1 << 20;
-				break;
-			case G33_GTT_2M:
-				gttSize = 2 << 20;
-				break;
-		}
-	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x
-			|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_ILK) {
-		switch (memoryConfig & G4X_GTT_MASK) {
-			case G4X_GTT_NONE:
-				gttSize = 0;
-				break;
-			case G4X_GTT_1M_NO_IVT:
-				gttSize = 1 << 20;
-				break;
-			case G4X_GTT_2M_NO_IVT:
-			case G4X_GTT_2M_IVT:
-				gttSize = 2 << 20;
-				break;
-			case G4X_GTT_3M_IVT:
-				gttSize = 3 << 20;
-				break;
-			case G4X_GTT_4M_IVT:
-				gttSize = 4 << 20;
-				break;
-		}
-	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB) {
-		switch (memoryConfig & SNB_GTT_SIZE_MASK) {
-			case SNB_GTT_SIZE_NONE:
-				gttSize = 0;
-				break;
-			case SNB_GTT_SIZE_1MB:
-				gttSize = 1 << 20;
-				break;
-			case SNB_GTT_SIZE_2MB:
-				gttSize = 2 << 20;
-				break;
-		}
-	} else {
-		// older models have the GTT as large as their frame buffer mapping
-		// TODO: check if the i9xx version works with the i8xx chips as well
-		size_t frameBufferSize = 0;
-		if ((info.type & INTEL_TYPE_8xx) != 0) {
-			if (info.type == INTEL_TYPE_83x
-				&& (memoryConfig & MEMORY_MASK) == i830_FRAME_BUFFER_64M)
-				frameBufferSize = 64 << 20;
-			else
-				frameBufferSize = 128 << 20;
-		} else if ((info.type & INTEL_TYPE_9xx) != 0)
-			frameBufferSize = info.display.u.h0.base_register_sizes[2];
-
-		TRACE("frame buffer size %lu MB\n", frameBufferSize >> 20);
-		gttSize = frameBufferSize / 1024;
-	}
-
-	// TODO: test with different models!
-
-	if (info.type == INTEL_TYPE_83x) {
+	if (info.type->InGroup(INTEL_GROUP_83x)) {
 		// Older chips
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i830_LOCAL_MEMORY_ONLY:
 				// TODO: determine its size!
-				dprintf("intel_gart: getting local memory size not "
-					"implemented.\n");
+				ERROR("getting local memory size not implemented.\n");
 				break;
 			case i830_STOLEN_512K:
 				memorySize >>= 1;
@@ -271,7 +206,7 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				memorySize *= 8;
 				break;
 		}
-	} else if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB) {
+	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
 		switch (memoryConfig & SNB_STOLEN_MEMORY_MASK) {
 			case SNB_STOLEN_MEMORY_32MB:
 				memorySize *= 32;
@@ -322,8 +257,11 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 				memorySize *= 512;
 				break;
 		}
-	} else if (info.type == INTEL_TYPE_85x
-		|| (info.type & INTEL_TYPE_9xx) == INTEL_TYPE_9xx) {
+	} else if (info.type->InGroup(INTEL_GROUP_85x)
+		|| info.type->InFamily(INTEL_FAMILY_9xx)
+        || info.type->InFamily(INTEL_FAMILY_SER5)
+        || info.type->InFamily(INTEL_FAMILY_SOC0)
+        || info.type->InFamily(INTEL_FAMILY_POVR)) {
 		switch (memoryConfig & STOLEN_MEMORY_MASK) {
 			case i855_STOLEN_MEMORY_4M:
 				memorySize *= 4;
@@ -366,14 +304,109 @@ determine_memory_sizes(intel_info &info, size_t &gttSize, size_t &stolenSize)
 		// TODO: error out!
 		memorySize = 4096;
 	}
+	return memorySize - 4096;
+}
 
-	stolenSize = memorySize - 4096;
+
+static size_t
+determine_gtt_size(intel_info &info)
+{
+	uint16 memoryConfig = gtt_memory_config(info);
+	size_t gttSize = 0;
+
+	if (info.type->IsModel(INTEL_MODEL_965)) {
+		switch (memoryConfig & i965_GTT_MASK) {
+			case i965_GTT_128K:
+				gttSize = 128 << 10;
+				break;
+			case i965_GTT_256K:
+				gttSize = 256 << 10;
+				break;
+			case i965_GTT_512K:
+				gttSize = 512 << 10;
+				break;
+		}
+	} else if (info.type->IsModel(INTEL_MODEL_G33)
+	           || info.type->InGroup(INTEL_GROUP_PIN)) {
+		switch (memoryConfig & G33_GTT_MASK) {
+			case G33_GTT_1M:
+				gttSize = 1 << 20;
+				break;
+			case G33_GTT_2M:
+				gttSize = 2 << 20;
+				break;
+		}
+	} else if (info.type->InGroup(INTEL_GROUP_G4x)
+			|| info.type->InGroup(INTEL_GROUP_ILK)) {
+		switch (memoryConfig & G4X_GTT_MASK) {
+			case G4X_GTT_NONE:
+				gttSize = 0;
+				break;
+			case G4X_GTT_1M_NO_IVT:
+				gttSize = 1 << 20;
+				break;
+			case G4X_GTT_2M_NO_IVT:
+			case G4X_GTT_2M_IVT:
+				gttSize = 2 << 20;
+				break;
+			case G4X_GTT_3M_IVT:
+				gttSize = 3 << 20;
+				break;
+			case G4X_GTT_4M_IVT:
+				gttSize = 4 << 20;
+				break;
+		}
+	} else if (info.type->InGroup(INTEL_GROUP_SNB)) {
+		switch (memoryConfig & SNB_GTT_SIZE_MASK) {
+			case SNB_GTT_SIZE_NONE:
+				gttSize = 0;
+				break;
+			case SNB_GTT_SIZE_1MB:
+				gttSize = 1 << 20;
+				break;
+			case SNB_GTT_SIZE_2MB:
+				gttSize = 2 << 20;
+				break;
+		}
+	} else {
+		// older models have the GTT as large as their frame buffer mapping
+		// TODO: check if the i9xx version works with the i8xx chips as well
+		size_t frameBufferSize = 0;
+		if (info.type->InFamily(INTEL_FAMILY_8xx)) {
+			if (info.type->InGroup(INTEL_GROUP_83x)
+				&& (memoryConfig & MEMORY_MASK) == i830_FRAME_BUFFER_64M)
+				frameBufferSize = 64 << 20;
+			else
+				frameBufferSize = 128 << 20;
+		} else if (info.type->Generation() >= 3) {
+			frameBufferSize = info.display.u.h0.base_register_sizes[2];
+		}
+
+		TRACE("frame buffer size %lu MB\n", frameBufferSize >> 20);
+		gttSize = frameBufferSize / 1024;
+	}
+	return gttSize;
 }
 
 
 static void
 set_gtt_entry(intel_info &info, uint32 offset, phys_addr_t physicalAddress)
 {
+	if (info.type->Generation() >= 8) {
+		// CHV + BXT
+		physicalAddress |= (physicalAddress >> 28) & 0x07f0;
+		// TODO: cache control?
+	} else if (info.type->Generation() >= 6) {
+		// SandyBridge, IronLake, IvyBridge, Haswell
+		physicalAddress |= (physicalAddress >> 28) & 0x0ff0;
+		physicalAddress |= 0x02; // cache control, l3 cacheable
+	} else if (info.type->Generation() >= 4) {
+		// Intel 9xx minus 91x, 94x, G33
+		// possible high bits are stored in the lower end
+		physicalAddress |= (physicalAddress >> 28) & 0x00f0;
+		// TODO: cache control?
+	}
+
 	// TODO: this is not 64-bit safe!
 	write32(info.gtt_base + (offset >> GTT_PAGE_SHIFT),
 		(uint32)physicalAddress | GTT_ENTRY_VALID);
@@ -396,7 +429,7 @@ intel_map(intel_info &info)
 {
 	int fbIndex = 0;
 	int mmioIndex = 1;
-	if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
+	if (info.type->Generation() >= 3) {
 		// for some reason Intel saw the need to change the order of the
 		// mappings with the introduction of the i9xx family
 		mmioIndex = 0;
@@ -410,7 +443,7 @@ intel_map(intel_info &info)
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.registers);
 
 	if (mmioMapper.InitCheck() < B_OK) {
-		dprintf("agp_intel: could not map memory I/O!\n");
+		ERROR("could not map memory I/O!\n");
 		return info.registers_area;
 	}
 
@@ -425,7 +458,7 @@ intel_map(intel_info &info)
 		&scratchAddress, B_ANY_KERNEL_ADDRESS, B_PAGE_SIZE, B_FULL_LOCK,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA);
 	if (scratchCreator.InitCheck() < B_OK) {
-		dprintf("agp_intel: could not create scratch page!\n");
+		ERROR("could not create scratch page!\n");
 		return info.scratch_area;
 	}
 
@@ -433,29 +466,27 @@ intel_map(intel_info &info)
 	if (get_memory_map(scratchAddress, B_PAGE_SIZE, &entry, 1) != B_OK)
 		return B_ERROR;
 
-	if ((info.type & INTEL_TYPE_FAMILY_MASK) == INTEL_TYPE_9xx) {
-		if ((info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_G4x
-			|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_ILK
-			|| (info.type & INTEL_TYPE_GROUP_MASK) == INTEL_TYPE_SNB) {
-			info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
-					+ (2UL << 20);
-		} else
-			info.gtt_physical_base
-				= get_pci_config(info.display, i915_GTT_BASE, 4);
-	} else {
+	// TODO: Review these
+	if (info.type->InFamily(INTEL_FAMILY_8xx)) {
 		info.gtt_physical_base = read32(info.registers
 			+ INTEL_PAGE_TABLE_CONTROL) & ~PAGE_TABLE_ENABLED;
 		if (info.gtt_physical_base == 0) {
 			// TODO: not sure how this is supposed to work under Linux/FreeBSD,
 			// but on my i865, this code is needed for Haiku.
-			dprintf("intel_gart: Use GTT address fallback.\n");
+			ERROR("Use GTT address fallback.\n");
 			info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
 				+ i830_GTT_BASE;
 		}
+	} else if (info.type->InGroup(INTEL_GROUP_91x)) {
+		info.gtt_physical_base = get_pci_config(info.display, i915_GTT_BASE, 4);
+	} else {
+		// 945+?
+		info.gtt_physical_base = info.display.u.h0.base_registers[mmioIndex]
+			+ (2UL << 20);
 	}
 
-	size_t gttSize, stolenSize;
-	determine_memory_sizes(info, gttSize, stolenSize);
+	size_t gttSize = determine_gtt_size(info);
+	size_t stolenSize = determine_gtt_stolen(info);
 
 	info.gtt_entries = gttSize / 4096;
 	info.gtt_stolen_entries = stolenSize / 4096;
@@ -468,7 +499,7 @@ intel_map(intel_info &info)
 		info.gtt_physical_base, gttSize, B_ANY_KERNEL_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA, (void**)&info.gtt_base);
 	if (gttMapper.InitCheck() < B_OK) {
-		dprintf("intel_gart: could not map GTT!\n");
+		ERROR("could not map GTT!\n");
 		return info.gtt_area;
 	}
 
@@ -477,16 +508,14 @@ intel_map(intel_info &info)
 	if (info.aperture_size == 0)
 		info.aperture_size = info.display.u.h0.base_register_sizes[fbIndex];
 
-	dprintf("intel_gart: detected %ld MB of stolen memory, aperture "
-		"size %ld MB, GTT size %ld KB\n", (stolenSize + (1023 << 10)) >> 20,
+	ERROR("detected %ld MB of stolen memory, aperture size %ld MB, "
+		"GTT size %ld KB\n", (stolenSize + (1023 << 10)) >> 20,
 		info.aperture_size >> 20, gttSize >> 10);
 
-	dprintf("intel_gart: GTT base = 0x%" B_PRIxPHYSADDR "\n",
-		info.gtt_physical_base);
-	dprintf("intel_gart: MMIO base = 0x%" B_PRIx32 "\n",
+	ERROR("GTT base = 0x%" B_PRIxPHYSADDR "\n", info.gtt_physical_base);
+	ERROR("MMIO base = 0x%" B_PRIx32 "\n",
 		info.display.u.h0.base_registers[mmioIndex]);
-	dprintf("intel_gart: GMR base = 0x%" B_PRIxPHYSADDR "\n",
-		info.aperture_physical_base);
+	ERROR("GMR base = 0x%" B_PRIxPHYSADDR "\n", info.aperture_physical_base);
 
 	AreaKeeper apertureMapper;
 	info.aperture_area = apertureMapper.Map("intel graphics aperture",
@@ -495,7 +524,7 @@ intel_map(intel_info &info)
 		B_READ_AREA | B_WRITE_AREA, (void**)&info.aperture_base);
 	if (apertureMapper.InitCheck() < B_OK) {
 		// try again without write combining
-		dprintf(DEVICE_NAME ": enabling write combined mode failed.\n");
+		ERROR("enabling write combined mode failed.\n");
 
 		info.aperture_area = apertureMapper.Map("intel graphics aperture",
 			info.aperture_physical_base, info.aperture_size,
@@ -503,7 +532,7 @@ intel_map(intel_info &info)
 			(void**)&info.aperture_base);
 	}
 	if (apertureMapper.InitCheck() < B_OK) {
-		dprintf(DEVICE_NAME ": could not map graphics aperture!\n");
+		ERROR("could not map graphics aperture!\n");
 		return info.aperture_area;
 	}
 
@@ -639,7 +668,7 @@ intel_init()
 		for (uint32 i = 0; i < sizeof(kSupportedDevices)
 				/ sizeof(kSupportedDevices[0]); i++) {
 			if (sInfo.bridge.device_id == kSupportedDevices[i].bridge_id) {
-				sInfo.type = kSupportedDevices[i].type;
+				sInfo.type = new DeviceType(kSupportedDevices[i].type);
 				if (has_display_device(sInfo.display,
 						kSupportedDevices[i].display_id)) {
 					TRACE("found intel bridge\n");
@@ -656,6 +685,8 @@ intel_init()
 static void
 intel_uninit()
 {
+	if (sInfo.type)
+		delete sInfo.type;
 }
 
 

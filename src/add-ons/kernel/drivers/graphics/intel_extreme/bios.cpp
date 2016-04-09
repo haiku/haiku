@@ -119,8 +119,6 @@ static struct vbios {
 } vbios;
 
 
-/* TODO: move code to accelerant, if possible */
-
 /*!	This is reimplementation, Haiku uses BIOS call and gets most current panel
 	info, we're, otherwise, digging in VBIOS memory and parsing VBT tables to
 	get native panel timings. This will allow to get non-updated,

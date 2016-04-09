@@ -25,12 +25,12 @@
 #undef TRACE
 //#define TRACE_OVERLAY
 #ifdef TRACE_OVERLAY
-#	define TRACE(x...) _sPrintf("intel_extreme accelerant:" x)
+#	define TRACE(x...) _sPrintf("intel_extreme: " x)
 #else
 #	define TRACE(x...)
 #endif
 
-#define ERROR(x...) _sPrintf("intel_extreme accelerant: " x)
+#define ERROR(x...) _sPrintf("intel_extreme: " x)
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
@@ -207,7 +207,7 @@ set_color_key(uint8 red, uint8 green, uint8 blue, uint8 redMask,
 static void
 set_color_key(const overlay_window* window)
 {
-	switch (gInfo->shared_info->current_mode.space) {
+	switch (gInfo->current_mode.space) {
 		case B_CMAP8:
 			set_color_key(0, 0, window->blue.value, 0x0, 0x0, 0xff);
 			break;
@@ -235,7 +235,7 @@ static void
 update_overlay(bool updateCoefficients)
 {
 	if (!gInfo->shared_info->overlay_active
-		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_965))
+		|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_965))
 		return;
 
 	QueueCommands queue(gInfo->shared_info->primary_ring_buffer);
@@ -259,7 +259,7 @@ static void
 show_overlay(void)
 {
 	if (gInfo->shared_info->overlay_active
-		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_965))
+		|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_965))
 		return;
 
 	gInfo->shared_info->overlay_active = true;
@@ -281,7 +281,7 @@ static void
 hide_overlay(void)
 {
 	if (!gInfo->shared_info->overlay_active
-		|| gInfo->shared_info->device_type.InGroup(INTEL_TYPE_965))
+		|| gInfo->shared_info->device_type.IsModel(INTEL_MODEL_965))
 		return;
 
 	overlay_registers* registers = gInfo->overlay_registers;
@@ -327,7 +327,7 @@ intel_overlay_supported_spaces(const display_mode* mode)
 	static const uint32 kSupportedi965Spaces[] = {B_YCbCr422, 0};
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 
-	if (sharedInfo.device_type.InGroup(INTEL_TYPE_96x))
+	if (sharedInfo.device_type.InGroup(INTEL_GROUP_96x))
 		return kSupportedi965Spaces;
 
 	return kSupportedSpaces;
@@ -380,7 +380,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 	// alloc graphics mem
 
 	int32 alignment = 0x3f;
-	if (sharedInfo.device_type.InGroup(INTEL_TYPE_965))
+	if (sharedInfo.device_type.IsModel(INTEL_MODEL_965))
 		alignment = 0xff;
 
 	overlay_buffer* buffer = &overlay->buffer;
@@ -396,7 +396,7 @@ intel_allocate_overlay_buffer(color_space colorSpace, uint16 width,
 		return NULL;
 	}
 
-	if (sharedInfo.device_type.InGroup(INTEL_TYPE_965)) {
+	if (sharedInfo.device_type.IsModel(INTEL_MODEL_965)) {
 		status = intel_allocate_memory(INTEL_i965_OVERLAY_STATE_SIZE,
 			B_APERTURE_NON_RESERVED, overlay->state_base);
 		if (status < B_OK) {
@@ -437,7 +437,7 @@ intel_release_overlay_buffer(const overlay_buffer* buffer)
 		hide_overlay();
 
 	intel_free_memory(overlay->buffer_base);
-	if (gInfo->shared_info->device_type.InGroup(INTEL_TYPE_965))
+	if (gInfo->shared_info->device_type.IsModel(INTEL_MODEL_965))
 		intel_free_memory(overlay->state_base);
 	free(overlay);
 
@@ -589,10 +589,10 @@ intel_configure_overlay(overlay_token overlayToken,
 			left = 0;
 		if (top < 0)
 			top = 0;
-		if (right > gInfo->shared_info->current_mode.timing.h_display)
-			right = gInfo->shared_info->current_mode.timing.h_display;
-		if (bottom > gInfo->shared_info->current_mode.timing.v_display)
-			bottom = gInfo->shared_info->current_mode.timing.v_display;
+		if (right > gInfo->current_mode.timing.h_display)
+			right = gInfo->current_mode.timing.h_display;
+		if (bottom > gInfo->current_mode.timing.v_display)
+			bottom = gInfo->current_mode.timing.v_display;
 		if (left >= right || top >= bottom) {
 			// overlay is not within visible bounds
 			hide_overlay();
@@ -630,7 +630,7 @@ intel_configure_overlay(overlay_token overlayToken,
 		// the result will be wrong, too.
 		registers->source_width_rgb = right - left;
 		registers->source_height_rgb = bottom - top;
-		if (gInfo->shared_info->device_type.InFamily(INTEL_TYPE_8xx)) {
+		if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_8xx)) {
 			registers->source_bytes_per_row_rgb = (((overlay->buffer_offset
 				+ (view->width << 1) + 0x1f) >> 5)
 				- (overlay->buffer_offset >> 5) - 1) << 2;

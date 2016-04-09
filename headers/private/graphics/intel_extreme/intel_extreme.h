@@ -1,9 +1,10 @@
 /*
- * Copyright 2006-2014, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
+ *		Alexander von Gluck, kallisti5@unixzen.com
  */
 #ifndef INTEL_EXTREME_H
 #define INTEL_EXTREME_H
@@ -20,50 +21,61 @@
 
 #define VENDOR_ID_INTEL			0x8086
 
-#define INTEL_TYPE_FAMILY_MASK	0x000f0000
-#define INTEL_TYPE_GROUP_MASK	0x000ffff0
-#define INTEL_TYPE_MODEL_MASK	0x000fffff
+#define INTEL_FAMILY_MASK	0x00ff0000
+#define INTEL_GROUP_MASK	0x00fffff0
+#define INTEL_MODEL_MASK	0x00ffffff
+#define INTEL_TYPE_MASK		0x0000000f
 // families
-#define INTEL_TYPE_7xx			0x00010000
-#define INTEL_TYPE_8xx			0x00020000
-#define INTEL_TYPE_9xx			0x00040000
+#define INTEL_FAMILY_7xx	0x00010000	// First Gen
+#define INTEL_FAMILY_8xx	0x00020000	// Second Gen
+#define INTEL_FAMILY_9xx	0x00040000	// Third Gen +
+#define INTEL_FAMILY_SER5	0x00080000	// Intel5 Series
+#define INTEL_FAMILY_POVR	0x00100000	// PowerVR (uugh)
+#define INTEL_FAMILY_SOC0	0x00200000  // Atom SOC
 // groups
-#define INTEL_TYPE_83x			(INTEL_TYPE_8xx | 0x0010)
-#define INTEL_TYPE_85x			(INTEL_TYPE_8xx | 0x0020)
-#define INTEL_TYPE_91x			(INTEL_TYPE_9xx | 0x0040)
-#define INTEL_TYPE_94x			(INTEL_TYPE_9xx | 0x0080)
-#define INTEL_TYPE_96x			(INTEL_TYPE_9xx | 0x0100)
-#define INTEL_TYPE_Gxx			(INTEL_TYPE_9xx | 0x0200)
-#define INTEL_TYPE_G4x			(INTEL_TYPE_9xx | 0x0400)
-#define INTEL_TYPE_IGD			(INTEL_TYPE_9xx | 0x0800)
-#define INTEL_TYPE_ILK			(INTEL_TYPE_9xx | 0x1000)
-#define INTEL_TYPE_SNB			(INTEL_TYPE_9xx | 0x2000)
-#define INTEL_TYPE_IVB			(INTEL_TYPE_9xx | 0x4000)
-#define INTEL_TYPE_VLV			(INTEL_TYPE_9xx | 0x8000)
+#define INTEL_GROUP_83x		(INTEL_FAMILY_8xx  | 0x0010)
+#define INTEL_GROUP_85x		(INTEL_FAMILY_8xx  | 0x0020)
+#define INTEL_GROUP_91x		(INTEL_FAMILY_9xx  | 0x0010)
+#define INTEL_GROUP_94x		(INTEL_FAMILY_9xx  | 0x0020)
+#define INTEL_GROUP_96x		(INTEL_FAMILY_9xx  | 0x0040)
+#define INTEL_GROUP_Gxx		(INTEL_FAMILY_9xx  | 0x0080)
+#define INTEL_GROUP_G4x		(INTEL_FAMILY_9xx  | 0x0100)
+#define INTEL_GROUP_PIN		(INTEL_FAMILY_9xx  | 0x0200)  // PineView
+#define INTEL_GROUP_ILK		(INTEL_FAMILY_SER5 | 0x0010)  // IronLake
+#define INTEL_GROUP_SNB		(INTEL_FAMILY_SER5 | 0x0020)  // SandyBridge
+#define INTEL_GROUP_IVB		(INTEL_FAMILY_SER5 | 0x0040)  // IvyBridge
+#define INTEL_GROUP_HAS		(INTEL_FAMILY_SER5 | 0x0080)  // Haswell
+#define INTEL_GROUP_SLT		(INTEL_FAMILY_POVR | 0x0010)  // Saltwell
+#define INTEL_GROUP_FSM		(INTEL_FAMILY_POVR | 0x0020)  // Fu.Silvermont
+#define INTEL_GROUP_VLV		(INTEL_FAMILY_SOC0 | 0x0010)  // ValleyView
+#define INTEL_GROUP_CHV		(INTEL_FAMILY_SOC0 | 0x0020)  // CherryView
+#define INTEL_GROUP_BXT		(INTEL_FAMILY_SOC0 | 0x0040)  // Broxton
 // models
-#define INTEL_TYPE_SERVER		0x0004
-#define INTEL_TYPE_MOBILE		0x0008
-#define INTEL_TYPE_915			(INTEL_TYPE_91x)
-#define INTEL_TYPE_915M			(INTEL_TYPE_91x | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_945			(INTEL_TYPE_94x)
-#define INTEL_TYPE_945M			(INTEL_TYPE_94x | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_965			(INTEL_TYPE_96x)
-#define INTEL_TYPE_965M			(INTEL_TYPE_96x | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_G33			(INTEL_TYPE_Gxx)
-#define INTEL_TYPE_G45			(INTEL_TYPE_G4x)
-#define INTEL_TYPE_GM45			(INTEL_TYPE_G4x | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_IGDG			(INTEL_TYPE_IGD)
-#define INTEL_TYPE_IGDGM		(INTEL_TYPE_IGD | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_ILKG			(INTEL_TYPE_ILK)
-#define INTEL_TYPE_ILKGM		(INTEL_TYPE_ILK | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_SNBG			(INTEL_TYPE_SNB)
-#define INTEL_TYPE_SNBGM		(INTEL_TYPE_SNB | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_SNBGS		(INTEL_TYPE_SNB | INTEL_TYPE_SERVER)
-#define INTEL_TYPE_IVBG			(INTEL_TYPE_IVB)
-#define INTEL_TYPE_IVBGM		(INTEL_TYPE_IVB | INTEL_TYPE_MOBILE)
-#define INTEL_TYPE_IVBGS		(INTEL_TYPE_IVB | INTEL_TYPE_SERVER)
-#define INTEL_TYPE_VLVG			(INTEL_TYPE_VLV)
-#define INTEL_TYPE_VLVGM		(INTEL_TYPE_VLV | INTEL_TYPE_MOBILE)
+#define INTEL_TYPE_SERVER	0x0004
+#define INTEL_TYPE_MOBILE	0x0008
+#define INTEL_MODEL_915		(INTEL_GROUP_91x)
+#define INTEL_MODEL_915M	(INTEL_GROUP_91x | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_945		(INTEL_GROUP_94x)
+#define INTEL_MODEL_945M	(INTEL_GROUP_94x | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_965		(INTEL_GROUP_96x)
+#define INTEL_MODEL_965M	(INTEL_GROUP_96x | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_G33		(INTEL_GROUP_Gxx)
+#define INTEL_MODEL_G45		(INTEL_GROUP_G4x)
+#define INTEL_MODEL_GM45	(INTEL_GROUP_G4x | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_PINE	(INTEL_GROUP_PIN)
+#define INTEL_MODEL_PINEM	(INTEL_GROUP_PIN | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_ILKG	(INTEL_GROUP_ILK)
+#define INTEL_MODEL_ILKGM	(INTEL_GROUP_ILK | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_SNBG	(INTEL_GROUP_SNB)
+#define INTEL_MODEL_SNBGM	(INTEL_GROUP_SNB | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_SNBGS	(INTEL_GROUP_SNB | INTEL_TYPE_SERVER)
+#define INTEL_MODEL_IVBG	(INTEL_GROUP_IVB)
+#define INTEL_MODEL_IVBGM	(INTEL_GROUP_IVB | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_IVBGS	(INTEL_GROUP_IVB | INTEL_TYPE_SERVER)
+#define INTEL_MODEL_HAS		(INTEL_GROUP_HAS)
+#define INTEL_MODEL_HASM	(INTEL_GROUP_HAS | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_VLV		(INTEL_GROUP_VLV)
+#define INTEL_MODEL_VLVM	(INTEL_GROUP_VLV | INTEL_TYPE_MOBILE)
 
 // ValleyView MMIO offset
 #define VLV_DISPLAY_BASE		0x180000
@@ -94,10 +106,10 @@
 #define ICH_SHARED_REGISTER_BASE						0x00000
 #define ICH_PORT_REGISTER_BASE							0x60000
 
-// PCH - Platform Control Hub - Newer hardware moves from a MCH/ICH based setup
-// to a PCH based one, that means anything that used to communicate via (G)MCH
-// registers needs to use different ones on PCH based platforms (Ironlake and
-// up, SandyBridge, etc.).
+// PCH - Platform Control Hub - Some hardware moves from a MCH/ICH based
+// setup to a PCH based one, that means anything that used to communicate via
+// (G)MCH registers needs to use different ones on PCH based platforms
+// (Ironlake, SandyBridge, IvyBridge, Some Haswell).
 #define PCH_NORTH_SHARED_REGISTER_BASE					0x40000
 #define PCH_NORTH_PIPE_AND_PORT_REGISTER_BASE			0x60000
 #define PCH_NORTH_PLANE_CONTROL_REGISTER_BASE			0x70000
@@ -121,23 +133,65 @@ struct DeviceType {
 
 	bool InFamily(uint32 family) const
 	{
-		return (type & INTEL_TYPE_FAMILY_MASK) == family;
+		return (type & INTEL_FAMILY_MASK) == family;
 	}
 
 	bool InGroup(uint32 group) const
 	{
-		return (type & INTEL_TYPE_GROUP_MASK) == group;
+		return (type & INTEL_GROUP_MASK) == group;
 	}
 
 	bool IsModel(uint32 model) const
 	{
-		return (type & INTEL_TYPE_MODEL_MASK) == model;
+		return (type & INTEL_MODEL_MASK) == model;
+	}
+
+	bool IsMobile() const
+	{
+		return (type & INTEL_TYPE_MASK) == INTEL_TYPE_MOBILE;
+	}
+
+	bool SupportsHDMI() const
+	{
+		return InGroup(INTEL_GROUP_G4x) || InFamily(INTEL_FAMILY_SER5)
+			|| InFamily(INTEL_FAMILY_SOC0);
 	}
 
 	bool HasPlatformControlHub() const
 	{
-		return InGroup(INTEL_TYPE_ILK) || InGroup(INTEL_TYPE_SNB)
-			|| InGroup(INTEL_TYPE_IVB) || InGroup(INTEL_TYPE_VLV);
+		return InFamily(INTEL_FAMILY_SER5);
+	}
+
+	bool HasDDI() const
+	{
+		// Intel Digital Display Interface
+		return InGroup(INTEL_GROUP_HAS) || (Generation() >= 8);
+	}
+
+	int Generation() const
+	{
+		if (InFamily(INTEL_FAMILY_7xx))
+			return 1;
+		if (InFamily(INTEL_FAMILY_8xx))
+			return 2;
+		if (InGroup(INTEL_GROUP_91x) || InGroup(INTEL_GROUP_94x)
+				|| IsModel(INTEL_MODEL_G33) || InGroup(INTEL_GROUP_PIN))
+			return 3;
+		if (InFamily(INTEL_FAMILY_9xx))
+			return 4;
+		if (InGroup(INTEL_GROUP_ILK))
+			return 5;
+		if (InGroup(INTEL_GROUP_SNB))
+			return 6;
+		if (InFamily(INTEL_FAMILY_SER5) || InGroup(INTEL_GROUP_VLV))
+			return 7;
+		if (InGroup(INTEL_GROUP_CHV))
+			return 8;
+		if (InGroup(INTEL_GROUP_BXT))
+			return 9;
+
+		// Generation 0 means somethins is wrong :-)
+		return 0;
 	}
 };
 
@@ -165,12 +219,12 @@ struct intel_shared_info {
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
 
-	display_mode	current_mode;
+	display_mode	panel_mode;			// VBIOS VBT panel mode
 	uint32			bytes_per_row;
 	uint32			bits_per_pixel;
 	uint32			dpms_mode;
 
-	area_id			registers_area;			// area of memory mapped registers
+	area_id			registers_area;		// area of memory mapped registers
 	uint32			register_blocks[REGISTER_BLOCK_COUNT];
 
 	uint8*			status_page;
@@ -181,6 +235,8 @@ struct intel_shared_info {
 
 	addr_t			frame_buffer;
 	uint32			frame_buffer_offset;
+
+	uint32			fdi_link_frequency;	// In Mhz
 
 	bool			got_vbt;
 	bool			single_head_locked;
@@ -213,6 +269,12 @@ struct intel_shared_info {
 
 	edid1_info		vesa_edid_info;
 	bool			has_vesa_edid_info;
+};
+
+enum pipe_index {
+    INTEL_PIPE_ANY,
+    INTEL_PIPE_A,
+    INTEL_PIPE_B
 };
 
 //----------------- ioctl() interface ----------------
@@ -254,7 +316,8 @@ struct intel_free_graphics_memory {
 // Register definitions, taken from X driver
 
 // PCI bridge memory management
-#define INTEL_GRAPHICS_MEMORY_CONTROL	0x52
+#define INTEL_GRAPHICS_MEMORY_CONTROL	0x52		// i830+
+
 	// GGC - (G)MCH Graphics Control Register
 #define MEMORY_CONTROL_ENABLED			0x0004
 #define MEMORY_MASK						0x0001
@@ -288,6 +351,7 @@ struct intel_free_graphics_memory {
 #define G4X_STOLEN_MEMORY_352MB			0xd0
 
 // SandyBridge (SNB)
+
 #define SNB_GRAPHICS_MEMORY_CONTROL		0x50
 
 #define SNB_STOLEN_MEMORY_MASK			0xf8
@@ -374,7 +438,7 @@ struct intel_free_graphics_memory {
 #define PCH_INTERRUPT_VBLANK_PIPEA_SNB		(1 << 7)
 #define PCH_INTERRUPT_VBLANK_PIPEB_SNB		(1 << 15)
 
-// display ports
+// graphics port control
 #define DISPLAY_MONITOR_PORT_ENABLED	(1UL << 31)
 #define DISPLAY_MONITOR_PIPE_B			(1UL << 30)
 #define DISPLAY_MONITOR_VGA_POLARITY	(1UL << 15)
@@ -386,23 +450,31 @@ struct intel_free_graphics_memory {
 #define DISPLAY_MONITOR_POLARITY_MASK	(3UL << 3)
 #define DISPLAY_MONITOR_POSITIVE_HSYNC	(1UL << 3)
 #define DISPLAY_MONITOR_POSITIVE_VSYNC	(2UL << 3)
+#define DISPLAY_MONITOR_PORT_DETECTED	(1UL << 2) // TMDS/DisplayPort only
+
 #define LVDS_POST2_RATE_SLOW			14 // PLL Divisors
 #define LVDS_POST2_RATE_FAST			7
-#define LVDS_CLKB_POWER_MASK			(3 << 4)
-#define LVDS_CLKB_POWER_UP				(3 << 4)
-#define LVDS_PORT_EN					(1 << 31)
-#define LVDS_A0A2_CLKA_POWER_UP			(3 << 8)
-#define LVDS_PIPEB_SELECT				(1 << 30)
-#define LVDS_B0B3PAIRS_POWER_UP			(3 << 2)
-#define LVDS_PLL_MODE_LVDS				(2 << 26)
-#define LVDS_18BIT_DITHER				(1 << 25)
+#define LVDS_B0B3_POWER_MASK			(3UL << 2)
+#define LVDS_B0B3_POWER_UP				(3UL << 2)
+#define LVDS_CLKB_POWER_MASK			(3UL << 4)
+#define LVDS_CLKB_POWER_UP				(3UL << 4)
+#define LVDS_A3_POWER_MASK				(3UL << 6)
+#define LVDS_A3_POWER_UP				(3UL << 6)
+#define LVDS_A0A2_CLKA_POWER_UP			(3UL << 8)
+#define LVDS_BORDER_ENABLE				(1UL << 15)
+#define LVDS_HSYNC_POLARITY				(1UL << 20)
+#define LVDS_VSYNC_POLARITY				(1UL << 21)
+#define LVDS_18BIT_DITHER				(1UL << 25)
+#define LVDS_PORT_EN					(1UL << 31)
+
 
 // PLL flags
 #define DISPLAY_PLL_ENABLED				(1UL << 31)
 #define DISPLAY_PLL_2X_CLOCK			(1UL << 30)
 #define DISPLAY_PLL_SYNC_LOCK_ENABLED	(1UL << 29)
 #define DISPLAY_PLL_NO_VGA_CONTROL		(1UL << 28)
-#define DISPLAY_PLL_MODE_ANALOG			(1UL << 26)
+#define DISPLAY_PLL_MODE_NORMAL			(1UL << 26)
+#define DISPLAY_PLL_MODE_LVDS			(2UL << 26)
 #define DISPLAY_PLL_DIVIDE_HIGH			(1UL << 24)
 #define DISPLAY_PLL_DIVIDE_4X			(1UL << 23)
 #define DISPLAY_PLL_POST1_DIVIDE_2		(1UL << 21)
@@ -423,35 +495,122 @@ struct intel_free_graphics_memory {
 #define DISPLAY_PLL_PULSE_PHASE_SHIFT	9
 
 // display
-#define INTEL_DISPLAY_A_HTOTAL			(0x0000 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_A_HBLANK			(0x0004 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_A_HSYNC			(0x0008 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_A_VTOTAL			(0x000c | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_A_VBLANK			(0x0010 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_A_VSYNC			(0x0014 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_B_HTOTAL			(0x1000 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_B_HBLANK			(0x1004 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_B_HSYNC			(0x1008 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_B_VTOTAL			(0x100c | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_B_VBLANK			(0x1010 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_B_VSYNC			(0x1014 | REGS_SOUTH_TRANSCODER_PORT)
+
+#define INTEL_DISPLAY_OFFSET			0x1000
+
+#define INTEL_DISPLAY_A_HTOTAL			(0x0000 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_A_HBLANK			(0x0004 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_A_HSYNC			(0x0008 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_A_VTOTAL			(0x000c | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_A_VBLANK			(0x0010 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_A_VSYNC			(0x0014 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_B_HTOTAL			(0x1000 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_B_HBLANK			(0x1004 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_B_HSYNC			(0x1008 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_B_VTOTAL			(0x100c | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_B_VBLANK			(0x1010 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_B_VSYNC			(0x1014 | REGS_NORTH_PIPE_AND_PORT)
 
 #define INTEL_DISPLAY_A_IMAGE_SIZE		(0x001c | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_B_IMAGE_SIZE		(0x101c | REGS_NORTH_PIPE_AND_PORT)
 
-#define INTEL_DISPLAY_A_ANALOG_PORT		(0x1100 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_A_DIGITAL_PORT	(0x1120 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_B_DIGITAL_PORT	(0x1140 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_C_DIGITAL			(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
-#define INTEL_DISPLAY_LVDS_PORT			(0x1180 | REGS_SOUTH_TRANSCODER_PORT)
+// on PCH we also have to set the transcoder
+#define INTEL_TRANSCODER_A_HTOTAL			(0x0000 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_A_HBLANK			(0x0004 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_A_HSYNC			(0x0008 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_A_VTOTAL			(0x000c | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_A_VBLANK			(0x0010 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_A_VSYNC			(0x0014 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_B_HTOTAL			(0x1000 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_B_HBLANK			(0x1004 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_B_HSYNC			(0x1008 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_B_VTOTAL			(0x100c | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_B_VBLANK			(0x1010 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_B_VSYNC			(0x1014 | REGS_SOUTH_TRANSCODER_PORT)
+
+#define INTEL_TRANSCODER_A_IMAGE_SIZE		(0x001c | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_TRANSCODER_B_IMAGE_SIZE		(0x101c | REGS_SOUTH_TRANSCODER_PORT)
+
+#define INTEL_ANALOG_PORT				(0x1100 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DIGITAL_PORT_A			(0x1120 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DIGITAL_PORT_B			(0x1140 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DIGITAL_PORT_C			(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DIGITAL_LVDS_PORT			(0x1180 | REGS_SOUTH_TRANSCODER_PORT)
+
+#define INTEL_HDMI_PORT_B				(0x1140 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_HDMI_PORT_C				(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
+
+#define PCH_HDMI_PORT_B					(0x1140 | REGS_SOUTH_TRANSCODER_PORT)
+#define PCH_HDMI_PORT_C					(0x1150 | REGS_SOUTH_TRANSCODER_PORT)
+#define PCH_HDMI_PORT_D					(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
+
+#define GEN4_HDMI_PORT_B				(0x1140 | REGS_SOUTH_TRANSCODER_PORT)
+#define GEN4_HDMI_PORT_C				(0x1160 | REGS_SOUTH_TRANSCODER_PORT)
+#define CHV_HDMI_PORT_D					(0x116C | REGS_SOUTH_TRANSCODER_PORT)
+
+// DDI Buffer Control (This replaces DP on Haswell+)
+#define DDI_BUF_CTL_A					(0x4000 | REGS_NORTH_PIPE_AND_PORT)
+#define DDI_BUF_CTL_B					(0x4100 | REGS_NORTH_PIPE_AND_PORT)
+#define 	DDI_BUF_CTL_ENABLE			(1 << 31)
+#define 	DDI_BUF_TRANS_SELECT(n)		((n) << 24)
+#define 	DDI_BUF_EMP_MASK			(0xf << 24)
+#define 	DDI_BUF_PORT_REVERSAL		(1 << 16)
+#define 	DDI_BUF_IS_IDLE				(1 << 7)
+#define 	DDI_A_4_LANES				(1 << 4)
+#define 	DDI_PORT_WIDTH(width)		(((width) - 1) << 1)
+#define 	DDI_INIT_DISPLAY_DETECTED	(1 << 0)
+
+// DP_A always @ 6xxxx, DP_B-DP_D move with PCH
+#define INTEL_DISPLAY_PORT_A			(0x4000 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DISPLAY_PORT_B			(0x4100 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DISPLAY_PORT_C			(0x4200 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DISPLAY_PORT_D			(0x4300 | REGS_SOUTH_TRANSCODER_PORT)
+
+// Unless you're a damn Valley/CherryView unicorn :-(
+#define VLV_DISPLAY_PORT_B				(VLV_DISPLAY_BASE + 0x64100)
+#define VLV_DISPLAY_PORT_C				(VLV_DISPLAY_BASE + 0x64200)
+#define CHV_DISPLAY_PORT_D				(VLV_DISPLAY_BASE + 0x64300)
+
+// DP AUX channels
+#define INTEL_DP_AUX_CTL_A				(0x4010 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_DP_AUX_CTL_B				(0x4110 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DP_AUX_CTL_C				(0x4210 | REGS_SOUTH_TRANSCODER_PORT)
+#define INTEL_DP_AUX_CTL_D				(0x4310 | REGS_SOUTH_TRANSCODER_PORT)
+
+#define VLV_DP_AUX_CTL_B				(VLV_DISPLAY_BASE + 0x64110)
+#define VLV_DP_AUX_CTL_C				(VLV_DISPLAY_BASE + 0x64210)
+#define CHV_DP_AUX_CTL_D				(VLV_DISPLAY_BASE + 0x64310)
+
+#define INTEL_DP_AUX_CTL_BUSY			(1 << 31)
+#define INTEL_DP_AUX_CTL_DONE			(1 << 30)
+#define INTEL_DP_AUX_CTL_INTERRUPT		(1 << 29)
+#define INTEL_DP_AUX_CTL_TIMEOUT_ERROR	(1 << 28)
+#define INTEL_DP_AUX_CTL_TIMEOUT_400us	(0 << 26)
+#define INTEL_DP_AUX_CTL_TIMEOUT_600us	(1 << 26)
+#define INTEL_DP_AUX_CTL_TIMEOUT_800us	(2 << 26)
+#define INTEL_DP_AUX_CTL_TIMEOUT_1600us (3 << 26)
+#define INTEL_DP_AUX_CTL_TIMEOUT_MASK	(3 << 26)
+#define INTEL_DP_AUX_CTL_RECEIVE_ERROR	(1 << 25)
+#define INTEL_DP_AUX_CTL_MSG_SIZE_MASK	(0x1f << 20)
+#define INTEL_DP_AUX_CTL_MSG_SIZE_SHIFT 20
+#define INTEL_DP_AUX_CTL_PRECHARGE_2US_MASK (0xf << 16)
+#define INTEL_DP_AUX_CTL_PRECHARGE_2US_SHIFT 16
+#define INTEL_DP_AUX_CTL_BIT_CLOCK_2X_MASK (0x7ff)
+#define INTEL_DP_AUX_CTL_BIT_CLOCK_2X_SHIFT 0
+#define INTEL_DP_AUX_CTL_SYNC_PULSE_SKL(c)   ((c) - 1)
 
 // planes
-#define INTEL_DISPLAY_A_PIPE_CONTROL	(0x0008 | REGS_NORTH_PLANE_CONTROL)
-#define INTEL_DISPLAY_B_PIPE_CONTROL	(0x1008 | REGS_NORTH_PLANE_CONTROL)
-#define DISPLAY_PIPE_ENABLED			(1UL << 31)
+#define INTEL_PIPE_ENABLED				(1UL << 31)
+#define INTEL_PIPE_CONTROL				0x0008
+#define INTEL_PIPE_STATUS				0x0024
 
+#define INTEL_PLANE_OFFSET				0x1000
+
+#define INTEL_DISPLAY_A_PIPE_CONTROL	(0x0008	| REGS_NORTH_PLANE_CONTROL)
+#define INTEL_DISPLAY_B_PIPE_CONTROL	(0x1008 | REGS_NORTH_PLANE_CONTROL)
 #define INTEL_DISPLAY_A_PIPE_STATUS		(0x0024 | REGS_NORTH_PLANE_CONTROL)
 #define INTEL_DISPLAY_B_PIPE_STATUS		(0x1024 | REGS_NORTH_PLANE_CONTROL)
+
 #define DISPLAY_PIPE_VBLANK_ENABLED		(1UL << 17)
 #define DISPLAY_PIPE_VBLANK_STATUS		(1UL << 1)
 
@@ -472,6 +631,7 @@ struct intel_free_graphics_memory {
 #define INTEL_DISPLAY_B_SURFACE			(0x119c | REGS_NORTH_PLANE_CONTROL)
 	// i965 and up only
 
+// INTEL_DISPLAY_A_CONTROL source pixel format
 #define DISPLAY_CONTROL_ENABLED			(1UL << 31)
 #define DISPLAY_CONTROL_GAMMA			(1UL << 30)
 #define DISPLAY_CONTROL_COLOR_MASK		(0x0fUL << 26)
@@ -479,6 +639,19 @@ struct intel_free_graphics_memory {
 #define DISPLAY_CONTROL_RGB15			(4UL << 26)
 #define DISPLAY_CONTROL_RGB16			(5UL << 26)
 #define DISPLAY_CONTROL_RGB32			(6UL << 26)
+
+// INTEL_DISPLAY_A_PIPE_CONTROL ILK+
+#define INTEL_PIPE_DITHER_TYPE_MASK		(0x0000000c)
+#define INTEL_PIPE_DITHER_TYPE_SP		(0 << 2)
+#define INTEL_PIPE_DITHER_TYPE_ST1		(1 << 2)
+#define INTEL_PIPE_DITHER_TYPE_ST2		(2 << 2)
+#define INTEL_PIPE_DITHER_TYPE_TEMP		(3 << 2)
+#define INTEL_PIPE_DITHER_EN			(1 << 4)
+#define INTEL_PIPE_8BPC					(0 << 5)
+#define INTEL_PIPE_10BPC				(1 << 5)
+#define INTEL_PIPE_6BPC					(2 << 5)
+#define INTEL_PIPE_12BPC				(3 << 5)
+#define INTEL_PIPE_PROGRESSIVE			(0 << 21)
 
 // cursors
 #define INTEL_CURSOR_CONTROL			(0x0080 | REGS_NORTH_PLANE_CONTROL)
@@ -503,10 +676,13 @@ struct intel_free_graphics_memory {
 // PLL registers
 #define INTEL_DISPLAY_A_PLL				(0x6014 | REGS_SOUTH_SHARED)
 #define INTEL_DISPLAY_B_PLL				(0x6018 | REGS_SOUTH_SHARED)
-#define INTEL_DISPLAY_A_PLL_MULTIPLIER_DIVISOR \
-										(0x601c | REGS_SOUTH_SHARED)
-#define INTEL_DISPLAY_B_PLL_MULTIPLIER_DIVISOR \
-										(0x6020 | REGS_SOUTH_SHARED)
+#define CHV_DISPLAY_C_PLL				(0x6030 | REGS_SOUTH_SHARED)
+
+//  Multiplier Divisor
+#define INTEL_DISPLAY_A_PLL_MD			(0x601C | REGS_SOUTH_SHARED)
+#define INTEL_DISPLAY_B_PLL_MD			(0x6020 | REGS_SOUTH_SHARED)
+#define CHV_DISPLAY_B_PLL_MD			(0x603C | REGS_SOUTH_SHARED)
+
 #define INTEL_DISPLAY_A_PLL_DIVISOR_0	(0x6040 | REGS_SOUTH_SHARED)
 #define INTEL_DISPLAY_A_PLL_DIVISOR_1	(0x6044 | REGS_SOUTH_SHARED)
 #define INTEL_DISPLAY_B_PLL_DIVISOR_0	(0x6048 | REGS_SOUTH_SHARED)
@@ -535,23 +711,41 @@ struct intel_free_graphics_memory {
 #define I2C_RESERVED					((1 << 13) | (1 << 5))
 
 // TODO: on IronLake this is in the north shared block at 0x41000
-#define INTEL_VGA_DISPLAY_CONTROL		0x71400
+#define INTEL_VGA_DISPLAY_CONTROL		(0x1400 | REGS_NORTH_PLANE_CONTROL)
 #define VGA_DISPLAY_DISABLED			(1UL << 31)
 
 // LVDS panel
-#define INTEL_PANEL_STATUS				0x61200
-#define PANEL_STATUS_POWER_ON			(1UL << 31)
-#define INTEL_PANEL_CONTROL				0x61204
-#define PANEL_CONTROL_POWER_TARGET_ON	(1UL << 0)
-#define INTEL_PANEL_FIT_CONTROL			0x61230
-#define INTEL_PANEL_FIT_RATIOS			0x61234
+#define INTEL_PANEL_STATUS				(0x1200 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_PANEL_CONTROL				(0x1204 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_PANEL_FIT_CONTROL			(0x1230 | REGS_NORTH_PIPE_AND_PORT)
+#define INTEL_PANEL_FIT_RATIOS			(0x1234 | REGS_NORTH_PIPE_AND_PORT)
 
 // LVDS on IronLake and up
-#define PCH_PANEL_CONTROL				0xc7200
-#define PCH_PANEL_STATUS				0xc7204
-#define PANEL_REGISTER_UNLOCK			(0xabcd << 16)
+#define PCH_PANEL_STATUS				(0x7200 | REGS_SOUTH_SHARED)
+#define PCH_PANEL_CONTROL				(0x7204 | REGS_SOUTH_SHARED)
+#define PCH_PANEL_ON_DELAYS				(0x7208 | REGS_SOUTH_SHARED)
+#define PCH_PANEL_OFF_DELAYS			(0x720c | REGS_SOUTH_SHARED)
+#define PCH_PANEL_DIVISOR				(0x7210 | REGS_SOUTH_SHARED)
 #define PCH_LVDS_DETECTED				(1 << 1)
 
+#define PANEL_STATUS_POWER_ON			(1UL << 31)
+#define PANEL_CONTROL_POWER_TARGET_OFF	(0UL << 0)
+#define PANEL_CONTROL_POWER_TARGET_ON	(1UL << 0)
+#define PANEL_CONTROL_POWER_TARGET_RST	(1UL << 1)
+#define PANEL_REGISTER_UNLOCK			(0xabcd << 16)
+
+// PCH_PANEL_ON_DELAYS
+#define PANEL_DELAY_PORT_SELECT_MASK	(3 << 30)
+#define PANEL_DELAY_PORT_SELECT_LVDS	(0 << 30)
+#define PANEL_DELAY_PORT_SELECT_DPA		(1 << 30)
+#define PANEL_DELAY_PORT_SELECT_DPC		(2 << 30)
+#define PANEL_DELAY_PORT_SELECT_DPD		(3 << 30)
+
+// PCH_PANEL_DIVISOR
+#define PANEL_DIVISOR_REFERENCE_DIV_MASK 0xffffff00
+#define PANEL_DIVISOR_REFERENCE_DIV_SHIFT 8
+#define PANEL_DIVISOR_POW_CYCLE_DLY_MASK 0x1f
+#define PANEL_DIVISOR_POW_CYCLE_DLY_SHIFT 0x1f
 
 // ring buffer commands
 
@@ -593,6 +787,99 @@ struct intel_free_graphics_memory {
 #define INTEL_OVERLAY_GAMMA_2			0x3001c
 #define INTEL_OVERLAY_GAMMA_1			0x30020
 #define INTEL_OVERLAY_GAMMA_0			0x30024
+
+// FDI - Flexible Display Interface, the interface between the (CPU-internal)
+// GPU and the PCH display outputs. Proprietary interface, based on DisplayPort
+// though, so similar link training and all...
+// There's an FDI transmitter (TX) on the CPU and an FDI receiver (RX) on the
+// PCH for each display pipe.
+// FDI receiver A is hooked up to transcoder A, FDI receiver B is hooked up to
+// transcoder B, so we have the same mapping as with the display pipes.
+#define PCH_FDI_RX_BASE_REGISTER		0xf0000
+#define PCH_FDI_RX_PIPE_OFFSET			0x01000
+#define PCH_FDI_RX_CONTROL				0x00c
+#define FDI_RX_ENABLE					(1 << 31)
+#define FDI_RX_PLL_ENABLED				(1 << 13)
+
+#define FDI_FS_ERRC_ENABLE				(1 << 27)
+#define FDI_FE_ERRC_ENABLE				(1 << 26)
+
+#define PCH_FDI_RX_TRANS_UNIT_SIZE_1	0x30
+#define PCH_FDI_RX_TRANS_UNIT_SIZE_2	0x38
+#define FDI_RX_TRANS_UNIT_SIZE(x)		((x - 1) << 25)
+#define FDI_RX_TRANS_UNIT_MASK			0x7e000000
+
+#define FDI_RX_ENHANCE_FRAME_ENABLE		(1 << 6)
+#define FDI_RX_CLOCK_MASK				(1 << 4)
+#define FDI_RX_CLOCK_RAW				(0 << 4)
+#define FDI_RX_CLOCK_PCD				(1 << 4)
+
+#define PCH_FDI_TX_BASE_REGISTER		0x60000
+#define PCH_FDI_TX_PIPE_OFFSET			0x01000
+#define PCH_FDI_TX_CONTROL				0x100
+#define FDI_TX_ENABLE					(1 << 31)
+#define FDI_TX_ENHANCE_FRAME_ENABLE		(1 << 18)
+#define FDI_TX_PLL_ENABLED				(1 << 14)
+
+#define FDI_PLL_BIOS_0					0x46000
+#define FDI_PLL_FB_CLOCK_MASK			0xff
+#define FDI_PLL_BIOS_1					0x46004
+#define FDI_PLL_BIOS_2					0x46008
+
+#define FDI_LINK_TRAIN_PATTERN_1		(0 << 28)
+#define FDI_LINK_TRAIN_PATTERN_2		(1 << 28)
+#define FDI_LINK_TRAIN_PATTERN_IDLE		(2 << 28)
+#define FDI_LINK_TRAIN_NONE				(3 << 28)
+#define FDI_LINK_TRAIN_VOLTAGE_0_4V		(0 << 25)
+#define FDI_LINK_TRAIN_VOLTAGE_0_6V		(1 << 25)
+#define FDI_LINK_TRAIN_VOLTAGE_0_8V		(2 << 25)
+#define FDI_LINK_TRAIN_VOLTAGE_1_2V		(3 << 25)
+#define FDI_LINK_TRAIN_PRE_EMPHASIS_NONE (0 << 22)
+#define FDI_LINK_TRAIN_PRE_EMPHASIS_1_5X (1 << 22)
+#define FDI_LINK_TRAIN_PRE_EMPHASIS_2X	(2 << 22)
+#define FDI_LINK_TRAIN_PRE_EMPHASIS_3X	(3 << 22)
+
+#define FDI_AUTO_TRAINING				(1 << 10)
+#define FDI_AUTO_TRAIN_DONE				(1 << 1)
+
+// SNB A-stepping
+#define FDI_LINK_TRAIN_400MV_0DB_SNB_A	(0x38 << 22)
+#define FDI_LINK_TRAIN_400MV_6DB_SNB_A	(0x02 << 22)
+#define FDI_LINK_TRAIN_600MV_3_5DB_SNB_A (0x01 << 22)
+#define FDI_LINK_TRAIN_800MV_0DB_SNB_A	(0x00 << 22)
+
+// SNB B-stepping
+#define FDI_LINK_TRAIN_400MV_0DB_SNB_B	(0x00 << 22)
+#define FDI_LINK_TRAIN_400MV_6DB_SNB_B	(0x3a << 22)
+#define FDI_LINK_TRAIN_600MV_3_5DB_SNB_B (0x39 << 22)
+#define FDI_LINK_TRAIN_800MV_0DB_SNB_B	(0x38 << 22)
+#define FDI_LINK_TRAIN_VOL_EMP_MASK		(0x3f << 22)
+
+#define FDI_LINK_TRAIN_PATTERN_1_CPT	(0 << 8)
+#define FDI_LINK_TRAIN_PATTERN_2_CPT	(1 << 8)
+#define FDI_LINK_TRAIN_PATTERN_IDLE_CPT	(2 << 8)
+#define FDI_LINK_TRAIN_NORMAL_CPT		(3 << 8)
+#define FDI_LINK_TRAIN_PATTERN_MASK_CPT	(3 << 8)
+
+// IvyBridge changes it up because... they hate developers?
+#define FDI_LINK_TRAIN_PATTERN_1_IVB	(0 << 8)
+#define FDI_LINK_TRAIN_PATTERN_2_IVB	(1 << 8)
+#define FDI_LINK_TRAIN_PATTERN_IDLE_IVB	(2 << 8)
+#define FDI_LINK_TRAIN_NONE_IVB			(3 << 8)
+
+// CPU Panel Fitters - These are for IronLake and up and are the CPU internal
+// panel fitters.
+#define PCH_PANEL_FITTER_BASE_REGISTER	0x68000
+#define PCH_PANEL_FITTER_PIPE_OFFSET	0x00800
+
+#define PCH_PANEL_FITTER_WINDOW_POS		0x70
+#define PCH_PANEL_FITTER_WINDOW_SIZE	0x74
+#define PCH_PANEL_FITTER_CONTROL		0x80
+#define PCH_PANEL_FITTER_V_SCALE		0x84
+#define PCH_PANEL_FITTER_H_SCALE		0x90
+
+#define PANEL_FITTER_ENABLED			(1 << 31)
+#define PANEL_FITTER_FILTER_MASK		(3 << 23)
 
 struct overlay_scale {
 	uint32 _reserved0 : 3;
@@ -768,7 +1055,7 @@ struct overlay_registers {
 inline bool
 intel_uses_physical_overlay(intel_shared_info &info)
 {
-	return !info.device_type.InGroup(INTEL_TYPE_Gxx);
+	return !info.device_type.InGroup(INTEL_GROUP_Gxx);
 }
 
 

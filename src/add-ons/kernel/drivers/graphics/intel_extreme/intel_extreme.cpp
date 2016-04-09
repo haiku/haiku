@@ -98,7 +98,7 @@ intel_interrupt_handler(void* data)
 
 		// Intel changed the PCH register mapping between Sandy Bridge and the
 		// later generations (Ivy Bridge and up).
-		if (info.device_type.InFamily(INTEL_TYPE_SNB)) {
+		if (info.device_type.InGroup(INTEL_GROUP_SNB)) {
 			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA_SNB
 				: INTERRUPT_VBLANK_PIPEA;
 			if ((identity & mask) != 0) {
@@ -287,7 +287,7 @@ intel_extreme_init(intel_info &info)
 
 	int fbIndex = 0;
 	int mmioIndex = 1;
-	if (info.device_type.InFamily(INTEL_TYPE_9xx)) {
+	if (info.device_type.Generation() >= 3) {
 		// For some reason Intel saw the need to change the order of the
 		// mappings with the introduction of the i9xx family
 		mmioIndex = 0;
@@ -316,12 +316,16 @@ intel_extreme_init(intel_info &info)
 		return info.registers_area;
 	}
 
+	ERROR("Init Intel generation %" B_PRId32 " GPU %s PCH split.\n",
+		info.device_type.Generation(),
+		info.device_type.HasPlatformControlHub() ? "with" : "without");
+
 	uint32* blocks = info.shared_info->register_blocks;
 	blocks[REGISTER_BLOCK(REGS_FLAT)] = 0;
 
 	// setup the register blocks for the different architectures
 	if (info.device_type.HasPlatformControlHub()) {
-		// PCH based platforms (IronLake and up)
+		// PCH based platforms (IronLake through ultra-low-power Broadwells)
 		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]
 			= PCH_NORTH_SHARED_REGISTER_BASE;
 		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)]
@@ -346,13 +350,23 @@ intel_extreme_init(intel_info &info)
 			= ICH_PORT_REGISTER_BASE;
 	}
 
-	// "I nearly got violent with the hw guys when they told me..."
-	if (info.device_type.InFamily(INTEL_TYPE_VLV)) {
-		TRACE("%s: ValleyView MMIO offset engaged\n", __func__);
-		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)] += VLV_DISPLAY_BASE;
-		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)] += VLV_DISPLAY_BASE;
+	// Everything in the display PRM gets +0x180000
+	if (info.device_type.InGroup(INTEL_GROUP_VLV)) {
+		// "I nearly got violent with the hw guys when they told me..."
 		blocks[REGISTER_BLOCK(REGS_SOUTH_SHARED)] += VLV_DISPLAY_BASE;
+		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)] += VLV_DISPLAY_BASE;
 	}
+
+	TRACE("REGS_NORTH_SHARED: 0x%X\n",
+		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]);
+	TRACE("REGS_NORTH_PIPE_AND_PORT: 0x%X\n",
+		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)]);
+	TRACE("REGS_NORTH_PLANE_CONTROL: 0x%X\n",
+		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)]);
+	TRACE("REGS_SOUTH_SHARED: 0x%X\n",
+		blocks[REGISTER_BLOCK(REGS_SOUTH_SHARED)]);
+	TRACE("REGS_SOUTH_TRANSCODER_PORT: 0x%X\n",
+		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)]);
 
 	// make sure bus master, memory-mapped I/O, and frame buffer is enabled
 	set_pci_config(info.pci, PCI_command, 2, get_pci_config(info.pci,
@@ -391,13 +405,16 @@ intel_extreme_init(intel_info &info)
 	info.shared_info->frame_buffer = 0;
 	info.shared_info->dpms_mode = B_DPMS_ON;
 
+	// Pull VBIOS panel mode for later use
 	info.shared_info->got_vbt = get_lvds_mode_from_bios(
-		&info.shared_info->current_mode);
+		&info.shared_info->panel_mode);
+
 	/* at least 855gm can't drive more than one head at time */
-	if (info.device_type.InFamily(INTEL_TYPE_8xx))
+	if (info.device_type.InFamily(INTEL_FAMILY_8xx))
 		info.shared_info->single_head_locked = 1;
 
-	if (info.device_type.InFamily(INTEL_TYPE_9xx)) {
+	if (info.device_type.InFamily(INTEL_FAMILY_9xx)
+		| info.device_type.InFamily(INTEL_FAMILY_SER5)) {
 		info.shared_info->pll_info.reference_frequency = 96000;	// 96 kHz
 		info.shared_info->pll_info.max_frequency = 400000;
 			// 400 MHz RAM DAC speed
@@ -456,6 +473,18 @@ intel_extreme_init(intel_info &info)
 	}
 
 	init_interrupt_handler(info);
+
+	if (info.device_type.HasPlatformControlHub()) {
+		if (info.device_type.Generation() == 5) {
+			info.shared_info->fdi_link_frequency = (read32(info, FDI_PLL_BIOS_0)
+				& FDI_PLL_FB_CLOCK_MASK) + 2;
+			info.shared_info->fdi_link_frequency *= 100;
+		} else {
+			info.shared_info->fdi_link_frequency = 2700;
+		}
+	} else {
+		info.shared_info->fdi_link_frequency = 0;
+	}
 
 	TRACE("%s: completed successfully!\n", __func__);
 	return B_OK;
