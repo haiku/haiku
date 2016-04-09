@@ -60,7 +60,7 @@ virtual	bool						IsConnected() = 0;
 		::Pipe*						GetPipe()
 										{ return fPipe; };
 
-		status_t					Power(bool enabled);
+virtual	status_t					Power(bool enabled);
 
 		bool						HasEDID();
 virtual	status_t					GetEDID(edid1_info* edid,
@@ -208,6 +208,8 @@ public:
 
 virtual	uint32						Type() const
 										{ return INTEL_PORT_TYPE_DVI; }
+
+virtual	status_t					Power(bool enabled);
 
 virtual	bool						IsConnected();
 

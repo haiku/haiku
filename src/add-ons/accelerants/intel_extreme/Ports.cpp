@@ -1022,6 +1022,24 @@ DigitalDisplayInterface::_DDCRegister()
 }
 
 
+status_t
+DigitalDisplayInterface::Power(bool enabled)
+{
+	TRACE("%s: %s DDI enabled: %s\n", __func__, PortName(),
+		enabled ? "true" : "false");
+
+	fPipe->Enable(enabled);
+
+	addr_t portRegister = _PortRegister();
+	uint32 state = read32(portRegister);
+	write32(portRegister,
+		enabled ? (state | DDI_BUF_CTL_ENABLE) : (state & ~DDI_BUF_CTL_ENABLE));
+	read32(portRegister);
+
+	return B_OK;
+}
+
+
 bool
 DigitalDisplayInterface::IsConnected()
 {
