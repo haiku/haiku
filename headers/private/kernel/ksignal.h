@@ -36,6 +36,10 @@ using BKernel::Thread;
 #define SYSCALL_RESTART_PARAMETER_SIZE	32
 
 // kernel-internal signals
+#define SIGNAL_DEBUG_THREAD		62
+	// Debug a thread. Used together with the B_THREAD_DEBUG_STOP thread debug
+	// flag. Continues the thread, if suspended, but has no effect otherwise.
+	// Non-blockable.
 #define SIGNAL_CANCEL_THREAD	63
 	// Cancel a thread. Non-blockable.
 #define SIGNAL_CONTINUE_THREAD	64

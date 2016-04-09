@@ -45,13 +45,15 @@
 
 #define BLOCKABLE_SIGNALS	\
 	(~(KILL_SIGNALS | SIGNAL_TO_MASK(SIGSTOP)	\
+	| SIGNAL_TO_MASK(SIGNAL_DEBUG_THREAD)	\
 	| SIGNAL_TO_MASK(SIGNAL_CONTINUE_THREAD)	\
 	| SIGNAL_TO_MASK(SIGNAL_CANCEL_THREAD)))
 #define STOP_SIGNALS \
 	(SIGNAL_TO_MASK(SIGSTOP) | SIGNAL_TO_MASK(SIGTSTP) \
 	| SIGNAL_TO_MASK(SIGTTIN) | SIGNAL_TO_MASK(SIGTTOU))
 #define CONTINUE_SIGNALS \
-	(SIGNAL_TO_MASK(SIGCONT) | SIGNAL_TO_MASK(SIGNAL_CONTINUE_THREAD))
+	(SIGNAL_TO_MASK(SIGCONT) | SIGNAL_TO_MASK(SIGNAL_CONTINUE_THREAD) \
+	| SIGNAL_TO_MASK(SIGNAL_DEBUG_THREAD))
 #define DEFAULT_IGNORE_SIGNALS \
 	(SIGNAL_TO_MASK(SIGCHLD) | SIGNAL_TO_MASK(SIGWINCH) \
 	| SIGNAL_TO_MASK(SIGCONT) \
@@ -1038,6 +1040,11 @@ handle_signals(Thread* thread)
 						notify_debugger(thread, signal, handler, false);
 					continue;
 
+				case SIGNAL_DEBUG_THREAD:
+					// ignore -- used together with B_THREAD_DEBUG_STOP, which
+					// is handled above
+					continue;
+
 				case SIGNAL_CANCEL_THREAD:
 					// set up the signal handler
 					handler.sa_handler = thread->cancel_function;
@@ -1422,6 +1429,19 @@ send_signal_to_thread_locked(Thread* thread, uint32 signalNumber,
 				scheduler_enqueue_in_run_queue(thread);
 			else
 				thread_interrupt(thread, true);
+
+			break;
+		}
+		case SIGNAL_DEBUG_THREAD:
+		{
+			// Wake up thread if it was suspended, otherwise interrupt it.
+			thread->going_to_suspend = false;
+
+			SpinLocker locker(thread->scheduler_lock);
+			if (thread->state == B_THREAD_SUSPENDED)
+				scheduler_enqueue_in_run_queue(thread);
+			else
+				thread_interrupt(thread, false);
 
 			break;
 		}

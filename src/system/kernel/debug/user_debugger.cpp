@@ -2903,39 +2903,24 @@ _user_debug_thread(thread_id threadID)
 	if ((thread->debug_info.flags & B_THREAD_DEBUG_NUB_THREAD) != 0)
 		return B_NOT_ALLOWED;
 
-	// already marked stopped?
-	if ((thread->debug_info.flags & B_THREAD_DEBUG_STOPPED) != 0)
+	// already marked stopped or being told to stop?
+	if ((thread->debug_info.flags
+			& (B_THREAD_DEBUG_STOPPED | B_THREAD_DEBUG_STOP)) != 0) {
 		return B_OK;
+	}
 
 	// set the flag that tells the thread to stop as soon as possible
 	atomic_or(&thread->debug_info.flags, B_THREAD_DEBUG_STOP);
 
 	update_thread_user_debug_flag(thread);
 
-	// resume/interrupt the thread, if necessary
+	// send the thread a SIGNAL_DEBUG_THREAD, so it is interrupted (or
+	// continued)
 	threadDebugInfoLocker.Unlock();
-	SpinLocker schedulerLocker(thread->scheduler_lock);
+	ReadSpinLocker teamLocker(thread->team_lock);
+	SpinLocker locker(thread->team->signal_lock);
 
-	switch (thread->state) {
-		case B_THREAD_SUSPENDED:
-			// thread suspended: wake it up
-			scheduler_enqueue_in_run_queue(thread);
-			break;
-
-		default:
-			// thread may be waiting: interrupt it
-			thread_interrupt(thread, false);
-				// TODO: If the thread is already in the kernel and e.g.
-				// about to acquire a semaphore (before
-				// thread_prepare_to_block()), we won't interrupt it.
-				// Maybe we should rather send a signal (SIGTRAP).
-			schedulerLocker.Unlock();
-
-			schedulerLocker.SetTo(thread_get_current_thread()->scheduler_lock,
-				false);
-			scheduler_reschedule_if_necessary_locked();
-			break;
-	}
+	send_signal_to_thread_locked(thread, SIGNAL_DEBUG_THREAD, NULL, 0);
 
 	return B_OK;
 }
