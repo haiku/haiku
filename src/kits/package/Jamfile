@@ -129,9 +129,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			SolverResult.cpp
 			:
 			shared
+			bnetapi
 			be
 			[ BuildFeatureAttribute curl : library ]
 			[ TargetLibstdc++ ]
+			$(TARGET_NETWORK_LIBS)
 			;
 	}
 }

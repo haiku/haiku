@@ -496,8 +496,8 @@ if $(HOST_PLATFORM_BEOS_COMPATIBLE) {
 		HOST_LIBROOT += /usr/lib/libgnuregex.so ;
 		HOST_STATIC_LIBROOT += /usr/lib/libgnuregex.so ;
 	} else if $(HOST_PLATFORM) = darwin {
-		HOST_LIBROOT += libgnuregex_build.a ;
-		HOST_STATIC_LIBROOT += libgnuregex_build.a ;
+		HOST_LIBROOT += libgnuregex_build.so ;
+		HOST_STATIC_LIBROOT += libgnuregex_build.so ;
 	}
 
 	# The BeOS compilers define __INTEL__ respectively __POWERPC__. On the

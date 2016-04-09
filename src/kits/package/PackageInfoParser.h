@@ -1,5 +1,6 @@
 /*
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
+ * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_PARSER_H
@@ -31,6 +32,8 @@ public:
 									BPackageResolvableExpression& _expression);
 
 private:
+			struct UrlStringValidator;
+			struct StringValidator;
 			struct ParseError;
 			struct Token;
 			struct ListElementParser;
@@ -74,7 +77,8 @@ private:
 									bool allowSingleNonListElement);
 			void				_ParseStringList(BStringList* value,
 									bool requireResolvableName = false,
-									bool convertToLowerCase = false);
+									bool convertToLowerCase = false,
+									StringValidator* stringValidator = NULL);
 			void				_ParseResolvableList(
 									BObjectList<BPackageResolvable>* value);
 			void				_ParseResolvableExprList(
@@ -149,6 +153,19 @@ struct BPackageInfo::Parser::ListElementParser {
 	}
 
 	virtual void operator()(const Token& token) = 0;
+};
+
+
+struct BPackageInfo::Parser::StringValidator {
+public:
+	virtual void Validate(const BString &string, const char *pos) = 0;
+};
+
+
+struct BPackageInfo::Parser::UrlStringValidator
+    : public BPackageInfo::Parser::StringValidator {
+public:
+	virtual	void				Validate(const BString &string, const char* pos);
 };
 
 

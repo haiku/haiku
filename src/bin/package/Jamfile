@@ -15,6 +15,6 @@ BinCommand package :
 	PackageWriterListener.cpp
 	PackageWritingUtils.cpp
 	:
-	package be
+	package be bnetapi
 	[ TargetLibsupc++ ]
 ;

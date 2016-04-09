@@ -9,6 +9,7 @@
 
 #include "NetworkAddressTest.h"
 #include "NetworkInterfaceTest.h"
+#include "NetworkUrlTest.h"
 
 
 BTestSuite*
@@ -18,6 +19,7 @@ getTestSuite()
 
 	NetworkAddressTest::AddTests(*suite);
 	NetworkInterfaceTest::AddTests(*suite);
+	NetworkUrlTest::AddTests(*suite);
 
 	return suite;
 }

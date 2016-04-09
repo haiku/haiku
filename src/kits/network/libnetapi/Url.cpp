@@ -1,9 +1,10 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2016 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Christophe Huriaux, c.huriaux@gmail.com
+ *		Andrew Lindesay, apl@lindesay.co.nz
  */
 
 
@@ -17,11 +18,15 @@
 #include <MimeType.h>
 #include <Roster.h>
 
-#include <ICUWrapper.h>
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	#include <ICUWrapper.h>
+#endif
 #include <RegExp.h>
 
-#include <unicode/idna.h>
-#include <unicode/stringpiece.h>
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
+	#include <unicode/idna.h>
+	#include <unicode/stringpiece.h>
+#endif
 
 
 static const char* kArchivedUrl = "be:url string";
@@ -498,8 +503,14 @@ BUrl::Fragment() const
 bool
 BUrl::IsValid() const
 {
+	if (!fHasProtocol)
+		return false;
+
+	if (fProtocol == "http" || fProtocol == "https" || fProtocol == "ftp")
+		return fHasHost;
+
 	// TODO: Implement for real!
-	return fHasProtocol && (fHasHost || fHasPath);
+	return fHasHost || fHasPath;
 }
 
 
@@ -598,6 +609,7 @@ BUrl::UrlDecode(bool strict)
 }
 
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 status_t
 BUrl::IDNAToAscii()
 {
@@ -618,8 +630,10 @@ BUrl::IDNAToAscii()
 	fHost = result;
 	return B_OK;
 }
+#endif
 
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 status_t
 BUrl::IDNAToUnicode()
 {
@@ -640,11 +654,13 @@ BUrl::IDNAToUnicode()
 	fHost = result;
 	return B_OK;
 }
+#endif
 
 
 // #pragma mark - utility functionality
 
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 bool
 BUrl::HasPreferredApplication() const
 {
@@ -657,8 +673,10 @@ BUrl::HasPreferredApplication() const
 
 	return false;
 }
+#endif
 
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 BString
 BUrl::PreferredApplication() const
 {
@@ -669,8 +687,10 @@ BUrl::PreferredApplication() const
 
 	return BString(appSignature);
 }
+#endif
 
 
+#ifdef HAIKU_TARGET_PLATFORM_HAIKU
 status_t
 BUrl::OpenWithPreferredApplication(bool onProblemAskUser) const
 {
@@ -710,6 +730,7 @@ BUrl::OpenWithPreferredApplication(bool onProblemAskUser) const
 
 	return status;
 }
+#endif
 
 
 // #pragma mark Url encoding/decoding of string
@@ -866,6 +887,28 @@ BUrl::_ResetFields()
 }
 
 
+bool
+BUrl::_ContainsDelimiter(const BString& url)
+{
+	int32 len = url.Length();
+
+	for (int32 i = 0; i < len; i++) {
+		switch (url[i]) {
+			case ' ':
+			case '\n':
+			case '\t':
+			case '\r':
+			case '<':
+			case '>':
+			case '"':
+				return true;
+		}
+	}
+
+	return false;
+}
+
+
 void
 BUrl::_ExplodeUrlString(const BString& url)
 {
@@ -875,6 +918,11 @@ BUrl::_ExplodeUrlString(const BString& url)
 
 	_ResetFields();
 
+	// RFC3986, Appendix C; the URL should not contain whitespace or delimiters
+	// by this point.
+	if (_ContainsDelimiter(url))
+		return; // TODO error handing
+
 	RegExp::MatchResult match = urlMatcher.Match(url.String());
 
 	if (!match.HasMatched())
@@ -883,6 +931,7 @@ BUrl::_ExplodeUrlString(const BString& url)
 	// Scheme/Protocol
 	url.CopyInto(fProtocol, match.GroupStartOffsetAt(1),
 		match.GroupEndOffsetAt(1) - match.GroupStartOffsetAt(1));
+
 	if (!_IsProtocolValid()) {
 		fHasProtocol = false;
 		fProtocol.Truncate(0);
@@ -981,6 +1030,7 @@ BUrl::SetAuthority(const BString& authority)
 		return;
 
 	int32 userInfoEnd = fAuthority.FindFirst('@');
+	int16 hostAndPortStart = 0;
 
 	// URL contains userinfo field
 	if (userInfoEnd != -1) {
@@ -1000,39 +1050,23 @@ BUrl::SetAuthority(const BString& authority)
 		} else {
 			SetUserName(fUser);
 		}
+
+		hostAndPortStart = userInfoEnd + 1;
 	}
 
+	int16 hostEnd = fAuthority.FindFirst(':', hostAndPortStart);
 
-	// Extract the host part
-	int16 hostEnd = fAuthority.FindFirst(':', userInfoEnd);
-	userInfoEnd++;
-
-	if (hostEnd < 0) {
-		// no ':' found, the host extends to the end of the URL
-		hostEnd = fAuthority.Length() + 1;
+	if (hostEnd != B_ERROR) {
+		if (hostEnd < fAuthority.Length()-1) {
+			 fPort = atoi(&(fAuthority.String())[hostEnd+1]);
+			 fHasPort = true;
+		}
 	}
+	else
+		hostEnd = fAuthority.Length();
 
-	// The host is likely to be present if an authority is
-	// defined, but in some weird cases, it's not.
-	if (hostEnd != userInfoEnd) {
-		fAuthority.CopyInto(fHost, userInfoEnd, hostEnd - userInfoEnd);
-		SetHost(fHost);
-	}
-
-	// Extract the port part
-	fPort = 0;
-	if (fAuthority.ByteAt(hostEnd) == ':') {
-		hostEnd++;
-		int16 portEnd = fAuthority.Length();
-
-		BString portString;
-		fAuthority.CopyInto(portString, hostEnd, portEnd - hostEnd);
-		fPort = atoi(portString.String());
-
-		//  Even if the port is invalid, the URL is considered to
-		// have a port.
-		fHasPort = portString.Length() > 0;
-	}
+	fAuthority.CopyInto(fHost, hostAndPortStart, hostEnd - hostAndPortStart);
+	SetHost(fHost);
 }
 
 
@@ -1088,7 +1122,7 @@ BUrl::_DoUrlDecodeChunk(const BString& chunk, bool strict)
 				result << decoded;
 			} else
 				result << chunk[i];
-		} 
+		}
 	}
 	return result;
 }

@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src build libshared ;
 
 USES_BE_API on libshared_build.a = true ;
 
+UseHeaders [ FDirName $(HAIKU_TOP) headers private shared ] : true ;
+
 UsePrivateBuildHeaders shared ;
 
 SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src kits shared ] ;
@@ -10,4 +12,9 @@ BuildPlatformStaticLibraryPIC libshared_build.a :
 	Keymap.cpp
 	NaturalCompare.cpp
 	SHA256.cpp
+	RegExp.cpp
+	
+	:
+	
+	# no shared libs, but will require 'libgnuregex' dynamic library on Darwin
 ;

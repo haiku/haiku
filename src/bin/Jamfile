@@ -134,7 +134,7 @@ StdBinCommands
 	ramdisk.cpp
 	: shared be [ TargetLibsupc++ ] : $(haiku-utils_rsrc) ;
 
-# standard commands that need libbe.so, libbnetapi.solibsupc++.so
+# standard commands that need libbe.so, libbnetapi.so, libsupc++.so
 StdBinCommands
 	open.cpp
 	urlwrapper.cpp

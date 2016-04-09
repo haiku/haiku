@@ -1,5 +1,6 @@
 /*
  * Copyright 2011, Oliver Tappe <zooey@hirschkaefer.de>
+ * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>
  * Distributed under the terms of the MIT License.
  */
 
@@ -13,6 +14,7 @@
 #include <algorithm>
 #include <string>
 
+#include <Url.h>
 
 namespace BPackageKit {
 
@@ -508,19 +510,22 @@ BPackageInfo::Parser::_ParseList(ListElementParser& elementParser,
 
 void
 BPackageInfo::Parser::_ParseStringList(BStringList* value,
-	bool requireResolvableName, bool convertToLowerCase)
+	bool requireResolvableName, bool convertToLowerCase,
+	StringValidator* stringValidator)
 {
 	struct StringParser : public ListElementParser {
 		BStringList* value;
 		bool requireResolvableName;
 		bool convertToLowerCase;
+		StringValidator* stringValidator;
 
 		StringParser(BStringList* value, bool requireResolvableName,
-			bool convertToLowerCase)
+			bool convertToLowerCase, StringValidator* stringValidator)
 			:
 			value(value),
 			requireResolvableName(requireResolvableName),
-			convertToLowerCase(convertToLowerCase)
+			convertToLowerCase(convertToLowerCase),
+			stringValidator(stringValidator)
 		{
 		}
 
@@ -541,9 +546,13 @@ BPackageInfo::Parser::_ParseStringList(BStringList* value,
 			if (convertToLowerCase)
 				element.ToLower();
 
+			if (stringValidator != NULL)
+				stringValidator->Validate(element, token.pos);
+
 			value->Add(element);
 		}
-	} stringParser(value, requireResolvableName, convertToLowerCase);
+	} stringParser(value, requireResolvableName, convertToLowerCase,
+		stringValidator);
 
 	_ParseList(stringParser, true);
 }
@@ -1008,11 +1017,19 @@ BPackageInfo::Parser::_Parse(BPackageInfo* packageInfo)
 				break;
 
 			case B_PACKAGE_INFO_URLS:
-				_ParseStringList(&packageInfo->fURLList);
+			{
+				UrlStringValidator stringValidator;
+				_ParseStringList(&packageInfo->fURLList,
+					false, false, &stringValidator);
+			}
 				break;
 
 			case B_PACKAGE_INFO_SOURCE_URLS:
-				_ParseStringList(&packageInfo->fSourceURLList);
+			{
+				UrlStringValidator stringValidator;
+				_ParseStringList(&packageInfo->fSourceURLList,
+					false, false, &stringValidator);
+			}
 				break;
 
 			case B_PACKAGE_INFO_GLOBAL_WRITABLE_FILES:
@@ -1143,6 +1160,16 @@ BPackageInfo::Parser::_IsValidResolvableName(const char* string,
 		return false;
 	}
 	return true;
+}
+
+void
+BPackageInfo::Parser::UrlStringValidator::Validate(const BString& urlString,
+	const char* pos)
+{
+	BUrl url(urlString);
+
+	if (!url.IsValid())
+		throw ParseError("invalid url", pos);
 }
 
 
