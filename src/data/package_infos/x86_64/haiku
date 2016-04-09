@@ -63,14 +63,14 @@ requires {
 	lib:libcurl
 	lib:libgcc_s
 	lib:libfreetype
-	lib:libicudata
-	lib:libicui18n
-	lib:libicuio
-	lib:libicule
-	lib:libiculx
-	lib:libicutest
-	lib:libicutu
-	lib:libicuuc
+	lib:libicudata >= 56
+	lib:libicui18n >= 56
+	lib:libicuio >= 56
+	lib:libicule >= 56
+	lib:libiculx >= 56
+	lib:libicutest >= 56
+	lib:libicutu >= 56
+	lib:libicuuc >= 56
 	lib:libncurses >= 6.0
 #ifdef HAIKU_REGULAR_BUILD
 #ifdef HAIKU_BUILD_FEATURE_X86_64_EXPAT_ENABLED
@@ -101,6 +101,16 @@ requires {
 #ifdef HAIKU_BUILD_FEATURE_X86_64_OPENSSL_ENABLED
 	lib:libssl >= 1.0.0
 	lib:libcrypto >= 1.0.0
+#endif
+#ifdef HAIKU_BUILD_FEATURE_X86_64_FFMPEG_ENABLED
+	lib:libavcodec >= 57
+	lib:libavdevice >= 57
+	lib:libavfilter >= 6
+	lib:libavformat >= 57
+	lib:libavresample >= 3
+	lib:libavutil >= 55
+	lib:libswscale >= 2
+	lib:libswresample >= 4
 #endif
 #endif
 	lib:libsolv
