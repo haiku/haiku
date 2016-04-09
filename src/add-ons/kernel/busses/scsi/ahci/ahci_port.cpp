@@ -234,27 +234,32 @@ AHCIPort::PortReset()
 {
 	TRACE("AHCIPort::PortReset port %d\n", fIndex);
 
-	// Spec v1.3.1, §10.4.2 Port Reset
-	// Physical comm between HBA and port disabled. More Intrusive
 	if (!Disable()) {
-		ERROR("%s: port %d unable to reset!\n", __func__, fIndex);
+		ERROR("%s: port %d unable to shutdown!\n", __func__, fIndex);
 		return B_ERROR;
 	}
 
 	_ClearErrorRegister();
 
 	// Wait for BSY and DRQ to clear (idle port)
-	wait_until_clear(&fRegs->tfd, ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST,
-		1000000);
+	if (wait_until_clear(&fRegs->tfd, ATA_STATUS_BUSY | ATA_STATUS_DATA_REQUEST,
+		1000000) < B_OK) {
+		// If we can't clear busy, do a full comreset
 
-	// comreset. Notice we're throwing out all other control flags.
-	fRegs->sctl = (SSTS_PORT_IPM_ACTIVE | SSTS_PORT_IPM_PARTIAL
-		| SCTL_PORT_DET_INIT);
-	FlushPostedWrites();
-	spin(1100);
+		// Spec v1.3.1, §10.4.2 Port Reset
+		// Physical comm between HBA and port disabled. More Intrusive
+		ERROR("%s: port %d undergoing COMRESET\n", __func__, fIndex);
+
+		// Notice we're throwing out all other control flags.
+		fRegs->sctl = (SSTS_PORT_IPM_ACTIVE | SSTS_PORT_IPM_PARTIAL
+			| SCTL_PORT_DET_INIT);
+		FlushPostedWrites();
+		spin(1100);
 		// You must wait 1ms at minimum
-	fRegs->sctl = (fRegs->sctl & ~HBA_PORT_DET_MASK) | SCTL_PORT_DET_NOINIT;
-	// Enable also flushes above write
+		fRegs->sctl = (fRegs->sctl & ~HBA_PORT_DET_MASK) | SCTL_PORT_DET_NOINIT;
+		FlushPostedWrites();
+	}
+
 	Enable();
 
 	if (wait_until_set(&fRegs->ssts, SSTS_PORT_DET_PRESENT, 500000) < B_OK) {
@@ -1053,7 +1058,10 @@ AHCIPort::ExecuteSataRequest(sata_request* request, bool isWrite)
 	fCommandList->cfl = 5; // 20 bytes, length in DWORDS
 	memcpy((char*)fCommandTable->cfis, request->FIS(), 20);
 
+	// We some hide messages when the test unit ready active is clear
+	// as empty removeable media resets constantly.
 	fTestUnitReadyActive = request->IsTestUnitReady();
+
 	if (request->IsATAPI()) {
 		// ATAPI PACKET is a 12 or 16 byte SCSI command
 		memset((char*)fCommandTable->acmd, 0, 32);
