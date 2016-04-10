@@ -121,14 +121,15 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case kMsgAddDevices:
 		{
-			InquiryPanel* inquiryPanel = new InquiryPanel(BRect(100, 100, 450, 450),
-				ActiveLocalDevice);
+			InquiryPanel* inquiryPanel= new InquiryPanel(
+				BRect(100, 100, 450, 450), ActiveLocalDevice);
 			inquiryPanel->Show();
 			break;
 		}
 
 		case kMsgRemoveDevice:
-			printf("kMsgRemoveDevice: %ld\n", fDeviceList->CurrentSelection(0));
+			printf("kMsgRemoveDevice: %" B_PRId32 "\n",
+				fDeviceList->CurrentSelection(0));
 			fDeviceList->RemoveItem(fDeviceList->CurrentSelection(0));
 			break;
 		case kMsgAddToRemoteList:
