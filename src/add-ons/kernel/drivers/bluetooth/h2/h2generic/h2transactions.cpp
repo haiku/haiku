@@ -63,7 +63,8 @@ event_complete(void* cookie, status_t status, void* data, size_t actual_len)
 	// bt_usb_dev* bdev = fetch_device(cookie, 0); -> safer / slower option
 	status_t error;
 
-	debugf("cookie@%p status=%s len=%ld\n", cookie, strerror(status), actual_len);
+	debugf("cookie@%p status=%s len=%" B_PRIuSIZE "\n", cookie,
+		strerror(status), actual_len);
 
 	if (bdev == NULL)
 		return;
@@ -212,7 +213,7 @@ command_complete(void* cookie, status_t status, void* data, size_t actual_len)
 	snet_buffer* snbuf = (snet_buffer*)cookie;
 	bt_usb_dev* bdev = (bt_usb_dev*)snb_cookie(snbuf);
 
-	debugf("status = %ld len = %ld @%p\n", status, actual_len, data);
+	debugf("len = %" B_PRIuSIZE " @%p\n", actual_len, data);
 
 	if (status == B_OK) {
 		bdev->stat.successfulTX++;
@@ -241,7 +242,7 @@ acl_tx_complete(void* cookie, status_t status, void* data, size_t actual_len)
 	net_buffer* nbuf = (net_buffer*)cookie;
 	bt_usb_dev* bdev = GET_DEVICE(nbuf);
 
-	debugf("fetched=%p status=%ld type %lx %p\n", bdev, status, nbuf->type, data);
+	//debugf("fetched=%p type %lx %p\n", bdev, nbuf->type, data);
 
 	if (status == B_OK) {
 		bdev->stat.successfulTX++;
