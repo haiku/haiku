@@ -99,8 +99,11 @@ SYSTEM_SERVERS += [ FFilterByBuildFeatures
 	print_server print_addon_server
 ] ;
 
-
+# Bluetooth stack + drivers
 SYSTEM_BT_STACK = hci btCoreData ;
+SYSTEM_ADD_ONS_DRIVERS_BT_H2 +=
+	h2generic
+;
 
 SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
 	x86,x86_64 @{

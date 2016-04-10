@@ -72,6 +72,7 @@ AddNewDriversToPackage power		: $(SYSTEM_ADD_ONS_DRIVERS_POWER) ;
 AddDriversToPackage					: console dprintf null <driver>tty usb_modeswitch zero ;
 AddDriversToPackage audio hmulti	: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO) ;
 AddDriversToPackage audio old		: $(SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD) ;
+AddDriversToPackage bluetooth h2	: $(SYSTEM_ADD_ONS_DRIVERS_BT_H2) ;
 AddDriversToPackage midi			: $(SYSTEM_ADD_ONS_DRIVERS_MIDI) ;
 AddDriversToPackage bus				: usb_raw fw_raw@x86 ;
 AddDriversToPackage disk floppy		: pc_floppy@x86 ;
@@ -263,6 +264,7 @@ AddFilesToPackage add-ons disk_systems
 	: <disk_system>fat <disk_system>intel <disk_system>gpt <disk_system>bfs
 		<disk_system>ntfs ;
 
+# Kernel bluetooth stack
 AddFilesToPackage add-ons kernel bluetooth : $(SYSTEM_BT_STACK) ;
 
 # the MIME DB
