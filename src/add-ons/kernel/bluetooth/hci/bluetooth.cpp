@@ -44,6 +44,9 @@
 #include "acl.h"
 
 
+int32 api_version = B_CUR_DRIVER_API_VERSION;
+
+
 typedef PortListener<void,
 	HCI_MAX_FRAME_SIZE, // Event Body can hold max 255 + 2 header
 	24					// Some devices have sent chunks of 24 events(inquiry result)
