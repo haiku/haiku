@@ -1,11 +1,14 @@
+/*
+ * Copyright 2008 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
+ * All rights reserved. Distributed under the terms of the MIT License.
+ */
+
 #include "FrameInterface.h"
 
-#define BT_DEBUG_THIS_MODULE
-#define SUBMODULE_NAME "Frame"
-#define SUBMODULE_COLOR 31
 #include <btDebug.h>
 
 #include <lock.h>
+
 
 L2capFrame*
 SignalByIdent(HciConnection* conn, uint8 ident)

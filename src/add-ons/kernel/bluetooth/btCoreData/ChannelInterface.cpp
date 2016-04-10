@@ -7,13 +7,11 @@
 #include <l2cap.h>
 #include <bluetooth/HCI/btHCI_command.h>
 
-#define BT_DEBUG_THIS_MODULE
-#define SUBMODULE_NAME "Channel"
-#define SUBMODULE_COLOR 31
 #include <btDebug.h>
 
 #include "ChannelInterface.h"
 #include "FrameInterface.h"
+
 
 L2capChannel*
 ChannelBySourceID(HciConnection *conn, uint16 scid)

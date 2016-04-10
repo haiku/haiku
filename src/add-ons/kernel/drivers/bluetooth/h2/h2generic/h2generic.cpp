@@ -5,6 +5,8 @@
  *
  */
 
+#include "h2generic.h"
+
 #include <kernel.h>
 #include <malloc.h>
 #include <stdio.h>
@@ -14,16 +16,11 @@
 #include <ByteOrder.h>
 #include <Drivers.h>
 
-
 #include "snet_buffer.h"
 
-#define BT_DEBUG_THIS_MODULE
-#define SUBMODULE_NAME BLUETOOTH_DEVICE_DEVFS_NAME
-#define SUBMODULE_COLOR 35
 #include <btDebug.h>
 #include <btModules.h>
 
-#include "h2generic.h"
 #include "h2transactions.h"
 #include "h2util.h"
 

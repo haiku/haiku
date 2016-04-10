@@ -14,9 +14,6 @@
 #include <bluetooth/HCI/btHCI_event.h>
 #include <bluetooth/bdaddrUtils.h>
 
-//#define BT_DEBUG_THIS_MODULE
-#define SUBMODULE_NAME "ACL"
-#define SUBMODULE_COLOR 34
 #include <btDebug.h>
 #include <btCoreData.h>
 #include <btModules.h>

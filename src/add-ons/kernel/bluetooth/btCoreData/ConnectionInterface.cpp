@@ -10,14 +10,12 @@
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/bdaddrUtils.h>
 
-#define BT_DEBUG_THIS_MODULE
-#define SUBMODULE_NAME "Connection"
-#define SUBMODULE_COLOR 31
 #include <btDebug.h>
 
 #include <l2cap.h>
 
 #include "ConnectionInterface.h"
+
 
 void PurgeChannels(HciConnection* conn);
 
