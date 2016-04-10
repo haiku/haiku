@@ -197,9 +197,11 @@ Assemble(bluetooth_device* bluetoothDevice, bt_packet_t type, void* data,
 				bluetoothDevice->fExpectedPacketSize[type] = 0;
 			} else {
 	#if DEBUG_ACL
-				if (type == BT_ACL)
-					debugf("ACL Packet not filled size=%ld expected=%ld\n",
-						nbuf->size, bluetoothDevice->fExpectedPacketSize[type]);
+				if (type == BT_ACL) {
+					debugf("ACL Packet not filled size=%" B_PRIuSIZE
+						" expected=%" B_PRIuSIZE "\n", nbuf->size,
+						bluetoothDevice->fExpectedPacketSize[type]);
+				}
 	#endif
 			}
 
@@ -220,13 +222,14 @@ HciPacketHandler(void* data, int32 code, size_t size)
 
 	bluetooth_device* bluetoothDevice = FindDeviceByID(deviceId);
 
-	debugf("to assemble %ld bytes of %ld\n", size, deviceId);
+	debugf("to assemble %" B_PRIuSIZE " bytes of 0x%" B_PRIx32 "\n", size,
+		deviceId);
 
 	if (bluetoothDevice != NULL)
 		return Assemble(bluetoothDevice, Bluetooth::CodeHandler::Protocol(code),
 			data, size);
 	else {
-		debugf("Device %ld could not be matched\n", deviceId);
+		debugf("Device 0x%" B_PRIx32 " could not be matched\n", deviceId);
 	}
 
 	return B_ERROR;
@@ -266,7 +269,7 @@ RegisterDriver(bt_hci_transport_hooks* hooks, bluetooth_device** _device)
 
 	sDeviceList.Add(device);
 
-	debugf("Device %lx\n", device->index );
+	debugf("Device %" B_PRIx32 "\n", device->index);
 
 	*_device = device;
 
@@ -309,12 +312,13 @@ PostACL(hci_id hciId, net_buffer* buffer)
 	bluetooth_device* device = FindDeviceByID(hciId);
 
 	if (device == NULL) {
-		debugf("No device %lx", hciId);
+		debugf("No device 0x%" B_PRIx32 "\n", hciId);
 		return B_ERROR;
 	}
 
-	debugf("index %lx try to send bt packet of %lu bytes (flags %ld):\n",
-		device->index, buffer->size, buffer->flags);
+	debugf("index 0x%" B_PRIx32 " try to send bt packet of %" B_PRIu32
+		" bytes (flags 0x%" B_PRIx32 "):\n", device->index, buffer->size,
+		buffer->flags);
 
 	// TODO: ATOMIC! any other thread should stop here
 	do {
@@ -378,7 +382,8 @@ dump_bluetooth_devices(int argc, char** argv)
 
 	while (iterator.HasNext()) {
 		device = iterator.Next();
-		kprintf("\tindex=%#lx @%p hooks=%p\n",device->index, device, device->hooks);
+		kprintf("\tindex=%" B_PRIx32 " @%p hooks=%p\n", device->index,
+			device, device->hooks);
 	}
 
 	return 0;
@@ -396,7 +401,9 @@ bluetooth_std_ops(int32 op, ...)
 		{
 			status_t status;
 
-			status = get_module(NET_BUFFER_MODULE_NAME,	(module_info**)&gBufferModule);
+			status = get_module(NET_BUFFER_MODULE_NAME,
+				(module_info**)&gBufferModule);
+
 			if (status < B_OK) {
 				panic("no way Dude we need that!");
 				return status;
@@ -431,7 +438,7 @@ bluetooth_std_ops(int32 op, ...)
 			mutex_init(&sListLock, "bluetooth devices");
 
 			// status = InitializeAclConnectionThread();
-			debugf("Connection Thread error=%lx\n", status);
+			debugf("%s: Connection Thread error\n", __func__);
 
 			add_debugger_command("btLocalDevices", &dump_bluetooth_devices,
 				"Lists Bluetooth LocalDevices registered in the Stack");
