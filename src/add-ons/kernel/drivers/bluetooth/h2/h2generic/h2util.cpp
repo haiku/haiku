@@ -4,19 +4,19 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include <malloc.h>
 
-#include "h2upper.h"
 #include "h2util.h"
-#include "h2transactions.h"
+
+#include <malloc.h>
 
 #include <bluetooth/HCI/btHCI_acl.h>
 #include <bluetooth/HCI/btHCI_command.h>
 #include <bluetooth/HCI/btHCI_event.h>
 #include <bluetooth/HCI/btHCI_sco.h>
 
-#define BT_DEBUG_THIS_MODULE
-#include <btDebug.h>
+#include "h2debug.h"
+#include "h2upper.h"
+#include "h2transactions.h"
 
 
 void*

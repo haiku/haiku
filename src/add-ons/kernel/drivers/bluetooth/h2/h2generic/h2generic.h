@@ -7,6 +7,7 @@
 #ifndef _H2GENERIC_H_
 #define _H2GENERIC_H_
 
+
 #include <net_buffer.h>
 #include <net_device.h>
 
@@ -25,6 +26,7 @@
 #include <btCoreData.h>
 
 #include "snet_buffer.h"
+
 
 // USB definitions for the generic device move to h2cfg
 #define UDCLASS_WIRELESS	0xe0

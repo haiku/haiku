@@ -2,11 +2,12 @@
  * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
  * All rights reserved. Distributed under the terms of the MIT License.
  */
-
 #ifndef _H2TRANSACTION_H_
 #define _H2TRANSACTION_H_
 
+
 #include "h2generic.h"
+
 
 status_t submit_rx_event(bt_usb_dev* bdev);
 status_t submit_rx_acl(bt_usb_dev* bdev);

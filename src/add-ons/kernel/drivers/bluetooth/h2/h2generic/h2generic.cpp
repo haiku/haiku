@@ -5,6 +5,7 @@
  *
  */
 
+
 #include "h2generic.h"
 
 #include <kernel.h>
@@ -16,15 +17,13 @@
 #include <ByteOrder.h>
 #include <Drivers.h>
 
-#include "snet_buffer.h"
-
-#include <btDebug.h>
 #include <btModules.h>
 
+#include "snet_buffer.h"
+#include "h2cfg.h"
+#include "h2debug.h"
 #include "h2transactions.h"
 #include "h2util.h"
-
-#include "h2cfg.h"
 
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;

@@ -4,19 +4,19 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
+
+#include "h2upper.h"
+
 #include <string.h>
 
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/HCI/btHCI_transport.h>
 #include <kernel.h>
 
+#include "h2debug.h"
 #include "h2generic.h"
-#include "h2upper.h"
 #include "h2transactions.h"
 #include "snet_buffer.h"
-
-#define BT_DEBUG_THIS_MODULE
-#include <btDebug.h>
 
 
 // TODO: split for commands and comunication (ACL & SCO)

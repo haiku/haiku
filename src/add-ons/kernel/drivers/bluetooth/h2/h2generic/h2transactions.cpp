@@ -4,24 +4,24 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
-#include "h2generic.h"
+
 #include "h2transactions.h"
-#include "h2upper.h"
-#include "h2util.h"
 
 #include <bluetooth/HCI/btHCI.h>
 #include <bluetooth/HCI/btHCI_event.h>
 #include <bluetooth/HCI/btHCI_acl.h>
 
 #include <ByteOrder.h>
-
 #include <kernel.h>
 #include <string.h>
 
-//#define DUMP_BUFFERS
-#define BT_DEBUG_THIS_MODULE
-#include <btDebug.h>
+#include "h2debug.h"
+#include "h2generic.h"
+#include "h2upper.h"
+#include "h2util.h"
 
+
+//#define DUMP_BUFFERS
 
 /* Forward declaration */
 

@@ -5,11 +5,13 @@
  *
  */
 
+
 #include "snet_buffer.h"
 
 #include <malloc.h>
 #include <string.h>
 #include <KernelExport.h>
+
 
 struct snet_buffer {
 	struct list_link	link;
@@ -22,7 +24,6 @@ struct snet_buffer {
 	uint16				pullingSize;
 
 	void*				cookie;
-	
 };
 
 
