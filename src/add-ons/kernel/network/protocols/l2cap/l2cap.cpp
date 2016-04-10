@@ -41,9 +41,6 @@
 #include <btModules.h>
 
 
-#define BT_DEBUG_THIS_MODULE
-#define SUBMODULE_NAME "L2cap"
-#define SUBMODULE_COLOR 32
 #include <btDebug.h>
 
 
@@ -64,12 +61,13 @@ static struct net_domain* sDomain;
 net_protocol*
 l2cap_init_protocol(net_socket* socket)
 {
+	CALLED();
+
 	L2capEndpoint* protocol = new(std::nothrow) L2capEndpoint(socket);
 	if (protocol == NULL)
 		return NULL;
 
 	EndpointList.Add(protocol);
-	debugf("Prococol created %p\n", protocol);
 
 	return protocol;
 }
@@ -78,7 +76,7 @@ l2cap_init_protocol(net_socket* socket)
 status_t
 l2cap_uninit_protocol(net_protocol* protocol)
 {
-	flowf("\n");
+	CALLED();
 
 	L2capEndpoint* endpoint = static_cast<L2capEndpoint*>(protocol);
 
@@ -94,7 +92,7 @@ l2cap_uninit_protocol(net_protocol* protocol)
 status_t
 l2cap_open(net_protocol* protocol)
 {
-	flowf("\n");
+	CALLED();
 
 	return B_OK;
 }
@@ -105,7 +103,7 @@ l2cap_close(net_protocol* protocol)
 {
 	L2capEndpoint* endpoint = static_cast<L2capEndpoint*>(protocol);
 
-	flowf("\n");
+	CALLED();
 
 	endpoint->Close();
 
@@ -116,7 +114,7 @@ l2cap_close(net_protocol* protocol)
 status_t
 l2cap_free(net_protocol* protocol)
 {
-	flowf("\n");
+	CALLED();
 
 	return B_OK;
 }
@@ -125,14 +123,13 @@ l2cap_free(net_protocol* protocol)
 status_t
 l2cap_connect(net_protocol* protocol, const struct sockaddr* address)
 {
-	debugf("from %p, with %p\n", protocol, address);
+	CALLED();
 
 	if (address == NULL)
 		return EINVAL;
 
- 	if (address->sa_family != AF_BLUETOOTH)
+	if (address->sa_family != AF_BLUETOOTH)
 		return EAFNOSUPPORT;
-
 
 	return ((L2capEndpoint*)protocol)->Connect(address);;
 }
@@ -141,6 +138,7 @@ l2cap_connect(net_protocol* protocol, const struct sockaddr* address)
 status_t
 l2cap_accept(net_protocol* protocol, struct net_socket** _acceptedSocket)
 {
+	CALLED();
 	return ((L2capEndpoint*)protocol)->Accept(_acceptedSocket);
 }
 
@@ -149,8 +147,7 @@ status_t
 l2cap_control(net_protocol* protocol, int level, int option, void* value,
 	size_t* _length)
 {
-	flowf("\n");
-
+	CALLED();
 	return EOPNOTSUPP;
 }
 
@@ -159,8 +156,7 @@ status_t
 l2cap_getsockopt(net_protocol* protocol, int level, int option,
 	void* value, int* length)
 {
-	flowf("\n");
-
+	CALLED();
 	return B_OK;
 }
 
@@ -169,10 +165,8 @@ status_t
 l2cap_setsockopt(net_protocol* protocol, int level, int option,
 	const void* value, int length)
 {
-	flowf("\n");
-
+	CALLED();
 	((L2capEndpoint*)protocol)->fConfigurationSet = true;
-
 	return B_OK;
 }
 
@@ -180,8 +174,7 @@ l2cap_setsockopt(net_protocol* protocol, int level, int option,
 status_t
 l2cap_bind(net_protocol* protocol, const struct sockaddr* address)
 {
-	debugf("from %p, with %p\n", protocol, address);
-
+	CALLED();
 	return ((L2capEndpoint*)protocol)->Bind(address);
 }
 
@@ -189,8 +182,7 @@ l2cap_bind(net_protocol* protocol, const struct sockaddr* address)
 status_t
 l2cap_unbind(net_protocol* protocol, struct sockaddr* address)
 {
-	flowf("\n");
-
+	CALLED();
 	return B_ERROR;
 }
 
@@ -198,6 +190,7 @@ l2cap_unbind(net_protocol* protocol, struct sockaddr* address)
 status_t
 l2cap_listen(net_protocol* protocol, int count)
 {
+	CALLED();
 	return ((L2capEndpoint*)protocol)->Listen(count);
 }
 
@@ -205,8 +198,7 @@ l2cap_listen(net_protocol* protocol, int count)
 status_t
 l2cap_shutdown(net_protocol* protocol, int direction)
 {
-	flowf("\n");
-
+	CALLED();
 	return EOPNOTSUPP;
 }
 
@@ -214,7 +206,7 @@ l2cap_shutdown(net_protocol* protocol, int direction)
 status_t
 l2cap_send_data(net_protocol* protocol, net_buffer* buffer)
 {
-	flowf("\n");
+	CALLED();
 
 	if (buffer == NULL)
 		return ENOBUFS;
@@ -227,8 +219,7 @@ status_t
 l2cap_send_routed_data(net_protocol* protocol, struct net_route* route,
 	net_buffer* buffer)
 {
-	flowf("\n");
-
+	CALLED();
 	return EOPNOTSUPP;
 }
 
@@ -236,8 +227,7 @@ l2cap_send_routed_data(net_protocol* protocol, struct net_route* route,
 ssize_t
 l2cap_send_avail(net_protocol* protocol)
 {
-	flowf("\n");
-
+	CALLED();
 	return B_ERROR;
 }
 
@@ -246,8 +236,7 @@ status_t
 l2cap_read_data(net_protocol* protocol, size_t numBytes, uint32 flags,
 	net_buffer** _buffer)
 {
-	flowf("\n");
-
+	CALLED();
 	return ((L2capEndpoint*)protocol)->ReadData(numBytes, flags, _buffer);
 }
 
@@ -255,8 +244,7 @@ l2cap_read_data(net_protocol* protocol, size_t numBytes, uint32 flags,
 ssize_t
 l2cap_read_avail(net_protocol* protocol)
 {
-	flowf("\n");
-
+	CALLED();
 	return B_ERROR;
 }
 
@@ -264,8 +252,7 @@ l2cap_read_avail(net_protocol* protocol)
 struct net_domain*
 l2cap_get_domain(net_protocol* protocol)
 {
-	flowf("\n");
-
+	CALLED();
 	return sDomain;
 }
 
@@ -273,8 +260,7 @@ l2cap_get_domain(net_protocol* protocol)
 size_t
 l2cap_get_mtu(net_protocol* protocol, const struct sockaddr* address)
 {
-	flowf("\n");
-
+	CALLED();
 	return protocol->next->module->get_mtu(protocol->next, address);
 }
 
@@ -283,7 +269,7 @@ status_t
 l2cap_receive_data(net_buffer* buffer)
 {
 	HciConnection* conn = (HciConnection*)buffer;
-	debugf("received some data, buffer length %lu\n",
+	TRACE("%s: received some data, buffer length %" B_PRIu32 "\n", __func__,
 		conn->currentRxPacket->size);
 
 	l2cap_receive(conn, conn->currentRxPacket);
@@ -295,7 +281,7 @@ l2cap_receive_data(net_buffer* buffer)
 status_t
 l2cap_error_received(net_error error, net_buffer* data)
 {
-	flowf("\n");
+	CALLED();
 
 	return B_ERROR;
 }
@@ -305,7 +291,7 @@ status_t
 l2cap_error_reply(net_protocol* protocol, net_buffer* cause, net_error error,
 	net_error_data* errorData)
 {
-	flowf("\n");
+	CALLED();
 
 	return B_ERROR;
 }
@@ -319,7 +305,7 @@ l2cap_std_ops(int32 op, ...)
 {
 	status_t error;
 
-	flowf("\n");
+	CALLED();
 
 	switch (op) {
 		case B_MODULE_INIT:

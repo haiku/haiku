@@ -31,10 +31,8 @@
 #include "l2cap_signal.h"
 #include "l2cap_upper.h"
 
-#define BT_DEBUG_THIS_MODULE
-#define SUBMODULE_NAME "lower"
-#define SUBMODULE_COLOR 36
 #include <btDebug.h>
+
 
 status_t
 l2cap_receive(HciConnection* conn, net_buffer* buffer)
@@ -44,7 +42,7 @@ l2cap_receive(HciConnection* conn, net_buffer* buffer)
 	uint16 length;
 
 #ifdef DUMP_L2CAP_FRAME
-	flowf("DUMP:");
+	dprintf("DUMP:");
 	for (uint i = 0; i < buffer->size; i++) {
 		uint8 c = 0;
 		gBufferModule->read(buffer, i, &c, 1);
@@ -54,7 +52,8 @@ l2cap_receive(HciConnection* conn, net_buffer* buffer)
 #endif
 	// Check packet
 	if (buffer->size < sizeof(l2cap_hdr_t)) {
-		debugf("invalid L2CAP packet. Packet too small, len=%ld\n", buffer->size);
+		ERROR("%s: invalid L2CAP packet. Packet too small, len=%" B_PRIu32 "\n",
+			__func__, buffer->size);
 		gBufferModule->free(buffer);
 		return EMSGSIZE;
 
@@ -70,14 +69,14 @@ l2cap_receive(HciConnection* conn, net_buffer* buffer)
 	length = bufferHeader->length = le16toh(bufferHeader->length);
 	dcid = bufferHeader->dcid = le16toh(bufferHeader->dcid);
 
-	debugf("len=%d cid=%x\n", length, dcid);
+	TRACE("%s: len=%d cid=%x\n", __func__, length, dcid);
 
 	bufferHeader.Remove(); // pulling
 
 	// Check payload size
 	if (length != buffer->size ) {
-		debugf("Payload length mismatch, packetlen=%d, bufferlen=%ld\n",
-			length, buffer->size);
+		ERROR("%s: Payload length mismatch, packetlen=%d, bufferlen=%" B_PRIu32
+			"\n", __func__, length, buffer->size);
 		gBufferModule->free(buffer);
 		return EMSGSIZE;
 	}
@@ -90,7 +89,7 @@ l2cap_receive(HciConnection* conn, net_buffer* buffer)
 
 		case L2CAP_CLT_CID: // Connectionless packet
 			// error = l2cap_cl_receive(buffer);
-			flowf("CL FRAME!!\n");
+			TRACE("%s: CL FRAME!!\n", __func__);
 		break;
 
 		default: // Data packet
@@ -119,7 +118,8 @@ AddL2capHeader(L2capFrame* frame)
 	status_t status = bufferHeader.Status();
 
 	if (status < B_OK) {
-		debugf("header could not be prepended! code=%d\n", frame->code);
+		ERROR("%s: header could not be prepended! code=%d\n", __func__,
+			frame->code);
 		return;
 	}
 
@@ -142,10 +142,9 @@ AddL2capHeader(L2capFrame* frame)
 void
 purge_connection(HciConnection* conn)
 {
+	CALLED();
 	L2capFrame* frame;
 	bool containerCanBeDestroyed;
-
-	debugf("handle=%d\n", conn->handle);
 
 	mutex_lock(&conn->fLock);
 
@@ -176,8 +175,8 @@ purge_connection(HciConnection* conn)
 		} // TODO: someone put it
 
 
-		debugf("type=%d, code=%d frame %p tolower\n", frame->type, frame->code,
-			frame->buffer);
+		TRACE("%s: type=%d, code=%d frame %p tolower\n", __func__, frame->type,
+			frame->code, frame->buffer);
 
 		frame->buffer->type = conn->handle;
 		btDevices->PostACL(conn->ndevice->index, frame->buffer);
@@ -213,13 +212,13 @@ connection_thread(void*)
 	while ((ssizePort = port_buffer_size(fPort)) != B_BAD_PORT_ID) {
 
 		if (ssizePort <= 0) {
-			debugf("Error %s\n", strerror(ssizePort));
+			ERROR("%s: Error %s\n", __func__, strerror(ssizePort));
 			snooze(500 * 1000);
 			continue;
 		}
 
 		if (ssizePort > (ssize_t) sizeof(conn)) {
-			debugf("Message too big %ld\n", ssizePort);
+			ERROR("%s: Message too big %ld\n", __func__,  ssizePort);
 			snooze(500 * 1000);
 			continue;
 		}
@@ -227,7 +226,8 @@ connection_thread(void*)
 		ssizeRead = read_port(fPort, &code, &conn, ssizePort);
 
 		if (ssizeRead != ssizePort) {
-			debugf("Missmatch size port=%ld read=%ld\n", ssizePort, ssizeRead);
+			ERROR("%s: Mismatch size port=%ld read=%ld\n", __func__,
+				ssizePort, ssizeRead);
 			snooze(500 * 1000);
 			continue;
 		}
@@ -242,12 +242,10 @@ connection_thread(void*)
 status_t
 InitializeConnectionPurgeThread()
 {
-
 	port_id fPort = find_port(BLUETOOTH_CONNECTION_SCHED_PORT);
-	if (fPort == B_NAME_NOT_FOUND)
-	{
+	if (fPort == B_NAME_NOT_FOUND) {
+		TRACE("%s: Creating connection purge port\n", __func__);
 		fPort = create_port(16, BLUETOOTH_CONNECTION_SCHED_PORT);
-		debugf("Connection purge port created %ld\n",fPort);
 	}
 
 	// This thread has to catch up connections before first package is sent.
@@ -264,13 +262,13 @@ InitializeConnectionPurgeThread()
 status_t
 QuitConnectionPurgeThread()
 {
+	CALLED();
 	status_t status;
 
 	port_id fPort = find_port(BLUETOOTH_CONNECTION_SCHED_PORT);
 	if (fPort != B_NAME_NOT_FOUND)
 		close_port(fPort);
 
-	flowf("Connection port deleted\n");
 	wait_for_thread(sConnectionThread, &status);
 	return status;
 }
@@ -286,7 +284,7 @@ SchedConnectionPurgeThread(HciConnection* conn)
 	if (port == B_NAME_NOT_FOUND)
 		panic("BT Connection Port Deleted");
 
-	status_t error = write_port(port, (uint32) conn, &temp, sizeof(conn));
+	status_t error = write_port(port, (addr_t)conn, &temp, sizeof(conn));
 
 	if (error != B_OK)
 		panic("BT Connection sched failed");

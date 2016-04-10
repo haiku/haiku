@@ -14,10 +14,6 @@
 #include <bluetooth/bdaddrUtils.h>
 #include <bluetooth/L2CAP/btL2CAP.h>
 
-#define BT_DEBUG_THIS_MODULE
-#define MODULE_NAME "l2cap"
-#define SUBMODULE_NAME "Endpoint"
-#define SUBMODULE_COLOR 32
 #include <btDebug.h>
 
 
@@ -40,7 +36,7 @@ L2capEndpoint::L2capEndpoint(net_socket* socket)
 	fPeerEndpoint(NULL),
 	fChannel(NULL)
 {
-	debugf("[%ld] %p\n", find_thread(NULL), this);
+	CALLED();
 
 	/* Set MTU and flow control settings to defaults */
 	fConfiguration.imtu = L2CAP_MTU_DEFAULT;
@@ -59,7 +55,7 @@ L2capEndpoint::L2capEndpoint(net_socket* socket)
 
 L2capEndpoint::~L2capEndpoint()
 {
-	debugf("[%ld] %p\n", find_thread(NULL), this);
+	CALLED();
 
 	gStackModule->uninit_fifo(&fReceivingFifo);
 }
@@ -68,7 +64,7 @@ L2capEndpoint::~L2capEndpoint()
 status_t
 L2capEndpoint::Init()
 {
-	debugf("[%ld] %p\n", find_thread(NULL), this);
+	CALLED();
 
 	return B_OK;
 }
@@ -77,7 +73,7 @@ L2capEndpoint::Init()
 void
 L2capEndpoint::Uninit()
 {
-	debugf("[%ld] %p\n", find_thread(NULL), this);
+	CALLED();
 
 }
 
@@ -85,7 +81,7 @@ L2capEndpoint::Uninit()
 status_t
 L2capEndpoint::Open()
 {
-	debugf("[%ld] %p\n", find_thread(NULL), this);
+	CALLED();
 
 	status_t error = ProtocolSocket::Open();
 	if (error != B_OK)
@@ -98,7 +94,7 @@ L2capEndpoint::Open()
 status_t
 L2capEndpoint::Close()
 {
-	debugf("[%ld] %p\n", find_thread(NULL), this);
+	CALLED();
 
 	if (fChannel == NULL) {
 		// TODO: Parent socket
@@ -106,7 +102,6 @@ L2capEndpoint::Close()
 	} else {
 		// Child Socket
 		if (fState == CLOSED) {
-			debugf("Already closed by peer %p\n", this);
 			// TODO: Clean needed stuff
 			return B_OK;
 		} else {
@@ -136,7 +131,7 @@ L2capEndpoint::Close()
 status_t
 L2capEndpoint::Free()
 {
-	debugf("[%ld] %p\n", find_thread(NULL), this);
+	CALLED();
 
 	return B_OK;
 }
@@ -172,9 +167,6 @@ L2capEndpoint::Bind(const struct sockaddr* _address)
 	memcpy(&socket->address, _address, sizeof(struct sockaddr_l2cap));
 	socket->address.ss_len = sizeof(struct sockaddr_l2cap);
 
-	debugf("for %s psm=%d\n", bdaddrUtils::ToString(address->l2cap_bdaddr),
-		address->l2cap_psm);
-
 	fState = BOUND;
 
 	return B_OK;
@@ -184,7 +176,7 @@ L2capEndpoint::Bind(const struct sockaddr* _address)
 status_t
 L2capEndpoint::Unbind()
 {
-	debugf("[%ld] %p\n", find_thread(NULL), this);
+	CALLED();
 
 	return B_OK;
 }
@@ -193,16 +185,16 @@ L2capEndpoint::Unbind()
 status_t
 L2capEndpoint::Listen(int backlog)
 {
-	debugf("[%ld] %p\n", find_thread(NULL), this);
+	CALLED();
 
 	if (fState != BOUND) {
-		debugf("Invalid State %p\n", this);
+		ERROR("%s: Invalid State\n", __func__);
 		return B_BAD_VALUE;
 	}
 
 	fEstablishSemaphore = create_sem(0, "l2cap serv accept");
 	if (fEstablishSemaphore < B_OK) {
-		flowf("Semaphore could not be created\n");
+		ERROR("%s: Semaphore could not be created\n", __func__);
 		return ENOBUFS;
 	}
 
@@ -224,23 +216,27 @@ L2capEndpoint::Connect(const struct sockaddr* _address)
 		return EINVAL;
 
 	// Check for any specific status?
-	if (fState == CONNECTING) {
+	if (fState == CONNECTING)
 		return EINPROGRESS;
-	}
 
 	// TODO: should not be in the BOUND status first?
 
-	debugf("[%ld] %p->L2capEndpoint::Connect(\"%s\")\n", find_thread(NULL),
-		this, ConstSocketAddress(&gL2cap4AddressModule, _address)
+	#if 0
+	TRACE("%s: [%ld] %p->L2capEndpoint::Connect(\"%s\")\n", __func__,
+		find_thread(NULL), this,
+		ConstSocketAddress(&gL2cap4AddressModule, _address)
 		.AsString().Data());
+	#endif
 
 	// TODO: If we were bound to a specific source address
 
 	// Route, we must find a Connection descriptor with address->l2cap_address
 	hci_id hid = btCoreData->RouteConnection(address->l2cap_bdaddr);
 
-	debugf("%lx for route %s\n", hid,
-		bdaddrUtils::ToString(address->l2cap_bdaddr));
+	#if 0
+	TRACE("%s: %" B_PRId32 " for route %s\n", __func__, hid,
+		bdaddrUtils::ToString(address->l2cap_bdaddr).String());
+	#endif
 
 	if (hid > 0) {
 		HciConnection* connection = btCoreData->ConnectionByDestination(
@@ -260,7 +256,7 @@ L2capEndpoint::Connect(const struct sockaddr* _address)
 
 			fEstablishSemaphore = create_sem(0, "l2cap client");
 			if (fEstablishSemaphore < B_OK) {
-				flowf("Semaphore could not be created\n");
+				ERROR("%s: Semaphore could not be created\n", __func__);
 				return ENOBUFS;
 			}
 
@@ -281,7 +277,7 @@ L2capEndpoint::Connect(const struct sockaddr* _address)
 status_t
 L2capEndpoint::Accept(net_socket** _acceptedSocket)
 {
-	debugf("[%ld]\n", find_thread(NULL));
+	CALLED();
 
 	// MutexLocker locker(fLock);
 
@@ -301,7 +297,8 @@ L2capEndpoint::Accept(net_socket** _acceptedSocket)
 		status = gSocketModule->dequeue_connected(socket, _acceptedSocket);
 
 		if (status != B_OK) {
-			debugf("Could not dequeue socket %s\n", strerror(status));
+			ERROR("%s: Could not dequeue socket %s\n", __func__,
+				strerror(status));
 		} else {
 
 			((L2capEndpoint*)((*_acceptedSocket)->first_protocol))->fState = ESTABLISHED;
@@ -321,8 +318,7 @@ ssize_t
 L2capEndpoint::Send(const iovec* vecs, size_t vecCount,
 	ancillary_data_container* ancillaryData)
 {
-	debugf("[%ld] %p Send(%p, %ld, %p)\n", find_thread(NULL),
-		this, vecs, vecCount, ancillaryData);
+	CALLED();
 
 	return B_OK;
 }
@@ -333,11 +329,10 @@ L2capEndpoint::Receive(const iovec* vecs, size_t vecCount,
 	ancillary_data_container** _ancillaryData, struct sockaddr* _address,
 	socklen_t* _addressLength)
 {
-	debugf("[%ld] %p Receive(%p, %ld)\n", find_thread(NULL),
-		this, vecs, vecCount);
+	CALLED();
 
 	if (fState != ESTABLISHED) {
-		debugf("Invalid State %p\n", this);
+		ERROR("%s: Invalid State %p\n", __func__, this);
 		return B_BAD_VALUE;
 	}
 
@@ -348,10 +343,10 @@ L2capEndpoint::Receive(const iovec* vecs, size_t vecCount,
 ssize_t
 L2capEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 {
-	debugf("e->%p num=%ld, f=%ld)\n", this, numBytes, flags);
+	CALLED();
 
 	if (fState != ESTABLISHED) {
-		debugf("Invalid State %p\n", this);
+		ERROR("%s: Invalid State %p\n", __func__, this);
 		return B_BAD_VALUE;
 	}
 
@@ -363,10 +358,10 @@ L2capEndpoint::ReadData(size_t numBytes, uint32 flags, net_buffer** _buffer)
 ssize_t
 L2capEndpoint::SendData(net_buffer* buffer)
 {
-	debugf("size=%ld\n", buffer->size);
+	CALLED();
 
 	if (fState != ESTABLISHED) {
-		debugf("Invalid State %p\n", this);
+		ERROR("%s: Invalid State %p\n", __func__, this);
 		return B_BAD_VALUE;
 	}
 
@@ -382,8 +377,7 @@ L2capEndpoint::SendData(net_buffer* buffer)
 ssize_t
 L2capEndpoint::Sendable()
 {
-	debugf("[%ld] %p\n", find_thread(NULL), this);
-
+	CALLED();
 	return B_OK;
 }
 
@@ -391,8 +385,7 @@ L2capEndpoint::Sendable()
 ssize_t
 L2capEndpoint::Receivable()
 {
-	debugf("[%ld] %p\n", find_thread(NULL), this);
-
+	CALLED();
 	return 0;
 }
 
@@ -425,7 +418,7 @@ L2capEndpoint::BindNewEnpointToChannel(L2capChannel* channel)
 	net_socket* newSocket;
 	status_t error = gSocketModule->spawn_pending_socket(socket, &newSocket);
 	if (error != B_OK) {
-		debugf("Could not spawn child for Endpoint %p\n", this);
+		ERROR("%s: Could not spawn child for Endpoint %p\n", __func__, this);
 		// TODO: Handle situation
 		return;
 	}
@@ -437,8 +430,8 @@ L2capEndpoint::BindNewEnpointToChannel(L2capChannel* channel)
 
 	channel->endpoint = endpoint;
 
-	debugf("new socket %p/e->%p from parent %p/e->%p\n",
-		newSocket, endpoint, socket, this);
+	//debugf("new socket %p/e->%p from parent %p/e->%p\n",
+	//	newSocket, endpoint, socket, this);
 
 	// Provide the channel the configuration set by the user socket
 	channel->configuration = &fConfiguration;
@@ -446,8 +439,8 @@ L2capEndpoint::BindNewEnpointToChannel(L2capChannel* channel)
 	// It might be used keep the last negotiated channel
 	// fChannel = channel;
 
-	debugf("New endpoint %p for psm %d, schannel %x dchannel %x\n", endpoint,
-		channel->psm, channel->scid, channel->dcid);
+	//debugf("New endpoint %p for psm %d, schannel %x dchannel %x\n", endpoint,
+	//	channel->psm, channel->scid, channel->dcid);
 }
 
 
@@ -468,10 +461,9 @@ L2capEndpoint::BindToChannel(L2capChannel* channel)
 status_t
 L2capEndpoint::MarkEstablished()
 {
-	status_t error = B_OK;
-	debugf("Endpoint %p for psm %d, schannel %x dchannel %x\n", this,
-		fChannel->psm, fChannel->scid, fChannel->dcid);
+	CALLED();
 
+	status_t error = B_OK;
 	fChannel->state = L2CAP_CHAN_OPEN;
 	fState = ESTABLISHED;
 
@@ -481,7 +473,8 @@ L2capEndpoint::MarkEstablished()
 		if (error == B_OK) {
 			release_sem(fPeerEndpoint->fEstablishSemaphore);
 		} else {
-			debugf("Could not set child Endpoint %p %s\n", this, strerror(error));
+			ERROR("%s: Could not set child Endpoint %p %s\n", __func__, this,
+				strerror(error));
 		}
 	} else
 		release_sem(fEstablishSemaphore);
@@ -493,10 +486,10 @@ L2capEndpoint::MarkEstablished()
 status_t
 L2capEndpoint::MarkClosed()
 {
-	flowf("\n");
-	if (fState == CLOSED) {
+	CALLED();
+
+	if (fState == CLOSED)
 		release_sem(fEstablishSemaphore);
-	}
 
 	fState = CLOSED;
 

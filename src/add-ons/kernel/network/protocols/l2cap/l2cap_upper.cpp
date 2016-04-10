@@ -30,7 +30,7 @@ l2cap_l2ca_con_ind(L2capChannel* channel)
 	L2capEndpoint* endpoint = L2capEndpoint::ForPsm(channel->psm);
 
 	if (endpoint == NULL) { // TODO: refuse connection no endpoint bound
-		debugf("No endpoint bound for psm %d\n", channel->psm);
+		ERROR("%s: No endpoint bound for psm %d\n", __func__, channel->psm);
 		return B_ERROR;
 	}
 
@@ -62,15 +62,16 @@ l2cap_con_rsp_ind(HciConnection* conn, L2capChannel* channel)
 	uint16* mtu = NULL;
 	l2cap_flow_t* flow = NULL;
 
-	flowf("\n");
+	CALLED();
 
 	// We received a configuration response, connection process
 	// is a step further but still configuration pending
 
 	// Check channel state
-	if (channel->state != L2CAP_CHAN_OPEN && channel->state != L2CAP_CHAN_CONFIG) {
-		debugf("unexpected L2CA_Config request message. Invalid channel" \
-		" state, state=%d, lcid=%d\n", channel->state, channel->scid);
+	if (channel->state != L2CAP_CHAN_OPEN
+		&& channel->state != L2CAP_CHAN_CONFIG) {
+		ERROR("%s: unexpected L2CA_Config request message. Invalid channel"
+			" state, state=%d, lcid=%d\n", __func__, channel->state, channel->scid);
 		return EINVAL;
 	}
 
@@ -122,7 +123,7 @@ l2cap_con_rsp_ind(HciConnection* conn, L2capChannel* channel)
 		channel->cfgState = 0;
 	}
 
-	flowf("Sending cfg req\n");
+	TRACE("%s: Sending cfg req\n", __func__);
 	// Link command to the queue
 	SchedConnectionPurgeThread(channel->conn);
 
@@ -161,18 +162,13 @@ l2cap_cfg_req_ind(L2capChannel* channel)
 			return ENOMEM;
 		}
 
-		flowf("Sending cfg resp\n");
 		// Link command to the queue
 		SchedConnectionPurgeThread(channel->conn);
 
 		// set status
 		channel->cfgState |= L2CAP_CFG_OUT_SENT;
 
-	} else {
-
-
 	}
-
 
 	if ((channel->cfgState & L2CAP_CFG_BOTH) == L2CAP_CFG_BOTH) {
 		// Channel can be declared open
@@ -194,8 +190,6 @@ l2cap_cfg_req_ind(L2capChannel* channel)
 				channel->state = L2CAP_CHAN_CLOSED;
 				return ENOMEM;
 			}
-
-			flowf("Sending cfg req\n");
 
 			// Link command to the queue
 			SchedConnectionPurgeThread(channel->conn);
@@ -287,17 +281,18 @@ l2cap_upper_dis_req(L2capChannel* channel)
 status_t
 l2cap_co_receive(HciConnection* conn, net_buffer* buffer, uint16 dcid)
 {
-	debugf("Handle %d To dcid %x size=%ld\n", conn->handle, dcid, buffer->size);
+	CALLED();
 
 	L2capChannel* channel = btCoreData->ChannelBySourceID(conn, dcid);
 
 	if (channel == NULL) {
-		debugf("dcid %d does not exist for handle %d\n", dcid, conn->handle);
+		ERROR("%s: dcid %d does not exist for handle %d\n", __func__,
+			dcid, conn->handle);
 		return B_ERROR;
 	}
 
 	if (channel->endpoint == NULL) {
-		debugf("dcid %d not bound to endpoint\n", dcid);
+		ERROR("%s: dcid %d not bound to endpoint\n", __func__, dcid);
 		return B_ERROR;
 	}
 
@@ -312,11 +307,10 @@ l2cap_cl_receive(HciConnection* conn, net_buffer* buffer, uint16 psm)
 	L2capEndpoint* endpoint = L2capEndpoint::ForPsm(psm);
 
 	if (endpoint == NULL) {
-		debugf("no enpoint bound with psm %d\n", psm);
+		ERROR("%s: no endpoint bound with psm %d\n", __func__, psm);
 		return B_ERROR;
 	}
 
-	flowf("Enqueue to fifo\n");
 	return gStackModule->fifo_enqueue_buffer(
 		&endpoint->fReceivingFifo, buffer);
 }
