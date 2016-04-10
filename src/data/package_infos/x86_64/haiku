@@ -109,8 +109,8 @@ requires {
 	lib:libavformat >= 57
 	lib:libavresample >= 3
 	lib:libavutil >= 55
-	lib:libswscale >= 2
-	lib:libswresample >= 4
+	lib:libswscale >= 4
+	lib:libswresample >= 2
 #endif
 #endif
 	lib:libsolv
