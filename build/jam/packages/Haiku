@@ -263,6 +263,7 @@ AddFilesToPackage add-ons disk_systems
 	: <disk_system>fat <disk_system>intel <disk_system>gpt <disk_system>bfs
 		<disk_system>ntfs ;
 
+AddFilesToPackage add-ons kernel bluetooth : $(SYSTEM_BT_STACK) ;
 
 # the MIME DB
 CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;

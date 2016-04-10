@@ -99,6 +99,9 @@ SYSTEM_SERVERS += [ FFilterByBuildFeatures
 	print_server print_addon_server
 ] ;
 
+
+SYSTEM_BT_STACK = hci btCoreData ;
+
 SYSTEM_ADD_ONS_ACCELERANTS += [ FFilterByBuildFeatures
 	x86,x86_64 @{
 		intel_810.accelerant intel_extreme.accelerant
