@@ -56,9 +56,10 @@ DispatchEvent(struct hci_event_header* header, int32 code, size_t size)
 
 
 BluetoothServer::BluetoothServer()
-	: BApplication(BLUETOOTH_SIGNATURE)
-	, fSDPThreadID(-1)
-	, fIsShuttingDown(false)
+	:
+	BApplication(BLUETOOTH_SIGNATURE),
+	fSDPThreadID(-1),
+	fIsShuttingDown(false)
 {
 	Output::Instance()->Run();
 	Output::Instance()->SetTitle("Bluetooth message gathering");
@@ -115,8 +116,6 @@ void BluetoothServer::ArgvReceived(int32 argc, char **argv)
 
 void BluetoothServer::ReadyToRun(void)
 {
-	ShowWindow(Output::Instance());
-
 	fDeviceManager->StartMonitoringDevice("bluetooth/h2");
 	fDeviceManager->StartMonitoringDevice("bluetooth/h3");
 	fDeviceManager->StartMonitoringDevice("bluetooth/h4");
