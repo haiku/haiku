@@ -43,44 +43,47 @@ DumpHciConnections(int argc, char** argv)
 
 	while (iterator.HasNext()) {
 		conn = iterator.Next();
-		kprintf("LocalDevice=%lx Destination=%s handle=%#x type=%d"
-			"outqueue=%ld expected=%ld\n", conn->Hid,
-			bdaddrUtils::ToString(conn->destination), conn->handle,	conn->type,
-			conn->OutGoingFrames.Count() , conn->ExpectedResponses.Count());
+		/*
+		kprintf("LocalDevice=0x%" B_PRIx32 " Destination=%s handle=%#x type=%d"
+			"outqueue=%" B_PRId32 " expected=%" B_PRId32 "\n", conn->Hid,
+			bdaddrUtils::ToString(conn->destination).String(), conn->handle,
+			conn->type, conn->OutGoingFrames.Count(),
+			conn->ExpectedResponses.Count());
+		*/
 
-			// each channel
-			kprintf("\tChannels\n");
-			DoublyLinkedList<L2capChannel>::Iterator channelIterator
-				= conn->ChannelList.GetIterator();
+		// each channel
+		kprintf("\tChannels\n");
+		DoublyLinkedList<L2capChannel>::Iterator channelIterator
+			= conn->ChannelList.GetIterator();
 
-			while (channelIterator.HasNext()) {
-				chan = channelIterator.Next();
-				kprintf("\t\tscid=%x dcid=%x state=%x cfg=%x\n", chan->scid,
-					chan->dcid, chan->state, chan->cfgState);
-			}
+		while (channelIterator.HasNext()) {
+			chan = channelIterator.Next();
+			kprintf("\t\tscid=%x dcid=%x state=%x cfg=%x\n", chan->scid,
+				chan->dcid, chan->state, chan->cfgState);
+		}
 
-			// Each outgoing
-			kprintf("\n\tOutGoingFrames\n");
-			DoublyLinkedList<L2capFrame>::Iterator frameIterator
-				= conn->OutGoingFrames.GetIterator();
-			while (frameIterator.HasNext()) {
-				frame = frameIterator.Next();
-				kprintf("\t\tscid=%x code=%x ident=%x type=%x, buffer=%p\n",
-					frame->channel->scid, frame->code, frame->ident,
-					frame->type, frame->buffer);
-			}
+		// Each outgoing
+		kprintf("\n\tOutGoingFrames\n");
+		DoublyLinkedList<L2capFrame>::Iterator frameIterator
+			= conn->OutGoingFrames.GetIterator();
+		while (frameIterator.HasNext()) {
+			frame = frameIterator.Next();
+			kprintf("\t\tscid=%x code=%x ident=%x type=%x, buffer=%p\n",
+				frame->channel->scid, frame->code, frame->ident,
+				frame->type, frame->buffer);
+		}
 
-			// Each expected
-			kprintf("\n\tExpectedFrames\n");
-			DoublyLinkedList<L2capFrame>::Iterator frameExpectedIterator
-				= conn->ExpectedResponses.GetIterator();
+		// Each expected
+		kprintf("\n\tExpectedFrames\n");
+		DoublyLinkedList<L2capFrame>::Iterator frameExpectedIterator
+			= conn->ExpectedResponses.GetIterator();
 
-			while (frameExpectedIterator.HasNext()) {
-				frame = frameExpectedIterator.Next();
-				kprintf("\t\tscid=%x code=%x ident=%x type=%x, buffer=%p\n",
-					frame->channel->scid, frame->code, frame->ident,
-					frame->type, frame->buffer);
-			}
+		while (frameExpectedIterator.HasNext()) {
+			frame = frameExpectedIterator.Next();
+			kprintf("\t\tscid=%x code=%x ident=%x type=%x, buffer=%p\n",
+				frame->channel->scid, frame->code, frame->ident,
+				frame->type, frame->buffer);
+		}
 	}
 
 	return 0;
