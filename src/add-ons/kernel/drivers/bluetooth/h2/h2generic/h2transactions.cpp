@@ -63,7 +63,7 @@ event_complete(void* cookie, status_t status, void* data, size_t actual_len)
 	// bt_usb_dev* bdev = fetch_device(cookie, 0); -> safer / slower option
 	status_t error;
 
-	debugf("cookie@%p status=%s len=%" B_PRIuSIZE "\n", cookie,
+	TRACE("%s: cookie@%p status=%s len=%" B_PRIuSIZE "\n", __func__, cookie,
 		strerror(status), actual_len);
 
 	if (bdev == NULL)
@@ -84,12 +84,14 @@ event_complete(void* cookie, status_t status, void* data, size_t actual_len)
 resubmit:
 
 	error = usb->queue_interrupt(bdev->intr_in_ep->handle, data,
-		max_c(HCI_MAX_EVENT_SIZE, bdev->max_packet_size_intr_in), event_complete, bdev);
+		max_c(HCI_MAX_EVENT_SIZE, bdev->max_packet_size_intr_in),
+		event_complete, bdev);
 
 	if (error != B_OK) {
 		reuse_room(&bdev->eventRoom, data);
 		bdev->stat.rejectedRX++;
-		debugf("RX event resubmittion failed %s\n", strerror(error));
+		ERROR("%s: RX event resubmittion failed %s\n", __func__,
+			strerror(error));
 	} else {
 		bdev->stat.acceptedRX++;
 	}
@@ -131,7 +133,7 @@ resubmit:
 	if (error != B_OK) {
 		reuse_room(&bdev->aclRoom, data);
 		bdev->stat.rejectedRX++;
-		debugf("RX acl resubmittion failed %s\n", strerror(error));
+		ERROR("%s: RX acl resubmittion failed %s\n", __func__, strerror(error));
 	} else {
 		bdev->stat.acceptedRX++;
 	}
@@ -160,7 +162,7 @@ submit_rx_event(bt_usb_dev* bdev)
 		bdev->stat.rejectedRX++;
 	} else {
 		bdev->stat.acceptedRX++;
-		debugf("Accepted RX Event %d\n", bdev->stat.acceptedRX);
+		TRACE("%s: Accepted RX Event %d\n", __func__, bdev->stat.acceptedRX);
 	}
 
 	return status;
@@ -213,7 +215,7 @@ command_complete(void* cookie, status_t status, void* data, size_t actual_len)
 	snet_buffer* snbuf = (snet_buffer*)cookie;
 	bt_usb_dev* bdev = (bt_usb_dev*)snb_cookie(snbuf);
 
-	debugf("len = %" B_PRIuSIZE " @%p\n", actual_len, data);
+	TRACE("%s: len = %" B_PRIuSIZE " @%p\n", __func__, actual_len, data);
 
 	if (status == B_OK) {
 		bdev->stat.successfulTX++;
@@ -281,7 +283,7 @@ submit_tx_command(bt_usb_dev* bdev, snet_buffer* snbuf)
 	// set cookie
 	snb_set_cookie(snbuf, bdev);
 
-	debugf("@%p\n", snb_get(snbuf));
+	TRACE("%s: @%p\n", __func__, snb_get(snbuf));
 
 	error = usb->queue_request(bdev->dev, bRequestType, bRequest,
 		value, wIndex, wLength,	snb_get(snbuf),

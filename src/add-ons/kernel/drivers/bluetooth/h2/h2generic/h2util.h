@@ -5,17 +5,20 @@
 #ifndef _H2UTIL_H_
 #define _H2UTIL_H_
 
+
 #include <util/list.h>
 
 #include "h2generic.h"
+
 
 /* net buffer utils for ACL, to be reviewed */
 #define DEVICEFIELD type
 #define SET_DEVICE(nbuf, hid) \
 	(nbuf->DEVICEFIELD=(nbuf->DEVICEFIELD & 0xFFFFFF00) | (hid & 0xFF))
-#define GET_DEVICE(nbuf) fetch_device(NULL,(nbuf->DEVICEFIELD&0xFF))
+#define GET_DEVICE(nbuf) fetch_device(NULL, (nbuf->DEVICEFIELD&0xFF))
 
-#define COOKIEFIELD flags 
+
+#define COOKIEFIELD flags
 void* nb_get_whole_buffer(net_buffer* nbuf); 
 void nb_destroy(net_buffer* nbuf);
 size_t get_expected_size(net_buffer* nbuf);

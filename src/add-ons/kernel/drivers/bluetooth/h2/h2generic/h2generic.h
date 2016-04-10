@@ -4,7 +4,6 @@
  * All rights reserved. Distributed under the terms of the MIT License.
  *
  */
-
 #ifndef _H2GENERIC_H_
 #define _H2GENERIC_H_
 
@@ -39,6 +38,7 @@
 #define USB_TYPE_CLASS			(0x01 << 5)  /// Check if it is in some other header
 #define USB_TYPE_VENDOR			(0x02 << 5)
 
+#define TOUCH(x) ((void)(x))
 
 // Expecting nobody is gonna have 16 USB-BT dongles connected in their system
 #define MAX_BT_GENERIC_USB_DEVICES	16
@@ -117,5 +117,24 @@ struct bt_usb_dev {
 };
 
 bt_usb_dev* fetch_device(bt_usb_dev* dev, hci_id hid);
+
+
+static inline uint32
+TEST_AND_SET(uint32 *byte, uint32 bit_mask)
+{
+	uint32 val = (*byte&bit_mask)!=0;
+	*byte |= bit_mask;
+	return val;
+}
+
+
+static inline uint32
+TEST_AND_CLEAR(uint32* byte, uint32 bit_mask)
+{
+	uint32 val = (*byte&bit_mask)!=0;
+	*byte &= ~bit_mask;
+	return val;
+}
+
 
 #endif

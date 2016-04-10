@@ -114,7 +114,8 @@ PostEvent(bluetooth_device* ndev, void* event, size_t size)
 			if (conn == NULL)
 				panic("no mem for conn desc");
 			conn->ndevice = ndev;
-			debugf("Registered connection handle=%#x\n",data->handle);
+			TRACE("%s: Registered connection handle=%#x\n", __func__,
+				data->handle);
 			break;
 		}
 
@@ -126,7 +127,8 @@ PostEvent(bluetooth_device* ndev, void* event, size_t size)
 				(outgoingEvent + 1);
 
 			RemoveConnection(data->handle, ndev->index);
-			debugf("unRegistered connection handle=%#x\n",data->handle);
+			TRACE("%s: unRegistered connection handle=%#x\n", __func__,
+				data->handle);
 			break;
 		}
 
@@ -140,10 +142,10 @@ PostEvent(bluetooth_device* ndev, void* event, size_t size)
 			event, size, B_TIMEOUT, 1 * 1000 * 1000);
 
 		if (err != B_OK)
-			debugf("Error posting userland %s\n", strerror(err));
+			ERROR("%s: Error posting userland %s\n", __func__, strerror(err));
 
 	} else {
-		flowf("ERROR:bluetooth_server not found for posting\n");
+		ERROR("%s: bluetooth_server not found for posting!\n", __func__);
 		err = B_NAME_NOT_FOUND;
 	}
 

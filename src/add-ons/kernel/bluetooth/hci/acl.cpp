@@ -40,7 +40,8 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 
 	// Check ACL data packet. Driver should ensure report complete ACL packets
 	if (nbuf->size < sizeof(struct hci_acl_header)) {
-		debugf("Invalid ACL data packet, small length=%ld\n", nbuf->size);
+		ERROR("%s: Invalid ACL data packet, small length=%" B_PRIu32 "\n",
+			__func__, nbuf->size);
 		gBufferModule->free(nbuf);
 		return (EMSGSIZE);
 	}
@@ -63,7 +64,7 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 
 	aclHeader.Remove();
 
-	debugf("ACL data packet, handle=%#x, PB=%#x, length=%d\n",
+	TRACE("%s: ACL data packet, handle=%#x, PB=%#x, length=%d\n", __func__,
 		con_handle, pb, length);
 
 	// a) Ensure there is HCI connection
@@ -72,13 +73,15 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 
 	HciConnection* conn = btCoreData->ConnectionByHandle(con_handle, hid);
 	if (conn == NULL) {
-		debugf("Uexpected handle=%#x does not exist!\n", con_handle);
+		ERROR("%s: expected handle=%#x does not exist!\n", __func__,
+			con_handle);
 		conn = btCoreData->AddConnection(con_handle, BT_ACL, BDADDR_NULL, hid);
 	}
 
 	// Verify connection state
 	if (conn->status!= HCI_CONN_OPEN) {
-		flowf("unexpected ACL data packet. Connection not open\n");
+		ERROR("%s: unexpected ACL data packet. Connection not open\n",
+			__func__);
 		gBufferModule->free(nbuf);
 		return EHOSTDOWN;
 	}
@@ -87,8 +90,8 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 	// Process packet
 	if (pb == HCI_ACL_PACKET_START) {
 		if (conn->currentRxPacket != NULL) {
-			debugf("Dropping incomplete L2CAP packet, got %ld want %d \n",
-				conn->currentRxPacket->size, length );
+			TRACE("%s: Dropping incomplete L2CAP packet, got %" B_PRIu32
+				" want %d \n", __func__, conn->currentRxPacket->size, length );
 			gBufferModule->free(conn->currentRxPacket);
 			conn->currentRxPacket = NULL;
 			conn->currentRxExpectedLength = 0;
@@ -96,8 +99,8 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 
 		// Get L2CAP header, ACL header was dimissed
 		if (nbuf->size < sizeof(l2cap_hdr_t)) {
-			debugf("Invalid L2CAP start fragment, small, length=%ld\n",
-				nbuf->size);
+			TRACE("%s: Invalid L2CAP start fragment, small, length=%" B_PRIu32
+				"\n", __func__, nbuf->size);
 			gBufferModule->free(nbuf);
 			return (EMSGSIZE);
 		}
@@ -113,7 +116,7 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 		l2capHeader->length = le16toh(l2capHeader->length);
 		l2capHeader->dcid = le16toh(l2capHeader->dcid);
 
-		debugf("New L2CAP, handle=%#x length=%d\n", con_handle,
+		TRACE("%s: New L2CAP, handle=%#x length=%d\n", __func__, con_handle,
 			le16toh(l2capHeader->length));
 
 		// Start new L2CAP packet
@@ -131,7 +134,8 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 		gBufferModule->merge(conn->currentRxPacket, nbuf, true);
 
 	} else {
-		debugf("invalid ACL data packet. Invalid PB flag=%#x\n", pb);
+		ERROR("%s: invalid ACL data packet. Invalid PB flag=%#x\n", __func__,
+			pb);
 		gBufferModule->free(nbuf);
 		return (EINVAL);
 	}
@@ -140,9 +144,9 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 	conn->currentRxExpectedLength -= length;
 
 	if (conn->currentRxExpectedLength < 0) {
-
-		debugf("Mismatch. Got %ld, expected %ld\n",
-			conn->currentRxPacket->size, conn->currentRxExpectedLength);
+		TRACE("%s: Mismatch. Got %" B_PRIu32 ", expected %" B_PRIuSIZE "\n",
+			__func__, conn->currentRxPacket->size,
+			conn->currentRxExpectedLength);
 
 		gBufferModule->free(conn->currentRxPacket);
 		conn->currentRxPacket = NULL;
@@ -150,13 +154,14 @@ AclAssembly(net_buffer* nbuf, hci_id hid)
 
 	} else if (conn->currentRxExpectedLength == 0) {
 		// OK, we have got complete L2CAP packet, so process it
-		debugf("L2cap packet ready %ld bytes\n", conn->currentRxPacket->size);
+		TRACE("%s: L2cap packet ready %" B_PRIu32 " bytes\n", __func__,
+			conn->currentRxPacket->size);
 		error = PostToUpper(conn, conn->currentRxPacket);
 		// clean
 		conn->currentRxPacket = NULL;
 		conn->currentRxExpectedLength = 0;
 	} else {
-		debugf("Expected %ld current adds %d\n",
+		TRACE("%s: Expected %ld current adds %d\n", __func__,
 			conn->currentRxExpectedLength, length);
 	}
 
@@ -169,8 +174,9 @@ PostToUpper(HciConnection* conn, net_buffer* buf)
 {
 	if (L2cap == NULL)
 
-	if (get_module(NET_BLUETOOTH_L2CAP_NAME,(module_info**)&L2cap) != B_OK) {
-		debugf("cannot get module \"%s\"\n", NET_BLUETOOTH_L2CAP_NAME);
+	if (get_module(NET_BLUETOOTH_L2CAP_NAME, (module_info**)&L2cap) != B_OK) {
+		ERROR("%s: cannot get module \"%s\"\n", __func__,
+			NET_BLUETOOTH_L2CAP_NAME);
 		return B_ERROR;
 	} // TODO: someone put it
 

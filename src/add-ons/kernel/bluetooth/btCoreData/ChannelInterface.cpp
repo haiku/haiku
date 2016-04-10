@@ -36,7 +36,7 @@ uint16
 ChannelAllocateCid(HciConnection* conn)
 {
 	uint16 cid = conn->lastCid;
-	debugf("Starting search cid %d\n",cid);
+	TRACE("%s: Starting search cid %d\n", __func__, cid);
 	do {
 		cid = (cid == L2CAP_LAST_CID) ? L2CAP_FIRST_CID : cid + 1;
 
@@ -81,7 +81,7 @@ AddChannel(HciConnection* conn, uint16 psm)
 	L2capChannel* channel = new (std::nothrow) L2capChannel;
 
 	if (channel == NULL) {
-		flowf ("no mem for channel");
+		ERROR("%s: Unable to allocate memory for channel!\n", __func__);
 		return NULL;
 	}
 
@@ -96,7 +96,7 @@ AddChannel(HciConnection* conn, uint16 psm)
 		channel->cfgState = 0;
 		channel->endpoint = NULL;
 
- 		// the last assigned CID should be the last in the list
+		// the last assigned CID should be the last in the list
 		// Think if keeping an ordered list will improve the search method
 		// as it is called in every reception
 		conn->ChannelList.Add(channel);
@@ -105,7 +105,7 @@ AddChannel(HciConnection* conn, uint16 psm)
 		// Any constance of the new channel created ...? ng_l2cap_con_ref(con);
 
 	} else {
-		flowf("no CID available\n");
+		ERROR("%s: no CID available\n", __func__);
 		delete channel;
 		channel = NULL;
 	}

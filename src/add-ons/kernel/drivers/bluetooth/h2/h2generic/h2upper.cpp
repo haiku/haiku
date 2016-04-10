@@ -27,7 +27,7 @@ sched_tx_processing(bt_usb_dev* bdev)
 	snet_buffer* snbuf;
 	status_t err;
 
-	debugf("(%p)\n", bdev)
+	TRACE("%s: (%p)\n", __func__, bdev);
 
 	if (!TEST_AND_SET(&bdev->state, PROCESSING)) {
 		// We are not processing in another thread so... START!!
@@ -106,7 +106,7 @@ post_packet_up(bt_usb_dev* bdev, bt_packet_t type, void* buf)
 		net_buffer* nbuf = (net_buffer*) buf;
 		// No need to free the buffer at allocation is gonna be reused
 		btDevices->receive_data(bdev->ndev, &nbuf);
-		flowf("to net_device\n");
+		TRACE("to net_device\n");
 	}
 
 	return err;
@@ -134,23 +134,24 @@ send_packet(hci_id hid, bt_packet_t type, net_buffer* nbuf)
 			case BT_COMMAND:
 			case BT_ACL:
 			case BT_SCO:
-				list_add_item(&bdev->nbuffersTx[type],nbuf);
+				list_add_item(&bdev->nbuffersTx[type], nbuf);
 				bdev->nbuffersPendingTx[type]++;
 			break;
 			default:
-				debugf("Unknown packet type for sending %d\n",type);
+				ERROR("%s: Unknown packet type for sending %d\n", __func__,
+					type);
 				// TODO: free the net_buffer -> no, allow upper layer 
 				// handle it with the given error
 				err = B_BAD_VALUE;
 			break;
 		}
 	} else {
-		flowf("tx sched provoked");
+		TRACE("%s: tx sched provoked", __func__);
 	}
 
 	// TODO: check if device is actually ready for this
 	// TODO: unlock device
-		
+
 	// sched in any case even if nbuf is null (provoke re-scheduling)
 	sched_tx_processing(bdev);
 
@@ -171,16 +172,16 @@ send_command(hci_id hid, snet_buffer* snbuf)
 	// TODO: mutex
 
 	if (snbuf != NULL) {
-		list_add_item(&bdev->nbuffersTx[BT_COMMAND],snbuf);
+		list_add_item(&bdev->nbuffersTx[BT_COMMAND], snbuf);
 		bdev->nbuffersPendingTx[BT_COMMAND]++;
 	} else {
 		err = B_BAD_VALUE;
-		flowf("tx sched provoked");
+		TRACE("%s: tx sched provoked", __func__);
 	}
 
 	// TODO: check if device is actually ready for this
 	// TODO: mutex
-		
+
 	/* sched in All cases even if nbuf is null (hidden way to provoke
 	 * re-scheduling)
 	 */

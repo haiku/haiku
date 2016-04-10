@@ -119,7 +119,7 @@ Assemble(bluetooth_device* bluetoothDevice, bt_packet_t type, void* data,
 
 						if (count >= bluetoothDevice->fExpectedPacketSize[type]) {
 							// the whole packet is here so it can be already posted.
-							flowf("EVENT posted in HCI!!!\n");
+							ERROR("%s: EVENT posted in HCI!!!\n", __func__);
 							btCoreData->PostEvent(bluetoothDevice, data,
 								bluetoothDevice->fExpectedPacketSize[type]);
 
@@ -188,7 +188,7 @@ Assemble(bluetooth_device* bluetoothDevice, bt_packet_t type, void* data,
 					case BT_ACL:
 						// TODO: device descriptor has been fetched better not
 						// pass id again
-						flowf("ACL parsed in ACL!\n");
+						TRACE("%s: ACL parsed in ACL!\n", __func__);
 						AclAssembly(nbuf, bluetoothDevice->index);
 						break;
 					default:
@@ -199,13 +199,11 @@ Assemble(bluetooth_device* bluetoothDevice, bt_packet_t type, void* data,
 				bluetoothDevice->fBuffersRx[type] = nbuf = NULL;
 				bluetoothDevice->fExpectedPacketSize[type] = 0;
 			} else {
-	#if DEBUG_ACL
 				if (type == BT_ACL) {
-					debugf("ACL Packet not filled size=%" B_PRIuSIZE
-						" expected=%" B_PRIuSIZE "\n", nbuf->size,
+					TRACE("%s: ACL Packet not filled size %" B_PRIu32
+						" expected=%" B_PRIuSIZE "\n", __func__, nbuf->size,
 						bluetoothDevice->fExpectedPacketSize[type]);
 				}
-	#endif
 			}
 
 		}
@@ -225,14 +223,15 @@ HciPacketHandler(void* data, int32 code, size_t size)
 
 	bluetooth_device* bluetoothDevice = FindDeviceByID(deviceId);
 
-	debugf("to assemble %" B_PRIuSIZE " bytes of 0x%" B_PRIx32 "\n", size,
-		deviceId);
+	TRACE("%s: to assemble %" B_PRIuSIZE " bytes of 0x%" B_PRIx32 "\n",
+		__func__, size, deviceId);
 
-	if (bluetoothDevice != NULL)
+	if (bluetoothDevice != NULL) {
 		return Assemble(bluetoothDevice, Bluetooth::CodeHandler::Protocol(code),
 			data, size);
-	else {
-		debugf("Device 0x%" B_PRIx32 " could not be matched\n", deviceId);
+	} else {
+		ERROR("%s: Device 0x%" B_PRIx32 " could not be matched\n", __func__,
+			deviceId);
 	}
 
 	return B_ERROR;
@@ -267,12 +266,12 @@ RegisterDriver(bt_hci_transport_hooks* hooks, bluetooth_device** _device)
 		device->index = HCI_DEVICE_INDEX_OFFSET; // REVIEW: dev index
 	else {
 		device->index = (sDeviceList.Tail())->index + 1; // REVIEW!
-		flowf("List not empty\n");
+		TRACE("%s: List not empty\n", __func__);
 	}
 
 	sDeviceList.Add(device);
 
-	debugf("Device %" B_PRIx32 "\n", device->index);
+	TRACE("%s: Device %" B_PRIx32 "\n", __func__, device->index);
 
 	*_device = device;
 
@@ -315,13 +314,13 @@ PostACL(hci_id hciId, net_buffer* buffer)
 	bluetooth_device* device = FindDeviceByID(hciId);
 
 	if (device == NULL) {
-		debugf("No device 0x%" B_PRIx32 "\n", hciId);
+		ERROR("%s: No device 0x%" B_PRIx32 "\n", __func__, hciId);
 		return B_ERROR;
 	}
 
-	debugf("index 0x%" B_PRIx32 " try to send bt packet of %" B_PRIu32
-		" bytes (flags 0x%" B_PRIx32 "):\n", device->index, buffer->size,
-		buffer->flags);
+	TRACE("%s: index 0x%" B_PRIx32 " try to send bt packet of %" B_PRIu32
+		" bytes (flags 0x%" B_PRIx32 "):\n", __func__, device->index,
+		buffer->size, buffer->flags);
 
 	// TODO: ATOMIC! any other thread should stop here
 	do {
@@ -350,7 +349,7 @@ PostACL(hci_id hciId, net_buffer* buffer)
 		// Send to driver
 		curr_frame->protocol = BT_ACL;
 
-		debugf("Tolower nbuf %p!\n", curr_frame);
+		TRACE("%s: Tolower nbuf %p!\n", __func__, curr_frame);
 		// We could pass a cookie and avoid the driver fetch the Id
 		device->hooks->SendACL(device->index, curr_frame);
 		flag = HCI_ACL_PACKET_FRAGMENT;
@@ -396,9 +395,6 @@ dump_bluetooth_devices(int argc, char** argv)
 static status_t
 bluetooth_std_ops(int32 op, ...)
 {
-
-	flowf("\n");
-
 	switch (op) {
 		case B_MODULE_INIT:
 		{
@@ -412,9 +408,10 @@ bluetooth_std_ops(int32 op, ...)
 				return status;
 			}
 
-			status = get_module(BT_CORE_DATA_MODULE_NAME,(module_info**)&btCoreData);
+			status = get_module(BT_CORE_DATA_MODULE_NAME,
+				(module_info**)&btCoreData);
 			if (status < B_OK) {
-				flowf("problem getting datacore\n");
+				ERROR("%s: problem getting bt core data module\n", __func__);
 				return status;
 			}
 
@@ -425,23 +422,23 @@ bluetooth_std_ops(int32 op, ...)
 				(BluetoothRawDataPort::port_listener_func)&HciPacketHandler);
 
 			if (BluetoothRXPort->Launch() != B_OK) {
-				flowf("RX thread creation failed!\n");
+				ERROR("%s: RX thread creation failed!\n", __func__);
 				// we Cannot do much here ... avoid registering
 			} else {
-				flowf("RX thread launched!\n");
+				TRACE("%s: RX thread launched!\n", __func__);
 			}
 
 			sLinkChangeSemaphore = create_sem(0, "bt sem");
 			if (sLinkChangeSemaphore < B_OK) {
 				put_module(NET_STACK_MODULE_NAME);
-				flowf("sem failed\n");
+				ERROR("%s: Link change semaphore failed\n", __func__);
 				return sLinkChangeSemaphore;
 			}
 
 			mutex_init(&sListLock, "bluetooth devices");
 
 			// status = InitializeAclConnectionThread();
-			debugf("%s: Connection Thread error\n", __func__);
+			ERROR("%s: Connection Thread error\n", __func__);
 
 			add_debugger_command("btLocalDevices", &dump_bluetooth_devices,
 				"Lists Bluetooth LocalDevices registered in the Stack");

@@ -1,52 +1,22 @@
 /*
- * Copyright 2007 Oliver Ruiz Dorantes, oliver.ruiz.dorantes_at_gmail.com
- *
- * All rights reserved. Distributed under the terms of the MIT License.
+ * Copyright 2015-2016 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
  *
  */
+#ifndef _BTDEBUG_H
+#define _BTDEBUG_H
 
 
-#ifdef BT_DEBUG_THIS_MODULE
-	#ifndef MODULE_NAME
-	//#warning MODULE_NAME not defined for Haiku BT debugging tools
-	#define MODULE_NAME "BT"
-	#endif
-	
-	#ifndef SUBMODULE_NAME
-	//#warning SUBMODULE_NAME not defined for Haiku BT debugging tools
-	#define SUBMODULE_NAME ""
-	#endif
-	
-	#ifndef SUBMODULE_COLOR
-	//#warning SUBMODULE_COLOR not defined for Haiku BT debugging tools
-	#define SUBMODULE_COLOR 38
-	#endif
-
-	#define debugf(a,param...) dprintf("\x1b[%dm" MODULE_NAME " " SUBMODULE_NAME " " "%s\x1b[0m: " a,SUBMODULE_COLOR,__FUNCTION__, param);
-	#define flowf(a) dprintf("\x1b[%dm" MODULE_NAME " " SUBMODULE_NAME " " "%s\x1b[0m: " a,SUBMODULE_COLOR,__FUNCTION__);
+// XXX: Remove once things get "better"
+#define DEBUG
+#ifdef DEBUG
+#   define TRACE(x...) dprintf("bt: " x)
 #else
-	#define debugf(a,param...)
-	#define flowf(a,param...)
-#endif
-#undef BT_DEBUG_THIS_MODULE
-
-#define TOUCH(x) ((void)(x))
-
-/* */ 
-#if 0
-#pragma mark - Kernel Auxiliary Stuff -
+#   define TRACE(x...) ;
 #endif
 
-static inline uint32 TEST_AND_SET(uint32 *byte, uint32 bit_mask) {
+#define ERROR(x...) dprintf("bt: " x)
+#define CALLED(x...) TRACE("bt: CALLED %s\n", __PRETTY_FUNCTION__)
 
-	uint32 val = (*byte&bit_mask)!=0;
-	*byte |= bit_mask;
-	return val;
-}
 
-static inline uint32 TEST_AND_CLEAR(uint32* byte, uint32 bit_mask) {
-
-	uint32 val = (*byte&bit_mask)!=0;
-	*byte &= ~bit_mask;
-	return val;
-}
+#endif /* _BTDEBUG_H */
