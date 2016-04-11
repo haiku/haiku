@@ -601,6 +601,9 @@ AVFormatWriter::AddTrackInfo(void* _cookie, uint32 code,
 	TRACE("AVFormatWriter::AddTrackInfo(%lu, %p, %ld, %lu)\n",
 		code, data, size, flags);
 
+	if (fHeaderError != 0)
+		return B_ERROR;
+
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->AddTrackInfo(code, data, size, flags);
 }
@@ -612,6 +615,9 @@ AVFormatWriter::WriteChunk(void* _cookie, const void* chunkBuffer,
 {
 	TRACE_PACKET("AVFormatWriter::WriteChunk(%p, %ld, %p)\n", chunkBuffer,
 		chunkSize, encodeInfo);
+
+	if (fHeaderError != 0)
+		return B_ERROR;
 
 	StreamCookie* cookie = reinterpret_cast<StreamCookie*>(_cookie);
 	return cookie->WriteChunk(chunkBuffer, chunkSize, encodeInfo);
