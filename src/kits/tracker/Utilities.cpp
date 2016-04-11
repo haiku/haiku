@@ -1545,6 +1545,23 @@ PositionPassingMenuItem::PositionPassingMenuItem(BMenu* menu, BMessage* message)
 }
 
 
+PositionPassingMenuItem::PositionPassingMenuItem(BMessage* data)
+	:
+	BMenuItem(data)
+{
+}
+
+
+BArchivable*
+PositionPassingMenuItem::Instantiate(BMessage* data)
+{
+	if (validate_instantiation(data, "PositionPassingMenuItem"))
+		return new PositionPassingMenuItem(data);
+
+	return NULL;
+}
+
+
 status_t
 PositionPassingMenuItem::Invoke(BMessage* message)
 {

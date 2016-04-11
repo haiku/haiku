@@ -271,8 +271,10 @@ class PositionPassingMenuItem : public BMenuItem {
 public:
 	PositionPassingMenuItem(const char* title, BMessage*,
 		char shortcut = 0, uint32 modifiers = 0);
-
 	PositionPassingMenuItem(BMenu*, BMessage*);
+	PositionPassingMenuItem(BMessage* data);
+
+	static BArchivable* Instantiate(BMessage* data);
 
 protected:
 	virtual status_t Invoke(BMessage* = 0);

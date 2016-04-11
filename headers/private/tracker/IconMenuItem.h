@@ -58,16 +58,28 @@ class IconMenuItem : public PositionPassingMenuItem {
 			const BNodeInfo* nodeInfo, icon_size which);
 		IconMenuItem(BMenu*, BMessage*, const char* iconType,
 			icon_size which);
+		IconMenuItem(BMessage* data);
 		virtual ~IconMenuItem();
+
+		static BArchivable* Instantiate(BMessage* data);
+		virtual status_t Archive(BMessage* data, bool deep = true) const;
 
 		virtual void GetContentSize(float* width, float* height);
 		virtual void DrawContent();
+		virtual void SetMarked(bool mark);
+
+		virtual void SetIcon(BBitmap* icon) { fDeviceIcon = icon; };
+		BBitmap* Icon() const { return fDeviceIcon; };
+
+		virtual void SetIconSize(icon_size which) { fWhich = which; };
+		icon_size IconSize() const { return fWhich; };
 
 	private:
 		BBitmap* fDeviceIcon;
 		float fHeightDelta;
+		icon_size fWhich;
 
-		typedef BMenuItem _inherited;
+		typedef PositionPassingMenuItem _inherited;
 };
 
 

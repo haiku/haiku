@@ -1839,10 +1839,12 @@ FindPanel::AddMimeTypesToMenu()
 {
 	BMessage* itemMessage = new BMessage(kMIMETypeItem);
 	itemMessage->AddString("mimetype", kAllMimeTypes);
-	MimeTypeMenu()->AddItem(
-		new BMenuItem(B_TRANSLATE("All files and folders"), itemMessage));
+
+	IconMenuItem* firstItem = new IconMenuItem(
+		B_TRANSLATE("All files and folders"), itemMessage, NULL);
+	MimeTypeMenu()->AddItem(firstItem);
 	MimeTypeMenu()->AddSeparatorItem();
-	MimeTypeMenu()->ItemAt(0)->SetMarked(true);
+	firstItem->SetMarked(true);
 
 	// add recent MIME types
 
