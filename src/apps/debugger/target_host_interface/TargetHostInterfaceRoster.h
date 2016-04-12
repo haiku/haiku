@@ -25,18 +25,21 @@ public:
 	static	status_t			CreateDefault();
 	static	void				DeleteDefault();
 
+			bool				Lock()		{ return fLock.Lock(); }
+			void				Unlock()	{ fLock.Unlock(); }
+
 			status_t			Init();
 			status_t			RegisterInterfaceInfos();
 
-			int32				CountInterfaceInfos();
+			int32				CountInterfaceInfos() const;
 			TargetHostInterfaceInfo*
 								InterfaceInfoAt(int32 index) const;
 
 			status_t			CreateInterface(TargetHostInterfaceInfo* info,
 									Settings* settings,
-									TargetHostInterface*& _interface) const;
+									TargetHostInterface*& _interface);
 
-			int32				CountActiveInterfaces();
+			int32				CountActiveInterfaces() const;
 			TargetHostInterface* ActiveInterfaceAt(int32 index) const;
 
 private:

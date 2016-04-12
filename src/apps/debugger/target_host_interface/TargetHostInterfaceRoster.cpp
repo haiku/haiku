@@ -7,6 +7,7 @@
 #include <new>
 
 #include <AutoDeleter.h>
+#include <AutoLocker.h>
 
 #include "LocalTargetHostInterfaceInfo.h"
 #include "TargetHostInterface.h"
@@ -99,3 +100,56 @@ TargetHostInterfaceRoster::RegisterInterfaceInfos()
 
 	return B_OK;
 }
+
+
+int32
+TargetHostInterfaceRoster::CountInterfaceInfos() const
+{
+	return fInterfaceInfos.CountItems();
+}
+
+
+TargetHostInterfaceInfo*
+TargetHostInterfaceRoster::InterfaceInfoAt(int32 index) const
+{
+	return fInterfaceInfos.ItemAt(index);
+}
+
+
+status_t
+TargetHostInterfaceRoster::CreateInterface(TargetHostInterfaceInfo* info,
+	Settings* settings, TargetHostInterface*& _interface)
+{
+	// TODO: this should eventually verify that an active interface with
+	// matching settings/type doesn't already exist, and if so, return that
+	// directly rather than instantiating a new one, since i.e. the interface
+	// for the local host only requires one instance.
+	AutoLocker<TargetHostInterfaceRoster> locker(this);
+	TargetHostInterface* interface;
+	status_t error = info->CreateInterface(settings, interface);
+	if (error != B_OK)
+		return error;
+
+	BReference<TargetHostInterface> interfaceReference(interface, true);
+	if (!fActiveInterfaces.AddItem(interface))
+		return B_NO_MEMORY;
+
+	_interface = interface;
+	interfaceReference.Detach();
+	return B_OK;
+}
+
+
+int32
+TargetHostInterfaceRoster::CountActiveInterfaces() const
+{
+	return fActiveInterfaces.CountItems();
+}
+
+
+TargetHostInterface*
+TargetHostInterfaceRoster::ActiveInterfaceAt(int32 index) const
+{
+	return fActiveInterfaces.ItemAt(index);
+}
+
