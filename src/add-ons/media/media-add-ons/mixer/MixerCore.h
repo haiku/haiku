@@ -30,6 +30,10 @@ class Resampler;
 //     but for now we redefine type 12
 #define B_CHANNEL_MONO		B_CHANNEL_TOP_CENTER
 
+#define MIXER_PROCESS_EVENT BTimedEventQueue::B_USER_EVENT+10
+#define MIXER_SCHEDULE_EVENT BTimedEventQueue::B_USER_EVENT+11
+
+
 class MixerCore {
 public:
 								MixerCore(AudioMixer* node);
@@ -53,10 +57,13 @@ public:
 			MixerInput*			Input(int index);
 			MixerOutput*		Output();
 
-			void				Lock();
+			bool				Lock();
 			bool				LockWithTimeout(bigtime_t timeout);
-			bool				LockFromMixThread();
+			bool				IsLocked() const;
 			void				Unlock();
+
+			void				Process();
+			bigtime_t			PickEvent();
 
 			void				BufferReceived(BBuffer* buffer,
 									bigtime_t lateness);
@@ -114,6 +121,9 @@ private:
 			BTimeSource*		fTimeSource;
 			thread_id			fMixThread;
 			sem_id				fMixThreadWaitSem;
+			bool				fHasEvent;
+			bigtime_t			fEventTime;
+			bigtime_t			fEventLatency;
 			float				fOutputGain;
 
 	friend class MixerInput;
@@ -121,10 +131,10 @@ private:
 };
 
 
-inline void
+inline bool
 MixerCore::Lock()
 {
-	fLocker->Lock();
+	return fLocker->Lock();
 }
 
 
@@ -135,6 +145,13 @@ MixerCore::LockWithTimeout(bigtime_t timeout)
 }
 
 
+inline bool
+MixerCore::IsLocked() const
+{
+	return fLocker->IsLocked();
+}
+
+
 inline void
 MixerCore::Unlock()
 {
@@ -142,18 +159,18 @@ MixerCore::Unlock()
 }
 
 
-inline bool
-MixerCore::LockFromMixThread()
+inline void
+MixerCore::Process()
 {
-	for (;;) {
-		if (LockWithTimeout(10000))
-			return true;
-		// XXX accessing fMixThreadWaitSem is still a race condition :(
-		if (acquire_sem_etc(fMixThreadWaitSem, 1, B_RELATIVE_TIMEOUT, 0)
-				!= B_WOULD_BLOCK) {
-			return false;
-		}
-	}
+	release_sem(fMixThreadWaitSem);
+}
+
+
+inline bigtime_t
+MixerCore::PickEvent()
+{
+	return fTimeSource->RealTimeFor(fEventTime, 0)
+		- fEventLatency - fDownstreamLatency;
 }
 
 

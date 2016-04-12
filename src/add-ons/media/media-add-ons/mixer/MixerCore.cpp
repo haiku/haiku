@@ -1,9 +1,10 @@
 /*
- * Copyright 2003-2010 Haiku Inc. All rights reserved.
+ * Copyright 2003-2016 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Marcus Overhagen
+ * 	Dario Casalinuovo
  */
 
 
@@ -83,6 +84,7 @@ MixerCore::MixerCore(AudioMixer *node)
 	fTimeSource(0),
 	fMixThread(-1),
 	fMixThreadWaitSem(-1),
+	fHasEvent(false),
 	fOutputGain(1.0)
 {
 }
@@ -377,13 +379,13 @@ MixerCore::StopMixThread()
 	ASSERT(fMixThread > 0);
 	ASSERT(fMixThreadWaitSem > 0);
 
+	fRunning = false;
 	status_t unused;
 	delete_sem(fMixThreadWaitSem);
 	wait_for_thread(fMixThread, &unused);
 
 	fMixThread = -1;
 	fMixThreadWaitSem = -1;
-	fRunning = false;
 }
 
 
@@ -477,7 +479,7 @@ MixerCore::_MixThread()
 	// The broken BeOS R5 multiaudio node starts with time 0,
 	// then publishes negative times for about 50ms, publishes 0
 	// again until it finally reaches time values > 0
-	if (!LockFromMixThread())
+	if (!Lock())
 		return;
 	bigtime_t start = fTimeSource->Now();
 	Unlock();
@@ -485,15 +487,13 @@ MixerCore::_MixThread()
 		TRACE("MixerCore: delaying _MixThread start, timesource is at %Ld\n",
 			start);
 		snooze(5000);
-		if (!LockFromMixThread())
+		if (!Lock())
 			return;
 		start = fTimeSource->Now();
 		Unlock();
 	}
 
-	if (!LockFromMixThread())
-		return;
-	bigtime_t latency = max((bigtime_t)3600, bigtime_t(0.4 * buffer_duration(
+	fEventLatency = max((bigtime_t)3600, bigtime_t(0.4 * buffer_duration(
 		fOutput->MediaOutput().format.u.raw_audio)));
 
 	// TODO: when the format changes while running, everything is wrong!
@@ -510,7 +510,6 @@ MixerCore::_MixThread()
 	int64 frameBase = ((temp / fMixBufferFrameCount) + 1)
 		* fMixBufferFrameCount;
 	bigtime_t timeBase = duration_for_frames(fMixBufferFrameRate, frameBase);
-	Unlock();
 
 	TRACE("MixerCore: starting _MixThread, start %Ld, timeBase %Ld, "
 		"frameBase %Ld\n", start, timeBase, frameBase);
@@ -526,20 +525,22 @@ MixerCore::_MixThread()
 	BStackOrHeapArray<chan_info_list, 16> mixChanInfos(fMixBufferChannelCount);
 		// TODO: this does not support changing output channel count
 
-	bigtime_t eventTime = timeBase;
+	fEventTime = timeBase;
 	int64 framePos = 0;
-	for (;;) {
-		if (!LockFromMixThread())
-			return;
-		bigtime_t waitUntil = fTimeSource->RealTimeFor(eventTime, 0)
-			- latency - fDownstreamLatency;
-		Unlock();
-		status_t rv = acquire_sem_etc(fMixThreadWaitSem, 1, B_ABSOLUTE_TIMEOUT,
-			waitUntil);
-		if (rv == B_INTERRUPTED)
+	status_t ret = B_ERROR;
+
+	while(fRunning == true) {
+		if (fHasEvent == false)
+			goto schedule_next_event;
+
+		ret = acquire_sem_etc(fMixThreadWaitSem, 1,
+			B_RELATIVE_TIMEOUT | B_DO_NOT_RESCHEDULE, 100000);
+		if (ret == B_TIMED_OUT)
 			continue;
-		if (rv != B_TIMED_OUT && rv < B_OK)
+		else if (ret != B_OK)
 			return;
+
+		fHasEvent = false;
 
 		if (!LockWithTimeout(10000)) {
 			ERROR("MixerCore: LockWithTimeout failed\n");
@@ -559,7 +560,7 @@ MixerCore::_MixThread()
 				hdr->type = B_MEDIA_RAW_AUDIO;
 				hdr->size_used = size;
 				hdr->time_source = fTimeSource->ID();
-				hdr->start_time = eventTime;
+				hdr->start_time = fEventTime;
 				if (fNode->SendBuffer(buffer, fOutput) != B_OK) {
 #if DEBUG
 					ERROR("MixerCore: SendBuffer failed for buffer %Ld\n",
@@ -587,7 +588,7 @@ MixerCore::_MixThread()
 		ASSERT(currentFramePos % fMixBufferFrameCount == 0);
 
 		PRINT(4, "create new buffer event at %Ld, reading input frames at "
-			"%Ld\n", eventTime, currentFramePos);
+			"%Ld\n", fEventTime, currentFramePos);
 
 		// Init the channel information for each MixerInput.
 		for (int i = 0; MixerInput* input = Input(i); i++) {
@@ -598,7 +599,7 @@ MixerCore::_MixThread()
 				uint32 sampleOffset;
 				float gain;
 				if (!input->GetMixerChannelInfo(channel, currentFramePos,
-						eventTime, &base, &sampleOffset, &type, &gain)) {
+						fEventTime, &base, &sampleOffset, &type, &gain)) {
 					continue;
 				}
 				if (type < 0 || type >= MAX_CHANNEL_TYPES)
@@ -689,7 +690,7 @@ MixerCore::_MixThread()
 			hdr->size_used
 				= fOutput->MediaOutput().format.u.raw_audio.buffer_size;
 			hdr->time_source = fTimeSource->ID();
-			hdr->start_time = eventTime;
+			hdr->start_time = fEventTime;
 
 			// swap byte order if necessary
 			fOutput->AdjustByteOrder(buffer);
@@ -721,11 +722,23 @@ MixerCore::_MixThread()
 			mixChanInfos[i].MakeEmpty();
 
 schedule_next_event:
+		Unlock();
+
 		// schedule next event
 		framePos += fMixBufferFrameCount;
-		eventTime = timeBase + bigtime_t((1000000LL * framePos)
+		fEventTime = timeBase + bigtime_t((1000000LL * framePos)
 			/ fMixBufferFrameRate);
-		Unlock();
+
+		media_timed_event mixerEvent(PickEvent(),
+			MIXER_PROCESS_EVENT, 0, BTimedEventQueue::B_NO_CLEANUP);
+
+		ret = write_port(fNode->ControlPort(), MIXER_SCHEDULE_EVENT,
+			&mixerEvent, sizeof(mixerEvent));
+		if (ret != B_OK)
+			TRACE("MixerCore::_MixThread: can't write to owner port\n");
+
+		fHasEvent = true;
+
 #if DEBUG
 		bufferIndex++;
 #endif
