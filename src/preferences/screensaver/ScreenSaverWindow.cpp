@@ -976,6 +976,8 @@ ScreenSaverWindow::ScreenSaverWindow()
 		ResizeTo(fSettings.WindowFrame().Width(),
 			fSettings.WindowFrame().Height());
 	}
+
+	CenterOnScreen();
 }
 
 
