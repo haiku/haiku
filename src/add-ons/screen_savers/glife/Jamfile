@@ -5,7 +5,7 @@ UseBuildFeatureHeaders mesa ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders screen_saver ;
-	# For BuildScreenSaverDefaultSettingsView
+	# For BuildDefaultSettingsView
 
 local sources =
 	GLifeSaver.cpp

@@ -16,9 +16,8 @@
 
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <DefaultSettingsView.h>
 #include <MimeType.h>
-
-#include <BuildScreenSaverDefaultSettingsView.h>
 
 #include "IconDisplay.h"
 #include "VectorIcon.h"
@@ -176,7 +175,7 @@ IconsSaver::Draw(BView* view, int32 frame)
 void
 IconsSaver::StartConfig(BView* view)
 {
-	BPrivate::BuildScreenSaverDefaultSettingsView(view, "Icons",
+	BPrivate::BuildDefaultSettingsView(view, "Icons",
 		B_TRANSLATE("by Vincent Duvert"));
 }
 

@@ -11,7 +11,7 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 		SharedLibrary [ MultiArchDefaultGristFiles libscreensaver.so ] :
-			BuildScreenSaverDefaultSettingsView.cpp
+			DefaultSettingsView.cpp
 			ScreenSaver.cpp
 			ScreenSaverSettings.cpp
 			ScreenSaverRunner.cpp

@@ -8,7 +8,7 @@
  */
 
 
-#include <BuildScreenSaverDefaultSettingsView.h>
+#include <DefaultSettingsView.h>
 
 #include <LayoutBuilder.h>
 #include <StringView.h>
@@ -19,8 +19,7 @@ namespace BPrivate {
 // Provides a consistent look for the settings view for screen savers
 // that don't provide any configuration settings.
 void
-BuildScreenSaverDefaultSettingsView(BView* view, const char* moduleName,
-	const char* info)
+BuildDefaultSettingsView(BView* view, const char* moduleName, const char* info)
 {
 	view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 

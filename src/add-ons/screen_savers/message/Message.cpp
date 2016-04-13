@@ -13,6 +13,7 @@
 
 #include <Bitmap.h>
 #include <Catalog.h>
+#include <DefaultSettingsView.h>
 #include <Font.h>
 #include <ObjectList.h>
 #include <Picture.h>
@@ -23,7 +24,6 @@
 #include <TextView.h>
 #include <View.h>
 
-#include <BuildScreenSaverDefaultSettingsView.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Screensaver Message"
@@ -120,7 +120,7 @@ Message::~Message()
 void 
 Message::StartConfig(BView *view) 
 { 
-	BPrivate::BuildScreenSaverDefaultSettingsView(view, "Message",
+	BPrivate::BuildDefaultSettingsView(view, "Message",
 		B_TRANSLATE("by Ryan Leavengood"));
 } 
 

@@ -23,6 +23,7 @@
 #include <Catalog.h>
 #include <CheckBox.h>
 #include <ControlLook.h>
+#include <DefaultSettingsView.h>
 #include <Directory.h>
 #include <DurationFormat.h>
 #include <Entry.h>
@@ -48,8 +49,6 @@
 
 #include <algorithm>
 	// for std::max and std::min
-
-#include <BuildScreenSaverDefaultSettingsView.h>
 
 #include "PreviewView.h"
 #include "ScreenCornerSelector.h"
@@ -865,7 +864,7 @@ ModulesView::_OpenSaver()
 	if (fSettingsView->ChildAt(0) == NULL) {
 		// There are no settings at all, we add the module name here to
 		// let it look a bit better at least.
-		BPrivate::BuildScreenSaverDefaultSettingsView(fSettingsView,
+		BPrivate::BuildDefaultSettingsView(fSettingsView,
 			fSettings.ModuleName()[0] ? fSettings.ModuleName()
 				: B_TRANSLATE("Blackness"),
 				saver != NULL || !fSettings.ModuleName()[0]

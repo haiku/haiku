@@ -3,7 +3,7 @@ SubDir HAIKU_TOP src add-ons screen_savers debugnow ;
 SetSubDirSupportedPlatformsBeOSCompatible ;
 
 UsePrivateHeaders screen_saver ;
-	# For BuildScreenSaverDefaultSettingsView
+	# For BuildDefaultSettingsView
 
 AddResources DebugNow : DebugNow.rdef ;
 

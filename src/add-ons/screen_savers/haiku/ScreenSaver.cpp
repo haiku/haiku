@@ -12,12 +12,12 @@
 #include <stdlib.h>
 
 #include <Catalog.h>
+#include <DefaultSettingsView.h>
 #include <Font.h>
 #include <ScreenSaver.h>
 #include <StringView.h>
 #include <View.h>
 
-#include <BuildScreenSaverDefaultSettingsView.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Screensaver Haiku"
@@ -61,7 +61,7 @@ ScreenSaver::ScreenSaver(BMessage *archive, image_id id)
 void 
 ScreenSaver::StartConfig(BView *view) 
 { 
-	BPrivate::BuildScreenSaverDefaultSettingsView(view, "Haiku",
+	BPrivate::BuildDefaultSettingsView(view, "Haiku",
 		B_TRANSLATE("by Marcus Overhagen"));
 } 
 

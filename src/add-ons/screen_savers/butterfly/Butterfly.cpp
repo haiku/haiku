@@ -14,10 +14,9 @@
 #include <stdlib.h>
 
 #include <Catalog.h>
+#include <DefaultSettingsView.h>
 #include <OS.h>
 #include <View.h>
-
-#include <BuildScreenSaverDefaultSettingsView.h>
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Screensaver Butterfly"
@@ -43,7 +42,7 @@ Butterfly::Butterfly(BMessage* archive, image_id imageId)
 void
 Butterfly::StartConfig(BView* view)
 {
-	BPrivate::BuildScreenSaverDefaultSettingsView(view, "Butterfly",
+	BPrivate::BuildDefaultSettingsView(view, "Butterfly",
 		B_TRANSLATE("by Geoffry Song"));
 }
 

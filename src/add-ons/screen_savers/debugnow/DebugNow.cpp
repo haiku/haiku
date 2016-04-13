@@ -10,11 +10,10 @@
 #include "DebugNow.h"
 
 #include <Catalog.h>
+#include <DefaultSettingsView.h>
 #include <Font.h>
 #include <StringView.h>
 #include <View.h>
-
-#include <BuildScreenSaverDefaultSettingsView.h>
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -51,7 +50,7 @@ DebugNow::DebugNow(BMessage* archive, image_id id)
 void
 DebugNow::StartConfig(BView* view)
 {
-	BPrivate::BuildScreenSaverDefaultSettingsView(view, "DEBUG NOW",
+	BPrivate::BuildDefaultSettingsView(view, "DEBUG NOW",
 		B_TRANSLATE("by Ryan Leavengood"));
 }
 
