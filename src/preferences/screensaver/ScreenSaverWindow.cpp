@@ -1,5 +1,5 @@
 /*
- * Copyright 2003-2014 Haiku, Inc. All rights reserved.
+ * Copyright 2003-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,7 +30,7 @@
 #include <File.h>
 #include <FindDirectory.h>
 #include <Font.h>
-#include <Layout.h>
+#include <GroupLayout.h>
 #include <LayoutBuilder.h>
 #include <ListItem.h>
 #include <ListView.h>
@@ -78,6 +78,10 @@ const int32 kMsgTurnOffSliderUpdate = 'TUup';
 
 const int32 kMsgFadeCornerChanged = 'fdcc';
 const int32 kMsgNeverFadeCornerChanged = 'nfcc';
+
+const float kWindowWidth = 446.0f;
+const float kWindowHeight = 325.0f;
+const float kDefaultItemSpacingAt12pt = 12.0f * 0.85;
 
 
 class TimeSlider : public BSlider {
@@ -572,6 +576,10 @@ ModulesView::ModulesView(const char* name, ScreenSaverSettings& settings)
 		fScreenSaversListView, 0, false, true);
 
 	fSettingsBox->SetLabel(B_TRANSLATE("Screensaver settings"));
+	fSettingsBox->SetExplicitMinSize(BSize(
+		floorf(be_control_look->DefaultItemSpacing()
+			* ((kWindowWidth - 157.0f) / kDefaultItemSpacingAt12pt)),
+		B_SIZE_UNSET));
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL)
 		.SetInsets(B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING,
@@ -914,20 +922,20 @@ TabView::MouseDown(BPoint where)
 
 ScreenSaverWindow::ScreenSaverWindow()
 	:
-	BWindow(BRect(50, 50, 496, 375),
+	BWindow(BRect(50.0f, 50.0f, 50.0f + kWindowWidth, 50.0f + kWindowHeight),
 		B_TRANSLATE_SYSTEM_NAME("ScreenSaver"), B_TITLED_WINDOW,
 		B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	fSettings.Load();
 
-	fMinWidth = ceilf(std::max(446.0f,
-		be_control_look->DefaultItemSpacing() * 44.6f));
+	fMinWidth = floorf(be_control_look->DefaultItemSpacing()
+		* (kWindowWidth / kDefaultItemSpacingAt12pt));
 
 	font_height fontHeight;
 	be_plain_font->GetHeight(&fontHeight);
 	float textHeight = ceilf(fontHeight.ascent + fontHeight.descent);
 
-	fMinHeight = ceilf(std::max(325.0f, textHeight * 28));
+	fMinHeight = ceilf(std::max(kWindowHeight, textHeight * 28));
 
 	// Create the password editing window
 	fPasswordWindow = new PasswordWindow(fSettings);
