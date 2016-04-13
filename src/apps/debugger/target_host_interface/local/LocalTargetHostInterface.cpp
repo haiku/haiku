@@ -16,6 +16,9 @@
 #include <system_info.h>
 #include <util/KMessage.h>
 
+#include "debug_utils.h"
+
+#include "LocalDebuggerInterface.h"
 #include "TargetHost.h"
 
 using std::set;
@@ -124,10 +127,35 @@ LocalTargetHostInterface::GetTargetHost()
 
 
 status_t
-LocalTargetHostInterface::Attach(team_id id, thread_id threadID,
+LocalTargetHostInterface::Attach(team_id teamID, thread_id threadID,
 	DebuggerInterface*& _interface)
 {
-	return B_NOT_SUPPORTED;
+	if (teamID < 0 && threadID < 0)
+		return B_BAD_VALUE;
+
+	status_t error;
+	if (teamID < 0) {
+		thread_info threadInfo;
+		error = get_thread_info(threadID, &threadInfo);
+		if (error != B_OK)
+			return error;
+
+		teamID = threadInfo.team;
+	}
+
+	LocalDebuggerInterface* interface
+		= new(std::nothrow) LocalDebuggerInterface(teamID);
+	if (interface == NULL)
+		return B_NO_MEMORY;
+
+	BReference<DebuggerInterface> interfaceReference(interface, true);
+	error = interface->Init();
+	if (error != B_OK)
+		return error;
+
+	_interface = interface;
+	interfaceReference.Detach();
+	return B_OK;
 }
 
 
@@ -135,7 +163,11 @@ status_t
 LocalTargetHostInterface::CreateTeam(int commandLineArgc,
 	const char* const* arguments, DebuggerInterface*& _interface)
 {
-	return B_NOT_SUPPORTED;
+	thread_id thread = load_program(arguments, commandLineArgc, false);
+	if (thread < 0)
+		return thread;
+
+	return Attach(-1, thread, _interface);
 }
 
 
