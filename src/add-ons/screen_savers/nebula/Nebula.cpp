@@ -191,8 +191,8 @@ drawshdisk(int x0, int y0, int r)
 				(because if x<0, then (unsigned)(x) = 2**32-|x| which is
 				BIG and thus >H )
 
-				This is clearly a stupid, unmaintanable, unreadable "optimization".
-				But i like it :)
+				This is clearly a stupid, unmaintanable, unreadable
+				"optimization". But i like it :)
 			*/
 			if ((uint32)(y0 - y - 1) < gHeight - 3)
 				memshset(&gBuffer8[x0 + gWidth * (y0 - y + 1)], c, d, x);
@@ -302,7 +302,8 @@ setPalette()
 		case 0:		// yellow
 		default:
 			for (i = 0; i < 30; i++)
-				gPalette[i] = (uint8)(i * 8 / 10) << 16 | (uint8)(i * 6 / 10) << 8;
+				gPalette[i] = (uint8)(i * 8 / 10) << 16
+					| (uint8)(i * 6 / 10) << 8;
 					// | (uint8)(i*3/10);
 
 			for (i = 30; i < 256; i++) {
@@ -412,15 +413,14 @@ setPalette()
 }
 
 
-/***********************************************************************************/
-// #pragma mark -
-// #pragma mark SimpleSlider
+// #pragma mark - SimpleSlider
+
 
 class SimpleSlider : public BSlider {
 public:
 	SimpleSlider(const char* label, BMessage* message)
-		:
-		BSlider(B_EMPTY_STRING, B_EMPTY_STRING, message, 1, 100, B_HORIZONTAL)
+	:
+	BSlider(B_EMPTY_STRING, B_EMPTY_STRING, message, 1, 100, B_HORIZONTAL)
 	{
 		SetLimitLabels("1", "100");
 		SetHashMarks(B_HASH_MARKS_BOTTOM);
@@ -440,8 +440,7 @@ private:
 };
 
 
-/***********************************************************************************/
-// #pragma mark -
+// #pragma mark - SettingsView
 
 
 class SettingsView : public BView {
@@ -555,7 +554,8 @@ SettingsView::SettingsView(BRect frame)
 		B_TRANSLATE("Enable motion blur"), new BMessage(kMsgMotionBlur));
 	fMotionCheck->SetValue((int)gMotionBlur);
 
-	fSpeedSlider = new SimpleSlider(B_TRANSLATE("Speed"), new BMessage(kMsgSpeed));
+	fSpeedSlider = new SimpleSlider(B_TRANSLATE("Speed"),
+		new BMessage(kMsgSpeed));
 	fSpeedSlider->SetValue((gSpeed - 0.002) / 0.05);
 
 	fFramesSlider = new SimpleSlider(B_TRANSLATE("Maximum Frames Per Second"),
@@ -642,15 +642,15 @@ SettingsView::MessageReceived(BMessage* message)
 
 		case kMsgFrames:
 			gMaxFramesPerSecond = fFramesSlider->Value();
-			gScreenSaver->SetTickSize((bigtime_t)(1000000LL / gMaxFramesPerSecond));
+			gScreenSaver->SetTickSize(
+				(bigtime_t)(1000000LL / gMaxFramesPerSecond));
 			break;
 	}
 }
 
 
 
-/***********************************************************************************/
-// #pragma mark -
+// #pragma mark - Nebula
 
 
 class Nebula : public BScreenSaver {
@@ -811,7 +811,8 @@ Nebula::Draw(BView* view, int32)
 	if (fStarted) {
 		view->SetHighColor(0, 0, 0, 0);
 		view->FillRect(view->Frame());
-		view->MovePenTo(0, (view->Bounds().Height() / fFactor - 1 - gHeight) / 2);
+		view->MovePenTo(0,
+			(view->Bounds().Height() / fFactor - 1 - gHeight) / 2);
 
 		fStarted = false;
 	}
@@ -826,8 +827,7 @@ Nebula::Draw(BView* view, int32)
 }
 
 
-/***********************************************************************************/
-// #pragma mark -
+// #pragma mark - instantiate_screen_saver
 
 
 extern "C" _EXPORT BScreenSaver*
