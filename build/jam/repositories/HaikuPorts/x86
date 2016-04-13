@@ -64,7 +64,7 @@ RemotePackageRepository HaikuPorts
 	cdrtools-3.02~a06-2
 	cdrtools_devel-3.02~a06-2
 	clipdinger-0.5.2-1
-	cmake-3.4.3-1
+	cmake-3.5.1-1
 	coreutils-8.24-1
 	cpio-2.10-1
 	ctags-5.8-3
@@ -117,13 +117,15 @@ RemotePackageRepository HaikuPorts
 	glew-1.11.0-1
 	glew_devel-1.11.0-1
 	glew_util-1.11.0-1
-	glib2-2.38.1-5
-	glib2_devel-2.38.1-5
+	glib2-2.46.2-1
+	glib2_devel-2.46.2-1
 	glu-9.0.0-3
 	glu_devel-9.0.0-3
 	gmp-6.1.0-1
 	gmp_devel-6.1.0-1
 	gperf-3.0.4-1
+	graphite2-1.3.8-1
+	graphite2_devel-1.3.8-1
 	grep-2.21-1
 	groff-1.20.1-3
 	gutenprint-5.2.11-2
@@ -131,6 +133,8 @@ RemotePackageRepository HaikuPorts
 	gzip-1.6-2
 	haikuwebkit-1.5.1-1
 	haikuwebkit_devel-1.5.1-1
+	harfbuzz-1.2.6-1
+	harfbuzz_devel-1.2.6-1
 	help2man-1.46.6-1
 	htmldoc-1.8.27-3
 	icu-56.1-1
@@ -469,10 +473,12 @@ RemotePackageRepository HaikuPorts
 	glu
 	gmp
 	gperf
+	graphite2
 	grep
 	groff
 	gutenprint
 	gzip
+	harfbuzz
 	htmldoc
 	icu
 	icu54
