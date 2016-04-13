@@ -42,7 +42,7 @@ RainbowItem::DrawItem(BView* owner, BRect frame, bool complete)
 
 	if (IsSelected() || complete) {
 		if (IsSelected()) {
-			owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
+			owner->SetHighUIColor(B_LIST_SELECTED_BACKGROUND_COLOR);
 			owner->SetLowColor(owner->HighColor());
 		} else
 			owner->SetHighColor(lowColor);
@@ -71,7 +71,7 @@ RainbowItem::DrawItem(BView* owner, BRect frame, bool complete)
 	owner->FillRect(colorRect, gradient);
 
 	// draw the border
-	owner->SetHighColor(ui_color(B_CONTROL_BORDER_COLOR));
+	owner->SetHighUIColor(B_CONTROL_BORDER_COLOR);
 	owner->StrokeRect(colorRect);
 
 	// draw the string
@@ -85,9 +85,9 @@ RainbowItem::DrawItem(BView* owner, BRect frame, bool complete)
 			owner->SetHighColor(tint_color(textColor, B_LIGHTEN_2_TINT));
 	} else {
 		if (IsSelected())
-			owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+			owner->SetHighUIColor(B_LIST_SELECTED_ITEM_TEXT_COLOR);
 		else
-			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
+			owner->SetHighUIColor(B_LIST_ITEM_TEXT_COLOR);
 	}
 
 	owner->DrawString(Text());
