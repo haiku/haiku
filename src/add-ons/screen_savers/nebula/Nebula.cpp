@@ -464,6 +464,8 @@ SettingsView::SettingsView(BRect frame)
 	:
 	BView(frame, "", B_FOLLOW_ALL, B_WILL_DRAW)
 {
+	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+
 	BStringView* titleString = new BStringView(B_EMPTY_STRING,
 		B_TRANSLATE("Nebula"));
 	titleString->SetFont(be_bold_font);
@@ -604,8 +606,6 @@ SettingsView::SettingsView(BRect frame)
 void
 SettingsView::AttachedToWindow()
 {
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-
 	fWidthMenu->Menu()->SetTargetForItems(this);
 	fColorMenu->Menu()->SetTargetForItems(this);
 	fBorderMenu->Menu()->SetTargetForItems(this);
