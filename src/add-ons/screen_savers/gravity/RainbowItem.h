@@ -3,9 +3,6 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- *		DarkWyrm, bpmagic@columbus.rr.com
- *		Rene Gollent, rene@gollent.com
- *		Ryan Leavengood, leavengood@gmail.com
  *		John Scipione, jscipione@gmail.com
  */
 #ifndef _RAINBOW_ITEM_H
