@@ -598,8 +598,6 @@ SettingsView::SettingsView(BRect frame)
 		.Add(fFramesSlider)
 		.AddGlue()
 	.End();
-
-	MoveBy(0, -25); // The view is not where it should be.
 }
 
 
@@ -695,7 +693,7 @@ Nebula::Nebula(BMessage* message, image_id id)
 void
 Nebula::StartConfig(BView* view)
 {
-	view->AddChild(new SettingsView(view->Frame()));
+	view->AddChild(new SettingsView(view->Bounds()));
 }
 
 
