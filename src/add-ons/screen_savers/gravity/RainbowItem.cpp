@@ -50,12 +50,12 @@ RainbowItem::DrawItem(BView* owner, BRect frame, bool complete)
 		owner->FillRect(frame);
 	}
 
-	float spacer = floorf(be_control_look->DefaultItemSpacing() / 2);
+	float spacer = ceilf(be_control_look->DefaultItemSpacing() / 2);
 
 	BRect colorRect(frame);
 	colorRect.InsetBy(2.0f, 2.0f);
 	colorRect.left += spacer;
-	colorRect.right = colorRect.left + colorRect.Height() * M_PHI;
+	colorRect.right = colorRect.left + floorf(colorRect.Height() * M_PHI);
 
 	// draw the rainbow
 	BGradientLinear gradient;

@@ -1,21 +1,32 @@
 /*
- * Copyright 2002-2013 Haiku, Inc. All rights reserved.
+ * Copyright 2001-2002 OpenBeOS
+ * Copyright 2003-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		DarkWyrm, darkwyrm@earthlink.net
  *		Rene Gollent, rene@gollent.com
  *		Ryan Leavengood, leavengood@gmail.com
+ *		John Scipione, jscipione@gmail.com
  */
 
 
 #include "ColorWhichItem.h"
 
-#include <stdio.h>
+#include <math.h>
+
+#include <ControlLook.h>
+
+
+// golden ratio
+#ifdef M_PHI
+#	undef M_PHI
+#endif
+#define M_PHI 1.61803398874989484820
 
 
 ColorWhichItem::ColorWhichItem(const char* text, color_which which,
-		rgb_color color)
+	rgb_color color)
 	:
 	BStringItem(text, 0, false),
 	fColorWhich(which),
@@ -32,7 +43,7 @@ ColorWhichItem::DrawItem(BView* owner, BRect frame, bool complete)
 
 	if (IsSelected() || complete) {
 		if (IsSelected()) {
-			owner->SetHighColor(ui_color(B_LIST_SELECTED_BACKGROUND_COLOR));
+			owner->SetHighUIColor(B_LIST_SELECTED_BACKGROUND_COLOR);
 			owner->SetLowColor(owner->HighColor());
 		} else
 			owner->SetHighColor(lowColor);
@@ -40,18 +51,18 @@ ColorWhichItem::DrawItem(BView* owner, BRect frame, bool complete)
 		owner->FillRect(frame);
 	}
 
-	rgb_color border = (rgb_color){ 184, 184, 184, 255 };
+	float spacer = ceilf(be_control_look->DefaultItemSpacing() / 2);
 
 	BRect colorRect(frame);
-	colorRect.InsetBy(2, 2);
-	colorRect.right = colorRect.left + colorRect.Height();
+	colorRect.InsetBy(2.0f, 2.0f);
+	colorRect.left += spacer;
+	colorRect.right = colorRect.left + floorf(colorRect.Height() * M_PHI);
 	owner->SetHighColor(fColor);
 	owner->FillRect(colorRect);
-	owner->SetHighColor(border);
+	owner->SetHighUIColor(B_CONTROL_BORDER_COLOR);
 	owner->StrokeRect(colorRect);
 
-	owner->MovePenTo(frame.left + colorRect.Width() + 8, frame.top
-		+ BaselineOffset());
+	owner->MovePenTo(colorRect.right + spacer, frame.top + BaselineOffset());
 
 	if (!IsEnabled()) {
 		rgb_color textColor = ui_color(B_LIST_ITEM_TEXT_COLOR);
@@ -61,9 +72,9 @@ ColorWhichItem::DrawItem(BView* owner, BRect frame, bool complete)
 			owner->SetHighColor(tint_color(textColor, B_LIGHTEN_2_TINT));
 	} else {
 		if (IsSelected())
-			owner->SetHighColor(ui_color(B_LIST_SELECTED_ITEM_TEXT_COLOR));
+			owner->SetHighUIColor(B_LIST_SELECTED_ITEM_TEXT_COLOR);
 		else
-			owner->SetHighColor(ui_color(B_LIST_ITEM_TEXT_COLOR));
+			owner->SetHighUIColor(B_LIST_ITEM_TEXT_COLOR);
 	}
 
 	owner->DrawString(Text());

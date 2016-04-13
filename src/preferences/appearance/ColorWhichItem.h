@@ -1,5 +1,6 @@
 /*
- * Copyright 2001-2008, Haiku.
+ * Copyright 2001-2002 OpenBeOS
+ * Copyright 2003-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -13,8 +14,7 @@
 
 
 #include <InterfaceDefs.h>
-#include <ListItem.h>
-#include <View.h>
+#include <StringItem.h>
 
 
 class ColorWhichItem : public BStringItem
