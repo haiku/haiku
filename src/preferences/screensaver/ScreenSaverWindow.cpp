@@ -855,7 +855,7 @@ ModulesView::_OpenSaver()
 		} else
 			fPreviewView->ShowNoPreview();
 	} else {
-		// Failed to load OR this is the "Darkness" screensaver. Show a black
+		// Failed to load OR this is the "Blackness" screensaver. Show a black
 		// preview (this is what will happen in both cases when screen_blanker
 		// runs).
 		fPreviewView->HideNoPreview();
