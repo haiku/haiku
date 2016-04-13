@@ -1,36 +1,40 @@
 /*
- * Copyright 2009, Haiku.
+ * Copyright 2009-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ryan Leavengood, leavengood@gmail.com
+ *		John Scipione, jscipione@gmail.com
  */
 
 
 #include <BuildScreenSaverDefaultSettingsView.h>
 
+#include <LayoutBuilder.h>
 #include <StringView.h>
-#include <View.h>
 
 
 namespace BPrivate {
 
-// This is used to provide a consistent look for the settings view for screen 
-// savers without any configuration.
+// Provides a consistent look for the settings view for screen savers
+// that don't provide any configuration settings.
 void
-BuildScreenSaverDefaultSettingsView(BView* view, const char* moduleName, const char* info)
+BuildScreenSaverDefaultSettingsView(BView* view, const char* moduleName,
+	const char* info)
 {
-	BRect rect(15, 15, 20, 20);
-	BStringView* stringView = new BStringView(rect, "module", moduleName);
-	stringView->SetFont(be_bold_font);
-	stringView->ResizeToPreferred();
-	view->AddChild(stringView);
+	view->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
-	rect.OffsetBy(0, stringView->Bounds().Height() + 4);
-	stringView = new BStringView(rect, "info", info);
-	stringView->ResizeToPreferred();
-	view->AddChild(stringView);
+	BStringView* nameStringView = new BStringView("module", moduleName);
+	nameStringView->SetFont(be_bold_font);
+
+	BStringView* infoStringView = new BStringView("info", info);
+
+	BLayoutBuilder::Group<>(view, B_VERTICAL, B_USE_SMALL_SPACING)
+		.Add(nameStringView)
+		.Add(infoStringView)
+		.AddGlue()
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.End();
 }
 
-}
-
+}	// namespace BPrivate

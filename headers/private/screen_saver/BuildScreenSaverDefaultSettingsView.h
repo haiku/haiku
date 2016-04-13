@@ -1,22 +1,24 @@
 /*
- * Copyright 2009, Haiku.
+ * Copyright 2009 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ryan Leavengood, leavengood@gmail.com
  */
-#ifndef BUILD_SCREEN_SAVER_DEFAULT_SETTINGS_VIEW
-#define BUILD_SCREEN_SAVER_DEFAULT_SETTINGS_VIEW
+#ifndef _BUILD_SCREEN_SAVER_DEFAULT_SETTINGS_VIEW_H
+#define _BUILD_SCREEN_SAVER_DEFAULT_SETTINGS_VIEW_H
 
 
 class BView;
 
 namespace BPrivate {
 
-void BuildScreenSaverDefaultSettingsView(BView* view, const char* moduleName, const char* info);
+void
+BuildScreenSaverDefaultSettingsView(BView* view, const char* moduleName,
+	const char* info);
 
-}
+}	// namespace BPrivate
 
 
-#endif // BUILD_SCREEN_SAVER_DEFAULT_SETTINGS_VIEW
+#endif	// _BUILD_SCREEN_SAVER_DEFAULT_SETTINGS_VIEW_H
 
