@@ -5,9 +5,9 @@
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Jérôme Duval, jerome.duval@free.fr
+ *		Puck Meerburg, puck@puckipedia.nl
  *		Michael Phipps
  *		John Scipione, jscipione@gmail.com
- *		Puck Meerburg, puck@puckipedia.nl
  */
 
 
