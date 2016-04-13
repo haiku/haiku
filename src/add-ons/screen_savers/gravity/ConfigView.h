@@ -27,6 +27,7 @@ class ConfigView : public BView {
 public:
 								ConfigView(BRect frame, Gravity* parent);
 
+			void				AllAttached();
 			void				AttachedToWindow();
 			void				MessageReceived(BMessage* message);
 

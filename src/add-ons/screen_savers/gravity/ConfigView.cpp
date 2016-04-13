@@ -53,8 +53,6 @@ ConfigView::ConfigView(BRect frame, Gravity* parent)
 	fShadeList->AddItem(new ColorItem("White", (rgb_color){ 255, 255, 255 }));
 	fShadeList->AddItem(new RainbowItem("Rainbow"));
 
-	fShadeList->Select(parent->Config.ShadeID);
-
 	fShadeScroll = new BScrollView(B_EMPTY_STRING, fShadeList,
 		B_WILL_DRAW | B_FRAME_EVENTS, false, true);
 
@@ -73,6 +71,19 @@ ConfigView::ConfigView(BRect frame, Gravity* parent)
 		.Add(fShadeScroll)
 		.Add(fCountSlider)
 		.SetInsets(B_USE_DEFAULT_SPACING));
+}
+
+
+void
+ConfigView::AllAttached()
+{
+	// fixup scroll bar range
+	fShadeScroll->ScrollBar(B_VERTICAL)->SetRange(0.0f,
+		fShadeList->ItemFrame(fShadeList->CountItems()).bottom
+			- fShadeList->ItemFrame((int32)0).top);
+
+	// select the shade
+	fShadeList->Select(fParent->Config.ShadeID);
 }
 
 
