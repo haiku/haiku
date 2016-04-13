@@ -10,11 +10,13 @@ if $(TARGET_GCC_VERSION_$(TARGET_PACKAGING_ARCH)[1]) < 3 {
 AddResources Gravity : Gravity.rdef ;
 
 local sources =
+	ColorItem.cpp
 	ConfigView.cpp
 	Gravity.cpp
 	GravitySource.cpp
 	GravityView.cpp
 	Particle.cpp
+	RainbowItem.cpp
 	main.cpp
 ;
 
