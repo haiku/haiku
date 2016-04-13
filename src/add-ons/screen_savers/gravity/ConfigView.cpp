@@ -41,7 +41,6 @@ ConfigView::ConfigView(BRect frame, Gravity* parent)
 	fShadeList(new BListView(B_EMPTY_STRING, B_SINGLE_SELECTION_LIST,
 		B_WILL_DRAW | B_NAVIGABLE))
 {
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
 	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	fShadeList->SetSelectionMessage(new BMessage(kMsgShade));
@@ -62,7 +61,7 @@ ConfigView::ConfigView(BRect frame, Gravity* parent)
 	fCountSlider->SetModificationMessage(new BMessage(kMsgSize));
 	fCountSlider->SetValue(parent->Config.ParticleCount);
 
-	AddChild(BLayoutBuilder::Group<>(B_VERTICAL, B_USE_DEFAULT_SPACING)
+	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.AddGroup(B_VERTICAL, 0)
 			.Add(fTitleString)
 			.Add(fAuthorString)
@@ -70,7 +69,8 @@ ConfigView::ConfigView(BRect frame, Gravity* parent)
 		.Add(fShadeString)
 		.Add(fShadeScroll)
 		.Add(fCountSlider)
-		.SetInsets(B_USE_DEFAULT_SPACING));
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.End();
 }
 
 
