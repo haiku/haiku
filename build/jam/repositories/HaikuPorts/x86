@@ -114,9 +114,9 @@ RemotePackageRepository HaikuPorts
 	git_email-2.2.2-3
 	git_remote_helpers-1.8.3.4-4
 	git_svn-2.2.2-3
-	glew-1.11.0-1
-	glew_devel-1.11.0-1
-	glew_util-1.11.0-1
+	glew-1.13.0-2
+	glew_devel-1.13.0-2
+	glew_util-1.13.0-2
 	glib2-2.46.2-1
 	glib2_devel-2.46.2-1
 	glu-9.0.0-3
