@@ -1,6 +1,6 @@
 /*
  * Copyright 2012-2013 Tri-Edge AI <triedgeai@gmail.com>
- * Copyright 2014 Haiku, Inc. All rights reserved.
+ * Copyright 2014-2016 Haiku, Inc. All rights reserved.
  *
  * Distributed under the terms of the MIT license.
  *

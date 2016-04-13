@@ -1,11 +1,11 @@
 /*
- * Copyright 2002-2016 Haiku, Inc. All rights reserved.
+ * Copyright 2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *
- * Based on ColorWhichIcon by DarkWyrm, bpmagic@columbus.rr.com
+ * Based on ColorWhichItem by DarkWyrm (bpmagic@columbus.rr.com)
  */
 #ifndef _COLOR_ITEM_H
 #define _COLOR_ITEM_H
