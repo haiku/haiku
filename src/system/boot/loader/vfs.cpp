@@ -294,7 +294,9 @@ MemoryDisk::MemoryDisk(const uint8* data, size_t size, const char* name)
 ssize_t
 MemoryDisk::ReadAt(void* cookie, off_t pos, void* buffer, size_t bufferSize)
 {
-	if (pos >= fSize)
+	if (pos < 0)
+		return B_BAD_VALUE;
+	if ((size_t)pos >= fSize)
 		return 0;
 
 	if (pos + bufferSize > fSize)

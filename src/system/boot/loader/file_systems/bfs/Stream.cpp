@@ -306,7 +306,7 @@ Stream::ReadAt(off_t pos, uint8* buffer, size_t* _length)
 
 	size_t length = *_length;
 
-	if (pos + length > data.Size())
+	if (pos + (off_t)length > data.Size())
 		length = data.Size() - pos;
 
 	block_run run;

@@ -6,13 +6,15 @@ local kernelArchSources =
 	arch_elf.cpp
 ;
 
-local kernelArch32Sources =
-	cpuid.S
-;
-
-local kernelLibArchSources =
-	arch_string.S
-;
+local kernelArchSpecificSources ;
+local kernelLibArchSpecificSources ;
+if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) != bios_ia32 {
+	kernelArchSpecificSources = cpuid.cpp ;
+	kernelLibArchSpecificSources = arch_string.cpp ;
+} else {
+	kernelArchSpecificSources = cpuid.S ;
+	kernelLibArchSpecificSources = arch_string.S ;
+}
 
 local librootOsArchSources =
 	byteorder.S
@@ -20,17 +22,25 @@ local librootOsArchSources =
 
 BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 	$(kernelArchSources)
-	$(kernelArch32Sources)
-	$(kernelLibArchSources)
+	$(kernelArchSpecificSources)
+	$(kernelLibArchSpecificSources)
 	$(librootOsArchSources)
-	: # additional flags
+	: -std=c++11 # additional flags
 ;
 
 SEARCH on [ FGristFiles $(kernelArchSources) ]
     = [ FDirName $(HAIKU_TOP) src system kernel arch x86 ] ;
-SEARCH on [ FGristFiles $(kernelArch32Sources) ]
+
+if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) != bios_ia32 {
+SEARCH on [ FGristFiles $(kernelArchSpecificSources) ]
+    = [ FDirName $(HAIKU_TOP) src system kernel arch x86 64 ] ;
+SEARCH on [ FGristFiles $(kernelLibArchSpecificSources) ]
+    = [ FDirName $(HAIKU_TOP) src system libroot posix string arch x86_64 ] ;
+} else {
+SEARCH on [ FGristFiles $(kernelArchSpecificSources) ]
     = [ FDirName $(HAIKU_TOP) src system kernel arch x86 32 ] ;
-SEARCH on [ FGristFiles $(kernelLibArchSources) ]
+SEARCH on [ FGristFiles $(kernelLibArchSpecificSources) ]
     = [ FDirName $(HAIKU_TOP) src system kernel lib arch x86 ] ;
+}
 SEARCH on [ FGristFiles $(librootOsArchSources) ]
     = [ FDirName $(HAIKU_TOP) src system libroot os arch x86 ] ;

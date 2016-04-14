@@ -61,6 +61,7 @@ private:
 };
 
 
+#ifdef BOOT_SUPPORT_ELF32
 struct ELF32Class {
 	static const uint8 kIdentClass = ELFCLASS32;
 
@@ -96,6 +97,7 @@ struct ELF32Class {
 };
 
 typedef ELFLoader<ELF32Class> ELF32Loader;
+#endif
 
 
 #ifdef BOOT_SUPPORT_ELF64
@@ -225,7 +227,7 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 				// known but unused type
 				continue;
 			default:
-				dprintf("unhandled pheader type 0x%lx\n", header.p_type);
+				dprintf("unhandled pheader type 0x%" B_PRIx32 "\n", header.p_type);
 				continue;
 		}
 
@@ -320,7 +322,7 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 			header.p_filesz);
 		if (length < (ssize_t)header.p_filesz) {
 			status = B_BAD_DATA;
-			dprintf("error reading in seg %ld\n", i);
+			dprintf("error reading in seg %" B_PRId32 "\n", i);
 			goto error2;
 		}
 
@@ -642,13 +644,14 @@ elf_load_image(int fd, preloaded_image** _image)
 			return status;
 	}
 #endif
-
+#if BOOT_SUPPORT_ELF32
 	if (gKernelArgs.kernel_image == NULL
 		|| gKernelArgs.kernel_image->elf_class == ELFCLASS32) {
 		status = ELF32Loader::Create(fd, _image);
 		if (status == B_OK)
 			return ELF32Loader::Load(fd, *_image);
 	}
+#endif
 
 	return status;
 }
@@ -706,16 +709,22 @@ elf_relocate_image(preloaded_image* image)
 		return ELF64Loader::Relocate(image);
 	else
 #endif
+#ifdef BOOT_SUPPORT_ELF32
 		return ELF32Loader::Relocate(image);
+#else
+		return B_ERROR;
+#endif
 }
 
 
+#ifdef BOOT_SUPPORT_ELF32
 status_t
 boot_elf_resolve_symbol(preloaded_elf32_image* image, Elf32_Sym* symbol,
 	Elf32_Addr* symbolAddress)
 {
 	return ELF32Loader::Resolve(image, symbol, symbolAddress);
 }
+#endif
 
 
 #ifdef BOOT_SUPPORT_ELF64

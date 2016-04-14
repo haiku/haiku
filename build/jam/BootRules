@@ -47,7 +47,7 @@ rule BootLd
 
 	LINK on $(1) = $(TARGET_LD_$(TARGET_PACKAGING_ARCH)) ;
 
-	LINKFLAGS on $(1) = $(4) ;
+	LINKFLAGS on $(1) = $(TARGET_BOOT_LINKFLAGS) $(4) ;
 	if $(3) { LINKFLAGS on $(1) += --script=$(3) ; }
 
 	# Remove any preset LINKLIBS, but link against libgcc.a. Linking against

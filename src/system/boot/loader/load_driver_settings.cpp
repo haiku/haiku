@@ -101,7 +101,7 @@ load_driver_settings(stage2_args* /*args*/, Directory* volume)
 
 			status_t status = load_driver_settings_file(settings, name);
 			if (status != B_OK)
-				dprintf("Could not load \"%s\" error %ld\n", name, status);
+				dprintf("Could not load \"%s\" error %" B_PRIx32 "\n", name, status);
 		}
 
 		settings->Close(cookie);

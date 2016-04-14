@@ -112,7 +112,8 @@ Volume::ValidateBlockRun(block_run run)
 		|| run.Start() > (1UL << AllocationGroupShift())
 		|| run.length == 0
 		|| uint32(run.Length() + run.Start()) > (1UL << AllocationGroupShift())) {
-		dprintf("bfs: invalid run(%ld,%d,%d)\n", run.AllocationGroup(), run.Start(), run.Length());
+		dprintf("bfs: invalid run(%" B_PRId32 ",%d,%d)\n",
+			run.AllocationGroup(), run.Start(), run.Length());
 		return B_BAD_DATA;
 	}
 	return B_OK;

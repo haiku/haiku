@@ -45,6 +45,11 @@ UsePrivateHeaders shared storage ;
 
 				#BOOT_SUPPORT_FILE_SYSTEM_FAT
 			;
+			if $(HAIKU_BOOT_PLATFORM) != efi {
+				DEFINES +=
+					BOOT_SUPPORT_ELF32
+				;
+			}
 		}
 	}
 

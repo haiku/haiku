@@ -257,7 +257,7 @@ Stream::ReadAt(off_t pos, void *_buffer, size_t *_length, off_t *diskOffset)
 
 	size_t length = *_length;
 
-	if (pos + length > fSize)
+	if (pos + (off_t)length > fSize)
 		length = fSize - pos;
 
 	off_t num; // block number

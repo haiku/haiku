@@ -571,6 +571,23 @@ if [ IsPackageAvailable expat_devel ] {
 }
 
 
+# gnu-efi
+if $(TARGET_PACKAGING_ARCH) = x86_64 {
+	if [ IsPackageAvailable gnuefi ] {
+		ExtractBuildFeatureArchives gnuefi :
+			file: base gnuefi
+				headers: $(developHeadersDir)/gnuefi
+				headersProtocol: $(developHeadersDir)/gnuefi/protocol
+				headersArch: $(developHeadersDir)/gnuefi/$(TARGET_ARCH)
+				libdir: $(libDir)/gnuefi
+			;
+
+		EnableBuildFeatures gnuefi ;
+	} else {
+		Echo "gnuefi support not available on $(TARGET_PACKAGING_ARCH)" ;
+	}
+}
+
 # GPL add-ons
 if $(HAIKU_INCLUDE_GPL_ADDONS) = 1 {
 	EnableBuildFeatures gpl ;

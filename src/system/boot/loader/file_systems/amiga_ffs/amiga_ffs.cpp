@@ -186,7 +186,7 @@ HashIterator::GetNext(int32 &block)
 
 	fNode.SetTo(fData);
 	if (fNode.ValidateCheckSum() != B_OK) {
-		dprintf("block at %ld bad checksum.\n", fBlock);
+		dprintf("block at %" B_PRId32 " bad checksum.\n", fBlock);
 		return NULL;
 	}
 

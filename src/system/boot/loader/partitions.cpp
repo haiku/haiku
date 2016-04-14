@@ -168,7 +168,7 @@ Partition::ReadAt(void *cookie, off_t position, void *buffer, size_t bufferSize)
 	if (position < 0)
 		return B_BAD_VALUE;
 
-	if (position + bufferSize > this->size)
+	if (position + (off_t)bufferSize > this->size)
 		bufferSize = this->size - position;
 
 	ssize_t result = read_pos(fFD, this->offset + position, buffer, bufferSize);
@@ -185,7 +185,7 @@ Partition::WriteAt(void *cookie, off_t position, const void *buffer,
 	if (position < 0)
 		return B_BAD_VALUE;
 
-	if (position + bufferSize > this->size)
+	if (position + (off_t)bufferSize > this->size)
 		bufferSize = this->size - position;
 
 	ssize_t result = write_pos(fFD, this->offset + position, buffer,
@@ -321,7 +321,7 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 		if (priority < 0.0)
 			continue;
 
-		TRACE(("  priority: %ld\n", (int32)(priority * 1000)));
+		TRACE(("  priority: %" B_PRId32 "\n", (int32)(priority * 1000)));
 		if (priority <= bestPriority) {
 			// the disk system recognized the partition worse than the currently
 			// best one
@@ -379,9 +379,9 @@ Partition::Scan(bool mountFileSystems, bool isBootDevice)
 		Partition *child = NULL;
 
 		while ((child = (Partition *)iterator.Next()) != NULL) {
-			TRACE(("%p Partition::Scan(): scan child %p (start = %Ld, size "
-				"= %Ld, parent = %p)!\n", this, child, child->offset,
-				child->size, child->Parent()));
+			TRACE(("%p Partition::Scan(): scan child %p (start = %" B_PRId64
+				", size = %" B_PRIdOFF ", parent = %p)!\n", this, child,
+				child->offset, child->size, child->Parent()));
 
 			child->Scan(mountFileSystems);
 
@@ -466,7 +466,7 @@ add_partitions_for(Node *device, bool mountFileSystems, bool isBootDevice)
 
 	status_t status = add_partitions_for(fd, mountFileSystems, isBootDevice);
 	if (status < B_OK)
-		dprintf("add_partitions_for(%d) failed: %ld\n", fd, status);
+		dprintf("add_partitions_for(%d) failed: %" B_PRIx32 "\n", fd, status);
 
 	close(fd);
 	return B_OK;
@@ -505,7 +505,8 @@ get_child_partition(partition_id id, int32 index)
 {
 	// TODO: do we really have to implement this?
 	//	The intel partition module doesn't really need this for our mission...
-	TRACE(("get_child_partition(id = %lu, index = %ld)\n", id, index));
+	TRACE(("get_child_partition(id = %" B_PRId32 ", index = %" B_PRId32 ")\n",
+		id, index));
 
 	return NULL;
 }

@@ -279,7 +279,7 @@ rule KernelArchitectureSetup architecture
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 192 ; # in kB - unused yet
 
 		case x86 :
-			HAIKU_BOOT_PLATFORM = bios_ia32 ;
+			HAIKU_BOOT_PLATFORM ?= bios_ia32 ;
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 320 ; # in kB
@@ -291,7 +291,7 @@ rule KernelArchitectureSetup architecture
 
 		case x86_64 :
 			# x86_64 completely shares the x86 bootloader.
-			HAIKU_BOOT_PLATFORM = bios_ia32 ;
+			HAIKU_BOOT_PLATFORM ?= bios_ia32 ;
 			HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 2880 ; # in kB
 			# offset in floppy image (>= sizeof(haiku_loader))
 			HAIKU_BOOT_ARCHIVE_IMAGE_OFFSET = 320 ; # in kB
@@ -326,12 +326,6 @@ rule KernelArchitectureSetup architecture
 			Exit "Currently unsupported target CPU:" $(cpu) ;
 	}
 
-	# Include embedded board-specific file.
-	if $(HAIKU_BOOT_BOARD) {
-		include [ FDirName $(HAIKU_BUILD_RULES_DIR) board $(HAIKU_BOOT_BOARD)
-			BoardSetup ] ;
-	}
-
 	# private kernel headers to be used when compiling kernel code
 	HAIKU_PRIVATE_KERNEL_HEADERS =
 		[ PrivateHeaders $(DOT) kernel libroot shared
@@ -361,6 +355,7 @@ rule KernelArchitectureSetup architecture
 	HAIKU_BOOT_CCFLAGS = $(HAIKU_CCFLAGS_$(architecture)) $(gccBaseFlags) ;
 	HAIKU_BOOT_C++FLAGS = $(HAIKU_C++FLAGS_$(architecture)) $(g++BaseFlags) ;
 	HAIKU_BOOT_LINKFLAGS = ;
+	HAIKU_BOOT_LDFLAGS = -Bstatic ;
 
 	if $(gccVersion[1]) >= 4 {
 		HAIKU_KERNEL_C++FLAGS += -std=gnu++11 ;
@@ -369,6 +364,16 @@ rule KernelArchitectureSetup architecture
 	HAIKU_KERNEL_PIC_CCFLAGS = -fno-pic ;
 	HAIKU_KERNEL_PIC_LINKFLAGS = ;
 	HAIKU_KERNEL_ADDON_LINKFLAGS = ;
+
+	# Include embedded board-specific file.
+	if $(HAIKU_BOOT_BOARD) {
+		include [ FDirName $(HAIKU_BUILD_RULES_DIR) board $(HAIKU_BOOT_BOARD)
+			BoardSetup ] ;
+		if $(HAIKU_BOARD_LOADER_BASE) {
+			HAIKU_BOOT_LDFLAGS +=
+				--defsym BOARD_LOADER_BASE=$(HAIKU_BOARD_LOADER_BASE) ;
+		}
+	}
 
 	switch $(cpu) {
 		case ppc :
@@ -401,10 +406,20 @@ rule KernelArchitectureSetup architecture
 			HAIKU_KERNEL_PIC_LINKFLAGS += -z max-page-size=0x1000 ;
 			HAIKU_KERNEL_ADDON_LINKFLAGS += -z max-page-size=0x1000 ;
 
-			# Bootloader is 32-bit.
-			HAIKU_BOOT_LINKFLAGS += -m elf_i386_haiku ;
-			HAIKU_BOOT_CCFLAGS += -m32 -march=pentium ;
-			HAIKU_BOOT_C++FLAGS += -m32 -march=pentium ;
+			# BIOS Bootloader is 32-bit.
+			if $(HAIKU_BOOT_PLATFORM) = bios_ia32 {
+				HAIKU_BOOT_LINKFLAGS += -m elf_i386_haiku ;
+				HAIKU_BOOT_CCFLAGS += -m32 -march=pentium ;
+				HAIKU_BOOT_C++FLAGS += -m32 -march=pentium ;
+			}
+	}
+
+	if $(HAIKU_BOOT_PLATFORM) = efi {
+		HAIKU_BOOT_CCFLAGS += -fpic -fno-stack-protector -fPIC -fshort-wchar -mno-red-zone
+			-maccumulate-outgoing-args -Wno-error=unused-variable ;
+		HAIKU_BOOT_C++FLAGS += -fpic -fno-stack-protector -fPIC -fshort-wchar -mno-red-zone
+			-maccumulate-outgoing-args -Wno-error=unused-variable ;
+		HAIKU_BOOT_LDFLAGS = -Bstatic -Bsymbolic -shared -nostdlib -znocombreloc -nostartfiles ;
 	}
 
 	# warning flags
