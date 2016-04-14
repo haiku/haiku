@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.04.04
-#	Date:    2016-04-04 03:15:02
+#	Version: 2016.04.12
+#	Date:    2016-04-12 03:15:07
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -9775,6 +9775,7 @@
 	0f01  GF108 [GeForce GT 620]
 	0f02  GF108 [GeForce GT 730]
 	0f06  GF108 [GeForce GT 730]
+	0fb0  GM200 High Definition Audio
 	0fbb  GM204 High Definition Audio Controller
 	0fc0  GK107 [GeForce GT 640 OEM]
 	0fc1  GK107 [GeForce GT 640]
@@ -10436,7 +10437,7 @@
 	1344  GM108M [GeForce 845M]
 	1346  GM108M [GeForce 930M]
 	1347  GM108M [GeForce 940M]
-	1348  GM108M [GeForce 945A]
+	1348  GM108M [GeForce 945M / 945A]
 	1349  GM108M [GeForce 930M]
 	134d  GM108M [GeForce 940MX]
 	134e  GM108M [GeForce 930MX]
@@ -10489,10 +10490,12 @@
 	13f8  GM204GLM [Quadro M5000M]
 	13f9  GM204GLM [Quadro M4000M]
 	13fa  GM204GLM [Quadro M3000M]
+	13fb  GM204GL [Quadro M5500]
 	1401  GM206 [GeForce GTX 960]
 	1402  GM206 [GeForce GTX 950]
 	1407  GM206 [GeForce GTX 750 v2]
 	1427  GM206M [GeForce GTX 965M]
+	1430  GM206GL [Quadro M2000]
 	1431  GM206GL [Tesla M4]
 	1617  GM204M [GeForce GTX 980M]
 	1618  GM204M [GeForce GTX 970M]
@@ -10534,6 +10537,7 @@
 	e240  OneConnect iSCSI Initiator (Lancer)
 	e260  OneConnect FCoE Initiator (Lancer)
 	e268  OneConnect 10Gb FCoE Converged Network Adapter (Lancer-VF)
+	e300  Lancer Gen6: LPe32000 Fibre Channel Host Adapter
 	f011  Saturn: LightPulse Fibre Channel Host Adapter
 	f015  Saturn: LightPulse Fibre Channel Host Adapter
 	f085  LP850 Fibre Channel Host Adapter
@@ -19881,10 +19885,12 @@
 	4022  TN9310 10GbE SFP+ Ethernet Adapter
 		1043 8709  XG-C100F 10GbE SFP+ Ethernet Adapter
 		1186 4d00  DXE-810S 10GbE SFP+ Ethernet Adapter
+		1432 8103  EN-8102PF 10GbE SPF+ Ethernet Adapter
 		1fc9 3015  Ethernet Adapter
 	4024  TN9210 10GBase-T Ethernet Adapter
 	4025  TN9510 10GBase-T/NBASE-T Ethernet Adapter
 		1186 2900  DXE-810T 10GBase-T Ethernet Adapter
+		1432 8102  EN-8102P 10GbE Ethernet Adapter
 		1fc9 3015  Ethernet Adapter
 	4026  TN9610 10GbE SFP+ Ethernet Adapter
 	4027  TN9710 10GBase-T/NBASE-T Ethernet Adapter
@@ -22319,7 +22325,7 @@
 	1603  Broadwell-U Processor Thermal Subsystem
 	1604  Broadwell-U Host Bridge -OPI
 	1605  Broadwell-U PCI Express x8 Controller
-	1606  Broadwell-U Integrated Graphics
+	1606  HD Graphics
 	1607  Broadwell-U CHAPS Device
 	1608  Broadwell-U Host Bridge -OPI
 	1609  Broadwell-U x4 PCIe
@@ -22330,19 +22336,19 @@
 	160e  Broadwell-U Integrated Graphics
 	160f  Broadwell-U SoftSKU
 	1610  Broadwell-U Host Bridge - DMI
-	1612  Broadwell-U Integrated Graphics
+	1612  HD Graphics 5600
 	1614  Broadwell-U Host Bridge - DMI
-	1616  Broadwell-U Integrated Graphics
+	1616  HD Graphics 5500
 		103c 2216  ZBook 15u G2 Mobile Workstation
 	1618  Broadwell-U Host Bridge - DMI
 	161a  Broadwell-U Integrated Graphics
 	161b  Broadwell-U Integrated Graphics
 	161d  Broadwell-U Integrated Graphics
-	161e  Broadwell-U Integrated Graphics
-	1622  Broadwell-U Integrated Graphics
-	1626  Broadwell-U Integrated Graphics
-	162a  Broadwell-U Integrated Graphics
-	162b  Broadwell-U Integrated Graphics
+	161e  HD Graphics 5300
+	1622  Iris Pro Graphics 6200
+	1626  HD Graphics 6000
+	162a  Iris Pro Graphics P6300
+	162b  Iris Graphics 6100
 	162d  Broadwell-U Integrated Graphics
 	162e  Broadwell-U Integrated Graphics
 	1632  Broadwell-U Integrated Graphics
@@ -22353,25 +22359,33 @@
 	163e  Broadwell-U Integrated Graphics
 	1900  Skylake Host Bridge/DRAM Registers
 	1901  Skylake PCIe Controller (x16)
+	1902  HD Graphics 510
 	1903  Skylake Processor Thermal Subsystem
 	1904  Skylake Host Bridge/DRAM Registers
 	1905  Skylake PCIe Controller (x8)
+	1906  HD Graphics 510
 	1908  Skylake Host Bridge/DRAM Registers
 	1909  Skylake PCIe Controller (x4)
 	190c  Skylake Host Bridge/DRAM Registers
 	190f  Skylake Host Bridge/DRAM Registers
 	1910  Skylake Host Bridge/DRAM Registers
 	1911  Skylake Gaussian Mixture Model
-	1912  Skylake Integrated Graphics
-	1916  Skylake Integrated Graphics
+	1912  HD Graphics 530
+	1916  HD Graphics 520
 	1918  Skylake Host Bridge/DRAM Registers
 	1919  Skylake Imaging Unit
-	191b  Skylake Integrated Graphics
-	191e  Skylake Integrated Graphics
+	191b  HD Graphics 530
+	191d  HD Graphics P530
+	191e  HD Graphics 515
 	191f  Skylake Host Bridge/DRAM Registers
-	1926  Skylake Integrated Graphics
-	1932  Skylake Integrated Graphics
-	193b  Skylake Integrated Graphics
+	1921  HD Graphics 520
+	1926  Iris Graphics 540
+	1927  Iris Graphics 550
+	192b  Iris Graphics 555
+	192d  Iris Graphics P555
+	1932  Iris Pro Graphics 580
+	193b  Iris Pro Graphics 580
+	193d  Iris Pro Graphics P580
 	1960  80960RP (i960RP) Microprocessor
 		101e 0431  MegaRAID 431 RAID Controller
 		101e 0438  MegaRAID 438 Ultra2 LVD RAID Controller
