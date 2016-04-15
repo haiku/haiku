@@ -52,6 +52,7 @@ RemotePackageRepository HaikuPorts
 	becjk-1.0.1-1
 	beezer-0.99.hg-4
 	befar-4.2_beta-3
+	beget-1.2.3-4
 	belife-1.0.0-2
 	bemines-1.0b2-1
 	bepdf-1.2.0-1
@@ -981,6 +982,7 @@ RemotePackageRepository HaikuPorts
 	becjk
 	beezer
 	befar
+	beget
 	belife
 	bemines
 	bepdf
