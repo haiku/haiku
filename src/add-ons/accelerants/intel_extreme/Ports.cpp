@@ -431,8 +431,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (!wait_for_clear(panelStatus, PANEL_STATUS_POWER_ON, 1000))
 		ERROR("%s: %s didn't power off within 1000ms!\n", __func__, PortName());
 
-	// TODO: Fix software scaling?
-
+#if 0
 	// Disable PanelFitter for now
 	addr_t panelFitterControl = PCH_PANEL_FITTER_BASE_REGISTER
 		+ PCH_PANEL_FITTER_CONTROL;
@@ -440,31 +439,19 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		panelFitterControl += PCH_PANEL_FITTER_PIPE_OFFSET;
 	write32(panelFitterControl, (read32(panelFitterControl) & ~PANEL_FITTER_ENABLED));
 	read32(panelFitterControl);
+#endif
 
-#if 0
 	// For LVDS panels, we actually always set the native mode in hardware
 	// Then we use the panel fitter to scale the picture to that.
 	display_mode hardwareTarget;
 	bool needsScaling = false;
 		// Try to get the panel preferred screen mode from EDID info
-	if (gInfo->has_edid) {
+
+	if (gInfo->shared_info->got_vbt) {
+		// Set vbios hardware panel mode as base
+		memcpy(&hardwareTarget, &gInfo->shared_info->panel_mode,
+			sizeof(display_mode));
 		hardwareTarget.space = target->space;
-		hardwareTarget.virtual_width
-			= gInfo->edid_info.std_timing[0].h_size;
-		hardwareTarget.virtual_height
-			= gInfo->edid_info.std_timing[0].v_size;
-		for (int i = 0; i < EDID1_NUM_DETAILED_MONITOR_DESC; i++) {
-			if (gInfo->edid_info.detailed_monitor[i].monitor_desc_type
-					== EDID1_IS_DETAILED_TIMING) {
-				hardwareTarget.virtual_width = gInfo->edid_info
-					.detailed_monitor[i].data.detailed_timing.h_active;
-				hardwareTarget.virtual_height = gInfo->edid_info
-					.detailed_monitor[i].data.detailed_timing.v_active;
-				break;
-			}
-		}
-		TRACE("%s: hardware mode will actually be %dx%d\n", __func__,
-			hardwareTarget.virtual_width, hardwareTarget.virtual_height);
 
 		if ((hardwareTarget.virtual_width <= target->virtual_width
 				&& hardwareTarget.virtual_height <= target->virtual_height
@@ -473,67 +460,20 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 			hardwareTarget = *target;
 		} else
 			needsScaling = true;
+
+		TRACE("%s: hardware mode will actually be %dx%d (%s)\n", __func__,
+			hardwareTarget.virtual_width, hardwareTarget.virtual_height,
+			needsScaling ? "scaled" : "unscaled");
 	} else {
 		// We don't have EDID data, try to set the requested mode directly
 		hardwareTarget = *target;
 	}
+
 	pll_divisors divisors;
 	if (needsScaling)
 		compute_pll_divisors(&hardwareTarget, &divisors, true);
 	else
 		compute_pll_divisors(target, &divisors, true);
-
-	uint32 dpll = DISPLAY_PLL_NO_VGA_CONTROL | DISPLAY_PLL_ENABLED;
-	if (gInfo->shared_info->device_type.Generation() >= 4) {
-		// DPLL mode LVDS for i915+
-		dpll |= LVDS_PLL_MODE_LVDS;
-	}
-
-	// Compute bitmask from p1 value
-	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
-		dpll |= (1 << (divisors.post1 - 1))
-			<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT;
-	} else {
-		dpll |= (1 << (divisors.post1 - 1))
-			<< DISPLAY_PLL_POST1_DIVISOR_SHIFT;
-	}
-	switch (divisors.post2) {
-		case 5:
-		case 7:
-			dpll |= DISPLAY_PLL_DIVIDE_HIGH;
-			break;
-	}
-
-	// Disable panel fitting, but enable 8 to 6-bit dithering
-	write32(INTEL_PANEL_FIT_CONTROL, 0x4);
-		// TODO: do not do this if the connected panel is 24-bit
-		// (I don't know how to detect that)
-
-	if ((dpll & DISPLAY_PLL_ENABLED) != 0) {
-		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IGD)) {
-			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
-				(((1 << divisors.n) << DISPLAY_PLL_N_DIVISOR_SHIFT)
-					& DISPLAY_PLL_IGD_N_DIVISOR_MASK)
-				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-					& DISPLAY_PLL_IGD_M2_DIVISOR_MASK));
-		} else {
-			write32(INTEL_DISPLAY_B_PLL_DIVISOR_0,
-				(((divisors.n - 2) << DISPLAY_PLL_N_DIVISOR_SHIFT)
-					& DISPLAY_PLL_N_DIVISOR_MASK)
-				| (((divisors.m1 - 2) << DISPLAY_PLL_M1_DIVISOR_SHIFT)
-					& DISPLAY_PLL_M1_DIVISOR_MASK)
-				| (((divisors.m2 - 2) << DISPLAY_PLL_M2_DIVISOR_SHIFT)
-					& DISPLAY_PLL_M2_DIVISOR_MASK));
-		}
-		write32(INTEL_DISPLAY_B_PLL, dpll & ~DISPLAY_PLL_ENABLED);
-		read32(INTEL_DISPLAY_B_PLL);
-		spin(150);
-	}
-#endif
-
-
-	pll_divisors divisors;
-	compute_pll_divisors(target, &divisors, true);
 
 	uint32 lvds = read32(_PortRegister())
 		| LVDS_PORT_EN | LVDS_A0A2_CLKA_POWER_UP;
@@ -579,7 +519,13 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	fPipe->Configure(target);
 
 	// Program pipe PLL's (pixel_clock is *always* the hardware pixel clock)
-	fPipe->ConfigureClocks(divisors, target->timing.pixel_clock, extraPLLFlags);
+	fPipe->ConfigureClocks(divisors, hardwareTarget.timing.pixel_clock,
+		extraPLLFlags);
+
+	// Disable panel fitting, but enable 8 to 6-bit dithering
+	write32(INTEL_PANEL_FIT_CONTROL, 0x4);
+		// TODO: do not do this if the connected panel is 24-bit
+		// (I don't know how to detect that)
 
 	// Power on Panel
 	write32(panelControl, read32(panelControl) | PANEL_CONTROL_POWER_TARGET_ON);
@@ -592,7 +538,6 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	fPipe->ConfigureTimings(target);
 
 #if 0
-
 	// update timing parameters
 	if (needsScaling) {
 		// TODO: Alternatively, it should be possible to use the panel
