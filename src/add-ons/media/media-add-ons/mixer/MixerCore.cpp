@@ -533,9 +533,8 @@ MixerCore::_MixThread()
 		if (fHasEvent == false)
 			goto schedule_next_event;
 
-		ret = acquire_sem_etc(fMixThreadWaitSem, 1,
-			B_RELATIVE_TIMEOUT, 100000);
-		if (ret == B_TIMED_OUT)
+		ret = acquire_sem(fMixThreadWaitSem);
+		if (ret == B_INTERRUPTED)
 			continue;
 		else if (ret != B_OK)
 			return;
