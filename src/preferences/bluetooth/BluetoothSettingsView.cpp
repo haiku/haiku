@@ -304,7 +304,7 @@ BluetoothSettingsView::_BuildLocalDevicesMenu()
 		fLocalDevicesMenu = new BPopUpMenu(B_TRANSLATE("Pick device..."));
 
 	while (fLocalDevicesMenu->CountItems() > 0) {
-		BMenuItem* item = fLocalDevicesMenu->RemoveItem(0);
+		BMenuItem* item = fLocalDevicesMenu->RemoveItem(0L);
 
 		if (item != NULL) {
 			delete item;
