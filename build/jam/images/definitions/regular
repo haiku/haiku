@@ -45,6 +45,7 @@ DESKBAR_DESKTOP_APPLETS +=
 ;
 
 SYSTEM_PREFERENCES += [ FFilterByBuildFeatures
+	Bluetooth
 	DataTranslations
 	E-mail
 	Media
@@ -69,6 +70,7 @@ rule HaikuImageGetSystemLibs
 		[ MultiArchDefaultGristFiles [ FFilterByBuildFeatures
 			libalm.so
 			libbe.so libbsd.so libbnetapi.so
+			libbluetooth.so
 			libdebug.so libdevice.so
 			libgame.so libglut.so@mesa libgnu.so
 			libmail.so libmedia.so libmidi.so libmidi2.so
@@ -95,7 +97,7 @@ rule HaikuImageGetPrivateSystemLibs
 
 SYSTEM_SERVERS += [ FFilterByBuildFeatures
 	mail_daemon media_addon_server media_server midi_server
-	nfs4_idmapper_server
+	nfs4_idmapper_server bluetooth_server
 	print_server print_addon_server
 ] ;
 
