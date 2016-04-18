@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2006-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _MENU_FIELD_H
@@ -135,6 +135,7 @@ private:
 			void				_InitMenuBar(BMenu* menu,
 									BRect frame, bool fixedSize);
 			void				_InitMenuBar(const BMessage* archive);
+			void				_AddMenu(BMenu* menu);
 
 			void				_ValidateLayoutData();
 			float				_MenuBarOffset() const;
@@ -158,5 +159,6 @@ private:
 
 			uint32				_reserved[2];
 };
+
 
 #endif // _MENU_FIELD_H

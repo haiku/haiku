@@ -57,6 +57,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			CheckBox.cpp
 			ColorConversion.cpp
 			ColorControl.cpp
+			ColorMenuItem.cpp
 			Control.cpp
 			ControlLook.cpp
 			DecorInfo.cpp
@@ -90,6 +91,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			MenuBar.cpp
 			MenuField.cpp
 			MenuItem.cpp
+			MenuItemPrivate.cpp
 			MenuPrivate.cpp
 			MenuWindow.cpp
 			OptionControl.cpp
