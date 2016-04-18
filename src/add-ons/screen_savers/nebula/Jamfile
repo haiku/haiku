@@ -4,6 +4,8 @@ SubDirC++Flags -Wno-error ;
 
 AddResources Nebula : Nebula.rdef ;
 
+UsePrivateHeaders interface ;
+
 ScreenSaver Nebula :
 	Draw.c
 	DrawStars.c

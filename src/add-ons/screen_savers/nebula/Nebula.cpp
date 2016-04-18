@@ -6,15 +6,18 @@
  * Effect from corTeX / Optimum.
  */
 
+
 #include <AppKit.h>
 #include <Catalog.h>
+#include <ColorMenuItem.h>
 #include <ControlLook.h>
 #include <InterfaceKit.h>
 #include <LayoutBuilder.h>
-#include <Window.h>
+#include <MenuField.h>
 #include <ScreenSaver.h>
 #include <String.h>
 #include <SupportDefs.h>
+#include <Window.h>
 
 #include <math.h>
 #include <stdio.h>
@@ -451,9 +454,9 @@ public:
 	virtual	void				MessageReceived(BMessage* message);
 
 	private:
-			BMenuField*			fWidthMenu;
-			BMenuField*			fColorMenu;
-			BMenuField*			fBorderMenu;
+			BMenuField*			fWidthMenuField;
+			BMenuField*			fColorMenuField;
+			BMenuField*			fBorderMenuField;
 			BCheckBox*			fMotionCheck;
 			BSlider*			fSpeedSlider;
 			BSlider*			fFramesSlider;
@@ -473,8 +476,7 @@ SettingsView::SettingsView(BRect frame)
 	BStringView* copyrightString = new BStringView(B_EMPTY_STRING,
 		B_TRANSLATE("© 2001-2004 Axel Dörfler."));
 
-	BPopUpMenu* popMenu;
-	BMenuItem* item;
+	BPopUpMenu* popUpMenu;
 
 	int32 widths[] = {
 		0,
@@ -492,7 +494,7 @@ SettingsView::SettingsView(BRect frame)
 
 	size_t widthsLength = sizeof(widths) / sizeof(widths[0]);
 
-	popMenu = new BPopUpMenu("");
+	popUpMenu = new BPopUpMenu("");
 	for (size_t i = 0; i < widthsLength; i++) {
 		BString label;
 		if (widths[i] == 0)
@@ -504,16 +506,15 @@ SettingsView::SettingsView(BRect frame)
 		message->AddInt32("width", widths[i]);
 
 		const char* l = label.String();
-		popMenu->AddItem(item = new BMenuItem(B_TRANSLATE(l), message));
-
-		if (gSettingsWidth == widths[i])
-			item->SetMarked(true);
+		BMenuItem* item = new BMenuItem(B_TRANSLATE(l), message);
+		popUpMenu->AddItem(item);
+		item->SetMarked(gSettingsWidth == widths[i]);
 	}
 
-	fWidthMenu = new BMenuField("res", B_TRANSLATE("Internal width:"),
-		popMenu);
+	fWidthMenuField = new BMenuField("res", B_TRANSLATE("Internal width:"),
+		popUpMenu);
 
-	const char* colorSchemes[] = {
+	const char* colorSchemeLabels[] = {
 		B_TRANSLATE("yellow"),
 		B_TRANSLATE("cyan"),
 		B_TRANSLATE("red"),
@@ -523,16 +524,27 @@ SettingsView::SettingsView(BRect frame)
 		B_TRANSLATE("orange (original)")
 	};
 
-	popMenu = new BPopUpMenu("");
+	rgb_color colorSchemeColors[] = {
+		(rgb_color){ 255, 220, 0   },
+		(rgb_color){ 127, 219, 255 },
+		(rgb_color){ 255, 65,  54  },
+		(rgb_color){ 46,  204, 64  },
+		(rgb_color){ 170, 170, 170 },
+		(rgb_color){ 234, 234, 234 },
+		(rgb_color){ 255, 133, 27  }
+	};
+
+	popUpMenu = new BPopUpMenu("");
 	for (int i = 0; i < 7; i++) {
 		BMessage* message = new BMessage(kMsgColorScheme);
 		message->AddInt8("scheme", (int8)i);
-		popMenu->AddItem(item = new BMenuItem(colorSchemes[i], message));
-		if (gPaletteScheme == i)
-			item->SetMarked(true);
+		BColorMenuItem* item = new BColorMenuItem(colorSchemeLabels[i],
+			message, colorSchemeColors[i]);
+		popUpMenu->AddItem(item);
+		item->SetMarked(gPaletteScheme == i);
 	}
 
-	fColorMenu = new BMenuField("col", B_TRANSLATE("Color:"), popMenu);
+	fColorMenuField = new BMenuField("col", B_TRANSLATE("Color:"), popUpMenu);
 
 	const char* blankBorderFormats[] = {
 		B_TRANSLATE("fullscreen, no borders"),
@@ -541,16 +553,17 @@ SettingsView::SettingsView(BRect frame)
 		B_TRANSLATE("only a slit")
 	};
 
-	popMenu = new BPopUpMenu("");
+	popUpMenu = new BPopUpMenu("");
 	for (int8 i = 0; i < 4; i++) {
 		BMessage* message = new BMessage(kMsgBlankBorders);
 		message->AddInt8("border", i);
-		popMenu->AddItem(item = new BMenuItem(blankBorderFormats[i], message));
-		if (gBlankBorders == i)
-			item->SetMarked(true);
+		BMenuItem* item = new BMenuItem(blankBorderFormats[i], message);
+		popUpMenu->AddItem(item);
+		item->SetMarked(gBlankBorders == i);
 	}
 
-	fBorderMenu = new BMenuField("cinema", B_TRANSLATE("Format:"), popMenu);
+	fBorderMenuField = new BMenuField("cinema", B_TRANSLATE("Format:"),
+		popUpMenu);
 
 	fMotionCheck = new BCheckBox(B_EMPTY_STRING,
 		B_TRANSLATE("Enable motion blur"), new BMessage(kMsgMotionBlur));
@@ -571,19 +584,19 @@ SettingsView::SettingsView(BRect frame)
 		.AddStrut(roundf(be_control_look->DefaultItemSpacing() / 2))
 		.AddGlue()
 		.AddGrid(B_USE_DEFAULT_SPACING, B_USE_SMALL_SPACING)
-			.Add(fColorMenu->CreateLabelLayoutItem(), 0, 0)
+			.Add(fColorMenuField->CreateLabelLayoutItem(), 0, 0)
 			.AddGroup(B_HORIZONTAL, 0.0f, 1, 0)
-				.Add(fColorMenu->CreateMenuBarLayoutItem(), 0.0f)
+				.Add(fColorMenuField->CreateMenuBarLayoutItem(), 0.0f)
 				.AddGlue()
 				.End()
-			.Add(fWidthMenu->CreateLabelLayoutItem(), 0, 1)
+			.Add(fWidthMenuField->CreateLabelLayoutItem(), 0, 1)
 			.AddGroup(B_HORIZONTAL, 0.0f, 1, 1)
-				.Add(fWidthMenu->CreateMenuBarLayoutItem(), 0.0f)
+				.Add(fWidthMenuField->CreateMenuBarLayoutItem(), 0.0f)
 				.AddGlue()
 				.End()
-			.Add(fBorderMenu->CreateLabelLayoutItem(), 0, 2)
+			.Add(fBorderMenuField->CreateLabelLayoutItem(), 0, 2)
 			.AddGroup(B_HORIZONTAL, 0.0f, 1, 2)
-				.Add(fBorderMenu->CreateMenuBarLayoutItem(), 0.0f)
+				.Add(fBorderMenuField->CreateMenuBarLayoutItem(), 0.0f)
 				.AddGlue()
 				.End()
 			.Add(fMotionCheck, 1, 3)
@@ -597,9 +610,9 @@ SettingsView::SettingsView(BRect frame)
 void
 SettingsView::AttachedToWindow()
 {
-	fWidthMenu->Menu()->SetTargetForItems(this);
-	fColorMenu->Menu()->SetTargetForItems(this);
-	fBorderMenu->Menu()->SetTargetForItems(this);
+	fWidthMenuField->Menu()->SetTargetForItems(this);
+	fColorMenuField->Menu()->SetTargetForItems(this);
+	fBorderMenuField->Menu()->SetTargetForItems(this);
 	fMotionCheck->SetTarget(this);
 	fSpeedSlider->SetTarget(this);
 	fFramesSlider->SetTarget(this);
