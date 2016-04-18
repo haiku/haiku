@@ -4,6 +4,8 @@ SetSubDirSupportedPlatformsBeOSCompatible ;
 
 AddResources Spider : Spider.rdef ;
 
+UsePrivateHeaders interface ;
+
 ScreenSaver Spider :
 	Polygon.cpp
 	PolygonQueue.cpp

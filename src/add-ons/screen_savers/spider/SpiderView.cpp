@@ -10,11 +10,11 @@
 #include "SpiderView.h"
 
 #include <Catalog.h>
+#include <ColorMenuItem.h>
 #include <ControlLook.h>
-#include <Message.h>
-#include <Menu.h>
 #include <MenuField.h>
-#include <MenuItem.h>
+#include <Message.h>
+#include <PopUpMenu.h>
 #include <Slider.h>
 #include <StringView.h>
 
@@ -105,64 +105,68 @@ SpiderView::SpiderView(BRect frame, SpiderSaver* saver, uint32 queueNumber,
 	AddChild(fQueueDepthSlider);
 
 	// color menu field
-	BMenu* menu = new BMenu(B_TRANSLATE("Color"));
-	BMenuItem* item;
+	BPopUpMenu* menu = new BPopUpMenu(B_TRANSLATE("Color"));
+	BColorMenuItem* item;
 	BMessage* message;
 
 	// red
 	message = new BMessage(kMsgColor);
 	message->AddInt32("color", RED);
-	item = new BMenuItem(B_TRANSLATE("Red"), message);
+	item = new BColorMenuItem(B_TRANSLATE("Red"), message,
+		(rgb_color){ 255, 65, 54 });
 	item->SetMarked(color == RED);
 	menu->AddItem(item);
 
 	// green
 	message = new BMessage(kMsgColor);
 	message->AddInt32("color", GREEN);
-	item = new BMenuItem(B_TRANSLATE("Green"), message);
+	item = new BColorMenuItem(B_TRANSLATE("Green"), message,
+		(rgb_color){ 46, 204, 64 });
 	item->SetMarked(color == GREEN);
 	menu->AddItem(item);
 
 	// blue
 	message = new BMessage(kMsgColor);
 	message->AddInt32("color", BLUE);
-	item = new BMenuItem(B_TRANSLATE("Blue"), message);
+	item = new BColorMenuItem(B_TRANSLATE("Blue"), message,
+		(rgb_color){ 0, 116, 217 });
 	item->SetMarked(color == BLUE);
 	menu->AddItem(item);
 
 	// yellow
 	message = new BMessage(kMsgColor);
 	message->AddInt32("color", YELLOW);
-	item = new BMenuItem(B_TRANSLATE("Yellow"), message);
+	item = new BColorMenuItem(B_TRANSLATE("Yellow"), message,
+		(rgb_color){ 255, 220, 0 });
 	item->SetMarked(color == YELLOW);
 	menu->AddItem(item);
 
 	// purple
 	message = new BMessage(kMsgColor);
 	message->AddInt32("color", PURPLE);
-	item = new BMenuItem(B_TRANSLATE("Purple"), message);
+	item = new BColorMenuItem(B_TRANSLATE("Purple"), message,
+		(rgb_color){ 177, 13, 201 });
 	item->SetMarked(color == PURPLE);
 	menu->AddItem(item);
 
 	// cyan
 	message = new BMessage(kMsgColor);
 	message->AddInt32("color", CYAN);
-	item = new BMenuItem(B_TRANSLATE("Cyan"), message);
+	item = new BColorMenuItem(B_TRANSLATE("Cyan"), message,
+		(rgb_color){ 127, 219, 255 });
 	item->SetMarked(color == CYAN);
 	menu->AddItem(item);
 
 	// gray
 	message = new BMessage(kMsgColor);
 	message->AddInt32("color", GRAY);
-	item = new BMenuItem(B_TRANSLATE("Gray"), message);
+	item = new BColorMenuItem(B_TRANSLATE("Gray"), message,
+		(rgb_color){ 170, 170, 170 });
 	item->SetMarked(color == GRAY);
 	menu->AddItem(item);
 
-	menu->SetLabelFromMarked(true);
-	menu->SetRadioMode(true);
-
 	frame.OffsetBy(0.0f, viewHeight);
-	fColorMenuField = new BMenuField(frame, "color", B_TRANSLATE("Color"),
+	fColorMenuField = new BMenuField( frame, "color", B_TRANSLATE("Color"),
 		menu);
 	fColorMenuField->SetDivider(fColorMenuField->StringWidth(
 		B_TRANSLATE("Color")) + be_control_look->DefaultItemSpacing());
