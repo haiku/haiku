@@ -46,6 +46,7 @@ public:
 			BRect				Padding() const;
 			void				GetItemMargins(float*, float*, float*, float*)
 									const;
+			void				SetItemMargins(float, float, float, float);
 
 			int					State(BMenuItem** item = NULL) const;
 

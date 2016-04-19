@@ -161,6 +161,13 @@ MenuPrivate::GetItemMargins(float* left, float* top, float* right,
 }
 
 
+void
+MenuPrivate::SetItemMargins(float left, float top, float right, float bottom)
+{
+	fMenu->SetItemMargins(left, top, right, bottom);
+}
+
+
 int
 MenuPrivate::State(BMenuItem** item) const
 {
