@@ -2383,6 +2383,13 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 	// When added to a BMenuField, a BPopUpMenu is the child of
 	// a _BMCMenuBar_ to "fake" the menu hierarchy
 	bool inMenuField = dynamic_cast<_BMCMenuBar_*>(superMenu) != NULL;
+
+	// Offset the menu field menu window left by the width of the checkmark
+	// so that the text when the menu is closed lines up with the text when
+	// the menu is open.
+	if (inMenuField)
+		frame.OffsetBy(-8.0f, 0.0f);
+
 	bool scroll = false;
 	if (superMenu == NULL || superItem == NULL || inMenuField) {
 		// just move the window on screen
