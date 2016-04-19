@@ -223,7 +223,7 @@ private:
 			BRect				_CalcFrame(BPoint where, bool* scrollOn);
 
 protected:
-			void				_DrawItems(BRect updateRect);
+			void				DrawItems(BRect updateRect);
 
 private:
 			bool				_OverSuper(BPoint loc);

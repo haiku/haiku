@@ -206,7 +206,7 @@ _BMCMenuBar_::Draw(BRect updateRect)
 	be_control_look->DrawMenuFieldBackground(this, rect,
 		updateRect, base, fShowPopUpMarker, flags);
 
-	_DrawItems(updateRect);
+	DrawItems(updateRect);
 }
 
 

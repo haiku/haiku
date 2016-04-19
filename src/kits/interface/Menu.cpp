@@ -427,7 +427,7 @@ BMenu::Draw(BRect updateRect)
 	}
 
 	DrawBackground(updateRect);
-	_DrawItems(updateRect);
+	DrawItems(updateRect);
 }
 
 
@@ -2436,7 +2436,7 @@ BMenu::_CalcFrame(BPoint where, bool* scrollOn)
 
 
 void
-BMenu::_DrawItems(BRect updateRect)
+BMenu::DrawItems(BRect updateRect)
 {
 	int32 itemCount = fItems.CountItems();
 	for (int32 i = 0; i < itemCount; i++) {

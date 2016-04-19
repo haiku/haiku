@@ -289,7 +289,7 @@ BMenuBar::Draw(BRect updateRect)
 	be_control_look->DrawMenuBarBackground(this, rect, updateRect, base,
 		0, fBorders);
 
-	_DrawItems(updateRect);
+	DrawItems(updateRect);
 }
 
 
