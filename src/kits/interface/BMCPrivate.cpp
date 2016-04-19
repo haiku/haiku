@@ -39,9 +39,9 @@ public:
 
 
 _BMCItem_::_BMCItem_(BMessage* data)
-	: BMenuItem(data)
+	:
+	BMenuItem(data)
 {
-
 }
 
 
@@ -255,7 +255,8 @@ _BMCMenuBar_::MessageReceived(BMessage* message)
 		{
 			BMenuItem* item = ItemAt(0);
 
-			if (item && item->Submenu() &&  item->Submenu()->Window()) {
+			if (item != NULL && item->Submenu() != NULL
+				&& item->Submenu()->Window() != NULL) {
 				BMessage message(B_KEY_DOWN);
 
 				message.AddInt8("byte", B_ESCAPE);

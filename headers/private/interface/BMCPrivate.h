@@ -70,4 +70,5 @@ private:
 			float				fPreviousWidth;
 };
 
+
 #endif // _BMC_PRIVATE_H

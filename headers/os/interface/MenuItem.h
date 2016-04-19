@@ -4,16 +4,16 @@
  */
 #ifndef _MENU_ITEM_H
 #define _MENU_ITEM_H
- 
+
 
 #include <Archivable.h>
 #include <InterfaceDefs.h>
 #include <Invoker.h>
 #include <Menu.h>
 
+
 class BMessage;
 class BWindow;
-
 
 class BMenuItem : public BArchivable, public BInvoker {
 public:

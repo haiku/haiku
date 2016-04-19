@@ -297,9 +297,9 @@ BMenuBar::Draw(BRect updateRect)
 
 
 void
-BMenuBar::MessageReceived(BMessage* msg)
+BMenuBar::MessageReceived(BMessage* message)
 {
-	BMenu::MessageReceived(msg);
+	BMenu::MessageReceived(message);
 }
 
 
@@ -460,7 +460,7 @@ void BMenuBar::_ReservedMenuBar3() {}
 void BMenuBar::_ReservedMenuBar4() {}
 
 
-BMenuBar &
+BMenuBar&
 BMenuBar::operator=(const BMenuBar &)
 {
 	return *this;
@@ -743,7 +743,7 @@ BMenuBar::_InitData(menu_layout layout)
 {
 	fBorders = BControlLook::B_ALL_BORDERS;
 	fLastBounds = new BRect(Bounds());
-	SetItemMargins(8, 2, 8, 2);
+	SetItemMargins(8.0f, 2.0f, 8.0f, 2.0f);
 	_SetIgnoreHidden(true);
 	SetLowUIColor(B_MENU_BACKGROUND_COLOR);
 	SetViewColor(B_TRANSPARENT_COLOR);

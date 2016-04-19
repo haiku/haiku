@@ -500,8 +500,8 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 						// If we're at the top menu below the menu bar, pass
 						// the keypress to the menu bar so we can move to
 						// another top level menu.
-						BMessenger msgr(Supermenu());
-						msgr.SendMessage(Window()->CurrentMessage());
+						BMessenger messenger(Supermenu());
+						messenger.SendMessage(Window()->CurrentMessage());
 					} else {
 						// tell _Track
 						fState = MENU_STATE_KEY_LEAVE_SUBMENU;
@@ -526,8 +526,8 @@ BMenu::KeyDown(const char* bytes, int32 numBytes)
 					// item in the top menu below the menubar,
 					// pass the keypress to the menubar
 					// so you can use the keypress to switch menus.
-					BMessenger msgr(Supermenu());
-					msgr.SendMessage(Window()->CurrentMessage());
+					BMessenger messenger(Supermenu());
+					messenger.SendMessage(Window()->CurrentMessage());
 				}
 			}
 			break;
@@ -704,7 +704,7 @@ BMenu::AddItem(BMenuItem* item, int32 index)
 			"be called if the menu layout is not B_ITEMS_IN_MATRIX");
 	}
 
-	if (!item || !_AddItem(item, index))
+	if (item == NULL || !_AddItem(item, index))
 		return false;
 
 	InvalidateLayout();
@@ -2604,7 +2604,7 @@ BMenu::_ItemMarked(BMenuItem* item)
 		}
 	}
 
-	if (IsLabelFromMarked() && Superitem())
+	if (IsLabelFromMarked() && Superitem() != NULL)
 		Superitem()->SetLabel(item->Label());
 }
 
@@ -2712,27 +2712,20 @@ BMenu::_NextItem(BMenuItem* item, bool forward) const
 
 
 void
-BMenu::_SetIgnoreHidden(bool on)
+BMenu::_SetStickyMode(bool sticky)
 {
-	fIgnoreHidden = on;
-}
-
-
-void
-BMenu::_SetStickyMode(bool on)
-{
-	if (fStickyMode == on)
+	if (fStickyMode == sticky)
 		return;
 
-	fStickyMode = on;
+	fStickyMode = sticky;
 
 	if (fSuper != NULL) {
 		// propagate the status to the super menu
-		fSuper->_SetStickyMode(on);
+		fSuper->_SetStickyMode(sticky);
 	} else {
 		// TODO: Ugly hack, but it needs to be done in this method
 		BMenuBar* menuBar = dynamic_cast<BMenuBar*>(this);
-		if (on && menuBar != NULL && menuBar->LockLooper()) {
+		if (sticky && menuBar != NULL && menuBar->LockLooper()) {
 			// If we are switching to sticky mode,
 			// steal the focus from the current focus view
 			// (needed to handle keyboard navigation)
@@ -2938,7 +2931,7 @@ BMenu::_UpdateWindowViewSize(const bool &move)
 	} else {
 		_CacheFontInfo();
 		window->ResizeTo(StringWidth(BPrivate::kEmptyMenuLabel)
-			+ fPad.left + fPad.right,
+				+ fPad.left + fPad.right,
 			fFontHeight + fPad.top + fPad.bottom);
 	}
 

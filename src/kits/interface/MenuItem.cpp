@@ -27,11 +27,12 @@
 #include "utf8_functions.h"
 
 
-const float kLightBGTint = (B_LIGHTEN_1_TINT + B_LIGHTEN_1_TINT + B_NO_TINT) / 3.0;
+const float kLightBGTint
+	= (B_LIGHTEN_1_TINT + B_LIGHTEN_1_TINT + B_NO_TINT) / 3.0;
 
 // map control key shortcuts to drawable Unicode characters
 // cf. http://unicode.org/charts/PDF/U2190.pdf
-const char *kUTF8ControlMap[] = {
+const char* kUTF8ControlMap[] = {
 	NULL,
 	"\xe2\x86\xb8", /* B_HOME U+21B8 */
 	NULL, NULL,
@@ -52,6 +53,7 @@ const char *kUTF8ControlMap[] = {
 	"\xe2\x86\x91", /* B_UP_ARROW */
 	"\xe2\x86\x93", /* B_DOWN_ARROW */
 };
+
 
 using BPrivate::MenuPrivate;
 
@@ -86,7 +88,7 @@ BMenuItem::BMenuItem(BMessage* data)
 	_InitData();
 
 	if (data->HasString("_label")) {
-		const char *string;
+		const char* string;
 
 		data->FindString("_label", &string);
 		SetLabel(string);
@@ -114,16 +116,16 @@ BMenuItem::BMenuItem(BMessage* data)
 	}
 
 	if (data->HasMessage("_msg")) {
-		BMessage *msg = new BMessage;
-		data->FindMessage("_msg", msg);
-		SetMessage(msg);
+		BMessage* message = new BMessage;
+		data->FindMessage("_msg", message);
+		SetMessage(message);
 	}
 
 	BMessage subMessage;
 	if (data->FindMessage("_submenu", &subMessage) == B_OK) {
 		BArchivable* object = instantiate_object(&subMessage);
 		if (object != NULL) {
-			BMenu* menu = dynamic_cast<BMenu *>(object);
+			BMenu* menu = dynamic_cast<BMenu*>(object);
 			if (menu != NULL)
 				_InitMenuData(menu);
 		}
@@ -144,36 +146,36 @@ BMenuItem::Instantiate(BMessage* data)
 status_t
 BMenuItem::Archive(BMessage* data, bool deep) const
 {
-	status_t ret = BArchivable::Archive(data, deep);
+	status_t status = BArchivable::Archive(data, deep);
 
-	if (ret == B_OK && fLabel)
-		ret = data->AddString("_label", Label());
+	if (status == B_OK && fLabel)
+		status = data->AddString("_label", Label());
 
-	if (ret == B_OK && !IsEnabled())
-		ret = data->AddBool("_disable", true);
+	if (status == B_OK && !IsEnabled())
+		status = data->AddBool("_disable", true);
 
-	if (ret == B_OK && IsMarked())
-		ret = data->AddBool("_marked", true);
+	if (status == B_OK && IsMarked())
+		status = data->AddBool("_marked", true);
 
-	if (ret == B_OK && fUserTrigger)
-		ret = data->AddInt32("_user_trig", fUserTrigger);
+	if (status == B_OK && fUserTrigger)
+		status = data->AddInt32("_user_trig", fUserTrigger);
 
-	if (ret == B_OK && fShortcutChar) {
-		ret = data->AddInt32("_shortcut", fShortcutChar);
-		if (ret == B_OK)
-			ret = data->AddInt32("_mods", fModifiers);
+	if (status == B_OK && fShortcutChar) {
+		status = data->AddInt32("_shortcut", fShortcutChar);
+		if (status == B_OK)
+			status = data->AddInt32("_mods", fModifiers);
 	}
 
-	if (ret == B_OK && Message())
-		ret = data->AddMessage("_msg", Message());
+	if (status == B_OK && Message() != NULL)
+		status = data->AddMessage("_msg", Message());
 
-	if (ret == B_OK && deep && fSubmenu) {
+	if (status == B_OK && deep && fSubmenu) {
 		BMessage submenu;
 		if (fSubmenu->Archive(&submenu, true) == B_OK)
-			ret = data->AddMessage("_submenu", &submenu);
+			status = data->AddMessage("_submenu", &submenu);
 	}
 
-	return ret;
+	return status;
 }
 
 
@@ -488,7 +490,7 @@ BMenuItem::Draw()
 		if (fShortcutChar)
 			_DrawShortcutSymbol();
 
-		if (Submenu())
+		if (Submenu() != NULL)
 			_DrawSubmenuSymbol();
 	}
 
