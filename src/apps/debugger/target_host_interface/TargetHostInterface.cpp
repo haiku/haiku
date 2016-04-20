@@ -36,6 +36,7 @@ TeamDebuggerOptions::TeamDebuggerOptions()
 TargetHostInterface::TargetHostInterface()
 	:
 	BLooper(),
+	fListeners(),
 	fTeamDebuggers(20, false)
 {
 }
@@ -43,6 +44,10 @@ TargetHostInterface::TargetHostInterface()
 
 TargetHostInterface::~TargetHostInterface()
 {
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->TargetHostInterfaceQuit(this);
+	}
 }
 
 
@@ -125,6 +130,22 @@ TargetHostInterface::RemoveTeamDebugger(TeamDebugger* debugger)
 
 
 void
+TargetHostInterface::AddListener(Listener* listener)
+{
+	AutoLocker<TargetHostInterface> interfaceLocker(this);
+	fListeners.Add(listener);
+}
+
+
+void
+TargetHostInterface::RemoveListener(Listener* listener)
+{
+	AutoLocker<TargetHostInterface> interfaceLocker(this);
+	fListeners.Remove(listener);
+}
+
+
+void
 TargetHostInterface::Quit()
 {
 	if (fTeamDebuggers.CountItems() == 0)
@@ -172,6 +193,7 @@ TargetHostInterface::TeamDebuggerStarted(TeamDebugger* debugger)
 {
 	AutoLocker<TargetHostInterface> locker(this);
 	AddTeamDebugger(debugger);
+	_NotifyTeamDebuggerStarted(debugger);
 }
 
 
@@ -189,9 +211,9 @@ TargetHostInterface::TeamDebuggerQuit(TeamDebugger* debugger)
 {
 	AutoLocker<TargetHostInterface> interfaceLocker(this);
 	RemoveTeamDebugger(debugger);
-	interfaceLocker.Unlock();
 
 	if (debugger->Thread() >= 0) {
+		_NotifyTeamDebuggerQuit(debugger);
 		BMessage message(MSG_TEAM_DEBUGGER_QUIT);
 		message.AddInt32("thread", debugger->Thread());
 		PostMessage(&message);
@@ -251,6 +273,26 @@ TargetHostInterface::_StartTeamDebugger(team_id teamID,
 }
 
 
+void
+TargetHostInterface::_NotifyTeamDebuggerStarted(TeamDebugger* debugger)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->TeamDebuggerStarted(debugger);
+	}
+}
+
+
+void
+TargetHostInterface::_NotifyTeamDebuggerQuit(TeamDebugger* debugger)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->TeamDebuggerQuit(debugger);
+	}
+}
+
+
 /*static*/ int
 TargetHostInterface::_CompareDebuggers(const TeamDebugger* a,
 	const TeamDebugger* b)
@@ -268,4 +310,31 @@ TargetHostInterface::_FindDebuggerByKey(const team_id* team,
 	else if (*team > debugger->TeamID())
 		return 1;
 	return 0;
+}
+
+
+// #pragma mark - TargetHostInterface::Listener
+
+
+TargetHostInterface::Listener::~Listener()
+{
+}
+
+
+void
+TargetHostInterface::Listener::TeamDebuggerStarted(TeamDebugger* debugger)
+{
+}
+
+
+void
+TargetHostInterface::Listener::TeamDebuggerQuit(TeamDebugger* debugger)
+{
+}
+
+
+void
+TargetHostInterface::Listener::TargetHostInterfaceQuit(
+	TargetHostInterface* interface)
+{
 }

@@ -10,6 +10,8 @@
 
 #include <ObjectList.h>
 
+#include <util/DoublyLinkedList.h>
+
 #include "TeamDebugger.h"
 
 
@@ -17,13 +19,13 @@ class DebuggerInterface;
 class Settings;
 class SettingsManager;
 class TargetHost;
-class TeamDebugger;
 struct TeamDebuggerOptions;
 class UserInterface;
 
 
 class TargetHostInterface : public BLooper, private TeamDebugger::Listener {
 public:
+	class Listener;
 								TargetHostInterface();
 	virtual						~TargetHostInterface();
 
@@ -52,6 +54,10 @@ public:
 	virtual	status_t			FindTeamByThread(thread_id thread,
 									team_id& _teamID) const = 0;
 
+
+			void				AddListener(Listener* listener);
+			void				RemoveListener(Listener* listener);
+
 	// BLooper
 	virtual	void				Quit();
 	virtual	void				MessageReceived(BMessage* message);
@@ -67,15 +73,34 @@ private:
 			status_t			_StartTeamDebugger(team_id teamID,
 									const TeamDebuggerOptions& options,
 									bool stopInMain);
+
+			void				_NotifyTeamDebuggerStarted(
+									TeamDebugger* debugger);
+			void				_NotifyTeamDebuggerQuit(
+									TeamDebugger* debugger);
+
 	static	int					_CompareDebuggers(const TeamDebugger* a,
 									const TeamDebugger* b);
 	static	int					_FindDebuggerByKey(const team_id* team,
 									const TeamDebugger* debugger);
 private:
+			typedef DoublyLinkedList<Listener> ListenerList;
 			typedef BObjectList<TeamDebugger> TeamDebuggerList;
 
 private:
+			ListenerList		fListeners;
 			TeamDebuggerList	fTeamDebuggers;
+};
+
+
+class TargetHostInterface::Listener
+	: public DoublyLinkedListLinkImpl<Listener> {
+public:
+	virtual						~Listener();
+	virtual	void				TeamDebuggerStarted(TeamDebugger* debugger);
+	virtual	void				TeamDebuggerQuit(TeamDebugger* debugger);
+	virtual	void				TargetHostInterfaceQuit(
+									TargetHostInterface* interface);
 };
 
 
