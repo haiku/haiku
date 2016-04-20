@@ -16,16 +16,20 @@ public:
 	virtual	status_t			Init(Settings* settings);
 	virtual	void				Close();
 
+	virtual	bool				IsLocal() const;
 	virtual	bool				Connected() const;
 
 	virtual	TargetHost*			GetTargetHost();
 
 	virtual	status_t			Attach(team_id id, thread_id threadID,
-									DebuggerInterface*& _interface);
+									DebuggerInterface*& _interface) const;
 
 	virtual	status_t			CreateTeam(int commandLineArgc,
 									const char* const* arguments,
-									DebuggerInterface*& _interface);
+									team_id& _teamID) const;
+	virtual	status_t			FindTeamByThread(thread_id thread,
+									team_id& _teamID) const;
+
 
 private:
 	static	status_t			_PortLoop(void* arg);

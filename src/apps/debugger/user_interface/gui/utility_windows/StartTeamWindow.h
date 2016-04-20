@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef START_TEAM_WINDOW_H
@@ -13,16 +13,18 @@ class BButton;
 class BFilePanel;
 class BStringView;
 class BTextControl;
+class TargetHostInterface;
 
 
 class StartTeamWindow : public BWindow
 {
 public:
-								StartTeamWindow();
+								StartTeamWindow(
+									TargetHostInterface* hostInterface);
 
 								~StartTeamWindow();
 
-	static	StartTeamWindow*	Create();
+	static	StartTeamWindow*	Create(TargetHostInterface* hostInterface);
 									// throws
 
 
@@ -42,6 +44,7 @@ private:
 			BFilePanel*			fBrowseTeamPanel;
 			BButton*			fStartButton;
 			BButton*			fCancelButton;
+			TargetHostInterface* fTargetHostInterface;
 };
 
 #endif // START_TEAM_WINDOW_H

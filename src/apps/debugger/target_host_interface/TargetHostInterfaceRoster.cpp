@@ -130,12 +130,13 @@ TargetHostInterfaceRoster::CreateInterface(TargetHostInterfaceInfo* info,
 	if (error != B_OK)
 		return error;
 
-	BReference<TargetHostInterface> interfaceReference(interface, true);
-	if (!fActiveInterfaces.AddItem(interface))
+	error = interface->Run();
+	if (error < B_OK || !fActiveInterfaces.AddItem(interface)) {
+		delete interface;
 		return B_NO_MEMORY;
+	}
 
 	_interface = interface;
-	interfaceReference.Detach();
 	return B_OK;
 }
 
@@ -153,3 +154,15 @@ TargetHostInterfaceRoster::ActiveInterfaceAt(int32 index) const
 	return fActiveInterfaces.ItemAt(index);
 }
 
+
+int32
+TargetHostInterfaceRoster::CountRunningTeamDebuggers() const
+{
+	int32 total = 0;
+	for (int32 i = 0; TargetHostInterface* interface = ActiveInterfaceAt(i);
+		i++) {
+		total += interface->CountTeamDebuggers();
+	}
+
+	return total;
+}

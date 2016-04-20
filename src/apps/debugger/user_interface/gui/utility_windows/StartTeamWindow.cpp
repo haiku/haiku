@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #include "StartTeamWindow.h"
@@ -24,7 +24,7 @@ enum {
 };
 
 
-StartTeamWindow::StartTeamWindow()
+StartTeamWindow::StartTeamWindow(TargetHostInterface* hostInterface)
 	:
 	BWindow(BRect(), "Start new team", B_TITLED_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
@@ -34,7 +34,8 @@ StartTeamWindow::StartTeamWindow()
 	fBrowseTeamButton(NULL),
 	fBrowseTeamPanel(NULL),
 	fStartButton(NULL),
-	fCancelButton(NULL)
+	fCancelButton(NULL),
+	fTargetHostInterface(hostInterface)
 {
 }
 
@@ -46,9 +47,9 @@ StartTeamWindow::~StartTeamWindow()
 
 
 StartTeamWindow*
-StartTeamWindow::Create()
+StartTeamWindow::Create(TargetHostInterface* hostInterface)
 {
-	StartTeamWindow* self = new StartTeamWindow;
+	StartTeamWindow* self = new StartTeamWindow(hostInterface);
 
 	try {
 		self->_Init();
@@ -141,6 +142,7 @@ StartTeamWindow::MessageReceived(BMessage* message)
 			appMessage.AddString("path", fTeamTextControl->TextView()->Text());
 			appMessage.AddString("arguments", fArgumentsTextControl->TextView()
 					->Text());
+			appMessage.AddPointer("interface", fTargetHostInterface);
 			BMessage reply;
 			be_app_messenger.SendMessage(&appMessage, &reply);
 			status_t error = reply.FindInt32("status");

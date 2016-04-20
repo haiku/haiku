@@ -6,26 +6,28 @@
 #define TARGET_HOST_INTERFACE_H
 
 #include <OS.h>
-#include <String.h>
+#include <Looper.h>
 
 #include <ObjectList.h>
-#include <Referenceable.h>
+
+#include "TeamDebugger.h"
 
 
 class DebuggerInterface;
 class Settings;
+class SettingsManager;
 class TargetHost;
 class TeamDebugger;
+struct TeamDebuggerOptions;
+class UserInterface;
 
 
-class TargetHostInterface : public BReferenceable {
+class TargetHostInterface : public BLooper, private TeamDebugger::Listener {
 public:
 								TargetHostInterface();
 	virtual						~TargetHostInterface();
 
-			const BString&		Name() const { return fName; }
-			void				SetName(const BString& name);
-
+			status_t			StartTeamDebugger(const TeamDebuggerOptions& options);
 
 			int32				CountTeamDebuggers() const;
 			TeamDebugger*		TeamDebuggerAt(int32 index) const;
@@ -36,18 +38,35 @@ public:
 	virtual	status_t			Init(Settings* settings) = 0;
 	virtual	void				Close() = 0;
 
+	virtual	bool				IsLocal() const = 0;
 	virtual	bool				Connected() const = 0;
 
 	virtual	TargetHost*			GetTargetHost() = 0;
 
 	virtual	status_t			Attach(team_id id, thread_id threadID,
-									DebuggerInterface*& _interface) = 0;
+									DebuggerInterface*& _interface) const = 0;
 
 	virtual	status_t			CreateTeam(int commandLineArgc,
 									const char* const* arguments,
-									DebuggerInterface*& _interface) = 0;
+									team_id& _teamID) const = 0;
+	virtual	status_t			FindTeamByThread(thread_id thread,
+									team_id& _teamID) const = 0;
+
+	// BLooper
+	virtual	void				Quit();
+	virtual	void				MessageReceived(BMessage* message);
 
 private:
+	// TeamDebugger::Listener
+	virtual void 				TeamDebuggerStarted(TeamDebugger* debugger);
+	virtual	void				TeamDebuggerRestartRequested(
+									TeamDebugger* debugger);
+	virtual void 				TeamDebuggerQuit(TeamDebugger* debugger);
+
+private:
+			status_t			_StartTeamDebugger(team_id teamID,
+									const TeamDebuggerOptions& options,
+									bool stopInMain);
 	static	int					_CompareDebuggers(const TeamDebugger* a,
 									const TeamDebugger* b);
 	static	int					_FindDebuggerByKey(const team_id* team,
@@ -56,8 +75,18 @@ private:
 			typedef BObjectList<TeamDebugger> TeamDebuggerList;
 
 private:
-			BString				fName;
 			TeamDebuggerList	fTeamDebuggers;
+};
+
+
+struct TeamDebuggerOptions {
+						TeamDebuggerOptions();
+	int					commandLineArgc;
+	const char* const*	commandLineArgv;
+	team_id				team;
+	thread_id			thread;
+	SettingsManager*	settingsManager;
+	UserInterface*		userInterface;
 };
 
 

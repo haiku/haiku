@@ -279,7 +279,6 @@ TeamsListView::TeamsListView(const char* name, team_id currentTeam,
 	fCurrentTeam(currentTeam),
 	fInterface(interface)
 {
-	fInterface->AcquireReference();
 	AddColumn(new TeamsColumn("Name", 400, 100, 600,
 		B_TRUNCATE_BEGINNING), kNameColumn);
 	AddColumn(new TeamsColumn("ID", 80, 40, 100,
@@ -290,7 +289,6 @@ TeamsListView::TeamsListView(const char* name, team_id currentTeam,
 
 TeamsListView::~TeamsListView()
 {
-	fInterface->ReleaseReference();
 }
 
 

@@ -55,6 +55,8 @@ public:
 									{ return fCommandLineArgc; }
 			const char**		Arguments() const
 									{ return fCommandLineArgv; }
+			SettingsManager*	GetSettingsManager() const
+									{ return fSettingsManager; }
 
 	virtual	void				MessageReceived(BMessage* message);
 

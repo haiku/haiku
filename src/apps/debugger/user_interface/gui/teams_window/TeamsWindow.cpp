@@ -24,7 +24,8 @@
 
 #include "MessageCodes.h"
 #include "SettingsManager.h"
-#include "LocalTargetHostInterface.h"
+#include "TargetHostInterface.h"
+#include "TargetHostInterfaceRoster.h"
 #include "TeamsListView.h"
 
 
@@ -51,8 +52,6 @@ TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 
 TeamsWindow::~TeamsWindow()
 {
-	if (fTargetHostInterface != NULL)
-		fTargetHostInterface->ReleaseReference();
 }
 
 
@@ -100,6 +99,7 @@ TeamsWindow::MessageReceived(BMessage* message)
 			if (row != NULL) {
 				BMessage message(MSG_DEBUG_THIS_TEAM);
 				message.AddInt32("team", row->TeamID());
+				message.AddPointer("interface", fTargetHostInterface);
 				be_app_messenger.SendMessage(&message);
 			}
 			break;
@@ -117,6 +117,14 @@ TeamsWindow::MessageReceived(BMessage* message)
 			}
 
 			fAttachTeamButton->SetEnabled(enabled);
+			break;
+		}
+
+		case MSG_SHOW_START_TEAM_WINDOW:
+		{
+			BMessage startMessage(*message);
+			startMessage.AddPointer("interface", fTargetHostInterface);
+			be_app_messenger.SendMessage(&startMessage);
 			break;
 		}
 
@@ -146,10 +154,8 @@ TeamsWindow::_Init()
 	BMessage settings;
 	_LoadSettings(settings);
 
-	fTargetHostInterface = new LocalTargetHostInterface();
-
-	if (fTargetHostInterface->Init(NULL) != B_OK)
-		throw std::bad_alloc();
+	fTargetHostInterface = TargetHostInterfaceRoster::Default()
+		->ActiveInterfaceAt(0);
 
 	BRect frame;
 	if (settings.FindRect("teams window frame", &frame) == B_OK) {
@@ -175,7 +181,7 @@ TeamsWindow::_Init()
 			MSG_TEAM_SELECTION_CHANGED));
 
 	fAttachTeamButton->SetEnabled(false);
-	fCreateTeamButton->SetTarget(be_app);
+	fCreateTeamButton->SetTarget(this);
 }
 
 

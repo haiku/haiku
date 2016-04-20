@@ -5,12 +5,37 @@
 
 #include "TargetHostInterface.h"
 
+#include <stdio.h>
+
+#include <AutoLocker.h>
+
+#include "DebuggerInterface.h"
+#include "GraphicalUserInterface.h"
+#include "MessageCodes.h"
 #include "TeamDebugger.h"
+
+
+// #pragma mark - TeamDebuggerOptions
+
+
+TeamDebuggerOptions::TeamDebuggerOptions()
+	:
+	commandLineArgc(0),
+	commandLineArgv(NULL),
+	team(-1),
+	thread(-1),
+	settingsManager(NULL),
+	userInterface(NULL)
+{
+}
+
+
+// #pragma mark - TargetHostInterface
 
 
 TargetHostInterface::TargetHostInterface()
 	:
-	BReferenceable(),
+	BLooper(),
 	fTeamDebuggers(20, false)
 {
 }
@@ -21,10 +46,40 @@ TargetHostInterface::~TargetHostInterface()
 }
 
 
-void
-TargetHostInterface::SetName(const BString& name)
+status_t
+TargetHostInterface::StartTeamDebugger(const TeamDebuggerOptions& options)
 {
-	fName = name;
+	// we only want to stop in main for teams we're responsible for
+	// creating ourselves.
+	bool stopInMain = options.commandLineArgv != NULL;
+	team_id team = options.team;
+	thread_id thread = options.thread;
+
+	AutoLocker<TargetHostInterface> interfaceLocker(this);
+	if (options.commandLineArgc > 0) {
+		status_t error = CreateTeam(options.commandLineArgc,
+			options.commandLineArgv, team);
+		if (error != B_OK)
+			return error;
+		thread = team;
+	}
+
+	if (team < 0 && thread < 0)
+		return B_BAD_VALUE;
+
+	if (team < 0) {
+		status_t error = FindTeamByThread(thread, team);
+		if (error != B_OK)
+			return error;
+	}
+
+	TeamDebugger* debugger = FindTeamDebugger(team);
+	if (debugger != NULL) {
+		debugger->Activate();
+		return B_OK;
+	}
+
+	return _StartTeamDebugger(team, options, stopInMain);
 }
 
 
@@ -66,6 +121,133 @@ TargetHostInterface::RemoveTeamDebugger(TeamDebugger* debugger)
 		&_FindDebuggerByKey);
 	if (index >= 0)
 		fTeamDebuggers.RemoveItemAt(index);
+}
+
+
+void
+TargetHostInterface::Quit()
+{
+	if (fTeamDebuggers.CountItems() == 0)
+		BLooper::Quit();
+}
+
+
+void
+TargetHostInterface::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+	case MSG_TEAM_DEBUGGER_QUIT:
+	{
+		thread_id thread;
+		if (message->FindInt32("thread", &thread) == B_OK)
+			wait_for_thread(thread, NULL);
+		break;
+	}
+	case MSG_TEAM_RESTART_REQUESTED:
+	{
+		int32 teamID;
+		if (message->FindInt32("team", &teamID) != B_OK)
+			break;
+
+		TeamDebugger* debugger = FindTeamDebugger(teamID);
+
+		TeamDebuggerOptions options;
+		options.commandLineArgc = debugger->ArgumentCount();
+		options.commandLineArgv = debugger->Arguments();
+		options.settingsManager = debugger->GetSettingsManager();
+		status_t result = StartTeamDebugger(options);
+		if (result == B_OK)
+			debugger->PostMessage(B_QUIT_REQUESTED);
+		break;
+	}
+	default:
+		BLooper::MessageReceived(message);
+		break;
+	}
+}
+
+
+void
+TargetHostInterface::TeamDebuggerStarted(TeamDebugger* debugger)
+{
+	AutoLocker<TargetHostInterface> locker(this);
+	AddTeamDebugger(debugger);
+}
+
+
+void
+TargetHostInterface::TeamDebuggerRestartRequested(TeamDebugger* debugger)
+{
+	BMessage message(MSG_TEAM_RESTART_REQUESTED);
+	message.AddInt32("team", debugger->TeamID());
+	PostMessage(&message);
+}
+
+
+void
+TargetHostInterface::TeamDebuggerQuit(TeamDebugger* debugger)
+{
+	AutoLocker<TargetHostInterface> interfaceLocker(this);
+	RemoveTeamDebugger(debugger);
+	interfaceLocker.Unlock();
+
+	if (debugger->Thread() >= 0) {
+		BMessage message(MSG_TEAM_DEBUGGER_QUIT);
+		message.AddInt32("thread", debugger->Thread());
+		PostMessage(&message);
+	}
+}
+
+
+status_t
+TargetHostInterface::_StartTeamDebugger(team_id teamID,
+	const TeamDebuggerOptions& options, bool stopInMain)
+{
+	BReference<UserInterface> userInterfaceReference;
+	UserInterface* userInterface = options.userInterface;
+	if (userInterface == NULL) {
+		userInterface = new(std::nothrow) GraphicalUserInterface;
+		if (userInterface == NULL) {
+			fprintf(stderr, "Error: Out of memory!\n");
+			return B_NO_MEMORY;
+		}
+
+		userInterfaceReference.SetTo(userInterface, true);
+	}
+
+	thread_id threadID = options.thread;
+	if (options.commandLineArgv != NULL)
+		threadID = teamID;
+
+	DebuggerInterface* interface = NULL;
+	TeamDebugger* debugger = NULL;
+	status_t error = Attach(teamID, options.thread, interface);
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Failed to attach to team %" B_PRId32 ": %s!\n",
+			teamID, strerror(error));
+		return error;
+	}
+
+	BReference<DebuggerInterface> debuggerInterfaceReference(interface,
+		true);
+	debugger = new(std::nothrow) TeamDebugger(this, userInterface,
+		options.settingsManager);
+	if (debugger != NULL) {
+		error = debugger->Init(interface, threadID,
+			options.commandLineArgc, options.commandLineArgv, stopInMain);
+	}
+
+	if (error != B_OK) {
+		printf("Error: debugger for team %" B_PRId32 " on interface %s failed"
+			" to init: %s!\n", interface->TeamID(), Name(), strerror(error));
+		delete debugger;
+		debugger = NULL;
+	} else {
+		printf("debugger for team %" B_PRId32 " on interface %s created and"
+			" initialized successfully!\n", interface->TeamID(), Name());
+	}
+
+	return error;
 }
 
 

@@ -59,14 +59,13 @@ LocalTargetHostInterfaceInfo::CreateInterface(Settings* settings,
 	if (interface == NULL)
 		return B_NO_MEMORY;
 
-	BReference<LocalTargetHostInterface> interfaceReference(interface, true);
 	status_t error = interface->Init(settings);
-	if (error != B_OK)
+	if (error != B_OK) {
+		delete interface;
 		return error;
+	}
 
 	_interface = interface;
-	interfaceReference.Detach();
-
 	return B_OK;
 }
 

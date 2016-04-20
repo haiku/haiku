@@ -20,10 +20,8 @@
 #include <AutoLocker.h>
 #include <ObjectList.h>
 
-#include "debug_utils.h"
-
 #include "CommandLineUserInterface.h"
-#include "LocalDebuggerInterface.h"
+#include "DebuggerInterface.h"
 #include "GraphicalUserInterface.h"
 #include "ImageDebugLoadingStateHandlerRoster.h"
 #include "MessageCodes.h"
@@ -31,6 +29,8 @@
 #include "SettingsManager.h"
 #include "SignalSet.h"
 #include "StartTeamWindow.h"
+#include "TargetHostInterface.h"
+#include "TargetHostInterfaceRoster.h"
 #include "TeamDebugger.h"
 #include "TeamsWindow.h"
 #include "TypeHandlerRoster.h"
@@ -101,13 +101,16 @@ struct Options {
 };
 
 
-struct DebuggedProgramInfo {
-	team_id		team;
-	thread_id	thread;
-	int			commandLineArgc;
-	const char* const* commandLineArgv;
-	bool		stopInMain;
-};
+static void
+set_debugger_options_from_options(TeamDebuggerOptions& _debuggerOptions,
+	const Options& options)
+{
+	_debuggerOptions.commandLineArgc = options.commandLineArgc;
+	_debuggerOptions.commandLineArgv = options.commandLineArgv;
+	_debuggerOptions.team = options.team;
+	_debuggerOptions.thread = options.thread;
+}
+
 
 
 static bool
@@ -219,136 +222,27 @@ global_init()
 	if (error != B_OK)
 		return error;
 
+	error = TargetHostInterfaceRoster::CreateDefault();
+	if (error != B_OK)
+		return error;
+
+	// for now, always create an instance of the local interface
+	// by default
+	TargetHostInterface* hostInterface;
+	TargetHostInterfaceRoster* roster = TargetHostInterfaceRoster::Default();
+	error = roster->CreateInterface(roster->InterfaceInfoAt(0), NULL,
+		hostInterface);
+	if (error != B_OK)
+		return error;
+
 	return B_OK;
-}
-
-
-/**
- * Finds or runs the program to debug, depending on the command line options.
- * @param options The parsed command line options.
- * @param _info The info for the program to fill in. Will only be filled in
- *		  if successful.
- * @return \c true, if the program has been found or ran.
- */
-static bool
-get_debugged_program(const Options& options, DebuggedProgramInfo& _info)
-{
-	team_id team = options.team;
-	thread_id thread = options.thread;
-	bool stopInMain = false;
-
-	// If command line arguments were given, start the program.
-	if (options.commandLineArgc > 0) {
-		printf("loading program: \"%s\" ...\n", options.commandLineArgv[0]);
-		// TODO: What about the CWD?
-		thread = load_program(options.commandLineArgv,
-			options.commandLineArgc, false);
-		if (thread < 0) {
-			// TODO: Notify the user!
-			fprintf(stderr, "Error: Failed to load program \"%s\": %s\n",
-				options.commandLineArgv[0], strerror(thread));
-			return false;
-		}
-
-		team = thread;
-			// main thread ID == team ID
-		stopInMain = true;
-	}
-
-	// no parameters given, prompt the user to attach to a team
-	if (team < 0 && thread < 0)
-		return false;
-
-	// no team, but a thread -- get team
-	if (team < 0) {
-		printf("no team yet, getting thread info...\n");
-		thread_info threadInfo;
-		status_t error = get_thread_info(thread, &threadInfo);
-		if (error != B_OK) {
-			// TODO: Notify the user!
-			fprintf(stderr, "Error: Failed to get info for thread \"%" B_PRId32
-				"\": %s\n", thread, strerror(error));
-			return false;
-		}
-
-		team = threadInfo.team;
-	}
-	printf("team: %" B_PRId32 ", thread: %" B_PRId32 "\n", team, thread);
-
-	_info.commandLineArgc = options.commandLineArgc;
-	_info.commandLineArgv = options.commandLineArgv;
-	_info.team = team;
-	_info.thread = thread;
-	_info.stopInMain = stopInMain;
-	return true;
-}
-
-
-/**
- * Creates a TeamDebugger for the given team. If userInterface is given,
- * that user interface is used (the caller retains its reference), otherwise
- * a graphical user interface is created.
- */
-static TeamDebugger*
-start_team_debugger(team_id teamID, SettingsManager* settingsManager,
-	TeamDebugger::Listener* listener, thread_id threadID = -1,
-	int commandLineArgc = 0, const char* const* commandLineArgv = NULL,
-	bool stopInMain = false, UserInterface* userInterface = NULL,
-	status_t* _result = NULL)
-{
-	if (teamID < 0)
-		return NULL;
-
-	BReference<UserInterface> userInterfaceReference;
-	if (userInterface == NULL) {
-		userInterface = new(std::nothrow) GraphicalUserInterface;
-		if (userInterface == NULL) {
-			// TODO: Notify the user!
-			fprintf(stderr, "Error: Out of memory!\n");
-			return NULL;
-		}
-
-		userInterfaceReference.SetTo(userInterface, true);
-	}
-
-	BReference<DebuggerInterface> interfaceReference;
-	DebuggerInterface* debuggerInterface
-		= new(std::nothrow) LocalDebuggerInterface(teamID);
-	if (debuggerInterface == NULL)
-		return NULL;
-	interfaceReference.SetTo(debuggerInterface, true);
-
-	if (debuggerInterface->Init() != B_OK)
-		return NULL;
-
-	status_t error = B_NO_MEMORY;
-
-	TeamDebugger* debugger = new(std::nothrow) TeamDebugger(listener,
-		userInterface, settingsManager);
-	if (debugger != NULL) {
-		error = debugger->Init(debuggerInterface, threadID, commandLineArgc,
-			commandLineArgv, stopInMain);
-	}
-
-	if (error != B_OK) {
-		printf("Error: debugger for team %" B_PRId32 " failed to init: %s!\n",
-			teamID, strerror(error));
-		delete debugger;
-		debugger = NULL;
-	} else
-		printf("debugger for team %" B_PRId32 " created and initialized "
-			"successfully!\n", teamID);
-
-	if (_result != NULL)
-		*_result = error;
-	return debugger;
 }
 
 
 // #pragma mark - Debugger application class
 
 
-class Debugger : public BApplication, private TeamDebugger::Listener {
+class Debugger : public BApplication {
 public:
 								Debugger();
 								~Debugger();
@@ -359,27 +253,15 @@ public:
 	virtual void 				ArgvReceived(int32 argc, char** argv);
 
 private:
-			typedef BObjectList<TeamDebugger>	TeamDebuggerList;
-
-private:
-	// TeamDebugger::Listener
-	virtual void 				TeamDebuggerStarted(TeamDebugger* debugger);
-	virtual	void				TeamDebuggerRestartRequested(
-									TeamDebugger* debugger);
-	virtual void 				TeamDebuggerQuit(TeamDebugger* debugger);
-
 	virtual bool 				QuitRequested();
 	virtual void 				Quit();
 
-			TeamDebugger* 		_FindTeamDebugger(team_id teamID) const;
-
-			status_t			_StartNewTeam(const char* path, const char* args);
-			status_t			_StartOrFindTeam(Options& options);
+private:
+			status_t			_StartNewTeam(TargetHostInterface* interface,
+									const char* teamPath, const char* args);
 
 private:
 			SettingsManager		fSettingsManager;
-			TeamDebuggerList	fTeamDebuggers;
-			int32				fRunningTeamDebuggers;
 			TeamsWindow*		fTeamsWindow;
 			StartTeamWindow*	fStartTeamWindow;
 };
@@ -388,34 +270,20 @@ private:
 // #pragma mark - CliDebugger
 
 
-class CliDebugger : private TeamDebugger::Listener {
+class CliDebugger {
 public:
 								CliDebugger();
 								~CliDebugger();
 
 			bool				Run(const Options& options);
-
-private:
-	// TeamDebugger::Listener
-	virtual void 				TeamDebuggerStarted(TeamDebugger* debugger);
-	virtual	void				TeamDebuggerRestartRequested(
-									TeamDebugger* debugger);
-	virtual void 				TeamDebuggerQuit(TeamDebugger* debugger);
 };
 
 
-class ReportDebugger : private TeamDebugger::Listener  {
+class ReportDebugger {
 public:
 								ReportDebugger();
 								~ReportDebugger();
 			bool				Run(const Options& options);
-
-private:
-	// TeamDebugger::Listener
-	virtual void 				TeamDebuggerStarted(TeamDebugger* debugger);
-	virtual	void				TeamDebuggerRestartRequested(
-									TeamDebugger* debugger);
-	virtual void 				TeamDebuggerQuit(TeamDebugger* debugger);
 };
 
 
@@ -425,7 +293,6 @@ private:
 Debugger::Debugger()
 	:
 	BApplication(kDebuggerSignature),
-	fRunningTeamDebuggers(0),
 	fTeamsWindow(NULL),
 	fStartTeamWindow(NULL)
 {
@@ -437,6 +304,7 @@ Debugger::~Debugger()
 	ValueHandlerRoster::DeleteDefault();
 	TypeHandlerRoster::DeleteDefault();
 	ImageDebugLoadingStateHandlerRoster::DeleteDefault();
+	TargetHostInterfaceRoster::DeleteDefault();
 }
 
 
@@ -480,9 +348,14 @@ Debugger::MessageReceived(BMessage* message)
 		}
 		case MSG_SHOW_START_TEAM_WINDOW:
 		{
+			TargetHostInterface* hostInterface;
+			if (message->FindPointer("interface",
+					reinterpret_cast<void**>(&hostInterface)) != B_OK) {
+				break;
+			}
 			BMessenger messenger(fStartTeamWindow);
 			if (!messenger.IsValid()) {
-				fStartTeamWindow = StartTeamWindow::Create();
+				fStartTeamWindow = StartTeamWindow::Create(hostInterface);
 				if (fStartTeamWindow == NULL)
 					break;
 				fStartTeamWindow->Show();
@@ -497,54 +370,43 @@ Debugger::MessageReceived(BMessage* message)
 		}
 		case MSG_DEBUG_THIS_TEAM:
 		{
-			int32 teamID;
+			team_id teamID;
 			if (message->FindInt32("team", &teamID) != B_OK)
 				break;
 
-			start_team_debugger(teamID, &fSettingsManager, this);
+			TargetHostInterface* interface;
+			if (message->FindPointer("interface", reinterpret_cast<void**>(
+					&interface)) != B_OK) {
+				break;
+			}
+
+			TeamDebuggerOptions options;
+			options.settingsManager = &fSettingsManager;
+			options.team = teamID;
+			status_t error = interface->StartTeamDebugger(options);
+			if (error != B_OK) {
+				// TODO: notify user.
+			}
 			break;
 		}
 		case MSG_START_NEW_TEAM:
 		{
+			TargetHostInterface* interface;
+			if (message->FindPointer("interface", reinterpret_cast<void**>(
+					&interface)) != B_OK) {
+				break;
+			}
+
 			const char* teamPath = NULL;
 			const char* args = NULL;
 
 			message->FindString("path", &teamPath);
 			message->FindString("arguments", &args);
 
-			status_t result = _StartNewTeam(teamPath, args);
+			status_t result = _StartNewTeam(interface, teamPath, args);
 			BMessage reply;
 			reply.AddInt32("status", result);
 			message->SendReply(&reply);
-			break;
-		}
-		case MSG_TEAM_RESTART_REQUESTED:
-		{
-			int32 teamID;
-			if (message->FindInt32("team", &teamID) != B_OK)
-				break;
-			TeamDebugger* debugger = _FindTeamDebugger(teamID);
-			if (debugger == NULL)
-				break;
-
-			Options options;
-			options.commandLineArgc = debugger->ArgumentCount();
-			options.commandLineArgv = debugger->Arguments();
-
-			status_t result = _StartOrFindTeam(options);
-			if (result == B_OK)
-				debugger->PostMessage(B_QUIT_REQUESTED);
-
-			break;
-		}
-		case MSG_TEAM_DEBUGGER_QUIT:
-		{
-			int32 threadID;
-			if (message->FindInt32("thread", &threadID) == B_OK)
-				wait_for_thread(threadID, NULL);
-
-			--fRunningTeamDebuggers;
-			Quit();
 			break;
 		}
 		default:
@@ -557,8 +419,10 @@ Debugger::MessageReceived(BMessage* message)
 void
 Debugger::ReadyToRun()
 {
-	if (fRunningTeamDebuggers == 0)
-	   PostMessage(MSG_SHOW_TEAMS_WINDOW);
+	TargetHostInterfaceRoster* roster = TargetHostInterfaceRoster::Default();
+	AutoLocker<TargetHostInterfaceRoster> lock(roster);
+	if (roster->CountRunningTeamDebuggers() == 0)
+		PostMessage(MSG_SHOW_TEAMS_WINDOW);
 }
 
 
@@ -571,51 +435,13 @@ Debugger::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
-	_StartOrFindTeam(options);
+	TargetHostInterface* hostInterface
+		= TargetHostInterfaceRoster::Default()->ActiveInterfaceAt(0);
 
-}
-
-
-void
-Debugger::TeamDebuggerStarted(TeamDebugger* debugger)
-{
-	printf("debugger for team %" B_PRId32 " started...\n", debugger->TeamID());
-
- 	// Note: see TeamDebuggerQuit() note about locking
-	AutoLocker<Debugger> locker(this);
-	fTeamDebuggers.AddItem(debugger);
-	fRunningTeamDebuggers++;
-	locker.Unlock();
-}
-
-
-void
-Debugger::TeamDebuggerQuit(TeamDebugger* debugger)
-{
-	// Note: Locking here only works, since we're never locking the other
-	// way around. If we even need to do that, we'll have to introduce a
-	// separate lock to protect the list.
-
-	printf("debugger for team %" B_PRId32 " quit.\n", debugger->TeamID());
-
-	AutoLocker<Debugger> locker(this);
-	fTeamDebuggers.RemoveItem(debugger);
-	locker.Unlock();
-
-	if (debugger->Thread() >= 0) {
-		BMessage message(MSG_TEAM_DEBUGGER_QUIT);
-		message.AddInt32("thread", debugger->Thread());
-		PostMessage(&message);
-	}
-}
-
-
-void
-Debugger::TeamDebuggerRestartRequested(TeamDebugger* debugger)
-{
-	BMessage message(MSG_TEAM_RESTART_REQUESTED);
-	message.AddInt32("team", debugger->TeamID());
-	PostMessage(&message);
+	TeamDebuggerOptions debuggerOptions;
+	set_debugger_options_from_options(debuggerOptions, options);
+	debuggerOptions.settingsManager = &fSettingsManager;
+	hostInterface->StartTeamDebugger(debuggerOptions);
 }
 
 
@@ -639,27 +465,17 @@ Debugger::QuitRequested()
 void
 Debugger::Quit()
 {
+	TargetHostInterfaceRoster* roster = TargetHostInterfaceRoster::Default();
+	AutoLocker<TargetHostInterfaceRoster> lock(roster);
 	// don't quit before all team debuggers have been quit
-	if (fRunningTeamDebuggers <= 0 && fTeamsWindow == NULL)
+	if (roster->CountRunningTeamDebuggers() == 0 && fTeamsWindow == NULL)
 		BApplication::Quit();
 }
 
 
-TeamDebugger*
-Debugger::_FindTeamDebugger(team_id teamID) const
-{
-	for (int32 i = 0; TeamDebugger* debugger = fTeamDebuggers.ItemAt(i);
-			i++) {
-		if (debugger->TeamID() == teamID)
-			return debugger;
-	}
-
-	return NULL;
-}
-
-
 status_t
-Debugger::_StartNewTeam(const char* path, const char* args)
+Debugger::_StartNewTeam(TargetHostInterface* interface, const char* path,
+	const char* args)
 {
 	if (path == NULL)
 		return B_BAD_VALUE;
@@ -672,7 +488,8 @@ Debugger::_StartNewTeam(const char* path, const char* args)
 	ArgumentVector argVector;
 	argVector.Parse(data.String());
 
-	Options options;
+	TeamDebuggerOptions options;
+	options.settingsManager = &fSettingsManager;
 	options.commandLineArgc = argVector.ArgumentCount();
 	if (options.commandLineArgc <= 0)
 		return B_BAD_VALUE;
@@ -682,31 +499,11 @@ Debugger::_StartNewTeam(const char* path, const char* args)
 	options.commandLineArgv = argv;
 	MemoryDeleter deleter(argv);
 
-	return _StartOrFindTeam(options);
-}
+	status_t error = interface->StartTeamDebugger(options);
+	if (error == B_OK)
+		deleter.Detach();
 
-
-status_t
-Debugger::_StartOrFindTeam(Options& options)
-{
-	DebuggedProgramInfo programInfo;
-	if (!get_debugged_program(options, programInfo))
-		return B_BAD_VALUE;
-
-	TeamDebugger* debugger = _FindTeamDebugger(programInfo.team);
-	if (debugger != NULL) {
-		printf("There's already a debugger for team: %" B_PRId32 "\n",
-			programInfo.team);
-		debugger->Activate();
-		return B_OK;
-	}
-
-	status_t result;
-	start_team_debugger(programInfo.team, &fSettingsManager, this,
-		programInfo.thread, programInfo.commandLineArgc,
-		programInfo.commandLineArgv, programInfo.stopInMain, NULL, &result);
-
-	return result;
+	return error;
 }
 
 
@@ -756,18 +553,20 @@ CliDebugger::Run(const Options& options)
 	}
 	BReference<UserInterface> userInterfaceReference(userInterface, true);
 
-	// get/run the program to be debugged and start the team debugger
-	DebuggedProgramInfo programInfo;
-	if (!get_debugged_program(options, programInfo))
+	// TODO: once we support specifying a remote interface via command line
+	// args, this needs to be adjusted. For now, always assume actions
+	// are being taken via the local interface.
+	TargetHostInterface* hostInterface
+		= TargetHostInterfaceRoster::Default()->ActiveInterfaceAt(0);
+
+	TeamDebuggerOptions debuggerOptions;
+	set_debugger_options_from_options(debuggerOptions, options);
+	debuggerOptions.userInterface = userInterface;
+	error = hostInterface->StartTeamDebugger(debuggerOptions);
+	if (error != B_OK)
 		return false;
 
-	TeamDebugger* teamDebugger = start_team_debugger(programInfo.team,
-		&settingsManager, this, programInfo.thread,
-		programInfo.commandLineArgc, programInfo.commandLineArgv,
-		programInfo.stopInMain, userInterface);
-	if (teamDebugger == NULL)
-		return false;
-
+	TeamDebugger* teamDebugger = hostInterface->TeamDebuggerAt(0);
 	thread_id teamDebuggerThread = teamDebugger->Thread();
 
 	// run the input loop
@@ -777,25 +576,6 @@ CliDebugger::Run(const Options& options)
 	wait_for_thread(teamDebuggerThread, NULL);
 
 	return true;
-}
-
-
-void
-CliDebugger::TeamDebuggerStarted(TeamDebugger* debugger)
-{
-}
-
-
-void
-CliDebugger::TeamDebuggerRestartRequested(TeamDebugger* debugger)
-{
-	// TODO: implement
-}
-
-
-void
-CliDebugger::TeamDebuggerQuit(TeamDebugger* debugger)
-{
 }
 
 
@@ -840,18 +620,17 @@ ReportDebugger::Run(const Options& options)
 	}
 	BReference<UserInterface> userInterfaceReference(userInterface, true);
 
-	// get/run the program to be debugged and start the team debugger
-	DebuggedProgramInfo programInfo;
-	if (!get_debugged_program(options, programInfo))
+	TargetHostInterface* hostInterface
+		= TargetHostInterfaceRoster::Default()->ActiveInterfaceAt(0);
+
+	TeamDebuggerOptions debuggerOptions;
+	set_debugger_options_from_options(debuggerOptions, options);
+	debuggerOptions.userInterface = userInterface;
+	error = hostInterface->StartTeamDebugger(debuggerOptions);
+	if (error != B_OK)
 		return false;
 
-	TeamDebugger* teamDebugger = start_team_debugger(programInfo.team,
-		&settingsManager, this, programInfo.thread,
-		programInfo.commandLineArgc, programInfo.commandLineArgv,
-		programInfo.stopInMain, userInterface);
-	if (teamDebugger == NULL)
-		return false;
-
+	TeamDebugger* teamDebugger = hostInterface->TeamDebuggerAt(0);
 	thread_id teamDebuggerThread = teamDebugger->Thread();
 
 	// run the input loop
@@ -861,24 +640,6 @@ ReportDebugger::Run(const Options& options)
 	wait_for_thread(teamDebuggerThread, NULL);
 
 	return true;
-}
-
-
-void
-ReportDebugger::TeamDebuggerStarted(TeamDebugger* debugger)
-{
-}
-
-
-void
-ReportDebugger::TeamDebuggerRestartRequested(TeamDebugger* debugger)
-{
-}
-
-
-void
-ReportDebugger::TeamDebuggerQuit(TeamDebugger* debugger)
-{
 }
 
 

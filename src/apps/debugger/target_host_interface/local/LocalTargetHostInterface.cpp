@@ -113,6 +113,13 @@ LocalTargetHostInterface::Close()
 
 
 bool
+LocalTargetHostInterface::IsLocal() const
+{
+	return true;
+}
+
+
+bool
 LocalTargetHostInterface::Connected() const
 {
 	return true;
@@ -128,7 +135,7 @@ LocalTargetHostInterface::GetTargetHost()
 
 status_t
 LocalTargetHostInterface::Attach(team_id teamID, thread_id threadID,
-	DebuggerInterface*& _interface)
+	DebuggerInterface*& _interface) const
 {
 	if (teamID < 0 && threadID < 0)
 		return B_BAD_VALUE;
@@ -161,13 +168,29 @@ LocalTargetHostInterface::Attach(team_id teamID, thread_id threadID,
 
 status_t
 LocalTargetHostInterface::CreateTeam(int commandLineArgc,
-	const char* const* arguments, DebuggerInterface*& _interface)
+	const char* const* arguments, team_id& _teamID) const
 {
 	thread_id thread = load_program(arguments, commandLineArgc, false);
 	if (thread < 0)
 		return thread;
 
-	return Attach(-1, thread, _interface);
+	// main thread ID == team ID.
+	_teamID = thread;
+	return B_OK;
+}
+
+
+status_t
+LocalTargetHostInterface::FindTeamByThread(thread_id thread,
+	team_id& _teamID) const
+{
+	thread_info info;
+	status_t error = get_thread_info(thread, &info);
+	if (error != B_OK)
+		return error;
+
+	_teamID = info.team;
+	return B_OK;
 }
 
 

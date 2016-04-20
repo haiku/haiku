@@ -42,6 +42,8 @@ public:
 			int32				CountActiveInterfaces() const;
 			TargetHostInterface* ActiveInterfaceAt(int32 index) const;
 
+			int32				CountRunningTeamDebuggers() const;
+
 private:
 			typedef BObjectList<TargetHostInterfaceInfo> InfoList;
 			typedef BObjectList<TargetHostInterface> InterfaceList;
