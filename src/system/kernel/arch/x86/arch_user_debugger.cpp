@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2016, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -194,6 +194,51 @@ set_iframe_registers(iframe* frame, const debug_cpu_state* cpuState)
 
 
 #endif	// __x86_64__
+
+
+static void
+get_cpu_state(Thread* thread, iframe* frame, debug_cpu_state* cpuState)
+{
+	// For the floating point state to be correct the calling function must
+	// not use these registers (not even indirectly).
+#ifdef __x86_64__
+	if (frame->fpu != nullptr) {
+		memcpy(&cpuState->extended_registers, frame->fpu,
+			sizeof(cpuState->extended_registers));
+	} else {
+		memset(&cpuState->extended_registers, 0,
+			sizeof(cpuState->extended_registers));
+	}
+#else
+	Thread* thisThread = thread_get_current_thread();
+	if (gHasSSE) {
+		if (thread == thisThread) {
+			// Since fxsave requires 16-byte alignment and this isn't guaranteed
+			// for the passed buffer, we use our thread's fpu_state field as
+			// temporary buffer. We need to disable interrupts to make use of
+			// it.
+			Thread* thread = thread_get_current_thread();
+			InterruptsLocker locker;
+			x86_fxsave(thread->arch_info.fpu_state);
+				// unlike fnsave, fxsave doesn't reinit the FPU state
+		}
+		memcpy(&cpuState->extended_registers, thread->arch_info.fpu_state,
+			sizeof(cpuState->extended_registers));
+	} else {
+		if (thread == thisThread) {
+			x86_fnsave(&cpuState->extended_registers);
+			// fnsave reinits the FPU state after saving, so we need to
+			// load it again
+			x86_frstor(&cpuState->extended_registers);
+		} else {
+			memcpy(&cpuState->extended_registers, thread->arch_info.fpu_state,
+				sizeof(cpuState->extended_registers));
+		}
+		// TODO: Convert to fxsave format!
+	}
+#endif
+	get_iframe_registers(frame, cpuState);
+}
 
 
 static inline void
@@ -719,38 +764,28 @@ arch_set_debug_cpu_state(const debug_cpu_state* cpuState)
 void
 arch_get_debug_cpu_state(debug_cpu_state* cpuState)
 {
-	if (iframe* frame = x86_get_user_iframe()) {
-		// For the floating point state to be correct the calling function must
-		// not use these registers (not even indirectly).
-#ifdef __x86_64__
-		if (frame->fpu != nullptr) {
-			memcpy(&cpuState->extended_registers, frame->fpu,
-				sizeof(cpuState->extended_registers));
-		} else {
-			memset(&cpuState->extended_registers, 0,
-				sizeof(cpuState->extended_registers));
-		}
-#else
-		if (gHasSSE) {
-			// Since fxsave requires 16-byte alignment and this isn't guaranteed
-			// passed buffer, we use our thread's fpu_state field as temporary
-			// buffer. We need to disable interrupts to make use of it.
-			Thread* thread = thread_get_current_thread();
-			InterruptsLocker locker;
-			x86_fxsave(thread->arch_info.fpu_state);
-				// unlike fnsave, fxsave doesn't reinit the FPU state
-			memcpy(&cpuState->extended_registers, thread->arch_info.fpu_state,
-				sizeof(cpuState->extended_registers));
-		} else {
-			x86_fnsave(&cpuState->extended_registers);
-			x86_frstor(&cpuState->extended_registers);
-				// fnsave reinits the FPU state after saving, so we need to
-				// load it again
-			// TODO: Convert to fxsave format!
-		}
-#endif
-		get_iframe_registers(frame, cpuState);
-	}
+	if (iframe* frame = x86_get_user_iframe())
+		get_cpu_state(thread_get_current_thread(), frame, cpuState);
+}
+
+
+/*!	\brief Retrieves the CPU state for the given thread.
+	The thread must not be running and the thread's scheduler spinlock must be
+	held.
+	\param thread The thread whose CPU state to retrieve.
+	\param cpuState Pointer to pre-allocated storage for the CPU state.
+	\return \c B_OK, if everything goes fine, another error code, if the CPU
+		state could not be retrieved.
+*/
+status_t
+arch_get_thread_debug_cpu_state(Thread* thread, debug_cpu_state* cpuState)
+{
+	iframe* frame = x86_get_thread_user_iframe(thread);
+	if (frame == NULL)
+		return B_BAD_VALUE;
+
+	get_cpu_state(thread, frame, cpuState);
+	return B_OK;
 }
 
 
