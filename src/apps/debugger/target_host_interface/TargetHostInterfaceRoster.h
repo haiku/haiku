@@ -10,13 +10,14 @@
 #include <Locker.h>
 #include <ObjectList.h>
 
+#include "TargetHostInterface.h"
+
 
 class Settings;
-class TargetHostInterface;
 class TargetHostInterfaceInfo;
 
 
-class TargetHostInterfaceRoster {
+class TargetHostInterfaceRoster : private TargetHostInterface::Listener {
 public:
 								TargetHostInterfaceRoster();
 	virtual						~TargetHostInterfaceRoster();
@@ -42,7 +43,14 @@ public:
 			int32				CountActiveInterfaces() const;
 			TargetHostInterface* ActiveInterfaceAt(int32 index) const;
 
-			int32				CountRunningTeamDebuggers() const;
+			int32				CountRunningTeamDebuggers() const
+									{ return fRunningTeamDebuggers; }
+
+	// TargetHostInterface::Listener
+	virtual	void				TeamDebuggerStarted(TeamDebugger* debugger);
+	virtual	void 				TeamDebuggerQuit(TeamDebugger* debugger);
+	virtual	void				TargetHostInterfaceQuit(
+									TargetHostInterface* interface);
 
 private:
 			typedef BObjectList<TargetHostInterfaceInfo> InfoList;
@@ -52,6 +60,7 @@ private:
 			BLocker				fLock;
 	static	TargetHostInterfaceRoster* sDefaultInstance;
 
+			int32				fRunningTeamDebuggers;
 			InfoList			fInterfaceInfos;
 			InterfaceList		fActiveInterfaces;
 };

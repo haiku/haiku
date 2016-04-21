@@ -10,7 +10,6 @@
 #include <AutoLocker.h>
 
 #include "LocalTargetHostInterfaceInfo.h"
-#include "TargetHostInterface.h"
 #include "TargetHostInterfaceInfo.h"
 
 
@@ -20,7 +19,9 @@
 
 TargetHostInterfaceRoster::TargetHostInterfaceRoster()
 	:
+	TargetHostInterface::Listener(),
 	fLock(),
+	fRunningTeamDebuggers(0),
 	fInterfaceInfos(20, false),
 	fActiveInterfaces(20, false)
 {
@@ -136,6 +137,7 @@ TargetHostInterfaceRoster::CreateInterface(TargetHostInterfaceInfo* info,
 		return B_NO_MEMORY;
 	}
 
+	interface->AddListener(this);
 	_interface = interface;
 	return B_OK;
 }
@@ -155,14 +157,24 @@ TargetHostInterfaceRoster::ActiveInterfaceAt(int32 index) const
 }
 
 
-int32
-TargetHostInterfaceRoster::CountRunningTeamDebuggers() const
+void
+TargetHostInterfaceRoster::TeamDebuggerStarted(TeamDebugger* debugger)
 {
-	int32 total = 0;
-	for (int32 i = 0; TargetHostInterface* interface = ActiveInterfaceAt(i);
-		i++) {
-		total += interface->CountTeamDebuggers();
-	}
+	fRunningTeamDebuggers++;
+}
 
-	return total;
+
+void
+TargetHostInterfaceRoster::TeamDebuggerQuit(TeamDebugger* debugger)
+{
+	fRunningTeamDebuggers--;
+}
+
+
+void
+TargetHostInterfaceRoster::TargetHostInterfaceQuit(
+	TargetHostInterface* interface)
+{
+	AutoLocker<TargetHostInterfaceRoster> locker(this);
+	fActiveInterfaces.RemoveItem(interface);
 }
