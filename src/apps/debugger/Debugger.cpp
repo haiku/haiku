@@ -208,7 +208,7 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 }
 
 static status_t
-global_init()
+global_init(TargetHostInterfaceRoster::Listener* listener)
 {
 	status_t error = TypeHandlerRoster::CreateDefault();
 	if (error != B_OK)
@@ -222,7 +222,7 @@ global_init()
 	if (error != B_OK)
 		return error;
 
-	error = TargetHostInterfaceRoster::CreateDefault();
+	error = TargetHostInterfaceRoster::CreateDefault(listener);
 	if (error != B_OK)
 		return error;
 
@@ -242,7 +242,8 @@ global_init()
 // #pragma mark - Debugger application class
 
 
-class Debugger : public BApplication {
+class Debugger : public BApplication,
+	private TargetHostInterfaceRoster::Listener {
 public:
 								Debugger();
 								~Debugger();
@@ -255,6 +256,9 @@ public:
 private:
 	virtual bool 				QuitRequested();
 	virtual void 				Quit();
+
+	// TargetHostInterfaceRoster::Listener
+	virtual	void				TeamDebuggerCountChanged(int32 count);
 
 private:
 			status_t			_StartNewTeam(TargetHostInterface* interface,
@@ -270,7 +274,7 @@ private:
 // #pragma mark - CliDebugger
 
 
-class CliDebugger {
+class CliDebugger : private TargetHostInterfaceRoster::Listener {
 public:
 								CliDebugger();
 								~CliDebugger();
@@ -279,7 +283,7 @@ public:
 };
 
 
-class ReportDebugger {
+class ReportDebugger : private TargetHostInterfaceRoster::Listener  {
 public:
 								ReportDebugger();
 								~ReportDebugger();
@@ -293,6 +297,7 @@ public:
 Debugger::Debugger()
 	:
 	BApplication(kDebuggerSignature),
+	TargetHostInterfaceRoster::Listener(),
 	fTeamsWindow(NULL),
 	fStartTeamWindow(NULL)
 {
@@ -311,7 +316,7 @@ Debugger::~Debugger()
 status_t
 Debugger::Init()
 {
-	status_t error = global_init();
+	status_t error = global_init(this);
 	if (error != B_OK)
 		return error;
 
@@ -351,8 +356,12 @@ Debugger::MessageReceived(BMessage* message)
 			TargetHostInterface* hostInterface;
 			if (message->FindPointer("interface",
 					reinterpret_cast<void**>(&hostInterface)) != B_OK) {
-				break;
+				// if an interface isn't explicitly supplied, fall back to
+				// the default local interface.
+				hostInterface = TargetHostInterfaceRoster::Default()
+					->ActiveInterfaceAt(0);
 			}
+
 			BMessenger messenger(fStartTeamWindow);
 			if (!messenger.IsValid()) {
 				fStartTeamWindow = StartTeamWindow::Create(hostInterface);
@@ -473,6 +482,16 @@ Debugger::Quit()
 }
 
 
+void
+Debugger::TeamDebuggerCountChanged(int32 count)
+{
+	if (count == 0) {
+		AutoLocker<Debugger> lock(this);
+		Quit();
+	}
+}
+
+
 status_t
 Debugger::_StartNewTeam(TargetHostInterface* interface, const char* path,
 	const char* args)
@@ -529,7 +548,7 @@ CliDebugger::Run(const Options& options)
 	SignalSet(SIGINT).BlockInCurrentThread();
 
 	// initialize global objects and settings manager
-	status_t error = global_init();
+	status_t error = global_init(this);
 	if (error != B_OK) {
 		fprintf(stderr, "Error: Global initialization failed: %s\n",
 			strerror(error));
@@ -596,7 +615,7 @@ bool
 ReportDebugger::Run(const Options& options)
 {
 	// initialize global objects and settings manager
-	status_t error = global_init();
+	status_t error = global_init(this);
 	if (error != B_OK) {
 		fprintf(stderr, "Error: Global initialization failed: %s\n",
 			strerror(error));

@@ -23,7 +23,8 @@ TargetHostInterfaceRoster::TargetHostInterfaceRoster()
 	fLock(),
 	fRunningTeamDebuggers(0),
 	fInterfaceInfos(20, false),
-	fActiveInterfaces(20, false)
+	fActiveInterfaces(20, false),
+	fListener(NULL)
 {
 }
 
@@ -41,7 +42,7 @@ TargetHostInterfaceRoster::Default()
 
 
 /*static*/ status_t
-TargetHostInterfaceRoster::CreateDefault()
+TargetHostInterfaceRoster::CreateDefault(Listener* listener)
 {
 	if (sDefaultInstance != NULL)
 		return B_OK;
@@ -52,7 +53,7 @@ TargetHostInterfaceRoster::CreateDefault()
 		return B_NO_MEMORY;
 	ObjectDeleter<TargetHostInterfaceRoster> rosterDeleter(roster);
 
-	status_t error = roster->Init();
+	status_t error = roster->Init(listener);
 	if (error != B_OK)
 		return error;
 
@@ -75,8 +76,9 @@ TargetHostInterfaceRoster::DeleteDefault()
 
 
 status_t
-TargetHostInterfaceRoster::Init()
+TargetHostInterfaceRoster::Init(Listener* listener)
 {
+	fListener = listener;
 	return fLock.InitCheck();
 }
 
@@ -161,6 +163,7 @@ void
 TargetHostInterfaceRoster::TeamDebuggerStarted(TeamDebugger* debugger)
 {
 	fRunningTeamDebuggers++;
+	fListener->TeamDebuggerCountChanged(fRunningTeamDebuggers);
 }
 
 
@@ -168,6 +171,7 @@ void
 TargetHostInterfaceRoster::TeamDebuggerQuit(TeamDebugger* debugger)
 {
 	fRunningTeamDebuggers--;
+	fListener->TeamDebuggerCountChanged(fRunningTeamDebuggers);
 }
 
 
@@ -177,4 +181,18 @@ TargetHostInterfaceRoster::TargetHostInterfaceQuit(
 {
 	AutoLocker<TargetHostInterfaceRoster> locker(this);
 	fActiveInterfaces.RemoveItem(interface);
+}
+
+
+// #pragma mark - TargetHostInterfaceRoster::Listener
+
+
+TargetHostInterfaceRoster::Listener::~Listener()
+{
+}
+
+
+void
+TargetHostInterfaceRoster::Listener::TeamDebuggerCountChanged(int32 count)
+{
 }

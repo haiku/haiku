@@ -19,17 +19,18 @@ class TargetHostInterfaceInfo;
 
 class TargetHostInterfaceRoster : private TargetHostInterface::Listener {
 public:
+	class Listener;
 								TargetHostInterfaceRoster();
 	virtual						~TargetHostInterfaceRoster();
 
 	static	TargetHostInterfaceRoster* Default();
-	static	status_t			CreateDefault();
+	static	status_t			CreateDefault(Listener* listener);
 	static	void				DeleteDefault();
 
 			bool				Lock()		{ return fLock.Lock(); }
 			void				Unlock()	{ fLock.Unlock(); }
 
-			status_t			Init();
+			status_t			Init(Listener* listener);
 			status_t			RegisterInterfaceInfos();
 
 			int32				CountInterfaceInfos() const;
@@ -63,6 +64,15 @@ private:
 			int32				fRunningTeamDebuggers;
 			InfoList			fInterfaceInfos;
 			InterfaceList		fActiveInterfaces;
+			Listener*			fListener;
+};
+
+
+class TargetHostInterfaceRoster::Listener {
+public:
+	virtual						~Listener();
+
+	virtual	void				TeamDebuggerCountChanged(int32 newCount);
 };
 
 
