@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.04.12
-#	Date:    2016-04-12 03:15:07
+#	Version: 2016.04.21
+#	Date:    2016-04-21 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -1507,6 +1507,8 @@
 	6646  Bonaire XT [Radeon R9 M280X]
 	6647  Bonaire PRO [Radeon R9 M270X]
 	6649  Bonaire [FirePro W5100]
+		1002 0b0c  FirePro W4300
+		103c 0b0c  Bonaire [FirePro W4300]
 	6650  Bonaire
 	6651  Bonaire
 	6658  Bonaire XTX [Radeon R7 260X/360]
@@ -2083,6 +2085,7 @@
 	679f  Tahiti
 	67a0  Hawaii XT GL [FirePro W9100]
 		1002 0335  FirePro S9150
+		1002 0735  FirePro S9170
 		1028 031f  FirePro W9100
 		1028 0335  FirePro S9150
 	67a1  Hawaii PRO GL [FirePro W8100]
@@ -2113,7 +2116,8 @@
 		174b e282  Vapor-X R9 290X Tri-X OC
 		174b e285  R9 290X Tri-X OC
 		1787 2020  R9 290X IceQ X² Turbo
-	67b1  Hawaii PRO [Radeon R9 290]
+	67b1  Hawaii PRO [Radeon R9 290/390]
+		148c 2358  Radeon R9 390
 	67b9  Vesuvius [Radeon R9 295X2]
 	67be  Hawaii LE
 	67c0  Ellesmere [Polaris10]
@@ -19755,6 +19759,7 @@
 	4254  10G-PCIE3-8D-2S
 	4255  10G-PCIE3-8D-Q
 	4256  10G-PCIE3-8D-2S
+	4258  10G-PCIE3-8E-2S
 1c1c  Symphony
 	0001  82C101
 1c28  Lite-On IT Corp. / Plextor
@@ -19889,6 +19894,7 @@
 		1fc9 3015  Ethernet Adapter
 	4024  TN9210 10GBase-T Ethernet Adapter
 	4025  TN9510 10GBase-T/NBASE-T Ethernet Adapter
+		105a 7203  SANLink3 NBase-T1
 		1186 2900  DXE-810T 10GBase-T Ethernet Adapter
 		1432 8102  EN-8102P 10GbE Ethernet Adapter
 		1fc9 3015  Ethernet Adapter
@@ -22256,14 +22262,16 @@
 		1028 0000  Ethernet 10G X710-k bNDC
 		1028 1f98  Ethernet 10G 4P X710-k bNDC
 		1028 1f9e  Ethernet 10G 2P X710-k bNDC
+		1590 0000  Ethernet 2-port 563i Adapter
+		1590 00f8  Ethernet 2-port 563i Adapter
 		8086 0000  Ethernet Converged Network Adapter XL710-Q2
 	1583  Ethernet Controller XL710 for 40GbE QSFP+
 		1028 0000  Ethernet 40G 2P XL710 QSFP+ rNDC
 		1028 1f9f  Ethernet 40G 2P XL710 QSFP+ rNDC
 		108e 0000  10 Gb/40 Gb Ethernet Adapter
 		108e 7b1b  10 Gb/40 Gb Ethernet Adapter
-		1137 0000  Ethernet Converged NIC XL710-Q2
-		1137 013c  Ethernet Converged NIC XL710-Q2
+		1137 0000  Ethernet Converged NIC XL710-QDA2
+		1137 013c  Ethernet Converged NIC XL710-QDA2
 		8086 0000  Ethernet Converged Network Adapter XL710-Q2
 		8086 0001  Ethernet Converged Network Adapter XL710-Q2
 		8086 0002  Ethernet Converged Network Adapter XL710-Q2
@@ -22384,6 +22392,7 @@
 	192b  Iris Graphics 555
 	192d  Iris Graphics P555
 	1932  Iris Pro Graphics 580
+	193a  Iris Pro Graphics P580
 	193b  Iris Pro Graphics 580
 	193d  Iris Pro Graphics P580
 	1960  80960RP (i960RP) Microprocessor
@@ -23512,6 +23521,7 @@
 	24f0  Omni-Path HFI Silicon 100 Series [discrete]
 		10a9 802e  Omni-path HFI 100 Series, 1-port
 		10a9 802f  Omni-path HFI 100 Series, 2-port
+		15d9 0001  Omni-Path HFI Adapter 100 Series, 1 Port, PCIe x16, SIOM Module
 		8086 2628  Omni-Path HFI Adapter 100 Series, 1 Port, PCIe x16
 		8086 2629  Omni-Path HFI Adapter 100 Series, 1 Port, PCIe x8
 		8086 262a  Omni-Path HFI Adapter 100 Series, 2 Ports, Split PCIe x16
@@ -27016,7 +27026,8 @@
 8384  SigmaTel
 8401  TRENDware International Inc.
 8686  ScaleMP
-	1010  vSMPowered system controller [vSMP CTL]
+	1010  vSMP Foundation controller [vSMP CTL]
+	1011  vSMP Foundation MEX/FLX controller [vSMP CTL]
 8800  Trigem Computer Inc.
 	2008  Video assistant component
 8866  T-Square Design Inc.
