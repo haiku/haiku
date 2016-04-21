@@ -20,6 +20,12 @@ local platform_src =
 	relocation_func.cpp
 	start.cpp
 	console.cpp
+	video.cpp
+	debug.cpp
+	mmu.cpp
+	heap.cpp
+	menu.cpp
+	devices.cpp
 	;
 
 Includes [ FGristFiles $(efi_glue_src) $(platform_src) ]
@@ -36,6 +42,9 @@ BootMergeObject boot_platform_efi.o :
 	: boot_platform_generic.a
 	;
 
-SEARCH on [ FGristFiles relocation_func.cpp ] = [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
-LOCATE on [ FGristFiles $(efi_glue_src) ] = [ BuildFeatureAttribute gnuefi : libdir : path ] ;
-Depends [ FGristFiles $(efi_glue_src) ] : [ BuildFeatureAttribute gnuefi : libdir ] ;
+SEARCH on [ FGristFiles relocation_func.cpp ]
+	= [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
+LOCATE on [ FGristFiles $(efi_glue_src) ]
+	 = [ BuildFeatureAttribute gnuefi : libdir : path ] ;
+Depends [ FGristFiles $(efi_glue_src) ]
+	: [ BuildFeatureAttribute gnuefi : libdir ] ;

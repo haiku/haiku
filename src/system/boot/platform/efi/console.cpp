@@ -1,6 +1,7 @@
 /*
  * Copyright 2014-2016 Haiku, Inc. All rights reserved.
- * Copyright 2013 Fredrik Holmqvist, fredrik.holmqvist@gmail.com. All rights reserved.
+ * Copyright 2013 Fredrik Holmqvist, fredrik.holmqvist@gmail.com. All rights
+ * reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -22,8 +23,10 @@ class Console : public ConsoleNode {
 	public:
 		Console();
 
-		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize);
-		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer, size_t bufferSize);
+		virtual ssize_t ReadAt(void *cookie, off_t pos, void *buffer,
+			size_t bufferSize);
+		virtual ssize_t WriteAt(void *cookie, off_t pos, const void *buffer,
+			size_t bufferSize);
 };
 
 
@@ -51,7 +54,8 @@ Console::ReadAt(void *cookie, off_t pos, void *buffer, size_t bufferSize)
 
 
 ssize_t
-Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer, size_t bufferSize)
+Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer,
+	size_t bufferSize)
 {
 	const char *string = (const char *)buffer;
 	CHAR16 ucsBuffer[bufferSize + 3];
@@ -67,7 +71,8 @@ Console::WriteAt(void *cookie, off_t /*pos*/, const void *buffer, size_t bufferS
 				//Not sure if we should keep going or abort for 0.
 				//Keep going was easy anyway.
 				ucsBuffer[j] = 0;
-				kSystemTable->ConOut->OutputString(kSystemTable->ConOut, ucsBuffer);
+				kSystemTable->ConOut->OutputString(kSystemTable->ConOut,
+					ucsBuffer);
 				j = 0;
 				continue;
 			}
