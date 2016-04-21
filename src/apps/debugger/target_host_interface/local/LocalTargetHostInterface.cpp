@@ -89,6 +89,9 @@ LocalTargetHostInterface::Init(Settings* settings)
 			return error;
 	}
 
+	snprintf(buffer, sizeof(buffer), "Local (%s)", hostname);
+	SetName(buffer);
+
 	return B_OK;
 }
 
