@@ -44,6 +44,10 @@ public:
 	// Check if the media services are running.
 	static	bool				IsRunning();
 
+	// Wait until the media_server is running or the specified timeout
+	// is reached.
+			status_t			SyncToServices(bigtime_t timeout);
+
 	// Getting common instances of system nodes:
 			status_t			GetVideoInput(media_node* _node);
 			status_t			GetAudioInput(media_node* _node);

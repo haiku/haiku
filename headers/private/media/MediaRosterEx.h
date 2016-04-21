@@ -95,7 +95,13 @@ public:
 		void				RegisterLocalNode(BMediaNode* node);
 		void				UnregisterLocalNode(BMediaNode* node);
 
+		void				EnableLaunchNotification(bool enable,
+								bool autoExit);
+
 private:
+		bool				fLaunchNotification;
+		bool				fAutoExit;
+
 	friend class BMediaRoster;
 };
 

@@ -83,6 +83,11 @@ struct RosterNotification {
 };
 
 
+struct SyncedMessage {
+	BMessage* message;
+};
+
+
 struct LocalNode {
 				LocalNode(BMediaNode* local_node)
 					:
@@ -107,6 +112,7 @@ static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
 static BLocker sInitLocker("BMediaRoster::Roster locker");
 static List<LocalNode> sRegisteredNodes;
+static List<SyncedMessage> sSyncedMessages;
 
 
 class MediaRosterUndertaker {
@@ -148,7 +154,9 @@ using namespace BPrivate::media;
 
 BMediaRosterEx::BMediaRosterEx(status_t* _error)
 	:
-	BMediaRoster()
+	BMediaRoster(),
+	fLaunchNotification(false),
+	fAutoExit(false)
 {
 	gDormantNodeManager = new DormantNodeManager();
 	gTimeSourceObjectManager = new TimeSourceObjectManager();
@@ -227,6 +235,17 @@ BMediaRosterEx::UnregisterLocalNode(BMediaNode* node)
 	int32 index = sRegisteredNodes.Find(LocalNode(node));
 	if (index != -1)
 		sRegisteredNodes.Remove(index);
+}
+
+
+void
+BMediaRosterEx::EnableLaunchNotification(bool enable, bool autoExit)
+{
+	// NOTE: in theory, we should personalize it depending on each
+	// request, but we are using it just in launch/shutdown_media_server,
+	// so we are enough safe to don't care about that.
+	fLaunchNotification = enable;
+	fAutoExit = autoExit;
 }
 
 
@@ -3344,6 +3363,26 @@ BMediaRoster::IsRunning()
 }
 
 
+status_t
+BMediaRoster::SyncToServices(bigtime_t timeout)
+{
+	BMessenger messenger(this);
+	BMessage msg(MEDIA_ROSTER_REGISTER_SYNC);
+	BMessage reply;
+
+	if (!messenger.IsValid())
+		return B_MEDIA_SYSTEM_FAILURE;
+
+	status_t ret = messenger.SendMessage(&msg, &reply, timeout, timeout);
+	if (ret == B_TIMED_OUT || reply.what == B_NO_REPLY)
+		return B_TIMED_OUT;
+	else if (ret != B_OK)
+		return ret;
+
+	return B_OK;
+}
+
+
 ssize_t
 BMediaRoster::AudioBufferSizeFor(int32 channelCount, uint32 sampleFormat,
 	float frameRate, bus_type busKind)
@@ -3432,6 +3471,20 @@ BMediaRoster::MessageReceived(BMessage* message)
 			return;
 		}
 
+		case MEDIA_ROSTER_REGISTER_SYNC:
+		{
+			BMessage reply;
+			if (sServerIsUp)
+				message->SendReply(&reply);
+			else {
+				DetachCurrentMessage();
+				SyncedMessage msg;
+				msg.message = message;
+				sSyncedMessages.Insert(msg);
+			}
+			return;
+		}
+
 		case B_SOME_APP_LAUNCHED:
 		{
 			BString mimeSig;
@@ -3493,6 +3546,22 @@ BMediaRoster::MessageReceived(BMessage* message)
 			TRACE("BMediaRoster::MessageReceived media services are"
 				" finally up.");
 
+			if (MediaRosterEx(this)->fLaunchNotification) {
+				progress_startup(100, NULL, NULL);
+				if (MediaRosterEx(this)->fAutoExit)
+					MediaRosterEx(this)->fLaunchNotification = false;
+			}
+
+			BMessage reply;
+			for (int32 i = 0; i < sSyncedMessages.CountItems(); i++) {
+				SyncedMessage* msg;
+				if (sSyncedMessages.Get(i, &msg) != true)
+					return;
+				msg->message->SendReply(&reply);
+				delete msg->message;
+				sSyncedMessages.Remove(i);
+			}
+
 			// Send the notification to our subscribers
 			for (int32 i = 0; i < sNotificationList.CountItems(); i++) {
 				RosterNotification* current;
@@ -3506,6 +3575,7 @@ BMediaRoster::MessageReceived(BMessage* message)
 					}
 				}
 			}
+			return;
 		}
 
 		case NODE_FINAL_RELEASE:

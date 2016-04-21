@@ -40,7 +40,10 @@ enum {
 enum {
 	// local media services status notification service
 	MEDIA_ROSTER_REQUEST_NOTIFICATIONS = 2000,
-	MEDIA_ROSTER_CANCEL_NOTIFICATIONS
+	MEDIA_ROSTER_CANCEL_NOTIFICATIONS,
+
+	// used to sync with media services startup
+	MEDIA_ROSTER_REGISTER_SYNC
 };
 
 // Raw port based communication

@@ -143,8 +143,6 @@ ServerApp::ReadyToRun()
 {
 	gNodeManager->LoadState();
 
-	progress_startup(50, NULL, NULL);
-
 	// make sure any previous media_addon_server is gone
 	_QuitAddOnServer();
 	// and start a new one
@@ -941,11 +939,8 @@ ServerApp::MessageReceived(BMessage* msg)
 			break;
 
 		case MEDIA_SERVER_RESCAN_COMPLETED:
-		{
 			gAppManager->NotifyRosters();
-			progress_startup(100, NULL, NULL);
 			break;
-		}
 
 		case B_SOME_APP_QUIT:
 		{

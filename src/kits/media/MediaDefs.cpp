@@ -29,6 +29,7 @@
 #include "DataExchange.h"
 #include "debug.h"
 #include "MediaMisc.h"
+#include "MediaRosterEx.h"
 
 
 #define META_DATA_MAX_SIZE			(16 << 20)
@@ -1301,6 +1302,15 @@ shutdown_media_server(bigtime_t timeout,
 	status_t err;
 	bool shutdown = false;
 
+	BMediaRoster* roster = BMediaRoster::Roster();
+	if (roster == NULL)
+		return B_ERROR;
+
+	if (progress == NULL && roster->Lock()) {
+		MediaRosterEx(roster)->EnableLaunchNotification(true, true);
+		roster->Unlock();
+	}
+
 	if ((err = msg.AddBool("be:_user_request", true)) != B_OK)
 		return err;
 
@@ -1323,8 +1333,8 @@ shutdown_media_server(bigtime_t timeout,
 			return rv;
 	}
 
-	shutdown = false;
 	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
+		shutdown = false;
 		BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);
 		progress_shutdown(40, progress, cookie);
 
@@ -1391,41 +1401,49 @@ launch_media_server(bigtime_t timeout,
 	if (BMediaRoster::IsRunning())
 		return B_ALREADY_RUNNING;
 
+	status_t err = B_MEDIA_SYSTEM_FAILURE;
+	BMediaRoster* roster = BMediaRoster::Roster(&err);
+	if (roster == NULL || err != B_OK)
+		return err;
+
+	if (progress == NULL && roster->Lock()) {
+		MediaRosterEx(roster)->EnableLaunchNotification(true, true);
+		roster->Unlock();
+	}
+
 	// The media_server crashed
 	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
 		progress_startup(10, progress, cookie);
 		kill_team(be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE));
-		snooze(1000000);
 	}
 
 	// The media_addon_server crashed
 	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
 		progress_startup(20, progress, cookie);
 		kill_team(be_roster->TeamFor(B_MEDIA_SERVER_SIGNATURE));
-		snooze(1000000);
 	}
 
-	status_t err = be_roster->Launch(B_MEDIA_SERVER_SIGNATURE);
-	if (err != B_OK)
-		return err;
+	progress_startup(50, progress, cookie);
 
-	err = B_MEDIA_SYSTEM_FAILURE;
-	for (int i = 0; i < 15; i++) {
-		snooze(2000000);
+	err = roster->SyncToServices(2000000);
+	if (err != B_OK) {
+		// At this point, it might be that the launch_daemon isn't
+		// restarting us, then we'll attempt at launching the server
+		// ourselves.
+		status_t err = be_roster->Launch(B_MEDIA_SERVER_SIGNATURE);
+		if (err != B_OK)
+			return err;
 
-		BMessage msg(1); // this is a hack
-		BMessage reply;
-		BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);
-
-		if (messenger.IsValid()) {
-			messenger.SendMessage(&msg, &reply, 2000000, 2000000);
-			err = B_OK;
-			break;
-		}
+		if (roster->SyncToServices(2000000) != B_OK)
+			err = B_MEDIA_SYSTEM_FAILURE;
 	}
 
 	if (err != B_OK)
 		progress_startup(90, progress, cookie);
+	else if (progress != NULL) {
+		progress_startup(100, progress, cookie);
+		err = B_OK;
+	}
 
 	return err;
 }
