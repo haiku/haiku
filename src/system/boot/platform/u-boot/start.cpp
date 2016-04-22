@@ -48,6 +48,17 @@ typedef struct uboot_gd {
 	uint32 fb_base;
 } uboot_gd;
 
+#ifdef __POWERPC__
+struct board_data {
+	unsigned long	bi_memstart;	/* start of DRAM memory */
+	uint64	bi_memsize;	/* size	 of DRAM memory in bytes */
+	unsigned long	bi_flashstart;	/* start of FLASH memory */
+	unsigned long	bi_flashsize;	/* size	 of FLASH memory */
+	unsigned long	bi_flashoffset; /* reserved area for startup monitor */
+	unsigned long	bi_sramstart;	/* start of SRAM memory */
+	unsigned long	bi_sramsize;	/* size	 of SRAM memory */
+};
+#endif
 
 // GCC defined globals
 extern void (*__ctor_list)(void);
@@ -116,6 +127,7 @@ platform_start_kernel(void)
 	mmu_init_for_kernel();
 //	smp_boot_other_cpus();
 
+	dprintf("ncpus %lx\n", gKernelArgs.num_cpus);
 	dprintf("kernel entry at %lx\n", kernelEntry);
 
 	status_t error = arch_start_kernel(&gKernelArgs, kernelEntry,
@@ -270,6 +282,16 @@ start_gen(int argc, const char **argv, struct image_header *uimage, void *fdt)
 		dprintf("gd @ %p\n", gUBootGlobalData);
 		if (gUBootGlobalData) {
 			dprintf("gd->bd @ %p\n", gUBootGlobalData->bd);
+#ifdef __POWERPC__
+			dprintf("gd->bd: \nmemstart = %lx\nmemsize = %Lx\nflashstart = %lx\nflashsize = %lx\nflashoffset = %lx\nsramstart = %lx\nsramsize = %lx\n",
+				gUBootGlobalData->bd->bi_memstart,
+				gUBootGlobalData->bd->bi_memsize,
+				gUBootGlobalData->bd->bi_flashstart,
+				gUBootGlobalData->bd->bi_flashsize,
+				gUBootGlobalData->bd->bi_flashoffset,
+				gUBootGlobalData->bd->bi_sramstart,
+				gUBootGlobalData->bd->bi_sramsize);
+#endif
 			dprintf("gd->fb_base @ %p\n", (void*)gUBootGlobalData->fb_base);
 		}
 		if (gUImage)
