@@ -1298,7 +1298,6 @@ shutdown_media_server(bigtime_t timeout,
 	void* cookie)
 {
 	BMessage msg(B_QUIT_REQUESTED);
-	BMessage reply;
 	status_t err = B_MEDIA_SYSTEM_FAILURE;
 	bool shutdown = false;
 
@@ -1314,15 +1313,19 @@ shutdown_media_server(bigtime_t timeout,
 	if ((err = msg.AddBool("be:_user_request", true)) != B_OK)
 		return err;
 
-	if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE)) {
-		BMessenger messenger(B_MEDIA_SERVER_SIGNATURE);
+	team_id mediaServer = be_roster->TeamFor(B_MEDIA_SERVER_SIGNATURE);
+	team_id addOnServer = be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE);
+
+	if (mediaServer != B_ERROR) {
+		BMessage reply;
+		BMessenger messenger(B_MEDIA_SERVER_SIGNATURE, mediaServer);
 		progress_shutdown(10, progress, cookie);
 
 		err = messenger.SendMessage(&msg, &reply, 2000000, 2000000);
 		reply.FindBool("_shutdown", &shutdown);
 		if (err == B_TIMED_OUT || shutdown == false) {
-			if (be_roster->IsRunning(B_MEDIA_SERVER_SIGNATURE))
-				kill_team(be_roster->TeamFor(B_MEDIA_SERVER_SIGNATURE));
+			if (messenger.IsValid())
+				kill_team(mediaServer);
 		} else if (err != B_OK)
 			return err;
 
@@ -1333,24 +1336,29 @@ shutdown_media_server(bigtime_t timeout,
 			return rv;
 	}
 
-	if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE)) {
+	if (addOnServer != B_ERROR) {
 		shutdown = false;
-		BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE);
+		BMessage reply;
+		BMessenger messenger(B_MEDIA_ADDON_SERVER_SIGNATURE, addOnServer);
 		progress_shutdown(40, progress, cookie);
 
-		err = messenger.SendMessage(&msg, &reply, 2000000, 2000000);
-		reply.FindBool("_shutdown", &shutdown);
-		if (err == B_TIMED_OUT || shutdown == false) {
-			if (be_roster->IsRunning(B_MEDIA_ADDON_SERVER_SIGNATURE))
-				kill_team(be_roster->TeamFor(B_MEDIA_ADDON_SERVER_SIGNATURE));
-		} else if (err != B_OK)
-			return err;
+		// The media_server usually shutdown the media_addon_server,
+		// if not let's do something.
+		if (messenger.IsValid()) {
+			err = messenger.SendMessage(&msg, &reply, 2000000, 2000000);
+			reply.FindBool("_shutdown", &shutdown);
+			if (err == B_TIMED_OUT || shutdown == false) {
+				if (messenger.IsValid())
+					kill_team(addOnServer);
+			} else if (err != B_OK)
+				return err;
 
-		progress_shutdown(50, progress, cookie);
+			progress_shutdown(50, progress, cookie);
 
-		int32 rv;
-		if (reply.FindInt32("error", &rv) == B_OK && rv != B_OK)
-			return rv;
+			int32 rv;
+			if (reply.FindInt32("error", &rv) == B_OK && rv != B_OK)
+				return rv;
+		}
 	}
 
 	progress_shutdown(100, progress, cookie);
@@ -1430,7 +1438,7 @@ launch_media_server(bigtime_t timeout,
 		// At this point, it might be that the launch_daemon isn't
 		// restarting us, then we'll attempt at launching the server
 		// ourselves.
-		status_t err = be_roster->Launch(B_MEDIA_SERVER_SIGNATURE);
+		err = be_roster->Launch(B_MEDIA_SERVER_SIGNATURE);
 		if (err != B_OK)
 			return err;
 
