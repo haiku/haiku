@@ -3555,10 +3555,10 @@ BMediaRoster::MessageReceived(BMessage* message)
 			BMessage reply;
 			for (int32 i = 0; i < sSyncedMessages.CountItems(); i++) {
 				SyncedMessage* msg;
-				if (sSyncedMessages.Get(i, &msg) != true)
-					return;
-				msg->message->SendReply(&reply);
-				delete msg->message;
+				if (sSyncedMessages.Get(i, &msg) == true) {
+					msg->message->SendReply(&reply);
+					delete msg->message;
+				}
 				sSyncedMessages.Remove(i);
 			}
 

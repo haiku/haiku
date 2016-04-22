@@ -1299,12 +1299,12 @@ shutdown_media_server(bigtime_t timeout,
 {
 	BMessage msg(B_QUIT_REQUESTED);
 	BMessage reply;
-	status_t err;
+	status_t err = B_MEDIA_SYSTEM_FAILURE;
 	bool shutdown = false;
 
-	BMediaRoster* roster = BMediaRoster::Roster();
-	if (roster == NULL)
-		return B_ERROR;
+	BMediaRoster* roster = BMediaRoster::Roster(&err);
+	if (roster == NULL || err != B_OK)
+		return err;
 
 	if (progress == NULL && roster->Lock()) {
 		MediaRosterEx(roster)->EnableLaunchNotification(true, true);
