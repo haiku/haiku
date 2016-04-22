@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot loader file_systems packagefs ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders kernel shared storage support ;
 UseBuildFeatureHeaders zlib ;

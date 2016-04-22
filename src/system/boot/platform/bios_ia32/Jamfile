@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot platform bios_ia32 ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 SubDirHdrs $(HAIKU_TOP) headers private kernel boot platform $(TARGET_BOOT_PLATFORM) ;
 
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;

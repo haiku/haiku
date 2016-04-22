@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot platform efi ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 UsePrivateHeaders [ FDirName kernel boot ] ;
 UseBuildFeatureHeaders gnuefi ;
 UseBuildFeatureHeaders gnuefi : headersProtocol ;

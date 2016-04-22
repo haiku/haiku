@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot arch x86 ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 DEFINES += _BOOT_MODE ;
 
 local kernelArchSources =

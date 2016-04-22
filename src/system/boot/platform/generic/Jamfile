@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot platform generic ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 UseBuildFeatureHeaders zlib ;
 UsePrivateKernelHeaders ;
 
@@ -11,5 +13,5 @@ BootStaticLibrary boot_platform_generic :
 	video_splash.cpp
 ;
 
-Includes [ FGristFiles video_splash.cpp ] 
+Includes [ FGristFiles video_splash.cpp ]
 	: [ BuildFeatureAttribute zlib : headers ] ;

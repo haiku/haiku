@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot loader ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;

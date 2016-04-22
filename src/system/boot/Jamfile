@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 DEFINES += _BOOT_MODE ;
 
 if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) != bios_ia32 {

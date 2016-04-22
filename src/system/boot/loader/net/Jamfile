@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot loader net ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 UsePrivateHeaders kernel [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders drivers ;
 
