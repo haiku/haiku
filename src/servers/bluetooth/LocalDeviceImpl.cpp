@@ -665,7 +665,7 @@ LocalDeviceImpl::CommandComplete(struct hci_ev_cmd_complete* event,
 
 			Output::Instance()->Postf(BLACKBOARD_LD(GetID()),
 				"Status %s addresss=%s\n", BluetoothError(linkKeyReply->status),
-				bdaddrUtils::ToString(linkKeyReply->bdaddr));
+				bdaddrUtils::ToString(linkKeyReply->bdaddr).String());
 
 			ClearWantedEvent(request, HCI_EVENT_CMD_COMPLETE, opcodeExpected);
 			break;
@@ -874,7 +874,7 @@ LocalDeviceImpl::RemoteNameRequestComplete(
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),
 		"%s for %s with status %s\n",
 		BluetoothEvent(HCI_EVENT_REMOTE_NAME_REQUEST_COMPLETE),
-		bdaddrUtils::ToString(remotename->bdaddr),
+		bdaddrUtils::ToString(remotename->bdaddr).String(),
 		BluetoothError(remotename->status));
 
 	printf("%s: Sending reply...\n", __func__);
@@ -897,7 +897,7 @@ LocalDeviceImpl::ConnectionRequest(struct hci_ev_conn_request* event,
 
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),
 		"Connection Incoming type %x from %s...\n",
-		event->link_type, bdaddrUtils::ToString(event->bdaddr));
+		event->link_type, bdaddrUtils::ToString(event->bdaddr).String());
 
 	// TODO: add a possible request in the queue
 	if (true) { // Check Preferences if we are to accept this connection
@@ -951,7 +951,7 @@ LocalDeviceImpl::ConnectionComplete(struct hci_ev_conn_complete* event,
 
 		Output::Instance()->Postf(BLACKBOARD_LD(GetID()),
 			"%s: Address %s handle=%#x type=%d encrypt=%d\n", __FUNCTION__,
-				bdaddrUtils::ToString(event->bdaddr), event->handle,
+				bdaddrUtils::ToString(event->bdaddr).String(), event->handle,
 				event->link_type, event->encrypt_mode);
 
 	} else {
@@ -1018,7 +1018,7 @@ LocalDeviceImpl::RoleChange(hci_ev_role_change* event, BMessage* request)
 {
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),
 		"%s: Address %s role=%d status=%d\n", __FUNCTION__,
-		bdaddrUtils::ToString(event->bdaddr), event->role, event->status);
+		bdaddrUtils::ToString(event->bdaddr).String(), event->role, event->status);
 }
 
 
@@ -1028,7 +1028,7 @@ LocalDeviceImpl::PageScanRepetitionModeChange(
 {
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),
 		"%s: Address %s type=%d\n",	__FUNCTION__,
-		bdaddrUtils::ToString(event->bdaddr), event->page_scan_rep_mode);
+		bdaddrUtils::ToString(event->bdaddr).String(), event->page_scan_rep_mode);
 }
 
 
@@ -1038,8 +1038,8 @@ LocalDeviceImpl::LinkKeyNotify(hci_ev_link_key_notify* event,
 {
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),
 		"%s: Address %s, key=%s, type=%d\n", __FUNCTION__,
-		bdaddrUtils::ToString(event->bdaddr),
-		LinkKeyUtils::ToString(event->link_key), event->key_type);
+		bdaddrUtils::ToString(event->bdaddr).String(),
+		LinkKeyUtils::ToString(event->link_key).String(), event->key_type);
 }
 
 
@@ -1049,7 +1049,7 @@ LocalDeviceImpl::LinkKeyRequested(struct hci_ev_link_key_req* keyRequested,
 {
 	Output::Instance()->Postf(BLACKBOARD_LD(GetID()),
 		"%s: Address %s\n", __FUNCTION__,
-		bdaddrUtils::ToString(keyRequested->bdaddr));
+		bdaddrUtils::ToString(keyRequested->bdaddr).String());
 
 	// TODO:
 	// Here we are suposed to check the BDADDR received, look into the server
@@ -1091,8 +1091,8 @@ LocalDeviceImpl::ReturnLinkKeys(struct hci_ev_return_link_keys* returnedKeys)
 	while (numKeys > 0) {
 
 		Output::Instance()->Postf(BLACKBOARD_LD(GetID()), "Address=%s key=%s\n",
-			bdaddrUtils::ToString(linkKeys->bdaddr),
-			LinkKeyUtils::ToString(linkKeys->link_key));
+			bdaddrUtils::ToString(linkKeys->bdaddr).String(),
+			LinkKeyUtils::ToString(linkKeys->link_key).String());
 
 		linkKeys++;
 	}
