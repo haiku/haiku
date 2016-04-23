@@ -32,6 +32,7 @@
 #define INTEL_FAMILY_SER5	0x00080000	// Intel5 Series
 #define INTEL_FAMILY_POVR	0x00100000	// PowerVR (uugh)
 #define INTEL_FAMILY_SOC0	0x00200000  // Atom SOC
+#define INTEL_FAMILY_LAKE	0x00400000	// Intel Lakes
 // groups
 #define INTEL_GROUP_83x		(INTEL_FAMILY_8xx  | 0x0010)
 #define INTEL_GROUP_85x		(INTEL_FAMILY_8xx  | 0x0020)
@@ -50,6 +51,8 @@
 #define INTEL_GROUP_VLV		(INTEL_FAMILY_SOC0 | 0x0010)  // ValleyView
 #define INTEL_GROUP_CHV		(INTEL_FAMILY_SOC0 | 0x0020)  // CherryView
 #define INTEL_GROUP_BXT		(INTEL_FAMILY_SOC0 | 0x0040)  // Broxton
+#define INTEL_GROUP_SKY		(INTEL_FAMILY_LAKE | 0x0010)  // SkyLake
+#define INTEL_GROUP_KBY		(INTEL_FAMILY_LAKE | 0x0020)  // KabyLake
 // models
 #define INTEL_TYPE_SERVER	0x0004
 #define INTEL_TYPE_MOBILE	0x0008
@@ -76,6 +79,9 @@
 #define INTEL_MODEL_HASM	(INTEL_GROUP_HAS | INTEL_TYPE_MOBILE)
 #define INTEL_MODEL_VLV		(INTEL_GROUP_VLV)
 #define INTEL_MODEL_VLVM	(INTEL_GROUP_VLV | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_SKY		(INTEL_GROUP_SKY)
+#define INTEL_MODEL_SKYM	(INTEL_GROUP_SKY | INTEL_TYPE_MOBILE)
+#define INTEL_MODEL_SKYS	(INTEL_GROUP_SKY | INTEL_TYPE_SERVER)
 
 // ValleyView MMIO offset
 #define VLV_DISPLAY_BASE		0x180000
@@ -187,7 +193,7 @@ struct DeviceType {
 			return 7;
 		if (InGroup(INTEL_GROUP_CHV))
 			return 8;
-		if (InGroup(INTEL_GROUP_BXT))
+		if (InGroup(INTEL_GROUP_BXT) || InFamily(INTEL_FAMILY_LAKE))
 			return 9;
 
 		// Generation 0 means somethins is wrong :-)
