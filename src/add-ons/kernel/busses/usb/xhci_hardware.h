@@ -67,7 +67,7 @@
 // Section 5.4.5
 #define XHCI_CRCR_LO		0x18
 #define XHCI_CRCR_HI		0x1C
-#define CRCR_RCS		(1<<0)
+#define CRCR_RCS			(1<<0)
 // Section 5.4.6
 #define XHCI_DCBAAP_LO		0x30
 #define XHCI_DCBAAP_HI		0x34
@@ -97,9 +97,9 @@
 
 
 // Host Controller Doorbell Registers
-#define XHCI_DOORBELL(n)		(0x0000 + (4 * (n)))
-#define XHCI_DOORBELL_TARGET(x)		((x) & 0xff)
-#define XHCI_DOORBELL_TARGET_GET(x)	((x) & 0xff)
+#define XHCI_DOORBELL(n)				(0x0000 + (4 * (n)))
+#define XHCI_DOORBELL_TARGET(x)			((x) & 0xff)
+#define XHCI_DOORBELL_TARGET_GET(x)		((x) & 0xff)
 #define XHCI_DOORBELL_STREAMID(x)		(((x) & 0xffff) << 16)
 #define XHCI_DOORBELL_STREAMID_GET(x)	(((x) >> 16) & 0xffff)
 
@@ -112,16 +112,16 @@
 #define XHCI_LEGSUP_OSOWNED		(1 << 24)	// OS Owned Semaphore
 #define XHCI_LEGSUP_BIOSOWNED	(1 << 16)	// BIOS Owned Semaphore
 
-#define XHCI_LEGCTLSTS			0x04
+#define XHCI_LEGCTLSTS				0x04
 #define XHCI_LEGCTLSTS_DISABLE_SMI	((0x7 << 1) + (0xff << 5) + (0x7 << 17))
-#define XHCI_LEGCTLSTS_EVENTS_SMI (0x7 << 29)
+#define XHCI_LEGCTLSTS_EVENTS_SMI	(0x7 << 29)
 
-#define XHCI_SUPPORTED_PROTOCOLS_CAPID	0x02
+#define XHCI_SUPPORTED_PROTOCOLS_CAPID		0x02
 #define XHCI_SUPPORTED_PROTOCOLS_0_MINOR(x)	(((x) >> 16) & 0xff)
 #define XHCI_SUPPORTED_PROTOCOLS_0_MAJOR(x)	(((x) >> 24) & 0xff)
 
 #define XHCI_SUPPORTED_PROTOCOLS_1_COUNT(x)	(((x) >> 8) & 0xff)
-#define XHCI_SUPPORTED_PROTOCOLS_1_OFFSET(x)	(((x) >> 0) & 0xff)
+#define XHCI_SUPPORTED_PROTOCOLS_1_OFFSET(x) (((x) >> 0) & 0xff)
 
 
 
@@ -156,55 +156,55 @@
 
 // Completion Code
 #define TRB_2_COMP_CODE_GET(x)		(((x) >> 24) & 0xff)
-#define COMP_INVALID			0
-#define COMP_SUCCESS			1
-#define COMP_DATA_BUFFER		2
-#define COMP_BABBLE				3
-#define COMP_USB_TRANSACTION	4
-#define COMP_TRB				5
-#define COMP_STALL				6
-#define COMP_RESOURCE			7
-#define COMP_BANDWIDTH			8
-#define COMP_NO_SLOTS			9
-#define COMP_INVALID_STREAM		10
-#define COMP_SLOT_NOT_ENABLED	11
+#define COMP_INVALID				0
+#define COMP_SUCCESS				1
+#define COMP_DATA_BUFFER			2
+#define COMP_BABBLE					3
+#define COMP_USB_TRANSACTION		4
+#define COMP_TRB					5
+#define COMP_STALL					6
+#define COMP_RESOURCE				7
+#define COMP_BANDWIDTH				8
+#define COMP_NO_SLOTS				9
+#define COMP_INVALID_STREAM			10
+#define COMP_SLOT_NOT_ENABLED		11
 #define COMP_ENDPOINT_NOT_ENABLED	12
-#define COMP_SHORT_PACKET		13
-#define COMP_RING_UNDERRUN		14
-#define COMP_RING_OVERRUN		15
-#define COMP_VF_RING_FULL		16
-#define COMP_PARAMETER			17
-#define COMP_BANDWIDTH_OVERRUN	18
-#define COMP_CONTEXT_STATE		19
-#define COMP_NO_PING_RESPONSE	20
-#define COMP_EVENT_RING_FULL	21
+#define COMP_SHORT_PACKET			13
+#define COMP_RING_UNDERRUN			14
+#define COMP_RING_OVERRUN			15
+#define COMP_VF_RING_FULL			16
+#define COMP_PARAMETER				17
+#define COMP_BANDWIDTH_OVERRUN		18
+#define COMP_CONTEXT_STATE			19
+#define COMP_NO_PING_RESPONSE		20
+#define COMP_EVENT_RING_FULL		21
 #define COMP_INCOMPATIBLE_DEVICE	22
-#define COMP_MISSED_SERVICE		23
+#define COMP_MISSED_SERVICE			23
 #define COMP_COMMAND_RING_STOPPED	24
-#define COMP_COMMAND_ABORTED	25
-#define COMP_STOPPED			26
-#define COMP_LENGTH_INVALID		27
-#define COMP_MAX_EXIT_LATENCY	29
-#define COMP_ISOC_OVERRUN		31
-#define COMP_EVENT_LOST			32
-#define COMP_UNDEFINED			33
-#define COMP_INVALID_STREAM_ID	34
+#define COMP_COMMAND_ABORTED		25
+#define COMP_STOPPED				26
+#define COMP_LENGTH_INVALID			27
+#define COMP_MAX_EXIT_LATENCY		29
+#define COMP_ISOC_OVERRUN			31
+#define COMP_EVENT_LOST				32
+#define COMP_UNDEFINED				33
+#define COMP_INVALID_STREAM_ID		34
 #define COMP_SECONDARY_BANDWIDTH	35
-#define COMP_SPLIT_TRANSACTION	36
+#define COMP_SPLIT_TRANSACTION		36
 
-#define TRB_2_TD_SIZE(x)			(((x) & 0x1F) << 17)
-#define TRB_2_TD_SIZE_GET(x)		(((x) >> 17) & 0x1F)
-#define TRB_2_REM(x)				((x) & 0xFFFFFF)
-#define TRB_2_REM_GET(x)			((x) & 0xFFFFFF)
-#define TRB_2_BYTES(x)				((x) & 0x1FFFF)
-#define TRB_2_BYTES_GET(x)			((x) & 0x1FFFF)
-#define TRB_2_IRQ(x)				(((x) & 0x3FF) << 22)
-#define TRB_2_IRQ_GET(x)			(((x) >> 22) & 0x3FF)
-#define TRB_2_STREAM(x)				(((x) & 0xFF) << 16)
-#define TRB_2_STREAM_GET(x)			(((x) >> 16) & 0xFF)
+#define TRB_2_TD_SIZE(x)		(((x) & 0x1F) << 17)
+#define TRB_2_TD_SIZE_GET(x)	(((x) >> 17) & 0x1F)
+#define TRB_2_REM(x)			((x) & 0xFFFFFF)
+#define TRB_2_REM_GET(x)		((x) & 0xFFFFFF)
+#define TRB_2_BYTES(x)			((x) & 0x1FFFF)
+#define TRB_2_BYTES_GET(x)		((x) & 0x1FFFF)
+#define TRB_2_IRQ(x)			(((x) & 0x3FF) << 22)
+#define TRB_2_IRQ_GET(x)		(((x) >> 22) & 0x3FF)
+#define TRB_2_STREAM(x)			(((x) & 0xFF) << 16)
+#define TRB_2_STREAM_GET(x)		(((x) >> 16) & 0xFF)
 
-#define TRB_3_TYPE(x)				(((x) & 0x3F) << 10)
-#define TRB_3_TYPE_GET(x)			(((x) >> 10) & 0x3F)
+#define TRB_3_TYPE(x)			(((x) & 0x3F) << 10)
+#define TRB_3_TYPE_GET(x)		(((x) >> 10) & 0x3F)
 // TRB Type (table 131)
 #define TRB_TYPE_NORMAL					1
 #define TRB_TYPE_SETUP_STAGE			2
@@ -243,24 +243,24 @@
 #define TRB_TYPE_NEC_COMMAND_COMPLETION	48
 #define TRB_TYPE_NEC_GET_FIRMWARE_REV	49
 
-#define TRB_3_CYCLE_BIT			(1U << 0)
-#define TRB_3_TC_BIT			(1U << 1)
-#define TRB_3_ENT_BIT			(1U << 1)
-#define TRB_3_ISP_BIT			(1U << 2)
-#define TRB_3_NSNOOP_BIT		(1U << 3)
-#define TRB_3_CHAIN_BIT			(1U << 4)
-#define TRB_3_IOC_BIT			(1U << 5)
-#define TRB_3_IDT_BIT			(1U << 6)
-#define TRB_3_BEI_BIT			(1U << 9)
-#define TRB_3_DCEP_BIT			(1U << 9)
-#define TRB_3_PRSV_BIT			(1U << 9)
-#define TRB_3_BSR_BIT			(1U << 9)
-#define TRB_3_TRT_MASK			(3U << 16)
-#define TRB_3_DIR_IN			(1U << 16)
-#define TRB_3_TRT_OUT			(2U << 16)
-#define TRB_3_TRT_IN			(3U << 16)
+#define TRB_3_CYCLE_BIT				(1U << 0)
+#define TRB_3_TC_BIT				(1U << 1)
+#define TRB_3_ENT_BIT				(1U << 1)
+#define TRB_3_ISP_BIT				(1U << 2)
+#define TRB_3_NSNOOP_BIT			(1U << 3)
+#define TRB_3_CHAIN_BIT				(1U << 4)
+#define TRB_3_IOC_BIT				(1U << 5)
+#define TRB_3_IDT_BIT				(1U << 6)
+#define TRB_3_BEI_BIT				(1U << 9)
+#define TRB_3_DCEP_BIT				(1U << 9)
+#define TRB_3_PRSV_BIT				(1U << 9)
+#define TRB_3_BSR_BIT				(1U << 9)
+#define TRB_3_TRT_MASK				(3U << 16)
+#define TRB_3_DIR_IN				(1U << 16)
+#define TRB_3_TRT_OUT				(2U << 16)
+#define TRB_3_TRT_IN				(3U << 16)
 #define TRB_3_SUSPEND_ENDPOINT_BIT	(1U << 23)
-#define TRB_3_ISO_SIA_BIT		(1U << 31)
+#define TRB_3_ISO_SIA_BIT			(1U << 31)
 
 #define TRB_3_TBC(x)			(((x) & 0x3) << 7)
 #define TRB_3_TBC_GET(x)		(((x) >> 7) & 0x3)
@@ -268,20 +268,20 @@
 #define TRB_3_TLBPC_GET(x)		(((x) >> 16) & 0xf)
 #define TRB_3_ENDPOINT(x)		(((x) & 0xf) << 16)
 #define TRB_3_ENDPOINT_GET(x)	(((x) >> 16) & 0xf)
-#define TRB_3_FRID(x)		(((x) & 0x7ff) << 20)
-#define TRB_3_FRID_GET(x)	(((x) >> 20) & 0x7ff)
-#define TRB_3_SLOT(x)		(((x) & 0xff) << 24)
-#define TRB_3_SLOT_GET(x)	(((x) >> 24) & 0xff)
+#define TRB_3_FRID(x)			(((x) & 0x7ff) << 20)
+#define TRB_3_FRID_GET(x)		(((x) >> 20) & 0x7ff)
+#define TRB_3_SLOT(x)			(((x) & 0xff) << 24)
+#define TRB_3_SLOT_GET(x)		(((x) >> 24) & 0xff)
 
 
-#define XHCI_MAX_EVENTS		(16 * 13)
+#define XHCI_MAX_EVENTS			(16 * 13)
 #define XHCI_MAX_COMMANDS		(16 * 1)
-#define XHCI_MAX_SLOTS		255
-#define XHCI_MAX_PORTS		127
-#define XHCI_MAX_ENDPOINTS	32
+#define XHCI_MAX_SLOTS			255
+#define XHCI_MAX_PORTS			127
+#define XHCI_MAX_ENDPOINTS		32
 #define XHCI_MAX_SCRATCHPADS	32
-#define XHCI_MAX_DEVICES	128
-#define XHCI_MAX_TRANSFERS	8
+#define XHCI_MAX_DEVICES		128
+#define XHCI_MAX_TRANSFERS		8
 #define XHCI_MAX_TRBS_PER_TD	18
 
 
@@ -352,8 +352,8 @@ struct xhci_slot_ctx {
 #define SLOT_2_PORT_NUM_GET(x)			(((x) >> 8) & 0xFF)
 #define SLOT_2_TT_TIME(x)				(((x) & 0x3) << 16)
 #define SLOT_2_TT_TIME_GET(x)			(((x) >> 16) & 0x3)
-#define SLOT_2_IRQ_TARGET(x)				(((x) & 0x7F) << 22)
-#define SLOT_2_IRQ_TARGET_GET(x)			(((x) >> 22) & 0x7F)
+#define SLOT_2_IRQ_TARGET(x)			(((x) & 0x7F) << 22)
+#define SLOT_2_IRQ_TARGET_GET(x)		(((x) >> 22) & 0x7F)
 
 #define SLOT_3_DEVICE_ADDRESS(x)		((x) & 0xFF)
 #define SLOT_3_DEVICE_ADDRESS_GET(x)	((x) & 0xFF)
@@ -371,32 +371,32 @@ struct xhci_endpoint_ctx {
 };
 
 
-#define ENDPOINT_0_STATE(x)					((x) & 0x3)
-#define ENDPOINT_0_STATE_GET(x)				((x) & 0x3)
+#define ENDPOINT_0_STATE(x)				((x) & 0x3)
+#define ENDPOINT_0_STATE_GET(x)			((x) & 0x3)
 #define ENDPOINT_0_MULT(x)				(((x) & 0x3) << 8)
 #define ENDPOINT_0_MULT_GET(x)			(((x) >> 8) & 0x3)
-#define ENDPOINT_0_MAXPSTREAMS(x)				(((x) & 0x1F) << 10)
-#define ENDPOINT_0_MAXPSTREAMS_GET(x)			(((x) >> 10) & 0x1F)
-#define ENDPOINT_0_LSA_BIT					(1U << 15)
-#define ENDPOINT_0_INTERVAL(x)				(((x) & 0xFF) << 16)
-#define ENDPOINT_0_INTERVAL_GET(x)			(((x) >> 16) & 0xFF)
+#define ENDPOINT_0_MAXPSTREAMS(x)		(((x) & 0x1F) << 10)
+#define ENDPOINT_0_MAXPSTREAMS_GET(x)	(((x) >> 10) & 0x1F)
+#define ENDPOINT_0_LSA_BIT				(1U << 15)
+#define ENDPOINT_0_INTERVAL(x)			(((x) & 0xFF) << 16)
+#define ENDPOINT_0_INTERVAL_GET(x)		(((x) >> 16) & 0xFF)
 
 #define ENDPOINT_1_CERR(x)				(((x) & 0x3) << 1)
 #define ENDPOINT_1_CERR_GET(x)			(((x) >> 1) & 0x3)
 #define ENDPOINT_1_EPTYPE(x)			(((x) & 0x7) << 3)
 #define ENDPOINT_1_EPTYPE_GET(x)		(((x) >> 3) & 0x7)
-#define ENDPOINT_1_HID_BIT					(1U << 7)
+#define ENDPOINT_1_HID_BIT				(1U << 7)
 #define ENDPOINT_1_MAXBURST(x)			(((x) & 0xFF) << 8)
 #define ENDPOINT_1_MAXBURST_GET(x)		(((x) >> 8) & 0xFF)
-#define ENDPOINT_1_MAXPACKETSIZE(x)			(((x) & 0xFFFF) << 16)
-#define ENDPOINT_1_MAXPACKETSIZE_GET(x)		(((x) >> 16) & 0xFFFF)
+#define ENDPOINT_1_MAXPACKETSIZE(x)		(((x) & 0xFFFF) << 16)
+#define ENDPOINT_1_MAXPACKETSIZE_GET(x)	(((x) >> 16) & 0xFFFF)
 
-#define ENDPOINT_2_DCS_BIT					(1U << 0)
+#define ENDPOINT_2_DCS_BIT				(1U << 0)
 
-#define ENDPOINT_4_AVGTRBLENGTH(x)			((x) & 0xFFFF)
-#define ENDPOINT_4_AVGTRBLENGTH_GET(x)		((x) & 0xFFFF)
-#define ENDPOINT_4_MAXESITPAYLOAD(x)		(((x) & 0xFFFF) << 16)
-#define ENDPOINT_4_MAXESITPAYLOAD_GET(x)	(((x) >> 16) & 0xFFFF)
+#define ENDPOINT_4_AVGTRBLENGTH(x)		((x) & 0xFFFF)
+#define ENDPOINT_4_AVGTRBLENGTH_GET(x)	((x) & 0xFFFF)
+#define ENDPOINT_4_MAXESITPAYLOAD(x)	(((x) & 0xFFFF) << 16)
+#define ENDPOINT_4_MAXESITPAYLOAD_GET(x) (((x) >> 16) & 0xFFFF)
 
 
 struct xhci_stream_ctx {
