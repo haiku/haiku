@@ -119,9 +119,10 @@ OHCI::OHCI(pci_info *info, Stack *stack)
 
 	// Check the revision of the controller, which should be 10h
 	uint32 revision = _ReadReg(OHCI_REVISION) & 0xff;
-	TRACE("version %ld.%ld%s\n", OHCI_REVISION_HIGH(revision),
-		OHCI_REVISION_LOW(revision), OHCI_REVISION_LEGACY(revision)
-		? ", legacy support" : "");
+	TRACE("version %" B_PRId32 ".%" B_PRId32 "%s\n",
+		OHCI_REVISION_HIGH(revision), OHCI_REVISION_LOW(revision),
+		OHCI_REVISION_LEGACY(revision) ? ", legacy support" : "");
+
 	if (OHCI_REVISION_HIGH(revision) != 1 || OHCI_REVISION_LOW(revision) != 0) {
 		TRACE_ERROR("unsupported OHCI revision\n");
 		return;
