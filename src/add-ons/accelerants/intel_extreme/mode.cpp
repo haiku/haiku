@@ -460,7 +460,7 @@ intel_set_display_mode(display_mode* mode)
 	Autolock locker(sharedInfo.accelerant_lock);
 
 	// First register dump
-	dump_registers();
+	//dump_registers();
 
 	// TODO: This may not be neccesary
 	set_display_power_mode(B_DPMS_OFF);
@@ -614,7 +614,7 @@ intel_set_display_mode(display_mode* mode)
 		// triggers writing back double-buffered registers
 
 	// Second register dump
-	dump_registers();
+	//dump_registers();
 
 	return B_OK;
 }
