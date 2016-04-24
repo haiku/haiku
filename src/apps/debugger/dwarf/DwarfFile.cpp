@@ -1584,11 +1584,11 @@ DwarfFile::_ParseEntryAttributes(DataReader& dataReader,
 			case DW_FORM_strp:
 			{
 				if (fDebugStringSection != NULL) {
-					off_t offset = unit->IsDwarf64()
-						? (off_t)dataReader.Read<uint64>(0)
-						: (off_t)dataReader.Read<uint32>(0);
+					uint64 offset = unit->IsDwarf64()
+						? dataReader.Read<uint64>(0)
+						: dataReader.Read<uint32>(0);
 					if (offset >= fDebugStringSection->Size()) {
-						WARNING("Invalid DW_FORM_strp offset: %" B_PRIdOFF "\n",
+						WARNING("Invalid DW_FORM_strp offset: %" B_PRIu64 "\n",
 							offset);
 						return B_BAD_DATA;
 					}
@@ -2097,7 +2097,7 @@ DwarfFile::_ParseCIEHeader(ElfSection* debugFrameSection,
 	CfaContext& context, off_t cieOffset, CIEAugmentation& cieAugmentation,
 	DataReader& dataReader, off_t& _cieRemaining)
 {
-	if (cieOffset < 0 || cieOffset >= debugFrameSection->Size())
+	if (cieOffset < 0 || (uint64)cieOffset >= debugFrameSection->Size())
 		return B_BAD_DATA;
 
 	dataReader.SetTo((uint8*)debugFrameSection->Data() + cieOffset,
