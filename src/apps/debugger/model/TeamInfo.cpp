@@ -34,3 +34,11 @@ TeamInfo::SetTo(team_id team, const team_info& info)
 	fTeam = team;
 	fArguments.SetTo(info.args);
 }
+
+
+void
+TeamInfo::SetTo(team_id team, const BString& arguments)
+{
+	fTeam = team;
+	fArguments.SetTo(arguments);
+}

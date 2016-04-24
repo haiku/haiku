@@ -19,6 +19,7 @@ public:
 									const team_info& info);
 
 			void				SetTo(team_id team, const team_info& info);
+			void				SetTo(team_id team, const BString& arguments);
 
 			team_id				TeamID() const	{ return fTeam; }
 
