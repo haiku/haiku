@@ -49,6 +49,8 @@ extern status_t remove_images(Team *team);
 typedef bool (*image_iterator_callback)(struct image* image, void* cookie);
 struct image* image_iterate_through_images(image_iterator_callback callback,
 					void* cookie);
+struct image* image_iterate_through_team_images(team_id teamID,
+					image_iterator_callback callback, void* cookie);
 
 extern status_t image_debug_lookup_user_symbol_address(Team *team,
 					addr_t address, addr_t *_baseAddress, const char **_symbolName,

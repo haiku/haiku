@@ -298,6 +298,31 @@ image_iterate_through_images(image_iterator_callback callback, void* cookie)
 }
 
 
+struct image*
+image_iterate_through_team_images(team_id teamID,
+	image_iterator_callback callback, void* cookie)
+{
+	// get the team
+	Team* team = Team::Get(teamID);
+	if (team == NULL)
+		return NULL;
+	BReference<Team> teamReference(team, true);
+
+	// iterate through the team's images
+	MutexLocker imageLocker(sImageMutex);
+
+	struct image* image = NULL;
+
+	while ((image = (struct image*)list_get_next_item(&team->image_list,
+			image)) != NULL) {
+		if (callback(image, cookie))
+			break;
+	}
+
+	return image;
+}
+
+
 status_t
 image_debug_lookup_user_symbol_address(Team *team, addr_t address,
 	addr_t *_baseAddress, const char **_symbolName, const char **_imageName,
