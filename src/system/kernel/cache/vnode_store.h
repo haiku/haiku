@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2016, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2004-2007, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
@@ -47,6 +47,11 @@ public:
 									{ return fFileCacheRef; }
 
 			void				VnodeDeleted()	{ fVnodeDeleted = true; }
+
+			dev_t				DeviceId() const
+									{ return fDevice; }
+			ino_t				InodeId() const
+									{ return fInode; }
 
 protected:
 	virtual	void				DeleteObject();

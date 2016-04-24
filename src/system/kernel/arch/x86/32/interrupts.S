@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2011, The Haiku Team. All rights reserved.
+ * Copyright 2002-2016, The Haiku Team. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
@@ -571,7 +571,8 @@ STATIC_FUNCTION(int_bottom_user):
 	jne		1f
 
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
-			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
+			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
+			| THREAD_FLAGS_TRAP_FOR_CORE_DUMP) \
 			, THREAD_flags(%edi)
 	jnz		kernel_exit_work
 1:
@@ -654,6 +655,7 @@ STATIC_FUNCTION(handle_syscall):
 
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
+			| THREAD_FLAGS_TRAP_FOR_CORE_DUMP \
 			| THREAD_FLAGS_64_BIT_SYSCALL_RETURN \
 			| THREAD_FLAGS_RESTART_SYSCALL | THREAD_FLAGS_SYSCALL_RESTARTED) \
 			, THREAD_flags(%edi)
@@ -714,9 +716,10 @@ FUNCTION_END(handle_syscall)
 
   bad_syscall_number:
   STATIC_FUNCTION(kernel_exit_work):
-	// if no signals are pending and the thread shall not be debugged, we can
-	// use the quick kernel exit function
-	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD) \
+	// if no signals are pending and the thread shall not be debugged or stopped
+	// for a core dump, we can use the quick kernel exit function
+	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD \
+			| THREAD_FLAGS_TRAP_FOR_CORE_DUMP) \
 			, THREAD_flags(%edi)
 	jnz		kernel_exit_handle_signals
 	cli								// disable interrupts
@@ -828,7 +831,8 @@ FUNCTION(x86_return_to_userland):
 	// check, if any kernel exit work has to be done
 	movl	%gs:0, %edi
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
-			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
+			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
+			| THREAD_FLAGS_TRAP_FOR_CORE_DUMP) \
 			, THREAD_flags(%edi)
 	jnz		kernel_exit_work
 

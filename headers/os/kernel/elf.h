@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ELF_H
@@ -153,6 +153,9 @@ typedef struct {
 #define ELFDATA2LSB	1	/* little endian */
 #define ELFDATA2MSB	2	/* big endian */
 
+/* ELF version (EI_VERSION) */
+#define EV_NONE		0	/* invalid */
+#define EV_CURRENT	1	/* current version */
 
 /*** section header ***/
 
@@ -576,6 +579,125 @@ typedef struct {
 
 /* values for vna_flags */
 #define VER_FLG_WEAK	0x2		/* weak version identifier */
+
+
+/*** core files ***/
+
+/* note section header */
+
+typedef struct {
+	Elf32_Word n_namesz;		/* length of the note's name */
+	Elf32_Word n_descsz;		/* length of the note's descriptor */
+	Elf32_Word n_type;			/* note type */
+} Elf32_Nhdr;
+
+typedef struct {
+	Elf64_Word n_namesz;		/* length of the note's name */
+	Elf64_Word n_descsz;		/* length of the note's descriptor */
+	Elf64_Word n_type;			/* note type */
+} Elf64_Nhdr;
+
+/* values for note name */
+#define ELF_NOTE_CORE		"CORE"
+#define ELF_NOTE_HAIKU		"Haiku"
+
+/* values for note type (n_type) */
+/* ELF_NOTE_CORE/... */
+#define NT_FILE				0x46494c45 /* mapped files */
+
+/* ELF_NOTE_HAIKU/... */
+#define NT_TEAM				0x7465616d 	/* team */
+#define NT_AREAS			0x61726561 	/* areas */
+#define NT_IMAGES			0x696d6167 	/* images */
+#define NT_THREADS			0x74687264 	/* threads */
+
+/* NT_TEAM: Elf32_Note_Team; char[] args */
+typedef struct {
+	int32		nt_id;				/* team ID */
+	int32		nt_uid;				/* team owner ID */
+	int32		nt_gid;				/* team group ID */
+} Elf32_Note_Team;
+
+typedef Elf32_Note_Team Elf64_Note_Team;
+
+/* NT_AREAS: uint32 count; Elf32_Note_Area_Entry[count]; char[] names */
+typedef struct {
+	int32		na_id;				/* area ID */
+	uint32		na_lock;			/* lock type (B_NO_LOCK, ...) */
+	uint32		na_protection;		/* protection (B_READ_AREA | ...) */
+	uint32		na_base;			/* area base address */
+	uint32		na_size;			/* area size */
+	uint32		na_ram_size;		/* physical memory used */
+} Elf32_Note_Area_Entry;
+
+/* NT_AREAS: uint64 count; Elf64_Note_Area_Entry[count]; char[] names */
+typedef struct {
+	int32		na_id;				/* area ID */
+	uint32		na_lock;			/* lock type (B_NO_LOCK, ...) */
+	uint32		na_protection;		/* protection (B_READ_AREA | ...) */
+	uint32		na_pad1;
+	uint64		na_base;			/* area base address */
+	uint64		na_size;			/* area size */
+	uint64		na_ram_size;		/* physical memory used */
+} Elf64_Note_Area_Entry;
+
+/* NT_IMAGES: uint32 count; Elf32_Note_Image_Entry[count]; char[] names */
+typedef struct {
+	int32		ni_id;				/* image ID */
+	int32		ni_type;			/* image type (B_APP_IMAGE, ...) */
+	uint32		ni_init_routine;	/* address of init function */
+	uint32		ni_term_routine;	/* address of termination function */
+	int32		ni_device;			/* device ID of mapped file */
+	int64		ni_node;			/* node ID of mapped file */
+	uint32		ni_text_base;		/* base address of text segment */
+	uint32		ni_text_size;		/* size of text segment */
+	uint32		ni_data_base;		/* base address of data segment */
+	uint32		ni_data_size;		/* size of data segment */
+} Elf32_Note_Image_Entry;
+
+/* NT_IMAGES: uint64 count; Elf64_Note_Image_Entry[count]; char[] names */
+typedef struct {
+	int32		ni_id;				/* image ID */
+	int32		ni_type;			/* image type (B_APP_IMAGE, ...) */
+	uint64		ni_init_routine;	/* address of init function */
+	uint64		ni_term_routine;	/* address of termination function */
+	uint32		ni_pad1;
+	int32		ni_device;			/* device ID of mapped file */
+	int64		ni_node;			/* node ID of mapped file */
+	uint64		ni_text_base;		/* base address of text segment */
+	uint64		ni_text_size;		/* size of text segment */
+	uint64		ni_data_base;		/* base address of data segment */
+	uint64		ni_data_size;		/* size of data segment */
+} Elf64_Note_Image_Entry;
+
+/* NT_THREADS:
+ * uint32 count;
+ * uint32 cpuStateSize;
+ * {Elf32_Note_Thread_Entry, uint8[cpuStateSize] cpuState}[count];
+ * char[] names
+ */
+typedef struct {
+	int32		nth_id;				/* thread ID */
+	int32		nth_state;			/* thread state (B_THREAD_RUNNING, ...) */
+	int32		nth_priority;		/* thread priority */
+	uint32		nth_stack_base;		/* thread stack base address */
+	uint32		nth_stack_end;		/* thread stack end address */
+} Elf32_Note_Thread_Entry;
+
+/* NT_THREADS:
+ * uint64 count;
+ * uint64 cpuStateSize;
+ * {Elf64_Note_Thread_Entry, uint8[cpuStateSize] cpuState}[count];
+ * char[] names
+ */
+typedef struct {
+	int32		nth_id;				/* thread ID */
+	int32		nth_state;			/* thread state (B_THREAD_RUNNING, ...) */
+	int32		nth_priority;		/* thread priority */
+	uint32		nth_pad1;
+	uint64		nth_stack_base;		/* thread stack base address */
+	uint64		nth_stack_end;		/* thread stack end address */
+} Elf64_Note_Thread_Entry;
 
 
 /*** inline functions ***/

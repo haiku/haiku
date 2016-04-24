@@ -272,7 +272,8 @@ STATIC_FUNCTION(int_bottom_user):
 	// If there are no signals pending or we're not debugging, we can avoid
 	// most of the work here, just need to update the kernel time.
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
-			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
+			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
+			| THREAD_FLAGS_TRAP_FOR_CORE_DUMP) \
 			, THREAD_flags(%r12)
 	jnz		.Lkernel_exit_work
 
@@ -294,7 +295,8 @@ STATIC_FUNCTION(int_bottom_user):
 	// Slow path for return to userland.
 
 	// Do we need to handle signals?
-	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD) \
+	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD \
+			| THREAD_FLAGS_TRAP_FOR_CORE_DUMP) \
 			, THREAD_flags(%r12)
 	jnz		.Lkernel_exit_handle_signals
 	cli
@@ -421,7 +423,7 @@ FUNCTION(x86_64_syscall_entry):
 2:
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
 			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
-			| THREAD_FLAGS_RESTART_SYSCALL) \
+			| THREAD_FLAGS_TRAP_FOR_CORE_DUMP | THREAD_FLAGS_RESTART_SYSCALL) \
 			, THREAD_flags(%r12)
 	jnz		.Lpost_syscall_work
 
@@ -482,7 +484,8 @@ FUNCTION(x86_64_syscall_entry):
 	addq	$48, %rsp
 1:
 	// Do we need to handle signals?
-	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD) \
+	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD \
+			| THREAD_FLAGS_TRAP_FOR_CORE_DUMP) \
 			, THREAD_flags(%r12)
 	jnz		.Lpost_syscall_handle_signals
 	cli
@@ -578,7 +581,8 @@ FUNCTION(x86_return_to_userland):
 	// Perform kernel exit work.
 	movq	%gs:0, %r12
 	testl	$(THREAD_FLAGS_DEBUGGER_INSTALLED | THREAD_FLAGS_SIGNALS_PENDING \
-			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED) \
+			| THREAD_FLAGS_DEBUG_THREAD | THREAD_FLAGS_BREAKPOINTS_DEFINED \
+			| THREAD_FLAGS_TRAP_FOR_CORE_DUMP) \
 			, THREAD_flags(%r12)
 	jnz		.Luserland_return_work
 
@@ -593,7 +597,8 @@ FUNCTION(x86_return_to_userland):
 	// Slow path for return to userland.
 
 	// Do we need to handle signals?
-	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD) \
+	testl	$(THREAD_FLAGS_SIGNALS_PENDING | THREAD_FLAGS_DEBUG_THREAD \
+			| THREAD_FLAGS_TRAP_FOR_CORE_DUMP) \
 			, THREAD_flags(%r12)
 	jnz		.Luserland_return_handle_signals
 	cli

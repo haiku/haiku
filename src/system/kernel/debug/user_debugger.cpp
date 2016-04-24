@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2005-2016, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -15,6 +15,7 @@
 
 #include <arch/debug.h>
 #include <arch/user_debugger.h>
+#include <core_dump.h>
 #include <cpu.h>
 #include <debugger.h>
 #include <kernel.h>
@@ -1696,6 +1697,7 @@ debug_nub_thread(void *)
 			debug_nub_get_signal_handler_reply	get_signal_handler;
 			debug_nub_start_profiler_reply		start_profiler;
 			debug_profiler_update				profiler_update;
+			debug_nub_write_core_file_reply		write_core_file;
 		} reply;
 		int32 replySize = 0;
 		port_id replyPort = -1;
@@ -2416,6 +2418,29 @@ debug_nub_thread(void *)
 						delete_area(sampleArea);
 					}
 				}
+
+				break;
+			}
+
+			case B_DEBUG_WRITE_CORE_FILE:
+			{
+				// get the parameters
+				replyPort = message.write_core_file.reply_port;
+				char* path = message.write_core_file.path;
+				path[sizeof(message.write_core_file.path) - 1] = '\0';
+
+				TRACE(("nub thread %" B_PRId32 ": B_DEBUG_WRITE_CORE_FILE"
+					": path: %s\n", nubThread->id, path));
+
+				// write the core file
+				status_t result = core_dump_write_core_file(path, false);
+
+				// prepare the reply
+				reply.write_core_file.error = result;
+				replySize = sizeof(reply.write_core_file);
+				sendReply = true;
+
+				break;
 			}
 		}
 

@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
- * Copyright 2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2011-2016, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2009, Axel Dörfler, axeld@pinc-software.de.
  * Copyright 2002, Angelo Mottola, a.mottola@libero.it.
  *
@@ -21,6 +21,7 @@
 #include <KernelExport.h>
 
 #include <cpu.h>
+#include <core_dump.h>
 #include <debug.h>
 #include <kernel.h>
 #include <kscheduler.h>
@@ -957,15 +958,25 @@ handle_signals(Thread* thread)
 		}
 
 		// Unless SIGKILL[THR] are pending, check, if the thread shall stop for
-		// debugging.
-		if ((signalMask & KILL_SIGNALS) == 0
-			&& (atomic_get(&thread->debug_info.flags) & B_THREAD_DEBUG_STOP)
-				!= 0) {
-			locker.Unlock();
-			teamLocker.Unlock();
+		// a core dump or for debugging.
+		if ((signalMask & KILL_SIGNALS) == 0) {
+			if ((atomic_get(&thread->flags) & THREAD_FLAGS_TRAP_FOR_CORE_DUMP)
+					!= 0) {
+				locker.Unlock();
+				teamLocker.Unlock();
 
-			user_debug_stop_thread();
-			continue;
+				core_dump_trap_thread();
+				continue;
+			}
+
+			if ((atomic_get(&thread->debug_info.flags) & B_THREAD_DEBUG_STOP)
+					!= 0) {
+				locker.Unlock();
+				teamLocker.Unlock();
+
+				user_debug_stop_thread();
+				continue;
+			}
 		}
 
 		// We're done, if there aren't any pending signals anymore.

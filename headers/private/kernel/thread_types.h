@@ -1,5 +1,5 @@
 /*
- * Copyright 2004-2011, Haiku, Inc.
+ * Copyright 2004-2016, Haiku, Inc.
  * Distributed under the terms of the MIT License.
  *
  * Thread definition and structures
@@ -44,6 +44,9 @@ enum team_state {
 };
 
 #define	TEAM_FLAG_EXEC_DONE	0x01
+	// team has executed exec*()
+#define	TEAM_FLAG_DUMP_CORE	0x02
+	// a core dump is in progress
 
 typedef enum job_control_state {
 	JOB_CONTROL_STATE_NONE,
@@ -392,6 +395,11 @@ public:
 									Thread* lockedThread = NULL) const;
 			bigtime_t			UserCPUTime() const;
 
+			ConditionVariable*	CoreDumpCondition() const
+									{ return fCoreDumpCondition; }
+			void				SetCoreDumpCondition(
+									ConditionVariable* condition)
+									{ fCoreDumpCondition = condition; }
 private:
 								Team(team_id id, bool kernel);
 
@@ -412,6 +420,9 @@ private:
 									// protected by scheduler lock
 			TeamUserTimeUserTimerList fUserTimeUserTimers;
 			int32				fUserDefinedTimerCount;	// accessed atomically
+
+			ConditionVariable*	fCoreDumpCondition;
+									// protected by fLock
 };
 
 
@@ -821,6 +832,9 @@ using BKernel::ProcessGroupList;
 	// the thread is currently in a syscall; set/reset only for certain
 	// functions (e.g. ioctl()) to allow inner functions to discriminate
 	// whether e.g. parameters were passed from userland or kernel
+#define	THREAD_FLAGS_TRAP_FOR_CORE_DUMP		0x1000
+	// core dump in progress; the thread shall not exit the kernel to userland,
+	// but shall invoke core_dump_trap_thread() instead.
 
 
 #endif	/* _KERNEL_THREAD_TYPES_H */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001 Travis Geiselbrecht. All rights reserved.
@@ -37,6 +37,11 @@ DEFINE_ELF_TYPE(Verdef, elf_verdef);
 DEFINE_ELF_TYPE(Verdaux, elf_verdaux);
 DEFINE_ELF_TYPE(Verneed, elf_verneed);
 DEFINE_ELF_TYPE(Vernaux, elf_vernaux);
+DEFINE_ELF_TYPE(Nhdr, elf_nhdr);
+DEFINE_ELF_TYPE(Note_Team, elf_note_team);
+DEFINE_ELF_TYPE(Note_Area_Entry, elf_note_area_entry);
+DEFINE_ELF_TYPE(Note_Image_Entry, elf_note_image_entry);
+DEFINE_ELF_TYPE(Note_Thread_Entry, elf_note_thread_entry);
 
 #undef DEFINE_ELF_TYPE
 #undef _ELF_TYPE

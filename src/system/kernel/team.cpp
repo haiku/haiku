@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Paweł Dziepak, pdziepak@quarnos.org.
- * Copyright 2008-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2008-2016, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  *
@@ -503,6 +503,8 @@ Team::Team(team_id id, bool kernel)
 	memset(fSignalActions, 0, sizeof(fSignalActions));
 
 	fUserDefinedTimerCount = 0;
+
+	fCoreDumpCondition = NULL;
 }
 
 

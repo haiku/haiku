@@ -1,5 +1,5 @@
 /*
- * Copyright 2005, Ingo Weinhold, bonefish@users.sf.net.
+ * Copyright 2005-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _DEBUGGER_H
@@ -163,7 +163,9 @@ typedef enum {
 										// install_team_debugger()
 
 	B_DEBUG_START_PROFILER,				// start/stop sampling
-	B_DEBUG_STOP_PROFILER				//
+	B_DEBUG_STOP_PROFILER,				//
+
+	B_DEBUG_WRITE_CORE_FILE				// write a core file
 } debug_nub_message;
 
 // messages sent to the debugger
@@ -412,6 +414,20 @@ typedef struct {
 	thread_id			thread;			// thread to profile
 } debug_nub_stop_profiler;
 
+// B_DEBUG_WRITE_CORE_FILE
+
+typedef struct {
+	port_id				reply_port;		// port to send the reply to
+	char				path[B_PATH_NAME_LENGTH];
+										// path of the core file; must not exist
+										// yet; must be absolute
+} debug_nub_write_core_file;
+
+typedef struct {
+	status_t	error;					// B_OK on success
+} debug_nub_write_core_file_reply;
+
+
 // reply is debug_profiler_update
 
 // union of all messages structures sent to the debug nub thread
@@ -433,6 +449,7 @@ typedef union {
 	debug_nub_get_signal_handler	get_signal_handler;
 	debug_nub_start_profiler		start_profiler;
 	debug_nub_stop_profiler			stop_profiler;
+	debug_nub_write_core_file		write_core_file;
 } debug_nub_message_data;
 
 
