@@ -144,6 +144,7 @@ local sources =
 	LocalDebuggerInterface.cpp
 
 	# elf
+	CoreFile.cpp
 	ElfFile.cpp
 
 	# files
