@@ -4,11 +4,21 @@
  * Distributed under the terms of the MIT License.
  */
 
+
 #include "DebuggerInterface.h"
 
 
 // #pragma mark - DebuggerInterface
 
+
 DebuggerInterface::~DebuggerInterface()
 {
+}
+
+
+bool
+DebuggerInterface::IsPostMortem() const
+{
+	// only true for core file interfaces
+	return false;
 }

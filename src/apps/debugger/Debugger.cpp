@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2016, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -20,6 +20,8 @@
 #include <AutoLocker.h>
 #include <ObjectList.h>
 
+#include "CoreFile.h"
+#include "CoreFileDebuggerInterface.h"
 #include "CommandLineUserInterface.h"
 #include "DebuggerInterface.h"
 #include "GraphicalUserInterface.h"
@@ -44,11 +46,12 @@ static const char* const kDebuggerSignature
 	= "application/x-vnd.Haiku-Debugger";
 
 
-static const char* kUsage =
+static const char* const kUsage =
 	"Usage: %s [ <options> ]\n"
 	"       %s [ <options> ] <command line>\n"
 	"       %s [ <options> ] --team <team>\n"
 	"       %s [ <options> ] --thread <thread>\n"
+	"       %s [ <options> ] --core <file>\n"
 	"\n"
 	"The first form starts the debugger displaying a requester to choose a\n"
 	"running team to debug respectively to specify the program to run and\n"
@@ -60,6 +63,8 @@ static const char* kUsage =
 	"\n"
 	"The third and fourth forms attach the debugger to a running team. The\n"
 	"fourth form additionally stops the specified thread.\n"
+	"\n"
+	"The fifth form loads a core file.\n"
 	"\n"
 	"Options:\n"
 	"  -h, --help        - Print this usage info and exit.\n"
@@ -73,7 +78,7 @@ static void
 print_usage_and_exit(bool error)
 {
     fprintf(error ? stderr : stdout, kUsage, kProgramName, kProgramName,
-    	kProgramName, kProgramName);
+    	kProgramName, kProgramName, kProgramName);
     exit(error ? 1 : 0);
 }
 
@@ -86,6 +91,7 @@ struct Options {
 	bool				useCLI;
 	bool				saveReport;
 	const char*			reportPath;
+	const char*			coreFilePath;
 
 	Options()
 		:
@@ -95,7 +101,8 @@ struct Options {
 		thread(-1),
 		useCLI(false),
 		saveReport(false),
-		reportPath(NULL)
+		reportPath(NULL),
+		coreFilePath(NULL)
 	{
 	}
 };
@@ -126,6 +133,7 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 			{ "save-report", optional_argument, 0, 's' },
 			{ "team", required_argument, 0, 't' },
 			{ "thread", required_argument, 0, 'T' },
+			{ "core", required_argument, 0, 'C' },
 			{ 0, 0, 0, 0 }
 		};
 
@@ -138,6 +146,10 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 		switch (c) {
 			case 'c':
 				options.useCLI = true;
+				break;
+
+			case 'C':
+				options.coreFilePath = optarg;
 				break;
 
 			case 'h':
@@ -207,6 +219,7 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 	return true;
 }
 
+
 static status_t
 global_init(TargetHostInterfaceRoster::Listener* listener)
 {
@@ -243,7 +256,8 @@ global_init(TargetHostInterfaceRoster::Listener* listener)
 
 
 class Debugger : public BApplication,
-	private TargetHostInterfaceRoster::Listener {
+	private TargetHostInterfaceRoster::Listener,
+	private TeamDebugger::Listener {
 public:
 								Debugger();
 								~Debugger();
@@ -260,9 +274,17 @@ private:
 	// TargetHostInterfaceRoster::Listener
 	virtual	void				TeamDebuggerCountChanged(int32 count);
 
+	// TeamDebugger::Listener
+	virtual void				TeamDebuggerStarted(TeamDebugger* debugger);
+	virtual	void				TeamDebuggerRestartRequested(
+									TeamDebugger* debugger);
+	virtual	void				TeamDebuggerQuit(TeamDebugger* debugger);
+
 private:
 			status_t			_StartNewTeam(TargetHostInterface* interface,
 									const char* teamPath, const char* args);
+			status_t			_LoadCoreFile(const char* coreFilePath,
+									TeamDebuggerOptions debuggerOptions);
 
 private:
 			SettingsManager		fSettingsManager;
@@ -444,13 +466,17 @@ Debugger::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
-	TargetHostInterface* hostInterface
-		= TargetHostInterfaceRoster::Default()->ActiveInterfaceAt(0);
-
 	TeamDebuggerOptions debuggerOptions;
 	set_debugger_options_from_options(debuggerOptions, options);
 	debuggerOptions.settingsManager = &fSettingsManager;
-	hostInterface->StartTeamDebugger(debuggerOptions);
+
+	if (options.coreFilePath != NULL) {
+		_LoadCoreFile(options.coreFilePath, debuggerOptions);
+	} else {
+		TargetHostInterface* hostInterface
+			= TargetHostInterfaceRoster::Default()->ActiveInterfaceAt(0);
+		hostInterface->StartTeamDebugger(debuggerOptions);
+	}
 }
 
 
@@ -492,6 +518,30 @@ Debugger::TeamDebuggerCountChanged(int32 count)
 }
 
 
+void
+Debugger::TeamDebuggerStarted(TeamDebugger* debugger)
+{
+	// TODO: Dummy for core file support. Managing team debuggers needs to work
+	// differently.
+}
+
+
+void
+Debugger::TeamDebuggerRestartRequested(TeamDebugger* debugger)
+{
+	// TODO: Dummy for core file support. Managing team debuggers needs to work
+	// differently.
+}
+
+
+void
+Debugger::TeamDebuggerQuit(TeamDebugger* debugger)
+{
+	// TODO: Dummy for core file support. Managing team debuggers needs to work
+	// differently.
+}
+
+
 status_t
 Debugger::_StartNewTeam(TargetHostInterface* interface, const char* path,
 	const char* args)
@@ -523,6 +573,61 @@ Debugger::_StartNewTeam(TargetHostInterface* interface, const char* path,
 		deleter.Detach();
 
 	return error;
+}
+
+
+status_t
+Debugger::_LoadCoreFile(const char* coreFilePath,
+	TeamDebuggerOptions debuggerOptions)
+{
+	// load the core file
+	CoreFile* coreFile = new(std::nothrow) CoreFile;
+	if (coreFile == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<CoreFile> coreFileDeleter(coreFile);
+
+	status_t error = coreFile->Init(coreFilePath);
+	if (error != B_OK)
+		return error;
+
+	// create the user interface
+	UserInterface* userInterface = new(std::nothrow) GraphicalUserInterface;
+	if (userInterface == NULL) {
+		fprintf(stderr, "Error: Out of memory!\n");
+		return B_NO_MEMORY;
+	}
+	BReference<UserInterface> userInterfaceReference(userInterface, true);
+
+	// create the debugger interface
+	CoreFileDebuggerInterface* interface
+		= new(std::nothrow) CoreFileDebuggerInterface(coreFile);
+	if (interface == NULL)
+		return B_NO_MEMORY;
+	coreFileDeleter.Detach();
+
+	BReference<DebuggerInterface> interfaceReference(interface, true);
+	error = interface->Init();
+	if (error != B_OK)
+		return error;
+
+	// create the team debugger
+	TeamDebugger* debugger = new(std::nothrow) TeamDebugger(this, userInterface,
+		&fSettingsManager);
+	if (debugger == NULL)
+		return B_NO_MEMORY;
+
+	const CoreFileTeamInfo& teamInfo = coreFile->GetTeamInfo();
+	error = debugger->Init(interface, teamInfo.Id(), 0, NULL, false);
+	if (error != B_OK) {
+		fprintf(stderr, "Error: failed to init team debugger for core file "
+			"\"%s\": %s", coreFilePath, strerror(error));
+		delete debugger;
+		return error;
+	}
+
+	printf("team debugger for core file \"%s\" created and"
+		" initialized successfully!\n", coreFilePath);
+	return B_OK;
 }
 
 

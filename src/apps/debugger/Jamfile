@@ -141,6 +141,7 @@ local sources =
 	DebuggerInterface.cpp
 
 	# debugger_interface/interfaces
+	CoreFileDebuggerInterface.cpp
 	LocalDebuggerInterface.cpp
 
 	# elf

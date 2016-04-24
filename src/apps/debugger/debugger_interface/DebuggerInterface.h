@@ -40,6 +40,8 @@ public:
 
 	virtual	bool				Connected() const = 0;
 
+	virtual	bool				IsPostMortem() const;
+
 	virtual	team_id				TeamID() const = 0;
 
 	virtual	Architecture*		GetArchitecture() const = 0;

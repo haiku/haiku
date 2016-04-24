@@ -496,16 +496,18 @@ TeamDebugger::Init(DebuggerInterface* interface, thread_id threadID, int argc,
 		}
 	}
 
-	// create the debug event listener
-	char buffer[128];
-	snprintf(buffer, sizeof(buffer), "team %" B_PRId32 " debug listener",
-		fTeamID);
-	fDebugEventListener = spawn_thread(_DebugEventListenerEntry, buffer,
-		B_NORMAL_PRIORITY, this);
-	if (fDebugEventListener < 0)
-		return fDebugEventListener;
+	// create the debug event listener (for live debugging only)
+	if (!fDebuggerInterface->IsPostMortem()) {
+		char buffer[128];
+		snprintf(buffer, sizeof(buffer), "team %" B_PRId32 " debug listener",
+			fTeamID);
+		fDebugEventListener = spawn_thread(_DebugEventListenerEntry, buffer,
+			B_NORMAL_PRIORITY, this);
+		if (fDebugEventListener < 0)
+			return fDebugEventListener;
 
-	resume_thread(fDebugEventListener);
+		resume_thread(fDebugEventListener);
+	}
 
 	// run looper
 	thread_id looperThread = Run();
@@ -520,7 +522,7 @@ TeamDebugger::Init(DebuggerInterface* interface, thread_id threadID, int argc,
 	}
 
 	// if requested, stop the given thread
-	if (threadID >= 0) {
+	if (threadID >= 0 && !fDebuggerInterface->IsPostMortem()) {
 		if (stopInMain) {
 			SymbolInfo symbolInfo;
 			if (appImage != NULL && mainThreadHandler != NULL
