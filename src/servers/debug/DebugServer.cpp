@@ -39,6 +39,7 @@
 enum {
 	kActionKillTeam,
 	kActionDebugTeam,
+	kActionWriteCoreFile,
 	kActionSaveReportTeam,
 	kActionPromptUser
 };
@@ -82,7 +83,8 @@ action_for_string(const char* action, int32& _action)
 	else if (strcmp(action, "log") == 0
 		|| strcmp(action, "report") == 0) {
 		_action = kActionSaveReportTeam;
-	}
+	} else if (strcasecmp(action, "core") == 0)
+		_action = kActionWriteCoreFile;
 	else if (strcasecmp(action, "user") == 0)
 		_action = kActionPromptUser;
 	else
@@ -116,8 +118,8 @@ match_team_name(const char* teamName, const char* parameterName)
 }
 
 
-static
-status_t action_for_team(const char* teamName, int32& _action,
+static status_t
+action_for_team(const char* teamName, int32& _action,
 	bool& _explicitActionFound)
 {
 	status_t error = B_OK;
@@ -223,6 +225,7 @@ private:
 
 	thread_id _EnterDebugger(bool saveReport);
 	status_t _SetupGDBArguments(BStringList &arguments, bool usingConsoled);
+	status_t _WriteCoreFile();
 	void _KillTeam();
 
 	int32 _HandleMessage(DebugMessage *message);
@@ -745,6 +748,72 @@ TeamDebugHandler::_KillTeam()
 }
 
 
+status_t
+TeamDebugHandler::_WriteCoreFile()
+{
+	// get a usable path for the core file
+	BPath directoryPath;
+	status_t error = find_directory(B_DESKTOP_DIRECTORY, &directoryPath);
+	if (error != B_OK) {
+		debug_printf("debug_server: Couldn't get desktop directory: %s\n",
+			strerror(error));
+		return error;
+	}
+
+	const char* executableName = strrchr(fExecutablePath, '/');
+	if (executableName == NULL)
+		executableName = fExecutablePath;
+	else
+		executableName++;
+
+	BString fileBaseName("core-");
+	fileBaseName << executableName << '-' << fTeam;
+	BPath filePath;
+
+	for (int32 index = 0;; index++) {
+		BString fileName(fileBaseName);
+		if (index > 0)
+			fileName << '-' << index;
+
+		error = filePath.SetTo(directoryPath.Path(), fileName.String());
+		if (error != B_OK) {
+			debug_printf("debug_server: Couldn't get core file path for team %"
+				B_PRId32 ": %s\n", fTeam, strerror(error));
+			return error;
+		}
+
+		struct stat st;
+		if (lstat(filePath.Path(), &st) != 0) {
+			if (errno == B_ENTRY_NOT_FOUND)
+				break;
+		}
+
+		if (index > 1000) {
+			debug_printf("debug_server: Couldn't get usable core file path for "
+				"team %" B_PRId32 "\n", fTeam);
+			return B_ERROR;
+		}
+	}
+
+	debug_nub_write_core_file message;
+	message.reply_port = fDebugContext.reply_port;
+	strlcpy(message.path, filePath.Path(), sizeof(message.path));
+
+	debug_nub_write_core_file_reply reply;
+
+	error = send_debug_message(&fDebugContext, B_DEBUG_WRITE_CORE_FILE,
+			&message, sizeof(message), &reply, sizeof(reply));
+	if (error == B_OK)
+		error = reply.error;
+	if (error != B_OK) {
+		debug_printf("debug_server: Failed to write core file for team %"
+			B_PRId32 ": %s\n", fTeam, strerror(error));
+	}
+
+	return error;
+}
+
+
 int32
 TeamDebugHandler::_HandleMessage(DebugMessage *message)
 {
@@ -832,14 +901,12 @@ TeamDebugHandler::_HandleMessage(DebugMessage *message)
 
 		// TODO: It would be nice if the alert would go away automatically
 		// if someone else kills our teams.
-#ifdef HANDOVER_USE_DEBUGGER
 		BAlert *alert = new BAlert(NULL, buffer.String(),
 			B_TRANSLATE("Terminate"), B_TRANSLATE("Debug"),
-			B_TRANSLATE("Save report"), B_WIDTH_AS_USUAL, B_WARNING_ALERT);
-#else
-		BAlert *alert = new BAlert(NULL, buffer.String(),
-			B_TRANSLATE("Kill"), B_TRANSLATE("Debug"), NULL,
+			B_TRANSLATE("Write core file"),
 			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+#ifdef HANDOVER_USE_DEBUGGER
+		alert->AddButton(B_TRANSLATE("Save report"));
 #endif
 		alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
 		debugAction = alert->Go();
@@ -1027,6 +1094,9 @@ TeamDebugHandler::_HandlerThread()
 		// The team shall be killed. Since that is also the handling in case
 		// an error occurs while handing over the team to the debugger, we do
 		// nothing here.
+	} else if (debugAction == kActionWriteCoreFile) {
+		_WriteCoreFile();
+		debugAction = kActionKillTeam;
 	} else if ((debuggerThread = _EnterDebugger(
 			debugAction == kActionSaveReportTeam)) >= 0) {
 		// wait for the "handed over" or a "team deleted" message
