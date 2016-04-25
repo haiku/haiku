@@ -47,10 +47,13 @@ public:
 
 	virtual	status_t			Attach(team_id id, thread_id threadID,
 									DebuggerInterface*& _interface) const = 0;
-
 	virtual	status_t			CreateTeam(int commandLineArgc,
 									const char* const* arguments,
 									team_id& _teamID) const = 0;
+	virtual	status_t			LoadCore(const char* coreFilePath,
+									DebuggerInterface*& _interface,
+									thread_id& _thread) const = 0;
+
 	virtual	status_t			FindTeamByThread(thread_id thread,
 									team_id& _teamID) const = 0;
 
@@ -104,14 +107,24 @@ public:
 };
 
 
+enum {
+	TEAM_DEBUGGER_REQUEST_UNKNOWN = 0,
+	TEAM_DEBUGGER_REQUEST_CREATE,
+	TEAM_DEBUGGER_REQUEST_ATTACH,
+	TEAM_DEBUGGER_REQUEST_LOAD_CORE
+};
+
+
 struct TeamDebuggerOptions {
 						TeamDebuggerOptions();
+	int					requestType;
 	int					commandLineArgc;
 	const char* const*	commandLineArgv;
 	team_id				team;
 	thread_id			thread;
 	SettingsManager*	settingsManager;
 	UserInterface*		userInterface;
+	const char*			coreFilePath;
 };
 
 

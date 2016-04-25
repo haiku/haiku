@@ -23,10 +23,13 @@ public:
 
 	virtual	status_t			Attach(team_id id, thread_id threadID,
 									DebuggerInterface*& _interface) const;
-
 	virtual	status_t			CreateTeam(int commandLineArgc,
 									const char* const* arguments,
 									team_id& _teamID) const;
+	virtual	status_t			LoadCore(const char* coreFilePath,
+									DebuggerInterface*& _interface,
+									thread_id& _thread) const;
+
 	virtual	status_t			FindTeamByThread(thread_id thread,
 									team_id& _teamID) const;
 

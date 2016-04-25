@@ -116,6 +116,14 @@ set_debugger_options_from_options(TeamDebuggerOptions& _debuggerOptions,
 	_debuggerOptions.commandLineArgv = options.commandLineArgv;
 	_debuggerOptions.team = options.team;
 	_debuggerOptions.thread = options.thread;
+	_debuggerOptions.coreFilePath = options.coreFilePath;
+
+	if (options.coreFilePath != NULL)
+		_debuggerOptions.requestType = TEAM_DEBUGGER_REQUEST_LOAD_CORE;
+	else if (options.commandLineArgc != 0)
+		_debuggerOptions.requestType = TEAM_DEBUGGER_REQUEST_CREATE;
+	else
+		_debuggerOptions.requestType = TEAM_DEBUGGER_REQUEST_ATTACH;
 }
 
 
@@ -256,8 +264,7 @@ global_init(TargetHostInterfaceRoster::Listener* listener)
 
 
 class Debugger : public BApplication,
-	private TargetHostInterfaceRoster::Listener,
-	private TeamDebugger::Listener {
+	private TargetHostInterfaceRoster::Listener {
 public:
 								Debugger();
 								~Debugger();
@@ -274,17 +281,9 @@ private:
 	// TargetHostInterfaceRoster::Listener
 	virtual	void				TeamDebuggerCountChanged(int32 count);
 
-	// TeamDebugger::Listener
-	virtual void				TeamDebuggerStarted(TeamDebugger* debugger);
-	virtual	void				TeamDebuggerRestartRequested(
-									TeamDebugger* debugger);
-	virtual	void				TeamDebuggerQuit(TeamDebugger* debugger);
-
 private:
 			status_t			_StartNewTeam(TargetHostInterface* interface,
 									const char* teamPath, const char* args);
-			status_t			_LoadCoreFile(const char* coreFilePath,
-									TeamDebuggerOptions debuggerOptions);
 
 private:
 			SettingsManager		fSettingsManager;
@@ -412,6 +411,7 @@ Debugger::MessageReceived(BMessage* message)
 			}
 
 			TeamDebuggerOptions options;
+			options.requestType = TEAM_DEBUGGER_REQUEST_ATTACH;
 			options.settingsManager = &fSettingsManager;
 			options.team = teamID;
 			status_t error = interface->StartTeamDebugger(options);
@@ -470,13 +470,9 @@ Debugger::ArgvReceived(int32 argc, char** argv)
 	set_debugger_options_from_options(debuggerOptions, options);
 	debuggerOptions.settingsManager = &fSettingsManager;
 
-	if (options.coreFilePath != NULL) {
-		_LoadCoreFile(options.coreFilePath, debuggerOptions);
-	} else {
-		TargetHostInterface* hostInterface
-			= TargetHostInterfaceRoster::Default()->ActiveInterfaceAt(0);
-		hostInterface->StartTeamDebugger(debuggerOptions);
-	}
+	TargetHostInterface* hostInterface
+		= TargetHostInterfaceRoster::Default()->ActiveInterfaceAt(0);
+	hostInterface->StartTeamDebugger(debuggerOptions);
 }
 
 
@@ -518,30 +514,6 @@ Debugger::TeamDebuggerCountChanged(int32 count)
 }
 
 
-void
-Debugger::TeamDebuggerStarted(TeamDebugger* debugger)
-{
-	// TODO: Dummy for core file support. Managing team debuggers needs to work
-	// differently.
-}
-
-
-void
-Debugger::TeamDebuggerRestartRequested(TeamDebugger* debugger)
-{
-	// TODO: Dummy for core file support. Managing team debuggers needs to work
-	// differently.
-}
-
-
-void
-Debugger::TeamDebuggerQuit(TeamDebugger* debugger)
-{
-	// TODO: Dummy for core file support. Managing team debuggers needs to work
-	// differently.
-}
-
-
 status_t
 Debugger::_StartNewTeam(TargetHostInterface* interface, const char* path,
 	const char* args)
@@ -558,6 +530,7 @@ Debugger::_StartNewTeam(TargetHostInterface* interface, const char* path,
 	argVector.Parse(data.String());
 
 	TeamDebuggerOptions options;
+	options.requestType = TEAM_DEBUGGER_REQUEST_CREATE;
 	options.settingsManager = &fSettingsManager;
 	options.commandLineArgc = argVector.ArgumentCount();
 	if (options.commandLineArgc <= 0)
@@ -573,61 +546,6 @@ Debugger::_StartNewTeam(TargetHostInterface* interface, const char* path,
 		deleter.Detach();
 
 	return error;
-}
-
-
-status_t
-Debugger::_LoadCoreFile(const char* coreFilePath,
-	TeamDebuggerOptions debuggerOptions)
-{
-	// load the core file
-	CoreFile* coreFile = new(std::nothrow) CoreFile;
-	if (coreFile == NULL)
-		return B_NO_MEMORY;
-	ObjectDeleter<CoreFile> coreFileDeleter(coreFile);
-
-	status_t error = coreFile->Init(coreFilePath);
-	if (error != B_OK)
-		return error;
-
-	// create the user interface
-	UserInterface* userInterface = new(std::nothrow) GraphicalUserInterface;
-	if (userInterface == NULL) {
-		fprintf(stderr, "Error: Out of memory!\n");
-		return B_NO_MEMORY;
-	}
-	BReference<UserInterface> userInterfaceReference(userInterface, true);
-
-	// create the debugger interface
-	CoreFileDebuggerInterface* interface
-		= new(std::nothrow) CoreFileDebuggerInterface(coreFile);
-	if (interface == NULL)
-		return B_NO_MEMORY;
-	coreFileDeleter.Detach();
-
-	BReference<DebuggerInterface> interfaceReference(interface, true);
-	error = interface->Init();
-	if (error != B_OK)
-		return error;
-
-	// create the team debugger
-	TeamDebugger* debugger = new(std::nothrow) TeamDebugger(this, userInterface,
-		&fSettingsManager);
-	if (debugger == NULL)
-		return B_NO_MEMORY;
-
-	const CoreFileTeamInfo& teamInfo = coreFile->GetTeamInfo();
-	error = debugger->Init(interface, teamInfo.Id(), 0, NULL, false);
-	if (error != B_OK) {
-		fprintf(stderr, "Error: failed to init team debugger for core file "
-			"\"%s\": %s", coreFilePath, strerror(error));
-		delete debugger;
-		return error;
-	}
-
-	printf("team debugger for core file \"%s\" created and"
-		" initialized successfully!\n", coreFilePath);
-	return B_OK;
 }
 
 

@@ -20,12 +20,14 @@
 
 TeamDebuggerOptions::TeamDebuggerOptions()
 	:
+	requestType(TEAM_DEBUGGER_REQUEST_UNKNOWN),
 	commandLineArgc(0),
 	commandLineArgv(NULL),
 	team(-1),
 	thread(-1),
 	settingsManager(NULL),
-	userInterface(NULL)
+	userInterface(NULL),
+	coreFilePath(NULL)
 {
 }
 
@@ -56,12 +58,12 @@ TargetHostInterface::StartTeamDebugger(const TeamDebuggerOptions& options)
 {
 	// we only want to stop in main for teams we're responsible for
 	// creating ourselves.
-	bool stopInMain = options.commandLineArgv != NULL;
+	bool stopInMain = options.requestType == TEAM_DEBUGGER_REQUEST_CREATE;
 	team_id team = options.team;
 	thread_id thread = options.thread;
 
 	AutoLocker<TargetHostInterface> interfaceLocker(this);
-	if (options.commandLineArgc > 0) {
+	if (options.requestType == TEAM_DEBUGGER_REQUEST_CREATE) {
 		status_t error = CreateTeam(options.commandLineArgc,
 			options.commandLineArgv, team);
 		if (error != B_OK)
@@ -69,19 +71,22 @@ TargetHostInterface::StartTeamDebugger(const TeamDebuggerOptions& options)
 		thread = team;
 	}
 
-	if (team < 0 && thread < 0)
-		return B_BAD_VALUE;
+	if (options.requestType != TEAM_DEBUGGER_REQUEST_LOAD_CORE) {
 
-	if (team < 0) {
-		status_t error = FindTeamByThread(thread, team);
-		if (error != B_OK)
-			return error;
-	}
+		if (team < 0 && thread < 0)
+			return B_BAD_VALUE;
 
-	TeamDebugger* debugger = FindTeamDebugger(team);
-	if (debugger != NULL) {
-		debugger->Activate();
-		return B_OK;
+		if (team < 0) {
+			status_t error = FindTeamByThread(thread, team);
+			if (error != B_OK)
+				return error;
+		}
+
+		TeamDebugger* debugger = FindTeamDebugger(team);
+		if (debugger != NULL) {
+			debugger->Activate();
+			return B_OK;
+		}
 	}
 
 	return _StartTeamDebugger(team, options, stopInMain);
@@ -243,12 +248,23 @@ TargetHostInterface::_StartTeamDebugger(team_id teamID,
 
 	DebuggerInterface* interface = NULL;
 	TeamDebugger* debugger = NULL;
-	status_t error = Attach(teamID, options.thread, interface);
-	if (error != B_OK) {
-		fprintf(stderr, "Error: Failed to attach to team %" B_PRId32 ": %s!\n",
-			teamID, strerror(error));
-		return error;
+	status_t error = B_OK;
+	if (options.requestType != TEAM_DEBUGGER_REQUEST_LOAD_CORE) {
+		error = Attach(teamID, options.thread, interface);
+		if (error != B_OK) {
+			fprintf(stderr, "Error: Failed to attach to team %" B_PRId32
+				": %s!\n", teamID, strerror(error));
+			return error;
+		}
+	} else {
+		error = LoadCore(options.coreFilePath, interface, threadID);
+		if (error != B_OK) {
+			fprintf(stderr, "Error: Failed to load core file '%s': %s!\n",
+				options.coreFilePath, strerror(error));
+			return error;
+		}
 	}
+
 
 	BReference<DebuggerInterface> debuggerInterfaceReference(interface,
 		true);

@@ -1,5 +1,6 @@
 /*
  * Copyright 2016, Rene Gollent, rene@gollent.com.
+ * Copyright 2016, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -12,12 +13,15 @@
 
 #include <image.h>
 
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 #include <system_info.h>
 #include <util/KMessage.h>
 
 #include "debug_utils.h"
 
+#include "CoreFile.h"
+#include "CoreFileDebuggerInterface.h"
 #include "LocalDebuggerInterface.h"
 #include "TargetHost.h"
 
@@ -179,6 +183,41 @@ LocalTargetHostInterface::CreateTeam(int commandLineArgc,
 
 	// main thread ID == team ID.
 	_teamID = thread;
+	return B_OK;
+}
+
+
+status_t
+LocalTargetHostInterface::LoadCore(const char* coreFilePath,
+	DebuggerInterface*& _interface, thread_id& _thread) const
+{
+	// load the core file
+	CoreFile* coreFile = new(std::nothrow) CoreFile;
+	if (coreFile == NULL)
+		return B_NO_MEMORY;
+	ObjectDeleter<CoreFile> coreFileDeleter(coreFile);
+
+	status_t error = coreFile->Init(coreFilePath);
+	if (error != B_OK)
+		return error;
+
+	// create the debugger interface
+	CoreFileDebuggerInterface* interface
+		= new(std::nothrow) CoreFileDebuggerInterface(coreFile);
+	if (interface == NULL)
+		return B_NO_MEMORY;
+	coreFileDeleter.Detach();
+
+	BReference<DebuggerInterface> interfaceReference(interface, true);
+	error = interface->Init();
+	if (error != B_OK)
+		return error;
+
+	const CoreFileTeamInfo& teamInfo = coreFile->GetTeamInfo();
+	_thread = teamInfo.Id();
+	_interface = interface;
+	interfaceReference.Detach();
+
 	return B_OK;
 }
 
