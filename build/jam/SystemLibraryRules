@@ -57,13 +57,14 @@ rule TargetLibsupc++ asPath
 			# there is no libsupc++.so for the legacy compiler
 			return ;
 		}
-		# return libsupc++.so from the gcc_syslibs build feature.
+		# return libstdc++.so (which includes libsupc++) from the gcc_syslibs
+		# build feature.
 		local flags ;
 		if $(asPath) = true {
 			flags += path ;
 		}
 		return [
-			BuildFeatureAttribute gcc_syslibs : libsupc++.so : $(flags)
+			BuildFeatureAttribute gcc_syslibs : libstdc++.so : $(flags)
 		] ;
 	} else {
 		# TODO: return libsupc++.so for non-Haiku target platform if needed
