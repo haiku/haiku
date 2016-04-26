@@ -1019,7 +1019,7 @@ SystemProfiler::_ImageAdded(struct image* image)
 		return false;
 
 	event->team = image->team;
-	event->info = image->info;
+	event->info = image->info.basic_info;
 
 	fHeader->size = fBufferSize;
 
@@ -1039,7 +1039,7 @@ SystemProfiler::_ImageRemoved(struct image* image)
 		return false;
 
 	event->team = image->team;
-	event->image = image->info.id;
+	event->image = image->info.basic_info.id;
 
 	fHeader->size = fBufferSize;
 

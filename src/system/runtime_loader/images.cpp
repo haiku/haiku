@@ -17,6 +17,7 @@
 #include <algorithm>
 
 #include <syscalls.h>
+#include <image_defs.h>
 #include <vm_defs.h>
 
 #include "add_ons.h"
@@ -466,22 +467,22 @@ void
 register_image(image_t* image, int fd, const char* path)
 {
 	struct stat stat;
-	image_info info;
+	extended_image_info info;
 
 	// TODO: set these correctly
-	info.id = 0;
-	info.type = image->type;
-	info.sequence = 0;
-	info.init_order = 0;
-	info.init_routine = (void (*)())image->init_routine;
-	info.term_routine = (void (*)())image->term_routine;
+	info.basic_info.id = 0;
+	info.basic_info.type = image->type;
+	info.basic_info.sequence = 0;
+	info.basic_info.init_order = 0;
+	info.basic_info.init_routine = (void (*)())image->init_routine;
+	info.basic_info.term_routine = (void (*)())image->term_routine;
 
 	if (_kern_read_stat(fd, NULL, false, &stat, sizeof(struct stat)) == B_OK) {
-		info.device = stat.st_dev;
-		info.node = stat.st_ino;
+		info.basic_info.device = stat.st_dev;
+		info.basic_info.node = stat.st_ino;
 	} else {
-		info.device = -1;
-		info.node = -1;
+		info.basic_info.device = -1;
+		info.basic_info.node = -1;
 	}
 
 	// We may have split segments into separate regions. Compute the correct
@@ -514,14 +515,17 @@ register_image(image_t* image, int fd, const char* path)
 		}
 	}
 
-	strlcpy(info.name, path, sizeof(info.name));
-	info.text = (void*)textBase;
-	info.text_size = textEnd - textBase;
-	info.data = (void*)dataBase;
-	info.data_size = dataEnd - dataBase;
-	info.api_version = image->api_version;
-	info.abi = image->abi;
-	image->id = _kern_register_image(&info, sizeof(image_info));
+	strlcpy(info.basic_info.name, path, sizeof(info.basic_info.name));
+	info.basic_info.text = (void*)textBase;
+	info.basic_info.text_size = textEnd - textBase;
+	info.basic_info.data = (void*)dataBase;
+	info.basic_info.data_size = dataEnd - dataBase;
+	info.basic_info.api_version = image->api_version;
+	info.basic_info.abi = image->abi;
+	info.symbol_table = image->syms;
+	info.symbol_hash = image->symhash;
+	info.string_table = image->strtab;
+	image->id = _kern_register_image(&info, sizeof(info));
 }
 
 

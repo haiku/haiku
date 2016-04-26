@@ -246,17 +246,17 @@ typedef DoublyLinkedList<ThreadState> ThreadStateList;
 struct ImageInfo : DoublyLinkedListLinkImpl<ImageInfo> {
 	ImageInfo(struct image* image)
 		:
-		fId(image->info.id),
-		fType(image->info.type),
-		fDeviceId(image->info.device),
-		fNodeId(image->info.node),
-		fName(strdup(image->info.name)),
-		fInitRoutine((addr_t)image->info.init_routine),
-		fTermRoutine((addr_t)image->info.term_routine),
-		fText((addr_t)image->info.text),
-		fData((addr_t)image->info.data),
-		fTextSize(image->info.text_size),
-		fDataSize(image->info.data_size)
+		fId(image->info.basic_info.id),
+		fType(image->info.basic_info.type),
+		fDeviceId(image->info.basic_info.device),
+		fNodeId(image->info.basic_info.node),
+		fName(strdup(image->info.basic_info.name)),
+		fInitRoutine((addr_t)image->info.basic_info.init_routine),
+		fTermRoutine((addr_t)image->info.basic_info.term_routine),
+		fText((addr_t)image->info.basic_info.text),
+		fData((addr_t)image->info.basic_info.data),
+		fTextSize(image->info.basic_info.text_size),
+		fDataSize(image->info.basic_info.data_size)
 	{
 	}
 

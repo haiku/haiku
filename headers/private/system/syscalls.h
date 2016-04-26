@@ -10,6 +10,7 @@
 #include <DiskDeviceDefs.h>
 #include <elf_private.h>
 #include <image.h>
+#include <image_defs.h>
 #include <OS.h>
 
 #include <signal.h>
@@ -223,7 +224,8 @@ extern status_t		_kern_set_signal_stack(const stack_t *newStack,
 						stack_t *oldStack);
 
 // image functions
-extern image_id		_kern_register_image(image_info *info, size_t size);
+extern image_id		_kern_register_image(extended_image_info *info,
+						size_t size);
 extern status_t		_kern_unregister_image(image_id id);
 extern void			_kern_image_relocated(image_id id);
 extern void			_kern_loading_app_failed(status_t error);

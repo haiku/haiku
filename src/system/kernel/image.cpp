@@ -40,9 +40,9 @@ struct ImageTableDefinition {
 	typedef struct image	ValueType;
 
 	size_t HashKey(image_id key) const { return key; }
-	size_t Hash(struct image* value) const { return value->info.id; }
+	size_t Hash(struct image* value) const { return value->info.basic_info.id; }
 	bool Compare(image_id key, struct image* value) const
-		{ return value->info.id == key; }
+		{ return value->info.basic_info.id == key; }
 	struct image*& GetLink(struct image* value) const
 		{ return value->hash_link; }
 };
@@ -63,7 +63,7 @@ public:
 		KMessage event;
 		event.SetTo(eventBuffer, sizeof(eventBuffer), IMAGE_MONITOR);
 		event.AddInt32("event", eventCode);
-		event.AddInt32("image", image->info.id);
+		event.AddInt32("image", image->info.basic_info.id);
 		event.AddPointer("imageStruct", image);
 
 		DefaultNotificationService::Notify(event, eventCode);
@@ -81,8 +81,8 @@ static ImageNotificationService sNotificationService;
 
 /*!	Registers an image with the specified team.
 */
-image_id
-register_image(Team *team, image_info *_info, size_t size)
+static image_id
+register_image(Team *team, extended_image_info *info, size_t size, bool locked)
 {
 	image_id id = atomic_add(&sNextImageID, 1);
 	struct image *image;
@@ -91,16 +91,17 @@ register_image(Team *team, image_info *_info, size_t size)
 	if (image == NULL)
 		return B_NO_MEMORY;
 
-	memcpy(&image->info, _info, sizeof(image_info));
+	memcpy(&image->info, info, sizeof(extended_image_info));
 	image->team = team->id;
 
-	mutex_lock(&sImageMutex);
+	if (!locked)
+		mutex_lock(&sImageMutex);
 
-	image->info.id = id;
+	image->info.basic_info.id = id;
 
 	// Add the app image to the head of the list. Some code relies on it being
 	// the first image to be returned by get_next_image_info().
-	if (image->info.type == B_APP_IMAGE)
+	if (image->info.basic_info.type == B_APP_IMAGE)
 		list_add_link_to_head(&team->image_list, image);
 	else
 		list_add_item(&team->image_list, image);
@@ -109,10 +110,20 @@ register_image(Team *team, image_info *_info, size_t size)
 	// notify listeners
 	sNotificationService.Notify(IMAGE_ADDED, image);
 
-	mutex_unlock(&sImageMutex);
+	if (!locked)
+		mutex_unlock(&sImageMutex);
 
 	TRACE(("register_image(team = %p, image id = %ld, image = %p\n", team, id, image));
 	return id;
+}
+
+
+/*!	Registers an image with the specified team.
+*/
+image_id
+register_image(Team *team, extended_image_info *info, size_t size)
+{
+	return register_image(team, info, size, false);
 }
 
 
@@ -136,7 +147,7 @@ unregister_image(Team *team, image_id id)
 
 	if (status == B_OK) {
 		// notify the debugger
-		user_debug_image_deleted(&image->info);
+		user_debug_image_deleted(&image->info.basic_info);
 
 		// notify listeners
 		sNotificationService.Notify(IMAGE_REMOVED, image);
@@ -145,6 +156,30 @@ unregister_image(Team *team, image_id id)
 	}
 
 	return status;
+}
+
+
+status_t
+copy_images(team_id fromTeamId, Team *toTeam)
+{
+	// get the team
+	Team* fromTeam = Team::Get(fromTeamId);
+	if (fromTeam == NULL)
+		return B_BAD_TEAM_ID;
+	BReference<Team> teamReference(fromTeam, true);
+
+	MutexLocker locker(sImageMutex);
+
+	struct image *image = NULL;
+	while ((image = (struct image*)list_get_next_item(&fromTeam->image_list,
+			image)) != NULL) {
+		image_id id = register_image(toTeam, &image->info, sizeof(image->info),
+			true);
+		if (id < 0)
+			return id;
+	}
+
+	return B_OK;
 }
 
 
@@ -204,7 +239,7 @@ _get_image_info(image_id id, image_info *info, size_t size)
 
 	struct image *image = sImageTable->Lookup(id);
 	if (image != NULL) {
-		memcpy(info, &image->info, size);
+		memcpy(info, &image->info.basic_info, size);
 		status = B_OK;
 	}
 
@@ -236,7 +271,7 @@ _get_next_image_info(team_id teamID, int32 *cookie, image_info *info,
 	while ((image = (struct image*)list_get_next_item(&team->image_list,
 			image)) != NULL) {
 		if (count == *cookie) {
-			memcpy(info, &image->info, size);
+			memcpy(info, &image->info.basic_info, size);
 			(*cookie)++;
 			return B_OK;
 		}
@@ -270,7 +305,7 @@ dump_images_list(int argc, char **argv)
 
 	while ((image = (struct image*)list_get_next_item(&team->image_list, image))
 			!= NULL) {
-		image_info *info = &image->info;
+		image_info *info = &image->info.basic_info;
 
 		kprintf("%6" B_PRId32 " %p %-7" B_PRId32 " %p %-7" B_PRId32 " %s\n",
 			info->id, info->text, info->text_size, info->data, info->data_size,
@@ -328,13 +363,14 @@ image_debug_lookup_user_symbol_address(Team *team, addr_t address,
 	addr_t *_baseAddress, const char **_symbolName, const char **_imageName,
 	bool *_exactMatch)
 {
-	// TODO: work together with ELF reader and runtime_loader
+	// TODO: Work together with ELF reader and runtime_loader. For regular user
+	// images we have the symbol and string table addresses.
 
 	struct image *image = NULL;
 
 	while ((image = (struct image*)list_get_next_item(&team->image_list, image))
 			!= NULL) {
-		image_info *info = &image->info;
+		image_info *info = &image->info.basic_info;
 
 		if ((address < (addr_t)info->text
 				|| address >= (addr_t)info->text + info->text_size)
@@ -424,11 +460,11 @@ _user_unregister_image(image_id id)
 
 
 image_id
-_user_register_image(image_info *userInfo, size_t size)
+_user_register_image(extended_image_info *userInfo, size_t size)
 {
-	image_info info;
+	extended_image_info info;
 
-	if (size != sizeof(image_info))
+	if (size != sizeof(info))
 		return B_BAD_VALUE;
 
 	if (!IS_USER_ADDRESS(userInfo)

@@ -108,23 +108,24 @@ unregister_elf_image(struct elf_image_info *image)
 static void
 register_elf_image(struct elf_image_info *image)
 {
-	image_info imageInfo;
+	extended_image_info imageInfo;
 
-	memset(&imageInfo, 0, sizeof(image_info));
-	imageInfo.id = image->id;
-	imageInfo.type = B_SYSTEM_IMAGE;
-	strlcpy(imageInfo.name, image->name, sizeof(imageInfo.name));
+	memset(&imageInfo, 0, sizeof(imageInfo));
+	imageInfo.basic_info.id = image->id;
+	imageInfo.basic_info.type = B_SYSTEM_IMAGE;
+	strlcpy(imageInfo.basic_info.name, image->name,
+		sizeof(imageInfo.basic_info.name));
 
-	imageInfo.text = (void *)image->text_region.start;
-	imageInfo.text_size = image->text_region.size;
-	imageInfo.data = (void *)image->data_region.start;
-	imageInfo.data_size = image->data_region.size;
+	imageInfo.basic_info.text = (void *)image->text_region.start;
+	imageInfo.basic_info.text_size = image->text_region.size;
+	imageInfo.basic_info.data = (void *)image->data_region.start;
+	imageInfo.basic_info.data_size = image->data_region.size;
 
 	if (image->text_region.id >= 0) {
 		// evaluate the API/ABI version symbols
 
 		// Haiku API version
-		imageInfo.api_version = 0;
+		imageInfo.basic_info.api_version = 0;
 		elf_sym* symbol = elf_find_symbol(image,
 			B_SHARED_OBJECT_HAIKU_VERSION_VARIABLE_NAME, NULL, true);
 		if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
@@ -135,12 +136,12 @@ register_elf_image(struct elf_image_info *image)
 			if (symbolAddress >= image->text_region.start
 				&& symbolAddress - image->text_region.start + sizeof(uint32)
 					<= image->text_region.size) {
-				imageInfo.api_version = *(uint32*)symbolAddress;
+				imageInfo.basic_info.api_version = *(uint32*)symbolAddress;
 			}
 		}
 
 		// Haiku ABI
-		imageInfo.abi = 0;
+		imageInfo.basic_info.abi = 0;
 		symbol = elf_find_symbol(image,
 			B_SHARED_OBJECT_HAIKU_ABI_VARIABLE_NAME, NULL, true);
 		if (symbol != NULL && symbol->st_shndx != SHN_UNDEF
@@ -151,17 +152,17 @@ register_elf_image(struct elf_image_info *image)
 			if (symbolAddress >= image->text_region.start
 				&& symbolAddress - image->text_region.start + sizeof(uint32)
 					<= image->text_region.size) {
-				imageInfo.api_version = *(uint32*)symbolAddress;
+				imageInfo.basic_info.api_version = *(uint32*)symbolAddress;
 			}
 		}
 	} else {
 		// in-memory image -- use the current values
-		imageInfo.api_version = B_HAIKU_VERSION;
-		imageInfo.abi = B_HAIKU_ABI;
+		imageInfo.basic_info.api_version = B_HAIKU_VERSION;
+		imageInfo.basic_info.abi = B_HAIKU_ABI;
 	}
 
 	image->id = register_image(team_get_kernel_team(), &imageInfo,
-		sizeof(image_info));
+		sizeof(imageInfo));
 	sImagesHash->Insert(image);
 }
 
@@ -1902,8 +1903,8 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 		goto error2;
 	}
 
-	image_info imageInfo;
-	memset(&imageInfo, 0, sizeof(image_info));
+	extended_image_info imageInfo;
+	memset(&imageInfo, 0, sizeof(imageInfo));
 
 	for (i = 0; i < elfHeader.e_phnum; i++) {
 		char regionName[B_OS_NAME_LENGTH];
@@ -1948,8 +1949,8 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 			}
 			mappedAreas[i] = id;
 
-			imageInfo.data = regionAddress;
-			imageInfo.data_size = memUpperBound;
+			imageInfo.basic_info.data = regionAddress;
+			imageInfo.basic_info.data_size = memUpperBound;
 
 			image->data_region.start = (addr_t)regionAddress;
 			image->data_region.size = memUpperBound;
@@ -2005,8 +2006,8 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 
 			mappedAreas[i] = id;
 
-			imageInfo.text = regionAddress;
-			imageInfo.text_size = segmentSize;
+			imageInfo.basic_info.text = regionAddress;
+			imageInfo.basic_info.text_size = segmentSize;
 
 			image->text_region.start = (addr_t)regionAddress;
 			image->text_region.size = segmentSize;
@@ -2053,20 +2054,25 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 	}
 
 	// register the loaded image
-	imageInfo.type = B_LIBRARY_IMAGE;
-    imageInfo.device = st.st_dev;
-    imageInfo.node = st.st_ino;
-	strlcpy(imageInfo.name, path, sizeof(imageInfo.name));
+	imageInfo.basic_info.type = B_LIBRARY_IMAGE;
+    imageInfo.basic_info.device = st.st_dev;
+    imageInfo.basic_info.node = st.st_ino;
+	strlcpy(imageInfo.basic_info.name, path, sizeof(imageInfo.basic_info.name));
 
-	imageInfo.api_version = B_HAIKU_VERSION;
-	imageInfo.abi = B_HAIKU_ABI;
+	imageInfo.basic_info.api_version = B_HAIKU_VERSION;
+	imageInfo.basic_info.abi = B_HAIKU_ABI;
 		// TODO: Get the actual values for the shared object. Currently only
 		// the runtime loader is loaded, so this is good enough for the time
 		// being.
 
-	imageInfo.id = register_image(team, &imageInfo, sizeof(image_info));
-	if (imageInfo.id >= 0 && team_get_current_team_id() == team->id)
-		user_debug_image_created(&imageInfo);
+	imageInfo.symbol_table = image->syms;
+	imageInfo.symbol_hash = image->symhash;
+	imageInfo.string_table = image->strtab;
+
+	imageInfo.basic_info.id = register_image(team, &imageInfo,
+		sizeof(imageInfo));
+	if (imageInfo.basic_info.id >= 0 && team_get_current_team_id() == team->id)
+		user_debug_image_created(&imageInfo.basic_info);
 		// Don't care, if registering fails. It's not crucial.
 
 	TRACE(("elf_load: done!\n"));

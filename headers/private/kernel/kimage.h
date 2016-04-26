@@ -7,6 +7,8 @@
 
 #include <image.h>
 
+#include <image_defs.h>
+
 
 struct image;
 
@@ -25,7 +27,7 @@ struct image {
 	struct image*			next;
 	struct image*			prev;
 	struct image*			hash_link;
-	image_info				info;
+	extended_image_info		info;
 	team_id					team;
 };
 
@@ -41,8 +43,10 @@ struct image {
 extern "C" {
 #endif
 
-extern image_id register_image(Team *team, image_info *info, size_t size);
+extern image_id register_image(Team *team, extended_image_info *info,
+					size_t size);
 extern status_t unregister_image(Team *team, image_id id);
+extern status_t copy_images(team_id fromTeamId, Team *toTeam);
 extern int32 count_images(Team *team);
 extern status_t remove_images(Team *team);
 
@@ -59,7 +63,8 @@ extern status_t image_init(void);
 
 // user-space exported calls
 extern status_t _user_unregister_image(image_id id);
-extern image_id _user_register_image(image_info *userInfo, size_t size);
+extern image_id _user_register_image(extended_image_info *userInfo,
+					size_t size);
 extern void		_user_image_relocated(image_id id);
 extern void		_user_loading_app_failed(status_t error);
 extern status_t _user_get_next_image_info(team_id team, int32 *_cookie,

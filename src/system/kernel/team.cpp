@@ -1604,15 +1604,18 @@ team_create_thread_start_internal(void* args)
 
 	// Register commpage image
 	image_id commPageImage = get_commpage_image();
-	image_info imageInfo;
-	err = get_image_info(commPageImage, &imageInfo);
+	extended_image_info imageInfo;
+	err = get_image_info(commPageImage, &imageInfo.basic_info);
 	if (err != B_OK) {
 		TRACE(("team_create_thread_start: get_image_info() failed: %s\n",
 			strerror(err)));
 		return err;
 	}
-	imageInfo.text = team->commpage_address;
-	image_id image = register_image(team, &imageInfo, sizeof(image_info));
+	imageInfo.basic_info.text = team->commpage_address;
+	imageInfo.symbol_table = NULL;
+	imageInfo.symbol_hash = NULL;
+	imageInfo.string_table = NULL;
+	image_id image = register_image(team, &imageInfo, sizeof(imageInfo));
 	if (image < 0) {
 		TRACE(("team_create_thread_start: register_image() failed: %s\n",
 			strerror(image)));
@@ -2031,7 +2034,6 @@ fork_team(void)
 	thread_id threadID;
 	status_t status;
 	ssize_t areaCookie;
-	int32 imageCookie;
 
 	TRACE(("fork_team(): team %" B_PRId32 "\n", parentTeam->id));
 
@@ -2174,14 +2176,8 @@ fork_team(void)
 	arch_store_fork_frame(forkArgs);
 
 	// copy image list
-	image_info imageInfo;
-	imageCookie = 0;
-	while (get_next_image_info(parentTeam->id, &imageCookie, &imageInfo)
-			== B_OK) {
-		image_id image = register_image(team, &imageInfo, sizeof(imageInfo));
-		if (image < 0)
-			goto err5;
-	}
+	if (copy_images(parentTeam->id, team) != B_OK)
+		goto err5;
 
 	// create the main thread
 	{
