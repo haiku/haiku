@@ -1,0 +1,308 @@
+/*
+ * Copyright 2016 Haiku, Inc. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		John Scipione, jscpione@gmail.com
+ *
+ * Corresponds to:
+ *		headers/os/app/PropertyInfo.h	hrev50253
+ *		src/kits/app/PropertyInfo.cpp	hrev50253
+ */
+
+
+/*!
+	\file PropertyInfo.h
+	\ingroup app
+	\ingroup libbe
+	\brief Provides the BPropertyInfo class and support structures.
+*/
+
+
+/*!
+	\struct property_info
+	\ingroup app
+	\ingroup libbe
+	\brief Property info struct containing lists of commands and specifiers.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var property_info::name
+	\brief The name of the property.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var property_info::commands
+	\brief Zero-terminated array of commands understood by the property
+	       e.g. \c B_GET_PROPERTY.
+
+	If the first element is 0 it is treated as a wildcard matching all
+	supported commands.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var property_info::specifiers
+	\brief Zero-terminated array of the specifiers understood by the property
+	       e.g. \c B_DIRECT_SPECIFIER.
+
+	If the first element is 0 it is treated as a wildcard matching all
+	supported specifiers.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var property_info::usage
+	\brief Human-readable string describing the property and its supported
+	       commands and specifiers.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var property_info::extra_data
+	\brief Place to specify freeform data, it is not used by the OS.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\var property_info::types
+	\brief Type chunks?
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var property_info::ctypes
+	\brief Type chunks?
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var property_info::_reserved
+	\brief Reserved for future expansion, do not use.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\enum value_kind
+	\brief Enumerates value types.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var value_kind B_COMMAND_KIND
+	\brief Command value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\var value_kind B_TYPE_CODE_KIND
+	\brief Type code value.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\class BPropertyInfo
+	\ingroup app
+	\ingroup libbe
+	\brief Class used to manage scripting.
+
+	\since BeOS R3
+*/
+
+
+
+/*!
+	\fn BPropertyInfo::BPropertyInfo(property_info* propertyInfo,
+		value_info* valueInfo, bool freeOnDelete)
+	\brief Initializes the object with the specified NULL-terminated arrays
+	       \a propertyInfo and \a valueInfo.
+
+	The arrays are not copied so do not modify or delete the arrays while
+	they are in use by BPropertyInfo.
+
+	\param propertyInfo The NULL-terminated properties array.
+	\param valueInfo The NULL-terminated values array.
+	\param freeOnDelete if \c true, free the memory associated with
+           \a propertyInfo and \a valueInfo when the object is destroyed.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn BPropertyInfo::~BPropertyInfo()
+	\brief Destructor method.
+
+	If \a freeOnDelete is set to \c true in the constructor this method
+	frees all memory associated with \a propertyInfo and \a valueInfo.
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn int32 BPropertyInfo::FindMatch(BMessage* message, int32 index,
+		BMessage* specifier, int32 form, const char* property, void* data) const
+
+	\since BeOS R3
+*/
+
+
+/*!
+	\fn bool BPropertyInfo::IsFixedSize() const
+	\brief Always returns \c false.
+
+	\see BFlattenable::IsFixedSize()
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn type_code BPropertyInfo::TypeCode() const
+	\brief Always returns \c B_PROPERTY_INFO_TYPE.
+
+	\see BFlattenable::TypeCode()
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn ssize_t BPropertyInfo::FlattenedSize() const
+	\brief Returns the size of the flattened object in bytes.
+
+	\see BFlattenable::FlattenedSize()
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BPropertyInfo::Flatten(void* buffer, ssize_t numBytes) const
+
+	\see BFlattenable::Flatten()
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn bool BPropertyInfo::AllowsTypeCode(type_code code) const
+	\brief Returns \c true if \a code is B_PROPERTY_INFO_TYPE,
+	       \c false otherwise.
+
+	\see BFlattenable::AllowsTypeCode()
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn status_t BPropertyInfo::Unflatten(type_code code, const void* buffer,
+		ssize_t numBytes)
+
+	\see BFlattenable::Unflatten()
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn const property_info* BPropertyInfo::Properties() const
+	\brief Returns the properties as a \c property_info pointer.
+
+	Returns the pointer directly, does not make copy.
+
+	Called PropertyInfo() in the BeBook.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn const value_info* BPropertyInfo::Values() const
+	\brief Returns the values as a \c value_info pointer.
+
+	Returns the pointer directly, does not make copy.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPropertyInfo::CountProperties() const
+	\brief Returns The number of properties specified as an int32.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn int32 BPropertyInfo::CountValues() const
+	\brief Returns The number of values specified as an int32.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn void BPropertyInfo::PrintToStream() const
+	\brief Prints each property, command, type, and specifier to standard
+	        output.
+
+	\since BeOS R4
+*/
+
+
+/*!
+	\fn bool BPropertyInfo::FindCommand(uint32 what, int32 index,
+		property_info* propertyInfo)
+	\brief Find the command inside of \a propertyInfo matching \a what and
+	      \a index.
+
+	You may want to override this method in derived classes.
+
+	\returns \c true if the command was found, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BPropertyInfo::FindSpecifier(uint32 form,
+		property_info* propertyInfo)
+	\brief Find the specifier inside of \a propertyInfo matching \a form.
+
+	You may want to override this method in derived classes.
+
+	\returns \c true if the specifier was found, \c false otherwise.
+
+	\since Haiku R1
+*/
