@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2005, Haiku.
+ * Copyright 2001-2005 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -113,8 +113,10 @@ BPropertyInfo::FlattenedSize() const
 				size += sizeof(int32);
 			size += sizeof(int32);
 
-			for (int32 i = 0; i < 3 && fPropInfo[pi].ctypes[i].pairs[0].name != 0; i++) {
-				for (int32 j = 0; j < 5 && fPropInfo[pi].ctypes[i].pairs[j].name != 0; j++) {
+			for (int32 i = 0; i < 3
+					&& fPropInfo[pi].ctypes[i].pairs[0].name != 0; i++) {
+				for (int32 j = 0; j < 5
+						&& fPropInfo[pi].ctypes[i].pairs[j].name != 0; j++) {
 					size += strlen(fPropInfo[pi].ctypes[i].pairs[j].name) + 1;
 					size += sizeof(int32);
 				}
@@ -171,22 +173,26 @@ BPropertyInfo::Flatten(void* buffer, ssize_t numBytes) const
 		for (int32 pi = 0; fPropInfo[pi].name != NULL; pi++) {
 			flatData.Write(fPropInfo[pi].name, strlen(fPropInfo[pi].name) + 1);
 			if (fPropInfo[pi].usage != NULL) {
-				flatData.Write(fPropInfo[pi].usage, strlen(fPropInfo[pi].usage) + 1);
+				flatData.Write(fPropInfo[pi].usage, strlen(fPropInfo[pi].usage)
+					+ 1);
 			} else {
 				tmpChar = 0;
 				flatData.Write(&tmpChar, sizeof(tmpChar));
 			}
 
-			flatData.Write(&fPropInfo[pi].extra_data, sizeof(fPropInfo[pi].extra_data));
+			flatData.Write(&fPropInfo[pi].extra_data,
+				sizeof(fPropInfo[pi].extra_data));
 
 			for (int32 i = 0; i < 10 && fPropInfo[pi].commands[i] != 0; i++) {
-				flatData.Write(&fPropInfo[pi].commands[i], sizeof(fPropInfo[pi].commands[i]));
+				flatData.Write(&fPropInfo[pi].commands[i],
+					sizeof(fPropInfo[pi].commands[i]));
 			}
 			tmpInt = 0;
 			flatData.Write(&tmpInt, sizeof(tmpInt));
 
 			for (int32 i = 0; i < 10 && fPropInfo[pi].specifiers[i] != 0; i++) {
-				flatData.Write(&fPropInfo[pi].specifiers[i], sizeof(fPropInfo[pi].specifiers[i]));
+				flatData.Write(&fPropInfo[pi].specifiers[i],
+					sizeof(fPropInfo[pi].specifiers[i]));
 			}
 			tmpInt = 0;
 			flatData.Write(&tmpInt, sizeof(tmpInt));
@@ -195,13 +201,16 @@ BPropertyInfo::Flatten(void* buffer, ssize_t numBytes) const
 		// Type chunks
 		for (int32 pi = 0; fPropInfo[pi].name != NULL; pi++) {
 			for (int32 i = 0; i < 10 && fPropInfo[pi].types[i] != 0; i++) {
-				flatData.Write(&fPropInfo[pi].types[i], sizeof(fPropInfo[pi].types[i]));
+				flatData.Write(&fPropInfo[pi].types[i],
+					sizeof(fPropInfo[pi].types[i]));
 			}
 			tmpInt = 0;
 			flatData.Write(&tmpInt, sizeof(tmpInt));
 
-			for (int32 i = 0; i < 3 && fPropInfo[pi].ctypes[i].pairs[0].name != 0; i++) {
-				for (int32 j = 0; j < 5 && fPropInfo[pi].ctypes[i].pairs[j].name != 0; j++) {
+			for (int32 i = 0; i < 3
+					&& fPropInfo[pi].ctypes[i].pairs[0].name != 0; i++) {
+				for (int32 j = 0; j < 5
+						&& fPropInfo[pi].ctypes[i].pairs[j].name != 0; j++) {
 					flatData.Write(fPropInfo[pi].ctypes[i].pairs[j].name,
 						strlen(fPropInfo[pi].ctypes[i].pairs[j].name) + 1);
 					flatData.Write(&fPropInfo[pi].ctypes[i].pairs[j].type,
@@ -221,14 +230,17 @@ BPropertyInfo::Flatten(void* buffer, ssize_t numBytes) const
 		for (int32 vi = 0; fValueInfo[vi].name != NULL; vi++) {
 			flatData.Write(&fValueInfo[vi].kind, sizeof(fValueInfo[vi].kind));
 			flatData.Write(&fValueInfo[vi].value, sizeof(fValueInfo[vi].value));
-			flatData.Write(fValueInfo[vi].name, strlen(fValueInfo[vi].name) + 1);
+			flatData.Write(fValueInfo[vi].name, strlen(fValueInfo[vi].name)
+				+ 1);
 			if (fValueInfo[vi].usage) {
-				flatData.Write(fValueInfo[vi].usage, strlen(fValueInfo[vi].usage) + 1);
+				flatData.Write(fValueInfo[vi].usage,
+					strlen(fValueInfo[vi].usage) + 1);
 			} else {
 				tmpChar = 0;
 				flatData.Write(&tmpChar, sizeof(tmpChar));
 			}
-			flatData.Write(&fValueInfo[vi].extra_data, sizeof(fValueInfo[vi].extra_data));
+			flatData.Write(&fValueInfo[vi].extra_data,
+				sizeof(fValueInfo[vi].extra_data));
 		}
 	}
 
@@ -272,20 +284,25 @@ BPropertyInfo::Unflatten(type_code code, const void* buffer,
 	}
 
 	if (flags & 1) {
-		fPropInfo = static_cast<property_info *>(malloc(sizeof(property_info) * (fPropCount + 1)));
+		fPropInfo = static_cast<property_info *>(malloc(sizeof(property_info)
+			* (fPropCount + 1)));
 		memset(fPropInfo, 0, (fPropCount + 1) * sizeof(property_info));
 
 		// Main chunks
 		for (int32 pi = 0; pi < fPropCount; pi++) {
-			fPropInfo[pi].name = strdup(static_cast<const char*>(buffer) + flatData.Position());
+			fPropInfo[pi].name = strdup(static_cast<const char*>(buffer)
+				+ flatData.Position());
 			flatData.Seek(strlen(fPropInfo[pi].name) + 1, SEEK_CUR);
 
-			fPropInfo[pi].usage = strdup(static_cast<const char *>(buffer) + flatData.Position());
+			fPropInfo[pi].usage = strdup(static_cast<const char *>(buffer)
+				+ flatData.Position());
 			flatData.Seek(strlen(fPropInfo[pi].usage) + 1, SEEK_CUR);
 
-			flatData.Read(&fPropInfo[pi].extra_data, sizeof(fPropInfo[pi].extra_data));
+			flatData.Read(&fPropInfo[pi].extra_data,
+				sizeof(fPropInfo[pi].extra_data));
 			if (swapRequired) {
-				fPropInfo[pi].extra_data = B_SWAP_INT32(fPropInfo[pi].extra_data);
+				fPropInfo[pi].extra_data
+					= B_SWAP_INT32(fPropInfo[pi].extra_data);
 			}
 
 			flatData.Read(&tmpInt, sizeof(tmpInt));
@@ -323,8 +340,10 @@ BPropertyInfo::Unflatten(type_code code, const void* buffer,
 				for (int32 j = 0; tmpInt != 0; j++) {
 					flatData.Seek(-sizeof(tmpInt), SEEK_CUR);
 					fPropInfo[pi].ctypes[i].pairs[j].name =
-						strdup(static_cast<const char *>(buffer) + flatData.Position());
-					flatData.Seek(strlen(fPropInfo[pi].ctypes[i].pairs[j].name) + 1, SEEK_CUR);
+						strdup(static_cast<const char *>(buffer)
+							+ flatData.Position());
+					flatData.Seek(strlen(fPropInfo[pi].ctypes[i].pairs[j].name)
+						+ 1, SEEK_CUR);
 
 					flatData.Read(&fPropInfo[pi].ctypes[i].pairs[j].type,
 						sizeof(fPropInfo[pi].ctypes[i].pairs[j].type));
@@ -345,24 +364,30 @@ BPropertyInfo::Unflatten(type_code code, const void* buffer,
 			fValueCount = B_SWAP_INT16(fValueCount);
 		}
 
-		fValueInfo = static_cast<value_info *>(malloc(sizeof(value_info) * (fValueCount + 1)));
+		fValueInfo = static_cast<value_info *>(malloc(sizeof(value_info)
+			* (fValueCount + 1)));
 		memset(fValueInfo, 0, (fValueCount + 1) * sizeof(value_info));
 
 		for (int32 vi = 0; vi < fValueCount; vi++) {
 			flatData.Read(&fValueInfo[vi].kind, sizeof(fValueInfo[vi].kind));
 			flatData.Read(&fValueInfo[vi].value, sizeof(fValueInfo[vi].value));
 
-			fValueInfo[vi].name = strdup(static_cast<const char *>(buffer) + flatData.Position());
+			fValueInfo[vi].name = strdup(static_cast<const char *>(buffer)
+				+ flatData.Position());
 			flatData.Seek(strlen(fValueInfo[vi].name) + 1, SEEK_CUR);
 
-			fValueInfo[vi].usage = strdup(static_cast<const char *>(buffer) + flatData.Position());
+			fValueInfo[vi].usage = strdup(static_cast<const char *>(buffer)
+				+ flatData.Position());
 			flatData.Seek(strlen(fValueInfo[vi].usage) + 1, SEEK_CUR);
 
-			flatData.Read(&fValueInfo[vi].extra_data, sizeof(fValueInfo[vi].extra_data));
+			flatData.Read(&fValueInfo[vi].extra_data,
+				sizeof(fValueInfo[vi].extra_data));
 			if (swapRequired) {
-				fValueInfo[vi].kind = static_cast<value_kind>(B_SWAP_INT32(fValueInfo[vi].kind));
+				fValueInfo[vi].kind = static_cast<value_kind>(
+					B_SWAP_INT32(fValueInfo[vi].kind));
 				fValueInfo[vi].value = B_SWAP_INT32(fValueInfo[vi].value);
-				fValueInfo[vi].extra_data = B_SWAP_INT32(fValueInfo[vi].extra_data);
+				fValueInfo[vi].extra_data
+					= B_SWAP_INT32(fValueInfo[vi].extra_data);
 			}
 		}
 	}
@@ -402,8 +427,10 @@ BPropertyInfo::CountValues() const
 void
 BPropertyInfo::PrintToStream() const
 {
-	printf("      property   commands                       types                specifiers\n");
-	printf("--------------------------------------------------------------------------------\n");
+	printf("      property   commands                       types              "
+		"     specifiers\n");
+	printf("-------------------------------------------------------------------"
+		"-------------\n");
 
 	for (int32 pi = 0; fPropInfo[pi].name != 0; pi++) {
 		// property
@@ -421,7 +448,8 @@ BPropertyInfo::PrintToStream() const
 			uint32 type = fPropInfo[pi].types[i];
 
 			printf("%c%c%c%c", int(type & 0xFF000000) >> 24,
-				int(type & 0xFF0000) >> 16, int(type & 0xFF00) >> 8, (int)type & 0xFF);
+				int(type & 0xFF0000) >> 16, int(type & 0xFF00) >> 8,
+					(int)type & 0xFF);
 		}
 		// specifiers
 		for (int32 i = 0; i < 10 && fPropInfo[pi].specifiers[i] != 0; i++) {
@@ -434,7 +462,8 @@ BPropertyInfo::PrintToStream() const
 
 
 bool
-BPropertyInfo::FindCommand(uint32 what, int32 index, property_info *propertyInfo)
+BPropertyInfo::FindCommand(uint32 what, int32 index,
+	property_info* propertyInfo)
 {
 	bool result = false;
 
@@ -454,7 +483,7 @@ BPropertyInfo::FindCommand(uint32 what, int32 index, property_info *propertyInfo
 
 
 bool
-BPropertyInfo::FindSpecifier(uint32 form, property_info *propertyInfo)
+BPropertyInfo::FindSpecifier(uint32 form, property_info* propertyInfo)
 {
 	bool result = false;
 
@@ -533,4 +562,3 @@ BPropertyInfo::FreeMem()
 
 	fInHeap = false;
 }
-
