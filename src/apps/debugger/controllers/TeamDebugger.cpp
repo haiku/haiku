@@ -218,6 +218,7 @@ TeamDebugger::TeamDebugger(Listener* listener, UserInterface* userInterface,
 	fSettingsManager(settingsManager),
 	fTeam(NULL),
 	fTeamID(-1),
+	fIsPostMortem(false),
 	fImageHandlers(NULL),
 	fImageInfoPendingThreads(NULL),
 	fDebuggerInterface(NULL),
@@ -337,6 +338,7 @@ TeamDebugger::Init(DebuggerInterface* interface, thread_id threadID, int argc,
 	fDebuggerInterface = interface;
 	fDebuggerInterface->AcquireReference();
 	fTeamID = interface->TeamID();
+	fIsPostMortem = interface->IsPostMortem();
 
 
 	// create file manager

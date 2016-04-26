@@ -110,7 +110,13 @@ TargetHostInterface::TeamDebuggerAt(int32 index) const
 TeamDebugger*
 TargetHostInterface::FindTeamDebugger(team_id team) const
 {
-	return fTeamDebuggers.BinarySearchByKey(team, &_FindDebuggerByKey);
+	for (int32 i = 0; i < fTeamDebuggers.CountItems(); i++) {
+		TeamDebugger* debugger = fTeamDebuggers.ItemAt(i);
+		if (debugger->TeamID() == team && !debugger->IsPostMortem())
+			return debugger;
+	}
+
+	return NULL;
 }
 
 
@@ -127,10 +133,12 @@ TargetHostInterface::AddTeamDebugger(TeamDebugger* debugger)
 void
 TargetHostInterface::RemoveTeamDebugger(TeamDebugger* debugger)
 {
-	int32 index = fTeamDebuggers.BinarySearchIndexByKey(debugger->TeamID(),
-		&_FindDebuggerByKey);
-	if (index >= 0)
-		fTeamDebuggers.RemoveItemAt(index);
+	for (int32 i = 0; i < fTeamDebuggers.CountItems(); i++) {
+		if (fTeamDebuggers.ItemAt(i) == debugger) {
+			fTeamDebuggers.RemoveItemAt(i);
+			break;
+		}
+	}
 }
 
 
@@ -314,18 +322,6 @@ TargetHostInterface::_CompareDebuggers(const TeamDebugger* a,
 	const TeamDebugger* b)
 {
 	return a->TeamID() < b->TeamID() ? -1 : 1;
-}
-
-
-/*static*/ int
-TargetHostInterface::_FindDebuggerByKey(const team_id* team,
-	const TeamDebugger* debugger)
-{
-	if (*team < debugger->TeamID())
-		return -1;
-	else if (*team > debugger->TeamID())
-		return 1;
-	return 0;
 }
 
 

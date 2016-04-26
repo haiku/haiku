@@ -84,8 +84,6 @@ private:
 
 	static	int					_CompareDebuggers(const TeamDebugger* a,
 									const TeamDebugger* b);
-	static	int					_FindDebuggerByKey(const team_id* team,
-									const TeamDebugger* debugger);
 private:
 			typedef DoublyLinkedList<Listener> ListenerList;
 			typedef BObjectList<TeamDebugger> TeamDebuggerList;

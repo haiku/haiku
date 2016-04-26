@@ -51,6 +51,8 @@ public:
 
 			team_id				TeamID() const	{ return fTeamID; }
 
+			bool				IsPostMortem() const { return fIsPostMortem; }
+
 			int					ArgumentCount() const
 									{ return fCommandLineArgc; }
 			const char**		Arguments() const
@@ -245,6 +247,7 @@ private:
 			SettingsManager*	fSettingsManager;
 			::Team*				fTeam;
 			team_id				fTeamID;
+			bool				fIsPostMortem;
 			ThreadHandlerTable	fThreadHandlers;
 									// protected by the team lock
 			ImageHandlerTable*	fImageHandlers;
