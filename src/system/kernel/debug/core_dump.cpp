@@ -1134,7 +1134,8 @@ private:
 		note.nt_id = fTeamInfo.team;
 		note.nt_uid = fTeamInfo.uid;
 		note.nt_gid = fTeamInfo.gid;
-		writer.Write(&note, sizeof(note));
+		writer.Write((uint32)sizeof(note));
+		writer.Write(note);
 
 		// write args
 		const char* args = fTeamInfo.args;
@@ -1214,7 +1215,8 @@ private:
 	void _WriteAreasNote(Writer& writer)
 	{
 		// area count
-		writer.Write(fAreaCount);
+		writer.Write((uint32)fAreaCount);
+		writer.Write((uint32)sizeof(elf_note_area_entry));
 
 		// write table
 		for (AreaInfoList::Iterator it = fAreaInfos.GetIterator();
@@ -1227,7 +1229,7 @@ private:
 			entry.na_base = areaInfo->Base();
 			entry.na_size = areaInfo->Size();
 			entry.na_ram_size = areaInfo->RamSize();
-			writer.Write(&entry, sizeof(entry));
+			writer.Write(entry);
 		}
 
 		// write strings
@@ -1261,7 +1263,8 @@ private:
 	void _WriteImagesNote(Writer& writer)
 	{
 		// image count
-		writer.Write(fImageCount);
+		writer.Write((uint32)fImageCount);
+		writer.Write((uint32)sizeof(elf_note_image_entry));
 
 		// write table
 		for (ImageInfoList::Iterator it = fImageInfos.GetIterator();
@@ -1278,7 +1281,7 @@ private:
 			entry.ni_text_size = imageInfo->TextSize();
 			entry.ni_data_base = imageInfo->DataBase();
 			entry.ni_data_size = imageInfo->DataSize();
-			writer.Write(&entry, sizeof(entry));
+			writer.Write(entry);
 		}
 
 		// write strings
@@ -1312,8 +1315,9 @@ private:
 	void _WriteThreadsNote(Writer& writer)
 	{
 		// thread count and size of CPU state
-		writer.Write(fThreadCount);
-		writer.Write(sizeof(debug_cpu_state));
+		writer.Write((uint32)fThreadCount);
+		writer.Write((uint32)sizeof(elf_note_thread_entry));
+		writer.Write((uint32)sizeof(debug_cpu_state));
 
 		// write table
 		for (ThreadStateList::Iterator it = fThreadStates.GetIterator();

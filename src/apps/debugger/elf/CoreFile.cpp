@@ -8,6 +8,8 @@
 
 #include <errno.h>
 
+#include <algorithm>
+
 #include <OS.h>
 
 #include <AutoDeleter.h>
@@ -319,23 +321,34 @@ CoreFile::_ReadTeamNote(const void* data, uint32 dataSize)
 {
 	typedef typename ElfClass::NoteTeam NoteTeam;
 
-	if (dataSize < sizeof(NoteTeam) + 1) {
+	if (dataSize < sizeof(uint32)) {
 		WARNING("Team note too short\n");
 		return B_BAD_DATA;
 	}
-	const NoteTeam* note = (const NoteTeam*)data;
+	uint32 entrySize = Get(*(const uint32*)data);
+	data = (const uint32*)data + 1;
+	dataSize -= sizeof(uint32);
+
+	if (entrySize == 0 || dataSize == 0 || dataSize - 1 < entrySize) {
+		WARNING("Team note: too short or invalid entry size (%" B_PRIu32 ")\n",
+			entrySize);
+		return B_BAD_DATA;
+	}
+
+	NoteTeam note = {};
+	_ReadEntry(data, dataSize, note, entrySize);
 
 	// check, if args are null-terminated
-	const char* args = (const char*)(note + 1);
-	size_t argsSize = dataSize - sizeof(NoteTeam);
-	if (argsSize == 0 || args[argsSize - 1] != '\0') {
+	const char* args = (const char*)data;
+	size_t argsSize = dataSize;
+	if (args[argsSize - 1] != '\0') {
 		WARNING("Team note args not terminated\n");
 		return B_BAD_DATA;
 	}
 
-	int32 id = Get(note->nt_id);
-	int32 uid = Get(note->nt_uid);
-	int32 gid = Get(note->nt_gid);
+	int32 id = Get(note.nt_id);
+	int32 uid = Get(note.nt_uid);
+	int32 gid = Get(note.nt_gid);
 
 	BString copiedArgs(args);
 	if (args[0] != '\0' && copiedArgs.Length() == 0)
@@ -350,29 +363,29 @@ template<typename ElfClass>
 status_t
 CoreFile::_ReadAreasNote(const void* data, uint32 dataSize)
 {
-	const size_t addressSize = sizeof(typename ElfClass::Size);
-	if (dataSize < addressSize) {
+	if (dataSize < 2 * sizeof(uint32)) {
 		WARNING("Areas note too short\n");
 		return B_BAD_DATA;
 	}
-	uint64 areaCount = Get(*(const typename ElfClass::Size*)data);
+	uint32 areaCount = _ReadValue<uint32>(data, dataSize);
+	uint32 entrySize = _ReadValue<uint32>(data, dataSize);
 
 	typedef typename ElfClass::NoteAreaEntry Entry;
-	const Entry* table = (Entry*)((const uint8*)data + addressSize);
-	dataSize -= addressSize;
 
 	if (areaCount == 0)
 		return B_OK;
 
-	// check area count
-	if (areaCount > dataSize || areaCount * sizeof(Entry) >= dataSize) {
-		WARNING("Areas note too short for area count\n");
+	// check entry size and area count
+	if (entrySize == 0 || dataSize == 0 || areaCount > dataSize
+			|| dataSize - 1 < entrySize || areaCount * entrySize >= dataSize) {
+		WARNING("Areas note: too short or invalid entry size (%" B_PRIu32 ")\n",
+			entrySize);
 		return B_BAD_DATA;
 	}
 
 	// check, if strings are null-terminated
-	const char* strings = (const char*)(table + areaCount);
-	size_t stringsSize = dataSize - areaCount * sizeof(Entry);
+	const char* strings = (const char*)data + areaCount * entrySize;
+	size_t stringsSize = dataSize - areaCount * entrySize;
 	if (stringsSize == 0 || strings[stringsSize - 1] != '\0') {
 		WARNING("Areas note strings not terminated\n");
 		return B_BAD_DATA;
@@ -380,8 +393,8 @@ CoreFile::_ReadAreasNote(const void* data, uint32 dataSize)
 
 	for (uint64 i = 0; i < areaCount; i++) {
 		// get entry values
-		Entry entry;
-		memcpy(&entry, table, sizeof(entry));
+		Entry entry = {};
+		_ReadEntry(data, dataSize, entry, entrySize);
 
 		int32 id = Get(entry.na_id);
 		uint64 baseAddress = Get(entry.na_base);
@@ -413,8 +426,6 @@ CoreFile::_ReadAreasNote(const void* data, uint32 dataSize)
 			delete area;
 			return B_NO_MEMORY;
 		}
-
-		table++;
 	}
 
 	return B_OK;
@@ -425,29 +436,29 @@ template<typename ElfClass>
 status_t
 CoreFile::_ReadImagesNote(const void* data, uint32 dataSize)
 {
-	const size_t addressSize = sizeof(typename ElfClass::Size);
-	if (dataSize < addressSize) {
+	if (dataSize < 2 * sizeof(uint32)) {
 		WARNING("Images note too short\n");
 		return B_BAD_DATA;
 	}
-	uint64 imageCount = Get(*(const typename ElfClass::Size*)data);
+	uint32 imageCount = _ReadValue<uint32>(data, dataSize);
+	uint32 entrySize = _ReadValue<uint32>(data, dataSize);
 
 	typedef typename ElfClass::NoteImageEntry Entry;
-	const Entry* table = (Entry*)((const uint8*)data + addressSize);
-	dataSize -= addressSize;
 
 	if (imageCount == 0)
 		return B_OK;
 
-	// check image count
-	if (imageCount > dataSize || imageCount * sizeof(Entry) >= dataSize) {
-		WARNING("Images note too short for image count\n");
+	// check entry size and image count
+	if (entrySize == 0 || dataSize == 0 || imageCount > dataSize
+			|| dataSize - 1 < entrySize || imageCount * entrySize >= dataSize) {
+		WARNING("Images note: too short or invalid entry size (%" B_PRIu32
+			")\n", entrySize);
 		return B_BAD_DATA;
 	}
 
 	// check, if strings are null-terminated
-	const char* strings = (const char*)(table + imageCount);
-	size_t stringsSize = dataSize - imageCount * sizeof(Entry);
+	const char* strings = (const char*)data + imageCount * entrySize;
+	size_t stringsSize = dataSize - imageCount * entrySize;
 	if (stringsSize == 0 || strings[stringsSize - 1] != '\0') {
 		WARNING("Images note strings not terminated\n");
 		return B_BAD_DATA;
@@ -455,8 +466,8 @@ CoreFile::_ReadImagesNote(const void* data, uint32 dataSize)
 
 	for (uint64 i = 0; i < imageCount; i++) {
 		// get entry values
-		Entry entry;
-		memcpy(&entry, table, sizeof(entry));
+		Entry entry = {};
+		_ReadEntry(data, dataSize, entry, entrySize);
 
 		int32 id = Get(entry.ni_id);
 		int32 type = Get(entry.ni_type);
@@ -494,8 +505,6 @@ CoreFile::_ReadImagesNote(const void* data, uint32 dataSize)
 			delete image;
 			return B_NO_MEMORY;
 		}
-
-		table++;
 	}
 
 	return B_OK;
@@ -506,40 +515,39 @@ template<typename ElfClass>
 status_t
 CoreFile::_ReadThreadsNote(const void* data, uint32 dataSize)
 {
-	const size_t addressSize = sizeof(typename ElfClass::Size);
-	if (dataSize < 2 * addressSize) {
+	if (dataSize < 3 * sizeof(uint32)) {
 		WARNING("Threads note too short\n");
 		return B_BAD_DATA;
 	}
-
-	const typename ElfClass::Size* header
-		= (const typename ElfClass::Size*)data;
-	uint64 threadCount = Get(header[0]);
-	uint64 cpuStateSize = Get(header[1]);
+	uint32 threadCount = _ReadValue<uint32>(data, dataSize);
+	uint32 entrySize = _ReadValue<uint32>(data, dataSize);
+	uint32 cpuStateSize = _ReadValue<uint32>(data, dataSize);
 
 	if (cpuStateSize > 1024 * 1024) {
-		WARNING("Threads note: unreasonable CPU state size: %" B_PRIu64 "\n",
+		WARNING("Threads note: unreasonable CPU state size: %" B_PRIu32 "\n",
 			cpuStateSize);
 		return B_BAD_DATA;
 	}
 
 	typedef typename ElfClass::NoteThreadEntry Entry;
-	const uint8* table = (const uint8*)(header + 2);
-	dataSize -= 2 * addressSize;
-
-	size_t totalEntrySize = sizeof(Entry) + (size_t)cpuStateSize;
-
-	// check thread count
-	if (threadCount > dataSize || threadCount * totalEntrySize >= dataSize) {
-		WARNING("Threads note too short for thread count\n");
-		return B_BAD_DATA;
-	}
 
 	if (threadCount == 0)
 		return B_OK;
 
+	size_t totalEntrySize = entrySize + cpuStateSize;
+
+	// check entry size and thread count
+	if (entrySize == 0 || dataSize == 0 || threadCount > dataSize
+			|| entrySize > dataSize || cpuStateSize > dataSize
+			|| dataSize - 1 < totalEntrySize
+			|| threadCount * totalEntrySize >= dataSize) {
+		WARNING("Threads note: too short or invalid entry size (%" B_PRIu32
+			")\n", entrySize);
+		return B_BAD_DATA;
+	}
+
 	// check, if strings are null-terminated
-	const char* strings = (const char*)(table + threadCount * totalEntrySize);
+	const char* strings = (const char*)data + threadCount * totalEntrySize;
 	size_t stringsSize = dataSize - threadCount * totalEntrySize;
 	if (stringsSize == 0 || strings[stringsSize - 1] != '\0') {
 		WARNING("Threads note strings not terminated\n");
@@ -548,8 +556,8 @@ CoreFile::_ReadThreadsNote(const void* data, uint32 dataSize)
 
 	for (uint64 i = 0; i < threadCount; i++) {
 		// get entry values
-		Entry entry;
-		memcpy(&entry, table, sizeof(entry));
+		Entry entry = {};
+		_ReadEntry(data, dataSize, entry, entrySize);
 
 		int32 id = Get(entry.nth_id);
 		int32 state = Get(entry.nth_state);
@@ -581,11 +589,9 @@ CoreFile::_ReadThreadsNote(const void* data, uint32 dataSize)
 		}
 
 		// get CPU state
-		const void* cpuState = table + sizeof(Entry);
-		if (!thread->SetCpuState(cpuState, cpuStateSize))
+		if (!thread->SetCpuState(data, cpuStateSize))
 			return B_NO_MEMORY;
-
-		table += totalEntrySize;
+		_Advance(data, dataSize, cpuStateSize);
 	}
 
 	return B_OK;
@@ -622,3 +628,29 @@ CoreFile::_FindAreaSegment(uint64 address) const
 }
 
 
+template<typename Type>
+Type
+CoreFile::_ReadValue(const void*& data, uint32& dataSize)
+{
+	Type value = Get(*(const Type*)data);
+	_Advance(data, dataSize, sizeof(Type));
+	return value;
+}
+
+
+template<typename Entry>
+void
+CoreFile::_ReadEntry(const void*& data, uint32& dataSize, Entry& entry,
+	size_t entrySize)
+{
+	memcpy(&entry, data, std::min(sizeof(entry), entrySize));
+	_Advance(data, dataSize, entrySize);
+}
+
+
+void
+CoreFile::_Advance(const void*& data, uint32& dataSize, size_t by)
+{
+	data = (const uint8*)data + by;
+	dataSize -= by;
+}

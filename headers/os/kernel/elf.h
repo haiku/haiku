@@ -611,7 +611,7 @@ typedef struct {
 #define NT_IMAGES			0x696d6167 	/* images */
 #define NT_THREADS			0x74687264 	/* threads */
 
-/* NT_TEAM: Elf32_Note_Team; char[] args */
+/* NT_TEAM: uint32 entrySize; Elf32_Note_Team; char[] args */
 typedef struct {
 	int32		nt_id;				/* team ID */
 	int32		nt_uid;				/* team owner ID */
@@ -620,7 +620,12 @@ typedef struct {
 
 typedef Elf32_Note_Team Elf64_Note_Team;
 
-/* NT_AREAS: uint32 count; Elf32_Note_Area_Entry[count]; char[] names */
+/* NT_AREAS:
+ * uint32 count;
+ * uint32 entrySize;
+ * Elf32_Note_Area_Entry[count];
+ * char[] names
+ */
 typedef struct {
 	int32		na_id;				/* area ID */
 	uint32		na_lock;			/* lock type (B_NO_LOCK, ...) */
@@ -630,7 +635,12 @@ typedef struct {
 	uint32		na_ram_size;		/* physical memory used */
 } Elf32_Note_Area_Entry;
 
-/* NT_AREAS: uint64 count; Elf64_Note_Area_Entry[count]; char[] names */
+/* NT_AREAS:
+ * uint32 count;
+ * uint32 entrySize;
+ * Elf64_Note_Area_Entry[count];
+ * char[] names
+ */
 typedef struct {
 	int32		na_id;				/* area ID */
 	uint32		na_lock;			/* lock type (B_NO_LOCK, ...) */
@@ -641,7 +651,12 @@ typedef struct {
 	uint64		na_ram_size;		/* physical memory used */
 } Elf64_Note_Area_Entry;
 
-/* NT_IMAGES: uint32 count; Elf32_Note_Image_Entry[count]; char[] names */
+/* NT_IMAGES:
+ * uint32 count;
+ * uint32 entrySize;
+ * Elf32_Note_Image_Entry[count];
+ * char[] names
+ */
 typedef struct {
 	int32		ni_id;				/* image ID */
 	int32		ni_type;			/* image type (B_APP_IMAGE, ...) */
@@ -655,7 +670,12 @@ typedef struct {
 	uint32		ni_data_size;		/* size of data segment */
 } Elf32_Note_Image_Entry;
 
-/* NT_IMAGES: uint64 count; Elf64_Note_Image_Entry[count]; char[] names */
+/* NT_IMAGES:
+ * uint32 count;
+ * uint32 entrySize;
+ * Elf64_Note_Image_Entry[count];
+ * char[] names
+ */
 typedef struct {
 	int32		ni_id;				/* image ID */
 	int32		ni_type;			/* image type (B_APP_IMAGE, ...) */
@@ -672,6 +692,7 @@ typedef struct {
 
 /* NT_THREADS:
  * uint32 count;
+ * uint32 entrySize;
  * uint32 cpuStateSize;
  * {Elf32_Note_Thread_Entry, uint8[cpuStateSize] cpuState}[count];
  * char[] names
@@ -685,8 +706,9 @@ typedef struct {
 } Elf32_Note_Thread_Entry;
 
 /* NT_THREADS:
- * uint64 count;
- * uint64 cpuStateSize;
+ * uint32 count;
+ * uint32 entrySize;
+ * uint32 cpuStateSize;
  * {Elf64_Note_Thread_Entry, uint8[cpuStateSize] cpuState}[count];
  * char[] names
  */

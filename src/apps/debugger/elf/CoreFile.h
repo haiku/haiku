@@ -179,6 +179,14 @@ private:
 			CoreFileAreaInfo*	_FindArea(uint64 address) const;
 			ElfSegment*			_FindAreaSegment(uint64 address) const;
 
+			template<typename Type>
+			Type				_ReadValue(const void*& data, uint32& dataSize);
+			template<typename Entry>
+			void				_ReadEntry(const void*& data, uint32& dataSize,
+									Entry& entry, size_t entrySize);
+			void				_Advance(const void*& data, uint32& dataSize,
+									size_t by);
+
 			template<typename Value>
 			Value				Get(const Value& value) const
 									{ return fElfFile.Get(value); }
