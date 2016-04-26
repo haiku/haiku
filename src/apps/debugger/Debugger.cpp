@@ -13,12 +13,14 @@
 #include <new>
 
 #include <Application.h>
+#include <Entry.h>
 #include <Message.h>
+#include <ObjectList.h>
+#include <Path.h>
 
 #include <ArgumentVector.h>
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
-#include <ObjectList.h>
 
 #include "CoreFile.h"
 #include "CoreFileDebuggerInterface.h"
@@ -273,6 +275,7 @@ public:
 	virtual void 				MessageReceived(BMessage* message);
 	virtual void 				ReadyToRun();
 	virtual void 				ArgvReceived(int32 argc, char** argv);
+	virtual	void				RefsReceived(BMessage* message);
 
 private:
 	virtual bool 				QuitRequested();
@@ -284,6 +287,7 @@ private:
 private:
 			status_t			_StartNewTeam(TargetHostInterface* interface,
 									const char* teamPath, const char* args);
+			status_t			_HandleOptions(const Options& options);
 
 private:
 			SettingsManager		fSettingsManager;
@@ -466,13 +470,32 @@ Debugger::ArgvReceived(int32 argc, char** argv)
 		return;
 	}
 
-	TeamDebuggerOptions debuggerOptions;
-	set_debugger_options_from_options(debuggerOptions, options);
-	debuggerOptions.settingsManager = &fSettingsManager;
+	_HandleOptions(options);
+}
 
-	TargetHostInterface* hostInterface
-		= TargetHostInterfaceRoster::Default()->ActiveInterfaceAt(0);
-	hostInterface->StartTeamDebugger(debuggerOptions);
+
+void
+Debugger::RefsReceived(BMessage* message)
+{
+	// iterate through the refs and handle the files we can handle
+	entry_ref ref;
+	for (int32 i = 0; message->FindRef("refs", i, &ref) == B_OK; i++) {
+		BPath path;
+		if (path.SetTo(&ref) != B_OK)
+			continue;
+
+		// check, whether this is a core file
+		{
+			ElfFile elfFile;
+			if (elfFile.Init(path.Path()) != B_OK || elfFile.Type() != ET_CORE)
+				continue;
+		}
+
+		// handle the core file
+		Options options;
+		options.coreFilePath = path.Path();
+		_HandleOptions(options);
+	}
 }
 
 
@@ -546,6 +569,19 @@ Debugger::_StartNewTeam(TargetHostInterface* interface, const char* path,
 		deleter.Detach();
 
 	return error;
+}
+
+
+status_t
+Debugger::_HandleOptions(const Options& options)
+{
+	TeamDebuggerOptions debuggerOptions;
+	set_debugger_options_from_options(debuggerOptions, options);
+	debuggerOptions.settingsManager = &fSettingsManager;
+
+	TargetHostInterface* hostInterface
+		= TargetHostInterfaceRoster::Default()->ActiveInterfaceAt(0);
+	return hostInterface->StartTeamDebugger(debuggerOptions);
 }
 
 
