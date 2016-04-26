@@ -76,6 +76,7 @@ enum {
 	MSG_START_TEAM_WINDOW_CLOSED				= 'stwc',
 	MSG_START_NEW_TEAM							= 'sttt',
 	MSG_DEBUG_THIS_TEAM							= 'dbtt',
+	MSG_LOAD_CORE_TEAM							= 'lcte',
 	MSG_SHOW_INSPECTOR_WINDOW					= 'sirw',
 	MSG_INSPECTOR_WINDOW_CLOSED					= 'irwc',
 	MSG_SHOW_EXPRESSION_WINDOW					= 'seww',

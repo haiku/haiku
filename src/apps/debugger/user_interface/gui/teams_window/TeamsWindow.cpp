@@ -15,6 +15,7 @@
 #include <Application.h>
 #include <Button.h>
 #include <File.h>
+#include <FilePanel.h>
 #include <FindDirectory.h>
 #include <LayoutBuilder.h>
 #include <ListView.h>
@@ -30,7 +31,8 @@
 
 
 enum {
-	MSG_TEAM_SELECTION_CHANGED = 'tesc'
+	MSG_TEAM_SELECTION_CHANGED = 'tesc',
+	MSG_CHOSE_CORE_FILE = 'chcf'
 };
 
 
@@ -42,6 +44,8 @@ TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 	fTeamsListView(NULL),
 	fAttachTeamButton(NULL),
 	fCreateTeamButton(NULL),
+	fLoadCoreButton(NULL),
+	fCoreSelectionPanel(NULL),
 	fSettingsManager(settingsManager)
 {
 	team_info info;
@@ -128,6 +132,39 @@ TeamsWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_CHOSE_CORE_FILE:
+		case B_CANCEL:
+		{
+			delete fCoreSelectionPanel;
+			fCoreSelectionPanel = NULL;
+			if (message->what == B_CANCEL)
+				break;
+
+			entry_ref ref;
+			if (message->FindRef("refs", &ref) != B_OK)
+				break;
+
+			BMessage coreMessage(MSG_LOAD_CORE_TEAM);
+			coreMessage.AddPointer("interface", fTargetHostInterface);
+			coreMessage.AddRef("core", &ref);
+			be_app_messenger.SendMessage(&coreMessage);
+			break;
+		}
+
+		case MSG_LOAD_CORE_TEAM:
+		{
+			try {
+				BMessenger messenger(this);
+				fCoreSelectionPanel = new BFilePanel(B_OPEN_PANEL, &messenger,
+					NULL, 0, false, new BMessage(MSG_CHOSE_CORE_FILE));
+				fCoreSelectionPanel->Show();
+			} catch (...) {
+				delete fCoreSelectionPanel;
+				fCoreSelectionPanel = NULL;
+			}
+			break;
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;
@@ -166,13 +203,16 @@ TeamsWindow::_Init()
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.Add(fTeamsListView = new TeamsListView("TeamsList", fCurrentTeam,
 			fTargetHostInterface))
-		.SetInsets(1.0f, 1.0f, 1.0f, 1.0f)
+		.SetInsets(1.0f, 1.0f, 1.0f, 5.0f)
 		.AddGroup(B_HORIZONTAL)
 			.SetInsets(B_USE_DEFAULT_SPACING)
 			.Add(fAttachTeamButton = new BButton("Attach", new BMessage(
 						MSG_DEBUG_THIS_TEAM)))
+			.AddGlue()
 			.Add(fCreateTeamButton = new BButton("Start new team"
 					B_UTF8_ELLIPSIS, new BMessage(MSG_SHOW_START_TEAM_WINDOW)))
+			.Add(fLoadCoreButton = new BButton("Load core" B_UTF8_ELLIPSIS,
+					new BMessage(MSG_LOAD_CORE_TEAM)))
 			.End()
 		.End();
 
@@ -182,6 +222,7 @@ TeamsWindow::_Init()
 
 	fAttachTeamButton->SetEnabled(false);
 	fCreateTeamButton->SetTarget(this);
+	fLoadCoreButton->SetTarget(this);
 }
 
 

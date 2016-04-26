@@ -12,6 +12,7 @@
 class BButton;
 class BListView;
 class BFile;
+class BFilePanel;
 class BMessage;
 class SettingsManager;
 class TargetHostInterface;
@@ -41,6 +42,8 @@ private:
 			TeamsListView*		fTeamsListView;
 			BButton*			fAttachTeamButton;
 			BButton*			fCreateTeamButton;
+			BButton*			fLoadCoreButton;
+			BFilePanel*			fCoreSelectionPanel;
 			SettingsManager*	fSettingsManager;
 
 };

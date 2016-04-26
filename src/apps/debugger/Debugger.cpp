@@ -444,6 +444,27 @@ Debugger::MessageReceived(BMessage* message)
 			message->SendReply(&reply);
 			break;
 		}
+		case MSG_LOAD_CORE_TEAM:
+		{
+			TargetHostInterface* interface;
+			if (message->FindPointer("interface", reinterpret_cast<void**>(
+					&interface)) != B_OK) {
+				break;
+			}
+
+			entry_ref ref;
+			if (message->FindRef("core", &ref) != B_OK)
+				break;
+
+			BPath path(&ref);
+			if (path.InitCheck() != B_OK)
+				break;
+
+			Options options;
+			options.coreFilePath = path.Path();
+			_HandleOptions(options);
+			break;
+		}
 		default:
 			BApplication::MessageReceived(message);
 			break;
