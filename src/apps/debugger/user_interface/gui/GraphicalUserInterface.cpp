@@ -178,7 +178,10 @@ GraphicalUserInterface::Init(Team* team, UserInterfaceListener* listener)
 void
 GraphicalUserInterface::Show()
 {
-	fTeamWindow->Show();
+	if (fTeamWindow->IsHidden())
+		fTeamWindow->Show();
+	else
+		fTeamWindow->Activate();
 }
 
 
