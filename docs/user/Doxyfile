@@ -664,6 +664,7 @@ INPUT                  = . \
                          support \
                          translation \
                          ../../headers/os/app \
+                         ../../headers/private/app \
                          ../../headers/os/device/Joystick.h \
                          ../../headers/os/drivers/fs_interface.h \
                          ../../headers/os/drivers/USB3.h \
