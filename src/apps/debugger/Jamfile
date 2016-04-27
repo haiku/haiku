@@ -171,6 +171,7 @@ local sources =
 	LoadSourceCodeJob.cpp
 	ResolveValueNodeJob.cpp
 	RetrieveMemoryBlockJob.cpp
+	WriteCoreFileJob.cpp
 	WriteMemoryJob.cpp
 	WriteValueNodeJob.cpp
 
@@ -278,6 +279,7 @@ local sources =
 	CliThreadCommand.cpp
 	CliThreadsCommand.cpp
 	CliVariablesCommand.cpp
+	CliWriteCoreFileCommand.cpp
 
 	# user_interface/gui
 	GraphicalUserInterface.cpp

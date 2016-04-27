@@ -1,11 +1,12 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef JOBS_H
 #define JOBS_H
 
+#include <Entry.h>
 #include <String.h>
 
 #include "ImageDebugInfoLoadingState.h"
@@ -54,7 +55,8 @@ enum {
 	JOB_TYPE_WRITE_VALUE_NODE_VALUE,
 	JOB_TYPE_GET_MEMORY_BLOCK,
 	JOB_TYPE_WRITE_MEMORY,
-	JOB_TYPE_EVALUATE_EXPRESSION
+	JOB_TYPE_EVALUATE_EXPRESSION,
+	JOB_TYPE_WRITE_CORE_FILE
 };
 
 
@@ -300,6 +302,24 @@ private:
 			Thread*				fThread;
 			ValueNodeManager*	fManager;
 			ExpressionResult*	fResultValue;
+};
+
+
+class WriteCoreFileJob : public Job {
+public:
+								WriteCoreFileJob(Team* team,
+									DebuggerInterface* debuggerInterface,
+									const entry_ref& targetPath);
+	virtual						~WriteCoreFileJob();
+
+	virtual	const JobKey&		Key() const;
+	virtual	status_t			Do();
+
+private:
+			SimpleJobKey		fKey;
+			Team*				fTeam;
+			DebuggerInterface*	fDebuggerInterface;
+			entry_ref			fTargetPath;
 };
 
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2016, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -49,6 +49,9 @@ public:
 									BString& _output);
 
 	static	const char*			ReportNameForTeam(::Team* team,
+									char* buffer, size_t bufferSize);
+
+	static	const char*			CoreFileNameForTeam(::Team* team,
 									char* buffer, size_t bufferSize);
 
 	// this function assumes the value nodes have already been resolved

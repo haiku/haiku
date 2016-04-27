@@ -1,6 +1,6 @@
 /*
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -252,6 +252,23 @@ UiUtils::ReportNameForTeam(::Team* team, char* buffer, size_t bufferSize)
 	snprintf(buffer, bufferSize, "%s-%" B_PRId32 "-debug-%02" B_PRId32 "-%02"
 		B_PRId32 "-%02" B_PRId32 "-%02" B_PRId32 "-%02" B_PRId32 "-%02"
 		B_PRId32 ".report", teamPath.Leaf(), team->ID(),
+		currentTime.Date().Day(), currentTime.Date().Month(),
+		currentTime.Date().Year(), currentTime.Time().Hour(),
+		currentTime.Time().Minute(), currentTime.Time().Second());
+
+	return buffer;
+}
+
+
+/*static*/ const char*
+UiUtils::CoreFileNameForTeam(::Team* team, char* buffer, size_t bufferSize)
+{
+	BPath teamPath(team->Name());
+	BDateTime currentTime;
+	currentTime.SetTime_t(time(NULL));
+	snprintf(buffer, bufferSize, "%s-%" B_PRId32 "-debug-%02" B_PRId32 "-%02"
+		B_PRId32 "-%02" B_PRId32 "-%02" B_PRId32 "-%02" B_PRId32 "-%02"
+		B_PRId32 ".core", teamPath.Leaf(), team->ID(),
 		currentTime.Date().Day(), currentTime.Date().Month(),
 		currentTime.Date().Year(), currentTime.Time().Hour(),
 		currentTime.Time().Minute(), currentTime.Time().Second());

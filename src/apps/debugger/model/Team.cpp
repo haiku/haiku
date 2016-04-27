@@ -853,6 +853,17 @@ Team::NotifyDebugReportChanged(const char* reportPath)
 
 
 void
+Team::NotifyCoreFileChanged(const char* targetPath)
+{
+	for (ListenerList::Iterator it = fListeners.GetIterator();
+			Listener* listener = it.Next();) {
+		listener->CoreFileChanged(CoreFileChangedEvent(
+			TEAM_EVENT_CORE_FILE_CHANGED, this, targetPath));
+	}
+}
+
+
+void
 Team::NotifyMemoryChanged(target_addr_t address, target_size_t size)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
@@ -1029,6 +1040,18 @@ Team::DebugReportEvent::DebugReportEvent(uint32 type, Team* team,
 	:
 	Event(type, team),
 	fReportPath(reportPath)
+{
+}
+
+
+// #pragma mark - CoreFileChangedEvent
+
+
+Team::CoreFileChangedEvent::CoreFileChangedEvent(uint32 type, Team* team,
+	const char* targetPath)
+	:
+	Event(type, team),
+	fTargetPath(targetPath)
 {
 }
 
@@ -1217,6 +1240,12 @@ Team::Listener::WatchpointChanged(const Team::WatchpointEvent& event)
 
 void
 Team::Listener::DebugReportChanged(const Team::DebugReportEvent& event)
+{
+}
+
+
+void
+Team::Listener::CoreFileChanged(const Team::CoreFileChangedEvent& event)
 {
 }
 

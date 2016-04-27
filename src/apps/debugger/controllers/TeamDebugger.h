@@ -131,6 +131,8 @@ private:
 
 	virtual void				DebugReportRequested(entry_ref* targetPath);
 
+	virtual	void				WriteCoreFileRequested(entry_ref* targetPath);
+
 	virtual	void				TeamRestartRequested();
 
 	virtual	bool				UserInterfaceQuitRequested(
@@ -219,6 +221,8 @@ private:
 									ExpressionInfo* info,
 									StackFrame* frame,
 									::Thread* thread);
+
+			void				_HandleWriteCoreFile(const entry_ref& ref);
 
 			status_t			_HandleSetArguments(int argc,
 									const char* const* argv);

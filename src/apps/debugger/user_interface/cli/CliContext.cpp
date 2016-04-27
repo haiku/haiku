@@ -517,6 +517,17 @@ CliContext::DebugReportChanged(const Team::DebugReportEvent& event)
 
 
 void
+CliContext::CoreFileChanged(const Team::CoreFileChangedEvent& event)
+{
+	printf("Successfully saved core file to %s\n",
+		event.GetTargetPath());
+
+	_QueueEvent(new(std::nothrow) Event(EVENT_CORE_FILE_CHANGED));
+	_SignalInputLoop(EVENT_CORE_FILE_CHANGED);
+}
+
+
+void
 CliContext::MemoryBlockRetrieved(TeamMemoryBlock* block)
 {
 	_QueueEvent(

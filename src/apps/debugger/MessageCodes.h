@@ -97,6 +97,7 @@ enum {
 	MSG_SHOW_CONTAINER_RANGE_PROMPT				= 'scrp',
 	MSG_SET_CONTAINER_RANGE						= 'chcr',
 	MSG_GENERATE_DEBUG_REPORT					= 'gdrp',
+	MSG_WRITE_CORE_FILE							= 'wrcf',
 	MSG_WRITE_VARIABLE_VALUE					= 'wrvv',
 
 	MSG_DEBUG_INFO_NEEDS_USER_INPUT				= 'dnui',

@@ -173,6 +173,8 @@ public:
 
 	virtual void				DebugReportRequested(entry_ref* path) = 0;
 
+	virtual	void				WriteCoreFileRequested(entry_ref* path) = 0;
+
 	virtual	void				TeamRestartRequested() = 0;
 
 	virtual	bool				UserInterfaceQuitRequested(

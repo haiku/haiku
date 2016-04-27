@@ -846,6 +846,16 @@ TeamDebugger::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case MSG_WRITE_CORE_FILE:
+		{
+			entry_ref ref;
+			if (message->FindRef("target", &ref) != B_OK)
+				break;
+
+			_HandleWriteCoreFile(ref);
+			break;
+		}
+
 		case MSG_THREAD_STATE_CHANGED:
 		{
 			int32 threadID;
@@ -1299,6 +1309,15 @@ void
 TeamDebugger::DebugReportRequested(entry_ref* targetPath)
 {
 	BMessage message(MSG_GENERATE_DEBUG_REPORT);
+	message.AddRef("target", targetPath);
+	PostMessage(&message);
+}
+
+
+void
+TeamDebugger::WriteCoreFileRequested(entry_ref* targetPath)
+{
+	BMessage message(MSG_WRITE_CORE_FILE);
 	message.AddRef("target", targetPath);
 	PostMessage(&message);
 }
@@ -2300,6 +2319,19 @@ TeamDebugger::_HandleEvaluateExpression(SourceLanguage* language,
 			language, info, frame, thread));
 	if (result != B_OK) {
 		_NotifyUser("Evaluate Expression", "Failed to evaluate expression: %s",
+			strerror(result));
+	}
+}
+
+
+void
+TeamDebugger::_HandleWriteCoreFile(const entry_ref& targetPath)
+{
+	status_t result = fWorker->ScheduleJob(
+		new(std::nothrow) WriteCoreFileJob(fTeam, fDebuggerInterface,
+			targetPath));
+	if (result != B_OK) {
+		_NotifyUser("Write Core File", "Failed to write core file: %s",
 			strerror(result));
 	}
 }

@@ -1,6 +1,6 @@
 /*
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2014-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef CLI_CONTEXT_H
@@ -42,7 +42,8 @@ public:
 				EVENT_VALUE_NODE_CHANGED			= 0x40,
 				EVENT_TEAM_MEMORY_BLOCK_RETRIEVED	= 0x80,
 				EVENT_EXPRESSION_EVALUATED			= 0x100,
-				EVENT_DEBUG_REPORT_CHANGED			= 0x200
+				EVENT_DEBUG_REPORT_CHANGED			= 0x200,
+				EVENT_CORE_FILE_CHANGED				= 0x400
 			};
 
 public:
@@ -111,6 +112,9 @@ private:
 
 	virtual	void				DebugReportChanged(
 									const Team::DebugReportEvent& event);
+
+	virtual	void				CoreFileChanged(
+									const Team::CoreFileChangedEvent& event);
 
 	// TeamMemoryBlock::Listener
 	virtual void				MemoryBlockRetrieved(TeamMemoryBlock* block);

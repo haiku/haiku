@@ -57,6 +57,8 @@ enum {
 
 	TEAM_EVENT_DEBUG_REPORT_CHANGED,
 
+	TEAM_EVENT_CORE_FILE_CHANGED,
+
 	TEAM_EVENT_MEMORY_CHANGED
 };
 
@@ -96,6 +98,7 @@ public:
 			class ThreadEvent;
 			class UserBreakpointEvent;
 			class WatchpointEvent;
+			class CoreFileChangedEvent;
 			class Listener;
 
 public:
@@ -262,6 +265,10 @@ public:
 			// debug report related service methods
 			void				NotifyDebugReportChanged(
 									const char* reportPath);
+
+			// core file related service methods
+			void				NotifyCoreFileChanged(
+									const char* targetPath);
 
 			// memory write related service methods
 			void				NotifyMemoryChanged(target_addr_t address,
@@ -433,6 +440,15 @@ protected:
 			const char*			fReportPath;
 };
 
+class Team::CoreFileChangedEvent : public Event {
+public:
+								CoreFileChangedEvent(uint32 type, Team* team,
+									const char* targetPath);
+			const char*			GetTargetPath() const	{ return fTargetPath; }
+protected:
+			const char*			fTargetPath;
+};
+
 
 class Team::MemoryChangedEvent : public Event {
 public:
@@ -532,6 +548,9 @@ public:
 
 	virtual void				DebugReportChanged(
 									const Team::DebugReportEvent& event);
+
+	virtual	void				CoreFileChanged(
+									const Team::CoreFileChangedEvent& event);
 
 	virtual	void				MemoryChanged(
 									const Team::MemoryChangedEvent& event);
