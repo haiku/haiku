@@ -668,6 +668,9 @@ typedef struct {
 	uint32		ni_text_size;		/* size of text segment */
 	uint32		ni_data_base;		/* base address of data segment */
 	uint32		ni_data_size;		/* size of data segment */
+	uint32		ni_symbol_table;	/* address of dynamic symbol table */
+	uint32		ni_symbol_hash;		/* address of dynamic symbol hash */
+	uint32		ni_string_table;	/* address of dynamic string table */
 } Elf32_Note_Image_Entry;
 
 /* NT_IMAGES:
@@ -688,6 +691,9 @@ typedef struct {
 	uint64		ni_text_size;		/* size of text segment */
 	uint64		ni_data_base;		/* base address of data segment */
 	uint64		ni_data_size;		/* size of data segment */
+	uint64		ni_symbol_table;	/* address of dynamic symbol table */
+	uint64		ni_symbol_hash;		/* address of dynamic symbol hash */
+	uint64		ni_string_table;	/* address of dynamic string table */
 } Elf64_Note_Image_Entry;
 
 /* NT_THREADS:

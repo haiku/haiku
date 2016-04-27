@@ -256,7 +256,10 @@ struct ImageInfo : DoublyLinkedListLinkImpl<ImageInfo> {
 		fText((addr_t)image->info.basic_info.text),
 		fData((addr_t)image->info.basic_info.data),
 		fTextSize(image->info.basic_info.text_size),
-		fDataSize(image->info.basic_info.data_size)
+		fDataSize(image->info.basic_info.data_size),
+		fSymbolTable((addr_t)image->info.symbol_table),
+		fSymbolHash((addr_t)image->info.symbol_hash),
+		fStringTable((addr_t)image->info.string_table)
 	{
 	}
 
@@ -332,6 +335,21 @@ struct ImageInfo : DoublyLinkedListLinkImpl<ImageInfo> {
 		return fDataSize;
 	}
 
+	addr_t SymbolTable() const
+	{
+		return fSymbolTable;
+	}
+
+	addr_t SymbolHash() const
+	{
+		return fSymbolHash;
+	}
+
+	addr_t StringTable() const
+	{
+		return fStringTable;
+	}
+
 private:
 	image_id	fId;
 	image_type	fType;
@@ -344,6 +362,9 @@ private:
 	addr_t		fData;
 	size_t		fTextSize;
 	size_t		fDataSize;
+	addr_t		fSymbolTable;
+	addr_t		fSymbolHash;
+	addr_t		fStringTable;
 };
 
 
@@ -1281,6 +1302,9 @@ private:
 			entry.ni_text_size = imageInfo->TextSize();
 			entry.ni_data_base = imageInfo->DataBase();
 			entry.ni_data_size = imageInfo->DataSize();
+			entry.ni_symbol_table = imageInfo->SymbolTable();
+			entry.ni_symbol_hash = imageInfo->SymbolHash();
+			entry.ni_string_table = imageInfo->StringTable();
 			writer.Write(entry);
 		}
 
