@@ -60,6 +60,8 @@ struct CoreFileImageInfo {
 									uint64 textBase, uint64 textSize,
 									uint64 dataBase, uint64 dataSize,
 									int32 deviceId, int64 nodeId,
+									uint64 symbolTable, uint64 symbolHash,
+									uint64 stringTable,
 									CoreFileAreaInfo* textArea,
 									CoreFileAreaInfo* dataArea,
 									const BString& name);
@@ -70,6 +72,9 @@ struct CoreFileImageInfo {
 			uint64				TextSize() const	{ return fTextSize; }
 			uint64				DataBase() const	{ return fDataBase; }
 			uint64				DataSize() const	{ return fDataSize; }
+			uint64				SymbolTable() const	{ return fSymbolTable; }
+			uint64				SymbolHash() const	{ return fSymbolHash; }
+			uint64				StringTable() const	{ return fStringTable; }
 			const BString&		Name() const		{ return fName; }
 
 private:
@@ -83,6 +88,9 @@ private:
 			uint64				fDataSize;
 			int32				fDeviceId;
 			int64				fNodeId;
+			uint64				fSymbolTable;
+			uint64				fSymbolHash;
+			uint64				fStringTable;
 			CoreFileAreaInfo*	fTextArea;
 			CoreFileAreaInfo*	fDataArea;
 			BString				fName;

@@ -66,7 +66,8 @@ CoreFileAreaInfo::CoreFileAreaInfo(ElfSegment* segment, int32 id,
 
 CoreFileImageInfo::CoreFileImageInfo(int32 id, int32 type, uint64 initRoutine,
 	uint64 termRoutine, uint64 textBase, uint64 textSize, uint64 dataBase,
-	uint64 dataSize, int32 deviceId, int64 nodeId, CoreFileAreaInfo* textArea,
+	uint64 dataSize, int32 deviceId, int64 nodeId, uint64 symbolTable,
+	uint64 symbolHash, uint64 stringTable, CoreFileAreaInfo* textArea,
 	CoreFileAreaInfo* dataArea, const BString& name)
 	:
 	fId(id),
@@ -79,6 +80,9 @@ CoreFileImageInfo::CoreFileImageInfo(int32 id, int32 type, uint64 initRoutine,
 	fDataSize(dataSize),
 	fDeviceId(deviceId),
 	fNodeId(nodeId),
+	fSymbolTable(symbolTable),
+	fSymbolHash(symbolHash),
+	fStringTable(stringTable),
 	fTextArea(textArea),
 	fDataArea(dataArea),
 	fName(name)
@@ -479,6 +483,9 @@ CoreFile::_ReadImagesNote(const void* data, uint32 dataSize)
 		uint64 dataSize = Get(entry.ni_data_size);
 		int32 deviceId = Get(entry.ni_device);
 		int64 nodeId = Get(entry.ni_node);
+		uint64 symbolTable = Get(entry.ni_symbol_table);
+		uint64 symbolHash = Get(entry.ni_symbol_hash);
+		uint64 stringTable = Get(entry.ni_string_table);
 
 		// get name
 		if (stringsSize == 0) {
@@ -500,7 +507,8 @@ CoreFile::_ReadImagesNote(const void* data, uint32 dataSize)
 		CoreFileAreaInfo* dataArea = _FindArea(dataBase);
 		CoreFileImageInfo* image = new(std::nothrow) CoreFileImageInfo(id, type,
 			initRoutine, termRoutine, textBase, textSize, dataBase, dataSize,
-			deviceId, nodeId, textArea, dataArea, copiedName);
+			deviceId, nodeId, symbolTable, symbolHash, stringTable, textArea,
+			dataArea, copiedName);
 		if (image == NULL || !fImageInfos.AddItem(image)) {
 			delete image;
 			return B_NO_MEMORY;
