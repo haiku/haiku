@@ -734,6 +734,27 @@ LocalDebuggerInterface::GetCpuFeatures(uint32& flags)
 
 
 status_t
+LocalDebuggerInterface::WriteCoreFile(const char* path)
+{
+	DebugContextGetter contextGetter(fDebugContextPool);
+
+	debug_nub_write_core_file_reply reply;
+
+	debug_nub_write_core_file message;
+	message.reply_port = contextGetter.Context()->reply_port;
+	strlcpy(message.path, path, sizeof(message.path));
+
+	status_t error = send_debug_message(contextGetter.Context(),
+		B_DEBUG_WRITE_CORE_FILE, &message, sizeof(message), &reply,
+		sizeof(reply));
+	if (error == B_OK)
+		error = reply.error;
+
+	return error;
+}
+
+
+status_t
 LocalDebuggerInterface::GetMemoryProperties(target_addr_t address,
 	uint32& protection, uint32& locking)
 {

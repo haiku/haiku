@@ -68,6 +68,8 @@ public:
 
 	virtual	status_t			GetCpuFeatures(uint32& flags);
 
+	virtual	status_t			WriteCoreFile(const char* path);
+
 	// TeamMemory
 	virtual	status_t			GetMemoryProperties(target_addr_t address,
 									uint32& protection, uint32& locking);

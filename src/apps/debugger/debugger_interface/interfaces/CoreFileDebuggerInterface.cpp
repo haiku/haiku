@@ -305,6 +305,13 @@ CoreFileDebuggerInterface::GetCpuFeatures(uint32& flags)
 
 
 status_t
+CoreFileDebuggerInterface::WriteCoreFile(const char* path)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
 CoreFileDebuggerInterface::GetMemoryProperties(target_addr_t address,
 	uint32& protection, uint32& locking)
 {
