@@ -38,7 +38,7 @@ status_t create_desktop_connection(ServerLink* link, const char* name,
 // _get_object_token_
 /*!	Return the token of a BHandler.
 
-	\param handler The BHandler.
+	\param object The BHandler.
 	\return the token.
 
 */
