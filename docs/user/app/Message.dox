@@ -95,7 +95,7 @@
 */
 
 
-/*!	
+/*!
 	\var B_ID_SPECIFIER
 	\brief Undocumented...
 
@@ -166,7 +166,7 @@
 
 /*!
 	\fn BMessage::BMessage()
-	\brief Construct an empty message, without any data members and with a 
+	\brief Construct an empty message, without any data members and with a
 	       \a what constant set to \c 0.
 
 	\see BMessage(uint32 what)
@@ -227,7 +227,7 @@
 
 
 //! @{
- 
+
 
 /*!
 	\fn status_t BMessage::GetInfo(type_code typeRequested, int32 index,
@@ -273,7 +273,7 @@
 	\param[out] typeFound In case of a match, the name of the data member will
 	            be put in this parameter. In case you are not interested, you
 	            can pass \c NULL.
-	\param[out] countFound In case of a match, the number of items at this 
+	\param[out] countFound In case of a match, the number of items at this
 	            label will be in this parameter. In case you are not
 	            interested, you can safely pass \c NULL.
 
@@ -410,7 +410,7 @@
 	         will delete the message as soon as it is done with it.
 
 	\warning If you need to check whether a message is delivered, you should
-	         either ask for a reply, or use one of the synchronous 
+	         either ask for a reply, or use one of the synchronous
 	         BMessenger::SendMessage() methods.
 
 	\since BeOS R3
@@ -492,7 +492,7 @@
 
 	If the message has been delivered because of drag and drop, which can be
 	verified with the WasDropped() method, this method will return a BPoint to
-	where exactly the drop off was made. 
+	where exactly the drop off was made.
 
 	Because drop messages are delivered to the BWindow in which they were
 	dropped, and BWindow is a subclass of BLooper, you can use BWindow to
@@ -606,7 +606,7 @@
 	\a replyToReply will be set to \c B_NO_REPLY.
 
 	\param reply The message that is in reply to this message.
-	\param[out] replyToReply The reply is copied into this argument. 
+	\param[out] replyToReply The reply is copied into this argument.
 	\param sendTimeout The maximum time in microseconds this delivery may take.
 	       The \a timeout is a relative timeout. You can also use
 	       \c B_INFINITE_TIMEOUT if you want to wait infinitely for the message
@@ -684,7 +684,7 @@
 
 	\param[in]  stream The stream to flatten the message to.
 	\param[out] size The method writes the number of bytes actually written
-	            to this argument. 
+	            to this argument.
 	\return \c B_OK in case of success, or an error code in case something
 	        went awry.
 
@@ -848,7 +848,7 @@
 	stored at the label specified in \a name. You are responsible for
 	specifying the correct \a type. The Haiku API already specifies
 	many constants, such as \c B_FLOAT_TYPE or \c B_RECT_TYPE. See
-	TypeConstants.h for more information on the system-wide defined types. 
+	TypeConstants.h for more information on the system-wide defined types.
 
 	If the field with the \a name already exists, the data is added in
 	an array-like form. If you are adding a certain \a name for the
@@ -999,7 +999,7 @@
 */
 
 
-/*! 
+/*!
 	\fn status_t BMessage::AddInt16(const char* name, int16 value)
 	\brief Convenience method to add an \c int16 to the label \a name.
 
@@ -1019,7 +1019,7 @@
 */
 
 
-/*!	
+/*!
 	\fn status_t BMessage::AddInt32(const char* name, int32 value)
 	\brief Convenience method to add an \c int32 to the label \a name.
 
@@ -1364,7 +1364,7 @@
 	message is deleted.
 
 	\param name The label the data should be associated with.
-	\param type The type of data you want to retrieve. You can pass 
+	\param type The type of data you want to retrieve. You can pass
 	       \c B_ANY_TYPE if you don't mind which type the data is.
 	\param index The index in the array of the data that you want to retrieve.
 	       Note that the array is zero-based.
@@ -1829,7 +1829,7 @@
 
 
 /*!
-	\fn status_t BMessage::FindColor(const char* name, rgb_color* value)
+	\fn status_t BMessage::FindColor(const char* name, rgb_color* value) const
 	\brief Find a color with the label \a name.
 
 	This is an overloaded version of
@@ -2633,7 +2633,7 @@
 
 
 /*!
-	\fn status_t BMessage::ReplaceColor(const char* name, rgb_color aColot)
+	\fn status_t BMessage::ReplaceColor(const char* name, rgb_color aColor)
 	\brief Replace a color at the label \a name.
 
 	This method is an overloaded method of
@@ -3636,7 +3636,7 @@ bool enabled = GetBool("enabled", false);
 
 /*!
 	\fn rgb_color BMessage::GetColor(const char* name, int32 index,
-		rgb_colorr defaultValue) const
+		rgb_color defaultValue) const
 	\brief Return the rgb_color value from message with \a name and \a index, or
 	       \a defaultValue if not found.
 
