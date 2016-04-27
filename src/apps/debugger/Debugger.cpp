@@ -661,6 +661,7 @@ CliDebugger::Run(const Options& options)
 	TeamDebuggerOptions debuggerOptions;
 	set_debugger_options_from_options(debuggerOptions, options);
 	debuggerOptions.userInterface = userInterface;
+	debuggerOptions.settingsManager = &settingsManager;
 	error = hostInterface->StartTeamDebugger(debuggerOptions);
 	if (error != B_OK)
 		return false;
@@ -725,6 +726,7 @@ ReportDebugger::Run(const Options& options)
 	TeamDebuggerOptions debuggerOptions;
 	set_debugger_options_from_options(debuggerOptions, options);
 	debuggerOptions.userInterface = userInterface;
+	debuggerOptions.settingsManager = &settingsManager;
 	error = hostInterface->StartTeamDebugger(debuggerOptions);
 	if (error != B_OK)
 		return false;
