@@ -79,6 +79,7 @@
 	if any.
 
 	\param signature The app \a signature.
+    \param data BMessage object to store the launch data in.
 	\return \c B_OK if the launch data has been received successfully.
 
 	\since Haiku R1
