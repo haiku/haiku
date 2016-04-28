@@ -63,7 +63,8 @@ destroy_scm_rights_descriptors(const ancillary_data_header* header,
 net_protocol *
 unix_init_protocol(net_socket *socket)
 {
-	TRACE("[%ld] unix_init_protocol(%p)\n", find_thread(NULL), socket);
+	TRACE("[%" B_PRId32 "] unix_init_protocol(%p)\n", find_thread(NULL),
+		socket);
 
 	UnixEndpoint* endpoint = new(std::nothrow) UnixEndpoint(socket);
 	if (endpoint == NULL)
@@ -82,7 +83,8 @@ unix_init_protocol(net_socket *socket)
 status_t
 unix_uninit_protocol(net_protocol *_protocol)
 {
-	TRACE("[%ld] unix_uninit_protocol(%p)\n", find_thread(NULL), _protocol);
+	TRACE("[%" B_PRId32 "] unix_uninit_protocol(%p)\n", find_thread(NULL),
+		_protocol);
 	((UnixEndpoint*)_protocol)->Uninit();
 	return B_OK;
 }
@@ -287,9 +289,9 @@ status_t
 unix_add_ancillary_data(net_protocol *self, ancillary_data_container *container,
 	const cmsghdr *header)
 {
-	TRACE("[%ld] unix_add_ancillary_data(%p, %p, %p (level: %d, type: %d, "
-		"len: %d))\n", find_thread(NULL), self, container, header,
-		header->cmsg_level, header->cmsg_type, (int)header->cmsg_len);
+	TRACE("[%" B_PRId32 "] unix_add_ancillary_data(%p, %p, %p (level: %d, type: %d, "
+		"len: %" B_PRId32 "))\n", find_thread(NULL), self, container, header,
+		header->cmsg_level, header->cmsg_type, header->cmsg_len);
 
 	// we support only SCM_RIGHTS
 	if (header->cmsg_level != SOL_SOCKET || header->cmsg_type != SCM_RIGHTS)
@@ -325,7 +327,7 @@ unix_add_ancillary_data(net_protocol *self, ancillary_data_container *container,
 		header.type = SCM_RIGHTS;
 		header.len = count * sizeof(file_descriptor*);
 
-		TRACE("[%ld] unix_add_ancillary_data(): adding %d FDs to "
+		TRACE("[%" B_PRId32 "] unix_add_ancillary_data(): adding %d FDs to "
 			"container\n", find_thread(NULL), count);
 
 		error = gStackModule->add_ancillary_data(container, &header,
@@ -351,8 +353,8 @@ unix_process_ancillary_data(net_protocol *self,
 	const ancillary_data_header *header, const void *data, void *buffer,
 	size_t bufferSize)
 {
-	TRACE("[%ld] unix_process_ancillary_data(%p, %p (level: %d, type: %d, "
-		"len: %lu), %p, %p, %lu)\n", find_thread(NULL), self, header,
+	TRACE("[%" B_PRId32 "] unix_process_ancillary_data(%p, %p (level: %d, "
+		"type: %d, len: %lu), %p, %p, %lu)\n", find_thread(NULL), self, header,
 		header->level, header->type, header->len, data, buffer, bufferSize);
 
 	// we support only SCM_RIGHTS
