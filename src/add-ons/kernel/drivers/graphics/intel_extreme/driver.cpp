@@ -74,8 +74,10 @@ const struct supported_device {
 	{0x2e42, INTEL_MODEL_G45, "B43"},
 	{0x2e92, INTEL_MODEL_G45, "B43"},
 
-	{0xa001, INTEL_MODEL_PINE, "Atom_Dx10"},
-	{0xa011, INTEL_MODEL_PINEM, "Atom_N4x0"},
+	{0xa001, INTEL_MODEL_PINE, "Atom D4xx"},
+	{0xa002, INTEL_MODEL_PINE, "Atom D5xx"},
+	{0xa011, INTEL_MODEL_PINEM, "Atom N4xx"},
+	{0xa012, INTEL_MODEL_PINEM, "Atom N5xx"},
 
 	{0x0042, INTEL_MODEL_ILKG, "IronLake Desktop"},
 	{0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
@@ -327,4 +329,3 @@ find_device(const char* name)
 
 	return NULL;
 }
-
