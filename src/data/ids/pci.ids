@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.04.21
-#	Date:    2016-04-21 03:15:02
+#	Version: 2016.04.28
+#	Date:    2016-04-28 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -478,6 +478,21 @@
 	007c  MegaRAID SAS 1078DE
 		1014 0395  ServeRAID-AR10is SAS/SATA Controller
 	007e  SSS6200 PCI-Express Flash SSD
+		1000 0504  Nytro NWD-BLP4-800
+		1000 0507  Nytro NWD-BLP4-1600
+		1000 0581  Nytro NWD-BLP4-400
+		1000 100d  Nytro NWD-BFH6-1200
+		1000 100e  Nytro NWD-BFH8-1600
+		1000 107e  Nytro NWD-BFH8-3200
+		1000 1310  Nytro XP6302-8B1536
+		1000 1311  Nytro XP6302-8B2048
+		1000 1314  Nytro XP6302-8B4096
+		1000 150c  Nytro XP6210-4A2048
+		1000 150f  Nytro XP6210-4B2048
+		1000 160b  Nytro XP6209-4A1024
+		1000 1613  Nytro XP6209-4B2048
+		108e 050a  Nytro ELP4x200_4d_n
+		108e 0581  Nytro ELP4x100_4d_n
 	0080  SAS2208 PCI-Express Fusion-MPT SAS-2
 	0081  SAS2208 PCI-Express Fusion-MPT SAS-2
 	0082  SAS2208 PCI-Express Fusion-MPT SAS-2
@@ -2095,27 +2110,40 @@
 	67a8  Hawaii
 	67a9  Hawaii
 	67aa  Hawaii
-	67b0  Hawaii XT [Radeon R9 290X]
+	67b0  Hawaii XT / Grenada XT [Radeon R9 290X/390X]
+		1028 0b00  Grenada XT [Radeon R9 390X]
+		103c 6566  Radeon R9 390X
 		1043 046a  R9 290X DirectCU II
 		1043 046c  R9 290X DirectCU II OC
 		1043 0474  Matrix R9 290X Platinum
 		1043 0476  ARES III
+		1043 04d7  Radeon R9 390X
+		1043 04db  Radeon R9 390X
+		1043 04df  Radeon R9 390X
+		1043 04e9  Radeon R9 390X
 		1458 227c  R9 290X WindForce 3X OC
 		1458 2281  R9 290X WindForce 3X OC
 		1458 228c  R9 290X WindForce 3X
 		1458 228d  R9 290X WindForce 3X OC
 		1458 2290  R9 290X WindForce 3X
+		1458 22bc  Radeon R9 390X
 		1458 22c1  Grenada PRO [Radeon R9 390]
+		1462 2015  Radeon R9 390X
 		1462 3070  R9 290X Lightning
 		1462 3071  R9 290X Lightning
 		1462 3072  R9 290X Lightning LE
 		1462 3080  R9 290X Gaming
 		1462 3082  R9 290X Gaming OC
 		148c 2347  Devil 13 Dual Core R9 290X
+		148c 2357  Grenada XT [Radeon R9 390X]
 		1682 9290  Double Dissipation R9 290X
+		1682 9395  Grenada XT [Radeon R9 390X]
+		174b 0e34  Radeon R9 390X
 		174b e282  Vapor-X R9 290X Tri-X OC
 		174b e285  R9 290X Tri-X OC
+		174b e324  Grenada XT2 [Radeon R9 390X]
 		1787 2020  R9 290X IceQ X² Turbo
+		1787 2357  Grenada XT [Radeon R9 390X]
 	67b1  Hawaii PRO [Radeon R9 290/390]
 		148c 2358  Radeon R9 390
 	67b9  Vesuvius [Radeon R9 295X2]
@@ -2813,8 +2841,15 @@
 	6929  Tonga XT GL [FirePro S7150]
 	692b  Tonga PRO GL [FirePro W7100]
 	692f  Tonga XTV GL [FirePro S7150V]
-	6938  Tonga XT / Amethyst XT [Radeon R9 380X / R9 M295X Mac Edition]
+	6938  Tonga XT / Amethyst XT [Radeon R9 380X / R9 M295X]
+		1043 04f5  Radeon R9 380X
+		1043 04f7  Radeon R9 380X
+		106b 013a  Radeon R9 M295X Mac Edition
+		1458 22c8  Radeon R9 380X
+		148c 2350  Radeon R9 380X
+		1682 9385  Radeon R9 380X
 		174b e308  Radeon R9 380X Nitro 4G D5
+		17af 2006  Radeon R9 380X
 	6939  Tonga PRO [Radeon R9 285/380]
 		148c 9380  Radeon R9 380
 # Make naming scheme consistent
@@ -13006,6 +13041,7 @@
 	2a55  88W8864 [Avastar] 802.11ac Wireless
 	2b36  88W8764 [Avastar] 802.11n Wireless
 	2b38  88W8897 [AVASTAR] 802.11ac Wireless
+	2b40  88W8964 [Avastar] 802.11ac Wireless
 	4101  OLPC Cafe Controller Secure Digital Controller
 	4320  88E8001 Gigabit Ethernet Controller
 		1019 0f38  Marvell 88E8001 Gigabit Ethernet Controller (ECS)
@@ -16322,7 +16358,7 @@
 		1028 0236  PowerEdge R610 BCM5709 Gigabit Ethernet
 		1028 0237  PowerEdge T610 BCM5709 Gigabit Ethernet
 		103c 7055  NC382i Integrated Multi-port PCI Express Gigabit Server Adapter
-		103c 7059  NC382T PCI Express Dual Port Multifunction Gigabit Server Adapter
+		103c 7059  NC382T PCIe Dual Port Multifunction Gigabit Server Adapter
 		10a9 8027  Quad port Gigabit Ethernet Controller
 	163a  NetXtreme II BCM5709S Gigabit Ethernet
 		1028 027b  PowerEdge M805 Broadcom NetXtreme II BCM5709S
@@ -16393,7 +16429,7 @@
 	1647  NetXtreme BCM5703 Gigabit Ethernet
 		0e11 0099  NC7780 1000BaseTX
 		0e11 009a  NC7770 1000BaseTX
-		10a9 8010  SGI IO9 Gigabit Ethernet (Copper)
+		10a9 8010  IO9 Gigabit Ethernet (Copper)
 		14e4 0009  BCM5703 1000BaseTX
 		14e4 000a  BCM5703 1000BaseSX
 		14e4 000b  BCM5703 1000BaseTX
@@ -19132,7 +19168,7 @@
 	000c  Qualcomm MSM6275 UMTS chip
 1932  DiBcom
 193c  MAXIM Integrated Products
-193f  Comtech AHA Corp.
+193f  AHA Products Group
 	0001  AHA36x-PCIX
 	0360  AHA360-PCIe
 	0363  AHA363-PCIe
@@ -19143,6 +19179,8 @@
 	0605  AHA605
 	3641  AHA3641
 	3642  AHA3642
+	6101  AHA6101
+	6102  AHA6102
 1942  ClearSpeed Technology plc
 	e511  Advance X620 accelerator card
 	e521  Advance e620 accelerator card
@@ -20160,58 +20198,128 @@
 	1960  RedCreek PCI adapter
 4943  Growth Networks
 494f  ACCES I/O Products, Inc.
-	0520  PCI-IDO-48
-	0920  PCI-IDI-48
-	0c50  PCI-DIO-24H
-	0c51  PCI-DIO-24D
-	0c60  PCI-DIO-48(H)
-	0c68  PCI-DIO-72
-	0c70  PCI-DIO-96
-	0c78  PCI-DIO-120
-	0dc8  PCI-IDIO-16
-	0e50  PCI-DIO-24S
-	0e51  PCI-DIO-24H(C)
-	0e52  PCI-DIO-24D(C)
-	0e60  PCI-DIO-48S(H)
-	0e61  P104-DIO-24S
-	0f00  PCI-IIRO-8
-	0f01  LPCI-IIRO-8
-	0f08  PCI-IIRO-16
-	1050  PCI-422/485-2
-	1058  PCI-COM422/4
-	1059  PCI-COM485/4
-	1068  PCI-COM422/8
-	1069  PCI-COM485/8
-	1088  PCI-COM232/1
-	1090  PCI-COM232/2
-	10a8  P104-COM232-8
-	10c9  PCI-COM-1S
-	10d0  PCI-COM2S
-	10e8  PCI-COM-8SM
-	1148  PCI-ICM-1S
-	1150  PCI-ICM-2S
-	1158  PCI-ICM422/4
-	1159  PCI-ICM485/4
-	1250  PCI-WDG-2S
+	0508  PCI-IDO-16A FET Output Card
+	0518  PCI-IDO-32A FET Output Card
+	0520  PCI-IDO-48 FET Output Card
+	0521  PCI-IDO-48A FET Output Card
+	0703  PCIe-RO-4 Electromechanical Relay Output Card
+	07d0  PCIe-IDO-24 FET Output Card
+	0920  PCI-IDI-48 Isolated Digital Input Card
+	0bd0  PCIe-IDI-24 Isolated Digital Input Card
+	0c50  PCI-DIO-24H 1x 8255 Digital Input / Output Card
+	0c51  PCI-DIO-24D 1x 8255 Digital Input / Output Card
+	0c52  PCIe-DIO-24 1x 8255 Digital Input / Output Card
+	0c53  PCIe-DIO-24H 8255 Digital Input / Output Card
+	0c57  mPCIe-DIO-24 8255 Digital Input / Output Card
+	0c60  PCI-DIO-48H 8255 Digital Input / Output Card
+	0c61  PCIe-DIO-48 8255 Digital Input / Output Card
+	0c62  P104-DIO-48 8255 Digital Input / Output Card
+	0c68  PCI-DIO-72 8255 Digital Input / Output Card
+	0c69  P104-DIO-96 8255 Digital Input / Output Card
+	0c70  PCI-DIO-96 8255 Digital Input / Output Card
+	0c78  PCI-DIO-120 8255 Digital Input / Output Card
+	0dc8  PCI-IDIO-16 Isolated Digital Input / FET Output Card
+	0e50  PCI-DIO-24S 8255 Digital Input / Output Card
+	0e51  PCI-DIO-24H(C) 8255 Digital Input / Output Card
+	0e52  PCI-DIO-24D(C) 8255 Digital Input / Output Card
+	0e53  PCIe-DIO-24S 8255 Digital Input / Output Card
+	0e54  PCIe-DIO-24HS 8255 Digital Input / Output Card
+	0e55  PCIe-DIO-24DC 8255 Digital Input / Output Card
+	0e56  PCIe-DIO-24DCS 8255 Digital Input / Output Card
+	0e57  mPCIe-DIO-24S 8255 Digital Input / Output Card
+	0e60  PCI-DIO-48S 2x 8255 Digital Input / Output Card
+	0e61  PCIe-DIO-48S 2x 8255 Digital Input / Output Card
+	0e62  P104-DIO-48S 2x 8255 Digital Input / Output Card
+	0f00  PCI-IIRO-8 Isolated Digital / Relay Output Card
+	0f01  LPCI-IIRO-8 Isolated Digital / Relay Output Card
+	0f02  PCIe-IIRO-8 Isolated Digital / Relay Output Card
+	0f08  PCI-IIRO-16 Isolated Digital / Relay Output Card
+	0f09  PCIe-IIRO-16 Isolated Digital / Relay Output Card
+	0fc0  PCIe-IDIO-12 Isolated Digital Input / FET Output Card
+	0fc1  PCIe-IDI-12 Isolated Digital Input Card
+	0fc2  PCIe-IDO-12 FET Output Card
+	0fd0  PCIe-IDIO-24 Isolated Digital Input / FET Output Card
+	1050  PCI-422/485-2 2x RS422/RS484 Card
+	1051  PCIe-COM-2SRJ 2x RS422/RS484 Card w/RJ45 Connectors
+	1052  104I-COM-2S 2x RS422/RS484 PCI/104 Board
+	1053  mPCIe-COM-2S 2x RS422/RS484 PCI Express Mini Card
+	1058  PCI-COM422/4 4x RS422 Card
+	1059  PCI-COM485/4 4x RS485 Card
+	105a  PCIe-COM422-4 4x RS422 Card
+	105b  PCIe-COM485-4 4x RS485 Card
+	105c  PCIe-COM-4SRJ 4x RS422/RS485 Card w/RJ45 Connectors
+	105d  104I-COM-4S 4x RS422/RS484 PCI/104 Board
+	105e  mPCIe-COM-4S 4x RS422/RS484 PCI Express Mini Card
+	1068  PCI-COM422/8 8x RS422 Card
+	1069  PCI-COM485/8 8x RS485 Card
+	106a  PCIe-COM422-8 8x RS422 Card
+	106b  PCIe-COM485-8 8x RS485 Card
+	106c  104I-COM-8S 8x RS422/RS485 PCI/104 Board
+	1088  PCI-COM232/1 1x RS232 Card
+	1090  PCI-COM232/2 2x RS232 Card
+	1091  PCIe-COM232-2RJ 2x RS232 Card w/RJ45 Connectors
+	1093  mPCIe-COM232-2 2x RS232 PCI Express Mini Card
+	1098  PCIe-COM232-4 4x RS232 Card
+	1099  PCIe-COM232-4RJ 4x RS232 Card w/RJ45 Connectors
+	109b  mPCIe-COM232-4 4x RS232 PCI Express Mini Card
+	10a8  P104-COM232-8 8x RS232 PC-104+ Board
+	10a9  PCIe-COM232-8 8x RS232 Card
+	10c9  PCI-COM-1S 1x RS422/RS485 Card
+	10d0  PCI-COM2S 2x RS422/RS485 Card
+	10d1  PCIe-COM-2SMRJ 2x RS232/RS422/RS485 Card w/RJ45 Connectors
+	10d2  104I-COM-2SM 2x RS232/RS422/RS485 PCI/104 Board
+	10d3  mPCIe-COM-2SM 2x RS232/RS422/RS485 PCI Express Mini Card
+	10d8  PCI-COM-4SM 4x RS232/RS422/RS485 Card
+	10d9  PCIe-COM-4SM 4x RS232/RS422/RS485 Card
+	10da  PCIe-COM-4SMRJ 4x RS232/RS422/RS485 Card w/RJ45 Connectors
+	10db  104I-COM-4SM 4x RS232/RS422/RS485 PCI/104 Board
+	10dc  mPCIe-COM-4SM 4x RS232/RS422/RS485 PCI Express Mini Card
+	10e8  PCI-COM-8SM 8x RS232/RS422/RS485 Card
+	10e9  PCIe-COM-8SM 8x RS232/RS422/RS485 Card
+	10ea  104I-COM-8SM 8x RS232/RS422/RS485 PCI-104 Board
+	1108  mPCIe-ICM485-1 1x Isolated RS485 PCI Express Mini Card
+	1110  mPCIe-ICM422-2 2x Isolated RS422 PCI Express Mini Card
+	1111  mPCIe-ICM485-2 2x Isolated RS485 PCI Express Mini Card
+	1118  mPCIe-ICM422-4 4x Isolated RS422 PCI Express Mini Card
+	1119  mPCIe-ICM485-4 4x Isolated RS485 PCI Express Mini Card
+	1148  PCI-ICM-1S 1x Isolated RS422/RS485 Card
+	1150  PCI-ICM-2S 2x Isolated RS422/RS485 Card
+	1152  PCIe-ICM-2S 2x Isolated RS422/RS485 Card
+	1158  PCI-ICM422/4 4x Isolated RS422 Card
+	1159  PCI-ICM485/4 4x Isolated RS485 Card
+	115a  PCIe-ICM-4S 4x Isolated RS422/RS485 Card
+	1190  PCIe-ICM232-2 2x Isolated RS232 Card
+	1191  mPCIe-ICM232-2 2x Isolated RS232 PCI Express Mini Card
+	1198  PCIe-ICM232-4 4x Isolated RS232 Card
+	1199  mPCIe-ICM232-4 4x Isolated RS422 PCI Express Mini Card
+	11d0  PCIe-ICM-2SM 2x Isolated RS232/RS422/RS485 Card
+	11d8  PCIe-ICM-4SM 4x Isolated RS232/RS422/RS485 Card
+	1250  PCI-WDG-2S Watchdog and 2x Serial Card
 	12d0  PCI-WDG-IMPAC
-	22c0  PCI-WDG-CSM
-	2c50  PCI-DIO-96CT
-	2c58  PCI-DIO-96C3
+	2230  PCI-QUAD-8 8x Quadrature Input Card
+	2231  PCI-QUAD-4 4x Quadrature Input Card
+	22c0  PCI-WDG-CSM Watchdog Card
+	25c0  P104-WDG-E Watchdog PC/104+ Board
+	2c50  PCI-DIO-96CT 96x Digital Input / Output Card
+	2c58  PCI-DIO-96C3 96x Digital Input / Output Card w/3x 8254 Counter Card
+	2ee0  PCIe-DIO24S-CTR12 24x Digital Input / Output Card w/4x 8254 Counter Card
+	2fc0  P104-WDG-CSM Watchdog PC/104+ Board
+	2fc1  P104-WDG-CSMA Advanced Watchdog PC/104+ Board
 	5ed0  PCI-DAC
-	6c90  PCI-DA12-2
-	6c98  PCI-DA12-4
-	6ca0  PCI-DA12-6
-	6ca8  PCI-DA12-8
+	6c90  PCI-DA12-2 2x 12-bit Analog Output Card
+	6c98  PCI-DA12-4 4x 12-bit Analog Output Card
+	6ca0  PCI-DA12-6 6x 12-bit Analog Output Card
+	6ca8  PCI-DA12-8 8x 12-bit Analog Output Card
 	6ca9  PCI-DA12-8V
-	6cb0  PCI-DA12-16
+	6cb0  PCI-DA12-16 16x 12-bit Analog Output Card
 	6cb1  PCI-DA12-16V
 	8ef0  P104-FAS16-16
-	aca8  PCI-AI12-16
-	aca9  PCI-AI12-16A
-	eca8  PCI-AIO12-16
-	eca9  PCI-A12-16
-	ecaa  PCI-A12-16A
-	ece8  PCI-A16-16
+	aca8  PCI-AI12-16 12-bit 100kHz Analog Input Card
+	aca9  PCI-AI12-16A 12-bit 100kHz Analog Input w/FIFO Card
+	eca8  PCI-AIO12-16 12-bit 100kHz Analog Input w/2x Analog Output and FIFO Card
+	ecaa  PCI-A12-16A 12-bit 100kHz Analog Input w/2x Analog Output and FIFO Card
+	ece8  LPCI-A16-16A 16-bit 500kHz Analog Input low-profile Card
+	ece9  LPCI-AIO16A 16-bit 500kHz Analog Input low-profile Card
 4978  Axil Computer Inc
 4a14  NetVin
 	5000  NV5000SC
@@ -22111,6 +22219,7 @@
 		1093 76b1  PCIe-8237R-S Ethernet Adapter
 		1093 775b  PCIe-8237 Ethernet Adapter
 		10a9 802a  UV2-BaseIO dual-port GbE
+		15d9 0652  Dual Port i350 GbE MicroLP [AOC-CGP-i2]
 		17aa 1074  ThinkServer I350-T4 AnyFabric
 		17aa 4005  I350 Gigabit Network Connection
 		8086 0001  Ethernet Server Adapter I350-T4
@@ -23519,9 +23628,11 @@
 	24df  82801ER (ICH5R) SATA Controller
 		1028 0168  Precision Workstation 670 Mainboard
 	24f0  Omni-Path HFI Silicon 100 Series [discrete]
-		10a9 802e  Omni-path HFI 100 Series, 1-port
-		10a9 802f  Omni-path HFI 100 Series, 2-port
-		15d9 0001  Omni-Path HFI Adapter 100 Series, 1 Port, PCIe x16, SIOM Module
+		10a9 802e  Omni-path HFI 100 Series, 1-port A-board
+		10a9 802f  Omni-path HFI 100 Series, 2-port A-board
+		10a9 8030  Omni-path HFI 100 Series, 1-port B-board
+		10a9 8031  Omni-path HFI 100 Series, 2-port B-board
+		15d9 0934  Omni-Path HFI Adapter 100 Series, 1 Port, PCIe x16, SIOM Module
 		8086 2628  Omni-Path HFI Adapter 100 Series, 1 Port, PCIe x16
 		8086 2629  Omni-Path HFI Adapter 100 Series, 1 Port, PCIe x8
 		8086 262a  Omni-Path HFI Adapter 100 Series, 2 Ports, Split PCIe x16
@@ -27536,6 +27647,7 @@ bdbd  Blackmagic Design
 	a13d  DeckLink 4K Pro
 	a13e  UltraStudio 4K Extreme
 	a13f  DeckLink Quad 2
+	a140  DeckLink Duo 2
 c001  TSI Telsys
 c0a9  Micron/Crucial Technology
 c0de  Motorola
