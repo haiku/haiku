@@ -68,9 +68,9 @@ wait_for_clear(addr_t address, uint32 mask, uint32 timeout)
 Port::Port(port_index index, const char* baseName)
 	:
 	fPipe(NULL),
+	fEDIDState(B_NO_INIT),
 	fPortIndex(index),
-	fPortName(NULL),
-	fEDIDState(B_NO_INIT)
+	fPortName(NULL)
 {
 	char portID[2];
 	portID[0] = 'A' + index - INTEL_PORT_A;
@@ -360,22 +360,41 @@ LVDSPort::IsConnected()
 	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
 		_PortRegister());
 
-	// Older generations don't have LVDS detection. If not mobile skip.
-	if (gInfo->shared_info->device_type.Generation() <= 4) {
-		if (!gInfo->shared_info->device_type.IsMobile()) {
-			TRACE("LVDS: Skipping LVDS detection due to gen and not mobile\n");
-			return false;
-		}
-	}
-
-	uint32 registerValue = read32(_PortRegister());
 	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
+		uint32 registerValue = read32(_PortRegister());
 		// there's a detection bit we can use
 		if ((registerValue & PCH_LVDS_DETECTED) == 0) {
 			TRACE("LVDS: Not detected\n");
 			return false;
 		}
 		// TODO: Skip if eDP support
+	} else if (gInfo->shared_info->device_type.Generation() <= 4) {
+		// Older generations don't have LVDS detection. If not mobile skip.
+		if (!gInfo->shared_info->device_type.IsMobile()) {
+			TRACE("LVDS: Skipping LVDS detection due to gen and not mobile\n");
+			return false;
+		}
+		// If mobile, try to grab EDID
+		// Linux seems to look at lid status for LVDS port detection
+		// If we don't get EDID, we can use vbios native mode or vesa?
+		if (!HasEDID()) {
+			#if 0
+			if (gInfo->shared_info->got_vbt) {
+				// TODO: Fake EDID from vbios native mode?
+				// I feel like this would be more accurate
+			} else if...
+			#endif
+			if (gInfo->shared_info->has_vesa_edid_info) {
+				TRACE("LVDS: Using VESA edid info\n");
+				memcpy(&fEDIDInfo, &gInfo->shared_info->vesa_edid_info,
+					sizeof(edid1_info));
+				fEDIDState = B_OK;
+				// HasEDID now true
+			} else {
+				TRACE("LVDS: Couldn't find any valid EDID!\n");
+				return false;
+			}
+		}
 	}
 
 	// Try getting EDID, as the LVDS port doesn't overlap with anything else,

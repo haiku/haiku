@@ -85,15 +85,15 @@ static	status_t					_SetI2CSignals(void* cookie, int clock,
 		display_mode				fCurrentMode;
 		Pipe*						fPipe;
 
+		status_t					fEDIDState;
+		edid1_info					fEDIDInfo;
+
 private:
 virtual	addr_t						_DDCRegister() = 0;
 virtual addr_t						_PortRegister() = 0;
 
 		port_index					fPortIndex;
 		char*						fPortName;
-
-		status_t					fEDIDState;
-		edid1_info					fEDIDInfo;
 };
 
 
