@@ -1,6 +1,7 @@
 /*
- * Copyright 2013-2015 Haiku, Inc.
+ * Copyright 2013-2016 Haiku, Inc.
  * Copyright 2011-2015, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2016, Rene Gollent, rene@gollent.com.
  * Copyright 2010, Clemens Zeidler <haiku@clemens-zeidler.de>
  * Distributed under the terms of the MIT License.
  */
@@ -17,6 +18,8 @@
 #include <Certificate.h>
 #include <FindDirectory.h>
 #include <Path.h>
+
+#include <AutoDeleter.h>
 
 #include "CertificatePrivate.h"
 
@@ -257,6 +260,33 @@ BSecureSocket::~BSecureSocket()
 
 
 status_t
+BSecureSocket::Accept(BAbstractSocket*& _socket)
+{
+	int fd = -1;
+	BNetworkAddress peer;
+	status_t error = AcceptNext(fd, peer);
+	if (error != B_OK)
+		return error;
+	BSecureSocket* socket = new(std::nothrow) BSecureSocket();
+	ObjectDeleter<BSecureSocket> socketDeleter(socket);
+	if (socket == NULL || socket->InitCheck() != B_OK) {
+		close(fd);
+		return B_NO_MEMORY;
+	}
+
+	socket->_SetTo(fd, fLocal, peer);
+	error = socket->_SetupAccept();
+	if (error != B_OK)
+		return error;
+
+	_socket = socket;
+	socketDeleter.Detach();
+
+	return B_OK;
+}
+
+
+status_t
 BSecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 {
 	status_t status = InitCheck();
@@ -267,7 +297,7 @@ BSecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 	if (status != B_OK)
 		return status;
 
-	return _Setup();
+	return _SetupConnect();
 }
 
 
@@ -351,7 +381,7 @@ BSecureSocket::Write(const void* buffer, size_t size)
 
 
 status_t
-BSecureSocket::_Setup()
+BSecureSocket::_SetupCommon()
 {
 	// Do this only after BSocket::Connect has checked wether we're already
 	// connected. We don't want to kill an existing SSL session, as that would
@@ -370,9 +400,38 @@ BSecureSocket::_Setup()
 	SSL_set_bio(fPrivate->fSSL, fPrivate->fBIO, fPrivate->fBIO);
 	SSL_set_ex_data(fPrivate->fSSL, Private::sDataIndex, this);
 
+	return B_OK;
+}
+
+
+status_t
+BSecureSocket::_SetupConnect()
+{
+	status_t error = _SetupCommon();
+	if (error != B_OK)
+		return error;
+
 	int returnValue = SSL_connect(fPrivate->fSSL);
 	if (returnValue <= 0) {
 		TRACE("SSLConnection can't connect\n");
+		BSocket::Disconnect();
+		return fPrivate->ErrorCode(returnValue);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+BSecureSocket::_SetupAccept()
+{
+	status_t error = _SetupCommon();
+	if (error != B_OK)
+		return error;
+
+	int returnValue = SSL_accept(fPrivate->fSSL);
+	if (returnValue <= 0) {
+		TRACE("SSLConnection can't accept\n");
 		BSocket::Disconnect();
 		return fPrivate->ErrorCode(returnValue);
 	}
@@ -415,6 +474,13 @@ BSecureSocket::CertificateVerificationFailed(BCertificate& certificate, const ch
 {
 	(void)certificate;
 	return false;
+}
+
+
+status_t
+BSecureSocket::Accept(BAbstractSocket*& _socket)
+{
+	return B_UNSUPPORTED;
 }
 
 
@@ -463,7 +529,21 @@ BSecureSocket::InitCheck()
 
 
 status_t
-BSecureSocket::_Setup()
+BSecureSocket::_SetupCommon()
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
+BSecureSocket::_SetupConnect()
+{
+	return B_UNSUPPORTED;
+}
+
+
+status_t
+BSecureSocket::_SetupAccept()
 {
 	return B_UNSUPPORTED;
 }

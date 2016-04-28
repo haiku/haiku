@@ -1,5 +1,6 @@
 /*
  * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -39,9 +40,9 @@ BSocket::~BSocket()
 
 
 status_t
-BSocket::Bind(const BNetworkAddress& local)
+BSocket::Bind(const BNetworkAddress& local, bool reuseAddr)
 {
-	return BAbstractSocket::Bind(local, SOCK_STREAM);
+	return BAbstractSocket::Bind(local, SOCK_STREAM, reuseAddr);
 }
 
 
@@ -49,6 +50,26 @@ status_t
 BSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 {
 	return BAbstractSocket::Connect(peer, SOCK_STREAM, timeout);
+}
+
+
+status_t
+BSocket::Accept(BAbstractSocket*& _socket)
+{
+	int fd = -1;
+	BNetworkAddress peer;
+	status_t error = AcceptNext(fd, peer);
+	if (error != B_OK)
+		return error;
+	BSocket* socket = new(std::nothrow) BSocket();
+	if (socket == NULL) {
+		close(fd);
+		return B_NO_MEMORY;
+	}
+
+	socket->_SetTo(fd, fLocal, peer);
+	_socket = socket;
+	return B_OK;
 }
 
 
@@ -94,6 +115,7 @@ BSocket::_SetTo(int fd, const BNetworkAddress& local,
 	fSocket = fd;
 	fLocal = local;
 	fPeer = peer;
+	fIsConnected = true;
 
 	TRACE("%p: accepted from %s to %s\n", this, local.ToString().c_str(),
 		peer.ToString().c_str());

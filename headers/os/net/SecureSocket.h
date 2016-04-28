@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SECURE_SOCKET_H
@@ -27,6 +27,8 @@ public:
 
 	// BSocket implementation
 
+	virtual	status_t			Accept(BAbstractSocket*& _socket);
+
 	virtual	status_t			Connect(const BNetworkAddress& peer,
 									bigtime_t timeout = B_INFINITE_TIMEOUT);
 	virtual	void				Disconnect();
@@ -40,7 +42,9 @@ public:
 	virtual ssize_t				Write(const void* buffer, size_t size);
 
 protected:
-			status_t			_Setup();
+			status_t			_SetupCommon();
+			status_t			_SetupConnect();
+			status_t			_SetupAccept();
 
 private:
 	friend class BCertificate;

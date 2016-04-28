@@ -70,7 +70,7 @@ BProxySecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 	if (httpStatus < 200 || httpStatus > 299)
 		return B_BAD_VALUE;
 
-	return _Setup();
+	return _SetupConnect();
 }
 
 

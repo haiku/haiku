@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _ABSTRACT_SOCKET_H
@@ -20,8 +20,12 @@ public:
 
 			status_t			InitCheck() const;
 
-	virtual status_t			Bind(const BNetworkAddress& local) = 0;
+	virtual status_t			Bind(const BNetworkAddress& local, bool reuseAddr) = 0;
 	virtual bool				IsBound() const;
+	virtual	bool				IsListening() const;
+
+	virtual	status_t			Listen(int backlog = 10);
+	virtual	status_t			Accept(BAbstractSocket*& _socket) = 0;
 
 	virtual	status_t			Connect(const BNetworkAddress& peer,
 									bigtime_t timeout = B_INFINITE_TIMEOUT) = 0;
@@ -44,9 +48,12 @@ public:
 			int					Socket() const;
 
 protected:
-			status_t			Bind(const BNetworkAddress& local, int type);
+			status_t			Bind(const BNetworkAddress& local,
+									bool reuseAddr, int type);
 			status_t			Connect(const BNetworkAddress& peer, int type,
 									bigtime_t timeout = B_INFINITE_TIMEOUT);
+			status_t			AcceptNext(int& _acceptedSocket,
+									BNetworkAddress& _peer);
 
 private:
 			status_t			_OpenIfNeeded(int family, int type);
@@ -60,6 +67,7 @@ protected:
 			BNetworkAddress		fPeer;
 			bool				fIsBound;
 			bool				fIsConnected;
+			bool				fIsListening;
 };
 
 

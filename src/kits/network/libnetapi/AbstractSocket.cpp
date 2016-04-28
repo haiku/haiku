@@ -1,5 +1,6 @@
 /*
  * Copyright 2011, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -25,7 +26,8 @@ BAbstractSocket::BAbstractSocket()
 	fInitStatus(B_NO_INIT),
 	fSocket(-1),
 	fIsBound(false),
-	fIsConnected(false)
+	fIsConnected(false),
+	fIsListening(false)
 {
 }
 
@@ -35,7 +37,8 @@ BAbstractSocket::BAbstractSocket(const BAbstractSocket& other)
 	fInitStatus(other.fInitStatus),
 	fLocal(other.fLocal),
 	fPeer(other.fPeer),
-	fIsConnected(other.fIsConnected)
+	fIsConnected(other.fIsConnected),
+	fIsListening(other.fIsListening)
 {
 	fSocket = dup(other.fSocket);
 	if (fSocket < 0)
@@ -64,9 +67,30 @@ BAbstractSocket::IsBound() const
 
 
 bool
+BAbstractSocket::IsListening() const
+{
+	return fIsListening;
+}
+
+
+bool
 BAbstractSocket::IsConnected() const
 {
 	return fIsConnected;
+}
+
+
+status_t
+BAbstractSocket::Listen(int backlog)
+{
+	if (!fIsBound)
+		return B_NO_INIT;
+
+	if (listen(Socket(), backlog) != 0)
+		return fInitStatus = errno;
+
+	fIsListening = true;
+	return B_OK;
 }
 
 
@@ -163,11 +187,19 @@ BAbstractSocket::Socket() const
 
 
 status_t
-BAbstractSocket::Bind(const BNetworkAddress& local, int type)
+BAbstractSocket::Bind(const BNetworkAddress& local, bool reuseAddr, int type)
 {
 	fInitStatus = _OpenIfNeeded(local.Family(), type);
 	if (fInitStatus != B_OK)
 		return fInitStatus;
+
+	if (reuseAddr) {
+		int value = 1;
+		if (setsockopt(Socket(), SOL_SOCKET, SO_REUSEADDR, &value,
+				sizeof(value)) != 0) {
+			return fInitStatus = errno;
+		}
+	}
 
 	if (bind(fSocket, local, local.Length()) != 0)
 		return fInitStatus = errno;
@@ -191,7 +223,7 @@ BAbstractSocket::Connect(const BNetworkAddress& peer, int type,
 	if (fInitStatus == B_OK && !IsBound()) {
 		BNetworkAddress local;
 		local.SetToWildcard(peer.Family());
-		fInitStatus = Bind(local);
+		fInitStatus = Bind(local, true);
 	}
 	if (fInitStatus != B_OK)
 		return fInitStatus;
@@ -211,6 +243,22 @@ BAbstractSocket::Connect(const BNetworkAddress& peer, int type,
 		fLocal.ToString().c_str());
 
 	return fInitStatus = B_OK;
+}
+
+
+status_t
+BAbstractSocket::AcceptNext(int& _acceptedSocket, BNetworkAddress& _peer)
+{
+	sockaddr_storage source;
+	socklen_t sourceLength = sizeof(sockaddr_storage);
+
+	int fd = accept(fSocket, (sockaddr*)&source, &sourceLength);
+	if (fd < 0)
+		return fd;
+
+	_peer.SetTo(source);
+	_acceptedSocket = fd;
+	return B_OK;
 }
 
 

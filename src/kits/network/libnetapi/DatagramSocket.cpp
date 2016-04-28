@@ -39,9 +39,16 @@ BDatagramSocket::~BDatagramSocket()
 
 
 status_t
-BDatagramSocket::Bind(const BNetworkAddress& local)
+BDatagramSocket::Bind(const BNetworkAddress& local, bool reuseAddr)
 {
-	return BAbstractSocket::Bind(local, SOCK_DGRAM);
+	return BAbstractSocket::Bind(local, reuseAddr, SOCK_DGRAM);
+}
+
+
+status_t
+BDatagramSocket::Accept(BAbstractSocket*& _socket)
+{
+	return B_NOT_SUPPORTED;
 }
 
 

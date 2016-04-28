@@ -1,5 +1,5 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _SOCKET_H
@@ -17,7 +17,11 @@ public:
 								BSocket(const BSocket& other);
 	virtual						~BSocket();
 
-	virtual	status_t			Bind(const BNetworkAddress& peer);
+	virtual	status_t			Bind(const BNetworkAddress& peer,
+									bool reuseAddr = true);
+
+	virtual	status_t			Accept(BAbstractSocket*& _socket);
+
 	virtual	status_t			Connect(const BNetworkAddress& peer,
 									bigtime_t timeout = B_INFINITE_TIMEOUT);
 
@@ -26,8 +30,7 @@ public:
 	virtual ssize_t				Read(void* buffer, size_t size);
 	virtual ssize_t				Write(const void* buffer, size_t size);
 
-private:
-	friend class BServerSocket;
+protected:
 
 			void				_SetTo(int fd, const BNetworkAddress& local,
 									const BNetworkAddress& peer);

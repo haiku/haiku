@@ -17,9 +17,12 @@ public:
 								BDatagramSocket(const BDatagramSocket& other);
 	virtual						~BDatagramSocket();
 
-	virtual	status_t			Bind(const BNetworkAddress& peer);
+	virtual	status_t			Bind(const BNetworkAddress& peer,
+									bool reuseAddr = true);
 	virtual	status_t			Connect(const BNetworkAddress& peer,
 									bigtime_t timeout = B_INFINITE_TIMEOUT);
+
+	virtual	status_t			Accept(BAbstractSocket*& _socket);
 
 			status_t			SetBroadcast(bool broadcast);
 			void				SetPeer(const BNetworkAddress& peer);
