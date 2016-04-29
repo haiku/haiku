@@ -6,8 +6,8 @@
  *		Adrien Destugues, pulkomandy@pulkomandy.tk
  *
  * Corresponds to:
- *		headers/os/net/AbstractSocket.h rev 43302
- *		src/kits/network/libnetapi/AbstractSocket.cpp rev 43302
+ *		headers/os/net/AbstractSocket.h hrev50265
+ *		src/kits/network/libnetapi/AbstractSocket.cpp hrev50265
  */
 
 /*!
@@ -161,12 +161,14 @@
 */
 
 /*!
-	\fn status_t BAbstractSocket::Bind(const BNetworkAddress& local, int type)
+	\fn status_t BAbstractSocket::Bind(const BNetworkAddress& local,
+		bool reuseAddr, int type)
 	\brief binds the socket to the given address
 
 	If the socket was already bound, the previous binding is removed.
 
 	\param local the local address to bind
+	\param reuseAddr if \c true, non-zero requests reuse \a local address
 	\param type the socket type
 	\return B_OK on success, other error codes on error.
 */
