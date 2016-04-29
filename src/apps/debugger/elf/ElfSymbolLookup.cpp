@@ -159,7 +159,7 @@ public:
 	template<typename Value>
 	Value Get(const Value& value) const
 	{
-		return ElfFile::Get(value, fSwappedByteOrder);
+		return ElfFile::StaticGet(value, fSwappedByteOrder);
 	}
 
 	void SetSource(ElfSymbolLookupSource* source)

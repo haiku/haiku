@@ -142,10 +142,11 @@ public:
 
 			template<typename Value>
 			Value				Get(const Value& value) const
-									{ return Get(value, fSwappedByteOrder); }
+									{ return StaticGet(value,
+										fSwappedByteOrder); }
 
 	template<typename Value>
-	static	Value				Get(const Value& value,
+	static	Value				StaticGet(const Value& value,
 									bool swappedByteOrder);
 
 private:
@@ -191,7 +192,7 @@ private:
 
 template<typename Value>
 /*static*/ inline Value
-ElfFile::Get(const Value& value, bool swappedByteOrder)
+ElfFile::StaticGet(const Value& value, bool swappedByteOrder)
 {
 	if (!swappedByteOrder)
 		return value;
