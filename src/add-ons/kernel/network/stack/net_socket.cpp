@@ -221,18 +221,23 @@ add_ancillary_data(net_socket* socket, ancillary_data_container* container,
 {
 	cmsghdr* header = (cmsghdr*)data;
 
-	while (dataLen > 0) {
-		if (header->cmsg_len < sizeof(cmsghdr) || header->cmsg_len > dataLen)
-			return B_BAD_VALUE;
+	if (dataLen == 0)
+		return B_OK;
 
-		if (socket->first_info->add_ancillary_data == NULL)
-			return B_NOT_SUPPORTED;
+	if (socket->first_info->add_ancillary_data == NULL)
+		return B_NOT_SUPPORTED;
+
+	while (true) {
+		if (header->cmsg_len < CMSG_LEN(0) || header->cmsg_len > dataLen)
+			return B_BAD_VALUE;
 
 		status_t status = socket->first_info->add_ancillary_data(
 			socket->first_protocol, container, header);
 		if (status != B_OK)
 			return status;
 
+		if (dataLen <= _ALIGN(header->cmsg_len))
+			break;
 		dataLen -= _ALIGN(header->cmsg_len);
 		header = (cmsghdr*)((uint8*)header + _ALIGN(header->cmsg_len));
 	}
