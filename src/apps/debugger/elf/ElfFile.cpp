@@ -13,10 +13,12 @@
 #include <sys/stat.h>
 #include <unistd.h>
 
+#include <algorithm>
 #include <new>
 
 #include <AutoDeleter.h>
 
+#include "ElfSymbolLookup.h"
 #include "Tracing.h"
 
 
@@ -100,6 +102,45 @@ ElfSegment::ElfSegment(uint32 type, uint64 fileOffset, uint64 fileSize,
 ElfSegment::~ElfSegment()
 {
 }
+
+
+// #pragma mark - SymbolLookupSource
+
+
+struct ElfFile::SymbolLookupSource : public ElfSymbolLookupSource {
+	SymbolLookupSource(int fd, uint64 fileOffset, uint64 fileLength,
+		uint64 memoryAddress)
+		:
+		fFd(fd),
+		fFileOffset(fileOffset),
+		fFileLength(fileLength),
+		fMemoryAddress(memoryAddress)
+	{
+	}
+
+	virtual ssize_t Read(uint64 address, void* buffer, size_t size)
+	{
+		if (address < fMemoryAddress || address - fMemoryAddress > fFileLength)
+			return B_BAD_VALUE;
+
+		uint64 offset = address - fMemoryAddress;
+		size_t toRead = (size_t)std::min((uint64)size, fFileLength - offset);
+		if (toRead == 0)
+			return 0;
+
+		ssize_t bytesRead = pread(fFd, buffer, toRead,
+			(off_t)(fFileOffset + offset));
+		if (bytesRead < 0)
+			return errno;
+		return bytesRead;
+	}
+
+private:
+	int		fFd;
+	uint64	fFileOffset;
+	uint64	fFileLength;
+	uint64	fMemoryAddress;
+};
 
 
 // #pragma mark - ElfFile
@@ -239,6 +280,15 @@ ElfFile::DataSegment() const
 	}
 
 	return NULL;
+}
+
+
+ElfSymbolLookupSource*
+ElfFile::CreateSymbolLookupSource(uint64 fileOffset, uint64 fileLength,
+	uint64 memoryAddress) const
+{
+	return new(std::nothrow) SymbolLookupSource(fFD, fileOffset, fileLength,
+		memoryAddress);
 }
 
 

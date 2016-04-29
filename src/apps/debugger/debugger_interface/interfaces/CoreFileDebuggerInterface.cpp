@@ -10,29 +10,14 @@
 #include <new>
 
 #include <errno.h>
-//
-// #include <Locker.h>
-//
-// #include <AutoLocker.h>
-// #include <memory_private.h>
-// #include <OS.h>
-// #include <system_info.h>
-// #include <util/DoublyLinkedList.h>
-// #include <util/KMessage.h>
-//
-// #include "debug_utils.h"
-//
+
+#include <AutoDeleter.h>
+
 #include "ArchitectureX86.h"
 #include "ArchitectureX8664.h"
-// #include "AreaInfo.h"
-// #include "AutoDeleter.h"
 #include "CoreFile.h"
-// #include "CpuState.h"
-// #include "DebugEvent.h"
+#include "ElfSymbolLookup.h"
 #include "ImageInfo.h"
-// #include "SemaphoreInfo.h"
-// #include "SymbolInfo.h"
-// #include "SystemInfo.h"
 #include "TeamInfo.h"
 #include "ThreadInfo.h"
 #include "Tracing.h"
@@ -43,7 +28,6 @@ CoreFileDebuggerInterface::CoreFileDebuggerInterface(CoreFile* coreFile)
 	fCoreFile(coreFile),
 	fArchitecture(NULL)
 {
-	// TODO:...
 }
 
 
@@ -252,7 +236,29 @@ status_t
 CoreFileDebuggerInterface::GetSymbolInfos(team_id team, image_id image,
 	BObjectList<SymbolInfo>& infos)
 {
-	// TODO:...
+	const CoreFileImageInfo* imageInfo = fCoreFile->ImageInfoForId(image);
+	if (imageInfo == NULL)
+		return B_BAD_IMAGE_ID;
+
+	ElfSymbolLookup* symbolLookup;
+	status_t error = fCoreFile->CreateSymbolLookup(imageInfo, symbolLookup);
+	if (error != B_OK) {
+		WARNING("Failed to create symbol lookup for image (%" B_PRId32
+			"): %s\n", image, strerror(error));
+		return error;
+	}
+	ObjectDeleter<ElfSymbolLookup> symbolLookupDeleter(symbolLookup);
+
+	SymbolInfo symbolInfo;
+	uint32 index = 0;
+	while (symbolLookup->NextSymbolInfo(index, symbolInfo) == B_OK) {
+		SymbolInfo* info = new(std::nothrow) SymbolInfo(symbolInfo);
+		if (info == NULL || !infos.AddItem(info)) {
+			delete info;
+			return B_NO_MEMORY;
+		}
+	}
+
 	return B_OK;
 }
 

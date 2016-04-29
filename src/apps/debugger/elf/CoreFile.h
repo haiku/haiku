@@ -78,6 +78,8 @@ struct CoreFileImageInfo {
 			uint64				SymbolHash() const	{ return fSymbolHash; }
 			uint64				StringTable() const	{ return fStringTable; }
 			const BString&		Name() const		{ return fName; }
+			CoreFileAreaInfo*	TextArea() const	{ return fTextArea; }
+			CoreFileAreaInfo*	DataArea() const	{ return fDataArea; }
 
 private:
 			int32				fId;
@@ -151,12 +153,17 @@ public:
 									{ return fImageInfos.CountItems(); }
 			const CoreFileImageInfo* ImageInfoAt(int32 index) const
 									{ return fImageInfos.ItemAt(index); }
+			const CoreFileImageInfo* ImageInfoForId(int32 id) const;
 
 			int32				CountThreadInfos() const
 									{ return fThreadInfos.CountItems(); }
 			const CoreFileThreadInfo* ThreadInfoAt(int32 index) const
 									{ return fThreadInfos.ItemAt(index); }
 			const CoreFileThreadInfo* ThreadInfoForId(int32 id) const;
+
+			status_t			CreateSymbolLookup(
+									const CoreFileImageInfo* imageInfo,
+									ElfSymbolLookup*& _lookup);
 
 private:
 			typedef BObjectList<CoreFileAreaInfo> AreaInfoList;

@@ -17,6 +17,10 @@
 #include "Types.h"
 
 
+class ElfSymbolLookup;
+class ElfSymbolLookupSource;
+
+
 class ElfSection {
 public:
 								ElfSection(const char* name, int fd,
@@ -81,6 +85,7 @@ struct ElfClass32 {
 	typedef Elf32_Ehdr				Ehdr;
 	typedef Elf32_Phdr				Phdr;
 	typedef Elf32_Shdr				Shdr;
+	typedef Elf32_Sym				Sym;
 	typedef Elf32_Nhdr				Nhdr;
 	typedef Elf32_Note_Team			NoteTeam;
 	typedef Elf32_Note_Area_Entry	NoteAreaEntry;
@@ -95,6 +100,7 @@ struct ElfClass64 {
 	typedef Elf64_Ehdr				Ehdr;
 	typedef Elf64_Phdr				Phdr;
 	typedef Elf64_Shdr				Shdr;
+	typedef Elf64_Sym				Sym;
 	typedef Elf64_Nhdr				Nhdr;
 	typedef Elf64_Note_Team			NoteTeam;
 	typedef Elf64_Note_Area_Entry	NoteAreaEntry;
@@ -113,6 +119,8 @@ public:
 			int					FD() const	{ return fFD; }
 
 			bool				Is64Bit() const	{ return f64Bit; }
+			bool				IsByteOrderSwapped() const
+									{ return fSwappedByteOrder; }
 			uint16				Type() const	{ return fType; }
 			uint16				Machine() const	{ return fMachine; }
 
@@ -128,11 +136,21 @@ public:
 			ElfSegment*			TextSegment() const;
 			ElfSegment*			DataSegment() const;
 
-			template<typename Value>
-			Value				Get(const Value& value) const;
+			ElfSymbolLookupSource* CreateSymbolLookupSource(uint64 fileOffset,
+									uint64 fileLength,
+									uint64 memoryAddress) const;
 
+			template<typename Value>
+			Value				Get(const Value& value) const
+									{ return Get(value, fSwappedByteOrder); }
+
+	template<typename Value>
+	static	Value				Get(const Value& value,
+									bool swappedByteOrder);
 
 private:
+			struct SymbolLookupSource;
+
 			typedef BObjectList<ElfSection> SectionList;
 			typedef BObjectList<ElfSegment> SegmentList;
 
@@ -172,10 +190,10 @@ private:
 
 
 template<typename Value>
-inline Value
-ElfFile::Get(const Value& value) const
+/*static*/ inline Value
+ElfFile::Get(const Value& value, bool swappedByteOrder)
 {
-	if (!fSwappedByteOrder)
+	if (!swappedByteOrder)
 		return value;
 	return _Swap(value);
 }

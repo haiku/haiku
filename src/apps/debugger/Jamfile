@@ -147,6 +147,7 @@ local sources =
 	# elf
 	CoreFile.cpp
 	ElfFile.cpp
+	ElfSymbolLookup.cpp
 
 	# files
 	FileManager.cpp

@@ -14,6 +14,7 @@
 
 #include <AutoDeleter.h>
 
+#include "ElfSymbolLookup.h"
 #include "Tracing.h"
 
 
@@ -166,6 +167,20 @@ CoreFile::Init(const char* fileName)
 }
 
 
+const CoreFileImageInfo*
+CoreFile::ImageInfoForId(int32 id) const
+{
+	int32 count = fImageInfos.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		CoreFileImageInfo* info = fImageInfos.ItemAt(i);
+		if (info->Id() == id)
+			return info;
+	}
+
+	return NULL;
+}
+
+
 const CoreFileThreadInfo*
 CoreFile::ThreadInfoForId(int32 id) const
 {
@@ -177,6 +192,43 @@ CoreFile::ThreadInfoForId(int32 id) const
 	}
 
 	return NULL;
+}
+
+
+status_t
+CoreFile::CreateSymbolLookup(const CoreFileImageInfo* imageInfo,
+	ElfSymbolLookup*& _lookup)
+{
+	// get the needed data
+	uint64 textDelta = imageInfo->TextDelta();
+	uint64 symbolTable = imageInfo->SymbolTable();
+	uint64 symbolHash = imageInfo->SymbolHash();
+	uint64 stringTable = imageInfo->StringTable();
+	CoreFileAreaInfo* textArea = imageInfo->TextArea();
+	ElfSegment* textSegment = textArea != NULL ? textArea->Segment() : NULL;
+
+	if (symbolTable == 0 || symbolHash == 0 || stringTable == 0
+			|| textSegment == NULL) {
+		return B_UNSUPPORTED;
+	}
+
+	// create a data source for the text segment
+	ElfSymbolLookupSource* source = fElfFile.CreateSymbolLookupSource(
+		textSegment->FileOffset(), textSegment->FileSize(),
+		textSegment->LoadAddress());
+	if (source == NULL)
+		return B_NO_MEMORY;
+
+	// get the symbol table entry size
+	// TODO: This is not actually correct, since at least theoretically the
+	// entry size may differ (cf. DT_SYMENT in the dynamic segment).
+	size_t symbolTableEntrySize = fElfFile.Is64Bit()
+		? sizeof(ElfClass64::Sym) : sizeof(ElfClass32::Sym);
+
+	// create the symbol lookup
+	return ElfSymbolLookup::Create(source, symbolTable, symbolHash, stringTable,
+		symbolTableEntrySize, textDelta, fElfFile.Is64Bit(),
+		fElfFile.IsByteOrderSwapped(), true, _lookup);
 }
 
 
