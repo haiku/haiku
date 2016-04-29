@@ -31,9 +31,6 @@
 #include <binary_compatibility/Support.h>
 
 
-using std::nothrow;
-
-
 static property_info sPropertyList[] = {
 	{
 		"Selection",
@@ -1239,7 +1236,7 @@ BTabView::_InitContainerView(bool layouted)
 	bool createdContainer = false;
 	if (layouted) {
 		if (GetLayout() == NULL) {
-			SetLayout(new(nothrow) BGroupLayout(B_HORIZONTAL));
+			SetLayout(new(std::nothrow) BGroupLayout(B_HORIZONTAL));
 			needsLayout = true;
 		}
 
