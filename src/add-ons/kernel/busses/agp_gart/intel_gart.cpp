@@ -1,6 +1,6 @@
 /*
  * Copyright 2008-2010, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2011-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -127,6 +127,23 @@ const struct supported_device {
 	{0x0f00, 0x0f32, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0f33, INTEL_MODEL_VLVM, "ValleyView Mobile"},
 	{0x0f00, 0x0157, INTEL_MODEL_VLVM, "ValleyView Mobile"},
+
+	// XXX: 0x1904 only confirmed on 0x1916
+	{0x1904, 0x1902, INTEL_MODEL_SKY,  "Skylake GT1"},
+	{0x1904, 0x1906, INTEL_MODEL_SKYM, "Skylake GT1"},
+	{0x1904, 0x190a, INTEL_MODEL_SKYS, "Skylake GT1"},
+	{0x1904, 0x190b, INTEL_MODEL_SKY,  "Skylake GT1"},
+	{0x1904, 0x190e, INTEL_MODEL_SKYM, "Skylake GT1"},
+	{0x1904, 0x1912, INTEL_MODEL_SKY,  "Skylake GT2"},
+	{0x1904, 0x1916, INTEL_MODEL_SKYM, "Skylake GT2"},
+	{0x1904, 0x191a, INTEL_MODEL_SKYS, "Skylake GT2"},
+	{0x1904, 0x191b, INTEL_MODEL_SKY,  "Skylake GT2"},
+	{0x1904, 0x191d, INTEL_MODEL_SKY,  "Skylake GT2"},
+	{0x1904, 0x191e, INTEL_MODEL_SKYM, "Skylake GT2"},
+	{0x1904, 0x1921, INTEL_MODEL_SKYM, "Skylake GT2F"},
+	{0x1904, 0x1926, INTEL_MODEL_SKYM, "Skylake GT3"},
+	{0x1904, 0x192a, INTEL_MODEL_SKYS, "Skylake GT3"},
+	{0x1904, 0x192b, INTEL_MODEL_SKY,  "Skylake GT3"},
 };
 
 struct intel_info {
