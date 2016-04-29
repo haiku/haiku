@@ -15,6 +15,8 @@
 #include <TabViewPrivate.h>
 
 #include <new>
+
+#include <math.h>
 #include <string.h>
 
 #include <CardLayout.h>
@@ -354,7 +356,7 @@ BTabView::BTabView(BMessage* archive)
 	if (archive->FindFloat("_high", &fTabHeight) != B_OK) {
 		font_height fh;
 		GetFontHeight(&fh);
-		fTabHeight = fh.ascent + fh.descent + fh.leading + 8.0f;
+		fTabHeight = ceilf(fh.ascent + fh.descent + fh.leading + 8.0f);
 	}
 
 	if (archive->FindInt32("_sel", &fSelection) != B_OK)
@@ -798,38 +800,73 @@ BTabView::Draw(BRect updateRect)
 BRect
 BTabView::DrawTabs()
 {
+	// TODO: Rewrite this method
+
 	// draw an inactive tab frame behind all tabs
-	BRect frame(Bounds());
-	frame.bottom = fTabHeight;
+	BRect bounds(Bounds());
+	bounds.bottom = fTabHeight;
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
-	uint32 borders = BControlLook::B_TOP_BORDER
-		| BControlLook::B_BOTTOM_BORDER;
+	uint32 borders = BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER;
 	if (fBorderStyle == B_NO_BORDER) {
 		// removes left border that is an artifact of DrawInactiveTab()
-		frame.left -= 1.0f;
+		bounds.left -= 1;
 	} else
 		borders |= BControlLook::B_LEFT_BORDER | BControlLook::B_RIGHT_BORDER;
 
-	be_control_look->DrawInactiveTab(this, frame, frame, base, 0, borders);
+	// TODO: Why do we have to do this?
+	if (fBorderStyle == B_PLAIN_BORDER) {
+		bounds.left -= 1;
+		bounds.right += 1;
+	}
 
-	// draw the tabs on top of the inactive tab frame
+	// TODO: Doesn't draw bottom border, why?
+	be_control_look->DrawInactiveTab(this, bounds, bounds, base, 0, borders);
+
+	// draw the tabs on top of the inactive tab bounds
 	float right = 0.0f;
+	BRect activeTabFrame;
 	int32 tabCount = CountTabs();
 	for (int32 i = 0; i < tabCount; i++) {
 		BRect tabFrame = TabFrame(i);
+		if (i == fSelection)
+			activeTabFrame = tabFrame;
+
 		TabAt(i)->DrawTab(this, tabFrame,
 			i == fSelection ? B_TAB_FRONT : (i == 0) ? B_TAB_FIRST : B_TAB_ANY,
 			i + 1 != fSelection);
 		right = tabFrame.right;
 	}
 
-	if (right < frame.right) {
+	if (right < bounds.right) {
 		// draw a 1px right border on the last tab
-		frame = Bounds();
-		frame.left = frame.right = right;
-		frame.bottom = fTabHeight;
-		be_control_look->DrawInactiveTab(this, frame, frame, base, 0,
+		bounds = Bounds();
+		bounds.left = bounds.right = right;
+		bounds.bottom = fTabHeight;
+		borders = BControlLook::B_TOP_BORDER;
+		be_control_look->DrawInactiveTab(this, bounds, bounds, base, 0,
 			BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
+	}
+
+	// TODO: Why do we have to do this?
+	// TODO: Why don't we have to do this for B_FANCY_BORDER?
+	// TODO: Why does this draw the wrong color (152 instead of 151)
+	if (fBorderStyle != B_FANCY_BORDER) {
+		// draw the bottom border of the tabs
+		rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
+
+		// draw the bottom border left of the active tab
+		bounds = Bounds();
+		bounds.top = bounds.bottom = fTabHeight;
+		bounds.right = activeTabFrame.left;
+		be_control_look->DrawBorder(this, bounds, bounds, base, B_PLAIN_BORDER,
+			0, BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
+
+		// draw the bottom border right of the active tab
+		bounds = Bounds();
+		bounds.top = bounds.bottom = fTabHeight;
+		bounds.left = activeTabFrame.right;
+		be_control_look->DrawBorder(this, bounds, bounds, base, B_PLAIN_BORDER,
+			0, BControlLook::B_TOP_BORDER | BControlLook::B_BOTTOM_BORDER);
 	}
 
 	return fSelection < CountTabs() ? TabFrame(fSelection) : BRect();
@@ -840,18 +877,16 @@ void
 BTabView::DrawBox(BRect selectedTabRect)
 {
 	BRect rect(Bounds());
-	rect.top = selectedTabRect.bottom;
-	if (fBorderStyle != B_FANCY_BORDER)
-		rect.top += 1.0f;
+	rect.top = fTabHeight;
 
 	rgb_color base = ui_color(B_PANEL_BACKGROUND_COLOR);
 	if (fBorderStyle == B_FANCY_BORDER)
 		be_control_look->DrawGroupFrame(this, rect, rect, base);
-	else {
+	else if (fBorderStyle == B_PLAIN_BORDER) {
 		be_control_look->DrawBorder(this, rect, rect, base, B_PLAIN_BORDER,
-			0, fBorderStyle == B_PLAIN_BORDER ? BControlLook::B_ALL_BORDERS
-				: BControlLook::B_TOP_BORDER);
-	}
+			0, BControlLook::B_ALL_BORDERS);
+	} else
+		; // B_NO_BORDER draws no box
 }
 
 
@@ -1215,7 +1250,7 @@ BTabView::_InitObject(bool layouted, button_width width)
 
 	font_height fh;
 	GetFontHeight(&fh);
-	fTabHeight = fh.ascent + fh.descent + fh.leading + 8.0f;
+	fTabHeight = ceilf(fh.ascent + fh.descent + fh.leading + 8.0f);
 
 	fContainerView = NULL;
 	_InitContainerView(layouted);
