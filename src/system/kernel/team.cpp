@@ -1612,6 +1612,7 @@ team_create_thread_start_internal(void* args)
 		return err;
 	}
 	imageInfo.basic_info.text = team->commpage_address;
+	imageInfo.text_delta = 0;
 	imageInfo.symbol_table = NULL;
 	imageInfo.symbol_hash = NULL;
 	imageInfo.string_table = NULL;

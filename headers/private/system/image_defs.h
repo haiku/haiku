@@ -19,6 +19,7 @@
 
 typedef struct extended_image_info {
 	image_info	basic_info;
+	ssize_t		text_delta;
 	void*		symbol_table;
 	void*		symbol_hash;
 	void*		string_table;

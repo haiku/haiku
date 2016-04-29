@@ -2065,6 +2065,7 @@ elf_load_user_image(const char *path, Team *team, int flags, addr_t *entry)
 		// the runtime loader is loaded, so this is good enough for the time
 		// being.
 
+	imageInfo.text_delta = delta;
 	imageInfo.symbol_table = image->syms;
 	imageInfo.symbol_hash = image->symhash;
 	imageInfo.string_table = image->strtab;

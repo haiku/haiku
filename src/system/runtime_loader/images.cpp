@@ -522,6 +522,7 @@ register_image(image_t* image, int fd, const char* path)
 	info.basic_info.data_size = dataEnd - dataBase;
 	info.basic_info.api_version = image->api_version;
 	info.basic_info.abi = image->abi;
+	info.text_delta = image->regions[0].delta;
 	info.symbol_table = image->syms;
 	info.symbol_hash = image->symhash;
 	info.string_table = image->strtab;
