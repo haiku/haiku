@@ -257,6 +257,7 @@ struct ImageInfo : DoublyLinkedListLinkImpl<ImageInfo> {
 		fData((addr_t)image->info.basic_info.data),
 		fTextSize(image->info.basic_info.text_size),
 		fDataSize(image->info.basic_info.data_size),
+		fTextDelta(image->info.text_delta),
 		fSymbolTable((addr_t)image->info.symbol_table),
 		fSymbolHash((addr_t)image->info.symbol_hash),
 		fStringTable((addr_t)image->info.string_table)
@@ -317,12 +318,16 @@ struct ImageInfo : DoublyLinkedListLinkImpl<ImageInfo> {
 	addr_t TextBase() const
 	{
 		return fText;
-
 	}
 
 	size_t TextSize() const
 	{
 		return fTextSize;
+	}
+
+	ssize_t TextDelta() const
+	{
+		return fTextDelta;
 	}
 
 	addr_t DataBase() const
@@ -362,6 +367,7 @@ private:
 	addr_t		fData;
 	size_t		fTextSize;
 	size_t		fDataSize;
+	ssize_t		fTextDelta;
 	addr_t		fSymbolTable;
 	addr_t		fSymbolHash;
 	addr_t		fStringTable;
@@ -1302,6 +1308,7 @@ private:
 			entry.ni_text_size = imageInfo->TextSize();
 			entry.ni_data_base = imageInfo->DataBase();
 			entry.ni_data_size = imageInfo->DataSize();
+			entry.ni_text_delta = imageInfo->TextDelta();
 			entry.ni_symbol_table = imageInfo->SymbolTable();
 			entry.ni_symbol_hash = imageInfo->SymbolHash();
 			entry.ni_string_table = imageInfo->StringTable();

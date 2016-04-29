@@ -58,6 +58,7 @@ struct CoreFileImageInfo {
 								CoreFileImageInfo(int32 id, int32 type,
 									uint64 initRoutine, uint64 termRoutine,
 									uint64 textBase, uint64 textSize,
+									int64 textDelta,
 									uint64 dataBase, uint64 dataSize,
 									int32 deviceId, int64 nodeId,
 									uint64 symbolTable, uint64 symbolHash,
@@ -70,6 +71,7 @@ struct CoreFileImageInfo {
 			int32				Type() const		{ return fType; }
 			uint64				TextBase() const	{ return fTextBase; }
 			uint64				TextSize() const	{ return fTextSize; }
+			int64				TextDelta() const	{ return fTextDelta; }
 			uint64				DataBase() const	{ return fDataBase; }
 			uint64				DataSize() const	{ return fDataSize; }
 			uint64				SymbolTable() const	{ return fSymbolTable; }
@@ -84,6 +86,7 @@ private:
 			uint64				fTermRoutine;
 			uint64				fTextBase;
 			uint64				fTextSize;
+			int64				fTextDelta;
 			uint64				fDataBase;
 			uint64				fDataSize;
 			int32				fDeviceId;

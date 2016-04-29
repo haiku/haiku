@@ -65,10 +65,10 @@ CoreFileAreaInfo::CoreFileAreaInfo(ElfSegment* segment, int32 id,
 
 
 CoreFileImageInfo::CoreFileImageInfo(int32 id, int32 type, uint64 initRoutine,
-	uint64 termRoutine, uint64 textBase, uint64 textSize, uint64 dataBase,
-	uint64 dataSize, int32 deviceId, int64 nodeId, uint64 symbolTable,
-	uint64 symbolHash, uint64 stringTable, CoreFileAreaInfo* textArea,
-	CoreFileAreaInfo* dataArea, const BString& name)
+	uint64 termRoutine, uint64 textBase, uint64 textSize, int64 textDelta,
+	uint64 dataBase, uint64 dataSize, int32 deviceId, int64 nodeId,
+	uint64 symbolTable, uint64 symbolHash, uint64 stringTable,
+	CoreFileAreaInfo* textArea, CoreFileAreaInfo* dataArea, const BString& name)
 	:
 	fId(id),
 	fType(type),
@@ -76,6 +76,7 @@ CoreFileImageInfo::CoreFileImageInfo(int32 id, int32 type, uint64 initRoutine,
 	fTermRoutine(termRoutine),
 	fTextBase(textBase),
 	fTextSize(textSize),
+	fTextDelta(textDelta),
 	fDataBase(dataBase),
 	fDataSize(dataSize),
 	fDeviceId(deviceId),
@@ -479,6 +480,7 @@ CoreFile::_ReadImagesNote(const void* data, uint32 dataSize)
 		uint64 termRoutine = Get(entry.ni_term_routine);
 		uint64 textBase = Get(entry.ni_text_base);
 		uint64 textSize = Get(entry.ni_text_size);
+		int64 textDelta = Get(entry.ni_text_delta);
 		uint64 dataBase = Get(entry.ni_data_base);
 		uint64 dataSize = Get(entry.ni_data_size);
 		int32 deviceId = Get(entry.ni_device);
@@ -506,9 +508,9 @@ CoreFile::_ReadImagesNote(const void* data, uint32 dataSize)
 		CoreFileAreaInfo* textArea = _FindArea(textBase);
 		CoreFileAreaInfo* dataArea = _FindArea(dataBase);
 		CoreFileImageInfo* image = new(std::nothrow) CoreFileImageInfo(id, type,
-			initRoutine, termRoutine, textBase, textSize, dataBase, dataSize,
-			deviceId, nodeId, symbolTable, symbolHash, stringTable, textArea,
-			dataArea, copiedName);
+			initRoutine, termRoutine, textBase, textSize, textDelta, dataBase,
+			dataSize, deviceId, nodeId, symbolTable, symbolHash, stringTable,
+			textArea, dataArea, copiedName);
 		if (image == NULL || !fImageInfos.AddItem(image)) {
 			delete image;
 			return B_NO_MEMORY;

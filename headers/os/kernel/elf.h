@@ -666,6 +666,8 @@ typedef struct {
 	int64		ni_node;			/* node ID of mapped file */
 	uint32		ni_text_base;		/* base address of text segment */
 	uint32		ni_text_size;		/* size of text segment */
+	int32		ni_text_delta;		/* delta of the text segment relative to
+									   load address specified in the ELF file */
 	uint32		ni_data_base;		/* base address of data segment */
 	uint32		ni_data_size;		/* size of data segment */
 	uint32		ni_symbol_table;	/* address of dynamic symbol table */
@@ -689,6 +691,8 @@ typedef struct {
 	int64		ni_node;			/* node ID of mapped file */
 	uint64		ni_text_base;		/* base address of text segment */
 	uint64		ni_text_size;		/* size of text segment */
+	int64		ni_text_delta;		/* delta of the text segment relative to
+									   load address specified in the ELF file */
 	uint64		ni_data_base;		/* base address of data segment */
 	uint64		ni_data_size;		/* size of data segment */
 	uint64		ni_symbol_table;	/* address of dynamic symbol table */
