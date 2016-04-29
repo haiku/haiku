@@ -1166,12 +1166,12 @@ BTabView::TabHeight() const
 
 
 void
-BTabView::SetBorder(border_style border)
+BTabView::SetBorder(border_style borderStyle)
 {
-	if (fBorderStyle == border)
+	if (fBorderStyle == borderStyle)
 		return;
 
-	fBorderStyle = border;
+	fBorderStyle = borderStyle;
 
 	_LayoutContainerView((Flags() & B_SUPPORTS_LAYOUT) != 0);
 }
@@ -1373,7 +1373,7 @@ BTabView::operator=(const BTabView&)
 
 extern "C" void
 B_IF_GCC_2(_ReservedTabView1__8BTabView, _ZN8BTabView17_ReservedTabView1Ev)(
-	BTabView* tabView, border_style border)
+	BTabView* tabView, border_style borderStyle)
 {
-	tabView->BTabView::SetBorder(border);
+	tabView->BTabView::SetBorder(borderStyle);
 }

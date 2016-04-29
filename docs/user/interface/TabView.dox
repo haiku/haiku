@@ -694,8 +694,13 @@
 
 
 /*!
-	\fn void BTabView::SetBorder(border_style border)
-	\brief Sets the border of the tab view to \a border.
+	\fn void BTabView::SetBorder(border_style borderStyle)
+	\brief Sets the border style of the tab view to \a borderStyle.
+
+	\param borderStyle One of the following:
+	       - \c B_FANCY_BORDER (the default)
+	       - \c B_PLAIN_BORDER a plain line border,
+	       - \c B_NO_BORDER do not draw a border.
 
 	\since Haiku R1
 */

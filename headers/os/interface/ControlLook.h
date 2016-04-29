@@ -240,7 +240,7 @@ public:
 									BRect verticalScrollBarFrame,
 									BRect horizontalScrollBarFrame,
 									const rgb_color& base,
-									border_style border,
+									border_style borderStyle,
 									uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
 
@@ -307,7 +307,7 @@ public:
 	virtual	void				DrawBorder(BView* view, BRect& rect,
 									const BRect& updateRect,
 									const rgb_color& base,
-									border_style border, uint32 flags = 0,
+									border_style borderStyle, uint32 flags = 0,
 									uint32 borders = B_ALL_BORDERS);
 
 	virtual	void				DrawRaisedBorder(BView* view, BRect& rect,

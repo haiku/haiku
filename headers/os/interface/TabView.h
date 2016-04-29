@@ -162,7 +162,7 @@ public:
 	virtual	void				SetTabHeight(float height);
 			float				TabHeight() const;
 
-	virtual	void				SetBorder(border_style border);
+	virtual	void				SetBorder(border_style borderStyle);
 			border_style		Border() const;
 
 			BView*				ContainerView() const;

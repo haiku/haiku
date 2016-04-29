@@ -680,7 +680,7 @@ void
 BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 	const BRect& updateRect, BRect verticalScrollBarFrame,
 	BRect horizontalScrollBarFrame, const rgb_color& base,
-	border_style border, uint32 flags, uint32 _borders)
+	border_style borderStyle, uint32 flags, uint32 _borders)
 {
 	// calculate scroll corner rect before messing with the "rect"
 	BRect scrollCornerFillRect(rect.right, rect.bottom,
@@ -692,7 +692,7 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 	if (verticalScrollBarFrame.IsValid())
 		scrollCornerFillRect.top = verticalScrollBarFrame.bottom + 1;
 
-	if (border == B_NO_BORDER) {
+	if (borderStyle == B_NO_BORDER) {
 		if (scrollCornerFillRect.IsValid()) {
 			view->SetHighColor(base);
 			view->FillRect(scrollCornerFillRect);
@@ -700,7 +700,7 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 		return;
 	}
 
-	bool excludeScrollCorner = border == B_FANCY_BORDER
+	bool excludeScrollCorner = borderStyle == B_FANCY_BORDER
 		&& horizontalScrollBarFrame.IsValid()
 		&& verticalScrollBarFrame.IsValid();
 
@@ -713,7 +713,7 @@ BControlLook::DrawScrollViewFrame(BView* view, BRect& rect,
 
 	rgb_color scrollbarFrameColor = tint_color(base, B_DARKEN_2_TINT);
 
-	if (border == B_FANCY_BORDER)
+	if (borderStyle == B_FANCY_BORDER)
 		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, flags, borders);
 
 	if ((flags & B_FOCUSED) != 0) {
@@ -1634,16 +1634,17 @@ BControlLook::DrawSplitter(BView* view, BRect& rect, const BRect& updateRect,
 
 void
 BControlLook::DrawBorder(BView* view, BRect& rect, const BRect& updateRect,
-	const rgb_color& base, border_style border, uint32 flags, uint32 borders)
+	const rgb_color& base, border_style borderStyle, uint32 flags,
+	uint32 borders)
 {
-	if (border == B_NO_BORDER)
+	if (borderStyle == B_NO_BORDER)
 		return;
 
 	rgb_color scrollbarFrameColor = tint_color(base, B_DARKEN_2_TINT);
 	if ((flags & B_FOCUSED) != 0)
 		scrollbarFrameColor = ui_color(B_KEYBOARD_NAVIGATION_COLOR);
 
-	if (border == B_FANCY_BORDER)
+	if (borderStyle == B_FANCY_BORDER)
 		_DrawOuterResessedFrame(view, rect, base, 1.0, 1.0, flags, borders);
 
 	_DrawFrame(view, rect, scrollbarFrameColor, scrollbarFrameColor,
