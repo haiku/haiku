@@ -25,6 +25,9 @@
 	\ingroup libbe
 	\brief The BLaunchRoster class lets you communicate with the launch_daemon.
 
+	\warning This class is not yet finalized, if you use it in your software
+	         assume that it will break some time in the future.
+
 	\since Haiku R1
 */
 
