@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-ShowImage	575555985
+1	hungarian	x-vnd.Haiku-ShowImage	3998703664
 Use as background…	Menus		Beállítás háttérnek…
 File	Menus		Fájl
 Slide delay	Menus		Képváltás közti szünet
@@ -7,6 +7,7 @@ Zoom in	Menus		Nagyítás
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		A '%s' nevű dokumentum megváltozott. Biztosan be szeretné zárni?
 Page setup…	Menus		Oldalbeállítás…
 Print…	Menus		Nyomtatás…
+Get info…	Menus		Információ lekérése…
 OK	SaveToFile		Rendben
 Previous page	Menus		Előző oldal
 View	Menus		Nézet

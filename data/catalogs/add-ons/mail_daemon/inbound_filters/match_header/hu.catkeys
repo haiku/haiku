@@ -1,5 +1,7 @@
-1	hungarian	x-vnd.Haiku-MatchHeader	4262558281
+1	hungarian	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<Válassza ki a műveletet>
+Header field (e.g. Subject, From, ...)	ConfigView		Fejléc (pl. Tárgy, Feladó, …)
+Account	ConfigView		Fiók
 has	ConfigView		tartalmaz
 Move to	ConfigView		mozgatás ide:
 Then	ConfigView		Akkor
@@ -12,3 +14,4 @@ Match header	RuleFilter		Fejléc egyezése
 Reply with	ConfigView		válaszolás:
 If	ConfigView		Ha:
 Match \"%attribute\" against \"%regex\"	RuleFilter		Egyező \"%attribute\" \"%regex\" helyett
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Általános kifejezés, mint például \"*spam*\".\nA \"REGEX:\" előtag megadása szükséges az általános kifejezések használatához.

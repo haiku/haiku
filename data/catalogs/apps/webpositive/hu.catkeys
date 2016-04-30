@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-WebPositive	98059607
+1	hungarian	x-vnd.Haiku-WebPositive	1282126593
 Show home button	Settings Window		Kezdőlap-gomb megjelenítése
 Username:	Authentication Panel		Felhasználónév:
 Copy URL to clipboard	Download Window		Cím másolása a vágólapra
@@ -16,6 +16,7 @@ Start page:	Settings Window		Kezdőlap:
 History	WebPositive Window		Előzmény
 Error opening downloads folder	Download Window		Hiba történt a letöltések mappa megnyitásakor
 Paste	WebPositive Window		Beillesztés
+Expiration	Cookie Manager		Lejárat
 Double-click or middle-click to open new tab.	Tab Manager		Új fül dupla kattintással vagy az egér középső gombjával.
 Proxy username:	Settings Window		Felhasználónév a proxyhoz:
 Save page as…	WebPositive Window		Oldal mentése…
@@ -23,10 +24,12 @@ Over %days left	Download Window		Több, mint %days nap van hátra
 Settings	Settings Window		Beállítások
 Confirmation	WebPositive Window		Megerősítés
 Window	WebPositive Window		Ablak
+Cookie manager	Cookie Manager		Sütikezelő
 Decrease size	WebPositive Window		Méret csökkentése
 Serif font:	Settings Window		Talpas betűtípus:
 Loading %url	WebPositive Window		%url betöltése
 Download aborted	Download Window		A letöltés megszakadt
+Value	Cookie Manager		Érték
 Page source	WebPositive Window		Oldal forrása
 Next	WebPositive Window		Következő
 Find next	WebPositive Window		Következő találat
@@ -42,16 +45,19 @@ Auto-hide mouse pointer	Settings Window		Egérmutató automatikus elrejtése
 Quit	WebPositive Window		Kilépés
 Full screen	WebPositive Window		Teljes képernyő
 Open download error	Download Window		A letöltés nem nyitható meg
+The cookie jar is empty!	Cookie Manager		A süti jar fájl üres!
 Standard font:	Settings Window		Normál betűtípus:
 Find previous occurrence of search terms	WebPositive Window	find bar previous button tooltip	Előző találat
 Restart	Download Window		Újraindítás
 Proxy server	Settings Window		Proxy
 Open containing folder	Download Window		Tartalmazó mappa megnyitása
 New window	WebPositive Window		Új ablak
+WebPositive	Download Window		WebPositive
 Open	Download Window		Megnyitás
 Reload	WebPositive Window		Újratöltés
 Downloads	Download Window		Letöltések
 Sans serif font:	Settings Window		Talpatlan betűtípus:
+Delete	Cookie Manager		Törlés
 Forward	WebPositive Window		Következő
 of	Download Window	...as in '12kB of 256kB'	/
 Revert	Settings Window		Visszaállít
@@ -93,10 +99,12 @@ Find	WebPositive Window		Keresés
 Find previous	WebPositive Window		Előző találat
 Settings	WebPositive Window		Beállítások
 Script console	WebPositive Window		Szkript konzol
+Name	Cookie Manager		Név
 Proxy server address:	Settings Window		Proxy címe:
 Proxy server port:	Settings Window		Proxy port:
 Bookmarks	WebPositive Window		Könyvjelzők
 Paste	URL Bar		Beillesztés
+Cookie manager	WebPositive Window		Sütikezelő
 /s)	Download Window	...as in 'per second'	/mp)
 Hide password text	Authentication Panel		Jelszó elrejtése
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Árvíztűrő tükörfúrógép.
@@ -104,9 +112,11 @@ Over 1 minute left	Download Window		Több, mint 1 perc van hátra
 Open start page	Settings Window		Kezdőlap megnyitása
 Continue downloads	WebPositive		Letöltések folytatása
 Cancel	Download Window		Mégse
+Flags	Cookie Manager		Jelölők
 Open search page	Settings Window		Keresőoldal megnyitása
 Clear	Console Window		Törlés
 Password:	Authentication Panel		Jelszó:
+Path	Cookie Manager		Útvonal
 Back	WebPositive Window		Előző
 New browser window	Download Window		Új böngészőablak
 Today	WebPositive Window		Ma
@@ -133,6 +143,7 @@ Open bookmarks confirmation	WebPositive Window		Könyvjelzők megerősítése
 Remove missing	Download Window		Hiányzó törlése
 Clone current page	Settings Window		Jelenlegi oldal másolása
 Do you want to open %addedCount bookmarks all at once?	WebPositive Window	Don't translate variable %addedCount.	Biztosan meg akar nyitni %addedCount könyvjelzőt egyszerre?
+Session cookie	Cookie Manager		Munkamenet-süti
 OK	Authentication Panel		Rendben
 Copy	URL Bar		Másolás
 Download finished	Download Window		A letöltés befejeződött
@@ -140,6 +151,7 @@ Show bookmark bar	WebPositive Window		Könyvjelzősáv megjelenítése
 OK	WebPositive Window		Rendben
 Manage bookmarks	WebPositive Window		Könyvjelzők kezelése
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Ehhez az oldalhoz (%bookmarkName) már tartozik könyvjelző.
+Cookies for %s	Cookie Manager		%s sütijei
 New windows:	Settings Window		Új ablak:
 %url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url betöltése kész
 Remove finished	Download Window		Elkészültek eltávolítása a listából

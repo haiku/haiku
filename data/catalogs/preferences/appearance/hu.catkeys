@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Appearance	727801787
+1	hungarian	x-vnd.Haiku-Appearance	2499598353
 Plain font:	Font view		Alap betűtípus:
 Control highlight	Colors tab		Kiválasztott vezérlőelem
 Control border	Colors tab		Vezérlőelem kerete
@@ -6,11 +6,14 @@ Antialiasing type:	AntialiasingSettingsView		Élsimítás módja:
 Shadow	Colors tab		Árnyék
 On	AntialiasingSettingsView		Be
 Defaults	APRWindow		Eredeti
+Link hover	Colors tab		Kijelölt hivatkozás
 Grayscale	AntialiasingSettingsView		Szürkeárnyalat
 Shine	Colors tab		Ragyogás színe
 About	DecorSettingsView		Névjegy
 About decorator	DecorSettingsView		Dekoráció névjegye
 Off	AntialiasingSettingsView		Ki
+Link text	Colors tab		Hivatkozás szövege
+Link active	Colors tab		Aktív hivatkozás
 Choose Decorator	DecorSettingsView		Dekoráció kiválasztása
 Success	Colors tab		Sikerült
 Inactive window tab text	Colors tab		Inaktív ablak címszövege
@@ -18,6 +21,7 @@ Failure	Colors tab		Nem sikerült
 Hinting menu	AntialiasingSettingsView		Körvonalmenü
 Scroll bar:	DecorSettingsView		Görgetősáv:
 Document background	Colors tab		Dokumentum háttere
+Status bar	Colors tab		Állapotsor
 Revert	APRWindow		Visszaállít
 Window tab	Colors tab		Ablakfül
 Tooltip background	Colors tab		Eszköztár háttere
@@ -36,6 +40,7 @@ List background	Colors tab		Lista háttere
 OK	DecorSettingsView		Rendben
 Control mark	Colors tab		Vezérlőelem jelölése
 Size:	Font Selection view		Méret:
+Link visited	Colors tab		Meglátogatott hivatkozás
 Decorator:	DecorSettingsView		Dekoráció:
 Selected list item background	Colors tab		Kiválasztott listaelem háttere
 Panel background	Colors tab		Panel háttere

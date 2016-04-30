@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	2711018042
+1	hungarian	x-vnd.Haiku-MediaPlayer	3805057997
 raw audio	MediaPlayer-InfoWin		nyers audio
 Location	MediaPlayer-InfoWin		Útvonal
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikai)
@@ -114,6 +114,7 @@ Error: 	MediaPlayer-Main		Hiba:
 Large	MediaPlayer-SettingsWindow		Nagy
 Bottom of video	MediaPlayer-SettingsWindow		A videó alján
 DrawBitmap	MediaPlayer-InfoWin		BittérképKirajzolás
+Total duration: %s	MediaPlayer-PlaylistWindow		Teljes időtartam: %s
 Stop	MediaPlayer-Main		Leállítás
 <unnamed media>	MediaPlayer-InfoWin		<névtelen>
 raw video	MediaPlayer-InfoWin		nyers videó
