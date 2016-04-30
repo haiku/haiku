@@ -32,7 +32,7 @@ RemotePackageRepository HaikuPorts
 	autoconf-2.69-6
 	automake-1.15.0-1
 	automake113-1.13.1-1
-	bash-4.3.42-2
+	bash-4.3.42-3
 #	bepdf-1.1.1~beta5_2013_04_28-1
 	binutils-2.26.0_2016_02_29-1
 	bison-2.6.5-1
