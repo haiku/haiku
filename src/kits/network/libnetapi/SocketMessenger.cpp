@@ -138,7 +138,8 @@ BSocketMessenger::_ReadMessage(BMessage& _message, bigtime_t timeout)
 	ssize_t readSize = fSocket.Read(&size, sizeof(ssize_t));
 	if (readSize < 0)
 		return readSize;
-	else if (readSize != sizeof(ssize_t))
+
+	if (readSize != sizeof(ssize_t))
 		return B_BAD_VALUE;
 
 	if (size <= 0)
@@ -152,7 +153,8 @@ BSocketMessenger::_ReadMessage(BMessage& _message, bigtime_t timeout)
 	readSize = fSocket.Read(buffer, size);
 	if (readSize < 0)
 		return readSize;
-	else if (readSize != size)
+
+	if (readSize != size)
 		return B_MISMATCHED_VALUES;
 
 	return _message.Unflatten(buffer);
