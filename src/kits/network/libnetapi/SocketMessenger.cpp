@@ -106,9 +106,9 @@ status_t
 BSocketMessenger::_SendMessage(const BMessage& message)
 {
 	ssize_t flatSize = message.FlattenedSize();
-	flatSize += sizeof(ssize_t);
+	ssize_t totalSize = flatSize + sizeof(ssize_t);
 
-	char* buffer = new(std::nothrow) char[flatSize];
+	char* buffer = new(std::nothrow) char[totalSize];
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
@@ -119,7 +119,7 @@ BSocketMessenger::_SendMessage(const BMessage& message)
 	if (error != B_OK)
 		return error;
 
-	ssize_t size = fSocket.Write(buffer, flatSize);
+	ssize_t size = fSocket.Write(buffer, totalSize);
 	if (size < 0)
 		return size;
 
