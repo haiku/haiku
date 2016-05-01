@@ -103,6 +103,7 @@ RemotePackageRepository HaikuPorts
 	doxygen-1.7.6.1-1
 	ducksaver-1.1.0-2
 	ed-1.7-1
+	einsteinium-20141023-2
 	enca-1.15-1
 	enca_devel-1.15-1
 	exomizer-2.0.7-1
@@ -1045,6 +1046,7 @@ RemotePackageRepository HaikuPorts
 	dtc_x86
 	ducksaver
 	ed
+	einsteinium
 	enca
 	enca_x86
 	exomizer
