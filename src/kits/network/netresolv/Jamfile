@@ -24,8 +24,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# we also need to use our BSD compatibility functions
 			local defines = _REENTRANT=1 USE_MD5=1 _BSD_SOURCE INET6 ;
 			defines = [ FDefines $(defines) ] ;
-			SubDirCcFlags $(defines) -Wno-error=sign-compare ;
-			SubDirC++Flags $(defines) -Wno-error=sign-compare ;
+			SubDirCcFlags $(defines) -Wno-sign-compare ;
+			SubDirC++Flags $(defines) -Wno-sign-compare ;
 		}
 
 		MergeObject <netresolv!$(architecture)>netresolv.o :
