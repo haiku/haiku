@@ -10,10 +10,10 @@
 #include <fs_attr.h>
 
 #include <Alert.h>
+#include <Autolock.h>
 #include <Directory.h>
-#include <FindDirectory.h>
 #include <E-mail.h>
-#include <Locker.h>
+#include <FindDirectory.h>
 #include <Node.h>
 #include <NodeInfo.h>
 #include <NodeMonitor.h>
@@ -88,7 +88,7 @@ BMailProtocol::MailNotifier() const
 bool
 BMailProtocol::AddFilter(BMailFilter* filter)
 {
-	BLocker locker(this);
+	BAutolock locker(const_cast< BMailProtocol * >(this));
 	return fFilterList.AddItem(filter);
 }
 
@@ -96,7 +96,7 @@ BMailProtocol::AddFilter(BMailFilter* filter)
 int32
 BMailProtocol::CountFilter() const
 {
-	BLocker locker(this);
+	BAutolock locker(const_cast< BMailProtocol * >(this));
 	return fFilterList.CountItems();
 }
 
@@ -104,7 +104,7 @@ BMailProtocol::CountFilter() const
 BMailFilter*
 BMailProtocol::FilterAt(int32 index) const
 {
-	BLocker locker(this);
+	BAutolock locker(const_cast< BMailProtocol * >(this));
 	return fFilterList.ItemAt(index);
 }
 
@@ -112,7 +112,7 @@ BMailProtocol::FilterAt(int32 index) const
 BMailFilter*
 BMailProtocol::RemoveFilter(int32 index)
 {
-	BLocker locker(this);
+	BAutolock locker(const_cast< BMailProtocol * >(this));
 	return fFilterList.RemoveItemAt(index);
 }
 
@@ -120,7 +120,7 @@ BMailProtocol::RemoveFilter(int32 index)
 bool
 BMailProtocol::RemoveFilter(BMailFilter* filter)
 {
-	BLocker locker(this);
+	BAutolock locker(const_cast< BMailProtocol * >(this));
 	return fFilterList.RemoveItem(filter);
 }
 
