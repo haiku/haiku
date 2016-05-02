@@ -780,11 +780,11 @@ int __CORTEX_NAMESPACE__ compareTypeAndID(
 	const MediaJack *rJack = *(reinterpret_cast<MediaJack * const*>(reinterpret_cast<void * const*>(rValue)));
 	if (lJack && rJack)
 	{
-		if (lJack->m_jackType < lJack->m_jackType)
+		if (lJack->m_jackType < rJack->m_jackType)
 		{
 			return -1;
 		}
-		if (lJack->m_jackType == lJack->m_jackType)
+		if (lJack->m_jackType == rJack->m_jackType)
 		{
 			if (lJack->m_index < rJack->m_index)
 			{
