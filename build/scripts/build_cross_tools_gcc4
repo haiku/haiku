@@ -223,6 +223,7 @@ CFLAGS="$ccFlags" CXXFLAGS="$cxxFlags" "$gccSourceDir/configure" \
 	--disable-nls --disable-shared --with-system-zlib \
 	--enable-languages=c,c++ --enable-lto --enable-frame-pointer \
 	--with-sysroot="$sysrootDir" --disable-threads --disable-tls \
+	--disable-libatomic \
 	$gccConfigureArgs \
 	|| exit 1
 
