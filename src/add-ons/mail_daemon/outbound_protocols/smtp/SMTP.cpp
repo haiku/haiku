@@ -907,12 +907,15 @@ SMTPProtocol::Send(const char* to, const char* from, BPositionIO *message)
 		if (!foundCRLFPeriod) {
 			if (amountUnread <= 0) { // No more data, all we have is in the buffer.
 				if (bufferLen > 0) {
-                            #ifdef USE_SSL
-                                    if (use_ssl)
-                                            SSL_write(ssl,data,bufferLen);
-                                    else
-                            #endif
+#ifdef USE_SSL
+					if (use_ssl) {
+						SSL_write(ssl,data,bufferLen);
+					} else {
+						send (fSocket,data, bufferLen,0);
+					}
+#else
 					send (fSocket,data, bufferLen,0);
+#endif
 					ReportProgress (bufferLen,0);
 					if (bufferLen >= 2)
 						messageEndedWithCRLF = (data[bufferLen-2] == '\r' &&
@@ -924,14 +927,18 @@ SMTPProtocol::Send(const char* to, const char* from, BPositionIO *message)
 			// Send most of the buffer, except a few characters to overlap with
 			// the next read, in case the CRLFPeriod is split between reads.
 			if (bufferLen > 3) {
-                        #ifdef USE_SSL
-                            if (use_ssl) {
-                                    if (SSL_write(ssl,data,bufferLen - 3) < 0)
-                                        break;
-                            } else
-                        #endif
+#ifdef USE_SSL
+				if (use_ssl) {
+					if (SSL_write(ssl,data,bufferLen - 3) < 0)
+						break;
+				} else {
+					if (send (fSocket,data, bufferLen - 3,0) < 0)
+						break; // Stop when an error happens.
+				}
+#else
 				if (send (fSocket,data, bufferLen - 3,0) < 0)
 					break; // Stop when an error happens.
+#endif
 				ReportProgress (bufferLen - 3,0);
 				memmove (data, data + bufferLen - 3, 3);
 				bufferLen = 3;
