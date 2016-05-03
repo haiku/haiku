@@ -699,7 +699,7 @@ IMAPConnectionWorker::MessageExpungeReceived(uint32 index)
 	if (fSelectedBox == NULL)
 		return;
 
-	BLocker locker(this);
+	BAutolock locker(fLocker);
 
 	IMAPMailbox* mailbox = _MailboxFor(*fSelectedBox);
 	if (mailbox != NULL) {
