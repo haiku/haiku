@@ -47,8 +47,8 @@ DiscoveryAgent::StartInquiry(uint32 accessCode, DiscoveryListener* listener, big
 	CALLED();
     size_t size;
 
-    if (fMessenger == NULL)
-    	return B_ERROR;
+	if (fMessenger == NULL)
+		return B_ERROR;
 
 	if (secs < 1 || secs > 61 )
 		return B_TIMED_OUT;
