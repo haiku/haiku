@@ -17,7 +17,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TRACE(x...)			debug_printf("WebHandler: "x)
+#define TRACE(x...)			debug_printf("WebHandler: " x)
 #define TRACE_ERROR(x...)	debug_printf("WebHandler: "x)
 
 

@@ -20,8 +20,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TRACE(x...)			debug_printf("WebServer: "x)
-#define TRACE_ERROR(x...)	debug_printf("WebServer: "x)
+#define TRACE(x...)			debug_printf("WebServer: " x)
+#define TRACE_ERROR(x...)	debug_printf("WebServer: " x)
 
 
 WebServer::WebServer(BNetEndpoint *listener)

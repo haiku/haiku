@@ -29,9 +29,9 @@
 #include <string.h>
 
 
-#define TRACE(x...)				debug_printf("HTML5HWInterface: "x)
+#define TRACE(x...)				debug_printf("HTML5HWInterface: " x)
 #define TRACE_ALWAYS(x...)		debug_printf("HTML5HWInterface: "x)
-#define TRACE_ERROR(x...)		debug_printf("HTML5HWInterface: "x)
+#define TRACE_ERROR(x...)		debug_printf("HTML5HWInterface: " x)
 
 
 struct callback_info {

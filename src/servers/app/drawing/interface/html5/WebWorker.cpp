@@ -18,8 +18,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TRACE(x...)			debug_printf("WebWorker: "x)
-#define TRACE_ERROR(x...)	debug_printf("WebWorker: "x)
+#define TRACE(x...)			debug_printf("WebWorker: " x)
+#define TRACE_ERROR(x...)	debug_printf("WebWorker: " x)
 
 
 WebWorker::WebWorker(BNetEndpoint *endpoint, WebHandler *handler)
