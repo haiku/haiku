@@ -500,8 +500,9 @@ void MediaWriter::GetFlavor(flavor_info * outInfo, int32 id)
 		return;
 	}
 	AbstractFileInterfaceNode::GetFlavor(outInfo,id);
-	strcpy(outInfo->name, "OpenBeOS Media Writer");
-	strcpy(outInfo->info, "The OpenBeOS Media Writer consumes a multistream and writes a file.");
+	strcpy(outInfo->name, "Media Writer");
+	strcpy(outInfo->info,
+		"The Haiku Media Writer consumes a multistream and writes a file.");
 	outInfo->kinds |= B_BUFFER_CONSUMER;
 	outInfo->in_format_count = 1; // 1 input
 	media_format * formats = new media_format[outInfo->in_format_count];

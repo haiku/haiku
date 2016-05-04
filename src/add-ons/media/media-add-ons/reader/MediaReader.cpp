@@ -10,7 +10,7 @@
 // see also MediaReaderAddOn.cpp
 #include "../AbstractFileInterfaceNode.h"
 #include "MediaReader.h"
-#include "misc.h"
+#include "../misc.h"
 #include "debug.h"
 
 #include <Buffer.h>
@@ -728,8 +728,9 @@ void MediaReader::GetFlavor(flavor_info * outInfo, int32 id)
 		return;
 
 	AbstractFileInterfaceNode::GetFlavor(outInfo,id);
-	outInfo->name = strdup("OpenBeOS Media Reader");
-	outInfo->info = strdup("The OpenBeOS Media Reader reads a file and produces a multistream.");
+	outInfo->name = strdup("Media Reader");
+	outInfo->info = strdup(
+		"The Haiku Media Reader reads a file and produces a multistream.");
 	outInfo->kinds |= B_BUFFER_PRODUCER;
 	outInfo->out_format_count = 1; // 1 output
 	media_format * formats = new media_format[outInfo->out_format_count];
