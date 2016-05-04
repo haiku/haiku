@@ -24,7 +24,7 @@
 
 #define TRACE(x...)				/*debug_printf("RemoteHWInterface: "x)*/
 #define TRACE_ALWAYS(x...)		debug_printf("RemoteHWInterface: "x)
-#define TRACE_ERROR(x...)		debug_printf("RemoteHWInterface: "x)
+#define TRACE_ERROR(x...)		debug_printf("RemoteHWInterface: " x)
 
 
 struct callback_info {
