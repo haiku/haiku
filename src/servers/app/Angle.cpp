@@ -225,8 +225,8 @@ Angle::Constrain180()
 		return Angle(fAngleValue);
 
 	float value = fmodf(fAngleValue, 180);;
-    if (value < 0)
-        value += 180;
+	if (value < 0)
+		value += 180;
 	return Angle(value);
 }
 
@@ -242,8 +242,8 @@ Angle::Constrain90()
 		return Angle(fAngleValue);
 
 	float value = fmodf(fAngleValue, 90);;
-    if (value < 0)
-        value += 90;
+	if (value < 0)
+		value += 90;
 	return Angle(value);
 }
 
