@@ -240,9 +240,11 @@ PlaylistWindow::MessageReceived(BMessage* message)
 		case M_PLAYLIST_RANDOMIZE:
 			fListView->Randomize();
 			break;
+
 		case M_PLAYLIST_REMOVE:
 			fListView->RemoveSelected();
 			break;
+
 		case M_PLAYLIST_MOVE_TO_TRASH:
 		{
 			int32 index;
@@ -252,6 +254,7 @@ PlaylistWindow::MessageReceived(BMessage* message)
 				fListView->RemoveSelectionToTrash();
 			break;
 		}
+
 		default:
 			BWindow::MessageReceived(message);
 			break;

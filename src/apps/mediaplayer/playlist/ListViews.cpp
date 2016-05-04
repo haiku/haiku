@@ -722,11 +722,19 @@ DragSortableListView::RemoveSelected()
 {
 	BList indices;
 	GetSelectedItems(indices);
+	int32 index = CurrentSelection()-1;
 
 	DeselectAll();
 
 	if (indices.CountItems() > 0)
 		RemoveItemList(indices);
+
+	if (CountItems() > 0) {
+		if (index < 0)
+			index = 0;
+
+		Select(index);
+	}
 }
 
 // RemoveAll
