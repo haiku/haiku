@@ -886,10 +886,10 @@ flush_cache_ent(cache_ent *ce)
         return 0;
 
  restart:
-    if (ce->clone)
-        data = ce->clone;
-    else
-        data = ce->data;
+	if (ce->clone)
+		data = ce->clone;
+	else
+		data = ce->data;
 
 	if (chatty_io > 2) printf("flush: %7Ld\n", ce->block_num);
 	ret = beos_write_phys_blocks(ce->dev, ce->block_num, data, 1, ce->bsize);
