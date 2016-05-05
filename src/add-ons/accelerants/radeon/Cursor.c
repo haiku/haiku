@@ -187,11 +187,11 @@ void moveOneCursor( accelerator_info *ai, int crtc_idx, int x, int y )
 	xorigin = 0;
 	yorigin = 0;
 		
-    if( x < 0 )
-    	xorigin = -x;
+	if( x < 0 )
+		xorigin = -x;
     	
-    if( y < 0 ) 
-    	yorigin = -y;
+	if( y < 0 )
+		yorigin = -y;
 
 	if( crtc_idx == 0 )	{
 		OUTREG( ai->regs, RADEON_CUR_HORZ_VERT_OFF, RADEON_CUR_LOCK
