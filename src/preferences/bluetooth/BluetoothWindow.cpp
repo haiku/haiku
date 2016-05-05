@@ -65,13 +65,6 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 		new BMessage(kMsgRefresh), 0));
 	fMenubar->AddItem(menu);
 
-	menu = new BMenu(B_TRANSLATE("View"));
-	menu->AddItem(new BMenuItem(
-		B_TRANSLATE("Connections & channels" B_UTF8_ELLIPSIS), NULL, 0));
-	menu->AddItem(new BMenuItem(
-		B_TRANSLATE("Remote devices list" B_UTF8_ELLIPSIS), NULL, 0));
-	fMenubar->AddItem(menu);
-
 	menu = new BMenu(B_TRANSLATE("Help"));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("About Bluetooth" B_UTF8_ELLIPSIS),
 		new BMessage(B_ABOUT_REQUESTED), 0));
