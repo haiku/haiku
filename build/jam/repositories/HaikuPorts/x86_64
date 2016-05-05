@@ -296,8 +296,8 @@ RemotePackageRepository HaikuPorts
 	mkdepend-1.7-3
 	mpc-1.0.3-1
 	mpc_devel-1.0.3-1
-	mpfr-3.1.3-1
-	mpfr_devel-3.1.3-1
+	mpfr-3.1.4-1
+	mpfr_devel-3.1.4-1
 	mpg123-1.22.4-1
 	mpg123_devel-1.22.4-1
 	nano-2.5.3-1
