@@ -21,7 +21,7 @@ class ConnChanView;
 class BluetoothWindow : public BWindow {
 public:
 			BluetoothWindow(BRect frame);
-	bool	QuitRequested(void);
+	bool	QuitRequested();
 	void	MessageReceived(BMessage *message);
 
 private:

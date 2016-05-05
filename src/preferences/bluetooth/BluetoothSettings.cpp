@@ -16,7 +16,6 @@ BluetoothSettings::BluetoothSettings()
 
 BluetoothSettings::~BluetoothSettings()
 {
-
 }
 
 

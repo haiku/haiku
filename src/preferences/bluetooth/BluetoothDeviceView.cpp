@@ -67,36 +67,26 @@ BluetoothDeviceView::BluetoothDeviceView(BluetoothDevice* bDevice, uint32 flags)
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 5)
 		.SetInsets(10)
 		.Add(fIcon)
-		.AddGlue()
 		.AddGroup(B_VERTICAL, 0)
 			.SetInsets(5)
 			.Add(fName)
-			.AddGlue()
 			.Add(fBdaddr)
-			.AddGlue()
 			.Add(fClass)
-			.AddGlue()
 			.Add(fClassService)
-			.AddGlue()
 			.Add(fHCIVersionProperties)
-			.AddGlue()
 			.Add(fLMPVersionProperties)
-			.AddGlue()
 			.Add(fManufacturerProperties)
-			.AddGlue()
 			.Add(fACLBuffersProperties)
-			.AddGlue()
 			.Add(fSCOBuffersProperties)
 		.End()
-		//.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
+		.AddGlue()
 	.End();
 
 }
 
 
-BluetoothDeviceView::~BluetoothDeviceView(void)
+BluetoothDeviceView::~BluetoothDeviceView()
 {
-
 }
 
 
@@ -104,7 +94,6 @@ void
 BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 {
 	if (bDevice != NULL) {
-
 		SetName(bDevice->GetFriendlyName().String());
 
 		fName->SetText(bDevice->GetFriendlyName().String());
@@ -158,16 +147,13 @@ BluetoothDeviceView::SetBluetoothDevice(BluetoothDevice* bDevice)
 		if (bDevice->GetProperty("sco_max_pkt", &value) == B_OK)
 			string << B_TRANSLATE(" packets: ") << value;
 		fSCOBuffersProperties->SetText(string.String());
-
 	}
-
 }
 
 
 void
 BluetoothDeviceView::SetTarget(BHandler* target)
 {
-
 }
 
 
@@ -188,5 +174,4 @@ BluetoothDeviceView::MessageReceived(BMessage* message)
 void
 BluetoothDeviceView::SetEnabled(bool value)
 {
-
 }

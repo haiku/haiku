@@ -22,7 +22,7 @@ class BluetoothDeviceView : public BView
 public:
 	BluetoothDeviceView(BluetoothDevice* bDevice,
 		uint32 flags = B_WILL_DRAW);
-	~BluetoothDeviceView(void);
+	~BluetoothDeviceView();
 
 			void SetBluetoothDevice(BluetoothDevice* bDevice);
 

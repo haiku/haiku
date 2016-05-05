@@ -18,8 +18,9 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "main"
 
-BluetoothApplication::BluetoothApplication(void)
- :	BApplication(BLUETOOTH_APP_SIGNATURE)
+BluetoothApplication::BluetoothApplication()
+	:
+	BApplication(BLUETOOTH_APP_SIGNATURE)
 {
 }
 
@@ -130,8 +131,8 @@ BluetoothApplication::AboutRequested()
 int
 main(int, char**)
 {
-	BluetoothApplication myApplication;
-	myApplication.Run();
+	BluetoothApplication app;
+	app.Run();
 
 	return 0;
 }
