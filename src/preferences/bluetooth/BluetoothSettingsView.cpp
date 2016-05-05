@@ -16,8 +16,7 @@
 
 #include <Box.h>
 #include <Catalog.h>
-#include <GridLayoutBuilder.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <MenuField.h>
 #include <MenuItem.h>
 #include <PopUpMenu.h>
@@ -95,27 +94,21 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 	fClassMenuField = new BMenuField("class", B_TRANSLATE("Identify host as:"),
 		fClassMenu);
 
-	// controls pane
-	AddChild(BGridLayoutBuilder(10, 10)
+	BLayoutBuilder::Grid<>(this, 0)
+		.SetInsets(10)
 		.Add(fClassMenuField->CreateLabelLayoutItem(), 0, 0)
 		.Add(fClassMenuField->CreateMenuBarLayoutItem(), 1, 0)
 
 		.Add(fPolicyMenuField->CreateLabelLayoutItem(), 0, 1)
 		.Add(fPolicyMenuField->CreateMenuBarLayoutItem(), 1, 1)
 
-		.Add(BSpaceLayoutItem::CreateGlue(), 0, 2, 2)
-
-		.Add(fInquiryTimeControl, 0, 3, 2)
-		.Add(BSpaceLayoutItem::CreateGlue(), 0, 4, 2)
+		.Add(fInquiryTimeControl, 0, 2, 2)
 
 		.Add(fLocalDevicesMenuField->CreateLabelLayoutItem(), 0, 5)
 		.Add(fLocalDevicesMenuField->CreateMenuBarLayoutItem(), 1, 5)
 
 		.Add(fExtDeviceView, 0, 6, 2)
-		.Add(BSpaceLayoutItem::CreateGlue(), 0, 7, 2)
-
-		.SetInsets(10, 10, 10, 10)
-	);
+	.End();
 }
 
 

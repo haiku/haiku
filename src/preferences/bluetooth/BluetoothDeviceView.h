@@ -20,8 +20,7 @@ class BitmapView;
 class BluetoothDeviceView : public BView
 {
 public:
-	BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice,
-		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+	BluetoothDeviceView(BluetoothDevice* bDevice,
 		uint32 flags = B_WILL_DRAW);
 	~BluetoothDeviceView(void);
 

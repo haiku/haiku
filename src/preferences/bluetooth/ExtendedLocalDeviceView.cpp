@@ -11,7 +11,7 @@
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <CheckBox.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
 
@@ -26,35 +26,28 @@ ExtendedLocalDeviceView::ExtendedLocalDeviceView(BRect frame,
 	fDevice(bDevice),
 	fScanMode(0)
 {
-	SetViewColor(B_TRANSPARENT_COLOR);
-	SetLowColor(0, 0, 0);
-	BRect iDontCare(0, 0, 0, 0);
+	fDeviceView = new BluetoothDeviceView(bDevice);
 
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
-	fDeviceView = new BluetoothDeviceView(BRect(0, 0, 5, 5), bDevice);
-
-	fDiscoverable = new BCheckBox(iDontCare, "Discoverable",
+	fDiscoverable = new BCheckBox("Discoverable",
 		B_TRANSLATE("Discoverable"), new BMessage(SET_DISCOVERABLE));
-	fVisible = new BCheckBox(iDontCare, "Visible",
+	fVisible = new BCheckBox("Visible",
 		B_TRANSLATE("Show name"), new BMessage(SET_VISIBLE));
-	fAuthentication = new BCheckBox(iDontCare, "Authenticate",
+	fAuthentication = new BCheckBox("Authenticate",
 		B_TRANSLATE("Authenticate"), new BMessage(SET_AUTHENTICATION));
 
 	SetEnabled(false);
 
-	AddChild(BGroupLayoutBuilder(B_VERTICAL, 0)
-				.Add(fDeviceView)
-				.Add(BGroupLayoutBuilder(B_HORIZONTAL)
-						.AddGlue()
-						.Add(fDiscoverable)
-						.Add(fVisible)
-						.SetInsets(5, 5, 5, 5)
-					)
-				.Add(fAuthentication)
-				.Add(BSpaceLayoutItem::CreateVerticalStrut(0))
-			.SetInsets(5, 5, 5, 5)
-	);
+	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(5)
+		.Add(fDeviceView)
+		.AddGroup(B_HORIZONTAL, 0)
+			.SetInsets(5)
+			.AddGlue()
+			.Add(fDiscoverable)
+			.Add(fVisible)
+		.End()
+		.Add(fAuthentication)
+	.End();
 }
 
 

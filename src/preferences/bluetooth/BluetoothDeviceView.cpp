@@ -11,7 +11,7 @@
 
 #include <Bitmap.h>
 #include <Catalog.h>
-#include <GroupLayoutBuilder.h>
+#include <LayoutBuilder.h>
 #include <Locale.h>
 #include <SpaceLayoutItem.h>
 #include <StringView.h>
@@ -21,17 +21,11 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Device View"
 
-BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice,
-	uint32 resizingMode, uint32 flags)
+BluetoothDeviceView::BluetoothDeviceView(BluetoothDevice* bDevice, uint32 flags)
 	:
-	BView(frame,"BluetoothDeviceView", resizingMode, flags | B_WILL_DRAW),
+	BView("BluetoothDeviceView", flags | B_WILL_DRAW),
 	fDevice(bDevice)
 {
-	SetViewColor(B_TRANSPARENT_COLOR);
-	SetLowColor(0, 0, 0);
-
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	fName = new BStringView("name", "");
 	fName->SetFont(be_bold_font);
 	fName->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT, B_ALIGN_MIDDLE));
@@ -64,40 +58,38 @@ BluetoothDeviceView::BluetoothDeviceView(BRect frame, BluetoothDevice* bDevice,
 	fSCOBuffersProperties->SetExplicitAlignment(BAlignment(B_ALIGN_LEFT,
 		B_ALIGN_MIDDLE));
 
-
 	fIcon = new BView(BRect(0, 0, 32 - 1, 32 - 1), "Icon", B_FOLLOW_ALL,
 		B_WILL_DRAW);
 	fIcon->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
 
 	SetBluetoothDevice(bDevice);
 
-	AddChild(BGroupLayoutBuilder(B_HORIZONTAL, 5)
-				.Add(fIcon)
-				.AddGlue()
-				.Add(BGroupLayoutBuilder(B_VERTICAL)
-						.Add(fName)
-						.AddGlue()
-						.Add(fBdaddr)
-						.AddGlue()
-						.Add(fClass)
-						.AddGlue()
-						.Add(fClassService)
-						.AddGlue()
-						.AddGlue()
-						.Add(fHCIVersionProperties)
-						.AddGlue()
-						.Add(fLMPVersionProperties)
-						.AddGlue()
-						.Add(fManufacturerProperties)
-						.AddGlue()
-						.Add(fACLBuffersProperties)
-						.AddGlue()
-						.Add(fSCOBuffersProperties)
-						.SetInsets(5, 5, 5, 5)
-					)
-			//	.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
-			.SetInsets(10, 10, 10, 10)
-	);
+	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 5)
+		.SetInsets(10)
+		.Add(fIcon)
+		.AddGlue()
+		.AddGroup(B_VERTICAL, 0)
+			.SetInsets(5)
+			.Add(fName)
+			.AddGlue()
+			.Add(fBdaddr)
+			.AddGlue()
+			.Add(fClass)
+			.AddGlue()
+			.Add(fClassService)
+			.AddGlue()
+			.Add(fHCIVersionProperties)
+			.AddGlue()
+			.Add(fLMPVersionProperties)
+			.AddGlue()
+			.Add(fManufacturerProperties)
+			.AddGlue()
+			.Add(fACLBuffersProperties)
+			.AddGlue()
+			.Add(fSCOBuffersProperties)
+		.End()
+		//.Add(BSpaceLayoutItem::CreateHorizontalStrut(5))
+	.End();
 
 }
 

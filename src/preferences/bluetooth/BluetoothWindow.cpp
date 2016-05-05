@@ -39,8 +39,6 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 	BWindow(frame, B_TRANSLATE_SYSTEM_NAME("Bluetooth"), B_TITLED_WINDOW,
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS)
 {
-	SetLayout(new BGroupLayout(B_HORIZONTAL));
-
 	fDefaultsButton = new BButton("defaults", B_TRANSLATE("Defaults"),
 		new BMessage(kMsgSetDefaults), B_WILL_DRAW);
 
@@ -93,16 +91,16 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 	fRevertButton->SetEnabled(false);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
+		.SetInsets(0)
 		.Add(fMenubar)
-		.AddStrut(B_USE_DEFAULT_SPACING)
+		.AddStrut(B_USE_HALF_ITEM_SPACING)
 		.Add(tabView)
-		.AddStrut(B_USE_DEFAULT_SPACING)
-		.AddGroup(B_HORIZONTAL, 0)
-			.Add(fRevertButton)
+		.AddGroup(B_HORIZONTAL, B_USE_HALF_ITEM_SPACING)
 			.AddGlue()
 			.Add(fDefaultsButton)
-			.End()
-		.SetInsets(B_USE_WINDOW_SPACING);
+			.Add(fRevertButton)
+		.End()
+	.End();
 }
 
 
