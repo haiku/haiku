@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.04.28
-#	Date:    2016-04-28 03:15:02
+#	Version: 2016.05.02
+#	Date:    2016-05-02 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -2145,6 +2145,7 @@
 		1787 2020  R9 290X IceQ X² Turbo
 		1787 2357  Grenada XT [Radeon R9 390X]
 	67b1  Hawaii PRO [Radeon R9 290/390]
+		1043 04dd  STRIX R9 390
 		148c 2358  Radeon R9 390
 	67b9  Vesuvius [Radeon R9 295X2]
 	67be  Hawaii LE
@@ -18475,6 +18476,10 @@
 	0095  Octeon III CN78XX Network Processor
 	0096  Octeon III CN70XX Network Processor
 	9700  Octeon III CN73XX Network Processor
+	9702  CN23XX [LiquidIO II] Intelligent Adapter
+		177d 0003  CN2350 [LiquidIO II] 2-port 10GbE Intelligent adapter
+		177d 0004  CN2350 [LiquidIO II] 2-port 25GbE Intelligent adapter
+	9712  CN23XX [LiquidIO II] SRIOV Virtual Function
 	9800  Octeon Fusion CNF75XX Processor
 	a001  THUNDERX MRML Bridge
 	a002  THUNDERX PCC Bridge
@@ -22961,6 +22966,37 @@
 	225c  Xeon Phi coprocessor SE10/7120 series
 	225d  Xeon Phi coprocessor 3120 series 
 	225e  Xeon Phi coprocessor 31S1
+	2280  Braswell SoC Transaction Router
+	2284  Braswell HD Audio Controller
+	2286  Braswell Serial I/O DMA
+	228a  Braswell Serial I/O HSUART Port 1
+	228c  Braswell Serial I/O HSUART Port 2
+	2292  Braswell Platform Controller Unit SMBus
+	2294  Braswell Storage Cluster Control MMC Port
+	2295  Braswell Storage Cluster Control SDIO Port
+	2296  Braswell Storage Cluster Control SD Port
+	2298  Braswell Trusted Execution Engine Interface
+	229c  Braswell Platform Controller Unit LPC
+	22a3  Braswell SATA Controller
+	22a4  Braswell SATA AHCI Controller
+	22a8  Braswell Low Power Engine Audio
+	22b0  Braswell PCI Configuration Registers
+	22b1  Braswell Integrated Graphics Controller
+	22b5  Braswell USB xHCI Host Controller
+	22b8  Braswell ISP Camera
+	22c0  Braswell Serial I/O DMA
+	22c1  Braswell Serial I/O I2C Port 1
+	22c2  Braswell Serial I/O I2C Port 2
+	22c3  Braswell Serial I/O I2C Port 3
+	22c4  Braswell Serial I/O I2C Port 4
+	22c5  Braswell Serial I/O I2C Port 5
+	22c6  Braswell Serial I/O I2C Port 6
+	22c7  Braswell Serial I/O I2C Port 7
+	22c8  Braswell PCIe Port 1
+	22ca  Braswell PCIe Port 2
+	22cc  Braswell PCIe Port 3
+	22ce  Braswell PCIe Port 4
+	22dc  Braswell P-Unit Power Management
 	2310  DH89xxCC LPC Controller
 	2323  DH89xxCC 4 Port SATA AHCI Controller
 	2330  DH89xxCC SMBus Controller
