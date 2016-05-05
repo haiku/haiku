@@ -37,9 +37,11 @@ compute_order(unsigned long size)
 	int	order;
 	unsigned long tmp;
 	for (order = 0, tmp = size; tmp >>= 1; ++order);
-		if (size & ~(1 << order))
-			++order;
-		return order;
+
+	if (size & ~(1 << order))
+		++order;
+
+	return order;
 }
 
 
