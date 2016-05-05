@@ -202,7 +202,8 @@ void PicturePrinter::DrawPixels(BRect src, BRect dest, int32 width, int32 height
 
 void PicturePrinter::SetClippingRects(BRect *rects, uint32 numRects) { 
 	Indent(); Print("SetClippingRects"); 
-	if (numRects == 0) Print("none"); Cr();
+	if (numRects == 0) Print("none");
+	Cr();
 	Print(numRects, rects);
 }
 
