@@ -28,20 +28,16 @@ void
 BluetoothApplication::ReadyToRun()
 {
 	if (!be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
-		BAlert* alert = new BAlert("bluetooth_server not running",
-			B_TRANSLATE("bluetooth_server has not been found running on the "
-			"system. Should be started, or stay offline"),
-			B_TRANSLATE("Work offline"), B_TRANSLATE("Quit"),
-			B_TRANSLATE("Start please"), B_WIDTH_AS_USUAL,
-			B_WARNING_ALERT);
-		alert->SetShortcut(2, B_ESCAPE);
+		BAlert* alert = new BAlert("Services not running",
+			B_TRANSLATE("The Bluetooth services are not currently running "
+				"on this system."),
+			B_TRANSLATE("Launch now"), B_TRANSLATE("Quit"), "",
+			B_WIDTH_AS_USUAL, B_WARNING_ALERT);
+		alert->SetShortcut(1, B_ESCAPE);
 		int32 choice = alert->Go();
 
-
 		switch (choice) {
-			case 1:
-				PostMessage(B_QUIT_REQUESTED);
-			case 2:
+			case 0:
 			{
 				status_t error;
 				error = be_roster->Launch(BLUETOOTH_SIGNATURE);
@@ -54,7 +50,11 @@ BluetoothApplication::ReadyToRun()
 				// when it's ready and you could just create window
 				BMessageRunner::StartSending(be_app_messenger,
 					new BMessage('Xtmp'), 2 * 1000000, 1);
+				break;
 			}
+			case 1:
+				PostMessage(B_QUIT_REQUESTED);
+				break;
 		}
 
 		return;
