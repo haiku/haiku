@@ -378,8 +378,8 @@ LocalDebuggerInterface::GetNextDebugEvent(DebugEvent*& _event)
 				if (message.origin.thread >= 0 && message.origin.nub_port >= 0)
 					error = continue_thread(message.origin.nub_port,
 						message.origin.thread);
-					if (error != B_OK)
-						return error;
+				if (error != B_OK)
+					return error;
 				continue;
 			}
 
