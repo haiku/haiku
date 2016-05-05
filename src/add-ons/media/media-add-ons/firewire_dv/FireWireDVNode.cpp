@@ -38,7 +38,7 @@
 
 #define REVISION		"unknown"
 #define VERSION			"1.0"
-#define BUILD	 		__DATE__ " "__TIME__
+#define BUILD	 		__DATE__ " " __TIME__
 
 // debugging
 #ifdef TRACE
