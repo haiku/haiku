@@ -130,10 +130,10 @@ Port::SetPipe(Pipe* pipe)
 
     uint32 portState = read32(portRegister);
 
-    if (pipe->Index() == INTEL_PIPE_A)
-        write32(portRegister, portState & ~DISPLAY_MONITOR_PIPE_B);
-    else
-        write32(portRegister, portState | DISPLAY_MONITOR_PIPE_B);
+	if (pipe->Index() == INTEL_PIPE_A)
+		write32(portRegister, portState & ~DISPLAY_MONITOR_PIPE_B);
+	else
+		write32(portRegister, portState | DISPLAY_MONITOR_PIPE_B);
 
 	fPipe = pipe;
 
