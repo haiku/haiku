@@ -677,7 +677,7 @@ status_t nv_acc_init_dma()
 
 			/* setup some unknown serially accessed registers (?) */
 			tmp = (NV_REG32(NV32_NV4X_WHAT0) & 0x000000ff);
-			for (cnt = 0; (tmp && !(tmp & 0x00000001)); tmp >>= 1, cnt++);
+			for (cnt = 0; (tmp && !(tmp & 0x00000001)); tmp >>= 1, cnt++)
 			{
 				ACCW(NV4X_WHAT2, cnt);
 			}
