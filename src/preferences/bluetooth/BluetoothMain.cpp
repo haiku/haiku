@@ -8,6 +8,7 @@
 #include <Catalog.h>
 #include <MessageRunner.h>
 #include <Roster.h>
+#include <private/interface/AboutWindow.h>
 
 #include "BluetoothMain.h"
 #include "BluetoothWindow.h"
@@ -91,40 +92,38 @@ BluetoothApplication::MessageReceived(BMessage* message)
 void
 BluetoothApplication::AboutRequested()
 {
-	BAlert* alert = new BAlert("about", B_TRANSLATE(
-							"Haiku Bluetooth system, (ARCE)\n\n"
-							"Created by Oliver Ruiz Dorantes\n\n"
-							"With support of:\n"
-							"	- Mika Lindqvist\n"
-							"	- Adrien Destugues\n"
-							"	- Maksym Yevmenkin\n\n"
-							"Thanks to the individuals who helped...\n\n"
-							"Shipping/donating hardware:\n"
-							"	- Henry Jair Abril Florez (el Colombian)\n"
-							"		& Stefanie Bartolich\n"
-							"	- Edwin Erik Amsler\n"
-							"	- Dennis d'Entremont\n"
-							"	- Luroh\n"
-							"	- Pieter Panman\n\n"
-							"Economically:\n"
-							"	- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n"
-							"	- Matt M, Doug F, Hubert H,\n"
-							"	- Sebastian B, Andrew M, Jared E,\n"
-							"	- Frederik H, Tom S, Ferry B,\n"
-							"	- Greg G, David F, Richard S, Martin W:\n\n"
-							"With patches:\n"
-							"	- Michael Weirauch\n"
-							"	- Fredrik Ekdahl\n"
-							"	- Raynald Lesieur\n"
-							"	- Andreas Färber\n"
-							"	- Joerg Meyer\n"
-							"Testing:\n"
-							"	- Petter H. Juliussen\n"
-							"Who gave me all the knowledge:\n"
-							"	- the yellowTAB team"),
-						B_TRANSLATE("OK"));
-	alert->SetFlags(alert->Flags() | B_CLOSE_ON_ESCAPE);
-	alert->Go();
+	BAboutWindow* about = new BAboutWindow("Bluetooth", BLUETOOTH_APP_SIGNATURE);
+	about->AddCopyright(2010, "Oliver Ruiz Dorantes");
+	about->AddText(B_TRANSLATE(
+		"With support of:\n"
+		" - Mika Lindqvist\n"
+		" - Adrien Destugues\n"
+		" - Maksym Yevmenkin\n\n"
+		"Thanks to the individuals who helped...\n\n"
+		"Shipping/donating hardware:\n"
+		" - Henry Jair Abril Florez (el Colombian)\n"
+		"	& Stefanie Bartolich\n"
+		" - Edwin Erik Amsler\n"
+		" - Dennis d'Entremont\n"
+		" - Luroh\n"
+		" - Pieter Panman\n\n"
+		"Economically:\n"
+		" - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n"
+		" - Matt M, Doug F, Hubert H,\n"
+		" - Sebastian B, Andrew M, Jared E,\n"
+		" - Frederik H, Tom S, Ferry B,\n"
+		" - Greg G, David F, Richard S, Martin W:\n\n"
+		"With patches:\n"
+		" - Michael Weirauch\n"
+		" - Fredrik Ekdahl\n"
+		" - Raynald Lesieur\n"
+		" - Andreas Färber\n"
+		" - Joerg Meyer\n"
+		"Testing:\n"
+		" - Petter H. Juliussen\n"
+		"Who gave me all the knowledge:\n"
+		" - the yellowTAB team"));
+	about->Show();
 }
 
 
