@@ -652,8 +652,8 @@ TIFFTranslator::translate_from_bits(BPositionIO *inSource, uint32 outType,
 		TIFF* tif = TIFFClientOpen("TIFFTranslator", "w", outDestination,
 			tiff_read_proc, tiff_write_proc, tiff_seek_proc, tiff_close_proc,
 			tiff_size_proc, tiff_map_file_proc, tiff_unmap_file_proc);
-	    if (!tif)
-	    	return B_NO_TRANSLATOR;
+		if (!tif)
+			return B_NO_TRANSLATOR;
 
 		// common fields which are independent of the bitmap format
 		uint32 width = bitsHeader.bounds.IntegerWidth() + 1;
