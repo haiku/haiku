@@ -27,7 +27,7 @@
 
 #define REVISION		"unknown"
 #define VERSION			"1.0"
-#define BUILD	 		__DATE__ " "__TIME__
+#define BUILD	 		__DATE__ " " __TIME__
 
 #define BUILD_FOR_HAIKU 1
 
