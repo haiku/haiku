@@ -95,9 +95,9 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 		.AddGroup(B_HORIZONTAL)
 			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
 				B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING)
-			.AddGlue()
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
+			.AddGlue()
 		.End()
 	.End();
 }
