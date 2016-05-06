@@ -59,7 +59,6 @@ ExtendedLocalDeviceView::~ExtendedLocalDeviceView()
 void
 ExtendedLocalDeviceView::SetLocalDevice(LocalDevice* lDevice)
 {
-	printf("ExtendedLocalDeviceView::SetLocalDevice\n");
 	if (lDevice != NULL) {
 		fDevice = lDevice;
 		SetName(lDevice->GetFriendlyName().String());
@@ -84,7 +83,6 @@ ExtendedLocalDeviceView::SetLocalDevice(LocalDevice* lDevice)
 void
 ExtendedLocalDeviceView::AttachedToWindow()
 {
-	printf("ExtendedLocalDeviceView::AttachedToWindow\n");
 	fDiscoverable->SetTarget(this);
 	fVisible->SetTarget(this);
 	fAuthentication->SetTarget(this);
@@ -101,10 +99,9 @@ ExtendedLocalDeviceView::SetTarget(BHandler* target)
 void
 ExtendedLocalDeviceView::MessageReceived(BMessage* message)
 {
-	printf("ExtendedLocalDeviceView::MessageReceived\n");
-
 	if (fDevice == NULL) {
 		printf("ExtendedLocalDeviceView::Device missing\n");
+		BView::MessageReceived(message);
 		return;
 	}
 
@@ -140,7 +137,7 @@ ExtendedLocalDeviceView::MessageReceived(BMessage* message)
 
 		default:
 			BView::MessageReceived(message);
-		break;
+			break;
 	}
 }
 
@@ -148,8 +145,6 @@ ExtendedLocalDeviceView::MessageReceived(BMessage* message)
 void
 ExtendedLocalDeviceView::SetEnabled(bool value)
 {
-	printf("ExtendedLocalDeviceView::SetEnabled\n");
-
 	fVisible->SetEnabled(value);
 	fAuthentication->SetEnabled(value);
 	fDiscoverable->SetEnabled(value);
@@ -159,8 +154,6 @@ ExtendedLocalDeviceView::SetEnabled(bool value)
 void
 ExtendedLocalDeviceView::ClearDevice()
 {
-	printf("ExtendedLocalDeviceView::ClearDevice\n");
-
 	fVisible->SetValue(false);
 	fAuthentication->SetValue(false);
 	fDiscoverable->SetValue(false);
