@@ -149,7 +149,7 @@ DeskbarReplicant::MessageReceived(BMessage* msg)
 			break;
 
 		case kMsgOpenBluetoothPreferences:
-			_OpenBluetoothPreferences();
+			be_roster->Launch(BLUETOOTH_APP_SIGNATURE);
 			break;
 
 		case kMsgQuitBluetoothServer:
@@ -193,16 +193,6 @@ DeskbarReplicant::MouseDown(BPoint where)
 	menu->SetTargetForItems(this);
 	ConvertToScreen(&point);
 	menu->Go(point, true, true, true);
-}
-
-
-void
-DeskbarReplicant::_OpenBluetoothPreferences()
-{
-	status_t status = be_roster->Launch(BLUETOOTH_APP_SIGNATURE);
-	if (status < B_OK) {
-		_ShowErrorAlert("Launching the Bluetooth preflet failed.", status);
-	}
 }
 
 
