@@ -139,10 +139,14 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 		{
 			DeviceListItem* device = static_cast<DeviceListItem*>(fDeviceList
 				->ItemAt(fDeviceList->CurrentSelection(0)));
-			RemoteDevice* remote = dynamic_cast<RemoteDevice*>(device->Device());
+			if (device == NULL)
+				break;
 
-			if (remote != NULL)
-				remote->Authenticate();
+			RemoteDevice* remote = dynamic_cast<RemoteDevice*>(device->Device());
+			if (remote == NULL)
+				break;
+
+			remote->Authenticate();
 
 			break;
 		}
@@ -150,10 +154,14 @@ RemoteDevicesView::MessageReceived(BMessage* message)
 		{
 			DeviceListItem* device = static_cast<DeviceListItem*>(fDeviceList
 				->ItemAt(fDeviceList->CurrentSelection(0)));
-			RemoteDevice* remote = dynamic_cast<RemoteDevice*>(device->Device());
+			if (device == NULL)
+				break;
 
-			if (remote != NULL)
-				remote->Disconnect();
+			RemoteDevice* remote = dynamic_cast<RemoteDevice*>(device->Device());
+			if (remote == NULL)
+				break;
+
+			remote->Disconnect();
 
 			break;
 		}
