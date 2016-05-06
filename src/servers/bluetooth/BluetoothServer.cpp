@@ -343,9 +343,9 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 		for (int index = lastIndex + 1;
 			index < fLocalDevicesList.CountItems();	index++) {
 			lDeviceImpl= fLocalDevicesList.ItemAt(index);
-			printf("Requesting local device %" B_PRId32 "\n",
-				lDeviceImpl->GetID());
 			if (lDeviceImpl != NULL && lDeviceImpl->Available()) {
+				printf("Requested local device %" B_PRId32 "\n",
+					lDeviceImpl->GetID());
 				Output::Instance()->Postf(BLACKBOARD_KIT,
 					"Device available: %lx\n", lDeviceImpl->GetID());
 				lastIndex = index;
@@ -357,9 +357,9 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 		if (lDeviceImpl == NULL) {
 			for (int index = 0; index <= lastIndex ; index ++) {
 				lDeviceImpl = fLocalDevicesList.ItemAt(index);
-				printf("Requesting local device %" B_PRId32 "\n",
-					lDeviceImpl->GetID());
 				if (lDeviceImpl != NULL && lDeviceImpl->Available()) {
+					printf("Requested local device %" B_PRId32 "\n",
+						lDeviceImpl->GetID());
 					Output::Instance()->Postf(BLACKBOARD_KIT,
 						"Device available: %lx\n", lDeviceImpl->GetID());
 					lastIndex = index;
