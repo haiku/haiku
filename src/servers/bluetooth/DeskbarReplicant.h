@@ -34,7 +34,6 @@ class DeskbarReplicant : public BView {
 	private:
 		void			_Init();
 
-		void			_ShowBluetoothServerConsole();
 		void			_QuitBluetoothServer();
 
 		void			_ShowErrorAlert(BString msg, status_t status);

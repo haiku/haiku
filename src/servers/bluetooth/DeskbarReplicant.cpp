@@ -26,7 +26,6 @@
 extern "C" _EXPORT BView *instantiate_deskbar_item(void);
 status_t our_image(image_info& image);
 
-const uint32 kMsgShowBluetoothServerConsole = 'sbtc';
 const uint32 kMsgOpenBluetoothPreferences = 'obtp';
 const uint32 kMsgQuitBluetoothServer = 'qbts';
 
@@ -144,10 +143,6 @@ void
 DeskbarReplicant::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
-		case kMsgShowBluetoothServerConsole:
-			_ShowBluetoothServerConsole();
-			break;
-
 		case kMsgOpenBluetoothPreferences:
 			be_roster->Launch(BLUETOOTH_APP_SIGNATURE);
 			break;
@@ -179,34 +174,12 @@ DeskbarReplicant::MouseDown(BPoint where)
 
 	// TODO show list of known/paired devices
 
-	/* The code below is for development purposes only, but doesn't
-	 * hurt to be enabled as long as in alpha state.
-	 */
-	menu->AddSeparatorItem();
-
-	menu->AddItem(new BMenuItem("Show server console" B_UTF8_ELLIPSIS,
-		new BMessage(kMsgShowBluetoothServerConsole)));
-
-	menu->AddItem(new BMenuItem("Stop server",
+	menu->AddItem(new BMenuItem("Quit",
 		new BMessage(kMsgQuitBluetoothServer)));
 
 	menu->SetTargetForItems(this);
 	ConvertToScreen(&point);
 	menu->Go(point, true, true, true);
-}
-
-
-void
-DeskbarReplicant::_ShowBluetoothServerConsole()
-{
-	if (!be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
-		return;
-	}
-	status_t status = BMessenger(BLUETOOTH_SIGNATURE).SendMessage(
-		BT_MSG_SERVER_SHOW_CONSOLE);
-	if (status < B_OK) {
-		_ShowErrorAlert("Showing the Bluetooth server console failed.", status);
-	}
 }
 
 
