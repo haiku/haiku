@@ -214,6 +214,10 @@ void
 DeskbarReplicant::_QuitBluetoothServer()
 {
 	if (!be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
+		// The server isn't running, so remove ourself
+		BDeskbar deskbar;
+		deskbar.RemoveItem(kDeskbarItemName);
+
 		return;
 	}
 	status_t status = BMessenger(BLUETOOTH_SIGNATURE).SendMessage(
