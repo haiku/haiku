@@ -22,10 +22,9 @@ class BCheckBox;
 class ExtendedLocalDeviceView : public BView
 {
 public:
-	ExtendedLocalDeviceView(BRect frame, LocalDevice* bDevice,
-		uint32 resizingMode = B_FOLLOW_LEFT | B_FOLLOW_TOP,
+	ExtendedLocalDeviceView(LocalDevice* bDevice,
 		uint32 flags = B_WILL_DRAW);
-	~ExtendedLocalDeviceView(void);
+	~ExtendedLocalDeviceView();
 
 	void SetLocalDevice(LocalDevice* lDevice);
 

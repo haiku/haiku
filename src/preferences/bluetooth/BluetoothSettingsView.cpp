@@ -69,7 +69,7 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 	fInquiryTimeControl->SetHashMarkCount(255 / 15);
 	fInquiryTimeControl->SetEnabled(true);
 
-	fExtDeviceView = new ExtendedLocalDeviceView(BRect(0, 0, 5, 5), NULL);
+	fExtDeviceView = new ExtendedLocalDeviceView(NULL);
 
 	// localdevices menu
 	_BuildLocalDevicesMenu();
