@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2012-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2012-2016, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>User Guide</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -44,6 +44,7 @@
 <li><a href="../pt_BR/workshop-wlan.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../ca/workshop-wlan.html"><img src="../images/flags/ca.png" alt="" />Català</a></li>
 <li><a href="../pl/workshop-wlan.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
+<li><a href="../ro/workshop-wlan.html"><img src="../images/flags/ro.png" alt="" />Română</a></li>
 <li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -56,7 +57,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -82,7 +82,7 @@ PCMCIA, CardBus, ExpressCard, USB und ISA Geräte funktionieren noch nicht.</div
 <p>Selbst wenn die erste Hürde von generell unterstützter Hardware genommen ist, benötigen einige Funknetzkarten noch Firmware Module um richtig zu funktionieren. Einige dieser proprietären Firmwaredateien dürfen aus lizenzrechtlichen Gründen nicht mit Haiku geliefert werden. Haiku bietet allerdings ein einfaches Skript, das alle benötigten Dateien herunterlädt und installiert. Wer drahtlos online gehen möchte, sollte das Skript ausführen um sicherzugehen, dass alle eventuell benötigten Firmwaredateien an Bord sind.</p>
 <p>Dazu öffnet man ein Terminal und schreibt:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
-<p>Nun werden die entsprechenden Lizenzen angezeigt, die akzeptiert werden müssen bevor die Firmwaredateien installiert werden.</p>
+<p>Es werden die entsprechenden Lizenzen angezeigt, die akzeptiert werden müssen bevor die Firmwaredateien installiert werden.</p>
 
 <p>Besteht keine Internetverbindung, um die fehlenden Firmwaredateien unter Haiku herunterzuladen, gibt es auch eine Offline-Methode, siehe <a href="#tips">Tipps</a> weiter unten.</p>
 
@@ -115,20 +115,23 @@ Die Ausgabe zeigt den öffenlichen Namen (SSID), die MAC Adresse, Signalstärke 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="tips" name="tips">Tipps</a></h2>
-<h3>Offline download of binary firmware files</h3>
-<p>If you cannot obtain the binary firmware files via the <tt>install-wifi-firmwares.sh</tt> script (for example due to lack of internet connection within Haiku), you can also download <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">this shell script</a>, and run it from any other OS that has <tt>wget</tt> and <tt>zip</tt> installed.<br />
-The script will download the needed files and create a zip file that is to be extracted to Haiku's <tt>/boot</tt>. Once unpacked, open a Terminal and type:</p>
+<h3>Beschaffen von Firmwaredateien ohne Internetverbindung</h3>
+<p>Wenn man die Firmwaredateien nicht über das <tt>install-wifi-firmwares.sh</tt> Skript herunterladen kann (vielleicht hat man ja keine funktionierende Internetverbindung unter Haiku), kann man stattdessen <a href="http://www.haiku-os.org/files/download-data-for-wlan-firmwares.txt">dieses Shellskript</a> herunterladen und unter einem anderen Betriebssystem mit installiertem <tt>wget</tt> und <tt>zip</tt> ausführen.<br />
+Das Skript lädt die benötigten Dateien herunter und erstellt eine ZIP Datei, die man dann unter Haiku in <tt>/boot</tt> entpackt. Ist das geschehen, öffnet man ein Terminal und schreibt:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
-<p>Review the licenses and accept them to install all of the now available firmware files.</p>
-
+<p>Es werden die entsprechenden Lizenzen angezeigt, die akzeptiert werden müssen bevor die Firmwaredateien installiert werden.</p>
+<h3>Verbindungsabbrüche vermeiden</h3>
+<p>Haikus Treiber für manche WLAN Chips, wie dem iprowifi4965, neigen dazu bei WPA Verschlüsselung die Verbindung zu verlieren. Wer davon betroffen ist, kann versuchen den "HT Mode" (High Throughput, 802.11n) auszuschalten bevor man sich mit einem Netzwerk verbindet:</p>
+<pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
+<p>Wird das Problem so gelöst, kann die Zeile in das <span class="path">~/config/settings/boot/UserBootscript</span> mit aufgenommen werden, um sie bei jedem Hochfahren automatisch auszuführen.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="workshop-email.html">Workshop: E-mails verwalten</a> 
-::  <a href="contents.html" class="uplink">Inhalt</a> 
-::  <a href="applications.html">Anwendungen</a>  »
+ «  <a href="workshop-email.html">Workshop: Managing Email</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
 </span></div>
 </div>
 

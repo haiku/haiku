@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2012-2015, Haiku, Inc. All rights reserved.
+ * Copyright 2012-2016, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -22,7 +22,7 @@
 <body>
 
 <div id="banner">
-<div><span>Manual d'usuari</span></div>
+<div><span>User guide</span></div>
 </div>
 
 <div class="nav">
@@ -44,6 +44,7 @@
 <li><a href="../hu/workshop-wlan.html"><img src="../images/flags/hu.png" alt="" />Magyar</a></li>
 <li><a href="../pt_BR/workshop-wlan.html"><img src="../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
 <li><a href="../pl/workshop-wlan.html"><img src="../images/flags/pl.png" alt="" />Polski</a></li>
+<li><a href="../ro/workshop-wlan.html"><img src="../images/flags/ro.png" alt="" />Română</a></li>
 <li><a href="../en/workshop-wlan.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 
@@ -56,7 +57,7 @@
 
 <div id="content">
 <div>
-<div class="box-info">La traducció d'aquesta pàgina encara no està acabada. Fins que ho sigui, algunes part correspondrà a la versió anglesa.</div>
+<div class="box-info">The translation of this page isn't yet complete. Until it is, unfinished parts use the English original.</div>
 
 
 <table class="index" id="index" summary="index">
@@ -119,15 +120,18 @@ The output shows the public name (SSID), MAC address, signal strength and authen
 The script will download the needed files and create a zip file that is to be extracted to Haiku's <tt>/boot</tt>. Once unpacked, open a Terminal and type:</p>
 <pre class="terminal">install-wifi-firmwares.sh</pre>
 <p>Review the licenses and accept them to install all of the now available firmware files.</p>
-
+<h3>Avoiding connection loss</h3>
+<p>Haiku's drivers for some WLAN chipsets like the iprowifi4965 are prone to lose connection when using WPA encryption. If you're affected by that, try to disable the "HT mode" (high throughput, 802.11n) before connecting to a network:</p>
+<pre class="terminal">ifconfig /dev/net/iprowifi4965/0 -ht</pre>
+<p>If that fixes the problem, put the line into <span class="path">~/config/settings/boot/UserBootscript</span> to have it applied automatically every boot-up.</p>
 </div>
 </div>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="workshop-email.html">Tutorial: Gestió del correu</a> 
-::  <a href="contents.html" class="uplink">Contingut</a> 
-::  <a href="applications.html">Aplicacions</a>  »
+ «  <a href="workshop-email.html">Workshop: Managing Email</a> 
+::  <a href="contents.html" class="uplink">Contents</a> 
+::  <a href="applications.html">Applications</a>  »
 </span></div>
 </div>
 
