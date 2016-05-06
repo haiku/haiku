@@ -12,6 +12,7 @@
 #include <LayoutBuilder.h>
 #include <Messenger.h>
 #include <Roster.h>
+#include <SeparatorView.h>
 #include <TabView.h>
 
 #include <stdio.h>
@@ -71,6 +72,7 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 	fMenubar->AddItem(menu);
 
 	BTabView* tabView = new BTabView("tabview", B_WIDTH_FROM_LABEL);
+	tabView->SetBorder(B_NO_BORDER);
 
 	fSettingsView = new BluetoothSettingsView(B_TRANSLATE("Settings"));
 //	fConnChan = new ConnChanView("Connections & Channels", B_WILL_DRAW);
@@ -88,7 +90,11 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 		.Add(fMenubar)
 		.AddStrut(B_USE_HALF_ITEM_SPACING)
 		.Add(tabView)
-		.AddGroup(B_HORIZONTAL, B_USE_HALF_ITEM_SPACING)
+		.AddStrut(B_USE_HALF_ITEM_SPACING)
+		.Add(new BSeparatorView(B_HORIZONTAL))
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_WINDOW_SPACING, B_USE_DEFAULT_SPACING,
+				B_USE_WINDOW_SPACING, B_USE_WINDOW_SPACING)
 			.AddGlue()
 			.Add(fDefaultsButton)
 			.Add(fRevertButton)
