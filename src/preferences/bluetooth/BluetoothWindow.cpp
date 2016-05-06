@@ -60,7 +60,7 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(
 		B_TRANSLATE("Show bluetooth console" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgStartServices), 0));
+		new BMessage(kMsgShowDebug), 0));
 	menu->AddItem(new BMenuItem(
 		B_TRANSLATE("Refresh LocalDevices" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgRefresh), 0));
@@ -121,6 +121,7 @@ BluetoothWindow::MessageReceived(BMessage* message)
 								|| fAntialiasingSettings->IsDefaultable());
 			fRevertButton->SetEnabled(false);
 */			break;
+
 		case kMsgStartServices:
 			printf("kMsgStartServices\n");
 			if (!be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
@@ -128,12 +129,18 @@ BluetoothWindow::MessageReceived(BMessage* message)
 				printf("kMsgStartServices: %s\n", strerror(error));
 			}
 			break;
-
 		case kMsgStopServices:
 			printf("kMsgStopServices\n");
 			if (be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
 				status_t error = BMessenger(BLUETOOTH_SIGNATURE).SendMessage(B_QUIT_REQUESTED);
 				printf("kMsgStopServices: %s\n", strerror(error));
+			}
+			break;
+		case kMsgShowDebug:
+			if (be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
+				status_t error = BMessenger(BLUETOOTH_SIGNATURE).SendMessage(
+					BT_MSG_SERVER_SHOW_CONSOLE);
+				printf("kMsgShowDebug: %s\n", strerror(error));
 			}
 			break;
 
