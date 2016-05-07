@@ -269,13 +269,6 @@ BMediaEventLooper::ControlLoop()
 			waitUntil = TimeSource()->RealTimeFor(
 				fEventQueue.FirstEventTime(),
 				fEventLatency + fSchedulingLatency);
-
-			// TODO: At boot the wait time go
-			// to negative depending on the system
-			// speed, this should be fixed.
-			if (waitUntil < 0)
-				waitUntil = 0;
-
 		} else if (!hasRealtime)
 			waitUntil = B_INFINITE_TIMEOUT;
 
@@ -289,7 +282,12 @@ BMediaEventLooper::ControlLoop()
 			} else
 				hasRealtime = false;
 		}
-		err = WaitForMessage(waitUntil);
+
+		if (waitUntil != B_INFINITE_TIMEOUT
+				&& TimeSource()->RealTime() >= waitUntil) {
+			err = WaitForMessage(0);
+		} else
+			err = WaitForMessage(waitUntil);
 	}
 }
 
