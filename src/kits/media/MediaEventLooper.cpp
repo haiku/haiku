@@ -246,14 +246,11 @@ BMediaEventLooper::ControlLoop()
 				// in the meantime, so that the client can
 				// notify to the producer only the portion
 				// that might be attributable.
-				bigtime_t lateness = 0;
-				if (waitUntil > 0) {
-					lateness = waitUntil - TimeSource()->RealTime();
-					if (lateness > 0) {
-						bigtime_t enqueueLatency
-							= event.enqueue_time - waitUntil;
-						if (enqueueLatency > 0)
-							lateness += enqueueLatency;
+				bigtime_t lateness = waitUntil - TimeSource()->RealTime();
+				if (lateness < 0) {
+					if (event.enqueue_time > waitUntil) {
+						lateness = event.enqueue_time
+							- TimeSource()->RealTime();
 					}
 				}
 				DispatchEvent(&event, -lateness, hasRealtime);
