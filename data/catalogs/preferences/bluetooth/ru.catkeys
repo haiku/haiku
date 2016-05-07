@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-BluetoothPrefs	3212620536
+1	russian	x-vnd.Haiku-BluetoothPrefs	2610775851
 About Bluetooth…	Window		О программе…
 Handheld	Settings view		Переносной
 Default inquiry time:	Settings view		Время запроса по умолчанию:
@@ -10,7 +10,6 @@ Smart phone	Settings view		Смартфон
 Server	Settings view		Сервер
 Stop bluetooth services…	Window		Остановить службу bluetooth…
 Identify host as:	Settings view		Идентифицировать как:
-View	Window		Вид
 Refresh…	Remote devices		Обновить…
 Pair…	Remote devices		Пара…
 Incoming connections policy:	Settings view		Политика входящих соединений:
@@ -20,16 +19,12 @@ Local devices found on system:	Settings view		Локальные устройс�
 Remaining %1 seconds	Inquiry panel		Осталось %1 секунд
 Server	Window		Сервер
 Scanning completed.	Inquiry panel		Сканирование завершено.
-OK	main		ОК
-Remote devices list…	Window		Список внешних устройств…
 Remove	Remote devices		Удалить
 Quit	main		Выход
 15 secs	Settings view		15 сек
-Start please	main		Запустить
 Start bluetooth services…	Window		Запуск службы bluetooth…
 Policy...	Settings view		Политика…
 61 secs	Settings view		61 сек
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Bluetooth Haiku стек, (ARCE)\n\nРазработл Oliver Ruiz Dorantes\n\nПри поддержке:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nСпасибо всем тем, кто оказывал помощь…\n\nПрисылал/жертвовал оборудование:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\tи Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nПоддерживал финансово:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nПатчи присылали:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nТестировал:\n\t- Petter H. Juliussen\nТем, кто дал мне все знания:\n\t- команде yellowTAB
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Не было найдено ни одного bluetooth устройства, зарегистрированного в системе.
 Identify us as...	Settings view		Идентифицировать нас как…
  packets: 	Device View		 пакетов: 
@@ -43,10 +38,7 @@ Revert	Window		Вернуть
 Remote devices	Window		Удалённые устройства
 Laptop	Settings view		Ноутбук
 Discoverable	Extended local device view		Видимый
-Work offline	main		Оставить выключенным
-bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_server не запущен на этой системе. Хотите его запустить или оставить его выключенным
 Service classes: 	Device View		Служебные классы: 
-Connections & channels…	Window		Список подключений и каналов…
 Refresh LocalDevices…	Window		Обновление локальных устройств…
 Settings	Window		Настройки
 Only from trusted devices	Settings view		Только от доверенных устройств

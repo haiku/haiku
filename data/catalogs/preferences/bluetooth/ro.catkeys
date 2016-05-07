@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-BluetoothPrefs	3212620536
+1	romanian	x-vnd.Haiku-BluetoothPrefs	2610775851
 About Bluetooth…	Window		Despre Bluetooth...
 Handheld	Settings view		Calculator de buzunar
 Default inquiry time:	Settings view		Timp implicit de întrebare:
@@ -10,7 +10,6 @@ Smart phone	Settings view		Telefon inteligent
 Server	Settings view		Server
 Stop bluetooth services…	Window		Oprește servicii bluetooth...
 Identify host as:	Settings view		Identifică gazda ca:
-View	Window		Vizualizare
 Refresh…	Remote devices		Reîmprospătează...
 Pair…	Remote devices		Pereche...
 Incoming connections policy:	Settings view		Regula conexiunilor de primire
@@ -20,16 +19,12 @@ Local devices found on system:	Settings view		Dispozitivele locale găsite în s
 Remaining %1 seconds	Inquiry panel		Au rămas %1 secunde
 Server	Window		Server
 Scanning completed.	Inquiry panel		Scanarea a fost completată.
-OK	main		OK
-Remote devices list…	Window		Lista cu dispozive la distanță...
 Remove	Remote devices		Elimină
 Quit	main		Închidere
 15 secs	Settings view		15 secunde
-Start please	main		Pornește
 Start bluetooth services…	Window		Pornește servicii bluetooth...
 Policy...	Settings view		Regulă...
 61 secs	Settings view		61 secunde
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Sistem Bluetooth Haiku, (ARCE)\n\nCreat de Oliver Ruiz Dorantes\n\nCu sprijinul al:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nMulțumesc persoanelor care au ajutat...\n\nExpediere/Donare hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomic:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nCu patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTestare:\n\t- Petter H. Juliussen\nCare mi-au dat toate cunoștințele:\n\t- echipa yellowTAB
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nu există niciun dispozitiv local Bluetooth înregistrat pe sistem.
 Identify us as...	Settings view		Identificare ca...
  packets: 	Device View		 pachete: 
@@ -43,10 +38,7 @@ Revert	Window		Revenire
 Remote devices	Window		Dispozitive la distanță
 Laptop	Settings view		Laptop
 Discoverable	Extended local device view		Poate fi descoperit
-Work offline	main		Lucrează deconectat
-bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_server nu rulează pe sistem. Ar trebui să fie pornit, sau să rămâneți deconectat
 Service classes: 	Device View		Clase de servicii:
-Connections & channels…	Window		Conexiuni & canale...
 Refresh LocalDevices…	Window		Reîmprospătează dispozitivele locale...
 Settings	Window		Configurări
 Only from trusted devices	Settings view		Numai de la dispozitivele de încredere

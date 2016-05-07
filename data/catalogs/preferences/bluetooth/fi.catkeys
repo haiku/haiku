@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-BluetoothPrefs	3212620536
+1	finnish	x-vnd.Haiku-BluetoothPrefs	2610775851
 About Bluetooth…	Window		Bluetooth-ohjelmasta…
 Handheld	Settings view		Kädessäpidettävät
 Default inquiry time:	Settings view		Oletuskyselyn pituus:
@@ -10,7 +10,6 @@ Smart phone	Settings view		Älypuhelin
 Server	Settings view		Palvelin
 Stop bluetooth services…	Window		Pysäytä bluetooth-palvelut…
 Identify host as:	Settings view		Tunnista verkkokone nimellä:
-View	Window		Näytä
 Refresh…	Remote devices		Päivitä…
 Pair…	Remote devices		Parita…
 Incoming connections policy:	Settings view		Saapuvien yhteyksien sääntö:
@@ -20,16 +19,12 @@ Local devices found on system:	Settings view		Järjestelmästä löydetyt paikal
 Remaining %1 seconds	Inquiry panel		Jäljellä %1 sekuntia
 Server	Window		Palvelin
 Scanning completed.	Inquiry panel		Etsintä valmis.
-OK	main		Valmis
-Remote devices list…	Window		Etälaiteluettelo…
 Remove	Remote devices		Poista
 Quit	main		Poistu
 15 secs	Settings view		15 sekuntia
-Start please	main		Käynnistä
 Start bluetooth services…	Window		Käynnistä bluetooth-palvelut…
 Policy...	Settings view		Sääntö...
 61 secs	Settings view		61 sekuntia
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth-järjestelmä, (ARCE)\n\nLuonut Oliver Ruiz Dorantes\n\nApuna ovat olleet:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nKiitos henkilöille, jotka auttoivat...\n\nLähettäen/lahjoittaen laitteistoa:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nTaloudellisesti:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nKorjauksilla:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTestaamalla:\n\t- Petter H. Juliussen\nJotka antoivat minulle kaiken tiedon:\n\t- yellowTAB-ryhmä
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Järjestelmästä ei löytynyt paikallisia Bluetooth-laitteita.
 Identify us as...	Settings view		Tunnista meidät nimellä...
  packets: 	Device View		 pakettia: 
@@ -43,10 +38,7 @@ Revert	Window		Palauta
 Remote devices	Window		Etälaitteet
 Laptop	Settings view		Kannettava
 Discoverable	Extended local device view		Paljastettava
-Work offline	main		Työskentele yhteydettömässä tilassa
-bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_server-palvelin ei ollut käynnissä järjestelmässä. Se pitäisi käynnistää tai pysy yhteydettömässä tilassa
 Service classes: 	Device View		Palveluluokat: 
-Connections & channels…	Window		Yhteys- ja kanavaluettelo…
 Refresh LocalDevices…	Window		Päivitä paikallisia laitteita…
 Settings	Window		Asetukset
 Only from trusted devices	Settings view		Vain luotetuista laitteista

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-BluetoothPrefs	3212620536
+1	japanese	x-vnd.Haiku-BluetoothPrefs	2610775851
 About Bluetooth…	Window		Bluetoothについて…
 Handheld	Settings view		ハンドヘルド機器
 Default inquiry time:	Settings view		デフォルトの問い合わせ時間:
@@ -10,7 +10,6 @@ Smart phone	Settings view		スマートフォン
 Server	Settings view		サーバー
 Stop bluetooth services…	Window		Bluetooth サービスを停止…
 Identify host as:	Settings view		ホスト名:
-View	Window		ビュー
 Refresh…	Remote devices		更新…
 Pair…	Remote devices		ペアリング…
 Incoming connections policy:	Settings view		着信接続ポリシー:
@@ -20,16 +19,12 @@ Local devices found on system:	Settings view		認識されたローカルデバ�
 Remaining %1 seconds	Inquiry panel		残り %1 秒
 Server	Window		サーバー
 Scanning completed.	Inquiry panel		スキャンが完了しました。
-OK	main		OK
-Remote devices list…	Window		リモートデバイス一覧…
 Remove	Remote devices		削除
 Quit	main		終了
 15 secs	Settings view		15 秒
-Start please	main		開始してください
 Start bluetooth services…	Window		Bluetooth サービスを開始…
 Policy...	Settings view		ポリシー…
 61 secs	Settings view		61 秒
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth システム, (ARCE)\n\nOliver Ruiz Dorantes 作\n\nその他の貢献者:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\n次の方々にも感謝…\n\nハードウェアを提供していただいた方々:\n\t- Henry Jair Abril Florez (el Colombiano)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\n金銭的な支援をしていただいた方々:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nパッチ提供者:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nすべての知識を提供してくれた方:\n\t- yellowTAB チーム
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		このシステムには Bluetooth ローカルデバイスが登録されていません。
 Identify us as...	Settings view		自機名…
  packets: 	Device View		パケット:
@@ -43,10 +38,7 @@ Revert	Window		元に戻す
 Remote devices	Window		リモートデバイス
 Laptop	Settings view		ラップトップ
 Discoverable	Extended local device view		発見可能
-Work offline	main		オフライン作業
-bluetooth_server has not been found running on the system. Should be started, or stay offline	main		bluetooth_serverが動作していません。起動するか、オフライン作業を続けてください
 Service classes: 	Device View		サービスクラス:
-Connections & channels…	Window		接続＆チャンネル…
 Refresh LocalDevices…	Window		ローカルデバイスを更新…
 Settings	Window		設定
 Only from trusted devices	Settings view		信用されているデバイスのみ

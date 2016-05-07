@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-BluetoothPrefs	3212620536
+1	lithuanian	x-vnd.Haiku-BluetoothPrefs	2610775851
 About Bluetooth…	Window		Apie…
 Handheld	Settings view		delninukas
 Default inquiry time:	Settings view		Numatytasis žvalgymo laikas:
@@ -10,7 +10,6 @@ Smart phone	Settings view		Išmanusis telefonas
 Server	Settings view		serveris
 Stop bluetooth services…	Window		Stabdyti „Bluetooth“ tarnybas…
 Identify host as:	Settings view		Šios sistemos tipas:
-View	Window		Rodymas
 Refresh…	Remote devices		Atnaujinti…
 Pair…	Remote devices		Suporuoti…
 Incoming connections policy:	Settings view		Automatiškai priimti įeinančius ryšius:
@@ -20,16 +19,12 @@ Local devices found on system:	Settings view		Vietiniai sistemoje rasti įrengin
 Remaining %1 seconds	Inquiry panel		Liko %1 sek.
 Server	Window		Tarnyba
 Scanning completed.	Inquiry panel		Žvalgymas baigtas.
-OK	main		Gerai
-Remote devices list…	Window		Nuotolinių įrenginių sąrašas…
 Remove	Remote devices		Pašalinti
 Quit	main		Baigti darbą
 15 secs	Settings view		15 sekundžių
-Start please	main		Paleisti tarnybą
 Start bluetooth services…	Window		Paleisti „Bluetooth“ tarnybas…
 Policy...	Settings view		pasirinkite…
 61 secs	Settings view		61 sekundė
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth sistema, (ARCE)\n\nSukūrė Oliver Ruiz Dorantes\n\nPagelbėjo:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nAtskira padėka pagelbėjusiems…\n\nĮrenginiais:\n\t- Henry Jair Abril Florez(el Colombian)\n\t\t ir Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nPinigais:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nPataisomis:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTestavimu:\n\t- Petter H. Juliussen\nSuteikusiems reikiamas žinias:\n\t- „yellowTAB“ komandai
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Sistemoje nepavyko aptikti jokių vietinių „Bluetooth“ įrenginių.
 Identify us as...	Settings view		pasirinkite…
  packets: 	Device View		 paketai: 
@@ -43,10 +38,7 @@ Revert	Window		Atšaukti pakeitimus
 Remote devices	Window		Nuotoliniai įrenginiai
 Laptop	Settings view		skreitinis kompiuteris
 Discoverable	Extended local device view		Aptinkamas
-Work offline	main		Dirbti neprisijungus
-bluetooth_server has not been found running on the system. Should be started, or stay offline	main		Šiuo metu nepaleista „Bluetooth“ tarnyba („bluetooth_server“). Ar norite, kad ji būtų paleista, ar tęsti darbą neprisijungus?
 Service classes: 	Device View		Tarnybų tipai: 
-Connections & channels…	Window		Prisijungimų ir kanalų sąrašas…
 Refresh LocalDevices…	Window		Atnaujinti vietinių įrenginių sąrašą…
 Settings	Window		Nuostatos
 Only from trusted devices	Settings view		tik iš patikimų įrenginių

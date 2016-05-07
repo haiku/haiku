@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-BluetoothPrefs	3212620536
+1	hungarian	x-vnd.Haiku-BluetoothPrefs	2610775851
 About Bluetooth…	Window		A Bluetooth-ról…
 Handheld	Settings view		Mobiltelefon
 Default inquiry time:	Settings view		Alapértelmezett lekérdezési időkorlát:
@@ -10,7 +10,6 @@ Smart phone	Settings view		Okostelefon
 Server	Settings view		Kiszolgáló
 Stop bluetooth services…	Window		Bluetooth-szolgáltatások leállítása…
 Identify host as:	Settings view		Gazdagép azonosítása mint:
-View	Window		Nézet
 Refresh…	Remote devices		Frissítés…
 Pair…	Remote devices		Párosítás…
 Incoming connections policy:	Settings view		Bejövő kapcsolatokra vonatkozó szabály:
@@ -20,16 +19,12 @@ Local devices found on system:	Settings view		Helyi megtalált eszközök a rend
 Remaining %1 seconds	Inquiry panel		%1 másodperc van hátra
 Server	Window		Kiszolgáló
 Scanning completed.	Inquiry panel		Keresés befejezve.
-OK	main		Rendben
-Remote devices list…	Window		Távoli eszközök listája…
 Remove	Remote devices		Eltávolítás
 Quit	main		Kilépés
 15 secs	Settings view		15 mp
-Start please	main		Indítás
 Start bluetooth services…	Window		Bluetooth-szolgáltatások elindítása…
 Policy...	Settings view		Szabály…
 61 secs	Settings view		61 mp
-Haiku Bluetooth system, (ARCE)\n\nCreated by Oliver Ruiz Dorantes\n\nWith support of:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nEconomically:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nWith patches:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nWho gave me all the knowledge:\n\t- the yellowTAB team	main		Haiku Bluetooth rendszer, (ARCE)\n\nLétrehozta: Oliver Ruiz Dorantes\n\nA következők támogatásával:\n\t- Mika Lindqvist\n\t- Adrien Destugues\n\t- Maksym Yevmenkin\n\nKöszönjük azoknak, akik segítettek…\n\nHardver szállításával/adományozásával:\n\t- Henry Jair Abril Florez (el Colombian)\n\t\t& Stefanie Bartolich\n\t- Edwin Erik Amsler\n\t- Dennis d'Entremont\n\t- Luroh\n\t- Pieter Panman\n\nGazdaságilag:\n\t- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n\t- Matt M, Doug F, Hubert H,\n\t- Sebastian B, Andrew M, Jared E,\n\t- Frederik H, Tom S, Ferry B,\n\t- Greg G, David F, Richard S, Martin W:\n\nJavításokkal:\n\t- Michael Weirauch\n\t- Fredrik Ekdahl\n\t- Raynald Lesieur\n\t- Andreas Färber\n\t- Joerg Meyer\nTesting:\n\t- Petter H. Juliussen\nAki megtanított engem minderre:\n\t- A yellowTAB csapat
 There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		Nincs egy regisztrált Bluetooth eszköz sem a rendszerben
 Identify us as...	Settings view		Azonosítása mint…
  packets: 	Device View		csomagok:
@@ -43,10 +38,7 @@ Revert	Window		Visszaállít
 Remote devices	Window		Távoli eszközök
 Laptop	Settings view		Laptop
 Discoverable	Extended local device view		Felfedezhető
-Work offline	main		Kapcsolat nélküli munka
-bluetooth_server has not been found running on the system. Should be started, or stay offline	main		A bluetooth_server jelenleg nem fut. El kívánja indítani, vagy kapcsolat nélküli módban kíván tovább dolgozni?
 Service classes: 	Device View		Szervizosztályok: 
-Connections & channels…	Window		Kapcsolatok és csatornák…
 Refresh LocalDevices…	Window		Helyi eszközök frissítése…
 Settings	Window		Beállítások
 Only from trusted devices	Settings view		Csak biztonságos eszközöktől
