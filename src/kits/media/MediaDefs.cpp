@@ -14,6 +14,7 @@
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <IconUtils.h>
+#include <LaunchRoster.h>
 #include <Locale.h>
 #include <MediaNode.h>
 #include <MediaRoster.h>
@@ -1433,18 +1434,7 @@ launch_media_server(bigtime_t timeout,
 
 	progress_startup(50, progress, cookie);
 
-	err = roster->SyncToServices(2000000);
-	if (err != B_OK) {
-		// At this point, it might be that the launch_daemon isn't
-		// restarting us, then we'll attempt at launching the server
-		// ourselves.
-		err = be_roster->Launch(B_MEDIA_SERVER_SIGNATURE);
-		if (err != B_OK)
-			return err;
-
-		if (roster->SyncToServices(2000000) != B_OK)
-			err = B_MEDIA_SYSTEM_FAILURE;
-	}
+	err = BLaunchRoster().Start(B_MEDIA_SERVER_SIGNATURE);
 
 	if (err != B_OK)
 		progress_startup(90, progress, cookie);

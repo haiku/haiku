@@ -112,7 +112,6 @@ static bool sServerIsUp = false;
 static List<RosterNotification> sNotificationList;
 static BLocker sInitLocker("BMediaRoster::Roster locker");
 static List<LocalNode> sRegisteredNodes;
-static List<SyncedMessage> sSyncedMessages;
 
 
 class MediaRosterUndertaker {
@@ -3363,26 +3362,6 @@ BMediaRoster::IsRunning()
 }
 
 
-status_t
-BMediaRoster::SyncToServices(bigtime_t timeout)
-{
-	BMessenger messenger(this);
-	BMessage msg(MEDIA_ROSTER_REGISTER_SYNC);
-	BMessage reply;
-
-	if (!messenger.IsValid())
-		return B_MEDIA_SYSTEM_FAILURE;
-
-	status_t ret = messenger.SendMessage(&msg, &reply, timeout, timeout);
-	if (ret == B_TIMED_OUT || reply.what == B_NO_REPLY)
-		return B_TIMED_OUT;
-	else if (ret != B_OK)
-		return ret;
-
-	return B_OK;
-}
-
-
 ssize_t
 BMediaRoster::AudioBufferSizeFor(int32 channelCount, uint32 sampleFormat,
 	float frameRate, bus_type busKind)
@@ -3471,20 +3450,6 @@ BMediaRoster::MessageReceived(BMessage* message)
 			return;
 		}
 
-		case MEDIA_ROSTER_REGISTER_SYNC:
-		{
-			BMessage reply;
-			if (sServerIsUp)
-				message->SendReply(&reply);
-			else {
-				DetachCurrentMessage();
-				SyncedMessage msg;
-				msg.message = message;
-				sSyncedMessages.Insert(msg);
-			}
-			return;
-		}
-
 		case B_SOME_APP_LAUNCHED:
 		{
 			BString mimeSig;
@@ -3550,16 +3515,6 @@ BMediaRoster::MessageReceived(BMessage* message)
 				progress_startup(100, NULL, NULL);
 				if (MediaRosterEx(this)->fAutoExit)
 					MediaRosterEx(this)->fLaunchNotification = false;
-			}
-
-			BMessage reply;
-			for (int32 i = 0; i < sSyncedMessages.CountItems(); i++) {
-				SyncedMessage* msg;
-				if (sSyncedMessages.Get(i, &msg) == true) {
-					msg->message->SendReply(&reply);
-					delete msg->message;
-				}
-				sSyncedMessages.Remove(i);
 			}
 
 			// Send the notification to our subscribers
