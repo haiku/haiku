@@ -417,6 +417,10 @@ void
 BMediaEventLooper::SetBufferDuration(bigtime_t duration)
 {
 	CALLED();
+
+	if (duration < 0)
+		duration = 0;
+
 	fBufferDuration = duration;
 }
 
