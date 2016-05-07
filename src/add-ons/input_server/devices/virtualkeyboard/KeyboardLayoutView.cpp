@@ -910,7 +910,7 @@ KeyboardLayoutView::_GetKeyLabel(const Key* key, char* text, size_t textSize,
 bool
 KeyboardLayoutView::_IsKeyPressed(uint32 code)
 {
-	if (fDropTarget != NULL && fDropTarget->code == (int32)code)
+	if (fDropTarget != NULL && fDropTarget->code == code)
 		return true;
 
 	return _KeyState(code);
@@ -947,7 +947,7 @@ KeyboardLayoutView::_KeyForCode(uint32 code)
 
 	for (int32 i = 0; i < fLayout->CountKeys(); i++) {
 		Key* key = fLayout->KeyAt(i);
-		if (key->code == (int32)code)
+		if (key->code == code)
 			return key;
 	}
 

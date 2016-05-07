@@ -3,6 +3,8 @@ SubDir HAIKU_TOP src add-ons input_server devices virtualkeyboard ;
 UsePrivateHeaders input interface shared tracker ;
 UsePrivateSystemHeaders ;
 
+SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src preferences keymap ] ;
+
 AddResources <input>virtualkeyboard : VirtualKeyboard.rdef ;
 
 Addon <input>virtualkeyboard :
