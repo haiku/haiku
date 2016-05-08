@@ -77,8 +77,6 @@ BluetoothSettingsView::BluetoothSettingsView(const char* name)
 		B_TRANSLATE("Local devices found on system:"),
 		fLocalDevicesMenu);
 
-	SetLayout(new BGroupLayout(B_VERTICAL));
-
 	if (ActiveLocalDevice != NULL) {
 		fExtDeviceView->SetLocalDevice(ActiveLocalDevice);
 		fExtDeviceView->SetEnabled(true);
