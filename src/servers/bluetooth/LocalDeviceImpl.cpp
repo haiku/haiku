@@ -84,7 +84,7 @@ LocalDeviceImpl::Unregister()
 
 	msg->AddInt32("hci_id", fHCIDelegate->Id());
 
-	TRACE_BT("LocalDeviceImpl: Unregistering %lx\n",
+	TRACE_BT("LocalDeviceImpl: Unregistering %" B_PRId32 "\n",
 		fHCIDelegate->Id());
 
 	be_app_messenger.SendMessage(msg);

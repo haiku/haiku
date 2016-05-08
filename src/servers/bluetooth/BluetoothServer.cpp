@@ -124,8 +124,7 @@ void BluetoothServer::ReadyToRun(void)
 #define _USE_FAKE_SDP_SERVER
 #ifdef _USE_FAKE_SDP_SERVER
 	if (fSDPThreadID <= 0 || resume_thread(fSDPThreadID) != B_OK) {
-		TRACE_BT("BluetoothServer: Failed launching the SDP server thread: %lx\n",
-			fSDPThreadID);
+		TRACE_BT("BluetoothServer: Failed launching the SDP server thread\n");
 	}
 #endif
 }
@@ -159,7 +158,7 @@ void BluetoothServer::MessageReceived(BMessage* message)
 			if (lDeviceImpl->GetID() >= 0) {
 				fLocalDevicesList.AddItem(lDeviceImpl);
 
-				TRACE_BT("LocalDevice %s id=%lx added\n", str.String(),
+				TRACE_BT("LocalDevice %s id=%" B_PRId32 " added\n", str.String(),
 					lDeviceImpl->GetID());
 			} else {
 				TRACE_BT("BluetoothServer: Adding LocalDevice hci id invalid\n");
@@ -320,7 +319,7 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 			if (lDeviceImpl != NULL && lDeviceImpl->Available()) {
 				printf("Requested local device %" B_PRId32 "\n",
 					lDeviceImpl->GetID());
-				TRACE_BT("BluetoothServer: Device available: %lx\n", lDeviceImpl->GetID());
+				TRACE_BT("BluetoothServer: Device available: %" B_PRId32 "\n", lDeviceImpl->GetID());
 				lastIndex = index;
 				break;
 			}
@@ -333,7 +332,7 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 				if (lDeviceImpl != NULL && lDeviceImpl->Available()) {
 					printf("Requested local device %" B_PRId32 "\n",
 						lDeviceImpl->GetID());
-					TRACE_BT("BluetoothServer: Device available: %lx\n", lDeviceImpl->GetID());
+					TRACE_BT("BluetoothServer: Device available: %" B_PRId32 "\n", lDeviceImpl->GetID());
 					lastIndex = index;
 					break;
 				}
@@ -347,7 +346,7 @@ BluetoothServer::HandleAcquireLocalDevice(BMessage* message, BMessage* reply)
 		hid = lDeviceImpl->GetID();
 		lDeviceImpl->Acquire();
 
-		TRACE_BT("BluetoothServer: Device acquired %lx\n", hid);
+		TRACE_BT("BluetoothServer: Device acquired %" B_PRId32 "\n", hid);
 		return reply->AddInt32("hci_id", hid);
 	}
 
