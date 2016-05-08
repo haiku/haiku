@@ -966,11 +966,19 @@ DigitalDisplayInterface::DigitalDisplayInterface(port_index index,
 addr_t
 DigitalDisplayInterface::_PortRegister()
 {
+	// TODO: Linux does a DDI_BUF_CTL(INTEL_PORT_A) which is cleaner
+	// (but we have to ensure the offsets + region base is correct)
 	switch (PortIndex()) {
 		case INTEL_PORT_A:
 			return DDI_BUF_CTL_A;
 		case INTEL_PORT_B:
 			return DDI_BUF_CTL_B;
+		case INTEL_PORT_C:
+			return DDI_BUF_CTL_C;
+		case INTEL_PORT_D:
+			return DDI_BUF_CTL_D;
+		case INTEL_PORT_E:
+			return DDI_BUF_CTL_E;
 		default:
 			return 0;
 	}
@@ -1019,6 +1027,36 @@ DigitalDisplayInterface::IsConnected()
 		TRACE("%s: %s link not detected\n", __func__, PortName());
 		return false;
 	}
+
+	// Probe a little port info.
+	if ((read32(DDI_BUF_CTL_A) & DDI_A_4_LANES) != 0) {
+		switch (PortIndex()) {
+			case INTEL_PORT_A:
+				fMaxLanes = 4;
+				break;
+			case INTEL_PORT_E:
+				fMaxLanes = 0;
+				break;
+			default:
+				fMaxLanes = 4;
+				break;
+		}
+	} else {
+		switch (PortIndex()) {
+			case INTEL_PORT_A:
+				fMaxLanes = 2;
+				break;
+			case INTEL_PORT_E:
+				fMaxLanes = 2;
+				break;
+			default:
+				fMaxLanes = 4;
+				break;
+		}
+	}
+
+	TRACE("%s: %s Maximum Lanes: %" B_PRId8 "\n", __func__,
+		PortName(), fMaxLanes);
 
 	HasEDID();
 

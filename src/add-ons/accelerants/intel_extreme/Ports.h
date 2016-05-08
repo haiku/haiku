@@ -37,7 +37,8 @@ enum port_index {
 	INTEL_PORT_A,
 	INTEL_PORT_B,
 	INTEL_PORT_C,
-	INTEL_PORT_D
+	INTEL_PORT_D,
+	INTEL_PORT_E
 };
 
 
@@ -219,6 +220,8 @@ virtual status_t					SetDisplayMode(display_mode* mode,
 protected:
 virtual	addr_t						_DDCRegister();
 virtual addr_t						_PortRegister();
+private:
+		uint8						fMaxLanes;
 };
 
 

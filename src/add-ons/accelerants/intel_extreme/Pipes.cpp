@@ -64,7 +64,13 @@ Pipe::Pipe(pipe_index pipeIndex)
 		fPlaneOffset = INTEL_PLANE_OFFSET;
 	}
 
+	// IvyBridge: Analog + Digital Ports behind FDI (on northbridge)
+	// Haswell: Only VGA behind FDI (on northbridge)
+	// SkyLake: FDI gone. No more northbridge video.
 	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
+		TRACE("%s: Pipe %s routed through FDI\n", __func__,
+			(pipeIndex == INTEL_PIPE_A) ? "A" : "B");
+
 		fHasTranscoder = true;
 
 		// Program FDILink if PCH

@@ -308,7 +308,7 @@ probe_ports()
 
 	// Digital Display Interface
 	if (gInfo->shared_info->device_type.HasDDI()) {
-		for (int i = INTEL_PORT_A; i <= INTEL_PORT_B; i++) {
+		for (int i = INTEL_PORT_A; i <= INTEL_PORT_E; i++) {
 			Port* ddiPort
 				= new(std::nothrow) DigitalDisplayInterface((port_index)i);
 
@@ -419,7 +419,7 @@ assign_pipes()
 					gInfo->ports[i]->PortName());
 				continue;
 			}
-	
+
 			gInfo->ports[i]->SetPipe(gInfo->pipes[current]);
 			current++;
 		}
@@ -593,4 +593,3 @@ intel_accelerant_retrace_semaphore()
 	CALLED();
 	return gInfo->shared_info->vblank_sem;
 }
-

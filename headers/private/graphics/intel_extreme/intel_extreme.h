@@ -537,6 +537,8 @@ struct intel_free_graphics_memory {
 #define INTEL_TRANSCODER_A_IMAGE_SIZE		(0x001c | REGS_SOUTH_TRANSCODER_PORT)
 #define INTEL_TRANSCODER_B_IMAGE_SIZE		(0x101c | REGS_SOUTH_TRANSCODER_PORT)
 
+// TODO: Is there consolidation that could happen here with digital ports?
+
 #define INTEL_ANALOG_PORT				(0x1100 | REGS_SOUTH_TRANSCODER_PORT)
 #define INTEL_DIGITAL_PORT_A			(0x1120 | REGS_SOUTH_TRANSCODER_PORT)
 #define INTEL_DIGITAL_PORT_B			(0x1140 | REGS_SOUTH_TRANSCODER_PORT)
@@ -557,6 +559,9 @@ struct intel_free_graphics_memory {
 // DDI Buffer Control (This replaces DP on Haswell+)
 #define DDI_BUF_CTL_A					(0x4000 | REGS_NORTH_PIPE_AND_PORT)
 #define DDI_BUF_CTL_B					(0x4100 | REGS_NORTH_PIPE_AND_PORT)
+#define DDI_BUF_CTL_C					(0x4200 | REGS_NORTH_PIPE_AND_PORT)
+#define DDI_BUF_CTL_D					(0x4300 | REGS_NORTH_PIPE_AND_PORT)
+#define DDI_BUF_CTL_E					(0x4400 | REGS_NORTH_PIPE_AND_PORT)
 #define 	DDI_BUF_CTL_ENABLE			(1 << 31)
 #define 	DDI_BUF_TRANS_SELECT(n)		((n) << 24)
 #define 	DDI_BUF_EMP_MASK			(0xf << 24)
