@@ -16,7 +16,7 @@
 #include "DeviceManager.h"
 #include "LocalDeviceImpl.h"
 
-#include "Output.h"
+#include "Debug.h"
 #include "BluetoothServer.h"
 
 #include <bluetoothserver_p.h>
@@ -36,14 +36,14 @@ DeviceManager::MessageReceived(BMessage* msg)
 					const char *name;
 					BDirectory dir;
 
-					Output::Instance()->Post("Something new in the bus ... ", BLACKBOARD_DEVICEMANAGER);
+					TRACE_BT("Something new in the bus ... ");
 
 					if ((msg->FindInt32("device", &ref.device)!=B_OK)
 						|| (msg->FindInt64("directory", &ref.directory)!=B_OK)
 						|| (msg->FindString("name",	&name) != B_OK))
 						return;
 
-					Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER, " -> %s\n",	name);
+					TRACE_BT("DeviceManager: -> %s\n", name);
 
 					ref.set_name(name);
 
@@ -62,8 +62,7 @@ DeviceManager::MessageReceived(BMessage* msg)
 				break;
 				case B_ENTRY_REMOVED:
 				{
-					Output::Instance()->Post("Something removed from the bus ...\n",
-												BLACKBOARD_DEVICEMANAGER);
+					TRACE_BT("Something removed from the bus ...\n");
 
 				}
 				break;
@@ -86,21 +85,20 @@ DeviceManager::AddDirectory(node_ref *nref)
 	BDirectory directory(nref);
 	status_t status	= directory.InitCheck();
 	if (status != B_OK)	{
-		Output::Instance()->Post("AddDirectory::Initcheck Failed\n", BLACKBOARD_DEVICEMANAGER);
+		TRACE_BT("AddDirectory::Initcheck Failed\n");
 		return status;
 	}
 
 	status = watch_node(nref, B_WATCH_DIRECTORY, this);
 	if (status != B_OK)	{
-		Output::Instance()->Post("AddDirectory::watch_node	Failed\n", BLACKBOARD_DEVICEMANAGER);
+		TRACE_BT("AddDirectory::watch_node	Failed\n");
 		return status;
 	}
 
 //	BPath path(*nref);
 //	BString	str(path.Path());
 //
-//	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER,
-//								"Exploring entries in %s\n", str.String());
+//	TRACE_BT("DeviceManager: Exploring entries in %s\n", str.String());
 
 	entry_ref ref;
 	status_t error;
@@ -109,8 +107,7 @@ DeviceManager::AddDirectory(node_ref *nref)
 		AddDevice(&ref);
 	}
 
-	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER,
-								"Finished exploring entries(%s)\n", strerror(error));
+	TRACE_BT("DeviceManager: Finished exploring entries(%s)\n", strerror(error));
 
 	return (error == B_OK || error == B_ENTRY_NOT_FOUND)?B_OK:error;
 }
@@ -157,7 +154,7 @@ DeviceManager::AddDevice(entry_ref* ref)
 
 	msg->AddString("name", *str	);
 
-	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER, "Device %s registered\n", path.Path());
+	TRACE_BT("DeviceManager: Device %s registered\n", path.Path());
 	return be_app_messenger.SendMessage(msg);
 }
 
@@ -233,7 +230,7 @@ DeviceManager::StartMonitoringDevice(const char	*device)
 	if (error != B_OK)
 		return error;
 
-	Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER,	"%s	path being monitored\n", path.Path());
+	TRACE_BT("DeviceManager: %s	path being monitored\n", path.Path());
 
 	// We are monitoring the root we may have already directories inside
 	// to be monitored
@@ -247,7 +244,7 @@ DeviceManager::StartMonitoringDevice(const char	*device)
 		AddDirectory(&driverNRef);
 	}
 
-    Output::Instance()->Postf(BLACKBOARD_DEVICEMANAGER, "Finished exploring entries(%s)\n", strerror(error));
+    TRACE_BT("DeviceManager: Finished exploring entries(%s)\n", strerror(error));
 
 #if	0
 	HCIDelegate	*tmphd = NULL;

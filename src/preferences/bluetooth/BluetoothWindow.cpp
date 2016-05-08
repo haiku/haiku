@@ -30,7 +30,6 @@ static const uint32 kMsgRevert = 'rvrt';
 
 static const uint32 kMsgStartServices = 'SrSR';
 static const uint32 kMsgStopServices = 'StST';
-static const uint32 kMsgShowDebug = 'ShDG';
 
 LocalDevice* ActiveLocalDevice = NULL;
 
@@ -59,10 +58,7 @@ BluetoothWindow::BluetoothWindow(BRect frame)
 		new BMessage(kMsgStopServices), 0));
 	menu->AddSeparatorItem();
 	menu->AddItem(new BMenuItem(
-		B_TRANSLATE("Show bluetooth console" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgShowDebug), 0));
-	menu->AddItem(new BMenuItem(
-		B_TRANSLATE("Refresh LocalDevices" B_UTF8_ELLIPSIS),
+		B_TRANSLATE("Refresh local devices" B_UTF8_ELLIPSIS),
 		new BMessage(kMsgRefresh), 0));
 	fMenubar->AddItem(menu);
 
@@ -132,13 +128,6 @@ BluetoothWindow::MessageReceived(BMessage* message)
 			if (be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
 				status_t error = BMessenger(BLUETOOTH_SIGNATURE).SendMessage(B_QUIT_REQUESTED);
 				printf("kMsgStopServices: %s\n", strerror(error));
-			}
-			break;
-		case kMsgShowDebug:
-			if (be_roster->IsRunning(BLUETOOTH_SIGNATURE)) {
-				status_t error = BMessenger(BLUETOOTH_SIGNATURE).SendMessage(
-					BT_MSG_SERVER_SHOW_CONSOLE);
-				printf("kMsgShowDebug: %s\n", strerror(error));
 			}
 			break;
 

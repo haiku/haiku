@@ -15,7 +15,6 @@ Server bluetooth_server
 	HCITransportAccessor.cpp
 	LocalDeviceHandler.cpp
 	LocalDeviceImpl.cpp
-	Output.cpp
 	: be network libbluetooth.so
 	[ TargetLibstdc++ ]
 ;
