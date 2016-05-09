@@ -415,9 +415,10 @@ intel_propose_display_mode(display_mode* target, const display_mode* low,
 		// TODO: improve this, ie. adapt pixel clock to allowed values!!!
 
 		if (target->virtual_width != mode->virtual_width
-		        || target->virtual_height != mode->virtual_height
-		        || target->space != mode->space)
-		        continue;
+			|| target->virtual_height != mode->virtual_height
+			|| target->space != mode->space) {
+			continue;
+		}
 
 		*target = *mode;
 		return B_OK;

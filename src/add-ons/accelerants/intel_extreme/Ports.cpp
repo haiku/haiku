@@ -105,14 +105,14 @@ Port::HasEDID()
 status_t
 Port::SetPipe(Pipe* pipe)
 {
-    CALLED();
+	CALLED();
 
 	if (pipe == NULL) {
 		ERROR("%s: Invalid pipe provided!\n", __func__);
 		return B_ERROR;
 	}
 
-    uint32 portRegister = _PortRegister();
+	uint32 portRegister = _PortRegister();
 	if (portRegister == 0) {
 		ERROR("%s: Invalid PortRegister ((0x%" B_PRIx32 ") for %s\n", __func__,
 			portRegister, PortName());
@@ -128,7 +128,7 @@ Port::SetPipe(Pipe* pipe)
 	TRACE("%s: Assigning %s (0x%" B_PRIx32 ") to pipe %s\n", __func__,
 		PortName(), portRegister, (pipe->Index() == INTEL_PIPE_A) ? "A" : "B");
 
-    uint32 portState = read32(portRegister);
+	uint32 portState = read32(portRegister);
 
 	if (pipe->Index() == INTEL_PIPE_A)
 		write32(portRegister, portState & ~DISPLAY_MONITOR_PIPE_B);
@@ -422,7 +422,7 @@ LVDSPort::_PortRegister()
 status_t
 LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 {
-    CALLED();
+	CALLED();
 	if (target == NULL) {
 		ERROR("%s: Invalid target mode passed!\n", __func__);
 		return B_ERROR;
@@ -955,8 +955,8 @@ EmbeddedDisplayPort::IsConnected()
 
 DigitalDisplayInterface::DigitalDisplayInterface(port_index index,
 		const char* baseName)
-    :
-    Port(index, baseName)
+	:
+	Port(index, baseName)
 {
 	// As of Haswell, Intel decided to change eDP ports to a "DDI" bus...
 	// on a dare because the hardware engineers were drunk one night.

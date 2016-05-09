@@ -64,13 +64,13 @@ FDITransmitter::Enable()
 void
 FDITransmitter::Disable()
 {
-    CALLED();
-    uint32 targetRegister = fRegisterBase + PCH_FDI_TX_CONTROL;
-    uint32 value = read32(targetRegister);
+	CALLED();
+	uint32 targetRegister = fRegisterBase + PCH_FDI_TX_CONTROL;
+	uint32 value = read32(targetRegister);
 
-    write32(targetRegister, value & ~FDI_TX_ENABLE);
-    read32(targetRegister);
-    spin(150);
+	write32(targetRegister, value & ~FDI_TX_ENABLE);
+	read32(targetRegister);
+	spin(150);
 }
 
 
@@ -149,13 +149,13 @@ FDIReceiver::Enable()
 void
 FDIReceiver::Disable()
 {
-    CALLED();
-    uint32 targetRegister = fRegisterBase + PCH_FDI_RX_CONTROL;
-    uint32 value = read32(targetRegister);
+	CALLED();
+	uint32 targetRegister = fRegisterBase + PCH_FDI_RX_CONTROL;
+	uint32 value = read32(targetRegister);
 
-    write32(targetRegister, value & ~FDI_RX_ENABLE);
-    read32(targetRegister);
-    spin(150);
+	write32(targetRegister, value & ~FDI_RX_ENABLE);
+	read32(targetRegister);
+	spin(150);
 }
 
 
@@ -237,7 +237,7 @@ FDILink::Train(display_mode* target)
 		default:
 			bitsPerPixel = 8;
 			break;
-    }
+	}
 
 	// Khz / 10. ( each output octet encoded as 10 bits.
 	uint32 linkBandwidth = gInfo->shared_info->fdi_link_frequency * 1000 / 10;

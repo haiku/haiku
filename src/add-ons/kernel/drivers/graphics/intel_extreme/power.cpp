@@ -52,7 +52,7 @@ intel_en_gating(intel_info &info)
 		uint32 gateValue = (1L << 28) | (1L << 3) | (1L << 2);
 		if ((info.device_type.type & INTEL_TYPE_MOBILE) == INTEL_TYPE_MOBILE) {
 			TRACE("G4x mobile clock gating\n");
-		    gateValue |= 1L << 18;
+			gateValue |= 1L << 18;
 		}
 		write32(info, 0x6200, gateValue);
 	} else {

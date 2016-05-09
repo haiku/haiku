@@ -14,22 +14,22 @@
 
 
 struct pll_divisors {
-    uint32  post;
-    uint32  post1;
-    uint32  post2;
-    bool    post2_high;
-    uint32  n;
-    uint32  m;
-    uint32  m1;
-    uint32  m2;
+	uint32  post;
+	uint32  post1;
+	uint32  post2;
+	bool    post2_high;
+	uint32  n;
+	uint32  m;
+	uint32  m1;
+	uint32  m2;
 };
 
 struct pll_limits {
-    pll_divisors    min;
-    pll_divisors    max;
-    uint32          min_post2_frequency;
-    uint32          min_vco;
-    uint32          max_vco;
+	pll_divisors    min;
+	pll_divisors    max;
+	uint32          min_post2_frequency;
+	uint32          min_vco;
+	uint32          max_vco;
 };
 
 
