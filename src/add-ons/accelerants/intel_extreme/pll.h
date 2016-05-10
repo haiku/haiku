@@ -14,10 +14,9 @@
 
 
 struct pll_divisors {
-	uint32  post;
-	uint32  post1;
-	uint32  post2;
-	bool    post2_high;
+	uint32  p;
+	uint32  p1;
+	uint32  p2;
 	uint32  n;
 	uint32  m;
 	uint32  m1;
@@ -27,13 +26,12 @@ struct pll_divisors {
 struct pll_limits {
 	pll_divisors    min;
 	pll_divisors    max;
-	uint32          min_post2_frequency;
+	uint32			dot_limit;
 	uint32          min_vco;
 	uint32          max_vco;
 };
 
 
-void get_pll_limits(pll_limits* limits, bool isLVDS);
 bool valid_pll_divisors(pll_divisors* divisors, pll_limits* limits);
 void compute_pll_divisors(display_mode* current, pll_divisors* divisors,
 	bool isLVDS);

@@ -239,7 +239,7 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 	float refFreq = gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
 
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)) {
-		float adjusted = ((refFreq * divisors.m) / divisors.n) 	/ divisors.post;
+		float adjusted = ((refFreq * divisors.m) / divisors.n) 	/ divisors.p;
 		uint32 pixelMultiply = uint32(adjusted 	/ (pixelClock / 1000.0f));
 		write32(pllMD, (0 << 24) | ((pixelMultiply - 1) << 8));
 	}
@@ -273,34 +273,33 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 	uint32 pll = DISPLAY_PLL_ENABLED | DISPLAY_PLL_NO_VGA_CONTROL | extraFlags;
 
 	if (gInfo->shared_info->device_type.Generation() >= 3) {
-		// post1 divisor << 1 , 1-8
+		// p1 divisor << 1 , 1-8
 		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_PIN)) {
-			pll |= ((1 << (divisors.post1 - 1))
+			pll |= ((1 << (divisors.p1 - 1))
 					<< DISPLAY_PLL_IGD_POST1_DIVISOR_SHIFT)
 				& DISPLAY_PLL_IGD_POST1_DIVISOR_MASK;
 		} else {
-			pll |= ((1 << (divisors.post1 - 1))
+			pll |= ((1 << (divisors.p1 - 1))
 					<< DISPLAY_PLL_POST1_DIVISOR_SHIFT)
 				& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
-		//	pll |= ((divisors.post1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+		//	pll |= ((divisors.p1 - 1) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
 		//		& DISPLAY_PLL_9xx_POST1_DIVISOR_MASK;
 		}
 
-		// p2 clock divider. 5 or 7 high
-		if (divisors.post2_high)
+		if (divisors.p2 == 5 || divisors.p2 == 7)
 			pll |= DISPLAY_PLL_DIVIDE_HIGH;
 
 		if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x))
 			pll |= 6 << DISPLAY_PLL_PULSE_PHASE_SHIFT;
 	} else {
-		if (!divisors.post2_high)
+		if (divisors.p2 != 5 && divisors.p2 != 7)
 			pll |= DISPLAY_PLL_DIVIDE_4X;
 
 		pll |= DISPLAY_PLL_2X_CLOCK;
 
 		// TODO: Is this supposed to be DISPLAY_PLL_IGD_POST1_DIVISOR_MASK??
-		if (divisors.post1 > 2) {
-			pll |= ((divisors.post1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
+		if (divisors.p1 > 2) {
+			pll |= ((divisors.p1 - 2) << DISPLAY_PLL_POST1_DIVISOR_SHIFT)
 				& DISPLAY_PLL_POST1_DIVISOR_MASK;
 		} else
 			pll |= DISPLAY_PLL_POST1_DIVIDE_2;

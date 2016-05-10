@@ -506,7 +506,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	// Set the B0-B3 data pairs corresponding to whether we're going to
 	// set the DPLLs for dual-channel mode or not.
-	if (divisors.post2_high) {
+	if (divisors.p2 == 5 || divisors.p2 == 7) {
 		TRACE("LVDS: dual channel\n");
 		lvds |= LVDS_B0B3_POWER_UP | LVDS_CLKB_POWER_UP;
 	} else {
