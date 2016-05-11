@@ -564,18 +564,18 @@ intel_get_accelerant_device_info(accelerant_device_info* info)
 
 	DeviceType* type = &gInfo->shared_info->device_type;
 
-	if (type->InFamily(INTEL_FAMILY_7xx))
-		strcpy(info->name, "Intel Extreme Graphics");
-	else if (type->InFamily(INTEL_FAMILY_8xx))
-		strcpy(info->name, "Intel Extreme Graphics 2");
+	if (type->InFamily(INTEL_FAMILY_7xx) || type->InFamily(INTEL_FAMILY_8xx))
+		strcpy(info->name, "Intel Extreme");
 	else if (type->InFamily(INTEL_FAMILY_9xx))
-		strcpy(info->name, "Intel Graphics Media Accelerator");
-	else if (type->InFamily(INTEL_FAMILY_SER5))
-		strcpy(info->name, "Intel HD/Iris Graphics");
+		strcpy(info->name, "Intel GMA");
 	else if (type->InFamily(INTEL_FAMILY_POVR))
-		strcpy(info->name, "Intel PowerVR Graphics");
+		strcpy(info->name, "Intel PowerVR");
 	else if (type->InFamily(INTEL_FAMILY_SOC0))
-		strcpy(info->name, "Intel Atom Graphics");
+		strcpy(info->name, "Intel Atom");
+	else if (type->InFamily(INTEL_FAMILY_SER5))
+		strcpy(info->name, "Intel HD/Iris");
+	else
+		strcpy(info->name, "Intel");
 
 	strcpy(info->chipset, gInfo->shared_info->device_identifier);
 	strcpy(info->serial_no, "None");
