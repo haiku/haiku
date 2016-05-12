@@ -74,7 +74,7 @@ bool BluetoothServer::QuitRequested(void)
 {
 	LocalDeviceImpl* lDeviceImpl = NULL;
 	while ((lDeviceImpl = (LocalDeviceImpl*)
-		fLocalDevicesList.RemoveItem((int32)0)) != NULL)
+		fLocalDevicesList.RemoveItemAt(0)) != NULL)
 		delete lDeviceImpl;
 
 	_RemoveDeskbarIcon();
