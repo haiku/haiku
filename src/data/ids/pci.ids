@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.05.02
-#	Date:    2016-05-02 03:15:02
+#	Version: 2016.05.11
+#	Date:    2016-05-11 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10482,7 +10482,8 @@
 	134d  GM108M [GeForce 940MX]
 	134e  GM108M [GeForce 930MX]
 	134f  GM108M [GeForce 920MX]
-	137a  GM108GLM [Quadro K620M]
+	137a  GM108GLM [Quadro K620M / Quadro M500M]
+		17aa 505a  Quadro M500M
 	137d  GM108M [GeForce 940A]
 	1380  GM107 [GeForce GTX 750 Ti]
 	1381  GM107 [GeForce GTX 750]
@@ -10530,7 +10531,7 @@
 	13f8  GM204GLM [Quadro M5000M]
 	13f9  GM204GLM [Quadro M4000M]
 	13fa  GM204GLM [Quadro M3000M]
-	13fb  GM204GL [Quadro M5500]
+	13fb  GM204GLM [Quadro M5500]
 	1401  GM206 [GeForce GTX 960]
 	1402  GM206 [GeForce GTX 950]
 	1407  GM206 [GeForce GTX 750 v2]
@@ -17620,6 +17621,7 @@
 15aa  Moreton Bay
 15ab  Bluesteel Networks Inc
 15ac  North Atlantic Instruments
+	6893  3U OpenVPX Multi-function I/O Board [Model 68C3]
 15ad  VMware
 	0405  SVGA II Adapter
 	0710  SVGA Adapter
@@ -17636,6 +17638,7 @@
 	07e0  SATA AHCI controller
 	0801  Virtual Machine Interface
 		15ad 0800  Hypervisor ROM Interface
+	0820  Paravirtual RDMA controller
 	1977  HD Audio Controller
 15ae  Amersham Pharmacia Biotech
 15b0  Zoltrix International Ltd
@@ -18479,7 +18482,9 @@
 	9702  CN23XX [LiquidIO II] Intelligent Adapter
 		177d 0003  CN2350 [LiquidIO II] 2-port 10GbE Intelligent adapter
 		177d 0004  CN2350 [LiquidIO II] 2-port 25GbE Intelligent adapter
+	9703  CN23XX [LiquidIO II] NVMe Controller
 	9712  CN23XX [LiquidIO II] SRIOV Virtual Function
+	9713  CN23XX [LiquidIO II] NVMe SRIOV Virtual Function
 	9800  Octeon Fusion CNF75XX Processor
 	a001  THUNDERX MRML Bridge
 	a002  THUNDERX PCC Bridge
