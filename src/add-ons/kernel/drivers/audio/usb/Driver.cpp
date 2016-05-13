@@ -14,7 +14,7 @@
 #include "Settings.h"
 
 
-static const char* sDeviceBaseName = "audio/hmulti/USB Audio/";
+static const char* sDeviceBaseName = "audio/hmulti/usb_audio/";
 
 usb_module_info* gUSBModule = NULL;
 
