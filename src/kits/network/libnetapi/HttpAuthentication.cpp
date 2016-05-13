@@ -53,6 +53,43 @@ BHttpAuthentication::BHttpAuthentication(const BString& username, const BString&
 }
 
 
+BHttpAuthentication::BHttpAuthentication(const BHttpAuthentication& other)
+	:
+	fAuthenticationMethod(other.fAuthenticationMethod),
+	fUserName(other.fUserName),
+	fPassword(other.fPassword),
+	fRealm(other.fRealm),
+	fDigestNonce(other.fDigestNonce),
+	fDigestCnonce(other.fDigestCnonce),
+	fDigestNc(other.fDigestNc),
+	fDigestOpaque(other.fDigestOpaque),
+	fDigestStale(other.fDigestStale),
+	fDigestAlgorithm(other.fDigestAlgorithm),
+	fDigestQop(other.fDigestQop),
+	fAuthorizationString(other.fAuthorizationString)
+{
+}
+
+
+BHttpAuthentication& BHttpAuthentication::operator=(
+	const BHttpAuthentication& other)
+{
+	fAuthenticationMethod = other.fAuthenticationMethod;
+	fUserName = other.fUserName;
+	fPassword = other.fPassword;
+	fRealm = other.fRealm;
+	fDigestNonce = other.fDigestNonce;
+	fDigestCnonce = other.fDigestCnonce;
+	fDigestNc = other.fDigestNc;
+	fDigestOpaque = other.fDigestOpaque;
+	fDigestStale = other.fDigestStale;
+	fDigestAlgorithm = other.fDigestAlgorithm;
+	fDigestQop = other.fDigestQop;
+	fAuthorizationString = other.fAuthorizationString;
+	return *this;
+}
+
+
 // #pragma mark Field modification
 
 
