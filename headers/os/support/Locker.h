@@ -32,6 +32,8 @@ public:
 private:
 								BLocker(const char* name, bool benaphoreStyle,
 									bool _ignored);
+								BLocker(const BLocker&);
+								BLocker& operator=(const BLocker&);
 			void				InitLocker(const char* name,
 									bool benaphoreStyle);
 			bool				AcquireLock(bigtime_t timeout, status_t* error);
