@@ -52,7 +52,7 @@ const int32 kGrowth = 16;
 
 static int32 sDeviceCount = 0;
 static BGameSoundDevice* sDevice = NULL;
-static BLocker sDeviceRefCountLock = BLocker("GameSound device lock");
+static BLocker sDeviceRefCountLock("GameSound device lock");
 
 
 BGameSoundDevice*
