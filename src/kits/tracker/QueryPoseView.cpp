@@ -80,7 +80,7 @@ using std::nothrow;
 BQueryPoseView::BQueryPoseView(Model* model)
 	:
 	BPoseView(model, kListMode),
-	fShowResultsFromTrash(false),
+	fRefFilter(NULL),
 	fQueryList(NULL),
 	fQueryListContainer(NULL),
 	fCreateOldPoseList(false)
@@ -201,33 +201,6 @@ BQueryPoseView::Refresh()
 }
 
 
-bool
-BQueryPoseView::ShouldShowPose(const Model* model, const PoseInfo* poseInfo)
-{
-	// add_poses, etc. filter
-	ASSERT(TargetModel());
-
-	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
-	if (!fShowResultsFromTrash && tracker != NULL
-		&& tracker->InTrashNode(model->EntryRef())) {
-		return false;
-	}
-
-	bool result = _inherited::ShouldShowPose(model, poseInfo);
-
-	PoseList* oldPoseList = fQueryListContainer->OldPoseList();
-	if (result && oldPoseList != NULL) {
-		// pose will get added - remove it from the old pose list
-		// because it is supposed to be showing
-		BPose* pose = oldPoseList->FindPose(model);
-		if (pose != NULL)
-			oldPoseList->RemoveItem(pose);
-	}
-
-	return result;
-}
-
-
 void
 BQueryPoseView::AddPosesCompleted()
 {
@@ -280,8 +253,6 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 		fQueryListContainer = NULL;
 		return NULL;
 	}
-
-	fShowResultsFromTrash = fQueryListContainer->ShowResultsFromTrash();
 
 	TTracker::WatchNode(sourceModel.NodeRef(), B_WATCH_NAME | B_WATCH_STAT
 		| B_WATCH_ATTR, this);
@@ -360,6 +331,8 @@ BQueryPoseView::InitDirentIterator(const entry_ref* ref)
 			delta);
 	}
 
+	SetRefFilter(new QueryRefFilter(fQueryListContainer->ShowResultsFromTrash()));
+
 	return fQueryListContainer->Clone();
 }
 
@@ -414,6 +387,26 @@ BQueryPoseView::ActiveOnDevice(dev_t device) const
 	}
 
 	return false;
+}
+
+
+//	#pragma mark - QueryRefFilter
+
+
+QueryRefFilter::QueryRefFilter(bool showResultsFromTrash)
+	:
+	fShowResultsFromTrash(showResultsFromTrash)
+{
+}
+
+
+bool
+QueryRefFilter::Filter(const entry_ref* ref, BNode* node, stat_beos* st,
+	const char* filetype)
+{
+	TTracker* tracker = dynamic_cast<TTracker*>(be_app);
+	return !(!fShowResultsFromTrash && tracker != NULL
+		&& tracker->InTrashNode(ref));
 }
 
 

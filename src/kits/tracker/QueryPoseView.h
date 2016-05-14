@@ -75,7 +75,6 @@ protected:
 	virtual void EditQueries();
 	virtual EntryListBase* InitDirentIterator(const entry_ref*);
 	virtual uint32 WatchNewNodeMask();
-	virtual bool ShouldShowPose(const Model*, const PoseInfo*);
 	virtual void AddPosesCompleted();
 
 private:
@@ -83,15 +82,26 @@ private:
 		// typically there will be one query per volume specified
 		// QueryEntryListCollection provides the abstraction layer
 		// defining the iterators for _add_poses_
-	bool fShowResultsFromTrash;
 	mutable BString fSearchForMimeType;
 
+	BRefFilter* fRefFilter;
 	BObjectList<BQuery>* fQueryList;
 	QueryEntryListCollection* fQueryListContainer;
 
 	bool fCreateOldPoseList;
 
 	typedef BPoseView _inherited;
+};
+
+
+class QueryRefFilter : public BRefFilter {
+public:
+	QueryRefFilter(bool showResultsFromTrash);
+	bool Filter(const entry_ref* ref, BNode* node, stat_beos* st,
+		const char* filetype);
+
+private:
+	bool fShowResultsFromTrash;
 };
 
 
