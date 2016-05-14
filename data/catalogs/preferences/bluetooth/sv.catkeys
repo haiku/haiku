@@ -1,11 +1,10 @@
-1	swedish	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	swedish	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		Om Bluetooth…
 Handheld	Settings view		Handhållen
 Default inquiry time:	Settings view		Förvald frågotid:
 Manufacturer: 	Device View		Tillverkare:
 Add device to list	Inquiry panel		Lägg till enhet till istan
 Starting scan...	Inquiry panel		Startar avsökning...
-Show bluetooth console…	Window		Visa Bluetooth-konsol…
 Smart phone	Settings view		Telefon
 Server	Settings view		Server
 Stop bluetooth services…	Window		Stoppa Bluetooth-tjänster…
@@ -39,7 +38,6 @@ Remote devices	Window		Fjärrenheter
 Laptop	Settings view		Bärbar dator
 Discoverable	Extended local device view		Synlig
 Service classes: 	Device View		Tjänsteklasser:
-Refresh LocalDevices…	Window		Uppdatera lokal enhet…
 Settings	Window		Inställningar
 Only from trusted devices	Settings view		Endast från betrodda källor
 Scanning progress	Inquiry panel		Genomsökningsstatus

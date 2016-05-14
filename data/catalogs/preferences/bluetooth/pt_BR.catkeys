@@ -1,11 +1,10 @@
-1	portuguese (brazil)	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	portuguese (brazil)	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		Sobre Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Tempo de consulta padrão:
 Manufacturer: 	Device View		Fabricante
 Add device to list	Inquiry panel		Adicionar dispositivo à lista
 Starting scan...	Inquiry panel		Pesquisando...
-Show bluetooth console…	Window		Mostrar console do bluetooth...
 Smart phone	Settings view		Smartphone
 Server	Settings view		Servidor
 Stop bluetooth services…	Window		Parar serviços bluetooth…
@@ -39,7 +38,6 @@ Remote devices	Window		Dispositivos remotos
 Laptop	Settings view		Laptop
 Discoverable	Extended local device view		Visível
 Service classes: 	Device View		Classes de serviço:
-Refresh LocalDevices…	Window		Atualizar os dispositivos locais...
 Settings	Window		Configurações
 Only from trusted devices	Settings view		Apenas dos dispositivos de confiança
 Scanning progress	Inquiry panel		Progresso da varredura

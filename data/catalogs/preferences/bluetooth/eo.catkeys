@@ -1,10 +1,9 @@
-1	esperanto	x-vnd.Haiku-BluetoothPrefs	3455846859
+1	esperanto	x-vnd.Haiku-BluetoothPrefs	2359729034
 About Bluetooth…	Window		Pri Bluetooth…
 Handheld	Settings view		Poŝkomputilo
 Default inquiry time:	Settings view		Apriora informmenda tempo:
 Add device to list	Inquiry panel		Aldoni la aparaton al liston
 Starting scan...	Inquiry panel		Ekskanante...
-Show bluetooth console…	Window		Montri bluetooth-an konzolon…
 Smart phone	Settings view		Sprittelefono
 Server	Settings view		Servilo
 Stop bluetooth services…	Window		Halti bluetooth-ajn servojn…
@@ -34,7 +33,6 @@ Remote devices	Window		Foraj aparatoj
 Laptop	Settings view		Tekkomputilo
 Discoverable	Extended local device view		Trovebla
 Service classes: 	Device View		Servaj klasoj:
-Refresh LocalDevices…	Window		Reŝarĝi lokajn aparatojn…
 Settings	Window		Agordoj
 Only from trusted devices	Settings view		Nur el fidaj aparatoj
 Scanning progress	Inquiry panel		Skanada progreso

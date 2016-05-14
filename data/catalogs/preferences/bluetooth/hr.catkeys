@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-BluetoothPrefs	2479605936
+1	croatian	x-vnd.Haiku-BluetoothPrefs	4194302208
 About Bluetooth…	Window		O Bluetooth-u...
 Manufacturer: 	Device View		Proizvođač: 
 Add device to list	Inquiry panel		Dodaj uređaj na listu
@@ -31,7 +31,6 @@ Revert	Window		Obrnuto
 Remote devices	Window		Udaljeni uređaji
 Laptop	Settings view		Prijenosno računalo
 Service classes: 	Device View		Klase servisa: 
-Refresh LocalDevices…	Window		Osvježi lokalne uređaje...
 Settings	Window		Postavke
 Only from trusted devices	Settings view		Samo sa sigurnih uređaja
 Scanning progress	Inquiry panel		Napredak pregledavanja

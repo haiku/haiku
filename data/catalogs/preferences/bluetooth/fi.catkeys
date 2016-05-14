@@ -1,11 +1,10 @@
-1	finnish	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	finnish	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		Bluetooth-ohjelmasta…
 Handheld	Settings view		Kädessäpidettävät
 Default inquiry time:	Settings view		Oletuskyselyn pituus:
 Manufacturer: 	Device View		Valmistaja: 
 Add device to list	Inquiry panel		Lisää laite luetteloon
 Starting scan...	Inquiry panel		Aloitetaan etsintä...
-Show bluetooth console…	Window		Näytä bluetooth-pääteikkuna…
 Smart phone	Settings view		Älypuhelin
 Server	Settings view		Palvelin
 Stop bluetooth services…	Window		Pysäytä bluetooth-palvelut…
@@ -39,7 +38,6 @@ Remote devices	Window		Etälaitteet
 Laptop	Settings view		Kannettava
 Discoverable	Extended local device view		Paljastettava
 Service classes: 	Device View		Palveluluokat: 
-Refresh LocalDevices…	Window		Päivitä paikallisia laitteita…
 Settings	Window		Asetukset
 Only from trusted devices	Settings view		Vain luotetuista laitteista
 Scanning progress	Inquiry panel		Etsinnän edistyminen

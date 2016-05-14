@@ -1,11 +1,10 @@
-1	ukrainian	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	ukrainian	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		Про Bluetooth…
 Handheld	Settings view		Переносний
 Default inquiry time:	Settings view		Час запиту по замовчуванню:
 Manufacturer: 	Device View		Виробник:
 Add device to list	Inquiry panel		Додати прилад  до списку
 Starting scan...	Inquiry panel		Початок сканування…
-Show bluetooth console…	Window		Показати консоль Bluetooth…
 Smart phone	Settings view		Смартфон
 Server	Settings view		Сервер
 Stop bluetooth services…	Window		Зупинити служби Bluetooth…
@@ -39,7 +38,6 @@ Remote devices	Window		Віддалені прилади
 Laptop	Settings view		Ноутбук
 Discoverable	Extended local device view		Видимий
 Service classes: 	Device View		Класи сервісу:
-Refresh LocalDevices…	Window		Обновлення локальних пристроїв…
 Settings	Window		Налаштування
 Only from trusted devices	Settings view		Тільки для перевірених приладів
 Scanning progress	Inquiry panel		Хід сканування

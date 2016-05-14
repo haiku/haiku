@@ -1,11 +1,10 @@
-1	romanian	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	romanian	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		Despre Bluetooth...
 Handheld	Settings view		Calculator de buzunar
 Default inquiry time:	Settings view		Timp implicit de întrebare:
 Manufacturer: 	Device View		Producător:
 Add device to list	Inquiry panel		Adaugă dispozitiv la listă
 Starting scan...	Inquiry panel		Se începe scanarea...
-Show bluetooth console…	Window		Afișează consolă bluetooth...
 Smart phone	Settings view		Telefon inteligent
 Server	Settings view		Server
 Stop bluetooth services…	Window		Oprește servicii bluetooth...
@@ -39,7 +38,6 @@ Remote devices	Window		Dispozitive la distanță
 Laptop	Settings view		Laptop
 Discoverable	Extended local device view		Poate fi descoperit
 Service classes: 	Device View		Clase de servicii:
-Refresh LocalDevices…	Window		Reîmprospătează dispozitivele locale...
 Settings	Window		Configurări
 Only from trusted devices	Settings view		Numai de la dispozitivele de încredere
 Scanning progress	Inquiry panel		Progresul scanării

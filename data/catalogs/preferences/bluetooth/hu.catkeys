@@ -1,11 +1,10 @@
-1	hungarian	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	hungarian	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		A Bluetooth-ról…
 Handheld	Settings view		Mobiltelefon
 Default inquiry time:	Settings view		Alapértelmezett lekérdezési időkorlát:
 Manufacturer: 	Device View		Gyártó:
 Add device to list	Inquiry panel		Eszköz hozzáadása
 Starting scan...	Inquiry panel		Keresés…
-Show bluetooth console…	Window		Bluetooth-konzol megjelenítése…
 Smart phone	Settings view		Okostelefon
 Server	Settings view		Kiszolgáló
 Stop bluetooth services…	Window		Bluetooth-szolgáltatások leállítása…
@@ -39,7 +38,6 @@ Remote devices	Window		Távoli eszközök
 Laptop	Settings view		Laptop
 Discoverable	Extended local device view		Felfedezhető
 Service classes: 	Device View		Szervizosztályok: 
-Refresh LocalDevices…	Window		Helyi eszközök frissítése…
 Settings	Window		Beállítások
 Only from trusted devices	Settings view		Csak biztonságos eszközöktől
 Scanning progress	Inquiry panel		Keresés folyamatban

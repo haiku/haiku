@@ -1,11 +1,10 @@
-1	lithuanian	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	lithuanian	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		Apie…
 Handheld	Settings view		delninukas
 Default inquiry time:	Settings view		Numatytasis žvalgymo laikas:
 Manufacturer: 	Device View		Gamintojas: 
 Add device to list	Inquiry panel		Pridėti įrenginį
 Starting scan...	Inquiry panel		Pradedamas žvalgymas…
-Show bluetooth console…	Window		Rodyti „Bluetooth“ pultą…
 Smart phone	Settings view		Išmanusis telefonas
 Server	Settings view		serveris
 Stop bluetooth services…	Window		Stabdyti „Bluetooth“ tarnybas…
@@ -39,7 +38,6 @@ Remote devices	Window		Nuotoliniai įrenginiai
 Laptop	Settings view		skreitinis kompiuteris
 Discoverable	Extended local device view		Aptinkamas
 Service classes: 	Device View		Tarnybų tipai: 
-Refresh LocalDevices…	Window		Atnaujinti vietinių įrenginių sąrašą…
 Settings	Window		Nuostatos
 Only from trusted devices	Settings view		tik iš patikimų įrenginių
 Scanning progress	Inquiry panel		Žvalgymo eiga

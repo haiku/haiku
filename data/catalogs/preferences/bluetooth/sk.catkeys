@@ -1,11 +1,10 @@
-1	slovak	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	slovak	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		O aplikácii Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Predvolený čas zisťovania:
 Manufacturer: 	Device View		Výrobca: 
 Add device to list	Inquiry panel		Pridať zariadenie do zoznamu
 Starting scan...	Inquiry panel		Začína hľadanie...
-Show bluetooth console…	Window		Zobraziť konzolu Bluetooth…
 Smart phone	Settings view		Smartfón
 Server	Settings view		Server
 Stop bluetooth services…	Window		Zastaviť zariadenia Bluetooth…
@@ -39,7 +38,6 @@ Remote devices	Window		Vzdialené zariadenia
 Laptop	Settings view		Notebook
 Discoverable	Extended local device view		Objaviteľné
 Service classes: 	Device View		Triedy služieb: 
-Refresh LocalDevices…	Window		Obnoviť lokálne zariadenia…
 Settings	Window		Nastavenia
 Only from trusted devices	Settings view		Iba z dôveryhodných zariadení
 Scanning progress	Inquiry panel		Priebeh hľadania

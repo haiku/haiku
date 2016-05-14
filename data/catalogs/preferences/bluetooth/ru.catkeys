@@ -1,11 +1,10 @@
-1	russian	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	russian	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		О программе…
 Handheld	Settings view		Переносной
 Default inquiry time:	Settings view		Время запроса по умолчанию:
 Manufacturer: 	Device View		Производитель: 
 Add device to list	Inquiry panel		Добавить устройство в список
 Starting scan...	Inquiry panel		Начало сканирования…
-Show bluetooth console…	Window		Показать консоль bluetooth…
 Smart phone	Settings view		Смартфон
 Server	Settings view		Сервер
 Stop bluetooth services…	Window		Остановить службу bluetooth…
@@ -39,7 +38,6 @@ Remote devices	Window		Удалённые устройства
 Laptop	Settings view		Ноутбук
 Discoverable	Extended local device view		Видимый
 Service classes: 	Device View		Служебные классы: 
-Refresh LocalDevices…	Window		Обновление локальных устройств…
 Settings	Window		Настройки
 Only from trusted devices	Settings view		Только от доверенных устройств
 Scanning progress	Inquiry panel		Прогресс сканирования

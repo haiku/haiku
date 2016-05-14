@@ -1,11 +1,10 @@
-1	dutch; flemish	x-vnd.Haiku-BluetoothPrefs	1026748543
+1	dutch; flemish	x-vnd.Haiku-BluetoothPrefs	4225598014
 About Bluetooth…	Window		Over Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Standaard onderzoekstijd:
 Manufacturer: 	Device View		Fabrikant:
 Add device to list	Inquiry panel		Apparaat aan lijst toevoegen
 Starting scan...	Inquiry panel		Afzoeken wordt gestart...
-Show bluetooth console…	Window		Toon bluetoothconsole…
 Smart phone	Settings view		Smartphone
 Server	Settings view		Server
 Stop bluetooth services…	Window		Bluetooth-diensten stoppen…
@@ -39,7 +38,6 @@ Remote devices	Window		Externe apparaten
 Laptop	Settings view		Laptop
 Discoverable	Extended local device view		Zichtbaar
 Service classes: 	Device View		Service-klassen:
-Refresh LocalDevices…	Window		Lokale apparaten herladen…
 Settings	Window		Instellingen
 Only from trusted devices	Settings view		Alleen van vertrouwde apparaten
 Scanning progress	Inquiry panel		Afzoek-voortgang

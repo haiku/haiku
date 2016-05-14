@@ -1,11 +1,10 @@
-1	belarusian	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	belarusian	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		Пра праграму Bluetooth…
 Handheld	Settings view		Наладоннік
 Default inquiry time:	Settings view		Час стандартнага запыту:
 Manufacturer: 	Device View		Вытворца: 
 Add device to list	Inquiry panel		Дадаць прыладу ў спіс
 Starting scan...	Inquiry panel		Пачаць пошук...
-Show bluetooth console…	Window		Паказаць кансоль Bluetooth…
 Smart phone	Settings view		Смартфон
 Server	Settings view		Сервер
 Stop bluetooth services…	Window		Спыніць службы Bluetooth…
@@ -39,7 +38,6 @@ Remote devices	Window		Падаленыя прылады
 Laptop	Settings view		Ноўтбук
 Discoverable	Extended local device view		Бачны для іншых
 Service classes: 	Device View		Класы сервісу: 
-Refresh LocalDevices…	Window		Абнавіць прылады (LocalDevices)…
 Settings	Window		Налады
 Only from trusted devices	Settings view		Толькі ад надзейных прылад
 Scanning progress	Inquiry panel		Прагрэс пошуку

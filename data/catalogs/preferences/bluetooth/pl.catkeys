@@ -1,11 +1,10 @@
-1	polish	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	polish	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		O aplikacji Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Domyślny czas zapytania:
 Manufacturer: 	Device View		Producent: 
 Add device to list	Inquiry panel		Dodaj urządzenie do listy
 Starting scan...	Inquiry panel		Rozpoczynanie skanowania...
-Show bluetooth console…	Window		Pokaż konsole bluetooth…
 Smart phone	Settings view		Telefon typu smartphone
 Server	Settings view		Serwer
 Stop bluetooth services…	Window		Zatrzymaj usługi bluetooth…
@@ -39,7 +38,6 @@ Remote devices	Window		Zdalne urządzenia
 Laptop	Settings view		Laptop
 Discoverable	Extended local device view		Wykrywalny
 Service classes: 	Device View		Klasy usług: 
-Refresh LocalDevices…	Window		Odśwież urządzenia lokalne…
 Settings	Window		Ustawienia
 Only from trusted devices	Settings view		Tylko od zaufanych urządzeń
 Scanning progress	Inquiry panel		Postęp skanowania

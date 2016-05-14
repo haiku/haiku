@@ -1,14 +1,15 @@
-1	german	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	german	x-vnd.Haiku-BluetoothPrefs	1700311008
 About Bluetooth…	Window		Über Bluetooth…
 Handheld	Settings view		Handheld
 Default inquiry time:	Settings view		Suchdauer:
 Manufacturer: 	Device View		Hersteller:
 Add device to list	Inquiry panel		Gerät zur Liste hinzufügen
 Starting scan...	Inquiry panel		Suche startet...
-Show bluetooth console…	Window		Bluetooth-Konsole anzeigen…
 Smart phone	Settings view		Smartphone
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		Mit Unterstützung von:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nDanke an alle, die mitgeholfen haben:...\n\nHardwarespenden und deren Versand:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nFinanzielle Unterstützung:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nPatches von:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTester:\n - Petter H. Juliussen\nInfos und Wissenswertes von:\n - the yellowTAB team
 Server	Settings view		Server
 Stop bluetooth services…	Window		Bluetooth-Dienste beenden…
+The Bluetooth services are not currently running on this system.	main		Im System laufen derzeit keine Bluetooth Dienste.
 Identify host as:	Settings view		Agieren als:
 Refresh…	Remote devices		Aktualisieren…
 Pair…	Remote devices		Pair…
@@ -19,6 +20,7 @@ Local devices found on system:	Settings view		Verwendbare Geräte:
 Remaining %1 seconds	Inquiry panel		Es verbleiben %1 Sekunden
 Server	Window		Server
 Scanning completed.	Inquiry panel		Suche abgeschlossen.
+Launch now	main		Jetzt starten
 Remove	Remote devices		Entfernen
 Quit	main		Beenden
 15 secs	Settings view		15 s
@@ -39,7 +41,6 @@ Remote devices	Window		Bekannte Geräte
 Laptop	Settings view		Laptop
 Discoverable	Extended local device view		Sichtbar
 Service classes: 	Device View		Gerätedienste:
-Refresh LocalDevices…	Window		Bluetooth-Geräte erkennen…
 Settings	Window		Einstellungen
 Only from trusted devices	Settings view		Nur vertraute Geräte
 Scanning progress	Inquiry panel		Suchfortschritt

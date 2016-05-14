@@ -1,11 +1,10 @@
-1	spanish; castilian	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	spanish; castilian	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		Acerca de Bluetooth...
 Handheld	Settings view		PC de bolsillo
 Default inquiry time:	Settings view		Tiempo de búsqueda predeterminado:
 Manufacturer: 	Device View		Fabricante
 Add device to list	Inquiry panel		Añadir dispositivo a la lista
 Starting scan...	Inquiry panel		Comenzando búsqueda...
-Show bluetooth console…	Window		Mostrar consola de Bluetooth...
 Smart phone	Settings view		Teléfono inteligente
 Server	Settings view		Servidor
 Stop bluetooth services…	Window		Detener servicios Bluetooth…
@@ -39,7 +38,6 @@ Remote devices	Window		Dispositivos remotos
 Laptop	Settings view		PC Portátil
 Discoverable	Extended local device view		Visible
 Service classes: 	Device View		Clases de servicio:
-Refresh LocalDevices…	Window		Actualizar dispositivos locales…
 Settings	Window		Configuración
 Only from trusted devices	Settings view		Sólo desde dispositivos de confianza
 Scanning progress	Inquiry panel		Progreso de la búsqueda

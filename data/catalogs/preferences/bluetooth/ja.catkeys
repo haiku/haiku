@@ -1,11 +1,10 @@
-1	japanese	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	japanese	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		Bluetoothについて…
 Handheld	Settings view		ハンドヘルド機器
 Default inquiry time:	Settings view		デフォルトの問い合わせ時間:
 Manufacturer: 	Device View		製造元:
 Add device to list	Inquiry panel		デバイスを一覧に追加
 Starting scan...	Inquiry panel		スキャン開始…
-Show bluetooth console…	Window		Bluetooth コンソールを表示…
 Smart phone	Settings view		スマートフォン
 Server	Settings view		サーバー
 Stop bluetooth services…	Window		Bluetooth サービスを停止…
@@ -39,7 +38,6 @@ Remote devices	Window		リモートデバイス
 Laptop	Settings view		ラップトップ
 Discoverable	Extended local device view		発見可能
 Service classes: 	Device View		サービスクラス:
-Refresh LocalDevices…	Window		ローカルデバイスを更新…
 Settings	Window		設定
 Only from trusted devices	Settings view		信用されているデバイスのみ
 Scanning progress	Inquiry panel		スキャンの進行状況

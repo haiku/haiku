@@ -1,11 +1,10 @@
-1	english	x-vnd.Haiku-BluetoothPrefs	2610775851
+1	english	x-vnd.Haiku-BluetoothPrefs	1514658026
 About Bluetooth…	Window		关于蓝牙...
 Handheld	Settings view		手持设备
 Default inquiry time:	Settings view		默认查询时间：
 Manufacturer: 	Device View		制造商：
 Add device to list	Inquiry panel		添加设备到列表
 Starting scan...	Inquiry panel		开始扫描...
-Show bluetooth console…	Window		显示蓝牙控制台...
 Smart phone	Settings view		智能手机
 Server	Settings view		服务器
 Stop bluetooth services…	Window		停止蓝牙服务...
@@ -39,7 +38,6 @@ Remote devices	Window		远程设备
 Laptop	Settings view		便携电脑
 Discoverable	Extended local device view		显示
 Service classes: 	Device View		服务等级：
-Refresh LocalDevices…	Window		刷新本地设备...
 Settings	Window		设置
 Only from trusted devices	Settings view		仅从信任设备
 Scanning progress	Inquiry panel		扫描进度
