@@ -54,6 +54,8 @@ const uint32 kMsgAppFlagsChanged = 'afch';
 const uint32 kMsgIconChanged = 'icch';
 const uint32 kMsgTypeIconsChanged = 'tich';
 
+const uint32 kMsgVersionInfoChanged = 'tvch';
+
 const uint32 kMsgTypeSelected = 'tpsl';
 const uint32 kMsgAddType = 'adtp';
 const uint32 kMsgTypeAdded = 'tpad';
@@ -67,6 +69,8 @@ public:
 								TabFilteringTextView(const char* name);
 	virtual						~TabFilteringTextView();
 
+	virtual void				InsertText(const char* text, int32 length,
+									int32 offset, const text_run_array* runs);
 	virtual	void				KeyDown(const char* bytes, int32 count);
 	virtual	void				TargetedByScrollView(BScrollView* scroller);
 	virtual	void				MakeFocus(bool focused = true);
@@ -122,6 +126,15 @@ TabFilteringTextView::TabFilteringTextView(const char* name)
 
 TabFilteringTextView::~TabFilteringTextView()
 {
+}
+
+
+void
+TabFilteringTextView::InsertText(const char* text, int32 length, int32 offset,
+	const text_run_array* runs)
+{
+	BTextView::InsertText(text, length, offset, runs);
+	Window()->PostMessage(kMsgVersionInfoChanged);
 }
 
 
@@ -397,29 +410,39 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	versionBox->SetLabel(B_TRANSLATE("Version info"));
 
 	fMajorVersionControl = new BTextControl(B_TRANSLATE("Version:"),
-		NULL, NULL);
+		NULL, NULL, new BMessage(kMsgVersionInfoChanged));
 	_MakeNumberTextControl(fMajorVersionControl);
 
-	fMiddleVersionControl = new BTextControl(".", NULL, NULL);
+	fMiddleVersionControl = new BTextControl(".", NULL, NULL,
+		new BMessage(kMsgVersionInfoChanged));
 	_MakeNumberTextControl(fMiddleVersionControl);
 
-	fMinorVersionControl = new BTextControl(".", NULL, NULL);
+	fMinorVersionControl = new BTextControl(".", NULL, NULL,
+		new BMessage(kMsgVersionInfoChanged));
 	_MakeNumberTextControl(fMinorVersionControl);
 
 	fVarietyMenu = new BPopUpMenu("variety", true, true);
-	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Development"), NULL));
-	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Alpha"), NULL));
-	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Beta"), NULL));
-	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Gamma"), NULL));
-	item = new BMenuItem(B_TRANSLATE("Golden master"), NULL);
+	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Development"),
+		new BMessage(kMsgVersionInfoChanged)));
+	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Alpha"),
+		new BMessage(kMsgVersionInfoChanged)));
+	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Beta"),
+		new BMessage(kMsgVersionInfoChanged)));
+	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Gamma"),
+		new BMessage(kMsgVersionInfoChanged)));
+	item = new BMenuItem(B_TRANSLATE("Golden master"),
+		new BMessage(kMsgVersionInfoChanged));
 	fVarietyMenu->AddItem(item);
 	item->SetMarked(true);
-	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Final"), NULL));
+	fVarietyMenu->AddItem(new BMenuItem(B_TRANSLATE("Final"),
+		new BMessage(kMsgVersionInfoChanged)));
 
 	BMenuField* varietyField = new BMenuField("", fVarietyMenu);
-	fInternalVersionControl = new BTextControl("/", NULL, NULL);
+	fInternalVersionControl = new BTextControl("/", NULL, NULL,
+		new BMessage(kMsgVersionInfoChanged));
 	fShortDescriptionControl =
-		new BTextControl(B_TRANSLATE("Short description:"), NULL, NULL);
+		new BTextControl(B_TRANSLATE("Short description:"), NULL, NULL,
+			new BMessage(kMsgVersionInfoChanged));
 
 	// TODO: workaround for a GCC 4.1.0 bug? Or is that really what the standard says?
 	version_info versionInfo;
@@ -898,6 +921,10 @@ ApplicationTypeWindow::MessageReceived(BMessage* message)
 		case kMsgTypeIconsChanged:
 			fOriginalInfo.typeIconsChanged = true;
 			_CheckSaveMenuItem(CHECK_TYPE_ICONS);
+			break;
+
+		case kMsgVersionInfoChanged:
+			_CheckSaveMenuItem(CHECK_VERSION);
 			break;
 
 		case kMsgSave:
