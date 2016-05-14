@@ -66,17 +66,20 @@ const uint32 kMsgTypeRemoved = 'tprm';
 //! TextView that filters the tab key to be able to tab-navigate while editing
 class TabFilteringTextView : public BTextView {
 public:
-								TabFilteringTextView(const char* name);
+								TabFilteringTextView(const char* name,
+									uint32 changedMessageWhat = 0);
 	virtual						~TabFilteringTextView();
 
 	virtual void				InsertText(const char* text, int32 length,
 									int32 offset, const text_run_array* runs);
+	virtual	void				DeleteText(int32 fromOffset, int32 toOffset);
 	virtual	void				KeyDown(const char* bytes, int32 count);
 	virtual	void				TargetedByScrollView(BScrollView* scroller);
 	virtual	void				MakeFocus(bool focused = true);
 
 private:
 			BScrollView*		fScrollView;
+			uint32				fChangedMessageWhat;
 };
 
 
@@ -116,10 +119,12 @@ public:
 // #pragma mark -
 
 
-TabFilteringTextView::TabFilteringTextView(const char* name)
+TabFilteringTextView::TabFilteringTextView(const char* name,
+	uint32 changedMessageWhat)
 	:
 	BTextView(name, B_WILL_DRAW | B_PULSE_NEEDED | B_NAVIGABLE),
-	fScrollView(NULL)
+	fScrollView(NULL),
+	fChangedMessageWhat(changedMessageWhat)
 {
 }
 
@@ -134,7 +139,17 @@ TabFilteringTextView::InsertText(const char* text, int32 length, int32 offset,
 	const text_run_array* runs)
 {
 	BTextView::InsertText(text, length, offset, runs);
-	Window()->PostMessage(kMsgVersionInfoChanged);
+	if (fChangedMessageWhat != 0)
+		Window()->PostMessage(fChangedMessageWhat);
+}
+
+
+void
+TabFilteringTextView::DeleteText(int32 fromOffset, int32 toOffset)
+{
+	BTextView::DeleteText(fromOffset, toOffset);
+	if (fChangedMessageWhat != 0)
+		Window()->PostMessage(fChangedMessageWhat);
 }
 
 
@@ -452,7 +467,8 @@ ApplicationTypeWindow::ApplicationTypeWindow(BPoint position,
 	BStringView* longLabel = new BStringView(NULL,
 		B_TRANSLATE("Long description:"));
 	longLabel->SetExplicitAlignment(labelAlignment);
-	fLongDescriptionView = new TabFilteringTextView("long desc");
+	fLongDescriptionView = new TabFilteringTextView("long desc",
+		kMsgVersionInfoChanged);
 	fLongDescriptionView->SetMaxBytes(sizeof(versionInfo.long_info));
 
 	scrollView = new BScrollView("desc scrollview", fLongDescriptionView,
