@@ -281,7 +281,7 @@ enum {
 
 BString WebAppInterface::fBaseUrl = BString(BASEURL_DEFAULT);
 BString WebAppInterface::fUserAgent = BString();
-BLocker WebAppInterface::fUserAgentLocker = BLocker();
+BLocker WebAppInterface::fUserAgentLocker;
 
 WebAppInterface::WebAppInterface()
 	:
