@@ -67,6 +67,9 @@ const char* kFileTypeNames[] = {
 #define DBG(x)
 #define OUT	printf
 
+#define B_VERSION_INFO_TYPE 'APPV'
+
+static const uint32 kVersionInfoIntCount = 5;
 
 // #pragma mark - helper functions/classes
 
@@ -323,8 +326,15 @@ ResourceFile::ReadResource(ResourceItem& resource, bool force)
 		}
 		if (error == B_OK) {
 			// convert the data, if necessary
-			if (!fHostEndianess)
-				swap_data(resource.Type(), data, size, B_SWAP_ALWAYS);
+			if (!fHostEndianess) {
+				if (resource.Type() == B_VERSION_INFO_TYPE) {
+					// Version info contains integers that need to be swapped
+					swap_data(B_UINT32_TYPE, data,
+						kVersionInfoIntCount * sizeof(uint32),
+						B_SWAP_ALWAYS);
+				} else
+					swap_data(resource.Type(), data, size, B_SWAP_ALWAYS);
+			}
 			resource.SetLoaded(true);
 			resource.SetModified(false);
 		}
@@ -1200,7 +1210,14 @@ ResourceFile::_WriteResources(ResourcesContainer& container)
 				// swap data, if necessary
 				if (!fHostEndianess) {
 					memcpy(data, itemData, itemSize);
-					swap_data(item->Type(), data, itemSize, B_SWAP_ALWAYS);
+					if (item->Type() == B_VERSION_INFO_TYPE) {
+						// Version info contains integers
+						// that need to be swapped
+						swap_data(B_UINT32_TYPE, data,
+							kVersionInfoIntCount * sizeof(uint32),
+							B_SWAP_ALWAYS);
+					} else
+						swap_data(item->Type(), data, itemSize, B_SWAP_ALWAYS);
 					itemData = data;
 				}
 				write_exactly(fFile, itemOffset, itemData, itemSize,
