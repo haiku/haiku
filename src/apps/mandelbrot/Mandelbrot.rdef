@@ -1,3 +1,18 @@
+resource app_signature "application/x-vnd.Haiku-Mandelbrot";
+
+resource app_name_catalog_entry "x-vnd.Haiku-Mandelbrot:System name:Mandelbrot";
+
+resource app_flags B_MULTIPLE_LAUNCH;
+
+resource app_version {
+	major      = 1,
+	middle     = 0,
+	minor      = 0,
+	variety    = B_APPV_DEVELOPMENT,
+	internal   = 0,
+	short_info = "Mandelbrot",
+	long_info  = "Mandelbrot"
+};
 
 resource vector_icon {
 	$"6E6369660C04006B0500020006023B4FDF3A26DEBE07943F1FB649C6A13E02F4"
@@ -23,10 +38,3 @@ resource vector_icon {
 	$"000A030107000A040108000A050109000A0701041001178100040A010104000A"
 	$"09010A000A09010C000A0A010D000A0A010B00"
 };
-
-resource app_signature "application/x-vnd.Haiku-Mandelbrot";
-
-resource app_name_catalog_entry "x-vnd.Haiku-Mandelbrot:System name:Mandelbrot";
-
-resource app_flags B_MULTIPLE_LAUNCH;
-

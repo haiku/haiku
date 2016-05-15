@@ -1,11 +1,12 @@
 SubDir HAIKU_TOP src apps mandelbrot ;
 
-SetSubDirSupportedPlatformsBeOSCompatible ;
 AddSubDirSupportedPlatforms libbe_test ;
+
+SubDirC++Flags -Wno-error ;
 
 Application Mandelbrot :
 	Mandelbrot.cpp
-	tsb.cpp
+	FractalEngine.cpp
 	: be [ TargetLibsupc++ ] localestub
 	: Mandelbrot.rdef
 	;
