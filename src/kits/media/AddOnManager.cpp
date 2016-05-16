@@ -210,12 +210,18 @@ AddOnManager::GetStreamers(entry_ref* outRefs, int32* outCount,
 	BAutolock locker(fLock);
 	RegisterAddOns();
 
+	int32 count = 0;
 	streamer_info* info;
 	for (fStreamerList.Rewind(); fStreamerList.GetNext(&info);) {
+			if (count == maxCount)
+				break;
+
 			*outRefs = info->ref;
 			outRefs++;
+			count++;
 	}
 
+	*outCount = count;
 	return B_OK;
 }
 
