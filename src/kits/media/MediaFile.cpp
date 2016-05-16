@@ -85,6 +85,7 @@ BMediaFile::BMediaFile(const media_file_format* mfi, int32 flags)
 BMediaFile::BMediaFile(BUrl* url)
 {
 	CALLED();
+	fDeleteSource = true;
 	_Init();
 	_InitReader(NULL, url);
 }
@@ -93,6 +94,7 @@ BMediaFile::BMediaFile(BUrl* url)
 BMediaFile::BMediaFile(BUrl* url, int32 flags)
 {
 	CALLED();
+	fDeleteSource = true;
 	_Init();
 	_InitReader(NULL, url, flags);
 }
@@ -102,8 +104,13 @@ BMediaFile::BMediaFile(BUrl* destination, const media_file_format* mfi,
 	int32 flags)
 {
 	CALLED();
+	fDeleteSource = true;
 	_Init();
 	_InitWriter(NULL, destination, mfi, flags);
+	// TODO: Implement streaming server support, it's
+	// a pretty complex thing compared to client mode
+	// and will require to expand the current BMediaFile
+	// design to be aware of it.
 }
 
 
@@ -128,6 +135,7 @@ BMediaFile::SetTo(BDataIO* destination)
 {
 	CALLED();
 
+	// TODO: A BUrl SetTo should be provided
 	if (destination == NULL)
 		return B_BAD_VALUE;
 
