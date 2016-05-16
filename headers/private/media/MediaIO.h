@@ -20,7 +20,7 @@ public:
 
 private:
 								BMediaIO(const BMediaIO&);
-			BMallocIO&			operator=(const BMediaIO&);
+			BMediaIO&			operator=(const BMediaIO&);
 
 	virtual	void				_ReservedMediaIO1();
 	virtual void				_ReservedMediaIO2();
