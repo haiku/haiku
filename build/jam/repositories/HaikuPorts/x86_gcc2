@@ -117,7 +117,7 @@ RemotePackageRepository HaikuPorts
 	f1spirit-0.rc9.1615-2
 	file-5.15-1
 	file_devel-5.15-1
-	filer-1.0.0-2
+	filer-1.1.0-1
 	filwip-1.0.0-5
 	findutils-4.4.2-1
 	ffmpeg-0.10.14-3
