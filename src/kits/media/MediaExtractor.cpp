@@ -184,12 +184,9 @@ MediaExtractor::~MediaExtractor()
 
 	gPluginManager.DestroyReader(fReader);
 
-	// If this is a streaming situation we own
-	// the source
-	if (fStreamer != NULL) {
-		delete fSource;
+	if (fStreamer != NULL)
 		gPluginManager.DestroyStreamer(fStreamer);
-	}
+
 	delete[] fStreamInfo;
 	// fSource is owned by the BMediaFile
 }
