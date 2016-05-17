@@ -722,7 +722,7 @@ DragSortableListView::RemoveSelected()
 {
 	BList indices;
 	GetSelectedItems(indices);
-	int32 index = CurrentSelection()-1;
+	int32 index = CurrentSelection() - 1;
 
 	DeselectAll();
 
