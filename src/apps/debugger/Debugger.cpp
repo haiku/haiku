@@ -418,10 +418,17 @@ Debugger::MessageReceived(BMessage* message)
 			options.requestType = TEAM_DEBUGGER_REQUEST_ATTACH;
 			options.settingsManager = &fSettingsManager;
 			options.team = teamID;
+			options.userInterface = new(std::nothrow) GraphicalUserInterface;
+			if (options.userInterface == NULL) {
+				// TODO: notify user.
+				break;
+			}
+			BReference<UserInterface> uiReference(options.userInterface, true);
 			status_t error = interface->StartTeamDebugger(options);
 			if (error != B_OK) {
 				// TODO: notify user.
-			}
+			} else
+				uiReference.Detach();
 			break;
 		}
 		case MSG_START_NEW_TEAM:
@@ -576,6 +583,10 @@ Debugger::_StartNewTeam(TargetHostInterface* interface, const char* path,
 	TeamDebuggerOptions options;
 	options.requestType = TEAM_DEBUGGER_REQUEST_CREATE;
 	options.settingsManager = &fSettingsManager;
+	options.userInterface = new(std::nothrow) GraphicalUserInterface;
+	if (options.userInterface == NULL)
+		return B_NO_MEMORY;
+	BReference<UserInterface> uiReference(options.userInterface, true);
 	options.commandLineArgc = argVector.ArgumentCount();
 	if (options.commandLineArgc <= 0)
 		return B_BAD_VALUE;
@@ -586,8 +597,10 @@ Debugger::_StartNewTeam(TargetHostInterface* interface, const char* path,
 	MemoryDeleter deleter(argv);
 
 	status_t error = interface->StartTeamDebugger(options);
-	if (error == B_OK)
+	if (error == B_OK) {
 		deleter.Detach();
+		uiReference.Detach();
+	}
 
 	return error;
 }
@@ -599,10 +612,17 @@ Debugger::_HandleOptions(const Options& options)
 	TeamDebuggerOptions debuggerOptions;
 	set_debugger_options_from_options(debuggerOptions, options);
 	debuggerOptions.settingsManager = &fSettingsManager;
-
+	debuggerOptions.userInterface = new(std::nothrow) GraphicalUserInterface;
+	if (debuggerOptions.userInterface == NULL)
+		return B_NO_MEMORY;
+	BReference<UserInterface> uiReference(debuggerOptions.userInterface, true);
 	TargetHostInterface* hostInterface
 		= TargetHostInterfaceRoster::Default()->ActiveInterfaceAt(0);
-	return hostInterface->StartTeamDebugger(debuggerOptions);
+	status_t error = hostInterface->StartTeamDebugger(debuggerOptions);
+	if (error == B_OK)
+		uiReference.Detach();
+
+	return error;
 }
 
 

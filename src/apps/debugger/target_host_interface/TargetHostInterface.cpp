@@ -10,7 +10,6 @@
 #include <AutoLocker.h>
 
 #include "DebuggerInterface.h"
-#include "GraphicalUserInterface.h"
 #include "MessageCodes.h"
 #include "TeamDebugger.h"
 
@@ -238,16 +237,11 @@ status_t
 TargetHostInterface::_StartTeamDebugger(team_id teamID,
 	const TeamDebuggerOptions& options, bool stopInMain)
 {
-	BReference<UserInterface> userInterfaceReference;
 	UserInterface* userInterface = options.userInterface;
 	if (userInterface == NULL) {
-		userInterface = new(std::nothrow) GraphicalUserInterface;
-		if (userInterface == NULL) {
-			fprintf(stderr, "Error: Out of memory!\n");
-			return B_NO_MEMORY;
-		}
-
-		userInterfaceReference.SetTo(userInterface, true);
+		fprintf(stderr, "Error: Requested team debugger start without "
+			"valid user interface!\n");
+		return B_BAD_VALUE;
 	}
 
 	thread_id threadID = options.thread;
@@ -272,7 +266,6 @@ TargetHostInterface::_StartTeamDebugger(team_id teamID,
 			return error;
 		}
 	}
-
 
 	BReference<DebuggerInterface> debuggerInterfaceReference(interface,
 		true);
