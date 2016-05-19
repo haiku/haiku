@@ -1,0 +1,9 @@
+SubDir HAIKU_TOP src tests kits media streamer_sniff_test ;
+
+UsePrivateHeaders media ;
+
+SimpleTest streamer_sniff_test
+	:
+	main.cpp
+	: media be bnetapi [ TargetLibsupc++ ]
+;
