@@ -214,7 +214,8 @@ BMediaFile::TrackAt(int32 index)
 		return NULL;
 	}
 	if (fTrackList[index] == NULL) {
-		TRACE("BMediaFile::TrackAt, creating new track for index %d\n", index);
+		TRACE("BMediaFile::TrackAt, creating new track for index %"
+			B_PRId32 "\n", index);
 		fTrackList[index] = new(std::nothrow) BMediaTrack(fExtractor, index);
 		TRACE("BMediaFile::TrackAt, new track is %p\n", fTrackList[index]);
 	}
@@ -235,7 +236,7 @@ BMediaFile::ReleaseTrack(BMediaTrack* track)
 	for (int32 i = 0; i < fTrackNum; i++) {
 		if (fTrackList[i] == track) {
 			TRACE("BMediaFile::ReleaseTrack, releasing track %p with index "
-				"%d\n", track, i);
+				"%" B_PRId32 "\n", track, i);
 			delete track;
 			fTrackList[i] = NULL;
 			return B_OK;
@@ -255,7 +256,7 @@ BMediaFile::ReleaseAllTracks()
 	for (int32 i = 0; i < fTrackNum; i++) {
 		if (fTrackList[i]) {
 			TRACE("BMediaFile::ReleaseAllTracks, releasing track %p with "
-				"index %d\n", fTrackList[i], i);
+				"index %" B_PRId32 "\n", fTrackList[i], i);
 			delete fTrackList[i];
 			fTrackList[i] = NULL;
 		}

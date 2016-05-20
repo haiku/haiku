@@ -123,7 +123,7 @@ BSoundPlayer::~BSoundPlayer()
 		err = roster->Disconnect(fMediaOutput, fMediaInput);
 		if (err != B_OK) {
 			TRACE("BSoundPlayer::~BSoundPlayer: Error disconnecting nodes: "
-				"%d (%s)\n", err, strerror(err));
+				"%" B_PRId32 " (%s)\n", err, strerror(err));
 		}
 	}
 
@@ -133,7 +133,7 @@ BSoundPlayer::~BSoundPlayer()
 		err = roster->ReleaseNode(fMediaInput.node);
 		if (err != B_OK) {
 			TRACE("BSoundPlayer::~BSoundPlayer: Error releasing input node: "
-				"%d (%s)\n", err, strerror(err));
+				"%" B_PRId32 " (%s)\n", err, strerror(err));
 		}
 	}
 
@@ -210,7 +210,7 @@ BSoundPlayer::Start()
 	status_t err = roster->StartNode(fPlayerNode->Node(),
 		fPlayerNode->TimeSource()->Now() + Latency() + 5000);
 	if (err != B_OK) {
-		TRACE("BSoundPlayer::Start: StartNode failed, %d", err);
+		TRACE("BSoundPlayer::Start: StartNode failed, %" B_PRId32, err);
 		return err;
 	}
 
@@ -285,8 +285,8 @@ BSoundPlayer::Latency()
 	bigtime_t latency;
 	status_t err = roster->GetLatencyFor(fMediaOutput.node, &latency);
 	if (err != B_OK) {
-		TRACE("BSoundPlayer::Latency: GetLatencyFor failed %d (%s)\n", err,
-			strerror(err));
+		TRACE("BSoundPlayer::Latency: GetLatencyFor failed %" B_PRId32
+			" (%s)\n", err, strerror(err));
 		return 0;
 	}
 
@@ -427,8 +427,8 @@ BSoundPlayer::Preroll()
 
 	status_t err = roster->PrerollNode(fMediaOutput.node);
 	if (err != B_OK) {
-		TRACE("BSoundPlayer::Preroll: Error while PrerollNode:  %d (%s)\n",
-			err, strerror(err));
+		TRACE("BSoundPlayer::Preroll: Error while PrerollNode: %"
+			B_PRId32 " (%s)\n", err, strerror(err));
 		return err;
 	}
 
@@ -867,7 +867,7 @@ BSoundPlayer::_Init(const media_node* node,
 
 	_GetVolumeSlider();
 
-	TRACE("BSoundPlayer node %d has timesource %d\n",
+	TRACE("BSoundPlayer node %" B_PRId32 " has timesource %" B_PRId32 "\n",
 		fPlayerNode->Node().node, fPlayerNode->TimeSource()->Node().node);
 }
 

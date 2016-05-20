@@ -620,7 +620,7 @@ _event_queue_imp::GetStart_AfterTime(bigtime_t eventTime, bool inclusive)
 void
 _event_queue_imp::Dump() const
 {
-	TRACE("fEventCount = %d\n", fEventCount);
+	TRACE("fEventCount = %" B_PRId32 "\n", fEventCount);
 	TRACE("fFirstEntry = 0x%p\n", (void*)fFirstEntry);
 	TRACE("fLastEntry  = 0x%p\n", (void*)fLastEntry);
 	for (event_queue_entry *entry = fFirstEntry; entry; entry = entry->next) {

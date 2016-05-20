@@ -444,8 +444,9 @@ BParameterWeb::ParameterAt(int32 index)
 			groups.AddList(group->fGroups);
 	}
 
-	TRACE("*** could not find parameter at %d (count = %d)\n", index,
-		CountParameters());
+	TRACE("*** could not find parameter at %"
+		B_PRId32 " (count = %" B_PRId32 ")\n", index, CountParameters());
+
 	return NULL;
 }
 

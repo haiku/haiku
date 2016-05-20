@@ -352,7 +352,7 @@ SoundPlayNode::PrepareToConnect(const media_source& what,
 		channel_count = *(uint32 *)&format->user_data[4];
 		frame_rate = *(float *)&format->user_data[20];
 		TRACE("SoundPlayNode::PrepareToConnect: found mixer info: "
-			"channel_count %d, frame_rate %.1f\n", channel_count, frame_rate);
+			"channel_count %" B_PRId32 " , frame_rate %.1f\n", channel_count, frame_rate);
 	}
 
 	media_format default_format;

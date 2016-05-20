@@ -328,8 +328,8 @@ BBufferConsumer::SendLatencyChange(const media_source& source,
 	command.latency = newLatency;
 	command.flags = flags;
 
-	TRACE("###### BBufferConsumer::SendLatencyChange: latency from %d/%d to "
-		"%d/%d changed to %" B_PRId64 "\n", source.port, source.id,
+	TRACE("###### BBufferConsumer::SendLatencyChange: latency from %" B_PRId32 "/%" B_PRId32 " to "
+		"%" B_PRId32 "/%" B_PRId32 " changed to %" B_PRId64 "\n", source.port, source.id,
 		destination.port, destination.id, newLatency);
 
 	return SendToPort(source.port, PRODUCER_LATENCY_CHANGED, &command,
