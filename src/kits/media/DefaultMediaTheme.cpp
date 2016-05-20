@@ -646,7 +646,7 @@ ContinuousMessageFilter::Filter(BMessage *message, BHandler **target)
 				value[i] = (float)(slider->ValueFor(i) / 1000.0);
 		}
 
-		TRACE("ContinuousMessageFilter::Filter: update view %s, %ld "
+		TRACE("ContinuousMessageFilter::Filter: update view %s, %d "
 			"channels\n", fControl->Name(), fParameter.CountChannels());
 
 		if (fParameter.SetValue((void *)value, sizeof(value),
@@ -758,7 +758,7 @@ DiscreteMessageFilter::Filter(BMessage *message, BHandler **target)
 		popUp->SelectedOption(NULL, &value);
 	}
 
-	TRACE("DiscreteMessageFilter::Filter: update view %s, value = %ld\n", control->Name(), value);
+	TRACE("DiscreteMessageFilter::Filter: update view %s, value = %d\n", control->Name(), value);
 
 	if (fParameter.SetValue((void *)&value, sizeof(value), -1) < B_OK) {
 		ERROR("DiscreteMessageFilter::Filter: Could not set parameter value for %p\n", &fParameter);

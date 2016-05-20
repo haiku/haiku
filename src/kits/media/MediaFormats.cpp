@@ -477,7 +477,7 @@ BMediaFormats::GetFormatFor(const media_format_description& description,
 			strerror(status));
 		return status;
 	}
-	TRACE("search for description family = %d, a = 0x%lx, b = 0x%lx\n",
+	TRACE("search for description family = %d, a = 0x%ux, b = 0x%ux\n",
 		description.family, description.u.misc.file_format,
 		description.u.misc.codec);
 

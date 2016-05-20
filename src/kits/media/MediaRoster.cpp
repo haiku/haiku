@@ -2215,11 +2215,11 @@ BMediaRoster::UnregisterNode(BMediaNode* node)
 	if (node == NULL)
 		return B_BAD_VALUE;
 
-	TRACE("BMediaRoster::UnregisterNode %ld (%p)\n", node->ID(), node);
+	TRACE("BMediaRoster::UnregisterNode %d (%p)\n", node->ID(), node);
 
 	if ((node->fKinds & NODE_KIND_NO_REFCOUNTING) !=0) {
 		TRACE("BMediaRoster::UnregisterNode, trying to unregister reference "
-			"counting disabled timesource, node %ld, port %ld, team %ld\n",
+			"counting disabled timesource, node %d, port %d, team %d\n",
 			node->ID(), node->ControlPort(), BPrivate::current_team());
 		return B_OK;
 	}

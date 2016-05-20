@@ -269,7 +269,7 @@ PluginManager::CreateReader(Reader** reader, int32* streamCount,
 
 		if ((*reader)->Sniff(streamCount) == B_OK) {
 			TRACE("PluginManager::CreateReader: Sniff success "
-				"(%ld stream(s))\n", *streamCount);
+				"(%d stream(s))\n", *streamCount);
 			(*reader)->GetFileFormatInfo(mff);
 			return B_OK;
 		}
@@ -735,7 +735,7 @@ PluginManager::PutPlugin(MediaPlugin* plugin)
 			if (pinfo->usecount == 0) {
 				TRACE("  deleting %p\n", pinfo->plugin);
 				delete pinfo->plugin;
-				TRACE("  unloading add-on: %ld\n\n", pinfo->image);
+				TRACE("  unloading add-on: %d\n\n", pinfo->image);
 				unload_add_on(pinfo->image);
 				fPluginList.RemoveCurrent();
 			}

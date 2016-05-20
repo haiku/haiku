@@ -352,7 +352,7 @@ SoundPlayNode::PrepareToConnect(const media_source& what,
 		channel_count = *(uint32 *)&format->user_data[4];
 		frame_rate = *(float *)&format->user_data[20];
 		TRACE("SoundPlayNode::PrepareToConnect: found mixer info: "
-			"channel_count %ld, frame_rate %.1f\n", channel_count, frame_rate);
+			"channel_count %d, frame_rate %.1f\n", channel_count, frame_rate);
 	}
 
 	media_format default_format;
@@ -419,7 +419,8 @@ SoundPlayNode::Connect(status_t error, const media_source& source,
 	// Do so, then make sure we get our events early enough.
 	media_node_id id;
 	FindLatencyFor(fOutput.destination, &fLatency, &id);
-	TRACE("SoundPlayNode::Connect: downstream latency = %Ld\n", fLatency);
+	TRACE("SoundPlayNode::Connect: downstream latency = %" B_PRId64 "\n",
+		fLatency);
 
 	// reset our buffer duration, etc. to avoid later calculations
 	bigtime_t duration = ((fOutput.format.u.raw_audio.buffer_size * 1000000LL)
@@ -428,10 +429,11 @@ SoundPlayNode::Connect(status_t error, const media_source& source,
 			* fOutput.format.u.raw_audio.channel_count))
 		/ (int32)fOutput.format.u.raw_audio.frame_rate;
 	SetBufferDuration(duration);
-	TRACE("SoundPlayNode::Connect: buffer duration is %Ld\n", duration);
+	TRACE("SoundPlayNode::Connect: buffer duration is %" B_PRId64 "\n",
+		duration);
 
 	fInternalLatency = (3 * BufferDuration()) / 4;
-	TRACE("SoundPlayNode::Connect: using %Ld as internal latency\n",
+	TRACE("SoundPlayNode::Connect: using %" B_PRId64 " as internal latency\n",
 		fInternalLatency);
 	SetEventLatency(fLatency + fInternalLatency);
 

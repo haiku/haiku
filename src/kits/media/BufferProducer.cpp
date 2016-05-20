@@ -142,7 +142,10 @@ BBufferProducer::HandleMessage(int32 message, const void* data, size_t size)
 			// when changing this, also change NODE_SET_RUN_MODE
 			fDelay = command->delay;
 			fRunMode = command->mode;
-			TRACE("PRODUCER_SET_RUN_MODE_DELAY: fDelay now %Ld\n", fDelay);
+
+			TRACE("PRODUCER_SET_RUN_MODE_DELAY: fDelay now %" B_PRId64 "\n",
+				fDelay);
+
 			SetRunMode(fRunMode);
 			return B_OK;
 		}
