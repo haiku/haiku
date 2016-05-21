@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Appearance	1140137500
+1	slovak	x-vnd.Haiku-Appearance	2499598353
 Plain font:	Font view		Základné písmo:
 Control highlight	Colors tab		Zvýraznenie ovládacieho prvku
 Control border	Colors tab		Okraj ovládacieho prvku
@@ -21,6 +21,7 @@ Failure	Colors tab		Zlyhanie
 Hinting menu	AntialiasingSettingsView		Menu s tipmi
 Scroll bar:	DecorSettingsView		Posuvník:
 Document background	Colors tab		Pozadie dokumentu
+Status bar	Colors tab		Stavový panel
 Revert	APRWindow		Vrátiť
 Window tab	Colors tab		Záložka okna
 Tooltip background	Colors tab		Pozadie tipov
