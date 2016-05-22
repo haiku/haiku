@@ -236,30 +236,38 @@ status_t
 CoreFileDebuggerInterface::GetSymbolInfos(team_id team, image_id image,
 	BObjectList<SymbolInfo>& infos)
 {
+	// get the image info
 	const CoreFileImageInfo* imageInfo = fCoreFile->ImageInfoForId(image);
 	if (imageInfo == NULL)
 		return B_BAD_IMAGE_ID;
 
+	if (const CoreFileSymbolsInfo* symbolsInfo = imageInfo->SymbolsInfo()) {
+		return GetElfSymbols(symbolsInfo->SymbolTable(),
+			symbolsInfo->SymbolCount(), symbolsInfo->SymbolTableEntrySize(),
+			symbolsInfo->StringTable(), symbolsInfo->StringTableSize(),
+			fCoreFile->GetElfFile().Is64Bit(),
+			fCoreFile->GetElfFile().IsByteOrderSwapped(),
+			imageInfo->TextDelta(), infos);
+	}
+
+	// get the symbols from the ELF file, if possible
+	status_t error = GetElfSymbols(imageInfo->Name(), imageInfo->TextDelta(),
+		infos);
+	if (error == B_OK)
+		return error;
+
+	// get the symbols from the core file, if possible
 	ElfSymbolLookup* symbolLookup;
-	status_t error = fCoreFile->CreateSymbolLookup(imageInfo, symbolLookup);
+	error = fCoreFile->CreateSymbolLookup(imageInfo, symbolLookup);
 	if (error != B_OK) {
 		WARNING("Failed to create symbol lookup for image (%" B_PRId32
 			"): %s\n", image, strerror(error));
 		return error;
 	}
+
 	ObjectDeleter<ElfSymbolLookup> symbolLookupDeleter(symbolLookup);
 
-	SymbolInfo symbolInfo;
-	uint32 index = 0;
-	while (symbolLookup->NextSymbolInfo(index, symbolInfo) == B_OK) {
-		SymbolInfo* info = new(std::nothrow) SymbolInfo(symbolInfo);
-		if (info == NULL || !infos.AddItem(info)) {
-			delete info;
-			return B_NO_MEMORY;
-		}
-	}
-
-	return B_OK;
+	return GetElfSymbols(symbolLookup, infos);
 }
 
 

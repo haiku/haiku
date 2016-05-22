@@ -12,6 +12,8 @@
 
 class CoreFile;
 struct CoreFileThreadInfo;
+class ElfSection;
+class ElfSymbolLookup;
 
 
 class CoreFileDebuggerInterface : public DebuggerInterface {
@@ -83,6 +85,9 @@ private:
 			void				_GetThreadInfo(
 									const CoreFileThreadInfo& coreInfo,
 									ThreadInfo& info);
+			status_t			_CreateSharedObjectFileSymbolLookup(
+									const char* path,
+									ElfSymbolLookup*& _lookup);
 
 private:
 			CoreFile*			fCoreFile;

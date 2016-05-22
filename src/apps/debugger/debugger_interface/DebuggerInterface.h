@@ -1,5 +1,5 @@
 /*
- * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2009-2016, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
@@ -15,9 +15,10 @@
 
 
 class Architecture;
+class AreaInfo;
 class CpuState;
 class DebugEvent;
-class AreaInfo;
+class ElfSymbolLookup;
 class ImageInfo;
 class SemaphoreInfo;
 class SymbolInfo;
@@ -99,6 +100,24 @@ public:
 									size_t size) = 0;
 	virtual	ssize_t				WriteMemory(target_addr_t address,
 									void* buffer, size_t size) = 0;
+
+protected:
+			status_t			GetElfSymbols(const char* filePath,
+									int64 textDelta,
+									BObjectList<SymbolInfo>& infos);
+			status_t			GetElfSymbols(const void* symbolTable,
+									uint32 symbolCount,
+									uint32 symbolTableEntrySize,
+									const char* stringTable,
+									uint32 stringTableSize, bool is64Bit,
+									bool swappedByteOrder, int64 textDelta,
+									BObjectList<SymbolInfo>& infos);
+			status_t			GetElfSymbols(ElfSymbolLookup* symbolLookup,
+									BObjectList<SymbolInfo>& infos);
+
+private:
+			struct SymbolTableLookupSource;
 };
+
 
 #endif	// DEBUGGER_INTERFACE_H
