@@ -132,7 +132,7 @@ dev() {
 	esac
 
 	# check for a TODO list
-	for f in TODO TODO.org; do
+	for f in TODO TODO.org todo todo.org; do
 		test -e "$f" && grep '^* ' "$f" | grep --color=always ' TODO ' | head -5 && break
 	done
 
