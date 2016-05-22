@@ -51,13 +51,13 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui teams_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui utility_windows ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value value_handlers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface report ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value type_handlers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_formatters ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_handlers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_nodes ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) value values ] ;
 
@@ -350,6 +350,16 @@ local sources =
 	TableCellValueEditor.cpp
 	TableCellValueRenderer.cpp
 	TableCellValueRendererUtils.cpp
+	ValueHandler.cpp
+	ValueHandlerRoster.cpp
+
+	# user_interface/gui/value/value_handlers
+	AddressValueHandler.cpp
+	BoolValueHandler.cpp
+	EnumerationValueHandler.cpp
+	FloatValueHandler.cpp
+	IntegerValueHandler.cpp
+	StringValueHandler.cpp
 
 	# user_interface/report
 	ReportUserInterface.cpp
@@ -370,8 +380,6 @@ local sources =
 	TypeHandlerRoster.cpp
 	Value.cpp
 	ValueFormatter.cpp
-	ValueHandler.cpp
-	ValueHandlerRoster.cpp
 	ValueLoader.cpp
 	ValueNode.cpp
 	ValueNodeContainer.cpp
@@ -389,14 +397,6 @@ local sources =
 	IntegerValueFormatter.cpp
 	FloatValueFormatter.cpp
 	StringValueFormatter.cpp
-
-	# value/value_handlers
-	AddressValueHandler.cpp
-	BoolValueHandler.cpp
-	EnumerationValueHandler.cpp
-	FloatValueHandler.cpp
-	IntegerValueHandler.cpp
-	StringValueHandler.cpp
 
 	# value/value_nodes
 	AddressValueNode.cpp
