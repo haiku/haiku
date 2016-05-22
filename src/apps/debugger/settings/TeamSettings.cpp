@@ -97,7 +97,8 @@ TeamSettings::SetTo(Team* team)
 
 
 status_t
-TeamSettings::SetTo(const BMessage& archive)
+TeamSettings::SetTo(const BMessage& archive,
+	const TeamUiSettingsFactory& factory)
 {
 	_Unset();
 
@@ -127,7 +128,7 @@ TeamSettings::SetTo(const BMessage& archive)
 	for (int32 i = 0; archive.FindMessage("uisettings", i, &childArchive)
 		== B_OK; i++) {
 		TeamUiSettings* setting = NULL;
-		error = TeamUiSettingsFactory::Create(childArchive, setting);
+		error = factory.Create(childArchive, setting);
 		if (error == B_OK && !fUiSettings.AddItem(setting))
 			error = B_NO_MEMORY;
 		if (error != B_OK) {

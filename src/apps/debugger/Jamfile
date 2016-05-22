@@ -44,6 +44,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui expression_eval_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui inspector_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui model ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui settings ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui team_settings_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui teams_window ] ;
@@ -216,7 +217,6 @@ local sources =
 
 	# settings
 	BreakpointSetting.cpp
-	GuiTeamUiSettings.cpp
 	SettingsManager.cpp
 	TeamFileManagerSettings.cpp
 	TeamSettings.cpp
@@ -295,6 +295,10 @@ local sources =
 	# user_interface/gui/inspector_window
 	InspectorWindow.cpp
 	MemoryView.cpp
+
+	# user_interface/gui/settings
+	DebuggerUiSettingsFactory.cpp
+	GuiTeamUiSettings.cpp
 
 	# user_interface/gui/teams_window
 	TeamsWindow.cpp

@@ -14,11 +14,10 @@ class TeamUiSettings;
 
 class TeamUiSettingsFactory {
 public:
-								TeamUiSettingsFactory();
-								~TeamUiSettingsFactory();
-						
-	static	status_t			Create(const BMessage& archive,
-									TeamUiSettings*& settings);
+	virtual						~TeamUiSettingsFactory();
+
+	virtual	status_t			Create(const BMessage& archive,
+									TeamUiSettings*& settings) const = 0;
 };
 
 #endif // TEAM_UI_SETTINGS_FACTORY_H

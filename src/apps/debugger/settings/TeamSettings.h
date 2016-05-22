@@ -18,6 +18,7 @@ class Team;
 class TeamFileManagerSettings;
 class TeamSignalSettings;
 class TeamUiSettings;
+class TeamUiSettingsFactory;
 
 
 class TeamSettings {
@@ -28,7 +29,8 @@ public:
 								~TeamSettings();
 
 			status_t			SetTo(Team* team);
-			status_t			SetTo(const BMessage& archive);
+			status_t			SetTo(const BMessage& archive,
+									const TeamUiSettingsFactory& factory);
 			status_t			WriteTo(BMessage& archive) const;
 
 			const BString&		TeamName() const	{ return fTeamName; }

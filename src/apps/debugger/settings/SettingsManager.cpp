@@ -26,7 +26,8 @@ static const int32 kMaxRecentTeamSettings		= 10;
 SettingsManager::SettingsManager()
 	:
 	fLock("settings manager"),
-	fRecentTeamSettings(kMaxRecentTeamSettings, true)
+	fRecentTeamSettings(kMaxRecentTeamSettings, true),
+	fUiSettingsFactory(NULL)
 {
 }
 
@@ -38,12 +39,14 @@ SettingsManager::~SettingsManager()
 
 
 status_t
-SettingsManager::Init()
+SettingsManager::Init(TeamUiSettingsFactory* factory)
 {
 	// check the lock
 	status_t error = fLock.InitCheck();
 	if (error != B_OK)
 		return error;
+
+	fUiSettingsFactory = factory;
 
 	// get and create our settings directory
 	if (find_directory(B_USER_SETTINGS_DIRECTORY, &fSettingsPath, true) == B_OK
@@ -147,7 +150,7 @@ SettingsManager::_LoadSettings()
 		if (settings == NULL)
 			return B_NO_MEMORY;
 
-		error = settings->SetTo(childArchive);
+		error = settings->SetTo(childArchive, *fUiSettingsFactory);
 		if (error != B_OK) {
 			delete settings;
 			continue;

@@ -13,6 +13,7 @@
 
 
 class TeamSettings;
+class TeamUiSettingsFactory;
 
 
 class SettingsManager {
@@ -20,7 +21,7 @@ public:
 								SettingsManager();
 								~SettingsManager();
 
-			status_t			Init();
+			status_t			Init(TeamUiSettingsFactory* factory);
 
 			status_t			LoadTeamSettings(const char* teamName,
 									TeamSettings& settings);
@@ -41,6 +42,7 @@ private:
 			BLocker				fLock;
 			BPath				fSettingsPath;
 			TeamSettingsList	fRecentTeamSettings;	// oldest is first
+			TeamUiSettingsFactory* fUiSettingsFactory;
 };
 
 

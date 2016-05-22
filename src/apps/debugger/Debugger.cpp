@@ -26,6 +26,7 @@
 #include "CoreFileDebuggerInterface.h"
 #include "CommandLineUserInterface.h"
 #include "DebuggerInterface.h"
+#include "DebuggerUiSettingsFactory.h"
 #include "GraphicalUserInterface.h"
 #include "ImageDebugLoadingStateHandlerRoster.h"
 #include "MessageCodes.h"
@@ -233,7 +234,11 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 static status_t
 global_init(TargetHostInterfaceRoster::Listener* listener)
 {
-	status_t error = TypeHandlerRoster::CreateDefault();
+	status_t error = DebuggerUiSettingsFactory::CreateDefault();
+	if (error != B_OK)
+		return error;
+
+	error = TypeHandlerRoster::CreateDefault();
 	if (error != B_OK)
 		return error;
 
@@ -331,6 +336,7 @@ Debugger::Debugger()
 
 Debugger::~Debugger()
 {
+	DebuggerUiSettingsFactory::DeleteDefault();
 	ValueHandlerRoster::DeleteDefault();
 	TypeHandlerRoster::DeleteDefault();
 	ImageDebugLoadingStateHandlerRoster::DeleteDefault();
@@ -345,7 +351,7 @@ Debugger::Init()
 	if (error != B_OK)
 		return error;
 
-	return fSettingsManager.Init();
+	return fSettingsManager.Init(DebuggerUiSettingsFactory::Default());
 }
 
 
@@ -656,7 +662,7 @@ CliDebugger::Run(const Options& options)
 	}
 
 	SettingsManager settingsManager;
-	error = settingsManager.Init();
+	error = settingsManager.Init(DebuggerUiSettingsFactory::Default());
 	if (error != B_OK) {
 		fprintf(stderr, "Error: Settings manager initialization failed: "
 			"%s\n", strerror(error));
@@ -724,7 +730,7 @@ ReportDebugger::Run(const Options& options)
 	}
 
 	SettingsManager settingsManager;
-	error = settingsManager.Init();
+	error = settingsManager.Init(DebuggerUiSettingsFactory::Default());
 	if (error != B_OK) {
 		fprintf(stderr, "Error: Settings manager initialization failed: "
 			"%s\n", strerror(error));
