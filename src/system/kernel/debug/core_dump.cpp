@@ -17,7 +17,9 @@
 
 #include <AutoDeleter.h>
 
+#include <commpage.h>
 #include <condition_variable.h>
+#include <elf.h>
 #include <kimage.h>
 #include <ksignal.h>
 #include <team.h>
@@ -260,13 +262,20 @@ struct ImageInfo : DoublyLinkedListLinkImpl<ImageInfo> {
 		fTextDelta(image->info.text_delta),
 		fSymbolTable((addr_t)image->info.symbol_table),
 		fSymbolHash((addr_t)image->info.symbol_hash),
-		fStringTable((addr_t)image->info.string_table)
+		fStringTable((addr_t)image->info.string_table),
+		fSymbolTableData(NULL),
+		fStringTableData(NULL),
+		fSymbolCount(0),
+		fStringTableSize(0)
 	{
+		if (fName != NULL && strcmp(fName, "commpage") == 0)
+			_GetCommpageSymbols();
 	}
 
 	~ImageInfo()
 	{
 		free(fName);
+		_FreeSymbolData();
 	}
 
 	static ImageInfo* Create(struct image* image)
@@ -355,6 +364,72 @@ struct ImageInfo : DoublyLinkedListLinkImpl<ImageInfo> {
 		return fStringTable;
 	}
 
+	elf_sym* SymbolTableData() const
+	{
+		return fSymbolTableData;
+	}
+
+	char* StringTableData() const
+	{
+		return fStringTableData;
+	}
+
+	uint32 SymbolCount() const
+	{
+		return fSymbolCount;
+	}
+
+	size_t StringTableSize() const
+	{
+		return fStringTableSize;
+	}
+
+private:
+	void _GetCommpageSymbols()
+	{
+		image_id commpageId = get_commpage_image();
+
+		// get the size of the tables
+		int32 symbolCount = 0;
+		size_t stringTableSize = 0;
+		status_t error = elf_read_kernel_image_symbols(commpageId, NULL,
+			&symbolCount, NULL, &stringTableSize,
+			NULL, true);
+		if (error != B_OK)
+			return;
+		if (symbolCount == 0 || stringTableSize == 0)
+			return;
+
+		// allocate the tables
+		fSymbolTableData = (elf_sym*)malloc(sizeof(elf_sym) * symbolCount);
+		fStringTableData = (char*)malloc(stringTableSize);
+		if (fSymbolTableData == NULL || fStringTableData == NULL) {
+			_FreeSymbolData();
+			return;
+		}
+
+		fSymbolCount = symbolCount;
+		fStringTableSize = stringTableSize;
+
+		// get the data
+		error = elf_read_kernel_image_symbols(commpageId,
+			fSymbolTableData, &symbolCount, fStringTableData, &stringTableSize,
+			NULL, true);
+		if (error != B_OK)
+			_FreeSymbolData();
+	}
+
+	void _FreeSymbolData()
+	{
+		free(fSymbolTableData);
+		free(fStringTableData);
+
+		fSymbolTableData = NULL;
+		fStringTableData = NULL;
+		fSymbolCount = 0;
+		fStringTableSize = 0;
+	}
+
 private:
 	image_id	fId;
 	image_type	fType;
@@ -371,6 +446,11 @@ private:
 	addr_t		fSymbolTable;
 	addr_t		fSymbolHash;
 	addr_t		fStringTable;
+	// for commpage image
+	elf_sym*	fSymbolTableData;
+	char*		fStringTableData;
+	uint32		fSymbolCount;
+	size_t		fStringTableSize;
 };
 
 
@@ -1146,6 +1226,10 @@ private:
 		if (error != B_OK)
 			return error;
 
+		error = _WriteImageSymbolsNotes();
+		if (error != B_OK)
+			return error;
+
 		error = _WriteThreadsNote();
 		if (error != B_OK)
 			return error;
@@ -1335,6 +1419,58 @@ private:
 
 		// write the note data
 		_WriteImagesNote(fFile);
+
+		// padding
+		_WriteNotePadding(dataSize);
+
+		return fFile.Status();
+	}
+
+	status_t _WriteImageSymbolsNotes()
+	{
+		// write table
+		for (ImageInfoList::Iterator it = fImageInfos.GetIterator();
+				ImageInfo* imageInfo = it.Next();) {
+			if (imageInfo->SymbolTableData() == NULL
+					|| imageInfo->StringTableData() == NULL) {
+				continue;
+			}
+
+			status_t error = _WriteImageSymbolsNote(imageInfo);
+			if (error != B_OK)
+				return error;
+		}
+
+		return B_OK;
+	}
+
+	template<typename Writer>
+	void _WriteImageSymbolsNote(const ImageInfo* imageInfo, Writer& writer)
+	{
+		uint32 symbolCount = imageInfo->SymbolCount();
+		uint32 symbolEntrySize = (uint32)sizeof(elf_sym);
+
+		writer.Write((int32)imageInfo->Id());
+		writer.Write(symbolCount);
+		writer.Write(symbolEntrySize);
+		writer.Write(imageInfo->SymbolTableData(),
+			symbolCount * symbolEntrySize);
+		writer.Write(imageInfo->StringTableData(),
+			imageInfo->StringTableSize());
+	}
+
+	status_t _WriteImageSymbolsNote(const ImageInfo* imageInfo)
+	{
+		// determine needed size for the note's data
+		DummyWriter dummyWriter;
+		_WriteImageSymbolsNote(imageInfo, dummyWriter);
+		size_t dataSize = dummyWriter.BytesWritten();
+
+		// write the note header
+		_WriteNoteHeader(kHaikuNote, NT_SYMBOLS, dataSize);
+
+		// write the note data
+		_WriteImageSymbolsNote(imageInfo, fFile);
 
 		// padding
 		_WriteNotePadding(dataSize);

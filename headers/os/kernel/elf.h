@@ -610,6 +610,7 @@ typedef struct {
 #define NT_AREAS			0x61726561 	/* areas */
 #define NT_IMAGES			0x696d6167 	/* images */
 #define NT_THREADS			0x74687264 	/* threads */
+#define NT_SYMBOLS			0x73796d73 	/* symbols */
 
 /* NT_TEAM: uint32 entrySize; Elf32_Note_Team; char[] args */
 typedef struct {
@@ -730,6 +731,14 @@ typedef struct {
 	uint64		nth_stack_base;		/* thread stack base address */
 	uint64		nth_stack_end;		/* thread stack end address */
 } Elf64_Note_Thread_Entry;
+
+/* NT_SYMBOLS:
+ * int32 imageId;
+ * uint32 symbolCount;
+ * uint32 entrySize;
+ * Elf{32,64}_Sym[count];
+ * char[] strings
+ */
 
 
 /*** inline functions ***/
