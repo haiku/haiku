@@ -149,6 +149,7 @@ private:
 private:
 			sockaddr_storage	fAddress;
 			status_t			fStatus;
+			BString				fHostName;
 };
 
 

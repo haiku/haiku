@@ -42,8 +42,8 @@ public:
 	virtual ssize_t				Write(const void* buffer, size_t size);
 
 protected:
-			status_t			_SetupCommon();
-			status_t			_SetupConnect();
+			status_t			_SetupCommon(const char* host = NULL);
+			status_t			_SetupConnect(const char* host = NULL);
 			status_t			_SetupAccept();
 
 private:

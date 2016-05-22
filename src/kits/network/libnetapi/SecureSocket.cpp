@@ -297,7 +297,7 @@ BSecureSocket::Connect(const BNetworkAddress& peer, bigtime_t timeout)
 	if (status != B_OK)
 		return status;
 
-	return _SetupConnect();
+	return _SetupConnect(peer.HostName().String());
 }
 
 
@@ -381,7 +381,7 @@ BSecureSocket::Write(const void* buffer, size_t size)
 
 
 status_t
-BSecureSocket::_SetupCommon()
+BSecureSocket::_SetupCommon(const char* host)
 {
 	// Do this only after BSocket::Connect has checked wether we're already
 	// connected. We don't want to kill an existing SSL session, as that would
@@ -399,15 +399,20 @@ BSecureSocket::_SetupCommon()
 	BIO_set_fd(fPrivate->fBIO, fSocket, BIO_NOCLOSE);
 	SSL_set_bio(fPrivate->fSSL, fPrivate->fBIO, fPrivate->fBIO);
 	SSL_set_ex_data(fPrivate->fSSL, Private::sDataIndex, this);
+	if (host != NULL) {
+		BString hostString = host;
+		if (hostString != "")
+			SSL_set_tlsext_host_name(fPrivate->fSSL, host);
+	}
 
 	return B_OK;
 }
 
 
 status_t
-BSecureSocket::_SetupConnect()
+BSecureSocket::_SetupConnect(const char* host)
 {
-	status_t error = _SetupCommon();
+	status_t error = _SetupCommon(host);
 	if (error != B_OK)
 		return error;
 
@@ -529,14 +534,14 @@ BSecureSocket::InitCheck()
 
 
 status_t
-BSecureSocket::_SetupCommon()
+BSecureSocket::_SetupCommon(const char* host)
 {
 	return B_UNSUPPORTED;
 }
 
 
 status_t
-BSecureSocket::_SetupConnect()
+BSecureSocket::_SetupConnect(const char* host)
 {
 	return B_UNSUPPORTED;
 }

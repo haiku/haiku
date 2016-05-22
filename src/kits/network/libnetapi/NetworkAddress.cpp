@@ -129,7 +129,8 @@ BNetworkAddress::BNetworkAddress(const in6_addr& address, uint16 port)
 BNetworkAddress::BNetworkAddress(const BNetworkAddress& other)
 	:
 	fAddress(other.fAddress),
-	fStatus(other.fStatus)
+	fStatus(other.fStatus),
+	fHostName(other.fHostName)
 {
 }
 
@@ -151,6 +152,7 @@ BNetworkAddress::Unset()
 {
 	fAddress.ss_family = AF_UNSPEC;
 	fAddress.ss_len = 2;
+	fHostName = "";
 	fStatus = B_OK;
 }
 
@@ -170,15 +172,13 @@ BNetworkAddress::SetTo(const char* host, uint16 port, uint32 flags)
 
 	uint32 cookie = 0;
 	status = resolver->GetNextAddress(AF_INET6, &cookie, *this);
-	if (status == B_OK) {
-		fStatus = B_OK;
-		return B_OK;
+	if (status != B_OK) {
+		cookie = 0;
+		status = resolver->GetNextAddress(&cookie, *this);
+		if (status != B_OK)
+			Unset();
 	}
-
-	cookie = 0;
-	status = resolver->GetNextAddress(&cookie, *this);
-	if (status != B_OK)
-		Unset();
+	fHostName = host;
 	fStatus = status;
 	return status;
 }
@@ -199,15 +199,13 @@ BNetworkAddress::SetTo(const char* host, const char* service, uint32 flags)
 
 	uint32 cookie = 0;
 	status = resolver->GetNextAddress(AF_INET6, &cookie, *this);
-	if (status == B_OK) {
-		fStatus = B_OK;
-		return B_OK;
+	if (status != B_OK) {
+		cookie = 0;
+		status = resolver->GetNextAddress(&cookie, *this);
+		if (status != B_OK)
+			Unset();
 	}
-
-	cookie = 0;
-	status = resolver->GetNextAddress(&cookie, *this);
-	if (status != B_OK)
-		Unset();
+	fHostName = host;
 	fStatus = status;
 	return status;
 }
@@ -235,6 +233,7 @@ BNetworkAddress::SetTo(int family, const char* host, uint16 port, uint32 flags)
 	status = resolver->GetNextAddress(&cookie, *this);
 	if (status != B_OK)
 		Unset();
+	fHostName = host;
 	fStatus = status;
 	return status;
 }
@@ -263,6 +262,7 @@ BNetworkAddress::SetTo(int family, const char* host, const char* service,
 	status = resolver->GetNextAddress(&cookie, *this);
 	if (status != B_OK)
 		Unset();
+	fHostName = host;
 	fStatus = status;
 	return status;
 }
@@ -372,6 +372,7 @@ BNetworkAddress::SetTo(const BNetworkAddress& other)
 {
 	fAddress = other.fAddress;
 	fStatus = other.fStatus;
+	fHostName = other.fHostName;
 }
 
 
@@ -1047,7 +1048,7 @@ BString
 BNetworkAddress::HostName() const
 {
 	// TODO: implement host name lookup
-	return ToString(false);
+	return fHostName;
 }
 
 
@@ -1159,6 +1160,7 @@ BNetworkAddress&
 BNetworkAddress::operator=(const BNetworkAddress& other)
 {
 	memcpy(&fAddress, &other.fAddress, other.fAddress.ss_len);
+	fHostName = other.fHostName;
 	fStatus = other.fStatus;
 
 	return *this;
@@ -1291,6 +1293,8 @@ BNetworkAddress::_ParseLinkAddress(const char* address)
 
 		address += 3;
 	}
+	
+	fHostName = address;
 
 	SetToLinkLevel(linkAddress, length);
 	return B_OK;
