@@ -87,8 +87,67 @@ CoreFileImageInfo::CoreFileImageInfo(int32 id, int32 type, uint64 initRoutine,
 	fStringTable(stringTable),
 	fTextArea(textArea),
 	fDataArea(dataArea),
-	fName(name)
+	fName(name),
+	fSymbolsInfo(NULL)
 {
+}
+
+
+CoreFileImageInfo::~CoreFileImageInfo()
+{
+	SetSymbolsInfo(NULL);
+}
+
+
+void
+CoreFileImageInfo::SetSymbolsInfo(CoreFileSymbolsInfo* symbolsInfo)
+{
+	if (fSymbolsInfo != NULL)
+		delete fSymbolsInfo;
+
+	fSymbolsInfo = symbolsInfo;
+}
+
+
+// pragma mark - CoreFileSymbolsInfo
+
+CoreFileSymbolsInfo::CoreFileSymbolsInfo()
+	:
+	fSymbolTable(NULL),
+	fStringTable(NULL),
+	fSymbolCount(0),
+	fSymbolTableEntrySize(0),
+	fStringTableSize(0)
+{
+}
+
+
+CoreFileSymbolsInfo::~CoreFileSymbolsInfo()
+{
+	free(fSymbolTable);
+	free(fStringTable);
+}
+
+
+bool
+CoreFileSymbolsInfo::Init(const void* symbolTable, uint32 symbolCount,
+	uint32 symbolTableEntrySize, const char* stringTable,
+	uint32 stringTableSize)
+{
+	fSymbolTable = malloc(symbolCount * symbolTableEntrySize);
+	fStringTable = (char*)malloc(stringTableSize);
+
+	if (fSymbolTable == NULL || fStringTable == NULL)
+		return false;
+
+	memcpy(fSymbolTable, symbolTable, symbolCount * symbolTableEntrySize);
+	memcpy(fStringTable, stringTable, stringTableSize);
+
+	fSymbolCount = symbolCount;
+	fSymbolTableEntrySize = symbolTableEntrySize;
+	fStringTableSize = stringTableSize;
+
+	return true;
 }
 
 
@@ -164,20 +223,6 @@ CoreFile::Init(const char* fileName)
 	if (fElfFile.Is64Bit())
 		return _Init<ElfClass64>();
 	return _Init<ElfClass32>();
-}
-
-
-const CoreFileImageInfo*
-CoreFile::ImageInfoForId(int32 id) const
-{
-	int32 count = fImageInfos.CountItems();
-	for (int32 i = 0; i < count; i++) {
-		CoreFileImageInfo* info = fImageInfos.ItemAt(i);
-		if (info->Id() == id)
-			return info;
-	}
-
-	return NULL;
 }
 
 
@@ -362,6 +407,8 @@ CoreFile::_ReadNote(const char* name, uint32 type, const void* data,
 				return _ReadAreasNote<ElfClass>(data, dataSize);
 			case NT_IMAGES:
 				return _ReadImagesNote<ElfClass>(data, dataSize);
+			case NT_SYMBOLS:
+				return _ReadSymbolsNote<ElfClass>(data, dataSize);
 			case NT_THREADS:
 				return _ReadThreadsNote<ElfClass>(data, dataSize);
 			break;
@@ -576,6 +623,64 @@ CoreFile::_ReadImagesNote(const void* data, uint32 dataSize)
 
 template<typename ElfClass>
 status_t
+CoreFile::_ReadSymbolsNote(const void* data, uint32 dataSize)
+{
+	if (dataSize < 3 * sizeof(uint32)) {
+		WARNING("Symbols note too short\n");
+		return B_BAD_DATA;
+	}
+	int32 imageId = _ReadValue<int32>(data, dataSize);
+	uint32 symbolCount = _ReadValue<uint32>(data, dataSize);
+	uint32 entrySize = _ReadValue<uint32>(data, dataSize);
+
+	typedef typename ElfClass::Sym Sym;
+
+	if (symbolCount == 0)
+		return B_OK;
+
+	// get the corresponding image
+	CoreFileImageInfo* imageInfo = _ImageInfoForId(imageId);
+	if (imageInfo == NULL) {
+		WARNING("Symbols note: image (ID %" B_PRId32 ") not found\n",
+			entrySize);
+		return B_BAD_DATA;
+	}
+
+	// check entry size and symbol count
+	if (entrySize < sizeof(Sym) || symbolCount > dataSize
+			|| dataSize - 1 < entrySize
+			|| symbolCount * entrySize >= dataSize - 1) {
+		WARNING("Symbols note: too short or invalid entry size (%" B_PRIu32
+			")\n", entrySize);
+		return B_BAD_DATA;
+	}
+
+	uint32 symbolTableSize = symbolCount * entrySize;
+	uint32 stringTableSize = dataSize - symbolTableSize;
+
+	// check, if the string table is null-terminated
+	const char* stringTable = (const char*)data + symbolTableSize;
+	if (stringTableSize == 0 || stringTable[stringTableSize - 1] != '\0') {
+		WARNING("Symbols note string table not terminated\n");
+		return B_BAD_DATA;
+	}
+
+	CoreFileSymbolsInfo* symbolsInfo = new(std::nothrow) CoreFileSymbolsInfo;
+	if (symbolsInfo == NULL
+			|| !symbolsInfo->Init(data, symbolCount, entrySize, stringTable,
+					stringTableSize)) {
+		delete symbolsInfo;
+		return B_NO_MEMORY;
+	}
+
+	imageInfo->SetSymbolsInfo(symbolsInfo);
+
+	return B_OK;
+}
+
+
+template<typename ElfClass>
+status_t
 CoreFile::_ReadThreadsNote(const void* data, uint32 dataSize)
 {
 	if (dataSize < 3 * sizeof(uint32)) {
@@ -685,6 +790,20 @@ CoreFile::_FindAreaSegment(uint64 address) const
 		ElfSegment* segment = fElfFile.SegmentAt(i);
 		if (segment->Type() == PT_LOAD && segment->LoadAddress() == address)
 			return segment;
+	}
+
+	return NULL;
+}
+
+
+CoreFileImageInfo*
+CoreFile::_ImageInfoForId(int32 id) const
+{
+	int32 count = fImageInfos.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		CoreFileImageInfo* info = fImageInfos.ItemAt(i);
+		if (info->Id() == id)
+			return info;
 	}
 
 	return NULL;

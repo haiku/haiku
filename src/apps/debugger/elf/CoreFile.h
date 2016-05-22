@@ -54,6 +54,33 @@ private:
 };
 
 
+struct CoreFileSymbolsInfo {
+								CoreFileSymbolsInfo();
+								~CoreFileSymbolsInfo();
+
+			bool				Init(const void* symbolTable,
+									uint32 symbolCount,
+									uint32 symbolTableEntrySize,
+									const char* stringTable,
+									uint32 stringTableSize);
+
+			const void*			SymbolTable() const	{ return fSymbolTable; }
+			const char*			StringTable() const	{ return fStringTable; }
+			uint32				SymbolCount() const	{ return fSymbolCount; }
+			uint32				SymbolTableEntrySize() const
+									{ return fSymbolTableEntrySize; }
+			uint32				StringTableSize() const
+									{ return fStringTableSize; }
+
+private:
+			void*				fSymbolTable;
+			char*				fStringTable;
+			uint32				fSymbolCount;
+			uint32				fSymbolTableEntrySize;
+			uint32				fStringTableSize;
+};
+
+
 struct CoreFileImageInfo {
 								CoreFileImageInfo(int32 id, int32 type,
 									uint64 initRoutine, uint64 termRoutine,
@@ -66,6 +93,7 @@ struct CoreFileImageInfo {
 									CoreFileAreaInfo* textArea,
 									CoreFileAreaInfo* dataArea,
 									const BString& name);
+								~CoreFileImageInfo();
 
 			int32				Id() const			{ return fId; }
 			int32				Type() const		{ return fType; }
@@ -80,6 +108,11 @@ struct CoreFileImageInfo {
 			const BString&		Name() const		{ return fName; }
 			CoreFileAreaInfo*	TextArea() const	{ return fTextArea; }
 			CoreFileAreaInfo*	DataArea() const	{ return fDataArea; }
+
+			const CoreFileSymbolsInfo* SymbolsInfo() const
+									{ return fSymbolsInfo; }
+			void				SetSymbolsInfo(
+									CoreFileSymbolsInfo* symbolsInfo);
 
 private:
 			int32				fId;
@@ -99,6 +132,7 @@ private:
 			CoreFileAreaInfo*	fTextArea;
 			CoreFileAreaInfo*	fDataArea;
 			BString				fName;
+			CoreFileSymbolsInfo* fSymbolsInfo;
 };
 
 
@@ -153,7 +187,8 @@ public:
 									{ return fImageInfos.CountItems(); }
 			const CoreFileImageInfo* ImageInfoAt(int32 index) const
 									{ return fImageInfos.ItemAt(index); }
-			const CoreFileImageInfo* ImageInfoForId(int32 id) const;
+			const CoreFileImageInfo* ImageInfoForId(int32 id) const
+									{ return _ImageInfoForId(id); }
 
 			int32				CountThreadInfos() const
 									{ return fThreadInfos.CountItems(); }
@@ -191,11 +226,16 @@ private:
 			status_t			_ReadImagesNote(const void* data,
 									uint32 dataSize);
 			template<typename ElfClass>
+			status_t			_ReadSymbolsNote(const void* data,
+									uint32 dataSize);
+			template<typename ElfClass>
 			status_t			_ReadThreadsNote(const void* data,
 									uint32 dataSize);
 
 			CoreFileAreaInfo*	_FindArea(uint64 address) const;
 			ElfSegment*			_FindAreaSegment(uint64 address) const;
+
+			CoreFileImageInfo*	_ImageInfoForId(int32 id) const;
 
 			template<typename Type>
 			Type				_ReadValue(const void*& data, uint32& dataSize);
