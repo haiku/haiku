@@ -25,17 +25,19 @@
 // #pragma mark - ElfSection
 
 
-ElfSection::ElfSection(const char* name, int fd, uint64 offset, uint64 size,
-	target_addr_t loadAddress, uint32 flags)
+ElfSection::ElfSection(const char* name, uint32 type, int fd, uint64 offset,
+	uint64 size, target_addr_t loadAddress, uint32 flags, uint32 linkIndex)
 	:
 	fName(name),
+	fType(type),
 	fFD(fd),
 	fOffset(offset),
 	fSize(size),
 	fData(NULL),
 	fLoadAddress(loadAddress),
 	fFlags(flags),
-	fLoadCount(0)
+	fLoadCount(0),
+	fLinkIndex(linkIndex)
 {
 }
 
@@ -108,38 +110,67 @@ ElfSegment::~ElfSegment()
 
 
 struct ElfFile::SymbolLookupSource : public ElfSymbolLookupSource {
-	SymbolLookupSource(int fd, uint64 fileOffset, uint64 fileLength,
-		uint64 memoryAddress)
+	SymbolLookupSource(int fd)
 		:
 		fFd(fd),
-		fFileOffset(fileOffset),
-		fFileLength(fileLength),
-		fMemoryAddress(memoryAddress)
+		fSegments(8, true)
 	{
+	}
+
+	bool AddSegment(uint64 fileOffset, uint64 fileLength, uint64 memoryAddress)
+	{
+		Segment* segment = new(std::nothrow) Segment(fileOffset, fileLength,
+			memoryAddress);
+		if (segment == NULL || !fSegments.AddItem(segment)) {
+			delete segment;
+			return false;
+		}
+		return true;
 	}
 
 	virtual ssize_t Read(uint64 address, void* buffer, size_t size)
 	{
-		if (address < fMemoryAddress || address - fMemoryAddress > fFileLength)
-			return B_BAD_VALUE;
+		for (int32 i = 0; Segment* segment = fSegments.ItemAt(i); i++) {
+			if (address < segment->fMemoryAddress
+					|| address - segment->fMemoryAddress
+						> segment->fFileLength) {
+				continue;
+			}
 
-		uint64 offset = address - fMemoryAddress;
-		size_t toRead = (size_t)std::min((uint64)size, fFileLength - offset);
-		if (toRead == 0)
-			return 0;
+			uint64 offset = address - segment->fMemoryAddress;
+			size_t toRead = (size_t)std::min((uint64)size,
+				segment->fFileLength - offset);
+			if (toRead == 0)
+				return 0;
 
-		ssize_t bytesRead = pread(fFd, buffer, toRead,
-			(off_t)(fFileOffset + offset));
-		if (bytesRead < 0)
-			return errno;
-		return bytesRead;
+			ssize_t bytesRead = pread(fFd, buffer, toRead,
+				(off_t)(segment->fFileOffset + offset));
+			if (bytesRead < 0)
+				return errno;
+			return bytesRead;
+		}
+
+		return B_BAD_VALUE;
 	}
 
 private:
-	int		fFd;
-	uint64	fFileOffset;
-	uint64	fFileLength;
-	uint64	fMemoryAddress;
+	struct Segment {
+		uint64	fFileOffset;
+		uint64	fFileLength;
+		uint64	fMemoryAddress;
+
+		Segment(uint64 fileOffset, uint64 fileLength, uint64 memoryAddress)
+			:
+			fFileOffset(fileOffset),
+			fFileLength(fileLength),
+			fMemoryAddress(memoryAddress)
+		{
+		}
+	};
+
+private:
+	int						fFd;
+	BObjectList<Segment>	fSegments;
 };
 
 
@@ -255,6 +286,20 @@ ElfFile::FindSection(const char* name) const
 }
 
 
+ElfSection*
+ElfFile::FindSection(uint32 type) const
+{
+	int32 count = fSections.CountItems();
+	for (int32 i = 0; i < count; i++) {
+		ElfSection* section = fSections.ItemAt(i);
+		if (section->Type() == type)
+			return section;
+	}
+
+	return NULL;
+}
+
+
 ElfSegment*
 ElfFile::TextSegment() const
 {
@@ -287,8 +332,52 @@ ElfSymbolLookupSource*
 ElfFile::CreateSymbolLookupSource(uint64 fileOffset, uint64 fileLength,
 	uint64 memoryAddress) const
 {
-	return new(std::nothrow) SymbolLookupSource(fFD, fileOffset, fileLength,
-		memoryAddress);
+	SymbolLookupSource* source = new(std::nothrow) SymbolLookupSource(fFD);
+	if (source == NULL
+			|| !source->AddSegment(fileOffset, fileLength, memoryAddress)) {
+		return NULL;
+	}
+
+	return source;
+}
+
+
+status_t
+ElfFile::CreateSymbolLookup(uint64 textDelta, ElfSymbolLookup*& _lookup) const
+{
+	// Get the symbol table + corresponding string section. There may be two
+	// symbol tables: the dynamic and the non-dynamic one. The former contains
+	// only the symbols needed at run-time. The latter, if existing, is likely
+	// more complete. So try to find and use the latter one, falling back to the
+	// former.
+	ElfSection* symbolSection;
+	ElfSection* stringSection;
+	if (!_FindSymbolSections(symbolSection, stringSection, SHT_SYMTAB)
+		&& !_FindSymbolSections(symbolSection, stringSection, SHT_DYNSYM)) {
+		return B_ENTRY_NOT_FOUND;
+	}
+
+	// create a source with a segment for each section
+	SymbolLookupSource* source = new(std::nothrow) SymbolLookupSource(fFD);
+	if (source == NULL)
+		return B_NO_MEMORY;
+	BReference<SymbolLookupSource> sourceReference(source, true);
+
+	if (!source->AddSegment(symbolSection->Offset(), symbolSection->Size(),
+				symbolSection->Offset())
+		|| !source->AddSegment(stringSection->Offset(), stringSection->Size(),
+				stringSection->Offset())) {
+		return B_NO_MEMORY;
+	}
+
+	// create the lookup
+	size_t symbolTableEntrySize = Is64Bit()
+		? sizeof(ElfClass64::Sym) : sizeof(ElfClass32::Sym);
+	uint32 symbolCount = uint32(symbolSection->Size() / symbolTableEntrySize);
+
+	return ElfSymbolLookup::Create(source, symbolSection->Offset(), 0,
+		stringSection->Offset(), symbolCount, symbolTableEntrySize, textDelta,
+		f64Bit, fSwappedByteOrder, true, _lookup);
 }
 
 
@@ -349,9 +438,11 @@ ElfFile::_LoadFile(const char* fileName)
 		size_t sectionStringSize = Get(stringSectionHeader->sh_size);
 
 		ElfSection* sectionStringSection = new(std::nothrow) ElfSection(
-			".shstrtab", fFD, Get(stringSectionHeader->sh_offset),
-			sectionStringSize, Get(stringSectionHeader->sh_addr),
-			Get(stringSectionHeader->sh_flags));
+			".shstrtab", Get(stringSectionHeader->sh_type),fFD,
+			Get(stringSectionHeader->sh_offset), sectionStringSize,
+			Get(stringSectionHeader->sh_addr),
+			Get(stringSectionHeader->sh_flags),
+			Get(stringSectionHeader->sh_link));
 		if (sectionStringSection == NULL)
 			return B_NO_MEMORY;
 		if (!fSections.AddItem(sectionStringSection)) {
@@ -379,12 +470,13 @@ ElfFile::_LoadFile(const char* fileName)
 			}
 
 			// create an ElfSection
-			ElfSection* section = new(std::nothrow) ElfSection(name, fFD,
-				Get(sectionHeader->sh_offset), Get(sectionHeader->sh_size),
-				Get(sectionHeader->sh_addr), Get(sectionHeader->sh_flags));
+			ElfSection* section = new(std::nothrow) ElfSection(name,
+				Get(sectionHeader->sh_type), fFD, Get(sectionHeader->sh_offset),
+				Get(sectionHeader->sh_size), Get(sectionHeader->sh_addr),
+				Get(sectionHeader->sh_flags), Get(sectionHeader->sh_link));
 			if (section == NULL)
 				return B_NO_MEMORY;
-			if (!fSections.AddItem(section)) {
+			if (!fSections.AddItem(section, i)) {
 				delete section;
 				return B_NO_MEMORY;
 			}
@@ -439,6 +531,26 @@ ElfFile::_LoadFile(const char* fileName)
 	}
 
 	return B_OK;
+}
+
+
+bool
+ElfFile::_FindSymbolSections(ElfSection*& _symbolSection,
+	ElfSection*& _stringSection, uint32 type) const
+{
+	// get the symbol table section
+	ElfSection* symbolSection = FindSection(type);
+	if (symbolSection == NULL)
+		return false;
+
+	// The symbol table section is linked to the corresponding string section.
+	ElfSection* stringSection = SectionAt(symbolSection->LinkIndex());
+	if (stringSection == NULL || stringSection->Type() != SHT_STRTAB)
+		return false;
+
+	_symbolSection = symbolSection;
+	_stringSection = stringSection;
+	return true;
 }
 
 

@@ -23,12 +23,14 @@ class ElfSymbolLookupSource;
 
 class ElfSection {
 public:
-								ElfSection(const char* name, int fd,
-									uint64 offset, uint64 size,
-									target_addr_t loadAddress, uint32 flags);
+								ElfSection(const char* name, uint32 type,
+									int fd, uint64 offset, uint64 size,
+									target_addr_t loadAddress, uint32 flags,
+									uint32 linkIndex);
 								~ElfSection();
 
 			const char*			Name() const	{ return fName; }
+			uint32				Type() const	{ return fType; }
 			uint64				Offset() const	{ return fOffset; }
 			uint64				Size() const	{ return fSize; }
 			const void*			Data() const	{ return fData; }
@@ -39,10 +41,12 @@ public:
 
 			status_t			Load();
 			void				Unload();
-			bool				IsLoaded() const { return fLoadCount > 0; }
+			bool				IsLoaded() const	{ return fLoadCount > 0; }
+			uint32				LinkIndex() const	{ return fLinkIndex; }
 
 private:
 			const char*			fName;
+			uint32				fType;
 			int					fFD;
 			uint64				fOffset;
 			uint64				fSize;
@@ -50,6 +54,7 @@ private:
 			target_addr_t		fLoadAddress;
 			uint32				fFlags;
 			int32				fLoadCount;
+			uint32				fLinkIndex;
 };
 
 
@@ -124,9 +129,14 @@ public:
 			uint16				Type() const	{ return fType; }
 			uint16				Machine() const	{ return fMachine; }
 
+			int32				CountSection() const
+									{ return fSections.CountItems(); }
+			ElfSection*			SectionAt(int32 index) const
+									{ return fSections.ItemAt(index); }
 			ElfSection*			GetSection(const char* name);
 			void				PutSection(ElfSection* section);
 			ElfSection*			FindSection(const char* name) const;
+			ElfSection*			FindSection(uint32 type) const;
 
 			int32				CountSegments() const
 									{ return fSegments.CountItems(); }
@@ -139,6 +149,8 @@ public:
 			ElfSymbolLookupSource* CreateSymbolLookupSource(uint64 fileOffset,
 									uint64 fileLength,
 									uint64 memoryAddress) const;
+			status_t			CreateSymbolLookup(uint64 textDelta,
+									ElfSymbolLookup*& _lookup) const;
 
 			template<typename Value>
 			Value				Get(const Value& value) const
@@ -158,6 +170,10 @@ private:
 private:
 			template<typename ElfClass>
 			status_t			_LoadFile(const char* fileName);
+
+			bool				_FindSymbolSections(ElfSection*& _symbolSection,
+									ElfSection*& _stringSection,
+									uint32 type) const;
 
 			bool				_CheckRange(uint64 offset, uint64 size) const;
 
