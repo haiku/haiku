@@ -21,11 +21,14 @@ public:
 
 class ElfSymbolLookup {
 public:
+	static	const uint32		kGetSymbolCountFromHash = ~(uint32)0;
+
+public:
 	virtual						~ElfSymbolLookup();
 
 	static	status_t			Create(ElfSymbolLookupSource* source,
 									uint64 symbolTable, uint64 symbolHash,
-									uint64 stringTable,
+									uint64 stringTable, uint32 symbolCount,
 									uint32 symbolTableEntrySize,
 									uint64 textDelta, bool is64Bit,
 									bool swappedByteOrder, bool cacheSource,

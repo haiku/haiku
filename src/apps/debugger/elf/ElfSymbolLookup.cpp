@@ -136,14 +136,14 @@ public:
 	typedef typename ElfClass::Sym ElfSym;
 
 	ElfSymbolLookupImpl(ElfSymbolLookupSource* source, uint64 symbolTable,
-		uint64 symbolHash, uint64 stringTable, uint32 symbolTableEntrySize,
-		uint64 textDelta, bool swappedByteOrder)
+		uint64 symbolHash, uint64 stringTable, uint32 symbolCount,
+		uint32 symbolTableEntrySize, uint64 textDelta, bool swappedByteOrder)
 		:
 		fSource(NULL),
 		fSymbolTable(symbolTable),
 		fSymbolHash(symbolHash),
 		fStringTable(stringTable),
-		fSymbolCount(0),
+		fSymbolCount(symbolCount),
 		fSymbolTableEntrySize(symbolTableEntrySize),
 		fTextDelta(textDelta),
 		fSwappedByteOrder(swappedByteOrder)
@@ -195,16 +195,18 @@ public:
 				return error;
 		}
 
-		// Read the number of symbols in the symbol table from the hash table
-		// entry 1.
-		uint32 symbolCount;
-		ssize_t bytesRead = fSource->Read(fSymbolHash + 4, &symbolCount, 4);
-		if (bytesRead < 0)
-			return bytesRead;
-		if (bytesRead != 4)
-			return B_IO_ERROR;
+		if (fSymbolCount == kGetSymbolCountFromHash) {
+			// Read the number of symbols in the symbol table from the hash
+			// table entry 1.
+			uint32 symbolCount;
+			ssize_t bytesRead = fSource->Read(fSymbolHash + 4, &symbolCount, 4);
+			if (bytesRead < 0)
+				return bytesRead;
+			if (bytesRead != 4)
+				return B_IO_ERROR;
 
-		fSymbolCount = Get(symbolCount);
+			fSymbolCount = Get(symbolCount);
+		}
 
 		return B_OK;
 	}
@@ -322,20 +324,20 @@ ElfSymbolLookup::~ElfSymbolLookup()
 
 /*static*/ status_t
 ElfSymbolLookup::Create(ElfSymbolLookupSource* source, uint64 symbolTable,
-	uint64 symbolHash, uint64 stringTable, uint32 symbolTableEntrySize,
-	uint64 textDelta, bool is64Bit, bool swappedByteOrder, bool cacheSource,
-	ElfSymbolLookup*& _lookup)
+	uint64 symbolHash, uint64 stringTable, uint32 symbolCount,
+	uint32 symbolTableEntrySize, uint64 textDelta, bool is64Bit,
+	bool swappedByteOrder, bool cacheSource, ElfSymbolLookup*& _lookup)
 {
 	// create
 	ElfSymbolLookup* lookup;
 	if (is64Bit) {
 		lookup = new(std::nothrow) ElfSymbolLookupImpl<ElfClass64>(source,
-			symbolTable, symbolHash, stringTable, symbolTableEntrySize,
-			textDelta, swappedByteOrder);
+			symbolTable, symbolHash, stringTable, symbolCount,
+			symbolTableEntrySize, textDelta, swappedByteOrder);
 	} else {
 		lookup = new(std::nothrow) ElfSymbolLookupImpl<ElfClass32>(source,
-			symbolTable, symbolHash, stringTable, symbolTableEntrySize,
-			textDelta, swappedByteOrder);
+			symbolTable, symbolHash, stringTable, symbolCount,
+			symbolTableEntrySize, textDelta, swappedByteOrder);
 	}
 
 	if (lookup == NULL)

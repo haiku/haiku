@@ -227,8 +227,9 @@ CoreFile::CreateSymbolLookup(const CoreFileImageInfo* imageInfo,
 
 	// create the symbol lookup
 	return ElfSymbolLookup::Create(source, symbolTable, symbolHash, stringTable,
-		symbolTableEntrySize, textDelta, fElfFile.Is64Bit(),
-		fElfFile.IsByteOrderSwapped(), true, _lookup);
+		ElfSymbolLookup::kGetSymbolCountFromHash, symbolTableEntrySize,
+		textDelta, fElfFile.Is64Bit(), fElfFile.IsByteOrderSwapped(), true,
+		_lookup);
 }
 
 
