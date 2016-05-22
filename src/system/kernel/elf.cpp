@@ -2564,6 +2564,125 @@ elf_add_memory_image_symbol(image_id id, const char* name, addr_t address,
 }
 
 
+/*!	Reads the symbol and string table for the kernel image with the given ID.
+	\a _symbolCount and \a _stringTableSize are both in- and output parameters.
+	When called they call the size of the buffers given by \a symbolTable and
+	\a stringTable respectively. When the function returns successfully, they
+	will contain the actual sizes (which can be greater than the original ones).
+	The function will copy as much as possible into the buffers. For only
+	getting the required buffer sizes, it can be invoked with \c NULL buffers.
+	On success \a _imageDelta will contain the offset to be added to the symbol
+	values in the table to get the actual symbol addresses.
+*/
+status_t
+elf_read_kernel_image_symbols(image_id id, elf_sym* symbolTable,
+	int32* _symbolCount, char* stringTable, size_t* _stringTableSize,
+	addr_t* _imageDelta, bool kernel)
+{
+	// check params
+	if (_symbolCount == NULL || _stringTableSize == NULL)
+		return B_BAD_VALUE;
+	if (!kernel) {
+		if (!IS_USER_ADDRESS(_symbolCount) || !IS_USER_ADDRESS(_stringTableSize)
+			|| (_imageDelta != NULL && !IS_USER_ADDRESS(_imageDelta))
+			|| (symbolTable != NULL && !IS_USER_ADDRESS(symbolTable))
+			|| (stringTable != NULL && !IS_USER_ADDRESS(stringTable))) {
+			return B_BAD_ADDRESS;
+		}
+	}
+
+	// get buffer sizes
+	int32 maxSymbolCount;
+	size_t maxStringTableSize;
+	if (kernel) {
+		maxSymbolCount = *_symbolCount;
+		maxStringTableSize = *_stringTableSize;
+	} else {
+		if (user_memcpy(&maxSymbolCount, _symbolCount, sizeof(maxSymbolCount))
+				!= B_OK
+			|| user_memcpy(&maxStringTableSize, _stringTableSize,
+				sizeof(maxStringTableSize)) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
+
+	// find the image
+	MutexLocker _(sImageMutex);
+	struct elf_image_info* image = find_image(id);
+	if (image == NULL)
+		return B_ENTRY_NOT_FOUND;
+
+	// get the tables and infos
+	addr_t imageDelta = image->text_region.delta;
+	const elf_sym* symbols;
+	int32 symbolCount;
+	const char* strings;
+
+	if (image->debug_symbols != NULL) {
+		symbols = image->debug_symbols;
+		symbolCount = image->num_debug_symbols;
+		strings = image->debug_string_table;
+	} else {
+		symbols = image->syms;
+		symbolCount = image->symhash[1];
+		strings = image->strtab;
+	}
+
+	// The string table size isn't stored in the elf_image_info structure. Find
+	// out by iterating through all symbols.
+	size_t stringTableSize = 0;
+	for (int32 i = 0; i < symbolCount; i++) {
+		size_t index = symbols[i].st_name;
+		if (index > stringTableSize)
+			stringTableSize = index;
+	}
+	stringTableSize += strlen(strings + stringTableSize) + 1;
+		// add size of the last string
+
+	// copy symbol table
+	int32 symbolsToCopy = min_c(symbolCount, maxSymbolCount);
+	if (symbolTable != NULL && symbolsToCopy > 0) {
+		if (kernel) {
+			memcpy(symbolTable, symbols, sizeof(elf_sym) * symbolsToCopy);
+		} else if (user_memcpy(symbolTable, symbols,
+				sizeof(elf_sym) * symbolsToCopy) != B_OK) {
+			return B_BAD_ADDRESS;
+		}
+	}
+
+	// copy string table
+	size_t stringsToCopy = min_c(stringTableSize, maxStringTableSize);
+	if (stringTable != NULL && stringsToCopy > 0) {
+		if (kernel) {
+			memcpy(stringTable, strings, stringsToCopy);
+		} else {
+			if (user_memcpy(stringTable, strings, stringsToCopy)
+					!= B_OK) {
+				return B_BAD_ADDRESS;
+			}
+		}
+	}
+
+	// copy sizes
+	if (kernel) {
+		*_symbolCount = symbolCount;
+		*_stringTableSize = stringTableSize;
+		if (_imageDelta != NULL)
+			*_imageDelta = imageDelta;
+	} else {
+		if (user_memcpy(_symbolCount, &symbolCount, sizeof(symbolCount)) != B_OK
+			|| user_memcpy(_stringTableSize, &stringTableSize,
+					sizeof(stringTableSize)) != B_OK
+			|| (_imageDelta != NULL && user_memcpy(_imageDelta, &imageDelta,
+					sizeof(imageDelta)) != B_OK)) {
+			return B_BAD_ADDRESS;
+		}
+	}
+
+	return B_OK;
+}
+
+
 status_t
 elf_init(kernel_args *args)
 {
@@ -2622,85 +2741,6 @@ _user_read_kernel_image_symbols(image_id id, elf_sym* symbolTable,
 	int32* _symbolCount, char* stringTable, size_t* _stringTableSize,
 	addr_t* _imageDelta)
 {
-	// check params
-	if (_symbolCount == NULL || _stringTableSize == NULL)
-		return B_BAD_VALUE;
-	if (!IS_USER_ADDRESS(_symbolCount) || !IS_USER_ADDRESS(_stringTableSize)
-		|| (_imageDelta != NULL && !IS_USER_ADDRESS(_imageDelta))
-		|| (symbolTable != NULL && !IS_USER_ADDRESS(symbolTable))
-		|| (stringTable != NULL && !IS_USER_ADDRESS(stringTable))) {
-		return B_BAD_ADDRESS;
-	}
-
-	// get buffer sizes
-	int32 maxSymbolCount;
-	size_t maxStringTableSize;
-	if (user_memcpy(&maxSymbolCount, _symbolCount, sizeof(maxSymbolCount))
-			!= B_OK
-		|| user_memcpy(&maxStringTableSize, _stringTableSize,
-			sizeof(maxStringTableSize)) != B_OK) {
-		return B_BAD_ADDRESS;
-	}
-
-	// find the image
-	MutexLocker _(sImageMutex);
-	struct elf_image_info* image = find_image(id);
-	if (image == NULL)
-		return B_ENTRY_NOT_FOUND;
-
-	// get the tables and infos
-	addr_t imageDelta = image->text_region.delta;
-	const elf_sym* symbols;
-	int32 symbolCount;
-	const char* strings;
-
-	if (image->debug_symbols != NULL) {
-		symbols = image->debug_symbols;
-		symbolCount = image->num_debug_symbols;
-		strings = image->debug_string_table;
-	} else {
-		symbols = image->syms;
-		symbolCount = image->symhash[1];
-		strings = image->strtab;
-	}
-
-	// The string table size isn't stored in the elf_image_info structure. Find
-	// out by iterating through all symbols.
-	size_t stringTableSize = 0;
-	for (int32 i = 0; i < symbolCount; i++) {
-		size_t index = symbols[i].st_name;
-		if (index > stringTableSize)
-			stringTableSize = index;
-	}
-	stringTableSize += strlen(strings + stringTableSize) + 1;
-		// add size of the last string
-
-	// copy symbol table
-	int32 symbolsToCopy = min_c(symbolCount, maxSymbolCount);
-	if (symbolTable != NULL && symbolsToCopy > 0) {
-		if (user_memcpy(symbolTable, symbols, sizeof(elf_sym) * symbolsToCopy)
-				!= B_OK) {
-			return B_BAD_ADDRESS;
-		}
-	}
-
-	// copy string table
-	size_t stringsToCopy = min_c(stringTableSize, maxStringTableSize);
-	if (stringTable != NULL && stringsToCopy > 0) {
-		if (user_memcpy(stringTable, strings, stringsToCopy)
-				!= B_OK) {
-			return B_BAD_ADDRESS;
-		}
-	}
-
-	// copy sizes
-	if (user_memcpy(_symbolCount, &symbolCount, sizeof(symbolCount)) != B_OK
-		|| user_memcpy(_stringTableSize, &stringTableSize,
-				sizeof(stringTableSize)) != B_OK
-		|| (_imageDelta != NULL && user_memcpy(_imageDelta, &imageDelta,
-				sizeof(imageDelta)) != B_OK)) {
-		return B_BAD_ADDRESS;
-	}
-
-	return B_OK;
+	return elf_read_kernel_image_symbols(id, symbolTable, _symbolCount,
+		stringTable, _stringTableSize, _imageDelta, false);
 }

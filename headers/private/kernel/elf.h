@@ -48,6 +48,9 @@ image_id elf_create_memory_image(const char* imageName, addr_t text,
 			size_t textSize, addr_t data, size_t dataSize);
 status_t elf_add_memory_image_symbol(image_id id, const char* name,
 			addr_t address, size_t size, int32 type);
+status_t elf_read_kernel_image_symbols(image_id id, elf_sym* symbolTable,
+			int32* _symbolCount, char* stringTable, size_t* _stringTableSize,
+			addr_t* _imageDelta, bool kernel);
 status_t elf_init(struct kernel_args *args);
 
 status_t _user_read_kernel_image_symbols(image_id id, elf_sym* symbolTable,
