@@ -336,6 +336,8 @@ RemotePackageRepository HaikuPorts
 	lighttpd-1.4.35-3
 	lighttpd_devel-1.4.35-3
 	links-2.8-1
+	live555-2016.01.29-3
+	live555_devel-2016.01.29-3
 	lmarbles-1.0.8-2
 	lnlauncher-1.1.2-5
 	ltris-1.0.19-1
@@ -810,6 +812,8 @@ RemotePackageRepository HaikuPorts
 	libxslt_x86_devel-1.1.28-5
 	libzip_x86-0.11.2-1
 	libzip_x86_devel-0.11.2-1
+	live555_x86-2016.01.29-3
+	live555_x86_devel-2016.01.29-3
 	llvm_x86-3.8.0-2
 	llvm_x86_clang-3.8.0-2
 	llvm_x86_clang_analysis-3.8.0-2
