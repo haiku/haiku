@@ -1257,6 +1257,8 @@ RemotePackageRepository HaikuPorts
 	libzip_x86
 	lighttpd
 	links
+	live555
+	live555_x86
 	llvm_x86
 	lmms_x86
 	lmarbles
