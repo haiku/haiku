@@ -219,6 +219,8 @@ RemotePackageRepository HaikuPorts
 	libxml2_python-2.9.3-2
 	libxslt-1.1.28-2
 	libxslt_devel-1.1.28-2
+	live555-2016.01.29-3
+	live555_devel-2016.01.29-3
 	llvm-3.8.0-2
 	llvm_clang-3.8.0-2
 	llvm_clang_analysis-3.8.0-2
@@ -400,6 +402,8 @@ RemotePackageRepository HaikuPorts
 	libwebp5_x86_gcc2_devel-0.4.4-1
 	libxml2_x86_gcc2-2.9.2-1
 	libxml2_x86_gcc2_devel-2.9.2-1
+	live555_x86_gcc2-2016.01.29-3
+	live555_x86_gcc2_devel-2016.01.29-3
 	mesa_x86_gcc2-7.9.2-5
 	mesa_x86_gcc2_devel-7.9.2-5
 	mesa_x86_gcc2_swrast-7.9.2-5
