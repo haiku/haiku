@@ -217,6 +217,8 @@ local sources =
 
 	# settings
 	BreakpointSetting.cpp
+	DebuggerSettingsManager.cpp
+	NoOpSettingsManager.cpp
 	SettingsManager.cpp
 	TeamFileManagerSettings.cpp
 	TeamSettings.cpp

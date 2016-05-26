@@ -26,12 +26,12 @@
 #include "CoreFileDebuggerInterface.h"
 #include "CommandLineUserInterface.h"
 #include "DebuggerInterface.h"
+#include "DebuggerSettingsManager.h"
 #include "DebuggerUiSettingsFactory.h"
 #include "GraphicalUserInterface.h"
 #include "ImageDebugLoadingStateHandlerRoster.h"
 #include "MessageCodes.h"
 #include "ReportUserInterface.h"
-#include "SettingsManager.h"
 #include "SignalSet.h"
 #include "StartTeamWindow.h"
 #include "TargetHostInterface.h"
@@ -295,7 +295,7 @@ private:
 			status_t			_HandleOptions(const Options& options);
 
 private:
-			SettingsManager		fSettingsManager;
+			DebuggerSettingsManager fSettingsManager;
 			TeamsWindow*		fTeamsWindow;
 			StartTeamWindow*	fStartTeamWindow;
 };
@@ -661,7 +661,7 @@ CliDebugger::Run(const Options& options)
 		return false;
 	}
 
-	SettingsManager settingsManager;
+	DebuggerSettingsManager settingsManager;
 	error = settingsManager.Init(DebuggerUiSettingsFactory::Default());
 	if (error != B_OK) {
 		fprintf(stderr, "Error: Settings manager initialization failed: "
@@ -729,14 +729,6 @@ ReportDebugger::Run(const Options& options)
 		return false;
 	}
 
-	SettingsManager settingsManager;
-	error = settingsManager.Init(DebuggerUiSettingsFactory::Default());
-	if (error != B_OK) {
-		fprintf(stderr, "Error: Settings manager initialization failed: "
-			"%s\n", strerror(error));
-		return false;
-	}
-
 	// create the report UI
 	ReportUserInterface* userInterface
 		= new(std::nothrow) ReportUserInterface(options.thread, options.reportPath);
@@ -752,7 +744,6 @@ ReportDebugger::Run(const Options& options)
 	TeamDebuggerOptions debuggerOptions;
 	set_debugger_options_from_options(debuggerOptions, options);
 	debuggerOptions.userInterface = userInterface;
-	debuggerOptions.settingsManager = &settingsManager;
 	error = hostInterface->StartTeamDebugger(debuggerOptions);
 	if (error != B_OK)
 		return false;

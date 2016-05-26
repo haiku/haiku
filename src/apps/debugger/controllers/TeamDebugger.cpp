@@ -40,6 +40,7 @@
 #include "Jobs.h"
 #include "LocatableFile.h"
 #include "MessageCodes.h"
+#include "NoOpSettingsManager.h"
 #include "SettingsManager.h"
 #include "SourceCode.h"
 #include "SourceLanguage.h"
@@ -334,6 +335,14 @@ TeamDebugger::Init(DebuggerInterface* interface, thread_id threadID, int argc,
 	status_t error = _HandleSetArguments(argc, argv);
 	if (error != B_OK)
 		return error;
+
+	if (fSettingsManager == NULL) {
+		// if we have not been provided with a settings manager,
+		// simply use the no-op manager by default.
+		fSettingsManager = new(std::nothrow) NoOpSettingsManager;
+		if (fSettingsManager == NULL)
+			return B_NO_MEMORY;
+	}
 
 	fDebuggerInterface = interface;
 	fDebuggerInterface->AcquireReference();
