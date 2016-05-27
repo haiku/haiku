@@ -440,7 +440,7 @@ RemotePackageRepository HaikuPorts
 	# the non-devel package isn't useful
 	qrencode_kdl_devel-3.3.0-2
 	qsystray-0.1-3
-	quickres-20011026-2
+	quickres-20011026-3
 	rdesktop-1.8.0-2
 	readline-6.3.8-1
 	readline_devel-6.3.8-1
