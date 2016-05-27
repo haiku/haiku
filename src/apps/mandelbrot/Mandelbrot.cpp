@@ -29,7 +29,6 @@ public:
 	FractalView();
 	~FractalView();
 
-	virtual void AttachedToWindow();
 	virtual void FrameResized(float, float)
 		{ RedrawFractal(); }
 	virtual void MouseDown(BPoint where);
@@ -41,7 +40,7 @@ private:
 	double fLocationY;
 	double fSize;
 
-	void RedrawFractal();
+	void RedrawFractal(uint16 width = 0, uint16 height = 0);
 };
 
 
@@ -53,6 +52,7 @@ FractalView::FractalView()
 	fLocationY(0),
 	fSize(0.005)
 {
+	RedrawFractal(641, 462);
 }
 
 
@@ -62,27 +62,30 @@ FractalView::~FractalView()
 }
 
 
-void FractalView::AttachedToWindow()
-{
-	//RedrawFractal();
-}
-
-
 void FractalView::MouseDown(BPoint where)
 {
+	uint32 buttons;
+	GetMouse(&where, &buttons);
+
 	BRect frame = Frame();
 	fLocationX = ((where.x - frame.Width() / 2) * fSize + fLocationX);
 	fLocationY = ((where.y - frame.Height() / 2) * -fSize + fLocationY);
-	fSize /= 2;
+	if (buttons & B_PRIMARY_MOUSE_BUTTON)
+		fSize /= 2;
+	else
+		fSize *= 2;
 	RedrawFractal();
 }
 
 
-void FractalView::RedrawFractal()
+void FractalView::RedrawFractal(uint16 width, uint16 height)
 {
 	delete fBitmap;
-	fBitmap = FractalEngine(Frame().Width(), Frame().Height(), fLocationX,
-		fLocationY, fSize);
+	if (width == 0)
+		width = (uint16)Frame().Width();
+	if (height == 0)
+		height = (uint16)Frame().Height();
+	fBitmap = FractalEngine(width, height, fLocationX, fLocationY, fSize);
 	Invalidate();
 }
 
