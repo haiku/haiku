@@ -36,24 +36,24 @@ public:
 	virtual void MessageReceived(BMessage* msg);
 	virtual void Draw(BRect updateRect);
 
+	FractalEngine* fFractalEngine;
+	void RedrawFractal();
+
 private:
 	bool fSizeChanged;
-	FractalEngine* fFractalEngine;
 	bool fOwnBitmap;
 	BBitmap* fDisplayBitmap;
 	double fLocationX;
 	double fLocationY;
 	double fSize;
-
-	void RedrawFractal();
 };
 
 
 FractalView::FractalView()
 	:
 	BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED),
-	fSizeChanged(false),
 	fFractalEngine(NULL),
+	fSizeChanged(false),
 	fOwnBitmap(false),
 	fDisplayBitmap(NULL),
 	fLocationX(0),
@@ -161,7 +161,17 @@ void FractalView::Draw(BRect updateRect)
 class MandelbrotWindow : public BWindow
 {
 public:
-
+	enum {
+		MSG_ROYAL_PALETTE = 'MndW',
+		MSG_DEEPFROST_PALETTE,
+		MSG_FROST_PALETTE,
+		MSG_FIRE_PALETTE,
+		MSG_MIDNIGHT_PALETTE,
+		MSG_GRASSLAND_PALETTE,
+		MSG_LIGHTNING_PALETTE,
+		MSG_SPRING_PALETTE,
+		MSG_HIGHCONTRAST_PALETTE,
+	};
 				MandelbrotWindow(BRect frame);
 				~MandelbrotWindow() {}
 
@@ -182,11 +192,26 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 	SetPulseRate(250000); // pulse twice per second
 
 	BMenuBar* menuBar = new BMenuBar("MenuBar");
+	BMenu* paletteMenu;
 	BLayoutBuilder::Menu<>(menuBar)
 		.AddMenu(B_TRANSLATE("File"))
 			.AddItem(B_TRANSLATE("Quit"), B_QUIT_REQUESTED, 'Q')
 		.End()
+		.AddMenu(B_TRANSLATE("Palette"))
+			.GetMenu(paletteMenu)
+			.AddItem(B_TRANSLATE("Royal"), MSG_ROYAL_PALETTE)
+			.AddItem(B_TRANSLATE("Deepfrost"), MSG_DEEPFROST_PALETTE)
+			.AddItem(B_TRANSLATE("Frost"), MSG_FROST_PALETTE)
+			.AddItem(B_TRANSLATE("Fire"), MSG_FIRE_PALETTE)
+			.AddItem(B_TRANSLATE("Midnight"), MSG_MIDNIGHT_PALETTE)
+			.AddItem(B_TRANSLATE("Grassland"), MSG_GRASSLAND_PALETTE)
+			.AddItem(B_TRANSLATE("Lightning"), MSG_LIGHTNING_PALETTE)
+			.AddItem(B_TRANSLATE("Spring"), MSG_SPRING_PALETTE)
+			.AddItem(B_TRANSLATE("High contrast"), MSG_HIGHCONTRAST_PALETTE)
+		.End()
 	.End();
+	paletteMenu->SetRadioMode(true);
+	paletteMenu->FindItem(MSG_ROYAL_PALETTE)->SetMarked(true);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0)
@@ -196,15 +221,34 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 }
 
 
+#define HANDLE_PALETTE(uiwhat, id) \
+	case uiwhat: { \
+		BMessage msg(FractalEngine::MSG_SET_PALETTE); \
+		msg.AddUInt8("palette", id); \
+		fFractalView->fFractalEngine->PostMessage(&msg); \
+		fFractalView->RedrawFractal(); \
+		break; \
+	}
 void
 MandelbrotWindow::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
+	HANDLE_PALETTE(MSG_ROYAL_PALETTE, 0)
+	HANDLE_PALETTE(MSG_DEEPFROST_PALETTE, 1)
+	HANDLE_PALETTE(MSG_FROST_PALETTE, 2)
+	HANDLE_PALETTE(MSG_FIRE_PALETTE, 3)
+	HANDLE_PALETTE(MSG_MIDNIGHT_PALETTE, 4)
+	HANDLE_PALETTE(MSG_GRASSLAND_PALETTE, 5)
+	HANDLE_PALETTE(MSG_LIGHTNING_PALETTE, 6)
+	HANDLE_PALETTE(MSG_SPRING_PALETTE, 7)
+	HANDLE_PALETTE(MSG_HIGHCONTRAST_PALETTE, 8)
+
 	default:
 		BWindow::MessageReceived(msg);
 		break;
 	}
 }
+#undef HANDLE_PALETTE
 
 
 bool

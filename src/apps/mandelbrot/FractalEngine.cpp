@@ -40,6 +40,19 @@ FractalEngine::~FractalEngine()
 void FractalEngine::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
+	case MSG_SET_PALETTE:
+		switch (msg->GetUInt8("palette", 0)) {
+		case 0: fColorset = Colorset_Royal; break;
+		case 1: fColorset = Colorset_DeepFrost; break;
+		case 2: fColorset = Colorset_Frost; break;
+		case 3: fColorset = Colorset_Fire; break;
+		case 4: fColorset = Colorset_Midnight; break;
+		case 5: fColorset = Colorset_Grassland; break;
+		case 6: fColorset = Colorset_Lightning; break;
+		case 7: fColorset = Colorset_Spring; break;
+		case 8: fColorset = Colorset_HighContrast; break;
+		}
+		break;
 	case MSG_RESIZE: {
 		delete fBitmapStandby;
 		// We don't delete the "display" bitmap; the viewer now owns it

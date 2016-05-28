@@ -19,7 +19,8 @@ class BBitmap;
 class FractalEngine : public BLooper {
 public:
 	enum {
-		MSG_RESIZE = 'Frct',
+		MSG_SET_PALETTE = 'Frct',
+		MSG_RESIZE,
 		MSG_RENDER,
 		MSG_RENDER_COMPLETE,
 	};
