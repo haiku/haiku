@@ -162,7 +162,14 @@ class MandelbrotWindow : public BWindow
 {
 public:
 	enum {
-		MSG_ROYAL_PALETTE = 'MndW',
+		MSG_MANDELBROT_SET = 'MndW',
+		MSG_BURNINGSHIP_SET,
+		MSG_TRICORN_SET,
+		MSG_JULIA_SET,
+		MSG_ORBITTRAP_SET,
+		MSG_MULTIBROT_SET,
+
+		MSG_ROYAL_PALETTE,
 		MSG_DEEPFROST_PALETTE,
 		MSG_FROST_PALETTE,
 		MSG_FIRE_PALETTE,
@@ -192,10 +199,20 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 	SetPulseRate(250000); // pulse twice per second
 
 	BMenuBar* menuBar = new BMenuBar("MenuBar");
+	BMenu* setMenu;
 	BMenu* paletteMenu;
 	BLayoutBuilder::Menu<>(menuBar)
 		.AddMenu(B_TRANSLATE("File"))
 			.AddItem(B_TRANSLATE("Quit"), B_QUIT_REQUESTED, 'Q')
+		.End()
+		.AddMenu(B_TRANSLATE("Set"))
+			.GetMenu(setMenu)
+			.AddItem(B_TRANSLATE("Mandelbrot"), MSG_MANDELBROT_SET)
+			.AddItem(B_TRANSLATE("Burning Ship"), MSG_BURNINGSHIP_SET)
+			.AddItem(B_TRANSLATE("Tricorn"), MSG_TRICORN_SET)
+			.AddItem(B_TRANSLATE("Julia"), MSG_JULIA_SET)
+			.AddItem(B_TRANSLATE("Orbit Trap"), MSG_ORBITTRAP_SET)
+			.AddItem(B_TRANSLATE("Multibrot"), MSG_MULTIBROT_SET)
 		.End()
 		.AddMenu(B_TRANSLATE("Palette"))
 			.GetMenu(paletteMenu)
@@ -210,6 +227,8 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 			.AddItem(B_TRANSLATE("High contrast"), MSG_HIGHCONTRAST_PALETTE)
 		.End()
 	.End();
+	setMenu->SetRadioMode(true);
+	setMenu->FindItem(MSG_MANDELBROT_SET)->SetMarked(true);
 	paletteMenu->SetRadioMode(true);
 	paletteMenu->FindItem(MSG_ROYAL_PALETTE)->SetMarked(true);
 
@@ -221,6 +240,14 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 }
 
 
+#define HANDLE_SET(uiwhat, id) \
+	case uiwhat: { \
+		BMessage msg(FractalEngine::MSG_CHANGE_SET); \
+		msg.AddUInt8("set", id); \
+		fFractalView->fFractalEngine->PostMessage(&msg); \
+		fFractalView->RedrawFractal(); \
+		break; \
+	}
 #define HANDLE_PALETTE(uiwhat, id) \
 	case uiwhat: { \
 		BMessage msg(FractalEngine::MSG_SET_PALETTE); \
@@ -233,6 +260,13 @@ void
 MandelbrotWindow::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
+	HANDLE_SET(MSG_MANDELBROT_SET, 0)
+	HANDLE_SET(MSG_BURNINGSHIP_SET, 1)
+	HANDLE_SET(MSG_TRICORN_SET, 2)
+	HANDLE_SET(MSG_JULIA_SET, 3)
+	HANDLE_SET(MSG_ORBITTRAP_SET, 4)
+	HANDLE_SET(MSG_MULTIBROT_SET, 5)
+
 	HANDLE_PALETTE(MSG_ROYAL_PALETTE, 0)
 	HANDLE_PALETTE(MSG_DEEPFROST_PALETTE, 1)
 	HANDLE_PALETTE(MSG_FROST_PALETTE, 2)
@@ -248,6 +282,7 @@ MandelbrotWindow::MessageReceived(BMessage* msg)
 		break;
 	}
 }
+#undef HANDLE_SET
 #undef HANDLE_PALETTE
 
 

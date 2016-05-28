@@ -40,6 +40,16 @@ FractalEngine::~FractalEngine()
 void FractalEngine::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
+	case MSG_CHANGE_SET:
+		switch (msg->GetUInt8("set", 0)) {
+		case 0: fDoSet = &FractalEngine::DoSet_Mandelbrot; break;
+		case 1: fDoSet = &FractalEngine::DoSet_BurningShip; break;
+		case 2: fDoSet = &FractalEngine::DoSet_Tricorn; break;
+		case 3: fDoSet = &FractalEngine::DoSet_Julia; break;
+		case 4: fDoSet = &FractalEngine::DoSet_OrbitTrap; break;
+		case 5: fDoSet = &FractalEngine::DoSet_Multibrot; break;
+		}
+		break;
 	case MSG_SET_PALETTE:
 		switch (msg->GetUInt8("palette", 0)) {
 		case 0: fColorset = Colorset_Royal; break;
