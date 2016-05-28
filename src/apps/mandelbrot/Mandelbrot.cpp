@@ -30,12 +30,14 @@ public:
 	~FractalView();
 
 	virtual void AttachedToWindow();
-	virtual void FrameResized(float width, float height);
+	virtual void FrameResized(float, float);
+	virtual void Pulse();
 	virtual void MouseDown(BPoint where);
 	virtual void MessageReceived(BMessage* msg);
 	virtual void Draw(BRect updateRect);
 
 private:
+	bool fSizeChanged;
 	FractalEngine* fFractalEngine;
 	bool fOwnBitmap;
 	BBitmap* fDisplayBitmap;
@@ -49,7 +51,8 @@ private:
 
 FractalView::FractalView()
 	:
-	BView(NULL, B_WILL_DRAW),
+	BView(NULL, B_WILL_DRAW | B_FRAME_EVENTS | B_PULSE_NEEDED),
+	fSizeChanged(false),
 	fFractalEngine(NULL),
 	fOwnBitmap(false),
 	fDisplayBitmap(NULL),
@@ -79,14 +82,23 @@ void FractalView::AttachedToWindow()
 }
 
 
-void FractalView::FrameResized(float width, float height)
+void FractalView::FrameResized(float, float)
 {
+	fSizeChanged = true;
+}
+
+
+void FractalView::Pulse()
+{
+	if (!fSizeChanged)
+		return;
 	BMessage msg(FractalEngine::MSG_RESIZE);
-	msg.AddUInt16("width", (uint16)width);
-	msg.AddUInt16("height", (uint16)height);
+	msg.AddUInt16("width", (uint16)Frame().Width() + 1);
+	msg.AddUInt16("height", (uint16)Frame().Height() + 1);
 	fFractalEngine->PostMessage(&msg);
 	// The renderer will create new bitmaps, so we own the bitmap now
 	fOwnBitmap = true;
+	fSizeChanged = false;
 	RedrawFractal();
 }
 
@@ -111,8 +123,10 @@ void FractalView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
 	case FractalEngine::MSG_RENDER_COMPLETE:
-		if (fOwnBitmap)
+		if (fOwnBitmap) {
+			fOwnBitmap = false;
 			delete fDisplayBitmap;
+		}
 		fDisplayBitmap = NULL; // In case the following line fails
 		msg->FindPointer("bitmap", (void**)&fDisplayBitmap);
 		Invalidate();
@@ -165,6 +179,8 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 		B_NORMAL_WINDOW_FEEL, 0L),
 	fFractalView(new FractalView)
 {
+	SetPulseRate(250000); // pulse twice per second
+
 	BMenuBar* menuBar = new BMenuBar("MenuBar");
 	BLayoutBuilder::Menu<>(menuBar)
 		.AddMenu(B_TRANSLATE("File"))
