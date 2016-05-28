@@ -78,13 +78,6 @@ double zImaginary_end = 0;
 double juliaC_a = 0;
 double juliaC_b = 1;
 
-uint8 r = 0;
-uint8 g = 0;
-uint8 b = 0;
-
-uint8 logChecked = 0;
-uint8 smoothChecked = 0;
-
 uint8 gEscapeHorizon = 4; // set to 64 when doing smooth colors
 
 int32 gIterations = 1024;
@@ -92,7 +85,13 @@ int32 gIterations = 1024;
 double gPower = 0;
 
 
-void FractalEngine::RenderPixelDefault(double real, double imaginary)
+#define RenderBuffer_SetPixel(x, y, r, g, b) \
+	uint32 _BUF_BASE = fWidth * y * 3 + x * 3; \
+	fRenderBuffer[_BUF_BASE + 0] = r; \
+	fRenderBuffer[_BUF_BASE + 1] = g; \
+	fRenderBuffer[_BUF_BASE + 2] = b
+void FractalEngine::RenderPixelDefault(uint32 x, uint32 y, double real,
+	double imaginary)
 {
 	int32 iterToEscape = (this->*fDoSet)(real, imaginary);
 	uint16 loc = 0;
@@ -103,13 +102,13 @@ void FractalEngine::RenderPixelDefault(double real, double imaginary)
 		loc = 998 - (iterToEscape % 999);
 	}
 
-	r = fColorset[loc * 3 + 0];
-	g = fColorset[loc * 3 + 1];
-	b = fColorset[loc * 3 + 2];
+	RenderBuffer_SetPixel(x, y, fColorset[loc * 3 + 0], fColorset[loc * 3 + 1],
+		fColorset[loc * 3 + 2]);
 }
 
 
-void FractalEngine::RenderPixelSmooth(double real, double imaginary)
+void FractalEngine::RenderPixelSmooth(uint32 x, uint32 y, double real,
+	double imaginary)
 {
 	int32 outColor = (this->*fDoSet)(real, imaginary);
 	int8 mapperDiff_r = 0;
@@ -128,9 +127,8 @@ void FractalEngine::RenderPixelSmooth(double real, double imaginary)
 	}
 
 	if (outColor == -1) {
-		r = fColorset[999 * 3];
-		g = fColorset[999 * 3 + 1];
-		b = fColorset[999 * 3 + 2];
+		RenderBuffer_SetPixel(x, y, fColorset[999 * 3], fColorset[999 * 3 + 1],
+			fColorset[999 * 3 + 2]);
 		return;
 	}
 	outColor = 998 - (outColor % 999);
@@ -141,10 +139,11 @@ void FractalEngine::RenderPixelSmooth(double real, double imaginary)
 	mapperDiff_g = fColorset[mapperLoc + 1] - fColorset[mapperLoc + 1 + 3];
 	mapperDiff_b = fColorset[mapperLoc + 2] - fColorset[mapperLoc + 2 + 3];
 
-	r = mapperDiff_r * ratio + fColorset[mapperLoc + 0];
-	g = mapperDiff_g * ratio + fColorset[mapperLoc + 1];
-	b = mapperDiff_b * ratio + fColorset[mapperLoc + 2];
+	RenderBuffer_SetPixel(x, y, mapperDiff_r * ratio + fColorset[mapperLoc + 0],
+		mapperDiff_g * ratio + fColorset[mapperLoc + 1],
+		mapperDiff_b * ratio + fColorset[mapperLoc + 2]);
 }
+#undef RenderBuffer_SetPixel
 
 
 int32 FractalEngine::DoSet_Mandelbrot(double real, double imaginary)
@@ -361,10 +360,6 @@ int32 FractalEngine::DoSet_Multibrot(double real, double imaginary)
 }
 
 
-#define buf_SetPixel(x, y, r, g, b) \
-	fRenderBuffer[fWidth * y * 3 + x * 3 + 0] = r; \
-	fRenderBuffer[fWidth * y * 3 + x * 3 + 1] = g; \
-	fRenderBuffer[fWidth * y * 3 + x * 3 + 2] = b;
 void FractalEngine::Render(double locationX, double locationY, double size)
 {
 	uint16 halfWidth = fWidth / 2;
@@ -372,9 +367,9 @@ void FractalEngine::Render(double locationX, double locationY, double size)
 
 	for (uint32 x = 0; x < fWidth; x++) {
 		for (uint32 y = 0; y < fHeight; y++) {
-			(this->*fRenderPixel)((x * size + locationX) - (halfWidth * size),
+			(this->*fRenderPixel)(x, y,
+				(x * size + locationX) - (halfWidth * size),
 				(y * -size + locationY) - (halfHeight * -size));
-			buf_SetPixel(x, y, r, g, b);
 		}
 	}
 
