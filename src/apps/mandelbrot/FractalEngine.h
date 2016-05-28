@@ -10,11 +10,49 @@
 #define FRACTALENGINE_H
 
 #include <SupportDefs.h>
-#include <Bitmap.h>
+#include <Looper.h>
+#include <Messenger.h>
+
+class BBitmap;
 
 
-BBitmap* FractalEngine(uint32 width, uint32 height, double locationX,
-	double locationY, double size);
+class FractalEngine : public BLooper {
+public:
+	enum {
+		MSG_RESIZE = 'Frct',
+		MSG_RENDER,
+		MSG_RENDER_COMPLETE,
+	};
+
+	FractalEngine(BHandler* parent, BLooper* looper);
+	~FractalEngine();
+
+	virtual void MessageReceived(BMessage* msg);
+
+private:
+	BMessenger fMessenger;
+	BBitmap* fBitmapStandby;
+	BBitmap* fBitmapDisplay;
+	uint16 fWidth;
+	uint16 fHeight;
+	uint8* fRenderBuffer;
+	uint32 fRenderBufferLen;
+
+	const uint8* fColorset;
+
+	int32 (FractalEngine::*fDoSet)(double real, double imaginary);
+	void (FractalEngine::*fRenderPixel)(double real, double imaginary);
+
+	void Render(double locationX, double locationY, double size);
+	void RenderPixelSmooth(double real, double imaginary);
+	void RenderPixelDefault(double real, double imaginary);
+	int32 DoSet_Mandelbrot(double real, double imaginary);
+	int32 DoSet_BurningShip(double real, double imaginary);
+	int32 DoSet_Tricorn(double real, double imaginary);
+	int32 DoSet_Julia(double real, double imaginary);
+	int32 DoSet_OrbitTrap(double real, double imaginary);
+	int32 DoSet_Multibrot(double real, double imaginary);
+};
 
 
 #endif	/* FRACTALENGINE_H */

@@ -8,11 +8,69 @@
  */
 #include "FractalEngine.h"
 
-#include <SupportDefs.h>
+#include <algorithm>
 #include <math.h>
 
+#include <Bitmap.h>
+
 #include "Colorsets.h"
-#define colors Colorset_Royal
+
+
+FractalEngine::FractalEngine(BHandler* parent, BLooper* looper)
+	:
+	BLooper("FractalEngine"),
+	fMessenger(parent, looper),
+	fBitmapStandby(NULL),
+	fBitmapDisplay(NULL),
+	fWidth(0), fHeight(0),
+	fRenderBuffer(NULL),
+	fRenderBufferLen(0),
+	fColorset(Colorset_Royal)
+{
+	fRenderPixel = &FractalEngine::RenderPixelDefault;
+	fDoSet = &FractalEngine::DoSet_Mandelbrot;
+}
+
+
+FractalEngine::~FractalEngine()
+{
+}
+
+
+void FractalEngine::MessageReceived(BMessage* msg)
+{
+	switch (msg->what) {
+	case MSG_RESIZE: {
+		delete fBitmapStandby;
+		// We don't delete the "display" bitmap; the viewer now owns it
+		delete fRenderBuffer;
+
+		fWidth = msg->GetUInt16("width", 320);
+		fHeight = msg->GetUInt16("height", 240);
+		BRect rect(0, 0, fWidth - 1, fHeight - 1);
+		fBitmapStandby = new BBitmap(rect, B_RGB24);
+		fBitmapDisplay = new BBitmap(rect, B_RGB24);
+		fRenderBufferLen = fWidth * fHeight * 3;
+		fRenderBuffer = new uint8[fRenderBufferLen];
+		break;
+	}
+	case MSG_RENDER: {
+		// Render to "standby" bitmap
+		Render(msg->GetDouble("locationX", 0), msg->GetDouble("locationY", 0),
+			msg->GetDouble("size", 0.005));
+		BMessage message(MSG_RENDER_COMPLETE);
+		message.AddPointer("bitmap", (const void*)fBitmapStandby);
+		fMessenger.SendMessage(&message);
+		std::swap(fBitmapStandby, fBitmapDisplay);
+		break;
+	}
+
+	default:
+		BLooper::MessageReceived(msg);
+		break;
+	}
+}
+
 
 double zReal_end = 0;
 double zImaginary_end = 0;
@@ -33,18 +91,10 @@ int32 gIterations = 1024;
 
 double gPower = 0;
 
-void renderPixel_smooth(double real, double imaginary);
-void renderPixel_default(double real, double imaginary);
-int32 (*inSet)(double real, double imaginary);
-int32 inSet_mandelbrot(double real, double imaginary);
-int32 inSet_burningShip(double real, double imaginary);
-int32 inSet_tricornMandelbrot(double real, double imaginary);
 
-void (*renderPixel)(double real, double imaginary);
-
-void renderPixel_default(double real, double imaginary)
+void FractalEngine::RenderPixelDefault(double real, double imaginary)
 {
-	int32 iterToEscape = (*inSet)(real, imaginary);
+	int32 iterToEscape = (this->*fDoSet)(real, imaginary);
 	uint16 loc = 0;
 	if (iterToEscape == -1) {
 		// Didn't escape.
@@ -53,14 +103,15 @@ void renderPixel_default(double real, double imaginary)
 		loc = 998 - (iterToEscape % 999);
 	}
 
-	r = colors[loc * 3 + 0];
-	g = colors[loc * 3 + 1];
-	b = colors[loc * 3 + 2];
+	r = fColorset[loc * 3 + 0];
+	g = fColorset[loc * 3 + 1];
+	b = fColorset[loc * 3 + 2];
 }
 
-void renderPixel_smooth(double real, double imaginary)
+
+void FractalEngine::RenderPixelSmooth(double real, double imaginary)
 {
-	int32 outColor = (*inSet)(real, imaginary);
+	int32 outColor = (this->*fDoSet)(real, imaginary);
 	int8 mapperDiff_r = 0;
 	int8 mapperDiff_g = 0;
 	int8 mapperDiff_b = 0;
@@ -77,25 +128,26 @@ void renderPixel_smooth(double real, double imaginary)
 	}
 
 	if (outColor == -1) {
-		r = colors[999 * 3];
-		g = colors[999 * 3 + 1];
-		b = colors[999 * 3 + 2];
+		r = fColorset[999 * 3];
+		g = fColorset[999 * 3 + 1];
+		b = fColorset[999 * 3 + 2];
 		return;
 	}
 	outColor = 998 - (outColor % 999);
 
 	mapperLoc = outColor * 3;
 
-	mapperDiff_r = colors[mapperLoc + 0] - colors[mapperLoc + 0 + 3];
-	mapperDiff_g = colors[mapperLoc + 1] - colors[mapperLoc + 1 + 3];
-	mapperDiff_b = colors[mapperLoc + 2] - colors[mapperLoc + 2 + 3];
+	mapperDiff_r = fColorset[mapperLoc + 0] - fColorset[mapperLoc + 0 + 3];
+	mapperDiff_g = fColorset[mapperLoc + 1] - fColorset[mapperLoc + 1 + 3];
+	mapperDiff_b = fColorset[mapperLoc + 2] - fColorset[mapperLoc + 2 + 3];
 
-	r = mapperDiff_r * ratio + colors[mapperLoc + 0];
-	g = mapperDiff_g * ratio + colors[mapperLoc + 1];
-	b = mapperDiff_b * ratio + colors[mapperLoc + 2];
+	r = mapperDiff_r * ratio + fColorset[mapperLoc + 0];
+	g = mapperDiff_g * ratio + fColorset[mapperLoc + 1];
+	b = mapperDiff_b * ratio + fColorset[mapperLoc + 2];
 }
 
-int32 inSet_mandelbrot(double real, double imaginary)
+
+int32 FractalEngine::DoSet_Mandelbrot(double real, double imaginary)
 {
 	double zReal = 0;
 	double zImaginary = 0;
@@ -126,7 +178,8 @@ int32 inSet_mandelbrot(double real, double imaginary)
 	return -1;
 }
 
-int32 inSet_burningShip(double real, double imaginary)
+
+int32 FractalEngine::DoSet_BurningShip(double real, double imaginary)
 {
 	double zReal = 0;
 	double zImaginary = 0;
@@ -163,7 +216,8 @@ int32 inSet_burningShip(double real, double imaginary)
 	return -1;
 }
 
-int32 inSet_tricornMandelbrot(double real, double imaginary)
+
+int32 FractalEngine::DoSet_Tricorn(double real, double imaginary)
 {
 	double zReal = 0;
 	double zImaginary = 0;
@@ -200,7 +254,8 @@ int32 inSet_tricornMandelbrot(double real, double imaginary)
 	return -1;
 }
 
-int32 inSet_julia(double real, double imaginary)
+
+int32 FractalEngine::DoSet_Julia(double real, double imaginary)
 {
 	double zReal = real;
 	double zImaginary = imaginary;
@@ -234,7 +289,7 @@ int32 inSet_julia(double real, double imaginary)
 	return -1;
 }
 
-int32 inSet_mandelbrot_orbitTrap(double real, double imaginary)
+int32 FractalEngine::DoSet_OrbitTrap(double real, double imaginary)
 {
 	double zReal = 0;
 	double zImaginary = 0;
@@ -274,7 +329,7 @@ int32 inSet_mandelbrot_orbitTrap(double real, double imaginary)
 	return floor(4 * log(4 / closest));
 }
 
-int32 inSet_multibrot_3(double real, double imaginary)
+int32 FractalEngine::DoSet_Multibrot(double real, double imaginary)
 {
 	double zReal = 0;
 	double zImaginary = 0;
@@ -305,68 +360,24 @@ int32 inSet_multibrot_3(double real, double imaginary)
 	return -1;
 }
 
-int32 inSet_fractional(double real, double imaginary)
-{
-	double zReal = 0;
-	double zImaginary = 0;
-
-	double r = 0;
-	double t = 0;
-
-	double power = gPower;
-
-	int32 iterations = gIterations;
-	uint8 escapeHorizon = gEscapeHorizon;
-
-	int32 i = 0;
-	for (i = 0; i < iterations; i++) {
-		r = sqrt(zReal * zReal + zImaginary * zImaginary);
-		r = pow(r, power);
-		t = atan2(zImaginary, zReal) * power;
-
-		double nzReal = r * cos(t);
-		zImaginary = r * sin(t);
-
-		zReal = nzReal;
-		zReal += real;
-		zImaginary += imaginary;
-
-		// If it is outside the 2 unit circle...
-		if ((zReal * zReal) + (zImaginary * zImaginary) > escapeHorizon) {
-			zReal_end = zReal;
-			zImaginary_end = zImaginary;
-
-			return i; // stop it from running longer
-		}
-	}
-	return -1;
-}
 
 #define buf_SetPixel(x, y, r, g, b) \
-	buf[width * y * 3 + x * 3 + 0] = r; \
-	buf[width * y * 3 + x * 3 + 1] = g; \
-	buf[width * y * 3 + x * 3 + 2] = b;
-BBitmap* FractalEngine(uint32 width, uint32 height, double locationX,
-	double locationY, double size)
+	fRenderBuffer[fWidth * y * 3 + x * 3 + 0] = r; \
+	fRenderBuffer[fWidth * y * 3 + x * 3 + 1] = g; \
+	fRenderBuffer[fWidth * y * 3 + x * 3 + 2] = b;
+void FractalEngine::Render(double locationX, double locationY, double size)
 {
-	uint16 halfcWidth =	width / 2;
-	uint16 halfcHeight = height / 2;
+	uint16 halfWidth = fWidth / 2;
+	uint16 halfHeight = fHeight / 2;
 
-	uint32 bufLen = width * height * 3;
-	uint8* buf = new uint8[bufLen];
-
-	renderPixel = renderPixel_default;
-	inSet = inSet_mandelbrot;
-
-	for (uint32 x = 0; x < width; x++) {
-		for (uint32 y = 0; y < height; y++) {
-			(*renderPixel)((x * size + locationX) - (halfcWidth * size),
-						   (y * -size + locationY) - (halfcHeight * -size));
+	for (uint32 x = 0; x < fWidth; x++) {
+		for (uint32 y = 0; y < fHeight; y++) {
+			(this->*fRenderPixel)((x * size + locationX) - (halfWidth * size),
+				(y * -size + locationY) - (halfHeight * -size));
 			buf_SetPixel(x, y, r, g, b);
 		}
 	}
 
-	BBitmap* ret = new BBitmap(BRect(0, 0, width - 1 , height - 1), 0, B_RGB24);
-	ret->ImportBits(buf, bufLen, width * 3, 0, B_RGB24_BIG);
-	return ret;
+	fBitmapStandby->ImportBits(fRenderBuffer, fRenderBufferLen, fWidth * 3,
+		0, B_RGB24_BIG);
 }

@@ -29,36 +29,65 @@ public:
 	FractalView();
 	~FractalView();
 
-	virtual void FrameResized(float, float)
-		{ RedrawFractal(); }
+	virtual void AttachedToWindow();
+	virtual void FrameResized(float width, float height);
 	virtual void MouseDown(BPoint where);
+	virtual void MessageReceived(BMessage* msg);
 	virtual void Draw(BRect updateRect);
 
 private:
-	BBitmap* fBitmap;
+	FractalEngine* fFractalEngine;
+	bool fOwnBitmap;
+	BBitmap* fDisplayBitmap;
 	double fLocationX;
 	double fLocationY;
 	double fSize;
 
-	void RedrawFractal(uint16 width = 0, uint16 height = 0);
+	void RedrawFractal();
 };
 
 
 FractalView::FractalView()
 	:
 	BView(NULL, B_WILL_DRAW),
-	fBitmap(NULL),
+	fFractalEngine(NULL),
+	fOwnBitmap(false),
+	fDisplayBitmap(NULL),
 	fLocationX(0),
 	fLocationY(0),
 	fSize(0.005)
 {
-	RedrawFractal(641, 462);
 }
 
 
 FractalView::~FractalView()
 {
-	delete fBitmap;
+	if (fOwnBitmap)
+		delete fDisplayBitmap;
+}
+
+
+void FractalView::AttachedToWindow()
+{
+	fFractalEngine = new FractalEngine(this, Window());
+	fFractalEngine->Run();
+	BMessage msg(FractalEngine::MSG_RESIZE);
+	msg.AddUInt16("width", 641);
+	msg.AddUInt16("height", 462);
+	fFractalEngine->PostMessage(&msg);
+	RedrawFractal();
+}
+
+
+void FractalView::FrameResized(float width, float height)
+{
+	BMessage msg(FractalEngine::MSG_RESIZE);
+	msg.AddUInt16("width", (uint16)width);
+	msg.AddUInt16("height", (uint16)height);
+	fFractalEngine->PostMessage(&msg);
+	// The renderer will create new bitmaps, so we own the bitmap now
+	fOwnBitmap = true;
+	RedrawFractal();
 }
 
 
@@ -78,21 +107,37 @@ void FractalView::MouseDown(BPoint where)
 }
 
 
-void FractalView::RedrawFractal(uint16 width, uint16 height)
+void FractalView::MessageReceived(BMessage* msg)
 {
-	delete fBitmap;
-	if (width == 0)
-		width = (uint16)Frame().Width();
-	if (height == 0)
-		height = (uint16)Frame().Height();
-	fBitmap = FractalEngine(width, height, fLocationX, fLocationY, fSize);
-	Invalidate();
+	switch (msg->what) {
+	case FractalEngine::MSG_RENDER_COMPLETE:
+		if (fOwnBitmap)
+			delete fDisplayBitmap;
+		fDisplayBitmap = NULL; // In case the following line fails
+		msg->FindPointer("bitmap", (void**)&fDisplayBitmap);
+		Invalidate();
+		break;
+
+	default:
+		BView::MessageReceived(msg);
+		break;
+	}
+}
+
+
+void FractalView::RedrawFractal()
+{
+	BMessage message(FractalEngine::MSG_RENDER);
+	message.AddDouble("locationX", fLocationX);
+	message.AddDouble("locationY", fLocationY);
+	message.AddDouble("size", fSize);
+	fFractalEngine->PostMessage(&message);
 }
 
 
 void FractalView::Draw(BRect updateRect)
 {
-	DrawBitmap(fBitmap, updateRect, updateRect);
+	DrawBitmap(fDisplayBitmap, updateRect, updateRect);
 }
 
 
