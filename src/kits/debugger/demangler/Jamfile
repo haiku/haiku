@@ -1,0 +1,14 @@
+SubDir HAIKU_TOP src kits debugger demangler ;
+
+SEARCH_SOURCE
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel debugger demangle ] ;
+
+
+MergeObject Debugger_demangler.o
+	:
+	Demangler.cpp
+
+	demangle.cpp
+	gcc2.cpp
+	gcc3+.cpp
+;

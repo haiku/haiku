@@ -22,13 +22,11 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
-#include "CoreFile.h"
-#include "CoreFileDebuggerInterface.h"
 #include "CommandLineUserInterface.h"
 #include "DebuggerGlobals.h"
-#include "DebuggerInterface.h"
 #include "DebuggerSettingsManager.h"
 #include "DebuggerUiSettingsFactory.h"
+#include "ElfFile.h"
 #include "GraphicalUserInterface.h"
 #include "MessageCodes.h"
 #include "ReportUserInterface.h"

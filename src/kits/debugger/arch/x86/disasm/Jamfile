@@ -1,0 +1,18 @@
+SubDir HAIKU_TOP src kits debugger arch x86 disasm ;
+
+UsePrivateHeaders shared ;
+
+UsePrivateHeaders [ FDirName debugger arch ] ;
+UsePrivateHeaders [ FDirName debugger types ] ;
+
+UseHeaders [ LibraryHeaders udis86 ] ;
+UseHeaders [ LibraryHeaders [ FDirName udis86 libudis86 ] ] ;
+
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) ] ;
+SubDirHdrs [ FDirName $(SUBDIR) $(DOTDOT) $(DOTDOT) ] ;
+
+
+MergeObject Debugger_disasm_x86.o
+	:
+	DisassemblerX86.cpp
+;

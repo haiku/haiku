@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -655,7 +655,7 @@ public:
 			void				SetContainerListener(
 									ContainerListener* listener);
 
-			void				SetStackFrame(Thread* thread,
+			void				SetStackFrame(::Thread* thread,
 									StackFrame* stackFrame);
 
 			void				ValueNodeChanged(ValueNodeChild* nodeChild,
@@ -727,7 +727,7 @@ private:
 									bool isOnlyChild = false);
 
 private:
-			Thread*				fThread;
+			::Thread*			fThread;
 			ValueNodeManager*	fNodeManager;
 			ContainerListener*	fContainerListener;
 			NodeList			fNodes;
@@ -1157,7 +1157,7 @@ VariablesView::VariableTableModel::SetContainerListener(
 
 
 void
-VariablesView::VariableTableModel::SetStackFrame(Thread* thread,
+VariablesView::VariableTableModel::SetStackFrame(::Thread* thread,
 	StackFrame* stackFrame)
 {
 	fThread = thread;
@@ -1822,7 +1822,7 @@ VariablesView::Create(Listener* listener, ValueNodeManager* manager)
 
 
 void
-VariablesView::SetStackFrame(Thread* thread, StackFrame* stackFrame)
+VariablesView::SetStackFrame(::Thread* thread, StackFrame* stackFrame)
 {
 	bool updateValues = fFrameClearPending;
 		// We only want to save previous values if we've continued

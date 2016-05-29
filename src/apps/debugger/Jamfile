@@ -2,12 +2,31 @@ SubDir HAIKU_TOP src apps debugger ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
-# for syscall_numbers.h
-UseHeaders [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
-	system kernel ] ;
-
-UsePrivateHeaders app debug interface kernel package shared libroot ;
+UsePrivateHeaders app interface kernel shared system ;
 UsePrivateSystemHeaders ;
+
+UsePrivateHeaders debugger ;
+UsePrivateHeaders [ FDirName debugger arch ] ;
+UsePrivateHeaders [ FDirName debugger controllers ] ;
+UsePrivateHeaders [ FDirName debugger debug_info ] ;
+UsePrivateHeaders [ FDirName debugger debug_managers ] ;
+UsePrivateHeaders [ FDirName debugger elf ] ;
+UsePrivateHeaders [ FDirName debugger files ] ;
+UsePrivateHeaders [ FDirName debugger ids ] ;
+UsePrivateHeaders [ FDirName debugger model ] ;
+UsePrivateHeaders [ FDirName debugger settings ] ;
+UsePrivateHeaders [ FDirName debugger settings generic ] ;
+UsePrivateHeaders [ FDirName debugger source_language ] ;
+UsePrivateHeaders [ FDirName debugger source_language c_family ] ;
+UsePrivateHeaders [ FDirName debugger target_host_interface ] ;
+UsePrivateHeaders [ FDirName debugger user_interface ] ;
+UsePrivateHeaders [ FDirName debugger user_interface util ] ;
+UsePrivateHeaders [ FDirName debugger types ] ;
+UsePrivateHeaders [ FDirName debugger util ] ;
+UsePrivateHeaders [ FDirName debugger value ] ;
+UsePrivateHeaders [ FDirName debugger value value_formatters ] ;
+UsePrivateHeaders [ FDirName debugger value value_nodes ] ;
+UsePrivateHeaders [ FDirName debugger value values ] ;
 
 UseBuildFeatureHeaders libedit ;
 
@@ -15,29 +34,7 @@ LINKFLAGS += -Wl,--exclude-libs,ALL ;
 
 SubDirC++Flags [ FDefines _BSD_SOURCE=1 ] ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) arch ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86 ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) arch x86_64 ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) controllers ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_info loading_state_handlers ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_managers ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface interfaces ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) jobs ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) model ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) settings generic ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language c_family ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) source_language x86 ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) target_host_interface ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) target_host_interface local ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) types ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli commands ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui ] ;
@@ -53,218 +50,18 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui value value_handlers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface report ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface util ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) util ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) value ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) value type_handlers ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_formatters ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) value value_nodes ] ;
-SEARCH_SOURCE += [ FDirName $(SUBDIR) value values ] ;
 
 local debugAnalyzerSources
 	= [ FDirName $(HAIKU_TOP) src apps debuganalyzer ] ;
 
-SubDirHdrs [ FDirName $(SUBDIR) demangler ] ;
-SubDirHdrs [ FDirName $(SUBDIR) dwarf ] ;
-SubDirHdrs [ FDirName $(HAIKU_TOP) src bin debug ] ;
 SubDirHdrs [ FDirName $(debugAnalyzerSources) gui ] ;
-
-SourceHdrs
-	DwarfFunctionDebugInfo.cpp
-	DwarfImageDebugInfo.cpp
-	DwarfStackFrameDebugInfo.cpp
-	DwarfTeamDebugInfo.cpp
-	DwarfTypeFactory.cpp
-	DwarfTypes.cpp
-	: [ FDirName $(SUBDIR) dwarf ]
-;
 
 local sources =
 	Debugger.cpp
-	DebuggerGlobals.cpp
-
-	# arch
-	Architecture.cpp
-	CpuState.cpp
-	InstructionInfo.cpp
-	Register.cpp
-	RegisterMap.cpp
-
-	# arch/x86
-	ArchitectureX86.cpp
-	CpuStateX86.cpp
-
-	# arch/x86_64
-	ArchitectureX8664.cpp
-	CpuStateX8664.cpp
-
-	# controllers
-	DebugReportGenerator.cpp
-	TeamDebugger.cpp
-	ThreadHandler.cpp
-
-	# debug_managers
-	BreakpointManager.cpp
-	TeamMemoryBlockManager.cpp
-	WatchpointManager.cpp
-
-	# debug_info
-	BasicFunctionDebugInfo.cpp
-	DebuggerImageDebugInfo.cpp
-	DebuggerTeamDebugInfo.cpp
-	DwarfFunctionDebugInfo.cpp
-	DwarfImageDebugInfo.cpp
-	DwarfImageDebugInfoLoadingState.cpp
-	DwarfStackFrameDebugInfo.cpp
-	DwarfTeamDebugInfo.cpp
-	DwarfTypeFactory.cpp
-	DwarfTypes.cpp
-	Function.cpp
-	FunctionDebugInfo.cpp
-	FunctionInstance.cpp
-	GlobalTypeLookup.cpp
-	ImageDebugInfo.cpp
-	ImageDebugInfoLoadingState.cpp
-	ImageDebugInfoProvider.cpp
-	ImageDebugLoadingStateHandler.cpp
-	ImageDebugLoadingStateHandlerRoster.cpp
-	NoOpStackFrameDebugInfo.cpp
-	SpecificImageDebugInfo.cpp
-	SpecificImageDebugInfoLoadingState.cpp
-	SpecificTeamDebugInfo.cpp
-	StackFrameDebugInfo.cpp
-	TeamDebugInfo.cpp
-
-	# debug_info/loading_state_handlers
-	DwarfLoadingStateHandler.cpp
-
-	# debugger_interface
-	DebugEvent.cpp
-	DebuggerInterface.cpp
-
-	# debugger_interface/interfaces
-	CoreFileDebuggerInterface.cpp
-	LocalDebuggerInterface.cpp
-
-	# elf
-	CoreFile.cpp
-	ElfFile.cpp
-	ElfSymbolLookup.cpp
-
-	# files
-	FileManager.cpp
-	LocatableDirectory.cpp
-	LocatableEntry.cpp
-	LocatableFile.cpp
-	SourceFile.cpp
-
-	# ids
-	FunctionID.cpp
-	FunctionParameterID.cpp
-	LocalVariableID.cpp
-	ObjectID.cpp
-	ReturnValueID.cpp
-
-	# jobs
-	ExpressionEvaluationJob.cpp
-	GetCPUStateJob.cpp
-	GetStackTraceJob.cpp
-	GetThreadStateJob.cpp
-	LoadImageDebugInfoJob.cpp
-	LoadSourceCodeJob.cpp
-	ResolveValueNodeJob.cpp
-	RetrieveMemoryBlockJob.cpp
-	WriteCoreFileJob.cpp
-	WriteMemoryJob.cpp
-	WriteValueNodeJob.cpp
-
-	# model
-	AreaInfo.cpp
-	Breakpoint.cpp
-	DisassembledCode.cpp
-	ExpressionInfo.cpp
-	ExpressionValues.cpp
-	FileSourceCode.cpp
-	Image.cpp
-	ImageInfo.cpp
-	LineDataSource.cpp
-	ReturnValueInfo.cpp
-	SemaphoreInfo.cpp
-	SignalInfo.cpp
-	SourceCode.cpp
-	StackFrame.cpp
-	StackFrameValues.cpp
-	StackFrameValueInfos.cpp
-	StackTrace.cpp
-	Statement.cpp
-	SymbolInfo.cpp
-	SyntheticPrimitiveType.cpp
-	SyscallInfo.cpp
-	SystemInfo.cpp
-	TargetHost.cpp
-	Team.cpp
-	TeamInfo.cpp
-	TeamMemory.cpp
-	TeamMemoryBlock.cpp
-	TeamTypeInformation.cpp
-	Thread.cpp
-	ThreadInfo.cpp
-	Type.cpp
-	TypeComponentPath.cpp
-	TypeLookupConstraints.cpp
-	UserBreakpoint.cpp
-	Variable.cpp
-	Watchpoint.cpp
 
 	# settings
-	BreakpointSetting.cpp
 	DebuggerSettingsManager.cpp
-	NoOpSettingsManager.cpp
-	SettingsManager.cpp
-	TeamFileManagerSettings.cpp
-	TeamSettings.cpp
-	TeamSignalSettings.cpp
-	TeamUiSettings.cpp
-	TeamUiSettingsFactory.cpp
-
-	# settings/generic
-	Setting.cpp
-	Settings.cpp
-	SettingsDescription.cpp
-
-	# source_language
-	SourceLanguage.cpp
-	SyntaxHighlighter.cpp
-	UnsupportedLanguage.cpp
-
-	# source_language/c_family
-	CLanguage.cpp
-	CLanguageExpressionEvaluator.cpp
-	CLanguageFamily.cpp
-	CLanguageFamilySyntaxHighlighter.cpp
-	CLanguageFamilySyntaxHighlightInfo.cpp
-	CLanguageTokenizer.cpp
-	CppLanguage.cpp
-
-	# source_language/x86
-	X86AssemblyLanguage.cpp
-
-	# target_host_interface
-	TargetHostInterface.cpp
-	TargetHostInterfaceInfo.cpp
-	TargetHostInterfaceRoster.cpp
-
-	# target_host_interface/local
-	LocalTargetHostInterface.cpp
-	LocalTargetHostInterfaceInfo.cpp
-
-	# types
-	ArrayIndexPath.cpp
-	TargetAddressRangeList.cpp
-	ValueLocation.cpp
-
-	# user_interface
-	UserInterface.cpp
 
 	# user_interface/cli
 	CliContext.cpp
@@ -366,95 +163,21 @@ local sources =
 
 	# user_interface/report
 	ReportUserInterface.cpp
-
-	# user_interface/util
-	UiUtils.cpp
-
-	# util
-	ArchivingUtils.cpp
-	BitBuffer.cpp
-	IntegerFormatter.cpp
-	RangeList.cpp
-	StringUtils.cpp
-	Worker.cpp
-
-	# value
-	TypeHandler.cpp
-	TypeHandlerRoster.cpp
-	Value.cpp
-	ValueFormatter.cpp
-	ValueLoader.cpp
-	ValueNode.cpp
-	ValueNodeContainer.cpp
-	ValueNodeManager.cpp
-	ValueWriter.cpp
-
-	# value/type_handlers
-	BListTypeHandler.cpp
-	BMessageTypeHandler.cpp
-	CStringTypeHandler.cpp
-
-	# value/value_formatters
-	BoolValueFormatter.cpp
-	EnumerationValueFormatter.cpp
-	IntegerValueFormatter.cpp
-	FloatValueFormatter.cpp
-	StringValueFormatter.cpp
-
-	# value/value_nodes
-	AddressValueNode.cpp
-	ArrayValueNode.cpp
-	BListValueNode.cpp
-	BMessageValueNode.cpp
-	CompoundValueNode.cpp
-	CStringValueNode.cpp
-	EnumerationValueNode.cpp
-	ExpressionValueNode.cpp
-	PointerToMemberValueNode.cpp
-	PrimitiveValueNode.cpp
-	VariableValueNodeChild.cpp
-
-	# value/values
-	AddressValue.cpp
-	BoolValue.cpp
-	EnumerationValue.cpp
-	FloatValue.cpp
-	IntegerValue.cpp
-	StringValue.cpp
-;
-
-# since syscall_numbers.h is generated on the fly, we need to explicitly
-# let Jam know about the dependency.
-Includes [ FGristFiles $(sources) ] :
-	<syscalls!$(TARGET_PACKAGING_ARCH)>syscall_numbers.h
-	[ BuildFeatureAttribute ncurses : headers ]
-	[ BuildFeatureAttribute libedit : headers ]
 ;
 
 Application Debugger :
 	$(sources)
 	:
-	<nogrist>Debugger_demangler.o
-	<nogrist>Debugger_disasm_x86.o
-	<nogrist>Debugger_disasm_x86_64.o
-	<nogrist>Debugger_dwarf.o
 	<nogrist>DebugAnalyzer_gui_table.o
 
-	libudis86.a
-	<bin>debug_utils.a
 	libcolumnlistview.a
 	shared
 
 	[ TargetLibstdc++ ]
-	be package tracker libbsd.so libdebug.so
+	be package tracker libbsd.so libdebugger.so
 
 	[ BuildFeatureAttribute ncurses : library ]
 	[ BuildFeatureAttribute libedit : library ]
 
 	: Debugger.rdef
 ;
-
-HaikuSubInclude arch x86 disasm ;
-HaikuSubInclude arch x86_64 disasm ;
-HaikuSubInclude demangler ;
-HaikuSubInclude dwarf ;

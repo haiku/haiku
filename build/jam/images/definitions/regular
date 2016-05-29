@@ -79,6 +79,7 @@ rule HaikuImageGetSystemLibs
 			libscreensaver.so
 			libtextencoding.so libtracker.so libtranslation.so
 		] ]
+		libdebugger.so@primary
 		;
 }
 

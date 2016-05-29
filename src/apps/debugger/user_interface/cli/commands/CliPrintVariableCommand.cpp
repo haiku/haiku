@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,7 +17,6 @@
 #include "Type.h"
 #include "UiUtils.h"
 #include "UserInterface.h"
-#include "ValueLoader.h"
 #include "ValueLocation.h"
 #include "ValueNode.h"
 #include "ValueNodeContainer.h"

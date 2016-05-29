@@ -1,7 +1,7 @@
 /*
  * Copyright 2009-2011, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Copyright 2002-2010, Axel Dörfler, axeld@pinc-software.de.
- * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  *
  * Copyright 2001-2002, Travis Geiselbrecht. All rights reserved.
@@ -32,6 +32,8 @@ CliDumpMemoryCommand::CliDumpMemoryCommand()
 		"%s [\"]address|expression[\"] [num]\n"
 		"Reads and displays the contents of memory at the target address.")
 {
+	// TODO: this should be retrieved via some indirect helper rather
+	// than instantiating the specific language directly.
 	fLanguage = new(std::nothrow) CppLanguage();
 }
 

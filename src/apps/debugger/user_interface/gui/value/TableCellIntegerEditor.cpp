@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2015-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,7 +10,7 @@
 #include <Variant.h>
 
 #include "IntegerValue.h"
-#include "IntegerValueFormatter.h"
+#include "ValueFormatter.h"
 
 
 TableCellIntegerEditor::TableCellIntegerEditor(::Value* initialValue,

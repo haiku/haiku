@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2015-2016, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -12,7 +12,6 @@
 #include <AutoDeleter.h>
 
 #include "IntegerValue.h"
-#include "IntegerValueFormatter.h"
 #include "Setting.h"
 #include "Settings.h"
 #include "SettingsDescription.h"
