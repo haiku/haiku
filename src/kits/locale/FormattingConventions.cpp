@@ -475,19 +475,7 @@ BFormattingConventions::GetTimeFormat(BTimeFormatStyle style,
 	BStringByteSink stringConverter(&outFormat);
 	icuString.toUTF8(stringConverter);
 
-	int8 use24HourClock = fExplicitUse24HourClock != CLOCK_HOURS_UNSET
-		? fExplicitUse24HourClock : fCachedUse24HourClock;
-	if (use24HourClock != CLOCK_HOURS_UNSET) {
-		// adjust to 12/24-hour clock as requested
-		bool localeUses24HourClock = !FormatUsesAmPm(outFormat);
-		if (localeUses24HourClock) {
-			if (use24HourClock == CLOCK_HOURS_12)
-				CoerceFormatTo12HourClock(outFormat);
-		} else {
-			if (use24HourClock == CLOCK_HOURS_24)
-				CoerceFormatTo24HourClock(outFormat);
-		}
-	}
+	CoerceFormatForClock(outFormat);
 
 	if (style != B_FULL_TIME_FORMAT) {
 		// use abbreviated timezone in short timezone format
@@ -530,6 +518,13 @@ BFormattingConventions::GetDateTimeFormat(BDateFormatStyle dateStyle,
 	dateFormatterImpl->toPattern(icuString);
 	BStringByteSink stringConverter(&outFormat);
 	icuString.toUTF8(stringConverter);
+
+	CoerceFormatForClock(outFormat);
+
+	if (dateStyle != B_FULL_DATE_FORMAT) {
+		// use abbreviated timezone in short timezone format
+		CoerceFormatToAbbreviatedTimezone(outFormat);
+	}
 
 	fCachedDateTimeFormats[dateStyle][timeStyle] = outFormat;
 
@@ -665,3 +660,23 @@ BFormattingConventions::Archive(BMessage* archive, bool deep) const
 
 	return status;
 }
+
+
+void
+BFormattingConventions::CoerceFormatForClock(BString& outFormat) const
+{
+	int8 use24HourClock = fExplicitUse24HourClock != CLOCK_HOURS_UNSET
+		? fExplicitUse24HourClock : fCachedUse24HourClock;
+	if (use24HourClock != CLOCK_HOURS_UNSET) {
+		// adjust to 12/24-hour clock as requested
+		bool localeUses24HourClock = !FormatUsesAmPm(outFormat);
+		if (localeUses24HourClock) {
+			if (use24HourClock == CLOCK_HOURS_12)
+				CoerceFormatTo12HourClock(outFormat);
+		} else {
+			if (use24HourClock == CLOCK_HOURS_24)
+				CoerceFormatTo24HourClock(outFormat);
+		}
+	}
+}
+

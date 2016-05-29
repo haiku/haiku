@@ -141,6 +141,7 @@ private:
 			bool				fUseStringsFromPreferredLanguage;
 
 			U_ICU_NAMESPACE::Locale*		fICULocale;
+			void				CoerceFormatForClock(BString& outFormat) const;
 };
 
 
