@@ -81,6 +81,7 @@ SourceHdrs
 
 local sources =
 	Debugger.cpp
+	DebuggerGlobals.cpp
 
 	# arch
 	Architecture.cpp

@@ -25,11 +25,11 @@
 #include "CoreFile.h"
 #include "CoreFileDebuggerInterface.h"
 #include "CommandLineUserInterface.h"
+#include "DebuggerGlobals.h"
 #include "DebuggerInterface.h"
 #include "DebuggerSettingsManager.h"
 #include "DebuggerUiSettingsFactory.h"
 #include "GraphicalUserInterface.h"
-#include "ImageDebugLoadingStateHandlerRoster.h"
 #include "MessageCodes.h"
 #include "ReportUserInterface.h"
 #include "SignalSet.h"
@@ -38,7 +38,6 @@
 #include "TargetHostInterfaceRoster.h"
 #include "TeamDebugger.h"
 #include "TeamsWindow.h"
-#include "TypeHandlerRoster.h"
 #include "ValueHandlerRoster.h"
 
 
@@ -231,42 +230,6 @@ parse_arguments(int argc, const char* const* argv, bool noOutput,
 }
 
 
-static status_t
-global_init(TargetHostInterfaceRoster::Listener* listener)
-{
-	status_t error = DebuggerUiSettingsFactory::CreateDefault();
-	if (error != B_OK)
-		return error;
-
-	error = TypeHandlerRoster::CreateDefault();
-	if (error != B_OK)
-		return error;
-
-	error = ValueHandlerRoster::CreateDefault();
-	if (error != B_OK)
-		return error;
-
-	error = ImageDebugLoadingStateHandlerRoster::CreateDefault();
-	if (error != B_OK)
-		return error;
-
-	error = TargetHostInterfaceRoster::CreateDefault(listener);
-	if (error != B_OK)
-		return error;
-
-	// for now, always create an instance of the local interface
-	// by default
-	TargetHostInterface* hostInterface;
-	TargetHostInterfaceRoster* roster = TargetHostInterfaceRoster::Default();
-	error = roster->CreateInterface(roster->InterfaceInfoAt(0), NULL,
-		hostInterface);
-	if (error != B_OK)
-		return error;
-
-	return B_OK;
-}
-
-
 // #pragma mark - Debugger application class
 
 
@@ -338,16 +301,23 @@ Debugger::~Debugger()
 {
 	DebuggerUiSettingsFactory::DeleteDefault();
 	ValueHandlerRoster::DeleteDefault();
-	TypeHandlerRoster::DeleteDefault();
-	ImageDebugLoadingStateHandlerRoster::DeleteDefault();
-	TargetHostInterfaceRoster::DeleteDefault();
+
+	debugger_global_uninit();
 }
 
 
 status_t
 Debugger::Init()
 {
-	status_t error = global_init(this);
+	status_t error = debugger_global_init(this);
+	if (error != B_OK)
+		return error;
+
+	error = DebuggerUiSettingsFactory::CreateDefault();
+	if (error != B_OK)
+		return error;
+
+	error = ValueHandlerRoster::CreateDefault();
 	if (error != B_OK)
 		return error;
 
@@ -642,6 +612,8 @@ CliDebugger::CliDebugger()
 
 CliDebugger::~CliDebugger()
 {
+	DebuggerUiSettingsFactory::DeleteDefault();
+	debugger_global_uninit();
 }
 
 
@@ -654,12 +626,20 @@ CliDebugger::Run(const Options& options)
 	SignalSet(SIGINT).BlockInCurrentThread();
 
 	// initialize global objects and settings manager
-	status_t error = global_init(this);
+	status_t error = debugger_global_init(this);
 	if (error != B_OK) {
 		fprintf(stderr, "Error: Global initialization failed: %s\n",
 			strerror(error));
 		return false;
 	}
+
+	error = DebuggerUiSettingsFactory::CreateDefault();
+	if (error != B_OK) {
+		fprintf(stderr, "Error: Failed to create default settings factory: "
+			"%s\n",	strerror(error));
+		return false;
+	}
+
 
 	DebuggerSettingsManager settingsManager;
 	error = settingsManager.Init(DebuggerUiSettingsFactory::Default());
@@ -715,6 +695,7 @@ ReportDebugger::ReportDebugger()
 
 ReportDebugger::~ReportDebugger()
 {
+	debugger_global_uninit();
 }
 
 
@@ -722,7 +703,7 @@ bool
 ReportDebugger::Run(const Options& options)
 {
 	// initialize global objects and settings manager
-	status_t error = global_init(this);
+	status_t error = debugger_global_init(this);
 	if (error != B_OK) {
 		fprintf(stderr, "Error: Global initialization failed: %s\n",
 			strerror(error));
