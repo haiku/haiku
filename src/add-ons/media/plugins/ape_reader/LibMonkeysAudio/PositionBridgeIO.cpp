@@ -57,15 +57,14 @@ int	TPositionBridgeIO::GetPosition()
 //------------------------------------------------------------------------------
 int	TPositionBridgeIO::GetSize()
 {
-	off_t	aCurPos;
-	off_t	aSize;
-
 	if ( mPositionIO == NULL )
 		return 0;
-	aCurPos = mPositionIO->Position();
-	mPositionIO->Seek(0, SEEK_END);
-	aSize = mPositionIO->Position();
-	mPositionIO->Seek(aCurPos, SEEK_SET);
+
+	off_t aSize;
+	status_t err = mPositionIO->GetSize(&aSize);
+	if (err != B_OK)
+		return -1;
+
 	return aSize;
 }
 //------------------------------------------------------------------------------
