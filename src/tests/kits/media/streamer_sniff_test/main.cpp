@@ -29,9 +29,13 @@ int main(int argc, char *argv[])
 	if (mediaFile->InitCheck() != B_OK) {
 		printf("Failed creation of BMediaFile!\n");
 		printf("Error: %s\n", strerror(mediaFile->InitCheck()));
-		return 0;
-	}
+	} else {
+		printf("Sniffing Success!\n");
 
-	printf("Success!\n");
-	sleep(5);
+		printf("Tracks Detected: %d\n", mediaFile->CountTracks());
+
+		sleep(5);
+	}
+	delete mediaFile;
+	return 0;
 }
