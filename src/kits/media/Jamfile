@@ -25,6 +25,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			Deprecated.cpp
 			MediaRecorder.cpp
 			MediaIO.cpp
+			AdapterIO.cpp
 
 			# Public Media Kit
 			Buffer.cpp
@@ -92,7 +93,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			StreamerPlugin.cpp
 			WriterPlugin.cpp
 			:
-			be localestub [ TargetLibsupc++ ] [ TargetLibstdc++ ]
+			be localestub shared [ TargetLibsupc++ ] [ TargetLibstdc++ ]
 			;
 	}
 }
