@@ -1,11 +1,13 @@
 /* 
  * Copyright 2004-2010, Marcus Overhagen. All rights reserved.
+ * Copyright 2016, Dario Casalinuovo. All rights reserved.
  * Distributed under the terms of the OpenBeOS License.
  */
 
+
+#include <AdapterIO.h>
 #include <BufferIO.h>
 #include <DataIO.h>
-#include <File.h>
 #include <image.h>
 #include <Path.h>
 
@@ -23,30 +25,84 @@ PluginManager gPluginManager;
 #define MAX_STREAMERS 40
 
 
-class BMediaIOWrapper : public BMediaIO {
+class DataIOAdapter : public BAdapterIO
+{
+public:
+			DataIOAdapter(BDataIO* dataIO)
+				:
+				BAdapterIO(B_MEDIA_SEEK_BACKWARD | B_MEDIA_MUTABLE_SIZE,
+					B_INFINITE_TIMEOUT),
+				fDataIO(dataIO)
+	{
+		fDataInputAdapter = BuildInputAdapter();
+	}
+
+	virtual	~DataIOAdapter()
+	{
+	}
+
+	virtual	ssize_t	ReadAt(off_t position, void* buffer,
+		size_t size)
+	{
+		if (position == Position()) {
+			ssize_t ret = fDataIO->Read(buffer, size);
+			fDataInputAdapter->Write(buffer, ret);
+			return ret;
+		}
+
+		off_t totalSize = 0;
+		if (GetSize(&totalSize) != B_OK)
+			return B_UNSUPPORTED;
+
+		if (position+size < totalSize)
+			return ReadAt(position, buffer, size);
+
+		return B_NOT_SUPPORTED;
+	}
+
+	virtual	ssize_t	WriteAt(off_t position, const void* buffer,
+		size_t size)
+	{
+		if (position == Position()) {
+			ssize_t ret = fDataIO->Write(buffer, size);
+			fDataInputAdapter->Write(buffer, ret);
+			return ret;
+		}
+
+		return B_NOT_SUPPORTED;
+	}
+
+private:
+	BDataIO*		fDataIO;
+	BInputAdapter*	fDataInputAdapter;
+};
+
+
+class BMediaIOWrapper : public BMediaIO
+{
 public:
 	BMediaIOWrapper(BDataIO* source)
 		:
 		fData(NULL),
 		fPosition(NULL),
 		fMedia(NULL),
-		fFile(NULL),
-		fFallbackBuffer(NULL),
+		fBufferIO(NULL),
+		fDataIOAdapter(NULL),
 		fErr(B_NO_ERROR)
 	{
 		CALLED();
 
 		fPosition = dynamic_cast<BPositionIO*>(source);
 		fMedia = dynamic_cast<BMediaIO*>(source);
-		fFile = dynamic_cast<BFile*>(source);
+		fBufferIO = dynamic_cast<BBufferIO *>(source);
 		fData = source;
 
 		// No need to do additional buffering if we have
 		// a BBufferIO or a BMediaIO.
-		if (dynamic_cast<BBufferIO *>(source) == NULL) {
+		if (!IsMedia() && fBufferIO == NULL) {
 			// Source needs to be at least a BPositionIO to wrap with a BBufferIO
-			if (IsSeekable()) {
-				fPosition = new(std::nothrow) BBufferIO(fPosition, 65536, true);
+			if (IsPosition()) {
+				fPosition = new(std::nothrow) BBufferIO(fPosition, 65536, false);
 				if (fPosition == NULL) {
 					fErr = B_NO_MEMORY;
 					return;
@@ -57,17 +113,34 @@ public:
 				// In this case we have to supply our own form
 				// of pseudo-seekable object from a non-seekable
 				// BDataIO.
-				fFallbackBuffer = new BMallocIO();
-				fFallbackBuffer->SetBlockSize(BLOCK_SIZE);
+				fDataIOAdapter = new DataIOAdapter(source);
+				fMedia = dynamic_cast<BMediaIO*>(fDataIOAdapter);
+				fPosition = dynamic_cast<BPositionIO*>(fDataIOAdapter);
+				fData = dynamic_cast<BDataIO*>(fDataIOAdapter);
 				TRACE("Unable to improve performance with a BufferIO\n");
 			}
 		}
+
+		if (IsMedia())
+			fMedia->GetFlags(&fFlags);
+		else if (IsPosition())
+			fFlags = B_MEDIA_SEEKABLE;
 	}
 
 	virtual	~BMediaIOWrapper()
 	{
-		delete fData;
-		delete fFallbackBuffer;
+		if (fBufferIO != NULL)
+			delete fBufferIO;
+
+		if (fDataIOAdapter != NULL)
+			delete fDataIOAdapter;
+	}
+
+	// BMediaIO interface
+
+	virtual void				GetFlags(int32* flags) const
+	{
+		*flags = fFlags;
 	}
 
 	// BPositionIO interface
@@ -77,28 +150,7 @@ public:
 	{
 		CALLED();
 
-		if (IsSeekable())
-			return fPosition->ReadAt(position, buffer, size);
-
-		off_t bufSize = 0;
-		ssize_t ret = B_NOT_SUPPORTED;
-		fFallbackBuffer->GetSize(&bufSize);
-
-		if (fFallbackBuffer->Position() == position
-				&& position+size > (size_t)bufSize) {
-			// TODO: Possibly part of the data we have
-			// to supply is cached.
-			ret = fData->Read(buffer, size);
-			if (ret > 0)
-				fFallbackBuffer->Write(buffer, ret);
-
-			return ret;
-		}
-
-		if (position+size <= (size_t)bufSize)
-			return fFallbackBuffer->ReadAt(position, buffer, size);
-
-		return ret;
+		return fPosition->ReadAt(position, buffer, size);
 	}
 
 	virtual	ssize_t				WriteAt(off_t position, const void* buffer,
@@ -106,51 +158,27 @@ public:
 	{
 		CALLED();
 
-		if (IsSeekable())
-			return fPosition->WriteAt(position, buffer, size);
-
-		off_t bufSize = 0;
-		fFallbackBuffer->GetSize(&bufSize);
-		if (position == bufSize) {
-			ssize_t ret = fData->Write(buffer, size);
-			fFallbackBuffer->WriteAt(bufSize, buffer, size);
-			return ret;
-		}
-
-		return B_NOT_SUPPORTED;
+		return fPosition->WriteAt(position, buffer, size);
 	}
 
 	virtual	off_t				Seek(off_t position, uint32 seekMode)
 	{
 		CALLED();
 
-		if (IsSeekable())
-			return fPosition->Seek(position, seekMode);
+		return fPosition->Seek(position, seekMode);
 
-		off_t bufSize = 0;
-		fFallbackBuffer->GetSize(&bufSize);
-		if (position <= bufSize)
-			return fFallbackBuffer->Seek(position, seekMode);
-
-		return B_NOT_SUPPORTED;
 	}
 
 	virtual off_t				Position() const
 	{
 		CALLED();
 
-		if (IsSeekable())
-			return fPosition->Position();
-
-		return fFallbackBuffer->Position();
+		return fPosition->Position();
 	}
 
 	virtual	status_t			SetSize(off_t size)
 	{
 		CALLED();
-
-		if (IsEndless())
-			return B_NOT_SUPPORTED;
 
 		return fPosition->SetSize(size);
 	}
@@ -159,31 +187,7 @@ public:
 	{
 		CALLED();
 
-		if (IsEndless())
-			return B_NOT_SUPPORTED;
-
 		return fPosition->GetSize(size);
-	}
-
-	// BMediaIO interface
-
-	virtual bool				IsSeekable() const
-	{
-		if (IsMedia())
-			return fMedia->IsSeekable();
-
-		return fPosition != NULL;
-	}
-
-	virtual	bool				IsEndless() const
-	{
-		if (IsMedia())
-			return fMedia->IsEndless();
-
-		if (IsSeekable())
-			return false;
-
-		return true;
 	}
 
 	// Utility methods
@@ -200,13 +204,20 @@ protected:
 		return fMedia != NULL;
 	}
 
+	bool						IsPosition() const
+	{
+		return fPosition != NULL;
+	}
+
 private:
 	BDataIO*					fData;
 	BPositionIO*				fPosition;
 	BMediaIO*					fMedia;
-	BFile*						fFile;
+	BBufferIO*					fBufferIO;
+	DataIOAdapter*				fDataIOAdapter;
 
-	BMallocIO*					fFallbackBuffer;
+	int32						fFlags;
+
 	status_t					fErr;
 };
 
