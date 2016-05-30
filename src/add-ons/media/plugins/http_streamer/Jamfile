@@ -1,6 +1,6 @@
 SubDir HAIKU_TOP src add-ons media plugins http_streamer ;
 
-UsePrivateHeaders media ;
+UsePrivateHeaders media shared ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
@@ -8,7 +8,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		Addon [ MultiArchDefaultGristFiles http_streamer ] :
 			HTTPStreamerPlugin.cpp
 			HTTPMediaIO.cpp
-			: be media bnetapi [ BuildFeatureAttribute curl : library ]
+			: be media bnetapi shared
 			[ TargetLibsupc++ ]
 		;
 	}

@@ -13,7 +13,7 @@ public:
 								HTTPStreamer();
 	virtual						~HTTPStreamer();
 
-			status_t			Sniff(BUrl* url, BMediaIO** source);
+	virtual status_t			Sniff(BUrl* url, BDataIO** source);
 };
 
 

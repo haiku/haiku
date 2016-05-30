@@ -6,32 +6,95 @@
 
 #include "HTTPMediaIO.h"
 
+#include <Handler.h>
+#include <UrlProtocolRoster.h>
+
+#include <stdio.h>
+
+
+class FileListener : public BUrlProtocolAsynchronousListener
+{
+public:
+					FileListener(BAdapterIO* owner)
+						:
+						BUrlProtocolAsynchronousListener(true),
+						fRequest(NULL),
+						fAdapterIO(owner)
+		{
+			fInputAdapter = fAdapterIO->BuildInputAdapter();
+		}
+
+		virtual		~FileListener() {};
+
+		bool		ConnectionSuccessful() const
+		{
+			printf("ConnectionSuccessful\n");
+			return fRequest != NULL;
+		}
+
+		void		ConnectionOpened(BUrlRequest* request)
+		{
+			printf("Connection opened\n");
+			if (fRequest != NULL)
+				fRequest->Stop();
+
+			fRequest = request;
+		}
+
+		void		DataReceived(BUrlRequest* request, const char* data,
+						off_t position, ssize_t size)
+		{
+			printf("Data received\n");
+			if (request != fRequest)
+				delete request;
+
+			fInputAdapter->Write(data, size);
+		}
+
+		void		RequestCompleted(BUrlRequest* request, bool success)
+		{
+			printf("Request completed\n");
+			printf("Success: %s\n", success ? "true" : "false");
+			if (request != fRequest)
+				return;
+
+			fRequest = NULL;
+			delete request;
+		}
+
+private:
+		BUrlRequest*	fRequest;
+		BAdapterIO*		fAdapterIO;
+		BInputAdapter*	fInputAdapter;
+};
+
 
 HTTPMediaIO::HTTPMediaIO(BUrl* url)
 	:
-	fContext(),
-	fBuffer(),
-	fInitErr(B_ERROR)
+	BAdapterIO(
+		B_MEDIA_STREAMING | B_MEDIA_MUTABLE_SIZE | B_MEDIA_SEEK_BACKWARD,
+		B_INFINITE_TIMEOUT),
+	fInitErr(B_OK)
 {
+	fContext = new BUrlContext();
 	fContext->AcquireReference();
 
-	fReq = new BHttpRequest(*url);
-	fReq->SetContext(fContext);
+	fListener = new FileListener(this);
+
+	fReq = BUrlProtocolRoster::MakeRequest(*url,
+		fListener, fContext);
+
 	fReq->Run();
-	fReq->AdoptInputData(fBuffer);
-
-	if (!fReq->IsRunning())
-		return;
-
-	fInitErr = _IntegrityCheck();
 }
 
 
 HTTPMediaIO::~HTTPMediaIO()
 {
+	delete fReq;
+	delete fListener;
+
 	fContext->ReleaseReference();
 	delete fContext;
-	delete fReq;
 }
 
 
@@ -43,69 +106,7 @@ HTTPMediaIO::InitCheck() const
 
 
 ssize_t
-HTTPMediaIO::ReadAt(off_t position, void* buffer, size_t size)
-{
-	return fBuffer->ReadAt(position, buffer, size);
-}
-
-
-ssize_t
 HTTPMediaIO::WriteAt(off_t position, const void* buffer, size_t size)
 {
 	return B_NOT_SUPPORTED;
-}
-
-
-off_t
-HTTPMediaIO::Seek(off_t position, uint32 seekMode)
-{
-	return fBuffer->Seek(position, seekMode);
-}
-
-off_t
-HTTPMediaIO::Position() const
-{
-	return fBuffer->Position();
-}
-
-
-status_t
-HTTPMediaIO::SetSize(off_t size)
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-status_t
-HTTPMediaIO::GetSize(off_t* size) const
-{
-	return B_NOT_SUPPORTED;
-}
-
-
-bool
-HTTPMediaIO::IsSeekable() const
-{
-	return false;
-}
-
-
-bool
-HTTPMediaIO::IsEndless() const
-{
-	return true;
-}
-
-
-status_t
-HTTPMediaIO::_IntegrityCheck()
-{
-	const BHttpResult& r = dynamic_cast<const BHttpResult&>(fReq->Result());
-	if (r.StatusCode() != 200)
-		return B_ERROR;
-
-	if (BString("OK")!=  r.StatusText())
-		return B_ERROR;
-
-	return B_OK;
 }
