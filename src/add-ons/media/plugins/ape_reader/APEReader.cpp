@@ -216,9 +216,11 @@ TAPEReader::Sniff(int32* oStreamCount)
 	if (mSrcPIO == NULL)
 		return B_ERROR;
 
+	int nFunctionRetVal = ERROR_SUCCESS;
 	mPositionBridgeIO.SetPositionIO(mSrcPIO);
-	mDecomp = CreateIAPEDecompressEx(&mPositionBridgeIO);
-	if (mDecomp == NULL)
+
+	mDecomp = CreateIAPEDecompressEx(&mPositionBridgeIO, &nFunctionRetVal);
+	if (mDecomp == NULL || nFunctionRetVal != ERROR_SUCCESS)
 		return B_ERROR;
 
 	// prepare about data
