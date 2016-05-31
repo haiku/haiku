@@ -84,8 +84,6 @@ const struct supported_device {
 	{0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
 	{0x0046, INTEL_MODEL_ILKGM, "IronLake Mobile"},
 
-// Experimental
-#if 0
 	{0x0102, INTEL_MODEL_SNBG, "SandyBridge Desktop GT1"},
 	{0x0112, INTEL_MODEL_SNBG, "SandyBridge Desktop GT2"},
 	{0x0122, INTEL_MODEL_SNBG, "SandyBridge Desktop GT2+"},
@@ -128,7 +126,6 @@ const struct supported_device {
 	{0x1926, INTEL_MODEL_SKYM, "Skylake GT3"},
 	{0x192a, INTEL_MODEL_SKYS, "Skylake GT3"},
 	{0x192b, INTEL_MODEL_SKY,  "Skylake GT3"},
-#endif
 };
 
 int32 api_version = B_CUR_DRIVER_API_VERSION;
