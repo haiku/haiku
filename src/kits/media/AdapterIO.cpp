@@ -131,7 +131,7 @@ BAdapterIO::_WaitForData(size_t size)
 	if (ret != B_OK)
 		return;
 
-	while(bufferSize < size) {
+	while((size_t)bufferSize < size) {
 		GetSize(&bufferSize);
 		snooze(100000);
 	}

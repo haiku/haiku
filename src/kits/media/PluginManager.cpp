@@ -54,7 +54,7 @@ public:
 		if (GetSize(&totalSize) != B_OK)
 			return B_UNSUPPORTED;
 
-		if (position+size < totalSize)
+		if (position+size < (size_t)totalSize)
 			return ReadAt(position, buffer, size);
 
 		return B_NOT_SUPPORTED;
