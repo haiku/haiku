@@ -47,6 +47,10 @@ static void
 enable_lvds_panel(bool enable)
 {
 	bool hasPCH = (gInfo->shared_info->pch_info != INTEL_PCH_NONE);
+	if (hasPCH) {
+		// TODO: fix for PCH (does not enable the panel - crashes?)
+		return;
+	}
 
 	int controlRegister = hasPCH ? PCH_PANEL_CONTROL : INTEL_PANEL_CONTROL;
 	int statusRegister = hasPCH ? PCH_PANEL_STATUS : INTEL_PANEL_STATUS;

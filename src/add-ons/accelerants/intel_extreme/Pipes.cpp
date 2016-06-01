@@ -182,31 +182,31 @@ Pipe::ConfigureTimings(display_mode* target)
 		return;
 	}
 
-	// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
-	write32(INTEL_DISPLAY_A_HTOTAL + fPipeOffset,
+	// update timing parameters
+	write32(INTEL_DISPLAY_A_HTOTAL,
 		((uint32)(target->timing.h_total - 1) << 16)
 		| ((uint32)target->timing.h_display - 1));
-	write32(INTEL_DISPLAY_A_HBLANK + fPipeOffset,
+	write32(INTEL_DISPLAY_A_HBLANK,
 		((uint32)(target->timing.h_total - 1) << 16)
 		| ((uint32)target->timing.h_display - 1));
-	write32(INTEL_DISPLAY_A_HSYNC + fPipeOffset,
+	write32(INTEL_DISPLAY_A_HSYNC,
 		((uint32)(target->timing.h_sync_end - 1) << 16)
 		| ((uint32)target->timing.h_sync_start - 1));
 
-	write32(INTEL_DISPLAY_A_VTOTAL + fPipeOffset,
+	write32(INTEL_DISPLAY_A_VTOTAL,
 		((uint32)(target->timing.v_total - 1) << 16)
 		| ((uint32)target->timing.v_display - 1));
-	write32(INTEL_DISPLAY_A_VBLANK + fPipeOffset,
+	write32(INTEL_DISPLAY_A_VBLANK,
 		((uint32)(target->timing.v_total - 1) << 16)
 		| ((uint32)target->timing.v_display - 1));
-	write32(INTEL_DISPLAY_A_VSYNC + fPipeOffset,
+	write32(INTEL_DISPLAY_A_VSYNC,
 		((uint32)(target->timing.v_sync_end - 1) << 16)
 		| ((uint32)target->timing.v_sync_start - 1));
 
 	// XXX: Is it ok to do these on non-digital?
 
 	write32(INTEL_DISPLAY_A_POS + fPipeOffset, 0);
-	write32(INTEL_DISPLAY_A_IMAGE_SIZE + fPipeOffset,
+	write32(INTEL_DISPLAY_A_IMAGE_SIZE,
 		((uint32)(target->virtual_width - 1) << 16)
 			| ((uint32)target->virtual_height - 1));
 
@@ -245,8 +245,8 @@ Pipe::ConfigureClocks(const pll_divisors& divisors, uint32 pixelClock,
 	float refFreq = gInfo->shared_info->pll_info.reference_frequency / 1000.0f;
 
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_96x)) {
-		float adjusted = ((refFreq * divisors.m) / divisors.n) 	/ divisors.p;
-		uint32 pixelMultiply = uint32(adjusted 	/ (pixelClock / 1000.0f));
+		float adjusted = ((refFreq * divisors.m) / divisors.n) / divisors.p;
+		uint32 pixelMultiply = uint32(adjusted / (pixelClock / 1000.0f));
 		write32(pllMD, (0 << 24) | ((pixelMultiply - 1) << 8));
 	}
 
