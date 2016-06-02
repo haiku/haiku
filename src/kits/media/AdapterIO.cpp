@@ -86,7 +86,9 @@ BAdapterIO::Position() const
 status_t
 BAdapterIO::SetSize(off_t size)
 {
-	return B_UNSUPPORTED;
+	AutoWriteLocker(fLock);
+
+	return fBuffer->SetSize(size);
 }
 
 
