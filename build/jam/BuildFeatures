@@ -543,15 +543,15 @@ if [ IsPackageAvailable live555_devel ] {
 		file: devel live555_devel
 			libraries:
 				$(developLibDir)/libliveMedia.a
+				$(developLibDir)/libBasicUsageEnvironment.a
 				$(developLibDir)/libgroupsock.a
 				$(developLibDir)/libUsageEnvironment.a
-				$(developLibDir)/libBasicUsageEnvironment.a
 
 			headers: $(developHeadersDir)
 				$(developHeadersDir)/liveMedia
+				$(developHeadersDir)/BasicUsageEnvironment
 				$(developHeadersDir)/groupsock
 				$(developHeadersDir)/UsageEnvironment
-				$(developHeadersDir)/BasicUsageEnvironment
 		;
 	EnableBuildFeatures live555 ;
 } else  {
