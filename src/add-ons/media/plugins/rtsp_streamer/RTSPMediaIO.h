@@ -1,0 +1,67 @@
+/*
+ * Copyright 2016, Dario Casalinuovo. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ */
+#ifndef _RTSP_MEDIA_IO_H
+#define _RTSP_MEDIA_IO_H
+
+
+#include <AdapterIO.h>
+#include <Url.h>
+
+#include "rtsp.h"
+
+
+class RTSPMediaIO : public BAdapterIO
+{
+public:
+								RTSPMediaIO(BUrl* ourUrl);
+	virtual						~RTSPMediaIO();
+
+			status_t			InitCheck() const;
+
+	virtual	ssize_t				WriteAt(off_t position, const void* buffer,
+									size_t size);
+private:
+	BUrl*						fUrl;
+
+	TaskScheduler*				fScheduler;
+	UsageEnvironment*			fEnv;
+	char						loopWatchVariable;
+
+	status_t					fInitErr;
+};
+
+
+class HaikuRTSPClient : public RTSPClient
+{
+public:
+								HaikuRTSPClient(UsageEnvironment& env,
+									char const* rtspURL,
+									portNumBits tunnelOverHTTPPortNum,
+									BInputAdapter* fInputAdapter);
+
+			BInputAdapter*		GetInputAdapter() const;
+
+			status_t			WaitForInit(bigtime_t timeout);
+
+			void				NotifyError();
+			void				NotifySucces();
+
+protected:
+	virtual 					~HaikuRTSPClient();
+
+public:
+
+	MediaSubsessionIterator* 	iter;
+	MediaSession*				session;
+	MediaSubsession*			subsession;
+	TaskToken					streamTimerTask;
+	double						duration;
+
+private:
+			BInputAdapter*		fInputAdapter;
+			port_id				fInitPort;
+};
+
+#endif
