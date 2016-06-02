@@ -48,7 +48,7 @@ BAdapterIO::ReadAt(off_t position, void* buffer, size_t size)
 {
 	printf("read at %d  %d \n", (int)position, (int)size);
 	_WaitForData(position+size);
-	AutoReadLocker(fLock);
+	AutoReadLocker _(fLock);
 
 	return fBuffer->ReadAt(position, buffer, size);
 }
@@ -58,7 +58,7 @@ ssize_t
 BAdapterIO::WriteAt(off_t position, const void* buffer, size_t size)
 {
 	_WaitForData(position+size);
-	AutoWriteLocker(fLock);
+	AutoWriteLocker _(fLock);
 
 	return fBuffer->WriteAt(position, buffer, size);
 }
@@ -68,7 +68,7 @@ off_t
 BAdapterIO::Seek(off_t position, uint32 seekMode)
 {
 	_WaitForData(position);
-	AutoWriteLocker(fLock);
+	AutoWriteLocker _(fLock);
 
 	return fBuffer->Seek(position, seekMode);
 }
@@ -77,7 +77,7 @@ BAdapterIO::Seek(off_t position, uint32 seekMode)
 off_t
 BAdapterIO::Position() const
 {
-	AutoReadLocker(fLock);
+	AutoReadLocker _(fLock);
 
 	return fBuffer->Position();
 }
@@ -86,7 +86,7 @@ BAdapterIO::Position() const
 status_t
 BAdapterIO::SetSize(off_t size)
 {
-	AutoWriteLocker(fLock);
+	AutoWriteLocker _(fLock);
 
 	return fBuffer->SetSize(size);
 }
@@ -95,7 +95,7 @@ BAdapterIO::SetSize(off_t size)
 status_t
 BAdapterIO::GetSize(off_t* size) const
 {
-	AutoReadLocker(fLock);
+	AutoReadLocker _(fLock);
 
 	return fBuffer->GetSize(size);
 }
@@ -115,7 +115,7 @@ BAdapterIO::BuildInputAdapter()
 ssize_t
 BAdapterIO::BackWrite(const void* buffer, size_t size)
 {
-	AutoWriteLocker(fLock);
+	AutoWriteLocker _(fLock);
 
 	off_t currentPos = Position();
 	off_t ret = fBuffer->WriteAt(fBackPosition, buffer, size);
