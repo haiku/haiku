@@ -145,6 +145,8 @@ RemotePackageRepository HaikuPorts
 	icu54_devel-54.1-1
 	icu55-55.1-1
 	icu55_devel-55.1-1
+	imagemagick-6.9.4.0-1
+	imagemagick_devel-6.9.4.0-1
 	intltool-0.40.6-4
 	jam-2.5_2012_10_12-2
 	jasper-1.900.1-4
@@ -268,11 +270,18 @@ RemotePackageRepository HaikuPorts
 	pkgconfig-0.27.1-2
 	pyenet-20141025-1
 	python-2.7.11-1
+	python_httplib2-0.9.2-1
 	python_mako-1.0.1-1
+	python_pyqt-5.5.1-1
 	python_setuptools-5.3-2
+	python_sip-4.18-1
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.1-2
 	python3-3.5.1-1
+	python3_httplib2-0.9.2-1
+	python3_pyqt-5.5.1-1
+	python3_setuptools-20.6.7-1
+	python3_sip-4.18-1
 	pyyaml-3.11-1
 	qca2-2.0.3-1
 	qca2_devel-2.0.3-1
@@ -314,6 +323,7 @@ RemotePackageRepository HaikuPorts
 	sqlite_devel-3.8.11.1-1
 	subversion-1.8.11-8
 	subversion_devel-1.8.11-8
+	swig-2.0.11-2
 	tar-1.27.1-2
 	tcpdump-4.7.4-2
 	texinfo-4.13a-7
@@ -495,6 +505,7 @@ RemotePackageRepository HaikuPorts
 	icu
 	icu54
 	icu55
+	imagemagick
 	intltool
 	jam
 	jasper
@@ -566,8 +577,11 @@ RemotePackageRepository HaikuPorts
 	pkgconfig_x86_gcc2
 	pyenet
 	python
+	python_httplib2
 	python_mako
+	python_pyqt
 	python_setuptools
+	python_sip
 	python_twisted
 	python_zope.interface
 	python3
@@ -593,6 +607,7 @@ RemotePackageRepository HaikuPorts
 	speex
 	sqlite
 	subversion
+	swig
 	tar
 	tcpdump
 	texi2html
