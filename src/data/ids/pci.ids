@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.05.24
-#	Date:    2016-05-24 03:15:02
+#	Version: 2016.05.31
+#	Date:    2016-05-31 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10541,17 +10541,47 @@
 	1427  GM206M [GeForce GTX 965M]
 	1430  GM206GL [Quadro M2000]
 	1431  GM206GL [Tesla M4]
+	15f0  GP100GL
+	15f1  GP100GL
+	15f8  GP100GL
+	15f9  GP100GL
 	1617  GM204M [GeForce GTX 980M]
 	1618  GM204M [GeForce GTX 970M]
 	1619  GM204M [GeForce GTX 965M]
 	161a  GM204M [GeForce GTX 980]
 	1667  GM204M [GeForce GTX 965M]
+	1725  GP100
+	172e  GP100
+	172f  GP100
 	17c2  GM200 [GeForce GTX TITAN X]
 	17c8  GM200 [GeForce GTX 980 Ti]
 	17f0  GM200GL [Quadro M6000]
 	17f1  GM200GL [Quadro M6000 24GB]
 	17fd  GM200GL [Tesla M40]
+	1b00  GP102
+	1b01  GP102
+	1b70  GP102GL
+	1b78  GP102GL
 	1b80  GP104 [GeForce GTX 1080]
+	1b81  GP104
+	1b82  GP104
+	1b83  GP104
+	1bb0  GP104GL
+	1bb1  GP104GL
+	1bb4  GP104GL
+	1c00  GP106
+	1c01  GP106
+	1c02  GP106
+	1c03  GP106
+	1c30  GP106GL
+	1c70  GP106GL
+	1c80  GP107
+	1c81  GP107
+	1c82  GP107
+	1ca7  GP107GL
+	1ca8  GP107GL
+	1caa  GP107GL
+	1d01  GP108
 10df  Emulex Corporation
 	0720  OneConnect NIC (Skyhawk)
 		103c 1934  FlexFabric 20Gb 2-port 650M Adapter
@@ -18541,6 +18571,15 @@
 	a030  THUNDERX L2C-MCI
 	a031  THUNDERX MIO-FUS (Fuse Access Controller)
 	a032  THUNDERX FUSF (Fuse Controller)
+	a033  THUNDERX Random Number Generator virtual function
+	a034  THUNDERX Network Interface Controller virtual function
+	a035  THUNDERX Parallel Bus
+	a036  THUNDERX RAD virtual function
+	a037  THUNDERX ZIP virtual function
+	a040  THUNDERX CPT Cryptographic Accelerator
+	a100  THUNDERX CN88XX 48 core SoC
+	a200  OCTEON TX CN81XX/CN80XX
+	a300  OCTEON TX CN83XX
 1787  Hightech Information System Ltd.
 1789  Ennyah Technologies Corp.
 # also used by Struck Innovative Systeme for joint developments
@@ -19684,6 +19723,9 @@
 		1af4 1100  QEMU Virtual Machine
 	0005  QEMU PCI Test Device
 		1af4 1100  QEMU Virtual Machine
+	0006  PCI Rocker Ethernet switch device
+	0007  PCI SD Card Host Controller Interface
+	000a  PCI-PCI bridge (multiseat)
 	0100  QXL paravirtual graphic card
 		1af4 1100  QEMU Virtual Machine
 1b37  Signal Processing Devices Sweden AB
