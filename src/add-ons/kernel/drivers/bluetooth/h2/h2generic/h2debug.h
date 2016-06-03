@@ -10,8 +10,11 @@
 #include <KernelExport.h>
 
 
-#define DEBUG
-#ifdef DEBUG
+/* debug is default */
+#ifndef NDEBUG
+#   define H2DEBUG
+#endif
+#ifdef H2DEBUG
 #   define TRACE(x...) dprintf("h2generic: " x)
 #else
 #   define TRACE(x...) ;
