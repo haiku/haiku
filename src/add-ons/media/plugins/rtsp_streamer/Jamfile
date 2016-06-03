@@ -12,10 +12,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		UseBuildFeatureHeaders live555 ;
 
 		Includes [ FGristFiles
-				rtsp.cpp
-				RTSPStreamerPlugin.cpp
-				RTSPMediaIO.cpp ]
-			: [ BuildFeatureAttribute live555 : headers ] ;
+			rtsp.cpp
+			RTSPStreamerPlugin.cpp
+			RTSPMediaIO.cpp ]
+		: [ BuildFeatureAttribute live555 : headers ] ;
 
 		Addon [ MultiArchDefaultGristFiles rtsp_streamer ] :
 			RTSPStreamerPlugin.cpp

@@ -3,7 +3,8 @@
 
 #include "StreamerPlugin.h"
 
-class RTSPStreamer : public Streamer {
+class RTSPStreamer : public Streamer
+{
 public:
 								RTSPStreamer();
 	virtual						~RTSPStreamer();

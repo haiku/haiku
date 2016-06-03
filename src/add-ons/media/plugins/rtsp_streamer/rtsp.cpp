@@ -43,39 +43,39 @@ UsageEnvironment& operator<<(UsageEnvironment& env,
 class AdapterSink : public MediaSink
 {
 public:
-				static 		AdapterSink* createNew(UsageEnvironment& env,
-								MediaSubsession& subsession,
-								BInputAdapter* inputAdapter,
-								char const* streamId = NULL);
+			static	 			AdapterSink* createNew(UsageEnvironment& env,
+									MediaSubsession& subsession,
+									BInputAdapter* inputAdapter,
+									char const* streamId = NULL);
 
 private:
-							AdapterSink(UsageEnvironment& env,
-								MediaSubsession& subsession,
-								char const* streamId,
-								BInputAdapter* inputAdapter);
+								AdapterSink(UsageEnvironment& env,
+									MediaSubsession& subsession,
+									char const* streamId,
+									BInputAdapter* inputAdapter);
 
-	virtual 				~AdapterSink();
+	virtual 					~AdapterSink();
 
-			static void		afterGettingFrame(void* clientData,
-								unsigned frameSize,
-								unsigned numTruncatedBytes,
-								struct timeval presentationTime,
-								unsigned durationInMicroseconds);
+			static void			afterGettingFrame(void* clientData,
+									unsigned frameSize,
+									unsigned numTruncatedBytes,
+									struct timeval presentationTime,
+									unsigned durationInMicroseconds);
 
-			void			afterGettingFrame(unsigned frameSize,
-								unsigned numTruncatedBytes,
-								struct timeval presentationTime,
-								unsigned durationInMicroseconds);
+			void				afterGettingFrame(unsigned frameSize,
+									unsigned numTruncatedBytes,
+									struct timeval presentationTime,
+									unsigned durationInMicroseconds);
 
 private:
 	// redefined virtual functions:
-	virtual Boolean			continuePlaying();
+	virtual Boolean				continuePlaying();
 
 private:
-	BInputAdapter*			fInputAdapter;
-	u_int8_t*				fReceiveBuffer;
-	MediaSubsession&		fSubsession;
-	char*					fStreamId;
+			BInputAdapter*		fInputAdapter;
+			u_int8_t*			fReceiveBuffer;
+			MediaSubsession&	fSubsession;
+			char*				fStreamId;
 };
 
 // Implementation of the RTSP 'response handlers':
@@ -174,8 +174,7 @@ void setupNextSubsession(RTSPClient* rtspClient)
 		// so send an appropriate "PLAY" command:
 		rtspClient->sendPlayCommand(*client->session, continueAfterPLAY,
 			client->session->absStartTime(), client->session->absEndTime());
-	}
-	else {
+	} else {
 		client->duration = client->session->playEndTime()
 			- client->session->playStartTime();
 		rtspClient->sendPlayCommand(*client->session, continueAfterPLAY);
@@ -201,8 +200,7 @@ void continueAfterSETUP(RTSPClient* rtspClient,
 			<< *client->subsession << "\" subsession (";
 		if (client->subsession->rtcpIsMuxed()) {
 			env << "client port " << client->subsession->clientPortNum();
-		}
-		else {
+		} else {
 			env << "client ports " << client->subsession->clientPortNum()
 				<< "-" << client->subsession->clientPortNum() + 1;
 		}

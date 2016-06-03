@@ -15,53 +15,54 @@
 class RTSPMediaIO : public BAdapterIO
 {
 public:
-								RTSPMediaIO(BUrl* ourUrl);
-	virtual						~RTSPMediaIO();
+										RTSPMediaIO(BUrl* ourUrl);
+	virtual								~RTSPMediaIO();
 
-			status_t			InitCheck() const;
+			status_t					InitCheck() const;
 
-	virtual	ssize_t				WriteAt(off_t position, const void* buffer,
-									size_t size);
+	virtual	ssize_t						WriteAt(off_t position,
+											const void* buffer,
+											size_t size);
 private:
-	BUrl*						fUrl;
+			BUrl*						fUrl;
 
-	TaskScheduler*				fScheduler;
-	UsageEnvironment*			fEnv;
-	char						loopWatchVariable;
+			TaskScheduler*				fScheduler;
+			UsageEnvironment*			fEnv;
+			char						loopWatchVariable;
 
-	status_t					fInitErr;
+			status_t					fInitErr;
 };
 
 
 class HaikuRTSPClient : public RTSPClient
 {
 public:
-								HaikuRTSPClient(UsageEnvironment& env,
-									char const* rtspURL,
-									portNumBits tunnelOverHTTPPortNum,
-									BInputAdapter* fInputAdapter);
+										HaikuRTSPClient(UsageEnvironment& env,
+											char const* rtspURL,
+											portNumBits tunnelOverHTTPPortNum,
+											BInputAdapter* fInputAdapter);
 
-			BInputAdapter*		GetInputAdapter() const;
+			BInputAdapter*				GetInputAdapter() const;
 
-			status_t			WaitForInit(bigtime_t timeout);
+			status_t					WaitForInit(bigtime_t timeout);
 
-			void				NotifyError();
-			void				NotifySucces();
+			void						NotifyError();
+			void						NotifySucces();
 
 protected:
-	virtual 					~HaikuRTSPClient();
+	virtual 							~HaikuRTSPClient();
 
 public:
 
-	MediaSubsessionIterator* 	iter;
-	MediaSession*				session;
-	MediaSubsession*			subsession;
-	TaskToken					streamTimerTask;
-	double						duration;
+			MediaSubsessionIterator* 	iter;
+			MediaSession*				session;
+			MediaSubsession*			subsession;
+			TaskToken					streamTimerTask;
+			double						duration;
 
 private:
-			BInputAdapter*		fInputAdapter;
-			port_id				fInitPort;
+			BInputAdapter*				fInputAdapter;
+			port_id						fInitPort;
 };
 
 #endif

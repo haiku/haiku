@@ -8,7 +8,8 @@
 
 #include "StreamerPlugin.h"
 
-class HTTPStreamer : public Streamer {
+class HTTPStreamer : public Streamer
+{
 public:
 								HTTPStreamer();
 	virtual						~HTTPStreamer();
@@ -17,7 +18,8 @@ public:
 };
 
 
-class HTTPStreamerPlugin : public StreamerPlugin {
+class HTTPStreamerPlugin : public StreamerPlugin
+{
 public:
 	virtual	Streamer*			NewStreamer();
 };
