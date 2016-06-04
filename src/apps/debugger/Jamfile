@@ -165,7 +165,7 @@ local sources =
 	ReportUserInterface.cpp
 ;
 
-Includes [ FGristFiles $(sources) ]
+Includes [ FGristFiles $(sources) ] : 
 	[ BuildFeatureAttribute ncurses : headers ]
 	[ BuildFeatureAttribute libedit : headers ]
 ;
