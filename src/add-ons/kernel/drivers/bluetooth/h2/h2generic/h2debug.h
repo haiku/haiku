@@ -10,7 +10,6 @@
 #include <KernelExport.h>
 
 
-#define DEBUG
 #ifdef DEBUG
 #   define TRACE(x...) dprintf("h2generic: " x)
 #else
