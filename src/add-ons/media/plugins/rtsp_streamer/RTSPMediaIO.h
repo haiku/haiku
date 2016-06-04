@@ -12,6 +12,9 @@
 #include "rtsp.h"
 
 
+class HaikuRTSPClient;
+
+
 class RTSPMediaIO : public BAdapterIO
 {
 public:
@@ -23,12 +26,22 @@ public:
 	virtual	ssize_t						WriteAt(off_t position,
 											const void* buffer,
 											size_t size);
-private:
-			BUrl*						fUrl;
 
-			TaskScheduler*				fScheduler;
+			void						LoopThread();
+			void						ShutdownLoop();
+private:
+			static int32				_LoopThread(void* data);
+
+			BUrl*						fUrl;
+			BInputAdapter*				fInputAdapter;
+
+
+			HaikuRTSPClient*			fClient;
 			UsageEnvironment*			fEnv;
-			char						loopWatchVariable;
+			TaskScheduler*				fScheduler;
+
+			char						fLoopWatchVariable;
+			thread_id					fLoopThread;
 
 			status_t					fInitErr;
 };
@@ -40,7 +53,9 @@ public:
 										HaikuRTSPClient(UsageEnvironment& env,
 											char const* rtspURL,
 											portNumBits tunnelOverHTTPPortNum,
-											BInputAdapter* fInputAdapter);
+											RTSPMediaIO* fInputAdapter);
+
+			void						Close();
 
 			BInputAdapter*				GetInputAdapter() const;
 
@@ -50,10 +65,9 @@ public:
 			void						NotifySucces();
 
 protected:
+
 	virtual 							~HaikuRTSPClient();
-
 public:
-
 			MediaSubsessionIterator* 	iter;
 			MediaSession*				session;
 			MediaSubsession*			subsession;
@@ -61,7 +75,8 @@ public:
 			double						duration;
 
 private:
-			BInputAdapter*				fInputAdapter;
+			RTSPMediaIO*				fInterface;
+
 			port_id						fInitPort;
 };
 

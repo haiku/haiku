@@ -125,7 +125,6 @@ void continueAfterDESCRIBE(RTSPClient* rtspClient,
 		return;
 	} while (0);
 
-	client->NotifyError();
 	// An unrecoverable error occurred with this stream.
 	shutdownStream(rtspClient);
 }
@@ -289,7 +288,6 @@ void continueAfterPLAY(RTSPClient* rtspClient,
 	delete[] resultString;
 
 	if (!success) {
-		client->NotifyError();
 		// An unrecoverable error occurred with this stream.
 		shutdownStream(rtspClient);
 	} else
@@ -383,6 +381,7 @@ void shutdownStream(RTSPClient* rtspClient, int exitCode)
 	Medium::close(rtspClient);
 	// Note that this will also cause this stream's
 	// "StreamClientState" structure to get reclaimed.
+	client->NotifyError();
 }
 
 

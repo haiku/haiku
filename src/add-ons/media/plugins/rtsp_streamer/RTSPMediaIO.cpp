@@ -16,31 +16,46 @@ RTSPMediaIO::RTSPMediaIO(BUrl* ourUrl)
 		B_MEDIA_STREAMING | B_MEDIA_MUTABLE_SIZE | B_MEDIA_SEEK_BACKWARD,
 		B_INFINITE_TIMEOUT),
 	fUrl(ourUrl),
-	fInitErr(B_OK),
+	fClient(NULL),
+	fInputAdapter(NULL),
 	fScheduler(NULL),
-	fEnv(NULL),
-	loopWatchVariable(0)
+	fLoopWatchVariable(0),
+	fLoopThread(-1),
+	fInitErr(B_OK)
 {
+	fInputAdapter = BuildInputAdapter();
 	fScheduler = BasicTaskScheduler::createNew();
 	fEnv = BasicUsageEnvironment::createNew(*fScheduler);
 
-	HaikuRTSPClient* client = new HaikuRTSPClient(*fEnv, fUrl->UrlString(),
-		0, BuildInputAdapter());
-	if (client == NULL) {
+	fClient = new HaikuRTSPClient(*fEnv, fUrl->UrlString(),
+		0, this);
+	if (fClient == NULL) {
 		fInitErr = B_ERROR;
 		return;
 	}
 
-	client->sendDescribeCommand(continueAfterDESCRIBE);
+	fClient->sendDescribeCommand(continueAfterDESCRIBE);
 
-	fEnv->taskScheduler().doEventLoop(&loopWatchVariable);
+	fLoopThread = spawn_thread(_LoopThread, "two minutes hate thread",
+		B_NORMAL_PRIORITY, this);
 
-	fInitErr = client->WaitForInit(5000000);
+	if (fLoopThread <= 0 || resume_thread(fLoopThread) != B_OK) {
+		fInitErr = B_ERROR;
+		return;
+	}
+
+	fInitErr = fClient->WaitForInit(5000000);
 }
 
 
 RTSPMediaIO::~RTSPMediaIO()
 {
+	fClient->Close();
+
+	ShutdownLoop();
+
+	if (fLoopThread != -1)
+		exit_thread(fLoopThread);
 }
 
 
@@ -51,6 +66,13 @@ RTSPMediaIO::InitCheck() const
 }
 
 
+void
+RTSPMediaIO::ShutdownLoop()
+{
+	fLoopWatchVariable = 1;
+}
+
+
 ssize_t
 RTSPMediaIO::WriteAt(off_t position, const void* buffer, size_t size)
 {
@@ -58,8 +80,24 @@ RTSPMediaIO::WriteAt(off_t position, const void* buffer, size_t size)
 }
 
 
+int32
+RTSPMediaIO::_LoopThread(void* data)
+{
+	static_cast<RTSPMediaIO *>(data)->LoopThread();
+	return 0;
+}
+
+
+void
+RTSPMediaIO::LoopThread()
+{
+	fEnv->taskScheduler().doEventLoop(&fLoopWatchVariable);
+	fLoopThread = -1;
+}
+
+
 HaikuRTSPClient::HaikuRTSPClient(UsageEnvironment& env, char const* rtspURL,
-		portNumBits tunnelOverHTTPPortNum, BInputAdapter* inputAdapter)
+		portNumBits tunnelOverHTTPPortNum, RTSPMediaIO* interface)
 	:
 	RTSPClient(env, rtspURL, LIVE555_VERBOSITY, "Haiku RTSP Streamer",
 		tunnelOverHTTPPortNum, -1),
@@ -68,9 +106,27 @@ HaikuRTSPClient::HaikuRTSPClient(UsageEnvironment& env, char const* rtspURL,
 	subsession(NULL),
 	streamTimerTask(NULL),
 	duration(0.0f),
-	fInputAdapter(inputAdapter)
+	fInterface(interface),
+	fInitPort(-1)
 {
 	fInitPort = create_port(1, "RTSP Client wait port");
+}
+
+
+HaikuRTSPClient::~HaikuRTSPClient()
+{
+}
+
+
+void
+HaikuRTSPClient::Close()
+{
+	delete iter;
+	if (session != NULL) {
+		UsageEnvironment& env = session->envir();
+		env.taskScheduler().unscheduleDelayedTask(streamTimerTask);
+		Medium::close(session);
+	}
 }
 
 
@@ -90,6 +146,7 @@ HaikuRTSPClient::WaitForInit(bigtime_t timeout)
 void
 HaikuRTSPClient::NotifyError()
 {
+	fInterface->ShutdownLoop();
 	status_t status = B_ERROR;
 	write_port(fInitPort, NULL, &status, sizeof(status));
 }
@@ -103,19 +160,8 @@ HaikuRTSPClient::NotifySucces()
 }
 
 
-HaikuRTSPClient::~HaikuRTSPClient()
-{
-	delete iter;
-	if (session != NULL) {
-		UsageEnvironment& env = session->envir();
-		env.taskScheduler().unscheduleDelayedTask(streamTimerTask);
-		Medium::close(session);
-	}
-}
-
-
 BInputAdapter*
 HaikuRTSPClient::GetInputAdapter() const
 {
-	return fInputAdapter;
+	return fInterface->BuildInputAdapter();
 }
