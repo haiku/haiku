@@ -6,8 +6,7 @@
 #ifndef _BTDEBUG_H
 #define _BTDEBUG_H
 
-// XXX: Remove once things get "better"
-#define DEBUG
+
 #ifdef DEBUG
 #   define TRACE(x...) dprintf("bt: " x)
 #else
