@@ -6,9 +6,6 @@ UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 UseHeaders [ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
 	system kernel ] ;
 
-UsePrivateHeaders app debug interface kernel package shared libroot ;
-UsePrivateSystemHeaders ;
-
 UsePrivateHeaders debugger ;
 UsePrivateHeaders [ FDirName debugger arch ] ;
 UsePrivateHeaders [ FDirName debugger controllers ] ;
@@ -31,6 +28,9 @@ UsePrivateHeaders [ FDirName debugger value ] ;
 UsePrivateHeaders [ FDirName debugger value value_formatters ] ;
 UsePrivateHeaders [ FDirName debugger value value_nodes ] ;
 UsePrivateHeaders [ FDirName debugger value values ] ;
+
+UsePrivateHeaders app debug interface kernel package shared libroot ;
+UsePrivateSystemHeaders ;
 
 LINKFLAGS += -Wl,--exclude-libs,ALL ;
 

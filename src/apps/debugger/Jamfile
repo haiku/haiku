@@ -2,10 +2,7 @@ SubDir HAIKU_TOP src apps debugger ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
-UsePrivateHeaders app interface kernel shared system ;
-UsePrivateSystemHeaders ;
-
-UsePrivateHeaders debugger ;
+UsePrivateHeaders debugger ; 
 UsePrivateHeaders [ FDirName debugger arch ] ;
 UsePrivateHeaders [ FDirName debugger controllers ] ;
 UsePrivateHeaders [ FDirName debugger debug_info ] ;
@@ -27,6 +24,9 @@ UsePrivateHeaders [ FDirName debugger value ] ;
 UsePrivateHeaders [ FDirName debugger value value_formatters ] ;
 UsePrivateHeaders [ FDirName debugger value value_nodes ] ;
 UsePrivateHeaders [ FDirName debugger value values ] ;
+
+UsePrivateHeaders app interface kernel shared system ;
+UsePrivateSystemHeaders ;
 
 UseBuildFeatureHeaders libedit ;
 
