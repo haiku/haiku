@@ -326,8 +326,6 @@ local sources =
 # let Jam know about the dependency.
 Includes [ FGristFiles $(sources) ] :
 	<syscalls!$(TARGET_PACKAGING_ARCH)>syscall_numbers.h
-	[ BuildFeatureAttribute ncurses : headers ]
-	[ BuildFeatureAttribute libedit : headers ]
 ;
 
 SharedLibrary libdebugger.so :
