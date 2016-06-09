@@ -14,140 +14,140 @@
 class RelativePositionIO : public BPositionIO
 {
 public:
-							RelativePositionIO(BPositionIO* buffer)
-							:
-							BPositionIO(),
-							fStartOffset(0),
-							fTotalSize(0),
-							fBuffer(buffer)
-							{}
+	RelativePositionIO(BPositionIO* buffer)
+		:
+		BPositionIO(),
+		fStartOffset(0),
+		fTotalSize(0),
+		fBuffer(buffer)
+		{}
 
-	virtual					~RelativePositionIO()
-			{
-				delete fBuffer;
-			}
+	virtual	~RelativePositionIO()
+	{
+		delete fBuffer;
+	}
 
-			void			SetTotalSize(size_t size)
-			{
-				fTotalSize = size;
-			}
+	void SetTotalSize(size_t size)
+	{
+		fTotalSize = size;
+	}
 
-			size_t			TotalSize() const
-			{
-				return fTotalSize;
-			}
+	size_t TotalSize() const
+	{
+		return fTotalSize;
+	}
 
-			status_t		ResetStartOffset(off_t offset)
-			{
-				status_t ret = fBuffer->SetSize(0);
-				if (ret == B_OK)
-					fStartOffset = offset;
+	status_t ResetStartOffset(off_t offset)
+	{
+		status_t ret = fBuffer->SetSize(0);
+		if (ret == B_OK)
+			fStartOffset = offset;
 
-				return ret;
-			}
+		return ret;
+	}
 
-			status_t		EvaluatePosition(off_t position)
-			{
-				if (position < 0)
-					return B_ERROR;
+	status_t EvaluatePosition(off_t position)
+	{
+		if (position < 0)
+			return B_ERROR;
 
-				if (position < fStartOffset)
-					return B_RESOURCE_UNAVAILABLE;
+		if (position < fStartOffset)
+			return B_RESOURCE_UNAVAILABLE;
 
-				// This is an endless stream, we don't know
-				// how much data will come and when, we could
-				// block on that.
-				if (fTotalSize == 0)
-					return B_WOULD_BLOCK;
+		// This is an endless stream, we don't know
+		// how much data will come and when, we could
+		// block on that.
+		if (fTotalSize == 0)
+			return B_WOULD_BLOCK;
 
-				if (position >= fTotalSize)
-					return B_ERROR;
+		if (position >= fTotalSize)
+			return B_ERROR;
 
-				off_t size = 0;
-				fBuffer->GetSize(&size);
-				if (position >= size)
-					return B_RESOURCE_UNAVAILABLE;
+		off_t size = 0;
+		fBuffer->GetSize(&size);
+		if (position >= size)
+			return B_RESOURCE_UNAVAILABLE;
 
-				return B_OK;
-			}
+		return B_OK;
+	}
 
-			status_t		WaitForData(off_t position)
-			{
-				off_t bufferSize = 0;
-				position = _PositionToRelative(position);
+	status_t WaitForData(off_t position)
+	{
+		off_t bufferSize = 0;
+		position = _PositionToRelative(position);
 
-				status_t ret = fBuffer->GetSize(&bufferSize);
-				if (ret != B_OK)
-					return B_ERROR;
+		status_t ret = fBuffer->GetSize(&bufferSize);
+		if (ret != B_OK)
+			return B_ERROR;
 
-				while(bufferSize < position) {
-					snooze(100000);
-					fBuffer->GetSize(&bufferSize);
-				}
-				return B_OK;
-			}
+		while(bufferSize < position) {
+			snooze(100000);
+			fBuffer->GetSize(&bufferSize);
+		}
+		return B_OK;
+	}
 
-	virtual	ssize_t			ReadAt(off_t position, void* buffer,
-								size_t size)
-			{
-				return fBuffer->ReadAt(
-					_PositionToRelative(position), buffer, size);
+	virtual	ssize_t	ReadAt(off_t position, void* buffer,
+		size_t size)
+	{
+		return fBuffer->ReadAt(
+			_PositionToRelative(position), buffer, size);
 
-			}
+	}
 
-	virtual	ssize_t			WriteAt(off_t position,
-								const void* buffer, size_t size)
-			{
-				return fBuffer->WriteAt(
-					_PositionToRelative(position), buffer, size);
-			}
+	virtual	ssize_t	WriteAt(off_t position,
+		const void* buffer, size_t size)
+	{
+		return fBuffer->WriteAt(
+			_PositionToRelative(position), buffer, size);
+	}
 
-	virtual	off_t			Seek(off_t position, uint32 seekMode)
-			{
-				return fBuffer->Seek(_PositionToRelative(position), seekMode);
-			}
+	virtual	off_t Seek(off_t position, uint32 seekMode)
+	{
+		return fBuffer->Seek(_PositionToRelative(position), seekMode);
+	}
 
-	virtual off_t			Position() const
-			{
-				return _RelativeToPosition(fBuffer->Position());
-			}
+	virtual off_t Position() const
+	{
+		return _RelativeToPosition(fBuffer->Position());
+	}
 
-	virtual	status_t		SetSize(off_t size)
-			{
-				return fBuffer->SetSize(_PositionToRelative(size));
-			}
+	virtual	status_t SetSize(off_t size)
+	{
+		return fBuffer->SetSize(_PositionToRelative(size));
+	}
 
-	virtual	status_t		GetSize(off_t* size) const
-			{
-				if (fTotalSize > 0) {
-					*size = fTotalSize;
-					return B_OK;
-				}
+	virtual	status_t GetSize(off_t* size) const
+	{
+		if (fTotalSize > 0) {
+			*size = fTotalSize;
+			return B_OK;
+		}
 
-				off_t bufferSize;
-				status_t ret = fBuffer->GetSize(&bufferSize);
-				if (ret == B_OK)
-					*size = _RelativeToPosition(bufferSize);
+		off_t bufferSize;
+		status_t ret = fBuffer->GetSize(&bufferSize);
+		if (ret == B_OK)
+			*size = _RelativeToPosition(bufferSize);
 
-				return ret;
-			}
+		return ret;
+	}
 
 private:
 
-			off_t			_PositionToRelative(off_t position) const
-			{
-				return position - fStartOffset;
-			}
+	off_t _PositionToRelative(off_t position) const
+	{
+		return position - fStartOffset;
+	}
 
-			off_t			_RelativeToPosition(off_t position) const
-			{
-				return position + fStartOffset;
-			}
+	off_t _RelativeToPosition(off_t position) const
+	{
+		return position + fStartOffset;
+	}
 
-			off_t			fStartOffset;
-			off_t			fTotalSize;
+	off_t			fStartOffset;
+	off_t			fTotalSize;
 
-			BPositionIO*	fBuffer;
+	BPositionIO*	fBuffer;
 };
 
 

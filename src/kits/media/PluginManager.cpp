@@ -28,11 +28,11 @@ PluginManager gPluginManager;
 class DataIOAdapter : public BAdapterIO
 {
 public:
-			DataIOAdapter(BDataIO* dataIO)
-				:
-				BAdapterIO(B_MEDIA_SEEK_BACKWARD | B_MEDIA_MUTABLE_SIZE,
-					B_INFINITE_TIMEOUT),
-				fDataIO(dataIO)
+	DataIOAdapter(BDataIO* dataIO)
+		:
+		BAdapterIO(B_MEDIA_SEEK_BACKWARD | B_MEDIA_MUTABLE_SIZE,
+			B_INFINITE_TIMEOUT),
+		fDataIO(dataIO)
 	{
 		fDataInputAdapter = BuildInputAdapter();
 	}
@@ -138,30 +138,30 @@ public:
 
 	// BMediaIO interface
 
-	virtual void				GetFlags(int32* flags) const
+	virtual void GetFlags(int32* flags) const
 	{
 		*flags = fFlags;
 	}
 
 	// BPositionIO interface
 
-	virtual	ssize_t				ReadAt(off_t position, void* buffer,
-									size_t size)
+	virtual	ssize_t ReadAt(off_t position, void* buffer,
+		size_t size)
 	{
 		CALLED();
 
 		return fPosition->ReadAt(position, buffer, size);
 	}
 
-	virtual	ssize_t				WriteAt(off_t position, const void* buffer,
-									size_t size)
+	virtual	ssize_t WriteAt(off_t position, const void* buffer,
+		size_t size)
 	{
 		CALLED();
 
 		return fPosition->WriteAt(position, buffer, size);
 	}
 
-	virtual	off_t				Seek(off_t position, uint32 seekMode)
+	virtual	off_t Seek(off_t position, uint32 seekMode)
 	{
 		CALLED();
 
@@ -169,21 +169,21 @@ public:
 
 	}
 
-	virtual off_t				Position() const
+	virtual off_t Position() const
 	{
 		CALLED();
 
 		return fPosition->Position();
 	}
 
-	virtual	status_t			SetSize(off_t size)
+	virtual	status_t SetSize(off_t size)
 	{
 		CALLED();
 
 		return fPosition->SetSize(size);
 	}
 
-	virtual	status_t			GetSize(off_t* size) const
+	virtual	status_t GetSize(off_t* size) const
 	{
 		CALLED();
 
@@ -192,33 +192,33 @@ public:
 
 	// Utility methods
 
-	status_t					InitCheck() const
+	status_t InitCheck() const
 	{
 		return fErr;
 	}
 
 protected:
 
-	bool						IsMedia() const
+	bool IsMedia() const
 	{
 		return fMedia != NULL;
 	}
 
-	bool						IsPosition() const
+	bool IsPosition() const
 	{
 		return fPosition != NULL;
 	}
 
 private:
-	BDataIO*					fData;
-	BPositionIO*				fPosition;
-	BMediaIO*					fMedia;
-	BBufferIO*					fBufferIO;
-	DataIOAdapter*				fDataIOAdapter;
+	BDataIO*			fData;
+	BPositionIO*		fPosition;
+	BMediaIO*			fMedia;
+	BBufferIO*			fBufferIO;
+	DataIOAdapter*		fDataIOAdapter;
 
-	int32						fFlags;
+	int32				fFlags;
 
-	status_t					fErr;
+	status_t			fErr;
 };
 
 
