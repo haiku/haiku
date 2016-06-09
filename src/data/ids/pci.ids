@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.05.31
-#	Date:    2016-05-31 03:15:02
+#	Version: 2016.06.07
+#	Date:    2016-06-07 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -1525,6 +1525,7 @@
 	6649  Bonaire [FirePro W5100]
 		1002 0b0c  FirePro W4300
 		103c 0b0c  Bonaire [FirePro W4300]
+		103c 230c  FirePro W5100
 	6650  Bonaire
 	6651  Bonaire
 	6658  Bonaire XTX [Radeon R7 260X/360]
@@ -2151,7 +2152,7 @@
 	67b9  Vesuvius [Radeon R9 295X2]
 	67be  Hawaii LE
 	67c0  Ellesmere [Polaris10]
-	67df  Ellesmere [Polaris10]
+	67df  Ellesmere [Radeon RX 480]
 	67e0  Baffin [Polaris11]
 	67e1  Baffin [Polaris11]
 	67e8  Baffin [Polaris11]
@@ -10563,7 +10564,7 @@
 	1b70  GP102GL
 	1b78  GP102GL
 	1b80  GP104 [GeForce GTX 1080]
-	1b81  GP104
+	1b81  GP104 [GeForce GTX 1070]
 	1b82  GP104
 	1b83  GP104
 	1bb0  GP104GL
@@ -16758,11 +16759,21 @@
 	16c9  BCM57302 NetXtreme-C Dual-port 10Gb/25Gb Ethernet
 	16ca  BCM57304 NetXtreme-C Dual-port 10Gb/25Gb/40Gb/50Gb Ethernet
 	16cb  BCM57304 NetXtreme-C Ethernet Virtual Function
+	16ce  BCM57311 NetXtreme-C Single-port 10Gb RDMA Ethernet
+	16cf  BCM57312 NetXtreme-C Dual-port 10Gb/25Gb RDMA Ethernet
 	16d0  BCM57402 NetXtreme-E Dual-port 10Gb Ethernet
 	16d1  BCM57404 NetXtreme-E Dual-port 10Gb/25Gb Ethernet
 	16d2  BCM57406 NetXtreme-E Dual-port 10GBase-T Ethernet
 	16d3  BCM57404 NetXtreme-E Ethernet Virtual Function
+	16d6  BCM57412 NetXtreme-E Dual-port 10Gb RDMA Ethernet
+	16d7  BCM57414 NetXtreme-E Dual-port 10Gb/25Gb RDMA Ethernet
+	16d8  BCM57416 NetXtreme-E Dual-port 10GBase-T RDMA Ethernet
+	16d9  BCM57417 NetXtreme-E Dual-port 10GBase-T RDMA Ethernet
+	16dc  BCM57414 NetXtreme-E Ethernet Virtual Function
 	16dd  NetLink BCM5781 Gigabit Ethernet PCI Express
+	16df  BCM57314 NetXtreme-C Dual-port 10Gb/25Gb/40Gb/50Gb RDMA Ethernet
+	16e1  BCM57314 NetXtreme-C Ethernet Virtual Function
+	16e2  BCM57417 NetXtreme-E Dual-port 10Gb/25Gb RDMA Ethernet
 	16f3  NetXtreme BCM5727 Gigabit Ethernet PCIe
 	16f7  NetXtreme BCM5753 Gigabit Ethernet PCI Express
 	16fd  NetXtreme BCM5753M Gigabit Ethernet PCI Express
@@ -18423,6 +18434,11 @@
 	7005  XMC-7K410CC: User-Configurable Kintex-7 FPGA, 410k logic cells, conduction-cooled
 	7006  XMC-7A200: User-Configurable Artix-7 FPGA, 200k logic cells with Plug-In I/O
 	7007  XMC-7A200CC: User-Configurable Conduction-Cooled Artix-7 FPGA, with 200k logic cells
+	7011  AP440-1: 32-Channel Isolated Digital Input Module
+	7012  AP440-2: 32-Channel Isolated Digital Input Module
+	7013  AP440-3: 32-Channel Isolated Digital Input Module
+	7014  AP445: 32-Channel Isolated Digital Output Module
+	7018  AP408: 32-Channel Digital I/O Module
 16da  Advantech Co., Ltd.
 	0011  INES GPIB-PCI
 16df  PIKA Technologies Inc.
@@ -18524,7 +18540,7 @@
 		177d 0003  CN2350 [LiquidIO II] 2-port 10GbE SRIOV Virtual Function
 	9713  CN23XX [LiquidIO II] NVMe SRIOV Virtual Function
 	9800  Octeon Fusion CNF75XX Processor
-	a001  THUNDERX MRML Bridge
+	a001  ThunderX MRML(Master RML Bridge to RSL devices)
 	a002  THUNDERX PCC Bridge
 		177d a102  CN88XX PCC Bridge
 	a008  THUNDERX SMMU
@@ -18562,11 +18578,11 @@
 	a026  THUNDERX BGX (Common Ethernet Interface)
 	a027  THUNDERX IOBN
 	a029  THUNDERX NCSI (Network Controller Sideband Interface)
-	a02a  THUNDERX SGP
+	a02a  ThunderX SGPIO (Serial GPIO controller for SATA disk lights)
 	a02b  THUNDERX SMI / MDIO Controller
 	a02c  THUNDERX DAP (Debug Access Port)
 	a02d  THUNDERX PCIERC (PCIe Root Complex)
-	a02e  THUNDERX L2C-TAD
+	a02e  ThunderX L2C-TAD (Level 2 cache tag and data)
 	a02f  THUNDERX L2C-CBC
 	a030  THUNDERX L2C-MCI
 	a031  THUNDERX MIO-FUS (Fuse Access Controller)
@@ -18574,7 +18590,7 @@
 	a033  THUNDERX Random Number Generator virtual function
 	a034  THUNDERX Network Interface Controller virtual function
 	a035  THUNDERX Parallel Bus
-	a036  THUNDERX RAD virtual function
+	a036  ThunderX RAD (RAID acceleration engine) virtual function
 	a037  THUNDERX ZIP virtual function
 	a040  THUNDERX CPT Cryptographic Accelerator
 	a100  THUNDERX CN88XX 48 core SoC
@@ -19933,6 +19949,8 @@
 1d21  Allo
 1d26  Kalray Inc.
 	0040  Turbocard2 Accelerator
+	0080  Open Network Interface Card 80G
+	00c0  Turbocard3 Accelerator
 	e004  AB01/EMB01 Development Board
 1d40  Techman Electronics (Changshu) Co., Ltd.
 1d44  DPT
@@ -23035,37 +23053,37 @@
 	225c  Xeon Phi coprocessor SE10/7120 series
 	225d  Xeon Phi coprocessor 3120 series 
 	225e  Xeon Phi coprocessor 31S1
-	2280  Braswell SoC Transaction Router
-	2284  Braswell HD Audio Controller
-	2286  Braswell Serial I/O DMA
-	228a  Braswell Serial I/O HSUART Port 1
-	228c  Braswell Serial I/O HSUART Port 2
-	2292  Braswell Platform Controller Unit SMBus
-	2294  Braswell Storage Cluster Control MMC Port
-	2295  Braswell Storage Cluster Control SDIO Port
-	2296  Braswell Storage Cluster Control SD Port
-	2298  Braswell Trusted Execution Engine Interface
-	229c  Braswell Platform Controller Unit LPC
-	22a3  Braswell SATA Controller
-	22a4  Braswell SATA AHCI Controller
-	22a8  Braswell Low Power Engine Audio
-	22b0  Braswell PCI Configuration Registers
-	22b1  Braswell Integrated Graphics Controller
-	22b5  Braswell USB xHCI Host Controller
-	22b8  Braswell ISP Camera
-	22c0  Braswell Serial I/O DMA
-	22c1  Braswell Serial I/O I2C Port 1
-	22c2  Braswell Serial I/O I2C Port 2
-	22c3  Braswell Serial I/O I2C Port 3
-	22c4  Braswell Serial I/O I2C Port 4
-	22c5  Braswell Serial I/O I2C Port 5
-	22c6  Braswell Serial I/O I2C Port 6
-	22c7  Braswell Serial I/O I2C Port 7
-	22c8  Braswell PCIe Port 1
-	22ca  Braswell PCIe Port 2
-	22cc  Braswell PCIe Port 3
-	22ce  Braswell PCIe Port 4
-	22dc  Braswell P-Unit Power Management
+	2280  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series SoC Transaction Register
+	2284  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series High Definition Audio Controller
+	2286  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series LPIO1 DMA Controller
+	228a  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series LPIO1 HSUART Controller #1
+	228c  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series LPIO1 HSUART Controller #2
+	2292  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx SMBus Controller
+	2294  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series MMC Controller
+	2295  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series SDIO Controller
+	2296  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series SD Controller
+	2298  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series Trusted Execution Engine
+	229c  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series PCU
+	22a3  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series SATA Controller
+	22a4  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series SATA AHCI Controller
+	22a8  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series Low Power Engine Audio
+	22b0  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series PCI Configuration Registers
+	22b1  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Integrated Graphics Controller
+	22b5  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series USB xHCI Controller
+	22b8  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series Imaging Unit
+	22c0  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series LPIO2 DMA Controller
+	22c1  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series LPIO2 I2C Controller #1
+	22c2  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series LPIO2 I2C Controller #2
+	22c3  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series LPIO2 I2C Controller #3
+	22c4  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series LPIO2 I2C Controller #4
+	22c5  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series LPIO2 I2C Controller #5
+	22c6  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series LPIO2 I2C Controller #6
+	22c7  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series LPIO2 I2C Controller #7
+	22c8  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series PCI Express Port #1
+	22ca  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series PCI Express Port #2
+	22cc  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series PCI Express Port #3
+	22ce  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series PCI Express Port #4
+	22dc  Atom/Celeron/Pentium Processor x5-E8000/J3xxx/N3xxx Series Power Management Controller
 	2310  DH89xxCC LPC Controller
 	2323  DH89xxCC 4 Port SATA AHCI Controller
 	2330  DH89xxCC SMBus Controller
@@ -25857,6 +25875,7 @@
 	37d2  Ethernet Connection X722 for 10GBASE-T
 	37d3  Ethernet Connection X722 for 10GbE SFP+
 	37d4  Ethernet Connection X722 for 10GbE QSFP+
+	37d9  X722 Hyper-V Virtual Function
 	3a00  82801JD/DO (ICH10 Family) 4-port SATA IDE Controller
 	3a02  82801JD/DO (ICH10 Family) SATA AHCI Controller
 	3a05  82801JD/DO (ICH10 Family) SATA RAID Controller
