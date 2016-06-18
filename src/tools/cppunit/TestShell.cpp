@@ -22,6 +22,10 @@
 #include <TestShell.h>
 #include <TestListener.h>
 
+#ifndef NO_ELF_SYMBOL_PATCHING
+#	include <ElfSymbolPatcher.h>
+#endif
+
 using std::cout;
 using std::endl;
 using std::set;

@@ -17,9 +17,7 @@ class BDirectory;
 class BLocker;
 class BPath;
 
-#ifndef NO_ELF_SYMBOL_PATCHING
-#include <tools/elfsymbolpatcher/ElfSymbolPatcher.h>
-#endif
+class ElfSymbolPatchGroup;
 
 // Defines SuiteFunction to be a pointer to a function that
 // takes no arguments and returns a pointer to a CppUnit::Test

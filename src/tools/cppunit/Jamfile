@@ -11,7 +11,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) cppunit ] ;
 {
 	DEFINES += BUILDING_CPPUNIT ;
 
-	if ( $(OS) != BEOS && $(OS) != HAIKU ) || $(OSPLAT) = PPC {
+	if $(OS) != BEOS || $(OSPLAT) = PPC {
 		DEFINES += NO_ELF_SYMBOL_PATCHING ;
 	}
 }
@@ -52,8 +52,8 @@ SharedLibrary libcppunit.so :
 	: be [ TargetLibstdc++ ]
 ;
 
-if  ( $(OS) = BEOS || $(OS) = HAIKU ) && $(OSPLAT) != PPC {
-	LinkAgainst libcppunit.so : libelfsymbolpatcher.a debug ;
+if  $(OS) = BEOS && $(OSPLAT) != PPC {
+	LinkAgainst libcppunit.so : libelfsymbolpatcher.a ;
 }
 
 # To run the tests we need the cppunit library.
