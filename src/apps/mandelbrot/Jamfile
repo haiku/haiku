@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src apps mandelbrot ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
+UsePrivateHeaders interface shared system ;
+
 Application Mandelbrot :
 	Mandelbrot.cpp
 	FractalEngine.cpp

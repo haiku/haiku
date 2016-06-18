@@ -7,6 +7,7 @@
  */
 
 
+#include <AboutWindow.h>
 #include <Application.h>
 #include <Bitmap.h>
 #include <Catalog.h>
@@ -307,6 +308,7 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 	BMenu* iterMenu;
 	BLayoutBuilder::Menu<>(menuBar)
 		.AddMenu(B_TRANSLATE("File"))
+			.AddItem(B_TRANSLATE("About"), B_ABOUT_REQUESTED)
 			.AddItem(B_TRANSLATE("Quit"), B_QUIT_REQUESTED, 'Q')
 		.End()
 		.AddMenu(B_TRANSLATE("Set"))
@@ -409,6 +411,19 @@ MandelbrotWindow::MessageReceived(BMessage* msg)
 	HANDLE_ITER(MSG_ITER_8192, 8192)
 	HANDLE_ITER(MSG_ITER_12288, 12288)
 	HANDLE_ITER(MSG_ITER_16384, 16384)
+
+	case B_ABOUT_REQUESTED: {
+		BAboutWindow* wind = new BAboutWindow("Mandelbrot", "application/x-vnd.Haiku-Mandelbrot");
+		const char* authors[] = {
+			"Augustin Cavalier <waddlesplash>",
+			B_TRANSLATE("kerwizzy (original FractalEngine author)"),
+			NULL
+		};
+		wind->AddCopyright(2016, "Haiku, Inc.");
+		wind->AddAuthors(authors);
+		wind->Show();
+		break;
+	}
 
 	default:
 		BWindow::MessageReceived(msg);
