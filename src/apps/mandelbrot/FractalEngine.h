@@ -43,11 +43,9 @@ private:
 	const uint8* fColorset;
 
 	int32 (FractalEngine::*fDoSet)(double real, double imaginary);
-	void (FractalEngine::*fRenderPixel)(uint32 x, uint32 y, double real, double imaginary);
 
 	void Render(double locationX, double locationY, double size);
-	void RenderPixelDefault(uint32 x, uint32 y, double real, double imaginary);
-	void RenderPixelSmooth(uint32 x, uint32 y, double real, double imaginary);
+	void RenderPixel(uint32 x, uint32 y, double real, double imaginary);
 	int32 DoSet_Mandelbrot(double real, double imaginary);
 	int32 DoSet_BurningShip(double real, double imaginary);
 	int32 DoSet_Tricorn(double real, double imaginary);

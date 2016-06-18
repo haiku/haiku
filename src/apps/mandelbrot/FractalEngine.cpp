@@ -27,7 +27,6 @@ FractalEngine::FractalEngine(BHandler* parent, BLooper* looper)
 	fRenderBufferLen(0),
 	fColorset(Colorset_Royal)
 {
-	fRenderPixel = &FractalEngine::RenderPixelDefault;
 	fDoSet = &FractalEngine::DoSet_Mandelbrot;
 }
 
@@ -108,12 +107,7 @@ int32 gIterations = 1024;
 double gPower = 0;
 
 
-#define RenderBuffer_SetPixel(x, y, r, g, b) \
-	uint32 _BUF_BASE = fWidth * y * 3 + x * 3; \
-	fRenderBuffer[_BUF_BASE + 0] = r; \
-	fRenderBuffer[_BUF_BASE + 1] = g; \
-	fRenderBuffer[_BUF_BASE + 2] = b
-void FractalEngine::RenderPixelDefault(uint32 x, uint32 y, double real,
+void FractalEngine::RenderPixel(uint32 x, uint32 y, double real,
 	double imaginary)
 {
 	int32 iterToEscape = (this->*fDoSet)(real, imaginary);
@@ -125,48 +119,11 @@ void FractalEngine::RenderPixelDefault(uint32 x, uint32 y, double real,
 		loc = 998 - (iterToEscape % 999);
 	}
 
-	RenderBuffer_SetPixel(x, y, fColorset[loc * 3 + 0], fColorset[loc * 3 + 1],
-		fColorset[loc * 3 + 2]);
+	uint32 offsetBase = fWidth * y * 3 + x * 3;
+	fRenderBuffer[offsetBase + 0] = fColorset[loc * 3 + 0];
+	fRenderBuffer[offsetBase + 1] = fColorset[loc * 3 + 1];
+	fRenderBuffer[offsetBase + 2] = fColorset[loc * 3 + 2];
 }
-
-
-void FractalEngine::RenderPixelSmooth(uint32 x, uint32 y, double real,
-	double imaginary)
-{
-	int32 outColor = (this->*fDoSet)(real, imaginary);
-	int8 mapperDiff_r = 0;
-	int8 mapperDiff_g = 0;
-	int8 mapperDiff_b = 0;
-
-	int16 mapperLoc = 0;
-
-	double dist = sqrt(zReal_end * zReal_end + zImaginary_end * zImaginary_end);
-
-	double ratio = (1 - (log(log(dist))) / log(2));
-	if (sqrt(real * real + imaginary * imaginary) >	8) {
-		 // Make the colors >8 be flat.
-		ratio = -1.0821509904820257;
-		outColor = 1;
-	}
-
-	if (outColor == -1) {
-		RenderBuffer_SetPixel(x, y, fColorset[999 * 3], fColorset[999 * 3 + 1],
-			fColorset[999 * 3 + 2]);
-		return;
-	}
-	outColor = 998 - (outColor % 999);
-
-	mapperLoc = outColor * 3;
-
-	mapperDiff_r = fColorset[mapperLoc + 0] - fColorset[mapperLoc + 0 + 3];
-	mapperDiff_g = fColorset[mapperLoc + 1] - fColorset[mapperLoc + 1 + 3];
-	mapperDiff_b = fColorset[mapperLoc + 2] - fColorset[mapperLoc + 2 + 3];
-
-	RenderBuffer_SetPixel(x, y, mapperDiff_r * ratio + fColorset[mapperLoc + 0],
-		mapperDiff_g * ratio + fColorset[mapperLoc + 1],
-		mapperDiff_b * ratio + fColorset[mapperLoc + 2]);
-}
-#undef RenderBuffer_SetPixel
 
 
 int32 FractalEngine::DoSet_Mandelbrot(double real, double imaginary)
@@ -390,8 +347,7 @@ void FractalEngine::Render(double locationX, double locationY, double size)
 
 	for (uint32 x = 0; x < fWidth; x++) {
 		for (uint32 y = 0; y < fHeight; y++) {
-			(this->*fRenderPixel)(x, y,
-				(x * size + locationX) - (halfWidth * size),
+			RenderPixel(x, y, (x * size + locationX) - (halfWidth * size),
 				(y * -size + locationY) - (halfHeight * -size));
 		}
 	}
