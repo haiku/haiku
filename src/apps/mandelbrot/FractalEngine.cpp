@@ -12,6 +12,7 @@
 #include <math.h>
 
 #include <Bitmap.h>
+#include <String.h>
 
 #include "Colorsets.h"
 
@@ -29,6 +30,20 @@ FractalEngine::FractalEngine(BHandler* parent, BLooper* looper)
 	fColorset(Colorset_Royal)
 {
 	fDoSet = &FractalEngine::DoSet_Mandelbrot;
+
+	fRenderSem = create_sem(0, "RenderSem");
+	fRenderFinishedSem = create_sem(0, "RenderFinishedSem");
+	system_info info;
+	get_system_info(&info);
+	fThreadCount = info.cpu_count;
+	if (fThreadCount >= 4)
+		fThreadCount = 4;
+	for (uint8 i = 0; i < fThreadCount; i++) {
+		fRenderThreads[i] = spawn_thread(&FractalEngine::RenderThread,
+			BString().SetToFormat("RenderThread%d", i).String(),
+			B_NORMAL_PRIORITY, this);
+		resume_thread(fRenderThreads[i]);
+	}
 }
 
 
@@ -99,11 +114,52 @@ void FractalEngine::MessageReceived(BMessage* msg)
 }
 
 
-// Magic numbers & other general constants
-const double gJuliaA = 0;
-const double gJuliaB = 1;
+void FractalEngine::Render(double locationX, double locationY, double size)
+{
+	fLocationX = locationX;
+	fLocationY = locationY;
+	fSize = size;
+	for (uint8 i = 0; i < fThreadCount; i++)
+		release_sem(fRenderSem);
+	for (uint8 i = 0; i < fThreadCount; i++)
+		acquire_sem(fRenderFinishedSem);
 
-const uint8 gEscapeHorizon = 4;
+	fBitmapStandby->ImportBits(fRenderBuffer, fRenderBufferLen, fWidth * 3,
+		0, B_RGB24_BIG);
+}
+
+
+status_t FractalEngine::RenderThread(void* data)
+{
+	FractalEngine* engine = static_cast<FractalEngine*>(data);
+	thread_id self = find_thread(NULL);
+	uint8 threadNum = 0;
+	for (uint8 i = 0; i < engine->fThreadCount; i++) {
+		if (engine->fRenderThreads[i] == self) {
+			threadNum = i;
+			break;
+		}
+	}
+
+	while (true) {
+		acquire_sem(engine->fRenderSem);
+
+		uint16 halfWidth = engine->fWidth / 2;
+		uint16 halfHeight = engine->fHeight / 2;
+		const uint32 startY = (engine->fHeight / engine->fThreadCount) * threadNum,
+			endY = (engine->fHeight / engine->fThreadCount) * (threadNum + 1);
+		for (uint32 x = 0; x < engine->fWidth; x++) {
+			for (uint32 y = startY; y < endY; y++) {
+				engine->RenderPixel(x, y,
+					(x * engine->fSize + engine->fLocationX) - (halfWidth * engine->fSize),
+					(y * -(engine->fSize) + engine->fLocationY) - (halfHeight * -(engine->fSize)));
+			}
+		}
+
+		release_sem(engine->fRenderFinishedSem);
+	}
+	return B_OK;
+}
 
 
 void FractalEngine::RenderPixel(uint32 x, uint32 y, double real,
@@ -124,6 +180,13 @@ void FractalEngine::RenderPixel(uint32 x, uint32 y, double real,
 	fRenderBuffer[offsetBase + 1] = fColorset[loc + 1];
 	fRenderBuffer[offsetBase + 2] = fColorset[loc + 2];
 }
+
+
+// Magic numbers & other general constants
+const double gJuliaA = 0;
+const double gJuliaB = 1;
+
+const uint8 gEscapeHorizon = 4;
 
 
 int32 FractalEngine::DoSet_Mandelbrot(double real, double imaginary)
@@ -298,21 +361,4 @@ int32 FractalEngine::DoSet_Multibrot(double real, double imaginary)
 		}
 	}
 	return -1;
-}
-
-
-void FractalEngine::Render(double locationX, double locationY, double size)
-{
-	uint16 halfWidth = fWidth / 2;
-	uint16 halfHeight = fHeight / 2;
-
-	for (uint32 x = 0; x < fWidth; x++) {
-		for (uint32 y = 0; y < fHeight; y++) {
-			RenderPixel(x, y, (x * size + locationX) - (halfWidth * size),
-				(y * -size + locationY) - (halfHeight * -size));
-		}
-	}
-
-	fBitmapStandby->ImportBits(fRenderBuffer, fRenderBufferLen, fWidth * 3,
-		0, B_RGB24_BIG);
 }
