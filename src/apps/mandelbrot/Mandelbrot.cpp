@@ -42,6 +42,7 @@ public:
 	virtual void MessageReceived(BMessage* msg);
 	virtual void Draw(BRect updateRect);
 
+			void ResetPosition();
 			void RedrawFractal();
 			FractalEngine* fFractalEngine;
 
@@ -87,6 +88,14 @@ FractalView::~FractalView()
 }
 
 
+void FractalView::ResetPosition()
+{
+	fLocationX = 0;
+	fLocationY = 0;
+	fSize = 0.005;
+}
+
+
 void FractalView::AttachedToWindow()
 {
 	fFractalEngine = new FractalEngine(this, Window());
@@ -118,6 +127,7 @@ void FractalView::Pulse()
 	fSizeChanged = false;
 	RedrawFractal();
 }
+
 
 BRect FractalView::GetDragFrame()
 {
@@ -336,6 +346,7 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 		BMessage msg(FractalEngine::MSG_CHANGE_SET); \
 		msg.AddUInt8("set", id); \
 		fFractalView->fFractalEngine->PostMessage(&msg); \
+		fFractalView->ResetPosition(); \
 		fFractalView->RedrawFractal(); \
 		break; \
 	}
