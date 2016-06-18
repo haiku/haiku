@@ -12,3 +12,6 @@ conf.sh
 # compiled/optimized Python
 *.pyc
 *.pyo
+
+# Mac OS X directory attributes
+.DS_Store
