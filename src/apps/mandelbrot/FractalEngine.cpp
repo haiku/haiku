@@ -134,7 +134,7 @@ int32 FractalEngine::DoSet_Mandelbrot(double real, double imaginary)
 	for (int32 i = 0; i < fIterations; i++) {
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
-		double nzReal = (zRealSq + (-1 * (zImaginarySq)));
+		double nzReal = (zRealSq + (-1 * zImaginarySq));
 
 		zImaginary = 2 * (zReal * zImaginary);
 		zReal = nzReal;
@@ -143,7 +143,7 @@ int32 FractalEngine::DoSet_Mandelbrot(double real, double imaginary)
 		zImaginary += imaginary;
 
 		// If it is outside the 2 unit circle...
-		if ((zRealSq) + (zImaginarySq) > gEscapeHorizon) {
+		if ((zRealSq + zImaginarySq) > gEscapeHorizon) {
 			return i; // stop it from running longer
 		}
 	}
@@ -165,7 +165,7 @@ int32 FractalEngine::DoSet_BurningShip(double real, double imaginary)
 
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
-		double nzReal = (zRealSq + (-1 * (zImaginarySq)));
+		double nzReal = (zRealSq + (-1 * zImaginarySq));
 
 		zImaginary = 2 * (zReal * zImaginary);
 		zReal = nzReal;
@@ -174,7 +174,7 @@ int32 FractalEngine::DoSet_BurningShip(double real, double imaginary)
 		zImaginary += imaginary;
 
 		// If it is outside the 2 unit circle...
-		if ((zRealSq) + (zImaginarySq) > gEscapeHorizon) {
+		if ((zRealSq + zImaginarySq) > gEscapeHorizon) {
 			return i; // stop it from running longer
 		}
 	}
@@ -196,7 +196,7 @@ int32 FractalEngine::DoSet_Tricorn(double real, double imaginary)
 
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
-		double nzReal = (zRealSq + (-1 * (zImaginarySq)));
+		double nzReal = (zRealSq + (-1 * zImaginarySq));
 
 		zImaginary = 2 * (zReal * zImaginary);
 		zReal = nzReal;
@@ -205,7 +205,7 @@ int32 FractalEngine::DoSet_Tricorn(double real, double imaginary)
 		zImaginary += imaginary;
 
 		// If it is outside the 2 unit circle...
-		if ((zRealSq) + (zImaginarySq) > gEscapeHorizon) {
+		if ((zRealSq + zImaginarySq) > gEscapeHorizon) {
 			return i; // stop it from running longer
 		}
 	}
@@ -233,7 +233,7 @@ int32 FractalEngine::DoSet_Julia(double real, double imaginary)
 		zImaginary += muIm;
 
 		// If it is outside the 2 unit circle...
-		if ((zRealSq) + (zImaginarySq) > gEscapeHorizon) {
+		if ((zRealSq + zImaginarySq) > gEscapeHorizon) {
 			return i; // stop it from running longer
 		}
 	}
@@ -253,7 +253,7 @@ int32 FractalEngine::DoSet_OrbitTrap(double real, double imaginary)
 	for (int32 i = 0; i < fIterations; i++) {
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
-		double nzReal = (zRealSq + (-1 * (zImaginarySq)));
+		double nzReal = (zRealSq + (-1 * zImaginarySq));
 
 		zImaginary = 2 * (zReal * zImaginary);
 		zReal = nzReal;
@@ -261,8 +261,8 @@ int32 FractalEngine::DoSet_OrbitTrap(double real, double imaginary)
 		zReal += real;
 		zImaginary += imaginary;
 
-		distance = sqrt((zRealSq) + (zImaginarySq));
-		lineDist = fabs((zReal) + (zImaginary));
+		distance = sqrt(zRealSq + zImaginarySq);
+		lineDist = fabs(zReal + zImaginary);
 
 		// If it is closer than ever before...
 		if (lineDist < closest)
@@ -284,16 +284,16 @@ int32 FractalEngine::DoSet_Multibrot(double real, double imaginary)
 	for (int32 i = 0; i < fIterations; i++) {
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
-		double nzReal = (zRealSq * zReal - 3 * zReal * (zImaginarySq));
+		double nzReal = (zRealSq * zReal - 3 * zReal * zImaginarySq);
 
-		zImaginary = 3 * ((zRealSq)*zImaginary) - (zImaginarySq * zImaginary);
+		zImaginary = 3 * (zRealSq * zImaginary) - (zImaginarySq * zImaginary);
 
 		zReal = nzReal;
 		zReal += real;
 		zImaginary += imaginary;
 
 		// If it is outside the 2 unit circle...
-		if ((zRealSq) + (zImaginarySq) > gEscapeHorizon) {
+		if ((zRealSq + zImaginarySq) > gEscapeHorizon) {
 			return i; // stop it from running longer
 		}
 	}
