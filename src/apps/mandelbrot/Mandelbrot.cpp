@@ -198,6 +198,21 @@ void FractalView::MouseUp(BPoint where)
 void FractalView::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
+	case B_MOUSE_WHEEL_CHANGED: {
+		float change = msg->FindFloat("be:wheel_delta_y");
+		BPoint where;
+		GetMouse(&where, NULL);
+		BRect frame = Frame();
+		fLocationX = ((where.x - frame.Width() / 2) * fSize + fLocationX);
+		fLocationY = ((where.y - frame.Height() / 2) * -fSize + fLocationY);
+		if (change < 0)
+			fSize /= 1.5;
+		else
+			fSize *= 1.5;
+		RedrawFractal();
+		break;
+	}
+
 	case FractalEngine::MSG_RENDER_COMPLETE:
 		if (fOwnBitmap) {
 			fOwnBitmap = false;
