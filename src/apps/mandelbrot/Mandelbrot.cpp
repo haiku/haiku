@@ -15,6 +15,8 @@
 #include <View.h>
 #include <Window.h>
 
+#include <algorithm>
+
 #include "FractalEngine.h"
 
 #undef B_TRANSLATION_CONTEXT
@@ -32,17 +34,30 @@ public:
 	virtual void AttachedToWindow();
 	virtual void FrameResized(float, float);
 	virtual void Pulse();
+
 	virtual void MouseDown(BPoint where);
+	virtual void MouseMoved(BPoint where, uint32 mode, const BMessage*);
+	virtual void MouseUp(BPoint where);
+
 	virtual void MessageReceived(BMessage* msg);
 	virtual void Draw(BRect updateRect);
 
-	FractalEngine* fFractalEngine;
-	void RedrawFractal();
+			void RedrawFractal();
+			FractalEngine* fFractalEngine;
 
 private:
+			BRect GetDragFrame();
+
 	bool fSizeChanged;
 	bool fOwnBitmap;
+
+	BPoint fSelectStart;
+	BPoint fSelectEnd;
+	bool fSelecting;
+	uint32 fMouseButtons;
+
 	BBitmap* fDisplayBitmap;
+
 	double fLocationX;
 	double fLocationY;
 	double fSize;
@@ -55,11 +70,13 @@ FractalView::FractalView()
 	fFractalEngine(NULL),
 	fSizeChanged(false),
 	fOwnBitmap(false),
+	fSelecting(false),
 	fDisplayBitmap(NULL),
 	fLocationX(0),
 	fLocationY(0),
 	fSize(0.005)
 {
+	SetHighColor(make_color(255, 255, 255, 255));
 }
 
 
@@ -102,19 +119,68 @@ void FractalView::Pulse()
 	RedrawFractal();
 }
 
+BRect FractalView::GetDragFrame()
+{
+	BRect dragZone = BRect(std::min(fSelectStart.x, fSelectEnd.x),
+		std::min(fSelectStart.y, fSelectEnd.y),
+		std::max(fSelectStart.x, fSelectEnd.x),
+		std::max(fSelectStart.y, fSelectEnd.y)),
+		frame = Frame();
+	float width = dragZone.Width(),
+		height = width * (frame.Height() / frame.Width());
+
+	float x1 = fSelectStart.x, y1 = fSelectStart.y,	x2, y2;
+	if (fSelectStart.x < fSelectEnd.x)
+		x2 = x1 + width;
+	else
+		x2 = x1 - width;
+	if (fSelectStart.y < fSelectEnd.y)
+		y2 = y1 + height;
+	else
+		y2 = y1 - height;
+	return BRect(x1, y1, x2, y2);
+}
+
 
 void FractalView::MouseDown(BPoint where)
 {
-	uint32 buttons;
-	GetMouse(&where, &buttons);
+	fSelecting = true;
+	fSelectStart = where;
+	GetMouse(NULL, &fMouseButtons);
+}
 
+
+void FractalView::MouseMoved(BPoint where, uint32 mode, const BMessage*)
+{
+	if (fSelecting) {
+		fSelectEnd = where;
+		Invalidate();
+	}
+}
+
+
+void FractalView::MouseUp(BPoint where)
+{
 	BRect frame = Frame();
-	fLocationX = ((where.x - frame.Width() / 2) * fSize + fLocationX);
-	fLocationY = ((where.y - frame.Height() / 2) * -fSize + fLocationY);
-	if (buttons & B_PRIMARY_MOUSE_BUTTON)
-		fSize /= 2;
-	else
-		fSize *= 2;
+	fSelecting = false;
+	if (fabs(fSelectStart.x - where.x) > 4) {
+		fSelectEnd = where;
+		BRect dragFrame = GetDragFrame();
+		BPoint lt = dragFrame.LeftTop();
+		float centerX = lt.x + dragFrame.Width() / 2,
+			centerY = lt.y + dragFrame.Height() / 2;
+		fLocationX = ((centerX - frame.Width() / 2) * fSize + fLocationX);
+		fLocationY = ((centerY - frame.Height() / 2) * -fSize + fLocationY);
+
+		fSize = (dragFrame.Width() * fSize) / frame.Width();
+	} else {
+		fLocationX = ((where.x - frame.Width() / 2) * fSize + fLocationX);
+		fLocationY = ((where.y - frame.Height() / 2) * -fSize + fLocationY);
+		if (fMouseButtons & B_PRIMARY_MOUSE_BUTTON)
+			fSize /= 2;
+		else
+			fSize *= 2;
+	}
 	RedrawFractal();
 }
 
@@ -152,6 +218,10 @@ void FractalView::RedrawFractal()
 void FractalView::Draw(BRect updateRect)
 {
 	DrawBitmap(fDisplayBitmap, updateRect, updateRect);
+
+	if (fSelecting) {
+		StrokeRect(GetDragFrame());
+	}
 }
 
 
