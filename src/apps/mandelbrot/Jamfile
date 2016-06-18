@@ -2,8 +2,6 @@ SubDir HAIKU_TOP src apps mandelbrot ;
 
 AddSubDirSupportedPlatforms libbe_test ;
 
-SubDirC++Flags -Wno-error ;
-
 Application Mandelbrot :
 	Mandelbrot.cpp
 	FractalEngine.cpp

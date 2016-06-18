@@ -97,14 +97,14 @@ void FractalEngine::MessageReceived(BMessage* msg)
 double zReal_end = 0;
 double zImaginary_end = 0;
 
-double juliaC_a = 0;
-double juliaC_b = 1;
+const double juliaC_a = 0;
+const double juliaC_b = 1;
 
-uint8 gEscapeHorizon = 4; // set to 64 when doing smooth colors
+const uint8 gEscapeHorizon = 4;
 
-int32 gIterations = 1024;
+const int32 gIterations = 1024;
 
-double gPower = 0;
+const double gPower = 0;
 
 
 void FractalEngine::RenderPixel(uint32 x, uint32 y, double real,
@@ -264,6 +264,7 @@ int32 FractalEngine::DoSet_Julia(double real, double imaginary)
 	return -1;
 }
 
+
 int32 FractalEngine::DoSet_OrbitTrap(double real, double imaginary)
 {
 	double zReal = 0;
@@ -297,11 +298,12 @@ int32 FractalEngine::DoSet_OrbitTrap(double real, double imaginary)
 		if (distance > escapeHorizon) {
 			zReal_end = zReal;
 			zImaginary_end = zImaginary;
-			return floor(4 * log(4 / closest));
+			return static_cast<int32>(floor(4 * log(4 / closest)));
 		}
 	}
-	return floor(4 * log(4 / closest));
+	return static_cast<int32>(floor(4 * log(4 / closest)));
 }
+
 
 int32 FractalEngine::DoSet_Multibrot(double real, double imaginary)
 {
