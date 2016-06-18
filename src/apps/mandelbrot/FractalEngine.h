@@ -35,8 +35,10 @@ private:
 	BMessenger fMessenger;
 	BBitmap* fBitmapStandby;
 	BBitmap* fBitmapDisplay;
+
 	uint16 fWidth;
 	uint16 fHeight;
+
 	uint8* fRenderBuffer;
 	uint32 fRenderBufferLen;
 

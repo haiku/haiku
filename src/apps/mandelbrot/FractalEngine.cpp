@@ -94,17 +94,12 @@ void FractalEngine::MessageReceived(BMessage* msg)
 }
 
 
-double zReal_end = 0;
-double zImaginary_end = 0;
-
-const double juliaC_a = 0;
-const double juliaC_b = 1;
+// Magic numbers & other general constants
+const double gJuliaA = 0;
+const double gJuliaB = 1;
 
 const uint8 gEscapeHorizon = 4;
-
 const int32 gIterations = 1024;
-
-const double gPower = 0;
 
 
 void FractalEngine::RenderPixel(uint32 x, uint32 y, double real,
@@ -120,9 +115,10 @@ void FractalEngine::RenderPixel(uint32 x, uint32 y, double real,
 	}
 
 	uint32 offsetBase = fWidth * y * 3 + x * 3;
-	fRenderBuffer[offsetBase + 0] = fColorset[loc * 3 + 0];
-	fRenderBuffer[offsetBase + 1] = fColorset[loc * 3 + 1];
-	fRenderBuffer[offsetBase + 2] = fColorset[loc * 3 + 2];
+	loc *= 3;
+	fRenderBuffer[offsetBase + 0] = fColorset[loc + 0];
+	fRenderBuffer[offsetBase + 1] = fColorset[loc + 1];
+	fRenderBuffer[offsetBase + 2] = fColorset[loc + 2];
 }
 
 
@@ -131,10 +127,7 @@ int32 FractalEngine::DoSet_Mandelbrot(double real, double imaginary)
 	double zReal = 0;
 	double zImaginary = 0;
 
-	int32 iterations = gIterations;
-	uint8 escapeHorizon = gEscapeHorizon;
-
-	for (int32 i = 0; i < iterations; i++) {
+	for (int32 i = 0; i < gIterations; i++) {
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
 		double nzReal = (zRealSq + (-1 * (zImaginarySq)));
@@ -146,10 +139,7 @@ int32 FractalEngine::DoSet_Mandelbrot(double real, double imaginary)
 		zImaginary += imaginary;
 
 		// If it is outside the 2 unit circle...
-		if ((zRealSq) + (zImaginarySq) > escapeHorizon) {
-			zReal_end = zReal;
-			zImaginary_end = zImaginary;
-
+		if ((zRealSq) + (zImaginarySq) > gEscapeHorizon) {
 			return i; // stop it from running longer
 		}
 	}
@@ -165,10 +155,7 @@ int32 FractalEngine::DoSet_BurningShip(double real, double imaginary)
 	// It looks "upside down" otherwise.
 	imaginary = -imaginary;
 
-	int32 iterations = gIterations;
-	uint8 escapeHorizon = gEscapeHorizon;
-
-	for (int32 i = 0; i < iterations; i++) {
+	for (int32 i = 0; i < gIterations; i++) {
 		zReal = fabs(zReal);
 		zImaginary = fabs(zImaginary);
 
@@ -183,10 +170,7 @@ int32 FractalEngine::DoSet_BurningShip(double real, double imaginary)
 		zImaginary += imaginary;
 
 		// If it is outside the 2 unit circle...
-		if ((zRealSq) + (zImaginarySq) > escapeHorizon) {
-			zReal_end = zReal;
-			zImaginary_end = zImaginary;
-
+		if ((zRealSq) + (zImaginarySq) > gEscapeHorizon) {
 			return i; // stop it from running longer
 		}
 	}
@@ -201,10 +185,7 @@ int32 FractalEngine::DoSet_Tricorn(double real, double imaginary)
 
 	real = -real;
 
-	int32 iterations = gIterations;
-	uint8 escapeHorizon = gEscapeHorizon;
-
-	for (int32 i = 0; i < iterations; i++) {
+	for (int32 i = 0; i < gIterations; i++) {
 		double znRe = zImaginary * -1;
 		zImaginary = zReal * -1;
 		zReal = znRe; // Swap the real and complex parts each time.
@@ -220,10 +201,7 @@ int32 FractalEngine::DoSet_Tricorn(double real, double imaginary)
 		zImaginary += imaginary;
 
 		// If it is outside the 2 unit circle...
-		if ((zRealSq) + (zImaginarySq) > escapeHorizon) {
-			zReal_end = zReal;
-			zImaginary_end = zImaginary;
-
+		if ((zRealSq) + (zImaginarySq) > gEscapeHorizon) {
 			return i; // stop it from running longer
 		}
 	}
@@ -236,13 +214,10 @@ int32 FractalEngine::DoSet_Julia(double real, double imaginary)
 	double zReal = real;
 	double zImaginary = imaginary;
 
-	double muRe = juliaC_a;
-	double muIm = juliaC_b;
+	double muRe = gJuliaA;
+	double muIm = gJuliaB;
 
-	int32 iterations = gIterations;
-	uint8 escapeHorizon = gEscapeHorizon;
-
-	for (int32 i = 0; i < iterations; i++) {
+	for (int32 i = 0; i < gIterations; i++) {
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
 		double nzReal = (zRealSq + (-1 * (zImaginarySq)));
@@ -254,10 +229,7 @@ int32 FractalEngine::DoSet_Julia(double real, double imaginary)
 		zImaginary += muIm;
 
 		// If it is outside the 2 unit circle...
-		if ((zRealSq) + (zImaginarySq) > escapeHorizon) {
-			zReal_end = zReal;
-			zImaginary_end = zImaginary;
-
+		if ((zRealSq) + (zImaginarySq) > gEscapeHorizon) {
 			return i; // stop it from running longer
 		}
 	}
@@ -274,10 +246,7 @@ int32 FractalEngine::DoSet_OrbitTrap(double real, double imaginary)
 	double distance = 0;
 	double lineDist = 0;
 
-	int32 iterations = gIterations;
-	uint8 escapeHorizon = gEscapeHorizon;
-
-	for (int32 i = 0; i < iterations; i++) {
+	for (int32 i = 0; i < gIterations; i++) {
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
 		double nzReal = (zRealSq + (-1 * (zImaginarySq)));
@@ -295,9 +264,7 @@ int32 FractalEngine::DoSet_OrbitTrap(double real, double imaginary)
 		if (lineDist < closest)
 			closest = lineDist;
 
-		if (distance > escapeHorizon) {
-			zReal_end = zReal;
-			zImaginary_end = zImaginary;
+		if (distance > gEscapeHorizon) {
 			return static_cast<int32>(floor(4 * log(4 / closest)));
 		}
 	}
@@ -310,10 +277,7 @@ int32 FractalEngine::DoSet_Multibrot(double real, double imaginary)
 	double zReal = 0;
 	double zImaginary = 0;
 
-	int32 iterations = gIterations;
-	uint8 escapeHorizon = gEscapeHorizon;
-
-	for (int32 i = 0; i < iterations; i++) {
+	for (int32 i = 0; i < gIterations; i++) {
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
 		double nzReal = (zRealSq * zReal - 3 * zReal * (zImaginarySq));
@@ -325,10 +289,7 @@ int32 FractalEngine::DoSet_Multibrot(double real, double imaginary)
 		zImaginary += imaginary;
 
 		// If it is outside the 2 unit circle...
-		if ((zRealSq) + (zImaginarySq) > escapeHorizon) {
-			zReal_end = zReal;
-			zImaginary_end = zImaginary;
-
+		if ((zRealSq) + (zImaginarySq) > gEscapeHorizon) {
 			return i; // stop it from running longer
 		}
 	}
