@@ -178,6 +178,14 @@ public:
 		MSG_LIGHTNING_PALETTE,
 		MSG_SPRING_PALETTE,
 		MSG_HIGHCONTRAST_PALETTE,
+
+		MSG_ITER_128,
+		MSG_ITER_512,
+		MSG_ITER_1024,
+		MSG_ITER_4096,
+		MSG_ITER_8192,
+		MSG_ITER_12288,
+		MSG_ITER_16384
 	};
 				MandelbrotWindow(BRect frame);
 				~MandelbrotWindow() {}
@@ -201,6 +209,7 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 	BMenuBar* menuBar = new BMenuBar("MenuBar");
 	BMenu* setMenu;
 	BMenu* paletteMenu;
+	BMenu* iterMenu;
 	BLayoutBuilder::Menu<>(menuBar)
 		.AddMenu(B_TRANSLATE("File"))
 			.AddItem(B_TRANSLATE("Quit"), B_QUIT_REQUESTED, 'Q')
@@ -226,11 +235,23 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 			.AddItem(B_TRANSLATE("Spring"), MSG_SPRING_PALETTE)
 			.AddItem(B_TRANSLATE("High contrast"), MSG_HIGHCONTRAST_PALETTE)
 		.End()
+		.AddMenu(B_TRANSLATE("Iterations"))
+			.GetMenu(iterMenu)
+			.AddItem("128", MSG_ITER_128)
+			.AddItem("512", MSG_ITER_512)
+			.AddItem("1024", MSG_ITER_1024)
+			.AddItem("4096", MSG_ITER_4096)
+			.AddItem("8192", MSG_ITER_8192)
+			.AddItem("12288", MSG_ITER_12288)
+			.AddItem("16384", MSG_ITER_16384)
+		.End()
 	.End();
 	setMenu->SetRadioMode(true);
 	setMenu->FindItem(MSG_MANDELBROT_SET)->SetMarked(true);
 	paletteMenu->SetRadioMode(true);
 	paletteMenu->FindItem(MSG_ROYAL_PALETTE)->SetMarked(true);
+	iterMenu->SetRadioMode(true);
+	iterMenu->FindItem(MSG_ITER_1024)->SetMarked(true);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.SetInsets(0)
@@ -256,6 +277,14 @@ MandelbrotWindow::MandelbrotWindow(BRect frame)
 		fFractalView->RedrawFractal(); \
 		break; \
 	}
+#define HANDLE_ITER(uiwhat, id) \
+	case uiwhat: { \
+		BMessage msg(FractalEngine::MSG_SET_ITERATIONS); \
+		msg.AddUInt16("iterations", id); \
+		fFractalView->fFractalEngine->PostMessage(&msg); \
+		fFractalView->RedrawFractal(); \
+		break; \
+	}
 void
 MandelbrotWindow::MessageReceived(BMessage* msg)
 {
@@ -277,6 +306,14 @@ MandelbrotWindow::MessageReceived(BMessage* msg)
 	HANDLE_PALETTE(MSG_SPRING_PALETTE, 7)
 	HANDLE_PALETTE(MSG_HIGHCONTRAST_PALETTE, 8)
 
+	HANDLE_ITER(MSG_ITER_128, 128)
+	HANDLE_ITER(MSG_ITER_512, 512)
+	HANDLE_ITER(MSG_ITER_1024, 1024)
+	HANDLE_ITER(MSG_ITER_4096, 4096)
+	HANDLE_ITER(MSG_ITER_8192, 8192)
+	HANDLE_ITER(MSG_ITER_12288, 12288)
+	HANDLE_ITER(MSG_ITER_16384, 16384)
+
 	default:
 		BWindow::MessageReceived(msg);
 		break;
@@ -284,6 +321,7 @@ MandelbrotWindow::MessageReceived(BMessage* msg)
 }
 #undef HANDLE_SET
 #undef HANDLE_PALETTE
+#undef HANDLE_ITER
 
 
 bool

@@ -21,6 +21,7 @@ public:
 	enum {
 		MSG_CHANGE_SET = 'Frct',
 		MSG_SET_PALETTE,
+		MSG_SET_ITERATIONS,
 		MSG_RESIZE,
 		MSG_RENDER,
 		MSG_RENDER_COMPLETE,
@@ -36,6 +37,7 @@ private:
 	BBitmap* fBitmapStandby;
 	BBitmap* fBitmapDisplay;
 
+	uint16 fIterations;
 	uint16 fWidth;
 	uint16 fHeight;
 

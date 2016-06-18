@@ -22,6 +22,7 @@ FractalEngine::FractalEngine(BHandler* parent, BLooper* looper)
 	fMessenger(parent, looper),
 	fBitmapStandby(NULL),
 	fBitmapDisplay(NULL),
+	fIterations(1024),
 	fWidth(0), fHeight(0),
 	fRenderBuffer(NULL),
 	fRenderBufferLen(0),
@@ -62,6 +63,10 @@ void FractalEngine::MessageReceived(BMessage* msg)
 		case 8: fColorset = Colorset_HighContrast; break;
 		}
 		break;
+	case MSG_SET_ITERATIONS:
+		fIterations = msg->GetUInt16("iterations", 0);
+		break;
+
 	case MSG_RESIZE: {
 		delete fBitmapStandby;
 		// We don't delete the "display" bitmap; the viewer now owns it
@@ -99,7 +104,6 @@ const double gJuliaA = 0;
 const double gJuliaB = 1;
 
 const uint8 gEscapeHorizon = 4;
-const int32 gIterations = 1024;
 
 
 void FractalEngine::RenderPixel(uint32 x, uint32 y, double real,
@@ -127,7 +131,7 @@ int32 FractalEngine::DoSet_Mandelbrot(double real, double imaginary)
 	double zReal = 0;
 	double zImaginary = 0;
 
-	for (int32 i = 0; i < gIterations; i++) {
+	for (int32 i = 0; i < fIterations; i++) {
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
 		double nzReal = (zRealSq + (-1 * (zImaginarySq)));
@@ -155,7 +159,7 @@ int32 FractalEngine::DoSet_BurningShip(double real, double imaginary)
 	// It looks "upside down" otherwise.
 	imaginary = -imaginary;
 
-	for (int32 i = 0; i < gIterations; i++) {
+	for (int32 i = 0; i < fIterations; i++) {
 		zReal = fabs(zReal);
 		zImaginary = fabs(zImaginary);
 
@@ -185,7 +189,7 @@ int32 FractalEngine::DoSet_Tricorn(double real, double imaginary)
 
 	real = -real;
 
-	for (int32 i = 0; i < gIterations; i++) {
+	for (int32 i = 0; i < fIterations; i++) {
 		double znRe = zImaginary * -1;
 		zImaginary = zReal * -1;
 		zReal = znRe; // Swap the real and complex parts each time.
@@ -217,7 +221,7 @@ int32 FractalEngine::DoSet_Julia(double real, double imaginary)
 	double muRe = gJuliaA;
 	double muIm = gJuliaB;
 
-	for (int32 i = 0; i < gIterations; i++) {
+	for (int32 i = 0; i < fIterations; i++) {
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
 		double nzReal = (zRealSq + (-1 * (zImaginarySq)));
@@ -246,7 +250,7 @@ int32 FractalEngine::DoSet_OrbitTrap(double real, double imaginary)
 	double distance = 0;
 	double lineDist = 0;
 
-	for (int32 i = 0; i < gIterations; i++) {
+	for (int32 i = 0; i < fIterations; i++) {
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
 		double nzReal = (zRealSq + (-1 * (zImaginarySq)));
@@ -277,7 +281,7 @@ int32 FractalEngine::DoSet_Multibrot(double real, double imaginary)
 	double zReal = 0;
 	double zImaginary = 0;
 
-	for (int32 i = 0; i < gIterations; i++) {
+	for (int32 i = 0; i < fIterations; i++) {
 		double zRealSq = zReal * zReal;
 		double zImaginarySq = zImaginary * zImaginary;
 		double nzReal = (zRealSq * zReal - 3 * zReal * (zImaginarySq));
