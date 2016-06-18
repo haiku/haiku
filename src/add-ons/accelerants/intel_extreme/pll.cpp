@@ -336,7 +336,7 @@ compute_dpll_g4x(display_mode* current, pll_divisors* divisors, bool isLVDS)
 			for (divisors->m2 = limits.max.m2; divisors->m2 >= limits.min.m2;
 					divisors->m2--) {
 				for (divisors->p1 = limits.max.p1;
-						divisors->p1 >= limits.max.p1; divisors->p1--) {
+						divisors->p1 >= limits.min.p1; divisors->p1--) {
 					divisors->m = compute_pll_m(divisors);
 					divisors->p = compute_pll_p(divisors);
 
@@ -449,9 +449,9 @@ compute_pll_divisors(display_mode* current, pll_divisors* divisors, bool isLVDS)
 		|| gInfo->shared_info->device_type.HasPlatformControlHub()) {
 		compute_dpll_g4x(current, divisors, isLVDS);
 	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV)) {
-		// TODO: CherryView
+		ERROR("%s: TODO: CherryView\n", __func__);
 	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV)) {
-		// TODO: VallyView
+		ERROR("%s: TODO: VallyView\n", __func__);
 	} else
 		compute_dpll_9xx(current, divisors, isLVDS);
 
