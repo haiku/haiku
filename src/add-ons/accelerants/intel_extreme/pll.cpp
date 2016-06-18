@@ -5,6 +5,16 @@
  * Authors:
  *		Axel Dörfler, axeld@pinc-software.de
  *		Alexander von Gluck IV, kallisti5@unixzen.com
+ *
+ * PLL TEST MODE
+ *  pll's on Intel can be extremely difficult. After
+ *  making any changes, it is advised to run PLL_TEST_MODE
+ *  to simulate your pll calculations on every card.
+ *  Example:
+ *  gcc pll.cpp \
+ *    -I $TOP/headers/private/graphics/intel_extreme/
+ *    -I $TOP/headers/private/graphics/common/
+ *    -I $TOP/headers/private/graphics/ -D PLL_TEST_MODE
  */
 
 
@@ -37,6 +47,17 @@
 #define ERROR(x...) _sPrintf("intel_extreme: " x)
 #define CALLED(x...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
+
+#ifdef PLL_TEST_MODE
+#undef ERROR
+#undef CALLED
+#undef TRACE
+
+#define TRACE(x...) printf("intel_extreme: " x)
+#define ERROR(x...) printf("intel_extreme: " x)
+#define CALLED(X...) TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
+struct accelerant_info* gInfo;
+#endif
 
 // Static pll limits taken from Linux kernel KMS
 
@@ -440,3 +461,83 @@ compute_pll_divisors(display_mode* current, pll_divisors* divisors, bool isLVDS)
 		divisors->p, divisors->p1, divisors->p2, divisors->n,
 		divisors->m, divisors->m1, divisors->m2);
 }
+
+
+#ifdef PLL_TEST_MODE
+
+const struct  test_device {
+	uint32 type;
+	const char* name;
+} kTestDevices[] = {
+	{INTEL_MODEL_915, "915"},
+	{INTEL_MODEL_945, "945"},
+	{INTEL_MODEL_965, "965"},
+	{INTEL_MODEL_G33, "G33"},
+	{INTEL_MODEL_G45, "G45"},
+	{INTEL_MODEL_PINE, "PineView"},
+	{INTEL_MODEL_ILKG, "IronLake"},
+	{INTEL_MODEL_SNBG, "SandyBridge"},
+	{INTEL_MODEL_IVBG, "IvyBridge"}
+};
+
+
+static void
+simulate_mode(display_mode* mode)
+{
+	mode->timing.flags = 0;
+	mode->timing.pixel_clock = uint32(75.2 * 1000);
+	mode->timing.h_display = 1366;
+	mode->timing.h_sync_start = 1414;
+	mode->timing.h_sync_end = 1478;
+	mode->timing.h_total = 1582;
+
+	mode->timing.v_display = 768;
+	mode->timing.v_sync_start = 772;
+	mode->timing.v_sync_end = 779;
+	mode->timing.v_total = 792;
+
+	mode->virtual_width = 1366;
+	mode->virtual_height = 768;
+}
+
+
+int
+main(void)
+{
+	display_mode fakeMode;
+	simulate_mode(&fakeMode);
+
+	// First we simulate our global card info structs
+	gInfo = (accelerant_info*)malloc(sizeof(accelerant_info));
+	if (gInfo == NULL) {
+		ERROR("Unable to malloc artificial gInfo!\n");
+		return 1;
+	}
+	gInfo->shared_info = (intel_shared_info*)malloc(sizeof(intel_shared_info));
+
+	for (uint32 index = 0; index < (sizeof(kTestDevices) / sizeof(test_device));
+		index++) {
+		gInfo->shared_info->device_type = kTestDevices[index].type;
+		ERROR("=== %s (Generation %d)\n",  kTestDevices[index].name,
+			gInfo->shared_info->device_type.Generation());
+
+		if (gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_9xx)
+			| gInfo->shared_info->device_type.InFamily(INTEL_FAMILY_SER5)) {
+			gInfo->shared_info->pll_info.reference_frequency = 96000;
+			gInfo->shared_info->pll_info.max_frequency = 400000;
+			gInfo->shared_info->pll_info.min_frequency = 20000;
+		} else {
+			gInfo->shared_info->pll_info.reference_frequency = 96000;
+			gInfo->shared_info->pll_info.max_frequency = 400000;
+			gInfo->shared_info->pll_info.min_frequency = 20000;
+		}
+
+		pll_divisors output;
+		compute_pll_divisors(&fakeMode, &output, false);
+	}
+
+	free(gInfo->shared_info);
+	free(gInfo);
+	return 0;
+}
+#endif
