@@ -242,7 +242,7 @@ private:
 			uint8				fPortSlots[XHCI_MAX_PORTS];
 
 			// Scratchpad
-			uint8				fScratchpadCount;
+			uint32				fScratchpadCount;
 			area_id				fScratchpadArea[XHCI_MAX_SCRATCHPADS];
 			void *				fScratchpad[XHCI_MAX_SCRATCHPADS];
 

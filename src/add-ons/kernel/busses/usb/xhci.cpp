@@ -425,7 +425,8 @@ XHCI::Start()
 	uint32 params2 = ReadCapReg32(XHCI_HCSPARAMS2);
 	fScratchpadCount = HCS_MAX_SC_BUFFERS(params2);
 	if (fScratchpadCount > XHCI_MAX_SCRATCHPADS) {
-		TRACE_ERROR("Invalid number of scratchpads: %u\n", fScratchpadCount);
+		TRACE_ERROR("Invalid number of scratchpads: %" B_PRIu32 "\n",
+			fScratchpadCount);
 		return B_ERROR;
 	}
 
