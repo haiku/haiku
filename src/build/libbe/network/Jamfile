@@ -1,6 +1,5 @@
-SubDir HAIKU_TOP src build libbe network;
+SubDir HAIKU_TOP src build libbe network ;
 
-UseHeaders [ FDirName $(HAIKU_TOP) headers build ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers os net ] : true ;
 UseHeaders [ FDirName $(HAIKU_TOP) headers private shared ] : true ;
 
