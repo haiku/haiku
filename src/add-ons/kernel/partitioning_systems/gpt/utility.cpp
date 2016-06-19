@@ -38,9 +38,31 @@ void
 to_utf8(const uint16* from, size_t maxFromLength, char* to, size_t toSize)
 {
 	for (uint32 i = 0; i < maxFromLength; i++) {
-		uint16 c = B_LENDIAN_TO_HOST_INT16(from[i]);
-		if (!c)
+		// Decoding UTF-16LE
+		uint32 c = 0;
+		uint16 w1 = B_LENDIAN_TO_HOST_INT16(from[i]);
+		if (!w1)
 			break;
+
+		bool valid = false;
+		if (w1 < 0xD800 || w1 > 0xDFFF) {
+			c = w1;
+			valid = true;
+		}
+
+		if (!valid && (w1 >= 0xD800 && w1 <= 0xDBFF)) {
+			if (i + 1 < maxFromLength) {
+				uint16 w2 = B_LENDIAN_TO_HOST_INT16(from[i + 1]);
+				if (w2 >= 0xDC00 && w2 <= 0xDFFF) {
+					c = ((w1 & 0x3FF) << 10) | (w2 & 0x3FF);
+					c += 0x10000;
+					++i;
+					valid = true;
+				}
+			}
+		}
+
+		if (!valid) break;
 
 		if (c < 0x80)
 			put_utf8_byte(to, toSize, c);
@@ -70,10 +92,21 @@ to_ucs2(const char* from, size_t fromLength, uint16* to, size_t maxToLength)
 {
 	size_t index = 0;
 	while (from[0] != '\0' && index < maxToLength) {
-		// TODO: handle characters that are not representable in UCS-2 better
-		uint32 code = UTF8ToCharCode(&from);
-		if (code < 0x10000)
-			to[index++] = code;
+		uint32 c = UTF8ToCharCode(&from);
+
+		// Encoding UTF-16LE
+		if (c > 0x10FFFF) break; // invalid
+		if (c < 0x10000) {
+			to[index++] = B_HOST_TO_LENDIAN_INT16(c);
+		} else {
+			if (index + 1 >= maxToLength) break;
+			uint32 c2 = c - 0x10000;
+			uint16 w1 = 0xD800, w2 = 0xDC00;
+			w1 = w1 + ((c2 >> 10) & 0x3FF);
+			w2 = w2 + (c2 & 0x3FF);
+			to[index++] = B_HOST_TO_LENDIAN_INT16(w1);
+			to[index++] = B_HOST_TO_LENDIAN_INT16(w2);
+		}
 	}
 
 	if (index < maxToLength)
