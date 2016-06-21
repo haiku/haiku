@@ -251,7 +251,7 @@ static status_t
 echo_get_mix(echo_dev *card, multi_mix_value_info * mmvi)
 {
 	int32 i;
-	uint32 id;
+	int32 id;
 	multi_mixer_control *control = NULL;
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
@@ -293,7 +293,7 @@ static status_t
 echo_set_mix(echo_dev *card, multi_mix_value_info * mmvi)
 {
 	int32 i;
-	uint32 id;
+	int32 id;
 	multi_mixer_control *control = NULL;
 	for (i = 0; i < mmvi->item_count; i++) {
 		id = mmvi->values[i].id - MULTI_CONTROL_FIRSTID;
