@@ -102,12 +102,13 @@ public:
 		if (!IsMedia() && fBufferIO == NULL) {
 			// Source needs to be at least a BPositionIO to wrap with a BBufferIO
 			if (IsPosition()) {
-				fPosition = new(std::nothrow) BBufferIO(fPosition, 65536, false);
-				if (fPosition == NULL) {
+				fBufferIO = new(std::nothrow) BBufferIO(fPosition, 65536, false);
+				if (fBufferIO == NULL) {
 					fErr = B_NO_MEMORY;
 					return;
 				}
-				// We have to reset our BDataIO reference too
+				// We have to reset our parents reference too
+				fPosition = dynamic_cast<BPositionIO*>(fBufferIO);
 				fData = dynamic_cast<BDataIO*>(fPosition);
 			} else {
 				// In this case we have to supply our own form
