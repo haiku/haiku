@@ -27,14 +27,14 @@ public:
 											const void* buffer,
 											size_t size);
 
+	virtual	status_t					SetSize(off_t size);
+
 			void						LoopThread();
 			void						ShutdownLoop();
 private:
 			static int32				_LoopThread(void* data);
 
 			BUrl*						fUrl;
-			BInputAdapter*				fInputAdapter;
-
 
 			HaikuRTSPClient*			fClient;
 			UsageEnvironment*			fEnv;

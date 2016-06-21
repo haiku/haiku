@@ -17,32 +17,26 @@ RTSPMediaIO::RTSPMediaIO(BUrl* ourUrl)
 		B_INFINITE_TIMEOUT),
 	fUrl(ourUrl),
 	fClient(NULL),
-	fInputAdapter(NULL),
 	fScheduler(NULL),
 	fLoopWatchVariable(0),
 	fLoopThread(-1),
-	fInitErr(B_OK)
+	fInitErr(B_ERROR)
 {
-	fInputAdapter = BuildInputAdapter();
 	fScheduler = BasicTaskScheduler::createNew();
 	fEnv = BasicUsageEnvironment::createNew(*fScheduler);
 
 	fClient = new HaikuRTSPClient(*fEnv, fUrl->UrlString(),
 		0, this);
-	if (fClient == NULL) {
-		fInitErr = B_ERROR;
+	if (fClient == NULL)
 		return;
-	}
 
 	fClient->sendDescribeCommand(continueAfterDESCRIBE);
 
 	fLoopThread = spawn_thread(_LoopThread, "two minutes hate thread",
 		B_NORMAL_PRIORITY, this);
 
-	if (fLoopThread <= 0 || resume_thread(fLoopThread) != B_OK) {
-		fInitErr = B_ERROR;
+	if (fLoopThread <= 0 || resume_thread(fLoopThread) != B_OK)
 		return;
-	}
 
 	fInitErr = fClient->WaitForInit(5000000);
 }
@@ -54,8 +48,9 @@ RTSPMediaIO::~RTSPMediaIO()
 
 	ShutdownLoop();
 
+	status_t status;
 	if (fLoopThread != -1)
-		exit_thread(fLoopThread);
+		wait_for_thread(fLoopThread, &status);
 }
 
 
@@ -75,6 +70,13 @@ RTSPMediaIO::ShutdownLoop()
 
 ssize_t
 RTSPMediaIO::WriteAt(off_t position, const void* buffer, size_t size)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+RTSPMediaIO::SetSize(off_t size)
 {
 	return B_NOT_SUPPORTED;
 }
@@ -134,11 +136,14 @@ status_t
 HaikuRTSPClient::WaitForInit(bigtime_t timeout)
 {
 	status_t status = B_ERROR;
-	read_port_etc(fInitPort, NULL, &status,
-		sizeof(status), B_RELATIVE_TIMEOUT, timeout);
+	if (read_port_etc(fInitPort, NULL, &status,
+			sizeof(status), B_RELATIVE_TIMEOUT, timeout) < 0) {
+		return B_ERROR;
+	}
 
 	close_port(fInitPort);
 	delete_port(fInitPort);
+	fInitPort = -1;
 	return status;
 }
 
