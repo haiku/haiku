@@ -15,27 +15,25 @@
 class FileListener : public BUrlProtocolAsynchronousListener
 {
 public:
-					FileListener(BAdapterIO* owner)
-						:
-						BUrlProtocolAsynchronousListener(true),
-						fRequest(NULL),
-						fAdapterIO(owner),
-						fTotalSize(0)
+		FileListener(BAdapterIO* owner)
+			:
+			BUrlProtocolAsynchronousListener(true),
+			fRequest(NULL),
+			fAdapterIO(owner),
+			fTotalSize(0)
 		{
 			fInputAdapter = fAdapterIO->BuildInputAdapter();
 		}
 
-		virtual		~FileListener() {};
+		virtual ~FileListener() {};
 
-		bool		ConnectionSuccessful() const
+		bool ConnectionSuccessful() const
 		{
-			printf("ConnectionSuccessful\n");
 			return fRequest != NULL;
 		}
 
-		void		ConnectionOpened(BUrlRequest* request)
+		void ConnectionOpened(BUrlRequest* request)
 		{
-			printf("Connection opened\n");
 			if (fRequest != NULL)
 				fRequest->Stop();
 
@@ -43,20 +41,17 @@ public:
 			fTotalSize = request->Result().Length();
 		}
 
-		void		DataReceived(BUrlRequest* request, const char* data,
-						off_t position, ssize_t size)
+		void DataReceived(BUrlRequest* request, const char* data,
+			off_t position, ssize_t size)
 		{
-			printf("Data received\n");
 			if (request != fRequest)
 				delete request;
 
 			fInputAdapter->Write(data, size);
 		}
 
-		void		RequestCompleted(BUrlRequest* request, bool success)
+		void RequestCompleted(BUrlRequest* request, bool success)
 		{
-			printf("Request completed\n");
-			printf("Success: %s\n", success ? "true" : "false");
 			if (request != fRequest)
 				return;
 
