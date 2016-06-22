@@ -10,6 +10,8 @@
 
 #include <stdio.h>
 
+#include "debug.h"
+
 
 class RelativePositionIO : public BPositionIO
 {
@@ -194,6 +196,8 @@ BAdapterIO::BAdapterIO(int32 flags, bigtime_t timeout)
 	fBuffer(NULL),
 	fInputAdapter(NULL)
 {
+	CALLED();
+
 	fBuffer = new RelativePositionIO(this, new BMallocIO());
 }
 
@@ -206,6 +210,8 @@ BAdapterIO::BAdapterIO(const BAdapterIO &)
 
 BAdapterIO::~BAdapterIO()
 {
+	CALLED();
+
 	delete fInputAdapter;
 	delete fBuffer;
 }
@@ -214,6 +220,8 @@ BAdapterIO::~BAdapterIO()
 void
 BAdapterIO::GetFlags(int32* flags) const
 {
+	CALLED();
+
 	*flags = fFlags;
 }
 
@@ -221,6 +229,8 @@ BAdapterIO::GetFlags(int32* flags) const
 ssize_t
 BAdapterIO::ReadAt(off_t position, void* buffer, size_t size)
 {
+	CALLED();
+
 	printf("read at %d  %d \n", (int)position, (int)size);
 	status_t ret = _EvaluateWait(position+size);
 	if (ret != B_OK)
@@ -233,6 +243,8 @@ BAdapterIO::ReadAt(off_t position, void* buffer, size_t size)
 ssize_t
 BAdapterIO::WriteAt(off_t position, const void* buffer, size_t size)
 {
+	CALLED();
+
 	status_t ret = _EvaluateWait(position+size);
 	if (ret != B_OK)
 		return ret;
@@ -244,6 +256,8 @@ BAdapterIO::WriteAt(off_t position, const void* buffer, size_t size)
 off_t
 BAdapterIO::Seek(off_t position, uint32 seekMode)
 {
+	CALLED();
+
 	status_t ret = _EvaluateWait(position);
 	if (ret != B_OK)
 		return ret;
@@ -255,6 +269,8 @@ BAdapterIO::Seek(off_t position, uint32 seekMode)
 off_t
 BAdapterIO::Position() const
 {
+	CALLED();
+
 	return fBuffer->Position();
 }
 
@@ -262,6 +278,8 @@ BAdapterIO::Position() const
 status_t
 BAdapterIO::SetSize(off_t size)
 {
+	CALLED();
+
 	if (!fBuffer->IsMutable()) {
 		fTotalSize = size;
 		return B_OK;
@@ -274,6 +292,8 @@ BAdapterIO::SetSize(off_t size)
 status_t
 BAdapterIO::GetSize(off_t* size) const
 {
+	CALLED();
+
 	if (!fBuffer->IsMutable()) {
 		*size = fTotalSize;
 		return B_OK;
@@ -286,6 +306,8 @@ BAdapterIO::GetSize(off_t* size) const
 ssize_t
 BAdapterIO::BackWrite(const void* buffer, size_t size)
 {
+	CALLED();
+
 	return fBuffer->BackWrite(buffer, size);
 }
 
@@ -293,6 +315,8 @@ BAdapterIO::BackWrite(const void* buffer, size_t size)
 status_t
 BAdapterIO::_EvaluateWait(off_t pos)
 {
+	CALLED();
+
 	status_t err = fBuffer->EvaluatePosition(pos);
 
 	if (err != B_RESOURCE_UNAVAILABLE && err != B_OK)
@@ -322,6 +346,8 @@ BAdapterIO::BuildInputAdapter()
 status_t
 BAdapterIO::SeekRequested(off_t position)
 {
+	CALLED();
+
 	return B_ERROR;
 }
 
@@ -329,6 +355,8 @@ BAdapterIO::SeekRequested(off_t position)
 status_t
 BAdapterIO::SeekCompleted(off_t position)
 {
+	CALLED();
+
 	return fBuffer->ResetStartOffset(position);
 }
 
