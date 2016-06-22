@@ -21,6 +21,8 @@ const EFI_SYSTEM_TABLE		*kSystemTable;
 const EFI_BOOT_SERVICES		*kBootServices;
 const EFI_RUNTIME_SERVICES	*kRuntimeServices;
 
+static uint32 sBootOptions;
+
 
 static void
 call_ctors(void)
@@ -35,7 +37,7 @@ call_ctors(void)
 extern "C" uint32
 platform_boot_options()
 {
-	return 0;
+	return sBootOptions;
 }
 
 
@@ -72,6 +74,8 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systemTable)
 	call_ctors();
 
 	console_init();
+
+	sBootOptions = console_check_boot_keys();
 
 	main(&args);
 

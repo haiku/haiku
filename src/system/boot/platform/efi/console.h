@@ -9,7 +9,8 @@
 #include <boot/platform/generic/text_console.h>
 
 
-extern "C" status_t console_init(void);
+status_t console_init(void);
+uint32 console_check_boot_keys(void);
 
 
 #endif	/* CONSOLE_H */

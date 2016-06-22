@@ -215,6 +215,29 @@ console_init(void)
 }
 
 
+uint32
+console_check_boot_keys(void)
+{
+	EFI_STATUS status;
+	EFI_INPUT_KEY key;
+
+	// give the user a chance to press a key
+	kBootServices->Stall(500000);
+
+	status = kSystemTable->ConIn->ReadKeyStroke(kSystemTable->ConIn, &key);
+
+	if (status != EFI_SUCCESS)
+		return 0;
+
+	if (key.UnicodeChar == 0 && key.ScanCode == SCAN_ESC)
+		return BOOT_OPTION_DEBUG_OUTPUT;
+	if (key.UnicodeChar == ' ')
+		return BOOT_OPTION_MENU;
+
+	return 0;
+}
+
+
 extern "C" void
 platform_switch_to_text_mode(void)
 {
