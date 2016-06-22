@@ -61,6 +61,8 @@ public:
 			// block on that.
 			if (IsMutable())
 				return B_WOULD_BLOCK;
+			else if (size == 0)
+				return B_RESOURCE_UNAVAILABLE;
 			else
 				return B_ERROR;
 		}
@@ -319,13 +321,15 @@ BAdapterIO::_EvaluateWait(off_t pos)
 
 	status_t err = fBuffer->EvaluatePosition(pos);
 
-	if (err != B_RESOURCE_UNAVAILABLE && err != B_OK)
-		return B_UNSUPPORTED;
-
-	if (err == B_RESOURCE_UNAVAILABLE && fBuffer->IsStreaming()
-			&& fBuffer->IsSeekable()) {
-		if (SeekRequested(pos) != B_OK)
+	if (err != B_WOULD_BLOCK) {
+		if (err != B_RESOURCE_UNAVAILABLE && err != B_OK)
 			return B_UNSUPPORTED;
+
+		if (err == B_RESOURCE_UNAVAILABLE && fBuffer->IsStreaming()
+				&& fBuffer->IsSeekable()) {
+			if (SeekRequested(pos) != B_OK)
+				return B_UNSUPPORTED;
+		}
 	}
 
 	return fBuffer->WaitForData(pos);
