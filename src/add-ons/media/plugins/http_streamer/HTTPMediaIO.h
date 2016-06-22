@@ -25,6 +25,9 @@ public:
 	virtual	ssize_t						WriteAt(off_t position,
 											const void* buffer, size_t size);
 
+	virtual status_t					SetSize(off_t size);
+	virtual status_t					GetSize(off_t* size) const;
+
 private:
 	BUrlContext*						fContext;
 	BUrlRequest*						fReq;

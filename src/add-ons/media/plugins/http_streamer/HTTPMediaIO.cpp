@@ -19,7 +19,8 @@ public:
 						:
 						BUrlProtocolAsynchronousListener(true),
 						fRequest(NULL),
-						fAdapterIO(owner)
+						fAdapterIO(owner),
+						fTotalSize(0)
 		{
 			fInputAdapter = fAdapterIO->BuildInputAdapter();
 		}
@@ -39,6 +40,7 @@ public:
 				fRequest->Stop();
 
 			fRequest = request;
+			fTotalSize = request->Result().Length();
 		}
 
 		void		DataReceived(BUrlRequest* request, const char* data,
@@ -62,17 +64,23 @@ public:
 			delete request;
 		}
 
+		off_t		TotalSize() const
+		{
+			return fTotalSize;
+		}
+
 private:
 		BUrlRequest*	fRequest;
 		BAdapterIO*		fAdapterIO;
 		BInputAdapter*	fInputAdapter;
+		off_t			fTotalSize;
 };
 
 
 HTTPMediaIO::HTTPMediaIO(BUrl* url)
 	:
 	BAdapterIO(
-		B_MEDIA_STREAMING | B_MEDIA_MUTABLE_SIZE | B_MEDIA_SEEK_BACKWARD,
+		B_MEDIA_STREAMING | B_MEDIA_SEEK_BACKWARD,
 		B_INFINITE_TIMEOUT),
 	fInitErr(B_OK)
 {
@@ -109,4 +117,19 @@ ssize_t
 HTTPMediaIO::WriteAt(off_t position, const void* buffer, size_t size)
 {
 	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+HTTPMediaIO::SetSize(off_t size)
+{
+	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+HTTPMediaIO::GetSize(off_t* size) const
+{
+	*size = fListener->TotalSize();
+	return B_OK;
 }
