@@ -72,10 +72,8 @@ private:
 			int32					fFlags;
 			bigtime_t				fTimeout;
 
-			off_t					fBackPosition;
-	mutable RWLocker				fLock;
-
 			RelativePositionIO*		fBuffer;
+			off_t					fTotalSize;
 
 			BInputAdapter*			fInputAdapter;
 
