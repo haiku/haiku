@@ -64,7 +64,7 @@ MediaExtractor::MediaExtractor(BDataIO* source, int32 flags)
 }
 
 
-MediaExtractor::MediaExtractor(BUrl url, int32 flags)
+MediaExtractor::MediaExtractor(const BUrl& url, int32 flags)
 	:
 	fExtractorThread(-1),
 	fReader(NULL),

@@ -82,7 +82,7 @@ BMediaFile::BMediaFile(const media_file_format* mfi, int32 flags)
 }
 
 
-BMediaFile::BMediaFile(BUrl url)
+BMediaFile::BMediaFile(const BUrl& url)
 {
 	CALLED();
 	fDeleteSource = true;
@@ -91,7 +91,7 @@ BMediaFile::BMediaFile(BUrl url)
 }
 
 
-BMediaFile::BMediaFile(BUrl url, int32 flags)
+BMediaFile::BMediaFile(const BUrl& url, int32 flags)
 {
 	CALLED();
 	fDeleteSource = true;
@@ -471,7 +471,7 @@ BMediaFile::_UnInit()
 
 
 void
-BMediaFile::_InitReader(BDataIO* source, BUrl* url, int32 flags)
+BMediaFile::_InitReader(BDataIO* source, const BUrl* url, int32 flags)
 {
 	CALLED();
 
@@ -512,7 +512,7 @@ BMediaFile::_InitReader(BDataIO* source, BUrl* url, int32 flags)
 
 
 void
-BMediaFile::_InitWriter(BDataIO* target, BUrl* url,
+BMediaFile::_InitWriter(BDataIO* target, const BUrl* url,
 	const media_file_format* fileFormat, int32 flags)
 {
 	CALLED();

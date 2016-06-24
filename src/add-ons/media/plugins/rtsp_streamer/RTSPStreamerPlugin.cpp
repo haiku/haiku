@@ -15,7 +15,7 @@ RTSPStreamer::~RTSPStreamer()
 
 
 status_t
-RTSPStreamer::Sniff(BUrl url, BDataIO** source)
+RTSPStreamer::Sniff(const BUrl& url, BDataIO** source)
 {
 	RTSPMediaIO* ret = new RTSPMediaIO(url);
 	if (ret->InitCheck() == B_OK) {

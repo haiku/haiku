@@ -20,7 +20,7 @@ HTTPStreamer::~HTTPStreamer()
 
 
 status_t
-HTTPStreamer::Sniff(BUrl url, BDataIO** source)
+HTTPStreamer::Sniff(const BUrl& url, BDataIO** source)
 {
 	HTTPMediaIO* ret = new HTTPMediaIO(url);
 	if (ret->InitCheck() == B_OK) {

@@ -72,8 +72,8 @@ public:
 
 	// Additional constructors used to stream data from protocols
 	// supported by the Streamer API
-								BMediaFile(BUrl url);
-								BMediaFile(BUrl url, int32 flags);
+								BMediaFile(const BUrl& url);
+								BMediaFile(const BUrl& url, int32 flags);
 	// Read-Write streaming constructor
 								BMediaFile(BUrl destination,
 								   const media_file_format* mfi,
@@ -84,7 +84,7 @@ public:
 			status_t			SetTo(const entry_ref* ref);
 			status_t			SetTo(BDataIO* destination);
 	// The streaming equivalent of SetTo
-			status_t			SetTo(BUrl url);
+			status_t			SetTo(const BUrl& url);
 
 			status_t			InitCheck() const;
 
@@ -179,9 +179,11 @@ private:
 
 			void				_Init();
 			void				_UnInit();
-			void				_InitReader(BDataIO* source, BUrl* url = NULL,
+			void				_InitReader(BDataIO* source,
+									const BUrl* url = NULL,
 									int32 flags = 0);
-			void				_InitWriter(BDataIO* target, BUrl* url,
+			void				_InitWriter(BDataIO* target,
+									const BUrl* url,
 									const media_file_format* fileFormat,
 									int32 flags);
 
