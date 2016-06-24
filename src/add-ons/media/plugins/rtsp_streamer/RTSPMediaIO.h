@@ -18,7 +18,7 @@ class HaikuRTSPClient;
 class RTSPMediaIO : public BAdapterIO
 {
 public:
-										RTSPMediaIO(BUrl* ourUrl);
+										RTSPMediaIO(BUrl ourUrl);
 	virtual								~RTSPMediaIO();
 
 			status_t					InitCheck() const;
@@ -34,7 +34,7 @@ public:
 private:
 			static int32				_LoopThread(void* data);
 
-			BUrl*						fUrl;
+			BUrl						fUrl;
 
 			HaikuRTSPClient*			fClient;
 			UsageEnvironment*			fEnv;

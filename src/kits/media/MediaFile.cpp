@@ -82,31 +82,31 @@ BMediaFile::BMediaFile(const media_file_format* mfi, int32 flags)
 }
 
 
-BMediaFile::BMediaFile(BUrl* url)
+BMediaFile::BMediaFile(BUrl url)
 {
 	CALLED();
 	fDeleteSource = true;
 	_Init();
-	_InitReader(NULL, url);
+	_InitReader(NULL, &url);
 }
 
 
-BMediaFile::BMediaFile(BUrl* url, int32 flags)
+BMediaFile::BMediaFile(BUrl url, int32 flags)
 {
 	CALLED();
 	fDeleteSource = true;
 	_Init();
-	_InitReader(NULL, url, flags);
+	_InitReader(NULL, &url, flags);
 }
 
 
-BMediaFile::BMediaFile(BUrl* destination, const media_file_format* mfi,
+BMediaFile::BMediaFile(BUrl destination, const media_file_format* mfi,
 	int32 flags)
 {
 	CALLED();
 	fDeleteSource = true;
 	_Init();
-	_InitWriter(NULL, destination, mfi, flags);
+	_InitWriter(NULL, &destination, mfi, flags);
 	// TODO: Implement streaming server support, it's
 	// a pretty complex thing compared to client mode
 	// and will require to expand the current BMediaFile
@@ -488,7 +488,7 @@ BMediaFile::_InitReader(BDataIO* source, BUrl* url, int32 flags)
 		}
 		fExtractor = new(std::nothrow) MediaExtractor(source, flags);
 	} else
-		fExtractor = new(std::nothrow) MediaExtractor(url, flags);
+		fExtractor = new(std::nothrow) MediaExtractor(*url, flags);
 
 	if (fExtractor == NULL)
 		fErr = B_NO_MEMORY;
@@ -532,7 +532,7 @@ BMediaFile::_InitWriter(BDataIO* target, BUrl* url,
 	if (target != NULL)
 		fWriter = new(std::nothrow) MediaWriter(target, fMFI);
 	else
-		fWriter = new(std::nothrow) MediaWriter(url, fMFI);
+		fWriter = new(std::nothrow) MediaWriter(*url, fMFI);
 
 	if (fWriter == NULL)
 		fErr = B_NO_MEMORY;

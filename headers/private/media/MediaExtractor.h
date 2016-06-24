@@ -40,7 +40,7 @@ struct stream_info {
 class MediaExtractor {
 public:
 								MediaExtractor(BDataIO* source, int32 flags);
-								MediaExtractor(BUrl* url, int32 flags);
+								MediaExtractor(BUrl url, int32 flags);
 
 								~MediaExtractor();
 

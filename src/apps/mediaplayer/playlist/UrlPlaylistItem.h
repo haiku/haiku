@@ -12,7 +12,7 @@
 
 class UrlPlaylistItem : public PlaylistItem {
 public:
-								UrlPlaylistItem(BUrl* url);
+								UrlPlaylistItem(BUrl url);
 								UrlPlaylistItem(const UrlPlaylistItem& item);
 								UrlPlaylistItem(const BMessage* archive);
 	virtual						~UrlPlaylistItem();
@@ -47,10 +47,10 @@ public:
 
 	virtual	TrackSupplier*		CreateTrackSupplier() const;
 
-			BUrl*				Url() const;
+			BUrl				Url() const;
 
 private:
-	BUrl*						fUrl;
+			BUrl				fUrl;
 };
 
 #endif

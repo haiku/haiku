@@ -93,7 +93,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			StreamerPlugin.cpp
 			WriterPlugin.cpp
 			:
-			be localestub shared [ TargetLibsupc++ ] [ TargetLibstdc++ ]
+			be localestub shared bnetapi
+			[ TargetLibsupc++ ] [ TargetLibstdc++ ]
 			;
 	}
 }

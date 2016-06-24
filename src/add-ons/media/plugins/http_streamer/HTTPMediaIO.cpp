@@ -72,7 +72,7 @@ private:
 };
 
 
-HTTPMediaIO::HTTPMediaIO(BUrl* url)
+HTTPMediaIO::HTTPMediaIO(BUrl url)
 	:
 	BAdapterIO(
 		B_MEDIA_STREAMING | B_MEDIA_SEEK_BACKWARD,
@@ -84,7 +84,7 @@ HTTPMediaIO::HTTPMediaIO(BUrl* url)
 
 	fListener = new FileListener(this);
 
-	fReq = BUrlProtocolRoster::MakeRequest(*url,
+	fReq = BUrlProtocolRoster::MakeRequest(url,
 		fListener, fContext);
 
 	fReq->Run();

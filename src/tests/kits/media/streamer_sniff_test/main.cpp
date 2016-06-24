@@ -19,8 +19,8 @@ int main(int argc, char *argv[])
 
 	printf("Instantiating the BMediaFile\n");
 
-	BUrl* url = new BUrl(argv[1]);
-	if (!url->IsValid()) {
+	BUrl url = BUrl(argv[1]);
+	if (!url.IsValid()) {
 		printf("Invalid URL\n");
 		return 0;
 	}

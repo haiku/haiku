@@ -128,7 +128,7 @@ private:
 	static	bool				_ExtraMediaExists(Playlist* playlist,
 									const entry_ref& ref);
 	static	bool				_ExtraMediaExists(Playlist* playlist,
-									BUrl* url);
+									BUrl url);
 	static	bool 				_IsImageFile(const BString& mimeString);
 	static	bool 				_IsMediaFile(const BString& mimeString);
 	static	bool				_IsTextPlaylist(const BString& mimeString);

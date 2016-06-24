@@ -11,7 +11,7 @@
 #include "MediaFileTrackSupplier.h"
 
 
-UrlPlaylistItem::UrlPlaylistItem(BUrl* url)
+UrlPlaylistItem::UrlPlaylistItem(BUrl url)
 	:
 	fUrl(url)
 {
@@ -21,7 +21,7 @@ UrlPlaylistItem::UrlPlaylistItem(BUrl* url)
 
 UrlPlaylistItem::UrlPlaylistItem(const UrlPlaylistItem& item)
 {
-	fUrl = new BUrl(item.Url()->UrlString());
+	fUrl = BUrl(item.Url());
 }
 
 
@@ -39,7 +39,7 @@ UrlPlaylistItem::~UrlPlaylistItem()
 PlaylistItem*
 UrlPlaylistItem::Clone() const
 {
-	return new UrlPlaylistItem(new BUrl(fUrl->UrlString()));
+	return new UrlPlaylistItem(fUrl);
 }
 
 
@@ -102,7 +102,7 @@ UrlPlaylistItem::GetAttribute(const Attribute& attribute, int64& value) const
 BString
 UrlPlaylistItem::LocationURI() const
 {
-	return fUrl->UrlString();
+	return fUrl.UrlString();
 }
 
 
@@ -147,7 +147,7 @@ UrlPlaylistItem::CreateTrackSupplier() const
 }
 
 
-BUrl*
+BUrl
 UrlPlaylistItem::Url() const
 {
 	return fUrl;

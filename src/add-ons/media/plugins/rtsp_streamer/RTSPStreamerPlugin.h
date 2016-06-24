@@ -9,7 +9,7 @@ public:
 								RTSPStreamer();
 	virtual						~RTSPStreamer();
 
-	virtual status_t			Sniff(BUrl* url, BDataIO** source);
+	virtual status_t			Sniff(BUrl url, BDataIO** source);
 };
 
 

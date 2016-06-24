@@ -22,7 +22,7 @@ class MediaWriter {
 public:
 								MediaWriter(BDataIO* target,
 									const media_file_format& fileFormat);
-								MediaWriter(BUrl* url,
+								MediaWriter(BUrl url,
 									const media_file_format& fileFormat);
 								~MediaWriter();
 

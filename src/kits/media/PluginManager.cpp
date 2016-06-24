@@ -595,7 +595,7 @@ PluginManager::DestroyEncoder(Encoder* encoder)
 
 
 status_t
-PluginManager::CreateStreamer(Streamer** streamer, BUrl* url, BDataIO** source)
+PluginManager::CreateStreamer(Streamer** streamer, BUrl url, BDataIO** source)
 {
 	TRACE("PluginManager::CreateStreamer enter\n");
 

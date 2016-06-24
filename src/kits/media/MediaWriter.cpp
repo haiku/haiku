@@ -58,7 +58,7 @@ MediaWriter::MediaWriter(BDataIO* target, const media_file_format& fileFormat)
 }
 
 
-MediaWriter::MediaWriter(BUrl* url, const media_file_format& fileFormat)
+MediaWriter::MediaWriter(BUrl url, const media_file_format& fileFormat)
 	:
 	fTarget(NULL),
 	fWriter(NULL),

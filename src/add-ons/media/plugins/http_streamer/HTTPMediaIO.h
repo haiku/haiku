@@ -17,7 +17,7 @@ class FileListener;
 
 class HTTPMediaIO : public BAdapterIO {
 public:
-										HTTPMediaIO(BUrl* url);
+										HTTPMediaIO(BUrl url);
 	virtual								~HTTPMediaIO();
 
 			status_t					InitCheck() const;

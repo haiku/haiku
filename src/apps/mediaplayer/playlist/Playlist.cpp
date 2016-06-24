@@ -637,7 +637,7 @@ Playlist::_ExtraMediaExists(Playlist* playlist, const entry_ref& ref)
 
 
 /*static*/ bool
-Playlist::_ExtraMediaExists(Playlist* playlist, BUrl* url)
+Playlist::_ExtraMediaExists(Playlist* playlist, BUrl url)
 {
 	for (int32 i = 0; i < playlist->CountItems(); i++) {
 		UrlPlaylistItem* compare

@@ -61,7 +61,7 @@ public:
 			void				DestroyEncoder(Encoder* encoder);
 
 			status_t			CreateStreamer(Streamer** streamer,
-									BUrl* url, BDataIO** source);
+									BUrl url, BDataIO** source);
 			void				DestroyStreamer(Streamer* streamer);
 
 private:

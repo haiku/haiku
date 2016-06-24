@@ -10,7 +10,7 @@
 #define LIVE555_VERBOSITY 1
 
 
-RTSPMediaIO::RTSPMediaIO(BUrl* ourUrl)
+RTSPMediaIO::RTSPMediaIO(BUrl ourUrl)
 	:
 	BAdapterIO(
 		B_MEDIA_STREAMING | B_MEDIA_MUTABLE_SIZE | B_MEDIA_SEEK_BACKWARD,
@@ -25,7 +25,7 @@ RTSPMediaIO::RTSPMediaIO(BUrl* ourUrl)
 	fScheduler = BasicTaskScheduler::createNew();
 	fEnv = BasicUsageEnvironment::createNew(*fScheduler);
 
-	fClient = new HaikuRTSPClient(*fEnv, fUrl->UrlString(),
+	fClient = new HaikuRTSPClient(*fEnv, fUrl.UrlString(),
 		0, this);
 	if (fClient == NULL)
 		return;

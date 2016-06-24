@@ -18,7 +18,7 @@ public:
 								Streamer();
 	virtual						~Streamer();
 
-	virtual status_t			Sniff(BUrl* url, BDataIO** source) = 0;
+	virtual status_t			Sniff(BUrl url, BDataIO** source) = 0;
 private:
 	virtual void				_ReservedStreamer1();
 	virtual void				_ReservedStreamer2();
