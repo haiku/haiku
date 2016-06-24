@@ -87,6 +87,9 @@ HTTPMediaIO::HTTPMediaIO(BUrl url)
 	fReq = BUrlProtocolRoster::MakeRequest(url,
 		fListener, fContext);
 
+	if (fReq == NULL)
+		return;
+
 	fReq->Run();
 }
 
