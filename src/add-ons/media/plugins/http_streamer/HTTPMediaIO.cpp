@@ -77,7 +77,7 @@ HTTPMediaIO::HTTPMediaIO(BUrl url)
 	BAdapterIO(
 		B_MEDIA_STREAMING | B_MEDIA_SEEK_BACKWARD,
 		B_INFINITE_TIMEOUT),
-	fInitErr(B_OK)
+	fInitErr(B_ERROR)
 {
 	fContext = new BUrlContext();
 	fContext->AcquireReference();
@@ -90,7 +90,10 @@ HTTPMediaIO::HTTPMediaIO(BUrl url)
 	if (fReq == NULL)
 		return;
 
-	fReq->Run();
+	if (fReq->Run() < 0)
+		return;
+
+	fInitErr = B_OK;
 }
 
 
