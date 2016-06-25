@@ -4,7 +4,7 @@
  */
 
 #ifndef PACKAGE_ACTION_HANDLER_H
-#define PACkAGE_ACTION_HANDLER_H
+#define PACKAGE_ACTION_HANDLER_H
 
 
 #include <SupportDefs.h>
