@@ -28,7 +28,7 @@ min = 0.0
 max = 1.0
 ----------------------------------------------------------*/
 #ifndef PEAK_VIEW_H
-#define PEAL_VIEW_H
+#define PEAK_VIEW_H
 
 
 #include <View.h>
