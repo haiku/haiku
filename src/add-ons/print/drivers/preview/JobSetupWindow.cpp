@@ -42,7 +42,7 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 
 	int32 lastPage;
 	fSetupMsg->FindInt32("last_page", &lastPage);
-	bool allPages = firstPage == 1 && lastPage == LONG_MAX;
+	bool allPages = firstPage == 1 && lastPage == INT32_MAX;
 
 	fAll = new BRadioButton("allPages", "Print all pages",
 		new BMessage(ALL_PAGES_MGS));
