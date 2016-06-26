@@ -124,8 +124,8 @@ struct block_cache {
 
 	void			Free(void* buffer);
 	void*			Allocate();
-	void			RemoveUnusedBlocks(int32_t maxAccessed = LONG_MAX,
-						int32_t count = LONG_MAX);
+	void			RemoveUnusedBlocks(int32_t maxAccessed = INT32_MAX,
+						int32_t count = INT32_MAX);
 	void			RemoveBlock(cached_block* block);
 	void			DiscardBlock(cached_block* block);
 	void			FreeBlock(cached_block* block);
