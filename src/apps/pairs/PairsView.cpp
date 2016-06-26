@@ -80,9 +80,9 @@ PairsView::~PairsView()
 	delete fMediumBitmapsList;
 	delete fLargeBitmapsList;
 	delete fPairsButtonList;
-	delete fRandomPosition;
-	delete fPositionX;
-	delete fPositionY;
+	delete[] fRandomPosition;
+	delete[] fPositionX;
+	delete[] fPositionY;
 }
 
 
