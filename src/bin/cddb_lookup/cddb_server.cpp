@@ -312,7 +312,7 @@ CDDBServer::_ParseAddress(const BString& cddbServer)
 			char* firstInvalid;
 			errno = 0;
 			port = strtol(portString.String(), &firstInvalid, 10);
-			if ((errno == ERANGE && (port == LONG_MAX || port == LONG_MIN))
+			if ((errno == ERANGE && (port == INT32_MAX || port == INT32_MIN))
 				|| (errno != 0 && port == 0)) {
 				return B_ERROR;
 			}
