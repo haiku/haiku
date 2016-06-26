@@ -26,7 +26,7 @@ PCL6Writer::PCL6Writer(PCL6WriterStream* stream, uint32 bufferSize)
 
 PCL6Writer::~PCL6Writer()
 {
-	delete fBuffer;
+	delete[] fBuffer;
 	fBuffer = NULL;
 }
 

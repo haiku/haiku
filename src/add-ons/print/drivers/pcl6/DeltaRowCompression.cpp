@@ -26,7 +26,7 @@ AbstractDeltaRowCompressor::AbstractDeltaRowCompressor(int rowSize,
 
 AbstractDeltaRowCompressor::~AbstractDeltaRowCompressor()
 {
-	delete fSeedRow;
+	delete[] fSeedRow;
 	fSeedRow = NULL;
 }
 
