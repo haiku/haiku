@@ -32,7 +32,6 @@ UrlPlaylistItem::UrlPlaylistItem(const BMessage* archive)
 
 UrlPlaylistItem::~UrlPlaylistItem()
 {
-	delete fUrl;
 }
 
 
@@ -128,7 +127,7 @@ UrlPlaylistItem::RestoreFromTrash()
 
 
 TrackSupplier*
-UrlPlaylistItem::CreateTrackSupplier() const
+UrlPlaylistItem::_CreateTrackSupplier() const
 {
 	MediaFileTrackSupplier* supplier
 		= new(std::nothrow) MediaFileTrackSupplier();

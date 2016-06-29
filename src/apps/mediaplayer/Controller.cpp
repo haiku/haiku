@@ -53,6 +53,31 @@
 using std::nothrow;
 
 
+class TrackSupplierReleaser {
+public:
+	TrackSupplierReleaser(PlaylistItemRef& owner)
+		:
+		fOwner(owner),
+		fRelease(true)
+		{}
+
+	virtual ~TrackSupplierReleaser()
+	{
+		if (fRelease)
+			fOwner.Get()->ReleaseTrackSupplier();
+	}
+
+	void Detach()
+	{
+		fRelease = false;
+	}
+
+private:
+	PlaylistItemRef&	fOwner;
+	bool				fRelease;
+};
+
+
 void
 HandleError(const char *text, status_t err)
 {
@@ -100,7 +125,6 @@ Controller::Controller()
 	fMuted(false),
 
 	fItem(NULL),
-	fTrackSupplier(NULL),
 
 	fVideoSupplier(new ProxyVideoSupplier()),
 	fAudioSupplier(new ProxyAudioSupplier(this)),
@@ -235,13 +259,13 @@ Controller::SetTo(const PlaylistItemRef& item)
 		return B_OK;
 	}
 
-	fItem = item;
-
 	fAudioSupplier->SetSupplier(NULL, fVideoFrameRate);
 	fVideoSupplier->SetSupplier(NULL);
 
-	ObjectDeleter<TrackSupplier> oldTrackSupplierDeleter(fTrackSupplier);
-	fTrackSupplier = NULL;
+	if (fItem != NULL)
+		TrackSupplierReleaser oldSupplierReleaser(fItem);
+
+	fItem = item;
 
 	// Do not delete the supplier chain until after we called
 	// NodeManager::Init() to setup a new media node chain
@@ -266,12 +290,12 @@ Controller::SetTo(const PlaylistItemRef& item)
 	if (fItem.Get() == NULL)
 		return B_BAD_VALUE;
 
-	TrackSupplier* trackSupplier = fItem->CreateTrackSupplier();
+	TrackSupplier* trackSupplier = fItem->GetTrackSupplier();
 	if (trackSupplier == NULL) {
 		_NotifyFileChanged(item.Get(), B_NO_MEMORY);
 		return B_NO_MEMORY;
 	}
-	ObjectDeleter<TrackSupplier> trackSupplierDeleter(trackSupplier);
+	TrackSupplierReleaser trackSupplierReleaser(fItem);
 
 	status_t err = trackSupplier->InitCheck();
 	if (err != B_OK) {
@@ -286,20 +310,17 @@ Controller::SetTo(const PlaylistItemRef& item)
 		return B_MEDIA_NO_HANDLER;
 	}
 
-	fTrackSupplier = trackSupplier;
-
 	SelectAudioTrack(0);
 	SelectVideoTrack(0);
 
 	if (fAudioTrackSupplier == NULL && fVideoTrackSupplier == NULL) {
 		printf("Controller::SetTo: no audio or video tracks found or "
 			"no decoders\n");
-		fTrackSupplier = NULL;
 		_NotifyFileChanged(item.Get(), B_MEDIA_NO_HANDLER);
 		return B_MEDIA_NO_HANDLER;
 	}
 
-	trackSupplierDeleter.Detach();
+	trackSupplierReleaser.Detach();
 
 	// prevent blocking the creation of new overlay buffers
 	if (fVideoView)
@@ -423,8 +444,8 @@ Controller::AudioTrackCount()
 {
 	BAutolock _(this);
 
-	if (fTrackSupplier != NULL)
-		return fTrackSupplier->CountAudioTracks();
+	if (fItem != NULL && fItem->HasTrackSupplier())
+		return fItem->GetTrackSupplier()->CountAudioTracks();
 	return 0;
 }
 
@@ -434,8 +455,8 @@ Controller::VideoTrackCount()
 {
 	BAutolock _(this);
 
-	if (fTrackSupplier != NULL)
-		return fTrackSupplier->CountVideoTracks();
+	if (fItem != NULL && fItem->HasTrackSupplier())
+		return fItem->GetTrackSupplier()->CountVideoTracks();
 	return 0;
 }
 
@@ -445,8 +466,8 @@ Controller::SubTitleTrackCount()
 {
 	BAutolock _(this);
 
-	if (fTrackSupplier != NULL)
-		return fTrackSupplier->CountSubTitleTracks();
+	if (fItem != NULL && fItem->HasTrackSupplier())
+		return fItem->GetTrackSupplier()->CountSubTitleTracks();
 	return 0;
 }
 
@@ -455,11 +476,12 @@ status_t
 Controller::SelectAudioTrack(int n)
 {
 	BAutolock _(this);
-	if (fTrackSupplier == NULL)
+	if (fItem == NULL || !fItem->HasTrackSupplier())
 		return B_NO_INIT;
 
 	ObjectDeleter<AudioTrackSupplier> deleter(fAudioTrackSupplier);
-	fAudioTrackSupplier = fTrackSupplier->CreateAudioTrackForIndex(n);
+	fAudioTrackSupplier
+		= fItem->GetTrackSupplier()->CreateAudioTrackForIndex(n);
 	if (fAudioTrackSupplier == NULL)
 		return B_BAD_INDEX;
 
@@ -505,11 +527,12 @@ Controller::SelectVideoTrack(int n)
 {
 	BAutolock _(this);
 
-	if (fTrackSupplier == NULL)
+	if (fItem == NULL || !fItem->HasTrackSupplier())
 		return B_NO_INIT;
 
 	ObjectDeleter<VideoTrackSupplier> deleter(fVideoTrackSupplier);
-	fVideoTrackSupplier = fTrackSupplier->CreateVideoTrackForIndex(n);
+	fVideoTrackSupplier
+		= fItem->GetTrackSupplier()->CreateVideoTrackForIndex(n);
 	if (fVideoTrackSupplier == NULL)
 		return B_BAD_INDEX;
 
@@ -550,11 +573,12 @@ Controller::SelectSubTitleTrack(int n)
 {
 	BAutolock _(this);
 
-	if (fTrackSupplier == NULL)
+	if (fItem == NULL || !fItem->HasTrackSupplier())
 		return B_NO_INIT;
 
 	fSubTitlesIndex = n;
-	fSubTitles = fTrackSupplier->SubTitleTrackForIndex(n);
+	fSubTitles =
+		fItem->GetTrackSupplier()->SubTitleTrackForIndex(n);
 
 	const SubTitle* subTitle = NULL;
 	if (fSubTitles != NULL)
@@ -586,10 +610,11 @@ Controller::SubTitleTrackName(int n)
 {
 	BAutolock _(this);
 
-	if (fTrackSupplier == NULL)
+	if (fItem == NULL || !fItem->HasTrackSupplier())
 		return NULL;
 
-	const SubTitles* subTitles = fTrackSupplier->SubTitleTrackForIndex(n);
+	const SubTitles* subTitles
+		= fItem->GetTrackSupplier()->SubTitleTrackForIndex(n);
 	if (subTitles == NULL)
 		return NULL;
 
@@ -800,7 +825,7 @@ bool
 Controller::HasFile()
 {
 	// you need to hold the data lock
-	return fTrackSupplier != NULL;
+	return fItem != NULL && fItem->HasTrackSupplier();
 }
 
 
@@ -808,9 +833,9 @@ status_t
 Controller::GetFileFormatInfo(media_file_format* fileFormat)
 {
 	// you need to hold the data lock
-	if (!fTrackSupplier)
+	if (fItem == NULL || !fItem->HasTrackSupplier())
 		return B_NO_INIT;
-	return fTrackSupplier->GetFileFormatInfo(fileFormat);
+	return fItem->GetTrackSupplier()->GetFileFormatInfo(fileFormat);
 }
 
 
@@ -818,9 +843,9 @@ status_t
 Controller::GetCopyright(BString* copyright)
 {
 	// you need to hold the data lock
-	if (!fTrackSupplier)
+	if (fItem == NULL || !fItem->HasTrackSupplier())
 		return B_NO_INIT;
-	return fTrackSupplier->GetCopyright(copyright);
+	return fItem->GetTrackSupplier()->GetCopyright(copyright);
 }
 
 
@@ -890,9 +915,9 @@ status_t
 Controller::GetMetaData(BMessage* metaData)
 {
 	// you need to hold the data lock
-	if (fTrackSupplier == NULL)
+	if (fItem == NULL || !fItem->HasTrackSupplier())
 		return B_NO_INIT;
-	return fTrackSupplier->GetMetaData(metaData);
+	return fItem->GetTrackSupplier()->GetMetaData(metaData);
 }
 
 
@@ -900,9 +925,9 @@ status_t
 Controller::GetVideoMetaData(int32 index, BMessage* metaData)
 {
 	// you need to hold the data lock
-	if (fTrackSupplier == NULL)
+	if (fItem == NULL || !fItem->HasTrackSupplier())
 		return B_NO_INIT;
-	return fTrackSupplier->GetVideoMetaData(index, metaData);
+	return fItem->GetTrackSupplier()->GetVideoMetaData(index, metaData);
 }
 
 
@@ -910,9 +935,9 @@ status_t
 Controller::GetAudioMetaData(int32 index, BMessage* metaData)
 {
 	// you need to hold the data lock
-	if (fTrackSupplier == NULL)
+	if (fItem == NULL || !fItem->HasTrackSupplier())
 		return B_NO_INIT;
-	return fTrackSupplier->GetAudioMetaData(index, metaData);
+	return fItem->GetTrackSupplier()->GetAudioMetaData(index, metaData);
 }
 
 

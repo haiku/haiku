@@ -197,7 +197,6 @@ private:
 			bool				fMuted;
 
 			PlaylistItemRef		fItem;
-			TrackSupplier*		fTrackSupplier;
 
 			ProxyVideoSupplier*	fVideoSupplier;
 			ProxyAudioSupplier*	fAudioSupplier;

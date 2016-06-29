@@ -45,9 +45,10 @@ public:
 	virtual	status_t			MoveIntoTrash();
 	virtual	status_t			RestoreFromTrash();
 
-	virtual	TrackSupplier*		CreateTrackSupplier() const;
-
 			BUrl				Url() const;
+
+protected:
+	virtual	TrackSupplier*		_CreateTrackSupplier() const;
 
 private:
 			BUrl				fUrl;

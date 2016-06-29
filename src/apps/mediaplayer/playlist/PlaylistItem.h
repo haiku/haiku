@@ -90,8 +90,13 @@ public:
 	virtual	status_t			MoveIntoTrash() = 0;
 	virtual	status_t			RestoreFromTrash() = 0;
 
-	// playback
-	virtual	TrackSupplier*		CreateTrackSupplier() const = 0;
+	// Create and return the TrackSupplier if it doesn't exist,
+	// this object is used for media playback.
+			TrackSupplier*		GetTrackSupplier();
+	// Delete and reset the TrackSupplier
+			void				ReleaseTrackSupplier();
+	// Return whether the supplier has been initialized
+			bool				HasTrackSupplier() const;
 
 			void				SetPlaybackFailed();
 			bool				PlaybackFailed() const
@@ -103,11 +108,13 @@ public:
 
 protected:
 			void				_NotifyListeners() const;
-	virtual	bigtime_t			_CalculateDuration() const;
+	virtual	bigtime_t			_CalculateDuration();
+	virtual	TrackSupplier*		_CreateTrackSupplier() const = 0;
 
 private:
 			BList				fListeners;
 			bool				fPlaybackFailed;
+			TrackSupplier*		fTrackSupplier;
 };
 
 typedef BReference<PlaylistItem> PlaylistItemRef;

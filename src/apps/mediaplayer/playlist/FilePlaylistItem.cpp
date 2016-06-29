@@ -288,7 +288,7 @@ FilePlaylistItem::RestoreFromTrash()
 // #pragma mark -
 
 TrackSupplier*
-FilePlaylistItem::CreateTrackSupplier() const
+FilePlaylistItem::_CreateTrackSupplier() const
 {
 	MediaFileTrackSupplier* supplier
 		= new(std::nothrow) MediaFileTrackSupplier();
@@ -400,7 +400,7 @@ FilePlaylistItem::ImageRef() const
 
 
 bigtime_t
-FilePlaylistItem::_CalculateDuration() const
+FilePlaylistItem::_CalculateDuration()
 {
 	BMediaFile mediaFile(&Ref());
 
