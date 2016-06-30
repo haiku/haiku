@@ -8,21 +8,23 @@
 
 #include <MediaIO.h>
 
-#include <stdio.h>
-
 #include "debug.h"
+
+
+#define TIMEOUT_QUANTA 100000
 
 
 class RelativePositionIO : public BPositionIO
 {
 public:
-	RelativePositionIO(BAdapterIO* owner, BPositionIO* buffer)
+	RelativePositionIO(BAdapterIO* owner, BPositionIO* buffer, bigtime_t timeout)
 		:
 		BPositionIO(),
 		fOwner(owner),
 		fBackPosition(0),
 		fStartOffset(0),
-		fBuffer(buffer)
+		fBuffer(buffer),
+		fTimeout(timeout)
 	{
 		fOwner->GetFlags(&fFlags);
 	}
@@ -84,8 +86,15 @@ public:
 		if (ret != B_OK)
 			return B_ERROR;
 
-		while(bufferSize < position) {
-			snooze(100000);
+		bigtime_t totalTimeOut = 0;
+
+		while(bufferSize <= position) {
+			if (fTimeout != B_INFINITE_TIMEOUT && totalTimeOut >= fTimeout)
+				return B_TIMED_OUT;
+
+			snooze(TIMEOUT_QUANTA);
+
+			totalTimeOut += TIMEOUT_QUANTA;
 			GetSize(&bufferSize);
 		}
 		return B_OK;
@@ -147,10 +156,15 @@ public:
 	{
 		AutoWriteLocker _(fLock);
 
-		off_t currentPos = Position();
 		off_t ret = fBuffer->WriteAt(fBackPosition, buffer, size);
 		fBackPosition += ret;
-		return fBuffer->Seek(currentPos, SEEK_SET);
+		return ret;
+	}
+
+	void SetBuffer(BPositionIO* buffer)
+	{
+		delete fBuffer;
+		fBuffer = buffer;
 	}
 
 	bool IsStreaming() const
@@ -188,19 +202,26 @@ private:
 	int32				fFlags;
 
 	mutable	RWLocker	fLock;
+
+	bigtime_t			fTimeout;
 };
 
 
 BAdapterIO::BAdapterIO(int32 flags, bigtime_t timeout)
 	:
 	fFlags(flags),
-	fTimeout(timeout),
 	fBuffer(NULL),
+	fTotalSize(0),
+	fOpened(false),
+	fSeekSem(-1),
 	fInputAdapter(NULL)
 {
 	CALLED();
 
-	fBuffer = new RelativePositionIO(this, new BMallocIO());
+	fBuffer = new RelativePositionIO(this, new BMallocIO(), timeout);
+
+	if (fBuffer->IsSeekable())
+		fSeekSem = create_sem(0, "BAdapterIO seek sem");
 }
 
 
@@ -213,6 +234,8 @@ BAdapterIO::BAdapterIO(const BAdapterIO &)
 BAdapterIO::~BAdapterIO()
 {
 	CALLED();
+
+	Close();
 
 	delete fInputAdapter;
 	delete fBuffer;
@@ -233,7 +256,8 @@ BAdapterIO::ReadAt(off_t position, void* buffer, size_t size)
 {
 	CALLED();
 
-	printf("read at %d  %d \n", (int)position, (int)size);
+	TRACE("BAdapterIO::ReadAt %" B_PRId64 " %" B_PRId64 "\n", position, size);
+
 	status_t ret = _EvaluateWait(position+size);
 	if (ret != B_OK)
 		return ret;
@@ -260,6 +284,7 @@ BAdapterIO::Seek(off_t position, uint32 seekMode)
 {
 	CALLED();
 
+	// TODO: Support seekModes
 	status_t ret = _EvaluateWait(position);
 	if (ret != B_OK)
 		return ret;
@@ -305,6 +330,66 @@ BAdapterIO::GetSize(off_t* size) const
 }
 
 
+status_t
+BAdapterIO::Open()
+{
+	CALLED();
+
+	fOpened = true;
+	return B_OK;
+}
+
+
+void
+BAdapterIO::Close()
+{
+	CALLED();
+
+	fOpened = false;
+}
+
+
+void
+BAdapterIO::SeekCompleted()
+{
+	CALLED();
+	release_sem(fSeekSem);
+}
+
+
+status_t
+BAdapterIO::SetBuffer(BPositionIO* buffer)
+{
+	// We can't change the buffer while we
+	// are running.
+	if (fOpened)
+		return B_ERROR;
+
+	fBuffer->SetBuffer(buffer);
+	return B_OK;
+}
+
+
+BInputAdapter*
+BAdapterIO::BuildInputAdapter()
+{
+	if (fInputAdapter != NULL)
+		return fInputAdapter;
+
+	fInputAdapter = new BInputAdapter(this);
+	return fInputAdapter;
+}
+
+
+status_t
+BAdapterIO::SeekRequested(off_t position)
+{
+	CALLED();
+
+	return B_ERROR;
+}
+
+
 ssize_t
 BAdapterIO::BackWrite(const void* buffer, size_t size)
 {
@@ -329,39 +414,13 @@ BAdapterIO::_EvaluateWait(off_t pos)
 				&& fBuffer->IsSeekable()) {
 			if (SeekRequested(pos) != B_OK)
 				return B_UNSUPPORTED;
+
+			acquire_sem(fSeekSem);
+			fBuffer->ResetStartOffset(pos);
 		}
 	}
 
 	return fBuffer->WaitForData(pos);
-}
-
-
-BInputAdapter*
-BAdapterIO::BuildInputAdapter()
-{
-	if (fInputAdapter != NULL)
-		return fInputAdapter;
-
-	fInputAdapter = new BInputAdapter(this);
-	return fInputAdapter;
-}
-
-
-status_t
-BAdapterIO::SeekRequested(off_t position)
-{
-	CALLED();
-
-	return B_ERROR;
-}
-
-
-status_t
-BAdapterIO::SeekCompleted(off_t position)
-{
-	CALLED();
-
-	return fBuffer->ResetStartOffset(position);
 }
 
 

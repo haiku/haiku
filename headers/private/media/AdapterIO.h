@@ -54,26 +54,30 @@ public:
 	virtual	status_t				SetSize(off_t size);
 	virtual	status_t				GetSize(off_t* size) const;
 
+	virtual status_t				Open();
+	virtual void					Close();
+
+			void					SeekCompleted();
+			status_t				SetBuffer(BPositionIO* buffer);
+
 			BInputAdapter*			BuildInputAdapter();
 
 protected:
 	friend class BInputAdapter;
 
-			void					SetBuffer(BPositionIO* io);
+	virtual	status_t				SeekRequested(off_t position);
 
 			ssize_t					BackWrite(const void* buffer, size_t size);
-
-			status_t				SeekRequested(off_t position);
-			status_t				SeekCompleted(off_t position);
 
 private:
 			status_t				_EvaluateWait(off_t position);
 
 			int32					fFlags;
-			bigtime_t				fTimeout;
 
 			RelativePositionIO*		fBuffer;
 			off_t					fTotalSize;
+			bool					fOpened;
+			sem_id					fSeekSem;
 
 			BInputAdapter*			fInputAdapter;
 
