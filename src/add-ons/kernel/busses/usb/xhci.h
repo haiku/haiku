@@ -42,6 +42,7 @@ typedef struct xhci_td {
 	size_t	buffer_size[XHCI_MAX_TRBS_PER_TD];	// Size of the buffer
 	uint8	buffer_count;
 
+	struct xhci_td	*next_chain;
 	struct xhci_td	*next;
 	Transfer *transfer;
 	uint8	trb_count;

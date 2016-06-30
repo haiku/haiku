@@ -373,7 +373,7 @@ XHCI::_SwitchIntelPorts()
 status_t
 XHCI::Start()
 {
-	TRACE("starting XHCI host controller\n");
+	TRACE_ALWAYS("starting XHCI host controller\n");
 	TRACE("usbcmd: 0x%08" B_PRIx32 "; usbsts: 0x%08" B_PRIx32 "\n",
 		ReadOpReg(XHCI_CMD), ReadOpReg(XHCI_STS));
 
@@ -640,12 +640,12 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 
 	TRACE("SubmitControlRequest() request linked\n");
 
-	TRACE("Endpoint status 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 "\n",
+	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
 		endpoint->device->device_ctx->endpoints[id-1].dwendpoint0,
 		endpoint->device->device_ctx->endpoints[id-1].dwendpoint1,
 		endpoint->device->device_ctx->endpoints[id-1].qwendpoint2);
 	Ring(endpoint->device->slot, id);
-	TRACE("Endpoint status 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 "\n",
+	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
 		endpoint->device->device_ctx->endpoints[id-1].dwendpoint0,
 		endpoint->device->device_ctx->endpoints[id-1].dwendpoint1,
 		endpoint->device->device_ctx->endpoints[id-1].qwendpoint2);
@@ -697,16 +697,15 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 
 	TRACE("SubmitNormalRequest() request linked\n");
 
-	TRACE("Endpoint status 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 "\n",
+	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
 		endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0,
 		endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1,
 		endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2);
 	Ring(endpoint->device->slot, id);
-	TRACE("Endpoint status 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx64 "\n",
+	TRACE("Endpoint status 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%016" B_PRIx64 "\n",
 		endpoint->device->device_ctx->endpoints[id - 1].dwendpoint0,
 		endpoint->device->device_ctx->endpoints[id - 1].dwendpoint1,
 		endpoint->device->device_ctx->endpoints[id - 1].qwendpoint2);
-
 	return B_OK;
 }
 
@@ -714,6 +713,8 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 status_t
 XHCI::CancelQueuedTransfers(Pipe *pipe, bool force)
 {
+	TRACE_ALWAYS("cancel queued transfers for pipe %p (%d)\n", pipe,
+		pipe->EndpointAddress());
 	return B_OK;
 }
 
@@ -790,6 +791,7 @@ XHCI::AddTo(Stack *stack)
 			switch ((item->vendor_id << 16) | item->device_id) {
 				case 0x10330194:	// Nec Corporation uPD720200
 				case 0x1b731009:	// Fresco Logic FL1009
+				case 0x80861e31:	// Intel xHCI found on VirtualBox5.
 					break;
 				default:
 					TRACE_MODULE_ERROR("found device but unsupported\n");
@@ -873,7 +875,7 @@ XHCI::CreateDescriptorChain(size_t bufferSize)
 		descriptor->buffer_count = trbs;
 		trbCount -= trbs;
 		if (last != NULL)
-			last->next = descriptor;
+			last->next_chain = descriptor;
 		last = descriptor;
 	}
 
@@ -981,7 +983,7 @@ XHCI::WriteDescriptorChain(xhci_td *descriptor, iovec *vector,
 			}
 		}
 
-		current = current->next;
+		current = current->next_chain;
 		trbIndex = 0;
 	}
 
@@ -1036,7 +1038,7 @@ XHCI::ReadDescriptorChain(xhci_td *descriptor, iovec *vector,
 			}
 		}
 
-		current = current->next;
+		current = current->next_chain;
 		trbIndex = 0;
 	}
 
@@ -1147,7 +1149,7 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	device->input_ctx->slot.dwslot3 = SLOT_3_SLOT_STATE(0)
 		| SLOT_3_DEVICE_ADDRESS(0);
 
-	TRACE("slot 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx32 " 0x%" B_PRIx32
+	TRACE("slot 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%08" B_PRIx32 " 0x%08" B_PRIx32
 		"\n", device->input_ctx->slot.dwslot0,
 		device->input_ctx->slot.dwslot1, device->input_ctx->slot.dwslot2,
 		device->input_ctx->slot.dwslot3);
@@ -1224,9 +1226,9 @@ XHCI::AllocateDevice(Hub *parent, int8 hubAddress, uint8 hubPort,
 	device->address = SLOT_3_DEVICE_ADDRESS_GET(
 		device->device_ctx->slot.dwslot3);
 
-	TRACE("device: address 0x%x state 0x%" B_PRIx32 "\n", device->address,
+	TRACE("device: address 0x%x state 0x%08" B_PRIx32 "\n", device->address,
 		SLOT_3_SLOT_STATE_GET(device->device_ctx->slot.dwslot3));
-	TRACE("endpoint0 state 0x%" B_PRIx32 "\n",
+	TRACE("endpoint0 state 0x%08" B_PRIx32 "\n",
 		ENDPOINT_0_STATE_GET(device->device_ctx->endpoints[0].dwendpoint0));
 
 	// Create a temporary pipe with the new address
@@ -1396,12 +1398,13 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 
 		uint8 endpoint = id + 1;
 
+		/* TODO: invalid Context State running the 3 following commands
 		StopEndpoint(false, endpoint, device->slot);
 
 		ResetEndpoint(false, endpoint, device->slot);
 
 		SetTRDequeue(device->endpoints[id].trb_addr, 0, endpoint,
-			device->slot);
+			device->slot); */
 
 		device->input_ctx->input.dropFlags = 0;
 		device->input_ctx->input.addFlags = (1 << endpoint) | (1 << 0);
@@ -1429,11 +1432,11 @@ XHCI::_InsertEndpointForPipe(Pipe *pipe)
 		EvaluateContext(device->input_ctx_addr, device->slot);
 
 		ConfigureEndpoint(device->input_ctx_addr, false, device->slot);
-		TRACE("device: address 0x%x state 0x%" B_PRIx32 "\n", device->address,
+		TRACE("device: address 0x%x state 0x%08" B_PRIx32 "\n", device->address,
 			SLOT_3_SLOT_STATE_GET(device->device_ctx->slot.dwslot3));
-		TRACE("endpoint[0] state 0x%" B_PRIx32 "\n",
+		TRACE("endpoint[0] state 0x%08" B_PRIx32 "\n",
 			ENDPOINT_0_STATE_GET(device->device_ctx->endpoints[0].dwendpoint0));
-		TRACE("endpoint[%d] state 0x%" B_PRIx32 "\n", id,
+		TRACE("endpoint[%d] state 0x%08" B_PRIx32 "\n", id,
 			ENDPOINT_0_STATE_GET(device->device_ctx->endpoints[id].dwendpoint0));
 		device->state = XHCI_STATE_CONFIGURED;
 	}
@@ -1461,7 +1464,7 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 {
 	TRACE("_LinkDescriptorForPipe\n");
 	MutexLocker endpointLocker(endpoint->lock);
-	if (endpoint->used > XHCI_MAX_TRANSFERS) {
+	if (endpoint->used >= XHCI_MAX_TRANSFERS) {
 		TRACE_ERROR("_LinkDescriptorForPipe max transfers count exceeded\n");
 		return B_BAD_VALUE;
 	}
@@ -1495,7 +1498,7 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 		| TRB_3_CYCLE_BIT;
 
 	TRACE("_LinkDescriptorForPipe pCurrent %p phys 0x%" B_PRIxPHYSADDR
-		" 0x%" B_PRIxPHYSADDR " 0x%" B_PRIx32 "\n", &endpoint->trbs[current],
+		" 0x%" B_PRIxPHYSADDR " 0x%08" B_PRIx32 "\n", &endpoint->trbs[current],
 		endpoint->trb_addr + current * sizeof(struct xhci_trb),
 		endpoint->trbs[current].qwtrb0, endpoint->trbs[current].dwtrb3);
 	endpoint->current = next;
@@ -1962,22 +1965,35 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 
 	xhci_device *device = &fDevices[slot];
 	xhci_endpoint *endpoint = &device->endpoints[endpointNumber - 1];
-	for (xhci_td *td = endpoint->td_head; td != NULL; td = td->next) {
-		int64 offset = source - td->this_phy;
-		TRACE("HandleTransferComplete td %p offset %" B_PRId64 "\n", td,
-			offset);
-		(void)offset;
-		_UnlinkDescriptorForPipe(td, endpoint);
-		td->trb_completion_code = completionCode;
-		td->trb_left = remainder;
-		// add descriptor to finished list (to be processed and freed)
-		Lock();
-		td->next = fFinishedHead;
-		fFinishedHead = td;
-		Unlock();
-		release_sem(fFinishTransfersSem);
-		break;
+	xhci_td *td = endpoint->td_head;
+	for (; td != NULL; td = td->next) {
+		xhci_td *td_chain = td;
+		for (; td_chain != NULL; td_chain = td_chain->next_chain) {
+			int64 offset = source - td_chain->this_phy;
+			TRACE("HandleTransferComplete td %p offset %" B_PRId64 " %"
+				B_PRIx64 "\n", td_chain, offset, source);
+			offset = offset / sizeof(xhci_trb);
+			if (offset <= td_chain->trb_count && offset >= 0) {
+				TRACE("HandleTransferComplete td %p trb %" B_PRId64 " found "
+					"\n", td_chain, offset);
+				// is it the last trb?
+				if (offset == td_chain->trb_count) {
+					_UnlinkDescriptorForPipe(td, endpoint);
+					td->trb_completion_code = completionCode;
+					td->trb_left = remainder;
+					// add descriptor to finished list
+					Lock();
+					td->next = fFinishedHead;
+					fFinishedHead = td;
+					Unlock();
+					release_sem(fFinishTransfersSem);
+					TRACE("HandleTransferComplete td %p\n", td);
+				}
+				return;
+			}
+		}
 	}
+
 }
 
 
