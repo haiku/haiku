@@ -59,7 +59,7 @@ public:
 			delete request;
 		}
 
-		off_t		TotalSize() const
+		off_t TotalSize() const
 		{
 			return fTotalSize;
 		}
@@ -74,43 +74,17 @@ private:
 
 HTTPMediaIO::HTTPMediaIO(BUrl url)
 	:
-	BAdapterIO(
-		B_MEDIA_STREAMING | B_MEDIA_SEEK_BACKWARD,
-		B_INFINITE_TIMEOUT),
-	fInitErr(B_ERROR)
+	BAdapterIO(B_MEDIA_STREAMING | B_MEDIA_SEEK_BACKWARD, B_INFINITE_TIMEOUT),
+	fContext(NULL),
+	fReq(NULL),
+	fListener(NULL),
+	fUrl(url)
 {
-	fContext = new BUrlContext();
-	fContext->AcquireReference();
-
-	fListener = new FileListener(this);
-
-	fReq = BUrlProtocolRoster::MakeRequest(url,
-		fListener, fContext);
-
-	if (fReq == NULL)
-		return;
-
-	if (fReq->Run() < 0)
-		return;
-
-	fInitErr = B_OK;
 }
 
 
 HTTPMediaIO::~HTTPMediaIO()
 {
-	delete fReq;
-	delete fListener;
-
-	fContext->ReleaseReference();
-	delete fContext;
-}
-
-
-status_t
-HTTPMediaIO::InitCheck() const
-{
-	return fInitErr;
 }
 
 
@@ -133,4 +107,45 @@ HTTPMediaIO::GetSize(off_t* size) const
 {
 	*size = fListener->TotalSize();
 	return B_OK;
+}
+
+
+status_t
+HTTPMediaIO::Open()
+{
+	fContext = new BUrlContext();
+	fContext->AcquireReference();
+
+	fListener = new FileListener(this);
+
+	fReq = BUrlProtocolRoster::MakeRequest(fUrl,
+		fListener, fContext);
+
+	if (fReq == NULL)
+		return B_ERROR;
+
+	if (fReq->Run() < 0)
+		return B_ERROR;
+
+	return BAdapterIO::Open();
+}
+
+
+void
+HTTPMediaIO::Close()
+{
+	delete fReq;
+	delete fListener;
+
+	fContext->ReleaseReference();
+	delete fContext;
+
+	BAdapterIO::Close();
+}
+
+
+status_t
+HTTPMediaIO::SeekRequested(off_t position)
+{
+	return BAdapterIO::SeekRequested(position);
 }

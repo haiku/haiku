@@ -22,13 +22,14 @@ HTTPStreamer::~HTTPStreamer()
 status_t
 HTTPStreamer::Sniff(const BUrl& url, BDataIO** source)
 {
-	HTTPMediaIO* ret = new HTTPMediaIO(url);
-	if (ret->InitCheck() == B_OK) {
-		*source = ret;
+	HTTPMediaIO* outSource = new HTTPMediaIO(url);
+	status_t ret = outSource->Open();
+	if (ret == B_OK) {
+		*source = outSource;
 		return B_OK;
 	}
-	delete ret;
-	return B_ERROR;
+	delete outSource;
+	return ret;
 }
 
 

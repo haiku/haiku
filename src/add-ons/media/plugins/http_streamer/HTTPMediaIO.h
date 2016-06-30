@@ -20,20 +20,24 @@ public:
 										HTTPMediaIO(BUrl url);
 	virtual								~HTTPMediaIO();
 
-			status_t					InitCheck() const;
-
 	virtual	ssize_t						WriteAt(off_t position,
 											const void* buffer, size_t size);
 
 	virtual status_t					SetSize(off_t size);
 	virtual status_t					GetSize(off_t* size) const;
 
+	virtual status_t					Open();
+	virtual void						Close();
+
+protected:
+	virtual	status_t					SeekRequested(off_t position);
+
 private:
 	BUrlContext*						fContext;
 	BUrlRequest*						fReq;
 	FileListener*						fListener;
 
-	status_t							fInitErr;
+	BUrl								fUrl;
 };
 
 #endif
