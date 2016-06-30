@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2016.03.03
-# Date:    2016-03-03 20:34:05
+# Version: 2016.06.28
+# Date:    2016-06-28 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -111,14 +111,24 @@
 	2109  STK541 ZigBee Development Board
 	210d  XPLAIN evaluation kit (CDC ACM)
 	2110  AVR JTAGICE3 Debugger and Programmer
+	2111  Xplained Pro board debugger and programmer
 	2122  XMEGA-A1 Explained evaluation kit
+	2140  AVR JTAGICE3 (v3.x) Debugger and Programmer
 	2141  ICE debugger
 	2310  EVK11xx evaluation board
 	2fe4  ATxmega32A4U DFU bootloader
 	2fe6  Cactus V6 (DFU)
 	2fea  Cactus RF60 (DFU)
+	2fee  atmega8u2 DFU bootloader
+	2fef  atmega16u2 DFU bootloader
 	2ff0  atmega32u2 DFU bootloader
+	2ff1  at32uc3a3 DFU bootloader
+	2ff3  atmega16u4 DFU bootloader
 	2ff4  atmega32u4 DFU bootloader
+	2ff6  at32uc3b0/1 DFU bootloader
+	2ff7  at90usb82 DFU bootloader
+	2ff8  at32uc3a0/1 DFU bootloader
+	2ff9  at90usb646/647 DFU bootloader
 	2ffa  at90usb162 DFU bootloader
 	2ffb  at90usb AVR DFU bootloader
 	2ffd  at89c5130/c5131 DFU bootloader
@@ -251,6 +261,7 @@
 	0c24  Bluetooth Dongle
 	0d12  OfficeJet 9100 series
 	0d17  LaserJet 1012
+	0d4a  SK-2025 Keyboard
 	0e17  LaserJet 1015
 	0f0c  Wireless Keyboard and Optical Mouse receiver
 	0f11  OfficeJet V40
@@ -266,6 +277,7 @@
 	1017  LaserJet 1300
 	1024  Smart Card Keyboard
 	1027  Virtual keyboard and mouse
+	102a  LaserJet Professional P 1102w
 	1102  PhotoSmart 240 series
 	1104  DeskJet 959c
 	1105  ScanJet 5470c/5490c
@@ -411,7 +423,7 @@
 	2e17  LaserJet 2600n
 	2e24  LP2275w Monitor Hub
 	2f11  PSC 1200
-	2f17  EWS 2605dn
+	2f17  Color LaserJet 2605dn
 	2f24  LP2475w Monitor Hub
 	3002  PhotoSmart P1000
 	3004  DeskJet 980c
@@ -429,6 +441,7 @@
 	3217  LaserJet 3050
 	3302  PhotoSmart 1218
 	3304  DeskJet 990c
+	3307  v125w Stick
 	3312  OfficeJet J6410
 	3317  LaserJet 3052
 	3402  PhotoSmart 1115
@@ -518,6 +531,7 @@
 	5717  LaserJet M1120n MFP
 	5811  PhotoSmart C5100 series
 	5817  LaserJet M1319f MFP
+	581d  lt4112 Gobi 4G Module Network Device
 	5911  PhotoSmart C6180
 	5912  Officejet Pro 8600
 	5a11  PhotoSmart C7100 series
@@ -1262,6 +1276,7 @@
 	3060  Sound Blaster Audigy 2 ZS External
 	3061  SoundBlaster Audigy 2 ZS Video Editor
 	3090  Sound Blaster Digital Music SX
+	30d0  Xmod
 	30d3  Sound Blaster Play!
 	3100  IR Receiver (SB0540)
 	3121  WoW tap chat
@@ -1270,6 +1285,7 @@
 	3f02  E-Mu 0202
 	3f04  E-Mu 0404
 	3f07  E-Mu Xmidi 1x1
+	3f0e  Xmidi 1x1 Tab
 	4003  VideoBlaster Webcam Go Plus [W9967CF]
 	4004  Nomad II MG
 	4005  Webcam Blaster Go ES
@@ -1330,6 +1346,7 @@
 	4087  Live! Cam Socialize HD 1080 [VF0680]
 	4088  Live! Cam Chat HD [VF0700]
 	4095  Live! Cam Sync HD [VF0770]
+	4097  Live! Cam Chat HD [VF0700]
 	4100  Nomad Jukebox 2
 	4101  Nomad Jukebox 3
 	4102  NOMAD MuVo^2
@@ -1505,6 +1522,7 @@
 	0610  CS-15 (Internet Stick 3G modem)
 	0661  Lumia 620/920
 	069a  130 [RM-1035] (Charging only)
+	06fc  Lumia 640 Phone
 	0720  X (RM-980)
 	0800  Connectivity Cable DKU-5
 	0801  Data Cable DKU-6
@@ -1524,6 +1542,7 @@
 	1237  Andromeda Hub
 0424  Standard Microsystems Corp.
 	0001  Integrated Hub
+	0140  LPC47M14x hub
 	0acd  Sitecom Internal Multi Memory reader/writer MD-005
 	0fdc  Floppy
 	10cd  Sitecom Internal Multi Memory reader/writer MD-005
@@ -1551,6 +1570,7 @@
 	7500  LAN7500 Ethernet 10/100/1000 Adapter
 	9512  SMC9512/9514 USB Hub
 	9514  SMC9514 Hub
+	9904  LAN9512/LAN9514 Ethernet 10/100 Adapter (SAL10)
 	a700  2 Port Hub
 	ec00  SMSC9512/9514 Fast Ethernet Adapter
 0425  Motorola Semiconductors HK, Ltd
@@ -1589,6 +1609,7 @@
 0431  Itac Systems, Inc.
 	0100  Mouse-Trak 3-button Track Ball
 0432  Unisys Corp.
+	0031  Document Processor
 0433  Alps Electric, Inc.
 	1101  IBM Game Controller
 	abab  Keyboard
@@ -1776,6 +1797,10 @@
 	6781  Keyboard with PS/2 Mouse Port
 	6782  Keyboard
 0447  Momentum Microsystems
+0449  Duta Multi Robotik
+	0128  Menengah
+	0210  Dasar
+	0612  Lanjutan
 044a  Shamrock Tech. Co., Ltd
 044b  WSI
 044c  CCL/ITRI
@@ -1841,7 +1866,9 @@
 	6060  RNDIS/BeWAN ADSL2+
 	6070  RNDIS/BeWAN ADSL2+
 	625f  TUSB6250 ATA Bridge
+	8041  Hub
 	8042  Hub
+	8043  Hub
 	8142  TUSB8041 4-Port Hub
 	926b  TUSB9260 Boot Loader
 	dbc0  Device Bay Controller
@@ -2089,7 +2116,7 @@
 	00f8  LifeCam NX-6000
 	00f9  Wireless Desktop Receiver 3.1
 	0202  Xbox Controller
-	0280  XBox Device
+	0280  Xbox Memory Unit (8MB)
 	0283  Xbox Communicator
 	0284  Xbox DVD Playback Kit
 	0285  Xbox Controller S
@@ -2111,12 +2138,13 @@
 	02ad  Xbox NUI Audio
 	02ae  Xbox NUI Camera
 	02b0  Xbox NUI Motor
-	02b6  Xbox 360 / Bluetooth Wireless Headset
+	02b6  Xbox360 Bluetooth Wireless Headset
 	02be  Kinect for Windows NUI Audio
 	02bf  Kinect for Windows NUI Camera
 	02c2  Kinect for Windows NUI Motor
-	02d1  XBOX One Controller for Windows
+	02d1  Xbox One Controller
 	02d5  Xbox One Digital TV Tuner
+	02dd  Xbox One Controller (Covert Forces/Firmware 2015)
 	0400  Windows Powered Pocket PC 2002
 	0401  Windows Powered Pocket PC 2002
 	0402  Windows Powered Pocket PC 2002
@@ -2509,6 +2537,8 @@
 	0a0b  ClearChat Pro USB
 	0a0c  Clear Chat Comfort USB Headset
 	0a13  Z-5 Speakers
+	0a14  USB Headset
+	0a15  G35 Headset
 	0a17  G330 Headset
 	0a1f  G930
 	0a29  H600 [Wireless Headset]
@@ -2588,8 +2618,10 @@
 	c06c  Optical Mouse
 	c077  M105 Optical Mouse
 	c07c  M-R0017 [G700s Rechargeable Gaming Mouse]
+	c07d  G502 Mouse
+	c07e  G402 Gaming Mouse
 	c101  UltraX Media Remote
-	c110  Harmony 785/885 Remote
+	c110  Harmony 785/880/885 Remote
 	c111  Harmony 525 Remote
 	c112  Harmony 890 Remote
 	c11f  Harmony 900/1100 Remote
@@ -3019,7 +3051,9 @@
 	a007  External Disk USB 3.0
 	a009  Stor.E Basics
 	a00d  STOR.E BASICS 500GB
+	a100  Canvio Alu 2TB 2.5" Black External Disk Model HDTH320EK3CA
 	a202  Canvio Basics HDD
+	a208  Canvio Basics 2TB USB 3.0 Portable Hard Drive
 	b001  Stor.E Partner
 	d000  External Disk 2TB Model DT01ABA200
 	d010  External Disk 3TB
@@ -3028,6 +3062,7 @@
 0482  Kyocera Corp.
 	000e  FS-1020D Printer
 	000f  FS-1920 Mono Printer
+	0015  FS-1030D printer
 	0100  Finecam S3x
 	0101  Finecam S4
 	0103  Finecam S5
@@ -3047,11 +3082,10 @@
 	2017  Biometric Smart Card Reader
 	2018  BioSimKey
 	2302  Portable Flash Device (PFD)
-	347b  ST-LINK/V2-1
-	3744  STLINK Pseudo disk
+	3744  ST-LINK/V1
 	3747  ST Micro Connect Lite
 	3748  ST-LINK/V2
-	374b  ST-LINK/V2.1 (Nucleo-F103RB)
+	374b  ST-LINK/V2.1
 	4810  ISDN adapter
 	481d  BT Digital Access adapter
 	5000  ST Micro/Ergenic ERG BT-002 Bluetooth Adapter
@@ -3425,6 +3459,7 @@
 	10b6  PIXMA iP4300 Printer
 	10c2  PIXMA iP1800 Printer
 	10c4  Pixma iP4500 Printer
+	10c9  PIXIMA iP4600 Printer
 	1404  W6400PG
 	1405  W8400PG
 	150f  BIJ2350 PCL
@@ -3483,6 +3518,7 @@
 	190a  CanoScan LiDE 210
 	190d  CanoScan 9000F Mark II
 	190e  CanoScan LiDE 120
+	190f  CanoScan LiDE 220
 	2200  CanoScan LiDE 25
 	2201  CanoScan FB320U
 	2202  CanoScan FB620U
@@ -3551,6 +3587,7 @@
 	2650  iR 6800C EUR
 	2651  iR 3100C EUR
 	2655  FP-L170/MF350/L380/L398
+	2656  iR1510-1670 CAPT Printer
 	2659  MF8100
 	265b  CAPT Printer
 	265c  iR C3220
@@ -3884,10 +3921,13 @@
 	329a  PowerShot SX60 HS
 	329b  PowerShot SX520 HS
 	329c  PowerShot SX400 IS
+	329d  PowerShot G7 X
 	329f  PowerShot SX530 HS
 	32a6  PowerShot SX710 HS
 	32aa  Powershot ELPH 160 / IXUS 160
 	32ac  PowerShot ELPH 170 IS / IXUS 170
+	32ad  PowerShot SX410 IS
+	32c1  PowerShot ELPH 180 / IXUS 175
 04aa  DaeWoo Telecom, Ltd
 04ab  Chromatic Research
 04ac  Micro Audiometrics Corp.
@@ -4045,6 +4085,7 @@
 	f000  CY30700 Licorice evaluation board
 	f111  CY8CKIT-002 PSoC MiniProg3 Rev A Program and debug kit
 	f115  PSoC FirstTouch Programmer
+	f232  Mono embedded computer
 	fd13  Programmable power socket
 04b5  ROHM LSI Systems USA, LLC
 	3064  Hantek DSO-3064
@@ -4356,10 +4397,11 @@
 	1766  HID Monitor Controls
 	2004  Bluetooth 4.0 [Broadcom BCM20702A0]
 	2006  Broadcom BCM43142A0 Bluetooth Device
+	3005  Atheros Bluetooth
 	300b  Atheros AR3012 Bluetooth
 	300d  Atheros AR3012 Bluetooth
 	300f  Atheros AR3012 Bluetooth
-	3014  Qualcoom Atheros Bluetooth
+	3014  Qualcomm Atheros Bluetooth
 	7025  HP HD Webcam
 	7046  TOSHIBA Web Camera - HD
 	9304  Hub
@@ -4538,6 +4580,7 @@
 	1503  Keyboard
 	1603  Keyboard
 	1702  Keyboard LKS02
+	1818  Keyboard [Diatec Filco Majestouch 2]
 	2011  Keyboard [Diatec Filco Majestouch 1]
 	2013  Keyboard [Das Keyboard]
 	2221  Keyboard
@@ -4545,6 +4588,7 @@
 	2519  Shenzhen LogoTech 2.4GHz receiver
 	2832  HT82A832R Audio MCU
 	2834  HT82A834R Audio MCU
+	a01c  wireless multimedia keyboard with trackball [Trust ADURA 17911]
 	a055  Keyboard
 04da  Panasonic (Matsushita)
 	0901  LS-120 Camera
@@ -4874,6 +4918,7 @@
 	6125  D3 Station External Hard Drive
 	61b5  M3 Portable Hard Drive 2TB
 	61b6  M3 Portable Hard Drive 1TB
+	61f3  MU-PT500B [T3 500GB USB SSD]
 	6601  Mobile Phone
 	6602  Galaxy
 	6603  Galaxy
@@ -5587,6 +5632,7 @@
 	0538  Wireless Optical Mouse 2.4G [Bright]
 	0561  Flexcam 100
 	05d8  Wireless keyboard/mouse
+	05da  SPEEDLINK SNAPPY Wireless Mouse Nano
 	0c15  SPIF215A SATA bridge
 	0c25  SATALink SPIF225A
 	1528  SPCA1527A/SPCA1528 SD card camera (webcam mode)
@@ -15403,7 +15449,6 @@
 	0002  HDReye (before firmware loads)
 1519  Comneon
 	0020  HSIC Device
-	0443  Telit LN930
 1520  Bitwire Corp.
 1524  ENE Technology Inc
 	6680  UTS 6680
