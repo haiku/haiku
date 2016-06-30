@@ -497,7 +497,14 @@ const struct supported_device {
 	{0x9874, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
 	{0x9875, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
 	{0x9876, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
-	{0x9877, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"}
+	{0x9877, 11, 0, RADEON_CARRIZO, CHIP_APU, "Radeon HD Carrizo"},
+
+	// Introduced: 2016
+	// Codename: Artic Islands / Polaris
+	// Process: 14 nm
+	// Radeon RX 460 TBA
+	// Radeon RX 470 TBA
+	{0x67df, 12, 0, RADEON_POLARIS, CHIP_STD, "Radeon RX480"}
 };
 
 
