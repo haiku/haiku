@@ -14,8 +14,7 @@
 #define TIMEOUT_QUANTA 100000
 
 
-class RelativePositionIO : public BPositionIO
-{
+class RelativePositionIO : public BPositionIO {
 public:
 	RelativePositionIO(BAdapterIO* owner, BPositionIO* buffer, bigtime_t timeout)
 		:

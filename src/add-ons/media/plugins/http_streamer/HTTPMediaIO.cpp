@@ -12,8 +12,7 @@
 #include <stdio.h>
 
 
-class FileListener : public BUrlProtocolAsynchronousListener
-{
+class FileListener : public BUrlProtocolAsynchronousListener {
 public:
 		FileListener(BAdapterIO* owner)
 			:
