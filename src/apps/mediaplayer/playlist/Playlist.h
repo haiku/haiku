@@ -105,9 +105,10 @@ public:
 			void				RemoveListener(Listener* listener);
 
 			// support functions
-			void				AppendRefs(const BMessage* refsReceivedMessage,
+			void				AppendItems(const BMessage* refsReceivedMessage,
 									int32 appendIndex
 										= APPEND_INDEX_REPLACE_PLAYLIST);
+
 	static	void				AppendToPlaylistRecursive(const entry_ref& ref,
 									Playlist* playlist);
 	static	void				AppendPlaylistToPlaylist(const entry_ref& ref,

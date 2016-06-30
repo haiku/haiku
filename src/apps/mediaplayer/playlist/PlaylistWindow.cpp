@@ -179,6 +179,7 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
+		case M_URL_RECEIVED:
 		case B_REFS_RECEIVED:
 			// Used for when we open a playlist from playlist window
 			if (!message->HasInt32("append_index")) {
@@ -193,7 +194,7 @@ PlaylistWindow::MessageReceived(BMessage* message)
 			// outside of the playlist!
 			int32 appendIndex;
 			if (message->FindInt32("append_index", &appendIndex) == B_OK)
-				fListView->RefsReceived(message, appendIndex);
+				fListView->ItemsReceived(message, appendIndex);
 			break;
 		}
 

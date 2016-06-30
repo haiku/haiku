@@ -139,6 +139,7 @@ PlaylistItem::TrackNumber() const
 bigtime_t
 PlaylistItem::Duration()
 {
+	printf("duration\n");
 	bigtime_t duration;
 	if (GetAttribute(ATTR_INT64_DURATION, duration) != B_OK) {
 		duration = this->_CalculateDuration();
@@ -188,6 +189,7 @@ PlaylistItem::_NotifyListeners() const
 
 bigtime_t PlaylistItem::_CalculateDuration()
 {
+	printf("calc duration\n");
 	// To be overridden in subclasses with more efficient methods
 	TrackSupplier* supplier = GetTrackSupplier();
 

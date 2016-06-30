@@ -429,7 +429,7 @@ Playlist::RemoveListener(Listener* listener)
 
 
 void
-Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
+Playlist::AppendItems(const BMessage* refsReceivedMessage, int32 appendIndex)
 {
 	// the playlist is replaced by the refs in the message
 	// or the refs are appended at the appendIndex
@@ -447,6 +447,15 @@ Playlist::AppendRefs(const BMessage* refsReceivedMessage, int32 appendIndex)
 	Playlist temporaryPlaylist;
 	Playlist* playlist = add ? &temporaryPlaylist : this;
 	bool sortPlaylist = true;
+
+	// TODO: This is not very fair, we should abstract from
+	// entry ref representation and support more URLs.
+	BMessage archivedUrl;
+	if (refsReceivedMessage->FindMessage("mediaplayer:url", &archivedUrl)
+			== B_OK) {
+		BUrl url(&archivedUrl);
+		AddItem(new UrlPlaylistItem(url));
+	}
 
 	entry_ref ref;
 	int32 subAppendIndex = CountItems();

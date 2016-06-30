@@ -46,7 +46,9 @@ enum  {
 	M_OPEN_PANEL_RESULT			= 'oprs',
 	M_SAVE_PANEL_RESULT			= 'sprs',
 
-	M_OPEN_PREVIOUS_PLAYLIST	= 'oppp'
+	M_OPEN_PREVIOUS_PLAYLIST	= 'oppp',
+
+	M_URL_RECEIVED				= 'urrc'
 };
 
 

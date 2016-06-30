@@ -112,6 +112,7 @@ Application MediaPlayer :
 	InfoWin.cpp
 	MainApp.cpp
 	MainWin.cpp
+	NetworkStreamWin.cpp
 	VideoView.cpp
 
 	: be game media tracker translation textencoding [ TargetLibstdc++ ]
@@ -128,6 +129,7 @@ DoCatalogs MediaPlayer :
 	MainApp.cpp
 	MainWin.cpp
 	MovePLItemsCommand.cpp
+	NetworkStreamWin.cpp
 	PeakView.cpp
 	PlaylistItem.cpp
 	PlaylistWindow.cpp

@@ -15,7 +15,6 @@ UrlPlaylistItem::UrlPlaylistItem(BUrl url)
 	:
 	fUrl(url)
 {
-
 }
 
 
@@ -52,7 +51,7 @@ UrlPlaylistItem::Instantiate(BMessage* archive)
 status_t
 UrlPlaylistItem::Archive(BMessage* into, bool deep) const
 {
-	return B_ERROR;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -66,35 +65,40 @@ UrlPlaylistItem::SetAttribute(const Attribute& attribute, const BString& string)
 status_t
 UrlPlaylistItem::GetAttribute(const Attribute& attribute, BString& string) const
 {
-	return B_ERROR;
+	if (attribute == ATTR_STRING_NAME) {
+		string = fUrl.UrlString();
+		return B_OK;
+	}
+
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
 UrlPlaylistItem::SetAttribute(const Attribute& attribute, const int32& value)
 {
-	return B_ERROR;
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
 UrlPlaylistItem::GetAttribute(const Attribute& attribute, int32& value) const
 {
-	return B_ERROR;
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
 UrlPlaylistItem::SetAttribute(const Attribute& attribute, const int64& value)
 {
-	return B_ERROR;
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
 UrlPlaylistItem::GetAttribute(const Attribute& attribute, int64& value) const
 {
-	return B_ERROR;
+	return B_NOT_SUPPORTED;
 }
 
 
@@ -108,21 +112,21 @@ UrlPlaylistItem::LocationURI() const
 status_t
 UrlPlaylistItem::GetIcon(BBitmap* bitmap, icon_size iconSize) const
 {
-	return B_ERROR;
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
 UrlPlaylistItem::MoveIntoTrash()
 {
-	return B_ERROR;
+	return B_NOT_SUPPORTED;
 }
 
 
 status_t
 UrlPlaylistItem::RestoreFromTrash()
 {
-	return B_ERROR;
+	return B_NOT_SUPPORTED;
 }
 
 

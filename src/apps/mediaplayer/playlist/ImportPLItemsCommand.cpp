@@ -45,7 +45,7 @@ ImportPLItemsCommand::ImportPLItemsCommand(Playlist* playlist,
 		return;
 
 	Playlist temp;
-	temp.AppendRefs(refsMessage);
+	temp.AppendItems(refsMessage);
 
 	fNewCount = temp.CountItems();
 	if (fNewCount <= 0)

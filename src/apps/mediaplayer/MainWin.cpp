@@ -33,6 +33,7 @@
 #include <Catalog.h>
 #include <Debug.h>
 #include <fs_attr.h>
+#include <LayoutBuilder.h>
 #include <Language.h>
 #include <Locale.h>
 #include <MediaRoster.h>
@@ -55,6 +56,7 @@
 #include "DurationToString.h"
 #include "FilePlaylistItem.h"
 #include "MainApp.h"
+#include "NetworkStreamWin.h"
 #include "PeakView.h"
 #include "PlaylistItem.h"
 #include "PlaylistObserver.h"
@@ -76,6 +78,7 @@ int MainWin::sNoVideoWidth = MIN_WIDTH;
 enum {
 	M_DUMMY = 0x100,
 	M_FILE_OPEN = 0x1000,
+	M_NETWORK_STREAM_OPEN,
 	M_FILE_INFO,
 	M_FILE_PLAYLIST,
 	M_FILE_CLOSE,
@@ -617,8 +620,10 @@ MainWin::MessageReceived(BMessage* msg)
 		}
 
 		case B_REFS_RECEIVED:
+		case M_URL_RECEIVED:
 			_RefsReceived(msg);
 			break;
+
 		case B_SIMPLE_DATA:
 			if (msg->HasRef("refs"))
 				_RefsReceived(msg);
@@ -831,6 +836,15 @@ MainWin::MessageReceived(BMessage* msg)
 			be_app->PostMessage(&appMessage);
 			break;
 		}
+
+		case M_NETWORK_STREAM_OPEN:
+		{
+			BMessenger target(this);
+			NetworkStreamWin* win = new NetworkStreamWin(target);
+			win->Show();
+			break;
+		}
+
 		case M_FILE_INFO:
 			ShowFileInfo();
 			break;
@@ -1497,6 +1511,10 @@ MainWin::_CreateMenu()
 		B_TRANSLATE("Open file" B_UTF8_ELLIPSIS), NULL, NULL, this, 10, true,
 		NULL, kAppSig), new BMessage(M_FILE_OPEN));
 	item->SetShortcut('O', 0);
+	fFileMenu->AddItem(item);
+
+	item = new BMenuItem(B_TRANSLATE("Open network stream"),
+		new BMessage(M_NETWORK_STREAM_OPEN));
 	fFileMenu->AddItem(item);
 
 	fFileMenu->AddSeparatorItem();

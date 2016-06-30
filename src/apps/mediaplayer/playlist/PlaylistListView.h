@@ -41,7 +41,7 @@ public:
 									BRect frame) const;
 
 	// PlaylistListView
-			void				RefsReceived(BMessage* message,
+			void				ItemsReceived(const BMessage* message,
 									int32 appendIndex);
 
 			void				Randomize();

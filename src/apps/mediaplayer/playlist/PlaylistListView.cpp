@@ -310,12 +310,12 @@ PlaylistListView::MessageReceived(BMessage* message)
 
 		case B_SIMPLE_DATA:
 			if (message->HasRef("refs"))
-				RefsReceived(message, fDropIndex);
+				ItemsReceived(message, fDropIndex);
 			else if (message->HasPointer("list"))
 				SimpleListView::MessageReceived(message);
 			break;
 		case B_REFS_RECEIVED:
-			RefsReceived(message, fDropIndex);
+			ItemsReceived(message, fDropIndex);
 			break;
 
 		default:
@@ -506,7 +506,7 @@ PlaylistListView::DrawListItem(BView* owner, int32 index, BRect frame) const
 
 
 void
-PlaylistListView::RefsReceived(BMessage* message, int32 appendIndex)
+PlaylistListView::ItemsReceived(const BMessage* message, int32 appendIndex)
 {
 	if (fCommandStack->Perform(new (nothrow) ImportPLItemsCommand(fPlaylist,
 			message, appendIndex)) != B_OK) {
