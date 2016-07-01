@@ -459,11 +459,13 @@ DumpSamplingFrequencies(uint8 type, const usb_audio_sampling_freq* freqs)
 	if (type > 0) {
 		printf("                    Sampling Freq ..... ");
 		for (uint8 i = 0; i < type; i++)
-			printf("%lu, ", GetSamplingFrequency(freqs[i]));
+			printf("%" B_PRIu32 ", ", GetSamplingFrequency(freqs[i]));
 		printf("\n");
-	} else
-		printf("                    Sampling Freq ..... %lu to %lu\n",
-			GetSamplingFrequency(freqs[0]), GetSamplingFrequency(freqs[1]));
+	} else {
+		printf("                    Sampling Freq ..... %" B_PRIu32 " to %"
+			B_PRIu32 "\n", GetSamplingFrequency(freqs[0]),
+			GetSamplingFrequency(freqs[1]));
+	}
 }
 
 
@@ -671,7 +673,7 @@ DumpASFmtSpecificAC_3(const usb_generic_descriptor* descriptor)
 		descriptor->data[0]);
 	printf("                    Format Tag ........ %u\n",
 		*(uint16*)&descriptor->data[1]);
-	printf("                    BSID .............. %lx\n",
+	printf("                    BSID .............. %" B_PRIx32 "\n",
 		*(uint32*)&descriptor->data[2]);
 	printf("                    AC3 Features ...... %u\n",
 		descriptor->data[6]);
@@ -1000,7 +1002,7 @@ DumpInterface(const BUSBInterface* interface)
 		if (!endpoint)
 			continue;
 
-		printf("                [Endpoint %lu]\n", i);
+		printf("                [Endpoint %" B_PRIu32 "]\n", i);
 		printf("                    MaxPacketSize .... %d\n",
 			endpoint->MaxPacketSize());
 		printf("                    Interval ......... %d\n",
@@ -1025,7 +1027,7 @@ DumpInterface(const BUSBInterface* interface)
 	usb_descriptor* generic = (usb_descriptor*)buffer;
 	for (uint32 i = 0;
 			interface->OtherDescriptorAt(i, generic, 256) == B_OK; i++) {
-		printf("                [Descriptor %lu]\n", i);
+		printf("                [Descriptor %" B_PRIu32 "]\n", i);
 		DumpDescriptor(&generic->generic, interface->Class(), interface->Subclass());
 	}
 }
@@ -1040,12 +1042,12 @@ DumpConfiguration(const BUSBConfiguration* configuration)
 	printf("        Configuration String . \"%s\"\n",
 		configuration->ConfigurationString());
 	for (uint32 i = 0; i < configuration->CountInterfaces(); i++) {
-		printf("        [Interface %lu]\n", i);
+		printf("        [Interface %" B_PRIu32 "]\n", i);
 		const BUSBInterface* interface = configuration->InterfaceAt(i);
 
 		for (uint32 j = 0; j < interface->CountAlternates(); j++) {
 			const BUSBInterface* alternate = interface->AlternateAt(j);
-			printf("            [Alternate %lu%s]\n", j,
+			printf("            [Alternate %" B_PRIu32 "%s]\n", j,
 				j == interface->AlternateIndex() ? " active" : "");
 			DumpInterface(alternate);
 		}
@@ -1089,7 +1091,7 @@ DumpInfo(BUSBDevice& device, bool verbose)
 	printf("    Serial Number .......... \"%s\"\n", device.SerialNumberString());
 
 	for (uint32 i = 0; i < device.CountConfigurations(); i++) {
-		printf("    [Configuration %lu]\n", i);
+		printf("    [Configuration %" B_PRIu32 "]\n", i);
 		DumpConfiguration(device.ConfigurationAt(i));
 	}
 
