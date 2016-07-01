@@ -30,7 +30,7 @@ THE SOFTWARE.
 */
 
 #ifndef _PICTURE_ITERATOR_H
-#define _PICTURE_TIERATOR_H
+#define _PICTURE_ITERATOR_H
 
 #include <AppKit.h>
 #include <InterfaceKit.h>
