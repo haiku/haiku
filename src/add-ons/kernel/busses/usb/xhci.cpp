@@ -791,7 +791,8 @@ XHCI::AddTo(Stack *stack)
 			switch ((item->vendor_id << 16) | item->device_id) {
 				case 0x10330194:	// Nec Corporation uPD720200
 				case 0x1b731009:	// Fresco Logic FL1009
-				case 0x80861e31:	// Intel xHCI found on VirtualBox5.
+				case 0x80861e31:	// Intel xHCI Panther Point (VirtualBox5)
+				case 0x80869c31:	// Intel xHCI Panther Point
 					break;
 				default:
 					TRACE_MODULE_ERROR("found device but unsupported\n");
