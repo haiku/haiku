@@ -9,7 +9,9 @@
 #include <Handler.h>
 #include <UrlProtocolRoster.h>
 
-#include <stdio.h>
+
+// 10 seconds timeout
+#define HTTP_TIMEOUT 10000000
 
 
 class FileListener : public BUrlProtocolAsynchronousListener {
@@ -19,9 +21,10 @@ public:
 			BUrlProtocolAsynchronousListener(true),
 			fRequest(NULL),
 			fAdapterIO(owner),
-			fTotalSize(0)
+			fInitSem(-1)
 		{
 			fInputAdapter = fAdapterIO->BuildInputAdapter();
+			fInitSem = create_sem(0, "http_streamer init sem");
 		}
 
 		virtual ~FileListener() {};
@@ -37,12 +40,17 @@ public:
 				fRequest->Stop();
 
 			fRequest = request;
-			fTotalSize = request->Result().Length();
 		}
 
 		void DataReceived(BUrlRequest* request, const char* data,
 			off_t position, ssize_t size)
 		{
+			if (fInitSem != -1) {
+				release_sem(fInitSem);
+				delete_sem(fInitSem);
+				fInitSem = -1;
+			}
+
 			if (request != fRequest)
 				delete request;
 
@@ -58,26 +66,27 @@ public:
 			delete request;
 		}
 
-		off_t TotalSize() const
+		status_t LockOnInit(bigtime_t timeout)
 		{
-			return fTotalSize;
+			return acquire_sem_etc(fInitSem, 1, B_RELATIVE_TIMEOUT, timeout);
 		}
 
 private:
 		BUrlRequest*	fRequest;
 		BAdapterIO*		fAdapterIO;
 		BInputAdapter*	fInputAdapter;
-		off_t			fTotalSize;
+		sem_id			fInitSem;
 };
 
 
 HTTPMediaIO::HTTPMediaIO(BUrl url)
 	:
-	BAdapterIO(B_MEDIA_STREAMING | B_MEDIA_SEEK_BACKWARD, B_INFINITE_TIMEOUT),
+	BAdapterIO(B_MEDIA_STREAMING | B_MEDIA_SEEK_BACKWARD, HTTP_TIMEOUT),
 	fContext(NULL),
 	fReq(NULL),
 	fListener(NULL),
-	fUrl(url)
+	fUrl(url),
+	fTotalSize(0)
 {
 }
 
@@ -104,7 +113,10 @@ HTTPMediaIO::SetSize(off_t size)
 status_t
 HTTPMediaIO::GetSize(off_t* size) const
 {
-	*size = fListener->TotalSize();
+	if (fReq == NULL)
+		return B_ERROR;
+
+	*size = fTotalSize;
 	return B_OK;
 }
 
@@ -125,6 +137,12 @@ HTTPMediaIO::Open()
 
 	if (fReq->Run() < 0)
 		return B_ERROR;
+
+	status_t ret = fListener->LockOnInit(HTTP_TIMEOUT);
+	if (ret != B_OK)
+		return ret;
+
+	fTotalSize = fReq->Result().Length();
 
 	return BAdapterIO::Open();
 }

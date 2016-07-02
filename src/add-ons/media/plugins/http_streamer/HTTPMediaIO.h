@@ -38,6 +38,7 @@ private:
 	FileListener*						fListener;
 
 	BUrl								fUrl;
+	off_t								fTotalSize;
 };
 
 #endif
