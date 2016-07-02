@@ -28,7 +28,7 @@ enum  {
 NetworkStreamWin::NetworkStreamWin(BMessenger target)
 	:
 	BWindow(BRect(0, 0, 300, 100), "Open Network Stream",
-		B_TITLED_WINDOW, B_NOT_RESIZABLE),
+		B_MODAL_WINDOW, B_NOT_RESIZABLE),
 	fTarget(target)
 {
 	fTextControl = new BTextControl("InputControl",
@@ -42,6 +42,8 @@ NetworkStreamWin::NetworkStreamWin(BMessenger target)
 				.Add(new BButton("Cancel", new BMessage(M_CANCEL)))
 			.End()
 		.End();
+
+	CenterOnScreen();
 }
 
 
