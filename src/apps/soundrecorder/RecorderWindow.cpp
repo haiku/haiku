@@ -1339,7 +1339,7 @@ RecorderWindow::CopyTarget(BMessage *msg)
 		if (!strcasecmp(type, B_FILE_MIME_TYPE)) {
 			const char *name;
 			entry_ref dir;
-			if (msg->FindString("be:filetypes") == B_OK
+			if (msg->FindString("be:filetypes") != NULL
 				&& msg->FindString("name", &name) == B_OK
 				&& msg->FindRef("directory", &dir) == B_OK) {
 				BDirectory directory(&dir);
