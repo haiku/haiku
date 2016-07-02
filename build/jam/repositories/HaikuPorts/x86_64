@@ -65,7 +65,7 @@ RemotePackageRepository HaikuPorts
 	bzip2_devel-1.0.6-5
 	cdrtools-3.02~a06-2
 	cdrtools_devel-3.02~a06-2
-	clipdinger-0.5.2-1
+	clipdinger-0.5.4-1
 	cmake-3.5.1-1
 	coreutils-8.24-1
 	cpio-2.12-1
@@ -395,6 +395,7 @@ RemotePackageRepository HaikuPorts
 	vision-0.9.7.r949-3
 	weather-0.1.1_git-2
 	wget-1.17.1-1
+	whereismymouse-1.0-1
 	which-2.21-1
 	wpa_supplicant-2.0-4
 	xml_parser-2.36-1
@@ -613,6 +614,7 @@ RemotePackageRepository HaikuPorts
 	vision
 	weather
 	wget
+	whereismymouse
 	which
 	wpa_supplicant
 	yasm

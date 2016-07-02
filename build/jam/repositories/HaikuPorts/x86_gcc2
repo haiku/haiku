@@ -190,6 +190,7 @@ RemotePackageRepository HaikuPorts
 	html_parser-3.71-1
 	hubbub-0.3.0-1
 	hubbub_devel-0.3.0-1
+	icebreaker-1.9.7-1
 	icu-56.1-1
 	icu_devel-56.1-1
 	icu55-55.1-1
@@ -533,6 +534,7 @@ RemotePackageRepository HaikuPorts
 	vncserver-1.27-1
 	weather-0.1.1_git-1
 	wget-1.17.1-1
+	whereismymouse-1.0-1
 	which-2.21-1
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-4
@@ -1134,6 +1136,7 @@ RemotePackageRepository HaikuPorts
 	htmldoc
 	html_parser
 	hubbub
+	icebreaker
 	icu
 	icu55
 	ilmbase_x86
@@ -1452,6 +1455,7 @@ RemotePackageRepository HaikuPorts
 	vmware_addons
 	vncserver
 	wget
+	whereismymouse
 	which
 	wizznic_x86
 	wpa_supplicant

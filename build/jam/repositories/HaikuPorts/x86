@@ -296,6 +296,7 @@ RemotePackageRepository HaikuPorts
 	qsystray-0.1-3
 	qt5-5.5.1-3
 	qt5_devel-5.5.1-3
+	quicklaunch-0.9.12-1
 	readline-6.3.8-1
 	readline_devel-6.3.8-1
 	ruby-2.2.2-4
@@ -343,6 +344,7 @@ RemotePackageRepository HaikuPorts
 	vision-0.9.7.r949-3
 	vim-7.4-5
 	wget-1.17.1-1
+	whereismymouse-1.0-1
 	which-2.21-1
 	wpa_supplicant-2.0-4
 	xml_parser-2.36-1
@@ -594,6 +596,7 @@ RemotePackageRepository HaikuPorts
 	qrencode
 	qscintilla
 	qsseditor
+	quicklaunch
 	readline
 	ruby
 	scons
@@ -625,6 +628,7 @@ RemotePackageRepository HaikuPorts
 	vim
 	vision
 	wget
+	whereismymouse
 	which
 	wpa_supplicant
 	yasm
