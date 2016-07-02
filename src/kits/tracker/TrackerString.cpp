@@ -265,7 +265,7 @@ TrackerString::StringMatchesPattern(const char* string, const char* pattern,
 				// Collapse any ** and *? constructions:
 				while (*pattern == '*' || *pattern == '?') {
 					pattern++;
-					if (*pattern == '?' && string != '\0') {
+					if (*pattern == '?' && *string != '\0') {
 						string++;
 						if (IsInsideGlyph(string[0]))
 							string = MoveToEndOfGlyph(string);
