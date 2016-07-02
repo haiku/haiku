@@ -70,7 +70,7 @@ DecorAddOn::AllocateDecorator(Desktop* desktop, DrawingEngine* engine,
 
 	decorator->UpdateColors(settings);
 
-	if (decorator->AddTab(settings, title, look, flags) == false) {
+	if (decorator->AddTab(settings, title, look, flags) == NULL) {
 		delete decorator;
 		return NULL;
 	}
