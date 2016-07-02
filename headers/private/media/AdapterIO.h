@@ -70,7 +70,7 @@ protected:
 			ssize_t					BackWrite(const void* buffer, size_t size);
 
 private:
-			status_t				_EvaluateWait(off_t position);
+			status_t				_EvaluateWait(off_t position, off_t size);
 
 			int32					fFlags;
 

@@ -8,6 +8,8 @@
 
 #include <MediaIO.h>
 
+#include <string.h>
+
 #include "debug.h"
 
 
@@ -16,7 +18,8 @@
 
 class RelativePositionIO : public BPositionIO {
 public:
-	RelativePositionIO(BAdapterIO* owner, BPositionIO* buffer, bigtime_t timeout)
+	RelativePositionIO(BAdapterIO* owner, BPositionIO* buffer,
+		bigtime_t timeout)
 		:
 		BPositionIO(),
 		fOwner(owner),
@@ -39,12 +42,12 @@ public:
 		if (ret != B_OK)
 			return ret;
 
-		fBackPosition = offset;
+		fBackPosition = 0;
 		fStartOffset = offset;
 		return B_OK;
 	}
 
-	status_t EvaluatePosition(off_t position)
+	status_t EvaluatePosition(off_t position, off_t totalSize)
 	{
 		if (position < 0)
 			return B_ERROR;
@@ -52,28 +55,15 @@ public:
 		if (position < fStartOffset)
 			return B_RESOURCE_UNAVAILABLE;
 
-		off_t size = 0;
-		if (fOwner->GetSize(&size) != B_OK)
-			return B_ERROR;
-
-		if (position > size) {
+		if (position > totalSize) {
 			// This is an endless stream, we don't know
 			// how much data will come and when, we could
 			// block on that.
 			if (IsMutable())
 				return B_WOULD_BLOCK;
-			else if (size == 0)
-				return B_RESOURCE_UNAVAILABLE;
 			else
 				return B_ERROR;
 		}
-
-		off_t bufSize = 0;
-		if (GetSize(&bufSize) != B_OK)
-			return B_ERROR;
-
-		if (position > bufSize)
-			return B_RESOURCE_UNAVAILABLE;
 
 		return B_OK;
 	}
@@ -143,12 +133,11 @@ public:
 	{
 		AutoReadLocker _(fLock);
 
-		off_t bufferSize;
-		status_t ret = fBuffer->GetSize(&bufferSize);
-		if (ret == B_OK)
-			*size = _RelativeToPosition(bufferSize);
+		// We use the backend position to make our buffer
+		// independant of that.
+		*size = _RelativeToPosition(fBackPosition);
 
-		return ret;
+		return B_OK;
 	}
 
 	ssize_t BackWrite(const void* buffer, size_t size)
@@ -234,7 +223,8 @@ BAdapterIO::~BAdapterIO()
 {
 	CALLED();
 
-	Close();
+	if (!fOpened)
+		Close();
 
 	delete fInputAdapter;
 	delete fBuffer;
@@ -255,9 +245,13 @@ BAdapterIO::ReadAt(off_t position, void* buffer, size_t size)
 {
 	CALLED();
 
-	TRACE("BAdapterIO::ReadAt %" B_PRId64 " %" B_PRId64 "\n", position, size);
+	off_t totalSize = 0;
+	GetSize(&totalSize);
 
-	status_t ret = _EvaluateWait(position+size);
+	TRACE("BAdapterIO::ReadAt TS %" B_PRId64 " P %" B_PRId64
+		" S %" B_PRId32 "\n", totalSize, position, size);
+
+	status_t ret = _EvaluateWait(position, size);
 	if (ret != B_OK)
 		return ret;
 
@@ -270,10 +264,6 @@ BAdapterIO::WriteAt(off_t position, const void* buffer, size_t size)
 {
 	CALLED();
 
-	status_t ret = _EvaluateWait(position+size);
-	if (ret != B_OK)
-		return ret;
-
 	return fBuffer->WriteAt(position, buffer, size);
 }
 
@@ -284,7 +274,7 @@ BAdapterIO::Seek(off_t position, uint32 seekMode)
 	CALLED();
 
 	// TODO: Support seekModes
-	status_t ret = _EvaluateWait(position);
+	status_t ret = _EvaluateWait(position, 0);
 	if (ret != B_OK)
 		return ret;
 
@@ -392,34 +382,42 @@ BAdapterIO::SeekRequested(off_t position)
 ssize_t
 BAdapterIO::BackWrite(const void* buffer, size_t size)
 {
-	CALLED();
-
 	return fBuffer->BackWrite(buffer, size);
 }
 
 
 status_t
-BAdapterIO::_EvaluateWait(off_t pos)
+BAdapterIO::_EvaluateWait(off_t pos, off_t size)
 {
 	CALLED();
 
-	status_t err = fBuffer->EvaluatePosition(pos);
+	off_t totalSize = 0;
+	if (GetSize(&totalSize) != B_OK)
+		TRACE("BAdapterIO::_EvaluateWait: Can't get our size!\n");
+
+	status_t err = fBuffer->EvaluatePosition(pos+size, totalSize);
+
+	TRACE("BAdapterIO::_EvaluateWait: %s\n", strerror(err));
 
 	if (err != B_WOULD_BLOCK) {
 		if (err != B_RESOURCE_UNAVAILABLE && err != B_OK)
-			return B_UNSUPPORTED;
+			return B_NOT_SUPPORTED;
 
 		if (err == B_RESOURCE_UNAVAILABLE && fBuffer->IsStreaming()
 				&& fBuffer->IsSeekable()) {
 			if (SeekRequested(pos) != B_OK)
-				return B_UNSUPPORTED;
+				return B_NOT_SUPPORTED;
 
+			TRACE("BAdapterIO::_EvaluateWait: Locking on seek\n");
 			acquire_sem(fSeekSem);
+			TRACE("BAdapterIO::_EvaluateWait: Seek completed\n");
 			fBuffer->ResetStartOffset(pos);
 		}
 	}
 
-	return fBuffer->WaitForData(pos);
+	TRACE("BAdapterIO::_EvaluateWait: waiting for data\n");
+
+	return fBuffer->WaitForData(pos+size);
 }
 
 
