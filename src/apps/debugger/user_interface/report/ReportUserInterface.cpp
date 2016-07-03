@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2015-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -81,6 +81,15 @@ void
 ReportUserInterface::Terminate()
 {
 	fTerminating = true;
+}
+
+
+UserInterface*
+ReportUserInterface::Clone() const
+{
+	// the report interface does not support cloning, since
+	// it won't ever be asked to interactively restart.
+	return NULL;
 }
 
 

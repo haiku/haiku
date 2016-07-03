@@ -166,6 +166,13 @@ CommandLineUserInterface::Terminate()
 }
 
 
+UserInterface*
+CommandLineUserInterface::Clone() const
+{
+	return new(std::nothrow) CommandLineUserInterface;
+}
+
+
 bool
 CommandLineUserInterface::IsInteractive() const
 {

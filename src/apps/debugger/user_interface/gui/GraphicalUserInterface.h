@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2014-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef GRAPHICAL_USER_INTERFACE_H
@@ -29,6 +29,8 @@ public:
 	virtual	void				Terminate();
 									// shut down the UI *now* -- no more user
 									// feedback
+
+	virtual	UserInterface*		Clone() const;
 
 	virtual	bool				IsInteractive() const;
 

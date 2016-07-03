@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2015-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef REPORT_USER_INTERFACE_H
@@ -26,6 +26,8 @@ public:
 									UserInterfaceListener* listener);
 	virtual	void				Show();
 	virtual	void				Terminate();
+
+	virtual	UserInterface*		Clone() const;
 
 	virtual	bool				IsInteractive() const;
 

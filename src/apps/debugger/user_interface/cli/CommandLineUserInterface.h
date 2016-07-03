@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -30,6 +30,8 @@ public:
 	virtual	void				Terminate();
 									// shut down the UI *now* -- no more user
 									// feedback
+
+	virtual	UserInterface*		Clone() const;
 
 	virtual	bool				IsInteractive() const;
 

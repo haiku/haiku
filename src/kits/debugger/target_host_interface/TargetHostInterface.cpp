@@ -184,13 +184,23 @@ TargetHostInterface::MessageReceived(BMessage* message)
 
 		TeamDebugger* debugger = FindTeamDebugger(teamID);
 
+		UserInterface* userInterface = debugger->GetUserInterface()->Clone();
+		if (userInterface == NULL)
+			break;
+
+		BReference<UserInterface> userInterfaceReference(userInterface, true);
+
 		TeamDebuggerOptions options;
+		options.requestType = TEAM_DEBUGGER_REQUEST_CREATE;
 		options.commandLineArgc = debugger->ArgumentCount();
 		options.commandLineArgv = debugger->Arguments();
 		options.settingsManager = debugger->GetSettingsManager();
+		options.userInterface = userInterface;
 		status_t result = StartTeamDebugger(options);
-		if (result == B_OK)
+		if (result == B_OK) {
+			userInterfaceReference.Detach();
 			debugger->PostMessage(B_QUIT_REQUESTED);
+		}
 		break;
 	}
 	default:

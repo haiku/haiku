@@ -66,6 +66,8 @@ public:
 									{ return fCommandLineArgv; }
 			SettingsManager*	GetSettingsManager() const
 									{ return fSettingsManager; }
+			UserInterface*		GetUserInterface() const
+									{ return fUserInterface; }
 
 	virtual	void				MessageReceived(BMessage* message);
 

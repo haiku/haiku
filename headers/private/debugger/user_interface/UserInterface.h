@@ -56,6 +56,13 @@ public:
 									// shut down the UI *now* -- no more user
 									// feedback
 
+	virtual	UserInterface*		Clone() const = 0;
+									// returns a new instance of the
+									// appropriate user interface subclass.
+									// primarily needed in order to
+									// reconstruct the necessary information
+									// for initiating a team restart.
+
 	virtual	bool				IsInteractive() const = 0;
 
 	virtual status_t			LoadSettings(const TeamUiSettings* settings)
