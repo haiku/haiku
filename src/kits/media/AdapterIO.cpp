@@ -28,7 +28,6 @@ public:
 		fBuffer(buffer),
 		fTimeout(timeout)
 	{
-		fOwner->GetFlags(&fFlags);
 	}
 
 	virtual	~RelativePositionIO()
@@ -55,7 +54,7 @@ public:
 		if (position < fStartOffset)
 			return B_RESOURCE_UNAVAILABLE;
 
-		if (position > totalSize) {
+		if (totalSize > 0 && position > totalSize) {
 			// This is an endless stream, we don't know
 			// how much data will come and when, we could
 			// block on that.
@@ -157,17 +156,23 @@ public:
 
 	bool IsStreaming() const
 	{
-		return (fFlags & B_MEDIA_STREAMING) == true;
+		int32 flags = 0;
+		fOwner->GetFlags(&flags);
+		return (flags & B_MEDIA_STREAMING) == true;
 	}
 
 	bool IsMutable() const
 	{
-		return (fFlags & B_MEDIA_MUTABLE_SIZE) == true;
+		int32 flags = 0;
+		fOwner->GetFlags(&flags);
+		return (flags & B_MEDIA_MUTABLE_SIZE) == true;
 	}
 
 	bool IsSeekable() const
 	{
-		return (fFlags & B_MEDIA_SEEKABLE) == true;
+		int32 flags = 0;
+		fOwner->GetFlags(&flags);
+		return (flags & B_MEDIA_SEEKABLE) == true;
 	}
 
 private:
@@ -187,7 +192,6 @@ private:
 	off_t				fStartOffset;
 
 	BPositionIO*		fBuffer;
-	int32				fFlags;
 
 	mutable	RWLocker	fLock;
 
@@ -245,12 +249,6 @@ BAdapterIO::ReadAt(off_t position, void* buffer, size_t size)
 {
 	CALLED();
 
-	off_t totalSize = 0;
-	GetSize(&totalSize);
-
-	TRACE("BAdapterIO::ReadAt TS %" B_PRId64 " P %" B_PRId64
-		" S %" B_PRId32 "\n", totalSize, position, size);
-
 	status_t ret = _EvaluateWait(position, size);
 	if (ret != B_OK)
 		return ret;
@@ -275,8 +273,18 @@ BAdapterIO::Seek(off_t position, uint32 seekMode)
 
 	// TODO: Support seekModes
 	status_t ret = _EvaluateWait(position, 0);
-	if (ret != B_OK)
-		return ret;
+
+	if (ret == B_RESOURCE_UNAVAILABLE && fBuffer->IsStreaming()
+			&& fBuffer->IsSeekable()) {
+		if (SeekRequested(position) != B_OK)
+			return B_NOT_SUPPORTED;
+
+		TRACE("BAdapterIO::Seek: Locking on backend seek\n");
+		acquire_sem(fSeekSem);
+		TRACE("BAdapterIO::Seek: Seek completed!\n");
+		fBuffer->ResetStartOffset(position);
+	} else if (ret != B_OK)
+		return B_NOT_SUPPORTED;
 
 	return fBuffer->Seek(position, seekMode);
 }
@@ -393,27 +401,17 @@ BAdapterIO::_EvaluateWait(off_t pos, off_t size)
 
 	off_t totalSize = 0;
 	if (GetSize(&totalSize) != B_OK)
-		TRACE("BAdapterIO::_EvaluateWait: Can't get our size!\n");
+		TRACE("BAdapterIO::ReadAt: Can't get our size!\n");
 
-	status_t err = fBuffer->EvaluatePosition(pos+size, totalSize);
+	TRACE("BAdapterIO::_EvaluateWait TS %" B_PRId64 " P %" B_PRId64
+		" S %" B_PRId64 "\n", totalSize, pos, size);
+
+	status_t err = fBuffer->EvaluatePosition(pos, totalSize);
 
 	TRACE("BAdapterIO::_EvaluateWait: %s\n", strerror(err));
 
-	if (err != B_WOULD_BLOCK) {
-		if (err != B_RESOURCE_UNAVAILABLE && err != B_OK)
-			return B_NOT_SUPPORTED;
-
-		if (err == B_RESOURCE_UNAVAILABLE && fBuffer->IsStreaming()
-				&& fBuffer->IsSeekable()) {
-			if (SeekRequested(pos) != B_OK)
-				return B_NOT_SUPPORTED;
-
-			TRACE("BAdapterIO::_EvaluateWait: Locking on seek\n");
-			acquire_sem(fSeekSem);
-			TRACE("BAdapterIO::_EvaluateWait: Seek completed\n");
-			fBuffer->ResetStartOffset(pos);
-		}
-	}
+	if (err != B_OK && err != B_WOULD_BLOCK)
+		return err;
 
 	TRACE("BAdapterIO::_EvaluateWait: waiting for data\n");
 

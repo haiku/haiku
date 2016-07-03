@@ -37,7 +37,9 @@ private:
 
 class BAdapterIO : public BMediaIO {
 public:
-									BAdapterIO(int32 flags,
+									BAdapterIO(
+										int32 flags = B_MEDIA_STREAMING
+											| B_MEDIA_SEEKABLE,
 										bigtime_t timeout = B_INFINITE_TIMEOUT);
 	virtual							~BAdapterIO();
 
@@ -70,7 +72,7 @@ protected:
 			ssize_t					BackWrite(const void* buffer, size_t size);
 
 private:
-			status_t				_EvaluateWait(off_t position, off_t size);
+			status_t				_EvaluateWait(off_t pos, off_t size);
 
 			int32					fFlags;
 
