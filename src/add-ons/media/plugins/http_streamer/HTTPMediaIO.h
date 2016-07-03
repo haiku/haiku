@@ -20,11 +20,12 @@ public:
 										HTTPMediaIO(BUrl url);
 	virtual								~HTTPMediaIO();
 
+	virtual void						GetFlags(int32* flags) const;
+
 	virtual	ssize_t						WriteAt(off_t position,
 											const void* buffer, size_t size);
 
 	virtual status_t					SetSize(off_t size);
-	virtual status_t					GetSize(off_t* size) const;
 
 	virtual status_t					Open();
 	virtual void						Close();
@@ -39,6 +40,7 @@ private:
 
 	BUrl								fUrl;
 	off_t								fTotalSize;
+	bool								fIsMutable;
 };
 
 #endif

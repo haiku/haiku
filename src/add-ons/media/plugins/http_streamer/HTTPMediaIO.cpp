@@ -81,18 +81,27 @@ private:
 
 HTTPMediaIO::HTTPMediaIO(BUrl url)
 	:
-	BAdapterIO(B_MEDIA_STREAMING | B_MEDIA_SEEK_BACKWARD, HTTP_TIMEOUT),
+	BAdapterIO(HTTP_TIMEOUT),
 	fContext(NULL),
 	fReq(NULL),
 	fListener(NULL),
 	fUrl(url),
-	fTotalSize(0)
+	fIsMutable(false)
 {
 }
 
 
 HTTPMediaIO::~HTTPMediaIO()
 {
+}
+
+
+void
+HTTPMediaIO::GetFlags(int32* flags) const
+{
+	*flags = B_MEDIA_STREAMING | B_MEDIA_SEEK_BACKWARD;
+	if (fIsMutable)
+		*flags = *flags | B_MEDIA_MUTABLE_SIZE;
 }
 
 
@@ -107,17 +116,6 @@ status_t
 HTTPMediaIO::SetSize(off_t size)
 {
 	return B_NOT_SUPPORTED;
-}
-
-
-status_t
-HTTPMediaIO::GetSize(off_t* size) const
-{
-	if (fReq == NULL)
-		return B_ERROR;
-
-	*size = fTotalSize;
-	return B_OK;
 }
 
 
@@ -142,7 +140,14 @@ HTTPMediaIO::Open()
 	if (ret != B_OK)
 		return ret;
 
-	fTotalSize = fReq->Result().Length();
+	off_t totalSize = fReq->Result().Length();
+
+	// At this point we decide if our size is fixed or mutable,
+	// this will change the behavior of our parent.
+	if (totalSize > 0)
+		BAdapterIO::SetSize(totalSize);
+	else
+		fIsMutable = true;
 
 	return BAdapterIO::Open();
 }
