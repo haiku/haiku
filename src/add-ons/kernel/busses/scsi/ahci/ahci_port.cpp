@@ -769,13 +769,29 @@ AHCIPort::ScsiInquiry(scsi_ccb* request)
 	// There's not enough space to fit all of the data in. ATA has 40 bytes for
 	// the model number, 20 for the serial number and another 8 for the
 	// firmware revision. SCSI has room for 8 for vendor ident, 16 for product
-	// ident and another 4 for product revision. We just try and fit in as much
-	// as possible of the model number into the vendor and product ident fields
-	// and put a little of the serial number into the product revision field.
-	memcpy(scsiData.vendor_ident, modelNumber, sizeof(scsiData.vendor_ident));
-	memcpy(scsiData.product_ident, modelNumber + 8,
-		sizeof(scsiData.product_ident));
-	memcpy(scsiData.product_rev, serialNumber, sizeof(scsiData.product_rev));
+	// ident and another 4 for product revision.
+	size_t vendorLen = strcspn(modelNumber, " ");
+	if (vendorLen >= sizeof(scsiData.vendor_ident))
+		vendorLen = strcspn(modelNumber, "-");
+	if (vendorLen < sizeof(scsiData.vendor_ident)) {
+		// First we try to break things apart smartly.
+		snprintf(scsiData.vendor_ident, vendorLen + 1, "%s", modelNumber);
+		size_t modelRemain = (sizeof(modelNumber) - vendorLen);
+		if (modelRemain > sizeof(scsiData.product_ident))
+			modelRemain = sizeof(scsiData.product_ident);
+		memcpy(scsiData.product_ident, modelNumber + (vendorLen + 1),
+			modelRemain);
+	} else {
+		// If we're unable to smartly break apart the vendor and model, just
+		// dumbly squeeze as much in as possible.
+		memcpy(scsiData.vendor_ident, modelNumber, sizeof(scsiData.vendor_ident));
+		memcpy(scsiData.product_ident, modelNumber + 8,
+			sizeof(scsiData.product_ident));
+	}
+	// Take the last 4 digits of the serial number as product rev
+	size_t serialLen = sizeof(scsiData.product_rev);
+	size_t serialOff = sizeof(serialNumber) - serialLen;
+	memcpy(scsiData.product_rev, serialNumber + serialOff, serialLen);
 
 	if (sg_memcpy(request->sg_list, request->sg_count, &scsiData,
 			sizeof(scsiData)) < B_OK) {
