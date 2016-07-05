@@ -28,7 +28,7 @@ struct TrackData {
 // Query command response.
 struct QueryResponseData {
 	BString category;
-	BString cddbId;
+	BString cddbID;
 	BString artist;
 	BString title;
 };
@@ -58,9 +58,13 @@ public:
 								CDDBServer(const BString& cddbServer);
 
 	// CDDB commands interface.
-			status_t			Query(uint32 cddbId, const scsi_toc_toc* toc,
+			status_t			Query(uint32 cddbID, const scsi_toc_toc* toc,
 									QueryResponseList& queryResponses);
 			status_t			Read(const QueryResponseData& diskData,
+									ReadResponseData& readResponse);
+			status_t			Read(const BString& category,
+									const BString& cddbID,
+									const BString& artist,
 									ReadResponseData& readResponse);
 
 private:

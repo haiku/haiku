@@ -27,7 +27,6 @@ CDDBServer::CDDBServer(const BString& cddbServer)
 	fInitialized(false),
 	fConnected(false)
 {
-
 	// Set up local host name.
 	char localHostName[MAXHOSTNAMELEN + 1];
 	if (gethostname(localHostName,  MAXHOSTNAMELEN + 1) == 0) {
@@ -50,7 +49,7 @@ CDDBServer::CDDBServer(const BString& cddbServer)
 
 
 status_t
-CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc,
+CDDBServer::Query(uint32 cddbID, const scsi_toc_toc* toc,
 	QueryResponseList& queryResponses)
 {
 	if (_OpenConnection() != B_OK)
@@ -58,7 +57,7 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc,
 
 	// Convert CDDB id to hexadecimal format.
 	char hexCddbId[9];
-	sprintf(hexCddbId, "%08" B_PRIx32, cddbId);
+	sprintf(hexCddbId, "%08" B_PRIx32, cddbID);
 
 	// Assemble the Query command.
 	int32 numTracks = toc->last_track + 1 - toc->first_track;
@@ -127,7 +126,7 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc,
 			output.MoveInto(responseData->category, 0, output.FindFirst(" "));
 			output.Remove(0, 1);
 
-			output.MoveInto(responseData->cddbId, 0, output.FindFirst(" "));
+			output.MoveInto(responseData->cddbID, 0, output.FindFirst(" "));
 			output.Remove(0, 1);
 
 			output.MoveInto(responseData->artist, 0, output.FindFirst(" / "));
@@ -156,12 +155,21 @@ status_t
 CDDBServer::Read(const QueryResponseData& diskData,
 	ReadResponseData& readResponse)
 {
+	return Read(diskData.category, diskData.cddbID, diskData.artist,
+		readResponse);
+}
+
+
+status_t
+CDDBServer::Read(const BString& category, const BString& cddbID,
+	const BString& artist, ReadResponseData& readResponse)
+{
 	if (_OpenConnection() != B_OK)
 		return B_ERROR;
 
 	// Assemble the Read command.
 	BString cddbCommand("cddb read ");
-	cddbCommand << diskData.category << " " << diskData.cddbId;
+	cddbCommand << category << " " << cddbID;
 
 	BString output;
 	status_t result = _SendCommand(cddbCommand, output);
@@ -256,17 +264,15 @@ CDDBServer::Read(const QueryResponseData& diskData,
 				trackData->trackNumber = track;
 
 				int32 pos = line.FindFirst(" / ");
-				if (pos >= 0 && diskData.artist.ICompare("Various") == 0) {
+				if (pos >= 0 && artist.ICompare("Various") == 0) {
 					// Disk is set to have a compilation artist and
 					// we have track specific artist information.
-					BString artist;
-					line.MoveInto(artist, 0, pos);
+					line.MoveInto(trackData->artist, 0, pos);
 						// Move artist information from line to artist.
 					line.Remove(0, 3);
 						// Remove " / " from line.
-					trackData->artist = artist;
 				} else {
-					trackData->artist = diskData.artist;
+					trackData->artist = artist;
 				}
 
 				trackData->title = line;

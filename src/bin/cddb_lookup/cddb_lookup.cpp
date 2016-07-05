@@ -8,6 +8,7 @@
  */
 
 
+#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,11 +31,17 @@ public:
 								CDDBLookup();
 	virtual						~CDDBLookup();
 
-			void				LookupAll();
-			status_t			Lookup(const dev_t device);
+			void				LookupAll(CDDBServer& server, bool dumpOnly,
+									bool verbose);
+			status_t			Lookup(CDDBServer& server, const char* path,
+									bool dumpOnly, bool verbose);
+			status_t			Lookup(CDDBServer& server, const dev_t device,
+									bool dumpOnly, bool verbose);
+			status_t			Dump(CDDBServer& server, const char* category,
+									const char* cddbID);
 
 private:
-			bool				_CanLookup(const dev_t device, uint32* cddbId,
+			bool				_ReadTOC(const dev_t device, uint32* cddbID,
 									scsi_toc_toc* toc) const;
 			const QueryResponseData*
 								_SelectResult(
@@ -42,12 +49,24 @@ private:
 			status_t			_WriteCDData(dev_t device,
 									const QueryResponseData& diskData,
 									const ReadResponseData& readResponse);
+			void				_Dump(const ReadResponseData& readResponse)
+									const;
+};
+
+
+static struct option const kLongOptions[] = {
+	{"info", required_argument, 0, 'i'},
+	{"dump", no_argument, 0, 'd'},
+	{"verbose", no_argument, 0, 'v'},
+	{"help", no_argument, 0, 'h'},
+	{NULL}
 };
 
 
 extern const char *__progname;
 static const char *kProgramName = __progname;
 
+static const char* kDefaultServerAddress = "freedb.freedb.org:80";
 static const char* kCddaFsName = "cdda";
 static const int kMaxTocSize = 1024;
 
@@ -65,36 +84,54 @@ CDDBLookup::~CDDBLookup()
 
 
 void
-CDDBLookup::LookupAll()
+CDDBLookup::LookupAll(CDDBServer& server, bool dumpOnly, bool verbose)
 {
 	BVolumeRoster roster;
 	BVolume volume;
 	while (roster.GetNextVolume(&volume) == B_OK) {
-		Lookup(volume.Device());
+		Lookup(server, volume.Device(), dumpOnly, verbose);
 	}
 }
 
 
 status_t
-CDDBLookup::Lookup(const dev_t device)
+CDDBLookup::Lookup(CDDBServer& server, const char* path, bool dumpOnly,
+	bool verbose)
+{
+	BVolumeRoster roster;
+	BVolume volume;
+	while (roster.GetNextVolume(&volume) == B_OK) {
+		fs_info info;
+		if (fs_stat_dev(volume.Device(), &info) != B_OK)
+			continue;
+
+		if (strcmp(path, info.device_name) == 0)
+			return Lookup(server, volume.Device(), dumpOnly, verbose);
+	}
+
+	return B_ENTRY_NOT_FOUND;
+}
+
+
+status_t
+CDDBLookup::Lookup(CDDBServer& server, const dev_t device, bool dumpOnly,
+	bool verbose)
 {
 	scsi_toc_toc* toc = (scsi_toc_toc*)malloc(kMaxTocSize);
 	if (toc == NULL)
 		return B_NO_MEMORY;
 
-	uint32 cddbId;
-	if (!_CanLookup(device, &cddbId, toc)) {
+	uint32 cddbID;
+	if (!_ReadTOC(device, &cddbID, toc)) {
 		free(toc);
 		fprintf(stderr, "Skipping device with id %" B_PRId32 ".\n", device);
 		return B_BAD_TYPE;
 	}
 
-	printf("Looking up CD with CDDB Id %08" B_PRIx32 ".\n", cddbId);
-
-	CDDBServer cddbServer("freedb.freedb.org:80");
+	printf("Looking up CD with CDDB Id %08" B_PRIx32 ".\n", cddbID);
 
 	BObjectList<QueryResponseData> queryResponses(10, true);
-	status_t result = cddbServer.Query(cddbId, toc, queryResponses);
+	status_t result = server.Query(cddbID, toc, queryResponses);
 	if (result != B_OK) {
 		fprintf(stderr, "Error when querying CD: %s\n", strerror(result));
 		free(toc);
@@ -110,28 +147,48 @@ CDDBLookup::Lookup(const dev_t device)
 	}
 
 	ReadResponseData readResponse;
-	result = cddbServer.Read(*diskData, readResponse);
+	result = server.Read(*diskData, readResponse);
 	if (result != B_OK) {
 		fprintf(stderr, "Could not read detailed CD entry from server: %s\n",
 			strerror(result));
 		return result;
 	}
 
-	result = _WriteCDData(device, *diskData, readResponse);
-	if (result == B_OK)
-		printf("CD data saved.\n");
-	else
-		fprintf(stderr, "Error writing CD data: %s\n", strerror(result));
+	if (verbose || dumpOnly)
+		_Dump(readResponse);
 
+	if (!dumpOnly) {
+		result = _WriteCDData(device, *diskData, readResponse);
+		if (result == B_OK)
+			printf("CD data saved.\n");
+		else
+			fprintf(stderr, "Error writing CD data: %s\n", strerror(result));
+	}
+	return B_OK;
+}
+
+
+status_t
+CDDBLookup::Dump(CDDBServer& server, const char* category, const char* cddbID)
+{
+	ReadResponseData readResponse;
+	status_t status = server.Read(category, cddbID, "", readResponse);
+	if (status != B_OK) {
+		fprintf(stderr, "Could not read detailed CD entry from server: %s\n",
+			strerror(status));
+		return status;
+	}
+
+	_Dump(readResponse);
 	return B_OK;
 }
 
 
 bool
-CDDBLookup::_CanLookup(const dev_t device, uint32* cddbId,
+CDDBLookup::_ReadTOC(const dev_t device, uint32* cddbID,
 	scsi_toc_toc* toc) const
 {
-	if (cddbId == NULL || toc == NULL)
+	if (cddbID == NULL || toc == NULL)
 		return false;
 
 	// Is it an Audio disk?
@@ -147,17 +204,17 @@ CDDBLookup::_CanLookup(const dev_t device, uint32* cddbId,
 
 	bool doLookup;
 	if (directory.ReadAttr("CD:do_lookup", B_BOOL_TYPE, 0, (void *)&doLookup,
-		sizeof(bool)) < B_OK || !doLookup)
+			sizeof(bool)) < B_OK || !doLookup)
 		return false;
 
 	// Does it have the CD:cddbid attribute?
-	if (directory.ReadAttr("CD:cddbid", B_UINT32_TYPE, 0, (void *)cddbId,
-		sizeof(uint32)) < B_OK)
+	if (directory.ReadAttr("CD:cddbid", B_UINT32_TYPE, 0, (void *)cddbID,
+			sizeof(uint32)) < B_OK)
 		return false;
 
 	// Does it have the CD:toc attribute?
 	if (directory.ReadAttr("CD:toc", B_RAW_TYPE, 0, (void *)toc,
-		kMaxTocSize) < B_OK)
+			kMaxTocSize) < B_OK)
 		return false;
 
 	return true;
@@ -178,7 +235,7 @@ CDDBLookup::_SelectResult(const QueryResponseList& responses) const
 
 		for (int32 i = 0; i < numItems; i++) {
 			QueryResponseData* data = responses.ItemAt(i);
-			printf("* %s : %s - %s (%s)\n", data->cddbId.String(),
+			printf("* %s : %s - %s (%s)\n", data->cddbID.String(),
 				data->artist.String(), data->title.String(),
 				data->category.String());
 		}
@@ -258,15 +315,120 @@ CDDBLookup::_WriteCDData(dev_t device, const QueryResponseData& diskData,
 }
 
 
+void
+CDDBLookup::_Dump(const ReadResponseData& readResponse) const
+{
+	printf("Artist: %s\n", readResponse.artist.String());
+	printf("Title:  %s\n", readResponse.title.String());
+	printf("Genre:  %s\n", readResponse.genre.String());
+	printf("Year:   %" B_PRIu32 "\n", readResponse.year);
+	puts("Tracks:");
+	for (int32 i = 0; i < readResponse.tracks.CountItems(); i++) {
+		TrackData* track = readResponse.tracks.ItemAt(i);
+		if (track->artist.IsEmpty()) {
+			printf("  %2" B_PRIu32 ". %s\n", track->trackNumber + 1,
+				track->title.String());
+		} else {
+			printf("  %2" B_PRIu32 ". %s - %s\n", track->trackNumber + 1,
+				track->artist.String(), track->title.String());
+		}
+	}
+}
+
+
 // #pragma mark -
 
 
-int
-main(void)
+static void
+usage(int exitCode)
 {
-	// TODO: support arguments to specify a device
+	fprintf(exitCode == EXIT_SUCCESS ? stdout : stderr,
+		"Usage: %s [-vdh] [-s <server>] [-i <category> <cddb-id>|<device>]\n"
+		"\nYou can specify the device either as path on the device, or using "
+		"the\ndevice name directly. If you do not specify a device, and are\n"
+		"using the -i option, all volumes will be scanned for CD info.\n\n"
+		"  -s, --server\tUse alternative server. Default is %s.\n"
+		"  -v, --verbose\tVerbose output.\n"
+		"  -d, --dump\tDo not write attributes, only dump info to terminal.\n"
+		"  -h, --help\tThis help text.\n"
+		"  -i\t\tDump info for the specified category/cddb ID pair.\n",
+		kProgramName, kDefaultServerAddress);
+	exit(exitCode);
+}
+
+
+int
+main(int argc, char* const* argv)
+{
+	const char* serverAddress = kDefaultServerAddress;
+	const char* category = NULL;
+	bool verbose = false;
+	bool dump = false;
+
+	int c;
+	while ((c = getopt_long(argc, argv, "i:s:vdh", kLongOptions, NULL)) != -1) {
+		switch (c) {
+			case 0:
+				break;
+			case 'i':
+				category = optarg;
+				break;
+			case 's':
+				serverAddress = optarg;
+				break;
+			case 'v':
+				verbose = true;
+				break;
+			case 'd':
+				dump = true;
+				break;
+			case 'h':
+				usage(0);
+				break;
+			default:
+				usage(1);
+				break;
+		}
+	}
+
+	CDDBServer server(serverAddress);
 	CDDBLookup cddb;
-	cddb.LookupAll();
+	int left = argc - optind;
+
+	if (category != NULL) {
+		if (left != 1) {
+			fprintf(stderr, "CDDB disc ID expected!\n");
+			return EXIT_FAILURE;
+		}
+
+		const char* cddbID = argv[optind];
+		cddb.Dump(server, category, cddbID);
+	} else {
+		// Lookup via actual CD
+		if (left > 0) {
+			for (int i = optind; i < argc; i++) {
+				// Allow to specify a device
+				const char* path = argv[i];
+				status_t status;
+				if (strncmp(path, "/dev/", 5) == 0) {
+					status = cddb.Lookup(server, path, dump, verbose);
+				} else {
+					dev_t device = dev_for_path(path);
+					if (device >= 0)
+						status = cddb.Lookup(server, device, dump, verbose);
+					else
+						status = (status_t)device;
+				}
+
+				if (status != B_OK) {
+					fprintf(stderr, "Invalid path \"%s\": %s\n", path,
+						strerror(status));
+					return EXIT_FAILURE;
+				}
+			}
+		} else
+			cddb.LookupAll(server, dump, verbose);
+	}
 
 	return 0;
 }
