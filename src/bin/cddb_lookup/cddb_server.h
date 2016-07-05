@@ -61,11 +61,13 @@ public:
 			status_t			Query(uint32 cddbID, const scsi_toc_toc* toc,
 									QueryResponseList& queryResponses);
 			status_t			Read(const QueryResponseData& diskData,
-									ReadResponseData& readResponse);
+									ReadResponseData& readResponse,
+									bool verbose = false);
 			status_t			Read(const BString& category,
 									const BString& cddbID,
 									const BString& artist,
-									ReadResponseData& readResponse);
+									ReadResponseData& readResponse,
+									bool verbose = false);
 
 private:
 			status_t 			_ParseAddress(const BString& cddbServer);

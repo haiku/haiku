@@ -38,7 +38,7 @@ public:
 			status_t			Lookup(CDDBServer& server, const dev_t device,
 									bool dumpOnly, bool verbose);
 			status_t			Dump(CDDBServer& server, const char* category,
-									const char* cddbID);
+									const char* cddbID, bool verbose);
 
 private:
 			bool				_ReadTOC(const dev_t device, uint32* cddbID,
@@ -147,14 +147,14 @@ CDDBLookup::Lookup(CDDBServer& server, const dev_t device, bool dumpOnly,
 	}
 
 	ReadResponseData readResponse;
-	result = server.Read(*diskData, readResponse);
+	result = server.Read(*diskData, readResponse, verbose);
 	if (result != B_OK) {
 		fprintf(stderr, "Could not read detailed CD entry from server: %s\n",
 			strerror(result));
 		return result;
 	}
 
-	if (verbose || dumpOnly)
+	if (dumpOnly)
 		_Dump(readResponse);
 
 	if (!dumpOnly) {
@@ -169,10 +169,11 @@ CDDBLookup::Lookup(CDDBServer& server, const dev_t device, bool dumpOnly,
 
 
 status_t
-CDDBLookup::Dump(CDDBServer& server, const char* category, const char* cddbID)
+CDDBLookup::Dump(CDDBServer& server, const char* category, const char* cddbID,
+	bool verbose)
 {
 	ReadResponseData readResponse;
-	status_t status = server.Read(category, cddbID, "", readResponse);
+	status_t status = server.Read(category, cddbID, "", readResponse, verbose);
 	if (status != B_OK) {
 		fprintf(stderr, "Could not read detailed CD entry from server: %s\n",
 			strerror(status));
@@ -402,7 +403,7 @@ main(int argc, char* const* argv)
 		}
 
 		const char* cddbID = argv[optind];
-		cddb.Dump(server, category, cddbID);
+		cddb.Dump(server, category, cddbID, verbose);
 	} else {
 		// Lookup via actual CD
 		if (left > 0) {

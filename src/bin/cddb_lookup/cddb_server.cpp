@@ -153,16 +153,16 @@ CDDBServer::Query(uint32 cddbID, const scsi_toc_toc* toc,
 
 status_t
 CDDBServer::Read(const QueryResponseData& diskData,
-	ReadResponseData& readResponse)
+	ReadResponseData& readResponse, bool verbose)
 {
 	return Read(diskData.category, diskData.cddbID, diskData.artist,
-		readResponse);
+		readResponse, verbose);
 }
 
 
 status_t
 CDDBServer::Read(const BString& category, const BString& cddbID,
-	const BString& artist, ReadResponseData& readResponse)
+	const BString& artist, ReadResponseData& readResponse, bool verbose)
 {
 	if (_OpenConnection() != B_OK)
 		return B_ERROR;
@@ -174,6 +174,9 @@ CDDBServer::Read(const BString& category, const BString& cddbID,
 	BString output;
 	status_t result = _SendCommand(cddbCommand, output);
 	if (result == B_OK) {
+		if (verbose)
+			puts(output);
+
 		// Remove the header from the reply.
 		output.Remove(0, output.FindFirst("\r\n\r\n") + 4);
 
