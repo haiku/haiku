@@ -1,17 +1,17 @@
 /*
- * Copyright 2008-2009, Haiku, Inc. All Rights Reserved.
+ * Copyright 2008-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *              Bruno Albuquerque, bga@bug-br.org.br
  */
- 
 #ifndef _CDDB_SERVER_H
 #define _CDDB_SERVER_H
 
-#include <List.h>
+
 #include <NetAddress.h>
 #include <NetEndpoint.h>
+#include <ObjectList.h>
 #include <String.h>
 
 #include <scsi_cmds.h>
@@ -40,34 +40,46 @@ struct ReadResponseData {
 	BString artist;
 	BString genre;
 	uint32 year;
-	BList tracks; // TrackData items.
+	BObjectList<TrackData> tracks;
+
+	ReadResponseData()
+		:
+		tracks(20, true)
+	{
+	}
 };
+
+
+typedef BObjectList<QueryResponseData> QueryResponseList;
 
 
 class CDDBServer {
 public:
-				CDDBServer(const BString& cddbServer);
+								CDDBServer(const BString& cddbServer);
 
 	// CDDB commands interface.
-	status_t	Query(uint32 cddbId, const scsi_toc_toc* toc,
-		BList* queryResponse);
-	status_t	Read(QueryResponseData* diskData,
-		ReadResponseData* readResponse);
+			status_t			Query(uint32 cddbId, const scsi_toc_toc* toc,
+									QueryResponseList& queryResponses);
+			status_t			Read(const QueryResponseData& diskData,
+									ReadResponseData& readResponse);
 
 private:
-	status_t 		_ParseAddress(const BString& cddbServer);
+			status_t 			_ParseAddress(const BString& cddbServer);
 
-	status_t		_OpenConnection();
-	void			_CloseConnection();
-	
-	status_t		_SendCddbCommand(const BString& command, BString* output);
+			status_t			_OpenConnection();
+			void				_CloseConnection();
 
-	BString			fLocalHostName;
-	BString			fLocalUserName;
-	BNetAddress		fCddbServerAddr;
-	BNetEndpoint	fConnection;
-	bool			fInitialized;
-	bool			fConnected;
+			status_t			_SendCommand(const BString& command,
+									BString& output);
+
+private:
+			BString				fLocalHostName;
+			BString				fLocalUserName;
+			BNetAddress			fServerAddress;
+			BNetEndpoint		fConnection;
+			bool				fInitialized;
+			bool				fConnected;
 };
+
 
 #endif  // _CDDB_SERVER_H

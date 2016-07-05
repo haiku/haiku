@@ -1,11 +1,11 @@
 /*
- * Copyright 2008-2015, Haiku, Inc. All Rights Reserved.
+ * Copyright 2008-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *              Bruno Albuquerque, bga@bug-br.org.br
  */
- 
+
 
 #include "cddb_server.h"
 
@@ -35,60 +35,58 @@ CDDBServer::CDDBServer(const BString& cddbServer)
 	} else {
 		fLocalHostName = kDefaultLocalHostName;
 	}
-	
+
 	// Set up local user name.
 	char* user = getenv("USER");
-	if (user == NULL) {
+	if (user == NULL)
 		fLocalUserName = "unknown";
-	} else {
+	else
 		fLocalUserName = user;
-	}
 
 	// Set up server address;
 	if (_ParseAddress(cddbServer) == B_OK)
-		fInitialized = true;		
+		fInitialized = true;
 }
 
 
 status_t
-CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
+CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc,
+	QueryResponseList& queryResponses)
 {
 	if (_OpenConnection() != B_OK)
 		return B_ERROR;
 
 	// Convert CDDB id to hexadecimal format.
 	char hexCddbId[9];
-	sprintf(hexCddbId, "%08" B_PRIx32 "", cddbId);
-	
+	sprintf(hexCddbId, "%08" B_PRIx32, cddbId);
+
 	// Assemble the Query command.
 	int32 numTracks = toc->last_track + 1 - toc->first_track;
-	
+
 	BString cddbCommand("cddb query ");
 	cddbCommand << hexCddbId << " " << numTracks << " ";
 
 	// Add track offsets in frames.
 	for (int32 i = 0; i < numTracks; ++i) {
 		const scsi_cd_msf& start = toc->tracks[i].start.time;
-		
+
 		uint32 startFrameOffset = start.minute * kFramesPerMinute +
 			start.second * kFramesPerSecond + start.frame;
-		
+
 		cddbCommand << startFrameOffset << " ";
 	}
-	
+
 	// Add total disc time in seconds. Last track is lead-out.
 	const scsi_cd_msf& lastTrack = toc->tracks[numTracks].start.time;
 	uint32 totalTimeInSeconds = lastTrack.minute * 60 + lastTrack.second;
-	cddbCommand << totalTimeInSeconds;	
+	cddbCommand << totalTimeInSeconds;
 
 	BString output;
-	status_t result;
-	result = _SendCddbCommand(cddbCommand, &output);
-	
+	status_t result = _SendCommand(cddbCommand, output);
 	if (result == B_OK) {
 		// Remove the header from the reply.
 		output.Remove(0, output.FindFirst("\r\n\r\n") + 4);
-		
+
 		// Check status code.
 		BString statusCode;
 		output.MoveInto(statusCode, 0, 3);
@@ -107,7 +105,7 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
 		} else if (statusCode == "202") {
 			// No match found.
 			printf("Error : CDDB entry for id %s not found.\n", hexCddbId);
-			
+
 			return B_ENTRY_NOT_FOUND;
 		} else {
 			// Something bad happened.
@@ -120,26 +118,26 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
 
 			return B_ERROR;
 		}
-		
+
 		// Process all entries.
 		bool done = false;
 		while (!done) {
 			QueryResponseData* responseData = new QueryResponseData;
-			
+
 			output.MoveInto(responseData->category, 0, output.FindFirst(" "));
 			output.Remove(0, 1);
-			
+
 			output.MoveInto(responseData->cddbId, 0, output.FindFirst(" "));
 			output.Remove(0, 1);
 
 			output.MoveInto(responseData->artist, 0, output.FindFirst(" / "));
-			output.Remove(0, 3);			
+			output.Remove(0, 3);
 
 			output.MoveInto(responseData->title, 0, output.FindFirst("\r\n"));
 			output.Remove(0, 2);
-			
-			queryResponse->AddItem(responseData);
-			
+
+			queryResponses.AddItem(responseData);
+
 			if (output == "" || output == ".\r\n") {
 				// All returned data was processed exit the loop.
 				done = true;
@@ -155,23 +153,22 @@ CDDBServer::Query(uint32 cddbId, const scsi_toc_toc* toc, BList* queryResponse)
 
 
 status_t
-CDDBServer::Read(QueryResponseData* diskData, ReadResponseData* readResponse)
+CDDBServer::Read(const QueryResponseData& diskData,
+	ReadResponseData& readResponse)
 {
 	if (_OpenConnection() != B_OK)
 		return B_ERROR;
 
 	// Assemble the Read command.
 	BString cddbCommand("cddb read ");
-	cddbCommand << diskData->category << " " << diskData->cddbId;
+	cddbCommand << diskData.category << " " << diskData.cddbId;
 
 	BString output;
-	status_t result;
-	result = _SendCddbCommand(cddbCommand, &output);
-
+	status_t result = _SendCommand(cddbCommand, output);
 	if (result == B_OK) {
 		// Remove the header from the reply.
 		output.Remove(0, output.FindFirst("\r\n\r\n") + 4);
-		
+
 		// Check status code.
 		BString statusCode;
 		output.MoveInto(statusCode, 0, 3);
@@ -182,7 +179,7 @@ CDDBServer::Read(QueryResponseData* diskData, ReadResponseData* readResponse)
 			// Something bad happened.
 			return B_ERROR;
 		}
-		
+
 		// Process all entries.
 		bool done = false;
 		while (!done) {
@@ -191,7 +188,7 @@ CDDBServer::Read(QueryResponseData* diskData, ReadResponseData* readResponse)
 				output.Remove(0, output.FindFirst("\r\n") + 2);
 				continue;
 			}
-			
+
 			// Extract one line to reduce the scope of processing to it.
 			BString line;
 			output.MoveInto(line, 0, output.FindFirst("\r\n"));
@@ -201,14 +198,14 @@ CDDBServer::Read(QueryResponseData* diskData, ReadResponseData* readResponse)
 			BString prefix;
 			line.MoveInto(prefix, 0, line.FindFirst("="));
 			line.Remove(0, 1);
-			
+
 			if (prefix == "DTITLE") {
 				// Disk title.
 				BString artist;
 				line.MoveInto(artist, 0, line.FindFirst(" / "));
 				line.Remove(0, 3);
-				readResponse->title = line;
-				readResponse->artist = artist;
+				readResponse.title = line;
+				readResponse.artist = artist;
 			} else if (prefix == "DYEAR") {
 				// Disk year.
 				char* firstInvalid;
@@ -221,19 +218,19 @@ CDDBServer::Read(QueryResponseData* diskData, ReadResponseData* readResponse)
 					printf("Year out of range: %s\n", line.String());
 					year = 0;
 				}
-				
+
 				if (firstInvalid == line.String()) {
 					printf("Invalid year: %s\n", line.String());
 					year = 0;
 				}
-							
-				readResponse->year = year;
+
+				readResponse.year = year;
 			} else if (prefix == "DGENRE") {
 				// Disk genre.
-				readResponse->genre = line;
+				readResponse.genre = line;
 			} else if (prefix.FindFirst("TTITLE") == 0) {
 				// Track title.
-				BString index;					
+				BString index;
 				prefix.MoveInto(index, 6, prefix.Length() - 6);
 
 				TrackData* trackData = new TrackData;
@@ -249,17 +246,17 @@ CDDBServer::Read(QueryResponseData* diskData, ReadResponseData* readResponse)
 					delete trackData;
 					return B_ERROR;
 				}
-				
+
 				if (firstInvalid == index.String()) {
 					printf("Invalid track: %s\n", index.String());
 					delete trackData;
-					return B_ERROR;	
+					return B_ERROR;
 				}
 
 				trackData->trackNumber = track;
 
-				int32 pos = line.FindFirst(" / " );
-				if (pos != B_ERROR && diskData->artist.ICompare("Various") == 0) {
+				int32 pos = line.FindFirst(" / ");
+				if (pos >= 0 && diskData.artist.ICompare("Various") == 0) {
 					// Disk is set to have a compilation artist and
 					// we have track specific artist information.
 					BString artist;
@@ -269,22 +266,22 @@ CDDBServer::Read(QueryResponseData* diskData, ReadResponseData* readResponse)
 						// Remove " / " from line.
 					trackData->artist = artist;
 				} else {
-					trackData->artist = diskData->artist;
+					trackData->artist = diskData.artist;
 				}
 
 				trackData->title = line;
-					
-				(readResponse->tracks).AddItem(trackData);
+
+				readResponse.tracks.AddItem(trackData);
 			}
-			
+
 			if (output == "" || output == ".\r\n") {
 				// All returned data was processed exit the loop.
 				done = true;
-			}			
-		}		
+			}
+		}
 	} else {
-		printf("Error sending CDDB command : \"%s\".\n", cddbCommand.String());		
-	}	
+		printf("Error sending CDDB command : \"%s\".\n", cddbCommand.String());
+	}
 
 	_CloseConnection();
 	return B_OK;
@@ -298,8 +295,8 @@ CDDBServer::_ParseAddress(const BString& cddbServer)
 	int32 pos = cddbServer.FindFirst(":");
 	if (pos == B_ERROR) {
 		// It seems we do not have the address:port format. Use hostname as-is.
-		fCddbServerAddr.SetTo(cddbServer.String(), kDefaultPortNumber);
-		if (fCddbServerAddr.InitCheck() == B_OK)
+		fServerAddress.SetTo(cddbServer.String(), kDefaultPortNumber);
+		if (fServerAddress.InitCheck() == B_OK)
 			return B_OK;
 	} else {
 		// Parse address:port format.
@@ -319,12 +316,12 @@ CDDBServer::_ParseAddress(const BString& cddbServer)
 			if (firstInvalid == portString.String()) {
 				return B_ERROR;
 			}
-			
+
 			newCddbServer.RemoveAll(":");
-			fCddbServerAddr.SetTo(newCddbServer.String(), port);
-			if (fCddbServerAddr.InitCheck() == B_OK)
+			fServerAddress.SetTo(newCddbServer.String(), port);
+			if (fServerAddress.InitCheck() == B_OK)
 				return B_OK;
-		} 
+		}
 	}
 
 	return B_ERROR;
@@ -340,11 +337,11 @@ CDDBServer::_OpenConnection()
 	if (fConnected)
 		return B_OK;
 
-	if (fConnection.Connect(fCddbServerAddr) == B_OK) {
+	if (fConnection.Connect(fServerAddress) == B_OK) {
 		fConnected = true;
 		return B_OK;
 	}
-	
+
 	return B_ERROR;
 }
 
@@ -354,14 +351,14 @@ CDDBServer::_CloseConnection()
 {
 	if (!fConnected)
 		return;
-		
+
 	fConnection.Close();
 	fConnected = false;
 }
 
 
 status_t
-CDDBServer::_SendCddbCommand(const BString& command, BString* output)
+CDDBServer::_SendCommand(const BString& command, BString& output)
 {
 	if (!fConnected)
 		return B_ERROR;
@@ -374,10 +371,10 @@ CDDBServer::_SendCddbCommand(const BString& command, BString* output)
 	// Replace spaces by + signs.
 	fullCommand.ReplaceAll(" ", "+");
 
-	// And now add command header and footer. 
+	// And now add command header and footer.
 	fullCommand.Prepend("GET /~cddb/cddb.cgi?cmd=");
 	fullCommand << " HTTP 1.0\n\n";
-	
+
 	int32 result = fConnection.Send((void*)fullCommand.String(),
 		fullCommand.Length());
 	if (result == fullCommand.Length()) {
@@ -385,11 +382,11 @@ CDDBServer::_SendCddbCommand(const BString& command, BString* output)
 		while (fConnection.Receive(netBuffer, 1024) != 0) {
 			// Do nothing. Data is automatically appended to the NetBuffer.
 		}
-		
+
 		// AppendString automatically adds the terminating \0.
 		netBuffer.AppendString("");
-	
-		output->SetTo((char*)netBuffer.Data(), netBuffer.Size());
+
+		output.SetTo((char*)netBuffer.Data(), netBuffer.Size());
 		return B_OK;
 	}
 
