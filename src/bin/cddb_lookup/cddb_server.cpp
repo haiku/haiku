@@ -244,43 +244,36 @@ CDDBServer::Read(const BString& category, const BString& cddbID,
 				BString index;
 				prefix.MoveInto(index, 6, prefix.Length() - 6);
 
-				TrackData* trackData = new TrackData;
-
 				char* firstInvalid;
 				errno = 0;
 				uint32 track = strtoul(index.String(), &firstInvalid, 10);
-				if ((errno == ERANGE &&
-					(track == (uint32)LONG_MAX || track == (uint32)LONG_MIN))
-					|| (errno != 0 && track == 0)) {
+				if (errno != 0 || track > 99) {
 					// Track out of range.
 					printf("Track out of range: %s\n", index.String());
-					delete trackData;
 					return B_ERROR;
 				}
 
 				if (firstInvalid == index.String()) {
 					printf("Invalid track: %s\n", index.String());
-					delete trackData;
 					return B_ERROR;
 				}
 
-				trackData->trackNumber = track;
-
+				BString trackArtist;
 				int32 pos = line.FindFirst(" / ");
 				if (pos >= 0 && artist.ICompare("Various") == 0) {
 					// Disk is set to have a compilation artist and
 					// we have track specific artist information.
-					line.MoveInto(trackData->artist, 0, pos);
+					line.MoveInto(trackArtist, 0, pos);
 						// Move artist information from line to artist.
 					line.Remove(0, 3);
 						// Remove " / " from line.
 				} else {
-					trackData->artist = artist;
+					trackArtist = artist;
 				}
 
-				trackData->title = line;
-
-				readResponse.tracks.AddItem(trackData);
+				TrackData* trackData = _Track(readResponse, track);
+				trackData->artist += trackArtist;
+				trackData->title += line;
 			}
 
 			if (output == "" || output == ".\r\n") {
@@ -400,4 +393,21 @@ CDDBServer::_SendCommand(const BString& command, BString& output)
 	}
 
 	return B_ERROR;
+}
+
+
+TrackData*
+CDDBServer::_Track(ReadResponseData& response, uint32 track) const
+{
+	for (int32 i = 0; i < response.tracks.CountItems(); i++) {
+		TrackData* trackData = response.tracks.ItemAt(i);
+		if (trackData->trackNumber == track)
+			return trackData;
+	}
+
+	TrackData* trackData = new TrackData();
+	trackData->trackNumber = track;
+	response.tracks.AddItem(trackData);
+
+	return trackData;
 }

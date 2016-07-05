@@ -77,6 +77,8 @@ private:
 
 			status_t			_SendCommand(const BString& command,
 									BString& output);
+			TrackData*			_Track(ReadResponseData& response,
+									uint32 track) const;
 
 private:
 			BString				fLocalHostName;
