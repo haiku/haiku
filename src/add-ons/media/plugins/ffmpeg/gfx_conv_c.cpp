@@ -48,7 +48,7 @@ gfx_conv_yuv410p_ycbcr422_c(AVFrame *in, AVFrame *out, int width, int height)
 				| ((v & 0x0FF) << 24));
 			b = (long)(((y1 & 0x0FF0000) >> 16) | ((u& 0x0FF) << 8)
 				| ((y1 & 0x0FF000000) >> 8) | ((v & 0x0FF) << 24));
-			c = (long)(y2 & 0x0FF | ((u& 0x0FF00)) | ((y2 & 0x0FF00) << 8)
+			c = (long)((y2 & 0x0FF) | (u & 0x0FF00) | ((y2 & 0x0FF00) << 8)
 				| ((v & 0x0FF00) << 16));
 			d = (long)(((y2 & 0x0FF0000) >> 16) | ((u& 0x0FF00))
 				| ((y2 & 0x0FF000000) >> 8) | ((v & 0x0FF00) << 16));
@@ -113,13 +113,13 @@ gfx_conv_yuv420p_ycbcr422_c(AVFrame *in, AVFrame *out, int width, int height)
 			y2 = *pi++;
 			u = *pi2++;
 			v = *pi3++;
-			a = (long)(y1 & 0x0FF | ((u& 0x0FF) << 8) | ((y1 & 0x0FF00) << 8)
+			a = (long)((y1 & 0x0FF) | ((u & 0x0FF) << 8) | ((y1 & 0x0FF00) << 8)
 				| ((v & 0x0FF) << 24));
-			b = (long)(((y1 & 0x0FF0000) >> 16) | ((u& 0x0FF00))
+			b = (long)(((y1 & 0x0FF0000) >> 16) | ((u & 0x0FF00))
 				| ((y1 & 0x0FF000000) >> 8) | ((v & 0x0FF00) << 16));
-			c = (long)(y2 & 0x0FF | ((u& 0x0FF0000) >> 8)
+			c = (long)((y2 & 0x0FF) | ((u & 0x0FF0000) >> 8)
 				| ((y2 & 0x0FF00) << 8) | ((v & 0x0FF0000) << 8));
-			d = (long)(((y2 & 0x0FF0000) >> 16) | ((u& 0x0FF000000) >> 16)
+			d = (long)(((y2 & 0x0FF0000) >> 16) | ((u & 0x0FF000000) >> 16)
 				| ((y2 & 0x0FF000000) >> 8) | ((v & 0x0FF000000)));
 
 			*(p++) = a;
@@ -272,7 +272,7 @@ gfx_conv_YCbCr422_RGB32_c(AVFrame *in, AVFrame *out, int width, int height)
 
 		uvIndex = 0;
 
-		for (uint32 j=0; j < width; j+=2) {
+		for (int32 j = 0; j < width; j += 2) {
 			rgbBase[j] = YUV444TORGBA8888(yBase[j], uBase[uvIndex],
 				vBase[uvIndex]);
 			rgbBase[j + 1] = YUV444TORGBA8888(yBase[j + 1], uBase[uvIndex],
