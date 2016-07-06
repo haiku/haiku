@@ -142,7 +142,7 @@ AVCodecDecoder::~AVCodecDecoder()
 {
 	TRACE("[%c] AVCodecDecoder::~AVCodecDecoder()\n", fIsAudio?('a'):('v'));
 
-#ifdef DO_PROFILING
+#if DO_PROFILING
 	if (profileCounter > 0) {
 		printf("[%c] profile: d1 = %lld, d2 = %lld (%Ld)\n",
 			fIsAudio?('a'):('v'), decodingTime / profileCounter,
@@ -857,7 +857,7 @@ AVCodecDecoder::_CheckAndFixConditionsThatHintAtBrokenAudioCodeBelow()
 {
 	if (fDecodedDataBufferSize < 0) {
 		fprintf(stderr, "Decoding read past the end of the decoded data "
-			"buffer! %ld\n", fDecodedDataBufferSize);
+			"buffer! %" B_PRId32 "\n", fDecodedDataBufferSize);
 		fDecodedDataBufferSize = 0;
 	}
 	if (fTempPacket.size < 0) {
@@ -1040,8 +1040,8 @@ AVCodecDecoder::_DecodeNextAudioFrameChunk()
 				// Report failure if not done already
 				int32 chunkBufferOffset = fTempPacket.data - fChunkBuffer;
 				printf("########### audio decode error, "
-					"fTempPacket.size %d, fChunkBuffer data offset %ld\n",
-					fTempPacket.size, chunkBufferOffset);
+					"fTempPacket.size %d, fChunkBuffer data offset %" B_PRId32
+					"\n", fTempPacket.size, chunkBufferOffset);
 				fAudioDecodeError = true;
 			}
 
