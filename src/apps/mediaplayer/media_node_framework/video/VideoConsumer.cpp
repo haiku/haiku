@@ -143,7 +143,7 @@ VideoConsumer::HandleMessage(int32 message, const void* data, size_t size)
 void
 VideoConsumer::BufferReceived(BBuffer* buffer)
 {
-	LOOP("VideoConsumer::Buffer #%ld received\n", buffer->ID());
+	LOOP("VideoConsumer::Buffer #%" B_PRId32 " received\n", buffer->ID());
 
 	if (RunState() == B_STOPPED) {
 		buffer->Recycle();
@@ -182,8 +182,9 @@ VideoConsumer::CreateBuffers(const media_format& format)
 	uint32 width = format.u.raw_video.display.line_width;
 	uint32 height = format.u.raw_video.display.line_count;	
 	color_space colorSpace = format.u.raw_video.display.format;
-	PROGRESS("VideoConsumer::CreateBuffers - Width = %ld - Height = %ld - "
-		"Colorspace = %d\n", width, height, colorSpace);
+	PROGRESS("VideoConsumer::CreateBuffers - Width = %" B_PRIu32 " - "
+		"Height = %" B_PRIu32 " - Colorspace = %d\n",
+		width, height, colorSpace);
 
 	fBuffers = new BBufferGroup();
 	status = fBuffers->InitCheck();
@@ -606,9 +607,9 @@ VideoConsumer::_HandleBuffer(BBuffer* buffer)
 			fManager->Unlock();
 		}
 		PROGRESS("VideoConsumer::HandleEvent - DROPPED FRAME\n"
-			"   start_time: %lld, current: %lld, latency: %lld\n",
-			buffer->Header()->start_time, TimeSource()->Now(),
-			SchedulingLatency());
+			"   start_time: %" B_PRIdBIGTIME ", current: %" B_PRIdBIGTIME ", "
+			"latency: %" B_PRIdBIGTIME "\n",  buffer->Header()->start_time,
+			TimeSource()->Now(), SchedulingLatency());
 	}
 	if (recycle)
 		buffer->Recycle();
