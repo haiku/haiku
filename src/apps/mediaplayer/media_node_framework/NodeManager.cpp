@@ -111,8 +111,7 @@ NodeManager::InitCheck()
 void
 NodeManager::SetPlayMode(int32 mode, bool continuePlaying)
 {
-	if (fVideoConsumer != NULL && fMediaRoster != NULL
-		&& fMediaRoster->Lock()) {
+	if (fVideoConsumer != NULL && fMediaRoster != NULL) {
 		BMediaNode::run_mode runMode = mode > 0 ?
 			BMediaNode::B_DROP_DATA : BMediaNode::B_OFFLINE;
 		status_t ret = fMediaRoster->SetRunModeNode(fVideoConnection.consumer,
@@ -121,7 +120,6 @@ NodeManager::SetPlayMode(int32 mode, bool continuePlaying)
 			printf("NodeManager::SetPlayMode(%" B_PRId32 "), setting run mode "
 				"failed: %s\n", mode, strerror(ret));
 		}
-		fMediaRoster->Unlock();
 	}
 
 	PlaybackManager::SetPlayMode(mode, continuePlaying);
@@ -286,14 +284,11 @@ NodeManager::_SetUpNodes(color_space preferredVideoFormat, uint32 enabledNodes,
 		fMediaRoster = NULL;
 		return fStatus;
 	}
-	if (!fMediaRoster->Lock())
-		return B_ERROR;
 
 	// find the time source
 	fStatus = fMediaRoster->GetTimeSource(&fTimeSource);
 	if (fStatus != B_OK) {
 		print_error("Can't get a time source", fStatus);
-		fMediaRoster->Unlock();
 		return fStatus;
 	}
 
@@ -302,7 +297,6 @@ NodeManager::_SetUpNodes(color_space preferredVideoFormat, uint32 enabledNodes,
 		fStatus = _SetUpVideoNodes(preferredVideoFormat, useOverlays);
 		if (fStatus != B_OK) {
 			print_error("Error setting up video nodes", fStatus);
-			fMediaRoster->Unlock();
 			return fStatus;
 		}
 	} else
@@ -313,17 +307,13 @@ NodeManager::_SetUpNodes(color_space preferredVideoFormat, uint32 enabledNodes,
 		fStatus = _SetUpAudioNodes(audioFrameRate, audioChannels);
 		if (fStatus != B_OK) {
 			print_error("Error setting up audio nodes", fStatus);
-			fMediaRoster->Unlock();
 			return fStatus;
 		}
-fNoAudio = false;
+		fNoAudio = false;
 	} else {
-fNoAudio = true;
+		fNoAudio = true;
 		printf("running without audio node\n");
 	}
-
-	// we're done mocking with the media roster
-	fMediaRoster->Unlock();
 
 	return fStatus;
 }
@@ -540,7 +530,7 @@ NodeManager::_SetUpAudioNodes(float audioFrameRate, uint32 audioChannels)
 status_t
 NodeManager::_TearDownNodes(bool disconnect)
 {
-TRACE("NodeManager::_TearDownNodes()\n");
+	TRACE("NodeManager::_TearDownNodes()\n");
 	status_t err = B_OK;
 	fMediaRoster = BMediaRoster::Roster(&err);
 	if (err != B_OK) {
@@ -548,15 +538,11 @@ TRACE("NodeManager::_TearDownNodes()\n");
 			"roster: %s\n", strerror(err));
 		fMediaRoster = NULL;
 	}
-	// begin mucking with the media roster
-	bool mediaRosterLocked = false;
-	if (fMediaRoster && fMediaRoster->Lock())
-		mediaRosterLocked = true;
 
 	if (fVideoConsumer && fVideoProducer && fVideoConnection.connected) {
 		// disconnect
 		if (fMediaRoster) {
-TRACE("  disconnecting video...\n");
+		TRACE("  disconnecting video...\n");
 			err = fMediaRoster->Disconnect(fVideoConnection.producer.node,
 				fVideoConnection.source, fVideoConnection.consumer.node,
 				fVideoConnection.destination);
@@ -569,12 +555,12 @@ TRACE("  disconnecting video...\n");
 		fVideoConnection.connected = false;
 	}
 	if (fVideoProducer) {
-TRACE("  releasing video producer...\n");
+		TRACE("  releasing video producer...\n");
 		fVideoProducer->Release();
 		fVideoProducer = NULL;
 	}
 	if (fVideoConsumer) {
-TRACE("  releasing video consumer...\n");
+		TRACE("  releasing video consumer...\n");
 		fVideoConsumer->Release();
 		fVideoConsumer = NULL;
 	}
@@ -585,8 +571,8 @@ TRACE("  releasing video consumer...\n");
 		// Mixer is a  Bad Idea (tm). So, we just disconnect from it, and
 		// release our references to the nodes that we're using.  We *are*
 		// supposed to do that even for global nodes like the Mixer.
-		if (fMediaRoster && disconnect) {
-TRACE("  disconnecting audio...\n");
+		if (fMediaRoster != NULL && disconnect) {
+			TRACE("  disconnecting audio...\n");
 			err = fMediaRoster->Disconnect(fAudioConnection.producer.node,
 				fAudioConnection.source, fAudioConnection.consumer.node,
 				fAudioConnection.destination);
@@ -599,23 +585,21 @@ TRACE("  disconnecting audio...\n");
 				"disconnect audio nodes, no media server!\n");
 		}
 
-TRACE("  releasing audio producer...\n");
+		TRACE("  releasing audio producer...\n");
 		fAudioProducer->Release();
 		fAudioProducer = NULL;
 		fAudioConnection.connected = false;
 
-		if (fMediaRoster && disconnect) {
-TRACE("  releasing audio consumer...\n");
+		if (fMediaRoster != NULL && disconnect) {
+			TRACE("  releasing audio consumer...\n");
 			fMediaRoster->ReleaseNode(fAudioConnection.consumer);
 		} else {
 			fprintf(stderr, "NodeManager::_TearDownNodes() - cannot release "
 				"audio consumer (system mixer)!\n");
 		}
 	}
-	// we're done mucking with the media roster
-	if (mediaRosterLocked && fMediaRoster)
-		fMediaRoster->Unlock();
-TRACE("NodeManager::_TearDownNodes() done\n");
+
+	TRACE("NodeManager::_TearDownNodes() done\n");
 	return err;
 }
 
@@ -626,9 +610,6 @@ NodeManager::_StartNodes()
 	status_t status = B_NO_INIT;
 	if (!fMediaRoster)
 		return status;
-	// begin mucking with the media roster
-	if (!fMediaRoster->Lock())
-		return B_ERROR;
 
 	bigtime_t latency = 0;
 	bigtime_t initLatency = 0;
@@ -723,9 +704,6 @@ NodeManager::_StartNodes()
 
 	fPerformanceTimeBase = perf;
 
-	// done mucking with the media roster
-	fMediaRoster->Unlock();
-
 	return status;
 }
 
@@ -735,7 +713,7 @@ NodeManager::_StopNodes()
 {
 	TRACE("NodeManager::_StopNodes()\n");
 	fMediaRoster = BMediaRoster::Roster();
-	if (fMediaRoster != NULL && fMediaRoster->Lock()) {
+	if (fMediaRoster != NULL) {
 		// begin mucking with the media roster
 		if (fVideoProducer != NULL) {
 			TRACE("  stopping video producer...\n");
@@ -751,8 +729,6 @@ NodeManager::_StopNodes()
 			fMediaRoster->StopNode(fVideoConnection.consumer, 0, true);
 		}
 		TRACE("  all nodes stopped\n");
-		// done mucking with the media roster
-		fMediaRoster->Unlock();
 	}
 	TRACE("NodeManager::_StopNodes() done\n");
 }
