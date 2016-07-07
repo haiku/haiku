@@ -199,6 +199,7 @@ bigtime_t PlaylistItem::_CalculateDuration()
 
 	delete vi;
 	delete au;
+	ReleaseTrackSupplier();
 
 	return duration;
 }

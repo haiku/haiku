@@ -139,12 +139,11 @@ UrlPlaylistItem::_CreateTrackSupplier() const
 		return NULL;
 
 	BMediaFile* mediaFile = new(std::nothrow) BMediaFile(fUrl);
-	if (mediaFile == NULL) {
+	if (mediaFile == NULL || supplier->AddMediaFile(mediaFile) != B_OK) {
+		delete mediaFile;
 		delete supplier;
 		return NULL;
 	}
-	if (supplier->AddMediaFile(mediaFile) != B_OK)
-			delete mediaFile;
 
 	return supplier;
 }
