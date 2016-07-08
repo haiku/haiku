@@ -7,18 +7,20 @@
 #include <Entry.h>
 #include <MediaFile.h>
 #include <MediaTrack.h>
+#include <OS.h>
 #include <SoundPlayer.h>
+#include <Url.h>
+
 #include <stdio.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <OS.h>
 
 thread_id reader = -1;
 sem_id finished = -1;
-BMediaTrack *playTrack;
+BMediaTrack* playTrack;
 media_format playFormat;
-BSoundPlayer *sp = 0;
+BSoundPlayer* sp = 0;
 volatile bool interrupt = false;
 
 void
@@ -49,14 +51,28 @@ int
 main(int argc, char *argv[])
 {
 	if (argc != 2) {
-		fprintf(stderr, "Usage:\n  %s <filename>\n", argv[0]);
+		fprintf(stderr, "Usage:\n  %s <filename or url>\n", argv[0]);
 		return 1;
 	}
-	
+
+	BUrl url;
+	bool isUrl = false;
 	entry_ref ref;
-	if (get_ref_for_path(argv[1], &ref)!=B_OK)
-		return 2;
-	BMediaFile *playFile = new BMediaFile(&ref);
+
+	if (get_ref_for_path(argv[1], &ref) != B_OK) {
+		url.SetUrlString(argv[1]);
+		if (url.IsValid())
+			isUrl = true;
+		else
+			return 2;
+	}
+
+	BMediaFile* playFile;
+	if (isUrl)
+		playFile = new BMediaFile(url);
+	else
+		playFile = new BMediaFile(&ref);
+
 	if (playFile->InitCheck()<B_OK) {
 		delete playFile;
 		return 2;
