@@ -85,6 +85,16 @@ NetworkStreamWin::MessageReceived(BMessage* message)
 			Quit();
 			break;
 
+		case B_KEY_DOWN:
+		{
+			int8 key;
+			if (message->FindInt8("byte", &key) == B_OK
+					&& key == B_ENTER) {
+				PostMessage(M_OPEN_URL);
+				break;
+			}
+		}
+
 		default:
 			BWindow::MessageReceived(message);
 	}
