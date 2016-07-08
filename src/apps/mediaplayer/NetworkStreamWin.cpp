@@ -121,7 +121,7 @@ NetworkStreamWin::_LookIntoClipboardForUrl()
 	// in that case avoid the user to paste it.
 	if (be_clipboard->Lock()) {
 		char* text = NULL;
-		int32 textLen = 0;
+		ssize_t textLen = 0;
 
 		BMessage* data = be_clipboard->Data();
 		if (data->FindData("text/plain", B_MIME_TYPE,
