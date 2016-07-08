@@ -10,6 +10,7 @@
 #include <Alert.h>
 #include <Button.h>
 #include <Catalog.h>
+#include <Clipboard.h>
 #include <LayoutBuilder.h>
 
 #include "MainApp.h"
@@ -42,6 +43,8 @@ NetworkStreamWin::NetworkStreamWin(BMessenger target)
 				.Add(new BButton("Cancel", new BMessage(M_CANCEL)))
 			.End()
 		.End();
+
+	_LookIntoClipboardForUrl();
 
 	CenterOnScreen();
 }
@@ -84,5 +87,50 @@ NetworkStreamWin::MessageReceived(BMessage* message)
 
 		default:
 			BWindow::MessageReceived(message);
+	}
+}
+
+
+void
+NetworkStreamWin::WindowActivated(bool active)
+{
+	if (active)
+		_LookIntoClipboardForUrl();
+}
+
+
+void
+NetworkStreamWin::_LookIntoClipboardForUrl()
+{
+	// Don't do anything if we already have something
+	// set to avoid annoying the user.
+	if (fTextControl->TextView()->TextLength() > 0)
+		return;
+
+	// Let's see if we already have an url in the clipboard
+	// in that case avoid the user to paste it.
+	if (be_clipboard->Lock()) {
+		char* text = NULL;
+		int32 textLen = 0;
+
+		BMessage* data = be_clipboard->Data();
+		if (data->FindData("text/plain", B_MIME_TYPE,
+				(const void **)&text, &textLen) == B_OK) {
+
+			// NOTE: This is done because urls copied
+			// from WebPositive have the mime string at
+			// the end.
+			// TODO: Looks like a problem in Web+, should
+			// be fixed.
+			text[textLen] = '\0';
+
+			// Before to set the text let's see if it's really
+			// a valid URL.
+			BUrl url(text);
+			if (url.IsValid())
+				fTextControl->SetText(text);
+		}
+
+		be_clipboard->Unlock();
 	}
 }

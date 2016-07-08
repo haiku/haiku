@@ -20,7 +20,10 @@ public:
 
 	virtual	void				MessageReceived(BMessage* message);
 
+	virtual void				WindowActivated(bool active);
 private:
+			void				_LookIntoClipboardForUrl();
+
 			BMessenger			fTarget;
 			BTextControl*		fTextControl;
 };
