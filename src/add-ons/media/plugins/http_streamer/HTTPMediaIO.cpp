@@ -81,7 +81,7 @@ private:
 
 HTTPMediaIO::HTTPMediaIO(BUrl url)
 	:
-	BAdapterIO(HTTP_TIMEOUT),
+	BAdapterIO(B_MEDIA_STREAMING | B_MEDIA_SEEKABLE, HTTP_TIMEOUT),
 	fContext(NULL),
 	fReq(NULL),
 	fListener(NULL),

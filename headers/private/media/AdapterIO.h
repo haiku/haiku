@@ -38,9 +38,8 @@ private:
 class BAdapterIO : public BMediaIO {
 public:
 									BAdapterIO(
-										int32 flags = B_MEDIA_STREAMING
-											| B_MEDIA_SEEKABLE,
-										bigtime_t timeout = B_INFINITE_TIMEOUT);
+										int32 flags,
+										bigtime_t timeout);
 	virtual							~BAdapterIO();
 
 	virtual void					GetFlags(int32* flags) const;
