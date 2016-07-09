@@ -30,6 +30,8 @@ public:
 	virtual status_t					Open();
 	virtual void						Close();
 
+	virtual bool						IsRunning() const;
+
 protected:
 	virtual	status_t					SeekRequested(off_t position);
 

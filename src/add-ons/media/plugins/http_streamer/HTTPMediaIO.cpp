@@ -45,11 +45,7 @@ public:
 		void DataReceived(BUrlRequest* request, const char* data,
 			off_t position, ssize_t size)
 		{
-			if (fInitSem != -1) {
-				release_sem(fInitSem);
-				delete_sem(fInitSem);
-				fInitSem = -1;
-			}
+			_ReleaseInit();
 
 			if (request != fRequest)
 				delete request;
@@ -59,6 +55,8 @@ public:
 
 		void RequestCompleted(BUrlRequest* request, bool success)
 		{
+			_ReleaseInit();
+
 			if (request != fRequest)
 				return;
 
@@ -72,6 +70,15 @@ public:
 		}
 
 private:
+		void _ReleaseInit()
+		{
+			if (fInitSem != -1) {
+				release_sem(fInitSem);
+				delete_sem(fInitSem);
+				fInitSem = -1;
+			}
+		}
+
 		BUrlRequest*	fRequest;
 		BAdapterIO*		fAdapterIO;
 		BInputAdapter*	fInputAdapter;
@@ -163,6 +170,13 @@ HTTPMediaIO::Close()
 	delete fContext;
 
 	BAdapterIO::Close();
+}
+
+
+bool
+HTTPMediaIO::IsRunning() const
+{
+	return fReq != NULL && fReq->IsRunning();
 }
 
 
