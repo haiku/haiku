@@ -67,7 +67,7 @@ public:
 		return B_OK;
 	}
 
-	status_t WaitForData(off_t position)
+	status_t WaitForData(off_t position, off_t size)
 	{
 		off_t bufferSize = 0;
 		status_t ret = GetSize(&bufferSize);
@@ -76,7 +76,12 @@ public:
 
 		bigtime_t totalTimeOut = 0;
 
-		while(bufferSize <= position) {
+		while(bufferSize < position+size) {
+			// We are not running, no luck to receive
+			// more data, let's return and avoid locking.
+			if (!fOwner->IsRunning())
+				return B_NOT_SUPPORTED;
+
 			if (fTimeout != B_INFINITE_TIMEOUT && totalTimeOut >= fTimeout)
 				return B_TIMED_OUT;
 
@@ -346,6 +351,13 @@ BAdapterIO::Close()
 }
 
 
+bool
+BAdapterIO::IsRunning() const
+{
+	return fOpened;
+}
+
+
 void
 BAdapterIO::SeekCompleted()
 {
@@ -415,7 +427,7 @@ BAdapterIO::_EvaluateWait(off_t pos, off_t size)
 
 	TRACE("BAdapterIO::_EvaluateWait: waiting for data\n");
 
-	return fBuffer->WaitForData(pos+size);
+	return fBuffer->WaitForData(pos, size);
 }
 
 

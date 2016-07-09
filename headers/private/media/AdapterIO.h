@@ -58,6 +58,8 @@ public:
 	virtual status_t				Open();
 	virtual void					Close();
 
+	virtual bool					IsRunning() const;
+
 			void					SeekCompleted();
 			status_t				SetBuffer(BPositionIO* buffer);
 
