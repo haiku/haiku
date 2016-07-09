@@ -231,29 +231,32 @@ BrowserApp::ReadyToRun()
 		fLaunchRefsMessage = NULL;
 	}
 
-	BMessage archivedWindow;
-	for (int i = 0; fSession->FindMessage("window", i, &archivedWindow) == B_OK;
-		i++) {
+	// If no refs led to a new open page, restore previous session.
+	if (pagesCreated == 0) {
+		BMessage archivedWindow;
+		for (int i = 0; fSession->FindMessage("window", i, &archivedWindow) == B_OK;
+			i++) {
+			BRect frame = archivedWindow.FindRect("window frame");
+			BString url;
+			archivedWindow.FindString("tab", 0, &url);
+			BrowserWindow* window = new(std::nothrow) BrowserWindow(frame,
+				fSettings, url, fContext);
 
-		BRect frame = archivedWindow.FindRect("window frame");
-		BString url;
-		archivedWindow.FindString("tab", 0, &url);
-		BrowserWindow* window = new(std::nothrow) BrowserWindow(frame,
-			fSettings, url, fContext);
-
-		if (window != NULL) {
-			window->Show();
-			pagesCreated++;
-
-			for (int j = 1; archivedWindow.FindString("tab", j, &url) == B_OK;
-				j++) {
-				printf("Create %d:%d\n", i, j);
-				_CreateNewTab(window, url, false);
+			if (window != NULL) {
+				window->Show();
 				pagesCreated++;
+
+				for (int j = 1; archivedWindow.FindString("tab", j, &url) == B_OK;
+					j++) {
+					printf("Create %d:%d\n", i, j);
+					_CreateNewTab(window, url, false);
+					pagesCreated++;
+				}
 			}
 		}
 	}
 
+	// If previous session did not contain any window, create a new empty one.
 	if (pagesCreated == 0)
 		_CreateNewWindow("", fullscreen);
 
