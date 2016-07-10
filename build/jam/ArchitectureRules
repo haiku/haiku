@@ -610,19 +610,19 @@ rule ArchitectureSetupWarnings architecture
 #	EnableWerror src add-ons translators hpgs ;
 	EnableWerror src add-ons translators hvif ;
 	EnableWerror src add-ons translators ico ;
-#	EnableWerror src add-ons translators jpeg ; # gcc2
+	EnableWerror src add-ons translators jpeg ;
 	EnableWerror src add-ons translators jpeg2000 ;
 	EnableWerror src add-ons translators pcx ;
-#	EnableWerror src add-ons translators png ; # gcc2
+	EnableWerror src add-ons translators png ;
 	EnableWerror src add-ons translators ppm ;
 	EnableWerror src add-ons translators raw ;
 	EnableWerror src add-ons translators rtf ;
 	EnableWerror src add-ons translators sgi ;
 	EnableWerror src add-ons translators shared ;
-#	EnableWerror src add-ons translators stxt ;
+	EnableWerror src add-ons translators stxt ;
 	EnableWerror src add-ons translators tga ;
 	EnableWerror src add-ons translators tiff ;
-#	EnableWerror src add-ons translators wonderbrush ;
+	EnableWerror src add-ons translators wonderbrush ;
 	EnableWerror src add-ons print ;
 	EnableWerror src bin desklink ;
 	EnableWerror src bin multiuser ;
