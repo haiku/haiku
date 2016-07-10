@@ -7,6 +7,7 @@
 #include "UrlPlaylistItem.h"
 
 #include <MediaFile.h>
+#include <MediaTrack.h>
 
 #include "MediaFileTrackSupplier.h"
 
@@ -26,6 +27,9 @@ UrlPlaylistItem::UrlPlaylistItem(const UrlPlaylistItem& item)
 
 UrlPlaylistItem::UrlPlaylistItem(const BMessage* archive)
 {
+	const char* url = NULL;
+	if (archive->FindString("mediaplayer:url", &url) == B_OK)
+		fUrl = BUrl(url);
 }
 
 
@@ -44,14 +48,17 @@ UrlPlaylistItem::Clone() const
 BArchivable*
 UrlPlaylistItem::Instantiate(BMessage* archive)
 {
-	return new UrlPlaylistItem(archive);
+	if (validate_instantiation(archive, "UrlPlaylistItem"))
+		return new (std::nothrow) UrlPlaylistItem(archive);
+
+	return NULL;
 }
 
 
 status_t
 UrlPlaylistItem::Archive(BMessage* into, bool deep) const
 {
-	return B_NOT_SUPPORTED;
+	return into->AddString("mediaplayer:url", fUrl.UrlString());
 }
 
 
@@ -127,6 +134,18 @@ status_t
 UrlPlaylistItem::RestoreFromTrash()
 {
 	return B_NOT_SUPPORTED;
+}
+
+
+bigtime_t
+UrlPlaylistItem::_CalculateDuration()
+{
+	BMediaFile mediaFile(fUrl);
+
+	if (mediaFile.InitCheck() != B_OK || mediaFile.CountTracks() < 1)
+		return 0;
+
+	return mediaFile.TrackAt(0)->Duration();
 }
 
 

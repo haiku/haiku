@@ -48,6 +48,8 @@ public:
 			BUrl				Url() const;
 
 protected:
+	virtual	bigtime_t			_CalculateDuration();
+
 	virtual	TrackSupplier*		_CreateTrackSupplier() const;
 
 private:
