@@ -21,28 +21,29 @@
 
 
 enum  {
-	M_OPEN_URL = 0,
-	M_CANCEL
+	M_OPEN_URL = 'NSOP',
+	M_CANCEL = 'NSCN'
 };
 
 
 NetworkStreamWin::NetworkStreamWin(BMessenger target)
 	:
-	BWindow(BRect(0, 0, 300, 100), "Open Network Stream",
+	BWindow(BRect(0, 0, 300, 100), B_TRANSLATE("Open network stream"),
 		B_MODAL_WINDOW, B_NOT_RESIZABLE),
 	fTarget(target)
 {
 	fTextControl = new BTextControl("InputControl",
-		"Insert URL", NULL, NULL);
+		B_TRANSLATE("Stream URL:"), NULL, NULL);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
-		.SetInsets(0, 0, 0, 0)
+		.SetInsets(B_USE_HALF_ITEM_INSETS)
 		.Add(fTextControl)
-			.AddGroup(B_HORIZONTAL)
-				.Add(new BButton("Ok", new BMessage(M_OPEN_URL)))
-				.Add(new BButton("Cancel", new BMessage(M_CANCEL)))
-			.End()
-		.End();
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(new BButton(B_TRANSLATE("OK"), new BMessage(M_OPEN_URL)))
+			.Add(new BButton(B_TRANSLATE("Cancel"), new BMessage(M_CANCEL)))
+		.End()
+	.End();
 
 	_LookIntoClipboardForUrl();
 
