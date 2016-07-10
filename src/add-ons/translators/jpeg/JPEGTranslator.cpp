@@ -764,10 +764,6 @@ JPEGTranslator::DerivedTranslate(BPositionIO* inSource,
 	const translator_info* inInfo, BMessage* ioExtension, uint32 outType,
 	BPositionIO* outDestination, int32 baseType)
 {
-	// If no specific type was requested, convert to the interchange format
-	if (outType == 0)
-		outType = B_TRANSLATOR_BITMAP;
-
 	// Setup a "breakpoint" since throwing exceptions does not seem to work
 	// at all in an add-on. (?)
 	// In the be_jerror.cpp we implement a handler for critical library errors
@@ -788,7 +784,8 @@ JPEGTranslator::DerivedTranslate(BPositionIO* inSource,
 				&& outType == JPEG_FORMAT) {
 			return Compress(inSource, outDestination, &longJumpBuffer);
 		} else if (inInfo->type == JPEG_FORMAT
-				&& outType == B_TRANSLATOR_BITMAP) {
+				&& (outType == B_TRANSLATOR_BITMAP || outType == 0)) {
+			// This is the default if no specific outType was requested.
 			return Decompress(inSource, outDestination, ioExtension,
 				&longJumpBuffer);
 		}
