@@ -76,7 +76,7 @@ public:
 
 		bigtime_t totalTimeOut = 0;
 
-		while(bufferSize < position+size) {
+		while (bufferSize < position + size) {
 			// We are not running, no luck to receive
 			// more data, let's return and avoid locking.
 			if (!fOwner->IsRunning())
@@ -216,9 +216,6 @@ BAdapterIO::BAdapterIO(int32 flags, bigtime_t timeout)
 	CALLED();
 
 	fBuffer = new RelativePositionIO(this, new BMallocIO(), timeout);
-
-	if (fBuffer->IsSeekable())
-		fSeekSem = create_sem(0, "BAdapterIO seek sem");
 }
 
 
@@ -281,6 +278,9 @@ BAdapterIO::Seek(off_t position, uint32 seekMode)
 
 	if (ret == B_RESOURCE_UNAVAILABLE && fBuffer->IsStreaming()
 			&& fBuffer->IsSeekable()) {
+
+		fSeekSem = create_sem(0, "BAdapterIO seek sem");
+
 		if (SeekRequested(position) != B_OK)
 			return B_NOT_SUPPORTED;
 
@@ -363,6 +363,8 @@ BAdapterIO::SeekCompleted()
 {
 	CALLED();
 	release_sem(fSeekSem);
+	delete_sem(fSeekSem);
+	fSeekSem = -1;
 }
 
 
