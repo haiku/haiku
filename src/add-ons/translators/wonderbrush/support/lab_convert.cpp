@@ -43,7 +43,7 @@ init_linear_table()
 }
 
 // conversion from RGB (0...255) to linear and normalized RGB (0...1)
-static uint8* gammaTable = init_gamma_table();
+/*static uint8* gammaTable = init_gamma_table();*/
 static float* linearTable = init_linear_table();
 
 // matrix entries: XYZ -> RGB (709 RGB, D65 Whitepoint)
