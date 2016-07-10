@@ -114,9 +114,7 @@ ShortcutsWindow::ShortcutsWindow()
 {
 	ShortcutsSpec::InitializeMetaMaps();
 
-	float spacing = be_control_look->DefaultItemSpacing();
-
-	BMenuBar* menuBar = new BMenuBar(BRect(0, 0, 0, 0), "Menu Bar");
+	BMenuBar* menuBar = new BMenuBar("Menu Bar");
 
 	BMenu* fileMenu = new BMenu(B_TRANSLATE("File"));
 	fileMenu->AddItem(new BMenuItem(B_TRANSLATE("Open KeySet" B_UTF8_ELLIPSIS),
@@ -188,29 +186,16 @@ ShortcutsWindow::ShortcutsWindow()
 	fColumnListView->SetSelectionMode(B_SINGLE_SELECTION_LIST);
 	fColumnListView->SetTarget(this);
 
-	fAddButton = new BButton(BRect(0, 0, 0, 0), "add",
-		B_TRANSLATE("Add new shortcut"), new BMessage(ADD_HOTKEY_ITEM),
-		B_FOLLOW_BOTTOM);
-	fAddButton->ResizeToPreferred();
-	fAddButton->MoveBy(spacing,
-		Bounds().bottom - fAddButton->Bounds().bottom - spacing);
+	fAddButton = new BButton("add", B_TRANSLATE("Add new shortcut"),
+		new BMessage(ADD_HOTKEY_ITEM), B_FOLLOW_BOTTOM);
 
-	fRemoveButton = new BButton(BRect(0, 0, 0, 0), "remove",
+	fRemoveButton = new BButton("remove",
 		B_TRANSLATE("Remove selected shortcut"),
 		new BMessage(REMOVE_HOTKEY_ITEM), B_FOLLOW_BOTTOM);
-	fRemoveButton->ResizeToPreferred();
-	fRemoveButton->MoveBy(fAddButton->Frame().right + spacing,
-		Bounds().bottom - fRemoveButton->Bounds().bottom - spacing);
-
 	fRemoveButton->SetEnabled(false);
 
-	fSaveButton = new BButton(BRect(0, 0, 0, 0), "save",
-		B_TRANSLATE("Save & apply"), new BMessage(SAVE_KEYSET),
-		B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT);
-	fSaveButton->ResizeToPreferred();
-	fSaveButton->MoveBy(Bounds().right - fSaveButton->Bounds().right - spacing,
-		Bounds().bottom - fSaveButton->Bounds().bottom - spacing);
-
+	fSaveButton = new BButton("save", B_TRANSLATE("Save & apply"),
+		new BMessage(SAVE_KEYSET), B_FOLLOW_BOTTOM | B_FOLLOW_RIGHT);
 	fSaveButton->SetEnabled(false);
 
 	CenterOnScreen();
@@ -240,6 +225,7 @@ ShortcutsWindow::ShortcutsWindow()
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(menuBar)
 		.AddGroup(B_VERTICAL)
+			.SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET))
 			.SetInsets(B_USE_WINDOW_SPACING)
 			.Add(fColumnListView)
 			.AddGroup(B_HORIZONTAL)
