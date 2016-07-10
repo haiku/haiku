@@ -292,6 +292,18 @@ PNGTranslator::DerivedIdentify(BPositionIO *inSource,
 	return identify_png_header(inSource, outInfo);
 }
 
+
+// Workaround for gcc2 complaining about clobbered variables when we do a
+// setjmp, even though the variables are not accessed when returning from
+// a longjmp. Moving setjmp to a different function is enough to hide the
+// problem from gcc2.
+static int
+setjmp_wrapper(jmp_buf buf)
+{
+	return setjmp(buf);
+}
+
+
 status_t
 PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 	BPositionIO *outDestination)
@@ -322,7 +334,7 @@ PNGTranslator::translate_from_png_to_bits(BPositionIO *inSource,
 		if (!pinfo)
 			break;
 		// set error handling
-		if (setjmp(png_jmpbuf(ppng)))
+		if (setjmp_wrapper(png_jmpbuf(ppng)))
 			// When an error occurs in libpng, it uses
 			// the longjmp function to continue execution
 			// from this point
@@ -829,7 +841,7 @@ PNGTranslator::translate_from_bits_to_png(BPositionIO *inSource,
 			break;
 		}
 		// set error handling
-		if (setjmp(png_jmpbuf(ppng))) {
+		if (setjmp_wrapper(png_jmpbuf(ppng))) {
 			// When an error occurs in libpng, it uses
 			// the longjmp function to continue execution
 			// from this point
