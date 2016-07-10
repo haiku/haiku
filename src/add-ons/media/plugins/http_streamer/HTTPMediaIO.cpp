@@ -16,7 +16,7 @@
 
 class FileListener : public BUrlProtocolAsynchronousListener {
 public:
-		FileListener(BAdapterIO* owner)
+		FileListener(HTTPMediaIO* owner)
 			:
 			BUrlProtocolAsynchronousListener(true),
 			fRequest(NULL),
@@ -38,6 +38,8 @@ public:
 		{
 			if (fRequest != NULL)
 				fRequest->Stop();
+
+			fAdapterIO->UpdateSize();
 
 			fRequest = request;
 		}
@@ -80,7 +82,7 @@ private:
 		}
 
 		BUrlRequest*	fRequest;
-		BAdapterIO*		fAdapterIO;
+		HTTPMediaIO*	fAdapterIO;
 		BInputAdapter*	fInputAdapter;
 		sem_id			fInitSem;
 };
@@ -91,6 +93,7 @@ HTTPMediaIO::HTTPMediaIO(BUrl url)
 	BAdapterIO(B_MEDIA_STREAMING | B_MEDIA_SEEKABLE, HTTP_TIMEOUT),
 	fContext(NULL),
 	fReq(NULL),
+	fReqThread(-1),
 	fListener(NULL),
 	fUrl(url),
 	fIsMutable(false)
@@ -140,21 +143,13 @@ HTTPMediaIO::Open()
 	if (fReq == NULL)
 		return B_ERROR;
 
-	if (fReq->Run() < 0)
+	fReqThread = fReq->Run();
+	if (fReqThread < 0)
 		return B_ERROR;
 
 	status_t ret = fListener->LockOnInit(HTTP_TIMEOUT);
 	if (ret != B_OK)
 		return ret;
-
-	off_t totalSize = fReq->Result().Length();
-
-	// At this point we decide if our size is fixed or mutable,
-	// this will change the behavior of our parent.
-	if (totalSize > 0)
-		BAdapterIO::SetSize(totalSize);
-	else
-		fIsMutable = true;
 
 	return BAdapterIO::Open();
 }
@@ -163,6 +158,10 @@ HTTPMediaIO::Open()
 void
 HTTPMediaIO::Close()
 {
+	fReq->Stop();
+	status_t status;
+	wait_for_thread(fReqThread, &status);
+
 	delete fReq;
 	delete fListener;
 
@@ -184,4 +183,17 @@ status_t
 HTTPMediaIO::SeekRequested(off_t position)
 {
 	return BAdapterIO::SeekRequested(position);
+}
+
+
+void
+HTTPMediaIO::UpdateSize()
+{
+	// At this point we decide if our size is fixed or mutable,
+	// this will change the behavior of our parent.
+	off_t size = fReq->Result().Length();
+	if (size > 0)
+		BAdapterIO::SetSize(size);
+	else
+		fIsMutable = true;
 }

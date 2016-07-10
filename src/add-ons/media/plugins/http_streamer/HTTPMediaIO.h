@@ -35,10 +35,16 @@ public:
 protected:
 	virtual	status_t					SeekRequested(off_t position);
 
+	// Other custom stuff
+
+			void						UpdateSize();
+
+	friend class FileListener;
 private:
 	BUrlContext*						fContext;
 	BUrlRequest*						fReq;
 	FileListener*						fListener;
+	thread_id							fReqThread;
 
 	BUrl								fUrl;
 	off_t								fTotalSize;
