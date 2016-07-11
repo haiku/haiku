@@ -273,11 +273,17 @@ BBox::AttachedToWindow()
 {
 	AdoptParentColors();
 
-	if (ViewColor() == B_TRANSPARENT_COLOR) {
-		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-		SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
-		SetHighUIColor(B_PANEL_TEXT_COLOR);
-	}
+	// Force low color to match view color for proper label drawing.
+	float viewTint = B_NO_TINT;
+	float lowTint = B_NO_TINT;
+
+	if (LowUIColor(&lowTint) != ViewUIColor(&viewTint) || viewTint != lowTint)
+		SetLowUIColor(ViewUIColor(), viewTint);
+	else if (LowColor() != ViewColor())
+		SetLowColor(ViewColor());
+
+	if (ViewColor() == B_TRANSPARENT_COLOR)
+		AdoptSystemColors();
 
 	// The box could have been resized in the mean time
 	fBounds = Bounds();
@@ -659,7 +665,7 @@ BBox::_InitObject(BMessage* archive)
 			fLabelView = ChildAt(0);
 	}
 
-	SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
+	AdoptSystemColors();
 }
 
 
