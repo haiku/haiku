@@ -285,7 +285,7 @@ BMenuItem::SetShortcut(char shortcut, uint32 modifiers)
 	if (fShortcutChar != 0 && (fModifiers & B_COMMAND_KEY) && fWindow)
 		fWindow->AddShortcut(fShortcutChar, fModifiers, this);
 
-	if (fSuper) {
+	if (fSuper != NULL) {
 		fSuper->InvalidateLayout();
 
 		if (fSuper->LockLooper()) {
@@ -740,29 +740,29 @@ BMenuItem::_DrawShortcutSymbol()
 
 	// TODO: It would be nice to draw these taking into account the text (low)
 	// color.
-	if (fModifiers & B_COMMAND_KEY) {
-		const BBitmap *command = MenuPrivate::MenuItemCommand();
+	if ((fModifiers & B_COMMAND_KEY) != 0) {
+		const BBitmap* command = MenuPrivate::MenuItemCommand();
 		const BRect &rect = command->Bounds();
 		where.x -= rect.Width() + 1;
 		fSuper->DrawBitmap(command, where);
 	}
 
-	if (fModifiers & B_CONTROL_KEY) {
-		const BBitmap *control = MenuPrivate::MenuItemControl();
+	if ((fModifiers & B_CONTROL_KEY) != 0) {
+		const BBitmap* control = MenuPrivate::MenuItemControl();
 		const BRect &rect = control->Bounds();
 		where.x -= rect.Width() + 1;
 		fSuper->DrawBitmap(control, where);
 	}
 
-	if (fModifiers & B_OPTION_KEY) {
-		const BBitmap *option = MenuPrivate::MenuItemOption();
+	if ((fModifiers & B_OPTION_KEY) != 0) {
+		const BBitmap* option = MenuPrivate::MenuItemOption();
 		const BRect &rect = option->Bounds();
 		where.x -= rect.Width() + 1;
 		fSuper->DrawBitmap(option, where);
 	}
 
-	if (fModifiers & B_SHIFT_KEY) {
-		const BBitmap *shift = MenuPrivate::MenuItemShift();
+	if ((fModifiers & B_SHIFT_KEY) != 0) {
+		const BBitmap* shift = MenuPrivate::MenuItemShift();
 		const BRect &rect = shift->Bounds();
 		where.x -= rect.Width() + 1;
 		fSuper->DrawBitmap(shift, where);
