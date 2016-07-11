@@ -23,8 +23,8 @@ BootstrapPackageRepository HaikuPortsCross
 	expat_bootstrap_devel-2.1.0-1
 	findutils_bootstrap-4.4.2-1
 	flex_bootstrap-2.5.35-1
-	freetype_bootstrap-2.4.9-1
-	freetype_bootstrap_devel-2.4.9-1
+	freetype_bootstrap-2.6.3-1
+	freetype_bootstrap_devel-2.6.3-1
 	gawk_bootstrap-3.1.8-2
 	grep_bootstrap-2.14-1
 	icu_bootstrap-54.1-1
@@ -43,8 +43,8 @@ BootstrapPackageRepository HaikuPortsCross
 		binutils_bootstrap_x86-2.25_2014_12_27-1
 		expat_bootstrap_x86-2.1.0-1
 		expat_bootstrap_x86_devel-2.1.0-1
-		freetype_bootstrap_x86-2.4.9-1
-		freetype_bootstrap_x86_devel-2.4.9-1
+		freetype_bootstrap_x86-2.6.3-1
+		freetype_bootstrap_x86_devel-2.6.3-1
 		icu_bootstrap_x86-4.8.1.1-1
 		icu_bootstrap_x86_devel-4.8.1.1-1
 		ncurses_bootstrap_x86-6.0-1
