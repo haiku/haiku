@@ -130,10 +130,18 @@ Port::SetPipe(Pipe* pipe)
 
 	uint32 portState = read32(portRegister);
 
-	if (pipe->Index() == INTEL_PIPE_A)
-		write32(portRegister, portState & ~DISPLAY_MONITOR_PIPE_B);
-	else
-		write32(portRegister, portState | DISPLAY_MONITOR_PIPE_B);
+	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
+		portState &= PORT_TRANS_SEL_MASK;
+		if (pipe->Index() == INTEL_PIPE_A)
+			write32(portRegister, portState | PORT_TRANS_A_SEL_CPT);
+		else
+			write32(portRegister, portState | PORT_TRANS_B_SEL_CPT);
+	} else {
+		if (pipe->Index() == INTEL_PIPE_A)
+			write32(portRegister, portState & ~DISPLAY_MONITOR_PIPE_B);
+		else
+			write32(portRegister, portState | DISPLAY_MONITOR_PIPE_B);
+	}
 
 	fPipe = pipe;
 
@@ -348,7 +356,7 @@ LVDSPort::LVDSPort()
 {
 	// Always unlock LVDS port as soon as we start messing with it.
 	uint32 panelControl = INTEL_PANEL_CONTROL;
-	if (gInfo->shared_info->device_type.HasPlatformControlHub())
+	if (gInfo->shared_info->pch_info != INTEL_PCH_NONE)
 		panelControl = PCH_PANEL_CONTROL;
 	write32(panelControl, read32(panelControl) | PANEL_REGISTER_UNLOCK);
 }
@@ -360,7 +368,7 @@ LVDSPort::IsConnected()
 	TRACE("%s: %s PortRegister: 0x%" B_PRIxADDR "\n", __func__, PortName(),
 		_PortRegister());
 
-	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
+	if (gInfo->shared_info->pch_info != INTEL_PCH_NONE) {
 		uint32 registerValue = read32(_PortRegister());
 		// there's a detection bit we can use
 		if ((registerValue & PCH_LVDS_DETECTED) == 0) {
@@ -438,7 +446,7 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 
 	addr_t panelControl = INTEL_PANEL_CONTROL;
 	addr_t panelStatus = INTEL_PANEL_STATUS;
-	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
+	if (gInfo->shared_info->pch_info != INTEL_PCH_NONE) {
 		panelControl = PCH_PANEL_CONTROL;
 		panelStatus = PCH_PANEL_STATUS;
 	}
@@ -502,6 +510,15 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 		// otherwise, 18bpp
 		if ((lvds & LVDS_A3_POWER_MASK) != LVDS_A3_POWER_UP)
 			lvds |= LVDS_18BIT_DITHER;
+	}
+
+	// LVDS on PCH needs set before display enable
+	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
+		lvds &= PORT_TRANS_SEL_MASK;
+		if (fPipe->Index() == INTEL_PIPE_A)
+			lvds |= PORT_TRANS_A_SEL_CPT;
+		else
+			lvds |= PORT_TRANS_B_SEL_CPT;
 	}
 
 	// Set the B0-B3 data pairs corresponding to whether we're going to
@@ -763,8 +780,8 @@ HDMIPort::IsConnected()
 	if (portRegister == 0)
 		return false;
 
-	if (!gInfo->shared_info->device_type.HasPlatformControlHub()
-		&& PortIndex() == INTEL_PORT_C) {
+	bool hasPCH = (gInfo->shared_info->pch_info != INTEL_PCH_NONE);
+	if (!hasPCH && PortIndex() == INTEL_PORT_C) {
 		// there's no detection bit on this port
 	} else if ((read32(portRegister) & DISPLAY_MONITOR_PORT_DETECTED) == 0)
 		return false;
@@ -777,7 +794,7 @@ addr_t
 HDMIPort::_PortRegister()
 {
 	// on PCH there's an additional port sandwiched in
-	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
+	bool hasPCH = (gInfo->shared_info->pch_info != INTEL_PCH_NONE);
 	bool fourthGen = gInfo->shared_info->device_type.InGroup(INTEL_GROUP_VLV);
 
 	switch (PortIndex()) {

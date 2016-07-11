@@ -46,7 +46,7 @@ enable_all_pipes(bool enable)
 static void
 enable_lvds_panel(bool enable)
 {
-	bool hasPCH = gInfo->shared_info->device_type.HasPlatformControlHub();
+	bool hasPCH = (gInfo->shared_info->pch_info != INTEL_PCH_NONE);
 
 	int controlRegister = hasPCH ? PCH_PANEL_CONTROL : INTEL_PANEL_CONTROL;
 	int statusRegister = hasPCH ? PCH_PANEL_STATUS : INTEL_PANEL_STATUS;

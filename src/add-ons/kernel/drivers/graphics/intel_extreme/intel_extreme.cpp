@@ -93,7 +93,7 @@ intel_interrupt_handler(void* data)
 	while (identity != 0) {
 
 		// TODO: verify that these aren't actually the same
-		bool hasPCH = info.device_type.HasPlatformControlHub();
+		bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
 		uint16 mask;
 
 		// Intel changed the PCH register mapping between Sandy Bridge and the
@@ -215,7 +215,7 @@ init_interrupt_handler(intel_info &info)
 			write16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), ~0);
 
 			// enable interrupts - we only want VBLANK interrupts
-			bool hasPCH = info.device_type.HasPlatformControlHub();
+			bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
 			uint16 enable = hasPCH
 				? (PCH_INTERRUPT_VBLANK_PIPEA | PCH_INTERRUPT_VBLANK_PIPEB)
 				: (INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB);
@@ -316,15 +316,16 @@ intel_extreme_init(intel_info &info)
 		return info.registers_area;
 	}
 
+	bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
+
 	ERROR("Init Intel generation %" B_PRId32 " GPU %s PCH split.\n",
-		info.device_type.Generation(),
-		info.device_type.HasPlatformControlHub() ? "with" : "without");
+		info.device_type.Generation(), hasPCH ? "with" : "without");
 
 	uint32* blocks = info.shared_info->register_blocks;
 	blocks[REGISTER_BLOCK(REGS_FLAT)] = 0;
 
 	// setup the register blocks for the different architectures
-	if (info.device_type.HasPlatformControlHub()) {
+	if (hasPCH) {
 		// PCH based platforms (IronLake through ultra-low-power Broadwells)
 		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]
 			= PCH_NORTH_SHARED_REGISTER_BASE;
@@ -428,6 +429,8 @@ intel_extreme_init(intel_info &info)
 
 	info.shared_info->pll_info.divisor_register = INTEL_DISPLAY_A_PLL_DIVISOR_0;
 
+	info.shared_info->pch_info = info.pch_info;
+
 	info.shared_info->device_type = info.device_type;
 #ifdef __HAIKU__
 	strlcpy(info.shared_info->device_identifier, info.device_identifier,
@@ -474,7 +477,7 @@ intel_extreme_init(intel_info &info)
 
 	init_interrupt_handler(info);
 
-	if (info.device_type.HasPlatformControlHub()) {
+	if (hasPCH) {
 		if (info.device_type.Generation() == 5) {
 			info.shared_info->fdi_link_frequency = (read32(info, FDI_PLL_BIOS_0)
 				& FDI_PLL_FB_CLOCK_MASK) + 2;

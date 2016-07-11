@@ -83,6 +83,17 @@
 #define INTEL_MODEL_SKYM	(INTEL_GROUP_SKY | INTEL_TYPE_MOBILE)
 #define INTEL_MODEL_SKYS	(INTEL_GROUP_SKY | INTEL_TYPE_SERVER)
 
+#define INTEL_PCH_DEVICE_ID_MASK			0xff00
+#define INTEL_PCH_IBX_DEVICE_ID		0x3b00
+#define INTEL_PCH_CPT_DEVICE_ID		0x1c00
+#define INTEL_PCH_PPT_DEVICE_ID		0x1e00
+#define INTEL_PCH_LPT_DEVICE_ID		0x8c00
+#define INTEL_PCH_LPT_LP_DEVICE_ID	0x9c00
+#define INTEL_PCH_SPT_DEVICE_ID		0xA100
+#define INTEL_PCH_SPT_LP_DEVICE_ID	0x9D00
+#define INTEL_PCH_P2X_DEVICE_ID		0x7100
+#define INTEL_PCH_P3X_DEVICE_ID		0x7000
+
 // ValleyView MMIO offset
 #define VLV_DISPLAY_BASE		0x180000
 
@@ -163,11 +174,6 @@ struct DeviceType {
 			|| InFamily(INTEL_FAMILY_SOC0);
 	}
 
-	bool HasPlatformControlHub() const
-	{
-		return InFamily(INTEL_FAMILY_SER5);
-	}
-
 	bool HasDDI() const
 	{
 		// Intel Digital Display Interface
@@ -199,6 +205,15 @@ struct DeviceType {
 		// Generation 0 means somethins is wrong :-)
 		return 0;
 	}
+};
+
+enum pch_info {
+	INTEL_PCH_NONE = 0,		// No PCH present
+	INTEL_PCH_IBX,			// Ibexpeak
+	INTEL_PCH_CPT,			// Cougarpoint
+	INTEL_PCH_LPT,			// Lynxpoint
+	INTEL_PCH_SPT,			// Sunrisepoint
+	INTEL_PCH_NOP
 };
 
 // info about PLL on graphics card
@@ -272,6 +287,8 @@ struct intel_shared_info {
 	DeviceType		device_type;
 	char			device_identifier[32];
 	struct pll_info	pll_info;
+
+	enum pch_info	pch_info;
 
 	edid1_info		vesa_edid_info;
 	bool			has_vesa_edid_info;
@@ -473,7 +490,6 @@ struct intel_free_graphics_memory {
 #define LVDS_18BIT_DITHER				(1UL << 25)
 #define LVDS_PORT_EN					(1UL << 31)
 
-
 // PLL flags
 #define DISPLAY_PLL_ENABLED				(1UL << 31)
 #define DISPLAY_PLL_2X_CLOCK			(1UL << 30)
@@ -519,6 +535,12 @@ struct intel_free_graphics_memory {
 
 #define INTEL_DISPLAY_A_IMAGE_SIZE		(0x001c | REGS_NORTH_PIPE_AND_PORT)
 #define INTEL_DISPLAY_B_IMAGE_SIZE		(0x101c | REGS_NORTH_PIPE_AND_PORT)
+
+// Cougar Point transcoder pipe selection
+#define  PORT_TRANS_A_SEL_CPT			0
+#define  PORT_TRANS_B_SEL_CPT			(1<<29)
+#define  PORT_TRANS_C_SEL_CPT			(2<<29)
+#define  PORT_TRANS_SEL_MASK			(3<<29)
 
 // on PCH we also have to set the transcoder
 #define INTEL_TRANSCODER_A_HTOTAL			(0x0000 | REGS_SOUTH_TRANSCODER_PORT)

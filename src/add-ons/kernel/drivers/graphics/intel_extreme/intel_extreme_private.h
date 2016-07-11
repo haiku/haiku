@@ -40,6 +40,8 @@ struct intel_info {
 
 	const char*		device_identifier;
 	DeviceType		device_type;
+
+	enum pch_info	pch_info;
 };
 
 
@@ -51,7 +53,7 @@ find_reg(const intel_info& info, uint32 target)
 		return target;
 	}
 
-	if (!info.device_type.HasPlatformControlHub())
+	if (info.pch_info == INTEL_PCH_NONE)
 		return target;
 
 	#define RETURN_REG(x)	case INTEL_##x: return PCH_##x;

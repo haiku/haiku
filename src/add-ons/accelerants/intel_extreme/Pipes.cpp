@@ -67,7 +67,7 @@ Pipe::Pipe(pipe_index pipeIndex)
 	// IvyBridge: Analog + Digital Ports behind FDI (on northbridge)
 	// Haswell: Only VGA behind FDI (on northbridge)
 	// SkyLake: FDI gone. No more northbridge video.
-	if (gInfo->shared_info->device_type.HasPlatformControlHub()) {
+	if (gInfo->shared_info->pch_info != INTEL_PCH_NONE) {
 		TRACE("%s: Pipe %s routed through FDI\n", __func__,
 			(pipeIndex == INTEL_PIPE_A) ? "A" : "B");
 
@@ -136,6 +136,10 @@ Pipe::Configure(display_mode* mode)
 void
 Pipe::_ConfigureTranscoder(display_mode* target)
 {
+	CALLED();
+
+	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
+
 	// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
 	write32(INTEL_TRANSCODER_A_HTOTAL + fPipeOffset,
 		((uint32)(target->timing.h_total - 1) << 16)
@@ -172,6 +176,8 @@ Pipe::ConfigureTimings(display_mode* target)
 {
 	CALLED();
 
+	TRACE("%s: fPipeOffset: 0x%" B_PRIx32"\n", __func__, fPipeOffset);
+
 	if (target == NULL) {
 		ERROR("%s: Invalid display mode!\n", __func__);
 		return;
@@ -199,6 +205,7 @@ Pipe::ConfigureTimings(display_mode* target)
 		| ((uint32)target->timing.v_sync_start - 1));
 
 	// XXX: Is it ok to do these on non-digital?
+
 	write32(INTEL_DISPLAY_A_POS + fPipeOffset, 0);
 	write32(INTEL_DISPLAY_A_IMAGE_SIZE + fPipeOffset,
 		((uint32)(target->virtual_width - 1) << 16)

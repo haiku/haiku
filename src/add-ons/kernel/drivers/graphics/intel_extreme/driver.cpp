@@ -170,6 +170,47 @@ get_next_intel_extreme(int32* _cookie, pci_info &info, uint32 &type)
 }
 
 
+static enum pch_info
+detect_intel_pch()
+{
+	pci_info info;
+
+	// find devices
+	for (int32 i = 0; gPCI->get_nth_pci_info(i, &info) == B_OK; i++) {
+		// check vendor
+		if (info.vendor_id != VENDOR_ID_INTEL
+			|| info.class_base != PCI_bridge
+			|| info.class_sub != PCI_isa) {
+			continue;
+		}
+
+		// check device
+		unsigned short id = info.device_id & INTEL_PCH_DEVICE_ID_MASK;
+		switch(id) {
+			case INTEL_PCH_IBX_DEVICE_ID:
+				ERROR("%s: Found Ibex Peak PCH\n", __func__);
+				return INTEL_PCH_IBX;
+			case INTEL_PCH_CPT_DEVICE_ID:
+				ERROR("%s: Found CougarPoint PCH\n", __func__);
+				return INTEL_PCH_CPT;
+			case INTEL_PCH_PPT_DEVICE_ID:
+				ERROR("%s: Found PantherPoint PCH\n", __func__);
+				return INTEL_PCH_CPT;
+			case INTEL_PCH_LPT_DEVICE_ID:
+				ERROR("%s: Found LynxPoint PCH\n", __func__);
+				return INTEL_PCH_LPT;
+			case INTEL_PCH_SPT_DEVICE_ID:
+			case INTEL_PCH_SPT_LP_DEVICE_ID:
+				ERROR("%s: Found SunrisePoint PCH\n", __func__);
+				return INTEL_PCH_SPT;
+		}
+	}
+
+	ERROR("%s: No PCH detected.\n", __func__);
+	return INTEL_PCH_NONE;
+}
+
+
 extern "C" const char**
 publish_devices(void)
 {
@@ -226,6 +267,8 @@ init_driver(void)
 		gPCIx86Module = NULL;
 	}
 
+	// find the PCH device (if any)
+	enum pch_info pchInfo = detect_intel_pch();
 
 	// find devices
 
@@ -269,6 +312,7 @@ init_driver(void)
 		gDeviceInfo[found]->registers = info->u.h0.base_registers[0];
 		gDeviceInfo[found]->device_identifier = kSupportedDevices[type].name;
 		gDeviceInfo[found]->device_type = kSupportedDevices[type].type;
+		gDeviceInfo[found]->pch_info = pchInfo;
 
 		dprintf(DEVICE_NAME ": (%ld) %s, revision = 0x%x\n", found,
 			kSupportedDevices[type].name, info->revision);

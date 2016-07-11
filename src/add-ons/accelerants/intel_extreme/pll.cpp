@@ -446,7 +446,7 @@ void
 compute_pll_divisors(display_mode* current, pll_divisors* divisors, bool isLVDS)
 {
 	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_G4x)
-		|| gInfo->shared_info->device_type.HasPlatformControlHub()) {
+		|| (gInfo->shared_info->pch_info != INTEL_PCH_NONE)) {
 		compute_dpll_g4x(current, divisors, isLVDS);
 	} else if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_CHV)) {
 		ERROR("%s: TODO: CherryView\n", __func__);
