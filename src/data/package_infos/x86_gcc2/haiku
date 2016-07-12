@@ -64,14 +64,14 @@ requires {
 #endif
 	lib:libcurl
 	lib:libfreetype
-	lib:libicudata
-	lib:libicui18n
-	lib:libicuio
-	lib:libicule
-	lib:libiculx
-	lib:libicutest
-	lib:libicutu
-	lib:libicuuc
+	lib:libicudata >= 57
+	lib:libicui18n >= 57
+	lib:libicuio >= 57
+	lib:libicule >= 57
+	lib:libiculx >= 57
+	lib:libicutest >= 57
+	lib:libicutu >= 57
+	lib:libicuuc >= 57
 	lib:libncurses >= 6.0
 #ifdef HAIKU_REGULAR_BUILD
 #ifdef HAIKU_BUILD_FEATURE_X86_GCC2_EXPAT_ENABLED
