@@ -362,6 +362,17 @@ LVDSPort::LVDSPort()
 }
 
 
+pipe_index
+LVDSPort::PipePreference()
+{
+	// LVDS always pipe b on < gen4
+	if (gInfo->shared_info->device_type.Generation() < 4)
+		return INTEL_PIPE_B;
+
+	return INTEL_PIPE_ANY;
+}
+
+
 bool
 LVDSPort::IsConnected()
 {
