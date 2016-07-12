@@ -92,6 +92,7 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* barView, bool vertical)
 	fBarView(barView),
 	fVertical(vertical),
 	fOverflow(false),
+	fFirstBuild(true),
 	fDeskbarMenuWidth(kMinMenuItemWidth),
 	fPreviousDragTargetItem(NULL),
 	fLastMousedOverItem(NULL),
@@ -506,6 +507,10 @@ TExpandoMenuBar::BuildItems()
 				AddItem(item, 0);
 			} else
 				AddItem(item);
+
+			if (fFirstBuild && fVertical && settings->expandNewTeams)
+				item->ToggleExpandState(true);
+
 		} else {
 			// existing team, update info and add it
 			TTeamMenuItem* item = iter->second;
@@ -551,6 +556,8 @@ TExpandoMenuBar::BuildItems()
 		// weird value - we just override it again
 		ResizeTo(itemWidth, 0);
 	}
+
+	fFirstBuild = false;
 }
 
 

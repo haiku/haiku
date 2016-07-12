@@ -114,6 +114,7 @@ private:
 			TBarView*		fBarView;
 			bool			fVertical : 1;
 			bool			fOverflow : 1;
+			bool			fFirstBuild : 1;
 
 			float			fDeskbarMenuWidth;
 			TTeamMenuItem*	fPreviousDragTargetItem;
