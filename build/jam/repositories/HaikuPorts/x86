@@ -139,12 +139,15 @@ RemotePackageRepository HaikuPorts
 	harfbuzz_devel-1.2.6-1
 	help2man-1.46.6-1
 	htmldoc-1.8.27-3
-	icu-56.1-1
-	icu_devel-56.1-1
+	icu-57.1-1
+	icu_devel-57.1-1
+	icu_tools-57.1-1
 	icu54-54.1-1
 	icu54_devel-54.1-1
 	icu55-55.1-1
 	icu55_devel-55.1-1
+	icu56-56.1-1
+	icu56_devel-56.1-1
 	imagemagick-6.9.4.0-1
 	imagemagick_devel-6.9.4.0-1
 	intltool-0.40.6-4
@@ -380,12 +383,14 @@ RemotePackageRepository HaikuPorts
 	glib2_x86_gcc2_devel-2.38.1-4
 	glu_x86_gcc2-9.0.0-2
 	glu_x86_gcc2_devel-9.0.0-2
-	icu_x86_gcc2-56.1-1
-	icu_x86_gcc2_devel-56.1-1
+	icu_x86_gcc2-57.1-1
+	icu_x86_gcc2_devel-57.1-1
 	icu54_x86_gcc2-54.1-1
 	icu54_x86_gcc2_devel-54.1-1
 	icu55_x86_gcc2-55.1-1
 	icu55_x86_gcc2_devel-55.1-1
+	icu56_x86_gcc2-56.1-1
+	icu56_x86_gcc2_devel-56.1-1
 	jasper_x86_gcc2-1.900.1-4
 	jasper_x86_gcc2_devel-1.900.1-4
 	jpeg_x86_gcc2-9-3
@@ -509,6 +514,7 @@ RemotePackageRepository HaikuPorts
 	icu
 	icu54
 	icu55
+	icu56
 	imagemagick
 	intltool
 	jam

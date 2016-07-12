@@ -191,10 +191,13 @@ RemotePackageRepository HaikuPorts
 	hubbub-0.3.0-1
 	hubbub_devel-0.3.0-1
 	icebreaker-1.9.7-1
-	icu-56.1-1
-	icu_devel-56.1-1
+	icu-57.1-1
+	icu_devel-57.1-1
+	icu_tools-57.1-1
 	icu55-55.1-1
 	icu55_devel-55.1-1
+	icu56-56.1-1
+	icu56_devel-56.1-1
 	imagemagick-6.8.9_8-1
 	imagemagick_devel-6.8.9_8-1
 	intltool-0.40.6-4
@@ -675,10 +678,12 @@ RemotePackageRepository HaikuPorts
 	haikuwebkit_x86_devel-1.5.2-1
 	harfbuzz_x86-0.9.39-1
 	harfbuzz_x86_devel-0.9.39-1
-	icu_x86-56.1-1
-	icu_x86_devel-56.1-1
+	icu_x86-57.1-1
+	icu_x86_devel-57.1-1
 	icu55_x86-55.1-1
 	icu55_x86_devel-55.1-1
+	icu56_x86-56.1-1
+	icu56_x86_devel-56.1-1
 	ilmbase_x86-2.2.0-1
 	ilmbase_x86_devel-2.2.0-1
 	jasper_x86-1.900.1-4
@@ -1139,6 +1144,7 @@ RemotePackageRepository HaikuPorts
 	icebreaker
 	icu
 	icu55
+	icu56
 	ilmbase_x86
 	imagemagick
 	intltool
