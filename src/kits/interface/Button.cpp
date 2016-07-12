@@ -135,7 +135,7 @@ BButton::Draw(BRect updateRect)
 	BRect rect(Bounds());
 	rgb_color background = ViewColor();
 	rgb_color base = LowColor();
-	rgb_color textColor = HighColor();
+	rgb_color textColor = ui_color(B_CONTROL_TEXT_COLOR);
 
 	uint32 flags = be_control_look->Flags(this);
 	if (_Flag(FLAG_DEFAULT))
