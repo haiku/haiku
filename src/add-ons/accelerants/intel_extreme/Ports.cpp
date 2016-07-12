@@ -365,11 +365,13 @@ LVDSPort::LVDSPort()
 pipe_index
 LVDSPort::PipePreference()
 {
-	// LVDS always pipe b on < gen4
-	if (gInfo->shared_info->device_type.Generation() < 4)
-		return INTEL_PIPE_B;
+	// TODO: Technically INTEL_PIPE_B is only required on < gen 4
+	// otherwise we can use INTEL_PIPE_ANY, however it seems to break
+	// modesetting atm. (likely due to a bug on our end)
+	//if (gInfo->shared_info->device_type.Generation() < 4)
+	//	return INTEL_PIPE_B;
 
-	return INTEL_PIPE_ANY;
+	return INTEL_PIPE_B;
 }
 
 
