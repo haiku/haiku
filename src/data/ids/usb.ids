@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2016.06.28
-# Date:    2016-06-28 20:34:05
+# Version: 2016.07.12
+# Date:    2016-07-12 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -17070,9 +17070,37 @@
 	000c  Ralink RT3070 802.11b/g/n Wireless Lan USB Device
 	000e  Ralink RT3070 802.11b/g/n Wireless Lan USB Device
 1d50  OpenMoko, Inc.
+	1db5  IDBG DFU
+	1db6  IDBG
+	5117  Neo1973/FreeRunner kernel usbnet (g_ether, CDC Ethernet) Mode
+	5118  Debug Board (FT2232D) for Neo1973/FreeRunner
 	5119  GTA01/GTA02 U-Boot Bootloader
+	511a  HXD8 u-boot usbtty CDC ACM Mode
+	511b  SMDK2440 u-boot usbtty CDC ACM mode
+	511c  SMDK2443 u-boot usbtty CDC ACM mode
+	511d  QT2410 u-boot usbtty CDC ACM mode
+	5120  Neo1973/FreeRunner u-boot generic serial mode
+	5121  Neo1973/FreeRunner kernel mass storage (g_storage) mode
+	5122  Neo1973/FreeRunner kernel usbnet (g_ether, RNDIS) mode
+	5123  Neo1973/FreeRunner internal Bluetooth CSR4 module
+	5124  Neo1973/FreeRunner Bluetooth Device ID service
+	6000  Ubertooth Zero
+	6001  Ubertooth Zero DFU
+	6002  Ubertooth One
+	6003  Ubertooth One DFU
+	6004  LeoLipo
+	6005  LED Flower S
+	6006  LED Cube
+	6007  LED Flower
+	6008  Kisbee 802.15.4 transceiver
+	6009  Adjacent Reality Tracker
+	6028  Teensy 2.0 Development Board [ErgoDox Keyboard]
 	602b  FPGALink
+	604b  HackRF Jawbreaker Software-Defined Radio
 	6053  Darkgame Controller
+	6089  Great Scott Gadgets HackRF One
+	60a1  Airspy
+	cc15  CCCAMP2015 rad1o badge
 1d57  Xenta
 	0005  Wireless Receiver (Keyboard and Mouse)
 	0006  Wireless Receiver (RC Laser Pointer)
