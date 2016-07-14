@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.07.01
-#	Date:    2016-07-01 03:15:02
+#	Version: 2016.07.13
+#	Date:    2016-07-13 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -1387,23 +1387,23 @@
 	5a11  RD890 Northbridge only single slot PCI-e GFX Hydra part
 	5a12  RD890 Northbridge only dual slot (2x8) PCI-e GFX Hydra part
 		15d9 a811  H8DGU
-	5a13  RD890 PCI to PCI bridge (external gfx0 port A)
-	5a14  RD890 PCI to PCI bridge (external gfx0 port B)
+	5a13  RD890S/SR5650 Host Bridge
+	5a14  RD9x0/RX980 Host Bridge
 	5a15  RD890 PCI to PCI bridge (PCI express gpp port A)
-	5a16  RD890 PCI to PCI bridge (PCI express gpp port B)
-	5a17  RD890 PCI to PCI bridge (PCI express gpp port C)
-	5a18  RD890 PCI to PCI bridge (PCI express gpp port D)
+	5a16  RD890/RD9x0/RX980 PCI to PCI bridge (PCI Express GFX port 0)
+	5a17  RD890/RD9x0 PCI to PCI bridge (PCI Express GFX port 1)
+	5a18  RD890/RD9x0/RX980 PCI to PCI bridge (PCI Express GPP Port 0)
 		15d9 a811  H8DGU
-	5a19  RD890 PCI to PCI bridge (PCI express gpp port E)
-	5a1a  RD890 PCI to PCI bridge (PCI express gpp port F)
-	5a1b  RD890 PCI to PCI bridge (PCI express gpp port G)
-	5a1c  RD890 PCI to PCI bridge (PCI express gpp port H)
-	5a1d  RD890 PCI to PCI bridge (external gfx1 port A)
-	5a1e  RD890 PCI to PCI bridge (external gfx1 port B)
-	5a1f  RD890 PCI to PCI bridge (NB-SB link)
+	5a19  RD890/RD9x0/RX980 PCI to PCI bridge (PCI Express GPP Port 1)
+	5a1a  RD890/RD9x0/RX980 PCI to PCI bridge (PCI Express GPP Port 2)
+	5a1b  RD890/RD9x0/RX980 PCI to PCI bridge (PCI Express GPP Port 3)
+	5a1c  RD890/RD9x0/RX980 PCI to PCI bridge (PCI Express GPP Port 4)
+	5a1d  RD890/RD9x0/RX980 PCI to PCI bridge (PCI Express GPP Port 5)
+	5a1e  RD890/RD9x0/RX980 PCI to PCI bridge (PCI Express GPP2 Port 0)
+	5a1f  RD890/RD990 PCI to PCI bridge (PCI Express GFX2 port 0)
 		15d9 a811  H8DGU
-	5a20  RD890S PCI Express bridge for GPP2 port 1
-	5a23  RD990 I/O Memory Management Unit (IOMMU)
+	5a20  RD890/RD990 PCI to PCI bridge (PCI Express GFX2 port 1)
+	5a23  RD890S/RD990 I/O Memory Management Unit (IOMMU)
 	5a31  RC410 Host Bridge
 	5a33  RS400 Host Bridge
 	5a34  RS4xx PCI Express Port [ext gfx]
@@ -10527,6 +10527,8 @@
 	13bb  GM107GL [Quadro K620]
 	13bc  GM107GL [Quadro K1200]
 	13bd  GM107GL [GRID M40]
+		10de 110a  GRID M40
+		10de 1160  Tesla M10
 	13c0  GM204 [GeForce GTX 980]
 		1043 8504  GTX980-4GD5
 	13c1  GM204
@@ -10585,7 +10587,7 @@
 	1c00  GP106
 	1c01  GP106
 	1c02  GP106
-	1c03  GP106
+	1c03  GP106 [GeForce GTX 1060]
 	1c30  GP106GL
 	1c70  GP106GL
 	1c80  GP107
@@ -16842,12 +16844,14 @@
 	16d1  BCM57404 NetXtreme-E Dual-port 10Gb/25Gb Ethernet
 	16d2  BCM57406 NetXtreme-E Dual-port 10GBase-T Ethernet
 	16d3  BCM57404 NetXtreme-E Ethernet Virtual Function
+	16d4  BCM57404 NetXtreme-E Ethernet Partition
 	16d6  BCM57412 NetXtreme-E Dual-port 10Gb RDMA Ethernet
 	16d7  BCM57414 NetXtreme-E Dual-port 10Gb/25Gb RDMA Ethernet
 	16d8  BCM57416 NetXtreme-E Dual-port 10GBase-T RDMA Ethernet
 	16d9  BCM57417 NetXtreme-E Dual-port 10GBase-T RDMA Ethernet
 	16dc  BCM57414 NetXtreme-E Ethernet Virtual Function
 	16dd  NetLink BCM5781 Gigabit Ethernet PCI Express
+	16de  BCM57414 NetXtreme-E Ethernet Partition
 	16df  BCM57314 NetXtreme-C Dual-port 10Gb/25Gb/40Gb/50Gb RDMA Ethernet
 	16e1  BCM57314 NetXtreme-C Ethernet Virtual Function
 	16e2  BCM57417 NetXtreme-E Dual-port 10Gb/25Gb RDMA Ethernet
@@ -18848,6 +18852,22 @@
 	190d  Virtex7 PCIe ASIC Emulation Board [DNV7F4A]
 	190e  Virtex7 PCIe ASIC Emulation Board [DNV7F2B]
 	190f  KintexUS PCIe MainRef Design [DNPCIE_40G_KU_LL]
+	1910  VirtexUS ASIC Emulation Board [DNVUF4A]
+	1911  VirtexUS PCIe ASIC Emulation Board [DNVU_F2PCIe]
+	1912  KintexUS PCIe MainRef Design [DNPCIe_40G_KU_LL_QSFP]
+	1913  VirtexUS ASIC Emulation Board [DNVUF1A]
+	1914  VirtexUS ASIC Emulation Board [DNVUF2A]
+	1915  Arria10 PCIe MainRef Design [DNPCIe_80G_A10_LL]
+	1916  VirtexUS PCIe Accelerator Board [DNVUF2_HPC_PCIe]
+	1a00  Virtex6 PCIe DMA Netlist Design
+	1a01  Virtex6 PCIe Darklite Design [DNPCIe_HXT_10G_LL]
+	1a02  Virtex7 PCIe DMA Netlist Design
+	1a03  Kintex7 PCIe Darklite Design [DNPCIe_K7_10G_LL]
+	1a05  Stratix5 PCIe Darklite Design [DNS5GX_F2]
+	1a06  VirtexUS PCIe DMA Netlist Design
+	1a07  KintexUS PCIe Darklite Design [DNPCIe_40G_KU_LL]
+	1a08  KintexUS PCIe Darklite Design [DNPCIe_40G_KU_LL_QSFP]
+	1a09  Arria10 PCIe Darklite Design [DNPCIe_80G_A10_LL]
 17e4  Sectra AB
 	0001  KK671 Cardbus encryption board
 	0002  KK672 Cardbus encryption board
@@ -19951,6 +19971,8 @@
 		1bb1 6522  Nytro XP6500-8A2048
 # 4TB Nytro PCIe controller
 		1bb1 6523  Nytro XP6500-8A4096
+	0100  Nytro Flash Storage
+		1bb1 01a1  Nytro XP7102
 1bb3  Bluecherry
 	4304  BC-04120A MPEG4 4 port video encoder / decoder
 	4309  BC-08240A MPEG4 4 port video encoder / decoder
@@ -22126,6 +22148,7 @@
 		1734 11a9  10 Gigabit Dual Port Network Connection
 		17aa 1071  ThinkServer X520-2 AnyFabric
 		17aa 4007  82599ES 10-Gigabit SFI/SFP+ Network Connection
+		17aa 402b  82599ES 10Gb 2-port Server Adapter X520-DA2
 		8086 0002  Ethernet Server Adapter X520-DA2
 		8086 0003  Ethernet Server Adapter X520-2
 		8086 0006  Ethernet Server Adapter X520-1
@@ -22552,16 +22575,17 @@
 		8086 0009  Ethernet Controller X710 for 10GbE SFP+
 		8086 000a  Ethernet Controller X710 for 10GbE SFP+
 		8086 000d  Ethernet Controller X710 for 10GbE SFP+
+		8086 0010  Ethernet Converged Network Adapter X710
 		8086 4005  Ethernet Controller XL710 for 10 Gigabit SFP+
 		8086 4006  Ethernet Controller X710 for 10GbE SFP+
-	1575  DSL5110 Thunderbolt NHI [Falcon Ridge LP 2014]
-	1576  DSL5110 Thunderbolt Bridge [Falcon Ridge LP 2014]
+	1575  DSL6340 Thunderbolt 3 NHI [Alpine Ridge 2C 2015]
+	1576  DSL6340 Thunderbolt 3 Bridge [Alpine Ridge 2C 2015]
 	1577  DSL6540 Thunderbolt 3 NHI [Alpine Ridge 4C 2015]
 	1578  DSL6540 Thunderbolt 3 Bridge [Alpine Ridge 4C 2015]
 	157b  I210 Gigabit Network Connection
 	157c  I210 Gigabit Backplane Connection
-	157d  DSL6340 Thunderbolt 3 NHI [Alpine Ridge 2C 2015]
-	157e  DSL6340 Thunderbolt 3 Bridge [Alpine Ridge 2C 2015]
+	157d  DSL5110 Thunderbolt 2 NHI (Low Power) [Win Ridge 2C 2014]
+	157e  DSL5110 Thunderbolt 2 Bridge (Low Power) [Win Ridge 2C 2014]
 	1580  Ethernet Controller XL710 for 40GbE backplane
 	1581  Ethernet Controller X710 for 10GbE backplane
 		1028 0000  Ethernet 10G X710-k bNDC
@@ -22605,6 +22629,7 @@
 		8086 0000  Ethernet Converged Network Adapter X710-T
 		8086 0001  Ethernet Converged Network Adapter X710-T4
 		8086 0002  Ethernet Converged Network Adapter X710-T4
+		8086 1003  Ethernet Converged Network Adapter X710-T
 	15a0  Ethernet Connection (2) I218-LM
 	15a1  Ethernet Connection (2) I218-V
 	15a2  Ethernet Connection (3) I218-LM
@@ -22623,16 +22648,22 @@
 	15b7  Ethernet Connection (2) I219-LM
 	15b8  Ethernet Connection (2) I219-V
 	15b9  Ethernet Connection (3) I219-LM
+	15bf  JHL6240 Thunderbolt 3 NHI (Low Power) [Alpine Ridge LP 2016]
+	15c0  JHL6240 Thunderbolt 3 Bridge (Low Power) [Alpine Ridge LP 2016]
 	15d0  Ethernet SDI Adapter FM10420-100GbE-QDA2
 	15d1  Ethernet Controller 10G X550T
 		8086 0002  Ethernet Converged Network Adapter X550-T1
 		8086 0021  Ethernet Converged Network Adapter X550-T1
 		8086 00a2  Ethernet Converged Network Adapter X550-T1
+	15d2  JHL6540 Thunderbolt 3 NHI (C step) [Alpine Ridge 4C 2016]
+	15d3  JHL6540 Thunderbolt 3 Bridge (C step) [Alpine Ridge 4C 2016]
 	15d5  Ethernet SDI Adapter FM10420-25GbE-DA2
 		8086 0001  Intel(R) Ethernet SDI Adapter FM10420-25GbE-DA2
 	15d6  Ethernet Connection (5) I219-V
 	15d7  Ethernet Connection (4) I219-LM
 	15d8  Ethernet Connection (4) I219-V
+	15d9  JHL6340 Thunderbolt 3 NHI (C step) [Alpine Ridge 2C 2016]
+	15da  JHL6340 Thunderbolt 3 Bridge (C step) [Alpine Ridge 2C 2016]
 	15e3  Ethernet Connection (5) I219-LM
 	1600  Broadwell-U Host Bridge -OPI
 	1601  Broadwell-U PCI Express x16 Controller
