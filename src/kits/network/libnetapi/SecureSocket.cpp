@@ -211,6 +211,9 @@ BSecureSocket::Private::_CreateContext()
 		"AES128-SHA:"
 		"AES256-SHA");
 
+	// Let OpenSSL choose the most appropriate D-H curve for us
+	SSL_CTX_set_ecdh_auto(sContext, 1);
+
 	// Setup certificate verification
 	BPath certificateStore;
 	find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);
