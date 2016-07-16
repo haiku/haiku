@@ -11,6 +11,7 @@
 
 #ifdef OPENSSL_ENABLED
 #	include <openssl/ssl.h>
+#	include <openssl/err.h>
 #endif
 
 #include <pthread.h>
@@ -120,7 +121,7 @@ BSecureSocket::Private::ErrorCode(int returnValue)
 		case SSL_ERROR_SYSCALL:
 		default:
 			// TODO: translate SSL error codes!
-			fprintf(stderr, "SSL error: %d\n", error);
+			fprintf(stderr, "SSL %s\n", ERR_error_string(error, NULL));
 			return B_ERROR;
 	}
 }
