@@ -343,7 +343,7 @@ RemotePackageRepository HaikuPorts
 	tinyxml_devel-2.6.2-1
 	transmission-2.84-4
 	unrar-5.3.2-1
-	unzip-6.0-2
+	unzip-6.0-3
 	vision-0.9.7.r949-3
 	vim-7.4-5
 	wget-1.17.1-1
@@ -354,7 +354,7 @@ RemotePackageRepository HaikuPorts
 	xz_utils-5.0.8-2
 	xz_utils_devel-5.0.8-2
 	yasm-1.3.0-1
-	zip-3.0-2
+	zip-3.0-3
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
 

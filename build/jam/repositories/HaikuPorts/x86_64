@@ -393,7 +393,7 @@ RemotePackageRepository HaikuPorts
 	transmission-2.84-4
 	ubertuber-0.9.11-1
 	unrar-5.3.4-1
-	unzip-6.0-2
+	unzip-6.0-3
 	vim-7.4-5
 	vision-0.9.7.r949-3
 	weather-0.1.1_git-2
@@ -407,7 +407,7 @@ RemotePackageRepository HaikuPorts
 	xz_utils-5.2.2-1
 	xz_utils_devel-5.2.2-1
 	yasm-1.3.0-1
-	zip-3.0-2
+	zip-3.0-3
 	zlib-1.2.8-4
 	zlib_devel-1.2.8-4
 
