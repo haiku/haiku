@@ -192,6 +192,24 @@ BSecureSocket::Private::_CreateContext()
 	// Don't bother us with ERROR_WANT_READ.
 	SSL_CTX_set_mode(sContext, SSL_MODE_AUTO_RETRY);
 
+	// Setup cipher suites.
+	// These suites are mostly the same ones used by Firefox 47 and Chrome 50.
+	SSL_CTX_set_cipher_list(sContext,
+		"ECDHE-ECDSA-AES128-GCM-SHA256:"
+		"ECDHE-RSA-AES128-GCM-SHA256:"
+		"ECDHE-ECDSA-AES256-GCM-SHA384:"
+		"ECDHE-RSA-AES256-GCM-SHA384:"
+		"ECDHE-ECDSA-CHACHA20-POLY1305-SHA256:"
+		"ECDHE-RSA-CHACHA20-POLY1305-SHA256:"
+		"ECDHE-ECDSA-AES256-SHA:"
+		"ECDHE-ECDSA-AES128-SHA:"
+		"ECDHE-RSA-AES128-SHA:"
+		"ECDHE-RSA-AES256-SHA:"
+		"DHE-RSA-AES128-SHA:"
+		"DHE-RSA-AES256-SHA:"
+		"AES128-SHA:"
+		"AES256-SHA");
+
 	// Setup certificate verification
 	BPath certificateStore;
 	find_directory(B_SYSTEM_DATA_DIRECTORY, &certificateStore);
