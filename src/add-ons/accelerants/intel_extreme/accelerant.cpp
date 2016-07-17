@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -294,6 +294,8 @@ probe_ports()
 		read32(INTEL_DIGITAL_PORT_B), read32(INTEL_DIGITAL_PORT_C));
 	TRACE("lvds: %08" B_PRIx32 "\n", read32(INTEL_DIGITAL_LVDS_PORT));
 
+	bool foundLVDS = false;
+
 	gInfo->port_count = 0;
 	for (int i = INTEL_PORT_A; i <= INTEL_PORT_D; i++) {
 		Port* displayPort = new(std::nothrow) DisplayPort((port_index)i);
@@ -368,6 +370,7 @@ probe_ports()
 	if (lvdsPort == NULL)
 		return B_NO_MEMORY;
 	if (lvdsPort->IsConnected()) {
+		foundLVDS = true;
 		gInfo->ports[gInfo->port_count++] = lvdsPort;
 		gInfo->head_mode |= HEAD_MODE_LVDS_PANEL;
 		gInfo->head_mode |= HEAD_MODE_B_DIGITAL;
@@ -386,6 +389,20 @@ probe_ports()
 
 	if (gInfo->port_count == 0)
 		return B_ERROR;
+
+	// Activate reference clocks if needed
+	if (gInfo->shared_info->pch_info == INTEL_PCH_IBX
+		|| gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
+		// XXX: Is LVDS the same as Panel?
+		refclk_activate_ilk(foundLVDS);
+	}
+	/*
+	} else if (gInfo->shared_info->pch_info == INTEL_PCH_LPT) {
+		// TODO: Some kind of stepped bend thing?
+		// only needed for vga
+		refclk_activate_lpt(foundLVDS);
+	}
+	*/
 
 	return B_OK;
 }

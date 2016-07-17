@@ -463,6 +463,92 @@ compute_pll_divisors(display_mode* current, pll_divisors* divisors, bool isLVDS)
 }
 
 
+void
+refclk_activate_ilk(bool hasPanel)
+{
+	CALLED();
+
+	// aka, our engineers hate you
+
+	bool wantsSSC;
+	bool hasCK505;
+	if (gInfo->shared_info->pch_info == INTEL_PCH_IBX) {
+		//XXX: This should be == vbt display_clock_mode
+		hasCK505 = true;
+		wantsSSC = hasCK505;
+	} else {
+		hasCK505 = false;
+		wantsSSC = true;
+	}
+
+	uint32 clkRef = read32(PCH_DREF_CONTROL);
+	uint32 newRef = clkRef;
+
+	newRef &= ~DREF_NONSPREAD_SOURCE_MASK;
+
+	if (hasCK505)
+		newRef |= DREF_NONSPREAD_CK505_ENABLE;
+	else
+		newRef |= DREF_NONSPREAD_SOURCE_ENABLE;
+
+	newRef &= ~DREF_SSC_SOURCE_MASK;
+	newRef &= ~DREF_CPU_SOURCE_OUTPUT_MASK;
+	newRef &= ~DREF_SSC1_ENABLE;
+
+	if (newRef == clkRef) {
+		TRACE("%s: No changes to reference clock.\n", __func__);
+		return;
+	}
+
+	if (hasPanel) {
+		newRef &= ~DREF_SSC_SOURCE_MASK;
+		newRef |= DREF_SSC_SOURCE_ENABLE;
+
+		if (wantsSSC)
+			newRef |= DREF_SSC1_ENABLE;
+		else
+			newRef &= ~DREF_SSC1_ENABLE;
+
+		// Power up SSC before enabling outputs
+		write32(PCH_DREF_CONTROL, newRef);
+		read32(PCH_DREF_CONTROL);
+		spin(200);
+
+		newRef &= ~DREF_CPU_SOURCE_OUTPUT_MASK;
+
+		bool hasEDP = true;
+		if (hasEDP) {
+			if (wantsSSC)
+				newRef |= DREF_CPU_SOURCE_OUTPUT_DOWNSPREAD;
+			else
+				newRef |= DREF_CPU_SOURCE_OUTPUT_NONSPREAD;
+		} else
+			newRef |= DREF_CPU_SOURCE_OUTPUT_DISABLE;
+
+		write32(PCH_DREF_CONTROL, newRef);
+		read32(PCH_DREF_CONTROL);
+		spin(200);
+	} else {
+		newRef &= ~DREF_CPU_SOURCE_OUTPUT_MASK;
+		newRef |= DREF_CPU_SOURCE_OUTPUT_DISABLE;
+
+		write32(PCH_DREF_CONTROL, newRef);
+		read32(PCH_DREF_CONTROL);
+		spin(200);
+
+		if (!wantsSSC) {
+			newRef &= ~DREF_SSC_SOURCE_MASK;
+			newRef |= DREF_SSC_SOURCE_DISABLE;
+			newRef &= ~DREF_SSC1_ENABLE;
+
+			write32(PCH_DREF_CONTROL, newRef);
+			read32(PCH_DREF_CONTROL);
+			spin(200);
+		}
+	}
+}
+
+
 #ifdef PLL_TEST_MODE
 
 const struct  test_device {
