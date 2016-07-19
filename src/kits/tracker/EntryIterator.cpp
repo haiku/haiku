@@ -167,8 +167,8 @@ CachedEntryIterator::~CachedEntryIterator()
 status_t
 CachedEntryIterator::GetNextEntry(BEntry* result, bool traverse)
 {
-	ASSERT(fDirentBuffer != NULL);
-	ASSERT(fEntryRefBuffer != NULL);
+	ASSERT(fDirentBuffer == NULL);
+	ASSERT(fEntryRefBuffer == NULL);
 
 	if (fEntryBuffer == NULL) {
 		fEntryBuffer = new BEntry [fCacheSize];
