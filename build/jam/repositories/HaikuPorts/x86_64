@@ -66,7 +66,7 @@ RemotePackageRepository HaikuPorts
 	cdrtools-3.02~a06-2
 	cdrtools_devel-3.02~a06-2
 	clipdinger-0.5.4-1
-	cmake-3.5.1-1
+	cmake-3.5.2-1
 	coreutils-8.24-1
 	cpio-2.12-1
 	cppunit-1.12.1-2
@@ -281,9 +281,9 @@ RemotePackageRepository HaikuPorts
 	libxslt_devel-1.1.28-2
 	live555-2016.01.29-3
 	live555_devel-2016.01.29-3
-	llvm-3.8.0-1
-	llvm_clang-3.8.0-1
-	llvm_clang_analysis-3.8.0-1
+	llvm-3.8.1-1
+	llvm_clang-3.8.1-1
+	llvm_clang_analysis-3.8.1-1
 	lua-5.2.3-2
 	lua_devel-5.2.3-2
 	lz4-r131-1
