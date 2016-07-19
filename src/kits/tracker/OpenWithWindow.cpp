@@ -1159,6 +1159,7 @@ OpenWithMenu::DoneBuildingItemList()
 	// add apps as menu items
 	BFont font;
 	GetFont(&font);
+	float scaling = font.Size() / 12.0f;
 
 	int32 lastRelation = -1;
 	for (int32 index = 0; index < count ; index++) {
@@ -1188,7 +1189,8 @@ OpenWithMenu::DoneBuildingItemList()
 				continue;
 			}
 			result = path.Path();
-			font.TruncateString(&result, B_TRUNCATE_MIDDLE, kMaxMenuWidth);
+			font.TruncateString(&result, B_TRUNCATE_MIDDLE,
+				kMaxMenuWidth * scaling);
 		}
 #if DEBUG
 		BString relationDescription;
