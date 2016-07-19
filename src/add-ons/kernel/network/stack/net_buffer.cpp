@@ -1,5 +1,5 @@
 /*
- * Copyright 2006-2010, Haiku, Inc. All Rights Reserved.
+ * Copyright 2006-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -1820,7 +1820,7 @@ remove_header(net_buffer* _buffer, size_t bytes)
 	size_t left = bytes;
 	data_node* node = NULL;
 
-	while (left >= 0) {
+	while (true) {
 		node = (data_node*)list_get_first_item(&buffer->buffers);
 		if (node == NULL) {
 			if (left == 0)
