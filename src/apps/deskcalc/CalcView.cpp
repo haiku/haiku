@@ -1294,8 +1294,6 @@ CalcView::_AudioFeedback(bool inBackGround)
 void
 CalcView::_Colorize()
 {
-	fBaseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
-
 	// calculate light and dark color from base color
 	fLightColor.red		= (uint8)(fBaseColor.red * 1.25);
 	fLightColor.green	= (uint8)(fBaseColor.green * 1.25);
