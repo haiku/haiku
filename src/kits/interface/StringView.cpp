@@ -128,16 +128,26 @@ BStringView::Archive(BMessage* data, bool deep) const
 void
 BStringView::AttachedToWindow()
 {
-	if (HasDefaultColors()) {
-		AdoptParentColors();
+	if (HasDefaultColors())
 		SetHighUIColor(B_PANEL_TEXT_COLOR);
+
+	BView* parent = Parent();
+
+	if (parent != NULL) {
+		float tint = B_NO_TINT;
+		color_which which = parent->ViewUIColor(&tint);
+
+		if (which != B_NO_COLOR) {
+			SetViewUIColor(which, tint);
+			SetLowUIColor(which, tint);
+		} else {
+			SetViewColor(parent->ViewColor());
+			SetLowColor(ViewColor());
+		}
 	}
 
-	if (ViewColor() == B_TRANSPARENT_COLOR) {
-		SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
-		SetLowUIColor(B_PANEL_BACKGROUND_COLOR);
-		SetHighUIColor(B_PANEL_TEXT_COLOR);
-	}
+	if (ViewColor() == B_TRANSPARENT_COLOR)
+		AdoptSystemColors();
 }
 
 
