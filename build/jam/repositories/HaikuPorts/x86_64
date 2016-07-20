@@ -85,8 +85,8 @@ RemotePackageRepository HaikuPorts
 	dtc-1.4.1-1
 	enca-1.18-1
 	enca_devel-1.18-1
-	expat-2.1.0-1
-	expat_devel-2.1.0-1
+	expat-2.2.0-1
+	expat_devel-2.2.0-1
 	fife-0.4.0~20150801-1
 	fifechan-0.1.2-2
 	fifechan_devel-0.1.2-2
@@ -397,7 +397,7 @@ RemotePackageRepository HaikuPorts
 	vim-7.4-5
 	vision-0.9.7.r949-3
 	weather-0.1.1_git-2
-	wget-1.17.1-1
+	wget-1.18-1
 	whereismymouse-1.0-1
 	which-2.21-1
 	wpa_supplicant-2.0-4

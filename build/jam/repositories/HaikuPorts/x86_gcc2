@@ -107,8 +107,8 @@ RemotePackageRepository HaikuPorts
 	enca-1.15-1
 	enca_devel-1.15-1
 	exomizer-2.0.7-1
-	expat-2.1.0-1
-	expat_devel-2.1.0-1
+	expat-2.2.0-1
+	expat_devel-2.2.0-1
 	faac-1.28-2
 	faac_devel-1.28-2
 	faad2-2.7-1
@@ -537,7 +537,7 @@ RemotePackageRepository HaikuPorts
 	vmware_addons-1.1.1-3
 	vncserver-1.27-1
 	weather-0.1.1_git-1
-	wget-1.17.1-1
+	wget-1.18-1
 	whereismymouse-1.0-1
 	which-2.21-1
 	wonderbrush-2.1.2-4
@@ -622,8 +622,8 @@ RemotePackageRepository HaikuPorts
 	dtc_x86-1.4.1-1
 	enca_x86-1.15-1
 	enca_x86_devel-1.15-1
-	expat_x86-2.1.0-1
-	expat_x86_devel-2.1.0-1
+	expat_x86-2.2.0-1
+	expat_x86_devel-2.2.0-1
 	faad2_x86-2.7-1
 	faad2_x86_devel-2.7-1
 	file_x86-5.15-1

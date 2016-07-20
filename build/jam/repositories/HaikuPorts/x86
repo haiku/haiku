@@ -79,8 +79,8 @@ RemotePackageRepository HaikuPorts
 	dos2unix-7.2.2-1
 	doxygen-1.8.10-2
 	dtc-1.4.1-1
-	expat-2.1.0-1
-	expat_devel-2.1.0-1
+	expat-2.2.0-1
+	expat_devel-2.2.0-1
 	fife-0.4.0~20150801-1
 	fifechan-0.1.2-2
 	fifechan_devel-0.1.2-2
@@ -346,7 +346,7 @@ RemotePackageRepository HaikuPorts
 	unzip-6.0-3
 	vision-0.9.7.r949-3
 	vim-7.4-5
-	wget-1.17.1-1
+	wget-1.18-1
 	whereismymouse-1.0-1
 	which-2.21-1
 	wpa_supplicant-2.0-4
@@ -364,8 +364,8 @@ RemotePackageRepository HaikuPorts
 	bzip2_x86_gcc2_devel-1.0.6-5
 	curl_x86_gcc2-7.45.0-2
 	curl_x86_gcc2_devel-7.45.0-2
-	expat_x86_gcc2-2.1.0-1
-	expat_x86_gcc2_devel-2.1.0-1
+	expat_x86_gcc2-2.2.0-1
+	expat_x86_gcc2_devel-2.2.0-1
 	ffmpeg_x86_gcc2-0.10.2-4
 	ffmpeg_x86_gcc2_devel-0.10.2-4
 	freetype_x86_gcc2-2.6.3-1
