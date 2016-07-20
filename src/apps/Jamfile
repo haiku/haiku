@@ -1,6 +1,5 @@
 SubDir HAIKU_TOP src apps ;
 
-HaikuSubInclude 3dmov ;
 HaikuSubInclude aboutsystem ;
 HaikuSubInclude activitymonitor ;
 HaikuSubInclude autoraise ;
