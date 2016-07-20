@@ -22,7 +22,7 @@ public:
 		void						Disable();
 
 		bool						IsPLLEnabled();
-		void						EnablePLL();
+		void						EnablePLL(uint32 lanes);
 		void						DisablePLL();
 
 		uint32						Base()
@@ -42,7 +42,7 @@ public:
 		void						Disable();
 
 		bool						IsPLLEnabled();
-		void						EnablePLL();
+		void						EnablePLL(uint32 lanes);
 		void						DisablePLL();
 
 		void						SwitchClock(bool toPCDClock);

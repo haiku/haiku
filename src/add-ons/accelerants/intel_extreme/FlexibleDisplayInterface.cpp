@@ -84,13 +84,14 @@ FDITransmitter::IsPLLEnabled()
 
 
 void
-FDITransmitter::EnablePLL()
+FDITransmitter::EnablePLL(uint32 lanes)
 {
 	CALLED();
 	uint32 targetRegister = fRegisterBase + PCH_FDI_TX_CONTROL;
 	uint32 value = read32(targetRegister);
 	if ((value & FDI_TX_PLL_ENABLED) != 0) {
 		// already enabled, possibly IronLake where it always is
+		TRACE("%s: Already enabled.\n", __func__);
 		return;
 	}
 
@@ -169,13 +170,20 @@ FDIReceiver::IsPLLEnabled()
 
 
 void
-FDIReceiver::EnablePLL()
+FDIReceiver::EnablePLL(uint32 lanes)
 {
 	CALLED();
 	uint32 targetRegister = fRegisterBase + PCH_FDI_RX_CONTROL;
 	uint32 value = read32(targetRegister);
-	if ((value & FDI_RX_PLL_ENABLED) != 0)
+	if ((value & FDI_RX_PLL_ENABLED) != 0) {
+		// already enabled, possibly IronLake where it always is
+		TRACE("%s: Already enabled.\n", __func__);
 		return;
+	}
+
+	value &= ~(FDI_DP_PORT_WIDTH_MASK | (0x7 << 16));
+	value |= FDI_DP_PORT_WIDTH(lanes);
+	//value |= (read32(PIPECONF(pipe)) & PIPECONF_BPC_MASK) << 11;
 
 	write32(targetRegister, value | FDI_RX_PLL_ENABLED);
 	read32(targetRegister);
@@ -248,9 +256,9 @@ FDILink::Train(display_mode* target)
 	TRACE("%s: FDI Link Lanes: %" B_PRIu32 "\n", __func__, lanes);
 
 	// Enable FDI clocks
-	Receiver().EnablePLL();
+	Receiver().EnablePLL(lanes);
 	Receiver().SwitchClock(true);
-	Transmitter().EnablePLL();
+	Transmitter().EnablePLL(lanes);
 
 	status_t result = B_ERROR;
 

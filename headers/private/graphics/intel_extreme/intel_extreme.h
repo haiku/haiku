@@ -878,6 +878,10 @@ struct intel_free_graphics_memory {
 #define FDI_TX_ENHANCE_FRAME_ENABLE		(1 << 18)
 #define FDI_TX_PLL_ENABLED				(1 << 14)
 
+#define FDI_DP_PORT_WIDTH_SHIFT			19
+#define FDI_DP_PORT_WIDTH_MASK			(7 << FDI_DP_PORT_WIDTH_SHIFT)
+#define FDI_DP_PORT_WIDTH(width)		(((width) - 1) << FDI_DP_PORT_WIDTH_SHIFT)
+
 #define FDI_PLL_BIOS_0					0x46000
 #define FDI_PLL_FB_CLOCK_MASK			0xff
 #define FDI_PLL_BIOS_1					0x46004
