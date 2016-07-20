@@ -124,8 +124,8 @@ RemotePackageRepository HaikuPorts
 	ffmpeg_devel-0.10.14-3
 	fftw-3.3.4-6
 	fftw_devel-3.3.4-6
-	flac-1.3.0-1
-	flac_devel-1.3.0-1
+	flac-1.3.1-1
+	flac_devel-1.3.1-1
 	flex-2.5.39-1
 	fluidsynth-1.1.6-2
 	fluidsynth_devel-1.1.6-2
@@ -220,8 +220,8 @@ RemotePackageRepository HaikuPorts
 	lcms_devel-2.5-1
 	less-481-1
 	lha-1.14i-1
-	libao-1.1.0-1
-	libao_devel-1.1.0-1
+	libao-1.2.0-1
+	libao_devel-1.2.0-1
 	libart_lgpl-2.3.21-1
 	libart_lgpl_devel-2.3.21-1
 	libassuan-2.1.3-1
@@ -277,8 +277,8 @@ RemotePackageRepository HaikuPorts
 	libmodplug_devel-0.8.8.4-1
 	libmpeg2-0.5.1-3
 	libmpeg2_devel-0.5.1-3
-	libogg-1.3.0-2
-	libogg_devel-1.3.0-2
+	libogg-1.3.2-1
+	libogg_devel-1.3.2-1
 	libpaper-1.1.24-1
 	libpaper_devel-1.1.24-1
 	libpcap-1.7.4-1
@@ -397,8 +397,8 @@ RemotePackageRepository HaikuPorts
 	openssh-7.1p1-4
 	openssl-1.0.2g-1
 	openssl_devel-1.0.2g-1
-	opus-1.1.1-1
-	opus_devel-1.1.1-1
+	opus-1.1.3-1
+	opus_devel-1.1.3-1
 	opusfile-0.6-1
 	opusfile_devel-0.6-1
 	opus_tools-0.1.9-1
@@ -633,8 +633,8 @@ RemotePackageRepository HaikuPorts
 	ffmpeg_x86_devel-2.8.1-1
 	fftw_x86-3.3.4-6
 	fftw_x86_devel-3.3.4-6
-	flac_x86-1.3.0-1
-	flac_x86_devel-1.3.0-1
+	flac_x86-1.3.1-1
+	flac_x86_devel-1.3.1-1
 	flare_x86-0.19-3
 	fluidsynth_x86-1.1.6-2
 	fluidsynth_x86_devel-1.1.6-2
@@ -697,8 +697,8 @@ RemotePackageRepository HaikuPorts
 	lame_x86_devel-3.99.5-5
 	lcms_x86-2.5-1
 	lcms_x86_devel-2.5-1
-	libao_x86-1.1.0-1
-	libao_x86_devel-1.1.0-1
+	libao_x86-1.2.0-1
+	libao_x86_devel-1.2.0-1
 	libart_lgpl_x86-2.3.21-1
 	libart_lgpl_x86_devel-2.3.21-1
 	libass_x86-0.12.2-1
@@ -763,8 +763,8 @@ RemotePackageRepository HaikuPorts
 	libmpdclient_x86_devel-2.11_git-1
 	libmpeg2_x86-0.5.1-3
 	libmpeg2_x86_devel-0.5.1-3
-	libogg_x86-1.3.0-2
-	libogg_x86_devel-1.3.0-2
+	libogg_x86-1.3.2-1
+	libogg_x86_devel-1.3.2-1
 	libotr_x86-4.1.0-1
 	libotr_x86_devel-4.1.0-1
 	libpaper_x86-1.1.24-1
@@ -788,8 +788,8 @@ RemotePackageRepository HaikuPorts
 	libsdl_x86_devel-1.2.15-9
 	libsdl2_x86-2.0.1-3
 	libsdl2_x86_devel-2.0.1-3
-	libsndfile_x86-1.0.25-3
-	libsndfile_x86_devel-1.0.25-3
+	libsndfile_x86-1.0.27-1
+	libsndfile_x86_devel-1.0.27-1
 	libsolv_x86-0.3.0_haiku_2014_12_22-1
 	libsolv_x86_devel-0.3.0_haiku_2014_12_22-1
 	libtasn1_x86-4.8-1
@@ -872,8 +872,8 @@ RemotePackageRepository HaikuPorts
 	openssl_x86-1.0.2g-1
 	openssl_x86_devel-1.0.2g-1
 	openttd_x86-1.3.3-1
-	opus_x86-1.1.1-1
-	opus_x86_devel-1.1.1-1
+	opus_x86-1.1.3-1
+	opus_x86_devel-1.1.3-1
 	opusfile_x86-0.6-1
 	opusfile_x86_devel-0.6-1
 	pango_x86-1.37.0-1
