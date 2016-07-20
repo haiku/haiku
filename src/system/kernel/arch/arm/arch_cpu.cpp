@@ -100,6 +100,9 @@ arch_cpu_sync_icache(void *address, size_t len)
 void
 arch_cpu_memory_read_barrier(void)
 {
+	// TODO: check if we need more here
+	// (or just call the inline version?)
+	// cf. headers/private/kernel/arch/arm/arch_atomic.h
 	asm volatile ("" : : : "memory");
 }
 
@@ -107,6 +110,9 @@ arch_cpu_memory_read_barrier(void)
 void
 arch_cpu_memory_write_barrier(void)
 {
+	// TODO: check if we need more here
+	// (or just call the inline version?)
+	// cf. headers/private/kernel/arch/arm/arch_atomic.h
 	asm volatile ("" : : : "memory");
 }
 
