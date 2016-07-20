@@ -445,6 +445,26 @@ extern bool m68k_is_hw_register_readable(addr_t address);
 extern bool m68k_is_hw_register_writable(addr_t address, uint16 value);
 	// defined in kernel: arch/m68k/cpu_asm.S
 
+
+static inline void
+arch_cpu_idle(void)
+{
+	// TODO: M68K CPU idle call
+	// there isn't really any insn for this. Maybe NOP/FNOP?
+	// TODO: make a 060 module using LPSTOP
+	//asm volatile ("lpstop");
+}
+
+
+static inline void
+arch_cpu_pause(void)
+{
+	// TODO: M68K STOP call
+	// the problem is STOP wants an immediate to put into SR
+	// but we don't want to overwrite it.
+	//asm volatile("stop #0" : : : "memory");
+}
+
 #ifdef __cplusplus
 }
 #endif
