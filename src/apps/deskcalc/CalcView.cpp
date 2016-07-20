@@ -130,6 +130,8 @@ CalcView::CalcView(BRect frame, rgb_color rgbBaseColor, BMessage* settings)
 	fBaseColor(rgbBaseColor),
 	fExpressionBGColor((rgb_color){ 0, 0, 0, 255 }),
 
+	fHasCustomBaseColor(rgbBaseColor != ui_color(B_PANEL_BACKGROUND_COLOR)),
+
 	fWidth(1),
 	fHeight(1),
 
@@ -166,6 +168,8 @@ CalcView::CalcView(BMessage* archive)
 
 	fBaseColor(ui_color(B_PANEL_BACKGROUND_COLOR)),
 	fExpressionBGColor((rgb_color){ 0, 0, 0, 255 }),
+
+	fHasCustomBaseColor(false),
 
 	fWidth(1),
 	fHeight(1),
@@ -231,9 +235,13 @@ CalcView::AttachedToWindow()
 void
 CalcView::MessageReceived(BMessage* message)
 {
-	if (message->what == B_COLORS_UPDATED
-		&& message->HasColor(ui_color_name(B_PANEL_BACKGROUND_COLOR))) {
-		_Colorize();
+	if (message->what == B_COLORS_UPDATED && !fHasCustomBaseColor) {
+		const char* panelBgColorName = ui_color_name(B_PANEL_BACKGROUND_COLOR);
+		if (message->HasColor(panelBgColorName)) {
+			fBaseColor = message->GetColor(panelBgColorName, fBaseColor);
+			_Colorize();
+		}
+
 		return;
 	}
 
@@ -774,6 +782,8 @@ CalcView::Paste(BMessage* message)
 		// check location of color drop
 		if (keypadRect.Contains(dropPoint) && dropColor != NULL) {
 			fBaseColor = *dropColor;
+			fHasCustomBaseColor =
+				fBaseColor != ui_color(B_PANEL_BACKGROUND_COLOR);
 			_Colorize();
 			// redraw
 			Invalidate();
@@ -1098,6 +1108,8 @@ CalcView::_LoadSettings(BMessage* archive)
 	} else {
 		fExpressionBGColor = *color;
 	}
+
+	fHasCustomBaseColor = fBaseColor != ui_color(B_PANEL_BACKGROUND_COLOR);
 
 	// load options
 	fOptions->LoadSettings(archive);

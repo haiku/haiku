@@ -135,6 +135,8 @@ class CalcView : public BView {
 			rgb_color			fExpressionBGColor;
 			rgb_color			fExpressionTextColor;
 
+			bool				fHasCustomBaseColor;
+
 			// view dimensions
 			float				fWidth;
 			float				fHeight;
