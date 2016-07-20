@@ -13,6 +13,8 @@
 
 #ifdef __x86_64__
 #	include <arch/generic/user_memory.h>
+#elif defined(__M68K__)
+#	include <arch/generic/user_memory.h>
 #else
 
 extern "C" {
