@@ -17,7 +17,7 @@
 
 struct M68KPagingStructures : DeferredDeletable {
 	uint32						pgroot_phys;
-	vint32						ref_count;
+	int32						ref_count;
 	vint32						active_on_cpus;
 		// mask indicating on which CPUs the map is currently used
 

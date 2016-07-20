@@ -122,7 +122,7 @@ M68KPagingMethod040::Method()
 M68KPagingMethod040::SetPageTableEntry(page_table_entry* entry,
 	page_table_entry newEntry)
 {
-	return atomic_set((int32*)entry, newEntry);
+	return atomic_get_and_set((int32*)entry, newEntry);
 }
 
 
