@@ -329,7 +329,8 @@ CalcView::MessageReceived(BMessage* message)
 			{
 				int32 end = fExpressionTextView->TextLength();
 				int32 start = end - 3;
-				if (fEnabled || strcmp(fExpressionTextView->Text() + start, "...") != 0) {
+				if (fEnabled || strcmp(fExpressionTextView->Text() + start,
+						"...") != 0) {
 					// stop the message runner
 					delete fEvaluateMessageRunner;
 					fEvaluateMessageRunner = NULL;
@@ -341,9 +342,10 @@ CalcView::MessageReceived(BMessage* message)
 					rgb_color fontColor = fExpressionTextView->HighColor();
 					rgb_color backColor = fExpressionTextView->LowColor();
 					fExpressionTextView->SetStylable(true);
-					fExpressionTextView->SetFontAndColor(start, end, NULL, 0, &backColor);
-					fExpressionTextView->SetFontAndColor(start + dot - 1, start + dot, NULL,
-						0, &fontColor);
+					fExpressionTextView->SetFontAndColor(start, end, NULL, 0,
+						&backColor);
+					fExpressionTextView->SetFontAndColor(start + dot - 1,
+						start + dot, NULL, 0, &fontColor);
 					fExpressionTextView->SetStylable(false);
 				}
 
@@ -770,7 +772,7 @@ CalcView::Paste(BMessage* message)
 		BRect keypadRect(0.0, sizeDisp, fWidth, fHeight);
 
 		// check location of color drop
-		if (keypadRect.Contains(dropPoint) && dropColor) {
+		if (keypadRect.Contains(dropPoint) && dropColor != NULL) {
 			fBaseColor = *dropColor;
 			_Colorize();
 			// redraw
@@ -799,16 +801,20 @@ CalcView::SaveSettings(BMessage* archive) const
 	// record grid dimensions
 	if (ret == B_OK)
 		ret = archive->AddInt16("cols", fColumns);
+
 	if (ret == B_OK)
 		ret = archive->AddInt16("rows", fRows);
 
 	// record color scheme
-	if (ret == B_OK)
+	if (ret == B_OK) {
 		ret = archive->AddData("rgbBaseColor", B_RGB_COLOR_TYPE,
 			&fBaseColor, sizeof(rgb_color));
-	if (ret == B_OK)
+	}
+
+	if (ret == B_OK) {
 		ret = archive->AddData("rgbDisplay", B_RGB_COLOR_TYPE,
 			&fExpressionBGColor, sizeof(rgb_color));
+	}
 
 	// record current options
 	if (ret == B_OK)
@@ -1081,9 +1087,8 @@ CalcView::_LoadSettings(BMessage* archive)
 		|| size != sizeof(rgb_color)) {
 		fBaseColor = ui_color(B_PANEL_BACKGROUND_COLOR);
 		puts("Missing rgbBaseColor from CalcView archive!\n");
-	} else {
+	} else
 		fBaseColor = *color;
-	}
 
 	if (archive->FindData("rgbDisplay", B_RGB_COLOR_TYPE,
 			(const void**)&color, &size) < B_OK
