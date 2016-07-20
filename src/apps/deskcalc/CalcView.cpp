@@ -164,7 +164,7 @@ CalcView::CalcView(BMessage* archive)
 	fColumns(5),
 	fRows(4),
 
-	fBaseColor((rgb_color){ 128, 128, 128, 255 }),
+	fBaseColor(ui_color(B_PANEL_BACKGROUND_COLOR)),
 	fExpressionBGColor((rgb_color){ 0, 0, 0, 255 }),
 
 	fWidth(1),
