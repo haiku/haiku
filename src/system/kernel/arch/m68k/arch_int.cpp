@@ -197,7 +197,7 @@ m68k_exception_entry(struct iframe *iframe)
 			if (kernelDebugger) {
 				// if this thread has a fault handler, we're allowed to be here
 				if (thread && thread->fault_handler != 0) {
-					iframe->cpu.pc = thread->fault_handler;
+					iframe->cpu.pc = reinterpret_cast<addr_t>(thread->fault_handler);
 					break;
 				}
 
@@ -215,7 +215,7 @@ m68k_exception_entry(struct iframe *iframe)
 				// disabled, which in most cases is a bug. We should add some thread
 				// flag allowing to explicitly indicate that this handling is desired.
 				if (thread && thread->fault_handler != 0) {
-					iframe->cpu.pc = thread->fault_handler;
+					iframe->cpu.pc = reinterpret_cast<addr_t>(thread->fault_handler);
 						return;
 				}
 
