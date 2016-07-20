@@ -13,6 +13,11 @@
 #endif	// !_ASSEMBLER
 
 
+#define CPU_MAX_CACHE_LEVEL	8
+
+#define CACHE_LINE_SIZE		16
+
+
 #define SR_IP_MASK 0x0700
 #define SR_S 0x2000
 #define M68K_SR_S 13
