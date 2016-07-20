@@ -19,35 +19,41 @@
 
 static uint64 sCPUClockFrequency;
 static uint64 sBusClockFrequency;
-static enum cpu_types sCPUType;
 static uint16 sCPURevision;
 
-status_t
-arch_get_system_info(system_info *info, size_t size)
+
+void
+arch_fill_topology_node(cpu_topology_node_info* node, int32 cpu)
 {
-	info->cpu_type = sCPUType;
-	info->cpu_revision = sCPURevision;
+	switch (node->type) {
+		case B_TOPOLOGY_ROOT:
+			node->data.root.platform = B_CPU_M68K;
+			break;
 
-	info->cpu_clock_speed = sCPUClockFrequency;
-	info->bus_clock_speed = sBusClockFrequency;
+		case B_TOPOLOGY_PACKAGE:
+			node->data.package.vendor = B_CPU_VENDOR_MOTOROLA;
+			node->data.package.cache_line_size = CACHE_LINE_SIZE;
+			break;
 
-	info->platform_type = M68KPlatform::Default()->PlatformType();
+		case B_TOPOLOGY_CORE:
+			node->data.core.model = sCPURevision;
+			node->data.core.default_frequency = sCPUClockFrequency;
+			break;
 
-	return B_OK;
+		default:
+			break;
+	}
 }
 
 
 status_t
 arch_system_info_init(struct kernel_args *args)
 {
-	int i;
-
 	sCPUClockFrequency = args->arch_args.cpu_frequency;
-	sBusClockFrequency = args->arch_args.bus_frequency;
+	sBusClockFrequency = args->arch_args.bus_frequency; // not reported anymore?
 
-	sCPURevision = args->arch_args.cpu_type; //XXX
+	sCPURevision = args->arch_args.cpu_type; //TODO:is it what we want?
 #warning M68K: use 060 PCR[15:8]
-	sCPUType = B_CPU_M68K;
 	
 	return B_OK;
 }
