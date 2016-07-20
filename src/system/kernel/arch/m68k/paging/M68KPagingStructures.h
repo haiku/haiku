@@ -14,11 +14,13 @@
 
 #include <heap.h>
 
+#include <smp.h>
+
 
 struct M68KPagingStructures : DeferredDeletable {
 	uint32						pgroot_phys;
 	int32						ref_count;
-	vint32						active_on_cpus;
+	CPUSet						active_on_cpus;
 		// mask indicating on which CPUs the map is currently used
 
 								M68KPagingStructures();
