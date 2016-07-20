@@ -288,7 +288,7 @@ M68KAtari::RTC::ReadReg(uint32 reg)
 
 // constructor
 M68KAtari::M68KAtari()
-	: M68KPlatform(B_ATARI_PLATFORM, M68K_PLATFORM_ATARI)
+	: M68KPlatform(M68K_PLATFORM_ATARI)
 {
 }
 

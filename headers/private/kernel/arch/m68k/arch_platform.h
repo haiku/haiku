@@ -23,13 +23,12 @@ namespace BPrivate {
 
 class M68KPlatform {
 public:
-	M68KPlatform(platform_type platformType, m68k_platform_type m68kPlatformType);
+	M68KPlatform(m68k_platform_type platformType);
 	virtual ~M68KPlatform();
 
 	static M68KPlatform *Default();
 
-	inline platform_type PlatformType() const	{ return fPlatformType; }
-	inline m68k_platform_type M68KPlatformType() const	{ return fM68KPlatformType; }
+	inline m68k_platform_type PlatformType() const	{ return fPlatformType; }
 
 	virtual status_t Init(struct kernel_args *kernelArgs) = 0;
 	virtual status_t InitSerialDebug(struct kernel_args *kernelArgs) = 0;
@@ -60,8 +59,7 @@ public:
 	virtual	void ShutDown(bool reboot) = 0;
 
 private:
-	m68k_platform_type	fM68KPlatformType;
-	platform_type	fPlatformType;
+	m68k_platform_type	fPlatformType;
 };
 
 

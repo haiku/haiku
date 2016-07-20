@@ -22,10 +22,8 @@ static M68KPlatform *sM68KPlatform;
 
 
 // constructor
-M68KPlatform::M68KPlatform(platform_type platformType,
-	m68k_platform_type m68kPlatformType)
-	: fPlatformType(platformType),
-	  fM68KPlatformType(m68kPlatformType)
+M68KPlatform::M68KPlatform(m68k_platform_type platformType)
+	: fPlatformType(platformType)
 {
 }
 
