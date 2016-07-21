@@ -51,8 +51,9 @@ public:
 				delete request;
 
 			BHttpRequest* httpReq = dynamic_cast<BHttpRequest*>(request);
-			const BHttpResult& httpRes = (const BHttpResult&)httpReq->Result();
 			if (httpReq != NULL) {
+				const BHttpResult& httpRes
+					= (const BHttpResult&)httpReq->Result();
 				int32 status = httpRes.StatusCode();
 				if (BHttpRequest::IsClientErrorStatusCode(status)
 						|| BHttpRequest::IsServerErrorStatusCode(status)) {
@@ -192,7 +193,11 @@ HTTPMediaIO::Close()
 bool
 HTTPMediaIO::IsRunning() const
 {
-	return fListener->IsRunning();
+	BHttpRequest* httpReq = dynamic_cast<BHttpRequest*>(fReq);
+	if (httpReq != NULL)
+		return fListener->IsRunning();
+	else
+		return fReq->IsRunning();
 }
 
 
