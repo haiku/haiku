@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.07.13
-#	Date:    2016-07-13 03:15:02
+#	Version: 2016.07.21
+#	Date:    2016-07-21 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10000,6 +10000,7 @@
 	10c3  GT218 [GeForce 8400 GS Rev. 3]
 	10c5  GT218 [GeForce 405]
 	10d8  GT218 [NVS 300]
+	10f0  GP104 High Definition Audio Controller
 	1140  GF117M [GeForce 610M/710M/810M/820M / GT 620M/625M/630M/720M]
 		1019 0799  GeForce 820M
 		1019 999f  GeForce GT 720M
@@ -10526,7 +10527,7 @@
 	13ba  GM107GL [Quadro K2200]
 	13bb  GM107GL [Quadro K620]
 	13bc  GM107GL [Quadro K1200]
-	13bd  GM107GL [GRID M40]
+	13bd  GM107GL [Tesla M10]
 		10de 110a  GRID M40
 		10de 1160  Tesla M10
 	13c0  GM204 [GeForce GTX 980]
@@ -10859,7 +10860,7 @@
 		1043 8505  P8 series motherboard
 		105b 0d7c  D270S/D250S Motherboard
 		10ec 8168  RTL8111/8168 PCI Express Gigabit Ethernet controller
-		1458 e000  Motherboard
+		1458 e000  Onboard Ethernet
 		1462 238c  Onboard RTL8111b on MSI P965 Platinum Mainboard
 		1462 368c  K9AG Neo2
 		1462 4180  Wind PC MS-7418
@@ -14423,7 +14424,7 @@
 12a8  News Datacom
 12a9  Xiotech Corporation
 12aa  SDL Communications, Inc.
-12ab  Yuan Yuan Enterprise Co., Ltd.
+12ab  YUAN High-Tech Development Co., Ltd.
 	0000  MPG160/Kuroutoshikou ITVC15-STVLP
 	0002  AU8830 [Vortex2] Based Sound Card With A3D Support
 	0003  T507 (DVB-T) TV tuner/capture device
@@ -17403,6 +17404,7 @@
 		0070 8010  WinTV HVR-1400 ExpressCard
 		0070 f038  WinTV HVR-5525
 		107d 6f22  WinFast PxTV1200
+		12ab d585  PE988J Hybrid ATSC/QAM PCI-E AVS Video Capture (SoftEncoder)
 		13c2 3013  TT-budget CT2-4500 CI
 		1461 c039  AVerTV Hybrid Express (A577)
 		153b 117e  Cinergy T PCIe Dual
@@ -17865,6 +17867,8 @@
 	caf1  ConnectX-4 CAPI Function
 # Spectrum, 100GbE Switch
 	cb84  MT52100
+	cf08  MT53236
+	d2f0  Switch-IB 3 HDR (200Gbps) switch
 15b4  CCI/TRIAD
 15b5  Cimetrics Inc
 15b6  Texas Memory Systems Inc
@@ -19972,6 +19976,8 @@
 # 4TB Nytro PCIe controller
 		1bb1 6523  Nytro XP6500-8A4096
 	0100  Nytro Flash Storage
+		1bb1 0101  Nytro XF1440
+		1bb1 0121  Nytro XM1440
 		1bb1 01a1  Nytro XP7102
 1bb3  Bluecherry
 	4304  BC-04120A MPEG4 4 port video encoder / decoder
@@ -20409,6 +20415,8 @@
 	adc1  ADC200ME High speed ADC
 	de01  DL200ME High resolution delay line PCI based card
 	de02  DL200ME Middle resolution delay line PCI based card
+# Can't find any information on this company
+4651  TXIC
 4680  Umax Computer Corp
 4843  Hercules Computer Technology Inc
 4916  RedCreek Communications Inc
@@ -20757,6 +20765,7 @@
 	0003  TURBOstor HFP-832 [HiPPI NIC]
 5646  Vector Fabrics BV
 5654  VoiceTronix Pty Ltd
+5678  Dawicontrol Computersysteme GmbH
 5700  Netpower
 584d  AuzenTech Co., Ltd.
 5851  Exacq Technologies
@@ -22574,6 +22583,7 @@
 		8086 0008  Ethernet Converged Network Adapter X710-2
 		8086 0009  Ethernet Controller X710 for 10GbE SFP+
 		8086 000a  Ethernet Controller X710 for 10GbE SFP+
+		8086 000b  Ethernet Server Adapter X710-DA2 for OCP
 		8086 000d  Ethernet Controller X710 for 10GbE SFP+
 		8086 0010  Ethernet Converged Network Adapter X710
 		8086 4005  Ethernet Controller XL710 for 10 Gigabit SFP+
@@ -26011,6 +26021,7 @@
 	37cd  X722 Virtual Function
 	37ce  Ethernet Connection X722 for 10GbE backplane
 		1590 0200  Ethernet 10Gb 2-port 568i Adapter
+		8086 0215  Ethernet 10Gb 2-port 568i Adapter
 	37cf  Ethernet Connection X722 for 10GbE QSFP+
 	37d0  Ethernet Connection X722 for 10GbE SFP+
 	37d1  Ethernet Connection X722 for 1GbE
