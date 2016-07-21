@@ -7,6 +7,7 @@
 #include "HTTPMediaIO.h"
 
 #include <Handler.h>
+#include <HttpRequest.h>
 #include <UrlProtocolRoster.h>
 
 
@@ -21,7 +22,8 @@ public:
 			BUrlProtocolAsynchronousListener(true),
 			fRequest(NULL),
 			fAdapterIO(owner),
-			fInitSem(-1)
+			fInitSem(-1),
+			fRunning(false)
 		{
 			fInputAdapter = fAdapterIO->BuildInputAdapter();
 			fInitSem = create_sem(0, "http_streamer init sem");
@@ -36,21 +38,30 @@ public:
 
 		void ConnectionOpened(BUrlRequest* request)
 		{
-			if (fRequest != NULL)
-				fRequest->Stop();
-
 			fAdapterIO->UpdateSize();
 
 			fRequest = request;
+			fRunning = true;
 		}
 
 		void DataReceived(BUrlRequest* request, const char* data,
 			off_t position, ssize_t size)
 		{
-			_ReleaseInit();
-
 			if (request != fRequest)
 				delete request;
+
+			BHttpRequest* httpReq = dynamic_cast<BHttpRequest*>(request);
+			const BHttpResult& httpRes = (const BHttpResult&)httpReq->Result();
+			if (httpReq != NULL) {
+				int32 status = httpRes.StatusCode();
+				if (BHttpRequest::IsClientErrorStatusCode(status)
+						|| BHttpRequest::IsServerErrorStatusCode(status)) {
+					fRunning = false;
+				} else if (BHttpRequest::IsRedirectionStatusCode(status))
+					return;
+			}
+
+			_ReleaseInit();
 
 			fInputAdapter->Write(data, size);
 		}
@@ -71,6 +82,11 @@ public:
 			return acquire_sem_etc(fInitSem, 1, B_RELATIVE_TIMEOUT, timeout);
 		}
 
+		bool IsRunning()
+		{
+			return fRunning;
+		}
+
 private:
 		void _ReleaseInit()
 		{
@@ -85,6 +101,7 @@ private:
 		HTTPMediaIO*	fAdapterIO;
 		BInputAdapter*	fInputAdapter;
 		sem_id			fInitSem;
+		bool			fRunning;
 };
 
 
@@ -175,7 +192,7 @@ HTTPMediaIO::Close()
 bool
 HTTPMediaIO::IsRunning() const
 {
-	return fReq != NULL && fReq->IsRunning();
+	return fListener->IsRunning();
 }
 
 
