@@ -39,8 +39,9 @@
 #define PCI_VENDOR_INTEL		0x8086
 #define PCI_VENDOR_NVIDIA		0x10de
 #define PCI_ALL_DEVICES			0xffffffff
-#define HDA_QUIRK_SNOOP			0x0001
-#define HDA_QUIRK_NO_MSI		0x0002
+#define HDA_QUIRK_SNOOP					0x0001
+#define HDA_QUIRK_NO_MSI				0x0002
+#define HDA_QUIRK_NO_CORBRP_RESET_ACK	0x0004
 
 
 static const struct {
@@ -50,6 +51,7 @@ static const struct {
 	{ PCI_VENDOR_INTEL, 0x1c20, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0x1d20, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0x1e20, HDA_QUIRK_SNOOP },
+	{ PCI_VENDOR_INTEL, 0x2668, HDA_QUIRK_NO_CORBRP_RESET_ACK },
 	{ PCI_VENDOR_INTEL, 0x8c20, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0x8d20, HDA_QUIRK_SNOOP },
 	{ PCI_VENDOR_INTEL, 0x8d21, HDA_QUIRK_SNOOP },
@@ -66,7 +68,8 @@ static const struct {
 	// Enable snooping for ATI and Nvidia, right now for all their hda-devices,
 	// but only based on guessing.
 	{ PCI_VENDOR_AMD, PCI_ALL_DEVICES, HDA_QUIRK_SNOOP },
-	{ PCI_VENDOR_NVIDIA, PCI_ALL_DEVICES, HDA_QUIRK_SNOOP | HDA_QUIRK_NO_MSI },
+	{ PCI_VENDOR_NVIDIA, PCI_ALL_DEVICES, HDA_QUIRK_SNOOP | HDA_QUIRK_NO_MSI
+		| HDA_QUIRK_NO_CORBRP_RESET_ACK },
 	{ PCI_VENDOR_CREATIVE, 0x0010, HDA_QUIRK_NO_MSI },
 	{ PCI_VENDOR_CREATIVE, 0x0012, HDA_QUIRK_NO_MSI }
 };
@@ -431,7 +434,7 @@ reset_controller(hda_controller* controller)
 	positioning is actually enabled in hda_stream_setup_buffers()).
 */
 static status_t
-init_corb_rirb_pos(hda_controller* controller)
+init_corb_rirb_pos(hda_controller* controller, uint32 quirks)
 {
 	// Determine and set size of CORB
 	uint8 corbSize = controller->Read8(HDAC_CORB_SIZE);
@@ -540,10 +543,9 @@ init_corb_rirb_pos(hda_controller* controller)
 		dprintf("hda: CORB read pointer reset not acknowledged\n");
 
 		// According to HDA spec v1.0a ch3.3.21, software must read the
-		// bit as 1 to verify that the reset completed. However, at least
-		// some nVidia HDA controllers do not update the bit after reset.
-		// Thus don't fail here on nVidia controllers.
-		if (controller->pci_info.vendor_id != PCI_VENDOR_NVIDIA)
+		// bit as 1 to verify that the reset completed, but not all HDA
+		// controllers follow that...
+		if ((quirks & HDA_QUIRK_NO_CORBRP_RESET_ACK) == 0)
 			return B_BUSY;
 	}
 
@@ -1075,7 +1077,7 @@ hda_hw_init(hda_controller* controller)
 	}
 
 	// Setup CORB/RIRB/DMA POS
-	status = init_corb_rirb_pos(controller);
+	status = init_corb_rirb_pos(controller, quirks);
 	if (status != B_OK) {
 		dprintf("hda: init_corb_rirb_pos failed\n");
 		goto corb_rirb_failed;
