@@ -3427,15 +3427,6 @@ BPoseView::NewFileFromTemplate(const BMessage* message)
 	BPose* pose = EntryCreated(targetModel->NodeRef(), &destNodeRef,
 		destEntryRef.name, &index);
 
-	if (fFiltering) {
-		if (fFilteredPoseList->FindPose(&destNodeRef, &index) == NULL) {
-			float scrollBy = 0;
-			BRect bounds = Bounds();
-			AddPoseToList(fFilteredPoseList, true, true, pose, bounds, scrollBy,
-				true, &index);
-		}
-	}
-
 	if (pose != NULL) {
 		WatchNewNode(pose->TargetModel()->NodeRef());
 		UpdateScrollRange();
