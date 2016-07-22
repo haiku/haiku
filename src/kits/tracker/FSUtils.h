@@ -165,6 +165,7 @@ private:
 #ifndef _IMPEXP_TRACKER
 #define _IMPEXP_TRACKER
 #endif
+_IMPEXP_TRACKER status_t FSCopyAttributesAndStats(BNode*, BNode*, bool);
 _IMPEXP_TRACKER status_t FSCopyAttributesAndStats(BNode*, BNode*);
 
 _IMPEXP_TRACKER void FSDuplicate(BObjectList<entry_ref>* srcList,

@@ -3414,7 +3414,7 @@ BPoseView::NewFileFromTemplate(const BMessage* message)
 	// copy the attributes from the template file
 	BNode srcNode(&srcRef);
 	BNode destNode(&destDir, fileName);
-	FSCopyAttributesAndStats(&srcNode, &destNode);
+	FSCopyAttributesAndStats(&srcNode, &destNode, false);
 
 	BEntry entry(&destDir, fileName);
 	entry.GetRef(&destEntryRef);

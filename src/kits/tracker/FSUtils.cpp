@@ -1804,7 +1804,7 @@ FSCopyFolder(BEntry* srcEntry, BDirectory* destDir,
 
 
 status_t
-FSCopyAttributesAndStats(BNode* srcNode, BNode* destNode)
+FSCopyAttributesAndStats(BNode* srcNode, BNode* destNode, bool copyTimes)
 {
 	char* buffer = new char[1024];
 
@@ -1847,10 +1847,19 @@ FSCopyAttributesAndStats(BNode* srcNode, BNode* destNode)
 	destNode->SetPermissions(srcStat.st_mode);
 	destNode->SetOwner(srcStat.st_uid);
 	destNode->SetGroup(srcStat.st_gid);
-	destNode->SetModificationTime(srcStat.st_mtime);
-	destNode->SetCreationTime(srcStat.st_crtime);
+	if (copyTimes) {
+		destNode->SetModificationTime(srcStat.st_mtime);
+		destNode->SetCreationTime(srcStat.st_crtime);
+	}
 
 	return B_OK;
+}
+
+
+status_t
+FSCopyAttributesAndStats(BNode* srcNode, BNode* destNode)
+{
+	return FSCopyAttributesAndStats(srcNode, destNode, true);
 }
 
 
