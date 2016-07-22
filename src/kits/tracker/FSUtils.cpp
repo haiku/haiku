@@ -1856,13 +1856,6 @@ FSCopyAttributesAndStats(BNode* srcNode, BNode* destNode, bool copyTimes)
 }
 
 
-status_t
-FSCopyAttributesAndStats(BNode* srcNode, BNode* destNode)
-{
-	return FSCopyAttributesAndStats(srcNode, destNode, true);
-}
-
-
 #if 0
 status_t
 FSCopyFile(BEntry* srcFile, StatStruct* srcStat, BDirectory* destDir,
@@ -2571,19 +2564,6 @@ FSGetTrashDir(BDirectory* trashDir, dev_t dev)
 
 	return B_OK;
 }
-
-
-#if __GNUC__ && __GNUC__ < 3
-// obsolete version of FSGetDeskDir retained for bin compat with
-// BeIDE and a few other apps that apparently use it
-status_t
-FSGetDeskDir(BDirectory* deskDir, dev_t)
-{
-	// since we no longer keep a desktop directory on any volume other
-	// than /boot, redirect to FSGetDeskDir ignoring the volume argument
-	return FSGetDeskDir(deskDir);
-}
-#endif // __GNUC__ && __GNUC__ < 3
 
 
 status_t

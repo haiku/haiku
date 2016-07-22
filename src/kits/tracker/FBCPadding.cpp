@@ -37,6 +37,7 @@ All rights reserved.
 
 #include "FilePanelPriv.h"
 #include "RecentItems.h"
+#include "FSUtils.h"
 
 
 // FBC fluff, stick it here to not pollute real .cpp files
@@ -138,6 +139,32 @@ _EXPORT void
 SetPanelDirectory__10BFilePanelP9entry_ref(BFilePanel* self, entry_ref* r)
 {
 	self->SetPanelDirectory(r);
+}
+
+_EXPORT status_t
+FSGetDeskDir__8BPrivateP10BDirectoryl(BDirectory* deskDir, dev_t)
+{
+	// since we no longer keep a desktop directory on any volume other
+	// than /boot, redirect to FSGetDeskDir ignoring the volume argument
+	return FSGetDeskDir(deskDir);
+}
+
+_EXPORT status_t
+FSGetDeskDir__FP10BDirectoryl(BDirectory* deskDir, dev_t)
+{
+	return FSGetDeskDir(deskDir);
+}
+
+_EXPORT status_t
+FSCopyAttributesAndStats__8BPrivateP5BNodeT1(BNode* srcNode, BNode* destNode)
+{
+	return FSCopyAttributesAndStats(srcNode, destNode);
+}
+
+_EXPORT status_t
+FSGetTrashDir__FP10BDirectoryl(BDirectory* trashDir, dev_t volume)
+{
+	return FSGetTrashDir(trashDir, volume);
 }
 
 }
