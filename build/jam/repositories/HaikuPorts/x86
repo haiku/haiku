@@ -31,7 +31,7 @@ RemotePackageRepository HaikuPorts
 	beam-1.2-2
 	bepdf-1.2.0-1
 	bescreencapture-1.9.4-1
-	binutils-2.26.0_2016_02_29-1
+	binutils-2.26.1_2016_07_22-1
 	bison-2.6.5-1
 	boost-1.55.0-6
 	boost_atomic-1.55.0-6
