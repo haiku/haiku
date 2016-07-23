@@ -176,6 +176,12 @@ PackageItem::InitPath(const char* path, BPath* destination)
 {
 	status_t ret = B_OK;
 
+	// If the path starts with /boot/, treat it as a P_SYSTEM_PATH.
+	// This may not be the correct way to handle such a case, but it fixes
+	// installation of the RefLine pkg.
+	if (strcmp("/boot/", path))
+		fPathType = P_SYSTEM_PATH;
+
 	if (fPathType == P_INSTALL_PATH) {
 		if (gVerbose)
 			printf("InitPath - relative: %s + %s\n", path, fPath.String());
