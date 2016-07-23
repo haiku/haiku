@@ -46,6 +46,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) debug_managers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface core ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface local ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) debugger_interface remote ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) elf ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) files ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) ids ] ;
@@ -149,6 +150,9 @@ local sources =
 
 	# debugger_interface/local
 	LocalDebuggerInterface.cpp
+
+	# debugger_interface/remote
+	RemoteDebugRequest.cpp
 
 	# elf
 	CoreFile.cpp
