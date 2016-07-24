@@ -200,6 +200,7 @@ RemotePackageRepository HaikuPorts
 	icu56_devel-56.1-1
 	imagemagick-6.8.9_8-1
 	imagemagick_devel-6.8.9_8-1
+	inputproto-2.3.1-1
 	intltool-0.40.6-4
 	itstool-2.0.2-1
 	jabber4haiku-1.2.1-2
@@ -212,6 +213,7 @@ RemotePackageRepository HaikuPorts
 	jpeg-9-3
 	jpeg_devel-9-3
 	jpeg_tools-9-3
+	kbproto-1.0.7-1
 	keymapswitcher-1.2.7.11-1
 	lame-3.99.5-3
 	lame_devel-3.99.5-3
@@ -328,11 +330,15 @@ RemotePackageRepository HaikuPorts
 	libwebp_devel-0.5.0-1
 	libwebp5-0.4.4-1
 	libwebp5_devel-0.4.4-1
+	libx11-1.6.3-2
+	libx11_devel-1.6.3-2
 	libxau-1.0.8-2
 	libxcb-1.6-2
 	libxml2-2.8.0-9
 	libxml2_devel-2.8.0-9
 	libxml2_python-2.8.0-9
+	libxpm-3.5.11-2
+	libxpm_devel-3.5.11-2
 	libxslt-1.1.28-5
 	libxslt_devel-1.1.28-5
 	libzip-0.11.2-1
@@ -543,10 +549,12 @@ RemotePackageRepository HaikuPorts
 	wonderbrush-2.1.2-4
 	wpa_supplicant-2.0-4
 	xcb_proto-1.6-2
+	xextproto-7.3.0-1
 	xmlto-0.0.26-1
 	xml_parser-2.36-1
-	xproto-7.0.26-2
+	xproto-7.0.26-3
 	xrick-021212-2
+	xtrans-1.3.5-2
 	yab-1.7.5.2-1
 	yab_ide-2.2.5-3
 	yasm-1.3.0-1
@@ -1148,6 +1156,7 @@ RemotePackageRepository HaikuPorts
 	icu56
 	ilmbase_x86
 	imagemagick
+	inputproto
 	intltool
 	itstool
 	jabber4haiku
@@ -1156,6 +1165,7 @@ RemotePackageRepository HaikuPorts
 	jbig2dec
 	jbig2dec_x86
 	jpeg
+	kbproto
 	keymapswitcher
 	lame
 	lame_x86
@@ -1257,10 +1267,12 @@ RemotePackageRepository HaikuPorts
 	libvpx
 	libwebp
 	libwebp5
+	libx11
 	libxau
 	libxcb
 	libxml2
 	libxml2_x86
+	libxpm
 	libxslt
 	libxslt_x86
 	libzip
@@ -1471,11 +1483,13 @@ RemotePackageRepository HaikuPorts
 	yasm
 	youtube_dl
 	xcb_proto
+	xextproto
 	xmlroff_x86
 	xmlto
 	xml_parser
 	xproto
 	xrick
+	xtrans
 	xz_utils_x86
 	zip
 	zlib
