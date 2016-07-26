@@ -211,9 +211,9 @@ RemotePackageRepository HaikuPorts
 	jasper_tools-1.900.1-4
 	jbig2dec-0.11-2
 	jbig2dec_devel-0.11-2
-	jpeg-9-3
-	jpeg_devel-9-3
-	jpeg_tools-9-3
+	jpeg-9b-2
+	jpeg_devel-9b-2
+	jpeg_tools-9b-2
 	kbproto-1.0.7-1
 	keymapswitcher-1.2.7.11-1
 	lame-3.99.5-3
@@ -701,8 +701,8 @@ RemotePackageRepository HaikuPorts
 	jasper_x86_devel-1.900.1-4
 	jbig2dec_x86-0.11-1
 	jbig2dec_x86_devel-0.11-1
-	jpeg_x86-9-3
-	jpeg_x86_devel-9-3
+	jpeg_x86-9b-2
+	jpeg_x86_devel-9b-2
 	lame_x86-3.99.5-5
 	lame_x86_devel-3.99.5-5
 	lcms_x86-2.5-1
