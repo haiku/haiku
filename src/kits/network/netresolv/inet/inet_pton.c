@@ -65,9 +65,6 @@ int
 inet_pton(int af, const char *src, void *dst)
 {
 
-	assert(src != NULL);
-	assert(dst != NULL);
-
 	switch (af) {
 	case AF_INET:
 		return (inet_pton4(src, dst, 1));
