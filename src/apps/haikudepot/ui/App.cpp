@@ -151,7 +151,7 @@ void
 App::_Open(const BEntry& entry)
 {
 	BPath path;
-	if (!entry.Exists() || !entry.GetPath(&path) == B_OK) {
+	if (!entry.Exists() || entry.GetPath(&path) != B_OK) {
 		fprintf(stderr, "Package file not found: %s\n", path.Path());
 		return;
 	}
