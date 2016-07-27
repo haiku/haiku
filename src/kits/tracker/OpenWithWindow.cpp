@@ -636,7 +636,7 @@ AddOneRefSignatures(const entry_ref* ref, void* castToIterator)
 	mimeType = model.MimeType();
 	mimeType.ToLower();
 
-	if (mimeType.Length() && !mimeType.ICompare(B_FILE_MIMETYPE) == 0)
+	if (mimeType.Length() && mimeType.ICompare(B_FILE_MIMETYPE) != 0)
 		queryIterator->NonGenericFileFound();
 
 	// get supporting apps for type
