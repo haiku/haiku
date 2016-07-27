@@ -614,7 +614,8 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 			| TRB_2_BYTES(requestData->Length)
 			| TRB_2_TD_SIZE(transfer->VectorCount());
 		setupDescriptor->trbs[index].dwtrb3 = TRB_3_TYPE(TRB_TYPE_DATA_STAGE)
-			| (directionIn ? TRB_3_DIR_IN : 0) | TRB_3_CYCLE_BIT;
+			| (directionIn ? (TRB_3_DIR_IN | TRB_3_ISP_BIT) : 0)
+			| TRB_3_CYCLE_BIT;
 
 		// TODO copy data for out transfers
 		index++;
@@ -663,23 +664,44 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 		return B_BAD_VALUE;
 	bool directionIn = (pipe->Direction() == Pipe::In);
 
-	xhci_td *descriptor = CreateDescriptorChain(transfer->DataLength());
+	int32 trbCount = 0;
+	xhci_td *descriptor = CreateDescriptorChain(transfer->DataLength(), trbCount);
 	if (descriptor == NULL)
 		return B_NO_MEMORY;
-	descriptor->trb_count = descriptor->buffer_count;
+
+	xhci_td *td_chain = descriptor;
+	xhci_td *last = descriptor;
+	int32 rest = trbCount - 1;
 
 	// set NormalStage
-	uint8 index;
-	for (index = 0; index < descriptor->buffer_count; index++) {
-		descriptor->trbs[index].qwtrb0 = descriptor->buffer_phy[index];
-		descriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0)
-			| TRB_2_BYTES(descriptor->buffer_size[index])
-			| TRB_2_TD_SIZE(descriptor->trb_count);
-		descriptor->trbs[index].dwtrb3 = TRB_3_TYPE(TRB_TYPE_NORMAL)
-			| TRB_3_CYCLE_BIT;
+	while (td_chain != NULL) {
+		td_chain->trb_count = td_chain->buffer_count;
+		uint8 index;
+		for (index = 0; index < td_chain->buffer_count; index++) {
+			td_chain->trbs[index].qwtrb0 = descriptor->buffer_phy[index];
+			td_chain->trbs[index].dwtrb2 = TRB_2_IRQ(0)
+				| TRB_2_BYTES(descriptor->buffer_size[index])
+				| TRB_2_TD_SIZE(rest);
+			td_chain->trbs[index].dwtrb3 = TRB_3_TYPE(TRB_TYPE_NORMAL)
+				| TRB_3_CYCLE_BIT | TRB_3_CHAIN_BIT | (directionIn ? TRB_3_ISP_BIT : 0);
+			rest--;
+		}
+		// link next td, if any
+		if (td_chain->next_chain != NULL) {
+			td_chain->trbs[td_chain->trb_count].qwtrb0 = td_chain->next_chain->this_phy;
+			td_chain->trbs[td_chain->trb_count].dwtrb2 = TRB_2_IRQ(0);
+			td_chain->trbs[td_chain->trb_count].dwtrb3 = TRB_3_TYPE(TRB_TYPE_LINK)
+				| TRB_3_CYCLE_BIT | TRB_3_CHAIN_BIT;
+		}
+
+		last = td_chain;
+		td_chain = td_chain->next_chain;
 	}
-	if (descriptor->trb_count > 0)
-		descriptor->trbs[index - 1].dwtrb3 |= TRB_3_IOC_BIT;
+
+	if (last->trb_count > 0) {
+		last->trbs[last->trb_count - 1].dwtrb3 |= TRB_3_IOC_BIT;
+		last->trbs[last->trb_count - 1].dwtrb3 &= ~TRB_3_CHAIN_BIT;
+	}
 
 	if (!directionIn) {
 		TRACE("copying out iov count %ld\n", transfer->VectorCount());
@@ -826,10 +848,10 @@ XHCI::AddTo(Stack *stack)
 
 
 xhci_td *
-XHCI::CreateDescriptorChain(size_t bufferSize)
+XHCI::CreateDescriptorChain(size_t bufferSize, int32 &trbCount)
 {
 	size_t packetSize = B_PAGE_SIZE * 16;
-	int32 trbCount = (bufferSize + packetSize - 1) / packetSize;
+	trbCount = (bufferSize + packetSize - 1) / packetSize;
 	// keep one trb for linking
 	int32 tdCount = (trbCount + XHCI_MAX_TRBS_PER_TD - 2)
 		/ (XHCI_MAX_TRBS_PER_TD - 1);
@@ -839,12 +861,13 @@ XHCI::CreateDescriptorChain(size_t bufferSize)
 	for (int32 i = 0; i < tdCount; i++) {
 		xhci_td *descriptor = CreateDescriptor(0);
 		if (!descriptor) {
-			//FreeDescriptorChain(firstDescriptor);
+			if (first != NULL)
+				FreeDescriptor(first);
 			return NULL;
 		} else if (first == NULL)
 			first = descriptor;
 
-		uint8 trbs = min_c(trbCount, XHCI_MAX_TRBS_PER_TD);
+		uint8 trbs = min_c(trbCount, XHCI_MAX_TRBS_PER_TD - 1);
 		TRACE("CreateDescriptorChain trbs %d for td %" B_PRId32 "\n", trbs, i);
 		for (int j = 0; j < trbs; j++) {
 			if (fStack->AllocateChunk(&descriptor->buffer_log[j],
@@ -888,6 +911,8 @@ XHCI::CreateDescriptor(size_t bufferSize)
 	result->buffer_size[0] = bufferSize;
 	result->trb_count = 0;
 	result->buffer_count = 1;
+	result->next = NULL;
+	result->next_chain = NULL;
 	if (bufferSize <= 0) {
 		result->buffer_log[0] = NULL;
 		result->buffer_phy[0] = 0;
@@ -902,6 +927,9 @@ XHCI::CreateDescriptor(size_t bufferSize)
 		return NULL;
 	}
 
+	TRACE("CreateDescriptor allocated buffer_size %ld %p\n",
+				result->buffer_size[0], result->buffer_log[0]);
+
 	return result;
 }
 
@@ -909,20 +937,22 @@ XHCI::CreateDescriptor(size_t bufferSize)
 void
 XHCI::FreeDescriptor(xhci_td *descriptor)
 {
-	if (!descriptor)
-		return;
+	while (descriptor != NULL) {
 
-	for (int i = 0; i < descriptor->buffer_count; i++) {
-		if (descriptor->buffer_size[i] == 0)
-			continue;
-		TRACE("FreeDescriptor buffer %d buffer_size %ld\n", i,
-			descriptor->buffer_size[i]);
-		fStack->FreeChunk(descriptor->buffer_log[i],
-			descriptor->buffer_phy[i], descriptor->buffer_size[i]);
+		for (int i = 0; i < descriptor->buffer_count; i++) {
+			if (descriptor->buffer_size[i] == 0)
+				continue;
+			TRACE("FreeDescriptor buffer %d buffer_size %ld %p\n", i,
+				descriptor->buffer_size[i], descriptor->buffer_log[i]);
+			fStack->FreeChunk(descriptor->buffer_log[i],
+				descriptor->buffer_phy[i], descriptor->buffer_size[i]);
+		}
+
+		xhci_td *next = descriptor->next_chain;
+		fStack->FreeChunk(descriptor, descriptor->this_phy,
+			sizeof(xhci_td));
+		descriptor = next;
 	}
-
-	fStack->FreeChunk(descriptor, descriptor->this_phy,
-		sizeof(xhci_td));
 }
 
 
@@ -966,9 +996,9 @@ XHCI::WriteDescriptorChain(xhci_td *descriptor, iovec *vector,
 			}
 
 			if (bufferOffset >= current->buffer_size[trbIndex]) {
+				bufferOffset = 0;
 				if (++trbIndex >= current->buffer_count)
 					break;
-				bufferOffset = 0;
 			}
 		}
 
@@ -1016,14 +1046,14 @@ XHCI::ReadDescriptorChain(xhci_td *descriptor, iovec *vector,
 						actualLength);
 					return actualLength;
 				}
-
 				vectorOffset = 0;
+
 			}
 
 			if (bufferOffset >= current->buffer_size[trbIndex]) {
+				bufferOffset = 0;
 				if (++trbIndex >= current->buffer_count)
 					break;
-				bufferOffset = 0;
 			}
 		}
 
@@ -1470,17 +1500,22 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 
 	TRACE("_LinkDescriptorForPipe current %d, next %d\n", current, next);
 
+	xhci_td *last = descriptor;
+	while (last->next_chain != NULL)
+		last = last->next_chain;
+
 	// compute next link
 	addr_t addr = endpoint->trb_addr + next * sizeof(struct xhci_trb);
-	descriptor->trbs[descriptor->trb_count].qwtrb0 = addr;
-	descriptor->trbs[descriptor->trb_count].dwtrb2 = TRB_2_IRQ(0);
-	descriptor->trbs[descriptor->trb_count].dwtrb3 = TRB_3_TYPE(TRB_TYPE_LINK)
+	last->trbs[last->trb_count].qwtrb0 = addr;
+	last->trbs[last->trb_count].dwtrb2 = TRB_2_IRQ(0);
+	last->trbs[last->trb_count].dwtrb3 = TRB_3_TYPE(TRB_TYPE_LINK)
 		| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT;
 
 	endpoint->trbs[next].qwtrb0 = 0;
 	endpoint->trbs[next].dwtrb2 = 0;
 	endpoint->trbs[next].dwtrb3 = 0;
 
+	// link the descriptor
 	endpoint->trbs[current].qwtrb0 = descriptor->this_phy;
 	endpoint->trbs[current].dwtrb2 = TRB_2_IRQ(0);
 	endpoint->trbs[current].dwtrb3 = TRB_3_TYPE(TRB_TYPE_LINK)

@@ -140,7 +140,8 @@ private:
 
 			// Descriptor
 			xhci_td *			CreateDescriptor(size_t bufferSize);
-			xhci_td *			CreateDescriptorChain(size_t bufferSize);
+			xhci_td *			CreateDescriptorChain(size_t bufferSize,
+									int32 &trbCount);
 			void				FreeDescriptor(xhci_td *descriptor);
 
 			size_t				WriteDescriptorChain(xhci_td *descriptor,
