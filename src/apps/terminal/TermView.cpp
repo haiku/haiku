@@ -1594,7 +1594,7 @@ TermView::MessageReceived(BMessage *msg)
 			int32 encodingID;
 			BMessage specifier;
 			if (msg->GetCurrentSpecifier(&i, &specifier) == B_OK
-				&& !strcmp("encoding",
+				&& strcmp("encoding",
 					specifier.FindString("property", i)) == 0) {
 				msg->FindInt32 ("data", &encodingID);
 				SetEncoding(encodingID);
