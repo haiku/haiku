@@ -133,8 +133,8 @@ RemotePackageRepository HaikuPorts
 	fontconfig-2.11.1-3
 	fontconfig_devel-2.11.1-3
 	fossil-1.35-1
-	freetype-2.6.3-1
-	freetype_devel-2.6.3-1
+	freetype-2.6.5-1
+	freetype_devel-2.6.5-1
 	fribidi-0.19.6-2
 	fribidi_devel-0.19.6-2
 	friss-0.8.0-1
@@ -326,8 +326,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis_devel-1.3.5-1
 	libvpx-1.0.0-2
 	libvpx_devel-1.0.0-2
-	libwebp-0.5.0-1
-	libwebp_devel-0.5.0-1
+	libwebp-0.5.1-1
+	libwebp_devel-0.5.1-1
 	libwebp5-0.4.4-1
 	libwebp5_devel-0.4.4-1
 	libx11-1.6.3-2
@@ -435,7 +435,7 @@ RemotePackageRepository HaikuPorts
 	psiconv_devel-0.9.8-1
 	psqlodbc-09.03.0400-2
 	psqlodbc_devel-09.03.0400-2
-	python-2.7.11-1
+	python-2.7.12-1
 	python_dateutil-1.5-2
 	python_imaging-1.1.7-2
 	python_lxml-3.3.5-2
@@ -649,8 +649,8 @@ RemotePackageRepository HaikuPorts
 	fontconfig_x86-2.11.1-3
 	fontconfig_x86_devel-2.11.1-3
 	freedroidrpg_x86-0.15.1-1
-	freetype_x86-2.6.3-1
-	freetype_x86_devel-2.6.3-1
+	freetype_x86-2.6.5-1
+	freetype_x86_devel-2.6.5-1
 	fribidi_x86-0.19.6-2
 	fribidi_x86_devel-0.19.6-2
 	gcc_x86-5.4.0_2016_06_04-1
@@ -685,8 +685,8 @@ RemotePackageRepository HaikuPorts
 	guilib_x86_devel-1.2.1-1
 	haikuwebkit_x86-1.5.2-2
 	haikuwebkit_x86_devel-1.5.2-2
-	harfbuzz_x86-0.9.39-1
-	harfbuzz_x86_devel-0.9.39-1
+	harfbuzz_x86-1.3.0-1
+	harfbuzz_x86_devel-1.3.0-1
 	icu_x86-57.1-1
 	icu_x86_devel-57.1-1
 	icu55_x86-55.1-1
@@ -818,8 +818,8 @@ RemotePackageRepository HaikuPorts
 	libvorbis_x86_devel-1.3.5-2
 	libvpx_x86-1.0.0-2
 	libvpx_x86_devel-1.0.0-2
-	libwebp_x86-0.5.0-1
-	libwebp_x86_devel-0.5.0-1
+	libwebp_x86-0.5.1-1
+	libwebp_x86_devel-0.5.1-1
 	libwebp5_x86-0.4.4-1
 	libwebp5_x86_devel-0.4.4-1
 	libxml2_x86-2.9.2-1
