@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.07.21
-#	Date:    2016-07-21 03:15:01
+#	Version: 2016.07.23
+#	Date:    2016-07-23 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -13698,6 +13698,7 @@
 		1202 9844  SK-9843 SX dual link
 1203  Bayer Corporation, Agfa Division
 1204  Lattice Semiconductor Corporation
+	1965  SB6501 802.11ad Wireless Network Adapter
 1205  Array Corporation
 1206  Amdahl Corporation
 1208  Parsytec GmbH
@@ -20064,6 +20065,7 @@
 	0302  Simulyzer-RT CompactPCI Serial PSI5-ECU-1 card
 	0303  Simulyzer-RT CompactPCI Serial PSI5-SIM-1 card
 	0304  Simulyzer-RT CompactPCI Serial PWR-ANA-1 card
+	0305  Simulyzer-RT CompactPCI Serial CAN-1 card
 1cdd  secunet Security Networks AG
 1ce4  Exablaze
 	0001  ExaNIC X4
