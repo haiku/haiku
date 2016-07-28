@@ -4,10 +4,18 @@ http://www.beyondlogic.org/serial/serial.htm
 http://jamesthornton.com/freebsd/articles/serial-uart/
 http://dugeem.net/david/work/freebsd-serial.html
 http://dugeem.net/david/work/etc/sio.c
+http://byterunner.com/16550.html
+https://en.wikibooks.org/wiki/Serial_Programming/8250_UART_Programming#Software_Identification_of_the_UART
 
 Moschip:
 http://lxr.linux.no/linux+v2.6.28.7/drivers/parport/parport_serial.c#L108
 http://lxr.linux.no/linux+v2.6.28.7/drivers/pci/quirks.c#L1462
+
+Oxford Semi OXuPCI952:
+http://mail-index.netbsd.org/netbsd-bugs/2013/09/04/msg034083.html
+
+FreeBSD's PUC data:
+http://fxr.watson.org/fxr/source/dev/pci/pucdata.c?v=NETBSD
 
 if you can understand it:
 http://lxr.linux.no/linux+v2.6.28.7/drivers/serial/
