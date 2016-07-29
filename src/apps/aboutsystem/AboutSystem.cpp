@@ -1241,12 +1241,6 @@ AboutView::_CreateCreditsView()
 		.SetLicense(kBSDThreeClause)
 		.SetURL("http://www.openexr.com"));
 
-	// Bullet copyrights
-	_AddPackageCredit(PackageCredit("Bullet")
-		.SetCopyright(COPYRIGHT_STRING "2003-2008 Erwin Coumans")
-		.SetLicense("Bullet")
-		.SetURL("http://www.bulletphysics.com"));
-
 	// Netcat copyrights
 	_AddPackageCredit(PackageCredit("Netcat")
 		.SetCopyright(COPYRIGHT_STRING "1996 Hobbit.")
