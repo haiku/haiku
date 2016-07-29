@@ -1326,14 +1326,14 @@ AboutView::_CreateCreditsView()
 	_AddPackageCredit(PackageCredit("MkDepend")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1995-2001 Lars Düning. "
 			"All rights reserved."))
-		.SetLicense("MkDepend")
+		.SetLicense("MIT")
 		.SetURL("http://bearnip.com/lars/be"));
 
 	// libhttpd copyright (used as Poorman backend)
 	_AddPackageCredit(PackageCredit("libhttpd")
 		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "1995, 1998-2001 "
 			"Jef Poskanzer. All rights reserved."))
-		.SetLicense("LibHTTPd")
+		.SetLicense(kBSDTwoClause)
 		.SetURL("http://www.acme.com/software/thttpd/"));
 
 #ifdef __INTEL__
