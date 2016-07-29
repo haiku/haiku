@@ -182,6 +182,7 @@ DownloadWindow::DownloadWindow(BRect frame, bool visible,
 	if (!visible)
 		Hide();
 	Show();
+	MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
 }
 
 
