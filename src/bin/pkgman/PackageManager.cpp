@@ -149,8 +149,8 @@ PackageManager::ConfirmChanges(bool fromMostSpecific)
 			_PrintResult(*fInstalledRepositories.ItemAt(i));
 	}
 
-	if (!fDecisionProvider.YesNoDecisionNeeded(BString(), "Continue?", "y", "n",
-			"y")) {
+	if (!fDecisionProvider.YesNoDecisionNeeded(BString(), "Continue?", "yes",
+			"no", "yes")) {
 		exit(1);
 	}
 }
