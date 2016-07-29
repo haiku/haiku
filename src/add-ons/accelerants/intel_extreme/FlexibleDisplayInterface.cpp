@@ -366,12 +366,12 @@ FDILink::_IlkTrain(uint32 lanes)
 	}
 
 	uint32 iirControl = Receiver().Base() + PCH_FDI_RX_IIR;
-	TRACE("%s: FDI RX IIR Control @ 0x%x\n", __func__, iirControl);
+	TRACE("%s: FDI RX IIR Control @ 0x%" B_PRIx32 "\n", __func__, iirControl);
 
 	int tries = 0;
 	for (tries = 0; tries < 5; tries++) {
 		tmp = read32(iirControl);
-		TRACE("%s: FDI RX IIR 0x%x\n", __func__, tmp);
+		TRACE("%s: FDI RX IIR 0x%" B_PRIx32 "\n", __func__, tmp);
 
 		if ((tmp & FDI_RX_BIT_LOCK)) {
 			TRACE("%s: FDI train 1 done\n", __func__);
@@ -401,7 +401,7 @@ FDILink::_IlkTrain(uint32 lanes)
 
 	for (tries = 0; tries < 5; tries++) {
 		tmp = read32(iirControl);
-		TRACE("%s: FDI RX IIR 0x%x\n", __func__, tmp);
+		TRACE("%s: FDI RX IIR 0x%" B_PRIx32 "\n", __func__, tmp);
 
 		if (tmp & FDI_RX_SYMBOL_LOCK) {
 			TRACE("%s: FDI train 2 done\n", __func__);
