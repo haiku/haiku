@@ -31,6 +31,14 @@
 #define CALLED() TRACE("CALLED %s\n", __PRETTY_FUNCTION__)
 
 
+static const int gSnbBFDITrainParam[] = {
+	FDI_LINK_TRAIN_400MV_0DB_SNB_B,
+	FDI_LINK_TRAIN_400MV_6DB_SNB_B,
+	FDI_LINK_TRAIN_600MV_3_5DB_SNB_B,
+	FDI_LINK_TRAIN_800MV_0DB_SNB_B,
+};
+
+
 // #pragma mark - FDITransmitter
 
 
@@ -423,12 +431,129 @@ status_t
 FDILink::_SnbTrain(uint32 lanes)
 {
 	CALLED();
-	//uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
-	//uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
+	uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
+	uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
 
-	ERROR("%s: TODO\n", __func__);
+	// Train 1
+	uint32 imrControl = Receiver().Base() + PCH_FDI_RX_IMR;
+	uint32 tmp = read32(imrControl);
+	tmp &= ~FDI_RX_SYMBOL_LOCK;
+	tmp &= ~FDI_RX_BIT_LOCK;
+	write32(imrControl, tmp);
+	read32(imrControl);
+	spin(150);
 
-	return B_ERROR;
+	tmp = read32(txControl);
+	tmp &= ~FDI_DP_PORT_WIDTH_MASK;
+	tmp |= FDI_DP_PORT_WIDTH(lanes);
+	tmp &= ~FDI_LINK_TRAIN_NONE;
+	tmp |= FDI_LINK_TRAIN_PATTERN_1;
+	tmp &= ~FDI_LINK_TRAIN_VOL_EMP_MASK;
+
+	tmp |= FDI_LINK_TRAIN_400MV_0DB_SNB_B;
+	write32(txControl, tmp);
+
+	write32(Receiver().Base() + PCH_FDI_RX_MISC,
+		FDI_RX_TP1_TO_TP2_48 | FDI_RX_FDI_DELAY_90);
+
+	tmp = read32(rxControl);
+	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
+		tmp &= ~FDI_LINK_TRAIN_PATTERN_MASK_CPT;
+		tmp |= FDI_LINK_TRAIN_PATTERN_1_CPT;
+	} else {
+		tmp &= ~FDI_LINK_TRAIN_NONE;
+		tmp |= FDI_LINK_TRAIN_PATTERN_1;
+	}
+	write32(rxControl, rxControl);
+	Receiver().Enable();
+
+	uint32 iirControl = Receiver().Base() + PCH_FDI_RX_IIR;
+	TRACE("%s: FDI RX IIR Control @ 0x%" B_PRIx32 "\n", __func__, iirControl);
+
+	int i = 0;
+	for (i = 0; i < 4; i++) {
+		tmp = read32(txControl);
+		tmp &= ~FDI_LINK_TRAIN_VOL_EMP_MASK;
+		tmp |= gSnbBFDITrainParam[i];
+		write32(txControl, tmp);
+
+		read32(txControl);
+		spin(500);
+
+		int retry = 0;
+		for (retry = 0; retry < 5; retry++) {
+			tmp = read32(iirControl);
+			TRACE("%s: FDI RX IIR 0x%" B_PRIx32 "\n", __func__, tmp);
+			if (tmp & FDI_RX_BIT_LOCK) {
+				TRACE("%s: FDI train 1 done\n", __func__);
+				write32(iirControl, tmp | FDI_RX_BIT_LOCK);
+				break;
+			}
+			spin(50);
+		}
+		if (retry < 5)
+			break;
+	}
+
+	if (i == 4) {
+		ERROR("%s: FDI train 1 failure!\n", __func__);
+		return B_ERROR;
+	}
+
+	// Train 2
+	tmp = read32(txControl);
+	tmp &= ~FDI_LINK_TRAIN_NONE;
+	tmp |= FDI_LINK_TRAIN_PATTERN_2;
+
+	// if gen6? It's always gen6
+	tmp &= ~FDI_LINK_TRAIN_VOL_EMP_MASK;
+	tmp |= FDI_LINK_TRAIN_400MV_0DB_SNB_B;
+	write32(txControl, tmp);
+
+	tmp = read32(rxControl);
+	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
+		tmp &= ~FDI_LINK_TRAIN_PATTERN_MASK_CPT;
+		tmp |= FDI_LINK_TRAIN_PATTERN_2_CPT;
+	} else {
+		tmp &= ~FDI_LINK_TRAIN_NONE;
+		tmp |= FDI_LINK_TRAIN_PATTERN_2;
+	}
+	write32(rxControl, tmp);
+
+	read32(rxControl);
+	spin(150);
+
+	for (i = 0; i < 4; i++) {
+		tmp = read32(txControl);
+		tmp &= ~FDI_LINK_TRAIN_VOL_EMP_MASK;
+		tmp |= gSnbBFDITrainParam[i];
+		write32(txControl, tmp);
+
+		read32(txControl);
+		spin(500);
+
+		int retry = 0;
+		for (retry = 0; retry < 5; retry++) {
+			tmp = read32(iirControl);
+			TRACE("%s: FDI RX IIR 0x%" B_PRIx32 "\n", __func__, tmp);
+
+			if (tmp & FDI_RX_SYMBOL_LOCK) {
+				TRACE("%s: FDI train 2 done\n", __func__);
+				write32(iirControl, tmp | FDI_RX_SYMBOL_LOCK);
+				break;
+			}
+			spin(50);
+		}
+		if (retry < 5)
+			break;
+	}
+
+	if (i == 4) {
+		ERROR("%s: FDI train 1 failure!\n", __func__);
+		return B_ERROR;
+	}
+
+	return B_OK;
 }
 
 
@@ -464,22 +589,15 @@ FDILink::_AutoTrain(uint32 lanes)
 		buffer &= ~FDI_LINK_TRAIN_NONE;
 	write32(txControl, buffer);
 
-	static const int snb_b_fdi_train_param[] = {
-		FDI_LINK_TRAIN_400MV_0DB_SNB_B,
-		FDI_LINK_TRAIN_400MV_6DB_SNB_B,
-		FDI_LINK_TRAIN_600MV_3_5DB_SNB_B,
-		FDI_LINK_TRAIN_800MV_0DB_SNB_B,
-	};
-
 	bool trained = false;
 
-	for (uint32 i = 0; i < (sizeof(snb_b_fdi_train_param)
-		/ sizeof(snb_b_fdi_train_param[0])); i++) {
+	for (uint32 i = 0; i < (sizeof(gSnbBFDITrainParam)
+		/ sizeof(gSnbBFDITrainParam[0])); i++) {
 		for (int j = 0; j < 2; j++) {
 			buffer = read32(txControl);
 			buffer |= FDI_AUTO_TRAINING;
 			buffer &= ~FDI_LINK_TRAIN_VOL_EMP_MASK;
-			buffer |= snb_b_fdi_train_param[i];
+			buffer |= gSnbBFDITrainParam[i];
 			write32(txControl, buffer | FDI_TX_ENABLE);
 
 			write32(rxControl, read32(rxControl) | FDI_RX_ENABLE);

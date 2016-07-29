@@ -855,12 +855,12 @@ struct intel_free_graphics_memory {
 #define PCH_FDI_RX_BASE_REGISTER		0xf0000
 #define PCH_FDI_RX_PIPE_OFFSET			0x01000
 #define PCH_FDI_RX_CONTROL				0x00c
+#define PCH_FDI_RX_MISC					0x010
 #define PCH_FDI_RX_IIR					0x014
 #define PCH_FDI_RX_IMR					0x018
 
 #define FDI_RX_ENABLE					(1 << 31)
 #define FDI_RX_PLL_ENABLED				(1 << 13)
-
 
 // FDI_tX interrupt register
 #define FDI_RX_INTER_LANE_ALIGN         (1 << 10)
@@ -887,6 +887,15 @@ struct intel_free_graphics_memory {
 #define FDI_RX_CLOCK_MASK				(1 << 4)
 #define FDI_RX_CLOCK_RAW				(0 << 4)
 #define FDI_RX_CLOCK_PCD				(1 << 4)
+
+// FDI RX MISC
+#define FDI_RX_PWRDN_LANE1_MASK		(3 << 26)
+#define FDI_RX_PWRDN_LANE1_VAL(x)	((x) << 26)
+#define FDI_RX_PWRDN_LANE0_MASK		(3 << 24)
+#define FDI_RX_PWRDN_LANE0_VAL(x)	((x) << 24)
+#define FDI_RX_TP1_TO_TP2_48		(2 << 20)
+#define FDI_RX_TP1_TO_TP2_64		(3 << 20)
+#define FDI_RX_FDI_DELAY_90			(0x90 << 0)
 
 #define PCH_FDI_TX_BASE_REGISTER			0x60000
 #define PCH_FDI_TX_PIPE_OFFSET				0x01000
