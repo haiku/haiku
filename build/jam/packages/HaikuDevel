@@ -50,6 +50,7 @@ AddFilesToPackage develop lib : libposix_error_mapper.a ;
 AddHeaderDirectoryToPackage config ;
 AddHeaderDirectoryToPackage glibc ;
 AddHeaderDirectoryToPackage libs alm ;
+AddHeaderDirectoryToPackage libs glut GL ;
 AddHeaderDirectoryToPackage os ;
 AddHeaderDirectoryToPackage posix ;
 
