@@ -1178,7 +1178,7 @@ AboutView::_CreateCreditsView()
 			COPYRIGHT_STRING "1997 Be Inc.",
 			COPYRIGHT_STRING "1999 Jake Hamby.",
 			NULL)
-		.SetLicense("GLUT (Mark Kilgard)")
+		.SetLicense("MIT")
 		.SetURL("http://www.opengl.org/resources/libraries/glut"));
 
 	// OpenGroup & DEC (BRegion backend) copyright
