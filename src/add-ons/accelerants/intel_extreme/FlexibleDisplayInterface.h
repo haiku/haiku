@@ -68,11 +68,16 @@ public:
 		status_t					Train(display_mode* target);
 
 private:
+		status_t					_NormalTrain(uint32 lanes);
+		status_t					_IlkTrain(uint32 lanes);
+		status_t					_SnbTrain(uint32 lanes);
 		status_t					_ManualTrain(uint32 lanes);
 		status_t					_AutoTrain(uint32 lanes);
 
 		FDITransmitter				fTransmitter;
 		FDIReceiver					fReceiver;
+
+		pipe_index					fPipeIndex;
 };
 
 

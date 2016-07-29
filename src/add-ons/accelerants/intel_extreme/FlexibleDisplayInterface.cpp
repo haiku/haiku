@@ -220,7 +220,8 @@ FDIReceiver::SwitchClock(bool toPCDClock)
 FDILink::FDILink(pipe_index pipeIndex)
 	:
 	fTransmitter(pipeIndex),
-	fReceiver(pipeIndex)
+	fReceiver(pipeIndex),
+	fPipeIndex(pipeIndex)
 {
 }
 
@@ -262,17 +263,172 @@ FDILink::Train(display_mode* target)
 
 	status_t result = B_ERROR;
 
-	// Over IVB supports AutoTraining of FDI
-	if (gInfo->shared_info->device_type.Generation() >= 7) {
+	// TODO: Only _AutoTrain on IVYB Stepping B or later
+	// otherwise, _ManualTrain
+	if (gInfo->shared_info->device_type.Generation() >= 7)
 		result = _AutoTrain(lanes);
-		if (result != B_OK) {
-			ERROR("%s: FDI auto-training fault. Attempting manual train.\n",
-				__func__);
-			return _ManualTrain(lanes);
-		}
-		return B_OK;
+	else if (gInfo->shared_info->device_type.Generation() == 6)
+		result = _SnbTrain(lanes);
+	else if (gInfo->shared_info->device_type.Generation() == 5)
+		result = _IlkTrain(lanes);
+	else
+		result = _NormalTrain(lanes);
+
+	if (result != B_OK) {
+		ERROR("%s: FDI training fault.\n", __func__);
 	}
-	return _ManualTrain(lanes);
+
+	return result;
+}
+
+
+status_t
+FDILink::_NormalTrain(uint32 lanes)
+{
+	CALLED();
+	uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
+	uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
+
+	// Enable normal link training
+	uint32 tmp = read32(txControl);
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB)) {
+		tmp &= ~FDI_LINK_TRAIN_NONE_IVB;
+		tmp |= FDI_LINK_TRAIN_NONE_IVB | FDI_TX_ENHANCE_FRAME_ENABLE;
+	} else {
+		tmp &= ~FDI_LINK_TRAIN_NONE;
+		tmp |= FDI_LINK_TRAIN_NONE | FDI_TX_ENHANCE_FRAME_ENABLE;
+	}
+	write32(txControl, tmp);
+
+	tmp = read32(rxControl);
+	if (gInfo->shared_info->pch_info == INTEL_PCH_CPT) {
+		tmp &= ~FDI_LINK_TRAIN_PATTERN_MASK_CPT;
+		tmp |= FDI_LINK_TRAIN_NORMAL_CPT;
+	} else {
+		tmp &= ~FDI_LINK_TRAIN_NONE;
+		tmp |= FDI_LINK_TRAIN_NONE;
+	}
+	write32(rxControl, tmp | FDI_RX_ENHANCE_FRAME_ENABLE);
+
+	// Wait 1x idle pattern
+	read32(rxControl);
+	spin(1000);
+
+	// Enable ecc on IVB
+	if (gInfo->shared_info->device_type.InGroup(INTEL_GROUP_IVB)) {
+		write32(rxControl, read32(rxControl)
+			| FDI_FS_ERRC_ENABLE | FDI_FE_ERRC_ENABLE);
+		read32(rxControl);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+FDILink::_IlkTrain(uint32 lanes)
+{
+	CALLED();
+	uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
+	uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
+
+	// Train 1: unmask FDI RX Interrupt symbol_lock and bit_lock
+	uint32 tmp = read32(Receiver().Base() + PCH_FDI_RX_IMR);
+	tmp &= ~FDI_RX_SYMBOL_LOCK;
+	tmp &= ~FDI_RX_BIT_LOCK;
+	write32(Receiver().Base() + PCH_FDI_RX_IMR, tmp);
+	spin(150);
+
+	// Enable CPU FDI TX and RX
+	tmp = read32(txControl);
+	tmp &= ~FDI_DP_PORT_WIDTH_MASK;
+	tmp |= FDI_DP_PORT_WIDTH(lanes);
+	tmp &= ~FDI_LINK_TRAIN_NONE;
+	tmp |= FDI_LINK_TRAIN_PATTERN_1;
+	write32(txControl, tmp);
+	Transmitter().Enable();
+
+	tmp = read32(rxControl);
+	tmp &= ~FDI_LINK_TRAIN_NONE;
+	tmp |= FDI_LINK_TRAIN_PATTERN_1;
+	write32(rxControl, tmp);
+	Receiver().Enable();
+
+	// ILK Workaround, enable clk after FDI enable
+	if (fPipeIndex == INTEL_PIPE_B) {
+		write32(PCH_FDI_RXB_CHICKEN, FDI_RX_PHASE_SYNC_POINTER_OVR);
+		write32(PCH_FDI_RXB_CHICKEN, FDI_RX_PHASE_SYNC_POINTER_OVR
+			| FDI_RX_PHASE_SYNC_POINTER_EN);
+	} else {
+		write32(PCH_FDI_RXA_CHICKEN, FDI_RX_PHASE_SYNC_POINTER_OVR);
+		write32(PCH_FDI_RXA_CHICKEN, FDI_RX_PHASE_SYNC_POINTER_OVR
+			| FDI_RX_PHASE_SYNC_POINTER_EN);
+	}
+
+	uint32 iirControl = Receiver().Base() + PCH_FDI_RX_IIR;
+	TRACE("%s: FDI RX IIR Control @ 0x%x\n", __func__, iirControl);
+
+	int tries = 0;
+	for (tries = 0; tries < 5; tries++) {
+		tmp = read32(iirControl);
+		TRACE("%s: FDI RX IIR 0x%x\n", __func__, tmp);
+
+		if ((tmp & FDI_RX_BIT_LOCK)) {
+			TRACE("%s: FDI train 1 done\n", __func__);
+			write32(iirControl, tmp | FDI_RX_BIT_LOCK);
+			break;
+		}
+	}
+
+	if (tries == 5) {
+		ERROR("%s: FDI train 1 failure!\n", __func__);
+		return B_ERROR;
+	}
+
+	// Train 2
+	tmp = read32(txControl);
+	tmp &= ~FDI_LINK_TRAIN_NONE;
+	tmp |= FDI_LINK_TRAIN_PATTERN_2;
+	write32(txControl, tmp);
+
+	tmp = read32(rxControl);
+	tmp &= ~FDI_LINK_TRAIN_NONE;
+	tmp |= FDI_LINK_TRAIN_PATTERN_2;
+	write32(rxControl, tmp);
+
+	read32(rxControl);
+	spin(150);
+
+	for (tries = 0; tries < 5; tries++) {
+		tmp = read32(iirControl);
+		TRACE("%s: FDI RX IIR 0x%x\n", __func__, tmp);
+
+		if (tmp & FDI_RX_SYMBOL_LOCK) {
+			TRACE("%s: FDI train 2 done\n", __func__);
+			write32(iirControl, tmp | FDI_RX_SYMBOL_LOCK);
+			break;
+		}
+	}
+
+	if (tries == 5) {
+		ERROR("%s: FDI train 2 failure!\n", __func__);
+		return B_ERROR;
+	}
+
+	return B_OK;
+}
+
+
+status_t
+FDILink::_SnbTrain(uint32 lanes)
+{
+	CALLED();
+	//uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
+	//uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
+
+	ERROR("%s: TODO\n", __func__);
+
+	return B_ERROR;
 }
 
 
@@ -280,14 +436,12 @@ status_t
 FDILink::_ManualTrain(uint32 lanes)
 {
 	CALLED();
+	//uint32 txControl = Transmitter().Base() + PCH_FDI_TX_CONTROL;
+	//uint32 rxControl = Receiver().Base() + PCH_FDI_RX_CONTROL;
 
-	// This needs completed
-	ERROR("TODO: Manual FDI Link Training\n");
+	ERROR("%s: TODO\n", __func__);
 
-	// Enable pipes
-	Transmitter().Enable();
-	Receiver().Enable();
-	return B_OK;
+	return B_ERROR;
 }
 
 

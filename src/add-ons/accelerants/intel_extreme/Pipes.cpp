@@ -74,8 +74,7 @@ Pipe::Pipe(pipe_index pipeIndex)
 		fHasTranscoder = true;
 
 		// Program FDILink if PCH
-		if (fFDILink == NULL)
-			fFDILink = new(std::nothrow) FDILink(pipeIndex);
+		fFDILink = new(std::nothrow) FDILink(pipeIndex);
 	}
 
 	TRACE("Pipe %s. Pipe Base: 0x%" B_PRIxADDR

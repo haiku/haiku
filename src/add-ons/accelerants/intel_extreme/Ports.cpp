@@ -471,6 +471,11 @@ LVDSPort::SetDisplayMode(display_mode* target, uint32 colorMode)
 	if (!wait_for_clear(panelStatus, PANEL_STATUS_POWER_ON, 1000))
 		ERROR("%s: %s didn't power off within 1000ms!\n", __func__, PortName());
 
+	// Train FDI if it exists
+	FDILink* link = fPipe->FDI();
+	if (link != NULL)
+		link->Train(target);
+
 #if 0
 	// Disable PanelFitter for now
 	addr_t panelFitterControl = PCH_PANEL_FITTER_BASE_REGISTER
