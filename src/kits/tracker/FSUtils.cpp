@@ -636,8 +636,9 @@ ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
 	if (FSIsDeskDir(entry) || FSIsTrashDir(entry) || FSIsRootDir(entry))
 		return false;
 
-	if (!DirectoryMatchesOrContains(entry, B_SYSTEM_DIRECTORY)
+	if ((!DirectoryMatchesOrContains(entry, B_SYSTEM_DIRECTORY)
 		&& !DirectoryMatchesOrContains(entry, B_USER_DIRECTORY))
+		|| DirectoryMatchesOrContains(entry, B_SYSTEM_TEMP_DIRECTORY))
 		// quick way out
 		return true;
 
