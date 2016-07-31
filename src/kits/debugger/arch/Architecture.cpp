@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -24,10 +25,11 @@
 
 
 Architecture::Architecture(TeamMemory* teamMemory, uint8 addressSize,
-	bool bigEndian)
+	size_t debugCpuStateSize, bool bigEndian)
 	:
 	fTeamMemory(teamMemory),
 	fAddressSize(addressSize),
+	fDebugCpuStateSize(debugCpuStateSize),
 	fBigEndian(bigEndian)
 {
 }

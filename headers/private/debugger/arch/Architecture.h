@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef ARCHITECTURE_H
@@ -50,12 +50,17 @@ enum {
 class Architecture : public BReferenceable {
 public:
 								Architecture(TeamMemory* teamMemory,
-									uint8 addressSize, bool bigEndian);
+									uint8 addressSize,
+									size_t debugCpuStateSize,
+									bool bigEndian);
+
 	virtual						~Architecture();
 
 	virtual	status_t			Init();
 
 	inline	uint8				AddressSize() const		{ return fAddressSize; }
+	inline	size_t				DebugCpuStateSize() const
+									{ return fDebugCpuStateSize; }
 
 	inline	bool				IsBigEndian() const		{ return fBigEndian; }
 	inline	bool				IsHostEndian() const;
@@ -136,6 +141,7 @@ public:
 protected:
 			TeamMemory*			fTeamMemory;
 			uint8				fAddressSize;
+			size_t				fDebugCpuStateSize;
 			bool				fBigEndian;
 };
 

@@ -1,7 +1,7 @@
 /*
  * Copyright 2012, Alex Smith, alex@alex-smith.me.uk.
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -144,7 +144,7 @@ struct ArchitectureX8664::FromDwarfRegisterMap : RegisterMap {
 
 ArchitectureX8664::ArchitectureX8664(TeamMemory* teamMemory)
 	:
-	Architecture(teamMemory, 8, false),
+	Architecture(teamMemory, 8, sizeof(x86_64_debug_cpu_state), false),
 	fAssemblyLanguage(NULL),
 	fToDwarfRegisterMap(NULL),
 	fFromDwarfRegisterMap(NULL)

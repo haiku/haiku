@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -127,7 +127,7 @@ struct ArchitectureX86::FromDwarfRegisterMap : RegisterMap {
 
 ArchitectureX86::ArchitectureX86(TeamMemory* teamMemory)
 	:
-	Architecture(teamMemory, 4, false),
+	Architecture(teamMemory, 4, sizeof(x86_debug_cpu_state), false),
 	fFeatureFlags(0),
 	fAssemblyLanguage(NULL),
 	fToDwarfRegisterMap(NULL),
@@ -155,6 +155,9 @@ ArchitectureX86::Init()
 		return B_NO_MEMORY;
 
 #if defined(__INTEL__)
+	// TODO: this needs to be determined/retrieved indirectly from the
+	// target host interface, as in the remote case the CPU features may
+	// differ from those of the local CPU.
 	cpuid_info info;
 	status_t error = get_cpuid(&info, 1, 0);
 	if (error != B_OK)
