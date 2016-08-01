@@ -1825,9 +1825,7 @@ FindPanel::AddOneMimeTypeToMenu(const ShortMimeInfo* info, void* castToMenu)
 			previous->SetLabel(label);
 		}
 
-		menu->AddItem(new IconMenuItem(
-			text, msg, info->InternalName(),
-			B_MINI_ICON));
+		menu->AddItem(new IconMenuItem(text, msg, info->InternalName()));
 	}
 
 	return false;
@@ -1841,7 +1839,8 @@ FindPanel::AddMimeTypesToMenu()
 	itemMessage->AddString("mimetype", kAllMimeTypes);
 
 	IconMenuItem* firstItem = new IconMenuItem(
-		B_TRANSLATE("All files and folders"), itemMessage, NULL);
+		B_TRANSLATE("All files and folders"), itemMessage,
+		static_cast<BBitmap*>(NULL));
 	MimeTypeMenu()->AddItem(firstItem);
 	MimeTypeMenu()->AddSeparatorItem();
 	firstItem->SetMarked(true);
@@ -1890,7 +1889,7 @@ FindPanel::AddMimeTypesToMenu()
 			message->AddString("mimetype", superType);
 
 			MimeTypeMenu()->AddItem(new IconMenuItem(superMenu, message,
-				superType, B_MINI_ICON));
+				superType));
 
 			// the MimeTypeMenu's font is not correct at this time
 			superMenu->SetFont(be_plain_font);
@@ -1987,7 +1986,7 @@ AddOneRecentItem(const entry_ref* ref, void* castToParams)
 	char type[B_MIME_TYPE_LENGTH];
 	BNode node(ref);
 	BNodeInfo(&node).GetType(type);
-	BMenuItem* item = new IconMenuItem(ref->name, message, type, B_MINI_ICON);
+	BMenuItem* item = new IconMenuItem(ref->name, message, type);
 	item->SetTarget(*params->target);
 	params->menu->AddItem(item);
 

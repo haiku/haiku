@@ -3538,8 +3538,7 @@ BContainerWindow::AddMimeMenu(const BMimeType& mimeType, bool isSuperType,
 
 	BMessage* message = new BMessage(kMIMETypeItem);
 	message->AddString("mimetype", mimeType.Type());
-	menu->AddItem(new IconMenuItem(mimeMenu, message, mimeType.Type(),
-		B_MINI_ICON));
+	menu->AddItem(new IconMenuItem(mimeMenu, message, mimeType.Type()));
 
 	return mimeMenu;
 }

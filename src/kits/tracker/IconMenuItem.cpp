@@ -253,12 +253,13 @@ SpecialModelMenuItem::DrawContent()
 
 	It's currently used in the mount and new file template menus.
 */
-IconMenuItem::IconMenuItem(const char* label, BMessage* message, BBitmap* icon)
+IconMenuItem::IconMenuItem(const char* label, BMessage* message, BBitmap* icon,
+	icon_size which)
 	:
 	PositionPassingMenuItem(label, message),
 	fDeviceIcon(icon),
 	fHeightDelta(0),
-	fWhich(icon ? (icon_size)icon->Bounds().IntegerWidth() : B_MINI_ICON)
+	fWhich(which)
 {
 	// IconMenuItem is used in synchronously invoked menus, make sure
 	// we invoke with a timeout

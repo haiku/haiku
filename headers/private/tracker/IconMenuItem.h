@@ -51,13 +51,14 @@ const bigtime_t kSynchMenuInvokeTimeout = 5000000;
 
 class IconMenuItem : public PositionPassingMenuItem {
 	public:
-		IconMenuItem(const char* label, BMessage* message, BBitmap* icon);
+		IconMenuItem(const char* label, BMessage* message, BBitmap* icon,
+			icon_size which = B_MINI_ICON);
 		IconMenuItem(const char* label, BMessage* message,
-			const char* iconType, icon_size which);
+			const char* iconType, icon_size which = B_MINI_ICON);
 		IconMenuItem(const char* label, BMessage* message,
 			const BNodeInfo* nodeInfo, icon_size which);
 		IconMenuItem(BMenu*, BMessage*, const char* iconType,
-			icon_size which);
+			icon_size which = B_MINI_ICON);
 		IconMenuItem(BMessage* data);
 		virtual ~IconMenuItem();
 
