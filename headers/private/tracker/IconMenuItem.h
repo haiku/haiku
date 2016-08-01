@@ -69,7 +69,7 @@ class IconMenuItem : public PositionPassingMenuItem {
 		virtual void DrawContent();
 		virtual void SetMarked(bool mark);
 
-		virtual void SetIcon(BBitmap* icon) { fDeviceIcon = icon; };
+		virtual void SetIcon(BBitmap* icon);
 		BBitmap* Icon() const { return fDeviceIcon; };
 
 		virtual void SetIconSize(icon_size which) { fWhich = which; };

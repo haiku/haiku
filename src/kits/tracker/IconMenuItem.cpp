@@ -257,10 +257,12 @@ IconMenuItem::IconMenuItem(const char* label, BMessage* message, BBitmap* icon,
 	icon_size which)
 	:
 	PositionPassingMenuItem(label, message),
-	fDeviceIcon(icon),
+	fDeviceIcon(NULL),
 	fHeightDelta(0),
 	fWhich(which)
 {
+	SetIcon(icon);
+
 	// IconMenuItem is used in synchronously invoked menus, make sure
 	// we invoke with a timeout
 	SetTimeout(kSynchMenuInvokeTimeout);
@@ -504,4 +506,22 @@ IconMenuItem::SetMarked(bool mark)
 	// update the icon
 	topLevelIconMenuItem->SetIcon(fDeviceIcon);
 	menu->Invalidate();
+}
+
+
+void
+IconMenuItem::SetIcon(BBitmap* icon)
+{
+	if (icon != NULL) {
+		if (fDeviceIcon != NULL)
+			delete fDeviceIcon;
+
+		fDeviceIcon = new BBitmap(BRect(0, 0, fWhich - 1, fWhich - 1),
+			icon->ColorSpace());
+		fDeviceIcon->SetBits(icon->Bits(), icon->BitsLength(), 0,
+			icon->ColorSpace());
+	} else {
+		delete fDeviceIcon;
+		fDeviceIcon = NULL;
+	}
 }
