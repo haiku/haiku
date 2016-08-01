@@ -947,6 +947,10 @@ FindPanel::AttachedToWindow()
 	}
 	fMimeTypeMenu->SetTargetForItems(this);
 
+	BMenuItem* firstItem = fMimeTypeMenu->ItemAt(0);
+	if (firstItem != NULL)
+		firstItem->SetMarked(true);
+
 	if (fDraggableIcon != NULL)
 		fDraggableIcon->SetTarget(BMessenger(this));
 
@@ -1843,7 +1847,6 @@ FindPanel::AddMimeTypesToMenu()
 		static_cast<BBitmap*>(NULL));
 	MimeTypeMenu()->AddItem(firstItem);
 	MimeTypeMenu()->AddSeparatorItem();
-	firstItem->SetMarked(true);
 
 	// add recent MIME types
 
@@ -1915,8 +1918,6 @@ FindPanel::AddMimeTypesToMenu()
 		} else
 			submenu->SetTargetForItems(this);
 	}
-
-	MimeTypeMenu()->SetTargetForItems(this);
 }
 
 
