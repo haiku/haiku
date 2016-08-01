@@ -1806,8 +1806,8 @@ FindPanel::AddOneMimeTypeToMenu(const ShortMimeInfo* info, void* castToMenu)
 
 	BMenuItem* superItem = menu->FindItem(super.Type());
 	if (superItem != NULL) {
-		BMessage* msg = new BMessage(kMIMETypeItem);
-		msg->AddString("mimetype", info->InternalName());
+		BMessage* message = new BMessage(kMIMETypeItem);
+		message->AddString("mimetype", info->InternalName());
 
 		// check to ensure previous item's name differs
 		BMenu* menu = superItem->Submenu();
@@ -1821,10 +1821,11 @@ FindPanel::AddOneMimeTypeToMenu(const ShortMimeInfo* info, void* castToMenu)
 			BMimeType type(previous->Message()->GetString("mimetype", NULL));
 			BString label = ShortMimeInfo(type).ShortDescription();
 			AddSubtype(label, type);
-			previous->SetLabel(label);
+			previous->SetLabel(label.String());
 		}
 
-		menu->AddItem(new IconMenuItem(text, msg, info->InternalName()));
+		menu->AddItem(new IconMenuItem(text.String(), message,
+			info->InternalName()));
 	}
 
 	return false;
