@@ -608,6 +608,177 @@ RemoteDebugSetCpuStateRequest::SaveSpecificInfoToMessage(
 }
 
 
+// #pragma mark - RemoteDebugAddressActionRequest
+
+
+RemoteDebugAddressActionRequest::RemoteDebugAddressActionRequest()
+	:
+	RemoteDebugRequest(),
+	fAddress(0)
+{
+}
+
+
+RemoteDebugAddressActionRequest::~RemoteDebugAddressActionRequest()
+{
+}
+
+
+void
+RemoteDebugAddressActionRequest::SetTo(target_addr_t address)
+{
+	fAddress = address;
+}
+
+
+status_t
+RemoteDebugAddressActionRequest::LoadSpecificInfoFromMessage(
+	const BMessage& data)
+{
+	return data.FindUInt64("address", &fAddress);
+}
+
+
+status_t
+RemoteDebugAddressActionRequest::SaveSpecificInfoToMessage(
+	BMessage& _output) const
+{
+	return _output.AddUInt64("address", fAddress);
+}
+
+
+// #pragma mark - RemoteDebugInstallBreakpointRequest
+
+
+RemoteDebugInstallBreakpointRequest::RemoteDebugInstallBreakpointRequest()
+	:
+	RemoteDebugAddressActionRequest()
+{
+}
+
+
+RemoteDebugInstallBreakpointRequest::~RemoteDebugInstallBreakpointRequest()
+{
+}
+
+
+remote_request_type
+RemoteDebugInstallBreakpointRequest::Type() const
+{
+	return REMOTE_REQUEST_TYPE_INSTALL_BREAKPOINT;
+}
+
+
+// #pragma mark - RemoteDebugUninstallBreakpointRequest
+
+
+RemoteDebugUninstallBreakpointRequest::RemoteDebugUninstallBreakpointRequest()
+	:
+	RemoteDebugAddressActionRequest()
+{
+}
+
+
+RemoteDebugUninstallBreakpointRequest::~RemoteDebugUninstallBreakpointRequest()
+{
+}
+
+remote_request_type
+RemoteDebugUninstallBreakpointRequest::Type() const
+{
+	return REMOTE_REQUEST_TYPE_UNINSTALL_BREAKPOINT;
+}
+
+
+// #pragma mark - RemoteDebugInstallWatchpointRequest
+
+
+RemoteDebugInstallWatchpointRequest::RemoteDebugInstallWatchpointRequest()
+	:
+	RemoteDebugRequest(),
+	fAddress(0),
+	fWatchType(B_DATA_READ_WATCHPOINT),
+	fLength(0)
+{
+}
+
+
+RemoteDebugInstallWatchpointRequest::~RemoteDebugInstallWatchpointRequest()
+{
+}
+
+
+void
+RemoteDebugInstallWatchpointRequest::SetTo(target_addr_t address, uint32 type,
+	int32 length)
+{
+	fAddress = address;
+	fWatchType = type;
+	fLength = length;
+}
+
+
+remote_request_type
+RemoteDebugInstallWatchpointRequest::Type() const
+{
+	return REMOTE_REQUEST_TYPE_INSTALL_WATCHPOINT;
+}
+
+
+status_t
+RemoteDebugInstallWatchpointRequest::LoadSpecificInfoFromMessage(
+	const BMessage& data)
+{
+	status_t error = data.FindUInt64("address", &fAddress);
+	if (error != B_OK)
+		return error;
+
+	error = data.FindUInt32("watchtype", &fWatchType);
+	if (error != B_OK)
+		return error;
+
+	return data.FindInt32("length", &fLength);
+}
+
+
+status_t
+RemoteDebugInstallWatchpointRequest::SaveSpecificInfoToMessage(
+	BMessage& _output) const
+{
+	status_t error = _output.AddUInt64("address", fAddress);
+	if (error != B_OK)
+		return error;
+
+	error = _output.AddUInt32("watchtype", fWatchType);
+	if (error != B_OK)
+		return error;
+
+	return _output.AddInt32("length", fLength);
+}
+
+
+// #pragma mark - RemoteDebugUninstallWatchpointRequest
+
+
+RemoteDebugUninstallWatchpointRequest::RemoteDebugUninstallWatchpointRequest()
+	:
+	RemoteDebugAddressActionRequest()
+{
+}
+
+
+RemoteDebugUninstallWatchpointRequest::~RemoteDebugUninstallWatchpointRequest()
+{
+}
+
+
+remote_request_type
+RemoteDebugUninstallWatchpointRequest::Type() const
+{
+	return REMOTE_REQUEST_TYPE_UNINSTALL_WATCHPOINT;
+}
+
+
 // #pragma mark - RemoteDebugReadMemoryResponse
 
 
