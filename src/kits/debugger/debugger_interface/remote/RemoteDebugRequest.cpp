@@ -6,14 +6,16 @@
 
 #include "RemoteDebugRequest.h"
 
-#include "Architecture.h"
-#include "CpuState.h"
-
-#include <AutoDeleter.h>
+#include <stdlib.h>
 
 #include <Message.h>
 
-#include <stdlib.h>
+#include <debugger.h>
+
+#include <AutoDeleter.h>
+
+#include "Architecture.h"
+#include "CpuState.h"
 
 
 // #pragma mark - RemoteDebugRequest
