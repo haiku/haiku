@@ -940,10 +940,10 @@ FindPanel::AttachedToWindow()
 	fVolMenu->SetTargetForItems(this);
 
 	// set target for MIME type items
-	for (int32 index = MimeTypeMenu()->CountItems();index-- > 2;) {
+	for (int32 index = MimeTypeMenu()->CountItems(); index-- > 2;) {
 		BMenu* submenu = MimeTypeMenu()->ItemAt(index)->Submenu();
 		if (submenu != NULL)
-				submenu->SetTargetForItems(this);
+			submenu->SetTargetForItems(this);
 	}
 	fMimeTypeMenu->SetTargetForItems(this);
 
@@ -1813,13 +1813,12 @@ FindPanel::AddOneMimeTypeToMenu(const ShortMimeInfo* info, void* castToMenu)
 		BMenu* menu = superItem->Submenu();
 		BMenuItem* previous = menu->ItemAt(menu->CountItems() - 1);
 		BString text = info->ShortDescription();
-		if (previous != NULL && strcasecmp(previous->Label(),
-				info->ShortDescription()) == 0) {
+		if (previous != NULL
+			&& strcasecmp(previous->Label(), info->ShortDescription()) == 0) {
 			AddSubtype(text, type);
 
 			// update the previous item as well
-			BMimeType type(previous->Message()->GetString("mimetype",
-				NULL));
+			BMimeType type(previous->Message()->GetString("mimetype", NULL));
 			BString label = ShortMimeInfo(type).ShortDescription();
 			AddSubtype(label, type);
 			previous->SetLabel(label);

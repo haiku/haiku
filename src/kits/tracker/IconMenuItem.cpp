@@ -279,7 +279,7 @@ IconMenuItem::IconMenuItem(const char* label, BMessage* message,
 		fDeviceIcon = new BBitmap(BRect(0, 0, which - 1, which - 1),
 			kDefaultIconDepth);
 
-		if (nodeInfo->GetTrackerIcon(fDeviceIcon, B_MINI_ICON)) {
+		if (nodeInfo->GetTrackerIcon(fDeviceIcon, B_MINI_ICON) != B_OK) {
 			delete fDeviceIcon;
 			fDeviceIcon = NULL;
 		}
