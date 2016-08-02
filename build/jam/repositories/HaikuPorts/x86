@@ -8,6 +8,8 @@ RemotePackageRepository HaikuPorts
 	caladea-20130214-3
 	carlito-20130920-1
 	dejavu-2.34-1
+	docbook_xml_dtd-4.5-2
+	docbook_xsl_stylesheets-1.78.1-1
 	texi2html-1.82-2
 	timgmsoundfont-fixed-5
 	unknown_horizons-2014.1-1
@@ -130,6 +132,7 @@ RemotePackageRepository HaikuPorts
 	graphite2_devel-1.3.8-1
 	grep-2.21-1
 	groff-1.20.1-3
+	gtk_doc-1.20-1
 	gutenprint-5.2.11-2
 	gutenprint_devel-5.2.11-2
 	gzip-1.6-2
@@ -151,6 +154,7 @@ RemotePackageRepository HaikuPorts
 	imagemagick-6.9.4.0-1
 	imagemagick_devel-6.9.4.0-1
 	intltool-0.40.6-4
+	itstool-2.0.2-1
 	jam-2.5_2012_10_12-2
 	jasper-1.900.1-4
 	jasper_devel-1.900.1-4
@@ -199,6 +203,8 @@ RemotePackageRepository HaikuPorts
 	libpng16_devel-1.6.20-1
 	libqt4-4.8.7-5
 	libqt4_devel-4.8.7-5
+	libsamplerate-0.1.8-3
+	libsamplerate_devel-0.1.8-3
 	libsanta-3.0.1-1
 	libsanta_devel-3.0.1-1
 	libsdl-1.2.15-9
@@ -517,6 +523,7 @@ RemotePackageRepository HaikuPorts
 	graphite2
 	grep
 	groff
+	gtk_doc
 	gutenprint
 	gzip
 	harfbuzz
@@ -527,6 +534,7 @@ RemotePackageRepository HaikuPorts
 	icu56
 	imagemagick
 	intltool
+	itstool
 	jam
 	jasper
 	jpeg
@@ -553,6 +561,7 @@ RemotePackageRepository HaikuPorts
 	libpcre0
 	libpng
 	libpng16
+	libsamplerate
 	libsanta
 	libsdl
 	libsndfile
