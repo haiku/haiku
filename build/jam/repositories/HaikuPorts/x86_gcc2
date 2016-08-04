@@ -127,6 +127,7 @@ RemotePackageRepository HaikuPorts
 	flac-1.3.1-1
 	flac_devel-1.3.1-1
 	flex-2.5.39-1
+	fluidlite_devel-1.0.0-1
 	fluidsynth-1.1.6-2
 	fluidsynth_devel-1.1.6-2
 	fontboy-0.9.7-3
@@ -644,6 +645,7 @@ RemotePackageRepository HaikuPorts
 	flac_x86-1.3.1-1
 	flac_x86_devel-1.3.1-1
 	flare_x86-0.19-3
+	fluidlite_x86_devel-1.0.0-1
 	fluidsynth_x86-1.1.6-2
 	fluidsynth_x86_devel-1.1.6-2
 	fontconfig_x86-2.11.1-3
@@ -1094,6 +1096,7 @@ RemotePackageRepository HaikuPorts
 	flac
 	flare_x86
 	flex
+	fluidlite
 	fluidsynth
 	fluidsynth_x86
 	fontboy
