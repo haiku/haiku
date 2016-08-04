@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2016, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -105,7 +105,7 @@ ServerApp::ServerApp(Desktop* desktop, port_id clientReplyPort,
 	fViewCursor(NULL),
 	fCursorHideLevel(0),
 	fIsActive(false),
-	fMemoryAllocator(new ClientMemoryAllocator(this))
+	fMemoryAllocator(new (std::nothrow) ClientMemoryAllocator(this))
 {
 	if (fSignature == "")
 		fSignature = "application/no-signature";
@@ -194,7 +194,8 @@ ServerApp::~ServerApp()
 		fWindowListLock.Lock();
 	}
 
-	fMemoryAllocator->Detach();
+	if (fMemoryAllocator != NULL)
+		fMemoryAllocator->Detach();
 	fMapLocker.Lock();
 
 	while (!fBitmapMap.empty())
@@ -204,7 +205,8 @@ ServerApp::~ServerApp()
 		fPictureMap.begin()->second->SetOwner(NULL);
 
 	fDesktop->GetCursorManager().DeleteCursors(fClientTeam);
-	fMemoryAllocator->ReleaseReference();
+	if (fMemoryAllocator != NULL)
+		fMemoryAllocator->ReleaseReference();
 
 	STRACE(("ServerApp %s::~ServerApp(): Exiting\n", Signature()));
 }
@@ -223,6 +225,9 @@ ServerApp::InitCheck()
 
 	if (fWindowListLock.Sem() < B_OK)
 		return fWindowListLock.Sem();
+
+	if (fMemoryAllocator == NULL)
+		return B_NO_MEMORY;
 
 	return B_OK;
 }
@@ -3318,10 +3323,12 @@ ServerApp::_CreateWindow(int32 code, BPrivate::LinkReceiver& link,
 	if (window != NULL) {
 		status = window->Init(frame, (window_look)look, (window_feel)feel,
 			flags, workspaces);
-		if (status == B_OK && !window->Run()) {
-			syslog(LOG_ERR, "ServerApp::_CreateWindow() - failed to run the "
-				"window thread\n");
-			status = B_ERROR;
+		if (status == B_OK) {
+			status = window->Run();
+			if (status != B_OK) {
+				syslog(LOG_ERR, "ServerApp::_CreateWindow() - failed to run "
+					"the window thread\n");
+			}
 		}
 
 		if (status != B_OK)

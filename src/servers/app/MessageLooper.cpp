@@ -1,5 +1,5 @@
 /*
- * Copyright 2005-2007, Haiku.
+ * Copyright 2005-2016, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,7 +30,7 @@ MessageLooper::~MessageLooper()
 }
 
 
-bool
+status_t
 MessageLooper::Run()
 {
 	BAutolock locker(this);
@@ -44,17 +44,17 @@ MessageLooper::Run()
 	fThread = spawn_thread(_message_thread, name, B_DISPLAY_PRIORITY, this);
 	if (fThread < B_OK) {
 		fQuitting = true;
-		return false;
+		return fThread;
 	}
 
 	if (resume_thread(fThread) != B_OK) {
 		fQuitting = true;
 		kill_thread(fThread);
 		fThread = -1;
-		return false;
+		return B_BAD_THREAD_ID;
 	}
 
-	return true;
+	return B_OK;
 }
 
 

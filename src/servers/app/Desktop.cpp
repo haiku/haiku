@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku.
+ * Copyright 2001-2016, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -2539,10 +2539,16 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 			if (link.ReadString(&appSignature) != B_OK)
 				break;
 
-			ServerApp* app = new ServerApp(this, clientReplyPort,
+			ServerApp* app = new (std::nothrow) ServerApp(this, clientReplyPort,
 				clientLooperPort, clientTeamID, htoken, appSignature);
-			if (app->InitCheck() == B_OK
-				&& app->Run()) {
+			status_t status = B_OK;
+			if (app == NULL)
+				status = B_NO_MEMORY;
+			if (status == B_OK)
+				status = app->InitCheck();
+			if (status == B_OK)
+				status = app->Run();
+			if (status == B_OK) {
 				// add the new ServerApp to the known list of ServerApps
 				fApplicationsLock.Lock();
 				fApplications.AddItem(app);
@@ -2553,7 +2559,7 @@ Desktop::_DispatchMessage(int32 code, BPrivate::LinkReceiver& link)
 				// if everything went well, ServerApp::Run() will notify
 				// the client - but since it didn't, we do it here
 				BPrivate::LinkSender reply(clientReplyPort);
-				reply.StartMessage(B_ERROR);
+				reply.StartMessage(status);
 				reply.Flush();
 			}
 

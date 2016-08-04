@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2015, Haiku, Inc.
+ * Copyright 2001-2016, Haiku, Inc.
  * Distributed under the terms of the MIT license.
  *
  * Authors:
@@ -176,10 +176,8 @@ AppServer::_CreateDesktop(uid_t userID, const char* targetScreen)
 		desktop = new Desktop(userID, targetScreen);
 
 		status_t status = desktop->Init();
-		if (status == B_OK) {
-			if (!desktop->Run())
-				status = B_ERROR;
-		}
+		if (status == B_OK)
+			status = desktop->Run();
 		if (status == B_OK && !fDesktops.AddItem(desktop))
 			status = B_NO_MEMORY;
 
