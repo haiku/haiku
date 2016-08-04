@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2016, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -341,7 +341,7 @@ CursorManager::GetCursor(BCursorID which)
 	\param token ID of the cursor to find
 	\return The cursor or NULL if not found
 */
-ServerCursor *
+ServerCursor*
 CursorManager::FindCursor(int32 token)
 {
 	if (!Lock())
@@ -357,6 +357,11 @@ CursorManager::FindCursor(int32 token)
 }
 
 
+/*!	\brief Initializes a predefined system cursor.
+
+	This method must only be called in the CursorManager's constructor,
+	as it may throw exceptions.
+*/
 void
 CursorManager::_InitCursor(ServerCursor*& cursorMember,
 	const uint8* cursorBits, BCursorID id, const BPoint& hotSpot)

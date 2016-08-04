@@ -481,6 +481,8 @@ Desktop::RegisterListener(DesktopListener* listener)
 }
 
 
+/*!	This method is allowed to throw exceptions.
+*/
 status_t
 Desktop::Init()
 {

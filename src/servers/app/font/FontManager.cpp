@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2009, Haiku.
+ * Copyright 2001-2016, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,13 +7,13 @@
  *		Axel Dörfler, axeld@pinc-software.de
  */
 
+
 /*!	Manages font families and styles */
 
 
-#include "FontFamily.h"
 #include "FontManager.h"
-#include "ServerConfig.h"
-#include "ServerFont.h"
+
+#include <new>
 
 #include <Autolock.h>
 #include <Directory.h>
@@ -25,7 +25,10 @@
 #include <Path.h>
 #include <String.h>
 
-#include <new>
+#include "FontFamily.h"
+#include "ServerConfig.h"
+#include "ServerFont.h"
+
 
 //#define TRACE_FONT_MANAGER
 #ifdef TRACE_FONT_MANAGER
@@ -608,8 +611,8 @@ FontManager::_AddFont(font_directory& directory, BEntry& entry)
 	FTRACE(("\tadd style: %s, %s\n", face->family_name, face->style_name));
 
 	// the FontStyle takes over ownership of the FT_Face object
-	FontStyle *style = new FontStyle(nodeRef, path.Path(), face);
-	if (!family->AddStyle(style)) {
+	FontStyle *style = new (std::nothrow) FontStyle(nodeRef, path.Path(), face);
+	if (style == NULL || !family->AddStyle(style)) {
 		delete style;
 		delete family;
 		return B_NO_MEMORY;

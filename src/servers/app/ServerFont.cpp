@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014, Haiku.
+ * Copyright 2001-2016, Haiku.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -30,6 +30,7 @@
 
 #include <stdio.h>
 #include <string.h>
+
 
 // functions needed to convert a freetype vector graphics to a BShape
 inline BPoint
@@ -401,7 +402,7 @@ ServerFont::PutTransformedFace(FT_Face face) const
 
 status_t
 ServerFont::GetGlyphShapes(const char charArray[], int32 numChars,
-	BShape *shapeArray[]) const
+	BShape* shapeArray[]) const
 {
 	if (!charArray || numChars <= 0 || !shapeArray)
 		return B_BAD_DATA;
@@ -418,9 +419,13 @@ ServerFont::GetGlyphShapes(const char charArray[], int32 numChars,
 	funcs.shift = 0;
 	funcs.delta = 0;
 
-	const char *string = charArray;
+	const char* string = charArray;
 	for (int i = 0; i < numChars; i++) {
-		shapeArray[i] = new BShape();
+		shapeArray[i] = new (std::nothrow) BShape();
+		if (shapeArray[i] == NULL) {
+			PutTransformedFace(face);
+			return B_NO_MEMORY;
+		}
 		FT_Load_Char(face, UTF8ToCharCode(&string), FT_LOAD_NO_BITMAP);
 		FT_Outline outline = face->glyph->outline;
 		FT_Outline_Decompose(&outline, &funcs, shapeArray[i]);
@@ -871,7 +876,10 @@ ServerFont::TruncateString(BString* inOut, uint32 mode, float width) const
 	int32 numChars = inOut->CountChars();
 
 	// get the escapement of each glyph in font units
-	float* escapementArray = new float[numChars];
+	float* escapementArray = new (std::nothrow) float[numChars];
+	if (escapementArray == NULL)
+		return;
+
 	static escapement_delta delta = (escapement_delta){ 0.0, 0.0 };
 	if (GetEscapements(inOut->String(), inOut->Length(), numChars, delta,
 		escapementArray) == B_OK) {
