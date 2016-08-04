@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.07.23
-#	Date:    2016-07-23 03:15:02
+#	Version: 2016.07.31
+#	Date:    2016-07-31 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -16840,23 +16840,31 @@
 	16c9  BCM57302 NetXtreme-C Dual-port 10Gb/25Gb Ethernet
 	16ca  BCM57304 NetXtreme-C Dual-port 10Gb/25Gb/40Gb/50Gb Ethernet
 	16cb  BCM57304 NetXtreme-C Ethernet Virtual Function
+	16cc  BCM57417 NetXtreme-E Ethernet Partition
 	16ce  BCM57311 NetXtreme-C Single-port 10Gb RDMA Ethernet
 	16cf  BCM57312 NetXtreme-C Dual-port 10Gb/25Gb RDMA Ethernet
 	16d0  BCM57402 NetXtreme-E Dual-port 10Gb Ethernet
 	16d1  BCM57404 NetXtreme-E Dual-port 10Gb/25Gb Ethernet
 	16d2  BCM57406 NetXtreme-E Dual-port 10GBase-T Ethernet
 	16d3  BCM57404 NetXtreme-E Ethernet Virtual Function
-	16d4  BCM57404 NetXtreme-E Ethernet Partition
+	16d4  BCM57402 NetXtreme-E Ethernet Partition
+	16d5  BCM57407 NetXtreme-E Dual-port 10GBase-T Ethernet
 	16d6  BCM57412 NetXtreme-E Dual-port 10Gb RDMA Ethernet
 	16d7  BCM57414 NetXtreme-E Dual-port 10Gb/25Gb RDMA Ethernet
 	16d8  BCM57416 NetXtreme-E Dual-port 10GBase-T RDMA Ethernet
 	16d9  BCM57417 NetXtreme-E Dual-port 10GBase-T RDMA Ethernet
 	16dc  BCM57414 NetXtreme-E Ethernet Virtual Function
 	16dd  NetLink BCM5781 Gigabit Ethernet PCI Express
-	16de  BCM57414 NetXtreme-E Ethernet Partition
+	16de  BCM57412 NetXtreme-E Ethernet Partition
 	16df  BCM57314 NetXtreme-C Dual-port 10Gb/25Gb/40Gb/50Gb RDMA Ethernet
 	16e1  BCM57314 NetXtreme-C Ethernet Virtual Function
 	16e2  BCM57417 NetXtreme-E Dual-port 10Gb/25Gb RDMA Ethernet
+	16e3  BCM57416 NetXtreme-E Dual-port 10Gb RDMA Ethernet
+	16e7  BCM57404 NetXtreme-E Ethernet Partition
+	16e8  BCM57406 NetXtreme-E Ethernet Partition
+	16e9  BCM57407 NetXtreme-E Dual-port 25Gb Ethernet
+	16ec  BCM57414 NetXtreme-E Ethernet Partition
+	16ee  BCM57416 NetXtreme-E Ethernet Partition
 	16f3  NetXtreme BCM5727 Gigabit Ethernet PCIe
 	16f7  NetXtreme BCM5753 Gigabit Ethernet PCI Express
 	16fd  NetXtreme BCM5753M Gigabit Ethernet PCI Express
@@ -20110,6 +20118,7 @@
 	100d  AR-ARKA-FX0 [Arkville 32B DPDK Data Mover]
 	100e  AR-ARKA-FX1 [Arkville 64B DPDK Data Mover]
 	4200  A5PL-E1-10GETI [10 GbE Ethernet Traffic Instrument]
+1d78  DERA
 1de1  Tekram Technology Co.,Ltd.
 	0391  TRM-S1040 [DC-315 / DC-395 series]
 	2020  DC-390
@@ -22156,6 +22165,7 @@
 		103c 2147  Ethernet 10Gb 1-port 561i Adapter
 		103c 2159  Ethernet 10Gb 2-port 562i Adapter
 		108e 7b11  Ethernet Server Adapter X520-2
+		1170 004c  82599 DP 10G Mezzanine Adapter
 		1734 11a9  10 Gigabit Dual Port Network Connection
 		17aa 1071  ThinkServer X520-2 AnyFabric
 		17aa 4007  82599ES 10-Gigabit SFI/SFP+ Network Connection
@@ -22166,6 +22176,7 @@
 		8086 0008  Ethernet OCP Server Adapter X520-2
 		8086 000a  Ethernet Server Adapter X520-1
 		8086 000c  Ethernet Server Adapter X520-2
+		8086 10a6  82599ES 10Gb 2 port Server Adapter X520-DA2
 		8086 7a11  Ethernet Server Adapter X520-2
 		8086 7a12  Ethernet Server Adapter X520-2
 	10fc  82599 10 Gigabit Dual Port Network Connection
