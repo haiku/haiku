@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Copyright 2002-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,12 +10,14 @@
 #define COLOR_PREVIEW_H_
 
 
-#include <View.h>
-#include <Message.h>
-#include <Invoker.h>
+#include <Control.h>
 
 
-class ColorPreview : public BView
+class BMessage;
+class BMessageRunner;
+
+
+class ColorPreview : public BControl
 {
 public:
 							ColorPreview(BRect frame, BMessage *msg,
@@ -24,24 +26,28 @@ public:
 								uint32 flags = B_WILL_DRAW);
 							~ColorPreview(void);
 
-	virtual	void			Draw(BRect update);
+	virtual	void			Draw(BRect updateRect);
 	virtual	void			MessageReceived(BMessage* message);
-	virtual	void			SetTarget(BHandler* target);
-	virtual	void			SetEnabled(bool value);
+	virtual	void			MouseDown(BPoint where);
+	virtual	void			MouseMoved(BPoint where, uint32 transit,
+								const BMessage* message);
+	virtual	void			MouseUp(BPoint where);
 
 			rgb_color		Color(void) const;
-			void			SetColor(rgb_color col);
-			void			SetColor(uint8 r,uint8 g, uint8 b);
+			void			SetColor(rgb_color color);
+			void			SetColor(uint8 r, uint8 g, uint8 b);
 
-			void			SetMode(bool is_rectangle);
+			void			SetMode(bool rectangle);
 
-protected:
-			BInvoker*		invoker;
+private:
+			void			_DragColor(BPoint where);
 
-			bool			is_enabled;
-			bool			is_rect;
-			rgb_color		disabledcol;
-			rgb_color		currentcol;
+			rgb_color		fColor;
+			rgb_color		fDisabledColor;
+
+			BMessageRunner*	fMessageRunner;
+
+			bool			fIsRectangle;
 };
 
 #endif	// COLOR_PREVIEW_H_

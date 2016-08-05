@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2013 Haiku Inc. All rights reserved.
+ * Copyright 2002-2016 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -10,41 +10,55 @@
 
 #include "ColorPreview.h"
 
+#include <algorithm>
 
-ColorPreview::ColorPreview(BRect frame, BMessage* message,
-	uint32 resizingMode, uint32 flags)
+#include <stdio.h>
+
+#include <Bitmap.h>
+#include <Message.h>
+#include <MessageRunner.h>
+#include <View.h>
+#include <Window.h>
+
+
+
+static const int32 kMsgMessageRunner = 'MsgR';
+
+
+//	#pragma mark - ColorPreview
+
+
+ColorPreview::ColorPreview(BRect frame, BMessage* message, uint32 resizingMode,
+	uint32 flags)
 	:
-	BView(frame,"ColorPreview", resizingMode, flags | B_WILL_DRAW)
+	BControl(frame, "ColorPreview", "", message, resizingMode,
+		flags | B_WILL_DRAW),
+	fColor(ui_color(B_PANEL_BACKGROUND_COLOR)),
+	fDisabledColor((rgb_color){ 128, 128, 128 }),
+	fMessageRunner(NULL),
+	fIsRectangle(true)
 {
 	SetViewColor(B_TRANSPARENT_COLOR);
 	SetLowColor(0, 0, 0);
-	invoker = new BInvoker(message, this);
-	disabledcol.red = 128;
-	disabledcol.green = 128;
-	disabledcol.blue = 128;
-	disabledcol.alpha = 255;
-	is_enabled = true;
-	is_rect = true;
 }
 
 
 ColorPreview::~ColorPreview(void)
 {
-	delete invoker;
 }
 
 
 void
-ColorPreview::Draw(BRect update)
+ColorPreview::Draw(BRect updateRect)
 {
 	rgb_color color;
-	if (is_enabled)
-		color = currentcol;
+	if (IsEnabled())
+		color = fColor;
 	else
-		color = disabledcol;
+		color = fDisabledColor;
 
-	if (is_rect) {
-		if (is_enabled) {
+	if (fIsRectangle) {
+		if (IsEnabled()) {
 			rgb_color background = ui_color(B_PANEL_BACKGROUND_COLOR);
 			rgb_color shadow = tint_color(background, B_DARKEN_1_TINT);
 			rgb_color darkShadow = tint_color(background, B_DARKEN_3_TINT);
@@ -85,11 +99,12 @@ ColorPreview::Draw(BRect update)
 	} else {
 		// fill background
 		SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
-		FillRect(update);
+		FillRect(updateRect);
 
 		SetHighColor(color);
 		FillEllipse(Bounds());
-		if (is_enabled)
+
+		if (IsEnabled())
 			StrokeEllipse(Bounds(), B_SOLID_LOW);
 	}
 }
@@ -108,60 +123,158 @@ ColorPreview::MessageReceived(BMessage* message)
 			col = (rgb_color*)ptr;
 			SetHighColor(*col);
 		}
+	} else if ((int32)message->what == kMsgMessageRunner) {
+		BPoint where;
+		uint32 buttons;
+		GetMouse(&where, &buttons);
+
+		_DragColor(where);
 	}
 
-	BView::MessageReceived(message);
+	BControl::MessageReceived(message);
 }
 
 
 void
-ColorPreview::SetEnabled(bool value)
+ColorPreview::MouseDown(BPoint where)
 {
-	if (is_enabled != value) {
-		is_enabled = value;
+	BWindow* window = Window();
+	if (window != NULL)
+		window->Activate();
+
+	fMessageRunner = new BMessageRunner(this, new BMessage(kMsgMessageRunner),
+		300000, 1);
+
+	SetMouseEventMask(B_POINTER_EVENTS,
+		B_SUSPEND_VIEW_FOCUS | B_LOCK_WINDOW_FOCUS);
+
+	BRect rect = Bounds().InsetByCopy(2.0f, 2.0f);
+	rect.top = roundf(rect.bottom / 2.0f + 1);
+
+	if (rect.Contains(where)) {
 		Invalidate();
+		Invoke();
 	}
+
+	BControl::MouseDown(where);
 }
 
 
 void
-ColorPreview::SetTarget(BHandler* target)
+ColorPreview::MouseMoved(BPoint where, uint32 transit, const BMessage* message)
 {
-	invoker->SetTarget(target);
+	if (fMessageRunner != NULL)
+		_DragColor(where);
+
+	BControl::MouseMoved(where, transit, message);
+}
+
+
+void
+ColorPreview::MouseUp(BPoint where)
+{
+	delete fMessageRunner;
+	fMessageRunner = NULL;
+
+	BControl::MouseUp(where);
 }
 
 
 rgb_color
 ColorPreview::Color(void) const
 {
-	return currentcol;
+	return fColor;
 }
 
 
 void
-ColorPreview::SetColor(rgb_color col)
+ColorPreview::SetColor(rgb_color color)
 {
-	SetHighColor(col);
-	currentcol = col;
-	Draw(Bounds());
-	invoker->Invoke();
+	color.alpha = 255;
+
+	SetHighColor(color);
+	fColor = color;
+
+	Invalidate();
+	Invoke();
 }
 
 
 void
-ColorPreview::SetColor(uint8 r,uint8 g, uint8 b)
+ColorPreview::SetColor(uint8 red, uint8 green, uint8 blue)
 {
-	SetHighColor(r,g,b);
-	currentcol.red = r;
-	currentcol.green = g;
-	currentcol.blue = b;
-	Draw(Bounds());
-	invoker->Invoke();
+	SetHighColor(red, green, blue);
+	fColor.red = red;
+	fColor.green = green;
+	fColor.blue = blue;
+	fColor.alpha = 255;
+
+	Invalidate();
+	Invoke();
 }
 
 
 void
-ColorPreview::SetMode(bool is_rectangle)
+ColorPreview::SetMode(bool rectangle)
 {
-	is_rect = is_rectangle;
+	fIsRectangle = rectangle;
+}
+
+
+//	#pragma mark - ColorPreview private methods
+
+
+void
+ColorPreview::_DragColor(BPoint where)
+{
+	char hexString[7];
+	sprintf(hexString, "#%.2X%.2X%.2X", fColor.red, fColor.green, fColor.blue);
+
+	BMessage message(B_PASTE);
+	message.AddData("text/plain", B_MIME_TYPE, &hexString, sizeof(hexString));
+	message.AddData("RGBColor", B_RGB_COLOR_TYPE, &fColor, sizeof(fColor));
+
+	BRect rect(0.0f, 0.0f, 20.0f, 20.0f);
+
+	BBitmap* bitmap = new BBitmap(rect, B_RGB32, true);
+	if (bitmap->Lock()) {
+		BView* view = new BView(rect, "", B_FOLLOW_NONE, B_WILL_DRAW);
+		bitmap->AddChild(view);
+
+		view->SetHighColor(B_TRANSPARENT_COLOR);
+		view->FillRect(view->Bounds());
+
+		++rect.top;
+		++rect.left;
+
+		view->SetHighColor(0, 0, 0, 100);
+		view->FillRect(rect);
+		rect.OffsetBy(-1.0f, -1.0f);
+
+		view->SetHighColor(std::min(255, (int)(1.2 * fColor.red + 40)),
+			std::min(255, (int)(1.2 * fColor.green + 40)),
+			std::min(255, (int)(1.2 * fColor.blue + 40)));
+		view->StrokeRect(rect);
+
+		++rect.left;
+		++rect.top;
+
+		view->SetHighColor((int32)(0.8 * fColor.red),
+			(int32)(0.8 * fColor.green),
+			(int32)(0.8 * fColor.blue));
+		view->StrokeRect(rect);
+
+		--rect.right;
+		--rect.bottom;
+
+		view->SetHighColor(fColor.red, fColor.green, fColor.blue);
+		view->FillRect(rect);
+		view->Sync();
+
+		bitmap->Unlock();
+	}
+
+	DragMessage(&message, bitmap, B_OP_ALPHA, BPoint(14.0f, 14.0f));
+
+	MouseUp(where);
 }
