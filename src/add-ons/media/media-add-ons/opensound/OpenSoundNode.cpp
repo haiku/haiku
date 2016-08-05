@@ -99,6 +99,8 @@ public:
 	{
 		CALLED();
 
+		fNode->_StopPlayThread(this);
+
 		RecycleAllBuffers();
 	}
 
@@ -203,6 +205,8 @@ public:
 	~NodeOutput()
 	{
 		CALLED();
+
+		fNode->_StopRecThread(this);
 
 		FreeBuffers();
 	}

@@ -31,6 +31,8 @@ class OpenSoundNode : public BBufferConsumer, public BBufferProducer,
 private:
 	class NodeInput;
 	class NodeOutput;
+	friend class NodeInput;
+	friend class NodeOutput;
 
 protected:
 	virtual						~OpenSoundNode();
