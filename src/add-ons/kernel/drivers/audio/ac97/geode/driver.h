@@ -48,7 +48,7 @@ extern pci_module_info* gPci;
 */
 struct geode_controller {
 	struct pci_info	pci_info;
-	vint32			opened;
+	int32			opened;
 	const char*		devfs_path;
 
 	uint32			nabmbar;
