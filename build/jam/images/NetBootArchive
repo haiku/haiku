@@ -23,7 +23,7 @@ SYSTEM_ADD_ONS_BUS_MANAGERS = [ FFilterByBuildFeatures
 	pci isa@x86 ide@ide ata@ata
 	scsi config_manager agp_gart
 ] ;
-SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs fat iso9660 ;
+SYSTEM_ADD_ONS_FILE_SYSTEMS = bfs packagefs ;
 
 
 # modules
@@ -71,7 +71,7 @@ AddFilesToNetBootArchive home config settings kernel drivers
 
 # add-ons
 AddFilesToNetBootArchive system add-ons kernel network
-	: <net>notifications stack ;
+	: stack ;
 AddFilesToNetBootArchive system add-ons kernel network devices
 	: $(SYSTEM_NETWORK_DEVICES) ;
 AddFilesToNetBootArchive
@@ -93,7 +93,6 @@ AddBootModuleSymlinksToNetBootArchive
 	openpic@ppc
 	generic_x86@x86
 #	nbd
-	<net>notifications
 	remote_disk
 	$(SYSTEM_ADD_ONS_DRIVERS_NET)
 	stack

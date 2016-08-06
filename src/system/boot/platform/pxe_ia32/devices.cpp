@@ -75,7 +75,8 @@ platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 				platform_free_region(data, size);
 				return B_NO_MEMORY;
 			}
-	
+
+			gBootVolume.SetBool(BOOT_VOLUME_BOOTED_FROM_IMAGE, true);
 			devicesList->Add(disk);
 			return B_OK;
 		} else {
