@@ -1,0 +1,7 @@
+SubDir HAIKU_TOP src add-ons kernel debugger netconsole ;
+
+UsePrivateHeaders kernel ;
+
+KernelAddon <kdebug>netconsole :
+	netconsole.cpp
+	;
