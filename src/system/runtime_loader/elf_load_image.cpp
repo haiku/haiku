@@ -375,7 +375,7 @@ status_t
 parse_elf_header(elf_ehdr* eheader, int32* _pheaderSize,
 	int32* _sheaderSize)
 {
-	if (memcmp(eheader->e_ident, ELF_MAGIC, 4) != 0)
+	if (memcmp(eheader->e_ident, ELFMAG, 4) != 0)
 		return B_NOT_AN_EXECUTABLE;
 
 	if (eheader->e_ident[4] != ELF_CLASS)

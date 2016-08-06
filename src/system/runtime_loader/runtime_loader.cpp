@@ -629,7 +629,7 @@ get_executable_architecture(int fd, const char** _architecture)
 		return B_NOT_AN_EXECUTABLE;
 
 	// check whether this is indeed an ELF file
-	if (memcmp(elfHeader.e_ident, ELF_MAGIC, 4) != 0)
+	if (memcmp(elfHeader.e_ident, ELFMAG, 4) != 0)
 		return B_NOT_AN_EXECUTABLE;
 
 	// check the architecture

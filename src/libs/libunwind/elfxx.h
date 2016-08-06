@@ -42,9 +42,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.  */
 # define elf_w(x)       _Uelf64_##x
 #endif
 
-#ifdef __HAIKU__
-# define ELFMAG ELF_MAGIC
-#endif
 #ifndef SELFMAG
 # define SELFMAG 4
 #endif

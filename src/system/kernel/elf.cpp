@@ -1107,7 +1107,7 @@ elf_relocate(struct elf_image_info* image, struct elf_image_info* resolveImage)
 static int
 verify_eheader(elf_ehdr *elfHeader)
 {
-	if (memcmp(elfHeader->e_ident, ELF_MAGIC, 4) != 0)
+	if (memcmp(elfHeader->e_ident, ELFMAG, 4) != 0)
 		return B_NOT_AN_EXECUTABLE;
 
 	if (elfHeader->e_ident[4] != ELF_CLASS)

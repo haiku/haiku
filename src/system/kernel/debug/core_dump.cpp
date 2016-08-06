@@ -1093,10 +1093,10 @@ private:
 		memset(&header, 0, sizeof(header));
 
 		// e_ident
-		header.e_ident[EI_MAG0] = ELF_MAGIC[0];
-		header.e_ident[EI_MAG1] = ELF_MAGIC[1];
-		header.e_ident[EI_MAG2] = ELF_MAGIC[2];
-		header.e_ident[EI_MAG3] = ELF_MAGIC[3];
+		header.e_ident[EI_MAG0] = ELFMAG[0];
+		header.e_ident[EI_MAG1] = ELFMAG[1];
+		header.e_ident[EI_MAG2] = ELFMAG[2];
+		header.e_ident[EI_MAG3] = ELFMAG[3];
 #ifdef B_HAIKU_64_BIT
 		header.e_ident[EI_CLASS] = ELFCLASS64;
 #else

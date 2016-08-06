@@ -224,7 +224,7 @@ ElfFile::Init(const char* fileName)
 		return bytesRead < 0 ? errno : B_ERROR;
 
 	// magic
-	if (!memcmp(elfIdent, ELF_MAGIC, 4) == 0)
+	if (!memcmp(elfIdent, ELFMAG, 4) == 0)
 		return B_ERROR;
 
 	// endianess

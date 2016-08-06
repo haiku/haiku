@@ -277,7 +277,7 @@ ImageFile::_LoadFile(const char* path, addr_t* _textAddress, size_t* _textSize,
 
 	// examine the elf header
 	elf_ehdr* elfHeader = (elf_ehdr*)fMappedFile;
-	if (memcmp(elfHeader->e_ident, ELF_MAGIC, 4) != 0)
+	if (memcmp(elfHeader->e_ident, ELFMAG, 4) != 0)
 		return B_NOT_AN_EXECUTABLE;
 
 	if (elfHeader->e_ident[4] != ELF_CLASS)

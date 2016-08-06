@@ -161,7 +161,7 @@ ELFLoader<Class>::Create(int fd, preloaded_image** _image)
 
 	const EhdrType& elfHeader = image->elf_header;
 
-	if (memcmp(elfHeader.e_ident, ELF_MAGIC, 4) != 0
+	if (memcmp(elfHeader.e_ident, ELFMAG, 4) != 0
 		|| elfHeader.e_ident[4] != Class::kIdentClass
 		|| elfHeader.e_phoff == 0
 		|| !elfHeader.IsHostEndian()
