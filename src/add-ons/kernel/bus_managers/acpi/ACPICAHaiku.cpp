@@ -475,7 +475,8 @@ AcpiOsMapMemory(ACPI_PHYSICAL_ADDRESS where, ACPI_SIZE length)
 	DEBUG_FUNCTION_F("addr: 0x%08lx; length: %lu; mapped: %p; area: %ld",
 		(addr_t)where, (size_t)length, there, area);
 	if (area < 0) {
-		dprintf("ACPI: cannot map memory at 0x%08x, length %d\n", where, length);
+		dprintf("ACPI: cannot map memory at 0x%" B_PRIuADDR ", length %"
+			B_PRIuSIZE "\n", where, length);
 		return NULL;
 	}
 	return there;
