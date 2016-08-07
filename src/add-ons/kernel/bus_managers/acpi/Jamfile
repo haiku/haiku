@@ -177,7 +177,6 @@ local utilities_src =
 	utosi.c
 	utownerid.c
 	utpredef.c
-	utprint.c
 	utresrc.c
 	utstate.c
 	utstring.c
