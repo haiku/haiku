@@ -76,6 +76,7 @@ typedef struct {
 } Elf64_Ehdr;
 
 #define ELFMAG		"\x7f""ELF"
+#define SELFMAG		4
 
 /* e_ident[] indices */
 #define EI_MAG0		0
