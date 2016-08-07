@@ -44,6 +44,7 @@ local events_src =
 	;
 
 local executer_src =
+	exconcat.c
 	exconfig.c
 	exconvrt.c
 	excreate.c
@@ -153,6 +154,7 @@ local tables_src =
 local utilities_src =
 	utaddress.c
 	utalloc.c
+	utascii.c
 	utbuffer.c
 	utcache.c
 	utcopy.c

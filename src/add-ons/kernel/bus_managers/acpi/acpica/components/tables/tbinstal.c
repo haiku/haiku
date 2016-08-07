@@ -364,7 +364,7 @@ AcpiTbInstallStandardTable (
         AcpiGbl_DisableSsdtTableInstall &&
         ACPI_COMPARE_NAME (&NewTableDesc.Signature, ACPI_SIG_SSDT))
     {
-        ACPI_INFO ((AE_INFO,
+        ACPI_INFO ((
             "Ignoring installation of %4.4s at %8.8X%8.8X",
             NewTableDesc.Signature.Ascii, ACPI_FORMAT_UINT64 (Address)));
         goto ReleaseAndExit;
@@ -398,7 +398,7 @@ AcpiTbInstallStandardTable (
             ACPI_BIOS_ERROR ((AE_INFO,
                 "Table has invalid signature [%4.4s] (0x%8.8X), "
                 "must be SSDT or OEMx",
-                AcpiUtValidAcpiName (NewTableDesc.Signature.Ascii) ?
+                AcpiUtValidNameseg (NewTableDesc.Signature.Ascii) ?
                     NewTableDesc.Signature.Ascii : "????",
                 NewTableDesc.Signature.Integer));
 
@@ -536,7 +536,7 @@ FinishOverride:
         return;
     }
 
-    ACPI_INFO ((AE_INFO, "%4.4s 0x%8.8X%8.8X"
+    ACPI_INFO (("%4.4s 0x%8.8X%8.8X"
         " %s table override, new table: 0x%8.8X%8.8X",
         OldTableDesc->Signature.Ascii,
         ACPI_FORMAT_UINT64 (OldTableDesc->Address),

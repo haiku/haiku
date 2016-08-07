@@ -1,6 +1,6 @@
 /******************************************************************************
  *
- * Name: acgcc.h - GCC specific defines, etc.
+ * Module Name: utascii - Utility ascii functions
  *
  *****************************************************************************/
 
@@ -113,37 +113,121 @@
  *
  *****************************************************************************/
 
-#ifndef __ACGCC_H__
-#define __ACGCC_H__
+#include "acpi.h"
+#include "accommon.h"
 
-/*
- * Use compiler specific <stdarg.h> is a good practice for even when
- * -nostdinc is specified (i.e., ACPI_USE_STANDARD_HEADERS undefined.
- */
-#include <stdarg.h>
 
-#define ACPI_INLINE             __inline__
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiUtValidNameseg
+ *
+ * PARAMETERS:  Name            - The name or table signature to be examined.
+ *                                Four characters, does not have to be a
+ *                                NULL terminated string.
+ *
+ * RETURN:      TRUE if signature is has 4 valid ACPI characters
+ *
+ * DESCRIPTION: Validate an ACPI table signature.
+ *
+ ******************************************************************************/
 
-/* Function name is used for debug output. Non-ANSI, compiler-dependent */
+BOOLEAN
+AcpiUtValidNameseg (
+    char                    *Name)
+{
+    UINT32                  i;
 
-#define ACPI_GET_FUNCTION_NAME          __func__
 
-/*
- * This macro is used to tag functions as "printf-like" because
- * some compilers (like GCC) can catch printf format string problems.
- */
-#define ACPI_PRINTF_LIKE(c) __attribute__ ((__format__ (__printf__, c, c+1)))
+    /* Validate each character in the signature */
 
-/*
- * Some compilers complain about unused variables. Sometimes we don't want to
- * use all the variables (for example, _AcpiModuleName). This allows us
- * to tell the compiler warning in a per-variable manner that a variable
- * is unused.
- */
-#define ACPI_UNUSED_VAR __attribute__ ((unused))
+    for (i = 0; i < ACPI_NAME_SIZE; i++)
+    {
+        if (!AcpiUtValidNameChar (Name[i], i))
+        {
+            return (FALSE);
+        }
+    }
 
-/* GCC supports __VA_ARGS__ in macros */
+    return (TRUE);
+}
 
-#define COMPILER_VA_MACRO               1
 
-#endif /* __ACGCC_H__ */
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiUtValidNameChar
+ *
+ * PARAMETERS:  Char            - The character to be examined
+ *              Position        - Byte position (0-3)
+ *
+ * RETURN:      TRUE if the character is valid, FALSE otherwise
+ *
+ * DESCRIPTION: Check for a valid ACPI character. Must be one of:
+ *              1) Upper case alpha
+ *              2) numeric
+ *              3) underscore
+ *
+ *              We allow a '!' as the last character because of the ASF! table
+ *
+ ******************************************************************************/
+
+BOOLEAN
+AcpiUtValidNameChar (
+    char                    Character,
+    UINT32                  Position)
+{
+
+    if (!((Character >= 'A' && Character <= 'Z') ||
+          (Character >= '0' && Character <= '9') ||
+          (Character == '_')))
+    {
+        /* Allow a '!' in the last position */
+
+        if (Character == '!' && Position == 3)
+        {
+            return (TRUE);
+        }
+
+        return (FALSE);
+    }
+
+    return (TRUE);
+}
+
+
+/*******************************************************************************
+ *
+ * FUNCTION:    AcpiUtCheckAndRepairAscii
+ *
+ * PARAMETERS:  Name                - Ascii string
+ *              Count               - Number of characters to check
+ *
+ * RETURN:      None
+ *
+ * DESCRIPTION: Ensure that the requested number of characters are printable
+ *              Ascii characters. Sets non-printable and null chars to <space>.
+ *
+ ******************************************************************************/
+
+void
+AcpiUtCheckAndRepairAscii (
+    UINT8                   *Name,
+    char                    *RepairedName,
+    UINT32                  Count)
+{
+    UINT32                  i;
+
+
+    for (i = 0; i < Count; i++)
+    {
+        RepairedName[i] = (char) Name[i];
+
+        if (!Name[i])
+        {
+            return;
+        }
+        if (!isprint (Name[i]))
+        {
+            RepairedName[i] = ' ';
+        }
+    }
+}

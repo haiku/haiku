@@ -359,10 +359,10 @@
 /* Generic bitfield macros and masks */
 
 #define ACPI_GET_BITS(SourcePtr, Position, Mask) \
-    ((*SourcePtr >> Position) & Mask)
+    ((*(SourcePtr) >> (Position)) & (Mask))
 
 #define ACPI_SET_BITS(TargetPtr, Position, Mask, Value) \
-    (*TargetPtr |= ((Value & Mask) << Position))
+    (*(TargetPtr) |= (((Value) & (Mask)) << (Position)))
 
 #define ACPI_1BIT_MASK      0x00000001
 #define ACPI_2BIT_MASK      0x00000003

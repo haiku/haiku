@@ -257,7 +257,7 @@ AcpiTbCopyDsdt (
         ACPI_PTR_TO_PHYSADDR (NewTable),
         ACPI_TABLE_ORIGIN_INTERNAL_VIRTUAL, NewTable);
 
-    ACPI_INFO ((AE_INFO,
+    ACPI_INFO ((
         "Forced DSDT copy: length 0x%05X copied locally, original unmapped",
         NewTable->Length));
 
@@ -345,7 +345,7 @@ AcpiTbGetRootTableEntry (
  *
  ******************************************************************************/
 
-ACPI_STATUS
+ACPI_STATUS ACPI_INIT_FUNCTION
 AcpiTbParseRootTable (
     ACPI_PHYSICAL_ADDRESS   RsdpAddress)
 {
@@ -482,37 +482,4 @@ NextTable:
 
     AcpiOsUnmapMemory (Table, Length);
     return_ACPI_STATUS (AE_OK);
-}
-
-
-/*******************************************************************************
- *
- * FUNCTION:    AcpiIsValidSignature
- *
- * PARAMETERS:  Signature           - Sig string to be validated
- *
- * RETURN:      TRUE if signature is has 4 valid ACPI characters
- *
- * DESCRIPTION: Validate an ACPI table signature.
- *
- ******************************************************************************/
-
-BOOLEAN
-AcpiIsValidSignature (
-    char                    *Signature)
-{
-    UINT32                  i;
-
-
-    /* Validate each character in the signature */
-
-    for (i = 0; i < ACPI_NAME_SIZE; i++)
-    {
-        if (!AcpiUtValidAcpiChar (Signature[i], i))
-        {
-            return (FALSE);
-        }
-    }
-
-    return (TRUE);
 }

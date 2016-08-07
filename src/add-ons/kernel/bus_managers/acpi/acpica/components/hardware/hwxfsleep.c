@@ -169,7 +169,7 @@ static ACPI_SLEEP_FUNCTIONS         AcpiSleepDispatch[] =
  *              PhysicalAddress     - 32-bit physical address of ACPI real mode
  *                                    entry point
  *              PhysicalAddress64   - 64-bit physical address of ACPI protected
- *                                    entry point
+ *                                    mode entry point
  *
  * RETURN:      Status
  *
@@ -225,7 +225,7 @@ AcpiHwSetFirmwareWakingVector (
  * PARAMETERS:  PhysicalAddress     - 32-bit physical address of ACPI real mode
  *                                    entry point
  *              PhysicalAddress64   - 64-bit physical address of ACPI protected
- *                                    entry point
+ *                                    mode entry point
  *
  * RETURN:      Status
  *

@@ -128,7 +128,7 @@ AcpiTbInitGenericAddress (
     UINT8                   SpaceId,
     UINT8                   ByteWidth,
     UINT64                  Address,
-    char                    *RegisterName,
+    const char              *RegisterName,
     UINT8                   Flags);
 
 static void
@@ -150,7 +150,7 @@ AcpiTbSelectAddress (
 
 typedef struct acpi_fadt_info
 {
-    char                    *Name;
+    const char              *Name;
     UINT16                  Address64;
     UINT16                  Address32;
     UINT16                  Length;
@@ -284,7 +284,7 @@ AcpiTbInitGenericAddress (
     UINT8                   SpaceId,
     UINT8                   ByteWidth,
     UINT64                  Address,
-    char                    *RegisterName,
+    const char              *RegisterName,
     UINT8                   Flags)
 {
     UINT8                   BitWidth;
@@ -492,15 +492,16 @@ AcpiTbCreateLocalFadt (
 
     /*
      * Check if the FADT is larger than the largest table that we expect
-     * (the ACPI 5.0 version). If so, truncate the table, and issue
-     * a warning.
+     * (typically the current ACPI specification version). If so, truncate
+     * the table, and issue a warning.
      */
     if (Length > sizeof (ACPI_TABLE_FADT))
     {
         ACPI_BIOS_WARNING ((AE_INFO,
-            "FADT (revision %u) is longer than ACPI 5.0 version, "
+            "FADT (revision %u) is longer than %s length, "
             "truncating length %u to %u",
-            Table->Revision, Length, (UINT32) sizeof (ACPI_TABLE_FADT)));
+            Table->Revision, ACPI_FADT_CONFORMANCE, Length,
+            (UINT32) sizeof (ACPI_TABLE_FADT)));
     }
 
     /* Clear the entire local FADT */
@@ -578,7 +579,7 @@ static void
 AcpiTbConvertFadt (
     void)
 {
-    char                    *Name;
+    const char              *Name;
     ACPI_GENERIC_ADDRESS    *Address64;
     UINT32                  Address32;
     UINT8                   Length;
@@ -587,17 +588,19 @@ AcpiTbConvertFadt (
 
 
     /*
-     * For ACPI 1.0 FADTs (revision 1 or 2), ensure that reserved fields which
+     * For ACPI 1.0 FADTs (revision 1), ensure that reserved fields which
      * should be zero are indeed zero. This will workaround BIOSs that
      * inadvertently place values in these fields.
      *
      * The ACPI 1.0 reserved fields that will be zeroed are the bytes located
      * at offset 45, 55, 95, and the word located at offset 109, 110.
      *
-     * Note: The FADT revision value is unreliable. Only the length can be
-     * trusted.
+     * Note: The FADT revision value is unreliable because of BIOS errors.
+     * The table length is instead used as the final word on the version.
+     *
+     * Note: FADT revision 3 is the ACPI 2.0 version of the FADT.
      */
-    if (AcpiGbl_FADT.Header.Length <= ACPI_FADT_V2_SIZE)
+    if (AcpiGbl_FADT.Header.Length <= ACPI_FADT_V3_SIZE)
     {
         AcpiGbl_FADT.PreferredProfile = 0;
         AcpiGbl_FADT.PstateControl = 0;
@@ -748,9 +751,11 @@ AcpiTbConvertFadt (
                 (!Address64->Address && Length))
             {
                 ACPI_BIOS_WARNING ((AE_INFO,
-                    "Optional FADT field %s has zero address or length: "
-                    "0x%8.8X%8.8X/0x%X",
-                    Name, ACPI_FORMAT_UINT64 (Address64->Address), Length));
+                    "Optional FADT field %s has valid %s but zero %s: "
+                    "0x%8.8X%8.8X/0x%X", Name,
+                    (Length ? "Length" : "Address"),
+                    (Length ? "Address": "Length"),
+                    ACPI_FORMAT_UINT64 (Address64->Address), Length));
             }
         }
     }

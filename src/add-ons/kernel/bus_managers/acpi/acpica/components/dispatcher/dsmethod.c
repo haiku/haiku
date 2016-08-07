@@ -532,6 +532,9 @@ AcpiDsBeginMethodExecution (
             {
                 ObjDesc->Method.Mutex->Mutex.OriginalSyncLevel =
                     ObjDesc->Method.Mutex->Mutex.SyncLevel;
+
+                ObjDesc->Method.Mutex->Mutex.ThreadId =
+                    AcpiOsGetThreadId ();
             }
         }
 
@@ -939,7 +942,7 @@ AcpiDsTerminateControlMethod (
         {
             if (WalkState)
             {
-                ACPI_INFO ((AE_INFO,
+                ACPI_INFO ((
                     "Marking method %4.4s as Serialized "
                     "because of AE_ALREADY_EXISTS error",
                     WalkState->MethodNode->Name.Ascii));

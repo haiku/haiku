@@ -277,8 +277,6 @@ ACPI_EXPORT_SYMBOL (AcpiWarning)
 
 void ACPI_INTERNAL_VAR_XFACE
 AcpiInfo (
-    const char              *ModuleName,
-    UINT32                  LineNumber,
     const char              *Format,
     ...)
 {
