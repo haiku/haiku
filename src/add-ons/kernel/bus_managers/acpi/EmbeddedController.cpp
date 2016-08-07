@@ -355,7 +355,7 @@ embedded_controller_init_driver(device_node* dev, void** _driverCookie)
 	sc->ec_suspending = FALSE;
 
 	// Attach bus resources for data and command/status ports.
-	status = sc->ec_acpi->walk_resources(sc->ec_handle, "_CRS",
+	status = sc->ec_acpi->walk_resources(sc->ec_handle, (ACPI_STRING)"_CRS",
 		embedded_controller_io_ports_parse_callback, sc);
 	if (status != B_OK) {
 		ERROR("Error while getting IO ports addresses\n");
