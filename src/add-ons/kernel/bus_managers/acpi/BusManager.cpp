@@ -239,7 +239,7 @@ acpi_std_ops(int32 op,...)
 			parameter.Count = 1;
 			parameter.Pointer = &arg;
 
-			AcpiEvaluateObject(NULL, "\\_PIC", &parameter, NULL);
+			AcpiEvaluateObject(NULL, (ACPI_STRING)"\\_PIC", &parameter, NULL);
 
 			if (checkAndLogFailure(AcpiEnableSubsystem(
 						ACPI_FULL_INITIALIZATION),
