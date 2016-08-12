@@ -660,13 +660,13 @@ KeymapWindow::_AddKeyboardLayoutMenu(BMenu* menu, BDirectory directory)
 			BMenu* submenu = new BMenu(B_TRANSLATE_NOCOLLECT(ref.name));
 
 			_AddKeyboardLayoutMenu(submenu, subdirectory);
-			menu->AddItem(submenu);
+			menu->AddItem(submenu, (int32)0);
 		} else {
 			BMessage* message = new BMessage(kChangeKeyboardLayout);
 
 			message->AddRef("ref", &ref);
 			menu->AddItem(new BMenuItem(B_TRANSLATE_NOCOLLECT(ref.name),
-				message));
+				message), (int32)0);
 		}
 	}
 }
