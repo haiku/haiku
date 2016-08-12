@@ -176,7 +176,6 @@ local ttFonts = [ Glob $(fontDir)/ttfonts : *.ttf ] ;
 AddFilesToPackage data fonts psfonts : $(psFonts) ;
 AddFilesToPackage data fonts ttfonts : $(ttFonts) ;
 
-
 # keymaps
 AddFilesToPackage data Keymaps : $(HAIKU_KEYMAP_FILES) ;
 local keymapAlias ;
@@ -184,7 +183,6 @@ for keymapAlias in $(HAIKU_KEYMAP_ALIASES) {
 	local aliasedTo = [ on $(keymapAlias) return $(HAIKU_KEYMAP_FILE) ] ;
 	AddSymlinkToPackage data Keymaps : $(aliasedTo:BSM) : $(keymapAlias:BSM) ;
 }
-
 
 # keyboard layouts
 AddFilesToPackage data KeyboardLayouts

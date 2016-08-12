@@ -54,7 +54,8 @@ HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES =
 	"Apple Aluminium International"
 	"Apple Aluminum (US)"
 	"Apple Aluminum Extended (US)" ;
-HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES = 	$(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES:G=keyboard-layout) ;
+HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES
+	= $(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES:G=keyboard-layout) ;
 SEARCH on $(HAIKU_APPLE_ALUMINUM_KEYBOARD_LAYOUT_FILES) = $(appleAluminumDir) ;
 
 # Add ThinkPad keyboard layout files to the image in a ThinkPad
