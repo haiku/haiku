@@ -1201,6 +1201,11 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 
 		status_t result = B_OK;
 		ImageDebugInfo* imageInfo = targetImage->GetImageDebugInfo();
+		if (imageInfo == NULL) {
+			// the subroutine may have resolved to a different image
+			// that doesn't have debug information available.
+			continue;
+		}
 
 		FunctionInstance* targetFunction;
 		if (imageInfo->GetAddressSectionType(subroutineAddress)
@@ -1218,6 +1223,14 @@ DwarfImageDebugInfo::_CreateReturnValues(ReturnValueInfoList* returnValueInfos,
 				if (targetImage == NULL)
 					continue;
 				imageInfo = targetImage->GetImageDebugInfo();
+				if (imageInfo == NULL) {
+					// As above, since the indirection here may have
+					// landed us in an entirely different image, there is
+					// no guarantee that debug info is available,
+					// depending on which image it was.
+					continue;
+				}
+
 			}
 		}
 
