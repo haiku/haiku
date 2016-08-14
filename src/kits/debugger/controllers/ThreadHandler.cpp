@@ -826,6 +826,9 @@ ThreadHandler::_HandleSingleStepStep(CpuState* cpuState)
 			if (stackTrace != NULL) {
 				StackFrame* frame = stackTrace->FrameAt(0);
 				Image* image = frame->GetImage();
+				if (image == NULL)
+					return false;
+
 				ImageDebugInfo* info = NULL;
 				if (GetImageDebugInfo(image, info) != B_OK)
 					return false;
