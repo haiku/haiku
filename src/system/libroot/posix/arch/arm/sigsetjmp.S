@@ -19,6 +19,7 @@ FUNCTION_END(__sigsetjmp)
 
 /* int setjmp(jmp_buf buffer) */
 FUNCTION(setjmp):
+FUNCTION(_setjmp):
 	stmia	r0, {r0-r14}
 	mrs	r1, cpsr
 	str	r1, [r0, #64]

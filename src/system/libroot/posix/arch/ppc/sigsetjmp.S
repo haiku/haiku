@@ -44,6 +44,7 @@ FUNCTION(sigsetjmp):
 
 /* int setjmp(jmp_buf buffer) */
 FUNCTION(setjmp):
+FUNCTION(_setjmp):
 	// call __sigsetjmp with saveMask = 0
 	addi	%r4, 0, 0
 	b		__sigsetjmp

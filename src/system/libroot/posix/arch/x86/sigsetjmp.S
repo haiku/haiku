@@ -43,6 +43,7 @@ FUNCTION_END(sigsetjmp)
 
 /* int setjmp(jmp_buf buffer) */
 FUNCTION(setjmp):
+FUNCTION(_setjmp):
 	// prepare %edx, %ecx, and %eax for sigsetjmp
 	mov		0(%esp), %edx
 	lea		4(%esp), %ecx

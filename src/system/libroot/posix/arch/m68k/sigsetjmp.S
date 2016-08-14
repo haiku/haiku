@@ -33,6 +33,7 @@ FUNCTION_END(sigsetjmp)
 
 /* int setjmp(jmp_buf buffer) */
 FUNCTION(setjmp):
+FUNCTION(_setjmp):
 	move.l	(%a7)+,%a0
 	move.l	(%a7)+,%d0
 	clr.l	-(%a7)		/* push 0 as 2nd arg */

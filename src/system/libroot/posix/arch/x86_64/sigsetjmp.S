@@ -30,6 +30,7 @@ FUNCTION_END(setjmp)
 
 /* int setjmp(jmp_buf buffer) */
 FUNCTION(setjmp):
+FUNCTION(_setjmp):
 	// Jump to sigsetjmp with a zero saveMask.
 	xorl	%esi, %esi
 	jmp		sigsetjmp@PLT
