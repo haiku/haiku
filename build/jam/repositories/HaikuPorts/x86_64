@@ -11,6 +11,7 @@ RemotePackageRepository HaikuPorts
 	docbook_xml_dtd-4.5-2
 	docbook_xsl_stylesheets-1.78.1-1
 	droid-113-2
+	fontawesome-4.6.3-1
 	gnuefi-3.0.4-1
 	texi2html-1.82-2
 	timgmsoundfont-fixed-5
