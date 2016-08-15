@@ -524,6 +524,7 @@ RemotePackageRepository HaikuPorts
 	tiff4-4.0.6-1
 	tiff4_devel-4.0.6-1
 	tiff4_tools-4.0.6-1
+	timetracker-0.2-1
 	tinyxml-2.6.2-1
 	tinyxml_devel-2.6.2-1
 	twolame-0.3.13-1
@@ -1457,6 +1458,7 @@ RemotePackageRepository HaikuPorts
 	tiff
 	tiff4
 	tig_x86
+	timetracker
 	tinyxml
 	transmission_x86
 	twolame
