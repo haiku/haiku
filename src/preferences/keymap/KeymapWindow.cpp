@@ -152,13 +152,12 @@ KeymapWindow::KeymapWindow()
 	}
 
 	BRect windowFrame;
-	BString keyboardLayout;
-	_LoadSettings(windowFrame, keyboardLayout);
-	_SetKeyboardLayout(keyboardLayout.String());
-
-	ResizeTo(windowFrame.Width(), windowFrame.Height());
-	MoveTo(windowFrame.LeftTop());
-	MoveOnScreen();
+	if (_LoadSettings(windowFrame) == B_OK) {
+		ResizeTo(windowFrame.Width(), windowFrame.Height());
+		MoveTo(windowFrame.LeftTop());
+		MoveOnScreen();
+	} else
+		CenterOnScreen();
 
 	// TODO: this might be a bug in the interface kit, but scrolling to
 	// selection does not correctly work unless the window is shown.
@@ -1053,7 +1052,7 @@ KeymapWindow::_GetSettings(BFile& file, int mode) const
 
 
 status_t
-KeymapWindow::_LoadSettings(BRect& windowFrame, BString& keyboardLayout)
+KeymapWindow::_LoadSettings(BRect& windowFrame)
 {
 	BScreen screen(this);
 
@@ -1067,8 +1066,6 @@ KeymapWindow::_LoadSettings(BRect& windowFrame, BString& keyboardLayout)
 	windowFrame.right *= scaling;
 	windowFrame.bottom *= scaling;
 
-	keyboardLayout = "";
-
 	BFile file;
 	status_t status = _GetSettings(file, B_READ_ONLY);
 	if (status == B_OK) {
@@ -1076,10 +1073,13 @@ KeymapWindow::_LoadSettings(BRect& windowFrame, BString& keyboardLayout)
 		status = settings.Unflatten(&file);
 		if (status == B_OK) {
 			BRect frame;
-			if (settings.FindRect("window frame", &frame) == B_OK)
+			status = settings.FindRect("window frame", &frame);
+			if (status == B_OK)
 				windowFrame = frame;
 
-			settings.FindString("keyboard layout", &keyboardLayout);
+			const char* layoutPath;
+			if (settings.FindString("keyboard layout", &layoutPath) == B_OK)
+				_SetKeyboardLayout(layoutPath);
 		}
 	}
 

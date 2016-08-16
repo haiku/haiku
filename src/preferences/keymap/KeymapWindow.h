@@ -68,8 +68,7 @@ protected:
 			void				_SelectCurrentMap();
 
 			status_t			_GetSettings(BFile& file, int mode) const;
-			status_t			_LoadSettings(BRect& frame,
-									BString& keyboardLayout);
+			status_t			_LoadSettings(BRect& frame);
 			status_t			_SaveSettings();
 			BPath				_GetMarkedKeyboardLayoutPath(BMenu* menu);
 
