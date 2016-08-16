@@ -1124,9 +1124,11 @@ KeymapWindow::_GetMarkedKeyboardLayoutPath(BMenu* menu)
 			continue;
 
 		BMenu* submenu = item->Submenu();
-		if (submenu != NULL)
-			return _GetMarkedKeyboardLayoutPath(submenu);
-		else {
+		if (submenu != NULL) {
+			path = _GetMarkedKeyboardLayoutPath(submenu);
+			if (path.InitCheck() == B_OK)
+				return path;
+		} else {
 			if (item->IsMarked()
 				&& item->Message()->FindRef("ref", &ref) == B_OK) {
 				path.SetTo(&ref);
