@@ -133,23 +133,17 @@ KeymapWindow::KeymapWindow()
 	path.Append("Keymap");
 
 	entry_ref ref;
-	if (get_ref_for_path(path.Path(), &ref) == B_OK) {
-		BDirectory userKeymapsDir(&ref);
-		if (userKeymapsDir.InitCheck() != B_OK)
-			create_directory(path.Path(), S_IRWXU | S_IRWXG | S_IRWXO);
+	get_ref_for_path(path.Path(), &ref);
 
-		BMessenger messenger(this);
-		fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, &ref,
-			B_FILE_NODE, false, NULL);
-		fSavePanel = new BFilePanel(B_SAVE_PANEL, &messenger, &ref,
-			B_FILE_NODE, false, NULL);
-	} else {
-		BMessenger messenger(this);
-		fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, NULL,
-			B_FILE_NODE, false, NULL);
-		fSavePanel = new BFilePanel(B_SAVE_PANEL, &messenger, NULL,
-			B_FILE_NODE, false, NULL);
-	}
+	BDirectory userKeymapsDir(&ref);
+	if (userKeymapsDir.InitCheck() != B_OK)
+		create_directory(path.Path(), S_IRWXU | S_IRWXG | S_IRWXO);
+
+	BMessenger messenger(this);
+	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, &ref,
+		B_FILE_NODE, false, NULL);
+	fSavePanel = new BFilePanel(B_SAVE_PANEL, &messenger, &ref,
+		B_FILE_NODE, false, NULL);
 
 	BRect windowFrame;
 	if (_LoadSettings(windowFrame) == B_OK) {
