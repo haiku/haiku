@@ -574,7 +574,7 @@ BListView::MouseDown(BPoint where)
 		fTrack->try_drag = true;
 	}
 
-	if (index > -1) {
+	if (index >= 0) {
 		if (fListType == B_MULTIPLE_SELECTION_LIST) {
 			if ((modifiers & B_SHIFT_KEY) != 0) {
 				// select entire block
