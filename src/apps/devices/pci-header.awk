@@ -130,7 +130,7 @@ END {
 
 	if ( devicecount > 0 ) {
 
-		print "typedef struct _PCI_DEVTABLE\n{\n\tunsigned short	VenId ;\n\tunsigned short	DevId ;\n\tunsigned short\tSubVenId ;\n\tunsigned short\tSubDevId ;\n\tconst char *\tChipDesc ;\n\tconst char *\tChip;\n}  PCI_DEVTABLE, *PPCI_DEVTABLE ;\n"  > ofile
+		print "typedef struct _PCI_DEVTABLE\n{\n\tunsigned short	VenId ;\n\tunsigned short	DevId ;\n\tunsigned short\tSubVenId ;\n\tunsigned short\tSubDevId ;\n\tconst char *\tChipDesc ;\n}  PCI_DEVTABLE, *PPCI_DEVTABLE ;\n"  > ofile
 		print "PCI_DEVTABLE\tPciDevTable [] =\n{" > ofile
 		for (i = 1; i <= devicecount; i++) {
 
