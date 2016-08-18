@@ -45,12 +45,25 @@ BDaemonClient::GetInstallationLocationInfo(
 	if (error != B_OK)
 		return error;
 
-	// send the request
 	BMessage request(B_MESSAGE_GET_INSTALLATION_LOCATION_INFO);
 	error = request.AddInt32("location", location);
 	if (error != B_OK)
 		return error;
 
+	// Get our filesystem root node. If we are in a chroot this is not the same
+	// as the package_daemon root node, so we must provide it.
+	struct stat st;
+	if (stat("/boot", &st) == 0)
+	{
+		error = request.AddInt32("volume", st.st_dev);
+		if (error != B_OK)
+			return error;
+		error = request.AddInt64("root", st.st_ino);
+		if (error != B_OK)
+			return error;
+	}
+
+	// send the request
 	BMessage reply;
 	fDaemonMessenger.SendMessage(&request, &reply);
 	if (reply.what != B_MESSAGE_GET_INSTALLATION_LOCATION_INFO_REPLY)

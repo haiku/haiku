@@ -110,8 +110,12 @@ BPackageManager::Init(uint32 flags)
 		// well. But we can easily filter those out.
 		_AddInstalledRepository(fSystemRepository);
 
-		if (!fSystemRepository->IsInstalled())
-			_AddInstalledRepository(fHomeRepository);
+		try {
+			if (!fSystemRepository->IsInstalled())
+				_AddInstalledRepository(fHomeRepository);
+		} catch(BFatalErrorException& exception) {
+			// No home repository found. This is ok for haikuporter chroots.
+		}
 	}
 
 	// add other repositories
@@ -787,11 +791,15 @@ BPackageManager::_AddLocalPackage(const char* fileName)
 bool
 BPackageManager::_NextSpecificInstallationLocation()
 {
-	if (fLocation == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
-		fLocation = B_PACKAGE_INSTALLATION_LOCATION_HOME;
-		fSystemRepository->SetInstalled(false);
-		_AddInstalledRepository(fHomeRepository);
-		return true;
+	try {
+		if (fLocation == B_PACKAGE_INSTALLATION_LOCATION_SYSTEM) {
+			fLocation = B_PACKAGE_INSTALLATION_LOCATION_HOME;
+			fSystemRepository->SetInstalled(false);
+			_AddInstalledRepository(fHomeRepository);
+			return true;
+		}
+	} catch (BFatalErrorException& e) {
+		// No home repo. This is acceptable for example when we are in an haikuporter chroot.
 	}
 
 	return false;

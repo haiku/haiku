@@ -83,8 +83,23 @@ PackageDaemon::MessageReceived(BMessage* message)
 		case B_MESSAGE_GET_INSTALLATION_LOCATION_INFO:
 		case B_MESSAGE_COMMIT_TRANSACTION:
 		{
-			if (fSystemRoot != NULL)
+			status_t error;
+			node_ref nodeRef;
+
+			// Get the node_ref of the filesystem root to see which one it is
+			error = message->FindInt32("volume", &nodeRef.device);
+			if (error == B_OK)
+				error = message->FindInt64("root", &nodeRef.node);
+
+			if (fSystemRoot != NULL && (error != B_OK
+					|| fSystemRoot->NodeRef() == nodeRef))
 				fSystemRoot->HandleRequest(DetachCurrentMessage());
+			else {
+				Root* root = _FindRoot(nodeRef);
+				if (root != NULL) {
+					root->HandleRequest(DetachCurrentMessage());
+				}
+			}
 			break;
 		}
 

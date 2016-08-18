@@ -10,9 +10,13 @@
 #include <string.h>
 
 #include <package/PackageResolvableExpression.h>
+#include <package/manager/Exceptions.h>
 #include <Path.h>
 #include <PathFinder.h>
 #include <StringList.h>
+
+
+using namespace BPackageKit::BManager::BPrivate;
 
 
 extern const char* __progname;
@@ -245,25 +249,37 @@ main(int argc, const char* const* argv)
 	}
 
 	if (referencePath != NULL || resolvable != NULL) {
-		BPathFinder pathFinder;
-		if (referencePath != NULL) {
-			pathFinder.SetTo(referencePath, dependency);
-		} else {
-			pathFinder.SetTo(
-				BPackageKit::BPackageResolvableExpression(resolvable),
-				dependency);
-		}
+		try {
+			BPathFinder pathFinder;
+			if (referencePath != NULL) {
+				pathFinder.SetTo(referencePath, dependency);
+			} else {
+				pathFinder.SetTo(
+					BPackageKit::BPackageResolvableExpression(resolvable),
+					dependency);
+			}
 
-		BPath path;
-		status_t error = pathFinder.FindPath(architecture, baseDirectory,
-			subPath, existingOnly ? B_FIND_PATH_EXISTING_ONLY : 0, path);
-		if (error != B_OK) {
-			fprintf(stderr, "Error: Failed to find path: %s\n",
-				strerror(error));
-			exit(1);
-		}
+			BPath path;
+			status_t error = pathFinder.FindPath(architecture, baseDirectory,
+				subPath, existingOnly ? B_FIND_PATH_EXISTING_ONLY : 0, path);
+			if (error != B_OK) {
+				fprintf(stderr, "Error: Failed to find path: %s\n",
+					strerror(error));
+				exit(1);
+			}
 
-		printf("%s\n", path.Path());
+			printf("%s\n", path.Path());
+		} catch(BFatalErrorException& exception) {
+			if (!exception.Details().IsEmpty())
+				fprintf(stderr, "%s", exception.Details().String());
+			if (exception.Error() == B_OK) {
+				fprintf(stderr, "Error: %s\n", exception.Message().String());
+			} else {
+				fprintf(stderr, "Error: %s: %s\n", exception.Message().String(),
+					strerror(exception.Error()));
+			}
+			return 1;
+		}
 	} else {
 		BStringList paths;
 		status_t error = BPathFinder::FindPaths(architecture, baseDirectory,
