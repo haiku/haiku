@@ -1449,9 +1449,14 @@ BListView::_InitObject(list_view_type type)
 	fAnchorIndex = -1;
 	fSelectMessage = NULL;
 	fScrollView = NULL;
+
 	fTrack = new track_data;
-	fTrack->try_drag = false;
+	fTrack->drag_start = B_ORIGIN;
 	fTrack->item_index = -1;
+	fTrack->was_selected = false;
+	fTrack->try_drag = false;
+	fTrack->last_click_time = 0;
+
 	SetViewUIColor(B_LIST_BACKGROUND_COLOR);
 	SetLowUIColor(B_LIST_BACKGROUND_COLOR);
 }
