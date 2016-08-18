@@ -537,6 +537,14 @@ BListView::MouseDown(BPoint where)
 	BMessage* message = Looper()->CurrentMessage();
 	int32 index = IndexOf(where);
 
+	int32 buttons = 0;
+	if (message != NULL)
+		message->FindInt32("buttons", &buttons);
+
+	int32 modifiers = 0;
+	if (message != NULL)
+		message->FindInt32("modifiers", &modifiers);
+
 	// If the user double (or more) clicked within the current selection,
 	// we don't change the selection but invoke the selection.
 	// TODO: move this code someplace where it can be shared everywhere
@@ -562,9 +570,6 @@ BListView::MouseDown(BPoint where)
 		Invoke();
 		return;
 	}
-
-	int32 modifiers;
-	message->FindInt32("modifiers", &modifiers);
 
 	if (!doubleClick) {
 		fTrack->drag_start = where;
