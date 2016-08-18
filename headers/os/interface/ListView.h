@@ -126,8 +126,8 @@ public:
 
 	virtual void				SelectionChanged();
 
-	virtual bool				InitiateDrag(BPoint point, int32 itemIndex,
-									bool initialySelected);
+	virtual bool				InitiateDrag(BPoint where, int32 index,
+									bool wasSelected);
 
 			void				SortItems(int (*cmp)(const void*,
 									const void*));

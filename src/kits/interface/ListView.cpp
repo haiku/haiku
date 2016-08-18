@@ -34,7 +34,7 @@ struct track_data {
 };
 
 
-const float kDoubleClickTresh = 6;
+const float kDoubleClickThreshold = 6.0f;
 
 
 static property_info sProperties[] = {
@@ -294,11 +294,12 @@ BListView::MessageReceived(BMessage* message)
 		{
 			BPropertyInfo propInfo(sProperties);
 			BMessage specifier;
-			const char *property;
+			const char* property;
 
 			if (message->GetCurrentSpecifier(NULL, &specifier) != B_OK
-				|| specifier.FindString("property", &property) != B_OK)
+				|| specifier.FindString("property", &property) != B_OK) {
 				return;
+			}
 
 			switch (propInfo.FindMatch(message, 0, &specifier, message->what,
 					property)) {
@@ -523,7 +524,7 @@ BListView::KeyDown(const char* bytes, int32 numBytes)
 
 
 void
-BListView::MouseDown(BPoint point)
+BListView::MouseDown(BPoint where)
 {
 	if (!IsFocus()) {
 		MakeFocus();
@@ -532,14 +533,14 @@ BListView::MouseDown(BPoint point)
 	}
 
 	BMessage* message = Looper()->CurrentMessage();
-	int32 index = IndexOf(point);
+	int32 index = IndexOf(where);
 
 	// If the user double (or more) clicked within the current selection,
 	// we don't change the selection but invoke the selection.
 	// TODO: move this code someplace where it can be shared everywhere
 	// instead of every class having to reimplement it, once some sane
 	// API for it is decided.
-	BPoint delta = point - fTrack->drag_start;
+	BPoint delta = where - fTrack->drag_start;
 	bigtime_t sysTime;
 	Window()->CurrentMessage()->FindInt64("when", &sysTime);
 	bigtime_t timeDelta = sysTime - fTrack->last_click_time;
@@ -548,8 +549,8 @@ BListView::MouseDown(BPoint point)
 	bool doubleClick = false;
 
 	if (timeDelta < doubleClickSpeed
-		&& fabs(delta.x) < kDoubleClickTresh
-		&& fabs(delta.y) < kDoubleClickTresh
+		&& fabs(delta.x) < kDoubleClickThreshold
+		&& fabs(delta.y) < kDoubleClickThreshold
 		&& fTrack->item_index == index) {
 		doubleClick = true;
 	}
@@ -564,7 +565,7 @@ BListView::MouseDown(BPoint point)
 	message->FindInt32("modifiers", &modifiers);
 
 	if (!doubleClick) {
-		fTrack->drag_start = point;
+		fTrack->drag_start = where;
 		fTrack->last_click_time = system_time();
 		fTrack->item_index = index;
 		fTrack->was_selected = index >= 0 ? ItemAt(index)->IsSelected() : false;
@@ -573,7 +574,7 @@ BListView::MouseDown(BPoint point)
 
 	if (index > -1) {
 		if (fListType == B_MULTIPLE_SELECTION_LIST) {
-			if (modifiers & B_SHIFT_KEY) {
+			if ((modifiers & B_SHIFT_KEY) != 0) {
 				// select entire block
 				// TODO: maybe review if we want it like in Tracker
 				// (anchor item)
@@ -586,7 +587,7 @@ BListView::MouseDown(BPoint point)
 						fLastSelected));
 				}
 			} else {
-				if (modifiers & B_COMMAND_KEY) {
+				if ((modifiers & B_COMMAND_KEY) != 0) {
 					// toggle selection state of clicked item (like in Tracker)
 					// toggle selection state of clicked item
 					if (ItemAt(index)->IsSelected())
@@ -598,7 +599,7 @@ BListView::MouseDown(BPoint point)
 			}
 		} else {
 			// toggle selection state of clicked item
-			if ((modifiers & B_COMMAND_KEY) && ItemAt(index)->IsSelected())
+			if ((modifiers & B_COMMAND_KEY) != 0 && ItemAt(index)->IsSelected())
 				Deselect(index);
 			else
 				Select(index);
@@ -636,7 +637,7 @@ BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 
 
 bool
-BListView::InitiateDrag(BPoint point, int32 index, bool wasSelected)
+BListView::InitiateDrag(BPoint where, int32 index, bool wasSelected)
 {
 	return false;
 }
