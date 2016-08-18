@@ -22,6 +22,7 @@
 #include <PropertyInfo.h>
 #include <ScrollBar.h>
 #include <ScrollView.h>
+#include <Thread.h>
 #include <Window.h>
 
 #include <binary_compatibility/Interface.h>
@@ -568,7 +569,7 @@ BListView::MouseDown(BPoint where)
 	if (doubleClick && index >= fFirstSelected && index <= fLastSelected) {
 		fTrack->drag_start.Set(INT32_MAX, INT32_MAX);
 		Invoke();
-		return;
+		return BView::MouseDown(where);
 	}
 
 	if (!doubleClick) {
@@ -577,6 +578,9 @@ BListView::MouseDown(BPoint where)
 		fTrack->item_index = index;
 		fTrack->was_selected = index >= 0 ? ItemAt(index)->IsSelected() : false;
 		fTrack->try_drag = true;
+
+		MouseDownThread<BListView>::TrackMouse(this,
+			&BListView::_DoneTracking, &BListView::_Track);
 	}
 
 	if (index >= 0) {
@@ -613,33 +617,22 @@ BListView::MouseDown(BPoint where)
 		}
 	} else if ((modifiers & B_COMMAND_KEY) == 0)
 		DeselectAll();
+
+	 BView::MouseDown(where);
 }
 
 
 void
 BListView::MouseUp(BPoint where)
 {
-	fTrack->try_drag = false;
+	BView::MouseUp(where);
 }
 
 
 void
 BListView::MouseMoved(BPoint where, uint32 code, const BMessage* dragMessage)
 {
-	if (fTrack->item_index == -1 || !fTrack->try_drag) {
-		// mouse was not clicked above any item
-		// or no mouse button pressed
-		return;
-	}
-
-	// Initiate a drag if the mouse was moved far enough
-	BPoint offset = where - fTrack->drag_start;
-	float dragDistance = sqrtf(offset.x * offset.x + offset.y * offset.y);
-	if (dragDistance >= 5.0f) {
-		fTrack->try_drag = false;
-		InitiateDrag(fTrack->drag_start, fTrack->item_index,
-			fTrack->was_selected);
-	}
+	BView::MouseMoved(where, code, dragMessage);
 }
 
 
@@ -1943,5 +1936,43 @@ BListView::_RecalcItemTops(int32 start, int32 end)
 		BListItem *item = ItemAt(i);
 		item->SetTop(top);
 		top += ceilf(item->Height());
+	}
+}
+
+
+void
+BListView::_DoneTracking(BPoint where)
+{
+	fTrack->try_drag = false;
+}
+
+
+void
+BListView::_Track(BPoint where, uint32)
+{
+	int32 index = IndexOf(where);
+	BListItem* item = ItemAt(index);
+
+	if (item != NULL && !item->IsSelected() && item->IsEnabled()) {
+		Select(index, fListType == B_MULTIPLE_SELECTION_LIST
+			&& (modifiers() & B_SHIFT_KEY) != 0);
+		ScrollToSelection();
+		fTrack->try_drag = false;
+			// don't try to initiate a drag once selection changes
+	}
+
+	if (fTrack->item_index < 0 || !fTrack->try_drag) {
+		// mouse was not clicked above any item
+		// or no mouse button pressed
+		return;
+	}
+
+	// Initiate a drag if the mouse was moved far enough
+	BPoint offset = where - fTrack->drag_start;
+	float dragDistance = sqrtf(offset.x * offset.x + offset.y * offset.y);
+	if (dragDistance >= 5.0f) {
+		fTrack->try_drag = false;
+		InitiateDrag(fTrack->drag_start, fTrack->item_index,
+			fTrack->was_selected);
 	}
 }
