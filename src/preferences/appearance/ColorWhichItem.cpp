@@ -82,17 +82,3 @@ ColorWhichItem::DrawItem(BView* owner, BRect frame, bool complete)
 	owner->SetHighColor(highColor);
 	owner->SetLowColor(lowColor);
 }
-
-
-color_which
-ColorWhichItem::ColorWhich(void)
-{
-	return fColorWhich;
-}
-
-
-void
-ColorWhichItem::SetColor(rgb_color color)
-{
-	fColor = color;
-}

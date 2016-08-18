@@ -20,6 +20,7 @@ Preference Appearance :
 	ColorPreview.cpp
 	Colors.cpp
 	ColorWhichItem.cpp
+	ColorWhichListView.cpp
 
 	# These are currently disabled while everything else is being worked on
 	#CurView.cpp

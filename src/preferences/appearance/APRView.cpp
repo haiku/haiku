@@ -29,6 +29,7 @@
 #include "defs.h"
 #include "ColorPreview.h"
 #include "Colors.h"
+#include "ColorWhichListView.h"
 #include "ColorWhichItem.h"
 
 
@@ -74,7 +75,7 @@ APRView::APRView(const char* name)
 	LoadSettings();
 
 	// Set up list of color attributes
-	fAttrList = new BListView("AttributeList", B_SINGLE_SELECTION_LIST);
+	fAttrList = new ColorWhichListView("AttributeList");
 
 	fScrollView = new BScrollView("ScrollView", fAttrList, 0, false, true);
 	fScrollView->SetViewUIColor(B_PANEL_BACKGROUND_COLOR);
