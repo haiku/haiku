@@ -13,6 +13,8 @@
 
 #include <ListView.h>
 
+#include <algorithm>
+
 #include <stdio.h>
 
 #include <Autolock.h>
@@ -495,7 +497,7 @@ BListView::KeyDown(const char* bytes, int32 numBytes)
 		case B_PAGE_UP:
 		{
 			BPoint scrollOffset(LeftTop());
-			scrollOffset.y = max_c(0, scrollOffset.y - Bounds().Height());
+			scrollOffset.y = std::max(0.0f, scrollOffset.y - Bounds().Height());
 			ScrollTo(scrollOffset);
 			break;
 		}
@@ -505,7 +507,7 @@ BListView::KeyDown(const char* bytes, int32 numBytes)
 			BPoint scrollOffset(LeftTop());
 			if (BListItem* item = LastItem()) {
 				scrollOffset.y += Bounds().Height();
-				scrollOffset.y = min_c(item->Bottom() - Bounds().Height(),
+				scrollOffset.y = std::min(item->Bottom() - Bounds().Height(),
 					scrollOffset.y);
 			}
 			ScrollTo(scrollOffset);
@@ -583,7 +585,7 @@ BListView::MouseDown(BPoint where)
 					// but from the first selected item to the clicked item
 					DeselectExcept(fFirstSelected, index);
 				} else {
-					Select(min_c(index, fFirstSelected), max_c(index,
+					Select(std::min(index, fFirstSelected), std::max(index,
 						fLastSelected));
 				}
 			} else {
@@ -1709,7 +1711,7 @@ BListView::_CalcLastSelected(int32 before)
 	if (before < 0)
 		return -1;
 
-	before = min_c(CountItems() - 1, before);
+	before = std::min(CountItems() - 1, before);
 
 	for (int32 i = before; i >= 0; i--) {
 		if (ItemAt(i)->IsSelected())
@@ -1767,12 +1769,12 @@ BListView::_SwapItems(int32 a, int32 b)
 	// track selection
 	// NOTE: this is only important if the selection status
 	// of both items is not the same
-	int32 first = min_c(a, b);
-	int32 last = max_c(a, b);
+	int32 first = std::min(a, b);
+	int32 last = std::max(a, b);
 	if (ItemAt(a)->IsSelected() != ItemAt(b)->IsSelected()) {
 		if (first < fFirstSelected || last > fLastSelected) {
-			_RescanSelection(min_c(first, fFirstSelected),
-				max_c(last, fLastSelected));
+			_RescanSelection(std::min(first, fFirstSelected),
+				std::max(last, fLastSelected));
 		}
 		// though the actually selected items stayed the
 		// same, the selection has still changed
@@ -1853,8 +1855,8 @@ BListView::_ReplaceItem(int32 index, BListItem* item)
 
 	// tack selection
 	if (selectionChanged) {
-		int32 start = min_c(fFirstSelected, index);
-		int32 end = max_c(fLastSelected, index);
+		int32 start = std::min(fFirstSelected, index);
+		int32 end = std::max(fLastSelected, index);
 		_RescanSelection(start, end);
 		SelectionChanged();
 	}
@@ -1887,8 +1889,8 @@ BListView::_RescanSelection(int32 from, int32 to)
 		to = tmp;
 	}
 
-	from = max_c(0, from);
-	to = min_c(to, CountItems() - 1);
+	from = std::max((int32)0, from);
+	to = std::min(to, CountItems() - 1);
 
 	if (fAnchorIndex != -1) {
 		if (fAnchorIndex == from)
