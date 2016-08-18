@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2016.07.21
-# Date:    2016-07-21 20:34:05
+# Version: 2016.08.11
+# Date:    2016-08-11 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -17864,6 +17864,8 @@
 	200b  MX Phone (PTP)
 	200c  MX Phone (PTP & ADB)
 	2012  MX Phone (MTP & ACM)
+2b24  KeepKey LLC
+	0001  Bitcoin hardware wallet
 2c02  Planex Communications
 	14ea  GW-US11H WLAN
 2c1a  Dolphin Peripherals
