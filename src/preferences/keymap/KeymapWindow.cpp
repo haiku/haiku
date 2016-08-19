@@ -136,8 +136,27 @@ KeymapWindow::KeymapWindow()
 	get_ref_for_path(path.Path(), &ref);
 
 	BDirectory userKeymapsDir(&ref);
-	if (userKeymapsDir.InitCheck() != B_OK)
-		create_directory(path.Path(), S_IRWXU | S_IRWXG | S_IRWXO);
+	if (userKeymapsDir.InitCheck() != B_OK) {
+		// directory does not exist
+		status_t result = create_directory(path.Path(),
+			S_IRWXU | S_IRWXG | S_IRWXO);
+		if (result == B_NOT_A_DIRECTORY) {
+			// could be a symlink
+			BEntry entry(&ref, true);
+			if (entry.InitCheck() == B_OK && entry.Exists()) {
+				// followed the symlink
+				result = entry.GetRef(&ref);
+			}
+		}
+
+		if (result != B_OK) {
+			// unable to create directory or resolve symlink,
+			// point ref to home directory
+			BPath home;
+			find_directory(B_USER_DIRECTORY, &home);
+			get_ref_for_path(home.Path(), &ref);
+		}
+	}
 
 	BMessenger messenger(this);
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, &ref,
