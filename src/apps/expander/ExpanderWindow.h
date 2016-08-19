@@ -27,6 +27,7 @@ class BTextView;
 
 class ExpanderThread;
 class ExpanderPreferences;
+class StatusView;
 
 
 class ExpanderWindow : public BWindow {
@@ -55,7 +56,6 @@ private:
 			void				_ExpandListingText();
 			void				StartListing();
 			void				StopListing();
-			void				SetStatus(BString text);
 			bool				ValidateDest();
 
 private:
@@ -79,7 +79,7 @@ private:
 			BCheckBox*			fShowContents;
 			BTextControl*		fSourceText;
 			BTextControl*		fDestText;
-			BStringView*		fStatusView;
+			StatusView*		fStatusView;
 			BTextView*			fListingText;
 			BScrollView*		fScrollView;
 

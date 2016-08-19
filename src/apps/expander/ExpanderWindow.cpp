@@ -45,7 +45,40 @@ const uint32 MSG_SOURCETEXT		= 'mSTX';
 const uint32 MSG_DESTTEXT		= 'mDTX';
 const uint32 MSG_SHOWCONTENTS	= 'mSCT';
 
-const int32 MAX_STATUS_LENGTH	= 35;
+
+class StatusView : public BStringView {
+public:
+	StatusView()
+		:
+		BStringView(NULL, "")
+	{
+	}
+
+	virtual ~StatusView()
+	{
+	}
+
+	void SetStatus(const BString &text)
+	{
+		fStatus = text;
+		Invalidate();
+	}
+
+	void Draw(BRect updateRect)
+	{
+		BString truncated = fStatus;
+		if(fStatus.IsEmpty() == false) {
+			be_plain_font->TruncateString(&truncated, B_TRUNCATE_END,
+				Bounds().Width());
+		}
+
+		SetText(truncated);
+		BStringView::Draw(updateRect);
+	}
+
+private:
+	BString fStatus;
+};
 
 
 #undef B_TRANSLATION_CONTEXT
@@ -94,12 +127,6 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	fScrollView = new BScrollView("", fListingText,	B_INVALIDATE_AFTER_LAYOUT,
 		true, true);
 
-	// workaround to let the layout manager estimate
-	// the width of status view and fix the #5289
-	// we assume that spaces are twice narrower than normal chars
-	BString statusPlaceholderString;
-	statusPlaceholderString.SetTo(' ', MAX_STATUS_LENGTH * 2);
-
 	const float spacing = be_control_look->DefaultItemSpacing();
 	BGroupLayout* pathLayout;
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
@@ -122,8 +149,7 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 					.Add(fShowContents = new BCheckBox(
 						B_TRANSLATE("Show contents"),
 						new BMessage(MSG_SHOWCONTENTS)))
-					.Add(fStatusView = new BStringView(NULL,
-						statusPlaceholderString))
+					.Add(fStatusView = new StatusView())
 					.End()
 				.End()
 			.Add(fScrollView)
@@ -133,6 +159,9 @@ ExpanderWindow::ExpanderWindow(BRect frame, const entry_ref* ref,
 	pathLayout->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 	size = GetLayout()->View()->PreferredSize();
 	fSizeLimit = size.Height() - fScrollView->PreferredSize().height - spacing;
+
+	fStatusView->SetExplicitMinSize(BSize(50.0f, B_SIZE_UNSET));
+	fStatusView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	ResizeTo(Bounds().Width(), fSizeLimit);
 	SetSizeLimits(size.Width(), 32767.0f, fSizeLimit, fSizeLimit);
@@ -443,7 +472,7 @@ ExpanderWindow::MessageReceived(BMessage* message)
 			// (finished, quit, killed, we don't know)
 			// reset window state
 			if (fExpandingStarted) {
-				SetStatus(B_TRANSLATE("File expanded"));
+				fStatusView->SetStatus(B_TRANSLATE("File expanded"));
 				StopExpanding();
 				OpenDestFolder();
 				CloseWindowOrKeepOpen();
@@ -452,14 +481,14 @@ ExpanderWindow::MessageReceived(BMessage* message)
 				StopListing();
 				_ExpandListingText();
 			} else
-				SetStatus("");
+				fStatusView->SetStatus("");
 			break;
 
 		case 'exrr':
 			// thread has finished
 			// reset window state
 
-			SetStatus(B_TRANSLATE("Error when expanding archive"));
+			fStatusView->SetStatus(B_TRANSLATE("Error when expanding archive"));
 			CloseWindowOrKeepOpen();
 			break;
 
@@ -649,9 +678,9 @@ ExpanderWindow::StartExpanding()
 
 	BEntry entry(&fSourceRef);
 	BPath path(&entry);
-	BString text(B_TRANSLATE("Expanding '%s'"));
+	BString text(B_TRANSLATE("Expanding '%s'" B_UTF8_ELLIPSIS));
 	text.ReplaceFirst("%s", path.Leaf());
-	SetStatus(text.String());
+	fStatusView->SetStatus(text.String());
 
 	fExpandingThread = new ExpanderThread(&message, new BMessenger(this));
 	fExpandingThread->Start();
@@ -751,18 +780,6 @@ ExpanderWindow::_UpdateWindowSize(bool showContents)
 
 
 void
-ExpanderWindow::SetStatus(BString text)
-{
-	if (text.Length() >= MAX_STATUS_LENGTH) {
-		text.Truncate(MAX_STATUS_LENGTH - 1);
-		text << B_UTF8_ELLIPSIS;
-	}
-
-	fStatusView->SetText(text);
-}
-
-
-void
 ExpanderWindow::StartListing()
 {
 	_UpdateWindowSize(true);
@@ -797,9 +814,9 @@ ExpanderWindow::StartListing()
 
 	BEntry entry(&fSourceRef);
 	BPath path(&entry);
-	BString text(B_TRANSLATE("Creating listing for '%s'"));
+	BString text(B_TRANSLATE("Creating listing for '%s'" B_UTF8_ELLIPSIS));
 	text.ReplaceFirst("%s", path.Leaf());
-	SetStatus(text.String());
+	fStatusView->SetStatus(text.String());
 	fListingText->SetText("");
 
 	fListingThread = new ExpanderThread(&message, new BMessenger(this));
@@ -830,7 +847,7 @@ ExpanderWindow::StopListing(void)
 	fSourceButton->SetEnabled(true);
 	fDestButton->SetEnabled(true);
 	fExpandButton->SetEnabled(true);
-	SetStatus("");
+	fStatusView->SetStatus("");
 }
 
 
