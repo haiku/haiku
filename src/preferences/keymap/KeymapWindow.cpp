@@ -133,14 +133,16 @@ KeymapWindow::KeymapWindow()
 	path.Append("Keymap");
 
 	entry_ref ref;
-	get_ref_for_path(path.Path(), &ref);
-
-	BDirectory userKeymapsDir(&ref);
+	BEntry entry(path.Path(), true); // follow symlink
+	BDirectory userKeymapsDir(&entry);
 	if (userKeymapsDir.InitCheck() != B_OK
 		&& create_directory(path.Path(), S_IRWXU | S_IRWXG | S_IRWXO)
 			== B_OK) {
 		get_ref_for_path(path.Path(), &ref);
-	}
+	} else if (entry.InitCheck() == B_OK)
+		entry.GetRef(&ref);
+	else
+		get_ref_for_path(path.Path(), &ref);
 
 	BMessenger messenger(this);
 	fOpenPanel = new BFilePanel(B_OPEN_PANEL, &messenger, &ref,
