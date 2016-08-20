@@ -70,32 +70,36 @@ ControlView::AttachedToWindow()
 
 	_AddFontMenu();
 
-	fFontsizeSlider = new BSlider("Fontsize", B_TRANSLATE("Size: 50"),
-		NULL, 4, 360, B_HORIZONTAL);
+	BString label;
+
+	label.SetToFormat(B_TRANSLATE("Size: %d"), 50);
+	fFontsizeSlider = new BSlider("Fontsize", label, NULL, 4, 360,
+		B_HORIZONTAL);
 	fFontsizeSlider->SetModificationMessage(new BMessage(FONTSIZE_MSG));
 	fFontsizeSlider->SetValue(50);
 	AddChild(fFontsizeSlider);
 
-	fShearSlider = new BSlider("Shear", B_TRANSLATE("Shear: 90"), NULL,
-		45, 135, B_HORIZONTAL);
+	label.SetToFormat(B_TRANSLATE("Shear: %d"), 90);
+	fShearSlider = new BSlider("Shear", label, NULL, 45, 135, B_HORIZONTAL);
 	fShearSlider->SetModificationMessage(new BMessage(FONTSHEAR_MSG));
 	fShearSlider->SetValue(90);
 	AddChild(fShearSlider);
 
-	fRotationSlider = new BSlider("Rotation", B_TRANSLATE("Rotation: 0"),
-		NULL, 0, 360, B_HORIZONTAL);
+	label.SetToFormat(B_TRANSLATE("Rotation: %d"), 0);
+	fRotationSlider = new BSlider("Rotation", label, NULL, 0, 360,
+		B_HORIZONTAL);
 	fRotationSlider->SetModificationMessage( new BMessage(ROTATION_MSG));
 	fRotationSlider->SetValue(0);
 	AddChild(fRotationSlider);
 
-	fSpacingSlider = new BSlider("Spacing", B_TRANSLATE("Spacing: 0"),
-		NULL, -5, 50, B_HORIZONTAL);
+	label.SetToFormat(B_TRANSLATE("Spacing: %d"), 0);
+	fSpacingSlider = new BSlider("Spacing", label, NULL, -5, 50, B_HORIZONTAL);
 	fSpacingSlider->SetModificationMessage(new BMessage(SPACING_MSG));
 	fSpacingSlider->SetValue(0);
 	AddChild(fSpacingSlider);
 
-	fOutlineSlider = new BSlider("Outline", B_TRANSLATE("Outline:"),
-		NULL, 0, 20, B_HORIZONTAL);
+	label.SetToFormat(B_TRANSLATE("Outline: %d"), 0);
+	fOutlineSlider = new BSlider("Outline", label, NULL, 0, 20, B_HORIZONTAL);
 	fOutlineSlider->SetModificationMessage(new BMessage(OUTLINE_MSG));
 	AddChild(fOutlineSlider);
 
@@ -167,10 +171,10 @@ ControlView::MessageReceived(BMessage* msg)
 
 		case FONTSIZE_MSG:
 		{
-			char buff[256];
-			sprintf(buff, B_TRANSLATE("Size: %d"),
+			BString label;
+			label.SetToFormat(B_TRANSLATE("Size: %d"),
 				static_cast<int>(fFontsizeSlider->Value()));
-			fFontsizeSlider->SetLabel(buff);
+			fFontsizeSlider->SetLabel(label);
 
 			BMessage msg(FONTSIZE_MSG);
 			msg.AddFloat("_size", static_cast<float>(fFontsizeSlider->Value()));
@@ -180,10 +184,10 @@ ControlView::MessageReceived(BMessage* msg)
 
 		case FONTSHEAR_MSG:
 		{
-			char buff[256];
-			sprintf(buff, B_TRANSLATE("Shear: %d"),
+			BString label;
+			label.SetToFormat(B_TRANSLATE("Shear: %d"),
 				static_cast<int>(fShearSlider->Value()));
-			fShearSlider->SetLabel(buff);
+			fShearSlider->SetLabel(label);
 
 			BMessage msg(FONTSHEAR_MSG);
 			msg.AddFloat("_shear", static_cast<float>(fShearSlider->Value()));
@@ -193,10 +197,10 @@ ControlView::MessageReceived(BMessage* msg)
 
 		case ROTATION_MSG:
 		{
-			char buff[256];
-			sprintf(buff, B_TRANSLATE("Rotation: %d"),
+			BString label;
+			label.SetToFormat(B_TRANSLATE("Rotation: %d"),
 				static_cast<int>(fRotationSlider->Value()));
-			fRotationSlider->SetLabel(buff);
+			fRotationSlider->SetLabel(label);
 
 			BMessage msg(ROTATION_MSG);
 			msg.AddFloat("_rotation", static_cast<float>(fRotationSlider->Value()));
@@ -206,10 +210,10 @@ ControlView::MessageReceived(BMessage* msg)
 
 		case SPACING_MSG:
 		{
-			char buff[256];
-			sprintf(buff, B_TRANSLATE("Spacing: %d"),
+			BString label;
+			label.SetToFormat(B_TRANSLATE("Spacing: %d"),
 				(int)fSpacingSlider->Value());
-			fSpacingSlider->SetLabel(buff);
+			fSpacingSlider->SetLabel(label);
 
 			BMessage msg(SPACING_MSG);
 			msg.AddFloat("_spacing", static_cast<float>(fSpacingSlider->Value()));
@@ -245,9 +249,9 @@ ControlView::MessageReceived(BMessage* msg)
 		{
 			int8 outlineVal = (int8)fOutlineSlider->Value();
 
-			char buff[256];
-			sprintf(buff, B_TRANSLATE("Outline: %d"), outlineVal);
-			fOutlineSlider->SetLabel(buff);
+			BString label;
+			label.SetToFormat(B_TRANSLATE("Outline: %d"), outlineVal);
+			fOutlineSlider->SetLabel(label);
 
 			fAliasingCheckBox->SetEnabled(outlineVal < 1);
 			fBoundingboxesCheckBox->SetEnabled(outlineVal < 1);
