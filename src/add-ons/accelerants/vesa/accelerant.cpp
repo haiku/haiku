@@ -90,6 +90,7 @@ init_common(int device, bool isClone)
 
 	gInfo->is_clone = isClone;
 	gInfo->device = device;
+	gInfo->current_mode = UINT16_MAX;
 
 	// get basic info from driver
 

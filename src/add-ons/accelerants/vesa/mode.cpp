@@ -162,13 +162,6 @@ vesa_set_display_mode(display_mode* _mode)
 	if (vesa_propose_display_mode(&mode, &mode, &mode) != B_OK)
 		return B_BAD_VALUE;
 
-	if (gInfo->shared_info->current_mode.virtual_width == mode.virtual_width
-		&& gInfo->shared_info->current_mode.virtual_height
-			== mode.virtual_height
-		&& gInfo->shared_info->current_mode.space == mode.space) {
-		return B_OK;
-	}
-
 	vesa_mode* modes = gInfo->vesa_modes;
 	for (uint32 i = gInfo->shared_info->vesa_mode_count; i-- > 0;) {
 		// search mode in VESA mode list
@@ -177,7 +170,12 @@ vesa_set_display_mode(display_mode* _mode)
 			&& modes[i].height == mode.virtual_height
 			&& get_color_space_for_depth(modes[i].bits_per_pixel)
 				== mode.space) {
-			return ioctl(gInfo->device, VESA_SET_DISPLAY_MODE, &i, sizeof(i));
+			if (gInfo->current_mode == i)
+				return B_OK;
+			status_t result = ioctl(gInfo->device, VESA_SET_DISPLAY_MODE, &i, sizeof(i));
+			if (result == B_OK)
+				gInfo->current_mode = i;
+			return result;
 		}
 	}
 
