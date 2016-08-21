@@ -621,9 +621,8 @@ enum {
 
 
 bool
-ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
-	const char* ifYouDoAction, const char* toDoAction,
-	const char* toConfirmAction, bool dontAsk, int32* confirmedAlready)
+ConfirmChangeIfWellKnownDirectory(const BEntry* entry, DestructiveAction action,
+	bool dontAsk, int32* confirmedAlready)
 {
 	// Don't let the user casually move/change important files/folders
 	//
@@ -646,41 +645,76 @@ ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
 	bool requireOverride = true;
 
 	if (DirectoryMatchesOrContains(entry, B_SYSTEM_DIRECTORY)) {
-		warning.SetTo(
-			B_TRANSLATE("If you %ifYouDoAction the system folder or its "
-			"contents, you won't be able to boot %osName!\n\nAre you sure "
-			"you want to do this?\n\nTo %toDoAction the system folder or its "
-			"contents anyway, hold down the Shift key and click "
-			"\"%toConfirmAction\"."));
+		if (action == kRename) {
+			warning.SetTo(
+				B_TRANSLATE("If you rename the system folder or its "
+				"contents, you won't be able to boot %osName!\n\nAre you sure "
+				"you want to do this?\n\nTo rename the system folder or its "
+				"contents anyway, hold down the Shift key and click "
+				"\"Rename\"."));
+		} else if(action == kMove) {
+			warning.SetTo(
+				B_TRANSLATE("If you move the system folder or its "
+				"contents, you won't be able to boot %osName!\n\nAre you sure "
+				"you want to do this?\n\nTo move the system folder or its "
+				"contents anyway, hold down the Shift key and click "
+				"\"Move\"."));
+		} else {
+			warning.SetTo(
+				B_TRANSLATE("If you alter the system folder or its "
+				"contents, you won't be able to boot %osName!\n\nAre you sure "
+				"you want to do this?\n\nTo alter the system folder or its "
+				"contents anyway, hold down the Shift key and click "
+				"\"I know what I'm doing\"."));
+		}
 	} else if (DirectoryMatches(entry, B_USER_DIRECTORY)) {
-		warning .SetTo(
-			B_TRANSLATE("If you %ifYouDoAction the home folder, %osName "
-			"may not behave properly!\n\nAre you sure you want to do this?"
-			"\n\nTo %toDoAction the home folder anyway, hold down the "
-			"Shift key and click \"%toConfirmAction\"."));
+		if (action == kRename) {
+			warning .SetTo(
+				B_TRANSLATE("If you rename the home folder, %osName "
+				"may not behave properly!\n\nAre you sure you want to do this?"
+				"\n\nTo rename the home folder anyway, hold down the "
+				"Shift key and click \"Move\"."));
+		} else if (action == kMove) {
+			warning .SetTo(
+				B_TRANSLATE("If you move the home folder, %osName "
+				"may not behave properly!\n\nAre you sure you want to do this?"
+				"\n\nTo move the home folder anyway, hold down the "
+				"Shift key and click \"Move\"."));
+		} else {
+			warning .SetTo(
+				B_TRANSLATE("If you alter the home folder, %osName "
+				"may not behave properly!\n\nAre you sure you want to do this?"
+				"\n\nTo alter the home folder anyway, hold down the "
+				"Shift key and click \"I know what I'm doing\"."));
+		}
 	} else if (DirectoryMatchesOrContains(entry, B_USER_CONFIG_DIRECTORY)
 		|| DirectoryMatchesOrContains(entry, B_SYSTEM_SETTINGS_DIRECTORY)) {
+		if (action == kRename) {
+			warning.SetTo(
+				B_TRANSLATE("If you rename %target, %osName may not behave "
+				"properly!\n\nAre you sure you want to do this?"));
+		} else if (action == kMove) {
+			warning.SetTo(
+				B_TRANSLATE("If you move %target, %osName may not behave "
+				"properly!\n\nAre you sure you want to do this?"));
+		} else {
+			warning.SetTo(
+				B_TRANSLATE("If you alter %target, %osName may not behave "
+				"properly!\n\nAre you sure you want to do this?"));
+		}
+
 		if (DirectoryMatchesOrContains(entry, "beos_mime",
 				B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatchesOrContains(entry, "beos_mime",
 				B_SYSTEM_SETTINGS_DIRECTORY)) {
-			warning.SetTo(
-				B_TRANSLATE("If you %ifYouDoAction the mime settings, "
-				"%osName may not behave properly!\n\nAre you sure you want "
-				"to do this?"));
+			warning.ReplaceFirst("%target", "the MIME settings");
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_CONFIG_DIRECTORY)) {
-			warning.SetTo(
-				B_TRANSLATE("If you %ifYouDoAction the config folder, "
-				"%osName may not behave properly!\n\nAre you sure you want "
-				"to do this?"));
+			warning.ReplaceFirst("%target", "the config folder");
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatches(entry, B_SYSTEM_SETTINGS_DIRECTORY)) {
-			warning.SetTo(
-				B_TRANSLATE("If you %ifYouDoAction the settings folder, "
-				"%osName may not behave properly!\n\nAre you sure you want "
-				"to do this?"));
+			warning.ReplaceFirst("%target", "the settings folder");
 			requireOverride = false;
 		}
 	}
@@ -702,11 +736,15 @@ ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
 	else
 		warning.ReplaceFirst("%osName", name.sysname);
 
-	warning.ReplaceFirst("%ifYouDoAction", ifYouDoAction);
-	warning.ReplaceFirst("%toDoAction", toDoAction);
-	warning.ReplaceFirst("%toConfirmAction", toConfirmAction);
-
-	BString buttonLabel(toConfirmAction);
+	BString buttonLabel;
+	if (action == kRename) {
+		buttonLabel = B_TRANSLATE_COMMENT("Rename", "button label");
+	} else if (action == kMove) {
+		buttonLabel = B_TRANSLATE_COMMENT("Move", "button label");
+	} else {
+		buttonLabel = B_TRANSLATE_COMMENT("I know what I'm doing",
+			"button label");
+	}
 
 	OverrideAlert* alert = new OverrideAlert("", warning.String(),
 		buttonLabel.String(), (requireOverride ? B_SHIFT_KEY : 0),
@@ -770,15 +808,7 @@ InitCopy(CopyLoopControl* loopControl, uint32 moveMode,
 			return B_ERROR;
 		}
 		if (moveMode == kMoveSelectionTo
-			&& !ConfirmChangeIfWellKnownDirectory(&entry,
-				B_TRANSLATE_COMMENT("move",
-					"As in 'if you move this folder...' (en) "
-					"'Wird dieser Ordner verschoben...' (de)"),
-				B_TRANSLATE_COMMENT("move",
-					"As in 'to move this folder...' (en) "
-					"Um diesen Ordner zu verschieben...' (de)"),
-				B_TRANSLATE_COMMENT("Move",
-					"Button label, 'Move' (en), 'Verschieben' (de)"),
+			&& !ConfirmChangeIfWellKnownDirectory(&entry, kMove,
 				false, &askOnceOnly)) {
 			return B_ERROR;
 		}

@@ -353,16 +353,9 @@ BTextWidget::StartEdit(BRect bounds, BPoseView* view, BPose* pose)
 
 	BEntry entry(pose->TargetModel()->EntryRef());
 	if (entry.InitCheck() == B_OK
-		&& !ConfirmChangeIfWellKnownDirectory(&entry,
-			B_TRANSLATE_COMMENT("rename",
-				"As in 'if you rename this folder...' (en) "
-				"'Wird dieser Ordner umbenannt...' (de)"),
-			B_TRANSLATE_COMMENT("rename",
-				"As in 'to rename this folder...' (en) "
-				"'Um diesen Ordner umzubenennen...' (de)"),
-			B_TRANSLATE_COMMENT("Rename",
-				"Button label, 'Rename' (en), 'Umbenennen' (de)")))
+		&& !ConfirmChangeIfWellKnownDirectory(&entry, kRename)) {
 		return;
+	}
 
 	// get bounds with full text length
 	BRect rect(bounds);

@@ -442,16 +442,9 @@ BInfoWindow::MessageReceived(BMessage* message)
 		{
 			BEntry entry(fModel->EntryRef());
 			if (!fModel->HasLocalizedName()
-				&& ConfirmChangeIfWellKnownDirectory(&entry,
-				B_TRANSLATE_COMMENT("rename",
-					"As in 'if you rename this folder...' (en) "
-					"'Wird dieser Ordner umbenannt...' (de)"),
-				B_TRANSLATE_COMMENT("rename",
-					"As in 'to rename this folder...' (en) "
-					"'Um diesen Ordner umzubenennen...' (de)"),
-				B_TRANSLATE_COMMENT("Rename",
-					"Button label, 'Rename' (en), 'Umbenennen' (de)")));
+				&& ConfirmChangeIfWellKnownDirectory(&entry, kRename)) {
 				fAttributeView->BeginEditingTitle();
+			}
 			break;
 		}
 
@@ -1246,17 +1239,9 @@ AttributeView::MouseDown(BPoint where)
 		fTrackingState = path_track;
 	} else if (fTitleRect.Contains(where)) {
 		if (!fModel->HasLocalizedName()
-			&& ConfirmChangeIfWellKnownDirectory(&entry,
-				B_TRANSLATE_COMMENT("rename",
-					"As in 'if you rename this folder...' (en) "
-					"'Wird dieser Ordner umbenannt...' (de)"),
-				B_TRANSLATE_COMMENT("rename",
-					"As in 'to rename this folder...' (en) "
-					"'Um diesen Ordner umzubenennen...' (de)"),
-				B_TRANSLATE_COMMENT("Rename",
-					"Button label, 'Rename' (en), 'Umbenennen' (de)"), true)
-			&& fTitleEditView == 0);
+			&& ConfirmChangeIfWellKnownDirectory(&entry, kRename)) {
 			BeginEditingTitle();
+		}
 	} else if (fTitleEditView) {
 		FinishEditingTitle(true);
 	} else if (fSizeRect.Contains(where)) {

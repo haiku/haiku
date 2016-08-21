@@ -255,12 +255,13 @@ status_t FSFindTrackerSettingsDir(BPath*, bool autoCreate = true);
 
 bool FSIsDeskDir(const BEntry*);
 
-// two separate ifYouDoAction and toDoAction versions are needed for
-// localization purposes. The first one is used in "If you do action..."
-// sentence, the second one in the "To do action" sentence.
+enum DestructiveAction {
+	kRename,
+	kMove
+};
+
 bool ConfirmChangeIfWellKnownDirectory(const BEntry* entry,
-	const char* ifYouDoAction, const char* toDoAction,
-	const char* toConfirmAction, bool dontAsk = false,
+	DestructiveAction action, bool dontAsk = false,
 	int32* confirmedAlready = NULL);
 
 bool CheckDevicesEqual(const entry_ref* entry, const Model* targetModel);
