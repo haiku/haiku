@@ -64,7 +64,6 @@
 #include "TitlePlaceholderMapper.h"
 
 
-const static int32 kMaxTabs = 6;
 const static int32 kTermViewOffset = 3;
 
 const static int32 kMinimumFontSize = 8;
@@ -1213,13 +1212,11 @@ TermWindow::_DoPrint()
 void
 TermWindow::_NewTab()
 {
-	if (fTabView->CountTabs() < kMaxTabs) {
-		ActiveProcessInfo info;
-		if (_ActiveTermView()->GetActiveProcessInfo(info))
-			_AddTab(NULL, info.CurrentDirectory());
-		else
-			_AddTab(NULL);
-	}
+	ActiveProcessInfo info;
+	if (_ActiveTermView()->GetActiveProcessInfo(info))
+		_AddTab(NULL, info.CurrentDirectory());
+	else
+		_AddTab(NULL);
 }
 
 
