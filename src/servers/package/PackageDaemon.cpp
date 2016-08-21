@@ -93,8 +93,9 @@ PackageDaemon::MessageReceived(BMessage* message)
 
 			if (fSystemRoot != NULL && (error != B_OK
 					|| fSystemRoot->NodeRef() == nodeRef))
+			{
 				fSystemRoot->HandleRequest(DetachCurrentMessage());
-			else {
+			} else if (error == B_OK) {
 				Root* root = _FindRoot(nodeRef);
 				if (root != NULL) {
 					root->HandleRequest(DetachCurrentMessage());
