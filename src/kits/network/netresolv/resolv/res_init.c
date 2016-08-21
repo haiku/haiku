@@ -131,8 +131,6 @@ static uint32_t net_mask __P((struct in_addr));
 # define isascii(c) (!(c & 0200))
 #endif
 
-static const struct timespec ts = { 0, 0 };
-
 /*
  * Resolver state default settings.
  */

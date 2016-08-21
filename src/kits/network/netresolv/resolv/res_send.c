@@ -174,7 +174,9 @@ static int		pselect(int, void *, void *, void *,
 #endif
 void res_pquery(const res_state, const u_char *, int, FILE *);
 
+#ifdef DEBUG
 static const int niflags = NI_NUMERICHOST | NI_NUMERICSERV;
+#endif
 
 /* Public. */
 
