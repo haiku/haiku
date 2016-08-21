@@ -17,7 +17,7 @@ RemotePackageRepository HaikuPorts
 	fontawesome-4.6.3-1
 	freedroidrpg_x86_data-0.15.1-1
 	gws-0.1.8-1
-	haikuporter-1.0.0-1
+	haikuporter-1.1.1-1
 	hub-1.12.4-2
 	openttd_gfx-0.4.7-1
 	openttd_msx-0.3.1-1
@@ -78,7 +78,7 @@ RemotePackageRepository HaikuPorts
 	ccache-3.1.9-1
 	cdrtools-3.02~a06-2
 	cdrtools_devel-3.02~a06-2
-	chat-20100903-2
+	chat-20100903-3
 	clipdinger-0.5.4-1
 	clockwerk-git-3
 	cpctools-0.3.0-2
