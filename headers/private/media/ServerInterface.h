@@ -244,10 +244,13 @@ public:
 	{
 		device = ref.device;
 		directory = ref.directory;
-		if (ref.name)
-			strcpy(name, ref.name);
-		else
+		if (ref.name == NULL)
 			name[0] = 0;
+		else if (strlen(ref.name) > B_FILE_NAME_LENGTH) {
+			debugger("File name too long!");
+			name[0] = 0;
+		} else 
+			strcpy(name, ref.name);
 
 		return *this;
 	}
