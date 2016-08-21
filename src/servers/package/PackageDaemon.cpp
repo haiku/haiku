@@ -92,8 +92,7 @@ PackageDaemon::MessageReceived(BMessage* message)
 				error = message->FindInt64("root", &nodeRef.node);
 
 			if (fSystemRoot != NULL && (error != B_OK
-					|| fSystemRoot->NodeRef() == nodeRef))
-			{
+					|| fSystemRoot->NodeRef() == nodeRef)) {
 				fSystemRoot->HandleRequest(DetachCurrentMessage());
 			} else if (error == B_OK) {
 				Root* root = _FindRoot(nodeRef);

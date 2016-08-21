@@ -110,8 +110,7 @@ BPackageManager::Init(uint32 flags)
 		// well. But we can easily filter those out.
 		_AddInstalledRepository(fSystemRepository);
 
-		if (!fSystemRepository->IsInstalled())
-		{
+		if (!fSystemRepository->IsInstalled()) {
 			// Only add the home repository if the directory exists
 			BPath path;
 			status_t error = find_directory(B_USER_PACKAGES_DIRECTORY, &path);
