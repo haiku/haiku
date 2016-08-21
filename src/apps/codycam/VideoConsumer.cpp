@@ -669,23 +669,23 @@ VideoConsumer::LocalSave(char* filename, BBitmap* bitmap)
 	if (output->SetTo(filename, B_READ_WRITE | B_CREATE_FILE | B_ERASE_FILE) == B_NO_ERROR) {
 		BBitmapStream input(bitmap);
 		status_t err = BTranslatorRoster::Default()->Translate(&input, NULL, NULL,
-        	output, fImageFormat);
-        if (err == B_OK) {
-        	err = SetFileType(output, fTranslator, fImageFormat);
-        	if (err != B_OK)
-        		UpdateFtpStatus(B_TRANSLATE("Error setting type of output file"));
-        }
-        else
-        	UpdateFtpStatus(B_TRANSLATE("Error writing output file"));
+			output, fImageFormat);
+		if (err == B_OK) {
+			err = SetFileType(output, fTranslator, fImageFormat);
+			if (err != B_OK)
+				UpdateFtpStatus(B_TRANSLATE("Error setting type of output file"));
+		}
+		else
+			UpdateFtpStatus(B_TRANSLATE("Error writing output file"));
 
 		input.DetachBitmap(&bitmap);
 		output->Unset();
 		delete output;
 		return B_OK;
-    } else {
+	} else {
 		UpdateFtpStatus(B_TRANSLATE("Error creating output file"));
-    	return B_ERROR;
-    }
+		return B_ERROR;
+	}
 }
 
 
