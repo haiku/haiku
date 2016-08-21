@@ -201,168 +201,168 @@ static long long atoll( const char* str );
 
 static void
 check_options( void )
-    {
+{
 #if defined(TILDE_MAP_1) && defined(TILDE_MAP_2)
 //    syslog( LOG_CRIT, "both TILDE_MAP_1 and TILDE_MAP_2 are defined" );
-    exit( 1 );
+	exit( 1 );
 #endif /* both */
-    }
+}
 
 
 static void
 free_httpd_server( httpd_server* hs )
-    {
-    if ( hs->binding_hostname != (char*) 0 )
-	free( (void*) hs->binding_hostname );
-    if ( hs->cwd != (char*) 0 )
-	free( (void*) hs->cwd );
-    if ( hs->cgi_pattern != (char*) 0 )
-	free( (void*) hs->cgi_pattern );
-    if ( hs->charset != (char*) 0 )
-	free( (void*) hs->charset );
-    if ( hs->p3p != (char*) 0 )
-	free( (void*) hs->p3p );
-    if ( hs->url_pattern != (char*) 0 )
-	free( (void*) hs->url_pattern );
-    if ( hs->local_pattern != (char*) 0 )
-	free( (void*) hs->local_pattern );
-    free( (void*) hs );
-    }
+{
+	if ( hs->binding_hostname != (char*) 0 )
+		free( (void*) hs->binding_hostname );
+	if ( hs->cwd != (char*) 0 )
+		free( (void*) hs->cwd );
+	if ( hs->cgi_pattern != (char*) 0 )
+		free( (void*) hs->cgi_pattern );
+	if ( hs->charset != (char*) 0 )
+		free( (void*) hs->charset );
+	if ( hs->p3p != (char*) 0 )
+		free( (void*) hs->p3p );
+	if ( hs->url_pattern != (char*) 0 )
+		free( (void*) hs->url_pattern );
+	if ( hs->local_pattern != (char*) 0 )
+		free( (void*) hs->local_pattern );
+	free( (void*) hs );
+}
 
 
 httpd_server*
 httpd_initialize(
-    char* hostname, httpd_sockaddr* sa4P, httpd_sockaddr* sa6P,
-    unsigned short port, char* cgi_pattern, int cgi_limit, char* charset,
-    char* p3p, int max_age, char* cwd, int no_log, FILE* logfp,
-    int no_symlink_check, int vhost, int global_passwd, char* url_pattern,
-    char* local_pattern, int no_empty_referers )
-    {
-    httpd_server* hs;
-    static char ghnbuf[256];
-    char* cp;
+		char* hostname, httpd_sockaddr* sa4P, httpd_sockaddr* sa6P,
+		unsigned short port, char* cgi_pattern, int cgi_limit, char* charset,
+		char* p3p, int max_age, char* cwd, int no_log, FILE* logfp,
+		int no_symlink_check, int vhost, int global_passwd, char* url_pattern,
+		char* local_pattern, int no_empty_referers )
+{
+	httpd_server* hs;
+	static char ghnbuf[256];
+	char* cp;
 
-    check_options();
+	check_options();
 
-    hs = NEW( httpd_server, 1 );
-    if ( hs == (httpd_server*) 0 )
+	hs = NEW( httpd_server, 1 );
+	if ( hs == (httpd_server*) 0 )
 	{
-//	syslog( LOG_CRIT, "out of memory allocating an httpd_server" );
-	return (httpd_server*) 0;
+		//	syslog( LOG_CRIT, "out of memory allocating an httpd_server" );
+		return (httpd_server*) 0;
 	}
 
-    if ( hostname != (char*) 0 )
+	if ( hostname != (char*) 0 )
 	{
-	hs->binding_hostname = strdup( hostname );
-	if ( hs->binding_hostname == (char*) 0 )
-	    {
-//	    syslog( LOG_CRIT, "out of memory copying hostname" );
-	    return (httpd_server*) 0;
-	    }
-	hs->server_hostname = hs->binding_hostname;
+		hs->binding_hostname = strdup( hostname );
+		if ( hs->binding_hostname == (char*) 0 )
+		{
+			//	    syslog( LOG_CRIT, "out of memory copying hostname" );
+			return (httpd_server*) 0;
+		}
+		hs->server_hostname = hs->binding_hostname;
 	}
-    else
+	else
 	{
-	hs->binding_hostname = (char*) 0;
-	hs->server_hostname = (char*) 0;
-	if ( gethostname( ghnbuf, sizeof(ghnbuf) ) < 0 )
-	    ghnbuf[0] = '\0';
+		hs->binding_hostname = (char*) 0;
+		hs->server_hostname = (char*) 0;
+		if ( gethostname( ghnbuf, sizeof(ghnbuf) ) < 0 )
+			ghnbuf[0] = '\0';
 #ifdef SERVER_NAME_LIST
-	if ( ghnbuf[0] != '\0' )
-	    hs->server_hostname = hostname_map( ghnbuf );
+		if ( ghnbuf[0] != '\0' )
+			hs->server_hostname = hostname_map( ghnbuf );
 #endif /* SERVER_NAME_LIST */
-	if ( hs->server_hostname == (char*) 0 )
-	    {
+		if ( hs->server_hostname == (char*) 0 )
+		{
 #ifdef SERVER_NAME
-	    hs->server_hostname = SERVER_NAME;
+			hs->server_hostname = SERVER_NAME;
 #else /* SERVER_NAME */
-	    if ( ghnbuf[0] != '\0' )
-		hs->server_hostname = ghnbuf;
+			if ( ghnbuf[0] != '\0' )
+				hs->server_hostname = ghnbuf;
 #endif /* SERVER_NAME */
-	    }
+		}
 	}
 
-    hs->port = port;
-    if ( cgi_pattern == (char*) 0 )
+	hs->port = port;
+	if ( cgi_pattern == (char*) 0 )
 	hs->cgi_pattern = (char*) 0;
-    else
+	else
 	{
-	/* Nuke any leading slashes. */
-	if ( cgi_pattern[0] == '/' )
-	    ++cgi_pattern;
-	hs->cgi_pattern = strdup( cgi_pattern );
-	if ( hs->cgi_pattern == (char*) 0 )
-	    {
-//	    syslog( LOG_CRIT, "out of memory copying cgi_pattern" );
-	    return (httpd_server*) 0;
-	    }
-	/* Nuke any leading slashes in the cgi pattern. */
-	while ( ( cp = strstr( hs->cgi_pattern, "|/" ) ) != (char*) 0 )
-	    (void) strcpy( cp + 1, cp + 2 );
+		/* Nuke any leading slashes. */
+		if ( cgi_pattern[0] == '/' )
+			++cgi_pattern;
+		hs->cgi_pattern = strdup( cgi_pattern );
+		if ( hs->cgi_pattern == (char*) 0 )
+		{
+			//	    syslog( LOG_CRIT, "out of memory copying cgi_pattern" );
+			return (httpd_server*) 0;
+		}
+		/* Nuke any leading slashes in the cgi pattern. */
+		while ( ( cp = strstr( hs->cgi_pattern, "|/" ) ) != (char*) 0 )
+			(void) strcpy( cp + 1, cp + 2 );
 	}
-    hs->cgi_limit = cgi_limit;
-    hs->cgi_count = 0;
-    hs->charset = strdup( charset );
-    hs->p3p = strdup( p3p );
-    hs->max_age = max_age;
-    hs->cwd = strdup( cwd );
-    if ( hs->cwd == (char*) 0 )
+	hs->cgi_limit = cgi_limit;
+	hs->cgi_count = 0;
+	hs->charset = strdup( charset );
+	hs->p3p = strdup( p3p );
+	hs->max_age = max_age;
+	hs->cwd = strdup( cwd );
+	if ( hs->cwd == (char*) 0 )
 	{
-//	syslog( LOG_CRIT, "out of memory copying cwd" );
-	return (httpd_server*) 0;
+		//	syslog( LOG_CRIT, "out of memory copying cwd" );
+		return (httpd_server*) 0;
 	}
-    if ( url_pattern == (char*) 0 )
-	hs->url_pattern = (char*) 0;
-    else
+	if ( url_pattern == (char*) 0 )
+		hs->url_pattern = (char*) 0;
+	else
 	{
-	hs->url_pattern = strdup( url_pattern );
-	if ( hs->url_pattern == (char*) 0 )
-	    {
-//	    syslog( LOG_CRIT, "out of memory copying url_pattern" );
-	    return (httpd_server*) 0;
-	    }
+		hs->url_pattern = strdup( url_pattern );
+		if ( hs->url_pattern == (char*) 0 )
+		{
+			//	    syslog( LOG_CRIT, "out of memory copying url_pattern" );
+			return (httpd_server*) 0;
+		}
 	}
-    if ( local_pattern == (char*) 0 )
-	hs->local_pattern = (char*) 0;
-    else
+	if ( local_pattern == (char*) 0 )
+		hs->local_pattern = (char*) 0;
+	else
 	{
-	hs->local_pattern = strdup( local_pattern );
-	if ( hs->local_pattern == (char*) 0 )
-	    {
-//	    syslog( LOG_CRIT, "out of memory copying local_pattern" );
-	    return (httpd_server*) 0;
-	    }
+		hs->local_pattern = strdup( local_pattern );
+		if ( hs->local_pattern == (char*) 0 )
+		{
+			//	    syslog( LOG_CRIT, "out of memory copying local_pattern" );
+			return (httpd_server*) 0;
+		}
 	}
-    hs->no_log = no_log;
-    hs->logfp = (FILE*) 0;
-    httpd_set_logfp( hs, logfp );
-    hs->no_symlink_check = no_symlink_check;
-    hs->vhost = vhost;
-    hs->global_passwd = global_passwd;
-    hs->no_empty_referers = no_empty_referers;
+	hs->no_log = no_log;
+	hs->logfp = (FILE*) 0;
+	httpd_set_logfp( hs, logfp );
+	hs->no_symlink_check = no_symlink_check;
+	hs->vhost = vhost;
+	hs->global_passwd = global_passwd;
+	hs->no_empty_referers = no_empty_referers;
 
-    /* Initialize listen sockets.  Try v6 first because of a Linux peculiarity;
-    ** like some other systems, it has magical v6 sockets that also listen for
-    ** v4, but in Linux if you bind a v4 socket first then the v6 bind fails.
-    */
-    /*if ( sa6P == (httpd_sockaddr*) 0 )
-	hs->listen6_fd = -1;
-    else
-	hs->listen6_fd = initialize_listen_socket( sa6P );
-    if ( sa4P == (httpd_sockaddr*) 0 )
-	hs->listen4_fd = -1;
-    else
-	hs->listen4_fd = initialize_listen_socket( sa4P );*/
-    /* If we didn't get any valid sockets, fail. */
-    /*if ( hs->listen4_fd == -1 && hs->listen6_fd == -1 )
-	{
-	free_httpd_server( hs );
-	return (httpd_server*) 0;
-	}*/
+	/* Initialize listen sockets.  Try v6 first because of a Linux peculiarity;
+	 ** like some other systems, it has magical v6 sockets that also listen for
+	 ** v4, but in Linux if you bind a v4 socket first then the v6 bind fails.
+	 */
+	/*if ( sa6P == (httpd_sockaddr*) 0 )
+	  hs->listen6_fd = -1;
+	  else
+	  hs->listen6_fd = initialize_listen_socket( sa6P );
+	  if ( sa4P == (httpd_sockaddr*) 0 )
+	  hs->listen4_fd = -1;
+	  else
+	  hs->listen4_fd = initialize_listen_socket( sa4P );*/
+	/* If we didn't get any valid sockets, fail. */
+	/*if ( hs->listen4_fd == -1 && hs->listen6_fd == -1 )
+	  {
+	  free_httpd_server( hs );
+	  return (httpd_server*) 0;
+	  }*/
 
-    init_mime();
+	init_mime();
 
-    /* Done initializing. */
+	/* Done initializing. */
 //    if ( hs->binding_hostname == (char*) 0 )
 //	syslog(
 //	    LOG_NOTICE, "%.80s starting on port %d", SERVER_SOFTWARE,
@@ -372,96 +372,96 @@ httpd_initialize(
 //	    LOG_NOTICE, "%.80s starting on %.80s, port %d", SERVER_SOFTWARE,
 //	    httpd_ntoa( hs->listen4_fd != -1 ? sa4P : sa6P ),
 //	    (int) hs->port );
-    return hs;
-    }
+	return hs;
+}
 
 
 int
 httpd_initialize_listen_socket( httpd_sockaddr* saP )
-    {
-    int listen_fd;
-    int on/*, flags*/;
+{
+	int listen_fd;
+	int on/*, flags*/;
 
-    /* Check sockaddr. */
-    if ( ! sockaddr_check( saP ) )
+	/* Check sockaddr. */
+	if ( ! sockaddr_check( saP ) )
 	{
-//	syslog( LOG_CRIT, "unknown sockaddr family on listen socket" );
-	return -1;
+		//	syslog( LOG_CRIT, "unknown sockaddr family on listen socket" );
+		return -1;
 	}
 
-    /* Create socket. */
-    listen_fd = socket( saP->sa.sa_family, SOCK_STREAM, 0 );
-    if ( listen_fd < 0 )
+	/* Create socket. */
+	listen_fd = socket( saP->sa.sa_family, SOCK_STREAM, 0 );
+	if ( listen_fd < 0 )
 	{
 //	syslog( LOG_CRIT, "socket %.80s - %m", httpd_ntoa( saP ) );
-	poorman_log("can't create socket.\n", false, INADDR_NONE, RED);
-	return -1;
+		poorman_log("can't create socket.\n", false, INADDR_NONE, RED);
+		return -1;
 	}
-    (void) fcntl( listen_fd, F_SETFD, 1 );
+	(void) fcntl( listen_fd, F_SETFD, 1 );
 
-    /* Allow reuse of local addresses. */
-    on = 1;
-    if ( setsockopt(
-	     listen_fd, SOL_SOCKET, SO_REUSEADDR, (char*) &on,
-	     sizeof(on) ) < 0 )
-	/*syslog( LOG_CRIT, "setsockopt SO_REUSEADDR - %m" )*/;
+	/* Allow reuse of local addresses. */
+	on = 1;
+	if ( setsockopt(
+				listen_fd, SOL_SOCKET, SO_REUSEADDR, (char*) &on,
+				sizeof(on) ) < 0 )
+		/*syslog( LOG_CRIT, "setsockopt SO_REUSEADDR - %m" )*/;
 
-    /* Bind to it. */
-    if ( bind( listen_fd, &saP->sa, sockaddr_len( saP ) ) < 0 )
+	/* Bind to it. */
+	if ( bind( listen_fd, &saP->sa, sockaddr_len( saP ) ) < 0 )
 	{
-//	syslog(
-//	    LOG_CRIT, "bind %.80s - %m", httpd_ntoa( saP ) );
-	poorman_log("can't bind to socket.\n", false, INADDR_NONE, RED);
-	(void) close( listen_fd );
-	return -1;
+		//	syslog(
+		//	    LOG_CRIT, "bind %.80s - %m", httpd_ntoa( saP ) );
+		poorman_log("can't bind to socket.\n", false, INADDR_NONE, RED);
+		(void) close( listen_fd );
+		return -1;
 	}
 
-    /* Start a listen going. */
-    if ( listen( listen_fd, LISTEN_BACKLOG ) < 0 )
+	/* Start a listen going. */
+	if ( listen( listen_fd, LISTEN_BACKLOG ) < 0 )
 	{
-//	syslog( LOG_CRIT, "listen - %m" );
-	poorman_log("can't listen to socket.\n", false, INADDR_NONE, RED);
-	(void) close( listen_fd );
-	return -1;
+		//	syslog( LOG_CRIT, "listen - %m" );
+		poorman_log("can't listen to socket.\n", false, INADDR_NONE, RED);
+		(void) close( listen_fd );
+		return -1;
 	}
 
-    /* Use accept filtering, if available. */
+	/* Use accept filtering, if available. */
 #ifdef SO_ACCEPTFILTER
-    {
+	{
 #if ( __FreeBSD_version >= 411000 )
 #define ACCEPT_FILTER_NAME "httpready"
 #else
 #define ACCEPT_FILTER_NAME "dataready"
 #endif
-    struct accept_filter_arg af;
-    (void) bzero( &af, sizeof(af) );
-    (void) strcpy( af.af_name, ACCEPT_FILTER_NAME );
-    (void) setsockopt(
-	listen_fd, SOL_SOCKET, SO_ACCEPTFILTER, (char*) &af, sizeof(af) );
-    }
+		struct accept_filter_arg af;
+		(void) bzero( &af, sizeof(af) );
+		(void) strcpy( af.af_name, ACCEPT_FILTER_NAME );
+		(void) setsockopt(
+				listen_fd, SOL_SOCKET, SO_ACCEPTFILTER, (char*) &af, sizeof(af) );
+	}
 #endif /* SO_ACCEPTFILTER */
 
-    return listen_fd;
-    }
+	return listen_fd;
+}
 
 
 void
 httpd_set_logfp( httpd_server* hs, FILE* logfp )
-    {
-    if ( hs->logfp != (FILE*) 0 )
-	(void) fclose( hs->logfp );
-    hs->logfp = logfp;
-    }
+{
+	if ( hs->logfp != (FILE*) 0 )
+		(void) fclose( hs->logfp );
+	hs->logfp = logfp;
+}
 
 
 void
 httpd_terminate( httpd_server* hs )
-    {
-    httpd_unlisten( hs );
-    if ( hs->logfp != (FILE*) 0 )
-	(void) fclose( hs->logfp );
-    free_httpd_server( hs );
-    }
+{
+	httpd_unlisten( hs );
+	if ( hs->logfp != (FILE*) 0 )
+		(void) fclose( hs->logfp );
+	free_httpd_server( hs );
+}
 
 
 void
@@ -1437,231 +1437,231 @@ vhost_map( httpd_conn* hc )
 */
 static char*
 expand_symlinks( char* path, char** freethis, char** restP, int no_symlink_check, int tildemapped )
-    {
-    char* checked;
-    char* rest;
-    char link[5000];
-    size_t maxchecked = 0, maxrest = 0;
-    size_t checkedlen , restlen, prevcheckedlen, prevrestlen;
-    ssize_t linklen;
-    int nlinks, i;
-    char* r;
-    char* cp1;
-    char* cp2;
+{
+	char* checked;
+	char* rest;
+	char link[5000];
+	size_t maxchecked = 0, maxrest = 0;
+	size_t checkedlen , restlen, prevcheckedlen, prevrestlen;
+	ssize_t linklen;
+	int nlinks, i;
+	char* r;
+	char* cp1;
+	char* cp2;
 
-    if ( no_symlink_check )
+	if ( no_symlink_check )
 	{
-	/* If we are chrooted, we can actually skip the symlink-expansion,
-	** since it's impossible to get out of the tree.  However, we still
-	** need to do the pathinfo check, and the existing symlink expansion
-	** code is a pretty reasonable way to do this.  So, what we do is
-	** a single stat() of the whole filename - if it exists, then we
-	** return it as is with nothing in restP.  If it doesn't exist, we
-	** fall through to the existing code.
-	**
-	** One side-effect of this is that users can't symlink to central
-	** approved CGIs any more.  The workaround is to use the central
-	** URL for the CGI instead of a local symlinked one.
-	*/
-	struct stat sb;
-	if ( stat( path, &sb ) != -1 )
-	    {
-	    checkedlen = strlen( path );
-	    httpd_realloc_str( &checked, &maxchecked, checkedlen );
-	    (void) strcpy( checked, path );
-	    /* Trim trailing slashes. */
-	    while ( checked[checkedlen - 1] == '/' )
+		/* If we are chrooted, we can actually skip the symlink-expansion,
+		 ** since it's impossible to get out of the tree.  However, we still
+		 ** need to do the pathinfo check, and the existing symlink expansion
+		 ** code is a pretty reasonable way to do this.  So, what we do is
+		 ** a single stat() of the whole filename - if it exists, then we
+		 ** return it as is with nothing in restP.  If it doesn't exist, we
+		 ** fall through to the existing code.
+		 **
+		 ** One side-effect of this is that users can't symlink to central
+		 ** approved CGIs any more.  The workaround is to use the central
+		 ** URL for the CGI instead of a local symlinked one.
+		 */
+		struct stat sb;
+		if ( stat( path, &sb ) != -1 )
 		{
-		checked[checkedlen - 1] = '\0';
-		--checkedlen;
+			checkedlen = strlen( path );
+			httpd_realloc_str( &checked, &maxchecked, checkedlen );
+			(void) strcpy( checked, path );
+			/* Trim trailing slashes. */
+			while ( checked[checkedlen - 1] == '/' )
+			{
+				checked[checkedlen - 1] = '\0';
+				--checkedlen;
+			}
+			httpd_realloc_str( &rest, &maxrest, 0 );
+			rest[0] = '\0';
+			*restP = rest;
+			*freethis = rest;
+			return checked;
 		}
-	    httpd_realloc_str( &rest, &maxrest, 0 );
-	    rest[0] = '\0';
-	    *restP = rest;
-	    *freethis = rest;
-	    return checked;
-	    }
 	}
 
-    /* Start out with nothing in checked and the whole filename in rest. */
-    httpd_realloc_str( &checked, &maxchecked, 1 );
-    checked[0] = '\0';
-    checkedlen = 0;
-    restlen = strlen( path );
-    httpd_realloc_str( &rest, &maxrest, restlen );
-    (void) strcpy( rest, path );
-    if ( rest[restlen - 1] == '/' )
-	rest[--restlen] = '\0';         /* trim trailing slash */
-    if ( ! tildemapped )
-	/* Remove any leading slashes. */
-	while ( rest[0] == '/' )
-	    {
-	    (void) strcpy( rest, &(rest[1]) );
-	    --restlen;
-	    }
-    r = rest;
-    nlinks = 0;
+	/* Start out with nothing in checked and the whole filename in rest. */
+	httpd_realloc_str( &checked, &maxchecked, 1 );
+	checked[0] = '\0';
+	checkedlen = 0;
+	restlen = strlen( path );
+	httpd_realloc_str( &rest, &maxrest, restlen );
+	(void) strcpy( rest, path );
+	if ( rest[restlen - 1] == '/' )
+		rest[--restlen] = '\0';         /* trim trailing slash */
+	if ( ! tildemapped )
+		/* Remove any leading slashes. */
+		while ( rest[0] == '/' )
+		{
+			(void) strcpy( rest, &(rest[1]) );
+			--restlen;
+		}
+	r = rest;
+	nlinks = 0;
 
-    /* While there are still components to check... */
-    while ( restlen > 0 )
+	/* While there are still components to check... */
+	while ( restlen > 0 )
 	{
-	/* Save current checkedlen in case we get a symlink.  Save current
-	** restlen in case we get a non-existant component.
-	*/
-	prevcheckedlen = checkedlen;
-	prevrestlen = restlen;
+		/* Save current checkedlen in case we get a symlink.  Save current
+		 ** restlen in case we get a non-existant component.
+		 */
+		prevcheckedlen = checkedlen;
+		prevrestlen = restlen;
 
-	/* Grab one component from r and transfer it to checked. */
-	cp1 = strchr( r, '/' );
-	if ( cp1 != (char*) 0 )
-	    {
-	    i = cp1 - r;
-	    if ( i == 0 )
+		/* Grab one component from r and transfer it to checked. */
+		cp1 = strchr( r, '/' );
+		if ( cp1 != (char*) 0 )
 		{
-		/* Special case for absolute paths. */
-		httpd_realloc_str( &checked, &maxchecked, checkedlen + 1 );
-		(void) strncpy( &checked[checkedlen], r, 1 );
-		checkedlen += 1;
+			i = cp1 - r;
+			if ( i == 0 )
+			{
+				/* Special case for absolute paths. */
+				httpd_realloc_str( &checked, &maxchecked, checkedlen + 1 );
+				(void) strncpy( &checked[checkedlen], r, 1 );
+				checkedlen += 1;
+			}
+			else if ( strncmp( r, "..", MAX( i, 2 ) ) == 0 )
+			{
+				/* Ignore ..'s that go above the start of the path. */
+				if ( checkedlen != 0 )
+				{
+					cp2 = strrchr( checked, '/' );
+					if ( cp2 == (char*) 0 )
+						checkedlen = 0;
+					else if ( cp2 == checked )
+						checkedlen = 1;
+					else
+						checkedlen = cp2 - checked;
+				}
+			}
+			else
+			{
+				httpd_realloc_str( &checked, &maxchecked, checkedlen + 1 + i );
+				if ( checkedlen > 0 && checked[checkedlen-1] != '/' )
+					checked[checkedlen++] = '/';
+				(void) strncpy( &checked[checkedlen], r, i );
+				checkedlen += i;
+			}
+			checked[checkedlen] = '\0';
+			r += i + 1;
+			restlen -= i + 1;
 		}
-	    else if ( strncmp( r, "..", MAX( i, 2 ) ) == 0 )
-		{
-		/* Ignore ..'s that go above the start of the path. */
-		if ( checkedlen != 0 )
-		    {
-		    cp2 = strrchr( checked, '/' );
-		    if ( cp2 == (char*) 0 )
-			checkedlen = 0;
-		    else if ( cp2 == checked )
-			checkedlen = 1;
-		    else
-			checkedlen = cp2 - checked;
-		    }
-		}
-	    else
-		{
-		httpd_realloc_str( &checked, &maxchecked, checkedlen + 1 + i );
-		if ( checkedlen > 0 && checked[checkedlen-1] != '/' )
-		    checked[checkedlen++] = '/';
-		(void) strncpy( &checked[checkedlen], r, i );
-		checkedlen += i;
-		}
-	    checked[checkedlen] = '\0';
-	    r += i + 1;
-	    restlen -= i + 1;
-	    }
-	else
-	    {
-	    /* No slashes remaining, r is all one component. */
-	    if ( strcmp( r, ".." ) == 0 )
-		{
-		/* Ignore ..'s that go above the start of the path. */
-		if ( checkedlen != 0 )
-		    {
-		    cp2 = strrchr( checked, '/' );
-		    if ( cp2 == (char*) 0 )
-			checkedlen = 0;
-		    else if ( cp2 == checked )
-			checkedlen = 1;
-		    else
-			checkedlen = cp2 - checked;
-		    checked[checkedlen] = '\0';
-		    }
-		}
-	    else
-		{
-		httpd_realloc_str(
-		    &checked, &maxchecked, checkedlen + 1 + restlen );
-		if ( checkedlen > 0 && checked[checkedlen-1] != '/' )
-		    checked[checkedlen++] = '/';
-		(void) strcpy( &checked[checkedlen], r );
-		checkedlen += restlen;
-		}
-	    r += restlen;
-	    restlen = 0;
-	    }
-
-	/* Try reading the current filename as a symlink */
-	if ( checked[0] == '\0' )
-	    continue;
-	linklen = readlink( checked, link, sizeof(link) - 1 );
-	if ( linklen == -1 )
-	    {
-	    if ( errno == EINVAL )
-		continue;               /* not a symlink */
-	    if ( errno == EACCES || errno == ENOENT || errno == ENOTDIR )
-		{
-		/* That last component was bogus.  Restore and return. */
-		*restP = r - ( prevrestlen - restlen );
-		if ( prevcheckedlen == 0 )
-		    (void) strcpy( checked, "." );
 		else
-		    checked[prevcheckedlen] = '\0';
-		*freethis = rest;
-		return checked;
+		{
+			/* No slashes remaining, r is all one component. */
+			if ( strcmp( r, ".." ) == 0 )
+			{
+				/* Ignore ..'s that go above the start of the path. */
+				if ( checkedlen != 0 )
+				{
+					cp2 = strrchr( checked, '/' );
+					if ( cp2 == (char*) 0 )
+						checkedlen = 0;
+					else if ( cp2 == checked )
+						checkedlen = 1;
+					else
+						checkedlen = cp2 - checked;
+					checked[checkedlen] = '\0';
+				}
+			}
+			else
+			{
+				httpd_realloc_str(
+						&checked, &maxchecked, checkedlen + 1 + restlen );
+				if ( checkedlen > 0 && checked[checkedlen-1] != '/' )
+					checked[checkedlen++] = '/';
+				(void) strcpy( &checked[checkedlen], r );
+				checkedlen += restlen;
+			}
+			r += restlen;
+			restlen = 0;
 		}
-//	    syslog( LOG_ERR, "readlink %.80s - %m", checked );
-	    free(checked);
-	    free(rest);
-	    *freethis = 0;
-	    return (char*) 0;
-	    }
-	++nlinks;
-	if ( nlinks > MAX_LINKS )
-	    {
-//	    syslog( LOG_ERR, "too many symlinks in %.80s", path );
-	    free(checked);
-	    free(rest);
-	    *freethis = 0;
-	    return (char*) 0;
-	    }
-	link[linklen] = '\0';
-	if ( link[linklen - 1] == '/' )
-	    link[--linklen] = '\0';     /* trim trailing slash */
 
-	/* Insert the link contents in front of the rest of the filename. */
-	if ( restlen != 0 )
-	    {
-	    (void) strcpy( rest, r );
-	    httpd_realloc_str( &rest, &maxrest, restlen + linklen + 1 );
-	    for ( i = restlen; i >= 0; --i )
-		rest[i + linklen + 1] = rest[i];
-	    (void) strcpy( rest, link );
-	    rest[linklen] = '/';
-	    restlen += linklen + 1;
-	    r = rest;
-	    }
-	else
-	    {
-	    /* There's nothing left in the filename, so the link contents
-	    ** becomes the rest.
-	    */
-	    httpd_realloc_str( &rest, &maxrest, linklen );
-	    (void) strcpy( rest, link );
-	    restlen = linklen;
-	    r = rest;
-	    }
+		/* Try reading the current filename as a symlink */
+		if ( checked[0] == '\0' )
+			continue;
+		linklen = readlink( checked, link, sizeof(link) - 1 );
+		if ( linklen == -1 )
+		{
+			if ( errno == EINVAL )
+				continue;               /* not a symlink */
+			if ( errno == EACCES || errno == ENOENT || errno == ENOTDIR )
+			{
+				/* That last component was bogus.  Restore and return. */
+				*restP = r - ( prevrestlen - restlen );
+				if ( prevcheckedlen == 0 )
+					(void) strcpy( checked, "." );
+				else
+					checked[prevcheckedlen] = '\0';
+				*freethis = rest;
+				return checked;
+			}
+			//	    syslog( LOG_ERR, "readlink %.80s - %m", checked );
+			free(checked);
+			free(rest);
+			*freethis = 0;
+			return (char*) 0;
+		}
+		++nlinks;
+		if ( nlinks > MAX_LINKS )
+		{
+			//	    syslog( LOG_ERR, "too many symlinks in %.80s", path );
+			free(checked);
+			free(rest);
+			*freethis = 0;
+			return (char*) 0;
+		}
+		link[linklen] = '\0';
+		if ( link[linklen - 1] == '/' )
+			link[--linklen] = '\0';     /* trim trailing slash */
 
-	if ( rest[0] == '/' )
-	    {
-	    /* There must have been an absolute symlink - zero out checked. */
-	    checked[0] = '\0';
-	    checkedlen = 0;
-	    }
-	else
-	    {
-	    /* Re-check this component. */
-	    checkedlen = prevcheckedlen;
-	    checked[checkedlen] = '\0';
-	    }
+		/* Insert the link contents in front of the rest of the filename. */
+		if ( restlen != 0 )
+		{
+			(void) strcpy( rest, r );
+			httpd_realloc_str( &rest, &maxrest, restlen + linklen + 1 );
+			for ( i = restlen; i >= 0; --i )
+				rest[i + linklen + 1] = rest[i];
+			(void) strcpy( rest, link );
+			rest[linklen] = '/';
+			restlen += linklen + 1;
+			r = rest;
+		}
+		else
+		{
+			/* There's nothing left in the filename, so the link contents
+			 ** becomes the rest.
+			 */
+			httpd_realloc_str( &rest, &maxrest, linklen );
+			(void) strcpy( rest, link );
+			restlen = linklen;
+			r = rest;
+		}
+
+		if ( rest[0] == '/' )
+		{
+			/* There must have been an absolute symlink - zero out checked. */
+			checked[0] = '\0';
+			checkedlen = 0;
+		}
+		else
+		{
+			/* Re-check this component. */
+			checkedlen = prevcheckedlen;
+			checked[checkedlen] = '\0';
+		}
 	}
 
-    /* Ok. */
-    *restP = r;
-    if ( checked[0] == '\0' )
-	(void) strcpy( checked, "." );
+	/* Ok. */
+	*restP = r;
+	if ( checked[0] == '\0' )
+		(void) strcpy( checked, "." );
 	*freethis = rest;
-    return checked;
-    }
+	return checked;
+}
 
 
 int
