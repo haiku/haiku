@@ -647,7 +647,8 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 		int32 itemCount = CountItems();
 		while (i < itemCount) {
 			teamItem = dynamic_cast<TTeamMenuItem*>(ItemAt(i));
-			if (teamItem != NULL && strcasecmp(teamItem->Label(), name) > 0) {
+			if (teamItem != NULL && gCollator.Compare(teamItem->Label(), name)
+					> 0) {
 				AddItem(item, i);
 				break;
 			}
