@@ -70,6 +70,8 @@ All rights reserved.
 #include "tracker_private.h"
 
 
+BCollator gCollator;
+
 BLocker TBarApp::sSubscriberLock;
 BList TBarApp::sBarTeamInfoList;
 BList TBarApp::sSubscribers;

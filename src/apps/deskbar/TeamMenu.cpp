@@ -65,7 +65,8 @@ TTeamMenu::TTeamMenu()
 int
 TTeamMenu::CompareByName(const void* first, const void* second)
 {
-	return strcasecmp((*(static_cast<BarTeamInfo* const*>(first)))->name,
+	return gCollator.Compare(
+		(*(static_cast<BarTeamInfo* const*>(first)))->name,
 		(*(static_cast<BarTeamInfo* const*>(second)))->name);
 }
 
@@ -88,7 +89,7 @@ TTeamMenu::AttachedToWindow()
 	float width = gMinimumWindowWidth - iconSize - 4;
 
 	if (settings->sortRunningApps)
-		teamList.SortItems(CompareByName);
+		teamList.SortItems(TTeamMenu::CompareByName);
 
 	int32 count = teamList.CountItems();
 	for (int32 i = 0; i < count; i++) {

@@ -63,6 +63,7 @@ All rights reserved.
 #include "ResourceSet.h"
 #include "ShowHideMenuItem.h"
 #include "StatusView.h"
+#include "TeamMenu.h"
 #include "TeamMenuItem.h"
 #include "WindowMenu.h"
 #include "WindowMenuItem.h"
@@ -108,14 +109,6 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* barView, bool vertical)
 		R_LeafLogoBitmap);
 	if (logoBitmap != NULL)
 		fDeskbarMenuWidth = logoBitmap->Bounds().Width() + 16;
-}
-
-
-int
-TExpandoMenuBar::CompareByName(const void* first, const void* second)
-{
-	return strcasecmp((*(static_cast<BarTeamInfo* const*>(first)))->name,
-		(*(static_cast<BarTeamInfo* const*>(second)))->name);
 }
 
 
@@ -489,7 +482,7 @@ TExpandoMenuBar::BuildItems()
 	}
 
 	if (settings->sortRunningApps)
-		fTeamList.SortItems(CompareByName);
+		fTeamList.SortItems(TTeamMenu::CompareByName);
 
 	int32 teamCount = fTeamList.CountItems();
 	for (int32 i = 0; i < teamCount; i++) {

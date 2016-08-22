@@ -51,7 +51,6 @@ public:
 			void			AttachedToWindow();
 			void			DetachedFromWindow();
 
-private:
 	static	int				CompareByName(const void* first,
 								const void* second);
 };
