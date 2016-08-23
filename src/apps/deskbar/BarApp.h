@@ -36,7 +36,6 @@ All rights reserved.
 #define BAR_APP_H
 
 
-#include <Collator.h>
 #include <Server.h>
 
 #include "BarSettings.h"
@@ -76,8 +75,6 @@ const int32 kIconCacheCount = (kMaximumIconSize - kMinimumIconSize)
 
 // update preferences message constant
 const uint32 kUpdatePreferences = 'Pref';
-
-extern BCollator gCollator;
 
 /* --------------------------------------------- */
 

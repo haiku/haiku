@@ -39,6 +39,7 @@ All rights reserved.
 #include <strings.h>
 
 #include <Application.h>
+#include <Collator.h>
 #include <Debug.h>
 #include <Roster.h>
 
@@ -65,7 +66,10 @@ TTeamMenu::TTeamMenu()
 int
 TTeamMenu::CompareByName(const void* first, const void* second)
 {
-	return gCollator.Compare(
+	BCollator collator;
+	BLocale::Default()->GetCollator(&collator);
+
+	return collator.Compare(
 		(*(static_cast<BarTeamInfo* const*>(first)))->name,
 		(*(static_cast<BarTeamInfo* const*>(second)))->name);
 }

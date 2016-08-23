@@ -42,6 +42,7 @@ All rights reserved.
 
 #include <Autolock.h>
 #include <Bitmap.h>
+#include <Collator.h>
 #include <ControlLook.h>
 #include <Debug.h>
 #include <MenuPrivate.h>
@@ -643,11 +644,14 @@ TExpandoMenuBar::AddTeam(BList* team, BBitmap* icon, char* name,
 			firstApp++;
 		}
 
+		BCollator collator;
+		BLocale::Default()->GetCollator(&collator);
+
 		int32 i = firstApp;
 		int32 itemCount = CountItems();
 		while (i < itemCount) {
 			teamItem = dynamic_cast<TTeamMenuItem*>(ItemAt(i));
-			if (teamItem != NULL && gCollator.Compare(teamItem->Label(), name)
+			if (teamItem != NULL && collator.Compare(teamItem->Label(), name)
 					> 0) {
 				AddItem(item, i);
 				break;
