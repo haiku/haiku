@@ -1239,7 +1239,7 @@ AttributeView::MouseDown(BPoint where)
 		fTrackingState = path_track;
 	} else if (fTitleRect.Contains(where)) {
 		if (!fModel->HasLocalizedName()
-			&& ConfirmChangeIfWellKnownDirectory(&entry, kRename)) {
+			&& ConfirmChangeIfWellKnownDirectory(&entry, kRename, true)) {
 			BeginEditingTitle();
 		}
 	} else if (fTitleEditView) {

@@ -707,19 +707,20 @@ ConfirmChangeIfWellKnownDirectory(const BEntry* entry, DestructiveAction action,
 				B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatchesOrContains(entry, "beos_mime",
 				B_SYSTEM_SETTINGS_DIRECTORY)) {
-			warning.ReplaceFirst("%target", "the MIME settings");
+			warning.ReplaceFirst("%target", B_TRANSLATE("the MIME settings"));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_CONFIG_DIRECTORY)) {
-			warning.ReplaceFirst("%target", "the config folder");
+			warning.ReplaceFirst("%target", B_TRANSLATE("the config folder"));
 			requireOverride = false;
 		} else if (DirectoryMatches(entry, B_USER_SETTINGS_DIRECTORY)
 			|| DirectoryMatches(entry, B_SYSTEM_SETTINGS_DIRECTORY)) {
-			warning.ReplaceFirst("%target", "the settings folder");
+			warning.ReplaceFirst("%target", B_TRANSLATE("the settings folder"));
 			requireOverride = false;
+		} else {
+			// It was not a special directory/file after all. Allow renaming.
+			return true;
 		}
-	}
-
-	if (!warning.Length())
+	} else
 		return true;
 
 	if (dontAsk)
