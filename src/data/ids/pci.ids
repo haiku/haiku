@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.07.31
-#	Date:    2016-07-31 03:15:01
+#	Version: 2016.08.20
+#	Date:    2016-08-20 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -2154,12 +2154,19 @@
 	67b9  Vesuvius [Radeon R9 295X2]
 	67be  Hawaii LE
 	67c0  Ellesmere [Polaris10]
-	67df  Ellesmere [Radeon RX 480]
+	67df  Ellesmere [Radeon RX 470/480]
+		1002 0b37  Radeon RX 480
+		1043 04fb  Radeon RX 480
+		1462 3411  Radeon RX 470
+		1462 3413  Radeon RX 480
+		1682 9480  Radeon RX 480
+		174b e347  Radeon RX 480
 	67e0  Baffin [Polaris11]
 	67e1  Baffin [Polaris11]
 	67e8  Baffin [Polaris11]
 	67e9  Baffin [Polaris11]
 	67eb  Baffin [Polaris11]
+	67ef  Baffin [Radeon RX 460]
 	67ff  Baffin [Polaris11]
 	6800  Wimbledon XT [Radeon HD 7970M]
 		1002 0124  Radeon HD 7970M
@@ -2981,6 +2988,7 @@
 	72b3  RV560 [Radeon X1650 GT] (Secondary)
 	7300  Fiji [Radeon R9 FURY / NANO Series]
 		1002 0b36  Radeon R9 FURY X / NANO
+		1002 1b36  Radeon Pro Duo
 		1043 049e  Radeon R9 FURY
 		1043 04a0  Radeon R9 FURY X
 		174b e329  Radeon R9 FURY
@@ -10571,7 +10579,7 @@
 	17f0  GM200GL [Quadro M6000]
 	17f1  GM200GL [Quadro M6000 24GB]
 	17fd  GM200GL [Tesla M40]
-	1b00  GP102
+	1b00  GP102 [TITAN X]
 	1b01  GP102
 	1b70  GP102GL
 	1b78  GP102GL
@@ -10587,9 +10595,10 @@
 	1be1  GP104M [GeForce GTX 1070]
 	1c00  GP106
 	1c01  GP106
-	1c02  GP106
-	1c03  GP106 [GeForce GTX 1060]
+	1c02  GP106 [GeForce GTX 1060 3GB]
+	1c03  GP106 [GeForce GTX 1060 6GB]
 	1c30  GP106GL
+	1c60  GP106M [GeForce GTX 1060]
 	1c70  GP106GL
 	1c80  GP107
 	1c81  GP107
@@ -10767,6 +10776,7 @@
 	5250  RTS5250 PCI Express Card Reader
 	525a  RTS525A PCI Express Card Reader
 	5286  RTS5286 PCI Express Card Reader
+	5287  RTL8411B PCI Express Card Reader
 	5288  RTS5288 PCI Express Card Reader
 	5289  RTL8411 PCI Express Card Reader
 		1043 1457  K55A Laptop
@@ -10904,6 +10914,7 @@
 	8191  RTL8192CE PCIe Wireless Network Adapter
 	8192  RTL8192E/RTL8192SE Wireless LAN Controller
 	8193  RTL8192DE Wireless LAN Controller
+	8196  RTL8196 Integrated PCI-e Bridge
 	8197  SmartLAN56 56K Modem
 	8199  RTL8187SE Wireless LAN Controller
 		1462 6894  MN54G2 / MS-6894 Wireless Mini PCIe Card
@@ -10932,6 +10943,7 @@
 	3fc4  RME Digi9652 (Hammerfall)
 	3fc5  RME Hammerfall DSP
 	3fc6  RME Hammerfall DSP MADI
+	7038  FPGA Card XC7VX690T
 	8380  Ellips ProfiXpress Profibus Master
 	8381  Ellips Santos Frame Grabber
 	d154  Copley Controls CAN card (PCI-CAN-02)
@@ -12003,6 +12015,7 @@
 		1093 75ff  PXIe-8383mc DMA
 		1093 7600  PXIe-8383mc DMA
 		1093 7602  PXIe-8384
+	808e  PES24NT24G2 PCI Express Switch
 # 32 port / 8 lane PCIe Gen 2 packet switch
 	808f  PES32NT8AG2
 	80cf  F32P08xG3 [PCIe boot mode]
@@ -16452,7 +16465,8 @@
 14e1  INVERTEX
 14e2  INFOLIBRIA
 14e3  AMTELCO
-14e4  Broadcom Corporation
+# Formerly Broadcom Corporation
+14e4  Broadcom Limited
 	0576  BCM43224 802.11a/b/g/n
 	0800  Sentry5 Chipcommon I/O Controller
 	0804  Sentry5 PCI Bridge
@@ -18533,7 +18547,12 @@
 	7012  AP440-2: 32-Channel Isolated Digital Input Module
 	7013  AP440-3: 32-Channel Isolated Digital Input Module
 	7014  AP445: 32-Channel Isolated Digital Output Module
+	7016  AP470 48-Channel TTL Level Digital Input/Output Module
 	7018  AP408: 32-Channel Digital I/O Module
+	701a  AP220-16 12-Bit, 16-Channel Analog Output Module
+	701b  AP231-16 16-Bit, 16-Channel Analog Output Module
+	7042  AP482 Counter Timer Module with TTL Level Input/Output
+	7044  AP484 Counter Timer Module with RS422 Input/Output
 16da  Advantech Co., Ltd.
 	0011  INES GPIB-PCI
 16df  PIKA Technologies Inc.
@@ -19925,7 +19944,7 @@
 	91a4  88SE912x IDE Controller
 	9220  88SE9220 PCIe 2.0 x2 2-port SATA 6 Gb/s RAID Controller
 	9230  88SE9230 PCIe SATA 6Gb/s Controller
-		1d49 0300  ThinkSystem M.2 with Mirroring Enablement Kit
+		1d49 0300  M.2 with Mirroring Enablement Kit
 	9235  88SE9235 PCIe 2.0 x2 4-port SATA 6 Gb/s Controller
 	9445  88SE9445 PCIe 2.0 x4 4-Port SAS/SATA 6 Gbps RAID Controller
 	9480  88SE9480 SAS/SATA 6Gb/s RAID controller
@@ -22732,8 +22751,10 @@
 	1903  Skylake Processor Thermal Subsystem
 	1904  Skylake Host Bridge/DRAM Registers
 		1028 06f3  Latitude 3570
+		17aa 382a  B51-80 Laptop
 	1905  Skylake PCIe Controller (x8)
 	1906  HD Graphics 510
+		17aa 382a  B51-80 Laptop
 	1908  Skylake Host Bridge/DRAM Registers
 	1909  Skylake PCIe Controller (x4)
 	190c  Skylake Host Bridge/DRAM Registers
@@ -23917,6 +23938,9 @@
 		10a9 802f  Omni-path HFI 100 Series, 2-port A-board
 		10a9 8030  Omni-path HFI 100 Series, 1-port B-board
 		10a9 8031  Omni-path HFI 100 Series, 2-port B-board
+		1590 00e7  100Gb 1-port OP101 QSFP28 x8 PCIe Gen3 with Intel Omni-Path Adapter
+		1590 00e8  100Gb 1-port OP101 QSFP28 x16 PCIe Gen3 with Intel Omni-Path Adapter
+		1590 021c  Apollo 100Gb 1-port Intel Omni-Path Architecture 860z Mezzanine FIO Adapter
 		15d9 0934  Omni-Path HFI Adapter 100 Series, 1 Port, PCIe x16, SIOM Module
 		1cb8 0001  Omni-Path HFI Adapter 100 Series, 1 Port, PCIe x16, TC4600 QSFP28
 		1cb8 0002  Omni-Path HFI Adapter 100 Series, 1 Port, PCIe x16, TC6600 Fixed Port
@@ -26033,8 +26057,7 @@
 	373f  Xeon C5500/C3500 IOxAPIC
 	37cd  X722 Virtual Function
 	37ce  Ethernet Connection X722 for 10GbE backplane
-		1590 0200  Ethernet 10Gb 2-port 568i Adapter
-		8086 0215  Ethernet 10Gb 2-port 568i Adapter
+		1590 0215  Ethernet 10Gb 2-port 568i Adapter
 	37cf  Ethernet Connection X722 for 10GbE QSFP+
 	37d0  Ethernet Connection X722 for 10GbE SFP+
 	37d1  Ethernet Connection X722 for 1GbE
@@ -27252,6 +27275,9 @@
 		1028 06f3  Latitude 3570
 	9d14  Sunrise Point-LP PCI Express Root Port #5
 	9d15  Sunrise Point-LP PCI Express Root Port #6
+	9d16  Sunrise Point-LP PCI Express Root Port #7
+	9d17  Sunrise Point-LP PCI Express Root Port #8
+	9d18  Sunrise Point-LP PCI Express Root Port #9
 	9d21  Sunrise Point-LP PMC
 		1028 06f3  Latitude 3570
 	9d23  Sunrise Point-LP SMBus
@@ -27267,6 +27293,7 @@
 		1028 06f3  Latitude 3570
 	9d3a  Sunrise Point-LP CSME HECI #1
 		1028 06f3  Latitude 3570
+	9d43  Sunrise Point-LP LPC Controller
 	9d48  Sunrise Point-LP LPC Controller
 		1028 06f3  Latitude 3570
 	9d60  Sunrise Point-LP Serial IO I2C Controller #0
