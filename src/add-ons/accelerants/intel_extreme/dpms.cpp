@@ -47,10 +47,6 @@ static void
 enable_lvds_panel(bool enable)
 {
 	bool hasPCH = (gInfo->shared_info->pch_info != INTEL_PCH_NONE);
-	if (hasPCH) {
-		// TODO: fix for PCH (does not enable the panel - crashes?)
-		return;
-	}
 
 	int controlRegister = hasPCH ? PCH_PANEL_CONTROL : INTEL_PANEL_CONTROL;
 	int statusRegister = hasPCH ? PCH_PANEL_STATUS : INTEL_PANEL_STATUS;
@@ -61,21 +57,26 @@ enable_lvds_panel(bool enable)
 	if (enable) {
 		if ((control & PANEL_CONTROL_POWER_TARGET_ON) == 0) {
 			write32(controlRegister, control | PANEL_CONTROL_POWER_TARGET_ON
-				| (hasPCH ? PANEL_REGISTER_UNLOCK : 0));
+				/*| (hasPCH ? PANEL_REGISTER_UNLOCK : 0)*/);
 		}
 
-		do {
-			panelStatus = read32(statusRegister);
-		} while ((panelStatus & PANEL_STATUS_POWER_ON) == 0);
+		if (!hasPCH) {
+			do {
+				panelStatus = read32(statusRegister);
+			} while ((panelStatus & PANEL_STATUS_POWER_ON) == 0);
+		}
 	} else {
 		if ((control & PANEL_CONTROL_POWER_TARGET_ON) != 0) {
 			write32(controlRegister, (control & ~PANEL_CONTROL_POWER_TARGET_ON)
-				| (hasPCH ? PANEL_REGISTER_UNLOCK : 0));
+				/*| (hasPCH ? PANEL_REGISTER_UNLOCK : 0)*/);
 		}
 
-		do {
-			panelStatus = read32(statusRegister);
-		} while ((panelStatus & PANEL_STATUS_POWER_ON) != 0);
+		if (!hasPCH)
+		{
+			do {
+				panelStatus = read32(statusRegister);
+			} while ((panelStatus & PANEL_STATUS_POWER_ON) != 0);
+		}
 	}
 }
 

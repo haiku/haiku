@@ -182,26 +182,32 @@ Pipe::ConfigureTimings(display_mode* target)
 		return;
 	}
 
-	// update timing parameters
-	write32(INTEL_DISPLAY_A_HTOTAL,
-		((uint32)(target->timing.h_total - 1) << 16)
-		| ((uint32)target->timing.h_display - 1));
-	write32(INTEL_DISPLAY_A_HBLANK,
-		((uint32)(target->timing.h_total - 1) << 16)
-		| ((uint32)target->timing.h_display - 1));
-	write32(INTEL_DISPLAY_A_HSYNC,
-		((uint32)(target->timing.h_sync_end - 1) << 16)
-		| ((uint32)target->timing.h_sync_start - 1));
+	/* If there is a transcoder, leave the display at its native resolution,
+	 * and configure only the transcoder (panel fitting will match them
+	 * together). */
+	if (!fHasTranscoder)
+	{
+		// update timing (fPipeOffset bumps the DISPLAY_A to B when needed)
+		write32(INTEL_DISPLAY_A_HTOTAL + fPipeOffset,
+			((uint32)(target->timing.h_total - 1) << 16)
+			| ((uint32)target->timing.h_display - 1));
+		write32(INTEL_DISPLAY_A_HBLANK + fPipeOffset,
+			((uint32)(target->timing.h_total - 1) << 16)
+			| ((uint32)target->timing.h_display - 1));
+		write32(INTEL_DISPLAY_A_HSYNC + fPipeOffset,
+			((uint32)(target->timing.h_sync_end - 1) << 16)
+			| ((uint32)target->timing.h_sync_start - 1));
 
-	write32(INTEL_DISPLAY_A_VTOTAL,
-		((uint32)(target->timing.v_total - 1) << 16)
-		| ((uint32)target->timing.v_display - 1));
-	write32(INTEL_DISPLAY_A_VBLANK,
-		((uint32)(target->timing.v_total - 1) << 16)
-		| ((uint32)target->timing.v_display - 1));
-	write32(INTEL_DISPLAY_A_VSYNC,
-		((uint32)(target->timing.v_sync_end - 1) << 16)
-		| ((uint32)target->timing.v_sync_start - 1));
+		write32(INTEL_DISPLAY_A_VTOTAL + fPipeOffset,
+			((uint32)(target->timing.v_total - 1) << 16)
+			| ((uint32)target->timing.v_display - 1));
+		write32(INTEL_DISPLAY_A_VBLANK + fPipeOffset,
+			((uint32)(target->timing.v_total - 1) << 16)
+			| ((uint32)target->timing.v_display - 1));
+		write32(INTEL_DISPLAY_A_VSYNC + fPipeOffset,
+			((uint32)(target->timing.v_sync_end - 1) << 16)
+			| ((uint32)target->timing.v_sync_start - 1));
+	}
 
 	// XXX: Is it ok to do these on non-digital?
 

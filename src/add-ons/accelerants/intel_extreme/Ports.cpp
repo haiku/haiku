@@ -354,14 +354,14 @@ LVDSPort::LVDSPort()
 	:
 	Port(INTEL_PORT_C, "LVDS")
 {
-#if 0
-	// FIXME results in black screen on SandyBridge
 	// Always unlock LVDS port as soon as we start messing with it.
 	uint32 panelControl = INTEL_PANEL_CONTROL;
-	if (gInfo->shared_info->pch_info != INTEL_PCH_NONE)
-		panelControl = PCH_PANEL_CONTROL;
+	if (gInfo->shared_info->pch_info != INTEL_PCH_NONE) {
+		// FIXME writing there results in black screen on SandyBridge
+		return;
+		// panelControl = PCH_PANEL_CONTROL;
+	}
 	write32(panelControl, read32(panelControl) | PANEL_REGISTER_UNLOCK);
-#endif
 }
 
 
