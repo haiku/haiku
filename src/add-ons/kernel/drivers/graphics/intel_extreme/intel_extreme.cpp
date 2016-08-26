@@ -79,12 +79,56 @@ release_vblank_sem(intel_info &info)
 }
 
 
+static uint32
+intel_get_interrupt_mask(intel_info& info, int pipes)
+{
+	uint32 mask = 0;
+	bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
+
+	// Intel changed the PCH register mapping between Sandy Bridge and the
+	// later generations (Ivy Bridge and up).
+
+	if (pipes & INTEL_PIPE_A) {
+		if (info.device_type.InGroup(INTEL_GROUP_SNB))
+			mask |= PCH_INTERRUPT_VBLANK_PIPEA_SNB;
+		else if (hasPCH)
+			mask |= PCH_INTERRUPT_VBLANK_PIPEA;
+		else
+			mask |= INTERRUPT_VBLANK_PIPEA;
+	}
+
+	if (pipes & INTEL_PIPE_B) {
+		if (info.device_type.InGroup(INTEL_GROUP_SNB))
+			mask |= PCH_INTERRUPT_VBLANK_PIPEB_SNB;
+		else if (hasPCH)
+			mask |= PCH_INTERRUPT_VBLANK_PIPEB;
+		else
+			mask |= INTERRUPT_VBLANK_PIPEB;
+	}
+
+	if (pipes == INTEL_PIPE_A | INTEL_PIPE_B)
+	{
+		if (info.device_type.InGroup(INTEL_GROUP_SNB))
+			mask |= PCH_INTERRUPT_GLOBAL_SNB;
+	}
+
+	return mask;
+}
+
+
 static int32
 intel_interrupt_handler(void* data)
 {
 	intel_info &info = *(intel_info*)data;
 	uint32 reg = find_reg(info, INTEL_INTERRUPT_IDENTITY);
-	uint16 identity = read16(info, reg);
+	bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
+	uint32 identity;
+
+	if (hasPCH)
+		identity = read32(info, reg);
+	else
+		identity = read16(info, reg);
+
 	if (identity == 0)
 		return B_UNHANDLED_INTERRUPT;
 
@@ -92,70 +136,46 @@ intel_interrupt_handler(void* data)
 
 	while (identity != 0) {
 
-		// TODO: verify that these aren't actually the same
-		bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
-		uint16 mask;
+		uint32 mask = intel_get_interrupt_mask(info, INTEL_PIPE_A);
 
-		// Intel changed the PCH register mapping between Sandy Bridge and the
-		// later generations (Ivy Bridge and up).
-		if (info.device_type.InGroup(INTEL_GROUP_SNB)) {
-			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA_SNB
-				: INTERRUPT_VBLANK_PIPEA;
-			if ((identity & mask) != 0) {
-				handled = release_vblank_sem(info);
+		if ((identity & mask) != 0) {
+			handled = release_vblank_sem(info);
 
-				// make sure we'll get another one of those
-				write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
-					DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-			}
-
-			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEB_SNB
-				: INTERRUPT_VBLANK_PIPEB;
-			if ((identity & mask) != 0) {
-				handled = release_vblank_sem(info);
-
-				// make sure we'll get another one of those
-				write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
-					DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-			}
-		} else {
-			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEA
-				: INTERRUPT_VBLANK_PIPEA;
-			if ((identity & mask) != 0) {
-				handled = release_vblank_sem(info);
-
-				// make sure we'll get another one of those
-				write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
-					DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-			}
-
-			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEB
-				: INTERRUPT_VBLANK_PIPEB;
-			if ((identity & mask) != 0) {
-				handled = release_vblank_sem(info);
-
-				// make sure we'll get another one of those
-				write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
-					DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-			}
-
-#if 0
-			// FIXME we don't have supprot for the 3rd pipe yet
-			mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEC
-				: 0;
-			if ((identity & mask) != 0) {
-				handled = release_vblank_sem(info);
-
-				// make sure we'll get another one of those
-				write32(info, INTEL_DISPLAY_C_PIPE_STATUS,
-					DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
-			}
-#endif
+			// make sure we'll get another one of those
+			write32(info, INTEL_DISPLAY_A_PIPE_STATUS,
+				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 		}
 
+		mask = intel_get_interrupt_mask(info, INTEL_PIPE_B);
+		if ((identity & mask) != 0) {
+			handled = release_vblank_sem(info);
+
+			// make sure we'll get another one of those
+			write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
+				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+		}
+
+#if 0
+		// FIXME we don't have supprot for the 3rd pipe yet
+		mask = hasPCH ? PCH_INTERRUPT_VBLANK_PIPEC
+			: 0;
+		if ((identity & mask) != 0) {
+			handled = release_vblank_sem(info);
+
+			// make sure we'll get another one of those
+			write32(info, INTEL_DISPLAY_C_PIPE_STATUS,
+				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
+		}
+#endif
+
 		// setting the bit clears it!
-		write16(info, reg, identity);
-		identity = read16(info, reg);
+		if (hasPCH) {
+			write32(info, reg, identity);
+			identity = read32(info, reg);
+		} else {
+			write16(info, reg, identity);
+			identity = read16(info, reg);
+		}
 	}
 
 	return handled;
@@ -212,16 +232,27 @@ init_interrupt_handler(intel_info &info)
 			write32(info, INTEL_DISPLAY_B_PIPE_STATUS,
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 
-			write16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), ~0);
-
-			// enable interrupts - we only want VBLANK interrupts
 			bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
-			uint16 enable = hasPCH
-				? (PCH_INTERRUPT_VBLANK_PIPEA | PCH_INTERRUPT_VBLANK_PIPEB)
-				: (INTERRUPT_VBLANK_PIPEA | INTERRUPT_VBLANK_PIPEB);
 
-			write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), enable);
-			write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~enable);
+			uint32 enable = intel_get_interrupt_mask(info,
+				INTEL_PIPE_A | INTEL_PIPE_B);
+
+			if (hasPCH) {
+				// Clear all the interrupts
+				write32(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), ~0);
+
+				// enable interrupts - we only want VBLANK interrupts
+				write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), enable);
+				write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~enable);
+			} else {
+				// Clear all the interrupts
+				write16(info, find_reg(info, INTEL_INTERRUPT_IDENTITY), ~0);
+
+				// enable interrupts - we only want VBLANK interrupts
+				write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), enable);
+				write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~enable);
+			}
+
 		}
 	}
 	if (status < B_OK) {
@@ -500,9 +531,16 @@ intel_extreme_uninit(intel_info &info)
 	CALLED();
 
 	if (!info.fake_interrupts && info.shared_info->vblank_sem > 0) {
+		bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
+
 		// disable interrupt generation
-		write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
-		write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
+		if (hasPCH) {
+			write32(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
+			write32(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
+		} else {
+			write16(info, find_reg(info, INTEL_INTERRUPT_ENABLED), 0);
+			write16(info, find_reg(info, INTEL_INTERRUPT_MASK), ~0);
+		}
 
 		remove_io_interrupt_handler(info.irq, intel_interrupt_handler, &info);
 

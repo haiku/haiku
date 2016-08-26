@@ -455,12 +455,16 @@ struct intel_free_graphics_memory {
 #define PCH_INTERRUPT_MASK				0x44004
 #define PCH_INTERRUPT_IDENTITY			0x44008
 #define PCH_INTERRUPT_ENABLED			0x4400c
+
 #define PCH_INTERRUPT_VBLANK_PIPEA		(1 << 0)
 #define PCH_INTERRUPT_VBLANK_PIPEB		(1 << 5)
 #define PCH_INTERRUPT_VBLANK_PIPEC		(1 << 10)
 
+// SandyBridge had only two pipes, and things were shuffled aroud again with
+// the introduction of pipe C.
 #define PCH_INTERRUPT_VBLANK_PIPEA_SNB		(1 << 7)
 #define PCH_INTERRUPT_VBLANK_PIPEB_SNB		(1 << 15)
+#define PCH_INTERRUPT_GLOBAL_SNB			(1 << 31)
 
 // graphics port control
 #define DISPLAY_MONITOR_PORT_ENABLED	(1UL << 31)
