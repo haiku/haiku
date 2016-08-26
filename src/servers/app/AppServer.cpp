@@ -108,7 +108,8 @@ AppServer::MessageReceived(BMessage* message)
 
 			if (version != AS_PROTOCOL_VERSION) {
 				syslog(LOG_ERR, "Application for user %" B_PRId32 " does not "
-					"support the current server protocol.\n", userID);
+					"support the current server protocol (%" B_PRId32 ").\n",
+					userID, version);
 			} else {
 				desktop = _FindDesktop(userID, targetScreen);
 				if (desktop == NULL) {
