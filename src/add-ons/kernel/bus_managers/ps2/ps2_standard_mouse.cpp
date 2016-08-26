@@ -230,22 +230,10 @@ standard_mouse_handle_int(ps2_dev* dev)
 	if (cookie->packet_index == 1) {
 		int xDelta
 			= ((cookie->buffer[0] & 0x10) ? 0xFFFFFF00 : 0) | data;
-		if (xDelta < -256 || xDelta > 255) {
-			INFO("ps2: strange mouse data, x-delta %d, trying resync\n",
-				xDelta);
-			cookie->packet_index = 0;
-			return B_HANDLED_INTERRUPT;
-		}
 	}
 	if (cookie->packet_index == 2) {
 		int yDelta
 			= ((cookie->buffer[0] & 0x20) ? 0xFFFFFF00 : 0) | data;
-		if (yDelta < -256 || yDelta > 255) {
-			INFO("ps2: strange mouse data, y-delta %d, trying resync\n",
-				yDelta);
-			cookie->packet_index = 0;
-			return B_HANDLED_INTERRUPT;
-		}
 	}
 
 	cookie->buffer[cookie->packet_index++] = data;
