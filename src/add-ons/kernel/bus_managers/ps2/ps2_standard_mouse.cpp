@@ -227,15 +227,6 @@ standard_mouse_handle_int(ps2_dev* dev)
 		return B_HANDLED_INTERRUPT;
 	}
 
-	if (cookie->packet_index == 1) {
-		int xDelta
-			= ((cookie->buffer[0] & 0x10) ? 0xFFFFFF00 : 0) | data;
-	}
-	if (cookie->packet_index == 2) {
-		int yDelta
-			= ((cookie->buffer[0] & 0x20) ? 0xFFFFFF00 : 0) | data;
-	}
-
 	cookie->buffer[cookie->packet_index++] = data;
 
 	if (cookie->packet_index != dev->packet_size) {
