@@ -35,6 +35,7 @@ __RCSID("$NetBSD: getprotoent.c,v 1.12 2008/04/28 20:23:00 martin Exp $");
 #endif /* LIBC_SCCS and not lint */
 
 #include <netdb.h>
+#include <pthread.h>
 
 #include "protoent.h"
 

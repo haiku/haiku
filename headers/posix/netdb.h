@@ -95,8 +95,6 @@
 #include <netinet/in.h>
 #include <stdio.h>
 
-#include <pthread.h>
-
 #ifndef _PATH_NETWORKS
 #define	_PATH_NETWORKS	"/etc/networks"
 #endif
