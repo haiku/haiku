@@ -148,9 +148,12 @@ typedef struct {
 #define EM_X86_64		62 /* Advanced Micro Devices X86-64 processor */
 
 /* architecture class (EI_CLASS) */
-#define ELFCLASS32	1
-#define ELFCLASS64	2
+#define ELFCLASSNONE	0
+#define ELFCLASS32		1
+#define ELFCLASS64		2
+
 /* endian (EI_DATA) */
+#define ELFDATANONE	0	/* invalid */
 #define ELFDATA2LSB	1	/* little endian */
 #define ELFDATA2MSB	2	/* big endian */
 
