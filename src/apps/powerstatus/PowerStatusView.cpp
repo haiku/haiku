@@ -678,35 +678,41 @@ PowerStatusReplicant::MessageReceived(BMessage *message)
 void
 PowerStatusReplicant::MouseDown(BPoint point)
 {
-	BPopUpMenu *menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
-	menu->SetFont(be_plain_font);
+	BMessage* msg = Window()->CurrentMessage();
+	int32 buttons = msg->GetInt32("buttons", 0);
+	if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
+		BMessenger messenger(this);
+		messenger.SendMessage(kMsgToggleExtInfo);
+	} else {
+		BPopUpMenu* menu = new BPopUpMenu(B_EMPTY_STRING, false, false);
+		menu->SetFont(be_plain_font);
 
-	BMenuItem* item;
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show text label"),
-		new BMessage(kMsgToggleLabel)));
-	if (fShowLabel)
-		item->SetMarked(true);
-	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show status icon"),
-		new BMessage(kMsgToggleStatusIcon)));
-	if (fShowStatusIcon)
-		item->SetMarked(true);
-	menu->AddItem(new BMenuItem(!fShowTime ? B_TRANSLATE("Show time") :
-	B_TRANSLATE("Show percent"),
-		new BMessage(kMsgToggleTime)));
+		BMenuItem* item;
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show text label"),
+			new BMessage(kMsgToggleLabel)));
+		if (fShowLabel)
+			item->SetMarked(true);
+		menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show status icon"),
+			new BMessage(kMsgToggleStatusIcon)));
+		if (fShowStatusIcon)
+			item->SetMarked(true);
+		menu->AddItem(new BMenuItem(!fShowTime ? B_TRANSLATE("Show time") :
+			B_TRANSLATE("Show percent"), new BMessage(kMsgToggleTime)));
 
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Battery info" B_UTF8_ELLIPSIS),
-		new BMessage(kMsgToggleExtInfo)));
+		menu->AddSeparatorItem();
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Battery info" B_UTF8_ELLIPSIS),
+			new BMessage(kMsgToggleExtInfo)));
 
-	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(B_TRANSLATE("About" B_UTF8_ELLIPSIS),
-		new BMessage(B_ABOUT_REQUESTED)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
-		new BMessage(B_QUIT_REQUESTED)));
-	menu->SetTargetForItems(this);
+		menu->AddSeparatorItem();
+		menu->AddItem(new BMenuItem(B_TRANSLATE("About" B_UTF8_ELLIPSIS),
+			new BMessage(B_ABOUT_REQUESTED)));
+		menu->AddItem(new BMenuItem(B_TRANSLATE("Quit"),
+			new BMessage(B_QUIT_REQUESTED)));
+		menu->SetTargetForItems(this);
 
-	ConvertToScreen(&point);
-	menu->Go(point, true, false, true);
+		ConvertToScreen(&point);
+		menu->Go(point, true, false, true);
+	}
 }
 
 
