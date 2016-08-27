@@ -311,7 +311,7 @@ init_driver(void)
 		gDeviceInfo[found]->device_type = kSupportedDevices[type].type;
 		gDeviceInfo[found]->pch_info = pchInfo;
 
-		dprintf(DEVICE_NAME ": (%ld) %s, revision = 0x%x\n", found,
+		dprintf(DEVICE_NAME ": (%" B_PRId32 ") %s, revision = 0x%x\n", found,
 			kSupportedDevices[type].name, info->revision);
 
 		found++;
