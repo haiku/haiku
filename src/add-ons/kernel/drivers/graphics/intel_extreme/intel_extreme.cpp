@@ -118,7 +118,7 @@ intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 
 	// On SandyBridge, there is an extra "global enable" flag, which must also
 	// be set when enabling the interrupts (but not when testing for them).
-	if (enable && &info.device_type.InGroup(INTEL_GROUP_SNB))
+	if (enable && info.device_type.InGroup(INTEL_GROUP_SNB))
 		mask |= PCH_INTERRUPT_GLOBAL_SNB;
 
 	return mask;
@@ -358,7 +358,7 @@ intel_extreme_init(intel_info &info)
 
 	bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
 
-	ERROR("Init Intel generation %" B_PRId32 " GPU %s PCH split.\n",
+	ERROR("Init Intel generation %d GPU %s PCH split.\n",
 		info.device_type.Generation(), hasPCH ? "with" : "without");
 
 	uint32* blocks = info.shared_info->register_blocks;
@@ -398,15 +398,15 @@ intel_extreme_init(intel_info &info)
 		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)] += VLV_DISPLAY_BASE;
 	}
 
-	TRACE("REGS_NORTH_SHARED: 0x%X\n",
+	TRACE("REGS_NORTH_SHARED: 0x%" B_PRIx32 "\n",
 		blocks[REGISTER_BLOCK(REGS_NORTH_SHARED)]);
-	TRACE("REGS_NORTH_PIPE_AND_PORT: 0x%X\n",
+	TRACE("REGS_NORTH_PIPE_AND_PORT: 0x%" B_PRIx32 "\n",
 		blocks[REGISTER_BLOCK(REGS_NORTH_PIPE_AND_PORT)]);
-	TRACE("REGS_NORTH_PLANE_CONTROL: 0x%X\n",
+	TRACE("REGS_NORTH_PLANE_CONTROL: 0x%" B_PRIx32 "\n",
 		blocks[REGISTER_BLOCK(REGS_NORTH_PLANE_CONTROL)]);
-	TRACE("REGS_SOUTH_SHARED: 0x%X\n",
+	TRACE("REGS_SOUTH_SHARED: 0x%" B_PRIx32 "\n",
 		blocks[REGISTER_BLOCK(REGS_SOUTH_SHARED)]);
-	TRACE("REGS_SOUTH_TRANSCODER_PORT: 0x%X\n",
+	TRACE("REGS_SOUTH_TRANSCODER_PORT: 0x%" B_PRIx32 "\n",
 		blocks[REGISTER_BLOCK(REGS_SOUTH_TRANSCODER_PORT)]);
 
 	// make sure bus master, memory-mapped I/O, and frame buffer is enabled
