@@ -79,16 +79,26 @@ release_vblank_sem(intel_info &info)
 }
 
 
+/** Get the appropriate interrupt mask for enabling or testing interrupts on
+ * the given pipes.
+ *
+ * The bits to test or set are different depending on the hardware generation.
+ *
+ * \param info Intel_extreme driver information
+ * \param pipes bit mask of the pipes to use
+ * \param enable true to get the mask for enabling the interrupts, false to get
+ *               the mask for testing them.
+ */
 static uint32
-intel_get_interrupt_mask(intel_info& info, int pipes)
+intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 {
 	uint32 mask = 0;
-	bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
+	bool hasPCH = info.pch_info != INTEL_PCH_NONE;
 
 	// Intel changed the PCH register mapping between Sandy Bridge and the
 	// later generations (Ivy Bridge and up).
 
-	if (pipes & INTEL_PIPE_A) {
+	if (pipes & INTEL_PIPE_A != 0) {
 		if (info.device_type.InGroup(INTEL_GROUP_SNB))
 			mask |= PCH_INTERRUPT_VBLANK_PIPEA_SNB;
 		else if (hasPCH)
@@ -97,7 +107,7 @@ intel_get_interrupt_mask(intel_info& info, int pipes)
 			mask |= INTERRUPT_VBLANK_PIPEA;
 	}
 
-	if (pipes & INTEL_PIPE_B) {
+	if (pipes & INTEL_PIPE_B != 0) {
 		if (info.device_type.InGroup(INTEL_GROUP_SNB))
 			mask |= PCH_INTERRUPT_VBLANK_PIPEB_SNB;
 		else if (hasPCH)
@@ -106,11 +116,10 @@ intel_get_interrupt_mask(intel_info& info, int pipes)
 			mask |= INTERRUPT_VBLANK_PIPEB;
 	}
 
-	if (pipes == INTEL_PIPE_A | INTEL_PIPE_B)
-	{
-		if (info.device_type.InGroup(INTEL_GROUP_SNB))
-			mask |= PCH_INTERRUPT_GLOBAL_SNB;
-	}
+	// On SandyBridge, there is an extra "global enable" flag, which must also
+	// be set when enabling the interrupts (but not when testing for them).
+	if (enable && &info.device_type.InGroup(INTEL_GROUP_SNB))
+		mask |= PCH_INTERRUPT_GLOBAL_SNB;
 
 	return mask;
 }
@@ -136,7 +145,7 @@ intel_interrupt_handler(void* data)
 
 	while (identity != 0) {
 
-		uint32 mask = intel_get_interrupt_mask(info, INTEL_PIPE_A);
+		uint32 mask = intel_get_interrupt_mask(info, INTEL_PIPE_A, false);
 
 		if ((identity & mask) != 0) {
 			handled = release_vblank_sem(info);
@@ -146,7 +155,7 @@ intel_interrupt_handler(void* data)
 				DISPLAY_PIPE_VBLANK_STATUS | DISPLAY_PIPE_VBLANK_ENABLED);
 		}
 
-		mask = intel_get_interrupt_mask(info, INTEL_PIPE_B);
+		mask = intel_get_interrupt_mask(info, INTEL_PIPE_B, false);
 		if ((identity & mask) != 0) {
 			handled = release_vblank_sem(info);
 
@@ -235,7 +244,7 @@ init_interrupt_handler(intel_info &info)
 			bool hasPCH = (info.pch_info != INTEL_PCH_NONE);
 
 			uint32 enable = intel_get_interrupt_mask(info,
-				INTEL_PIPE_A | INTEL_PIPE_B);
+				INTEL_PIPE_A | INTEL_PIPE_B, true);
 
 			if (hasPCH) {
 				// Clear all the interrupts
