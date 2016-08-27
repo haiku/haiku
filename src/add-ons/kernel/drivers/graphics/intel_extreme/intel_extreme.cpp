@@ -98,7 +98,7 @@ intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 	// Intel changed the PCH register mapping between Sandy Bridge and the
 	// later generations (Ivy Bridge and up).
 
-	if (pipes & INTEL_PIPE_A != 0) {
+	if ((pipes & INTEL_PIPE_A) != 0) {
 		if (info.device_type.InGroup(INTEL_GROUP_SNB))
 			mask |= PCH_INTERRUPT_VBLANK_PIPEA_SNB;
 		else if (hasPCH)
@@ -107,7 +107,7 @@ intel_get_interrupt_mask(intel_info& info, int pipes, bool enable)
 			mask |= INTERRUPT_VBLANK_PIPEA;
 	}
 
-	if (pipes & INTEL_PIPE_B != 0) {
+	if ((pipes & INTEL_PIPE_B) != 0) {
 		if (info.device_type.InGroup(INTEL_GROUP_SNB))
 			mask |= PCH_INTERRUPT_VBLANK_PIPEB_SNB;
 		else if (hasPCH)

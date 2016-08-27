@@ -105,7 +105,7 @@ tcsendbreak(int fd, int duration)
 speed_t
 cfgetispeed(const struct termios *termios)
 {
-	if (termios->c_cflag & CBAUD == CBAUD)
+	if ((termios->c_cflag & CBAUD) == CBAUD)
 		return termios->c_ispeed;
 
 	return termios->c_cflag & CBAUD;
@@ -134,7 +134,7 @@ cfsetispeed(struct termios *termios, speed_t speed)
 speed_t
 cfgetospeed(const struct termios *termios)
 {
-	if (termios->c_cflag & CBAUD == CBAUD)
+	if ((termios->c_cflag & CBAUD) == CBAUD)
 		return termios->c_ospeed;
 
 	return termios->c_cflag & CBAUD;
