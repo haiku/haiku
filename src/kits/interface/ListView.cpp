@@ -33,6 +33,7 @@ struct track_data {
 	int32		item_index;
 	bool		was_selected;
 	bool		try_drag;
+	bool		is_dragging;
 	bigtime_t	last_click_time;
 };
 
@@ -290,6 +291,11 @@ void
 BListView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_MOUSE_WHEEL_CHANGED:
+			if (!fTrack->is_dragging)
+				BView::MessageReceived(message);
+			break;
+
 		case B_COUNT_PROPERTIES:
 		case B_EXECUTE_PROPERTY:
 		case B_GET_PROPERTY:
@@ -1453,6 +1459,7 @@ BListView::_InitObject(list_view_type type)
 	fTrack->item_index = -1;
 	fTrack->was_selected = false;
 	fTrack->try_drag = false;
+	fTrack->is_dragging = false;
 	fTrack->last_click_time = 0;
 
 	SetViewUIColor(B_LIST_BACKGROUND_COLOR);
@@ -1944,35 +1951,32 @@ void
 BListView::_DoneTracking(BPoint where)
 {
 	fTrack->try_drag = false;
+	fTrack->is_dragging = false;
 }
 
 
 void
 BListView::_Track(BPoint where, uint32)
 {
-	int32 index = IndexOf(where);
-	BListItem* item = ItemAt(index);
-
-	if (item != NULL && !item->IsSelected() && item->IsEnabled()) {
-		Select(index, fListType == B_MULTIPLE_SELECTION_LIST
-			&& (modifiers() & B_SHIFT_KEY) != 0);
-		ScrollToSelection();
-		fTrack->try_drag = false;
-			// don't try to initiate a drag once selection changes
+	if (fTrack->item_index > 0 && fTrack->try_drag) {
+		// initiate a drag if the mouse was moved far enough
+		BPoint offset = where - fTrack->drag_start;
+		float dragDistance = sqrtf(offset.x * offset.x + offset.y * offset.y);
+		if (dragDistance >= 5.0f) {
+			fTrack->try_drag = false;
+			fTrack->is_dragging = InitiateDrag(fTrack->drag_start,
+				fTrack->item_index, fTrack->was_selected);
+		}
 	}
 
-	if (fTrack->item_index < 0 || !fTrack->try_drag) {
-		// mouse was not clicked above any item
-		// or no mouse button pressed
-		return;
-	}
-
-	// Initiate a drag if the mouse was moved far enough
-	BPoint offset = where - fTrack->drag_start;
-	float dragDistance = sqrtf(offset.x * offset.x + offset.y * offset.y);
-	if (dragDistance >= 5.0f) {
-		fTrack->try_drag = false;
-		InitiateDrag(fTrack->drag_start, fTrack->item_index,
-			fTrack->was_selected);
+	if (!fTrack->is_dragging) {
+		// do selection only if a drag was not initiated
+		int32 index = IndexOf(where);
+		BListItem* item = ItemAt(index);
+		if (item != NULL && !item->IsSelected() && item->IsEnabled()) {
+			Select(index, fListType == B_MULTIPLE_SELECTION_LIST
+				&& (modifiers() & B_SHIFT_KEY) != 0);
+			ScrollToSelection();
+		}
 	}
 }
