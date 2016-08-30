@@ -1352,10 +1352,6 @@ BContainerWindow::ResizeToFit()
 	frame.right = frame.left + extent.Width() + widthDiff;
 	frame.bottom = frame.top + extent.Height() + heightDiff;
 
-	// add some padding to the right and bottom
-	frame.right += be_control_look->DefaultItemSpacing() * 2;
-	frame.bottom += be_control_look->DefaultItemSpacing() * 2;
-
 	// make sure entire window fits on screen
 	frame = frame & screenFrame;
 
