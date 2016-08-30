@@ -263,8 +263,8 @@ device_ioctl(void* data, uint32 op, void* buffer, size_t bufferLength)
 		}
 
 		default:
-			ERROR("ioctl() unknown message %ld (length = %ld)\n", op,
-				bufferLength);
+			ERROR("ioctl() unknown message %" B_PRIu32 " (length = %"
+				B_PRIuSIZE ")\n", op, bufferLength);
 			break;
 	}
 
