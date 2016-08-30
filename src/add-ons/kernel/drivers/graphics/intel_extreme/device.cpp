@@ -79,18 +79,19 @@ getset_register(int argc, char** argv)
 	if (set)
 		value = parse_expression(argv[2]);
 
-	kprintf("intel_extreme register %#lx\n", reg);
+	kprintf("intel_extreme register %#" B_PRIx32 "\n", reg);
 
 	intel_info &info = *gDeviceInfo[0];
 	uint32 oldValue = read32(info, reg);
 
-	kprintf("  %svalue: %#lx (%lu)\n", set ? "old " : "", oldValue, oldValue);
+	kprintf("  %svalue: %#" B_PRIx32 " (%" B_PRIu32 ")\n", set ? "old " : "",
+		oldValue, oldValue);
 
 	if (set) {
 		write32(info, reg, value);
 
 		value = read32(info, reg);
-		kprintf("  new value: %#lx (%lu)\n", value, value);
+		kprintf("  new value: %#" B_PRIx32 " (%" B_PRIu32 ")\n", value, value);
 	}
 
 	return 0;
