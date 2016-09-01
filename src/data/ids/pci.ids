@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.08.20
-#	Date:    2016-08-20 03:15:02
+#	Version: 2016.09.01
+#	Date:    2016-09-01 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10587,6 +10587,7 @@
 	1b81  GP104 [GeForce GTX 1070]
 	1b82  GP104
 	1b83  GP104
+	1ba0  GP104M [GeForce GTX 1080]
 	1ba1  GP104M [GeForce GTX 1070]
 	1bb0  GP104GL
 	1bb1  GP104GL
@@ -10597,6 +10598,7 @@
 	1c01  GP106
 	1c02  GP106 [GeForce GTX 1060 3GB]
 	1c03  GP106 [GeForce GTX 1060 6GB]
+	1c20  GP106M [GeForce GTX 1060]
 	1c30  GP106GL
 	1c60  GP106M [GeForce GTX 1060]
 	1c70  GP106GL
@@ -10944,6 +10946,7 @@
 	3fc5  RME Hammerfall DSP
 	3fc6  RME Hammerfall DSP MADI
 	7038  FPGA Card XC7VX690T
+		17aa 402f  FPGA XC7VX690T-3FFG1157E
 	8380  Ellips ProfiXpress Profibus Master
 	8381  Ellips Santos Frame Grabber
 	d154  Copley Controls CAN card (PCI-CAN-02)
@@ -16850,33 +16853,33 @@
 		103c 1321  Core I/O LAN/SCSI Combo [AB314A]
 		14e4 0009  NetXtreme BCM5703 1000Base-T
 		14e4 000a  NetXtreme BCM5703 1000Base-SX
-	16c8  BCM57301 NetXtreme-C Single-port 10Gb Ethernet
-	16c9  BCM57302 NetXtreme-C Dual-port 10Gb/25Gb Ethernet
-	16ca  BCM57304 NetXtreme-C Dual-port 10Gb/25Gb/40Gb/50Gb Ethernet
+	16c8  BCM57301 NetXtreme-C 10Gb Ethernet Controller
+	16c9  BCM57302 NetXtreme-C 10Gb/25Gb Ethernet Controller
+	16ca  BCM57304 NetXtreme-C 10Gb/25Gb/40Gb/50Gb Ethernet Controller
 	16cb  BCM57304 NetXtreme-C Ethernet Virtual Function
 	16cc  BCM57417 NetXtreme-E Ethernet Partition
-	16ce  BCM57311 NetXtreme-C Single-port 10Gb RDMA Ethernet
-	16cf  BCM57312 NetXtreme-C Dual-port 10Gb/25Gb RDMA Ethernet
-	16d0  BCM57402 NetXtreme-E Dual-port 10Gb Ethernet
-	16d1  BCM57404 NetXtreme-E Dual-port 10Gb/25Gb Ethernet
-	16d2  BCM57406 NetXtreme-E Dual-port 10GBase-T Ethernet
+	16ce  BCM57311 NetXtreme-C 10Gb RDMA Ethernet Controller
+	16cf  BCM57312 NetXtreme-C 10Gb/25Gb RDMA Ethernet Controller
+	16d0  BCM57402 NetXtreme-E 10Gb Ethernet Controller
+	16d1  BCM57404 NetXtreme-E 10Gb/25Gb Ethernet Controller
+	16d2  BCM57406 NetXtreme-E 10GBASE-T Ethernet Controller
 	16d3  BCM57404 NetXtreme-E Ethernet Virtual Function
 	16d4  BCM57402 NetXtreme-E Ethernet Partition
-	16d5  BCM57407 NetXtreme-E Dual-port 10GBase-T Ethernet
-	16d6  BCM57412 NetXtreme-E Dual-port 10Gb RDMA Ethernet
-	16d7  BCM57414 NetXtreme-E Dual-port 10Gb/25Gb RDMA Ethernet
+	16d5  BCM57407 NetXtreme-E 10GBase-T Ethernet Controller
+	16d6  BCM57412 NetXtreme-E 10Gb RDMA Ethernet Controller
+	16d7  BCM57414 NetXtreme-E 10Gb/25Gb RDMA Ethernet Controller
 	16d8  BCM57416 NetXtreme-E Dual-port 10GBase-T RDMA Ethernet
-	16d9  BCM57417 NetXtreme-E Dual-port 10GBase-T RDMA Ethernet
+	16d9  BCM57417 NetXtreme-E 10GBASE-T RDMA Ethernet Controller
 	16dc  BCM57414 NetXtreme-E Ethernet Virtual Function
 	16dd  NetLink BCM5781 Gigabit Ethernet PCI Express
 	16de  BCM57412 NetXtreme-E Ethernet Partition
-	16df  BCM57314 NetXtreme-C Dual-port 10Gb/25Gb/40Gb/50Gb RDMA Ethernet
+	16df  BCM57314 NetXtreme-C 10Gb/25Gb/40Gb/50Gb RDMA Ethernet Controller
 	16e1  BCM57314 NetXtreme-C Ethernet Virtual Function
-	16e2  BCM57417 NetXtreme-E Dual-port 10Gb/25Gb RDMA Ethernet
-	16e3  BCM57416 NetXtreme-E Dual-port 10Gb RDMA Ethernet
+	16e2  BCM57417 NetXtreme-E 10Gb/25Gb RDMA Ethernet Controller
+	16e3  BCM57416 NetXtreme-E 10Gb RDMA Ethernet Controller
 	16e7  BCM57404 NetXtreme-E Ethernet Partition
 	16e8  BCM57406 NetXtreme-E Ethernet Partition
-	16e9  BCM57407 NetXtreme-E Dual-port 25Gb Ethernet
+	16e9  BCM57407 NetXtreme-E 25Gb Ethernet Controller
 	16ec  BCM57414 NetXtreme-E Ethernet Partition
 	16ee  BCM57416 NetXtreme-E Ethernet Partition
 	16f3  NetXtreme BCM5727 Gigabit Ethernet PCIe
@@ -17578,6 +17581,7 @@
 	1410  CB1410 Cardbus Controller
 		1025 003c  CL50 motherboard
 		1025 005a  TravelMate 290
+		103c 30d5  530 Laptop
 	1411  CB-710/2/4 Cardbus Controller
 		103c 006a  NX9500
 	1412  CB-712/4 Cardbus Controller
@@ -17627,6 +17631,7 @@
 	9277  5 Volt Delta Sigma Converter Card
 	9278  10 Volt Delta Sigma Converter Card
 	9287  Analog Output Card
+	9290  FPGA Card
 1543  SILICON Laboratories
 	3052  Intel 537 [Winmodem]
 	4c22  Si3036 MC'97 DAA
@@ -18913,6 +18918,7 @@
 17f2  Albatron Corp.
 17f3  RDC Semiconductor, Inc.
 	1010  R1010 IDE Controller
+	2012  M2012/R3308 VGA-compatible graphics adapter
 	6020  R6020 North Bridge
 	6021  R6021 Host Bridge
 	6030  R6030 ISA Bridge
@@ -19130,6 +19136,7 @@
 18d2  Sitecom Europe BV (Wrong ID)
 # Sitecom HFC-S based ISDN controller card DC-105v2
 	3069  DC-105v2 ISDN controller
+18d4  Celestica
 18d8  Dialogue Technology Corp.
 18dd  Artimi Inc
 	4c6f  Artimi RTMI-100 UWB adapter
@@ -19944,7 +19951,7 @@
 	91a4  88SE912x IDE Controller
 	9220  88SE9220 PCIe 2.0 x2 2-port SATA 6 Gb/s RAID Controller
 	9230  88SE9230 PCIe SATA 6Gb/s Controller
-		1d49 0300  M.2 with Mirroring Enablement Kit
+		1d49 0300  ThinkSystem M.2 with Mirroring Enablement Kit
 	9235  88SE9235 PCIe 2.0 x2 4-port SATA 6 Gb/s Controller
 	9445  88SE9445 PCIe 2.0 x4 4-Port SAS/SATA 6 Gbps RAID Controller
 	9480  88SE9480 SAS/SATA 6Gb/s RAID controller
@@ -20039,7 +20046,13 @@
 	4254  10G-PCIE3-8D-2S
 	4255  10G-PCIE3-8D-Q
 	4256  10G-PCIE3-8D-2S
-	4258  10G-PCIE3-8E-2S
+	4258  10G-PCIE3-8E-2S Network Adapter
+	4260  10G-PCIE3-8E-4S Network Adapter
+	4261  10G-PCIE3-8E-4S Network Adapter
+	4262  10G-PCIE3-8E-4S Network Adapter
+	4263  10G-PCIE3-8E-4S Network Adapter
+	4264  10G-PCIE3-8E-2S Network Adapter
+	4265  10G-PCIE3-8E-2S Network Adapter
 1c1c  Symphony
 	0001  82C101
 1c28  Lite-On IT Corp. / Plextor
@@ -20138,6 +20151,7 @@
 	100e  AR-ARKA-FX1 [Arkville 64B DPDK Data Mover]
 	4200  A5PL-E1-10GETI [10 GbE Ethernet Traffic Instrument]
 1d78  DERA
+1d8f  Enyx
 1de1  Tekram Technology Co.,Ltd.
 	0391  TRM-S1040 [DC-315 / DC-395 series]
 	2020  DC-390
@@ -21940,6 +21954,7 @@
 	1066  82562 EM/EX/GX - PRO/100 VM (LOM) Ethernet Controller
 	1067  82562 EM/EX/GX - PRO/100 VM Ethernet Controller
 	1068  82562ET/EZ/GT/GZ - PRO/100 VE (LOM) Ethernet Controller Mobile
+		103c 30d5  530 Laptop
 	1069  82562EM/EX/GX - PRO/100 VM (LOM) Ethernet Controller Mobile
 	106a  82562G - PRO/100 VE (LOM) Ethernet Controller
 	106b  82562G - PRO/100 VE Ethernet Controller Mobile
@@ -22189,6 +22204,10 @@
 		17aa 1071  ThinkServer X520-2 AnyFabric
 		17aa 4007  82599ES 10-Gigabit SFI/SFP+ Network Connection
 		17aa 402b  82599ES 10Gb 2-port Server Adapter X520-DA2
+		17aa 402f  FPGA Card XC7VX690T-3FFG1157E
+		1bd4 001b  10G SFP+ DP ER102Fi4 Rack Adapter
+		1bd4 002f  10G SFP+ DP EP102Fi4A Adapter
+		1bd4 0032  10G SFP+ DP EP102Fi4 Adapter
 		8086 0002  Ethernet Server Adapter X520-DA2
 		8086 0003  Ethernet Server Adapter X520-2
 		8086 0006  Ethernet Server Adapter X520-1
@@ -22481,6 +22500,8 @@
 		15d9 0652  Dual Port i350 GbE MicroLP [AOC-CGP-i2]
 		17aa 1074  ThinkServer I350-T4 AnyFabric
 		17aa 4005  I350 Gigabit Network Connection
+		1bd4 001d  1G base-T QP EP014Ti1 Adapter
+		1bd4 0035  1G base-T QP EP014Ti1 Adapter
 		8086 0001  Ethernet Server Adapter I350-T4
 		8086 0002  Ethernet Server Adapter I350-T2
 		8086 00a1  Ethernet Server Adapter I350-T4
@@ -22524,6 +22545,9 @@
 		1137 00bf  Ethernet Converged Network Adapter X540-T2
 		17aa 1073  ThinkServer X540-T2 AnyFabric
 		17aa 4006  Ethernet Controller 10-Gigabit X540-AT2
+		1bd4 001a  10G base-T DP ER102Ti3 Rack Adapter
+		1bd4 0033  10G base-T DP EP102Ti3 Adapter
+		1bd4 0034  10G base-T DP EP102Ti3A Adapter
 		8086 0001  Ethernet Converged Network Adapter X540-T2
 		8086 0002  Ethernet Converged Network Adapter X540-T1
 		8086 001a  Ethernet Converged Network Adapter X540-T2
@@ -22564,6 +22588,8 @@
 		8086 7b11  10GbE 2P X520 Adapter
 	1557  82599 10 Gigabit Network Connection
 		17aa 4008  82599EN 10 Gigabit Network Connection
+		1bd4 001c  10G SFP+ SP ER101Fi4 Rack Adapter
+		1bd4 0030  10G SFP+ SP EP101Fi4A Adapter
 		8086 0001  Ethernet OCP Server Adapter X520-1
 	1558  Ethernet Converged Network Adapter X520-Q1
 		8086 011a  Ethernet Converged Network Adapter X520-Q1
@@ -22602,6 +22628,8 @@
 		103c 22fd  HP Ethernet 10Gb 2-port 562SFP+ Adapter
 		1137 0000  Ethernet Converged NIC X710-4
 		1137 013b  Ethernet Converged NIC X710-4
+		1590 0000  Ethernet 10GbE 4P 563SFP+ Adapter
+		1590 0225  Ethernet 10GbE 4P 563SFP+ Adapter
 		17aa 0000  ThinkServer X710 AnyFabric for 10GbE SFP+
 		17aa 4001  ThinkServer X710-4 AnyFabric for 10GbE SFP+
 		17aa 4002  ThinkServer X710-2 AnyFabric for 10GbE SFP+
@@ -23404,6 +23432,7 @@
 		144d c072  Notebook N150P
 		1458 5000  GA-D525TUD
 		1734 1055  Amilo M1420
+		17aa 2013  ThinkPad R60e
 		17aa 20ae  ThinkPad T61/R61
 		17c0 10d2  Medion Akoya E7214 Notebook PC [MD98410]
 		17c0 4083  Medion WIM 2210 Notebook PC [MD96850]
@@ -24487,6 +24516,7 @@
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
+		103c 30d5  530 Laptop
 		1043 1237  A6J-Q008
 		1071 8209  Medion MIM 2240 Notebook PC [MD98100]
 		17aa 2015  ThinkPad T60
@@ -24497,10 +24527,12 @@
 		1071 8209  Medion MIM 2240 Notebook PC [MD98100]
 	27a2  Mobile 945GM/GMS, 943/940GML Express Integrated Graphics Controller
 		103c 30a1  NC2400
+		103c 30d5  530 Laptop
 		17aa 201a  ThinkPad R60/T60/X60 series
 		9902 1584  CCE MPL-D10H120F
 	27a6  Mobile 945GM/GMS/GME, 943/940GML Express Integrated Graphics Controller
 		103c 30a1  NC2400
+		103c 30d5  530 Laptop
 		1775 11cc  CC11/CL11 integrated graphics (secondary)
 		17aa 201a  ThinkPad R60/T60/X60 series
 	27ac  Mobile 945GSE Express Memory Controller Hub
@@ -24523,6 +24555,7 @@
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
+		103c 30d5  530 Laptop
 		1071 8209  Medion MIM 2240 Notebook PC [MD98100]
 		10f7 8338  Panasonic CF-Y5 laptop
 		17aa 2009  ThinkPad R60/T60/X60 series
@@ -24566,6 +24599,7 @@
 	27c5  82801GBM/GHM (ICH7-M Family) SATA Controller [AHCI mode]
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a3  Compaq nw8440
+		103c 30d5  530 Laptop
 		17aa 200d  ThinkPad R60/T60/X60 series
 	27c6  82801GHM (ICH7-M DH) SATA Controller [RAID mode]
 	27c8  NM10/ICH7 Family USB UHCI Controller #1
@@ -24578,6 +24612,7 @@
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
+		103c 30d5  530 Laptop
 		1043 1237  A6J-Q008
 		1043 8179  P5KPL-VM,P5LD2-VM Mainboard
 		105b 0d7c  D270S/D250S Motherboard
@@ -24667,6 +24702,7 @@
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
+		103c 30d5  530 Laptop
 		1043 1237  A6J-Q008
 		1043 8179  P5KPL-VM,P5LD2-VM Mainboard
 		105b 0d7c  D270S/D250S Motherboard
@@ -24687,6 +24723,7 @@
 		1458 5001  GA-D525TUD
 		1462 7418  Wind PC MS-7418
 		1775 11cc  CC11/CL11
+		17aa 2011  ThinkPad R60e
 		8086 544b  Desktop Board D425KT
 	27d2  NM10/ICH7 Family PCI Express Port 2
 		103c 309f  Compaq nx9420 Notebook
@@ -24695,12 +24732,14 @@
 		144d c072  Notebook N150P
 		1462 7418  Wind PC MS-7418
 		1775 11cc  CC11/CL11
+		17aa 2011  ThinkPad R60e
 		8086 544b  Desktop Board D425KT
 	27d4  NM10/ICH7 Family PCI Express Port 3
 		1071 8209  Medion MIM 2240 Notebook PC [MD98100]
 		144d c072  Notebook N150P
 		1462 7418  Wind PC MS-7418
 		1775 11cc  CC11/CL11
+		17aa 2011  ThinkPad R60e
 		8086 544b  Desktop Board D425KT
 	27d6  NM10/ICH7 Family PCI Express Port 4
 		103c 30a3  Compaq nw8440
@@ -24708,6 +24747,7 @@
 		144d c072  Notebook N150P
 		1462 7418  Wind PC MS-7418
 		1775 11cc  CC11/CL11
+		17aa 2011  ThinkPad R60e
 		8086 544b  Desktop Board D425KT
 	27d8  NM10/ICH7 Family High Definition Audio Controller
 		1025 006c  9814 WKMI
@@ -24716,6 +24756,7 @@
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
+		103c 30d5  530 Laptop
 		1043 1123  A6J-Q008
 		1043 13c4  Asus G2P
 		1043 817f  P5LD2-VM Mainboard (Realtek ALC 882 codec)
@@ -24775,6 +24816,7 @@
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
+		103c 30d5  530 Laptop
 		1043 1237  A6J-Q008
 		1043 8179  P5KPL-VM Motherboard
 		107b 5048  E4500
@@ -26480,6 +26522,7 @@
 		1351 103c  Compaq NC6220
 	4224  PRO/Wireless 2915ABG [Calexico2] Network Connection
 	4227  PRO/Wireless 3945ABG [Golan] Network Connection
+		8086 1010  ThinkPad R60e
 		8086 1011  ThinkPad T60/R60e/X60s
 		8086 1014  PRO/Wireless 3945BG Network Connection
 	4229  PRO/Wireless 4965 AG or AGN [Kedron] Network Connection
@@ -27273,15 +27316,21 @@
 	9ce6  Wildcat Point-LP Serial IO GSPI Controller #1
 	9d03  Sunrise Point-LP SATA Controller [AHCI mode]
 		1028 06f3  Latitude 3570
+		17aa 382a  B51-80 Laptop
 	9d14  Sunrise Point-LP PCI Express Root Port #5
+		17aa 382a  B51-80 Laptop
 	9d15  Sunrise Point-LP PCI Express Root Port #6
+		17aa 382a  B51-80 Laptop
 	9d16  Sunrise Point-LP PCI Express Root Port #7
 	9d17  Sunrise Point-LP PCI Express Root Port #8
 	9d18  Sunrise Point-LP PCI Express Root Port #9
+		17aa 382a  B51-80 Laptop
 	9d21  Sunrise Point-LP PMC
 		1028 06f3  Latitude 3570
+		17aa 382a  B51-80 Laptop
 	9d23  Sunrise Point-LP SMBus
 		1028 06f3  Latitude 3570
+		17aa 382a  B51-80 Laptop
 	9d27  Sunrise Point-LP Serial IO UART Controller #0
 	9d28  Sunrise Point-LP Serial IO UART Controller #1
 	9d29  Sunrise Point-LP Serial IO SPI Controller #0
@@ -27289,11 +27338,15 @@
 	9d2d  Sunrise Point-LP Secure Digital IO Controller
 	9d2f  Sunrise Point-LP USB 3.0 xHCI Controller
 		1028 06f3  Latitude 3570
+		17aa 382a  B51-80 Laptop
 	9d31  Sunrise Point-LP Thermal subsystem
 		1028 06f3  Latitude 3570
+		17aa 382a  B51-80 Laptop
 	9d3a  Sunrise Point-LP CSME HECI #1
 		1028 06f3  Latitude 3570
+		17aa 382a  B51-80 Laptop
 	9d43  Sunrise Point-LP LPC Controller
+		17aa 382a  B51-80 Laptop
 	9d48  Sunrise Point-LP LPC Controller
 		1028 06f3  Latitude 3570
 	9d60  Sunrise Point-LP Serial IO I2C Controller #0
@@ -27307,6 +27360,7 @@
 	9d66  Sunrise Point-LP Serial IO UART Controller #2
 	9d70  Sunrise Point-LP HD Audio
 		1028 06f3  Latitude 3570
+		17aa 382a  B51-80 Laptop
 	a000  Atom Processor D4xx/D5xx/N4xx/N5xx DMI Bridge
 		1458 5000  GA-D525TUD
 		8086 4f4d  DeskTop Board D510MO
