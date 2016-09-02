@@ -33,6 +33,8 @@ All rights reserved.
 */
 
 
+#include "TextWidget.h"
+
 #include <string.h>
 #include <stdlib.h>
 
@@ -51,7 +53,6 @@ All rights reserved.
 #include "Commands.h"
 #include "FSUtils.h"
 #include "PoseView.h"
-#include "TextWidget.h"
 #include "Utilities.h"
 
 

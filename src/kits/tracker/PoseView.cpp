@@ -8129,7 +8129,7 @@ BPoseView::FindPose(BPoint point, int32* poseIndex) const
 {
 	if (ViewMode() == kListMode) {
 		int32 index = (int32)(point.y / fListElemHeight);
-		if (poseIndex)
+		if (poseIndex != NULL)
 			*poseIndex = index;
 
 		BPoint loc(0, index * fListElemHeight);
@@ -9488,10 +9488,12 @@ BPoseView::ColumnFor(uint32 attr) const
 }
 
 
-bool		// returns true if actually resized
+bool
 BPoseView::ResizeColumnToWidest(BColumn* column)
 {
 	ASSERT(ViewMode() == kListMode);
+
+	// returns true if actually resized
 
 	float maxWidth = kMinColumnWidth;
 

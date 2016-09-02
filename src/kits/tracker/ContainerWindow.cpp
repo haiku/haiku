@@ -419,7 +419,7 @@ DraggableContainerIcon::MouseMoved(BPoint where, uint32, const BMessage*)
 	if (button)
 		message.AddInt32("buttons", (int32)button);
 
-	if (button & B_PRIMARY_MOUSE_BUTTON) {
+	if ((button & B_PRIMARY_MOUSE_BUTTON) != 0) {
 		// add an action specifier to the message, so that it is not copied
 		message.AddInt32("be:actions", (modifiers() & B_OPTION_KEY) != 0
 			? B_COPY_TARGET : B_MOVE_TARGET);

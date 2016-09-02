@@ -523,7 +523,7 @@ bool
 BPose::PointInPose(BPoint loc, const BPoseView* poseView, BPoint where,
 	BTextWidget** hitWidget) const
 {
-	if (hitWidget)
+	if (hitWidget != NULL)
 		*hitWidget = NULL;
 
 	// check intersection with icon
@@ -603,7 +603,7 @@ BPose::Draw(BRect rect, const BRect& updateRect, BPoseView* poseView,
 						&& windowActive;
 
 					if (index == 0 && selectDuringDraw) {
-						//draw with dark background to select text
+						// draw with dark background to select text
 						drawView->PushState();
 						drawView->SetLowColor(0, 0, 0);
 					}
@@ -962,7 +962,7 @@ BPose::CalcRect(const BPoseView* poseView) const
 		rect.right = rect.left + poseView->IconSizeInt();
 
 		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
-		if (widget) {
+		if (widget != NULL) {
 			float textWidth = ceilf(widget->TextWidth(poseView) + 1);
 			if (textWidth > poseView->IconSizeInt()) {
 				rect.left += (poseView->IconSizeInt() - textWidth) / 2;
@@ -979,7 +979,7 @@ BPose::CalcRect(const BPoseView* poseView) const
 		rect.right = rect.left + B_MINI_ICON + kMiniIconSeparator;
 		rect.bottom = rect.top + poseView->IconPoseHeight();
 		BTextWidget* widget = WidgetFor(poseView->FirstColumn()->AttrHash());
-		if (widget)
+		if (widget != NULL)
 			rect.right += ceil(widget->TextWidth(poseView) + 1);
 	}
 

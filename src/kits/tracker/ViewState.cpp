@@ -460,8 +460,8 @@ BViewState::_Init()
 {
 	fViewMode = kListMode;
 	fLastIconMode = 0;
-	fIconSize = 32;
-	fLastIconSize = 32;
+	fIconSize = B_LARGE_ICON;
+	fLastIconSize = B_LARGE_ICON;
 	fListOrigin.Set(0, 0);
 	fIconOrigin.Set(0, 0);
 	fPrimarySortAttr = AttrHashString(kAttrStatName, B_STRING_TYPE);
