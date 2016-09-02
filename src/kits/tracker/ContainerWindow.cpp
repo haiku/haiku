@@ -1985,14 +1985,12 @@ BContainerWindow::AddWindowMenu(BMenu* menu)
 	message = new BMessage(kIconMode);
 	message->AddInt32("size", 96);
 	item = new BMenuItem(B_TRANSLATE("96 x 96"), message);
-	item->SetMarked(PoseView()->IconSizeInt() == 96);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
 	message = new BMessage(kIconMode);
 	message->AddInt32("size", 128);
 	item = new BMenuItem(B_TRANSLATE("128 x 128"), message);
-	item->SetMarked(PoseView()->IconSizeInt() == 128);
 	item->SetTarget(PoseView());
 	iconSizeMenu->AddItem(item);
 
