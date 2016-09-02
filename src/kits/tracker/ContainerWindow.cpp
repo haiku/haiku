@@ -2019,10 +2019,28 @@ BContainerWindow::AddWindowMenu(BMenu* menu)
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
 
-	item = new BMenuItem(B_TRANSLATE("List view"),
-		new BMessage(kListMode), '3');
+	BMenu* listViewMenu = new BMenu("List view");
+
+	message = new BMessage(kListMode);
+	message->AddInt32("icon_size", B_MINI_ICON);
+	item = new BMenuItem(listViewMenu, message);
+	item->SetShortcut('3', B_COMMAND_KEY);
 	item->SetTarget(PoseView());
 	menu->AddItem(item);
+
+	message = new BMessage(kListMode);
+	message->AddInt32("icon_size", B_MINI_ICON);
+	item = new BMenuItem(B_TRANSLATE("Mini"), message);
+	item->SetTarget(PoseView());
+	listViewMenu->AddItem(item);
+
+	message = new BMessage(kListMode);
+	message->AddInt32("icon_size", B_LARGE_ICON);
+	item = new BMenuItem(B_TRANSLATE("Large"), message);
+	item->SetTarget(PoseView());
+	listViewMenu->AddItem(item);
+
+	listViewMenu->SetTargetForItems(PoseView());
 
 	menu->AddSeparatorItem();
 
@@ -3120,31 +3138,62 @@ BContainerWindow::UpdateMenu(BMenu* menu, UpdateMenuContext context)
 	}
 
 	if (context == kMenuBarContext || context == kWindowPopUpContext) {
-		BMenu* sizeMenu = NULL;
-		if (BMenuItem* item = menu->FindItem(kIconMode)) {
-			sizeMenu = item->Submenu();
-		}
-
 		uint32 viewMode = PoseView()->ViewMode();
-		if (sizeMenu) {
+
+		BMenu* iconSizeMenu = NULL;
+		if (BMenuItem* item = menu->FindItem(kIconMode))
+			iconSizeMenu = item->Submenu();
+
+		if (iconSizeMenu != NULL) {
 			if (viewMode == kIconMode) {
-				int32 iconSize = (int32)PoseView()->IconSizeInt();
-				for (int32 i = 0; BMenuItem* item = sizeMenu->ItemAt(i); i++) {
+				int32 iconSize = PoseView()->IconSizeInt();
+				BMenuItem* item = iconSizeMenu->ItemAt(0);
+				for (int32 i = 0; (item = iconSizeMenu->ItemAt(i)) != NULL;
+						i++) {
 					BMessage* message = item->Message();
-					if (!message) {
+					if (message == NULL) {
 						item->SetMarked(false);
 						continue;
 					}
 					int32 size;
-					if (message->FindInt32("size", &size) < B_OK)
+					if (message->FindInt32("size", &size) != B_OK)
 						size = -1;
 					item->SetMarked(iconSize == size);
 				}
 			} else {
-				for (int32 i = 0; BMenuItem* item = sizeMenu->ItemAt(i); i++)
+				BMenuItem* item;
+				for (int32 i = 0; (item = iconSizeMenu->ItemAt(i)) != NULL; i++)
 					item->SetMarked(false);
 			}
 		}
+
+		BMenu* listSizeMenu = NULL;
+		if (BMenuItem* item = menu->FindItem(kListMode))
+			listSizeMenu = item->Submenu();
+
+		if (listSizeMenu != NULL) {
+			if (viewMode == kListMode) {
+				int32 iconSize = PoseView()->IconSizeInt();
+				BMenuItem* item = listSizeMenu->ItemAt(0);
+				for (int32 i = 0; (item = listSizeMenu->ItemAt(i)) != NULL;
+						i++) {
+					BMessage* message = item->Message();
+					if (message == NULL) {
+						item->SetMarked(false);
+						continue;
+					}
+					int32 size;
+					if (message->FindInt32("icon_size", &size) != B_OK)
+						size = -1;
+					item->SetMarked(iconSize == size);
+				}
+			} else {
+				BMenuItem* item;
+				for (int32 i = 0; (item = listSizeMenu->ItemAt(i)) != NULL; i++)
+					item->SetMarked(false);
+			}
+		}
+
 		MarkNamedMenuItem(menu, kIconMode, viewMode == kIconMode);
 		MarkNamedMenuItem(menu, kListMode, viewMode == kListMode);
 		MarkNamedMenuItem(menu, kMiniIconMode, viewMode == kMiniIconMode);

@@ -175,7 +175,8 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 				break;
 		}
 
-		result.bottom = poseLoc.y + (view->ListElemHeight() - 1);
+		result.bottom = poseLoc.y
+			+ roundf((view->ListElemHeight() + view->FontHeight()) / 2);
 	} else {
 		if (view->ViewMode() == kIconMode) {
 			// large/scaled icon mode
@@ -187,7 +188,6 @@ BTextWidget::CalcRectCommon(BPoint poseLoc, const BColumn* column,
 
 		result.right = result.left + textWidth;
 		result.bottom = poseLoc.y + view->IconPoseHeight();
-
 	}
 	result.top = result.bottom - view->FontHeight();
 

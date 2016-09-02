@@ -806,7 +806,7 @@ OpenWithPoseView::SetUpDefaultColumnsIfNeeded()
 	if (fColumnList->CountItems() != 0)
 		return;
 
-	BColumn* nameColumn = new BColumn(B_TRANSLATE("Name"), kColumnStart, 125,
+	BColumn* nameColumn = new BColumn(B_TRANSLATE("Name"), StartOffset(), 125,
 		B_ALIGN_LEFT, kAttrStatName, B_STRING_TYPE, true, true);
 	fColumnList->AddItem(nameColumn);
 	BColumn* relationColumn = new BColumn(B_TRANSLATE("Relation"), 180, 100,

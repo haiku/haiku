@@ -224,6 +224,7 @@ public:
 		// returns height, descent, etc.
 	float FontHeight() const;
 	float ListElemHeight() const;
+	void SetListElemHeight();
 
 	void SetIconPoseHeight();
 	float IconPoseHeight() const;
@@ -265,6 +266,9 @@ public:
 	BColumn* LastColumn() const;
 	int32 IndexOfColumn(const BColumn*) const;
 	int32 CountColumns() const;
+
+	// Where to start the first column
+	float StartOffset() const;
 
 	// pose access
 	int32 IndexOfPose(const BPose*) const;
@@ -861,6 +865,18 @@ BPoseView::ListElemHeight() const
 }
 
 
+inline void
+BPoseView::SetListElemHeight()
+{
+	float extra = 0;
+	if (IconSize() > B_MINI_ICON)
+		extra = kLargeIconSeparator;
+
+	fListElemHeight = std::max((float)IconSize() + extra,
+		ceilf(sFontHeight) < 20 ? 20 : ceilf(sFontHeight * 1.1f));
+}
+
+
 inline float
 BPoseView::IconPoseHeight() const
 {
@@ -1054,6 +1070,13 @@ inline int32
 BPoseView::CountColumns() const
 {
 	return fColumnList->CountItems();
+}
+
+
+inline float
+BPoseView::StartOffset() const
+{
+	return kListOffset + IconSizeInt() + kMiniIconSeparator + 1;
 }
 
 

@@ -57,7 +57,6 @@ const int32 kTitleColumnExtraMargin = kTitleColumnLeftExtraMargin
 	+ kTitleColumnRightExtraMargin;
 const int32 kMinColumnWidth = 20;
 const int32 kRemoveTitleMargin = 10;
-const int32 kColumnStart = 40;
 
 
 class BTitleView : public BView {

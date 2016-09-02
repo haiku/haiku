@@ -349,10 +349,13 @@ BPoseView::InitCommon()
 	PinPointToValidRange(origin);
 
 	// init things related to laying out items
-	fListElemHeight = ceilf(sFontHeight) < 20 ? 20 : ceilf(sFontHeight * 1.1f);
+
 	SetIconPoseHeight();
 	GetLayoutInfo(ViewMode(), &fGrid, &fOffset);
 	ResetPosePlacementHint();
+
+	if (ViewMode() == kListMode)
+		SetListElemHeight();
 
 	DisableScrollBars();
 	ScrollTo(origin);
@@ -615,7 +618,7 @@ BPoseView::SetUpDefaultColumnsIfNeeded()
 	if (fColumnList->CountItems() != 0)
 		return;
 
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Name"), kColumnStart, 145,
+	fColumnList->AddItem(new BColumn(B_TRANSLATE("Name"), StartOffset(), 145,
 		B_ALIGN_LEFT, kAttrStatName, B_STRING_TYPE, true, true));
 	fColumnList->AddItem(new BColumn(B_TRANSLATE("Size"), 200, 80,
 		B_ALIGN_RIGHT, kAttrStatSize, B_OFF_T_TYPE, true, false));
@@ -1018,10 +1021,13 @@ BPoseView::SetIconPoseHeight()
 				IconSizeInt() ? IconSizeInt() : sFontHeight + 1);
 			break;
 
+		case kListMode:
 		default:
-			fViewState->SetIconSize(B_MINI_ICON);
+		{
+			SetListElemHeight();
 			fIconPoseHeight = fListElemHeight;
 			break;
+		}
 	}
 }
 
@@ -2233,8 +2239,41 @@ BPoseView::MessageReceived(BMessage* message)
 				}
 				fViewState->SetIconSize(iconSize);
 			}
-		} // fall thru
+			SetViewMode(message->what);
+			break;
+		}
+
 		case kListMode:
+		{
+			uint32 oldMode = fViewState->ViewMode();
+			int32 oldIconSize = fViewState->IconSize();
+			int32 iconSize;
+			if (message->FindInt32("icon_size", &iconSize) == B_OK) {
+				// sanatize
+				if ((icon_size)iconSize != B_LARGE_ICON)
+					iconSize = B_MINI_ICON;
+			} else
+				iconSize = B_MINI_ICON;
+
+			fViewState->SetIconSize(iconSize);
+			SetViewMode(message->what);
+
+			if (oldMode == kListMode && iconSize == oldIconSize)
+				break;
+
+			if (iconSize == B_MINI_ICON)
+				ResizeColumn(FirstColumn(), FirstColumn()->Width() - B_MINI_ICON);
+			else
+				ResizeColumn(FirstColumn(), FirstColumn()->Width() + B_MINI_ICON);
+
+			SetListElemHeight();
+			Invalidate();
+			if (fTitleView != NULL && !fTitleView->IsHidden())
+				fTitleView->Invalidate();
+
+			break;
+		}
+
 		case kMiniIconMode:
 			SetViewMode(message->what);
 			break;
@@ -2790,7 +2829,7 @@ BPoseView::AddColumn(BColumn* newColumn, const BColumn* after)
 		offset = after->Offset() + after->Width() + kTitleColumnExtraMargin;
 		afterColumnIndex = IndexOfColumn(after);
 	} else {
-		offset = kColumnStart;
+		offset = StartOffset();
 		afterColumnIndex = CountColumns() - 1;
 	}
 
@@ -9550,8 +9589,7 @@ BPoseView::ResizeColumn(BColumn* column, float newSize,
 
 	column->SetWidth(newSize);
 
-	float offset = kColumnStart;
-
+	float offset = StartOffset();
 	int32 count = fColumnList->CountItems();
 	for (int32 index = 0; index < count; index++) {
 		column = fColumnList->ItemAt(index);
@@ -9609,9 +9647,8 @@ BPoseView::MoveColumnTo(BColumn* src, BColumn* dest)
 	fColumnList->RemoveItem(src, false);
 	fColumnList->AddItem(src, index);
 
-	float offset = kColumnStart;
+	float offset = StartOffset();
 	int32 count = fColumnList->CountItems();
-
 	for (int32 index = 0; index < count; index++) {
 		BColumn* column = fColumnList->ItemAt(index);
 		column->SetOffset(offset);

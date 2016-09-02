@@ -128,7 +128,7 @@ BQueryPoseView::SetUpDefaultColumnsIfNeeded()
 	if (fColumnList->CountItems() != 0)
 		return;
 
-	fColumnList->AddItem(new BColumn(B_TRANSLATE("Name"), kColumnStart, 145,
+	fColumnList->AddItem(new BColumn(B_TRANSLATE("Name"), StartOffset(), 145,
 		B_ALIGN_LEFT, kAttrStatName, B_STRING_TYPE, true, true));
 	fColumnList->AddItem(new BColumn(B_TRANSLATE("Location"), 200, 225,
 		B_ALIGN_LEFT, kAttrPath, B_STRING_TYPE, true, false));
