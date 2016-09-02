@@ -284,6 +284,9 @@ BPoseView::BPoseView(Model* model, uint32 viewMode)
 	fTextWidgetToCheck(NULL)
 {
 	fViewState->SetViewMode(viewMode);
+	if (viewMode == kIconMode && fViewState->IconSize() == B_MINI_ICON)
+		fViewState->SetIconSize(B_LARGE_ICON);
+
 	fShowSelectionWhenInactive
 		= TrackerSettings().ShowSelectionWhenInactive();
 	fTransparentSelection = TrackerSettings().TransparentSelection();
