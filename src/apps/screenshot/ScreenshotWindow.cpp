@@ -619,6 +619,22 @@ ScreenshotWindow::_SaveScreenshot()
 	if (path == NULL)
 		return B_ERROR;
 
+	BEntry directoryEntry;
+	directoryEntry.SetTo(path.Path());
+
+	// create folder if it doesn't exist
+	// necessary, for example, when the user selects the Artwork folder from
+	// the list of predefined folders.
+	if (!directoryEntry.Exists()) {
+		if (create_directory(path.Path(), 0755) != B_OK) {
+			return B_ERROR;
+		}
+	} else if (!directoryEntry.IsDirectory()) {
+		// the entry exists but is not a directory.
+		// not much we can do
+		return B_ERROR;
+	}
+
 	path.Append(fNameControl->Text());
 
 	BEntry entry;
