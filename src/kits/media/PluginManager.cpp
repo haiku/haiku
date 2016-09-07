@@ -25,8 +25,7 @@ PluginManager gPluginManager;
 #define MAX_STREAMERS 40
 
 
-class DataIOAdapter : public BAdapterIO
-{
+class DataIOAdapter : public BAdapterIO {
 public:
 	DataIOAdapter(BDataIO* dataIO)
 		:
@@ -78,8 +77,7 @@ private:
 };
 
 
-class BMediaIOWrapper : public BMediaIO
-{
+class BMediaIOWrapper : public BMediaIO {
 public:
 	BMediaIOWrapper(BDataIO* source)
 		:
@@ -639,6 +637,7 @@ PluginManager::CreateStreamer(Streamer** streamer, BUrl url, BDataIO** source)
 		if ((*streamer)->Sniff(url, &streamSource) == B_OK) {
 			TRACE("PluginManager::CreateStreamer: Sniff success\n");
 			*source = streamSource;
+			(*streamer)->fReference.AcquireReference();
 			return B_OK;
 		}
 
@@ -657,12 +656,18 @@ PluginManager::DestroyStreamer(Streamer* streamer)
 	if (streamer != NULL) {
 		TRACE("PluginManager::DestroyStreamer(%p, plugin: %p)\n", streamer,
 			streamer->fMediaPlugin);
-		// NOTE: We have to put the plug-in after deleting the encoder,
+		// NOTE: We have to put the plug-in after deleting the streamer,
 		// since otherwise we may actually unload the code for the
 		// destructor...
+
 		MediaPlugin* plugin = streamer->fMediaPlugin;
-		delete streamer;
-		PutPlugin(plugin);
+		streamer->fReference.ReleaseReference();
+
+		// Delete the streamer only when every reference is released
+		if (streamer->fReference.CountReferences() == 0) {
+			delete streamer;
+			PutPlugin(plugin);
+		}
 	}
 }
 

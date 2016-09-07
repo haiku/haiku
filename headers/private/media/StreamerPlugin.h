@@ -4,6 +4,7 @@
 
 #include <MediaIO.h>
 #include <MediaTrack.h>
+#include <Referenceable.h>
 #include <Url.h>
 
 #include "MediaPlugin.h"
@@ -27,6 +28,7 @@ private:
 	virtual void				_ReservedStreamer5();
 
 			MediaPlugin*		fMediaPlugin;
+			BReferenceable		fReference;
 			uint32				fReserved[5];
 
 	// needed for plug-in reference count management
