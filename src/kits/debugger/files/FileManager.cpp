@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -41,9 +41,12 @@ struct FileManager::EntryPath {
 
 	EntryPath(const LocatableEntry* entry)
 		:
-		directory(entry->Parent() != NULL ? entry->Parent()->Path() : NULL),
+		directory(NULL),
 		name(entry->Name())
 	{
+		LocatableDirectory* parent = entry->Parent();
+		if (parent != NULL && strlen(parent->Path()) > 0)
+			directory = parent->Path();
 	}
 
 	EntryPath(const EntryPath& other)

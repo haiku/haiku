@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -40,7 +41,9 @@ void
 LocatableFile::GetPath(BString& _path) const
 {
 	fParent->GetPath(_path);
-	_path << '/' << fName;
+	if (_path.Length() != 0)
+		_path << '/';
+	_path << fName;
 }
 
 
