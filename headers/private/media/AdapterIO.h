@@ -56,7 +56,6 @@ public:
 	virtual	status_t				GetSize(off_t* size) const;
 
 	virtual status_t				Open();
-	virtual void					Close();
 
 	virtual bool					IsRunning() const;
 

@@ -229,9 +229,6 @@ BAdapterIO::~BAdapterIO()
 {
 	CALLED();
 
-	if (!fOpened)
-		Close();
-
 	delete fInputAdapter;
 	delete fBuffer;
 }
@@ -339,15 +336,6 @@ BAdapterIO::Open()
 
 	fOpened = true;
 	return B_OK;
-}
-
-
-void
-BAdapterIO::Close()
-{
-	CALLED();
-
-	fOpened = false;
 }
 
 
