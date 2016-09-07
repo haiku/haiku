@@ -509,7 +509,7 @@ FindWindow::FindWindow(BRect _rect, BMessage& previous, BMessenger& target,
 	message->AddInt8("mode", kAsciiMode);
 	if (mode == kAsciiMode)
 		item->SetMarked(true);
-	fMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Hexadecimal", 
+	fMenu->AddItem(item = new BMenuItem(B_TRANSLATE_COMMENT("Hexadecimal",
 		"A menu item, as short as possible, noun is recommended if it is "
 		"shorter than adjective."), message = new BMessage(kMsgFindMode)));
 	message->AddInt8("mode", kHexMode);
@@ -628,6 +628,14 @@ FindWindow::QuitRequested()
 
 	be_app_messenger.SendMessage(kMsgFindWindowClosed);
 	return true;
+}
+
+
+void
+FindWindow::Show()
+{
+	fTextView->SelectAll();
+	BWindow::Show();
 }
 
 

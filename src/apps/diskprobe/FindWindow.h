@@ -30,6 +30,7 @@ class FindWindow : public BWindow {
 		virtual void WindowActivated(bool active);
 		virtual void MessageReceived(BMessage *message);
 		virtual bool QuitRequested();
+		virtual void Show();
 
 		void SetTarget(BMessenger &target);
 
