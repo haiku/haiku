@@ -85,8 +85,8 @@ BMediaFile::BMediaFile(const media_file_format* mfi, int32 flags)
 BMediaFile::BMediaFile(const BUrl& url)
 {
 	CALLED();
-	fDeleteSource = true;
 	_Init();
+	fDeleteSource = true;
 	_InitReader(NULL, &url);
 }
 
@@ -94,8 +94,8 @@ BMediaFile::BMediaFile(const BUrl& url)
 BMediaFile::BMediaFile(const BUrl& url, int32 flags)
 {
 	CALLED();
-	fDeleteSource = true;
 	_Init();
+	fDeleteSource = true;
 	_InitReader(NULL, &url, flags);
 }
 
@@ -104,8 +104,8 @@ BMediaFile::BMediaFile(BUrl destination, const media_file_format* mfi,
 	int32 flags)
 {
 	CALLED();
-	fDeleteSource = true;
 	_Init();
+	fDeleteSource = true;
 	_InitWriter(NULL, &destination, mfi, flags);
 	// TODO: Implement streaming server support, it's
 	// a pretty complex thing compared to client mode
