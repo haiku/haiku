@@ -10,6 +10,8 @@
 #include <HttpRequest.h>
 #include <UrlProtocolRoster.h>
 
+#include "debug.h"
+
 
 // 10 seconds timeout
 #define HTTP_TIMEOUT 10000000
@@ -29,7 +31,10 @@ public:
 			fInitSem = create_sem(0, "http_streamer init sem");
 		}
 
-		virtual ~FileListener() {};
+		virtual ~FileListener()
+		{
+			_ReleaseInit();
+		}
 
 		bool ConnectionSuccessful() const
 		{
@@ -47,8 +52,10 @@ public:
 		void DataReceived(BUrlRequest* request, const char* data,
 			off_t position, ssize_t size)
 		{
-			if (request != fRequest)
+			if (request != fRequest) {
 				delete request;
+				return;
+			}
 
 			BHttpRequest* httpReq = dynamic_cast<BHttpRequest*>(request);
 			if (httpReq != NULL) {
@@ -111,16 +118,29 @@ HTTPMediaIO::HTTPMediaIO(BUrl url)
 	BAdapterIO(B_MEDIA_STREAMING | B_MEDIA_SEEKABLE, HTTP_TIMEOUT),
 	fContext(NULL),
 	fReq(NULL),
-	fReqThread(-1),
 	fListener(NULL),
+	fReqThread(-1),
 	fUrl(url),
 	fIsMutable(false)
 {
+	CALLED();
+
+	// The context has the same life time of the object
+	fContext = new BUrlContext();
+	fContext->AcquireReference();
 }
 
 
 HTTPMediaIO::~HTTPMediaIO()
 {
+	CALLED();
+
+	fReq->Stop();
+	status_t status;
+	wait_for_thread(fReqThread, &status);
+
+	fContext->ReleaseReference();
+	delete fContext;
 }
 
 
@@ -150,8 +170,7 @@ HTTPMediaIO::SetSize(off_t size)
 status_t
 HTTPMediaIO::Open()
 {
-	fContext = new BUrlContext();
-	fContext->AcquireReference();
+	CALLED();
 
 	fListener = new FileListener(this);
 
@@ -170,23 +189,6 @@ HTTPMediaIO::Open()
 		return ret;
 
 	return BAdapterIO::Open();
-}
-
-
-void
-HTTPMediaIO::Close()
-{
-	fReq->Stop();
-	status_t status;
-	wait_for_thread(fReqThread, &status);
-
-	delete fReq;
-	delete fListener;
-
-	fContext->ReleaseReference();
-	delete fContext;
-
-	BAdapterIO::Close();
 }
 
 

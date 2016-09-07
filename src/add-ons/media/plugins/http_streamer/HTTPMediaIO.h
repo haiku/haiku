@@ -28,7 +28,6 @@ public:
 	virtual status_t					SetSize(off_t size);
 
 	virtual status_t					Open();
-	virtual void						Close();
 
 	virtual bool						IsRunning() const;
 
