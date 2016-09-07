@@ -333,11 +333,18 @@ TextViewFilter(BMessage* message, BHandler**, BMessageFilter* filter)
 		BTextView* textView = dynamic_cast<BTextView*>(
 			scrollView->FindView("WidgetTextView"));
 		if (textView != NULL) {
+			BRect textRect = textView->TextRect();
 			BRect rect = scrollView->Frame();
 
-			if (rect.right + 3 > poseView->Bounds().right
-				|| rect.left - 3 < 0)
+			if (rect.right + 5 > poseView->Bounds().right
+				|| rect.left - 5 < 0)
 				textView->MakeResizable(true, NULL);
+
+			if (textRect.Width() + 10 < rect.Width()) {
+				textView->MakeResizable(true, scrollView);
+				// make sure no empty white space stays on the right
+				textView->ScrollToOffset(0);
+			}
 		}
 	}
 
