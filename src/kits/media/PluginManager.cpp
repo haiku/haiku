@@ -632,12 +632,12 @@ PluginManager::CreateStreamer(Streamer** streamer, BUrl url, BDataIO** source)
 		}
 
 		(*streamer)->fMediaPlugin = plugin;
+		(*streamer)->fReference.AcquireReference();
 
 		BDataIO* streamSource = NULL;
 		if ((*streamer)->Sniff(url, &streamSource) == B_OK) {
 			TRACE("PluginManager::CreateStreamer: Sniff success\n");
 			*source = streamSource;
-			(*streamer)->fReference.AcquireReference();
 			return B_OK;
 		}
 
@@ -661,13 +661,14 @@ PluginManager::DestroyStreamer(Streamer* streamer)
 		// destructor...
 
 		MediaPlugin* plugin = streamer->fMediaPlugin;
-		streamer->fReference.ReleaseReference();
-
 		// Delete the streamer only when every reference is released
-		if (streamer->fReference.CountReferences() == 0) {
+		// we avoid to call ReleaseReference on the last object
+		// and handle deletion when the streamer is destroyed.
+		if (streamer->fReference.CountReferences() == 1) {
 			delete streamer;
 			PutPlugin(plugin);
-		}
+		} else
+			streamer->fReference.ReleaseReference();
 	}
 }
 
