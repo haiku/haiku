@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2016.08.11
-# Date:    2016-08-11 20:34:05
+# Version: 2016.09.07
+# Date:    2016-09-07 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -115,7 +115,9 @@
 	2122  XMEGA-A1 Explained evaluation kit
 	2140  AVR JTAGICE3 (v3.x) Debugger and Programmer
 	2141  ICE debugger
+	2145  ATMEGA328P-XMINI (CDC ACM)
 	2310  EVK11xx evaluation board
+	2404  The Micro
 	2fe4  ATxmega32A4U DFU bootloader
 	2fe6  Cactus V6 (DFU)
 	2fea  Cactus RF60 (DFU)
@@ -372,6 +374,7 @@
 	2205  ScanJet 3500c
 	2212  OfficeJet Pro L7600
 	2217  color LaserJet 9500 MFP
+	222a  LaserJet Pro MFP M125nw
 	2302  PhotoSmart 7600 series
 	2304  DeskJet 656c
 	2305  ScanJet 3970c
@@ -624,6 +627,7 @@
 	8711  Deskjet 2050 J510
 	8804  DeskJet 6980 series
 	8904  DeskJet 6940 series
+	8911  Deskjet 1050 J410
 	8c07  Digital Stereo Headset
 	8c11  Deskjet F4500 series
 	9002  PhotoSmart M437
@@ -2088,7 +2092,7 @@
 	0080  Digital Media Pro Keyboard
 	0083  Basic Optical Mouse
 	0084  Basic Optical Mouse
-	008a  Wireless Keyboard and Mouse
+	008a  Wireless Optical Desktop Receiver 2.0A
 	008b  Dual Receiver Wireless Mouse (IntelliPoint)
 	008c  Wireless Intellimouse Explorer 2.0
 	0095  IntelliMouse Explorer 4.0 (IntelliPoint)
@@ -2717,6 +2721,7 @@
 	c31b  Compact Keyboard K300
 	c31c  Keyboard K120
 	c31d  Media Keyboard K200
+	c332  G502 Proteus Spectrum Optical Mouse
 	c401  TrackMan Marble Wheel
 	c402  Marble Mouse (2-button)
 	c403  Turbo TrackMan Marble FX
@@ -3076,6 +3081,7 @@
 	0108  Digital Camera Device
 	0203  AH-K3001V
 	0204  iBurst Terminal
+	0408  FS-1320D Printer
 0483  STMicroelectronics
 	0137  BeWAN ADSL USB ST (blue or green)
 	0138  Unicorn II (ST70138B + MTC-20174TQ chipset)
@@ -3203,6 +3209,7 @@
 	103c  MOTIF-RACK ES
 	1054  S90XS Keyboard/Music Synthesizer
 	160f  P-105
+	1613  Clavinova CLP535
 	2000  DGP-7
 	2001  DGP-5
 	3001  YST-MS55D USB Speaker
@@ -3464,6 +3471,7 @@
 	10c2  PIXMA iP1800 Printer
 	10c4  Pixma iP4500 Printer
 	10c9  PIXIMA iP4600 Printer
+	10e3  PIXMA iX6850 Printer
 	1404  W6400PG
 	1405  W8400PG
 	150f  BIJ2350 PCL
@@ -4068,6 +4076,7 @@
 	4381  SCAPS USC-1 Scanner Controller
 	4611  Storage Adapter FX2 (CY)
 	4616  Flash Disk (TPP)
+	4624  DS-Xtreme Flash Card
 	5201  Combi Keyboard-Hub (Hub)
 	5202  Combi Keyboard-Hub (Keyboard)
 	5500  HID->COM RS232 Adapter
@@ -4155,6 +4164,7 @@
 	0142  GT-F730 [GT-S630/Perfection V33/V330 Photo]
 	0143  GT-S55
 	0144  GT-S85
+	0151  Perfection V800 Photo
 	0202  Receipt Printer M129C/TM-T70
 	0401  CP 800 Digital Camera
 	0402  PhotoPC 850z
@@ -4384,6 +4394,7 @@
 	10e7  fi-5900C
 	10fe  S500
 	1150  fi-6230
+	125a  PalmSecure Sensor Device - MP
 	201d  SATA 3.0 6Gbit/s Adaptor [GROOVY]
 04c6  Toshiba America Electronic Components
 04c7  Micro Macro Technologies
@@ -4398,10 +4409,12 @@
 	072c  Revio KD20M
 	072d  Revio KD410Z
 04ca  Lite-On Technology Corp.
+	004b  Keyboard
 	004f  SK-9020 keyboard
 	1766  HID Monitor Controls
 	2004  Bluetooth 4.0 [Broadcom BCM20702A0]
 	2006  Broadcom BCM43142A0 Bluetooth Device
+	2007  Broadcom BCM43142A0 Bluetooth Device
 	3005  Atheros Bluetooth
 	300b  Atheros AR3012 Bluetooth
 	300d  Atheros AR3012 Bluetooth
@@ -4594,6 +4607,7 @@
 	2832  HT82A832R Audio MCU
 	2834  HT82A834R Audio MCU
 	a01c  wireless multimedia keyboard with trackball [Trust ADURA 17911]
+	a050  Chatman V1
 	a055  Keyboard
 04da  Panasonic (Matsushita)
 	0901  LS-120 Camera
@@ -4778,6 +4792,7 @@
 	1003  MP3 Player and Recorder
 	1006  SDC-200Z
 	130c  NX100
+	1323  WB700 Camera
 	1f05  S2 Portable [JMicron] (500GB)
 	1f06  HX-MU064DA portable harddisk
 	2018  WIS09ABGN LinkStick Wireless LAN Adapter
@@ -5079,6 +5094,7 @@
 	b1b9  Asus Integrated Webcam
 	b1cf  Lenovo Integrated Camera
 	b1d6  CNF9055 Toshiba Webcam
+	b1d8  1.3M Webcam
 	b1e4  Toshiba Integrated Webcam
 	b213  Fujitsu Integrated Camera
 	b217  Lenovo Integrated Camera (0.3MP)
@@ -6223,6 +6239,7 @@
 	2009  UC-210T Ethernet
 	2011  UC-2324 4xSerial Ports [mos7840]
 	2202  CS124U Miniview II KVM Switch
+	2212  Keyboard/Mouse
 	2213  CS682 2-Port USB 2.0 DVI KVM Switch
 	2221  Winbond Hermon
 	2404  4-port switch
@@ -6231,7 +6248,7 @@
 	4000  DSB-650 10Mbps Ethernet [klsi]
 	7000  Hub
 	7820  UC-2322 2xSerial Ports [mos7820]
-	8021  CS1764A [CubiQ DVI KVMP Switch]
+	8021  Hub
 0558  Truevision, Inc.
 	1009  GW Instek GDS-1000 Oscilloscope
 	100a  GW Instek GDS-1000A Oscilloscope
@@ -7227,6 +7244,7 @@
 	0259  Internal Keyboard/Trackpad
 	0263  Apple Internal Keyboard / Trackpad (MacBook Retina)
 	0267  Magic Keyboard A1644
+	0269  Magic Mouse 2 (Lightning connector)
 	0273  Internal Keyboard/Trackpad (ISO)
 	0301  USB Mouse [Mitsumi, M4848]
 	0302  Optical Mouse [Fujitsu]
@@ -7814,6 +7832,7 @@
 	0741  microSD Card Reader
 	0743  SDXC and microSDXC CardReader
 	0745  Logilink CR0012
+	0748  All-in-One Cardreader
 	0751  microSD Card Reader
 	0760  USB 2.0 Card Reader/Writer
 	0761  Genesys Mass Storage Device
@@ -7890,6 +7909,7 @@
 	262a  3dfx HammerHead FX
 	262f  HammerHead Fx
 	daae  Game Shark
+	dbae  Datel XBoxMC
 05fe  Chic Technology Corp.
 	0001  Mouse
 	0003  Cypress USB Mouse
@@ -8089,6 +8109,7 @@
 	e263  HP TrueVision HD Integrated Webcam
 	f102  Lenovo Integrated Webcam [R5U877]
 	f103  Lenovo Integrated Webcam [R5U877]
+	f209  HP Webcam
 	f300  UVC 0.3M Webcam
 064f  WIBU-Systems AG
 	03e9  CmStick (article no. 1001)
@@ -9291,6 +9312,8 @@
 	557d  Cruzer Force (64GB)
 	5580  SDCZ80 Flash Drive
 	5581  Ultra
+	5583  Ultra Fit
+	5591  Ultra Flair
 	5e10  Encrypted
 	6100  Ultra II SD Plus 2GB
 	7100  Cruzer Mini
@@ -10645,6 +10668,8 @@
 	0003  GPS (various models)
 	0004  iQue 3600
 	0200  Data Card Programmer (install)
+	086e  Forerunner 735XT
+	097f  Forerunner 235
 	1200  Data Card Programmer
 	21a5  etrex Cx (msc)
 	2236  nuvi 360
@@ -10710,6 +10735,7 @@
 	0009  Gigabeat F/X (HDD audio player)
 	000c  Gigabeat F (mtp)
 	0010  Gigabeat S (mtp)
+	01bf  2.5"External Hard Disk
 	0200  Integrated Bluetooth (Taiyo Yuden)
 	021c  Atheros AR3012 Bluetooth
 	0301  PCX1100U Cable Modem (WDM)
@@ -10906,6 +10932,7 @@
 0955  NVidia Corp.
 	7030  Tegra 3 (recovery mode)
 	7100  Tegra Device
+	7210  SHIELD Controller
 	7820  Tegra 2 AC100 developer mode
 	b400  SHIELD (debug)
 	b401  SHIELD
@@ -10938,7 +10965,13 @@
 	0204  WarpLink 802.11b Adapter
 0968  Catalyst Enterprises, Inc.
 096e  Feitian Technologies, Inc.
+	0005  ePass2000
 	0120  Microcosm Ltd Dinkey
+	0305  ePass2000Auto
+	0309  ePass3000GM
+	0401  ePass3000
+	0702  ePass3003
+	0703  ePass3003Auto
 	0802  ePass2000 (G&D STARCOS SPK 2.4)
 	0807  ePass2003
 0971  Gretag-Macbeth AG
@@ -10988,6 +11021,7 @@
 	610c  EL-610 Super Mini Electron luminescent Keyboard
 	713a  WK-713 Multimedia Keyboard
 	7160  Hyper Slim Keyboard
+099e  Trimble Navigation, Ltd
 09a3  PairGain Technologies
 09a4  Contech Research, Inc.
 09a5  VCON Telecommunications
@@ -11044,6 +11078,15 @@
 09c5  Memory Corp.
 09ca  BMC Messsysteme GmbH
 	5544  PIO
+09cb  FLIR Systems
+	1001  Network Adapter
+	1002  Ex-Series RNDIS interface
+	1004  Ex-Series UVC interface
+	1005  Ex-Series RNDIS and UVC interface
+	1006  Ex-Series RNDIS and MSD interface
+	1007  Ex-Series UVC and MSD interface
+	1008  Serial Port
+	1996  FLIR ONE Camera
 09cc  Workbit Corp.
 	0404  BAFO USB-ATA/ATAPI Bridge Controller
 09cd  Psion Dacom Home Networks, Ltd
@@ -11055,7 +11098,7 @@
 09d3  Com One
 	0001  ISDN TA / Light Rider 128K
 	000b  Bluetooth Adapter class 1 [BlueLight]
-09d7  Novatel Wireless
+09d7  NovAtel Inc.
 	0100  NovAtel FlexPack GPS receiver
 09d9  KRF Tech, Ltd
 09da  A4Tech Co., Ltd.
@@ -11069,6 +11112,7 @@
 	024f  RF Receiver and G6-20D Wireless Optical Mouse
 	0260  KV-300H Isolation Keyboard
 	032b  Wireless Mouse (Battery Free)
+	1068  Bloody A90 Mouse
 	8090  X-718BK Oscar Optical Gaming Mouse
 	9033  X-718BK Optical Mouse
 	9066  F3 V-Track Gaming Mouse
@@ -11313,7 +11357,9 @@
 	2150  BCM2046 Bluetooth Device
 	2151  Bluetooth
 	2154  BCM92046DG-CL1ROM Bluetooth 2.1 UHE Dongle
+	216a  BCM43142A0 Bluetooth
 	216c  BCM43142A0 Bluetooth Device
+	216d  BCM43142A0 Bluetooth 4.0
 	216f  BCM20702A0 Bluetooth
 	217d  HP Bluethunder
 	217f  BCM2045B (BDC-2.1)
@@ -11342,6 +11388,7 @@
 	5803  BCM5880 Secure Applications Processor with secure keyboard
 	5804  BCM5880 Secure Applications Processor with fingerprint swipe sensor
 	6300  Pirelli Remote NDIS Device
+	6410  BCM20703A1 Bluetooth 4.1 + LE
 	bd11  TiVo AG0100 802.11bg Wireless Adapter [Broadcom BCM4320]
 	bd13  BCM4323 802.11abgn Wireless Adapter
 	bd16  BCM4319 802.11bgn Wireless Adapter
@@ -11703,6 +11750,8 @@
 	17c9  USB-AC53 802.11a/b/g/n/ac Wireless Adapter [Broadcom BCM43526]
 	17cb  Broadcom BCM20702A0 Bluetooth
 	17d1  AC51 802.11a/b/g/n/ac Wireless Adapter [Mediatek MT7610/Ralink RT2870]
+	180a  Broadcom BCM20702 Single-Chip Bluetooth 4.0 + LE
+	1825  Qualcomm Bluetooth 4.1
 	4c80  Transformer Pad TF300TG
 	4c90  Transformer Pad Infinity TF700
 	4c91  Transformer Pad Infinity TF700 (Debug mode)
@@ -11728,10 +11777,15 @@
 0b0d  ProjectLab
 	0000  CenturyCD
 0b0e  GN Netcom
+	0348  Jabra UC VOICE 550a MS
 	034c  Jabra UC Voice 750 MS
+	0410  Jabra SPEAK 410
 	0420  Jabra SPEAK 510
 	094d  GN Netcom / Jabra REVO Wireless
+	1017  Jabra PRO 930
 	1022  Jabra PRO 9450, Type 9400BS (DECT Headset)
+	1041  Jabra PRO 9460
+	1900  Jabra Biz 1900
 	2007  GN 2000 Stereo Corded Headset
 	620c  Jabra BT620s
 	9330  Jabra GN9330 Headset
@@ -11753,6 +11807,7 @@
 	0006  SM Media-Shuttle Card Reader
 0b33  Contour Design, Inc.
 	0020  ShuttleXpress
+	0030  ShuttlePro v2
 	0700  RollerMouse Pro
 0b37  Hitachi ULSI Systems Co., Ltd
 0b38  Gear Head
@@ -11812,6 +11867,7 @@
 	3011  TT-connect S2-4600
 	3012  TT-connect CT2-4650 CI
 	3014  TT-TVStick CT2-4400
+	3015  TT-connect CT2-4650 CI
 0b49  ASCII Corp.
 	064f  Trance Vibrator
 0b4b  Pine Corp. Ltd.
@@ -11893,7 +11949,7 @@
 	7720  AX88772
 	772a  AX88772A Fast Ethernet
 	772b  AX88772B
-	7e2b  AX88772B
+	7e2b  AX88772B Fast Ethernet Controller
 0b96  Sewon Telecom
 0b97  O2 Micro, Inc.
 	7732  Smart Card Reader
@@ -12122,9 +12178,12 @@
 	0ca2  Desire HD (debug mode)
 	0ca5  Android Phone [Evo Shift 4G]
 	0cae  T-Mobile MyTouch 4G Slide [Doubleshot]
+	0de5  One (M7)
 	0dea  M7_UL [HTC One]
 	0f25  One M8
+	0f63  Desire 610 Via MTP
 	0f64  Desire 601
+	0fb4  Remote NDIS based Device
 	0ff8  Desire HD (Tethering Mode)
 	0ff9  Desire / Desire HD / Hero / Thunderbolt (Charge Mode)
 	0ffe  Desire HD (modem mode)
@@ -12149,6 +12208,7 @@
 	2100  FreeAgent Go
 	2200  FreeAgent Go FW
 	2300  Expansion Portable
+	231a  Expansion Portable
 	2320  USB 3.0 bridge [Portable Expansion Drive]
 	2321  Expansion Portable
 	2340  FreeAgent External Hard Drive
@@ -12162,6 +12222,7 @@
 	5021  FreeAgent GoFlex USB 2.0
 	5030  FreeAgent GoFlex Upgrade Cable STAE104
 	5031  FreeAgent GoFlex USB 3.0
+	5032  SATA cable
 	5070  FreeAgent GoFlex Desk
 	5071  FreeAgent GoFlex Desk
 	50a1  FreeAgent GoFlex Desk
@@ -12174,7 +12235,9 @@
 	ab00  Slim Portable Drive
 	ab20  Backup Plus Portable Drive
 	ab21  Backup Plus Slim
+	ab24  Backup Plus Portable Drive
 	ab31  Backup Plus Desktop Drive (5TB)
+	ab34  Backup Plus
 0bc3  IPWireless, Inc.
 	0001  UMTS-TDD (TD-CDMA) modem
 0bc4  Microcube Corp.
@@ -12208,6 +12271,7 @@
 	0106  Mass Storage Device
 	0107  Mass Storage Device
 	0108  Mass Storage Device
+	0109  microSDXC Card Reader [Hama 00091047]
 	0111  RTS5111 Card Reader Controller
 	0113  Mass Storage Device
 	0115  Mass Storage Device (Multicard Reader)
@@ -12220,7 +12284,7 @@
 	0139  RTS5139 Card Reader Controller
 	0151  Mass Storage Device (Multicard Reader)
 	0152  Mass Storage Device
-	0153  Mass Storage Device
+	0153  3-in-1 (SD/SDHC/SDXC) Card Reader
 	0156  Mass Storage Device
 	0157  Mass Storage Device
 	0158  USB 2.0 multicard reader
@@ -12235,15 +12299,21 @@
 	0184  RTS5182 Card Reader
 	0186  Card Reader
 	0301  multicard reader
+	0307  Card Reader
 	1724  RTL8723AU 802.11n WLAN Adapter
 	2831  RTL2831U DVB-T
 	2832  RTL2832U DVB-T
 	2838  RTL2838 DVB-T
 	5401  RTL 8153 USB 3.0 hub with gigabit ethernet
+	570c  Asus laptop camera
 	5730  HP 2.0MP High Definition Webcam
 	5775  HP "Truevision HD" laptop camera
+	57b3  Acer 640 × 480 laptop camera
+	57da  Built-In Video Camera
 	8150  RTL8150 Fast Ethernet Adapter
 	8151  RTL8151 Adapteon Business Mobile Networks BV
+	8152  RTL8152 Fast Ethernet Adapter
+	8153  RTL8153 Gigabit Ethernet Adapter
 	8171  RTL8188SU 802.11n WLAN Adapter
 	8172  RTL8191SU 802.11n WLAN Adapter
 	8174  RTL8192SU 802.11n WLAN Adapter
@@ -12253,6 +12323,7 @@
 	817f  RTL8188RU 802.11n WLAN Adapter
 	8187  RTL8187 Wireless Adapter
 	8189  RTL8187B Wireless 802.11g 54Mbps Network Adapter
+	818b  ACT-WNP-UA-005 802.11b/g/n WLAN Adapter
 	8192  RTL8191SU 802.11n Wireless Adapter
 	8193  RTL8192DU 802.11an WLAN Adapter
 	8197  RTL8187B Wireless Adapter
@@ -12271,6 +12342,7 @@
 	1909  F3307 v2 Mobile Broadband Module
 	190a  F3307 Mobile Broadband Module
 	190b  C3607w v2 Mobile Broadband Module
+	1926  H5321 gw Mobile Broadband Driver
 0bdc  Y Media Corp.
 0bdd  Orange PCS
 0be2  Kanda Tsushin Kogyo Co., Ltd
@@ -12304,6 +12376,7 @@
 	100c  Keyboard FSC KBPC PX
 	100f  miniCard D2301 802.11bg Wireless Module [SiS 163U]
 	1017  Keyboard KB SCR
+	101f  Fujitsu Full HD Pro Webcam
 0bfd  Kvaser AB
 	0004  USBcan II
 	000b  Leaf Light HS
@@ -12541,6 +12614,10 @@
 	6480  Sonix 1.3 MP Laptop Integrated Webcam
 	648b  Integrated Webcam
 	64bd  Sony Visual Communication Camera
+	64d2  Integrated Webcam
+	651b  HP Webcam
+	6705  Integrated HD Webcam
+	6710  Integrated Webcam
 	7401  TEMPer Temperature Sensor
 	7402  TEMPerHUM Temperature & Humidity Sensor
 	7403  Foot Switch
@@ -12712,6 +12789,8 @@
 	3050  EZ710 Smart Card Reader
 0ca7  Information Systems Laboratories
 0cad  Motorola CGISS
+	1030  APX Series Radio
+	1602  IMPRES Battery Data Reader
 	9001  PowerPad Pocket PC Device
 0cae  Ascom Business Systems, Ltd
 0caf  Buslink
@@ -12745,7 +12824,6 @@
 0cc4  emsys GmbH
 0cc5  Sendo
 0cc6  Intermagic Corp.
-0cc7  Kontron Medical AG
 0cc8  Technotools Corp.
 0cc9  BroadMAX Technologies, Inc.
 0cca  Amphenol
@@ -12780,12 +12858,15 @@
 	0078  Cinergy T XXS
 	0086  Cinergy Hybrid XE
 	008e  Cinergy HTC XS
+	0096  Grabby
 	0097  Cinergy T RC MKII
 	0099  AfaTech 9015 [Cinergy T Stick Dual]
 	00a5  Cinergy Hybrid Stick
 	00a9  RTL2838 DVB-T COFDM Demodulator [TerraTec Cinergy T Stick Black]
 	00b3  NOXON DAB/DAB+ Stick
 	00e0  NOXON DAB/DAB+ Stick V2
+	0102  Cinergy S2 Stick
+	0105  Cinergy S2 Box
 	10a7  TerraTec G3
 0cd4  Bang Olufsen
 	0101  BeolinkPC2
@@ -12844,7 +12925,7 @@
 	6225  SD card reader (UB6225)
 	6230  SD Card Reader (UB623X)
 	6250  SD card reader (UB6250)
-0cf3  Atheros Communications, Inc.
+0cf3  Qualcomm Atheros Communications
 	0001  AR5523
 	0002  AR5523 (no firmware)
 	0003  AR5523
@@ -12860,12 +12941,15 @@
 	3002  AR3011 Bluetooth
 	3004  AR3012 Bluetooth 4.0
 	3005  AR3011 Bluetooth
+	3007  AR3012 Bluetooth 4.0 (no firmware)
 	3008  Bluetooth (AR3011)
+	311f  AR3012 Bluetooth
 	7015  TP-Link TL-WN821N v3 / TL-WN822N v2 802.11n [Atheros AR7010+AR9287]
 	9170  AR9170 802.11n
 	9271  AR9271 802.11n
 	b002  Ubiquiti WiFiStation 802.11n [Atheros AR9271]
 	b003  Ubiquiti WiFiStationEXT 802.11n [Atheros AR9271]
+	e006  Dell Wireless 1802 Bluetooth 4.0 LE
 0cf4  Fomtex Corp.
 0cf5  Cellink Co., Ltd
 0cf6  Compucable Corp.
@@ -13215,6 +13299,7 @@
 0dba  Digidesign
 	1000  Mbox 1 [Mbox]
 	3000  Mbox 2
+	b011  Eleven Rack
 0dbc  A&D Medical
 	0003  AND Serial Cable [AND Smart Cable]
 0dbe  Jiuh Shiuh Precision Industry Co., Ltd
@@ -13224,6 +13309,7 @@
 	021b  USB-2.0 IDE Adapter
 	0300  Storage Adapter
 	0333  Storage Adapter
+	0502  FSC Storagebird XL hard disk
 	0707  ZIV Drive
 0dc0  G7 Solutions (formerly Great Notions)
 0dc1  Tamagawa Seiki Co., Ltd
@@ -13340,8 +13426,10 @@
 	005d  WLA-2000 v1.001 WLAN [RTL8191SU]
 	0060  WLA-4000 802.11bgn [Ralink RT3072]
 	0062  WLA-5000 802.11abgn [Ralink RT3572]
+	006f  WLA-5100
 	0072  AX88179 Gigabit Ethernet [Sitecom]
 	061c  LN-028 Network USB 2.0 Adapter
+	214a  IDE/SATA Combo Adapter [CN-330]
 	21f4  44 St Bluetooth Device
 	2200  Sitecom bluetooth2.0 class 2 dongle CN-512
 	2208  Sitecom bluetooth2.0 class 2 dongle CN-520
@@ -13413,11 +13501,8 @@
 0e34  Micro Computer Control Corp.
 0e35  3Pea Technologies, Inc.
 0e36  TiePie engineering
-	0008  Handyscope HS3
-	0009  Handyscope HS3 (br)
-	000a  Handyscope HS4
-	000b  Handyscope HS4 (br)
-	000e  Handyscope HS4-DIFF
+	0009  Handyscope HS3
+	000b  Handyscope HS4
 	000f  Handyscope HS4-DIFF (br)
 	0010  Handyscope HS2
 	0011  TiePieSCOPE HS805 (br)
@@ -13517,10 +13602,13 @@
 0e8c  Well Force Electronic Co., Ltd
 0e8d  MediaTek Inc.
 	0003  MT6227 phone
+		0e8d 0003  M26 - BT Smart Watch for Android Phones
 	0004  MT6227 phone
 	0023  S103
+	00a5  GSM modem [Medion Surfstick Model:S4222]
 	1806  Samsung SE-208 Slim Portable DVD Writer
 	1836  Samsung SE-S084 Super WriteMaster Slim External DVD writer
+	1956  Samsung SE-506 Portable BluRay Disc Writer
 	2000  MT65xx Preloader
 	3329  Qstarz BT-Q1000XT
 	763e  MT7630e Bluetooth Adapter
@@ -13639,6 +13727,9 @@
 0f0d  Hori Co., Ltd
 	0011  Real Arcade Pro 3
 0f0e  Energy Full Corp.
+0f0f  Silego Technology Inc
+	0006  GreenPak Universal Dev Board (Active Mode)
+	8006  GreenPak Universal Dev Board (Reset Mode)
 0f11  LD Didactic GmbH
 	1000  CASSY-S
 	1010  Pocket-CASSY
@@ -13658,6 +13749,7 @@
 0f13  Acetek Technology Co., Ltd
 0f14  Ingenico
 	0012  Vital'Act 3S
+	0038  XIRING Smart Card Terminal LEO V2
 0f18  Finger Lakes Instrumentation
 	0002  CCD
 	0006  Focuser
@@ -13812,6 +13904,12 @@
 	0169  Xperia S
 	0172  Xperia P
 	0177  Xperia Ion [Mass Storage]
+	0188  ST26i
+	019c  C6833
+	019e  C6903
+	01a5  SO-04F
+	01a7  D5503
+	01ba  D6603 [Xperia Z3]
 	01bb  D5803 [Xperia Z3 Compact] (MTP mode)
 	0dde  Xperia Mini Pro Bootloader
 	1010  WMC Modem
@@ -13829,6 +13927,7 @@
 	5169  Xperia S [Adb-Enable Mode]
 	5177  Xperia Ion [Debug Mode]
 	518c  C1605 [Xperia E dual] MTD mode
+	51a7  D5503 (Xperia Z1 Compact)
 	614f  Xperia X12 (debug mode)
 	6166  Xperia Mini Pro
 	618c  C1605 [Xperia E dual] MSC mode
@@ -13885,6 +13984,12 @@
 	e166  Xperia Mini Pro
 	e167  XPERIA mini
 	e19b  C2005 [Xperia M dual] (Mass Storage)
+	e1a9  D5303
+	e1aa  D2303
+	e1ad  D5103
+	e1b0  D6708
+	e1b5  D2004
+	e1ba  D6683
 	f0fa  MN800 / Smartwatch 2 (DFU mode)
 0fcf  Dynastream Innovations, Inc.
 	1003  ANT Development Board
