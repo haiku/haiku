@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.09.01
-#	Date:    2016-09-01 03:15:01
+#	Version: 2016.09.05
+#	Date:    2016-09-05 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -242,6 +242,11 @@
 		1000 1000  LSI53C895A PCI to Ultra2 SCSI Controller
 	0013  53c875a
 		1000 1000  LSI53C875A PCI to Ultra SCSI Controller
+	0014  MegaRAID Tri-Mode SAS3516
+	0016  MegaRAID Tri-Mode SAS3508
+	0017  MegaRAID Tri-Mode SAS3408
+	001b  MegaRAID Tri-Mode SAS3504
+	001c  MegaRAID Tri-Mode SAS3404
 	0020  53c1010 Ultra3 SCSI Adapter
 		1000 1000  LSI53C1010-33 PCI to Dual Channel Ultra160 SCSI Controller
 		107b 1040  Server Onboard 53C1010-33
@@ -349,6 +354,8 @@
 	005c  SAS1064A PCI-X Fusion-MPT SAS
 	005d  MegaRAID SAS-3 3108 [Invader]
 		1000 9361  MegaRAID SAS 9361-8i
+		1000 9364  MegaRAID SAS 9364-8i
+		1000 936a  MegaRAID SAS 9364-8i
 		1028 1f41  PERC H830 Adapter
 		1028 1f42  PERC H730P Adapter
 		1028 1f43  PERC H730 Adapter
@@ -504,6 +511,7 @@
 	0087  SAS2308 PCI-Express Fusion-MPT SAS-2
 		1000 3020  9207-8i SAS2.1 HBA
 		1000 3040  9207-8e SAS2.1 HBA
+		1000 3050  SAS9217-8i
 		1590 0044  H220i
 	008f  53c875J
 		1092 8000  FirePort 40 SCSI Controller
@@ -514,8 +522,16 @@
 	0095  SAS3108 PCI-Express Fusion-MPT SAS-3
 	0096  SAS3004 PCI-Express Fusion-MPT SAS-3
 	0097  SAS3008 PCI-Express Fusion-MPT SAS-3
+		1000 3090  SAS9311-8i
+		1000 30e0  SAS9300-8i
 		1028 1f45  12GB/s HBA internal
 		1028 1f46  12Gbps HBA
+	00ab  SAS3516 Fusion-MPT Tri-Mode RAID On Chip (ROC)
+	00ac  SAS3416 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
+	00ae  SAS3508 Fusion-MPT Tri-Mode RAID On Chip (ROC)
+	00af  SAS3408 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
+	00be  SAS3504 Fusion-MPT Tri-Mode RAID On Chip (ROC)
+	00bf  SAS3404 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
 	00c0  SAS3324 PCI-Express Fusion-MPT SAS-3
 	00c1  SAS3324 PCI-Express Fusion-MPT SAS-3
 	00c2  SAS3324 PCI-Express Fusion-MPT SAS-3
@@ -531,6 +547,9 @@
 		1000 9390  MegaRAID SAS 9380-8i8e
 	00cf  MegaRAID SAS-3 3324 [Intruder]
 		1000 9370  MegaRAID SAS 9361-24i
+	00d0  SAS3716 Fusion-MPT Tri-Mode RAID Controller Chip (ROC)
+	00d1  SAS3616 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
+	00d3  MegaRAID Tri-Mode SAS3716W
 	0407  MegaRAID
 		1000 0530  MegaRAID 530 SCSI 320-0X RAID Controller
 		1000 0531  MegaRAID 531 SCSI 320-4X RAID Controller
@@ -2156,11 +2175,19 @@
 	67c0  Ellesmere [Polaris10]
 	67df  Ellesmere [Radeon RX 470/480]
 		1002 0b37  Radeon RX 480
+		1043 04a8  Radeon RX 480
+		1043 04b0  Radeon RX 470
 		1043 04fb  Radeon RX 480
 		1462 3411  Radeon RX 470
 		1462 3413  Radeon RX 480
+		148c 2372  Radeon RX 480
+		148c 2373  Radeon RX 470
+		1682 9470  Radeon RX 470
 		1682 9480  Radeon RX 480
-		174b e347  Radeon RX 480
+		174b e347  Radeon RX 470/480
+		174b e349  Radeon RX 470
+		1787 a470  Radeon RX 470
+		1787 a480  Radeon RX 480
 	67e0  Baffin [Polaris11]
 	67e1  Baffin [Polaris11]
 	67e8  Baffin [Polaris11]
@@ -3183,7 +3210,7 @@
 	95cc  RV620 GL [FirePro V3700]
 	95cd  RV620 [FirePro 2450]
 	95cf  RV620 GL [FirePro 2260]
-	960f  RS780 HDMI Audio [Radeon (HD) 3000 Series]
+	960f  RS780 HDMI Audio [Radeon 3000/3100 / HD 3200/3300]
 	9610  RS780 [Radeon HD 3200]
 		1458 d000  GA-MA78GM-S2H Motherboard
 	9611  RS780C [Radeon 3100]
@@ -3284,7 +3311,7 @@
 	9917  Trinity [Radeon HD 7620G]
 	9918  Trinity [Radeon HD 7600G]
 	9919  Trinity [Radeon HD 7500G]
-	9920  Liverpool Graphics
+	9920  Liverpool [Playstation 4 APU]
 	9921  Liverpool HDMI/DP Audio Controller
 	9990  Trinity [Radeon HD 7520G]
 	9991  Trinity [Radeon HD 7540D]
@@ -3304,40 +3331,41 @@
 	99a0  Trinity [Radeon HD 7520G]
 	99a2  Trinity [Radeon HD 7420G]
 	99a4  Trinity [Radeon HD 7400G]
-	aa00  R600 HDMI Audio [Radeon HD 2900 Series]
+	aa00  R600 HDMI Audio [Radeon HD 2900 GT/PRO/XT]
+	aa01  RV635 HDMI Audio [Radeon HD 3650/3730/3750]
 	aa08  RV630 HDMI Audio [Radeon HD 2600 Series]
-	aa10  RV610 HDMI Audio [Radeon HD 2350/2400 Series]
+	aa10  RV610 HDMI Audio [Radeon HD 2350 PRO / 2400 PRO/XT / HD 3410]
 		174b aa10  Radeon HD 2400 PRO
 		18bc aa10  Radeon HD 2400 PRO
 	aa18  RV670/680 HDMI Audio [Radeon HD 3690/3800 Series]
-	aa20  RV635 HDMI Audio [Radeon HD 3600 Series]
-	aa28  RV620 HDMI Audio [Radeon HD 3400 Series]
+	aa20  RV635 HDMI Audio [Radeon HD 3650/3730/3750]
+	aa28  RV620 HDMI Audio [Radeon HD 3450/3470/3550/3570]
 	aa30  RV770 HDMI Audio [Radeon HD 4850/4870]
 		174b aa30  Radeon HD 4850 512MB GDDR3 PCI-E Dual Slot Fansink
 	aa38  RV710/730 HDMI Audio [Radeon HD 4000 series]
 		103c 3628  dv6-1190en
-	aa50  Cypress HDMI Audio [Radeon HD 5800 Series]
+	aa50  Cypress HDMI Audio [Radeon HD 5830/5850/5870 / 6850/6870 Rebrand]
 	aa58  Juniper HDMI Audio [Radeon HD 5700 Series]
 # 5500, 5600 and mobile 5700 series
 	aa60  Redwood HDMI Audio [Radeon HD 5000 Series]
 		1025 033d  Mobility Radeon HD 5650
 		1025 0347  Aspire 7740G
-	aa68  Cedar HDMI Audio [Radeon HD 5400/6300 Series]
+	aa68  Cedar HDMI Audio [Radeon HD 5400/6300/7300 Series]
 		1028 aa68  XPS 8300
-	aa80  Cayman/Antilles HDMI Audio [Radeon HD 6900 Series]
+	aa80  Cayman/Antilles HDMI Audio [Radeon HD 6930/6950/6970/6990]
 	aa88  Barts HDMI Audio [Radeon HD 6800 Series]
-	aa90  Turks/Whistler HDMI Audio [Radeon HD 6000 Series]
+	aa90  Turks HDMI Audio [Radeon HD 6500/6600 / 6700M Series]
 		1028 04a3  Precision M4600
 	aa98  Caicos HDMI Audio [Radeon HD 6400 Series]
 		174b aa98  Radeon HD 6450 1GB DDR3
-	aaa0  Tahiti XT HDMI Audio [Radeon HD 7970 Series]
+	aaa0  Tahiti HDMI Audio [Radeon HD 7870 XT / 7950/7970]
 	aab0  Cape Verde/Pitcairn HDMI Audio [Radeon HD 7700/7800 Series]
 	aac0  Tobago HDMI Audio [Radeon R7 360 / R9 360 OEM]
-	aac8  Hawaii HDMI Audio
+	aac8  Hawaii HDMI Audio [Radeon R9 290/290X / 390/390X]
 # I have a Tonga card and this is the HDMI Audio part
 	aad8  Tonga HDMI Audio [Radeon R9 285/380]
 		174b aad8  Radeon R9 285/380 HDMI Audio
-	aae8  Fiji HDMI/DP Audio Controller
+	aae8  Fiji HDMI/DP Audio [Radeon R9 Nano / FURY/FURY X]
 	ac00  Theater 600 Pro
 	ac02  TV Wonder HD 600 PCIe
 	ac12  Theater HD T507 (DVB-T) TV tuner/capture device
@@ -10794,6 +10822,7 @@
 		11ec 8129  RTL8111/8168 PCIe Gigabit Ethernet (misconfigured)
 	8136  RTL8101/2/6E PCI Express Fast/Gigabit Ethernet controller
 		103c 1985  Pavilion 17-e163sg Notebook PC
+		103c 2a8c  Compaq 500B Microtower
 		103c 2ab1  Pavilion p6774
 		103c 30cc  Pavilion dv6700
 		1179 ff64  RTL8102E PCI-E Fast Ethernet NIC
@@ -24545,6 +24574,7 @@
 		8086 544e  DeskTop Board D945GTP
 	27b8  82801GB/GR (ICH7 Family) LPC Interface Bridge
 		1028 01e6  PowerEdge 860
+		103c 2a8c  Compaq 500B Microtower
 		1043 8179  P5KPL-VM Motherboard
 		107b 5048  E4500
 		1462 7418  Wind PC MS-7418
@@ -24571,6 +24601,7 @@
 		1028 01ad  OptiPlex GX620
 		1028 01df  PowerEdge SC440
 		1028 01e6  PowerEdge 860
+		103c 2a8c  Compaq 500B Microtower
 		1043 8179  P5KPL-VM Motherboard
 		107b 5048  E4500
 		1462 2310  MSI Hetis 945
@@ -24609,6 +24640,7 @@
 		1028 01df  PowerEdge SC440
 		1028 01e6  PowerEdge 860
 		103c 2a3b  Pavilion A1512X
+		103c 2a8c  Compaq 500B Microtower
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
@@ -24633,6 +24665,7 @@
 		1028 01df  PowerEdge SC440
 		1028 01e6  PowerEdge 860
 		103c 2a3b  Pavilion A1512X
+		103c 2a8c  Compaq 500B Microtower
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
@@ -24656,6 +24689,7 @@
 		1028 01df  PowerEdge SC440
 		1028 01e6  PowerEdge 860
 		103c 2a3b  Pavilion A1512X
+		103c 2a8c  Compaq 500B Microtower
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
@@ -24677,6 +24711,7 @@
 		1028 01d7  XPS M1210
 		1028 01df  PowerEdge SC440
 		103c 2a3b  Pavilion A1512X
+		103c 2a8c  Compaq 500B Microtower
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
@@ -24699,6 +24734,7 @@
 		1028 01df  PowerEdge SC440
 		1028 01e6  PowerEdge 860
 		103c 2a3b  Pavilion A1512X
+		103c 2a8c  Compaq 500B Microtower
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
@@ -24753,6 +24789,7 @@
 		1025 006c  9814 WKMI
 		1028 01d7  XPS M1210
 		103c 2a3b  Pavilion A1512X
+		103c 2a8c  Compaq 500B Microtower
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
@@ -24788,6 +24825,7 @@
 		1028 01df  PowerEdge SC440
 		1028 01e6  PowerEdge 860
 		103c 2a3b  Pavilion A1512X
+		103c 2a8c  Compaq 500B Microtower
 		1043 8179  P5KPL-VM Motherboard
 		105b 0d7c  D270S/D250S Motherboard
 		1071 8209  Medion MIM 2240 Notebook PC [MD98100]
@@ -24813,6 +24851,7 @@
 		1028 01df  PowerEdge SC440
 		1028 01e6  PowerEdge 860
 		103c 2a3b  Pavilion A1512X
+		103c 2a8c  Compaq 500B Microtower
 		103c 309f  Compaq nx9420 Notebook
 		103c 30a1  NC2400
 		103c 30a3  Compaq nw8440
@@ -25618,8 +25657,10 @@
 	2e27  4 Series Chipset Serial KT Controller
 	2e29  4 Series Chipset PCI Express Root Port
 	2e30  4 Series Chipset DRAM Controller
+		103c 2a8c  Compaq 500B Microtower
 	2e31  4 Series Chipset PCI Express Root Port
 	2e32  4 Series Chipset Integrated Graphics Controller
+		103c 2a8c  Compaq 500B Microtower
 	2e33  4 Series Chipset Integrated Graphics Controller
 	2e34  4 Series Chipset HECI Controller
 	2e35  4 Series Chipset HECI Controller
