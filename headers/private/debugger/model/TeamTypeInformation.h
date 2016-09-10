@@ -1,12 +1,11 @@
 /*
- * Copyright 2011-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_TYPE_INFORMATION_H
 #define TEAM_TYPE_INFORMATION_H
 
 
-#include <Referenceable.h>
 #include <SupportDefs.h>
 
 
@@ -15,7 +14,7 @@ class Type;
 class TypeLookupConstraints;
 
 
-class TeamTypeInformation : public BReferenceable {
+class TeamTypeInformation {
 public:
 	virtual						~TeamTypeInformation();
 

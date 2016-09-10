@@ -54,6 +54,7 @@
 #include "SymbolInfo.h"
 #include "TargetAddressRangeList.h"
 #include "Team.h"
+#include "TeamFunctionSourceInformation.h"
 #include "TeamMemory.h"
 #include "Tracing.h"
 #include "TypeLookupConstraints.h"
@@ -329,7 +330,8 @@ struct DwarfImageDebugInfo::TypeEntryInfo {
 DwarfImageDebugInfo::DwarfImageDebugInfo(const ImageInfo& imageInfo,
 	DebuggerInterface* interface, Architecture* architecture,
 	FileManager* fileManager, GlobalTypeLookup* typeLookup,
-	GlobalTypeCache* typeCache, DwarfFile* file)
+	GlobalTypeCache* typeCache, TeamFunctionSourceInformation* sourceInfo,
+	DwarfFile* file)
 	:
 	fLock("dwarf image debug info"),
 	fImageInfo(imageInfo),
@@ -338,6 +340,7 @@ DwarfImageDebugInfo::DwarfImageDebugInfo(const ImageInfo& imageInfo,
 	fFileManager(fileManager),
 	fTypeLookup(typeLookup),
 	fTypeCache(typeCache),
+	fSourceInfo(sourceInfo),
 	fTypeNameTable(NULL),
 	fFile(file),
 	fTextSegment(NULL),
@@ -806,6 +809,17 @@ DwarfImageDebugInfo::GetStatement(FunctionDebugInfo* _function,
 		TRACE_CODE("  -> no source file\n");
 
 		// no source code -- rather return the assembly statement
+		return fArchitecture->GetStatement(function, address, _statement);
+	}
+
+	SourceCode* sourceCode = NULL;
+	status_t error = fSourceInfo->GetActiveSourceCode(_function, sourceCode);
+	BReference<SourceCode> sourceReference(sourceCode, true);
+	if (error != B_OK || dynamic_cast<DisassembledCode*>(sourceCode) != NULL) {
+		// either no source code or disassembly is currently active (i.e.
+		// due to failing to locate the source file on disk or the user
+		// deliberately switching to disassembly view).
+		// return the assembly statement.
 		return fArchitecture->GetStatement(function, address, _statement);
 	}
 

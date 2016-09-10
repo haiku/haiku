@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -23,13 +23,15 @@
 
 DwarfTeamDebugInfo::DwarfTeamDebugInfo(Architecture* architecture,
 	DebuggerInterface* interface, FileManager* fileManager,
-	GlobalTypeLookup* typeLookup, GlobalTypeCache* typeCache)
+	GlobalTypeLookup* typeLookup, TeamFunctionSourceInformation* sourceInfo,
+	GlobalTypeCache* typeCache)
 	:
 	fArchitecture(architecture),
 	fDebuggerInterface(interface),
 	fFileManager(fileManager),
 	fManager(NULL),
 	fTypeLookup(typeLookup),
+	fSourceInfo(sourceInfo),
 	fTypeCache(typeCache)
 {
 	fDebuggerInterface->AcquireReference();
@@ -95,7 +97,7 @@ DwarfTeamDebugInfo::CreateImageDebugInfo(const ImageInfo& imageInfo,
 	// create the image debug info
 	DwarfImageDebugInfo* debugInfo = new(std::nothrow) DwarfImageDebugInfo(
 		imageInfo, fDebuggerInterface, fArchitecture, fFileManager,
-		fTypeLookup, fTypeCache, dwarfState->GetFileState().dwarfFile);
+		fTypeLookup, fTypeCache, fSourceInfo, dwarfState->GetFileState().dwarfFile);
 	if (debugInfo == NULL)
 		return B_NO_MEMORY;
 

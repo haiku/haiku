@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DWARF_IMAGE_DEBUG_INFO_H
@@ -33,6 +33,7 @@ class GlobalTypeCache;
 class GlobalTypeLookup;
 class LocatableFile;
 class SourceCode;
+class TeamFunctionSourceInformation;
 
 
 class DwarfImageDebugInfo : public SpecificImageDebugInfo {
@@ -43,6 +44,7 @@ public:
 									FileManager* fileManager,
 									GlobalTypeLookup* typeLookup,
 									GlobalTypeCache* typeCache,
+									TeamFunctionSourceInformation* sourceInfo,
 									DwarfFile* file);
 	virtual						~DwarfImageDebugInfo();
 
@@ -138,6 +140,7 @@ private:
 			FileManager*		fFileManager;
 			GlobalTypeLookup*	fTypeLookup;
 			GlobalTypeCache*	fTypeCache;
+			TeamFunctionSourceInformation* fSourceInfo;
 			TypeNameTable*		fTypeNameTable;
 			DwarfFile*			fFile;
 			ElfSegment*			fTextSegment;

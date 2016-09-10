@@ -211,6 +211,7 @@ local sources =
 	SystemInfo.cpp
 	TargetHost.cpp
 	Team.cpp
+	TeamFunctionSourceInformation.cpp
 	TeamInfo.cpp
 	TeamMemory.cpp
 	TeamMemoryBlock.cpp

@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -346,7 +346,8 @@ TeamDebugInfo::Init()
 
 	// DWARF
 	DwarfTeamDebugInfo* dwarfInfo = new(std::nothrow) DwarfTeamDebugInfo(
-		fArchitecture, fDebuggerInterface, fFileManager, this, fTypeCache);
+		fArchitecture, fDebuggerInterface, fFileManager, this, this,
+		fTypeCache);
 	if (dwarfInfo == NULL || !fSpecificInfos.AddItem(dwarfInfo)) {
 		delete dwarfInfo;
 		return B_NO_MEMORY;
@@ -473,6 +474,40 @@ TeamDebugInfo::HasType(GlobalTypeCache* cache, const BString& name,
 		imageDebugInfo->ReleaseReference();
 
 	return found;
+}
+
+
+status_t
+TeamDebugInfo::GetActiveSourceCode(FunctionDebugInfo* info, SourceCode*& _code)
+{
+	AutoLocker<BLocker> locker(fLock);
+
+	LocatableFile* file = info->SourceFile();
+	if (file != NULL) {
+		Function* function = FunctionAtSourceLocation(file,
+			info->SourceStartLocation());
+		if (function != NULL) {
+			if (function->SourceCodeState() == FUNCTION_SOURCE_LOADED) {
+				_code = function->GetSourceCode();
+				_code->AcquireReference();
+				return B_OK;
+			}
+		}
+	}
+
+	for (int32 i = 0; i < fImages.CountItems(); i++) {
+		ImageDebugInfo* imageInfo = fImages.ItemAt(i);
+		FunctionInstance* instance = imageInfo->FunctionAtAddress(
+			info->Address());
+		if (instance != NULL && instance->SourceCodeState()
+				== FUNCTION_SOURCE_LOADED) {
+			_code = instance->GetSourceCode();
+			_code->AcquireReference();
+			return B_OK;
+		}
+	}
+
+	return B_ENTRY_NOT_FOUND;
 }
 
 

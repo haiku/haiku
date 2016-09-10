@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef TEAM_DEBUG_INFO_H
@@ -15,8 +15,8 @@
 
 #include "GlobalTypeLookup.h"
 #include "ImageInfo.h"
+#include "TeamFunctionSourceInformation.h"
 #include "TeamTypeInformation.h"
-
 
 class Architecture;
 class DebuggerInterface;
@@ -35,7 +35,8 @@ class SourceLocation;
 class SpecificTeamDebugInfo;
 
 
-class TeamDebugInfo : public GlobalTypeLookup, public TeamTypeInformation {
+class TeamDebugInfo : public BReferenceable, public GlobalTypeLookup,
+	public TeamTypeInformation, public TeamFunctionSourceInformation {
 public:
 								TeamDebugInfo(
 									DebuggerInterface* debuggerInterface,
@@ -58,6 +59,9 @@ public:
 									Type*& _type);
 	virtual	bool				TypeExistsByName(const BString& name,
 									const TypeLookupConstraints& constraints);
+
+	virtual	status_t			GetActiveSourceCode(FunctionDebugInfo* info,
+									SourceCode*& _code);
 
 			status_t			LoadImageDebugInfo(const ImageInfo& imageInfo,
 									LocatableFile* imageFile,
