@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.09.05
-#	Date:    2016-09-05 03:15:02
+#	Version: 2016.09.13
+#	Date:    2016-09-13 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -243,10 +243,18 @@
 	0013  53c875a
 		1000 1000  LSI53C875A PCI to Ultra SCSI Controller
 	0014  MegaRAID Tri-Mode SAS3516
+		1d49 0602  ThinkSystem RAID 930-16i 4GB Flash PCIe 12Gb Adapter
 	0016  MegaRAID Tri-Mode SAS3508
+		1d49 0601  ThinkSystem RAID 930-8i 2GB Flash PCIe 12Gb Adapter
+		1d49 0603  ThinkSystem RAID 930-24i 4GB Flash PCIe 12Gb Adapter
+		1d49 0604  ThinkSystem RAID 930-8e 4GB Flash PCIe 12Gb Adapter
 	0017  MegaRAID Tri-Mode SAS3408
+		1d49 0500  ThinkSystem RAID 530-8i PCIe 12Gb Adapter
+		1d49 0502  ThinkSystem RAID 530-8i Dense Adapter
 	001b  MegaRAID Tri-Mode SAS3504
+		1d49 0605  ThinkSystem RAID 930-4i 2GB Flash Flex Adapter
 	001c  MegaRAID Tri-Mode SAS3404
+		1d49 0501  ThinkSystem RAID 530-4i Flex Adapter
 	0020  53c1010 Ultra3 SCSI Adapter
 		1000 1000  LSI53C1010-33 PCI to Dual Channel Ultra160 SCSI Controller
 		107b 1040  Server Onboard 53C1010-33
@@ -368,6 +376,7 @@
 		1028 1f54  PERC FD33xD
 		17aa 1052  ThinkServer RAID 720i
 		17aa 1053  ThinkServer RAID 720ix
+		1d49 0600  ThinkSystem RAID 730-8i 1GB Cache PCIe 12Gb Adapter
 	005e  SAS1066 PCI-X Fusion-MPT SAS
 	005f  MegaRAID SAS-3 3008 [Fury]
 		1028 1f44  PERC H330 Adapter
@@ -528,8 +537,12 @@
 		1028 1f46  12Gbps HBA
 	00ab  SAS3516 Fusion-MPT Tri-Mode RAID On Chip (ROC)
 	00ac  SAS3416 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
+		1d49 0201  ThinkSystem 9400-16i PCIe 12Gb HBA
+		1d49 0203  ThinkSystem 9400-16e PCIe 12Gb HBA
 	00ae  SAS3508 Fusion-MPT Tri-Mode RAID On Chip (ROC)
 	00af  SAS3408 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
+		1d49 0200  ThinkSystem 9400-8i PCIe 12Gb HBA
+		1d49 0202  ThinkSystem 9400-8e PCIe 12Gb HBA
 	00be  SAS3504 Fusion-MPT Tri-Mode RAID On Chip (ROC)
 	00bf  SAS3404 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
 	00c0  SAS3324 PCI-Express Fusion-MPT SAS-3
@@ -7494,6 +7507,7 @@
 		1885 0700  Tsunami FPGA PMC with Altera Stratix S40
 		1885 0701  Tsunami FPGA PMC with Altera Stratix S30
 	9733  PEX 9733 33-lane, 9-port PCI Express Gen 3 (8.0 GT/s) Switch
+		1d49 0001  ThinkSystem P310W-4P NVMe Switch Card
 	9749  PEX 9749 49-lane, 13-port PCI Express Gen 3 (8.0 GT/s) Switch
 	a100  Blackmagic Design DeckLink
 	bb04  B&B 3PCIOSD1A Isolated PCI Serial
@@ -16897,14 +16911,20 @@
 	16d5  BCM57407 NetXtreme-E 10GBase-T Ethernet Controller
 	16d6  BCM57412 NetXtreme-E 10Gb RDMA Ethernet Controller
 	16d7  BCM57414 NetXtreme-E 10Gb/25Gb RDMA Ethernet Controller
-	16d8  BCM57416 NetXtreme-E Dual-port 10GBase-T RDMA Ethernet
+		1590 020e  Ethernet 25Gb 2-port 631SFP28 Adapter
+		1590 0211  Ethernet 25Gb 2-port 631FLR-SFP28 Adapter
+	16d8  BCM57416 NetXtreme-E 10GBase-T RDMA Ethernet Controller
+		1590 020c  Ethernet 10Gb 2-port 535T Adapter
+		1590 0212  Ethernet 10Gb 2-port 535FLR-T Adapter
 	16d9  BCM57417 NetXtreme-E 10GBASE-T RDMA Ethernet Controller
+		108e 4866  Dual Port 10GBase-T Ethernet Controller
 	16dc  BCM57414 NetXtreme-E Ethernet Virtual Function
 	16dd  NetLink BCM5781 Gigabit Ethernet PCI Express
 	16de  BCM57412 NetXtreme-E Ethernet Partition
 	16df  BCM57314 NetXtreme-C 10Gb/25Gb/40Gb/50Gb RDMA Ethernet Controller
 	16e1  BCM57314 NetXtreme-C Ethernet Virtual Function
 	16e2  BCM57417 NetXtreme-E 10Gb/25Gb RDMA Ethernet Controller
+		108e 4866  Dual Port 10Gb/25Gb SFP28 Ethernet Controller
 	16e3  BCM57416 NetXtreme-E 10Gb RDMA Ethernet Controller
 	16e7  BCM57404 NetXtreme-E Ethernet Partition
 	16e8  BCM57406 NetXtreme-E Ethernet Partition
@@ -17837,6 +17857,10 @@
 	0209  MT27700 Family [ConnectX-4 Flash Recovery]
 	020b  MT27710 Family [ConnectX-4 Lx Flash Recovery]
 	020d  MT28800 Family [ConnectX-5 Flash Recovery]
+# reserved for RM#105916
+	024e  MT53100 [Spectrum-2, Flash recovery mode]
+# Actual value to be used
+	024f  MT53100 [Spectrum-2, Flash recovery mode]
 	0262  MT27710 [ConnectX-4 Lx Programmable] EN
 	0263  MT27710 [ConnectX-4 Lx Programmable Virtual Function] EN
 	1002  MT25400 Family [ConnectX-2 Virtual Function]
@@ -17871,10 +17895,10 @@
 	1014  MT27700 Family [ConnectX-4 Virtual Function]
 	1015  MT27710 Family [ConnectX-4 Lx]
 	1016  MT27710 Family [ConnectX-4 Lx Virtual Function]
-	1017  MT27800 Family [ConnectX-5, PCIe 3.0]
+	1017  MT27800 Family [ConnectX-5]
 	1018  MT28800 Family [ConnectX-5 Virtual Function]
-	1019  MT28800 Family [ConnectX-5, PCIe 4.0]
-	101a  MT28830
+	1019  MT28800 Family [ConnectX-5 Ex]
+	101a  MT28800 Family [ConnectX-5 Ex Virtual Function]
 	101b  MT28831
 	101c  MT28840
 	101d  MT28841
@@ -17882,6 +17906,7 @@
 	101f  MT28851
 	1020  MT28860
 	1021  MT28861
+	1974  MT28800 Family [ConnectX-5 PCIe Bridge]
 	5274  MT21108 InfiniBridge
 	5a44  MT23108 InfiniHost
 	5a45  MT23108 [Infinihost HCA Flash Recovery]
@@ -17925,6 +17950,7 @@
 # Spectrum, 100GbE Switch
 	cb84  MT52100
 	cf08  MT53236
+	cf6c  MT53100 [Spectrum-2, 64 x 100GbE switch]
 	d2f0  Switch-IB 3 HDR (200Gbps) switch
 15b4  CCI/TRIAD
 15b5  Cimetrics Inc
@@ -22633,6 +22659,8 @@
 		8086 0002  Ethernet Server Bypass Adapter X520-LR2
 	1560  Ethernet Controller X540
 	1563  Ethernet Controller 10G X550T
+		1028 1fa8  Ethernet 10G 4P X550/I350 rNDC
+		1028 1fa9  Ethernet 10G 4P X550 rNDC
 		8086 0001  Ethernet Converged Network Adapter X550-T2
 		8086 001a  Ethernet Converged Network Adapter X550-T2
 		8086 0022  Ethernet Converged Network Adapter X550-T2
@@ -24900,6 +24928,12 @@
 		1028 01da  OptiPlex 745
 		1462 7235  P965 Neo MS-7235 mainboard
 	2826  C600/X79 series chipset SATA RAID Controller
+		1d49 0100  ThinkSystem RAID 331
+		1d49 0101  ThinkSystem RAID 331
+		1d49 0102  ThinkSystem RAID 331
+		1d49 0103  ThinkSystem RAID 331
+		1d49 0104  ThinkSystem RAID 331
+		1d49 0105  ThinkSystem RAID 331
 	2827  C610/X99 series chipset sSATA Controller [RAID mode]
 	2828  82801HM/HEM (ICH8M/ICH8M-E) SATA Controller [IDE mode]
 		1028 01f3  Inspiron 1420
