@@ -72,6 +72,5 @@ enum {
 	R_ResBackNav = 1042,
 	R_ResForwNav = 1043,
 	R_ResUpNav = 1044,
-	R_ShareIcon = 1051,
-	R_MICN_ShareIcon = 1051
+	R_ShareIcon = 1051
 };
