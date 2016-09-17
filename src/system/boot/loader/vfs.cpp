@@ -1044,7 +1044,7 @@ open_from(Directory *directory, const char *name, int mode, mode_t permissions)
 			if (lastSlash[1] == '\0')
 				return B_ENTRY_NOT_FOUND;
 
-			lastSlash = '\0';
+			*lastSlash = '\0';
 			name = lastSlash + 1;
 
 			// resolve the directory
