@@ -6,8 +6,10 @@
 ps |& grep -e $PPID |& grep -e $SHELL |& grep -q -e $PPID > /dev/null 2>&1
 if [ $? -eq 1 ] ; then
 	echo -e "\nWelcome to the Haiku shell.\n"
+	export PS1="\w> "
 else
 	echo -e "\nSwitching to architecture `getarch`\n"
+	export PS1="[`getarch`] \w> "
 fi
 
 export USER=`id -un`
@@ -17,7 +19,6 @@ if [ -z $BE_HOST_CPU ]; then
 	. /boot/system/boot/SetupEnvironment
 fi
 
-export PS1="\w> "
 export HISTFILESIZE=500
 export HISTCONTROL=ignoredups
 
