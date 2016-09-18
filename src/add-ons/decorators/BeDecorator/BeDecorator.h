@@ -26,13 +26,14 @@ public:
 
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
-									BRect rect);
+									BRect rect, Desktop* desktop);
 };
 
 
 class BeDecorator: public SATDecorator {
 public:
-								BeDecorator(DesktopSettings& settings, BRect frame);
+								BeDecorator(DesktopSettings& settings,
+									BRect frame, Desktop* desktop);
 	virtual						~BeDecorator();
 
 	virtual	void				GetComponentColors(Component component,

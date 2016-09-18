@@ -30,6 +30,7 @@
 #include <View.h>
 
 #include "BitmapDrawingEngine.h"
+#include "Desktop.h"
 #include "DesktopSettings.h"
 #include "DrawingEngine.h"
 #include "DrawState.h"
@@ -51,7 +52,7 @@ static const float kBorderResizeLength = 22.0;
 static const float kResizeKnobSize = 18.0;
 
 
-//	#pragma mark - BeDecorAddOn
+//     #pragma mark - BeDecorAddOn
 
 
 BeDecorAddOn::BeDecorAddOn(image_id id, const char* name)
@@ -62,9 +63,10 @@ BeDecorAddOn::BeDecorAddOn(image_id id, const char* name)
 
 
 Decorator*
-BeDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect)
+BeDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
+	Desktop* desktop)
 {
-	return new (std::nothrow)BeDecorator(settings, rect);
+	return new (std::nothrow)BeDecorator(settings, rect, desktop);
 }
 
 
@@ -73,9 +75,10 @@ BeDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect)
 
 // TODO: get rid of DesktopSettings here, and introduce private accessor
 //	methods to the Decorator base class
-BeDecorator::BeDecorator(DesktopSettings& settings, BRect rect)
+BeDecorator::BeDecorator(DesktopSettings& settings, BRect rect,
+	Desktop* desktop)
 	:
-	SATDecorator(settings, rect)
+	SATDecorator(settings, rect, desktop)
 {
 	STRACE(("BeDecorator:\n"));
 	STRACE(("\tFrame (%.1f,%.1f,%.1f,%.1f)\n",
@@ -111,48 +114,50 @@ BeDecorator::GetComponentColors(Component component, uint8 highlight,
 		case COMPONENT_TAB:
 			if (highlight == HIGHLIGHT_STACK_AND_TILE) {
 				_colors[COLOR_TAB_FRAME_LIGHT]
-					= tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
+					= tint_color(fFocusFrameColor, B_DARKEN_3_TINT);
 				_colors[COLOR_TAB_FRAME_DARK]
-					= tint_color(kFocusFrameColor, B_DARKEN_4_TINT);
-				_colors[COLOR_TAB] = tint_color(kFocusTabColor, B_DARKEN_1_TINT);
-				_colors[COLOR_TAB_LIGHT] = tint_color(kFocusTabColorLight, B_DARKEN_1_TINT);
-				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = kFocusTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
+					= tint_color(fFocusFrameColor, B_DARKEN_4_TINT);
+				_colors[COLOR_TAB] = tint_color(fFocusTabColor,
+					B_DARKEN_1_TINT);
+				_colors[COLOR_TAB_LIGHT] = tint_color(fFocusTabColorLight,
+					B_DARKEN_1_TINT);
+				_colors[COLOR_TAB_BEVEL] = fFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = fFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = fFocusTextColor;
 			} else if (tab && tab->buttonFocus) {
 				_colors[COLOR_TAB_FRAME_LIGHT]
-					= tint_color(kFocusFrameColor, B_DARKEN_2_TINT);
+					= tint_color(fFocusFrameColor, B_DARKEN_2_TINT);
 				_colors[COLOR_TAB_FRAME_DARK]
-					= tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
-				_colors[COLOR_TAB] = kFocusTabColor;
-				_colors[COLOR_TAB_LIGHT] = kFocusTabColorLight;
-				_colors[COLOR_TAB_BEVEL] = kFocusTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = kFocusTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = kFocusTextColor;
+					= tint_color(fFocusFrameColor, B_DARKEN_3_TINT);
+				_colors[COLOR_TAB] = fFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = fFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = fFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = fFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = fFocusTextColor;
 			} else {
 				_colors[COLOR_TAB_FRAME_LIGHT]
-					= tint_color(kNonFocusFrameColor, B_DARKEN_2_TINT);
+					= tint_color(fNonFocusFrameColor, B_DARKEN_2_TINT);
 				_colors[COLOR_TAB_FRAME_DARK]
-					= tint_color(kNonFocusFrameColor, B_DARKEN_3_TINT);
-				_colors[COLOR_TAB] = kNonFocusTabColor;
-				_colors[COLOR_TAB_LIGHT] = kNonFocusTabColorLight;
-				_colors[COLOR_TAB_BEVEL] = kNonFocusTabColorBevel;
-				_colors[COLOR_TAB_SHADOW] = kNonFocusTabColorShadow;
-				_colors[COLOR_TAB_TEXT] = kNonFocusTextColor;
+					= tint_color(fNonFocusFrameColor, B_DARKEN_3_TINT);
+				_colors[COLOR_TAB] = fNonFocusTabColor;
+				_colors[COLOR_TAB_LIGHT] = fNonFocusTabColorLight;
+				_colors[COLOR_TAB_BEVEL] = fNonFocusTabColorBevel;
+				_colors[COLOR_TAB_SHADOW] = fNonFocusTabColorShadow;
+				_colors[COLOR_TAB_TEXT] = fNonFocusTextColor;
 			}
 			break;
 
 		case COMPONENT_CLOSE_BUTTON:
 		case COMPONENT_ZOOM_BUTTON:
 			if (highlight == HIGHLIGHT_STACK_AND_TILE) {
-				_colors[COLOR_BUTTON] = tint_color(kFocusTabColor, B_DARKEN_1_TINT);
-				_colors[COLOR_BUTTON_LIGHT] = tint_color(kFocusTabColorLight, B_DARKEN_1_TINT);
+				_colors[COLOR_BUTTON] = tint_color(fFocusTabColor, B_DARKEN_1_TINT);
+				_colors[COLOR_BUTTON_LIGHT] = tint_color(fFocusTabColorLight, B_DARKEN_1_TINT);
 			} else if (tab && tab->buttonFocus) {
-				_colors[COLOR_BUTTON] = kFocusTabColor;
-				_colors[COLOR_BUTTON_LIGHT] = kFocusTabColorLight;
+				_colors[COLOR_BUTTON] = fFocusTabColor;
+				_colors[COLOR_BUTTON_LIGHT] = fFocusTabColorLight;
 			} else {
-				_colors[COLOR_BUTTON] = kNonFocusTabColor;
-				_colors[COLOR_BUTTON_LIGHT] = kNonFocusTabColorLight;
+				_colors[COLOR_BUTTON] = fNonFocusTabColor;
+				_colors[COLOR_BUTTON_LIGHT] = fNonFocusTabColorLight;
 			}
 			break;
 
@@ -165,11 +170,11 @@ BeDecorator::GetComponentColors(Component component, uint8 highlight,
 		{
 			rgb_color base;
 			if (highlight == HIGHLIGHT_STACK_AND_TILE)
-				base = tint_color(kFocusFrameColor, B_DARKEN_3_TINT);
+				base = tint_color(fFocusFrameColor, B_DARKEN_3_TINT);
 			else if (tab && tab->buttonFocus)
-				base = kFocusFrameColor;
+				base = fFocusFrameColor;
 			else
-				base = kNonFocusFrameColor;
+				base = fNonFocusFrameColor;
 
 			//_colors[0].SetColor(152, 152, 152);
 			//_colors[1].SetColor(255, 255, 255);
