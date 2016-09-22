@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.09.13
-#	Date:    2016-09-13 03:15:02
+#	Version: 2016.09.22
+#	Date:    2016-09-22 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -4472,6 +4472,11 @@
 		102b 2241  M9138 LP PCIe x16
 		102b 2280  M9188 ATX PCIe x16
 		102b 22c0  M9128 LP PCIe x16
+	0550  SV2
+		102b 00c0  MURA-IPX-I4EF
+		102b 00c1  MURA-IPX-I4DF
+		102b 00c3  MURA-IPX-I4DHF
+		102b 00c5  MURA-IPX-I4EHF
 	0d10  MGA Ultima/Impression
 	1000  MGA G100 [Productiva]
 		102b ff01  Productiva G100
@@ -7368,6 +7373,7 @@
 	8732  PEX 8732 32-lane, 8-Port PCI Express Gen 3 (8.0 GT/s) Switch
 	8734  PEX 8734 32-lane, 8-Port PCI Express Gen 3 (8.0GT/s) Switch
 	8747  PEX 8747 48-Lane, 5-Port PCI Express Gen 3 (8.0 GT/s) Switch
+	8748  PEX 8748 48-Lane, 12-Port PCI Express Gen 3 (8 GT/s) Switch, 27 x 27mm FCBGA
 # This is the Non-Transparent-Bridge Virtualized Port as presented by the PLX PEX 8732 chip, the physical bridges show up at 10b5:8732
 	87b0  PEX 8732 32-lane, 8-Port PCI Express Gen 3 (8.0 GT/s) Switch
 		1093 7761  PXIe-8830mc
@@ -13704,6 +13710,16 @@
 	8032  ATTO Celerity FC8xEN
 		117c 003b  Celerity FC-82EN Fibre Channel Adapter
 		117c 003c  Celerity FC-84EN Fibre Channel Adapter
+	8053  PM8053 SXP 12G 24-port SAS/SATA expander
+	8054  PM8054 SXP 12G 36-port SAS/SATA expander
+	8055  PM8055 SXP 12G 48-port SAS/SATA expander
+	8056  PM8056 SXP 12G 68-port SAS/SATA expander
+	8060  PM8060 SRCv 12G eight-port SAS/SATA RoC
+	8063  PM8063 SRCv 12G 16-port SAS/SATA RoC
+	8070  PM8070 Tachyon SPCv 12G eight-port SAS/SATA controller
+	8071  PM8071 Tachyon SPCve 12G eight-port SAS/SATA controller
+	8072  PM8072 Tachyon SPCv 12G 16-port SAS/SATA controller
+	8073  PM8073 Tachyon SPCve 12G 16-port SAS/SATA controller
 11f9  I-Cube Inc
 11fa  Kasan Electronics Company, Ltd.
 11fb  Datel Inc
@@ -18842,13 +18858,16 @@
 	0017  StorSecure 300 GZIP Compression and AES Encryption Card
 17c0  Wistron Corp.
 17c2  Newisys, Inc.
-17cb  Airgo Networks, Inc.
+# nee Airgo Networks, Inc.
+17cb  Qualcomm
 	0001  AGN100 802.11 a/b/g True MIMO Wireless Card
 		1385 5c00  WGM511 Pre-N 802.11g Wireless CardBus Adapter
 		1737 0045  WMP54GX v1 802.11g Wireless-G PCI Adapter with SRX
 	0002  AGN300 802.11 a/b/g True MIMO Wireless Card
 		1385 6d00  WPNT511 RangeMax 240 Mbps Wireless CardBus Adapter
 		1737 0054  WPC54GX4 v1 802.11g Wireless-G Notebook Adapter with SRX400
+	0400  Datacenter Technologies QDF2432 PCI Express Root Port
+	0401  Datacenter Technologies QDF2400 PCI Express Root Port
 17cc  NetChip Technology, Inc
 	2280  USB 2.0
 17cf  Z-Com, Inc.
