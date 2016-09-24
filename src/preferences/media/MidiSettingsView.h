@@ -11,6 +11,7 @@
 
 class BButton;
 class BListView;
+class BStringView;
 class MidiSettingsView : public SettingsView {
 public:
 	MidiSettingsView();
@@ -21,8 +22,10 @@ private:
 	void _RetrieveSoftSynthList();
 	void _LoadSettings();
 	void _SaveSettings();
+	BString _SelectedSoundFont() const;
 
 	BListView* fListView;
+	BStringView* fActiveSoundFont;
 };
 
 #endif /* MIDIVIEW_H_ */

@@ -22,6 +22,7 @@
 #include <PathFinder.h>
 #include <ScrollView.h>
 #include <StringList.h>
+#include <StringView.h>
 
 #include <stdio.h>
 
@@ -55,6 +56,8 @@ MidiSettingsView::MidiSettingsView()
 	BLayoutBuilder::Group<>(this)
 		.SetInsets(0, 0, 0, 0)
 		.Add(defaultsBox)
+		.Add(fActiveSoundFont = new BStringView("ActiveSoundFont",
+				"Active Sound Font:"))
 		.AddGlue();
 }
 
@@ -77,9 +80,13 @@ void
 MidiSettingsView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kSelectSoundFont:
+		case kSelectSoundFont: {
+			BString text = "Active Sound Font: ";
+			text << _SelectedSoundFont();
+			fActiveSoundFont->SetText(text);
 			_SaveSettings();
 			break;
+		}
 
 		default:
 			SettingsView::MessageReceived(message);
@@ -142,16 +149,25 @@ MidiSettingsView::_LoadSettings()
 void
 MidiSettingsView::_SaveSettings()
 {
-	int32 selection = fListView->CurrentSelection();
-	if (selection < 0)
-		return;
-
-	BStringItem* item = (BStringItem*)fListView->ItemAt(selection);
-	if (item == NULL)
-		return;
-
-	struct BPrivate::midi_settings settings;
-	strlcpy(settings.soundfont_file, item->Text(), sizeof(settings.soundfont_file));
-	BPrivate::write_midi_settings(settings);
+	BString soundFont = _SelectedSoundFont();
+	if (soundFont.Length() > 0) {
+		struct BPrivate::midi_settings settings;
+		strlcpy(settings.soundfont_file, soundFont, sizeof(settings.soundfont_file));
+		BPrivate::write_midi_settings(settings);
+	}
 }
 
+
+BString
+MidiSettingsView::_SelectedSoundFont() const
+{
+	BString string;
+	int32 selection = fListView->CurrentSelection();
+	if (selection >= 0) {
+		BStringItem* item = (BStringItem*)fListView->ItemAt(selection);
+		if (item != NULL)
+			string = item->Text();
+	}
+
+	return string;
+}
