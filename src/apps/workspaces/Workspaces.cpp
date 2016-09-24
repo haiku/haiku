@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2012, Haiku, Inc. All rights reserved.
+ * Copyright 2002-2016, Haiku, Inc. All rights reserved.
  * Copyright 2002, François Revol, revol@free.fr.
  * This file is distributed under the terms of the MIT License.
  *
@@ -8,6 +8,7 @@
  *		Axel Dörfler, axeld@pinc-software.de
  *		Oliver "Madison" Kohl,
  *		Matt Madia
+ *		Daniel Devine, devine@ddevnet.net
  */
 
 
@@ -56,7 +57,6 @@ static const uint32 kMsgToggleAlwaysOnTop = 'tgAT';
 static const uint32 kMsgToggleLiveInDeskbar = 'tgDb';
 static const uint32 kMsgToggleSwitchOnWheel = 'tgWh';
 
-static const float kScreenBorderOffset = 10.0;
 
 extern "C" _EXPORT BView* instantiate_deskbar_item();
 
@@ -73,6 +73,7 @@ class WorkspacesSettings {
 		bool HasTitle() const { return fHasTitle; }
 		bool HasBorder() const { return fHasBorder; }
 		bool SwitchOnWheel() const { return fSwitchOnWheel; }
+		bool SettingsLoaded() const { return fLoaded; }
 
 		void UpdateFramesForScreen(BRect screenFrame);
 		void UpdateScreenFrame();
@@ -94,6 +95,7 @@ class WorkspacesSettings {
 		bool	fHasTitle;
 		bool	fHasBorder;
 		bool	fSwitchOnWheel;
+		bool	fLoaded;
 };
 
 class WorkspacesView : public BView {
@@ -139,14 +141,19 @@ class WorkspacesWindow : public BWindow {
 		virtual bool QuitRequested();
 
 		void SetAutoRaise(bool enable);
-		bool IsAutoRaising() const { return fAutoRaising; }
+		bool IsAutoRaising() const { return fSettings->AutoRaising(); }
 		void SetSwitchOnWheel(bool enable);
 		bool SwitchOnWheel() const { return fSwitchOnWheel; }
 
+		float GetTabHeight() { return fSettings->HasTitle() ? fTabHeight : 0; }
+		float GetBorderWidth() { return fBorderWidth; }
+		float GetScreenBorderOffset() { return 2.0 * fBorderWidth; }
+
 	private:
 		WorkspacesSettings *fSettings;
-		bool	fAutoRaising;
 		bool	fSwitchOnWheel;
+		float	fTabHeight;
+		float	fBorderWidth;
 };
 
 class WorkspacesApp : public BApplication {
@@ -171,11 +178,11 @@ WorkspacesSettings::WorkspacesSettings()
 	fAlwaysOnTop(false),
 	fHasTitle(true),
 	fHasBorder(true),
-	fSwitchOnWheel(false)
+	fSwitchOnWheel(false),
+	fLoaded(false)
 {
 	UpdateScreenFrame();
 
-	bool loaded = false;
 	BScreen screen;
 
 	BFile file;
@@ -184,7 +191,7 @@ WorkspacesSettings::WorkspacesSettings()
 		if (settings.Unflatten(&file) == B_OK) {
 			if (settings.FindRect("window", &fWindowFrame) == B_OK
 				&& settings.FindRect("screen", &fScreenFrame) == B_OK)
-				loaded = true;
+				fLoaded = true;
 
 			settings.FindBool("auto-raise", &fAutoRaising);
 			settings.FindBool("always on top", &fAlwaysOnTop);
@@ -212,52 +219,16 @@ WorkspacesSettings::WorkspacesSettings()
 				else
 					fScreenFrame = screen.Frame();
 
-				loaded = true;
+				fLoaded = true;
 			}
 		}
 	}
 
-	if (loaded) {
+	if (fLoaded) {
 		// if the current screen frame is different from the one
 		// just loaded, we need to alter the window frame accordingly
 		if (fScreenFrame != screen.Frame())
 			UpdateFramesForScreen(screen.Frame());
-	}
-
-	if (!loaded
-		|| !(screen.Frame().right + 5 >= fWindowFrame.right
-			&& screen.Frame().bottom + 5 >= fWindowFrame.bottom
-			&& screen.Frame().left - 5 <= fWindowFrame.left
-			&& screen.Frame().top - 5 <= fWindowFrame.top)) {
-		// set to some usable defaults
-		float screenWidth = screen.Frame().Width();
-		float screenHeight = screen.Frame().Height();
-		float aspectRatio = screenWidth / screenHeight;
-
-		uint32 columns, rows;
-		BPrivate::get_workspaces_layout(&columns, &rows);
-
-		// default size of ~1/10 of screen width
-		float workspaceWidth = screenWidth / 10;
-		float workspaceHeight = workspaceWidth / aspectRatio;
-
-		float width = floor(workspaceWidth * columns);
-		float height = floor(workspaceHeight * rows);
-
-		float tabHeight = 20;
-			// TODO: find tabHeight without being a window
-
-		// shrink to fit more
-		while (width + 2 * kScreenBorderOffset > screenWidth
-			|| height + 2 * kScreenBorderOffset + tabHeight > screenHeight) {
-			width = floor(0.95 * width);
-			height = floor(0.95 * height);
-		}
-
-		fWindowFrame = fScreenFrame;
-		fWindowFrame.OffsetBy(-kScreenBorderOffset, -kScreenBorderOffset);
-		fWindowFrame.left = fWindowFrame.right - width;
-		fWindowFrame.top = fWindowFrame.bottom - height;
 	}
 }
 
@@ -564,11 +535,19 @@ WorkspacesView::MouseMoved(BPoint where, uint32 transit,
 
 	where = ConvertToScreen(where);
 	BScreen screen(window);
-	BRect frame = screen.Frame();
-	if (where.x == frame.left || where.x == frame.right
-		|| where.y == frame.top || where.y == frame.bottom) {
+	BRect screenFrame = screen.Frame();
+	BRect windowFrame = window->Frame();
+	float tabHeight = window->GetTabHeight();
+	float borderWidth = window->GetBorderWidth();
+
+	if (where.x == screenFrame.left || where.x == screenFrame.right
+			|| where.y == screenFrame.top || where.y == screenFrame.bottom) {
 		// cursor is on screen edge
-		if (window->Frame().Contains(where))
+
+		// Stretch frame to also accept mouse moves over the window borders
+		windowFrame.InsetBy(-borderWidth, -(tabHeight + borderWidth));
+
+		if (windowFrame.Contains(where))
 			window->Activate();
 	}
 }
@@ -673,20 +652,74 @@ WorkspacesView::MouseDown(BPoint where)
 
 WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
 	:
-	BWindow(settings->WindowFrame(), B_TRANSLATE_SYSTEM_NAME("Workspaces"), 
+	BWindow(settings->WindowFrame(), B_TRANSLATE_SYSTEM_NAME("Workspaces"),
 		B_TITLED_WINDOW_LOOK, B_NORMAL_WINDOW_FEEL,
 		B_AVOID_FRONT | B_WILL_ACCEPT_FIRST_CLICK | B_CLOSE_ON_ESCAPE,
 		B_ALL_WORKSPACES),
 	fSettings(settings),
-	fAutoRaising(false),
 	fSwitchOnWheel(false)
 {
-	AddChild(new WorkspacesView(Bounds()));
+	// Turn window decor on to grab decor widths.
+	BMessage windowSettings;
+	float borderWidth = 0;
+
+	SetLook(B_TITLED_WINDOW_LOOK);
+	if (GetDecoratorSettings(&windowSettings) == B_OK) {
+		BRect tabFrame = windowSettings.FindRect("tab frame");
+		borderWidth = windowSettings.FindFloat("border width");
+		fTabHeight = tabFrame.Height();
+		fBorderWidth = borderWidth;
+	}
+
+	if (!fSettings->SettingsLoaded()) {
+		// No settings, compute a reasonable default frame.
+		// We aim for previews at 10% of actual screen size, and matching the
+		// aspect ratio. We then scale that down, until it fits the screen.
+		// Finally, we put the window on the bottom right of the screen so the
+		// auto-raise mode can be used.
+
+		BScreen screen;
+
+		float screenWidth = screen.Frame().Width();
+		float screenHeight = screen.Frame().Height();
+		float aspectRatio = screenWidth / screenHeight;
+
+		uint32 columns, rows;
+		BPrivate::get_workspaces_layout(&columns, &rows);
+
+		// default size of ~1/10 of screen width
+		float workspaceWidth = screenWidth / 10;
+		float workspaceHeight = workspaceWidth / aspectRatio;
+
+		float width = floor(workspaceWidth * columns);
+		float height = floor(workspaceHeight * rows);
+
+		// If you have too many workspaces to fit on the screen, shrink until they fit.
+		while (width + 2 * borderWidth > screenWidth
+				|| height + 2 * borderWidth + GetTabHeight() > screenHeight) {
+			width = floor(0.95 * width);
+			height = floor(0.95 * height);
+		}
+
+		BRect frame = fSettings->ScreenFrame();
+		frame.OffsetBy(-2.0 * borderWidth, -2.0 * borderWidth);
+		frame.left = frame.right - width;
+		frame.top = frame.bottom - height;
+		ResizeTo(frame.Width(), frame.Height());
+
+		// Put it in bottom corner by default.
+		MoveTo(screenWidth - frame.Width() - borderWidth,
+			screenHeight - frame.Height() - borderWidth);
+
+		fSettings->SetWindowFrame(frame);
+	}
 
 	if (!fSettings->HasBorder())
 		SetLook(B_NO_BORDER_WINDOW_LOOK);
 	else if (!fSettings->HasTitle())
 		SetLook(B_MODAL_WINDOW_LOOK);
+
+	AddChild(new WorkspacesView(Bounds()));
 
 	if (fSettings->AlwaysOnTop())
 		SetFeel(B_FLOATING_ALL_WINDOW_FEEL);
@@ -762,15 +795,25 @@ WorkspacesWindow::Zoom(BPoint origin, float width, float height)
 	width = floor(workspaceWidth * columns);
 	height = floor(workspaceHeight * rows);
 
-	float tabHeight = Frame().top - DecoratorFrame().top;
-
-	while (width + 2 * kScreenBorderOffset > screenWidth
-		|| height + 2 * kScreenBorderOffset + tabHeight > screenHeight) {
+	while (width + 2 * GetScreenBorderOffset() > screenWidth
+		|| height + 2 * GetScreenBorderOffset() + GetTabHeight() > screenHeight) {
 		width = floor(0.95 * width);
 		height = floor(0.95 * height);
 	}
 
 	ResizeTo(width, height);
+
+	if (fSettings->AutoRaising())
+	{
+		// The auto-raising mode makes sense only if the window is positionned
+		// exactly in the bottom-right corner. If the setting is enabled, move
+		// the window there.
+		origin = screen.Frame().RightBottom();
+		origin.x -= GetScreenBorderOffset() + width;
+		origin.y -= GetScreenBorderOffset() + height;
+
+		MoveTo(origin);
+	}
 }
 
 
@@ -821,8 +864,7 @@ WorkspacesWindow::MessageReceived(BMessage *message)
 			else
 				SetLook(B_MODAL_WINDOW_LOOK);
 
-			// No matter what the setting for title, 
-			// we must force the border on
+			// No matter what the setting for title, we must force the border on
 			fSettings->SetHasBorder(true);
 			fSettings->SetHasTitle(enable);
 			break;
@@ -883,10 +925,6 @@ WorkspacesWindow::QuitRequested()
 void
 WorkspacesWindow::SetAutoRaise(bool enable)
 {
-	if (enable == fAutoRaising)
-		return;
-
-	fAutoRaising = enable;
 	fSettings->SetAutoRaising(enable);
 
 	if (enable)
