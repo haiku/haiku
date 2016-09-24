@@ -80,11 +80,14 @@ void
 MidiSettingsView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
-		case kSelectSoundFont: {
-			BString text = "Active Sound Font: ";
-			text << _SelectedSoundFont();
-			fActiveSoundFont->SetText(text);
-			_SaveSettings();
+		case kSelectSoundFont:
+		{
+			BString text = _SelectedSoundFont();
+			if (text != "") {
+				text.Prepend("Active Sound Font: ");
+				fActiveSoundFont->SetText(text);
+				_SaveSettings();
+			}
 			break;
 		}
 
