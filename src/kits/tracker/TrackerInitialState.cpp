@@ -62,6 +62,7 @@ All rights reserved.
 #include "FSUtils.h"
 #include "QueryContainerWindow.h"
 #include "Tracker.h"
+#include "ViewState.h"
 
 
 enum {
@@ -73,181 +74,38 @@ enum {
 };
 
 
-const char* kAttrName = "META:name";
-const char* kAttrCompany = "META:company";
-const char* kAttrAddress = "META:address";
-const char* kAttrCity = "META:city";
-const char* kAttrState = "META:state";
-const char* kAttrZip = "META:zip";
-const char* kAttrCountry = "META:country";
-const char* kAttrHomePhone = "META:hphone";
-const char* kAttrWorkPhone = "META:wphone";
-const char* kAttrFax = "META:fax";
-const char* kAttrEmail = "META:email";
-const char* kAttrURL = "META:url";
-const char* kAttrGroup = "META:group";
-const char* kAttrNickname = "META:nickname";
+static const char* kAttrName = "META:name";
+static const char* kAttrCompany = "META:company";
+static const char* kAttrAddress = "META:address";
+static const char* kAttrCity = "META:city";
+static const char* kAttrState = "META:state";
+static const char* kAttrZip = "META:zip";
+static const char* kAttrCountry = "META:country";
+static const char* kAttrHomePhone = "META:hphone";
+static const char* kAttrWorkPhone = "META:wphone";
+static const char* kAttrFax = "META:fax";
+static const char* kAttrEmail = "META:email";
+static const char* kAttrURL = "META:url";
+static const char* kAttrGroup = "META:group";
+static const char* kAttrNickname = "META:nickname";
 
-const char* kNetPositiveSignature = "application/x-vnd.Be-NPOS";
-const char* kPeopleSignature = "application/x-vnd.Be-PEPL";
+static const char* kNetPositiveSignature = "application/x-vnd.Be-NPOS";
+static const char* kPeopleSignature = "application/x-vnd.Be-PEPL";
 
-// the following templates are in big endian and we rely on the Tracker
-// translation support to swap them on little endian machines
-//
-// in case there is an attribute (B_RECT_TYPE) that gets swapped by the media
-// (unzip, file system endianness swapping, etc., the correct endianness for
-// the correct machine has to be used here
+static const BRect kDefaultFrame(40, 40, 695, 350);
+static const int32 sDefaultQueryTemplateCount = 3;
 
-const BRect kDefaultFrame(40, 40, 695, 350);
-const int32 kDefaultQueryTemplateCount = 3;
 
-const AttributeTemplate kDefaultQueryTemplate[] =
-	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/
-		application_octet-stream */
+struct ColumnData
 {
-	{
-		// default frame
-		kAttrWindowFrame,
-		B_RECT_TYPE,
-		16,
-		(const char*)&kDefaultFrame
-	},
-	{
-		// attr: _trk/viewstate
-		kAttrViewState_be,
-		B_RAW_TYPE,
-		49,
-		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
-		"\000\000\000\000\000\000\000\000\000\000\357\323\335RCSTR\000\000"
-		"\000\000\000\000\000\000\000"
-	},
-	{
-		// attr: _trk/columns
-		kAttrColumns_be,
-		B_RAW_TYPE,
-		223,
-		"O\362VR\000\000\000\025\000\000\000\004Name\000B \000\000C\021\000"
-		"\000\000\000\000\000\000\000\000\012_stat/name\000\357\323\335RCST"
-		"R\001\001O\362VR\000\000\000\025\000\000\000\004Path\000CH\000\000"
-		"Ca\000\000\000\000\000\000\000\000\000\011_trk/path\000\357_\174RC"
-		"STR\000\000O\362VR\000\000\000\025\000\000\000\004Size\000C\334\000"
-		"\000B$\000\000\000\000\000\001\000\000\000\012_stat/size\000\317\317"
-		"\306TOFFT\001\000O\362VR\000\000\000\025\000\000\000\010Modified\000"
-		"C\370\000\000C\012\000\000\000\000\000\000\000\000\000\016_stat/mo"
-		"dified\000]KmETIME\001\000"
-	}
-};
-
-
-const AttributeTemplate kBookmarkQueryTemplate[] =
-	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/
-		application_x-vnd.Be-bookmark */
-{
-	{
-		// default frame
-		kAttrWindowFrame,
-		B_RECT_TYPE,
-		16,
-		(const char*)&kDefaultFrame
-	},
-	{
-		// attr: _trk/viewstate
-		kAttrViewState_be,
-		B_RAW_TYPE,
-		49,
-		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
-		"\000\000\000\000\000\000\000\000\000\000w\373\175RCSTR\000\000\000"
-		"\000\000\000\000\000\000"
-	},
-	{
-		// attr: _trk/columns
-		kAttrColumns_be,
-		B_RAW_TYPE,
-		163,
-		"O\362VR\000\000\000\025\000\000\000\005Title\000B \000\000C+\000\000"
-		"\000\000\000\000\000\000\000\012META:title\000w\373\175RCSTR\000\001"
-		"O\362VR\000\000\000\025\000\000\000\003URL\000Cb\000\000C\217\200"
-		"\000\000\000\000\000\000\000\000\010META:url\000\343[TRCSTR\000\001O"
-		"\362VR\000\000\000\025\000\000\000\010Keywords\000D\004\000\000C\002"
-		"\000\000\000\000\000\000\000\000\000\011META:keyw\000\333\363\334"
-		"RCSTR\000\001"
-	}
-};
-
-
-const AttributeTemplate kPersonQueryTemplate[] =
-	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/
-		application_x-vnd.Be-bookmark */
-{
-	{
-		// default frame
-		kAttrWindowFrame,
-		B_RECT_TYPE,
-		16,
-		(const char*)&kDefaultFrame
-	},
-	{
-		// attr: _trk/viewstate
-		kAttrViewState_be,
-		B_RAW_TYPE,
-		49,
-		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
-		"\000\000\000\000\000\000\000\000\000\000\357\323\335RCSTR\000\000"
-		"\000\000\000\000\000\000\000"
-	},
-	{
-		// attr: _trk/columns
-		kAttrColumns_be,
-		B_RAW_TYPE,
-		230,
-		"O\362VR\000\000\000\025\000\000\000\004Name\000B \000\000B\346\000"
-		"\000\000\000\000\000\000\000\000\012_stat/name\000\357\323\335RCST"
-		"R\001\001O\362VR\000\000\000\025\000\000\000\012Work Phone\000C*\000"
-		"\000B\264\000\000\000\000\000\000\000\000\000\013META:wphone\000C_"
-		"uRCSTR\000\001O\362VR\000\000\000\025\000\000\000\006E-mail\000C\211"
-		"\200\000B\272\000\000\000\000\000\000\000\000\000\012META:email\000"
-		"sW\337RCSTR\000\001O\362VR\000\000\000\025\000\000\000\007Company"
-		"\000C\277\200\000B\360\000\000\000\000\000\000\000\000\000\014"
-		"META:company\000CS\174RCSTR\000\001"
-	},
-};
-
-
-const AttributeTemplate kEmailQueryTemplate[] =
-	/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/
-		text_x-email */
-{
-	{
-		// default frame
-		kAttrWindowFrame,
-		B_RECT_TYPE,
-		16,
-		(const char*)&kDefaultFrame
-	},
-	{
-		// attr: _trk/viewstate
-		kAttrViewState_be,
-		B_RAW_TYPE,
-		49,
-		"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
-		"\000\000\000\000\000\000\000\000\000\000\366_\377ETIME\000\000\000"
-		"\000\000\000\000\000\000"
-	},
-	{
-		// attr: _trk/columns
-		kAttrColumns_be,
-		B_RAW_TYPE,
-		222,
-		"O\362VR\000\000\000\025\000\000\000\007Subject\000B \000\000B\334"
-		"\000\000\000\000\000\000\000\000\000\014MAIL:subject\000\343\173\337"
-		"RCSTR\000\000O\362VR\000\000\000\025\000\000\000\004From\000C%\000"
-		"\000C\031\000\000\000\000\000\000\000\000\000\011MAIL:from\000\317"
-		"s_RCSTR\000\000O\362VR\000\000\000\025\000\000\000\004When\000C\246"
-		"\200\000B\360\000\000\000\000\000\000\000\000\000\011MAIL:when\000"
-		"\366_\377ETIME\000\000O\362VR\000\000\000\025\000\000\000\006Status"
-		"\000C\352\000\000BH\000\000\000\000\000\001\000\000\000\013"
-		"MAIL:status\000G\363\134RCSTR\000\001"
-	},
+	const char*	title;
+	float		offset;
+	float		width;
+	alignment	align;
+	const char*	attributeName;
+	uint32		attrType;
+	bool		statField;
+	bool		editable;
 };
 
 
@@ -358,6 +216,22 @@ AddTemporaryBackgroundImages(BMessage* message, const char* imagePath,
 	message->AddInt32(kBackgroundImageInfoMode, mode);
 	message->AddBool(kBackgroundImageInfoTextOutline, textWidgetOutlines);
 	message->AddPoint(kBackgroundImageInfoOffset, offset);
+}
+
+
+static size_t
+mkColumnsBits(BMallocIO& stream, const ColumnData* src, int32 nelm,
+	const char* context)
+{
+	for (int32 i = 0; i < nelm; i++) {
+		BColumn c(
+			B_TRANSLATE_CONTEXT(src[i].title, context),
+			src[i].offset, src[i].width, src[i].align, src[i].attributeName,
+			src[i].attrType, src[i].statField, src[i].editable);
+		c.ArchiveToStream(&stream);
+	}
+
+	return stream.Position();
 }
 
 
@@ -592,6 +466,197 @@ TTracker::InstallIndices(dev_t device)
 void
 TTracker::InstallDefaultTemplates()
 {
+	// the following templates are in big endian and we rely on the Tracker
+	// translation support to swap them on little endian machines
+	//
+	// in case there is an attribute (B_RECT_TYPE) that gets swapped by the media
+	// (unzip, file system endianness swapping, etc., the correct endianness for
+	// the correct machine has to be used here
+
+	static AttributeTemplate sDefaultQueryTemplate[] =
+		/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/
+		   application_octet-stream */
+	{
+		{
+			// default frame
+			kAttrWindowFrame,
+			B_RECT_TYPE,
+			16,
+			(const char*)&kDefaultFrame
+		},
+		{
+			// attr: _trk/viewstate
+			kAttrViewState_be,
+			B_RAW_TYPE,
+			49,
+			"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
+				"\000\000\000\000\000\000\000\000\000\000\357\323\335RCSTR\000\000"
+				"\000\000\000\000\000\000\000"
+		},
+		{
+			// attr: _trk/columns
+			kAttrColumns_be,
+			B_RAW_TYPE,
+			0,
+			NULL
+		}
+	};
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Default Query Columns"
+
+	static const ColumnData defaultQueryColumns[] =
+	{
+		{ B_TRANSLATE_MARK("Name"), 40, 145, B_ALIGN_LEFT, "_stat/name",
+			B_STRING_TYPE, true, true },
+		{ B_TRANSLATE_MARK("Path"), 200, 225, B_ALIGN_LEFT, "_trk/path",
+			B_STRING_TYPE, false, false },
+		{ B_TRANSLATE_MARK("Size"), 440, 41, B_ALIGN_LEFT, "_stat/size",
+			B_OFF_T_TYPE, true, false },
+		{ B_TRANSLATE_MARK("Modified"), 496, 138, B_ALIGN_LEFT, "_stat/modified",
+			B_TIME_TYPE, true, false }
+	};
+
+
+	static AttributeTemplate sBookmarkQueryTemplate[] =
+		/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/
+		   application_x-vnd.Be-bookmark */
+	{
+		{
+			// default frame
+			kAttrWindowFrame,
+			B_RECT_TYPE,
+			16,
+			(const char*)&kDefaultFrame
+		},
+		{
+			// attr: _trk/viewstate
+			kAttrViewState_be,
+			B_RAW_TYPE,
+			49,
+			"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
+				"\000\000\000\000\000\000\000\000\000\000w\373\175RCSTR\000\000\000"
+				"\000\000\000\000\000\000"
+		},
+		{
+			// attr: _trk/columns
+			kAttrColumns_be,
+			B_RAW_TYPE,
+			0,
+			NULL
+		}
+	};
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Bookmark Query Columns"
+
+
+	static const ColumnData bookmarkQueryColumns[] =
+	{
+		{ B_TRANSLATE_MARK("Title"), 40, 171, B_ALIGN_LEFT, "META:title",
+			B_STRING_TYPE, false, true },
+		{ B_TRANSLATE_MARK("URL"), 226, 287, B_ALIGN_LEFT, kAttrURL,
+			B_STRING_TYPE, false, true },
+		{ B_TRANSLATE_MARK("Keywords"), 528, 130, B_ALIGN_LEFT, "META:keyw",
+			B_STRING_TYPE, false, true }
+	};
+
+
+	static AttributeTemplate sPersonQueryTemplate[] =
+		/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/
+		   application_x-vnd.Be-bookmark */
+	{
+		{
+			// default frame
+			kAttrWindowFrame,
+			B_RECT_TYPE,
+			16,
+			(const char*)&kDefaultFrame
+		},
+		{
+			// attr: _trk/viewstate
+			kAttrViewState_be,
+			B_RAW_TYPE,
+			49,
+			"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
+				"\000\000\000\000\000\000\000\000\000\000\357\323\335RCSTR\000\000"
+				"\000\000\000\000\000\000\000"
+		},
+		{
+			// attr: _trk/columns
+			kAttrColumns_be,
+			B_RAW_TYPE,
+			0,
+			NULL
+		},
+	};
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Person Query Columns"
+
+
+	static const ColumnData personQueryColumns[] =
+	{
+		{ B_TRANSLATE_MARK("Name"), 40, 115, B_ALIGN_LEFT, "_stat/name",
+			B_STRING_TYPE, true, true },
+		{ B_TRANSLATE_MARK("Work Phone"), 170, 90, B_ALIGN_LEFT, kAttrWorkPhone,
+			B_STRING_TYPE, false, true },
+		{ B_TRANSLATE_MARK("E-mail"), 275, 93, B_ALIGN_LEFT, kAttrEmail,
+			B_STRING_TYPE, false, true },
+		{ B_TRANSLATE_MARK("Company"), 383, 120, B_ALIGN_LEFT, kAttrCompany,
+			B_STRING_TYPE, false, true }
+	};
+
+
+	static AttributeTemplate sEmailQueryTemplate[] =
+		/* /boot/home/config/settings/Tracker/DefaultQueryTemplates/
+		   text_x-email */
+	{
+		{
+			// default frame
+			kAttrWindowFrame,
+			B_RECT_TYPE,
+			16,
+			(const char*)&kDefaultFrame
+		},
+		{
+			// attr: _trk/viewstate
+			kAttrViewState_be,
+			B_RAW_TYPE,
+			49,
+			"o^\365R\000\000\000\012Tlst\000\000\000\000\000\000\000\000\000\000"
+				"\000\000\000\000\000\000\000\000\000\000\366_\377ETIME\000\000\000"
+				"\000\000\000\000\000\000"
+		},
+		{
+			// attr: _trk/columns
+			kAttrColumns_be,
+			B_RAW_TYPE,
+			0,
+			NULL
+		},
+	};
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "Email Query Columns"
+
+
+	static const ColumnData emailQueryColumns[] =
+	{
+		{ B_TRANSLATE_MARK("Subject"), 40, 110, B_ALIGN_LEFT, "MAIL:subject",
+			B_STRING_TYPE, false, false },
+		{ B_TRANSLATE_MARK("From"), 165, 153, B_ALIGN_LEFT, "MAIL:from",
+			B_STRING_TYPE, false, false },
+		{ B_TRANSLATE_MARK("When"), 333, 120, B_ALIGN_LEFT, "MAIL:when",
+			B_STRING_TYPE, false, false },
+		{ B_TRANSLATE_MARK("Status"), 468, 50, B_ALIGN_RIGHT, "MAIL:status",
+			B_STRING_TYPE, false, true }
+	};
+
+
 	BNode node;
 	BString query(kQueryTemplates);
 	query += "/application_octet-stream";
@@ -600,8 +665,14 @@ TTracker::InstallDefaultTemplates()
 			&node, false)) {
 		if (BContainerWindow::DefaultStateSourceNode(query.String(),
 				&node, true)) {
+			BMallocIO stream;
+			size_t n = mkColumnsBits(stream,
+					defaultQueryColumns, 4, "Default Query Columns");
+			sDefaultQueryTemplate[2].fSize = n;
+			sDefaultQueryTemplate[2].fBits = (const char*)stream.Buffer();
+
 			AttributeStreamFileNode fileNode(&node);
-			AttributeStreamTemplateNode tmp(kDefaultQueryTemplate, 3);
+			AttributeStreamTemplateNode tmp(sDefaultQueryTemplate, 3);
 			fileNode << tmp;
 		}
 	}
@@ -611,8 +682,14 @@ TTracker::InstallDefaultTemplates()
 			&node, false)) {
 		if (BContainerWindow::DefaultStateSourceNode(query.String(),
 				&node, true)) {
+			BMallocIO stream;
+			size_t n = mkColumnsBits(stream,
+				bookmarkQueryColumns, 3, "Bookmark Query Columns");
+			sBookmarkQueryTemplate[2].fSize = n;
+			sBookmarkQueryTemplate[2].fBits = (const char*)stream.Buffer();
+
 			AttributeStreamFileNode fileNode(&node);
-			AttributeStreamTemplateNode tmp(kBookmarkQueryTemplate, 3);
+			AttributeStreamTemplateNode tmp(sBookmarkQueryTemplate, 3);
 			fileNode << tmp;
 		}
 	}
@@ -622,8 +699,14 @@ TTracker::InstallDefaultTemplates()
 			&node, false)) {
 		if (BContainerWindow::DefaultStateSourceNode(query.String(),
 				&node, true)) {
+			BMallocIO stream;
+			size_t n = mkColumnsBits(stream,
+				personQueryColumns, 4, "Person Query Columns");
+			sPersonQueryTemplate[2].fSize = n;
+			sPersonQueryTemplate[2].fBits = (const char*)stream.Buffer();
+
 			AttributeStreamFileNode fileNode(&node);
-			AttributeStreamTemplateNode tmp(kPersonQueryTemplate, 3);
+			AttributeStreamTemplateNode tmp(sPersonQueryTemplate, 3);
 			fileNode << tmp;
 		}
 	}
@@ -633,8 +716,14 @@ TTracker::InstallDefaultTemplates()
 			&node, false)) {
 		if (BContainerWindow::DefaultStateSourceNode(query.String(),
 				&node, true)) {
+			BMallocIO stream;
+			size_t n = mkColumnsBits(stream,
+				emailQueryColumns, 4, "Email Query Columns");
+			sEmailQueryTemplate[2].fSize = n;
+			sEmailQueryTemplate[2].fBits = (const char*)stream.Buffer();
+
 			AttributeStreamFileNode fileNode(&node);
-			AttributeStreamTemplateNode tmp(kEmailQueryTemplate, 3);
+			AttributeStreamTemplateNode tmp(sEmailQueryTemplate, 3);
 			fileNode << tmp;
 		}
 	}
