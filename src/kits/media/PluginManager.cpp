@@ -6,6 +6,7 @@
 
 
 #include <AdapterIO.h>
+#include <Autolock.h>
 #include <BufferIO.h>
 #include <DataIO.h>
 #include <image.h>
@@ -595,6 +596,8 @@ PluginManager::DestroyEncoder(Encoder* encoder)
 status_t
 PluginManager::CreateStreamer(Streamer** streamer, BUrl url, BDataIO** source)
 {
+	BAutolock _(fLocker);
+
 	TRACE("PluginManager::CreateStreamer enter\n");
 
 	entry_ref refs[MAX_STREAMERS];
@@ -632,7 +635,7 @@ PluginManager::CreateStreamer(Streamer** streamer, BUrl url, BDataIO** source)
 		}
 
 		(*streamer)->fMediaPlugin = plugin;
-		(*streamer)->fReference.AcquireReference();
+		(*streamer)->fRefCount += 1;
 
 		BDataIO* streamSource = NULL;
 		if ((*streamer)->Sniff(url, &streamSource) == B_OK) {
@@ -653,22 +656,23 @@ PluginManager::CreateStreamer(Streamer** streamer, BUrl url, BDataIO** source)
 void
 PluginManager::DestroyStreamer(Streamer* streamer)
 {
+	BAutolock _(fLocker);
+
 	if (streamer != NULL) {
 		TRACE("PluginManager::DestroyStreamer(%p, plugin: %p)\n", streamer,
 			streamer->fMediaPlugin);
+
 		// NOTE: We have to put the plug-in after deleting the streamer,
 		// since otherwise we may actually unload the code for the
 		// destructor...
-
 		MediaPlugin* plugin = streamer->fMediaPlugin;
+
 		// Delete the streamer only when every reference is released
-		// we avoid to call ReleaseReference on the last object
-		// and handle deletion when the streamer is destroyed.
-		if (streamer->fReference.CountReferences() == 1) {
+		if (streamer->fRefCount == 1) {
 			delete streamer;
 			PutPlugin(plugin);
 		} else
-			streamer->fReference.ReleaseReference();
+			streamer->fRefCount -= 1;
 	}
 }
 

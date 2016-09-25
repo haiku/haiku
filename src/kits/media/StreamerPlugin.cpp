@@ -8,7 +8,8 @@
 
 Streamer::Streamer()
 	:
-	fMediaPlugin(NULL)
+	fMediaPlugin(NULL),
+	fRefCount(0)
 {
 }
 
