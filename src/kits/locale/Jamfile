@@ -21,6 +21,7 @@ local sources =
 	LocaleRoster.cpp
 	LocaleRosterData.cpp
 	MutableLocaleRoster.cpp
+	TextEncoding.cpp
 	TimeZone.cpp
 
 	# in progress
