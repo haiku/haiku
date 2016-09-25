@@ -6,7 +6,7 @@ UsePublicHeaders locale ;
 UsePrivateHeaders locale shared ;
 
 BinCommand collectcatkeys : collectcatkeys.cpp RegExp.cpp 
-	: be [ TargetLibsupc++ ] ;
+	: be localestub [ TargetLibsupc++ ] ;
 
 BinCommand linkcatkeys : linkcatkeys.cpp : be  [ TargetLibstdc++ ] ;
 

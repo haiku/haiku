@@ -15,6 +15,9 @@ local localetools =
 # Due to the use of STL fstream open() mapping the function names via macro
 # name doesn't work.
 DEFINES += _HAIKU_BUILD_DONT_REMAP_FD_FUNCTIONS ;
+# Use empty translation macros to avoid a dependency on the locale kit
+DEFINES += B_AVOID_TRANSLATION_MACROS 'B_TRANSLATE_NOCOLLECT(x)=x'
+	'B_TRANSLATE_MARK(x)=x' ;
 # We link against the host libbe.so which could also contain this class, so
 # rename it for locale tools
 DEFINES += DefaultCatalog=ToolsDefaultCatalog ;

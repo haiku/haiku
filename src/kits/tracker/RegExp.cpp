@@ -66,9 +66,14 @@ All rights reserved.
 #include <stdio.h>
 #include <string.h>
 
+#include <Catalog.h>
 #include <Errors.h>
 
 #include "RegExp.h"
+
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "libtracker"
 
 
 // The first byte of the regexp internal "program" is actually this magic
@@ -179,21 +184,21 @@ enum {
 
 
 const char* kRegExpErrorStringArray[] = {
-	"Unmatched parenthesis.",
-	"Expression too long.",
-	"Too many parenthesis.",
-	"Junk on end.",
-	"*+? operand may be empty.",
-	"Nested *?+.",
-	"Invalid bracket range.",
-	"Unmatched brackets.",
-	"Internal error.",
-	"?+* follows nothing.",
-	"Trailing \\.",
-	"Corrupted expression.",
-	"Memory corruption.",
-	"Corrupted pointers.",
-	"Corrupted opcode."
+	B_TRANSLATE_MARK("Unmatched parenthesis."),
+	B_TRANSLATE_MARK("Expression too long."),
+	B_TRANSLATE_MARK("Too many parenthesis."),
+	B_TRANSLATE_MARK("Junk on end."),
+	B_TRANSLATE_MARK("*+? operand may be empty."),
+	B_TRANSLATE_MARK("Nested *?+."),
+	B_TRANSLATE_MARK("Invalid bracket range."),
+	B_TRANSLATE_MARK("Unmatched brackets."),
+	B_TRANSLATE_MARK("Internal error."),
+	B_TRANSLATE_MARK("?+* follows nothing."),
+	B_TRANSLATE_MARK("Trailing \\."),
+	B_TRANSLATE_MARK("Corrupted expression."),
+	B_TRANSLATE_MARK("Memory corruption."),
+	B_TRANSLATE_MARK("Corrupted pointers."),
+	B_TRANSLATE_MARK("Corrupted opcode.")
 };
 
 
@@ -409,7 +414,8 @@ RegExp::ErrorString() const
 {
 	if (fError >= REGEXP_UNMATCHED_PARENTHESIS
 		&& fError <= REGEXP_CORRUPTED_OPCODE) {
-		return kRegExpErrorStringArray[fError - B_ERRORS_END];
+		return B_TRANSLATE_NOCOLLECT(
+			kRegExpErrorStringArray[fError - B_ERRORS_END]);
 	}
 
 	return strerror(fError);
