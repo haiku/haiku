@@ -694,7 +694,8 @@ WorkspacesWindow::WorkspacesWindow(WorkspacesSettings *settings)
 		float width = floor(workspaceWidth * columns);
 		float height = floor(workspaceHeight * rows);
 
-		// If you have too many workspaces to fit on the screen, shrink until they fit.
+		// If you have too many workspaces to fit on the screen, shrink until
+		// they fit.
 		while (width + 2 * borderWidth > screenWidth
 				|| height + 2 * borderWidth + GetTabHeight() > screenHeight) {
 			width = floor(0.95 * width);
@@ -796,15 +797,15 @@ WorkspacesWindow::Zoom(BPoint origin, float width, float height)
 	height = floor(workspaceHeight * rows);
 
 	while (width + 2 * GetScreenBorderOffset() > screenWidth
-		|| height + 2 * GetScreenBorderOffset() + GetTabHeight() > screenHeight) {
+		|| height + 2 * GetScreenBorderOffset() + GetTabHeight()
+			> screenHeight) {
 		width = floor(0.95 * width);
 		height = floor(0.95 * height);
 	}
 
 	ResizeTo(width, height);
 
-	if (fSettings->AutoRaising())
-	{
+	if (fSettings->AutoRaising()) {
 		// The auto-raising mode makes sense only if the window is positionned
 		// exactly in the bottom-right corner. If the setting is enabled, move
 		// the window there.
