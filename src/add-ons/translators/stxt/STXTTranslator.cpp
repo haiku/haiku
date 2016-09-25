@@ -522,40 +522,40 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 			size_t	fSize;
 	} encodingBuffer;
 	BMallocIO encodingIO;
-	uint32 encodingID = 0;
-		// defaults to UTF-8 or no encoding
 
 	BNode* node = dynamic_cast<BNode*>(source);
 	if (node != NULL) {
 		// determine encoding, if available
-		const BCharacterSet* characterSet = NULL;
 		bool hasAttribute = false;
 		if (encoding != NULL && !forceEncoding) {
 			BString name;
-			if (node->ReadAttrString("be:encoding", &name) == B_OK) {
+			if ((node->ReadAttrString("be:encoding", &name) == B_OK)
+				&& (name.Length() > 0)) {
 				encoding = name.String();
 				hasAttribute = true;
 			} else {
+				// Try the BeOS version of the atribute, which used an int32
+				// and a well-known list of encodings.
 				int32 value;
 				ssize_t bytesRead = node->ReadAttr("be:encoding", B_INT32_TYPE, 0,
 					&value, sizeof(value));
 				if (bytesRead == (ssize_t)sizeof(value)) {
 					hasAttribute = true;
-					if (value != 65535)
+					if (value != 65535) {
+						const BCharacterSet* characterSet = NULL;
 						characterSet = BCharacterSetRoster::GetCharacterSetByConversionID(value);
+						if (characterSet != NULL)
+							encoding = characterSet->GetName();
+					}
 				}
 			}
 		} else {
 			hasAttribute = true;
 				// we don't write the encoding in this case
 		}
-		if (characterSet == NULL && encoding != NULL)
-			characterSet = BCharacterSetRoster::FindCharacterSetByName(encoding);
 
-		if (characterSet != NULL) {
-			encodingID = characterSet->GetConversionID();
+		if (encoding != NULL)
 			encodingBuffer.Allocate(READ_BUFFER_SIZE * 4);
-		}
 
 		if (!hasAttribute && encoding != NULL) {
 			// add encoding attribute, so that someone opening the file can
@@ -567,7 +567,8 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 
 	off_t outputSize = 0;
 	ssize_t bytesRead;
-	int32 state = 0;
+
+	TextEncoding codec(encoding);
 
 	// output the actual text part of the data
 	do {
@@ -591,22 +592,24 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 			outputSize += bytesRead;
 		} else {
 			// decode text file to UTF-8
-			char* pos = (char*)buffer;
-			int32 encodingLength = encodingIO.BufferLength();
+			const char* pos = (char*)buffer;
+			size_t encodingLength = encodingIO.BufferLength();
 			int32 bytesLeft = bytesRead;
-			int32 bytes;
+			size_t bytes;
 			do {
 				encodingLength = READ_BUFFER_SIZE * 4;
 				bytes = bytesLeft;
 
-				status = convert_to_utf8(encodingID, pos, &bytes,
-					(char*)encodingBuffer.Buffer(), &encodingLength, &state);
-				if (status < B_OK)
+				status = codec.Decode(pos, bytes,
+					(char*)encodingBuffer.Buffer(), encodingLength);
+				if (status < B_OK) {
+					puts("oops");
 					return status;
+				}
 
 				ssize_t bytesWritten = destination->Write(encodingBuffer.Buffer(),
 					encodingLength);
-				if (bytesWritten < encodingLength) {
+				if (bytesWritten < (ssize_t)encodingLength) {
 					if (bytesWritten < B_OK)
 						return bytesWritten;
 
