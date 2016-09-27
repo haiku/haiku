@@ -19,8 +19,7 @@ struct UConverter;
 namespace BPrivate {
 
 
-class BTextEncoding
-{
+class BTextEncoding {
 public:
 								BTextEncoding(BString name);
 								BTextEncoding(const char* data, size_t length);
