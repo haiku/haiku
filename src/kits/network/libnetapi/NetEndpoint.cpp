@@ -311,8 +311,7 @@ BNetEndpoint::SetReuseAddr(bool enable)
 void
 BNetEndpoint::SetTimeout(bigtime_t timeout)
 {
-	fTimeout = timeout;
-	// TODO: Map value < 0 to B_INFINITE_TIMEOUT or use -1 by default.
+	fTimeout = timeout < 0 ? B_INFINITE_TIMEOUT : timeout;
 }
 
 
@@ -434,8 +433,6 @@ BNetEndpoint::Listen(int backlog)
 BNetEndpoint*
 BNetEndpoint::Accept(int32 timeout)
 {
-	// TODO: IsDataPending() expects 0 as special value for infinite timeout,
-	// hence the following call is broken for timeout < 0 and timeout == 0.
 	if (!IsDataPending(timeout < 0 ? B_INFINITE_TIMEOUT : 1000LL * timeout))
 		return NULL;
 
@@ -483,13 +480,17 @@ BNetEndpoint::IsDataPending(bigtime_t timeout)
 	FD_ZERO(&fds);
 	FD_SET(fSocket, &fds);
 
-	if (timeout > 0) {
+	// Make sure the timeout does not overflow. If it does, have an infinite
+	// timeout instead. Note that this conveniently includes B_INFINITE_TIMEOUT.
+	if (timeout > INT32_MAX * 1000000ll)
+		timeout = -1;
+
+	if (timeout >= 0) {
 		tv.tv_sec = timeout / 1000000;
-			// TODO: A big value (e.g. B_INFINITE_TIMEOUT) will overflow!
 		tv.tv_usec = (timeout % 1000000);
 	}
 
-	if (select(fSocket + 1, &fds, NULL, NULL, timeout > 0 ? &tv : NULL) < 0) {
+	if (select(fSocket + 1, &fds, NULL, NULL, timeout >= 0 ? &tv : NULL) < 0) {
 		fStatus = errno;
 		return false;
 	}
@@ -504,8 +505,6 @@ BNetEndpoint::Receive(void* buffer, size_t length, int flags)
 	if (fSocket < 0 && _SetupSocket() != B_OK)
 		return fStatus;
 
-	// TODO: For fTimeout == 0 this is broken as IsDataPending(0) means wait
-	// without timeout. Furthermore the default fTimeout is B_INFINITE_TIMEOUT.
 	if (fTimeout >= 0 && IsDataPending(fTimeout) == false)
 		return 0;
 
@@ -535,8 +534,6 @@ BNetEndpoint::ReceiveFrom(void* buffer, size_t length,
 	if (fSocket < 0 && _SetupSocket() != B_OK)
 		return fStatus;
 
-	// TODO: For fTimeout == 0 this is broken as IsDataPending(0) means wait
-	// without timeout. Furthermore the default fTimeout is B_INFINITE_TIMEOUT.
 	if (fTimeout >= 0 && IsDataPending(fTimeout) == false)
 		return 0;
 
