@@ -21,7 +21,7 @@ enum number_format_base {
 };
 
 class BNumberFormatParameters : public BFormatParameters {
-	public:
+public:
 		BNumberFormatParameters(const BNumberFormatParameters *parent = NULL);
 		BNumberFormatParameters(const BNumberFormatParameters &other);
 		~BNumberFormatParameters();
@@ -49,10 +49,10 @@ class BNumberFormatParameters : public BFormatParameters {
 		BNumberFormatParameters &operator=(
 			const BNumberFormatParameters &other);
 
-	protected:
+protected:
 		void SetParentNumberParameters(const BNumberFormatParameters *parent);
 
-	private:
+private:
 		const BNumberFormatParameters	*fParent;
 		bool							fUseGrouping;
 		number_format_sign_policy		fSignPolicy;

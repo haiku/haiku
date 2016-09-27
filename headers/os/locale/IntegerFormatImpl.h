@@ -6,7 +6,7 @@ class BIntegerFormatParameters;
 class BString;
 
 class BIntegerFormatImpl {
-	public:
+public:
 		BIntegerFormatImpl();
 		virtual ~BIntegerFormatImpl();
 

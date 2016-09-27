@@ -6,7 +6,7 @@ class BFloatFormatParameters;
 class BString;
 
 class BFloatFormatImpl {
-	public:
+public:
 		BFloatFormatImpl();
 		virtual ~BFloatFormatImpl();
 

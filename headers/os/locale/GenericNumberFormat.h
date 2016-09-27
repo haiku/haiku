@@ -8,7 +8,7 @@ class BString;
 struct format_field_position;
 
 class BGenericNumberFormat {
-	public:
+public:
 		BGenericNumberFormat();
 		~BGenericNumberFormat();
 
@@ -96,7 +96,7 @@ class BGenericNumberFormat {
 // is a multiple of 3), i.e. allow setting the number of which the exponent
 // must be a multiple of.
 
-	private:
+private:
 		class BufferWriter;
 		class Float;
 		class GroupingInfo;

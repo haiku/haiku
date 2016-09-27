@@ -6,7 +6,7 @@
 class BFormatParameters;
 
 class BFormatImpl {
-	public:
+public:
 		BFormatImpl();
 		virtual ~BFormatImpl();
 

@@ -4,7 +4,7 @@
 #include <NumberFormatParameters.h>
 
 class BIntegerFormatParameters : public BNumberFormatParameters {
-	public:
+public:
 		BIntegerFormatParameters(const BIntegerFormatParameters *parent = NULL);
 		BIntegerFormatParameters(const BIntegerFormatParameters &other);
 		~BIntegerFormatParameters();
@@ -15,7 +15,7 @@ class BIntegerFormatParameters : public BNumberFormatParameters {
 		BIntegerFormatParameters &operator=(
 			const BIntegerFormatParameters &other);
 
-	private:
+private:
 		const BIntegerFormatParameters	*fParent;
 };
 

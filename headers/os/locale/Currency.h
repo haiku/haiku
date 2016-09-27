@@ -8,7 +8,7 @@
 class BLocale;
 
 class BCurrency : public BArchivable {
-	public:
+public:
 		BCurrency(const BCurrency &other);
 		BCurrency(BMessage *archive);
 		BCurrency(const char *currencyCode);
@@ -31,7 +31,7 @@ class BCurrency : public BArchivable {
 		bool operator==(const BCurrency &other) const;
 		bool operator!=(const BCurrency &other) const;
 
-	private:
+private:
 		BCurrency();
 
 		bool _CheckData() const;

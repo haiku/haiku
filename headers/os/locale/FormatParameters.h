@@ -9,7 +9,7 @@ enum format_alignment {
 };
 
 class BFormatParameters {
-	public:
+public:
 		BFormatParameters(const BFormatParameters *parent = NULL);
 		BFormatParameters(const BFormatParameters &other);
 		~BFormatParameters();
@@ -24,10 +24,10 @@ class BFormatParameters {
 
 		BFormatParameters &operator=(const BFormatParameters &other);
 
-	protected:
+protected:
 		void SetParentParameters(const BFormatParameters *parent);
 
-	private:
+private:
 		const BFormatParameters	*fParent;
 		format_alignment		fAlignment;
 		size_t					fWidth;

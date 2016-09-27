@@ -8,7 +8,7 @@ class BString;
 class BFloatFormatImpl;
 
 class BFloatFormat : public BNumberFormat, public BFloatFormatParameters {
-	public:
+public:
 		BFloatFormat(const BFloatFormat &other);
 		~BFloatFormat();
 

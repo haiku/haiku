@@ -18,7 +18,7 @@ struct UConverter;
 
 class TextEncoding
 {
-	public:
+public:
 								TextEncoding(BString name);
 								TextEncoding(const char* data, size_t length);
 
@@ -33,7 +33,7 @@ class TextEncoding
 									char* output, size_t& outputLength);
 			status_t			Flush(char* output, size_t& outputLength);
 
-	private:
+private:
 			BString				fName;
 
 			UConverter*			fUtf8Converter;

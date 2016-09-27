@@ -13,7 +13,7 @@ class BString;
 // classes' accessor methods.
 //
 class BIntegerFormat : public BNumberFormat, public BIntegerFormatParameters {
-	public:
+public:
 		BIntegerFormat(const BIntegerFormat &other);
 		~BIntegerFormat();
 

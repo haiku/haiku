@@ -11,7 +11,7 @@ enum float_format_type {
 };
 
 class BFloatFormatParameters : public BNumberFormatParameters {
-	public:
+public:
 		BFloatFormatParameters(const BFloatFormatParameters *parent = NULL);
 		BFloatFormatParameters(const BFloatFormatParameters &other);
 		~BFloatFormatParameters();
@@ -40,7 +40,7 @@ class BFloatFormatParameters : public BNumberFormatParameters {
 		BFloatFormatParameters &operator=(
 			const BFloatFormatParameters &other);
 
-	private:
+private:
 		const BFloatFormatParameters	*fParent;
 		size_t							fMinimalFractionDigits;
 		size_t							fMaximalFractionDigits;
