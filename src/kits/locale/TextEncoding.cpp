@@ -12,7 +12,10 @@
 #include <algorithm>
 
 
-TextEncoding::TextEncoding(BString name)
+namespace BPrivate {
+
+
+BTextEncoding::BTextEncoding(BString name)
 	:
 	fName(name),
 	fUtf8Converter(NULL),
@@ -21,7 +24,7 @@ TextEncoding::TextEncoding(BString name)
 }
 
 
-TextEncoding::TextEncoding(const char* data, size_t length)
+BTextEncoding::BTextEncoding(const char* data, size_t length)
 	:
 	fUtf8Converter(NULL),
 	fConverter(NULL)
@@ -37,7 +40,7 @@ TextEncoding::TextEncoding(const char* data, size_t length)
 }
 
 
-TextEncoding::~TextEncoding()
+BTextEncoding::~BTextEncoding()
 {
 	if (fUtf8Converter != NULL)
 		ucnv_close(fUtf8Converter);
@@ -48,7 +51,7 @@ TextEncoding::~TextEncoding()
 
 
 status_t
-TextEncoding::InitCheck()
+BTextEncoding::InitCheck()
 {
 	if (fName.IsEmpty())
 		return B_NO_INIT;
@@ -58,7 +61,7 @@ TextEncoding::InitCheck()
 
 
 status_t
-TextEncoding::Decode(const char* input, size_t& inputLength, char* output,
+BTextEncoding::Decode(const char* input, size_t& inputLength, char* output,
 	size_t& outputLength)
 {
 	const char* base = input;
@@ -102,7 +105,7 @@ TextEncoding::Decode(const char* input, size_t& inputLength, char* output,
 
 
 status_t
-TextEncoding::Encode(const char* input, size_t& inputLength, char* output,
+BTextEncoding::Encode(const char* input, size_t& inputLength, char* output,
 	size_t& outputLength)
 {
 	const char* base = input;
@@ -142,7 +145,7 @@ TextEncoding::Encode(const char* input, size_t& inputLength, char* output,
 
 
 status_t
-TextEncoding::Flush(char* output, size_t& outputLength)
+BTextEncoding::Flush(char* output, size_t& outputLength)
 {
 	char* target = output;
 
@@ -166,7 +169,10 @@ TextEncoding::Flush(char* output, size_t& outputLength)
 
 
 BString
-TextEncoding::GetName()
+BTextEncoding::GetName()
 {
 	return fName;
 }
+
+
+};

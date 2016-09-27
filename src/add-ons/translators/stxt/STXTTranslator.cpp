@@ -230,7 +230,7 @@ identify_text(uint8* data, int32 bytesRead, BPositionIO* source,
 
 	bytesRead += readLater;
 
-	TextEncoding textEncoding((char*)data, (size_t)bytesRead);
+	BPrivate::BTextEncoding textEncoding((char*)data, (size_t)bytesRead);
 	encoding = textEncoding.GetName();
 	if (strlen(encoding) == 0) {
 		/* No valid character encoding found! */
@@ -568,7 +568,7 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 	off_t outputSize = 0;
 	ssize_t bytesRead;
 
-	TextEncoding codec(encoding);
+	BPrivate::BTextEncoding codec(encoding);
 
 	// output the actual text part of the data
 	do {

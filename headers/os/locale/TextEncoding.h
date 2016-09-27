@@ -16,13 +16,16 @@
 struct UConverter;
 
 
-class TextEncoding
+namespace BPrivate {
+
+
+class BTextEncoding
 {
 public:
-								TextEncoding(BString name);
-								TextEncoding(const char* data, size_t length);
+								BTextEncoding(BString name);
+								BTextEncoding(const char* data, size_t length);
 
-								~TextEncoding();
+								~BTextEncoding();
 
 			status_t			InitCheck();
 			BString				GetName();
@@ -38,6 +41,9 @@ private:
 
 			UConverter*			fUtf8Converter;
 			UConverter*			fConverter;
+};
+
+
 };
 
 
