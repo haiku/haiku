@@ -666,7 +666,8 @@ get_nfs_attr(struct XDRInPacket *reply, struct stat *st)
 	st->st_blksize=XDRInPacketGetInt32(reply);
 #endif
 	st->st_rdev=XDRInPacketGetInt32(reply);
-	XDRInPacketGetInt32(reply);	// blocks
+	// XDRInPacketGetInt32(reply);	// blocks
+	st->st_blocks=XDRInPacketGetInt32(reply);
 	XDRInPacketGetInt32(reply);	// fsid
 	st->st_ino=XDRInPacketGetInt32(reply);
 	st->st_atime=XDRInPacketGetInt32(reply);
