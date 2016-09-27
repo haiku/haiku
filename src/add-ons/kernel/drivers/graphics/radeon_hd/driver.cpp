@@ -502,9 +502,8 @@ const struct supported_device {
 	// Introduced: 2016
 	// Codename: Artic Islands / Polaris
 	// Process: 14 nm
-	// Radeon RX 460 TBA
-	// Radeon RX 470 TBA
-	{0x67df, 12, 0, RADEON_POLARIS, CHIP_STD, "Radeon RX480"}
+	{0x67ef, 12, 0, RADEON_POLARIS, CHIP_STD, "Radeon RX 460"},
+	{0x67df, 12, 0, RADEON_POLARIS, CHIP_STD, "Radeon RX 470/480"}
 };
 
 
