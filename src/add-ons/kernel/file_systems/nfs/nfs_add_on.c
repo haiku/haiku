@@ -659,14 +659,8 @@ get_nfs_attr(struct XDRInPacket *reply, struct stat *st)
 	st->st_uid=XDRInPacketGetInt32(reply);
 	st->st_gid=XDRInPacketGetInt32(reply);
 	st->st_size=XDRInPacketGetInt32(reply);
-#if 0
-	XDRInPacketGetInt32(reply);	// blksize
-	st->st_blksize=NFS_MAXDATA;
-#else
 	st->st_blksize=XDRInPacketGetInt32(reply);
-#endif
 	st->st_rdev=XDRInPacketGetInt32(reply);
-	// XDRInPacketGetInt32(reply);	// blocks
 	st->st_blocks=XDRInPacketGetInt32(reply);
 	XDRInPacketGetInt32(reply);	// fsid
 	st->st_ino=XDRInPacketGetInt32(reply);
