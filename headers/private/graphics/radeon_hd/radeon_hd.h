@@ -190,7 +190,8 @@ struct overlay_registers;
 
 struct radeon_shared_info {
 	uint32			deviceIndex;		// accelerant index
-	uint32			pciID;				// device pciid
+	uint32			pciID;				// device pci id
+	uint32			pciRev;				// device pci revision
 	area_id			mode_list_area;		// area containing display mode list
 	uint32			mode_count;
 

@@ -165,9 +165,16 @@
 #define		SOFT_RESET_VGT			(1 << 14)
 #define		SOFT_RESET_IA			(1 << 15)
 
+#define TARGET_HW_I2C_CLOCK			50
 
 status_t radeon_gpu_probe();
 status_t radeon_gpu_reset();
+status_t radeon_gpu_quirks();
+
+status_t radeon_gpu_i2c_cmd(uint16 slaveAddr, uint16 lineNumber, uint8 offset,
+	uint8 data);
+
+
 void radeon_gpu_mc_halt(struct gpu_state *gpuState);
 void radeon_gpu_mc_resume(struct gpu_state *gpuState);
 status_t radeon_gpu_mc_idlewait();
@@ -175,7 +182,6 @@ status_t radeon_gpu_mc_setup();
 status_t radeon_gpu_ring_setup();
 status_t radeon_gpu_ring_boot(uint32 ringType);
 status_t radeon_gpu_ss_control(pll_info* pll, bool enable);
-
 
 
 #endif

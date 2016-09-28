@@ -223,6 +223,49 @@ radeon_gpu_reset()
 }
 
 
+status_t
+radeon_gpu_quirks()
+{
+	radeon_shared_info &info = *gInfo->shared_info;
+
+	// Fix PCIe power distribution issue for Polaris10 XT
+	// aka "Card draws >75W from PCIe bus"
+	if (info.chipsetID == RADEON_POLARIS && info.pciRev == 0xc7) {
+		ERROR("%s: Applying Polaris10 power distribution fix.\n",
+			__func__);
+		radeon_gpu_i2c_cmd(0x10, 0x96, 0x1e, 0xdd);
+		radeon_gpu_i2c_cmd(0x10, 0x96, 0x1f, 0xd0);
+	}
+
+	return B_OK;
+}
+
+
+status_t
+radeon_gpu_i2c_cmd(uint16 slaveAddr, uint16 lineNumber, uint8 offset,
+	uint8 data)
+{
+	TRACE("%s\n", __func__);
+
+	PROCESS_I2C_CHANNEL_TRANSACTION_PS_ALLOCATION args;
+	memset(&args, 0, sizeof(args));
+
+	int index = GetIndexIntoMasterTable(COMMAND,
+		ProcessI2cChannelTransaction);
+
+	args.ucRegIndex = offset;
+	args.lpI2CDataOut = data;
+	args.ucFlag = HW_I2C_WRITE;
+	args.ucI2CSpeed = TARGET_HW_I2C_CLOCK;
+	args.ucTransBytes = 1;
+	args.ucSlaveAddr = slaveAddr;
+	args.ucLineNumber = lineNumber;
+
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
+	return B_OK;
+}
+
+
 void
 radeon_gpu_mc_halt(gpu_state* gpuState)
 {

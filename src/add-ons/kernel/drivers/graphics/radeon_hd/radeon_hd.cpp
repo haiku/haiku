@@ -650,6 +650,7 @@ radeon_hd_init(radeon_info &info)
 	// Pass common information to accelerant
 	info.shared_info->deviceIndex = info.id;
 	info.shared_info->pciID = info.pciID;
+	info.shared_info->pciRev = info.pci->revision;
 	info.shared_info->chipsetID = info.chipsetID;
 	info.shared_info->chipsetFlags = info.chipsetFlags;
 	info.shared_info->dceMajor = info.dceMajor;

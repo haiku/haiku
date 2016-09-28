@@ -258,6 +258,9 @@ radeon_init_accelerant(int device)
 	// probe firmware information
 	radeon_gpu_probe();
 
+	// apply GPU quirks
+	radeon_gpu_quirks();
+
 	// find GPIO pins from AtomBIOS
 	gpio_populate();
 
