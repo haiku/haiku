@@ -141,7 +141,6 @@ StyledEditApp::StyledEditApp()
 	sWindowRect.top *= factor;
 	sWindowRect.right *= factor;
 	sWindowRect.bottom *= factor;
-	sWindowRect.PrintToStream();
 }
 
 

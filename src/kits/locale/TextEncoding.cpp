@@ -87,10 +87,6 @@ BTextEncoding::Decode(const char* input, size_t& inputLength, char* output,
 	ucnv_convertEx(fUtf8Converter, fConverter, &target, output + outputLength,
 		&base, input + inputLength, NULL, NULL, NULL, NULL, FALSE, TRUE,
 		&error);
-	if (!U_SUCCESS(error)) {
-		printf("zz %s\n", u_errorName(error));
-	}
-
 
 	// inputLength is set to the number of bytes consumed. We may not use all of
 	// the input data (for example if it is cut in the middle of an utf-8 char).

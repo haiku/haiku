@@ -524,16 +524,19 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 	BMallocIO encodingIO;
 
 	BNode* node = dynamic_cast<BNode*>(source);
+	BString name(encoding);
 	if (node != NULL) {
 		// determine encoding, if available
 		bool hasAttribute = false;
 		if (encoding != NULL && !forceEncoding) {
-			BString name;
-			if ((node->ReadAttrString("be:encoding", &name) == B_OK)
-				&& (name.Length() > 0)) {
+			attr_info info;
+			node->GetAttrInfo("be:encoding", &info);
+
+			if ((info.type == B_STRING_TYPE) && (node->ReadAttrString(
+					"be:encoding", &name) == B_OK)) {
 				encoding = name.String();
 				hasAttribute = true;
-			} else {
+			} else if (info.type == B_INT32_TYPE) {
 				// Try the BeOS version of the atribute, which used an int32
 				// and a well-known list of encodings.
 				int32 value;
@@ -542,8 +545,8 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 				if (bytesRead == (ssize_t)sizeof(value)) {
 					hasAttribute = true;
 					if (value != 65535) {
-						const BCharacterSet* characterSet = NULL;
-						characterSet = BCharacterSetRoster::GetCharacterSetByConversionID(value);
+						const BCharacterSet* characterSet
+							= BCharacterSetRoster::GetCharacterSetByConversionID(value);
 						if (characterSet != NULL)
 							encoding = characterSet->GetName();
 					}
@@ -603,7 +606,6 @@ translate_from_text(BPositionIO* source, const char* encoding, bool forceEncodin
 				status = codec.Decode(pos, bytes,
 					(char*)encodingBuffer.Buffer(), encodingLength);
 				if (status < B_OK) {
-					puts("oops");
 					return status;
 				}
 
