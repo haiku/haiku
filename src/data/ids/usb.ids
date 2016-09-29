@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2016.09.07
-# Date:    2016-09-07 20:34:05
+# Version: 2016.09.28
+# Date:    2016-09-28 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -465,6 +465,7 @@
 	3817  LaserJet P2015 series
 	3902  PhotoSmart 130
 	3912  Officejet Pro 8500
+	3917  LaserJet P2014
 	3a02  PhotoSmart 7150
 	3a11  OfficeJet 5500 series
 	3a17  Printing Support
@@ -2311,6 +2312,7 @@
 	0780  Comfort Curve Keyboard 3000
 	0797  Optical Mouse 200
 	07a5  Wireless Receiver 1461C
+	07b9  Wired Keyboard 200
 	07ca  Surface Pro 3 Docking Station Audio Device
 	07f8  Wired Keyboard 600 (model 1576)
 	07fd  Nano Transceiver 1.1
@@ -2556,6 +2558,7 @@
 	0a4d  G430 Surround Sound Gaming Headset
 	0b02  C-UV35 [Bluetooth Mini-Receiver] (HID proxy mode)
 	8801  Video Camera
+	b014  Bluetooth Mouse M336/M337/M535
 	b305  BT Mini-Receiver
 	bfe4  Premium Optical Wheel Mouse
 	c000  N43 [Pilot Mouse]
@@ -2675,6 +2678,7 @@
 	c22b  Gaming Keyboard G110 G-keys
 	c22d  G510 Gaming Keyboard
 	c22e  G510 Gaming Keyboard onboard audio
+	c231  G13 Virtual Mouse
 	c245  G400 Optical Mouse
 	c246  Gaming Mouse G300
 	c248  G105 Gaming Keyboard
@@ -2697,6 +2701,7 @@
 	c29c  Speed Force Wireless Wheel for Wii
 	c2a0  Wingman Force Feedback Mouse
 	c2a1  WingMan Force Feedback Mouse
+	c2ab  G13 Joystick
 	c301  iTouch Keyboard
 	c302  iTouch Pro Keyboard
 	c303  iTouch Keyboard
@@ -4574,6 +4579,7 @@
 	c001  PicoLCD 20x4
 	e11c  TL866CS EEPROM Programmer [MiniPRO]
 	f2c4  Macareux-labs Hygrometry Temperature Sensor
+	f2f7  Yepkit YKUSH
 	f3aa  Macareux-labs Usbce Bootloader mode
 	f437  SBE Tech Ultrasonic Anemometer
 	f4b5  SmartScope
@@ -7969,6 +7975,8 @@
 0615  Quabbin Wire & Cable Co., Inc.
 0616  Future Techno Designs PVT, Ltd
 0617  Swiss Federal Insitute of Technology
+	000a  Thymio-II
+	000c  Thymio-II Wireless
 0618  MacAlly
 	0101  Mouse
 0619  Seiko Instruments, Inc.
@@ -11868,6 +11876,7 @@
 	3012  TT-connect CT2-4650 CI
 	3014  TT-TVStick CT2-4400
 	3015  TT-connect CT2-4650 CI
+	3017  TT-connect S2-4650 CI
 0b49  ASCII Corp.
 	064f  Trance Vibrator
 0b4b  Pine Corp. Ltd.
@@ -13319,7 +13328,7 @@
 	1104  ASEDrive IIIe KB
 	1701  ASEKey
 	1702  ASEKey
-0dc4  Macpower Peripherals, Ltd
+0dc4  inXtron, Inc.
 	0040  Mass Storage Device
 	0041  Mass Storage Device
 	0042  Mass Storage Device
@@ -13990,6 +13999,12 @@
 	e1b0  D6708
 	e1b5  D2004
 	e1ba  D6683
+	e1bb  SO-02G
+	e1bc  D2203
+	e1c0  SGP621
+	e1c2  D2533
+	e1c9  E6553
+	e1cf  SGP771
 	f0fa  MN800 / Smartwatch 2 (DFU mode)
 0fcf  Dynastream Innovations, Inc.
 	1003  ANT Development Board
@@ -14022,14 +14037,16 @@
 	0100  Bluetooth Mouse
 	0101  Bluetooth IMU
 	0200  Bluetooth Keypad
+0fe2  Air Techniques
 0fe4  IN-Tech Electronics, Ltd
 0fe5  Greenconn (U.S.A.), Inc.
-0fe6  Kontron (Industrial Computer Source / ICS Advent)
+0fe6  ICS Advent
 	8101  DM9601 Fast Ethernet Adapter
 	811e  Parallel Adapter
 	9700  DM9601 Fast Ethernet Adapter
 0fe9  DVICO
 	4020  TViX M-6500
+	9010  FusionRemote IR receiver
 	db00  FusionHDTV DVB-T (MT352+LgZ201) (uninitialized)
 	db01  FusionHDTV DVB-T (MT352+LgZ201) (initialized)
 	db10  FusionHDTV DVB-T (MT352+Thomson7579) (uninitialized)
@@ -14069,12 +14086,13 @@
 	61f9  Optimus (Various Models) MTP Mode
 	61fc  Optimus 3
 	61fe  Optimus Android Phone [USB tethering mode]
-	6300  G2/Optimus Android Phone
+	627f  G3 (VS985) Android Phone (MTP/Download mode)
+	6300  G2/Optimus Android Phone [Charge mode]
 	631c  G2/Optimus Android Phone [MTP mode]
 	631d  Optimus Android Phone (Camera/PTP Mode)
 	631e  G2/Optimus Android Phone [Camera/PTP mode]
 	631f  Optimus Android Phone (Charge Mode)
-	633e  G2 Android Phone [MTP mode]
+	633e  G2/G3 Android Phone [MTP/PTP/Download mode]
 	6344  G2 Android Phone [tethering mode]
 	6356  Optimus Android Phone [Virtual CD mode]
 	6800  CDMA Modem
@@ -14247,13 +14265,20 @@
 	0742  My Passport Essential SE (WDBGYS)
 	0748  My Passport (WDBKXH, WDBY8L)
 	07a8  My Passport (WDBBEP), My Passport for Mac (WDBLUZ)
+	07ae  My Passport Edge for Mac (WDBJBH)
+	07ba  PiDrive (WDLB)
 	0810  My Passport Ultra (WDBZFP)
+	0816  My Passport Air (WDBBLW)
 	0820  My Passport Ultra (WDBMWV, WDBZFP)
+	0822  My Passport Ultra (WDBBUZ)
+	0824  My Passport Slim (WDBPDZ)
 	0830  My Passport Ultra (WDBZFP)
+	0837  My Passport Ultra (WDBBKD)
 	0900  MyBook Essential External HDD
 	0901  My Book Essential Edition (Green Ring) (WDG1U)
 	0902  My Book Pro Edition (WDG1T)
 	0903  My Book Premium Edition
+	0905  My Book Pro Edition II (WD10000C033-001)
 	0910  My Book Essential Edition (Green Ring) (WDG1U)
 	1001  Elements Desktop (WDE1U)
 	1003  WD Elements Desktop (WDE1UBK)
@@ -14262,6 +14287,7 @@
 	1023  Elements SE Portable (WDBABV)
 	1042  Elements SE Portable (WDBPCK)
 	1048  Elements Portable (WDBU6Y)
+	1078  Elements Portable (WDBUZG)
 	107c  Elements Desktop (WDBWLG)
 	10a2  Elements SE Portable (WDBPCK)
 	10a8  Elements Portable (WDBUZG)
@@ -14277,7 +14303,10 @@
 	1123  My Book 3.0 (WDBABP)
 	1130  My Book Essential (WDBACW)
 	1140  My Book Essential (WDBACW)
-	1230  My Book (WDBFJK0030HBK)
+	1230  My Book (WDBFJK)
+	1235  My Book (WDBFJK0040HBK)
+	259d  My Passport Ultra (WDBBKD)
+	259f  My Passport Ultra (WD10JMVW)
 1059  Giesecke & Devrient GmbH
 	000b  StarSign Bio Token 3.0
 105b  Foxconn International, Inc.
@@ -16584,7 +16613,28 @@
 	3188  ARK3188 UVC Webcam
 	3299  Webcam Carrefour
 	3366  Bresser Biolux NV
+18f8  [Maxxter]
+	0f99  Optical gaming mouse
+18fb  Scriptel Corporation
+	01c0  ST1501-STN
+	01c1  ST1526-STN
+	01c2  ST1501-PYJ
+	01c3  ST1501B-PYJ
+	01c4  ST1501-PUN
+	01c5  ST1401-STN
+	01c7  ST1526-PYJ
+	01c8  ST1501-ECA
+	01c9  ST1476-STN
+	01cb  ST1571-STN
+	0200  ST1500
+	0201  ST1550
+	0202  ST1525
+	0204  ST1400
+	0206  ST1475
+	0207  ST1570
 18fd  FineArch Inc.
+1901  GE Healthcare
+	0015  Nemo Tracker
 1908  GEMBIRD
 	1320  PhotoFrame PF-15-1
 190d  Motorola GSG
@@ -16595,6 +16645,8 @@
 	2234  Linksys WUSB54G v1 OEM 802.11g Adapter [Intersil ISL3886]
 	2235  Linksys WUSB54GP v1 OEM 802.11g Adapter [Intersil ISL3886]
 	2236  Linksys WUSB11 v3.0 802.11b Adapter [Intersil PRISM 3]
+191c  Innovative Technology LTD
+	4104  Banknote validator NV-150
 1923  FitLinxx
 	0002  Personal SyncPoint
 1926  NextWindow
@@ -16637,6 +16689,8 @@
 	0602  F71610 or F71612 Consumer Infrared Receiver/Transceiver
 	0702  Integrated Consumer Infrared Receiver/Transceiver
 	5168  F71610A or F71612A Consumer Infrared Receiver/Transceiver
+1938  Meinberg Funkuhren GmbH & Co. KG
+	0501  TCR51USB IRIG Time Code Reader
 1941  Dream Link
 	8021  WH1080 Weather Station / USB Missile Launcher
 1943  Sensoray Co., Inc.
