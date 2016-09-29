@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.09.22
-#	Date:    2016-09-22 03:15:02
+#	Version: 2016.09.28
+#	Date:    2016-09-28 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -1597,6 +1597,7 @@
 		17aa 390c  Radeon R5 M330
 	6663  Sun PRO [Radeon HD 8570A/8570M]
 		1025 0846  Radeon HD 8570A
+		17aa 3805  Radeon HD 8570M
 	6664  Jet XT [Radeon R5 M240]
 	6665  Jet PRO [Radeon R5 M230]
 		17aa 368f  Radeon R5 A230
@@ -7370,6 +7371,7 @@
 	8696  PEX 8696 96-lane, 24-Port PCI Express Gen 2 (5.0 GT/s) Multi-Root Switch
 	8717  PEX 8717 16-lane, 8-Port PCI Express Gen 3 (8.0 GT/s) Switch with DMA
 	8718  PEX 8718 16-Lane, 5-Port PCI Express Gen 3 (8.0 GT/s) Switch
+	8724  PEX 8724 24-Lane, 6-Port PCI Express Gen 3 (8 GT/s) Switch, 19 x 19mm FCBGA
 	8732  PEX 8732 32-lane, 8-Port PCI Express Gen 3 (8.0 GT/s) Switch
 	8734  PEX 8734 32-lane, 8-Port PCI Express Gen 3 (8.0GT/s) Switch
 	8747  PEX 8747 48-Lane, 5-Port PCI Express Gen 3 (8.0 GT/s) Switch
@@ -10951,6 +10953,7 @@
 	8173  RTL8192SE Wireless LAN Controller
 	8174  RTL8192SE Wireless LAN Controller
 	8176  RTL8188CE 802.11b/g/n WiFi Adapter
+		1043 84b5  PCE-N10
 		1a3b 1139  AW-NE139H Half-size Mini PCIe Card
 	8177  RTL8191CE PCIe Wireless Network Adapter
 	8178  RTL8192CE PCIe Wireless Network Adapter
@@ -22776,6 +22779,17 @@
 		8086 0001  Ethernet Converged Network Adapter X710-T4
 		8086 0002  Ethernet Converged Network Adapter X710-T4
 		8086 1003  Ethernet Converged Network Adapter X710-T
+	158a  Ethernet Controller XXV710 for 25GbE backplane
+	158b  Ethernet Controller XXV710 for 25GbE SFP28
+		8086 0000  Ethernet Network Adapter XXV710
+		8086 0001  Ethernet Network Adapter XXV710-2
+		8086 0002  Ethernet Network Adapter XXV710-2
+		8086 0003  Ethernet Network Adapter XXV710-1
+		8086 0004  Ethernet Network Adapter XXV710-1
+		8086 0005  Ethernet Network Adapter OCP XXV710-2
+		8086 0006  Ethernet Network Adapter OCP XXV710-2
+		8086 0007  Ethernet Network Adapter OCP XXV710-1
+		8086 0008  Ethernet Network Adapter OCP XXV710-1
 	15a0  Ethernet Connection (2) I218-LM
 	15a1  Ethernet Connection (2) I218-V
 	15a2  Ethernet Connection (3) I218-LM
