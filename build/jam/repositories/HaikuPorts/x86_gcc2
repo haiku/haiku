@@ -140,6 +140,7 @@ RemotePackageRepository HaikuPorts
 	fribidi-0.19.6-2
 	fribidi_devel-0.19.6-2
 	friss-0.8.0-1
+	fuse-1.1.1-1
 	gawk-4.1.0-2
 	gcal-3.6.3-1
 	gcc-2.95.3_2014_10_14-3
@@ -308,6 +309,8 @@ RemotePackageRepository HaikuPorts
 	libsndfile_devel-1.0.25-3
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
+	libspectrum-1.1.1-1
+	libspectrum_devel-1.1.1-1
 	libssh2-1.5.0-1
 	libssh2_devel-1.5.0-1
 	libtheora-1.1.1-2
@@ -1109,6 +1112,7 @@ RemotePackageRepository HaikuPorts
 	fribidi
 	fribidi_x86
 	friss
+	fuse
 	gawk
 	gcal
 	gcc
@@ -1253,6 +1257,7 @@ RemotePackageRepository HaikuPorts
 	libsndfile
 	libsndfile_x86
 	libsolv
+	libspectrum
 	libssh2
 	libtasn1_x86
 	libtheora
