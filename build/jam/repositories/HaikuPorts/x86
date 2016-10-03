@@ -33,7 +33,8 @@ RemotePackageRepository HaikuPorts
 	bash-4.3.42-1
 	beam-1.2-2
 	bepdf-1.2.0-1
-	bescreencapture-1.9.4-1
+	bescreencapture-2.1-1
+	bescreencapture_inputfilter-2.1-1
 	binutils-2.26.1_2016_07_22-1
 	bison-2.6.5-1
 	boost-1.55.0-6
@@ -476,6 +477,7 @@ RemotePackageRepository HaikuPorts
 	bash
 	beam
 	bepdf
+#	bescreencapture
 	binutils
 	binutils_x86_gcc2
 	bison
