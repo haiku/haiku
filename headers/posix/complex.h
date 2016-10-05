@@ -15,6 +15,10 @@
 #define complex _Complex
 #define I _Complex_I
 
+#ifdef  __cplusplus
+extern "C" {
+#endif
+
 extern double               cabs(double complex);
 extern float                cabsf(float complex);
 extern long double          cabsl(long double complex);
@@ -81,5 +85,9 @@ extern double complex       ctanh(double complex);
 extern float complex        ctanhf(float complex);
 extern long double complex  ctanhl(long double complex);
 extern long double complex  ctanl(long double complex);
+
+#ifdef __cplusplus
+} /* extern "C" */
+#endif
 
 #endif	/* _COMPLEX_H_ */
