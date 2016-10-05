@@ -547,6 +547,29 @@ encoder_digital_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 }
 
 
+static uint32
+encoder_get_bpc()
+{
+	/*
+	switch (8) {
+		case 0:
+			return PANEL_BPC_UNDEFINE;
+		case 6:
+			return PANEL_6BIT_PER_COLOR;
+		case 8:
+			return PANEL_8BIT_PER_COLOR;
+		case 10:
+			return PANEL_10BIT_PER_COLOR;
+		case 12:
+			return PANEL_12BIT_PER_COLOR;
+		case 16:
+			return PANEL_16BIT_PER_COLOR;
+	}
+	*/
+	return PANEL_8BIT_PER_COLOR;
+}
+
+
 status_t
 encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 {
@@ -579,6 +602,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 		DIG_ENCODER_CONTROL_PARAMETERS_V2 v2;
 		DIG_ENCODER_CONTROL_PARAMETERS_V3 v3;
 		DIG_ENCODER_CONTROL_PARAMETERS_V4 v4;
+		DIG_ENCODER_CONTROL_PARAMETERS_V5 v5;
 	};
 	union digEncoderControl args;
 	memset(&args, 0, sizeof(args));
@@ -638,8 +662,14 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 		dualLink = true;
 	}
 
+	uint32 encoderMode = display_get_encoder_mode(connectorIndex);
+
 	// Careful! The mapping of ucHPD_ID differs between atombios calls
 	uint16 hpdID = connector_pick_atom_hpdid(connectorIndex);
+
+	if (tableMajor != 1) {
+		ERROR("%s: Unknown table major!\n", __func__);
+	}
 
 	switch (tableMinor) {
 		case 1:
@@ -649,8 +679,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 			if (command == ATOM_ENCODER_CMD_SETUP_PANEL_MODE)
 				args.v3.ucPanelMode = panelMode;
 			else {
-				args.v1.ucEncoderMode
-					= display_get_encoder_mode(connectorIndex);
+				args.v1.ucEncoderMode = encoderMode;
 			}
 
 			if (args.v1.ucEncoderMode == ATOM_ENCODER_MODE_DP
@@ -692,10 +721,8 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 
 			if (command == ATOM_ENCODER_CMD_SETUP_PANEL_MODE)
 				args.v3.ucPanelMode = panelMode;
-			else {
-				args.v3.ucEncoderMode
-					= display_get_encoder_mode(connectorIndex);
-			}
+			else
+				args.v3.ucEncoderMode = encoderMode;
 
 			if (args.v3.ucEncoderMode == ATOM_ENCODER_MODE_DP
 				|| args.v3.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
@@ -712,29 +739,7 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 			}
 
 			args.v3.acConfig.ucDigSel = encoder_pick_dig(connectorIndex);
-
-			// TODO: get BPC
-			switch (8) {
-				case 0:
-					args.v3.ucBitPerColor = PANEL_BPC_UNDEFINE;
-					break;
-				case 6:
-					args.v3.ucBitPerColor = PANEL_6BIT_PER_COLOR;
-					break;
-				case 8:
-				default:
-					args.v3.ucBitPerColor = PANEL_8BIT_PER_COLOR;
-					break;
-				case 10:
-					args.v3.ucBitPerColor = PANEL_10BIT_PER_COLOR;
-					break;
-				case 12:
-					args.v3.ucBitPerColor = PANEL_12BIT_PER_COLOR;
-					break;
-				case 16:
-					args.v3.ucBitPerColor = PANEL_16BIT_PER_COLOR;
-					break;
-			}
+			args.v3.ucBitPerColor = encoder_get_bpc();
 			break;
 		case 4:
 			args.v4.ucAction = command;
@@ -742,10 +747,8 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 
 			if (command == ATOM_ENCODER_CMD_SETUP_PANEL_MODE)
 				args.v4.ucPanelMode = panelMode;
-			else {
-				args.v4.ucEncoderMode
-					= display_get_encoder_mode(connectorIndex);
-			}
+			else
+				args.v4.ucEncoderMode = encoderMode;
 
 			if (args.v4.ucEncoderMode == ATOM_ENCODER_MODE_DP
 				|| args.v4.ucEncoderMode == ATOM_ENCODER_MODE_DP_MST) {
@@ -765,37 +768,54 @@ encoder_dig_setup(uint32 connectorIndex, uint32 pixelClock, int command)
 				args.v4.ucLaneNum = 4;
 			}
 			args.v4.acConfig.ucDigSel = digEncoderID;
-
-			// TODO: get BPC
-			switch (8) {
-				case 0:
-					args.v4.ucBitPerColor = PANEL_BPC_UNDEFINE;
-					break;
-				case 6:
-					args.v4.ucBitPerColor = PANEL_6BIT_PER_COLOR;
-					break;
-				case 8:
-				default:
-					args.v4.ucBitPerColor = PANEL_8BIT_PER_COLOR;
-					break;
-				case 10:
-					args.v4.ucBitPerColor = PANEL_10BIT_PER_COLOR;
-					break;
-				case 12:
-					args.v4.ucBitPerColor = PANEL_12BIT_PER_COLOR;
-					break;
-				case 16:
-					args.v4.ucBitPerColor = PANEL_16BIT_PER_COLOR;
-					break;
-			}
+			args.v4.ucBitPerColor = encoder_get_bpc();
 
 			if (hpdID == 0xff)
 				args.v4.ucHPD_ID = 0;
 			else
 				args.v4.ucHPD_ID = hpdID + 1;
 			break;
+		case 5:
+			switch(command) {
+				case ATOM_ENCODER_CMD_SETUP_PANEL_MODE:
+					args.v5.asDPPanelModeParam.ucAction = command;
+					args.v5.asDPPanelModeParam.ucPanelMode = panelMode;
+					args.v5.asDPPanelModeParam.ucDigId = digEncoderID;
+					break;
+				case ATOM_ENCODER_CMD_STREAM_SETUP:
+					args.v5.asStreamParam.ucAction = command;
+					args.v5.asStreamParam.ucDigId = digEncoderID;
+					args.v5.asStreamParam.ucDigMode = encoderMode;
+					if (encoderMode == ATOM_ENCODER_MODE_DP
+						|| encoderMode == ATOM_ENCODER_MODE_DP_MST) {
+						args.v5.asStreamParam.ucLaneNum = dpInfo->laneCount;
+					} else if (dualLink)
+						args.v5.asStreamParam.ucLaneNum = 8;
+					else
+						args.v5.asStreamParam.ucLaneNum = 4;
+					args.v5.asStreamParam.ulPixelClock
+						= B_HOST_TO_LENDIAN_INT16(pixelClock / 10);
+					args.v5.asStreamParam.ucBitPerColor = encoder_get_bpc();
+					args.v5.asStreamParam.ucLinkRateIn270Mhz = dpClock / 27000;
+					break;
+				case ATOM_ENCODER_CMD_DP_LINK_TRAINING_START:
+				case ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN1:
+				case ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN2:
+				case ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN3:
+				case ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN4:
+				case ATOM_ENCODER_CMD_DP_LINK_TRAINING_COMPLETE:
+				case ATOM_ENCODER_CMD_DP_VIDEO_OFF:
+				case ATOM_ENCODER_CMD_DP_VIDEO_ON:
+					args.v5.asCmdParam.ucAction = command;
+					args.v5.asCmdParam.ucDigId = digEncoderID;
+					break;
+				default:
+					ERROR("%s: Unknown command: 0x%X\n", __func__, command);
+			}
+			break;
 		default:
 			ERROR("%s: unknown tableMinor!\n", __func__);
+			return B_ERROR;
 	}
 
 	status_t result = atom_execute_table(gAtomContext, index, (uint32*)&args);
