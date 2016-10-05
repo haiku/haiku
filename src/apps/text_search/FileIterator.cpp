@@ -58,6 +58,9 @@ FileIterator::_ExamineFile(BEntry& entry, char* buffer, bool textFilesOnly)
 			return true;
 		}
 	}
+	// Make an exception for XHTML files
+	if (strcmp("application/xhtml+xml", mimeTypeString) == 0)
+		return true;
 
 	return false;
 }
