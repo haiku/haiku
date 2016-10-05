@@ -405,6 +405,33 @@ dp_get_link_rate(uint32 connectorIndex, display_mode* mode)
 }
 
 
+static uint8
+dp_encoder_service(int action, int linkRate, uint8 lane, uint8 config)
+{
+	DP_ENCODER_SERVICE_PARAMETERS args;
+	int index = GetIndexIntoMasterTable(COMMAND, DPEncoderService);
+
+	memset(&args, 0, sizeof(args));
+	args.ucLinkClock = linkRate / 10;
+	args.ucConfig = config;
+	args.ucAction = action;
+	args.ucLaneNum = lane;
+	args.ucStatus = 0;
+
+	atom_execute_table(gAtomContext, index, (uint32*)&args);
+	return args.ucStatus;
+}
+
+
+uint8
+dp_get_sink_type(uint32 connectorIndex)
+{
+	dp_info* dpInfo = &gConnector[connectorIndex]->dpInfo;
+	return dp_encoder_service(ATOM_DP_ACTION_GET_SINK_TYPE, 0, 0,
+		dpInfo->auxPin);
+}
+
+
 void
 dp_setup_connectors()
 {
@@ -616,80 +643,28 @@ dp_get_adjust_train(dp_info* dp)
 }
 
 
-static uint8
-dp_encoder_service(uint32 connectorIndex, int action, int linkRate,
-	uint8 lane)
-{
-	DP_ENCODER_SERVICE_PARAMETERS args;
-	int index = GetIndexIntoMasterTable(COMMAND, DPEncoderService);
-
-	memset(&args, 0, sizeof(args));
-	args.ucLinkClock = linkRate;
-	args.ucAction = action;
-	args.ucLaneNum = lane;
-	args.ucConfig = 0;
-	args.ucStatus = 0;
-
-	// We really can't do ATOM_DP_ACTION_GET_SINK_TYPE with the
-	// way I designed this below. Not used though.
-
-	// Calculate encoder_id config
-	if (encoder_pick_dig(connectorIndex))
-		args.ucConfig |= ATOM_DP_CONFIG_DIG2_ENCODER;
-	else
-		args.ucConfig |= ATOM_DP_CONFIG_DIG1_ENCODER;
-
-	if (gConnector[connectorIndex]->encoder.linkEnumeration
-			== GRAPH_OBJECT_ENUM_ID2) {
-		args.ucConfig |= ATOM_DP_CONFIG_LINK_B;
-	} else
-		args.ucConfig |= ATOM_DP_CONFIG_LINK_A;
-
-	atom_execute_table(gAtomContext, index, (uint32*)&args);
-
-	return args.ucStatus;
-}
-
-
 static void
 dp_set_tp(uint32 connectorIndex, int trainingPattern)
 {
 	TRACE("%s\n", __func__);
-
-	radeon_shared_info &info = *gInfo->shared_info;
-	dp_info* dp = &gConnector[connectorIndex]->dpInfo;
 	pll_info* pll = &gConnector[connectorIndex]->encoder.pll;
 
 	int rawTrainingPattern = 0;
 
 	/* set training pattern on the source */
-	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {
-		TRACE("%s: Training with encoder...\n", __func__);
-		switch (trainingPattern) {
-			case DP_TRAIN_PATTERN_1:
-				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN1;
-				break;
-			case DP_TRAIN_PATTERN_2:
-				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN2;
-				break;
-			case DP_TRAIN_PATTERN_3:
-				rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN3;
-				break;
-		}
-		encoder_dig_setup(connectorIndex, pll->pixelClock, rawTrainingPattern);
-	} else {
-		TRACE("%s: Training with encoder service...\n", __func__);
-		switch (trainingPattern) {
-			case DP_TRAIN_PATTERN_1:
-				rawTrainingPattern = 0;
-				break;
-			case DP_TRAIN_PATTERN_2:
-				rawTrainingPattern = 1;
-				break;
-		}
-		dp_encoder_service(connectorIndex, ATOM_DP_ACTION_TRAINING_PATTERN_SEL,
-			dp->linkRate, rawTrainingPattern);
+	TRACE("%s: Training with encoder...\n", __func__);
+	switch (trainingPattern) {
+		case DP_TRAIN_PATTERN_1:
+			rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN1;
+			break;
+		case DP_TRAIN_PATTERN_2:
+			rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN2;
+			break;
+		case DP_TRAIN_PATTERN_3:
+			rawTrainingPattern = ATOM_ENCODER_CMD_DP_LINK_TRAINING_PATTERN3;
+			break;
 	}
+	encoder_dig_setup(connectorIndex, pll->pixelClock, rawTrainingPattern);
 
 	// Enable training pattern on the sink
 	dpcd_reg_write(connectorIndex, DP_TRAIN, trainingPattern);
@@ -839,34 +814,6 @@ dp_link_train(uint8 crtcID)
 		return B_ERROR;
 	}
 
-	int index = GetIndexIntoMasterTable(COMMAND, DPEncoderService);
-	// Table version
-	uint8 tableMajor;
-	uint8 tableMinor;
-
-	dp->trainingUseEncoder = true;
-	if (atom_parse_cmd_header(gAtomContext, index, &tableMajor, &tableMinor)
-		== B_OK) {
-		if (tableMinor > 1) {
-			// The AtomBIOS DPEncoderService greater then 1.1 can't program the
-			// training pattern properly.
-			dp->trainingUseEncoder = false;
-		}
-	}
-
-	uint32 linkEnumeration
-		= gConnector[connectorIndex]->encoder.linkEnumeration;
-
-	uint32 dpEncoderID = 0;
-	if (encoder_pick_dig(connectorIndex) > 0)
-		dpEncoderID |= ATOM_DP_CONFIG_DIG2_ENCODER;
-	else
-		dpEncoderID |= ATOM_DP_CONFIG_DIG1_ENCODER;
-	if (linkEnumeration == GRAPH_OBJECT_ENUM_ID2)
-		dpEncoderID |= ATOM_DP_CONFIG_LINK_B;
-	else
-		dpEncoderID |= ATOM_DP_CONFIG_LINK_A;
-
 	dp->trainingReadInterval
 		= dpcd_reg_read(connectorIndex, DP_TRAINING_AUX_RD_INTERVAL);
 
@@ -905,13 +852,8 @@ dp_link_train(uint8 crtcID)
 	dpcd_reg_write(connectorIndex, DP_LINK_RATE, sandbox);
 
 	// Start link training on source
-	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {
-		encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
-			ATOM_ENCODER_CMD_DP_LINK_TRAINING_START);
-	} else {
-		dp_encoder_service(connectorIndex, ATOM_DP_ACTION_TRAINING_START,
-			dp->linkRate, 0);
-	}
+	encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
+		ATOM_ENCODER_CMD_DP_LINK_TRAINING_START);
 
 	// Disable the training pattern on the sink
 	dpcd_reg_write(connectorIndex, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
@@ -926,13 +868,8 @@ dp_link_train(uint8 crtcID)
 	dpcd_reg_write(connectorIndex, DP_TRAIN, DP_TRAIN_PATTERN_DISABLED);
 
 	// Disable the training pattern on the source
-	if (info.dceMajor >= 4 || !dp->trainingUseEncoder) {
-		encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
-			ATOM_ENCODER_CMD_DP_LINK_TRAINING_COMPLETE);
-	} else {
-        dp_encoder_service(connectorIndex, ATOM_DP_ACTION_TRAINING_COMPLETE,
-			dp->linkRate, 0);
-	}
+	encoder_dig_setup(connectorIndex, mode->timing.pixel_clock,
+		ATOM_ENCODER_CMD_DP_LINK_TRAINING_COMPLETE);
 
 	return B_OK;
 }
@@ -1055,8 +992,6 @@ debug_dp_info()
 				dp->config[DP_DOWNSTREAMPORT_COUNT]
 				& DP_DOWNSTREAMPORT_COUNT_MASK);
 			ERROR(" + Training\n");
-			ERROR("   - use encoder:             %s\n",
-				dp->trainingUseEncoder ? "true" : "false");
 			ERROR("   - attempts:                %" B_PRIu8 "\n",
 				dp->trainingAttempts);
 			ERROR("   - delay:                   %d\n",

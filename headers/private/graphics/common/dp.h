@@ -28,8 +28,6 @@ typedef struct {
 	// Internal State information
 	uint8	linkStatus[DP_LINK_STATUS_SIZE];
 
-	bool    trainingUseEncoder;
-
 	uint8   trainingAttempts;
 	uint8   trainingSet[4];
 	int     trainingReadInterval;

@@ -36,6 +36,7 @@ status_t dp_aux_get_i2c_byte(uint32 connectorIndex, uint16 address,
 
 uint32 dp_get_link_rate(uint32 connectorIndex, display_mode* mode);
 uint32 dp_get_lane_count(uint32 connectorIndex, display_mode* mode);
+uint8 dp_get_sink_type(uint32 connectorIndex);
 
 void dp_setup_connectors();
 
