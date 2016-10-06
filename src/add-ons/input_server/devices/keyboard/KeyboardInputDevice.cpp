@@ -340,7 +340,7 @@ KeyboardDevice::_ControlThread()
 			if (isKeyDown)
 				states[(keycode) >> 3] |= (1 << (7 - (keycode & 0x7)));
 			else
-				states[(keycode) >> 3] &= (!(1 << (7 - (keycode & 0x7))));
+				states[(keycode) >> 3] &= (~(1 << (7 - (keycode & 0x7))));
 		}
 
 		if (isKeyDown && keycode == 0x34 // DELETE KEY
