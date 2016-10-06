@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.09.28
-#	Date:    2016-09-28 03:15:02
+#	Version: 2016.10.03
+#	Date:    2016-10-03 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10254,7 +10254,7 @@
 		144d c0e3  NVS 5200M
 		144d c0e4  NVS 5200M
 		144d c10d  GeForce 820M
-		144d c652  GeForce GT 620M
+		144d c652  GeForce GT 620M on NP300E5C series laptop
 		144d c709  GeForce 710M
 		144d c711  GeForce 710M
 		144d c736  GeForce 710M
@@ -10604,6 +10604,7 @@
 	13f8  GM204GLM [Quadro M5000M]
 	13f9  GM204GLM [Quadro M4000M]
 	13fa  GM204GLM [Quadro M3000M]
+		10de 11c9  Quadro M3000 SE
 	13fb  GM204GLM [Quadro M5500]
 	1401  GM206 [GeForce GTX 960]
 	1402  GM206 [GeForce GTX 950]
@@ -10631,6 +10632,7 @@
 	17fd  GM200GL [Tesla M40]
 	1b00  GP102 [TITAN X]
 	1b01  GP102
+	1b30  GP102GL [Quadro P6000]
 	1b70  GP102GL
 	1b78  GP102GL
 	1b80  GP104 [GeForce GTX 1080]
@@ -10639,7 +10641,7 @@
 	1b83  GP104
 	1ba0  GP104M [GeForce GTX 1080]
 	1ba1  GP104M [GeForce GTX 1070]
-	1bb0  GP104GL
+	1bb0  GP104GL [Quadro P5000]
 	1bb1  GP104GL
 	1bb4  GP104GL
 	1be0  GP104M [GeForce GTX 1080]
@@ -10654,7 +10656,7 @@
 	1c70  GP106GL
 	1c80  GP107
 	1c81  GP107
-	1c82  GP107
+	1c82  GP107 [GeForce GTX 1050 Ti]
 	1ca7  GP107GL
 	1ca8  GP107GL
 	1caa  GP107GL
@@ -10923,6 +10925,7 @@
 		1043 8505  P8 series motherboard
 		105b 0d7c  D270S/D250S Motherboard
 		10ec 8168  RTL8111/8168 PCI Express Gigabit Ethernet controller
+		144d c652  RTL8168 on a NP300E5C series laptop
 		1458 e000  Onboard Ethernet
 		1462 238c  Onboard RTL8111b on MSI P965 Platinum Mainboard
 		1462 368c  K9AG Neo2
@@ -15052,6 +15055,7 @@
 	0206  GPS180PEX GPS Receiver (PCI Express)
 	0207  GLN180PEX GPS/GLONASS receiver (PCI Express)
 	0208  GPS180AMC GPS Receiver (PCI Express / MicroTCA / AdvancedMC)
+	0209  GRC181PEX GPS/GLONASS/BEIDOU receiver (PCI Express)
 	0301  TCR510PCI IRIG Timecode Reader
 	0302  TCR167PCI IRIG Timecode Reader
 	0303  TCR511PCI IRIG Timecode Reader
@@ -18242,6 +18246,7 @@
 	7181  Proc10a_27S
 	7191  Proc10a_48S
 	71a1  Proc10a_66S
+	71b1  Proc10A
 165d  Hsing Tech. Enterprise Co., Ltd.
 165f  Linux Media Labs, LLC
 	1020  LMLM4 MPEG-4 encoder
@@ -18488,6 +18493,7 @@
 		1028 0208  Wireless 1506 WLAN Half Mini-Card
 		103c 1838  AR9485/HB125 802.11bgn 1×1 Wi-Fi Adapter
 		105b e044  Unex DHXA-225
+		144d 410e  AR9485WB-EG 802.11b/g/n mini-PCIe card on a series 3 laptop
 		1a3b 1186  AW-NE186H
 	0033  AR958x 802.11abgn Wireless Network Adapter
 		168c a120  AR9582 802.11a/n WLAN Mini-PCIe Adapter
@@ -20116,6 +20122,8 @@
 1bd4  Inspur Electronic Information Industry Co., Ltd.
 1bee  IXXAT Automation GmbH
 	0003  CAN-IB200/PCIe
+1bef  Lantiq
+	0011  MIPS SoC PCI Express Port
 1bf4  VTI Instruments Corporation
 	0001  SentinelEX
 1bfd  EeeTOP
@@ -21033,6 +21041,7 @@
 	0101  Xeon E3-1200/2nd Generation Core Processor Family PCI Express Root Port
 		1028 04b2  Vostro 3350
 		106b 00dc  MacBookPro8,2 [Core i7, 15", 2011]
+		144d c652  NP300E5C series laptop
 	0102  2nd Generation Core Processor Family Integrated Graphics Controller
 		1028 04aa  XPS 8300
 		1043 0102  P8H67 Series Motherboard
@@ -21041,6 +21050,7 @@
 		1028 04b2  Vostro 3350
 		1028 04da  Vostro 3750
 		106b 00dc  MacBookPro8,2 [Core i7, 15", 2011]
+		144d c652  NP300E5C series laptop
 	0105  Xeon E3-1200/2nd Generation Core Processor Family PCI Express Root Port
 		106b 00dc  MacBookPro8,2 [Core i7, 15", 2011]
 	0106  2nd Generation Core Processor Family Integrated Graphics Controller
@@ -21054,6 +21064,7 @@
 	0112  2nd Generation Core Processor Family Integrated Graphics Controller
 	0116  2nd Generation Core Processor Family Integrated Graphics Controller
 		1028 04da  Vostro 3750
+		144d c652  integrated HD 3000 graphics controller on NP300E5C series laptop
 	0122  2nd Generation Core Processor Family Integrated Graphics Controller
 	0126  2nd Generation Core Processor Family Integrated Graphics Controller
 		1028 04cc  Vostro 3350
@@ -22683,6 +22694,8 @@
 	1563  Ethernet Controller 10G X550T
 		1028 1fa8  Ethernet 10G 4P X550/I350 rNDC
 		1028 1fa9  Ethernet 10G 4P X550 rNDC
+		1590 00d1  Ethernet 10Gb 2-port 562T Adapter
+		1590 00d2  Ethernet 10Gb 2-port 562FLR-T Adapter
 		8086 0001  Ethernet Converged Network Adapter X550-T2
 		8086 001a  Ethernet Converged Network Adapter X550-T2
 		8086 0022  Ethernet Converged Network Adapter X550-T2
@@ -23137,6 +23150,7 @@
 	1d76  C600/X79 series chipset Multi-Function Glue
 	1e00  7 Series/C210 Series Chipset Family 4-port SATA Controller [IDE mode]
 	1e01  7 Series Chipset Family 4-port SATA Controller [IDE mode]
+		144d c652  NP300E5C series laptop
 	1e02  7 Series/C210 Series Chipset Family 6-port SATA Controller [AHCI mode]
 		1043 84ca  P8 series motherboard
 		1849 1e02  Motherboard
@@ -23144,18 +23158,21 @@
 		1043 108d  VivoBook X202EV
 		1043 1477  N56VZ
 		1043 1517  Zenbook Prime UX31A
+		144d c652  NP300E5C series laptop
 	1e04  7 Series/C210 Series Chipset Family SATA Controller [RAID mode]
 	1e05  7 Series Chipset SATA Controller [RAID mode]
 	1e06  7 Series/C210 Series Chipset Family SATA Controller [RAID mode]
 	1e07  7 Series Chipset Family SATA Controller [RAID mode]
 	1e08  7 Series/C210 Series Chipset Family 2-port SATA Controller [IDE mode]
 	1e09  7 Series Chipset Family 2-port SATA Controller [IDE mode]
+		144d c652  NP300E5C series laptop
 	1e0e  7 Series/C210 Series Chipset Family SATA Controller [RAID mode]
 	1e10  7 Series/C210 Series Chipset Family PCI Express Root Port 1
 		1043 108d  VivoBook X202EV
 		1043 1477  N56VZ
 		1043 1517  Zenbook Prime UX31A
 		1043 84ca  P8H77-I Motherboard
+		144d c652  NP300E5C series laptop
 		1849 1e10  Motherboard
 	1e12  7 Series/C210 Series Chipset Family PCI Express Root Port 2
 		1043 108d  VivoBook X202EV
@@ -23165,6 +23182,7 @@
 	1e16  7 Series/C210 Series Chipset Family PCI Express Root Port 4
 		1043 108d  VivoBook X202EV
 		1043 1477  N56VZ
+		144d c652  NP300E5C series laptop
 		1849 1618  Z77 Extreme4 motherboard
 	1e18  7 Series/C210 Series Chipset Family PCI Express Root Port 5
 		1043 84ca  P8H77-I Motherboard
@@ -23181,12 +23199,14 @@
 		1043 1517  Zenbook Prime UX31A
 		1043 8415  P8H77-I Motherboard
 		1043 8445  ASUS P8Z77-V LX Motherboard
+		144d c652  NP300E5C series laptop
 		1849 1898  Z77 Extreme4 motherboard
 	1e22  7 Series/C210 Series Chipset Family SMBus Controller
 		1043 108d  VivoBook X202EV
 		1043 1477  N56VZ
 		1043 1517  Zenbook Prime UX31A
 		1043 84ca  P8 series motherboard
+		144d c652  NP300E5C series laptop
 		1849 1e22  Motherboard
 	1e24  7 Series/C210 Series Chipset Family Thermal Management Controller
 		1043 1517  Zenbook Prime UX31A
@@ -23196,12 +23216,14 @@
 		1043 1477  N56VZ
 		1043 1517  Zenbook Prime UX31A
 		1043 84ca  P8 series motherboard
+		144d c652  NP300E5C series laptop
 		1849 1e26  Motherboard
 	1e2d  7 Series/C210 Series Chipset Family USB Enhanced Host Controller #2
 		1043 108d  VivoBook X202EV
 		1043 1477  N56VZ
 		1043 1517  Zenbook Prime UX31A
 		1043 84ca  P8 series motherboard
+		144d c652  NP300E5C series laptop
 		1849 1e2d  Motherboard
 	1e31  7 Series/C210 Series Chipset Family USB xHCI Host Controller
 		103c 17ab  ProBook 6570b
@@ -23216,6 +23238,7 @@
 		1043 1477  N56VZ
 		1043 1517  Zenbook Prime UX31A
 		1043 84ca  P8 series motherboard
+		144d c652  NP300E5C series laptop
 		1849 1e3a  Motherboard
 	1e3b  7 Series/C210 Series Chipset Family MEI Controller #2
 	1e3c  7 Series/C210 Series Chipset Family IDE-r Controller
@@ -23254,6 +23277,7 @@
 	1e5b  UM77 Express Chipset LPC Controller
 	1e5c  7 Series Chipset Family LPC Controller
 	1e5d  HM75 Express Chipset LPC Controller
+		144d c652  NP300E5C series laptop
 	1e5e  7 Series Chipset Family LPC Controller
 		1043 108d  VivoBook X202EV
 	1e5f  7 Series Chipset Family LPC Controller
