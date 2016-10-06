@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2016.09.28
-# Date:    2016-09-28 20:34:05
+# Version: 2016.09.29
+# Date:    2016-09-29 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -13611,7 +13611,6 @@
 0e8c  Well Force Electronic Co., Ltd
 0e8d  MediaTek Inc.
 	0003  MT6227 phone
-		0e8d 0003  M26 - BT Smart Watch for Android Phones
 	0004  MT6227 phone
 	0023  S103
 	00a5  GSM modem [Medion Surfstick Model:S4222]
