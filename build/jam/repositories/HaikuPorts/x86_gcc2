@@ -19,6 +19,8 @@ RemotePackageRepository HaikuPorts
 	gws-0.1.8-1
 	haikuporter-1.1.1-1
 	hub-1.12.4-2
+	noto-20160613-1
+	noto_chroscore-20160613-1
 	noto_sans-1.00-1
 	noto_serif-1.00-1
 	openttd_gfx-0.4.7-1
