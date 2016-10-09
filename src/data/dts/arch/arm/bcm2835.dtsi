@@ -144,7 +144,7 @@
 			#gpio-cells = <2>;
 
 			interrupt-controller;
-			#interrupt-cells = <1>;
+			#interrupt-cells = <2>;
 
 			pinctrl-names = "default";
 			pinctrl-0 = <&pins_reserved>;
@@ -396,6 +396,14 @@
 			};
 		};
 
+		rng {
+			compatible = "broadcom,bcm2835-rng",
+				     "broadcom,bcm2708-rng";
+			reg = <0x104000 0x20>;
+			interrupts = <69>;
+			interrupt-parent = <&intc>;
+		};
+
 		bsc0 {
 			#address-cells = <1>;
 			#size-cells = <0>;
@@ -474,11 +482,12 @@
 			reg-shift = <2>;
 		};
 
-		vchiq {
+		vchiq: vchiq {
 			compatible = "broadcom,bcm2835-vchiq";
 			reg = <0xB800 0x50>;
 			interrupts = <2>;
 			interrupt-parent = <&intc>;
+			cache-line-size = <32>;
 		};
 
 		usb {
