@@ -559,8 +559,8 @@ PrimaryPartition::GetPartitionDescriptor(partition_descriptor* descriptor) const
 		descriptor->size = Size() / BlockSize();
 		descriptor->type = Type();
 		descriptor->active = Active() ? 0x80 : 0x00;
-		descriptor->begin.Unset();
-		descriptor->end.Unset();
+		descriptor->begin.SetUnused();
+		descriptor->end.SetUnused();
 	}
 }
 
@@ -713,8 +713,8 @@ LogicalPartition::GetPartitionDescriptor(partition_descriptor* descriptor,
 
 	descriptor->size = Size() / BlockSize();
 	descriptor->active = 0x00;
-	descriptor->begin.Unset();
-	descriptor->end.Unset();
+	descriptor->begin.SetUnused();
+	descriptor->end.SetUnused();
 }
 
 

@@ -52,11 +52,15 @@ is_extended_type(uint8 type)
 void get_partition_type_string(uint8 type, char* buffer);
 
 // chs
-// NOTE: The CHS cannot express locations within larger disks and is therefor
-// mostly obsolete.
+// NOTE: The CHS cannot express locations within larger disks (more than 8GB),
+// and is therefore obsolete.
+// However, some BIOSes still rely on it being 0 for unused partition, and some
+// other value for valid records. Usually they are filled with 0xFF, which is
+// an invalid CHS value, to notify the BIOS that LBA should be used instead.
 struct chs {
 	uint8	cylinder;
 	uint16	head_sector;	// head[15:10], sector[9:0]
+	void SetUnused() { cylinder = 0xFF; head_sector = 0xFFFF; }
 	void Unset() { cylinder = 0; head_sector = 0; }
 } _PACKED;
 
