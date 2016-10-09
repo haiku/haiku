@@ -10,8 +10,8 @@ BootstrapPackageRepository HaikuPortsCross
 	gcc_bootstrap_syslibs_devel-5.4.0_2016_06_04-1
 	:
 	# repository architecture packages (stage 1)
-	bash_bootstrap-4.3.30-1
-	binutils_bootstrap-2.26.0_2016_02_29-1
+	bash_bootstrap-4.3.42-1
+	binutils_bootstrap-2.26.1_2016_02_29-1
 	bison_bootstrap-2.4.3-1
 	coreutils_bootstrap-8.22-1
 	curl_bootstrap-7.40.0-1

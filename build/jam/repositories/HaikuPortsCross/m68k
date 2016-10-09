@@ -10,7 +10,7 @@ BootstrapPackageRepository HaikuPortsCross
 	gcc_bootstrap_syslibs_devel-5.4.0_2016_06_04-1
 	:
 	# repository architecture packages (stage 1)
-	binutils_bootstrap-2.26.0_2016_02_29-1
+	binutils_bootstrap-2.26.1_2016_02_29-1
 	zlib_bootstrap-1.2.8-2
 	zlib_bootstrap_devel-1.2.8-2
 	:

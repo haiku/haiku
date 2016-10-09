@@ -15,10 +15,12 @@ BootstrapPackageRepository HaikuPortsCross
 	}@ # secondary_x86_gcc2
 	:
 	# repository architecture packages (stage 1)
-	bash_bootstrap-4.3.30-1
-	binutils_bootstrap-2.26.0_2016_02_29-1
+	bash_bootstrap-4.3.42-1
+	binutils_bootstrap-2.26.1_2016_02_29-1
 	bison_bootstrap-2.4.3-1
 	coreutils_bootstrap-8.22-1
+	curl_bootstrap-7.40.0-1
+	curl_bootstrap_devel-7.40.0-1
 	expat_bootstrap-2.1.0-1
 	expat_bootstrap_devel-2.1.0-1
 	findutils_bootstrap-4.4.2-1
@@ -29,6 +31,7 @@ BootstrapPackageRepository HaikuPortsCross
 	grep_bootstrap-2.14-1
 	icu_bootstrap-54.1-1
 	icu_bootstrap_devel-54.1-1
+	less_bootstrap-451-1
 	m4_bootstrap-1.4.16-1
 	make_bootstrap-3.82-1
 	ncurses6_bootstrap-6.0-1
@@ -67,6 +70,7 @@ BootstrapPackageRepository HaikuPortsCross
 	binutils_bootstrap
 	bison_bootstrap
 	coreutils_bootstrap
+	curl_bootstrap
 	expat_bootstrap
 	findutils_bootstrap
 	flex_bootstrap
@@ -74,6 +78,7 @@ BootstrapPackageRepository HaikuPortsCross
 	gawk_bootstrap
 	gcc_bootstrap
 	grep_bootstrap
+	less_bootstrap
 	libsolv_bootstrap
 	m4_bootstrap
 	make_bootstrap
