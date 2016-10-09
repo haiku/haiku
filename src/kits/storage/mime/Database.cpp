@@ -477,10 +477,10 @@ Database::SetIconForType(const char *type, const char *fileType,
 	} else if (!err) {
 		if (fileType) {
 			_SendMonitorUpdate(B_ICON_FOR_TYPE_CHANGED, type, fileType,
-				(which == B_LARGE_ICON), B_META_MIME_MODIFIED);
+				which == B_LARGE_ICON, B_META_MIME_MODIFIED);
 		} else {
 			_SendMonitorUpdate(B_ICON_CHANGED, type,
-				(which == B_LARGE_ICON), B_META_MIME_MODIFIED);
+				which == B_LARGE_ICON, B_META_MIME_MODIFIED);
 		}
 	}
 	return err;
@@ -1115,7 +1115,7 @@ Database::DeleteIcon(const char *type, icon_size which)
 	const char *attr = which == B_MINI_ICON ? kMiniIconAttr : kLargeIconAttr;
 	status_t status = fLocation->DeleteAttribute(type, attr);
 	if (status == B_OK) {
-		_SendMonitorUpdate(B_ICON_CHANGED, type, (which == B_LARGE_ICON),
+		_SendMonitorUpdate(B_ICON_CHANGED, type, which == B_LARGE_ICON,
 			B_META_MIME_DELETED);
 	} else if (status == B_ENTRY_NOT_FOUND)
 		status = B_OK;
