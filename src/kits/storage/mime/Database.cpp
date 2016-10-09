@@ -1114,9 +1114,10 @@ Database::DeleteIcon(const char *type, icon_size which)
 {
 	const char *attr = which == B_MINI_ICON ? kMiniIconAttr : kLargeIconAttr;
 	status_t status = fLocation->DeleteAttribute(type, attr);
-	if (status == B_OK)
-		_SendMonitorUpdate(B_ICON_CHANGED, type, which, B_META_MIME_DELETED);
-	else if (status == B_ENTRY_NOT_FOUND)
+	if (status == B_OK) {
+		_SendMonitorUpdate(B_ICON_CHANGED, type, (which == B_LARGE_ICON),
+			B_META_MIME_DELETED);
+	} else if (status == B_ENTRY_NOT_FOUND)
 		status = B_OK;
 
 	return status;
@@ -1135,10 +1136,11 @@ Database::DeleteIcon(const char *type, icon_size which)
 status_t
 Database::DeleteIcon(const char *type)
 {
-	// TODO: extra notification for vector icon (uses B_LARGE_ICON now)
+	// TODO: extra notification for vector icon (for now we notify a "large"
+	// icon)
 	status_t status = fLocation->DeleteAttribute(type, kIconAttr);
 	if (status == B_OK) {
-		_SendMonitorUpdate(B_ICON_CHANGED, type, B_LARGE_ICON,
+		_SendMonitorUpdate(B_ICON_CHANGED, type, true,
 						   B_META_MIME_DELETED);
 	} else if (status == B_ENTRY_NOT_FOUND)
 		status = B_OK;
