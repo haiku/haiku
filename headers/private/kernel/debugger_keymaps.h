@@ -10,6 +10,11 @@
 #ifndef DEBUGGER_KEYMAPS_H
 #define DEBUGGER_KEYMAPS_H
 
+#define KDL_KEYMAP_DV 1
+#define KDL_KEYMAP_FR 2
+#define KDL_KEYMAP_IT 3
+#define KDL_KEYMAP_SG 4
+#define KDL_KEYMAP_US 5
 
 #include "kernel_debugger_config.h"
 
@@ -155,7 +160,6 @@ static const char kAltedKeymap[128] = {
 
 #else // default US keymap
 
-#error "use default keymap"
 static const char kUnshiftedKeymap[128] = {
 	0, 27, '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '=', 8, '\t',
 	'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\n', 0, 'a', 's',
