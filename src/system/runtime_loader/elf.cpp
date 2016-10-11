@@ -257,8 +257,20 @@ init_dependencies(image_t *image, bool initHead)
 
 		TRACE(("%ld:  init: %s\n", find_thread(NULL), image->name));
 
+		if (image->preinit_array) {
+			uint count_preinit = image->preinit_array_len / sizeof(addr_t);
+			for (uint j = 0; j < count_preinit; j++)
+				((init_term_function)image->preinit_array[j])(image->id);
+		}
+
 		if (image->init_routine != 0)
 			((init_term_function)image->init_routine)(image->id);
+
+		if (image->init_array) {
+			uint count_init = image->init_array_len / sizeof(addr_t);
+			for (uint j = 0; j < count_init; j++)
+				((init_term_function)image->init_array[j])(image->id);
+		}
 
 		image_event(image, IMAGE_EVENT_INITIALIZED);
 	}
@@ -632,6 +644,12 @@ unload_library(void* handle, image_id imageID, bool addOn)
 			}
 
 			image_event(image, IMAGE_EVENT_UNINITIALIZING);
+
+			if (image->term_array) {
+				uint count_term = image->term_array_len / sizeof(addr_t);
+				for (uint i = count_term; i-- > 0;)
+					((init_term_function)image->term_array[i])(image->id);
+			}
 
 			if (image->term_routine)
 				((init_term_function)image->term_routine)(image->id);
@@ -1016,6 +1034,12 @@ terminate_program(void)
 		TRACE(("%ld:  term: %s\n", find_thread(NULL), image->name));
 
 		image_event(image, IMAGE_EVENT_UNINITIALIZING);
+
+		if (image->term_array) {
+			uint count_term = image->term_array_len / sizeof(addr_t);
+			for (uint j = count_term; j-- > 0;)
+				((init_term_function)image->term_array[j])(image->id);
+		}
 
 		if (image->term_routine)
 			((init_term_function)image->term_routine)(image->id);

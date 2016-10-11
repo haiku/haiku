@@ -115,6 +115,12 @@ typedef struct image_t {
 	int					rela_len;
 	elf_rel				*pltrel;
 	int					pltrel_len;
+	addr_t				*init_array;
+	int					init_array_len;
+	addr_t				*preinit_array;
+	int					preinit_array_len;
+	addr_t				*term_array;
+	int					term_array_len;
 
 	unsigned			dso_tls_id;
 
