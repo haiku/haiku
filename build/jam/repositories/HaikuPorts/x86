@@ -11,9 +11,13 @@ RemotePackageRepository HaikuPorts
 	docbook_xml_dtd-4.5-2
 	docbook_xsl_stylesheets-1.78.1-1
 	fontawesome-4.6.3-1
-	noto-20160613-3
-	noto_chroscore-20160613-3
-	noto_regional-20160613-3
+	noto-20160613-4
+	noto_chroscore-20160613-4
+	noto_regional-20160613-4
+	noto_sans_cjk_kr-1.004-2
+	noto_sans_cjk_jp-1.004-2
+	noto_sans_cjk_sc-1.004-2
+	noto_sans_cjk_tc-1.004-2
 	texi2html-1.82-2
 	timgmsoundfont-fixed-5
 	unknown_horizons-2014.1-1
