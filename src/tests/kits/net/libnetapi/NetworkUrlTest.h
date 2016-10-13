@@ -28,11 +28,23 @@ public:
 			void				TestHostWithNoPortNoPath();
 			void				TestHostWithPortNoPath();
 			void				TestHostWithEmptyPort();
+			void				TestHostWithPathAndFragment();
+			void				TestHostWithFragment();
+			void				TestIpv6HostPortPathAndRequest();
+			void				TestProtocol();
+			void				TestMailTo();
+			void				TestDataUrl();
+
+			void				TestAuthorityNoUserName();
+			void				TestAuthorityWithCredentialsSeparatorNoPassword();
+			void				TestAuthorityWithoutCredentialsSeparatorNoPassword();
+			void				TestAuthorityBadPort();
 
 			void				TestWhitespaceBefore();
 			void				TestWhitespaceAfter();
 			void				TestWhitespaceMiddle();
 			void				TestHttpNoHost();
+			void				TestEmpty();
 
 	static	void				AddTests(BTestSuite& suite);
 

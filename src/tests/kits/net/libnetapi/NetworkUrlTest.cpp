@@ -64,6 +64,63 @@ void NetworkUrlTest::TestValidFullUrl()
 }
 
 
+void NetworkUrlTest::TestHostWithPathAndFragment()
+{
+	BUrl url("http://1.2.3.4/some/path#frag/ment");
+	CPPUNIT_ASSERT(url.IsValid());
+	CPPUNIT_ASSERT(url.Protocol() == "http");
+	CPPUNIT_ASSERT(url.HasProtocol());
+	CPPUNIT_ASSERT(!url.HasUserName());
+	CPPUNIT_ASSERT(!url.HasPassword());
+	CPPUNIT_ASSERT(url.Host() == "1.2.3.4");
+	CPPUNIT_ASSERT(url.HasHost());
+	CPPUNIT_ASSERT(!url.HasPort());
+	CPPUNIT_ASSERT(url.Path() == "/some/path");
+	CPPUNIT_ASSERT(url.HasPath());
+	CPPUNIT_ASSERT(!url.HasRequest());
+	CPPUNIT_ASSERT(url.Fragment() == "frag/ment");
+	CPPUNIT_ASSERT(url.HasFragment());
+}
+
+
+void NetworkUrlTest::TestHostWithFragment()
+{
+	BUrl url("http://1.2.3.4#frag/ment");
+	CPPUNIT_ASSERT(url.IsValid());
+	CPPUNIT_ASSERT(url.Protocol() == "http");
+	CPPUNIT_ASSERT(url.HasProtocol());
+	CPPUNIT_ASSERT(!url.HasUserName());
+	CPPUNIT_ASSERT(!url.HasPassword());
+	CPPUNIT_ASSERT(url.Host() == "1.2.3.4");
+	CPPUNIT_ASSERT(url.HasHost());
+	CPPUNIT_ASSERT(!url.HasPort());
+	CPPUNIT_ASSERT(url.HasPath()); // see Url.cpp - evidently an empty path is still a path?
+	CPPUNIT_ASSERT(!url.HasRequest());
+	CPPUNIT_ASSERT(url.Fragment() == "frag/ment");
+	CPPUNIT_ASSERT(url.HasFragment());
+}
+
+
+void NetworkUrlTest::TestIpv6HostPortPathAndRequest()
+{
+	BUrl url("http://[123:123:0:123::123]:8080/some/path?key1=value1");
+	CPPUNIT_ASSERT(url.IsValid());
+	CPPUNIT_ASSERT(url.Protocol() == "http");
+	CPPUNIT_ASSERT(url.HasProtocol());
+	CPPUNIT_ASSERT(!url.HasUserName());
+	CPPUNIT_ASSERT(!url.HasPassword());
+	CPPUNIT_ASSERT(url.Host() == "[123:123:0:123::123]");
+	CPPUNIT_ASSERT(url.HasHost());
+	CPPUNIT_ASSERT(url.Port() == 8080);
+	CPPUNIT_ASSERT(url.HasPort());
+	CPPUNIT_ASSERT(url.Path() == "/some/path");
+	CPPUNIT_ASSERT(url.HasPath());
+	CPPUNIT_ASSERT(url.Request() == "key1=value1");
+	CPPUNIT_ASSERT(url.HasRequest());
+	CPPUNIT_ASSERT(!url.HasFragment());
+}
+
+
 void NetworkUrlTest::TestFileUrl()
 {
 	BUrl url("file:///northisland/wellington/brooklyn/windturbine");
@@ -77,6 +134,21 @@ void NetworkUrlTest::TestFileUrl()
 	CPPUNIT_ASSERT(!url.HasPort());
 	CPPUNIT_ASSERT(url.Path() == "/northisland/wellington/brooklyn/windturbine");
 	CPPUNIT_ASSERT(url.HasPath());
+	CPPUNIT_ASSERT(!url.HasRequest());
+	CPPUNIT_ASSERT(!url.HasFragment());
+}
+
+
+void NetworkUrlTest::TestDataUrl()
+{
+	BUrl url("data:image/png;base64,iVBORw0KGI12P4//8/w38GIErkJggg==");
+	CPPUNIT_ASSERT(url.IsValid());
+	CPPUNIT_ASSERT(url.Protocol() == "data");
+	CPPUNIT_ASSERT(!url.HasUserName());
+	CPPUNIT_ASSERT(!url.HasPassword());
+	CPPUNIT_ASSERT(!url.HasHost());
+	CPPUNIT_ASSERT(url.HasPath());
+	CPPUNIT_ASSERT(url.Path() == "image/png;base64,iVBORw0KGI12P4//8/w38GIErkJggg==");
 	CPPUNIT_ASSERT(!url.HasRequest());
 	CPPUNIT_ASSERT(!url.HasFragment());
 }
@@ -96,7 +168,7 @@ void NetworkUrlTest::TestWithUserNameAndPasswordNoHostAndPort()
 	CPPUNIT_ASSERT(url.Password() == "tree");
 	CPPUNIT_ASSERT(url.HasPassword());
 	CPPUNIT_ASSERT(url.Host() == "");
-	CPPUNIT_ASSERT(!url.HasHost());
+	CPPUNIT_ASSERT(url.HasHost()); // any authority means there "is a host" - see SetAuthority comment.
 	CPPUNIT_ASSERT(!url.HasPort());
 	CPPUNIT_ASSERT(url.Path() == "/x");
 	CPPUNIT_ASSERT(url.HasPath());
@@ -194,6 +266,93 @@ void NetworkUrlTest::TestHostWithEmptyPort()
 }
 
 
+void NetworkUrlTest::TestProtocol()
+{
+	BUrl url("olala:");
+	CPPUNIT_ASSERT(url.IsValid());
+	CPPUNIT_ASSERT(url.Protocol() == "olala");
+	CPPUNIT_ASSERT(url.HasProtocol());
+	CPPUNIT_ASSERT(!url.HasUserName());
+	CPPUNIT_ASSERT(!url.HasPassword());
+	CPPUNIT_ASSERT(!url.HasHost());
+	CPPUNIT_ASSERT(!url.HasPort());
+	CPPUNIT_ASSERT(!url.HasPath());
+	CPPUNIT_ASSERT(!url.HasRequest());
+	CPPUNIT_ASSERT(!url.HasFragment());
+}
+
+
+void NetworkUrlTest::TestMailTo()
+{
+	BUrl url("mailto:eric@example.com");
+	CPPUNIT_ASSERT(url.IsValid());
+	CPPUNIT_ASSERT(url.Protocol() == "mailto");
+	CPPUNIT_ASSERT(url.HasProtocol());
+	CPPUNIT_ASSERT(!url.HasUserName());
+	CPPUNIT_ASSERT(!url.HasPassword());
+	CPPUNIT_ASSERT(!url.HasHost());
+	CPPUNIT_ASSERT(!url.HasPort());
+	CPPUNIT_ASSERT(url.Path() == "eric@example.com");
+	CPPUNIT_ASSERT(url.HasPath());
+	CPPUNIT_ASSERT(!url.HasRequest());
+	CPPUNIT_ASSERT(!url.HasFragment());
+}
+
+
+// Various Authority Checks ----------------------------------------------------
+
+
+void NetworkUrlTest::TestAuthorityNoUserName()
+{
+	BUrl url("anything://:pwd@host");
+	CPPUNIT_ASSERT(url.IsValid());
+	CPPUNIT_ASSERT(!url.HasUserName());
+	CPPUNIT_ASSERT(url.HasPassword());
+	CPPUNIT_ASSERT(url.Password() == "pwd");
+	CPPUNIT_ASSERT(url.HasHost());
+	CPPUNIT_ASSERT(url.Host() == "host");
+	CPPUNIT_ASSERT(!url.HasPort());
+}
+
+
+void NetworkUrlTest::TestAuthorityWithCredentialsSeparatorNoPassword()
+{
+	BUrl url("anything://unam:@host");
+	CPPUNIT_ASSERT(url.IsValid());
+	CPPUNIT_ASSERT(url.HasUserName());
+	CPPUNIT_ASSERT(url.UserName() == "unam");
+	CPPUNIT_ASSERT(!url.HasPassword());
+	CPPUNIT_ASSERT(url.HasHost());
+	CPPUNIT_ASSERT(url.Host() == "host");
+	CPPUNIT_ASSERT(!url.HasPort());
+}
+
+
+void NetworkUrlTest::TestAuthorityWithoutCredentialsSeparatorNoPassword()
+{
+	BUrl url("anything://unam@host");
+	CPPUNIT_ASSERT(url.IsValid());
+	CPPUNIT_ASSERT(url.HasUserName());
+	CPPUNIT_ASSERT(url.UserName() == "unam");
+	CPPUNIT_ASSERT(!url.HasPassword());
+	CPPUNIT_ASSERT(url.HasHost());
+	CPPUNIT_ASSERT(url.Host() == "host");
+	CPPUNIT_ASSERT(!url.HasPort());
+}
+
+
+void NetworkUrlTest::TestAuthorityBadPort()
+{
+	BUrl url("anything://host:aaa");
+	CPPUNIT_ASSERT(url.IsValid());
+	CPPUNIT_ASSERT(!url.HasUserName());
+	CPPUNIT_ASSERT(!url.HasPassword());
+	CPPUNIT_ASSERT(url.HasHost());
+	CPPUNIT_ASSERT(url.Host() == "host");
+	CPPUNIT_ASSERT(!url.HasPort());
+}
+
+
 // Invalid Forms ---------------------------------------------------------------
 
 
@@ -225,6 +384,13 @@ void NetworkUrlTest::TestHttpNoHost()
 }
 
 
+void NetworkUrlTest::TestEmpty()
+{
+	BUrl url("");
+	CPPUNIT_ASSERT(!url.IsValid());
+}
+
+
 // Control ---------------------------------------------------------------------
 
 
@@ -245,12 +411,43 @@ NetworkUrlTest::AddTests(BTestSuite& parent)
 	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
 		"NetworkUrlTest::TestHostWithNoPortNoPath",
 		&NetworkUrlTest::TestHostWithNoPortNoPath));
-    suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
-        "NetworkUrlTest::TestHostWithPortNoPath",
-        &NetworkUrlTest::TestHostWithPortNoPath));
 	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
-        "NetworkUrlTest::TestHostWithEmptyPort",
-        &NetworkUrlTest::TestHostWithEmptyPort));
+		"NetworkUrlTest::TestHostWithPortNoPath",
+		&NetworkUrlTest::TestHostWithPortNoPath));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+		"NetworkUrlTest::TestHostWithEmptyPort",
+		&NetworkUrlTest::TestHostWithEmptyPort));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+		"NetworkUrlTest::TestHostWithPathAndFragment",
+		&NetworkUrlTest::TestHostWithPathAndFragment));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+		"NetworkUrlTest::TestHostWithFragment",
+		&NetworkUrlTest::TestHostWithFragment));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+		"NetworkUrlTest::TestIpv6HostPortPathAndRequest",
+		&NetworkUrlTest::TestIpv6HostPortPathAndRequest));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+		"NetworkUrlTest::TestProtocol",
+		&NetworkUrlTest::TestProtocol));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+		"NetworkUrlTest::TestMailTo",
+		&NetworkUrlTest::TestMailTo));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+		"NetworkUrlTest::TestDataUrl",
+		&NetworkUrlTest::TestDataUrl));
+
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+		"NetworkUrlTest::TestAuthorityNoUserName",
+		&NetworkUrlTest::TestAuthorityNoUserName));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+        "NetworkUrlTest::TestAuthorityWithCredentialsSeparatorNoPassword",
+        &NetworkUrlTest::TestAuthorityWithCredentialsSeparatorNoPassword));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+        "NetworkUrlTest::TestAuthorityWithoutCredentialsSeparatorNoPassword",
+        &NetworkUrlTest::TestAuthorityWithoutCredentialsSeparatorNoPassword));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+        "NetworkUrlTest::TestAuthorityBadPort",
+        &NetworkUrlTest::TestAuthorityBadPort));
 
 	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
 		"NetworkUrlTest::TestWhitespaceBefore",
@@ -261,6 +458,9 @@ NetworkUrlTest::AddTests(BTestSuite& parent)
 	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
 		"NetworkUrlTest::TestWhitespaceMiddle",
 		&NetworkUrlTest::TestWhitespaceMiddle));
+	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
+		"NetworkUrlTest::TestEmpty",
+		&NetworkUrlTest::TestEmpty));
 
 	suite.addTest(new CppUnit::TestCaller<NetworkUrlTest>(
 		"NetworkUrlTest::TestFileUrl",

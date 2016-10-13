@@ -21,7 +21,6 @@
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	#include <ICUWrapper.h>
 #endif
-#include <RegExp.h>
 
 #ifdef HAIKU_TARGET_PLATFORM_HAIKU
 	#include <unicode/idna.h>
@@ -506,11 +505,17 @@ BUrl::IsValid() const
 	if (!fHasProtocol)
 		return false;
 
-	if (fProtocol == "http" || fProtocol == "https" || fProtocol == "ftp")
-		return fHasHost;
+	if (fProtocol == "http" || fProtocol == "https" || fProtocol == "ftp"
+		|| fProtocol == "ipp" || fProtocol == "afp" || fProtocol == "telnet"
+		|| fProtocol == "gopher" || fProtocol == "nntp" || fProtocol == "sftp"
+		|| fProtocol == "finger" || fProtocol == "pop" || fProtocol == "imap") {
+		return fHasHost && !fHost.IsEmpty();
+	}
 
-	// TODO: Implement for real!
-	return fHasHost || fHasPath;
+	if (fProtocol == "file")
+		return fHasPath;
+
+	return true;
 }
 
 
@@ -909,75 +914,194 @@ BUrl::_ContainsDelimiter(const BString& url)
 }
 
 
-void
+enum explode_url_parse_state {
+	EXPLODE_PROTOCOL,
+	EXPLODE_PROTOCOLTERMINATOR,
+	EXPLODE_AUTHORITYORPATH,
+	EXPLODE_AUTHORITY,
+	EXPLODE_PATH,
+	EXPLODE_REQUEST, // query
+	EXPLODE_FRAGMENT,
+	EXPLODE_ERROR,
+	EXPLODE_COMPLETE
+};
+
+
+typedef bool (*explode_char_match_fn)(char c);
+
+
+static bool
+explode_is_protocol_char(char c)
+{
+	return isalnum(c) || c == '+' || c == '.' || c == '-';
+}
+
+
+static bool
+explode_is_authority_char(char c)
+{
+	return !(c == '/' || c == '?' || c == '#');
+}
+
+
+static bool
+explode_is_path_char(char c)
+{
+	return !(c == '#' || c == '?');
+}
+
+
+static bool
+explode_is_request_char(char c)
+{
+	return c != '#';
+}
+
+
+static int32
+char_offset_until_fn_false(const char* url, int32 len, int32 offset,
+	explode_char_match_fn fn)
+{
+	while (offset < len && fn(url[offset]))
+		offset++;
+
+	return offset;
+}
+
+/*
+ * This function takes a URL in string-form and parses the components of the URL out.
+ */
+status_t
 BUrl::_ExplodeUrlString(const BString& url)
 {
-	// The regexp is provided in RFC3986 (URI generic syntax), Appendix B
-	static RegExp urlMatcher(
-		"^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?");
-
 	_ResetFields();
 
 	// RFC3986, Appendix C; the URL should not contain whitespace or delimiters
 	// by this point.
+
 	if (_ContainsDelimiter(url))
-		return; // TODO error handing
+		return B_BAD_VALUE;
 
-	RegExp::MatchResult match = urlMatcher.Match(url.String());
+	explode_url_parse_state state = EXPLODE_PROTOCOL;
+	int32 offset = 0;
+	int32 length = url.Length();
+	const char *url_c = url.String();
 
-	if (!match.HasMatched())
-		return; // TODO error reporting
+	// The regexp is provided in RFC3986 (URI generic syntax), Appendix B
+	// ^(([^:/?#]+):)?(//([^/?#]*))?([^?#]*)(\\?([^#]*))?(#(.*))?
+	// The ensuing logic attempts to simulate the behaviour of extracting the groups
+	// from the string without requiring a group-capable regex engine.
 
-	// Scheme/Protocol
-	url.CopyInto(fProtocol, match.GroupStartOffsetAt(1),
-		match.GroupEndOffsetAt(1) - match.GroupStartOffsetAt(1));
+	while (state != EXPLODE_ERROR && offset < length) {
+		switch (state) {
 
-	if (!_IsProtocolValid()) {
-		fHasProtocol = false;
-		fProtocol.Truncate(0);
-	} else
-		fHasProtocol = true;
+			case EXPLODE_PROTOCOL:
+			{
+				int32 end_protocol = char_offset_until_fn_false(url_c, length,
+					offset, explode_is_protocol_char);
 
-	// Authority (including user credentials, host, and port
-	if (match.GroupEndOffsetAt(2) - match.GroupStartOffsetAt(2) > 0)
-	{
-		url.CopyInto(fAuthority, match.GroupStartOffsetAt(3),
-			match.GroupEndOffsetAt(3) - match.GroupStartOffsetAt(3));
-		SetAuthority(fAuthority);
-	} else {
-		fHasHost = false;
-		fHasPort = false;
-		fHasUserName = false;
-		fHasPassword = false;
+				if (end_protocol < length) {
+					SetProtocol(BString(&url_c[offset], end_protocol - offset));
+					state = EXPLODE_PROTOCOLTERMINATOR;
+					offset = end_protocol;
+				} else {
+#if DEBUG
+					fprintf(stderr,
+						"unexpected end of url when parsing the protocol\n");
+#endif
+					state = EXPLODE_ERROR;
+				}
+				break;
+			}
+
+			case EXPLODE_PROTOCOLTERMINATOR:
+			{
+				if (url[offset] == ':') {
+					state = EXPLODE_AUTHORITYORPATH;
+					offset++;
+				} else {
+#ifdef DEBUG
+					fprintf(stderr,
+						"unexpected character '%c' terminating the protocol\n",
+						url_c[offset]);
+#endif
+					state = EXPLODE_ERROR;
+				}
+				break;
+			}
+
+			case EXPLODE_AUTHORITYORPATH:
+			{
+				if (strncmp(&url_c[offset], "//", 2) == 0) {
+					state = EXPLODE_AUTHORITY;
+					offset += 2;
+				} else {
+					state = EXPLODE_PATH;
+				}
+				break;
+			}
+
+			case EXPLODE_AUTHORITY:
+			{
+				int end_authority = char_offset_until_fn_false(url_c, length,
+					offset, explode_is_authority_char);
+				SetAuthority(BString(&url_c[offset], end_authority - offset));
+				state = EXPLODE_PATH;
+				offset = end_authority;
+				break;
+			}
+
+			case EXPLODE_PATH:
+			{
+				int end_path = char_offset_until_fn_false(url_c, length, offset,
+					explode_is_path_char);
+				SetPath(BString(&url_c[offset], end_path - offset));
+				state = EXPLODE_REQUEST;
+				offset = end_path;
+				break;
+			}
+
+			case EXPLODE_REQUEST: // query
+			{
+				if (url_c[offset] == '?') {
+					offset++;
+					int end_request = char_offset_until_fn_false(url_c, length,
+						offset, explode_is_request_char);
+					SetRequest(BString(&url_c[offset], end_request - offset));
+					offset = end_request;
+				}
+				state = EXPLODE_FRAGMENT;
+				break;
+			}
+
+			case EXPLODE_FRAGMENT:
+			{
+				if (url_c[offset] == '#') {
+					offset++;
+					SetFragment(BString(&url_c[offset], length - offset));
+					offset = length;
+				}
+				state = EXPLODE_COMPLETE;
+				break;
+			}
+
+			case EXPLODE_ERROR:
+			case EXPLODE_COMPLETE:
+				// should never be reached - keeps the compiler happy
+				break;
+
+		}
 	}
 
-	// Path
-	url.CopyInto(fPath, match.GroupStartOffsetAt(4),
-		match.GroupEndOffsetAt(4) - match.GroupStartOffsetAt(4));
-	if (!fPath.IsEmpty())
-		fHasPath = true;
-
-	// Query
-	if (match.GroupEndOffsetAt(5) - match.GroupStartOffsetAt(5) > 0)
-	{
-		url.CopyInto(fRequest, match.GroupStartOffsetAt(6),
-			match.GroupEndOffsetAt(6) - match.GroupStartOffsetAt(6));
-		fHasRequest = true;
-	} else {
-		fRequest = "";
-		fHasRequest = false;
+	if(state == EXPLODE_ERROR) {
+#ifdef DEBUG
+		fprintf(stderr, "failure to explode url\n");
+#endif
+		_ResetFields();
+		return B_BAD_VALUE;
 	}
 
-	// Fragment
-	if (match.GroupEndOffsetAt(7) - match.GroupStartOffsetAt(7) > 0)
-	{
-		url.CopyInto(fFragment, match.GroupStartOffsetAt(8),
-			match.GroupEndOffsetAt(8) - match.GroupStartOffsetAt(8));
-		fHasFragment = true;
-	} else {
-		fFragment = "";
-		fHasFragment = false;
-	}
+	return B_OK;
 }
 
 
@@ -1011,62 +1135,173 @@ BUrl::_SetPathUnsafe(const BString& path)
 }
 
 
+enum authority_parse_state {
+	AUTHORITY_USERNAME,
+	AUTHORITY_PASSWORD,
+	AUTHORITY_HOST,
+	AUTHORITY_PORT,
+	AUTHORITY_COMPLETE
+};
+
+
+static bool
+authority_is_username_char(char c)
+{
+	return !(c == ':' || c == '@');
+}
+
+
+static bool
+authority_is_password_char(char c)
+{
+	return !(c == '@');
+}
+
+
+static bool
+authority_is_ipv6_host_char(char c) {
+	return (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f')
+		|| (c >= '0' && c <= '9') || c == ':';
+}
+
+
+static bool
+authority_is_host_char(char c) {
+	return !(c == ':' || c == '/');
+}
+
+
+static bool
+authority_is_port_char(char c) {
+	return c >= '0' && c <= '9';
+}
+
+
 void
 BUrl::SetAuthority(const BString& authority)
 {
 	fAuthority = authority;
 
+	fUser.Truncate(0);
+	fPassword.Truncate(0);
+	fHost.Truncate(0);
+	fPort = 0;
 	fHasPort = false;
 	fHasUserName = false;
 	fHasPassword = false;
+
+	bool hasUsernamePassword = B_ERROR != fAuthority.FindFirst('@');
+	authority_parse_state state = AUTHORITY_USERNAME;
+	int32 offset = 0;
+	int32 length = authority.Length();
+	const char *authority_c = authority.String();
+
+	while (AUTHORITY_COMPLETE != state && offset < length) {
+
+		switch (state) {
+
+			case AUTHORITY_USERNAME:
+			{
+				if (hasUsernamePassword) {
+					int32 end_username = char_offset_until_fn_false(
+						authority_c, length, offset,
+						authority_is_username_char);
+
+					SetUserName(BString(&authority_c[offset],
+						end_username - offset));
+
+					state = AUTHORITY_PASSWORD;
+					offset = end_username;
+				} else {
+					state = AUTHORITY_HOST;
+				}
+				break;
+			}
+
+			case AUTHORITY_PASSWORD:
+			{
+				if (hasUsernamePassword && ':' == authority[offset]) {
+					offset++; // move past the delimiter
+					int32 end_password = char_offset_until_fn_false(
+						authority_c, length, offset,
+						authority_is_password_char);
+
+					SetPassword(BString(&authority_c[offset],
+						end_password - offset));
+
+					offset = end_password;
+				}
+
+				// if the host was preceded by a username + password couple
+				// then there will be an '@' delimiter to avoid.
+
+				if (authority_c[offset] == '@') {
+					offset++;
+				}
+
+				state = AUTHORITY_HOST;
+				break;
+			}
+
+			case AUTHORITY_HOST:
+			{
+
+				// the host may be enclosed within brackets in order to express
+				// an IPV6 address.
+
+				if (authority_c[offset] == '[') {
+					int32 end_ipv6_host = char_offset_until_fn_false(
+						authority_c, length, offset + 1,
+						authority_is_ipv6_host_char);
+
+					if (authority_c[end_ipv6_host] == ']') {
+						SetHost(BString(&authority_c[offset],
+							(end_ipv6_host - offset) + 1));
+						state = AUTHORITY_PORT;
+						offset = end_ipv6_host + 1;
+					}
+				}
+
+				// if an IPV6 host was not found.
+
+				if (AUTHORITY_HOST == state) {
+					int32 end_host = char_offset_until_fn_false(
+						authority_c, length, offset, authority_is_host_char);
+
+					SetHost(BString(&authority_c[offset], end_host - offset));
+					state = AUTHORITY_PORT;
+					offset = end_host;
+				}
+
+				break;
+			}
+
+			case AUTHORITY_PORT:
+			{
+				if (authority_c[offset] == ':') {
+					offset++;
+					int32 end_port = char_offset_until_fn_false(
+						authority_c, length, offset, authority_is_port_char);
+					SetPort(atoi(&authority_c[offset]));
+					offset = end_port;
+				}
+
+				state = AUTHORITY_COMPLETE;
+
+				break;
+			}
+
+			case AUTHORITY_COMPLETE:
+				// should never be reached - keeps the compiler happy
+				break;
+		}
+	}
 
 	// An empty authority is still an authority, making it possible to have
 	// URLs such as file:///path/to/file.
 	// TODO however, there is no way to unset the authority once it is set...
 	// We may want to take a const char* parameter and allow NULL.
 	fHasHost = true;
-
-	if (fAuthority.IsEmpty())
-		return;
-
-	int32 userInfoEnd = fAuthority.FindFirst('@');
-	int16 hostAndPortStart = 0;
-
-	// URL contains userinfo field
-	if (userInfoEnd != -1) {
-		BString userInfo;
-		fAuthority.CopyInto(userInfo, 0, userInfoEnd);
-
-		int16 colonDelimiter = userInfo.FindFirst(':', 0);
-
-		if (colonDelimiter == 0) {
-			SetPassword(userInfo);
-		} else if (colonDelimiter != -1) {
-			userInfo.CopyInto(fUser, 0, colonDelimiter);
-			userInfo.CopyInto(fPassword, colonDelimiter + 1,
-				userInfo.Length() - colonDelimiter);
-			SetUserName(fUser);
-			SetPassword(fPassword);
-		} else {
-			SetUserName(fUser);
-		}
-
-		hostAndPortStart = userInfoEnd + 1;
-	}
-
-	int16 hostEnd = fAuthority.FindFirst(':', hostAndPortStart);
-
-	if (hostEnd != B_ERROR) {
-		if (hostEnd < fAuthority.Length()-1) {
-			 fPort = atoi(&(fAuthority.String())[hostEnd+1]);
-			 fHasPort = true;
-		}
-	}
-	else
-		hostEnd = fAuthority.Length();
-
-	fAuthority.CopyInto(fHost, hostAndPortStart, hostEnd - hostAndPortStart);
-	SetHost(fHost);
 }
 
 

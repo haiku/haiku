@@ -104,7 +104,7 @@ public:
 private:
 			void				_ResetFields();
 			bool				_ContainsDelimiter(const BString& url);
-			void				_ExplodeUrlString(const BString& urlString);
+			status_t			_ExplodeUrlString(const BString& urlString);
 			BString				_MergePath(const BString& relative) const;
 			void				_SetPathUnsafe(const BString& path);
 
