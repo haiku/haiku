@@ -439,6 +439,7 @@ CharacterView::Draw(BRect updateRect)
 						y + fCharacterHeight - fGap));
 
 					SetHighColor(color);
+					SetLowColor(highlight);
 				}
 
 				// Draw character
