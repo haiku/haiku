@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2014, Adrien Destugues <pulkomandy@pulkomandy.tk>.
+ * Copyright 2010-2016, Adrien Destugues <pulkomandy@pulkomandy.tk>.
  * Distributed under the terms of the MIT License.
  */
 
@@ -10,13 +10,14 @@
 #include <locks.h>
 
 
-static BCatalog sCatalog;
 static int32 sCatalogInitOnce = INIT_ONCE_UNINITIALIZED;
 
 
 BCatalog*
 BLocaleRoster::GetCatalog()
 {
+	static BCatalog sCatalog;
+
 	#if (__GNUC__ < 3)
 		asm volatile(".hidden GetCatalog__13BLocaleRoster");
 	#else
