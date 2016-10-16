@@ -92,19 +92,11 @@ Includes [ FGristFiles syscalls.cpp ]
 	<syscalls!$(TARGET_PACKAGING_ARCH)>syscall_numbers.h
 ;
 
-# TODO: fix or update binutils for ppc, in the meantime this should get things going.
-local linkHackLdFlags ;
-if $(TARGET_ARCH) = ppc {
-	linkHackLdFlags = -Bdynamic ;
-} else {
-	linkHackLdFlags = -shared -Bdynamic ;
-}
-
 KernelLd linkhack.so :
 	<$(SOURCE_GRIST)>linkhack.o
 	:
 	:
-	$(linkHackLdFlags)
+	-shared -Bdynamic
 ;
 
 KernelLd kernel_$(TARGET_ARCH) :
