@@ -2,6 +2,7 @@ SubDir HAIKU_TOP src build libgnuregex ;
 
 BuildPlatformSharedLibrary libgnuregex_build.so :
 	regex.c
+	printchar.c
 	:
 	# no linked libraries here
 ;
