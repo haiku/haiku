@@ -38,6 +38,9 @@ struct stack_frame {
 #define NUM_PREVIOUS_LOCATIONS 32
 
 
+static bool is_kernel_stack_address(Thread* thread, addr_t address);
+
+
 static bool
 already_visited(addr_t* visited, int32* _last, int32* _num, addr_t bp)
 {
@@ -64,11 +67,12 @@ already_visited(addr_t* visited, int32* _last, int32* _num, addr_t bp)
 */
 static status_t
 get_next_frame_no_debugger(addr_t bp, addr_t* _next, addr_t* _ip,
-	bool onKernelStack)
+	bool onKernelStack, Thread* thread)
 {
 	// TODO: Do this more efficiently in assembly.
 	stack_frame frame;
-	if (onKernelStack)
+	if (onKernelStack
+		&& is_kernel_stack_address(thread, bp + sizeof(frame) - 1))
 		memcpy(&frame, (void*)bp, sizeof(frame));
 	else if (user_memcpy(&frame, (void*)bp, sizeof(frame)) != B_OK)
 		return B_BAD_ADDRESS;
@@ -1092,7 +1096,8 @@ arch_debug_contains_call(Thread* thread, const char* symbol, addr_t start,
 		} else {
 			addr_t ip, nextBp;
 
-			if (get_next_frame_no_debugger(bp, &nextBp, &ip, true) != B_OK
+			if (get_next_frame_no_debugger(bp, &nextBp, &ip, true,
+					thread) != B_OK
 				|| ip == 0 || bp == 0)
 				break;
 
@@ -1163,7 +1168,7 @@ arch_debug_get_stack_trace(addr_t* returnAddresses, int32 maxCount,
 			}
 		} else {
 			if (get_next_frame_no_debugger(bp, &nextBp, &ip,
-					onKernelStack) != B_OK) {
+					onKernelStack, thread) != B_OK) {
 				break;
 			}
 		}
