@@ -1594,8 +1594,10 @@ BView::GetMouse(BPoint* _location, uint32* _buttons, bool checkMessageQueue)
 							continue;
 						}
 					}
-					message->FindPoint("screen_where", _location);
-					message->FindInt32("buttons", (int32*)_buttons);
+					if (_location != NULL)
+						message->FindPoint("screen_where", _location);
+					if (_buttons != NULL)
+						message->FindInt32("buttons", (int32*)_buttons);
 					queue->Unlock();
 						// we need to hold the queue lock until here, because
 						// the message might still be used for something else
