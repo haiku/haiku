@@ -335,6 +335,8 @@ BPoseView::InitCommon()
 
 	// Create the TitleView and CountView
 	fTitleView = new BTitleView(this);
+	if (ViewMode() != kListMode)
+		fTitleView->Hide();
 	if (fHScrollBar != NULL)
 		fHScrollBar->SetTitleView(fTitleView);
 
