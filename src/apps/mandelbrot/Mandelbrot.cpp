@@ -157,7 +157,7 @@ void FractalView::MouseDown(BPoint where)
 {
 	fSelecting = true;
 	fSelectStart = where;
-	GetMouse(&where, &fMouseButtons);
+	GetMouse(NULL, &fMouseButtons);
 }
 
 
