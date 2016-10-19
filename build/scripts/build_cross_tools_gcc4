@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# parameters <machine> <haiku sourcedir> <buildtools dir> <isntall dir>
+# parameters <machine> <haiku sourcedir> <buildtools dir> <install dir>
 
 # get and check the parameters
 if [ $# -lt 4 ]; then
