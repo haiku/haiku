@@ -75,7 +75,7 @@ public:
 								BMediaFile(const BUrl& url);
 								BMediaFile(const BUrl& url, int32 flags);
 	// Read-Write streaming constructor
-								BMediaFile(BUrl destination,
+								BMediaFile(const BUrl& destination,
 								   const media_file_format* mfi,
 								   int32 flags = 0);
 

@@ -100,7 +100,7 @@ BMediaFile::BMediaFile(const BUrl& url, int32 flags)
 }
 
 
-BMediaFile::BMediaFile(BUrl destination, const media_file_format* mfi,
+BMediaFile::BMediaFile(const BUrl& destination, const media_file_format* mfi,
 	int32 flags)
 {
 	CALLED();
@@ -135,12 +135,23 @@ BMediaFile::SetTo(BDataIO* destination)
 {
 	CALLED();
 
-	// TODO: A BUrl SetTo should be provided
 	if (destination == NULL)
 		return B_BAD_VALUE;
 
 	_UnInit();
 	_InitReader(destination);
+
+	return fErr;
+}
+
+
+status_t
+BMediaFile::SetTo(const BUrl& url)
+{
+	CALLED();
+
+	_UnInit();
+	_InitReader(NULL, &url);
 
 	return fErr;
 }
