@@ -270,21 +270,32 @@ BAdapterIO::Seek(off_t position, uint32 seekMode)
 {
 	CALLED();
 
-	// TODO: Support seekModes
-	status_t ret = _EvaluateWait(position, 0);
+	off_t absolutePosition = 0;
+	off_t size = 0;
+
+	if (seekMode == SEEK_CUR)
+		absolutePosition = Position()+position;
+	else if (seekMode == SEEK_END) {
+		if (GetSize(&size) != B_OK)
+			return B_NOT_SUPPORTED;
+
+		absolutePosition = size-position;
+	}
+
+	status_t ret = _EvaluateWait(absolutePosition, 0);
 
 	if (ret == B_RESOURCE_UNAVAILABLE && fBuffer->IsStreaming()
 			&& fBuffer->IsSeekable()) {
 
 		fSeekSem = create_sem(0, "BAdapterIO seek sem");
 
-		if (SeekRequested(position) != B_OK)
+		if (SeekRequested(absolutePosition) != B_OK)
 			return B_NOT_SUPPORTED;
 
 		TRACE("BAdapterIO::Seek: Locking on backend seek\n");
 		acquire_sem(fSeekSem);
 		TRACE("BAdapterIO::Seek: Seek completed!\n");
-		fBuffer->ResetStartOffset(position);
+		fBuffer->ResetStartOffset(absolutePosition);
 	} else if (ret != B_OK)
 		return B_NOT_SUPPORTED;
 
