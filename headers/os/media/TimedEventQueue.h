@@ -38,9 +38,8 @@ struct media_timed_event {
 			int32				data;
 			int64				bigdata;
 			char				user_data[64];
-			bigtime_t			enqueue_time;
 
-			uint32				_reserved_media_timed_event_[6];
+			uint32				_reserved_media_timed_event_[8];
 };
 
 

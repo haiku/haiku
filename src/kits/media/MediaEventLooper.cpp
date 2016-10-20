@@ -239,19 +239,13 @@ BMediaEventLooper::ControlLoop()
 			if (err == B_OK) {
 				// The general idea of lateness is to allow
 				// the client code to detect when the buffer
-				// is handled late or early. What we add is
-				// that the code log the time at which the
-				// current event is added to the queue. This
-				// allow us to detect cyclic/stagnant latency
-				// in the meantime, so that the client can
-				// notify to the producer only the portion
-				// that might be attributable.
-				bigtime_t lateness = waitUntil - TimeSource()->RealTime();
-				if (lateness < 0 && event.enqueue_time > waitUntil) {
-					lateness = event.enqueue_time
-						- TimeSource()->RealTime();
-				}
-				DispatchEvent(&event, -lateness, hasRealtime);
+				// is handled late or early.
+				bigtime_t lateness = TimeSource()->RealTime() - waitUntil;
+				// Maximum amount of lateness we tolerate
+				if (lateness < 3000L)
+					lateness = 0;
+
+				DispatchEvent(&event, lateness, hasRealtime);
 			}
 		} else if (err != B_OK)
 			return;
