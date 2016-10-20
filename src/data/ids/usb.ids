@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2016.09.29
-# Date:    2016-09-29 20:34:05
+# Version: 2016.10.13
+# Date:    2016-10-13 20:34:14
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -17281,37 +17281,236 @@
 	000c  Ralink RT3070 802.11b/g/n Wireless Lan USB Device
 	000e  Ralink RT3070 802.11b/g/n Wireless Lan USB Device
 1d50  OpenMoko, Inc.
-	1db5  IDBG DFU
+	1db5  IDBG (DFU)
 	1db6  IDBG
-	5117  Neo1973/FreeRunner kernel usbnet (g_ether, CDC Ethernet) Mode
-	5118  Debug Board (FT2232D) for Neo1973/FreeRunner
-	5119  GTA01/GTA02 U-Boot Bootloader
+	5117  Neo1973/FreeRunner kernel usbnet (g_ether, CDC Ethernet) mode
+	5118  Neo1973/FreeRunner Debug board (V2+)
+	5119  Neo1973/FreeRunner u-boot cdc_acm serial port
 	511a  HXD8 u-boot usbtty CDC ACM Mode
 	511b  SMDK2440 u-boot usbtty CDC ACM mode
 	511c  SMDK2443 u-boot usbtty CDC ACM mode
 	511d  QT2410 u-boot usbtty CDC ACM mode
-	5120  Neo1973/FreeRunner u-boot generic serial mode
+	5120  Neo1973/FreeRunner u-boot usbtty generic serial
 	5121  Neo1973/FreeRunner kernel mass storage (g_storage) mode
-	5122  Neo1973/FreeRunner kernel usbnet (g_ether, RNDIS) mode
-	5123  Neo1973/FreeRunner internal Bluetooth CSR4 module
+	5122  Neo1973/FreeRunner kernel cdc_ether USB network
+	5123  Neo1973/FreeRunner internal USB CSR4 module
 	5124  Neo1973/FreeRunner Bluetooth Device ID service
+	5300  Rockbox
 	6000  Ubertooth Zero
-	6001  Ubertooth Zero DFU
+	6001  Ubertooth Zero (DFU)
 	6002  Ubertooth One
-	6003  Ubertooth One DFU
+	6003  Ubertooth One (DFU)
 	6004  LeoLipo
 	6005  LED Flower S
 	6006  LED Cube
 	6007  LED Flower
 	6008  Kisbee 802.15.4 transceiver
 	6009  Adjacent Reality Tracker
+	600a  AVR Programmer
+	600b  Hypna Go Go
+	600c  CatNip LPC1343 development board
+	600d  Enhanced RoboBrrd Brain board
+	600e  OpenRISC Ordb2a-ep4ce22 development board
+	600f  Paparazzi Lisa/M (DFU)
+	6010  OpenPipe: OSHW Bagpipes MIDI controller
+	6011  LeoLipo (DFU)
+	6012  Universal C64 Cartridge
+	6013  DiscFerret magnetic disc analyser (bootloader)
+	6014  DiscFerret magnetic disc analyser
+	6015  Smoothieboard
+	6016  phInterface
+	6017  Black Magic Debug Probe (DFU)
+	6018  Black Magic Debug Probe (Application)
+	6019  4pi 5 axis motion controller
+	601a  Paparazzi Lisa/M
+	601b  IST-2 chronograph for bullet speeds
+	601c  EPOSMote II
+	601e  5x5 STM32 prototyping board
+	601f  uNSF
+	6020  Toad3
+	6021  AlphaSphere
+	6022  LightPack
+	6023  Pixelkit
+	6024  Illucia
+	6025  Keyglove (HID)
+	6027  Key64 Keyboard
 	6028  Teensy 2.0 Development Board [ErgoDox Keyboard]
+	602a  Marlin 2.0 (Mass Storage)
 	602b  FPGALink
+	602c  5nes5snes (5x8)
+	602d  5nes5snes (4x12)
+	602e  Flexibity
+	602f  K-copter
+	6030  USB-oscope
+	6031  Handmade GSM GPS tracker
+	6033  frobiac / adnw keyboard
+	6034  Tiflomag Ergo 2
+	6035  FreeLaserTag Gun
+	6036  FreeLaserTag Big Brother
+	6037  FreeLaserTag Node
+	6038  Monaka
+	6039  eXtreme Feedback Device
+	603a  TiLDA
+	603b  Raspiface
+	603c  Paparazzi (bootloader)
+	603d  Paparazzi (Serial)
+	603e  Paparazzi (Mass Storage)
+	603f  airGuitar
+	6040  moco
+	6041  AlphaSphere (bootloader)
+	6042  Dspace robot controller
+	6043  pc-power
+	6044  open-usb-can (DFU)
+	6045  open-usb-can
+	6046  mimus-weigand
+	6047  RfCat Chronos Dongle
+	6048  RfCat Dons Dongle
+	6049  RfCat Chronos bootloader
+	604a  RfCat Dons bootloader
 	604b  HackRF Jawbreaker Software-Defined Radio
+	604c  Makibox A6
+	604d  Paella Pulse height analyzer
+	604e  Miniscope v2b
+	604f  Miniscope v2c
+	6050  GoodFET
+	6051  pinocc.io
+	6052  APB Team Robotic Development Board
 	6053  Darkgame Controller
-	6089  Great Scott Gadgets HackRF One
+	6054  Satlab/AAUSAT3 BlueBox
+	6056  The Glitch
+	605b  RfCat YARD Stick One
+	605c  YARD Stick One bootloader
+	605d  Funky Sensor v2
+	605e  Blinkiverse Analog LED Fader
+	605f  Small DIP package Cypress FX2
+	6060  Data logger using the Cypress FX2
+	6061  Power Manager
+	6063  CPC FPGA
+	6064  CPC FPGA (DFU)
+	6065  CPC FPGA (Serial)
+	6066  Nuand BladeRF
+	6067  Orbotron 9000 (Serial)
+	6068  Orbotron 9000 (HID)
+	6069  xser (DFU)
+	606a  xser (legacy)
+	606b  S08-245, urJtag compatible firmware for S08JS
+	606c  Blinkytape full-color light tape
+	606d  TinyG open source motion controller
+	606e  Reefangel Evolution 1.0
+	6070  Open Pinball Project
+	6071  The Glitch HID
+	6072  The Glitch Disk
+	6073  The Glitch Serial
+	6074  The Glitch MIDI
+	6075  The Glitch RawHID
+	6076  Vultureprog BIOS chip programmer
+	6077  PaintDuino
+	6078  DTplug
+	607a  Fadecandy
+	607b  RCDongle for IR remote control
+	607c  OpenVizsla USB sniffer/analyzer
+	607d  Spark Core Arduino-compatible board with WiFi
+	607f  Spark Core Arduino-compatible board with WiFi (bootloader)
+	6080  arcin arcade controller
+	6081  BladeRF (bootloader)
+	6082  Facecandy (DFU)
+	6083  LightUp (bootloader)
+	6084  arcin arcade controller (DFU)
+	6085  IRKit for controlloing home electronics from iOS devices
+	6086  OneRNG entropy device
+	6088  picp PIC16F145x based PIC16F145x programmer
+	6089  Great Scott Gadgets HackRF One SDR
+	608a  BLEduino
+	608b  Loctronix ASR-2300 SDR/motion sensing module
+	608c  Fx2lafw
+	608d  Fx2lafw
+	608e  Fx2lafw
+	608f  Fx2lafw
+	6090  Fx2lafw
+	6091  Fx2lafw
+	6092  Fx2lafw
+	6093  Fx2lafw
+	6094  Fx2lafw
+	6095  Fx2lafw
+	6096  LightUp (sketch)
+	6097  Tessel JavaScript enabled Microcontroller with built-in WiFi
+	6098  RFIDler
+	6099  RASDR Radio Astronomy SDR Rx Interface
+	609a  RASDR Radio Astronomy SDR Tx Interface
+	609b  RASDR Radio Astronomy SDR (bootloader)
+	609c  antiAFK keyboard
+	609d  PIC16F145x bootloader
+	609e  Clyde Lamp by Fabule (bootloader)
+	609f  Clyde Lamp by Fabule (sketch)
+	60a0  Smoothiepanel robotic control interface
 	60a1  Airspy
-	cc15  CCCAMP2015 rad1o badge
+	60a2  barebox (DFU)
+	60a3  keyboard (bootloader)
+	60a4  Papilio Duo (AVR)
+	60a5  Papilio Duo (FPGA)
+	60a6  HydraBus/HydraNFC (bootloader)
+	60a7  HydraBus/HydraNFC
+	60a8  reserved
+	60a9  Blinky Light Controller (DFU)
+	60aa  Blinky Light Controller
+	60ab  AllPixel
+	60ac  OpenBLT generic microcontroller (bootloader)
+	60b0  Waterott Arduino based Clock (caterina bootloader)
+	60b1  Drinkbot (processing)
+	60b2  Drinkbot (OTG-tablet support)
+	60b3  calc.pw password generator device (standard)
+	60b4  calc.pw password generator device (enhanced)
+	60b5  TimVideos' HDMI2USB (FX2) - Unconfigured device
+	60b6  TimVideos' HDMI2USB (FX2) - Firmware load/upgrade
+	60b7  TimVideos' HDMI2USB (FX2) - HDMI/DVI Capture Device
+	60b8  TimVideos' HDMI2USB (Soft+UTMI) - Unconfigured device
+	60b9  TimVideos' HDMI2USB (Soft+UTMI) - Firmware upgrade
+	60ba  TimVideos' HDMI2USB (Soft+UTMI) - HDMI/DVI Capture Device
+	60bc  Simple CC25xx programmer / serial board
+	60bd  Open Source control interface for multimedia applications
+	60be  Pixelmatix Aurora (bootloader)
+	60bf  Pixelmatix Aurora
+	60c1  BrewBit Model-T pOSHW temperature controller for homebrewers (bootloader)
+	60c2  BrewBit Model-T pOSHW temperature controller for homebrewers
+	60c3  X Antenna Tracker arduino board
+	60c6  USBtrng hardware random number generator
+	60c7  Zubax GNSS positioning module for light UAV systems
+	60c8  Xlink data transfer and control system for Commodore C64
+	60c9  random number generator
+	60ca  FinalKey password manager
+	60cb  PteroDAQ Data Acquisition on FRDM-KL25Z and future boards
+	60cc  LamDiNao
+	60de  Cryptech.is random number generator
+	60df  Numato Opsis HDMI2USB board (unconfigured)
+	60e0  Numato Opsis HDMI2USB board (JTAG Programming Mode)
+	60e1  Numato Opsis HDMI2USB board (User Mode)
+	60e2  Osmocom SIMtrace 2 (DFU)
+	60e3  Osmocom SIMtrace 2
+	60e4  3D printed racing game - (Catalina CDC bootloader)
+	60e5  3D printed racing game
+	60e6  replacement for GoodFET/FaceDancer - GreatFet
+	60e7  replacement for GoodFET/FaceDancer - GreatFet target
+	60e8  Alpen Clack keyboard
+	60e9  keyman64 keyboard itercepter
+	60ea  Wiggleport FPGA-based I/O board
+	60ec  Duet 3D Printer Controller
+	60f0  UDAD-T1 data aquisition device (boot)
+	60f1  UDAD-T1 data aquisition device
+	60f2  UDAD-T2 data aquisition device (boot)
+	60f3  UDAD-T2 data aquisition device
+	60f4  Uniti ARC motor controller
+	60f5  EightByEight Blinky Badge (DFU)
+	60f6  EightByEight Blinky Badge
+	60f7  cardio NFC/RFID card reader (bootloader)
+	60f8  cardio NFC/RFID card reader
+	60fc  OnlyKey Two-factor Authentication and Password Solution
+	6100  overlay64 video overlay module
+	6104  ScopeFun open source instrumentation
+	6108  Myriad-RF LimeSDR
+	610c  Magic Keys (boot)
+	610d  Magic Keys
+	8085  Box0 (box0-v5)
+	cc15  rad1o badge for CCC congress 2015
 1d57  Xenta
 	0005  Wireless Receiver (Keyboard and Mouse)
 	0006  Wireless Receiver (RC Laser Pointer)
