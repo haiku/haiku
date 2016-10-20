@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MODEL_H
@@ -56,6 +57,7 @@ public:
 			bool				HasDepot(const BString& name) const;
 			const DepotList&	Depots() const
 									{ return fDepots; }
+			const DepotInfo*	DepotForName(const BString& name) const;
 			bool				SyncDepot(const DepotInfo& depot);
 
 			void				Clear();
@@ -114,6 +116,9 @@ public:
 			void				SetShowDevelopPackages(bool show);
 			bool				ShowDevelopPackages() const
 									{ return fShowDevelopPackages; }
+
+			void				PopulateWebAppRepositoryCode(
+									DepotInfo& depotInfo);
 
 			// Retrieve package information
 	static	const uint32		POPULATE_CACHED_RATING	= 1 << 0;

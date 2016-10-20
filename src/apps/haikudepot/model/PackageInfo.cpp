@@ -1,6 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent <rene@gollent.com>.
+ * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -931,6 +932,13 @@ PackageInfo::SetSize(int64 size)
 }
 
 
+void
+PackageInfo::SetDepotName(const BString& depotName)
+{
+	fDepotName = depotName;
+}
+
+
 bool
 PackageInfo::AddListener(const PackageInfoListenerRef& listener)
 {
@@ -982,7 +990,8 @@ PackageInfo::_NotifyListeners(uint32 changes)
 DepotInfo::DepotInfo()
 	:
 	fName(),
-	fPackages()
+	fPackages(),
+	fWebAppRepositoryCode()
 {
 }
 
@@ -990,7 +999,8 @@ DepotInfo::DepotInfo()
 DepotInfo::DepotInfo(const BString& name)
 	:
 	fName(name),
-	fPackages()
+	fPackages(),
+	fWebAppRepositoryCode()
 {
 }
 
@@ -998,7 +1008,9 @@ DepotInfo::DepotInfo(const BString& name)
 DepotInfo::DepotInfo(const DepotInfo& other)
 	:
 	fName(other.fName),
-	fPackages(other.fPackages)
+	fPackages(other.fPackages),
+	fWebAppRepositoryCode(other.fWebAppRepositoryCode),
+	fBaseURL(other.fBaseURL)
 {
 }
 
@@ -1008,6 +1020,8 @@ DepotInfo::operator=(const DepotInfo& other)
 {
 	fName = other.fName;
 	fPackages = other.fPackages;
+	fBaseURL = other.fBaseURL;
+	fWebAppRepositoryCode = other.fWebAppRepositoryCode;
 	return *this;
 }
 
@@ -1071,3 +1085,16 @@ DepotInfo::SyncPackages(const PackageList& otherPackages)
 	}
 }
 
+
+void
+DepotInfo::SetBaseURL(const BString& baseURL)
+{
+	fBaseURL = baseURL;
+}
+
+
+void
+DepotInfo::SetWebAppRepositoryCode(const BString& code)
+{
+	fWebAppRepositoryCode = code;
+}

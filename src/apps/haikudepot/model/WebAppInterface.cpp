@@ -1,5 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -26,7 +27,6 @@
 #include "PackageInfo.h"
 
 
-#define CODE_REPOSITORY_DEFAULT "haikuports"
 #define BASEURL_DEFAULT "https://depot.haiku-os.org"
 #define USERAGENT_FALLBACK_VERSION "0.0.0"
 
@@ -437,8 +437,33 @@ WebAppInterface::SetPreferredLanguage(const BString& language)
 
 
 status_t
+WebAppInterface::RetrieveRepositoriesForSourceBaseURLs(
+	const StringList& repositorySourceBaseURLs,
+	BMessage& message)
+{
+	BString jsonString = JsonBuilder()
+		.AddValue("jsonrpc", "2.0")
+		.AddValue("id", ++fRequestIndex)
+		.AddValue("method", "searchRepositories")
+		.AddArray("params")
+			.AddObject()
+				.AddArray("repositorySourceSearchUrls")
+					.AddStrings(repositorySourceBaseURLs)
+				.EndArray()
+				.AddValue("offset", 0)
+				.AddValue("limit", 1000) // effectively a safety limit
+			.EndObject()
+		.EndArray()
+	.End();
+
+	return _SendJsonRequest("repository", jsonString, 0, message);
+}
+
+
+status_t
 WebAppInterface::RetrievePackageInfo(const BString& packageName,
-	const BString& architecture, BMessage& message)
+	const BString& architecture, const BString& repositoryCode,
+	BMessage& message)
 {
 	BString jsonString = JsonBuilder()
 		.AddValue("jsonrpc", "2.0")
@@ -449,7 +474,7 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 				.AddValue("name", packageName)
 				.AddValue("architectureCode", architecture)
 				.AddValue("naturalLanguageCode", fLanguage)
-				.AddValue("repositoryCode", CODE_REPOSITORY_DEFAULT)
+				.AddValue("repositoryCode", repositoryCode)
 				.AddValue("versionType", "NONE")
 			.EndObject()
 		.EndArray()
@@ -461,7 +486,8 @@ WebAppInterface::RetrievePackageInfo(const BString& packageName,
 
 status_t
 WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
-	const StringList& packageArchitectures, BMessage& message)
+	const StringList& packageArchitectures,
+	const StringList& repositoryCodes, BMessage& message)
 {
 	BString jsonString = JsonBuilder()
 		.AddValue("jsonrpc", "2.0")
@@ -476,7 +502,7 @@ WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
 					.AddStrings(packageArchitectures)
 				.EndArray()
 				.AddArray("repositoryCodes")
-					.AddItem(CODE_REPOSITORY_DEFAULT)
+					.AddStrings(repositoryCodes)
 				.EndArray()
 				.AddValue("naturalLanguageCode", fLanguage)
 				.AddValue("versionType", "LATEST")
@@ -552,7 +578,8 @@ WebAppInterface::RetrieveUserRatings(const BString& packageName,
 status_t
 WebAppInterface::RetrieveUserRating(const BString& packageName,
 	const BPackageVersion& version, const BString& architecture,
-	const BString& username, BMessage& message)
+	const BString &repositoryCode, const BString& username,
+	BMessage& message)
 {
 	BString jsonString = JsonBuilder()
 		.AddValue("jsonrpc", "2.0")
@@ -568,7 +595,7 @@ WebAppInterface::RetrieveUserRating(const BString& packageName,
 				.AddValue("pkgVersionMicro", version.Micro(), true)
 				.AddValue("pkgVersionPreRelease", version.PreRelease(), true)
 				.AddValue("pkgVersionRevision", (int)version.Revision())
-				.AddValue("repositoryCode", CODE_REPOSITORY_DEFAULT)
+				.AddValue("repositoryCode", repositoryCode)
 			.EndObject()
 		.EndArray()
 	.End();
@@ -579,9 +606,9 @@ WebAppInterface::RetrieveUserRating(const BString& packageName,
 
 status_t
 WebAppInterface::CreateUserRating(const BString& packageName,
-	const BString& architecture, const BString& languageCode,
-	const BString& comment, const BString& stability, int rating,
-	BMessage& message)
+	const BString& architecture, const BString& repositoryCode,
+	const BString& languageCode, const BString& comment,
+	const BString& stability, int rating, BMessage& message)
 {
 	BString jsonString = JsonBuilder()
 		.AddValue("jsonrpc", "2.0")
@@ -596,7 +623,7 @@ WebAppInterface::CreateUserRating(const BString& packageName,
 				.AddValue("rating", rating)
 				.AddValue("userRatingStabilityCode", stability, true)
 				.AddValue("comment", comment)
-				.AddValue("repositoryCode", CODE_REPOSITORY_DEFAULT)
+				.AddValue("repositoryCode", repositoryCode)
 				.AddValue("naturalLanguageCode", languageCode)
 			.EndObject()
 		.EndArray()

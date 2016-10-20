@@ -1,5 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef WEB_APP_INTERFACE_H
@@ -37,14 +38,20 @@ public:
 			void				SetPreferredLanguage(const BString& language);
 			void				SetArchitecture(const BString& architecture);
 
+			status_t			RetrieveRepositoriesForSourceBaseURLs(
+									const StringList& repositorySourceBaseURL,
+									BMessage& message);
+
 			status_t			RetrievePackageInfo(
 									const BString& packageName,
 									const BString& architecture,
+									const BString& repositoryCode,
 									BMessage& message);
 
 			status_t			RetrieveBulkPackageInfo(
 									const StringList& packageNames,
 									const StringList& packageArchitectures,
+									const StringList& repositoryCodes,
 									BMessage& message);
 
 			status_t			RetrievePackageIcon(
@@ -61,12 +68,14 @@ public:
 									const BString& packageName,
 									const BPackageVersion& version,
 									const BString& architecture,
+									const BString& repositoryCode,
 									const BString& username,
 									BMessage& message);
 
 			status_t			CreateUserRating(
 									const BString& packageName,
 									const BString& architecture,
+									const BString& repositoryCode,
 									const BString& languageCode,
 									const BString& comment,
 									const BString& stability,

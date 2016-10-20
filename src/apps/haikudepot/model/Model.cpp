@@ -1,6 +1,7 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
+ * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -464,11 +465,18 @@ Model::AddDepot(const DepotInfo& depot)
 bool
 Model::HasDepot(const BString& name) const
 {
+	return NULL != DepotForName(name);
+}
+
+
+const DepotInfo*
+Model::DepotForName(const BString& name) const
+{
 	for (int32 i = fDepots.CountItems() - 1; i >= 0; i--) {
 		if (fDepots.ItemAtFast(i).Name() == name)
-			return true;
+			return &fDepots.ItemAtFast(i);
 	}
-	return false;
+	return NULL;
 }
 
 
@@ -827,6 +835,59 @@ Model::SetAuthorization(const BString& username, const BString& password,
 
 
 void
+Model::PopulateWebAppRepositoryCode(DepotInfo& depotInfo)
+{
+	if (depotInfo.BaseURL().Length() > 0) {
+
+		BMessage repositoriesEnvelope;
+		BMessage result;
+		double total;
+		StringList repositorySourceBaseURLs;
+
+		repositorySourceBaseURLs.Add(depotInfo.BaseURL());
+
+        // TODO; better API call handling around errors.
+
+		if (fWebAppInterface.RetrieveRepositoriesForSourceBaseURLs(
+			repositorySourceBaseURLs, repositoriesEnvelope) == B_OK
+			&& repositoriesEnvelope.FindMessage("result", &result) == B_OK
+			&& result.FindDouble("total", &total) == B_OK) {
+
+			if ((int64) total > 0) {
+				BMessage repositories;
+				BMessage repository;
+				BString repositoryCode;
+
+				if (result.FindMessage("items", &repositories) == B_OK
+					&& repositories.FindMessage("0", &repository) == B_OK
+					&& repository.FindString("code", &repositoryCode) == B_OK) {
+
+					depotInfo.SetWebAppRepositoryCode(repositoryCode);
+
+					printf("did assign web app repository code '%s' to local "
+						"depot '%s'\n",
+						depotInfo.WebAppRepositoryCode().String(),
+						depotInfo.Name().String());
+				} else {
+					printf("unable to find the 'code' in the api response for local depot '%s'\n",
+						depotInfo.Name().String());
+				}
+			} else {
+				printf("unable to find a repository code for '%s'\n",
+					depotInfo.BaseURL().String());
+			}
+		} else {
+			printf("unexpected result obtaining repository code for '%s'\n",
+				depotInfo.BaseURL().String());
+		}
+	} else {
+		printf("missing base url for depot info %s --> will not obtain web app repository code\n",
+			depotInfo.Name().String());
+	}
+}
+
+
+void
 Model::_UpdateIsFeaturedFilter()
 {
 	if (fShowFeaturedPackages && SearchTerms().IsEmpty())
@@ -987,83 +1048,101 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 
 	StringList packageNames;
 	StringList packageArchitectures;
+	StringList repositoryCodes;
+
 	for (int i = 0; i < packages.CountItems(); i++) {
 		const PackageInfoRef& package = packages.ItemAtFast(i);
 		packageNames.Add(package->Name());
-		packageArchitectures.Add(package->Architecture());
-	}
 
-	status_t status = fWebAppInterface.RetrieveBulkPackageInfo(packageNames,
-		packageArchitectures, info);
-	if (status == B_OK) {
-		// Parse message
-//		info.PrintToStream();
-		BMessage result;
-		BMessage pkgs;
-		if (info.FindMessage("result", &result) == B_OK
-			&& result.FindMessage("pkgs", &pkgs) == B_OK) {
-			int32 index = 0;
-			while (true) {
-				if (fStopPopulatingAllPackages)
-					return;
-				BString name;
-				name << index++;
-				BMessage pkgInfo;
-				if (pkgs.FindMessage(name, &pkgInfo) != B_OK)
-					break;
+		if (!packageArchitectures.Contains(package->Architecture()))
+			packageArchitectures.Add(package->Architecture());
 
-				BString pkgName;
-				if (pkgInfo.FindString("name", &pkgName) != B_OK)
-					continue;
+		const DepotInfo *depot = DepotForName(package->DepotName());
 
-				// Find the PackageInfoRef
-				bool found = false;
-				for (int i = 0; i < packages.CountItems(); i++) {
-					const PackageInfoRef& package = packages.ItemAtFast(i);
-					if (pkgName == package->Name()) {
-						_PopulatePackageInfo(package, pkgInfo);
-						if (_HasNativeIcon(pkgInfo))
-							packagesWithIcons.Add(package);
+		if (depot != NULL) {
+			BString repositoryCode = depot->WebAppRepositoryCode();
 
-						// Store in cache
-						BFile file;
-						BPath path;
-						BString fileName(package->Name());
-						fileName << ".info";
-						if (_GetCacheFile(path, file, B_USER_CACHE_DIRECTORY,
-								"HaikuDepot", fileName,
-								B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE)) {
-							pkgInfo.Flatten(&file);
-						}
-
-						packages.Remove(i);
-						found = true;
-						break;
-					}
-				}
-				if (!found)
-					printf("No matching package for %s\n", pkgName.String());
+			if (repositoryCode.Length() != 0
+				&& !repositoryCodes.Contains(repositoryCode)) {
+				repositoryCodes.Add(repositoryCode);
 			}
 		}
-	} else {
-		printf("Error sending request: %s\n", strerror(status));
-		int count = packages.CountItems();
-		if (count >= 4) {
-			// Retry in smaller chunks
-			PackageList firstHalf;
-			PackageList secondHalf;
-			for (int i = 0; i < count / 2; i++)
-				firstHalf.Add(packages.ItemAtFast(i));
-			for (int i = count / 2; i < count; i++)
-				secondHalf.Add(packages.ItemAtFast(i));
-			packages.Clear();
-			_PopulatePackageInfos(firstHalf, fromCacheOnly, packagesWithIcons);
-			_PopulatePackageInfos(secondHalf, fromCacheOnly, packagesWithIcons);
+	}
+
+	if (repositoryCodes.CountItems() != 0) {
+		status_t status = fWebAppInterface.RetrieveBulkPackageInfo(packageNames,
+			packageArchitectures, repositoryCodes, info);
+
+		if (status == B_OK) {
+			// Parse message
+	//		info.PrintToStream();
+			BMessage result;
+			BMessage pkgs;
+			if (info.FindMessage("result", &result) == B_OK
+				&& result.FindMessage("pkgs", &pkgs) == B_OK) {
+				int32 index = 0;
+				while (true) {
+					if (fStopPopulatingAllPackages)
+						return;
+					BString name;
+					name << index++;
+					BMessage pkgInfo;
+					if (pkgs.FindMessage(name, &pkgInfo) != B_OK)
+						break;
+
+					BString pkgName;
+					if (pkgInfo.FindString("name", &pkgName) != B_OK)
+						continue;
+
+					// Find the PackageInfoRef
+					bool found = false;
+					for (int i = 0; i < packages.CountItems(); i++) {
+						const PackageInfoRef& package = packages.ItemAtFast(i);
+						if (pkgName == package->Name()) {
+							_PopulatePackageInfo(package, pkgInfo);
+							if (_HasNativeIcon(pkgInfo))
+								packagesWithIcons.Add(package);
+
+							// Store in cache
+							BFile file;
+							BPath path;
+							BString fileName(package->Name());
+							fileName << ".info";
+							if (_GetCacheFile(path, file, B_USER_CACHE_DIRECTORY,
+									"HaikuDepot", fileName,
+									B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE)) {
+								pkgInfo.Flatten(&file);
+							}
+
+							packages.Remove(i);
+							found = true;
+							break;
+						}
+					}
+					if (!found)
+						printf("No matching package for %s\n", pkgName.String());
+				}
+			}
 		} else {
-			while (packages.CountItems() > 0) {
-				const PackageInfoRef& package = packages.ItemAtFast(0);
-				_PopulatePackageInfo(package, fromCacheOnly);
-				packages.Remove(0);
+			printf("Error sending request: %s\n", strerror(status));
+			int count = packages.CountItems();
+			if (count >= 4) {
+				// Retry in smaller chunks
+				PackageList firstHalf;
+				PackageList secondHalf;
+				for (int i = 0; i < count / 2; i++)
+					firstHalf.Add(packages.ItemAtFast(i));
+				for (int i = count / 2; i < count; i++)
+					secondHalf.Add(packages.ItemAtFast(i));
+				packages.Clear();
+				_PopulatePackageInfos(firstHalf, fromCacheOnly, packagesWithIcons);
+				_PopulatePackageInfos(secondHalf, fromCacheOnly, packagesWithIcons);
+			} else {
+				while (packages.CountItems() > 0) {
+					const PackageInfoRef& package = packages.ItemAtFast(0);
+					_PopulatePackageInfo(package, fromCacheOnly);
+					packages.Remove(0);
+				}
 			}
 		}
 	}
@@ -1083,17 +1162,34 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, bool fromCacheOnly)
 	if (fromCacheOnly)
 		return;
 
-	// Retrieve info from web-app
-	BMessage info;
+	BString repositoryCode;
+	const DepotInfo* depot = DepotForName(package->DepotName());
 
-	status_t status = fWebAppInterface.RetrievePackageInfo(package->Name(),
-		package->Architecture(), info);
-	if (status == B_OK) {
-		// Parse message
-//		info.PrintToStream();
-		BMessage result;
-		if (info.FindMessage("result", &result) == B_OK)
-			_PopulatePackageInfo(package, result);
+	if (depot != NULL) {
+		repositoryCode = depot->WebAppRepositoryCode();
+
+		if (repositoryCode.Length() > 0) {
+			// Retrieve info from web-app
+			BMessage info;
+
+			status_t status = fWebAppInterface.RetrievePackageInfo(
+				package->Name(), package->Architecture(), repositoryCode,
+				info);
+
+			if (status == B_OK) {
+				// Parse message
+		//		info.PrintToStream();
+				BMessage result;
+				if (info.FindMessage("result", &result) == B_OK)
+					_PopulatePackageInfo(package, result);
+			}
+		} else {
+			printf("unable to find the web app repository code for depot; %s\n",
+				package->DepotName().String());
+		}
+	} else {
+		printf("no depot for name; %s\n",
+			package->DepotName().String());
 	}
 }
 
@@ -1189,7 +1285,7 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 
 		append_word_list(foundInfo, "prominence");
 	}
-	
+
 	BString changelog;
 	if (data.FindString("pkgChangelogContent", &changelog) == B_OK) {
 		package->SetChangelog(changelog);
@@ -1380,4 +1476,3 @@ Model::_NotifyAuthorizationChanged()
 			listener->AuthorizationChanged();
 	}
 }
-

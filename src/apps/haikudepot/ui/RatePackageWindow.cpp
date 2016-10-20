@@ -1,5 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -408,64 +409,74 @@ RatePackageWindow::_QueryRatingThread()
 
 	WebAppInterface interface;
 	BMessage info;
+	const DepotInfo* depot = fModel.DepotForName(package->DepotName());
+	BString repositoryCode;
 
-	status_t status = interface.RetrieveUserRating(
-		package->Name(), package->Version(), package->Architecture(),
-		username, info);
+	if (depot != NULL)
+		repositoryCode = depot->WebAppRepositoryCode();
 
-//	info.PrintToStream();
-
-	BMessage result;
-	if (status == B_OK && info.FindMessage("result", &result) == B_OK
-		&& Lock()) {
-
-		result.FindString("code", &fRatingID);
-		result.FindBool("active", &fRatingActive);
-		BString comment;
-		if (result.FindString("comment", &comment) == B_OK) {
-			MarkupParser parser;
-			fRatingText = parser.CreateDocumentFromMarkup(comment);
-			fTextView->SetTextDocument(fRatingText);
-		}
-		if (result.FindString("userRatingStabilityCode",
-			&fStability) == B_OK) {
-			int32 index = 0;
-			for (int32 i = fStabilityCodes.CountItems() - 1; i >= 0; i--) {
-				const StabilityRating& stability
-					= fStabilityCodes.ItemAtFast(i);
-				if (stability.Name() == fStability) {
-					index = i;
-					break;
-				}
-			}
-			BMenuItem* item = fStabilityField->Menu()->ItemAt(index);
-			if (item != NULL)
-				item->SetMarked(true);
-		}
-		if (result.FindString("naturalLanguageCode",
-			&fCommentLanguage) == B_OK) {
-			BMenuItem* item = fCommentLanguageField->Menu()->ItemAt(
-				fModel.SupportedLanguages().IndexOf(fCommentLanguage));
-			if (item != NULL)
-				item->SetMarked(true);
-		}
-		double rating;
-		if (result.FindDouble("rating", &rating) == B_OK) {
-			fRating = (float)rating;
-			fSetRatingView->SetPermanentRating(fRating);
-		}
-
-		fRatingActiveCheckBox->SetValue(fRatingActive);
-		fRatingActiveCheckBox->Show();
-
-		fSendButton->SetLabel(B_TRANSLATE("Update"));
-
-		Unlock();
+	if (repositoryCode.Length() == 0) {
+		printf("unable to obtain the repository code for depot; %s\n",
+			package->DepotName().String());
 	} else {
-		fprintf(stderr, "rating query: Failed response: %s\n",
-			strerror(status));
-		if (!info.IsEmpty())
-			info.PrintToStream();
+		status_t status = interface.RetrieveUserRating(
+			package->Name(), package->Version(), package->Architecture(),
+			repositoryCode, username, info);
+
+	//	info.PrintToStream();
+
+		BMessage result;
+		if (status == B_OK && info.FindMessage("result", &result) == B_OK
+			&& Lock()) {
+
+			result.FindString("code", &fRatingID);
+			result.FindBool("active", &fRatingActive);
+			BString comment;
+			if (result.FindString("comment", &comment) == B_OK) {
+				MarkupParser parser;
+				fRatingText = parser.CreateDocumentFromMarkup(comment);
+				fTextView->SetTextDocument(fRatingText);
+			}
+			if (result.FindString("userRatingStabilityCode",
+				&fStability) == B_OK) {
+				int32 index = 0;
+				for (int32 i = fStabilityCodes.CountItems() - 1; i >= 0; i--) {
+					const StabilityRating& stability
+						= fStabilityCodes.ItemAtFast(i);
+					if (stability.Name() == fStability) {
+						index = i;
+						break;
+					}
+				}
+				BMenuItem* item = fStabilityField->Menu()->ItemAt(index);
+				if (item != NULL)
+					item->SetMarked(true);
+			}
+			if (result.FindString("naturalLanguageCode",
+				&fCommentLanguage) == B_OK) {
+				BMenuItem* item = fCommentLanguageField->Menu()->ItemAt(
+					fModel.SupportedLanguages().IndexOf(fCommentLanguage));
+				if (item != NULL)
+					item->SetMarked(true);
+			}
+			double rating;
+			if (result.FindDouble("rating", &rating) == B_OK) {
+				fRating = (float)rating;
+				fSetRatingView->SetPermanentRating(fRating);
+			}
+
+			fRatingActiveCheckBox->SetValue(fRatingActive);
+			fRatingActiveCheckBox->Show();
+
+			fSendButton->SetLabel(B_TRANSLATE("Update"));
+
+			Unlock();
+		} else {
+			fprintf(stderr, "rating query: Failed response: %s\n",
+				strerror(status));
+			if (!info.IsEmpty())
+				info.PrintToStream();
+		}
 	}
 
 	_SetWorkerThread(-1);
@@ -491,6 +502,7 @@ RatePackageWindow::_SendRatingThread()
 
 	BString package = fPackage->Name();
 	BString architecture = fPackage->Architecture();
+	BString repositoryCode;
 	int rating = (int)fRating;
 	BString stability = fStability;
 	BString comment = fRatingText->Text();
@@ -498,9 +510,21 @@ RatePackageWindow::_SendRatingThread()
 	BString ratingID = fRatingID;
 	bool active = fRatingActive;
 
+	const DepotInfo* depot = fModel.DepotForName(fPackage->DepotName());
+
+	if (depot != NULL)
+		repositoryCode = depot->WebAppRepositoryCode();
+
 	WebAppInterface interface = fModel.GetWebAppInterface();
 
 	Unlock();
+
+	if (repositoryCode.Length() == 0) {
+		printf("unable to find the web app repository code for the local "
+			"depot %s\n",
+			fPackage->DepotName().String());
+		return;
+	}
 
 	if (stability == "unspecified")
 		stability = "";
@@ -512,7 +536,7 @@ RatePackageWindow::_SendRatingThread()
 		languageCode, comment, stability, rating, active, info);
 	} else {
 		status = interface.CreateUserRating(package, architecture,
-		languageCode, comment, stability, rating, info);
+			repositoryCode, languageCode, comment, stability, rating, info);
 	}
 
 	BString error = B_TRANSLATE(

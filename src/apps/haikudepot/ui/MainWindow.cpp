@@ -3,6 +3,7 @@
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2013, Rene Gollent, rene@gollent.com.
  * Copyright 2013, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -834,7 +835,27 @@ MainWindow::_RefreshPackageList(bool force)
 	DepotInfoMap depots;
 	for (int32 i = 0; i < repositoryNames.CountStrings(); i++) {
 		const BString& repoName = repositoryNames.StringAt(i);
-		depots[repoName] = DepotInfo(repoName);
+		DepotInfo depotInfo = DepotInfo(repoName);
+
+		BRepositoryConfig repoConfig;
+		status_t getRepositoryConfigStatus = roster.GetRepositoryConfig(
+			repoName, &repoConfig);
+
+		if (getRepositoryConfigStatus == B_OK) {
+			depotInfo.SetBaseURL(repoConfig.BaseURL());
+
+			// it would be nice if this could be more logically located such as
+			// when the repository is added to the model, but that is probably
+			// a bigger change.
+
+			fModel.PopulateWebAppRepositoryCode(depotInfo);
+		} else {
+			printf("unable to obtain the repository config for local "
+				"repository '%s'; %s\n",
+				repoName.String(), strerror(getRepositoryConfigStatus));
+		}
+
+		depots[repoName] = depotInfo;
 	}
 
 	PackageManager manager(B_PACKAGE_INSTALLATION_LOCATION_HOME);
@@ -891,6 +912,7 @@ MainWindow::_RefreshPackageList(bool force)
 	for (int32 i = 0; i < packages.CountItems(); i++) {
 		BSolverPackage* package = packages.ItemAt(i);
 		const BPackageInfo& repoPackageInfo = package->Info();
+		const BString repositoryName = package->Repository()->Name();
 		PackageInfoRef modelInfo;
 		PackageInfoMap::iterator it = foundPackages.find(
 			repoPackageInfo.Name());
@@ -903,6 +925,8 @@ MainWindow::_RefreshPackageList(bool force)
 
 			if (modelInfo.Get() == NULL)
 				return;
+
+			modelInfo->SetDepotName(repositoryName);
 
 			foundPackages[repoPackageInfo.Name()] = modelInfo;
 		}
@@ -1244,4 +1268,3 @@ MainWindow::_ShowScreenshot()
 
 	fScreenshotWindow->Unlock();
 }
-

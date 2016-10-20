@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
+ * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef PACKAGE_INFO_H
@@ -340,6 +341,10 @@ public:
 			int64				Size() const
 									{ return fSize; }
 
+			void				SetDepotName(const BString& depotName);
+			const BString&		DepotName() const
+									{ return fDepotName; }
+
 			bool				AddListener(
 									const PackageInfoListenerRef& listener);
 			void				RemoveListener(
@@ -376,6 +381,7 @@ private:
 			BString				fLocalFilePath;
 			BString				fFileName;
 			int64				fSize;
+			BString				fDepotName;
 
 	static	BitmapRef			sDefaultIcon;
 };
@@ -407,9 +413,19 @@ public:
 
 			void				SyncPackages(const PackageList& packages);
 
+			void				SetBaseURL(const BString& baseURL);
+			const BString&		BaseURL() const
+									{ return fBaseURL; }
+
+			void				SetWebAppRepositoryCode(const BString& code);
+			const BString&		WebAppRepositoryCode() const
+									{ return fWebAppRepositoryCode; }
+
 private:
 			BString				fName;
 			PackageList			fPackages;
+			BString				fWebAppRepositoryCode;
+			BString				fBaseURL;
 };
 
 
