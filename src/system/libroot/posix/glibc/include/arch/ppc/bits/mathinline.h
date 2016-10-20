@@ -51,10 +51,10 @@
 
 #if !defined __NO_MATH_INLINES && defined __OPTIMIZE__
 
-#ifdef __cplusplus
+#ifndef __extern_always_inline
 # define __MATH_INLINE __inline
 #else
-# define __MATH_INLINE extern __inline
+# define __MATH_INLINE __extern_always_inline
 #endif  /* __cplusplus */
 
 #ifdef __USE_ISOC99
