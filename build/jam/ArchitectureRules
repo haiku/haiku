@@ -234,7 +234,12 @@ rule KernelArchitectureSetup architecture
 
 		case arm :
 			switch $(HAIKU_BOOT_BOARD) {
-				case beagle :
+				case beagleboard :
+				{
+					HAIKU_BOOT_PLATFORM ?= u-boot ;
+					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
+				}
+				case beaglebone :
 				{
 					HAIKU_BOOT_PLATFORM ?= u-boot ;
 					HAIKU_BOOT_FLOPPY_IMAGE_SIZE = 1440 ;
