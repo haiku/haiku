@@ -15,15 +15,18 @@ buildToolsDir=$3
 installDir=$4
 shift 4
 additionalMakeArgs=$*
+gdbSourceDir="$HAIKU_USE_GDB"
 
 ccFlags="-O2"
 cxxFlags="-O2"
 binutilsTargets="$haikuMachine"
+gdbTarget="$haikuMachine"
 case $haikuMachine in
 i586-*)
 	binutilsConfigureArgs="--disable-multilib"
 	gccConfigureArgs="--disable-multilib"
 	binutilsTargets="$binutilsTargets,i386-efi-pe,x86_64-efi-pe"
+	gdbConfigureArgs="--disable-multilib"
 	;;
 x86_64-*)
 	# GCC's default is to enable multilib, but there is a bug when
@@ -31,10 +34,12 @@ x86_64-*)
 	# failure
 	binutilsConfigureArgs=""
 	binutilsTargets="$binutilsTargets,i386-efi-pe,x86_64-efi-pe"
+	gdbConfigureArgs="--disable-multilib"
 	;;
 m68k-*)
 	binutilsConfigureArgs="--enable-multilib"
 	gccConfigureArgs="--enable-multilib"
+	gdbConfigureArgs="--disable-multilib"
 	;;
 arm-*)
 	# Multilib creates a lot of confusion as the wrong libs end up being linked.
@@ -47,15 +52,20 @@ arm-*)
 	# TODO: Disable building with TLS support for ARM until implemented.
 	binutilsConfigureArgs="$binutilsConfigureArgs --disable-tls"
 	gccConfigureArgs="$gccConfigureArgs --disable-tls"
+	gdbConfigureArgs="--disable-multilib --disable-werror -enable-interwork"
+	gdbTarget="arm-unknown-elf"
 	;;
 powerpc-*)
 	binutilsConfigureArgs="--disable-multilib"
 	gccConfigureArgs="--disable-multilib"
 	binutilsTargets="$binutilsTargets,powerpc-apple-linux,powerpc-apple-freebsd,powerpc-apple-vxworks"
+	gdbConfigureArgs="--disable-multilib --disable-werror"
+	gdbTarget="powerpc-unknown-elf"
 	;;
 *)
 	binutilsConfigureArgs="--disable-multilib"
 	gccConfigureArgs="--disable-multilib"
+	gdbConfigureArgs="--disable-multilib"
 	;;
 esac
 
@@ -72,6 +82,11 @@ fi
 
 if [ ! -d "$buildToolsDir" ]; then
 	echo "No such directory: \"$buildToolsDir\"" >&2
+	exit 1
+fi
+
+if [ -n "$gdbSourceDir" -a ! -d "$gdbSourceDir" ]; then
+	echo "No such directory: \"$gdbSourceDir\"" >&2
 	exit 1
 fi
 
@@ -95,6 +110,12 @@ cd "$installDir"
 installDir=$(pwd)
 cd "$currentDir"
 
+if [ -n "$gdbSourceDir" ]; then
+cd "$gdbSourceDir"
+gdbSourceDir=$(pwd)
+cd "$currentDir"
+fi
+
 binutilsSourceDir="$buildToolsDir/binutils"
 gccSourceDir="$buildToolsDir/gcc"
 
@@ -117,6 +138,7 @@ find "$binutilsSourceDir" "$gccSourceDir" -name \*.info -print0 | xargs -0 touch
 objDir="${installDir}-build"
 binutilsObjDir="$objDir/binutils"
 gccObjDir="$objDir/gcc"
+gdbObjDir="$objDir/gdb"
 stdcxxObjDir="$objDir/stdcxx"
 sysrootDir="$installDir/sysroot"
 tmpIncludeDir="$sysrootDir/boot/system/develop/headers"
@@ -124,8 +146,8 @@ tmpLibDir="$sysrootDir/boot/system/develop/lib"
 
 rm -rf "$installDir" "$objDir"
 
-mkdir -p "$installDir" "$objDir" "$binutilsObjDir" "$gccObjDir" "$stdcxxObjDir" \
-	"$tmpIncludeDir" "$tmpLibDir" || exit 1
+mkdir -p "$installDir" "$objDir" "$binutilsObjDir" "$gccObjDir" "$gdbObjDir" \
+	"$stdcxxObjDir" "$tmpIncludeDir" "$tmpLibDir" || exit 1
 mkdir -p "$installDir/lib/gcc/$haikuMachine/$gccVersion"
 
 if [ "$HAIKU_USE_GCC_GRAPHITE" = 1 ]; then
@@ -154,6 +176,17 @@ fi
 
 # force the POSIX locale, as the build (makeinfo) might choke otherwise
 export LC_ALL=POSIX
+
+# build gdb
+if [ -n "$HAIKU_USE_GDB" ]; then
+cd "$gdbObjDir"
+	"$gdbSourceDir/configure" \
+		--prefix="$installDir" --target=$gdbTarget \
+		$gdbConfigureArgs \
+		|| exit 1
+	$MAKE $additionalMakeArgs || exit 1
+	$MAKE $additionalMakeArgs install || exit 1
+fi
 
 # build binutils
 cd "$binutilsObjDir"
