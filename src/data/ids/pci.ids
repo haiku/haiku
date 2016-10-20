@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.10.13
-#	Date:    2016-10-13 03:15:02
+#	Version: 2016.10.20
+#	Date:    2016-10-20 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -7358,6 +7358,7 @@
 	8533  PEX 8533 32-lane, 6-port PCI Express Switch
 	8547  PEX 8547 48-lane, 3-port PCI Express Switch
 	8548  PEX 8548 48-lane, 9-port PCI Express Switch
+	8603  PEX 8603 3-lane, 3-Port PCI Express Gen 2 (5.0 GT/s) Switch
 	8604  PEX 8604 4-lane, 4-Port PCI Express Gen 2 (5.0 GT/s) Switch
 	8605  PEX 8605 PCI Express 4-port Gen2 Switch
 	8606  PEX 8606 6 Lane, 6 Port PCI Express Gen 2 (5.0 GT/s) Switch
@@ -18653,7 +18654,12 @@
 	7018  AP408: 32-Channel Digital I/O Module
 	701a  AP220-16 12-Bit, 16-Channel Analog Output Module
 	701b  AP231-16 16-Bit, 16-Channel Analog Output Module
+	7021  APA7-201 Reconfigurable Artix-7 FPGA module 48 TTL channels
+	7022  APA7-202 Reconfigurable Artix-7 FPGA module 24 RS485 channels
+	7023  APA7-203 Reconfigurable Artix-7 FPGA module 24 TTL & 12 RS485 channels
+	7024  APA7-204 Reconfigurable Artix-7 FPGA module 24 LVDS channels
 	7042  AP482 Counter Timer Module with TTL Level Input/Output
+	7043  AP483 Counter Timer Module with TTL Level and RS422 Input/Output
 	7044  AP484 Counter Timer Module with RS422 Input/Output
 16da  Advantech Co., Ltd.
 	0011  INES GPIB-PCI
@@ -22588,8 +22594,15 @@
 	1520  I350 Ethernet Controller Virtual Function
 	1521  I350 Gigabit Network Connection
 		1028 0602  Gigabit 2P I350-t LOM
+		1028 0693  Gigabit 2P I350-t LOM
+		1028 06e2  Gigabit 2P I350-t LOM
+		1028 0757  Gigabit I350-t LOM
+		1028 075a  Gigabit I350-t LOM
 		1028 1f60  Gigabit 4P I350-t rNDC
 		1028 1f62  Gigabit 4P X540/I350 rNDC
+		1028 1fa8  Ethernet 10G 4P X550/I350 rNDC
+		1028 1fa9  Ethernet 10G 4P X550 rNDC
+		1028 1faa  Gigabit 4P X550/I350 rNDC
 		1028 ff9a  Gigabit 4P X710/I350 rNDC
 		103c 17d1  Ethernet 1Gb 4-port 366FLR Adapter
 		103c 2003  Ethernet 1Gb 2-port 367i Adapter
@@ -26254,10 +26267,21 @@
 	37cd  X722 Virtual Function
 	37ce  Ethernet Connection X722 for 10GbE backplane
 		1590 0215  Ethernet 10Gb 2-port 568i Adapter
+		17aa 4023  Intel Ethernet Connection X722 for 10GbE backplane
 	37cf  Ethernet Connection X722 for 10GbE QSFP+
 	37d0  Ethernet Connection X722 for 10GbE SFP+
 	37d1  Ethernet Connection X722 for 1GbE
+		17aa 4020  Intel Ethernet Connection X722 for 1GbE
+		17aa 4021  Intel Ethernet Connection X722 for 1GbE
+		17aa 4022  Intel Ethernet Connection X722 for 1GbE
+		8086 4020  Ethernet Connection X722 for 1GbE
+		8086 4021  Ethernet Connection X722 for 1GbE
+		8086 4022  Ethernet Connection X722 for 1GbE
 	37d2  Ethernet Connection X722 for 10GBASE-T
+		17aa 4020  Intel Ethernet Connection X722 for 10GBASE
+		17aa 4021  Intel Ethernet Connection X722 for 10GBASE
+		8086 4020  Ethernet Connection X722 for 10GBASE
+		8086 4021  Ethernet Connection X722 for 10GBASE
 	37d3  Ethernet Connection X722 for 10GbE SFP+
 	37d4  Ethernet Connection X722 for 10GbE QSFP+
 	37d9  X722 Hyper-V Virtual Function
