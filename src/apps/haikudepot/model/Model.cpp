@@ -172,7 +172,7 @@ public:
 
 	virtual bool AcceptsPackage(const PackageInfoRef& package) const
 	{
-		if (package.Get()==NULL)
+		if (package.Get() == NULL)
 			return false;
 
 		printf("TEST %s\n", package->Name().String());
@@ -846,14 +846,14 @@ Model::PopulateWebAppRepositoryCode(DepotInfo& depotInfo)
 
 		repositorySourceBaseURLs.Add(depotInfo.BaseURL());
 
-        // TODO; better API call handling around errors.
+		// TODO; better API call handling around errors.
 
 		if (fWebAppInterface.RetrieveRepositoriesForSourceBaseURLs(
 			repositorySourceBaseURLs, repositoriesEnvelope) == B_OK
 			&& repositoriesEnvelope.FindMessage("result", &result) == B_OK
 			&& result.FindDouble("total", &total) == B_OK) {
 
-			if ((int64) total > 0) {
+			if ((int64)total > 0) {
 				BMessage repositories;
 				BMessage repository;
 				BString repositoryCode;
@@ -869,7 +869,8 @@ Model::PopulateWebAppRepositoryCode(DepotInfo& depotInfo)
 						depotInfo.WebAppRepositoryCode().String(),
 						depotInfo.Name().String());
 				} else {
-					printf("unable to find the 'code' in the api response for local depot '%s'\n",
+					printf("unable to find the 'code' in the api response for "
+						"local depot '%s'\n",
 						depotInfo.Name().String());
 				}
 			} else {
@@ -881,7 +882,8 @@ Model::PopulateWebAppRepositoryCode(DepotInfo& depotInfo)
 				depotInfo.BaseURL().String());
 		}
 	} else {
-		printf("missing base url for depot info %s --> will not obtain web app repository code\n",
+		printf("missing base url for depot info %s --> will not obtain web app "
+			"repository code\n",
 			depotInfo.Name().String());
 	}
 }
@@ -1075,7 +1077,6 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 
 		if (status == B_OK) {
 			// Parse message
-	//		info.PrintToStream();
 			BMessage result;
 			BMessage pkgs;
 			if (info.FindMessage("result", &result) == B_OK
