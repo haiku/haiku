@@ -17,7 +17,7 @@ HAIKU_BOARD_LOADER_ENTRY_LINUX = `printf \"obase=16;ibase=16;10 + %x\\n\" $(HAIK
 #
 
 # u-boot image
-HAIKU_BOARD_UBOOT_IMAGE_URL = https://github.com/kallisti5/rpi-uboot-bins/raw/master/rpi2 ;
+HAIKU_BOARD_UBOOT_IMAGE_URL = https://github.com/haiku/firmware/raw/master/arm/rpi2 ;
 ubootFile = [ DownloadFile u-boot.bin : $(HAIKU_BOARD_UBOOT_IMAGE_URL)/u-boot.bin ] ;
 configFile = [ DownloadFile config.txt : $(HAIKU_BOARD_UBOOT_IMAGE_URL)/config.txt ] ;
 

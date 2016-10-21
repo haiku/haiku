@@ -26,11 +26,11 @@ HAIKU_BOARD_SDIMAGE_SIZE = 64 ;
 HAIKU_BOARD_SDIMAGE_FAT_SIZE = 32 ;
 
 # OMAP x-loader image, must be first file on FAT partition
-HAIKU_BOARD_MLO_IMAGE_URL = https://github.com/kallisti5/beagle-uboot-bins/raw/master/beaglebone ;
+HAIKU_BOARD_MLO_IMAGE_URL = https://github.com/haiku/firmware/raw/master/arm/beaglebone ;
 mloFile = [ DownloadFile MLO : $(HAIKU_BOARD_MLO_IMAGE_URL)/MLO ] ;
 
 # u-boot image
-HAIKU_BOARD_UBOOT_IMAGE_URL = https://github.com/kallisti5/beagle-uboot-bins/raw/master/beaglebone ;
+HAIKU_BOARD_UBOOT_IMAGE_URL = https://github.com/haiku/firmware/raw/master/arm/beaglebone ;
 ubootFile = [ DownloadFile u-boot.img : $(HAIKU_BOARD_UBOOT_IMAGE_URL)/u-boot.img ] ;
 
 # U-Boot environment
