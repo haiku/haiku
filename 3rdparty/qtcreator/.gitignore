@@ -1,0 +1,5 @@
+# Ignore everything in this directory...
+*
+# Except for this file, and the script.
+!.gitignore
+!create_project_file.sh
