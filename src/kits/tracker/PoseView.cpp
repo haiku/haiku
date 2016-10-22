@@ -114,11 +114,6 @@ const int32 kRoomForLine = 2;
 
 const int32 kMenuTrackMargin = 20;
 
-namespace BPrivate {
-extern bool delete_point(void*);
-	// TODO: exterminate this
-}
-
 const float kSlowScrollBucket = 30;
 const float kBorderHeight = 20;
 
