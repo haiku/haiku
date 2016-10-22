@@ -274,22 +274,11 @@ sanitize_display_mode(display_mode& mode)
 // #pragma mark -
 
 
-void
-set_frame_buffer_base()
+static void set_frame_buffer_registers(uint32 baseRegister,
+	uint32 surfaceRegister)
 {
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	display_mode &mode = gInfo->current_mode;
-
-	uint32 baseRegister;
-	uint32 surfaceRegister;
-
-	if (gInfo->head_mode & HEAD_MODE_A_ANALOG) {
-		baseRegister = INTEL_DISPLAY_A_BASE;
-		surfaceRegister = INTEL_DISPLAY_A_SURFACE;
-	} else {
-		baseRegister = INTEL_DISPLAY_B_BASE;
-		surfaceRegister = INTEL_DISPLAY_B_SURFACE;
-	}
 
 	if (sharedInfo.device_type.InGroup(INTEL_GROUP_96x)
 		|| sharedInfo.device_type.InGroup(INTEL_GROUP_G4x)
@@ -307,6 +296,16 @@ set_frame_buffer_base()
 			+ mode.h_display_start * (sharedInfo.bits_per_pixel + 7) / 8);
 		read32(baseRegister);
 	}
+}
+
+
+void
+set_frame_buffer_base()
+{
+	// TODO we always set both displays to the same address. When we support
+	// multiple framebuffers, they should get different addresses here.
+	set_frame_buffer_registers(INTEL_DISPLAY_A_BASE, INTEL_DISPLAY_A_SURFACE);
+	set_frame_buffer_registers(INTEL_DISPLAY_B_BASE, INTEL_DISPLAY_B_SURFACE);
 }
 
 
@@ -599,10 +598,11 @@ intel_set_display_mode(display_mode* mode)
 	// Changing bytes per row seems to be ignored if the plane/pipe is turned
 	// off
 
-	if (gInfo->head_mode & HEAD_MODE_A_ANALOG)
-		write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow);
-	if (gInfo->head_mode & HEAD_MODE_B_DIGITAL)
-		write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
+	// Always set both pipes, just in case
+	// TODO rework this when we get multiple head support with different
+	// resolutions
+	write32(INTEL_DISPLAY_A_BYTES_PER_ROW, bytesPerRow);
+	write32(INTEL_DISPLAY_B_BYTES_PER_ROW, bytesPerRow);
 
 	// update shared info
 	gInfo->current_mode = target;
