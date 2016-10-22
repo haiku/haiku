@@ -113,9 +113,7 @@ class TMagnify : public BView {
 		bool			ShowGrid();
 
 		void			StartSave();
-		void			SaveImage(entry_ref* ref, char* name, bool selectionOnly=false);
-		void 			SaveBits(BFile* file, const BBitmap *bitmap,
-							const char* name) const;
+		void			SaveImage(entry_ref* ref, char* name);
 		void			EndSave();
 
 	private:

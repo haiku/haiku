@@ -12,6 +12,7 @@
 
 #include <Alert.h>
 #include <Bitmap.h>
+#include <BitmapStream.h>
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <Debug.h>
@@ -22,11 +23,14 @@
 #include <MenuItem.h>
 #include <MenuField.h>
 #include <MessageFormat.h>
+#include <NodeInfo.h>
 #include <Path.h>
 #include <PopUpMenu.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <TextView.h>
+#include <TranslationUtils.h>
+#include <TranslatorRoster.h>
 #include <WindowScreen.h>
 
 #include <stdio.h>
@@ -321,7 +325,7 @@ TWindow::MessageReceived(BMessage* m)
 			BMessage message(msg_dump);
 			fSavePanel = new BFilePanel(B_SAVE_PANEL, &messenger, 0, 0, false,
 				&message);
-			fSavePanel->SetSaveText("Bitmaps.h");
+			fSavePanel->SetSaveText("Bitmaps.png");
 			fSavePanel->Show();
 		}	break;
 		case msg_dump:
@@ -1640,116 +1644,26 @@ TMagnify::EndSave()
 
 
 void
-TMagnify::SaveImage(entry_ref* ref, char* name, bool selectionOnly)
+TMagnify::SaveImage(entry_ref* ref, char* name)
 {
 	// create a new file
 	BFile file;
 	BDirectory parentDir(ref);
 	parentDir.CreateFile(name, &file);
 
-	// write off the bitmaps bits to the file
-	SaveBits(&file, fImageView->Bitmap(), "Data");
+	// Write the screenshot bitmap to the file
+	BBitmapStream stream(fImageView->Bitmap());
+	BTranslatorRoster* roster = BTranslatorRoster::Default();
+	roster->Translate(&stream, NULL, NULL, &file, B_PNG_FORMAT,
+		B_TRANSLATOR_BITMAP);
+
+	BBitmap* bitmap;
+	stream.DetachBitmap(&bitmap);
+		// The stream takes over ownership of the bitmap
 
 	// unfreeze the image, image was frozen before invoke of FilePanel
 	EndSave();
 }
-
-
-void
-TMagnify::SaveBits(BFile* file, const BBitmap *bitmap, const char* name) const
-{
-	int32 bytesPerPixel;
-	const char *kColorSpaceName;
-
-	switch (bitmap->ColorSpace()) {
-		case B_GRAY8:
-			bytesPerPixel = 1;
-			kColorSpaceName = "B_GRAY8";
-			break;
-
-		case B_CMAP8:
-			bytesPerPixel = 1;
-			kColorSpaceName = "B_CMAP8";
-			break;
-
-		case B_RGB15:
-		case B_RGBA15:
-		case B_RGB15_BIG:
-		case B_RGBA15_BIG:
-			bytesPerPixel = 2;
-			kColorSpaceName = "B_RGB15";
-			break;
-
-		case B_RGB16:
-		case B_RGB16_BIG:
-			bytesPerPixel = 2;
-			kColorSpaceName = "B_RGB16";
-			break;
-
-		case B_RGB32:
-		case B_RGBA32:
-		case B_RGBA32_BIG:
-		case B_BIG_RGB_32_BIT:
-			bytesPerPixel = 3;
-			kColorSpaceName = "B_RGB32";
-			break;
-
-		default:
-			printf("dump: usupported ColorSpace\n");
-			return;
-	}
-
-	char str[1024];
-	// stream out the width, height and ColorSpace
-	sprintf(str, "const int32 k%sWidth = %" B_PRIi32 ";\n", name,
-		(int32)bitmap->Bounds().Width()+1);
-	file->Write(str, strlen(str));
-	sprintf(str, "const int32 k%sHeight = %" B_PRIi32 ";\n", name,
-		(int32)bitmap->Bounds().Height()+1);
-	file->Write(str, strlen(str));
-	sprintf(str, "const color_space k%sColorSpace = %s;\n\n", name,
-		kColorSpaceName);
-	file->Write(str, strlen(str));
-
-	// stream out the constant name for this array
-	sprintf(str, "const unsigned char k%sBits [] = {", name);
-	file->Write(str, strlen(str));
-
-	const unsigned char *bits = (const unsigned char *)bitmap->Bits();
-	const int32 kMaxColumnWidth = 16;
-	int32 bytesPerRow = bitmap->BytesPerRow();
-	int32 columnWidth = (bytesPerRow < kMaxColumnWidth) ? bytesPerRow : kMaxColumnWidth;
-
-	for (int32 remaining = bitmap->BitsLength(); remaining; ) {
-		sprintf(str, "\n\t");
-		file->Write(str, strlen(str));
-
-		//	stream out each row, based on the number of bytes required per row
-		//	padding is in the bitmap and will be streamed as 0xff
-		for (int32 column = 0; column < columnWidth; column++) {
-			// stream out individual pixel components
-			for (int32 count = 0; count < bytesPerPixel; count++) {
-				--remaining;
-				sprintf(str, "0x%02x", *bits++);
-				file->Write(str, strlen(str));
-
-				if (remaining) {
-					sprintf(str, ",");
-					file->Write(str, strlen(str));
-				} else
-					break;
-			}
-
-			//	make sure we don't walk off the end of the bits array
-			if (!remaining)
-				break;
-		}
-	}
-
-	sprintf(str, "\n};\n\n");
-	file->Write(str, strlen(str));
-}
-
 
 //	#pragma mark -
 

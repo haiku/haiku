@@ -6,15 +6,15 @@ AddSubDirSupportedPlatforms libbe_test ;
 
 UsePrivateHeaders shared ;
 
-Application Magnify : 
-	Magnify.cpp 
-	: be game localestub [ TargetLibsupc++ ] tracker
+Application Magnify :
+	Magnify.cpp
+	: be game localestub [ TargetLibsupc++ ] tracker translation
 	: Magnify.rdef
 ;
 
-DoCatalogs Magnify : 
+DoCatalogs Magnify :
 	x-vnd.Haiku-Magnify
-	: 
+	:
 	Magnify.cpp
 ;
 
