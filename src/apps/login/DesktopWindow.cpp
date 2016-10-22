@@ -14,6 +14,7 @@
 #include <Path.h>
 #include <Screen.h>
 #include <View.h>
+#include <WindowPrivate.h>
 
 #include "LoginApp.h"
 #include "DesktopWindow.h"
@@ -21,15 +22,11 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "Desktop Window"
 
-const window_feel kPrivateDesktopWindowFeel = window_feel(1024);
-const window_look kPrivateDesktopWindowLook = window_look(4);
-	// this is a mirror of an app server private values
-
 
 DesktopWindow::DesktopWindow(BRect frame, bool editMode)
-	: BWindow(frame, B_TRANSLATE("Desktop"), 
-		kPrivateDesktopWindowLook, 
-		kPrivateDesktopWindowFeel, 
+	: BWindow(frame, B_TRANSLATE("Desktop"),
+		kDesktopWindowLook,
+		kDesktopWindowFeel,
 		B_NOT_MOVABLE | B_NOT_CLOSABLE | B_NOT_ZOOMABLE
 		 | B_NOT_MINIMIZABLE | B_NOT_RESIZABLE
 		 | B_ASYNCHRONOUS_CONTROLS,

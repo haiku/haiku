@@ -58,6 +58,7 @@ All rights reserved.
 #include <UnicodeChar.h>
 #include <Volume.h>
 #include <VolumeRoster.h>
+#include <WindowPrivate.h>
 
 #include <fs_attr.h>
 #include <image.h>
@@ -585,7 +586,7 @@ BContainerWindow::~BContainerWindow()
 BRect
 BContainerWindow::InitialWindowRect(window_feel feel)
 {
-	if (feel != kPrivateDesktopWindowFeel)
+	if (feel != kDesktopWindowFeel)
 		return sNewWindRect;
 
 	// do not offset desktop window

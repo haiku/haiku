@@ -39,6 +39,7 @@ All rights reserved.
 #include <Locale.h>
 #include <MenuItem.h>
 #include <MessageFilter.h>
+#include <WindowPrivate.h>
 
 #include "AutoLock.h"
 #include "ContainerWindow.h"
@@ -65,7 +66,7 @@ SelectionWindow::SelectionWindow(BContainerWindow* window)
 			| B_NOT_ANCHORED_ON_ACTIVATE),
 	fParentWindow(window)
 {
-	if (window->Feel() & kPrivateDesktopWindowFeel) {
+	if (window->Feel() & kDesktopWindowFeel) {
 		// The window will not show up if we have
 		// B_FLOATING_SUBSET_WINDOW_FEEL and use it with the desktop window
 		// since it's never in front.

@@ -13,6 +13,7 @@
 
 #include <algorithm>
 
+#include <Bitmap.h>
 #include <Control.h>
 #include <GradientLinear.h>
 #include <LayoutUtils.h>
@@ -21,8 +22,7 @@
 #include <String.h>
 #include <View.h>
 #include <Window.h>
-
-#include "ContainerWindow.h"
+#include <WindowPrivate.h>
 
 
 namespace BPrivate {
@@ -1790,8 +1790,8 @@ BControlLook::DrawLabel(BView* view, const char* label, const rgb_color& base,
 
 	BWindow* window = view->Window();
 	bool isDesktop = window
-		&& window->Feel() == kPrivateDesktopWindowFeel
-		&& window->Look() == kPrivateDesktopWindowLook
+		&& window->Feel() == kDesktopWindowFeel
+		&& window->Look() == kDesktopWindowLook
 		&& view->Parent()
 		&& view->Parent()->Parent() == NULL
 		&& (flags & B_IGNORE_OUTLINE) == 0;

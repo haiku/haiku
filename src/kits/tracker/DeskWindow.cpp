@@ -50,6 +50,7 @@ All rights reserved.
 #include <String.h>
 #include <StringList.h>
 #include <Volume.h>
+#include <WindowPrivate.h>
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -186,8 +187,8 @@ LoadAddOnDir(BDirectory directory, BDeskWindow* window,
 
 BDeskWindow::BDeskWindow(LockingList<BWindow>* windowList)
 	:
-	BContainerWindow(windowList, 0, kPrivateDesktopWindowLook,
-		kPrivateDesktopWindowFeel, B_NOT_MOVABLE | B_WILL_ACCEPT_FIRST_CLICK
+	BContainerWindow(windowList, 0, kDesktopWindowLook,
+		kDesktopWindowFeel, B_NOT_MOVABLE | B_WILL_ACCEPT_FIRST_CLICK
 			| B_NOT_ZOOMABLE | B_NOT_CLOSABLE | B_NOT_MINIMIZABLE
 			| B_NOT_RESIZABLE | B_ASYNCHRONOUS_CONTROLS, B_ALL_WORKSPACES,
 			false, true),

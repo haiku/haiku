@@ -70,10 +70,6 @@ class SelectionWindow;
 
 extern const char* kAddOnsMenuName;
 
-const window_feel kPrivateDesktopWindowFeel = window_feel(1024);
-const window_look kPrivateDesktopWindowLook = window_look(4);
-	// this is a mirror of an app server private values
-
 
 enum {
 	// flags that describe opening of the window
