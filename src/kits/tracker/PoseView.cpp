@@ -80,7 +80,6 @@ All rights reserved.
 #include "Bitmaps.h"
 #include "Commands.h"
 #include "CountView.h"
-#include "Cursors.h"
 #include "DeskWindow.h"
 #include "DesktopPoseView.h"
 #include "FilePanelPriv.h"
