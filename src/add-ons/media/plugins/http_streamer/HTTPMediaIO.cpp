@@ -195,11 +195,12 @@ HTTPMediaIO::Open()
 bool
 HTTPMediaIO::IsRunning() const
 {
-	BHttpRequest* httpReq = dynamic_cast<BHttpRequest*>(fReq);
-	if (httpReq != NULL)
+	if (fListener != NULL)
 		return fListener->IsRunning();
-	else
+	else if (fReq != NULL)
 		return fReq->IsRunning();
+
+	return false;
 }
 
 
