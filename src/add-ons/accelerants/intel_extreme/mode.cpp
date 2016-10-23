@@ -274,8 +274,8 @@ sanitize_display_mode(display_mode& mode)
 // #pragma mark -
 
 
-static void set_frame_buffer_registers(uint32 baseRegister,
-	uint32 surfaceRegister)
+static void
+set_frame_buffer_registers(uint32 baseRegister, uint32 surfaceRegister)
 {
 	intel_shared_info &sharedInfo = *gInfo->shared_info;
 	display_mode &mode = gInfo->current_mode;
