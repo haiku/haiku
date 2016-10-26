@@ -1958,7 +1958,7 @@ BListView::_DoneTracking(BPoint where)
 void
 BListView::_Track(BPoint where, uint32)
 {
-	if (fTrack->item_index > 0 && fTrack->try_drag) {
+	if (fTrack->item_index >= 0 && fTrack->try_drag) {
 		// initiate a drag if the mouse was moved far enough
 		BPoint offset = where - fTrack->drag_start;
 		float dragDistance = sqrtf(offset.x * offset.x + offset.y * offset.y);
