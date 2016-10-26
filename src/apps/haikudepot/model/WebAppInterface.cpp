@@ -525,7 +525,7 @@ status_t
 WebAppInterface::RetrievePackageIcon(const BString& packageName,
 	BDataIO* stream)
 {
-	BString urlString = _FormFullUrl(BString("/pkgicon/") << packageName
+	BString urlString = _FormFullUrl(BString("/__pkgicon/") << packageName
 		<< ".hvif");
 	bool isSecure = 0 == urlString.FindFirst("https://");
 
@@ -671,7 +671,7 @@ status_t
 WebAppInterface::RetrieveScreenshot(const BString& code,
 	int32 width, int32 height, BDataIO* stream)
 {
-	BString urlString = _FormFullUrl(BString("/pkgscreenshot/") << code
+	BString urlString = _FormFullUrl(BString("/__pkgscreenshot/") << code
 		<< ".png" << "?tw=" << width << "&th=" << height);
 	bool isSecure = 0 == urlString.FindFirst("https://");
 
@@ -795,7 +795,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	if ((flags & ENABLE_DEBUG) != 0)
 		printf("_SendJsonRequest(%s)\n", jsonString.String());
 
-	BString urlString = _FormFullUrl(BString("/api/v1/") << domain);
+	BString urlString = _FormFullUrl(BString("/__api/v1/") << domain);
 	bool isSecure = 0 == urlString.FindFirst("https://");
 	BUrl url(urlString);
 
