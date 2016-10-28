@@ -751,8 +751,8 @@ RemotePackageRepository HaikuPorts
 	libedit_x86_devel-2015_03_21_3.1-2
 	libelf_x86-0.8.13-1
 	libelf_x86_devel-0.8.13-1
-	libevent_x86-2.0.21-7
-	libevent_x86_devel-2.0.21-7
+	libevent_x86-2.0.21-10
+	libevent_x86_devel-2.0.21-10
 	libexecinfo_x86-1.1-1
 	libexecinfo_x86_devel-1.1-1
 	libffi_x86-3.0.13-1
@@ -978,7 +978,7 @@ RemotePackageRepository HaikuPorts
 	tinyxml_x86-2.6.2-1
 	tinyxml_x86_devel-2.6.2-1
 	tig_x86-2.1-1
-	transmission_x86-2.84-4
+	transmission_x86-2.92-2
 	twolame_x86-0.3.13-2
 	twolame_x86_devel-0.3.13-2
 	vacuum_x86-1.2.5-1
