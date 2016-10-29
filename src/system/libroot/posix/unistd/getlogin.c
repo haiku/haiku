@@ -30,9 +30,9 @@ int getlogin_r(char *name, size_t nameSize)
 {
 	struct passwd *pw;
 	pw = getpwuid(getuid());
-	if (pw && (nameSize > 32/*PW_MAX_NAME*/)) {
+	if (pw && (nameSize >= LOGIN_NAME_MAX)) {
 		memset(name, 0, nameSize);
-		strlcpy(name, pw->pw_name, 32/*PW_MAX_NAME*/);
+		strlcpy(name, pw->pw_name, LOGIN_NAME_MAX);
 		return B_OK;
 	}
 	return ENOMEM;
