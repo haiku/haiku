@@ -275,7 +275,7 @@ private:
 			int					fFontAscent;
 			struct escapement_delta fEscapement;
 			bool				fEmulateBold;
-			bool				fBrightInsteadOfBold;
+			bool				fAllowBold;
 
 			// frame resized flag.
 			bool				fFrameResized;

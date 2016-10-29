@@ -61,9 +61,9 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		B_TRANSLATE("Blinking cursor"),
 			new BMessage(MSG_BLINK_CURSOR_CHANGED));
 
-	fBrightInsteadOfBold = new BCheckBox(
-		B_TRANSLATE("Use bright instead of bold text"),
-			new BMessage(MSG_BRIGHT_INSTEAD_OF_BOLD_CHANGED));
+	fAllowBold = new BCheckBox(
+		B_TRANSLATE("Allow bold text"),
+			new BMessage(MSG_ALLOW_BOLD_CHANGED));
 
 	fWarnOnExit = new BCheckBox(
 		B_TRANSLATE("Confirm exit if active programs exist"),
@@ -139,7 +139,7 @@ AppearancePrefView::AppearancePrefView(const char* name,
 		.Add(fColorControl = new BColorControl(BPoint(10, 10),
 			B_CELLS_32x8, 8.0, "", new BMessage(MSG_COLOR_CHANGED)))
 		.Add(fBlinkCursor)
-		.Add(fBrightInsteadOfBold)
+		.Add(fAllowBold)
 		.Add(fWarnOnExit);
 
 	fTabTitle->SetAlignment(B_ALIGN_RIGHT, B_ALIGN_LEFT);
@@ -171,7 +171,7 @@ AppearancePrefView::Revert()
 	fWindowTitle->SetText(pref->getString(PREF_WINDOW_TITLE));
 
 	fBlinkCursor->SetValue(pref->getBool(PREF_BLINK_CURSOR));
-	fBrightInsteadOfBold->SetValue(pref->getBool(PREF_BRIGHT_INSTEAD_OF_BOLD));
+	fAllowBold->SetValue(pref->getBool(PREF_ALLOW_BOLD));
 	fWarnOnExit->SetValue(pref->getBool(PREF_WARN_ON_EXIT));
 
 	_SetCurrentColorScheme();
@@ -193,7 +193,7 @@ AppearancePrefView::AttachedToWindow()
 	fTabTitle->SetTarget(this);
 	fWindowTitle->SetTarget(this);
 	fBlinkCursor->SetTarget(this);
-	fBrightInsteadOfBold->SetTarget(this);
+	fAllowBold->SetTarget(this);
 	fWarnOnExit->SetTarget(this);
 
 	fFontField->Menu()->SetTargetForItems(this);
@@ -329,11 +329,11 @@ AppearancePrefView::MessageReceived(BMessage* msg)
 			}
 			break;
 
-		case MSG_BRIGHT_INSTEAD_OF_BOLD_CHANGED:
-			if (PrefHandler::Default()->getBool(PREF_BRIGHT_INSTEAD_OF_BOLD)
-				!= fBrightInsteadOfBold->Value()) {
-					PrefHandler::Default()->setBool(PREF_BRIGHT_INSTEAD_OF_BOLD,
-						fBrightInsteadOfBold->Value());
+		case MSG_ALLOW_BOLD_CHANGED:
+			if (PrefHandler::Default()->getBool(PREF_ALLOW_BOLD)
+				!= fAllowBold->Value()) {
+					PrefHandler::Default()->setBool(PREF_ALLOW_BOLD,
+						fAllowBold->Value());
 					modified = true;
 			}
 			break;
