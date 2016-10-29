@@ -51,8 +51,10 @@ LocalTargetHostInterface::Init(Settings* settings)
 {
 	char hostname[HOST_NAME_MAX + 1];
 	status_t error = gethostname(hostname, sizeof(hostname));
-	if (error != B_OK)
-		return error;
+	if (error != B_OK) {
+		fprintf(stderr, "gethostname() failed, defaults to localhost\n");
+		strlcpy(hostname, "localhost", sizeof(hostname));
+	}
 
 	fTargetHost = new(std::nothrow) TargetHost(hostname);
 	if (fTargetHost == NULL)
