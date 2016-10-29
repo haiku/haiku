@@ -1,7 +1,7 @@
 1	romanian	x-vnd.Haiku.TV	1995288111
 TV	MainWin		TV
 Channel	MainWin		Canal
-Settings…	MainWin		Configurări...
+Settings…	MainWin		Configurări…
 Interface	MainWin		Interfață
 Keep aspect ratio	MainWin		Păstrează proporție aspect
 Previous channel	MainWin		Canalul precedent
@@ -14,7 +14,7 @@ Quit	MainWin		Închidere
 Full screen	MainWin		Ecran complet
 Debug	MainWin		Depanare
 Scale to native size	MainWin		Scalează la dimensiunea nativă
-unknown	MainWin		Necunoscut
+unknown	MainWin		necunoscut
 Next channel	MainWin		Canalul următor
 Error, interface is busy:\n\n	MainWin		Eroare, interfața este ocupată:\n\n
 None	MainWin		Nimic

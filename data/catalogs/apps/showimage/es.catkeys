@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-ShowImage	466377502
+1	spanish; castilian	x-vnd.Haiku-ShowImage	575555985
 Use as background…	Menus		Usar como fondo de pantalla…
 File	Menus		Archivo
 Slide delay	Menus		Retardo de diapositiva
@@ -52,6 +52,7 @@ Select all	Menus		Seleccionar todo
 Zoom factor in %:	PrintOptionsWindow		Factor de zoom en %:
 Width:	PrintOptionsWindow		Ancho:
 Image	Menus		Imagen
+Move to Trash	Menus		Mover a la papelera
 OK	Alerts		Aceptar
 Rotate clockwise	Menus		Rotar en sentido horario
 Job setup	PrintOptionsWindow		Configuración de tareas

@@ -31,7 +31,7 @@ Blue	TestPageView		Albastru
 1 pending job.	PrinterListView		1 sarcină în așteptare.
 Remove	PrintersWindow		Elimină
 <pick one>	AddPrinterDialog		<pick one>
-Print jobs for 	PrintersWindow		Sarcini de tipărire pentru
+Print jobs for 	PrintersWindow		Sarcini de tipărire pentru 
 Failed	JobListView		Eșuat
 %.2f KB	JobListView		%.2f KB
 Magenta	TestPageView		Purpuriu

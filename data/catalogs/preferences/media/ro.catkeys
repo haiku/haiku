@@ -8,7 +8,7 @@ MIDI Settings	Media Window		Configurări MIDI
 Quit	Media Window		Închidere
 Video settings	Media Window		Configurări video
 Video output:	Media views		Ieșire video:
-Could not connect to the media server.\nWould you like to start it ?	Media Window		Nu s-a putut conecta la serverul media.\nDoriți să îl porniți?
+Could not connect to the media server.\nWould you like to start it ?	Media Window		Nu s-a putut conecta la serverul media.\nDoriți să îl porniți ?
 Restart media services	Media views		Restartează servicii media
 Couldn't remove volume control in Deskbar: %s\n	Media views		Nu s-a putut elimina controlul de volum de pe bara de desktop: %s\n
 Media	System name		Media

@@ -9,12 +9,12 @@ Modified	StatusView		Modificat
 Lines:	Statistics		Linii:
 Italic	Menus		Cursiv
 Left	Menus		Stânga
-Search backwards	FindandReplaceWindow		Caută înapoi 
+Search backwards	FindandReplaceWindow		Caută înapoi
 Unlock file	StatusView		Deblocare fișier
 Size	Menus		Dimensiune
 Save	QuitAlert		Salvează
-Page setup…	Menus		Configurări pagină...
-Print…	Menus		Tipărește...
+Page setup…	Menus		Configurări pagină…
+Print…	Menus		Tipărește…
 Can't undo	Menus		Nu se poate reface
 Save	Menus		Salvează
 Default	Menus		Implicit
@@ -36,7 +36,7 @@ Edit	Menus		Editează
 Revert	RevertToSavedAlert		Revenire
 Font	Menus		Font
 Replace all	FindandReplaceWindow		Înlocuiește tot
-Statistics…	Menus		Statistici...
+Statistics…	Menus		Statistici…
 Default	Open_and_SaveAsPanel		Implicit
 Replace next	Menus		Înlocuiește următorul
 \"%s\" has unsaved changes.\nRevert it to the last saved version? 	RevertToSavedAlert		\"%s\" are caractere nesalvate.\nReveniți la ultima versiune salvată? 
@@ -51,7 +51,7 @@ Don't save	QuitAlert		Nu salva
 Align	Menus		Aliniază
 Color	Menus		Culoare
 OK	QuitAlert		OK
-Open…	Menus		Deschide...
+Open…	Menus		Deschide…
 Center	Menus		Centru
 Unable to unlock file\n\t%s	QuitAlert		Nu s-a putut debloca fișierul\n\t%s
 line %d, column %d	StatusView		linia %d, coloana %d
@@ -68,7 +68,7 @@ File \"%file%\" was modified by another application, reload it?	NodeMonitorAlert
 Replace	FindandReplaceWindow		Înlocuiește
 Find again	Menus		Găsește din nou
 Cancel	QuitAlert		Anulează
-Find…	Menus		Găsește...
+Find…	Menus		Găsește…
 Select all	Menus		Selectează tot
 Don't save	SaveAlert		Nu salva
 Recover	NodeMonitorAlerts		Recuperează
@@ -76,13 +76,13 @@ Error loading \"%s\":\n\t%s	LoadAlert		Eroare la încărcarea lui \"%s\":\n\t%s
 Ignore	NodeMonitorAlerts		Ignoră
 Read-only	StatusView		Protejat la scriere
 Undo typing	QuitAlert		Refă tastarea
-Untitled 	StyledEditWindow		Fără titlu
+Untitled 	StyledEditWindow		Fără titlu 
 OK	SaveAlert		OK
 Find	FindandReplaceWindow		Găsește
 Encoding	Open_and_SaveAsPanel		Codare
 Characters:	Statistics		Caractere:
-Save as…	Menus		Salvează ca...
+Save as…	Menus		Salvează ca…
 Redo typing	QuitAlert		Repetă tastarea
-Reload…	Menus		Reîncărcare...
-Replace…	Menus		Înlocuiește...
+Reload…	Menus		Reîncărcare…
+Replace…	Menus		Înlocuiește…
 Right	Menus		Dreapta

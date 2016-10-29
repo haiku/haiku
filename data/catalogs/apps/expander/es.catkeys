@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Expander	2177073262
+1	spanish; castilian	x-vnd.Haiku-Expander	2825008254
 Expand	ExpanderMenu		Extraer
 Close window when done expanding	ExpanderPreferences		Cerrar ventana después de extraer
 Set destination…	ExpanderMenu		Elegir destino...
@@ -14,7 +14,6 @@ Error when expanding archive	ExpanderWindow		Error extrayendo archivo
 Hide contents	ExpanderWindow		Esconder contenidos
 Cancel	ExpanderWindow		Cancelar
 Automatically expand files	ExpanderPreferences		Automáticamente extraer archivos
-Creating listing for '%s'	ExpanderWindow		Creando listado para '%s'
 Continue	ExpanderWindow		Continuar
 Destination folder	ExpanderPreferences		Carpeta de destino
 Other	ExpanderPreferences		Otro
@@ -24,7 +23,6 @@ Are you sure you want to stop expanding this\narchive? The expanded items may no
 Select	DirectoryFilePanel		Seleccionar
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		La carpeta de destino no existe. ¿Desea crearla?
 Same directory as source (archive) file	ExpanderPreferences		Mismo directorio que el archivo fuente
-Expanding '%s'	ExpanderWindow		Extrayendo '%s'
 Settings	ExpanderMenu		Configuración
 Settings…	ExpanderMenu		Configuración...
 Expander: Choose destination	DirectoryFilePanel		Expander: Elegir destino

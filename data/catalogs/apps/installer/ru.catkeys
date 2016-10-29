@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Installer	1697808283
+1	russian	x-vnd.Haiku-Installer	2424417449
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, приложение для настройки загрузочного меню Haiku, не может быть запущено.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Вы уверены, что хотите прервать установку и перезагрузить компьютер?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\n\tразработал Jérôme Duval и Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -24,6 +24,7 @@ Failed to launch Boot Manager	InstallerWindow		Ну удалось запуст�
 Install from:	InstallerWindow		Установить с:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld из %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		ВАЖНАЯ ИНФОРМАЦИЯ ПЕРЕД НАЧАЛОМ УСТАНОВКИ HAIKU\n\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		Схема наименования для разделов GRUB: (hdN,n)\n
 Continue	InstallerWindow	In alert after pressing Stop	Продолжить
 Write boot sector to '%s'	InstallerWindow		Записать загрузочный сектор на раздел '%s'
 Collecting copy information.	InstallProgress		Сбор иформации для копирования.

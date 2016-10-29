@@ -25,7 +25,7 @@ The partition %s is already unmounted.	MainWindow		Partiția %s este deja demont
 Failed to delete the partition. No changes have been written to disk.	MainWindow		Ștergerea partiției a eșuat. Nu s-au scris modificări pe disc.
 Could not delete the selected partition.	MainWindow		Nu s-a putut șterge partiția selectată.
 Initialize	MainWindow		Inițializează
-Error: 	MainWindow	in any error alert	Eroare:
+Error: 	MainWindow	in any error alert	Eroare: 
 Partition %ld	DiskView		Partiție %ld
 <empty>	DiskView		<liber>
 Initialization of the partition %s failed. (Nothing has been written to disk.)	MainWindow		Inițializarea partiției %s a eșuat. (Nu s-a scris nimic pe disk.)
@@ -43,7 +43,7 @@ Partition name:	ChangeParametersPanel		Nume partiție:
 Change	ChangeParametersPanel		Modificare
 Are you sure you want to write the changes back to disk now?\n\nAll data on the disk %s will be irretrievably lost if you do so!	MainWindow		Sigur doriți să scrieți modificările înapoi pe disc acum?\n\nToate datele de pe discul %s vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
 Are you sure you want to delete the selected partition?\n\nAll data on the partition will be irretrievably lost if you do so!	MainWindow		Sigur doriți să ștergeți partiția selectată?\n\nToate datele de pe partiție vor fi pierdute fără posibilitatea de a le recupera dacă faceți acest lucru!
-Create…	MainWindow		Crează...
+Create…	MainWindow		Creare…
 Are you sure you want to format a raw disk? (Most people initialize the disk with a partitioning system first) You will be asked again before changes are written to the disk.	MainWindow		Sigur doriți să formatați un disc liber? (Majoritatea persoanelor mai întâi inițializează discul cu un sistem de partiționare) Veți fi întrebat din nou înainte ca modificările să fie scrise pe disc.
 The disk has been successfully initialized.\n	MainWindow		Discul a fost inițializat cu succes.\n
 Could not unmount partition %s.	MainWindow		Nu se poate demonta partiția %s.

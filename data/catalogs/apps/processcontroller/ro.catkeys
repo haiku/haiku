@@ -4,13 +4,13 @@ Kill this team!	ProcessController		Omoară această echipă!
 Idle priority	ProcessController		Prioritate în așteptare
 Restart Deskbar	ProcessController		Repornește bara de desktop
 Custom priority	ProcessController		Prioritate personalizată
-This team is already gone…	ProcessController		Această echipă este plecată deja...
+This team is already gone…	ProcessController		Această echipă este plecată deja…
 Error saving file	ProcessController		Eroare la salvarea fișierului
 Real-time priority	ProcessController		Prioritate în timp real
 Power saving	ProcessController		Economisire de energie
 Your setting file could not be saved!\n(%s)	ProcessController		Fișierul de configurare nu a putut fi salvat!\n(%s)
 What do you want to do with the team \"%s\"?	ProcessController		Ce doriți să faceți cu echipa \"%s\"?
-This thread is already gone…	ProcessController		Acest fir de execuție este plecat deja...
+This thread is already gone…	ProcessController		Acest fir de execuție este plecat deja…
 Cancel	ProcessController		Anulează
 Display priority	ProcessController		Prioritate afișaj
 Run in window	ProcessController		Pornește în fereastră
@@ -22,7 +22,7 @@ Info	ProcessController		Detalii
 Quit application	ProcessController		Închide aplicația
 Low priority	ProcessController		Prioritate scăzută
 What do you want to do with the thread \"%s\"?	ProcessController		Ce doriți să faceți cu firul de execuție \"%s\"?
-Gone teams…	ProcessController		Echipe plecate...
+Gone teams…	ProcessController		Echipe plecate…
 Lowest active priority	ProcessController		Cea mai scăzută prioritate activă
 Restart Tracker	ProcessController		Repornește Tracker
 Live in the Deskbar	ProcessController		Activ pe bara de desktop
@@ -31,8 +31,8 @@ Debug this thread!	ProcessController		Depanează acest fir de execuție!
 Normal priority	ProcessController		Prioritate normală
 New Terminal	ProcessController		Terminal nou
 Urgent priority	ProcessController		Prioritate urgentă
-About ProcessController…	ProcessController		Despre ControlerProces
-Ok!	ProcessController		OK!
+About ProcessController…	ProcessController		Despre ProcessController…
+Ok!	ProcessController		Ok!
 Quit an application	ProcessController		Închide o aplicație
 Install in Deskbar	ProcessController		Instalează pe bara de desktop
 Threads and CPU usage	ProcessController		Utilizare fire de execuție și CPU
@@ -45,6 +45,6 @@ Usage: %s [-deskbar]\n	ProcessController		Utilizare: %s [-deskbar]\n
 ProcessController	System name		ControlProcese
 Real-time display priority	ProcessController		Prioritate afișaj în timp real
 Please confirm	ProcessController		Confirmați
-System resources & caches…	ProcessController		Resurse de sistem & cache-uri
+System resources & caches…	ProcessController		Resurse de sistem & cache-uri…
 That's no Fun!	ProcessController		Nu e amuzant!
 You can run ProcessController in a window or install it in the Deskbar.	ProcessController		Puteți să rulați ControlerProces într-o fereastră sau să îl instalați pe bara de desktop.

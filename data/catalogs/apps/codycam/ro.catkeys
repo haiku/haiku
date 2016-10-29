@@ -1,6 +1,6 @@
 1	romanian	x-vnd.Haiku-CodyCam	2193838145
-Upload…	VideoConsumer.cpp		Încărcare...
-Capturing Image…	VideoConsumer.cpp		Se capturează imaginea...
+Upload…	VideoConsumer.cpp		Încărcare…
+Capturing Image…	VideoConsumer.cpp		Se capturează imaginea…
 Every 30 seconds	CodyCam		La fiecare 30 de secunde
 File name:	CodyCam		Nume fișier:
 Last Capture: 	VideoConsumer.cpp		Ultima captură: 
@@ -22,8 +22,8 @@ password	CodyCam		parolă
 Directory:	CodyCam		Dosar:
 Every minute	CodyCam		La fiecare minut
 read: %ld\n	SftpClient		citește: %ld\n
-Waiting…	CodyCam		Se așteaptă...
-Logging in…	VideoConsumer.cpp		Se deschide sesiunea...
+Waiting…	CodyCam		Se așteaptă…
+Logging in…	VideoConsumer.cpp		Se deschide sesiunea…
 Server:	CodyCam		Server:
 server address expected	CodyCam		adresă de server așteptată
 Error creating output file	VideoConsumer.cpp		Eroare la crearea fișierului de ieșire
@@ -55,13 +55,13 @@ Stop video	CodyCam		Oprește video
 Locking the window\n	VideoConsumer.cpp		Se blochează fereastra\n
 File %s; Line %ld # %s	SettingsHandler		Fișier %s; Linie %ld # %s
 Couldn't find requested directory on server	VideoConsumer.cpp		Nu s-a putut găsi dosarul cerut pe server
-Renaming…	VideoConsumer.cpp		Se redenumește...
+Renaming…	VideoConsumer.cpp		Se redenumește…
 Local	CodyCam		Local
 Error setting type of output file	VideoConsumer.cpp		Eroare la setarea tipului pentru fișierul de ieșire
 upload client name expected	CodyCam		nume de client pentru încărcare așteptat
 SFTP	CodyCam		SFTP
-Connected…	VideoConsumer.cpp		Conectat...
-PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed> (parolă reală trimisă)\n
+Connected…	VideoConsumer.cpp		Conectat…
+PASS <suppressed>  (real password sent)\n	FtpClient		PASS <suppressed>  (parolă reală trimisă)\n
 File upload failed	VideoConsumer.cpp		Încărcarea fisierului a eşuat
 Every 5 minutes	CodyCam		La fiecare 5 minute
 read: %d\n	SftpClient		citește: %d\n
@@ -70,10 +70,10 @@ Every hour	CodyCam		La fiecare oră
 Cannot connect the video source to the video window	CodyCam		Nu se poate conecta sursa video la fereastra video
 capture rate expected	CodyCam		cota de captură așteptată
 Error getting initial latency for the capture node	CodyCam		Eroare la obținerea latenței inițiale pentru modul captură
-Send to…	CodyCam		Trimite la...
+Send to…	CodyCam		Trimite la…
 on or off expected	Settings	Do not translate 'on' and 'off'	on sau off așteptat
 Quit	CodyCam		Închidere
-cmd: '%s'\n	FtpClient		cmd: „%s”\n
+cmd: '%s'\n	FtpClient		cmd: '%s'\n
 Never	CodyCam		Niciodată
 Cannot create a video window	CodyCam		Nu se poate crea o fereastră video
 Every 10 minutes	CodyCam		La fiecare 10 minute
@@ -88,5 +88,5 @@ Cannot seek time source!	CodyCam		Nu se poate derula sursa de timp!
 File	CodyCam		Fișier
 Image Format Menu	CodyCam		Meniu format imagine
 Every 30 minutes	CodyCam		La fiecare 30 de minute
-reply: '%s'\n	SftpClient		răspuns: „%s”\n
+reply: '%s'\n	SftpClient		răspuns: '%s'\n
 Start video	CodyCam		Pornește video

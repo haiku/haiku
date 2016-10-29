@@ -1,5 +1,7 @@
-1	russian	x-vnd.Haiku-MatchHeader	2053505383
+1	russian	x-vnd.Haiku-MatchHeader	2711986092
 <Choose action>	ConfigView		<Выберите действие>
+Header field (e.g. Subject, From, ...)	ConfigView		Поле заголовка (например, Тема, От, ...)
+Account	ConfigView		Аккаунт
 has	ConfigView		содержит
 Move to	ConfigView		Переместить в
 Then	ConfigView		Тогда

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	3644595724
+1	swedish	x-vnd.Haiku-libtracker	545841200
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Tillägg
 Mount settings…	ContainerWindow		Monteringsinställningar...
@@ -18,7 +18,6 @@ Recent documents	FavoritesMenu		Senaste dokumenten
 Modified	QueryPoseView		Modifierad
 Created	ContainerWindow		Skapad
 Error %error loading add-On %name.	ContainerWindow		Fel %error vid laddning av Tillägg %name.
-If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Om du %ifYouDoAction inställnings foldern, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?
 Skip all	FSUtils		Hoppa över alla
 contains	SelectionWindow		innehåller
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Du kan inte spara i roten på filsystemet.
@@ -49,7 +48,6 @@ Clean up	DeskWindow		Rada upp
 You cannot copy or move the root directory.	FSUtils		Du kan inte kopiera eller flytta root-mappen.
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed av %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Invertera markering
-Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Döp om
 save text	FilePanelPriv		spara text
 Select all	FilePanelPriv		Välj allt
 Link to:	InfoWindow		Länka till:
@@ -88,7 +86,6 @@ Tracker preferences	TrackerSettingsWindow		Trackerinställningar
 Cut	FilePanelPriv		Klipp ut
 Replace	FilePanelPriv		Ersätt
 Opens with:	InfoWindow		Öppnas med:
-If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Om du %ifYouDoAction mime inställningarna, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?
 Open	ContainerWindow		Öppna
 96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Ett fel uppstod vid beräkningen av mappens storlek.
@@ -98,7 +95,6 @@ Favorites	FavoritesMenu		Favoriter
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" är en osupporterad körbarfil
 Sorry, you can't copy items to the Trash.	PoseView		Du kan inte kopiera filer till Papperskorgen.
 matches wildcard expression	SelectionWindow		matchar jokeruttryck
-rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	byt namn
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Du kan inte ersätta en mapp eller en mjuk länk med en fil.
 Show space bars on volumes	SettingsView		Visa ledigt utrymme på volymer
 Invert selection	ContainerWindow		Invertera markering
@@ -107,7 +103,6 @@ Resize to fit	ContainerWindow		Anpassa storleken
 Add printer…	ContainerWindow		Lägg till skrivare...
 New folder	ContainerWindow		Ny mapp
 Kind	ContainerWindow		Sort
-rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	byt namn
 home	B_USER_DIRECTORY		hem
 Select…	ContainerWindow		Markera...
 Copy to	ContainerWindow		Kopiera till
@@ -115,18 +110,15 @@ Move to Trash	ContainerWindow		Flytta till Papperskorgen
 Move to	ContainerWindow		Flytta till
 Create %s clipping	PoseView		Skapa %s förkortning
 Set new link target	InfoWindow		Ange nytt länkmål
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Om du %ifYouDoAction system foldern eller dess innehåll, kommer du inte att kunna boot:a %osName!\n \n Är du säker på att du vill göra detta?\n\nFör att %toDoAction system foldern eller dess innehåll i alla fall,  håll nere Shift och klicka  \"%toConfirmAction\".
 Save as Query template:	FindPanel		Spara som Sökmall:
 preferences	B_PREFERENCES_DIRECTORY		inställningar
 Cancel	FSUtils		Avbryt
-move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	flytta
 Edit name	ContainerWindow		Ändra namn
 Show volumes on Desktop	SettingsView		Visa volymer på Skrivbordet
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Fel %error vid laddning av Tillägg %name.
 Defaults	TrackerSettingsWindow		Förval
 Mini icon view	ContainerWindow		Mini ikonvy
-OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Kunde inte öppna "%name". Filen är av misstag markerad som exekverbar.
 Add-ons	ContainerWindow		Tillägg
 Edit templates…	TemplatesMenu		Redigera mallar...
@@ -196,9 +188,7 @@ You cannot create a link to the root directory.	FSUtils		Du kan inte skapa en l�
 Could not find application \"%appname\"	OpenWithWindow		Kunde inte hitta programmet "%appname"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Det markerade objektet kan inte flyttas till Papperskorgen. Vill du ta bort den istället? (Denna operation kan inte ångras.)
 Invert	SelectionWindow		Invertera
-rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	byt namn
 Find	FindPanel		Sök
-Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Flytta
 Get info	ContainerWindow		Visa information
 Error creating link to \"%name\".	FSUtils		Fel vid skapande av länk till "%name".
 Select	SelectionWindow		Markera
@@ -242,7 +232,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Filen "%name" finns redan i den valda katalogen. Vill du ersätta den?
 Cancel	ContainerWindow		Avbryt
 Only the boot disk	AutoMounterSettings		Bara uppstartsdisken
-If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Om du %ifYouDoAction config foldern, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?
 Unmount	ContainerWindow		Avmontera
 Copy layout	ContainerWindow		Kopiera layout
 label too long	PoseView		etiketten är för lång
@@ -267,7 +256,6 @@ Unknown	WidgetAttributeText		Okänd
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Kunde inte öppna "%dokument" (Saknar symbol: %symbol). \n
 by name	FindPanel		genom namn
 Creating links: 	StatusWindow		Skapar länkar:
-Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Byt namn
 Paused: click to resume or stop	StatusWindow		Pausad: Klicka för att fortsätta eller stanna
 Preferred for %type	OpenWithWindow		Föredras för %type
 GiB	WidgetAttributeText		GiB
@@ -290,7 +278,6 @@ Previously mounted disks	AutoMounterSettings		Tidigare monterade volymer
 %Ld B	WidgetAttributeText		%Ld B
 copying	FSUtils		kopierar
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Fel vid kopiering av katalogen "%name":\n\t%error\n\nVill du fortsätta?
-move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	flytta
 Show Disks icon	SettingsView		Visa ikonen Volymer
 Cancel	PoseView		Avbryt
 You can't move or copy items to read-only volumes.	FSUtils		Du kan inte flytta eller kopiera saker till skrivskyddade volymer.
@@ -306,7 +293,6 @@ Permissions	ContainerWindow		Behörigheter
 moving	FSUtils		flyttar
 Identify	InfoWindow		Identifiera
 Recent folders	ContainerWindow		Senaste mapparna
-rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	byt namn
 Close all	ContainerWindow		Stäng alla
 Include trash	FindPanel		Inkludera papperskorg
 Query template	FindPanel		Sökmall
@@ -321,10 +307,8 @@ after	FindPanel		efter
 Select…	QueryContainerWindow		Markera...
 More options	FindPanel		Fler alternativ
 link	FSUtils	filename link	länk
-At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		I %func \nfind_directory() misslyckades. \nOrsak: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Det valda namnet är otillåtet. Var god välj ett annat namn.
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Du kan inte flytta mappen till sig själv eller någon annan av sina undermappar.
-List view	ContainerWindow		Listvy
 Handles any file	OpenWithWindow		Hanterar alla filtyper
 Get info	FilePanelPriv		Få info
 32 x 32	DeskWindow		32 x 32
@@ -364,7 +348,6 @@ Preferences…	ContainerWindow		Inställningar…
 Move	PoseView		Flytta
 Open and make preferred	OpenWithWindow		Öppna och gör till förval
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Är du säker på att du vill radera de valda objekten? Denna operation kan inte ångras.
-If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Om du %ifYouDoAction home foldern, %osName kommer kanske inte att fungera som den ska!\n \n Är du säker på att du vill göra detta?\n\nFör att %toDoAction home foldern ändå, håll nere Shift och klicka \"%toConfirmAction\".
 Add-ons	DeskWindow		Tillägg
 Name	FindPanel		Namn
 And	FindPanel		Och

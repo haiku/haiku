@@ -5,7 +5,7 @@ Follow symbolic links	GrepWindow		Urmărește legăturile simbolice
 Close	GrepWindow		Închide
 Cancel	GrepWindow		Anulează
 The unselected files will be removed from the list.	GrepWindow		Fișierele neselectate vor fi eliminate din listă.
-Set target…	GrepWindow		Configurează destinație...
+Set target…	GrepWindow		Configurează destinație…
 Please select the files you wish to have selected for you in Tracker.	GrepWindow		Selectați fișierele pe care le doriți selectate pentru dumneavoastră în Tracker.
 Open files in Pe	GrepWindow		Deschide fișiere în Pe
 %appname% : %path%	GrepWindow		%appname% : %path%

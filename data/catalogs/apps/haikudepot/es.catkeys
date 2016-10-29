@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-HaikuDepot	3640331610
+1	spanish; castilian	x-vnd.Haiku-HaikuDepot	4018828204
 Name	PackageListView		Nombre
 Available packages	MainWindow		Paquetes disponibles
 Open %DeskbarLink%	PackageManager		Abrir %DeskbarLink%
@@ -35,6 +35,7 @@ An error occurred while initializing the package manager: %message%	MainWindow		
 Email address:	UserLoginWindow		Dirección de correo electrónico:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Su puntuación fue enviada exitosamente. Puede actualizarla o borrarla en cualquier momento puntuado el paquete otra vez.
 Very unstable	RatePackageWindow		Muy inestable
+<Package contents not available for remote packages>	PackageContentsView		<El contenido del paquete no está disponible para paquetes remotos>
 The username is already taken. Please choose another.	UserLoginWindow		El nombre de usuario ya fue tomado. Por favor elija otro.
 Close	PackageManager		Cerrar
 Not logged in	MainWindow		No se inició sesión
@@ -83,7 +84,9 @@ Productivity	Model		Productividad
 No, quit HaikuDepot	App		No, salir de HaikuDepot
 Authentication failed	UserLoginWindow		Falló la autenticación
 Logged in as %User%	MainWindow		Sesión iniciada como %User%
+9999.99 KiB	PackageListView		9999.99 KiB
 Language	RatePackageWindow		Idioma
+Size	PackageListView		Tamaño
 Failed to create or update rating: %s\n	RatePackageWindow		Fallo al crear o actualizar la valoración: %s\n
 You need to be logged into an account before you can rate packages.	MainWindow		Necesita haber ingresado con una cuenta antes de poder valorar paquetes.
  It responded with: 	RatePackageWindow		 Respondió con: 
@@ -107,12 +110,17 @@ Input validation	UserLoginWindow		Validación de entrada
 Update	RatePackageWindow		Actualizar
 Video	Model		Vídeo
 All categories	FilterView		Todas las categorías
+Contents	PackageInfoView		Contenidos
 An error occurred while refreshing the repository: %error%	MainWindow		Un error ocurrió al actualizar el repositorio: %error%
+Try again	App		Inténtelo de nuevo
 Login or Create account	MainWindow		Ingresar o crear una cuenta
 Pending…	PackageListView		Pendiente…
 Depot	FilterView		Depósito
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# elemento} other{# elementos}}
 OK	PackageInfoView		Aceptar
 Uninstalled	PackageListView		Desinstalado
+Show	MainWindow		Mostrar
+Stable	RatePackageWindow		Estable
 Unknown	PackageListView		Desconocido
 All depots	FilterView		Todos los depósitos
 Comment language:	RatePackageWindow		Comentar idioma:
@@ -128,10 +136,12 @@ Cancel	RatePackageWindow		Cancelar
 Package action failed	PackageInfoView		La acción del paquete falló
 OK	UserLoginWindow		Aceptar
 Send	RatePackageWindow		Enviar
+-	no package size		-
 Category:	FilterView		Categoría:
 Failed to create account	UserLoginWindow		Fallo al registrar la cuenta
 There are problems with the data you entered:\n\n	UserLoginWindow		Hubo problemas con la información que se ingresó:\n\n
 Featured packages	MainWindow		Paquetes destacados
+Start package daemon	App		Arrancar demonio de paquetes
 Success	RatePackageWindow		Éxito
 Business	Model		Trabajo
 Audio	Model		Audio

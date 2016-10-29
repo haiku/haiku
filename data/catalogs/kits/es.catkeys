@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-libbe	3198309111
+1	spanish; castilian	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		gama
 beta	AboutWindow		beta
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -12,7 +12,9 @@ Copy	TextView		Copiar
 alpha	AboutWindow		alfa
 Error	PrintJob		Error
 All Rights Reserved.	AboutWindow		Todos los derechos reservados.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# byte} other{# bytes}}
 About %app%	AboutWindow		Acerca de %app%
+No pages to print!	PrintJob		¡Sin páginas para imprimir!
 OK	Dragger		Aceptar
 OK	PrintJob		Aceptar
 Green:	ColorControl		Verde:

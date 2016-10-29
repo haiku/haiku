@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-ShowImage	575555985
+1	russian	x-vnd.Haiku-ShowImage	3998703664
 Use as background…	Menus		Сделать фоном рабочего стола…
 File	Menus		Файл
 Slide delay	Menus		Задержка слайд шоу
@@ -7,6 +7,7 @@ Zoom in	Menus		Увеличить
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Изображение '%s' было изменено. Вы хотите закрыть его без сохранения?
 Page setup…	Menus		Настройка печати…
 Print…	Menus		Печать…
+Get info…	Menus		Свойства…
 OK	SaveToFile		ОК
 Previous page	Menus		Предыдущая страница
 View	Menus		Вид

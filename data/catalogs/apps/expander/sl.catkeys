@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-Expander	3517351105
+1	slovenian	x-vnd.Haiku-Expander	3207090043
 Expand	ExpanderMenu		Razširi
 Close window when done expanding	ExpanderPreferences		Zapri okno po razširjanju
 Set destination…	ExpanderMenu		Izberi cilj…
@@ -13,7 +13,6 @@ Automatically expand files	ExpanderPreferences		Samodejno razširi datoteke
 Continue	ExpanderWindow		Nadaljuj
 Destination folder	ExpanderPreferences		Ciljna mapa
 Same directory as source (archive) file	ExpanderPreferences		Mapa, v kateri je izvorna datoteka
-Expanding '%s'	ExpanderWindow		Razširjam %s
 Settings	ExpanderMenu		Nastavitve
 Settings…	ExpanderMenu		Nastavitve…
 Select	ExpanderPreferences		Izberi

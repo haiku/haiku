@@ -1,7 +1,8 @@
-1	spanish; castilian	x-vnd.Be-MAIL	4285843074
+1	spanish; castilian	x-vnd.Be-MAIL	1865394837
 View	Mail		Ver
 %d - Date	Mail		%d - Fecha
 Attach attributes:	Mail		Adjuntar atributos:
+Unknown	Mail		Desconocido
 Inconsistency occurred in the undo/redo buffer.	Mail		Se produjo una inconsistencia en el búfer de deshacer/rehacer.
 An error occurred trying to save the attachment.	Mail		Se produjo un error mientras se trataba de guardar el archivo adjunto.
 Copy to new	Mail		Copiar a mensaje nuevo
@@ -146,6 +147,7 @@ sent	B_USER_DIRECTORY/mail/sent		enviado
 Put your favorite e-mail queries and query templates in this folder.	Mail		Ponga sus consultas y plantillas de consulta de correo favoritas en esta carpeta.
 Spam	Mail		Correo basura
 Reply	Mail		Responder
+Encoding	Mail		Codificación
 From:	Mail		De:
 Couldn't open this signature. Sorry.	Mail		No se pudo abrir la firma. Disculpe.
 Open draft	Mail		Abrir borrador

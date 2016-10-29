@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.haiku-screenshot	3326393685
+1	spanish; castilian	x-vnd.haiku-screenshot	3896204963
 seconds	ScreenshotWindow		segundos
 Desktop	ScreenshotWindow		Escritorio
 Include window border	ScreenshotWindow		Incuir el borde de la ventana
@@ -8,6 +8,7 @@ Capture active window	ScreenshotWindow		Capturar la ventana actual
 Cancel	ScreenshotWindow		Cancelar
 Name:	ScreenshotWindow		Nombre:
 Choose folder…	ScreenshotWindow		Elegir carpeta…
+This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		El fichero ya existe.\n¿Está seguro que desea sobrescribirlo?
 Choose folder	ScreenshotWindow		Elegir carpeta
 Save	ScreenshotWindow		Guardar
 Overwrite	ScreenshotWindow		Sobrescribir

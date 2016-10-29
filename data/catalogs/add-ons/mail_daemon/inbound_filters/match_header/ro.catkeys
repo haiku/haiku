@@ -1,5 +1,7 @@
-1	romanian	x-vnd.Haiku-MatchHeader	4262558281
+1	romanian	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<Selectează acțiunea>
+Header field (e.g. Subject, From, ...)	ConfigView		Câmp antet (e.x. Subiect, De la, …)
+Account	ConfigView		Cont
 has	ConfigView		are
 Move to	ConfigView		Mută la
 Then	ConfigView		Atunci
@@ -12,3 +14,4 @@ Match header	RuleFilter		Potrivește antet
 Reply with	ConfigView		Răspunde cu
 If	ConfigView		Dacă
 Match \"%attribute\" against \"%regex\"	RuleFilter		Găsește \"%attribute\" în \"%regex\"
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Valoare metacaracter ca \"*spam*\".\nPrefixați cu \"REGEX:\" pentru a utiliza expresii regulate.

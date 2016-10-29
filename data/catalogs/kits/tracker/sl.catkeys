@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-libtracker	2148414392
+1	slovenian	x-vnd.Haiku-libtracker	1663758762
 OK	WidgetAttributeText		V redu
 Add-ons	FilePanelPriv		Dodatki
 Desktop	Model		Namizje
@@ -27,7 +27,6 @@ Clean up	DeskWindow		Pospravi
 You cannot copy or move the root directory.	FSUtils		Ne morete kopirati ali premakniti korenskega imenika.
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed od %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Obrni izbor
-Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Preimenuj
 Size	QueryPoseView		Velikost
 Emptying Trash… 	StatusWindow		Praznim koš…
 Close all in workspace	ContainerWindow		Zapri vse na delovni površini
@@ -52,7 +51,6 @@ Sorry, you can't copy items to the Trash.	PoseView		Oprostite, predmetov ne more
 Add printer…	ContainerWindow		Dodaj tiskalnik…
 New folder	ContainerWindow		Nova mapa
 Kind	ContainerWindow		Vrsta
-rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	preimenujete
 home	B_USER_DIRECTORY		domača mapa
 Select…	ContainerWindow		Izberi…
 Copy to	ContainerWindow		Kopiraj v
@@ -63,7 +61,6 @@ KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Napaka %error pri nalaganju dodatka %name.
 Defaults	TrackerSettingsWindow		Privzete vrednosti
 Mini icon view	ContainerWindow		Majhen ikonski pogled
-OK	TrackerInitialState		V redu
 Searching for disks to mount…	StatusWindow		Iščem diske za priklop…
 New folder	FSUtils		Nova mapa
 Free space color	SettingsView		Barva nerabljenega prostora
@@ -91,7 +88,6 @@ Replace all	FSUtils		Zamenjaj vse
 Replace other file	WidgetAttributeText		Zamenjaj drugo datoteko
 Some of the selected items cannot be moved to the Trash. Would you like to delete them instead? (This operation cannot be reverted.)	PoseView		Nekaterih izbranih predmetov ni mogoče premakniti v koš. Jih želite izbrisati? (Tega ni mogoče razveljaviti.)
 You cannot create a link to the root directory.	FSUtils		Ne morete ustvariti povezave na korenski imenik.
-Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Premakni
 Get info	ContainerWindow		Informacije
 Error creating link to \"%name\".	FSUtils		Napaka pri ustvarjanju povezave na \"%name\".
 Select	SelectionWindow		Izberi
@@ -136,7 +132,6 @@ Previously mounted disks	AutoMounterSettings		Predhodno priklopljeni diski
 %Ld B	WidgetAttributeText		%Ld B
 copying	FSUtils		kopiranje
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Napaka pri kopiranju mape \"%name\":\n\t%error\n\nŽelite nadaljevati?
-move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	premaknete
 Show Disks icon	SettingsView		Prikaži ikono Diski
 Other	FilePermissionsView		Drugo
 Query name:	FindPanel		Ime poizvedbe:
@@ -145,7 +140,6 @@ Permissions	ContainerWindow		Dovoljenja
 moving	FSUtils		premikanje
 Identify	InfoWindow		Identificiraj
 Recent folders	ContainerWindow		Nedavne mape
-rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	preimenujete
 Close all	ContainerWindow		Zapri vse
 after	FindPanel		po
 Select…	QueryContainerWindow		Izberi…
@@ -153,7 +147,6 @@ More options	FindPanel		Več možnosti
 link	FSUtils	filename link	povezava
 The specified name is illegal. Please choose another name.	FilePanelPriv		Ime ni veljavno. Prosim, določite drugo ime.
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Mape ne morete premakniti same vase ali v katero od njenih podmap.
-List view	ContainerWindow		Seznamski pogled
 multiple disks	FindPanel		več diskov
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		Predmete morare spustiti na eno od diskovnih ikon v oknu \"Diski\".
 Untitled clipping	PoseView		Neimenovan izrezek

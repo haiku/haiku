@@ -7,7 +7,7 @@ Select	ScreenshotWindow		Selectează
 Capture active window	ScreenshotWindow		Capturează fereastra activă
 Cancel	ScreenshotWindow		Anulează
 Name:	ScreenshotWindow		Nume:
-Choose folder…	ScreenshotWindow		Alege dosar...
+Choose folder…	ScreenshotWindow		Alege dosar…
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Acest fișier există deja.\n Sigur doriți să-l suprascrieți?
 Choose folder	ScreenshotWindow		Alege dosar
 Save	ScreenshotWindow		Salvează
@@ -20,7 +20,7 @@ screenshot	Screenshot	Base filename of screenshot files	captură de ecran
 New screenshot	ScreenshotWindow		Captură de ecran nouă
 Artwork folder	ScreenshotWindow		Dosar artwork
 Home folder	ScreenshotWindow		Dosar personal
-Settings…	ScreenshotWindow		Configurări...
+Settings…	ScreenshotWindow		Configurări…
 overwrite	ScreenshotWindow		suprascrie
 Delay:	ScreenshotWindow		Întârziere:
 Include mouse pointer	ScreenshotWindow		Include indicator maus

@@ -1,16 +1,11 @@
-1	english	x-vnd.Haiku-FontDemo	3522850500
-Outline:	ControlView		轮廓：
-Size: 50	ControlView		大小：50
+1	english	x-vnd.Haiku-FontDemo	3449067186
 Stop cycling	ControlView		停止循环
-Shear: 90	ControlView		翻转：90
-Spacing: 0	ControlView		间距：0
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		旋转：%d
 Shear: %d	ControlView		翻转：%d
 Spacing: %d	ControlView		间距：%d
 Cycle fonts	ControlView		循环字体
 Font:	ControlView		字体：
-Rotation: 0	ControlView		旋转：0
 Drawing mode:	ControlView		绘制模式：
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		控件

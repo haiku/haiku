@@ -3,7 +3,7 @@ Stop	file:ZipOMaticWindow.cpp		Detener
 Creating archive: %s	file:ZipOMaticWindow.cpp		Creando archivo: %s
 Continue	file:ZipOMaticWindow.cpp		Continuar
 Preparing to archive	file:ZipperThread.cpp		Preparando para comprimir
-Drop files here.	file:ZipOMaticWindow.cpp		Suelte archivos aquí.
+Drop files here.	file:ZipOMaticWindow.cpp		Suelte los archivos aquí.
 Filename: %s	file:ZipOMaticWindow.cpp		Nombre de archivo: %s
 You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		Tiene {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} funcionando.\n\n
 Let them continue	file:ZipOMatic.cpp		Permitirles continuar
@@ -13,5 +13,5 @@ Stopped	file:ZipOMaticWindow.cpp		Detenido
 Archive	file:ZipperThread.cpp		Archivo
 Error creating archive	file:ZipOMaticWindow.cpp		Error al crear el archivo
 {0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# archivo añadido.} other{# archivos añadidos.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Archivo creado correctamente
+Archive created OK	file:ZipOMaticWindow.cpp		Archivo correctamente creado
 Stop them	file:ZipOMatic.cpp		Detenerlos

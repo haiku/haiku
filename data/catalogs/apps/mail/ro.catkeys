@@ -44,11 +44,11 @@ Undo	Mail		Refă
 Date:	Mail		Dată:
 An error occurred trying to open this signature.	Mail		A apărut o eroare când s-a încercat deschiderea acestei semnături.
 No file attributes, just plain data	Mail		Nu există atribute de fișier, doar date simple
-Edit queries…	Mail		Editează interogări
+Edit queries…	Mail		Editează interogări…
 queries	B_USER_DIRECTORY/mail/queries		interogări
 Paste	Mail		Lipește
 in	B_USER_DIRECTORY/mail/in		primit
-Save attachment…	Mail		Salvează atașament...
+Save attachment…	Mail		Salvează atașament…
 Include file attributes in attachments	Mail		Include atributele de fișier în atașamente
 OK	Mail		OK
 Send	Mail		Trimite
@@ -58,9 +58,9 @@ Hide	Mail		Ascunde
 Forward without attachments	Mail		Trimite mai departe fără atașamente
 Previous	Mail		Precedent
 Redo	Mail		Repetă
-Add enclosure…	Mail		Adaugă contur...
+Add enclosure…	Mail		Adaugă contur…
 Mail	System name		Email
-Print…	Mail		Tipărește
+Print…	Mail		Tipărește…
 Warn unencodable:	Mail		Avertisment care nu se poate coda:
 Quit	Mail		Închidere
 %n - Full name	Mail		%n - Nume complet
@@ -70,7 +70,7 @@ Trash	Mail		Gunoi
 Default account:	Mail		Cont implicit:
 Size:	Mail		Dimensiune:
 Account from mail	Mail		Cont de la mail
-Edit signatures…	Mail		Editează semnături...
+Edit signatures…	Mail		Editează semnături…
 New	Mail		Nou
 Attachments: 	Mail		Atașamente: 
 On	Mail		Pornit
@@ -84,12 +84,12 @@ Previous message	Mail		Mesajul precedent
 Attachments:	Mail		Atașamente:
 Title:	Mail		Titlu:
 <no account found>	Mail		<no account found>
-Find…	Mail		Găsește...
-Accounts…	Mail		Conturi...
+Find…	Mail		Găsește…
+Accounts…	Mail		Conturi…
 Mail preferences	Mail		Preferințe email
 Initial spell check mode:	Mail		Mod de corectare ortografică inițială:
 Leave same	Mail		Menține la fel
-Page setup…	Mail		Configurare pagină...
+Page setup…	Mail		Configurare pagină…
 Text wrapping:	Mail		Încadrare text:
 Revert	Mail		Revenire
 File	Mail		Fișier
@@ -118,19 +118,19 @@ User interface	Mail		Interfață cu utilizatorul
 Cancel	Mail		Anulează
 Send message	Mail		Trimite mesaj
 Remove enclosure	Mail		Elimină contur
-Sorry, could not find an application that supports the 'Person' data type.	Mail		Îmi pare rău, nu s-a putut găsi o aplicație care suportă tipul de date „Persoană”.
+Sorry, could not find an application that supports the 'Person' data type.	Mail		Nu s-a putut găsi o aplicație care suportă tipul de date 'Persoană'.
 Delete	Mail		Șterge
 Don't send	Mail		Nu trimite
-Leave as '%s'	Mail		Menține ca „%s”
+Leave as '%s'	Mail		Menține ca '%s'
 Copy	Mail		Copiază
 Mail couldn't find its dictionary.	Mail		Mail nu a putut găsi dicționarul.
 Reply preamble:	Mail		Prefață de răspuns:
 Signatures	Mail		Semnături
 Next	Mail		Următorul
-Set to…	Mail		Stabilește la...
+Set to…	Mail		Stabilește la…
 Use default account	Mail		Utilizează contul implicit
 Sorry	Mail		Îmi pare rău
-Encoding:	Mail		Codare
+Encoding:	Mail		Codare:
 Font:	Mail		Font:
 (Address unavailable)	Mail		(Adresă indisponibilă)
 Save address	Mail		Salvează adresa
@@ -138,7 +138,7 @@ Queries	Mail		Interogări
 Send this message before closing?	Mail		Trimiteți acest mesaj înainte să închideți?
 Save	Mail		Salvează
 Random	Mail		Aleator
-Close and 	Mail		Închide și
+Close and 	Mail		Închide și 
 Save as draft	Mail		Salvează ca ciornă
 The mail_daemon could not be started:\n\t	Mail		Mail_serviciu nu a putut fi pornit:\n\t
 Open attachment	Mail		Deschide atașament

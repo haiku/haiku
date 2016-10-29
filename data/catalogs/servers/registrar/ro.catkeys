@@ -10,7 +10,7 @@ Asking other processes to quit.	ShutdownProcess		Cerere altor procese să termin
 Asking \"%appName%\" to quit.	ShutdownProcess		Cerere \"%appName%\" să termine.
 %action%?	ShutdownProcess		%action%?
 Shutdown aborted	ShutdownProcess		Oprire anulată
-Restarting…	ShutdownProcess		Repornire...
+Restarting…	ShutdownProcess		Repornire…
 Asking background applications to quit.	ShutdownProcess		Cerere aplicațiilor de fond să termine.
 Application \"%appName%\" has aborted the shutdown process.	ShutdownProcess		Applicația \"%appName%\" a eșuat procesul de oprire.
 Tidying things up a bit.	ShutdownProcess		Aranjez lucrurile un pic.
@@ -20,4 +20,4 @@ Cancel shutdown	ShutdownProcess		Anulează oprirea
 Kill application	ShutdownProcess		Omoară aplicația
 Shut down	ShutdownProcess		Oprire
 Restart	ShutdownProcess		Repornire
-Shutting down…	ShutdownProcess		Se oprește...
+Shutting down…	ShutdownProcess		Se oprește…

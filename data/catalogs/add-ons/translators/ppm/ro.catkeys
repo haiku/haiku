@@ -25,7 +25,7 @@ RGB 5:5:5 16 bits	PPMTranslator		RGB 5:5:5 16 biți
 Bitmap 1 bit	PPMTranslator		Bitmap 1 bit
 RGBA 8:8:8:8 32 bits big-endian	PPMTranslator		RGBA 8:8:8:8 32 biți big-endian
 RGB 8:8:8 32 bits	PPMTranslator		RGB 8:8:8 32 biți
-Sample code copyright 1999, Be Incorporated	PPMTranslator		Cod mostră drepturi de autor 1999, Be Incorporated
+Sample code copyright 1999, Be Incorporated	PPMTranslator		Cod mostră Copyright 1999, Be Incorporated
 PPMTranslator Settings	PPMTranslator		Configurări PPMTranslator
 Something is wrong with the PPMTranslator!	PPMMain		Ceva nu e în regulă cu PPMTranslator!
 System palette 8 bits	PPMTranslator		Paletă de sistem 8 biți

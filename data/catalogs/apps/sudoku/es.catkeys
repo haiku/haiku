@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Sudoku	2463385585
+1	spanish; castilian	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Restaurar
 Could not set Sudoku:\n%s\n	SudokuWindow		No puedo crear el Sudoku:\n%s\n
 Export as…	SudokuWindow		Exportar como…
@@ -26,6 +26,7 @@ Text	SudokuWindow		Texto
 Creating solvable field	SudokuGenerator		Crear campo resoluble
 View	SudokuWindow		Vista
 Progress monitor	ProgressWindow		Indicador de progreso
+Set all hints	SudokuWindow		Mostrar todas las pistas
 Mark invalid values	SudokuWindow		Marcar valores incorrectos
 Blank	SudokuWindow		Vacio
 Help	SudokuWindow		Ayuda

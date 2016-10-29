@@ -1,12 +1,13 @@
-1	romanian	x-vnd.Haiku-ShowImage	575555985
-Use as background…	Menus		Utilizează ca fundal...
+1	romanian	x-vnd.Haiku-ShowImage	3998703664
+Use as background…	Menus		Utilizează ca fundal…
 File	Menus		Fișier
 Slide delay	Menus		Întârziere imagine
 Selection mode	Menus		Mod de selectare
 Zoom in	Menus		Mărește
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Documentul '%s' a fost modificat. Doriți să închideți documentul?
-Page setup…	Menus		Configurare pagină...
-Print…	Menus		Tipărește...
+Page setup…	Menus		Configurare pagină…
+Print…	Menus		Tipărește…
+Get info…	Menus		Obține detalii…
 OK	SaveToFile		OK
 Previous page	Menus		Pagina anterioară
 View	Menus		Vizualizează
@@ -29,11 +30,11 @@ Rating	Menus		Evaluare
 Flip left to right	Menus		Inversează stânga cu dreapta
 Show caption in full screen mode	Menus		Afișează legendă în modul ecran complet
 DPI:	PrintOptionsWindow		DPI:
-Open…	Menus		Deschide...
+Open…	Menus		Deschide…
 Next file	Menus		Fișierul următor
 Clear selection	Menus		Eliberează selecție
 Close document	ClosePrompt		Închide document
-Height: 	PrintOptionsWindow		Înălțime:
+Height: 	PrintOptionsWindow		Înălțime: 
 The file '%s' could not be written.	SaveToFile		Fișierul '%s' nu a putut fi scris.
 Cancel	ClosePrompt		Anulează
 Show tool bar	Menus		Afișează bara de unelte
@@ -58,4 +59,4 @@ Rotate clockwise	Menus		Rotește în sens orar
 Job setup	PrintOptionsWindow		Configurare sarcină
 Original size	Menus		Dimensiune originală
 Next page	Menus		Pagina următoare
-Save as…	Menus		Salvează ca...
+Save as…	Menus		Salvează ca…

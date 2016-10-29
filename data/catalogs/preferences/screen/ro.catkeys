@@ -2,13 +2,13 @@
 yes	Screen		da
 Use laptop panel:	Screen		Utilizează panou laptop:
 15 bits/pixel, 32768 colors	Screen		15 biți/pixel, 32768 culori
-/other…	Screen		/alte…
+/other…	Screen		/other…
 16 bits/pixel, 65536 colors	Screen		16 biți/pixel, 65536 culori
 Revert	Screen		Revenire
 Swap displays:	Screen		Interschimbă afișări:
 Combine displays:	Screen		Combină afișări:
 Done	Screen		Gata
-Set background…	Screen		Configurează fundal...
+Set background…	Screen		Configurează fundal…
 Undo	Screen		Refă
 if needed	Screen		dacă este nevoie
 Screen preferences by the Haiku team	Screen		Preferințe de ecran de echipa Haiku
@@ -28,12 +28,12 @@ disable	Screen		dezactivează
 Columns:	Screen		Coloane:
 All workspaces	Screen		Toate spațiile de lucru
 always	Screen		întotdeauna
-32 bits/pixel, 16 Million colors	Screen		32  biți/pixel, 16 Milioane de culori
+32 bits/pixel, 16 Million colors	Screen		32 biți/pixel, 16 Milioane de culori
 Current workspace	Screen		Spațiul de lucru curent
 About	Screen		Despre
 24 bits/pixel, 16 Million colors	Screen		24 biți/pixel, 16 Milioane de culori
 horizontally	Screen		orizontal
-Other…	Screen		Altele...
+Other…	Screen		Altele…
 Cancel	Screen		Anulează
 bits/pixel	Screen		biți/pixel
 Refresh rate:	Screen		Cotă de împrospătare:
@@ -47,7 +47,7 @@ Screen	Screen		Ecran
 %.1f Hz	Screen		%.1f Hz
 8 bits/pixel, 256 colors	Screen		8 biți/pixel, 256 de culori
 Apply	Screen		Aplică
-Refresh rate	Screen		cotă de reîmprospătare
+Refresh rate	Screen		Cotă de reîmprospătare
 %sSerial no.: %s	Screen		%sNr serie: %s
 Colors:	Screen		Culori:
 Video format:	Screen		Format video:

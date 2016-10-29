@@ -5,5 +5,5 @@ RAW image translator	RAWTranslator		Traducător imagine RAW
 RAW Settings	RAWTranslator main		Configurări RAW
 RAW images	RAWTranslator		Imagini RAW
 RAW image translator	ConfigView		Traducător imagine RAW
-%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	Imagine RAW %s
+%s RAW image	RAWTranslator	Parameter (%s) is the name of the manufacturer (like 'Canon')	%s imagine RAW
 Based on Dave Coffin's dcraw 8.63	ConfigView		Bazat pe dcraw 8.63 al lui Dave Coffin

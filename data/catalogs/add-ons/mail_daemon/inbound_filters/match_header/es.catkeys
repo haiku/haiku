@@ -1,5 +1,7 @@
-1	spanish; castilian	x-vnd.Haiku-MatchHeader	4262558281
+1	spanish; castilian	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<Elegir acción>
+Header field (e.g. Subject, From, ...)	ConfigView		Campos de cabecera (p. ej.: asunto, de, ...)
+Account	ConfigView		Cuenta
 has	ConfigView		tiene
 Move to	ConfigView		Mover a 
 Then	ConfigView		Luego
@@ -12,3 +14,4 @@ Match header	RuleFilter		Cabecera concordante
 Reply with	ConfigView		Responder con
 If	ConfigView		Si
 Match \"%attribute\" against \"%regex\"	RuleFilter		Concordar \"%attribute\" contra \"%regex\"
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Valor de comodín como \"*spam*\.\nPrefijos con \"REGEX:\" para utilizar expresiones regulares.

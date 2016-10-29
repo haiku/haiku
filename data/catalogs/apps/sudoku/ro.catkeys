@@ -1,14 +1,14 @@
 1	romanian	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Restaurează instantaneu
 Could not set Sudoku:\n%s\n	SudokuWindow		Nu s-a putut stabili Sudoku:\n%s\n
-Export as…	SudokuWindow		Exportă ca...
+Export as…	SudokuWindow		Exportă ca…
 OK	SudokuWindow		OK
 New	SudokuWindow		Nou
 Abort	ProgressWindow		Anulează
 Sudoku	System name		Sudoku
 Could not open \"%s\":\n%s\n	SudokuWindow		Nu s-a putut deschide \"%s\":\n%s\n
 Easy	SudokuWindow		Simplu
-Open file…	SudokuWindow		Deschidere fișier...
+Open file…	SudokuWindow		Deschidere fișier…
 Solve single field	SudokuWindow		Rezolvă câmp unic
 Solve	SudokuWindow		Rezolvare
 Redo	SudokuWindow		Repetă

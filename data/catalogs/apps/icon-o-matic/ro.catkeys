@@ -39,15 +39,15 @@ Remove Paths	Icon-O-Matic-RemovePathsCmd		Elimină căi
 Scale Y	Icon-O-Matic-PropertyNames		Scară Y
 Add Control Point	Icon-O-Matic-AddPointCmd		Adaugă punct de control
 Untitled	Icon-O-Matic-Main		Fără titlu
-Multi Set 	Multi Set (property name)		Configurare multi
+Multi Set 	Multi Set (property name)		Set multiplu 
 any of the other lists to	Empty property list - 2nd line		oricare din celelalte liste la
-Save as…	Icon-O-Matic-Menu-File		Salvează ca...
+Save as…	Icon-O-Matic-Menu-File		Salvează ca…
 Don't save	Icon-O-Matic-Menu-Settings		Nu salva
 Change Color	Icon-O-Matic-SetColorCmd		Schimbă culoarea
 Style	Icon-O-Matic-Menus		Stil
 <modify path>	Icon-O-Matic-PathCmd		<schimbă calea>
 Opening the icon failed!	Icon-O-Matic-Main		Deschiderea pictogramei a eșuat!
-Error: 	Icon-O-Matic-Main		Eroare:
+Error: 	Icon-O-Matic-Main		Eroare: 
 Rotate indices backwards	Icon-O-Matic-PathsList		Rotește indicii înapoi
 Name	Icon-O-Matic-PropertyNames		Nume
 bad news	Icon-O-Matic-Exporter		vești rele
@@ -58,7 +58,7 @@ PNG Set	Icon-O-Matic-SavePanel		Configurare PNG
 Joins	Icon-O-Matic-PropertyNames		Legături
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Elimină stil
 Scale X	Icon-O-Matic-PropertyNames		Scară X
-Set 	Set (property name)		Configurează
+Set 	Set (property name)		Set 
 Cancel	Icon-O-Matic-SVGExport		Anulează
 Add shape with style	Icon-O-Matic-Menu-Shape		Adaugă formă cu stil
 Remove Shape	Icon-O-Matic-RemoveShapesCmd		Elimină formă
@@ -109,7 +109,7 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		Mută forme
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Elimină stiluri
 Add	Icon-O-Matic-TransformersList		Adaugă
 Color	Icon-O-Matic-StyleTypes		Culoare
-Settings…	Icon-O-Matic-SavePanel		Configurări...
+Settings…	Icon-O-Matic-SavePanel		Configurări…
 Remove	Icon-O-Matic-PathManipulator		Elimină
 Radial	Icon-O-Matic-StyleTypes		Radial
 Perspective	Icon-O-Matic-TransformersList		Perspectivă
@@ -119,7 +119,7 @@ Min LOD	Icon-O-Matic-PropertyNames		LOD min
 BEOS:ICON Attribute	Icon-O-Matic-SavePanel		Atribut BEOS:ICON
 Invert selection	Icon-O-Matic-Properties		Inversează selecția
 Drop shapes	Icon-O-Matic-ShapesList		Renunță la forme
-Export as…	Icon-O-Matic-Menu-File		Exportă ca...
+Export as…	Icon-O-Matic-Menu-File		Exportă ca…
 Transformation	Transformation		Transformare
 Click on an object in	Empty property list - 1st line		Dați clic pe un obiect în
 Move Transformers	Icon-O-Matic-MoveTransformersCmd		Mută transformatori
@@ -142,11 +142,11 @@ Move Pivot	Icon-O-Matic-TransformationBoxStates		Mută pivot
 Path	Icon-O-Matic-Menus		Cale
 Freeze transformation	Icon-O-Matic-ShapesList		Îngheață transformare
 File	Icon-O-Matic-Menus		Fișier
-Error: 	Icon-O-Matic-Exporter		Eroare:
+Error: 	Icon-O-Matic-Exporter		Eroare: 
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Adaugă transformatori
 Diamond	Icon-O-Matic-StyleTypes		Diamant
 Path	Icon-O-Matic-PropertyNames		Cale
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		A eșuat deschiderea fișierului „%s” ca document SVG.\n\nEroare: %s
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		A eșuat deschiderea fișierului '%s' ca document SVG.\n\nEroare: %s
 Swatches	Icon-O-Matic-Menus		Eșantioane
 <unavailable>	Icon-O-Matic-StyleTypes		<indisponibil>
 Rotation	Icon-O-Matic-PropertyNames		Rotație
@@ -184,13 +184,13 @@ Reverse Path	Icon-O-Matic-ReversePathCmd		Cale inversă
 Scale	Icon-O-Matic-TransformationBoxStates		Scală
 Duplicate	Icon-O-Matic-PathsList		Duplicat
 Save	Icon-O-Matic-Menu-File		Salvează
-Append…	Icon-O-Matic-Menu-File		Adaugă...
+Append…	Icon-O-Matic-Menu-File		Adaugă…
 Move Path	Icon-O-Matic-MovePathsCmd		Mută cale
 Overwrite	Icon-O-Matic-SVGExport		Suprascrie
 Text too long	Icon-O-Matic-StyledTextImport		Text prea lung
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Îngheață forme
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Separă punct de control
-Open…	Icon-O-Matic-Menu-File		Deschide...
+Open…	Icon-O-Matic-Menu-File		Deschide…
 Save icon	Dialog title		Salvează pictogramă
 Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Culoare (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Editează degrade
@@ -198,4 +198,4 @@ Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Curăță cale
 Rounding	Icon-O-Matic-PropertyNames		Înconjurare
 Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Elimină forme
 Clean up	Icon-O-Matic-PathsList		Curăță
-Detect Orient.	Icon-O-Matic-PropertyNames		Detectează orientarea
+Detect Orient.	Icon-O-Matic-PropertyNames		Detectare orient.

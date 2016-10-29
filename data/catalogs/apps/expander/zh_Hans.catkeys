@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Expander	2177073262
+1	english	x-vnd.Haiku-Expander	2825008254
 Expand	ExpanderMenu		解压缩
 Close window when done expanding	ExpanderPreferences		完成解压后，关闭窗口。
 Set destination…	ExpanderMenu		目标文件…
@@ -14,7 +14,6 @@ Error when expanding archive	ExpanderWindow		解压缩出错
 Hide contents	ExpanderWindow		隐藏内容
 Cancel	ExpanderWindow		取消
 Automatically expand files	ExpanderPreferences		自动解压文件
-Creating listing for '%s'	ExpanderWindow		为 '%s' 创建列表
 Continue	ExpanderWindow		继续
 Destination folder	ExpanderPreferences		目标文件夹
 Other	ExpanderPreferences		其他
@@ -24,7 +23,6 @@ Are you sure you want to stop expanding this\narchive? The expanded items may no
 Select	DirectoryFilePanel		选择
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		目标目录不存在。您是否希望创建该目录？
 Same directory as source (archive) file	ExpanderPreferences		相同于源文件（压缩档）目录
-Expanding '%s'	ExpanderWindow		'%s' 解压进行中
 Settings	ExpanderMenu		设置
 Settings…	ExpanderMenu		设置…
 Expander: Choose destination	DirectoryFilePanel		归档管理器：选择目标文件

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-ProcessController	1848752768
+1	spanish; castilian	x-vnd.Haiku-ProcessController	1761882987
 Memory usage	ProcessController		Utilización de almacenamiento
 Kill this team!	ProcessController		¡Eliminar este equipo!
 Idle priority	ProcessController		Prioridad Vacío
@@ -7,6 +7,7 @@ Custom priority	ProcessController		Prioridad personalizada
 This team is already gone…	ProcessController		Este equipo ya sale...
 Error saving file	ProcessController		Error cuando tratamos de gaurdar el archivo
 Real-time priority	ProcessController		Prioridad de Tiempo-Real
+Power saving	ProcessController		Ahorro de energía
 Your setting file could not be saved!\n(%s)	ProcessController		¡Tu archivo de ajustes no pudo ser salvado!\n(%s)
 What do you want to do with the team \"%s\"?	ProcessController		¿Qué quiere hacer con el equipo \"%s\"?
 This thread is already gone…	ProcessController		Este hilo ya sale...
@@ -36,6 +37,7 @@ Quit an application	ProcessController		Salir una applicación
 Install in Deskbar	ProcessController		Instalar en barra de escritorio
 Threads and CPU usage	ProcessController		Hilos y utilización de CPU
 Urgent display priority	ProcessController		Prioridad de muestra Urgente
+Low latency	ProcessController		Baja latencia
 OK	ProcessController		Aceptar
 Damned!	ProcessController		¡Ay caramba!
 Debug this team!	ProcessController		¡Depurar este hilo!

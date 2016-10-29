@@ -22,7 +22,7 @@ Scanner	DeviceSCSI		Scanner
 Printer	DeviceSCSI		Imprimantă
 Processor	Device		Procesor
 Optical Drive	DeviceSCSI		Unitate optică
-ACPI Processor Namespace '%2'	DeviceACPI		Spațiu de nume procesor ACPI „%2”
+ACPI Processor Namespace '%2'	DeviceACPI		Spațiu de nume procesor ACPI '%2'
 Bridge	DeviceSCSI		Punte
 unknown	Device		necunoscut
 ACPI Information	DeviceACPI		Informații ACPI
@@ -68,7 +68,7 @@ Device	Device		Dispozitiv
 Signal processing controller	Device		Controler de procesare a semnalului
 Serial bus controller	Device		Controler de magistrală serială
 Wireless controller	Device		Controler fără fir
-ACPI node '%1'	DeviceACPI		Nod ACPI „%1”
+ACPI node '%1'	DeviceACPI		Nod ACPI '%1'
 Device name	Device		Nume dispozitiv
 Manufacturer	Device		Producător
 Name	PropertyList		Nume

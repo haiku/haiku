@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku.TextSearch	1180598828
+1	spanish; castilian	x-vnd.Haiku.TextSearch	374162881
 %s: Not enough room to escape the filename.	Grepper		%s: No hay suficiente espacio para evitar el nombre del archivo
 Trim to selection	GrepWindow		Recortar selección
 Follow symbolic links	GrepWindow		Siga los enlaces simbólicos
@@ -31,3 +31,4 @@ Show files in Tracker	GrepWindow		Mostrar archivos en el rastreador
 Case-sensitive	GrepWindow		Entre mayúsculas y minúsculas 
 Text files only	GrepWindow		Solo archivos de texto
 Show lines	GrepWindow		Mostrar líneas
+%appname% : %path% : %searchtext%	GrepWindow		%appname% : %path% : %searchtext%

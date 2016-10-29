@@ -10,7 +10,7 @@ New Messages	MailDaemon		Mesaje noi
 Mail status	MailDaemon		Stare email
 Shutdown mail services	DeskbarView		Oprește serviciile de email
 Sending mail for %name	Notifier		Se trimite emailul pentru %name
-Create new message…	DeskbarView		Creează mesaj nou...
+Create new message…	DeskbarView		Creează mesaj nou…
 No new messages	MailDaemon		Nu sunt mesaje noi
 Check for mail now	DeskbarView		Verifică email acum
 No new messages	DeskbarView		Nu sunt mesaje noi

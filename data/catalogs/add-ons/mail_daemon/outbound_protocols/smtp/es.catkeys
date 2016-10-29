@@ -1,11 +1,11 @@
 1	spanish; castilian	x-vnd.Haiku-SMTP	2740407895
 SMTP server:	ConfigView		Servidor SMTP:
 STARTTLS	ConfigView		STARTTLS
-Error while logging in to %serv	smtp		Error durante el logado en %serv
+Error while logging in to %serv	smtp		Error durante el ingreso en %serv
 Unencrypted	ConfigView		Sin cifrar
 . The server says:\n	smtp		. El servidor dice:\n
 ESMTP	ConfigView		ESTMP
-Connecting to server…	smtp		Conectando al servidor...
+Connecting to server…	smtp		Conectando al servidor…
 Error while opening connection to %serv	smtp		Error durante la apertura de la conexión a %serv
 POP3 authentication failed. The server said:\n	smtp		Fallo de autenticación POP3. El servidor dijo:\n
 Destination:	ConfigView		Destino:

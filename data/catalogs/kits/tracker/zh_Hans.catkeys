@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	3644595724
+1	english	x-vnd.Haiku-libtracker	545841200
 OK	WidgetAttributeText		确定
 Add-ons	FilePanelPriv		附加组件
 Mount settings…	ContainerWindow		挂载设置...
@@ -18,7 +18,6 @@ Recent documents	FavoritesMenu		最近文本
 Modified	QueryPoseView		修改
 Created	ContainerWindow		创建
 Error %error loading add-On %name.	ContainerWindow		载入附加组件 %name 出错：%error 。
-If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		如果您 %ifYouDoAction settings 目录, %osName 可能无法正常工作！\n\n您是否确认执行此操作？
 Skip all	FSUtils		跳过所有
 contains	SelectionWindow		包含
 Sorry, you can't save things at the root of your system.	FilePanelPriv		对不起，您不能够在系统根目录保存内容。
@@ -49,7 +48,6 @@ Clean up	DeskWindow		清空
 You cannot copy or move the root directory.	FSUtils		您无法复制或移动根目录。
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		(%SizeProcessed / %TotalSize, %BytesPerSecond/s)
 Invert selection	FilePanelPriv		反向选择
-Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	重命名
 save text	FilePanelPriv		保存文本
 Select all	FilePanelPriv		全选
 Link to:	InfoWindow		链接到： 
@@ -88,7 +86,6 @@ Tracker preferences	TrackerSettingsWindow		文件浏览器首选项
 Cut	FilePanelPriv		剪切
 Replace	FilePanelPriv		替换
 Opens with:	InfoWindow		打开方式：
-If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		如果您 %ifYouDoAction mime 目录, %osName 可能无法正常工作！\n\n您是否确认执行此操作？
 Open	ContainerWindow		打开
 96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		文件夹大小计算错误。
@@ -98,7 +95,6 @@ Favorites	FavoritesMenu		选择
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" 是不支持的可执行文件。
 Sorry, you can't copy items to the Trash.	PoseView		对不起，您无法复制项目至垃圾箱。
 matches wildcard expression	SelectionWindow		匹配通配符表达式
-rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	重命名
 You cannot replace a folder or a symbolic link with a file.	FSUtils		您不能够使用文件夹或符号链接替代文件。
 Show space bars on volumes	SettingsView		显示卷进度栏
 Invert selection	ContainerWindow		反向选择
@@ -107,7 +103,6 @@ Resize to fit	ContainerWindow		合适大小
 Add printer…	ContainerWindow		添加打印机...
 New folder	ContainerWindow		新建文件夹
 Kind	ContainerWindow		种类
-rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	重命名
 home	B_USER_DIRECTORY		主目录
 Select…	ContainerWindow		选择...
 Copy to	ContainerWindow		复制到
@@ -115,18 +110,15 @@ Move to Trash	ContainerWindow		移动到垃圾箱
 Move to	ContainerWindow		移动到
 Create %s clipping	PoseView		创建 %s 片段
 Set new link target	InfoWindow		设置链接目标
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		如果您 %ifYouDoAction system 目录或者其中内容，您将无法启动 %osName！\n\n您确定要执行此操作?\n\n为了 %toDoAction system 目录或者其中内容，请按下 Shift 键并点击 \"%toConfirmAction\"。
 Save as Query template:	FindPanel		保存查询模板：
 preferences	B_PREFERENCES_DIRECTORY		系统设置
 Cancel	FSUtils		取消
-move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	移动
 Edit name	ContainerWindow		编辑名称
 Show volumes on Desktop	SettingsView		在桌面显示卷
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		载入附加组件 %name 出错：%error 。
 Defaults	TrackerSettingsWindow		默认
 Mini icon view	ContainerWindow		迷你视图
-OK	TrackerInitialState		确定
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		无法打开 \"%name\"。  该文件被错误标识为可执行文件。
 Add-ons	ContainerWindow		附加组件
 Edit templates…	TemplatesMenu		编辑模版...
@@ -196,9 +188,7 @@ You cannot create a link to the root directory.	FSUtils		您无法创建至根�
 Could not find application \"%appname\"	OpenWithWindow		未找到 \"%appname\" 程序。
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		选中项目无法移动至垃圾箱。您希望删除它们吗？（该操作将无法恢复。）
 Invert	SelectionWindow		恢复
-rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	重命名
 Find	FindPanel		搜索
-Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	移动
 Get info	ContainerWindow		获取信息
 Error creating link to \"%name\".	FSUtils		创建至 \"%name\" 的链接出错。
 Select	SelectionWindow		选择
@@ -242,7 +232,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		指定目录中已经存在 \"%name\" 文件。您确定要将其替换吗？
 Cancel	ContainerWindow		取消
 Only the boot disk	AutoMounterSettings		仅引导磁盘
-If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		如果您 %ifYouDoAction config 目录, %osName 可能无法正常执行！\n\n您确定要执行此操作？
 Unmount	ContainerWindow		卸载
 Copy layout	ContainerWindow		复制布局
 label too long	PoseView		标签太长
@@ -267,7 +256,6 @@ Unknown	WidgetAttributeText		未知
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		无法打开 \"%document\"（缺失符号：%symbol）。\n
 by name	FindPanel		名称
 Creating links: 	StatusWindow		创建链接：
-Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	重命名
 Paused: click to resume or stop	StatusWindow		暂停：点击继续或停止
 Preferred for %type	OpenWithWindow		首选 %type
 GiB	WidgetAttributeText		GiB
@@ -290,7 +278,6 @@ Previously mounted disks	AutoMounterSettings		先前载入磁盘
 %Ld B	WidgetAttributeText		%Ld B
 copying	FSUtils		复制中
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		复制目录 \"%name\" 出错：\n\t%error\n\n是否继续？
-move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	移动
 Show Disks icon	SettingsView		显示磁盘图标
 Cancel	PoseView		取消
 You can't move or copy items to read-only volumes.	FSUtils		您无法移动或复制项目到只读卷。
@@ -306,7 +293,6 @@ Permissions	ContainerWindow		权限
 moving	FSUtils		移动中
 Identify	InfoWindow		标识
 Recent folders	ContainerWindow		最近目录
-rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	重命名
 Close all	ContainerWindow		关闭所有
 Include trash	FindPanel		包括垃圾箱
 Query template	FindPanel		查询模板
@@ -321,10 +307,8 @@ after	FindPanel		之后
 Select…	QueryContainerWindow		选择...
 More options	FindPanel		更多选项
 link	FSUtils	filename link	链接
-At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		在 %func \nfind_directory()失败。\n原因：%error
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定名称非法。请选择其他命名。
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		您无法移动目录到其本身及子目录。
-List view	ContainerWindow		列表视图
 Handles any file	OpenWithWindow		处理所有文件
 Get info	FilePanelPriv		获取信息
 32 x 32	DeskWindow		32 x 32
@@ -364,7 +348,6 @@ Preferences…	ContainerWindow		首选项…
 Move	PoseView		移动
 Open and make preferred	OpenWithWindow		打开并创建首选
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		您确定要删除选中项目？该操作将无法恢复。
-If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		如果您 %ifYouDoAction home 目录，%osName 可能无法正常执行！\n\n您确定要执行次操作吗？\n\n为了 %toDoAction home 目录，请按下 Shift 键并点击 \"%toConfirmAction\"。
 Add-ons	DeskWindow		附加组件
 Name	FindPanel		名称
 And	FindPanel		添加

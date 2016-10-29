@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-libtracker	3917713227
+1	slovak	x-vnd.Haiku-libtracker	818958703
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Doplnky
 Mount settings…	ContainerWindow		Nastavenia pripojenia…
@@ -18,7 +18,6 @@ Recent documents	FavoritesMenu		Nedávne dokumenty
 Modified	QueryPoseView		Zmenené
 Created	ContainerWindow		Vytvorené
 Error %error loading add-On %name.	ContainerWindow		Chyba %error pri načítaní doplnku %name.
-If you %ifYouDoAction the settings folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ak %ifYouDoAction priečinok nastavení, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?
 Skip all	FSUtils		Preskočiť všetko
 contains	SelectionWindow		obsahuje
 Sorry, you can't save things at the root of your system.	FilePanelPriv		Ľutujeme, nemôžete ukladať veci do koreňového adresára systému.
@@ -48,7 +47,6 @@ Clean up	DeskWindow		Vyčistiť
 You cannot copy or move the root directory.	FSUtils		Nemôžete skopírovať alebo presunúť koreňový adresár.
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed z %TotalSize, %BytesPerSecond/s
 Invert selection	FilePanelPriv		Invertovať výber
-Rename	InfoWindow	Button label, 'Rename' (en), 'Umbenennen' (de)	Premenovať
 save text	FilePanelPriv		uložiť text
 Select all	FilePanelPriv		Vybrať všetky
 Link to:	InfoWindow		Odkazovať na:
@@ -87,7 +85,6 @@ Tracker preferences	TrackerSettingsWindow		Nastavenia Trackera
 Cut	FilePanelPriv		Vystrihnúť
 Replace	FilePanelPriv		Nahradiť
 Opens with:	InfoWindow		Otvára sa pomocou:
-If you %ifYouDoAction the mime settings, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ak %ifYouDoAction nastavenia MIME, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?
 Open	ContainerWindow		Otvoriť
 96 x 96	DeskWindow		96 x 96
 Error calculating folder size.	InfoWindow		Chyba pri výpočte veľkosti priečinka.
@@ -97,7 +94,6 @@ Favorites	FavoritesMenu		Obľúbené
 \"%name\" is an unsupported executable.	FSUtils		„%name“ je nepodporovaný spustiteľný súbor.
 Sorry, you can't copy items to the Trash.	PoseView		Ľutujeme, nemôžete kopírovať položky do Koša.
 matches wildcard expression	SelectionWindow		zodpovedá výrazu so zástupnými znakmi
-rename	TextWidget	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	premenujete
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Nemôžete nahradiť priečinok alebo symbolický odkaz súborom.
 Show space bars on volumes	SettingsView		Zobraziť indikátory voľného miesta na zväzkoch
 Invert selection	ContainerWindow		Invertovať výber
@@ -106,7 +102,6 @@ Resize to fit	ContainerWindow		Prispôsobiť veľkosť
 Add printer…	ContainerWindow		Pridať tlačiareň…
 New folder	ContainerWindow		Nový priečinok
 Kind	ContainerWindow		Druh
-rename	TextWidget	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	premenovať
 home	B_USER_DIRECTORY		domov
 Select…	ContainerWindow		Vybrať…
 Copy to	ContainerWindow		Kopírovať do
@@ -114,18 +109,15 @@ Move to Trash	ContainerWindow		Presunúť do Koša
 Move to	ContainerWindow		Presunúť do
 Create %s clipping	PoseView		Vytvoriť orezanie %s
 Set new link target	InfoWindow		Nastaviť nový cieľ odkazu
-If you %ifYouDoAction the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo %toDoAction the system folder or its contents anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction priečinok „system“, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?\n\nAk chcete priečinok „system“ napriek tomu %toDoAction, podržte kláves Shift a kliknite na „%toConfirmAction“.
 Save as Query template:	FindPanel		Uložiť ako šablónu Požiadavky:
 preferences	B_PREFERENCES_DIRECTORY		nastavenia
 Cancel	FSUtils		Zrušiť
-move	FSUtils	As in 'to move this folder...' (en) Um diesen Ordner zu verschieben...' (de)	presunúť
 Edit name	ContainerWindow		Upraviť názov
 Show volumes on Desktop	SettingsView		Zobraziť zväzky na ploche
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		Chyba %error pri načítaní doplnku %name.
 Defaults	TrackerSettingsWindow		Predvolené
 Mini icon view	ContainerWindow		Zobrazenie mini ikon
-OK	TrackerInitialState		OK
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Nebolo možné otvoriť „%name“. Súbor je chybne označený ako spustiteľný. 
 Add-ons	ContainerWindow		Doplnky
 Edit templates…	TemplatesMenu		Upraviť šablóny…
@@ -195,9 +187,7 @@ You cannot create a link to the root directory.	FSUtils		Nemôžete vytvoriť od
 Could not find application \"%appname\"	OpenWithWindow		Nepodarilo sa nájsť aplikáciu „%appname“
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Vybranú položka nemožno presunúť do Koša. Chcete ju namiesto toho zmazať? (Túto operáciu nemožno vrátiť.)
 Invert	SelectionWindow		Invertovať
-rename	InfoWindow	As in 'if you rename this folder...' (en) 'Wird dieser Ordner umbenannt...' (de)	premenujete
 Find	FindPanel		Nájsť
-Move	FSUtils	Button label, 'Move' (en), 'Verschieben' (de)	Presunúť
 Get info	ContainerWindow		Získať info
 Error creating link to \"%name\".	FSUtils		Chyba pri vytváraní odkazu „%name“.
 Select	SelectionWindow		Vybrať
@@ -241,7 +231,6 @@ TiB	WidgetAttributeText		TiB
 The file \"%name\" already exists in the specified folder. Do you want to replace it?	FilePanelPriv		Súbor „%name“ už existuje v uvedenom priečinku. Chcete ho nahradiť?
 Cancel	ContainerWindow		Zrušiť
 Only the boot disk	AutoMounterSettings		Iba zavádzací disk
-If you %ifYouDoAction the config folder, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		Ak %ifYouDoAction priečinok „config“, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?
 Unmount	ContainerWindow		Odpojiť
 Copy layout	ContainerWindow		Kopírovať rozloženie
 label too long	PoseView		menovka je príliš dlhá
@@ -266,7 +255,6 @@ Unknown	WidgetAttributeText		Neznámy
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		Nebolo možné otvoriť „%document“ (Chýbajúci symbol: %symbol). \n
 by name	FindPanel		podľa názvu
 Creating links: 	StatusWindow		Vytvárajú sa odkazy: 
-Rename	TextWidget	Button label, 'Rename' (en), 'Umbenennen' (de)	Premenovať
 Paused: click to resume or stop	StatusWindow		Pozastavené: kliknutím môžete pokračovať alebo zastaviť
 Preferred for %type	OpenWithWindow		Preferovaná pre %type
 GiB	WidgetAttributeText		GiB
@@ -289,7 +277,6 @@ Previously mounted disks	AutoMounterSettings		V minulosti pripojené disky
 %Ld B	WidgetAttributeText		%Ld B
 copying	FSUtils		kopírovanie
 Error copying folder \"%name\":\n\t%error\n\nWould you like to continue?	FSUtils		Chyba pri kopírovaní „%name“:\n\t%error\n\nChcete pokračovať?
-move	FSUtils	As in 'if you move this folder...' (en) 'Wird dieser Ordner verschoben...' (de)	presuniete
 Show Disks icon	SettingsView		Zobraziť ikonu Disky
 Cancel	PoseView		Zrušiť
 You can't move or copy items to read-only volumes.	FSUtils		Nemôžete presúvať alebo kopírovať položky na zväzky, ktoré sú len na čítanie.
@@ -305,7 +292,6 @@ Permissions	ContainerWindow		Oprávnenia
 moving	FSUtils		presúvanie
 Identify	InfoWindow		Identifikovať
 Recent folders	ContainerWindow		Nedávne priečinky
-rename	InfoWindow	As in 'to rename this folder...' (en) 'Um diesen Ordner umzubenennen...' (de)	premenovať
 Close all	ContainerWindow		Zatvoriť všetky
 Include trash	FindPanel		Vrátane Koša
 Query template	FindPanel		Šablóna Požiadavky
@@ -320,10 +306,8 @@ after	FindPanel		po
 Select…	QueryContainerWindow		Vybrať…
 More options	FindPanel		Ďalšie možnosti
 link	FSUtils	filename link	odkaz
-At %func \nfind_directory() failed. \nReason: %error	TrackerInitialState		V %func \nfind_directory() zlyhalo. \nDôvod: %error
 The specified name is illegal. Please choose another name.	FilePanelPriv		Uvedený názov je neplatný. Prosím, vyberte iný názov.
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Nemôžete presunúť priečinok do seba samého alebo do jeho podpriečinka.
-List view	ContainerWindow		Zobrazenie zoznamu
 Handles any file	OpenWithWindow		Pracuje s ľubovoľným súborom
 Get info	FilePanelPriv		Získať info
 32 x 32	DeskWindow		32 x 32
@@ -363,7 +347,6 @@ Preferences…	ContainerWindow		Nastavenia…
 Move	PoseView		Presunúť
 Open and make preferred	OpenWithWindow		Otvoriť a nastaviť ako preferovanú
 Are you sure you want to delete the selected item(s)? This operation cannot be reverted.	FSUtils		Ste si istí, že chcete zmazať vybrané položky? Túto operáciu nemožno vrátiť.
-If you %ifYouDoAction the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo %toDoAction the home folder anyway, hold down the Shift key and click \"%toConfirmAction\".	FSUtils		Ak %ifYouDoAction priečinok „home“, %osName sa nemusí chovať správne!\n\nSte si istí, že to chcete urobiť?\n\nAk chcete priečinok „home“ napriek tomu %toDoAction, podržte kláves Shift a kliknite na „%toConfirmAction“.
 Add-ons	DeskWindow		Doplnky
 Name	FindPanel		Názov
 And	FindPanel		a

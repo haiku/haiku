@@ -50,7 +50,7 @@ Rate package	RatePackageWindow		Оценить пакет
 Development	Model		Разработка
 Fatal error	PackageManager		Неисправимая ошибка
 The user name needs to be at least 3 letters long.	UserLoginWindow		Имя пользователя должно состоять минимум из 3-х символов.
-Log in	UserLoginWindow		Войти…
+Log in	UserLoginWindow		Войти
 Repeat pass phrase:	UserLoginWindow		Повторить пароль:
 Ratings	PackageInfoView		Оценки
 But none could be listed here, sorry.	UserLoginWindow		Но не удалось определить с какими именно, извините.

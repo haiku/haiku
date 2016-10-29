@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Installer	2181874765
+1	spanish; castilian	x-vnd.Haiku-Installer	2908483931
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, la aplicación para configurar el menú de arranque de Haiku, no se pudo abrir.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		¿Está seguro que desea abortar la instalación y reiniciar el sistema?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\tescrito por Jérôme Duval y Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -25,6 +25,7 @@ Failed to launch Boot Manager	InstallerWindow		Fallo al iniciar Boot Manager
 Install from:	InstallerWindow		Instalar desde:
 %1ld of %2ld	InstallerWindow	number of files copied	%1ld de %2ld
 IMPORTANT INFORMATION BEFORE INSTALLING HAIKU\n\n	InstallerApp		INFORMACION IMPORTANTE ANTES DE INSTALAR HAIKU\n\n
+GRUB's naming scheme for partitions is: (hdN,n)\n\n	InstallerApp		El esquema de nombres de GRUB para las particiones es: (hdN,n)\n\n
 Continue	InstallerWindow	In alert after pressing Stop	Continuar
 Write boot sector to '%s'	InstallerWindow		Escribir sector de arranque en '%s'
 Collecting copy information.	InstallProgress		Recopilando información para la copia.

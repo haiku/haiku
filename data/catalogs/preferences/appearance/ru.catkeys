@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	727801787
+1	russian	x-vnd.Haiku-Appearance	283083658
 Plain font:	Font view		Простой шрифт:
 Control highlight	Colors tab		Подсветка элемента
 Control border	Colors tab		Граница элемента
@@ -18,6 +18,7 @@ Failure	Colors tab		Неудача
 Hinting menu	AntialiasingSettingsView		Корректировка (хинтинг)
 Scroll bar:	DecorSettingsView		Полоса прокрутки:
 Document background	Colors tab		Фон документа
+Status bar	Colors tab		Строка статуса
 Revert	APRWindow		Вернуть
 Window tab	Colors tab		Заголовок окна
 Tooltip background	Colors tab		Фон подсказки
@@ -36,6 +37,7 @@ List background	Colors tab		Фон списка
 OK	DecorSettingsView		ОК
 Control mark	Colors tab		Отметка
 Size:	Font Selection view		Размер:
+Link visited	Colors tab		Посещенная ссылка
 Decorator:	DecorSettingsView		Декоратор:
 Selected list item background	Colors tab		Фон выбранного пункта меню
 Panel background	Colors tab		Фон панели

@@ -5,18 +5,18 @@ You can run NetworkStatus in a window or install it in the Deskbar.	NetworkStatu
 Run in window	NetworkStatus		Rulează în fereastră
 No link	NetworkStatusView		Nicio legătură
 Install in Deskbar	NetworkStatus		Instalează în bara de desktop
-Launching the network preflet failed.\n\nError: 	NetworkStatusView		Lansarea prefletului de rețea a eșuat.\n\nEroare:
+Launching the network preflet failed.\n\nError: 	NetworkStatusView		Lansarea prefletului de rețea a eșuat.\n\nEroare: 
 Netmask	NetworkStatusView		Mască de rețea
 Broadcast	NetworkStatusView		Bandă largă
 Unknown	NetworkStatusView		Necunoscut
 Network Status	NetworkStatusView		Stare Rețea
 Ready	NetworkStatusView		Gata
 No stateful configuration	NetworkStatusView		Nicio configurație de stare
-%ifaceName information:\n	NetworkStatusView		informații despre %ifaceName:\n
+%ifaceName information:\n	NetworkStatusView		%ifaceName info:\n
 Configuring	NetworkStatusView		Se configurează
 Address	NetworkStatusView		Adresă
 OK	NetworkStatusView		OK
 NetworkStatus	System name		StareRețea
-Open network preferences…	NetworkStatusView		Deschide preferințe de rețea...
+Open network preferences…	NetworkStatusView		Deschide preferințe de rețea…
 Could not join wireless network:\n	NetworkStatusView		Nu s-a putut face legătura la rețeaua fără fir:\n
 Quit	NetworkStatusView		Închidere

@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Keymap	618043781
+1	spanish; castilian	x-vnd.Haiku-Keymap	891710937
 Dvorak	Keyboard Layout View		Dvorak
 Shift:	Modifier keys window	Shift key role name	Mayúsculas:
 Revert	Modifier keys window		Revertir
@@ -7,7 +7,10 @@ Hungarian	Keyboard Layout View		Húngaro
 German	Keyboard Layout View		Alemán
 Swiss-French	Keyboard Layout View		Suizo francés
 Warning: left and right key roles do not match	Modifier keys window		Advertencia: los roles de tecla izquierda y derecha no concuerdan
+Belgian (comma)	Keyboard Layout View		Belga (coma)
+Scroll lock	Keyboard Layout View		Bloq Despl
 Belarusian (Mac)	Keyboard Layout View		Bielorruso (Mac)
+Belarusian	Keyboard Layout View		Bielorruso
 Italian	Keyboard Layout View		Italiano
 Polish (Typewriter)	Keyboard Layout View		Polaco (máquina de escribir)
 Tilde trigger	Keymap window		Disparador de tilde (~)
@@ -22,6 +25,7 @@ Icelandic	Keyboard Layout View		Islandés
 Command	Keyboard Layout View	Command key	Comando
 Polish	Keyboard Layout View		Polaco
 Serbian (Cyrillic)	Keyboard Layout View		Serbio (Cirílico)
+French	Keyboard Layout View		Francés
 Defaults	Keymap window		Predeterminados
 Quit	Keymap window		Salir
 Switch shortcut keys to Haiku mode	Keymap window		Cambiar atajos de teclado a modo Haiku

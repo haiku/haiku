@@ -45,6 +45,6 @@ Disable	IntefaceView		Dezactivare
 <no wireless networks found>	IntefaceView		<nu s-au găsit rețele wireless>
 Netmask:	IntefaceAddressView		Mască rețea:
 Disable	ServiceView		Dezactivare
-Your IP address	IntefaceAddressView		Adresă IP:
+Your IP address	IntefaceAddressView		Adresă IP
 Manage…	NetworkWindow		Administrează…
 WEP	WEP protected network		WEP

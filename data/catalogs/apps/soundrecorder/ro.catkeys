@@ -28,9 +28,9 @@ Channels:	RecorderWindow		Canale:
  bits	RecorderWindow		 biți
 None	RecorderWindow		Nimic
 Record	RecorderWindow		Înregistrează
-Sample size: 	RecorderWindow		Dimensiune mostră:
+Sample size: 	RecorderWindow		Dimensiune mostră: 
 Cannot recognize this file as a media file	RecorderWindow		Nu se poate recunoaște acest fișier ca fiind un fișier media
-Format: 	RecorderWindow		Format:
+Format: 	RecorderWindow		Format: 
 File name: 	RecorderWindow		Nume fișier: 
 Cannot connect to the selected sound input	RecorderWindow		Nu se poate conecta la intrarea de sunet selectată
 Cannot get the file to play	RecorderWindow		Nu se poate reda fișierul
@@ -38,9 +38,9 @@ Cannot record a sound that long	RecorderWindow		Nu se poate înregistra un sunet
 Duration:	RecorderWindow		Durată:
 Compression:	RecorderWindow		Compresie:
 Cannot find an unused name to use for the new recording	RecorderWindow		Nu se poate găsi un nume neutilizat pentru înregistrarea nouă
-Channels: 	RecorderWindow		Canale:
+Channels: 	RecorderWindow		Canale: 
 Save	RecorderWindow		Salvează
-Sample rate: 	RecorderWindow		Rată monstră:
+Sample rate: 	RecorderWindow		Cotă monstră: 
 Cannot connect to media server	RecorderWindow		Nu se poate conecta la serverul media
 The file doesn't appear to be an audio file.	RecorderWindow		Fișierul nu pare să fie un fișier audio.
 File name:	RecorderWindow		Nume de fișier:

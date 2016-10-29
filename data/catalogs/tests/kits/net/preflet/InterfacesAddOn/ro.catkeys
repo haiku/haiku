@@ -1,6 +1,6 @@
 1	romanian	x-vnd.Haiku-InterfacesAddOn	160108912
 Interface	InterfaceWindow		Interfață
-Configure…	InterfacesListView		Configurare...
+Configure…	InterfacesListView		Configurare…
 Static	IntefaceAddressView		Static
 None	InterfacesListView		Nimic
 IP:	InterfacesListView	IPv4 address label	IP:
@@ -19,7 +19,7 @@ Gateway:	IntefaceAddressView		Gateway:
 Disable	InterfacesListView		Dezactivare
 Sent:	IntefaceHardwareView		Trimis:
 Disable	InterfacesAddOn		Dezactivare
-Configure…	InterfacesAddOn		Configurare...
+Configure…	InterfacesAddOn		Configurare…
 Renegotiate Address	InterfacesListView		Renegociază adresa
 DHCP	IntefaceAddressView		DHCP
 Mode:	IntefaceAddressView		Mod:

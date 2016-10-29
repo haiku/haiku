@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-MediaPlayer	1854844358
+1	spanish; castilian	x-vnd.Haiku-MediaPlayer	3805057997
 raw audio	MediaPlayer-InfoWin		audio bruto
 Location	MediaPlayer-InfoWin		Ubicación
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Americano)
@@ -114,6 +114,7 @@ Error: 	MediaPlayer-Main		Error:
 Large	MediaPlayer-SettingsWindow		Grande
 Bottom of video	MediaPlayer-SettingsWindow		Parte inferior del vídeo
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+Total duration: %s	MediaPlayer-PlaylistWindow		Duración total: %s
 Stop	MediaPlayer-Main		Parar
 <unnamed media>	MediaPlayer-InfoWin		<multimedia sin nombrar>
 raw video	MediaPlayer-InfoWin		video bruto
@@ -139,6 +140,7 @@ Start media server	MediaPlayer-Main		Empezar servidor de medios
 Toggle fullscreen.	MediaPlayer-Main		Alternar la vista de pantalla completa.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Obtiene la duración del elemento reproduciéndose actualmente en microsegundos.
 ToggleFullscreen	MediaPlayer-Main		Cambiar a pantalla completa
+{0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Estéreo} other{# Canales}}
 <unnamed>	PlaylistItem-name		<sin nombre>
 OK	MediaPlayer-PlaylistWindow		Aceptar
 none	Audio track menu		ninguno

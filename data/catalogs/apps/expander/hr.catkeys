@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-Expander	3142903023
+1	croatian	x-vnd.Haiku-Expander	2832641961
 Expand	ExpanderMenu		Proširi
 Close window when done expanding	ExpanderPreferences		Zatvori prozor kada je proširivanje završeno
 Set destination…	ExpanderMenu		Postavi odredište...
@@ -22,7 +22,6 @@ Are you sure you want to stop expanding this\narchive? The expanded items may no
 Select	DirectoryFilePanel		Odaberi
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Odredišna mapa ne postoji. Želite li ju napraviti?
 Same directory as source (archive) file	ExpanderPreferences		Isti direktorij kao i izvorna (arhiva) datoteka
-Expanding '%s'	ExpanderWindow		Proširujem '%s'
 Settings	ExpanderMenu		Postavke
 Settings…	ExpanderMenu		Postavke...
 Expander: Choose destination	DirectoryFilePanel		Proširivač:Izaberite odredište

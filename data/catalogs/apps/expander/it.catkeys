@@ -1,4 +1,4 @@
-1	italian	x-vnd.Haiku-Expander	3394631502
+1	italian	x-vnd.Haiku-Expander	4042566494
 Expand	ExpanderMenu		Decomprimi
 Close window when done expanding	ExpanderPreferences		Chiudi la finestra quando la decompressione è completata
 Set destination…	ExpanderMenu		Scegli la destinazione…
@@ -13,13 +13,11 @@ Error when expanding archive	ExpanderWindow		Errore durante la decompressione de
 Hide contents	ExpanderWindow		Nascondi il contenuto
 Cancel	ExpanderWindow		Annulla
 Automatically expand files	ExpanderPreferences		Decomprimi automaticamente i file
-Creating listing for '%s'	ExpanderWindow		Creazione lista per '%s'
 Continue	ExpanderWindow		Continua
 Cancel	ExpanderPreferences		Cancella
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Siete sicuri di voler interrompere la decompressione di questo\narchivio? I file estratti potrebbero essere incompleti.
 Select	DirectoryFilePanel		Seleziona
 Same directory as source (archive) file	ExpanderPreferences		Stessa directory come sorgente del file archivio
-Expanding '%s'	ExpanderWindow		Decompressione '%s 
 Settings	ExpanderMenu		Impostazioni
 Settings…	ExpanderMenu		Impostazioni…
 Expander: Choose destination	DirectoryFilePanel		Decompressore: Scegli la destinazione

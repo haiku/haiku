@@ -51,7 +51,7 @@ Development	Model		Entwicklung
 Fatal error	PackageManager		Schwerwiegender Fehler
 The user name needs to be at least 3 letters long.	UserLoginWindow		Der Benutzername muss mindestens 3 Zeichen lang sein.
 Log in	UserLoginWindow		Anmelden
-Repeat pass phrase:	UserLoginWindow		Zugangsphrase wiederholen:
+Repeat pass phrase:	UserLoginWindow		Kennwort wiederholen:
 Ratings	PackageInfoView		Bewertungen
 But none could be listed here, sorry.	UserLoginWindow		Leider können sie hier nicht aufgeführt werden.
 System & Utilities	Model		Tools & System

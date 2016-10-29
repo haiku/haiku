@@ -42,7 +42,7 @@ Not logged in	MainWindow		Nu sunteți autentificat
 The authentication was successful.	UserLoginWindow		Autentificarea a fost reușită.
 Installed packages	MainWindow		Pachete instalate
 Status	PackageListView		Stare
-Switch account…	MainWindow		Schimbare cont...
+Switch account…	MainWindow		Schimbare cont…
 Ignore	UserLoginWindow		Ignoră
 Language	UserLoginWindow		Limbă
 The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Parola e prea slabă sau nevalidă. Utilizați cel puțin 8 caractere cu minimum 2 numere și 2 litere majuscule.
@@ -114,7 +114,7 @@ Contents	PackageInfoView		Conținut
 An error occurred while refreshing the repository: %error%	MainWindow		O eroare a apărut la actualizarea depoului: %error%
 Try again	App		Încearcă din nou
 Login or Create account	MainWindow		Autentificare sau Creare cont
-Pending…	PackageListView		În așteptare...
+Pending…	PackageListView		În așteptare…
 Depot	FilterView		Depot
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} other{# elemente}}
 OK	PackageInfoView		OK
@@ -130,7 +130,7 @@ Not specified	RatePackageWindow		Nespecificat
 Available	PackageListView		Disponibil
 Develop packages	MainWindow		Dezvoltă pachete
 n/a	PackageInfoView		n/a
-If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Dacă nu furnizați o adresă de email, nu veți putea reseta parola dacă o uitați. 
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Dacă nu furnizați o adresă de email, nu veți putea reseta parola dacă o uitați.
  It responded with: 	UserLoginWindow		 A răspuns cu: 
 Authentication failed. Connection to the service failed.	UserLoginWindow		Autentificare eșuată. Conectare la serviciu eșuată.
 Cancel	RatePackageWindow		Anulează

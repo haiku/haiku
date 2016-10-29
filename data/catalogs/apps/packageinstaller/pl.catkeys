@@ -1,7 +1,8 @@
-1	polish	x-vnd.Haiku-PackageInstaller	591566249
+1	polish	x-vnd.Haiku-PackageInstaller	600665259
 Install to:	PackageView		Zainstaluj w:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akceptuj
+No package selected.	UninstallView		Żaden pakiet nie został wybrany.
 Continue	PackageInstall		Kontynuuj
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Żądany pakiet nie zainstalował się poprawnie w Twoim systemie. To może być problem ze ścieżkami docelowymi plików z pakietu. Proszę skontaktuj się z dystrybutorem paczki.
 Image not loaded correctly	PackageImageViewer		Obraz nie załadował się poprawnie
@@ -50,6 +51,7 @@ Abort	PackageInstall		Przerwij
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Kontynuuj
 Begin	PackageView		Instaluj
+OK	UninstallView		OK
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Dowiązanie symboliczne o nazwie „%s” istnieje już w podanym miejscu.\nZastąpić istniejące dowiązanie tym z pakietu czy pominąć?
 Replace	PackageView		Zastąp
 Installation progress	PackageView		Postęp instalacji

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-MediaPlayer	2711018042
+1	russian	x-vnd.Haiku-MediaPlayer	3805057997
 raw audio	MediaPlayer-InfoWin		raw аудио
 Location	MediaPlayer-InfoWin		Путь
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Американский)
@@ -114,6 +114,7 @@ Error: 	MediaPlayer-Main		Ошибка:
 Large	MediaPlayer-SettingsWindow		крупный
 Bottom of video	MediaPlayer-SettingsWindow		нижняя часть видео
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
+Total duration: %s	MediaPlayer-PlaylistWindow		Общая длительность: %s
 Stop	MediaPlayer-Main		Остановить
 <unnamed media>	MediaPlayer-InfoWin		<безымянное медиа>
 raw video	MediaPlayer-InfoWin		необработанное видео

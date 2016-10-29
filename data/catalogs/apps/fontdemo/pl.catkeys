@@ -1,16 +1,11 @@
-1	polish	x-vnd.Haiku-FontDemo	3522850500
-Outline:	ControlView		Kontur:
-Size: 50	ControlView		Rozmiar: 50
+1	polish	x-vnd.Haiku-FontDemo	3449067186
 Stop cycling	ControlView		Zatrzymaj zmianę
-Shear: 90	ControlView		Pochylenie: 90
-Spacing: 0	ControlView		Odstęp: 0
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Obrót: %d
 Shear: %d	ControlView		Pochylenie: %d
 Spacing: %d	ControlView		Odstęp: %d
 Cycle fonts	ControlView		Zmieniaj fonty
 Font:	ControlView		Font:
-Rotation: 0	ControlView		Obrót: 0
 Drawing mode:	ControlView		Tryb rysowania:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Sterowanie

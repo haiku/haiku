@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Expander	2177073262
+1	slovak	x-vnd.Haiku-Expander	2825008254
 Expand	ExpanderMenu		Rozbaliť
 Close window when done expanding	ExpanderPreferences		Zatvoriť okno po dokončení rozbaľovania
 Set destination…	ExpanderMenu		Nastaviť cieľ…
@@ -14,7 +14,6 @@ Error when expanding archive	ExpanderWindow		Chyba počas expandovania archívu
 Hide contents	ExpanderWindow		Skryť obsah
 Cancel	ExpanderWindow		Zrušiť
 Automatically expand files	ExpanderPreferences		Automaticky rozbaľovať súbory
-Creating listing for '%s'	ExpanderWindow		Vytvára sa zoznam pre „%s“
 Continue	ExpanderWindow		Pokračovať
 Destination folder	ExpanderPreferences		Cieľový priečinok
 Other	ExpanderPreferences		Ďalšie
@@ -24,7 +23,6 @@ Are you sure you want to stop expanding this\narchive? The expanded items may no
 Select	DirectoryFilePanel		Vybrať
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Cieľový priečinok neexistuje. Chcete ho vytvoriť?
 Same directory as source (archive) file	ExpanderPreferences		Rovnaký ako zdrojový (archívny) súbor
-Expanding '%s'	ExpanderWindow		Rozbaľuje sa „%s“
 Settings	ExpanderMenu		Nastavenia
 Settings…	ExpanderMenu		Nastavenia…
 Expander: Choose destination	DirectoryFilePanel		Rozbaľovač: Vyberte cieľ

@@ -3,16 +3,16 @@ Display	DeviceClass		Afișare
 Capturing	DeviceClass		Captură
 Printer	DeviceClass		Imprimantă
 Uncategorized	DeviceClass		Necategorisit
-1-17% utilized	DeviceClass		Utilizat 1-17%
+1-17% utilized	DeviceClass		1-17% utilizat
 Positioning	DeviceClass		Poziționare
 Rendering	DeviceClass		Redare
 Phone	DeviceClass		Telefon
-17-33% utilized	DeviceClass		Utilizat 17-33%
+17-33% utilized	DeviceClass		17-33% utilizat
 #ServerNotReady#Not Valid name	RemoteDevice		#ServerNotReady#Nume nevalid
 Combo keyboard/pointing device	DeviceClass		Combinație tastatură/dispozitiv de indicare
 Controller	DeviceClass		Controler
 No service available	DeviceClass		Niciun serviciu disponibil
-Wearable	DeviceClass	A wearable computer	Portabil                             
+Wearable	DeviceClass	A wearable computer	Portabil
 Handheld	DeviceClass		Calculator de buzunar
 Invalid device class!\n	DeviceClass		Clasă de dispozitive nevalidă!\n
 Sensing device	DeviceClass		Dispozitiv de identificare
@@ -22,7 +22,7 @@ Microphone	DeviceClass		Microfon
 Unknown (reserved) minor device class	DeviceClass		Clasă minoră de dispozitive necunoscută (rezervată)
 Cordless	DeviceClass		Fără fir
 Common ISDN access	DeviceClass		Acces ISDN comun
-83-99% utilized	DeviceClass		Utilizat 83-99%
+83-99% utilized	DeviceClass		83-99% utilizat
 Scanner	DeviceClass		Scaner
 Game	DeviceClass		Joc
 Gamepad	DeviceClass		Dispozitiv gamepad
@@ -32,8 +32,8 @@ Audio/Video	DeviceClass		Audio/Video
 Glasses	DeviceClass		Ochelari
 Keyboard	DeviceClass		Tastatură
 Camera	DeviceClass		Cameră
-Major class: 	DeviceClass		Clasă majoră:
-50-67% utilized	DeviceClass		Utilizat 50-67%
+Major class: 	DeviceClass		Clasă majoră: 
+50-67% utilized	DeviceClass		50-67% utilizat
 Card reader	DeviceClass		Cititor de card
 Set-top box	DeviceClass		Casetă set-top
 Helmet	DeviceClass		Cască
@@ -43,7 +43,7 @@ SIM card reader	DeviceClass		Cititor de card SIM
 Headphones	DeviceClass		Căști
 Information	DeviceClass		Informație
 Remote control	DeviceClass		Telecomandă
-Service classes: 	DeviceClass		Clase de serviciu:
+Service classes: 	DeviceClass		Clase serviciu: 
 Pager	DeviceClass	A small radio device to receive short text messages	Pager
 Object transfer	DeviceClass		Transfer de obiect
 Gaming/Toy	DeviceClass		Jocuri/Jucărie
@@ -55,7 +55,7 @@ Loudspeaker	DeviceClass		Difuzor
 Joystick	DeviceClass		Joystick
 LAN access	DeviceClass		Acces LAN
 Wrist watch	DeviceClass		Ceas de mână
-Minor class: 	DeviceClass		Clasă minoră:
+Minor class: 	DeviceClass		Clasă minoră: 
 Networking	DeviceClass		Rețelistică
 Portable audio	DeviceClass		Audio portabil
 Device conforms to the headset profile	DeviceClass		Dispozitivul este în conformitate cu profilul căștilor
@@ -70,7 +70,7 @@ Wired modem or voice gateway	DeviceClass		Modem cu fir sau gateway cu voce
 Jacket	DeviceClass		Jachetă
 Unspecified	DeviceClass		Nespecificat
 Fully available	DeviceClass		Complet disponibil
-67-83% utilized	DeviceClass		Utilizat 67-83%
+67-83% utilized	DeviceClass		67-83% utilizat
 Not implemented	RemoteDevice		Nu este implementat
 #NotCompletedRequest#Not Valid name	RemoteDevice		#NotCompletedRequest#Nume nevalid
 Server	DeviceClass		Server
@@ -84,5 +84,5 @@ VCR	DeviceClass		VCR
 Video monitor	DeviceClass		Monitor video
 Pointing device	DeviceClass		Dispozitiv de indicare
 Miscellaneous	DeviceClass		Diverse
-33-50% utilized	DeviceClass		Utilizat 33-50%
-Imaging	DeviceClass		Imaginare
+33-50% utilized	DeviceClass		33-50% utilizat
+Imaging	DeviceClass		Imagistică

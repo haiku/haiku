@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Appearance	727801787
+1	spanish; castilian	x-vnd.Haiku-Appearance	2689495842
 Plain font:	Font view		Tipo de letra plano:
 Control highlight	Colors tab		Resaltado del control
 Control border	Colors tab		Borde del control
@@ -11,6 +11,8 @@ Shine	Colors tab		Brillo
 About	DecorSettingsView		Acerca
 About decorator	DecorSettingsView		Acerca de Decorador
 Off	AntialiasingSettingsView		Desactivado
+Link text	Colors tab		Texto del enlace
+Link active	Colors tab		Enlace activo
 Choose Decorator	DecorSettingsView		Elegir decorador
 Success	Colors tab		Éxito
 Inactive window tab text	Colors tab		Texto de la pestaña en ventana inactiva
@@ -36,6 +38,7 @@ List background	Colors tab		Listar fondo
 OK	DecorSettingsView		Aceptar
 Control mark	Colors tab		Marca de control
 Size:	Font Selection view		Tamaño:
+Link visited	Colors tab		Enlace visitado
 Decorator:	DecorSettingsView		Decorador:
 Selected list item background	Colors tab		Fondo de elemento de menú seleccionado
 Panel background	Colors tab		Fondo de panel

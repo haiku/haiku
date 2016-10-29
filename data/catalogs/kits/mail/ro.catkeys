@@ -3,7 +3,7 @@ Partially download messages larger than	ProtocolConfigView		Descarcă parțial m
 Password:	ProtocolConfigView		Parolă:
 Remove mail from server when deleted	ProtocolConfigView		Elimină mailul de pe server când este șters
 Mail server:	ProtocolConfigView		Server mail:
-Select…	MailKit		Selectează...
+Select…	MailKit		Selectează…
 Connection type:	ProtocolConfigView		Tip de conexiune:
 KB	ProtocolConfigView	kilo byte	KB
 Leave mail on server	ProtocolConfigView		Lasă mailul pe server

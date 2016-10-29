@@ -7,7 +7,7 @@ Add graph	ActivityWindow		Adaugă grafic
 Teams	DataSource		Echipe
 Hide legend	ActivityView		Ascunde legenda
 MiB	DataSource		MiO
-Network send	DataSource		Trimite în rețea 
+Network send	DataSource		Trimite în rețea
 CPU usage (combined)	DataSource		Utilizare CPU (combinat)
 CPU	DataSource		CPU
 Used memory	DataSource		Memorie utilizată
@@ -17,7 +17,7 @@ Show legend	ActivityView		Arată legenda
 Text clipboard	DataSource		Clipboard text
 Settings	ActivityWindow		Configurări
 Receiving	DataSource		Primire
-Settings…	ActivityWindow		Configurări...
+Settings…	ActivityWindow		Configurări…
 Ports	DataSource		Porturi
 Page faults	DataSource		Defecțiuni de pagină
 Sending	DataSource		Trimitere

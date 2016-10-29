@@ -46,10 +46,10 @@ Print setup	ConfigWindow		Configurare tipărire
 A1	ConfigWindow	ISO 216 paper size	A1
 Retrieve a specific transport	PrintServerApp Scripting		Recuperează un transport specific
 Get name of printer	Printer Scripting		Obține numele imprimantei
-A3	ConfigWindow	ISO 216 paper size	A3 (297 x 420 mm)
+A3	ConfigWindow	ISO 216 paper size	A3
 Get name of transport	Transport Scripting		Obține numele transportului
-A5	ConfigWindow	ISO 216 paper size	A5 (148 x 210 mm)
+A5	ConfigWindow	ISO 216 paper size	A5
 Would you like to make @ the default printer?	PrintServerApp		Doriți să stabiliți @ ca imprimantă implicită?
-Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid (279 x 432 mm)
+Tabloid	ConfigWindow	ANSI B (tabloid), a North American paper size	Tabloid
 Page setup	ConfigWindow		Configurare pagină
 Paper setup:	ConfigWindow		Configurare hărtie:

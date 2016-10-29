@@ -34,7 +34,7 @@ Warning	Dragger		Avertisment
 Undo	TextView		Refă
 Red:	ColorControl		Roșu:
 %3.2f MiB	StringForSize		%3.2f MiB
-About %app…	Dragger		Despre %app...
+About %app…	Dragger		Despre %app…
 development	AboutWindow		dezvoltare
 Error	ZombieReplicantView		Eroare
 Blue:	ColorControl		Albastru:

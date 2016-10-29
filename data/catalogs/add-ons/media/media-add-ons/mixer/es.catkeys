@@ -8,7 +8,7 @@ Allow input channel remapping	AudioMixer		Permitir la entrada del canal de reasi
 Resampling algorithm	AudioMixer		Algoritmo de remuestreo
 Attenuate mixer output by 3dB (like BeOS R5)	AudioMixer		Salida del mezclador atenuado 3 dB (como BeOS R5)
 Display balance control for stereo connections	AudioMixer		Pantalla de control de balance para las conexiones estéreo
-To output	AudioMixer		A salida
+To output	AudioMixer		A la salida
 not connected	AudioMixer		no conectado
 Refuse input format changes	AudioMixer		Rechazar los cambios de formato de entrada
 Drop/repeat samples	AudioMixer		Muestras de soltar/repetir
@@ -16,11 +16,11 @@ Output channel sources	AudioMixer		Fuentes de salida del canal
 dB	AudioMixer		dB
 Gain controls	AudioMixer		Controles de ganancia
 Input mapping	AudioMixer		Mapeo de entrada
-Mute	AudioMixer		Mudo
+Mute	AudioMixer		Silencio
 Input channel destinations	AudioMixer		Destinos del canal de entrada
 To master	AudioMixer		A maestro
 Master output	AudioMixer		Salida maestra
-Setup	AudioMixer		Ajustar
+Setup	AudioMixer		Configuración
 Use non linear gain sliders (like BeOS R5)	AudioMixer		Utilice reguladores de ganancia no lineal (como BeOS R5)
 Gain	AudioMixer		Ganancia
 Allow output channel remapping	AudioMixer		Permitir la salida de canal de reasignación

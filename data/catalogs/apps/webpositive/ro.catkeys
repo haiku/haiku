@@ -107,8 +107,8 @@ Paste	URL Bar		Lipire
 Cookie manager	WebPositive Window		Manager cookie
 /s)	Download Window	...as in 'per second'	/s)
 Hide password text	Authentication Panel		Ascunde textul parolei
-The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Șipotul țâșnește hipnotic azvârlindu-se în mrejele bălții fumegânde
-Over 1 minute left	Download Window		Peste un minut rămas
+The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Șipotul țâșnește hipnotic azvârlindu-se în mrejele bălții fumegânde.
+Over 1 minute left	Download Window		Peste 1 minut rămas
 Open start page	Settings Window		Deschide pagina de start
 Continue downloads	WebPositive		Continuă descărcări
 Cancel	Download Window		Anulează
@@ -153,5 +153,5 @@ Manage bookmarks	WebPositive Window		Administrează favorite
 A bookmark for this page (%bookmarkName) already exists.	WebPositive Window	Don't translate variable %bookmarkName	Există deja un favorit pentru această pagină (%bookmarkName).
 Cookies for %s	Cookie Manager		Cookies pentru %s
 New windows:	Settings Window		Ferestre noi:
-%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url s-a terminat.
+%url finished	WebPositive Window	Loading URL finished. Don't translate variable %url.	%url terminat
 Remove finished	Download Window		Eliminare terminată

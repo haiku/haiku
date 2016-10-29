@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Expander	2177073262
+1	hungarian	x-vnd.Haiku-Expander	2825008254
 Expand	ExpanderMenu		Kicsomagol
 Close window when done expanding	ExpanderPreferences		A kicsomagolás végeztével zárja be az ablakot
 Set destination…	ExpanderMenu		Célmappa megadása…
@@ -14,7 +14,6 @@ Error when expanding archive	ExpanderWindow		Hiba történt a kicsomagolás köz
 Hide contents	ExpanderWindow		Tartalom elrejtése
 Cancel	ExpanderWindow		Mégse
 Automatically expand files	ExpanderPreferences		Fájlok automatikus kicsomagolása
-Creating listing for '%s'	ExpanderWindow		'%s' lista létrehozása
 Continue	ExpanderWindow		Folytatás
 Destination folder	ExpanderPreferences		Célmappa
 Other	ExpanderPreferences		Egyéb
@@ -24,7 +23,6 @@ Are you sure you want to stop expanding this\narchive? The expanded items may no
 Select	DirectoryFilePanel		Kiválaszt
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		A célmappa nem létezik. Létre szeretné hozni?
 Same directory as source (archive) file	ExpanderPreferences		A mappa amiben a forrásfájl (archívum) van
-Expanding '%s'	ExpanderWindow		'%s' kicsomagolása
 Settings	ExpanderMenu		Beállítások
 Settings…	ExpanderMenu		Beállítások…
 Expander: Choose destination	DirectoryFilePanel		Kicsomagoló: Cél választása

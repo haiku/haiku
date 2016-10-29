@@ -1,4 +1,4 @@
-1	esperanto	x-vnd.Haiku-libtracker	2515890756
+1	esperanto	x-vnd.Haiku-libtracker	1304853728
 OK	WidgetAttributeText		Bone
 Add-ons	FilePanelPriv		Aldonaĵoj
 Desktop	Model		Labortablo
@@ -7,7 +7,6 @@ Open	OpenWithWindow		Malfermi
 Icon view	ContainerWindow		Bildeta vido
 OK	AutoMounterSettings		Bone
 Open	ContainerWindow		Malfermi
-OK	TrackerInitialState		Bone
 Add-ons	ContainerWindow		Aldonaĵoj
 Desktop	TrackerSettingsWindow		Labortablo
 OK	InfoWindow		Bone

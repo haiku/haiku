@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Expander	2177073262
+1	russian	x-vnd.Haiku-Expander	2825008254
 Expand	ExpanderMenu		Распаковать
 Close window when done expanding	ExpanderPreferences		Закрывать окно после распаковки
 Set destination…	ExpanderMenu		Путь назначения для извлечения…
@@ -14,7 +14,6 @@ Error when expanding archive	ExpanderWindow		Ошибка при распако�
 Hide contents	ExpanderWindow		Скрыть содержимое
 Cancel	ExpanderWindow		Отмена
 Automatically expand files	ExpanderPreferences		Автоматически распаковывать файлы
-Creating listing for '%s'	ExpanderWindow		Создается список файлов для '%s'
 Continue	ExpanderWindow		Продолжить
 Destination folder	ExpanderPreferences		Путь для извлечения
 Other	ExpanderPreferences		Другое
@@ -24,7 +23,6 @@ Are you sure you want to stop expanding this\narchive? The expanded items may no
 Select	DirectoryFilePanel		Выбрать
 Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Папка назначения не существует. Создать её?
 Same directory as source (archive) file	ExpanderPreferences		Использовать ту же папку где находится архив
-Expanding '%s'	ExpanderWindow		Распаковывается '%s'
 Settings	ExpanderMenu		Настройки
 Settings…	ExpanderMenu		Настройки…
 Expander: Choose destination	DirectoryFilePanel		Expander: Выбор папки для извлечения

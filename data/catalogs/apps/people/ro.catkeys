@@ -2,11 +2,11 @@
 Edit	People		Editează
 Error	People		Eroare
 City	People		Oraș
-The file '%name%' could not be written.	People		Nu a putut fi scris fișierul „%name%”.
+The file '%name%' could not be written.	People		Nu a putut fi scris fișierul '%name%'.
 none	Groups list		nimic
 Configure attributes	People		Configurează atribute
 Company	People		Companie
-%name% picture	People		imagine %name%
+%name% picture	People		%name% imagine
 Work phone	People		Telefon de serviciu
 People	System name		Oameni
 New person	People		Persoană nouă
@@ -24,21 +24,21 @@ Revert	People		Revenire
 Don't save	People		Nu salva
 Undo	People		Refă
 E-mail	People		Email
-Load image…	People		Încarcă imagine...
+Load image…	People		Încarcă imagine…
 OK	People		OK
 Remove image	People		Elimină imaginea
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Lansarea preferinței TipuriFișier pentru a configura atributele aplicației Oameni a eșuat.\n\nEroare:
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Lansarea preferinței FileTypes pentru a configura atributele aplicației Person a eșuat.\n\nEroare: 
 Home phone	People		Telefon de acasă
-Save as…	People		Salvează ca...
+Save as…	People		Salvează ca…
 Redo	People		Repetă
 Save changes before closing?	People		Doriți să salvați modificările înainte de a închide?
 Paste	People		Lipește
 Drop an image here,\nor use the contextual menu.	People		Plasează o imagine aici,\nsau utilizează meniul contextual.
 Save	People		Salvează
 Person	Short mimetype description		Persoană
-New person…	People		Persoană nouă...
+New person…	People		Persoană nouă…
 Address	People		Adresă
-URL	People		Adresă URL
+URL	People		URL
 Sorry	People		Îmi pare rău
 Zip	People		Cod poștal
 Contact information for a person.	Long mimetype description		Informațiile de contact pentru o persoană.

@@ -12,9 +12,9 @@ Show icons in list	FileTypes Window		Afișează pictograme în listă
 Type name:	FileTypes Window		Nume tip:
 Internal name:	New File Type Window		Nume intern:
 Choose type	Type List Window		Alege tip
-New file type	New File Type Window		Tip de fișier nou:
+New file type	New File Type Window		Tip de fișier nou
 Rule:	FileTypes Window		Regulă:
-Add icon…	Icon View		Adaugă pictogramă...
+Add icon…	Icon View		Adaugă pictogramă…
 Multiple files from \"%s\" file type	FileType Window		Fișiere multiple de la tipul de fișier \"%s\"
 File type	FileType Window		Tip de fișier
 Could not change attributes	Attribute Window		Nu s-au putut modifica atributele
@@ -52,7 +52,7 @@ Set preferred application	Preferred App Menu		Stabilire aplicație preferată
 Don't save	Application Type Window		Nu salva
 Save changes before closing?	Application Type Window		Doriți să salvați modificările înainte de a închide?
 File	Application Type Window		Fișier
-{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Tip aplicație ar putea fi eliminat} other{# Tipuri aplicație ar putea fi eliminate}}
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# tip de aplicație a putut fi eliminat} other{# tipuri de aplicație au putut fi eliminate}}
 Version:	Application Type Window		Versiune:
 Select…	FileTypes Window		Selectează…
 FileTypes request	FileTypes		Cerere TipuriFișier
@@ -83,7 +83,7 @@ Select preferred application	FileType Window		Selectează aplicația preferată
 Single launch	Application Type Window		Pornire unică
 Golden master	Application Types Window		Versiune principală
 %s file type	FileType Window		%s tip fișier
-The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Aplicația \"%s\” nu suportă acest tip de fișier.\nSigur doriți să o configurați oricum?
+The application \"%s\" does not support this file type.\nAre you sure you want to set it anyway?	Preferred App Menu		Aplicația \"%s\" nu suportă acest tip de fișier.\nSigur doriți să o configurați oricum?
 Type:	Attribute Window		Tip:
 Removing uninstalled application types	Application Types Window		Se elimină tipurile de aplicații dezinstalate
 Done	Attribute Window		Finalizat
@@ -99,7 +99,7 @@ New resource file…	FileTypes Window		Fișier resursă nou…
 Cancel	New File Type Window		Anulează
 Icon	FileTypes Window		Pictogramă
 Extension:	Extension Window		Extensie:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Eliminarea unui tip super nu este reversibilă.\nToate tipurile de fișier care aparțin acestui tip super vor fi pierdute!\n\nSigur doriți să faceți acest lucru? Pentru a elimina un grup întreg, mențineți apăsată tasta Shift și apăsați pe \„Elimină\”.
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Eliminarea unui tip super nu este reversibilă.\nToate tipurile de fișier care aparțin acestui tip super vor fi pierdute!\n\nSigur doriți să faceți acest lucru? Pentru a elimina un grup întreg, mențineți apăsată tasta Shift și apăsați pe \"Elimină\".
 Internal name:	FileTypes Window		Nume intern:
 Add	Attribute Window		Adaugă
 Close	Application Type Window		Închide
@@ -107,7 +107,7 @@ File recognition	FileTypes Window		Recunoaștere fișier
 Remove uninstalled	Application Types Window		Elimină dezinstalate
 Center	Attribute Window	Attribute column alignment in Tracker	Centru
 Golden master	Application Type Window		Principal
-Could not open \"%s\":\n%s	FileTypes		Nu s-a putut deschide \„%s\”:\n%s
+Could not open \"%s\":\n%s	FileTypes		Nu s-a putut deschide \"%s\":\n%s
 Alignment:	Attribute Window		Aliniere:
 Left	Attribute Window	Attribute column alignment in Tracker	Stânga
 Cancel	Extension Window		Anulează
@@ -121,7 +121,7 @@ Beta	Application Type Window		Beta
 None	FileTypes Window		Niciunul
 Remove	FileTypes Window		Elimină
 Attribute name:	Attribute Window		Nume atribut:
-Extension	Extension Window		Extensie:
+Extension	Extension Window		Extensie
 Add type	New File Type Window		Adaugă tip
 Internal name:	Attribute Window		Nume intern:
 Show in Tracker…	Application Types Window		Afișează în Tracker…

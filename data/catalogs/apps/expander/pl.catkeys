@@ -1,10 +1,10 @@
-1	polish	x-vnd.Haiku-Expander	2177073262
+1	polish	x-vnd.Haiku-Expander	2825008254
 Expand	ExpanderMenu		Rozpakuj
 Close window when done expanding	ExpanderPreferences		Zamknij okno po zakończeniu rozpakowywania
 Set destination…	ExpanderMenu		Wybierz miejsce docelowe…
 Use:	ExpanderPreferences		Użyj:
 File expanded	ExpanderWindow		Plik rozpakowany
-The destination is read only.	ExpanderWindow		Nie można zapisywać w miejscu docelowym.
+The destination is read only.	ExpanderWindow		Miejsce docelowe jest tylko do odczytu.
 Expander: Open	ExpanderWindow		Expander: Otwórz
  is not supported	ExpanderWindow		 nie jest obsługiwany
 Expander settings	ExpanderPreferences		Ustawienia Expandera
@@ -14,7 +14,6 @@ Error when expanding archive	ExpanderWindow		Wystąpił błąd podczas rozpakowy
 Hide contents	ExpanderWindow		Ukryj zawartość
 Cancel	ExpanderWindow		Anuluj
 Automatically expand files	ExpanderPreferences		Automatycznie rozpakuj pliki
-Creating listing for '%s'	ExpanderWindow		Tworzenie listy dla „%s”
 Continue	ExpanderWindow		Kontynuuj
 Destination folder	ExpanderPreferences		Katalog docelowy
 Other	ExpanderPreferences		Inne
@@ -22,9 +21,8 @@ Cancel	ExpanderPreferences		Anuluj
 Expansion	ExpanderPreferences		Rozpakowywanie
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Czy na pewno chcesz przerwać rozpakowywanie?\nRozpakowane dane najprawdopodobniej będą niekompletne.
 Select	DirectoryFilePanel		Wybierz
-Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Katalog docelowy  nie istnieje. Czy chcesz go utworzyć?
+Destination folder doesn't exist. Would you like to create it?	ExpanderWindow		Katalog docelowy nie istnieje. Czy chcesz go utworzyć?
 Same directory as source (archive) file	ExpanderPreferences		Ten sam co archiwum źródłowe
-Expanding '%s'	ExpanderWindow		Rozpakowywanie „%s”
 Settings	ExpanderMenu		Ustawienia
 Settings…	ExpanderMenu		Ustawienia…
 Expander: Choose destination	DirectoryFilePanel		Expander: Wybierz katalog docelowy

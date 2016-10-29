@@ -1,10 +1,7 @@
-1	croatian	x-vnd.Haiku-FontDemo	725213520
-Outline:	ControlView		Kontura:
-Size: 50	ControlView		Veličina: 50
+1	croatian	x-vnd.Haiku-FontDemo	2839549937
 Haiku, Inc.	FontDemoView		Haiku, Inc.
 Rotation: %d	ControlView		Rotacija:%d
 Font:	ControlView		Font:
-Rotation: 0	ControlView		Rotacija: 0
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Kontrole
 Text:	ControlView		Tekst:

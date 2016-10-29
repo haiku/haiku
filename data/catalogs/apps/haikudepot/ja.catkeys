@@ -69,14 +69,14 @@ Mostly stable	RatePackageWindow		ほとんど安定
 There was a puzzling response from the web service.	RatePackageWindow		ウェブサービスから不可解なレスポンスがあった。
 Log out	MainWindow		ログアウト
 Education	Model		教育
-Search terms:	FilterView		検索語句:
+Search terms:	FilterView		検索:
 %Version%	PackageInfoView		%Version%
 No user ratings available.	PackageInfoView		ユーザー評価がありません。
 Failed to update rating	RatePackageWindow		評価の更新に失敗しました
 Does not start	RatePackageWindow		開始しない
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		リポジトリの更新中にエラーが発生しました: %error% (%details%)
 It was not possible to contact the web service.	RatePackageWindow		ウェブサービスにコンタクトできなかった。
-Only featured packages	MainWindow		推奨パッケージのみ
+Only featured packages	MainWindow		おすすめパッケージのみ
 There are problems in the form:\n\n	UserLoginWindow		次のフォームに問題があります:\n\n
 The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		ウェブサービスはパッケージを見つけられませんでした。これは、おそらくここで追跡されていないデポからのパッケージであることを意味します。残念ながら、このようなパッケージの評価はサポートされていません。
 Create account	UserLoginWindow		アカウントの作成
