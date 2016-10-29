@@ -93,8 +93,18 @@ patch_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
 }
 
 
+static bool is_symbol_visible(elf_sym* symbol)
+{
+	if (symbol->Bind() == STB_GLOBAL)
+		return true;
+	if (symbol->Bind() == STB_WEAK)
+		return true;
+	return false;
+}
+
+
 elf_sym*
-find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo)
+find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo, bool allowLocal)
 {
 	if (image->dynamic_ptr == 0)
 		return NULL;
@@ -109,8 +119,7 @@ find_symbol(image_t* image, const SymbolLookupInfo& lookupInfo)
 		elf_sym* symbol = &image->syms[i];
 
 		if (symbol->st_shndx != SHN_UNDEF
-			&& ((symbol->Bind() == STB_GLOBAL)
-				|| (symbol->Bind() == STB_WEAK))
+			&& (allowLocal || is_symbol_visible(symbol))
 			&& !strcmp(SYMNAME(image, symbol), lookupInfo.name)) {
 
 			// check if the type matches
