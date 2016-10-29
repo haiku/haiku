@@ -198,11 +198,12 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	uint32 eec = 0xffffffff;
 	uint32 eecp = HCS0_XECP(cparams) << 2;
 	for (; eecp != 0 && XECP_NEXT(eec); eecp += XECP_NEXT(eec) << 2) {
+		TRACE("eecp register: 0x%08" B_PRIx32 "\n", eecp);
+
 		eec = ReadCapReg32(eecp);
 		if (XECP_ID(eec) != XHCI_LEGSUP_CAPID)
 			continue;
 
-		TRACE("eecp register: 0x%08" B_PRIx32 "\n", eecp);
 		if (eec & XHCI_LEGSUP_BIOSOWNED) {
 			TRACE_ALWAYS("the host controller is bios owned, claiming"
 				" ownership\n");
