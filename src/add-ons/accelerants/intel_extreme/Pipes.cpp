@@ -212,7 +212,12 @@ Pipe::ConfigureTimings(display_mode* target)
 	// XXX: Is it ok to do these on non-digital?
 
 	write32(INTEL_DISPLAY_A_POS + fPipeOffset, 0);
+
+	// Set the image size for both pipes, just in case.
 	write32(INTEL_DISPLAY_A_IMAGE_SIZE,
+		((uint32)(target->virtual_width - 1) << 16)
+			| ((uint32)target->virtual_height - 1));
+	write32(INTEL_DISPLAY_B_IMAGE_SIZE,
 		((uint32)(target->virtual_width - 1) << 16)
 			| ((uint32)target->virtual_height - 1));
 
