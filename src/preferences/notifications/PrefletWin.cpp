@@ -33,13 +33,14 @@ const int32 kApply = '_APY';
 
 PrefletWin::PrefletWin()
 	:
-	BWindow(BRect(0, 0, 1, 1), B_TRANSLATE_SYSTEM_NAME("Notifications"),
+	BWindow(BRect(0, 0, 500, 400), B_TRANSLATE_SYSTEM_NAME("Notifications"),
 		B_TITLED_WINDOW, B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
 		| B_AUTO_UPDATE_SIZE_LIMITS)
 {
 	// Preflet container view
 	fMainView = new PrefletView(this);
 	fMainView->SetBorder(B_NO_BORDER);
+	fMainView->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	// Apply and revert buttons
 	fRevert = new BButton("revert", B_TRANSLATE("Revert"),

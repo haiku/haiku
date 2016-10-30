@@ -82,8 +82,8 @@ NotificationsView::NotificationsView(SettingsHost* host)
 		(kCLVTitlePadding * 2), rect.Width(), B_TRUNCATE_END, B_ALIGN_LEFT);
 	fNotifications->AddColumn(fTitleCol, kTitleIndex);
 
-	fDateCol = new BDateColumn(B_TRANSLATE("Last Received"), 100,
-		be_plain_font->StringWidth(B_TRANSLATE("Last Received")) +
+	fDateCol = new BDateColumn(B_TRANSLATE("Last received"), 100,
+		be_plain_font->StringWidth(B_TRANSLATE("Last received")) +
 		(kCLVTitlePadding * 2), rect.Width(), B_ALIGN_LEFT);
 	fNotifications->AddColumn(fDateCol, kDateIndex);
 
