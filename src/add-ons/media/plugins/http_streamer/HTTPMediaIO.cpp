@@ -43,10 +43,13 @@ public:
 
 		void ConnectionOpened(BUrlRequest* request)
 		{
-			fAdapterIO->UpdateSize();
-
 			fRequest = request;
 			fRunning = true;
+		}
+
+		void HeadersReceived(BUrlRequest* request)
+		{
+			fAdapterIO->UpdateSize();
 		}
 
 		void DataReceived(BUrlRequest* request, const char* data,
