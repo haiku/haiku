@@ -447,8 +447,6 @@ label:
 				i -= 1900;
 			if (c == 'y' && i < 69)
 				i += 100;
-			if (i < 0)
-				return 0;
 
 			tm->tm_year = i;
 
