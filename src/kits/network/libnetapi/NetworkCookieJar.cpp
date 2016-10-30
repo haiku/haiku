@@ -603,6 +603,13 @@ BNetworkCookieJar::Iterator::NextDomain()
 		fList = *fIterator->fCookieMapIterator.NextValue();
 		fList->LockForReading();
 
+		while (fList->CountItems() == 0 && fIterator->fCookieMapIterator.HasNext()) {
+			// Empty list. Skip it
+			fList->Unlock();
+			fList = *fIterator->fCookieMapIterator.NextValue();
+			fList->LockForReading();
+		}
+
 		fCookieJar->fCookieHashMap->Unlock();
 	}
 
@@ -685,6 +692,13 @@ BNetworkCookieJar::Iterator::_FindNext()
 	if (fCookieJar->fCookieHashMap->Lock()) {
 		fList = *(fIterator->fCookieMapIterator.NextValue());
 		fList->LockForReading();
+
+		while (fList->CountItems() == 0 && fIterator->fCookieMapIterator.HasNext()) {
+			// Empty list. Skip it
+			fList->Unlock();
+			fList = *fIterator->fCookieMapIterator.NextValue();
+			fList->LockForReading();
+		}
 
 		fCookieJar->fCookieHashMap->Unlock();
 	}
