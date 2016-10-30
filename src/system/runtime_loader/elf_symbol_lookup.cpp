@@ -93,7 +93,8 @@ patch_undefined_symbol(image_t* rootImage, image_t* image, const char* name,
 }
 
 
-static bool is_symbol_visible(elf_sym* symbol)
+static bool
+is_symbol_visible(elf_sym* symbol)
 {
 	if (symbol->Bind() == STB_GLOBAL)
 		return true;
