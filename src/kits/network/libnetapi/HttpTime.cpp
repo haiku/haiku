@@ -1,9 +1,10 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2016 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Christophe Huriaux, c.huriaux@gmail.com
+ *		Adrien Destugues, pulkomandy@gmail.com
  */
 
 #include <HttpTime.h>
@@ -16,6 +17,8 @@
 static const char* kDateFormats[] = {
 	"%a, %d %b %Y %H:%M:%S",
 	"%a, %d-%b-%Y %H:%M:%S",
+	"%a, %d-%b-%Y %H:%M:%S GMT",
+	"%a, %d-%b-%Y %H:%M:%S UTC",
 	"%A, %d-%b-%y %H:%M:%S",
 	"%a %d %b %H:%M:%S %Y"
 };
@@ -76,16 +79,8 @@ BHttpTime::Parse()
 	if (fDateString.Length() < 4)
 		return 0;
 
-	expireTime.tm_sec = 0;
-	expireTime.tm_min = 0;
-	expireTime.tm_hour = 0;
-	expireTime.tm_mday = 0;
-	expireTime.tm_mon = 0;
-	expireTime.tm_year = 0;
-	expireTime.tm_wday = 0;
-	expireTime.tm_yday = 0;
-	expireTime.tm_isdst = 0;
-	
+	memset(&expireTime, 0, sizeof(struct tm));
+
 	fDateFormat = B_HTTP_TIME_FORMAT_PARSED;
 	unsigned int i;
 	for (i = 0; i < sizeof(kDateFormats) / sizeof(const char*);
@@ -93,17 +88,20 @@ BHttpTime::Parse()
 		const char* result = strptime(fDateString.String(), kDateFormats[i],
 			&expireTime);
 
-		// Make sure we parsed enough of the date string, not just a small
-		// part of it.
-		if (result != NULL && result > fDateString.String() + 24) {
+		// We need to parse the complete value for the "Expires" key.
+		// Otherwise, we consider this to be a session cookie (or try another
+		// one of the date formats).
+		if (result == fDateString.String() + fDateString.Length()) {
 			fDateFormat = i;
 			break;
 		}
 	}
 
+	// Did we identify some valid format?
 	if (fDateFormat == B_HTTP_TIME_FORMAT_PARSED)
 		return 0;
 
+	// Now convert the struct tm from strptime into a BDateTime.
 	BTime time(expireTime.tm_hour, expireTime.tm_min, expireTime.tm_sec);
 	BDate date(expireTime.tm_year + 1900, expireTime.tm_mon + 1,
 		expireTime.tm_mday);
