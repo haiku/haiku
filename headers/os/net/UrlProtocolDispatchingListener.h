@@ -27,7 +27,8 @@ enum {
 	B_URL_PROTOCOL_DOWNLOAD_PROGRESS,
 	B_URL_PROTOCOL_UPLOAD_PROGRESS,
 	B_URL_PROTOCOL_REQUEST_COMPLETED,
-	B_URL_PROTOCOL_CERTIFICATE_VERIFICATION_FAILED
+	B_URL_PROTOCOL_CERTIFICATE_VERIFICATION_FAILED,
+	B_URL_PROTOCOL_DEBUG_MESSAGE
 };
 
 
@@ -53,6 +54,9 @@ public:
 									ssize_t bytesSent, ssize_t bytesTotal);
 	virtual void				RequestCompleted(BUrlRequest* caller,
 									bool success);
+	virtual void				DebugMessage(BUrlRequest* caller,
+									BUrlProtocolDebugMessage type,
+									const char* text);
 	virtual bool				CertificateVerificationFailed(
 									BUrlRequest* caller,
 									BCertificate& certificate,

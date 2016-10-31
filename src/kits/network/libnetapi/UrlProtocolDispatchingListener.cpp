@@ -125,6 +125,18 @@ BUrlProtocolDispatchingListener::RequestCompleted(BUrlRequest* caller,
 }
 
 
+void
+BUrlProtocolDispatchingListener::DebugMessage(BUrlRequest* caller,
+	BUrlProtocolDebugMessage type, const char* text)
+{
+	BMessage message(B_URL_PROTOCOL_NOTIFICATION);
+	message.AddInt32("url:type", type);
+	message.AddString("url:text", text);
+
+	_SendMessage(&message, B_URL_PROTOCOL_DEBUG_MESSAGE, caller);
+}
+
+
 bool
 BUrlProtocolDispatchingListener::CertificateVerificationFailed(
 	BUrlRequest* caller, BCertificate& certificate, const char* error)
@@ -149,7 +161,7 @@ BUrlProtocolDispatchingListener::_SendMessage(BMessage* message,
 	int8 notification, BUrlRequest* caller)
 {
 	ASSERT(message != NULL);
-		
+
 	message->AddPointer(kUrlProtocolCaller, caller);
 	message->AddInt8(kUrlProtocolMessageType, notification);
 

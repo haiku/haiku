@@ -12,6 +12,7 @@
 #include <AppKit.h>
 #include <UrlProtocolAsynchronousListener.h>
 #include <Debug.h>
+#include <String.h>
 
 extern const char* kUrlProtocolMessageType;
 extern const char* kUrlProtocolCaller;
@@ -139,6 +140,16 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 				message->FindBool("url:success", &success);
 
 				RequestCompleted(caller, success);
+			}
+			break;
+
+		case B_URL_PROTOCOL_DEBUG_MESSAGE:
+			{
+				BUrlProtocolDebugMessage type
+					= (BUrlProtocolDebugMessage)message->FindInt32("url:type");
+				BString text = message->FindString("url:text");
+
+				DebugMessage(caller, type, text);
 			}
 			break;
 
