@@ -666,6 +666,10 @@ URLInputGroup::TextView() const
 void
 URLInputGroup::SetText(const char* text)
 {
+	// Ignore setting the text, if the user is currently editing the URL.
+	if (fWindowActive && fTextView->IsFocus())
+		return;
+
 	if (!text || !Text() || strcmp(Text(), text) != 0) {
 		fTextView->SetUpdateAutoCompleterChoices(false);
 		fTextView->SetText(text);
