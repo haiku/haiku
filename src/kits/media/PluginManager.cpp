@@ -635,7 +635,7 @@ PluginManager::CreateStreamer(Streamer** streamer, BUrl url, BDataIO** source)
 		}
 
 		(*streamer)->fMediaPlugin = plugin;
-		(*streamer)->fRefCount += 1;
+		plugin->fRefCount += 1;
 
 		BDataIO* streamSource = NULL;
 		if ((*streamer)->Sniff(url, &streamSource) == B_OK) {
@@ -666,13 +666,14 @@ PluginManager::DestroyStreamer(Streamer* streamer)
 		// since otherwise we may actually unload the code for the
 		// destructor...
 		MediaPlugin* plugin = streamer->fMediaPlugin;
+		delete streamer;
 
-		// Delete the streamer only when every reference is released
-		if (streamer->fRefCount == 1) {
-			delete streamer;
+		// Delete the plugin only when every reference is released
+		if (plugin->fRefCount == 1) {
+			plugin->fRefCount = 0;
 			PutPlugin(plugin);
 		} else
-			streamer->fRefCount -= 1;
+			plugin->fRefCount -= 1;
 	}
 }
 

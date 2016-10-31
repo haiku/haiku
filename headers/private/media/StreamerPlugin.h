@@ -27,10 +27,8 @@ private:
 	virtual void				_ReservedStreamer5();
 
 			MediaPlugin*		fMediaPlugin;
-			int32				fRefCount;
 			uint32				fReserved[5];
 
-	// needed for plug-in reference count management
 	friend class PluginManager;
 };
 

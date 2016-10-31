@@ -13,6 +13,12 @@ class MediaPlugin {
 public:
 								MediaPlugin();
 	virtual						~MediaPlugin();
+
+private:
+	// needed for plug-in reference count management
+	friend class PluginManager;
+
+			int32				fRefCount;
 };
 
 class Decoder;

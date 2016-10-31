@@ -8,6 +8,8 @@
 
 
 MediaPlugin::MediaPlugin()
+	:
+	fRefCount(0)
 {
 }
 
