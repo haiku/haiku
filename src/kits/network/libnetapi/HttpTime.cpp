@@ -14,12 +14,36 @@
 #include <cstdio>
 
 
+// The formats used should be, in order of preference (according to RFC2616,
+// section 3.3):
+// RFC1123 / RFC822: "Sun, 06 Nov 1994 08:49:37 GMT"
+// RFC1036 / RFC850: "Sunday, 06-Nov-94 08:49:37 GMT"
+// asctime         : "Sun Nov  6 08:49:37 1994"
+//
+// RFC1123 is the preferred one because it has 4 digit years.
+//
+// But of course in real life, all possible mixes of the formats are used.
+// Believe it or not, it's even possible to find some website that gets this
+// right and use one of the 3 formats above.
+// Often seen variants are:
+// - RFC1036 but with 4 digit year,
+// - Missing or different timezone indicator
+// - Invalid weekday
 static const char* kDateFormats[] = {
-	"%a, %d %b %Y %H:%M:%S",
-	"%a, %d-%b-%Y %H:%M:%S",
-	"%a, %d-%b-%Y %H:%M:%S GMT",
-	"%a, %d-%b-%Y %H:%M:%S UTC",
-	"%A, %d-%b-%y %H:%M:%S",
+	// RFC1123
+	"%a, %d %b %Y %H:%M:%S",     // without timezone
+	"%a, %d %b %Y %H:%M:%S GMT", // canonical
+
+	// RFC1036
+	"%A, %d-%b-%y %H:%M:%S",     // without timezone
+	"%A, %d-%b-%y %H:%M:%S GMT", // canonical
+
+	// RFC1036 with 4 digit year
+	"%a, %d-%b-%Y %H:%M:%S",     // without timezone
+	"%a, %d-%b-%Y %H:%M:%S GMT", // with 4-digit year
+	"%a, %d-%b-%Y %H:%M:%S UTC", // "UTC" timezone
+
+	// asctime
 	"%a %d %b %H:%M:%S %Y"
 };
 

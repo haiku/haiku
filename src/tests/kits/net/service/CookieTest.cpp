@@ -494,6 +494,12 @@ CookieTest::ExpireParsingTest()
 			// NOTE: This can't really happen when we get cookies from HTTP
 			// headers. It could happen when the cookie is set from meta html
 			// tags or from JS.
+		{ "301-32=1; expires=Mon, 31-Oct-2035 08:08:40 GMT;",
+			true, false, false }, // Wrong weekday
+		{ "301-33=1; expires=Tue, 19-Oct-66 07:08:40;",
+			true, false, false }, // RFC1036 format with 2 digit year
+		{ "301-34=1; expires=Sat, 21-Oct-56 07:08:40 GMT;",
+			true, false, false }, // RFC1036 format with 2 digit year
 	};
 
 	for (unsigned int i = 0; i < sizeof(tests) / sizeof(Test); i++)
