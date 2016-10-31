@@ -40,7 +40,6 @@ protected:
 
 	friend class FileListener;
 private:
-	BUrlContext*						fContext;
 	BUrlRequest*						fReq;
 	FileListener*						fListener;
 	thread_id							fReqThread;

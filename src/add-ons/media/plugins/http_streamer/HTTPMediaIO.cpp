@@ -85,7 +85,6 @@ public:
 				return;
 
 			fRequest = NULL;
-			delete request;
 		}
 
 		status_t LockOnInit(bigtime_t timeout)
@@ -119,7 +118,6 @@ private:
 HTTPMediaIO::HTTPMediaIO(BUrl url)
 	:
 	BAdapterIO(B_MEDIA_STREAMING | B_MEDIA_SEEKABLE, HTTP_TIMEOUT),
-	fContext(NULL),
 	fReq(NULL),
 	fListener(NULL),
 	fReqThread(-1),
@@ -127,10 +125,6 @@ HTTPMediaIO::HTTPMediaIO(BUrl url)
 	fIsMutable(false)
 {
 	CALLED();
-
-	// The context has the same life time of the object
-	fContext = new BUrlContext();
-	fContext->AcquireReference();
 }
 
 
@@ -142,8 +136,7 @@ HTTPMediaIO::~HTTPMediaIO()
 	status_t status;
 	wait_for_thread(fReqThread, &status);
 
-	fContext->ReleaseReference();
-	delete fContext;
+	delete fReq;
 }
 
 
@@ -177,8 +170,7 @@ HTTPMediaIO::Open()
 
 	fListener = new FileListener(this);
 
-	fReq = BUrlProtocolRoster::MakeRequest(fUrl,
-		fListener, fContext);
+	fReq = BUrlProtocolRoster::MakeRequest(fUrl, fListener);
 
 	if (fReq == NULL)
 		return B_ERROR;
