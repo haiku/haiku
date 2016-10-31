@@ -673,7 +673,7 @@ ConfirmChangeIfWellKnownDirectory(const BEntry* entry, DestructiveAction action,
 				B_TRANSLATE("If you rename the home folder, %osName "
 				"may not behave properly!\n\nAre you sure you want to do this?"
 				"\n\nTo rename the home folder anyway, hold down the "
-				"Shift key and click \"Move\"."));
+				"Shift key and click \"Rename\"."));
 		} else if (action == kMove) {
 			warning .SetTo(
 				B_TRANSLATE("If you move the home folder, %osName "
