@@ -570,6 +570,7 @@ BHttpRequest::_MakeRequest()
 	ssize_t bytesRead = 0;
 	ssize_t bytesReceived = 0;
 	ssize_t bytesTotal = 0;
+	size_t previousBufferSize = 0;
 	off_t bytesUnpacked = 0;
 	char* inputTempBuffer = new(std::nothrow) char[kHttpBufferSize];
 	ssize_t inputTempSize = kHttpBufferSize;
@@ -579,7 +580,7 @@ BHttpRequest::_MakeRequest()
 	ObjectDeleter<BDataIO> decompressingStreamDeleter;
 
 	while (!fQuit && !(receiveEnd && parseEnd)) {
-		if (!receiveEnd) {
+		if ((!receiveEnd) && (fInputBuffer.Size() == previousBufferSize)) {
 			fSocket->WaitForReadable();
 			BStackOrHeapArray<char, 4096> chunk(kHttpBufferSize);
 			bytesRead = fSocket->Read(chunk, kHttpBufferSize);
@@ -593,6 +594,8 @@ BHttpRequest::_MakeRequest()
 			fInputBuffer.AppendData(chunk, bytesRead);
 		} else
 			bytesRead = 0;
+
+		previousBufferSize = fInputBuffer.Size();
 
 		if (fRequestStatus < kRequestStatusReceived) {
 			_ParseStatus();
