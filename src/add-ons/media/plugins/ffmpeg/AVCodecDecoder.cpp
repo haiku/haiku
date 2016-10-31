@@ -928,6 +928,7 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 	// "planar" audio (each channel separated instead of interleaved samples).
 	// In that case, we use swresample to convert the data
 	if (av_sample_fmt_is_planar(fContext->sample_fmt)) {
+#if 0
 		const uint8_t* ptr[8];
 		for (int i = 0; i < 8; i++) {
 			if (fDecodedDataBuffer->data[i] == NULL)
@@ -950,6 +951,21 @@ AVCodecDecoder::_MoveAudioFramesToRawDecodedAudioAndUpdateStartTimes()
 
 		if (frames < 0)
 			debugger("resampling failed");
+#else
+		// interleave planar audio with same format
+		uintptr_t out = (uintptr_t)fRawDecodedAudio->data[0];
+		int32 offset = fDecodedDataBufferOffset;
+		for (int i = 0; i < frames; i++) {
+			for (int j = 0; j < fContext->channels; j++) {
+				memcpy((void*)out, fDecodedDataBuffer->data[j]
+					+ offset, fInputFrameSize);
+				out += fInputFrameSize;
+			}
+			offset += fInputFrameSize;
+		}
+		outFrames = frames;
+		inFrames = frames;
+#endif
 	} else {
 		memcpy(fRawDecodedAudio->data[0], fDecodedDataBuffer->data[0]
 				+ fDecodedDataBufferOffset, frames * fOutputFrameSize);
