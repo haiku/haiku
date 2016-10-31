@@ -132,8 +132,7 @@ HTTPMediaIO::~HTTPMediaIO()
 {
 	CALLED();
 
-	if (fReq != NULL)
-	{
+	if (fReq != NULL) {
 		fReq->Stop();
 		status_t status;
 		wait_for_thread(fReqThread, &status);
