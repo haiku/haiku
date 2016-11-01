@@ -212,15 +212,8 @@ StdBinCommands
 
 # standard commands that need libbe.so, libdevice.so
 StdBinCommands
-	listusb.cpp
 	setusbconfig.cpp
 	: be libdevice.so : $(haiku-utils_rsrc) ;
-
-ObjectHdrs [ FGristFiles listusb$(SUFOBJ) ]
-	: [ FDirName $(SUBDIR) $(DOTDOT) add-ons kernel bus_managers usb ]
-		[ FDirName $(TARGET_COMMON_DEBUG_OBJECT_DIR_$(TARGET_PACKAGING_ARCH))
-			apps devices ] ;
-Includes [ FGristFiles listusb.cpp ] : <src!apps!devices>usbhdr.h ;
 
 # standard commands that need libbluetooth.so, due the Bluetooth Kit
 StdBinCommands
@@ -272,6 +265,7 @@ SubInclude HAIKU_TOP src bin ideinfo ;
 SubInclude HAIKU_TOP src bin keymap ;
 SubInclude HAIKU_TOP src bin keystore ;
 SubInclude HAIKU_TOP src bin listdev ;
+SubInclude HAIKU_TOP src bin listusb ;
 SubInclude HAIKU_TOP src bin locale ;
 SubInclude HAIKU_TOP src bin makebootable ;
 #SubInclude HAIKU_TOP src bin makeudfimage ;
