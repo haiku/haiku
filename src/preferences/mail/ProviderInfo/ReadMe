@@ -15,11 +15,11 @@ resource(9, "Username Pattern") 0;
  
 you can pass the following options to the last six items:
  
-"POP Authentification":
+"POP Authentication":
 	0	plain text
 	1	APOP
  
-"SMTP Authentification":
+"SMTP Authentication":
 	0	none
 	1	ESMTP
 	2	POP3 before SMTP
