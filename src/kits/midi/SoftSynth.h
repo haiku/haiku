@@ -19,7 +19,7 @@
 	This version of SoftSynth is a wrapper libfluidsynth.so.
  */
 
-#include <fluidsynth.h>
+#include <fluidlite.h>
 #include <Midi.h>
 #include <SoundPlayer.h>
 #include <Synth.h>

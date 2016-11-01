@@ -256,6 +256,37 @@ if [ IsPackageAvailable ffmpeg_devel ] {
 }
 
 
+# Fluidlite
+if [ IsPackageAvailable fluidlite_devel ] && [ IsPackageAvailable libvorbis_devel ] {
+	ExtractBuildFeatureArchives fluidlite :
+		file: devel fluidlite_devel
+			library: $(developLibDir)/libfluidlite.a
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures fluidlite ;
+} else {
+	Echo "Fluidlite support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
+# Libvorbis
+if [ IsPackageAvailable libvorbis_devel ] {
+	ExtractBuildFeatureArchives libvorbis :
+		file: base libvorbis
+			runtime: lib
+		file: devel libvorbis_devel
+			depends: base
+			library: $(developLibDir)/libvorbisfile.so.3
+			headers: $(developHeadersDir)
+		;
+
+	EnableBuildFeatures libvorbis ;
+} else {
+	Echo "Libvorbis support not available on $(TARGET_PACKAGING_ARCH)" ;
+}
+
+
 # Freetype
 if [ IsPackageAvailable freetype_devel ] {
 	ExtractBuildFeatureArchives freetype :

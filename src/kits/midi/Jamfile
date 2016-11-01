@@ -9,11 +9,20 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 UsePrivateHeaders midi ;
-UseLibraryHeaders fluidsynth ;
+
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
+		if ! [ FIsBuildFeatureEnabled fluidlite ] {
+			continue ;
+		}
+
+		UseBuildFeatureHeaders fluidlite ;
+		Includes [ FGristFiles MidiSynth.cpp MidiSynthFile.cpp
+			SoftSynth.cpp Synth.cpp ]
+			: [ BuildFeatureAttribute fluidlite : headers ] ;
+
 		SharedLibrary [ MultiArchDefaultGristFiles libmidi.so ] :
 			Midi.cpp
 			MidiGlue.cpp
@@ -30,7 +39,8 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			be
 			midi2
 			media
-			[ MultiArchDefaultGristFiles libfluidsynth.so ]
+			[ BuildFeatureAttribute libvorbis : library ]
+			[ BuildFeatureAttribute fluidlite : library ]
 			[ TargetLibsupc++ ]
 			;
 	}
