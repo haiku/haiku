@@ -75,9 +75,6 @@ typedef struct {
 #endif
 } Elf64_Ehdr;
 
-#define ELFMAG		"\x7f""ELF"
-#define SELFMAG		4
-
 /* e_ident[] indices */
 #define EI_MAG0		0
 #define EI_MAG1		1
@@ -87,6 +84,14 @@ typedef struct {
 #define EI_DATA		5
 #define EI_VERSION	6
 #define EI_PAD		7
+
+/* Values for the magic number bytes. */
+#define ELFMAG0		0x7f
+#define ELFMAG1		'E'
+#define ELFMAG2		'L'
+#define ELFMAG3		'F'
+#define ELFMAG		"\x7f""ELF"
+#define SELFMAG		4
 
 /* e_type (Object file type) */
 #define ET_NONE			0 /* No file type */
