@@ -258,11 +258,6 @@ AddFilesToHaikuImage home config settings Tracker "Tracker New Templates"
 	"<tracker-new-templates>text file"
 ;
 
-# decorators
-AddFilesToHaikuImage system non-packaged add-ons decorators
-	: BeDecorator ;
-# MacDecorator WinDecorator
-
 # printers
 AddDirectoryToHaikuImage home config settings printers Preview
 	: home-config-settings-printers-preview.rdef ;
