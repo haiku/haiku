@@ -19,10 +19,12 @@ void
 DumpAudioCSInterfaceDescriptorHeader(
 	const usb_audiocontrol_header_descriptor* descriptor)
 {
+	printf("                    Type .............. 0x%02x\n",
+		descriptor->descriptor_type);
 	printf("                    Subtype ........... 0x%02x (Header)\n",
 		descriptor->descriptor_subtype);
-	printf("                    bcdADC Release date 0x%04x\n",
-		descriptor->bcd_release_no);
+	printf("                    ADC Release ....... %d.%d\n",
+		descriptor->bcd_release_no >> 8, descriptor->bcd_release_no & 0xFF);
 	printf("                    Total Length ...... %u\n",
 		descriptor->r1.total_length);
 	printf("                    Interfaces ........ ");
@@ -81,7 +83,7 @@ DumpChannelConfig(uint32 wChannelConfig)
 }
 
 
-const char*
+static const char*
 TerminalTypeName(uint16 terminalType)
 {
 	switch (terminalType) {
@@ -138,6 +140,8 @@ void
 DumpAudioCSInterfaceDescriptorInputTerminal(
 	const usb_audio_input_terminal_descriptor* descriptor)
 {
+	printf("                    Type .............. 0x%02x\n",
+		descriptor->descriptor_type);
 	printf("                    Subtype ........... 0x%02x (Input Terminal)\n",
 		descriptor->descriptor_subtype);
 	printf("                    Terminal ID ....... %u\n",
@@ -164,6 +168,8 @@ void
 DumpAudioCSInterfaceDescriptorOutputTerminal(
 	const usb_audio_output_terminal_descriptor* descriptor)
 {
+	printf("                    Type .............. 0x%02x\n",
+		descriptor->descriptor_type);
 	printf("                    Subtype ........... 0x%02x (Output Terminal)\n",
 		descriptor->descriptor_subtype);
 	printf("                    Terminal ID ....... %u\n",
@@ -184,6 +190,8 @@ void
 DumpAudioCSInterfaceDescriptorMixerUnit(
 	const usb_audio_mixer_unit_descriptor* descriptor)
 {
+	printf("                    Type .............. 0x%02x\n",
+		descriptor->descriptor_type);
 	printf("                    Subtype ........... 0x%02x (Mixer Unit)\n",
 		descriptor->descriptor_subtype);
 	printf("                    Unit ID ........... %u\n",
@@ -222,6 +230,8 @@ void
 DumpAudioCSInterfaceDescriptorSelectorUnit(
 	const usb_audio_selector_unit_descriptor* descriptor)
 {
+	printf("                    Type .............. 0x%02x\n",
+		descriptor->descriptor_type);
 	printf("                    Subtype ........... 0x%02x (Selector Unit)\n",
 		descriptor->descriptor_subtype);
 	printf("                    Unit ID ........... %u\n",
@@ -275,6 +285,8 @@ void
 DumpAudioCSInterfaceDescriptorFeatureUnit(
 	const usb_audio_feature_unit_descriptor* descriptor)
 {
+	printf("                    Type .............. 0x%02x\n",
+		descriptor->descriptor_type);
 	printf("                    Subtype ........... 0x%02x (Feature Unit)\n",
 		descriptor->descriptor_subtype);
 	printf("                    Unit ID ........... %u\n",
@@ -316,6 +328,8 @@ void
 DumpAudioCSInterfaceDescriptorAssociated(
 	const usb_generic_descriptor* descriptor)
 {
+	printf("                    Type .............. 0x%02x\n",
+		descriptor->descriptor_type);
 	printf("                    Subtype ........... 0x%02x (Associate Interface)\n",
 		(uint8)descriptor->data[0]);
 	printf("                    Interface ......... %u\n",
@@ -324,6 +338,7 @@ DumpAudioCSInterfaceDescriptorAssociated(
 	printf("                    Data .............. ");
 	for (uint8 i = 0; i < descriptor->length - 2; i++)
 		printf("%02x ", descriptor->data[i]);
+	printf("\n");
 }
 
 

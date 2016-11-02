@@ -14,18 +14,18 @@ enum {
 	USB_AUDIO_INTERFACE_AUDIO_CLASS		= 0x01
 };
 
-enum { // Audio Interface Subclasses	
-	USB_AUDIO_INTERFACE_UNDEFINED_SUBCLASS =	0x00, 
+enum { // Audio Interface Subclasses
+	USB_AUDIO_INTERFACE_UNDEFINED_SUBCLASS =	0x00,
 	USB_AUDIO_INTERFACE_AUDIOCONTROL_SUBCLASS =	0x01,
-	USB_AUDIO_INTERFACE_AUDIOSTREAMING_SUBCLASS,		//
-	USB_AUDIO_INTERFACE_MIDISTREAMING_SUBCLASS			// 
+	USB_AUDIO_INTERFACE_AUDIOSTREAMING_SUBCLASS,
+	USB_AUDIO_INTERFACE_MIDISTREAMING_SUBCLASS
 };
 
 enum { // Audio Interface Protocol Codes	
-	USB_AUDIO_PROTOCOL_UNDEFINED =	0x00 
+	USB_AUDIO_PROTOCOL_UNDEFINED =	0x00
 };
 
-enum { // Audio Interface Protocol Codes	
+enum { // Audio Interface Class-Specific Descriptor Types
 	USB_AUDIO_CS_UNDEFINED				= 0x20,
 	USB_AUDIO_CS_DEVICE					= 0x21,
 	USB_AUDIO_CS_CONFIGURATION			= 0x22,
@@ -66,7 +66,7 @@ typedef struct {
 		struct {
 			uint16	total_length;
 			uint8	in_collection;
-			uint8	interface_numbers[1];
+			uint8	interface_numbers[0];
 		} _PACKED r1;
 
 		struct {

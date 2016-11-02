@@ -10,12 +10,14 @@
 #include <Entry.h>
 #include <Path.h>
 #include <String.h>
-#include <USBKit.h>
 #include <stdio.h>
 #include <usb/USB_audio.h>
+#include <usb/USB_video.h>
 
 #include "usbspec_private.h"
 #include "usb-utils.h"
+
+#include "listusb.h"
 
 
 const char*
@@ -23,7 +25,7 @@ ClassName(int classNumber) {
 	switch (classNumber) {
 		case 0:
 			return "Per-interface classes";
-		case 1:
+		case USB_AUDIO_DEVICE_CLASS:
 			return "Audio";
 		case 2:
 			return "Communication";
@@ -45,7 +47,7 @@ ClassName(int classNumber) {
 			return "Smart card";
 		case 13:
 			return "Content security";
-		case 14:
+		case USB_VIDEO_DEVICE_CLASS:
 			return "Video";
 		case 15:
 			return "Personal Healthcare";
@@ -65,7 +67,58 @@ ClassName(int classNumber) {
 }
 
 
-void DumpAudioDescriptor(const usb_generic_descriptor* descriptor, int subclass);
+const char*
+SubclassName(int classNumber, int subclass)
+{
+	if (classNumber == 0xEF) {
+		if (subclass == 0x02)
+			return " (Common)";
+	}
+
+	if (classNumber == USB_VIDEO_DEVICE_CLASS) {
+		switch (subclass) {
+			case USB_VIDEO_INTERFACE_UNDEFINED_SUBCLASS:
+				return " (Undefined)";
+			case USB_VIDEO_INTERFACE_VIDEOCONTROL_SUBCLASS:
+				return " (Control)";
+			case USB_VIDEO_INTERFACE_VIDEOSTREAMING_SUBCLASS:
+				return " (Streaming)";
+			case USB_VIDEO_INTERFACE_COLLECTION_SUBCLASS:
+				return " (Collection)";
+		}
+	}
+	return "";
+}
+
+
+const char*
+ProtocolName(int classNumber, int subclass, int protocol)
+{
+	switch (classNumber) {
+		case 0x09:
+			if (subclass == 0x00)
+			{
+				switch (protocol) {
+					case 0x00:
+						return " (Full speed)";
+					case 0x01:
+						return " (Hi-speed, single TT)";
+					case 0x02:
+						return " (Hi-speed, multiple TT)";
+					case 0x03:
+						return " (Super speed)";
+				}
+			}
+		case 0xE0:
+			if (subclass == 0x01 && protocol == 0x01)
+				return " (Bluetooth)";
+		case 0xEF:
+			if (subclass == 0x02 && protocol == 0x01)
+				return " (Interface Association)";
+			break;
+	}
+	return "";
+}
 
 
 void
@@ -90,6 +143,9 @@ DumpDescriptor(const usb_generic_descriptor* descriptor,
 		case USB_AUDIO_DEVICE_CLASS:
 			DumpAudioDescriptor(descriptor, subclass);
 			break;
+		case USB_VIDEO_DEVICE_CLASS:
+			DumpVideoDescriptor(descriptor, subclass);
+			break;
 		default:
 			DumpDescriptorData(descriptor);
 			break;
@@ -105,10 +161,12 @@ DumpInterface(const BUSBInterface* interface)
 
 	printf("                Class .............. 0x%02x (%s)\n",
 		interface->Class(), ClassName(interface->Class()));
-	printf("                Subclass ........... 0x%02x\n",
-		interface->Subclass());
-	printf("                Protocol ........... 0x%02x\n",
-		interface->Protocol());
+	printf("                Subclass ........... 0x%02x%s\n",
+		interface->Subclass(),
+		SubclassName(interface->Class(), interface->Subclass()));
+	printf("                Protocol ........... 0x%02x%s\n",
+		interface->Protocol(), ProtocolName(interface->Class(),
+			interface->Subclass(), interface->Protocol()));
 	printf("                Interface String ... \"%s\"\n",
 		interface->InterfaceString());
 
@@ -190,10 +248,13 @@ DumpInfo(BUSBDevice& device, bool verbose)
 	printf("[Device /dev/bus/usb%s]\n", device.Location());
 	printf("    Class .................. 0x%02x (%s)\n", device.Class(),
 		ClassName(device.Class()));
-	printf("    Subclass ............... 0x%02x\n", device.Subclass());
-	printf("    Protocol ............... 0x%02x\n", device.Protocol());
+	printf("    Subclass ............... 0x%02x%s\n", device.Subclass(),
+		SubclassName(device.Class(), device.Subclass()));
+	printf("    Protocol ............... 0x%02x%s\n", device.Protocol(),
+		ProtocolName(device.Class(), device.Subclass(), device.Protocol()));
 	printf("    Max Endpoint 0 Packet .. %d\n", device.MaxEndpoint0PacketSize());
-	printf("    USB Version ............ 0x%04x\n", device.USBVersion());
+	uint32_t version = device.USBVersion();
+	printf("    USB Version ............ %d.%d\n", version >> 8, version & 0xFF);
 	printf("    Vendor ID .............. 0x%04x", device.VendorID());
 	if (vendorName != NULL)
 		printf(" (%s)", vendorName);
