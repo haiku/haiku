@@ -451,13 +451,21 @@ VideoWindow::VideoWindow(const char* title, window_type type,
 	_BuildCaptureControls();
 
 	BBox* box = new BBox("box");
+	BGroupLayout* layout = new BGroupLayout(B_VERTICAL);
+	box->SetLayout(layout);
+	layout->SetInsets(2, 2, 2, 2);
 	box->AddChild(fVideoView);
+	box->AddChild(fErrorView);
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(menuBar)
 		.AddGroup(B_VERTICAL)
 			.SetInsets(B_USE_WINDOW_SPACING)
-			.Add(box)
+			.AddGroup(B_HORIZONTAL)
+				.AddGlue()
+				.Add(box)
+				.AddGlue()
+			.End()
 			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 				.Add(fCaptureSetupBox)
 				.Add(fFtpSetupBox)
@@ -592,14 +600,12 @@ void
 VideoWindow::_BuildCaptureControls()
 {
 	// a view to hold the video image
-	fVideoView = new BTextView("");
+	fVideoView = new BView("Video preview", B_WILL_DRAW);
 	fVideoView->SetExplicitMinSize(BSize(VIDEO_SIZE_X, VIDEO_SIZE_Y));
 	fVideoView->SetExplicitMaxSize(BSize(VIDEO_SIZE_X, VIDEO_SIZE_Y));
-	fVideoView->MakeEditable(false);
-	fVideoView->MakeResizable(false);
-	fVideoView->MakeSelectable(false);
-	fVideoView->SetAlignment(B_ALIGN_CENTER);
-	fVideoView->SetInsets(0, VIDEO_SIZE_Y / 3, 0 , 0);
+
+	fErrorView = new BTextView("error");
+	fErrorView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	// Capture controls
 	fCaptureSetupBox = new BBox("Capture Controls", B_WILL_DRAW);
@@ -734,7 +740,14 @@ void
 VideoWindow::ErrorAlert(const char* message, status_t err)
 {
 	Lock();
-	fVideoView->SetText(message);
+	fErrorView->SetText(message);
+	fErrorView->MakeEditable(false);
+	fErrorView->MakeSelectable(false);
+	fErrorView->SetWordWrap(true);
+	fErrorView->SetExplicitMinSize(BSize(VIDEO_SIZE_X, VIDEO_SIZE_Y));
+	fErrorView->SetExplicitMaxSize(BSize(VIDEO_SIZE_X, VIDEO_SIZE_Y));
+	fErrorView->Show();
+	fVideoView->Hide();
 	Unlock();
 
 	printf("%s\n%s [%" B_PRIx32 "]", message, strerror(err), err);

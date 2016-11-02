@@ -142,7 +142,8 @@ private:
 			media_node*		fProducer;
 			port_id*		fPortPtr;
 
-			BTextView*		fVideoView;
+			BView*			fVideoView;
+			BTextView*	fErrorView;
 
 			BTextControl*	fFileName;
 			BBox*			fCaptureSetupBox;
