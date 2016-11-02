@@ -745,8 +745,10 @@ BasicTerminalBuffer::InsertTab()
 	if (x != fCursor.x) {
 		TerminalLine* line = _LineAt(fCursor.y);
 		for (int32 i = fCursor.x; i <= x; i++) {
-			line->cells[i].character = ' ';
-			line->cells[i].attributes = fAttributes;
+			if (line->length <= i) {
+				line->cells[i].character = ' ';
+				line->cells[i].attributes = fAttributes;
+			}
 		}
 		fCursor.x = x;
 		if (line->length < fCursor.x)
