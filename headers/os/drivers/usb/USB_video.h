@@ -52,6 +52,30 @@ enum { // Video Class-Specific VideoControl Interface descriptor subtypes
 };
 
 
+enum { // Video Class-Specific VideoStreaming Interface descriptor subtypes
+	USB_VIDEO_VS_UNDEFINED						= 0x00,
+	USB_VIDEO_VS_INPUT_HEADER					= 0x01,
+	USB_VIDEO_VS_OUTPUT_HEADER					= 0x02,
+	USB_VIDEO_VS_STILL_IMAGE_FRAME				= 0x03,
+	USB_VIDEO_VS_FORMAT_UNCOMPRESSED			= 0x04,
+	USB_VIDEO_VS_FRAME_UNCOMPRESSED				= 0x05,
+	USB_VIDEO_VS_FORMAT_MJPEG					= 0x06,
+	USB_VIDEO_VS_FRAME_MJPEG					= 0x07,
+	USB_VIDEO_VS_FORMAT_MPEG2TS					= 0x0a,
+	USB_VIDEO_VS_FORMAT_DV						= 0x0c,
+	USB_VIDEO_VS_COLORFORMAT					= 0x0d,
+	USB_VIDEO_VS_FORMAT_FRAME_BASED				= 0x10,
+	USB_VIDEO_VS_FRAME_FRAME_BASED				= 0x11,
+	USB_VIDEO_VS_FORMAT_STREAM_BASED			= 0x12,
+	USB_VIDEO_VS_FORMAT_H264					= 0x13,
+	USB_VIDEO_VS_FRAME_H264						= 0x14,
+	USB_VIDEO_VS_FORMAT_H264_SIMULCAST			= 0x15,
+	USB_VIDEO_VS_FORMAT_VP8						= 0x16,
+	USB_VIDEO_VS_FRAME_VP8						= 0x17,
+	USB_VIDEO_VS_FORMAT_VP8_SIMULCAST			= 0x18,
+};
+
+
 enum {
 	// USB Terminal Types
 	USB_VIDEO_VENDOR_USB_IO						= 0x100,
@@ -69,6 +93,14 @@ enum {
 	USB_VIDEO_COMPOSITE_EXT						= 0x401,
 	USB_VIDEO_SVIDEO_EXT						= 0x402,
 	USB_VIDEO_COMPONENT_EXT						= 0x403,
+};
+
+
+enum {
+	EP_SUBTYPE_UNDEFINED						= 0x00,
+	EP_SUBTYPE_GENERAL							= 0x01,
+	EP_SUBTYPE_ENDPOINT							= 0x02,
+	EP_SUBTYPE_INTERRUPT						= 0x03,
 };
 
 
@@ -137,6 +169,30 @@ typedef struct {
 	uint8	processing;
 	uint8	video_standards;
 } _PACKED usb_video_processing_unit_descriptor;
+
+
+struct usb_video_frame_descriptor {
+	uint8	length;
+	uint8	descriptor_type;
+	uint8	descriptor_subtype;
+	uint8	frame_index;
+	uint8	capabilities;
+	uint16	width;
+	uint16	height;
+	uint32	min_bit_rate;
+	uint32	max_bit_rate;
+	uint32	max_video_frame_buffer_size;
+	uint32	default_frame_interval;
+	uint8	frame_interval_type;
+	union {
+		struct {
+			uint32	min_frame_interval;
+			uint32	max_frame_tnterval;
+			uint32	frame_interval_step;
+		} continuous;
+		uint32	discrete_frame_intervals[0];
+	};
+} _PACKED;
 
 
 #endif /* !USB_VIDEO_H */

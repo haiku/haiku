@@ -275,7 +275,239 @@ DumpVideoControlCSInterfaceDescriptor(const usb_generic_descriptor* descriptor)
 
 
 void
-DumpAudioStreamCSInterfaceDescriptor(const usb_generic_descriptor* descriptor);
+DumpVideoControlCSInterruptEndpointDescriptor(const usb_generic_descriptor* descriptor)
+{
+	printf("                    Type .............. 0x%02x (Endpoint)\n",
+		descriptor->descriptor_type);
+	printf("                    Subtype ........... 0x%02x (Interrupt)\n",
+		(uint8)descriptor->data[0]);
+	printf("                    Max Transfer Size . %u\n",
+		(uint16)((descriptor->data[1] << 8) | descriptor->data[2]));
+}
+
+
+void
+DumpVideoControlCSEndpointDescriptor(const usb_generic_descriptor* descriptor)
+{
+	uint8 descriptorSubtype = descriptor->data[0];
+	switch (descriptorSubtype) {
+		case EP_SUBTYPE_INTERRUPT:
+			DumpVideoControlCSInterruptEndpointDescriptor(descriptor);
+			break;
+		default:
+			DumpDescriptorData(descriptor);
+	}
+}
+
+
+void
+DumpVideoStreamInputHeaderDescriptor(const usb_generic_descriptor* descriptor)
+{
+	printf("                    Type .............. 0x%02x (VideoStream Interface)\n",
+		descriptor->descriptor_type);
+	printf("                    Subtype ........... 0x%02x (Input header)\n",
+		(uint8)descriptor->data[0]);
+	printf("                    Format count ...... %u\n",
+		(uint8)descriptor->data[1]);
+	printf("                    Total length ...... %u\n",
+		(uint16)((descriptor->data[2] << 8) | descriptor->data[3]));
+	printf("                    Endpoint .......... 0x%02x\n",
+		(uint8)descriptor->data[4]);
+	printf("                    Info .............. 0x%02x\n",
+		(uint8)descriptor->data[5]);
+	printf("                    Terminal Link ..... 0x%02x\n",
+		(uint8)descriptor->data[6]);
+	printf("                    Still capture ..... 0x%02x\n",
+		(uint8)descriptor->data[7]);
+	printf("                    Trigger support ... %u\n",
+		(uint8)descriptor->data[8]);
+	printf("                    Trigger usage ..... %u\n",
+		(uint8)descriptor->data[9]);
+
+	uint8 nformat = descriptor->data[1];
+	uint8 formatsize = descriptor->data[10];
+	uint8 i, j;
+
+	for (i = 0; i < nformat; i++)
+	{
+		printf("                    Format %2d ......... 0x", i);
+		for (j = 0; j < formatsize; j++)
+			printf("%02x", (uint8)descriptor->data[11 + i * formatsize + j]);
+		printf("\n");
+	}
+}
+
+
+void
+DumpVideoStillImageDescriptor(const usb_generic_descriptor* descriptor)
+{
+	printf("                    Type .............. 0x%02x (VideoStream Interface)\n",
+		descriptor->descriptor_type);
+	printf("                    Subtype ........... 0x%02x (Still Image)\n",
+		(uint8)descriptor->data[0]);
+	printf("                    Endpoint .......... %u\n",
+		(uint8)descriptor->data[1]);
+
+	uint8 npatterns = descriptor->data[2];
+	uint8 i;
+	printf("                    Resolutions ....... ");
+	for (i = 0; i < npatterns; i++)
+	{
+		// FIXME these are reverse-endian compared to everything else.
+		// Is my webcam wrong, or is it some quirk in the spec?
+		printf("%ux%u, ",
+			(uint16)((descriptor->data[i * 4 + 4] << 8) | (descriptor->data[i * 4 + 3])),
+			(uint16)((descriptor->data[i * 4 + 6] << 8) | (descriptor->data[i * 4 + 5])));
+	}
+	printf("\n");
+
+	i = i * 4 + 3;
+
+	npatterns = descriptor->data[i];
+	while (npatterns > 0)
+	{
+		printf("                    Compression ....... %u\n",
+			(uint8)descriptor->data[i]);
+		npatterns--;
+	}
+}
+
+
+static const char*
+VSInterfaceString(int subtype)
+{
+	switch(subtype) {
+		case USB_VIDEO_VS_UNDEFINED:
+			return "Undefined";
+		case USB_VIDEO_VS_INPUT_HEADER:
+			return "Input header";
+		case USB_VIDEO_VS_OUTPUT_HEADER:
+			return "Output header";
+		case USB_VIDEO_VS_STILL_IMAGE_FRAME:
+			return "Still image";
+		case USB_VIDEO_VS_FORMAT_UNCOMPRESSED:
+			return "Uncompressed format";
+		case USB_VIDEO_VS_FRAME_UNCOMPRESSED:
+			return "Uncompressed frame";
+		case USB_VIDEO_VS_FORMAT_MJPEG:
+			return "MJPEG format";
+		case USB_VIDEO_VS_FRAME_MJPEG:
+			return "MJPEG frame";
+		case USB_VIDEO_VS_FORMAT_MPEG2TS:
+			return "MPEG2TS format";
+		case USB_VIDEO_VS_FORMAT_DV:
+			return "DV format";
+		case USB_VIDEO_VS_COLORFORMAT:
+			return "Color format";
+		case USB_VIDEO_VS_FORMAT_FRAME_BASED:
+			return "Frame based format";
+		case USB_VIDEO_VS_FRAME_FRAME_BASED:
+			return "Frame based frame";
+		case USB_VIDEO_VS_FORMAT_STREAM_BASED:
+			return "Stream based format";
+		case USB_VIDEO_VS_FORMAT_H264:
+			return "H264 format";
+		case USB_VIDEO_VS_FRAME_H264:
+			return "H264 frame";
+		case USB_VIDEO_VS_FORMAT_H264_SIMULCAST:
+			return "H264 simulcast";
+		case USB_VIDEO_VS_FORMAT_VP8:
+			return "VP8 format";
+		case USB_VIDEO_VS_FRAME_VP8:
+			return "VP8 frame";
+		case USB_VIDEO_VS_FORMAT_VP8_SIMULCAST:
+			return "VP8 simulcast";
+		default:
+			return "Unknown";
+	};
+}
+
+
+void
+DumpVideoFormatDescriptor(const usb_generic_descriptor* descriptor)
+{
+	printf("                    Type .............. 0x%02x (VideoStream Interface)\n",
+		descriptor->descriptor_type);
+	printf("                    Subtype ........... 0x%02x (%s)\n",
+		(uint8)descriptor->data[0], VSInterfaceString(descriptor->data[0]));
+	printf("                    Index ............. 0x%02x\n",
+		(uint8)descriptor->data[1]);
+	printf("                    Frame number ...... 0x%02x\n",
+		(uint8)descriptor->data[2]);
+
+	printf("                    GUID .............. ");
+	for (uint8 i = 3; i < 16 + 3; i++)
+		printf("%02x ", descriptor->data[i]);
+	printf("\n");
+
+	printf("                    Bits per pixel .... %u\n",
+		(uint8)descriptor->data[19]);
+	printf("                    Default frame idx . 0x%02x\n",
+		(uint8)descriptor->data[20]);
+	printf("                    Aspect ratio ...... %u:%u\n",
+		(uint8)descriptor->data[21], (uint8)descriptor->data[22]);
+	printf("                    Interlace flags ... 0x%02x\n",
+		(uint8)descriptor->data[23]);
+	printf("                    Copy protect ...... %u\n",
+		(uint8)descriptor->data[24]);
+}
+
+
+void
+DumpVideoFrameDescriptor(const usb_video_frame_descriptor* descriptor)
+{
+	printf("                    Type .............. 0x%02x (VideoStream Interface)\n",
+		descriptor->descriptor_type);
+	printf("                    Subtype ........... 0x%02x (%s)\n",
+		descriptor->descriptor_subtype,
+		VSInterfaceString(descriptor->descriptor_subtype));
+	printf("                    Index ............. 0x%02x\n",
+		descriptor->frame_index);
+	printf("                    Capabilities ...... 0x%02x\n",
+		descriptor->capabilities);
+	printf("                    Resolution ........ %u x %u\n",
+		descriptor->width, descriptor->height);
+	printf("                    Bit rates ......... %" B_PRIu32 " - %" B_PRIu32 "\n",
+		descriptor->min_bit_rate, descriptor->max_bit_rate);
+	printf("                    Frame buffer size . %" B_PRIu32 "\n",
+		descriptor->max_video_frame_buffer_size);
+	printf("                    Frame interval .... %.4fms\n",
+		descriptor->default_frame_interval / 10000.f);
+	for (uint8 i = 0; i < descriptor->frame_interval_type; i++)
+	{
+		printf("                    Frame interval %2d . %.4fms\n",
+			i, descriptor->discrete_frame_intervals[i] / 10000.f);
+	}
+	// TODO if frame__interval_type is 0, dump continuous frame intervals
+}
+
+
+void
+DumpVideoStreamCSInterfaceDescriptor(const usb_generic_descriptor* descriptor)
+{
+	uint8 subtype = descriptor->data[0];
+	switch (subtype) {
+		case USB_VIDEO_VS_INPUT_HEADER:
+			DumpVideoStreamInputHeaderDescriptor(descriptor);
+			break;
+		case USB_VIDEO_VS_STILL_IMAGE_FRAME:
+			DumpVideoStillImageDescriptor(descriptor);
+			break;
+		case USB_VIDEO_VS_FORMAT_UNCOMPRESSED:
+		case USB_VIDEO_VS_FORMAT_MJPEG:
+			DumpVideoFormatDescriptor(descriptor);
+			break;
+		case USB_VIDEO_VS_FRAME_UNCOMPRESSED:
+		case USB_VIDEO_VS_FRAME_MJPEG:
+			DumpVideoFrameDescriptor((usb_video_frame_descriptor*)descriptor);
+			break;
+		default:
+			DumpDescriptorData(descriptor);
+			break;
+	}
+}
+
+
 
 void
 DumpVideoDescriptor(const usb_generic_descriptor* descriptor, int subclass)
@@ -286,6 +518,9 @@ DumpVideoDescriptor(const usb_generic_descriptor* descriptor, int subclass)
 				case USB_VIDEO_CS_INTERFACE:
 					DumpVideoControlCSInterfaceDescriptor(descriptor);
 					break;
+				case USB_VIDEO_CS_ENDPOINT:
+					DumpVideoControlCSEndpointDescriptor(descriptor);
+					break;
 				default:
 					DumpDescriptorData(descriptor);
 					break;
@@ -294,7 +529,7 @@ DumpVideoDescriptor(const usb_generic_descriptor* descriptor, int subclass)
 		case USB_VIDEO_INTERFACE_VIDEOSTREAMING_SUBCLASS:
 			switch (descriptor->descriptor_type) {
 				case USB_VIDEO_CS_INTERFACE:
-					DumpAudioStreamCSInterfaceDescriptor(descriptor);
+					DumpVideoStreamCSInterfaceDescriptor(descriptor);
 					break;
 				default:
 					DumpDescriptorData(descriptor);
