@@ -153,19 +153,25 @@ XHCI::XHCI(pci_info *info, Stack *stack)
 	sPCIModule->write_pci_config(fPCIInfo->bus, fPCIInfo->device,
 		fPCIInfo->function, PCI_command, 2, command);
 
-	// map the registers
-	uint32 offset = fPCIInfo->u.h0.base_registers[0] & (B_PAGE_SIZE - 1);
-	phys_addr_t physicalAddress = fPCIInfo->u.h0.base_registers[0] - offset;
-	size_t mapSize = (fPCIInfo->u.h0.base_register_sizes[0] + offset
-		+ B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+	// map the registers (low + high for 64-bit when requested)
+	phys_addr_t physicalAddress = fPCIInfo->u.h0.base_registers[0];
+	physicalAddress &= PCI_address_memory_32_mask;
+	if ((fPCIInfo->u.h0.base_register_flags[0] & 0xC) == PCI_address_type_64)
+		physicalAddress += (phys_addr_t)fPCIInfo->u.h0.base_registers[1] << 32;
 
-	TRACE("map physical memory 0x%08" B_PRIx32 " (base: 0x%08" B_PRIxPHYSADDR
-		"; offset: %" B_PRIx32 "); size: %" B_PRId32 "\n",
-		fPCIInfo->u.h0.base_registers[0], physicalAddress, offset,
+	uint32 offset = physicalAddress & (B_PAGE_SIZE - 1);
+	phys_addr_t physicalAddressAligned = physicalAddress - offset;
+	size_t mapSize = (fPCIInfo->u.h0.base_register_sizes[0]
+		+ offset + B_PAGE_SIZE - 1) & ~(B_PAGE_SIZE - 1);
+
+	TRACE("map physical memory 0x%08" B_PRIx32 " : 0x%08" B_PRIx32 " "
+		"(base: 0x%08" B_PRIxPHYSADDR "; offset: %" B_PRIx32 ");"
+		"size: %" B_PRId32 "\n", fPCIInfo->u.h0.base_registers[0],
+		fPCIInfo->u.h0.base_registers[1], physicalAddress, offset,
 		fPCIInfo->u.h0.base_register_sizes[0]);
 
 	fRegisterArea = map_physical_memory("XHCI memory mapped registers",
-		physicalAddress, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
+		physicalAddressAligned, mapSize, B_ANY_KERNEL_BLOCK_ADDRESS,
 		B_KERNEL_READ_AREA | B_KERNEL_WRITE_AREA | B_READ_AREA | B_WRITE_AREA,
 		(void **)&fCapabilityRegisters);
 	if (fRegisterArea < B_OK) {
