@@ -19,6 +19,7 @@
 #endif
 #include <util/kernel_cpp.h>
 
+#include <errno.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
@@ -729,6 +730,45 @@ efi_gpt_initialize(int fd, partition_id partitionID, const char* name,
 
 
 static status_t
+efi_gpt_uninitialize(int fd, partition_id partitionID, off_t partitionSize,
+	uint32 blockSize, disk_job_id job)
+{
+	if (fd < 0)
+		return B_ERROR;
+
+	partition_data* partition = get_partition(partitionID);
+	if (partition == NULL)
+		return B_BAD_VALUE;
+
+	update_disk_device_job_progress(job, 0.0);
+
+	const int header_size = partition->block_size * 3;
+	// The first block is the protective MBR
+	// The second block is the GPT header
+	// The third block is the start of the partition list (it can span more
+	// blocks, but that doesn't matter as soon as the header is erased).
+
+	uint8 buffer[header_size];
+	memset(buffer, 0xE5, sizeof(buffer));
+
+	// Erase the first blocks
+	if (write_pos(fd, 0, &buffer, header_size) < 0)
+		return errno;
+
+	// Erase the last blocks
+	// Only 2 blocks, as there is no protective MBR
+	if (write_pos(fd, partitionSize - 2 * partition->block_size,
+			&buffer, 2 * partition->block_size) < 0) {
+		return errno;
+	}
+
+	update_disk_device_job_progress(job, 1.0);
+
+	return B_OK;
+}
+
+
+static status_t
 efi_gpt_create_child(int fd, partition_id partitionID, off_t offset,
 	off_t size, const char* type, const char* name, const char* parameters,
 	disk_job_id job, partition_id* childID)
@@ -918,7 +958,7 @@ partition_module_info gEFIPartitionModule = {
 	NULL, // set_parameters
 	NULL, // set_content_parameters
 	efi_gpt_initialize,
-	NULL, // uninitialize
+	efi_gpt_uninitialize,
 	efi_gpt_create_child,
 	efi_gpt_delete_child
 #else

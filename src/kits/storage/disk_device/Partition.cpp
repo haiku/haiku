@@ -1149,8 +1149,7 @@ BPartition::Initialize(const char* diskSystem, const char* name,
 status_t
 BPartition::Uninitialize()
 {
-	// TODO: Implement!
-	return B_NOT_SUPPORTED;
+	return fDelegate->Uninitialize();
 }
 
 
