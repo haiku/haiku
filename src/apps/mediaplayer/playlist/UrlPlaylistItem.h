@@ -54,6 +54,7 @@ protected:
 
 private:
 			BUrl				fUrl;
+			bigtime_t			fDuration;
 };
 
 #endif

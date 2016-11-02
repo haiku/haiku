@@ -14,7 +14,8 @@
 
 UrlPlaylistItem::UrlPlaylistItem(BUrl url)
 	:
-	fUrl(url)
+	fUrl(url),
+	fDuration(-1)
 {
 }
 
@@ -105,6 +106,10 @@ UrlPlaylistItem::SetAttribute(const Attribute& attribute, const int64& value)
 status_t
 UrlPlaylistItem::GetAttribute(const Attribute& attribute, int64& value) const
 {
+	if (attribute == ATTR_INT64_DURATION && fDuration >= 0) {
+		value = fDuration;
+		return B_OK;
+	}
 	return B_NOT_SUPPORTED;
 }
 
@@ -140,12 +145,14 @@ UrlPlaylistItem::RestoreFromTrash()
 bigtime_t
 UrlPlaylistItem::_CalculateDuration()
 {
-	BMediaFile mediaFile(fUrl);
+	if (fDuration < 0) {
+		BMediaFile mediaFile(fUrl);
 
-	if (mediaFile.InitCheck() != B_OK || mediaFile.CountTracks() < 1)
-		return 0;
-
-	return mediaFile.TrackAt(0)->Duration();
+		if (mediaFile.InitCheck() != B_OK || mediaFile.CountTracks() < 1)
+			return 0;
+		fDuration = mediaFile.TrackAt(0)->Duration();
+	}
+	return fDuration;
 }
 
 
