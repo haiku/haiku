@@ -742,17 +742,17 @@ efi_gpt_uninitialize(int fd, partition_id partitionID, off_t partitionSize,
 
 	update_disk_device_job_progress(job, 0.0);
 
-	const int header_size = partition->block_size * 3;
+	const int headerSize = partition->block_size * 3;
 	// The first block is the protective MBR
 	// The second block is the GPT header
 	// The third block is the start of the partition list (it can span more
 	// blocks, but that doesn't matter as soon as the header is erased).
 
-	uint8 buffer[header_size];
+	uint8 buffer[headerSize];
 	memset(buffer, 0xE5, sizeof(buffer));
 
 	// Erase the first blocks
-	if (write_pos(fd, 0, &buffer, header_size) < 0)
+	if (write_pos(fd, 0, &buffer, headerSize) < 0)
 		return errno;
 
 	// Erase the last blocks
