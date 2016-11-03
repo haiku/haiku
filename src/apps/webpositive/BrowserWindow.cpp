@@ -2406,7 +2406,8 @@ BrowserWindow::_NewTabURL(bool isNewWindow) const
 			url = fStartPageURL;
 			break;
 		case OpenSearchPage:
-			url.SetToFormat(fSearchPageURL, "");
+			url.SetTo(fSearchPageURL);
+			url.ReplaceAll("%s", "");
 			break;
 		case CloneCurrentPage:
 			if (CurrentWebView() != NULL)
@@ -2454,8 +2455,8 @@ BrowserWindow::_VisitURL(const BString& url)
 void
 BrowserWindow::_VisitSearchEngine(const BString& search)
 {
-	BString engine = "";
-	engine.SetToFormat(fSearchPageURL, _EncodeURIComponent(search).String());
+	BString engine(fSearchPageURL);
+	engine.ReplaceAll("%s", _EncodeURIComponent(search).String());
 
 	_VisitURL(engine);
 }
