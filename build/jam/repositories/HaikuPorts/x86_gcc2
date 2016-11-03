@@ -495,7 +495,8 @@ RemotePackageRepository HaikuPorts
 	sdllopan-10-2
 	sed-4.2.1-6
 	seeker-1.0-3
-	sequitur-2.1.2-5
+	sequitur-2.1.3-1
+	sequitur_devices-2.1.3-1
 	serf-1.3.8-1
 	serf_devel-1.3.8-1
 	sge-030809-2
