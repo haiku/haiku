@@ -759,6 +759,27 @@ BasicTerminalBuffer::InsertTab()
 
 
 void
+BasicTerminalBuffer::InsertCursorBackTab(int32 numTabs)
+{
+	int32 x = fCursor.x - 1;
+
+	fSoftWrappedCursor = false;
+
+	// Find the next tab stop
+	while (numTabs-- > 0)
+		for (; x >=0 && !fTabStops[x]; x--)
+			;
+	// Ensure x stays within the line bounds
+	x = restrict_value(x, 0, fWidth - 1);
+
+	if (x != fCursor.x) {
+		fCursor.x = x;
+		_CursorChanged();
+	}
+}
+
+
+void
 BasicTerminalBuffer::InsertLines(int32 numLines)
 {
 	if (fCursor.y >= fScrollTop && fCursor.y < fScrollBottom) {

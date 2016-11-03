@@ -1172,6 +1172,36 @@ TermParse::EscParse()
 					parsestate = groundtable;
 					break;
 
+				case CASE_CBT:	// cursor back tab
+					if ((column = param[0]) < 1)
+						column = 1;
+					fBuffer->InsertCursorBackTab(column);
+					parsestate = groundtable;
+					break;
+
+				case CASE_CFT:	// cursor forward tab
+					if ((column= param[0]) < 1)
+						column = 1;
+					for (int32 i = 0; i < column; ++i)
+						fBuffer->InsertTab();
+					parsestate = groundtable;
+					break;
+
+				case CASE_CNL:	// cursor next line
+					if ((row= param[0]) < 1)
+						row = 1;
+					fBuffer->SetCursorX(0);
+					fBuffer->MoveCursorDown(row);
+					parsestate = groundtable;
+					break;
+
+				case CASE_CPL:	// cursor previous line
+					if ((row= param[0]) < 1)
+						row = 1;
+					fBuffer->SetCursorX(0);
+					fBuffer->MoveCursorUp(row);
+					parsestate = groundtable;
+					break;
 				default:
 					break;
 			}

@@ -137,6 +137,7 @@ public:
 			void				InsertLF();
 			void				InsertRI();
 			void				InsertTab();
+			void				InsertCursorBackTab(int32 numTabs);
 			void				SetInsertMode(int flag);
 			void				InsertSpace(int32 num);
 			void				InsertLines(int32 numLines);

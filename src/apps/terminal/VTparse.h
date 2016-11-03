@@ -95,3 +95,7 @@
 
 #define CASE_DECSCUSR_ETC 93
 #define CASE_CSI_SP 94
+#define CASE_CBT 95
+#define CASE_CNL 96
+#define CASE_CPL 97
+#define CASE_CFT 98

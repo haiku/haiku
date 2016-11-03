@@ -522,7 +522,7 @@ AppearancePrefView::_MakeFontSizeMenu(const char* label, uint32 command,
 	menu->SetLabelFromMarked(false);
 
 	int32 sizes[] = {
-		8, 9, 10, 11, 12, 14, 16, 18, 20, 22, 24, 28, 32, 36, 0
+		8, 9, 10, 11, 12, 13, 14, 16, 18, 20, 22, 24, 28, 32, 36, 0
 	};
 
 	bool found = false;
