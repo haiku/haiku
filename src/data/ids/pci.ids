@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.10.20
-#	Date:    2016-10-20 03:15:02
+#	Version: 2016.10.29
+#	Date:    2016-10-29 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -10647,6 +10647,7 @@
 	1b00  GP102 [TITAN X]
 	1b01  GP102
 	1b30  GP102GL [Quadro P6000]
+	1b38  GP102GL [Tesla P40]
 	1b70  GP102GL
 	1b78  GP102GL
 	1b80  GP104 [GeForce GTX 1080]
@@ -10666,10 +10667,11 @@
 	1c03  GP106 [GeForce GTX 1060 6GB]
 	1c20  GP106M [GeForce GTX 1060]
 	1c30  GP106GL
+	1c35  GP106
 	1c60  GP106M [GeForce GTX 1060]
 	1c70  GP106GL
 	1c80  GP107
-	1c81  GP107
+	1c81  GP107 [GeForce GTX 1050]
 	1c82  GP107 [GeForce GTX 1050 Ti]
 	1ca7  GP107GL
 	1ca8  GP107GL
@@ -16211,6 +16213,71 @@
 	589a  T520-509A Unified Wire Ethernet Controller [VF]
 	589b  T540-509B Unified Wire Ethernet Controller [VF]
 	589c  T520-509C Unified Wire Ethernet Controller [VF]
+	6001  T6225-CR Unified Wire Ethernet Controller
+	6002  T6225-SO-CR Unified Wire Ethernet Controller
+	6003  T6425-CR Unified Wire Ethernet Controller
+	6004  T6425-SO-CR Unified Wire Ethernet Controller
+	6005  T6225-OCP-SO Unified Wire Ethernet Controller
+	6006  T62100-OCP-SO Unified Wire Ethernet Controller
+	6007  T62100-LP-CR Unified Wire Ethernet Controller
+	6008  T62100-SO-CR Unified Wire Ethernet Controller
+	6009  T6210-BT Unified Wire Ethernet Controller
+	600d  T62100-CR Unified Wire Ethernet Controller
+	6011  T6225-LL-CR Unified Wire Ethernet Controller
+	6014  T61100-OCP-SO Unified Wire Ethernet Controller
+	6015  T6201-BT Unified Wire Ethernet Controller
+	6401  T6225-CR Unified Wire Ethernet Controller
+	6402  T6225-SO-CR Unified Wire Ethernet Controller
+	6403  T6425-CR Unified Wire Ethernet Controller
+	6404  T6425-SO-CR Unified Wire Ethernet Controller
+	6405  T6225-OCP-SO Unified Wire Ethernet Controller
+	6406  T62100-OCP-SO Unified Wire Ethernet Controller
+	6407  T62100-LP-CR Unified Wire Ethernet Controller
+	6408  T62100-SO-CR Unified Wire Ethernet Controller
+	6409  T6210-BT Unified Wire Ethernet Controller
+	640d  T62100-CR Unified Wire Ethernet Controller
+	6411  T6225-LL-CR Unified Wire Ethernet Controller
+	6414  T61100-OCP-SO Unified Wire Ethernet Controller
+	6415  T6201-BT Unified Wire Ethernet Controller
+	6501  T6225-CR Unified Wire Storage Controller
+	6502  T6225-SO-CR Unified Wire Storage Controller
+	6503  T6425-CR Unified Wire Storage Controller
+	6504  T6425-SO-CR Unified Wire Storage Controller
+	6505  T6225-OCP-SO Unified Wire Storage Controller
+	6506  T62100-OCP-SO Unified Wire Storage Controller
+	6507  T62100-LP-CR Unified Wire Storage Controller
+	6508  T62100-SO-CR Unified Wire Storage Controller
+	6509  T6210-BT Unified Wire Storage Controller
+	650d  T62100-CR Unified Wire Storage Controller
+	6511  T6225-LL-CR Unified Wire Storage Controller
+	6514  T61100-OCP-SO Unified Wire Storage Controller
+	6515  T6201-BT Unified Wire Storage Controller
+	6601  T6225-CR Unified Wire Storage Controller
+	6602  T6225-SO-CR Unified Wire Storage Controller
+	6603  T6425-CR Unified Wire Storage Controller
+	6604  T6425-SO-CR Unified Wire Storage Controller
+	6605  T6225-OCP-SO Unified Wire Storage Controller
+	6606  T62100-OCP-SO Unified Wire Storage Controller
+	6607  T62100-LP-CR Unified Wire Storage Controller
+	6608  T62100-SO-CR Unified Wire Storage Controller
+	6609  T6210-BT Unified Wire Storage Controller
+	660d  T62100-CR Unified Wire Storage Controller
+	6611  T6225-LL-CR Unified Wire Storage Controller
+	6614  T61100-OCP-SO Unified Wire Storage Controller
+	6615  T6201-BT Unified Wire Storage Controller
+	6801  T6225-CR Unified Wire Ethernet Controller [VF]
+	6802  T6225-SO-CR Unified Wire Ethernet Controller [VF]
+	6803  T6425-CR Unified Wire Ethernet Controller [VF]
+	6804  T6425-SO-CR Unified Wire Ethernet Controller [VF]
+	6805  T6225-OCP-SO Unified Wire Ethernet Controller [VF]
+	6806  T62100-OCP-SO Unified Wire Ethernet Controller [VF]
+	6807  T62100-LP-CR Unified Wire Ethernet Controller [VF]
+	6808  T62100-SO-CR Unified Wire Ethernet Controller [VF]
+	6809  T6210-BT Unified Wire Ethernet Controller [VF]
+	680d  T62100-CR Unified Wire Ethernet Controller [VF]
+	6811  T6225-LL-CR Unified Wire Ethernet Controller [VF]
+	6814  T61100-OCP-SO Unified Wire Ethernet Controller [VF]
+	6815  T6201-BT Unified Wire Ethernet Controller [VF]
 	a000  PE10K Unified Wire Ethernet Controller
 1426  Storage Technology Corp.
 1427  Better On-Line Solutions
@@ -17911,6 +17978,7 @@
 	1005  MT27510 Family
 	1006  MT27511 Family
 	1007  MT27520 Family [ConnectX-3 Pro]
+		1014 04eb  2-Port 10GbE NIC and RoCE SR PCIe3
 		103c 22f3  InfiniBand FDR/Ethernet 10Gb/40Gb 2-port 544+QSFP Adapter
 		103c 22f4  InfiniBand FDR/Ethernet 10Gb/40Gb 2-port 544+FLR-QSFP Adapter
 		103c 801f  Ethernet 10G 2-port 546SFP+ Adapter
@@ -17967,6 +18035,7 @@
 		103c 1781  NC543i 1-port 4x QDR IB/Flex-10 10Gb Adapter
 		103c 3349  NC543i 2-port 4xQDR IB/10Gb Adapter
 	6750  MT26448 [ConnectX EN 10GigE, PCIe 2.0 5GT/s]
+		1014 0461  2-Port 10 GbE RoCE SR LP PCIe2 (rev b0)
 		15b3 0018  HP 10 GbE PCI-e G2 Dual-Port NIC (rev C1)
 	675a  MT25408 [ConnectX EN 10GigE 10GBaseT, PCIe Gen2 5GT/s]
 	6764  MT26468 [ConnectX EN 10GigE, PCIe 2.0 5GT/s Virtualization+]
@@ -19761,6 +19830,7 @@
 	0714  OneConnect 10Gb FCoE Initiator (be3)
 		103c 3315  NC553i 10Gb 2-port FlexFabric Converged Network Adapter
 		103c 337b  NC554FLB 10Gb 2-port FlexFabric Converged Network Adapter
+	0800  ServerView iRMC HTI
 19a8  DAQDATA GmbH
 19ac  Kasten Chase Applied Research
 	0001  ACA2400 Crypto Accelerator
@@ -20119,7 +20189,9 @@
 		1bb1 6523  Nytro XP6500-8A4096
 	0100  Nytro Flash Storage
 		1bb1 0101  Nytro XF1440
+		1bb1 0103  Nytro 5000
 		1bb1 0121  Nytro XM1440
+		1bb1 0123  Nytro 5000
 		1bb1 01a1  Nytro XP7102
 1bb3  Bluecherry
 	4304  BC-04120A MPEG4 4 port video encoder / decoder
@@ -20261,6 +20333,8 @@
 	4200  A5PL-E1-10GETI [10 GbE Ethernet Traffic Instrument]
 1d78  DERA
 1d8f  Enyx
+1d95  Graphcore Ltd
+1da1  Teko Telecom S.r.l.
 1de1  Tekram Technology Co.,Ltd.
 	0391  TRM-S1040 [DC-315 / DC-395 series]
 	2020  DC-390
@@ -22972,7 +23046,30 @@
 		e4bf 3100  CX1-BAND
 	1962  80960RM (i960RM) Microprocessor
 		105a 0000  SuperTrak SX6000 I2O CPU
+	19ac  DNV SMBus Contoller - Host
+	19b0  DNV SATA Controller 0
+	19b1  DNV SATA Controller 0
+	19b2  DNV SATA Controller 0
+	19b3  DNV SATA Controller 0
+	19b4  DNV SATA Controller 0
+	19b5  DNV SATA Controller 0
+	19b6  DNV SATA Controller 0
+	19b7  DNV SATA Controller 0
+	19be  DNV SATA Controller 0
+	19bf  DNV SATA Controller 0
+	19c0  DNV SATA Controller 1
+	19c1  DNV SATA Controller 1
+	19c2  DNV SATA Controller 1
+	19c3  DNV SATA Controller 1
+	19c4  DNV SATA Controller 1
+	19c5  DNV SATA Controller 1
+	19c6  DNV SATA Controller 1
+	19c7  DNV SATA Controller 1
+	19ce  DNV SATA Controller 1
+	19cf  DNV SATA Controller 1
+	19dc  DNV LPC or eSPI
 	19df  DNV SMBus controller
+	19e0  DNV SPI Controller
 	1a21  82840 840 [Carmel] Chipset Host Bridge (Hub A)
 	1a23  82840 840 [Carmel] Chipset AGP Bridge
 	1a24  82840 840 [Carmel] Chipset PCI Bridge (Hub B)
@@ -25843,6 +25940,9 @@
 	2f09  Xeon E7 v3/Xeon E5 v3/Core i7 PCI Express Root Port 3
 	2f0a  Xeon E7 v3/Xeon E5 v3/Core i7 PCI Express Root Port 3
 	2f0b  Xeon E7 v3/Xeon E5 v3/Core i7 PCI Express Root Port 3
+	2f0d  Haswell Xeon Non-Transparent Bridge (Back-to-back)
+	2f0e  Haswell Xeon Non-Transparent Bridge (Primary Side)
+	2f0f  Haswell Xeon Non-Transparent Bridge (Secondary Side)
 	2f10  Xeon E7 v3/Xeon E5 v3/Core i7 IIO Debug
 	2f11  Xeon E7 v3/Xeon E5 v3/Core i7 IIO Debug
 	2f12  Xeon E7 v3/Xeon E5 v3/Core i7 IIO Debug
@@ -26270,18 +26370,15 @@
 		17aa 4023  Intel Ethernet Connection X722 for 10GbE backplane
 	37cf  Ethernet Connection X722 for 10GbE QSFP+
 	37d0  Ethernet Connection X722 for 10GbE SFP+
+		17aa 4020  Intel Ethernet Connection X722 for 10G SFP+
+		17aa 4021  Intel Ethernet Connection X722 for 10G SFP+
 	37d1  Ethernet Connection X722 for 1GbE
 		17aa 4020  Intel Ethernet Connection X722 for 1GbE
 		17aa 4021  Intel Ethernet Connection X722 for 1GbE
 		17aa 4022  Intel Ethernet Connection X722 for 1GbE
-		8086 4020  Ethernet Connection X722 for 1GbE
-		8086 4021  Ethernet Connection X722 for 1GbE
-		8086 4022  Ethernet Connection X722 for 1GbE
 	37d2  Ethernet Connection X722 for 10GBASE-T
 		17aa 4020  Intel Ethernet Connection X722 for 10GBASE
 		17aa 4021  Intel Ethernet Connection X722 for 10GBASE
-		8086 4020  Ethernet Connection X722 for 10GBASE
-		8086 4021  Ethernet Connection X722 for 10GBASE
 	37d3  Ethernet Connection X722 for 10GbE SFP+
 	37d4  Ethernet Connection X722 for 10GbE QSFP+
 	37d9  X722 Hyper-V Virtual Function
@@ -27639,6 +27736,7 @@
 	a16a  Sunrise Point-H PCI Root Port #20
 	a170  Sunrise Point-H HD Audio
 	a182  Lewisburg SATA Controller [AHCI mode]
+	a186  Lewisburg SATA Controller [RAID mode]
 	a190  Lewisburg PCI Express Root Port #1
 	a191  Lewisburg PCI Express Root Port #2
 	a192  Lewisburg PCI Express Root Port #3
@@ -27674,6 +27772,7 @@
 	a1c6  Lewisburg LPC Controller
 	a1c7  Lewisburg LPC Controller
 	a1d2  Lewisburg SSATA Controller [AHCI mode]
+	a1d6  Lewisburg SSATA Controller [RAID mode]
 	a1e7  Lewisburg PCI Express Root Port #17
 	a1e8  Lewisburg PCI Express Root Port #18
 	a1e9  Lewisburg PCI Express Root Port #19
@@ -27685,6 +27784,14 @@
 	a1fa  Lewisburg IE: IDE-r
 	a1fb  Lewisburg IE: KT Controller
 	a1fc  Lewisburg IE: HECI #3
+	a202  Lewisburg SATA Controller [AHCI mode]
+	a206  Lewisburg SATA Controller [RAID mode]
+	a223  Lewisburg SMBus
+	a224  Lewisburg SPI Controller
+	a242  Lewisburg LPC or eSPI Controller
+	a243  Lewisburg LPC or eSPI Controller
+	a252  Lewisburg SSATA Controller [AHCI mode]
+	a256  Lewisburg SSATA Controller [RAID mode]
 	a620  6400/6402 Advanced Memory Buffer (AMB)
 	abc0  Omni-Path Fabric Switch Silicon 100 Series
 	b152  21152 PCI-to-PCI Bridge
