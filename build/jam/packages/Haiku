@@ -266,9 +266,8 @@ AddFilesToPackage add-ons disk_systems
 AddFilesToPackage add-ons kernel bluetooth : $(SYSTEM_BT_STACK) ;
 
 # decorators
-AddFilesToHaikuImage system non-packaged add-ons decorators
-	: BeDecorator ;
-# MacDecorator WinDecorator
+AddFilesToPackage add-ons decorators : BeDecorator ;
+	# MacDecorator WinDecorator
 
 # the MIME DB
 CopyDirectoryToPackage data : <mimedb>mime_db : : : isTarget ;
