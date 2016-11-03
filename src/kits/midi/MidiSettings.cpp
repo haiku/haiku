@@ -35,7 +35,7 @@ read_midi_settings(struct midi_settings* settings)
 			|| file.Read(buffer, sizeof(buffer)) <= 0)
 		return B_ERROR;
 
-	sscanf(buffer, "# Midi Settings\n soundfont = %s\n",
+	sscanf(buffer, "# Midi Settings\n soundfont = %[^\n]\n",
 		settings->soundfont_file);
 
 	return B_OK;
