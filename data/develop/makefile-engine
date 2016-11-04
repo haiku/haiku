@@ -302,9 +302,9 @@ $(OBJ_DIR)/%.o : %.CPP
 
 # Rules to compile the resource definition files.
 $(OBJ_DIR)/%.rsrc : %.rdef
-	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -I $(dir $<) -o "$@" -
+	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -av '^#' | $(RESCOMP) -I $(dir $<) -o "$@" -
 $(OBJ_DIR)/%.rsrc : %.RDEF
-	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -v '^#' | $(RESCOMP) -I $(dir $<) -o "$@" -
+	cat $< | $(CC) -E $(INCLUDES) $(CFLAGS) - | grep -av '^#' | $(RESCOMP) -I $(dir $<) -o "$@" -
 
 # Rule to compile localization data catalogs.
 $(CATALOGS_DIR)/%.catalog : $(CATKEYS_DIR)/%.catkeys
