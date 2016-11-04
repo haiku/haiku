@@ -467,7 +467,7 @@ struct RawDevice : Device, DoublyLinkedListLinkImpl<RawDevice> {
 			for (size_t i = 0; i < pagesToWrite; i++) {
 				if (vm_page* page = pages[i]) {
 					DEBUG_PAGE_ACCESS_START(page);
-					pages[i]->busy = true;
+					page->busy = true;
 				}
 			}
 
