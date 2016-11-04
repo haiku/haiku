@@ -1,6 +1,10 @@
 SubDir HAIKU_TOP src tests kits interface bprintjob ;
 
+UsePrivateHeaders app ;
 UsePrivateHeaders interface ;
+UsePrivateHeaders locale ;
+UsePrivateHeaders print ;
+UsePrivateHeaders shared ;
 
 SimpleTest print_test
 	: PrintTestApp.cpp
