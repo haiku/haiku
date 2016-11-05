@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Terminal	3447234076
+1	spanish; castilian	x-vnd.Haiku-Terminal	1851594193
 Not found.	Terminal TermWindow		No encontrado.
 Switch Terminals	Terminal TermWindow		Intercambiar Terminales
 Change directory	Terminal TermView		Cambiar directorio 
@@ -71,7 +71,6 @@ New tab	Terminal TermWindow		Nueva pestaña
 Selected background	Terminal AppearancePrefView		Fondo seleccionado
 Slate	Terminal colors scheme		Pizarra
 Text under cursor	Terminal AppearancePrefView		Texto bajo el cursor
-Use bright instead of bold text	Terminal AppearancePrefView		Usar texto brillante en lugar de texto en negrita
 Midnight	Terminal colors scheme		Medianoche
 Decrease	Terminal TermWindow		Disminuir
 Default	Terminal colors scheme		Predeterminada

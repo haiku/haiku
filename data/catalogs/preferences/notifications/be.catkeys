@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Notifications	4081029523
+1	belarusian	x-vnd.Haiku-Notifications	3235747343
 Notifications	GeneralView		Паведамленні
 seconds of inactivity	GeneralView		секунд прастою
 Revert	PrefletWin		Вярнуць
@@ -12,7 +12,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		Важна
 Cannot disable notifications because the server can't be reached.	GeneralView		Немагчыма выключыць паведамленні, бо сервер недаступны.
 Progress	NotificationView		Прагрэс
-Last Received	NotificationView		Апошняе атрыманае
 General	PrefletView		Агульныя
 Apply	PrefletWin		Ужыць
 Display	PrefletView		Экран

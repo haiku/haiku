@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Notifications	3961154942
+1	slovak	x-vnd.Haiku-Notifications	3115872762
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Vyskytla sa chyba pri ukladaní nastavení.\nJe možné, že vám došlo miesto na disku.
 Notifications	GeneralView		Oznamy
 seconds of inactivity	GeneralView		sekundách nečinnosti
@@ -14,7 +14,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		Dôležité
 Cannot disable notifications because the server can't be reached.	GeneralView		Nie je možné vypnúť oznamy, pretože server nebolo možné kontaktovať.
 Progress	NotificationView		Priebeh
-Last Received	NotificationView		Posledný prijatý
 General	PrefletView		Všeobecné
 Apply	PrefletWin		Použiť
 Display	PrefletView		Displej

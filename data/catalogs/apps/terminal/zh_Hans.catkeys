@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Terminal	2980268722
+1	english	x-vnd.Haiku-Terminal	1384628839
 Not found.	Terminal TermWindow		未找到。  
 Switch Terminals	Terminal TermWindow		切换终端
 Change directory	Terminal TermView		更改目录
@@ -73,7 +73,6 @@ New tab	Terminal TermWindow		新建标签
 Selected background	Terminal AppearancePrefView		选中背景
 Slate	Terminal colors scheme		岩石主题
 Text under cursor	Terminal AppearancePrefView		下划线
-Use bright instead of bold text	Terminal AppearancePrefView		使用明亮文本以代替加粗文本
 Midnight	Terminal colors scheme		午夜主题
 Decrease	Terminal TermWindow		缩小
 Default	Terminal colors scheme		默认主题

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Notifications	3961154942
+1	german	x-vnd.Haiku-Notifications	3115872762
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Das Speichern der Einstellungen ist fehlgeschlagen.\nMöglicherweise steht nicht genügend Speicherplatz zur Verfügung.
 Notifications	GeneralView		Notifications - Benachrichtigungen
 seconds of inactivity	GeneralView		Sekunden Leerlauf.
@@ -14,7 +14,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		Wichtig
 Cannot disable notifications because the server can't be reached.	GeneralView		Benachrichtigungen können nicht deaktiviert werden, weil der Server nicht erreicht werden kann.
 Progress	NotificationView		Fortschritt
-Last Received	NotificationView		Zuletzt empfangen
 General	PrefletView		Allgemein
 Apply	PrefletWin		Anwenden
 Display	PrefletView		Darstellung

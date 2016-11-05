@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-Notifications	3502142944
+1	spanish; castilian	x-vnd.Haiku-Notifications	2656860764
 Notifications	GeneralView		Notificaciones
 seconds of inactivity	GeneralView		segundos de inactividad
 Revert	PrefletWin		revertir
@@ -13,7 +13,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		Importante
 Cannot disable notifications because the server can't be reached.	GeneralView		No pudimos inutilizar notificaciones porque no pudimos contactar el servidor.
 Progress	NotificationView		Progreso
-Last Received	NotificationView		Última Fecha
 General	PrefletView		General
 Apply	PrefletWin		Aplicar
 Display	PrefletView		Visualizador

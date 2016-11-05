@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Terminal	4155859181
+1	lithuanian	x-vnd.Haiku-Terminal	2560219298
 Not found.	Terminal TermWindow		Nerasta.
 Switch Terminals	Terminal TermWindow		Pereiti į kitą terminalą
 Change directory	Terminal TermView		Keisti aplanką
@@ -65,7 +65,6 @@ New tab	Terminal TermWindow		Nauja kortelė
 Selected background	Terminal AppearancePrefView		Pažymėto teksto fono
 Slate	Terminal colors scheme		Skalūnas
 Text under cursor	Terminal AppearancePrefView		Tekstas po žymekliu
-Use bright instead of bold text	Terminal AppearancePrefView		Užuot tekstą storinus, suteikti jam skaistesnę spalvą
 Midnight	Terminal colors scheme		Vidurnaktis
 Decrease	Terminal TermWindow		Pamažinti
 Default	Terminal colors scheme		Numatytoji

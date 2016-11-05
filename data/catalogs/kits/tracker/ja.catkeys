@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	545841200
+1	japanese	x-vnd.Haiku-libtracker	3252534291
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		アドオン
 Mount settings…	ContainerWindow		マウント設定…
@@ -12,11 +12,15 @@ Window	ContainerWindow		ウィンドウ
 Decrease size	ContainerWindow		サイズを小さく
 You must have at least one attribute showing.	PoseView		最低一つの属性を表示する必要があります。
 Permissions	InfoWindow		アクセス権
+Keywords	Bookmark Query Columns		キーワード
 128 x 128	DeskWindow		128 x 128
 128 x 128	ContainerWindow		128 x 128
+If you move %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target を移動すると、%osName が正しく機能しない可能性があります!\n\n移動しますか?
 Recent documents	FavoritesMenu		最近開いたドキュメント
 Modified	QueryPoseView		更新日時
 Created	ContainerWindow		作成日時
+Unmatched brackets.	libtracker		角括弧が不一致です。
+Move	FSUtils	button label	移動
 Error %error loading add-On %name.	ContainerWindow		%nameアドオンの読み込み中に%errorエラーが発生
 Skip all	FSUtils		すべてスキップ
 contains	SelectionWindow		含む
@@ -27,11 +31,15 @@ Name	OpenWithWindow		名前
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		\"%app\" はごみ箱にあるため、\"%document\" を開けません。
 File	ContainerWindow		ファイル
 Handles any %type	OpenWithWindow		すべての%typeに対応
+Name	Person Query Columns		名前
+the config folder	FSUtils		config フォルダ
+If you alter the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo alter the system folder or its contents anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		システムフォルダやその内容を変更すると、%osName が起動しなくなります!\n\n変更しますか?\n\nそれでもシステムフォルダやその内容を変更するなら、シフトキーを押したまま \"私はなにをするか理解しています\" をクリックします。
 Delete	ContainerWindow		削除
 32 x 32	ContainerWindow		32 x 32
 Cannot unmount the boot volume \"%name\".	FSUtils		起動ボリューム \"%name\" をマウント解除できません。
 Open with…	ContainerWindow		指定アプリケーションで開く…
 Write	FilePermissionsView		書き込み
+When	Email Query Columns		受信日
 Modified	PoseView		更新日時
 Make active printer	ContainerWindow		プリンターを有効にする
 Create link here	ContainerWindow		ここにリンクを作成
@@ -44,6 +52,7 @@ greater than	FindPanel		より大きい
 Delete	PoseView		削除
 Select all	ContainerWindow		すべて選択
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		「Character」属性にはマルチバイト文字を保存できません。
+Memory corruption.	libtracker		メモリーが破損しています。
 Clean up	DeskWindow		アイコンの整列
 You cannot copy or move the root directory.	FSUtils		ルートフォルダーをコピーまたは移動はできません。
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%TotalSize中%SizeProcessed処理済, %BytesPerSecond/秒
@@ -95,11 +104,14 @@ Favorites	FavoritesMenu		お気に入り
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" はサポートされていない実行形式です。
 Sorry, you can't copy items to the Trash.	PoseView		ごみ箱にコピーすることはできません。
 matches wildcard expression	SelectionWindow		ワイルドカード表現と一致
+Large	ContainerWindow		大
 You cannot replace a folder or a symbolic link with a file.	FSUtils		フォルダーをリンクまたはファイルと置き換えることはできません。
 Show space bars on volumes	SettingsView		ディスクの容量グラフを表示する
+Company	Person Query Columns		会社
 Invert selection	ContainerWindow		選択範囲を反転
 Increase size	DeskWindow		サイズを大きく
 Resize to fit	ContainerWindow		最適な表示サイズに変更
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		%func にて\nfind_directory() が失敗。\nエラー: %error
 Add printer…	ContainerWindow		プリンターの追加…
 New folder	ContainerWindow		新規フォルダー
 Kind	ContainerWindow		種類
@@ -107,16 +119,21 @@ home	B_USER_DIRECTORY		ホーム
 Select…	ContainerWindow		選択…
 Copy to	ContainerWindow		指定先にコピー
 Move to Trash	ContainerWindow		ごみ箱に移動
+If you move the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo move the system folder or its contents anyway, hold down the Shift key and click \"Move\".	FSUtils		システムフォルダやその内容を移動すると、%osName が起動しなくなります!\n\n移動しますか?\n\nそれでもシステムフォルダやその内容を移動するなら、シフトキーを押しながら \"移動\" をクリックしてください。
+Modified	Default Query Columns		更新日時
 Move to	ContainerWindow		指定先に移動
 Create %s clipping	PoseView		%s クリップを作成
 Set new link target	InfoWindow		リンク先を変更
 Save as Query template:	FindPanel		クエリ雛型として保存する:
 preferences	B_PREFERENCES_DIRECTORY		設定
+Unmatched parenthesis.	libtracker		括弧が不一致です。
 Cancel	FSUtils		中止
 Edit name	ContainerWindow		名前を編集
+Nested *?+.	libtracker		*?+ が入れ子になっています。
 Show volumes on Desktop	SettingsView		ディスクをデスクトップに表示する
 KiB	WidgetAttributeText		KiB
 Error %error loading Add-On %name.	ContainerWindow		%nameアドオンの読み込み中に%errorエラーが発生
+Mini	ContainerWindow		小
 Defaults	TrackerSettingsWindow		デフォルト
 Mini icon view	ContainerWindow		ミニアイコン表示
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		ファイルが誤って実行可能に設定されているため、\"%name\" を開けませんでした。
@@ -132,11 +149,13 @@ Searching for disks to mount…	StatusWindow		マウントできるディスク�
 New folder	FSUtils		新規フォルダー
 Free space color	SettingsView		空き容量の色
 Cut	ContainerWindow		切り取り
+Status	Email Query Columns		状態
 Remove	FindPanel		削除
 Resize to fit	QueryContainerWindow		最適な表示サイズに変更
 Desktop	TrackerSettingsWindow		デスクトップ
 Sorry, you can't copy items to the Trash.	FSClipBoard		ごみ箱にコピーすることはできません。
 by attribute	FindPanel		属性で検索
+Too many parenthesis.	libtracker		括弧が多すぎます。
 Disk mounting during boot	AutoMounterSettings		起動時の設定
 New Query	FindPanel		新規クエリ
 Preparing to move items…	StatusWindow		移動の準備をしています…
@@ -161,6 +180,7 @@ Size	PoseView		サイズ
 Location	OpenWithWindow		場所
 Force identify	ContainerWindow		ファイル形式を判別
 Duplicate	ContainerWindow		複製
+Corrupted pointers.	libtracker		ポインターが破損しています。
 New folder%ld	FSUtils		新規フォルダー %ld 
 Outline selection rectangle only	SettingsView		マウスドラッグ選択時アウトラインのみ表示
 Select all	DeskWindow		すべて選択
@@ -187,6 +207,7 @@ You cannot create a link to the root directory.	FSUtils		ルートフォルダ�
 48 x 48	ContainerWindow		48 x 48
 Could not find application \"%appname\"	OpenWithWindow		アプリケーション \"%appname\" が見つかりませんでした
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		選択した項目をごみ箱に移動できません。完全に削除しても良いでしょうか? 元には戻せませんので、ご注意ください。
+Work Phone	Person Query Columns		勤務先の電話番号
 Invert	SelectionWindow		反転
 Find	FindPanel		検索
 Get info	ContainerWindow		詳細情報…
@@ -198,14 +219,17 @@ The Tracker must be running to see set the default printer.	PoseView		デフォ�
 {0, plural, one{# byte} other{# bytes}}	FSUtils		{0, plural, one{# バイト} other{# バイト}}
 by formula	FindPanel		式で検索
 40 x 40	DeskWindow		40 x 40
+Corrupted expression.	libtracker		式が間違っています。
 Name	PoseView		名前
 Group	FilePermissionsView		グループ
+Subject	Email Query Columns		件名
 Version:	InfoWindow		バージョン:
 Created:	InfoWindow		作成日時:
 \nShould this be fixed?	FSUtils		\n修復しますか？
 Copying: 	StatusWindow		コピー中:
 Capacity:	InfoWindow		容量:
 Delete	FilePanelPriv		削除
+Path	Default Query Columns		パス
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# バイト)} other{(# バイト)}}
 Save	FindPanel		保存
 copy	FSUtils	filename copy	コピー
@@ -217,6 +241,7 @@ Save query as template…	FindPanel		クエリテンプレートとして保存�
 Show folder location in title tab	SettingsView		タイトルタブにフォルダー位置を表示
 Proceed	FSUtils		続行
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		%verbしようとしているものと同じ名前の項目がすでにフォルダーの中に存在します。\n \n%verbして置き換えますか？それとも、一つずつ確認しますか？
+Rename	FSUtils	button label	名前の変更
 The mount server could not be contacted.	AutoMounterSettings		マウントサーバーが応答しません。
 Error deleting items	FSUtils		ファイル削除中にエラーが発生しました
 Create relative link here	ContainerWindow		ここに相対リンクを作成
@@ -244,21 +269,26 @@ Reverse order	ContainerWindow		逆順にする
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# アイテム} other{# アイテム}}
 OK	OpenWithWindow		OK
 Add current folder	FilePanelPriv		このフォルダーを追加
+Invalid bracket range.	libtracker		角括弧内の範囲が正しくありません。
+Name	Default Query Columns		名前
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を \"%app\" で開けませんでした (シンボル %symbol が見つかりません)。\n
 The target disk does not support creating links.	FSUtils		指定されたディスクはリンクをサポートしていません。
 starts with	SelectionWindow		指定文字列で始まる
+Corrupted opcode.	libtracker		オペコードが壊れています。
 Preparing to delete items…	StatusWindow		削除の準備をしています…
 Enable type-ahead filtering	SettingsView		先行入力フィルターを有効にする
 Would you like to find a suitable application to open the file?	FSUtils		このファイルを開くことのできるアプリケーションを検索しますか?
 There was an error writing the attribute.	WidgetAttributeText		属性の書き込み中にエラーが発生しました。
 Recalculate folder size	InfoWindow		フォルダーサイズを再計算
 Unknown	WidgetAttributeText		不明
+I know what I'm doing	FSUtils	button label	私はなにをするか理解しています
 Could not open \"%document\" (Missing symbol: %symbol). \n	FSUtils		\"%document\" を開けませんでした (シンボル %symbol がありません)。\n
 by name	FindPanel		名前で検索
 Creating links: 	StatusWindow		作成中リンク:
 Paused: click to resume or stop	StatusWindow		一時停止中: クリックで動作の再開また中断をしてください 
 Preferred for %type	OpenWithWindow		%type対応優先アプリ
 GiB	WidgetAttributeText		GiB
+Title	Bookmark Query Columns		タイトル
 There was an error deleting \"%name\":\n\t%error	FSUtils		\"%name\" の移動中にエラーが発生しました:\n\t%error
 Paste	FilePanelPriv		貼り付け
 Copy more	ContainerWindow		さらにコピー
@@ -271,6 +301,7 @@ File	FilePanelPriv		ファイル
 Real name	ContainerWindow		実名
 Error moving \"%name\"	FSUtils		\"%name\"の移動中にエラーが発生
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		ホームフォルダを移動すると、%osName は正しく動作しないかもしれません!\n\n移動しますか?\n\nそれでもホームフォルダを移動するなら、シフトキーを押しながら \"移動\" を押してください。
 Cancel	WidgetAttributeText		中止
 Could not find an application to open \"%name\" (%error). 	FSUtils		%errorエラーが発生したため、\"%name\" を開くアプリケーションが見つかりませんでした。
 Create a Query template	FindPanel		クエリ雛型を作成
@@ -282,7 +313,9 @@ Show Disks icon	SettingsView		ディスクアイコンを表示
 Cancel	PoseView		中止
 You can't move or copy items to read-only volumes.	FSUtils		読み取り専用パーティションへファイルまたはフォルダーを移動やコピーはできません。
 Unknown	FilePermissionsView		不明
+Junk on end.	libtracker		Junk on end.
 All files and folders	FindPanel		すべてのファイルとフォルダー
+Trailing \\.	libtracker		行末に \\ があります。
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{# 個のファイル} other{# 個のファイル}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		%libraryライブラリがインストールされてないため、\"%document\" を開けませんでした。\n
 The Tracker must be running to see Info windows.	PoseView		情報ウィンドウを表示するには、Trackerが実行されている必要があります。
@@ -292,6 +325,7 @@ Permissions	ContainerWindow		アクセス権
 96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		移動中
 Identify	InfoWindow		ファイル形式を判別
+Internal error.	libtracker		内部エラーが発生しました。
 Recent folders	ContainerWindow		最近開いたフォルダー
 Close all	ContainerWindow		すべて閉じる
 Include trash	FindPanel		ごみ箱を含む
@@ -307,9 +341,12 @@ after	FindPanel		以降
 Select…	QueryContainerWindow		選択…
 More options	FindPanel		検索オプションを表示
 link	FSUtils	filename link	リンク
+Expression too long.	libtracker		式が長過ぎます。
 The specified name is illegal. Please choose another name.	FilePanelPriv		指定された名前は利用できない文字を含んでいます。他の名前を指定してください。
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		フォルダーを同じフォルダーやサブフォルダーに移動できません。
+?+* follows nothing.	libtracker		?+* のうしろに何もありません。
 Handles any file	OpenWithWindow		すべてのファイルに対応
+E-mail	Person Query Columns		電子メール
 Get info	FilePanelPriv		詳細情報…
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		中止
@@ -322,6 +359,7 @@ Sorry, could not create a new folder.	FSUtils		新規フォルダーを作成で
 Disk mount	TrackerSettingsWindow		ディスクのマウント
 multiple disks	FindPanel		複数ディスク
 You must drop items on one of the disk icons in the \"Disks\" window.	PoseView		\"Disks\" ウィンドウ内のディスクアイコンの上に項目をドラッグ＆ドロップしてください。
+the settings folder	FSUtils		settings フォルダ
 Untitled clipping	PoseView		無名クリッピング
 Don't automount	AutoMounterSettings		自動マウントを使わない
 Save	FilePanelPriv		保存
@@ -332,6 +370,7 @@ Size:	InfoWindow		サイズ:
 Empty folder	SlowContextPopup		空フォルダー
 Open selection with:	OpenWithWindow		選択ファイルをアプリケーションで開く:
 Preparing to create links…	StatusWindow		リンク作成の準備をしています…
+Size	Default Query Columns		サイズ
 Show navigator	SettingsView		ツールバーを表示
 Desktop	B_DESKTOP_DIRECTORY		デスクトップ
 List folders first	SettingsView		フォルダーを先頭に表示
@@ -339,10 +378,12 @@ Name	SelectionWindow		名前
 Trash	Model		ごみ箱
 Favorites	FilePanelPriv		お気に入り
 Name	QueryPoseView		名前
+OK	Email Query Columns		OK
 Delete	FSUtils		削除
 Modified	FindPanel		更新日時
 Error moving \"%name\" to Trash. (%error)	FSUtils		\"%name\" をごみ箱に移動しようとしたら、エラーが発生しました。(%error)
 You can't replace a folder with one of its sub-folders.	FSUtils		サブフォルダーを同名のフォルダーと置き換えられません。
+If you alter %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target を変更すると、%osName は正しく動作しないかもしれません!\n\n変更しますか?
 <No recent items>	FavoritesMenu		<最近使った項目はありません>
 Preferences…	ContainerWindow		設定…
 Move	PoseView		移動
@@ -354,8 +395,10 @@ And	FindPanel		かつ
 Select…	DeskWindow		選択…
 Copy	FilePanelPriv		コピー
 Icon view	DeskWindow		アイコン表示
+If you alter the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo alter the home folder anyway, hold down the Shift key and click \"I know what I'm doing\".	FSUtils		ホームフォルダの内容を変更すると、%osName は正しく動作しないかもしれません!\n\n内容を変更しますか?\n\nそれでもホームフォルダの内容を変更するなら、シフトキーを押しながら \"私はなにをするか理解しています\" をクリックしてください。
 Select all	QueryContainerWindow		すべて選択
 Files cannot be moved or deleted from a read-only volume.	PoseView		読み取り専用パーティションへの移動やファイルの削除はできません。
+If you rename the system folder or its contents, you won't be able to boot %osName!\n\nAre you sure you want to do this?\n\nTo rename the system folder or its contents anyway, hold down the Shift key and click \"Rename\".	FSUtils		システムフォルダやその内容の名前を変更すると、%osName が起動しなくなります!\n\n変更しますか?\n\nそれでもシステムフォルダやその内容の名前を変更するなら、シフトキーを押しながら \"名前の変更\" をクリックしてください。
 There was a problem trying to replace \"%name\". The item might be open or busy.	FSUtils		\"%name\"を置き換えようとしたら不具合が発生しました。項目は開いた状態か使用中かもしれません。
 Owner	FilePermissionsView		所有者
 There was a problem trying to save in the folder you specified. Please try another one.	FilePanelPriv		指定されたフォルダーへの保存に失敗しました。別のフォルダーを指定してみてください。
@@ -372,6 +415,7 @@ Cancel	OpenWithWindow		中止
 That name is too long. Please type another one.	InfoWindow		名前が長すぎます。もっと短い名前にしてください。
 OK	FSUtils		OK
 Paste layout	ContainerWindow		レイアウトを貼り付ける
+If you rename %target, %osName may not behave properly!\n\nAre you sure you want to do this?	FSUtils		%target の名前を変更すると、%osName は正しく動作しないかもしれません!\n\n名称を変更しますか?
 Select	InfoWindow		選択
 Could not update permissions of file \"%name\". %error	FSUtils		\"%name\"の権限を更新できませんでした。%error
 Select…	FilePanelPriv		\"%name\" は古い実行形式です。最新版を入手するか、アプリケーションをリコンパイルしてください。
@@ -383,6 +427,7 @@ ends with	SelectionWindow		指定文字列で終わる
 Volume icons	TrackerSettingsWindow		ディスクアイコン
 That name is already taken. Please type another one.	WidgetAttributeText		指定された名前はすでに使用されています。別の名前を指定してください。
 Close	QueryContainerWindow		閉じる
+the MIME settings	FSUtils		MIME 設定
 Formula %formula	FindPanel	FindResultTitle	式 %formula
 Kind:	InfoWindow		種類:
 starts with	FindPanel		指定文字列で始まる
@@ -391,12 +436,14 @@ is	FindPanel		と等しい
 Attributes	ContainerWindow		属性
 Handles %type	OpenWithWindow		%type に対応
 ends with	FindPanel		指定文字列で終わる
+URL	Bookmark Query Columns		URL
 New	ContainerWindow		新規
 Name matches wildcard expression:###	SelectionWindow		ファイル名がワイルドカード表現と一致: ###
 less than	FindPanel		より小さい
 64 x 64	DeskWindow		64 x 64
 develop	B_SYSTEM_DEVELOP_DIRECTORY		develop
 Modified	ContainerWindow		更新日時
+*+? operand may be empty.	libtracker		*+? オペランドが空かもしれません。
 Edit Query template	FindPanel		クエリテンプレートを編集
 Prompt	FSUtils		プロンプト
 Edit query	ContainerWindow		クエリを編集
@@ -412,6 +459,7 @@ parent folder	NavMenu		親フォルダー
 contains	FindPanel		含む
 Relation	OpenWithWindow		関連
 Open	FilePanelPriv		開く
+From	Email Query Columns		差出人
 Mount	DeskWindow		マウント
 Recent queries	FindPanel		最近のクエリー
 Mount	ContainerWindow		マウント

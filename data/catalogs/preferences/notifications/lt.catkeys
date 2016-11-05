@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Notifications	4081029523
+1	lithuanian	x-vnd.Haiku-Notifications	3235747343
 Notifications	GeneralView		Pranešimai
 seconds of inactivity	GeneralView		sek. pasyvumo
 Revert	PrefletWin		Atšaukti pakeitimus
@@ -12,7 +12,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		Svarbu
 Cannot disable notifications because the server can't be reached.	GeneralView		Pranešimų išjungti nepavyko, nes pranešimų tarnyba nepasiekiama.
 Progress	NotificationView		Eiga
-Last Received	NotificationView		Paskiausiai gautas
 General	PrefletView		Bendrosios
 Apply	PrefletWin		Taikyti
 Display	PrefletView		Išvaizda

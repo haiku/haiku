@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Terminal	2980268722
+1	romanian	x-vnd.Haiku-Terminal	1384628839
 Not found.	Terminal TermWindow		Nu a fost găsit.
 Switch Terminals	Terminal TermWindow		Comută terminale
 Change directory	Terminal TermView		Modifică dosar
@@ -73,7 +73,6 @@ New tab	Terminal TermWindow		Tab nou
 Selected background	Terminal AppearancePrefView		Fundal selectat
 Slate	Terminal colors scheme		Tablă
 Text under cursor	Terminal AppearancePrefView		Text sub cursor
-Use bright instead of bold text	Terminal AppearancePrefView		Utilizează text luminos în loc de aldin
 Midnight	Terminal colors scheme		Miezul nopții
 Decrease	Terminal TermWindow		Micșorează
 Default	Terminal colors scheme		Implicit

@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaPlayer	3805057997
+1	french	x-vnd.Haiku-MediaPlayer	3946855505
 raw audio	MediaPlayer-InfoWin		audio brut
 Location	MediaPlayer-InfoWin		Emplacement
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
@@ -29,10 +29,12 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Obteni
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinémascope)
 Display mode	MediaPlayer-InfoWin		Modes d’affichage
 Medium	MediaPlayer-SettingsWindow		Intermédiaire
+Open network stream	MediaPlayer-NetworkStream		Ouvrir un flux réseau
 Close	MediaPlayer-PlaylistWindow		Fermer
 Open…	MediaPlayer-PlaylistWindow		Ouvrir…
 Toggle mute.	MediaPlayer-Main		(Dés)Activer la sourdine.
 Undo	MediaPlayer-PlaylistWindow		Annuler
+Stream URL:	MediaPlayer-NetworkStream		URL du flux :
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Utiliser le recouvrement vidéo si le matériel est disponible
 File info…	MediaPlayer-Main		Informations du fichier…
 Pause playback.	MediaPlayer-Main		Suspendre la lecture.
@@ -79,6 +81,7 @@ Skip to the previous track.	MediaPlayer-Main		Passer à la piste précédente.
 Close window after playing video	MediaPlayer-SettingsWindow		Fermer la fenêtre après la lecture des vidéos
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Redimensionner le film harmonieusement (mode sans-recouvrements)
 OK	MediaPlayer-RemovePLItemsCmd		OK
+Open network stream	MediaPlayer-Main		Ouvrir un flux réseau
 50% scale	MediaPlayer-Main		Échelle 50%
 Subtitles	MediaPlayer-Main		Sous-titres
 Prev	MediaPlayer-Main		Précédent
@@ -126,6 +129,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Copier l’entrée
 none	Subtitles menu		aucun
 Move file to Trash	MediaPlayer-PlaylistWindow		Envoyer le fichier à la corbeille
 URI	MediaPlayer-Main		URI
+OK	MediaPlayer-NetworkStream		OK
 Mute	MediaPlayer-Main		Muet
 Toggle pause/play.	MediaPlayer-Main		Basculer entre lecture et pause.
 min	MediaPlayer-InfoWin	Minutes	min
@@ -140,12 +144,14 @@ Start media server	MediaPlayer-Main		Démarrer le serveur de médias
 Toggle fullscreen.	MediaPlayer-Main		Basculer en plein écran.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Obtenir la durée de l’élément en cours de lecture en microsecondes.
 ToggleFullscreen	MediaPlayer-Main		Basculer en plein écran
+Bad URL	MediaPlayer-NetworkStream		URL invalide
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stéréo} other{# Canaux}}
 <unnamed>	PlaylistItem-name		<sans nom>
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		aucun
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obtenir/définir le volume (0.0-2.0).
 Duration	MediaPlayer-Main		Durée
+Cancel	MediaPlayer-NetworkStream		Annuler
 Playlist…	MediaPlayer-Main		Liste de lecture…
 <unknown>	PlaylistItem-author		<inconnu>
 Save as…	MediaPlayer-PlaylistWindow		Enregistrer sous…

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Terminal	4155859181
+1	ukrainian	x-vnd.Haiku-Terminal	2560219298
 Not found.	Terminal TermWindow		Не знайдено.
 Switch Terminals	Terminal TermWindow		Перемкнути термінали
 Change directory	Terminal TermView		Змінити каталог
@@ -65,7 +65,6 @@ New tab	Terminal TermWindow		Нова вкладка
 Selected background	Terminal AppearancePrefView		Вибрати тло
 Slate	Terminal colors scheme		Шифер
 Text under cursor	Terminal AppearancePrefView		Текст під курсором
-Use bright instead of bold text	Terminal AppearancePrefView		Використовувати яскравий текст замість повного
 Midnight	Terminal colors scheme		Північ
 Decrease	Terminal TermWindow		Зменшити
 Default	Terminal colors scheme		Типовий

@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-Notifications	2718138102
+1	dutch; flemish	x-vnd.Haiku-Notifications	1872855922
 Notifications	GeneralView		Aankondigingen
 seconds of inactivity	GeneralView		seconden inactief
 Revert	PrefletWin		Herstellen
@@ -12,7 +12,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		Belangrijk
 Cannot disable notifications because the server can't be reached.	GeneralView		Kan aankondigingen niet aanzetten omdat de server niet bereikt kan worden.
 Progress	NotificationView		Voortgang
-Last Received	NotificationView		Laatst ontvangen
 General	PrefletView		Algemeen
 Display	PrefletView		Weergave
 Search:	NotificationView		Zoek:

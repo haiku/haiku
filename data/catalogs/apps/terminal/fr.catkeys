@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	2980268722
+1	french	x-vnd.Haiku-Terminal	1384628839
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -73,7 +73,6 @@ New tab	Terminal TermWindow		Nouvel onglet
 Selected background	Terminal AppearancePrefView		Fond sélectionné
 Slate	Terminal colors scheme		Ardoise
 Text under cursor	Terminal AppearancePrefView		Texte sous le curseur
-Use bright instead of bold text	Terminal AppearancePrefView		Utiliser du clair plutôt que du texte gras
 Midnight	Terminal colors scheme		Minuit
 Decrease	Terminal TermWindow		Réduire
 Default	Terminal colors scheme		Par défaut

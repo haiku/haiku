@@ -1,5 +1,6 @@
-1	french	x-vnd.Haiku-Expander	2825008254
+1	french	x-vnd.Haiku-Expander	130018254
 Expand	ExpanderMenu		Décompresser
+Expanding '%s'…	ExpanderWindow		Décompression de « %s »…
 Close window when done expanding	ExpanderPreferences		Fermer la fenêtre après l’extraction
 Set destination…	ExpanderMenu		Choisir la destination…
 Use:	ExpanderPreferences		Utiliser :
@@ -43,6 +44,7 @@ Expand	ExpanderWindow		Décompresser
 Close	ExpanderMenu		Fermer
 The destination is not a folder.	ExpanderWindow		La destination n’est pas un dossier.
 Open destination folder after extraction	ExpanderPreferences		Ouvrir le dossier de destination après l’extraction
+Creating listing for '%s'…	ExpanderWindow		Créer un inventaire pour « %s »…
 Set source…	ExpanderMenu		Choisir la source…
 Show contents	ExpanderMenu		Montrer le contenu
 Stop	ExpanderWindow		Arrêt

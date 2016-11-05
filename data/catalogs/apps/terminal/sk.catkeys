@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Terminal	2980268722
+1	slovak	x-vnd.Haiku-Terminal	1384628839
 Not found.	Terminal TermWindow		Nenájdené.
 Switch Terminals	Terminal TermWindow		Prepnúť terminály
 Change directory	Terminal TermView		Zmeniť adresár
@@ -73,7 +73,6 @@ New tab	Terminal TermWindow		Nová karta
 Selected background	Terminal AppearancePrefView		Vybrané pozadie
 Slate	Terminal colors scheme		Bridlica
 Text under cursor	Terminal AppearancePrefView		Text pod kurzorom
-Use bright instead of bold text	Terminal AppearancePrefView		Použiť svetlý text namiesto hrubého
 Midnight	Terminal colors scheme		Polnoc
 Decrease	Terminal TermWindow		Zmenšiť
 Default	Terminal colors scheme		Predvolená

@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-MediaPlayer	3805057997
+1	japanese	x-vnd.Haiku-MediaPlayer	2558878117
 raw audio	MediaPlayer-InfoWin		raw オーディオ
 Location	MediaPlayer-InfoWin		場所
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
@@ -29,10 +29,12 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		現在
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (シネマスコープ)
 Display mode	MediaPlayer-InfoWin		表示モード
 Medium	MediaPlayer-SettingsWindow		中
+Open network stream	MediaPlayer-NetworkStream		ネットワークストリームを開く
 Close	MediaPlayer-PlaylistWindow		閉じる
 Open…	MediaPlayer-PlaylistWindow		開く…
 Toggle mute.	MediaPlayer-Main		ミュートのオン / オフ
 Undo	MediaPlayer-PlaylistWindow		元に戻す
+Stream URL:	MediaPlayer-NetworkStream		ストリームのURL:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		利用できるなら、ハードウェアビデオオーバーレイを使う
 File info…	MediaPlayer-Main		ファイル情報…
 Pause playback.	MediaPlayer-Main		再生を一時停止する。
@@ -79,6 +81,7 @@ Skip to the previous track.	MediaPlayer-Main		前のトラックに飛ぶ
 Close window after playing video	MediaPlayer-SettingsWindow		ビデオ再生終了後、ウィンドウを閉じる
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		ムービーのスムーズな拡大縮小 (オーバーレイモード以外)
 OK	MediaPlayer-RemovePLItemsCmd		OK
+Open network stream	MediaPlayer-Main		ネットワークストリームを開く 
 50% scale	MediaPlayer-Main		50% 表示
 Subtitles	MediaPlayer-Main		字幕
 Prev	MediaPlayer-Main		前に
@@ -126,6 +129,8 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		項目をコピー
 none	Subtitles menu		無し
 Move file to Trash	MediaPlayer-PlaylistWindow		ファイルをごみ箱に移動
 URI	MediaPlayer-Main		URI
+Invalid URL inserted!	MediaPlayer-NetworkStream		無効な URL が書き込まれました!
+OK	MediaPlayer-NetworkStream		OK
 Mute	MediaPlayer-Main		ミュート
 Toggle pause/play.	MediaPlayer-Main		一時停止 / 再生
 min	MediaPlayer-InfoWin	Minutes	分
@@ -140,12 +145,14 @@ Start media server	MediaPlayer-Main		メディアサーバーを起動する
 Toggle fullscreen.	MediaPlayer-Main		全画面表示 / 解除
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		現在再生中の項目の再生時間をマイクロセコンド単位で得る。
 ToggleFullscreen	MediaPlayer-Main		全画面表示 / 解除
+Bad URL	MediaPlayer-NetworkStream		Bad URL
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{モノラル} =2{ステレオ} other{# チャンネル}}
 <unnamed>	PlaylistItem-name		<名前が無い>
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		無し
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		ボリュームの取得および設定 (0.0-2.0) 。
 Duration	MediaPlayer-Main		再生時間
+Cancel	MediaPlayer-NetworkStream		取り消し
 Playlist…	MediaPlayer-Main		プレイリスト…
 <unknown>	PlaylistItem-author		<不明>
 Save as…	MediaPlayer-PlaylistWindow		名前を付けて保存…

@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Notifications	3961154942
+1	swedish	x-vnd.Haiku-Notifications	3115872762
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Ett fel uppstod när inställningarna skulle sparas.\nEn möjlighet är att du har slut på diskutrymme.
 Notifications	GeneralView		Aviseringar
 seconds of inactivity	GeneralView		sekunder av inaktivitet
@@ -14,7 +14,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		Viktigt
 Cannot disable notifications because the server can't be reached.	GeneralView		Kan inte inaktivera aviseringarna eftersom servern inte kan nås.
 Progress	NotificationView		Progress
-Last Received	NotificationView		Sista mottagna 
 General	PrefletView		Allmän
 Apply	PrefletWin		Verkställ
 Display	PrefletView		Visa

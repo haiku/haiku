@@ -7,7 +7,7 @@ none	Groups list		無し
 Configure attributes	People		属性を編集
 Company	People		会社
 %name% picture	People		%name% の画像
-Work phone	People		会社の電話番号
+Work phone	People		勤務先の電話番号
 People	System name		People
 New person	People		新規作成
 Select all	People		すべて選択

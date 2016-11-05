@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-Terminal	4155859181
+1	belarusian	x-vnd.Haiku-Terminal	2560219298
 Not found.	Terminal TermWindow		Не знойдзена.
 Switch Terminals	Terminal TermWindow		Пераключыць Тэрміналы
 Change directory	Terminal TermView		Змяніць дырэкторыю
@@ -65,7 +65,6 @@ New tab	Terminal TermWindow		Новая ўкладка
 Selected background	Terminal AppearancePrefView		Выбраны фон
 Slate	Terminal colors scheme		Шыфер
 Text under cursor	Terminal AppearancePrefView		Тэкст пад курсорам
-Use bright instead of bold text	Terminal AppearancePrefView		Выкарыстоўваць светлы тэкст замест тлустага
 Midnight	Terminal colors scheme		Поўнач
 Decrease	Terminal TermWindow		Паменшыць
 Default	Terminal colors scheme		Дапомная

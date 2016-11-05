@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Notifications	3961154942
+1	finnish	x-vnd.Haiku-Notifications	3115872762
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Asetuksia tallennettaessa tapahtui virhe.\nLevytila on mahdollisesti lopussa.
 Notifications	GeneralView		Ilmoitukset
 seconds of inactivity	GeneralView		joutilaisuussekunnit
@@ -14,7 +14,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		Tärkeä
 Cannot disable notifications because the server can't be reached.	GeneralView		Ilmoitusten ottaminen pois käytöstä epäonnistui, koska palvelinta ei tavoiteta.
 Progress	NotificationView		Edistyminen
-Last Received	NotificationView		Viimeksi vastaanotettu
 General	PrefletView		Yleistä
 Apply	PrefletWin		Käytä
 Display	PrefletView		Näyttö

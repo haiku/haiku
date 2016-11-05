@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-Terminal	2980268722
+1	swedish	x-vnd.Haiku-Terminal	1384628839
 Not found.	Terminal TermWindow		Hittades ej.
 Switch Terminals	Terminal TermWindow		Växla terminal
 Change directory	Terminal TermView		Byt katalog
@@ -73,7 +73,6 @@ New tab	Terminal TermWindow		Ny flik
 Selected background	Terminal AppearancePrefView		Vald bakgrund
 Slate	Terminal colors scheme		Slate
 Text under cursor	Terminal AppearancePrefView		Text under markören
-Use bright instead of bold text	Terminal AppearancePrefView		Använd ljus istället för fet text
 Midnight	Terminal colors scheme		Midnatt
 Decrease	Terminal TermWindow		Minska
 Default	Terminal colors scheme		Standard

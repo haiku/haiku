@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Notifications	3961154942
+1	hungarian	x-vnd.Haiku-Notifications	3115872762
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Nem sikerült menteni a beállításokat.\nLehetséges, hogy nincsen több szabad hely a lemezen.
 Notifications	GeneralView		Értesítések
 seconds of inactivity	GeneralView		másodpercnyi inaktivitás után
@@ -14,7 +14,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		Fontos
 Cannot disable notifications because the server can't be reached.	GeneralView		Nem lehet letiltani az értesítéseket, mert nem sikerült elérni a kiszolgálót.
 Progress	NotificationView		Folyamat
-Last Received	NotificationView		Legutóbbi fogadott
 General	PrefletView		Általános
 Apply	PrefletWin		Alkalmaz
 Display	PrefletView		Kijelző

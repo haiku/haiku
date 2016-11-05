@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-Terminal	2980268722
+1	finnish	x-vnd.Haiku-Terminal	1384628839
 Not found.	Terminal TermWindow		Ei löytynyt.
 Switch Terminals	Terminal TermWindow		Vaihda pääteikkunoita
 Change directory	Terminal TermView		Vaihda hakemistoa
@@ -73,7 +73,6 @@ New tab	Terminal TermWindow		Uusi välilehti
 Selected background	Terminal AppearancePrefView		Valitse tausta
 Slate	Terminal colors scheme		Laatta
 Text under cursor	Terminal AppearancePrefView		Teksti kohdistimen alla
-Use bright instead of bold text	Terminal AppearancePrefView		Käytä vaaleaa eikä vahvennettua tekstiä
 Midnight	Terminal colors scheme		Keskiyö
 Decrease	Terminal TermWindow		Vähennä
 Default	Terminal colors scheme		Oletus

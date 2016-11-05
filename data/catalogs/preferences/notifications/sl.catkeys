@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-Notifications	2659658615
+1	slovenian	x-vnd.Haiku-Notifications	1814376435
 Notifications	GeneralView		Obvestila
 seconds of inactivity	GeneralView		sekundah nedejavnosti
 Revert	PrefletWin		Povrni
@@ -11,7 +11,6 @@ Notifications cannot be stopped, because the server can't be reached.	GeneralVie
 Important	NotificationView		Pomembno
 Cannot disable notifications because the server can't be reached.	GeneralView		Ni mogoče onemogočiti obvestil, ker ni mogoče doseči strežnika.
 Progress	NotificationView		Potek
-Last Received	NotificationView		Zadnjič prejeto
 General	PrefletView		Splošno
 Apply	PrefletWin		Uporabi
 Display	PrefletView		Prikaz

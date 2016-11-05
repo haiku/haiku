@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Notifications	4081029523
+1	ukrainian	x-vnd.Haiku-Notifications	3235747343
 Notifications	GeneralView		Повідомлення
 seconds of inactivity	GeneralView		секунд бездіяльності
 Revert	PrefletWin		Повернути
@@ -12,7 +12,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		Важливо
 Cannot disable notifications because the server can't be reached.	GeneralView		Неможливо відмінити повідомлення, бо сервер недоступний.
 Progress	NotificationView		Хід
-Last Received	NotificationView		Останє повідомлення  отримано
 General	PrefletView		Основні
 Apply	PrefletWin		Застосувати
 Display	PrefletView		Дисплей

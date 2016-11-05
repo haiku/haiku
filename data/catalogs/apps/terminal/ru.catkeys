@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Terminal	4292164358
+1	russian	x-vnd.Haiku-Terminal	2696524475
 Not found.	Terminal TermWindow		Текст не найден
 Switch Terminals	Terminal TermWindow		Переключить терминалы
 Change directory	Terminal TermView		Сменить каталог
@@ -73,7 +73,6 @@ New tab	Terminal TermWindow		Новая вкладка
 Selected background	Terminal AppearancePrefView		Выделенного фона
 Slate	Terminal colors scheme		Шифер
 Text under cursor	Terminal AppearancePrefView		Текст под курсором
-Use bright instead of bold text	Terminal AppearancePrefView		Использовать светлый текст вместо жирного
 Midnight	Terminal colors scheme		Полночь
 Decrease	Terminal TermWindow		Уменьшить
 Default	Terminal colors scheme		По умолчанию

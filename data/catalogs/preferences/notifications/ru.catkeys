@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Notifications	3961154942
+1	russian	x-vnd.Haiku-Notifications	3115872762
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Произошла ошибка при сохранении настроек.\nВозможно кончилось место на диске.
 Notifications	GeneralView		Уведомления
 seconds of inactivity	GeneralView		секунд бездействия
@@ -14,7 +14,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		Важно
 Cannot disable notifications because the server can't be reached.	GeneralView		Невозможно отключить уведомления, потому что сервер уведомлений недоступен.
 Progress	NotificationView		Прогресс
-Last Received	NotificationView		Последнее полученное
 General	PrefletView		Основные
 Apply	PrefletWin		Применить
 Display	PrefletView		Отображение

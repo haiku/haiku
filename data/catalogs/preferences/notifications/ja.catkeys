@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Notifications	3961154942
+1	japanese	x-vnd.Haiku-Notifications	3115872762
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		設定の保存中にエラーが発生しました。\nディスクの空きが無いのかもしれません。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		秒後に画面から隠されます。
@@ -14,7 +14,6 @@ Cannot enable notifications because the server cannot be found.\nThis means your
 Important	NotificationView		重要
 Cannot disable notifications because the server can't be reached.	GeneralView		サーバーと通信できないので通知を無効にできません。
 Progress	NotificationView		進行状況
-Last Received	NotificationView		最終受信時刻
 General	PrefletView		一般設定
 Apply	PrefletWin		適用
 Display	PrefletView		表示設定
