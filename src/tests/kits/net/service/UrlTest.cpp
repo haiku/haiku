@@ -68,7 +68,7 @@ void UrlTest::TestIsValid()
 		!url.IsValid());
 
 	url.SetHost("<invalid>");
-	CPPUNIT_ASSERT_MESSAGE("Set to an invalid host.", !url.IsValid());
+	CPPUNIT_ASSERT_MESSAGE("Set to an invalid host", !url.IsValid());
 
 	url.SetUrlString("");
 	url.SetProtocol("\t \n");
@@ -193,10 +193,16 @@ const ExplodeTest	kTestExplode[] =
 			{ "urn",    "",        "", "",            0,   "oasis:names:specification:docbook:dtd:xml:4.1.2", "", "" } },
 		{ "http://www.goodsearch.com/login?return_path=/",
 			{ "http",   "",        "", "www.goodsearch.com", 0, "/login", "return_path=/", "" } },
-		{ "ldap://[2001:db8::7]/c=GB?objectClass?one",
+		{ "ldap://[2001:db8::7]:389/c=GB?objectClass?one",
 			{ "ldap",   "",        "", "[2001:db8::7]",389,"/c=GB",   "objectClass?one", "" } },
+		{ "ldap://[2001:db8::7]/c=GB?objectClass?one",
+			{ "ldap",   "",        "", "[2001:db8::7]",0,  "/c=GB",   "objectClass?one", "" } },
 		{ "HTTP://example.com.:80/%70a%74%68?a=%31#1%323",
-			{ "HTTP",   "",        "", "example.com.",80,  "/%70a%74%68","a=%31","1%323"} }
+			{ "HTTP",   "",        "", "example.com.",80,  "/%70a%74%68","a=%31","1%323"} },
+		{ "/boot/home/Desktop/index.html",
+			{ "",   "",            "", "",             0,  "/boot/home/Desktop/index.html","",""} },
+		{ "//remote.host/boot/home/Desktop",
+			{ "",   "",            "", "remote.host",  0,  "/boot/home/Desktop","",""} }
 	};
 
 void UrlTest::ExplodeImplodeTest()

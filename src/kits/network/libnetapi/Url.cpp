@@ -385,11 +385,12 @@ BUrl::UrlString() const
 
 		if (HasProtocol()) {
 			fUrlString << fProtocol << ':';
-			if (HasAuthority())
-				fUrlString << "//";
 		}
 
-		fUrlString << Authority();
+		if (HasAuthority()) {
+			fUrlString << "//";
+			fUrlString << Authority();
+		}
 		fUrlString << Path();
 
 		if (HasRequest())
@@ -922,7 +923,6 @@ enum explode_url_parse_state {
 	EXPLODE_PATH,
 	EXPLODE_REQUEST, // query
 	EXPLODE_FRAGMENT,
-	EXPLODE_ERROR,
 	EXPLODE_COMPLETE
 };
 
@@ -992,7 +992,7 @@ BUrl::_ExplodeUrlString(const BString& url)
 	// The ensuing logic attempts to simulate the behaviour of extracting the groups
 	// from the string without requiring a group-capable regex engine.
 
-	while (state != EXPLODE_ERROR && offset < length) {
+	while (offset < length) {
 		switch (state) {
 
 			case EXPLODE_PROTOCOL:
@@ -1005,11 +1005,11 @@ BUrl::_ExplodeUrlString(const BString& url)
 					state = EXPLODE_PROTOCOLTERMINATOR;
 					offset = end_protocol;
 				} else {
-#if DEBUG
-					fprintf(stderr,
-						"unexpected end of url when parsing the protocol\n");
-#endif
-					state = EXPLODE_ERROR;
+					// No protocol was found, try parsing from the string
+					// start, beginning with authority or path
+					SetProtocol("");
+					offset = 0;
+					state = EXPLODE_AUTHORITYORPATH;
 				}
 				break;
 			}
@@ -1017,21 +1017,21 @@ BUrl::_ExplodeUrlString(const BString& url)
 			case EXPLODE_PROTOCOLTERMINATOR:
 			{
 				if (url[offset] == ':') {
-					state = EXPLODE_AUTHORITYORPATH;
 					offset++;
 				} else {
-#ifdef DEBUG
-					fprintf(stderr,
-						"unexpected character '%c' terminating the protocol\n",
-						url_c[offset]);
-#endif
-					state = EXPLODE_ERROR;
+					// No protocol was found, try parsing from the string
+					// start, beginning with authority or path
+					SetProtocol("");
+					offset = 0;
 				}
+				state = EXPLODE_AUTHORITYORPATH;
 				break;
 			}
 
 			case EXPLODE_AUTHORITYORPATH:
 			{
+				// The authority must start with //. If it isn't there, skip
+				// to parsing the path.
 				if (strncmp(&url_c[offset], "//", 2) == 0) {
 					state = EXPLODE_AUTHORITY;
 					offset += 2;
@@ -1085,20 +1085,11 @@ BUrl::_ExplodeUrlString(const BString& url)
 				break;
 			}
 
-			case EXPLODE_ERROR:
 			case EXPLODE_COMPLETE:
 				// should never be reached - keeps the compiler happy
 				break;
 
 		}
-	}
-
-	if(state == EXPLODE_ERROR) {
-#ifdef DEBUG
-		fprintf(stderr, "failure to explode url\n");
-#endif
-		_ResetFields();
-		return B_BAD_VALUE;
 	}
 
 	return B_OK;
