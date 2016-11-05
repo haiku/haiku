@@ -469,15 +469,18 @@ BMediaFile::_UnInit()
 	free(fTrackList);
 	fTrackList = NULL;
 	fTrackNum = 0;
-	delete fExtractor;
-	fExtractor = NULL;
-	delete fWriter;
-	fWriter = NULL;
 	if (fDeleteSource) {
 		delete fSource;
 		fSource = NULL;
 		fDeleteSource = false;
 	}
+	// Deleting the extractor or writer can cause unloading of the plugins.
+	// The source must be deleted before that, because it can come from a
+	// plugin (for example the http_streamer)
+	delete fExtractor;
+	fExtractor = NULL;
+	delete fWriter;
+	fWriter = NULL;
 }
 
 
