@@ -45,7 +45,7 @@ BookmarkBar::AttachedToWindow()
 	// Enumerate initial directory content
 	BDirectory dir(&fNodeRef);
 	BEntry bookmark;
-	while (dir.GetNextEntry(&bookmark) == B_OK) {
+	while (dir.GetNextEntry(&bookmark, true) == B_OK) {
 		node_ref ref;
 		if (bookmark.GetNodeRef(&ref) == B_OK)
 			_AddItem(ref.node, &bookmark);
@@ -72,7 +72,7 @@ BookmarkBar::MessageReceived(BMessage* message)
 					message->FindString("name", &name);
 					ref.set_name(name);
 
-					BEntry entry(&ref);
+					BEntry entry(&ref, true);
 					if (entry.InitCheck() == B_OK)
 						_AddItem(inode, &entry);
 					break;
@@ -88,7 +88,7 @@ BookmarkBar::MessageReceived(BMessage* message)
 					ref.set_name(name);
 
 					if (fItemsMap[inode] == NULL) {
-						BEntry entry(&ref);
+						BEntry entry(&ref, true);
 						_AddItem(inode, &entry);
 						break;
 					} else {
@@ -177,6 +177,10 @@ BookmarkBar::MinSize()
 	// We only need space to show the "more" button.
 	size.width = 32;
 
+	// We need enough vertical space to show bookmark icons.
+	if (size.height < 20)
+		size.height = 20;
+
 	return size;
 }
 
@@ -214,7 +218,9 @@ BookmarkBar::_AddItem(ino_t inode, BEntry* entry)
 		item = new IconMenuItem(name, message, &info, B_MINI_ICON);
 	}
 
-	BMenuBar::AddItem(item, CountItems() - 1);
+	int32 count = CountItems();
+
+	BMenuBar::AddItem(item, count - 1);
 	fItemsMap[inode] = item;
 
 	// Move the item to the "more" menu if it overflows.

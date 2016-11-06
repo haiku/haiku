@@ -508,7 +508,8 @@ BrowserWindow::BrowserWindow(BRect frame, SettingsMessage* appSettings,
 			fBookmarkBarMenuItem->SetEnabled(true);
 		} else
 			fBookmarkBarMenuItem->SetEnabled(false);
-	}
+	} else
+		fBookmarkBarMenuItem->SetEnabled(false);
 
 	// Back, Forward, Stop & Home buttons
 	fBackButton = new BIconButton("Back", NULL, new BMessage(GO_BACK));
@@ -2648,6 +2649,10 @@ BrowserWindow::_HandlePageSourceResult(const BMessage* message)
 void
 BrowserWindow::_ShowBookmarkBar(bool show)
 {
+	// It is not allowed to show the bookmark bar when it is empty
+	if (show && fBookmarkBar->CountItems() <= 1)
+		return;
+
 	fBookmarkBarMenuItem->SetMarked(show);
 
 	if (fBookmarkBar == NULL || fBookmarkBar->IsHidden() != show)
