@@ -2650,7 +2650,7 @@ void
 BrowserWindow::_ShowBookmarkBar(bool show)
 {
 	// It is not allowed to show the bookmark bar when it is empty
-	if (show && (!fBookmarkBar || fBookmarkBar->CountItems() <= 1))
+	if (show && (fBookmarkBar == NULL || fBookmarkBar->CountItems() <= 1))
 	{
 		fBookmarkBarMenuItem->SetMarked(false);
 		return;
