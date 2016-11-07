@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Haiku, Inc. All rights reserved.
+ * Copyright 2014-2016, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 
@@ -18,6 +18,7 @@
 #include <Locale.h>
 #include <Node.h>
 #include <NodeInfo.h>
+#include <NodeMonitor.h>
 #include <Path.h>
 #include <PathFinder.h>
 #include <ScrollView.h>
@@ -31,20 +32,22 @@
 #define B_TRANSLATION_CONTEXT "Midi View"
 
 const static uint32 kSelectSoundFont = 'SeSf';
+const static uint32 kDoubleClick = 'DClk';
 
 
 MidiSettingsView::MidiSettingsView()
 	:
 	SettingsView()
 {
-	BBox* defaultsBox = new BBox("SoundFont");
-	defaultsBox->SetLabel(B_TRANSLATE("Available SoundFonts"));
+	BBox* defaultsBox = new BBox("SoundFonts");
+	defaultsBox->SetLabel(B_TRANSLATE("SoundFonts"));
 	BGridView* defaultsGridView = new BGridView();
 
 	fListView = new BListView(B_SINGLE_SELECTION_LIST);
 	fListView->SetSelectionMessage(new BMessage(kSelectSoundFont));
+	fListView->SetInvocationMessage(new BMessage(kDoubleClick));
 
-	BScrollView *scrollView = new BScrollView("ScrollView", fListView,
+	BScrollView* scrollView = new BScrollView("ScrollView", fListView,
 			0, false, true);
 	BLayoutBuilder::Grid<>(defaultsGridView)
 		.SetInsets(B_USE_DEFAULT_SPACING, 0, B_USE_DEFAULT_SPACING,
@@ -52,12 +55,16 @@ MidiSettingsView::MidiSettingsView()
 		.Add(scrollView, 0, 0);
 
 	defaultsBox->AddChild(defaultsGridView);
+	fSoundFontStatus = new BStringView("SoundFontStatus", "");
 
 	BLayoutBuilder::Group<>(this)
 		.SetInsets(0, 0, 0, 0)
 		.Add(defaultsBox)
-		.Add(fActiveSoundFont = new BStringView("ActiveSoundFont",
-				"Active Sound Font:"))
+		.AddGroup(B_HORIZONTAL)
+			.AddGlue()
+			.Add(fSoundFontStatus)
+			.AddGlue()
+			.End()
 		.AddGlue();
 }
 
@@ -69,9 +76,21 @@ MidiSettingsView::AttachedToWindow()
 	SettingsView::AttachedToWindow();
 
 	fListView->SetTarget(this);
-	_RetrieveSoftSynthList();
-
 	_LoadSettings();
+	_RetrieveSoundFontList();
+	_SelectActiveSoundFont();
+	_UpdateSoundFontStatus();
+	_WatchFolders();
+}
+
+
+/* virtual */
+void
+MidiSettingsView::DetachedFromWindow()
+{
+	SettingsView::DetachedFromWindow();
+
+	stop_watching(this);
 }
 
 
@@ -80,14 +99,54 @@ void
 MidiSettingsView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case B_NODE_MONITOR:
+		{
+			int32 selected = fListView->CurrentSelection();
+			BStringItem* olditem = (BStringItem*)fListView->ItemAt(selected);
+
+			_RetrieveSoundFontList();
+
+			int32 count = fListView->CountItems();
+			if (count == 1) {
+				fListView->Select(0);
+				_SaveSettings();
+			} else if (olditem != NULL) {
+				for (int32 i = 0; i < fListView->CountItems(); i++) {
+					BStringItem* item = (BStringItem*)fListView->ItemAt(i);
+					if (!strcmp(item->Text(), olditem->Text())) {
+						fListView->Select(i);
+						break;
+					}
+				}
+			}
+			_UpdateSoundFontStatus();
+			break;
+		}
 		case kSelectSoundFont:
 		{
-			BString text = _SelectedSoundFont();
-			if (text != "") {
-				text.Prepend("Active Sound Font: ");
-				fActiveSoundFont->SetText(text);
+			int selection = fListView->CurrentSelection();
+			if (selection < 0)
+				_SelectActiveSoundFont();
+			else
 				_SaveSettings();
-			}
+
+			_UpdateSoundFontStatus();
+			break;
+		}
+		case kDoubleClick:
+		{
+			int selection = fListView->CurrentSelection();
+			BStringItem* item = (BStringItem*)fListView->ItemAt(selection);
+
+			BEntry entry(item->Text());
+			BEntry parent;
+			entry.GetParent(&parent);
+			entry_ref folderRef;
+			parent.GetRef(&folderRef);
+			BMessenger msgr("application/x-vnd.Be-TRAK");
+			BMessage refMsg(B_REFS_RECEIVED);
+			refMsg.AddRef("refs",&folderRef);
+			msgr.SendMessage(&refMsg);
 			break;
 		}
 
@@ -99,7 +158,7 @@ MidiSettingsView::MessageReceived(BMessage* message)
 
 
 void
-MidiSettingsView::_RetrieveSoftSynthList()
+MidiSettingsView::_RetrieveSoundFontList()
 {
 	// TODO: Duplicated code between here
 	// and BSoftSynth::SetDefaultInstrumentsFile
@@ -137,26 +196,39 @@ void
 MidiSettingsView::_LoadSettings()
 {
 	struct BPrivate::midi_settings settings;
-	if (BPrivate::read_midi_settings(&settings) == B_OK) {
-		for (int32 i = 0; i < fListView->CountItems(); i++) {
-			BStringItem* item = (BStringItem*)fListView->ItemAt(i);
-			if (!strcmp(item->Text(), settings.soundfont_file)) {
-				fListView->Select(i);
-				break;
-			}
-		}
-	}
+	if (BPrivate::read_midi_settings(&settings) == B_OK)
+		fActiveSoundFont = new BString(settings.soundfont_file);
 }
 
 
 void
 MidiSettingsView::_SaveSettings()
 {
-	BString soundFont = _SelectedSoundFont();
-	if (soundFont.Length() > 0) {
+	fActiveSoundFont = new BString(_SelectedSoundFont());
+	if (fActiveSoundFont->Length() > 0) {
 		struct BPrivate::midi_settings settings;
-		strlcpy(settings.soundfont_file, soundFont, sizeof(settings.soundfont_file));
+		strlcpy(settings.soundfont_file, fActiveSoundFont->String(),
+			sizeof(settings.soundfont_file));
 		BPrivate::write_midi_settings(settings);
+	}
+}
+
+
+void
+MidiSettingsView::_SelectActiveSoundFont()
+{
+	int32 count = fListView->CountItems();
+	if (count == 1) {
+		fListView->Select(0);
+		_SaveSettings();
+		return;
+	}
+	for (int32 i = 0; i < fListView->CountItems(); i++) {
+		BStringItem* item = (BStringItem*)fListView->ItemAt(i);
+		if (!strcmp(item->Text(), fActiveSoundFont->String())) {
+			fListView->Select(i);
+			break;
+		}
 	}
 }
 
@@ -173,4 +245,37 @@ MidiSettingsView::_SelectedSoundFont() const
 	}
 
 	return string;
+}
+
+
+void
+MidiSettingsView::_UpdateSoundFontStatus()
+{
+	if (fListView->IsEmpty()) {
+		fSoundFontStatus->SetText(
+			B_TRANSLATE("There are no SoundFont installed."));
+		return;
+	}
+	int32 selection = fListView->CurrentSelection();
+	if (selection < 0) {
+		fSoundFontStatus->SetText(
+			B_TRANSLATE("Please select a SoundFont."));
+		return;
+	}
+	fSoundFontStatus->SetText("");
+}
+
+
+void
+MidiSettingsView::_WatchFolders()
+{
+	BStringList paths;
+	BPathFinder().FindPaths(B_FIND_PATH_DATA_DIRECTORY, "synth", paths);
+	for (int32 i = 0; i < paths.CountStrings(); i++) {
+		BEntry entry(paths.StringAt(i));
+		node_ref nref;
+		entry.GetNodeRef(&nref);
+
+		watch_node(&nref, B_WATCH_ALL, this);
+	}
 }
