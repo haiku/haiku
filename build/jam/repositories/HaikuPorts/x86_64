@@ -113,7 +113,7 @@ RemotePackageRepository HaikuPorts
 	fluidlite_devel-1.0.0-1
 	fontconfig-2.11.94-1
 	fontconfig_devel-2.11.94-1
-	fossil-1.35-1
+	fossil-1.36-3
 	freeciv-2.5.1-2
 	freetype-2.6.5-1
 	freetype_devel-2.6.5-1
