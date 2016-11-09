@@ -99,3 +99,5 @@
 #define CASE_CNL 96
 #define CASE_CPL 97
 #define CASE_CFT 98
+#define CASE_INDEX 99
+#define CASE_NEXT_LINE 100

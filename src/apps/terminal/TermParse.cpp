@@ -475,6 +475,16 @@ TermParse::EscParse()
 					fBuffer->InsertCR();
 					break;
 
+				case CASE_INDEX:
+					fBuffer->InsertLF();
+					parsestate = groundtable;
+					break;
+
+				case CASE_NEXT_LINE:
+					fBuffer->NextLine();
+					parsestate = groundtable;
+					break;
+
 				case CASE_SJIS_KANA:
 					cbuf[srcLen++] = c;
 					convert_to_utf8(currentEncoding, cbuf, &srcLen,

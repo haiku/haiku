@@ -166,6 +166,7 @@ public:
 	inline	void				MoveCursorLeft(int32 num);
 	inline	void				MoveCursorUp(int32 num);
 	inline	void				MoveCursorDown(int32 num);
+	inline	void				NextLine();
 
 			// scroll region
 	inline	void				ScrollBy(int32 numLines);
@@ -351,5 +352,11 @@ BasicTerminalBuffer::ScrollBy(int32 numLines)
 	_Scroll(fScrollTop, fScrollBottom, numLines);
 }
 
+
+void
+BasicTerminalBuffer::NextLine()
+{
+	SetCursor(0, fCursor.y + 1);
+}
 
 #endif	// BASIC_TERMINAL_BUFFER_H
