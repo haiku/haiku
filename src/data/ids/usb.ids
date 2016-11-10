@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2016.10.13
-# Date:    2016-10-13 20:34:14
+# Version: 2016.11.08
+# Date:    2016-11-08 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -6982,6 +6982,7 @@
 	001e  Projector
 	001f  Projector
 	ffe5  IN34 Projector
+	ffeb  Projector IN76
 058d  Micrel Semiconductor
 058e  Tripath Technology, Inc.
 058f  Alcor Micro Corp.
@@ -11108,6 +11109,8 @@
 	000b  Bluetooth Adapter class 1 [BlueLight]
 09d7  NovAtel Inc.
 	0100  NovAtel FlexPack GPS receiver
+09d8  ELATEC
+	0406  TWN4 MIFARE NFC
 09d9  KRF Tech, Ltd
 09da  A4Tech Co., Ltd.
 	0006  Optical Mouse WOP-35 / Trust 450L Optical Mouse
@@ -18145,6 +18148,13 @@
 	1042  MPIO FY670
 	1043  HCT HMD-180A
 	1044  HCT HMD-180A
+273f  Hughski Limited
+	1000  ColorHug bootloader
+	1001  ColorHug
+	1002  ColorHug+
+	1003  ColorHug+ Bootloader
+	1004  ColorHug2
+	1005  ColorHug2 bootloader
 2770  NHJ, Ltd
 	0a01  ScanJet 4600 series
 	905c  Che-Ez Snap SNAP-U/Digigr8/Soundstar TDC-35
