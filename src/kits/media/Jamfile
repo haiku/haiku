@@ -23,9 +23,13 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			# Private Media Kit
 			!missing_symbols.cpp
 			Deprecated.cpp
-			MediaRecorder.cpp
-			MediaIO.cpp
+
 			AdapterIO.cpp
+			MediaIO.cpp
+			MediaClient.cpp
+			MediaConnection.cpp
+			MediaRecorder.cpp
+
 
 			# Public Media Kit
 			Buffer.cpp
@@ -63,6 +67,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DefaultMediaTheme.cpp
 			DormantNodeManager.cpp
 			FormatManager.cpp
+			MediaClientNode.cpp
 			MediaRecorderNode.cpp
 			Notifications.cpp
 			request_data.cpp
