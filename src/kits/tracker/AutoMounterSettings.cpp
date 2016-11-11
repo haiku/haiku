@@ -87,7 +87,7 @@ AutomountSettingsPanel::AutomountSettingsPanel()
 		new BMessage(kAutomountSettingsChanged));
 
 	fAutoMountAllBFSCheck = new BRadioButton("autoBFS",
-		B_TRANSLATE("All BeOS disks"),
+		B_TRANSLATE("All Haiku disks"),
 			new BMessage(kAutomountSettingsChanged));
 
 	fAutoMountAllCheck = new BRadioButton("autoAll",
@@ -112,7 +112,7 @@ AutomountSettingsPanel::AutomountSettingsPanel()
 		new BMessage(kBootMountSettingsChanged));
 
 	fInitialMountAllBFSCheck = new BRadioButton("initialBFS",
-		B_TRANSLATE("All BeOS disks"),
+		B_TRANSLATE("All Haiku disks"),
 		new BMessage(kBootMountSettingsChanged));
 
 	fInitialMountAllCheck = new BRadioButton("initialAll",
