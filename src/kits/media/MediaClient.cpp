@@ -120,7 +120,7 @@ BMediaClient::Bind(BMediaConnection* input, BMediaConnection* output)
 		return B_ERROR;
 
 	if (input == NULL
-		|| input == NULL)
+		|| output == NULL)
 		return B_ERROR;
 
 	// TODO: Implement binding one input to more outputs.
@@ -566,6 +566,7 @@ BMediaClient::_Connect(BMediaConnection* connection,
 {
 	CALLED();
 
+	return B_ERROR;
 }
 
 
