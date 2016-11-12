@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-Notifications	3115872762
+1	japanese	x-vnd.Haiku-Notifications	746652830
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		設定の保存中にエラーが発生しました。\nディスクの空きが無いのかもしれません。
 Notifications	GeneralView		通知
 seconds of inactivity	GeneralView		秒後に画面から隠されます。
@@ -20,6 +20,7 @@ Display	PrefletView		表示設定
 Search:	NotificationView		検索:
 Allowed	NotificationView		許可された
 Yes	NotificationView		はい
+Last received	NotificationView		最終受信時刻
 Large icon	DisplayView		大きいアイコン
 Icon size:	DisplayView		アイコンのサイズ:
 Hide notifications from screen after	GeneralView		通知はなにもしないと

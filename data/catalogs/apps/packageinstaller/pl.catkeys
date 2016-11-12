@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-PackageInstaller	600665259
+1	polish	x-vnd.Haiku-PackageInstaller	1477424735
 Install to:	PackageView		Zainstaluj w:
 OK	PackageView		OK
 Accept	PackageTextViewer		Akceptuj
@@ -9,6 +9,7 @@ Image not loaded correctly	PackageImageViewer		Obraz nie załadował się popraw
 No package selected.	PackageInfo		Żaden pakiet nie został wybrany.
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Dany pakiet jest już zainstalowany w Twoim systemie. Czy chcesz by odinstalować istniejący pakiet i kontynuować instalację?
 Do you want to remember this decision for the rest of this installation?\n	PackageView		Czy chcesz zapamiętać tę decyzję do końca instalacji?\n
+Installed packages	UninstallWindow		Zainstalowane pakiety
 There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Prawdopodobnie pliki w pakiecie mają nieprawidłowy rozmiar. Pakiet może być uszkodzony, lub został zmodyfikowany po jego utworzeniu. Czy nadal chcesz kontynuować?
 Error while installing the package\n	PackageView		Błąd instalacji pakietu\n
 Disclaimer	PackageTextViewer		Oświadczenie

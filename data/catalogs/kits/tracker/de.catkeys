@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	2958397069
+1	german	x-vnd.Haiku-libtracker	671778905
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-ons
 Mount settings…	ContainerWindow		Einhänge-Einstellungen…
@@ -111,6 +111,7 @@ Increase size	DeskWindow		Vergrößern
 Resize to fit	ContainerWindow		Optimale Größe
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Bei %func \nfind_directory() fehlgeschlagen \nGrund: %error
 Add printer…	ContainerWindow		Drucker hinzufügen…
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Wird der Home Ordner umbenannt, kann es sein dass %osName nicht mehr richtig funktioniert!\n\nTrotzdem umbenennen?\n\nUm den Home Ordner trotzdem umzubenennen, Shift-Taste gedrückt halten und \"Umbenennen\" klicken.
 New folder	ContainerWindow		Neuer Ordner
 Kind	ContainerWindow		Art
 Select…	ContainerWindow		Auswählen…

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Terminal	1384628839
+1	german	x-vnd.Haiku-Terminal	1269023683
 Not found.	Terminal TermWindow		Nicht gefunden.
 Switch Terminals	Terminal TermWindow		Terminals wechseln
 Change directory	Terminal TermView		Zum Ordner wechseln
@@ -82,6 +82,7 @@ Close	Terminal TermWindow		Schließen
 Text	Terminal AppearancePrefView		Text
 Clear all	Terminal TermWindow		Bildschirm leeren
 Text encoding	Terminal TermWindow		Kodierung
+Allow bold text	Terminal AppearancePrefView		Text in Fettschrift zulassen
 Close window	Terminal TermWindow		Fenster schließen
 Copy absolute path	Terminal TermView		Absoluten Pfad kopieren
 Save as default	Terminal TermWindow		Als Standardwerte speichern
