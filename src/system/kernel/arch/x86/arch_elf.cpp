@@ -37,7 +37,7 @@ is_in_image(struct elf_image_info *image, addr_t address)
 #endif	// !_BOOT_MODE
 
 
-#if !defined(__x86_64__) || defined(_BOOT_MODE)
+#if !defined(__x86_64__) || (defined(_BOOT_MODE) && _BOOT_PLATFORM != efi)
 
 
 #ifdef TRACE_ARCH_ELF
@@ -183,7 +183,7 @@ arch_elf_relocate_rela(struct elf_image_info *image,
 }
 
 
-#endif	// !__x86_64__ || _BOOT_MODE
+#endif	// !__x86_64__ || (_BOOT_MODE && _BOOT_PLATFORM != efi)
 
 
 #if defined(__x86_64__) || defined(_BOOT_MODE)

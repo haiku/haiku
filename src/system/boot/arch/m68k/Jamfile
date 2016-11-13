@@ -16,24 +16,24 @@ local kernelLibArchObjects =
 BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 	arch_elf.cpp
 	$(librootArchObjects)
-	: -fno-pic
+	:
 	:
 	$(kernelLibArchObjects)
 ;
 
 BootMergeObject boot_arch_m68k_030.o :
 	mmu_030.cpp
-	: -fno-pic -Wno-unused -mcpu=68030
+	: -Wno-unused -mcpu=68030
 ;
 
 BootMergeObject boot_arch_m68k_040.o :
 	mmu_040.cpp
-	: -fno-pic -Wno-unused -mcpu=68040 -Wa,-m68040
+	: -Wno-unused -mcpu=68040 -Wa,-m68040
 ;
 
 BootMergeObject boot_arch_m68k_060.o :
 	mmu_060.cpp
-	: -fno-pic -Wno-unused -mcpu=68060
+	: -Wno-unused -mcpu=68060
 ;
 
 SEARCH on [ FGristFiles arch_elf.cpp ]

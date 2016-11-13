@@ -61,6 +61,7 @@ private:
 };
 
 
+#ifdef BOOT_SUPPORT_ELF32
 struct ELF32Class {
 	static const uint8 kIdentClass = ELFCLASS32;
 
@@ -96,6 +97,7 @@ struct ELF32Class {
 };
 
 typedef ELFLoader<ELF32Class> ELF32Loader;
+#endif
 
 
 #ifdef BOOT_SUPPORT_ELF64
@@ -117,6 +119,17 @@ struct ELF64Class {
 	AllocateRegion(AddrType* _address, AddrType size, uint8 protection,
 		void **_mappedAddress)
 	{
+#ifdef _BOOT_PLATFORM_EFI
+		void* address = (void*)*_address;
+
+		status_t status = platform_allocate_region(&address, size, protection,
+			false);
+		if (status != B_OK)
+			return status;
+
+		*_mappedAddress = address;
+		platform_bootloader_address_to_kernel_address(address, _address);
+#else
 		// Assume the real 64-bit base address is KERNEL_LOAD_BASE_64_BIT and
 		// the mappings in the loader address space are at KERNEL_LOAD_BASE.
 
@@ -130,14 +143,23 @@ struct ELF64Class {
 		*_mappedAddress = address;
 		*_address = (AddrType)(addr_t)address + KERNEL_LOAD_BASE_64_BIT
 			- KERNEL_LOAD_BASE;
+#endif
 		return B_OK;
 	}
 
 	static inline void*
 	Map(AddrType address)
 	{
+#ifdef _BOOT_PLATFORM_EFI
+		void *result;
+		if (platform_kernel_address_to_bootloader_address(address, &result) != B_OK) {
+			panic("Couldn't convert address %#lx", address);
+		}
+		return result;
+#else
 		return (void*)(addr_t)(address - KERNEL_LOAD_BASE_64_BIT
 			+ KERNEL_LOAD_BASE);
+#endif
 	}
 };
 
@@ -152,7 +174,7 @@ ELFLoader<Class>::Create(int fd, preloaded_image** _image)
 	ImageType* image = (ImageType*)kernel_args_malloc(sizeof(ImageType));
 	if (image == NULL)
 		return B_NO_MEMORY;
-	
+
 	ssize_t length = read_pos(fd, 0, &image->elf_header, sizeof(EhdrType));
 	if (length < (ssize_t)sizeof(EhdrType)) {
 		kernel_args_free(image);
@@ -225,7 +247,7 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 				// known but unused type
 				continue;
 			default:
-				dprintf("unhandled pheader type 0x%lx\n", header.p_type);
+				dprintf("unhandled pheader type 0x%" B_PRIx32 "\n", header.p_type);
 				continue;
 		}
 
@@ -320,7 +342,7 @@ ELFLoader<Class>::Load(int fd, preloaded_image* _image)
 			header.p_filesz);
 		if (length < (ssize_t)header.p_filesz) {
 			status = B_BAD_DATA;
-			dprintf("error reading in seg %ld\n", i);
+			dprintf("error reading in seg %" B_PRId32 "\n", i);
 			goto error2;
 		}
 
@@ -642,13 +664,14 @@ elf_load_image(int fd, preloaded_image** _image)
 			return status;
 	}
 #endif
-
+#if BOOT_SUPPORT_ELF32
 	if (gKernelArgs.kernel_image == NULL
 		|| gKernelArgs.kernel_image->elf_class == ELFCLASS32) {
 		status = ELF32Loader::Create(fd, _image);
 		if (status == B_OK)
 			return ELF32Loader::Load(fd, *_image);
 	}
+#endif
 
 	return status;
 }
@@ -706,16 +729,22 @@ elf_relocate_image(preloaded_image* image)
 		return ELF64Loader::Relocate(image);
 	else
 #endif
+#ifdef BOOT_SUPPORT_ELF32
 		return ELF32Loader::Relocate(image);
+#else
+		return B_ERROR;
+#endif
 }
 
 
+#ifdef BOOT_SUPPORT_ELF32
 status_t
 boot_elf_resolve_symbol(preloaded_elf32_image* image, Elf32_Sym* symbol,
 	Elf32_Addr* symbolAddress)
 {
 	return ELF32Loader::Resolve(image, symbol, symbolAddress);
 }
+#endif
 
 
 #ifdef BOOT_SUPPORT_ELF64

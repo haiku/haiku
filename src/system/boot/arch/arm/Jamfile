@@ -49,7 +49,7 @@ BootMergeObject boot_arch_$(TARGET_KERNEL_ARCH).o :
 	$(kernelDebugSources)
 
 	$(librootArchObjects)
-	: -fno-pic
+	:
 	:
 	$(kernelLibArchObjects)
 ;

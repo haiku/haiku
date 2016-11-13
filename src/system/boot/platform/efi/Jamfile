@@ -1,0 +1,59 @@
+SubDir HAIKU_TOP src system boot platform efi ;
+
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
+UsePrivateHeaders [ FDirName kernel boot ] ;
+UseBuildFeatureHeaders gnuefi ;
+UseBuildFeatureHeaders gnuefi : headersProtocol ;
+UseBuildFeatureHeaders gnuefi : headersArch ;
+
+{
+	local defines = _BOOT_MODE GNU_EFI_USE_MS_ABI _BOOT_PLATFORM_EFI ;
+	defines = [ FDefines $(defines) ] ;
+	SubDirCcFlags $(defines) ;
+	SubDirC++Flags $(defines) -fno-rtti ;
+}
+
+local efi_glue_src =
+	crt0-efi-x86_64.S
+	;
+
+local platform_src =
+	relocation_func.cpp
+	start.cpp
+	console.cpp
+	video.cpp
+	debug.cpp
+	entry.S
+	mmu.cpp
+	heap.cpp
+	acpi.cpp
+	menu.cpp
+	devices.cpp
+	hpet.cpp
+	cpu.cpp
+	smp.cpp
+	smp_trampoline.S
+	support.S
+	;
+
+Includes [ FGristFiles $(efi_glue_src) $(platform_src) ]
+	:
+	[ BuildFeatureAttribute gnuefi : headers ]
+	[ BuildFeatureAttribute gnuefi : headersProtocol ]
+	[ BuildFeatureAttribute gnuefi : headersArch ]
+	;
+
+BootMergeObject boot_platform_efi.o :
+	$(efi_glue_src)
+	$(platform_src)
+	:
+	: boot_platform_generic.a
+	;
+
+SEARCH on [ FGristFiles relocation_func.cpp ]
+	= [ FDirName $(SUBDIR) arch $(TARGET_ARCH) ] ;
+LOCATE on [ FGristFiles $(efi_glue_src) ]
+	 = [ BuildFeatureAttribute gnuefi : libdir : path ] ;
+Depends [ FGristFiles $(efi_glue_src) ]
+	: [ BuildFeatureAttribute gnuefi : libdir ] ;

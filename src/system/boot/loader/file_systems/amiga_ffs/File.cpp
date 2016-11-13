@@ -107,7 +107,7 @@ Stream::ReadAt(off_t offset, uint8 *buffer, size_t size)
 {
 	if (offset < 0)
 		return B_BAD_VALUE;
-	if (offset + size > fNode.Size())
+	if (offset + (off_t)size > fNode.Size())
 		size = fNode.Size() - offset;
 
 	ssize_t bytesLeft = (ssize_t)size;

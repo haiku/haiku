@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot loader file_systems bfs ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 UsePrivateKernelHeaders ;
 UsePrivateHeaders file_systems shared storage ;
 
@@ -18,7 +20,6 @@ BootStaticLibrary boot_bfs :
 	Stream.cpp
 	BPlusTree.cpp
 	QueryParserUtils.cpp
-	: -fno-pic
 	;
 
 SEARCH on [ FGristFiles BPlusTree.cpp ]

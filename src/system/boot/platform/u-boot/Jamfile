@@ -59,7 +59,7 @@ BootMergeObject boot_platform_u-boot_common.o :
 	$(libFDTSources)
 
 
-	: -fno-pic
+	:
 	: boot_platform_generic.a
 ;
 

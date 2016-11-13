@@ -127,6 +127,7 @@
 #	include <dpc.h>
 #	include <PCI.h>
 
+#	include <boot_item.h>
 #	include <kernel.h>
 #	include <vm/vm.h>
 #endif
@@ -181,7 +182,7 @@ extern void *gDPCHandle;
 extern FILE *AcpiGbl_DebugFile;
 FILE *AcpiGbl_OutputFile;
 
-static uint32 sACPIRoot = 0;
+static ACPI_PHYSICAL_ADDRESS sACPIRoot = 0;
 static void *sInterruptHandlerData[32];
 
 
@@ -233,12 +234,15 @@ AcpiOsGetRootPointer()
 {
 #ifdef _KERNEL_MODE
 	ACPI_PHYSICAL_ADDRESS address;
-	ACPI_STATUS status;
+	ACPI_STATUS status = AE_OK;
 	DEBUG_FUNCTION();
 	if (sACPIRoot == 0) {
-		status = AcpiFindRootPointer(&address);
-		if (status == AE_OK)
-			sACPIRoot = address;
+		sACPIRoot = (ACPI_PHYSICAL_ADDRESS)get_boot_item("ACPI_ROOT_POINTER", NULL);
+		if (sACPIRoot == 0) {
+			status = AcpiFindRootPointer(&address);
+			if (status == AE_OK)
+				sACPIRoot = address;
+		}
 	}
 	return sACPIRoot;
 #else

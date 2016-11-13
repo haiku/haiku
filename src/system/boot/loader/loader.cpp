@@ -123,7 +123,7 @@ load_kernel(stage2_args* args, BootVolume& volume)
 	close(fd);
 
 	if (status < B_OK) {
-		dprintf("loading kernel failed: %lx!\n", status);
+		dprintf("loading kernel failed: %" B_PRIx32 "!\n", status);
 		return status;
 	}
 
@@ -131,7 +131,7 @@ load_kernel(stage2_args* args, BootVolume& volume)
 
 	status = elf_relocate_image(gKernelArgs.kernel_image);
 	if (status < B_OK) {
-		dprintf("relocating kernel failed: %lx!\n", status);
+		dprintf("relocating kernel failed: %" B_PRIx32 "!\n", status);
 		return status;
 	}
 
@@ -163,7 +163,7 @@ load_modules_from(BootVolume& volume, const char* path)
 
 			status_t status = elf_load_image(modules, name);
 			if (status != B_OK)
-				dprintf("Could not load \"%s\" error %ld\n", name, status);
+				dprintf("Could not load \"%s\" error %" B_PRIx32 "\n", name, status);
 		}
 
 		modules->Close(cookie);

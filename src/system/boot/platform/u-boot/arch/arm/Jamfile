@@ -16,7 +16,6 @@ BootMergeObject boot_platform_u-boot_arm.o :
 	shell.S
 
 	arch_mailbox.cpp
-	: -fno-pic
 ;
 
 #SEARCH on [ FGristFiles arch_cpu_asm.S ]

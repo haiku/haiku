@@ -1,9 +1,17 @@
 SubDir HAIKU_TOP src system boot ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 DEFINES += _BOOT_MODE ;
 
-SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot os arch
-					$(TARGET_KERNEL_ARCH) ] ;
+if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) != bios_ia32 {
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot os arch
+				x86_64 ] ;
+} else {
+	SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot os arch
+				$(TARGET_KERNEL_ARCH) ] ;
+}
+
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix string ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix stdlib ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot posix locale ] ;
@@ -41,13 +49,7 @@ BootMergeObject boot_libroot.o :
 	strrchr.c
 	strtol.c
 	$(extraSources)
-	: -fno-pic
 ;
-
-local extraLinkerArgs = ;
-if $(HAIKU_BOARD_LOADER_BASE) {
-	extraLinkerArgs += --defsym BOARD_LOADER_BASE=$(HAIKU_BOARD_LOADER_BASE) ;
-}
 
 AddResources haiku_loader : boot_loader.rdef ;
 
@@ -76,7 +78,7 @@ BootLd boot_loader_$(TARGET_BOOT_PLATFORM) :
 	boot_libroot.o
 
 	: $(HAIKU_TOP)/src/system/ldscripts/$(TARGET_ARCH)/boot_loader_$(TARGET_BOOT_PLATFORM).ld
-	: -Bstatic $(extraLinkerArgs)
+	: $(TARGET_BOOT_LDFLAGS)
 ;
 
 rule BuildCoffLoader {
@@ -129,6 +131,22 @@ BuildBiosLoader haiku_loader : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 # different target for PXE, to be build with TARGET_BOOT_PLATFORM=pxe_ia32 jam pxehaiku-loader
 BuildBiosLoader pxehaiku-loader : boot_loader_$(TARGET_BOOT_PLATFORM) ;
+
+rule BuildEFILoader {
+	local efiLoader = $(1) ;
+	local bootLoader = $(2) ;
+
+	Depends $(efiLoader) : $(bootLoader) ;
+	MakeLocateDebug $(efiLoader) ;
+}
+
+actions BuildEFILoader {
+	rm -f $(1)
+	$(TARGET_OBJCOPY_$(TARGET_PACKAGING_ARCH)) -j .text -j .sdata -j .data -j .dynamic -j .dynsym \
+	-j .rel -j .rela -j .reloc --target=efi-app-x86_64 $(2) $(1)
+}
+
+BuildEFILoader haiku_loader.efi : boot_loader_$(TARGET_BOOT_PLATFORM) ;
 
 SubInclude HAIKU_TOP src system boot arch $(TARGET_KERNEL_ARCH) ;
 SubInclude HAIKU_TOP src system boot loader ;

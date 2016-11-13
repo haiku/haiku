@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot loader ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems amiga ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems apple ;
 SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
@@ -45,6 +47,15 @@ UsePrivateHeaders shared storage ;
 
 				#BOOT_SUPPORT_FILE_SYSTEM_FAT
 			;
+			if $(HAIKU_BOOT_PLATFORM) != efi {
+				DEFINES +=
+					BOOT_SUPPORT_ELF32
+				;
+			} else {
+				DEFINES +=
+					_BOOT_PLATFORM_EFI
+				;
+			}
 		}
 	}
 
@@ -85,8 +96,6 @@ BootStaticLibrary boot_loader :
 
 	DataIO.cpp
 	Referenceable.cpp
-
-	: -fno-pic
 	;
 
 # The partition support is built in an extra static library
@@ -105,7 +114,6 @@ BootStaticLibrary boot_partitions :
 	intel.cpp
 	PartitionMap.cpp
 	PartitionMapParser.cpp
-	: -fno-pic
 	;
 
 # Tell Jam where to find the utility sources

@@ -1,5 +1,7 @@
 SubDir HAIKU_TOP src system boot loader file_systems hfs_plus ;
 
+SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
+
 UsePrivateHeaders [ FDirName kernel boot platform $(TARGET_BOOT_PLATFORM) ] ;
 UsePrivateHeaders [ FDirName kernel disk_device_manager ] ;
 UsePrivateHeaders kernel storage ;
@@ -8,5 +10,4 @@ SubDirC++Flags -fno-rtti ;
 
 BootStaticLibrary boot_hfs_plus :
 	hfs_plus.cpp
-	: -fno-pic
 	;
