@@ -45,7 +45,7 @@ index_to_color_which(int32 index)
 			return (color_which)(index + 1);
 		else {
 			return (color_which)(index + B_SUCCESS_COLOR
-				- kColorWhichCount - 3);
+				- kColorWhichCount + 3);
 		}
 	}
 
