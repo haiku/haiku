@@ -672,7 +672,7 @@ TWindow::UpdateInfoBarOnResize()
 		|| infoHeight > Bounds().Height()) {
 		ShowInfo(false);
 	} else {
-		ShowInfo(true);
+		ShowInfo(fInfoBarState);
 	}
 }
 
