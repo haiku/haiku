@@ -119,8 +119,7 @@ public:
 	~MediaRosterUndertaker()
 	{
 		BAutolock _(sInitLocker);
-		if (BMediaRoster::CurrentRoster() != NULL
-				&& BMediaRoster::CurrentRoster()->Lock()) {
+		if (BMediaRoster::CurrentRoster() != NULL) {
 
 			// Detect any forgotten node
 			if (sRegisteredNodes.CountItems() > 0) {
@@ -137,7 +136,14 @@ public:
 			if (be_app != NULL)
 				be_app->UnregisterLooper(BMediaRoster::CurrentRoster());
 
-			BMediaRoster::CurrentRoster()->Quit();
+			status_t err = B_ERROR;
+			thread_id roster = BMediaRoster::CurrentRoster()->Thread();
+
+			BMediaRoster::CurrentRoster()->PostMessage(B_QUIT_REQUESTED);
+
+			wait_for_thread(roster, &err);
+			if (err != B_OK)
+				ERROR("BMediaRoster: wait_for_thread returned error");
 		}
 	}
 };
