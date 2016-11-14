@@ -2302,7 +2302,7 @@ BMediaRoster::Roster(status_t* out_error)
 	BAutolock lock(sInitLocker);
 
 	if (be_app == NULL)
-		TRACE("Warning! You should have a valid BApplication.");
+		debugger("Warning! You should have a valid BApplication.");
 
 	if (!lock.IsLocked())
 		return NULL;
