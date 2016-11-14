@@ -4,7 +4,7 @@ SetupFeatureObjectsDir $(TARGET_BOOT_PLATFORM) ;
 
 DEFINES += _BOOT_MODE ;
 
-if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) != bios_ia32 {
+if $(TARGET_ARCH) = x86_64 && $(TARGET_BOOT_PLATFORM) = efi {
 	SEARCH_SOURCE += [ FDirName $(SUBDIR) $(DOTDOT) libroot os arch
 				x86_64 ] ;
 } else {
