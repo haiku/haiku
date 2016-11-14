@@ -47,16 +47,16 @@ UsePrivateHeaders shared storage ;
 
 				#BOOT_SUPPORT_FILE_SYSTEM_FAT
 			;
-			if $(HAIKU_BOOT_PLATFORM) != efi {
-				DEFINES +=
-					BOOT_SUPPORT_ELF32
-				;
-			} else {
+			if $(HAIKU_BOOT_PLATFORM) = efi {
 				DEFINES +=
 					_BOOT_PLATFORM_EFI
 				;
 			}
 		}
+	}
+
+	if $(HAIKU_BOOT_PLATFORM) != efi {
+		DEFINES += BOOT_SUPPORT_ELF32 ;
 	}
 
 	local kernelC++Header = [ FDirName $(HAIKU_TOP) headers private kernel util
