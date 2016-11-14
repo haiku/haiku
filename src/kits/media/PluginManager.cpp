@@ -635,7 +635,7 @@ PluginManager::CreateStreamer(Streamer** streamer, BUrl url, BDataIO** source)
 		}
 
 		(*streamer)->fMediaPlugin = plugin;
-		plugin->fRefCount += 1;
+		plugin->fRefCount++;
 
 		BDataIO* streamSource = NULL;
 		if ((*streamer)->Sniff(url, &streamSource) == B_OK) {
@@ -673,7 +673,7 @@ PluginManager::DestroyStreamer(Streamer* streamer)
 			plugin->fRefCount = 0;
 			PutPlugin(plugin);
 		} else
-			plugin->fRefCount -= 1;
+			plugin->fRefCount--;
 	}
 }
 
