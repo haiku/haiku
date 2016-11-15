@@ -146,7 +146,7 @@ BuildInfoMenu(BMenu *menu)
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem(B_TRANSLATE("Hide/Show info"),
+	menuItem = new BMenuItem(B_TRANSLATE("Show info"),
 		new BMessage(msg_show_info), 'T');
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem(B_TRANSLATE("Add a crosshair"),
@@ -155,12 +155,12 @@ BuildInfoMenu(BMenu *menu)
 	menuItem = new BMenuItem(B_TRANSLATE("Remove a crosshair"),
 		new BMessage(msg_remove_cross_hair), 'H', B_SHIFT_KEY);
 	menu->AddItem(menuItem);
-	menuItem = new BMenuItem(B_TRANSLATE("Hide/Show grid"),
+	menuItem = new BMenuItem(B_TRANSLATE("Show grid"),
 		new BMessage(msg_toggle_grid), 'G');
 	menu->AddItem(menuItem);
 	menu->AddSeparatorItem();
 
-	menuItem = new BMenuItem(B_TRANSLATE("Freeze/Unfreeze image"),
+	menuItem = new BMenuItem(B_TRANSLATE("Freeze image"),
 		new BMessage(msg_freeze), 'F');
 	menu->AddItem(menuItem);
 	menuItem = new BMenuItem(B_TRANSLATE("Stick coordinates"),
@@ -185,6 +185,59 @@ BuildInfoMenu(BMenu *menu)
 	menu->AddItem(menuItem);
 }
 
+static void
+UpdateInfoMenu(BMenu *menu, TWindow *window)
+{
+	bool state = true;
+	bool showGrid = true;
+	bool infoBarIsVisible = true;
+	bool stickCordinates = true;
+	if (window) {
+		state = window->IsActive();
+		showGrid = window->ShowGrid();
+		infoBarIsVisible = window->InfoBarIsVisible();
+		stickCordinates = window->IsSticked();
+	}
+	BMenuItem* menuItem = menu->FindItem(B_TRANSLATE("Show info"));
+	if (menuItem) {
+		menuItem->SetEnabled(state);
+		menuItem->SetMarked(infoBarIsVisible);
+	}
+	menuItem = menu->FindItem(B_TRANSLATE("Add a crosshair"));
+	if (menuItem)
+		menuItem->SetEnabled(state);
+	menuItem = menu->FindItem(B_TRANSLATE("Remove a crosshair"));
+	if (menuItem)
+		menuItem->SetEnabled(state);
+	menuItem = menu->FindItem(B_TRANSLATE("Show grid"));
+	if (menuItem) {
+		menuItem->SetEnabled(state);
+		menuItem->SetMarked(showGrid);
+	}
+	menuItem = menu->FindItem(B_TRANSLATE("Freeze image"));
+	if (menuItem) {
+		menuItem->SetMarked(!state);
+	}
+	menuItem = menu->FindItem(B_TRANSLATE("Stick coordinates"));
+	if (menuItem) {
+		menuItem->SetMarked(stickCordinates);
+	}
+	menuItem = menu->FindItem(B_TRANSLATE("Make square"));
+	if (menuItem)
+		menuItem->SetEnabled(state);
+	menuItem = menu->FindItem(B_TRANSLATE("Decrease window size"));
+	if (menuItem)
+		menuItem->SetEnabled(state);
+	menuItem = menu->FindItem(B_TRANSLATE("Increase window size"));
+	if (menuItem)
+		menuItem->SetEnabled(state);
+	menuItem = menu->FindItem(B_TRANSLATE("Decrease pixel size"));
+	if (menuItem)
+		menuItem->SetEnabled(state);
+	menuItem = menu->FindItem(B_TRANSLATE("Increase pixel size"));
+	if (menuItem)
+		menuItem->SetEnabled(state);
+}
 
 //	#pragma mark -
 
@@ -655,6 +708,13 @@ TWindow::InfoIsShowing()
 }
 
 
+bool
+TWindow::InfoBarIsVisible()
+{
+	return fInfoBarState;
+}
+
+
 void
 TWindow::UpdateInfo()
 {
@@ -776,6 +836,13 @@ bool
 TWindow::IsActive()
 {
 	return fFatBits->Active();
+}
+
+
+bool
+TWindow::IsSticked()
+{
+	return fFatBits->Sticked();
 }
 
 
@@ -965,37 +1032,7 @@ TMenu::~TMenu()
 void
 TMenu::AttachedToWindow()
 {
-	bool state = true;
-	if (fMainWindow)
-		state = fMainWindow->IsActive();
-
-	BMenuItem* menuItem = FindItem(B_TRANSLATE("Hide/Show info"));
-	if (menuItem)
-		menuItem->SetEnabled(state);
-	menuItem = FindItem(B_TRANSLATE("Add a crosshair"));
-	if (menuItem)
-		menuItem->SetEnabled(state);
-	menuItem = FindItem(B_TRANSLATE("Remove a crosshair"));
-	if (menuItem)
-		menuItem->SetEnabled(state);
-	menuItem = FindItem(B_TRANSLATE("Hide/Show grid"));
-	if (menuItem)
-		menuItem->SetEnabled(state);
-	menuItem = FindItem(B_TRANSLATE("Make square"));
-	if (menuItem)
-		menuItem->SetEnabled(state);
-	menuItem = FindItem(B_TRANSLATE("Decrease window size"));
-	if (menuItem)
-		menuItem->SetEnabled(state);
-	menuItem = FindItem(B_TRANSLATE("Increase window size"));
-	if (menuItem)
-		menuItem->SetEnabled(state);
-	menuItem = FindItem(B_TRANSLATE("Decrease pixel size"));
-	if (menuItem)
-		menuItem->SetEnabled(state);
-	menuItem = FindItem(B_TRANSLATE("Increase pixel size"));
-	if (menuItem)
-		menuItem->SetEnabled(state);
+	UpdateInfoMenu(this, fMainWindow);
 
 	BMenu::AttachedToWindow();
 }
@@ -1228,10 +1265,11 @@ TMagnify::MouseDown(BPoint where)
 		if ((buttons & B_SECONDARY_MOUSE_BUTTON) || (modifiers & B_CONTROL_KEY)) {
 			// secondary button was clicked or control key was down, show menu and return
 
-			BPopUpMenu *menu = new BPopUpMenu(B_TRANSLATE("Info"));
+			BPopUpMenu *menu = new BPopUpMenu(B_TRANSLATE("Info"), false, false);
 			menu->SetFont(be_plain_font);
 			BuildInfoMenu(menu);
-
+			UpdateInfoMenu(menu, dynamic_cast<TWindow*>(Window()));
+MakeFocus();
 			BMenuItem *selected = menu->Go(ConvertToScreen(where));
 			if (selected)
 				Window()->PostMessage(selected->Message()->what);

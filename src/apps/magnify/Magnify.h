@@ -221,6 +221,7 @@ class TWindow : public BWindow {
 
 		void			ShowInfo(bool);
 		bool			InfoIsShowing();
+		bool			InfoBarIsVisible();
 		void			UpdateInfo();
 		void			UpdateInfoBarOnResize();
 
@@ -235,6 +236,7 @@ class TWindow : public BWindow {
 		int32			PixelSize();
 
 		bool			IsActive();
+		bool			IsSticked();
 
 	private:
 		float			fInfoHeight;
