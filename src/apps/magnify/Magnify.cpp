@@ -1269,7 +1269,6 @@ TMagnify::MouseDown(BPoint where)
 			menu->SetFont(be_plain_font);
 			BuildInfoMenu(menu);
 			UpdateInfoMenu(menu, dynamic_cast<TWindow*>(Window()));
-MakeFocus();
 			BMenuItem *selected = menu->Go(ConvertToScreen(where));
 			if (selected)
 				Window()->PostMessage(selected->Message()->what);
