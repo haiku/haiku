@@ -1015,9 +1015,9 @@ ActivityView::MouseDown(BPoint where)
 
 	menu->AddItem(new BMenuItem(additionalMenu));
 	menu->AddSeparatorItem();
-	menu->AddItem(new BMenuItem(fShowLegend ?
-		B_TRANSLATE("Hide legend") : B_TRANSLATE("Show legend"),
+	menu->AddItem(item = new BMenuItem(B_TRANSLATE("Show legend"),
 		new BMessage(kMsgToggleLegend)));
+	item->SetMarked(fShowLegend);
 
 	menu->SetTargetForItems(this);
 	additionalMenu->SetTargetForItems(this);
