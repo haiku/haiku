@@ -43,15 +43,17 @@ MacDecorAddOn::MacDecorAddOn(image_id id, const char* name)
 
 
 Decorator*
-MacDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect)
+MacDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
+	Desktop* desktop)
 {
-	return new (std::nothrow)MacDecorator(settings, rect);
+	return new (std::nothrow)MacDecorator(settings, rect, desktop);
 }
 
 
-MacDecorator::MacDecorator(DesktopSettings& settings, BRect frame)
+MacDecorator::MacDecorator(DesktopSettings& settings, BRect frame,
+	Desktop* desktop)
 	:
-	Decorator(settings, frame),
+	SATDecorator(settings, frame, desktop),
 	fButtonHighColor((rgb_color) { 232, 232, 232, 255 }),
 	fButtonLowColor((rgb_color) { 128, 128, 128, 255 }),
 	fFrameHighColor((rgb_color) { 255, 255, 255, 255 }),

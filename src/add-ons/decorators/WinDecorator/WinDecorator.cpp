@@ -43,15 +43,17 @@ WinDecorAddOn::WinDecorAddOn(image_id id, const char* name)
 
 
 Decorator*
-WinDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect)
+WinDecorAddOn::_AllocateDecorator(DesktopSettings& settings, BRect rect,
+	Desktop* desktop)
 {
-	return new (std::nothrow)WinDecorator(settings, rect);
+	return new (std::nothrow)WinDecorator(settings, rect, desktop);
 }
 
 
-WinDecorator::WinDecorator(DesktopSettings& settings, BRect frame)
+WinDecorator::WinDecorator(DesktopSettings& settings, BRect frame,
+	Desktop* desktop)
 	:
-	Decorator(settings, frame),
+	SATDecorator(settings, frame, desktop),
 	// common colors to both focus and non focus state
 	fFrameHighColor((rgb_color){ 255, 255, 255, 255 }),
 	fFrameMidColor((rgb_color){ 216, 216, 216, 255 }),

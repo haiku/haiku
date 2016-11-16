@@ -13,6 +13,7 @@
 
 #include "DecorManager.h"
 #include "RGBColor.h"
+#include "SATDecorator.h"
 
 
 class MacDecorAddOn : public DecorAddOn {
@@ -21,14 +22,14 @@ public:
 
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
-									BRect rect);
+									BRect rect,	Desktop* desktop);
 };
 
 
-class MacDecorator: public Decorator {
+class MacDecorator: public SATDecorator {
 public:
 								MacDecorator(DesktopSettings& settings,
-									BRect frame);
+									BRect frame,	Desktop* desktop);
 	virtual						~MacDecorator();
 
 			void				Draw(BRect updateRect);

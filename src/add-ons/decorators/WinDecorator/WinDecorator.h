@@ -11,8 +11,8 @@
 #define WIN_DECORATOR_H
 
 
-#include "Decorator.h"
 #include "DecorManager.h"
+#include "SATDecorator.h"
 
 
 struct rgb_color;
@@ -26,14 +26,14 @@ public:
 
 protected:
 	virtual Decorator*			_AllocateDecorator(DesktopSettings& settings,
-									BRect rect);
+									BRect rect,	Desktop* desktop);
 };
 
 
-class WinDecorator: public Decorator {
+class WinDecorator: public SATDecorator {
 public:
 								WinDecorator(DesktopSettings& settings,
-									BRect frame);
+									BRect frame, Desktop* desktop);
 								~WinDecorator(void);
 
 	virtual	void				Draw(BRect updateRect);
