@@ -189,7 +189,7 @@ KeyboardFilter::Filter(BMessage* message, EventTarget** _target,
 		// Check for safe video mode (shift + cmd + ctrl + escape)
 		if (key == 0x01 && (modifiers & B_COMMAND_KEY) != 0
 			&& (modifiers & B_CONTROL_KEY) != 0
-			&& (modifiers & B_SHIFT_KEY) != 0){
+			&& (modifiers & B_SHIFT_KEY) != 0) {
 			system("screenmode --fall-back &");
 			return B_SKIP_MESSAGE;
 		}
