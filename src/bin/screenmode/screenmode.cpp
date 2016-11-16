@@ -334,8 +334,8 @@ main(int argc, char** argv)
 	if (fallbackMode) {
 		// display notification requester
 		BAlert* alert = new BAlert("screenmode",
-			"You have used the shortcut <Command><Ctrl><Escape> to reset the "
-			"screen mode to a safe fallback.", "Keep", "Revert");
+			"You have used the shortcut <Shift><Command><Ctrl><Escape> to "
+			"reset the screen mode to a safe fallback.", "Keep", "Revert");
 		alert->SetShortcut(1, B_ESCAPE);
 		if (alert->Go() == 1)
 			screenMode.Revert();
