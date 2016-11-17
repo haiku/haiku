@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2016.11.08
-# Date:    2016-11-08 20:34:05
+# Version: 2016.11.14
+# Date:    2016-11-14 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -13234,7 +13234,7 @@
 	0300  Avaya Wireless Card
 	1007  Discovery Kids Digital Camera
 0d99  Trazer Technologies, Inc.
-0d9a  RTX Telecom AS
+0d9a  RTX AS
 	0001  Bluetooth Device
 0d9b  Tat Shing Electrical Co.
 0d9c  Chee Chen Hi-Technology Co., Ltd
@@ -18237,6 +18237,8 @@
 	14ea  GW-US11H WLAN
 2c1a  Dolphin Peripherals
 	0000  Wireless Optical Mouse
+2dcf  Dialog Semiconductor
+	c952  Audio Class 2.0 Devices
 2fb2  Fujitsu, Ltd
 3125  Eagletron
 	0001  TrackerPod Camera Stand
