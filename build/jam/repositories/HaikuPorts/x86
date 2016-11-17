@@ -359,8 +359,8 @@ RemotePackageRepository HaikuPorts
 	tiff4-4.0.6-1
 	tiff4_devel-4.0.6-1
 	tiff4_tools-4.0.6-1
-	tinyxml-2.6.2-1
-	tinyxml_devel-2.6.2-1
+	tinyxml-2.6.2-3
+	tinyxml_devel-2.6.2-3
 	transmission-2.84-4
 	unrar-5.3.2-1
 	unzip-6.0-3
@@ -468,8 +468,8 @@ RemotePackageRepository HaikuPorts
 	tiff_x86_gcc2_devel-3.9.6-2
 	tiff4_x86_gcc2-4.0.6-1
 	tiff4_x86_gcc2_devel-4.0.6-1
-	tinyxml_x86_gcc2-2.6.2-1
-	tinyxml_x86_gcc2_devel-2.6.2-1
+	tinyxml_x86_gcc2-2.6.2-3
+	tinyxml_x86_gcc2_devel-2.6.2-3
 	wonderbrush_x86_gcc2-2.1.2-4
 	zlib_x86_gcc2-1.2.8-4
 	zlib_x86_gcc2_devel-1.2.8-4

@@ -518,7 +518,7 @@ RemotePackageRepository HaikuPorts
 	substrate-1.0b-1
 	subversion-1.8.11-6
 	subversion_devel-1.8.11-6
-	sum_it-0.2beta-3
+	sum_it-0.2beta-5
 	super_transball-2.1.5-1
 	taglib-1.7.2-1
 	taglib_devel-1.7.2-1
@@ -537,8 +537,8 @@ RemotePackageRepository HaikuPorts
 	tiff4_devel-4.0.6-1
 	tiff4_tools-4.0.6-1
 	timetracker-0.2-1
-	tinyxml-2.6.2-1
-	tinyxml_devel-2.6.2-1
+	tinyxml-2.6.2-3
+	tinyxml_devel-2.6.2-3
 	twolame-0.3.13-1
 	twolame_devel-0.3.13-1
 	ubertuber-0.9.11-1
@@ -976,8 +976,8 @@ RemotePackageRepository HaikuPorts
 	tiff_x86_devel-3.9.6-2
 	tiff4_x86-4.0.6-1
 	tiff4_x86_devel-4.0.6-1
-	tinyxml_x86-2.6.2-1
-	tinyxml_x86_devel-2.6.2-1
+	tinyxml_x86-2.6.2-3
+	tinyxml_x86_devel-2.6.2-3
 	tig_x86-2.1-1
 	transmission_x86-2.92-2
 	twolame_x86-0.3.13-2

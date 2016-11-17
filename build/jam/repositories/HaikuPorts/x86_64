@@ -403,8 +403,8 @@ RemotePackageRepository HaikuPorts
 	tiff4-4.0.6-1
 	tiff4_devel-4.0.6-1
 	tiff4_tools-4.0.6-1
-	tinyxml-2.6.2-1
-	tinyxml_devel-2.6.2-1
+	tinyxml-2.6.2-3
+	tinyxml_devel-2.6.2-3
 	transmission-2.84-4
 	ubertuber-0.9.11-1
 	unrar-5.3.4-1
