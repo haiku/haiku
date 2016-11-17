@@ -18,6 +18,7 @@ UnitTestLib libmediatest.so :
 	: be media [ TargetLibstdc++ ] [ TargetLibsupc++ ]
 ;
 
+SubInclude HAIKU_TOP src tests kits media media_client ;
 SubInclude HAIKU_TOP src tests kits media media_decoder ;
 SubInclude HAIKU_TOP src tests kits media mpeg2_decoder_test ;
 SubInclude HAIKU_TOP src tests kits media mp3_decoder_test ;

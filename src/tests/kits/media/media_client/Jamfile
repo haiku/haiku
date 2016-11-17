@@ -1,0 +1,8 @@
+SubDir HAIKU_TOP src tests kits media media_client ;
+
+UsePrivateHeaders media ;
+
+SimpleTest media_client :
+	media_client.cpp
+	: libmedia.so be root [ TargetLibsupc++ ]
+;
