@@ -19,26 +19,10 @@ RTSPMediaIO::RTSPMediaIO(BUrl ourUrl)
 	fClient(NULL),
 	fScheduler(NULL),
 	fLoopWatchVariable(0),
-	fLoopThread(-1),
-	fInitErr(B_ERROR)
+	fLoopThread(-1)
 {
 	fScheduler = BasicTaskScheduler::createNew();
 	fEnv = BasicUsageEnvironment::createNew(*fScheduler);
-
-	fClient = new HaikuRTSPClient(*fEnv, fUrl.UrlString(),
-		0, this);
-	if (fClient == NULL)
-		return;
-
-	fClient->sendDescribeCommand(continueAfterDESCRIBE);
-
-	fLoopThread = spawn_thread(_LoopThread, "two minutes hate thread",
-		B_NORMAL_PRIORITY, this);
-
-	if (fLoopThread <= 0 || resume_thread(fLoopThread) != B_OK)
-		return;
-
-	fInitErr = fClient->WaitForInit(5000000);
 }
 
 
@@ -51,20 +35,6 @@ RTSPMediaIO::~RTSPMediaIO()
 	status_t status;
 	if (fLoopThread != -1)
 		wait_for_thread(fLoopThread, &status);
-}
-
-
-status_t
-RTSPMediaIO::InitCheck() const
-{
-	return fInitErr;
-}
-
-
-void
-RTSPMediaIO::ShutdownLoop()
-{
-	fLoopWatchVariable = 1;
 }
 
 
@@ -82,6 +52,26 @@ RTSPMediaIO::SetSize(off_t size)
 }
 
 
+status_t
+RTSPMediaIO::Open()
+{
+	fClient = new HaikuRTSPClient(*fEnv, fUrl.UrlString(),
+		0, this);
+	if (fClient == NULL)
+		return B_ERROR;
+
+	fClient->sendDescribeCommand(continueAfterDESCRIBE);
+
+	fLoopThread = spawn_thread(_LoopThread, "two minutes hate thread",
+		B_NORMAL_PRIORITY, this);
+
+	if (fLoopThread <= 0 || resume_thread(fLoopThread) != B_OK)
+		return B_ERROR;
+
+	return fClient->WaitForInit(5000000);
+}
+
+
 int32
 RTSPMediaIO::_LoopThread(void* data)
 {
@@ -95,6 +85,13 @@ RTSPMediaIO::LoopThread()
 {
 	fEnv->taskScheduler().doEventLoop(&fLoopWatchVariable);
 	fLoopThread = -1;
+}
+
+
+void
+RTSPMediaIO::ShutdownLoop()
+{
+	fLoopWatchVariable = 1;
 }
 
 

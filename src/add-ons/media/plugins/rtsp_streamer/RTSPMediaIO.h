@@ -21,13 +21,13 @@ public:
 										RTSPMediaIO(BUrl ourUrl);
 	virtual								~RTSPMediaIO();
 
-			status_t					InitCheck() const;
-
 	virtual	ssize_t						WriteAt(off_t position,
 											const void* buffer,
 											size_t size);
 
 	virtual	status_t					SetSize(off_t size);
+
+	virtual status_t					Open();
 
 			void						LoopThread();
 			void						ShutdownLoop();
@@ -42,8 +42,6 @@ private:
 
 			char						fLoopWatchVariable;
 			thread_id					fLoopThread;
-
-			status_t					fInitErr;
 };
 
 

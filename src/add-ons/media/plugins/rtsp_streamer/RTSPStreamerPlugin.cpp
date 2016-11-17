@@ -17,13 +17,14 @@ RTSPStreamer::~RTSPStreamer()
 status_t
 RTSPStreamer::Sniff(const BUrl& url, BDataIO** source)
 {
-	RTSPMediaIO* ret = new RTSPMediaIO(url);
-	if (ret->InitCheck() == B_OK) {
-		*source = ret;
+	RTSPMediaIO* outSource = new RTSPMediaIO(url);
+	status_t ret = outSource->Open();
+	if (ret == B_OK) {
+		*source = outSource;
 		return B_OK;
 	}
-	delete ret;
-	return B_ERROR;
+	delete outSource;
+	return ret;
 }
 
 
