@@ -85,14 +85,6 @@ public:
 	virtual BMediaConnection*		BeginConnection(const media_input& input);
 	virtual BMediaConnection*		BeginConnection(const media_output& output);
 
-	// This is used when we want to connect us with another BMediaClient, the
-	// returned connection is the one you will use to call the Connect method
-	// and will represents it by the point of view of this node. Don't try to
-	// use directly connections built by another BMediaClient, it will fail,
-	// always pass between this function to get a local connection from the point
-	// of view of *this* node and then call Connect().
-	virtual BMediaConnection*		BeginConnection(BMediaConnection* connection);
-
 	// Bind internally two connections of the same BMediaClient, so that the
 	// input will be automatically forwarded to the output just after the
 	// ProcessFunc is called. The buffer is automatically recycled too.
@@ -107,8 +99,9 @@ public:
 	// If the user want a particular format for a connection it should
 	// use BMediaConnection::SetAcceptedFormat(), if it's not specified
 	// BMediaClient::Format() will be used, in case both aren't specified
-	// an error is returned. The connection should always belong to this
-	// node, in any other case it will return an error.
+	// an error is returned. The first parameter should always belong to
+	// this node, the second will be a connection obtained from another
+	// BMediaClient.
 	virtual status_t				Connect(BMediaConnection* ourConnection,
 										BMediaConnection* theirConnection);
 

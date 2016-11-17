@@ -92,23 +92,6 @@ BMediaClient::BeginConnection(const media_output& output)
 }
 
 
-BMediaConnection*
-BMediaClient::BeginConnection(BMediaConnection* connection)
-{
-	CALLED();
-
-	if (connection->fOwner == this)
-		return NULL;
-
-	BMediaConnection* ret = NULL;
-	if (_TranslateConnection(ret, connection) == B_OK) {
-		AddConnection(ret);
-		return ret;
-	}
-	return NULL;
-}
-
-
 status_t
 BMediaClient::Bind(BMediaConnection* input, BMediaConnection* output)
 {
