@@ -19,12 +19,16 @@
 
 namespace BPrivate { namespace media {
 
-// The node can receive media data.
-#define B_MEDIA_RECORDER		0x000000001
-// The node can send media data to another node.
-#define B_MEDIA_PLAYER			0x000000002
-// The node specify a control GUI which can be used to configure it.
-#define B_MEDIA_CONTROLLABLE	0x000000004
+typedef int32 media_client_kind;
+
+enum media_client_kinds {
+	// The node can receive media data.
+	B_MEDIA_RECORDER		= 0x000000001,
+	// The node can send media data to another node.
+	B_MEDIA_PLAYER			= 0x000000002,
+	// The node specify a control GUI which can be used to configure it.
+	B_MEDIA_CONTROLLABLE	= 0x000000004
+};
 
 // TODO: Add file interface
 // TODO: Offline mode is still missing
@@ -55,7 +59,7 @@ public:
 									BMediaClient(const char* name,
 										media_type type
 											= B_MEDIA_UNKNOWN_TYPE,
-										uint64
+										media_client_kind
 											capabilities = B_MEDIA_PLAYER
 												& B_MEDIA_RECORDER);
 
@@ -64,7 +68,7 @@ public:
 			status_t				InitCheck() const;
 
 	// Return the capabilities of this BMediaClient instance.
-			uint64					Capabilities() const;
+			media_client_kind		Capabilities() const;
 			media_type				Type() const;
 
 	// To connect pass the BMediaConnection to this class or to another BMediaClient,
@@ -205,7 +209,7 @@ private:
 
 			status_t				fInitErr;
 
-			uint64					fCapabilities;
+			media_client_kind		fCapabilities;
 
 			bool					fRunning;
 			BMediaClientNode*		fNode;

@@ -12,9 +12,9 @@
 
 
 BMediaClient::BMediaClient(const char* name,
-	media_type type, uint64 capability)
+	media_type type, media_client_kind capabilities)
 	:
-	fCapabilities(capability)
+	fCapabilities(capabilities)
 {
 	CALLED();
 
@@ -40,7 +40,7 @@ BMediaClient::InitCheck() const
 }
 
 
-uint64
+media_client_kind
 BMediaClient::Capabilities() const
 {
 	CALLED();
