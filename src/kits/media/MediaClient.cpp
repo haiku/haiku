@@ -455,7 +455,7 @@ BMediaClient::PerformanceTime() const
 
 
 status_t
-BMediaClient::SendBuffer(BMediaConnection* connection, BBuffer* buffer)
+BMediaClient::SendBuffer(BBuffer* buffer, BMediaConnection* connection)
 {
 	CALLED();
 

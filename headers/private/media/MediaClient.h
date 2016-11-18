@@ -165,8 +165,8 @@ public:
 	// to ovverride it so that you can track something, in this case
 	// be sure to call the base version.
 	// Automatically recycle the BBuffer.
-	virtual	status_t				SendBuffer(BMediaConnection* connection,
-										BBuffer* buffer);
+	virtual	status_t				SendBuffer(BBuffer* buffer,
+										BMediaConnection* connection);
 
 	// This is supplied to support using this class in a BMediaAddOn.
 	// Default version just return NULL.

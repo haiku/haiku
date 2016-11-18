@@ -73,8 +73,10 @@ void _ProducerFilterConsumerTest()
 	BMediaConnection* filterInput = sFilter->BeginConnection(B_MEDIA_INPUT);
 	BMediaConnection* filterOutput = sFilter->BeginConnection(B_MEDIA_OUTPUT);
 
+	assert(sFilter->Bind(filterInput, filterOutput) == B_OK);
+
 	assert(sProducer->Connect(output, filterInput) == B_OK);
-	assert(sProducer->Connect(filterOutput, input) == B_OK);
+	assert(sFilter->Connect(filterOutput, input) == B_OK);
 
 	assert(sFilter->Disconnect() == B_OK);
 
