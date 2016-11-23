@@ -250,7 +250,7 @@ BMediaClient::OutputAt(int32 index) const
 
 
 BMediaConnection*
-BMediaClient::FindConnection(const media_destination& dest) const
+BMediaClient::FindInput(const media_destination& dest) const
 {
 	CALLED();
 
@@ -263,7 +263,7 @@ BMediaClient::FindConnection(const media_destination& dest) const
 
 
 BMediaConnection*
-BMediaClient::FindConnection(const media_source& source) const
+BMediaClient::FindOutput(const media_source& source) const
 {
 	CALLED();
 
