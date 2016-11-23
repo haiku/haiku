@@ -6,6 +6,7 @@
 #include "MediaClientNode.h"
 
 #include <MediaClient.h>
+#include <MediaConnection.h>
 #include <scheduler.h>
 #include <TimeSource.h>
 
@@ -28,11 +29,11 @@ BMediaClientNode::BMediaClientNode(const char* name,
 	CALLED();
 
 	// Configure the node to do the requested jobs
-	if (fOwner->Capabilities() & B_MEDIA_PLAYER)
+	if (fOwner->Kind() & B_MEDIA_PLAYER)
 		AddNodeKind(B_BUFFER_PRODUCER);
-	if (fOwner->Capabilities() & B_MEDIA_RECORDER)
+	if (fOwner->Kind() & B_MEDIA_RECORDER)
 		AddNodeKind(B_BUFFER_CONSUMER);
-	if (fOwner->Capabilities() & B_MEDIA_CONTROLLABLE)
+	if (fOwner->Kind() & B_MEDIA_CONTROLLABLE)
 		AddNodeKind(B_CONTROLLABLE);
 }
 
@@ -174,7 +175,7 @@ BMediaClientNode::GetNextInput(int32* cookie,
 	} else {
 		BMediaConnection* conn = fOwner->InputAt(*cookie);
 		if (conn != NULL) {
-			conn->BuildMediaInput(input);
+			*input = conn->MediaInput();
 			*cookie += 1;
 			return B_OK;
 		}
@@ -230,7 +231,7 @@ BMediaClientNode::Connected(const media_source& source,
 		return B_MEDIA_BAD_DESTINATION;
 
 	conn->ConnectedCallback(source, format);
-	conn->BuildMediaInput(outInput);
+	*outInput = conn->MediaInput();
 	return B_OK;
 }
 
@@ -289,7 +290,7 @@ BMediaClientNode::FormatSuggestionRequested(media_type type,
 	} else {
 		// In that case we return just a very generic format.
 		media_format outFormat;
-		outFormat.type = fOwner->Type();
+		outFormat.type = fOwner->MediaType();
 		*format = outFormat;
 		return B_OK;
 	}
@@ -350,7 +351,7 @@ BMediaClientNode::GetNextOutput(int32* cookie, media_output* output)
 	} else {
 		BMediaConnection* conn = fOwner->OutputAt(*cookie);
 		if (conn != NULL) {
-			conn->BuildMediaOutput(output);
+			*output = conn->MediaOutput();
 			*cookie += 1;
 			return B_OK;
 		}
@@ -413,15 +414,15 @@ BMediaClientNode::PrepareToConnect(const media_source& source,
 	if (conn == NULL)
 		return B_MEDIA_BAD_SOURCE;
 
-	if (conn->fDestination != media_destination::null)
+	if (conn->Destination() != media_destination::null)
 		return B_MEDIA_ALREADY_CONNECTED;
 
-	if (format->type != fOwner->Type())
+	if (format->type != fOwner->MediaType())
 		return B_MEDIA_BAD_FORMAT;
 
-	conn->fDestination = dest;
+	conn->fConnection.destination = dest;
 	conn->SetAcceptedFormat(*format);
-	*out_source = conn->fSource;
+	*out_source = conn->Source();
 	strcpy(name, Name());
 	return B_OK;
 }
@@ -473,7 +474,7 @@ BMediaClientNode::Disconnect(const media_source& source,
 	if (conn == NULL)
 		return;
 
-	if (source == conn->fSource && dest == conn->fDestination)
+	if (source == conn->Source() && dest == conn->Destination())
 		conn->Reset();
 
 	conn->DisconnectCallback(dest);

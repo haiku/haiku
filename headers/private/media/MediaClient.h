@@ -10,6 +10,7 @@
 #include <Buffer.h>
 
 #include <MediaAddOn.h>
+#include <MediaClientDefs.h>
 #include <MediaConnection.h>
 #include <MediaDefs.h>
 #include <MediaNode.h>
@@ -19,19 +20,6 @@
 
 namespace BPrivate { namespace media {
 
-typedef int32 media_client_kind;
-
-enum media_client_kinds {
-	// The node can receive media data.
-	B_MEDIA_RECORDER		= 0x000000001,
-	// The node can send media data to another node.
-	B_MEDIA_PLAYER			= 0x000000002,
-	// The node specify a control GUI which can be used to configure it.
-	B_MEDIA_CONTROLLABLE	= 0x000000004
-};
-
-// TODO: Add file interface
-// TODO: Offline mode is still missing
 
 // BMediaClient is a general purpose class allowing to create any kind
 // of media_node. It automatically manage the expected behavior under
@@ -56,20 +44,25 @@ public:
 											...);
 
 	// TODO: Should allow BControllable capabilities
+	// TODO: Add file interface
+	// TODO: Offline mode is still missing
+
 									BMediaClient(const char* name,
 										media_type type
 											= B_MEDIA_UNKNOWN_TYPE,
 										media_client_kind
-											capabilities = B_MEDIA_PLAYER
+											kind = B_MEDIA_PLAYER
 												& B_MEDIA_RECORDER);
 
 	virtual							~BMediaClient();
 
-			status_t				InitCheck() const;
+			const media_client&		Client() const;
 
 	// Return the capabilities of this BMediaClient instance.
-			media_client_kind		Capabilities() const;
-			media_type				Type() const;
+			media_client_kind		Kind() const;
+			media_type				MediaType() const;
+
+			status_t				InitCheck() const;
 
 	// To connect pass the BMediaConnection to this class or to another BMediaClient,
 	// also in another team the connection object will be valid.
@@ -83,11 +76,6 @@ public:
 	// BMediaClient::BeginConnection() and then Connect(), so that it
 	// will automatically connect to this node.
 	virtual BMediaConnection*		BeginConnection(media_connection_kind kind);
-
-	// Those are used if you want to connect to a precise input/output of
-	// another node, the connection returned represents a remote input/output.
-	virtual BMediaConnection*		BeginConnection(const media_input& input);
-	virtual BMediaConnection*		BeginConnection(const media_output& output);
 
 	// Bind internally two connections of the same BMediaClient, so that the
 	// input will be automatically forwarded to the output just after the
@@ -110,18 +98,20 @@ public:
 										BMediaConnection* theirConnection);
 
 	virtual status_t				Connect(BMediaConnection* ourConnection,
-										const dormant_node_info& dormantInfo);
+										const media_connection& theirConnection);
 
+	// Find a free input/output and try to connect to the media_client,
+	// return meaningful error otherwise.
 	virtual status_t				Connect(BMediaConnection* ourConnection,
-										const media_node& node);
+										const media_client& client);
 
 	// Disconnect any connection belonging to this object, to disconnect
 	// a single connection use BMediaConnection::Disconnect().
 	virtual status_t				Disconnect();
 
-			int32					CountConnections() const;
 			int32					CountInputs() const;
 			int32					CountOutputs() const;
+
 			BMediaConnection*		InputAt(int32 index) const;
 			BMediaConnection*		OutputAt(int32 index) const;
 
@@ -164,14 +154,6 @@ public:
 	// when run_mode != B_OFFLINE.
 			bigtime_t				PerformanceTime() const;
 
-	// When a connection is not binded with another, it's your job to send
-	// the buffer to the connection you want. You might want
-	// to ovverride it so that you can track something, in this case
-	// be sure to call the base version.
-	// Automatically recycle the BBuffer.
-	virtual	status_t				SendBuffer(BBuffer* buffer,
-										BMediaConnection* connection);
-
 	// This is supplied to support using this class in a BMediaAddOn.
 	// Default version just return NULL.
 	virtual	BMediaAddOn*			AddOn(int32* id) const;
@@ -180,6 +162,13 @@ public:
 										void* cookie = NULL);
 
 protected:
+	// When a connection is not binded with another, it's your job to send
+	// the buffer to the connection you want. You might want
+	// to ovverride it so that you can track something, in this case
+	// be sure to call the base version.
+	virtual	status_t				SendBuffer(BBuffer* buffer,
+										BMediaConnection* connection);
+
 	virtual void					BufferReceived(BMediaConnection* connection,
 										BBuffer* buffer);
 
@@ -192,24 +181,20 @@ protected:
 			status_t				DisconnectConnection(BMediaConnection* conn);
 			status_t				ResetConnection(BMediaConnection* conn);
 			status_t				ReleaseConnection(BMediaConnection* conn);
+
 private:
 
 			void					_Init();
 			void					_Deinit();
 
-			status_t				_TranslateConnection(BMediaConnection* dest,
-										BMediaConnection* source);
-
-			status_t				_Connect(BMediaConnection* conn,
-										media_node node);
 			status_t				_ConnectInput(BMediaConnection* output,
-										BMediaConnection* input);
+										const media_connection& input);
 			status_t				_ConnectOutput(BMediaConnection* input,
-										BMediaConnection* output);
+										const media_connection& output);
 
 			status_t				fInitErr;
 
-			media_client_kind		fCapabilities;
+			media_client			fClient;
 
 			bool					fRunning;
 			BMediaClientNode*		fNode;
@@ -226,6 +211,9 @@ private:
 
 			BObjectList<BMediaConnection> fInputs;
 			BObjectList<BMediaConnection> fOutputs;
+
+			int32					fLastInputID;
+			int32					fLastOutputID;
 
 	virtual	void					_ReservedMediaClient0();
 	virtual	void					_ReservedMediaClient1();

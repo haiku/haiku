@@ -27,6 +27,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			AdapterIO.cpp
 			MediaIO.cpp
 			MediaClient.cpp
+			MediaClientDefs.cpp
 			MediaConnection.cpp
 			MediaRecorder.cpp
 

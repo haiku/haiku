@@ -5,9 +5,51 @@
 
 #include <MediaConnection.h>
 
-#include <MediaClient.h>
-
 #include "debug.h"
+
+
+BMediaConnection::BMediaConnection(BMediaClient* owner,
+	media_connection_kind kind,
+	media_connection_id id)
+	:
+	fOwner(owner),
+	fBind(NULL)
+{
+	CALLED();
+
+	_Init();
+
+	fConnection.kind = kind;
+	fConnection.id = id;
+	fConnection.client = fOwner->Client();
+
+	if (IsOutput()) {
+		fConnection.source.port = fOwner->fNode->ControlPort();
+		fConnection.source.id = fConnection.id;
+
+		fConnection.destination = media_destination::null;
+	} else {
+		// IsInput()
+		fConnection.destination.port = fOwner->fNode->ControlPort();
+		fConnection.destination.id = fConnection.id;
+
+		fConnection.source = media_source::null;
+	}
+}
+
+
+BMediaConnection::~BMediaConnection()
+{
+	CALLED();
+
+}
+
+
+const media_connection&
+BMediaConnection::Connection() const
+{
+	return fConnection;
+}
 
 
 bool
@@ -15,7 +57,7 @@ BMediaConnection::IsOutput() const
 {
 	CALLED();
 
-	return fKind == B_MEDIA_OUTPUT;
+	return fConnection.IsOutput();
 }
 
 
@@ -24,49 +66,7 @@ BMediaConnection::IsInput() const
 {
 	CALLED();
 
-	return fKind == B_MEDIA_INPUT;
-}
-
-
-void
-BMediaConnection::BuildMediaOutput(media_output* output) const
-{
-	CALLED();
-
-	output->format = AcceptedFormat();
-	output->node = fOwner->fNode->Node();
-	output->source = fSource;
-	output->source.port = fOwner->fNode->ControlPort();
-}
-
-
-void
-BMediaConnection::BuildMediaInput(media_input* input) const
-{
-	CALLED();
-
-	input->format = AcceptedFormat();
-	input->node = fOwner->fNode->Node();
-	input->destination = fDestination;
-	input->destination.port = fOwner->fNode->ControlPort();
-}
-
-
-const media_destination&
-BMediaConnection::Destination() const
-{
-	CALLED();
-
-	return fDestination;
-}
-
-
-const media_source&
-BMediaConnection::Source() const
-{
-	CALLED();
-
-	return fSource;
+	return fConnection.IsInput();
 }
 
 
@@ -93,7 +93,7 @@ BMediaConnection::SetAcceptedFormat(const media_format& format)
 {
 	CALLED();
 
-	fFormat = format;
+	fConnection.format = format;
 }
 
 
@@ -102,7 +102,7 @@ BMediaConnection::AcceptedFormat() const
 {
 	CALLED();
 
-	return fFormat;
+	return fConnection.format;
 }
 
 
@@ -147,11 +147,6 @@ BMediaConnection::Reset()
 {
 	CALLED();
 
-	if (IsOutput())
-		fDestination = media_destination::null;
-	else
-		fSource = media_source::null;
-
 	delete fBufferGroup;
 	fBufferGroup = NULL;
 
@@ -177,52 +172,6 @@ BMediaConnection::SetHooks(process_hook processHook,
 	fProcessHook = processHook;
 	fNotifyHook = notifyHook;
 	fBufferCookie = cookie;
-}
-
-
-BMediaConnection::BMediaConnection(BMediaClient* owner,
-	media_connection_kind kind)
-	:
-	fKind(kind),
-	fOwner(owner),
-	fBind(NULL)
-{
-	CALLED();
-
-	_Init();
-}
-
-
-BMediaConnection::BMediaConnection(BMediaClient* owner,
-	const media_output& output)
-	:
-	fKind(B_MEDIA_OUTPUT),
-	fOwner(owner),
-	fBind(NULL)
-{
-	CALLED();
-
-	_Init();
-}
-
-
-BMediaConnection::BMediaConnection(BMediaClient* owner,
-	const media_input& input)
-	:
-	fKind(B_MEDIA_INPUT),
-	fOwner(owner),
-	fBind(NULL)
-{
-	CALLED();
-
-	_Init();
-}
-
-
-BMediaConnection::~BMediaConnection()
-{
-	CALLED();
-
 }
 
 
@@ -266,7 +215,7 @@ void
 BMediaConnection::ConnectedCallback(const media_source& source,
 	const media_format& format)
 {
-	fSource = source;
+	fConnection.source = source;
 	SetAcceptedFormat(format);
 
 	if (fNotifyHook != NULL)
@@ -279,8 +228,6 @@ BMediaConnection::ConnectedCallback(const media_source& source,
 void
 BMediaConnection::DisconnectedCallback(const media_source& source)
 {
-	fSource = media_source::null;
-
 	if (fNotifyHook != NULL)
 		(*fNotifyHook)(B_DISCONNECTED, this);
 
@@ -291,14 +238,13 @@ BMediaConnection::DisconnectedCallback(const media_source& source)
 void
 BMediaConnection::ConnectCallback(const media_destination& destination)
 {
-	fDestination = destination;
+	fConnection.destination = destination;
 }
 
 
 void
 BMediaConnection::DisconnectCallback(const media_destination& destination)
 {
-	fDestination = destination;
 }
 
 
@@ -310,9 +256,34 @@ BMediaConnection::_Init()
 	fBufferGroup = NULL;
 	fNotifyHook = NULL;
 	fProcessHook = NULL;
+}
 
-	fSource = media_source::null;
-	fDestination = media_destination::null;
+
+media_input
+BMediaConnection::MediaInput() const
+{
+	return fConnection.MediaInput();
+}
+
+
+media_output
+BMediaConnection::MediaOutput() const
+{
+	return fConnection.MediaOutput();
+}
+
+
+const media_source&
+BMediaConnection::Source() const
+{
+	return fConnection.Source();
+}
+
+
+const media_destination&
+BMediaConnection::Destination() const
+{
+	return fConnection.Destination();
 }
 
 

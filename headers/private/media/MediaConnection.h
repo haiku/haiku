@@ -9,19 +9,14 @@
 #include <BufferGroup.h>
 #include <MediaDefs.h>
 
+#include <MediaClient.h>
+#include <MediaClientDefs.h>
+
 #include "MediaClientNode.h"
 
 
 namespace BPrivate { namespace media {
 
-
-enum media_connection_kind {
-	B_MEDIA_INPUT = 0,
-	B_MEDIA_OUTPUT = 1
-};
-
-
-class BMediaClient;
 
 // The BMediaConnection class is the swiss knife of BMediaClient.
 // It represents a connection between two nodes and allow to create complex
@@ -51,7 +46,8 @@ public:
 		B_ASK_TIMER
 	};
 
-	// This function is called when it has come the moment to handle a buffer.
+
+	// This function is called when it is the moment to handle a buffer.
 	typedef void					(*process_hook)(BMediaConnection* connection,
 										BBuffer* buffer);
 
@@ -63,15 +59,16 @@ public:
 
 	virtual							~BMediaConnection();
 
+	const media_connection&			Connection() const;
+	media_connection_id				Id() const;
+	const char*						Name() const;
+
 	// TODO: while most of the objects for both kinds are common
 	// it would be worthwile to have a private implementation
 	// so that we can better model the differences and avoid
 	// problems.
-	bool 							IsOutput() const;
 	bool							IsInput() const;
-
-	const media_destination& 		Destination() const;
-	const media_source&				Source() const;
+	bool 							IsOutput() const;
 
 	bool							HasBinding() const;
 	BMediaConnection*				Binding() const;
@@ -119,11 +116,8 @@ public:
 
 protected:
 									BMediaConnection(BMediaClient* owner,
-										media_connection_kind kind);
-									BMediaConnection(BMediaClient* owner,
-										const media_output& output);
-									BMediaConnection(BMediaClient* owner,
-										const media_input& input);
+										media_connection_kind kind,
+										media_connection_id id);
 
 	// TODO: All notifications should be done into private callbacks like this.
 	void							ConnectedCallback(const media_source& source,
@@ -134,18 +128,17 @@ protected:
 	void							DisconnectCallback(const media_destination& source);
 
 private:
-	void							BuildMediaOutput(media_output* output) const;
-	void							BuildMediaInput(media_input* output) const;
+	media_input						MediaInput() const;
+	media_output					MediaOutput() const;
+
+	const media_source&				Source() const;
+	const media_destination&		Destination() const;
 
 	void							_Init();
 
-	bool							fConnected;
-	bool							fOutputEnabled;
+	media_connection				fConnection;
 
-	media_connection_kind			fKind;
 	BMediaClient*					fOwner;
-	media_node						fOwnerNode;
-	team_id							fOwnerTeam;
 
 	// A connection might be binded so that it will automatically
 	// forward or receive the data from/to a local BMediaConnection,
@@ -156,17 +149,13 @@ private:
 	notify_hook						fNotifyHook;
 	void*							fBufferCookie;
 
-	media_source					fSource;
-	media_destination				fDestination;
-
-	// This represents the node at other end of connection.
-	media_node						fRemoteNode;
-
-	media_format					fFormat;
 	size_t							fBufferSize;
 	bigtime_t						fBufferDuration;
 
 	BBufferGroup*					fBufferGroup;
+
+	bool							fConnected;
+	bool							fOutputEnabled;
 
 	virtual	void					_ReservedMediaConnection0();
 	virtual	void					_ReservedMediaConnection1();
