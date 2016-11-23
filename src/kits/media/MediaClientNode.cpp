@@ -417,8 +417,10 @@ BMediaClientNode::PrepareToConnect(const media_source& source,
 	if (conn->Destination() != media_destination::null)
 		return B_MEDIA_ALREADY_CONNECTED;
 
-	if (format->type != fOwner->MediaType())
+	if (fOwner->MediaType() != B_MEDIA_UNKNOWN_TYPE
+			&& format->type != fOwner->MediaType()) {
 		return B_MEDIA_BAD_FORMAT;
+	}
 
 	conn->fConnection.destination = dest;
 	conn->SetAcceptedFormat(*format);
