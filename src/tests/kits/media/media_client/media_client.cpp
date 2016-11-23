@@ -18,8 +18,9 @@ static BMediaClient* sFilter = NULL;
 
 void _InitClients(bool hasFilter)
 {
-	BMediaClient* sProducer = new BMediaClient("MediaClientProducer");
-	BMediaClient* sConsumer = new BMediaClient("MediaClientConsumer");
+	sProducer = new BMediaClient("MediaClientProducer");
+	sConsumer = new BMediaClient("MediaClientConsumer");
+
 	if (hasFilter)
 		sFilter = new BMediaClient("MediaClientFilter");
 	else
@@ -35,12 +36,25 @@ void _DeleteClients()
 }
 
 
+media_format _BuildRawAudioFormat()
+{
+	media_format format;
+	format.type = B_MEDIA_RAW_AUDIO;
+	format.u.raw_audio = media_multi_audio_format::wildcard;
+
+	return format;
+}
+
+
 void _ConsumerProducerTest()
 {
 	_InitClients(false);
 
 	BMediaConnection* output = sProducer->BeginConnection(B_MEDIA_OUTPUT);
 	BMediaConnection* input = sConsumer->BeginConnection(B_MEDIA_INPUT);
+
+	output->SetAcceptedFormat(_BuildRawAudioFormat());
+	input->SetAcceptedFormat(_BuildRawAudioFormat());
 
 	assert(sConsumer->Connect(input, output) == B_OK);
 	assert(sConsumer->Disconnect() == B_OK);
