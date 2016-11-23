@@ -487,10 +487,30 @@ TeamDebugInfo::GetActiveSourceCode(FunctionDebugInfo* info, SourceCode*& _code)
 		Function* function = FunctionAtSourceLocation(file,
 			info->SourceStartLocation());
 		if (function != NULL) {
+			function_source_state state = function->SourceCodeState();
 			if (function->SourceCodeState() == FUNCTION_SOURCE_LOADED) {
 				_code = function->GetSourceCode();
 				_code->AcquireReference();
 				return B_OK;
+			} else if (state == FUNCTION_SOURCE_NOT_LOADED) {
+				// if the function's source state is not loaded, check
+				// if we already know the file anyways. Currently, when
+				// a source code job runs, it does so on behalf of a specific
+				// function, and consequently only sets the loaded source code
+				// on that particular function at that point in time, rather
+				// than all others sharing that same file. Consequently,
+				// set it lazily here.
+				SourceFileEntry* entry = fSourceFiles->Lookup(file);
+				if (entry != NULL) {
+					FileSourceCode* sourceCode = entry->GetSourceCode();
+					if (sourceCode != NULL) {
+						function->SetSourceCode(sourceCode,
+							FUNCTION_SOURCE_LOADED);
+						_code = sourceCode;
+						_code->AcquireReference();
+						return B_OK;
+					}
+				}
 			}
 		}
 	}

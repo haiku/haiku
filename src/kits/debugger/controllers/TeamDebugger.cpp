@@ -1008,8 +1008,9 @@ TeamDebugger::FunctionSourceCodeRequested(FunctionInstance* functionInstance,
 	functionInstance->SetSourceCode(NULL, FUNCTION_SOURCE_LOADING);
 
 	bool loadForFunction = false;
-	if (!forceDisassembly && function->SourceCodeState()
-			== FUNCTION_SOURCE_NOT_LOADED) {
+	if (!forceDisassembly && (function->SourceCodeState()
+				== FUNCTION_SOURCE_NOT_LOADED
+			|| function->SourceCodeState() == FUNCTION_SOURCE_SUPPRESSED)) {
 		loadForFunction = true;
 		function->SetSourceCode(NULL, FUNCTION_SOURCE_LOADING);
 	}

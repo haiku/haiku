@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2009-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2009-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -2140,8 +2140,9 @@ SourceView::MessageReceived(BMessage* message)
 				code = instance->GetSourceCode();
 			} else {
 				Function* function = instance->GetFunction();
-				if (function->SourceCodeState()
-					== FUNCTION_SOURCE_NOT_LOADED) {
+				if (function->SourceCodeState() == FUNCTION_SOURCE_NOT_LOADED
+					|| function->SourceCodeState()
+						== FUNCTION_SOURCE_SUPPRESSED) {
 					fListener->FunctionSourceCodeRequested(instance, false);
 					break;
 				}

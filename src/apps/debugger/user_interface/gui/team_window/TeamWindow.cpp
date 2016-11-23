@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2010-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2010-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -1535,8 +1535,11 @@ TeamWindow::_UpdateSourcePathState()
 		if (sourceFile != NULL && !sourceFile->GetLocatedPath(sourceText))
 			sourceFile->GetPath(sourceText);
 
-		if (fActiveFunction->GetFunction()->SourceCodeState()
-			!= FUNCTION_SOURCE_NOT_LOADED
+		function_source_state state = fActiveFunction->GetFunction()
+			->SourceCodeState();
+		if (state == FUNCTION_SOURCE_SUPPRESSED)
+			sourceText.Prepend("Disassembly for: ");
+		else if (state != FUNCTION_SOURCE_NOT_LOADED
 			&& fActiveSourceCode->GetSourceFile() == NULL
 			&& sourceFile != NULL) {
 			sourceText.Prepend("Click to locate source file '");

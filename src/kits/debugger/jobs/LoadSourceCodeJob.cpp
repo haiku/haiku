@@ -1,5 +1,5 @@
 /*
- * Copyright 2012, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2016, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -94,11 +94,11 @@ LoadSourceCodeJob::Do()
 			if (function->SourceCodeState() == FUNCTION_SOURCE_LOADED) {
 				FileSourceCode* sourceCode = function->GetSourceCode();
 				function->SetSourceCode(sourceCode,
-					FUNCTION_SOURCE_NOT_LOADED);
+					FUNCTION_SOURCE_SUPPRESSED);
 			}
 
 			fFunctionInstance->SetSourceCode(sourceCode,
-				FUNCTION_SOURCE_LOADED);
+				FUNCTION_SOURCE_SUPPRESSED);
 			sourceCode->ReleaseReference();
 		}
 	} else

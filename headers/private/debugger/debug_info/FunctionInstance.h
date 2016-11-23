@@ -1,5 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
+ * Copyright 2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef FUNCTION_INSTANCE_H
@@ -14,7 +15,8 @@ enum function_source_state {
 	FUNCTION_SOURCE_NOT_LOADED,
 	FUNCTION_SOURCE_LOADING,
 	FUNCTION_SOURCE_LOADED,
-	FUNCTION_SOURCE_UNAVAILABLE
+	FUNCTION_SOURCE_UNAVAILABLE,
+	FUNCTION_SOURCE_SUPPRESSED
 };
 
 
