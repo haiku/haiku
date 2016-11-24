@@ -116,9 +116,9 @@ public:
 			BMediaConnection*		OutputAt(int32 index) const;
 
 			BMediaConnection*		FindInput(
-										const media_destination& dest) const;
+										const media_connection& input) const;
 			BMediaConnection*		FindOutput(
-										const media_source& source) const;
+										const media_connection& output) const;
 
 			bool					IsRunning() const;
 
@@ -135,7 +135,9 @@ public:
 	// It will be B_INCREASE_LATENCY by default
 			BMediaNode::run_mode	RunMode() const;
 			status_t				SetRunMode(BMediaNode::run_mode mode);
-			status_t				SetTimeSource(media_node timesource);
+	// TODO: Really needed?
+			status_t				SetTimeSource(
+										const media_client& timesource);
 
 	// Specify a latency range to allow the node behave correctly.
 	// Ideally the minimum latency should be the algorithmic latency you expect
@@ -183,6 +185,10 @@ protected:
 			status_t				ReleaseConnection(BMediaConnection* conn);
 
 private:
+			BMediaConnection*		FindInput(
+										const media_destination& dest) const;
+			BMediaConnection*		FindOutput(
+										const media_source& source) const;
 
 			void					_Init();
 			void					_Deinit();
