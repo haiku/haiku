@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.10.29
-#	Date:    2016-10-29 03:15:01
+#	Version: 2016.11.21
+#	Date:    2016-11-21 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -48,9 +48,11 @@
 021b  Compaq Computer Corporation
 	8139  HNE-300 (RealTek RTL8139c) [iPaq Networking]
 0270  Hauppauge computer works Inc. (Wrong ID)
+0291  Davicom Semiconductor, Inc. (Wrong ID)
 # SpeedStream is Efficient Networks, Inc, a Siemens Company
 02ac  SpeedStream
 	1012  1012 PCMCIA 10/100 Ethernet Card [RTL81xx]
+02e0  XFX Pine Group Inc. (Wrong ID)
 0303  Hewlett-Packard Company (Wrong ID)
 0308  ZyXEL Communications Corporation (Wrong ID)
 0315  SK-Electronics Co., Ltd.
@@ -546,12 +548,12 @@
 		1028 1fd3  HBA330 MMZ
 	00ab  SAS3516 Fusion-MPT Tri-Mode RAID On Chip (ROC)
 	00ac  SAS3416 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
-		1d49 0201  ThinkSystem 9400-16i PCIe 12Gb HBA
-		1d49 0203  ThinkSystem 9400-16e PCIe 12Gb HBA
+		1d49 0201  ThinkSystem 430-16i SAS/SATA 12Gb HBA
+		1d49 0203  ThinkSystem 430-16e SAS/SATA 12Gb HBA
 	00ae  SAS3508 Fusion-MPT Tri-Mode RAID On Chip (ROC)
 	00af  SAS3408 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
-		1d49 0200  ThinkSystem 9400-8i PCIe 12Gb HBA
-		1d49 0202  ThinkSystem 9400-8e PCIe 12Gb HBA
+		1d49 0200  ThinkSystem 430-8i SAS/SATA 12Gb HBA
+		1d49 0202  ThinkSystem 430-8e SAS/SATA 12Gb HBA
 	00be  SAS3504 Fusion-MPT Tri-Mode RAID On Chip (ROC)
 	00bf  SAS3404 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
 	00c0  SAS3324 PCI-Express Fusion-MPT SAS-3
@@ -7529,7 +7531,7 @@
 		1885 0700  Tsunami FPGA PMC with Altera Stratix S40
 		1885 0701  Tsunami FPGA PMC with Altera Stratix S30
 	9733  PEX 9733 33-lane, 9-port PCI Express Gen 3 (8.0 GT/s) Switch
-		1d49 0001  ThinkSystem P310W-4P NVMe Switch Card
+		1d49 0001  ThinkSystem 1610-4P NVMe Switch Adapter
 	9749  PEX 9749 49-lane, 13-port PCI Express Gen 3 (8.0 GT/s) Switch
 	a100  Blackmagic Design DeckLink
 	bb04  B&B 3PCIOSD1A Isolated PCI Serial
@@ -8375,6 +8377,7 @@
 		1048 0c45  GLoria II
 		1048 0c4a  GLoria II-64 Pro
 		1048 0c4b  GLoria II-64 Pro DVII
+		10a9 9002  VPro VR3
 	0110  NV11 [GeForce2 MX/MX 400]
 		1043 4015  AGP-V7100 Pro
 		1043 4021  V7100 Deluxe Combo
@@ -13729,6 +13732,7 @@
 	7375  PM7375 [LASAR-155 ATM SAR]
 	7384  PM7384 [FREEDM - 84P672 Frm Engine & Datalink Mgr]
 	8000  PM8000  [SPC - SAS Protocol Controller]
+	8009  PM8009 SPCve 8x6G
 	8032  ATTO Celerity FC8xEN
 		117c 003b  Celerity FC-82EN Fibre Channel Adapter
 		117c 003c  Celerity FC-84EN Fibre Channel Adapter
@@ -13742,6 +13746,8 @@
 	8071  PM8071 Tachyon SPCve 12G eight-port SAS/SATA controller
 	8072  PM8072 Tachyon SPCv 12G 16-port SAS/SATA controller
 	8073  PM8073 Tachyon SPCve 12G 16-port SAS/SATA controller
+	8531  PM8531 PFX 24xG3 Fanout PCIe Switches
+	8546  PM8546 B-FEIP PSX 96xG3 PCIe Storage Switch
 11f9  I-Cube Inc
 11fa  Kasan Electronics Company, Ltd.
 11fb  Datel Inc
@@ -16988,6 +16994,7 @@
 	16bc  BCM57765/57785 SDXC/MMC Card Reader
 	16be  BCM57765/57785 MS Card Reader
 	16bf  BCM57765/57785 xD-Picture Card Reader
+	16c1  NetXtreme-E RDMA Virtual Function
 	16c6  NetXtreme BCM5702A3 Gigabit Ethernet
 		10b7 1100  3C1000B-T 10/100/1000 PCI
 		14e4 000c  BCM5702 1000Base-T
@@ -17034,7 +17041,9 @@
 	16e8  BCM57406 NetXtreme-E Ethernet Partition
 	16e9  BCM57407 NetXtreme-E 25Gb Ethernet Controller
 	16ec  BCM57414 NetXtreme-E Ethernet Partition
+	16ed  BCM57414 NetXtreme-E RDMA Partition
 	16ee  BCM57416 NetXtreme-E Ethernet Partition
+	16ef  BCM57416 NetXtreme-E RDMA Partition
 	16f3  NetXtreme BCM5727 Gigabit Ethernet PCIe
 	16f7  NetXtreme BCM5753 Gigabit Ethernet PCI Express
 	16fd  NetXtreme BCM5753M Gigabit Ethernet PCI Express
@@ -17961,6 +17970,7 @@
 	0209  MT27700 Family [ConnectX-4 Flash Recovery]
 	020b  MT27710 Family [ConnectX-4 Lx Flash Recovery]
 	020d  MT28800 Family [ConnectX-5 Flash Recovery]
+	020f  MT28908A0 Family [ConnectX-6 Flash Recovery]
 # reserved for RM#105916
 	024e  MT53100 [Spectrum-2, Flash recovery mode]
 # Actual value to be used
@@ -18004,8 +18014,8 @@
 	1018  MT27800 Family [ConnectX-5 Virtual Function]
 	1019  MT28800 Family [ConnectX-5 Ex]
 	101a  MT28800 Family [ConnectX-5 Ex Virtual Function]
-	101b  MT28831
-	101c  MT28840
+	101b  MT28908 Family [ConnectX-6]
+	101c  MT28908 Family [ConnectX-6 Virtual Function]
 	101d  MT28841
 	101e  MT28850
 	101f  MT28851
@@ -18048,8 +18058,8 @@
 	7121  NPS-600 configuration and management interface
 	7122  NPS-600 network interface PF
 	7123  NPS-600 network interface VF
-	a2d0  MT416842
-	a2d1  MT416842
+	a2d0  MT416842 BlueField SoC Crypto enabled
+	a2d1  MT416842 BlueField SoC Crypto disabled
 	a2d3  MT416842 BlueField multicore SoC family VF
 # SwitchX-2, 40GbE switch
 	c738  MT51136
@@ -19298,7 +19308,7 @@
 18bc  GeCube Technologies, Inc.
 18c3  Micronas Semiconductor Holding AG
 	0720  nGene PCI-Express Multimedia Controller
-		07ca 032e  Hybrid M779 PCI-E
+		1461 032e  Hybrid M779 PCI-E
 # Nee Octigabay System
 18c8  Cray Inc
 18c9  ARVOO Engineering BV
@@ -19397,6 +19407,8 @@
 	0155  NT100E3-1-PTP Network Adapter 1x100Gb
 	0165  NT80E3-2-PTP Network Adapter 2x40Gb
 	0175  NT20E3-2-PTP Network Adapter 2x10Gb
+	0185  NT40A01-4x1 Network Adapter 4x1Gb
+	01a5  NT200A01 Network Adapter 2x100Gb
 18f6  NextIO
 	1000  [Nexsis] Switch Virtual P2P PCIe Bridge
 	1001  [Texsis] Switch Virtual P2P PCIe Bridge
@@ -20249,7 +20261,9 @@
 	00a5  FBC2XLG Capture 2x40Gb
 	00a6  FBC1CG Capture 1x100Gb
 	00a9  FBC2XGHH Capture 2x10Gb
+	00ad  FBC2CGG3HL Capture 2x200Gb
 	00af  Capture slave device
+	a001  FBC2CGG3 Capture 2x200Gb
 # Used on V120 VME Crate Controller
 1c32  Highland Technology, Inc.
 1c33  Daktronics, Inc
@@ -20329,9 +20343,12 @@
 	100b  K35-2SFP
 	100c  K35-4SFP
 	100d  AR-ARKA-FX0 [Arkville 32B DPDK Data Mover]
+		1d6c 2001  DPDK-Aware Virtual Function [Arkville VF]
 	100e  AR-ARKA-FX1 [Arkville 64B DPDK Data Mover]
+		1d6c 2001  DPDK-Aware Virtual Function [Arkville VF]
 	4200  A5PL-E1-10GETI [10 GbE Ethernet Traffic Instrument]
 1d78  DERA
+1d7c  Aerotech, Inc.
 1d8f  Enyx
 1d95  Graphcore Ltd
 1da1  Teko Telecom S.r.l.
@@ -20418,6 +20435,7 @@
 2bd8  ROPEX Industrie-Elektronik GmbH
 3000  Hansol Electronics Inc.
 3112  Satelco Ingenieria S.A.
+3130  AUDIOTRAK
 3142  Post Impression Systems.
 31ab  Zonet
 	1faa  ZEW1602 802.11b/g Wireless Adapter
@@ -22753,6 +22771,8 @@
 		8086 5004  Ethernet 10G 2P X540-t Adapter
 	1529  82599 10 Gigabit Dual Port Network Connection with FCoE
 	152a  82599 10 Gigabit Dual Port Backplane Connection with FCoE
+	152e  82599 Virtual Function
+	1530  X540 Virtual Function
 	1533  I210 Gigabit Network Connection
 		103c 0003  Ethernet I210-T1 GbE NIC
 		1093 7706  Compact Vision System Ethernet Adapter
@@ -22808,6 +22828,7 @@
 		8086 0001  Ethernet Converged Network Adapter X550-T2
 		8086 001a  Ethernet Converged Network Adapter X550-T2
 		8086 0022  Ethernet Converged Network Adapter X550-T2
+	1564  X550 Virtual Function
 	1565  X550 Virtual Function
 	1566  DSL4410 Thunderbolt NHI [Redwood Ridge 2C 2013]
 	1567  DSL4410 Thunderbolt Bridge [Redwood Ridge 2C 2013]
@@ -22827,10 +22848,12 @@
 		103c 0000  Ethernet 10Gb 562SFP+ Adapter
 		103c 22fc  HP Ethernet 10Gb 2-port 562FLR-SFP+ Adapter
 		103c 22fd  HP Ethernet 10Gb 2-port 562SFP+ Adapter
-		1137 0000  Ethernet Converged NIC X710-4
-		1137 013b  Ethernet Converged NIC X710-4
-		1590 0000  Ethernet 10GbE 4P 563SFP+ Adapter
+		1137 0000  Ethernet Converged NIC X710-DA
+		1137 013b  Ethernet Converged NIC X710-DA4
+		1137 020a  Ethernet Converged NIC X710-DA2
+		1590 0000  Ethernet Controller X710 for 10GbE SFP+
 		1590 0225  Ethernet 10GbE 4P 563SFP+ Adapter
+		1590 022f  Ethernet 10Gb 2-port 564i Communication Board
 		17aa 0000  ThinkServer X710 AnyFabric for 10GbE SFP+
 		17aa 4001  ThinkServer X710-4 AnyFabric for 10GbE SFP+
 		17aa 4002  ThinkServer X710-2 AnyFabric for 10GbE SFP+
@@ -22847,7 +22870,7 @@
 		8086 000b  Ethernet Server Adapter X710-DA2 for OCP
 		8086 000d  Ethernet Controller X710 for 10GbE SFP+
 		8086 0010  Ethernet Converged Network Adapter X710
-		8086 4005  Ethernet Controller XL710 for 10 Gigabit SFP+
+		8086 4005  Ethernet Controller X710 for 10GbE SFP+
 		8086 4006  Ethernet Controller X710 for 10GbE SFP+
 	1575  DSL6340 Thunderbolt 3 NHI [Alpine Ridge 2C 2015]
 	1576  DSL6340 Thunderbolt 3 Bridge [Alpine Ridge 2C 2015]
@@ -22919,12 +22942,14 @@
 	15a4  Ethernet Switch FM10000 Host Interface
 	15a5  Ethernet Switch FM10000 Host Virtual Interface
 	15a8  Ethernet Connection X552 Virtual Function
+	15a9  X552 Virtual Function
 	15aa  Ethernet Connection X552 10 GbE Backplane
 		1059 0120  T4008 10GbE interface
 	15ab  Ethernet Connection X552 10 GbE Backplane
 	15ac  Ethernet Connection X552 10 GbE SFP+
 	15ad  Ethernet Connection X552/X557-AT 10GBASE-T
 	15ae  Ethernet Connection X552 1000BASE-T
+	15b4  X553 Virtual Function
 	15b5  DSL6340 USB 3.1 Controller [Alpine Ridge]
 	15b6  DSL6540 USB 3.1 Controller [Alpine Ridge]
 	15b7  Ethernet Connection (2) I219-LM
@@ -22932,6 +22957,7 @@
 	15b9  Ethernet Connection (3) I219-LM
 	15bf  JHL6240 Thunderbolt 3 NHI (Low Power) [Alpine Ridge LP 2016]
 	15c0  JHL6240 Thunderbolt 3 Bridge (Low Power) [Alpine Ridge LP 2016]
+	15c5  X553 Virtual Function
 	15d0  Ethernet SDI Adapter FM10420-100GbE-QDA2
 	15d1  Ethernet Controller 10G X550T
 		8086 0002  Ethernet Converged Network Adapter X550-T1
@@ -26372,14 +26398,20 @@
 	37d0  Ethernet Connection X722 for 10GbE SFP+
 		17aa 4020  Intel Ethernet Connection X722 for 10G SFP+
 		17aa 4021  Intel Ethernet Connection X722 for 10G SFP+
+		17aa 4022  Ethernet Connection X722 for 10GbE SFP+
 	37d1  Ethernet Connection X722 for 1GbE
+		1590 0216  Ethernet 1Gb 2-port 368i Adapter
+		1590 0217  Ethernet 1Gb 2-port 368FLR-MMT Adapter
 		17aa 4020  Intel Ethernet Connection X722 for 1GbE
 		17aa 4021  Intel Ethernet Connection X722 for 1GbE
 		17aa 4022  Intel Ethernet Connection X722 for 1GbE
 	37d2  Ethernet Connection X722 for 10GBASE-T
+		1590 0218  Ethernet 10Gb 2-port 568FLR-MMT Adapter
 		17aa 4020  Intel Ethernet Connection X722 for 10GBASE
 		17aa 4021  Intel Ethernet Connection X722 for 10GBASE
+		17aa 4022  Ethernet Connection X722 for 10GBASE-T
 	37d3  Ethernet Connection X722 for 10GbE SFP+
+		1590 0219  Ethernet 10Gb 2-port 568FLR-MMSFP+ Adapter
 	37d4  Ethernet Connection X722 for 10GbE QSFP+
 	37d9  X722 Hyper-V Virtual Function
 	3a00  82801JD/DO (ICH10 Family) 4-port SATA IDE Controller
