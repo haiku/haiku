@@ -7,6 +7,8 @@
 #include <MediaConnection.h>
 #include <SupportDefs.h>
 
+#include <debug.h>
+
 #include <assert.h>
 #include <stdio.h>
 
