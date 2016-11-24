@@ -10,6 +10,11 @@
 #include <assert.h>
 #include <stdio.h>
 
+#ifdef DEBUG
+#define DELAYED_MODE 1
+#define SNOOZE_FOR 1000000
+#endif
+
 
 static BMediaClient* sProducer = NULL;
 static BMediaClient* sConsumer = NULL;
@@ -57,6 +62,11 @@ void _ConsumerProducerTest()
 	input->SetAcceptedFormat(_BuildRawAudioFormat());
 
 	assert(sConsumer->Connect(input, output) == B_OK);
+
+	#ifdef DELAYED_MODE
+	snooze(SNOOZE_FOR);
+	#endif
+
 	assert(sConsumer->Disconnect() == B_OK);
 
 	_DeleteClients();
@@ -71,6 +81,11 @@ void _ProducerConsumerTest()
 	BMediaConnection* input = sConsumer->BeginConnection(B_MEDIA_INPUT);
 
 	assert(sProducer->Connect(output, input) == B_OK);
+
+	#ifdef DELAYED_MODE
+	snooze(SNOOZE_FOR);
+	#endif
+
 	assert(sProducer->Disconnect() == B_OK);
 
 	_DeleteClients();
@@ -91,6 +106,9 @@ void _ProducerFilterConsumerTest()
 
 	assert(sProducer->Connect(output, filterInput) == B_OK);
 	assert(sFilter->Connect(filterOutput, input) == B_OK);
+	#ifdef DELAYED_MODE
+	snooze(SNOOZE_FOR);
+	#endif
 
 	assert(sFilter->Disconnect() == B_OK);
 
