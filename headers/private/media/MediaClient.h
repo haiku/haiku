@@ -115,9 +115,9 @@ public:
 			BMediaConnection*		InputAt(int32 index) const;
 			BMediaConnection*		OutputAt(int32 index) const;
 
-			BMediaConnection*		FindConnection(
+			BMediaConnection*		FindInput(
 										const media_destination& dest) const;
-			BMediaConnection*		FindConnection(
+			BMediaConnection*		FindOutput(
 										const media_source& source) const;
 
 			bool					IsRunning() const;

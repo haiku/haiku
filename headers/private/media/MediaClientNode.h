@@ -71,12 +71,12 @@ protected:
 								media_node_id* timesource);
 
 	virtual	status_t		Connected(const media_source& source,
-								const media_destination& where,
+								const media_destination& dest,
 								const media_format& format,
 								media_input* outInput);
 
 	virtual	void			Disconnected(const media_source& source,
-								const media_destination& where);
+								const media_destination& dest);
 
 	virtual	status_t		FormatChanged(const media_source& source,
 								const media_destination& consumer,
