@@ -15,6 +15,7 @@ namespace BPrivate { namespace media {
 
 typedef int32 media_client_id;
 typedef int32 media_client_kind;
+typedef int32 media_connection_kind;
 typedef int32 media_connection_id;
 
 
@@ -27,7 +28,7 @@ enum media_client_kinds {
 	B_MEDIA_CONTROLLABLE	= 0x000000004
 };
 
-enum media_connection_kind {
+enum media_connection_kinds {
 	B_MEDIA_INPUT = 0,
 	B_MEDIA_OUTPUT = 1
 };
@@ -55,7 +56,7 @@ typedef struct media_connection {
 	media_connection_id			Id() const;
 	media_connection_kind		Kind() const;
 
-	media_client				Client() const;
+	const media_client&			Client() const;
 
 	const char*					Name() const;
 
