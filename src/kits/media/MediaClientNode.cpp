@@ -451,18 +451,8 @@ BMediaClientNode::Connect(status_t status, const media_source& source,
 	strcpy(name, Name());
 	conn->SetAcceptedFormat(format);
 
-	bigtime_t latency;
-	media_node_id id;
-	FindLatencyFor(dest, &latency, &id);
-
-	bigtime_t duration = ((format.u.raw_audio.buffer_size * 1000000LL)
-		/ ((format.u.raw_audio.format
-				& media_raw_audio_format::B_AUDIO_SIZE_MASK)
-			* format.u.raw_audio.channel_count))
-		/ (int32)format.u.raw_audio.frame_rate;
-	SetBufferDuration(duration);
-	SetEventLatency((3 * BufferDuration()) / 4);
 	// TODO: Allocate buffers, add correct latency estimate
+	// and buffer duration mode.
 }
 
 
