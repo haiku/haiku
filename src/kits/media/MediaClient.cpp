@@ -16,8 +16,7 @@
 BMediaClient::BMediaClient(const char* name,
 	media_type type, media_client_kind kind)
 	:
-	fLastInputID(0),
-	fLastOutputID(0)
+	fLastID(0)
 {
 	CALLED();
 
@@ -77,13 +76,7 @@ BMediaClient::BeginConnection(media_connection_kind kind)
 {
 	CALLED();
 
-	media_connection_id id;
-	if (kind == B_MEDIA_INPUT)
-		id = fLastInputID++;
-	else
-		id = fLastOutputID++;
-
-	BMediaConnection* conn = new BMediaConnection(this, kind, id);
+	BMediaConnection* conn = new BMediaConnection(this, kind, fLastID++);
 	AddConnection(conn);
 	return conn;
 }

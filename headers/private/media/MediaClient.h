@@ -218,8 +218,7 @@ private:
 			BObjectList<BMediaConnection> fInputs;
 			BObjectList<BMediaConnection> fOutputs;
 
-			int32					fLastInputID;
-			int32					fLastOutputID;
+			media_connection_id		fLastID;
 
 	virtual	void					_ReservedMediaClient0();
 	virtual	void					_ReservedMediaClient1();
