@@ -136,6 +136,9 @@ MidiSettingsView::MessageReceived(BMessage* message)
 		case kDoubleClick:
 		{
 			int selection = fListView->CurrentSelection();
+			if (selection < 0)
+				break;
+
 			BStringItem* item = (BStringItem*)fListView->ItemAt(selection);
 
 			BEntry entry(item->Text());
