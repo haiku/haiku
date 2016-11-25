@@ -128,9 +128,6 @@ protected:
 	void							DisconnectCallback(const media_destination& source);
 
 private:
-	media_input						MediaInput() const;
-	media_output					MediaOutput() const;
-
 	const media_source&				Source() const;
 	const media_destination&		Destination() const;
 
@@ -171,6 +168,30 @@ private:
 	uint32							fPadding[64];
 
 	friend class BMediaClient;
+	friend class BMediaClientNode;
+};
+
+
+class BMediaInput : public BMediaConnection {
+public:
+									BMediaInput(BMediaClient* owner,
+										media_connection_id id);
+
+private:
+	media_input						MediaInput() const;
+
+	friend class BMediaClientNode;
+};
+
+
+class BMediaOutput : public BMediaConnection {
+public:
+									BMediaOutput(BMediaClient* owner,
+										media_connection_id id);
+
+private:
+	media_output					MediaOutput() const;
+
 	friend class BMediaClientNode;
 };
 

@@ -14,7 +14,7 @@
 
 #ifdef DEBUG
 #define DELAYED_MODE 1
-#define SNOOZE_FOR 1000000
+#define SNOOZE_FOR 10000000
 #endif
 
 
@@ -57,8 +57,8 @@ void _ConsumerProducerTest()
 {
 	_InitClients(false);
 
-	BMediaConnection* output = sProducer->BeginConnection(B_MEDIA_OUTPUT);
-	BMediaConnection* input = sConsumer->BeginConnection(B_MEDIA_INPUT);
+	BMediaOutput* output = sProducer->BeginOutput();
+	BMediaInput* input = sConsumer->BeginInput();
 
 	output->SetAcceptedFormat(_BuildRawAudioFormat());
 	input->SetAcceptedFormat(_BuildRawAudioFormat());
@@ -79,8 +79,8 @@ void _ProducerConsumerTest()
 {
 	_InitClients(false);
 
-	BMediaConnection* output = sProducer->BeginConnection(B_MEDIA_OUTPUT);
-	BMediaConnection* input = sConsumer->BeginConnection(B_MEDIA_INPUT);
+	BMediaOutput* output = sProducer->BeginOutput();
+	BMediaInput* input = sConsumer->BeginInput();
 
 	assert(sProducer->Connect(output, input) == B_OK);
 
@@ -98,11 +98,11 @@ void _ProducerFilterConsumerTest()
 {
 	_InitClients(true);
 
-	BMediaConnection* output = sProducer->BeginConnection(B_MEDIA_OUTPUT);
-	BMediaConnection* input = sConsumer->BeginConnection(B_MEDIA_INPUT);
+	BMediaOutput* output = sProducer->BeginOutput();
+	BMediaInput* input = sConsumer->BeginInput();
 
-	BMediaConnection* filterInput = sFilter->BeginConnection(B_MEDIA_INPUT);
-	BMediaConnection* filterOutput = sFilter->BeginConnection(B_MEDIA_OUTPUT);
+	BMediaInput* filterInput = sFilter->BeginInput();
+	BMediaOutput* filterOutput = sFilter->BeginOutput();
 
 	assert(sFilter->Bind(filterInput, filterOutput) == B_OK);
 

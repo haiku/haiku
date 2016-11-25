@@ -90,8 +90,10 @@ private:
 	uint32						padding[16];
 
 	friend class BMediaClient;
-	friend class BMediaConnection;
 	friend class BMediaClientNode;
+	friend class BMediaConnection;
+	friend class BMediaInput;
+	friend class BMediaOutput;
 } media_connection;
 
 

@@ -259,20 +259,6 @@ BMediaConnection::_Init()
 }
 
 
-media_input
-BMediaConnection::MediaInput() const
-{
-	return fConnection.MediaInput();
-}
-
-
-media_output
-BMediaConnection::MediaOutput() const
-{
-	return fConnection.MediaOutput();
-}
-
-
 const media_source&
 BMediaConnection::Source() const
 {
@@ -298,3 +284,31 @@ void BMediaConnection::_ReservedMediaConnection7() {}
 void BMediaConnection::_ReservedMediaConnection8() {}
 void BMediaConnection::_ReservedMediaConnection9() {}
 void BMediaConnection::_ReservedMediaConnection10() {}
+
+
+BMediaInput::BMediaInput(BMediaClient* owner, media_connection_id id)
+	:
+	BMediaConnection(owner, B_MEDIA_INPUT, id)
+{
+}
+
+
+media_input
+BMediaInput::MediaInput() const
+{
+	return Connection().MediaInput();
+}
+
+
+BMediaOutput::BMediaOutput(BMediaClient* owner, media_connection_id id)
+	:
+	BMediaConnection(owner, B_MEDIA_OUTPUT, id)
+{
+}
+
+
+media_output
+BMediaOutput::MediaOutput() const
+{
+	return Connection().MediaOutput();
+}

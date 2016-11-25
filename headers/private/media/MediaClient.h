@@ -11,7 +11,6 @@
 
 #include <MediaAddOn.h>
 #include <MediaClientDefs.h>
-#include <MediaConnection.h>
 #include <MediaDefs.h>
 #include <MediaNode.h>
 
@@ -20,6 +19,10 @@
 
 namespace BPrivate { namespace media {
 
+
+class BMediaConnection;
+class BMediaInput;
+class BMediaOutput;
 
 // BMediaClient is a general purpose class allowing to create any kind
 // of media_node. It automatically manage the expected behavior under
@@ -75,18 +78,19 @@ public:
 	// You can pass the object returned by this function to another
 	// BMediaClient::BeginConnection() and then Connect(), so that it
 	// will automatically connect to this node.
-	virtual BMediaConnection*		BeginConnection(media_connection_kind kind);
+	virtual BMediaInput*			BeginInput();
+	virtual BMediaOutput*			BeginOutput();
 
 	// Bind internally two connections of the same BMediaClient, so that the
 	// input will be automatically forwarded to the output just after the
 	// ProcessFunc is called. The buffer is automatically recycled too.
 	// Beware that the binding operation is valid only for local connections
 	// which belong to this node, otherwise return B_ERROR.
-	virtual status_t				Bind(BMediaConnection* input,
-										BMediaConnection* output);
+	virtual status_t				Bind(BMediaInput* input,
+										BMediaOutput* output);
 
-	virtual status_t				Unbind(BMediaConnection* input,
-										BMediaConnection* output);
+	virtual status_t				Unbind(BMediaInput* input,
+										BMediaOutput* output);
 
 	// If the user want a particular format for a connection it should
 	// use BMediaConnection::SetAcceptedFormat(), if it's not specified
@@ -112,12 +116,12 @@ public:
 			int32					CountInputs() const;
 			int32					CountOutputs() const;
 
-			BMediaConnection*		InputAt(int32 index) const;
-			BMediaConnection*		OutputAt(int32 index) const;
+			BMediaInput*			InputAt(int32 index) const;
+			BMediaOutput*			OutputAt(int32 index) const;
 
-			BMediaConnection*		FindInput(
+			BMediaInput*			FindInput(
 										const media_connection& input) const;
-			BMediaConnection*		FindOutput(
+			BMediaOutput*			FindOutput(
 										const media_connection& output) const;
 
 			bool					IsRunning() const;
@@ -164,20 +168,21 @@ public:
 										void* cookie = NULL);
 
 protected:
+	virtual void					BufferReceived(BBuffer* buffer,
+										BMediaInput* input);
+
 	// When a connection is not binded with another, it's your job to send
 	// the buffer to the connection you want. You might want
 	// to ovverride it so that you can track something, in this case
 	// be sure to call the base version.
 	virtual	status_t				SendBuffer(BBuffer* buffer,
-										BMediaConnection* connection);
-
-	virtual void					BufferReceived(BMediaConnection* connection,
-										BBuffer* buffer);
+										BMediaOutput* output);
 
 	// This is used when the user want to override the BeginConnection
 	// mechanism, for example to supply your BMediaConnection derived
 	// class. Take ownership of the object.
-	virtual void					AddConnection(BMediaConnection* connection);
+	virtual void					AddInput(BMediaInput* input);
+	virtual void					AddOutput(BMediaOutput* output);
 
 	// Called from BMediaConnection
 			status_t				DisconnectConnection(BMediaConnection* conn);
@@ -185,17 +190,17 @@ protected:
 			status_t				ReleaseConnection(BMediaConnection* conn);
 
 private:
-			BMediaConnection*		FindInput(
+			BMediaInput*			FindInput(
 										const media_destination& dest) const;
-			BMediaConnection*		FindOutput(
+			BMediaOutput*			FindOutput(
 										const media_source& source) const;
 
 			void					_Init();
 			void					_Deinit();
 
-			status_t				_ConnectInput(BMediaConnection* output,
+			status_t				_ConnectInput(BMediaOutput* output,
 										const media_connection& input);
-			status_t				_ConnectOutput(BMediaConnection* input,
+			status_t				_ConnectOutput(BMediaInput* input,
 										const media_connection& output);
 
 			status_t				fInitErr;
@@ -215,8 +220,8 @@ private:
 
 			void*					fNotifyCookie;
 
-			BObjectList<BMediaConnection> fInputs;
-			BObjectList<BMediaConnection> fOutputs;
+			BObjectList<BMediaInput>	fInputs;
+			BObjectList<BMediaOutput>	fOutputs;
 
 			media_connection_id		fLastID;
 
