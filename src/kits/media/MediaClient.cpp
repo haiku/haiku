@@ -442,20 +442,11 @@ BMediaClient::SetLatencyRange(bigtime_t min, bigtime_t max)
 
 
 bigtime_t
-BMediaClient::OfflineTime() const
+BMediaClient::CurrentTime() const
 {
 	CALLED();
 
-	return fOfflineTime;
-}
-
-
-bigtime_t
-BMediaClient::PerformanceTime() const
-{
-	CALLED();
-
-	return fPerformanceTime;
+	return fCurrentTime;
 }
 
 

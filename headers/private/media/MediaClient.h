@@ -154,11 +154,9 @@ public:
 			void					GetLatencyRange(bigtime_t* min,
 										bigtime_t* max) const;
 
-	// When in B_OFFLINE it returns OfflineTime().
-			bigtime_t				OfflineTime() const;
-	// Return the current performance time handled by the object
-	// when run_mode != B_OFFLINE.
-			bigtime_t				PerformanceTime() const;
+	// Return the current performance time handled by the object when
+	// run_mode != B_OFFLINE. Otherwise returns the current offline time.
+			bigtime_t				CurrentTime() const;
 
 	// This is supplied to support using this class in a BMediaAddOn.
 	// Default version just return NULL.
@@ -210,8 +208,7 @@ private:
 			bool					fRunning;
 			BMediaClientNode*		fNode;
 
-			bigtime_t				fPerformanceTime;
-			bigtime_t				fOfflineTime;
+			bigtime_t				fCurrentTime;
 
 			bigtime_t				fMinLatency;
 			bigtime_t				fMaxLatency;
