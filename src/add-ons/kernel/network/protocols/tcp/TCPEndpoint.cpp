@@ -47,10 +47,12 @@
 //	- NewReno Modification to TCP's Fast Recovery, RFC 2582
 //	- Explicit Congestion Notification (ECN), RFC 3168
 //	- SYN-Cache
-//	- TCP Extensions for High Performance, RFC 1323
 //	- SACK, Selective Acknowledgment - RFC 2018, RFC 2883, RFC 3517
 //	- Forward RTO-Recovery, RFC 4138
 //	- Time-Wait hash instead of keeping sockets alive
+//
+// Things incomplete in this implementation:
+//	- TCP Extensions for High Performance, RFC 1323 - RTTM, PAWS
 
 #define PrintAddress(address) \
 	AddressString(Domain(), address, true).Data()
