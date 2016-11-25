@@ -1,5 +1,5 @@
 /*
- * Copyright 2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2016, Rene Gollent, rene@gollent.com.
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -112,6 +112,23 @@ BVariant
 RectSetting::DefaultValue() const
 {
 	return DefaultRectValue();
+}
+
+
+// #pragma mark - StringSetting
+
+
+setting_type
+StringSetting::Type() const
+{
+	return SETTING_TYPE_STRING;
+}
+
+
+BVariant
+StringSetting::DefaultValue() const
+{
+	return DefaultStringValue().String();
 }
 
 
@@ -396,6 +413,25 @@ RectSettingImpl::RectSettingImpl(const BString& id, const BString& name,
 
 BRect
 RectSettingImpl::DefaultRectValue() const
+{
+	return fDefaultValue;
+}
+
+
+// #pragma mark - StringSettingImpl
+
+
+StringSettingImpl::StringSettingImpl(const BString& id, const BString& name,
+	const BString& defaultValue)
+	:
+	AbstractSetting(id, name),
+	fDefaultValue(defaultValue)
+{
+}
+
+
+const BString&
+StringSettingImpl::DefaultStringValue() const
 {
 	return fDefaultValue;
 }

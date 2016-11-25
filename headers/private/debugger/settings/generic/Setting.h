@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef SETTING_H
@@ -20,7 +20,8 @@ enum setting_type {
 	SETTING_TYPE_OPTIONS,
 	SETTING_TYPE_BOUNDED,
 	SETTING_TYPE_RANGE,
-	SETTING_TYPE_RECT
+	SETTING_TYPE_RECT,
+	SETTING_TYPE_STRING
 };
 
 
@@ -103,6 +104,16 @@ public:
 	virtual	BVariant			DefaultValue() const;
 
 	virtual	BRect				DefaultRectValue() const = 0;
+};
+
+
+class StringSetting : public virtual Setting {
+public:
+	virtual	setting_type		Type() const;
+
+	virtual	BVariant			DefaultValue() const;
+
+	virtual	const BString&		DefaultStringValue() const = 0;
 };
 
 
@@ -227,6 +238,19 @@ public:
 
 private:
 			BRect				fDefaultValue;
+};
+
+
+class StringSettingImpl : public AbstractSetting, public StringSetting {
+public:
+								StringSettingImpl(const BString& id,
+									const BString& name,
+									const BString& defaultValue);
+
+	virtual	const BString&		DefaultStringValue() const;
+
+private:
+			BString				fDefaultValue;
 };
 
 
