@@ -250,6 +250,30 @@ BMediaClient::OutputAt(int32 index) const
 
 
 BMediaConnection*
+BMediaClient::FindInput(const media_connection& input) const
+{
+	CALLED();
+
+	if (!input.IsInput())
+		return NULL;
+
+	return FindInput(input.Destination());
+}
+
+
+BMediaConnection*
+BMediaClient::FindOutput(const media_connection& output) const
+{
+	CALLED();
+
+	if (!output.IsOutput())
+		return NULL;
+
+	return FindOutput(output.Source());
+}
+
+
+BMediaConnection*
 BMediaClient::FindInput(const media_destination& dest) const
 {
 	CALLED();
@@ -388,12 +412,12 @@ BMediaClient::SetRunMode(BMediaNode::run_mode mode)
 
 
 status_t
-BMediaClient::SetTimeSource(media_node timesource)
+BMediaClient::SetTimeSource(const media_client& timesource)
 {
 	CALLED();
 
 	return BMediaRoster::CurrentRoster()->SetTimeSourceFor(fNode->Node().node,
-		timesource.node);
+		timesource.node.node);
 }
 
 
