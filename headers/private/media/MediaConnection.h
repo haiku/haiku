@@ -91,18 +91,14 @@ public:
 	void							SetCookie(void* cookie);
 	void*							Cookie() const;
 
-	// Disconnect this connection.
+	// Disconnect this connection. When a connection is disconnected,
+	// it can be reused as brand new.
 	status_t						Disconnect();
-
-	// TODO: We really need a Reset()?
-	// When you reset a connection it can be reused as it was brand new.
-	status_t						Reset();
 
 	// Once you are done with this connection you release it, it automatically
 	// remove the object from the BMediaClient and free all used resources.
 	// This will make the connection to disappear completely, so if you
-	// want to preserve it for future connections just Disconnect() and
-	// Reset() it.
+	// want to preserve it for future connections just Disconnect() it.
 	status_t						Release();
 
 	// Use this to set your callbacks.

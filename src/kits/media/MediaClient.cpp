@@ -196,15 +196,6 @@ BMediaClient::DisconnectConnection(BMediaConnection* conn)
 
 
 status_t
-BMediaClient::ResetConnection(BMediaConnection* conn)
-{
-	CALLED();
-
-	return B_OK;
-}
-
-
-status_t
 BMediaClient::ReleaseConnection(BMediaConnection* conn)
 {
 	CALLED();

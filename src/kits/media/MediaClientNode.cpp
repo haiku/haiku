@@ -445,7 +445,7 @@ BMediaClientNode::Connect(status_t status, const media_source& source,
 
 	// Reset the connection to reuse it
 	if (status != B_OK) {
-		conn->Reset();
+		conn->Disconnect();
 		return;
 	}
 
@@ -470,10 +470,10 @@ BMediaClientNode::Disconnect(const media_source& source,
 	if (conn == NULL)
 		return;
 
-	if (source == conn->Source() && dest == conn->Destination())
-		conn->Reset();
-
-	conn->Disconnected();
+	if (conn->Destination() == dest) {
+		conn->Disconnect();
+		conn->Disconnected();
+	}
 }
 
 

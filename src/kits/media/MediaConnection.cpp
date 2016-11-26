@@ -129,19 +129,10 @@ BMediaConnection::Disconnect()
 {
 	CALLED();
 
-	return fOwner->DisconnectConnection(this);
-}
-
-
-status_t
-BMediaConnection::Reset()
-{
-	CALLED();
-
 	delete fBufferGroup;
 	fBufferGroup = NULL;
 
-	return fOwner->ResetConnection(this);
+	return fOwner->DisconnectConnection(this);
 }
 
 

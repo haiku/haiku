@@ -174,7 +174,6 @@ protected:
 
 	// Called from BMediaConnection
 			status_t				DisconnectConnection(BMediaConnection* conn);
-			status_t				ResetConnection(BMediaConnection* conn);
 			status_t				ReleaseConnection(BMediaConnection* conn);
 
 private:
