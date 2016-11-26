@@ -287,6 +287,19 @@ BMediaInput::BufferReceived(BBuffer* buffer)
 }
 
 
+void BMediaInput::_ReservedMediaInput0() {}
+void BMediaInput::_ReservedMediaInput1() {}
+void BMediaInput::_ReservedMediaInput2() {}
+void BMediaInput::_ReservedMediaInput3() {}
+void BMediaInput::_ReservedMediaInput4() {}
+void BMediaInput::_ReservedMediaInput5() {}
+void BMediaInput::_ReservedMediaInput6() {}
+void BMediaInput::_ReservedMediaInput7() {}
+void BMediaInput::_ReservedMediaInput8() {}
+void BMediaInput::_ReservedMediaInput9() {}
+void BMediaInput::_ReservedMediaInput10() {}
+
+
 BMediaOutput::BMediaOutput(BMediaClient* owner, media_connection_id id)
 	:
 	BMediaConnection(owner, B_MEDIA_OUTPUT, id)
@@ -346,3 +359,16 @@ BMediaOutput::MediaOutput() const
 {
 	return Connection().MediaOutput();
 }
+
+
+void BMediaOutput::_ReservedMediaOutput0() {}
+void BMediaOutput::_ReservedMediaOutput1() {}
+void BMediaOutput::_ReservedMediaOutput2() {}
+void BMediaOutput::_ReservedMediaOutput3() {}
+void BMediaOutput::_ReservedMediaOutput4() {}
+void BMediaOutput::_ReservedMediaOutput5() {}
+void BMediaOutput::_ReservedMediaOutput6() {}
+void BMediaOutput::_ReservedMediaOutput7() {}
+void BMediaOutput::_ReservedMediaOutput8() {}
+void BMediaOutput::_ReservedMediaOutput9() {}
+void BMediaOutput::_ReservedMediaOutput10() {}

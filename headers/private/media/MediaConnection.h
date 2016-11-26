@@ -176,6 +176,19 @@ protected:
 private:
 	media_input						MediaInput() const;
 
+	virtual	void					_ReservedMediaInput0();
+	virtual	void					_ReservedMediaInput1();
+	virtual	void					_ReservedMediaInput2();
+	virtual	void					_ReservedMediaInput3();
+	virtual	void					_ReservedMediaInput4();
+	virtual	void					_ReservedMediaInput5();
+	virtual	void					_ReservedMediaInput6();
+	virtual	void					_ReservedMediaInput7();
+	virtual	void					_ReservedMediaInput8();
+	virtual	void					_ReservedMediaInput9();
+	virtual	void					_ReservedMediaInput10();
+	uint32							fPadding[32];
+
 	friend class BMediaClientNode;
 };
 
@@ -205,6 +218,19 @@ private:
 	media_output					MediaOutput() const;
 
 	bool							fOutputEnabled;
+
+	virtual	void					_ReservedMediaOutput0();
+	virtual	void					_ReservedMediaOutput1();
+	virtual	void					_ReservedMediaOutput2();
+	virtual	void					_ReservedMediaOutput3();
+	virtual	void					_ReservedMediaOutput4();
+	virtual	void					_ReservedMediaOutput5();
+	virtual	void					_ReservedMediaOutput6();
+	virtual	void					_ReservedMediaOutput7();
+	virtual	void					_ReservedMediaOutput8();
+	virtual	void					_ReservedMediaOutput9();
+	virtual	void					_ReservedMediaOutput10();
+	uint32							fPadding[32];
 
 	friend class BMediaClientNode;
 };
