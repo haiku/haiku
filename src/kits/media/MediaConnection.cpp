@@ -115,15 +115,6 @@ BMediaConnection::IsConnected() const
 }
 
 
-bool
-BMediaConnection::IsOutputEnabled() const
-{
-	CALLED();
-
-	return fOutputEnabled;
-}
-
-
 void*
 BMediaConnection::Cookie() const
 {
@@ -212,12 +203,8 @@ BMediaConnection::BufferDuration() const
 
 
 void
-BMediaConnection::ConnectedCallback(const media_source& source,
-	const media_format& format)
+BMediaConnection::Connected(const media_format& format)
 {
-	fConnection.source = source;
-	SetAcceptedFormat(format);
-
 	if (fNotifyHook != NULL)
 		(*fNotifyHook)(B_CONNECTED, this);
 
@@ -226,25 +213,12 @@ BMediaConnection::ConnectedCallback(const media_source& source,
 
 
 void
-BMediaConnection::DisconnectedCallback(const media_source& source)
+BMediaConnection::Disconnected()
 {
 	if (fNotifyHook != NULL)
 		(*fNotifyHook)(B_DISCONNECTED, this);
 
 	fConnected = false;
-}
-
-
-void
-BMediaConnection::ConnectCallback(const media_destination& destination)
-{
-	fConnection.destination = destination;
-}
-
-
-void
-BMediaConnection::DisconnectCallback(const media_destination& destination)
-{
 }
 
 
@@ -300,10 +274,79 @@ BMediaInput::MediaInput() const
 }
 
 
+status_t
+BMediaInput::FormatChanged(const media_format& format)
+{
+	if (!format_is_compatible(format, AcceptedFormat()))
+		return B_MEDIA_BAD_FORMAT;
+
+	SetAcceptedFormat(format);
+
+	return B_OK;
+}
+
+
+void
+BMediaInput::BufferReceived(BBuffer* buffer)
+{
+	CALLED();
+
+	if (fProcessHook != NULL)
+		fProcessHook(this, buffer);
+}
+
+
 BMediaOutput::BMediaOutput(BMediaClient* owner, media_connection_id id)
 	:
 	BMediaConnection(owner, B_MEDIA_OUTPUT, id)
 {
+}
+
+
+bool
+BMediaOutput::IsOutputEnabled() const
+{
+	CALLED();
+
+	return fOutputEnabled;
+}
+
+
+status_t
+BMediaOutput::PrepareToConnect(media_format* format)
+{
+	SetAcceptedFormat(*format);
+
+	return B_OK;
+}
+
+
+status_t
+BMediaOutput::FormatProposal(media_format* format)
+{
+	if (fOwner->fNotifyHook != NULL) {
+		return (*fNotifyHook)(BMediaConnection::B_FORMAT_PROPOSAL,
+			this, format);
+	} else
+		*format = AcceptedFormat();
+
+	return B_OK;
+}
+
+
+status_t
+BMediaOutput::FormatChangeRequested(media_format* format)
+{
+	return B_ERROR;
+}
+
+
+status_t
+BMediaOutput::SendBuffer(BBuffer* buffer)
+{
+	CALLED();
+
+	return fOwner->fNode->SendBuffer(buffer, this);
 }
 
 

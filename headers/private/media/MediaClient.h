@@ -166,16 +166,6 @@ public:
 										void* cookie = NULL);
 
 protected:
-	virtual void					BufferReceived(BBuffer* buffer,
-										BMediaInput* input);
-
-	// When a connection is not binded with another, it's your job to send
-	// the buffer to the connection you want. You might want
-	// to ovverride it so that you can track something, in this case
-	// be sure to call the base version.
-	virtual	status_t				SendBuffer(BBuffer* buffer,
-										BMediaOutput* output);
-
 	// This is used when the user want to override the BeginConnection
 	// mechanism, for example to supply your BMediaConnection derived
 	// class. Take ownership of the object.
@@ -237,6 +227,8 @@ private:
 
 	friend class BMediaClientNode;
 	friend class BMediaConnection;
+	friend class BMediaInput;
+	friend class BMediaOutput;
 };
 
 

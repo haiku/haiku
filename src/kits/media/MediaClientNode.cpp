@@ -169,7 +169,7 @@ BMediaClientNode::GetNextInput(int32* cookie,
 	if (fOwner->CountInputs() == 0)
 		return B_BAD_INDEX;
 
-	if (*cookie < 0 || *cookie > fOwner->CountInputs()) {
+	if (*cookie < 0 || *cookie >= fOwner->CountInputs()) {
 		*cookie = -1;
 		input = NULL;
 	} else {
@@ -230,7 +230,11 @@ BMediaClientNode::Connected(const media_source& source,
 	if (conn == NULL)
 		return B_MEDIA_BAD_DESTINATION;
 
-	conn->ConnectedCallback(source, format);
+	conn->fConnection.source = source;
+	conn->SetAcceptedFormat(format);
+
+	conn->Connected(format);
+
 	*outInput = conn->MediaInput();
 	return B_OK;
 }
@@ -246,7 +250,7 @@ BMediaClientNode::Disconnected(const media_source& source,
 	if (conn == NULL)
 		return;
 
-	conn->DisconnectedCallback(source);
+	conn->Disconnected();
 }
 
 
@@ -261,12 +265,7 @@ BMediaClientNode::FormatChanged(const media_source& source,
 	if (conn == NULL)
 		return B_MEDIA_BAD_DESTINATION;
 
-	if (!format_is_compatible(format, conn->AcceptedFormat()))
-		return B_MEDIA_BAD_FORMAT;
-
-	conn->SetAcceptedFormat(format);
-
-	return B_OK;
+	return conn->FormatChanged(format);
 }
 
 
@@ -307,13 +306,7 @@ BMediaClientNode::FormatProposal(const media_source& source,
 	if (conn == NULL)
 		return B_MEDIA_BAD_DESTINATION;
 
-	if (fOwner->fNotifyHook != NULL) {
-		return (*conn->fNotifyHook)(BMediaConnection::B_FORMAT_PROPOSAL,
-			conn, format);
-	} else
-		*format = conn->AcceptedFormat();
-
-	return B_OK;
+	return conn->FormatProposal(format);
 }
 
 
@@ -324,7 +317,11 @@ BMediaClientNode::FormatChangeRequested(const media_source& source,
 {
 	CALLED();
 
-	return B_ERROR;
+	BMediaOutput* conn = fOwner->FindOutput(source);
+	if (conn == NULL)
+		return B_MEDIA_BAD_DESTINATION;
+
+	return conn->FormatChangeRequested(format);
 }
 
 
@@ -345,7 +342,7 @@ BMediaClientNode::GetNextOutput(int32* cookie, media_output* output)
 	if (fOwner->CountOutputs() == 0)
 		return B_BAD_INDEX;
 
-	if (*cookie < 0 || *cookie > fOwner->CountOutputs()) {
+	if (*cookie < 0 || *cookie >= fOwner->CountOutputs()) {
 		*cookie = -1;
 		output = NULL;
 	} else {
@@ -423,9 +420,14 @@ BMediaClientNode::PrepareToConnect(const media_source& source,
 	}
 
 	conn->fConnection.destination = dest;
-	conn->SetAcceptedFormat(*format);
+
+	status_t err = conn->PrepareToConnect(format);
+	if (err != B_OK)
+		return err;
+
 	*out_source = conn->Source();
 	strcpy(name, Name());
+
 	return B_OK;
 }
 
@@ -447,12 +449,14 @@ BMediaClientNode::Connect(status_t status, const media_source& source,
 		return;
 	}
 
-	conn->ConnectCallback(dest);
-	strcpy(name, Name());
+	conn->fConnection.destination = dest;
 	conn->SetAcceptedFormat(format);
+	strcpy(name, Name());
 
 	// TODO: Allocate buffers, add correct latency estimate
 	// and buffer duration mode.
+
+	conn->Connected(format);
 }
 
 
@@ -469,7 +473,7 @@ BMediaClientNode::Disconnect(const media_source& source,
 	if (source == conn->Source() && dest == conn->Destination())
 		conn->Reset();
 
-	conn->DisconnectCallback(dest);
+	conn->Disconnected();
 }
 
 
@@ -572,7 +576,7 @@ BMediaClientNode::_HandleBuffer(BBuffer* buffer)
 	BMediaInput* conn = fOwner->FindInput(dest);
 
 	if (conn != NULL)
-		fOwner->BufferReceived(buffer, conn);
+		conn->BufferReceived(buffer);
 	// TODO: this should be logged someway
 }
 

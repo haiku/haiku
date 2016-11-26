@@ -450,15 +450,6 @@ BMediaClient::CurrentTime() const
 }
 
 
-status_t
-BMediaClient::SendBuffer(BBuffer* buffer, BMediaOutput* output)
-{
-	CALLED();
-
-	return fNode->SendBuffer(buffer, output);
-}
-
-
 void
 BMediaClient::AddInput(BMediaInput* input)
 {
@@ -474,17 +465,6 @@ BMediaClient::AddOutput(BMediaOutput* output)
 	CALLED();
 
 	fOutputs.AddItem(output);
-}
-
-
-void
-BMediaClient::BufferReceived(BBuffer* buffer,
-	BMediaInput* connection)
-{
-	CALLED();
-
-	if (connection->fProcessHook != NULL)
-		connection->fProcessHook(connection, buffer);
 }
 
 

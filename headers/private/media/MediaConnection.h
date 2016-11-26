@@ -42,8 +42,7 @@ public:
 		B_FORMAT_PROPOSAL,		// media_format* format
 
 		B_ASK_FORMAT_CHANGE,
-		B_FORMAT_CHANGED,
-		B_ASK_TIMER
+		B_FORMAT_CHANGED
 	};
 
 
@@ -89,9 +88,6 @@ public:
 
 	bool							IsConnected() const;
 
-	void							SetOutputEnabled(bool enabled);
-	bool							IsOutputEnabled() const;
-
 	void							SetCookie(void* cookie);
 	void*							Cookie() const;
 
@@ -119,13 +115,9 @@ protected:
 										media_connection_kind kind,
 										media_connection_id id);
 
-	// TODO: All notifications should be done into private callbacks like this.
-	void							ConnectedCallback(const media_source& source,
-											const media_format& format);
-	void							DisconnectedCallback(const media_source& source);
-
-	void							ConnectCallback(const media_destination& source);
-	void							DisconnectCallback(const media_destination& source);
+	// Those callbacks are shared between BMediaInput and BMediaOutput
+	virtual void					Connected(const media_format& format);
+	virtual void					Disconnected();
 
 private:
 	const media_source&				Source() const;
@@ -152,7 +144,6 @@ private:
 	BBufferGroup*					fBufferGroup;
 
 	bool							fConnected;
-	bool							fOutputEnabled;
 
 	virtual	void					_ReservedMediaConnection0();
 	virtual	void					_ReservedMediaConnection1();
@@ -169,6 +160,9 @@ private:
 
 	friend class BMediaClient;
 	friend class BMediaClientNode;
+
+	friend class BMediaInput;
+	friend class BMediaOutput;
 };
 
 
@@ -176,6 +170,12 @@ class BMediaInput : public BMediaConnection {
 public:
 									BMediaInput(BMediaClient* owner,
 										media_connection_id id);
+
+protected:
+	// Callbacks
+	virtual status_t				FormatChanged(const media_format& format);
+
+	virtual void					BufferReceived(BBuffer* buffer);
 
 private:
 	media_input						MediaInput() const;
@@ -189,8 +189,26 @@ public:
 									BMediaOutput(BMediaClient* owner,
 										media_connection_id id);
 
+	void							SetOutputEnabled(bool enabled);
+	bool							IsOutputEnabled() const;
+
+protected:
+	// Callbacks
+	virtual status_t				PrepareToConnect(media_format* format);
+
+	virtual status_t				FormatProposal(media_format* format);
+	virtual status_t				FormatChangeRequested(media_format* format);
+
+	// When a connection is not binded with another, it's your job to send
+	// the buffer to the connection you want. You might want
+	// to ovverride it so that you can track something, in this case
+	// be sure to call the base version.
+	virtual	status_t				SendBuffer(BBuffer* buffer);
+
 private:
 	media_output					MediaOutput() const;
+
+	bool							fOutputEnabled;
 
 	friend class BMediaClientNode;
 };
