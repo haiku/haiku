@@ -11,6 +11,6 @@ for f in data/artwork/icons/*; do
   echo "-label"
   echo "${bn}"
   echo "${tmpf}${bn}.png"
-done | xargs -d '\n' sh -c 'montage -frame 5 -background "#336699" -geometry +4+4 -font /system/data/fonts/ttfonts/DejaVuSansCondensed.ttf -pointsize 8 "$@" haiku_icons.png' --
+done | xargs -d '\n' sh -c 'montage -frame 5 -background "#336699" -geometry +4+4 -font /system/data/fonts/ttfonts/NotoSans-Regular.ttf -pointsize 9 "$@" haiku_icons.png' --
 
 rm /tmp/$$_icon_*

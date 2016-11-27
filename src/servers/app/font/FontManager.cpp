@@ -334,16 +334,16 @@ FontManager::_LoadRecentFontMappings()
 		ttfontsPath.Append("ttfonts");
 
 		BPath veraFontPath = ttfontsPath;
-		veraFontPath.Append("DejaVuSans.ttf");
-		_AddDefaultMapping("DejaVu Sans", "Book", veraFontPath.Path());
+		veraFontPath.Append("NotoSans-Regular.ttf");
+		_AddDefaultMapping("Noto Sans", "Book", veraFontPath.Path());
 
 		veraFontPath.SetTo(ttfontsPath.Path());
-		veraFontPath.Append("DejaVuSans-Bold.ttf");
-		_AddDefaultMapping("DejaVu Sans", "Bold", veraFontPath.Path());
+		veraFontPath.Append("NotoSans-Bold.ttf");
+		_AddDefaultMapping("Noto Sans", "Bold", veraFontPath.Path());
 
 		veraFontPath.SetTo(ttfontsPath.Path());
-		veraFontPath.Append("DejaVuSansMono.ttf");
-		_AddDefaultMapping("DejaVu Sans Mono", "Book", veraFontPath.Path());
+		veraFontPath.Append("NotoMono-Regular.ttf");
+		_AddDefaultMapping("Noto Mono", "Regular", veraFontPath.Path());
 
 		return true;
 	}
