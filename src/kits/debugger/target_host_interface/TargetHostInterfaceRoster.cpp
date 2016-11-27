@@ -10,6 +10,7 @@
 #include <AutoLocker.h>
 
 #include "LocalTargetHostInterfaceInfo.h"
+#include "NetworkTargetHostInterfaceInfo.h"
 #include "TargetHostInterfaceInfo.h"
 
 
@@ -100,6 +101,7 @@ TargetHostInterfaceRoster::RegisterInterfaceInfos()
 		interfaceReference.Detach();
 
 	REGISTER_INTERFACE_INFO(Local)
+	REGISTER_INTERFACE_INFO(Network)
 
 	return B_OK;
 }
