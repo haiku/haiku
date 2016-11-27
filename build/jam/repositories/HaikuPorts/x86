@@ -109,8 +109,8 @@ RemotePackageRepository HaikuPorts
 	fontconfig-2.11.95-1
 	fontconfig_devel-2.11.95-1
 	fossil-1.36-3
-	freetype-2.6.5-1
-	freetype_devel-2.6.5-1
+	freetype-2.7-1
+	freetype_devel-2.7-1
 	gawk-4.1.3-1
 	gcc-5.4.0_2016_06_04-1
 	gcc_syslibs-5.4.0_2016_06_04-1
@@ -391,8 +391,8 @@ RemotePackageRepository HaikuPorts
 	flac_x86_gcc2-1.3.1-1
 	flac_x86_gcc2_devel-1.3.1-1
 	fluidlite_x86_gcc2_devel-1.0.0-1
-	freetype_x86_gcc2-2.6.5-1
-	freetype_x86_gcc2_devel-2.6.5-1
+	freetype_x86_gcc2-2.7-1
+	freetype_x86_gcc2_devel-2.7-1
 	gcc_x86_gcc2-2.95.3_2014_07_26-1
 	gcc_x86_gcc2_syslibs_devel-2.95.3_2014_07_26-1
 	gettext_x86_gcc2-0.19.6-2

@@ -115,8 +115,8 @@ RemotePackageRepository HaikuPorts
 	fontconfig_devel-2.11.94-1
 	fossil-1.36-3
 	freeciv-2.5.1-2
-	freetype-2.6.5-1
-	freetype_devel-2.6.5-1
+	freetype-2.7-1
+	freetype_devel-2.7-1
 	fribidi-0.19.6-2
 	fribidi_devel-0.19.6-2
 	gawk-4.1.0-2
