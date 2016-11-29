@@ -100,27 +100,24 @@ AppMenuItem::~AppMenuItem()
 void
 AppMenuItem::GetContentSize(float* _width, float* _height)
 {
+	BMenuItem::GetContentSize(_width, _height);
 	if (_width)
-		*_width = fIcon->Bounds().Width()
-			+ be_plain_font->StringWidth(Label());
-
-	if (_height) {
-		struct font_height fh;
-		be_plain_font->GetHeight(&fh);
-		float fontHeight = ceilf(fh.ascent) + ceilf(fh.descent)
-			+ ceilf(fh.leading);
-		*_height = max_c(fontHeight, fIcon->Bounds().Height());
-	}
+		*_width += fIcon->Bounds().Width();
+	if (_height)
+		*_height = max_c(*_height, fIcon->Bounds().Height());
 }
 
 
 void
 AppMenuItem::DrawContent()
 {
+	float yOffset, height;
+	GetContentSize(NULL, &height);
+	yOffset = (height - fIcon->Bounds().Height()) / 2;
 	Menu()->SetDrawingMode(B_OP_OVER);
-	Menu()->MovePenBy(0.0, -1.0);
+	Menu()->MovePenBy(0.0, yOffset);
 	Menu()->DrawBitmap(fIcon);
-	Menu()->MovePenBy(fIcon->Bounds().Width() + kSmallHMargin, 0.0);
+	Menu()->MovePenBy(fIcon->Bounds().Width() + kSmallHMargin, -yOffset);
 	BMenuItem::DrawContent();
 }
 
