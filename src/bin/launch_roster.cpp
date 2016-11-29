@@ -92,6 +92,9 @@ start_job(const char* name)
 {
 	BLaunchRoster roster;
 	status_t status = roster.Start(name);
+	if (status == B_NAME_NOT_FOUND)
+		status = roster.Target(name);
+
 	if (status != B_OK) {
 		fprintf(stderr, "%s: Starting job \"%s\" failed: %s\n", kProgramName,
 			name, strerror(status));
@@ -105,11 +108,22 @@ stop_job(const char* name)
 {
 	BLaunchRoster roster;
 	status_t status = roster.Stop(name);
+	if (status == B_NAME_NOT_FOUND)
+		status = roster.StopTarget(name);
+
 	if (status != B_OK) {
 		fprintf(stderr, "%s: Stopping job \"%s\" failed: %s\n", kProgramName,
 			name, strerror(status));
 		exit(EXIT_FAILURE);
 	}
+}
+
+
+static void
+restart_job(const char* name)
+{
+	stop_job(name);
+	start_job(name);
 }
 
 
@@ -134,8 +148,9 @@ usage(int status)
 		"  list - Lists all jobs (the default command)\n"
 		"  list-targets - Lists all targets\n"
 		"The following <command>s have a <name> argument:\n"
-		"  start - Starts a job\n"
-		"  stop - Stops a running job\n"
+		"  start - Starts a job/target\n"
+		"  stop - Stops a running job/target\n"
+		"  restart - Restarts a running job/target\n"
 		"  info - Shows info for a job/target\n",
 		kProgramName);
 
@@ -187,6 +202,8 @@ main(int argc, char** argv)
 			start_job(name);
 		} else if (strcmp(command, "stop") == 0) {
 			stop_job(name);
+		} else if (strcmp(command, "restart") == 0) {
+			restart_job(name);
 		} else if (strcmp(command, "enable") == 0) {
 			enable_job(name, true);
 		} else if (strcmp(command, "disable") == 0) {
