@@ -153,6 +153,7 @@ public:
 private:
 			void				_HandleGetLaunchData(BMessage* message);
 			void				_HandleLaunchTarget(BMessage* message);
+			void				_HandleStopLaunchTarget(BMessage* message);
 			void				_HandleLaunchJob(BMessage* message);
 			void				_HandleEnableLaunchJob(BMessage* message);
 			void				_HandleStopLaunchJob(BMessage* message);
@@ -185,6 +186,7 @@ private:
 			void				_InitJobs(Target* target);
 			void				_LaunchJobs(Target* target,
 									bool forceNow = false);
+			void				_StopJobs(Target* target, bool force);
 			bool				_CanLaunchJob(Job* job, uint32 options,
 									bool testOnly = false);
 			bool				_CanLaunchJobRequirements(Job* job,
@@ -553,6 +555,9 @@ LaunchDaemon::MessageReceived(BMessage* message)
 		case B_LAUNCH_TARGET:
 			_HandleLaunchTarget(message);
 			break;
+		case B_STOP_LAUNCH_TARGET:
+			_HandleStopLaunchTarget(message);
+			break;
 		case B_LAUNCH_JOB:
 			_HandleLaunchJob(message);
 			break;
@@ -735,6 +740,40 @@ LaunchDaemon::_HandleLaunchTarget(BMessage* message)
 		target->AddData(data.GetString("name"), data);
 
 	_LaunchJobs(target);
+
+	BMessage reply((uint32)B_OK);
+	message->SendReply(&reply);
+}
+
+
+void
+LaunchDaemon::_HandleStopLaunchTarget(BMessage* message)
+{
+	uid_t user = _GetUserID(message);
+	if (user < 0)
+		return;
+
+	const char* name = message->GetString("target");
+
+	Target* target = FindTarget(name);
+	if (target == NULL) {
+		Session* session = FindSession(user);
+		if (session != NULL) {
+			// Forward request to user launch_daemon
+			if (session->Daemon().SendMessage(message) == B_OK)
+				return;
+		}
+
+		BMessage reply(B_NAME_NOT_FOUND);
+		message->SendReply(&reply);
+		return;
+	}
+
+	BMessage data;
+	if (message->FindMessage("data", &data) == B_OK)
+		target->AddData(data.GetString("name"), data);
+
+	_StopJobs(target, message->GetBool("force"));
 
 	BMessage reply((uint32)B_OK);
 	message->SendReply(&reply);
@@ -1466,6 +1505,23 @@ LaunchDaemon::_LaunchJobs(Target* target, bool forceNow)
 		Job* job = iterator->second;
 		if (job->Target() == target)
 			_LaunchJob(job);
+	}
+}
+
+
+/*!	Stops all running jobs of the specified target (may be \c NULL).
+*/
+void
+LaunchDaemon::_StopJobs(Target* target, bool force)
+{
+	if (target != NULL && !target->HasLaunched())
+		return;
+
+	for (JobMap::reverse_iterator iterator = fJobs.rbegin();
+			iterator != fJobs.rend(); iterator++) {
+		Job* job = iterator->second;
+		if (job->Target() == target)
+			_StopJob(job, force);
 	}
 }
 
