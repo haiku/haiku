@@ -8,33 +8,17 @@
 #include "debug.h"
 
 
-BMediaConnection::BMediaConnection(BMediaClient* owner,
-	media_connection_kind kind,
-	media_connection_id id)
+BMediaConnection::BMediaConnection(media_connection_kind kind)
 	:
-	fOwner(owner),
-	fBind(NULL)
+	fOwner(NULL),
+	fBind(NULL),
+	fBufferGroup(NULL)
 {
 	CALLED();
 
-	_Init();
-
 	fConnection.kind = kind;
-	fConnection.id = id;
-	fConnection.client = fOwner->Client();
-
-	if (IsOutput()) {
-		fConnection.source.port = fOwner->fNode->ControlPort();
-		fConnection.source.id = fConnection.id;
-
-		fConnection.destination = media_destination::null;
-	} else {
-		// IsInput()
-		fConnection.destination.port = fOwner->fNode->ControlPort();
-		fConnection.destination.id = fConnection.id;
-
-		fConnection.source = media_source::null;
-	}
+	fConnection.id = -1;
+	//fConnection.client = media_client::null;
 }
 
 
@@ -115,15 +99,6 @@ BMediaConnection::IsConnected() const
 }
 
 
-void*
-BMediaConnection::Cookie() const
-{
-	CALLED();
-
-	return fBufferCookie;
-}
-
-
 status_t
 BMediaConnection::Disconnect()
 {
@@ -132,7 +107,7 @@ BMediaConnection::Disconnect()
 	delete fBufferGroup;
 	fBufferGroup = NULL;
 
-	return fOwner->DisconnectConnection(this);
+	return fOwner->ConnectionDisconnected(this);
 }
 
 
@@ -141,19 +116,7 @@ BMediaConnection::Release()
 {
 	CALLED();
 
-	return fOwner->ReleaseConnection(this);
-}
-
-
-void
-BMediaConnection::SetHooks(process_hook processHook,
-	notify_hook notifyHook, void* cookie)
-{
-	CALLED();
-
-	fProcessHook = processHook;
-	fNotifyHook = notifyHook;
-	fBufferCookie = cookie;
+	return fOwner->ConnectionReleased(this);
 }
 
 
@@ -196,9 +159,6 @@ BMediaConnection::BufferDuration() const
 void
 BMediaConnection::Connected(const media_format& format)
 {
-	if (fNotifyHook != NULL)
-		(*fNotifyHook)(B_CONNECTED, this);
-
 	fConnected = true;
 }
 
@@ -206,21 +166,29 @@ BMediaConnection::Connected(const media_format& format)
 void
 BMediaConnection::Disconnected()
 {
-	if (fNotifyHook != NULL)
-		(*fNotifyHook)(B_DISCONNECTED, this);
-
 	fConnected = false;
 }
 
 
 void
-BMediaConnection::_Init()
+BMediaConnection::ConnectionRegistered(BMediaClient* owner,
+	media_connection_id id)
 {
-	CALLED();
+	fOwner = owner;
+	fConnection.id = id;
+	fConnection.client = fOwner->Client();
 
-	fBufferGroup = NULL;
-	fNotifyHook = NULL;
-	fProcessHook = NULL;
+	if (IsOutput()) {
+		fConnection.source.port = fOwner->fNode->ControlPort();
+		fConnection.source.id = fConnection.id;
+
+		fConnection.destination = media_destination::null;
+	} else {
+		fConnection.destination.port = fOwner->fNode->ControlPort();
+		fConnection.destination.id = fConnection.id;
+
+		fConnection.source = media_source::null;
+	}
 }
 
 
@@ -251,9 +219,9 @@ void BMediaConnection::_ReservedMediaConnection9() {}
 void BMediaConnection::_ReservedMediaConnection10() {}
 
 
-BMediaInput::BMediaInput(BMediaClient* owner, media_connection_id id)
+BMediaInput::BMediaInput()
 	:
-	BMediaConnection(owner, B_MEDIA_INPUT, id)
+	BMediaConnection(B_MEDIA_INPUT)
 {
 }
 
@@ -282,8 +250,6 @@ BMediaInput::BufferReceived(BBuffer* buffer)
 {
 	CALLED();
 
-	if (fProcessHook != NULL)
-		fProcessHook(this, buffer);
 }
 
 
@@ -300,9 +266,9 @@ void BMediaInput::_ReservedMediaInput9() {}
 void BMediaInput::_ReservedMediaInput10() {}
 
 
-BMediaOutput::BMediaOutput(BMediaClient* owner, media_connection_id id)
+BMediaOutput::BMediaOutput()
 	:
-	BMediaConnection(owner, B_MEDIA_OUTPUT, id)
+	BMediaConnection(B_MEDIA_OUTPUT)
 {
 }
 
@@ -328,12 +294,7 @@ BMediaOutput::PrepareToConnect(media_format* format)
 status_t
 BMediaOutput::FormatProposal(media_format* format)
 {
-	if (fOwner->fNotifyHook != NULL) {
-		return (*fNotifyHook)(BMediaConnection::B_FORMAT_PROPOSAL,
-			this, format);
-	} else
-		*format = AcceptedFormat();
-
+	*format = AcceptedFormat();
 	return B_OK;
 }
 

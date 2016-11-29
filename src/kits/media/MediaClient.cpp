@@ -71,25 +71,21 @@ BMediaClient::MediaType() const
 }
 
 
-BMediaInput*
-BMediaClient::BeginInput()
+status_t
+BMediaClient::RegisterInput(BMediaInput* input)
 {
-	CALLED();
-
-	BMediaInput* input = new BMediaInput(this, fLastID++);
+	input->ConnectionRegistered(this, fLastID++);
 	AddInput(input);
-	return input;
+	return B_OK;
 }
 
 
-BMediaOutput*
-BMediaClient::BeginOutput()
+status_t
+BMediaClient::RegisterOutput(BMediaOutput* output)
 {
-	CALLED();
-
-	BMediaOutput* output = new BMediaOutput(this, fLastID++);
+	output->ConnectionRegistered(this, fLastID++);
 	AddOutput(output);
-	return output;
+	return B_OK;
 }
 
 
@@ -181,24 +177,6 @@ BMediaClient::Disconnect()
 
 	for (int32 i = 0; i < CountOutputs(); i++)
 		OutputAt(i)->Disconnect();
-
-	return B_OK;
-}
-
-
-status_t
-BMediaClient::DisconnectConnection(BMediaConnection* conn)
-{
-	CALLED();
-
-	return B_OK;
-}
-
-
-status_t
-BMediaClient::ReleaseConnection(BMediaConnection* conn)
-{
-	CALLED();
 
 	return B_OK;
 }
@@ -469,12 +447,48 @@ BMediaClient::AddOn(int32* id) const
 
 
 void
-BMediaClient::SetNotificationHook(notify_hook notifyHook, void* cookie)
+BMediaClient::HandleStart(bigtime_t performanceTime)
 {
-	CALLED();
+}
 
-	fNotifyHook = notifyHook;
-	fNotifyCookie = cookie;
+
+void
+BMediaClient::HandleStop(bigtime_t performanceTime)
+{
+}
+
+
+void
+BMediaClient::HandleSeek(bigtime_t mediaTime, bigtime_t performanceTime)
+{
+}
+
+
+void
+BMediaClient::HandleTimeWarp(bigtime_t realTime, bigtime_t performanceTime)
+{
+}
+
+
+status_t
+BMediaClient::HandleFormatSuggestion(media_type type, int32 quality,
+	media_format* format)
+{
+	return B_ERROR;
+}
+
+
+status_t
+BMediaClient::ConnectionReleased(BMediaConnection* connection)
+{
+	return B_OK;
+}
+
+
+status_t
+BMediaClient::ConnectionDisconnected(BMediaConnection* connection)
+{
+	return B_OK;
 }
 
 
@@ -482,9 +496,6 @@ void
 BMediaClient::_Init()
 {
 	CALLED();
-
-	fNotifyHook = NULL;
-	fNotifyCookie = NULL;
 
 	BMediaRoster* roster = BMediaRoster::Roster(&fInitErr);
 	if (fInitErr == B_OK && roster != NULL)

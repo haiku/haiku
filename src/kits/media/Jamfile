@@ -30,7 +30,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			MediaClientDefs.cpp
 			MediaConnection.cpp
 			MediaRecorder.cpp
-
+			SimpleMediaClient.cpp
 
 			# Public Media Kit
 			Buffer.cpp

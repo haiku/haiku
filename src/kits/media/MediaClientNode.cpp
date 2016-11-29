@@ -280,19 +280,16 @@ BMediaClientNode::FormatSuggestionRequested(media_type type,
 		return B_MEDIA_BAD_FORMAT;
 	}
 
-	if (fOwner->fNotifyHook != NULL) {
-		status_t result = B_OK;
-		(*fOwner->fNotifyHook)(fOwner->fNotifyCookie,
-			BMediaClient::B_FORMAT_SUGGESTION,
-			type, quality, format, &result);
-		return result;
-	} else {
+	status_t ret = fOwner->HandleFormatSuggestion(type, quality, format);
+	if (ret != B_OK) {
 		// In that case we return just a very generic format.
 		media_format outFormat;
 		outFormat.type = fOwner->MediaType();
 		*format = outFormat;
 		return B_OK;
 	}
+
+	return ret;
 }
 
 
@@ -539,20 +536,25 @@ BMediaClientNode::HandleEvent(const media_timed_event* event,
 		case BTimedEventQueue::B_START:
 		{
 			if (RunState() != B_STARTED)
-				_HandleStart(event->event_time);
+				fOwner->HandleStart(event->event_time);
 			break;
 		}
 
 		case BTimedEventQueue::B_STOP:
-			_HandleStop(event->event_time, true);
+		{
+			fOwner->HandleStop(event->event_time);
+
+			EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true,
+				BTimedEventQueue::B_HANDLE_BUFFER);
 			break;
+		}
 
 		case BTimedEventQueue::B_SEEK:
-			_HandleSeek(event->event_time, event->bigdata);
+			fOwner->HandleSeek(event->event_time, event->bigdata);
 			break;
 
 		case BTimedEventQueue::B_WARP:
-			_HandleTimeWarp(event->event_time, event->bigdata);
+			fOwner->HandleTimeWarp(event->event_time, event->bigdata);
 			break;
 	}
 }
@@ -594,61 +596,4 @@ BMediaClientNode::_ProduceNewBuffer(const media_timed_event* event,
 	// so that we know which connection
 
 	// event.pointer == connection
-}
-
-
-void
-BMediaClientNode::_HandleStart(bigtime_t performanceTime)
-{
-	CALLED();
-
-	if (fOwner->fNotifyHook != NULL) {
-		(*fOwner->fNotifyHook)(fOwner->fNotifyCookie,
-			BMediaClient::B_WILL_START,
-			performanceTime);
-	}
-}
-
-
-void
-BMediaClientNode::_HandleStop(bigtime_t performanceTime,
-	bool immediate)
-{
-	CALLED();
-
-	if (fOwner->fNotifyHook != NULL) {
-		(*fOwner->fNotifyHook)(fOwner->fNotifyCookie,
-			BMediaClient::B_WILL_STOP,
-			performanceTime, immediate);
-	}
-	EventQueue()->FlushEvents(0, BTimedEventQueue::B_ALWAYS, true,
-		BTimedEventQueue::B_HANDLE_BUFFER);
-}
-
-
-void
-BMediaClientNode::_HandleSeek(bigtime_t mediaTime,
-	bigtime_t performanceTime)
-{
-	CALLED();
-
-	if (fOwner->fNotifyHook != NULL) {
-		(*fOwner->fNotifyHook)(fOwner->fNotifyCookie,
-			BMediaClient::B_WILL_SEEK,
-			performanceTime, mediaTime);
-	}
-}
-
-
-void
-BMediaClientNode::_HandleTimeWarp(bigtime_t realTime,
-	bigtime_t performanceTime)
-{
-	CALLED();
-
-	if (fOwner->fNotifyHook != NULL) {
-		(*fOwner->fNotifyHook)(fOwner->fNotifyCookie,
-			BMediaClient::B_WILL_TIMEWARP,
-			realTime, performanceTime);
-	}
 }

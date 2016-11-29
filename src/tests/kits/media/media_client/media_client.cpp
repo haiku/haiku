@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  */
 
-#include <MediaClient.h>
+#include <SimpleMediaClient.h>
 #include <MediaConnection.h>
 #include <SupportDefs.h>
 
@@ -18,18 +18,18 @@
 #endif
 
 
-static BMediaClient* sProducer = NULL;
-static BMediaClient* sConsumer = NULL;
-static BMediaClient* sFilter = NULL;
+static BSimpleMediaClient* sProducer = NULL;
+static BSimpleMediaClient* sConsumer = NULL;
+static BSimpleMediaClient* sFilter = NULL;
 
 
 void _InitClients(bool hasFilter)
 {
-	sProducer = new BMediaClient("MediaClientProducer");
-	sConsumer = new BMediaClient("MediaClientConsumer");
+	sProducer = new BSimpleMediaClient("MediaClientProducer");
+	sConsumer = new BSimpleMediaClient("MediaClientConsumer");
 
 	if (hasFilter)
-		sFilter = new BMediaClient("MediaClientFilter");
+		sFilter = new BSimpleMediaClient("MediaClientFilter");
 	else
 		sFilter = NULL;
 }

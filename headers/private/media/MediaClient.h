@@ -32,24 +32,6 @@ class BMediaOutput;
 // performance_time.
 class BMediaClient {
 public:
-	enum notification {
-		B_WILL_START = 1,			// performance_time
-		B_WILL_STOP,				// performance_time immediate
-		B_WILL_SEEK,				// performance_time media_time
-		B_WILL_TIMEWARP,			// real_time performance_time
-
-		B_FORMAT_SUGGESTION,		// media_type type, int32 quality,
-									// media_format* format
-	};
-
-	typedef void					(*notify_hook)(void* cookie,
-											notification what,
-											...);
-
-	// TODO: Should allow BControllable capabilities
-	// TODO: Add file interface
-	// TODO: Offline mode is still missing
-
 									BMediaClient(const char* name,
 										media_type type
 											= B_MEDIA_UNKNOWN_TYPE,
@@ -67,19 +49,17 @@ public:
 
 			status_t				InitCheck() const;
 
+	// TODO: Should allow BControllable capabilities
+	// TODO: Add file interface
+	// TODO: Offline mode is still missing
+
 	// To connect pass the BMediaConnection to this class or to another BMediaClient,
 	// also in another team the connection object will be valid.
 	// When those functions return, the BMediaConnection is added to the
 	// list and is visible to other nodes as not connected.
 
-	// This is supplied to support generic connections not related
-	// to a certain destination or source node, however for various ambiguity
-	// reasons we want the BMediaConnection to be declared as input or output.
-	// You can pass the object returned by this function to another
-	// BMediaClient::BeginConnection() and then Connect(), so that it
-	// will automatically connect to this node.
-	virtual BMediaInput*			BeginInput();
-	virtual BMediaOutput*			BeginOutput();
+	virtual status_t				RegisterInput(BMediaInput* input);
+	virtual status_t				RegisterOutput(BMediaOutput* output);
 
 	// Bind internally two connections of the same BMediaClient, so that the
 	// input will be automatically forwarded to the output just after the
@@ -126,8 +106,8 @@ public:
 
 			bool					IsRunning() const;
 
-	virtual status_t				Start(bool force = false);
-	virtual status_t				Stop(bool force = false);
+			status_t				Start(bool force = false);
+			status_t				Stop(bool force = false);
 			status_t				Seek(bigtime_t mediaTime,
 										bigtime_t performanceTime);
 			status_t				Roll(bigtime_t start, bigtime_t stop,
@@ -162,9 +142,6 @@ public:
 	// Default version just return NULL.
 	virtual	BMediaAddOn*			AddOn(int32* id) const;
 
-	void							SetNotificationHook(notify_hook notifyHook = NULL,
-										void* cookie = NULL);
-
 protected:
 	// This is used when the user want to override the BeginConnection
 	// mechanism, for example to supply your BMediaConnection derived
@@ -172,9 +149,21 @@ protected:
 	virtual void					AddInput(BMediaInput* input);
 	virtual void					AddOutput(BMediaOutput* output);
 
+	virtual void					HandleStart(bigtime_t performanceTime);
+	virtual void					HandleStop(bigtime_t performanceTime);
+
+	virtual void					HandleSeek(bigtime_t mediaTime,
+										bigtime_t performanceTime);
+
+	virtual void					HandleTimeWarp(bigtime_t realTime,
+										bigtime_t performanceTime);
+
+	virtual status_t				HandleFormatSuggestion(media_type type,
+										int32 quality, media_format* format);
+
 	// Called from BMediaConnection
-			status_t				DisconnectConnection(BMediaConnection* conn);
-			status_t				ReleaseConnection(BMediaConnection* conn);
+			status_t				ConnectionDisconnected(BMediaConnection* conn);
+			status_t				ConnectionReleased(BMediaConnection* conn);
 
 private:
 			BMediaInput*			FindInput(
@@ -201,10 +190,6 @@ private:
 
 			bigtime_t				fMinLatency;
 			bigtime_t				fMaxLatency;
-
-			notify_hook				fNotifyHook;
-
-			void*					fNotifyCookie;
 
 			BObjectList<BMediaInput>	fInputs;
 			BObjectList<BMediaOutput>	fOutputs;

@@ -132,14 +132,6 @@ private:
 				void		_ProduceNewBuffer(const media_timed_event* event,
 								bigtime_t late);
 
-				void		_HandleStart(bigtime_t performanceTime);
-				void		_HandleStop(bigtime_t performanceTime,
-								bool immediate);
-				void		_HandleSeek(bigtime_t mediaTime,
-								bigtime_t performanceTime);
-				void		_HandleTimeWarp(bigtime_t realTime,
-								bigtime_t performanceTime);
-
 			BMediaClient*	fOwner;
 };
 

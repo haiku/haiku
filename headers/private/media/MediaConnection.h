@@ -30,42 +30,14 @@ namespace BPrivate { namespace media {
 // recycle the buffer when you don't want to do anything further.
 class BMediaConnection {
 public:
-	enum notification {
-		B_CONNECTED = 1,
-		B_DISCONNECTED,
-
-		B_PREPARE_TO_CONNECT,	// media_format* format, media_source* source,
-								// char* name
-		B_CONNECT,
-		B_DISCONNECT,
-
-		B_FORMAT_PROPOSAL,		// media_format* format
-
-		B_ASK_FORMAT_CHANGE,
-		B_FORMAT_CHANGED
-	};
-
-
-	// This function is called when it is the moment to handle a buffer.
-	typedef void					(*process_hook)(BMediaConnection* connection,
-										BBuffer* buffer);
-
-	// Used to notify or inquire the client about what to do when certain
-	// events happen.
-	typedef status_t				(*notify_hook)(notification what,
-										BMediaConnection* connection,
-										...);
-
 	virtual							~BMediaConnection();
 
 	const media_connection&			Connection() const;
 	media_connection_id				Id() const;
 	const char*						Name() const;
 
-	// TODO: while most of the objects for both kinds are common
-	// it would be worthwile to have a private implementation
-	// so that we can better model the differences and avoid
-	// problems.
+	BMediaClient*					MediaClient() const;
+
 	bool							IsInput() const;
 	bool 							IsOutput() const;
 
@@ -88,9 +60,6 @@ public:
 
 	bool							IsConnected() const;
 
-	void							SetCookie(void* cookie);
-	void*							Cookie() const;
-
 	// Disconnect this connection. When a connection is disconnected,
 	// it can be reused as brand new.
 	status_t						Disconnect();
@@ -101,25 +70,19 @@ public:
 	// want to preserve it for future connections just Disconnect() it.
 	status_t						Release();
 
-	// Use this to set your callbacks.
-	void							SetHooks(process_hook processHook = NULL,
-										notify_hook notifyHook = NULL,
-										void* cookie = NULL);
-
 protected:
-									BMediaConnection(BMediaClient* owner,
-										media_connection_kind kind,
-										media_connection_id id);
+									BMediaConnection(media_connection_kind kind);
 
 	// Those callbacks are shared between BMediaInput and BMediaOutput
 	virtual void					Connected(const media_format& format);
 	virtual void					Disconnected();
 
 private:
+			void					ConnectionRegistered(BMediaClient* owner,
+										media_connection_id id);
+
 	const media_source&				Source() const;
 	const media_destination&		Destination() const;
-
-	void							_Init();
 
 	media_connection				fConnection;
 
@@ -129,10 +92,6 @@ private:
 	// forward or receive the data from/to a local BMediaConnection,
 	// see BMediaClient::Bind.
 	BMediaConnection*				fBind;
-
-	process_hook					fProcessHook;
-	notify_hook						fNotifyHook;
-	void*							fBufferCookie;
 
 	size_t							fBufferSize;
 	bigtime_t						fBufferDuration;
@@ -164,8 +123,7 @@ private:
 
 class BMediaInput : public BMediaConnection {
 public:
-									BMediaInput(BMediaClient* owner,
-										media_connection_id id);
+									BMediaInput();
 
 protected:
 	// Callbacks
@@ -195,8 +153,7 @@ private:
 
 class BMediaOutput : public BMediaConnection {
 public:
-									BMediaOutput(BMediaClient* owner,
-										media_connection_id id);
+									BMediaOutput();
 
 	void							SetOutputEnabled(bool enabled);
 	bool							IsOutputEnabled() const;
