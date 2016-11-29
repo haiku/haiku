@@ -735,6 +735,9 @@ LaunchDaemon::_HandleLaunchTarget(BMessage* message)
 		target->AddData(data.GetString("name"), data);
 
 	_LaunchJobs(target);
+
+	BMessage reply((uint32)B_OK);
+	message->SendReply(&reply);
 }
 
 
