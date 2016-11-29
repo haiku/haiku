@@ -194,7 +194,7 @@ AddGroupToHaikuImage party : 101 : baron walter ;
 #            ("haiku.vmdk" in the generated directory) will be used, unless the
 #           respective variables are set.
 # anyboot - A custom image (type "anyboot-image"), its size will be 4 MB larger
-#           than the value of HAIKU_IMAGE_SIZE, named haiku-anyboot.image.
+#           than the value of HAIKU_IMAGE_SIZE, named haiku-anyboot.iso.
 # crash   - Similar to the vmware profile, but created at a specific location
 #           and 1 GB size. Furthermore a "crash-tests" directory will be copied
 #           to the image.
@@ -203,7 +203,7 @@ AddGroupToHaikuImage party : 101 : baron walter ;
 DefineBuildProfile disk : disk : "/dev/sda57" ;
 DefineBuildProfile qemu : image : "haiku-qemu.image" ;
 DefineBuildProfile vmware : vmware-image ;
-DefineBuildProfile anyboot : anyboot-image : "haiku-anyboot.image" ;
+DefineBuildProfile anyboot : anyboot-image : "haiku-anyboot.iso" ;
 DefineBuildProfile crash : vmware-image
 	: "/home/foobar/vmware/Virtual Machines/CrashOMatic/CrashOMatic.vmdk" ;
 DefineBuildProfile install : install : /Haiku2 ;
