@@ -232,6 +232,7 @@ RemotePackageRepository HaikuPorts
 	dtc-1.4.1-1
 	ducksaver-1.1.0-2
 	dulwich-0.12.0-1
+	dvdauthor-0.7.1-1
 	dvdbackup-0.4.2-1
 	ed-1.13-1
 	enca-1.18-1
@@ -382,6 +383,8 @@ RemotePackageRepository HaikuPorts
 	icu56_devel-56.1-1
 	ilmbase-2.2.0-2
 	ilmbase_devel-2.2.0-2
+	imagemagick-6.9.6.6-1
+	imagemagick_devel-6.9.6.6-1
 	inputproto-2.3.1-1
 	intltool-0.51.0-1
 	irrlicht-1.8.3-1
@@ -403,6 +406,7 @@ RemotePackageRepository HaikuPorts
 	jpeg-9b-4
 	jpeg_devel-9b-4
 	jpeg_tools-9b-4
+	jpegoptim-1.4.4-1
 	jq-1.5-1
 	json_c-0.12-2
 	json_c_devel-0.12-2
@@ -417,6 +421,9 @@ RemotePackageRepository HaikuPorts
 	lcms_devel-2.8-1
 	lensfun-0.3.2-1
 	lensfun_devel-0.3.2-1
+	leptonica-1.73-2
+	leptonica_devel-1.73-2
+	leptonica_tools-1.73-2
 	less-481-1
 	lftp-4.4.16-1
 	lftp_devel-4.4.16-1
@@ -476,8 +483,8 @@ RemotePackageRepository HaikuPorts
 	libgcrypt_devel-1.7.3-1
 	libgeotiff-1.4.0-2
 	libgeotiff_devel-1.4.0-2
-	libgpg_error-1.24-2
-	libgpg_error_devel-1.24-2
+	libgpg_error-1.25-1
+	libgpg_error_devel-1.25-1
 	libgsasl-1.8.0-2
 	libgsasl_devel-1.8.0-2
 	libicns-0.8.1-5
@@ -528,6 +535,10 @@ RemotePackageRepository HaikuPorts
 	liboauth_devel-1.0.3-1
 	libogg-1.3.2-3
 	libogg_devel-1.3.2-3
+	libopenshot-0.1.1-4
+	libopenshot_audio-0.1.1-2
+	libopenshot_audio_devel-0.1.1-2
+	libopenshot_devel-0.1.1-4
 	libpaper-1.1.24-1
 	libpaper_devel-1.1.24-1
 	libparserutils-0.2.3-1
@@ -560,6 +571,8 @@ RemotePackageRepository HaikuPorts
 	libshout_devel-2.4.1-2
 	libsndfile-1.0.27-2
 	libsndfile_devel-1.0.27-2
+	libsodium-1.0.11-4
+	libsodium_devel-1.0.11-4
 	libsolv-0.3.0_haiku_2014_12_22-1
 	libsolv_devel-0.3.0_haiku_2014_12_22-1
 	libsoundtouch-1.9.2-2
@@ -568,6 +581,8 @@ RemotePackageRepository HaikuPorts
 	libssh2_devel-1.7.0-2
 	libsvgtiny-0.1.4-2
 	libsvgtiny_devel-0.1.4-2
+	libsvm-v321-1
+	libsvm_devel-v321-1
 	libtasn1-4.9-2
 	libtasn1_devel-4.9-2
 	libtheora-1.1.1-5
@@ -673,8 +688,8 @@ RemotePackageRepository HaikuPorts
 	ncurses_devel-5.9-10
 	ncurses6-6.0-2
 	ncurses6_devel-6.0-2
-	neon-0.30.1-2
-	neon_devel-0.30.1-2
+	neon-0.30.2-3
+	neon_devel-0.30.2-3
 	netcat-1.10-2
 	netpulse-0.2.3-5
 	netsurf_buildsystem-1.3-1
@@ -692,12 +707,14 @@ RemotePackageRepository HaikuPorts
 	openexr_devel-2.2.0-2
 	openjpeg-2.1.2-1
 	openjpeg_devel-2.1.2-1
+	openshot-2.0.7-2
 	openssh-7.2p2-2
 	openssl-1.0.2j-1
 	openssl_devel-1.0.2j-1
 	optipng-0.7.6-1
 	opus-1.1.3-1
 	opus_devel-1.1.3-1
+	opus_tools-0.1.9-2
 	opusfile-0.7-1
 	opusfile_devel-0.7-1
 	p7zip-9.20.1-6
@@ -739,20 +756,23 @@ RemotePackageRepository HaikuPorts
 	python3_mako-1.0.3-1
 	python3_numpy-1.10.1-1
 	python3_pip-7.0.3-1
+	python3_pyqt-5.5.1-1
 	python3_requests-2.9.1-1
-	python3_setuptools-22.0.0-1
+	python3_setuptools-28.8.0-1
 	python3_sip-4.18-1
 	python_ecdsa-0.13-1
 	python_html2text-2016.4.2-1
 	python_httplib2-0.9.2-1
 	python_mako-1.0.3-1
 	python_paramiko-1.16.0-1
+	python_pyqt-5.5.1-2
 	python_requests-2.9.1-1
 	python_setuptools-22.0.0-1
 	python_sip-4.18-1
 	python_twisted-13.2.0-1
 	python_zope.interface-4.1.3-1
 	pyyaml-3.11-1
+	qca-2.1.1-3
 	qca2-2.0.3-1
 	qca2_devel-2.0.3-1
 	qemu-2.1.2-2
@@ -761,6 +781,9 @@ RemotePackageRepository HaikuPorts
 	qrencode_kdl-3.4.4-1
 	qrencode_kdl_devel-3.4.4-1
 	qsystray-0.1-3
+	qt5-5.5.1-4
+	qt5_devel-5.5.1-4
+#	qt5_docs-5.5.1-4
 	quicklaunch-0.9.12-1
 	qupzilla-1.8.6-1
 	qutim-0.3.3-1
@@ -823,8 +846,9 @@ RemotePackageRepository HaikuPorts
 	sqlite-3.15.1.0-1
 	sqlite_devel-3.15.1.0-1
 	substrate-1.0b-1
-	subversion-1.8.11-6
-	subversion_devel-1.8.11-6
+	subversion-1.9.4-5
+	subversion_devel-1.9.4-5
+	swig-3.0.10-1
 	szip-2.1-1
 	szip_devel-2.1-1
 	taglib-1.11.1-1
@@ -873,6 +897,8 @@ RemotePackageRepository HaikuPorts
 	vim-7.4-5
 	vision-0.9.7.r949-3
 	weather-0.1.1_git-4
+	weechat-1.5-2
+	weechat_devel-1.5-2
 	wget-1.18-2
 	whereismymouse-1.0-1
 	which-2.21-3
@@ -1006,6 +1032,7 @@ RemotePackageRepository HaikuPorts
 	dtc
 	ducksaver
 	dulwich
+	dvdauthor
 	dvdbackup
 	ed
 	enca
@@ -1099,6 +1126,7 @@ RemotePackageRepository HaikuPorts
 	icu55
 	icu56
 	ilmbase
+	imagemagick
 	inputproto
 	intltool
 	irrlicht
@@ -1111,6 +1139,7 @@ RemotePackageRepository HaikuPorts
 	jasper
 	jbig2dec
 	jpeg
+	jpegoptim
 	jq
 	json_c
 	kbproto
@@ -1121,6 +1150,7 @@ RemotePackageRepository HaikuPorts
 	lcms
 	lcov
 	lensfun
+	leptonica
 	less
 	lftp
 	libaacs
@@ -1179,6 +1209,8 @@ RemotePackageRepository HaikuPorts
 	libnsutils
 	liboauth
 	libogg
+	libopenshot
+	libopenshot_audio
 	libpaper
 	libparserutils
 	libpcap
@@ -1196,10 +1228,12 @@ RemotePackageRepository HaikuPorts
 	libsdl
 	libshout
 	libsndfile
+	libsodium
 	libsolv
 	libsoundtouch
 	libssh2
 	libsvgtiny
+	libsvm
 	libtasn1
 	libtheora
 	libtimidity
@@ -1274,12 +1308,14 @@ RemotePackageRepository HaikuPorts
 	openal
 	openexr
 	openjpeg
+	openshot
 	openssh
 	openssl
 	openttd_gfx
 	optipng
 	opusfile
 	opus
+	opus_tools
 	p7zip
 	padblocker
 	pari
@@ -1307,6 +1343,7 @@ RemotePackageRepository HaikuPorts
 	python3_mako
 	python3_numpy
 	python3_pip
+	python3_pyqt
 	python3_requests
 	python3_setuptools
 	python3_sip
@@ -1316,6 +1353,7 @@ RemotePackageRepository HaikuPorts
 	python_httplib2
 	python_mako
 	python_paramiko
+	python_pyqt
 	python_requests
 	python_setuptools
 	python_sip
@@ -1323,11 +1361,13 @@ RemotePackageRepository HaikuPorts
 	python_zope.interface
 	python
 	pyyaml
+	qca
 	qca2
 	qemu
 	qrencode_kdl
 	qrencode
 	qsystray
+#	qt5
 	quicklaunch
 	raptor
 	rasqal
@@ -1363,6 +1403,7 @@ RemotePackageRepository HaikuPorts
 	sqlite
 	substrate
 	subversion
+	swig
 	szip
 	taglib
 	tar
@@ -1397,6 +1438,7 @@ RemotePackageRepository HaikuPorts
 	vim
 	vision
 	weather
+	weechat
 	wget
 	whereismymouse
 	which
