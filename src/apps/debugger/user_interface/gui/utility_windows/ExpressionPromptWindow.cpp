@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #include "ExpressionPromptWindow.h"
@@ -9,7 +9,7 @@
 #include <String.h>
 #include <TextControl.h>
 
-#include "MessageCodes.h"
+#include "AppMessageCodes.h"
 
 
 ExpressionPromptWindow::ExpressionPromptWindow(BHandler* addTarget,

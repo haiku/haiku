@@ -22,6 +22,7 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
+#include "AppMessageCodes.h"
 #include "CommandLineUserInterface.h"
 #include "DebuggerGlobals.h"
 #include "DebuggerSettingsManager.h"

@@ -28,7 +28,7 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
-#include "MessageCodes.h"
+#include "AppMessageCodes.h"
 #include "SettingsManager.h"
 #include "TargetHostInterface.h"
 #include "TargetHostInterfaceRoster.h"

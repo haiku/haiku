@@ -17,6 +17,7 @@
 #include <StringView.h>
 #include <TextControl.h>
 
+#include "AppMessageCodes.h"
 #include "Architecture.h"
 #include "CppLanguage.h"
 #include "GuiTeamUiSettings.h"

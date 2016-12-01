@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2014-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #include "BreakpointEditWindow.h"
@@ -13,10 +13,10 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
-#include "MessageCodes.h"
+#include "AppMessageCodes.h"
+#include "Team.h"
 #include "UserBreakpoint.h"
 #include "UserInterface.h"
-#include "Team.h"
 
 
 enum {

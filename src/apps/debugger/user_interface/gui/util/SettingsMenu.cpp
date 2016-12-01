@@ -13,7 +13,7 @@
 
 #include <AutoDeleter.h>
 
-#include "MessageCodes.h"
+#include "AppMessageCodes.h"
 #include "SettingsDescription.h"
 
 

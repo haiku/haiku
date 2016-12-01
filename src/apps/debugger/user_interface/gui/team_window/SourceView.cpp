@@ -31,6 +31,7 @@
 #include <AutoLocker.h>
 #include <ObjectList.h>
 
+#include "AppMessageCodes.h"
 #include "AutoDeleter.h"
 #include "Breakpoint.h"
 #include "DisassembledCode.h"

@@ -14,7 +14,7 @@
 #include <StringView.h>
 #include <TextControl.h>
 
-#include "MessageCodes.h"
+#include "AppMessageCodes.h"
 #include "UserInterface.h"
 
 

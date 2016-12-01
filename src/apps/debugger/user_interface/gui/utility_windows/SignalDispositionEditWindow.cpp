@@ -1,5 +1,5 @@
 /*
- * Copyright 2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2015-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #include "SignalDispositionEditWindow.h"
@@ -13,12 +13,12 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
-#include "MessageCodes.h"
+#include "AppMessageCodes.h"
 #include "SignalDispositionMenu.h"
 #include "SignalDispositionTypes.h"
+#include "Team.h"
 #include "UiUtils.h"
 #include "UserInterface.h"
-#include "Team.h"
 
 
 enum {

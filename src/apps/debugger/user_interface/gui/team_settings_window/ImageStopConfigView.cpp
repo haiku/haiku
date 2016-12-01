@@ -14,6 +14,7 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
+#include "AppMessageCodes.h"
 #include "FunctionInstance.h"
 #include "Image.h"
 #include "ImageDebugInfo.h"

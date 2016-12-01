@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2014, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #include "WatchPromptWindow.h"
@@ -15,6 +15,7 @@
 
 #include "AutoLocker.h"
 
+#include "AppMessageCodes.h"
 #include "Architecture.h"
 #include "CppLanguage.h"
 #include "IntegerValue.h"

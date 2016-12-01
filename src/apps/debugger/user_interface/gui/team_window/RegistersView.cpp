@@ -1,6 +1,6 @@
 /*
  * Copyright 2009-2012, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -17,11 +17,11 @@
 
 #include "table/TableColumns.h"
 
+#include "AppMessageCodes.h"
 #include "Architecture.h"
 #include "AutoDeleter.h"
 #include "CpuState.h"
 #include "GuiSettingsUtils.h"
-#include "MessageCodes.h"
 #include "Register.h"
 #include "UiUtils.h"
 

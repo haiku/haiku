@@ -33,6 +33,7 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
+#include "AppMessageCodes.h"
 #include "Breakpoint.h"
 #include "BreakpointEditWindow.h"
 #include "ConsoleOutputView.h"

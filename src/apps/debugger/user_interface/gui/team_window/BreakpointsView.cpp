@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -16,6 +16,7 @@
 #include <AutoLocker.h>
 #include <ObjectList.h>
 
+#include "AppMessageCodes.h"
 #include "MessageCodes.h"
 #include "Team.h"
 #include "UserBreakpoint.h"

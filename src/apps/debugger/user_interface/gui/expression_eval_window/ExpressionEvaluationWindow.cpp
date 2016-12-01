@@ -13,6 +13,7 @@
 #include <AutoDeleter.h>
 #include <AutoLocker.h>
 
+#include "AppMessageCodes.h"
 #include "CppLanguage.h"
 #include "FunctionDebugInfo.h"
 #include "FunctionInstance.h"

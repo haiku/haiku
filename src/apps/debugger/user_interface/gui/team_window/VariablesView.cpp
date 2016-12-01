@@ -24,6 +24,7 @@
 #include "table/TableColumns.h"
 
 #include "ActionMenuItem.h"
+#include "AppMessageCodes.h"
 #include "Architecture.h"
 #include "ExpressionInfo.h"
 #include "ExpressionValues.h"

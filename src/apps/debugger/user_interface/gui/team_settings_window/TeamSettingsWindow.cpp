@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2013-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #include "TeamSettingsWindow.h"
@@ -8,9 +8,9 @@
 #include <LayoutBuilder.h>
 #include <TabView.h>
 
+#include "AppMessageCodes.h"
 #include "ExceptionStopConfigView.h"
 #include "ImageStopConfigView.h"
-#include "MessageCodes.h"
 #include "SignalsConfigView.h"
 
 

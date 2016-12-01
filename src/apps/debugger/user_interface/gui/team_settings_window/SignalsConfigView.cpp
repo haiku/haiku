@@ -14,6 +14,7 @@
 
 #include "table/TableColumns.h"
 
+#include "AppMessageCodes.h"
 #include "MessageCodes.h"
 #include "SignalDispositionEditWindow.h"
 #include "SignalDispositionMenu.h"
