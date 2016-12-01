@@ -62,6 +62,7 @@ StartTeamWindow::Create(TargetHostInterface* hostInterface)
 
 }
 
+
 void
 StartTeamWindow::_Init()
 {
@@ -96,12 +97,14 @@ StartTeamWindow::_Init()
 	fCancelButton->SetTarget(this);
 }
 
+
 void
 StartTeamWindow::Show()
 {
 	CenterOnScreen();
 	BWindow::Show();
 }
+
 
 void
 StartTeamWindow::MessageReceived(BMessage* message)
