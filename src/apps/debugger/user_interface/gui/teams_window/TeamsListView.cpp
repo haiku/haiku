@@ -29,6 +29,7 @@
 
 
 enum {
+	MSG_SELECTED_INTERFACE_CHANGED = 'seic',
 	MSG_TEAM_ADDED = 'tead',
 	MSG_TEAM_REMOVED = 'tere',
 	MSG_TEAM_RENAMED = 'tern'
@@ -271,13 +272,12 @@ TeamRow::_SetTo(TeamInfo* info)
 //	#pragma mark - TeamsListView
 
 
-TeamsListView::TeamsListView(const char* name, team_id currentTeam,
-	TargetHostInterface* interface)
+TeamsListView::TeamsListView(const char* name)
 	:
 	Inherited(name, B_NAVIGABLE, B_PLAIN_BORDER),
 	TargetHost::Listener(),
-	fCurrentTeam(currentTeam),
-	fInterface(interface)
+	TeamsWindow::Listener(),
+	fInterface(NULL)
 {
 	AddColumn(new TeamsColumn("Name", 400, 100, 600,
 		B_TRUNCATE_BEGINNING), kNameColumn);
@@ -297,10 +297,6 @@ TeamsListView::AttachedToWindow()
 {
 	Inherited::AttachedToWindow();
 	TeamsColumn::InitTextMargin(ScrollView());
-
-	fInterface->GetTargetHost()->AddListener(this);
-
-	_InitList();
 }
 
 
@@ -308,10 +304,7 @@ void
 TeamsListView::DetachedFromWindow()
 {
 	Inherited::DetachedFromWindow();
-
-	fInterface->GetTargetHost()->RemoveListener(this);
-
-	Clear();
+	_SetInterface(NULL);
 }
 
 
@@ -319,6 +312,16 @@ void
 TeamsListView::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
+		case MSG_SELECTED_INTERFACE_CHANGED:
+		{
+			TargetHostInterface* interface;
+			if (message->FindPointer("interface", reinterpret_cast<void**>(
+					&interface)) == B_OK) {
+				_SetInterface(interface);
+			}
+			break;
+		}
+
 		case MSG_TEAM_ADDED:
 		{
 			TeamInfo* info;
@@ -421,6 +424,15 @@ TeamsListView::TeamRenamed(TeamInfo* info)
 
 
 void
+TeamsListView::SelectedInterfaceChanged(TargetHostInterface* interface)
+{
+	BMessage message(MSG_SELECTED_INTERFACE_CHANGED);
+	message.AddPointer("interface", interface);
+	BMessenger(this).SendMessage(&message);
+}
+
+
+void
 TeamsListView::_InitList()
 {
 	TargetHost* host = fInterface->GetTargetHost();
@@ -430,4 +442,24 @@ TeamsListView::_InitList()
 		BRow* row = new TeamRow(info);
 		AddRow(row);
 	}
+}
+
+
+void
+TeamsListView::_SetInterface(TargetHostInterface* interface)
+{
+	if (interface == fInterface)
+		return;
+
+	if (fInterface != NULL) {
+		Clear();
+		fInterface->GetTargetHost()->RemoveListener(this);
+	}
+
+	fInterface = interface;
+	if (fInterface == NULL)
+		return;
+
+	fInterface->GetTargetHost()->AddListener(this);
+	_InitList();
 }

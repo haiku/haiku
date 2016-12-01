@@ -15,6 +15,7 @@
 
 #include "TargetHost.h"
 #include "TeamInfo.h"
+#include "TeamsWindow.h"
 
 
 class BBitmap;
@@ -89,12 +90,11 @@ private:
 };
 
 
-class TeamsListView : public BColumnListView, public TargetHost::Listener {
+class TeamsListView : public BColumnListView, public TargetHost::Listener,
+	public TeamsWindow::Listener {
 	typedef BColumnListView Inherited;
 public:
-								TeamsListView(const char* name,
-									team_id currentTeam,
-									TargetHostInterface* interface);
+								TeamsListView(const char* name);
 	virtual 					~TeamsListView();
 
 			TeamRow* 			FindTeamRow(team_id teamId);
@@ -104,6 +104,10 @@ public:
 	virtual	void				TeamRemoved(team_id team);
 	virtual	void				TeamRenamed(TeamInfo* info);
 
+			// TeamsWindow::Listener
+	virtual	void				SelectedInterfaceChanged(
+									TargetHostInterface* interface);
+
 protected:
 	virtual void 				AttachedToWindow();
 	virtual void 				DetachedFromWindow();
@@ -112,9 +116,9 @@ protected:
 
 private:
 			void 				_InitList();
+			void				_SetInterface(TargetHostInterface* interface);
 
 private:
-			team_id				fCurrentTeam;
 			TargetHostInterface* fInterface;
 };
 
