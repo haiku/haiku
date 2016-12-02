@@ -38,8 +38,7 @@
 enum {
 	MSG_TEAM_SELECTION_CHANGED = 'tesc',
 	MSG_CHOSE_CORE_FILE = 'chcf',
-	MSG_SWITCH_TARGET_CONNECTION = 'stco',
-	MSG_CREATE_NEW_CONNECTION = 'cnco'
+	MSG_SWITCH_TARGET_CONNECTION = 'stco'
 };
 
 
@@ -54,7 +53,8 @@ TeamsWindow::TeamsWindow(SettingsManager* settingsManager)
 	fLoadCoreButton(NULL),
 	fConnectionField(NULL),
 	fCoreSelectionPanel(NULL),
-	fSettingsManager(settingsManager)
+	fSettingsManager(settingsManager),
+	fListeners()
 {
 	team_info info;
 	get_team_info(B_CURRENT_TEAM, &info);
@@ -173,11 +173,6 @@ TeamsWindow::MessageReceived(BMessage* message)
 			break;
 		}
 
-		case MSG_CREATE_NEW_CONNECTION:
-		{
-			break;
-		}
-
 		case MSG_SWITCH_TARGET_CONNECTION:
 		{
 			TargetHostInterface* interface;
@@ -191,6 +186,7 @@ TeamsWindow::MessageReceived(BMessage* message)
 
 			fTargetHostInterface = interface;
 			_NotifySelectedInterfaceChanged(interface);
+			fLoadCoreButton->SetEnabled(fTargetHostInterface->IsLocal());
 			break;
 		}
 
@@ -271,7 +267,8 @@ TeamsWindow::_Init()
 				connectionMenu))
 			.AddGlue()
 			.Add(fCreateConnectionButton = new BButton("Create new connection"
-					B_UTF8_ELLIPSIS, new BMessage(MSG_CREATE_NEW_CONNECTION)))
+					B_UTF8_ELLIPSIS, new BMessage(
+						MSG_SHOW_CONNECTION_CONFIG_WINDOW)))
 		.End()
 		.Add(fTeamsListView = new TeamsListView("TeamsList"))
 		.SetInsets(1.0f, 1.0f, 1.0f, 5.0f)
@@ -297,10 +294,10 @@ TeamsWindow::_Init()
 	fTeamsListView->SetSelectionMessage(new BMessage(
 			MSG_TEAM_SELECTION_CHANGED));
 
-	fCreateConnectionButton->SetEnabled(true);
 	fAttachTeamButton->SetEnabled(false);
 	fCreateTeamButton->SetTarget(this);
 	fLoadCoreButton->SetTarget(this);
+	fCreateConnectionButton->SetTarget(be_app);
 
 	_NotifySelectedInterfaceChanged(fTargetHostInterface);
 }

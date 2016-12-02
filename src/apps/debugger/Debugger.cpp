@@ -24,6 +24,7 @@
 
 #include "AppMessageCodes.h"
 #include "CommandLineUserInterface.h"
+#include "ConnectionConfigWindow.h"
 #include "DebuggerGlobals.h"
 #include "DebuggerSettingsManager.h"
 #include "DebuggerUiSettingsFactory.h"
@@ -258,6 +259,7 @@ private:
 
 private:
 			DebuggerSettingsManager fSettingsManager;
+			ConnectionConfigWindow* fConnectionWindow;
 			TeamsWindow*		fTeamsWindow;
 			StartTeamWindow*	fStartTeamWindow;
 };
@@ -290,6 +292,7 @@ Debugger::Debugger()
 	:
 	BApplication(kDebuggerSignature),
 	TargetHostInterfaceRoster::Listener(),
+	fConnectionWindow(NULL),
 	fTeamsWindow(NULL),
 	fStartTeamWindow(NULL)
 {
@@ -375,6 +378,28 @@ Debugger::MessageReceived(BMessage* message)
 		case MSG_START_TEAM_WINDOW_CLOSED:
 		{
 			fStartTeamWindow = NULL;
+			break;
+		}
+		case MSG_SHOW_CONNECTION_CONFIG_WINDOW:
+		{
+			if (fConnectionWindow != NULL) {
+				fConnectionWindow->Activate(true);
+				break;
+			}
+
+			try {
+				fConnectionWindow = ConnectionConfigWindow::Create();
+				if (fConnectionWindow != NULL)
+					fConnectionWindow->Show();
+			} catch (...) {
+				// TODO: Notify the user!
+				fprintf(stderr, "Error: Failed to create Teams window\n");
+			}
+			break;
+		}
+		case MSG_CONNECTION_CONFIG_WINDOW_CLOSED:
+		{
+			fConnectionWindow = NULL;
 			break;
 		}
 		case MSG_DEBUG_THIS_TEAM:
