@@ -8,8 +8,9 @@ USES_BE_API on <build>get_package_dependencies = true ;
 
 BuildPlatformMain <build>get_package_dependencies :
 	get_package_dependencies.cpp
+	HTTPClient.cpp
 	:
 	libpackage-add-on-libsolv_build.so
 	libsolvext_build.so libsolv_build.so
-	libpackage_build.so $(HOST_LIBBE) $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
+	libpackage_build.so $(HOST_LIBBE) curl $(HOST_LIBSUPC++) $(HOST_LIBSTDC++)
 	;

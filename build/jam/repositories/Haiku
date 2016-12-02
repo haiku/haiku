@@ -52,4 +52,8 @@ if $(webPositiveIsAvailable) {
 	packages += webpositive ;
 }
 
-HaikuRepository $(haikuRepository) : $(repoInfo) : $(packages:S=.hpkg) ;
+local version = current ;
+#local version = $(HAIKU_VERSION) ;
+local remoteURL = http://packages.haiku-os.org/haiku/master/$(HAIKU_PACKAGING_ARCH)/$(version) ;
+
+HaikuRepository $(haikuRepository) : $(repoInfo) : $(packages:S=.hpkg) : $(remoteURL) ;

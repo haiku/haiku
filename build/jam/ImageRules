@@ -901,7 +901,7 @@ rule AddPackagesAndRepositoryVariablesToContainerScript script : container
 	local repositoryFiles ;
 	for repository in $(HAIKU_REPOSITORIES) {
 		repositoryFiles
-			+= [ on $(repository) return $(HAIKU_REPOSITORY_CACHE_FILE) ] ;
+			+= [ on $(repository) return $(HAIKU_REPOSITORY_CONFIG_FILE) ] ;
 	}
 
 	AddTargetVariableToScript $(script) : $(repositoryFiles) : repositories ;

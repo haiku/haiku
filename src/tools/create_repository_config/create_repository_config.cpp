@@ -1,9 +1,10 @@
 /*
- * Copyright 2013, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
+ * 		Alexander von Gluck IV <kallisti5@unixzen.com>
  */
 
 
@@ -37,11 +38,10 @@ void
 print_usage_and_exit(bool error)
 {
 	fprintf(error ? stderr : stdout,
-		"Usage: %s [ <URL> ] <repository info> <repository config>\n"
+		"Usage: %s <URL> <repository info> <repository config>\n"
 		"Creates a repository config file from a given repository info and\n"
-		"the base URL (the directory in which the \"repo\", \"repo.info\',\n"
-		"and \"repo.sha256 files can be found). If the URL is not specified,\n"
-		"the one from the repository info is used.",
+		"the base URL (the directory in which the 'repo', 'repo.info',\n"
+		"and 'repo.sha256' files can be found).\n",
 		sProgramName);
 	exit(error ? 1 : 0);
 }
@@ -50,7 +50,7 @@ print_usage_and_exit(bool error)
 int
 main(int argc, const char* const* argv)
 {
-	if (argc < 3 || argc > 4) {
+	if (argc != 4) {
 		if (argc == 2
 			&& (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)) {
 				print_usage_and_exit(false);
@@ -59,7 +59,7 @@ main(int argc, const char* const* argv)
 	}
 
 	int argi = 1;
-	const char* url = argc == 4 ? argv[argi++] : NULL;
+	const char* url = argv[argi++];
 	const char* infoPath = argv[argi++];
 	const char* configPath = argv[argi++];
 
@@ -67,9 +67,6 @@ main(int argc, const char* const* argv)
 	BPackageKit::BRepositoryInfo repoInfo;
 	DIE_ON_ERROR(repoInfo.SetTo(infoPath),
 		"failed to read repository info file \"%s\"", infoPath);
-
-	if (url == NULL)
-		url = repoInfo.OriginalBaseURL();
 
 	// init and write the config
 	BPackageKit::BRepositoryConfig repoConfig;

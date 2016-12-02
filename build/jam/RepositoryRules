@@ -761,10 +761,10 @@ actions BuildRemoteHaikuPortsRepository1
 }
 
 
-rule HaikuRepository repository : repoInfoTemplate : packages
+rule HaikuRepository repository : repoInfoTemplate : packages : url
 {
-	# HaikuRepository <repository> : <repoInfoTemplate> : <packages>
-	#	[ : <url> [ : <versionFile> ] ] ;
+	# HaikuRepository <repository> : <repoInfoTemplate> : <packages> : <url>
+	#	[ : <versionFile> ] ;
 	# Builds the Haiku repository from the given packages and repository info
 	# template. <repository> must already be located.
 	#
@@ -773,6 +773,7 @@ rule HaikuRepository repository : repoInfoTemplate : packages
 	#	meta data files.
 	# <repoInfoTemplate> - The repository info template file to be used.
 	# <packages> - The packages to be added to the repository.
+	# <url> - The remote location of the initial update repository
 
 	local architecture = $(HAIKU_PACKAGING_ARCH) ;
 	local secondaryArchitecture ;
@@ -791,7 +792,7 @@ rule HaikuRepository repository : repoInfoTemplate : packages
 	# build the respository config
 	local repositoryConfig = $(repository:G=repository-config)-config ;
 	MakeLocate $(repositoryConfig) : $(repositoriesDir) ;
-	RepositoryConfig $(repositoryConfig) : $(repositoryInfo) ;
+	RepositoryConfig $(repositoryConfig) : $(repositoryInfo) : $(url) ;
 	HAIKU_REPOSITORY_CONFIG_FILE on $(repository) = $(repositoryConfig) ;
 
 	# setup the repository cache file

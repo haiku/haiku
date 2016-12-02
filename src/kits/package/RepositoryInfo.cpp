@@ -1,9 +1,10 @@
 /*
- * Copyright 2011, Haiku, Inc. All Rights Reserved.
+ * Copyright 2011-2016, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Oliver Tappe <zooey@hirschkaefer.de>
+ *		Alexander von Gluck IV <kallisti5@unixzen.com>
  */
 
 
@@ -27,13 +28,15 @@ namespace BPackageKit {
 const uint8 BRepositoryInfo::kDefaultPriority	= 50;
 
 const char* const BRepositoryInfo::kNameField			= "name";
-const char* const BRepositoryInfo::kURLField			= "url";
 const char* const BRepositoryInfo::kVendorField			= "vendor";
 const char* const BRepositoryInfo::kSummaryField		= "summary";
 const char* const BRepositoryInfo::kPriorityField		= "priority";
 const char* const BRepositoryInfo::kArchitectureField	= "architecture";
 const char* const BRepositoryInfo::kLicenseNameField	= "licenseName";
 const char* const BRepositoryInfo::kLicenseTextField	= "licenseText";
+
+// XXX: Kill me after everyone upgrades.
+const char* const BRepositoryInfo::kURLField			= "url";
 
 
 BRepositoryInfo::BRepositoryInfo()
@@ -82,14 +85,15 @@ BRepositoryInfo::Archive(BMessage* data, bool deep) const
 	if (result != B_OK)
 		return result;
 
-	if ((result = data->AddString(kNameField, fName)) != B_OK)
+	// XXX: Kill me after everyone upgrades
+	if ((result = data->AddString(kURLField, "STUB")) != B_OK)
 		return result;
-	if ((result = data->AddString(kURLField, fOriginalBaseURL)) != B_OK)
+
+	if ((result = data->AddString(kNameField, fName)) != B_OK)
 		return result;
 	if ((result = data->AddString(kVendorField, fVendor)) != B_OK)
 		return result;
-	result = data->AddString(kSummaryField, fSummary);
-	if (result != B_OK)
+	if ((result = data->AddString(kSummaryField, fSummary)) != B_OK)
 		return result;
 	if ((result = data->AddUInt8(kPriorityField, fPriority)) != B_OK)
 		return result;
@@ -139,13 +143,6 @@ BRepositoryInfo::Name() const
 
 
 const BString&
-BRepositoryInfo::OriginalBaseURL() const
-{
-	return fOriginalBaseURL;
-}
-
-
-const BString&
 BRepositoryInfo::Vendor() const
 {
 	return fVendor;
@@ -191,13 +188,6 @@ void
 BRepositoryInfo::SetName(const BString& name)
 {
 	fName = name;
-}
-
-
-void
-BRepositoryInfo::SetOriginalBaseURL(const BString& url)
-{
-	fOriginalBaseURL = url;
 }
 
 
@@ -256,8 +246,6 @@ BRepositoryInfo::_SetTo(const BMessage* data)
 
 	status_t result;
 	if ((result = data->FindString(kNameField, &fName)) != B_OK)
-		return result;
-	if ((result = data->FindString(kURLField, &fOriginalBaseURL)) != B_OK)
 		return result;
 	if ((result = data->FindString(kVendorField, &fVendor)) != B_OK)
 		return result;
@@ -318,7 +306,6 @@ BRepositoryInfo::_SetTo(const BEntry& entry)
 		&unload_driver_settings);
 
 	const char* name = get_driver_parameter(settingsHandle, "name", NULL, NULL);
-	const char* url = get_driver_parameter(settingsHandle, "url", NULL, NULL);
 	const char* vendor
 		= get_driver_parameter(settingsHandle, "vendor", NULL, NULL);
 	const char* summary
@@ -328,7 +315,7 @@ BRepositoryInfo::_SetTo(const BEntry& entry)
 	const char* architectureString
 		= get_driver_parameter(settingsHandle, "architecture", NULL, NULL);
 
-	if (name == NULL || *name == '\0' || url == NULL || *url == '\0'
+	if (name == NULL || *name == '\0'
 		|| vendor == NULL || *vendor == '\0'
 		|| summary == NULL || *summary == '\0'
 		|| priorityString == NULL || *priorityString == '\0'
@@ -343,7 +330,6 @@ BRepositoryInfo::_SetTo(const BEntry& entry)
 	}
 
 	fName = name;
-	fOriginalBaseURL = url;
 	fVendor = vendor;
 	fSummary = summary;
 	fPriority = atoi(priorityString);

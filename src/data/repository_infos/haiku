@@ -2,5 +2,4 @@ name Haiku
 vendor "Haiku Project"
 summary "The Haiku repository (for Haiku %HAIKU_VERSION_NO_REVISION%)"
 priority 1
-url http://packages.haiku-os.org/haiku/master/%HAIKU_PACKAGING_ARCH%/%HAIKU_VERSION_NO_REVISION%
 architecture %HAIKU_PACKAGING_ARCH%
