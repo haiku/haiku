@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src apps debugger ;
 
 UseHeaders [ FDirName $(HAIKU_TOP) headers compatibility bsd ] : true ;
 
-UsePrivateHeaders debugger ; 
+UsePrivateHeaders debugger ;
 UsePrivateHeaders [ FDirName debugger arch ] ;
 UsePrivateHeaders [ FDirName debugger controllers ] ;
 UsePrivateHeaders [ FDirName debugger debug_info ] ;
@@ -132,6 +132,7 @@ local sources =
 
 	# user_interface/gui/utility_windows
 	BreakpointEditWindow.cpp
+	ConnectionConfigWindow.cpp
 	ExpressionPromptWindow.cpp
 	SignalDispositionEditWindow.cpp
 	StartTeamWindow.cpp
@@ -165,7 +166,7 @@ local sources =
 	ReportUserInterface.cpp
 ;
 
-Includes [ FGristFiles $(sources) ] : 
+Includes [ FGristFiles $(sources) ] :
 	[ BuildFeatureAttribute ncurses : headers ]
 	[ BuildFeatureAttribute libedit : headers ]
 ;

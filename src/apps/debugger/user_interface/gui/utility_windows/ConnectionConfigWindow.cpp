@@ -1,0 +1,165 @@
+/*
+ * Copyright 2016, Rene Gollent, rene@gollent.com.
+ * Distributed under the terms of the MIT License.
+ */
+#include "ConnectionConfigWindow.h"
+
+#include <Application.h>
+#include <Button.h>
+#include <GroupView.h>
+#include <MenuField.h>
+#include <LayoutBuilder.h>
+
+#include <AutoLocker.h>
+
+#include "AppMessageCodes.h"
+#include "TargetHostInterfaceInfo.h"
+#include "TargetHostInterfaceRoster.h"
+#include "TargetHostInterface.h"
+
+
+enum {
+	MSG_SWITCH_CONNECTION_TYPE 	= 'swct',
+	MSG_CREATE_CONNECTION 		= 'crco'
+};
+
+
+ConnectionConfigWindow::ConnectionConfigWindow()
+	:
+	BWindow(BRect(), "Create new connection", B_TITLED_WINDOW,
+		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
+	fConnectionTypeField(NULL),
+	fConfigGroupView(NULL),
+	fCloseButton(NULL),
+	fConnectButton(NULL)
+{
+}
+
+
+ConnectionConfigWindow::~ConnectionConfigWindow()
+{
+}
+
+
+ConnectionConfigWindow*
+ConnectionConfigWindow::Create()
+{
+	ConnectionConfigWindow* self = new ConnectionConfigWindow();
+
+	try {
+		self->_Init();
+	} catch (...) {
+		delete self;
+		throw;
+	}
+
+	return self;
+
+}
+
+
+void
+ConnectionConfigWindow::Show()
+{
+	CenterOnScreen();
+	BWindow::Show();
+}
+
+
+bool
+ConnectionConfigWindow::QuitRequested()
+{
+	return be_app_messenger.SendMessage(MSG_CONNECTION_CONFIG_WINDOW_CLOSED)
+		== B_OK;
+}
+
+
+void
+ConnectionConfigWindow::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		default:
+			BWindow::MessageReceived(message);
+			break;
+	}
+
+}
+
+
+void
+ConnectionConfigWindow::_Init()
+{
+	BMenu* menu = _BuildTypeMenu();
+
+	fConfigGroupView = new BGroupView(B_HORIZONTAL);
+
+	BLayoutBuilder::Group<>(this, B_VERTICAL)
+		.SetInsets(B_USE_DEFAULT_SPACING)
+		.Add(fConnectionTypeField = new BMenuField("Type:", menu))
+		.AddGroup(fConfigGroupView)
+			// this group is a placeholder to contain
+			// the actual config view
+		.End()
+		.AddGroup(B_HORIZONTAL)
+			.SetInsets(B_USE_SMALL_SPACING)
+			.AddGlue()
+			.Add(fCloseButton = new BButton("Close",
+					new BMessage(B_QUIT_REQUESTED)))
+			.Add(fConnectButton = new BButton("Connect",
+					new BMessage(MSG_CREATE_CONNECTION)))
+		.End();
+
+	fConnectionTypeField->Menu()->SetLabelFromMarked(true);
+	fConnectionTypeField->Menu()->SetTargetForItems(this);
+
+	fCloseButton->SetTarget(this);
+	fConnectButton->SetTarget(this);
+	fConnectButton->SetEnabled(false);
+
+	if (menu->CountItems() > 0) {
+		BMenuItem* item = menu->ItemAt(0);
+		BMessage* message = item->Message();
+		TargetHostInterfaceInfo* info = NULL;
+		if (message->FindPointer("info", reinterpret_cast<void**>(&info))
+			== B_OK) {
+			_UpdateActiveConfig(info);
+			menu->ItemAt(0)->SetMarked(true);
+		}
+	}
+}
+
+
+BMenu*
+ConnectionConfigWindow::_BuildTypeMenu()
+{
+	BMenu* menu = new BMenu("Types");
+	TargetHostInterfaceRoster* roster = TargetHostInterfaceRoster::Default();
+
+	AutoLocker<TargetHostInterfaceRoster> rosterLocker(roster);
+
+	for (int32 i = 0; i < roster->CountInterfaceInfos(); i++) {
+		TargetHostInterfaceInfo* info = roster->InterfaceInfoAt(i);
+		if (info->IsLocal())
+			continue;
+
+		BMenuItem* item = new BMenuItem(info->Name(), new BMessage(
+				MSG_SWITCH_CONNECTION_TYPE));
+		item->Message()->AddPointer("info", info);
+		menu->AddItem(item);
+	}
+
+	return menu;
+}
+
+
+void
+ConnectionConfigWindow::_UpdateActiveConfig(TargetHostInterfaceInfo* info)
+{
+	if (fConfigGroupView->CountChildren() > 0) {
+		BView* view = fConfigGroupView->ChildAt(0);
+		fConfigGroupView->RemoveChild(view);
+		delete view;
+	}
+
+
+}
