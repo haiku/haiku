@@ -1,12 +1,13 @@
 SubDir HAIKU_TOP src servers mount ;
 
 UsePrivateHeaders app mount shared storage ;
+SubDirHdrs $(HAIKU_TOP) src kits tracker ;
 
 Server mount_server
 	:
 	AutoMounter.cpp
 	:
-	libbe.so localestub [ TargetLibstdc++ ]
+	libbe.so tracker localestub [ TargetLibstdc++ ]
 	:
 	mount_server.rdef
 ;

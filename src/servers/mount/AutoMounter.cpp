@@ -1,5 +1,5 @@
 /*
- * Copyright 2007-2010, Haiku, Inc. All rights reserved.
+ * Copyright 2007-2018, Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -40,6 +40,8 @@
 
 #include "MountServer.h"
 
+#include "Utilities.h"
+
 
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "AutoMounter"
@@ -51,11 +53,296 @@ static const char* kMountFlagsKeyExtension = " mount flags";
 static const char* kInitialMountEvent = "initial_volumes_mounted";
 
 
+class MountVisitor : public BDiskDeviceVisitor {
+public:
+								MountVisitor(mount_mode normalMode,
+									mount_mode removableMode,
+									bool initialRescan, BMessage& previous,
+									partition_id deviceID);
+	virtual						~MountVisitor()
+									{}
+
+	virtual	bool				Visit(BDiskDevice* device);
+	virtual	bool				Visit(BPartition* partition, int32 level);
+
+private:
+			bool				_WasPreviouslyMounted(const BPath& path,
+									const BPartition* partition);
+
+private:
+			mount_mode			fNormalMode;
+			mount_mode			fRemovableMode;
+			bool				fInitialRescan;
+			BMessage&			fPrevious;
+			partition_id		fOnlyOnDeviceID;
+};
+
+
+class MountArchivedVisitor : public BDiskDeviceVisitor {
+public:
+								MountArchivedVisitor(
+									const BDiskDeviceList& devices,
+									const BMessage& archived);
+	virtual						~MountArchivedVisitor();
+
+	virtual	bool				Visit(BDiskDevice* device);
+	virtual	bool				Visit(BPartition* partition, int32 level);
+
+private:
+			int					_Score(BPartition* partition);
+
+private:
+			const BDiskDeviceList& fDevices;
+			const BMessage&		fArchived;
+			int					fBestScore;
+			partition_id		fBestID;
+};
+
+
 static bool
 BootedInSafeMode()
 {
-	const char *safeMode = getenv("SAFEMODE");
-	return (safeMode && strcmp(safeMode, "yes") == 0);
+	const char* safeMode = getenv("SAFEMODE");
+	return safeMode != NULL && strcmp(safeMode, "yes") == 0;
+}
+
+
+class ArchiveVisitor : public BDiskDeviceVisitor {
+public:
+								ArchiveVisitor(BMessage& message);
+	virtual						~ArchiveVisitor();
+
+	virtual	bool				Visit(BDiskDevice* device);
+	virtual	bool				Visit(BPartition* partition, int32 level);
+
+private:
+			BMessage&			fMessage;
+};
+
+
+// #pragma mark - MountVisitor
+
+
+MountVisitor::MountVisitor(mount_mode normalMode, mount_mode removableMode,
+		bool initialRescan, BMessage& previous, partition_id deviceID)
+	:
+	fNormalMode(normalMode),
+	fRemovableMode(removableMode),
+	fInitialRescan(initialRescan),
+	fPrevious(previous),
+	fOnlyOnDeviceID(deviceID)
+{
+}
+
+
+bool
+MountVisitor::Visit(BDiskDevice* device)
+{
+	return Visit(device, 0);
+}
+
+
+bool
+MountVisitor::Visit(BPartition* partition, int32 level)
+{
+	if (fOnlyOnDeviceID >= 0) {
+		// only mount partitions on the given device id
+		// or if the partition ID is already matched
+		BPartition* device = partition;
+		while (device->Parent() != NULL) {
+			if (device->ID() == fOnlyOnDeviceID) {
+				// we are happy
+				break;
+			}
+			device = device->Parent();
+		}
+		if (device->ID() != fOnlyOnDeviceID)
+			return false;
+	}
+
+	mount_mode mode = !fInitialRescan && partition->Device()->IsRemovableMedia()
+		? fRemovableMode : fNormalMode;
+	if (mode == kNoVolumes || partition->IsMounted()
+		|| !partition->ContainsFileSystem()) {
+		return false;
+	}
+
+	BPath path;
+	if (partition->GetPath(&path) != B_OK)
+		return false;
+
+	if (mode == kRestorePreviousVolumes) {
+		// mount all volumes that were stored in the settings file
+		if (!_WasPreviouslyMounted(path, partition))
+			return false;
+	} else if (mode == kOnlyBFSVolumes) {
+		if (partition->ContentType() == NULL
+			|| strcmp(partition->ContentType(), kPartitionTypeBFS))
+			return false;
+	}
+
+	uint32 mountFlags;
+	if (!fInitialRescan) {
+		// Ask the user about mount flags if this is not the
+		// initial scan.
+		// TODO!
+		//if (!_SuggestMountFlags(partition, &mountFlags))
+			return false;
+	} else {
+		BString mountFlagsKey(path.Path());
+		mountFlagsKey << kMountFlagsKeyExtension;
+		if (fPrevious.FindInt32(mountFlagsKey.String(),
+				(int32*)&mountFlags) < B_OK) {
+			mountFlags = 0;
+		}
+	}
+
+	if (partition->Mount(NULL, mountFlags) != B_OK) {
+		// TODO: Error to syslog
+	}
+	return false;
+}
+
+
+bool
+MountVisitor::_WasPreviouslyMounted(const BPath& path,
+	const BPartition* partition)
+{
+	// We only check the legacy config data here; the current method
+	// is implemented in ArchivedVolumeVisitor -- this can be removed
+	// some day.
+	const char* volumeName = NULL;
+	if (partition->ContentName() == NULL
+		|| fPrevious.FindString(path.Path(), &volumeName) != B_OK
+		|| strcmp(volumeName, partition->ContentName()) != 0)
+		return false;
+
+	return true;
+}
+
+
+// #pragma mark - MountArchivedVisitor
+
+
+MountArchivedVisitor::MountArchivedVisitor(const BDiskDeviceList& devices,
+		const BMessage& archived)
+	:
+	fDevices(devices),
+	fArchived(archived),
+	fBestScore(-1),
+	fBestID(-1)
+{
+}
+
+
+MountArchivedVisitor::~MountArchivedVisitor()
+{
+	if (fBestScore >= 6) {
+		uint32 mountFlags = fArchived.GetUInt32("mountFlags", 0);
+		BPartition* partition = fDevices.PartitionWithID(fBestID);
+		if (partition != NULL)
+			partition->Mount(NULL, mountFlags);
+	}
+}
+
+
+bool
+MountArchivedVisitor::Visit(BDiskDevice* device)
+{
+	return Visit(device, 0);
+}
+
+
+bool
+MountArchivedVisitor::Visit(BPartition* partition, int32 level)
+{
+	if (partition->IsMounted() || !partition->ContainsFileSystem())
+		return false;
+
+	int score = _Score(partition);
+	if (score > fBestScore) {
+		fBestScore = score;
+		fBestID = partition->ID();
+	}
+
+	return false;
+}
+
+
+int
+MountArchivedVisitor::_Score(BPartition* partition)
+{
+	BPath path;
+	if (partition->GetPath(&path) != B_OK)
+		return false;
+
+	int score = 0;
+
+	int64 capacity = fArchived.GetInt64("capacity", 0);
+	if (capacity == partition->ContentSize())
+		score += 4;
+
+	BString deviceName = fArchived.GetString("deviceName");
+	if (deviceName == path.Path())
+		score += 3;
+
+	BString volumeName = fArchived.GetString("volumeName");
+	if (volumeName == partition->ContentName())
+		score += 2;
+
+	BString fsName = fArchived.FindString("fsName");
+	if (fsName == partition->ContentType())
+		score += 1;
+
+	uint32 blockSize = fArchived.GetUInt32("blockSize", 0);
+	if (blockSize == partition->BlockSize())
+		score += 1;
+
+	return score;
+}
+
+
+// #pragma mark - ArchiveVisitor
+
+
+ArchiveVisitor::ArchiveVisitor(BMessage& message)
+	:
+	fMessage(message)
+{
+}
+
+
+ArchiveVisitor::~ArchiveVisitor()
+{
+}
+
+
+bool
+ArchiveVisitor::Visit(BDiskDevice* device)
+{
+	return Visit(device, 0);
+}
+
+
+bool
+ArchiveVisitor::Visit(BPartition* partition, int32 level)
+{
+	if (!partition->ContainsFileSystem())
+		return false;
+
+	BPath path;
+	if (partition->GetPath(&path) != B_OK)
+		return false;
+
+	BMessage info;
+	info.AddUInt32("blockSize", partition->BlockSize());
+	info.AddInt64("capacity", partition->ContentSize());
+	info.AddString("deviceName", path.Path());
+	info.AddString("volumeName", partition->ContentName());
+	info.AddString("fsName", partition->ContentType());
+
+	fMessage.AddMessage("info", &info);
+	return false;
 }
 
 
@@ -273,108 +560,23 @@ AutoMounter::_MountVolumes(mount_mode normal, mount_mode removable,
 	if (normal == kNoVolumes && removable == kNoVolumes)
 		return;
 
-	class InitialMountVisitor : public BDiskDeviceVisitor {
-		public:
-			InitialMountVisitor(mount_mode normalMode, mount_mode removableMode,
-					bool initialRescan, BMessage& previous,
-					partition_id deviceID)
-				:
-				fNormalMode(normalMode),
-				fRemovableMode(removableMode),
-				fInitialRescan(initialRescan),
-				fPrevious(previous),
-				fOnlyOnDeviceID(deviceID)
-			{
-			}
-
-			virtual
-			~InitialMountVisitor()
-			{
-			}
-
-			virtual bool
-			Visit(BDiskDevice* device)
-			{
-				return Visit(device, 0);
-			}
-
-			virtual bool
-			Visit(BPartition* partition, int32 level)
-			{
-				if (fOnlyOnDeviceID >= 0) {
-					// only mount partitions on the given device id
-					// or if the partition ID is already matched
-					BPartition* device = partition;
-					while (device->Parent() != NULL) {
-						if (device->ID() == fOnlyOnDeviceID) {
-							// we are happy
-							break;
-						}
-						device = device->Parent();
-					}
-					if (device->ID() != fOnlyOnDeviceID)
-						return false;
-				}
-
-				mount_mode mode = !fInitialRescan
-					&& partition->Device()->IsRemovableMedia()
-					? fRemovableMode : fNormalMode;
-				if (mode == kNoVolumes
-					|| partition->IsMounted()
-					|| !partition->ContainsFileSystem())
-					return false;
-
-				BPath path;
-				if (partition->GetPath(&path) != B_OK)
-					return false;
-
-				if (mode == kRestorePreviousVolumes) {
-					// mount all volumes that were stored in the settings file
-					const char *volumeName = NULL;
-					if (partition->ContentName() == NULL
-						|| fPrevious.FindString(path.Path(), &volumeName)
-							!= B_OK
-						|| strcmp(volumeName, partition->ContentName()))
-						return false;
-				} else if (mode == kOnlyBFSVolumes) {
-					if (partition->ContentType() == NULL
-						|| strcmp(partition->ContentType(), kPartitionTypeBFS))
-						return false;
-				}
-
-				uint32 mountFlags;
-				if (!fInitialRescan) {
-					// Ask the user about mount flags if this is not the
-					// initial scan.
-					if (!_SuggestMountFlags(partition, &mountFlags))
-						return false;
-				} else {
-					BString mountFlagsKey(path.Path());
-					mountFlagsKey << kMountFlagsKeyExtension;
-					if (fPrevious.FindInt32(mountFlagsKey.String(),
-							(int32*)&mountFlags) < B_OK) {
-						mountFlags = 0;
-					}
-				}
-
-				if (partition->Mount(NULL, mountFlags) != B_OK) {
-					// TODO: Error to syslog
-				}
-				return false;
-			}
-
-		private:
-			mount_mode		fNormalMode;
-			mount_mode		fRemovableMode;
-			bool			fInitialRescan;
-			BMessage&		fPrevious;
-			partition_id	fOnlyOnDeviceID;
-	} visitor(normal, removable, initialRescan, fSettings, deviceID);
-
 	BDiskDeviceList devices;
 	status_t status = devices.Fetch();
-	if (status == B_OK)
-		devices.VisitEachPartition(&visitor);
+	if (status != B_OK)
+		return;
+
+	if (normal == kRestorePreviousVolumes) {
+		BMessage archived;
+		for (int32 index = 0;
+				fSettings.FindMessage("info", index, &archived) == B_OK;
+				index++) {
+			MountArchivedVisitor visitor(devices, archived);
+			devices.VisitEachPartition(&visitor);
+		}
+	}
+
+	MountVisitor visitor(normal, removable, initialRescan, fSettings, deviceID);
+	devices.VisitEachPartition(&visitor);
 }
 
 
@@ -591,7 +793,7 @@ AutoMounter::_FromMode(mount_mode mode, bool& all, bool& bfs, bool& restore)
 }
 
 
-AutoMounter::mount_mode
+mount_mode
 AutoMounter::_ToMode(bool all, bool bfs, bool restore)
 {
 	if (all)
@@ -673,7 +875,7 @@ AutoMounter::_WriteSettings()
 
 	ssize_t settingsSize = message.FlattenedSize();
 
-	char *buffer = new(std::nothrow) char[settingsSize];
+	char* buffer = new(std::nothrow) char[settingsSize];
 	if (buffer == NULL) {
 		PRINT(("error writing automounter settings, out of memory\n"));
 		return;
@@ -682,6 +884,8 @@ AutoMounter::_WriteSettings()
 	status_t result = message.Flatten(buffer, settingsSize);
 
 	fPrefsFile.Seek(0, SEEK_SET);
+	fPrefsFile.SetSize(0);
+
 	result = fPrefsFile.Write(buffer, (size_t)settingsSize);
 	if (result != settingsSize)
 		PRINT(("error writing automounter settings, %s\n", strerror(result)));
@@ -741,22 +945,8 @@ AutoMounter::_GetSettings(BMessage *message)
 
 	// Save mounted volumes so we can optionally mount them on next
 	// startup
-	BVolumeRoster volumeRoster;
-	BVolume volume;
-	while (volumeRoster.GetNextVolume(&volume) == B_OK) {
-        fs_info info;
-        if (fs_stat_dev(volume.Device(), &info) == 0
-			&& (info.flags & (B_FS_IS_REMOVABLE | B_FS_IS_PERSISTENT)) != 0) {
-			message->AddString(info.device_name, info.volume_name);
-
-			BString mountFlagsKey(info.device_name);
-			mountFlagsKey << kMountFlagsKeyExtension;
-			uint32 mountFlags = 0;
-			if (volume.IsReadOnly())
-				mountFlags |= B_MOUNT_READ_ONLY;
-			message->AddInt32(mountFlagsKey.String(), mountFlags);
-		}
-	}
+	ArchiveVisitor visitor(*message);
+	BDiskDeviceRoster().VisitEachMountedPartition(&visitor);
 }
 
 
