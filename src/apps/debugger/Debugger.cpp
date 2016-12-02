@@ -330,19 +330,19 @@ Debugger::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case MSG_SHOW_TEAMS_WINDOW:
 		{
-            if (fTeamsWindow) {
-               	fTeamsWindow->Activate(true);
-               	break;
-            }
+			if (fTeamsWindow) {
+				fTeamsWindow->Activate(true);
+				break;
+			}
 
-           	try {
+			try {
 				fTeamsWindow = TeamsWindow::Create(&fSettingsManager);
 				if (fTeamsWindow != NULL)
 					fTeamsWindow->Show();
-           	} catch (...) {
+			} catch (...) {
 				// TODO: Notify the user!
 				fprintf(stderr, "Error: Failed to create Teams window\n");
-           	}
+			}
 			break;
 		}
 		case MSG_TEAMS_WINDOW_CLOSED:
