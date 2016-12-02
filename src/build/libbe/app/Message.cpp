@@ -137,8 +137,8 @@ BMessage::operator=(const BMessage &other)
 {
 	DEBUG_FUNCTION_ENTER;
 
-    if (this == &other)
-        return *this;
+	if (this == &other)
+		return *this;
 
 	_Clear();
 
