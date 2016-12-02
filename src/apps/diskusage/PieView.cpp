@@ -725,6 +725,7 @@ PieView::_ShowContextMenu(FileInfo* info, BPoint p)
 					break;
 				case kIdxRescan:
 					fScanner->Refresh(info);
+					fWindow->EnableCancel();
 					Invalidate();
 					break;
 				default: // must be "Open With" submenu
