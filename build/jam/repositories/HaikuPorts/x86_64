@@ -177,8 +177,8 @@ RemotePackageRepository HaikuPorts
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
 	cabextract-1.6-1
-	cairo-1.12.18-1
-	cairo_devel-1.12.18-1
+	cairo-1.12.18-2
+	cairo_devel-1.12.18-2
 	cal-1.0.0-2
 	canna-1.0.2-2
 	c_ares-1.11.0-1
@@ -339,6 +339,8 @@ RemotePackageRepository HaikuPorts
 	gpgme-1.6.0-1
 	gpgme_devel-1.6.0-1
 	gptfdisk-1.0.1-1
+	graphicsmagick-1.3.25-1
+	graphicsmagick_devel-1.3.25-1
 	graphite2-1.3.8-1
 	graphite2_devel-1.3.8-1
 	grep-2.24-1
@@ -471,8 +473,8 @@ RemotePackageRepository HaikuPorts
 	libdvdread_devel-5.0.3-3
 	libebml-1.3.4-1
 	libebml_devel-1.3.4-1
-	libedit-2015_03_21_3.1-3
-	libedit_devel-2015_03_21_3.1-3
+	libedit-2015_03_21_3.1-5
+	libedit_devel-2015_03_21_3.1-5
 	libevent-2.0.21-11
 	libevent_devel-2.0.21-11
 	libexecinfo-1.1-1
@@ -487,6 +489,8 @@ RemotePackageRepository HaikuPorts
 	libgpg_error_devel-1.25-1
 	libgsasl-1.8.0-2
 	libgsasl_devel-1.8.0-2
+	libguess-1.2-1
+	libguess_devel-1.2-1
 	libicns-0.8.1-5
 	libicns_devel-0.8.1-5
 	libiconv-1.13.1-8
@@ -557,6 +561,9 @@ RemotePackageRepository HaikuPorts
 	libpthread_stubs-0.3-2
 	libqt4-4.8.7-4
 	libqt4_devel-4.8.7-4
+	libraw-0.17.2-3
+	libraw_devel-0.17.2-3
+	libraw_tools-0.17.2-3
 	libreplaygain-475-1
 	libreplaygain_devel-475-1
 	librevenge-0.0.1-1
@@ -717,8 +724,12 @@ RemotePackageRepository HaikuPorts
 	opus_tools-0.1.9-2
 	opusfile-0.7-1
 	opusfile_devel-0.7-1
+	orc-0.4.19-3
+	orc_devel-0.4.19-3
 	p7zip-9.20.1-6
 	padblocker-1.0-1
+	pango-1.40.2-1
+	pango_devel-1.40.2-1
 	pari-2.7.6-2
 	pari_devel-2.7.6-2
 	patch-2.7.5-1
@@ -810,6 +821,8 @@ RemotePackageRepository HaikuPorts
 	sbc-1.3-2
 	sbc_devel-1.3-2
 	sbc_tools-1.3-2
+	schroedinger-1.0.11-2
+	schroedinger_devel-1.0.11-2
 	scons-2.5.1-1
 	sdl2_image-2.0.1-2
 	sdl2_image_devel-2.0.1-2
@@ -840,11 +853,13 @@ RemotePackageRepository HaikuPorts
 	smpeg_devel-0.4.5-5
 	snappy-1.1.3-2
 	snappy_devel-1.1.3-2
+	soxr-0.1.1-2
+	soxr_devel-0.1.1-2
 	sparsehash-2.0.3-1
 	speex-1.2~rc2-3
 	speex_devel-1.2~rc2-3
-	sqlite-3.15.1.0-1
-	sqlite_devel-3.15.1.0-1
+	sqlite-3.15.2.0-1
+	sqlite_devel-3.15.2.0-1
 	substrate-1.0b-1
 	subversion-1.9.4-5
 	subversion_devel-1.9.4-5
@@ -1094,6 +1109,7 @@ RemotePackageRepository HaikuPorts
 	gperf
 	gpgme
 	gptfdisk
+	graphicsmagick
 	graphite2
 	grep
 	groff
@@ -1185,6 +1201,7 @@ RemotePackageRepository HaikuPorts
 	libgeotiff
 	libgpg_error
 	libgsasl
+	libguess
 	libicns
 	libiconv
 	libidl
@@ -1221,6 +1238,7 @@ RemotePackageRepository HaikuPorts
 	libpng
 	libpthread_stubs
 	libqt4
+	libraw
 	libreplaygain
 	librevenge
 	libsamplerate
@@ -1316,8 +1334,10 @@ RemotePackageRepository HaikuPorts
 	opusfile
 	opus
 	opus_tools
+	orc
 	p7zip
 	padblocker
+	pango
 	pari
 	patch
 	patchutils
@@ -1381,6 +1401,7 @@ RemotePackageRepository HaikuPorts
 	ruby
 	sane_backends
 	sbc
+	schroedinger
 	scons
 	sdl2_image
 	sdl2_mixer
@@ -1398,6 +1419,7 @@ RemotePackageRepository HaikuPorts
 	smpeg2
 	smpeg
 	snappy
+	soxr
 	sparsehash
 	speex
 	sqlite
