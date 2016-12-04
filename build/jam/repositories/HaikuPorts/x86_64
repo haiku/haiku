@@ -670,6 +670,7 @@ RemotePackageRepository HaikuPorts
 	lighttpd-1.4.42-1
 	lighttpd_devel-1.4.42-1
 	lighttpd_mod_geoip-1.4.42-1
+	linaro_qemu-2014.01-2
 	live555-2016.06.22-3
 	live555_devel-2016.06.22-3
 	llvm-3.9.0-1
@@ -741,6 +742,8 @@ RemotePackageRepository HaikuPorts
 	ocaml-4.01.0-1
 	openal-1.13.0-2
 	openal_devel-1.13.0-2
+	openblas-0.2.19-2
+	openblas_devel-0.2.19-2
 	openexr-2.2.0-2
 	openexr_devel-2.2.0-2
 	openjpeg-2.1.2-1
@@ -1336,6 +1339,7 @@ RemotePackageRepository HaikuPorts
 	libxslt
 	libzip
 	lighttpd
+	linaro_qemu
 	live555
 	llvm
 	lm4tools
@@ -1385,6 +1389,7 @@ RemotePackageRepository HaikuPorts
 	nss
 	ocaml
 	openal
+	openblas
 	openexr
 	openjpeg
 	openldap
