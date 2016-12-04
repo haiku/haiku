@@ -38,6 +38,9 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) settings ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface cli commands ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui connection_config ] ;
+SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui connection_config
+	config_handlers ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui expression_eval_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui inspector_window ] ;
 SEARCH_SOURCE += [ FDirName $(SUBDIR) user_interface gui model ] ;
@@ -84,6 +87,15 @@ local sources =
 
 	# user_interface/gui
 	GraphicalUserInterface.cpp
+
+	# user_interface/gui/connection_config
+	ConnectionConfigHandler.cpp
+	ConnectionConfigHandlerRoster.cpp
+	ConnectionConfigView.cpp
+
+	# user_interface/gui/connection_config/config_handlers
+	NetworkConnectionConfigHandler.cpp
+	NetworkConnectionConfigView.cpp
 
 	# user_interface/gui/model
 	VariablesViewState.cpp
