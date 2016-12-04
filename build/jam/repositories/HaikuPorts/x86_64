@@ -43,6 +43,8 @@ RemotePackageRepository HaikuPorts
 	clear_sans-1.00-1
 	colordiff-1.0.13-1
 	colormake-0.9.20140503-1
+	courier_prime-1.203-1
+	croscorefonts-1.31.0-1
 	dejagnu-1.6-1
 	dejavu-2.35-1
 	docbook_xml_dtd-4.5-2
@@ -230,6 +232,8 @@ RemotePackageRepository HaikuPorts
 	dcadec_devel-0.2.0-1
 	dcraw-9.26.0-1
 	defendguin-0.0.12-1
+	dfu_programmer-0.6.2-2
+	dialog-1.3_20160828-1
 	diffutils-3.5-1
 	discount-2.2.1-1
 	discount_devel-2.2.1-1
@@ -587,6 +591,8 @@ RemotePackageRepository HaikuPorts
 	libpthread_stubs-0.3-2
 	libqt4-4.8.7-5
 	libqt4_devel-4.8.7-5
+	libquicktime-1.2.4-3
+	libquicktime_devel-1.2.4-3
 	libraw-0.17.2-3
 	libraw_devel-0.17.2-3
 	libraw_tools-0.17.2-3
@@ -1088,6 +1094,8 @@ RemotePackageRepository HaikuPorts
 	dcraw
 	defendguin
 	dejagnu
+	dfu_programmer
+	dialog
 	diffutils
 	discount
 	djvulibre
@@ -1299,6 +1307,7 @@ RemotePackageRepository HaikuPorts
 	libpng
 	libpthread_stubs
 	libqt4
+	libquicktime
 	libraw
 	libreplaygain
 	librevenge
