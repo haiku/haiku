@@ -70,6 +70,7 @@ RemotePackageRepository HaikuPorts
 	libertine-5.3.0_2012_07_02-1
 	lohit-2.3.8-2
 	monoid-0.61-1
+	mplus-2.2.4-3
 	msttcorefonts-1.0-1
 	nafees_nastaleeq-1.02-3
 	nafees_riqa-1.00-3
@@ -93,6 +94,7 @@ RemotePackageRepository HaikuPorts
 	pciutils_data-3.5.2-1
 	redoflacs-0.30-1
 	roboto-1.2-2
+	screenfetch-3.7.0-1
 	scheherazade_font-1.005-3
 	source_pro-20160608-1
 	symbola-9.00-1
@@ -691,9 +693,9 @@ RemotePackageRepository HaikuPorts
 	mawk-1.3.4_20150503-1
 	mc-4.8.18-1
 	mercurial-3.2.1-2
-	mesa-13.0.1-1
-	mesa_devel-13.0.1-1
-	mesa_swpipe-13.0.1-1
+	mesa-13.0.2-1
+	mesa_devel-13.0.2-1
+	mesa_swpipe-13.0.2-1
 	milkytracker-0.90.86-2
 	minicom-2.6.2-1
 	mjpegtools-2.1.0-1
@@ -729,6 +731,7 @@ RemotePackageRepository HaikuPorts
 	netpulse-0.2.3-5
 	nettle-3.2-1
 	nettle_devel-3.2-1
+	nfd-1.0-2
 	ninja-1.5.1-2
 	nsgenbind-0.3-1
 	nspr-4.12-1
@@ -793,6 +796,7 @@ RemotePackageRepository HaikuPorts
 	pylzma-0.4.8-2
 	python-2.7.12-1
 	python3-3.5.2-1
+	python3_fonttools-3.0-1
 	python3_httplib2-0.9.2-1
 	python3_mako-1.0.3-1
 	python3_numpy-1.10.1-1
@@ -853,7 +857,7 @@ RemotePackageRepository HaikuPorts
 	sbc_tools-1.3-2
 	schroedinger-1.0.11-2
 	schroedinger_devel-1.0.11-2
-	scons-2.5.1-1
+	scons-2.5.1-2
 	sdl2_gfx-1.0.1-1
 	sdl2_gfx_devel-1.0.1-1
 	sdl2_image-2.0.1-2
@@ -944,6 +948,8 @@ RemotePackageRepository HaikuPorts
 	unzip-6.0-3
 	urllib3-1.15.1-1
 	util_macros-1.19.0-2
+	vala-0.32.1-1
+	vala_common-0.32.1-1
 	vamp_plugin_sdk-2.6-1
 	vamp_plugin_sdk_devel-2.6-1
 	vcdimager-0.7.24-3
@@ -1372,6 +1378,7 @@ RemotePackageRepository HaikuPorts
 	netcat
 	netpulse
 	nettle
+	nfd
 	ninja
 	nsgenbind
 	nspr
@@ -1414,6 +1421,7 @@ RemotePackageRepository HaikuPorts
 	pycrypto
 	pyenet
 	pylzma
+	python3_fonttools
 	python3_httplib2
 	python3_mako
 	python3_numpy
@@ -1458,6 +1466,7 @@ RemotePackageRepository HaikuPorts
 	sbc
 	schroedinger
 	scons
+	screenfetch
 	sdl2_gfx
 	sdl2_image
 	sdl2_mixer
@@ -1516,6 +1525,7 @@ RemotePackageRepository HaikuPorts
 	unzip
 	urllib3
 	util_macros
+	vala
 	vamp_plugin_sdk
 	vcdimager
 	vim
