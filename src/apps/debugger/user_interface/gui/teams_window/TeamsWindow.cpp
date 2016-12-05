@@ -260,9 +260,12 @@ TeamsWindow::_Init()
 		connectionMenu->AddItem(item);
 	}
 
+	BGroupLayout* connectionLayout = NULL;
+
 	BLayoutBuilder::Group<>(this, B_VERTICAL)
 		.AddGroup(B_HORIZONTAL)
 			.SetInsets(B_USE_DEFAULT_SPACING)
+			.GetLayout(&connectionLayout)
 			.Add(fConnectionField = new BMenuField("Connected to:",
 				connectionMenu))
 			.AddGlue()
@@ -283,6 +286,8 @@ TeamsWindow::_Init()
 					new BMessage(MSG_LOAD_CORE_TEAM)))
 			.End()
 		.End();
+
+	connectionLayout->SetVisible(false);
 
 	menuDeleter.Detach();
 
