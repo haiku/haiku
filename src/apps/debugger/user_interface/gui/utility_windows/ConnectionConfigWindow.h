@@ -5,18 +5,21 @@
 #ifndef CONNECTION_CONFIG_WINDOW_H
 #define CONNECTION_CONFIG_WINDOW_H
 
-
 #include <Window.h>
+
+#include "ConnectionConfigView.h"
 
 
 class BButton;
 class BGroupView;
 class BMenu;
 class BMenuField;
+class Settings;
 class TargetHostInterfaceInfo;
 
 
-class ConnectionConfigWindow : public BWindow
+class ConnectionConfigWindow : public BWindow,
+	private ConnectionConfigView::Listener
 {
 public:
 								ConnectionConfigWindow();
@@ -32,6 +35,10 @@ public:
 	virtual	void				Show();
 
 	virtual	bool				QuitRequested();
+
+	// ConnectionConfigView::Listener
+
+	virtual	void				ConfigurationChanged(Settings* settings);
 
 private:
 			void	 			_Init();

@@ -24,6 +24,7 @@
 
 #include "AppMessageCodes.h"
 #include "CommandLineUserInterface.h"
+#include "ConnectionConfigHandlerRoster.h"
 #include "ConnectionConfigWindow.h"
 #include "DebuggerGlobals.h"
 #include "DebuggerSettingsManager.h"
@@ -303,6 +304,7 @@ Debugger::~Debugger()
 {
 	DebuggerUiSettingsFactory::DeleteDefault();
 	ValueHandlerRoster::DeleteDefault();
+	ConnectionConfigHandlerRoster::DeleteDefault();
 
 	debugger_global_uninit();
 }
@@ -320,6 +322,10 @@ Debugger::Init()
 		return error;
 
 	error = ValueHandlerRoster::CreateDefault();
+	if (error != B_OK)
+		return error;
+
+	error = ConnectionConfigHandlerRoster::CreateDefault();
 	if (error != B_OK)
 		return error;
 

@@ -10,9 +10,11 @@
 #include <MenuField.h>
 #include <LayoutBuilder.h>
 
+#include <AutoDeleter.h>
 #include <AutoLocker.h>
 
 #include "AppMessageCodes.h"
+#include "ConnectionConfigHandlerRoster.h"
 #include "TargetHostInterfaceInfo.h"
 #include "TargetHostInterfaceRoster.h"
 #include "TargetHostInterface.h"
@@ -28,6 +30,7 @@ ConnectionConfigWindow::ConnectionConfigWindow()
 	:
 	BWindow(BRect(), "Create new connection", B_TITLED_WINDOW,
 		B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
+	ConnectionConfigView::Listener(),
 	fConnectionTypeField(NULL),
 	fConfigGroupView(NULL),
 	fCloseButton(NULL),
@@ -75,6 +78,13 @@ ConnectionConfigWindow::QuitRequested()
 
 
 void
+ConnectionConfigWindow::ConfigurationChanged(Settings* settings)
+{
+	// TODO: implement
+}
+
+
+void
 ConnectionConfigWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what) {
@@ -82,7 +92,6 @@ ConnectionConfigWindow::MessageReceived(BMessage* message)
 			BWindow::MessageReceived(message);
 			break;
 	}
-
 }
 
 
@@ -161,5 +170,21 @@ ConnectionConfigWindow::_UpdateActiveConfig(TargetHostInterfaceInfo* info)
 		delete view;
 	}
 
+	ConnectionConfigHandlerRoster* roster
+		= ConnectionConfigHandlerRoster::Default();
 
+	if (roster->HasHandlerFor(info)) {
+		ConnectionConfigView* view = NULL;
+		status_t error = roster->CreateConfigView(info, this, view);
+		if (error != B_OK)
+			return;
+
+		ObjectDeleter<ConnectionConfigView> viewDeleter(view);
+		BLayoutItem* item = fConfigGroupView->GroupLayout()->AddView(view);
+		if (item != NULL) {
+			viewDeleter.Detach();
+		}
+	}
+
+	fConfigGroupView->InvalidateLayout();
 }
