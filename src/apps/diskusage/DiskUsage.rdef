@@ -14,7 +14,7 @@ resource app_version {
 		long_info = "1.0.2 ©1999 Mike Steed, ©2008-2011 Haiku"
 };
 
-resource app_flags B_MULTIPLE_LAUNCH;
+resource app_flags B_SINGLE_LAUNCH;
 
 resource file_types message {
 		"types" = "application/x-vnd.Be-volume",

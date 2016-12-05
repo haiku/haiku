@@ -35,8 +35,7 @@ Scanner::Scanner(BVolume *v, BHandler *handler)
 	fDesiredPath(),
 	fTask(),
 	fBusy(false),
-	fQuitRequested(false),
-	fPreviousSnapshot(NULL)
+	fQuitRequested(false)
 {
 	Run();
 }
@@ -144,11 +143,11 @@ Scanner::_DirectoryContains(FileInfo* currentDir, entry_ref* ref)
 void
 Scanner::_RunScan(FileInfo* startInfo)
 {
-	fPreviousSnapshot = fSnapshot;
 	fQuitRequested = false;
 	BString stringScan(B_TRANSLATE("Scanning %refName%"));
 
 	if (startInfo == NULL || startInfo == fSnapshot->rootDir) {
+		VolumeSnapshot* previousSnapshot = fSnapshot;
 		fSnapshot = new VolumeSnapshot(fVolume);
 		stringScan.ReplaceFirst("%refName%", fSnapshot->name.c_str());
 		fTask = stringScan.String();
@@ -162,7 +161,7 @@ Scanner::_RunScan(FileInfo* startInfo)
 		fSnapshot->rootDir = _GetFileInfo(&root, NULL);
 		if (fSnapshot->rootDir == NULL) {
 			delete fSnapshot;
-			fSnapshot = fPreviousSnapshot;
+			fSnapshot = previousSnapshot;
 			fBusy = false;
 			fListener.SendMessage(&fDoneMessage);
 			return;
@@ -177,7 +176,7 @@ Scanner::_RunScan(FileInfo* startInfo)
 
 		fSnapshot->currentDir = NULL;
 
-		delete fPreviousSnapshot;
+		delete previousSnapshot;
 	} else {
 		off_t previousVolumeCapacity = fSnapshot->capacity;
 		off_t previousVolumeFreeBytes = fSnapshot->freeBytes;

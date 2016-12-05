@@ -52,13 +52,10 @@ const float	kPieOuterMargin		= 10.0;
 const float	kMinSegmentSpan		= 2.0;
 const float	kDragThreshold		= 5.0;
 
-extern entry_ref helpFileRef;
-extern bool helpFileWasFound;
 
 #define kMenuSelectVol				'gMSV'
 #define kBtnRescan					'gBRF'
 #define kBtnCancel					'gCAN'
-#define kBtnHelp					'gHLP'
 #define kScanRefresh				'gSRF'
 #define kScanProgress				'gSPR'
 #define kScanDone					'gSDN'

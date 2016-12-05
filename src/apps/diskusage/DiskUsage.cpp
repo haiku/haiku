@@ -17,8 +17,6 @@
 #undef B_TRANSLATION_CONTEXT
 #define B_TRANSLATION_CONTEXT "DiskUsage"
 
-entry_ref helpFileRef;
-bool helpFileWasFound = false;
 
 int
 main() 

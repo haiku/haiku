@@ -72,8 +72,6 @@ private:
 			string				fTask;
 			bool				fBusy;
 			bool				fQuitRequested;
-
-			VolumeSnapshot*		fPreviousSnapshot;
 };
 
 #endif // SCANNER_H

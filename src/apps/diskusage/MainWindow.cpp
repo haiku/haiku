@@ -58,11 +58,6 @@ MainWindow::MessageReceived(BMessage* message)
 			fControlsView->MessageReceived(message);
 			break;
 
-		case kBtnHelp:
-			if (helpFileWasFound)
-				be_roster->Launch(&helpFileRef);
-			break;
-
 		default:
 			BWindow::MessageReceived(message);
 			break;

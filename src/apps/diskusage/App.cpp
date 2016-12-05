@@ -25,18 +25,9 @@
 App::App()
 	:
 	BApplication(kAppSignature),
-	fMainWindow(NULL), fSavedRefsReceived(NULL)
+	fMainWindow(NULL),
+	fSavedRefsReceived(NULL)
 {
-	// Get a reference to the help file.
-	BPath path;
-	if (find_directory(B_BEOS_DOCUMENTATION_DIRECTORY, &path) == B_OK
-		&& path.Append(kHelpFileName) == B_OK) {
-		printf("help file =? %s\n", path.Path());
-		BEntry entry(path.Path());
-		helpFileWasFound = entry.Exists();
-		entry.GetRef(&helpFileRef);
-	} else
-		helpFileWasFound = false;
 }
 
 
