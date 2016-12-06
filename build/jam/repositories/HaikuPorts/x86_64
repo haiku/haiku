@@ -380,7 +380,7 @@ RemotePackageRepository HaikuPorts
 	haikuwebkit_devel-1.5.3-1
 	hamlib-3.0.1-2
 	hamlib_devel-3.0.1-2
-	handbrake-0.10.2-3
+	handbrake-0.10.5-1
 	haproxy-1.6.7-1
 	harfbuzz-1.3.3-1
 	harfbuzz_devel-1.3.3-1
@@ -567,10 +567,10 @@ RemotePackageRepository HaikuPorts
 	liboauth_devel-1.0.3-1
 	libogg-1.3.2-3
 	libogg_devel-1.3.2-3
-	libopenshot-0.1.1-4
+	libopenshot-0.1.1-5
 	libopenshot_audio-0.1.1-2
 	libopenshot_audio_devel-0.1.1-2
-	libopenshot_devel-0.1.1-4
+	libopenshot_devel-0.1.1-5
 	libpaper-1.1.24-1
 	libpaper_devel-1.1.24-1
 	libparserutils-0.2.3-1
@@ -720,7 +720,7 @@ RemotePackageRepository HaikuPorts
 	mpfr_devel-3.1.4-4
 	mpg123-1.23.8-1
 	mpg123_devel-1.23.8-1
-	mpv-0.22.0-1
+	mpv-0.22.0-2
 	mtools-4.0.18-1
 	mtr-0.73-1
 	mupdf-1.8-1
