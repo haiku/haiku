@@ -26,10 +26,10 @@ class BMediaOutput;
 
 // BMediaClient is a general purpose class allowing to create any kind
 // of media_node. It automatically manage the expected behavior under
-// different run modes, and allow to specify the different capabilities
-// which you may want. It work with a central loop allowing to handle,
-// calling the right callbacks automatically events at a certain
-// performance_time.
+// different run modes, and allow to specify the different capabilities needed.
+// BMediaClient is not using any of the coding patterns you might be used to.
+// There are no events to care, and threading is managed internally using
+// the data processing specified by the BMediaGraph class.
 class BMediaClient {
 public:
 									BMediaClient(const char* name,
@@ -53,11 +53,9 @@ public:
 	// TODO: Add file interface
 	// TODO: Offline mode is still missing
 
-	// To connect pass the BMediaConnection to this class or to another BMediaClient,
-	// also in another team the connection object will be valid.
 	// When those functions return, the BMediaConnection is added to the
-	// list and is visible to other nodes as not connected.
-
+	// list and is visible to other nodes as not connected. Any input/output
+	// should be registered to a BMediaNode to become something useful.
 	virtual status_t				RegisterInput(BMediaInput* input);
 	virtual status_t				RegisterOutput(BMediaOutput* output);
 
@@ -106,6 +104,10 @@ public:
 
 			bool					IsRunning() const;
 
+	// NOTE: The following functions aren't provided to be inherited,
+	// always use the protected HandleSomething version. This is because
+	// otherwise you could break the connection mechanism and mine interoperability
+	// from remote nodes.
 			status_t				Start(bool force = false);
 			status_t				Stop(bool force = false);
 			status_t				Seek(bigtime_t mediaTime,
@@ -143,12 +145,6 @@ public:
 	virtual	BMediaAddOn*			AddOn(int32* id) const;
 
 protected:
-	// This is used when the user want to override the BeginConnection
-	// mechanism, for example to supply your BMediaConnection derived
-	// class. Take ownership of the object.
-	virtual void					AddInput(BMediaInput* input);
-	virtual void					AddOutput(BMediaOutput* output);
-
 	virtual void					HandleStart(bigtime_t performanceTime);
 	virtual void					HandleStop(bigtime_t performanceTime);
 
@@ -166,6 +162,9 @@ protected:
 			status_t				ConnectionReleased(BMediaConnection* conn);
 
 private:
+	virtual void					AddInput(BMediaInput* input);
+	virtual void					AddOutput(BMediaOutput* output);
+
 			BMediaInput*			FindInput(
 										const media_destination& dest) const;
 			BMediaOutput*			FindOutput(

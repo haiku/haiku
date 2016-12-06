@@ -22,12 +22,9 @@ namespace BPrivate { namespace media {
 // It represents a connection between two nodes and allow to create complex
 // nodes without dealing with the unneeded complexity. Two local connections,
 // can be binded, this means that when you will receive a buffer A as input,
-// the Process function will be called so that you can process the BBuffer,
+// the BufferReceived function will be called so that you can process the BBuffer,
 // and once the function returns the output will be automatically forwarded
-// to the connection B.
-// If you don't bind a connection, you have to call yourself the
-// BMediaClient::SendBuffer() method or call BMediaClient::Recycle to
-// recycle the buffer when you don't want to do anything further.
+// to the connection B SendBuffer method.
 class BMediaConnection {
 public:
 	virtual							~BMediaConnection();
@@ -165,10 +162,11 @@ protected:
 	virtual status_t				FormatProposal(media_format* format);
 	virtual status_t				FormatChangeRequested(media_format* format);
 
-	// When a connection is not binded with another, it's your job to send
-	// the buffer to the connection you want. You might want
-	// to ovverride it so that you can track something, in this case
-	// be sure to call the base version.
+	// When a connection is not binded with another, and you really don't want
+	// to use BMediaGraph it's your job to send the buffer to the connection
+	// you want. You might want to ovverride it so that you can track something,
+	// in this case be sure to call the base version. Be sure to know what
+	// you are doing.
 	virtual	status_t				SendBuffer(BBuffer* buffer);
 
 private:
