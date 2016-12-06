@@ -16,6 +16,13 @@ media_client::Id() const
 }
 
 
+media_client_kinds
+media_client::Kinds() const
+{
+	return kinds;
+}
+
+
 media_connection_id
 media_connection::Id() const
 {
@@ -23,24 +30,24 @@ media_connection::Id() const
 }
 
 
-media_connection_kind
-media_connection::Kind() const
+media_connection_kinds
+media_connection::Kinds() const
 {
-	return kind;
+	return kinds;
 }
 
 
 bool
 media_connection::IsInput() const
 {
-	return Kind() == B_MEDIA_INPUT;
+	return Kinds() == B_MEDIA_INPUT;
 }
 
 
 bool
 media_connection::IsOutput() const
 {
-	return Kind() == B_MEDIA_OUTPUT;
+	return Kinds() == B_MEDIA_OUTPUT;
 }
 
 

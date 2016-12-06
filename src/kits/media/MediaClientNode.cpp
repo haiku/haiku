@@ -29,11 +29,11 @@ BMediaClientNode::BMediaClientNode(const char* name,
 	CALLED();
 
 	// Configure the node to do the requested jobs
-	if (fOwner->Kind() & B_MEDIA_PLAYER)
+	if (fOwner->Kinds() & B_MEDIA_PLAYER)
 		AddNodeKind(B_BUFFER_PRODUCER);
-	if (fOwner->Kind() & B_MEDIA_RECORDER)
+	if (fOwner->Kinds() & B_MEDIA_RECORDER)
 		AddNodeKind(B_BUFFER_CONSUMER);
-	if (fOwner->Kind() & B_MEDIA_CONTROLLABLE)
+	if (fOwner->Kinds() & B_MEDIA_CONTROLLABLE)
 		AddNodeKind(B_CONTROLLABLE);
 }
 

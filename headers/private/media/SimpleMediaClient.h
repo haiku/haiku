@@ -35,8 +35,8 @@ public:
 									BSimpleMediaClient(const char* name,
 										media_type type
 											= B_MEDIA_UNKNOWN_TYPE,
-										media_client_kind
-											kind = B_MEDIA_PLAYER
+										media_client_kinds
+											kinds = B_MEDIA_PLAYER
 												& B_MEDIA_RECORDER);
 
 	virtual							~BSimpleMediaClient();

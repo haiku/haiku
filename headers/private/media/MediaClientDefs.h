@@ -13,13 +13,13 @@
 namespace BPrivate { namespace media {
 
 
-typedef int32 media_client_id;
-typedef int32 media_client_kind;
-typedef int32 media_connection_kind;
-typedef int32 media_connection_id;
+typedef uint64 media_client_id;
+typedef uint64 media_client_kinds;
+typedef uint64 media_connection_kinds;
+typedef uint64 media_connection_id;
 
 
-enum media_client_kinds {
+enum media_client_kind {
 	// The client can receive media data.
 	B_MEDIA_RECORDER		= 0x000000001,
 	// The client can send media data to another client.
@@ -28,7 +28,7 @@ enum media_client_kinds {
 	B_MEDIA_CONTROLLABLE	= 0x000000004
 };
 
-enum media_connection_kinds {
+enum media_connection_kind {
 	B_MEDIA_INPUT = 0,
 	B_MEDIA_OUTPUT = 1
 };
@@ -36,12 +36,12 @@ enum media_connection_kinds {
 
 typedef struct media_client {
 	media_client_id				Id() const;
-	media_client_kind			Kind() const;
+	media_client_kinds			Kinds() const;
 
 	BMessage*					ToMessage();
 
 private:
-	media_client_kind			kind;
+	media_client_kinds			kinds;
 
 	media_node					node;
 	uint32						padding[16];
@@ -54,7 +54,7 @@ private:
 
 typedef struct media_connection {
 	media_connection_id			Id() const;
-	media_connection_kind		Kind() const;
+	media_connection_kinds		Kinds() const;
 
 	const media_client&			Client() const;
 
@@ -86,7 +86,7 @@ private:
     media_format				format;
     char						name[B_MEDIA_NAME_LENGTH];
 
-	media_connection_kind		kind;
+	media_connection_kinds		kinds;
 	uint32						padding[16];
 
 	friend class BMediaClient;

@@ -35,7 +35,7 @@ public:
 									BMediaClient(const char* name,
 										media_type type
 											= B_MEDIA_UNKNOWN_TYPE,
-										media_client_kind
+										media_client_kinds
 											kind = B_MEDIA_PLAYER
 												& B_MEDIA_RECORDER);
 
@@ -43,8 +43,10 @@ public:
 
 			const media_client&		Client() const;
 
+			media_client_id			Id() const;
+			const char*				Name() const;
 	// Return the capabilities of this BMediaClient instance.
-			media_client_kind		Kind() const;
+			media_client_kinds		Kinds() const;
 			media_type				MediaType() const;
 
 			status_t				InitCheck() const;
@@ -55,7 +57,7 @@ public:
 
 	// When those functions return, the BMediaConnection is added to the
 	// list and is visible to other nodes as not connected. Any input/output
-	// should be registered to a BMediaNode to become something useful.
+	// should be registered to a BMediaClient to become something useful.
 	virtual status_t				RegisterInput(BMediaInput* input);
 	virtual status_t				RegisterOutput(BMediaOutput* output);
 

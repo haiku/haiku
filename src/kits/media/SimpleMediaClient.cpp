@@ -9,9 +9,9 @@
 
 
 BSimpleMediaClient::BSimpleMediaClient(const char* name,
-	media_type type, media_client_kind kind)
+	media_type type, media_client_kinds kinds)
 	:
-	BMediaClient(name, type, kind),
+	BMediaClient(name, type, kinds),
 	fNotifyHook(NULL),
 	fNotifyCookie(NULL)
 {

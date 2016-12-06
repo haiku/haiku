@@ -8,7 +8,7 @@
 #include "debug.h"
 
 
-BMediaConnection::BMediaConnection(media_connection_kind kind)
+BMediaConnection::BMediaConnection(media_connection_kinds kinds)
 	:
 	fOwner(NULL),
 	fBind(NULL),
@@ -16,8 +16,8 @@ BMediaConnection::BMediaConnection(media_connection_kind kind)
 {
 	CALLED();
 
-	fConnection.kind = kind;
-	fConnection.id = -1;
+	fConnection.kinds = kinds;
+	fConnection.id = 0;
 	//fConnection.client = media_client::null;
 }
 

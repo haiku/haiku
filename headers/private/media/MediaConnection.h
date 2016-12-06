@@ -30,10 +30,10 @@ public:
 	virtual							~BMediaConnection();
 
 	const media_connection&			Connection() const;
+	BMediaClient*					Client() const;
+
 	media_connection_id				Id() const;
 	const char*						Name() const;
-
-	BMediaClient*					MediaClient() const;
 
 	bool							IsInput() const;
 	bool 							IsOutput() const;
@@ -68,7 +68,8 @@ public:
 	status_t						Release();
 
 protected:
-									BMediaConnection(media_connection_kind kind);
+									BMediaConnection(
+										media_connection_kinds kinds);
 
 	// Those callbacks are shared between BMediaInput and BMediaOutput
 	virtual void					Connected(const media_format& format);

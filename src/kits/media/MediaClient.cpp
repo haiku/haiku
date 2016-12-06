@@ -14,7 +14,7 @@
 
 
 BMediaClient::BMediaClient(const char* name,
-	media_type type, media_client_kind kind)
+	media_type type, media_client_kinds kinds)
 	:
 	fLastID(0)
 {
@@ -24,7 +24,7 @@ BMediaClient::BMediaClient(const char* name,
 	_Init();
 
 	fClient.node = fNode->Node();
-	fClient.kind = kind;
+	fClient.kinds = kinds;
 }
 
 
@@ -52,12 +52,12 @@ BMediaClient::InitCheck() const
 }
 
 
-media_client_kind
-BMediaClient::Kind() const
+media_client_kinds
+BMediaClient::Kinds() const
 {
 	CALLED();
 
-	return fClient.kind;
+	return fClient.Kinds();
 }
 
 
