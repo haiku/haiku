@@ -125,6 +125,7 @@ RemotePackageRepository HaikuPorts
 	advancemame-1.4-1
 	amoebax-0.2.1-1
 	apache-2.4.3-2
+	apng2gif-1.7-1
 	app2png-1.0.0-1
 	apr-1.5.2-3
 	apr_devel-1.5.2-3
@@ -242,6 +243,7 @@ RemotePackageRepository HaikuPorts
 	djvulibre_devel-3.5.25-3
 	dmg2img-1.6.5-1
 	docutils-0.12-1
+	documentviewer-0.3_git-9
 	dos2unix-7.3.2-1
 	doxygen-1.6.3-4
 	dtc-1.4.1-1
@@ -347,8 +349,8 @@ RemotePackageRepository HaikuPorts
 	globe-0.4-3
 	gloox-1.0.16-1
 	gloox_devel-1.0.16-1
-	glu-9.0.0-3
-	glu_devel-9.0.0-3
+	glu-9.0.0-5
+	glu_devel-9.0.0-5
 	gmp-6.1.0-1
 	gmp_devel-6.1.0-1
 	gnuchess-6.2.4-1
@@ -437,6 +439,7 @@ RemotePackageRepository HaikuPorts
 	json_c_devel-0.12-2
 	kbproto-1.0.7-1
 	keymapswitcher-1.2.7.11-2
+	konfetti-1.0.0-2
 	ladspa_sdk-1.13-2
 	ladspa_sdk_devel-1.13-2
 	lame-3.99.5-7
@@ -466,6 +469,8 @@ RemotePackageRepository HaikuPorts
 	libassuan_devel-2.4.3-1
 	libaubio-0.4.2-1
 	libaubio_devel-0.4.2-1
+	libbdplus-0.1.2-3
+	libbdplus_devel-0.1.2-3
 	libbluray-0.9.3-1
 	libbluray_devel-0.9.3-1
 	libburn-1.4.6-1
@@ -510,6 +515,8 @@ RemotePackageRepository HaikuPorts
 	libexecinfo_devel-1.1-1
 	libffi-3.2.1-3
 	libffi_devel-3.2.1-3
+	libfilezilla-0.6.1-2
+	libfilezilla_devel-0.6.1-2
 	libgcrypt-1.7.3-1
 	libgcrypt_devel-1.7.3-1
 	libgeotiff-1.4.0-2
@@ -714,6 +721,7 @@ RemotePackageRepository HaikuPorts
 	mjpegtools_devel-2.1.0-1
 	mkdepend-1.7-4
 	mksh-54-1
+	moe-1.1.2-3
 	monkeystudio-1.9.0.4-2
 	mpc-1.0.3-2
 	mpc_devel-1.0.3-2
@@ -1013,6 +1021,7 @@ RemotePackageRepository HaikuPorts
 	amoebax
 	ansiweather
 	apache
+	apng2gif
 	app2png
 	apr
 	apr_util
@@ -1113,6 +1122,7 @@ RemotePackageRepository HaikuPorts
 	dmg2img
 	docbook_xml_dtd
 	docbook_xsl_stylesheets
+	documentviewer
 	docutils
 	dos2unix
 	doxygen
@@ -1236,6 +1246,7 @@ RemotePackageRepository HaikuPorts
 	json_c
 	kbproto
 	keymapswitcher
+	konfetti
 	ladspa_sdk
 	lame
 	lcab
@@ -1252,6 +1263,7 @@ RemotePackageRepository HaikuPorts
 	libass
 	libassuan
 	libaubio
+	libbdplus
 	libbluray
 	libburn
 	libcaca
@@ -1276,6 +1288,7 @@ RemotePackageRepository HaikuPorts
 	libevent
 	libexecinfo
 	libffi
+	libfilezilla
 	libgcrypt
 	libgeotiff
 	libgpg_error
@@ -1384,6 +1397,7 @@ RemotePackageRepository HaikuPorts
 	mjpegtools
 	mkdepend
 	mksh
+	moe
 	monkeystudio
 	monoid
 	mpc
@@ -1595,6 +1609,7 @@ RemotePackageRepository HaikuPorts
 	flickcurl
 	freetype
 	gawk
+	glu
 	grep
 	jpeg
 	m4
