@@ -117,6 +117,7 @@ RemotePackageRepository HaikuPorts
 	:
 	# repository architecture packages
 	# primary architecture (x86_64)
+	2048-1.0.0-2
 	a52dec-0.7.4-4
 	a52dec_devel-0.7.4-4
 	aalib-1.4~rc5-1
@@ -320,7 +321,7 @@ RemotePackageRepository HaikuPorts
 	getopt-1.1.6-1
 	gettext-0.19.8.1-3
 	gettext_libintl-0.19.8.1-3
-	gif2apng-1.9-1
+	gif2apng-1.9-2
 	giflib-5.1.2-2
 	giflib6-5.0.5-3
 	giflib6_devel-5.0.5-3
@@ -712,7 +713,7 @@ RemotePackageRepository HaikuPorts
 	mjpegtools-2.1.0-1
 	mjpegtools_devel-2.1.0-1
 	mkdepend-1.7-4
-	mksh-53a-1
+	mksh-54-1
 	monkeystudio-1.9.0.4-2
 	mpc-1.0.3-2
 	mpc_devel-1.0.3-2
@@ -791,9 +792,11 @@ RemotePackageRepository HaikuPorts
 	pixman-0.32.6-2
 	pixman_devel-0.32.6-2
 	pkgconfig-0.29.1-1
+	png2ico-2002.12.08-1
 	pngcrush-1.8.10-1
 	pnglite-0.1.17-1
 	pnglite_devel-0.1.17-1
+	pngquant-2.7.2-2
 	podofo-0.9.4-1
 	podofo_devel-0.9.4-1
 	polarssl-1.3.9-1
@@ -984,6 +987,7 @@ RemotePackageRepository HaikuPorts
 	x265-2.0-1
 	x265_devel-2.0-1
 	xcb_proto-1.6-2
+	xdelta-3.1.0-1
 	xerces_c-3.1.4-1
 	xerces_c_devel-3.1.4-1
 	xextproto-7.3.0-1
@@ -1002,6 +1006,7 @@ RemotePackageRepository HaikuPorts
 	:
 
 	# source packages
+	2048
 	a52dec
 	aalib
 	advancemame
@@ -1433,8 +1438,10 @@ RemotePackageRepository HaikuPorts
 	pipepanic
 	pixman
 	pkgconfig
+	png2ico
 	pngcrush
 	pnglite
+	pngquant
 	podofo
 	polarssl
 	popt
@@ -1565,6 +1572,7 @@ RemotePackageRepository HaikuPorts
 	x264
 	x265
 	xcb_proto
+	xdelta
 	xerces_c
 	xextproto
 	xml_parser
