@@ -22,6 +22,7 @@
 #include "DisassembledCode.h"
 #include "FunctionInstance.h"
 #include "Image.h"
+#include "ImageDebugInfo.h"
 #include "MessageCodes.h"
 #include "Register.h"
 #include "SemaphoreInfo.h"
@@ -64,6 +65,7 @@ DebugReportGenerator::DebugReportGenerator(::Team* team,
 	fCurrentBlock(NULL),
 	fBlockRetrievalStatus(B_OK),
 	fTraceWaitingThread(NULL),
+	fSourceWaitForDisassembly(false),
 	fSourceWaitingFunction(NULL)
 {
 	fTeam->AddListener(this);
@@ -221,11 +223,22 @@ DebugReportGenerator::FunctionSourceCodeChanged(Function* function)
 {
 	AutoLocker< ::Team> teamLocker(fTeam);
 	if (function == fSourceWaitingFunction) {
-		if (function->FirstInstance()->SourceCodeState()
-				== FUNCTION_SOURCE_LOADED
-		   || function->FirstInstance()->SourceCodeState()
-				== FUNCTION_SOURCE_UNAVAILABLE) {
-			release_sem(fTeamDataSem);
+		function_source_state state;
+		if (fSourceWaitForDisassembly)
+			state = function->FirstInstance()->SourceCodeState();
+		else
+			state = function->SourceCodeState();
+
+		switch (state) {
+			case FUNCTION_SOURCE_LOADED:
+			case FUNCTION_SOURCE_SUPPRESSED:
+			case FUNCTION_SOURCE_UNAVAILABLE:
+			{
+				release_sem(fTeamDataSem);
+				// fall through
+			}
+			default:
+				break;
 		}
 	}
 }
@@ -517,7 +530,39 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BFile& _output,
 		BString sourcePath;
 
 		target_addr_t ip = frame->InstructionPointer();
-		FunctionInstance* functionInstance;
+		Image* image = fTeam->ImageByAddress(ip);
+		FunctionInstance* functionInstance = NULL;
+		if (image != NULL && image->ImageDebugInfoState()
+				== IMAGE_DEBUG_INFO_LOADED) {
+			ImageDebugInfo* info = image->GetImageDebugInfo();
+			functionInstance = info->FunctionAtAddress(ip);
+		}
+
+		if (functionInstance != NULL) {
+			Function* function = functionInstance->GetFunction();
+			if (function->SourceCodeState() == FUNCTION_SOURCE_NOT_LOADED
+				&& functionInstance->SourceCodeState()
+					== FUNCTION_SOURCE_NOT_LOADED) {
+				fSourceWaitingFunction = function;
+				fSourceWaitForDisassembly = false;
+				fSourceWaitingFunction->AddListener(this);
+				fListener->FunctionSourceCodeRequested(functionInstance);
+
+				locker.Unlock();
+
+				do {
+					error = acquire_sem(fTeamDataSem);
+				} while (error == B_INTERRUPTED);
+
+				if (error != B_OK)
+					break;
+
+				locker.Lock();
+
+				fSourceWaitingFunction->RemoveListener(this);
+			}
+		}
+
 		Statement* statement;
 		if (fTeam->GetStatementAtAddress(ip,
 				functionInstance, statement) == B_OK) {
@@ -634,6 +679,7 @@ DebugReportGenerator::_DumpFunctionDisassembly(BFile& _output,
 				// function has been loaded, but the disassembly has not.
 				function->AddListener(this);
 				fSourceWaitingFunction = function;
+				fSourceWaitForDisassembly = true;
 				fListener->FunctionSourceCodeRequested(instance, true);
 				// fall through
 			case FUNCTION_SOURCE_LOADING:
@@ -647,6 +693,7 @@ DebugReportGenerator::_DumpFunctionDisassembly(BFile& _output,
 					return error;
 
 				teamLocker.Lock();
+				fSourceWaitingFunction->RemoveListener(this);
 				break;
 			}
 			default:

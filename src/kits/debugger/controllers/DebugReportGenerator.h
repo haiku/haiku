@@ -103,6 +103,7 @@ private:
 			TeamMemoryBlock*	fCurrentBlock;
 			status_t			fBlockRetrievalStatus;
 			::Thread*			fTraceWaitingThread;
+			bool				fSourceWaitForDisassembly;
 			Function*			fSourceWaitingFunction;
 };
 

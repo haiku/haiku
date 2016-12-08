@@ -91,14 +91,15 @@ LoadSourceCodeJob::Do()
 			// explicitly asked for disassembly. This needs to be done first
 			// since Function will clear the disassembled code states of all
 			// its child instances.
+			function_source_state state
+				= fLoadForFunction ? FUNCTION_SOURCE_LOADED
+					: FUNCTION_SOURCE_SUPPRESSED;
 			if (function->SourceCodeState() == FUNCTION_SOURCE_LOADED) {
-				FileSourceCode* sourceCode = function->GetSourceCode();
-				function->SetSourceCode(sourceCode,
-					FUNCTION_SOURCE_SUPPRESSED);
+				FileSourceCode* functionSourceCode = function->GetSourceCode();
+				function->SetSourceCode(functionSourceCode, state);
 			}
 
-			fFunctionInstance->SetSourceCode(sourceCode,
-				FUNCTION_SOURCE_SUPPRESSED);
+			fFunctionInstance->SetSourceCode(sourceCode, state);
 			sourceCode->ReleaseReference();
 		}
 	} else
