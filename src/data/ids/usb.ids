@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2016.11.14
-# Date:    2016-11-14 20:34:05
+# Version: 2016.12.05
+# Date:    2016-12-05 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -36,6 +36,7 @@
 	145f  NW-3100 802.11b/g 54Mbps Wireless Network Adapter [zd1211]
 0127  IBP
 	0002  HDM Interface
+	0127  ibp
 0145  Unknown
 	0112  Card Reader
 017c  MLK
@@ -633,6 +634,7 @@
 	8c11  Deskjet F4500 series
 	9002  PhotoSmart M437
 	9102  PhotoSmart M537
+	9207  HD-4110 Webcam
 	9302  PhotoSmart R930 series
 	9402  PhotoSmart R837
 	9502  PhotoSmart R840 series
@@ -1830,6 +1832,8 @@
 	ffff  Compaq Bluetooth Multiport Module
 044f  ThrustMaster, Inc.
 	0400  HOTAS Cougar
+	0402  HOTAS Warthog Joystick
+	0404  HOTAS Warthog Throttle
 	044f  GP XID
 	a003  Rage 3D Game Pad
 	a01b  PK-GP301 Driving Wheel
@@ -2153,6 +2157,7 @@
 	02d1  Xbox One Controller
 	02d5  Xbox One Digital TV Tuner
 	02dd  Xbox One Controller (Covert Forces/Firmware 2015)
+	02e6  Wireless XBox Controller Dongle
 	0400  Windows Powered Pocket PC 2002
 	0401  Windows Powered Pocket PC 2002
 	0402  Windows Powered Pocket PC 2002
@@ -2303,6 +2308,7 @@
 	0750  Wired Keyboard 600
 	0752  Wired Keyboard 400
 	075d  LifeCam Cinema
+	0761  LifeCam VX-2000
 	0766  LifeCam VX-800
 	0768  Sidewinder X4
 	076c  Comfort Mouse 4500
@@ -2408,6 +2414,8 @@
 	0081  eHealth Keyboard G87 1504
 	0106  R-300 Wireless Mouse Receiver
 	010d  MX-Board 3.0 Keyboard
+	b090  Keyboard
+	b091  Mouse
 046b  American Megatrends, Inc.
 	0001  Keyboard
 	0101  PS/2 Keyboard, Mouse & Joystick Ports
@@ -2653,7 +2661,7 @@
 	c20c  WingMan Precision
 	c20d  WingMan Attack 2
 	c20e  WingMan Formula GP
-	c211  iTouch Cordless Reciever
+	c211  iTouch Cordless Receiver
 	c212  WingMan Extreme Digital 3D
 	c213  J-UH16 (Freedom 2.4 Cordless Joystick)
 	c214  ATK3 (Attack III Joystick)
@@ -3069,6 +3077,7 @@
 	a202  Canvio Basics HDD
 	a208  Canvio Basics 2TB USB 3.0 Portable Hard Drive
 	b001  Stor.E Partner
+	b207  Canvio Ready
 	d000  External Disk 2TB Model DT01ABA200
 	d010  External Disk 3TB
 	d011  Canvio Desk
@@ -3140,6 +3149,7 @@
 048c  Alps Electric Ireland, Ltd
 048d  Integrated Technology Express, Inc.
 	1165  IT1165 Flash Controller
+	1172  Flash Drive
 	1336  SD/MMC Cardreader
 	1345  Multi Cardreader
 	9006  IT9135 BDA Afatech DVB-T HDTV Dongle
@@ -3473,9 +3483,11 @@
 	10a8  iP6220D
 	10a9  iP6600D
 	10b6  PIXMA iP4300 Printer
+	10b7  PIXMA iP5300 Printer
 	10c2  PIXMA iP1800 Printer
 	10c4  Pixma iP4500 Printer
-	10c9  PIXIMA iP4600 Printer
+	10c9  PIXMA iP4600 Printer
+	10ca  PIXMA iP3600 Printer
 	10e3  PIXMA iX6850 Printer
 	1404  W6400PG
 	1405  W8400PG
@@ -3514,7 +3526,7 @@
 	1725  MP610 ser
 	1726  MP970 ser
 	1727  MX300 ser
-	1728  MX310 ser
+	1728  PIXMA MX310 series
 	1729  MX700 ser
 	172b  MP140 ser
 	1736  PIXMA MX320 series
@@ -3925,6 +3937,7 @@
 	3276  PowerShot SX170 IS
 	3277  PowerShot SX510 HS
 	3278  PowerShot S200
+	327a  SELPHY CP910
 	327d  Powershot ELPH 115 IS / IXUS 132
 	327f  EOS Rebel T5 / EOS 1200D / EOS Kiss X70
 	3284  PowerShot D30
@@ -3945,6 +3958,7 @@
 	32aa  Powershot ELPH 160 / IXUS 160
 	32ac  PowerShot ELPH 170 IS / IXUS 170
 	32ad  PowerShot SX410 IS
+	32b1  SELPHY CP1200
 	32c1  PowerShot ELPH 180 / IXUS 175
 04aa  DaeWoo Telecom, Ltd
 04ab  Chromatic Research
@@ -6143,6 +6157,7 @@
 	021b  Net MD
 	021c  Hi-MD WALKMAN
 	021d  Net MD
+	0226  UP-CR10L
 	0227  Printing Support
 	022c  Net MD
 	022d  Hi-MD AUDIO
@@ -6492,6 +6507,12 @@
 	0317  PTH-851 [Intuos pro (L)]
 	0318  CTH-301 [Bamboo]
 	032f  DTU-1031X
+	0347  Integrated Hub
+	0348  Integrated Hub
+	034a  DTH-W1320 [MobileStudio Pro 13] touchscreen
+	034b  DTH-W1620 [MobileStudio Pro 16] touchscreen
+	034d  DTH-W1320 [MobileStudio Pro 13] tablet
+	034e  DTH-W1620 [MobileStudio Pro 16] tablet
 	0400  PenPartner 4x5
 	4001  TPC4001
 	4004  TPC4004
@@ -8745,6 +8766,11 @@
 	0394  CP9000D/DW Port
 	03a1  CP9550D/DW Port
 	03a5  CP9550DW-S
+	03a9  CP-9600DW
+	03aa  CP3020DA
+	03ad  CP-9800DW-S
+	03ae  CP-9800DW-S
+	3b10  P95D
 	3b30  CP-D70DW / CP-D707DW
 	3b31  CP-K60DW-S
 06d4  Cisco Systems
@@ -8983,6 +9009,7 @@
 	0622  TDK Trans-It 4GB
 	0624  TDK Trans-It 16GB
 	1120  RDX External dock (redbud)
+	4006  8x Slim DVD Multi-Format Recorder External
 	d000  Disc Stakka CD/DVD Manager
 0719  Tremon Enterprises Co., Ltd
 071b  Domain Technologies, Inc.
@@ -9318,10 +9345,12 @@
 	5571  Cruzer Fit
 	5575  Cruzer Glide
 	5576  Cruzer Facet
+	5577  Cruzer Pop (8GB)
 	557d  Cruzer Force (64GB)
 	5580  SDCZ80 Flash Drive
 	5581  Ultra
 	5583  Ultra Fit
+	5590  Ultra Dual
 	5591  Ultra Flair
 	5e10  Encrypted
 	6100  Ultra II SD Plus 2GB
@@ -10317,14 +10346,21 @@
 	01f4  USBSIMM1
 08b9  RadioShack Corp. (Tandy)
 08bb  Texas Instruments
-	2702  Speakers
-	2704  Audio Codec
-	2706  PCM2706 Audio Codec
+	2702  PCM2702 16-bit stereo audio DAC
+	2704  PCM2704 16-bit stereo audio DAC
+	2705  PCM2705 stereo audio DAC
+	2706  PCM2706 stereo audio DAC
+	2707  PCM2707 stereo audio DAC
+	27c4  PCM2704C stereo audio DAC
+	27c5  PCM2705C stereo audio DAC
+	27c6  PCM2706C stereo audio DAC
+	27c7  PCM2707C stereo audio DAC
 	2900  PCM2900 Audio Codec
 	2901  PCM2901 Audio Codec
 	2902  PCM2902 Audio Codec
 	2904  PCM2904 Audio Codec
 	2910  PCM2912 Audio Codec
+	2912  PCM2912A Audio Codec
 	29b0  PCM2900B Audio CODEC
 	29b2  PCM2902 Audio CODEC
 	29b3  PCM2903B Audio CODEC
@@ -10696,6 +10732,7 @@
 	253c  GPSmap 62sc
 	255b  Nuvi 2505LM
 	26a1  Nuvi 55
+	47fb  nuviCam
 0920  Echelon Co.
 	7500  Network Interface
 0921  GoHubs, Inc.
@@ -10714,6 +10751,7 @@
 	23dd  DocuPrint M760 (X760_USB)
 	3ce8  Phaser 3428 Printer
 	3cea  Phaser 3125
+	3cec  Phaser 3250
 	3d5b  Phaser 6115MFP TWAIN Scanner
 	3d6d  WorkCentre 6015N/NI
 	420f  WorkCentre PE220 Series
@@ -10939,6 +10977,7 @@
 	168c  DT Elite 3.0
 0954  RPM Systems Corp.
 0955  NVidia Corp.
+	7018  APX
 	7030  Tegra 3 (recovery mode)
 	7100  Tegra Device
 	7210  SHIELD Controller
@@ -11773,9 +11812,15 @@
 	4daf  Transformer Pad Infinity TF700 (Fastboot)
 	5410  MeMO Pad HD 7 (MTP mode)
 	5412  MeMO Pad HD 7 (PTP mode)
-	550f  ASUS fonepad 7
+	550f  Fonepad 7
 	6101  Cable Modem
 	620a  Remote NDIS Device
+	7772  ASUS Zenfone GO (ZB500KL) (MTP mode)
+	7773  ASUS Zenfone GO (ZB500KL) (Debug, MTP mode)
+	7774  ASUS Zenfone GO (ZB500KL) (RNDIS mode)
+	7775  ASUS Zenfone GO (ZB500KL) (Debug, RNDIS mode)
+	7776  ASUS Zenfone GO (ZB500KL) (PTP mode)
+	7777  ASUS Zenfone GO (ZB500KL) (Debug, PTP mode)
 	b700  Broadcom Bluetooth 2.1
 0b0b  Datamax-O'Neil
 	106e  Datamax E-4304
@@ -12223,6 +12268,7 @@
 	231a  Expansion Portable
 	2320  USB 3.0 bridge [Portable Expansion Drive]
 	2321  Expansion Portable
+	2322  SRD0NF1 Expansion Portable (STEA)
 	2340  FreeAgent External Hard Drive
 	3000  FreeAgent Desktop
 	3008  FreeAgent Desk 1TB
@@ -12241,6 +12287,7 @@
 	50a5  FreeAgent GoFlex Desk USB 3.0
 	5121  FreeAgent GoFlex
 	5161  FreeAgent GoFlex dock
+	61b7  Maxtor M3 Portable
 	a003  Backup Plus
 	a0a1  Backup Plus Desktop
 	a0a4  Backup Plus Desktop Drive
@@ -12250,6 +12297,7 @@
 	ab24  Backup Plus Portable Drive
 	ab31  Backup Plus Desktop Drive (5TB)
 	ab34  Backup Plus
+	ab38  Backup Plus Hub
 0bc3  IPWireless, Inc.
 	0001  UMTS-TDD (TD-CDMA) modem
 0bc4  Microcube Corp.
@@ -12319,6 +12367,7 @@
 	5401  RTL 8153 USB 3.0 hub with gigabit ethernet
 	570c  Asus laptop camera
 	5730  HP 2.0MP High Definition Webcam
+	5751  Integrated Webcam
 	5775  HP "Truevision HD" laptop camera
 	57b3  Acer 640 × 480 laptop camera
 	57da  Built-In Video Camera
@@ -12393,6 +12442,8 @@
 	0004  USBcan II
 	000b  Leaf Light HS
 	000e  Leaf SemiPro HS
+0c00  FireFly Mouse Mat
+	1607  Apex M500
 0c04  MOTO Development Group, Inc.
 0c05  Appian Graphics
 0c06  Hasbro Games, Inc.
@@ -12626,6 +12677,7 @@
 	6480  Sonix 1.3 MP Laptop Integrated Webcam
 	648b  Integrated Webcam
 	64bd  Sony Visual Communication Camera
+	64d0  Integrated Webcam
 	64d2  Integrated Webcam
 	651b  HP Webcam
 	6705  Integrated HD Webcam
@@ -12801,7 +12853,9 @@
 	3050  EZ710 Smart Card Reader
 0ca7  Information Systems Laboratories
 0cad  Motorola CGISS
-	1030  APX Series Radio
+	1007  APX Series Consolette
+	1030  APX Series Radio (Portable)
+	1031  APX Series Radio (Mobile)
 	1602  IMPRES Battery Data Reader
 	9001  PowerPad Pocket PC Device
 0cae  Ascom Business Systems, Ltd
@@ -12885,6 +12939,10 @@
 0cd5  LabJack Corporation
 	0003  U3
 	0009  UE9
+0cd6  Scheidt & Bachmann
+	000c  S&B TPU
+	000e  S&B BKV
+	0011  Money Coin Unit
 0cd7  NewChip S.r.l.
 0cd8  JS Digitech, Inc.
 	2007  Smart Card Reader/JSTU-9700
@@ -12997,6 +13055,7 @@
 	0001  PhotoShuttle
 	0002  Photo Printer 730 series
 	0004  Photo Printer 63xPL/PS
+	000e  P910L
 	0100  Photo Printer 63xPL/PS
 	0102  Photo Printer 64xPS
 	0103  Photo Printer 730 series
@@ -13465,6 +13524,7 @@
 0dfa  Toyo Communication Equipment Co., Ltd
 0dfc  GeneralTouch Technology Co., Ltd
 	0001  Touchscreen
+	0101  5-point Touch Screen
 0e03  Nippon Systemware Co., Ltd
 0e08  Winbest Technology Co., Ltd
 0e0b  Amigo Technology Inc.
@@ -13902,6 +13962,7 @@
 	8010  Blackberry Playbook (Connect to Windows mode)
 	8011  Blackberry Playbook (Connect to Mac mode)
 	8020  Blackberry Playbook (CD-Rom mode)
+	8037  Blackberry PRIV
 0fce  Sony Ericsson Mobile Communications AB
 	0076  W910i (Multimedia mode)
 	00af  V640i Phone [PTP Camera]
@@ -14094,6 +14155,7 @@
 	631d  Optimus Android Phone (Camera/PTP Mode)
 	631e  G2/Optimus Android Phone [Camera/PTP mode]
 	631f  Optimus Android Phone (Charge Mode)
+	633a  Ultimate 2 Android Phone L41C
 	633e  G2/G3 Android Phone [MTP/PTP/Download mode]
 	6344  G2 Android Phone [tethering mode]
 	6356  Optimus Android Phone [Virtual CD mode]
@@ -14307,6 +14369,7 @@
 	1140  My Book Essential (WDBACW)
 	1230  My Book (WDBFJK)
 	1235  My Book (WDBFJK0040HBK)
+	2599  My Passport Ultra (WD40NMZW)
 	259d  My Passport Ultra (WDBBKD)
 	259f  My Passport Ultra (WD10JMVW)
 1059  Giesecke & Devrient GmbH
@@ -17538,6 +17601,9 @@
 	0200  Qemu Audio Device
 1d90  Citizen
 	201e  PPU-700
+1d9d  Sigma Sport
+	1010  Docking Station Topline 2009
+	1011  Docking Station Topline 2012
 1de1  Actions Microelectronics Co.
 	1101  Generic Display Device (Mass storage mode)
 	c101  Generic Display Device
