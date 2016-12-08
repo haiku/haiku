@@ -476,7 +476,7 @@ ElfFile::_LoadFile(const char* fileName)
 				Get(sectionHeader->sh_flags), Get(sectionHeader->sh_link));
 			if (section == NULL)
 				return B_NO_MEMORY;
-			if (!fSections.AddItem(section, i)) {
+			if (!fSections.AddItem(section)) {
 				delete section;
 				return B_NO_MEMORY;
 			}
