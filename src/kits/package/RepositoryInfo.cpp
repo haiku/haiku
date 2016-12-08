@@ -35,7 +35,6 @@ const char* const BRepositoryInfo::kArchitectureField	= "architecture";
 const char* const BRepositoryInfo::kLicenseNameField	= "licenseName";
 const char* const BRepositoryInfo::kLicenseTextField	= "licenseText";
 
-
 BRepositoryInfo::BRepositoryInfo()
 	:
 	fInitStatus(B_NO_INIT),
@@ -81,6 +80,11 @@ BRepositoryInfo::Archive(BMessage* data, bool deep) const
 	status_t result = inherited::Archive(data, deep);
 	if (result != B_OK)
 		return result;
+
+	// XXX: This was removed but left in for repo
+	// compatibility.  Please remove at a later date
+	// once 99% of people are running hrev50723 or later.
+	data->AddString("url", "STUB");
 
 	if ((result = data->AddString(kNameField, fName)) != B_OK)
 		return result;
