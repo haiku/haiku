@@ -45,14 +45,18 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	BNodeInfo::GetTrackerIcon(&appInfo.ref, icon, B_LARGE_ICON);
 
 	fStripeView = new StripeView(icon);
-	BStringView* introText = new BStringView("intro",
+	BStringView* headerText = new BStringView("header",
 		"Software updates are available.", B_WILL_DRAW);
 	BFont font;
-	introText->GetFont(&font);
+	headerText->GetFont(&font);
 	font.SetFace(B_BOLD_FACE);
 	font.SetSize(font.Size() * 1.5);
-	introText->SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE
+	headerText->SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE
 		| B_FONT_FLAGS);
+
+	BStringView* detailText = new BStringView("detail",
+		"There are 134 updates available for your system.",
+		B_WILL_DRAW);
 
 	BButton* updateButton = new BButton("Apply Updates",
 		new BMessage(UPDATE_MESSAGE));
@@ -63,7 +67,8 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 			.SetInsets(0, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			//.SetInsets(B_USE_WINDOW_SPACING)
-			.Add(introText)
+			.Add(headerText)
+			.Add(detailText)
 			.Add(updateButton)
 		.End()
 		.AddGlue()
