@@ -55,9 +55,6 @@ public:
 
 	static	const uint8			kDefaultPriority;
 
-	// XXX: Kill me after everyone upgrades
-	static  const char* const	kURLField;
-
 	static	const char* const	kNameField;
 	static	const char* const	kVendorField;
 	static	const char*	const	kSummaryField;

@@ -35,9 +35,6 @@ const char* const BRepositoryInfo::kArchitectureField	= "architecture";
 const char* const BRepositoryInfo::kLicenseNameField	= "licenseName";
 const char* const BRepositoryInfo::kLicenseTextField	= "licenseText";
 
-// XXX: Kill me after everyone upgrades.
-const char* const BRepositoryInfo::kURLField			= "url";
-
 
 BRepositoryInfo::BRepositoryInfo()
 	:
@@ -83,10 +80,6 @@ BRepositoryInfo::Archive(BMessage* data, bool deep) const
 {
 	status_t result = inherited::Archive(data, deep);
 	if (result != B_OK)
-		return result;
-
-	// XXX: Kill me after everyone upgrades
-	if ((result = data->AddString(kURLField, "STUB")) != B_OK)
 		return result;
 
 	if ((result = data->AddString(kNameField, fName)) != B_OK)
