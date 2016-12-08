@@ -49,6 +49,7 @@ HaikuSubInclude resedit ;
 HaikuSubInclude screenshot ;
 HaikuSubInclude serialconnect ;
 HaikuSubInclude showimage ;
+HaikuSubInclude softwareupdater ;
 HaikuSubInclude soundrecorder ;
 HaikuSubInclude stylededit ;
 HaikuSubInclude sudoku ;
