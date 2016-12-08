@@ -9,7 +9,6 @@
 #include "SoftwareUpdaterApp.h"
 
 #include <stdio.h>
-
 #include <AppDefs.h>
 
 #include "SoftwareUpdaterWindow.h"

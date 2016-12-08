@@ -9,7 +9,11 @@
 #define _SOFTWARE_UPDATER_WINDOW_H
 
 
+#include <Roster.h>
+#include <StatusBar.h>
 #include <Window.h>
+
+#include "StripeView.h"
 
 
 class SoftwareUpdaterWindow : public BWindow {
@@ -17,6 +21,10 @@ public:
 							SoftwareUpdaterWindow();
 							~SoftwareUpdaterWindow();
 			bool			QuitRequested();
+
+private:
+			StripeView*		fStripeView;
+			app_info*		fAppInfo;
 };
 
 
