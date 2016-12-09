@@ -34,7 +34,7 @@ const uint32 EXIT_MESSAGE = 'iEXT';
 
 SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	:
-	BWindow(BRect(0, 0, 500, 300), "Software Update",
+	BWindow(BRect(0, 0, 0, 300), "Software Update",
 		B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE),
 	fStripeView(NULL)
 {
@@ -90,10 +90,9 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 		.AddGroup(B_VERTICAL, B_USE_SMALL_SPACING)
 			.SetInsets(0, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
-			//.SetInsets(B_USE_WINDOW_SPACING)
 			.Add(headerView)
 			.Add(detailView)
-			.AddGroup(B_HORIZONTAL, 0)
+			.AddGroup(B_HORIZONTAL, B_USE_DEFAULT_SPACING)
 				.AddGlue()
 				.Add(updateButton)
 				.Add(exitButton)
