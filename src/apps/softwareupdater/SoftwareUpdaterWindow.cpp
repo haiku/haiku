@@ -20,6 +20,7 @@
 #include <Message.h>
 #include <Resources.h>
 #include <SeparatorView.h>
+#include <String.h>
 #include <StringView.h>
 
 
@@ -28,6 +29,7 @@
 
 
 const uint32 UPDATE_MESSAGE = 'iUPD';
+const uint32 EXIT_MESSAGE = 'iEXT';
 
 
 SoftwareUpdaterWindow::SoftwareUpdaterWindow()
@@ -36,8 +38,9 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 		B_TITLED_WINDOW, B_AUTO_UPDATE_SIZE_LIMITS | B_NOT_ZOOMABLE),
 	fStripeView(NULL)
 {
-	BBitmap* icon = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
+	uint32 updatesAvailable = 45;
 
+	BBitmap* icon = new BBitmap(BRect(0, 0, 31, 31), 0, B_RGBA32);
 	team_info teamInfo;
 	get_team_info(B_CURRENT_TEAM, &teamInfo);
 	app_info appInfo;
@@ -45,21 +48,42 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	BNodeInfo::GetTrackerIcon(&appInfo.ref, icon, B_LARGE_ICON);
 
 	fStripeView = new StripeView(icon);
-	BStringView* headerText = new BStringView("header",
-		"Software updates are available.", B_WILL_DRAW);
+
+	BButton* updateButton = new BButton("Update Now",
+		new BMessage(UPDATE_MESSAGE));
+
+	BButton* exitButton = new BButton("Cancel",
+		new BMessage(EXIT_MESSAGE));
+
+	// Form text based on updates available
+	BStringView* headerView;
+	BStringView* detailView;
+
+	if (updatesAvailable > 0) {
+		headerView = new BStringView("header",
+			"Software updates are available.", B_WILL_DRAW);
+		char detailString[1024];
+		snprintf(detailString, 1024, "There are %d updates available"
+			" for your system.", updatesAvailable);
+		detailView = new BStringView("detail", detailString, B_WILL_DRAW);
+		updateButton->MakeDefault(true);
+	} else {
+		headerView = new BStringView("header",
+			"Your system is up to date.", B_WILL_DRAW);
+		detailView = new BStringView("detail",
+			"No updates are available at this time.",
+			B_WILL_DRAW);
+		updateButton->Hide();
+		exitButton->SetLabel("Quit");
+		exitButton->MakeDefault(true);
+	}
+
 	BFont font;
-	headerText->GetFont(&font);
+	headerView->GetFont(&font);
 	font.SetFace(B_BOLD_FACE);
 	font.SetSize(font.Size() * 1.5);
-	headerText->SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE
+	headerView->SetFont(&font, B_FONT_FAMILY_AND_STYLE | B_FONT_SIZE
 		| B_FONT_FLAGS);
-
-	BStringView* detailText = new BStringView("detail",
-		"There are 134 updates available for your system.",
-		B_WILL_DRAW);
-
-	BButton* updateButton = new BButton("Apply Updates",
-		new BMessage(UPDATE_MESSAGE));
 
 	BLayoutBuilder::Group<>(this, B_HORIZONTAL, 0)
 		.Add(fStripeView)
@@ -67,9 +91,12 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 			.SetInsets(0, B_USE_DEFAULT_SPACING,
 				B_USE_DEFAULT_SPACING, B_USE_DEFAULT_SPACING)
 			//.SetInsets(B_USE_WINDOW_SPACING)
-			.Add(headerText)
-			.Add(detailText)
-			.Add(updateButton)
+			.Add(headerView)
+			.Add(detailView)
+			.AddGroup(B_HORIZONTAL, 0)
+				.Add(updateButton)
+				.Add(exitButton)
+			.End()
 		.End()
 		.AddGlue()
 		//.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
