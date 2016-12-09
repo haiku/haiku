@@ -63,7 +63,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 		headerView = new BStringView("header",
 			"Software updates are available.", B_WILL_DRAW);
 		char detailString[1024];
-		snprintf(detailString, 1024, "There are %d updates available"
+		snprintf(detailString, 1024, "There are %" B_PRIu32 " updates available"
 			" for your system.", updatesAvailable);
 		detailView = new BStringView("detail", detailString, B_WILL_DRAW);
 		updateButton->MakeDefault(true);
