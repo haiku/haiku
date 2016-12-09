@@ -24,7 +24,7 @@ SYSTEM_APPS += [ FFilterByBuildFeatures
 	Magnify Mail MediaConverter MediaPlayer MidiPlayer
 	People PoorMan PowerStatus
 	RemoteDesktop
-	Screenshot SerialConnect SoundRecorder
+	Screenshot SerialConnect SoftwareUpdater SoundRecorder
 	TV
 	WebWatch
 ] ;
