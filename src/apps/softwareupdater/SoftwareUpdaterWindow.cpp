@@ -49,7 +49,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 
 	fStripeView = new StripeView(icon);
 
-	BButton* updateButton = new BButton("Update Now",
+	BButton* updateButton = new BButton("Update now",
 		new BMessage(UPDATE_MESSAGE));
 
 	BButton* exitButton = new BButton("Cancel",
@@ -94,6 +94,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 			.Add(headerView)
 			.Add(detailView)
 			.AddGroup(B_HORIZONTAL, 0)
+				.AddGlue()
 				.Add(updateButton)
 				.Add(exitButton)
 			.End()
