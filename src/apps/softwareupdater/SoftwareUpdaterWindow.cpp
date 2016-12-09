@@ -100,7 +100,7 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 		.End()
 		.AddGlue()
 		//.Add(new BSeparatorView(B_HORIZONTAL, B_PLAIN_BORDER))
-    ;
+	;
 	CenterOnScreen();
 	Show();
 }
