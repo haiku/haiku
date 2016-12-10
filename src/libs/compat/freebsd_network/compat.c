@@ -14,6 +14,8 @@
 #include <KernelExport.h>
 #include <image.h>
 
+#include <util/BitUtils.h>
+
 #include <compat/machine/resource.h>
 #include <compat/dev/mii/mii.h>
 #include <compat/sys/bus.h>
@@ -602,7 +604,12 @@ _kernel_malloc(size_t size, int flags)
 {
 	// our kernel malloc() is insufficient, must handle M_WAIT
 
-	void *ptr = malloc(size);
+	// According to the FreeBSD kernel malloc man page the allocator is expected
+	// to return power of two aligned addresses for allocations up to one page
+	// size. While it also states that this shouldn't be relied upon, at least
+	// bus_dmamem_alloc expects it and drivers may depend on it as well.
+	void *ptr
+		= memalign(size >= PAGE_SIZE ? PAGE_SIZE : next_power_of_2(size), size);
 	if (ptr == NULL)
 		return NULL;
 
