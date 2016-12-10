@@ -842,12 +842,12 @@ Team::NotifyWatchpointChanged(Watchpoint* watchpoint)
 
 
 void
-Team::NotifyDebugReportChanged(const char* reportPath)
+Team::NotifyDebugReportChanged(const char* reportPath, status_t result)
 {
 	for (ListenerList::Iterator it = fListeners.GetIterator();
 			Listener* listener = it.Next();) {
 		listener->DebugReportChanged(DebugReportEvent(
-			TEAM_EVENT_DEBUG_REPORT_CHANGED, this, reportPath));
+			TEAM_EVENT_DEBUG_REPORT_CHANGED, this, reportPath, result));
 	}
 }
 
@@ -1036,10 +1036,11 @@ Team::ConsoleOutputEvent::ConsoleOutputEvent(uint32 type, Team* team,
 
 
 Team::DebugReportEvent::DebugReportEvent(uint32 type, Team* team,
-	const char* reportPath)
+	const char* reportPath, status_t finalStatus)
 	:
 	Event(type, team),
-	fReportPath(reportPath)
+	fReportPath(reportPath),
+	fFinalStatus(finalStatus)
 {
 }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -32,6 +32,7 @@
 #include "StringUtils.h"
 #include "SystemInfo.h"
 #include "Team.h"
+#include "TeamDebugInfo.h"
 #include "Thread.h"
 #include "Type.h"
 #include "UiUtils.h"
@@ -65,7 +66,6 @@ DebugReportGenerator::DebugReportGenerator(::Team* team,
 	fCurrentBlock(NULL),
 	fBlockRetrievalStatus(B_OK),
 	fTraceWaitingThread(NULL),
-	fSourceWaitForDisassembly(false),
 	fSourceWaitingFunction(NULL)
 {
 	fTeam->AddListener(this);
@@ -128,9 +128,9 @@ DebugReportGenerator::Create(::Team* team, UserInterfaceListener* listener,
 
 
 status_t
-DebugReportGenerator::_GenerateReport(const entry_ref& outputPath)
+DebugReportGenerator::_GenerateReport(const char* outputPath)
 {
-	BFile file(&outputPath, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
+	BFile file(outputPath, B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE);
 	status_t result = file.InitCheck();
 	if (result != B_OK)
 		return result;
@@ -155,10 +155,8 @@ DebugReportGenerator::_GenerateReport(const entry_ref& outputPath)
 	if (result != B_OK)
 		return result;
 
-	BPath path(&outputPath);
-
 	AutoLocker< ::Team> teamLocker(fTeam);
-	fTeam->NotifyDebugReportChanged(path.Path());
+	fTeam->NotifyDebugReportChanged(outputPath, B_OK);
 
 	return B_OK;
 }
@@ -171,8 +169,12 @@ DebugReportGenerator::MessageReceived(BMessage* message)
 		case MSG_GENERATE_DEBUG_REPORT:
 		{
 			entry_ref ref;
-			if (message->FindRef("target", &ref) == B_OK)
-				_GenerateReport(ref);
+			if (message->FindRef("target", &ref) == B_OK) {
+				BPath path(&ref);
+				status_t error = _GenerateReport(path.Path());
+				if (error != B_OK)
+					fTeam->NotifyDebugReportChanged(path.Path(), error);
+			}
 			break;
 		}
 
@@ -223,17 +225,15 @@ DebugReportGenerator::FunctionSourceCodeChanged(Function* function)
 {
 	AutoLocker< ::Team> teamLocker(fTeam);
 	if (function == fSourceWaitingFunction) {
-		function_source_state state;
-		if (fSourceWaitForDisassembly)
-			state = function->FirstInstance()->SourceCodeState();
-		else
-			state = function->SourceCodeState();
+		function_source_state state = function->SourceCodeState();
 
 		switch (state) {
 			case FUNCTION_SOURCE_LOADED:
 			case FUNCTION_SOURCE_SUPPRESSED:
 			case FUNCTION_SOURCE_UNAVAILABLE:
 			{
+				fSourceWaitingFunction->RemoveListener(this);
+				fSourceWaitingFunction = NULL;
 				release_sem(fTeamDataSem);
 				// fall through
 			}
@@ -455,8 +455,10 @@ DebugReportGenerator::_DumpRunningThreads(BFile& _output)
 	for (ThreadList::ConstIterator it = fTeam->Threads().GetIterator();
 		  (thread = it.Next());) {
 		 threads.AddItem(thread);
+		 thread->AcquireReference();
 	}
 
+	status_t error = B_OK;
 	threads.SortItems(&_CompareThreads);
 	for (int32 i = 0; (thread = threads.ItemAt(i)) != NULL; i++) {
 		try {
@@ -478,19 +480,21 @@ DebugReportGenerator::_DumpRunningThreads(BFile& _output)
 				// we need to release our lock on the team here
 				// since we might need to block and wait
 				// on the stack trace.
-				BReference< ::Thread> threadRef(thread);
 				locker.Unlock();
-				status_t error = _DumpDebuggedThreadInfo(_output, thread);
-				if (error != B_OK)
-					return error;
+				error = _DumpDebuggedThreadInfo(_output, thread);
 				locker.Lock();
+				if (error != B_OK)
+					break;
 			}
 		} catch (...) {
-			return B_NO_MEMORY;
+			error = B_NO_MEMORY;
 		}
 	}
 
-	return B_OK;
+	for (int32 i = 0; (thread = threads.ItemAt(i)) != NULL; i++)
+		thread->ReleaseReference();
+
+	return error;
 }
 
 
@@ -516,7 +520,7 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BFile& _output,
 		} while (error == B_INTERRUPTED);
 
 		if (error != B_OK)
-			break;
+			return error;
 
 		locker.Lock();
 	}
@@ -544,7 +548,6 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BFile& _output,
 				&& functionInstance->SourceCodeState()
 					== FUNCTION_SOURCE_NOT_LOADED) {
 				fSourceWaitingFunction = function;
-				fSourceWaitForDisassembly = false;
 				fSourceWaitingFunction->AddListener(this);
 				fListener->FunctionSourceCodeRequested(functionInstance);
 
@@ -555,11 +558,9 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BFile& _output,
 				} while (error == B_INTERRUPTED);
 
 				if (error != B_OK)
-					break;
+					return error;
 
 				locker.Lock();
-
-				fSourceWaitingFunction->RemoveListener(this);
 			}
 		}
 
@@ -589,7 +590,8 @@ DebugReportGenerator::_DumpDebuggedThreadInfo(BFile& _output,
 		// only dump the topmost frame
 		if (i == 0) {
 			locker.Unlock();
-			error = _DumpFunctionDisassembly(_output, frame->InstructionPointer());
+			error = _DumpFunctionDisassembly(_output,
+				frame->InstructionPointer());
 			if (error != B_OK)
 				return error;
 			error = _DumpStackFrameMemory(_output, thread->GetCpuState(),
@@ -658,55 +660,50 @@ DebugReportGenerator::_DumpFunctionDisassembly(BFile& _output,
 	AutoLocker< ::Team> teamLocker(fTeam);
 	BString data;
 	FunctionInstance* instance = NULL;
-	Statement* statement = NULL;
-	status_t error = fTeam->GetStatementAtAddress(instructionPointer, instance,
-		statement);
-	if (error != B_OK) {
-		data.SetToFormat("Unable to retrieve disassembly for IP %#" B_PRIx64
-				": %s\n", instructionPointer, strerror(error));
+	Image* image = fTeam->ImageByAddress(instructionPointer);
+	if (image == NULL) {
+		data.SetToFormat("\t\t\tUnable to retrieve disassembly for IP %#"
+			B_PRIx64 ": address not contained in any valid image.\n",
+			instructionPointer);
 		WRITE_AND_CHECK(_output, data);
 		return B_OK;
 	}
 
+	ImageDebugInfo* info = image->GetImageDebugInfo();
+	if (info == NULL) {
+		data.SetToFormat("\t\t\tUnable to retrieve disassembly for IP %#"
+			B_PRIx64 ": no debug info available for image '%s'.\n",
+			instructionPointer,	image->Name().String());
+		WRITE_AND_CHECK(_output, data);
+		return B_OK;
+	}
+
+	instance = info->FunctionAtAddress(instructionPointer);
+	if (instance == NULL) {
+		data.SetToFormat("\t\t\tUnable to retrieve disassembly for IP %#"
+			B_PRIx64 ": address does not point to a function.\n",
+			instructionPointer);
+		WRITE_AND_CHECK(_output, data);
+		return B_OK;
+	}
+
+	Statement* statement = NULL;
 	DisassembledCode* code = instance->GetSourceCode();
-	Function* function = instance->GetFunction();
+	BReference<DisassembledCode> codeReference;
 	if (code == NULL) {
-		switch (function->SourceCodeState()) {
-			case FUNCTION_SOURCE_NOT_LOADED:
-			case FUNCTION_SOURCE_LOADED:
-				// FUNCTION_SOURCE_LOADED is included since, if we entered
-				// here, it implies that the high level source for the
-				// function has been loaded, but the disassembly has not.
-				function->AddListener(this);
-				fSourceWaitingFunction = function;
-				fSourceWaitForDisassembly = true;
-				fListener->FunctionSourceCodeRequested(instance, true);
-				// fall through
-			case FUNCTION_SOURCE_LOADING:
-			{
-				teamLocker.Unlock();
-				do {
-					error = acquire_sem(fTeamDataSem);
-				} while (error == B_INTERRUPTED);
-
-				if (error != B_OK)
-					return error;
-
-				teamLocker.Lock();
-				fSourceWaitingFunction->RemoveListener(this);
-				break;
-			}
-			default:
-				return B_OK;
+		status_t error = fTeam->DebugInfo()->DisassembleFunction(instance,
+			code);
+		if (error != B_OK) {
+			data.SetToFormat("\t\t\tUnable to retrieve disassembly for IP %#"
+				B_PRIx64 ": %s.\n", instructionPointer, strerror(error));
+			WRITE_AND_CHECK(_output, data);
+			return B_OK;
 		}
 
-		if (instance->SourceCodeState() == 	FUNCTION_SOURCE_UNAVAILABLE)
-			return B_OK;
-
-		error = fTeam->GetStatementAtAddress(instructionPointer, instance,
-			statement);
-		code = instance->GetSourceCode();
-	}
+		codeReference.SetTo(code, true);
+		statement = code->StatementAtAddress(instructionPointer);
+	} else
+		codeReference.SetTo(code);
 
 	SourceLocation location = statement->StartSourceLocation();
 
@@ -741,10 +738,12 @@ DebugReportGenerator::_DumpStackFrameMemory(BFile& _output,
 		endAddress = framePointer;
 	}
 
-	status_t error;
+	if (endAddress <= startAddress)
+		return B_OK;
+
 	if (fCurrentBlock == NULL || !fCurrentBlock->Contains(startAddress)) {
+		status_t error;
 		fListener->InspectRequested(startAddress, this);
-		error = B_OK;
 		do {
 			error = acquire_sem(fTeamDataSem);
 		} while (error == B_INTERRUPTED);
@@ -825,6 +824,7 @@ DebugReportGenerator::_HandleMemoryBlockRetrieved(TeamMemoryBlock* block,
 	fCurrentBlock = block;
 	release_sem(fTeamDataSem);
 }
+
 
 
 /*static*/ int

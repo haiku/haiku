@@ -305,9 +305,16 @@ TeamWindow::MessageReceived(BMessage* message)
 		}
 		case MSG_DEBUG_REPORT_SAVED:
 		{
+			status_t finalStatus = message->GetInt32("status", B_OK);
 			BString data;
-			data.SetToFormat("Debug report successfully saved to '%s'",
-				message->FindString("path"));
+			if (finalStatus == B_OK) {
+				data.SetToFormat("Debug report successfully saved to '%s'",
+					message->FindString("path"));
+			} else {
+				data.SetToFormat("Failed to save debug report: '%s'",
+					strerror(finalStatus));
+			}
+
 			BAlert *alert = new(std::nothrow) BAlert("Report saved",
 				data.String(), "Close");
 			if (alert == NULL)
@@ -964,6 +971,7 @@ TeamWindow::DebugReportChanged(const Team::DebugReportEvent& event)
 {
 	BMessage message(MSG_DEBUG_REPORT_SAVED);
 	message.AddString("path", event.GetReportPath());
+	message.AddInt32("status", event.GetFinalStatus());
 	PostMessage(&message);
 }
 

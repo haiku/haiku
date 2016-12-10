@@ -265,7 +265,7 @@ public:
 
 			// debug report related service methods
 			void				NotifyDebugReportChanged(
-									const char* reportPath);
+									const char* reportPath, status_t result);
 
 			// core file related service methods
 			void				NotifyCoreFileChanged(
@@ -434,12 +434,16 @@ protected:
 class Team::DebugReportEvent : public Event {
 public:
 								DebugReportEvent(uint32 type, Team* team,
-									const char* reportPath);
+									const char* reportPath,
+									status_t finalStatus);
 
 			const char*			GetReportPath() const	{ return fReportPath; }
+			status_t			GetFinalStatus() const	{ return fFinalStatus; }
 protected:
 			const char*			fReportPath;
+			status_t			fFinalStatus;
 };
+
 
 class Team::CoreFileChangedEvent : public Event {
 public:

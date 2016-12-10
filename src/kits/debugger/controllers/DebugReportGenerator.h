@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2013, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2016, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 #ifndef DEBUG_REPORT_GENERATOR_H
@@ -64,7 +64,7 @@ private:
 	virtual	void				FunctionSourceCodeChanged(Function* function);
 
 private:
-			status_t			_GenerateReport(const entry_ref& outputPath);
+			status_t			_GenerateReport(const char* outputPath);
 			status_t			_GenerateReportHeader(BFile& _output);
 			status_t			_DumpLoadedImages(BFile& _output);
 			status_t			_DumpAreas(BFile& _output);
@@ -103,7 +103,6 @@ private:
 			TeamMemoryBlock*	fCurrentBlock;
 			status_t			fBlockRetrievalStatus;
 			::Thread*			fTraceWaitingThread;
-			bool				fSourceWaitForDisassembly;
 			Function*			fSourceWaitingFunction;
 };
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012-2015, Rene Gollent, rene@gollent.com.
+ * Copyright 2012-2016, Rene Gollent, rene@gollent.com.
  * Copyright 2012, Ingo Weinhold, ingo_weinhold@gmx.de.
  * Distributed under the terms of the MIT License.
  */
@@ -508,8 +508,13 @@ CliContext::ExpressionEvaluated(ExpressionInfo* info, status_t result,
 void
 CliContext::DebugReportChanged(const Team::DebugReportEvent& event)
 {
-	printf("Successfully saved debug report to %s\n",
-		event.GetReportPath());
+	if (event.GetFinalStatus() == B_OK) {
+		printf("Successfully saved debug report to %s\n",
+			event.GetReportPath());
+	} else {
+		fprintf(stderr, "Failed to write debug report: %s\n", strerror(
+				event.GetFinalStatus()));
+	}
 
 	_QueueEvent(new(std::nothrow) Event(EVENT_DEBUG_REPORT_CHANGED));
 	_SignalInputLoop(EVENT_DEBUG_REPORT_CHANGED);

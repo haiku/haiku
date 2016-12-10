@@ -237,6 +237,11 @@ ReportUserInterface::ThreadStateChanged(const Team::ThreadEvent& event)
 void
 ReportUserInterface::DebugReportChanged(const Team::DebugReportEvent& event)
 {
-	printf("Debug report saved to %s\n", event.GetReportPath());
+	if (event.GetFinalStatus() == B_OK)
+		printf("Debug report saved to %s\n", event.GetReportPath());
+	else {
+		fprintf(stderr, "Failed to write debug report: %s\n", strerror(
+				event.GetFinalStatus()));
+	}
 	release_sem(fReportSemaphore);
 }
