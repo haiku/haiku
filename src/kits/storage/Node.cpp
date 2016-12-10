@@ -1,10 +1,9 @@
 /*
- * Copyright 2002-2016 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2011 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Tyler Dauwalder
- *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, bonefish@users.sf.net
  */
 
@@ -61,7 +60,7 @@ node_ref::node_ref(const node_ref& other)
 bool
 node_ref::operator==(const node_ref& other) const
 {
-	return device == other.device && node == other.node;
+	return (device == other.device && node == other.node);
 }
 
 
@@ -109,8 +108,7 @@ BNode::BNode(const entry_ref* ref)
 	fAttrFd(-1),
 	fCStatus(B_NO_INIT)
 {
-	// fCStatus is set by SetTo(), ignore return value
-	(void)SetTo(ref);
+	SetTo(ref);
 }
 
 
@@ -120,8 +118,7 @@ BNode::BNode(const BEntry* entry)
 	fAttrFd(-1),
 	fCStatus(B_NO_INIT)
 {
-	// fCStatus is set by SetTo(), ignore return value
-	(void)SetTo(entry);
+	SetTo(entry);
 }
 
 
@@ -131,8 +128,7 @@ BNode::BNode(const char* path)
 	fAttrFd(-1),
 	fCStatus(B_NO_INIT)
 {
-	// fCStatus is set by SetTo(), ignore return value
-	(void)SetTo(path);
+	SetTo(path);
 }
 
 
@@ -142,8 +138,7 @@ BNode::BNode(const BDirectory* dir, const char* path)
 	fAttrFd(-1),
 	fCStatus(B_NO_INIT)
 {
-	// fCStatus is set by SetTo(), ignore return value
-	(void)SetTo(dir, path);
+	SetTo(dir, path);
 }
 
 
@@ -173,9 +168,7 @@ BNode::InitCheck() const
 status_t
 BNode::SetTo(const entry_ref* ref)
 {
-	fCStatus = _SetTo(ref, false);
-
-	return fCStatus;
+	return _SetTo(ref, false);
 }
 
 
@@ -184,20 +177,17 @@ BNode::SetTo(const BEntry* entry)
 {
 	if (entry == NULL) {
 		Unset();
-		fCStatus = B_BAD_VALUE;
-	} else
-		fCStatus = _SetTo(entry->fDirFd, entry->fName, false);
+		return (fCStatus = B_BAD_VALUE);
+	}
 
-	return fCStatus;
+	return _SetTo(entry->fDirFd, entry->fName, false);
 }
 
 
 status_t
 BNode::SetTo(const char* path)
 {
-	fCStatus = _SetTo(-1, path, false);
-
-	return fCStatus;
+	return _SetTo(-1, path, false);
 }
 
 
@@ -207,11 +197,10 @@ BNode::SetTo(const BDirectory* dir, const char* path)
 	if (dir == NULL || path == NULL
 		|| BPrivate::Storage::is_absolute_path(path)) {
 		Unset();
-		fCStatus = B_BAD_VALUE;
-	} else
-		fCStatus = _SetTo(dir->fDirFd, path, false);
+		return (fCStatus = B_BAD_VALUE);
+	}
 
-	return fCStatus;
+	return _SetTo(dir->fDirFd, path, false);
 }
 
 
@@ -246,10 +235,7 @@ BNode::Unlock()
 status_t
 BNode::Sync()
 {
-	if (fCStatus != B_OK)
-		return B_FILE_ERROR;
-
-	return _kern_fsync(fFd);
+	return (fCStatus != B_OK) ? B_FILE_ERROR : _kern_fsync(fFd);
 }
 
 
@@ -258,15 +244,14 @@ BNode::WriteAttr(const char* attr, type_code type, off_t offset,
 	const void* buffer, size_t length)
 {
 	if (fCStatus != B_OK)
-		return (ssize_t)B_FILE_ERROR;
+		return B_FILE_ERROR;
 
 	if (attr == NULL || buffer == NULL)
-		return (ssize_t)B_BAD_VALUE;
+		return B_BAD_VALUE;
 
-	ssize_t bytesWritten = fs_write_attr(fFd, attr, type, offset, buffer,
-		length);
+	ssize_t result = fs_write_attr(fFd, attr, type, offset, buffer, length);
 
-	return bytesWritten < 0 ? (ssize_t)errno : bytesWritten;
+	return result < 0 ? errno : result;
 }
 
 
@@ -275,14 +260,14 @@ BNode::ReadAttr(const char* attr, type_code type, off_t offset,
 	void* buffer, size_t length) const
 {
 	if (fCStatus != B_OK)
-		return (ssize_t)B_FILE_ERROR;
+		return B_FILE_ERROR;
 
 	if (attr == NULL || buffer == NULL)
-		return (ssize_t)B_BAD_VALUE;
+		return B_BAD_VALUE;
 
-	ssize_t bytesRead = fs_read_attr(fFd, attr, type, offset, buffer, length);
+	ssize_t result = fs_read_attr(fFd, attr, type, offset, buffer, length);
 
-	return bytesRead == -1 ? (ssize_t)errno : bytesRead;
+	return result == -1 ? errno : result;
 }
 
 
@@ -312,7 +297,7 @@ BNode::GetAttrInfo(const char* name, struct attr_info* info) const
 	if (name == NULL || info == NULL)
 		return B_BAD_VALUE;
 
-	return fs_stat_attr(fFd, name, info) < 0 ? errno : B_OK;
+	return fs_stat_attr(fFd, name, info) < 0 ? errno : B_OK ;
 }
 
 
@@ -357,23 +342,16 @@ BNode::RewindAttrs()
 status_t
 BNode::WriteAttrString(const char* name, const BString* data)
 {
-	status_t result = (name == NULL || data == NULL) ? B_BAD_VALUE : B_OK;
-	if (result == B_OK) {
+	status_t error = (!name || !data)  ? B_BAD_VALUE : B_OK;
+	if (error == B_OK) {
 		int32 length = data->Length() + 1;
-		ssize_t bytesWritten = WriteAttr(name, B_STRING_TYPE, 0, data->String(),
+		ssize_t sizeWritten = WriteAttr(name, B_STRING_TYPE, 0, data->String(),
 			length);
-		if (bytesWritten < 0) {
-			// error code returned by WriteAttr()
-			result = (status_t)bytesWritten;
-		} else if (bytesWritten != length) {
-			// attribute partially written
-			result = B_FILE_ERROR;
-		}
-
-		// wrote exactly what we were supposed to, nothing more to do
+		if (sizeWritten != length)
+			error = sizeWritten;
 	}
 
-	return result;
+	return error;
 }
 
 
@@ -423,11 +401,10 @@ BNode::operator=(const BNode& node)
 
 	// Close down out current state
 	Unset();
-
 	// We have to manually dup the node, because R5::BNode::Dup()
 	// is not declared to be const (which IMO is retarded).
 	fFd = _kern_dup(node.fFd);
-	fCStatus = fFd < 0 ? B_NO_INIT : B_OK;
+	fCStatus = (fFd < 0) ? B_NO_INIT : B_OK ;
 
 	return *this;
 }
@@ -544,7 +521,7 @@ BNode::set_status(status_t newStatus)
 
 
 /*!	Initializes the BNode's file descriptor to the node referred to
-	by the given \a fd and \a path combo.
+	by the given FD and path combo.
 
 	\a path must either be \c NULL, an absolute or a relative path.
 	In the first case, \a fd must not be \c NULL; the node it refers to will
@@ -573,8 +550,8 @@ BNode::_SetTo(int fd, const char* path, bool traverse)
 {
 	Unset();
 
-	status_t result = (fd >= 0 || path != NULL) ? B_OK : B_BAD_VALUE;
-	if (result == B_OK) {
+	status_t error = (fd >= 0 || path ? B_OK : B_BAD_VALUE);
+	if (error == B_OK) {
 		int traverseFlag = (traverse ? 0 : O_NOTRAVERSE);
 		fFd = _kern_open(fd, path, O_RDWR | O_CLOEXEC | traverseFlag, 0);
 		if (fFd < B_OK && fFd != B_ENTRY_NOT_FOUND) {
@@ -582,10 +559,10 @@ BNode::_SetTo(int fd, const char* path, bool traverse)
 			fFd = _kern_open(fd, path, O_RDONLY | O_CLOEXEC | traverseFlag, 0);
 		}
 		if (fFd < 0)
-			result = fFd;
+			error = fFd;
 	}
 
-	return result;
+	return fCStatus = error;
 }
 
 
@@ -609,9 +586,9 @@ BNode::_SetTo(const entry_ref* ref, bool traverse)
 {
 	Unset();
 
-	status_t result = ref != NULL ? B_OK : B_BAD_VALUE;
+	status_t result = (ref ? B_OK : B_BAD_VALUE);
 	if (result == B_OK) {
-		int traverseFlag = traverse ? 0 : O_NOTRAVERSE;
+		int traverseFlag = (traverse ? 0 : O_NOTRAVERSE);
 		fFd = _kern_open_entry_ref(ref->device, ref->directory, ref->name,
 			O_RDWR | O_CLOEXEC | traverseFlag, 0);
 		if (fFd < B_OK && fFd != B_ENTRY_NOT_FOUND) {
@@ -623,7 +600,7 @@ BNode::_SetTo(const entry_ref* ref, bool traverse)
 			result = fFd;
 	}
 
-	return result;
+	return fCStatus = result;
 }
 
 
@@ -643,7 +620,8 @@ BNode::set_stat(struct stat& stat, uint32 what)
 	if (fCStatus != B_OK)
 		return B_FILE_ERROR;
 
-	return _kern_write_stat(fFd, NULL, false, &stat, sizeof(struct stat), what);
+	return _kern_write_stat(fFd, NULL, false, &stat, sizeof(struct stat),
+		what);
 }
 
 
@@ -673,10 +651,9 @@ BNode::InitAttrDir()
 status_t
 BNode::_GetStat(struct stat* stat) const
 {
-	if (fCStatus != B_OK)
-		return fCStatus;
-
-	return _kern_read_stat(fFd, NULL, false, stat, sizeof(struct stat));
+	return fCStatus != B_OK
+		? fCStatus
+		: _kern_read_stat(fFd, NULL, false, stat, sizeof(struct stat));
 }
 
 
@@ -684,9 +661,9 @@ status_t
 BNode::_GetStat(struct stat_beos* stat) const
 {
 	struct stat newStat;
-	status_t result = _GetStat(&newStat);
-	if (result != B_OK)
-		return result;
+	status_t error = _GetStat(&newStat);
+	if (error != B_OK)
+		return error;
 
 	convert_to_stat_beos(&newStat, stat);
 
