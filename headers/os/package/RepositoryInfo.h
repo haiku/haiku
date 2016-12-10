@@ -33,6 +33,7 @@ public:
 			status_t			InitCheck() const;
 
 			const BString&		Name() const;
+			const BString&		OriginalBaseURL() const;
 			const BString&		Vendor() const;
 			const BString&		Summary() const;
 			uint8				Priority() const;
@@ -41,6 +42,7 @@ public:
 			const BStringList&	LicenseTexts() const;
 
 			void				SetName(const BString& name);
+			void				SetOriginalBaseURL(const BString& url);
 			void				SetVendor(const BString& vendor);
 			void				SetSummary(const BString& summary);
 			void				SetPriority(uint8 priority);
@@ -56,6 +58,7 @@ public:
 	static	const uint8			kDefaultPriority;
 
 	static	const char* const	kNameField;
+	static	const char* const	kURLField;
 	static	const char* const	kVendorField;
 	static	const char*	const	kSummaryField;
 	static	const char*	const	kPriorityField;
@@ -71,6 +74,7 @@ private:
 			status_t			fInitStatus;
 
 			BString				fName;
+			BString				fOriginalBaseURL;
 			BString				fVendor;
 			BString				fSummary;
 			uint8				fPriority;

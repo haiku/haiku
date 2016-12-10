@@ -7,7 +7,7 @@ set -o errexit
 # tmpDir
 # addBuildCompatibilityLibDir
 # systemPackages - lists of the hpkg packages copied/updated
-# repositories - all repository configuration files
+# repositories - all repository files
 # downloadDir
 # The following are only for image types:
 # installDir

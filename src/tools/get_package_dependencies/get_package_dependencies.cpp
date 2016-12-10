@@ -1,10 +1,9 @@
 /*
- * Copyright 2013-2016, Haiku, Inc. All Rights Reserved.
+ * Copyright 2013, Haiku, Inc. All Rights Reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Ingo Weinhold <ingo_weinhold@gmx.de>
- *		Alexander von Gluck IV <kallisti5@unixzen.com>
  */
 
 
@@ -14,8 +13,6 @@
 
 #include <map>
 
-#include <FindDirectory.h>
-#include <package/RepositoryConfig.h>
 #include <package/RepositoryCache.h>
 #include <package/manager/Exceptions.h>
 #include <package/manager/RepositoryBuilder.h>
@@ -26,9 +23,6 @@
 #include <package/solver/SolverProblemSolution.h>
 #include <package/solver/SolverRepository.h>
 #include <package/solver/SolverResult.h>
-#include <Path.h>
-
-#include "HTTPClient.h"
 
 
 using namespace BPackageKit;
@@ -50,40 +44,13 @@ void
 print_usage_and_exit(bool error)
 {
 	fprintf(error ? stderr : stdout,
-		"Usage: %s <repository-config> ... -- <package> ...\n"
+		"Usage: %s <repository> ... -- <package> ...\n"
 		"Resolves the dependencies of the given packages using the given\n"
 		"repositories and prints the URLs of the packages that are also\n"
 		"needed to satisfy all requirements. Fails, if there are conflicts\n"
 		"or some requirements cannot be satisfied.\n",
 		sProgramName);
 	exit(error ? 1 : 0);
-}
-
-
-static status_t
-get_repocache(BRepositoryConfig config, BPath* outFile)
-{
-	BString finalURL;
-	finalURL.SetTo(config.BaseURL());
-	finalURL += "/repo";
-
-	if (find_directory(B_SYSTEM_TEMP_DIRECTORY, outFile) != B_OK)
-		outFile->SetTo("/tmp");
-
-	BString tempFile = config.Name();
-	tempFile += ".repocache";
-
-	outFile->Append(tempFile);
-
-	//printf("Downloading: %s\n", finalURL.String());
-	//printf("Final output will be %s\n", outFile->Path());
-
-	BEntry entry(outFile->Path());
-	HTTPClient* http = new HTTPClient;
-	status_t result = http->Get(&finalURL, &entry);
-	delete http;
-
-	return result;
 }
 
 
@@ -126,31 +93,17 @@ main(int argc, const char* const* argv)
 		DIE(B_OK, "%s", e.Details().String());
 	}
 
-	// add specified remote repositories
-	std::map<BSolverRepository*, BString> repositoryURLs;
-
+	// add external repositories
+	std::map<BSolverRepository*, BRepositoryInfo> repositoryInfos;
 	for (int i = 0; i < repositoryCount; i++) {
 		BSolverRepository* repository = new BSolverRepository;
-		BRepositoryConfig config;
-		error = config.SetTo(repositories[i]);
-		if (error != B_OK)
-			DIE(error, "failed to read repository config '%s'", repositories[i]);
-
-		// TODO: It would make sense if BRepositoryBuilder could accept a
-		// BRepositoryConfig directly and "get" the remote BRepositoryCache
-		// to properly solve dependencies. For now we curl here.
-
-		BPath output;
-		get_repocache(config, &output);
-
 		BRepositoryCache cache;
-		error = cache.SetTo(output.Path());
+		error = cache.SetTo(repositories[i]);
 		if (error != B_OK)
-			DIE(error, "failed to read repository cache '%s'", repositories[i]);
-
+			DIE(error, "failed to read repository file '%s'", repositories[i]);
 		BRepositoryBuilder(*repository, cache)
 			.AddToSolver(solver, false);
-		repositoryURLs[repository] = config.BaseURL();
+		repositoryInfos[repository] = cache.Info();
 	}
 
 	// solve
@@ -199,7 +152,9 @@ main(int argc, const char* const* argv)
 		switch (element->Type()) {
 			case BSolverResultElement::B_TYPE_INSTALL:
 				if (package->Repository() != &installedRepository) {
-					BString url = repositoryURLs[package->Repository()];
+					const BRepositoryInfo& info
+						= repositoryInfos[package->Repository()];
+					BString url = info.OriginalBaseURL();
 					url << "/packages/" << package->Info().CanonicalFileName();
 					printf("%s\n", url.String());
 				}
