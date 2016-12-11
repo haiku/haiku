@@ -79,54 +79,18 @@ private:
 };
 
 
-class BSimpleMediaInput : public BMediaInput {
+class BSimpleMediaConnection : public virtual BMediaConnection {
 public:
 	enum notification {
-		B_CONNECTED = 1,
-		B_DISCONNECTED,
+		// Inputs
+		B_INPUT_CONNECTED = 1,
+		B_INPUT_DISCONNECTED,
 
-		B_FORMAT_CHANGED
-	};
+		B_FORMAT_CHANGED,
 
-	// This function is called when it is the moment to handle a buffer.
-	typedef void					(*process_hook)(
-										BMediaConnection* connection,
-										BBuffer* buffer);
-
-	// Used to notify or inquire the client about what to do when certain
-	// events happen.
-	typedef status_t				(*notify_hook)(
-										notification what,
-										BMediaConnection* connection,
-										...);
-
-									BSimpleMediaInput();
-
-			// Use this to set your callbacks.
-			void					SetHooks(process_hook processHook = NULL,
-										notify_hook notifyHook = NULL,
-										void* cookie = NULL);
-
-			void*					Cookie() const;
-
-protected:
-	virtual void					Connected(const media_format& format);
-	virtual void					Disconnected();
-
-			void					BufferReceived(BBuffer* buffer);
-
-private:
-			process_hook			fProcessHook;
-			notify_hook				fNotifyHook;
-			void*					fBufferCookie;
-};
-
-
-class BSimpleMediaOutput : public BMediaOutput {
-public:
-	enum notification {
-		B_CONNECTED = 1,
-		B_DISCONNECTED,
+		// Outputs
+		B_OUTPUT_CONNECTED,
+		B_OUTPUT_DISCONNECTED,
 
 		B_PREPARE_TO_CONNECT,	// media_format* format, media_source* source,
 								// char* name
@@ -147,8 +111,6 @@ public:
 										BMediaConnection* connection,
 										...);
 
-									BSimpleMediaOutput();
-
 			// Use this to set your callbacks.
 			void					SetHooks(process_hook processHook = NULL,
 										notify_hook notifyHook = NULL,
@@ -157,15 +119,36 @@ public:
 			void*					Cookie() const;
 
 protected:
+									BSimpleMediaConnection(
+										media_connection_kinds kinds);
+
+			process_hook			fProcessHook;
+			notify_hook				fNotifyHook;
+			void*					fBufferCookie;
+};
+
+
+class BSimpleMediaInput : public BSimpleMediaConnection, public BMediaInput {
+public:
+									BSimpleMediaInput();
+
+protected:
+	virtual void					Connected(const media_format& format);
+	virtual void					Disconnected();
+
+	virtual void					BufferReceived(BBuffer* buffer);
+};
+
+
+class BSimpleMediaOutput : public BSimpleMediaConnection, public BMediaOutput {
+public:
+									BSimpleMediaOutput();
+
+protected:
 	virtual void					Connected(const media_format& format);
 	virtual void					Disconnected();
 
 	virtual status_t				FormatProposal(media_format* format);
-
-private:
-			process_hook			fProcessHook;
-			notify_hook				fNotifyHook;
-			void*					fBufferCookie;
 };
 
 
