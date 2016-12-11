@@ -22,6 +22,8 @@ public:
 							~SoftwareUpdaterWindow();
 			bool			QuitRequested();
 
+			void			MessageReceived(BMessage* message);
+
 private:
 			StripeView*		fStripeView;
 			app_info*		fAppInfo;

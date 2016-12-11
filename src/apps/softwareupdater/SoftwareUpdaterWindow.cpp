@@ -28,8 +28,8 @@
 #define B_TRANSLATION_CONTEXT "SoftwareUpdater"
 
 
-const uint32 UPDATE_MESSAGE = 'iUPD';
-const uint32 EXIT_MESSAGE = 'iEXT';
+const uint32 kMsgUpdate = 'iUPD';
+const uint32 kMsgExit = 'iEXT';
 
 
 SoftwareUpdaterWindow::SoftwareUpdaterWindow()
@@ -50,10 +50,10 @@ SoftwareUpdaterWindow::SoftwareUpdaterWindow()
 	fStripeView = new StripeView(icon);
 
 	BButton* updateButton = new BButton("Update now",
-		new BMessage(UPDATE_MESSAGE));
+		new BMessage(kMsgUpdate));
 
 	BButton* exitButton = new BButton("Cancel",
-		new BMessage(EXIT_MESSAGE));
+		new BMessage(kMsgExit));
 
 	// Form text based on updates available
 	BStringView* headerView;
@@ -117,4 +117,19 @@ SoftwareUpdaterWindow::QuitRequested()
 {
 	be_app->PostMessage(B_QUIT_REQUESTED);
 	return true;
+}
+
+
+void
+SoftwareUpdaterWindow::MessageReceived(BMessage* message)
+{
+	switch (message->what) {
+		case kMsgExit:
+			QuitRequested();
+			break;
+		case kMsgUpdate:
+			break;
+		default:
+			BWindow::MessageReceived(message);
+	}
 }
