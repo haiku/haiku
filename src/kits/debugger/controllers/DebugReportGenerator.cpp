@@ -701,9 +701,17 @@ DebugReportGenerator::_DumpFunctionDisassembly(BFile& _output,
 		}
 
 		codeReference.SetTo(code, true);
-		statement = code->StatementAtAddress(instructionPointer);
 	} else
 		codeReference.SetTo(code);
+
+	statement = code->StatementAtAddress(instructionPointer);
+	if (statement == NULL) {
+		data.SetToFormat("\t\t\tUnable to retrieve disassembly for IP %#"
+			B_PRIx64 ": address does not map to a valid instruction.\n",
+			instructionPointer);
+		WRITE_AND_CHECK(_output, data);
+		return B_OK;
+	}
 
 	SourceLocation location = statement->StartSourceLocation();
 
