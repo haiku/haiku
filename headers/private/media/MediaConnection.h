@@ -119,7 +119,7 @@ private:
 };
 
 
-class BMediaInput : public BMediaConnection {
+class BMediaInput : public virtual BMediaConnection {
 public:
 									BMediaInput();
 
@@ -149,7 +149,7 @@ private:
 };
 
 
-class BMediaOutput : public BMediaConnection {
+class BMediaOutput : public virtual BMediaConnection {
 public:
 									BMediaOutput();
 

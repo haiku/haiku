@@ -147,9 +147,9 @@ BMediaClient::Connect(BMediaConnection* ourConnection,
 	CALLED();
 
 	if (ourConnection->IsOutput() && theirConnection.IsInput())
-		return _ConnectInput((BMediaOutput*)ourConnection, theirConnection);
+		return _ConnectInput(dynamic_cast<BMediaOutput*>(ourConnection), theirConnection);
 	else if (ourConnection->IsInput() && theirConnection.IsOutput())
-		return _ConnectOutput((BMediaInput*)ourConnection, theirConnection);
+		return _ConnectOutput(dynamic_cast<BMediaInput*>(ourConnection), theirConnection);
 
 	return B_ERROR;
 }
