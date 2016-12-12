@@ -331,9 +331,6 @@ BMediaBufferEncoder::WriteChunk(const void* chunkData,
 	if (fBuffer == NULL)
 		return B_ENTRY_NOT_FOUND;
 
-	if (chunkLen < 0)
-		return B_ERROR;
-
 	if (chunkLen > (size_t)fBufferSize) {
 		memcpy(fBuffer, chunkData, fBufferSize);
 		fBuffer = NULL;
