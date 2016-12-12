@@ -9,11 +9,13 @@
 #define _SOFTWARE_UPDATER_WINDOW_H
 
 
+#include <Button.h>
 #include <Roster.h>
-#include <StatusBar.h>
+#include <StringView.h>
 #include <Window.h>
 
 #include "StripeView.h"
+#include "UpdateManager.h"
 
 
 class SoftwareUpdaterWindow : public BWindow {
@@ -25,8 +27,17 @@ public:
 			void			MessageReceived(BMessage* message);
 
 private:
+			void			_Error(const char* error);
+			void			_Refresh();
+
+			UpdateManager*	fUpdateManager;
 			StripeView*		fStripeView;
 			app_info*		fAppInfo;
+
+			BStringView*	fHeaderView;
+			BStringView*	fDetailView;
+			BButton*		fUpdateButton;
+			BButton*		fCancelButton;
 };
 
 
