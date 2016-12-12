@@ -903,7 +903,7 @@ ThreadTimeUserTimer::Schedule(bigtime_t nextTime, bigtime_t interval,
 	uint32 flags, bigtime_t& _oldRemainingTime, bigtime_t& _oldInterval)
 {
 	InterruptsWriteSequentialLocker locker(sUserTimerLock);
-	SpinLocker timeLocker(fThread->time_lock);
+	SpinLocker timeLocker(fThread != NULL ? &fThread->time_lock : NULL);
 
 	// get the current time, but only if needed
 	bool nowValid = fThread != NULL;
