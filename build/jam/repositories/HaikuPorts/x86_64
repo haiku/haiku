@@ -518,8 +518,8 @@ RemotePackageRepository HaikuPorts
 	libffi_devel-3.2.1-3
 	libfilezilla-0.6.1-2
 	libfilezilla_devel-0.6.1-2
-	libgcrypt-1.7.3-1
-	libgcrypt_devel-1.7.3-1
+	libgcrypt-1.7.4-1
+	libgcrypt_devel-1.7.4-1
 	libgeotiff-1.4.0-2
 	libgeotiff_devel-1.4.0-2
 	libgpg_error-1.25-1
@@ -870,6 +870,8 @@ RemotePackageRepository HaikuPorts
 	readline-7.0-1
 	readline_devel-7.0-1
 	rsync-3.1.2-1
+	rtmpdump-2.4_20161210-1
+	rtmpdump_devel-2.4_20161210-1
 	rubberband-1.8.1-2
 	rubberband_devel-1.8.1-2
 	ruby-2.2.2-5
@@ -990,7 +992,7 @@ RemotePackageRepository HaikuPorts
 	wget-1.18-2
 	whereismymouse-1.0-1
 	which-2.21-3
-	wpa_supplicant-2.0-4
+	wpa_supplicant-2.0-5
 	x264-20160712-2
 	x264_devel-20160712-2
 	x265-2.0-1
@@ -1506,6 +1508,7 @@ RemotePackageRepository HaikuPorts
 	readline
 	redoflacs
 	rsync
+	rtmpdump
 	rubberband
 	ruby
 	sane_backends
