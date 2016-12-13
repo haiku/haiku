@@ -36,6 +36,8 @@ All rights reserved.
 
 #include "TimeView.h"
 
+#include <algorithm>
+
 #include <string.h>
 
 #include <Application.h>
@@ -179,8 +181,9 @@ TTimeView::GetPreferredSize(float* width, float* height)
 	// TODO: SetOrientation never gets called, fix that when in vertical mode,
 	// we want to limit the width so that it can't overlap the bevels in the
 	// parent view.
-	*width = fOrientation ?
-		min_c(fMaxWidth - kHMargin, kHMargin + StringWidth(fCurrentTimeStr))
+	*width = fOrientation
+		? std::min(fMaxWidth - kHMargin,
+			kHMargin + StringWidth(fCurrentTimeStr))
 		: kHMargin + StringWidth(fCurrentTimeStr);
 }
 

@@ -625,7 +625,7 @@ status_t
 TReplicantTray::LoadAddOn(BEntry* entry, int32* id, bool addToSettings)
 {
 	if (entry == NULL)
-		return B_ERROR;
+		return B_BAD_VALUE;
 
 	node_ref nodeRef;
 	entry->GetNodeRef(&nodeRef);
@@ -820,7 +820,7 @@ status_t
 TReplicantTray::ItemInfo(int32 id, const char** name)
 {
 	if (id < 0)
-		return B_ERROR;
+		return B_BAD_VALUE;
 
 	int32 index;
 	int32 temp;
@@ -842,7 +842,7 @@ status_t
 TReplicantTray::ItemInfo(const char* name, int32* id)
 {
 	if (name == NULL || *name == '\0')
-		return B_ERROR;
+		return B_BAD_VALUE;
 
 	int32 index;
 	BView* view = ViewAt(&index, id, name);
@@ -861,7 +861,7 @@ status_t
 TReplicantTray::ItemInfo(int32 index, const char** name, int32* id)
 {
 	if (index < 0)
-		return B_ERROR;
+		return B_BAD_VALUE;
 
 	BView* view;
 	fShelf->ReplicantAt(index, &view, (uint32*)id, NULL);
@@ -919,7 +919,7 @@ status_t
 TReplicantTray::AddIcon(BMessage* archive, int32* id, const entry_ref* addOn)
 {
 	if (archive == NULL || id == NULL)
-		return B_ERROR;
+		return B_BAD_VALUE;
 
 	// find entry_ref
 
@@ -974,7 +974,7 @@ TReplicantTray::AddIcon(BMessage* archive, int32* id, const entry_ref* addOn)
 	BView* view;
 	fShelf->ReplicantAt(count - 1, &view, (uint32*)id, NULL);
 
-	if (originalBounds != view->Bounds()) {
+	if (view != NULL && originalBounds != view->Bounds()) {
 		// The replicant changed its size when added to the window, so we need
 		// to recompute all over again (it's already done once via
 		// BShelf::AddReplicant() and TReplicantShelf::CanAcceptReplicantView())
