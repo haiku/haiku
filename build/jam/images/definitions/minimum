@@ -87,7 +87,7 @@ rule HaikuImageGetSystemLibs
 		# libs with standard grist
 		[ MultiArchDefaultGristFiles [ FFilterByBuildFeatures
 			libbe.so libbsd.so libbnetapi.so
-			libdebug.so 
+			libdebug.so
 			libdebugger.so@primary
 			libdevice.so
 			libgnu.so
@@ -144,7 +144,7 @@ SYSTEM_NETWORK_PROTOCOLS =
 
 SYSTEM_ADD_ONS_ACCELERANTS = [ FFilterByBuildFeatures
 	x86,x86_64 @{
-		vesa.accelerant
+		framebuffer.accelerant vesa.accelerant
 	}@ # x86,x86_64
 ] ;
 
@@ -172,7 +172,7 @@ SYSTEM_ADD_ONS_DRIVERS_AUDIO_OLD = ;
 
 SYSTEM_ADD_ONS_DRIVERS_GRAPHICS = [ FFilterByBuildFeatures
 	x86,x86_64 @{
-		vesa
+		framebuffer vesa
 	}@ # x86,x86_64
 ] ;
 

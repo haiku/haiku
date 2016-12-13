@@ -20,6 +20,13 @@ static UINTN sGraphicsMode;
 extern "C" status_t
 platform_init_video(void)
 {
+	// we don't support VESA modes or EDID
+	gKernelArgs.vesa_modes = NULL;
+	gKernelArgs.vesa_modes_size = 0;
+	gKernelArgs.edid_info = NULL;
+
+	// make a guess at the best video mode to use, and save the mode ID
+	// for switching to graphics mode
 	EFI_STATUS status = kBootServices->LocateProtocol(&sGraphicsOutputGuid,
 		NULL, (void **)&sGraphicsOutput);
 	if (sGraphicsOutput == NULL || status != EFI_SUCCESS) {
