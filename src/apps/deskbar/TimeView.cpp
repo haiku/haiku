@@ -52,7 +52,7 @@ All rights reserved.
 #include "CalendarMenuWindow.h"
 
 
-static const char*  const kMinString = "99:99 AM";
+static const char* const kMinString = "99:99 AM";
 static const float kHMargin = 2.0;
 
 
@@ -282,8 +282,10 @@ TTimeView::Pulse()
 void
 TTimeView::ResizeToPreferred()
 {
-	float width, height;
-	float oldWidth = Bounds().Width(), oldHeight = Bounds().Height();
+	float width;
+	float height;
+	float oldWidth = Bounds().Width();
+	float oldHeight = Bounds().Height();
 
 	GetPreferredSize(&width, &height);
 	if (height != oldHeight || width != oldWidth) {

@@ -199,9 +199,9 @@ public:
 	virtual void GetPreferredSize(float*, float*);
 	virtual void Draw(BRect);
 	virtual void FrameMoved(BPoint);
-	virtual void MouseDown(BPoint );
-	virtual void MouseUp(BPoint );
-	virtual void MouseMoved(BPoint , uint32 , const BMessage*);
+	virtual void MouseDown(BPoint);
+	virtual void MouseUp(BPoint);
+	virtual void MouseMoved(BPoint, uint32, const BMessage*);
 
 	void DrawDragRegion();
 	BRect DragRegion() const;
