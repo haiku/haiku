@@ -200,6 +200,9 @@ mmu_post_efi_setup(UINTN memory_map_size, EFI_MEMORY_DESCRIPTOR *memory_map, UIN
 	// Something involving ConvertPointer might need to be done after this?
 	// http://wiki.phoenix.com/wiki/index.php/EFI_RUNTIME_SERVICES#SetVirtualAddressMap.28.29
 	kRuntimeServices->SetVirtualAddressMap(memory_map_size, descriptor_size, descriptor_version, memory_map);
+
+	// Important.  Make sure supervisor threads can fault on read only pages...
+	asm("mov %%rax, %%cr0" : : "a" ((1 << 31) | (1 << 16) | (1 << 5) | 1));
 }
 
 
