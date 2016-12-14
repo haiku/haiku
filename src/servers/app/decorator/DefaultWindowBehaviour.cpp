@@ -232,7 +232,7 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
 	{
-		if (!(fWindow->Flags() & B_NOT_MOVABLE)) {
+		if ((fWindow->Flags() & B_NOT_MOVABLE) == 0) {
 			BPoint oldLeftTop = fWindow->Frame().LeftTop();
 
 			fBehavior.AlterDeltaForSnap(fWindow, delta, now);
@@ -241,7 +241,7 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 			// constrain delta to true change in position
 			delta = fWindow->Frame().LeftTop() - oldLeftTop;
 		} else
-			delta = BPoint(0, 0);
+			delta = BPoint(0.0f, 0.0f);
 	}
 };
 
@@ -259,11 +259,11 @@ struct DefaultWindowBehaviour::ResizeState : MouseTrackingState {
 
 	virtual void MouseMovedAction(BPoint& delta, bigtime_t now)
 	{
-		if (!(fWindow->Flags() & B_NOT_RESIZABLE)) {
-			if (fWindow->Flags() & B_NOT_V_RESIZABLE)
-				delta.y = 0;
-			if (fWindow->Flags() & B_NOT_H_RESIZABLE)
-				delta.x = 0;
+		if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0) {
+			if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
+				delta.y = 0.0f;
+			if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
+				delta.x = 0.0f;
 
 			BPoint oldRightBottom = fWindow->Frame().RightBottom();
 
@@ -272,7 +272,7 @@ struct DefaultWindowBehaviour::ResizeState : MouseTrackingState {
 			// constrain delta to true change in size
 			delta = fWindow->Frame().RightBottom() - oldRightBottom;
 		} else
-			delta = BPoint(0, 0);
+			delta = BPoint(0.0f, 0.0f);
 	}
 };
 
@@ -300,9 +300,9 @@ struct DefaultWindowBehaviour::SlideTabState : MouseTrackingState {
 		location += delta.x;
 		AdjustMultiTabLocation(location, true);
 		if (fDesktop->SetWindowTabLocation(fWindow, location, true))
-			delta.y = 0;
+			delta.y = 0.0f;
 		else
-			delta = BPoint(0, 0);
+			delta = BPoint(0.0f, 0.0f);
 	}
 
 	void AdjustMultiTabLocation(float location, bool isShifting)
@@ -328,13 +328,17 @@ struct DefaultWindowBehaviour::SlideTabState : MouseTrackingState {
 			return;
 
 		if (movingTab->tabOffset > location) {
-			if (location >
-				neighbourTab->tabOffset + neighbourTab->tabRect.Width() / 2)
+			if (location
+					> neighbourTab->tabOffset + neighbourTab->tabRect.Width()
+					/ 2) {
 				return;
+			}
 		} else {
-			if (location + movingTab->tabRect.Width() <
-				neighbourTab->tabOffset + neighbourTab->tabRect.Width() / 2)
+			if (location + movingTab->tabRect.Width()
+					< neighbourTab->tabOffset + neighbourTab->tabRect.Width()
+					/ 2) {
 				return;
+			}
 		}
 		
 		fWindow->MoveToStackPosition(neighbourIndex, isShifting);
@@ -915,7 +919,7 @@ DefaultWindowBehaviour::MouseMoved(BMessage* message, BPoint where, bool isFake)
 	// change focus in FFM mode
 	DesktopSettings desktopSettings(fDesktop);
 	if (desktopSettings.FocusFollowsMouse()
-		&& !fWindow->IsFocus() && !(fWindow->Flags() & B_AVOID_FOCUS)) {
+		&& !fWindow->IsFocus() && (fWindow->Flags() & B_AVOID_FOCUS) == 0) {
 		// If the mouse move is a fake one, we set the focus to NULL, which
 		// will cause the window that had focus last to retrieve it again - this
 		// makes FFM much nicer to use with the keyboard.
