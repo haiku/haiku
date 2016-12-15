@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.11.21
-#	Date:    2016-11-21 03:15:01
+#	Version: 2016.12.15
+#	Date:    2016-12-15 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -546,6 +546,7 @@
 		1028 1f53  HBA330 Mini
 		1028 1fd2  HBA330 MX
 		1028 1fd3  HBA330 MMZ
+		1bd4 0011  Inspur 12Gb 8i-3008 IT SAS HBA
 	00ab  SAS3516 Fusion-MPT Tri-Mode RAID On Chip (ROC)
 	00ac  SAS3416 Fusion-MPT Tri-Mode I/O Controller Chip (IOC)
 		1d49 0201  ThinkSystem 430-16i SAS/SATA 12Gb HBA
@@ -2199,6 +2200,8 @@
 	67b9  Vesuvius [Radeon R9 295X2]
 	67be  Hawaii LE
 	67c0  Ellesmere [Polaris10]
+	67c4  Ellesmere [Radeon Pro WX 7100]
+	67c7  Ellesmere [Radeon Pro WX 5100]
 	67df  Ellesmere [Radeon RX 470/480]
 		1002 0b37  Radeon RX 480
 		1043 04a8  Radeon RX 480
@@ -2216,6 +2219,7 @@
 		1787 a480  Radeon RX 480
 	67e0  Baffin [Polaris11]
 	67e1  Baffin [Polaris11]
+	67e3  Baffin [Radeon Pro WX 4100]
 	67e8  Baffin [Polaris11]
 	67e9  Baffin [Polaris11]
 	67eb  Baffin [Polaris11]
@@ -10618,7 +10622,7 @@
 	13f1  GM204GL [Quadro M4000]
 	13f2  GM204GL [Tesla M60]
 	13f3  GM204GL [Tesla M6]
-	13f8  GM204GLM [Quadro M5000M]
+	13f8  GM204GLM [Quadro M5000M / M5000 SE]
 	13f9  GM204GLM [Quadro M4000M]
 	13fa  GM204GLM [Quadro M3000M]
 		10de 11c9  Quadro M3000 SE
@@ -10632,8 +10636,9 @@
 	1431  GM206GL [Tesla M4]
 	15f0  GP100GL
 	15f1  GP100GL
-	15f8  GP100GL
-	15f9  GP100GL
+	15f7  GP100GL [Tesla P100 PCIe 12GB]
+	15f8  GP100GL [Tesla P100 PCIe 16GB]
+	15f9  GP100GL [Tesla P100 SMX2 16GB]
 	1617  GM204M [GeForce GTX 980M]
 	1618  GM204M [GeForce GTX 970M]
 	1619  GM204M [GeForce GTX 965M]
@@ -10657,10 +10662,12 @@
 	1b81  GP104 [GeForce GTX 1070]
 	1b82  GP104
 	1b83  GP104
+	1b84  GP104 [GeForce GTX 1060 3GB]
 	1ba0  GP104M [GeForce GTX 1080]
 	1ba1  GP104M [GeForce GTX 1070]
 	1bb0  GP104GL [Quadro P5000]
 	1bb1  GP104GL
+	1bb3  GP104GL [Tesla P4]
 	1bb4  GP104GL
 	1be0  GP104M [GeForce GTX 1080]
 	1be1  GP104M [GeForce GTX 1070]
@@ -15992,6 +15999,7 @@
 	509a  T520-509A Unified Wire Ethernet Controller
 	509b  T540-509B Unified Wire Ethernet Controller
 	509c  T520-509C Unified Wire Ethernet Controller
+	509d  T540-509D Unified Wire Ethernet Controller
 	5401  T520-CR Unified Wire Ethernet Controller
 	5402  T522-CR Unified Wire Ethernet Controller
 	5403  T540-CR Unified Wire Ethernet Controller
@@ -16039,6 +16047,7 @@
 	549a  T520-509A Unified Wire Ethernet Controller
 	549b  T540-509B Unified Wire Ethernet Controller
 	549c  T520-509C Unified Wire Ethernet Controller
+	549d  T540-509D Unified Wire Ethernet Controller
 	5501  T520-CR Unified Wire Storage Controller
 	5502  T522-CR Unified Wire Storage Controller
 	5503  T540-CR Unified Wire Storage Controller
@@ -16086,6 +16095,7 @@
 	559a  T520-509A Unified Wire Storage Controller
 	559b  T540-509B Unified Wire Storage Controller
 	559c  T520-509C Unified Wire Storage Controller
+	559d  T540-509D Unified Wire Storage Controller
 	5601  T520-CR Unified Wire Storage Controller
 	5602  T522-CR Unified Wire Storage Controller
 	5603  T540-CR Unified Wire Storage Controller
@@ -16133,6 +16143,7 @@
 	569a  T520-509A Unified Wire Storage Controller
 	569b  T540-509B Unified Wire Storage Controller
 	569c  T520-509C Unified Wire Storage Controller
+	569d  T540-509D Unified Wire Storage Controller
 	5701  T520-CR Unified Wire Ethernet Controller
 	5702  T522-CR Unified Wire Ethernet Controller
 	5703  T540-CR Unified Wire Ethernet Controller
@@ -16219,6 +16230,7 @@
 	589a  T520-509A Unified Wire Ethernet Controller [VF]
 	589b  T540-509B Unified Wire Ethernet Controller [VF]
 	589c  T520-509C Unified Wire Ethernet Controller [VF]
+	589d  T540-509D Unified Wire Ethernet Controller [VF]
 	6001  T6225-CR Unified Wire Ethernet Controller
 	6002  T6225-SO-CR Unified Wire Ethernet Controller
 	6003  T6425-CR Unified Wire Ethernet Controller
@@ -16355,7 +16367,8 @@
 144d  Samsung Electronics Co Ltd
 	1600  Apple PCIe SSD
 	a800  XP941 PCIe SSD
-	a802  NVMe SSD Controller
+	a802  NVMe SSD Controller SM951/PM951
+	a804  NVMe SSD Controller SM961/PM961
 	a820  NVMe SSD Controller 171X
 		1028 1f95  Express Flash NVMe XS1715 SSD 400GB
 		1028 1f96  Express Flash NVMe XS1715 SSD 800GB
@@ -17971,6 +17984,7 @@
 	020b  MT27710 Family [ConnectX-4 Lx Flash Recovery]
 	020d  MT28800 Family [ConnectX-5 Flash Recovery]
 	020f  MT28908A0 Family [ConnectX-6 Flash Recovery]
+	0211  MT416842 Family [BlueField SoC Flash Recovery]
 # reserved for RM#105916
 	024e  MT53100 [Spectrum-2, Flash recovery mode]
 # Actual value to be used
@@ -18730,6 +18744,7 @@
 	7013  AP440-3: 32-Channel Isolated Digital Input Module
 	7014  AP445: 32-Channel Isolated Digital Output Module
 	7016  AP470 48-Channel TTL Level Digital Input/Output Module
+	7017  AP323 16-bit, 20 or 40 Channel Analog Input Module
 	7018  AP408: 32-Channel Digital I/O Module
 	701a  AP220-16 12-Bit, 16-Channel Analog Output Module
 	701b  AP231-16 16-Bit, 16-Channel Analog Output Module
@@ -19576,6 +19591,7 @@
 	1813  SFL9021 Virtual Function [Solarstorm]
 	1903  SFC9120 Virtual Function
 	1923  SFC9140 Virtual Function
+	1a03  SFC9220 Virtual Function
 	6703  SFC4000 rev A iSCSI/Onload [Solarstorm]
 		10b8 0102  SMC10GPCIe-10BT (A2) [TigerCard]
 		10b8 0103  SMC10GPCIe-10BT (A3) [TigerCard]
@@ -20308,6 +20324,7 @@
 	0003  ExaNIC X10
 	0004  ExaNIC X10-GM
 	0005  ExaNIC X40
+	0006  ExaNIC X10-HPT
 1cf7  Subspace Dynamics
 1d00  Pure Storage
 1d1d  CNEX Labs
@@ -22915,8 +22932,8 @@
 		103c 0000  HPE Ethernet 10/20Gb 2-port 660FLB Adapter
 		103c 22fe  HPE Ethernet 10/20Gb 2-port 660FLB Adapter
 	1588  Ethernet Controller XL710 for 20GbE backplane
-		103c 0000  HPE Ethernet 10/20Gb 2-port 660M Adapter
-		103c 22ff  HPE Ethernet 10/20Gb 2-port 660M Adapter
+		103c 0000  Ethernet 10/20Gb 2-port 660M Adapter
+		103c 22ff  Ethernet 10/20Gb 2-port 660M Adapter
 	1589  Ethernet Controller X710/X557-AT 10GBASE-T
 		108e 0000  Quad Port 10GBase-T Adapter
 		108e 7b1c  Quad Port 10GBase-T Adapter
@@ -22949,6 +22966,7 @@
 	15ac  Ethernet Connection X552 10 GbE SFP+
 	15ad  Ethernet Connection X552/X557-AT 10GBASE-T
 	15ae  Ethernet Connection X552 1000BASE-T
+	15b0  Ethernet Connection X552 Backplane
 	15b4  X553 Virtual Function
 	15b5  DSL6340 USB 3.1 Controller [Alpine Ridge]
 	15b6  DSL6540 USB 3.1 Controller [Alpine Ridge]
@@ -24256,6 +24274,9 @@
 	24f4  Wireless 8260
 # Snow Field Peak AC
 		8086 0030  Dual Band Wireless-AC 8260
+	24fd  Wireless 8265 / 8275
+# Windstorm Peak
+		8086 0010  Dual Band Wireless-AC 8265
 	2500  82820 820 (Camino) Chipset Host Bridge (MCH)
 		1028 0095  Precision Workstation 220 Chipset
 		1043 801c  P3C-2000 system chipset
@@ -28603,6 +28624,7 @@ f1d0  AJA Video
 	cafe  Kona SD
 	cfee  Xena LS/SD-22-DA/SD-DA
 	daff  KONA LHi
+	db09  Corvid 24
 	dcaf  Kona HD
 	dfee  Xena HD-DA
 	efac  Xena SD-MM/SD-22-MM
