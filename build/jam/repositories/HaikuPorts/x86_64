@@ -855,7 +855,7 @@ RemotePackageRepository HaikuPorts
 	qt5-5.5.1-4
 	qt5_devel-5.5.1-4
 #	qt5_docs-5.5.1-4
-	quicklaunch-0.9.12-1
+	quicklaunch-0.9.12-2
 	qupzilla-1.8.7-1
 	qutim-0.3.3-1
 	raptor-2.0.15-1
