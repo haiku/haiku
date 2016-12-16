@@ -25,6 +25,7 @@
 #include "hpet.h"
 #include "cpu.h"
 #include "mmu.h"
+#include "serial.h"
 #include "smp.h"
 
 
@@ -223,6 +224,12 @@ platform_start_kernel(void)
 	dprintf("Calling ExitBootServices. So long, EFI!\n");
 	while (true) {
 		if (kBootServices->ExitBootServices(kImage, map_key) == EFI_SUCCESS) {
+			// The console was provided by boot services, disable it.
+			stdout = NULL;
+			stderr = NULL;
+			// Also switch to legacy serial output (may not work on all systems)
+			serial_switch_to_legacy();
+			dprintf("Switched to legacy serial output\n");
 			break;
 		}
 
@@ -231,10 +238,6 @@ platform_start_kernel(void)
 			panic("Unable to fetch system memory map.");
 		}
 	}
-	// We're on our own now...
-
-	// The console was provided by boot services, disable it.
-	stdout = NULL;
 
 	// Update EFI, generate final kernel physical memory map, etc.
 	mmu_post_efi_setup(memory_map_size, memory_map, descriptor_size, descriptor_version);
@@ -279,6 +282,8 @@ efi_main(EFI_HANDLE image, EFI_SYSTEM_TABLE *systemTable)
 	call_ctors();
 
 	console_init();
+	serial_init();
+	serial_enable();
 
 	sBootOptions = console_check_boot_keys();
 

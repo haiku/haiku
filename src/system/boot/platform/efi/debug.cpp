@@ -11,11 +11,29 @@
 #include <boot/stdio.h>
 
 #include "efi_platform.h"
+#include "serial.h"
+
+
+static void
+dprintf_args(const char *format, va_list args)
+{
+	char buffer[512];
+	int length = vsnprintf(buffer, sizeof(buffer), format, args);
+	if (length == 0)
+		return;
+
+	serial_puts(buffer, length);
+}
 
 
 extern "C" void
 dprintf(const char *format, ...)
 {
+	va_list args;
+
+	va_start(args, format);
+	dprintf_args(format, args);
+	va_end(args);
 }
 
 

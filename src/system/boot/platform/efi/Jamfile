@@ -33,6 +33,7 @@ local platform_src =
 	hpet.cpp
 	cpu.cpp
 	smp.cpp
+	serial.cpp
 	smp_trampoline.S
 	support.S
 	;
