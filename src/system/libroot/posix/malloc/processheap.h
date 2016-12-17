@@ -67,6 +67,9 @@ class processHeap : public hoardHeap {
 		// Get a thread heap index.
 		inline int getHeapIndex(void);
 
+		// Get thread heap max.
+		inline int getMaxThreadHeaps(void);
+
 		// Get the thread heap with index i.
 		inline HEAPTYPE & getHeap(int i);
 
@@ -196,6 +199,15 @@ processHeap::getHeapIndex(void)
 	int tid = find_thread(NULL) & _numProcessorsMask;
 	assert(tid < fMaxThreadHeaps);
 	return tid;
+}
+
+
+// Return the maximum number of heaps.
+
+int
+processHeap::getMaxThreadHeaps(void)
+{
+	return fMaxThreadHeaps;
 }
 
 

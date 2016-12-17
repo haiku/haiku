@@ -36,6 +36,9 @@ void __init_env(const struct user_space_program_args *args);
 void __init_env_post_heap(void);
 status_t __init_heap(void);
 void __heap_terminate_after(void);
+void __heap_before_fork(void);
+void __heap_after_fork_child(void);
+void __heap_after_fork_parent(void);
 
 void __init_time(addr_t commPageTable);
 void __arch_init_time(struct real_time_data *data, bool setDefaults);

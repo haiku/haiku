@@ -115,6 +115,9 @@ class hoardHeap {
 		// Unlock this heap.
 		inline void unlock(void);
 
+		// Init this heap lock.
+		inline void initLock(void);
+
 		// Set our index number (which heap we are).
 		inline void setIndex(int i);
 
@@ -441,6 +444,14 @@ hoardHeap::unlock(void)
 {
 	assert(_magic == HEAP_MAGIC);
 	hoardUnlock(_lock);
+}
+
+
+void
+hoardHeap::initLock(void)
+{
+	// Initialize the per-heap lock.
+	hoardLockInit(_lock, "hoard heap");
 }
 
 

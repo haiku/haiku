@@ -132,8 +132,7 @@ hoardHeap::hoardHeap(void)
 	, _magic(HEAP_MAGIC)
 #endif
 {
-	// Initialize the per-heap lock.
-	hoardLockInit(_lock, "hoard heap");
+	initLock();
 
 	for (int i = 0; i < SUPERBLOCK_FULLNESS_GROUP; i++) {
 		for (int j = 0; j < SIZE_CLASSES; j++) {

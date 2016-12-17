@@ -67,8 +67,8 @@ static size_t sFreeHeapSize, sHeapAreaSize;
 static free_chunk *sFreeChunks;
 
 
-static void
-init_after_fork(void)
+void
+__init_after_fork(void)
 {
 	// find the heap area
 	sHeapArea = area_for((void*)sFreeHeapBase);
@@ -109,13 +109,6 @@ __init_heap(void)
 	sHeapAreaSize = kInitialHeapSize;
 
 	hoardLockInit(sHeapLock, "heap");
-
-	atfork(&init_after_fork);
-		// Note: Needs malloc(). Hence we need to be fully initialized.
-		// TODO: We should actually also install a hook that is called before
-		// fork() is being executed. In a multithreaded app it would need to
-		// acquire *all* allocator locks, so that we don't fork() an
-		// inconsistent state.
 
 	return B_OK;
 }

@@ -16,6 +16,7 @@
 #include <pthread_private.h>
 #include <runtime_loader.h>
 #include <syscalls.h>
+#include <user_thread.h>
 
 
 typedef struct fork_hook {
@@ -105,9 +106,13 @@ call_fork_hooks(fork_hook *hook)
 status_t
 __register_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
 {
+	defer_signals();
+
 	status_t status = mutex_lock(&sForkLock);
-	if (status != B_OK)
+	if (status != B_OK) {
+		undefer_signals();
 		return status;
+	}
 
 	if (prepare)
 		status = add_fork_hook(&sPrepareHooks, NULL, prepare);
@@ -119,6 +124,9 @@ __register_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(voi
 		status = add_fork_hook(&sChildHooks, &sLastChildHook, child);
 
 	mutex_unlock(&sForkLock);
+
+	undefer_signals();
+
 	return status;
 }
 
@@ -129,21 +137,19 @@ fork(void)
 	thread_id thread;
 	status_t status;
 
+	defer_signals();
+
 	status = mutex_lock(&sForkLock);
-	if (status != B_OK)
+	if (status != B_OK) {
+		undefer_signals();
 		return status;
+	}
 
 	// call preparation hooks
 	call_fork_hooks(sPrepareHooks);
+	__heap_before_fork();
 
 	thread = _kern_fork();
-	if (thread < 0) {
-		// something went wrong
-		mutex_unlock(&sForkLock);
-		__set_errno(thread);
-		return -1;
-	}
-
 	if (thread == 0) {
 		// we are the child
 		// ToDo: initialize child
@@ -155,13 +161,23 @@ fork(void)
 			// process we should make sure that it is in a consistent state when
 			// calling the kernel.
 		__gRuntimeLoader->reinit_after_fork();
+		__heap_after_fork_child();
 		__reinit_pwd_backend_after_fork();
 
 		call_fork_hooks(sChildHooks);
 	} else {
 		// we are the parent
+		__heap_after_fork_parent();
 		call_fork_hooks(sParentHooks);
 		mutex_unlock(&sForkLock);
+	}
+
+	undefer_signals();
+
+	if (thread < 0) {
+		// something went wrong
+		__set_errno(thread);
+		thread = -1;
 	}
 
 	return thread;

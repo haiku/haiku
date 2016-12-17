@@ -256,6 +256,35 @@ getAllocator(void)
 }
 
 
+extern "C" void
+__heap_before_fork(void)
+{
+	static processHeap *pHeap = getAllocator();
+	for (int i = 0; i < pHeap->getMaxThreadHeaps(); i++)
+		pHeap->getHeap(i).lock();
+}
+
+void __init_after_fork(void);
+
+extern "C" void
+__heap_after_fork_child(void)
+{
+	__init_after_fork();
+	static processHeap *pHeap = getAllocator();
+	for (int i = 0; i < pHeap->getMaxThreadHeaps(); i++)
+		pHeap->getHeap(i).initLock();
+}
+
+
+extern "C" void
+__heap_after_fork_parent(void)
+{
+	static processHeap *pHeap = getAllocator();
+	for (int i = 0; i < pHeap->getMaxThreadHeaps(); i++)
+		pHeap->getHeap(i).unlock();
+}
+
+
 //	#pragma mark - public functions
 
 

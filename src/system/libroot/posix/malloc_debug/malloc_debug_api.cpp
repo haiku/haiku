@@ -202,6 +202,24 @@ __heap_terminate_after()
 }
 
 
+extern "C" void
+__heap_before_fork(void)
+{
+}
+
+
+extern "C" void
+__heap_after_fork_child(void)
+{
+}
+
+
+extern "C" void
+__heap_after_fork_parent(void)
+{
+}
+
+
 // #pragma mark - Public API
 
 
