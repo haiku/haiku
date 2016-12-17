@@ -44,12 +44,12 @@ TestServerLoopAdapter::~TestServerLoopAdapter()
 }
 
 
-bool
+status_t
 TestServerLoopAdapter::Run()
 {
  	rename_thread(find_thread(NULL), "picasso");
 	_message_thread((void*)this);
-	return true;
+	return B_OK;
 }
 
 

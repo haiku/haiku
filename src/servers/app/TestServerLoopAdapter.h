@@ -26,7 +26,7 @@ public:
 
 	// MessageLooper interface
 	virtual	port_id				MessagePort() const { return fMessagePort; }
-	virtual	bool				Run();
+	virtual	status_t			Run();
 
 	// BApplication interface
 	virtual	void				MessageReceived(BMessage* message) = 0;
