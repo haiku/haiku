@@ -35,9 +35,6 @@ public:
 	media_connection_id				Id() const;
 	const char*						Name() const;
 
-	bool							IsInput() const;
-	bool 							IsOutput() const;
-
 	bool							HasBinding() const;
 	BMediaConnection*				Binding() const;
 

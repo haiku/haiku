@@ -37,24 +37,6 @@ BMediaConnection::Connection() const
 
 
 bool
-BMediaConnection::IsOutput() const
-{
-	CALLED();
-
-	return fConnection.IsOutput();
-}
-
-
-bool
-BMediaConnection::IsInput() const
-{
-	CALLED();
-
-	return fConnection.IsInput();
-}
-
-
-bool
 BMediaConnection::HasBinding() const
 {
 	CALLED();
@@ -162,7 +144,7 @@ BMediaConnection::ConnectionRegistered(BMediaClient* owner,
 	fConnection.id = id;
 	fConnection.client = fOwner->Client();
 
-	if (IsOutput()) {
+	if (fConnection.IsOutput()) {
 		fConnection.source.port = fOwner->fNode->ControlPort();
 		fConnection.source.id = fConnection.id;
 
