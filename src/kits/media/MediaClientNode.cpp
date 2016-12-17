@@ -482,7 +482,7 @@ BMediaClientNode::EnableOutput(const media_source& source,
 
 	BMediaOutput* conn = fOwner->FindOutput(source);
 	if (conn != NULL) {
-		conn->fOutputEnabled = enabled;
+		conn->SetEnabled(enabled);
 		return;
 	}
 }

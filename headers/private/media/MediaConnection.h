@@ -153,8 +153,8 @@ class BMediaOutput : public virtual BMediaConnection {
 public:
 									BMediaOutput();
 
-	void							SetOutputEnabled(bool enabled);
-	bool							IsOutputEnabled() const;
+	void							SetEnabled(bool enabled);
+	bool							IsEnabled() const;
 
 protected:
 	// Callbacks
@@ -173,7 +173,7 @@ protected:
 private:
 	media_output					MediaOutput() const;
 
-	bool							fOutputEnabled;
+	bool							fEnabled;
 
 	virtual	void					_ReservedMediaOutput0();
 	virtual	void					_ReservedMediaOutput1();
