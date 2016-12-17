@@ -123,9 +123,6 @@ public:
 	// It will be B_INCREASE_LATENCY by default
 			BMediaNode::run_mode	RunMode() const;
 			status_t				SetRunMode(BMediaNode::run_mode mode);
-	// TODO: Really needed?
-			status_t				SetTimeSource(
-										const media_client& timesource);
 
 	// Specify a latency range to allow the node behave correctly.
 	// Ideally the minimum latency should be the algorithmic latency you expect
@@ -153,9 +150,6 @@ protected:
 	virtual void					HandleSeek(bigtime_t mediaTime,
 										bigtime_t performanceTime);
 
-	virtual void					HandleTimeWarp(bigtime_t realTime,
-										bigtime_t performanceTime);
-
 	virtual status_t				HandleFormatSuggestion(media_type type,
 										int32 quality, media_format* format);
 
@@ -172,6 +166,14 @@ private:
 			BMediaOutput*			FindOutput(
 										const media_source& source) const;
 
+	// Possible canditates for removal
+			void					HandleTimeWarp(bigtime_t realTime,
+										bigtime_t performanceTime);
+
+			status_t				SetTimeSource(
+										const media_client& timesource);
+
+private:
 			void					_Init();
 			void					_Deinit();
 
