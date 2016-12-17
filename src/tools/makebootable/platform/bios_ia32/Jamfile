@@ -15,7 +15,7 @@ if $(HOST_PLATFORM) = linux || $(HOST_PLATFORM) = freebsd || $(HOST_PLATFORM) = 
 	UsePrivateHeaders interface ;
 
 	hostPlatformSources = PartitionMap.cpp PartitionMapParser.cpp
-		crc32.cpp Header.cpp utility.cpp ;
+		PartitionMapWriter.cpp crc32.cpp Header.cpp utility.cpp ;
 
 	SEARCH_SOURCE += [ FDirName $(HAIKU_TOP) src add-ons kernel
 		partitioning_systems intel ] ;

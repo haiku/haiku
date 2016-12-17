@@ -20,6 +20,11 @@
 #	include <new>
 #endif
 
+#ifndef _BOOT_MODE
+#include "PartitionMap.h"
+#include "PartitionMapWriter.h"
+#endif
+
 #if !defined(_BOOT_MODE) && !defined(_USER_MODE)
 #include "uuid.h"
 #endif
@@ -216,6 +221,22 @@ Header::WriteEntry(int fd, uint32 entryIndex)
 status_t
 Header::Write(int fd)
 {
+	// Try to write the protective MBR
+	PartitionMap partitionMap;
+	PrimaryPartition *partition = NULL;
+	uint32 index = 0;
+	while ((partition = partitionMap.PrimaryPartitionAt(index)) != NULL) {
+		if (index == 0) {
+			uint64 deviceSize = fHeader.AlternateBlock() * fBlockSize;
+			partition->SetTo(fBlockSize, deviceSize, 0xEE, false, fBlockSize);
+		} else
+			partition->Unset();
+		++index;
+	}
+	PartitionMapWriter writer(fd, fBlockSize);
+	writer.WriteMBR(&partitionMap, true);
+		// We also write the bootcode, so we can boot GPT disks from BIOS
+
 	status_t status = _Write(fd, fHeader.EntriesBlock() * fBlockSize, fEntries,
 		_EntryArraySize());
 	if (status != B_OK)
@@ -224,6 +245,7 @@ Header::Write(int fd)
 	// First write the header, so that we have at least one completely correct
 	// data set
 	status = _WriteHeader(fd);
+
 
 	// Write backup entries
 	status_t backupStatus = _Write(fd,

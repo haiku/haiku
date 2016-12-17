@@ -15,8 +15,9 @@
 
 #include <new>
 
+#ifndef _USER_MODE
 #include <debug.h>
-
+#endif
 
 #ifndef _USER_MODE
 #	include <KernelExport.h>
@@ -38,8 +39,10 @@ using std::nothrow;
 
 
 #if defined(__INTEL__) || defined(__x86_64__)
-#define MBR_HEADER "MBR.h"
-#include MBR_HEADER
+#	ifndef _USER_MODE
+#		define MBR_HEADER "MBR.h"
+#		include MBR_HEADER
+#	endif
 #endif
 
 
