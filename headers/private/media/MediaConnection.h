@@ -41,21 +41,21 @@ public:
 	bool							HasBinding() const;
 	BMediaConnection*				Binding() const;
 
+	bool							IsConnected() const;
+
 	// This allow to specify a format that will be used while
 	// connecting to another node. See BMediaClient::SetFormat.
 	void							SetAcceptedFormat(
 										const media_format& format);
 	const media_format&				AcceptedFormat() const;
 
-	// Represents the buffer size used by the media_node
-	void							SetBufferSize(size_t size);
+	// Represents the buffer size, depends on the format set or negotiated
+	// for this connection.
 	size_t							BufferSize() const;
 
-	// Represents the duration of one buffer
-	void							SetBufferDuration(bigtime_t duration);
+	// Represents the duration of one buffer depends on the format set or
+	// negotiated for this connection.
 	bigtime_t						BufferDuration() const;
-
-	bool							IsConnected() const;
 
 	// Disconnect this connection. When a connection is disconnected,
 	// it can be reused as brand new.

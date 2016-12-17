@@ -120,30 +120,14 @@ BMediaConnection::Release()
 }
 
 
-void
-BMediaConnection::SetBufferSize(size_t size)
-{
-	CALLED();
-
-	fBufferSize = size;
-}
-
-
+// TODO: The data represented by the following two functions should be
+// automatically calculated depending on the media_format.
 size_t
 BMediaConnection::BufferSize() const
 {
 	CALLED();
 
 	return fBufferSize;
-}
-
-
-void
-BMediaConnection::SetBufferDuration(bigtime_t duration)
-{
-	CALLED();
-
-	fBufferDuration = duration;
 }
 
 
