@@ -74,7 +74,7 @@ BMediaClient::MediaType() const
 status_t
 BMediaClient::RegisterInput(BMediaInput* input)
 {
-	input->ConnectionRegistered(this, fLastID++);
+	input->ConnectionRegistered(this, ++fLastID);
 	AddInput(input);
 	return B_OK;
 }
@@ -83,7 +83,7 @@ BMediaClient::RegisterInput(BMediaInput* input)
 status_t
 BMediaClient::RegisterOutput(BMediaOutput* output)
 {
-	output->ConnectionRegistered(this, fLastID++);
+	output->ConnectionRegistered(this, ++fLastID);
 	AddOutput(output);
 	return B_OK;
 }
