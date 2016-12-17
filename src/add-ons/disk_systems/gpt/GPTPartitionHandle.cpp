@@ -18,6 +18,7 @@
 
 #include <AutoDeleter.h>
 
+#include "guid.h"
 #include "gpt_known_guids.h"
 
 
