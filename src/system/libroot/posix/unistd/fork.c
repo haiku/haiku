@@ -106,9 +106,11 @@ call_fork_hooks(fork_hook *hook)
 status_t
 __register_atfork(void (*prepare)(void), void (*parent)(void), void (*child)(void))
 {
+	status_t status;
+
 	defer_signals();
 
-	status_t status = mutex_lock(&sForkLock);
+	status = mutex_lock(&sForkLock);
 	if (status != B_OK) {
 		undefer_signals();
 		return status;
