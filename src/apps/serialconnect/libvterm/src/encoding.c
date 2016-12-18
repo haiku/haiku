@@ -74,15 +74,20 @@ static void decode_utf8(VTermEncoding *enc, void *data_,
         // Check for overlong sequences
         switch(data->bytes_total) {
         case 2:
-          if(data->this_cp <  0x0080) data->this_cp = UNICODE_INVALID; break;
+          if(data->this_cp <  0x0080) data->this_cp = UNICODE_INVALID;
+          break;
         case 3:
-          if(data->this_cp <  0x0800) data->this_cp = UNICODE_INVALID; break;
+          if(data->this_cp <  0x0800) data->this_cp = UNICODE_INVALID;
+          break;
         case 4:
-          if(data->this_cp < 0x10000) data->this_cp = UNICODE_INVALID; break;
+          if(data->this_cp < 0x10000) data->this_cp = UNICODE_INVALID;
+          break;
         case 5:
-          if(data->this_cp < 0x200000) data->this_cp = UNICODE_INVALID; break;
+          if(data->this_cp < 0x200000) data->this_cp = UNICODE_INVALID;
+          break;
         case 6:
-          if(data->this_cp < 0x4000000) data->this_cp = UNICODE_INVALID; break;
+          if(data->this_cp < 0x4000000) data->this_cp = UNICODE_INVALID;
+          break;
         }
         // Now look for plain invalid ones
         if((data->this_cp >= 0xD800 && data->this_cp <= 0xDFFF) ||
