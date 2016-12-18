@@ -57,8 +57,10 @@ NodePreloader::InstallNodePreloader(const char* name, BLooper* host)
 	NodePreloader* result = new NodePreloader(name);
 	{
 		AutoLock<BLooper> lock(host);
-		if (!lock)
+		if (!lock) {
+			delete result;
 			return NULL;
+		}
 
 		host->AddHandler(result);
 	}
