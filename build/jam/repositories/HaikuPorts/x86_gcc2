@@ -618,7 +618,7 @@ RemotePackageRepository HaikuPorts
 	boost_x86_timer-1.55.0-6
 	boost_x86_unit_test_framework-1.55.0-6
 	boost_x86_wave-1.55.0-6
-	burnitnow_x86-0.1.0-1
+	burnitnow_x86-0.1.0-2
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
 	cairo_x86-1.12.18-1
