@@ -8,6 +8,7 @@
 #include <boot/platform.h>
 #include <boot/platform/generic/video.h>
 #include <boot/stage2.h>
+#include <boot/stdio.h>
 
 #include "efi_platform.h"
 
@@ -38,12 +39,21 @@ platform_init_video(void)
 	UINTN bestArea = 0;
 	UINTN bestDepth = 0;
 
+	dprintf("looking for best graphics mode...\n");
+
 	for (UINTN mode = 0; mode < sGraphicsOutput->Mode->MaxMode; ++mode) {
 		EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *info;
 		UINTN size, depth;
 		sGraphicsOutput->QueryMode(sGraphicsOutput, mode, &size, &info);
 		UINTN area = info->HorizontalResolution * info->VerticalResolution;
+		dprintf("  mode: %lu\n", mode);
+		dprintf("  width: %u\n", info->HorizontalResolution);
+		dprintf("  height: %u\n", info->VerticalResolution);
+		dprintf("  area: %lu\n", area);
 		if (info->PixelFormat == PixelRedGreenBlueReserved8BitPerColor)
+			depth = 32;
+		else if (info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor)
+			// seen this in the wild, but acts like RGB, go figure...
 			depth = 32;
 		else if (info->PixelFormat == PixelBitMask
 			&& info->PixelInformation.RedMask == 0xFF0000
@@ -51,11 +61,17 @@ platform_init_video(void)
 			&& info->PixelInformation.BlueMask == 0x0000FF
 			&& info->PixelInformation.ReservedMask == 0)
 			depth = 24;
-		else
+		else {
+			dprintf("  pixel format: %x unsupported\n",
+				info->PixelFormat);
 			continue;
+		}
+		dprintf("  depth: %lu\n", depth);
 
 		area *= depth;
+		dprintf("  area (w/depth): %lu\n", area);
 		if (area >= bestArea) {
+			dprintf("selected new best mode: %lu\n", mode);
 			bestArea = area;
 			bestDepth = depth;
 			sGraphicsMode = mode;
@@ -64,9 +80,11 @@ platform_init_video(void)
 
 	if (bestArea == 0 || bestDepth == 0) {
 		sGraphicsOutput = NULL;
+		gKernelArgs.frame_buffer.enabled = false;
 		return B_ERROR;
 	}
 
+	gKernelArgs.frame_buffer.enabled = true;
 	return B_OK;
 }
 
@@ -74,11 +92,10 @@ platform_init_video(void)
 extern "C" void
 platform_switch_to_logo(void)
 {
-	if (sGraphicsOutput == NULL || gKernelArgs.frame_buffer.enabled)
+	if (sGraphicsOutput == NULL || !gKernelArgs.frame_buffer.enabled)
 		return;
 
 	sGraphicsOutput->SetMode(sGraphicsOutput, sGraphicsMode);
-	gKernelArgs.frame_buffer.enabled = true;
 	gKernelArgs.frame_buffer.physical_buffer.start =
 		sGraphicsOutput->Mode->FrameBufferBase;
 	gKernelArgs.frame_buffer.physical_buffer.size =

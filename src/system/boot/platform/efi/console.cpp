@@ -243,5 +243,4 @@ platform_switch_to_text_mode(void)
 {
 	kSystemTable->ConOut->Reset(kSystemTable->ConOut, false);
 	kSystemTable->ConOut->SetMode(kSystemTable->ConOut, sScreenMode);
-	gKernelArgs.frame_buffer.enabled = false;
 }
