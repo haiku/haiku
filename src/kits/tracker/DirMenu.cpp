@@ -95,10 +95,12 @@ BDirMenu::Populate(const BEntry* startEntry, BWindow* originatingWindow,
 		Model model(startEntry);
 		ThrowOnInitCheckError(&model);
 
-		ModelMenuItem* menu = new ModelMenuItem(&model, this, true, true);
+		ModelMenuItem* menu = NULL;
 
-		if (fMenuBar)
+		if (fMenuBar) {
+			menu = new ModelMenuItem(&model, this, true, true);
 			fMenuBar->AddItem(menu);
+		}
 
 		BEntry entry(*startEntry);
 
