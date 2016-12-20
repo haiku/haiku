@@ -475,7 +475,7 @@ RemotePackageRepository HaikuPorts
 	rsync-3.1.0-1
 	sane_backends-1.0.25-3
 	sane_backends_devel-1.0.25-3
-	sanity-0.5a-1
+	sanity-0.6-3
 	samba-3.6.25-1
 	samba_devel-3.6.25-1
 	sawteeth-1.3-3
@@ -1425,6 +1425,7 @@ RemotePackageRepository HaikuPorts
 	rocksndiamonds_x86
 	ruby_x86
 	sane_backends
+	sanity
 	sawteeth
 	scons
 	scummvm_x86
