@@ -32,9 +32,10 @@ RemotePackageRepository HaikuPorts
 	aspell_sv-0.51~0-1
 	aspell_uk-1.4.0~0-1
 	avr_libc-1.8.0-2
-	bash_completion-2.3-2
+	bash_completion-2.1-2
 	be_book-2008_10_26-1
 	caladea-20130214-3
+	calc_data-2.12.5.3-1
 	cantarell-0.0.16-1
 	cardo-1.04-2
 	carlito-20130920-1
@@ -185,19 +186,21 @@ RemotePackageRepository HaikuPorts
 	buildbot_slave-0.8.8-2
 	burnitnow-0.1.0-2
 	byacc-20150711-1
-	bzflag-2.4.4-1
+	bzflag-2.4.8-1
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
 	cabextract-1.6-1
 	cairo-1.12.18-2
 	cairo_devel-1.12.18-2
 	cal-1.0.0-2
+	calc-2.12.5.3-1
+	calc_devel-2.12.5.3-1
 	canna-1.0.2-2
 	c_ares-1.11.0-1
 	c_ares_devel-1.11.0-1
 	ccache-3.2.5-1
-	cdrtools-3.02~a06-2
-	cdrtools_devel-3.02~a06-2
+	cdrtools-3.02~a07-1
+	cdrtools_devel-3.02~a07-1
 	check-0.10.0-2
 	check_devel-0.10.0-2
 	chmlib-0.40-3
@@ -460,6 +463,8 @@ RemotePackageRepository HaikuPorts
 	libaacs_devel-0.8.1-2
 	libao-1.2.0-3
 	libao_devel-1.2.0-3
+	libarchive-3.1.2-1
+	libarchive_devel-3.1.2-1
 	libart_lgpl-2.3.21-1
 	libart_lgpl_devel-2.3.21-1
 	libasr-1.0.2-3
@@ -518,8 +523,8 @@ RemotePackageRepository HaikuPorts
 	libffi_devel-3.2.1-3
 	libfilezilla-0.6.1-2
 	libfilezilla_devel-0.6.1-2
-	libgcrypt-1.7.4-1
-	libgcrypt_devel-1.7.4-1
+	libgcrypt-1.7.5-1
+	libgcrypt_devel-1.7.5-1
 	libgeotiff-1.4.0-2
 	libgeotiff_devel-1.4.0-2
 	libgpg_error-1.25-1
@@ -528,6 +533,8 @@ RemotePackageRepository HaikuPorts
 	libgsasl_devel-1.8.0-2
 	libguess-1.2-1
 	libguess_devel-1.2-1
+	libical-2.0.0-1
+	libical_devel-2.0.0-1
 	libicns-0.8.1-5
 	libicns_devel-0.8.1-5
 	libiconv-1.13.1-8
@@ -684,18 +691,22 @@ RemotePackageRepository HaikuPorts
 	libxpm_devel-3.5.11-3
 	libxslt-1.1.28-8
 	libxslt_devel-1.1.28-8
+	libyubikey-1.13-1
+	libyubikey_devel-1.13-1
 	libzip-1.1.3-1
 	libzip_devel-1.1.3-1
 	lighttpd-1.4.42-1
 	lighttpd_devel-1.4.42-1
 	lighttpd_mod_geoip-1.4.42-1
 	linaro_qemu-2014.01-2
+	links-2.8-2
 	live555-2016.06.22-3
 	live555_devel-2016.06.22-3
 	llvm-3.9.0-1
 	llvm_clang-3.9.0-1
 	llvm_clang_analysis-3.9.0-1
 	lm4tools-0.1.3-1
+	lmms-1.2.0_git-2
 	lpsolve-5.5.2.3-1
 	lpsolve_devel-5.5.2.3-1
 	lsdvd-0.17-1
@@ -1085,6 +1096,7 @@ RemotePackageRepository HaikuPorts
 	cabextract
 	cairo
 	cal
+	calc
 	canna
 	c_ares
 	ccache
@@ -1262,6 +1274,7 @@ RemotePackageRepository HaikuPorts
 	lftp
 	libaacs
 	libao
+	libarchive
 	libart_lgpl
 	libasr
 	libass
@@ -1298,6 +1311,7 @@ RemotePackageRepository HaikuPorts
 	libgpg_error
 	libgsasl
 	libguess
+	libical
 	libicns
 	libiconv
 	libidl
@@ -1376,12 +1390,15 @@ RemotePackageRepository HaikuPorts
 	libxml2
 	libxpm
 	libxslt
+	libyubikey
 	libzip
 	lighttpd
 	linaro_qemu
+	links
 	live555
 	llvm
 	lm4tools
+	lmms
 	lpsolve
 	lsdvd
 	lua
