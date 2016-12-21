@@ -257,6 +257,9 @@ void
 BListView::FrameResized(float newWidth, float newHeight)
 {
 	_FixupScrollBar();
+
+	// notify items of new width.
+	_FontChanged();
 }
 
 
