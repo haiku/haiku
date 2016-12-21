@@ -411,7 +411,6 @@ RemotePackageRepository HaikuPorts
 	neon_devel-0.29.6-6
 	netcat-1.10-2
 	netpulse-0.2.3-6
-	netsurf-3.3-2
 	ocaml-4.02.1-1
 	openjpeg-2.1.0-2
 	openjpeg_devel-2.1.0-2
@@ -706,6 +705,8 @@ RemotePackageRepository HaikuPorts
 	haikuwebkit_x86_devel-1.5.3-1
 	harfbuzz_x86-1.3.0-1
 	harfbuzz_x86_devel-1.3.0-1
+	hubbub_x86-0.3.3-2
+	hubbub_x86_devel-0.3.3-2
 	icu_x86-57.1-1
 	icu_x86_devel-57.1-1
 	icu55_x86-55.1-1
@@ -792,6 +793,10 @@ RemotePackageRepository HaikuPorts
 	libmpdclient_x86_devel-2.11_git-1
 	libmpeg2_x86-0.5.1-3
 	libmpeg2_x86_devel-0.5.1-3
+	libnsbmp_x86-0.1.4-1
+	libnsbmp_x86_devel-0.1.4-1
+	libnsgif_x86-0.1.4-1
+	libnsgif_x86_devel-0.1.4-1
 	libogg_x86-1.3.2-2
 	libogg_x86_devel-1.3.2-2
 	libotr_x86-4.1.0-1
@@ -833,6 +838,8 @@ RemotePackageRepository HaikuPorts
 	libusb_x86_devel-1.0.20-2
 	libusb_compat_x86-0.1.5-4
 	libusb_compat_x86_devel-0.1.5-4
+	libutf8proc_x86-1.3.1~2-1
+	libutf8proc_x86_devel-1.3.1~2-1
 	libuuid_x86-1.0.3-3
 	libuuid_x86_devel-1.0.3-3
 	libvorbis_x86-1.3.5-2
@@ -887,6 +894,7 @@ RemotePackageRepository HaikuPorts
 	ncurses_x86_devel-5.9-11
 	ncurses6_x86-6.0-2
 	ncurses6_x86_devel-6.0-2
+	netsurf_x86-3.6-1
 	nettle_x86-3.2-1
 	nettle_x86_devel-3.2-1
 	ninja_x86-1.5.1-2
@@ -1176,6 +1184,7 @@ RemotePackageRepository HaikuPorts
 	htmldoc
 	html_parser
 	hubbub
+	hubbub_x86
 	icebreaker
 	icu
 	icu55
@@ -1251,6 +1260,8 @@ RemotePackageRepository HaikuPorts
 	libmpdclient_x86
 	libmpeg2
 	libmpeg2_x86
+	libnsbmp_x86
+	libnsgif_x86
 	libogg
 	libogg_x86
 	libotr_x86
@@ -1292,6 +1303,7 @@ RemotePackageRepository HaikuPorts
 	libusb_compat
 	libusb_compat_x86
 	libutf8proc
+	libutf8proc_x86
 	libuuid
 	libuuid_x86
 	libvorbis
@@ -1364,7 +1376,7 @@ RemotePackageRepository HaikuPorts
 	neon
 	netcat
 	netpulse
-	netsurf
+	netsurf_x86
 	nettle_x86
 	ninja_x86
 	ocaml
