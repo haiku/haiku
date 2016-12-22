@@ -34,9 +34,10 @@ put_utf8_byte(char*& to, size_t& left, char c)
 // #pragma mark -
 
 
-void
+size_t
 to_utf8(const uint16* from, size_t maxFromLength, char* to, size_t toSize)
 {
+	const char* start = to;
 	for (uint32 i = 0; i < maxFromLength; i++) {
 		// Decoding UTF-16LE
 		uint32 c = 0;
@@ -82,12 +83,14 @@ to_utf8(const uint16* from, size_t maxFromLength, char* to, size_t toSize)
 	}
 
 	if (toSize > 0)
-		*to = '\0';
+		*to++ = '\0';
+
+	return to - start;
 }
 
 
 #ifndef _BOOT_MODE
-void
+size_t
 to_ucs2(const char* from, size_t fromLength, uint16* to, size_t maxToLength)
 {
 	size_t index = 0;
@@ -110,7 +113,9 @@ to_ucs2(const char* from, size_t fromLength, uint16* to, size_t maxToLength)
 	}
 
 	if (index < maxToLength)
-		to[index] = '\0';
+		to[index++] = '\0';
+
+	return index;
 }
 #endif // !_BOOT_MODE
 
