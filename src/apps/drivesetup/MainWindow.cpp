@@ -1034,6 +1034,12 @@ MainWindow::_Initialize(BDiskDevice* disk, partition_id selectedPartition,
 		return;
 	}
 
+	// Also set the partition name in the partition table if supported
+	if (partition->CanSetName()
+		&& partition->ValidateSetName(&validatedName) == B_OK) {
+		partition->SetName(validatedName.String());
+	}
+
 	// everything looks fine, we are ready to actually write the changes
 	// to disk
 

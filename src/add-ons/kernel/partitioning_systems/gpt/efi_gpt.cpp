@@ -321,7 +321,7 @@ efi_gpt_validate_move_child(partition_data* partition, partition_data* child,
 
 
 static bool
-efi_gpt_validate_set_content_name(partition_data* partition, char* name)
+efi_gpt_validate_set_name(partition_data* partition, char* name)
 {
 	// TODO: should validate that the utf-8 -> ucs-2 is valid
 	// TODO: should count actual utf-8 chars
@@ -603,7 +603,7 @@ efi_gpt_move_child(int fd, partition_id partitionID, partition_id childID,
 
 
 static status_t
-efi_gpt_set_content_name(int fd, partition_id partitionID, const char* name,
+efi_gpt_set_name(int fd, partition_id partitionID, const char* name,
 	disk_job_id job)
 {
 	if (fd < 0)
@@ -906,12 +906,12 @@ partition_module_info gEFIPartitionModule = {
 	| B_DISK_SYSTEM_SUPPORTS_MOVING
 	| B_DISK_SYSTEM_SUPPORTS_RESIZING
 	| B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE
-	| B_DISK_SYSTEM_SUPPORTS_CONTENT_NAME
-	| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_NAME
 	| B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
 	| B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
 	| B_DISK_SYSTEM_SUPPORTS_CREATING_CHILD
 	| B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD
+	| B_DISK_SYSTEM_SUPPORTS_SETTING_NAME
+	| B_DISK_SYSTEM_SUPPORTS_NAME
 	,
 
 	// scanning
@@ -932,8 +932,8 @@ partition_module_info gEFIPartitionModule = {
 	efi_gpt_validate_resize_child,
 	efi_gpt_validate_move,
 	efi_gpt_validate_move_child,
-	NULL, // validate_set_name
-	efi_gpt_validate_set_content_name,
+	efi_gpt_validate_set_name,
+	NULL, // validate_set_content_name
 	efi_gpt_validate_set_type,
 	NULL, // validate_set_parameters
 	NULL, // validate_set_content_parameters
@@ -952,8 +952,8 @@ partition_module_info gEFIPartitionModule = {
 	efi_gpt_resize_child,
 	efi_gpt_move,
 	efi_gpt_move_child,
-	NULL, // set_name
-	efi_gpt_set_content_name,
+	efi_gpt_set_name,
+	NULL, // set_content_name
 	efi_gpt_set_type,
 	NULL, // set_parameters
 	NULL, // set_content_parameters

@@ -20,6 +20,7 @@
 
 #include "guid.h"
 #include "gpt_known_guids.h"
+#include "utility.h"
 
 
 //#define TRACE_GPT_PARTITION_HANDLE
@@ -73,6 +74,8 @@ GPTPartitionHandle::SupportedOperations(uint32 mask)
 	uint32 flags = B_DISK_SYSTEM_SUPPORTS_RESIZING
 		| B_DISK_SYSTEM_SUPPORTS_MOVING
 		| B_DISK_SYSTEM_SUPPORTS_SETTING_CONTENT_PARAMETERS
+		| B_DISK_SYSTEM_SUPPORTS_NAME
+		| B_DISK_SYSTEM_SUPPORTS_SETTING_NAME
 		| B_DISK_SYSTEM_SUPPORTS_INITIALIZING;
 
 	// creating child
@@ -92,7 +95,9 @@ uint32
 GPTPartitionHandle::SupportedChildOperations(const BMutablePartition* child,
 	uint32 mask)
 {
-	return B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
+	return B_DISK_SYSTEM_SUPPORTS_NAME
+		| B_DISK_SYSTEM_SUPPORTS_SETTING_NAME
+		| B_DISK_SYSTEM_SUPPORTS_RESIZING_CHILD
 		| B_DISK_SYSTEM_SUPPORTS_MOVING_CHILD
 		| B_DISK_SYSTEM_SUPPORTS_SETTING_TYPE
 		| B_DISK_SYSTEM_SUPPORTS_DELETING_CHILD;
@@ -104,7 +109,7 @@ GPTPartitionHandle::GetNextSupportedType(const BMutablePartition* child,
 	int32* cookie, BString* type)
 {
 	int32 index = *cookie;
-	TRACE("GPTPartitionHandle::GetNextSupportedType(child: %p, cookie: %ld)\n",
+	TRACE("GPTPartitionHandle::GetNextSupportedType(child: %p, cookie: %" B_PRId32 ")\n",
 		child, index);
 
 	if (index >= int32(sizeof(kTypeMap) / sizeof(kTypeMap[0])))
@@ -156,6 +161,37 @@ GPTPartitionHandle::GetParameterEditor(B_PARAMETER_EDITOR_TYPE type,
 		return B_OK;
 	}
 	return B_NOT_SUPPORTED;
+}
+
+
+status_t
+GPTPartitionHandle::ValidateSetName(const BMutablePartition *child, BString* name)
+{
+	// UCS-2 can use up to 2 code points per character, and GPT allows
+	// a maximum of 36 code units;
+	size_t length = name->CountChars();
+	if (length == 0)
+		return B_OK;
+
+	size_t size = length * 2;
+	uint16 buffer[size + 1];
+
+	do {
+		size = to_ucs2(name->String(), length, buffer, length * 2);
+		if (size <= 36)
+			return B_OK;
+		length--;
+		name->TruncateChars(length, false);
+	} while (size > 36 && length > 0);
+
+	return B_OK;
+}
+
+
+status_t
+GPTPartitionHandle::SetName(BMutablePartition* child, const char* name)
+{
+	return child->SetName(name);
 }
 
 

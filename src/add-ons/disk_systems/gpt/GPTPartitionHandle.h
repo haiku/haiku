@@ -22,6 +22,11 @@ public:
 									const BMutablePartition* child,
 									uint32 mask);
 
+	virtual status_t			ValidateSetName(const BMutablePartition* child,
+									BString* name);
+	virtual status_t			SetName(BMutablePartition* child,
+									const char* name);
+
 	virtual	status_t			GetNextSupportedType(
 									const BMutablePartition* child,
 									int32* cookie, BString* type);

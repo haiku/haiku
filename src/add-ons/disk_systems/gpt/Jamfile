@@ -13,5 +13,8 @@ Addon <disk_system>gpt :
 	GPTDiskAddOn.cpp
 	GPTPartitionHandle.cpp
 
+	# from the gpt partitioning add-on
+	utility.cpp
+
 	: be [ TargetLibsupc++ ] libuuid_kernel.a
 ;
