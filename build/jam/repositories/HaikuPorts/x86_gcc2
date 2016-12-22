@@ -299,8 +299,9 @@ RemotePackageRepository HaikuPorts
 	libpaper_devel-1.1.24-1
 	libpcap-1.7.4-1
 	libpcap_devel-1.7.4-1
-	libpcre-8.21-5
-	libpcre_devel-8.21-5
+	libpcre0-8.21-6
+	libpcre-8.38-1
+	libpcre_devel-8.38-1
 	libpng-1.5.25-2
 	libpng_devel-1.5.25-2
 	libpng16-1.6.20-2
@@ -350,9 +351,9 @@ RemotePackageRepository HaikuPorts
 	libx11_devel-1.6.3-2
 	libxau-1.0.8-2
 	libxcb-1.6-2
-	libxml2-2.8.0-9
-	libxml2_devel-2.8.0-9
-	libxml2_python-2.8.0-9
+	libxml2-2.9.3-2
+	libxml2_devel-2.9.3-2
+	libxml2_python-2.9.3-2
 	libxpm-3.5.11-3
 	libxpm_devel-3.5.11-3
 	libxslt-1.1.28-6
@@ -803,8 +804,9 @@ RemotePackageRepository HaikuPorts
 	libotr_x86_devel-4.1.0-1
 	libpaper_x86-1.1.24-1
 	libpaper_x86_devel-1.1.24-1
-	libpcre_x86-8.33-2
-	libpcre_x86_devel-8.33-2
+	libpcre_x86-8.38-1
+	libpcre_x86_devel-8.38-1
+	libpcre0_x86-8.21-6
 	libpng_x86-1.5.25-2
 	libpng_x86_devel-1.5.25-2
 	libpng16_x86-1.6.20-2
@@ -850,8 +852,8 @@ RemotePackageRepository HaikuPorts
 	libwebp_x86_devel-0.5.1-1
 	libwebp5_x86-0.4.4-1
 	libwebp5_x86_devel-0.4.4-1
-	libxml2_x86-2.9.2-1
-	libxml2_x86_devel-2.9.2-1
+	libxml2_x86-2.9.3-2
+	libxml2_x86_devel-2.9.3-2
 	libxslt_x86-1.1.28-6
 	libxslt_x86_devel-1.1.28-6
 	libzip_x86-0.11.2-1
@@ -1269,6 +1271,8 @@ RemotePackageRepository HaikuPorts
 	libpcap
 	libpcre
 	libpcre_x86
+	libpcre0
+	libpcre0_x86
 	libpng
 	libpng_x86
 	libpng16
