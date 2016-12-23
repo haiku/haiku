@@ -48,7 +48,9 @@ InitializeNTFSEditor::~InitializeNTFSEditor()
 void
 InitializeNTFSEditor::SetTo(BPartition* partition)
 {
-	BString name = partition->ContentName();
+	BString name = partition->Name();
+	if (name.IsEmpty())
+		name = partition->ContentName();
 	if (!name.IsEmpty())
 		fNameControl->SetText(name.String());
 }
