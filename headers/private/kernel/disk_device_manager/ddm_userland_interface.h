@@ -77,7 +77,8 @@ status_t _user_initialize_partition(partition_id partitionID,
 				int32* changeCounter, const char* diskSystemName,
 				const char* name, const char* parameters);
 status_t _user_uninitialize_partition(partition_id partitionID,
-				int32* changeCounter);
+				int32* changeCounter, partition_id parentID,
+				int32* parentChangeCounter);
 
 status_t _user_create_child_partition(partition_id partitionID,
 				int32* changeCounter, off_t offset, off_t size,

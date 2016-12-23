@@ -109,13 +109,16 @@ class AutoLockerPartitionRegistration {
 public:
 	inline bool Lock(KPartition *partition)
 	{
+		if (partition == NULL)
+			return true;
 		partition->Register();
 		return true;
 	}
 
 	inline void Unlock(KPartition *partition)
 	{
-		partition->Unregister();
+		if (partition != NULL)
+			partition->Unregister();
 	}
 };
 

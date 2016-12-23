@@ -1218,13 +1218,19 @@ _user_initialize_partition(partition_id partitionID, int32* _changeCounter,
 
 
 status_t
-_user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
+_user_uninitialize_partition(partition_id partitionID, int32* _changeCounter,
+	partition_id parentID, int32* _parentChangeCounter)
 {
 	// copy parameters in
 	int32 changeCounter;
+	int32 parentChangeCounter;
+	bool haveParent = parentID >= 0;
 
 	status_t error;
 	if ((error = copy_from_user_value(changeCounter, _changeCounter)) != B_OK)
+		return error;
+	if (haveParent && (error = copy_from_user_value(parentChangeCounter,
+			_parentChangeCounter)) != B_OK)
 		return error;
 
 	// get the partition
@@ -1237,8 +1243,17 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
 	PartitionRegistrar registrar2(partition->Device(), true);
 	DeviceWriteLocker locker(partition->Device(), true);
 
+	// register parent
+	KPartition* parent = NULL;
+	if (haveParent)
+		parent = manager->RegisterPartition(parentID);
+
+	PartitionRegistrar registrar3(parent, true);
+
 	// check change counter
 	if (changeCounter != partition->ChangeCounter())
+		return B_BAD_VALUE;
+	if (haveParent && parentChangeCounter != parent->ChangeCounter())
 		return B_BAD_VALUE;
 
 	// the partition must be initialized
@@ -1274,6 +1289,9 @@ _user_uninitialize_partition(partition_id partitionID, int32* _changeCounter)
 	// return change counter
 	error = copy_to_user_value(_changeCounter, partition->ChangeCounter());
 	if (error != B_OK)
+		return error;
+	if (haveParent && (error = copy_to_user_value(_parentChangeCounter,
+			parent->ChangeCounter())) != B_OK)
 		return error;
 
 	return B_OK;

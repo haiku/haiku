@@ -194,7 +194,7 @@ extern status_t		_kern_unlock_node(int fd);
 // extern status_t		_kern_set_timezone(int32 timezoneOffset, bool daylightSavingTime);
 // extern status_t		_kern_set_tzfilename(const char *filename, size_t length, bool isGMT);
 // extern status_t		_kern_get_tzfilename(char *filename, size_t length, bool *_isGMT);
-// 
+//
 // extern bigtime_t	_kern_system_time();
 // extern status_t		_kern_snooze_etc(bigtime_t time, int timebase, int32 flags);
 
@@ -210,10 +210,10 @@ extern status_t		_kern_unlock_node(int fd);
 // extern area_id		_kern_transfer_area(area_id area, void **_address, uint32 addressSpec,
 // 						team_id target);
 // extern status_t		_kern_set_area_protection(area_id area, uint32 newProtection);
-// extern area_id		_kern_clone_area(const char *name, void **_address, uint32 addressSpec, 
+// extern area_id		_kern_clone_area(const char *name, void **_address, uint32 addressSpec,
 // 						uint32 protection, area_id sourceArea);
 // extern status_t		_kern_init_heap_address_range(addr_t base, addr_t size);
-// 
+//
 // area_id sys_vm_map_file(const char *name, void **address, int addr_type,
 // 			addr_t size, int lock, int mapping, const char *path, off_t offset);
 
@@ -237,7 +237,7 @@ extern status_t		_kern_unlock_node(int fd);
 // debug support functions
 // extern void			_kern_debugger(const char *message);
 // extern int			_kern_disable_debugger(int state);
-// 
+//
 // extern status_t		_kern_install_default_debugger(port_id debuggerPort);
 // extern port_id		_kern_install_team_debugger(team_id team,
 // 						port_id debuggerPort);
@@ -252,7 +252,7 @@ extern status_t		_kern_unlock_node(int fd);
 // extern int32		_kern_atomic_test_and_set(vint32 *value, int32 newValue, int32 testAgainst);
 // extern int32		_kern_atomic_add(vint32 *value, int32 addValue);
 // extern int32		_kern_atomic_and(vint32 *value, int32 andValue);
-// extern int32		_kern_atomic_or(vint32 *value, int32 orValue);	
+// extern int32		_kern_atomic_or(vint32 *value, int32 orValue);
 // extern int32		_kern_atomic_get(vint32 *value);
 // #endif	// ATOMIC_FUNCS_ARE_SYSCALLS
 
@@ -261,7 +261,7 @@ extern status_t		_kern_unlock_node(int fd);
 // extern int64		_kern_atomic_test_and_set64(vint64 *value, int64 newValue, int64 testAgainst);
 // extern int64		_kern_atomic_add64(vint64 *value, int64 addValue);
 // extern int64		_kern_atomic_and64(vint64 *value, int64 andValue);
-// extern int64		_kern_atomic_or64(vint64 *value, int64 orValue);	
+// extern int64		_kern_atomic_or64(vint64 *value, int64 orValue);
 // extern int64		_kern_atomic_get64(vint64 *value);
 // #endif	// ATOMIC64_FUNCS_ARE_SYSCALLS
 
@@ -281,7 +281,7 @@ extern status_t		_kern_unlock_node(int fd);
 // extern area_id		_kern_register_messaging_service(sem_id lockingSem,
 // 						sem_id counterSem);
 // extern status_t		_kern_unregister_messaging_service();
-// 
+//
 // extern void			_kern_clear_caches(void *address, size_t length, uint32 flags);
 
 // #ifdef __INTEL__
@@ -397,7 +397,8 @@ extern status_t		_kern_initialize_partition(partition_id partitionID,
 						const char *name, const char *parameters,
 						size_t parametersSize);
 extern status_t		_kern_uninitialize_partition(partition_id partitionID,
-						int32 changeCounter);
+						int32 changeCounter, partition_id parentID,
+						int32 parentChangeCounter);
 extern status_t		_kern_create_child_partition(partition_id partitionID,
 						int32 changeCounter, off_t offset, off_t size, const char *type,
 						const char *parameters, size_t parametersSize,

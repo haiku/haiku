@@ -374,7 +374,8 @@ _kern_initialize_partition(partition_id partitionID, int32 changeCounter,
 
 
 status_t
-_kern_uninitialize_partition(partition_id partitionID, int32 changeCounter)
+_kern_uninitialize_partition(partition_id partitionID, int32 changeCounter,
+	partition_id parentID, int32 parentChangeCounter)
 {
 	return B_ERROR;
 }

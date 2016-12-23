@@ -11,8 +11,9 @@
 
 
 // constructor
-UninitializeJob::UninitializeJob(PartitionReference* partition)
-	: DiskDeviceJob(partition)
+UninitializeJob::UninitializeJob(PartitionReference* partition,
+		PartitionReference* parent)
+	: DiskDeviceJob(parent, partition)
 {
 }
 
@@ -27,14 +28,20 @@ UninitializeJob::~UninitializeJob()
 status_t
 UninitializeJob::Do()
 {
-	int32 changeCounter = fPartition->ChangeCounter();
-	status_t error = _kern_uninitialize_partition(fPartition->PartitionID(),
-		&changeCounter);
+	bool haveParent = fPartition != NULL;
+	int32 changeCounter = fChild->ChangeCounter();
+	int32 parentChangeCounter = haveParent ? fPartition->ChangeCounter() : 0;
+	partition_id parentID = haveParent ? fPartition->PartitionID() : -1;
+
+	status_t error = _kern_uninitialize_partition(fChild->PartitionID(),
+		&changeCounter, parentID, &parentChangeCounter);
 
 	if (error != B_OK)
 		return error;
 
-	fPartition->SetChangeCounter(changeCounter);
+	fChild->SetChangeCounter(changeCounter);
+	if (haveParent)
+		fPartition->SetChangeCounter(parentChangeCounter);
 
 	return B_OK;
 }

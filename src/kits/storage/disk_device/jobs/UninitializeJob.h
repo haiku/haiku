@@ -14,7 +14,8 @@ namespace BPrivate {
 class UninitializeJob : public DiskDeviceJob {
 public:
 
-								UninitializeJob(PartitionReference* partition);
+								UninitializeJob(PartitionReference* partition,
+									PartitionReference* parent = NULL);
 	virtual						~UninitializeJob();
 
 	virtual	status_t			Do();

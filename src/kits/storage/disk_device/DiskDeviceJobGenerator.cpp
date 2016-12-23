@@ -523,7 +523,15 @@ DiskDeviceJobGenerator::_GenerateUninitializeJob(BPartition* partition)
 	if (error != B_OK)
 		return error;
 
-	return _AddJob(new(nothrow) UninitializeJob(reference));
+	BPartition* parent = partition->Parent();
+	PartitionReference* parentReference = NULL;
+	if (parent != NULL) {
+		error = _GetPartitionReference(parent, parentReference);
+		if (error != B_OK)
+			return error;
+	}
+
+	return _AddJob(new(nothrow) UninitializeJob(reference, parentReference));
 }
 
 
