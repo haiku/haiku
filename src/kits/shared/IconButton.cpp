@@ -448,9 +448,9 @@ BIconButton::SetIcon(const unsigned char* bitsFromQuickRes,
 				BBitmap* bitmap = new(std::nothrow) BBitmap(
 					quickResBitmap->Bounds(), B_RGB32, true);
 				if (bitmap && bitmap->IsValid()) {
-					BView* helper = new BView(bitmap->Bounds(), "helper",
-						B_FOLLOW_NONE, B_WILL_DRAW);
 					if (bitmap->Lock()) {
+						BView* helper = new BView(bitmap->Bounds(), "helper",
+							B_FOLLOW_NONE, B_WILL_DRAW);
 						bitmap->AddChild(helper);
 						helper->SetHighColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 						helper->FillRect(helper->Bounds());
@@ -664,9 +664,9 @@ BIconButton::_ConvertToRGB32(const BBitmap* bitmap) const
 		B_BITMAP_ACCEPTS_VIEWS, B_RGBA32);
 	if (convertedBitmap && convertedBitmap->IsValid()) {
 		memset(convertedBitmap->Bits(), 0, convertedBitmap->BitsLength());
-		BView* helper = new BView(bitmap->Bounds(), "helper",
-								  B_FOLLOW_NONE, B_WILL_DRAW);
 		if (convertedBitmap->Lock()) {
+			BView* helper = new BView(bitmap->Bounds(), "helper",
+				B_FOLLOW_NONE, B_WILL_DRAW);
 			convertedBitmap->AddChild(helper);
 			helper->SetDrawingMode(B_OP_OVER);
 			helper->DrawBitmap(bitmap, BPoint(0.0, 0.0));
