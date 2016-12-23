@@ -50,18 +50,18 @@ platform_init_video(void)
 		dprintf("  width: %u\n", info->HorizontalResolution);
 		dprintf("  height: %u\n", info->VerticalResolution);
 		dprintf("  area: %lu\n", area);
-		if (info->PixelFormat == PixelRedGreenBlueReserved8BitPerColor)
+		if (info->PixelFormat == PixelRedGreenBlueReserved8BitPerColor) {
 			depth = 32;
-		else if (info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor)
+		} else if (info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor) {
 			// seen this in the wild, but acts like RGB, go figure...
 			depth = 32;
-		else if (info->PixelFormat == PixelBitMask
+		} else if (info->PixelFormat == PixelBitMask
 			&& info->PixelInformation.RedMask == 0xFF0000
 			&& info->PixelInformation.GreenMask == 0x00FF00
 			&& info->PixelInformation.BlueMask == 0x0000FF
-			&& info->PixelInformation.ReservedMask == 0)
+			&& info->PixelInformation.ReservedMask == 0) {
 			depth = 24;
-		else {
+		} else {
 			dprintf("  pixel format: %x unsupported\n",
 				info->PixelFormat);
 			continue;
