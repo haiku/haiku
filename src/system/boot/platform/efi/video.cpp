@@ -4,23 +4,154 @@
  */
 
 
+#include "video.h"
+
+#include <stdlib.h>
+
 #include <boot/kernel_args.h>
+#include <boot/menu.h>
 #include <boot/platform.h>
 #include <boot/platform/generic/video.h>
 #include <boot/stage2.h>
 #include <boot/stdio.h>
+#include <drivers/driver_settings.h>
+#include <util/list.h>
 
 #include "efi_platform.h"
+
+
+//#define TRACE_VIDEO
+#ifdef TRACE_VIDEO
+#	define TRACE(x) dprintf x
+#else
+#	define TRACE(x) ;
+#endif
+
+
+struct video_mode {
+	list_link	link;
+	UINTN		mode;
+	UINTN		width, height, bits_per_pixel, bytes_per_row;
+};
 
 
 static EFI_GUID sGraphicsOutputGuid = EFI_GRAPHICS_OUTPUT_PROTOCOL_GUID;
 static EFI_GRAPHICS_OUTPUT_PROTOCOL *sGraphicsOutput;
 static UINTN sGraphicsMode;
+static struct list sModeList;
+static uint32 sModeCount;
+static bool sModeChosen;
+static bool sSettingsLoaded;
+
+
+static int
+compare_video_modes(video_mode *a, video_mode *b)
+{
+	int compare = a->width - b->width;
+	if (compare != 0)
+		return compare;
+
+	compare = a->height - b->height;
+	if (compare != 0)
+		return compare;
+
+	return a->bits_per_pixel - b->bits_per_pixel;
+}
+
+
+static void
+add_video_mode(video_mode *videoMode)
+{
+	video_mode *mode = NULL;
+	while ((mode = (video_mode*)list_get_next_item(&sModeList, mode))
+			!= NULL) {
+		int compare = compare_video_modes(videoMode, mode);
+		if (compare == 0) {
+			// mode already exists
+			return;
+		}
+
+		if (compare > 0)
+			break;
+	}
+
+	list_insert_item_before(&sModeList, mode, videoMode);
+	sModeCount++;
+}
+
+
+static video_mode*
+closest_video_mode(uint32 width, uint32 height, uint32 depth)
+{
+	video_mode *bestMode = NULL;
+	uint32 bestDiff = 0;
+
+	video_mode *mode = NULL;
+	while ((mode = (video_mode*)list_get_next_item(&sModeList, mode)) != NULL) {
+		if (mode->width > width) {
+			// Only choose modes with a width less or equal than the searched
+			// one; or else it might well be that the monitor cannot keep up.
+			continue;
+		}
+
+		uint32 diff = 2 * abs(mode->width - width) + abs(mode->height - height)
+			+ abs(mode->bits_per_pixel - depth);
+
+		if (bestMode == NULL || bestDiff > diff) {
+			bestMode = mode;
+			bestDiff = diff;
+		}
+	}
+
+	return bestMode;
+}
+
+
+static void
+get_mode_from_settings(void)
+{
+	if (sSettingsLoaded)
+		return;
+
+	void *handle = load_driver_settings("vesa");
+	if (handle == NULL)
+		return;
+
+	bool found = false;
+
+	const driver_settings *settings = get_driver_settings(handle);
+	if (settings == NULL)
+		goto out;
+
+	sSettingsLoaded = true;
+
+	for (int32 i = 0; i < settings->parameter_count; i++) {
+		driver_parameter &parameter = settings->parameters[i];
+
+		if (strcmp(parameter.name, "mode") == 0 && parameter.value_count > 2) {
+			uint32 width = strtoul(parameter.values[0], NULL, 0);
+			uint32 height = strtoul(parameter.values[1], NULL, 0);
+			uint32 depth = strtoul(parameter.values[2], NULL, 0);
+
+			// search mode that fits
+			video_mode *mode = closest_video_mode(width, height, depth);
+			if (mode != NULL) {
+				found = true;
+				sGraphicsMode = mode->mode;
+			}
+		}
+	}
+
+out:
+	unload_driver_settings(handle);
+}
 
 
 extern "C" status_t
 platform_init_video(void)
 {
+	list_init(&sModeList);
+
 	// we don't support VESA modes or EDID
 	gKernelArgs.vesa_modes = NULL;
 	gKernelArgs.vesa_modes_size = 0;
@@ -39,17 +170,17 @@ platform_init_video(void)
 	UINTN bestArea = 0;
 	UINTN bestDepth = 0;
 
-	dprintf("looking for best graphics mode...\n");
+	TRACE(("looking for best graphics mode...\n"));
 
 	for (UINTN mode = 0; mode < sGraphicsOutput->Mode->MaxMode; ++mode) {
 		EFI_GRAPHICS_OUTPUT_MODE_INFORMATION *info;
 		UINTN size, depth;
 		sGraphicsOutput->QueryMode(sGraphicsOutput, mode, &size, &info);
 		UINTN area = info->HorizontalResolution * info->VerticalResolution;
-		dprintf("  mode: %lu\n", mode);
-		dprintf("  width: %u\n", info->HorizontalResolution);
-		dprintf("  height: %u\n", info->VerticalResolution);
-		dprintf("  area: %lu\n", area);
+		TRACE(("  mode: %lu\n", mode));
+		TRACE(("  width: %u\n", info->HorizontalResolution));
+		TRACE(("  height: %u\n", info->VerticalResolution));
+		TRACE(("  area: %lu\n", area));
 		if (info->PixelFormat == PixelRedGreenBlueReserved8BitPerColor) {
 			depth = 32;
 		} else if (info->PixelFormat == PixelBlueGreenRedReserved8BitPerColor) {
@@ -62,16 +193,26 @@ platform_init_video(void)
 			&& info->PixelInformation.ReservedMask == 0) {
 			depth = 24;
 		} else {
-			dprintf("  pixel format: %x unsupported\n",
-				info->PixelFormat);
+			TRACE(("  pixel format: %x unsupported\n",
+				info->PixelFormat));
 			continue;
 		}
-		dprintf("  depth: %lu\n", depth);
+		TRACE(("  depth: %lu\n", depth));
+
+		video_mode *videoMode = (video_mode*)malloc(sizeof(struct video_mode));
+		if (videoMode != NULL) {
+			videoMode->mode = mode;
+			videoMode->width = info->HorizontalResolution;
+			videoMode->height = info->VerticalResolution;
+			videoMode->bits_per_pixel = info->PixelFormat == PixelBitMask ? 24 : 32;
+			videoMode->bytes_per_row = info->PixelsPerScanLine * depth / 8;
+			add_video_mode(videoMode);
+		}
 
 		area *= depth;
-		dprintf("  area (w/depth): %lu\n", area);
+		TRACE(("  area (w/depth): %lu\n", area));
 		if (area >= bestArea) {
-			dprintf("selected new best mode: %lu\n", mode);
+			TRACE(("selected new best mode: %lu\n", mode));
 			bestArea = area;
 			bestDepth = depth;
 			sGraphicsMode = mode;
@@ -85,6 +226,8 @@ platform_init_video(void)
 	}
 
 	gKernelArgs.frame_buffer.enabled = true;
+	sModeChosen = false;
+	sSettingsLoaded = false;
 	return B_OK;
 }
 
@@ -94,6 +237,9 @@ platform_switch_to_logo(void)
 {
 	if (sGraphicsOutput == NULL || !gKernelArgs.frame_buffer.enabled)
 		return;
+
+	if (!sModeChosen)
+		get_mode_from_settings();
 
 	sGraphicsOutput->SetMode(sGraphicsOutput, sGraphicsMode);
 	gKernelArgs.frame_buffer.physical_buffer.start =
@@ -111,6 +257,48 @@ platform_switch_to_logo(void)
 			* gKernelArgs.frame_buffer.depth / 8;
 
 	video_display_splash(gKernelArgs.frame_buffer.physical_buffer.start);
+}
+
+
+bool
+video_mode_hook(Menu *menu, MenuItem *item)
+{
+	menu = item->Submenu();
+	item = menu->FindMarked();
+	if (item != NULL) {
+		sGraphicsMode = (UINTN)item->Data();
+		sModeChosen = true;
+	}
+
+	return true;
+}
+
+
+Menu*
+video_mode_menu()
+{
+	Menu *menu = new(std::nothrow)Menu(CHOICE_MENU, "Select Video Mode");
+	MenuItem *item;
+
+	video_mode *mode = NULL;
+	while ((mode = (video_mode*)list_get_next_item(&sModeList, mode)) != NULL) {
+		char label[64];
+		snprintf(label, sizeof(label), "%lux%lu %lu bit", mode->width,
+			mode->height, mode->bits_per_pixel);
+
+		menu->AddItem(item = new (std::nothrow)MenuItem(label));
+		item->SetData((const void*)mode->mode);
+		if (mode->mode == sGraphicsMode) {
+			item->SetMarked(true);
+			item->Select(true);
+		}
+	}
+
+	menu->AddSeparatorItem();
+	menu->AddItem(item = new(std::nothrow)MenuItem("Return to main menu"));
+	item->SetType(MENU_ITEM_NO_CHOICE);
+
+	return menu;
 }
 
 

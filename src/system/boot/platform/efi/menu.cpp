@@ -8,12 +8,27 @@
 #include <boot/platform/generic/text_menu.h>
 
 #include "efi_platform.h"
+#include "video.h"
 
 
 void
 platform_add_menus(Menu *menu)
 {
-	// No platform specific menus
+	MenuItem *item;
+
+	switch (menu->Type()) {
+		case MAIN_MENU:
+			item = new(std::nothrow)MenuItem("Select video mode", video_mode_menu());
+			if (item != NULL) {
+				menu->AddItem(item);
+				item->SetTarget(video_mode_hook);
+				item->SetShortcut('v');
+			}
+
+			break;
+		default:
+			break;
+	}
 }
 
 
