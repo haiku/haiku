@@ -241,7 +241,7 @@ struct DefaultWindowBehaviour::DragState : MouseTrackingState {
 			// constrain delta to true change in position
 			delta = fWindow->Frame().LeftTop() - oldLeftTop;
 		} else
-			delta = BPoint(0.0f, 0.0f);
+			delta = BPoint(0, 0);
 	}
 };
 
@@ -261,9 +261,9 @@ struct DefaultWindowBehaviour::ResizeState : MouseTrackingState {
 	{
 		if ((fWindow->Flags() & B_NOT_RESIZABLE) == 0) {
 			if ((fWindow->Flags() & B_NOT_V_RESIZABLE) != 0)
-				delta.y = 0.0f;
+				delta.y = 0;
 			if ((fWindow->Flags() & B_NOT_H_RESIZABLE) != 0)
-				delta.x = 0.0f;
+				delta.x = 0;
 
 			BPoint oldRightBottom = fWindow->Frame().RightBottom();
 
@@ -272,7 +272,7 @@ struct DefaultWindowBehaviour::ResizeState : MouseTrackingState {
 			// constrain delta to true change in size
 			delta = fWindow->Frame().RightBottom() - oldRightBottom;
 		} else
-			delta = BPoint(0.0f, 0.0f);
+			delta = BPoint(0, 0);
 	}
 };
 
@@ -300,9 +300,9 @@ struct DefaultWindowBehaviour::SlideTabState : MouseTrackingState {
 		location += delta.x;
 		AdjustMultiTabLocation(location, true);
 		if (fDesktop->SetWindowTabLocation(fWindow, location, true))
-			delta.y = 0.0f;
+			delta.y = 0;
 		else
-			delta = BPoint(0.0f, 0.0f);
+			delta = BPoint(0, 0);
 	}
 
 	void AdjustMultiTabLocation(float location, bool isShifting)
@@ -328,19 +328,17 @@ struct DefaultWindowBehaviour::SlideTabState : MouseTrackingState {
 			return;
 
 		if (movingTab->tabOffset > location) {
-			if (location
-					> neighbourTab->tabOffset + neighbourTab->tabRect.Width()
-					/ 2) {
+			if (location > neighbourTab->tabOffset
+					+ neighbourTab->tabRect.Width() / 2) {
 				return;
 			}
 		} else {
-			if (location + movingTab->tabRect.Width()
-					< neighbourTab->tabOffset + neighbourTab->tabRect.Width()
-					/ 2) {
+			if (location + movingTab->tabRect.Width() < neighbourTab->tabOffset
+					+ neighbourTab->tabRect.Width() / 2) {
 				return;
 			}
 		}
-		
+
 		fWindow->MoveToStackPosition(neighbourIndex, isShifting);
 	}
 };
