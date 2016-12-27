@@ -60,6 +60,8 @@ typedef struct __timer_t*	timer_t;
 
 typedef struct	_pthread_thread		*pthread_t;
 typedef struct  _pthread_attr		*pthread_attr_t;
+typedef struct  _pthread_barrier	pthread_barrier_t;
+typedef struct  _pthread_barrierattr	*pthread_barrierattr_t;
 typedef struct  _pthread_mutex		pthread_mutex_t;
 typedef struct  _pthread_mutexattr	*pthread_mutexattr_t;
 typedef struct  _pthread_cond		pthread_cond_t;
@@ -69,10 +71,6 @@ typedef struct  _pthread_once		pthread_once_t;
 typedef struct  _pthread_rwlock		pthread_rwlock_t;
 typedef struct  _pthread_rwlockattr	*pthread_rwlockattr_t;
 typedef struct  _pthread_spinlock	pthread_spinlock_t;
-/*
-typedef struct  _pthread_barrier	*pthread_barrier_t;
-typedef struct  _pthread_barrierattr *pthread_barrierattr_t;
-*/
 
 struct _pthread_mutex {
 	__haiku_std_uint32	flags;
@@ -80,6 +78,14 @@ struct _pthread_mutex {
 	__haiku_std_int32	unused;
 	__haiku_std_int32	owner;
 	__haiku_std_int32	owner_count;
+};
+
+struct _pthread_barrier {
+	__haiku_std_uint32	flags;
+	__haiku_std_int32	lock;
+	__haiku_std_int32	mutex;
+	__haiku_std_int32	waiter_count;
+	__haiku_std_int32	waiter_max;
 };
 
 struct _pthread_cond {

@@ -15,6 +15,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			pthread.cpp
 			pthread_atfork.c
 			pthread_attr.c
+			pthread_barrier.cpp
 			pthread_cancel.cpp
 			pthread_cleanup.cpp
 			pthread_cond.cpp

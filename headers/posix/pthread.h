@@ -114,6 +114,20 @@ extern int pthread_mutexattr_setpshared(pthread_mutexattr_t *mutexAttr,
 	int processShared);
 extern int pthread_mutexattr_settype(pthread_mutexattr_t *mutexAttr, int type);
 
+/* barrier functions */
+extern int pthread_barrier_init(pthread_barrier_t *barrier,
+	const pthread_barrierattr_t *attr, unsigned count);
+extern int pthread_barrier_destroy(pthread_barrier_t *barrier);
+extern int pthread_barrier_wait(pthread_barrier_t *barrier);
+
+/* barrier attribute functions */
+extern int pthread_barrierattr_destroy(pthread_barrierattr_t *attr);
+extern int pthread_barrierattr_getpshared(const pthread_barrierattr_t *attr,
+	int *shared);
+extern int pthread_barrierattr_init(pthread_barrierattr_t *attr);
+extern int pthread_barrierattr_setpshared(pthread_barrierattr_t *attr,
+	int shared);
+
 /* condition variable functions */
 extern int pthread_cond_destroy(pthread_cond_t *cond);
 extern int pthread_cond_init(pthread_cond_t *cond,

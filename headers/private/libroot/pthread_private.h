@@ -37,6 +37,10 @@ typedef struct _pthread_mutexattr {
 	bool		process_shared;
 } pthread_mutexattr;
 
+typedef struct _pthread_barrierattr {
+	bool		process_shared;
+} pthread_barrierattr;
+
 typedef struct _pthread_attr {
 	int32		detach_state;
 	int32		sched_priority;
