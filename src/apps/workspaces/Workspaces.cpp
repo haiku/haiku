@@ -489,15 +489,15 @@ WorkspacesView::MessageReceived(BMessage* message)
 
 		case B_MOUSE_WHEEL_CHANGED:
 		{
-			WorkspacesWindow *window;
-			window = dynamic_cast<WorkspacesWindow *>(Window());
-			if (window && !window->SwitchOnWheel())
+			WorkspacesWindow* window
+				= dynamic_cast<WorkspacesWindow*>(Window());
+			if (window == NULL || !window->SwitchOnWheel())
 				break;
 
-			float dy = message->FindFloat("be:wheel_delta_y");
-			if (dy > 0.1)
+			float deltaY = message->FindFloat("be:wheel_delta_y");
+			if (deltaY > 0.1)
 				activate_workspace(current_workspace() + 1);
-			else if (dy < -0.1)
+			else if (deltaY < -0.1)
 				activate_workspace(current_workspace() - 1);
 			break;
 		}
@@ -1049,7 +1049,7 @@ WorkspacesApp::ArgvReceived(int32 argc, char **argv)
 BView* instantiate_deskbar_item()
 {
 	// Calculate the correct size of the Deskbar replicant first
-	
+
 	BScreen screen;
 	float screenWidth = screen.Frame().Width();
 	float screenHeight = screen.Frame().Height();
