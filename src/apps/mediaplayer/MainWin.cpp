@@ -1872,6 +1872,8 @@ MainWin::_ResizeWindow(int percent, bool useNoVideoWidth, bool stayOnScreen)
 		if (!screenFrame.Contains(frame)) {
 			// Resize the window so it doesn't extend outside the current
 			// screen frame.
+			// We don't use BWindow::MoveOnScreen() in order to resize the
+			// window while keeping the same aspect ratio.
 			if (frame.Width() > screenFrame.Width()
 				|| frame.Height() > screenFrame.Height()) {
 				// too large
@@ -2396,6 +2398,7 @@ MainWin::_ShowIfNeeded()
 	if (!fHasVideo && fNoVideoFrame.IsValid()) {
 		MoveTo(fNoVideoFrame.LeftTop());
 		ResizeTo(fNoVideoFrame.Width(), fNoVideoFrame.Height());
+		MoveOnScreen(B_MOVE_IF_PARTIALLY_OFFSCREEN);
 	} else if (fHasVideo && IsHidden())
 		CenterOnScreen();
 
