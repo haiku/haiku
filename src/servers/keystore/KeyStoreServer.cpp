@@ -648,7 +648,7 @@ KeyStoreServer::_ValidateAppAccess(Keyring& keyring, const app_info& appInfo,
 		return result;
 
 	// TODO: Implement running image checksum mechanism.
-	BString checksum = "dummy";
+	BString checksum = path.Path();
 
 	bool appIsNew = false;
 	bool appWasUpdated = false;
