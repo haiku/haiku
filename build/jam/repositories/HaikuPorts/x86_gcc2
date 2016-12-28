@@ -65,7 +65,6 @@ RemotePackageRepository HaikuPorts
 	beget-1.2.3-4
 	belife-1.0.0-2
 	bemines-1.0b2-1
-	bepdf-1.2.0-1
 	bepodder-1.3.0-3
 	bescreencapture-2.2-1
 	bescreencapture_inputfilter-2.2-1
@@ -595,6 +594,7 @@ RemotePackageRepository HaikuPorts
 	avr_binutils_x86-2.26.1_2016_07_22-1
 	avr_gcc_x86-4.8.2_2014_03_20-1
 	avrdude_x86-6.0.1-2
+	bepdf_x86-2.0.1~beta1-1
 	beshare_x86-2.31-1
 	binutils_x86-2.26.1_2016_07_22-1
 	bison_x86-3.0.4-3
@@ -1045,7 +1045,7 @@ RemotePackageRepository HaikuPorts
 	beget
 	belife
 	bemines
-	bepdf
+	bepdf_x86
 	bepodder
 #	bescreencapture
 	beshare_x86
