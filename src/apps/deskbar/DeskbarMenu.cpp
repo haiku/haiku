@@ -196,6 +196,9 @@ TDeskbarMenu::AddNextItem()
 						&data->fTarget, data->fDragMessage);
 				}
 			}
+		} else {
+			for (int i = 0; i < recentTypes; i++)
+				delete recentItem[i];
 		}
 
 		AddSeparatorItem();
