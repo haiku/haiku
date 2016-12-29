@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.12.19
-#	Date:    2016-12-19 03:15:01
+#	Version: 2016.12.25
+#	Date:    2016-12-25 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -2203,6 +2203,9 @@
 	67c0  Ellesmere [Polaris10]
 	67c4  Ellesmere [Radeon Pro WX 7100]
 	67c7  Ellesmere [Radeon Pro WX 5100]
+	67ca  Ellesmere [Polaris10]
+	67cc  Ellesmere [Polaris10]
+	67cf  Ellesmere [Polaris10]
 	67df  Ellesmere [Radeon RX 470/480]
 		1002 0b37  Radeon RX 480
 		1043 04a8  Radeon RX 480
@@ -2927,6 +2930,12 @@
 		148c 9380  Radeon R9 380
 # Make naming scheme consistent
 		174b e308  Radeon R9 380 Nitro 4G D5
+	6980  Polaris12
+	6981  Polaris12
+	6985  Polaris12
+	6986  Polaris12
+	6987  Polaris12
+	699f  Polaris12
 	700f  RS100 AGP Bridge
 	7010  RS200/RS250 AGP Bridge
 	7100  R520 [Radeon X1800 XT]
@@ -10080,6 +10089,7 @@
 	10c3  GT218 [GeForce 8400 GS Rev. 3]
 	10c5  GT218 [GeForce 405]
 	10d8  GT218 [NVS 300]
+	10ef  GP102 HDMI Audio Controller
 	10f0  GP104 High Definition Audio Controller
 	1140  GF117M [GeForce 610M/710M/810M/820M / GT 620M/625M/630M/720M]
 		1019 0799  GeForce 820M
@@ -19525,7 +19535,7 @@
 		1924 5105  SFN4111T-R5
 		1924 5201  SFN4112F-R1
 		1924 5202  SFN4112F-R2
-	0803  SFC9020 [Solarstorm]
+	0803  SFC9020 10G Ethernet Controller
 		1014 0478  2-port 10GbE Low-Latency (R7)
 		1014 0479  2-port 10GbE OpenOnload (R7)
 		1014 04a7  Solarflare 10Gb Low-latency Dual-port HBA (R7)
@@ -19555,7 +19565,7 @@
 		1924 7207  SFN5162F-R7 SFP+ Server Adapter
 		1924 7a06  SFN5152F-R6 SFP+ Server Adapter
 		1924 7a07  SFN5152F-R7 SFP+ Server Adapter
-	0813  SFL9021 [Solarstorm]
+	0813  SFL9021 10GBASE-T Ethernet Controller
 		1924 6100  SFN5121T-R0 10GBASE-T Server Adapter
 		1924 6102  SFN5121T-R2 10GBASE-T Server Adapter
 		1924 6103  SFN5121T-R3 10GBASE-T Server Adapter
@@ -19564,7 +19574,7 @@
 		1924 6904  SFN5111T-R4 10GBASE-T Server Adapter
 		1924 7104  SFN5161T-R4 10GBASE-T Server Adapter
 		1924 7904  SFN5151T-R4 10GBASE-T Server Adapter
-	0903  SFC9120
+	0903  SFC9120 10G Ethernet Controller
 		1014 04cc  SFN7122F-R2 2x10GbE SFP+ Flareon Ultra
 		1924 8002  SFN7122F-R1 SFP+ Server Adapter
 		1924 8003  SFN7x41Q-R1 Flareon Ultra 7000 Series 10/40G Adapter
@@ -19576,11 +19586,11 @@
 		1924 800d  SFN7x02F-R3 Flareon 7000 Series 10G Adapter
 		1924 8010  SFA7942Q-R1 QSFP+ AOE Adapter
 		1924 8015  SFA7942Q-A5-0-R1 QSFP+ AOE Adapter
-	0923  SFC9140
+	0923  SFC9140 10/40G Ethernet Controller
 		1924 800b  SFN7x42Q-R1 Flareon Ultra 7000 Series 10/40G Adapter
 		1924 800e  SFN7x42Q-R2 Flareon Ultra 7000 Series 10/40G Adapter
 		1924 800f  SFN7xx4F-R1 Flareon Ultra 7000 Series 10G Adapter
-	0a03  SFC9220
+	0a03  SFC9220 10/40G Ethernet Controller
 		1924 8011  SFN 8022-R1 Solarflare Flareon 8000 Series 10G Adapter
 		1924 8012  SFN8522-R1 Flareon Ultra 8000 Series 10G Adapter
 		1924 8013  SFN8042-R1 Solarflare Flareon 8000 Series 10/40G Adapter
@@ -19589,11 +19599,11 @@
 		1924 8017  SFN8522-R2 Flareon Ultra 8000 Series 10G Adapter
 		1924 8018  SFN8042-R2 Flareon 8000 Series 10/40G Adapter
 		1924 8019  SFN8542-R2 Flareon Ultra 8000 Series 10/40G Adapter
-	1803  SFC9020 Virtual Function [Solarstorm]
-	1813  SFL9021 Virtual Function [Solarstorm]
-	1903  SFC9120 Virtual Function
-	1923  SFC9140 Virtual Function
-	1a03  SFC9220 Virtual Function
+	1803  SFC9020 10G Ethernet Controller (Virtual Function)
+	1813  SFL9021 10GBASE-T Ethernet Controller (Virtual Function)
+	1903  SFC9120 10G Ethernet Controller (Virtual Function)
+	1923  SFC9140 10/40G Ethernet Controller (Virtual Function)
+	1a03  SFC9220 10/40G Ethernet Controller (Virtual Function)
 	6703  SFC4000 rev A iSCSI/Onload [Solarstorm]
 		10b8 0102  SMC10GPCIe-10BT (A2) [TigerCard]
 		10b8 0103  SMC10GPCIe-10BT (A3) [TigerCard]
