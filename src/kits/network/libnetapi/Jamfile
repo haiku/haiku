@@ -36,11 +36,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			SetupFeatureObjectsDir no-ssl ;
 		}
 
-		# BUrl uses ICU to perform IDNA conversions (unicode domain names)
-		UseBuildFeatureHeaders icu ;
-		Includes [ FGristFiles Url.cpp ]
-			: [ BuildFeatureAttribute icu : headers ] ;
-
 		SharedLibrary [ MultiArchDefaultGristFiles libbnetapi.so ] :
 			init.cpp
 			DynamicBuffer.cpp
@@ -91,7 +86,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			$(md5Sources)
 
 			NetworkRequest.cpp
-			Url.cpp
 			UrlContext.cpp
 			UrlProtocolAsynchronousListener.cpp
 			UrlProtocolDispatchingListener.cpp

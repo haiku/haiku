@@ -11,7 +11,6 @@ BuildPlatformSharedLibrary libbe_build.so :
 	<libbe_build>app_kit.o
 	<libbe_build>icon_kit.o
 	<libbe_build>interface_kit.o
-	<libbe_build>network_kit.o
 	<libbe_build>storage_kit.o
 	<libbe_build>support_kit.o
 
@@ -23,6 +22,5 @@ BuildPlatformSharedLibrary libbe_build.so :
 SubInclude HAIKU_TOP src build libbe app ;
 SubInclude HAIKU_TOP src build libbe icon ;
 SubInclude HAIKU_TOP src build libbe interface ;
-SubInclude HAIKU_TOP src build libbe network ;
 SubInclude HAIKU_TOP src build libbe storage ;
 SubInclude HAIKU_TOP src build libbe support ;

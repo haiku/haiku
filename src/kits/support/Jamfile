@@ -2,7 +2,7 @@ SubDir HAIKU_TOP src kits support ;
 
 SetSubDirSupportedPlatforms haiku libbe_test ;
 
-UsePrivateHeaders app interface media shared support ;
+UsePrivateHeaders app interface locale media shared support ;
 
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
@@ -13,6 +13,11 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 
 		Includes [ FGristFiles ZlibCompressionAlgorithm.cpp ]
 			: [ BuildFeatureAttribute zlib : headers ] ;
+
+		# BUrl uses ICU to perform IDNA conversions (unicode domain names)
+		UseBuildFeatureHeaders icu ;
+		Includes [ FGristFiles Url.cpp ]
+			: [ BuildFeatureAttribute icu : headers ] ;
 
 		MergeObject <libbe!$(architecture)>support_kit.o :
 			Architecture.cpp
@@ -38,6 +43,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			StopWatch.cpp
 			String.cpp
 			StringList.cpp
+			Url.cpp
 			Uuid.cpp
 			ZlibCompressionAlgorithm.cpp
 			;

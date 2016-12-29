@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src build libbe support ;
 
 UsePrivateBuildHeaders app interface shared support ;
+UsePrivateObjectHeaders Url.cpp : locale ;
 
 USES_BE_API on <libbe_build>support_kit.o = true ;
 
@@ -22,5 +23,6 @@ BuildPlatformMergeObjectPIC <libbe_build>support_kit.o :
 	Referenceable.cpp
 	String.cpp
 	StringList.cpp
+	Url.cpp
 	ZlibCompressionAlgorithm.cpp
 ;
