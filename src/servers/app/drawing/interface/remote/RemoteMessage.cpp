@@ -502,8 +502,10 @@ RemoteMessage::ReadGradient(BGradient** _gradient)
 
 		Read(color);
 		result = Read(offset);
-		if (result != B_OK)
+		if (result != B_OK) {
+			delete gradient;
 			return result;
+		}
 
 		gradient->AddColor(color, offset);
 	}
