@@ -465,7 +465,8 @@ TabDecorator::_DistributeTabSize(float delta)
 	}
 
 	// done
-	previousTab->tabRect.right = floorf(fFrame.right + fBorderWidth);
+	if (previousTab != NULL)
+		previousTab->tabRect.right = floorf(fFrame.right + fBorderWidth);
 
 	for (int32 i = 0; i < tabCount; i++) {
 		Decorator::Tab* tab = fTabList.ItemAt(i);
