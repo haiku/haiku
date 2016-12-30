@@ -600,7 +600,7 @@ RemotePackageRepository HaikuPorts
 	avrdude_x86-6.0.1-2
 	bepdf_x86-2.0.1~beta1-1
 	beshare_x86-2.31-1
-	binutils_x86-2.26.1_2016_07_22-1
+	binutils_x86-2.26.1_2016_07_22-2
 	bison_x86-3.0.4-3
 	boost_x86-1.55.0-6
 	boost_x86_atomic-1.55.0-6
