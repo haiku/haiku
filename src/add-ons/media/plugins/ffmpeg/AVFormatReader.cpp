@@ -29,7 +29,7 @@ extern "C" {
 #include "Utilities.h"
 
 
-#define TRACE_AVFORMAT_READER
+//#define TRACE_AVFORMAT_READER
 #ifdef TRACE_AVFORMAT_READER
 #	define TRACE printf
 #	define TRACE_IO(a...)
