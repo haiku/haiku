@@ -239,9 +239,21 @@ size_t
 BSoundFile::ReadFrames(char *buf,
 					   size_t count)
 {
-	UNIMPLEMENTED();
-
-	return 0;
+	size_t frameRead = 0;
+	int64 frames = count;
+	while (count > 0) {
+		status_t status = fMediaTrack->ReadFrames(
+				reinterpret_cast<void *>(buf), &frames);
+		count -= frames;
+		frameRead += frames;
+		buf += fSampleSize * fChannelCount * frames;
+		if (status != B_OK) {
+			if (frameRead > 0)
+				break;
+			return status;
+		}
+	}
+	return frameRead;
 }
 
 
@@ -249,18 +261,21 @@ size_t
 BSoundFile::WriteFrames(char *buf,
 						size_t count)
 {
-	UNIMPLEMENTED();
-
-	return 0;
+	return fMediaTrack->WriteFrames(
+			reinterpret_cast<void *>(buf), count);
 }
 
 
 /* virtual */ off_t
 BSoundFile::SeekToFrame(off_t n)
 {
-	UNIMPLEMENTED();
+	int64 frames = n;
+	status_t status = fMediaTrack->SeekToFrame(&frames);
 
-	return 0;
+	if (status != B_OK)
+		return status;
+
+	return frames;
 }
 
 
@@ -306,6 +321,17 @@ BSoundFile::_init_raw_stats()
 }
 
 
+static int32
+_ParseMimeType(char *mime_type)
+{
+	if (strcmp(mime_type, "audio/x-aiff") == 0)
+		return B_AIFF_FILE;
+	if (strcmp(mime_type, "audio/x-wav") == 0)
+		return B_WAVE_FILE;
+	return B_UNKNOWN_FILE;
+}
+
+
 status_t
 BSoundFile::_ref_to_file(const entry_ref *ref)
 {
@@ -328,14 +354,14 @@ BSoundFile::_ref_to_file(const entry_ref *ref)
 	switch (mfi.family) {
 		case B_AIFF_FORMAT_FAMILY: fFileFormat = B_AIFF_FILE; break;
 		case B_WAV_FORMAT_FAMILY:  fFileFormat = B_WAVE_FILE; break;
-		default:                fFileFormat = B_UNKNOWN_FILE; break;
+		default: fFileFormat = _ParseMimeType(mfi.mime_type); break;
 	}
 	int trackNum = 0;
 	BMediaTrack * track = 0;
 	media_format mf;
 	while (trackNum < media->CountTracks()) {
 		track = media->TrackAt(trackNum);
-		status = track->EncodedFormat(&mf);
+		status = track->DecodedFormat(&mf);
 		if (status != B_OK) {
 			media->ReleaseTrack(track);
 			delete media;
@@ -393,6 +419,7 @@ BSoundFile::_ref_to_file(const entry_ref *ref)
 	}
 	fMediaFile = media;
 	fMediaTrack = track;
+	fSoundFile = file;
 	return B_OK;
 }
 
