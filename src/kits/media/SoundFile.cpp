@@ -6,6 +6,9 @@
 #include <MediaFile.h>
 #include <MediaTrack.h>
 #include <SoundFile.h>
+
+#include <string.h>
+
 #include "debug.h"
 
 /*************************************************************
