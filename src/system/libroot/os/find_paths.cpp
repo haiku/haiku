@@ -125,6 +125,7 @@ public:
 						homeInstallationLocation);
 				if (locations != NULL && locations->IsValid())
 					return locations;
+				delete locations;
 			}
 		}
 
