@@ -29,7 +29,7 @@ extern "C" {
 #include "Utilities.h"
 
 
-//#define TRACE_AVFORMAT_READER
+#define TRACE_AVFORMAT_READER
 #ifdef TRACE_AVFORMAT_READER
 #	define TRACE printf
 #	define TRACE_IO(a...)
@@ -1255,13 +1255,13 @@ AVFormatReader::Stream::GetStreamInfo(int64* frameCount,
 	#endif
 
 	*frameCount = fStream->nb_frames;
-//	if (*frameCount == 0) {
+	if (*frameCount == 0) {
 		// Calculate from duration and frame rate
 		*frameCount = (int64)(*duration * frameRate / 1000000LL);
 		TRACE("  frameCount calculated: %lld, from context: %lld\n",
 			*frameCount, fStream->nb_frames);
-//	} else
-//		TRACE("  frameCount: %lld\n", *frameCount);
+	} else
+		TRACE("  frameCount: %lld\n", *frameCount);
 
 	*format = fFormat;
 
