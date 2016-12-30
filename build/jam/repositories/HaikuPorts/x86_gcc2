@@ -493,8 +493,8 @@ RemotePackageRepository HaikuPorts
 	sdl_net_devel-1.2.8-5
 	sdl_sound-1.0.3-2
 	sdl_sound_devel-1.0.3-2
-	sdl_ttf-2.0.11-4
-	sdl_ttf_devel-2.0.11-4
+	sdl_ttf-2.0.11-5
+	sdl_ttf_devel-2.0.11-5
 	sdl2_image-2.0.0-4
 	sdl2_image_devel-2.0.0-4
 	sdl2_ttf-2.0.12-3
