@@ -975,14 +975,14 @@ RemotePackageRepository HaikuPorts
 	sdcc_x86-3.4.0-1
 	sdl_gfx_x86-2.0.24-1
 	sdl_gfx_x86_devel-2.0.24-1
-	sdl_image_x86-1.2.12-4
-	sdl_image_x86_devel-1.2.12-4
+	sdl_image_x86-1.2.12-5
+	sdl_image_x86_devel-1.2.12-5
 	sdl_net_x86-1.2.8-4
 	sdl_net_x86_devel-1.2.8-4
 	sdl_mixer_x86-1.2.12-3
 	sdl_mixer_x86_devel-1.2.12-3
-	sdl_sound_x86-1.0.3-1
-	sdl_sound_x86_devel-1.0.3-1
+	sdl_sound_x86-1.0.3-5
+	sdl_sound_x86_devel-1.0.3-5
 	sdl_ttf_x86-2.0.11-1
 	sdl_ttf_x86_devel-2.0.11-1
 	sge_x86-030809-1
