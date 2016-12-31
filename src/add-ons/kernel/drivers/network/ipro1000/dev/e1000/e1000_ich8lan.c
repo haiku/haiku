@@ -1146,6 +1146,8 @@ static s32 e1000_check_for_copper_link_ich8lan(struct e1000_hw *hw)
 
 	/* Work-around I218 hang issue */
 	if ((hw->device_id == E1000_DEV_ID_PCH_LPTLP_I218_LM) ||
+	    (hw->device_id == E1000_DEV_ID_PCH_I218_LM3) ||
+	    (hw->device_id == E1000_DEV_ID_PCH_I218_V3) ||
 	    (hw->device_id == E1000_DEV_ID_PCH_LPTLP_I218_V)) {
 		ret_val = e1000_k1_workaround_lpt_lp(hw, link);
 		if (ret_val)
@@ -4479,6 +4481,8 @@ void e1000_suspend_workarounds_ich8lan(struct e1000_hw *hw)
 		u16 phy_reg, device_id = hw->device_id;
 
 		if ((device_id == E1000_DEV_ID_PCH_LPTLP_I218_LM) ||
+		    (device_id == E1000_DEV_ID_PCH_I218_LM3) ||
+		    (device_id == E1000_DEV_ID_PCH_I218_V3) ||
 		    (device_id == E1000_DEV_ID_PCH_LPTLP_I218_V)) {
 			u32 fextnvm6 = E1000_READ_REG(hw, E1000_FEXTNVM6);
 
