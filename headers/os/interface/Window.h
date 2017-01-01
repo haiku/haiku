@@ -366,6 +366,8 @@ private:
 									float* _tabHeight) const;
 			void				_SendShowOrHideMessage();
 
+			void				_CenterAboveCenter(BRect rect);
+
 private:
 			char*				fTitle;
 			int32				_unused0;
