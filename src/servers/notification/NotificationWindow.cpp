@@ -168,9 +168,6 @@ NotificationWindow::MessageReceived(BMessage* message)
 				else
 					be_roster->GetAppInfo("application/x-vnd.Be-SHEL", &info);
 
-				NotificationView* view = new NotificationView(this,
-					notification, timeout);
-
 				bool allow = false;
 				appfilter_t::iterator it = fAppFilters.find(info.signature);
 
@@ -198,6 +195,9 @@ NotificationWindow::MessageReceived(BMessage* message)
 						GetLayout()->AddView(group);
 					} else
 						group = aIt->second;
+
+					NotificationView* view = new NotificationView(this,
+						notification, timeout);
 
 					group->AddInfo(view);
 
