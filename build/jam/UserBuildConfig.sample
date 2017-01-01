@@ -17,6 +17,10 @@
 #SetConfigVar DEBUG : HAIKU_TOP src system boot loader : 1 : global ;
 
 
+# Add default Locale settings skipping FirstBootPrompt
+#AddFilesToHaikuImage home config settings
+#	: $(HAIKU_TOP)/data/settings/first_boot/Locale\ settings ;
+
 # Add symlink/file (keymap settings) to the image.
 #AddFilesToHaikuImage home config settings : <keymap>US-International
 #	: Key_map ;
