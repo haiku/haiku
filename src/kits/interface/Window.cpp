@@ -2568,7 +2568,6 @@ BWindow::ResizeToPreferred()
 }
 
 
-// Centers the window in rect.
 void
 BWindow::CenterIn(const BRect& rect)
 {
@@ -2583,21 +2582,18 @@ BWindow::CenterIn(const BRect& rect)
 }
 
 
-// Centers the window offset a bit above center on the current screen.
 void
 BWindow::CenterOnScreen()
 {
-	BRect screenFrame(BScreen(this).Frame());
-	_CenterAboveCenter(screenFrame);
+	CenterIn(BScreen(this).Frame());
 }
 
 
-// Centers the window offset a bit above center on the screen specified by id.
+// Centers the window on the screen with the passed in id.
 void
 BWindow::CenterOnScreen(screen_id id)
 {
-	BRect screenFrame(BScreen(id).Frame());
-	_CenterAboveCenter(screenFrame);
+	CenterIn(BScreen(id).Frame());
 }
 
 
@@ -4181,45 +4177,6 @@ BWindow::_SendShowOrHideMessage()
 	fLink->StartMessage(AS_SHOW_OR_HIDE_WINDOW);
 	fLink->Attach<int32>(fShowLevel);
 	fLink->Flush();
-}
-
-
-// Centers the window in the rect offset a bit above center.
-void
-BWindow::_CenterAboveCenter(BRect rect)
-{
-	BAutolock locker(this);
-
-	// Set size limits now if needed
-	UpdateSizeLimits();
-
-	BPoint centered = BLayoutUtils::AlignInFrame(rect, Size(),
-		BAlignment(B_ALIGN_HORIZONTAL_CENTER, B_ALIGN_VERTICAL_CENTER))
-			.LeftTop();
-	centered.y -= floorf(rect.Height() / 16);
-		// Offset y coordinate so that the window is positioned like this:
-
-	// ----------------------------------------------------------
-	// |                                                        |
-	// |                                                        |
-	// |                _________                               |
-	// |               [_]_______|_____________                 |
-	// |               |                       |                |
-	// |               |                       |                |
-	// |               |                       |                |
-	// |               |                       |                |
-	// |               |                       |                |
-	// |               |                       |                |
-	// |               |_______________________|                |
-	// |                                                        |
-	// |                                                        |
-	// |                                                        |
-	// |                                                        |
-	// |                                                        |
-	// |                                                        |
-	// ----------------------------------------------------------
-
-	MoveTo(centered);
 }
 
 

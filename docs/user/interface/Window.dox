@@ -1954,11 +1954,7 @@
 
 /*!
 	\fn void BWindow::CenterOnScreen()
-	\brief Centers the window on the current screen.
-
-	The window is positioned on the screen a bit above center. If you want to
-	center the window exactly in the middle you'll need to use
-	BWindow::CenterIn() instead.
+	\brief Centers the window on the screen the window is currently on.
 
 	\since Haiku R1
 */
@@ -1967,12 +1963,6 @@
 /*!
 	\fn void BWindow::CenterOnScreen(screen_id id)
 	\brief Centers the window on the screen with the passed in \a id.
-
-	\param id The screen_id of the screen to center the window in.
-
-	The window is positioned on the screen a bit above center. If you want to
-	center the window exactly in the middle you'll need to use
-	BWindow::CenterIn() instead.
 
 	\since Haiku R1
 */
