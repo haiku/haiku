@@ -373,7 +373,7 @@ pre.terminal {			/* Terminal output*/
 	
 	/* some links we want to print the url along with (CSS2) */
 	a.printurl:after {
-		content: " <" attr(href) ">";
+		content: " &lt;" attr(href) "&gt;";
 		font-weight: normal;
 		font-size: small;
 	}
