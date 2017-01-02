@@ -78,6 +78,7 @@ RemotePackageRepository HaikuPorts
 	bonnie++-1.03e-1
 	bookmarkconverter-0.4.3-1
 	buildbot_slave-0.8.8-4
+	burnitnow-1.1-1
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
 	bzr-2.6.0-2
@@ -626,7 +627,6 @@ RemotePackageRepository HaikuPorts
 	boost_x86_timer-1.55.0-6
 	boost_x86_unit_test_framework-1.55.0-6
 	boost_x86_wave-1.55.0-6
-	burnitnow_x86-0.1.0-2
 	bzip2_x86-1.0.6-5
 	bzip2_x86_devel-1.0.6-5
 	cairo_x86-1.12.18-1
@@ -1078,7 +1078,7 @@ RemotePackageRepository HaikuPorts
 	bookmarkconverter
 	boost_x86
 	buildbot_slave
-	burnitnow_x86
+	burnitnow
 	bzip2
 	bzr
 	cairo_x86

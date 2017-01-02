@@ -71,7 +71,7 @@ RemotePackageRepository HaikuPorts
 	boost_unit_test_framework-1.55.0-6
 	boost_wave-1.55.0-6
 	buildbot_slave-0.8.8-2
-	burnitnow-0.1.0-1
+	burnitnow-1.1-1
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
 	cdrtools-3.02~a06-2
