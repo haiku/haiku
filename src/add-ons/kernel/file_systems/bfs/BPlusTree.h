@@ -165,7 +165,10 @@ public:
 	CachedNode(BPlusTree* tree)
 		:
 		fTree(tree),
-		fNode(NULL)
+		fNode(NULL),
+		fOffset(0),
+		fBlockNumber(0),
+		fWritable(false)
 	{
 #if _BOOT_MODE
 		fBlock = NULL;
@@ -175,7 +178,10 @@ public:
 	CachedNode(BPlusTree* tree, off_t offset, bool check = true)
 		:
 		fTree(tree),
-		fNode(NULL)
+		fNode(NULL),
+		fOffset(0),
+		fBlockNumber(0),
+		fWritable(false)
 	{
 #if _BOOT_MODE
 		fBlock = NULL;
