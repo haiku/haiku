@@ -46,8 +46,8 @@ FilterView::FilterView()
 	fShowField = new BMenuField("category", B_TRANSLATE("Category:"), showMenu);
 
 	// Construct repository popup
-	BPopUpMenu* repositoryMenu = new BPopUpMenu(B_TRANSLATE("Depot"));
-	fRepositoryField = new BMenuField("repository", B_TRANSLATE("Depot:"),
+	BPopUpMenu* repositoryMenu = new BPopUpMenu(B_TRANSLATE("Repository"));
+	fRepositoryField = new BMenuField("repository", B_TRANSLATE("Repository:"),
 		repositoryMenu);
 
 	// Construct search terms field
@@ -125,7 +125,7 @@ FilterView::AdoptModel(const Model& model)
 	BMenu* repositoryMenu = fRepositoryField->Menu();
 		repositoryMenu->RemoveItems(0, repositoryMenu->CountItems(), true);
 
-	repositoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All depots"),
+	repositoryMenu->AddItem(new BMenuItem(B_TRANSLATE("All repositories"),
 		new BMessage(MSG_DEPOT_SELECTED)));
 
 	repositoryMenu->AddItem(new BSeparatorItem());

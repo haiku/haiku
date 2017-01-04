@@ -24,6 +24,7 @@
 #include <MenuBar.h>
 #include <MenuItem.h>
 #include <Messenger.h>
+#include <Roster.h>
 #include <Screen.h>
 #include <ScrollView.h>
 #include <StringList.h>
@@ -63,7 +64,8 @@
 
 enum {
 	MSG_MODEL_WORKER_DONE		= 'mmwd',
-	MSG_REFRESH_DEPOTS			= 'mrdp',
+	MSG_REFRESH_REPOS			= 'mrrp',
+	MSG_MANAGE_REPOS			= 'mmrp',
 	MSG_LOG_IN					= 'lgin',
 	MSG_LOG_OUT					= 'lgot',
 	MSG_AUTHORIZATION_CHANGED	= 'athc',
@@ -316,8 +318,12 @@ MainWindow::MessageReceived(BMessage* message)
 			_StartRefreshWorker(false);
 			break;
 
-		case MSG_REFRESH_DEPOTS:
+		case MSG_REFRESH_REPOS:
 			_StartRefreshWorker(true);
+			break;
+
+		case MSG_MANAGE_REPOS:
+			be_roster->Launch("application/x-vnd.Haiku-Repositories");
 			break;
 
 		case MSG_LOG_IN:
@@ -567,8 +573,10 @@ void
 MainWindow::_BuildMenu(BMenuBar* menuBar)
 {
 	BMenu* menu = new BMenu(B_TRANSLATE("Tools"));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Refresh depots"),
-			new BMessage(MSG_REFRESH_DEPOTS)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Refresh repositories"),
+			new BMessage(MSG_REFRESH_REPOS)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Manage repositories"),
+			new BMessage(MSG_MANAGE_REPOS)));
 
 	menuBar->AddItem(menu);
 

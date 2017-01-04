@@ -1,0 +1,31 @@
+SubDir HAIKU_TOP src preferences repositories ;
+
+UsePrivateHeaders interface ;
+UsePrivateHeaders package ;
+
+Preference Repositories :
+	AddRepoWindow.cpp
+	RepoRow.cpp
+	Repositories.cpp
+	RepositoriesView.cpp
+	RepositoriesWindow.cpp
+	RepositoriesSettings.cpp
+	TaskLooper.cpp
+	TaskTimer.cpp
+	: be package libcolumnlistview.a [ TargetLibstdc++ ] localestub
+	: Repositories.rdef
+;
+
+Depends Repositories : libcolumnlistview.a ;
+
+DoCatalogs Repositories :
+	x-vnd.Haiku-Repositories
+	:
+	AddRepoWindow.cpp
+	constants.h
+	Repositories.cpp
+	RepositoriesView.cpp
+	RepositoriesWindow.cpp
+	TaskLooper.cpp
+	TaskTimer.cpp
+	;
