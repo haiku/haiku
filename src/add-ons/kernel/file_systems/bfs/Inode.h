@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2016, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef INODE_H
@@ -45,7 +45,7 @@ public:
 			recursive_lock&		SmallDataLock() { return fSmallDataLock; }
 
 			status_t			WriteBack(Transaction& transaction);
-			void				UpdateNodeFromDisk();
+			status_t			UpdateNodeFromDisk();
 
 			bool				IsContainer() const
 									{ return S_ISDIR(Mode()); }

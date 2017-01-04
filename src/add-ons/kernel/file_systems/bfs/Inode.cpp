@@ -346,10 +346,13 @@ Inode::Inode(Volume* volume, ino_t id)
 {
 	PRINT(("Inode::Inode(volume = %p, id = %Ld) @ %p\n", volume, id, this));
 
-	UpdateNodeFromDisk();
-
 	rw_lock_init(&fLock, "bfs inode");
 	recursive_lock_init(&fSmallDataLock, "bfs inode small data");
+
+	if (UpdateNodeFromDisk() != B_OK) {
+		// TODO: the error code gets eaten
+		return;
+	}
 
 	// these two will help to maintain the indices
 	fOldSize = Size();
@@ -381,6 +384,11 @@ Inode::Inode(Volume* volume, Transaction& transaction, ino_t id, mode_t mode,
 	recursive_lock_init(&fSmallDataLock, "bfs inode small data");
 
 	NodeGetter node(volume, transaction, this, true);
+	if (node.Node() == NULL) {
+		FATAL(("Could not read inode block %" B_PRId64 "!\n", BlockNumber()));
+		return;
+	}
+
 	memset(&fNode, 0, sizeof(bfs_inode));
 
 	// Initialize the bfs_inode structure -- it's not written back to disk
@@ -490,12 +498,19 @@ Inode::WriteBack(Transaction& transaction)
 }
 
 
-void
+status_t
 Inode::UpdateNodeFromDisk()
 {
 	NodeGetter node(fVolume, this);
+	if (node.Node() == NULL) {
+		FATAL(("Failed to read block %" B_PRId64 " from disk!\n",
+			BlockNumber()));
+		return B_IO_ERROR;
+	}
+
 	memcpy(&fNode, node.Node(), sizeof(bfs_inode));
 	fNode.flags &= HOST_ENDIAN_TO_BFS_INT32(INODE_PERMANENT_FLAGS);
+	return B_OK;
 }
 
 
@@ -916,6 +931,9 @@ status_t
 Inode::GetName(char* buffer, size_t size) const
 {
 	NodeGetter node(fVolume, this);
+	if (node.Node() == NULL)
+		return B_IO_ERROR;
+
 	RecursiveLocker locker(fSmallDataLock);
 
 	const char* name = Name(node.Node());
@@ -940,6 +958,9 @@ Inode::SetName(Transaction& transaction, const char* name)
 		return B_BAD_VALUE;
 
 	NodeGetter node(fVolume, transaction, this);
+	if (node.Node() == NULL)
+		return B_IO_ERROR;
+
 	const char nameTag[2] = {FILE_NAME_NAME, 0};
 
 	return _AddSmallData(transaction, node, nameTag, FILE_NAME_TYPE, 0,
@@ -1013,6 +1034,9 @@ Inode::ReadAttribute(const char* name, int32 type, off_t pos, uint8* buffer,
 	// search in the small_data section (which has to be locked first)
 	{
 		NodeGetter node(fVolume, this);
+		if (node.Node() == NULL)
+			return B_IO_ERROR;
+
 		RecursiveLocker locker(fSmallDataLock);
 
 		small_data* smallData = FindSmallData(node.Node(), name);
@@ -1079,6 +1103,9 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 
 		// save the old attribute data
 		NodeGetter node(fVolume, transaction, this);
+		if (node.Node() == NULL)
+			return B_IO_ERROR;
+
 		recursive_lock_lock(&fSmallDataLock);
 
 		small_data* smallData = FindSmallData(node.Node(), name);
@@ -1148,6 +1175,9 @@ Inode::WriteAttribute(Transaction& transaction, const char* name, int32 type,
 
 		// check if the data fits into the small_data section again
 		NodeGetter node(fVolume, transaction, this);
+		if (node.Node() == NULL)
+			return B_IO_ERROR;
+
 		status = _AddSmallData(transaction, node, name, type, pos, buffer,
 			*_length);
 
@@ -1214,6 +1244,8 @@ Inode::RemoveAttribute(Transaction& transaction, const char* name)
 	Index index(fVolume);
 	bool hasIndex = index.SetTo(name) == B_OK;
 	NodeGetter node(fVolume, this);
+	if (node.Node() == NULL)
+		return B_IO_ERROR;
 
 	// update index for attributes in the small_data section
 	{
@@ -2431,7 +2463,8 @@ void
 Inode::TransactionDone(bool success)
 {
 	if (!success) {
-		// revert any changes made to the cached bfs_inode
+		// Revert any changes made to the cached bfs_inode
+		// TODO: return code gets eaten
 		UpdateNodeFromDisk();
 	}
 }
@@ -2822,6 +2855,9 @@ AttributeIterator::GetNext(char* name, size_t* _length, uint32* _type,
 
 	if (fCurrentSmallData >= 0) {
 		NodeGetter nodeGetter(fInode->GetVolume(), fInode);
+		if (nodeGetter.Node() == NULL)
+			return B_IO_ERROR;
+
 		const bfs_inode* node = nodeGetter.Node();
 		const small_data* item = ((bfs_inode*)node)->SmallDataStart();
 
