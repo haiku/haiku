@@ -1,11 +1,12 @@
 /*
- * Copyright 2001-2008, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 #ifndef CACHED_BLOCK_H
 #define CACHED_BLOCK_H
 
-//!	interface for the block cache
+
+//!	Interface for the block cache
 
 
 #include "system_dependencies.h"
@@ -21,41 +22,44 @@
 // convenient to use them).
 
 class CachedBlock {
-	public:
-		CachedBlock(Volume* volume);
-		CachedBlock(Volume* volume, off_t block);
-		CachedBlock(Volume* volume, block_run run);
-		CachedBlock(CachedBlock* cached);
-		~CachedBlock();
+public:
+								CachedBlock(Volume* volume);
+								CachedBlock(Volume* volume, off_t block);
+								CachedBlock(Volume* volume, block_run run);
+								CachedBlock(CachedBlock* cached);
+								~CachedBlock();
 
-		inline void Keep();
-		inline void Unset();
+	inline	void				Keep();
+	inline	void				Unset();
 
-		inline const uint8* SetTo(off_t block, off_t base, size_t length);
-		inline const uint8* SetTo(off_t block);
-		inline const uint8* SetTo(block_run run);
-		inline uint8* SetToWritable(Transaction& transaction, off_t block,
-			off_t base, size_t length, bool empty = false);
-		inline uint8* SetToWritable(Transaction& transaction, off_t block,
-			bool empty = false);
-		inline uint8* SetToWritable(Transaction& transaction, block_run run,
-			bool empty = false);
-		inline status_t MakeWritable(Transaction& transaction);
+	inline const uint8*			SetTo(off_t block, off_t base, size_t length);
+	inline const uint8*			SetTo(off_t block);
+	inline const uint8*			SetTo(block_run run);
+	inline uint8*				SetToWritable(Transaction& transaction,
+									off_t block, off_t base, size_t length,
+									bool empty = false);
+	inline uint8*				SetToWritable(Transaction& transaction,
+									off_t block, bool empty = false);
+	inline uint8*				SetToWritable(Transaction& transaction,
+									block_run run, bool empty = false);
+	inline status_t				MakeWritable(Transaction& transaction);
 
-		const uint8* Block() const { return fBlock; }
-		off_t BlockNumber() const { return fBlockNumber; }
-		uint32 BlockSize() const { return fVolume->BlockSize(); }
-		uint32 BlockShift() const { return fVolume->BlockShift(); }
+			const uint8*		Block() const { return fBlock; }
+			off_t				BlockNumber() const { return fBlockNumber; }
+			uint32				BlockSize() const
+									{ return fVolume->BlockSize(); }
+			uint32				BlockShift() const
+									{ return fVolume->BlockShift(); }
 
-	private:
-		CachedBlock(const CachedBlock& other);
-		CachedBlock& operator=(const CachedBlock& other);
-			// no implementation
+private:
+	CachedBlock(const CachedBlock& other);
+	CachedBlock& operator=(const CachedBlock& other);
+		// no implementation
 
-	protected:
-		Volume	*fVolume;
-		off_t	fBlockNumber;
-		uint8	*fBlock;
+protected:
+			Volume*				fVolume;
+			off_t				fBlockNumber;
+			uint8*				fBlock;
 };
 
 
@@ -195,5 +199,6 @@ CachedBlock::MakeWritable(Transaction& transaction)
 	return block_cache_make_writable(fVolume->BlockCache(), fBlockNumber,
 		transaction.ID());
 }
+
 
 #endif	// CACHED_BLOCK_H
