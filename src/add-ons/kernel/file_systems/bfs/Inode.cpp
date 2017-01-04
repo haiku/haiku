@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -1431,6 +1431,8 @@ Inode::FindBlockRun(off_t pos, block_run& run, off_t& offset)
 			int32 indirectSize;
 			get_double_indirect_sizes(data->double_indirect.Length(),
 				fVolume->BlockSize(), runsPerBlock, directSize, indirectSize);
+			if (directSize <= 0 || indirectSize <= 0)
+				RETURN_ERROR(B_BAD_DATA);
 
 			off_t start = pos - data->MaxIndirectRange();
 			int32 index = start / indirectSize;
@@ -1920,6 +1922,8 @@ Inode::_GrowStream(Transaction& transaction, off_t size)
 			int32 indirectSize;
 			get_double_indirect_sizes(data->double_indirect.Length(),
 				fVolume->BlockSize(), runsPerBlock, directSize, indirectSize);
+			if (directSize <= 0 || indirectSize <= 0)
+				return B_BAD_DATA;
 
 			off_t start = data->MaxDoubleIndirectRange()
 				- data->MaxIndirectRange();
@@ -2031,6 +2035,8 @@ Inode::_FreeStaticStreamArray(Transaction& transaction, int32 level,
 		indirectSize = double_indirect_max_direct_size(run.Length(),
 			fVolume->BlockSize());
 	}
+	if (indirectSize <= 0)
+		return B_BAD_DATA;
 
 	off_t start;
 	if (size > offset)
