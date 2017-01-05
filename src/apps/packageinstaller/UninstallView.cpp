@@ -361,8 +361,8 @@ UninstallView::_ReloadAppList()
 		if (iter.GetNodeRef(&ref) != B_OK)
 			continue;
 
-		if (strncmp(filename + (strnlen(filename, B_FILE_NAME_LENGTH) - 3),
-				"pdb", 3) != 0) {
+		size_t len = strnlen(filename, B_FILE_NAME_LENGTH);
+		if (len < 3 || strncmp(filename + (len - 3), "pdb", 3) != 0) {
 			printf("Ignoring non-package '%s'\n", filename);
 			continue;
 		}
