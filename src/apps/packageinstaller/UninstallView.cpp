@@ -351,8 +351,6 @@ UninstallView::_ReloadAppList()
 	if (ret != B_OK)
 		return ret;
 
-	fprintf(stderr, "Ichi! %s\n", fToPackages.Path());
-
 	BEntry iter;
 	while (dir.GetNextEntry(&iter) == B_OK) {
 		char filename[B_FILE_NAME_LENGTH];
@@ -362,6 +360,12 @@ UninstallView::_ReloadAppList()
 		node_ref ref;
 		if (iter.GetNodeRef(&ref) != B_OK)
 			continue;
+
+		if (strncmp(filename + (strnlen(filename, B_FILE_NAME_LENGTH) - 3),
+				"pdb", 3) != 0) {
+			printf("Ignoring non-package '%s'\n", filename);
+			continue;
+		}
 
 		printf("Found package '%s'\n", filename);
 		_AddFile(filename, ref);
