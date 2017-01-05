@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2016.12.25
-#	Date:    2016-12-25 03:15:02
+#	Version: 2017.01.01
+#	Date:    2017-01-01 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -19017,6 +19017,7 @@
 	1160  ARC-1160 16-Port PCI-X to SATA RAID Controller
 	1170  ARC-1170 24-Port PCI-X to SATA RAID Controller
 	1201  ARC-1200 2-Port PCI-Express to SATA II RAID Controller
+	1203  ARC-1203 2/4/8 Port PCIe 2.0 to SATA 6Gb RAID Controller
 	1210  ARC-1210 4-Port PCI-Express to SATA RAID Controller
 	1214  ARC-12x4 PCIe 2.0 to SAS/SATA 6Gb RAID Controller
 		17d3 1214  ARC-1214 4-Port PCIe 2.0 to SAS/SATA 6Gb RAID Controller
@@ -23020,6 +23021,10 @@
 	15b7  Ethernet Connection (2) I219-LM
 	15b8  Ethernet Connection (2) I219-V
 	15b9  Ethernet Connection (3) I219-LM
+	15bb  Intel(R) Ethernet Connection (7) I219-LM
+	15bc  Intel(R) Ethernet Connection (7) I219-V
+	15bd  Intel(R) Ethernet Connection (6) I219-LM
+	15be  Intel(R) Ethernet Connection (6) I219-V
 	15bf  JHL6240 Thunderbolt 3 NHI (Low Power) [Alpine Ridge LP 2016]
 	15c0  JHL6240 Thunderbolt 3 Bridge (Low Power) [Alpine Ridge LP 2016]
 	15c5  X553 Virtual Function
