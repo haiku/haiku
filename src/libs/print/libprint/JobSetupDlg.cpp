@@ -211,7 +211,7 @@ JobSetupView::AttachedToWindow()
 	// page range
 
 	BBox* pageRangeBox = new BBox("pageRange");
-	pageRangeBox->SetLabel("Page Range");
+	pageRangeBox->SetLabel("Page range");
 
 	fAll = new BRadioButton("all", "Print all Pages", new BMessage(kMsgRangeAll));
 
@@ -256,7 +256,7 @@ JobSetupView::AttachedToWindow()
 	FillCapabilityMenu(fPaperFeed, kMsgNone, PrinterCap::kPaperSource,
 		fJobData->GetPaperSource());
 	BMenuField* paperSourceMenufield = new BMenuField("paperSource",
-		"Paper Source:", fPaperFeed);
+		"Paper source:", fPaperFeed);
 
 	// Pages per sheet
 	fNup = new BPopUpMenu("");
@@ -264,7 +264,7 @@ JobSetupView::AttachedToWindow()
 	FillCapabilityMenu(fNup, kMsgNone, gNups,
 		sizeof(gNups) / sizeof(gNups[0]), (int)fJobData->GetNup());
 	BMenuField* pagesPerSheet = new BMenuField("pagesPerSheet",
-		"Pages Per Sheet:", fNup);
+		"Pages per sheet:", fNup);
 
 	// duplex
 	if (fPrinterCap->Supports(PrinterCap::kPrintStyle)) {
@@ -279,7 +279,7 @@ JobSetupView::AttachedToWindow()
 	}
 
 	// copies
-	fCopies = new BTextControl("copies", "Number of Copies:", "", NULL);
+	fCopies = new BTextControl("copies", "Number of copies:", "", NULL);
 	AllowOnlyDigits(fCopies->TextView(), 3);
 
 	BString copies;
@@ -295,7 +295,7 @@ JobSetupView::AttachedToWindow()
 	fCollate->SetTarget(this);
 
 	// reverse
-	fReverse = new BCheckBox("reverse", "Reverse Order",
+	fReverse = new BCheckBox("reverse", "Reverse order",
 		new BMessage(kMsgReverseChanged));
 	if (fJobData->GetReverse()) {
 		fReverse->SetValue(B_CONTROL_ON);
@@ -313,14 +313,14 @@ JobSetupView::AttachedToWindow()
 
 	// page selection
 	BBox* pageSelectionBox = new BBox("pageSelection");
-	pageSelectionBox->SetLabel("Page Selection");
+	pageSelectionBox->SetLabel("Page selection");
 
-	fAllPages = CreatePageSelectionItem("allPages", "All Pages",
+	fAllPages = CreatePageSelectionItem("allPages", "All pages",
 		JobData::kAllPages);
 	fOddNumberedPages = CreatePageSelectionItem("oddPages",
-		"Odd-Numbered Pages", JobData::kOddNumberedPages);
+		"Odd-numbered pages", JobData::kOddNumberedPages);
 	fEvenNumberedPages = CreatePageSelectionItem("evenPages",
-		"Even-Numbered Pages", JobData::kEvenNumberedPages);
+		"Even-numbered pages", JobData::kEvenNumberedPages);
 
 	fPreview = new BCheckBox("preview", "Show preview before printing", NULL);
 	if (fJobData->GetShowPreview())
@@ -493,7 +493,7 @@ JobSetupView::CreateHalftoneConfigurationUI()
 	fGamma->SetTarget(this);
 
 	// ink density
-	fInkDensity = new JSDSlider("inkDensity", "Ink Usage",
+	fInkDensity = new JSDSlider("inkDensity", "Ink usage",
 		new BMessage(kMsgQuality), 0, 127);
 
 	fInkDensity->SetLimitLabels("Min", "Max");
@@ -1013,7 +1013,7 @@ JobSetupView::UpdateJobData()
 JobSetupDlg::JobSetupDlg(JobData* jobData, PrinterData* printerData,
 	const PrinterCap* printerCap)
 	:
-	DialogWindow(BRect(100, 100, 200, 200), "PrintJob Setup",
+	DialogWindow(BRect(100, 100, 200, 200), "Print job setup",
 		B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
 			| B_ASYNCHRONOUS_CONTROLS | B_AUTO_UPDATE_SIZE_LIMITS

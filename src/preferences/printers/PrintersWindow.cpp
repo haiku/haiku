@@ -52,7 +52,7 @@ private:
 
 
 TestPageWindow::TestPageWindow(BPrintJob* job, PrinterItem* printer)
-	: BWindow(job->PaperRect().OffsetByCopy(-20000, -20000), B_TRANSLATE("Test Page"),
+	: BWindow(job->PaperRect().OffsetByCopy(-20000, -20000), B_TRANSLATE("Test page"),
 		B_TITLED_WINDOW, 0), fJob(job)
 {
 	fTestPage = new TestPageView(job->PrintableRect(), printer);
@@ -223,7 +223,7 @@ PrintersWindow::MessageReceived(BMessage* msg)
 void
 PrintersWindow::PrintTestPage(PrinterItem* printer)
 {
-	BPrintJob* job = new BPrintJob(B_TRANSLATE("Test Page"));
+	BPrintJob* job = new BPrintJob(B_TRANSLATE("Test page"));
 	job->ConfigPage();
 
 	// job->ConfigJob();

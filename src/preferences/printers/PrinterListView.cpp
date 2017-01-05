@@ -512,15 +512,15 @@ PrinterItem::UpdatePendingJobs()
 	if (fFolder) {
 		uint32 pendingJobs = fFolder->CountJobs();
 		if (pendingJobs == 1) {
-			fPendingJobs = B_TRANSLATE("1 pending job.");
+			fPendingJobs = B_TRANSLATE("1 pending job");
 			return;
 		} else if (pendingJobs > 1) {
 			fPendingJobs = "";
-			fPendingJobs << pendingJobs << B_TRANSLATE(" pending jobs.");
+			fPendingJobs << pendingJobs << B_TRANSLATE(" pending jobs");
 			return;
 		}
 	}
-	fPendingJobs = B_TRANSLATE("No pending jobs.");
+	fPendingJobs = B_TRANSLATE("No pending jobs");
 }
 
 

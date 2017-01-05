@@ -54,7 +54,7 @@ static BMessage* BorderWidthMessage(uint32 what, float width)
 
 
 AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
-	: HWindow(BRect(0, 0, 450, 180), "Advanced Settings", B_TITLED_WINDOW_LOOK,
+	: HWindow(BRect(0, 0, 450, 180), "Advanced settings", B_TITLED_WINDOW_LOOK,
 		B_MODAL_APP_WINDOW_FEEL, B_NOT_RESIZABLE | B_NOT_MINIMIZABLE |
 		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
 	 fSettings(settings)
@@ -87,7 +87,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 		fCloseOption = kNever;
 
 	fLicenseKey = new BTextControl("pdflib_license_key",
-		"PDFlib License Key: ", "", NULL);
+		"PDFlib license key: ", "", NULL);
 	fLicenseKey->SetEnabled(false);
 	fLicenseKey->TextView()->HideTyping(true);
 	fLicenseKey->TextView()->SetText(licenseKey.String());
@@ -102,7 +102,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	menuLinkBorder->SetRadioMode(true);
 
 	BMenuField* menuFieldLinkBorder = new BMenuField("link_border_width_menu",
-		"Link Border: ", menuLinkBorder);
+		"Link border:", menuLinkBorder);
 	menuFieldLinkBorder->Menu()->SetLabelFromMarked(true);
 
 	BMenuItem* item;
@@ -112,19 +112,19 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	item->SetMarked(!fCreateLinks);
 	menuLinkBorder->AddSeparatorItem();
 
-	menuLinkBorder->AddItem(item = new BMenuItem("No Border",
+	menuLinkBorder->AddItem(item = new BMenuItem("No border",
 		BorderWidthMessage(LINK_BORDER_MSG, 0.0)));
 
 	if (fCreateLinks && fLinkBorderWidth == 0)
 		item->SetMarked(true);
 
-	menuLinkBorder->AddItem(item = new BMenuItem("Normal Border",
+	menuLinkBorder->AddItem(item = new BMenuItem("Normal border",
 		BorderWidthMessage(LINK_BORDER_MSG, 1.0)));
 
 	if (fCreateLinks && fLinkBorderWidth == 1)
 		item->SetMarked(true);
 
-	menuLinkBorder->AddItem(item = new BMenuItem("Bold Border",
+	menuLinkBorder->AddItem(item = new BMenuItem("Bold border",
 		BorderWidthMessage(LINK_BORDER_MSG, 2.0)));
 
 	if (fCreateLinks && fLinkBorderWidth == 2)
@@ -137,7 +137,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	menuBookmark->SetRadioMode(true);
 
 	BMenuField* menuFieldBookmark = new BMenuField("definition_menu",
-		"Bookmark Definition File: ", menuBookmark);
+		"Bookmark definition file:", menuBookmark);
 	menuFieldBookmark->Menu()->SetLabelFromMarked(true);
 
 	menuBookmark->AddItem(item = new BMenuItem("None",
@@ -164,7 +164,7 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	menuCrossReferences->SetRadioMode(true);
 
 	BMenuField* menuFieldCrossReferences = new BMenuField("xrefs_menu",
-		"Cross References File: ", menuCrossReferences);
+		"Cross references file:", menuCrossReferences);
 	menuFieldCrossReferences->Menu()->SetLabelFromMarked(true);
 
 	menuCrossReferences->AddItem(item = new BMenuItem("None",
@@ -191,25 +191,25 @@ AdvancedSettingsWindow::AdvancedSettingsWindow(BMessage *settings)
 	menuStatusWindow->SetRadioMode(true);
 
 	BMenuField* menuFieldStatusWindow = new BMenuField("close_option_menu",
-		"Close status window when done: ", menuStatusWindow);
+		"Close status window when done:", menuStatusWindow);
 	menuFieldStatusWindow->Menu()->SetLabelFromMarked(true);
 
 	_AddMenuItem(menuStatusWindow, "Never", kNever);
-	_AddMenuItem(menuStatusWindow, "No Errors", kNoErrors);
-	_AddMenuItem(menuStatusWindow, "No Errors or Warnings",
+	_AddMenuItem(menuStatusWindow, "No errors", kNoErrors);
+	_AddMenuItem(menuStatusWindow, "No errors or warnings",
 		kNoErrorsOrWarnings);
-	_AddMenuItem(menuStatusWindow, "No Errors, Warnings or Info",
+	_AddMenuItem(menuStatusWindow, "No errors, warnings or info",
 		kNoErrorsWarningsOrInfo);
 	_AddMenuItem(menuStatusWindow, "Always", kAlways);
 
 	BButton *cancelButton = new BButton("cancel", "Cancel",
 		new BMessage(CANCEL_MSG));
 
-	BButton *okButton = new BButton("ok", "Ok", new BMessage(OK_MSG));
+	BButton *okButton = new BButton("ok", "OK", new BMessage(OK_MSG));
 	okButton->MakeDefault(true);
 
 	BButton *openButton = new BButton("openSettingsFolder",
-		"Open Settings Folder" B_UTF8_ELLIPSIS,
+		"Open settings folder" B_UTF8_ELLIPSIS,
 		new BMessage(OPEN_SETTINGS_FOLDER_MSG));
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL)

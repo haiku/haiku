@@ -2,9 +2,9 @@
 
 DocInfoWindow.cpp
 
-Copyright (c) 2002 OpenBeOS. 
+Copyright (c) 2002 OpenBeOS.
 
-Author: 
+Author:
 	Michael Pfeiffer
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
@@ -50,7 +50,7 @@ THE SOFTWARE.
 
 
 DocInfoWindow::DocInfoWindow(BMessage *docInfo)
-	: HWindow(BRect(0, 0, 400, 250), "Document Information", B_TITLED_WINDOW_LOOK,
+	: HWindow(BRect(0, 0, 400, 250), "Document information", B_TITLED_WINDOW_LOOK,
 		B_MODAL_APP_WINDOW_FEEL, B_NOT_MINIMIZABLE | B_CLOSE_ON_ESCAPE),
 	fDocInfo(docInfo)
 {
@@ -189,7 +189,7 @@ DocInfoWindow::_SetupDocInfoView(BBox* panel)
 #endif
 
 	// add list of keys
-	fKeyList = new BMenu("Delete Key");
+	fKeyList = new BMenu("Delete key");
 	BMenuField *menu = new BMenuField(bounds, "delete", "", fKeyList,
 		B_FOLLOW_BOTTOM);
 	panel->AddChild(menu);
@@ -199,13 +199,13 @@ DocInfoWindow::_SetupDocInfoView(BBox* panel)
 	menu->ResizeToPreferred();
 	menu->MoveTo(bounds.left, bounds.bottom - menu->Bounds().Height());
 #else
-	menu->ResizeTo(menu->StringWidth("Delete Key") + 15.0, 25.0);
+	menu->ResizeTo(menu->StringWidth("Delete key") + 15.0, 25.0);
 	menu->MoveTo(bounds.left, bounds.bottom - 25.0);
 #endif
 
 	const char* title[6] = { "Title", "Author", "Subject", "Keywords", "Creator",
 		NULL };	// PDFlib sets these: "Producer", "CreationDate", not "ModDate"
-	BMenu* defaultKeys = new BMenu("Default Keys");
+	BMenu* defaultKeys = new BMenu("Default keys");
 	for (int32 i = 0; title[i] != NULL; ++i)
 		defaultKeys->AddItem(new BMenuItem(title[i], new BMessage(DEFAULT_KEY_MSG)));
 
@@ -218,21 +218,21 @@ DocInfoWindow::_SetupDocInfoView(BBox* panel)
 	menu->ResizeToPreferred();
 	menu->MoveBy(frame.Width() + 10.0, 0.0);
 #else
-	menu->ResizeTo(menu->StringWidth("Default Keys") + 15.0, 25.0);
+	menu->ResizeTo(menu->StringWidth("Default keys") + 15.0, 25.0);
 	menu->MoveBy(menu->Bounds().Width() + 10.0, 0.0);
 #endif
 
 	frame = menu->Frame();
 	frame.left = frame.right + 10.0;
 	frame.right = bounds.right;
-	BTextControl *add = new BTextControl(frame, "add", "Add Key:", "",
+	BTextControl *add = new BTextControl(frame, "add", "Add key:", "",
 		new BMessage(ADD_KEY_MSG), B_FOLLOW_LEFT_RIGHT | B_FOLLOW_BOTTOM);
 	panel->AddChild(add);
 
 	float width, height;
 	add->GetPreferredSize(&width, &height);
 	add->ResizeTo(bounds.right - frame.left, height);
-	add->SetDivider(be_plain_font->StringWidth("Add Key: "));
+	add->SetDivider(be_plain_font->StringWidth("Add key: "));
 
 	bounds.bottom = frame.top - 10.0;
 	bounds.right -= B_V_SCROLL_BAR_WIDTH;
@@ -437,13 +437,13 @@ DocInfoWindow::_SetupPasswordView(BBox* panel)
 	BRect bounds(panel->Bounds().InsetByCopy(10.0, 10.0));
 
 	fMasterPassword = _AddPasswordControl(bounds, panel, "master_password",
-		"Master Password:");
+		"Master password:");
 	bounds.OffsetBy(0, fMasterPassword->Bounds().Height());
 	fUserPassword = _AddPasswordControl(bounds, panel, "user_password",
-		"User Password:");
+		"User password:");
 
-	float divider = max_c(panel->StringWidth("Master Password:"),
-		panel->StringWidth("User Password:"));
+	float divider = max_c(panel->StringWidth("Master password:"),
+		panel->StringWidth("User password:"));
 	fMasterPassword->SetDivider(divider);
 	fUserPassword->SetDivider(divider);
 }

@@ -253,7 +253,7 @@ TestPageView::AttachedToWindow()
 	statusView->MakeEditable(false);
 	statusView->MakeSelectable(false);
 
-	const char* title = B_TRANSLATE("Test Page");
+	const char* title = B_TRANSLATE("Test page");
 	BString text;
 	text << title << "\n\n";
 	text << B_TRANSLATE(

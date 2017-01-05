@@ -44,16 +44,16 @@ THE SOFTWARE.
 #include "DocInfoWindow.h"
 
 static const char* includeKeys[] = {
-	"doc_info", 
+	"doc_info",
 #if HAVE_FULLVERSION_PDF_LIB
-	"master_password", "user_password", "permissions", 
+	"master_password", "user_password", "permissions",
 #endif
 	NULL
 };
 
 // --------------------------------------------------
 JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
-	:	HWindow(BRect(0, 0, 100, 100), "Job Setup",
+	:	HWindow(BRect(0, 0, 100, 100), "Job setup",
 			B_TITLED_WINDOW_LOOK,
 			B_MODAL_APP_WINDOW_FEEL,
 			B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
@@ -62,14 +62,14 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 	fSetupMsg = msg;
 	fExitSem = create_sem(0, "JobSetup");
 	fResult	= B_ERROR;
-	
+
 	if (printerName) {
 		BString	title;
-		title << printerName << " Job Setup";
+		title << printerName << " job setup";
 		SetTitle(title.String());
 		fPrinterName = printerName;
 	}
-	
+
 	// PrinterDriver ensures that property exists
 	int32 firstPage;
 	fSetupMsg->FindInt32("first_page", &firstPage);
@@ -85,7 +85,7 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 		fSetupMsg->AddMessage("doc_info", &doc_info);
 	}
 	AddFields(&fDocInfo, fSetupMsg, NULL, includeKeys);
-	
+
 	bool allPages = firstPage == 1 && lastPage == MAX_INT32;
 
 	fAll = new BRadioButton("allPages", "Print all pages",
@@ -155,7 +155,7 @@ JobSetupWindow::JobSetupWindow(BMessage *msg, const char * printerName)
 
 // --------------------------------------------------
 void
-JobSetupWindow::UpdateJobMessage() 
+JobSetupWindow::UpdateJobMessage()
 {
 	int32 copies = 1;
 
@@ -203,7 +203,7 @@ JobSetupWindow::MessageReceived(BMessage *msg)
 			fResult = B_OK;
 			release_sem(fExitSem);
 			break;
-		
+
 		case CANCEL_MSG:
 			release_sem(fExitSem);
 			break;
@@ -227,7 +227,7 @@ JobSetupWindow::MessageReceived(BMessage *msg)
 			break;
 	}
 }
-			
+
 
 // --------------------------------------------------
 status_t

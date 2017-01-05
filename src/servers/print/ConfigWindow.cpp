@@ -160,23 +160,23 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	fPrinters = new BMenuField(B_TRANSLATE("Printer:"), menu);
 
 	// page format button
-	fPageSetup = AddPictureButton(panel, "Paper setup",
+	fPageSetup = AddPictureButton(panel, "Page setup",
 		"PAGE_SETUP", MSG_PAGE_SETUP);
 
 	// add description to button
 	BStringView *pageFormatTitle = new BStringView("paperSetupTitle",
-		B_TRANSLATE("Paper setup:"));
-	fPageFormatText = new BStringView("paperSetupText", "");
+		B_TRANSLATE("Page setup:"));
+	fPageFormatText = new BStringView("pageSetupText", "");
 
 	// page selection button
 	fJobSetup = NULL;
 	BStringView* jobSetupTitle = NULL;
 	if (kind == kJobSetup) {
-		fJobSetup = AddPictureButton(panel, "Page setup",
+		fJobSetup = AddPictureButton(panel, "Job setup",
 			"JOB_SETUP", MSG_JOB_SETUP);
 		// add description to button
 		jobSetupTitle = new BStringView("jobSetupTitle",
-			B_TRANSLATE("Page setup:"));
+			B_TRANSLATE("Print job setup:"));
 		fJobSetupText = new BStringView("jobSetupText", "");
 	}
 

@@ -65,7 +65,7 @@ const static float kMinFieldWidth = 100; // pixels
 const static float kMinUnitHeight = 30; // pixels
 
 const static float kUnitFormat[] = { kInchUnits, kCMUnits, kPointUnits };
-const static char *kUnitNames[] = { "Inch", "cm", "Points", NULL };
+const static char *kUnitNames[] = { "inch", "cm", "points", NULL };
 const static MarginUnit kUnitMsg[] = { kUnitInch, kUnitCM, kUnitPoint };
 
 const pattern kDots = {{ 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55 }};

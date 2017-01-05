@@ -792,22 +792,22 @@ PreviewWindow::PreviewWindow(BFile* jobFile, bool showOkAndCancelButtons)
 
 	bounds.OffsetBy(10.0, 10.0);
 
-	fFirst = new BButton(bounds, "first", "First Page", new BMessage(MSG_FIRST_PAGE));
+	fFirst = new BButton(bounds, "first", "First page", new BMessage(MSG_FIRST_PAGE));
 	panel->AddChild(fFirst);
 	fFirst->ResizeToPreferred();
 
 	bounds.OffsetBy(fFirst->Bounds().Width() + 10.0, 0.0);
-	fPrev = new BButton(bounds, "previous", "Previous Page", new BMessage(MSG_PREV_PAGE));
+	fPrev = new BButton(bounds, "previous", "Previous page", new BMessage(MSG_PREV_PAGE));
 	panel->AddChild(fPrev);
 	fPrev->ResizeToPreferred();
 
 	bounds.OffsetBy(fPrev->Bounds().Width() + 10.0, 0.0);
-	fNext = new BButton(bounds, "next", "Next Page", new BMessage(MSG_NEXT_PAGE));
+	fNext = new BButton(bounds, "next", "Next page", new BMessage(MSG_NEXT_PAGE));
 	panel->AddChild(fNext);
 	fNext->ResizeToPreferred();
 
 	bounds.OffsetBy(fNext->Bounds().Width() + 10.0, 0.0);
-	fLast = new BButton(bounds, "last", "Last Page", new BMessage(MSG_LAST_PAGE));
+	fLast = new BButton(bounds, "last", "Last page", new BMessage(MSG_LAST_PAGE));
 	panel->AddChild(fLast);
 	fLast->ResizeToPreferred();
 
@@ -832,16 +832,16 @@ PreviewWindow::PreviewWindow(BFile* jobFile, bool showOkAndCancelButtons)
 	bounds.OffsetBy(fPageNumber->Bounds().Width() + 5.0, 0.0);
 	fPageText = new BStringView(bounds, "pageText", "");
 	panel->AddChild(fPageText);
-	fPageText->ResizeTo(fPageText->StringWidth("of 99999 Pages"),
+	fPageText->ResizeTo(fPageText->StringWidth("of 99999 pages"),
 		fFirst->Bounds().Height());
 
 	bounds.OffsetBy(fPageText->Bounds().Width() + 10.0, 0.0);
-	fZoomIn = new BButton(bounds, "zoomIn", "Zoom In", new BMessage(MSG_ZOOM_IN));
+	fZoomIn = new BButton(bounds, "zoomIn", "Zoom in", new BMessage(MSG_ZOOM_IN));
 	panel->AddChild(fZoomIn);
 	fZoomIn->ResizeToPreferred();
 
 	bounds.OffsetBy(fZoomIn->Bounds().Width() + 10.0, 0.0);
-	fZoomOut = new BButton(bounds, "ZoomOut", "Zoom Out", new BMessage(MSG_ZOOM_OUT));
+	fZoomOut = new BButton(bounds, "ZoomOut", "Zoom out", new BMessage(MSG_ZOOM_OUT));
 	panel->AddChild(fZoomOut);
 	fZoomOut->ResizeToPreferred();
 

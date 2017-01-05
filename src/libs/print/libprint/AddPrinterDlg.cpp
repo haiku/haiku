@@ -20,7 +20,7 @@ ProtocolClassItem::ProtocolClassItem(const ProtocolClassCap* cap)
 }
 
 
-int 
+int
 ProtocolClassItem::GetProtocolClass() const
 {
 	return fProtocolClassCap->fProtocolClass;
@@ -53,22 +53,22 @@ AddPrinterView::AttachedToWindow()
 {
 	// protocol class box
 	BBox* protocolClassBox = new BBox("protocolClass");
-	protocolClassBox->SetLabel("Protocol Classes:");
-	
+	protocolClassBox->SetLabel("Protocol classes:");
+
 	// protocol class
 	fProtocolClassList = new BListView("protocolClassList");
 	fProtocolClassList->SetExplicitMinSize(BSize(500, 200));
 	BScrollView* protocolClassScroller = new BScrollView(
-		"protocolClassListScroller", 
-		fProtocolClassList, 
-		0, 
-		false, 
+		"protocolClassListScroller",
+		fProtocolClassList,
+		0,
+		false,
 		true,
 		B_NO_BORDER);
 	fProtocolClassList->SetSelectionMessage(
 		new BMessage(kMsgProtocolClassChanged));
 	fProtocolClassList->SetTarget(this);
-	
+
 	protocolClassBox->AddChild(protocolClassScroller);
 
 	int count = fPrinterCap->CountCap(PrinterCap::kProtocolClass);
@@ -76,7 +76,7 @@ AddPrinterView::AttachedToWindow()
 		(ProtocolClassCap **)fPrinterCap->GetCaps(PrinterCap::kProtocolClass);
 	while (count--) {
 		const ProtocolClassCap *protocolClass = *protocolClasses;
-		
+
 		BStringItem* item = new ProtocolClassItem(protocolClass);
 		fProtocolClassList->AddItem(item);
 		if (protocolClass->fIsDefault) {
@@ -85,7 +85,7 @@ AddPrinterView::AttachedToWindow()
 		}
 		protocolClasses ++;
 	}
-	
+
 	// description of protocol class box
 	BBox* descriptionBox = new BBox("descriptionBox");
 	descriptionBox->SetLabel("Description:");
@@ -128,7 +128,7 @@ AddPrinterView::AttachedToWindow()
 		.SetInsets(0, 0, 0, 0)
 	);
 
-	
+
 	// update description
 	BMessage updateDescription(kMsgProtocolClassChanged);
 	MessageReceived(&updateDescription);
@@ -153,7 +153,7 @@ AddPrinterView::MessageReceived(BMessage* msg)
 		ProtocolClassItem *item = CurrentSelection();
 		if (item != NULL) {
 			fDescription->SetText(item->GetDescription());
-		}		
+		}
 	} else {
 		BView::MessageReceived(msg);
 	}
@@ -175,7 +175,7 @@ AddPrinterDlg::AddPrinterDlg(PrinterData* printerData,
 	const PrinterCap *printerCap)
 	:
 	DialogWindow(BRect(100, 100, 120, 120),
-		"Add Printer", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
+		"Add printer", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE | B_ASYNCHRONOUS_CONTROLS
 			| B_AUTO_UPDATE_SIZE_LIMITS)
 {
@@ -190,7 +190,7 @@ AddPrinterDlg::AddPrinterDlg(PrinterData* printerData,
 }
 
 
-void 
+void
 AddPrinterDlg::MessageReceived(BMessage* msg)
 {
 	switch (msg->what) {
