@@ -145,6 +145,31 @@ StringSearchTest::PerformTest(void)
 	CPPUNIT_ASSERT(i == B_ERROR);
 	delete string1;
 
+#ifndef TEST_R5
+	//StartsWith(BString&)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	string2 = new BString("last");
+	i = (int32)string1->StartsWith(*string2);
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+	delete string2;
+
+	//StartsWith(const char*)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	i = (int32)string1->StartsWith("last");
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+
+	//StartsWith(const char*, int32)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	i = (int32)string1->StartsWith("last", 4);
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+#endif
+
 	//FindLast(BString&)
 	NextSubTest();
 	string1 = new BString("last but not least");
@@ -387,6 +412,29 @@ StringSearchTest::PerformTest(void)
 	delete string1;
 
 #ifndef TEST_R5
+	//IStartsWith(BString&)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	string2 = new BString("lAsT");
+	i = (int32)string1->StartsWith(*string2);
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+	delete string2;
+
+	//IStartsWith(const char*)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	i = (int32)string1->StartsWith("lAsT");
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+
+	//IStartsWith(const char*, int32)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	i = (int32)string1->StartsWith("lAsT", 4);
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+
 	//IFindLast(BString&)
 	NextSubTest();
 	string1 = new BString("last but not least");
@@ -403,6 +451,92 @@ StringSearchTest::PerformTest(void)
 	CPPUNIT_ASSERT(i == 16);
 	delete string1;
 	delete string2;
+
+	//EndsWith(BString&)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	string2 = new BString("st");
+	i = (int32)string1->EndsWith(*string2);
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+	delete string2;
+
+	NextSubTest();
+	string1 = new BString("laSt but NOT leaSt");
+	string2 = new BString("sT");
+	i = (int32)string1->EndsWith(*string2);
+	CPPUNIT_ASSERT(i == 0);
+	delete string1;
+	delete string2;
+
+	//EndsWith(const char*)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	i = (int32)string1->EndsWith("least");
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+
+	NextSubTest();
+	string1 = new BString("laSt but NOT leaSt");
+	i = (int32)string1->EndsWith("least");
+	CPPUNIT_ASSERT(i == 0);
+	delete string1;
+
+	//EndsWith(const char*, int32)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	i = (int32)string1->EndsWith("sT", 2);
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+
+	NextSubTest();
+	string1 = new BString("laSt but NOT leaSt");
+	i = (int32)string1->EndsWith("sT", 2);
+	CPPUNIT_ASSERT(i == 0);
+	delete string1;
+
+	//IEndsWith(BString&)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	string2 = new BString("st");
+	i = (int32)string1->IEndsWith(*string2);
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+	delete string2;
+
+	NextSubTest();
+	string1 = new BString("laSt but NOT leaSt");
+	string2 = new BString("sT");
+	i = (int32)string1->IEndsWith(*string2);
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+	delete string2;
+
+	//IEndsWith(const char*)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	i = (int32)string1->IEndsWith("st");
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+
+	NextSubTest();
+	string1 = new BString("laSt but NOT leaSt");
+	i = (int32)string1->IEndsWith("sT");
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+
+	//IEndsWith(const char*, int32)
+	NextSubTest();
+	string1 = new BString("last but not least");
+	i = (int32)string1->IEndsWith("st", 2);
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
+
+	NextSubTest();
+	string1 = new BString("laSt but NOT leaSt");
+	i = (int32)string1->IEndsWith("sT", 2);
+	CPPUNIT_ASSERT(i != 0);
+	delete string1;
 #endif
 
 	NextSubTest();
