@@ -1413,6 +1413,30 @@ BString::StartsWith(const char* string, int32 length) const
 
 
 bool
+BString::IStartsWith(const BString& string) const
+{
+	return IStartsWith(string.String(), string.Length());
+}
+
+
+bool
+BString::IStartsWith(const char* string) const
+{
+	return IStartsWith(string, strlen(string));
+}
+
+
+bool
+BString::IStartsWith(const char* string, int32 length) const
+{
+	if (length > Length() || length > (int32)strlen(string))
+		return false;
+
+	return _IFindAfter(string, 0, length) == 0;
+}
+
+
+bool
 BString::EndsWith(const BString& string) const
 {
 	return EndsWith(string.String(), string.Length());
@@ -1434,6 +1458,31 @@ BString::EndsWith(const char* string, int32 length) const
 		return false;
 
 	return memcmp(String() + offset, string, length) == 0;
+}
+
+
+bool
+BString::IEndsWith(const BString& string) const
+{
+	return IEndsWith(string.String(), string.Length());
+}
+
+
+bool
+BString::IEndsWith(const char* string) const
+{
+	return IEndsWith(string, strlen(string));
+}
+
+
+bool
+BString::IEndsWith(const char* string, int32 length) const
+{
+	int32 offset = Length() - length;
+	if (offset < 0)
+		return false;
+
+	return _IFindBefore(string, Length(), length) == offset;
 }
 
 
