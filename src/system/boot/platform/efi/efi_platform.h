@@ -18,6 +18,6 @@
 extern const EFI_SYSTEM_TABLE		*kSystemTable;
 extern const EFI_BOOT_SERVICES		*kBootServices;
 extern const EFI_RUNTIME_SERVICES	*kRuntimeServices;
-
+extern EFI_HANDLE kImage;
 
 #endif	/* EFI_PLATFORM_H */
