@@ -2034,6 +2034,49 @@
 
 
 /*!
+	\fn bool BString::IStartsWith(const BString& string) const
+	\brief Returns whether or not the BString starts with \a string
+	       case-insensitively.
+
+	\param string The \a string to search for.
+
+	\return \c true if the BString started with \a string case-insensitively,
+	        \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BString::IStartsWith(const char* string) const
+	\brief Returns whether or not the BString starts with \a string
+	       case-insensitively.
+
+	\param string The \a string to search for.
+
+	\return \c true if the BString started with \a string case-insensitively,
+	        \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BString::IStartsWith(const char* string, int32 length) const
+	\brief Returns whether or not the BString starts with \a length characters
+	       of \a string case-insensitively.
+
+	\param string The \a string to search for.
+	\param length The number of characters (bytes) of \a string to search for.
+
+	\return \c true if the BString started with \a length characters of
+	        \a string case-insensitively, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
 	\fn bool BString::EndsWith(const BString& string) const
 	\brief Returns whether or not the BString ends with \a string.
 
@@ -2067,6 +2110,49 @@
 
 	\return \c true if the BString ended with \a length characters of
 	        \a string, \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BString::IEndsWith(const BString& string) const
+	\brief Returns whether or not the BString ends with \a string
+	       case-insensitively.
+
+	\param string The \a string to search for.
+
+	\return \c true if the BString ended with \a string case-insensitively,
+	        \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BString::IEndsWith(const char* string) const
+	\brief Returns whether or not the BString ends with \a string
+	       case-insensitively.
+
+	\param string The \a string to search for.
+
+	\return \c true if the BString ended with \a string case-insensitively,
+	        \c false otherwise.
+
+	\since Haiku R1
+*/
+
+
+/*!
+	\fn bool BString::IEndsWith(const char* string, int32 length) const
+	\brief Returns whether or not the BString ends with \a length characters
+	       of \a string case-insensitively.
+
+	\param string The \a string to search for.
+	\param length The number of characters (bytes) of \a string to search for.
+
+	\return \c true if the BString ended with \a length characters of
+	        \a string case-insensitively, \c false otherwise.
 
 	\since Haiku R1
 */
