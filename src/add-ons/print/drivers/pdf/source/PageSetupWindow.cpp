@@ -93,7 +93,7 @@ static const char *pdf_compatibility[] = { "1.3", "1.4", NULL };
 
 
 PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
-	: HWindow(BRect(0, 0, 200, 100), "Page setup", B_TITLED_WINDOW_LOOK,
+	: HWindow(BRect(0, 0, 200, 100), "Paper setup", B_TITLED_WINDOW_LOOK,
  		B_MODAL_APP_WINDOW_FEEL,
  		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE),
@@ -105,7 +105,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	fExitSem = create_sem(0, "PageSetup");
 
 	if (printerName)
-		SetTitle(BString(printerName).Append(" page setup").String());
+		SetTitle(BString(printerName).Append(" paper setup").String());
 
 	if (fSetupMsg->FindInt32("orientation", &fCurrentOrientation) != B_OK)
 		fCurrentOrientation = PrinterDriver::PORTRAIT_ORIENTATION;

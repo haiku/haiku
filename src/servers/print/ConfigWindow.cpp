@@ -160,12 +160,12 @@ ConfigWindow::ConfigWindow(config_setup_kind kind, Printer* defaultPrinter,
 	fPrinters = new BMenuField(B_TRANSLATE("Printer:"), menu);
 
 	// page format button
-	fPageSetup = AddPictureButton(panel, "Page setup",
+	fPageSetup = AddPictureButton(panel, "Paper setup",
 		"PAGE_SETUP", MSG_PAGE_SETUP);
 
 	// add description to button
 	BStringView *pageFormatTitle = new BStringView("paperSetupTitle",
-		B_TRANSLATE("Page setup:"));
+		B_TRANSLATE("Paper setup:"));
 	fPageFormatText = new BStringView("pageSetupText", "");
 
 	// page selection button
