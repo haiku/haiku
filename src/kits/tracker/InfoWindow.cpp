@@ -368,7 +368,14 @@ BInfoWindow::Show()
 	float width = font->StringWidth("This is a really long string which we"
 		"will use to find the window width");
 
-	float height = font->Size() * 15;
+	// window height depends on file type
+	int lines = 7;
+	if (fModel->IsSymLink())
+		lines++;
+	if (fModel->IsExecutable())
+		lines += 2;
+	float height = font->Size() * (lines * 2 + 1);
+
 	ResizeTo(width, height);
 
 	BRect attrRect(Bounds());
