@@ -106,7 +106,7 @@ RepositoriesView::RepositoriesView()
 	fListStatusView->SetHighUIColor(fListStatusView->HighUIColor(), .9f);
 
 	// Set appropriate explicit view sizes
-	float viewWidth = max(fListStatusView->StringWidth(templateText),
+	float viewWidth = std::max(fListStatusView->StringWidth(templateText),
 		fListStatusView->StringWidth(kStatusCompletedText));
 	BSize statusViewSize(viewWidth + 3, B_H_SCROLL_BAR_HEIGHT - 2);
 	fListStatusView->SetExplicitSize(statusViewSize);
@@ -247,11 +247,11 @@ RepositoriesView::MessageReceived(BMessage* message)
 				BString repoText;
 				repoText.Append("\n").Append(rowItem->Name())
 					.Append(" (").Append(rowItem->Url()).Append(")");
-				minWidth = max(minWidth, StringWidth(repoText.String()));
+				minWidth = std::max(minWidth, StringWidth(repoText.String()));
 				text.Append(repoText);
 				rowItem = dynamic_cast<RepoRow*>(fListView->CurrentSelection(rowItem));
 			}
-			minWidth = min(minWidth, Frame().Width());
+			minWidth = std::min(minWidth, Frame().Width());
 				// Ensure alert window isn't much larger than the main window
 			BAlert* alert = new BAlert("confirm", text, kRemoveLabel,
 				kCancelLabel, NULL, B_WIDTH_AS_USUAL, B_WARNING_ALERT);
