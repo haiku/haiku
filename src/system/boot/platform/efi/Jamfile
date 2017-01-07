@@ -6,6 +6,7 @@ UsePrivateHeaders [ FDirName kernel boot ] ;
 UseBuildFeatureHeaders gnuefi ;
 UseBuildFeatureHeaders gnuefi : headersProtocol ;
 UseBuildFeatureHeaders gnuefi : headersArch ;
+SubDirHdrs $(HAIKU_TOP) src add-ons kernel partitioning_systems gpt ;
 
 {
 	local defines = _BOOT_MODE GNU_EFI_USE_MS_ABI _BOOT_PLATFORM_EFI ;

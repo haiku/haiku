@@ -30,6 +30,8 @@ public:
 									{ return fHeader.FirstUsableBlock(); }
 			uint64				LastUsableBlock() const
 									{ return fHeader.LastUsableBlock(); }
+			const efi_table_header& TableHeader() const
+									{ return fHeader; }
 
 			uint32				EntryCount() const
 									{ return fHeader.EntryCount(); }

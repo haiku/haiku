@@ -12,7 +12,11 @@
 #include <boot/stdio.h>
 #include <util/list.h>
 
+#include "Header.h"
+
 #include "efi_platform.h"
+#include "efigpt.h"
+#include "gpt_known_guids.h"
 
 
 struct device_handle {
@@ -395,6 +399,53 @@ add_remaining_devices(NodeList *devicesList)
 }
 
 
+static bool
+device_contains_partition(EfiDevice *device, boot::Partition *partition)
+{
+	EFI::Header *header = (EFI::Header*)partition->content_cookie;
+	if (header != NULL && header->InitCheck() == B_OK) {
+		// check if device is GPT, and contains partition entry
+		uint32 blockSize = device->BlockSize();
+		EFI_PARTITION_TABLE_HEADER *deviceHeader =
+			(EFI_PARTITION_TABLE_HEADER*)malloc(blockSize);
+		ssize_t bytesRead = device->ReadAt(NULL, blockSize, deviceHeader,
+			blockSize);
+		if (bytesRead != blockSize)
+			return false;
+
+		if (memcmp(deviceHeader, &header->TableHeader(),
+				sizeof(efi_table_header)) != 0)
+			return false;
+
+		// partition->cookie == int partition entry index
+		uint32 index = (uint32)(addr_t)partition->cookie;
+		uint32 size = sizeof(EFI_PARTITION_ENTRY) * (index + 1);
+		EFI_PARTITION_ENTRY *entries = (EFI_PARTITION_ENTRY*)malloc(size);
+		bytesRead = device->ReadAt(NULL,
+			deviceHeader->PartitionEntryLBA * blockSize, entries, size);
+		if (bytesRead != size)
+			return false;
+
+		if (memcmp(&entries[index], &header->EntryAt(index),
+				sizeof(efi_partition_entry)) != 0)
+			return false;
+
+		for (size_t i = 0; i < sizeof(kTypeMap) / sizeof(struct type_map); ++i)
+			if (strcmp(kTypeMap[i].type, BFS_NAME) == 0)
+				if (kTypeMap[i].guid == header->EntryAt(index).partition_type)
+					return true;
+
+		// Our partition has an EFI header, but we couldn't find one, so bail
+		return false;
+	}
+
+	if ((partition->offset + partition->size) <= device->Size())
+			return true;
+
+	return false;
+}
+
+
 status_t
 platform_add_boot_device(struct stage2_args *args, NodeList *devicesList)
 {
@@ -437,12 +488,10 @@ platform_get_boot_partition(struct stage2_args *args, Node *bootDevice,
 	NodeIterator iterator = partitions->GetIterator();
 	boot::Partition *partition = NULL;
 	while ((partition = (boot::Partition *)iterator.Next()) != NULL) {
-		// Currently we pick last partition; seems to work enough for now
-		// until we can actually identify the partition we want to boot
-		// from
-		*_partition = partition;
-		if (!iterator.HasNext())
+		if (device_contains_partition((EfiDevice*)bootDevice, partition)) {
+			*_partition = partition;
 			return B_OK;
+		}
 	}
 
 	return B_ENTRY_NOT_FOUND;
