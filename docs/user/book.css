@@ -147,7 +147,8 @@ h4 a:hover, a:active, h5 a:hover, a:active, h6 a:hover, a:active {
 
 #banner div.logo {
 	background: url('https://api.haiku-os.org/logo.png') no-repeat scroll 0 0 transparent;
-	width: 59em;
+	min-width: 59em;
+	max-width: 70em;
 	height: 100%;
 	margin: 0 auto;
 }
@@ -183,18 +184,21 @@ input[type=text], input[type=password] {
 div.header {
 	margin-top: 20px;
 	margin: 10px auto;
-	width: 59em;
+	min-width: 59em;
+	max-width: 70em;
 }
 
 div.summary {
 	margin: 0 auto;
-	width: 59em;
+	min-width: 59em;
+	max-width: 70em;
 
 	display: none;
 }
 
 div.headertitle {
-	width: 59em;
+	min-width: 59em;
+	max-width: 70em;
 }
 
 div.headertitle div.title {
@@ -226,12 +230,14 @@ div.tabs ul.tablist, div.tabs2 ul.tablist, div.tabs3 ul.tablist {
 	padding-top: 3px;
 	padding-bottom: 2px;
 	list-style: none;
-	width: 59em;
+	min-width: 59em;
+	max-width: 70em;
 }
 
 div.navpath {
 	margin: 20px auto;
-	width: 59em;
+	min-width: 59em;
+	max-width: 70em;
 }
 
 div.navpath ul {
@@ -277,7 +283,8 @@ div.tabs ul.tablist li li.current a, div.tabs2 ul.tablist li li.current a,
 div.contents, footer {
 	line-height: 1.5;
 	margin: 10px auto;
-	width: 59em;
+	min-width: 59em;
+	max-width: 70em;
 }
 
 div.contents ul, div.contents ol {
