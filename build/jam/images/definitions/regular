@@ -50,6 +50,7 @@ SYSTEM_PREFERENCES += [ FFilterByBuildFeatures
 	E-mail
 	Media
 	Printers
+	Repositories
 	ScreenSaver Sounds
 ] ;
 
@@ -71,7 +72,7 @@ rule HaikuImageGetSystemLibs
 			libalm.so
 			libbe.so libbsd.so libbnetapi.so
 			libbluetooth.so
-			libdebug.so 
+			libdebug.so
 			libdebugger.so@primary
 			libdevice.so
 			libgame.so libglut.so@mesa libgnu.so
