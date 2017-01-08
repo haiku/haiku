@@ -195,7 +195,7 @@ if [ IsOptionalHaikuImagePackageAdded WebPositive ] {
 				AddPackageFilesToHaikuImage system : webpositive.hpkg
 					: nameFromMetaInfo ;
 				InstallOptionalHaikuImagePackage
-					$(baseURL)/WebPositiveBookmarks-2016-11-06.zip
+					$(baseURL)/WebPositiveBookmarks-2017-01-08.zip
 					: home config settings WebPositive ;
 				break ;
 			}
