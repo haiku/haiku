@@ -111,13 +111,21 @@ TBarMenuBar::TBarMenuBar(BRect frame, const char* name, TBarView* barView)
 
 	fDeskbarMenuItem = new TDeskbarMenuTitle(frame.Width(), frame.Height(),
 		NULL, beMenu);
-	fDeskbarMenuItem->FetchIcon();
 	AddItem(fDeskbarMenuItem);
 }
 
 
 TBarMenuBar::~TBarMenuBar()
 {
+}
+
+
+void
+TBarMenuBar::AttachedToWindow()
+{
+	fDeskbarMenuItem->FetchIcon();
+
+	BMenuBar::AttachedToWindow();
 }
 
 

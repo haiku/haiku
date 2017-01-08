@@ -62,6 +62,8 @@ public:
 								TBarView* barView);
 	virtual					~TBarMenuBar();
 
+	virtual	void			AttachedToWindow();
+
 	virtual	void			MouseMoved(BPoint where, uint32 code,
 								const BMessage* message);
 
