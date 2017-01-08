@@ -30,7 +30,7 @@ const int32 kPageSelected = '_LCH';
 
 PrefletView::PrefletView(SettingsHost* host)
 	:
-	BTabView("pages")
+	BTabView("pages", B_WIDTH_FROM_WIDEST)
 {
 	// Pages
 	GeneralView* general = new GeneralView(host);

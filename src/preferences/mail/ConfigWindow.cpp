@@ -208,7 +208,7 @@ ConfigWindow::ConfigWindow()
 	fLastSelectedAccount(NULL),
 	fSaveSettings(false)
 {
-	BTabView* tabView = new BTabView("tab");
+	BTabView* tabView = new BTabView("tab", B_WIDTH_FROM_WIDEST);
 	tabView->SetBorder(B_NO_BORDER);
 
 	// accounts listview
