@@ -183,7 +183,7 @@ mmu_post_efi_setup(UINTN memory_map_size, EFI_MEMORY_DESCRIPTOR *memory_map, UIN
 			break;
 		case EfiRuntimeServicesCode:
 		case EfiRuntimeServicesData:
-			entry->VirtualStart = entry->PhysicalStart + 0xFFFFFF0000000000ull;
+			entry->VirtualStart = entry->PhysicalStart;
 			break;
 		}
 	}
