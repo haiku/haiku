@@ -76,6 +76,9 @@ class TDeskbarMenuTitle : public TBarMenuTitle {
 public:
 								TDeskbarMenuTitle(float width, float height,
 									const BBitmap* icon, BMenu* menu);
+	virtual						~TDeskbarMenuTitle();
+
+	virtual	void				SetIcon(const BBitmap* icon);
 
 	virtual	void				DrawContent();
 
