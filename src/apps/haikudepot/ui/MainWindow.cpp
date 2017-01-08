@@ -575,8 +575,8 @@ MainWindow::_BuildMenu(BMenuBar* menuBar)
 	BMenu* menu = new BMenu(B_TRANSLATE("Tools"));
 	menu->AddItem(new BMenuItem(B_TRANSLATE("Refresh repositories"),
 		new BMessage(MSG_REFRESH_REPOS)));
-	menu->AddItem(new BMenuItem(B_TRANSLATE("Manage repositories")
-		B_UTF8_ELLIPSIS, new BMessage(MSG_MANAGE_REPOS)));
+	menu->AddItem(new BMenuItem(B_TRANSLATE("Manage repositories"
+		B_UTF8_ELLIPSIS), new BMessage(MSG_MANAGE_REPOS)));
 
 	menuBar->AddItem(menu);
 
