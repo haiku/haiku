@@ -149,6 +149,7 @@ bail1:
 	delete_sem(new_bt_dev->cmd_complete);
 bail0:
 	free(new_bt_dev);
+	new_bt_dev = NULL;
 exit:
 	return new_bt_dev;
 }
