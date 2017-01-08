@@ -123,9 +123,9 @@ TBarMenuBar::~TBarMenuBar()
 void
 TBarMenuBar::AttachedToWindow()
 {
-	fDeskbarMenuItem->FetchIcon();
-
 	BMenuBar::AttachedToWindow();
+
+	fDeskbarMenuItem->FetchIcon();
 }
 
 
