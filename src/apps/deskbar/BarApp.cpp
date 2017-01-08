@@ -66,7 +66,6 @@ All rights reserved.
 #include "Switcher.h"
 #include "Utilities.h"
 
-#include "icons.h"
 #include "tracker_private.h"
 
 

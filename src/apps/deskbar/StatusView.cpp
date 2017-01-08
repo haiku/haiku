@@ -69,6 +69,8 @@ All rights reserved.
 #include "icons.h"
 
 #include "BarApp.h"
+#include "BarMenuBar.h"
+#include "BarMenuTitle.h"
 #include "DeskbarUtils.h"
 #include "ResourceSet.h"
 #include "StatusViewShelf.h"
@@ -138,15 +140,8 @@ TReplicantTray::TReplicantTray(TBarView* parent, bool vertical)
 	fMinimumTrayWidth(kMinimumTrayWidth),
 	fAlignmentSupport(false)
 {
-	// init the minimum window width according to the logo.
-	const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
-		R_LeafLogoBitmap);
-	if (logoBitmap != NULL) {
-		gMinimumWindowWidth = std::max(gMinimumWindowWidth,
-			2 * (logoBitmap->Bounds().Width() + 8));
-	}
 	gMinimumWindowWidth = std::max(gMinimumWindowWidth,
-			be_plain_font->StringWidth("WWWWWWWWW") + 20);
+		be_plain_font->StringWidth("WWWWWWWWW") + 20);
 	if (vertical)
 		fMinimumTrayWidth = gMinimumWindowWidth - kGutter - kDragRegionWidth;
 

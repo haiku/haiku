@@ -116,7 +116,6 @@ private:
 			bool			fOverflow : 1;
 			bool			fFirstBuild : 1;
 
-			float			fDeskbarMenuWidth;
 			TTeamMenuItem*	fPreviousDragTargetItem;
 			BMenuItem*		fLastMousedOverItem;
 			BMenuItem*		fLastClickedItem;
