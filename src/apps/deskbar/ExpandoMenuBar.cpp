@@ -55,7 +55,6 @@ All rights reserved.
 #include "icons.h"
 
 #include "BarApp.h"
-#include "BarMenuBar.h"
 #include "BarMenuTitle.h"
 #include "BarView.h"
 #include "BarWindow.h"
@@ -96,6 +95,7 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* barView, bool vertical)
 	fVertical(vertical),
 	fOverflow(false),
 	fFirstBuild(true),
+	fDeskbarMenuWidth(kMinMenuItemWidth),
 	fPreviousDragTargetItem(NULL),
 	fLastMousedOverItem(NULL),
 	fLastClickedItem(NULL)
@@ -103,6 +103,13 @@ TExpandoMenuBar::TExpandoMenuBar(TBarView* barView, bool vertical)
 	SetItemMargins(0.0f, 0.0f, 0.0f, 0.0f);
 	SetFont(be_plain_font);
 	SetMaxItemWidth();
+
+	// top or bottom mode, add deskbar menu and sep for menubar tracking
+	// consistency
+	const BBitmap* logoBitmap = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
+		R_LeafLogoBitmap);
+	if (logoBitmap != NULL)
+		fDeskbarMenuWidth = logoBitmap->Bounds().Width() + 16;
 }
 
 
@@ -362,7 +369,7 @@ TExpandoMenuBar::MouseMoved(BPoint where, uint32 code, const BMessage* message)
 					break;
 				}
 
-				if (!static_cast<TBarApp*>(be_app)->Settings()->hideLabels) {
+				if (!dynamic_cast<TBarApp*>(be_app)->Settings()->hideLabels) {
 					// item has a visible label, set tool tip if truncated
 					fLastMousedOverItem = menuItem;
 					if (strcasecmp(item->TruncatedLabel(), item->Label()) > 0) {
@@ -734,11 +741,8 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 
 	bool drawLabels = !static_cast<TBarApp*>(be_app)->Settings()->hideLabels;
 
-	float deskbarMenuWidth
-		= fBarView->BarMenuBar()->DeskbarMenuTitle()->CalcIconWidth();
-
 	float maxWidth = fBarView->DragRegion()->Frame().left
-		- deskbarMenuWidth - kSepItemWidth;
+		- fDeskbarMenuWidth - kSepItemWidth;
 	int32 iconSize = static_cast<TBarApp*>(be_app)->IconSize();
 	float iconOnlyWidth = kIconPadding + iconSize + kIconPadding;
 	float minItemWidth = drawLabels
@@ -747,7 +751,7 @@ TExpandoMenuBar::CheckItemSizes(int32 delta)
 	float maxItemWidth = drawLabels
 		? gMinimumWindowWidth + iconSize - kMinimumIconSize
 		: iconOnlyWidth;
-	float menuWidth = maxItemWidth * CountItems() + deskbarMenuWidth
+	float menuWidth = maxItemWidth * CountItems() + fDeskbarMenuWidth
 		+ kSepItemWidth;
 
 	bool reset = false;
@@ -877,12 +881,10 @@ TExpandoMenuBar::CheckForSizeOverrun()
 	float minItemWidth = !static_cast<TBarApp*>(be_app)->Settings()->hideLabels
 		? iconOnlyWidth + kMinMenuItemWidth
 		: iconOnlyWidth - kIconPadding;
-	float deskbarMenuWidth
-		= fBarView->BarMenuBar()->DeskbarMenuTitle()->CalcIconWidth();
-	float menuWidth = minItemWidth * CountItems() + deskbarMenuWidth
+	float menuWidth = minItemWidth * CountItems() + fDeskbarMenuWidth
 		+ kSepItemWidth;
 	float maxWidth = fBarView->DragRegion()->Frame().left
-		- deskbarMenuWidth - kSepItemWidth;
+		- fDeskbarMenuWidth - kSepItemWidth;
 
 	return menuWidth > maxWidth;
 }

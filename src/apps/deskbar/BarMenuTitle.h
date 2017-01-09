@@ -32,8 +32,8 @@ brand product names are registered trademarks or trademarks of their respective
 holders.
 All rights reserved.
 */
-#ifndef BAR_MENU_TITLE_H
-#define BAR_MENU_TITLE_H
+#ifndef BARMENUTITLE_H
+#define BARMENUTITLE_H
 
 
 //
@@ -47,45 +47,27 @@ All rights reserved.
 class BBitmap;
 class BMenu;
 
-
 class TBarMenuTitle : public BMenuItem {
 public:
-								TBarMenuTitle(float width, float height,
-									const BBitmap* icon, BMenu* menu);
-	virtual						~TBarMenuTitle();
+	TBarMenuTitle(float width, float height, const BBitmap* icon,
+		BMenu* menu, bool expando = false);
+	virtual ~TBarMenuTitle();
 
-	virtual	void				SetContentSize(float width, float height);
-	virtual	void				Draw();
+	void SetContentSize(float width, float height);
+	void Draw();
 
-	virtual	status_t			Invoke(BMessage* message);
-
-	const	BBitmap*			Icon() { return fIcon; };
-	virtual	void				SetIcon(const BBitmap* icon);
+	status_t Invoke(BMessage* message);
 
 protected:
-	virtual	void				DrawContent();
-	virtual	void				GetContentSize(float* width, float* height);
-
-			float				fWidth;
-			float				fHeight;
-	const	BBitmap*			fIcon;
-};
-
-
-class TDeskbarMenuTitle : public TBarMenuTitle {
-public:
-								TDeskbarMenuTitle(float width, float height,
-									const BBitmap* icon, BMenu* menu);
-
-	virtual	void				DrawContent();
-
-	const	BBitmap*			FetchIcon();
-			float				CalcIconWidth();
+	void DrawContent();
+	void GetContentSize(float* width, float* height);
 
 private:
-	const	uint8*				fVectorIconData;
-			size_t				fVectorIconSize;
+	float fWidth;
+	float fHeight;
+	bool fInExpando;
+	const BBitmap* fIcon;
 };
 
 
-#endif	// BAR_MENU_TITLE_H
+#endif	// BARMENUTITLE_H

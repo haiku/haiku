@@ -49,7 +49,6 @@ All rights reserved.
 #include "icons.h"
 #include "BarApp.h"
 #include "BarMenuBar.h"
-#include "BarMenuTitle.h"
 #include "BarWindow.h"
 #include "DeskbarMenu.h"
 #include "DeskbarUtils.h"
@@ -395,10 +394,8 @@ TBarView::PlaceDeskbarMenu()
 			width += 1;
 		} else {
 			// shows apps to the right of bemenu
-			width = fBarMenuBar->DeskbarMenuTitle()->CalcIconWidth()
-				+ kMinimumIconSize;
 			fBarMenuBar->AddSeparatorItem();
-			width += kSepItemWidth;
+			width = floorf(width) / 2 + kSepItemWidth;
 		}
 		loc = Bounds().LeftTop();
 	} else {

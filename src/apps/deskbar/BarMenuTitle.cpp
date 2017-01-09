@@ -36,28 +36,22 @@ All rights reserved.
 
 #include "BarMenuTitle.h"
 
-#include <algorithm>
-
 #include <Bitmap.h>
 #include <ControlLook.h>
 #include <Debug.h>
-#include <IconUtils.h>
 
 #include "BarApp.h"
 #include "BarView.h"
 #include "BarWindow.h"
-#include "ResourceSet.h"
-#include "StatusView.h"
-
-#include "icons.h"
 
 
 TBarMenuTitle::TBarMenuTitle(float width, float height, const BBitmap* icon,
-	BMenu* menu)
+	BMenu* menu, bool expando)
 	:
 	BMenuItem(menu, new BMessage(B_REFS_RECEIVED)),
 	fWidth(width),
 	fHeight(height),
+	fInExpando(expando),
 	fIcon(icon)
 {
 }
@@ -129,7 +123,7 @@ TBarMenuTitle::DrawContent()
 
 	float widthOffset = rintf((frame.Width() - iconRect.Width()) / 2);
 	float heightOffset = rintf((frame.Height() - iconRect.Height()) / 2);
-	iconRect.OffsetBy(widthOffset - 1, heightOffset - 1);
+	iconRect.OffsetBy(widthOffset - 1.0f, heightOffset + 2.0f);
 
 	menu->DrawBitmapAsync(fIcon, iconRect);
 }
@@ -149,98 +143,4 @@ TBarMenuTitle::Invoke(BMessage* message)
 	}
 
 	return BMenuItem::Invoke(message);
-}
-
-
-void
-TBarMenuTitle::SetIcon(const BBitmap* icon)
-{
-	delete fIcon;
-	fIcon = icon;
-}
-
-
-//	#pragma mark - TDeskbarMenuTitle
-
-
-const int32 kIconSizeCutoff = 48;
-	// icon size to stop increasing logo width in horizontal mode
-
-
-TDeskbarMenuTitle::TDeskbarMenuTitle(float width, float height,
-	const BBitmap* icon, BMenu* menu)
-	:
-	TBarMenuTitle(width, height, icon, menu),
-	fVectorIconData(NULL),
-	fVectorIconSize(0)
-{
-}
-
-
-void
-TDeskbarMenuTitle::DrawContent()
-{
-	if (fIcon == NULL)
-		return;
-
-	BMenu* menu = Menu();
-	BRect frame(Frame());
-	BRect iconRect(fIcon->Bounds());
-
-	menu->SetDrawingMode(B_OP_ALPHA);
-	iconRect.OffsetTo(frame.LeftTop());
-
-	float widthOffset = rintf((frame.Width() - iconRect.Width()) / 2);
-	float heightOffset = rintf((frame.Height() - iconRect.Height()) / 2);
-
-	// move bitmap down a few pixels so leaf gets cut off
-	heightOffset += 3;
-
-	iconRect.OffsetBy(widthOffset - 1, heightOffset - 1);
-
-	menu->DrawBitmapAsync(fIcon, iconRect);
-}
-
-
-const BBitmap*
-TDeskbarMenuTitle::FetchIcon()
-{
-	if (fVectorIconData == NULL || fVectorIconSize == 0) {
-		// haven't fetched vector icon data yet, fetch it
-		fVectorIconData = (const uint8*)AppResSet()->FindResource(
-			B_VECTOR_ICON_TYPE, R_LeafLogoVector, &fVectorIconSize);
-	}
-
-	float width = CalcIconWidth();
-	BBitmap* icon = new BBitmap(BRect(0, 0, width - 1, width - 1),
-		B_RGBA32);
-	if (fVectorIconData != NULL && fVectorIconSize > 0
-		&& BIconUtils::GetVectorIcon(fVectorIconData, fVectorIconSize, icon)
-			== B_OK) {
-		// rasterized vector icon into a bitmap
-		fIcon = icon;
-	} else {
-		// fetched bitmap instead
-		fIcon = AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_LeafLogoBitmap);
-		// TODO: scale the bitmap into icon
-		delete icon;
-	}
-
-	return fIcon;
-}
-
-
-float
-TDeskbarMenuTitle::CalcIconWidth()
-{
-	TBarApp* barApp = static_cast<TBarApp*>(be_app);
-	bool isVertical = barApp->BarView()->Vertical();
-	bool hasBitmapIcon = fVectorIconData == NULL;
-
-	float m = 3;
-	float x = (isVertical || hasBitmapIcon) ? kMinimumIconSize
-		: std::min(barApp->IconSize(), kIconSizeCutoff);
-	float b = kMinimumIconSize;
-
-	return m * x + b;
 }
