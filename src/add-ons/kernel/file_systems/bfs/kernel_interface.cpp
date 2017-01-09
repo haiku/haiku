@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2016, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -714,12 +714,17 @@ bfs_ioctl(fs_volume* _volume, fs_vnode* _node, void* _cookie, uint32 cmd,
 				return B_BAD_VALUE;
 			if (user_memcpy(&update, buffer, sizeof(update_boot_block)) != B_OK)
 				return B_BAD_ADDRESS;
-			if (update.offset < offsetof(disk_super_block, pad_to_block)
-				|| update.length + update.offset > 512)
+
+			uint32 minOffset = offsetof(disk_super_block, pad_to_block);
+			if (update.offset < minOffset
+				|| update.offset >= 512 || update.length > 512 - minOffset
+				|| update.length + update.offset > 512) {
 				return B_BAD_VALUE;
+			}
 			if (user_memcpy((uint8*)&volume->SuperBlock() + update.offset,
-					update.data, update.length) != B_OK)
+					update.data, update.length) != B_OK) {
 				return B_BAD_ADDRESS;
+			}
 
 			return volume->WriteSuperBlock();
 		}
