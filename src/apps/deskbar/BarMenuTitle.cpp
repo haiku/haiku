@@ -37,7 +37,6 @@ All rights reserved.
 #include "BarMenuTitle.h"
 
 #include <algorithm>
-#include <new>
 
 #include <Bitmap.h>
 #include <ControlLook.h>
@@ -156,6 +155,7 @@ TBarMenuTitle::Invoke(BMessage* message)
 void
 TBarMenuTitle::SetIcon(const BBitmap* icon)
 {
+	delete fIcon;
 	fIcon = icon;
 }
 
@@ -174,20 +174,6 @@ TDeskbarMenuTitle::TDeskbarMenuTitle(float width, float height,
 	fVectorIconData(NULL),
 	fVectorIconSize(0)
 {
-}
-
-
-TDeskbarMenuTitle::~TDeskbarMenuTitle()
-{
-	delete fIcon;
-}
-
-
-void
-TDeskbarMenuTitle::SetIcon(const BBitmap* icon)
-{
-	delete fIcon;
-	fIcon = icon;
 }
 
 
@@ -226,21 +212,16 @@ TDeskbarMenuTitle::FetchIcon()
 	}
 
 	float width = CalcIconWidth();
-	BBitmap* icon = new(std::nothrow) BBitmap(BRect(0, 0, width - 1, width - 1),
+	BBitmap* icon = new BBitmap(BRect(0, 0, width - 1, width - 1),
 		B_RGBA32);
-	if (fVectorIconData != NULL && fVectorIconSize > 0 && icon != NULL
+	if (fVectorIconData != NULL && fVectorIconSize > 0
 		&& BIconUtils::GetVectorIcon(fVectorIconData, fVectorIconSize, icon)
 			== B_OK) {
 		// rasterized vector icon into a bitmap
-		SetIcon(icon);
+		fIcon = icon;
 	} else {
 		// fetched bitmap instead
-		const BBitmap* leaf = AppResSet()->FindBitmap(B_MESSAGE_TYPE,
-			R_LeafLogoBitmap);
-		// make a copy of the leaf bitmap that we can safely delete
-		BBitmap* leafCopy = new BBitmap(leaf->Bounds(), leaf->ColorSpace());
-		leafCopy->ImportBits(leaf);
-		SetIcon(leafCopy);
+		fIcon = AppResSet()->FindBitmap(B_MESSAGE_TYPE, R_LeafLogoBitmap);
 		// TODO: scale the bitmap into icon
 		delete icon;
 	}
