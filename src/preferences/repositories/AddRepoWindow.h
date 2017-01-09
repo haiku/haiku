@@ -24,11 +24,12 @@ public:
 	virtual void			FrameResized(float newWidth, float newHeight);
 
 private:
+	status_t				_GetClipboardData();
+	
 	BTextControl*			fText;
 	BButton*				fAddButton;
 	BButton*				fCancelButton;
 	BMessenger				fReplyMessenger;
-	status_t				_GetClipboardData();
 };
 
 

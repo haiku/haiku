@@ -43,8 +43,9 @@ RepositoriesWindow::RepositoriesWindow()
 	BScreen screen;
 	BRect screenFrame = screen.Frame();
 	if (screenFrame.right < frame.right || screenFrame.left > frame.left
-		|| screenFrame.top > frame.top || screenFrame.bottom < frame.bottom)
+		|| screenFrame.top > frame.top || screenFrame.bottom < frame.bottom) {
 		CenterOnScreen();
+	}
 	else
 		MoveTo(frame.left, frame.top);
 	Show();
@@ -126,29 +127,38 @@ RepositoriesWindow::MessageReceived(BMessage* message)
 {
 	switch (message->what)
 	{
-		case ADD_REPO_WINDOW: {
+		case ADD_REPO_WINDOW:
+		{
 			BRect frame = Frame();
 			fAddWindow = new AddRepoWindow(frame, fMessenger);
 			break;
 		}
-		case ADD_REPO_URL: {
+		
+		case ADD_REPO_URL:
+		{
 			BString url;
 			status_t result = message->FindString(key_url, &url);
 			if (result == B_OK)
 				fView->AddManualRepository(url);
 			break;
 		}
-		case ADD_WINDOW_CLOSED: {
+		
+		case ADD_WINDOW_CLOSED:
+		{
 			fAddWindow = NULL;
 			break;
 		}
-		case DELETE_KEY_PRESSED: {
+		
+		case DELETE_KEY_PRESSED:
+		{
 			BMessage message(REMOVE_REPOS);
 			fView->MessageReceived(&message);
 			break;
 		}
+		
 		// captures pkgman changes while the Repositories application is running
-		case B_NODE_MONITOR: {
+		case B_NODE_MONITOR:
+		{
 			// This preflet is making the changes, so ignore this message
 			if (fView->IsTaskRunning())
 				break;
@@ -159,7 +169,8 @@ RepositoriesWindow::MessageReceived(BMessage* message)
 				{
 					case B_ATTR_CHANGED:
 					case B_ENTRY_CREATED:
-					case B_ENTRY_REMOVED: {
+					case B_ENTRY_REMOVED:
+					{
 						PostMessage(UPDATE_LIST, fView);
 						break;
 					}
@@ -167,6 +178,7 @@ RepositoriesWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		
 		default:
 			BWindow::MessageReceived(message);
 	}

@@ -38,6 +38,27 @@ public:
 	bool					IsTaskRunning() { return fRunningTaskCount > 0; }
 
 private:
+	// Message helpers
+	void					_AddSelectedRowsToQueue();
+	void					_TaskStarted(RepoRow* rowItem, int16 count);
+	void					_TaskCompleted(RepoRow* rowItem, int16 count,
+								BString& newName);
+	void					_TaskCanceled(RepoRow* rowItem, int16 count);
+	void					_ShowCompletedStatusIfDone();
+	void					_UpdateFromRepoConfig(RepoRow* rowItem);
+
+	// GUI functions
+	BString					_GetPathIdentifier(BString urlPath);
+	status_t				_EmptyList();
+	void					_InitList();
+	void					_RefreshList();
+	void					_UpdateListFromRoster();
+	void					_SaveList();
+	RepoRow*				_AddRepo(BString name, BString url, bool enabled);
+	void					_FindSiblings();
+	void					_UpdateButtons();
+	void					_UpdateStatusView();
+	
 	RepositoriesSettings	fSettings;
 	RepositoriesListView*	fListView;
 	BView*					fStatusContainerView;
@@ -49,27 +70,6 @@ private:
 	BButton*				fRemoveButton;
 	BButton*				fEnableButton;
 	BButton*				fDisableButton;
-
-	// Message helpers
-	void					_AddSelectedRowsToQueue();
-	void					_TaskStarted(RepoRow* rowItem, int16 count);
-	void					_TaskCompleted(RepoRow* rowItem, int16 count,
-								BString& newName);
-	void					_TaskCanceled(RepoRow* rowItem, int16 count);
-	void					_ShowCompletedStatusIfDone();
-	void					_UpdateFromRepoConfig(RepoRow* rowItem);
-
-	// GUI functions
-	BString					_GetRootUrl(BString url);
-	status_t				_EmptyList();
-	void					_InitList();
-	void					_RefreshList();
-	void					_UpdateListFromRoster();
-	void					_SaveList();
-	RepoRow*				_AddRepo(BString name, BString url, bool enabled);
-	void					_FindSiblings();
-	void					_UpdateButtons();
-	void					_UpdateStatusView();
 };
 
 

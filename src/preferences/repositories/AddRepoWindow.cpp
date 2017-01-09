@@ -14,6 +14,7 @@
 #include <Catalog.h>
 #include <Clipboard.h>
 #include <LayoutBuilder.h>
+#include <Url.h>
 
 #include "constants.h"
 
@@ -76,14 +77,15 @@ AddRepoWindow::MessageReceived(BMessage* message)
 				Quit();
 			break;
 
-		case ADD_BUTTON_PRESSED: {
+		case ADD_BUTTON_PRESSED:
+		{
 			BString url(fText->Text());
 			if (url != "") {
 				// URL must have a protocol
-				if (url.FindFirst("://") == B_ERROR) {
+				BUrl newRepoUrl(url);
+				if (!newRepoUrl.IsValid()) {
 					BAlert* alert = new BAlert("error",
-						B_TRANSLATE_COMMENT("The URL must start with a "
-							"protocol, for example http:// or https://",
+						B_TRANSLATE_COMMENT("This is not a valid URL.",
 							"Add URL error message"),
 						kOKLabel, NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
 					alert->SetFeel(B_MODAL_APP_WINDOW_FEEL);
@@ -100,6 +102,7 @@ AddRepoWindow::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		
 		default:
 			BWindow::MessageReceived(message);
 	}
@@ -124,10 +127,10 @@ AddRepoWindow::_GetClipboardData()
 			&stringLen);
 		be_clipboard->Unlock();
 
-		// The string must contain a web protocol
+		// The string must be a valid url
 		BString clipString(string, stringLen);
-		int32 ww = clipString.FindFirst("://");
-		if (ww == B_ERROR)
+		BUrl testUrl(clipString.String());
+		if (!testUrl.IsValid())
 			return B_ERROR;
 		else
 			fText->SetText(clipString);

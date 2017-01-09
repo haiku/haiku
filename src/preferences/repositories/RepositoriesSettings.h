@@ -29,11 +29,12 @@ public:
 								BStringList& urlList);
 
 private:
+	BMessage				_ReadFromFile();
+	status_t				_SaveToFile(BMessage settings);
+	
 	BPath					fFilePath;
 	BFile					fFile;
 	status_t				fInitStatus;
-	BMessage				_ReadFromFile();
-	status_t				_SaveToFile(BMessage settings);
 };
 
 

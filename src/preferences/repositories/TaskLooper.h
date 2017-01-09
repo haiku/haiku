@@ -54,11 +54,12 @@ public:
 	virtual void			MessageReceived(BMessage*);
 
 private:
-	BObjectList<Task>		fTaskQueue;
 	void					_RemoveAndDelete(Task* task);
 	static status_t			_DoTask(void* data);
 	static void				_AppendErrorDetails(BString& details,
 								JobStateListener* listener);
+	
+	BObjectList<Task>		fTaskQueue;
 	BMessenger				fReplyTarget;
 	BMessenger				fMessenger;
 };

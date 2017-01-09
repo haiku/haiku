@@ -65,7 +65,8 @@ TaskTimer::MessageReceived(BMessage* message)
 {
 	switch (message->what)
 	{
-		case TASK_TIMEOUT: {
+		case TASK_TIMEOUT:
+		{
 			fMessageRunner = NULL;
 			if (fTimerIsRunning) {
 				BString text(B_TRANSLATE_COMMENT("The task for repository"
@@ -94,7 +95,9 @@ TaskTimer::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-		case TIMEOUT_ALERT_BUTTON_SELECTION: {
+		
+		case TIMEOUT_ALERT_BUTTON_SELECTION:
+		{
 			fTimeoutAlert = NULL;
 			// Timeout alert was invoked by user and timer still has not
 			// been stopped
@@ -126,9 +129,10 @@ TaskTimer::Start(const char* name)
 
 	// Create a message runner that will send a TASK_TIMEOUT message if the
 	// timer is not stopped
-	if (fMessageRunner == NULL)
+	if (fMessageRunner == NULL) {
 		fMessageRunner = new BMessageRunner(fMessenger, &fTimeoutMessage,
 			fTimeoutMicroSeconds, 1);
+	}
 	else
 		fMessageRunner->SetInterval(fTimeoutMicroSeconds);
 }

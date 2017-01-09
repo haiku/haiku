@@ -18,6 +18,7 @@
 #include <MessageRunner.h>
 #include <ScrollBar.h>
 #include <SeparatorView.h>
+#include <Url.h>
 #include <package/PackageRoster.h>
 #include <package/RepositoryConfig.h>
 
@@ -224,7 +225,8 @@ RepositoriesView::MessageReceived(BMessage* message)
 {
 	switch (message->what)
 	{
-		case REMOVE_REPOS: {
+		case REMOVE_REPOS:
+		{
 			RepoRow* rowItem = dynamic_cast<RepoRow*>(fListView->CurrentSelection());
 			if (!rowItem || !fRemoveButton->IsEnabled())
 				break;
@@ -272,11 +274,13 @@ RepositoriesView::MessageReceived(BMessage* message)
 			_SaveList();
 			break;
 		}
+		
 		case LIST_SELECTION_CHANGED:
 			_UpdateButtons();
 			break;
 
-		case ITEM_INVOKED: {
+		case ITEM_INVOKED:
+		{
 			// Simulates pressing whichever is the enabled button
 			if (fEnableButton->IsEnabled()) {
 				BMessage invokeMessage(ENABLE_BUTTON_PRESSED);
@@ -287,7 +291,9 @@ RepositoriesView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
-		case ENABLE_BUTTON_PRESSED: {
+		
+		case ENABLE_BUTTON_PRESSED:
+		{
 			BStringList names;
 			bool paramsOK = true;
 			// Check if there are multiple selections of the same repository,
@@ -314,12 +320,14 @@ RepositoriesView::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		
 		case DISABLE_BUTTON_PRESSED:
 			_AddSelectedRowsToQueue();
 			_UpdateButtons();
 			break;
 
-		case TASK_STARTED: {
+		case TASK_STARTED:
+		{
 			int16 count;
 			status_t result1 = message->FindInt16(key_count, &count);
 			RepoRow* rowItem;
@@ -328,7 +336,9 @@ RepositoriesView::MessageReceived(BMessage* message)
 				_TaskStarted(rowItem, count);
 			break;
 		}
-		case TASK_COMPLETED_WITH_ERRORS: {
+		
+		case TASK_COMPLETED_WITH_ERRORS:
+		{
 			BString errorDetails;
 			status_t result = message->FindString(key_details, &errorDetails);
 			if (result == B_OK) {
@@ -350,7 +360,9 @@ RepositoriesView::MessageReceived(BMessage* message)
 			_UpdateButtons();
 			break;
 		}
-		case TASK_COMPLETED: {
+		
+		case TASK_COMPLETED:
+		{
 			BString repoName = message->GetString(key_name,
 				kNewRepoDefaultName.String());
 			int16 count;
@@ -367,7 +379,9 @@ RepositoriesView::MessageReceived(BMessage* message)
 			_UpdateButtons();
 			break;
 		}
-		case TASK_CANCELED: {
+		
+		case TASK_CANCELED:
+		{
 			int16 count;
 			status_t result1 = message->FindInt16(key_count, &count);
 			RepoRow* rowItem;
@@ -380,18 +394,21 @@ RepositoriesView::MessageReceived(BMessage* message)
 			_UpdateButtons();
 			break;
 		}
+		
 		case UPDATE_LIST:
 			_RefreshList();
 			_UpdateButtons();
 			break;
 
-		case STATUS_VIEW_COMPLETED_TIMEOUT: {
+		case STATUS_VIEW_COMPLETED_TIMEOUT:
+		{
 			int32 timerID;
 			status_t result = message->FindInt32(key_ID, &timerID);
 			if (result == B_OK && timerID == fLastCompletedTimerId)
 				_UpdateStatusView();
 			break;
 		}
+		
 		default:
 			BView::MessageReceived(message);
 	}
@@ -434,8 +451,9 @@ RepositoriesView::_TaskCompleted(RepoRow* rowItem, int16 count, BString& newName
 	// Update row state and values
 	rowItem->SetTaskState(STATE_NOT_IN_QUEUE);
 	if (kNewRepoDefaultName.Compare(rowItem->Name()) == 0
-		&& newName.Compare("") != 0)
+		&& newName.Compare("") != 0) {
 		rowItem->SetName(newName.String());
+	}
 	_UpdateFromRepoConfig(rowItem);
 }
 
@@ -486,27 +504,33 @@ RepositoriesView::_UpdateFromRepoConfig(RepoRow* rowItem)
 void
 RepositoriesView::AddManualRepository(BString url)
 {
+	BUrl newRepoUrl(url);
+	if (!newRepoUrl.IsValid())
+		return;
+	
 	BString name(kNewRepoDefaultName);
-	BString rootUrl = _GetRootUrl(url);
-	bool foundRoot = false;
+	BString newPathIdentifier = _GetPathIdentifier(newRepoUrl.Path());
+	bool foundMatchingRoot = false;
 	int32 index;
 	int32 listCount = fListView->CountRows();
 	for (index = 0; index < listCount; index++) {
 		RepoRow* repoItem = dynamic_cast<RepoRow*>(fListView->RowAt(index));
-		const char* urlPtr = repoItem->Url();
+		BUrl rowRepoUrl(repoItem->Url());
 		// Find an already existing URL
-		if (url.ICompare(urlPtr) == 0) {
+		if (newRepoUrl == rowRepoUrl) {
 			(new BAlert("duplicate",
 				B_TRANSLATE_COMMENT("This repository URL already exists.",
 					"Error message"),
 				kOKLabel))->Go(NULL);
 			return;
 		}
-		// Use the same name from another repo with the same root url
-		if (foundRoot == false && rootUrl.ICompare(urlPtr,
-				rootUrl.Length()) == 0) {
-			foundRoot = true;
-			name = repoItem->Name();
+		// Predict the repo name from another url with matching path root
+		if (!foundMatchingRoot) {
+			BString rowPathIdentifier = _GetPathIdentifier(rowRepoUrl.Path());
+			 if (newPathIdentifier.ICompare(rowPathIdentifier) == 0) {
+				foundMatchingRoot = true;
+				name = repoItem->Name();
+			 }
 		}
 	}
 	RepoRow* newRepo = _AddRepo(name, url, false);
@@ -519,33 +543,28 @@ RepositoriesView::AddManualRepository(BString url)
 
 
 BString
-RepositoriesView::_GetRootUrl(BString url)
+RepositoriesView::_GetPathIdentifier(BString urlPath)
 {
-	// Find the protocol if it exists
-	int32 ww = url.FindFirst("://");
-	if (ww == B_ERROR)
-		ww = 0;
-	else
-		ww += 3;
 	// Find second /
-	int32 rootEnd = url.FindFirst("/", ww + 1);
-	if (rootEnd == B_ERROR)
-		return url;
-	rootEnd = url.FindFirst("/", rootEnd + 1);
-	if (rootEnd == B_ERROR)
-		return url;
+	int32 index = urlPath.FindFirst("/");
+	if (index == B_ERROR)
+		return urlPath;
+	index = urlPath.FindFirst("/", index + 1);
+	if (index == B_ERROR)
+		return urlPath;
 	else
-		return url.Truncate(rootEnd);
+		return urlPath.Truncate(index);
 }
 
 
 status_t
 RepositoriesView::_EmptyList()
 {
-	BRow* row;
-	while ((row = fListView->RowAt((int32)0, NULL)) != NULL) {
+	BRow* row = fListView->RowAt((int32)0, NULL);
+	while (row != NULL) {
 		fListView->RemoveRow(row);
 		delete row;
+		row = fListView->RowAt((int32)0, NULL);
 	}
 	return B_OK;
 }
@@ -639,27 +658,26 @@ RepositoriesView::_SaveList()
 RepoRow*
 RepositoriesView::_AddRepo(BString name, BString url, bool enabled)
 {
-	// URL must have a protocol
-	if (url.FindFirst("://") == B_ERROR)
+	// URL must be valid
+	BUrl repoUrl(url);
+	if (!repoUrl.IsValid())
 		return NULL;
-	RepoRow* addedRow = NULL;
 	int32 index;
 	int32 listCount = fListView->CountRows();
 	// Find if the repo already exists in list
 	for (index = 0; index < listCount; index++) {
 		RepoRow* repoItem = dynamic_cast<RepoRow*>(fListView->RowAt(index));
-		if (url.ICompare(repoItem->Url()) == 0) {
+		BUrl itemUrl(repoItem->Url());
+		if (repoUrl == itemUrl) {
 			// update name and enabled values
-			if (name.Compare(repoItem->Name()) != 0)
+			if (name != repoItem->Name())
 				repoItem->SetName(name.String());
 			repoItem->SetEnabled(enabled);
-			addedRow = repoItem;
+			return repoItem;
 		}
 	}
-	if (addedRow == NULL) {
-		addedRow = new RepoRow(name, url, enabled);
-		fListView->AddRow(addedRow);
-	}
+	RepoRow* addedRow = new RepoRow(name, url, enabled);
+	fListView->AddRow(addedRow);
 	return addedRow;
 }
 
@@ -698,17 +716,18 @@ RepositoriesView::_UpdateButtons()
 	RepoRow* rowItem = dynamic_cast<RepoRow*>(fListView->CurrentSelection());
 	// At least one row is selected
 	if (rowItem) {
-		bool someAreEnabled = false,
-			someAreDisabled = false,
-			someAreInQueue = false;
+		bool someAreEnabled = false;
+		bool someAreDisabled = false;
+		bool someAreInQueue = false;
 		int32 selectedCount = 0;
 		RepoRow* rowItem = dynamic_cast<RepoRow*>(fListView->CurrentSelection());
 		while (rowItem) {
 			selectedCount++;
 			uint32 taskState = rowItem->TaskState();
 			if ( taskState == STATE_IN_QUEUE_WAITING
-				|| taskState == STATE_IN_QUEUE_RUNNING)
+				|| taskState == STATE_IN_QUEUE_RUNNING) {
 				someAreInQueue = true;
+			}
 			if (rowItem->IsEnabled())
 				someAreEnabled = true;
 			else

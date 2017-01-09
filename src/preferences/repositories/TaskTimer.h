@@ -44,6 +44,8 @@ public:
 	void					Stop(const char* name);
 
 private:
+	int32					_NextAlertStackCount();
+	
 	int32					fTimeoutMicroSeconds;
 	bool					fTimerIsRunning;
 	BString					fRepositoryName;
@@ -54,7 +56,6 @@ private:
 	BAlert*					fTimeoutAlert;
 	BInvoker				fTimeoutAlertInvoker;
 	Task*					fOwner;
-	int32					_NextAlertStackCount();
 };
 
 

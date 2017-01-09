@@ -25,6 +25,9 @@ public:
 	virtual void			MessageReceived(BMessage*);
 
 private:
+	void					_StartWatching();
+	void					_StopWatching();
+	
 	RepositoriesSettings	fSettings;
 	RepositoriesView*		fView;
 	AddRepoWindow*			fAddWindow;
@@ -34,8 +37,6 @@ private:
 	status_t				fPackageNodeStatus;
 	bool					fWatchingPackageNode;
 		// true when package-repositories directory is being watched
-	void					_StartWatching();
-	void					_StopWatching();
 };
 
 

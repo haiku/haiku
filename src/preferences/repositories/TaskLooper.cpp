@@ -115,7 +115,8 @@ TaskLooper::MessageReceived(BMessage* message)
 {
 	switch (message->what)
 	{
-		case DO_TASK: {
+		case DO_TASK:
+		{
 			RepoRow* rowItem;
 			status_t result = message->FindPointer(key_rowptr, (void**)&rowItem);
 			if (result == B_OK) {
@@ -170,9 +171,11 @@ TaskLooper::MessageReceived(BMessage* message)
 			}
 			break;
 		}
+		
 		case TASK_COMPLETED:
 		case TASK_COMPLETED_WITH_ERRORS:
-		case TASK_CANCELED: {
+		case TASK_CANCELED:
+		{
 			Task* task;
 			status_t result = message->FindPointer(key_taskptr, (void**)&task);
 			if (result == B_OK && fTaskQueue.HasItem(task)) {
@@ -183,14 +186,17 @@ TaskLooper::MessageReceived(BMessage* message)
 				if (message->what == TASK_COMPLETED_WITH_ERRORS)
 					reply.AddString(key_details, task->resultErrorDetails);
 				if (task->taskType == ENABLE_REPO
-					&& task->name.Compare(task->resultName) != 0)
+					&& task->name.Compare(task->resultName) != 0) {
 					reply.AddString(key_name, task->resultName);
+				}
 				fReplyTarget.SendMessage(&reply);
 				_RemoveAndDelete(task);
 			}
 			break;
 		}
-		case TASK_KILL_REQUEST: {
+		
+		case TASK_KILL_REQUEST:
+		{
 			Task* task;
 			status_t result = message->FindPointer(key_taskptr, (void**)&task);
 			if (result == B_OK && fTaskQueue.HasItem(task)) {
@@ -230,7 +236,8 @@ TaskLooper::_DoTask(void* data)
 	JobStateListener listener;
 	switch (task->taskType)
 	{
-		case DISABLE_REPO: {
+		case DISABLE_REPO:
+		{
 			BString nameParam(task->taskParam);
 			BPackageKit::BContext context(decisionProvider, listener);
 			BPackageKit::DropRepositoryRequest dropRequest(context, nameParam);
@@ -249,7 +256,9 @@ TaskLooper::_DoTask(void* data)
 			}
 			break;
 		}
-		case ENABLE_REPO: {
+		
+		case ENABLE_REPO:
+		{
 			BString urlParam(task->taskParam);
 			BPackageKit::BContext context(decisionProvider, listener);
 			// Add repository
