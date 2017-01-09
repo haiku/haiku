@@ -212,7 +212,7 @@ BFormattingConventions::BFormattingConventions(
 
 		for (int t = 0; t < B_TIME_FORMAT_STYLE_COUNT; ++t) {
 			fCachedDateTimeFormats[s][t] = other.fCachedDateFormats[s][t];
-			fExplicitDateFormats[s][t] = other.fExplicitDateFormats[s][t];
+			fExplicitDateTimeFormats[s][t] = other.fExplicitDateFormats[s][t];
 		}
 	}
 	for (int s = 0; s < B_TIME_FORMAT_STYLE_COUNT; ++s) {

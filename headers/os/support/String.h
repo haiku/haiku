@@ -183,6 +183,9 @@ public:
 			int				Compare(const BString& string, int32 length) const;
 			int				Compare(const char* string, int32 length) const;
 
+			int				CompareAt(size_t offset, const BString& string,
+								int32 length) const;
+
 			int				CompareChars(const BString& string,
 								int32 charCount) const;
 			int				CompareChars(const char* string,
@@ -293,9 +296,7 @@ public:
 			// Unchecked char access
 			char			operator[](int32 index) const;
 
-#if __GNUC__ > 3
-			BStringRef		operator[](int32 index);
-#else
+#if __GNUC__ == 2
 			char&			operator[](int32 index);
 #endif
 
@@ -308,6 +309,7 @@ public:
 			// Fast low-level manipulation
 			char*			LockBuffer(int32 maxLength);
 			BString&		UnlockBuffer(int32 length = -1);
+			BString&		SetCharAt(int32 pos, char to);
 
 			// Upercase <-> Lowercase
 			BString&		ToLower();
@@ -350,7 +352,6 @@ public:
 
 private:
 			class PosVect;
-			friend class BStringRef;
 
 			enum PrivateDataTag {
 				PRIVATE_DATA
@@ -602,28 +603,6 @@ operator!=(const char* str, const BString& string)
 {
 	return string != str;
 }
-
-
-//	#pragma mark - BStringRef
-
-
-class BStringRef {
-public:
-	BStringRef(BString& string, int32 position);
-	~BStringRef() {}
-
-	operator char() const;
-
-	char* operator&();
-	const char* operator&() const;
-
-	BStringRef& operator=(char c);
-	BStringRef& operator=(const BStringRef& rc);
-
-private:
-	BString&	fString;
-	int32		fPosition;
-};
 
 
 #endif	// _B_STRING_H

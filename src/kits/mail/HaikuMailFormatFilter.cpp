@@ -247,7 +247,7 @@ HaikuMailFormatFilter::_RemoveExtraWhitespace(BString& name)
 			if (i == remove + 1 || i == name.Length())
 				remove++;
 			else
-				name[i - spaces] = ' ';
+				name.SetCharAt(i - spaces, ' ');
 			name.Remove(i - remove, remove);
 			i -= remove;
 			spaces = 0;

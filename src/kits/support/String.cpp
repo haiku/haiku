@@ -132,57 +132,6 @@ private:
 };
 
 
-//	#pragma mark - BStringRef
-
-
-BStringRef::BStringRef(BString& string, int32 position)
-	:
-	fString(string), fPosition(position)
-{
-}
-
-
-BStringRef::operator char() const
-{
-	return fPosition < fString.Length() ? fString.fPrivateData[fPosition] : 0;
-}
-
-
-BStringRef&
-BStringRef::operator=(char c)
-{
-	fString._MakeWritable();
-	fString.fPrivateData[fPosition] = c;
-	return *this;
-}
-
-
-BStringRef&
-BStringRef::operator=(const BStringRef &rc)
-{
-	return operator=(rc.fString.fPrivateData[rc.fPosition]);
-}
-
-
-const char*
-BStringRef::operator&() const
-{
-	return &fString.fPrivateData[fPosition];
-}
-
-
-char*
-BStringRef::operator&()
-{
-	if (fString._MakeWritable() != B_OK)
-		return NULL;
-
-	fString._ReferenceCount() = -1;
-		// mark as unsharable
-	return &fString.fPrivateData[fPosition];
-}
-
-
 //	#pragma mark - BString
 
 
@@ -1110,6 +1059,13 @@ BString::Compare(const char* string, int32 length) const
 
 
 int
+BString::CompareAt(size_t offset, const BString& string, int32 length) const
+{
+	return strncmp(String() + offset, string.String(), length);
+}
+
+
+int
 BString::CompareChars(const BString& string, int32 charCount) const
 {
 	return Compare(string, UTF8CountBytes(fPrivateData, charCount));
@@ -1866,13 +1822,7 @@ BString::ReplaceCharsSet(const char* setOfChars, const char* with)
 //	#pragma mark - Unchecked char access
 
 
-#if __GNUC__ > 3
-BStringRef
-BString::operator[](int32 index)
-{
-	return BStringRef(*this, index);
-}
-#else
+#if __GNUC__ == 2
 char&
 BString::operator[](int32 index)
 {
@@ -1948,6 +1898,16 @@ BString::UnlockBuffer(int32 length)
 		_ReferenceCount() = 1;
 			// mark shareable again
 	}
+
+	return *this;
+}
+
+
+BString&
+BString::SetCharAt(int32 pos, char to)
+{
+	if (pos < Length() && _MakeWritable() == B_OK)
+		fPrivateData[pos] = to;
 
 	return *this;
 }
