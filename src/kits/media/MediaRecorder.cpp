@@ -13,8 +13,8 @@
 #include <MediaRoster.h>
 #include <TimeSource.h>
 
-#include <MediaDebug.h>
-#include <MediaRecorderNode.h>
+#include "MediaDebug.h"
+#include "MediaRecorderNode.h"
 
 
 BMediaRecorder::BMediaRecorder(const char* name, media_type type)

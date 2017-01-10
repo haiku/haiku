@@ -10,12 +10,12 @@
 
 #include <BufferConsumer.h>
 #include <MediaEventLooper.h>
+#include <MediaRecorder.h>
 #include <String.h>
 
 
 namespace BPrivate { namespace media {
 
-class BMediaRecorder;
 
 class BMediaRecorderNode : public BMediaEventLooper,
 	public BBufferConsumer {

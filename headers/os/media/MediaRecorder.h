@@ -11,9 +11,10 @@
 
 
 namespace BPrivate { namespace media {
-
-
 class BMediaRecorderNode;
+}
+}
+
 
 class BMediaRecorder {
 public:
@@ -105,18 +106,12 @@ private:
 			media_node			fOutputNode;
 			media_source		fOutputSource;
 
-			BMediaRecorderNode*	fNode;
+			BPrivate::media::BMediaRecorderNode* fNode;
 
 			void*				fBufferCookie;
 			uint32				fPadding[32];
 
-			friend class		BMediaRecorderNode;
+			friend class		BPrivate::media::BMediaRecorderNode;
 };
-
-}
-
-}
-
-using namespace BPrivate::media;
 
 #endif	//	_MEDIA_RECORDER_H

@@ -15,6 +15,7 @@
 #include <MediaFiles.h>
 #include <MediaFormats.h>
 #include <MediaNode.h>
+#include <MediaRecorder.h>
 #include <MediaRoster.h>
 #include <MediaTheme.h>
 #include <MediaTrack.h>

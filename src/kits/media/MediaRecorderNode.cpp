@@ -15,8 +15,7 @@
 #include <TimedEventQueue.h>
 #include <TimeSource.h>
 
-#include <MediaDebug.h>
-#include <MediaRecorder.h>
+#include "MediaDebug.h"
 
 
 BMediaRecorderNode::BMediaRecorderNode(const char* name,
