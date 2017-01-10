@@ -126,7 +126,8 @@ CodyCam::ReadyToRun()
 {
 	fWindow = new VideoWindow(
 		(const char*) B_TRANSLATE_SYSTEM_NAME("CodyCam"), B_TITLED_WINDOW,
-		B_NOT_ZOOMABLE | B_AUTO_UPDATE_SIZE_LIMITS, &fPort);
+		B_NOT_ZOOMABLE | B_NOT_V_RESIZABLE
+		| B_AUTO_UPDATE_SIZE_LIMITS, &fPort);
 
 	if (_SetUpNodes() != B_OK)
 		fWindow->ToggleMenuOnOff();
@@ -223,8 +224,8 @@ CodyCam::_SetUpNodes()
 	INFO("CodyCam acquiring VideoInput node\n");
 	status = fMediaRoster->GetVideoInput(&fProducerNode);
 	if (status != B_OK) {
-		fWindow->ErrorAlert(B_TRANSLATE("Cannot find a video source. You need "
-			"a webcam to use CodyCam."), status);
+		fWindow->ErrorAlert(B_TRANSLATE("Cannot find a video source.\n"
+			"You need a webcam to use CodyCam."), status);
 		return status;
 	}
 
@@ -608,12 +609,16 @@ VideoWindow::_BuildCaptureControls()
 	fErrorView->SetViewColor(ui_color(B_PANEL_BACKGROUND_COLOR));
 
 	// Capture controls
+	BGridLayout *controlsLayout = new BGridLayout(B_USE_DEFAULT_SPACING,
+		B_USE_SMALL_SPACING);
+	controlsLayout->SetInsets(B_USE_SMALL_SPACING);
+
+	BView* controlView = new BView("Controls", B_SUPPORTS_LAYOUT, NULL);
+	controlView->SetLayout(controlsLayout);
+
 	fCaptureSetupBox = new BBox("Capture Controls", B_WILL_DRAW);
 	fCaptureSetupBox->SetLabel(B_TRANSLATE("Capture controls"));
-
-	BGridLayout *controlsLayout = new BGridLayout(B_USE_DEFAULT_SPACING, 0);
-	controlsLayout->SetInsets(10, 15, 5, 5);
-	fCaptureSetupBox->SetLayout(controlsLayout);
+	fCaptureSetupBox->AddChild(controlView);
 
 	// file name
 	fFileName = new BTextControl("File Name", B_TRANSLATE("File name:"),
@@ -657,8 +662,20 @@ VideoWindow::_BuildCaptureControls()
 		.Add(BSpaceLayoutItem::CreateGlue(), 0, 3, 2, 1);
 
 	// FTP setup box
+	BGridLayout* ftpLayout = new BGridLayout(B_USE_DEFAULT_SPACING,
+		B_USE_SMALL_SPACING);
+	ftpLayout->SetInsets(B_USE_SMALL_SPACING);
+
+	BView* outputView = new BView("Output", B_SUPPORTS_LAYOUT, NULL);
+	outputView->SetLayout(ftpLayout);
+
 	fFtpSetupBox = new BBox("FTP Setup", B_WILL_DRAW);
 	fFtpSetupBox->SetLabel(B_TRANSLATE("Output"));
+	fFtpSetupBox->AddChild(outputView);
+	float minWidth = be_plain_font->StringWidth(
+		"The server label plus ftp.reasonably.com");
+	fFtpSetupBox->SetExplicitMinSize(BSize(minWidth, B_SIZE_UNSET));
+	fFtpSetupBox->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	fUploadClientMenu = new BPopUpMenu(B_TRANSLATE("Send to" B_UTF8_ELLIPSIS));
 	for (int i = 0; i < kUploadClientsCount; i++) {
@@ -669,14 +686,11 @@ VideoWindow::_BuildCaptureControls()
 
 	fUploadClientMenu->SetTargetForItems(this);
 	fUploadClientMenu->FindItem(fUploadClientSetting->Value())->SetMarked(true);
+
 	fUploadClientSelector = new BMenuField("UploadClient", NULL,
 		fUploadClientMenu);
 
 	fUploadClientSelector->SetLabel(B_TRANSLATE("Type:"));
-
-	BGridLayout *ftpLayout = new BGridLayout(B_USE_DEFAULT_SPACING, 0);
-	ftpLayout->SetInsets(10, 15, 5, 5);
-	fFtpSetupBox->SetLayout(ftpLayout);
 
 	fServerName = new BTextControl("Server", B_TRANSLATE("Server:"),
 		fServerSetting->Value(), new BMessage(msg_server));
@@ -701,6 +715,7 @@ VideoWindow::_BuildCaptureControls()
 		new BMessage(msg_passiveftp));
 	fPassiveFtp->SetTarget(this);
 	fPassiveFtp->SetValue(fPassiveFtpSetting->Value());
+	fPassiveFtp->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 
 	BLayoutBuilder::Grid<>(ftpLayout)
 		.AddMenuField(fUploadClientSelector, 0, 0)
@@ -712,6 +727,7 @@ VideoWindow::_BuildCaptureControls()
 
 	fStatusLine = new BStringView("Status Line",
 		B_TRANSLATE("Waiting" B_UTF8_ELLIPSIS));
+	fStatusLine->SetExplicitMaxSize(BSize(B_SIZE_UNLIMITED, B_SIZE_UNSET));
 }
 
 
