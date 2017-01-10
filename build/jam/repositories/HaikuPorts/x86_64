@@ -766,7 +766,7 @@ RemotePackageRepository HaikuPorts
 	neon-0.30.2-3
 	neon_devel-0.30.2-3
 	netcat-1.10-2
-	netpulse-0.2.3-5
+	netpulse-0.2.3-7
 	nettle-3.2-1
 	nettle_devel-3.2-1
 	nfd-1.0-2
