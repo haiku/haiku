@@ -604,8 +604,8 @@ struct DefaultWindowBehaviour::ManageWindowState : State {
 
 	virtual bool MouseDown(BMessage* message, BPoint where, bool& _unhandled)
 	{
-		// We're only interested, if the secondary mouse button was pressed.
-		// Othewise let the our caller handle the event.
+		// We're only interested if the secondary mouse button was pressed,
+		// otherwise let the caller handle the event.
 		int32 buttons = message->FindInt32("buttons");
 		if ((buttons & B_SECONDARY_MOUSE_BUTTON) == 0) {
 			_unhandled = true;

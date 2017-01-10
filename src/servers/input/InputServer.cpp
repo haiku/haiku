@@ -212,7 +212,8 @@ void
 InputServer::_InitKeyboardMouseStates()
 {
 	CALLED();
-	// This is where we determine the screen resolution from the app_server and find the center of the screen
+	// This is where we determine the screen resolution from the app_server and
+	// find the center of the screen
 	// fMousePos is then set to the center of the screen.
 
 	fFrame = fScreen.Frame();
@@ -530,8 +531,8 @@ InputServer::MessageReceived(BMessage* message)
 		case IS_RELEASE_INPUT:
 			_ReleaseInput(message);
 			return;
-   		case IS_SCREEN_BOUNDS_UPDATED:
-   		{
+		case IS_SCREEN_BOUNDS_UPDATED:
+		{
 			// This is what the R5 app_server sends us when the screen
 			// configuration changes
 			BRect frame;
