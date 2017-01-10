@@ -379,26 +379,6 @@ BMediaClient::SetTimeSource(const media_client& timesource)
 }
 
 
-void
-BMediaClient::GetLatencyRange(bigtime_t* min, bigtime_t* max) const
-{
-	CALLED();
-
-	*min = fMinLatency;
-	*max = fMaxLatency;
-}
-
-
-void
-BMediaClient::SetLatencyRange(bigtime_t min, bigtime_t max)
-{
-	CALLED();
-
-	fMinLatency = min;
-	fMaxLatency = max;
-}
-
-
 bigtime_t
 BMediaClient::CurrentTime() const
 {

@@ -124,17 +124,6 @@ public:
 			BMediaNode::run_mode	RunMode() const;
 			status_t				SetRunMode(BMediaNode::run_mode mode);
 
-	// Specify a latency range to allow the node behave correctly.
-	// Ideally the minimum latency should be the algorithmic latency you expect
-	// from the node and will be used as starting point. The max latency is the
-	// maximum acceptable by you, over that point the node will adjust it's
-	// performance time to recover if a big delay happen.
-			void					SetLatencyRange(bigtime_t min,
-										bigtime_t max);
-
-			void					GetLatencyRange(bigtime_t* min,
-										bigtime_t* max) const;
-
 	// Return the current performance time handled by the object when
 	// run_mode != B_OFFLINE. Otherwise returns the current offline time.
 			bigtime_t				CurrentTime() const;
@@ -190,9 +179,6 @@ private:
 			BMediaClientNode*		fNode;
 
 			bigtime_t				fCurrentTime;
-
-			bigtime_t				fMinLatency;
-			bigtime_t				fMaxLatency;
 
 			BObjectList<BMediaInput>	fInputs;
 			BObjectList<BMediaOutput>	fOutputs;

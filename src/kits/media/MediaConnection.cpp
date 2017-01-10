@@ -12,7 +12,9 @@ BMediaConnection::BMediaConnection(media_connection_kinds kinds)
 	:
 	fOwner(NULL),
 	fBind(NULL),
-	fBufferGroup(NULL)
+	fBufferGroup(NULL),
+	fMinLatency(0),
+	fMaxLatency(0)
 {
 	CALLED();
 
@@ -133,6 +135,26 @@ void
 BMediaConnection::Disconnected()
 {
 	fConnected = false;
+}
+
+
+void
+BMediaConnection::GetLatencyRange(bigtime_t* min, bigtime_t* max) const
+{
+	CALLED();
+
+	*min = fMinLatency;
+	*max = fMaxLatency;
+}
+
+
+void
+BMediaConnection::SetLatencyRange(bigtime_t min, bigtime_t max)
+{
+	CALLED();
+
+	fMinLatency = min;
+	fMaxLatency = max;
 }
 
 

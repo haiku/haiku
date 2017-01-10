@@ -72,6 +72,17 @@ protected:
 	virtual void					Connected(const media_format& format);
 	virtual void					Disconnected();
 
+	// Specify a latency range to allow the connection behave correctly.
+	// Ideally the minimum latency should be the algorithmic latency you expect
+	// from the node and will be used as starting point. The max latency is the
+	// maximum acceptable by you, over that point the node will adjust it's
+	// performance time to recover if a big delay happen.
+			void					SetLatencyRange(bigtime_t min,
+										bigtime_t max);
+
+			void					GetLatencyRange(bigtime_t* min,
+										bigtime_t* max) const;
+
 private:
 			void					ConnectionRegistered(BMediaClient* owner,
 										media_connection_id id);
@@ -94,6 +105,9 @@ private:
 	BBufferGroup*					fBufferGroup;
 
 	bool							fConnected;
+
+	bigtime_t						fMinLatency;
+	bigtime_t						fMaxLatency;
 
 	virtual	void					_ReservedMediaConnection0();
 	virtual	void					_ReservedMediaConnection1();

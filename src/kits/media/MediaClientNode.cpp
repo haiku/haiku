@@ -213,7 +213,7 @@ BMediaClientNode::GetLatencyFor(const media_destination& dest,
 	if (conn == NULL)
 		return B_MEDIA_BAD_DESTINATION;
 
-	*latency = fOwner->fMaxLatency;
+	*latency = conn->fMaxLatency;
 	*timesource = TimeSource()->ID();
 	return B_OK;
 }
@@ -494,7 +494,7 @@ BMediaClientNode::GetLatency(bigtime_t* outLatency)
 	CALLED();
 
 	// TODO: finish latency handling
-	*outLatency = fOwner->fMinLatency;
+	*outLatency = 0;
 	return B_OK;
 }
 
