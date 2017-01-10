@@ -312,7 +312,7 @@ $(CATALOGS_DIR)/%.catalog : $(CATKEYS_DIR)/%.catkeys
 
 # Rule to preprocess program sources into file ready for collecting catkeys.
 $(OBJ_DIR)/$(NAME).pre : $(SRCS)
-	-cat $(SRCS) | $(CC) -E -x c++ $(INCLUDES) $(CFLAGS) -DB_COLLECTING_CATKEYS - > $(OBJ_DIR)/$(NAME).pre
+	-cat $(SRCS) | $(CC) -E -x c++ $(INCLUDES) $(CFLAGS) -DB_COLLECTING_CATKEYS - | grep -av '^#' > $(OBJ_DIR)/$(NAME).pre
 
 # Rules to collect localization catkeys.
 catkeys : $(CATKEYS_DIR)/en.catkeys
