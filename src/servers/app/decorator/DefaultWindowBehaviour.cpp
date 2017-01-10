@@ -704,6 +704,27 @@ DefaultWindowBehaviour::MouseDown(BMessage* message, BPoint where,
 	fLastModifiers = message->FindInt32("modifiers");
 	int32 buttons = message->FindInt32("buttons");
 
+	int32 numButtons;
+	if (get_mouse_type(&numButtons) == B_OK) {
+		switch (numButtons) {
+			case 1:
+				// 1 button mouse
+				if ((fLastModifiers & B_CONTROL_KEY) != 0) {
+					// emulate right click by holding control
+					buttons = B_SECONDARY_MOUSE_BUTTON;
+					message->ReplaceInt32("buttons", buttons);
+				}
+				break;
+
+			case 2:
+				// TODO: 2 button mouse, pressing both buttons simultaneously
+				// emulates middle click
+
+			default:
+				break;
+		}
+	}
+
 	// if a state is active, let it do the job
 	if (fState != NULL) {
 		bool unhandled = false;
