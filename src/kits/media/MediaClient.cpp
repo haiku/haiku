@@ -296,15 +296,8 @@ BMediaClient::Start(bool force)
 				remoteNode, fNode->TimeSource()->Now());
 	}
 
-	err = BMediaRoster::CurrentRoster()->StartNode(
+	return BMediaRoster::CurrentRoster()->StartNode(
 		fNode->Node(), fNode->TimeSource()->Now());
-
-	if (err == B_OK)
-		fRunning = true;
-	else
-		fRunning = false;
-
-	return err;
 }
 
 
@@ -313,15 +306,8 @@ BMediaClient::Stop(bool force)
 {
 	CALLED();
 
-	status_t err = BMediaRoster::CurrentRoster()->StopNode(
+	return BMediaRoster::CurrentRoster()->StopNode(
 		fNode->Node(), fNode->TimeSource()->Now());
-
-	if (err == B_OK)
-		fRunning = false;
-	else
-		fRunning = true;
-
-	return err;
 }
 
 
@@ -452,12 +438,14 @@ BMediaClient::AddOn(int32* id) const
 void
 BMediaClient::HandleStart(bigtime_t performanceTime)
 {
+	fRunning = true;
 }
 
 
 void
 BMediaClient::HandleStop(bigtime_t performanceTime)
 {
+	fRunning = false;
 }
 
 
