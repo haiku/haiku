@@ -223,12 +223,25 @@ ICUCtypeData::MultibyteToWchar(wchar_t* wcOut, const char* mb, size_t mbLen,
 	UErrorCode icuStatus = U_ZERO_ERROR;
 
 	const char* buffer = mb;
-	UChar targetBuffer[2];
+	UChar targetBuffer[3];
 	UChar* target = targetBuffer;
 	ucnv_toUnicode(converter, &target, target + 1, &buffer, buffer + mbLen,
 		NULL, FALSE, &icuStatus);
 	size_t sourceLengthUsed = buffer - mb;
 	size_t targetLengthUsed = (size_t)(target - targetBuffer);
+
+	if (U16_IS_LEAD(targetBuffer[0])) {
+		// we have a surrogate pair, so re-read with enough space for a pair
+		// of characters instead
+		TRACE(("MultibyteToWchar(): have a surrogate pair\n"));
+		ucnv_resetToUnicode(converter);
+		buffer = mb;
+		target = targetBuffer;
+		ucnv_toUnicode(converter, &target, target + 2, &buffer, buffer + mbLen,
+			NULL, FALSE, &icuStatus);
+		sourceLengthUsed = buffer - mb;
+		targetLengthUsed = (size_t)(target - targetBuffer);
+	}
 
 	if (icuStatus == U_BUFFER_OVERFLOW_ERROR && targetLengthUsed > 0) {
 		// we've got one character, which is all that we wanted
@@ -248,7 +261,7 @@ ICUCtypeData::MultibyteToWchar(wchar_t* wcOut, const char* mb, size_t mbLen,
 		result = B_BAD_INDEX;
 	} else {
 		UChar32 unicodeChar = 0xBADBEEF;
-		U16_GET(targetBuffer, 0, 0, 2, unicodeChar);
+		U16_GET(targetBuffer, 0, 0, targetLengthUsed, unicodeChar);
 
 		if (unicodeChar == 0) {
 			// reset to initial state
