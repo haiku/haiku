@@ -551,8 +551,13 @@ ICUCtypeData::_GetConverterForMbState(mbstate_t* mbState,
 status_t
 ICUCtypeData::_DropConverterFromMbState(mbstate_t* mbState)
 {
-	if (mbState->converter != NULL)
+	if (mbState->converter != NULL && (char*)mbState->converter >= mbState->data
+			&& (char*)mbState->converter < mbState->data + 8) {
+		// check that the converter actually lives in *this* mbState,
+		// otherwise we risk freeing a converter that doesn't belong to us;
+		// this parallels the check in _GetConverterForMbState()
 		ucnv_close((UConverter*)mbState->converter);
+	}
 	memset(mbState, 0, sizeof(mbstate_t));
 
 	return B_OK;
