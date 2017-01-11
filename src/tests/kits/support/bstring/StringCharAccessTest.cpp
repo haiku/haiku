@@ -27,7 +27,7 @@ StringCharAccessTest::PerformTest(void)
 
 	//&operator[]
 	NextSubTest();
-	string[0] = 'a';
+	string.SetCharAt(0, 'a');
 	CPPUNIT_ASSERT(strcmp(string.String(), "a simple string") == 0);
 	
 	//ByteAt(int32)
