@@ -215,7 +215,7 @@ ICUCtypeData::MultibyteToWchar(wchar_t* wcOut, const char* mb, size_t mbLen,
 	status_t result = _GetConverterForMbState(mbState, converter);
 	if (result != B_OK) {
 		TRACE(("MultibyteToWchar(): couldn't get converter for mbstate %p - "
-				"%lx\n", mbState, result));
+				"%" B_PRIx32 "\n", mbState, result));
 		return result;
 	}
 
@@ -279,7 +279,7 @@ ICUCtypeData::MultibyteStringToWchar(wchar_t* wcDest, size_t wcDestLength,
 	status_t result = _GetConverterForMbState(mbState, converter);
 	if (result != B_OK) {
 		TRACE(("MultibyteStringToWchar(): couldn't get converter for mbstate %p"
-				" - %lx\n", mbState, result));
+				" - %" B_PRIx32 "\n", mbState, result));
 		return result;
 	}
 
@@ -349,7 +349,7 @@ ICUCtypeData::WcharToMultibyte(char* mbOut, wchar_t wc, mbstate_t* mbState,
 	status_t result = _GetConverterForMbState(mbState, converter);
 	if (result != B_OK) {
 		TRACE(("WcharToMultibyte(): couldn't get converter for mbstate %p - "
-				"%lx\n", mbState, result));
+				"%" B_PRIx32 "\n", mbState, result));
 		return result;
 	}
 
@@ -410,7 +410,7 @@ ICUCtypeData::WcharStringToMultibyte(char* mbDest, size_t mbDestLength,
 	status_t result = _GetConverterForMbState(mbState, converter);
 	if (result != B_OK) {
 		TRACE(("WcharStringToMultibyte(): couldn't get converter for mbstate %p"
-			" - %lx\n", mbState, result));
+			" - %" B_PRIx32 "\n", mbState, result));
 		return result;
 	}
 
