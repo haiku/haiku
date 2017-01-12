@@ -100,11 +100,11 @@ BSpinner::BSpinner(BMessage* data)
 {
 	_InitObject();
 
-	if (data->FindInt32("_max", &fMaxValue) != B_OK)
-		fMinValue = INT32_MAX;
-
 	if (data->FindInt32("_min", &fMinValue) != B_OK)
 		fMinValue = INT32_MIN;
+
+	if (data->FindInt32("_max", &fMaxValue) != B_OK)
+		fMaxValue = INT32_MAX;
 
 	if (data->FindInt32("_val", &fValue) != B_OK)
 		fValue = 0;
@@ -269,8 +269,8 @@ BSpinner::SetValueFromText()
 void
 BSpinner::_InitObject()
 {
-	fMaxValue = INT32_MIN;
-	fMinValue = INT32_MAX;
+	fMinValue = INT32_MIN;
+	fMaxValue = INT32_MAX;
 	fValue = 0;
 
 	TextView()->SetAlignment(B_ALIGN_RIGHT);
