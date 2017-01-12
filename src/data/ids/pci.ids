@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2017.01.01
-#	Date:    2017-01-01 03:15:02
+#	Version: 2017.01.08
+#	Date:    2017-01-08 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -5107,6 +5107,7 @@
 		0675 1704  ISDN Adapter (PCI Bus, D, C)
 		0675 1707  ISDN Adapter (PCI Bus, DV, W)
 		10cf 105e  ISDN Adapter (PCI Bus, DV, W)
+	13a0  Transformer Book T101HA-GR030R
 # Should be 1022:9602
 	9602  AMD RS780/RS880 PCI to PCI bridge (int gfx)
 		1043 83a2  M4A785TD Motherboard
@@ -10694,6 +10695,9 @@
 	1c80  GP107
 	1c81  GP107 [GeForce GTX 1050]
 	1c82  GP107 [GeForce GTX 1050 Ti]
+	1c8c  GP107M [GeForce GTX 1050 Ti]
+	1c8d  GP107M [GeForce GTX 1050]
+	1c8e  GP107M
 	1ca7  GP107GL
 	1ca8  GP107GL
 	1caa  GP107GL
@@ -12119,7 +12123,11 @@
 111f  Precision Digital Images
 	4a47  Precision MX Video engine interface
 	5243  Frame capture bus interface
-1120  EMC Corporation
+# formerly EMC Corporation
+1120  Dell EMC
+	2306  Unity Fibre Channel Controller
+	2501  Unity Ethernet Controller
+	2505  Unity Fibre Channel Controller
 1121  Zilog
 1122  Multi-tech Systems, Inc.
 1123  Excellent Design, Inc.
@@ -15991,7 +15999,7 @@
 	5081  T540-5081 Unified Wire Ethernet Controller
 	5082  T504-5082 Unified Wire Ethernet Controller
 	5083  T540-5083 Unified Wire Ethernet Controller
-	5084  T580-5084 Unified Wire Ethernet Controller
+	5084  T540-5084 Unified Wire Ethernet Controller
 	5085  T580-5085 Unified Wire Ethernet Controller
 	5086  T580-5086 Unified Wire Ethernet Controller
 	5087  T580-5087 Unified Wire Ethernet Controller
@@ -19891,6 +19899,7 @@
 	5801  DDRdrive X1
 	5808  DDRdrive X8
 	dd52  DDRdrive X1-30
+19e5  Huawei Technologies Co., Ltd.
 19e7  NET (Network Equipment Technologies)
 	1001  STIX DSP Card
 	1002  STIX - 1 Port T1/E1 Card
@@ -23021,10 +23030,10 @@
 	15b7  Ethernet Connection (2) I219-LM
 	15b8  Ethernet Connection (2) I219-V
 	15b9  Ethernet Connection (3) I219-LM
-	15bb  Intel(R) Ethernet Connection (7) I219-LM
-	15bc  Intel(R) Ethernet Connection (7) I219-V
-	15bd  Intel(R) Ethernet Connection (6) I219-LM
-	15be  Intel(R) Ethernet Connection (6) I219-V
+	15bb  Ethernet Connection (7) I219-LM
+	15bc  Ethernet Connection (7) I219-V
+	15bd  Ethernet Connection (6) I219-LM
+	15be  Ethernet Connection (6) I219-V
 	15bf  JHL6240 Thunderbolt 3 NHI (Low Power) [Alpine Ridge LP 2016]
 	15c0  JHL6240 Thunderbolt 3 Bridge (Low Power) [Alpine Ridge LP 2016]
 	15c5  X553 Virtual Function
