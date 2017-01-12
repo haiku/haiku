@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -594,7 +594,8 @@ Journal::ReplayLog()
 	fVolume->SuperBlock().log_start = HOST_ENDIAN_TO_BFS_INT64(
 		fVolume->LogEnd());
 	fVolume->LogStart() = HOST_ENDIAN_TO_BFS_INT64(fVolume->LogEnd());
-	fVolume->SuperBlock().flags = SUPER_BLOCK_DISK_CLEAN;
+	fVolume->SuperBlock().flags = HOST_ENDIAN_TO_BFS_INT32(
+		SUPER_BLOCK_DISK_CLEAN);
 
 	return fVolume->WriteSuperBlock();
 }
@@ -667,7 +668,7 @@ Journal::_TransactionWritten(int32 transactionID, int32 event, void* _logEntry)
 
 	if (update) {
 		if (superBlock.log_start == superBlock.log_end)
-			superBlock.flags = SUPER_BLOCK_DISK_CLEAN;
+			superBlock.flags = HOST_ENDIAN_TO_BFS_INT32(SUPER_BLOCK_DISK_CLEAN);
 
 		status_t status = journal->fVolume->WriteSuperBlock();
 		if (status != B_OK) {
