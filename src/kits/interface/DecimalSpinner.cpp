@@ -140,11 +140,11 @@ BDecimalSpinner::BDecimalSpinner(BMessage* data)
 {
 	_InitObject();
 
-	if (data->FindDouble("_max", &fMaxValue) != B_OK)
-		fMinValue = 100.0;
-
 	if (data->FindDouble("_min", &fMinValue) != B_OK)
 		fMinValue = 0.0;
+
+	if (data->FindDouble("_max", &fMaxValue) != B_OK)
+		fMinValue = 100.0;
 
 	if (data->FindUInt32("_precision", &fPrecision) != B_OK)
 		fPrecision = 2;
@@ -179,10 +179,10 @@ BDecimalSpinner::Archive(BMessage* data, bool deep) const
 	data->AddString("class", "DecimalSpinner");
 
 	if (status == B_OK)
-		status = data->AddDouble("_max", fMaxValue);
+		status = data->AddDouble("_min", fMinValue);
 
 	if (status == B_OK)
-		status = data->AddDouble("_min", fMinValue);
+		status = data->AddDouble("_max", fMaxValue);
 
 	if (status == B_OK)
 		status = data->AddUInt32("_precision", fPrecision);
@@ -246,20 +246,20 @@ BDecimalSpinner::SetEnabled(bool enable)
 
 
 void
-BDecimalSpinner::SetMaxValue(double max)
-{
-	fMaxValue = max;
-	if (fValue > fMaxValue)
-		SetValue(fMaxValue);
-}
-
-
-void
 BDecimalSpinner::SetMinValue(double min)
 {
 	fMinValue = min;
 	if (fValue < fMinValue)
 		SetValue(fMinValue);
+}
+
+
+void
+BDecimalSpinner::SetMaxValue(double max)
+{
+	fMaxValue = max;
+	if (fValue > fMaxValue)
+		SetValue(fMaxValue);
 }
 
 
@@ -332,8 +332,8 @@ BDecimalSpinner::SetValueFromText()
 void
 BDecimalSpinner::_InitObject()
 {
-	fMaxValue = 100.0;
 	fMinValue = 0.0;
+	fMaxValue = 100.0;
 	fPrecision = 2;
 	fStep = 1.0;
 	fValue = 0.0;

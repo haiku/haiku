@@ -133,10 +133,10 @@ BSpinner::Archive(BMessage* data, bool deep) const
 	data->AddString("class", "Spinner");
 
 	if (status == B_OK)
-		status = data->AddInt32("_max", fMaxValue);
+		status = data->AddInt32("_min", fMinValue);
 
 	if (status == B_OK)
-		status = data->AddInt32("_min", fMinValue);
+		status = data->AddInt32("_max", fMaxValue);
 
 	if (status == B_OK)
 		status = data->AddInt32("_val", fValue);
@@ -194,20 +194,20 @@ BSpinner::SetEnabled(bool enable)
 
 
 void
-BSpinner::SetMaxValue(int32 max)
-{
-	fMaxValue = max;
-	if (fValue > fMaxValue)
-		SetValue(fMaxValue);
-}
-
-
-void
 BSpinner::SetMinValue(int32 min)
 {
 	fMinValue = min;
 	if (fValue < fMinValue)
 		SetValue(fMinValue);
+}
+
+
+void
+BSpinner::SetMaxValue(int32 max)
+{
+	fMaxValue = max;
+	if (fValue > fMaxValue)
+		SetValue(fMaxValue);
 }
 
 

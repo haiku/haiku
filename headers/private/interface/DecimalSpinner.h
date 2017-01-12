@@ -39,11 +39,11 @@ public:
 			uint32				Precision() const { return fPrecision; };
 	virtual	void				SetPrecision(uint32 precision) { fPrecision = precision; };
 
-			double				MaxValue() const { return fMaxValue; }
-	virtual	void				SetMaxValue(double max);
-
 			double				MinValue() const { return fMinValue; }
 	virtual	void				SetMinValue(double min);
+
+			double				MaxValue() const { return fMaxValue; }
+	virtual	void				SetMaxValue(double max);
 
 			void				Range(double* min, double* max);
 	virtual	void				SetRange(double min, double max);

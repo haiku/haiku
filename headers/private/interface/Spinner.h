@@ -36,11 +36,11 @@ public:
 
 	virtual	void				SetEnabled(bool enable);
 
-			int32				MaxValue() const { return fMaxValue; }
-	virtual	void				SetMaxValue(int32 max);
-
 			int32				MinValue() const { return fMinValue; }
 	virtual	void				SetMinValue(int32 min);
+
+			int32				MaxValue() const { return fMaxValue; }
+	virtual	void				SetMaxValue(int32 max);
 
 			void				Range(int32* min, int32* max);
 	virtual	void				SetRange(int32 min, int32 max);
