@@ -352,6 +352,7 @@ public:
 
 private:
 			class PosVect;
+			friend class BStringRef;
 
 			enum PrivateDataTag {
 				PRIVATE_DATA

@@ -2658,6 +2658,88 @@ __ls__7BStringR7BString(BString* self, BString& string)
 }
 
 
+#if __GNUC__ > 3
+
+//	#pragma mark - BStringRef backwards compatibility
+
+
+class BStringRef {
+public:
+	BStringRef(BString& string, int32 position);
+	~BStringRef() {}
+
+	operator char() const;
+
+	char* operator&();
+	const char* operator&() const;
+
+	BStringRef& operator=(char c);
+	BStringRef& operator=(const BStringRef& rc);
+
+private:
+	BString&	fString;
+	int32		fPosition;
+};
+
+
+BStringRef::BStringRef(BString& string, int32 position)
+	:
+	fString(string), fPosition(position)
+{
+}
+
+
+BStringRef::operator char() const
+{
+	return fPosition < fString.Length() ? fString.fPrivateData[fPosition] : 0;
+}
+
+
+BStringRef&
+BStringRef::operator=(char c)
+{
+	fString._MakeWritable();
+	fString.fPrivateData[fPosition] = c;
+	return *this;
+}
+
+
+BStringRef&
+BStringRef::operator=(const BStringRef &rc)
+{
+	return operator=(rc.fString.fPrivateData[rc.fPosition]);
+}
+
+
+const char*
+BStringRef::operator&() const
+{
+	return &fString.fPrivateData[fPosition];
+}
+
+
+char*
+BStringRef::operator&()
+{
+	if (fString._MakeWritable() != B_OK)
+		return NULL;
+
+	fString._ReferenceCount() = -1;
+		// mark as unsharable
+	return &fString.fPrivateData[fPosition];
+}
+
+
+
+extern "C" BStringRef
+_ZN7BStringixEi(BString* self, int32 index)
+
+{
+	return BStringRef(*self, index);
+}
+#endif
+
+
 //	#pragma mark - Non-member compare for sorting, etc.
 
 
