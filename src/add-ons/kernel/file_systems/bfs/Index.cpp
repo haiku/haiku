@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2014, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -386,7 +386,10 @@ Index::UpdateLastModified(Transaction& transaction, Inode* inode,
 		sizeof(int64), inode);
 
 	inode->Node().last_modified_time = HOST_ENDIAN_TO_BFS_INT64(modified);
-	if (status == B_OK)
+	// No matter if the index exists or not, we will update the old last
+	// modified field, since this is also being used to determine whether
+	// or not to send out notifications.
+	if (status == B_OK || status == B_BAD_INDEX)
 		inode->UpdateOldLastModified();
 
 	return status;
