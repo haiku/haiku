@@ -532,6 +532,7 @@ SpinnerTextView::SpinnerTextView(BRect rect, BRect textRect)
 		B_WILL_DRAW | B_NAVIGABLE),
 	fParent(NULL)
 {
+	MakeResizable(true);
 }
 
 
