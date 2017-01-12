@@ -229,14 +229,14 @@ DNSTools::ConvertToDNSName(const BString& string)
 
 			// set a counts to the dot
 			diff =  dot - 1 - lastDot;
-			outString.SetCharAt(lastDot, (char)diff);
+			outString.SetByteAt(lastDot, (char)diff);
 			lastDot = dot;
 		}
 	} else
 		lastDot = 0;
 
 	diff = outString.CountChars() - 1 - lastDot;
-	outString.SetCharAt(lastDot, (char)diff);
+	outString.SetByteAt(lastDot, (char)diff);
 
 	return outString;
 }
@@ -259,7 +259,7 @@ DNSTools::ConvertFromDNSName(const BString& string)
 		if (dot == 0)
 			break;
 		// set a "."
-		outString.SetCharAt(nextDot, '.');
+		outString.SetByteAt(nextDot, '.');
 		nextDot+= dot + 1;
 	}
 	return outString;

@@ -309,7 +309,7 @@ public:
 			// Fast low-level manipulation
 			char*			LockBuffer(int32 maxLength);
 			BString&		UnlockBuffer(int32 length = -1);
-			BString&		SetCharAt(int32 pos, char to);
+			BString&		SetByteAt(int32 pos, char to);
 
 			// Upercase <-> Lowercase
 			BString&		ToLower();

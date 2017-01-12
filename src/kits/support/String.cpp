@@ -1904,7 +1904,7 @@ BString::UnlockBuffer(int32 length)
 
 
 BString&
-BString::SetCharAt(int32 pos, char to)
+BString::SetByteAt(int32 pos, char to)
 {
 	if (pos < Length() && _MakeWritable() == B_OK)
 		fPrivateData[pos] = to;

@@ -288,13 +288,13 @@ ExpressionTextView::SetValue(BString value)
 				if (digit != 10)
 					break;
 
-				value.SetCharAt(offset, '0');
+				value.SetByteAt(offset, '0');
 			}
 			if (digit == 10) {
 				// carry over, shift the result
 				if (value[firstDigit + 1] == '.') {
-					value.SetCharAt(firstDigit + 1, '0');
-					value.SetCharAt(firstDigit, '.');
+					value.SetByteAt(firstDigit + 1, '0');
+					value.SetByteAt(firstDigit, '.');
 				}
 				value.Insert('1', 1, firstDigit);
 
@@ -311,7 +311,7 @@ ExpressionTextView::SetValue(BString value)
 				value << 'E' << exponent;
 			} else {
 				// increase the current digit value with one
-				value.SetCharAt(offset, char(digit + 48));
+				value.SetByteAt(offset, char(digit + 48));
 
 				// set offset to last digit
 				offset = value.FindFirst('E');
