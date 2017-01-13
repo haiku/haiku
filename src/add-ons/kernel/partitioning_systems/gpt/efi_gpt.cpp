@@ -140,6 +140,7 @@ efi_gpt_scan_partition(int fd, partition_data* partition, void* _cookie)
 		child->type = strdup(get_partition_type(entry.partition_type));
 		child->block_size = partition->block_size;
 		child->cookie = (void*)(addr_t)i;
+		child->content_cookie = header;
 	}
 
 	return B_OK;
