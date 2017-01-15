@@ -185,6 +185,7 @@ private:
 	media_output					MediaOutput() const;
 
 	bool							fEnabled;
+	size_t							fFramesSent;
 
 	virtual	void					_ReservedMediaOutput0();
 	virtual	void					_ReservedMediaOutput1();

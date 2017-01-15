@@ -128,11 +128,13 @@ protected:
 	virtual					~BMediaClientNode();
 
 private:
+				void		_ScheduleConnections(bigtime_t eventTime);
 				void		_HandleBuffer(BBuffer* buffer);
 				void		_ProduceNewBuffer(const media_timed_event* event,
 								bigtime_t late);
 
 			BMediaClient*	fOwner;
+			bigtime_t		fStartTime;
 };
 
 }

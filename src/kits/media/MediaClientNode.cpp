@@ -467,10 +467,8 @@ BMediaClientNode::Disconnect(const media_source& source,
 	if (conn == NULL)
 		return;
 
-	if (conn->Destination() == dest) {
+	if (conn->Destination() == dest)
 		conn->Disconnect();
-		conn->Disconnected();
-	}
 }
 
 
@@ -481,10 +479,8 @@ BMediaClientNode::EnableOutput(const media_source& source,
 	CALLED();
 
 	BMediaOutput* conn = fOwner->FindOutput(source);
-	if (conn != NULL) {
+	if (conn != NULL)
 		conn->SetEnabled(enabled);
-		return;
-	}
 }
 
 
@@ -523,7 +519,7 @@ BMediaClientNode::HandleEvent(const media_timed_event* event,
 
 	switch (event->type) {
 		// This event is used for inputs which consumes buffers
-		// or binded connections which also sent them to an output.
+		// or binded connections which also send them to an output.
 		case BTimedEventQueue::B_HANDLE_BUFFER:
 			_HandleBuffer((BBuffer*)event->pointer);
 			break;
@@ -537,6 +533,8 @@ BMediaClientNode::HandleEvent(const media_timed_event* event,
 		{
 			if (RunState() != B_STARTED)
 				fOwner->HandleStart(event->event_time);
+
+			_ScheduleConnections(event->event_time);
 			break;
 		}
 
@@ -569,6 +567,27 @@ BMediaClientNode::~BMediaClientNode()
 
 
 void
+BMediaClientNode::_ScheduleConnections(bigtime_t eventTime)
+{
+	for (int32 i = 0; i < fOwner->CountOutputs(); i++) {
+		BMediaOutput* output = fOwner->OutputAt(i);
+
+		if (output->HasBinding())
+			continue;
+
+		fStartTime = eventTime;
+		media_timed_event firstBufferEvent(eventTime,
+			B_NEW_BUFFER);
+
+		output->fFramesSent = 0;
+
+		firstBufferEvent.pointer = (void*) output;
+		EventQueue()->AddEvent(firstBufferEvent);
+	}
+}
+
+
+void
 BMediaClientNode::_HandleBuffer(BBuffer* buffer)
 {
 	CALLED();
@@ -579,7 +598,13 @@ BMediaClientNode::_HandleBuffer(BBuffer* buffer)
 
 	if (conn != NULL)
 		conn->BufferReceived(buffer);
-	// TODO: this should be logged someway
+
+	// TODO: Investigate system level latency logging
+
+	if (conn->HasBinding()) {
+		BMediaOutput* output = dynamic_cast<BMediaOutput*>(conn->Binding());
+		output->SendBuffer(buffer);
+	}
 }
 
 
