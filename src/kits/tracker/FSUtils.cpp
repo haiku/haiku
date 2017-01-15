@@ -1589,10 +1589,12 @@ CopyFolder(BEntry* srcEntry, BDirectory* destDir,
 				removeSource);
 			if (removeSource)
 				FSDeleteFolder(&entry, loopControl, true, true, false);
-		} else {
+		} else if (S_ISREG(statbuf.st_mode) || S_ISLNK(statbuf.st_mode)) {
 			CopyFile(&entry, &statbuf, &newDir, loopControl, 0, false, undo);
 			if (removeSource)
 				entry.Remove();
+		} else {
+			// Ignore special files
 		}
 	}
 	if (removeSource)
