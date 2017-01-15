@@ -105,6 +105,51 @@ class TitleView : public BView {
 		const char *fTitle;
 };
 
+class CheckBox : public BCheckBox {
+	public:
+		CheckBox(BRect area, const char* name, const char* label,
+			BDiscreteParameter &parameter);
+		virtual ~CheckBox();
+
+		virtual void AttachedToWindow();
+	private:
+		BDiscreteParameter &fParameter;
+};
+
+class OptionPopUp : public BOptionPopUp {
+	public:
+		OptionPopUp(BRect area, const char* name, const char* label,
+			BDiscreteParameter &parameter);
+		virtual ~OptionPopUp();
+
+		virtual void AttachedToWindow();
+	private:
+		BDiscreteParameter &fParameter;
+};
+
+class Slider : public BSlider {
+	public:
+		Slider(BRect area, const char* name, const char*label, int32 minValue,
+			int32 maxValue, BContinuousParameter &parameter);
+		virtual ~Slider();
+
+		virtual void AttachedToWindow();
+	private:
+		BContinuousParameter &fParameter;
+};
+
+class ChannelSlider : public BChannelSlider {
+	public:
+		ChannelSlider(BRect area, const char* name, const char* label,
+			orientation orientation, int32 channels,
+			BContinuousParameter &parameter);
+		virtual ~ChannelSlider();
+
+		virtual void AttachedToWindow();
+	private:
+		BContinuousParameter &fParameter;
+};
+
 class MessageFilter : public BMessageFilter {
 	public:
 		static MessageFilter *FilterFor(BView *view, BParameter &parameter);
@@ -126,7 +171,6 @@ class ContinuousMessageFilter : public MessageFilter {
 
 		BControl				*fControl;
 		BContinuousParameter	&fParameter;
-		bool					fRegistered;
 };
 
 class DiscreteMessageFilter : public MessageFilter {
@@ -146,7 +190,7 @@ class DiscreteMessageFilter : public MessageFilter {
 const uint32 kMsgParameterChanged = '_mPC';
 
 
-static bool 
+static bool
 parameter_should_be_hidden(BParameter &parameter)
 {
 	// ToDo: note, this is probably completely stupid, but it's the only
@@ -164,6 +208,25 @@ parameter_should_be_hidden(BParameter &parameter)
 	return false;
 }
 
+
+static void
+start_watching_for_parameter_changes(BControl* control, BParameter &parameter)
+{
+	if (BMediaRoster* roster = BMediaRoster::CurrentRoster()) {
+		roster->StartWatching(control, parameter.Web()->Node(),
+			B_MEDIA_NEW_PARAMETER_VALUE);
+	}
+}
+
+
+static void
+stop_watching_for_parameter_changes(BControl* control, BParameter &parameter)
+{
+	if (BMediaRoster* roster = BMediaRoster::CurrentRoster()) {
+		roster->StopWatching(control, parameter.Web()->Node(),
+			B_MEDIA_NEW_PARAMETER_VALUE);
+	}
+}
 
 //	#pragma mark -
 
@@ -203,21 +266,21 @@ DynamicScrollView::AttachedToWindow(void)
 }
 
 
-void 
+void
 DynamicScrollView::FrameResized(float width, float height)
 {
 	UpdateBars();
 }
 
 
-void 
+void
 DynamicScrollView::FrameMoved(BPoint newPosition)
 {
 	UpdateBars();
 }
 
 
-void 
+void
 DynamicScrollView::GetPreferredSize(float *_width, float *_height)
 {
 	float width = 50;
@@ -233,7 +296,7 @@ DynamicScrollView::GetPreferredSize(float *_width, float *_height)
 }
 
 
-void 
+void
 DynamicScrollView::SetContentBounds(BRect bounds)
 {
 	fContentBounds = bounds;
@@ -242,7 +305,7 @@ DynamicScrollView::SetContentBounds(BRect bounds)
 }
 
 
-void 
+void
 DynamicScrollView::UpdateBars()
 {
 	// we need the size that the view wants to have, and the one
@@ -326,7 +389,7 @@ DynamicScrollView::UpdateBars()
 		}
 		if (vertical || fIsDocumentScroller)
 			barWidth -= B_V_SCROLL_BAR_WIDTH + 1;
-		
+
 		fHorizontalScrollBar->MoveTo(bounds.left, bounds.bottom + 1);
 		fHorizontalScrollBar->ResizeTo(barWidth, B_H_SCROLL_BAR_HEIGHT);
 	}
@@ -368,7 +431,7 @@ GroupView::~GroupView()
 }
 
 
-void 
+void
 GroupView::AttachedToWindow()
 {
 	for (int32 i = CountChildren(); i-- > 0;) {
@@ -381,13 +444,13 @@ GroupView::AttachedToWindow()
 }
 
 
-void 
+void
 GroupView::AllAttached()
 {
 }
 
 
-void 
+void
 GroupView::GetPreferredSize(float *_width, float *_height)
 {
 	if (_width)
@@ -421,7 +484,7 @@ GroupView::MaxSize()
 }
 
 
-void 
+void
 GroupView::SetContentBounds(BRect bounds)
 {
 	fContentBounds = bounds;
@@ -445,7 +508,7 @@ TabView::TabView(BRect frame, const char *name, button_width width,
 }
 
 
-void 
+void
 TabView::FrameResized(float width, float height)
 {
 	BRect rect = Bounds();
@@ -457,7 +520,7 @@ TabView::FrameResized(float width, float height)
 }
 
 
-void 
+void
 TabView::Select(int32 tab)
 {
 	BTabView::Select(tab);
@@ -486,7 +549,7 @@ SeparatorView::~SeparatorView()
 }
 
 
-void 
+void
 SeparatorView::Draw(BRect updateRect)
 {
 	rgb_color color = ui_color(B_PANEL_BACKGROUND_COLOR);
@@ -523,7 +586,7 @@ TitleView::~TitleView()
 }
 
 
-void 
+void
 TitleView::Draw(BRect updateRect)
 {
 	BRect rect(Bounds());
@@ -538,7 +601,7 @@ TitleView::Draw(BRect updateRect)
 }
 
 
-void 
+void
 TitleView::GetPreferredSize(float *_width, float *_height)
 {
 	if (_width)
@@ -551,6 +614,93 @@ TitleView::GetPreferredSize(float *_width, float *_height)
 		*_height = fontHeight.ascent + fontHeight.descent + fontHeight.leading
 			+ 8;
 	}
+}
+
+
+//	#pragma mark -
+
+
+CheckBox::CheckBox(BRect area, const char* name, const char* label,
+	BDiscreteParameter &parameter)
+	: BCheckBox(area, name, label, NULL),
+	fParameter(parameter)
+{
+}
+
+
+CheckBox::~CheckBox()
+{
+	stop_watching_for_parameter_changes(this, fParameter);
+}
+
+
+void
+CheckBox::AttachedToWindow()
+{
+	start_watching_for_parameter_changes(this, fParameter);
+}
+
+
+OptionPopUp::OptionPopUp(BRect area, const char* name, const char* label,
+	BDiscreteParameter &parameter)
+	: BOptionPopUp(area, name, label, NULL),
+	fParameter(parameter)
+{
+}
+
+
+OptionPopUp::~OptionPopUp()
+{
+	stop_watching_for_parameter_changes(this, fParameter);
+}
+
+
+void
+OptionPopUp::AttachedToWindow()
+{
+	start_watching_for_parameter_changes(this, fParameter);
+}
+
+
+Slider::Slider(BRect area, const char* name, const char* label, int32 minValue,
+	int32 maxValue, BContinuousParameter &parameter)
+	: BSlider(area, name, label, NULL, minValue, maxValue),
+	fParameter(parameter)
+{
+}
+
+
+Slider::~Slider()
+{
+	stop_watching_for_parameter_changes(this, fParameter);
+}
+
+
+void
+Slider::AttachedToWindow()
+{
+	start_watching_for_parameter_changes(this, fParameter);
+}
+
+
+ChannelSlider::ChannelSlider(BRect area, const char* name, const char* label,
+	orientation orientation, int32 channels, BContinuousParameter &parameter)
+	: BChannelSlider(area, name, label, NULL, orientation, channels),
+	fParameter(parameter)
+{
+}
+
+
+ChannelSlider::~ChannelSlider()
+{
+	stop_watching_for_parameter_changes(this, fParameter);
+}
+
+
+void
+ChannelSlider::AttachedToWindow()
+{
+	start_watching_for_parameter_changes(this, fParameter);
 }
 
 
@@ -593,8 +743,7 @@ ContinuousMessageFilter::ContinuousMessageFilter(BControl *control,
 		BContinuousParameter &parameter)
 	: MessageFilter(),
 	fControl(control),
-	fParameter(parameter),
-	fRegistered(false)
+	fParameter(parameter)
 {
 	// initialize view for us
 	control->SetMessage(new BMessage(kMsgParameterChanged));
@@ -616,22 +765,12 @@ ContinuousMessageFilter::~ContinuousMessageFilter()
 }
 
 
-filter_result 
+filter_result
 ContinuousMessageFilter::Filter(BMessage *message, BHandler **target)
 {
 	if (*target != fControl)
 		return B_DISPATCH_MESSAGE;
 
-	// TODO: remove this work-around! We can solve this by subclassing the
-	// slider classes, and start watching in their AttachedToWindow() method
-	if (!fRegistered) {
-		if (BMediaRoster* roster = BMediaRoster::CurrentRoster()) {
-			roster->StartWatching(fControl, fParameter.Web()->Node(),
-				B_MEDIA_NEW_PARAMETER_VALUE);
-		}
-		fRegistered = true;
-	}
-		
 	if (message->what == kMsgParameterChanged) {
 		// update parameter from control
 		// TODO: support for response!
@@ -715,7 +854,6 @@ DiscreteMessageFilter::DiscreteMessageFilter(BControl *control,
 	control->SetMessage(new BMessage(kMsgParameterChanged));
 
 	// set initial value
-
 	size_t size = sizeof(int32);
 	int32 value;
 	if (parameter.GetValue((void *)&value, &size, NULL) < B_OK) {
@@ -739,13 +877,44 @@ DiscreteMessageFilter::~DiscreteMessageFilter()
 }
 
 
-filter_result 
+filter_result
 DiscreteMessageFilter::Filter(BMessage *message, BHandler **target)
 {
 	BControl *control;
 
-	if (message->what != kMsgParameterChanged
-		|| (control = dynamic_cast<BControl *>(*target)) == NULL)
+	if ((control = dynamic_cast<BControl *>(*target)) == NULL)
+		return B_DISPATCH_MESSAGE;
+
+	if (message->what == B_MEDIA_NEW_PARAMETER_VALUE) {
+		TRACE("DiscreteMessageFilter::Filter: Got a new parameter value\n");
+		const media_node* node;
+		int32 parameterID;
+		ssize_t size;
+		if (message->FindInt32("parameter", &parameterID) != B_OK
+			|| fParameter.ID() != parameterID
+			|| message->FindData("node", B_RAW_TYPE, (const void**)&node,
+					&size) != B_OK
+			|| fParameter.Web()->Node() != *node)
+			return B_DISPATCH_MESSAGE;
+
+		int32 value = 0;
+		size_t valueSize = sizeof(int32);
+		if (fParameter.GetValue((void*)&value, &valueSize, NULL) < B_OK) {
+			ERROR("DiscreteMessageFilter: Could not get value for continuous "
+			"parameter %p (name '%s', node %d)\n", &fParameter,
+			fParameter.Name(), (int)fParameter.Web()->Node().node);
+			return B_SKIP_MESSAGE;
+		}
+		if (BCheckBox* checkBox = dynamic_cast<BCheckBox*>(control)) {
+			checkBox->SetValue(value);
+		} else if (BOptionPopUp* popUp = dynamic_cast<BOptionPopUp*>(control)) {
+			popUp->SetValue(value);
+		}
+
+		return B_SKIP_MESSAGE;
+	}
+
+	if (message->what != kMsgParameterChanged)
 		return B_DISPATCH_MESSAGE;
 
 	// update view
@@ -801,7 +970,7 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 	BRect rect;
 	if (hintRect)
 		rect = *hintRect;
-		
+
 	BRect bestRect;
 
 	// do we have more than one attached parameter group?
@@ -844,20 +1013,20 @@ DefaultMediaTheme::MakeViewFor(BParameterWeb *web, const BRect *hintRect)
 
 			return new DynamicScrollView(groupView->Name(), groupView);
 		}
-		
-		DynamicScrollView *scrollView = new DynamicScrollView(groupView->Name(), groupView);		
+
+		DynamicScrollView *scrollView = new DynamicScrollView(groupView->Name(), groupView);
 		tabView->AddTab(scrollView);
-		
-		if (!hintRect) {			
-			bestRect = bestRect | scrollView->Bounds();			
-		}	
+
+		if (!hintRect) {
+			bestRect = bestRect | scrollView->Bounds();
+		}
 	}
-	
-	if (tabView != NULL) {		
+
+	if (tabView != NULL) {
 		// this adjustment must be kept in sync with TabView::FrameResized
 		bestRect.bottom += tabView->TabHeight();
-		bestRect.InsetBy(-3.0,-3.0);	
-		
+		bestRect.InsetBy(-3.0,-3.0);
+
 		tabView->ResizeTo(bestRect.Width(), bestRect.Height());
 		tabView->FrameResized(bestRect.Width(), bestRect.Height());
 			//needed since we're not attached to a window yet
@@ -1077,8 +1246,8 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 				|| discrete.CountItems() == 0) {
 				// create a checkbox item
 
-				BCheckBox *checkBox = new BCheckBox(rect, discrete.Name(),
-					discrete.Name(), NULL);
+				BCheckBox *checkBox = new CheckBox(rect, discrete.Name(),
+					discrete.Name(), discrete);
 				checkBox->ResizeToPreferred();
 
 				return checkBox;
@@ -1099,8 +1268,8 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 				width += font.StringWidth(discrete.Name()) + 55;
 				rect.right = rect.left + width;
 
-				BOptionPopUp *popUp = new BOptionPopUp(rect, discrete.Name(),
-					discrete.Name(), NULL);
+				BOptionPopUp *popUp = new OptionPopUp(rect, discrete.Name(),
+					discrete.Name(), discrete);
 
 				for (int32 i = 0; i < discrete.CountItems(); i++) {
 					popUp->AddOption(discrete.ItemNameAt(i), discrete.ItemValueAt(i));
@@ -1118,8 +1287,9 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 
 			if (!strcmp(continuous.Kind(), B_MASTER_GAIN)
 				|| !strcmp(continuous.Kind(), B_GAIN)) {
-				BChannelSlider *slider = new BChannelSlider(rect, continuous.Name(),
-					continuous.Name(), NULL, B_VERTICAL, continuous.CountChannels());
+				BChannelSlider *slider = new ChannelSlider(rect,
+					continuous.Name(), continuous.Name(), B_VERTICAL,
+					continuous.CountChannels(), continuous);
 
 				char minLabel[64], maxLabel[64];
 
@@ -1148,8 +1318,8 @@ DefaultMediaTheme::MakeViewFor(BParameter *parameter, const BRect *hintRect)
 				return slider;
 			}
 
-			BSlider *slider = new BSlider(rect, parameter->Name(), parameter->Name(),
-				NULL, 0, 100);
+			BSlider *slider = new Slider(rect, parameter->Name(),
+				parameter->Name(), 0, 100, continuous);
 
 			float width, height;
 			slider->GetPreferredSize(&width, &height);
