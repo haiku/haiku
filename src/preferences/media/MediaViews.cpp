@@ -62,8 +62,7 @@ SettingsView::MakeRestartButton()
 {
 	return new BButton("restartButton",
 		B_TRANSLATE("Restart media services"),
-		new BMessage(ML_RESTART_MEDIA_SERVER),
-			B_ALIGN_RIGHT);
+		new BMessage(ML_RESTART_MEDIA_SERVER));
 }
 
 
