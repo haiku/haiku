@@ -262,6 +262,11 @@ _BMethodAddOn_::AddMethod()
 	msg.AddInt32("cookie", fCookie);
 	msg.AddString("name", fName);
 	msg.AddData("icon", B_RAW_TYPE, fIcon, 16*16*1);
+	BMessage menuMsg;
+	if (fMenu != NULL)
+		fMenu->Archive(&menuMsg);
+	msg.AddMessage("menu", &menuMsg);
+	msg.AddMessenger("target", fMessenger);
 	if (((InputServer*)be_app)->MethodReplicant())
 		return ((InputServer*)be_app)->MethodReplicant()->SendMessage(&msg);
 	else

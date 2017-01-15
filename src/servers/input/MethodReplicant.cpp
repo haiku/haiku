@@ -367,13 +367,35 @@ MethodReplicant::AddMethod(BMessage* message)
 		return;
 	}
 
+	BMessage menuMsg;
+	if (message->FindMessage("menu", &menuMsg) != B_OK) {
+		fprintf(stderr, "can't find menu in message\n");
+		return;
+	}
+	PRINT_OBJECT(menuMsg);
+
+	BMessenger messenger;
+	if (message->FindMessenger("target", &messenger) != B_OK) {
+		fprintf(stderr, "can't find target in message\n");
+		return;
+	}
+
+	BMenu* menu = static_cast<BMenu*>(BMenu::Instantiate(&menuMsg));
+	if (menu == NULL) {
+		PRINT(("can't instantiate menu\n"));
+	} else
+		menu->SetTargetForItems(messenger);
+
 	MethodMenuItem* item = FindItemByCookie(cookie);
 	if (item != NULL) {
 		fprintf(stderr, "item with cookie %" B_PRIx32 " already exists\n", cookie);
 		return;
 	}
 
-	item = new MethodMenuItem(cookie, name, icon);
+	if (menu != NULL) {
+		item = new MethodMenuItem(cookie, name, icon, menu, messenger);
+	} else
+		item = new MethodMenuItem(cookie, name, icon);
 	fMenu.AddItem(item);
 	item->SetTarget(this);
 
