@@ -57,8 +57,8 @@ void _ConsumerProducerTest()
 {
 	_InitClients(false);
 
-	BMediaOutput* output = sProducer->BeginOutput();
-	BMediaInput* input = sConsumer->BeginInput();
+	BSimpleMediaOutput* output = sProducer->BeginOutput();
+	BSimpleMediaInput* input = sConsumer->BeginInput();
 
 	output->SetAcceptedFormat(_BuildRawAudioFormat());
 	input->SetAcceptedFormat(_BuildRawAudioFormat());

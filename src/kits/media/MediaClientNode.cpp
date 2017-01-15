@@ -99,7 +99,6 @@ BMediaClientNode::Start(bigtime_t performanceTime)
 	CALLED();
 
 	BMediaEventLooper::Start(performanceTime);
-	fOwner->fRunning = true;
 }
 
 
@@ -109,7 +108,6 @@ BMediaClientNode::Stop(bigtime_t performanceTime, bool immediate)
 	CALLED();
 
 	BMediaEventLooper::Stop(performanceTime, immediate);
-	fOwner->fRunning = false;
 }
 
 
@@ -538,6 +536,8 @@ BMediaClientNode::HandleEvent(const media_timed_event* event,
 			if (RunState() != B_STARTED)
 				fOwner->HandleStart(event->event_time);
 
+			fStartTime = event->event_time;
+
 			_ScheduleConnections(event->event_time);
 			break;
 		}
@@ -579,7 +579,6 @@ BMediaClientNode::_ScheduleConnections(bigtime_t eventTime)
 		if (output->HasBinding())
 			continue;
 
-		fStartTime = eventTime;
 		media_timed_event firstBufferEvent(eventTime,
 			B_NEW_BUFFER);
 

@@ -196,7 +196,7 @@ BSimpleMediaInput::BufferReceived(BBuffer* buffer)
 
 BSimpleMediaOutput::BSimpleMediaOutput()
 	:
-BMediaConnection(B_MEDIA_INPUT),
+	BMediaConnection(B_MEDIA_OUTPUT),
 	BSimpleMediaConnection(B_MEDIA_OUTPUT),
 	BMediaOutput()
 {
