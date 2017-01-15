@@ -127,6 +127,10 @@ Attribute::Create(const char* name, type_code type, int openMode,
 	if (cookie == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
+	bool exists = Get(name) == B_OK;
+	if (exists && (openMode & O_EXCL) != 0)
+		return B_FILE_EXISTS;
+
 	fName = name;
 
 	// initialize the cookie
@@ -135,11 +139,9 @@ Attribute::Create(const char* name, type_code type, int openMode,
 	cookie->open_mode = openMode;
 	cookie->create = true;
 
-	if (Get(name) == B_OK) {
-		// attribute already exists
-		if ((openMode & O_TRUNC) != 0)
-			_Truncate();
-	}
+	if (exists && (openMode & O_TRUNC) != 0)
+		_Truncate();
+
 	*_cookie = cookie;
 	return B_OK;
 }
