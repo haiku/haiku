@@ -110,13 +110,17 @@ public:
 	// always use the protected HandleSomething version. This is because
 	// otherwise you could break the connection mechanism and mine interoperability
 	// from remote nodes.
-			status_t				Start(bool force = false);
-			status_t				Stop(bool force = false);
+			status_t				Start();
+			status_t				Stop();
 			status_t				Seek(bigtime_t mediaTime,
 										bigtime_t performanceTime);
 			status_t				Roll(bigtime_t start, bigtime_t stop,
 										bigtime_t seek);
+
+	// Preroll the client to buffer startup latency
 			status_t				Preroll();
+
+	// This function return when the client reach the specified performanceTime
 			status_t				SyncTo(bigtime_t performanceTime,
 										bigtime_t timeout = -1);
 

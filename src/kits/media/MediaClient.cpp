@@ -281,7 +281,7 @@ BMediaClient::IsRunning() const
 
 
 status_t
-BMediaClient::Start(bool force)
+BMediaClient::Start()
 {
 	CALLED();
 
@@ -302,7 +302,7 @@ BMediaClient::Start(bool force)
 
 
 status_t
-BMediaClient::Stop(bool force)
+BMediaClient::Stop()
 {
 	CALLED();
 
