@@ -103,17 +103,6 @@ ScreenCornerSelector::Draw(BRect updateRect)
 		StrokeRoundRect(outerRect, kMonitorBorderSize * 3 / 2,
 			kMonitorBorderSize * 3 / 2);
 
-		if (!IsFocusChanging()) {
-			SetHighColor(210, 210, 255);
-			FillRoundRect(innerRect, kMonitorBorderSize, kMonitorBorderSize);
-		}
-
-		if (IsFocus() && Window()->IsActive())
-			SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
-		else
-			SetHighColor(blackColor);
-		StrokeRoundRect(innerRect, kMonitorBorderSize, kMonitorBorderSize);
-
 		if (IsFocusChanging())
 			return;
 
@@ -124,6 +113,17 @@ ScreenCornerSelector::Draw(BRect updateRect)
 			- kMonitorBorderSize);
 		StrokeLine(powerPos, BPoint(powerPos.x + 2, powerPos.y));
 	}
+
+	if (!IsFocusChanging()) {
+		SetHighColor(210, 210, 255);
+		FillRoundRect(innerRect, kMonitorBorderSize, kMonitorBorderSize);
+	}
+
+	if (IsFocus() && Window()->IsActive())
+		SetHighColor(ui_color(B_KEYBOARD_NAVIGATION_COLOR));
+	else
+		SetHighColor(blackColor);
+	StrokeRoundRect(innerRect, kMonitorBorderSize, kMonitorBorderSize);
 
 	innerRect = _InnerFrame(outerRect);
 
