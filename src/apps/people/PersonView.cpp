@@ -64,6 +64,10 @@ PersonView::PersonView(const char* name, const char* categoryAttribute,
 	fPictureView = new PictureView(70, 90, ref);
 
 	BGridLayout* layout = GridLayout();
+
+	float spacing = be_control_look->DefaultItemSpacing();
+	layout->SetInsets(spacing, spacing, spacing, spacing);
+
 	layout->AddView(fPictureView, 0, 0, 1, 5);
 	layout->ItemAt(0, 0)->SetExplicitAlignment(
 		BAlignment(B_ALIGN_CENTER, B_ALIGN_TOP));

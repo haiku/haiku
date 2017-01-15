@@ -109,10 +109,7 @@ PersonWindow::PersonWindow(BRect frame, const char* title,
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, 0)
 		.Add(menuBar)
-		.AddGroup(B_VERTICAL, 0)
-			.Add(fView)
-			.SetInsets(B_USE_WINDOW_SPACING)
-			.End();
+		.Add(fView);
 
 	fRevert->SetTarget(fView);
 	selectAllItem->SetTarget(fView);
