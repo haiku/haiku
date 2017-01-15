@@ -131,7 +131,6 @@ public:
 	virtual void			MouseDown(BPoint point);
 	virtual void			Draw(BRect updateRect);
 	virtual void			MessageReceived(BMessage* message);
-	virtual void			Pulse();
 
 private:
 			status_t		_LaunchByPath(const char* path);
@@ -142,6 +141,11 @@ private:
 			void			_LoadSettings();
 			void			_SaveSettings();
 			void			_Init();
+
+			void			_DisconnectMixer();
+			status_t		_ConnectMixer();
+
+			MixerControl*	fMixerControl;
 
 			BBitmap*		fIcon;
 			BBitmap*		fMutedIcon;
@@ -179,6 +183,7 @@ MediaReplicant::~MediaReplicant()
 {
 	delete fIcon;
 	_SaveSettings();
+	_DisconnectMixer();
 }
 
 
@@ -207,6 +212,8 @@ void
 MediaReplicant::AttachedToWindow()
 {
 	AdoptParentColors();
+
+	_ConnectMixer();
 
 	BView::AttachedToWindow();
 }
@@ -267,13 +274,13 @@ MediaReplicant::MouseDown(BPoint point)
 			where + BPoint(4, 4)));
 
 	} else if ((buttons & B_TERTIARY_MOUSE_BUTTON) != 0) {
-		MixerControl mixerControl;
-		if (mixerControl.Connect(fVolumeWhich)) {
-			mixerControl.SetMute(!fMuted);
-			fMuted = mixerControl.Mute();
+		if (fMixerControl != NULL) {
+			fMixerControl->SetMute(!fMuted);
+			fMuted = fMixerControl->Mute();
 			VolumeToolTip* tip = dynamic_cast<VolumeToolTip*>(ToolTip());
 			if (tip != NULL) {
 				tip->SetMuteMessage(fMuted ? B_TRANSLATE("Muted"): NULL);
+				tip->Update();
 				ShowToolTip(tip);
 			}
 			Invalidate();
@@ -284,28 +291,6 @@ MediaReplicant::MouseDown(BPoint point)
 		fVolumeSlider = new VolumeWindow(BRect(where.x, where.y,
 			where.x + 207, where.y + 19), fDontBeep, fVolumeWhich);
 		fVolumeSlider->Show();
-	}
-}
-
-
-void
-MediaReplicant::Pulse()
-{
-	bool setMuted = false;
-	MixerControl mixerControl;
-	const char* errorString = NULL;
-	if (!mixerControl.Connect(fVolumeWhich, NULL, &errorString)) {
-		fMuted = true;
-		errorString = NULL;
-	} else
-		setMuted = mixerControl.Mute();
-
-	if (setMuted != fMuted) {
-		fMuted = setMuted;
-		VolumeToolTip* tip = dynamic_cast<VolumeToolTip*>(ToolTip());
-		if (tip != NULL)
-			tip->SetMuteMessage(errorString);
-		Invalidate();
 	}
 }
 
@@ -350,8 +335,18 @@ MediaReplicant::MessageReceived(BMessage* message)
 			fVolumeWhich = item->IsMarked()
 				? VOLUME_USE_PHYS_OUTPUT : VOLUME_USE_MIXER;
 
-			if (VolumeToolTip* tip = dynamic_cast<VolumeToolTip*>(ToolTip()))
+			if (_ConnectMixer() != B_OK
+				&& fVolumeWhich == VOLUME_USE_PHYS_OUTPUT) {
+				// unable to switch to physical output
+				item->SetMarked(false);
+				fVolumeWhich = VOLUME_USE_MIXER;
+				_ConnectMixer();
+			}
+
+			if (VolumeToolTip* tip = dynamic_cast<VolumeToolTip*>(ToolTip())) {
 				tip->SetWhich(fVolumeWhich);
+				tip->Update();
+			}
 			break;
 		}
 
@@ -359,15 +354,53 @@ MediaReplicant::MessageReceived(BMessage* message)
 		{
 			float deltaY;
 			if (message->FindFloat("be:wheel_delta_y", &deltaY) == B_OK
-				&& deltaY != 0.0) {
-				MixerControl mixerControl;
-				mixerControl.Connect(fVolumeWhich);
-				mixerControl.ChangeVolumeBy(deltaY < 0 ? 6 : -6);
+				&& deltaY != 0.0 && fMixerControl != NULL) {
+				fMixerControl->ChangeVolumeBy(deltaY < 0 ? 6 : -6);
 
 				VolumeToolTip* tip = dynamic_cast<VolumeToolTip*>(ToolTip());
 				if (tip != NULL) {
 					tip->Update();
 					ShowToolTip(tip);
+				}
+			}
+			break;
+		}
+
+		case B_MEDIA_NEW_PARAMETER_VALUE:
+		{
+			if (fMixerControl != NULL && !fMixerControl->Connected())
+				return;
+
+			bool setMuted = fMixerControl->Mute();
+			if (setMuted != fMuted) {
+				fMuted = setMuted;
+				VolumeToolTip* tip = dynamic_cast<VolumeToolTip*>(ToolTip());
+				if (tip != NULL) {
+					tip->SetMuteMessage(fMuted ? B_TRANSLATE("Muted") : NULL);
+					tip->Update();
+				}
+				Invalidate();
+			}
+			break;
+		}
+
+		case B_MEDIA_SERVER_STARTED:
+			_ConnectMixer();
+			break;
+
+		case B_MEDIA_NODE_CREATED:
+		{
+			// It's not enough to wait for B_MEDIA_SERVER_STARTED message, as
+			// the mixer will still be getting loaded by the media server
+			media_node mixerNode;
+			media_node_id mixerNodeID;
+			BMediaRoster* roster = BMediaRoster::CurrentRoster();
+			if (roster != NULL
+				&& message->FindInt32("media_node_id",&mixerNodeID) == B_OK
+				&& roster->GetNodeFor(mixerNodeID, &mixerNode) == B_OK) {
+				if (mixerNode.kind == B_SYSTEM_MIXER) {
+					_ConnectMixer();
+					roster->ReleaseNode(mixerNode);
 				}
 			}
 			break;
@@ -506,6 +539,56 @@ MediaReplicant::_Init()
 	_LoadSettings();
 
 	SetToolTip(new VolumeToolTip(fVolumeWhich));
+}
+
+
+void
+MediaReplicant::_DisconnectMixer()
+{
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	if (roster == NULL)
+		return;
+
+	roster->StopWatching(this, B_MEDIA_SERVER_STARTED | B_MEDIA_NODE_CREATED);
+
+	if (fMixerControl->MuteNode() != media_node::null) {
+		roster->StopWatching(this, fMixerControl->MuteNode(),
+			B_MEDIA_NEW_PARAMETER_VALUE);
+	}
+
+	delete fMixerControl;
+	fMixerControl = NULL;
+}
+
+
+status_t
+MediaReplicant::_ConnectMixer()
+{
+	_DisconnectMixer();
+
+	BMediaRoster* roster = BMediaRoster::Roster();
+	if (roster == NULL)
+		return B_ERROR;
+
+	roster->StartWatching(this, B_MEDIA_SERVER_STARTED | B_MEDIA_NODE_CREATED);
+
+	fMixerControl = new MixerControl(fVolumeWhich);
+
+	const char* errorString = NULL;
+	float volume = 0.0;
+	fMixerControl->Connect(fVolumeWhich, &volume, &errorString);
+
+	if (errorString != NULL) {
+		SetToolTip(errorString);
+		return B_ERROR;
+	}
+
+	if (fMixerControl->MuteNode() != media_node::null) {
+		roster->StartWatching(this, fMixerControl->MuteNode(),
+			B_MEDIA_NEW_PARAMETER_VALUE);
+	}
+
+	return B_OK;
 }
 
 

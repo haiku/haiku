@@ -23,6 +23,7 @@ MixerControl::MixerControl(int32 volumeWhich)
 	:
 	fVolumeWhich(volumeWhich),
 	fGainMediaNode(media_node::null),
+	fMuteMediaNode(media_node::null),
 	fParameterWeb(NULL),
 	fMixerParameter(NULL),
 	fMuteParameter(NULL),
@@ -74,8 +75,10 @@ MixerControl::Connect(int32 volumeWhich, float* _value, const char** _error)
 					p = fParameterWeb->ParameterAt(i);
 
 					// assume the mute preceeding master gain control
-					if (!strcmp(p->Kind(), B_MUTE))
+					if (!strcmp(p->Kind(), B_MUTE)) {
 						fMuteParameter = p;
+						fMuteMediaNode = fMuteParameter->Web()->Node();
+					}
 
 					PRINT(("BParameter[%i]: %s\n", i, p->Name()));
 					if (volumeWhich == VOLUME_USE_MIXER) {
@@ -151,8 +154,10 @@ MixerControl::Connect(int32 volumeWhich, float* _value, const char** _error)
 	} else
 		errorString = "Media services not running";
 
-	if (status != B_OK)
+	if (status != B_OK) {
 		fGainMediaNode = media_node::null;
+		fMuteMediaNode = media_node::null;
+	}
 
 	if (errorString) {
 		fprintf(stderr, "MixerControl: %s.\n", errorString);

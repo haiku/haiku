@@ -44,12 +44,14 @@ public:
 			float			Maximum() const { return fMax; }
 
 			media_node		GainNode() { return fGainMediaNode; }
+			media_node		MuteNode() { return fMuteMediaNode; }
 
 private:
 			void			_Disconnect();
 
 			int32			fVolumeWhich;
 			media_node		fGainMediaNode;
+			media_node		fMuteMediaNode;
 			BParameterWeb*	fParameterWeb;
 			BContinuousParameter* fMixerParameter;
 			BParameter*		fMuteParameter;
