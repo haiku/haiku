@@ -188,7 +188,6 @@ void
 BMediaClientNode::DisposeInputCookie(int32 cookie)
 {
 	CALLED();
-
 }
 
 
@@ -250,7 +249,10 @@ BMediaClientNode::Disconnected(const media_source& source,
 	if (conn == NULL)
 		return;
 
-	conn->Disconnected();
+	if (conn->Source() == source) {
+		conn->Disconnect();
+		conn->Disconnected();
+	}
 }
 
 
@@ -467,8 +469,10 @@ BMediaClientNode::Disconnect(const media_source& source,
 	if (conn == NULL)
 		return;
 
-	if (conn->Destination() == dest)
+	if (conn->Destination() == dest) {
 		conn->Disconnect();
+		conn->Disconnected();
+	}
 }
 
 
