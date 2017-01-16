@@ -586,6 +586,7 @@ MediaReplicant::_ConnectMixer()
 	if (fMixerControl->MuteNode() != media_node::null) {
 		roster->StartWatching(this, fMixerControl->MuteNode(),
 			B_MEDIA_NEW_PARAMETER_VALUE);
+		fMuted = fMixerControl->Mute();
 	}
 
 	return B_OK;
