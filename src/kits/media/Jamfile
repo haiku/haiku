@@ -8,6 +8,7 @@ if $(TARGET_PLATFORM) != haiku {
 }
 
 UsePrivateHeaders app media shared ;
+UsePrivateHeaders [ FDirName media experimental ] ;
 
 if $(CHECK_MALLOC) {
 	SubDirC++Flags -D_NO_INLINE_ASM -fcheck-memory-usage ;
@@ -17,21 +18,10 @@ local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
 
+		SEARCH_SOURCE += [ FDirName $(SUBDIR) experimental ] ;
 		SEARCH_SOURCE += [ FDirName $(SUBDIR) legacy ] ;
 
 		SharedLibrary [ MultiArchDefaultGristFiles libmedia.so ] :
-			# Private Media Kit
-			!missing_symbols.cpp
-			Deprecated.cpp
-
-			AdapterIO.cpp
-			MediaIO.cpp
-			MediaClient.cpp
-			MediaClientDefs.cpp
-			MediaConnection.cpp
-			MediaRecorder.cpp
-			SimpleMediaClient.cpp
-
 			# Public Media Kit
 			Buffer.cpp
 			BufferConsumer.cpp
@@ -48,6 +38,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			MediaFiles.cpp
 			MediaFormats.cpp
 			MediaNode.cpp
+			MediaRecorder.cpp
 			MediaRoster.cpp
 			MediaTheme.cpp
 			MediaTrack.cpp
@@ -61,6 +52,15 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			TimedEventQueue.cpp
 			TimeSource.cpp
 
+			# Experimental Media Kit
+			AdapterIO.cpp
+			MediaClient.cpp
+			MediaClientDefs.cpp
+			MediaClientNode.cpp
+			MediaConnection.cpp
+			MediaIO.cpp
+			SimpleMediaClient.cpp
+
 			# Internal Functionality
 			AddOnManager.cpp
 			BufferCache.cpp
@@ -68,7 +68,6 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			DefaultMediaTheme.cpp
 			DormantNodeManager.cpp
 			FormatManager.cpp
-			MediaClientNode.cpp
 			MediaRecorderNode.cpp
 			Notifications.cpp
 			request_data.cpp
@@ -98,6 +97,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			ReaderPlugin.cpp
 			StreamerPlugin.cpp
 			WriterPlugin.cpp
+
+			# Compat Media Kit
+			!missing_symbols.cpp
+			Deprecated.cpp
 			:
 			be localestub shared
 			[ TargetLibsupc++ ] [ TargetLibstdc++ ]

@@ -10,6 +10,8 @@
 #include <MediaRoster.h>
 #include <TimeSource.h>
 
+#include "MediaClientNode.h"
+
 #include "debug.h"
 
 

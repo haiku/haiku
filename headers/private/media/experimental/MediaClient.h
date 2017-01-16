@@ -14,12 +14,11 @@
 #include <MediaDefs.h>
 #include <MediaNode.h>
 
-#include "MediaClientNode.h"
-
 
 namespace BPrivate { namespace media {
 
 
+class BMediaClientNode;
 class BMediaConnection;
 class BMediaInput;
 class BMediaOutput;

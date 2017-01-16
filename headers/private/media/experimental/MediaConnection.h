@@ -12,10 +12,10 @@
 #include <MediaClient.h>
 #include <MediaClientDefs.h>
 
-#include "MediaClientNode.h"
-
 
 namespace BPrivate { namespace media {
+
+class BMediaClientNode;
 
 
 // The BMediaConnection class is the swiss knife of BMediaClient.

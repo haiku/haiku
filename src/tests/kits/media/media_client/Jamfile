@@ -2,6 +2,8 @@ SubDir HAIKU_TOP src tests kits media media_client ;
 
 UsePrivateHeaders media ;
 
+UsePrivateHeaders [ FDirName media experimental ] ;
+
 SimpleTest media_client :
 	media_client.cpp
 	: libmedia.so be root [ TargetLibsupc++ ]
