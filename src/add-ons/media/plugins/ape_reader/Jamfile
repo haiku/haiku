@@ -1,6 +1,8 @@
 SubDir HAIKU_TOP src add-ons media plugins ape_reader ;
 
 UsePrivateHeaders media ;
+UsePrivateHeaders [ FDirName media experimental ] ;
+
 SubDirHdrs [ FDirName $(SUBDIR) ../LibMonkeysAudio ] ;
 
 SubDirHdrs [ FDirName $(SUBDIR) LibMonkeysAudio ] ;

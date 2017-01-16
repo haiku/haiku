@@ -1,6 +1,7 @@
 SubDir HAIKU_TOP src add-ons media plugins rtsp_streamer ;
 
 UsePrivateHeaders media shared ;
+UsePrivateHeaders [ FDirName media experimental ] ;
 
 # TODO: Investigate this
 SubDirC++Flags -w ;
