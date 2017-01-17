@@ -145,41 +145,6 @@ PasswordWindow::Update()
 }
 
 
-char*
-PasswordWindow::_SanitizeSalt(const char* password)
-{
-	char* salt;
-
-	uint8 length = strlen(password);
-
-	if (length < 2)
-		salt = new char[3];
-	else
-		salt = new char[length + 1];
-
-	uint8 i = 0;
-	uint8 j = 0;
-	for (; i < length; i++) {
-		if (isalnum(password[i]) || password[i] == '.' || password[i] == '/') {
-			salt[j] = password[i];
-			j++;
-		}
-	}
-
-	/*
-	 *	We need to pad the salt.
-	 */ 
-	while (j < 2) {
-		salt[j] = '.';
-		j++;
-	}
-
-	salt[j] = '\0';
-	
-	return salt;
-}
-
-
 void 
 PasswordWindow::MessageReceived(BMessage* message)
 {
@@ -196,9 +161,7 @@ PasswordWindow::MessageReceived(BMessage* message)
 					alert->Go();
 					break;
 				}
-				const char* salt = _SanitizeSalt(fPasswordControl->Text());
-				fSettings.SetPassword(crypt(fPasswordControl->Text(), salt));
-				delete[] salt;
+				fSettings.SetPassword(crypt(fPasswordControl->Text(), NULL));
 			} else
 				fSettings.SetPassword("");
 

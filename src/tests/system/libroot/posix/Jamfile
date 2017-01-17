@@ -73,6 +73,13 @@ SimpleTest test_wcfuncs : test_wcfuncs.c ;
 SimpleTest test_wctype : test_wctype.c ;
 SimpleTest wcs_test : wcs_test.cpp ;
 
+UnitTestLib librootposixtest.so :
+	LibRootPosix.cpp
+
+	CryptTest.cpp
+
+	: be [ TargetLibstdc++ ] [ TargetLibsupc++ ]
+;
 
 SubInclude HAIKU_TOP src tests system libroot posix math ;
 SubInclude HAIKU_TOP src tests system libroot posix string ;

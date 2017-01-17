@@ -1,5 +1,8 @@
 SubDir HAIKU_TOP src system libroot posix crypt ;
 
+UsePrivateHeaders shared ;
+UsePrivateSystemHeaders ;
+
 local architectureObject ;
 for architectureObject in [ MultiArchSubDirSetup ] {
 	on $(architectureObject) {
@@ -11,8 +14,12 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 				: -Wall -Wmissing-prototypes -Wsign-compare ] ;
 
 		MergeObject <$(architecture)>posix_crypt.o :
-			crypt.c
-			crypt_util.c
+			crypt_legacy.c
+			crypt_legacy_util.c
+			crypto_scrypt_smix.cpp
+			crypto_scrypt.cpp
+			crypt.cpp
+			pbkdf2.cpp
 			;
 	}
 }

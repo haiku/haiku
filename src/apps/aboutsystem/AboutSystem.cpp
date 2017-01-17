@@ -1420,6 +1420,15 @@ AboutView::_CreateCreditsView()
 	_AddCopyrightsFromAttribute();
 	_AddPackageCreditEntries();
 
+	// scrypt
+	_AddPackageCredit(PackageCredit("scrypt")
+		.SetCopyright(B_TRANSLATE(COPYRIGHT_STRING "2009 Colin Percival"))
+		.SetLicense(kBSDTwoClause)
+		.SetURL("https://tarsnap.com/scrypt.html"));
+
+	_AddCopyrightsFromAttribute();
+	_AddPackageCreditEntries();
+
 	return new CropView(creditsScroller, 0, 1, 1, 1);
 }
 

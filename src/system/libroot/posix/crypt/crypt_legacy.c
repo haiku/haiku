@@ -12,7 +12,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * Library General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU Library General Public
  * License along with this library; if not, write to the Free
  * Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
@@ -51,19 +51,19 @@ ufc_long *_ufc_doit(l1, l2, r1, r2, itr)
       k = &_ufc_keytab[0][0];
       for(i=8; i--; ) {
 	s = *k++ ^ r1;
-	l1 ^= SBA(sb1, s & 0xffff); l2 ^= SBA(sb1, (s & 0xffff)+4);  
-        l1 ^= SBA(sb0, s >>= 16);   l2 ^= SBA(sb0, (s)         +4); 
-        s = *k++ ^ r2; 
+	l1 ^= SBA(sb1, s & 0xffff); l2 ^= SBA(sb1, (s & 0xffff)+4);
+        l1 ^= SBA(sb0, s >>= 16);   l2 ^= SBA(sb0, (s)         +4);
+        s = *k++ ^ r2;
         l1 ^= SBA(sb3, s & 0xffff); l2 ^= SBA(sb3, (s & 0xffff)+4);
         l1 ^= SBA(sb2, s >>= 16);   l2 ^= SBA(sb2, (s)         +4);
 
-        s = *k++ ^ l1; 
-        r1 ^= SBA(sb1, s & 0xffff); r2 ^= SBA(sb1, (s & 0xffff)+4);  
-        r1 ^= SBA(sb0, s >>= 16);   r2 ^= SBA(sb0, (s)         +4); 
-        s = *k++ ^ l2; 
-        r1 ^= SBA(sb3, s & 0xffff); r2 ^= SBA(sb3, (s & 0xffff)+4);  
+        s = *k++ ^ l1;
+        r1 ^= SBA(sb1, s & 0xffff); r2 ^= SBA(sb1, (s & 0xffff)+4);
+        r1 ^= SBA(sb0, s >>= 16);   r2 ^= SBA(sb0, (s)         +4);
+        s = *k++ ^ l2;
+        r1 ^= SBA(sb3, s & 0xffff); r2 ^= SBA(sb3, (s & 0xffff)+4);
         r1 ^= SBA(sb2, s >>= 16);   r2 ^= SBA(sb2, (s)         +4);
-      } 
+      }
       s=l1; l1=r1; r1=s; s=l2; l2=r2; r2=s;
     }
     ary[0] = l1; ary[1] = l2; ary[2] = r1; ary[3] = r2;
@@ -111,7 +111,7 @@ ufc_long *_ufc_doit(l1, l2, r1, r2, itr)
         r ^= SBA(sb2, (s >> 16) & 0xffff);
         r ^= SBA(sb1, (s >> 32) & 0xffff);
         r ^= SBA(sb0, (s >> 48) & 0xffff);
-      } 
+      }
       s=l; l=r; r=s;
     }
 

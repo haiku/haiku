@@ -172,7 +172,7 @@ main(int argc, const char* const* argv)
 		memset(repeatedPassword, 0, sizeof(repeatedPassword));
 
 		// crypt it
-		encryptedPassword = crypt(password, user);
+		encryptedPassword = crypt(password, NULL);
 		memset(password, 0, sizeof(password));
 	}
 
@@ -182,7 +182,7 @@ main(int argc, const char* const* argv)
 		|| message.AddInt32("last changed", time(NULL)) != B_OK
 		|| message.AddString("password", "x") != B_OK
 		|| message.AddString("shadow password", encryptedPassword) != B_OK) {
-		fprintf(stderr, "Error: Out of memory!\n");
+		fprintf(stderr, "Error: Failed to construct message!\n");
 		exit(1);
 	}
 

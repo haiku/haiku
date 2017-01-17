@@ -85,6 +85,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			$(librootNoDebugObjects)
 			[ TargetStaticLibsupc++ ]
 			[ TargetLibgcc ]
+			shared
 			;
 
 		# Use the standard libroot.so soname, so when the debug version is
@@ -99,6 +100,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			$(librootDebugObjects)
 			[ TargetStaticLibsupc++ ]
 			[ TargetLibgcc ]
+			shared
 			;
 		
 		StaticLibrary [ MultiArchDefaultGristFiles libm.a ] : empty.c ;
