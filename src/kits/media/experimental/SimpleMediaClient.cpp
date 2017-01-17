@@ -90,17 +90,6 @@ BSimpleMediaClient::HandleSeek(bigtime_t mediaTime, bigtime_t performanceTime)
 }
 
 
-void
-BSimpleMediaClient::HandleTimeWarp(bigtime_t realTime, bigtime_t performanceTime)
-{
-	if (fNotifyHook != NULL) {
-		(*fNotifyHook)(BSimpleMediaClient::fNotifyCookie,
-			BSimpleMediaClient::B_WILL_TIMEWARP,
-			realTime, performanceTime);
-	}
-}
-
-
 status_t
 BSimpleMediaClient::HandleFormatSuggestion(media_type type, int32 quality,
 	media_format* format)

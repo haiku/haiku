@@ -93,7 +93,7 @@ BMediaConnection::Disconnect()
 	delete fBufferGroup;
 	fBufferGroup = NULL;
 
-	return fOwner->ConnectionDisconnected(this);
+	return B_OK;
 }
 
 
@@ -102,7 +102,7 @@ BMediaConnection::Release()
 {
 	CALLED();
 
-	return fOwner->ConnectionReleased(this);
+	return B_OK;
 }
 
 
@@ -161,7 +161,7 @@ BMediaConnection::SetLatencyRange(bigtime_t min, bigtime_t max)
 
 
 void
-BMediaConnection::ConnectionRegistered(BMediaClient* owner,
+BMediaConnection::_ConnectionRegistered(BMediaClient* owner,
 	media_connection_id id)
 {
 	fOwner = owner;
@@ -183,16 +183,16 @@ BMediaConnection::ConnectionRegistered(BMediaClient* owner,
 
 
 const media_source&
-BMediaConnection::Source() const
+BMediaConnection::_Source() const
 {
-	return fConnection.Source();
+	return fConnection._Source();
 }
 
 
 const media_destination&
-BMediaConnection::Destination() const
+BMediaConnection::_Destination() const
 {
-	return fConnection.Destination();
+	return fConnection._Destination();
 }
 
 
@@ -216,13 +216,6 @@ BMediaInput::BMediaInput()
 }
 
 
-media_input
-BMediaInput::MediaInput() const
-{
-	return Connection().MediaInput();
-}
-
-
 status_t
 BMediaInput::FormatChanged(const media_format& format)
 {
@@ -240,6 +233,13 @@ BMediaInput::BufferReceived(BBuffer* buffer)
 {
 	CALLED();
 
+}
+
+
+media_input
+BMediaInput::_MediaInput() const
+{
+	return Connection()._MediaInput();
 }
 
 
@@ -313,9 +313,9 @@ BMediaOutput::SendBuffer(BBuffer* buffer)
 
 
 media_output
-BMediaOutput::MediaOutput() const
+BMediaOutput::_MediaOutput() const
 {
-	return Connection().MediaOutput();
+	return Connection()._MediaOutput();
 }
 
 

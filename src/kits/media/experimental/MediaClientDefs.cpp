@@ -52,7 +52,7 @@ media_connection::IsOutput() const
 
 
 media_input
-media_connection::MediaInput() const
+media_connection::_MediaInput() const
 {
 	media_input input;
 	input.node = client.node;
@@ -64,7 +64,7 @@ media_connection::MediaInput() const
 
 
 media_output
-media_connection::MediaOutput() const
+media_connection::_MediaOutput() const
 {
 	media_output output;
 	output.node = client.node;
@@ -76,21 +76,21 @@ media_connection::MediaOutput() const
 
 
 const media_source&
-media_connection::Source() const
+media_connection::_Source() const
 {
 	return source;
 }
 
 
 const media_destination&
-media_connection::Destination() const
+media_connection::_Destination() const
 {
 	return destination;
 }
 
 
 media_node
-media_connection::RemoteNode() const
+media_connection::_RemoteNode() const
 {
 	return remote_client.node;
 }

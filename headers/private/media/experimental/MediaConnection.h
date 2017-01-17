@@ -84,11 +84,11 @@ protected:
 										bigtime_t* max) const;
 
 private:
-			void					ConnectionRegistered(BMediaClient* owner,
+			void					_ConnectionRegistered(BMediaClient* owner,
 										media_connection_id id);
 
-	const media_source&				Source() const;
-	const media_destination&		Destination() const;
+	const media_source&				_Source() const;
+	const media_destination&		_Destination() const;
 
 	media_connection				fConnection;
 
@@ -141,7 +141,7 @@ protected:
 	virtual void					BufferReceived(BBuffer* buffer);
 
 private:
-	media_input						MediaInput() const;
+	media_input						_MediaInput() const;
 
 	virtual	void					_ReservedMediaInput0();
 	virtual	void					_ReservedMediaInput1();
@@ -182,7 +182,7 @@ protected:
 	virtual	status_t				SendBuffer(BBuffer* buffer);
 
 private:
-	media_output					MediaOutput() const;
+	media_output					_MediaOutput() const;
 
 	bool							fEnabled;
 	size_t							fFramesSent;

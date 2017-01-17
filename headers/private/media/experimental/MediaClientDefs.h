@@ -66,15 +66,14 @@ typedef struct media_connection {
 	BMessage*					ToMessage() const;
 
 private:
-	media_input					MediaInput() const;
-	media_output				MediaOutput() const;
+	media_input					_MediaInput() const;
+	media_output				_MediaOutput() const;
 
-	const media_source&			Source() const;
-	const media_destination&	Destination() const;
+	const media_source&			_Source() const;
+	const media_destination&	_Destination() const;
 
-	media_node					RemoteNode() const;
+	media_node					_RemoteNode() const;
 
-private:
 	media_connection_id			id;
 
 	media_client				client;

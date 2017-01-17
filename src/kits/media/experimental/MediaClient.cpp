@@ -76,8 +76,8 @@ BMediaClient::MediaType() const
 status_t
 BMediaClient::RegisterInput(BMediaInput* input)
 {
-	input->ConnectionRegistered(this, ++fLastID);
-	AddInput(input);
+	input->_ConnectionRegistered(this, ++fLastID);
+	_AddInput(input);
 	return B_OK;
 }
 
@@ -85,8 +85,8 @@ BMediaClient::RegisterInput(BMediaInput* input)
 status_t
 BMediaClient::RegisterOutput(BMediaOutput* output)
 {
-	output->ConnectionRegistered(this, ++fLastID);
-	AddOutput(output);
+	output->_ConnectionRegistered(this, ++fLastID);
+	_AddOutput(output);
 	return B_OK;
 }
 
@@ -231,7 +231,7 @@ BMediaClient::FindInput(const media_connection& input) const
 	if (!input.IsInput())
 		return NULL;
 
-	return FindInput(input.Destination());
+	return _FindInput(input._Destination());
 }
 
 
@@ -243,33 +243,7 @@ BMediaClient::FindOutput(const media_connection& output) const
 	if (!output.IsOutput())
 		return NULL;
 
-	return FindOutput(output.Source());
-}
-
-
-BMediaInput*
-BMediaClient::FindInput(const media_destination& dest) const
-{
-	CALLED();
-
-	for (int32 i = 0; i < CountInputs(); i++) {
-		if (dest.id == InputAt(i)->Destination().id)
-			return InputAt(i);
-	}
-	return NULL;
-}
-
-
-BMediaOutput*
-BMediaClient::FindOutput(const media_source& source) const
-{
-	CALLED();
-
-	for (int32 i = 0; i < CountOutputs(); i++) {
-		if (source.id == OutputAt(i)->Source().id)
-			return OutputAt(i);
-	}
-	return NULL;
+	return _FindOutput(output._Source());
 }
 
 
@@ -289,7 +263,7 @@ BMediaClient::Start()
 
 	status_t err = B_OK;
 	for (int32 i = 0; i < CountOutputs(); i++) {
-		media_node remoteNode = OutputAt(i)->Connection().RemoteNode();
+		media_node remoteNode = OutputAt(i)->Connection()._RemoteNode();
 		if (remoteNode.kind & B_TIME_SOURCE)
 			err = BMediaRoster::CurrentRoster()->StartTimeSource(
 				remoteNode, BTimeSource::RealTime());
@@ -371,40 +345,12 @@ BMediaClient::SetRunMode(BMediaNode::run_mode mode)
 }
 
 
-status_t
-BMediaClient::SetTimeSource(const media_client& timesource)
-{
-	CALLED();
-
-	return BMediaRoster::CurrentRoster()->SetTimeSourceFor(fNode->Node().node,
-		timesource.node.node);
-}
-
-
 bigtime_t
 BMediaClient::CurrentTime() const
 {
 	CALLED();
 
 	return fCurrentTime;
-}
-
-
-void
-BMediaClient::AddInput(BMediaInput* input)
-{
-	CALLED();
-
-	fInputs.AddItem(input);
-}
-
-
-void
-BMediaClient::AddOutput(BMediaOutput* output)
-{
-	CALLED();
-
-	fOutputs.AddItem(output);
 }
 
 
@@ -437,31 +383,11 @@ BMediaClient::HandleSeek(bigtime_t mediaTime, bigtime_t performanceTime)
 }
 
 
-void
-BMediaClient::HandleTimeWarp(bigtime_t realTime, bigtime_t performanceTime)
-{
-}
-
-
 status_t
-BMediaClient::HandleFormatSuggestion(media_type type, int32 quality,
+BMediaClient::FormatSuggestion(media_type type, int32 quality,
 	media_format* format)
 {
 	return B_ERROR;
-}
-
-
-status_t
-BMediaClient::ConnectionReleased(BMediaConnection* connection)
-{
-	return B_OK;
-}
-
-
-status_t
-BMediaClient::ConnectionDisconnected(BMediaConnection* connection)
-{
-	return B_OK;
 }
 
 
@@ -490,17 +416,61 @@ BMediaClient::_Deinit()
 }
 
 
+void
+BMediaClient::_AddInput(BMediaInput* input)
+{
+	CALLED();
+
+	fInputs.AddItem(input);
+}
+
+
+void
+BMediaClient::_AddOutput(BMediaOutput* output)
+{
+	CALLED();
+
+	fOutputs.AddItem(output);
+}
+
+
+BMediaInput*
+BMediaClient::_FindInput(const media_destination& dest) const
+{
+	CALLED();
+
+	for (int32 i = 0; i < CountInputs(); i++) {
+		if (dest.id == InputAt(i)->_Destination().id)
+			return InputAt(i);
+	}
+	return NULL;
+}
+
+
+BMediaOutput*
+BMediaClient::_FindOutput(const media_source& source) const
+{
+	CALLED();
+
+	for (int32 i = 0; i < CountOutputs(); i++) {
+		if (source.id == OutputAt(i)->_Source().id)
+			return OutputAt(i);
+	}
+	return NULL;
+}
+
+
 status_t
 BMediaClient::_ConnectInput(BMediaOutput* output,
 	const media_connection& input)
 {
 	CALLED();
 
-	if (input.Destination() == media_destination::null)
+	if (input._Destination() == media_destination::null)
 		return B_MEDIA_BAD_DESTINATION;
 
-	media_output ourOutput = output->Connection().MediaOutput();
-	media_input theirInput = input.MediaInput();
+	media_output ourOutput = output->Connection()._MediaOutput();
+	media_input theirInput = input._MediaInput();
 	media_format format = output->AcceptedFormat();
 
 	return BMediaRoster::CurrentRoster()->Connect(ourOutput.source,
@@ -515,11 +485,11 @@ BMediaClient::_ConnectOutput(BMediaInput* input,
 {
 	CALLED();
 
-	if (output.Source() == media_source::null)
+	if (output._Source() == media_source::null)
 		return B_MEDIA_BAD_SOURCE;
 
-	media_input ourInput = input->Connection().MediaInput();
-	media_output theirOutput = output.MediaOutput();
+	media_input ourInput = input->Connection()._MediaInput();
+	media_output theirOutput = output._MediaOutput();
 	media_format format = input->AcceptedFormat();
 
 	// TODO manage the node problems

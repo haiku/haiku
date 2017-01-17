@@ -22,7 +22,6 @@ public:
 		B_WILL_START = 1,			// performance_time
 		B_WILL_STOP,				// performance_time immediate
 		B_WILL_SEEK,				// performance_time media_time
-		B_WILL_TIMEWARP,			// real_time performance_time
 
 		B_FORMAT_SUGGESTION,		// media_type type, int32 quality,
 									// media_format* format
@@ -57,9 +56,6 @@ protected:
 	virtual void					HandleStop(bigtime_t performanceTime);
 
 	virtual void					HandleSeek(bigtime_t mediaTime,
-										bigtime_t performanceTime);
-
-	virtual void					HandleTimeWarp(bigtime_t realTime,
 										bigtime_t performanceTime);
 
 	virtual status_t				HandleFormatSuggestion(media_type type,

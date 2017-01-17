@@ -142,32 +142,20 @@ protected:
 	virtual void					HandleSeek(bigtime_t mediaTime,
 										bigtime_t performanceTime);
 
-	virtual status_t				HandleFormatSuggestion(media_type type,
+	virtual status_t				FormatSuggestion(media_type type,
 										int32 quality, media_format* format);
-
-	// Called from BMediaConnection
-			status_t				ConnectionDisconnected(BMediaConnection* conn);
-			status_t				ConnectionReleased(BMediaConnection* conn);
-
-private:
-	virtual void					AddInput(BMediaInput* input);
-	virtual void					AddOutput(BMediaOutput* output);
-
-			BMediaInput*			FindInput(
-										const media_destination& dest) const;
-			BMediaOutput*			FindOutput(
-										const media_source& source) const;
-
-	// Possible canditates for removal
-			void					HandleTimeWarp(bigtime_t realTime,
-										bigtime_t performanceTime);
-
-			status_t				SetTimeSource(
-										const media_client& timesource);
 
 private:
 			void					_Init();
 			void					_Deinit();
+
+			void					_AddInput(BMediaInput* input);
+			void					_AddOutput(BMediaOutput* output);
+
+			BMediaInput*			_FindInput(
+										const media_destination& dest) const;
+			BMediaOutput*			_FindOutput(
+										const media_source& source) const;
 
 			status_t				_ConnectInput(BMediaOutput* output,
 										const media_connection& input);
