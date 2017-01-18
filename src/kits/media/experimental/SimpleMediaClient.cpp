@@ -123,6 +123,12 @@ BSimpleMediaConnection::BSimpleMediaConnection(media_connection_kinds kinds)
 }
 
 
+BSimpleMediaConnection::~BSimpleMediaConnection()
+{
+	CALLED();
+}
+
+
 void
 BSimpleMediaConnection::SetHooks(process_hook processHook,
 	notify_hook notifyHook, void* cookie)
@@ -150,6 +156,12 @@ BSimpleMediaInput::BSimpleMediaInput()
 	BSimpleMediaConnection(B_MEDIA_INPUT),
 	BMediaInput()
 {
+}
+
+
+BSimpleMediaInput::~BSimpleMediaInput()
+{
+	CALLED();
 }
 
 
@@ -189,6 +201,12 @@ BSimpleMediaOutput::BSimpleMediaOutput()
 	BSimpleMediaConnection(B_MEDIA_OUTPUT),
 	BMediaOutput()
 {
+}
+
+
+BSimpleMediaOutput::~BSimpleMediaOutput()
+{
+	CALLED();
 }
 
 

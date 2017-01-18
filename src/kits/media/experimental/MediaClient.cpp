@@ -15,6 +15,77 @@
 #include "debug.h"
 
 
+namespace BPrivate { namespace media {
+
+
+class ConnReleaser {
+public:
+	ConnReleaser(BMediaConnection* conn)
+		:
+		fConn(conn) {}
+
+	virtual ~ConnReleaser()
+	{
+		fConn->Release();
+	}
+
+	bool operator== (const ConnReleaser &c1)
+	{
+		return c1.fConn == this->fConn;
+	}
+
+protected:
+	BMediaConnection* Obj() const
+	{
+		return fConn;
+	}
+
+private:
+	BMediaConnection* fConn;
+};
+
+
+class InputReleaser : public ConnReleaser {
+public:
+	InputReleaser(BMediaInput* input)
+		:
+		ConnReleaser(input) {}
+
+	BMediaInput* Obj() const
+	{
+		return dynamic_cast<BMediaInput*>(ConnReleaser::Obj());
+	}
+
+	operator BMediaInput* () const
+	{
+		return Obj();
+	}
+
+};
+
+
+class OutputReleaser : public ConnReleaser {
+public:
+	OutputReleaser(BMediaOutput* output)
+		:
+		ConnReleaser(output) {}
+
+	BMediaOutput* Obj() const
+	{
+		return dynamic_cast<BMediaOutput*>(ConnReleaser::Obj());
+	}
+
+	operator BMediaOutput* () const
+	{
+		return Obj();
+	}
+};
+
+
+}
+}
+
+
 BMediaClient::BMediaClient(const char* name,
 	media_type type, media_client_kinds kinds)
 	:
@@ -210,7 +281,7 @@ BMediaClient::InputAt(int32 index) const
 {
 	CALLED();
 
-	return fInputs.ItemAt(index);
+	return fInputs.ItemAt(index)->Obj();
 }
 
 
@@ -219,7 +290,7 @@ BMediaClient::OutputAt(int32 index) const
 {
 	CALLED();
 
-	return fOutputs.ItemAt(index);
+	return fOutputs.ItemAt(index)->Obj();
 }
 
 
@@ -412,6 +483,10 @@ BMediaClient::_Deinit()
 
 	Disconnect();
 
+	// This will release the connections too.
+	fInputs.MakeEmpty(true);
+	fOutputs.MakeEmpty(true);
+
 	fNode->Release();
 }
 
@@ -421,7 +496,7 @@ BMediaClient::_AddInput(BMediaInput* input)
 {
 	CALLED();
 
-	fInputs.AddItem(input);
+	fInputs.AddItem(new InputReleaser(input));
 }
 
 
@@ -430,7 +505,7 @@ BMediaClient::_AddOutput(BMediaOutput* output)
 {
 	CALLED();
 
-	fOutputs.AddItem(output);
+	fOutputs.AddItem(new OutputReleaser(output));
 }
 
 

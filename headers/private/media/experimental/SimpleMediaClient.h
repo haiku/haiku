@@ -117,6 +117,7 @@ public:
 protected:
 									BSimpleMediaConnection(
 										media_connection_kinds kinds);
+	virtual							~BSimpleMediaConnection();
 
 			process_hook			fProcessHook;
 			notify_hook				fNotifyHook;
@@ -129,6 +130,8 @@ public:
 									BSimpleMediaInput();
 
 protected:
+	virtual							~BSimpleMediaInput();
+
 	virtual void					Connected(const media_format& format);
 	virtual void					Disconnected();
 
@@ -141,6 +144,8 @@ public:
 									BSimpleMediaOutput();
 
 protected:
+	virtual							~BSimpleMediaOutput();
+
 	virtual void					Connected(const media_format& format);
 	virtual void					Disconnected();
 

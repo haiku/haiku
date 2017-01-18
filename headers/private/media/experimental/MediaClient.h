@@ -23,6 +23,11 @@ class BMediaConnection;
 class BMediaInput;
 class BMediaOutput;
 
+// Private stuff
+class InputReleaser;
+class OutputReleaser;
+
+
 // BMediaClient is a general purpose class allowing to create any kind
 // of media_node. It automatically manage the expected behavior under
 // different run modes, and allow to specify the different capabilities needed.
@@ -171,8 +176,8 @@ private:
 
 			bigtime_t				fCurrentTime;
 
-			BObjectList<BMediaInput>	fInputs;
-			BObjectList<BMediaOutput>	fOutputs;
+			BObjectList<InputReleaser>	fInputs;
+			BObjectList<OutputReleaser>	fOutputs;
 
 			media_connection_id		fLastID;
 

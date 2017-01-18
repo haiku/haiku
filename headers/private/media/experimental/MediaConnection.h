@@ -27,8 +27,6 @@ class BMediaClientNode;
 // to the connection B SendBuffer method.
 class BMediaConnection {
 public:
-	virtual							~BMediaConnection();
-
 	const media_connection&			Connection() const;
 	BMediaClient*					Client() const;
 
@@ -67,6 +65,7 @@ public:
 protected:
 									BMediaConnection(
 										media_connection_kinds kinds);
+	virtual							~BMediaConnection();
 
 	// Those callbacks are shared between BMediaInput and BMediaOutput
 	virtual void					Connected(const media_format& format);
@@ -84,6 +83,7 @@ protected:
 										bigtime_t* max) const;
 
 private:
+
 			void					_ConnectionRegistered(BMediaClient* owner,
 										media_connection_id id);
 
@@ -135,6 +135,8 @@ public:
 									BMediaInput();
 
 protected:
+	virtual							~BMediaInput();
+
 	// Callbacks
 	virtual status_t				FormatChanged(const media_format& format);
 
@@ -168,6 +170,8 @@ public:
 	bool							IsEnabled() const;
 
 protected:
+	virtual							~BMediaOutput();
+
 	// Callbacks
 	virtual status_t				PrepareToConnect(media_format* format);
 

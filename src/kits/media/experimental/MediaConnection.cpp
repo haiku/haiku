@@ -216,6 +216,12 @@ BMediaInput::BMediaInput()
 }
 
 
+BMediaInput::~BMediaInput()
+{
+	CALLED();
+}
+
+
 status_t
 BMediaInput::FormatChanged(const media_format& format)
 {
@@ -260,6 +266,12 @@ BMediaOutput::BMediaOutput()
 	:
 	BMediaConnection(B_MEDIA_OUTPUT)
 {
+}
+
+
+BMediaOutput::~BMediaOutput()
+{
+	CALLED();
 }
 
 
