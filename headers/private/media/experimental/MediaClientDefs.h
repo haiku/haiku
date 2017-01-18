@@ -72,13 +72,14 @@ private:
 	const media_source&			_Source() const;
 	const media_destination&	_Destination() const;
 
+	media_node					_Node() const;
 	media_node					_RemoteNode() const;
 
 	media_connection_id			id;
 
 	media_client				client;
-	// TODO really needed?
-	media_client				remote_client;
+
+	media_node					remote_node;
 
     media_source				source;
     media_destination			destination;

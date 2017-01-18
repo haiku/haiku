@@ -23,6 +23,13 @@ media_client::Kinds() const
 }
 
 
+const media_client&
+media_connection::Client() const
+{
+	return client;
+}
+
+
 media_connection_id
 media_connection::Id() const
 {
@@ -92,5 +99,12 @@ media_connection::_Destination() const
 media_node
 media_connection::_RemoteNode() const
 {
-	return remote_client.node;
+	return remote_node;
+}
+
+
+media_node
+media_connection::_Node() const
+{
+	return client.node;
 }

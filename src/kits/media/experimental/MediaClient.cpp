@@ -576,6 +576,47 @@ BMediaClient::_ConnectOutput(BMediaInput* input,
 }
 
 
+status_t
+BMediaClient::_DisconnectConnection(BMediaConnection* conn)
+{
+	if (conn->Client() != this)
+		return B_ERROR;
+
+	const media_connection& handle = conn->Connection();
+	if (handle.IsInput()) {
+		return BMediaRoster::CurrentRoster()->Disconnect(
+			handle._RemoteNode().node, handle._Source(),
+			handle._Node().node, handle._Destination());
+	} else {
+		return BMediaRoster::CurrentRoster()->Disconnect(
+			handle._Node().node, handle._Source(),
+			handle._RemoteNode().node, handle._Destination());
+	}
+
+	return B_ERROR;
+}
+
+
+status_t
+BMediaClient::_ReleaseConnection(BMediaConnection* conn)
+{
+	if (conn->Client() != this)
+		return B_ERROR;
+
+	if (conn->Connection().IsInput()) {
+		InputReleaser obj = InputReleaser(dynamic_cast<BMediaInput*>(conn));
+		fInputs.RemoveItem(&obj);
+		return B_OK;
+	} else {
+		OutputReleaser obj = OutputReleaser(dynamic_cast<BMediaOutput*>(conn));
+		fOutputs.RemoveItem(&obj);
+		return B_OK;
+	}
+
+	return B_ERROR;
+}
+
+
 void BMediaClient::_ReservedMediaClient0() {}
 void BMediaClient::_ReservedMediaClient1() {}
 void BMediaClient::_ReservedMediaClient2() {}

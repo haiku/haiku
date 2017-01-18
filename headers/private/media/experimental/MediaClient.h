@@ -167,6 +167,9 @@ private:
 			status_t				_ConnectOutput(BMediaInput* input,
 										const media_connection& output);
 
+			status_t				_DisconnectConnection(BMediaConnection* conn);
+			status_t				_ReleaseConnection(BMediaConnection* conn);
+
 			status_t				fInitErr;
 
 			media_client			fClient;

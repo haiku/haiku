@@ -40,6 +40,13 @@ BMediaConnection::Connection() const
 }
 
 
+BMediaClient*
+BMediaConnection::Client() const
+{
+	return fOwner;
+}
+
+
 bool
 BMediaConnection::HasBinding() const
 {
@@ -90,10 +97,14 @@ BMediaConnection::Disconnect()
 {
 	CALLED();
 
+	status_t ret = fOwner->_DisconnectConnection(this);
+	if (ret != B_OK)
+		return ret;
+
 	delete fBufferGroup;
 	fBufferGroup = NULL;
 
-	return B_OK;
+	return ret;
 }
 
 
@@ -102,7 +113,12 @@ BMediaConnection::Release()
 {
 	CALLED();
 
-	return B_OK;
+	status_t ret = fOwner->_ReleaseConnection(this);
+	if (ret != B_OK)
+		return ret;
+
+	delete this;
+	return ret;
 }
 
 
