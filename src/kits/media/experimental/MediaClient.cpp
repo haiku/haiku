@@ -55,12 +55,6 @@ public:
 	{
 		return dynamic_cast<BMediaInput*>(ConnReleaser::Obj());
 	}
-
-	operator BMediaInput* () const
-	{
-		return Obj();
-	}
-
 };
 
 
@@ -73,11 +67,6 @@ public:
 	BMediaOutput* Obj() const
 	{
 		return dynamic_cast<BMediaOutput*>(ConnReleaser::Obj());
-	}
-
-	operator BMediaOutput* () const
-	{
-		return Obj();
 	}
 };
 
