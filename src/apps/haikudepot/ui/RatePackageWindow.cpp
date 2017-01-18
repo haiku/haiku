@@ -199,6 +199,7 @@ RatePackageWindow::RatePackageWindow(BWindow* parent, BRect frame,
 	fRatingText = parser.CreateDocumentFromMarkup("");
 
 	fTextView->SetInsets(10.0f);
+	fTextView->SetViewUIColor(B_DOCUMENT_BACKGROUND_COLOR);
 	fTextView->SetTextDocument(fRatingText);
 	fTextView->SetTextEditor(fTextEditor);
 
