@@ -145,6 +145,8 @@ uint64_t	ifmedia_baudrate(int);
 #define	IFM_10G_SR	19		/* 10GBase-SR 850nm Multi-mode */
 #define	IFM_10G_CX4	20		/* 10GBase CX4 copper */
 #define IFM_2500_SX	21		/* 2500BaseSX - multi-mode fiber */
+#define	IFM_UNKNOWN	25		/* media types not defined yet */
+
 
 /* note 31 is the max! */
 
@@ -352,6 +354,7 @@ struct ifmedia_description {
 	{ IFM_10G_LR,	"10Gbase-LR" },					\
 	{ IFM_10G_SR,	"10Gbase-SR" },					\
 	{ IFM_10G_CX4,	"10Gbase-CX4" },				\
+	{ IFM_UNKNOWN,	"Unknown" },					\
 	{ IFM_2500_SX,	"2500BaseSX" },					\
 	{ 0, NULL },							\
 }

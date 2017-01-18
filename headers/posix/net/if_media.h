@@ -32,6 +32,7 @@
 #define IFM_1000_T		16			/* 1000Base-T - RJ45 */
 #define IFM_1000_SX		18			/* 1000Base-SX - Fiber Optic */
 #define IFM_10G_T		22			/* 10GBase-T - RJ45 */
+#define IFM_UNKNOWN		25			/* media types not defined yet */
 
 /* General options */
 

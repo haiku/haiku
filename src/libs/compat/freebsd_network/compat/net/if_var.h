@@ -89,6 +89,22 @@ struct	route;
 
 #include <altq/if_altq.h>
 
+typedef enum {
+	IFCOUNTER_IPACKETS = 0,
+	IFCOUNTER_IERRORS,
+	IFCOUNTER_OPACKETS,
+	IFCOUNTER_OERRORS,
+	IFCOUNTER_COLLISIONS,
+	IFCOUNTER_IBYTES,
+	IFCOUNTER_OBYTES,
+	IFCOUNTER_IMCASTS,
+	IFCOUNTER_OMCASTS,
+	IFCOUNTER_IQDROPS,
+	IFCOUNTER_OQDROPS,
+	IFCOUNTER_NOPROTO,
+	IFCOUNTERS /* Array size. */
+} ift_counter;
+
 TAILQ_HEAD(ifnethead, ifnet);	/* we use TAILQs so that the order of */
 TAILQ_HEAD(ifaddrhead, ifaddr);	/* instantiation is preserved in the list */
 TAILQ_HEAD(ifprefixhead, ifprefix);
@@ -227,6 +243,7 @@ typedef void if_init_f_t(void *);
 #define	if_imcasts	if_data.ifi_imcasts
 #define	if_omcasts	if_data.ifi_omcasts
 #define	if_iqdrops	if_data.ifi_iqdrops
+#define	if_oqdrops	if_data.ifi_oqdrops
 #define	if_noproto	if_data.ifi_noproto
 #define	if_lastchange	if_data.ifi_lastchange
 #define if_recvquota	if_data.ifi_recvquota
@@ -662,6 +679,7 @@ typedef	void *if_com_alloc_t(u_char type, struct ifnet *ifp);
 typedef	void if_com_free_t(void *com, u_char type);
 void	if_register_com_alloc(u_char type, if_com_alloc_t *a, if_com_free_t *f);
 void	if_deregister_com_alloc(u_char type);
+void	if_inc_counter(struct ifnet *, ift_counter, int64_t);
 
 #define IF_LLADDR(ifp)		LLADDR(&ifp->if_lladdr)
 

@@ -715,3 +715,49 @@ ether_ioctl(struct ifnet *ifp, u_long command, caddr_t data)
 
 	return 0;
 }
+
+
+void
+if_inc_counter(struct ifnet *ifp, ift_counter cnt, int64_t inc)
+{
+	switch (cnt) {
+		case IFCOUNTER_IPACKETS:
+			atomic_add(&ifp->if_ipackets, inc);
+			break;
+		case IFCOUNTER_IERRORS:
+			atomic_add(&ifp->if_ierrors, inc);
+			break;
+		case IFCOUNTER_OPACKETS:
+			atomic_add(&ifp->if_opackets, inc);
+			break;
+		case IFCOUNTER_OERRORS:
+			atomic_add(&ifp->if_oerrors, inc);
+			break;
+		case IFCOUNTER_COLLISIONS:
+			atomic_add(&ifp->if_collisions, inc);
+			break;
+		case IFCOUNTER_IBYTES:
+			atomic_add(&ifp->if_ibytes, inc);
+			break;
+		case IFCOUNTER_OBYTES:
+			atomic_add(&ifp->if_obytes, inc);
+			break;
+		case IFCOUNTER_IMCASTS:
+			atomic_add(&ifp->if_imcasts, inc);
+			break;
+		case IFCOUNTER_OMCASTS:
+			atomic_add(&ifp->if_omcasts, inc);
+			break;
+		case IFCOUNTER_IQDROPS:
+			atomic_add(&ifp->if_iqdrops, inc);
+			break;
+		case IFCOUNTER_OQDROPS:
+			atomic_add(&ifp->if_oqdrops, inc);
+			break;
+		case IFCOUNTER_NOPROTO:
+			atomic_add(&ifp->if_noproto, inc);
+			break;
+		case IFCOUNTERS:
+			KASSERT(cnt < IFCOUNTERS, ("%s: invalid cnt %d", __func__, cnt));
+	}
+}

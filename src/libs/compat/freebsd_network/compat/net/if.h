@@ -84,6 +84,7 @@ struct if_data {
 	u_long	ifi_imcasts;		/* packets received via multicast */
 	u_long	ifi_omcasts;		/* packets sent via multicast */
 	u_long	ifi_iqdrops;		/* dropped on input, this interface */
+	u_long	ifi_oqdrops;		/* dropped on output, this interface */
 	u_long	ifi_noproto;		/* destined for unsupported protocol */
 	u_long	ifi_hwassist;		/* HW offload capabilities */
 	time_t	ifi_epoch;			/* uptime at attach or stat reset */
