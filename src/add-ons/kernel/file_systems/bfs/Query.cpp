@@ -757,7 +757,16 @@ Equation::_CopyString(char* start, char* end)
 	if (copy == NULL)
 		return NULL;
 
-	memcpy(copy, start, length - 1);
+	// Filter out remaining escaping slashes
+	for (int32 i = 0; i < length; i++) {
+		char c = start++[0];
+		if (c == '\\' && i < length) {
+			length--;
+			i--;
+			continue;
+		}
+		copy[i] = c;
+	}
 	copy[length - 1] = '\0';
 
 	return copy;
