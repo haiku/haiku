@@ -1,5 +1,5 @@
 /*
- * Copyright 2008-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2008-2017, Axel Dörfler, axeld@pinc-software.de.
  * Distributed under the terms of the MIT License.
  */
 
@@ -54,12 +54,15 @@ command_checkfs(int argc, const char* const* argv)
 	// check all files and report errors
 	while (_kern_ioctl(rootDir, BFS_IOCTL_CHECK_NEXT_NODE, &result,
 			sizeof(result)) == B_OK) {
-		if (++counter % 50 == 0)
-			fssh_dprintf("%9Ld nodes processed\x1b[1A\n", counter);
+		if (++counter % 50 == 0) {
+			fssh_dprintf("%9" FSSH_B_PRIu64 " nodes processed\x1b[1A\n",
+				counter);
+		}
 
 		if (result.pass == BFS_CHECK_PASS_BITMAP) {
 			if (result.errors) {
-				fssh_dprintf("%s (inode = %lld)", result.name, result.inode);
+				fssh_dprintf("%s (inode = %" FSSH_B_PRIdINO ")", result.name,
+					result.inode);
 				if ((result.errors & BFS_MISSING_BLOCKS) != 0)
 					fssh_dprintf(", some blocks weren't allocated");
 				if ((result.errors & BFS_BLOCKS_ALREADY_SET) != 0)
@@ -105,24 +108,26 @@ command_checkfs(int argc, const char* const* argv)
 
 	_kern_close(rootDir);
 
-	fssh_dprintf("        %" B_PRIu64 " nodes checked,\n\t%" B_PRIu64 " blocks "
-		"not allocated,\n\t%" B_PRIu64 " blocks already set,\n\t%" B_PRIu64
-		" blocks could be freed\n\n", counter, result.stats.missing,
+	fssh_dprintf("        %" FSSH_B_PRIu64 " nodes checked,\n\t%" FSSH_B_PRIu64
+		" blocks not allocated,\n\t%" FSSH_B_PRIu64 " blocks already set,\n\t%"
+		B_PRIu64 " blocks could be freed\n\n", counter, result.stats.missing,
 		result.stats.already_set, result.stats.freed);
-	fssh_dprintf("\tfiles\t\t%" B_PRIu64 "\n\tdirectories\t%" B_PRIu64 "\n"
-		"\tattributes\t%" B_PRIu64 "\n\tattr. dirs\t%" B_PRIu64 "\n"
-		"\tindices\t\t%" B_PRIu64 "\n", files, directories, attributes,
+	fssh_dprintf("\tfiles\t\t%" FSSH_B_PRIu64 "\n\tdirectories\t%"
+		FSSH_B_PRIu64 "\n"
+		"\tattributes\t%" FSSH_B_PRIu64 "\n\tattr. dirs\t%" FSSH_B_PRIu64 "\n"
+		"\tindices\t\t%" FSSH_B_PRIu64 "\n", files, directories, attributes,
 		attributeDirectories, indices);
 
-	fssh_dprintf("\n\tdirect block runs\t\t%" B_PRIu64 " (%lld)\n",
-		result.stats.direct_block_runs,
+	fssh_dprintf("\n\tdirect block runs\t\t%" FSSH_B_PRIu64 " (%" FSSH_B_PRIu64
+		")\n", result.stats.direct_block_runs,
 		result.stats.blocks_in_direct * result.stats.block_size);
-	fssh_dprintf("\tindirect block runs\t\t%" B_PRIu64 " (in %" B_PRIu64
-		" array blocks, %lld)\n", result.stats.indirect_block_runs,
-		result.stats.indirect_array_blocks,
+	fssh_dprintf("\tindirect block runs\t\t%" FSSH_B_PRIu64 " (in %"
+		FSSH_B_PRIu64 " array blocks, %" FSSH_B_PRIu64 ")\n",
+		result.stats.indirect_block_runs, result.stats.indirect_array_blocks,
 		result.stats.blocks_in_indirect * result.stats.block_size);
-	fssh_dprintf("\tdouble indirect block runs\t%" B_PRIu64 " (in %" B_PRIu64
-		" array blocks, %lld)\n", result.stats.double_indirect_block_runs,
+	fssh_dprintf("\tdouble indirect block runs\t%" FSSH_B_PRIu64 " (in %"
+		FSSH_B_PRIu64 " array blocks, %" FSSH_B_PRIu64 ")\n",
+		result.stats.double_indirect_block_runs,
 		result.stats.double_indirect_array_blocks,
 		result.stats.blocks_in_double_indirect * result.stats.block_size);
 
