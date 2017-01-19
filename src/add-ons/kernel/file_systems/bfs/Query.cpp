@@ -74,31 +74,32 @@ union value {
 */
 class Term {
 public:
-						Term(int8 op) : fOp(op), fParent(NULL) {}
-	virtual				~Term() {}
+								Term(int8 op) : fOp(op), fParent(NULL) {}
+	virtual						~Term() {}
 
-			int8		Op() const { return fOp; }
+			int8				Op() const { return fOp; }
 
-			void		SetParent(Term* parent) { fParent = parent; }
-			Term*		Parent() const { return fParent; }
+			void				SetParent(Term* parent) { fParent = parent; }
+			Term*				Parent() const { return fParent; }
 
-	virtual	status_t	Match(Inode* inode, const char* attribute = NULL,
-							int32 type = 0, const uint8* key = NULL,
-							size_t size = 0) = 0;
-	virtual	void		Complement() = 0;
+	virtual	status_t			Match(Inode* inode,
+									const char* attribute = NULL,
+									int32 type = 0, const uint8* key = NULL,
+									size_t size = 0) = 0;
+	virtual	void				Complement() = 0;
 
-	virtual	void		CalculateScore(Index& index) = 0;
-	virtual	int32		Score() const = 0;
+	virtual	void				CalculateScore(Index& index) = 0;
+	virtual	int32				Score() const = 0;
 
-	virtual	status_t	InitCheck() = 0;
+	virtual	status_t			InitCheck() = 0;
 
 #ifdef DEBUG
-	virtual	void		PrintToStream() = 0;
+	virtual	void				PrintToStream() = 0;
 #endif
 
 protected:
-			int8		fOp;
-			Term*		fParent;
+			int8				fOp;
+			Term*				fParent;
 };
 
 
@@ -115,51 +116,54 @@ protected:
 */
 class Equation : public Term {
 public:
-						Equation(char** expression);
-	virtual				~Equation();
+								Equation(char** _expression);
+	virtual						~Equation();
 
-	virtual	status_t	InitCheck();
+	virtual	status_t			InitCheck();
 
-			status_t	ParseQuotedString(char** _start, char** _end);
-			char*		CopyString(char* start, char* end);
+	virtual	status_t			Match(Inode* inode,
+									const char* attribute = NULL,
+									int32 type = 0, const uint8* key = NULL,
+									size_t size = 0);
+	virtual void				Complement();
 
-	virtual	status_t	Match(Inode* inode, const char* attribute = NULL,
-							int32 type = 0, const uint8* key = NULL,
-							size_t size = 0);
-	virtual void		Complement();
+			status_t			PrepareQuery(Volume* volume, Index& index,
+									TreeIterator** iterator,
+									bool queryNonIndexed);
+			status_t			GetNextMatching(Volume* volume,
+									TreeIterator* iterator,
+									struct dirent* dirent, size_t bufferSize);
 
-			status_t	PrepareQuery(Volume* volume, Index& index,
-							TreeIterator** iterator, bool queryNonIndexed);
-			status_t	GetNextMatching(Volume* volume, TreeIterator* iterator,
-							struct dirent* dirent, size_t bufferSize);
-
-	virtual	void		CalculateScore(Index &index);
-	virtual	int32		Score() const { return fScore; }
+	virtual	void				CalculateScore(Index &index);
+	virtual	int32				Score() const { return fScore; }
 
 #ifdef DEBUG
-	virtual	void		PrintToStream();
+	virtual	void				PrintToStream();
 #endif
 
 private:
-						Equation(const Equation& other);
-						Equation& operator=(const Equation& other);
-							// no implementation
+								Equation(const Equation& other);
+								Equation& operator=(const Equation& other);
+									// no implementation
 
-			status_t	ConvertValue(type_code type);
-			bool		CompareTo(const uint8* value, uint16 size);
-			uint8*		Value() const { return (uint8*)&fValue; }
-			status_t	MatchEmptyString();
+			status_t			_ParseQuotedString(char** _start, char** _end);
+			char*				_CopyString(char* start, char* end);
+			status_t			_ConvertValue(type_code type);
+			bool				_CompareTo(const uint8* value, uint16 size);
+			uint8*				_Value() const { return (uint8*)&fValue; }
+			status_t			_MatchEmptyString();
 
-			char*		fAttribute;
-			char*		fString;
-			union value fValue;
-			type_code	fType;
-			size_t		fSize;
-			bool		fIsPattern;
-			bool		fIsSpecialTime;
+private:
+			char*				fAttribute;
+			char*				fString;
+			union value			fValue;
+			type_code			fType;
+			size_t				fSize;
+			bool				fIsPattern;
+			bool				fIsSpecialTime;
 
-			int32		fScore;
-			bool		fHasIndex;
+			int32				fScore;
+			bool				fHasIndex;
 };
 
 
@@ -168,40 +172,42 @@ private:
 */
 class Operator : public Term {
 public:
-						Operator(Term* left, int8 op, Term* right);
-	virtual				~Operator();
+								Operator(Term* left, int8 op, Term* right);
+	virtual						~Operator();
 
-			Term*		Left() const { return fLeft; }
-			Term*		Right() const { return fRight; }
+			Term*				Left() const { return fLeft; }
+			Term*				Right() const { return fRight; }
 
-	virtual	status_t	Match(Inode* inode, const char* attribute = NULL,
-							int32 type = 0, const uint8* key = NULL,
-							size_t size = 0);
-	virtual	void		Complement();
+	virtual	status_t			Match(Inode* inode,
+									const char* attribute = NULL,
+									int32 type = 0, const uint8* key = NULL,
+									size_t size = 0);
+	virtual	void				Complement();
 
-	virtual	void		CalculateScore(Index& index);
-	virtual	int32		Score() const;
+	virtual	void				CalculateScore(Index& index);
+	virtual	int32				Score() const;
 
-	virtual	status_t	InitCheck();
+	virtual	status_t			InitCheck();
 
 #ifdef DEBUG
-	virtual	void		PrintToStream();
+	virtual	void				PrintToStream();
 #endif
 
 private:
-						Operator(const Operator& other);
-						Operator& operator=(const Operator& other);
-							// no implementation
+								Operator(const Operator& other);
+								Operator& operator=(const Operator& other);
+									// no implementation
 
-			Term*		fLeft;
-			Term*		fRight;
+private:
+			Term*				fLeft;
+			Term*				fRight;
 };
 
 
 //	#pragma mark -
 
 
-Equation::Equation(char** expr)
+Equation::Equation(char** _expression)
 	:
 	Term(OP_EQUATION),
 	fAttribute(NULL),
@@ -209,7 +215,7 @@ Equation::Equation(char** expr)
 	fType(0),
 	fIsPattern(false)
 {
-	char* string = *expr;
+	char* string = *_expression;
 	char* start = string;
 	char* end = NULL;
 
@@ -220,7 +226,7 @@ Equation::Equation(char** expr)
 
 	if (*start == '"' || *start == '\'') {
 		// string is quoted (start has to be on the beginning of a string)
-		if (ParseQuotedString(&start, &end) < B_OK)
+		if (_ParseQuotedString(&start, &end) < B_OK)
 			return;
 
 		// set string to a valid start of the equation symbol
@@ -228,7 +234,7 @@ Equation::Equation(char** expr)
 		skipWhitespace(&string);
 		if (*string != '=' && *string != '<' && *string != '>'
 			&& *string != '!') {
-			*expr = string;
+			*_expression = string;
 			return;
 		}
 	} else {
@@ -274,7 +280,7 @@ Equation::Equation(char** expr)
 
 		// any invalid characters will be rejected
 		default:
-			*expr = string;
+			*_expression = string;
 			return;
 	}
 
@@ -286,14 +292,14 @@ Equation::Equation(char** expr)
 
 	// allocate & copy the attribute string
 
-	fAttribute = CopyString(start, end);
+	fAttribute = _CopyString(start, end);
 	if (fAttribute == NULL)
 		return;
 
 	start = string;
 	if (*start == '"' || *start == '\'') {
 		// string is quoted (start has to be on the beginning of a string)
-		if (ParseQuotedString(&start, &end) < B_OK)
+		if (_ParseQuotedString(&start, &end) < B_OK)
 			return;
 
 		string = end + 2;
@@ -306,19 +312,19 @@ Equation::Equation(char** expr)
 		skipWhitespaceReverse(&end, start);
 	}
 
-	// at this point, "start" will point to the first character of the value,
+	// At this point, "start" will point to the first character of the value,
 	// "end" will point to its last character, and "start" to the first non-
-	// whitespace character after the value string
+	// whitespace character after the value string.
 
-	fString = CopyString(start, end);
+	fString = _CopyString(start, end);
 	if (fString == NULL)
 		return;
 
-	// patterns are only allowed for these operations (and strings)
+	// Patterns are only allowed for these operations (and strings)
 	if (fOp == OP_EQUAL || fOp == OP_UNEQUAL) {
 		fIsPattern = isPattern(fString);
 		if (fIsPattern && isValidPattern(fString) < B_OK) {
-			// we only want to have valid patterns; setting fString
+			// Only valid patterns are allowed; setting fString
 			// to NULL will cause InitCheck() to fail
 			free(fString);
 			fString = NULL;
@@ -333,7 +339,7 @@ Equation::Equation(char** expr)
 	// too one day.
 	fIsSpecialTime = !strcmp(fAttribute, "last_modified");
 
-	*expr = string;
+	*_expression = string;
 }
 
 
@@ -351,184 +357,6 @@ Equation::InitCheck()
 		return B_BAD_VALUE;
 
 	return B_OK;
-}
-
-
-status_t
-Equation::ParseQuotedString(char** _start, char** _end)
-{
-	char* start = *_start;
-	char quote = *start++;
-	char* end = start;
-
-	for (; *end && *end != quote; end++) {
-		if (*end == '\\')
-			end++;
-	}
-	if (*end == '\0')
-		return B_BAD_VALUE;
-
-	*_start = start;
-	*_end = end - 1;
-
-	return B_OK;
-}
-
-
-char*
-Equation::CopyString(char* start, char* end)
-{
-	// end points to the last character of the string - and the length
-	// also has to include the null-termination
-	int32 length = end + 2 - start;
-	// just to make sure; since that's the max. attribute name length and
-	// the max. string in an index, it make sense to have it that way
-	if (length > INODE_FILE_NAME_LENGTH || length <= 0)
-		return NULL;
-
-	char* copy = (char*)malloc(length);
-	if (copy == NULL)
-		return NULL;
-
-	memcpy(copy, start, length - 1);
-	copy[length - 1] = '\0';
-
-	return copy;
-}
-
-
-status_t
-Equation::ConvertValue(type_code type)
-{
-	// Has the type already been converted?
-	if (type == fType)
-		return B_OK;
-
-	char* string = fString;
-
-	switch (type) {
-		case B_MIME_STRING_TYPE:
-			type = B_STRING_TYPE;
-			// supposed to fall through
-		case B_STRING_TYPE:
-			strncpy(fValue.String, string, INODE_FILE_NAME_LENGTH);
-			fValue.String[INODE_FILE_NAME_LENGTH - 1] = '\0';
-			fSize = strlen(fValue.String);
-			break;
-		case B_INT32_TYPE:
-			fValue.Int32 = strtol(string, &string, 0);
-			fSize = sizeof(int32);
-			break;
-		case B_UINT32_TYPE:
-			fValue.Int32 = strtoul(string, &string, 0);
-			fSize = sizeof(uint32);
-			break;
-		case B_INT64_TYPE:
-			fValue.Int64 = strtoll(string, &string, 0);
-			fSize = sizeof(int64);
-			break;
-		case B_UINT64_TYPE:
-			fValue.Uint64 = strtoull(string, &string, 0);
-			fSize = sizeof(uint64);
-			break;
-		case B_FLOAT_TYPE:
-			fValue.Float = strtod(string, &string);
-			fSize = sizeof(float);
-			break;
-		case B_DOUBLE_TYPE:
-			fValue.Double = strtod(string, &string);
-			fSize = sizeof(double);
-			break;
-		default:
-			FATAL(("query value conversion to 0x%x requested!\n", (int)type));
-			// should we fail here or just do a safety int32 conversion?
-			return B_ERROR;
-	}
-
-	fType = type;
-
-	// patterns are only allowed for string types
-	if (fType != B_STRING_TYPE && fIsPattern)
-		fIsPattern = false;
-
-	return B_OK;
-}
-
-
-/*!	Returns true when the key matches the equation. You have to
-	call ConvertValue() before this one.
-*/
-bool
-Equation::CompareTo(const uint8* value, uint16 size)
-{
-	int32 compare;
-
-	// fIsPattern is only true if it's a string type, and fOp OP_EQUAL, or
-	// OP_UNEQUAL
-	if (fIsPattern) {
-		// we have already validated the pattern, so we don't check for failing
-		// here - if something is broken, and matchString() returns an error,
-		// we just don't match
-		compare = matchString(fValue.String, (char*)value) == MATCH_OK ? 0 : 1;
-	} else if (fIsSpecialTime) {
-		// the index is a shifted int64 index, but we have to match
-		// against an unshifted value (i.e. the last_modified index)
-		int64 timeValue = *(int64*)value >> INODE_TIME_SHIFT;
-		compare = compareKeys(fType, &timeValue, sizeof(int64), &fValue.Int64,
-			sizeof(int64));
-	} else
-		compare = compareKeys(fType, value, size, Value(), fSize);
-
-	switch (fOp) {
-		case OP_EQUAL:
-			return compare == 0;
-		case OP_UNEQUAL:
-			return compare != 0;
-		case OP_LESS_THAN:
-			return compare < 0;
-		case OP_LESS_THAN_OR_EQUAL:
-			return compare <= 0;
-		case OP_GREATER_THAN:
-			return compare > 0;
-		case OP_GREATER_THAN_OR_EQUAL:
-			return compare >= 0;
-	}
-	FATAL(("Unknown/Unsupported operation: %d\n", fOp));
-	return false;
-}
-
-
-void
-Equation::Complement()
-{
-	D(if (fOp <= OP_EQUATION || fOp > OP_LESS_THAN_OR_EQUAL) {
-		FATAL(("op out of range!"));
-		return;
-	});
-
-	int8 complementOp[] = {OP_UNEQUAL, OP_EQUAL, OP_LESS_THAN_OR_EQUAL,
-			OP_GREATER_THAN_OR_EQUAL, OP_LESS_THAN, OP_GREATER_THAN};
-	fOp = complementOp[fOp - OP_EQUAL];
-}
-
-
-status_t
-Equation::MatchEmptyString()
-{
-	// There is no matching attribute, we will just bail out if we
-	// already know that our value is not of a string type.
-	// If not, it will be converted to a string - and then be compared with "".
-	// That's why we have to call ConvertValue() here - but it will be
-	// a cheap call for the next time
-	// TODO: Should we do this only for OP_UNEQUAL?
-	if (fType != 0 && fType != B_STRING_TYPE)
-		return NO_MATCH;
-
-	status_t status = ConvertValue(B_STRING_TYPE);
-	if (status == B_OK)
-		status = CompareTo((const uint8*)"", fSize) ? MATCH_OK : NO_MATCH;
-
-	return status;
 }
 
 
@@ -550,7 +378,7 @@ Equation::Match(Inode* inode, const char* attributeName, int32 type,
 	if (attributeName != NULL && !strcmp(fAttribute, attributeName)) {
 		if (key == NULL) {
 			if (type == B_STRING_TYPE)
-				return MatchEmptyString();
+				return _MatchEmptyString();
 
 			return NO_MATCH;
 		}
@@ -623,13 +451,13 @@ Equation::Match(Inode* inode, const char* attributeName, int32 type,
 				}
 				inode->ReleaseAttribute(attribute);
 			} else
-				return MatchEmptyString();
+				return _MatchEmptyString();
 		}
 	}
 	// prepare own value for use, if it is possible to convert it
-	status_t status = ConvertValue(type);
+	status_t status = _ConvertValue(type);
 	if (status == B_OK)
-		status = CompareTo(buffer, size) ? MATCH_OK : NO_MATCH;
+		status = _CompareTo(buffer, size) ? MATCH_OK : NO_MATCH;
 
 	if (locked)
 		recursive_lock_unlock(&inode->SmallDataLock());
@@ -639,36 +467,16 @@ Equation::Match(Inode* inode, const char* attributeName, int32 type,
 
 
 void
-Equation::CalculateScore(Index &index)
+Equation::Complement()
 {
-	// As always, these values could be tuned and refined.
-	// And the code could also need some real world testing :-)
-
-	// do we have to operate on a "foreign" index?
-	if (fOp == OP_UNEQUAL || index.SetTo(fAttribute) < B_OK) {
-		fScore = 0;
+	D(if (fOp <= OP_EQUATION || fOp > OP_LESS_THAN_OR_EQUAL) {
+		FATAL(("op out of range!"));
 		return;
-	}
+	});
 
-	// if we have a pattern, how much does it help our search?
-	if (fIsPattern)
-		fScore = getFirstPatternSymbol(fString) << 3;
-	else {
-		// Score by operator
-		if (fOp == OP_EQUAL)
-			// higher than pattern="255 chars+*"
-			fScore = 2048;
-		else
-			// the pattern search is regarded cheaper when you have at
-			// least one character to set your index to
-			fScore = 5;
-	}
-
-	// take index size into account (1024 is the current node size
-	// in our B+trees)
-	// 2048 * 2048 == 4194304 is the maximum score (for an empty
-	// tree, since the header + 1 node are already 2048 bytes)
-	fScore = fScore * ((2048 * 1024LL) / index.Node()->Size());
+	int8 complementOp[] = {OP_UNEQUAL, OP_EQUAL, OP_LESS_THAN_OR_EQUAL,
+			OP_GREATER_THAN_OR_EQUAL, OP_LESS_THAN, OP_GREATER_THAN};
+	fOp = complementOp[fOp - OP_EQUAL];
 }
 
 
@@ -701,7 +509,7 @@ Equation::PrepareQuery(Volume* /*volume*/, Index& index,
 		type = index.Type();
 	}
 
-	if (ConvertValue(type) < B_OK)
+	if (_ConvertValue(type) < B_OK)
 		return B_BAD_VALUE;
 
 	BPlusTree* tree = index.Node()->Tree();
@@ -753,7 +561,7 @@ Equation::PrepareQuery(Volume* /*volume*/, Index& index,
 			if (status == B_ENTRY_NOT_FOUND)
 				return B_OK;
 		} else {
-			status = (*iterator)->Find(Value(), keySize);
+			status = (*iterator)->Find(_Value(), keySize);
 			if (fOp == OP_EQUAL && !fIsPattern)
 				return status;
 			else if (status == B_ENTRY_NOT_FOUND
@@ -787,7 +595,7 @@ Equation::GetNextMatching(Volume* volume, TreeIterator* iterator,
 		// only compare against the index entry when this is the correct
 		// index for the equation
 		if (fHasIndex && duplicate < 2
-			&& !CompareTo((uint8*)&indexValue, keyLength)) {
+			&& !_CompareTo((uint8*)&indexValue, keyLength)) {
 			// They aren't equal? Let the operation decide what to do. Since
 			// we always start at the beginning of the index (or the correct
 			// position), only some needs to be stopped if the entry doesn't
@@ -873,6 +681,204 @@ Equation::GetNextMatching(Volume* volume, TreeIterator* iterator,
 			return B_OK;
 	}
 	RETURN_ERROR(B_ERROR);
+}
+
+
+void
+Equation::CalculateScore(Index &index)
+{
+	// As always, these values could be tuned and refined.
+	// And the code could also need some real world testing :-)
+
+	// do we have to operate on a "foreign" index?
+	if (fOp == OP_UNEQUAL || index.SetTo(fAttribute) < B_OK) {
+		fScore = 0;
+		return;
+	}
+
+	// if we have a pattern, how much does it help our search?
+	if (fIsPattern)
+		fScore = getFirstPatternSymbol(fString) << 3;
+	else {
+		// Score by operator
+		if (fOp == OP_EQUAL)
+			// higher than pattern="255 chars+*"
+			fScore = 2048;
+		else
+			// the pattern search is regarded cheaper when you have at
+			// least one character to set your index to
+			fScore = 5;
+	}
+
+	// take index size into account (1024 is the current node size
+	// in our B+trees)
+	// 2048 * 2048 == 4194304 is the maximum score (for an empty
+	// tree, since the header + 1 node are already 2048 bytes)
+	fScore = fScore * ((2048 * 1024LL) / index.Node()->Size());
+}
+
+
+status_t
+Equation::_ParseQuotedString(char** _start, char** _end)
+{
+	char* start = *_start;
+	char quote = *start++;
+	char* end = start;
+
+	for (; *end && *end != quote; end++) {
+		if (*end == '\\')
+			end++;
+	}
+	if (*end == '\0')
+		return B_BAD_VALUE;
+
+	*_start = start;
+	*_end = end - 1;
+
+	return B_OK;
+}
+
+
+char*
+Equation::_CopyString(char* start, char* end)
+{
+	// end points to the last character of the string - and the length
+	// also has to include the null-termination
+	int32 length = end + 2 - start;
+	// just to make sure; since that's the max. attribute name length and
+	// the max. string in an index, it make sense to have it that way
+	if (length > INODE_FILE_NAME_LENGTH || length <= 0)
+		return NULL;
+
+	char* copy = (char*)malloc(length);
+	if (copy == NULL)
+		return NULL;
+
+	memcpy(copy, start, length - 1);
+	copy[length - 1] = '\0';
+
+	return copy;
+}
+
+
+status_t
+Equation::_ConvertValue(type_code type)
+{
+	// Has the type already been converted?
+	if (type == fType)
+		return B_OK;
+
+	char* string = fString;
+
+	switch (type) {
+		case B_MIME_STRING_TYPE:
+			type = B_STRING_TYPE;
+			// supposed to fall through
+		case B_STRING_TYPE:
+			strncpy(fValue.String, string, INODE_FILE_NAME_LENGTH);
+			fValue.String[INODE_FILE_NAME_LENGTH - 1] = '\0';
+			fSize = strlen(fValue.String);
+			break;
+		case B_INT32_TYPE:
+			fValue.Int32 = strtol(string, &string, 0);
+			fSize = sizeof(int32);
+			break;
+		case B_UINT32_TYPE:
+			fValue.Int32 = strtoul(string, &string, 0);
+			fSize = sizeof(uint32);
+			break;
+		case B_INT64_TYPE:
+			fValue.Int64 = strtoll(string, &string, 0);
+			fSize = sizeof(int64);
+			break;
+		case B_UINT64_TYPE:
+			fValue.Uint64 = strtoull(string, &string, 0);
+			fSize = sizeof(uint64);
+			break;
+		case B_FLOAT_TYPE:
+			fValue.Float = strtod(string, &string);
+			fSize = sizeof(float);
+			break;
+		case B_DOUBLE_TYPE:
+			fValue.Double = strtod(string, &string);
+			fSize = sizeof(double);
+			break;
+		default:
+			FATAL(("query value conversion to 0x%x requested!\n", (int)type));
+			// should we fail here or just do a safety int32 conversion?
+			return B_ERROR;
+	}
+
+	fType = type;
+
+	// patterns are only allowed for string types
+	if (fType != B_STRING_TYPE && fIsPattern)
+		fIsPattern = false;
+
+	return B_OK;
+}
+
+
+/*!	Returns true when the key matches the equation. You have to
+	call ConvertValue() before this one.
+*/
+bool
+Equation::_CompareTo(const uint8* value, uint16 size)
+{
+	int32 compare;
+
+	// fIsPattern is only true if it's a string type, and fOp OP_EQUAL, or
+	// OP_UNEQUAL
+	if (fIsPattern) {
+		// we have already validated the pattern, so we don't check for failing
+		// here - if something is broken, and matchString() returns an error,
+		// we just don't match
+		compare = matchString(fValue.String, (char*)value) == MATCH_OK ? 0 : 1;
+	} else if (fIsSpecialTime) {
+		// the index is a shifted int64 index, but we have to match
+		// against an unshifted value (i.e. the last_modified index)
+		int64 timeValue = *(int64*)value >> INODE_TIME_SHIFT;
+		compare = compareKeys(fType, &timeValue, sizeof(int64), &fValue.Int64,
+			sizeof(int64));
+	} else
+		compare = compareKeys(fType, value, size, _Value(), fSize);
+
+	switch (fOp) {
+		case OP_EQUAL:
+			return compare == 0;
+		case OP_UNEQUAL:
+			return compare != 0;
+		case OP_LESS_THAN:
+			return compare < 0;
+		case OP_LESS_THAN_OR_EQUAL:
+			return compare <= 0;
+		case OP_GREATER_THAN:
+			return compare > 0;
+		case OP_GREATER_THAN_OR_EQUAL:
+			return compare >= 0;
+	}
+	FATAL(("Unknown/Unsupported operation: %d\n", fOp));
+	return false;
+}
+
+
+status_t
+Equation::_MatchEmptyString()
+{
+	// There is no matching attribute, we will just bail out if we
+	// already know that our value is not of a string type.
+	// If not, it will be converted to a string - and then be compared with "".
+	// That's why we have to call ConvertValue() here - but it will be
+	// a cheap call for the next time
+	// TODO: Should we do this only for OP_UNEQUAL?
+	if (fType != 0 && fType != B_STRING_TYPE)
+		return NO_MATCH;
+
+	status_t status = _ConvertValue(B_STRING_TYPE);
+	if (status == B_OK)
+		status = _CompareTo((const uint8*)"", fSize) ? MATCH_OK : NO_MATCH;
+
+	return status;
 }
 
 
