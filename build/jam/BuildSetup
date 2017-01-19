@@ -599,6 +599,11 @@ if $(HOST_PLATFORM) = darwin {
 	# and the libs are located in /opt/local/.
 	HOST_HDRS += /opt/local/include ;
 	HOST_LINKFLAGS += -L/opt/local/lib ;
+
+	# Mac OS X users may be using homebrew libraries, in which case the headers
+	# and the libs are locted in the /usr/local/.
+	HOST_HDRS += /usr/local/include ;
+	HOST_LINKFLAGS += -L/usr/local/lib ;
 }
 
 HOST_BE_API_HEADERS =
