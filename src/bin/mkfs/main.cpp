@@ -1,5 +1,5 @@
 /*
- * Copyright 2008 Haiku Inc. All rights reserved.
+ * Copyright 2008-2017 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -33,7 +33,12 @@ print_help(bool out)
 		"  -h, --help              - print this help text\n"
 		"  -o, --options    <opt>  - set fs specific options\n"
 		"  -q, --dont-ask          - do not ask before initializing\n"
-		"  -v, --verbose           - set verbose output\n",
+		"  -v, --verbose           - set verbose output\n"
+		"\n"
+		"Example:\n"
+		"  mkfs -t bfs -o 'block_size 4096; noindex' ./test.image Data\n"
+		"\tThis will initialize \"test.image\" with BFS with a block\n"
+		"\tsize of 4096 bytes, without index, and named \"Data\".\n",
 		kProgramName);
 }
 
