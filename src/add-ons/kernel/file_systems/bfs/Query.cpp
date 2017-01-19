@@ -148,6 +148,8 @@ private:
 
 			status_t			_ParseQuotedString(char** _start, char** _end);
 			char*				_CopyString(char* start, char* end);
+	inline	bool				_IsEquationChar(char c) const;
+	inline	bool				_IsOperatorChar(char c) const;
 			status_t			_ConvertValue(type_code type);
 			bool				_CompareTo(const uint8* value, uint16 size);
 			uint8*				_Value() const { return (uint8*)&fValue; }
@@ -232,16 +234,17 @@ Equation::Equation(char** _expression)
 		// set string to a valid start of the equation symbol
 		string = end + 2;
 		skipWhitespace(&string);
-		if (*string != '=' && *string != '<' && *string != '>'
-			&& *string != '!') {
+		if (!_IsEquationChar(string[0])) {
 			*_expression = string;
 			return;
 		}
 	} else {
 		// search the (in)equation for the actual equation symbol (and for other operators
 		// in case the equation is malformed)
-		while (*string && *string != '=' && *string != '<' && *string != '>'
-			&& *string != '!' && *string != '&' && *string != '|') {
+		while (string[0] != 0 && !_IsOperatorChar(string[0])
+			&& !_IsEquationChar(string[0])) {
+			if (string[0] == '\\' && string[1] != 0)
+				string++;
 			string++;
 		}
 
@@ -305,7 +308,7 @@ Equation::Equation(char** _expression)
 		string = end + 2;
 		skipWhitespace(&string);
 	} else {
-		while (*string && *string != '&' && *string != '|' && *string != ')')
+		while (string[0] && !_IsOperatorChar(string[0]) && string[0] != ')')
 			string++;
 
 		end = string - 1;
@@ -758,6 +761,20 @@ Equation::_CopyString(char* start, char* end)
 	copy[length - 1] = '\0';
 
 	return copy;
+}
+
+
+bool
+Equation::_IsEquationChar(char c) const
+{
+	return c == '=' || c == '<' || c == '>' || c == '!';
+}
+
+
+bool
+Equation::_IsOperatorChar(char c) const
+{
+	return c == '&' || c == '|';
 }
 
 
