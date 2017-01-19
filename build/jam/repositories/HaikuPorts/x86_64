@@ -150,7 +150,7 @@ RemotePackageRepository HaikuPorts
 	bafx-0.2.3-3
 	bash-4.4.005-2
 	bchunk-1.2.0-2
-#	bepdf-1.1.1~beta5_2013_04_28-1
+	bepdf-2.0.1~beta1-2
 	bescreencapture-2.2.1-1
 	bescreencapture_inputfilter-2.2.1-1
 	bin86-0.16.21-1
@@ -192,8 +192,8 @@ RemotePackageRepository HaikuPorts
 	bzip2-1.0.6-5
 	bzip2_devel-1.0.6-5
 	cabextract-1.6-1
-	cairo-1.12.18-2
-	cairo_devel-1.12.18-2
+	cairo-1.12.18-3
+	cairo_devel-1.12.18-3
 	cal-1.0.0-2
 	calc-2.12.5.3-1
 	calc_devel-2.12.5.3-1
@@ -282,8 +282,8 @@ RemotePackageRepository HaikuPorts
 	file-5.29-1
 	file_devel-5.29-1
 	findutils-4.4.2-4
-	flac-1.3.1-2
-	flac_devel-1.3.1-2
+	flac-1.3.2-1
+	flac_devel-1.3.2-1
 	flare-0.19-3
 	flex-2.6.1-2
 	flickcurl-1.26-3
@@ -294,15 +294,15 @@ RemotePackageRepository HaikuPorts
 	fluidlite_devel-1.0.0-2
 	fluidsynth-1.1.6-4
 	fluidsynth_devel-1.1.6-4
-	fontconfig-2.12.1-1
-	fontconfig_devel-2.12.1-1
+	fontconfig-2.12.1-2
+	fontconfig_devel-2.12.1-2
 	fontutil-1.3.1-1
 	fossil-1.36-3
 	freealut-1.1.0-3
 	freealut_devel-1.1.0-3
 	freeciv-2.5.5-2
-	freetype-2.7-1
-	freetype_devel-2.7-1
+	freetype-2.7.1-1
+	freetype_devel-2.7.1-1
 	fribidi-0.19.7-3
 	fribidi_devel-0.19.7-3
 	ftgl-2.1.3~rc5-2
@@ -362,12 +362,13 @@ RemotePackageRepository HaikuPorts
 	gmp_devel-6.1.2-1
 	gnuchess-6.2.4-1
 	gnupg-1.4.21-1
+	gnuplot-5.0.5-1
 	gnutls34-3.4.17-1
 	gnutls34_bin-3.4.17-1
 	gnutls34_devel-3.4.17-1
-	gnutls35-3.5.7-1
-	gnutls35_bin-3.5.7-1
-	gnutls35_devel-3.5.7-1
+	gnutls35-3.5.8-1
+	gnutls35_bin-3.5.8-1
+	gnutls35_devel-3.5.8-1
 	gperf-3.0.4-1
 	gpgme-1.6.0-1
 	gpgme_devel-1.6.0-1
@@ -392,12 +393,14 @@ RemotePackageRepository HaikuPorts
 	hamlib_devel-3.0.1-2
 	handbrake-0.10.5-1
 	haproxy-1.6.7-1
-	harfbuzz-1.3.4-1
-	harfbuzz_devel-1.3.4-1
+	harfbuzz-1.4.1-1
+	harfbuzz_devel-1.4.1-1
 	hdialog-0.2-2
 	help2man-1.47.4-1
 	hexcompare-1.0.4-1
 	hexedit-1.2.13-1
+	hidapi-20160919-1
+	hidapi_devel-20160919-1
 	htmldoc-1.8.29-1
 	html_parser-3.71-2
 	hubbub-0.3.3-2
@@ -472,8 +475,8 @@ RemotePackageRepository HaikuPorts
 	libart_lgpl_devel-2.3.21-1
 	libasr-1.0.2-3
 	libasr_devel-1.0.2-3
-	libass-0.13.2-2
-	libass_devel-0.13.2-2
+	libass-0.13.2-3
+	libass_devel-0.13.2-3
 	libassuan-2.4.3-1
 	libassuan_devel-2.4.3-1
 	libaubio-0.4.2-1
@@ -490,6 +493,8 @@ RemotePackageRepository HaikuPorts
 	libcddb_devel-1.3.2-2
 	libcdio-0.93-3
 	libcdio_devel-0.93-3
+	libcdr-0.1.3-1
+	libcdr_devel-0.1.3-1
 	libconfig-1.5-1
 	libconfig_devel-1.5-1
 	libcroco-0.6.11-3
@@ -518,6 +523,8 @@ RemotePackageRepository HaikuPorts
 	libebml_devel-1.3.4-1
 	libedit-2015_03_21_3.1-5
 	libedit_devel-2015_03_21_3.1-5
+	libetonyek-0.1.2-1
+	libetonyek_devel-0.1.2-1
 	libevent-2.0.21-11
 	libevent_devel-2.0.21-11
 	libexecinfo-1.1-1
@@ -572,8 +579,12 @@ RemotePackageRepository HaikuPorts
 	libmp4v2_devel-2.0.0-4
 	libmpeg2-0.5.1-5
 	libmpeg2_devel-0.5.1-5
+	libmspub-0.1.2-1
+	libmspub_devel-0.1.2-1
 	libmtp-1.1.12-1
 	libmtp_devel-1.1.12-1
+	libmwaw-0.3.5-1
+	libmwaw_devel-0.3.5-1
 	libnatpmp-20140401-1
 	libnatpmp_devel-20140401-1
 	libnsbmp-0.1.4-1
@@ -590,6 +601,8 @@ RemotePackageRepository HaikuPorts
 	libopenshot_audio-0.1.1-2
 	libopenshot_audio_devel-0.1.1-2
 	libopenshot_devel-0.1.1-5
+	libpagemaker-0.0.3-1
+	libpagemaker_devel-0.0.3-1
 	libpaper-1.1.24-1
 	libpaper_devel-1.1.24-1
 	libparserutils-0.2.3-1
@@ -603,10 +616,10 @@ RemotePackageRepository HaikuPorts
 	libpcre2_devel-10.22-1
 	libplist-1.12-1
 	libplist_devel-1.12-1
-	libpng-1.5.27-2
-	libpng16-1.6.26-1
-	libpng16_devel-1.6.26-1
-	libpng_devel-1.5.27-2
+	libpng-1.5.28-1
+	libpng16-1.6.28-1
+	libpng16_devel-1.6.28-1
+	libpng_devel-1.5.28-1
 	libpthread_stubs-0.3-2
 	libqt4-4.8.7-5
 	libqt4_devel-4.8.7-5
@@ -617,8 +630,8 @@ RemotePackageRepository HaikuPorts
 	libraw_tools-0.17.2-3
 	libreplaygain-475-1
 	libreplaygain_devel-475-1
-	librevenge-0.0.1-1
-	librevenge_devel-0.0.1-1
+	librevenge-0.0.4-1
+	librevenge_devel-0.0.4-1
 	librsync-2.0.0-2
 	librsync_devel-2.0.0-2
 	libsamplerate-0.1.9-1
@@ -653,6 +666,8 @@ RemotePackageRepository HaikuPorts
 	libtimidity_devel-0.1.0-2
 	libtool-2.4.2-2
 	libtool_libltdl-2.4.2-2
+	libtorrent_rasterbar-1.0.9-2
+	libtorrent_rasterbar_devel-1.0.9-2
 	libunistring-0.9.7-1
 	libunistring_devel-0.9.7-1
 	libupnp-1.6.19-1
@@ -667,18 +682,22 @@ RemotePackageRepository HaikuPorts
 	libuuid_devel-1.0.3-3
 	libuv-1.10.1-1
 	libuv_devel-1.10.1-1
+	libvisio-0.1.5-1
+	libvisio_devel-0.1.5-1
 	libvorbis-1.3.5-3
 	libvorbis_devel-1.3.5-3
 	libvpx-1.0.0-2
 	libvpx_devel-1.0.0-2
 	libvpx3-1.5.0-1
 	libvpx3_devel-1.5.0-1
-	libwapcaplet-0.4.0-1
-	libwapcaplet_devel-0.4.0-1
-	libwebp-0.5.1-2
+	libwapcaplet-0.4.0-2
+	libwapcaplet_devel-0.4.0-2
+	libwebp-0.5.2-1
 	libwebp5-0.4.4-1
 	libwebp5_devel-0.4.4-1
-	libwebp_devel-0.5.1-2
+	libwebp_devel-0.5.2-1
+	libwps-0.3.1-1
+	libwps_devel-0.3.1-1
 	libx11-1.6.3-2
 	libx11_devel-1.6.3-2
 	libxau-1.0.8-3
@@ -724,7 +743,7 @@ RemotePackageRepository HaikuPorts
 	m4-1.4.17-3
 	make-4.1-1
 	man-1.6g-4
-	mawk-1.3.4_20150503-1
+	mawk-1.3.4_20161120-1
 	mc-4.8.18-1
 	mercurial-3.2.1-2
 	mesa-13.0.2-1
@@ -780,8 +799,8 @@ RemotePackageRepository HaikuPorts
 	odt2txt-0.5-1
 	openal-1.13.0-2
 	openal_devel-1.13.0-2
-	openblas-0.2.19-2
-	openblas_devel-0.2.19-2
+	openblas-0.2.19-3
+	openblas_devel-0.2.19-3
 	openexr-2.2.0-2
 	openexr_devel-2.2.0-2
 	openjpeg-2.1.2-1
@@ -815,7 +834,7 @@ RemotePackageRepository HaikuPorts
 	perl-5.18.2-2
 	physfs-2.0.3-3
 	physfs_devel-2.0.3-3
-	pipepanic-0.1.3-4
+	pipepanic-0.1.3-5
 	pixman-0.32.6-2
 	pixman_devel-0.32.6-2
 	pkgconfig-0.29.1-1
@@ -1035,8 +1054,8 @@ RemotePackageRepository HaikuPorts
 	yaml_cpp-0.5.1-2
 	yasm-1.3.0-3
 	zip-3.0-3
-	zlib-1.2.8-4
-	zlib_devel-1.2.8-4
+	zlib-1.2.11-1
+	zlib_devel-1.2.11-1
 	zsh-5.2-2
 
 	:
@@ -1095,7 +1114,7 @@ RemotePackageRepository HaikuPorts
 	bash_completion
 	bash
 	bchunk
-#	bepdf
+	bepdf
 	bescreencapture
 	bin86
 	binutils
@@ -1222,6 +1241,7 @@ RemotePackageRepository HaikuPorts
 	gmp
 	gnuchess
 	gnupg
+	gnuplot
 	gnutls34
 	gnutls35
 	gperf
@@ -1248,6 +1268,7 @@ RemotePackageRepository HaikuPorts
 	help2man
 	hexcompare
 	hexedit
+	hidapi
 	htmldoc
 	html_parser
 	hubbub
@@ -1301,6 +1322,7 @@ RemotePackageRepository HaikuPorts
 	libcaca
 	libcddb
 	libcdio
+	libcdr
 	libconfig
 	libcroco
 	libcss
@@ -1317,6 +1339,7 @@ RemotePackageRepository HaikuPorts
 	libedit
 	liberation_fonts
 	libertine
+	libetonyek
 	libevent
 	libexecinfo
 	libffi
@@ -1344,7 +1367,9 @@ RemotePackageRepository HaikuPorts
 	libmodplug
 	libmp4v2
 	libmpeg2
+	libmspub
 	libmtp
+	libmwaw
 	libnatpmp
 	libnsbmp
 	libnsgif
@@ -1353,6 +1378,7 @@ RemotePackageRepository HaikuPorts
 	libogg
 	libopenshot
 	libopenshot_audio
+	libpagemaker
 	libpaper
 	libparserutils
 	libpcap
@@ -1385,6 +1411,7 @@ RemotePackageRepository HaikuPorts
 	libtheora
 	libtimidity
 	libtool
+	libtorrent_rasterbar
 	libunistring
 	libupnp
 	libusb_compat
@@ -1392,12 +1419,14 @@ RemotePackageRepository HaikuPorts
 	libutf8proc
 	libuuid
 	libuv
+	libvisio
 	libvorbis
 	libvpx
 	libvpx3
 	libwapcaplet
 	libwebp5
 	libwebp
+	libwps
 	libx11
 	libxau
 	libxcb
