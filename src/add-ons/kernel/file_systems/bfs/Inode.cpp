@@ -143,7 +143,7 @@ public:
 							InodeAllocator(Transaction& transaction);
 							~InodeAllocator();
 
-			status_t		New(block_run* parentRun, mode_t mode,
+			status_t		New(block_run* parentRun, mode_t mode, uint32 flags,
 								block_run& run, fs_vnode_ops* vnodeOps,
 								Inode** _inode);
 			status_t		CreateTree();
@@ -191,8 +191,8 @@ InodeAllocator::~InodeAllocator()
 
 
 status_t
-InodeAllocator::New(block_run* parentRun, mode_t mode, block_run& run,
-	fs_vnode_ops* vnodeOps, Inode** _inode)
+InodeAllocator::New(block_run* parentRun, mode_t mode, uint32 publishFlags,
+	block_run& run, fs_vnode_ops* vnodeOps, Inode** _inode)
 {
 	Volume* volume = fTransaction->GetVolume();
 
@@ -211,7 +211,8 @@ InodeAllocator::New(block_run* parentRun, mode_t mode, block_run& run,
 	if (fInode == NULL)
 		RETURN_ERROR(B_NO_MEMORY);
 
-	if (!volume->IsInitializing()) {
+	if (!volume->IsInitializing()
+		&& (publishFlags & BFS_DO_NOT_PUBLISH_VNODE) == 0) {
 		status = new_vnode(volume->FSVolume(), fInode->ID(), fInode,
 			vnodeOps != NULL ? vnodeOps : &gBFSVnodeOps);
 		if (status < B_OK) {
@@ -272,7 +273,8 @@ InodeAllocator::Keep(fs_vnode_ops* vnodeOps, uint32 publishFlags)
 
 	// Symbolic links are not published -- the caller needs to do this once
 	// the contents have been written.
-	if (!fInode->IsSymLink() && volume->ID() >= 0) {
+	if (!fInode->IsSymLink() && !volume->IsInitializing()
+		&& (publishFlags & BFS_DO_NOT_PUBLISH_VNODE) == 0) {
 		status = publish_vnode(volume->FSVolume(), fInode->ID(), fInode,
 			vnodeOps != NULL ? vnodeOps : &gBFSVnodeOps, fInode->Mode(),
 			publishFlags);
@@ -2688,7 +2690,8 @@ Inode::Create(Transaction& transaction, Inode* parent, const char* name,
 	InodeAllocator allocator(transaction);
 	block_run run;
 	Inode* inode;
-	status = allocator.New(&parentRun, mode, run, vnodeOps, &inode);
+	status = allocator.New(&parentRun, mode, publishFlags, run, vnodeOps,
+		&inode);
 	if (status < B_OK)
 		return status;
 

@@ -23,6 +23,10 @@ class NodeGetter;
 class Transaction;
 
 
+// To be used in Inode::Create() as publishFlags
+#define BFS_DO_NOT_PUBLISH_VNODE	0x80000000
+
+
 class Inode : public TransactionListener {
 	typedef DoublyLinkedListLink<Inode> Link;
 

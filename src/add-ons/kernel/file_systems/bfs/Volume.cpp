@@ -1,5 +1,5 @@
 /*
- * Copyright 2001-2012, Axel Dörfler, axeld@pinc-software.de.
+ * Copyright 2001-2017, Axel Dörfler, axeld@pinc-software.de.
  * This file may be used under the terms of the MIT License.
  */
 
@@ -503,7 +503,7 @@ Volume::CreateIndicesRoot(Transaction& transaction)
 	off_t id;
 	status_t status = Inode::Create(transaction, NULL, NULL,
 		S_INDEX_DIR | S_STR_INDEX | S_DIRECTORY | 0700, 0, 0, NULL, &id,
-		&fIndicesNode);
+		&fIndicesNode, NULL, BFS_DO_NOT_PUBLISH_VNODE);
 	if (status < B_OK)
 		RETURN_ERROR(status);
 
@@ -770,15 +770,15 @@ Volume::Initialize(int fd, const char* name, uint32 blockSize,
 	status = CreateVolumeID(transaction);
 	if (status < B_OK)
 		return status;
-	
+
 	status = _EraseUnusedBootBlock();
 	if (status < B_OK)
 		return status;
-	
+
 	status = WriteSuperBlock();
 	if (status < B_OK)
 		return status;
-		
+
 	status = transaction.Done();
 	if (status < B_OK)
 		return status;
