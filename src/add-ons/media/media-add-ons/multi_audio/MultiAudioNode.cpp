@@ -173,6 +173,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 	BBufferConsumer(B_MEDIA_RAW_AUDIO),
 	BBufferProducer(B_MEDIA_RAW_AUDIO),
 	BMediaEventLooper(),
+	fRunOutput(false),
 	fBufferLock("multi audio buffers"),
 	fThread(-1),
 	fDevice(device),
@@ -1172,6 +1173,8 @@ MultiAudioNode::_HandleBuffer(const media_timed_event* event,
 		fprintf(stderr,"	<- LATE BUFFER : %" B_PRIdBIGTIME "\n", lateness);
 		buffer->Recycle();
 	} else {
+		BAutolock _(fBufferLock);
+
 		//WriteBuffer(buffer, *channel);
 		// TODO: This seems like a very fragile mechanism to wait until
 		// the previous buffer for this channel has been processed...
@@ -1777,18 +1780,13 @@ MultiAudioNode::_OutputThread()
 
 	// init the performance time computation
 	{
-		BAutolock locker(fBufferLock);
+		fBufferLock.Lock();
 		fTimeComputer.Init(fOutputPreferredFormat.u.raw_audio.frame_rate,
 			system_time());
+		fBufferLock.Unlock();
 	}
 
-	while (true) {
-		// TODO: why this semaphore??
-		if (acquire_sem_etc(fBufferFreeSem, 1, B_RELATIVE_TIMEOUT, 0)
-				== B_BAD_SEM_ID) {
-			return B_OK;
-		}
-
+	while (fRunOutput) {
 		BAutolock locker(fBufferLock);
 			// make sure the buffers don't change while we're playing with them
 
@@ -1836,9 +1834,6 @@ MultiAudioNode::_OutputThread()
 						_WriteZeros(*input, input->fBufferCycle);
 					//PRINT(("MultiAudioNode::Runthread WriteZeros\n"));
 				}
-
-				// mark buffer free
-				release_sem(fBufferFreeSem);
 			} else {
 				//PRINT(("playback_buffer_cycle non ok input : %i\n", i));
 			}
@@ -2048,21 +2043,14 @@ MultiAudioNode::_StartOutputThreadIfNeeded()
 	if (fThread >= 0)
 		return B_OK;
 
-	// allocate buffer free semaphore
-	fBufferFreeSem = create_sem(
-		fDevice->BufferList().return_playback_buffers - 1,
-		"multi_audio out buffer free");
-	if (fBufferFreeSem < B_OK)
-		return fBufferFreeSem;
+	fRunOutput = true;
 
 	PublishTime(-50, 0, 0);
 
 	fThread = spawn_thread(_OutputThreadEntry, "multi_audio audio output",
 		B_REAL_TIME_PRIORITY, this);
-	if (fThread < B_OK) {
-		delete_sem(fBufferFreeSem);
+	if (fThread < B_OK)
 		return fThread;
-	}
 
 	resume_thread(fThread);
 	return B_OK;
@@ -2073,7 +2061,8 @@ status_t
 MultiAudioNode::_StopOutputThread()
 {
 	CALLED();
-	delete_sem(fBufferFreeSem);
+
+	fRunOutput = false;
 
 	status_t exitValue;
 	wait_for_thread(fThread, &exitValue);

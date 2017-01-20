@@ -208,6 +208,7 @@ private:
 
 private:
 	status_t			fInitStatus;
+	bool				fRunOutput;
 
 	BMediaAddOn*		fAddOn;
 	int32				fId;
@@ -227,7 +228,6 @@ private:
 		// not the defaults that are in the parameters
 	bigtime_t			fBufferPeriod;
 
-	sem_id				fBufferFreeSem;
 	thread_id			fThread;
 	MultiAudioDevice*	fDevice;
 	bool 				fTimeSourceStarted;
