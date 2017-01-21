@@ -93,7 +93,7 @@ static struct
 
 
 PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
-	: BlockingWindow(BRect(0, 0, 100, 100), "Page setup",
+	: BlockingWindow(BRect(0, 0, 100, 100), "Paper setup",
 			B_TITLED_WINDOW_LOOK,
  			B_MODAL_APP_WINDOW_FEEL,
  			B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
@@ -102,7 +102,7 @@ PageSetupWindow::PageSetupWindow(BMessage *msg, const char *printerName)
 	fPrinterDirName(printerName)
 {
 	if (printerName)
-		SetTitle(BString(printerName).Append(" Page setup").String());
+		SetTitle(BString(printerName).Append(" paper setup").String());
 
 	// load orientation
 	if (fSetupMsg->FindInt32("orientation", &fCurrentOrientation) != B_OK)
