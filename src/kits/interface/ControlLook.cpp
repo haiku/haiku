@@ -1355,7 +1355,7 @@ BControlLook::DrawSliderHashMarks(BView* view, BRect& rect,
 
 void
 BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
-	const rgb_color& base, uint32 flags, uint32 borders)
+	const rgb_color& base, uint32 flags, uint32 borders, uint32 side)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -1409,40 +1409,118 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 	BRect leftTopCorner(rect);
 	leftTopCorner.right = floorf(leftTopCorner.left + kRoundCornerRadius);
 	leftTopCorner.bottom = floorf(rect.top + kRoundCornerRadius);
-	clipping.Exclude(leftTopCorner);
-
-	// draw the left top corner
-	_DrawRoundCornerLeftTop(view, leftTopCorner, updateRect, base,
-		edgeShadowColor, frameLightColor, bevelLightColor,
-		fillGradient);
 
 	// right top corner dimensions
 	BRect rightTopCorner(rect);
-	rightTopCorner.right = floorf(rect.right);
 	rightTopCorner.left = floorf(rightTopCorner.right - kRoundCornerRadius);
 	rightTopCorner.bottom = floorf(rect.top + kRoundCornerRadius);
-	clipping.Exclude(rightTopCorner);
 
-	// draw the right top corner
-	_DrawRoundCornerRightTop(view, rightTopCorner, updateRect, base,
-		edgeShadowColor, edgeLightColor, frameLightColor,
-		frameShadowColor, bevelLightColor, bevelShadowColor,
-		fillGradient);
+	// left bottom corner dimensions
+	BRect leftBottomCorner(rect);
+	leftBottomCorner.right = floorf(leftBottomCorner.left + kRoundCornerRadius);
+	leftBottomCorner.top = floorf(rect.bottom - kRoundCornerRadius);
+
+	// right bottom corner dimensions
+	BRect rightBottomCorner(rect);
+	rightBottomCorner.left = floorf(rightBottomCorner.right
+		- kRoundCornerRadius);
+	rightBottomCorner.top = floorf(rect.bottom - kRoundCornerRadius);
+
+	switch (side) {
+		case B_TOP_BORDER:
+			clipping.Exclude(leftTopCorner);
+			clipping.Exclude(rightTopCorner);
+
+			// draw the left top corner
+			_DrawRoundCornerLeftTop(view, leftTopCorner, updateRect, base,
+				edgeShadowColor, frameLightColor, bevelLightColor,
+				fillGradient);
+			// draw the right top corner
+			_DrawRoundCornerRightTop(view, rightTopCorner, updateRect, base,
+				edgeShadowColor, edgeLightColor, frameLightColor,
+				frameShadowColor, bevelLightColor, bevelShadowColor,
+				fillGradient);
+			break;
+		case B_BOTTOM_BORDER:
+			clipping.Exclude(leftBottomCorner);
+			clipping.Exclude(rightBottomCorner);
+
+			// draw the left top corner
+			_DrawRoundCornerLeftBottom(view, leftBottomCorner, updateRect, base,
+				edgeShadowColor, edgeLightColor, frameLightColor,
+				frameShadowColor, bevelLightColor, bevelShadowColor,
+				fillGradient);
+			// draw the right top corner
+			_DrawRoundCornerRightBottom(view, rightBottomCorner, updateRect,
+				base, edgeLightColor, frameShadowColor, bevelShadowColor,
+				fillGradient);
+			break;
+		case B_LEFT_BORDER:
+			clipping.Exclude(leftTopCorner);
+			clipping.Exclude(leftBottomCorner);
+
+			// draw the left top corner
+			_DrawRoundCornerLeftTop(view, leftTopCorner, updateRect, base,
+				edgeShadowColor, frameLightColor, bevelLightColor,
+				fillGradient);
+			// draw the left top corner
+			_DrawRoundCornerLeftBottom(view, leftBottomCorner, updateRect, base,
+				edgeShadowColor, edgeLightColor, frameLightColor,
+				frameShadowColor, bevelLightColor, bevelShadowColor,
+				fillGradient);
+			break;
+		case B_RIGHT_BORDER:
+			clipping.Exclude(rightTopCorner);
+			clipping.Exclude(rightBottomCorner);
+
+			// draw the right top corner
+			_DrawRoundCornerRightTop(view, rightTopCorner, updateRect, base,
+				edgeShadowColor, edgeLightColor, frameLightColor,
+				frameShadowColor, bevelLightColor, bevelShadowColor,
+				fillGradient);
+			// draw the right top corner
+			_DrawRoundCornerRightBottom(view, rightBottomCorner, updateRect,
+				base, edgeLightColor, frameShadowColor, bevelShadowColor,
+				fillGradient);
+			break;
+	}
 
 	// clip out the corners
 	view->ConstrainClippingRegion(&clipping);
 
+	uint32 bordersToDraw = 0;
+	switch (side) {
+		case B_TOP_BORDER:
+			bordersToDraw = (B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER);
+			break;
+		case B_BOTTOM_BORDER:
+			bordersToDraw = (B_LEFT_BORDER | B_BOTTOM_BORDER | B_RIGHT_BORDER);
+			break;
+		case B_LEFT_BORDER:
+			bordersToDraw = (B_LEFT_BORDER | B_BOTTOM_BORDER | B_TOP_BORDER);
+			break;
+		case B_RIGHT_BORDER:
+			bordersToDraw = (B_RIGHT_BORDER | B_BOTTOM_BORDER | B_TOP_BORDER);
+			break;
+	}
+
 	// draw the rest of frame and fill
 	_DrawFrame(view, rect, edgeShadowColor, edgeShadowColor, edgeLightColor,
-		edgeLightColor,
-		borders & (B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER));
-	if ((borders & B_LEFT_BORDER) == 0)
-		rect.left++;
-	if ((borders & B_RIGHT_BORDER) == 0)
-		rect.right--;
+		edgeLightColor, borders & bordersToDraw);
+	if (side == B_TOP_BORDER || side == B_BOTTOM_BORDER) {
+		if ((borders & B_LEFT_BORDER) == 0)
+			rect.left++;
+		if ((borders & B_RIGHT_BORDER) == 0)
+			rect.right--;
+	} else if (side == B_LEFT_BORDER || side == B_RIGHT_BORDER) {
+		if ((borders & B_TOP_BORDER) == 0)
+			rect.top++;
+		if ((borders & B_BOTTOM_BORDER) == 0)
+			rect.bottom--;
+	}
 
 	_DrawFrame(view, rect, frameLightColor, frameLightColor, frameShadowColor,
-		frameShadowColor, B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER);
+		frameShadowColor, bordersToDraw);
 
 	_DrawFrame(view, rect, bevelLightColor, bevelLightColor, bevelShadowColor,
 		bevelShadowColor);
@@ -1456,7 +1534,7 @@ BControlLook::DrawActiveTab(BView* view, BRect& rect, const BRect& updateRect,
 
 void
 BControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateRect,
-	const rgb_color& base, uint32 flags, uint32 borders)
+	const rgb_color& base, uint32 flags, uint32 borders, uint32 side)
 {
 	if (!rect.IsValid() || !rect.Intersects(updateRect))
 		return;
@@ -1491,26 +1569,53 @@ BControlLook::DrawInactiveTab(BView* view, BRect& rect, const BRect& updateRect,
 		fillGradient.AddColor(tint_color(base, 1.08), 255);
 	}
 
+	uint32 bordersToDraw = 0;
+	switch (side) {
+		case B_TOP_BORDER:
+			bordersToDraw = (B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER);
+			rect.top += 4;
+			break;
+		case B_BOTTOM_BORDER:
+			bordersToDraw = (B_LEFT_BORDER | B_BOTTOM_BORDER | B_RIGHT_BORDER);
+			rect.bottom -= 4;
+			break;
+		case B_LEFT_BORDER:
+			bordersToDraw = (B_LEFT_BORDER | B_BOTTOM_BORDER | B_TOP_BORDER);
+			rect.left += 4;
+			break;
+		case B_RIGHT_BORDER:
+			bordersToDraw = (B_RIGHT_BORDER | B_BOTTOM_BORDER | B_TOP_BORDER);
+			rect.right -= 4;
+		break;
+	}
+
 	// active tabs stand out at the top, but this is an inactive tab
 	view->SetHighColor(base);
-	view->FillRect(BRect(rect.left, rect.top, rect.right, rect.top + 4));
-	rect.top += 4;
+	view->FillRect(rect);
 
 	// frame and fill
 	_DrawFrame(view, rect, edgeShadowColor, edgeShadowColor, edgeLightColor,
-		edgeLightColor,
-		borders & (B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER));
+		edgeLightColor, borders & bordersToDraw);
 
 	_DrawFrame(view, rect, frameLightColor, frameLightColor, frameShadowColor,
-		frameShadowColor,
-		borders & (B_LEFT_BORDER | B_TOP_BORDER | B_RIGHT_BORDER));
+		frameShadowColor, borders & bordersToDraw);
 
 	if (rect.IsValid()) {
-		_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
-			bevelLightColor, bevelLightColor, B_LEFT_BORDER & ~borders);
+		if (side == B_TOP_BORDER || side == B_BOTTOM_BORDER) {
+			_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
+				bevelLightColor, bevelLightColor, B_LEFT_BORDER & ~borders);
+		} else if (side == B_LEFT_BORDER || side == B_RIGHT_BORDER) {
+			_DrawFrame(view, rect, bevelShadowColor, bevelShadowColor,
+				bevelLightColor, bevelLightColor, B_TOP_BORDER & ~borders);
+		}
 	} else {
-		if ((B_LEFT_BORDER & ~borders) != 0)
-			rect.left++;
+		if (side == B_TOP_BORDER || side == B_BOTTOM_BORDER) {
+			if ((B_LEFT_BORDER & ~borders) != 0)
+				rect.left++;
+		} else if (side == B_LEFT_BORDER || side == B_RIGHT_BORDER) {
+			if ((B_TOP_BORDER & ~borders) != 0)
+				rect.top++;
+		}
 	}
 
 	view->FillRect(rect, fillGradient);
