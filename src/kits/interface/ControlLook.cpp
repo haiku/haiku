@@ -3164,12 +3164,12 @@ BControlLook::_DrawRoundCornerFrameRightBottom(BView* view, BRect& cornerRect,
 	// frame
 	ellipseRect.InsetBy(1, 1);
 	cornerRect.right--;
-	cornerRect.bottom++;
+	cornerRect.bottom--;
 	view->SetHighColor(frameColor);
 	view->FillEllipse(ellipseRect);
 
 	// prepare for bevel
-	cornerRect.left++;
+	cornerRect.right--;
 	cornerRect.bottom--;
 }
 
