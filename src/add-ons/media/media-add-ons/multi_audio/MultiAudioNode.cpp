@@ -175,6 +175,7 @@ MultiAudioNode::MultiAudioNode(BMediaAddOn* addon, const char* name,
 	BBufferProducer(B_MEDIA_RAW_AUDIO),
 	BMediaEventLooper(),
 	fBufferLock("multi audio buffers"),
+	fQuitThread(0),
 	fThread(-1),
 	fDevice(device),
 	fTimeSourceStarted(false),
@@ -1821,13 +1822,7 @@ MultiAudioNode::_OutputThread()
 			system_time());
 	}
 
-	while (true) {
-		// TODO: why this semaphore??
-		if (acquire_sem_etc(fBufferFreeSem, 1, B_RELATIVE_TIMEOUT, 0)
-				== B_BAD_SEM_ID) {
-			return B_OK;
-		}
-
+	while (atomic_get(&fQuitThread) == 0) {
 		BAutolock locker(fBufferLock);
 			// make sure the buffers don't change while we're playing with them
 
@@ -1875,9 +1870,6 @@ MultiAudioNode::_OutputThread()
 						_WriteZeros(*input, input->fBufferCycle);
 					//PRINT(("MultiAudioNode::Runthread WriteZeros\n"));
 				}
-
-				// mark buffer free
-				release_sem(fBufferFreeSem);
 			} else {
 				//PRINT(("playback_buffer_cycle non ok input: %i\n", i));
 			}
@@ -2088,21 +2080,12 @@ MultiAudioNode::_StartOutputThreadIfNeeded()
 	if (fThread >= 0)
 		return B_OK;
 
-	// allocate buffer free semaphore
-	fBufferFreeSem = create_sem(
-		fDevice->BufferList().return_playback_buffers - 1,
-		"multi_audio out buffer free");
-	if (fBufferFreeSem < B_OK)
-		return fBufferFreeSem;
-
 	PublishTime(-50, 0, 0);
 
 	fThread = spawn_thread(_OutputThreadEntry, "multi_audio audio output",
 		B_REAL_TIME_PRIORITY, this);
-	if (fThread < B_OK) {
-		delete_sem(fBufferFreeSem);
+	if (fThread < 0)
 		return fThread;
-	}
 
 	resume_thread(fThread);
 	return B_OK;
@@ -2113,10 +2096,9 @@ status_t
 MultiAudioNode::_StopOutputThread()
 {
 	CALLED();
-	delete_sem(fBufferFreeSem);
+	atomic_set(&fQuitThread, 1);
 
-	status_t exitValue;
-	wait_for_thread(fThread, &exitValue);
+	wait_for_thread(fThread, NULL);
 	fThread = -1;
 	return B_OK;
 }

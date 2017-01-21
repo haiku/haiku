@@ -254,7 +254,7 @@ private:
 				// not the defaults that are in the parameters
 			bigtime_t			fBufferPeriod;
 
-			sem_id				fBufferFreeSem;
+			int32				fQuitThread;
 			thread_id			fThread;
 			MultiAudioDevice*	fDevice;
 			bool 				fTimeSourceStarted;
