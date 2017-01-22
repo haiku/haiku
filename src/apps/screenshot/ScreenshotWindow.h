@@ -50,6 +50,7 @@ private:
 								uint32 shortcutKey = 0);
 			void			_UpdateFilenameSelection();
 			void			_SetupTranslatorMenu();
+			void			_DisplaySaveError(BString _message);
 			status_t		_SaveScreenshot();
 			void			_ShowSettings(bool activate);
 			BString			_FindValidFileName(const char* name);

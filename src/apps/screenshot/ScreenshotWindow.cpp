@@ -608,6 +608,21 @@ ScreenshotWindow::_SetupTranslatorMenu()
 }
 
 
+void
+ScreenshotWindow::_DisplaySaveError(BString _message) {
+	BString alertText;
+	alertText.SetToFormat(B_TRANSLATE("Error saving \"%s\":\n\t%s"),
+		fNameControl->Text(), _message.String());
+
+	BAlert* alert = new BAlert(B_TRANSLATE("Failed to save screenshot"),
+		alertText.String(),	B_TRANSLATE("OK"),
+		NULL, NULL, B_WIDTH_AS_USUAL, B_STOP_ALERT);
+
+	alert->SetShortcut(0, B_ESCAPE);
+	alert->Go();
+}
+
+
 status_t
 ScreenshotWindow::_SaveScreenshot()
 {
@@ -626,13 +641,19 @@ ScreenshotWindow::_SaveScreenshot()
 	// necessary, for example, when the user selects the Artwork folder from
 	// the list of predefined folders.
 	if (!directoryEntry.Exists()) {
-		if (create_directory(path.Path(), 0755) != B_OK) {
-			return B_ERROR;
+		status_t directoryCreateStatus = create_directory(path.Path(), 0755);
+		if (directoryCreateStatus != B_OK) {
+			_DisplaySaveError(strerror(directoryCreateStatus));
+
+			return directoryCreateStatus;
 		}
 	} else if (!directoryEntry.IsDirectory()) {
 		// the entry exists but is not a directory.
 		// not much we can do
-		return B_ERROR;
+		_DisplaySaveError(
+			B_TRANSLATE("The destination path exists but is not a folder."));
+
+		return B_NOT_A_DIRECTORY;
 	}
 
 	path.Append(fNameControl->Text());
@@ -655,7 +676,14 @@ ScreenshotWindow::_SaveScreenshot()
 			return B_CANCELED;
 	}
 
-	return fUtility.Save(fScreenshot, path.Path(), fImageFileType);
+	status_t saveStatus = fUtility.Save(fScreenshot,
+		path.Path(), fImageFileType);
+
+	if (saveStatus != B_OK) {
+		_DisplaySaveError(strerror(saveStatus));
+		return saveStatus;
+	}
+	return B_OK;
 }
 
 
