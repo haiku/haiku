@@ -348,7 +348,7 @@ PageSetupView::MessageReceived(BMessage *msg)
 // TODO center window on screen
 PageSetupDlg::PageSetupDlg(JobData *job_data, PrinterData *printer_data, const PrinterCap *printer_cap)
 	: DialogWindow(BRect(100, 100, 160, 160),
-		"Page setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
+		"Paper setup", B_TITLED_WINDOW_LOOK, B_MODAL_APP_WINDOW_FEEL,
 		B_NOT_RESIZABLE | B_NOT_MINIMIZABLE | B_NOT_ZOOMABLE
 			| B_AUTO_UPDATE_SIZE_LIMITS | B_CLOSE_ON_ESCAPE)
 {
