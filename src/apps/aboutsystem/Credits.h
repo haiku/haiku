@@ -422,6 +422,7 @@ static const Translation kTranslations[] = {
 	"Lucian Adrian Grijincu\n" \
 	"Sean Healy\n" \
 	"Andreas Henriksson\n" \
+	"Brian Hill\n" \
 	"Markus Himmel\n" \
 	"Matthijs Hollemans\n" \
 	"Mathew Hounsell\n" \
