@@ -18,7 +18,7 @@ html {
 }
 
 body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,form,fieldset,input,textarea,
-	p,blockquote,th,td { 
+	p,blockquote,th,td {
 	margin: 0;
 	padding: 0;
 }
@@ -96,20 +96,20 @@ abbr,acronym {
 	border: 0;
 }
 
-a:link { 
-	font-weight: bold; 
-	text-decoration: none; 
+a:link {
+	font-weight: bold;
+	text-decoration: none;
 	color: #dc3c01; /* grenadier */
 }
 
-a:visited { 
-	font-weight: bold; 
-	text-decoration: none; 
+a:visited {
+	font-weight: bold;
+	text-decoration: none;
 	color: #892601; /* peru tan */
 }
 
-a:hover, a:active { 
-	text-decoration: underline; 
+a:hover, a:active {
+	text-decoration: underline;
 	color: #ff4500; /* vermilion */
 }
 
@@ -146,7 +146,7 @@ h4 a:hover, a:active, h5 a:hover, a:active, h6 a:hover, a:active {
 }
 
 #banner div.logo {
-	background: url('https://api.haiku-os.org/logo.png') no-repeat scroll 0 0 transparent;
+	background: url('https://www.haiku-os.org/images/haiku_logo_black.png') no-repeat scroll 0 0 transparent;
 	min-width: 59em;
 	max-width: 70em;
 	height: 100%;
@@ -167,7 +167,7 @@ h4 a:hover, a:active, h5 a:hover, a:active, h6 a:hover, a:active {
 #banner span.search {
 	position: relative;
 	top: 48px;
-	left: 462px;
+	left: 600px;
 }
 
 input[type=text], input[type=password] {
@@ -241,21 +241,7 @@ div.navpath {
 }
 
 div.navpath ul {
-	list-style: none;
-}
-
-div.navpath ul li {
-	padding-top: 3px;
-	padding-bottom: 2px;
-}
-
-div.tabs ul.tablist {
-}
-
-div.tabs2 ul.tablist {
-}
-
-div.tabs3 ul.tablist {
+	display: none;
 }
 
 div.tabs ul.tablist li, div.tabs2 ul.tablist li, div.tabs3 ul.tablist li {
@@ -291,7 +277,7 @@ div.contents ul, div.contents ol {
 	line-height: 1.3;
 }
 
-div.contents em, div.contents code {
+div.contents em, div.contents code, div.contents .mlabel {
 	font-weight: normal;
 	font-style: normal;
 }
@@ -300,19 +286,32 @@ div.contents em {
 	color: #dc3c01; /* grenadier */
 }
 
-div.contents code {
+div.contents .mlabels-right {
+	vertical-align: middle;
+}
+div.contents code, div.contents .mlabel {
 	color: blue;
+	font-family: "Deja Vu Mono", Courier, "Courier New", monospace, fixed;
+	font-weight: normal;
+	font-style: normal;
+}
+div.contents .mlabel:before {
+	content: "[";
+}
+div.contents .mlabel:after {
+	content: "]";
 }
 
 div.contents td {
 	line-height: 1.3;
 }
 
-div.contents code {
-	color: blue;
-	font-family: "Deja Vu Mono", Courier, "Courier New", monospace, fixed;
+div.contents td span.arrow {
+	cursor: pointer;
+}
+
+div.contents td.desc {
 	font-weight: normal;
-	font-style: normal;
 }
 
 div.contents div.dynheader {
@@ -335,9 +334,13 @@ div.contents div.dyncontent div.center {
 	margin: 16px;
 }
 
+div.contents td.memSeparator {
+	display: none;
+}
+
 div.contents span.keycap, div.contents span.keysym {
 	-webkit-border-radius: 3px;
-	-khtml-border-radius: 3px;	
+	-khtml-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 	border-color: #c7c7c7; /* silver */
@@ -368,6 +371,28 @@ div.contents dt {
 	margin-bottom: 8px;
 }
 
+.icon {
+	font-weight: bold;
+	font-size: 12px;
+	height: 14px;
+	width: 16px;
+	display: inline-block;
+	background-color: #ff4500;
+	color: white;
+	text-align: center;
+	border-radius: 4px;
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+/* Entry markers */
+dl dt {
+	font-weight: bold;
+}
+dl dt::after {
+	content: ":";
+}
+
 /* The boxes from the userguide */
 dl.note, dl.remark, dl.warning, dl.attention {
 	border-style: solid;
@@ -384,29 +409,29 @@ dl.note dd, dl.remark dd, dl.warning dd, dl.attention dd {
 
 dl.note {
 	/* rice flower */
-	background:#e4ffde url('https://haiku-os.org/sites/haiku-os.org/themes/shijin/haiku-icons/alert_info_32.png') 15px 15px no-repeat;
+	background:#e4ffde url('https://www.haiku-os.org/images/alert_info_32.png') 15px 15px no-repeat;
 	border-color: #94ce18; /* lima */
 }
 
 dl.remark {
-	background: #f3f3f3 url('https://api.haiku-os.org/images/alert_idea_32.png') 15px 15px no-repeat;
+	background: #f3f3f3 url('https://www.haiku-os.org/images/alert_idea_32.png') 15px 15px no-repeat;
 	border-color: #c0c0c0; /* silver */
 }
 
 dl.warning {
 	/* lemon chiffon */
-	background: #fffbc6 url('https://api.haiku-os.org/images/alert_warning_32.png') 15px 15px no-repeat;
+	background: #fffbc6 url('https://www.haiku-os.org/images/alert_warning_32.png') 15px 15px no-repeat;
 	border-color: #eed300; /* gold */
 }
 
 dl.attention {
 	/* fair pink */
-	background: #ffeae6 url('https://api.haiku-os.org/images/alert_stop_32.png') 15px 15px no-repeat;
+	background: #ffeae6 url('https://www.haiku-os.org/images/alert_stop_32.png') 15px 15px no-repeat;
 	border-color: red;
 }
 
 dl.note dt, dl.remark dt, dl.warning dt, dl.attention dt {
-	display: none; /* don't display the Note: or Warning: header */ 
+	display: none; /* don't display the Note: or Warning: header */
 }
 
 dl.note dd, dl.remark dd, dl.warning dd, dl.attention dd {
@@ -419,7 +444,7 @@ dl.note dd, dl.remark dd, dl.warning dd, dl.attention dd {
 
 div.contents span.keycap {
 	-webkit-border-radius: 3px;
-	-khtml-border-radius: 3px;	
+	-khtml-border-radius: 3px;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 	border-color: #c7c7c7; /* silver */
@@ -520,12 +545,11 @@ dl.el {
 	margin-left: -1cm
 }
 div.fragment {
+	white-space: pre;
 	width: 99%;
 	background-color: #f3f3f3; /* concrete */
 	border: 1px solid #c0c0c0; /* silver */
 	padding: 4px;
-}
-div.fragment pre.fragment {
 	color: black;
 	font-family: "Deja Vu Mono", Courier, "Courier New", monospace, fixed;
 	font-weight: normal;
@@ -686,7 +710,7 @@ table.memberdecls td.memTemplParams {
 	background-color: #f3f3f3; /* concrete */
 }
 
-table.memberdecls td div.groupHeader {
+table.memberdecls td div.groupHeader, tr.inherit_header {
 	/* same as h3 */
 	color: #0c3762; /* madison */
 	margin-top: 0.5em;
@@ -694,6 +718,9 @@ table.memberdecls td div.groupHeader {
 	font-size: 1.2em;
 	font-weight: normal;
 	border-bottom: dotted thin #c0c0c0; /* silver */
+}
+tr.inherit_header {
+	cursor: pointer;
 }
 
 table.memberdecls td div.groupText {
@@ -705,7 +732,7 @@ table.memberdecls td div.groupText {
 div.memtemplate {
 	font-weight: normal;
 	font-style: normal;
-} 
+}
 
 div.memnav {
 	background-color: #f3f3f3; /* concrete */
@@ -838,7 +865,7 @@ div.memdoc dl dd table.retval td.paramname {
 	margin: 0.5em;
 }
 
-.directory { font-size: 9pt; font-weight: bold; }
+.directory { font-size: 14.4px; font-weight: bold; }
 .directory h3 { margin: 0px; margin-top: 1em; font-size: 11pt; }
 .directory > h3 { margin-top: 0; }
 .directory p { margin: 0px; white-space: nowrap; }
