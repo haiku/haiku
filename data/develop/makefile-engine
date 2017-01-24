@@ -35,8 +35,8 @@ endif
 MIMESET	:= mimeset
 XRES	:= xres
 RESCOMP	:= rc
-CC		:= gcc
-C++		:= g++
+CC		:= $(CC)
+C++		:= $(CXX)
 
 # Set up CFLAGS.
 ifeq ($(strip $(TYPE)), DRIVER)
@@ -79,7 +79,7 @@ endif
 
 # Set up the linker & linker flags.
 ifeq ($(origin LD), default)
-	LD			:= gcc
+	LD			:= $(CC)
 endif
 LDFLAGS		+= $(DEBUG)
 
