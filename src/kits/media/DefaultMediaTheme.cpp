@@ -112,6 +112,7 @@ class CheckBox : public BCheckBox {
 		virtual ~CheckBox();
 
 		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
 	private:
 		BDiscreteParameter &fParameter;
 };
@@ -123,6 +124,7 @@ class OptionPopUp : public BOptionPopUp {
 		virtual ~OptionPopUp();
 
 		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
 	private:
 		BDiscreteParameter &fParameter;
 };
@@ -134,6 +136,7 @@ class Slider : public BSlider {
 		virtual ~Slider();
 
 		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
 	private:
 		BContinuousParameter &fParameter;
 };
@@ -146,6 +149,7 @@ class ChannelSlider : public BChannelSlider {
 		virtual ~ChannelSlider();
 
 		virtual void AttachedToWindow();
+		virtual void DetachedFromWindow();
 	private:
 		BContinuousParameter &fParameter;
 };
@@ -212,7 +216,8 @@ parameter_should_be_hidden(BParameter &parameter)
 static void
 start_watching_for_parameter_changes(BControl* control, BParameter &parameter)
 {
-	if (BMediaRoster* roster = BMediaRoster::CurrentRoster()) {
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	if (roster != NULL) {
 		roster->StartWatching(control, parameter.Web()->Node(),
 			B_MEDIA_NEW_PARAMETER_VALUE);
 	}
@@ -222,7 +227,8 @@ start_watching_for_parameter_changes(BControl* control, BParameter &parameter)
 static void
 stop_watching_for_parameter_changes(BControl* control, BParameter &parameter)
 {
-	if (BMediaRoster* roster = BMediaRoster::CurrentRoster()) {
+	BMediaRoster* roster = BMediaRoster::CurrentRoster();
+	if (roster != NULL) {
 		roster->StopWatching(control, parameter.Web()->Node(),
 			B_MEDIA_NEW_PARAMETER_VALUE);
 	}
@@ -630,7 +636,6 @@ CheckBox::CheckBox(BRect area, const char* name, const char* label,
 
 CheckBox::~CheckBox()
 {
-	stop_watching_for_parameter_changes(this, fParameter);
 }
 
 
@@ -638,6 +643,13 @@ void
 CheckBox::AttachedToWindow()
 {
 	start_watching_for_parameter_changes(this, fParameter);
+}
+
+
+void
+CheckBox::DetachedFromWindow()
+{
+	stop_watching_for_parameter_changes(this, fParameter);
 }
 
 
@@ -651,7 +663,6 @@ OptionPopUp::OptionPopUp(BRect area, const char* name, const char* label,
 
 OptionPopUp::~OptionPopUp()
 {
-	stop_watching_for_parameter_changes(this, fParameter);
 }
 
 
@@ -659,6 +670,13 @@ void
 OptionPopUp::AttachedToWindow()
 {
 	start_watching_for_parameter_changes(this, fParameter);
+}
+
+
+void
+OptionPopUp::DetachedFromWindow()
+{
+	stop_watching_for_parameter_changes(this, fParameter);
 }
 
 
@@ -672,7 +690,6 @@ Slider::Slider(BRect area, const char* name, const char* label, int32 minValue,
 
 Slider::~Slider()
 {
-	stop_watching_for_parameter_changes(this, fParameter);
 }
 
 
@@ -680,6 +697,13 @@ void
 Slider::AttachedToWindow()
 {
 	start_watching_for_parameter_changes(this, fParameter);
+}
+
+
+void
+Slider::DetachedFromWindow()
+{
+	stop_watching_for_parameter_changes(this, fParameter);
 }
 
 
@@ -693,7 +717,6 @@ ChannelSlider::ChannelSlider(BRect area, const char* name, const char* label,
 
 ChannelSlider::~ChannelSlider()
 {
-	stop_watching_for_parameter_changes(this, fParameter);
 }
 
 
@@ -701,6 +724,13 @@ void
 ChannelSlider::AttachedToWindow()
 {
 	start_watching_for_parameter_changes(this, fParameter);
+}
+
+
+void
+ChannelSlider::DetachedFromWindow()
+{
+	stop_watching_for_parameter_changes(this, fParameter);
 }
 
 
