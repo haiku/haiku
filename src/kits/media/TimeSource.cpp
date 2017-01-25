@@ -227,8 +227,10 @@ BTimeSource::GetTime(bigtime_t* performance_time,
 		return B_OK;
 	}
 
-	int32 index;
-	index = _atomic_read(&fBuf->readindex);
+	if (fBuf == NULL)
+		debugger("BTimeSource::GetTime: fBuf == NULL");
+
+	int32 index = _atomic_read(&fBuf->readindex);
 	index &= (TS_INDEX_COUNT - 1);
 	*real_time = fBuf->realtime[index];
 	*performance_time = fBuf->perftime[index];
@@ -359,8 +361,7 @@ BTimeSource::PublishTime(bigtime_t performance_time,
 		return;
 	}
 
-	int32 index;
-	index = atomic_add(&fBuf->writeindex, 1);
+	int32 index = atomic_add(&fBuf->writeindex, 1);
 	index &= (TS_INDEX_COUNT - 1);
 	fBuf->realtime[index] = real_time;
 	fBuf->perftime[index] = performance_time;

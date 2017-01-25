@@ -2153,17 +2153,17 @@ BMediaRosterEx::RegisterNode(BMediaNode* node, media_addon_id addOnID,
 	ASSERT(reply.node_id == node->Node().node);
 	ASSERT(reply.node_id == node->ID());
 
-	// call the callback
-	node->NodeRegistered();
-
-	TRACE("BMediaRoster::RegisterNode: NodeRegistered callback finished\n");
-
 	// if the BMediaNode also inherits from BTimeSource, we need to call
 	// BTimeSource::FinishCreate()
 	if ((node->Kinds() & B_TIME_SOURCE) != 0) {
 		if (BTimeSource* timeSource = dynamic_cast<BTimeSource*>(node))
 			timeSource->FinishCreate();
 	}
+
+	// call the callback
+	node->NodeRegistered();
+
+	TRACE("BMediaRoster::RegisterNode: NodeRegistered callback finished\n");
 
 	TRACE("BMediaRoster::RegisterNode: publishing inputs/outputs\n");
 
