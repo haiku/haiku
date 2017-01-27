@@ -805,6 +805,9 @@ Equation::_ConvertValue(type_code type)
 			fValue.String[INODE_FILE_NAME_LENGTH - 1] = '\0';
 			fSize = strlen(fValue.String);
 			break;
+		case B_TIME_TYPE:
+			type = B_INT32_TYPE;
+			// supposed to fall through
 		case B_INT32_TYPE:
 			fValue.Int32 = strtol(string, &string, 0);
 			fSize = sizeof(int32);
