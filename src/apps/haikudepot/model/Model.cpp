@@ -1,11 +1,12 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
  * Copyright 2014, Axel Dörfler <axeld@pinc-software.de>.
- * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2017, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
 #include "Model.h"
+#include "StorageUtils.h"
 
 #include <ctime>
 #include <stdarg.h>
@@ -642,7 +643,7 @@ Model::SetShowDevelopPackages(bool show)
 }
 
 
-// #pragma mark - information retrival
+// #pragma mark - information retrieval
 
 
 void
@@ -905,7 +906,51 @@ Model::_PopulateAllPackagesEntry(void* cookie)
 	Model* model = static_cast<Model*>(cookie);
 	model->_PopulateAllPackagesThread(true);
 	model->_PopulateAllPackagesThread(false);
+	model->_PopulateAllPackagesIcons();
 	return 0;
+}
+
+
+void
+Model::_PopulateAllPackagesIcons()
+{
+	fLocalIconStore.UpdateFromServerIfNecessary();
+
+	int32 depotIndex = 0;
+	int32 packageIndex = 0;
+	int32 countIconsSet = 0;
+
+	fprintf(stdout, "will populate all packages' icons\n");
+
+	while (true) {
+		PackageInfoRef package;
+		BAutolock locker(&fLock);
+
+		if (depotIndex > fDepots.CountItems()) {
+			fprintf(stdout, "did populate %ld packages' icons\n",
+				countIconsSet);
+			return;
+		}
+
+		const DepotInfo& depot = fDepots.ItemAt(depotIndex);
+		const PackageList& packages = depot.Packages();
+
+		if (packageIndex >= packages.CountItems()) {
+			// Need the next depot
+			packageIndex = 0;
+			depotIndex++;
+		} else {
+			package = packages.ItemAt(packageIndex);
+#ifdef DEBUG
+			fprintf(stdout, "will populate package icon for [%s]\n",
+				package->Name().String());
+#endif
+			if (_PopulatePackageIcon(package) == B_OK)
+				countIconsSet++;
+
+			packageIndex++;
+		}
+	}
 }
 
 
@@ -915,7 +960,6 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 	int32 depotIndex = 0;
 	int32 packageIndex = 0;
 	PackageList bulkPackageList;
-	PackageList packagesWithIconsList;
 
 	while (!fStopPopulatingAllPackages) {
 		// Obtain PackageInfoRef while keeping the depot and package lists
@@ -946,30 +990,15 @@ Model::_PopulateAllPackagesThread(bool fromCacheOnly)
 		//_PopulatePackageInfo(package, fromCacheOnly);
 		bulkPackageList.Add(package);
 		if (bulkPackageList.CountItems() == 50) {
-			_PopulatePackageInfos(bulkPackageList, fromCacheOnly,
-				packagesWithIconsList);
+			_PopulatePackageInfos(bulkPackageList, fromCacheOnly);
 			bulkPackageList.Clear();
 		}
-		if (fromCacheOnly)
-			_PopulatePackageIcon(package, fromCacheOnly);
 		// TODO: Average user rating. It needs to be shown in the
 		// list view, so without the user clicking the package.
 	}
 
 	if (bulkPackageList.CountItems() > 0) {
-		_PopulatePackageInfos(bulkPackageList, fromCacheOnly,
-			packagesWithIconsList);
-	}
-
-	if (!fromCacheOnly) {
-		for (int i = packagesWithIconsList.CountItems() - 1; i >= 0; i--) {
-			if (fStopPopulatingAllPackages)
-				break;
-			const PackageInfoRef& package = packagesWithIconsList.ItemAtFast(i);
-			printf("Getting/Updating native icon for %s\n",
-				package->Name().String());
-			_PopulatePackageIcon(package, fromCacheOnly);
-		}
+		_PopulatePackageInfos(bulkPackageList, fromCacheOnly);
 	}
 }
 
@@ -1012,8 +1041,7 @@ Model::_GetCacheFile(BPath& path, BFile& file, directory_which directory,
 
 
 void
-Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
-	PackageList& packagesWithIcons)
+Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly)
 {
 	if (fStopPopulatingAllPackages)
 		return;
@@ -1035,8 +1063,6 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 			BMessage pkgInfo;
 			if (pkgInfo.Unflatten(&file) == B_OK) {
 				_PopulatePackageInfo(package, pkgInfo);
-				if (_HasNativeIcon(pkgInfo))
-					packagesWithIcons.Add(package);
 				packages.Remove(i);
 			}
 		}
@@ -1101,8 +1127,6 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 						const PackageInfoRef& package = packages.ItemAtFast(i);
 						if (pkgName == package->Name()) {
 							_PopulatePackageInfo(package, pkgInfo);
-							if (_HasNativeIcon(pkgInfo))
-								packagesWithIcons.Add(package);
 
 							// Store in cache
 							BFile file;
@@ -1136,8 +1160,8 @@ Model::_PopulatePackageInfos(PackageList& packages, bool fromCacheOnly,
 				for (int i = count / 2; i < count; i++)
 					secondHalf.Add(packages.ItemAtFast(i));
 				packages.Clear();
-				_PopulatePackageInfos(firstHalf, fromCacheOnly, packagesWithIcons);
-				_PopulatePackageInfos(secondHalf, fromCacheOnly, packagesWithIcons);
+				_PopulatePackageInfos(firstHalf, fromCacheOnly);
+				_PopulatePackageInfos(secondHalf, fromCacheOnly);
 			} else {
 				while (packages.CountItems() > 0) {
 					const PackageInfoRef& package = packages.ItemAtFast(0);
@@ -1337,41 +1361,33 @@ Model::_PopulatePackageInfo(const PackageInfoRef& package, const BMessage& data)
 }
 
 
-void
-Model::_PopulatePackageIcon(const PackageInfoRef& package, bool fromCacheOnly)
+status_t
+Model::_PopulatePackageIcon(const PackageInfoRef& package)
 {
-	// See if there is a cached icon file
-	BFile iconFile;
-	BPath iconCachePath;
-	BString iconName(package->Name());
-	iconName << ".hvif";
-	if (_GetCacheFile(iconCachePath, iconFile, B_USER_CACHE_DIRECTORY,
-		"HaikuDepot", iconName, fromCacheOnly, 60 * 60)) {
-		// Cache file is recent enough, just use it and return.
-		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(iconFile), true);
+	BPath bestIconPath;
+
+	if ( fLocalIconStore.TryFindIconPath(
+		package->Name(), bestIconPath) == B_OK) {
+
+		BFile bestIconFile(bestIconPath.Path(), O_RDONLY);
+		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(bestIconFile), true);
 		BAutolock locker(&fLock);
 		package->SetIcon(bitmapRef);
-		return;
+
+#ifdef DEBUG
+		fprintf(stdout, "have set the package icon for [%s] from [%s]\n",
+			package->Name().String(), bestIconPath.Path());
+#endif
+
+		return B_OK;
 	}
 
-	if (fromCacheOnly)
-		return;
+#ifdef DEBUG
+	fprintf(stdout, "did not set the package icon for [%s]; no data\n",
+		package->Name().String());
+#endif
 
-	// Retrieve icon from web-app
-	BMallocIO buffer;
-
-	status_t status = fWebAppInterface.RetrievePackageIcon(package->Name(),
-		&buffer);
-	if (status == B_OK) {
-		BitmapRef bitmapRef(new(std::nothrow)SharedBitmap(buffer), true);
-		BAutolock locker(&fLock);
-		package->SetIcon(bitmapRef);
-		locker.Unlock();
-		if (iconFile.SetTo(iconCachePath.Path(),
-				B_WRITE_ONLY | B_CREATE_FILE | B_ERASE_FILE) == B_OK) {
-			iconFile.Write(buffer.Buffer(), buffer.BufferLength());
-		}
-	}
+	return B_FILE_NOT_FOUND;
 }
 
 
@@ -1436,32 +1452,6 @@ Model::_PopulatePackageScreenshot(const PackageInfoRef& package,
 			"at %" B_PRIi32 "x%" B_PRIi32 ".\n", info.Code().String(),
 			scaledWidth, scaledHeight);
 	}
-}
-
-
-bool
-Model::_HasNativeIcon(const BMessage& message) const
-{
-	BMessage pkgIcons;
-	if (message.FindMessage("pkgIcons", &pkgIcons) != B_OK)
-		return false;
-
-	int32 index = 0;
-	while (true) {
-		BString name;
-		name << index++;
-
-		BMessage typeCodeInfo;
-		if (pkgIcons.FindMessage(name, &typeCodeInfo) != B_OK)
-			break;
-
-		BString mediaTypeCode;
-		if (typeCodeInfo.FindString("mediaTypeCode", &mediaTypeCode) == B_OK
-			&& mediaTypeCode == "application/x-vnd.haiku-icon") {
-			return true;
-		}
-	}
-	return false;
 }
 
 

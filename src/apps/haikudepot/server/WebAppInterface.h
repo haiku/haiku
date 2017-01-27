@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2017, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef WEB_APP_INTERFACE_H
@@ -34,7 +34,6 @@ public:
 			const BString&		Username() const
 									{ return fUsername; }
 
-	static	status_t			SetBaseUrl(const BString& url);
 			void				SetPreferredLanguage(const BString& language);
 			void				SetArchitecture(const BString& architecture);
 
@@ -53,10 +52,6 @@ public:
 									const StringList& packageArchitectures,
 									const StringList& repositoryCodes,
 									BMessage& message);
-
-			status_t			RetrievePackageIcon(
-									const BString& packageName,
-									BDataIO* stream);
 
 			status_t			RetrieveUserRatings(
 									const BString& packageName,
@@ -110,17 +105,11 @@ public:
 									BMessage& message);
 
 private:
-	static  const BString		_GetUserAgentVersionString();
-	static	const BString		_GetUserAgent();
-			BString				_FormFullUrl(const BString& suffix) const;
 			status_t			_SendJsonRequest(const char* domain,
 									BString jsonString, uint32 flags,
 									BMessage& reply) const;
 
 private:
-	static	BString				fBaseUrl;
-	static	BString				fUserAgent;
-	static	BLocker				fUserAgentLocker;
 			BString				fUsername;
 			BString				fPassword;
 			BString				fLanguage;

@@ -1,6 +1,6 @@
 /*
  * Copyright 2013-2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2017, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 #ifndef MODEL_H
@@ -9,6 +9,7 @@
 #include <FindDirectory.h>
 #include <Locker.h>
 
+#include "LocalIconStore.h"
 #include "PackageInfo.h"
 #include "WebAppInterface.h"
 
@@ -156,6 +157,8 @@ private:
 	static	int32				_PopulateAllPackagesEntry(void* cookie);
 			void				_PopulateAllPackagesThread(bool fromCacheOnly);
 
+			void				_PopulateAllPackagesIcons();
+
 			bool				_GetCacheFile(BPath& path, BFile& file,
 									directory_which directory,
 									const char* relativeLocation,
@@ -169,18 +172,15 @@ private:
 
 			void				_PopulatePackageInfos(
 									PackageList& packages,
-									bool fromCacheOnly,
-									PackageList& packagesWithIcons);
+									bool fromCacheOnly);
 			void				_PopulatePackageInfo(
 									const PackageInfoRef& package,
 									bool fromCacheOnly);
 			void				_PopulatePackageInfo(
 									const PackageInfoRef& package,
 									const BMessage& data);
-			void				_PopulatePackageIcon(
-									const PackageInfoRef& package,
-									bool fromCacheOnly);
-			bool				_HasNativeIcon(const BMessage& message) const;
+			status_t			_PopulatePackageIcon(
+									const PackageInfoRef& package);
 			void				_PopulatePackageScreenshot(
 									const PackageInfoRef& package,
 									const ScreenshotInfo& info,
@@ -193,6 +193,8 @@ private:
 			BLocker				fLock;
 
 			DepotList			fDepots;
+
+			LocalIconStore		fLocalIconStore;
 
 			CategoryRef			fCategoryAudio;
 			CategoryRef			fCategoryBusiness;

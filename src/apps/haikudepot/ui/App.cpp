@@ -5,6 +5,7 @@
 
 
 #include "App.h"
+#include "ServerSettings.h"
 
 #include <stdio.h>
 
@@ -117,29 +118,113 @@ App::RefsReceived(BMessage* message)
 }
 
 
+enum arg_switch {
+	UNKNOWN_SWITCH,
+	NOT_SWITCH,
+	HELP_SWITCH,
+	WEB_APP_BASE_URL_SWITCH,
+	URL_CONNECTION_TRACE_LOGGING_SWITCH,
+};
+
+
+static void
+app_print_help()
+{
+	fprintf(stdout, "HaikuDepot ");
+	fprintf(stdout, "[-u|--webappbaseurl <web-app-base-url>] ");
+	fprintf(stdout, "[-h] ");
+	fprintf(stdout, "[-t|--urlconnectiontracelogging]\n");
+}
+
+
+static arg_switch
+app_resolve_switch(char *arg)
+{
+	int arglen = strlen(arg);
+
+	if (arglen > 0 && arg[0] == '-') {
+
+		if (arglen > 3 && arg[1] == '-') { // long form
+			if (0 == strcmp(&arg[2], "webappbaseurl"))
+				return WEB_APP_BASE_URL_SWITCH;
+
+			if (0 == strcmp(&arg[2], "help"))
+				return HELP_SWITCH;
+
+			if (0 == strcmp(&arg[2], "urlconnectiontracelogging"))
+				return URL_CONNECTION_TRACE_LOGGING_SWITCH;
+		} else {
+			if (arglen == 2) { // short form
+				switch (arg[1]) {
+					case 'u':
+						return WEB_APP_BASE_URL_SWITCH;
+
+					case 'h':
+						return HELP_SWITCH;
+
+					case 't':
+						return URL_CONNECTION_TRACE_LOGGING_SWITCH;
+				}
+			}
+		}
+
+		return UNKNOWN_SWITCH;
+	}
+
+	return NOT_SWITCH;
+}
+
+
 void
 App::ArgvReceived(int32 argc, char* argv[])
 {
 	for (int i = 1; i < argc;) {
-		if (0 == strcmp("--webappbaseurl", argv[i])) {
-			if (i == argc-1) {
-				fprintf(stderr, "unexpected end of arguments; missing web app base url\n");
+		switch (app_resolve_switch(argv[i])) {
+
+			case URL_CONNECTION_TRACE_LOGGING_SWITCH:
+				ServerSettings::EnableUrlConnectionTraceLogging();
+				break;
+
+			case HELP_SWITCH:
+				app_print_help();
 				Quit();
+				break;
+
+			case WEB_APP_BASE_URL_SWITCH:
+				if (i == argc-1) {
+					fprintf(stdout, "unexpected end of arguments; missing "
+						"web-app base url\n");
+					Quit();
+				}
+
+				if (ServerSettings::SetBaseUrl(argv[i + 1]) != B_OK) {
+					fprintf(stdout, "malformed web app base url; %s\n",
+						argv[i + 1]);
+					Quit();
+				}
+				else {
+					fprintf(stdout, "did configure the web base url; %s\n",
+						argv[i + 1]);
+				}
+
+				i++; // also move past the url value
+
+				break;
+
+			case NOT_SWITCH:
+			{
+				BEntry entry(argv[i], true);
+				_Open(entry);
+				break;
 			}
 
-			if (WebAppInterface::SetBaseUrl(argv[i + 1]) != B_OK) {
-				fprintf(stderr, "malformed web app base url; %s\n", argv[i + 1]);
+			case UNKNOWN_SWITCH:
+				fprintf(stdout, "unknown switch; %s\n", argv[i]);
 				Quit();
-			}
-			else
-				fprintf(stderr, "did configure the web base url; %s\n",argv[i + 1]);
-
-			i += 2;
-		} else {
-			BEntry entry(argv[i], true);
-			_Open(entry);
-			i++;
+				break;
 		}
+
+		i++; // move on at least one arg
 	}
 }
 

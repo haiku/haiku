@@ -1,10 +1,10 @@
 SubDir HAIKU_TOP src apps haikudepot ;
 
-UsePrivateHeaders interface shared package ;
+UsePrivateHeaders interface shared package support ;
 
 # source directories
 local sourceDirs =
-	edits_generic model textview ui ui_generic
+	edits_generic model textview ui ui_generic server tar util
 ;
 
 local sourceDir ;
@@ -49,6 +49,7 @@ Application HaikuDepot :
 	DecisionProvider.cpp
 	FeaturedPackagesView.cpp
 	FilterView.cpp
+	LocalIconStore.cpp
 	JobStateListener.cpp
 	LinkView.cpp
 	LinkedBitmapView.cpp
@@ -72,8 +73,22 @@ Application HaikuDepot :
 	ScrollableGroupView.cpp
 	SharedBitmap.cpp
 	UserLoginWindow.cpp
+	
+	# network + server
+	AbstractServerProcess.cpp
+	ServerSettings.cpp
 	WebAppInterface.cpp
-
+	ServerIconExportUpdateProcess.cpp
+	IconMetaData.cpp
+	
+	# tar
+	TarArchiveHeader.cpp
+	TarArchiveService.cpp
+	
+	#util
+	ToFileUrlProtocolListener.cpp
+	StorageUtils.cpp
+	
 	# package_daemon
 	ProblemWindow.cpp
 	ResultWindow.cpp

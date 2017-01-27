@@ -1,6 +1,6 @@
 /*
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>.
- * Copyright 2016, Andrew Lindesay <apl@lindesay.co.nz>.
+ * Copyright 2016-2017, Andrew Lindesay <apl@lindesay.co.nz>.
  * All rights reserved. Distributed under the terms of the MIT License.
  */
 
@@ -25,6 +25,7 @@
 #include "AutoLocker.h"
 #include "List.h"
 #include "PackageInfo.h"
+#include "ServerSettings.h"
 
 
 #define BASEURL_DEFAULT "https://depot.haiku-os.org"
@@ -186,43 +187,36 @@ private:
 
 class ProtocolListener : public BUrlProtocolListener {
 public:
-	ProtocolListener()
+	ProtocolListener(bool traceLogging)
 		:
 		fDownloadIO(NULL),
-		fDebug(false)
+		fTraceLogging(traceLogging)
+	{
+	}
+
+	virtual ~ProtocolListener()
 	{
 	}
 
 	virtual	void ConnectionOpened(BUrlRequest* caller)
 	{
-//		printf("ConnectionOpened(%p)\n", caller);
 	}
 
 	virtual void HostnameResolved(BUrlRequest* caller, const char* ip)
 	{
-//		printf("HostnameResolved(%p): %s\n", caller, ip);
 	}
 
 	virtual void ResponseStarted(BUrlRequest* caller)
 	{
-		if (fDebug)
-			printf("ResponseStarted(%p)\n", caller);
 	}
 
 	virtual void HeadersReceived(BUrlRequest* caller)
 	{
-		if (fDebug)
-			printf("HeadersReceived(%p)\n", caller);
 	}
 
 	virtual void DataReceived(BUrlRequest* caller, const char* data,
 		off_t position, ssize_t size)
 	{
-		if (fDebug) {
-			printf("DataReceived(%p): %ld bytes\n", caller, size);
-			printf("%.*s", (int)size, data);
-		}
-
 		if (fDownloadIO != NULL)
 			fDownloadIO->Write(data, size);
 	}
@@ -230,27 +224,22 @@ public:
 	virtual	void DownloadProgress(BUrlRequest* caller, ssize_t bytesReceived,
 		ssize_t bytesTotal)
 	{
-//		printf("DownloadProgress(%p): %ld/%ld\n", caller, bytesReceived,
-//			bytesTotal);
 	}
 
 	virtual void UploadProgress(BUrlRequest* caller, ssize_t bytesSent,
 		ssize_t bytesTotal)
 	{
-		if (fDebug)
-			printf("UploadProgress(%p): %ld/%ld\n", caller, bytesSent, bytesTotal);
 	}
 
 	virtual void RequestCompleted(BUrlRequest* caller, bool success)
 	{
-		if (fDebug)
-			printf("RequestCompleted(%p): %d\n", caller, success);
 	}
 
 	virtual void DebugMessage(BUrlRequest* caller,
 		BUrlProtocolDebugMessage type, const char* text)
 	{
-//		printf("DebugMessage(%p): %s\n", caller, text);
+		if (fTraceLogging)
+			printf("jrpc: %s\n", text);
 	}
 
 	void SetDownloadIO(BDataIO* downloadIO)
@@ -258,14 +247,9 @@ public:
 		fDownloadIO = downloadIO;
 	}
 
-	void SetDebug(bool debug)
-	{
-		fDebug = debug;
-	}
-
 private:
 	BDataIO*		fDownloadIO;
-	bool			fDebug;
+	bool			fTraceLogging;
 };
 
 
@@ -275,13 +259,8 @@ WebAppInterface::fRequestIndex = 0;
 
 enum {
 	NEEDS_AUTHORIZATION = 1 << 0,
-	ENABLE_DEBUG		= 1 << 1,
 };
 
-
-BString WebAppInterface::fBaseUrl = BString(BASEURL_DEFAULT);
-BString WebAppInterface::fUserAgent = BString();
-BLocker WebAppInterface::fUserAgentLocker;
 
 WebAppInterface::WebAppInterface()
 	:
@@ -324,108 +303,6 @@ WebAppInterface::SetAuthorization(const BString& username,
 {
 	fUsername = username;
 	fPassword = password;
-}
-
-
-static bool
-arguments_is_url_valid(const BString& value)
-{
-	if (value.Length() < 8) {
-		fprintf(stderr, "the url is less than 8 characters in length\n");
-		return false;
-	}
-
-	int32 schemeEnd = value.FindFirst("://");
-
-	if (schemeEnd < B_OK) {
-		fprintf(stderr, "the url does not contain the '://' string\n");
-		return false;
-	}
-
-	BString scheme;
-	value.CopyInto(scheme, 0, schemeEnd);
-
-	if (scheme != "http" && scheme != "https") {
-		fprintf(stderr, "the url scheme should be 'http' or 'https'\n");
-		return false;
-	}
-
-	if (value.Length() - 1 == value.FindLast("/")) {
-		fprintf(stderr, "the url should be be terminated with a '/'\n");
-		return false;
-	}
-
-	return true;
-}
-
-
-/*! This method will set the web app base URL, returning a status to
-    indicate if the URL was acceptable.
-    \return B_OK if the base URL was valid and B_BAD_VALUE if not.
- */
-status_t
-WebAppInterface::SetBaseUrl(const BString& url)
-{
-	if (!arguments_is_url_valid(url))
-		return B_BAD_VALUE;
-
-	fBaseUrl.SetTo(url);
-
-	return B_OK;
-}
-
-
-const BString
-WebAppInterface::_GetUserAgentVersionString()
-{
-	app_info info;
-
-	if (be_app->GetAppInfo(&info) != B_OK) {
-		fprintf(stderr, "Unable to get the application info\n");
-		be_app->Quit();
-		return BString(USERAGENT_FALLBACK_VERSION);
-	}
-
-	BFile file(&info.ref, B_READ_ONLY);
-
-	if (file.InitCheck() != B_OK) {
-		fprintf(stderr, "Unable to access the application info file\n");
-		be_app->Quit();
-		return BString(USERAGENT_FALLBACK_VERSION);
-	}
-
-	BAppFileInfo appFileInfo(&file);
-	version_info versionInfo;
-
-	if (appFileInfo.GetVersionInfo(
-		&versionInfo, B_APP_VERSION_KIND) != B_OK) {
-		fprintf(stderr, "Unable to establish the application version\n");
-		be_app->Quit();
-		return BString(USERAGENT_FALLBACK_VERSION);
-	}
-
-	BString result;
-	result.SetToFormat("%" B_PRId32 ".%" B_PRId32 ".%" B_PRId32,
-		versionInfo.major, versionInfo.middle, versionInfo.minor);
-	return result;
-}
-
-
-/*! This method will devise a suitable User-Agent header value that
-	can be transmitted with HTTP requests to the server in order
-	to identify this client.
- */
-const BString
-WebAppInterface::_GetUserAgent()
-{
-	AutoLocker<BLocker> lock(&fUserAgentLocker);
-
-	if (fUserAgent.IsEmpty()) {
-		fUserAgent.SetTo("HaikuDepot/");
-		fUserAgent.Append(_GetUserAgentVersionString());
-	}
-
-	return fUserAgent;
 }
 
 
@@ -509,7 +386,6 @@ WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
 				.AddArray("filter")
 					.AddItem("PKGCATEGORIES")
 					.AddItem("PKGSCREENSHOTS")
-					.AddItem("PKGICONS")
 					.AddItem("PKGVERSIONLOCALIZATIONDESCRIPTIONS")
 					.AddItem("PKGCHANGELOG")
 				.EndArray()
@@ -518,37 +394,6 @@ WebAppInterface::RetrieveBulkPackageInfo(const StringList& packageNames,
 	.End();
 
 	return _SendJsonRequest("pkg", jsonString, 0, message);
-}
-
-
-status_t
-WebAppInterface::RetrievePackageIcon(const BString& packageName,
-	BDataIO* stream)
-{
-	BString urlString = _FormFullUrl(BString("/__pkgicon/") << packageName
-		<< ".hvif");
-	bool isSecure = 0 == urlString.FindFirst("https://");
-
-	BUrl url(urlString);
-
-	ProtocolListener listener;
-	listener.SetDownloadIO(stream);
-
-	BHttpRequest request(url, isSecure, "HTTP", &listener);
-	request.SetMethod(B_HTTP_GET);
-
-	thread_id thread = request.Run();
-	wait_for_thread(thread, NULL);
-
-	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
-		request.Result());
-
-	int32 statusCode = result.StatusCode();
-
-	if (statusCode == 200)
-		return B_OK;
-
-	return B_ERROR;
 }
 
 
@@ -671,17 +516,18 @@ status_t
 WebAppInterface::RetrieveScreenshot(const BString& code,
 	int32 width, int32 height, BDataIO* stream)
 {
-	BString urlString = _FormFullUrl(BString("/__pkgscreenshot/") << code
+	BString urlString = ServerSettings::CreateFullUrl(BString("/__pkgscreenshot/") << code
 		<< ".png" << "?tw=" << width << "&th=" << height);
 	bool isSecure = 0 == urlString.FindFirst("https://");
 
 	BUrl url(urlString);
 
-	ProtocolListener listener;
+	ProtocolListener listener(
+		ServerSettings::UrlConnectionTraceLoggingEnabled());
 	listener.SetDownloadIO(stream);
 
 	BHttpHeaders headers;
-	headers.AddHeader("User-Agent", _GetUserAgent());
+	ServerSettings::AugmentHeaders(headers);
 
 	BHttpRequest request(url, isSecure, "HTTP", &listener);
 	request.SetMethod(B_HTTP_GET);
@@ -776,35 +622,24 @@ WebAppInterface::AuthenticateUser(const BString& nickName,
 // #pragma mark - private
 
 
-BString
-WebAppInterface::_FormFullUrl(const BString& suffix) const
-{
-	if (fBaseUrl.IsEmpty()) {
-		fprintf(stderr, "illegal state - missing web app base url\n");
-		exit(EXIT_FAILURE);
-	}
-
-	return BString(fBaseUrl) << suffix;
-}
-
-
 status_t
 WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	uint32 flags, BMessage& reply) const
 {
-	if ((flags & ENABLE_DEBUG) != 0)
+	if (ServerSettings::UrlConnectionTraceLoggingEnabled())
 		printf("_SendJsonRequest(%s)\n", jsonString.String());
 
-	BString urlString = _FormFullUrl(BString("/__api/v1/") << domain);
+	BString urlString = ServerSettings::CreateFullUrl(BString("/__api/v1/") << domain);
 	bool isSecure = 0 == urlString.FindFirst("https://");
 	BUrl url(urlString);
 
-	ProtocolListener listener;
+	ProtocolListener listener(
+		ServerSettings::UrlConnectionTraceLoggingEnabled());
 	BUrlContext context;
 
 	BHttpHeaders headers;
 	headers.AddHeader("Content-Type", "application/json");
-	headers.AddHeader("User-Agent", _GetUserAgent());
+	ServerSettings::AugmentHeaders(headers);
 
 	BHttpRequest request(url, isSecure, "HTTP", &listener, &context);
 	request.SetMethod(B_HTTP_POST);
@@ -827,7 +662,6 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 
 	BMallocIO replyData;
 	listener.SetDownloadIO(&replyData);
-	listener.SetDebug((flags & ENABLE_DEBUG) != 0);
 
 	thread_id thread = request.Run();
 	wait_for_thread(thread, NULL);
@@ -848,7 +682,8 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 
 	BJson parser;
 	status_t status = parser.Parse(reply, jsonString);
-	if ((flags & ENABLE_DEBUG) != 0 && status == B_BAD_DATA) {
+	if (ServerSettings::UrlConnectionTraceLoggingEnabled() &&
+		status == B_BAD_DATA) {
 		printf("Parser choked on JSON:\n%s\n", jsonString.String());
 	}
 	return status;
