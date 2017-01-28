@@ -604,7 +604,7 @@ SPAN.keywordtype   { color: #5c5f05; /* antique bronze */ }
 SPAN.keywordflow   { color: #e08000; /* mango tango */ }
 SPAN.comment       { color: #008000; /* japanese laurel */ }
 SPAN.preprocessor  { color: #806020; /* kumera */ }
-SPAN.stringliteral { color: blue; }
+SPAN.stringliteral { color: gray; }
 SPAN.charliteral   { color: #008080; /* teal */ }
 .search {
 	color: #003399; /* smalt */
