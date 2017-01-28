@@ -145,7 +145,7 @@
 	\class BTabView
 	\ingroup interface
 	\ingroup libbe
-	\brief Displays and manipulates styled text.
+	\brief A container for BTab objects to display all tabs.
 
 	\since BeOS R3
 */
@@ -253,16 +253,6 @@
 	       - \c B_TAB_FRONT
 	       - \c B_TAB_ANY
 	\param full Whether or not to completely draw the tab, no longer used.
-
-	\since BeOS R3
-*/
-
-
-/*!
-	\class BTabView
-	\ingroup interface
-	\ingroup libbe
-	\brief A container for BTab objects to display all tabs.
 
 	\since BeOS R3
 */
