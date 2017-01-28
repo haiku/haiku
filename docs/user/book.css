@@ -408,9 +408,8 @@ dl.note dd, dl.remark dd, dl.warning dd, dl.attention dd {
 }
 
 dl.note {
-	/* rice flower */
-	background:#e4ffde url('https://www.haiku-os.org/images/alert_info_32.png') 15px 15px no-repeat;
-	border-color: #94ce18; /* lima */
+	background: #deebff url('https://www.haiku-os.org/images/alert_info_32.png') 15px 15px no-repeat;
+	border-color: #183cce;
 }
 
 dl.remark {
