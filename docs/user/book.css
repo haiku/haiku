@@ -291,7 +291,7 @@ div.contents .mlabels-right {
 }
 div.contents code, div.contents .mlabel {
 	color: blue;
-	font-family: "Deja Vu Mono", Courier, "Courier New", monospace, fixed;
+	font-family: "Deja Vu Mono", Consolas, "Courier New", monospace, fixed;
 	font-weight: normal;
 	font-style: normal;
 }
@@ -551,7 +551,7 @@ div.fragment {
 	border: 1px solid #c0c0c0; /* silver */
 	padding: 4px;
 	color: black;
-	font-family: "Deja Vu Mono", Courier, "Courier New", monospace, fixed;
+	font-family: "Deja Vu Mono", Consolas, "Courier New", monospace, fixed;
 	font-weight: normal;
 	font-style: normal;
 	font-size: 13px;
@@ -638,6 +638,7 @@ table.memberdecls {
 
 table.memberdecls td.memItemLeft {
 	font-size: 13px;
+	font-family: "Deja Vu Mono", Consolas, "Courier New", monospace, fixed;
 	white-space: nowrap;
 	text-align: right;
 	padding: 6px 0px 4px 8px;
@@ -650,6 +651,7 @@ table.memberdecls td.memItemLeft {
 
 table.memberdecls td.memItemRight {
 	font-size: 13px;
+	font-family: "Deja Vu Mono", Consolas, "Courier New", monospace, fixed;
 	padding: 6px 8px 4px 0px;
 	margin: 4px;
 	vertical-align: top;
@@ -762,6 +764,7 @@ div.memproto {
 	padding: 4px;
 	background-color: #f3f3f3; /* concrete */
 	border: 1px solid #c0c0c0; /* silver */
+	font-family: "Deja Vu Mono", Consolas, "Courier New", monospace, fixed;
 }
 
 div.memproto table {
