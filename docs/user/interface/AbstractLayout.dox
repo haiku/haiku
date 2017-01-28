@@ -4,7 +4,7 @@
  *
  * Authors:
  *		Alex Wilson, yourpalal2@gmail.com
- * 
+ *
  * Corresponds to:
  *		headers/os/interface/AbstractLayout.h	rev 39055
  *		src/kits/inteface/AbstractLayout.cpp	rev 39055
@@ -13,7 +13,6 @@
 
 /*!
 	\class BAbstractLayout
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief BLayout subclass providing convenience methods for derived

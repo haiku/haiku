@@ -5,7 +5,7 @@
  * Authors:
  *		John Scipione, jscipione@gmail.com
  *		Ingo Weinhold, bonefish@cs.tu-berlin.de
- * 
+ *
  * Corresponds to:
  *		headers/os/interface/GroupLayoutBuilder.h	 rev 42274
  *		src/kits/interface/GroupLayoutBuilder.cpp	 rev 42274
@@ -14,7 +14,6 @@
 
 /*!
 	\file GroupLayoutBuilder.h
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief Provides the BLayoutBuilder::Group<> class.
@@ -25,7 +24,6 @@
 
 /*!
 	\class BLayoutBuilder::Group<>
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief BLayoutBuilder::Base subclass for building BGroupLayouts.

@@ -13,7 +13,6 @@
 
 /*!
 	\file TwoDimensionalLayout.h
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief Defines the BTwoDimensionalLayout class.
@@ -22,7 +21,6 @@
 
 /*!
 	\class BTwoDimensionalLayout
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief Abstract BLayout subclass arranging items within rows and columns.

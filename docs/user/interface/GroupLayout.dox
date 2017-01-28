@@ -13,7 +13,6 @@
 
 /*!
 	\file GroupLayout.h
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief Describes the BGroupLayout class.
@@ -22,7 +21,6 @@
 
 /*!
 	\class BGroupLayout
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief The BGroupLayout class is a simple BLayout subclass that
@@ -163,7 +161,7 @@
 		\a weight.
 
 	\since Haiku R1
-*/ 
+*/
 
 
 /*!

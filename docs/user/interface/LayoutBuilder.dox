@@ -13,7 +13,6 @@
 
 /*!
 	\file LayoutBuilder.h
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief Defines the BLayoutBuilder templates.
@@ -22,13 +21,12 @@
 
 /*!
 	\class BLayoutBuilder::Base<>
-	\ingroup interface
 	\ingroup layout
 	\brief Base for all other layout builders in the BLayoutBuilder namespace.
 
 	This class provides the stack-like semantics for its subclasses. The
 	BLayoutBuilder::Group, BLayoutBuilder::Grid and BLayoutBuilder::Split all
-	provide methods such as AddGrid() AddGroup() and AddSplit(), which 
+	provide methods such as AddGrid() AddGroup() and AddSplit(), which
 	make a new builder, place it on top of your builder stack and return it.
 	Now you are operating on the new builder. When you call	the End() method on
 	the new builder, you are returned the one you had previously been using. At
@@ -173,7 +171,7 @@ public:
 	inline	GroupBuilder		AddGroup(BGroupView* groupView,	int32 column,
 									int32 row, int32 columnCount = 1,
 									int32 rowCount = 1);
-	inline	GroupBuilder		AddGroup(BGroupLayout* groupLayout, 
+	inline	GroupBuilder		AddGroup(BGroupLayout* groupLayout,
 									int32 column, int32 row,
 									int32 columnCount = 1, int32 rowCount = 1);
 

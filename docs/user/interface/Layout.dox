@@ -13,7 +13,6 @@
 
 /*!
 	\file Layout.h
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief Defines the BLayout class.
@@ -22,7 +21,6 @@
 
 /*!
 	\class BLayout
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief The BLayout class provides an interface, and some basic

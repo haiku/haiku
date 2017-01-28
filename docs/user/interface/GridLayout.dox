@@ -13,7 +13,6 @@
 
 /*!
 	\file GridLayout.h
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief Provides the BGridLayout class.
@@ -22,7 +21,6 @@
 
 /*!
 	\class BGridLayout
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief The BGridLayout class a BLayout subclass that arranges the items it

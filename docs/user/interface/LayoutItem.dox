@@ -13,7 +13,6 @@
 
 /*!
 	\file LayoutItem.h
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief Describes the BLayoutItem class.
@@ -22,7 +21,6 @@
 
 /*!
 	\class BLayoutItem
-	\ingroup interface
 	\ingroup layout
 	\ingroup libbe
 	\brief Abstract class representing things that are positionable and
@@ -257,7 +255,7 @@
 	\fn BRect BLayoutItem::Frame() = 0
 	\brief Return the bounding frame of this item.
 
-	The returned BRect is in the coordinate system of the target view of the 
+	The returned BRect is in the coordinate system of the target view of the
 	BLayout this item belongs to.
 
 	\since Haiku R1
