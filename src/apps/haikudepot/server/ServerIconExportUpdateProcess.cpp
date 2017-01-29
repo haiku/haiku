@@ -210,12 +210,12 @@ ServerIconExportUpdateProcess::_Download(BPath& tarGzFilePath, const BUrl& url,
 
 		default:
 			if (0 == statusCode || 5 == (statusCode / 100)) {
-				fprintf(stdout, "error response from server; %zu --> "
+				fprintf(stdout, "error response from server; %" B_PRId32 " --> "
 					"retry...\n", statusCode);
 				return _Download(tarGzFilePath, url, redirects, failures + 1);
 			}
 
-			fprintf(stdout, "unexpected response from server; %zu\n",
+			fprintf(stdout, "unexpected response from server; %" B_PRId32 "\n",
 				statusCode);
 			return B_IO_ERROR;
 	}

@@ -106,7 +106,7 @@ TarArchiveService::_UnpackItem(BDataIO& tarDataIo,
 	BString entryFileName = header.GetFileName();
 	uint32 entryLength = header.GetLength();
 
-	fprintf(stdout, "will unpack item [%s] length [%zu]b\n",
+	fprintf(stdout, "will unpack item [%s] length [%" B_PRIu32 "]b\n",
 		entryFileName.String(), entryLength);
 
 	// if the path ends in "/" then it is a directory and there's no need to

@@ -927,7 +927,7 @@ Model::_PopulateAllPackagesIcons()
 		BAutolock locker(&fLock);
 
 		if (depotIndex > fDepots.CountItems()) {
-			fprintf(stdout, "did populate %ld packages' icons\n",
+			fprintf(stdout, "did populate %" B_PRId32 " packages' icons\n",
 				countIconsSet);
 			return;
 		}
