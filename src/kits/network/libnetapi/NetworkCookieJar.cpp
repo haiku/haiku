@@ -886,10 +886,10 @@ BNetworkCookieJar::UrlIterator::_FindNext()
 		fLastList->Unlock();
 
 	fLastList = fList;
-	if (fLastList)
-		fLastList->LockForReading();
-
 	if (fCookieJar->fCookieHashMap->Lock()) {
+		if (fLastList)
+			fLastList->LockForReading();
+
 		while (!_FindPath()) {
 			if (!_SuperDomain()) {
 				fElement = NULL;
