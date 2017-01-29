@@ -27,7 +27,8 @@ public:
 
 
 ArchUART8250::ArchUART8250(addr_t base, int64 clock)
-	: DebugUART8250(base, clock)
+	:
+	DebugUART8250(base, clock)
 {
 }
 

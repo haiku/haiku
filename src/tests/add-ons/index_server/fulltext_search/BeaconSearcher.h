@@ -23,10 +23,10 @@ using namespace lucene::analysis::standard ;
 
 class BeaconSearcher {
 	public:
-		BeaconSearcher() ;
-		~BeaconSearcher() ;
-		wchar_t* GetNextHit() ;
-		void Search(const char* query) ;
+							BeaconSearcher() ;
+							~BeaconSearcher() ;
+		wchar_t*			GetNextHit() ;
+		void				Search(const char* query) ;
 	
 	private:
 		BPath				GetIndexPath(BVolume *volume);

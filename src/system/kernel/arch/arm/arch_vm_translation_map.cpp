@@ -29,7 +29,7 @@ static union {
 	uint64	align;
 	char	thirty_two[sizeof(ARMPagingMethod32Bit)];
 	#if B_HAIKU_PHYSICAL_BITS == 64
-	char	pae[sizeof(ARMPagingMethodPAE)];
+		char	pae[sizeof(ARMPagingMethodPAE)];
 	#endif
 } sPagingMethodBuffer;
 

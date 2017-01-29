@@ -145,7 +145,8 @@ arch_int_init_post_vm(kernel_args *args)
 		B_READ_AREA | B_EXECUTE_AREA, sVectorPageArea);
 
 	if (sUserVectorPageArea < 0)
-		panic("user vector page @ %p could not be created (%lx)!", sVectorPageAddress, sUserVectorPageArea);
+		panic("user vector page @ %p could not be created (%lx)!",
+			sVectorPageAddress, sUserVectorPageArea);
 
 	// copy vectors into the newly created area
 	memcpy(sVectorPageAddress, &_vectors_start, VECTORPAGE_SIZE);

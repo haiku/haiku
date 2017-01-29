@@ -26,7 +26,6 @@ CatchUpAnalyser::CatchUpAnalyser(const BVolume& volume, time_t start,
 	time_t end, BHandler* manager)
 	:
 	AnalyserDispatcher("CatchUpAnalyser"),
-
 	fVolume(volume),
 	fStart(start),
 	fEnd(end),

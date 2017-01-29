@@ -146,7 +146,8 @@
 
 
 ArchUARTPL011::ArchUARTPL011(addr_t base, int64 clock)
-	: DebugUART(base, clock)
+	:
+	DebugUART(base, clock)
 {
 	Barrier();
 

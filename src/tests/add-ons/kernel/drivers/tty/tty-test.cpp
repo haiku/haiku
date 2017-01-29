@@ -407,7 +407,8 @@ open_tty(int index, bool master)
 	int fd = open(path, O_RDWR | (master ? 0 : O_NOCTTY));
 
 	if (fd < 0) {
-		fprintf(stderr, "Failed to open tty `%s': %s\n", path, strerror(errno));
+		fprintf(stderr, "Failed to open tty `%s': %s\n", path,
+			strerror(errno));
 		exit(1);
 	}
 
@@ -431,10 +432,11 @@ close_tty(int &fd)
 class TestUnblockOnCloseRead : public TestCase {
 public:
 	TestUnblockOnCloseRead(bool master, bool crossOver)
-		: fMaster(-1),
-		  fSlave(-1),
-		  fTestMaster(master),
-		  fCrossOver(crossOver)
+		:
+		fMaster(-1),
+		fSlave(-1),
+		fTestMaster(master),
+		fCrossOver(crossOver)
 	{
 		printf("TestUnblockOnCloseRead(%d, %d)\n", master, crossOver);
 	}
@@ -491,11 +493,12 @@ private:
 class TestUnblockOnCloseWrite : public TestCase {
 public:
 	TestUnblockOnCloseWrite(bool master, bool crossOver, bool echo)
-		: fMaster(-1),
-		  fSlave(-1),
-		  fTestMaster(master),
-		  fCrossOver(crossOver),
-		  fEcho(echo)
+		:
+		fMaster(-1),
+		fSlave(-1),
+		fTestMaster(master),
+		fCrossOver(crossOver),
+		fEcho(echo)
 	{
 		printf("TestUnblockOnCloseWrite(%d, %d, %d)\n", master, crossOver,
 			echo);
@@ -560,10 +563,11 @@ private:
 class TestSelectAlreadyReady : public TestCase {
 public:
 	TestSelectAlreadyReady(bool master, bool write)
-		: fMaster(-1),
-		  fSlave(-1),
-		  fTestMaster(master),
-		  fWrite(write)
+		:
+		fMaster(-1),
+		fSlave(-1),
+		fTestMaster(master),
+		fWrite(write)
 	{
 		printf("TestSelectAlreadyReady(%d, %d)\n", master, write);
 	}
@@ -694,11 +698,12 @@ private:
 class TestSelectNotifyAfterPending : public TestCase {
 public:
 	TestSelectNotifyAfterPending(bool master, bool write, bool unblock)
-		: fMaster(-1),
-		  fSlave(-1),
-		  fTestMaster(master),
-		  fWrite(write),
-		  fUnblock(unblock)
+		:
+		fMaster(-1),
+		fSlave(-1),
+		fTestMaster(master),
+		fWrite(write),
+		fUnblock(unblock)
 	{
 		printf("TestSelectNotifyAfterPending(%d, %d, %d)\n", master, write,
 			unblock);
@@ -808,9 +813,10 @@ private:
 class TestIoctlFIONRead : public TestCase {
 public:
 	TestIoctlFIONRead(bool master)
-		: fMaster(-1),
-		  fSlave(-1),
-		  fTestMaster(master)
+		:
+		fMaster(-1),
+		fSlave(-1),
+		fTestMaster(master)
 	{
 		printf("TestIoctlFIONRead(%d)\n", master);
 	}
@@ -835,20 +841,20 @@ protected:
 		errno = 0;
 		err = ioctl(fd, FIONREAD, NULL);
 		CHK(err == -1);
-printf("e: %s\n", strerror(errno));
+		printf("e: %s\n", strerror(errno));
 		// should be CHK(errno == EINVAL); !!
 		CHK(errno == EFAULT);
 
 		errno = 0;
 		err = ioctl(fd, FIONREAD, (void *)1);
 		CHK(err == -1);
-printf("e: %s\n", strerror(errno));
+		printf("e: %s\n", strerror(errno));
 		CHK(errno == EFAULT);
 
 		errno = 0;
 
 		err = ioctl(fd, FIONREAD, &toRead);
-printf("e: %s\n", strerror(errno));
+		printf("e: %s\n", strerror(errno));
 		//CHK(err == 0);
 		//CHK(toRead == 0);
 
@@ -857,7 +863,7 @@ printf("e: %s\n", strerror(errno));
 		errno = 0;
 
 		err = ioctl(fd, FIONREAD, &toRead);
-printf("e: %d\n", err);
+		printf("e: %d\n", err);
 		CHK(err == 0);
 		CHK(toRead == 1);
 

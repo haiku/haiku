@@ -3,8 +3,8 @@
  * Distributed under the terms of the MIT License.
  *
  * Authors:
- * 		François Revol <revol@free.fr>
- *              Ithamar R. Adema <ithamar@upgrade-android.com>
+ *		François Revol <revol@free.fr>
+ *		Ithamar R. Adema <ithamar@upgrade-android.com>
  *
  * Copyright 2001, Travis Geiselbrecht. All rights reserved.
  * Distributed under the terms of the NewOS License.

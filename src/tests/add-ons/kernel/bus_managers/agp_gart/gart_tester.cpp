@@ -181,10 +181,13 @@ test_gart()
 
 	addr_t base[5], physical[5];
 	allocate(aperture, 2 * B_PAGE_SIZE, 0, 0, base[0], physical[0]);
-	allocate(aperture, 4 * B_PAGE_SIZE, 0, B_APERTURE_NON_RESERVED, base[1], physical[1]);
-	allocate(aperture, 1 * B_PAGE_SIZE, 0, B_APERTURE_NEED_PHYSICAL, base[2], physical[2]);
+	allocate(aperture, 4 * B_PAGE_SIZE, 0, B_APERTURE_NON_RESERVED, base[1],
+		physical[1]);
+	allocate(aperture, 1 * B_PAGE_SIZE, 0, B_APERTURE_NEED_PHYSICAL, base[2],
+		physical[2]);
 	sGART->deallocate_memory(aperture, base[2]);
-	allocate(aperture, 1 * B_PAGE_SIZE, 4 * B_PAGE_SIZE, 0, base[2], physical[2]);
+	allocate(aperture, 1 * B_PAGE_SIZE, 4 * B_PAGE_SIZE, 0, base[2],
+		physical[2]);
 
 	sGART->deallocate_memory(aperture, base[1]);
 

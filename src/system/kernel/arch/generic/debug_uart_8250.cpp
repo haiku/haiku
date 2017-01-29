@@ -27,7 +27,8 @@
 
 
 DebugUART8250::DebugUART8250(addr_t base, int64 clock)
-	: DebugUART(base, clock)
+	:
+	DebugUART(base, clock)
 {
 }
 
@@ -35,6 +36,7 @@ DebugUART8250::DebugUART8250(addr_t base, int64 clock)
 DebugUART8250::~DebugUART8250()
 {
 }
+
 
 #define UART_RHR    0
 #define UART_THR    0

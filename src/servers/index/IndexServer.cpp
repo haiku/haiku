@@ -76,7 +76,6 @@ AnalyserMonitorHandler::AddOnDisabled(const add_on_entry_info* entryInfo)
 IndexServer::IndexServer()
 	:
 	BApplication("application/x-vnd.Haiku-index_server"),
-
 	fVolumeObserverHandler(this),
 	fAddOnMonitorHandler(this),
 	fPulseRunner(NULL)
