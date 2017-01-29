@@ -5,6 +5,8 @@
 
 #include "LocalIconStore.h"
 
+#include <stdio.h>
+
 #include <Directory.h>
 #include <FindDirectory.h>
 
