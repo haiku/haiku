@@ -1,9 +1,10 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2017 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Christophe Huriaux, c.huriaux@gmail.com
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
  */
 
 #include <iostream>
@@ -42,7 +43,7 @@ BUrlProtocolListener::ResponseStarted(BUrlRequest*)
 
 
 void
-BUrlProtocolListener::HeadersReceived(BUrlRequest*)
+BUrlProtocolListener::HeadersReceived(BUrlRequest*, const BUrlResult& result)
 {
 }
 

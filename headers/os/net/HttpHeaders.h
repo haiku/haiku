@@ -7,6 +7,7 @@
 
 
 #include <List.h>
+#include <Message.h>
 #include <String.h>
 
 
@@ -65,6 +66,10 @@ public:
 									const char* value);
 			bool				AddHeader(const char* name,
 									int32 value);
+
+	// Archiving
+			void				PopulateFromArchive(BMessage*);
+			void				Archive(BMessage*) const;
 
 	// Header deletion
 			void				Clear();

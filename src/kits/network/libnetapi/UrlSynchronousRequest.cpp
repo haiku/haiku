@@ -71,7 +71,7 @@ BUrlSynchronousRequest::ResponseStarted(BUrlRequest*)
 
 
 void
-BUrlSynchronousRequest::HeadersReceived(BUrlRequest*)
+BUrlSynchronousRequest::HeadersReceived(BUrlRequest*, const BUrlResult& result)
 {
 	PRINT(("SynchronousRequest::HeadersReceived()\n"));
 }

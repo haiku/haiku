@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2017 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_URL_PROTOCOL_LISTENER_H_
@@ -8,6 +8,8 @@
 
 #include <stddef.h>
 #include <cstdlib>
+
+#include <UrlResult.h>
 
 
 class BCertificate;
@@ -61,7 +63,8 @@ public:
 		Called when all the server response metadata (such as headers) have
 		been read and parsed.
 	*/
-	virtual void				HeadersReceived(BUrlRequest* caller);
+	virtual void				HeadersReceived(BUrlRequest* caller,
+									const BUrlResult& result);
 
 	/**
 		DataReceived(data, position, size)

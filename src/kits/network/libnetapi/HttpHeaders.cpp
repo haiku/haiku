@@ -245,6 +245,42 @@ BHttpHeaders::AddHeader(const char* name, int32 value)
 }
 
 
+// #pragma mark Archiving
+
+
+void
+BHttpHeaders::PopulateFromArchive(BMessage* archive)
+{
+	Clear();
+
+	int32 index = 0;
+	char* nameFound;
+	for(;;) {
+		if (archive->GetInfo(B_STRING_TYPE, index, &nameFound, NULL) != B_OK)
+			return;
+
+		BString value = archive->FindString(nameFound);
+		AddHeader(nameFound, value);
+
+		index++;
+	}
+}
+
+
+void
+BHttpHeaders::Archive(BMessage* message) const
+{
+	int32 count = CountHeaders();
+	int32 i;
+
+	for (i = 0; i < count; i++)
+	{
+		BHttpHeader& header = HeaderAt(i);
+		message->AddString(header.Name(), header.Value());
+	}
+}
+
+
 // #pragma mark Header deletion
 
 

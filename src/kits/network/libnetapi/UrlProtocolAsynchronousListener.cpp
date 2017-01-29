@@ -1,21 +1,27 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2017 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Christophe Huriaux, c.huriaux@gmail.com
+ *		Adrien Destugues, pulkomandy@pulkomandy.tk
  */
 
+
+#include <UrlProtocolAsynchronousListener.h>
 
 #include <new>
 
 #include <AppKit.h>
-#include <UrlProtocolAsynchronousListener.h>
+#include <Archivable.h>
 #include <Debug.h>
 #include <String.h>
+#include <UrlResult.h>
+
 
 extern const char* kUrlProtocolMessageType;
 extern const char* kUrlProtocolCaller;
+
 
 BUrlProtocolAsynchronousListener::BUrlProtocolAsynchronousListener(
 	bool transparent)
@@ -92,7 +98,14 @@ BUrlProtocolAsynchronousListener::MessageReceived(BMessage* message)
 			break;
 
 		case B_URL_PROTOCOL_HEADERS_RECEIVED:
-			HeadersReceived(caller);
+			{
+				BMessage archive;
+				message->FindMessage("url:result", &archive);
+				BUrlResult* result = dynamic_cast<BUrlResult*>(
+					instantiate_object(&archive));
+				HeadersReceived(caller, *result);
+				delete result;
+			}
 			break;
 
 		case B_URL_PROTOCOL_DATA_RECEIVED:

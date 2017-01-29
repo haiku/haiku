@@ -613,7 +613,7 @@ BHttpRequest::_MakeRequest()
 
 				//! ProtocolHook:HeadersReceived
 				if (fListener != NULL)
-					fListener->HeadersReceived(this);
+					fListener->HeadersReceived(this, fResult);
 
 				// Parse received cookies
 				if (fContext != NULL) {
@@ -696,8 +696,6 @@ BHttpRequest::_MakeRequest()
 						}
 
 						chunkSize = strtol(chunkHeader.String(), NULL, 16);
-						PRINT(("BHP[%p] Chunk %s=%ld\n", this,
-							chunkHeader.String(), chunkSize));
 						if (chunkSize == 0)
 							fRequestStatus = kRequestContentReceived;
 

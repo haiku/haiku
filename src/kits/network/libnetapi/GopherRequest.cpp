@@ -325,7 +325,6 @@ BGopherRequest::_ProtocolLoop()
 				// continue parsing the error text anyway
 				// but it won't look good
 			}
-			
 
 			// now we probably have correct data
 			dataValidated = true;
@@ -333,11 +332,6 @@ BGopherRequest::_ProtocolLoop()
 			//! ProtocolHook:ResponseStarted
 			if (fListener != NULL)
 				fListener->ResponseStarted(this);
-
-			// we don't really have headers but well...
-			//! ProtocolHook:HeadersReceived
-			if (fListener != NULL)
-				fListener->HeadersReceived(this);
 
 			// now we can assign MIME type if we know it
 			const char *mime = "application/octet-stream";
@@ -348,6 +342,11 @@ BGopherRequest::_ProtocolLoop()
 				}
 			}
 			fResult.SetContentType(mime);
+
+			// we don't really have headers but well...
+			//! ProtocolHook:HeadersReceived
+			if (fListener != NULL)
+				fListener->HeadersReceived(this, fResult);
 		}
 
 		if (_NeedsParsing())

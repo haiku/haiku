@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Haiku Inc. All rights reserved.
+ * Copyright 2010-2017 Haiku Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  */
 #ifndef _B_HTTP_RESULT_H_
@@ -22,12 +22,13 @@ class BHttpResult: public BUrlResult {
 			
 public:
 										BHttpResult(const BUrl& url);
+										BHttpResult(BMessage*);
 										BHttpResult(const BHttpResult& other);
 										~BHttpResult();
-	
+
 	// Result parameters modifications
 			void						SetUrl(const BUrl& url);
-		
+
 	// Result parameters access
 			const BUrl&					Url() const;
 			BString						ContentType() const;
@@ -37,13 +38,15 @@ public:
 			const BHttpHeaders&			Headers() const;
 			const BString&				StatusText() const;
 			int32						StatusCode() const;
-	
+
 	// Result tests
 			bool						HasHeaders() const;
-			
+
 	// Overloaded members
-			BHttpResult&					operator=(const BHttpResult& other);
-									
+			BHttpResult&				operator=(const BHttpResult& other);
+
+	virtual	status_t					Archive(BMessage*, bool) const;
+	static	BArchivable*				Instantiate(BMessage*);
 private:
 			BUrl						fUrl;
 			
