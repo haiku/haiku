@@ -1,6 +1,6 @@
 /*
  * Copyright 2009, Ingo Weinhold, ingo_weinhold@gmx.de.
- * Copyright 2011, Rene Gollent, rene@gollent.com.
+ * Copyright 2011-2017, Rene Gollent, rene@gollent.com.
  * Distributed under the terms of the MIT License.
  */
 
@@ -128,8 +128,9 @@ public:
 				if (thread->State() != THREAD_STATE_RUNNING) {
 					value.SetTo(thread->StoppedReasonInfo(),
 						B_VARIANT_DONT_COPY_DATA);
+					return true;
 				}
-				return true;
+				return false;
 			}
 			default:
 				return false;
