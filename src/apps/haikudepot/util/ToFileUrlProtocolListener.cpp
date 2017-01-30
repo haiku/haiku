@@ -45,7 +45,8 @@ ToFileUrlProtocolListener::ResponseStarted(BUrlRequest* caller)
 
 
 void
-ToFileUrlProtocolListener::HeadersReceived(BUrlRequest* caller)
+ToFileUrlProtocolListener::HeadersReceived(BUrlRequest* caller,
+	const BUrlResult& result)
 {
 }
 
@@ -67,6 +68,7 @@ ToFileUrlProtocolListener::DataReceived(BUrlRequest* caller, const char* data,
 			fprintf(stdout, "unable to write all of the data to the file\n");
 	}
 }
+
 
 void
 ToFileUrlProtocolListener::DownloadProgress(BUrlRequest* caller,

@@ -17,7 +17,8 @@ public:
 			void				HostnameResolved(BUrlRequest* caller,
 									const char* ip);
 			void				ResponseStarted(BUrlRequest* caller);
-			void				HeadersReceived(BUrlRequest* caller);
+			void				HeadersReceived(BUrlRequest* caller,
+									const BUrlResult& result);
 			void				DataReceived(BUrlRequest* caller,
 									const char* data, off_t position,
 									ssize_t size);
