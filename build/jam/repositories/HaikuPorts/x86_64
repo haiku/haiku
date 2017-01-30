@@ -150,6 +150,7 @@ RemotePackageRepository HaikuPorts
 	bafx-0.2.3-3
 	bash-4.4.005-2
 	bchunk-1.2.0-2
+	becasso-2.0-3
 	bepdf-2.0.1~beta1-2
 	bescreencapture-2.2.1-1
 	bescreencapture_inputfilter-2.2.1-1
@@ -1114,6 +1115,7 @@ RemotePackageRepository HaikuPorts
 	bash_completion
 	bash
 	bchunk
+	becasso
 	bepdf
 	bescreencapture
 	bin86
