@@ -60,7 +60,7 @@ ServerSettings::GetUserAgent()
 }
 
 
-const void
+void
 ServerSettings::_InitUserAgent()
 {
 	sUserAgent.SetTo("HaikuDepot/");

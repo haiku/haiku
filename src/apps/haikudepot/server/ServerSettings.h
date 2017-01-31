@@ -23,7 +23,7 @@ public:
 		static bool						UrlConnectionTraceLoggingEnabled();
 
 private:
-		static const void				_InitUserAgent();
+		static void						_InitUserAgent();
 		static const BString			_GetUserAgentVersionString();
 
 		static BUrl						sBaseUrl;
