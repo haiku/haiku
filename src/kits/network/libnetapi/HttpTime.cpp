@@ -145,7 +145,7 @@ BHttpTime::ToString(int8 format)
 	expirationTm.tm_mday = fDate.Date().Day();
 	expirationTm.tm_mon = fDate.Date().Month() - 1;
 	expirationTm.tm_year = fDate.Date().Year() - 1900;
-	expirationTm.tm_wday = 0;
+	expirationTm.tm_wday = fDate.Date().DayOfWeek();
 	expirationTm.tm_yday = 0;
 	expirationTm.tm_isdst = 0;
 

@@ -661,7 +661,7 @@ BDate::GetDate(int32* year, int32* month, int32* day) const
 
 
 /*!
-	Adds \c days to the current date. If the passed value is negativ it will
+	Adds \c days to the current date. If the passed value is negative it will
 	become earlier. If the current date is invalid, the \c days are not added.
 */
 void

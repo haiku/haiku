@@ -7,6 +7,7 @@
 #ifndef ICON_META_DATA_H
 #define ICON_META_DATA_H
 
+#include <DateTime.h>
 #include <File.h>
 #include <HttpHeaders.h>
 #include <Locker.h>
@@ -22,13 +23,17 @@
 class IconMetaData {
 public:
 			uint64_t					GetCreateTimestamp();
+			BDateTime					GetCreateTimestampAsDateTime();
 			void						SetCreateTimestamp(uint64_t value);
 
 			uint64_t					GetDataModifiedTimestamp();
+			BDateTime					GetDataModifiedTimestampAsDateTime();
 			void						SetDataModifiedTimestamp(
 											uint64_t value);
 
 private:
+			BDateTime					_CreateDateTime(
+											uint64_t millisSinceEpoc);
 			uint64_t					fCreateTimestamp;
 			uint64_t					fDataModifiedTimestamp;
 };

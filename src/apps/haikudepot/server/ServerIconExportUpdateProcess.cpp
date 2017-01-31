@@ -12,6 +12,7 @@
 
 #include <AutoDeleter.h>
 #include <HttpRequest.h>
+#include <HttpTime.h>
 #include <Json.h>
 #include <Url.h>
 #include <UrlProtocolRoster.h>
@@ -111,8 +112,14 @@ ServerIconExportUpdateProcess::_IfModifiedSinceHeaderValue(BString& headerValue,
 	status_t result = _PopulateIconMetaData(iconMetaData, iconMetaDataPath);
 
 	if (result == B_OK) {
-		_TimestampToRfc2822String(iconMetaData.GetDataModifiedTimestamp(),
-			headerValue);
+
+		// An example of this output would be; 'Fri, 24 Oct 2014 19:32:27 +0000'
+
+		BDateTime modifiedDateTime = iconMetaData
+			.GetDataModifiedTimestampAsDateTime();
+		BPrivate::BHttpTime modifiedHttpTime(modifiedDateTime);
+		headerValue.SetTo(modifiedHttpTime
+			.ToString(BPrivate::B_HTTP_TIME_FORMAT_COOKIE));
 	}
 
 	return result;
@@ -196,7 +203,7 @@ ServerIconExportUpdateProcess::_Download(BPath& tarGzFilePath, const BUrl& url,
 		const char *locationValue = responseHeaders["Location"];
 
 		if (locationValue != NULL && strlen(locationValue) != 0) {
-			BUrl location(locationValue);
+			BUrl location(result.Url(), locationValue);
 			fprintf(stdout, "will redirect to; %s\n",
 				location.UrlString().String());
 				return _Download(tarGzFilePath, location, redirects + 1, 0);
@@ -268,23 +275,5 @@ ServerIconExportUpdateProcess::_PopulateIconMetaData(IconMetaData& iconMetaData,
 		return _PopulateIconMetaData(iconMetaData, infoMetaDataStr);
 
 	return result;
-}
-
-
-/* The output format for this is suitable for use in the "If-Modified-Since"
- * header.  An example of this output would be;
- * 'Fri, 24 Oct 2014 19:32:27 +0000'
- */
-
-void
-ServerIconExportUpdateProcess::_TimestampToRfc2822String(
-	uint64_t timestampMillis,
-	BString& rfc2822String) const
-{
-	char output[256];
-	output[0] = 0;
-	time_t t = (timestampMillis / 1000);
-	strftime(output, 256, "%a, %d %b %Y %T %z", gmtime(&t));
-	rfc2822String.SetTo(output);
 }
 

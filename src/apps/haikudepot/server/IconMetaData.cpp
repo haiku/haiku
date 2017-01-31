@@ -6,10 +6,27 @@
 #include "IconMetaData.h"
 
 
+BDateTime
+IconMetaData::_CreateDateTime(uint64_t millisSinceEpoc)
+{
+	time_t secondsSinceEpoc = (millisSinceEpoc / 1000);
+	BDateTime result;
+	result.SetTime_t(secondsSinceEpoc);
+	return result;
+}
+
+
 uint64_t
 IconMetaData::GetCreateTimestamp()
 {
 	return fCreateTimestamp;
+}
+
+
+BDateTime
+IconMetaData::GetCreateTimestampAsDateTime()
+{
+	return _CreateDateTime(GetCreateTimestamp());
 }
 
 
@@ -32,3 +49,10 @@ IconMetaData::SetDataModifiedTimestamp(uint64_t value)
 {
 	fDataModifiedTimestamp = value;
 }
+
+BDateTime
+IconMetaData::GetDataModifiedTimestampAsDateTime()
+{
+	return _CreateDateTime(GetDataModifiedTimestamp());
+}
+

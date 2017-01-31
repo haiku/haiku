@@ -46,10 +46,6 @@ private:
 									IconMetaData& iconMetaData,
 									BMessage& message) const;
 
-			void				_TimestampToRfc2822String(
-									uint64_t timestampMillis,
-									BString& rfc2822String) const;
-
 			BString				fBaseUrl;
 			BPath				fLocalStorageDirectoryPath;
 
