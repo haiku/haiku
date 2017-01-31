@@ -195,7 +195,7 @@ ServerIconExportUpdateProcess::_Download(BPath& tarGzFilePath, const BUrl& url,
 		const BHttpHeaders responseHeaders = result.Headers();
 		const char *locationValue = responseHeaders["Location"];
 
-		if (NULL != locationValue && 0 != strlen(locationValue)) {
+		if (locationValue != NULL && strlen(locationValue) != 0) {
 			BUrl location(locationValue);
 			fprintf(stdout, "will redirect to; %s\n",
 				location.UrlString().String());
@@ -205,7 +205,7 @@ ServerIconExportUpdateProcess::_Download(BPath& tarGzFilePath, const BUrl& url,
 		fprintf(stdout, "unable to find 'Location' header for redirect\n");
 		return B_IO_ERROR;
 	} else {
-		if (0 == statusCode || 5 == (statusCode / 100)) {
+		if (statusCode == 0 || (statusCode / 100) == 5) {
 			fprintf(stdout, "error response from server; %" B_PRId32 " --> "
 				"retry...\n", statusCode);
 			return _Download(tarGzFilePath, url, redirects, failures + 1);
