@@ -197,7 +197,7 @@ App::ArgvReceived(int32 argc, char* argv[])
 					Quit();
 				}
 
-				if (ServerSettings::SetBaseUrl(argv[i + 1]) != B_OK) {
+				if (ServerSettings::SetBaseUrl(BUrl(argv[i + 1])) != B_OK) {
 					fprintf(stdout, "malformed web app base url; %s\n",
 						argv[i + 1]);
 					Quit();

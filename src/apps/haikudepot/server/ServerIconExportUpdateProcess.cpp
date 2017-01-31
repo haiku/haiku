@@ -10,9 +10,11 @@
 #include <sys/stat.h>
 #include <time.h>
 
+#include <AutoDeleter.h>
 #include <HttpRequest.h>
 #include <Json.h>
 #include <Url.h>
+#include <UrlProtocolRoster.h>
 #include <support/ZlibCompressionAlgorithm.h>
 
 #include "ServerSettings.h"
@@ -130,8 +132,8 @@ ServerIconExportUpdateProcess::_IfModifiedSinceHeaderValue(BString& headerValue)
 status_t
 ServerIconExportUpdateProcess::_Download(BPath& tarGzFilePath)
 {
-	BString urlString = ServerSettings::CreateFullUrl("/__pkgicon/all.tar.gz");
-	return _Download(tarGzFilePath, BUrl(urlString), 0, 0);
+	return _Download(tarGzFilePath,
+		ServerSettings::CreateFullUrl("/__pkgicon/all.tar.gz"), 0, 0);
 }
 
 
@@ -152,10 +154,8 @@ ServerIconExportUpdateProcess::_Download(BPath& tarGzFilePath, const BUrl& url,
 	fprintf(stdout, "will stream '%s' to [%s]\n", url.UrlString().String(),
 		tarGzFilePath.Path());
 
-	bool isSecure = url.Protocol() == BString("https");
 	ToFileUrlProtocolListener listener(tarGzFilePath, "icon-export",
 		ServerSettings::UrlConnectionTraceLoggingEnabled());
-	BUrlContext context;
 
 	BHttpHeaders headers;
 	ServerSettings::AugmentHeaders(headers);
@@ -169,55 +169,51 @@ ServerIconExportUpdateProcess::_Download(BPath& tarGzFilePath, const BUrl& url,
 		headers.AddHeader("If-Modified-Since", ifModifiedSinceHeader);
 	}
 
-	BHttpRequest request(url, isSecure, "HTTP", &listener, &context);
-	request.SetMethod(B_HTTP_GET);
-	request.SetHeaders(headers);
-	request.SetTimeout(TIMEOUT_MICROSECONDS);
+	BHttpRequest *request = dynamic_cast<BHttpRequest *>(
+		BUrlProtocolRoster::MakeRequest(url, &listener));
+	ObjectDeleter<BHttpRequest> requestDeleter(request);
+	request->SetHeaders(headers);
+	request->SetMaxRedirections(0);
+	request->SetTimeout(TIMEOUT_MICROSECONDS);
 
-	thread_id thread = request.Run();
+	thread_id thread = request->Run();
 	wait_for_thread(thread, NULL);
 
 	const BHttpResult& result = dynamic_cast<const BHttpResult&>(
-		request.Result());
+		request->Result());
 
 	int32 statusCode = result.StatusCode();
 
-	switch (statusCode) {
-		case HTTP_STATUS_OK:
-			fprintf(stdout, "did complete streaming data\n");
-			return B_OK;
+	if (BHttpRequest::IsSuccessStatusCode(statusCode)) {
+		fprintf(stdout, "did complete streaming data\n");
+		return B_OK;
+	} else if (statusCode == HTTP_STATUS_NOT_MODIFIED) {
+		fprintf(stdout, "remote data has not changed since [%s]\n",
+			ifModifiedSinceHeader.String());
+		return APP_ERR_NOT_MODIFIED;
+	} else if (BHttpRequest::IsRedirectionStatusCode(statusCode)) {
+		const BHttpHeaders responseHeaders = result.Headers();
+		const char *locationValue = responseHeaders["Location"];
 
-		case HTTP_STATUS_NOT_MODIFIED:
-			fprintf(stdout, "remote data has not changed since [%s]\n",
-				ifModifiedSinceHeader.String());
-			return APP_ERR_NOT_MODIFIED;
-
-		case HTTP_STATUS_FOUND: // redirect
-		{
-			const BHttpHeaders responseHeaders = result.Headers();
-			const char *locationValue = responseHeaders["Location"];
-
-			if (NULL != locationValue && 0 != strlen(locationValue)) {
-				BUrl location(locationValue);
-				fprintf(stdout, "will redirect to; %s\n",
-					location.UrlString().String());
+		if (NULL != locationValue && 0 != strlen(locationValue)) {
+			BUrl location(locationValue);
+			fprintf(stdout, "will redirect to; %s\n",
+				location.UrlString().String());
 				return _Download(tarGzFilePath, location, redirects + 1, 0);
-			}
-
-			fprintf(stdout, "unable to find 'Location' header for redirect\n");
-			return B_IO_ERROR;
 		}
 
-		default:
-			if (0 == statusCode || 5 == (statusCode / 100)) {
-				fprintf(stdout, "error response from server; %" B_PRId32 " --> "
-					"retry...\n", statusCode);
-				return _Download(tarGzFilePath, url, redirects, failures + 1);
-			}
+		fprintf(stdout, "unable to find 'Location' header for redirect\n");
+		return B_IO_ERROR;
+	} else {
+		if (0 == statusCode || 5 == (statusCode / 100)) {
+			fprintf(stdout, "error response from server; %" B_PRId32 " --> "
+				"retry...\n", statusCode);
+			return _Download(tarGzFilePath, url, redirects, failures + 1);
+		}
 
-			fprintf(stdout, "unexpected response from server; %" B_PRId32 "\n",
-				statusCode);
-			return B_IO_ERROR;
+		fprintf(stdout, "unexpected response from server; %" B_PRId32 "\n",
+			statusCode);
+		return B_IO_ERROR;
 	}
 }
 

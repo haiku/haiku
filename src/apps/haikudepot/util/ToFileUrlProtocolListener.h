@@ -33,9 +33,10 @@ public:
 									const char* text);
 
 private:
+			bool				fShouldDownload;
 			bool				fTraceLogging;
 			BString				fTraceLoggingIdentifier;
-			BDataIO*			fDownloadIO;
+			BPositionIO*		fDownloadIO;
 
 
 };

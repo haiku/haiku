@@ -516,11 +516,11 @@ status_t
 WebAppInterface::RetrieveScreenshot(const BString& code,
 	int32 width, int32 height, BDataIO* stream)
 {
-	BString urlString = ServerSettings::CreateFullUrl(BString("/__pkgscreenshot/") << code
-		<< ".png" << "?tw=" << width << "&th=" << height);
-	bool isSecure = 0 == urlString.FindFirst("https://");
+	BUrl url = ServerSettings::CreateFullUrl(
+		BString("/__pkgscreenshot/") << code << ".png" << "?tw="
+			<< width << "&th=" << height);
 
-	BUrl url(urlString);
+	bool isSecure = url.Protocol() == "https";
 
 	ProtocolListener listener(
 		ServerSettings::UrlConnectionTraceLoggingEnabled());
@@ -545,7 +545,7 @@ WebAppInterface::RetrieveScreenshot(const BString& code,
 		return B_OK;
 
 	fprintf(stderr, "failed to get screenshot from '%s': %" B_PRIi32 "\n",
-		urlString.String(), statusCode);
+		url.UrlString().String(), statusCode);
 	return B_ERROR;
 }
 
@@ -629,9 +629,8 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	if (ServerSettings::UrlConnectionTraceLoggingEnabled())
 		printf("_SendJsonRequest(%s)\n", jsonString.String());
 
-	BString urlString = ServerSettings::CreateFullUrl(BString("/__api/v1/") << domain);
-	bool isSecure = 0 == urlString.FindFirst("https://");
-	BUrl url(urlString);
+	BUrl url = ServerSettings::CreateFullUrl(BString("/__api/v1/") << domain);
+	bool isSecure = url.Protocol() == "https";
 
 	ProtocolListener listener(
 		ServerSettings::UrlConnectionTraceLoggingEnabled());

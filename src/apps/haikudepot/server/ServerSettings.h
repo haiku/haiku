@@ -8,27 +8,28 @@
 
 #include <File.h>
 #include <HttpHeaders.h>
-#include <Locker.h>
 #include <String.h>
+#include <Url.h>
 
 
 class ServerSettings {
 public:
-		static status_t					SetBaseUrl(const BString& baseUrl);
+		static status_t					SetBaseUrl(const BUrl& baseUrl);
 		static const BString			GetUserAgent();
 		static void						AugmentHeaders(BHttpHeaders& headers);
-		static BString					CreateFullUrl(
+		static BUrl						CreateFullUrl(
 											const BString urlPathComponents);
 		static void						EnableUrlConnectionTraceLogging();
 		static bool						UrlConnectionTraceLoggingEnabled();
 
 private:
+		static const void				_InitUserAgent();
 		static const BString			_GetUserAgentVersionString();
 
-		static BString					fBaseUrl;
-		static BString					fUserAgent;
-		static BLocker					fUserAgentLocker;
-		static bool						fUrlConnectionTraceLogging;
+		static BUrl						sBaseUrl;
+		static BString					sUserAgent;
+		static pthread_once_t			sUserAgentInitOnce;
+		static bool						sUrlConnectionTraceLogging;
 };
 
 #endif // SERVER_SETTINGS_H

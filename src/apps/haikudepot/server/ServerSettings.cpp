@@ -13,74 +13,69 @@
 #include <Roster.h>
 #include <Url.h>
 
-#include "AutoLocker.h"
-
 
 #define BASEURL_DEFAULT "https://depot.haiku-os.org"
 #define USERAGENT_FALLBACK_VERSION "0.0.0"
 
 
-BString ServerSettings::fBaseUrl = BString(BASEURL_DEFAULT);
-BString ServerSettings::fUserAgent = BString();
-BLocker ServerSettings::fUserAgentLocker;
-bool ServerSettings::fUrlConnectionTraceLogging = false;
+BUrl ServerSettings::sBaseUrl = BUrl(BASEURL_DEFAULT);
+BString ServerSettings::sUserAgent = BString();
+pthread_once_t ServerSettings::sUserAgentInitOnce = PTHREAD_ONCE_INIT;
+bool ServerSettings::sUrlConnectionTraceLogging = false;
 
 
 status_t
-ServerSettings::SetBaseUrl(const BString& value)
+ServerSettings::SetBaseUrl(const BUrl& value)
 {
-	BUrl url(value);
-
-	if (!url.IsValid()) {
+	if (!value.IsValid()) {
 		fprintf(stderr, "the url is not valid\n");
 		return B_BAD_VALUE;
 	}
 
-	if (url.Protocol() != "http" && url.Protocol() != "https") {
+	if (value.Protocol() != "http" && value.Protocol() != "https") {
 		fprintf(stderr, "the url protocol must be 'http' or 'https'\n");
 		return B_BAD_VALUE;
 	}
 
-	fBaseUrl.SetTo(value);
-
-	if (fBaseUrl.EndsWith("/")) {
-		fprintf(stderr, "will remove trailing '/' character in url base\n");
-		fBaseUrl.Remove(fBaseUrl.Length() - 1, 1);
-	}
+	sBaseUrl = value;
 
 	return B_OK;
 }
 
 
-BString
+BUrl
 ServerSettings::CreateFullUrl(const BString urlPathComponents)
 {
-	return BString(fBaseUrl) << urlPathComponents;
+	return BUrl(sBaseUrl, urlPathComponents);
 }
 
 
 const BString
 ServerSettings::GetUserAgent()
 {
-	AutoLocker<BLocker> lock(&fUserAgentLocker);
+	if (sUserAgent.IsEmpty())
+		pthread_once(&sUserAgentInitOnce, &ServerSettings::_InitUserAgent);
 
-	if (fUserAgent.IsEmpty()) {
-		fUserAgent.SetTo("HaikuDepot/");
-		fUserAgent.Append(_GetUserAgentVersionString());
-	}
+	return sUserAgent;
+}
 
-	return fUserAgent;
+
+const void
+ServerSettings::_InitUserAgent()
+{
+	sUserAgent.SetTo("HaikuDepot/");
+	sUserAgent.Append(_GetUserAgentVersionString());
 }
 
 
 void
 ServerSettings::EnableUrlConnectionTraceLogging() {
-	fUrlConnectionTraceLogging = true;
+	sUrlConnectionTraceLogging = true;
 }
 
 bool
 ServerSettings::UrlConnectionTraceLoggingEnabled() {
-	return fUrlConnectionTraceLogging;
+	return sUrlConnectionTraceLogging;
 }
 
 

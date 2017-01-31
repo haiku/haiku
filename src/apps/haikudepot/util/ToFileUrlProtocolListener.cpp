@@ -6,6 +6,7 @@
 #include "ToFileUrlProtocolListener.h"
 
 #include <File.h>
+#include <HttpRequest.h>
 
 #include <stdio.h>
 
@@ -16,6 +17,7 @@ ToFileUrlProtocolListener::ToFileUrlProtocolListener(BPath path,
 	fDownloadIO = new BFile(path.Path(), O_WRONLY | O_CREAT);
 	fTraceLoggingIdentifier = traceLoggingIdentifier;
 	fTraceLogging = traceLogging;
+	fShouldDownload = true;
 }
 
 
@@ -48,6 +50,19 @@ void
 ToFileUrlProtocolListener::HeadersReceived(BUrlRequest* caller,
 	const BUrlResult& result)
 {
+
+	// check that the status code is success.  Only if it is successful
+	// should the payload be streamed to the file.
+
+	const BHttpResult& httpResult = dynamic_cast<const BHttpResult&>(result);
+	int32 statusCode = httpResult.StatusCode();
+
+	if (!BHttpRequest::IsSuccessStatusCode(statusCode)) {
+		fprintf(stdout, "received %" B_PRId32
+			" --> will not store download to file\n", statusCode);
+		fShouldDownload = false;
+	}
+
 }
 
 
@@ -55,12 +70,13 @@ void
 ToFileUrlProtocolListener::DataReceived(BUrlRequest* caller, const char* data,
 	off_t position, ssize_t size)
 {
-	if (fDownloadIO != NULL && size > 0) {
+	if (fShouldDownload && fDownloadIO != NULL && size > 0) {
 		size_t remaining = size;
 		size_t written = 0;
 
 		do {
-			written = fDownloadIO->Write(&data[size - remaining], remaining);
+			written = fDownloadIO->WriteAt(position, &data[size - remaining],
+				remaining);
 			remaining -= written;
 		} while (remaining > 0 && written > 0);
 
