@@ -13,6 +13,8 @@
  *		Rodastahm Islamov
  *		Michael Smirnov
  *		Diver
+ *		Akuji
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -63,15 +65,16 @@
 
 <h1>Загрузчик (Boot Loader)</h1>
 
-<p>Haiku's Boot Loader can help when you experience hardware related problems or want to choose which Haiku installation to start, if you have more than one (maybe on an installation CD or USB stick). It's also handy if you have installed a software component that acts up and prevents you from booting Haiku, see <a href="#troubleshooting">Troubleshooting</a> below.</p>
+<p>Загрузчик Haiku может помочь решить аппаратные проблемы или выбрать, какую из систем запустить для установки, если у вас более одной копии Haiku (установочный CD или USB-флэшка). Загрузчик также полезен в случае, когда установленный программный компонент препятствует успешной загрузке системы, о чем подробнее написано в <a href="#troubleshooting">Исправлении проблем</a>.</p>
 <p>Для того чтобы зайти в настройки загрузчика, необходимо нажать и удерживать клавишу <span class="key">SHIFT</span> до начала загрузки Haiku. Если загрузчик установлен, то вы можете начать удерживать <span class="key">SHIFT</span> перед выбором загрузочной записи Haiku, а если она является единственной операционной системой на компьютере, то вы можете начать удерживать клавишу во время стартовых сообщений BIOS.</p>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="options" name="options">Boot Loader Options</a></h2>
+<a id="options" name="options">Опции загрузчика</a></h2>
 <p>Вы увидите три пункта меню:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Выбор загрузочного раздела <br />(Select boot volume)</b></td><td> </td><td>Choose which Haiku installation/version to start.</td></tr>
-<tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
+<tr><td><b>Выбор загрузочного раздела <br />(Select boot volume)</b></td><td> </td><td>Выбор конкретной инсталляции/версии Haiku для старта.</td></tr>
+<tr><td><b>Выбор опций безопасного режима <br />(Select safe mode options)</b><br />
+</td><td> </td><td>Здесь находится несколько опций, которые могут помочь с решением аппаратных проблем или же побороть нестабильную работу системы в случае некорректно ведущего себя адд-она. При выборе опции в нижней части экрана отображается её краткое описание.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
 		Puts the system into safe mode. This can be enabled independently from the other options.</p>
@@ -98,7 +101,7 @@
 		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
 	<p><span class="menu">Blacklist entries</span><br />
 		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
-<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
 		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
@@ -123,8 +126,8 @@
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
-<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../welcome/en/bugreports.html">bug report</a> in any case.</p>
+<a id="troubleshooting" name="troubleshooting">Исправление проблем</a></h2>
+<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../../welcome/en/bugreports.html">bug report</a> in any case.</p>
 <p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
 <ul>
 <li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootScript from being started.</p></li>
@@ -136,7 +139,7 @@ So, if you encounter boot problems after installing some package, boot a Haiku v
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="booting" name="booting">Booting Haiku</a></h2>
+<a id="booting" name="booting">Загрузка Haiku</a></h2>
 <p>После активации одной или более опций вернитесь в главное меню и продолжите загрузку. Далее вы увидите загрузочный экран:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
@@ -149,7 +152,7 @@ So, if you encounter boot problems after installing some package, boot a Haiku v
 	<tr><td><b>Загрузочные диск</b></td><td> </td><td>Монтирование загрузочного диска.</td></tr>
 	<tr><td><b>Чип</b></td><td> </td><td>Загрузка модулей процессора.</td></tr>
 	<tr><td><b>Папка</b></td><td> </td><td>Финальная инициализация подсистем.</td></tr>
-	<tr><td><b>Ракета</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
+	<tr><td><b>Ракета</b></td><td> </td><td>Демон загрузки Launch_daemon запускает систему.</td></tr>
 </table>
 
 </div>

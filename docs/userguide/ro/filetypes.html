@@ -16,7 +16,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Tipuri de fișiere</title>
+	<title>Filetypes</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -58,7 +58,7 @@
 <div>
 <div class="box-info">Traducerea acestei pagini nu este completă încă. Până când va fi, părțile incomplete utilizează originalul în limba engleză.</div>
 
-<h1>Tipuri de fișiere</h1>
+<h1>Filetypes</h1>
 
 <p>Other than Windows, Haiku doesn't rely on the 3-letter file extension for a file type (e.g. .txt, .jpg, .mp3). This method is only a last resort fallback. Haiku uses <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> types just like it's custom on the internet.</p>
 <div class="box-info">While there's no reason to use file extensions in Haiku, remember to add them to files you want to share with users of other operating systems, e.g. over email, uploading to a server or via exchange of an USB drive. Otherwise their system may not recognize the file type.</div>
@@ -73,8 +73,8 @@
 <a name="filetype" id="filetype">Tipul de fișier</a></h3>
 <p>The above is a PNG file, it's MIME string image/png. Let's say you definitely know that it's not a PNG but a GIF. You can change that either by entering the correct MIME string by hand or with one of the two buttons below the textbox:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="button">Select...</span></td><td> </td><td>shows a hierarchical list of filetypes where you navigate to <tt>image | GIF Image</tt>.</td></tr>
-<tr><td><span class="button">Same as...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the filetype you're looking for.</td></tr>
+<tr><td><span class="button">Selectare...</span></td><td> </td><td>afișează o listă ierarhică de tipuri de fișier unde navigați la <tt>imagine | Imagine GIF</tt>.</td></tr>
+<tr><td><span class="button">La fel ca...</span></td><td> </td><td>deschide un dialog de fișier unde alegeți orice fișier care are deja tipul de fișier pe care îl căutați.</td></tr>
 </table>
 
 <h3>
@@ -95,20 +95,20 @@
 <p>If you invoke the <span class="app">Filetype add-on</span> on an executable (here: <span class="app">StyledEdit</span>), you'll get a different dialog:</p>
 <img src="images/filetypes-images/filetype-addon-stylededit.png" alt="filetype-addon-stylededit.png" />
 <p>On top, you'll see, instead of a standardized MIME string, the unique application signature. With it, the system finds the program wherever it's installed.</p>
-<p>Below it are several flags, controlling the app's behaviour:</p>
+<p>Mai jos sunt câteva marcaje, care controlează comportamentul aplicației:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><span class="menu">Single launch</span></td><td> </td><td>Only one instance of the app can be running per executable file. If you have two copies of that app, however, they can run side by side.</td></tr>
-<tr><td><span class="menu">Multiple launch</span></td><td> </td><td>Many instances of the app can run simultaneously.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Exclusive launch</span></td><td> </td><td>Really only one instance with that app's signature is allowed to run at a time.</td></tr>
-<tr><td><span class="menu">Args only</span></td><td> </td><td>Indicates the app doesn't respond to messages.</td></tr>
-<tr><td><span class="menu">Background app</span></td><td> </td><td>The app won't appear in <a href="twitcher.html">Twitcher</a> or the list of running apps of the Deskbar.</td></tr>
+<tr><td><span class="menu">Lansare unică</span></td><td> </td><td>Only one instance of the app can be running per executable file. If you have two copies of that app, however, they can run side by side.</td></tr>
+<tr><td><span class="menu">Lansare multiplă</span></td><td> </td><td>Multe instanțe ale aplicației pot rula simultan.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Lansare exclusivă</span></td><td> </td><td>Really only one instance with that app's signature is allowed to run at a time.</td></tr>
+<tr><td><span class="menu">Doar argumente</span></td><td> </td><td>Indică faptul că aplicația nu răspunde la mesaje.</td></tr>
+<tr><td><span class="menu">Aplicație plan secund</span></td><td> </td><td>The app won't appear in <a href="twitcher.html">Twitcher</a> or the list of running apps of the Deskbar.</td></tr>
 </table>
 <p>Then there's the list of supported filetypes. You can add (and remove) filetypes if you think the application can handle them. As a consequence, the app will appear in the menu for preferred applications or Tracker's <span class="menu">Open with...</span> context menu when you right-click on a file of that type.</p>
 <p>At the bottom are version and copyright information. Like the application signature, they are filled in by the app's author and shouldn't be altered.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filetypes-preferences" name="filetypes-preferences">Global settings with the FileTypes Preferences</a></h2>
+<a id="filetypes-preferences" name="filetypes-preferences">Configurări globale cu perferințele FileTypes</a></h2>
 <p>The <span class="app">FileTypes</span> preferences don't deal with individual files but with global settings of filetypes. You can change default icons and preferred applications or add, remove, or alter attributes of whole filetypes. You can even create your own filetype from scratch.</p>
 <p>All filetypes and their configurations are stored in <span class="path">/boot/home/config/settings/beos_mime/</span>. Before you start experimenting, it may be prudent to make a backup of that folder...</p>
 <p>To learn more about the <span class="app">FileTypes</span> preferences see the workshop: <a href="workshop-filetypes+attributes.html">Filetypes, Attributes, Index and Queries</a>.</p>

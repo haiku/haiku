@@ -127,6 +127,11 @@ Voici par exemple comment ajouter <span class="app">Screenshot</span> avec diver
 </td></tr>
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">diskimage</span> vous permet d'inscrire un ficher ordinaire en tant que periphérique disque. Par exemple, vous pouvez inscrire l'image disque "anyboot" d'Haiku, puis monter le volume qu'elle contient dans le Tracker et copier, éditer ou supprimer les fichiers avant de l'utiliser comme source dans le programme d'installation.</p></td></tr>
+<tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>The launch_daemon starts all sorts of services and applications at boot-up. For some it was instructed to re-start them if they were quit. If you don't want that – maybe you'd like to test a modified Tracker, for example – you use <span class="cli">launch_roster</span> to <tt>stop</tt> the re-starting of the application before quitting it. Similarly, you can <tt>start</tt> it again or get <tt>info</tt> about it. Without parameter, <span class="cli">launch_roster</span> lists all apps/services that are under its control.<br />
+For example, this will stop the re-launching of the Deskbar:</p>
+<pre class="terminal">launch_roster stop x-vnd.be-tskb</pre>
+</td></tr>
 <tr><td><p><span class="cli">mountvolume</span><br /><span class="cli">mount</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">mountvolume</span> is preferred by many to mount local partitions and disks, because its usage is so easy: just call it with the name of the partition and you're done. Try <tt>--help</tt> for more options.</p>
 <p><span class="cli">mount</span> can additionally mount remote disks by using a network filesystem, like NFS4. You specify the used filesystem with the <tt>-t</tt> parameter and the remote location with the <tt>-p</tt> parameter. As filesystem parameter you can use anything you find in <span class="path">/system/add-ons/kernel/file_system</span> (and corresponding file hierarchies under <span class="path">~/config</span> or "<span class="path">non-packaged</span>", of course). You also have to create a folder as mountpoint. Here's an example:</p>
@@ -134,6 +139,21 @@ Voici par exemple comment ajouter <span class="app">Screenshot</span> avec diver
 mount -t nfs4 -p "192.168.178.3:volume1" /DiskStation</pre></td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">open</span> est un petit outils très pratique pour ouvrir n'importe quel fichier avec son application préférée, ou pour démarrer une application particulière à partir de sa signature sans avoir besoin de connaître son emplacement exact. Ça fonctionne également avec les URLs, et même avec les dossiers "virtuels" <tt>.</tt> et <tt>..</tt> qui représentent respectivement le dossier courant et le dossier parent, qui seront ainsi ouvert dans le Tracker.</p></td></tr>
+<tr><td><p><span class="cli">ramdisk</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>A ramdisk is like a harddisk running only in the computer's memory. That makes it very fast but also volatile, because its contents vanishes when you shut down the computer, or it crashes or you experience a blackout.<br />
+To create a ramdisk of 1 GiB, format to the name "RAMses" and mount it, you enter this in Terminal or create a script of it:</p>
+<pre class="terminal">ramdisk create -s 1gb
+mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMses
+mountvolume RAMses</pre>
+<p>Note: When creating a ramdisk, the <span class="cli">ramdisk</span> command prints out the path to it. If you create several disks, that path <span class="path">/dev/disk/virtual/ram/0/raw</span> will change!</p>
+<p>To preserve the contents, at least if no calamity like a blackout etc. strikes, a ramdisk can be set up to read/write an image on the harddisk. For that, you need to supply a file of the desired size that will be read from every time you start your ramdisk, and written to when you unmount it. To create an image file "RAMimage" of 500MiB and format it, do this:</p>
+<pre class="terminal">dd if=/dev/zero of=RAMimage bs=500M count=1
+mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMimage</pre>
+<p>From now on, you start the ramdisk like this:</p>
+<pre class="terminal">ramdisk create RAMimage
+mountvolume RAMimage</pre>
+<p>It's very important to always cleanly unmount you ramdisk, either from Tracker or with <span class="cli">unmount /RAMimage</span>, or the changes won't be written back to the image file!</p>
+</td></tr>
 </table>
 </div>
 </div>

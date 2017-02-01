@@ -10,6 +10,8 @@
  * Authors:
  *		Maciej Bałuta  (Google Code-In student)
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Emrys
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -48,7 +50,7 @@
 </ul>
 <span>
  «  <a href="powerstatus.html">PowerStatus</a> 
-::  <a href="../desktop-applets.html" class="uplink">Mini-aplicații Desktop</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>
@@ -59,9 +61,9 @@
 
 <h2><img src="../../images/desktop-applets-images/processcontroller-icon_64.png" alt="processcontroller-icon_64.png" width="64" height="64" />ProcessController</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Mini-aplicații Desktop</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Desktop Applets</span></td></tr>
 <tr><td>Locație:</td><td></td><td><span class="path">/boot/system/apps/ProcessController</span></td></tr>
-<tr><td>Configurări:</td><td></td><td><i>none</i></td></tr>
+<tr><td>Configurări:</td><td></td><td><i>nimic</i></td></tr>
 </table>
 
 <p><img src="../images/processcontroller-images/applet.png" alt="ProcessController applet" style="float:left;margin: 0 1em 0 0" />The primary task of the ProcessController applet is to show the activity of your CPU(s) and the amount of used memory. It allows monitoring of individual teams, change their priority, and kill them if the program freezes. In multiprocessor environments it allows you to disable individual processors/cores. When Tracker or Deskbar crash you can restart them from ProcessController's menu.</p>
@@ -69,10 +71,10 @@
 <p>If not yet running, launching ProcessController asks if it should open in window mode or live in the Deskbar. In window mode you can resize the bar-display by resizing the window and then use the <a href="../gui.html#replicants">Replicant</a> handle to drag it to the Desktop.<br />
 Wherever it's installed, it's operated via a right-click context menu.<br />
 To remove the applet again from the Deskbar, uncheck <span class="menu">Live in the Deskbar</span> in its context menu.</p>
-<h2>Quit an application</h2>
+<h2>Ieșirea dintr-o aplicație</h2>
 <img src="../images/processcontroller-images/quit.png" alt="ProcessController - Quit an application" />
 <p>To quit an application just choose its name from the <span class="menu">Quit an application</span> menu. This is a clean way to close app, just like  clicking its close button. Be careful not to quit system processes like servers or daemons, however. Your system may stop working reliably. </p>
-<h2>Memory usage</h2>
+<h2>Utilizarea memoriei</h2>
 <img src="../images/processcontroller-images/memory.png" alt="ProcessController - Memory usage" />
 <p>Monitoring memory usage can be rather inaccurate.</p>
 <p>This menu allows you to monitor memory usage of different teams in your system. Next to the team's name there are two columns: first with the amount reserved for writable memory, while the second shows all memory including read-only space (shared libraries for example).</p>
@@ -82,14 +84,14 @@ To remove the applet again from the Deskbar, uncheck <span class="menu">Live in 
 		<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Memory including read-only space (can be shared with other applications)</td></tr>
 </table>
 
-<h2>Threads and CPU usage</h2>
+<h2>Thread-uri și utilizarea CPU</h2>
 <p>This menu allows you to change thread priorities, kill teams or debug them.</p>
 <div class="box-stop">Changes via the commands in this menu reach deep into the system and can cause data loss and system instability. Keep that mouse hand steady!</div>
 <img src="../images/processcontroller-images/priority.png" alt="ProcessController - Priority" />
 <table>
-	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Kernel code</td></tr>
-	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>User code</td></tr>
-	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Idle thread</td></tr>
+	<tr><td style="width:20px;height:20px;background:#1414E7"></td><td style="width:10px"></td><td>Cod kernel</td></tr>
+	<tr><td style="height:20px;background:#A4A4F5"></td><td></td><td>Cod utilizator</td></tr>
+	<tr><td style="height:20px;background:#6EBE6E"></td><td></td><td>Thread în așteptare</td></tr>
 </table>
 <p>At the first level you see team names. By clicking on one, you can kill the whole team. The dark-blue part of the bar is time spent in kernel code, the light-blue part in user code, the green part in the idle thread(s). A bar completely filled with blue means that the team is using all processoring power.</p>
 <p>The second level shows particular threads of a team. By clicking on one, you can debug or kill it. A bar completely filled with blue means that the thread is pegging one processor/core.</p>
@@ -102,7 +104,7 @@ To remove the applet again from the Deskbar, uncheck <span class="menu">Live in 
 <div class="nav">
 <div class="inner"><span>
 «  <a href="powerstatus.html">PowerStatus</a> 
-::  <a href="../desktop-applets.html" class="uplink">Mini-aplicații Desktop</a> 
+::  <a href="../desktop-applets.html" class="uplink">Desktop Applets</a> 
 ::  <a href="workspaces.html">Workspaces</a>  »
 </span></div>
 </div>

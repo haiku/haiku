@@ -56,50 +56,49 @@
 
 <div id="content">
 <div>
-<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Vzhľad</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Nastavenie</span></td></tr>
+<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Nastavenia</span></td></tr>
 <tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/preferences/Appearance</span></td></tr>
-<tr><td>Nastavenie:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
+<tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/system/app_server/appearance</span><br />
 <span class="path">~/config/settings/system/app_server/fonts</span></td></tr>
 </table>
 <p>Nastavenia vzhľadu vám umožňujú meniť vizuálnu stránku Haiku.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="fonts" name="fonts">Fonts</a></h2>
+<a id="fonts" name="fonts">Písma</a></h2>
 <img src="../images/prefs-images/appearance-fonts.png" alt="appearance-fonts.png" />
-<p>Haiku defines three standard fonts for different purposes. You set plain, bold and fixed font types and sizes that will be used throughout the system. Besides these, there's also a separate setting for the font used in menus.</p>
+<p>Haiku definuje tri štandarné písma na rozličné účely. Môžete nastaviť bežný, hrubý typ písma a proporcionálne písmo, ktoré sa budú používať v rôznych častiach systému. Okrem nich sa zvlášť nastavuje písmo používané v menu.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="installing_fonts" name="installing_fonts">Installing new fonts</a></h3>
-<p>New fonts that don't come as part of a regular .hpkg package, can be installed by copying them into a subfolder according to the font type (<tt>psfonts</tt> or <tt>ttfonts</tt>) into their respective <tt>non-packaged</tt> folder (see topic <a href="../filesystem-layout.html">Filesystem layout</a>). For TrueType fonts that would be:</p>
+<a id="installing_fonts" name="installing_fonts">Inštalovanie nových písiem</a></h3>
+<p>Nové písma, ktoré sa nedodávajú ako súčasť bežného balíka .hpkg je možné nainštalovať skopírovaním do podpriečinka zodpovedajúceho typu písma (<tt>psfonts</tt> alebo <tt>ttfonts</tt>) do ich zodpovedajúcich priečinkov <tt>non-packaged</tt> (pozri tému <a href="../filesystem-layout.html">Rozloženie súborového systému</a>). Pre písma TrueType by to boli priečinky:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> pre písma dostupné každému používateľovi.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> pre písma dostupné iba vám.</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="colors" name="colors">Farby</a></h2>
 <img src="../images/prefs-images/appearance-colors.png" alt="appearance-colors.png" />
-<p>In the <span class="menu">Colors</span> tab, you can change the colors of different parts of the user interface. The color well accepts drag&amp;drops from other programs, letting you drag colors over from e.g. <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> or the <span class="app">Backgrounds</span> panel.</p>
+<p>V prvej záložke, <span class="menu">Farby</span>, môžete meniť farby rôznych častí používateľského rozhrania. Z iných programov, napr. <span class="app">WonderBrush</span>, <span class="app">Icon-O-Matic</span> alebo panelu <span class="app">Pozadia</span>, môžete myšou pretiahnuť farby.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="decorators" name="decorators">Window decorators</a></h2>
+<a id="decorators" name="decorators">Dekorácie okien</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
-<p>Decorators determine the look and feel of windows and all GUI elements. Currently Haiku comes with only one default decorator. Should you find and install other decorators, you can choose a different one from the pop-up menu.</p>
-<p>Haiku's default decorator lets you set the arrow style of the scroll bar: either single arrows at the end of scrollbars to conserve a bit of space, or double arrows — the traditional BeOS way — potentially saving some mouse moving when scrolling up and down or left and right...</p>
+<p>Dekorácie určujú vzhľad a správanie okien a všetkých prvkov grafického používateľského rozhrania.  V súčasnej dobe sa Haiku dodáva iba s jednou predvolenou dekoráciou. Ak by ste našli nainštalovali ďalšie dekorácie, môžete si vybrať inú z roletového menu.</p>
+<p>Predvolená dekorácia Haiku vám umožňuje nastaviť štýl šípky posuvníka: buď jednoduché šípky na konci posuvníkov, ktoré ušetria trochu priestoru alebo dvojité šípky - v tradičnom štýle BeOS - potenciálne ušetria trochu pohybu myši pri posúvaní smerom nahor a nadol, resp. doľava a doprava...</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="antialiasing" name="antialiasing">Antialiasing</a></h2>
 <img src="../images/prefs-images/appearance-antialiasing.png" alt="appearance-antialiasing.png" />
-<p>The tab <span class="menu">Antialiasing</span> provides different settings for how things are rendered on screen.</p>
+<p>Druhá záložka, <span class="menu">Antialiasing</span>, ponúka rôzne nastavenia vykresľovania obsahu na obrazovke.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

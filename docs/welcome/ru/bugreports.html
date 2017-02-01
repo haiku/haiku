@@ -15,6 +15,7 @@
  *		Michael Smirnov
  *		Diver
  *		Rodastahm Islamov
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -102,8 +103,9 @@
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Ошибки серверов</a></h2>
-<p>Когда жизненно важный сервер, такой как app server, registrar или input server падает, вы не увидите обычное сообщение о падении приложения. Вместо этого весь экран станет белым и запустится gdb сессия, ее вывод будет попадать напрямую на экран. Скорее всего вы все еще сможете двигать курсором, что приведет к перезаписи участков белого экрана с выводом. Все еще работающие приложения (например Контроллер процессов или часы в Deskbar) могут также прорисовываться сквозь вывод отладчика на экран.<br />
-Кроме того, что все более выглядит более страшно и неудобно, применимо все то же самое, что и в случае ошибок приложений. Самое важное в данном случае - это выполнение трассировки коммандой (<span class="cli">bt</span>). Скорее всего вам понадобится сфотографировать экран, так как будет невозможно куда либо скопировать текст трассировки.</p>
+<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
+Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
+Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Ошибки ядра</a></h2>
@@ -115,7 +117,7 @@
 <li><p>Система не загружается корректно. Она может спонтанно перезагружаться на каком-то моменте или зависать (например на каком-то значке экрана загрузки). В случае зависания попробуйте нажать <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
 <li><p>Система или какое-то устройство не работает нормально. Например если она работает очень медленно, появляются ошибки, или что-то вообще не работает. Если какое-то устройство вообще не работает первое что нужно проверить это поддерживает ли его Haiku в данный момент (например спросить в списке рассылки или на форуме).</p></li>
 </ul>
-<p>Note that while only the last point seems to indicate hardware relation, all the other symptoms could be caused by a bug in a hardware driver as well. If you have a suspicion what piece of hardware or corresponding driver might have to do with the problem, check whether removing/disabling the hardware or the driver makes a difference. For example, if you suspect Wifi you may find that your BIOS has an option to disable it. Or if not, you could blacklist the responsible Wifi driver from your Haiku installation (see <a href="../../../userguide/en/bootloader.html">Boot Loader</a>).</p>
+<p>Заметьте, что хотя только последний пункт указывает на проблему связанную с оборудованием, все остальные симптомы могут также быть вызваны ошибкой в драйвере оборудования. Если вы подозреваете, что какое-то устройство или его драйвер могут быть как-то связаны с наблюдаемой проблемой, то проверьте изменится что-либо после отключения устройства или удаления его драйвера. Например если вы подозреваете Wifi, то вы можете найти опцию в BIOS для его отключения. Если же такой опции нет, то вы можете удалить соответствующий Wifi драйвер (из папки <span class="path">/boot/system/add-ons/kernel/drivers/bin</span>).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Царство отладки ядра - KDL</a>
@@ -147,7 +149,7 @@ In the boot loader's <span class="menu">Debug menu</span> you should find the en
 <p><b>Функция вывода отладочной информации на экран полезна для отладки только специфичных проблем, она также имеет известные проблемы с таймингами. Используйте ее только если это очень необходимо.</b><br />
 Ее использование имеет смысл только когда Haiku не загружается на вашем компьютереи функция <span class="menu">Debug syslog option</span> по какой-то причине не работает. Перед появлением загрузочного экрана зажмите  <span class="key">SHIFT</span> для входа в меню загрузчика. Выберите <span class="menu">Select safe mode options</span>. Почти в самом низу будет опция, <span class="menu">[ ] Enable on screen debug output</span>. (Имейте в виду, что можно включить остальные опции, чтобы Haiku загрузилась. Если Haiku будет загружаться только при включении одной или более опций, не забудьте указать какие именно.)<br />
 И наконец выбарите <span class="menu">Return to main menu</span>, а затем then <span class="menu">Continue booting</span>.<br />
-Одна страница текста или более появятся на экране, только последние несколько строк нужно включать в ваш багрепорт. Дополнительная информация имеется в статье <a href="../../../userguide/ru/bootloader.html">Загрузчик</a>.</p>
+Одна страница текста или более появятся на экране, только последние несколько строк нужно включать в ваш багрепорт. Дополнительная информация имеется в статье <a href="../../userguide/ru/bootloader.html">Загрузчик</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hardware" name="hardware">Аппаратные ошибки/Ошибки в драйверах</a></h2>

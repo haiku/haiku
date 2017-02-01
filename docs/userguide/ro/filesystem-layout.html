@@ -16,7 +16,7 @@
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 	<meta http-equiv="Content-Style-Type" content="text/css" />
 	<meta name="robots" content="all" />
-	<title>Aranjament sistem de fișiere</title>
+	<title>Filesystem layout</title>
 	<link rel="stylesheet" type="text/css" href="../Haiku-doc.css" />
 </head>
 <body>
@@ -58,7 +58,7 @@
 <div>
 <div class="box-info">Traducerea acestei pagini nu este completă încă. Până când va fi, părțile incomplete utilizează originalul în limba engleză.</div>
 
-<h1>Aranjament sistem de fișiere</h1>
+<h1>Filesystem layout</h1>
 
 <p>Haiku's filesystem layout is quite transparent, trying to always use non-cryptic names for files and folders, that don't leave the user guessing. Files and folders that are important for the system to function properly, are protected from accidental tempering by showing one of these alerts:</p>
 <img src="images/filesystem-layout-images/achtung-user.png" alt="achtung-user.png" /> 
@@ -66,8 +66,8 @@
 <p>The second alert pops up if you try to rename or delete something in the system hierarchy. Here, the "<span class="button">Rename</span>" button will only become clickable when you're holding down the <span class="key">SHIFT</span> key.</p>
 <p>Generally, there are two separate branches springing from the root folder of the boot volume:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Contains system files and applications/packages shared by all users.</td></tr>
-<tr><td><span class="path">/boot/home/</span></td><td> </td><td>This is your personal folder where you keep your data and settings and the applications/packages that are <i>not</i> shared by all users.</td></tr>
+<tr><td><span class="path">/boot/system/</span></td><td> </td><td>Conține fișierele de sistem și aplicațiile/pachetele partajate de toți utilizatorii.</td></tr>
+<tr><td><span class="path">/boot/home/</span></td><td> </td><td>Acesta este dosarul personal unde păstrați datele, configurările și aplicațiile/pachetele care <i>nu</i> sunt partajate de toți utilizatorii.</td></tr>
 </table>
 <p>As long as Haiku isn't multi-user, this distinction between shared and not-shared applications/packages has no apparent effect, as there's only one user with one home folder. But since there will be support for more users than one eventually, it makes sense to learn the right way from the start.</p>
 
@@ -83,7 +83,7 @@ Most of the folders inside <span class="path">/boot/system/</span> are read-only
 <tr><td><span class="path">/boot/system/settings/</span></td><td> </td><td>Contains system-wide settings.</td></tr>
 <tr><td><span class="path">/boot/system/var/</span></td><td> </td><td>Contains logs like the syslog (important when troubleshooting) and is the default location for the swap file.</td></tr>
 </table>
-<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="applications.html">Applications</a>.</span></p>
+<p><span class="box-info">Pentru mai multe informații despre dosarele <span class="path">packages</span> și <span class="path">non-packaged</span>, vedeți subiectul <a href="applications.html">Applications</a>.</span></p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -115,7 +115,7 @@ Files that you'd like to share with other users in a future multi-user environme
 <td>This folder contains the settings to all applications and a few configurations for the system. Some applications manage their settings in their own subfolders, others simply put their configuration file in there.</td></tr>
 </table>
 
-<p><span class="box-info">For more information on the <span class="path">packages</span> and <span class="path">non-packaged</span> folders, see topic <a href="applications.html">Applications</a>.</span></p>
+<p><span class="box-info">Pentru mai multe informații despre dosarele <span class="path">packages</span> și <span class="path">non-packaged</span>, vedeți subiectul <a href="applications.html">Applications</a>.</span></p>
 <p>Here are some of the more interesting subfolders in <span class="path">~/config/settings/</span>:</p>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="4">

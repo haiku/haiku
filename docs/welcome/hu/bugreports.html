@@ -13,6 +13,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		Dancsó Róbert
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -100,8 +101,9 @@ Miután megbizonyosodtál róla, hogy a hiba egyedi, akkor azt a lehető legpont
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Kiszolgáló/szolgáltatás hibák</a></h2>
-<p>Amikor egy létfontosságú szolgáltatás, mint például az alkalmazás szolgáltatás (app_server), a registrar vagy a bemeneti eszköz szolgáltatás (input_server) hibásodik meg, akkor nem valószínű, hogy a szokásos üzenetet kapod majd. Ehelyett a teljes képernyő egy Terminálhoz hasonló képernyőre változik, ahol a hibakereső folyamat elindul, és az üzenetek ott jelennek meg. Lehetséges, hogy az egér mozgatható, ekkor azonban az egér-kurzor törli a fehér képernyőn lévő információt. A programok továbbra is futnak (például a Folyamatkezelő vagy az óra az Ásztalsávon), amik szintén törölhetik a fehér képernyőt.<br />
-Attól, hogy kicsit kényelmetlen, minden épp úgy működik, mint a programhibák esetében. A legfontosabb a hiba visszakövetése (<span class="cli">bt</span> parancs). Erről a képernyőről készíthetsz egy képet is egy digitális fényképezőgéppel, itt ugyanis nem használható a kijelölés és másolás.</p>
+<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
+Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
+Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Kernel hibák</a></h2>
@@ -113,7 +115,7 @@ Attól, hogy kicsit kényelmetlen, minden épp úgy működik, mint a programhib
 <li><p>A rendszer nem megfelelően indul. Néha újraindul vagy megáll egy adott ponton (például egy indító képernyő egyik ikonjának felvillanásakor). Később ismét megpróbálható a <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span> kombináció.</p></li>
 <li><p>A teljes rendszer, vagy bizonyos eszközök nem működnek megfelelően. Például nagyon lelassul vagy valami egyártalán nem működik. Ha egy eszköz nem működik, akkor elsőként azt kell kideríteni, hogy egyártalán támogatott eszközről van-e szó (például levelező listán vagy fórumon ajánlott megkérdezni).</p></li>
 </ul>
-<p>Ne feledd, hogy csak az utolsó pont utal eszköz hibára, azonban más problémát is okozhat egy eszközvezérlő hibája. Ha gyanítod, hogy a hibát egy adott vezérlő okozza, akkor ellenőrizd le, hogy mi változik, ha az eszközt vagy a vezérlőt eltávolítod vagy letiltod. Például, ha a Wifi-re gyanakszol, akkor próbáld meg kideríteni, hogy a BIOS-ban letiltható-e. Ha nem, akkor a gyanús vezérlőt feketelistára rakhatod (további információk a <a href="../../../userguide/en/bootloader.html">Rendszertöltő</a> fejezetben).</p>
+<p>Ne feledd, hogy csak az utolsó pont utal eszköz hibára, azonban más problémát is okozhat egy eszközvezérlő hibája. Ha gyanítod, hogy a hibát egy adott vezérlő okozza, akkor ellenőrizd le, hogy mi változik, ha az eszközt vagy a vezérlőt eltávolítod vagy letiltod. Például, ha a Wifi-re gyanakszol, akkor próbáld meg kideríteni, hogy a BIOS-ban letiltható-e. Ha nem, akkor a gyanús vezérlőt feketelistára rakhatod (további információk a <a href="../../userguide/hu/bootloader.html">Rendszertöltő</a> fejezetben).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Kernel Debugging Land - KDL (Kernel Hibakereső Felület)</a></h3>
@@ -140,10 +142,10 @@ A rendszertöltő <span class="menu">Debug menu</span>-ben (hibakereső menü) a
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="onscreen" name="onscreen">Hibakeresés a képernyőn</a></h3>
-<p><b>A képernyőn történő hibakeresés csak egy megadott hiba esetében hasznos, és időigényes. Ne használd, ha nem szükséges.</b><br />
-Ez akkor fontos, ha a Haiku nem tud elindulni és a <span class="menu">hibakereső naplózás</span> valamiért nem működik. Mielőtt a Haiku logó megjelenik, tartsd lenyomva a <span class="key">SHIFT</span>-et a rendszertöltőbe való belépéshez. Válasszd a <span class="menu">Select safe mode options</span> (hibakereső opciók) menüt, majd azon belül az <span class="menu">[ ] Enable on screen debug output</span> (képernyőn történő hibakeresés engedélyezése) opciót. (Megjegyzés: több opció is haszálható betöltéskor. Ha a Haiku indításakor egy vagy több opciót is használsz, akkor azokat is említsd meg.)<br />
-Végül válaszd a <span class="menu">Return to main menu</span> (visszatérés a főmenübe), majd a <span class="menu">Continue booting</span> (betöltés folytatása) menüpontot.<br />
-Egy vagy több oldalnyi szöveg is megjelenik majd a képernyőn, amiből csak az utolsó néhány sort szükséges a jelentéshez csatolni. További információk a <a href="../../userguide/hu/bootloader.html">Rendszertöltő</a> fejezetben.</p>
+<p><b>The on-screen debug output is useful only for debugging very specific issues and is known to have (timing) issues. Don't use it, if you don't have to.</b><br />
+This is only relevant when Haiku fails to boot on your machine and the <span class="menu">Debug syslog option</span> doesn't work for some reason. Before the Haiku boot logo appears, hold <span class="key">SHIFT</span> to enter the boot loader menu. Select <span class="menu">Select safe mode options</span>. Near the bottom, <span class="menu">[ ] Enable on screen debug output</span> will be listed. (Note: The other options could be enabled in an attempt to boot Haiku. If Haiku will boot only when one or more options are activated, be sure to mention which ones.)<br />
+Finally select <span class="menu">Return to main menu</span> and then <span class="menu">Continue booting</span>.<br />
+One or more pages of text will display on the screen, only the last few lines need to be included on your ticket. There's more information on the <a href="../../userguide/hu/bootloader.html">Boot Loader</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hardware" name="hardware">Eszköz/vezérlő hibák</a></h2>

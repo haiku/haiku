@@ -4,11 +4,13 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2014 Haiku. All rights reserved.
+ * Copyright 2013-2017 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Akuji
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -57,89 +59,94 @@
 <div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <table class="index" id="index" summary="index">
-<tr class="heading"><td>Index</td></tr>
-<tr class="index"><td><a href="#filter">The Filter</a><br />
-                <a href="#list">The List</a><br />
-                <a href="#info">The Info Area</a><br />
-                <a href="#menu">Tools and Options</a><br />
-                <a href="#account">Creating a User Account</a><br />
-                <a href="#rating">Rating and Commenting</a><br />
+<tr class="heading"><td>Содержание</td></tr>
+<tr class="index"><td><a href="#filter">Фильтры</a><br />
+                <a href="#list">Список</a><br />
+                <a href="#info">Информация</a><br />
+                <a href="#menu">Инструменты и отображение</a><br />
+                <a href="#account">Создание аккаунта пользователя</a><br />
+                <a href="#rating">Оценивание и комментирование</a><br />
 </td></tr>
 </table>
 
 <h2><img src="../../images/apps-images/haikudepot-icon_64.png" alt="haikudepot-icon_64.png" width="64" height="64" />HaikuDepot</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
-<tr><td>Location:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
-<tr><td>Settings:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
+<tr><td>Расположение в Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Приложения (Applications)</span></td></tr>
+<tr><td>Расположение в Tracker:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
+<tr><td>Настройки хранятся по адресу:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span> - The main settings of the application<br />
+<span class="path">~/config/cache/HaikuDepot</span> - Cached icons, screenshots, descriptions etc.</td></tr>
 </table>
 <p><br /></p>
-<p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories (also called "depots") and install, update and uninstall packages. HaikuDepot starts up with a list of "<i>Featured packages</i>", software that's deemed interesting to many users. As soon as you enter a term in the search box or choose a category, the display changes to smaller icons and more information arranged in columns.</p>
+<p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories and install, update and uninstall packages. By default, HaikuDepot starts up with a list of "<i>Featured packages</i>", software that's deemed interesting to many users.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
+<p>Как только вы вводите критерий в поле <span class="menu">Условия поиска</span> отображение переключается на иконки меньшего размера, а вместе с ними - выводит дополнительную информацию в новых колонках.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filter" name="filter">The Filter</a></h2>
-<p>At the top we find a few means to filter the list of available packages below:</p>
+<a id="filter" name="filter">Фильтры</a></h2>
+<p>Вверху мы видим несколько способов фильтрации списка пакетов:</p>
 <ul>
-<li><p>The <span class="menu">Category</span> pop-up menu lets you limit the list to individual categories like "<i>Audio</i>" or "<i>Games</i>".</p></li>
-<li><p>The <span class="menu">Depot</span> pop-up menu determines which online depots are queried or if only those packages shown, that were installed from somewhere other than an online depot ("<i>Local</i>"). Maybe from an USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
-<li><p>The <span class="menu">Search terms</span> text field filters the list to those packages that have all the entered (space-delimited) strings in their name or description.</p></li>
+<li><p><span class="menu">Категория</span> - позволяет ограничить перечень определенной категорией, например "<i>Аудио</i>" или "<i>Игры</i>".</p></li>
+<li><p>The <span class="menu">Repositories</span> pop-up menu determines which online repos are queried or if only those packages are shown, that were installed from somewhere other than an online repo ("<i>Local</i>"). Maybe from an USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
+<li><p><span class="menu">Условия поиска</span> - фильтрует список, отображая лишь те пакеты, которые содержат введенные слова (разделенные пробелом) в названии и описании.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="list" name="list">The List</a></h2>
-<p>Like in any Tracker window, you can choose from a context menu which columns to display by right-clicking the column heading. A left-click sorts the list according to that column. Of course, you can rearrange the columns by dragging them to a new position.</p>
-<p>The status column of a package can have one of several states:</p>
+<a id="list" name="list">Список</a></h2>
+<p>Как и в любом окне Tracker, вы можете выбрать из контекстного списка, какие колонки отображать, кликнув правой кнопкой по заголовку любой из них. Левый клик сортирует список по конкретной колонке. Конечно же, вы можете изменить порядок расположения колонок, перетаскивая их на новую позицию.</p>
+<p>Колонка "Статус" может иметь одно из нескольких значений:</p>
 <ul>
-<li><p><span class="menu">Active</span>: The package is currently installed and ready to be used.</p></li>
-<li><p><span class="menu">Available</span>: The package exists in that depot and can be downloaded and installed. If there are any dependencies on other packages, you'll be informed of that while installing and get the choice of downloading/installing all that's necessary.</p></li>
-<li><p><span class="menu">Pending / %</span>: <i>Pending</i> is shown for a package that is queued for download/installation. While a package is downloaded, the progress is shown as percentage.</p></li>
-<li><p><span class="menu">Update available</span>: There's a newer version than your installed one available.</p></li>
+<li><p><span class="menu">Активирован</span>: Пакет в данный момент установлен и готов к использованию.</p></li>
+<li><p><span class="menu">Available</span>: The package exists in that repository and can be downloaded and installed. If there are any dependencies on other packages, you'll be informed of that while installing and get the choice of downloading/installing all that's necessary.</p></li>
+<li><p><span class="menu">Ожидание... / %</span>: <i>Ожидание...</i> отображается для пакета, который стоит в очереди на скачивание и установку. В процессе скачивания прогресс отображается в виде процентного значения.</p></li>
+<li><p><span class="menu">Доступно обновление</span>: Доступна новая версия установленного пакета.</p></li>
 </ul>
-<p>You can grab the dotted line between the packages list and the info area to vertically resize the packages list.</p>
+<p>Вы можете захватить пунктирную линию между списком пакетов и информационной областью и изменить высоту списка.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="info" name="info">The Info Area</a></h2>
-<p>At the bottom is an area that displays information on the package that is currently selected in the list above it.<br />
-To the right of package name, author, rating and version is a button, that – depending on the current state of the package – lets you <span class="button">Install</span>, <span class="button">Uninstall</span> or <span class="button">Update</span> it. If a package is already installed, you'll find an additional button there to <span class="button">Open</span> the application.</p>
-<p>Below are three tabs: About, Ratings, and Changelog.</p>
+<a id="info" name="info">Информация</a></h2>
+<p>Внизу окна находится область, содержащая основную информацию о пакете, выбранном в данный момент из списка выше.<br />
+Справа от названия, разработчика, оценки и версии расположена кнопка, которая, в зависимости от состояния пакета, позволяет вам <span class="button">Установить</span>, <span class="button">Удалить</span> или <span class="button">Обновить</span> его. Если пакет уже установлен, вы увидите дополнительную кнопку, которая <span class="button">Открывает (запускает)</span> приложение.</p>
+<p>Ниже находятся четыре вкладки: О программе, Оценки, История изменений и Содержимое.</p>
 <ul>
-<li><p _translation_id="5252"><span class="menu">About</span></p>
-<p _translation_id="5253">The first tab has a detailed description of the package, as well as screenshots and a contact address and URL of the team that maintains the packaged software, if available. Clicking the screenshot thumbnail will open it full-size in a new window</p></li>
-<li><p _translation_id="5254"><span class="menu">Ratings</span></p>
-<p _translation_id="5255">The second tab shows ratings and comments of users, if available.</p>
+<li><p _translation_id="5252"><span class="menu">О программе</span></p>
+<p _translation_id="5253">Первая вкладка содержит подробное описание пакета и скриншоты, а также адрес и ссылку на официальный сайт команды, которая отвечает за поддержку пакета, если таковая имеется. Клик по скриншоту открывает его полноразмерную версию в новом окне.</p></li>
+<li><p _translation_id="5254"><span class="menu">Оценки</span></p>
+<p _translation_id="5255">Вторая вкладка отображает оценки и комментарии пользователей в случае их наличия.</p>
 <img src="../images/apps-images/haikudepot-rating-tab.png" alt="haikudepot-rating-tab.png" />
-<p _translation_id="5268">To the left is a statistic, showing the number of stars (1 to 5) the package got from how many users.<br />
-In the middle are user comments with their nickname, the number of stars they gave the package and which version of the package they were rating or commenting on. You'll find more on how to rate a package yourself <a href="#rating">further down</a>.<br />
-With the little thumb up/down icons to the right, you can show your approval or disapproval with a certain comment.</p></li>
-<li><p _translation_id="5257"><span class="menu">Changelog</span></p>
-<p _translation_id="5258">The last tab shows the detailed history of all the  versions of the package that have been released so far.</p></li>
+<p _translation_id="5268">Слева находится статистика, отображающая количество звезд (от 1 до 5), которые пакет получил от определенного количества пользователей.<br />
+В центре расположены комментарии, также содержащие ник пользователя, количество поставленных звезд и версию оцениваемого пакета. Вы узнаете о том, как оценивать и комментировать пакеты самостоятельно <a href="#rating">ниже</a>.<br />
+</p></li>
+<li><p _translation_id="5257"><span class="menu">История изменений</span></p>
+<p _translation_id="5258">Третья вкладка отображает подробную историю всех версий пакета, выпущенных на данный момент, если ответственный за него человек предоставил эту информацию.</p></li>
+<li><p><span class="menu">Содержимое</span></p>
+<p>Последняя вкладка отображает все файлы и папки, содержащиеся в пакете. Это актуально лишь для уже скачанных пакетов.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Tools and Options</a></h2>
-<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh depots</span>. This will request an up-to-date list of all available packages from the repositories.</p>
-<p>Under <span class="menu">Options</span> you can choose to also <span class="menu">Show develop packages</span> and <span class="menu">Show source packages</span> in the packages list. For the normal user those are of no interest and would only clutter the list. They are important, however, for people who need the libraries, headers etc. of a package to develop and compile programs depending on them.</p>
-<p>Of more interest are the other two items, <span class="menu">Show available packages</span> and <span class="menu">Show installed packages</span>, which are pretty self-explanatory.</p>
+<a id="menu" name="menu">Инструменты и отображение</a></h2>
+<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories. The other item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.</p>
+<p>В меню <span class="menu">Показывать</span> вы можете выбрать, отображать ли <span class="menu">Только популярные пакеты</span>. В случае отключения опции будут отображаться все доступные пакеты.<br />
+Более того, вы также можете настроить видимость <span class="menu">Пакетов для разработчиков</span> и <span class="menu">Пакетов с исходным кодом</span>  в общем списке. Для обычного пользователя они не представляют особого интереса и будут лишь загромождать список. Тем не менее, данные пакеты важны для людей, которые нуждаются в библиотеках, заголовочных файлах из пакета для разработки и компиляции приложений, зависящих от них.</p>
+<p>Более интересными являются другие две опции, показывающие <span class="menu">Доступные пакеты</span> и <span class="menu">Установленные пакеты</span>. Их предназначение очевидно.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="account" name="account">Creating a User Account</a></h2>
-<p>To be able to rate a package, you need a user account at the <a href="http://depot.haiku-os.org">Haiku Depot Server</a> that serves all the packages and keeps track of ratings and user comments. You can create an account within the HaikuDepot application by clicking on the menu in the far right of the menu bar that shows your current status: <span class="menu">Not logged in</span>. Choosing <span class="menu">Log in...</span> opens a window with two tabs; one to enter your user name and password (once you have those) to log in, and the other to create a new account:</p>
+<a id="account" name="account">Создание аккаунта пользователя</a></h2>
+<p>Чтобы иметь возможность оценивать пакет, вам необходима учетная запись на <a href="http://depot.haiku-os.org">сервере Haiku Depot</a>, который обслуживает все пакеты, а также хранит оценки и комментарии пользователей. Вы можете создать аккаунт в приложении HaikuDepot, кликнув на область в правом верхнем углу, которая отображает ваш текущий статус: <span class="menu">Вход не выполнен</span>. Выбор опции <span class="menu">Войти...</span>, открывает окно с двумя вкладками; одна предназначена для ввода логина и пароля (когда они у вас будут), а вторая - для создания учетной записи:</p>
 <img src="../images/apps-images/haikudepot-login-tab.png" alt="haikudepot-login-tab.png" /> 
-<p>To create an account you need to:</p>
-<ul><li>use an all lower-case user name without special characters</li>
-<li>use a password that's at least 8 characters long with at least 2 capitals and 2 numbers</li>
-<li>provide a valid email address (if you want a new password sent to you in case you forgot it)</li>
-<li>solve the captcha</li></ul>
-<p>After logging in, the top-right menu of the HaikuDepot window will now say <span class="menu">Logged in as (...)</span>, showing your user name. The menu now offers you to <span class="menu">Switch account...</span> or <span class="menu">Log out</span>.</p>
+<p>Для создания аккаунта вам необходимо:</p>
+<ul><li>использовать любое имя пользователя без заглавных букв и специальных символов</li>
+<li>использовать пароль длиной минимум восемь символов, содержащий минимум две заглавные буквы и две цифры</li>
+<li>указать корректный адрес email (если вы хотите иметь возможность получить новый пароль в случае, когда старый - забыт)</li>
+<li>ответить на капчу</li></ul>
+<p>После входа в правом верхнем углу окна HaikuDepot будет написано <span class="menu">Выполнен вход под пользователем (...)</span> вместе с вашим ником. Данное меню теперь позволяет вам <span class="menu">Сменить аккаунт...</span> или <span class="menu">Выйти из системы</span>.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="rating" name="rating">Rating and Commenting</a></h2>
-<p>After you've created a user account and are logged in, you can rate a package and leave a comment, if you want. Just hover the mouse over the rating stars in the info area of a package and they turn into a <span class="button">Rating...</span> button. Click it to open the rating window:</p>
+<a id="rating" name="rating">Оценивание и комментирование</a></h2>
+<p>После создания учетной записи и входа в систему, вы можете оценивать пакеты и оставлять комментарии, если хотите. Наведите курсор на рейтинг пакета в виде звезд в разделе информации и он превратится в кнопку <span class="button">Оценить пакет...</span>. Нажмите на нее для открытия окна оценивания:</p>
 <img src="../images/apps-images/haiku-depot-ratingpanel.png" alt="haiku-depot-ratingpanel.png" />
 <p>Here you move the mouse over the stars to light them up and choose your rating, you can also choose from a number of levels to judge the stability of the application and pick the language of your optional comment. To make a comment meaningful, you should have worked with the application you're about to rate for a while to become familiar with its features, bugs and quirks. And don't write the next great American novel... keep it short, sweet and polite. :)<br />
-After you click <span class="button">Send</span> the data is transmitted to the server. You may have to go to the <span class="menu">Tools</span> menu to <span class="menu">Refresh depots</span> before you can see your changes.</p>
-<p>At any time, you can come back and edit your comment and re-rate it. You can also hide your rating from other users by deactivating the checkbox <span class="menu">Other users can see this rating</span>.</p>
+After you click <span class="button">Send</span> the data is transmitted to the server. You may have to go to the <span class="menu">Tools</span> menu to <span class="menu">Refresh repositories</span> before you can see your changes.</p>
+<p>Вы можете вернуться и изменить ваш комментарий и переоценить пакет в любое время. Вы также можете скрыть вашу оценку от других пользователей, убрав метку <span class="menu">Другие пользователи могут видеть этот рейтинг</span>.</p>
 </div>
 </div>
 

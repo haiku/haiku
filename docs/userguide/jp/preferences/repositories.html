@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2017, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		mt
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>リポジトリ</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>ユーザーガイド</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/jp.png" alt="" /> 日本語</li>
+<li><a href="../../fr/preferences/repositories.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/repositories.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/repositories.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/repositories.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/repositories.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/repositories.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../uk/preferences/repositories.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/repositories.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/repositories.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/repositories.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../sk/preferences/repositories.html"><img src="../../images/flags/sk.png" alt="" />Slovenčina</a></li>
+<li><a href="../../hu/preferences/repositories.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/preferences/repositories.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/preferences/repositories.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../pl/preferences/repositories.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
+<li><a href="../../ro/preferences/repositories.html"><img src="../../images/flags/ro.png" alt="" />Română</a></li>
+<li><a href="../../en/preferences/repositories.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="printers.html">Printers</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a>
+::  <a href="screen.html">Screen</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+
+<h2><img src="../../images/prefs-images/repositories-icon_64.png" alt="repositories-icon_64.png" width="64" height="64" />リポジトリ</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Preferences</span></td></tr>
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/preferences/Repositories</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Repositories_settings</span></td></tr>
+</table>
+<p>リポジトリはソフトウェアパッケージのコレクションです。初期設定では、オペレーティングシステムのパッケージをすべて備えた<i>Haiku</i> のリポジトリと、<i>HaikuPorts</i>、たくさんの Haiku に移植されたソフトウェアおよびネイティブな Haiku ソフトウェアを提供するリポジトリがあります。さらに、Haiku コミュニティメンバーにによって監督されたいくつかのリポジトリがあります。ウェブサイト上の、<a href="https://www.haiku-os.org/community/software">ソフトウェアサイト (Software Sites)</a> をチェックしてください。</p>
+<p>これは、ユーザーのリポジトリを管理するプレファレンスパネルです (<a href="../applications/haikudepot.html">HaikuDepot の</a> <span class="menu">ツール (Tools)</span> メニューからも開けます):</p>
+<img src="../images/prefs-images/repositories.png" alt="repositories.png" />
+<p>有名なリポジトリのリスト内の最初の列は、リポジトリが有効かどうかを示しています。チェックマークが無ければ、それはHaikuDepot や、コマンドラインからの <span class="cli">pkgman</span> から検索されないでしょう。ボタンを使って、選択されたリポジトリを<span class="button">有効 (Enable)</span> または<span class="button">無効 (Disable)</span> にしてください。または、リポジトリをダブルクリックして、状態を切り替えてください。</p>
+<p>リポジトリのサイズやインターネット接続の速度にもよりますが、リポジトリの有効化には数秒掛かることがあります。それが長く掛かる場合は、 <span class="button">+/-</span> ボタンの上の小さなテキストボックスにタスクが終了してないことを表示されます。非常に長く掛かる場合は、キャンセルかリトライするよう表示されます。
+</p>
+<p>"<span class="button">-</span>" ボタンでリポジトリを完全に削除できるため、それは無効にする必要があります。<br />"<span class="button">+</span>" ボタンで新しいリポジトリを追加します。それは次のパネルを開きます。
+</p>
+<img src="../images/prefs-images/repositories_add.png" alt="repositories_add.png" />
+<p>新しいリポジトリを追加するには、その URL をテキストフィールドに貼り付けます。有効にするまで "不明 (Unknown)" と名付けられます。</p>
+<div class="box-warning">言うまでもなく、リポジトリを追加して、そこからソフトウェアをダウンロードしてインストールすることは、信頼の問題です。インターネットでたまたま見つけた URL を不用意に追加しないでください。
+</div>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="printers.html">プリンター</a> 
+::  <a href="../preferences.html" class="uplink">Preferences (プレファレンス)</a>
+::  <a href="screen.html">画面</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

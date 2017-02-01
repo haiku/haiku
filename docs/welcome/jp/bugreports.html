@@ -57,6 +57,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>目次</td></tr>
@@ -101,8 +102,9 @@
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">サーバーのバグ</a></h2>
-<p>App server、registrar、input server のような重要なサーバーがクラッシュしたときはよくあるクラッシュアラートを見ることは無いでしょう。スクリーン全体が白で塗りつぶされ、gdb のセッションがスタートします。出力はスクリーンに直接出力されます。たぶん、マウスはまだ動かせでも gdb の出力を上書きするでしょう。アプリケーションも動いたままで、(たとえば、プロセスコントローラーや デスクバーの時計のように) それも gdb の出力を上書きします。<br />
-さらに、アプリケーションのバグに比べ、すべては見にくく便利ではありません。アプリケーションのバグのようにはいかないでしょう。バックトレースの取得 (<span class="cli">bt</span> コマンド) も、テキストのコピーができないためデジタルカメラ等を用いて写真を撮影しないとならないでしょう。</p>
+<p>App server、registrar、input server のような重要なサーバーがクラッシュしたときはよくあるクラッシュアラートを見ることは無いでしょう。その代わりに、スクリーン全体が白で塗りつぶされ、gdb のセッションがスタートします。出力はスクリーンに直接出力されます。たぶん、マウスはまだ動かせでも gdb の出力を上書きするでしょう。アプリケーションも動いたままで、(たとえば、プロセスコントローラーや デスクバーの時計のように) それも gdb の出力を上書きします。<br />
+さらに、アプリケーションのバグに比べ、すべては見にくく便利ではありません。アプリケーションのバグのようにはいかないでしょう。もっとも重要なバックトレースの取得 (<span class="cli">bt</span> コマンド) も、どこでもテキストのコピーができないのでデジタルカメラ等を用いて写真を撮影しないとならないでしょう。<br />
+実際にクラッシュしているものに応じて、デスクトップに <span class="cli">save-report</span> を使ってクラッシュレポートを保存してみてもよいです。それから電源ボタンを一度押して、手際よくシャットダウンしてみることもできます。</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">カーネルのバグ</a></h2>
@@ -141,10 +143,10 @@ syslog (system log の略称) はシステムに発生した有益な情報を�
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="onscreen" name="onscreen">スクリーン上でのデバッグ</a></h3>
-<p><b>スクリーン上のデバッグ出力は特定の問題とすでにわかっている問題について役立つでしょう。必要でないなら使用しないでください。</b><br />
-これは Haiku がうまく起動せず、なおかつ <span class="menu">Debug syslog option</span> もうまく動作しないときに使います。Haiku の起動ロゴが現れる前に、<span class="key">SHIFT</span> を押したままにしてブートローダーメニューに入り、<span class="menu">Select safe mode options</span> を選びます。下の方にある <span class="menu">[ ] Enable on screen debug output</span> を有効にします (ノート: ほかのオプションも Haiku のブートを試みるときに有効になります。Haiku がどのオプションでのみ起動するかを確認してください)。<br />
-最後に、<span class="menu">Return to main menu</span> を選択し <span class="menu">Continue booting</span> を選択します。<br />
-1 ページ以上のテキストがスクリーンに表示されます。最後の数行がチケットに添付する必要がある物でしょう。詳細は、<a href="../../../userguide/jp/bootloader.html">ブートローダー</a>を参照のこと。</p>
+<p><b>The on-screen debug output is useful only for debugging very specific issues and is known to have (timing) issues. Don't use it, if you don't have to.</b><br />
+This is only relevant when Haiku fails to boot on your machine and the <span class="menu">Debug syslog option</span> doesn't work for some reason. Before the Haiku boot logo appears, hold <span class="key">SHIFT</span> to enter the boot loader menu. Select <span class="menu">Select safe mode options</span>. Near the bottom, <span class="menu">[ ] Enable on screen debug output</span> will be listed. (Note: The other options could be enabled in an attempt to boot Haiku. If Haiku will boot only when one or more options are activated, be sure to mention which ones.)<br />
+Finally select <span class="menu">Return to main menu</span> and then <span class="menu">Continue booting</span>.<br />
+One or more pages of text will display on the screen, only the last few lines need to be included on your ticket. There's more information on the <a href="../../userguide/jp/bootloader.html">Boot Loader</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hardware" name="hardware">ハードウェアとドライバーのバグ</a></h2>

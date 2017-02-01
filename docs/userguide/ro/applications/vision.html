@@ -60,21 +60,21 @@
 
 <h2><img src="../../images/apps-images/vision-icon_64.png" alt="vision-icon_64.png" width="64" height="64" />Vision</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicații</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Locație:</td><td></td><td><span class="path">/boot/system/apps/Vision/Vision</span></td></tr>
 <tr><td>Configurări:</td><td></td><td><span class="path">~/config/settings/Vision/*</span></td></tr>
 </table>
 <p><br /></p>
 <p>Vision este un client IRC dezvoltat original pentru BeOS. Documentația și un manager de defecțiuni sunt disponibile la <a href="http://vision.sourceforge.net/">site-ul Vision</a>.</p>
-<div class="box-info">You can find help from other Haiku users and developers on <a href="http://www.haiku-os.org/community/irc">Haiku channels</a> in various languages.<br />
-The most frequented is the English speaking #haiku at irc.freenode.org.</div>
-<p>Some advice, especially if you're new to IRC:</p>
+<div class="box-info">Puteți primi ajutor de la alți utilizatori și dezvoltatori Haiku pe <a href="http://www.haiku-os.org/community/irc">canalele Haiku</a> în diferite limbi străine.<br />
+Cel mai frecventat este cel de limba engleză, #haiku pe irc.freenode.org.</div>
+<p>Câteva sfaturi, mai ales dacă sunteți nou la RC:</p>
 <ul>
 <li><p>Search the web for "IRC etiquette" to learn about the do's and don'ts of chatting. Without much searching, I found <a href="https://workaround.org/getting-help-on-irc/">Getting help on IRC</a> by Christoph Haas to be quite helpful.</p></li>
 <li><p>By registering your nickname you make sure nobody can pull any shenanigans and you gain the trust of the residents. See <a href="http://freenode.net/faq.shtml#nicksetup">Freenode's FAQ</a> on that matter.</p></li>
 <li><p>Set up a sound in Haiku's Sounds preferences to be notified if someone mentions your nickname. People don't always watch their IRC client screen. Putting the nickname of the person you're talking to at the beginning of what you're about to post increases your chance to be noticed. Similar to the Terminal, Vision supports tab-completion for nicknames, i.e. if you enter the starting letters of  a nickname and press the tab key, Vision completes it with the first name that matches.</p></li>
 </ul>
-<p>Here's a list of built-in commands, taken with permission from Vision's website.</p>
+<p>Aceasta este o listă de comenzi integrate, obținute cu permisiune de pe pagina web Vision.</p>
 <p>Sintaxa:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="0">
 <tr><td><tt>/COMMAND</tt></td><td width="10"></td><td>comanda</td></tr>
@@ -86,10 +86,10 @@ The most frequented is the English speaking #haiku at irc.freenode.org.</div>
 
 <ul>
 <li><p><span class="menu">/ABOUT</span><br />
-Opens Vision's About window.</p></li>
+Deschide fereastra Despre a Vision.</p></li>
 
 <li><p><span class="menu">/ACRONYM [word]</span><br />
-Opens www.acronymfinder.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
+Deschide www.acronymfinder.com cu navigatorul web curent. (Notă: Dacă gestionarul de fișier nu este un navigator web, se deschide aplicația specificată în FileTypes.)</p></li>
 
 <li><p><span class="menu">/AWAY [away-reason]</span><br />
 Sets away status on current network. If no away reason is specified, it is set to 'BRB'. (be right back)</p></li>
@@ -104,7 +104,7 @@ Clears the contents of the current text buffer.</p></li>
 Executes the specified ctcp command on a channel or nick.</p></li>
 
 <li><p><span class="menu">/DCC &lt;CHAT&gt; &lt;nick&gt;</span><br />
-Opens a private dcc chat session with the specified nick.</p></li>
+Deschide o sesiune de chat dcc privată cu nick-ul specificat.</p></li>
 
 <li><p><span class="menu">/DCC &lt;SEND&gt; &lt;nick&gt; [file]</span><br />
 Sends a file to &lt;nick&gt;. If no file is specified, a File panel will open.</p></li>
@@ -113,25 +113,25 @@ Sends a file to &lt;nick&gt;. If no file is specified, a File panel will open.</
 De-ops or de-voices &lt;nick(s)&gt;.</p></li>
 
 <li><p><span class="menu">/DESCRIBE &lt;nick&gt; &lt;message&gt;</span><br />
-Same as /ME, but opens a query on &lt;nick&gt;.</p></li>
+La fel ca /ME, dar deschide o interogare cu &lt;nick&gt;.</p></li>
 
 <li><p><span class="menu">/DNS &lt;domain name/IP address&gt;</span><br />
-Resolves the given IP or domain name.</p></li>
+Rezolvă IP-ul sau numele de domeniu furnizat.</p></li>
 
 <li><p><span class="menu">/EXIT</span><br />
-Quits Vision.</p></li>
+Oprește Vision.</p></li>
 
 <li><p><span class="menu">/GAWAY [away-reason]</span><br />
-Same as /AWAY [away-reason], but applies to all connected networks.</p></li>
+La fel ca /AWAY [away-reason], dar se aplică la toate rețelele conectate.</p></li>
 
 <li><p><span class="menu">/GBACK</span><br />
-Same as /BACK, but on applies to all connected networks.</p></li>
+La fel ca /BACK, dar se aplică doar la toate rețelele conectate.</p></li>
 
 <li><p><span class="menu">/GOOGLE [search-string]</span><br />
 Opens www.google.com with your current html handler. (Note: If the file-handler is not a browser, it opens the application specified in FileTypes.)</p></li>
 
 <li><p><span class="menu">/INVITE /I &lt;nick&gt; &lt;channel&gt;</span><br />
-Invites &lt;nick&gt; to the &lt;channel&gt;.</p></li>
+Invită &lt;nick&gt; la &lt;channel&gt;.</p></li>
 
 <li><p><span class="menu">/JOIN /J &lt;channel&gt; [channel-key]</span><br />
 Joins the &lt;channel&gt;. Provide a [channel-key] if necessary.</p></li>
@@ -152,31 +152,31 @@ Displays the channel modes of the current channel.</p></li>
 Same as <span class="menu">MODE &lt;channel&gt; &lt;modes&gt; &lt;nick&gt;</span>, but on current channel.</p></li>
 
 <li><p><span class="menu">/M &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
-Same as <span class="menu">/MODE &lt;channel&gt; &lt;modes&gt;</span>, but on current channel.</p></li>
+La fel ca <span class="menu">/MODE &lt;channel&gt; &lt;modes&gt;</span>, dar pe canalul curent.</p></li>
 
 <li><p><span class="menu">/ME &lt;text&gt;</span><br />
-Displays: <i>* {YourNickname} &lt;text&gt;.</i></p></li>
+Afișează: <i>* {YourNickname} &lt;text&gt;.</i></p></li>
 
 <li><p><span class="menu">/MODE &lt;channel&gt; &lt;+-ohvbeqa&gt; &lt;nick1&gt; [nick2] ...</span><br />
-Sets mode for &lt;nick(s)&gt; on &lt;channel&gt;.<br />
-e.g. <span class="menu">/MODE #channel +o nick1</span><br />
-or <span class="menu">/MODE #channel +oo-o nick1 nick2 nick3</span></p></li>
+Stabilește modul pentru &lt;nick(s)&gt; pe &lt;channel&gt;.<br />
+ex: <span class="menu">/MODE #channel +o nick1</span><br />
+sau <span class="menu">/MODE #channel +oo-o nick1 nick2 nick3</span></p></li>
 
 <li><p><span class="menu">/MODE &lt;channel&gt; &lt;+-kfL,l,psmntirRcOAQKVHGCuzN&gt;</span><br />
 Sets the mode of &lt;channel&gt;. (Note: Commata just for optical separation.)<br />
 e.g. <span class="menu">/MODE #channel +ms</span></p></li>
 
 <li><p><span class="menu">/MSG &lt;nick&gt; &lt;message&gt;</span><br />
-Sends a &lt;message&gt; to &lt;nick&gt;.</p></li>
+Trimite un &lt;message&gt; către &lt;nick&gt;.</p></li>
 
 <li><p><span class="menu">/NAMES</span><br />
 Displays all channels and all nicks of the network in the network window. (Careful with this one)</p></li>
 
 <li><p><span class="menu">/NAMES &lt;channel&gt;</span><br />
-Displays nick(s) in &lt;channel&gt;.</p></li>
+Afișează nick(s) în &lt;channel&gt;.</p></li>
 
 <li><p><span class="menu">/NICK &lt;newnick&gt;</span><br />
-Changes your nick to &lt;newnick&gt;.</p></li>
+Schimbă nick-ul la &lt;newnick&gt;.</p></li>
 
 <li><p><span class="menu">/NOTICE &lt;nick&gt; &lt;message&gt;</span><br />
 Sends a notice to &lt;nick&gt; with the given &lt;message&gt;.</p></li>
@@ -217,16 +217,16 @@ Causes current thread to sleep for the specified time ; for future scripting use
 IRC operator command to disconnect a server.</p></li>
 
 <li><p><span class="menu">/T</span><br />
-Displays the channel-topic of current channel.</p></li>
+Afișează subiectul de canal al canalului curent.</p></li>
 
 <li><p><span class="menu">/T &lt;new-channel-topic&gt;</span><br />
-Same as <span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span>, but on current channel.</p></li>
+La fel ca <span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span>, numai că pe canalul curent.</p></li>
 
 <li><p><span class="menu">/TIME &lt;nick&gt;</span><br />
-Returns local time of &lt;nick&gt;. Equivalent to <span class="menu">/CTCP &lt;nick&gt; TIME.</span></p></li>
+Întoarce timpul local al lui &lt;nick&gt;. Echivalent cu <span class="menu">/CTCP &lt;nick&gt; TIME.</span></p></li>
 
 <li><p><span class="menu">/TOPIC &lt;channel&gt;</span><br />
-Displays the channel-topic of &lt;channel&gt;.</p></li>
+Afișează subiectul de canal al &lt;channel&gt;.</p></li>
 
 <li><p><span class="menu">/TOPIC &lt;channel&gt; &lt;new-channel-topic&gt;</span><br />
 Sets the channel topic of &lt;channel&gt; to &lt;new-channel-topic&gt;.</p></li>
@@ -253,7 +253,7 @@ Displays the Vision uptime. The [-l] parameter has the same effect as in <span c
 IRC operator command that sends a wallops message (visible to those with umode  w active).</p></li>
 
 <li><p><span class="menu">/WHOIS /W &lt;nick&gt;</span><br />
-Returns whois information of &lt;nick&gt;.</p></li>
+Întoarce informațiile whois ale lui &lt;nick&gt;.</p></li>
 </ul>
 
 </div>

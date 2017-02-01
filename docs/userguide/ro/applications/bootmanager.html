@@ -9,6 +9,8 @@
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		Emrys
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -54,45 +56,44 @@
 
 <div id="content">
 <div>
-<div class="box-info">Traducerea acestei pagini nu este completă încă. Până când va fi, părțile incomplete utilizează originalul în limba engleză.</div>
 
 <h2><img src="../../images/apps-images/bootmanager-icon_64.png" alt="bootmanager-icon_64.png" width="64" height="64" />BootManager</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>No entry, normally started from Installer's <span class="menu">Tools</span> menu</i></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><i>Nicio intrare, de obicei pornit din meniul <span class="menu">Unelte</span> al Installer</i></td></tr>
 <tr><td>Locație:</td><td></td><td><span class="path">/boot/system/apps/BootManager</span></td></tr>
-<tr><td>Configurări:</td><td></td><td><i>none</i><br />MBR backups are saved by default in <span class="path">~/config/settings/bootman/</span></td></tr>
+<tr><td>Configurări:</td><td></td><td><i>nimic</i><br />Copiile de rezervă MBR sunt salvate implici în <span class="path">~/config/settings/bootman/</span></td></tr>
 </table>
 <p><br /></p>
-<p>If you don't add the Haiku partition to an existing boot manager like GRUB, BootManager can install a small boot menu in the Master Boot Record (MBR) that looks something like this:</p>
+<p>Dacă nu adăugați partiția Haiku la un gestionar de boot precum GRUB, BootManager poate instala un meniu de boot minimalist în Master Boot Record (MBR) care arată în felul următor:</p>
 <img src="../images/apps-images/bootmenu.png" alt="bootmenu.png" />
-<div class="box-info">Boot Manager isn't yet tested very well and still has a few restrictions that it will complain about if they aren't met: the menu can only be installed on your first harddisk and there has to be a 2KiB space after the Master Boot Record (MBR).</div>
-<p>BootManager guides you through the installation process of the boot menu.</p>
+<div class="box-info">BootManager încă nu este testat foarte bine și mai are câteva restricții de care vă va atenționa dacă nu v-ați ocupat de ele: meniul poate fi instalat doar pe primul hard disc și trebuie să existe un spațiu de 2KiB după Master Boot Record (MBR).</div>
+<p>BootManager vă ghidează prin procesul de instalare al meniului de pornire a sistemului.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="1-drives" id="1-drives">Choosing the destination drive</a></h2>
+<a name="1-drives" id="1-drives">Alegerea unui disc destinație</a></h2>
 <img src="../images/apps-images/bootmanager-1.png" alt="bootmanager-1.png" />
-<p>The BootManager starts off with a list of all available drives from which you choose the destination. If there's already a boot menu on that drive, the <span class="button">Uninstall</span> button becomes active, leading you through the simple procedure to restore a formerly backed-up MBR, thereby removing the boot menu again.<br />
-Otherwise, choose <span class="button">Install</span> to continue.</p>
+<p>BootManager începe cu o listă cu toate discurile disponibile din care alegeți destinația. Dacă deja există un meniu de boot pe acel disc, butonul <span class="button">Dezinstalare</span> devine activ, care vă conduce prin procedura simplă de recuperare a copiei de rezervă MBR, în acest fel eliminând din nou meniul de boot.<br />
+Alfter, alegeți <span class="button">Instalare</span> pentru a continua.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="2-backup" id="2-backup">Backing up the Master Boot Record (MBR)</a></h2>
-<p>In case anything goes wrong or you want to remove the boot menu again, the Master Boot Record (MBR) is now saved. This is obviously a very important step, make sure you don't accidentally overwrite some other MBR-backup maybe from some earlier experimentation, for example!</p>
+<a name="2-backup" id="2-backup">Copierea de rezervă a Master Boot Record (MBR)</a></h2>
+<p>În cazul în care ceva nu merge bine sau doriți să eliminați din nou meniul de boot, Master Boot Record (MBR) este acum salvată. Acesta este evident un pas foarte important, asigurați-vă, de exemplu, că nu suprascrieți accidental altă copie de rezervă MBR de la un eventual experiment anterior!</p>
 <img src="../images/apps-images/bootmanager-2.png" alt="bootmanager-2.png" /> 
 <img src="../images/apps-images/bootmanager-3.png" alt="bootmanager-3.png" />
-<p>Just select a destination for the backup file "<tt>MBR</tt>" or leave the default path. After clicking <span class="button">Next</span> you'll get a confirmation if the backup was successful.</p>
+<p>Selectați doar destinația pentru fișierul copiei de rezervă „<tt>MBR</tt>” sau lăsați calea implicită. După ce ați dat clic pe <span class="button">Următorul</span> veți primi o confirmare dacă s-a realizat cu succes copia de rezervă.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="3-menu" id="3-menu">Configuring the boot menu</a></h2>
+<a name="3-menu" id="3-menu">Configurarea meniului de boot</a></h2>
 <img src="../images/apps-images/bootmanager-4.png" alt="bootmanager-4.png" /> 
 <img src="../images/apps-images/bootmanager-5.png" alt="bootmanager-5.png" />
-<p>Next you're presented with a list of all partitions on the destination drive. By setting checkmarks you decide what entries will appear in the boot menu, the text boxes allow you to rename an entry.</p>
-<p>After that, you pick from the pop-up menu which partition will be booted from by default and set a timeout with the slider below. Here, "<i>Immediately</i>" will skip the boot menu entirely, "<i>Never</i>" will just stop at the boot menu. You can override the timeout setting by holding <span class="key">ALT</span> while booting.</p>
+<p>După asta vă este prezentată o listă cu toate partițiile de pe discul destinație. Prin adăugarea de marcaje decideți care intrări vor apărea în meniul de boot, căsuțele de text vă permit să redenumiți o intrare.</p>
+<p>După aceea, alegeți din meniul contextual de pe care partiție se va porni implicit sistemul și stabiliți o limită de timp cu glisorul de mai jos. Aici „<i>Imediat</i>" va sări peste meniul de boot cu totul, "<i>Niciodată</i>" doar se va opri la meniul de boot. Puteți suprascrie configurarea de limită de timp prin ținerea apăsată a tastei <span class="key">ALT</span> în timpul pornirii sistemului.</p>
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a name="4-mbr" id="4-mbr">Writing the boot menu</a></h2>
+<a name="4-mbr" id="4-mbr">Scrierea meniului de boot</a></h2>
 <img src="../images/apps-images/bootmanager-6.png" alt="bootmanager-6.png" /> 
 <img src="../images/apps-images/bootmanager-7.png" alt="bootmanager-7.png" />
-<p>Before the boot menu is written to the MBR, you'll get a summary of your configuration and then one last chance to abort the operation. Don't worry though, as long as you keep the MBR backup safe, you can easily revert the changes. Should things get thoroughly messed up, you can always boot from a Haiku install CD or USB stick and write back the MBR backup with BootManager.</p>
+<p>Înainte ca meniul de boot să fie scris la MBR, veți primi un rezumat al configurării și apoi o ultimă șansă să anulați operația. Nu vă faceți griji totuși, atât timp cât păstrați în siguranță copia de rezervă MBR, veți putea să întoarceți modificările cu ușurință. Dacă lucrurile se încurcă peste măsură, puteți să porniți întotdeauna de pe un CD sau stick USB de instalare Haiku și să scrieți înapoi copia de rezervă MBR cu BootManager.</p>
 
 </div>
 </div>

@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2014, Haiku. All rights reserved.
+ * Copyright 2010-2016, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,6 +57,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Kaikkien komentorivisovellusten luettelo</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -153,6 +154,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire-ohjausohjelma</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>Mallinetsintä- ja prosessointikieli. </td></tr>
 <tr><td><tt>gdb</tt></td><td> </td><td>GNU-vikajäljitin</td></tr>
+<tr><td><tt>getarch</tt></td><td> </td><td>Shows the environment's compiler version. </td></tr>
 <tr><td><tt>getlimits</tt></td><td> </td><td>Tulostaa alustariippuvaiset rajat komentotulkkiskripteille hyödyllisessä muodossa. </td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Mallin etsintä.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>Tulostaa jokaisen käyttäjätunnuksen ryhmäjäsenyyden. </td></tr>
@@ -176,6 +178,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>kernel_debugger</tt></td><td> </td><td>Siirtyy ydinvikajäljittimeen.</td></tr>
 <tr><td><tt>keymap</tt></td><td> </td><td>Lataa ja tallentaa näppäimistökuvauksen.</td></tr>
 <tr><td><tt>kill</tt></td><td> </td><td>Lähettää signaalin prosessin lopettamiseksi. </td></tr>
+<tr><td><tt>launch_roster</tt></td><td> </td><td>Controls the launch_daemon, e.g. stop and restart services. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>less</tt></td><td> </td><td>Katsoo tiedoston sisällön.</td></tr>
 <tr><td><tt>lessecho</tt></td><td> </td><td>Tulostaa argumentit ja laajentaa metamerkit, kuten * ja ? tiedostonimissä.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Määrittää näppäinsidonnat less-komennolle. </td></tr>
@@ -218,6 +221,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>mount_nfs</tt></td><td> </td><td>Liittää NFS-osion. </td></tr>
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Liittää taltion nimen avulla.</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>Siirtää tai nimeää tiedoston uudelleen. </td></tr>
+<tr><td><tt>nano</tt></td><td> </td><td>The default text editor in the Terminal, a clone of 'Pico'. </td></tr>
 <tr><td><tt>netcat</tt></td><td> </td><td>TCP- ja UDP-apuohjelma.</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>Tulostaa verkkoyhteydet, reititystaulukot, verkkoliittymätilastot, peitetyt yhteydet ja monilähetysjäsenyydet. </td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>Tulostaa jokaisen tiedoston lisätyillä rivinumeroilla. </td></tr>
@@ -250,6 +254,7 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>pwd</tt></td><td> </td><td>Tulostaa nykyisen hakemiston.</td></tr>
 <tr><td><tt>query</tt></td><td> </td><td>Komentotulkkkiapuohjelma, joka matkii Seuraajan "Etsi kaavan avulla"-toiminnallisuutta.  <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
 <tr><td><tt>quit</tt></td><td> </td><td>Sulkee sovelluksen. </td></tr>
+<tr><td><tt>ramdisk</tt></td><td> </td><td>Creates a ramdisk. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>rc</tt></td><td> </td><td>Resurssikääntäjä</td></tr>
 <tr><td><tt>readlink</tt></td><td> </td><td>Tulostaa polun symbolisen linkin kohteeseen.</td></tr>
 <tr><td><tt>reindex</tt></td><td> </td><td>Laittaa olemassaolevien tiedostojen attribuutit vasta luotuihin indekseihin. <a href="cli-apps.html">(Haiku-kohtainen)</a></td></tr>
@@ -267,8 +272,8 @@ Tässä on luettelo Haikun mukana tulevista komentorivisovelluksista. Jokaisen k
 <tr><td><tt>screenmode</tt></td><td> </td><td>Näyttää tai asettaa näyttötilan. </td></tr>
 <tr><td><tt>sdiff</tt></td><td> </td><td>Näyttää ja yhdistää kahden tiedoston erot vieri-viereen.</td></tr>
 <tr><td><tt>seq</tt></td><td> </td><td>Tulostaa numerosekvenssin.</td></tr>
+<tr><td><tt>setarch</tt></td><td> </td><td>Sets the environment to a specific compiler version. </td></tr>
 <tr><td><tt>setdecor</tt></td><td> </td><td>Näyttää tai asettaa koristeet. </td></tr>
-<tr><td><tt>setgcc</tt></td><td> </td><td>Näyttää/asettaa käytetyn gcc-version. </td></tr>
 <tr><td><tt>settype</tt></td><td> </td><td>Asettaa tiedoston MIME-tyypin, allekirjoituksen ja ensisijaisen sovelluksen. </td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Näyttää tiedoston version.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Asettaa järjestelmän äänen voimakkuuden. </td></tr>

@@ -15,6 +15,7 @@
  *		Diver
  *		Humdinger
  *		PoZorro
+ *		Akuji
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -59,7 +60,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <h2><img src="../../images/prefs-images/appearance-icon_64.png" alt="appearance-icon_64.png" width="64" height="64" />Внешний вид</h2>
 <table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
@@ -79,10 +79,11 @@
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="installing_fonts" name="installing_fonts">Установка новых шрифтов</a></h3>
-<p>New fonts that don't come as part of a regular .hpkg package, can be installed by copying them into a subfolder according to the font type (<tt>psfonts</tt> or <tt>ttfonts</tt>) into their respective <tt>non-packaged</tt> folder (see topic <a href="../filesystem-layout.html">Filesystem layout</a>). For TrueType fonts that would be:</p>
+<p>Новые шрифты, не являющиеся частью стандартного пакета .hpkg, могут быть установлены путем их копирования в соответствующую папку <tt>non-packaged</tt> в зависимости от их типа (<tt>psfonts</tt> или <tt>ttfonts</tt>)
+(см. также раздел <a href="../filesystem-layout.html">Структура файловой системы</a>). Для шрифтов TrueType это:</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts available to every user.</td></tr>
-<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td> for fonts only available to yourself.</td></tr>
+<tr><td><span class="path">/boot/system/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>для шрифтов, доступных каждому пользователю.</td></tr>
+<tr><td><span class="path">/boot/home/config/non-packaged/data/fonts/ttfonts/</span></td><td>   </td><td>для шрифтов, доступных лишь вам.</td></tr>
 </table>
 
 <h2>
@@ -96,7 +97,7 @@
 <a id="decorators" name="decorators">Декораторы окон</a></h2>
 <img src="../images/prefs-images/appearance-decorators.png" alt="appearance-decorators.png" />
 <p>Декораторы определяют внешний вид окон и всех элелементов пользовательского интерфейса. Сейчас Haiku имеет по умолчанию только один декоратор. Если Вы найдете и установите другие декораторы, Вы сможете выбрать их в данном меню.</p>
-<p>Haiku's default decorator lets you set the arrow style of the scroll bar: either single arrows at the end of scrollbars to conserve a bit of space, or double arrows — the traditional BeOS way — potentially saving some mouse moving when scrolling up and down or left and right...</p>
+<p>Базовый декоратор Haiku позволяет вам настроить стиль стрелок у полосы прокрутки: либо одна стрелка с каждой стороны, либо две (как у BeOS), позволяющие потенциально уменьшить движение мыши при горизонтальной или вертикальной прокрутке.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>

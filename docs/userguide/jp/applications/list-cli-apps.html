@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2014, Haiku. All rights reserved.
+ * Copyright 2010-2016, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -57,10 +57,11 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />コマンドラインアプリケーションの一覧表</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>位置:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
+<tr><td>場所:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
 </table>
 <p><br /></p>
 <p>Haiku に標準装備されているすべてのコマンドラインアプリケーションは、<span class="path">/boot/system/bin</span> に存在します。ユーザー自身が作ったコマンドラインアプリケーションや、追加インストールしたコマンドラインアプリケーションは、.hpkg パッケージからインストールされた場合 <span class="path">~/config/bin/</span> に現れます。パッケージでない場合は、<span class="path">~/config/non-packaged/bin/</span> に入れられます。これらの場所はすべて PATH 環境変数に含まれているため、自動的に検出されます。<br />
@@ -152,6 +153,7 @@
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire 制御プログラム</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>パターン検索および処理言語。</td></tr>
 <tr><td><tt>gdb</tt></td><td> </td><td>GNU デバッガー</td></tr>
+<tr><td><tt>getarch</tt></td><td> </td><td>Shows the environment's compiler version. </td></tr>
 <tr><td><tt>getlimits</tt></td><td> </td><td>シェルスクリプトに役立つフォーマット内のプラットフォーム依存の範囲を表示します。</td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>パターン検索</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>それぞれのユーザー名に対して、グループメンバーシップを表示します。</td></tr>
@@ -175,6 +177,7 @@
 <tr><td><tt>kernel_debugger</tt></td><td> </td><td>カーネルデバッガーに入ります。</td></tr>
 <tr><td><tt>keymap</tt></td><td> </td><td>キーマップの読み込みまたは保存を行います。</td></tr>
 <tr><td><tt>kill</tt></td><td> </td><td>シグナルを送信して、プロセスを終了させます。</td></tr>
+<tr><td><tt>launch_roster</tt></td><td> </td><td>launch_daemon を制御します。たとえば、サービスの停止と再起動を行います。<a href="cli-apps.html">(Haiku 固有)</a></td></tr>
 <tr><td><tt>less</tt></td><td> </td><td>ファイルを表示します。</td></tr>
 <tr><td><tt>lessecho</tt></td><td> </td><td>引数を表示して、ファイル名中の * や ? のような、メタキャラクタを展開します。</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>less のキーバインディングを指定します。</td></tr>
@@ -217,6 +220,7 @@
 <tr><td><tt>mount_nfs</tt></td><td> </td><td>NFS パーティションををマウントします。</td></tr>
 <tr><td><tt>mountvolume</tt></td><td> </td><td>ボリュームを名前でマウントします。</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>ファイルの移動 / リネームを行います。</td></tr>
+<tr><td><tt>nano</tt></td><td> </td><td>ターミナルでのデフォルトテキストエディターで、'Pico' のクローンです。 </td></tr>
 <tr><td><tt>netcat</tt></td><td> </td><td>TCP および UDP ユーティリティ</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>ネットワークコネクション、ルーティングテーブル、インターフェース統計、マスカレードコネクション、およびマルチキャストメンバーシップを表示します。</td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>それぞれのファイルに行番号を付けて表示します。</td></tr>
@@ -249,6 +253,7 @@
 <tr><td><tt>pwd</tt></td><td> </td><td>現在のディレクトリを表示します。</td></tr>
 <tr><td><tt>query</tt></td><td> </td><td>Tracker の "式で検索 (Find by formula)" 機能をエミュレートするシェルユーティリティです <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
 <tr><td><tt>quit</tt></td><td> </td><td>アプリケーションを終了します。</td></tr>
+<tr><td><tt>ramdisk</tt></td><td> </td><td>ラムディスクを作成します。 <a href="cli-apps.html">(Haiku 固有)</a></td></tr>
 <tr><td><tt>rc</tt></td><td> </td><td>リソースコンパイラ</td></tr>
 <tr><td><tt>readlink</tt></td><td> </td><td>シンボリックリンクが指すパスを表示します。</td></tr>
 <tr><td><tt>reindex</tt></td><td> </td><td>既存のファイルの属性を、新規に作成したインデックスに入れます <a href="cli-apps.html">(Haiku 固有)</a>。</td></tr>
@@ -266,8 +271,8 @@
 <tr><td><tt>screenmode</tt></td><td> </td><td>スクリーンモードの表示 / 設定を行います。</td></tr>
 <tr><td><tt>sdiff</tt></td><td> </td><td>隣り合ったファイルの違いを表示またはマージします。</td></tr>
 <tr><td><tt>seq</tt></td><td> </td><td>一連の数字を表示します。</td></tr>
+<tr><td><tt>setarch</tt></td><td> </td><td>環境を特定のコンパイラのバージョンに設定します、</td></tr>
 <tr><td><tt>setdecor</tt></td><td> </td><td>ウィンドウデコレーターの表示、および設定を行います。</td></tr>
-<tr><td><tt>setgcc</tt></td><td> </td><td>使用している gcc のバージョンを表示または設定します。</td></tr>
 <tr><td><tt>settype</tt></td><td> </td><td>ファイルの MIME タイプ、シグネチャー、および優先アプリケーションを設定します。</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>ファイルのバージョンを表示します。</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>システムサウンドボリュームを設定します。</td></tr>

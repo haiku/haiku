@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2015, Haiku. All rights reserved.
+ * Copyright 2008-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Obsah</td></tr>
@@ -71,7 +72,7 @@
 <h2>
 <a id="welcome" name="welcome">Víta vás Haiku!</a></h2>
 <p>Ďakujeme vám, že ste vyskúšali Haiku! Toto je naše štvrté verejné vydanie. Dúfame, že náš projekt zaujme nových vývojárov a dá budúcim používateľom šancu vyskúšať Haiku. Uvedomujeme si, že toto <i>alfa vydanie</i> zatiaľ celkom nedosahuje cieľov, ktoré sme si stanovili a neponúka všetky možnosti a bezproblémový používateľský zážitok, ktorý je plánovaný pre finálne vydanie R1. Dúfame však, že vám toto vydanie Haiku umožní objaviť veľký potenciál Haiku a že zdieľate naše nadšenie.</p>
-<p>Posledné novinky a oznámenia nájdete na webovej stránke projeku <a hrf="http://www.haiku-os.org">Haiku-os.org</a>.</p>
+<p>Visit our project's website <a hrf="https://www.haiku-os.org">Haiku-os.org</a> for the latest news and announcements.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -81,7 +82,7 @@
 
 <p>Jedným z hlavných dôvodov vydania alfa verzie je prilákanie ďalších ľudí, aby otestovali systém a odhalili chyby alebo vyjadrili svoje návrhy ďalších vylepšení. Prosím, posielajte chyby a vylepšenia do nášho systému na sledovanie chýb potom, ako použijete jeho vyhľadávacie funkcie, aby sme predišli duplicitám.</p>
 <ul>
-	<li><a href="http://dev.haiku-os.org/wiki" class="printurl">Systém sledovania chýb Haiku</a></li>
+	<li><a href="https://dev.haiku-os.org/wiki" class="printurl">Haiku Bug Tracker</a></li>
 	<li><a href="sk/bugreports.html">Tipy na užitočné hlásenie o chybe</a></li>
 </ul>
 
@@ -91,7 +92,7 @@
 <p>Prvé vydanie či vydania Haiku budú veľmi podobné ako BeOS R5, operačný systém, ktorý sa snaží reimplementovať. Ak ho nikdy nezažili, pozrite sa na tieto odkazy:</p>
 <ul>
 	<li><a href="../userguide/sk/contents.html">Používateľská príručka Haiku</a></li>
-	<li><a href="http://www.haiku-os.org/community/" class="printurl">Zoznam webov o BeOS/Haiku</a></li>
+	<li><a href="https://www.haiku-os.org/community/" class="printurl">List of BeOS/Haiku websites</a></li>
 </ul>
 
 <h2>
@@ -99,15 +100,13 @@
 <a id="software" name="software">Inštalovanie ďalšieho softvéru</a></h2>
 <p>Väčšinu dostupného softvéru je možné stiahnuť a nainštalovať pomocou aplikácie HaikuDepot, ktorá sa dodáva spolu s Haiku.<br />
 Vďaka tomu, že Haiku je kompatibilné s BeOS na binárnej úrovni aj na úrovni zdrojového kódu, mnohé aplikácie pre BeOS bežia na Haiku. Pre mnohé z nich boli vytvorené balíky pre Haiku alebo jednoducho bežia nezmenené. Ďalšie informácie o inštalovaní nových programov nájdete v Používateľskej príručke v kapitole <a href="../userguide/sk/applications.html">Aplikácie</a>.</p>
+<p>There are several community-based software collections. See the <a href="https://www.haiku-os.org/community/software">Software Sites</a> page on our website.</p>
 
-<p>Ďalšie populárne zdroje softvéru okrem HaikuDepot sú:</p>
-<ul>
-	<li><a href="http://pulkomandy.tk/~beosarchive/about.html" class="printurl">PulkoMandy-ho archív BeOS softvéru</a></li>
-	<li><a href="http://haiku.uwolke.ru/" class="printurl">Repozitár Haiku od Guest One</a></li>
-	<li><a href="http://fatelk.com/repo" class="printurl">Fat Elk Software</a></li>
-	<li><a href="http://haikuports.org" class="printurl">HaikuPorts</a> - spravuje záplaty portovaného softvéru</li>
-	<li><a href="https://github.com/HaikuArchives" class="printurl">HaikuArchives</a> - na GitHube hosťuje natívne open source projekty pre BeOS a Haiku</li>
-</ul>
+<h2>
+<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="update" name="update">Updating Haiku</a></h2>
+<p>Updating Haiku is currently done from the command line. Open a Terminal and enter "pkgman update". When it's finished, reboot.<br />
+For more details, see the guide <a href="https://www.haiku-os.org/guides/daily-tasks/updating-system">Updating your system</a> on our website.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -122,24 +121,24 @@ Odchýlky od API BeOSu a rozšírenia špecifické pre Haiku sú zdokumentované
 
 <p>Existujú zdroje, ktoré vám pomôžu začať:</p>
 <ul>
-	<li><a href="http://www.haiku-os.org/development/faq" class="printurl">Často kladené otázky - vývoj</a></li>
+	<li><a href="https://www.haiku-os.org/development/faq" class="printurl">Development FAQ</a></li>
 	<li><a href="http://cgit.haiku-os.org/" class="printurl">Prehliadač zdrojového kódu</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/" class="printurl">The Be Book</a></li>
-	<li><a href="http://api.haiku-os.org" class="printurl">The Haiku Book</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Archív newsletterov Be</a></li>
+	<li><a href="https://www.haiku-os.org/legacy-docs/bebook/" class="printurl">The Be Book</a></li>
+	<li><a href="https://api.haiku-os.org" class="printurl">The Haiku Book</a></li>
+	<li><a href="https://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Be Newsletter Archive</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="contact" name="contact">Kontaktujte nás</a></h2>
-<p>Kontaktujte ostatných vývojárov a používateľov a pridajte sa do diskusií na IRC (<a href="http://webchat.freenode.net/?channels=haiku">#haiku</a> na webčete), v našich fórach alebo poštových konferenciách. Keď sa zhromaždí veľa rôznych ľudí, musia sa stanoviť pravidlá, aby komunikácia zostala efektívna. Prosím, rešpektujte <a href="http://www.haiku-os.org/community/ml/etiquette">Etiketu našej konferencie</a>.</p>
+<p>Get in contact with other developers and users and join the discussions on IRC (<a href="http://webchat.freenode.net/?channels=haiku">#haiku</a> on webchat), in our forums or the mailing lists. When many different people come together, rules have to established to keep communication effective. Please respect our <a href="https://www.haiku-os.org/community/ml/etiquette">Mailing List Etiquette</a>.</p>
 <ul>
-	<li><a href="http://www.haiku-os.org/community/irc" class="printurl">Kanály IRC</a></li>
-	<li><a href="http://www.haiku-os.org/forum" class="printurl">Fóra</a></li>
+	<li><a href="https://www.haiku-os.org/community/irc" class="printurl">IRC channels</a></li>
+	<li><a href="https://www.haiku-os.org/forum" class="printurl">Forums</a></li>
 	<li><a href="http://www.freelists.org/list/haiku" class="printurl">Všeobecná poštová konferencia</a></li>
 	<li><a href="http://www.freelists.org/list/haiku-development" class="printurl">Poštová konferencia o vývoji samotného Haiku</a></li>
 	<li><a href="http://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">Poštová konferencia o vývoji aplikácií tretích strán</a></li>
-	<li><a href="http://www.haiku-os.org/community/ml" class="printurl">Prehľad všetkých poštových konferencií</a></li>
+	<li><a href="https://www.haiku-os.org/community/ml" class="printurl">Overview of all mailing lists</a></li>
 </ul>
 
 </div>

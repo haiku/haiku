@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2014, Haiku. All rights reserved.
+ * Copyright 2010-2016, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,6 +58,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Zoznam všetkých aplikácií príkazového riadka</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -153,6 +154,7 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>Program na ovládanie FireWire</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>Jazyk na hľadanie a spracovanie vzorov.</td></tr>
 <tr><td><tt>gdb</tt></td><td> </td><td>GNU debugger</td></tr>
+<tr><td><tt>getarch</tt></td><td> </td><td>Shows the environment's compiler version. </td></tr>
 <tr><td><tt>getlimits</tt></td><td> </td><td>Zobrazí obmedzenia závislé na platforme vo formáte užitočnom pre skripty shellu.</td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Hľadá vzory.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>Vypíše členstvá v skupinách každého používateľského mena.</td></tr>
@@ -176,6 +178,7 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>kernel_debugger</tt></td><td> </td><td>Spustí ladenie jadra.</td></tr>
 <tr><td><tt>keymap</tt></td><td> </td><td>Načíta alebo uloží klávesovú mapu.</td></tr>
 <tr><td><tt>kill</tt></td><td> </td><td>Pošle signál na ukončenie procesu.</td></tr>
+<tr><td><tt>launch_roster</tt></td><td> </td><td>Controls the launch_daemon, e.g. stop and restart services. <a href="cli-apps.html">(Haiku specific)</a></td></tr>
 <tr><td><tt>less</tt></td><td> </td><td>Zobrazí súbor.</td></tr>
 <tr><td><tt>lessecho</tt></td><td> </td><td>Vypíše argumenty, ktoré dostal a expanduje metaznaky ako * a ? v názvoch súborov.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Určuje klávesové väzby pre less. </td></tr>
@@ -218,6 +221,7 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>mount_nfs</tt></td><td> </td><td>Pripojí diskovú oblasť NFS.</td></tr>
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Pripojí zväzok podľa názvu.</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>Presunie/premenuje súbor.</td></tr>
+<tr><td><tt>nano</tt></td><td> </td><td>The default text editor in the Terminal, a clone of 'Pico'. </td></tr>
 <tr><td><tt>netcat</tt></td><td> </td><td>TCP a UDP nástroj.</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>Vypíše sieťové spojenia, smerovacie tabuľky, štatistiky rozhraní, spojenia NAT a členstvá v multicastových skupinách.</td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>Vypíše všetky súbory s pridanými číslami riadkov.</td></tr>
@@ -250,6 +254,7 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>pwd</tt></td><td> </td><td>Vypíše aktuálny adresár.</td></tr>
 <tr><td><tt>query</tt></td><td> </td><td>Nástroj shellu emulujúci funkciu Trackera „Nájsť podľa vzorca“.  <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td><tt>quit</tt></td><td> </td><td>Ukončí aplikáciu.</td></tr>
+<tr><td><tt>ramdisk</tt></td><td> </td><td>Vytvorí ramdisk. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
 <tr><td><tt>rc</tt></td><td> </td><td>Kompilátor zdrojov</td></tr>
 <tr><td><tt>readlink</tt></td><td> </td><td>Vypíše cestu k cieľu symbolického odkazu.</td></tr>
 <tr><td><tt>reindex</tt></td><td> </td><td>Vloží atribúty existujúcich súborov do novo vytvorených indexov. <a href="cli-apps.html">(špecifické pre Haiku)</a></td></tr>
@@ -267,8 +272,8 @@ Tu je zoznam všetkých aplikácií príkazového riadka, ktoré sa nachádzajú
 <tr><td><tt>screenmode</tt></td><td> </td><td>Zobrazí/nastaví režim obrazovky.</td></tr>
 <tr><td><tt>sdiff</tt></td><td> </td><td>Zobrazí alebo zlúči rozdiely v dvoch súboroch bok po boku. </td></tr>
 <tr><td><tt>seq</tt></td><td> </td><td>Vypíše postupnosť čísel.</td></tr>
+<tr><td><tt>setarch</tt></td><td> </td><td>Nastaví prostredie na konkrétnu verziu kompilátora.</td></tr>
 <tr><td><tt>setdecor</tt></td><td> </td><td>Zobrazí/nastaví dekorátor.</td></tr>
-<tr><td><tt>setgcc</tt></td><td> </td><td>Zobrazí/nastaví použitú verziu gcc.</td></tr>
 <tr><td><tt>settype</tt></td><td> </td><td>Nastaví typ MIME, podpis a preferovanú aplikáciu súboru.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Zobrazí verziu súboru.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Nastaví systémovú úroveň hlasitosti.</td></tr>

@@ -15,6 +15,7 @@
  *		Loïc
  *		Vincent Duvert
  *		roptat
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -106,10 +107,9 @@ En saisissant <span class="cli">bt</span>, vous obtiendrez ainsi une trace de la
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Bogues dans les serveurs</a></h2>
-<p>Lorsque les serveurs vitaux comme le serveur d'application, de registre ou d'entré plantent, vous ne verrez pas l'alerte de crash habituelle. à la place, l'écran sera nettoyé de blanc et une session gdb sera lancée, qui affichera directement ses restitutions à l'écran. 
-Il se pourrait que vous soyez toujours à même de déplacer la souris, qui dessinera alors par dessus l'écran blanc de gdb. Les demandes encore en cours (comme ProcessController ou l'horloge dans la barre de Bureau) pourrait également dessiner au dessus de la sortie du débogueur à l'écran.<br />
-Bien que tout soit plus laid et peu commode, les même fondamentaux que pour déboguer les applications s'appliquent.
-Le plus important est de fournir une trace de la pile d'appel à l'aide de la commande <span class="cli">bt</span> (backtrace). Mais comme vous ne serez pas en mesure de copier le texte, vous aurez besoin de prendre une photo de l'écran avec un appareil photo numérique.</p>
+<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
+Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
+Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Bogues du noyau</a></h2>
@@ -124,7 +124,7 @@ La seconde ligne dit « <i>Welcome to Kernel Debugging Land…</i> ». Celle a
 </ul>
 <p>Notez que si seul le dernier point semble indiquer une relation avec le matériel, tous les autres symptômes pourraient aussi être causés par un bogue dans un pilote.
 Si vous soupçonnez un matériel ou son pilote d'être responsable du problème, vérifiez si la suppression ou la désactivation du matériel ou du pilote change quelque chose.
-Par exemple, si vous soupçonnez le Wifi, votre BIOS a peut-être une option pour le désactiver. Sinon, vous pouvez supprimer le pilote Wifi installé dans Haiku (voir <a href="../../../userguide/en/bootloader.html">Chargeur de démarrage</a>).</p>
+Par exemple, si vous soupçonnez le Wifi, votre BIOS a peut-être une option pour le désactiver. Sinon, vous pouvez supprimer le pilote Wifi installé dans Haiku (voir <a href="../../userguide/fr/bootloader.html">Chargeur de démarrage</a>).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Le mode débogage noyau - KDL</a></h3>
@@ -155,7 +155,7 @@ In the boot loader's <span class="menu">Debug menu</span> you should find the en
 <p><b>La sortie écran du débogueur n'est utile que pour déboguer certains problèmes bien spécifiques, et est connu pour avoir des problèmes (timing). Ne l'utilisez que si vous en avez vraiment besoin.</b><br />
 Ce n'est pertinent que si Haiku n'arrive pas à démarrer sur votre machine et que le <span class="menu">Debug syslog option</span> ne fonctionne pas pour quelque raison que ce soit. Pour accéder au menu du chargeur de démarrage, maintenez la touche <span class="key">MAJ</span> enfoncée avant que le logo de Haiku n'apparaisse. Choisissez <span class="menu">Select safe mode options</span>. Selectionnez <span class="menu">[ ] Enable on screen debug output</span> que vous verrez en bas. (Notez que les autres options peuvent êtres activées pour tenter de démarrer Haiku. Si Haiku ne démarre que lorsque certaines options sont activées, n'oubliez pas de mentionner lesquelles )<br />
 Enfin choisissez <span class="menu">Return to main menu</span> puis <span class="menu">Continue booting</span>.<br />
-Une ou plusieurs pages de texte seront affiché à l'écran, Seules les quelques dernières lignes ont besoin de figurer dans votre rapport de bogue. Vous trouvez plus d'information dans le sujet consacré au <a href="../../../userguide/fr/bootloader.html">Chargeur de démarrage</a>.</p>
+Une ou plusieurs pages de texte seront affiché à l'écran, Seules les quelques dernières lignes ont besoin de figurer dans votre rapport de bogue. Vous trouvez plus d'information dans le sujet consacré au <a href="../../userguide/fr/bootloader.html">Chargeur de démarrage</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hardware" name="hardware">Bogues liés au matériel ou aux pilotes</a></h2>

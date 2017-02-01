@@ -62,16 +62,16 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td>
-	<a href="#preparations">Preparations</a><br />
-	<a href="#custom-filetype">Creating a custom filetype</a><br />
-	<a href="#icon">Icon</a><br />
-        <a href="#file-recognition">File recognition</a><br />
-	<a href="#description">Description</a><br />
-	<a href="#pref_app">Preferred Application</a><br />
-	<a href="#extra_attribute">Extra Attributes</a><br />
-	<a href="#indexing">Indexing</a><br />
-	<a href="#filling-data">Filling in the data</a><br />
-	<a href="#query-db">Querying the database</a>
+	<a href="#preparations">Pregătiri</a><br />
+	<a href="#custom-filetype">Crearea unui tip de fișier personalizat</a><br />
+	<a href="#icon">Pictogramă</a><br />
+        <a href="#file-recognition">Recunoașterea fișierelor</a><br />
+	<a href="#description">Descriere</a><br />
+	<a href="#pref_app">Aplicația preferată</a><br />
+	<a href="#extra_attribute">Atribute extra</a><br />
+	<a href="#indexing">Indexare</a><br />
+	<a href="#filling-data">Adăugarea datelor</a><br />
+	<a href="#query-db">Interogarea bazei de date</a>
 </td></tr>
 </table>
 
@@ -102,44 +102,44 @@ In any case, to these files we add a couple of attributes. Here we have to decid
 <a id="custom-filetype" name="custom-filetype">Crearea unui tip de fișier personalizat</a></h2>
 <p>Start the <span class="app">Filetypes</span> preferences, and click on the <span class="button">Add...</span> button below the hierarchical list on the left. A small dialog opens and you specify in which MIME Group your new filetype will reside. You can also create a completely new group. Let's put it into "<i>applications</i>" and set the "Internal Name" to <i>DVDdb</i>.</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-new-file-type.png" alt="filetypes-new-file-type.png" />
-<p>Now, a panel for your new DVDdb filetype opens:</p>
+<p>Un panou pentru noul tip de fișier DVDdb se deschide:</p>
 <img src="images/workshop-filetypes+attributes-images/filetypes-dvddb.png" alt="filetypes-dvddb.png" />
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="icon" name="icon">Icon</a></h3>
+<a id="icon" name="icon">Pictogramă</a></h3>
 <p>Double-click the icon well to open  <a href="applications/icon-o-matic.html">Icon-O-Matic</a> to design an icon for your filetype. You can also drag&amp;drop an icon from the icon well of another type, maybe as starting point for a modified version.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="file-recognition" name="file-recognition">File Recognition</a></h3>
+<a id="file-recognition" name="file-recognition">Recunoașterea fișierelor</a></h3>
 <p>You can add suffixes like .txt, .jpg, .mp3 to recognize files by their extention. Useful when working with files from systems without MIME typing. We don't need that for our example.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="description" name="description">Description</a></h3>
+<a id="description" name="description">Descriere</a></h3>
 <ul>
-<li><i>Type name</i> - Appears e.g. in the Attribute menu of Tracker windows and the "Kind" attribute of a file.</li>
-<li><i>Description</i> - A bit more detailed description.</li>
+<li><i>Nume de tip</i> - Apare de ex. în meniul Atribute al ferestrelor Tracker și în atributul „Tip” al unui fișier.</li>
+<li><i>Descriere</i> - O descriere puțin mai detaliată.</li>
 </ul>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="pref_app" name="pref_app">Preferred Application</a></h3>
+<a id="pref_app" name="pref_app">Aplicația preferată</a></h3>
 <p>This pop-up menu shows a list of all applications that can handle this particular filetype. From here you can choose which program should open this specific file when it's double-clicked.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="button">Select...</span></td><td> </td><td>opens a file dialog where you choose the application to open with this filetype. Here, we set <span class="app">ShowImage</span> to display the DVD's cover.</td></tr>
-<tr><td class="onelinetop"><span class="button">Same as...</span></td><td> </td><td>opens a file dialog where you choose any file that already has the preferred application set that you're looking for.</td></tr>
+<tr><td><span class="button">Selectare...</span></td><td> </td><td>deschide un dialog de fișier unde alegeți aplicația de deschis cu acest tip de fișier. Aici vom stabili <span class="app">ShowImage</span> ca să afișeze coperta DVD.</td></tr>
+<tr><td class="onelinetop"><span class="button">La fel ca...</span></td><td> </td><td>deschide un dialog de fișier unde alegeți orice fișier care are deja stabilită aplicația preferată pe care o căutați.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="extra_attribute" name="extra_attribute">Extra Attributes</a></h3>
-<p>Here we enter all the custom attributes we decided on in our preparations. Clicking the <span class="button">Add...</span> button opens a panel:</p>
+<a id="extra_attribute" name="extra_attribute">Atribute extra</a></h3>
+<p>Aici introducem toate atributele personalizate asupra cărora ne-am decis în pregătirile precedente. Clic pe butonul <span class="button">Adăugare...</span> deschide un panou:</p>
 <img src="images/workshop-filetypes+attributes-images/filetype-extra-attribute.png" alt="filetype-extra-attribute.png" />
 <ul>
-<li><p><i>Attribute name</i> - Appears e.g. as the column heading in Tracker windows.</p></li>
-<li><p><i>Internal name</i> - Is used for indexing and querying the attribute.</p></li>
+<li><p><i>Nume atribut</i> - Apare de ex. ca titlul coloanei în ferestrele Tracker.</p></li>
+<li><p><i>Nume intern</i> - Este utilizat pentru indexarea și interogarea atributului.</p></li>
 <li><i>Type</i> - Defines the value the attribute can hold and therefore how it can be queried.
     <ul>
     <li><span class="menu">String</span> for normal text</li>
@@ -165,43 +165,43 @@ In any case, to these files we add a couple of attributes. Here we have to decid
     <li><span class="menu">Width</span> - The default width of that attributes column in a Tracker window.</li>
     <li><span class="menu">Alignment</span> - The attribute can be displayed left, center, or right aligned.</li>
 </ul></li></ul>
-<p>Now, insert all the info for our attributes:</p>
+<p>Acum introduceți toate informațiile pentru atribute:</p>
 <table summary="DVDdb Attributes" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th><th>indexed?</th><th>Description</th></tr>
-<tr><td>DVDdb:title</td>	<td>text</td>		<td>yes</td>	<td>Titlu film</td></tr>
-<tr><td>DVDdb:genre</td>	<td>text</td>		<td>yes</td>	<td>Gen</td></tr>
-<tr><td>DVDdb:url</td>		<td>text</td>		<td>no</td>	<td>URL</td></tr>
-<tr><td>DVDdb:cast</td>		<td>text</td>		<td>yes</td>	<td>Director/Actori</td></tr>
-<tr><td>DVDdb:plot</td>		<td>text</td>		<td>no</td>	<td>Subiect</td></tr>
-<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>yes</td>	<td>Rating 1 to 10</td></tr>
-<tr><td>DVDdb:coord</td>	<td>text</td>		<td>no</td>	<td>Shelf</td></tr>
-<tr><td>DVDdb:lent</td>		<td>text</td>		<td>yes</td>	<td>Lent to</td></tr>
+<tr><th>Nume intern</th><th>Tip de atribut</th><th>indexat?</th><th>Descriere</th></tr>
+<tr><td>DVDdb:title</td>	<td>text</td>		<td>da</td>	<td>Titlu film</td></tr>
+<tr><td>DVDdb:genre</td>	<td>text</td>		<td>da</td>	<td>Gen</td></tr>
+<tr><td>DVDdb:url</td>		<td>text</td>		<td>nu</td>	<td>URL</td></tr>
+<tr><td>DVDdb:cast</td>		<td>text</td>		<td>da</td>	<td>Director/Actori</td></tr>
+<tr><td>DVDdb:plot</td>		<td>text</td>		<td>nu</td>	<td>Subiect</td></tr>
+<tr><td>DVDdb:rating</td>	<td>int-32</td>		<td>da</td>	<td>Evaluare 1 la 10</td></tr>
+<tr><td>DVDdb:coord</td>	<td>text</td>		<td>nu</td>	<td>Raft</td></tr>
+<tr><td>DVDdb:lent</td>		<td>text</td>		<td>da</td>	<td>Împrumutat la</td></tr>
 </table>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="indexing" name="indexing">Indexing</a></h2>
+<a id="indexing" name="indexing">Indexare</a></h2>
 <p>Before we start entering data in our little DVD database, we should add certain attributes to the <a href="index.html">Index</a>. Only indexed attributes can use Haiku's fast <a href="queries.html">Queries</a>.<br />
 So, what will we be searching in the future? We probably won't ask "What's in the B4 coordinate in my shelf?" or "Does the IMdB URL or the plot of the movie contain the word 'pope-shenooda'?".</p>
-<p>This leaves these attributes:</p>
+<p>Aceasta lasă următoarele atribute:</p>
 <table summary="Attribute Type" cellpadding="10" border="1">
-<tr><th>Internal Name</th><th>Attribute type</th></tr>
+<tr><th>Nume intern</th><th>Tip de atribut</th></tr>
 <tr><td>DVDdb:title</td><td>text</td></tr>
 <tr><td>DVDdb:genre</td><td>text</td></tr>
 <tr><td>DVDdb:cast</td><td>text</td></tr>
 <tr><td>DVDdb:rating</td><td>int-32</td></tr>
 </table>
 
-<p>To index them, we open a Terminal and simply add one attribute after the other:</p>
+<p>Pentru a le indexa, deschidem un Terminal și adăugăm pur și simplu atributele unul după altul:</p>
 <pre class="terminal">mkindex -t string DVDdb:title
 mkindex -t string DVDdb:genre
 mkindex -t string DVDdb:cast
 mkindex -t int DVDdb:rating</pre>
-<p>The <span class="cli">-t</span> option defines the type of attribute, which is "string" for all but the rating, which is an integer number.</p>
+<p>Opțiunea <span class="cli">-t</span> definește tipul de atribut, care e „string” pentru toate în afară de evaluare, care este un număr întreg.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="filling-data" name="filling-data">Filling in the data</a></h2>
+<a id="filling-data" name="filling-data">Adăugarea datelor</a></h2>
 <p>Now, everything's set and we can begin putting some data into our base.<br />
 Since our basic file is a cover image, we go to some online resource like IMdB, look for our first movie and save the cover or movie poster in a new folder where we want to keep our DVDdb files.</p>
 <p>Opening that folder we see a typical Tracker window with one JPEG in it. Right-clicking it, we change its filetype to <tt>application/DVDdb</tt> with the <span class="app">Filetype Addon</span>. There's more info on this in the <a href="filetypes.html">Filetypes</a> document.</p>
@@ -213,12 +213,12 @@ Since our basic file is a cover image, we go to some online resource like IMdB, 
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="query-db" name="query-db">Querying the database</a></h2>
+<a id="query-db" name="query-db">Interogarea bazei de date</a></h2>
 <p>Several hours of grunt work later, we have a nice little database that you can query to find all your Christina Ricci movies that have a 7+ rating...  :)</p>
 <p>You can assign a sensible attribute layout for query results of a specific filetype.<br />
 Open the folder containing your DVDdb files and arrange the attributes how you'd like to have query results presented. Copy this layout with <span class="menu">Attributes | Copy layout</span>.</p>
 <p>Open <span class="path">/boot/home/config/settings/Tracker/DefaultQueryTemplates</span>, create a new folder and rename it to <i>group/filetype</i>, replacing slashes with underscores; in our case "applications_DVDdb".</p>
-<p>Open the new folder and paste in the layout with <span class="menu">Attributes | Paste layout</span>. Voilà:</p>
+<p>Deschideți un dosar nou și lipiți aranjamentul cu <span class="menu">Atribute | Lipire aranjament</span>. Voilà:</p>
 <img src="images/workshop-filetypes+attributes-images/query-dvddb.png" alt="query-dvddb.png" />
 
 </div>

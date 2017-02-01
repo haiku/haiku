@@ -67,12 +67,12 @@
 
 <h2><img src="../../images/apps-images/mail-icon_64.png" alt="mail-icon_64.png" width="64" height="64" />Mail</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicații</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Locație:</td><td></td><td><span class="path">/boot/system/apps/Mail</span></td></tr>
 <tr><td>Configurări:</td><td></td><td><span class="path">~/config/settings/Mail/</span><br />
-<span class="path">~/config/settings/Mail/Menu Links/</span> - Objects put here appear in the mailbox' context menu<br />
-<span class="path">~/config/settings/Mail/signatures/</span> - Location to store signatures<br />
-<span class="path">~/config/settings/Mail/status/</span> - Location to store custom statuses</td></tr>
+<span class="path">~/config/settings/Mail/Menu Links/</span> - Obiectele plasate aici apar în meniul contexual al căsuței poștale<br />
+<span class="path">~/config/settings/Mail/signatures/</span> - Locația pentru stocarea semnăturilor<br />
+<span class="path">~/config/settings/Mail/status/</span> - Locația pentru stocarea stărilor personalizate</td></tr>
 </table>
 <p><br /></p>
 <p>Mail is Haiku's default viewer and editor of emails. It has nothing to do with the actual fetching and sending of mails, which is done by the mail_daemon and can be configured via the <a href="../preferences/e-mail.html">E-mail</a> preferences.</p>
@@ -148,42 +148,42 @@ Right-clicking such a word opens a context menu offering suggestions to correct 
 
 <img src="../images/apps-images/mail-attachments.png" alt="email-attachments.png" /> 
 
-<p>File attachments are listed below the header section. You can remove a file by invoking a context menu or by selecting it and pressing <span class="key">DEL</span>.</p>
+<p>Atașamentele de fișier sunt listate mai jos de secțiunea antet. Puteți elimina un fișier prin deschiderea unui meniu contextual sau prin selectarea fișierului și apăsarea tastei <span class="key">DEL</span>.</p>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Interogări</h3>
-<p>This doesn't work yet, but is intended to hold queries that would show all mail related to the currently open mail, like all to the same recipient or same subject/thread.</p>
+<p>Aceasta nu funcționează încă, dar este destinată să păstreze interogările care ar arăta toate emailurile care sunt legate de emailul deschis în mod curent, precum toate emailurile către același destinatar sau același subiect/thread.</p>
 
 <h2>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="preferences" name="preferences">Preferințe</a></h2>
 <img src="../images/apps-images/mail-preferences.png" alt="email-preferences.png" /> 
-<p>Mail's preferences come in two parts:</p>
+<p>Preferințele email vin în două secțiuni:</p>
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Interfață cu utilizatorul</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Button bar</span></td><td style="width:10px;"></td><td>Options to show labels under the icons or hide the tool bar completely.</td></tr>
-<tr><td><span class="menu">Font</span></td><td></td><td>Sets the type of font used for the email text.</td></tr>
-<tr><td><span class="menu">Size</span></td><td></td><td>Sets the font size.</td></tr>
-<tr><td><span class="menu">Colored quotes</span></td><td></td><td>Colors different levels of quotation.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Initial spell check mode</span></td><td></td><td>Turns the spell checker on/off on startup.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Automatically mark mail as read</span></td><td></td><td>If you close an email with the Status "New", you can have it automatically marked as "Read".</td></tr>
+<tr><td><span class="menu">Bara de butoane</span></td><td style="width:10px;"></td><td>Opțiuni pentru afișare etichetelor sub pictograme sau ascunderea completă a barei de unelte.</td></tr>
+<tr><td><span class="menu">Font</span></td><td></td><td>Stabilește tipul de font utilizat pentru textul emailului.</td></tr>
+<tr><td><span class="menu">Dimensiune</span></td><td></td><td>Stabilește dimensiunea fontului.</td></tr>
+<tr><td><span class="menu">Citate colorate</span></td><td></td><td>Colorează diferite niveluri de citare.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Mod corectare ortografică inițială</span></td><td></td><td>Stabilește ca pornit/oprit corectorul ortografic la pornire.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Marchează automat email drept citit</span></td><td></td><td>Dacă închideți un email cu starea „Nou”, puteți să îl marcați automat drept „Citit”.</td></tr>
 </table>
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>Poștă electronică</h3>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Cont implicit</span></td><td style="width:10px;"></td><td>If you have several email accounts, this specifies which to use by default when creating a new message.</td></tr>
-<tr><td><span class="menu">Reply account</span></td><td></td><td>When you reply to a mail, you can either always <span class="menu">Use default account</span> set in the pop-up menu above, or use the <span class="menu">Account from mail</span>, which will send the mail from the same account that received the original message.</td></tr>
-<tr><td><span class="menu">Reply preamble</span></td><td></td><td>This is inserted before the quoted text in your reply. You can use various variables from the pop-up menu next to the text field. Example: "<i>Hello %n!\n\nOn %d you wrote:\n</i>" produces this:
+<tr><td><span class="menu">Cont implicit</span></td><td style="width:10px;"></td><td>Dacă aveți mai multe conturi de email, aceasta specifică pe care dintre ele să îl utilizați implicit la crearea unui mesaj nou.</td></tr>
+<tr><td><span class="menu">Cont răspuns</span></td><td></td><td>When you reply to a mail, you can either always <span class="menu">Use default account</span> set in the pop-up menu above, or use the <span class="menu">Account from mail</span>, which will send the mail from the same account that received the original message.</td></tr>
+<tr><td><span class="menu">Răspuns preambul</span></td><td></td><td>This is inserted before the quoted text in your reply. You can use various variables from the pop-up menu next to the text field. Example: "<i>Hello %n!\n\nOn %d you wrote:\n</i>" produces this:
 <pre>Hello Dr. Hawking!
 
 On Mon, 18 Jan 1998 02:55:16 +0800 you wrote:
 &gt; so thanks again for the inspiration concerning the cosmological constant.
 &gt; ...and the rest of the quoted text following...</pre></td></tr>
-<tr><td><span class="menu">Semnătură automată</span></td><td></td><td>Adds a signature automatically to the end of the mail.</td></tr>
-<tr><td><span class="menu">Encoding</span></td><td></td><td>Sets the default encoding.</td></tr>
-<tr><td class="onelinetop"><span class="menu">Warn unencodable</span></td><td></td><td>If your mail contains characters that can't be encoded with the currently set encoding method, you can turn on being warned about that. That gives you the opportunity to change the encoding before sending. Otherwise unencodable characters are replaced by rectangle symbols.</td></tr>
+<tr><td><span class="menu">Semnătură automată</span></td><td></td><td>Adaugă o semnătură automat la sfârșitul emaillului.</td></tr>
+<tr><td><span class="menu">Codare</span></td><td></td><td>Stabilește codarea implicită.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Avertizează necodabil</span></td><td></td><td>If your mail contains characters that can't be encoded with the currently set encoding method, you can turn on being warned about that. That gives you the opportunity to change the encoding before sending. Otherwise unencodable characters are replaced by rectangle symbols.</td></tr>
 <tr><td><span class="menu">Text wrapping</span></td><td></td><td>Inserts line-breaks every 76 characters which makes mails easier to read.</td></tr>
 <tr><td><span class="menu">Atașează atribute</span></td><td></td><td>You can choose to send BFS' attributes of a file alongside the attachments. This is nice for other Haiku users, as they'll get a "complete" file (think artist, album, title attributes of MP3 files), but may cause confusion (or even suspicion) with others, who will wonder what the additional "BeOS Attributes" attachment might be...<br />
 Should you opt not to send attributes with your attachments, remember zip up your files before you send them or you'll strip away BFS attributes.</td></tr>

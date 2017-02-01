@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2014 Haiku. All rights reserved.
+ * Copyright 2013-2017 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,15 +56,16 @@
 
 <div id="content">
 <div>
+<div class="box-info">Tämän sivun kotoistaminen ei ole vielä täydellinen. Siihen asti keskeneräiset osat käyttävät englanninkielistä alkuperäistekstiä.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Hakemisto</td></tr>
-<tr class="index"><td><a href="#filter">Suodatin</a><br />
-                <a href="#list">Luettelo</a><br />
-                <a href="#info">Tietoalue</a><br />
-                <a href="#menu">Työkalut ja valitsimet</a><br />
-                <a href="#account">Käyttäjätilin luominen</a><br />
-                <a href="#rating">Arvosanat ja kommentointi</a><br />
+<tr class="index"><td><a href="#filter">The Filter</a><br />
+                <a href="#list">The List</a><br />
+                <a href="#info">The Info Area</a><br />
+                <a href="#menu">Tools and Show</a><br />
+                <a href="#account">Creating a User Account</a><br />
+                <a href="#rating">Rating and Commenting</a><br />
 </td></tr>
 </table>
 
@@ -72,18 +73,20 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Työpöytäpalkki:</td><td style="width:15px;"></td><td><span class="menu">Sovellukset</span></td></tr>
 <tr><td>Sijainti:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
-<tr><td>Asetukset:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
+<tr><td>Asetukset:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span> - The main settings of the application<br />
+<span class="path">~/config/cache/HaikuDepot</span> - Cached icons, screenshots, descriptions etc.</td></tr>
 </table>
 <p><br /></p>
-<p>HaikuVarasto on keskeinen sovellus ohjelmistopakkaustesi hallintaan. Sovelluksella voit selata ja etsiä pakkausvarastoja (joita kutsutaan myös "varastot") sekä asentaa, päivittää ja poistaa pakkauksia. HaikuVarasto alkaa <i>Mainostetut pakkaukset</i>-luettelolla, jossa on ohjelmistoja, jotka tuntuvat kiinnostavan monia käyttäjiä. Heti kun kirjoitat termin hakukenttään tai valitset luokan, näyttö vaihtaa pienempään kuvakkeeseen ja sarakkeisiin järjestetään lisätietoja.</p>
+<p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories and install, update and uninstall packages. By default, HaikuDepot starts up with a list of "<i>Featured packages</i>", software that's deemed interesting to many users.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
+<p>As soon as you enter something in the <span class="menu">Search terms</span> box, the display changes to smaller icons and more information arranged in columns.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filter" name="filter">Suodatin</a></h2>
 <p>Ylimpänä löydämme muutamia keinoja suodattaa alla saatavilla olevien pakkausten luetteloa:</p>
 <ul>
 <li><p><span class="menu">Luokka</span> ponnahdusvalikko sallii sinun rajoittaa luettelon yksittäisiksi luokiksi kuten "<i>Audio</i>" tai "<i>Pelit</i>".</p></li>
-<li><p><span class="menu">Varasto</span> ponnahdusvalikko määrittää, mitkä verkkovarastot kysellään tai jos näytetään vain ne asennetut pakkaukset, jotka on asennettu jostain muualta kuin verkkovarastosta ("<i>Paikallinen</i>"). Ehkä USB-tikulta tai joltain webbisivulta ladatut tai pakkaukset, jotka olet rakentanut itse.</p></li>
+<li><p>The <span class="menu">Repositories</span> pop-up menu determines which online repos are queried or if only those packages are shown, that were installed from somewhere other than an online repo ("<i>Local</i>"). Maybe from an USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
 <li><p><span class="menu">Etsintätermit</span>-tekstikenttäsuodattimet sitten luetteloivat ne pakkaukset, jotka on kirjoitettu (välilyönneillä eroteltuina) merkkijonoina niiden nimissä tai kuvauksissa.</p></li>
 </ul>
 
@@ -93,7 +96,7 @@
 <p>Pakkauksen tilasarakkeessa voi olla yksi seuraavista tiloista:</p>
 <ul>
 <li><p><span class="menu">Aktiivi</span>: Pakkaus on asennettu ja valmiina käytettäväksi.</p></li>
-<li><p><span class="menu">Saatavilla</span>: Pakkaus on tässä varastossa ja se voidaan ladata ja asentaa. Jos pakkauksella on riippuvuuksia muihin pakkauksiin, sinulle kerrotaan siitä asennuksen aikana ja tarjotaan mahdollisuus ladata/asentaa kaikki välttämätön.</p></li>
+<li><p><span class="menu">Available</span>: The package exists in that repository and can be downloaded and installed. If there are any dependencies on other packages, you'll be informed of that while installing and get the choice of downloading/installing all that's necessary.</p></li>
 <li><p><span class="menu">Odottaa / %</span>: <i>Odottaa</i> näytetään pakkaukselle, jota jonotetaan lataukseen/asennukseen. Pakkauksen latauksen aikana edistyminen näytetään prosentteina.</p></li>
 <li><p><span class="menu">Päivitys saatavilla</span>: Asennettuun pakkaukseen on saatavilla uudempi versio.</p></li>
 </ul>
@@ -103,25 +106,30 @@
 <a id="info" name="info">Tietoalue</a></h2>
 <p>Alimmaisena on alue, joka näyttää tietoja pakkauksesta, joka on parhaillaan valittuna luettelossa.<br />
 Pakkausnimen, tekijän, arvosanan ja version oikealla puolella on painike, joka – riippuen pakkauksen nykyisestä tilasta – sallii sinun <span class="button">Asentaa</span>, <span class="button">Poistaa asennus</span> tai <span class="button">Päivittää</span> se. Jos pakkaus on jo asennettu, löydät täältä lisäpainikkeen, joka <span class="button">Avaa</span> sovelluksen.</p>
-<p>Alla on kolme välilehteä: Ohjelmasta, Arvosanat, ja Muutosloki.</p>
+<p>Below are four tabs: About, Ratings, Changelog and Contents.</p>
 <ul>
 <li><p _translation_id="5252"><span class="menu">Ohjelmasta</span></p>
 <p _translation_id="5253">Ensimmäisessä välilehdessä on yksityiskohtainen pakkauskuvaus sekä kuvakaappaukset ja yhteystiedot ja pakkausta ylläpitävän ryhmän verkko-osoite, jos sellainen on saatavilla. Kuvakaappauksen pienoiskuvan napsauttaminen avaa uuteen ikkunaan kuvan suurikokoisemman version</p></li>
-<li><p _translation_id="5254"><span class="menu">Arvosanat</span></p>
-<p _translation_id="5255">Toisessa välilehdessä näytetään arvosanat ja käyttäjäkommentit, jos niitä on saatavilla.</p>
+<li><p _translation_id="5254"><span class="menu">Ratings</span></p>
+<p _translation_id="5255">The second tab shows ratings and comments of users, if available.</p>
 <img src="../images/apps-images/haikudepot-rating-tab.png" alt="haikudepot-rating-tab.png" />
-<p _translation_id="5268">Vasemmalla on tilasto, joka näyttää kuinka monelta käyttäjältä pakkaus sai tietyn määrän (1...5) tähtiä.<br />
-Keskellä on käyttäjäkommentteja käyttäjätunnuksilla, heidän antamiensa tähtien määrä ja mistä pakkausversiosta he antoivat arvosanan tai kommentin. Löydät lisätietoja siitä kuinka voit itse antaa pakkaukselle arvosanan <a href="#rating">alempaa</a>.<br />
-Pienellä ylöspäin tai alaspäin olevalla peukalolla voit näyttää mielipiteesi tietystä kommentista.</p></li>
-<li><p _translation_id="5257"><span class="menu">Muutosloki</span></p>
-<p _translation_id="5258">Viimeisessä välilehdessä näytetään pakkauksen kaikkien toistaiseksi julkaistujen versioiden yksityiskohtainen historia.</p></li>
+<p _translation_id="5268">To the left is a statistic, showing the number of stars (1 to 5) the package got from how many users.<br />
+In the middle are user comments with their nickname, the number of stars they gave the package and which version of the package they were rating or commenting on. You'll find more on how to rate a package yourself <a href="#rating">further down</a>.<br />
+<!--  With the little thumb up/down icons to the right, you can show your approval or disapproval with a certain comment.
+-->
+</p></li>
+<li><p _translation_id="5257"><span class="menu">Changelog</span></p>
+<p _translation_id="5258">Here you find a detailed history of all the  versions of the package that have been released so far, if the maintainer of the package  provides that information.</p></li>
+<li><p><span class="menu">Contents</span></p>
+<p>The last tab shows all the files and folders a package contains. This only works for already downloaded packages.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Työkalut ja valitsimet</a></h2>
-<p><span class="menu">Työkalut</span>-valikossa ikkunan yläosassa löydät rivin <span class="menu">Päivitä varastot</span>. Tämä pyytää varastoista ajantasaisen luettelon saatavilla olevista pakkauksista.</p>
-<p>Valikosta <span class="menu">Valitsimet</span> voit valita myös <span class="menu">Näytä kehityspakkaukset</span> ja <span class="menu">Näytä lähdekoodipakkaukset</span> pakkausluetteloon. Tavalliset käyttäjät eivät ole niistä kiinnostuneita ja ne sotkisivat luetteloa. Ne ovat kuitenkin tarpeita niille ihmisille, jotka tarvitsevat kirjastoja, otsakkeita jne. pakkauskehitykseen ja niistä riippuvien ohjelmien kääntämiseen.</p>
-<p>Kahdesta muusta aiheesta lisää kiinnostuneille valikosta löytyy <span class="menu">Näytä saatavilla olevat pakkaukset</span> ja <span class="menu">Näytä asennetut pakkaukset</span>, jotka ovat aika itseään selittäviä.</p>
+<a id="menu" name="menu">Tools and Show</a></h2>
+<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories. The other item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.</p>
+<p>Under <span class="menu">Show</span> you can deactivate <span class="menu">Only featured packages</span>. Now you'll always see all packages and not just the featured ones when HaikuDepot starts up or the search text field is empty.<br />
+Furthermore, you can choose to also Show <span class="menu">Develop packages</span> and <span class="menu">Source packages</span> in the packages list. For the normal user those are of no interest and would only clutter the list. They are important, however, for people who need the libraries, headers etc. of a package to develop and compile programs depending on them.</p>
+<p>Of more interest are the options to only show <span class="menu">Available packages</span> and <span class="menu">Installed packages</span>, which are pretty self-explanatory.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="account">Käyttäjätilin luominen</a></h2>
@@ -138,8 +146,8 @@ Pienellä ylöspäin tai alaspäin olevalla peukalolla voit näyttää mielipite
 <a id="rating" name="rating">Arvosanat ja kommentointi</a></h2>
 <p>Kun olet luonut käyttäjätilin ja kirjautunut sisään, voit antaa pakkaukselle arvosanan ja jättää kommentin, jos haluat. Liikuta vain hiiren kohdistinta pakkauksen tietoalueen arvosanatähtien päällä ja ne muuttuvat <span class="button">Anna pakkauksen arvosana...</span>-painikkeeksi. Napsauta sitä arvosanaikkunan avaamiseksi:</p>
 <img src="../images/apps-images/haiku-depot-ratingpanel.png" alt="haiku-depot-ratingpanel.png" />
-<p>Tässä liikutat hiiren kohdistinta tähtien yläpuolella niiden sytyttämiseksi ja arvosanasi valitsemiseksi, voit myös valita tasonumeron sovelluksen stabilisuusarvioksi ja poimia valinnaisen kommentin kielen. Jotta kommentti olisi merkityksellinen, sinun pitäisi työskennellä sovelluksella, jota arvioit tutustuaksesi sen ominaisuuksiin, ohjelmointivirheisiin ja oikkuihin. Ja älä kirjoita seuraa suomalaista suurromaania... pidä se lyhyenä, lempeänä ja kohteliaana. :)<br />
-<span class="button">Lähetä</span>-painikkeen napsauttamisen jälkeen tiedot lähetetään palvelimelle. Sinun on ehkä siirryttävä <span class="menu">Työkalut</span>-valikkoon valitsemaan <span class="menu">Päivitä varastot</span> ennen kuin voit nähdä muutoksesi.</p>
+<p>Here you move the mouse over the stars to light them up and choose your rating, you can also choose from a number of levels to judge the stability of the application and pick the language of your optional comment. To make a comment meaningful, you should have worked with the application you're about to rate for a while to become familiar with its features, bugs and quirks. And don't write the next great American novel... keep it short, sweet and polite. :)<br />
+After you click <span class="button">Send</span> the data is transmitted to the server. You may have to go to the <span class="menu">Tools</span> menu to <span class="menu">Refresh repositories</span> before you can see your changes.</p>
 <p>Milloin tahansa voit palata ja muokata kommenttiasi tai antaa arvosanan uudelleen. Voit myös piilottaa arvioinnin muilta käyttäjältä poistamalla valinnan valintaruudusta <span class="menu">Muut käyttäjät voivat nähdä tämän arvosanan</span>.</p>
 </div>
 </div>

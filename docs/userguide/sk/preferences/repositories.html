@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US" xml:lang="en-US">
+<head>
+<!-- 
+ *
+ * Copyright 2017, Haiku. All rights reserved.
+ * Distributed under the terms of the MIT License.
+ *
+ * Authors:
+ *		Humdinger <humdingerb@gmail.com>
+ * Translators:
+ *		helix84
+ *
+-->
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Style-Type" content="text/css" />
+	<meta name="robots" content="all" />
+	<title>Zdroje softvéru</title>
+	<link rel="stylesheet" type="text/css" href="../../Haiku-doc.css" />
+</head>
+<body>
+
+<div id="banner">
+<div><span>Používateľská príručka</span></div>
+</div>
+
+<div class="nav">
+<div class="inner">
+<ul class="lang-menu">
+<li class="now"><img src="../../images/flags/sk.png" alt="" /> Slovenčina</li>
+<li><a href="../../fr/preferences/repositories.html"><img src="../../images/flags/fr.png" alt="" />Français</a></li>
+<li><a href="../../de/preferences/repositories.html"><img src="../../images/flags/de.png" alt="" />Deutsch</a></li>
+<li><a href="../../it/preferences/repositories.html"><img src="../../images/flags/it.png" alt="" />Italiano</a></li>
+<li><a href="../../ru/preferences/repositories.html"><img src="../../images/flags/ru.png" alt="" />Русский</a></li>
+<li><a href="../../es/preferences/repositories.html"><img src="../../images/flags/es.png" alt="" />Español</a></li>
+<li><a href="../../sv_SE/preferences/repositories.html"><img src="../../images/flags/sv_SE.png" alt="" />Svenska</a></li>
+<li><a href="../../jp/preferences/repositories.html"><img src="../../images/flags/jp.png" alt="" />日本語</a></li>
+<li><a href="../../uk/preferences/repositories.html"><img src="../../images/flags/uk.png" alt="" />Українська</a></li>
+<li><a href="../../zh_CN/preferences/repositories.html"><img src="../../images/flags/zh_CN.png" alt="" /> 中文 ［中文］</a></li>
+<li><a href="../../pt_PT/preferences/repositories.html"><img src="../../images/flags/pt_PT.png" alt="" />Português</a></li>
+<li><a href="../../fi/preferences/repositories.html"><img src="../../images/flags/fi.png" alt="" />Suomi</a></li>
+<li><a href="../../hu/preferences/repositories.html"><img src="../../images/flags/hu.png" alt="" />Magyar</a></li>
+<li><a href="../../pt_BR/preferences/repositories.html"><img src="../../images/flags/pt_BR.png" alt="" />Português (Brazil)</a></li>
+<li><a href="../../ca/preferences/repositories.html"><img src="../../images/flags/ca.png" alt="" />Català</a></li>
+<li><a href="../../pl/preferences/repositories.html"><img src="../../images/flags/pl.png" alt="" />Polski</a></li>
+<li><a href="../../ro/preferences/repositories.html"><img src="../../images/flags/ro.png" alt="" />Română</a></li>
+<li><a href="../../en/preferences/repositories.html"><img src="../../images/flags/gb.png" alt="" />English</a></li>
+</ul>
+
+<span>
+ «  <a href="printers.html">Printers</a> 
+::  <a href="../preferences.html" class="uplink">Preferences</a>
+::  <a href="screen.html">Screen</a>  »
+</span></div>
+</div>
+
+<div id="content">
+<div>
+<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
+
+<h2><img src="../../images/prefs-images/repositories-icon_64.png" alt="repositories-icon_64.png" width="64" height="64" />Zdroje softvéru</h2>
+<table summary="quickinfo" border="0" cellspacing="0" cellpadding="2">
+<tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Nastavenia</span></td></tr>
+<tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/preferences/Repositories</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/Repositories_settings</span></td></tr>
+</table>
+<p>Zdroje softvéru sú kolekcie balíkov softvéru. Štandardne nastavený je zdrojo softvéru <i>Haiku</i> so všetkými balíkmi operačného systému a <i>HaikuPorts</i>, ktorý poskytuje veľké množstvo portovaných aplikácií a natívneho softvéru pre Haiku. Existuje niekoľko ďalších zdrojov softvéru, ktoré spravujú členovia komunity Haiku. Pozrite sa na webovej stránke na <a href="https://www.haiku-os.org/community/software">Webstránky so softvérom</a>.</p>
+<p>This is the preference panel to manage your respositories (you can open it also from <a href="../applications/haikudepot.html">HaikuDepot's</a> <span class="menu">Tools</span> menu):</p>
+<img src="../images/prefs-images/repositories.png" alt="repositories.png" />
+<p>The first column in the list of known repositories shows if a repo is currently enabled. If it doesn't have a checkmark, it will not be queried by HaikuDepot or <span class="cli">pkgman</span> from the command line. Use the buttons to <span class="button">Enable</span> or <span class="button">Disable</span> the selected repositories, or double-click a repo to toggle the status.</p>
+<p>Depending on the size of the repository and the speed of the internet connection, enabling a repository may take a few seconds. If it takes longer, you're informed of pending tasks in the little text box above the <span class="button">+/-</span> buttons. If it takes unusually long, you'll be asked to either cancel or retry.</p>
+<p>To be able to remove a repository completely with the "<span class="button">-</span>" button, it has to be disabled.<br />
+You add a new repository with the "<span class="button"> </span>" button, which will open this panel:</p>
+<img src="../images/prefs-images/repositories_add.png" alt="repositories_add.png" />
+<p>To add a new repository, just paste its URL into the text field. It'll be named "Unknown" until you enable it.</p>
+<div class="box-warning">It goes without saying that adding a repository and downloading and installing software from it is a matter of trust. Don't carelessly just add any URL you happen upon on the internets.</div>
+</div>
+</div>
+
+<div class="nav">
+<div class="inner"><span>
+ «  <a href="printers.html">Tlačiarne</a> 
+::  <a href="../preferences.html" class="uplink">Nastavenia</a>
+::  <a href="screen.html">Obrazovka</a>  »
+</span></div>
+</div>
+
+</body>
+</html>

@@ -61,20 +61,20 @@
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td><a href="#bitmap-vector">BeOS bitmap vs. Haiku vector icons</a><br />
-                <a href="#icons-attributes">Icons are attributes</a><br />
-                <a href="#i-o-m">Creating icons with Icon-O-Matic</a><br />
-                  <a href="#i-o-m-path">Path</a><br />
-                  <a href="#i-o-m-shape">Shape</a><br />
-                  <a href="#i-o-m-style">Style</a><br />
+                <a href="#icons-attributes">Pictogramele sunt atribute</a><br />
+                <a href="#i-o-m">Crearea de pictograme cu Icon-O-Matic</a><br />
+                  <a href="#i-o-m-path">Cale</a><br />
+                  <a href="#i-o-m-shape">Formă</a><br />
+                  <a href="#i-o-m-style">Stil</a><br />
                   <a href="#i-o-m-transformer">Transformer</a><br />
-                  <a href="#i-o-m-save">Saving an icon</a><br />
-                  <a href="#i-o-m-tips">Tips &amp; Tricks</a></td></tr>
+                  <a href="#i-o-m-save">Salvarea ca pictogramă</a><br />
+                  <a href="#i-o-m-tips">Sfaturi &amp; Trucuri</a></td></tr>
 </table>
 
 <h2><img src="../../images/apps-images/icon-o-matic-icon_64.png" alt="icon-o-matic-icon_64.png" width="64" height="64" />Icon-O-Matic</h2>
 
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Aplicații</span></td></tr>
+<tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Applications</span></td></tr>
 <tr><td>Locație:</td><td></td><td><span class="path">/boot/system/apps/Icon-O-Matic</span></td></tr>
 <tr><td>Configurări:</td><td></td><td><span class="path">~/config/settings/Icon-O-Matic</span></td></tr>
 </table>
@@ -131,7 +131,7 @@ For example, by re-using a path, several objects can be modified together by man
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-path" name="i-o-m-path">Traseu</a></h3>
+<a id="i-o-m-path" name="i-o-m-path"> Traseu</a></h3>
 <p>A path consists of several points which are connected with lines or Bezier curves. To add or change points, make sure the path is selected in the path list.</p>
 
 <p>Simply clicking in the canvas will set the first point. While setting a point, you decide if the resulting line will be straight or curved: a simple click and release produces a straight line, holding down the mouse button and moving the mouse will drag out the handles for a Bezier curve. Of course, you can also change it all later on.</p>
@@ -145,7 +145,7 @@ Vice versa, to go from Bezier to a corner-point, hold <span class="key">ALT</spa
 To insert a point into a path you click on the connecting line between two points.<br />
 Selected points are deleted by pressing <span class="key">DEL</span> or by clicking on any point while holding <span class="key">CTRL</span>.</p>
 
-<p>The mouse pointer indicates the current mode:</p>
+<p>Cursorul mouseului indică modul curent:</p>
 <table summary="Mouse pointer states, Path" border="0" cellpadding="10">
         <tr align="center">
                 <td><img src="../../images/apps-images/i-o-m-pointer-move-path.png" alt="i-o-m-pointer-move-path" width="16" height="16" /></td>
@@ -166,30 +166,30 @@ Selected points are deleted by pressing <span class="key">DEL</span> or by click
 </table>
 <p>Puteți invoca un meniu contextual prin clic dreapta pe un punct sau o selecție de puncte:</p>
 <table summary="Path context" border="0" cellspacing="0" cellpadding="2">
-<tr><td class="onelinetop"><span class="menu">Select all</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>Selects all points of the current path.</td></tr>
-<tr><td><span class="menu">Transform</span></td><td><span class="key">T</span></td><td>Puts all selected points in a transformation box, so you can move, resize and rotate them together. It works just like with shapes, described a bit further down.</td></tr>
-<tr><td><span class="menu">Split</span></td><td></td><td>Splits selected points into two, one sitting on top of the other.</td></tr>
-<tr><td><span class="menu">Flip</span></td><td></td><td>Rotates selected points by 180°. Only has an effect on Bezier points.</td></tr>
-<tr><td><span class="menu">Eliminare</span></td><td><span class="key">DEL</span></td><td>Deletes selected points.</td></tr>
+<tr><td class="onelinetop"><span class="menu">Selectează tot</span></td><td style="width:70px"><span class="key">ALT</span> <span class="key">A</span></td><td>Selectează toate punctele traseului curent.</td></tr>
+<tr><td><span class="menu">Transformă</span></td><td><span class="key">T</span></td><td>Adaugă toate punctele selectate într-o cutie de transformare, deci puteți să le mutați, redimensionați și rotați împreună. Funcționează exact ca formele, descrise puțin mai jos.</td></tr>
+<tr><td><span class="menu">Împarte</span></td><td></td><td>Împarte punctele selectate în două, unul stă deasupra celuilalt.</td></tr>
+<tr><td><span class="menu">Inversează</span></td><td></td><td>Rotește punctele selectate cu 180°. Are efect doar pentru punctele Bezier.</td></tr>
+<tr><td><span class="menu">Elimină</span></td><td><span class="key">DEL</span></td><td>Șterge punctele selectate.</td></tr>
 </table>
 
 <h4><a id="i-o-m-path-menu" name="i-o-m-path-menu">Meniu traseu</a></h4>
 <p>The <span class="menu">Path</span> menu offers a few obvious entries to <span class="menu">Add rectangle</span> and <span class="menu">Add circle</span> or to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a path. Here are some that may need a bit more explaining:</p>
 
 <table summary="Path menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Reverse</span></td><td style="width:15px;"></td><td>If your path isn't "closed" (see Path Properties below), a click into the canvas always creates a new point, connecting it with the last one. "Reverse" will reverse this order and your new point will connect to original start point instead.</td></tr>
+<tr><td><span class="menu">Inversează</span></td><td style="width:15px;"></td><td>If your path isn't "closed" (see Path Properties below), a click into the canvas always creates a new point, connecting it with the last one. "Reverse" will reverse this order and your new point will connect to original start point instead.</td></tr>
 <tr><td><span class="menu">Clean up</span></td><td></td><td>Most useful with imported SVGs, this function will remove redundant points.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Rotate indices right</span></td><td><span class="key">ALT</span> <span class="key">R</span></td><td>Practically, this rotates the opening of a path. It's best seen when using a not-closed path with a style and a shape with a stroke transformer. Now, if your path looks like a ⊂ it will rotate like this: ⊂ ∩ ⊃ ∪.</td></tr>
 <tr><td class="onelinetop"><span class="menu">Rotate indices left</span></td><td><span class="key">ALT</span> <span class="key">SHIFT</span> <span class="key">R</span></td><td>Does the same in the other direction.</td></tr>
 </table>
 
-<h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">Path Properties</a></h4>
+<h4><a id="i-o-m-path-properties" name="i-o-m-path-properties">Proprietăți traseu</a></h4>
 <p><span class="menu">Properties</span> at the bottom left of the window offers all available settings of the currently selected object. A path only has two: a <span class="menu">Name</span> and if it's <span class="menu">Closed</span> or not.</p>
 
 
 <h3>
 <a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="i-o-m-shape" name="i-o-m-shape">Shape</a></h3>
+<a id="i-o-m-shape" name="i-o-m-shape">Formă</a></h3>
 <p>A shape groups together one or more paths with a style. Practically, it's the object that you'll actually see on the canvas. The grouping is done with the checkboxes in front of the paths and styles: Just select your shape and tick off the desired path(s) and a style.</p>
 <p>A shape defines how a path and style is applied, e.g. if the object is filled or only stroked (which is done by using Transformers on the shape, we'll get to that later). Also, a shape can be moved, rotated or resized without touching the used path. That way, you can re-use a single path and get different, but related, shapes.</p>
 
@@ -204,16 +204,16 @@ Selected points are deleted by pressing <span class="key">DEL</span> or by click
                 <td><img src="../../images/apps-images/i-o-m-pointer-move-path.png" alt="i-o-m-pointer-move-rotation" width="16" height="16" /></td>
         </tr>
         <tr align="center">
-                <td>Move</td>
-                <td>Resize</td>
-                <td>Rotate</td>
-                <td>Move<br />rotation point</td>
+                <td>Mutare</td>
+                <td>Redimensionare</td>
+                <td>Rotire</td>
+                <td>Mutare<br />punct de rotație</td>
         </tr>
 </table>
 
 <p>Shapes lie on top of each other, each is on its own layer, if you will. To reorder them you drag&amp;drop their entry to a different position in the list.</p>
 
-<h4><a id="i-o-m-shape-menu" name="i-o-m-path-menu">Shape Menu</a></h4>
+<h4><a id="i-o-m-shape-menu" name="i-o-m-path-menu">Meniu formă</a></h4>
 <p>The <span class="menu">Shape</span> menu offers the before mentioned possibility to <span class="menu">Add empty, with path/style/path &amp; style</span> and to <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a shape. Then, there is:</p>
 <table summary="Shape menu" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">Reset transformation</span></td><td style="width:15px;"></td><td>Reverts all the move, resize and rotate transformations you have applied to the shape.</td></tr>
@@ -221,15 +221,15 @@ Selected points are deleted by pressing <span class="key">DEL</span> or by click
 If not, "Freeze transformation" will apply the current shape transformation to the assigned path(s). A future "Reset Transformation" will then return to this new state.</td></tr>
 </table>
 
-<h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">Shape Properties</a></h4>
+<h4><a id="i-o-m-shape-properties" name="i-o-m-shape-properties">Proprietăți formă</a></h4>
 <p>Besides a <span class="menu">Name</span>, the <span class="menu">Properties</span> view for a shape has these options:</p>
 
 <table summary="Shape properties" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Min LOD</span></td><td></td><td>Minimum Level of Detail</td></tr>
-<tr><td><span class="menu">Max LOD</span></td><td></td><td>Maximum Level of Detail</td></tr>
+<tr><td><span class="menu">LOD min</span></td><td></td><td>Nivel de detaliu minim</td></tr>
+<tr><td><span class="menu">LOD max</span></td><td></td><td>Nivel de detaliu maxim</td></tr>
 </table>
 
-<h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">Level of Detail (LOD)</a></h5>
+<h5><a id="i-o-m-shape-lod" name="i-o-m-shape-lod">Nivel de detaliu (LOD)</a></h5>
 <table summary="LOD example" border="0" cellpadding="10">
         <tr align="center"><td><b>16x16</b></td><td><b>32x32</b></td><td><b>64x64</b></td></tr>
         <tr align="center">
@@ -245,12 +245,12 @@ With the LOD you control the visibility of a shape depending on its size. That w
 For example, if Shape 1 were to be shown below 48px and Shape 2 from 48px upward (LOD: 48/64 = 0.75):</p>
 
 <table summary="LOD values example" border="0" cellpadding="5">
-<tr align="center"><td></td><td colspan="2"><b>OK</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>Not OK!</b></td></tr>
-<tr style="background-color:#F1F1F1"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Forma 1</b></td><td>Min LOD</td><td>0.00</td><td>Min LOD</td><td>0.00</td></tr>
-<tr style="background-color:#F1F1F1"><td>Max LOD</td><td><span style="background-color:#33FF33">0.74</span></td><td>Max LOD</td><td><span style="background-color:#FF9977">0.75</span></td></tr>
+<tr align="center"><td></td><td colspan="2"><b>Corect</b></td><td style="width:25px" rowspan="6"></td><td colspan="2"><b>Nu e corect!</b></td></tr>
+<tr style="background-color:#F1F1F1"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Forma 1</b></td><td>LOD min</td><td>0.00</td><td>LOD min</td><td>0.00</td></tr>
+<tr style="background-color:#F1F1F1"><td>LOD max</td><td><span style="background-color:#33FF33">0.74</span></td><td>LOD max</td><td><span style="background-color:#FF9977">0.75</span></td></tr>
 <tr><td colspan="6"></td></tr>
-<tr style="background-color:#F8F8F8"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Forma 2</b></td><td>Min LOD</td><td>0.75</td><td>Min LOD</td><td>0.75</td></tr>
-<tr style="background-color:#F8F8F8"><td>Max LOD</td><td>4.00</td><td>Max LOD</td><td>4.00</td></tr>
+<tr style="background-color:#F8F8F8"><td rowspan="2" style="vertical-align:middle ; background-color:#FFFFFF"><b>Forma 2</b></td><td>LOD min</td><td>0.75</td><td>LOD min</td><td>0.75</td></tr>
+<tr style="background-color:#F8F8F8"><td>LOD max</td><td>4.00</td><td>LOD max</td><td>4.00</td></tr>
 </table>
 
 
@@ -265,10 +265,10 @@ Besides the predefined colors under <span class="menu">Swatches</span>, you can 
 Of course you can move these indicators to change the gradient to your liking. You can also insert more indicators to add more colors by double-clicking into the gradient. Pressing <span class="key">DEL</span> removes the selected indicator.</p>
 <p>You can move, resize and rotate the representing box of a gradient on the canvas until it fits your needs. This works just like with shapes.</p>
 
-<h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">Style Menu</a></h4>
+<h4><a id="i-o-m-style-menu" name="i-o-m-style-menu">Meniu stil</a></h4>
 <p>The <span class="menu">Style</span> menu offers the usual entries to <span class="menu">Add</span>, <span class="menu">Duplicate</span> or <span class="menu">Remove</span> a style and to <span class="menu">Reset transformation</span>.</p>
 
-<h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">Style Properties</a></h4>
+<h4><a id="i-o-m-style-properties" name="i-o-m-style-properties">Proprietăți stil</a></h4>
 <p>The <span class="menu">Name</span> is the only <span class="menu">Properties</span> of a style.</p>
 
 
@@ -279,13 +279,13 @@ Of course you can move these indicators to change the gradient to your liking. Y
 
 <h4><a id="i-o-m-transformer-menu" name="i-o-m-transformer-menu">Transformer Add Menu</a></h4>
 <table summary=" Transformer Add menu" border="0" cellspacing="0" cellpadding="2">
-<tr><td><span class="menu">Contour</span></td><td></td><td>Adds an outline to a shape.</td></tr>
-<tr><td><span class="menu">Stroke</span></td><td></td><td>Strokes the path of a shape instead of filling it with a style.</td></tr>
+<tr><td><span class="menu">Contur</span></td><td></td><td>Adds an outline to a shape.</td></tr>
+<tr><td><span class="menu">Tușă</span></td><td></td><td>Strokes the path of a shape instead of filling it with a style.</td></tr>
 </table>
 
 <p>Depending on the kind of Transformer, you'll get a different set of properties.</p>
 
-<h4><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">Transformer Properties</a></h4>
+<h4><a id="i-o-m-transformer-properties" name="i-o-m-transformer-properties">Proprietăți transformator</a></h4>
 <p>Besides a <span class="menu">Name</span> and the actual <span class="menu">Width</span> for the transformer, the <span class="menu">Properties</span> view has these (depending on its type slightly differing) options:</p>
 <table summary="Transformer properties" border="0" cellspacing="0" cellpadding="2">
 <tr><td><span class="menu">Caps</span></td><td style="width:15px;"></td><td><i>Stroke only</i>. Defines the end caps of a line: <span class="menu">Butt</span>, <span class="menu">Square</span> or <span class="menu">Round</span>.</td></tr>
@@ -305,12 +305,12 @@ Of course you can move these indicators to change the gradient to your liking. Y
 <table summary="file formats" border="0" cellspacing="0" cellpadding="2">
 <tr><td>HVIF</td><td style="width:15px;"></td><td>Haiku Vector Icon Format</td></tr>
 <tr><td>HVIF RDef</td><td></td><td>Saves as resource used by programmers</td></tr>
-<tr><td>HVIF source code</td><td></td><td>Saves as source code used by programmers</td></tr>
+<tr><td>Cod sursă HVIF</td><td></td><td>Saves as source code used by programmers</td></tr>
 <tr><td>SVG</td><td></td><td>Saves as SVG</td></tr>
 <tr><td>PNG</td><td></td><td>Saves as a 64px sized PNG</td></tr>
-<tr><td>PNG set</td><td></td><td>Saves as 16, 32 and 64px sized PNGs</td></tr>
-<tr><td>BEOS:ICON attribute</td><td></td><td>Choose a file and set its icon attribute directly</td></tr>
-<tr><td>META:ICON attribute</td><td></td><td>Choose a file and attach the icon as mere meta data</td></tr>
+<tr><td>Set PNG</td><td></td><td>Saves as 16, 32 and 64px sized PNGs</td></tr>
+<tr><td>Atribut BEOS:ICON</td><td></td><td>Choose a file and set its icon attribute directly</td></tr>
+<tr><td>Atribut META:ICON</td><td></td><td>Choose a file and attach the icon as mere meta data</td></tr>
 </table>
 
 
@@ -319,7 +319,7 @@ Of course you can move these indicators to change the gradient to your liking. Y
 <a id="i-o-m-tips" name="i-o-m-tips">Sfaturi &amp; Trucuri</a></h3>
 <p>A few things you should keep in mind when working with Icon-O-Matic and some general tips for its usage:</p>
 <ul>
-<li><p>Read the <a href="http://cgit.haiku-os.org/haiku/plain/docs/icon_guidelines/index.html">Icon Guidelines</a> to learn about important characteristics of Haiku icons, e.g. perspective, colors and shadows.</p></li>
+<li><p>Read the <a href="https://www.haiku-os.org/development/icon-guidelines">Icon Guidelines</a> to learn about important characteristics of Haiku icons, e.g. perspective, colors and shadows.</p></li>
 <li><p>You should always try to minimize your use of paths, those are the most expensive, file size wise. Re-use paths wherever possible and work with manipulated shapes and their transformers instead. Smart use of gradients can also save space.</p></li>
 <li><p>Wherever possible, you should activate Snap-to-Grid from the <span class="menu">Options</span> menu when editing paths. Path points that align with the 64x64 pixel grid use less storage space. You'll also get the crispest look if points are set on exact pixel borders. For example, it is important to align the most prominent outlines with the 16x16 grid.</p></li>
 <li><p>Check the preview to see if your icon still looks good in 16x16. You may want to use the <a href="#i-o-m-shape-lod">Level Of Detail</a> settings described in the Shapes section.</p></li>

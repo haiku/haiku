@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2014 Haiku. All rights reserved.
+ * Copyright 2013-2017 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -63,7 +63,7 @@
 <tr class="index"><td><a href="#filter">Filter</a><br />
                 <a href="#list">Zoznam</a><br />
                 <a href="#info">Informačná oblasť</a><br />
-                <a href="#menu">Nástroje a voľby</a><br />
+                <a href="#menu">Nástroje a zobrazenie</a><br />
                 <a href="#account">Vytvorenie používateľského účtu</a><br />
                 <a href="#rating">Hodnotenie a komentovanie</a><br /></td></tr>
 </table>
@@ -72,38 +72,39 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Panel:</td><td style="width:15px;"></td><td><span class="menu">Aplikácie</span></td></tr>
 <tr><td>Umiestnenie:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
-<tr><td>Nastavenie:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
+<tr><td>Nastavenia:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
 </table>
 <p><br /></p>
-<p>HaikuDepot je hlavná aplikácia na správu vašich balíkov softvéru. Pomocou nej môžete prehliadať a vyhľadávať v zdrojoch balíkov (tiež sa nazývajú „repozitáre“ alebo „depá“) a inštalovať, aktualizovať a odinštalovávať balíky. HaikuDepot po spustení zobrazí zoznam „<i>odporúčaných balíkov</i>“ - softvéru, ktorý je považovaný za zaujímavý pre mnohých používateľov. Po zadaní kľúčového slova do vyhľadávacieho poľa alebo po vybraní kategórie sa zobrazenie zmení na menšie ikony a ďalšie informácie zoradené do stĺpcov.</p>
+<p>HaikuDepot je hlavná aplikácia na správu vašich balíkov softvéru. Pomocou nej môžete prehliadať a vyhľadávať v zdrojoch balíkoch (tiež sa nazývajú „repozitáre“ alebo „depá“) a inštalovať, aktualizovať a odinštalovávať balíky. HaikuDepot po spustení zobrazí zoznam „<i>odporúčaných balíkov</i>“ - softvéru, ktorý je považovaný za zaujímavý pre mnohých používateľov.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
+<p>Hneď ako niečo napíšete do poľa <span class="menu">Hľadané výrazy</span> sa zobrazenie zmení na menšie ikony a ďalšie informácie zoradené do stĺpcov.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filter" name="filter">Filter</a></h2>
 <p>Hore nájdete niekoľko spôsobov filtrovania dostupných balíkov:</p>
 <ul>
-<li><p>The <span class="menu">Category</span> pop-up menu lets you limit the list to individual categories like "<i>Audio</i>" or "<i>Games</i>".</p></li>
-<li><p>The <span class="menu">Depot</span> pop-up menu determines which online depots are queried or if only those packages shown, that were installed from somewhere other than an online depot ("<i>Local</i>"). Maybe from an USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
-<li><p>The <span class="menu">Search terms</span> text field filters the list to those packages that have all the entered (space-delimited) strings in their name or description.</p></li>
+<li><p>Roletové menu <span class="menu">Kategória</span> vám umožňuje obmedziť zpznam na jednotlivé kategórie ako sú „<i>Zvuk</i>“ alebo „<i>Hry</i>“.</p></li>
+<li><p>Roletové menu <span class="menu">Zdroje softvéru</span> určuje, ktoré online zdroje sa prehľadajú alebo či sa len zobrazia balíky, ktoré boli nainštalované odinakiaľ ako z online zdroja („<i>Lokálne</i>“). Možno z flash disku USB alebo stiahnuté z nejakej webovej stránky alebo to sú balíky, ktoré ste si zostavili sami.</p></li>
+<li><p>Textové pole <span class="menu">Hľadané výrazy</span> filtruje zoznam na tie balíky, ktoré majú vyplnené zadané kľúčové slová (oddelené medzerou) v názve alebo v popise.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="list" name="list">Zoznam</a></h2>
-<p>Like in any Tracker window, you can choose from a context menu which columns to display by right-clicking the column heading. A left-click sorts the list according to that column. Of course, you can rearrange the columns by dragging them to a new position.</p>
-<p>The status column of a package can have one of several states:</p>
+<p>Ako v ľubovoľnom okne Trackera si môžete vybrať z kontextového menu ktoré stĺpce chcete zobraziť kliknutím  pravým tlačidlom na záhlavie stĺpca. Kliknutie ľavým tlačidlom zoradí zoznam podľa vybraného stĺpca. Samozrejme môžete zmeniť poradie stĺpcov tým, že ich pretiahnete na nové miesto.</p>
+<p>Stavový stĺpec balíka môže obsahovať jeden z niekoľkých stavov:</p>
 <ul>
-<li><p><span class="menu">Active</span>: The package is currently installed and ready to be used.</p></li>
-<li><p><span class="menu">Available</span>: The package exists in that depot and can be downloaded and installed. If there are any dependencies on other packages, you'll be informed of that while installing and get the choice of downloading/installing all that's necessary.</p></li>
-<li><p><span class="menu">Pending / %</span>: <i>Pending</i> is shown for a package that is queued for download/installation. While a package is downloaded, the progress is shown as percentage.</p></li>
-<li><p><span class="menu">Update available</span>: There's a newer version than your installed one available.</p></li>
+<li><p><span class="menu">Aktívny</span>: Balík je momentálne nainštalovaný a pripravený na použitie.</p></li>
+<li><p><span class="menu">Dostupný</span>: Balík existuje v danom zdroji softvéru a je možné ho stiahnuť a nainštalovať. Ak závisí od iných balíkov, informáciu o tom dostanete pred jeho inštaláciou a budete sa môcť rozhodnúť, či chcete stiahnuť a nainštalovať všetko potrebné.</p></li>
+<li><p><span class="menu">Čakajúci / %</span>: <i>Čakajúci</i> sa zobrazí pri balíku, ktorý je vo fronte na stiahnutie alebo inštaláciu. Kým sa balík sťahuje, zobrazuje sa pribeh vo forme percent.</p></li>
+<li><p><span class="menu">Dostupná aktualizácia</span>: Je dostupná novšia verzia aplikácie než tá, ktorú máte nainštalovanú.</p></li>
 </ul>
-<p>You can grab the dotted line between the packages list and the info area to vertically resize the packages list.</p>
+<p>Môžete chytiť bodkovanú čiaru medzi zoznamom balíkov a informačnou oblasťou a zvisle zmeniť veľkosť zoznamu balíkov.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="info" name="info">Informačná oblasť</a></h2>
 <p>At the bottom is an area that displays information on the package that is currently selected in the list above it.<br />
 To the right of package name, author, rating and version is a button, that – depending on the current state of the package – lets you <span class="button">Install</span>, <span class="button">Uninstall</span> or <span class="button">Update</span> it. If a package is already installed, you'll find an additional button there to <span class="button">Open</span> the application.</p>
-<p>Below are three tabs: About, Ratings, and Changelog.</p>
+<p>Below are four tabs: About, Ratings, Changelog and Contents.</p>
 <ul>
 <li><p _translation_id="5252"><span class="menu">About</span></p>
 <p _translation_id="5253">The first tab has a detailed description of the package, as well as screenshots and a contact address and URL of the team that maintains the packaged software, if available. Clicking the screenshot thumbnail will open it full-size in a new window</p></li>
@@ -112,16 +113,21 @@ To the right of package name, author, rating and version is a button, that – d
 <img src="../images/apps-images/haikudepot-rating-tab.png" alt="haikudepot-rating-tab.png" />
 <p _translation_id="5268">To the left is a statistic, showing the number of stars (1 to 5) the package got from how many users.<br />
 In the middle are user comments with their nickname, the number of stars they gave the package and which version of the package they were rating or commenting on. You'll find more on how to rate a package yourself <a href="#rating">further down</a>.<br />
-With the little thumb up/down icons to the right, you can show your approval or disapproval with a certain comment.</p></li>
+<!--  With the little thumb up/down icons to the right, you can show your approval or disapproval with a certain comment.
+-->
+</p></li>
 <li><p _translation_id="5257"><span class="menu">Changelog</span></p>
-<p _translation_id="5258">The last tab shows the detailed history of all the  versions of the package that have been released so far.</p></li>
+<p _translation_id="5258">Here you find a detailed history of all the  versions of the package that have been released so far, if the maintainer of the package  provides that information.</p></li>
+<li><p><span class="menu">Contents</span></p>
+<p>The last tab shows all the files and folders a package contains. This only works for already downloaded packages.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Nástroje a voľby</a></h2>
-<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh depots</span>. This will request an up-to-date list of all available packages from the repositories.</p>
-<p>Under <span class="menu">Options</span> you can choose to also <span class="menu">Show develop packages</span> and <span class="menu">Show source packages</span> in the packages list. For the normal user those are of no interest and would only clutter the list. They are important, however, for people who need the libraries, headers etc. of a package to develop and compile programs depending on them.</p>
-<p>Of more interest are the other two items, <span class="menu">Show available packages</span> and <span class="menu">Show installed packages</span>, which are pretty self-explanatory.</p>
+<a id="menu" name="menu">Nástroje a zobrazenie</a></h2>
+<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories. The other item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.</p>
+<p>Under <span class="menu">Show</span> you can deactivate <span class="menu">Only featured packages</span>. Now you'll always see all packages and not just the featured ones when HaikuDepot starts up or the search text field is empty.<br />
+Furthermore, you can choose to also Show <span class="menu">Develop packages</span> and <span class="menu">Source packages</span> in the packages list. For the normal user those are of no interest and would only clutter the list. They are important, however, for people who need the libraries, headers etc. of a package to develop and compile programs depending on them.</p>
+<p>Of more interest are the options to only show <span class="menu">Available packages</span> and <span class="menu">Installed packages</span>, which are pretty self-explanatory.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="account">Vytvorenie používateľského účtu</a></h2>
@@ -139,7 +145,7 @@ With the little thumb up/down icons to the right, you can show your approval or 
 <p>After you've created a user account and are logged in, you can rate a package and leave a comment, if you want. Just hover the mouse over the rating stars in the info area of a package and they turn into a <span class="button">Rating...</span> button. Click it to open the rating window:</p>
 <img src="../images/apps-images/haiku-depot-ratingpanel.png" alt="haiku-depot-ratingpanel.png" />
 <p>Here you move the mouse over the stars to light them up and choose your rating, you can also choose from a number of levels to judge the stability of the application and pick the language of your optional comment. To make a comment meaningful, you should have worked with the application you're about to rate for a while to become familiar with its features, bugs and quirks. And don't write the next great American novel... keep it short, sweet and polite. :)<br />
-After you click <span class="button">Send</span> the data is transmitted to the server. You may have to go to the <span class="menu">Tools</span> menu to <span class="menu">Refresh depots</span> before you can see your changes.</p>
+After you click <span class="button">Send</span> the data is transmitted to the server. You may have to go to the <span class="menu">Tools</span> menu to <span class="menu">Refresh repositories</span> before you can see your changes.</p>
 <p>At any time, you can come back and edit your comment and re-rate it. You can also hide your rating from other users by deactivating the checkbox <span class="menu">Other users can see this rating</span>.</p>
 </div>
 </div>

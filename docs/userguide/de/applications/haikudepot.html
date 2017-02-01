@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2013-2014 Haiku. All rights reserved.
+ * Copyright 2013-2017 Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -56,13 +56,14 @@
 
 <div id="content">
 <div>
+<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
 <tr class="index"><td><a href="#filter">Filter</a><br />
                 <a href="#list">Paketliste</a><br />
                 <a href="#info">Infobereich</a><br />
-                <a href="#menu">Werkzeuge und Einstellungen</a><br />
+                <a href="#menu">Werkzeuge und Anzeigen</a><br />
                 <a href="#account">Benutzerkonto einrichten</a><br />
                 <a href="#rating">Bewerten und kommentieren</a><br />
 </td></tr>
@@ -72,18 +73,20 @@
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">Anwendungen</span></td></tr>
 <tr><td>Ort:</td><td></td><td><span class="path">/boot/system/apps/HaikuDepot</span></td></tr>
-<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span></td></tr>
+<tr><td>Einstellungen:</td><td></td><td><span class="path">~/config/settings/HaikuDepot/</span> - The main settings of the application<br />
+<span class="path">~/config/cache/HaikuDepot</span> - Cached icons, screenshots, descriptions etc.</td></tr>
 </table>
 <p><br /></p>
-<p>HaikuDepot ist die zentrale Anwendung, um Software-Pakete zu managen. Mit ihr lassen sich Repositories (auch "Depots" genannt) durchstöbern und Pakete installieren, aktualisieren und deinstallieren. HaikuDepot öffnet sich mit einer Liste empfohlener Pakete. Sobald man jedoch einen Suchbegriff eingibt oder eine Kategorie auswählt, ändert sich die Darstellung zu kleineren Icons und es werden weitere Informationen in Spalten angezeigt.</p>
+<p>HaikuDepot is the central application when it comes to managing your software packages. With it you can browse and search through package repositories and install, update and uninstall packages. By default, HaikuDepot starts up with a list of "<i>Featured packages</i>", software that's deemed interesting to many users.</p>
 <img src="../images/apps-images/haikudepot.png" alt="haikudepot.png" />
+<p>Sobald man einen oder mehrere <span class="menu">Suchbegriffe</span> eingibt, ändert sich die Darstellung zu kleineren Icons und es werden weitere Informationen in Spalten angezeigt.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="filter" name="filter">Filter</a></h2>
 <p>Ganz oben hat man einige Möglichkeiten, die Paketliste darunter zu filtern:</p>
 <ul>
 <li><p>Mit dem <span class="menu">Kategorien</span> Menü lässt sich die Liste auf bestimmte Kategorien wie "<i>Audio</i>" oder "<i>Spiele</i>" begrenzen. </p></li>
-<li><p>Im <span class="menu">Depot</span> Menü bestimmt man welche Online-Depots überhaupt in der Liste auftauchen sollen, oder ob nur die Pakete gelistet werden sollen, die aus anderen Quellen als Online-Depots gekommen sind ("<i>Lokal</i>"). Diese können beispielsweise von einem USB Stick kopiert, oder von irgendeiner Webseite heruntergeladen, oder auch selbst gebaut worden sein.</p></li>
+<li><p>The <span class="menu">Repositories</span> pop-up menu determines which online repos are queried or if only those packages are shown, that were installed from somewhere other than an online repo ("<i>Local</i>"). Maybe from an USB thumb drive or downloaded from some website or a package that you've built yourself.</p></li>
 <li><p>Die im <span class="menu">Suchbegriffe</span> Textfeld eingegebenen Zeichen filtern die Liste auf die Pakete, die alle (per Leerzeichen getrennten) Wörter in Namen oder Beschreibung haben.</p></li>
 </ul>
 
@@ -93,7 +96,7 @@
 <p>In der entsprechenden Spalte eines Pakets können unterschiedliche Status angezeigt werden:</p>
 <ul>
 <li><p><span class="menu">Aktiviert</span>: Das Paket ist momentan installiert und benutzbar.</p></li>
-<li><p><span class="menu">Verfügbar</span>:Das Paket existiert in diesem Depot und es kann heruntergalden und installiert werden. Bestehen Abhängigkeiten zu anderen Paketen, so wird einem dies bei der Installation mitgeteilt und man hat die Wahl alles Nötige ebenfalls herunterzuladen und installieren zu lassen.</p></li>
+<li><p><span class="menu">Available</span>: The package exists in that repository and can be downloaded and installed. If there are any dependencies on other packages, you'll be informed of that while installing and get the choice of downloading/installing all that's necessary.</p></li>
 <li><p><span class="menu">Ausstehend / %</span>: <i>Ausstehend</i> wird bei Paketen angezeigt, die darauf warten heruntergeladen/installiert zu werden. Der Fortschritt beim Herunterladen wird dann als Prozentangabe dargestellt.</p></li>
 <li><p><span class="menu">Update verfügbar</span>: Eine neuere Version als die installierte ist verfügbar.</p></li>
 </ul>
@@ -103,7 +106,7 @@
 <a id="info" name="info">Infobereich</a></h2>
 <p>Ganz unten befindet sich ein Bereich mit Informationen des momentan in der Liste ausgewählten Pakets.<br />
 Rechts neben Paketname, Autor, Bewertung und Version befindet sich ein Button, mit dem sich ein Paket – je nach aktuellem Status – <span class="button">Installieren</span>, <span class="button">Deinstallieren</span> oder <span class="button">Updaten</span> lässt. Ist ein Paket bereits installiert, erscheint dort ein weiterer Button, um die Anwendung zu <span class="button">Öffnen</span>.</p>
-<p>Darunter befinden sich drei Reiter: Über, Bewertungen und Änderungsprotokoll.</p>
+<p>Darunter befinden sich vier Reiter: Über, Bewertunge, Änderungsprotokoll und Inhalt.</p>
 <ul>
 <li><p _translation_id="5252"><span class="menu">Über</span></p>
 <p _translation_id="5253">
@@ -113,17 +116,20 @@ Hier findet man eine ausführlichere Beschreibung des Pakets, sowie falls vorhan
 <img src="../images/apps-images/haikudepot-rating-tab.png" alt="haikudepot-rating-tab.png" />
 <p _translation_id="5268">
 Links befindet sich eine Statistik, die zeigt wieviele Sterne (zwischen 1 und 5) das Paket  von wievielen Benutzern erhalten hat.<br />
-In der Mitte folgen die Kommentare der Benutzer mit ihren Namen, die Anzahl der vergebenen Sterne und die Paketversion, die bewertet oder kommentiert wurde. Wie man selbst eine Bewertung abgeben kann, steht <a href="#rating">weiter unten</a>.<br />
-Mittels der kleinen Daumen-rauf/runter-Icons rechts, kann man die einzelnen Kommentare bewerten.</p></li>
+In der Mitte folgen die Kommentare der Benutzer mit ihren Namen, die Anzahl der vergebenen Sterne und die Paketversion, die bewertet oder kommentiert wurde. Wie man selbst eine Bewertung abgeben kann, steht <a href="#rating">weiter unten</a>.<!-- <br />
+Mittels der kleinen Daumen-rauf/runter-Icons rechts, kann man die einzelnen Kommentare bewerten. --></p></li>
 <li><p _translation_id="5257"><span class="menu">Änderungsprotokoll</span></p>
-<p _translation_id="5258">Im letzten Reiter lässt sich die Historie der veröffentlichten Versionen des Pakets nachlesen.</p></li>
+<p _translation_id="5258">Hier lässt sich die Historie der veröffentlichten Versionen des Pakets nachlesen, falls dessen Entwickler diese Infos zur Verfügung stellt.</p></li>
+<li><p><span class="menu">Inhalt</span></p>
+<p>Der letzte Reiter zeigt alle Dateien und Ordner in einem Paket. Das funktioniert allerdings nur mit bereits heruntergeladenen Paketen.</p></li>
 </ul>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="menu" name="menu">Werkzeuge und Einstellungen</a></h2>
-<p>Im <span class="menu">Werkzeuge</span> Menü ganz oben im HaikuDepot-Fenster findet sich der Menüpunkt <span class="menu">Depots aktualisieren</span>. Er fordert eine aktuelle Liste aller verfügbaren Pakete der Repositories an.</p>
-<p>Im <span class="menu">Einstellungen</span> Menü gibt es die Optionen zum <span class="menu">Entwicklungs-Pakete anzeigen</span> und <span class="menu">Quellcode-Pakete anzeigen</span> in der Paketliste. Für den normalen Benutzer sind sie nicht so interessant und blähen die Paketliste nur unnötig auf. Sie sind sie allerdings wichtig für Leute, die deren Bibliotheken, Header-Dateien etc. brauchen, um darauf aufbauende Programme zu entwickeln und zu kompilieren.</p>
-<p>Interessanter sind die beiden anderen Menüpunkte, <span class="menu">Verfügbare Pakete anzeigen</span> und <span class="menu">Installierte Pakete anzeigen</span>, die wohl keiner weiteren Erklärung bedürfen.</p>
+<a id="menu" name="menu">Werkzeuge und Anzeigen</a></h2>
+<p>In the <span class="menu">Tools</span> menu at the top of the window, you'll find an item to <span class="menu">Refresh repositories</span>. This will request an up-to-date list of all available packages from the repositories. The other item is to <span class="menu">Manage repositories...</span>. It opens the <a href="../preferences/repositories.html">Repositories</a> preferences, to add/remove or disable and enable repositories.</p>
+<p>Im <span class="menu">Anzeigen</span> Menü gibt es die Möglichkeit <span class="menu">Nur Empfehlungen</span> zu deaktivieren. Dann sieht man immer alle verfügbaren Pakete, nicht nur die empfohlenen, wenn HaikuDepot startet oder kein Suchbegriff eingegeben wurde.<br />
+Außerdem kann man <span class="menu">Entwicklungs-Pakete</span> und <span class="menu">Quellcode-Pakete</span> anzeigen lassen. Für den normalen Benutzer sind sie nicht so interessant und blähen die Paketliste nur unnötig auf. Sie sind allerdings wichtig für Leute, die deren Bibliotheken, Header-Dateien etc. brauchen, um darauf aufbauende Programme zu entwickeln und zu kompilieren.</p>
+<p>Interessanter, und selbsterklärend, sind die beiden anderen Menüpunkte, um nur <span class="menu">Verfügbare Pakete</span> und <span class="menu">Installierte Pakete</span> anzuzeigen.</p>
 
 <h2><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="account" name="account">Benutzerkonto einrichten</a></h2>
@@ -140,8 +146,8 @@ Mittels der kleinen Daumen-rauf/runter-Icons rechts, kann man die einzelnen Komm
 <a id="rating" name="rating">Bewerten und kommentieren</a></h2>
 <p>Sobald man ein Benutzerkonto angelegt und sich angemeldet hat, kann man Pakete bewerten und, wenn man will, auch kommentieren. Lässt man den Mauszeiger über den Bewertungssternen des Infobereichs schweben, verwandeln sie sich in einen Button zum <span class="button">Paket bewerten...</span>. Ein Klick darauf öffnet das Bewertungsfenster:</p>
 <img src="../images/apps-images/haiku-depot-ratingpanel.png" alt="haiku-depot-ratingpanel.png" />
-<p>Hier bringt man mit dem Mauszeiger die Sterne zum aufleuchten und wählt so eine entsprechende Bewertung. Es lassen sich unterschiedliche Stabilitätsstufen vergeben und die Sprache für den optionalen Kommentar auswählen. Um einen sinnvollen Kommentar abgeben zu können, sollte man die Anwendung schon eine Weile benutzt haben, um ihre Features, Bugs und Eigenheiten kennegelernt zu haben. Außerdem sollte man keine großen Romane schreiben... lieber kurz und bündig und dabei immer höflich bleiben. :)<br />
-Klickt man auf <span class="button">Senden</span> werden die Daten zum Server geschickt. Bevor man seine Änderungen sehen kann, muss man ggf. aus dem <span class="menu">Werkzeuge</span> Menü <span class="menu">Depots aktualisieren</span> anwählen.</p>
+<p>Here you move the mouse over the stars to light them up and choose your rating, you can also choose from a number of levels to judge the stability of the application and pick the language of your optional comment. To make a comment meaningful, you should have worked with the application you're about to rate for a while to become familiar with its features, bugs and quirks. And don't write the next great American novel... keep it short, sweet and polite. :)<br />
+After you click <span class="button">Send</span> the data is transmitted to the server. You may have to go to the <span class="menu">Tools</span> menu to <span class="menu">Refresh repositories</span> before you can see your changes.</p>
 <p>Bewertung und Kommentar lassen sich jederzeit ändern. Die Bewertung lässt auch komplett vor anderen Benutzern verbergen, indem man die Option <span class="menu">Diese Bewertung ist für andere Anwender sichtbar</span> abwählt.</p>
 </div>
 </div>

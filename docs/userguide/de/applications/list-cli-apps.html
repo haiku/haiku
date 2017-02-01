@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2010-2014, Haiku. All rights reserved.
+ * Copyright 2010-2016, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -58,7 +58,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Solange die Übersetzung dieser Seite noch nicht ganz fertig ist, erscheint für die noch fehlenden Teile die englische Version.</div>
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Liste aller Konsolenprogramme</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
@@ -154,6 +153,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>fwcontrol</tt></td><td> </td><td>FireWire Steuerprogramm.</td></tr>
 <tr><td><tt>gawk</tt></td><td> </td><td>Sprache zur Mustererkennung und Verarbeitung.</td></tr>
 <tr><td><tt>gdb</tt></td><td> </td><td>GNU Debugger.</td></tr>
+<tr><td><tt>getarch</tt></td><td> </td><td>Zeigt die Compiler Version der Umgebung.</td></tr>
 <tr><td><tt>getlimits</tt></td><td> </td><td>Zeigt die plattformspezifischen Limits in einem für Skripte nutzbaren Format.</td></tr>
 <tr><td><tt>grep</tt></td><td> </td><td>Sucht nach Mustern.</td></tr>
 <tr><td><tt>groups</tt></td><td> </td><td>Zeigt die Grupopenzugehörigkeit aller Benutzer.</td></tr>
@@ -177,6 +177,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>kernel_debugger</tt></td><td> </td><td>Wechselt in den Kernel Debugger.</td></tr>
 <tr><td><tt>keymap</tt></td><td> </td><td>Lädt oder speichert eine Tastaturbelegungs-Datei.</td></tr>
 <tr><td><tt>kill</tt></td><td> </td><td>Sendet ein Signal um einen Prozess zu beenden.</td></tr>
+<tr><td><tt>launch_roster</tt></td><td> </td><td>Steuert den launch_daemon, beispielsweise um Dienste zu stoppen und wieder zu starten. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>less</tt></td><td> </td><td>Zeigt eine Datei an.</td></tr>
 <tr><td><tt>lessecho</tt></td><td> </td><td>Gibt übergebene Argumente aus und erweitert Meta-Symbole wie * und ? in Dateinamen.</td></tr>
 <tr><td><tt>lesskey</tt></td><td> </td><td>Tastatureinstellungen für less.</td></tr>
@@ -206,7 +207,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>merge</tt></td><td> </td><td>Vereint drei Datei-Versionen.</td></tr>
 <tr><td><tt>message</tt></td><td> </td><td>Gibt eine "flattened BMessage" Datei aus.</td></tr>
 <tr><td><tt>mimeset</tt></td><td> </td><td>Setzt den MIME-Typ einer Datei.</td></tr>
-<tr><td><tt>mkdepend</tt></td><td> </td><td>Makefile dependency generator.</td></tr>
+<tr><td><tt>mkdepend</tt></td><td> </td><td>Der Makefile Dependency Generator.</td></tr>
 <tr><td><tt>mkdir</tt></td><td> </td><td>Erzeugt ein Verzeichnis.</td></tr>
 <tr><td><tt>mkdos</tt></td><td> </td><td>Initialisiert eine FAT Partition.</td></tr>
 <tr><td><tt>mkfifo</tt></td><td> </td><td>Erzeugt eine Pipe mit einem bestimmten Namen.</td></tr>
@@ -219,6 +220,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>mount_nfs</tt></td><td> </td><td>Hängt eine NFS Partition ein.</td></tr>
 <tr><td><tt>mountvolume</tt></td><td> </td><td>Hängt eine Partition anhand ihres Namens ein.</td></tr>
 <tr><td><tt>mv</tt></td><td> </td><td>Verschiebt eine Datei oder benennt sie um.</td></tr>
+<tr><td><tt>nano</tt></td><td> </td><td>Der standard Texteditor im Terminal, ein Klon von 'Pico'. </td></tr>
 <tr><td><tt>netcat</tt></td><td> </td><td>Ein TCP und UDP Tool.</td></tr>
 <tr><td><tt>netstat</tt></td><td> </td><td>Zeigt die aktuellen Netzwerkverbindungen, Routing Tabellen, Statistiken und Informationen zu Masquerading und Multicast.</td></tr>
 <tr><td><tt>nl</tt></td><td> </td><td>Gibt jede Datei mit Zeilennummern aus.</td></tr>
@@ -251,6 +253,7 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>pwd</tt></td><td> </td><td>Gibt das aktuelle Verzeichnis aus.</td></tr>
 <tr><td><tt>query</tt></td><td> </td><td>Die Konsolen-Version von Trackers "Find by formula". <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>quit</tt></td><td> </td><td>Beendet eine Anwendung.</td></tr>
+<tr><td><tt>ramdisk</tt></td><td> </td><td>Erstellt eine Ramdisk. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
 <tr><td><tt>rc</tt></td><td> </td><td>Ressource Kompiler.</td></tr>
 <tr><td><tt>readlink</tt></td><td> </td><td>Gibt den Pfad zum Ziel einer symbolischen Verknüpfung aus.</td></tr>
 <tr><td><tt>reindex</tt></td><td> </td><td>Nimmt Attribute bestehender Dateien in einen neu angelegten index auf. <a href="cli-apps.html">(Haiku spezifisch)</a></td></tr>
@@ -268,8 +271,8 @@ Nachfolgend eine Liste aller in Haiku enthaltenen Konsolenprogramme mit einer ku
 <tr><td><tt>screenmode</tt></td><td> </td><td>Zeigt oder setzt den Bildschirmmodus.</td></tr>
 <tr><td><tt>sdiff</tt></td><td> </td><td>Zeigt die Unterschiede zweier Dateien nebeneinander und ermöglicht eine Zusammenführung.</td></tr>
 <tr><td><tt>seq</tt></td><td> </td><td>Gibt eine Zahlenreihe aus.</td></tr>
+<tr><td><tt>setarch</tt></td><td> </td><td>Zeigt die Compiler Version der Umgebung.</td></tr>
 <tr><td><tt>setdecor</tt></td><td> </td><td>Zeigt oder aktiviert einen Dekorator.</td></tr>
-<tr><td><tt>setgcc</tt></td><td> </td><td>Zeigt oder setzt die zu benutzende GCC Version.</td></tr>
 <tr><td><tt>settype</tt></td><td> </td><td>Setzt den MIME Typ, Signatur und die bevorzugte Anwendung einer Datei.</td></tr>
 <tr><td><tt>setversion</tt></td><td> </td><td>Zeigt die Version einer Datei.</td></tr>
 <tr><td><tt>setvolume</tt></td><td> </td><td>Regelt die Lautstärke im System.</td></tr>

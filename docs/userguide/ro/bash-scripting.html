@@ -50,56 +50,55 @@
 <span>
  «  <a href="preferences.html">Preferințe</a> 
 ::  <a href="contents.html" class="uplink">Conținut</a> 
-<!-- ::  <a href="filesystem-layout.html">Aranjament sistem de fișiere</a>  » -->
+<!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
 </span></div>
 </div>
 
 <div id="content">
 <div>
-<div class="box-info">Traducerea acestei pagini nu este completă încă. Până când va fi, părțile incomplete utilizează originalul în limba engleză.</div>
 
 <h1>Bash și Scriptare</h1>
 
-<p>"Scripting" is the technique of automating procedures by stringing together commands and saving it all as text files, so called "scripts". Every time you run such a script, the commands are processed one after the other just like they would if you entered them into the <a href="applications/terminal.html">Terminal</a> by hand.<br />
-Scripts can range from simply executing a few commands in a specific order to sophisticated pieces of code that solve complex tasks.</p>
+<p>„Scriptarea” este tehnica de automatizare de proceduri prin alăturarea comenzilor și salvarea lor împreună ca fișiere text, așa numitele „scripturi”. De fiecare dată când rulați un script, comenzile sunt procesate una după alta exact în felul în care le-ați fi scris manual într-un <a href="applications/terminal.html">Terminal</a>.<br />
+Scripturile pot să varieze de la executarea simplă a câtorva comenzi într-o ordine specifică, la fragmente de cod sofisticate care rezolvă sarcini complexe.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="bash" name="bash">Bash</a></h2>
-<p>Since scripts rely naturally a lot on the shell they are interpreted by, you should first familiarize yourself with the BASH that's used by Haiku. There are many resources online as it's a widely used shell. One nice document is Johan Jansson's <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introduction to bash - a tutorial for bash under BeOS</a>.</p>
+<p>De vreme ce scripturile se bazează natural pe shell, de care sunt interpretate, ar trebui să vă familiarizați întâi cu BASH folosit de Haiku. Există multe resurse online întrucât este un shell utilizat pe scară largă. Un document bun este <a href="http://www.beforever.com/bashtut.htm" class="printurl">Introducere în bash - un tutorial pentru bash din BeOS</a>, scris de Johan Jansson.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="scripting-bible" name="scripting-bible">Biblia de Scriptare</a></h2>
-<p>After you've learned a few basics about working in the shell, it's time to slowly ease yourself into the world of scripting. Again, you'll find loads of tutorials and reference material online as well as in bookstores. A very nice introduction that's practically tailor-made for Haiku is the online available <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Scripting Chapter</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) of Scot Hacker's BeOS Bible.</p>
+<p>După ce ați învățat câteva aspecte de bază despre lucrul în shell, a venit timpul să faceți primii pași în lumea scriptării. Din nou, veți găsi o multitudine e tutoriale și material de referință online și în librării. O introducere bună, disponibilă online, care se potrivește perfect cu Haiku este <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting1.html" class="printurl">Capitolul de Scriptare</a> (<a href="http://www.birdhouse.org/beos/bible/bos/BeOS.scripting.PDF">PDF, 900kb</a>) din Biblia BeOS, scrisă de Scot Hacker.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a><a id="user-scripts" name="user-scripts">Scripturi în Haiku</a></h2>
-<p>Haiku used to have scripts for booting and shutting down. Today it uses the <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a> instead. However, the user can still augment this process with certain user scripts.
-If they don't exist already, you'll have to create the needed files yourself. Otherwise simply add your commands where in the process you want them to be executed.</p>
+<p>Haiku obișnuia să aibă scripturi pentru pornirea și oprirea sistemului. În prezent se utilizează în schimb <a href="https://dev.haiku-os.org/wiki/LaunchDaemon">launch_daemon</a>. Totuși, utilizatorul poate augmenta încă acest proces cu anumite scripturi de utilizator.
+Dacă nu există deja, va trebui să creați fișierele necesare. Altfel, pur și simplu adăugați comenzile în locurile din proces unde vreți să fie executate.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="userbootscript" name="userbootscript">UserBootscript</a></h3>
-<p><span class="path">/boot/home/config/settings/boot/UserBootscript</span> will be executed after the system has finished its boot process. For example, you could launch a number of programs that would then be automatically started on every boot up:</p>
+<p><span class="path">/boot/home/config/settings/boot/UserBootscript</span> va fi executat după ce sistemul a terminat procesul de boot. De exemplu, ați putea să lansați un număr de programe care vor fi apoi rulate automat la fiecare pornire a sistemului.</p>
 <pre># Start LaunchBox
 /boot/system/apps/LaunchBox &amp;
 
 # Start Workspaces Applet
 /boot/system/apps/Workspaces &amp;</pre>
-<p>Remember to end a command with an "<tt>&amp;</tt>" to start it as a background process, or the script will halt until that command has finished (in this case: the launched app was closed again).</p>
+<p>Amintiți-vă să terminați o comandă cu un „<tt>&amp;</tt>” pentru a o porni ca process de plan secund, sau scriptul se va opri brusc până când acea comandă va fi terminată (în cazul acesta: aplicația lansată a fost închisă din nou).</p>
 
-<p>A simple alternative to the above for launching applications at boot up is to put links to them in the <span class="path">/boot/home/config/settings/boot/launch</span> directory. This can be done simply by right-clicking on the application you wish to have started automatically, going to <span class="menu">Create Link</span> and then <a href="tracker.html#navigating">navigating</a> to the above directory.</p>
+<p>O alternativă simplă la cele de mai sus pentru lansarea de aplicații la pornire este să adăugați legături către acestea în dosarul <span class="path">/boot/home/config/settings/boot/launch</span>. Acest lucru se poate realiza simplu prin clic dreapta pe aplicația care vreți să pornească automat, apoi dați clic pe <span class="menu">Creează legătură</span> și după aceea <a href="tracker.html#navigating">navigați</a> la dosarul precedent.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="usershutdownscript" name="usershutdownscript">UserShutdownScript</a></h3>
-<p><span class="path">/boot/home/config/settings/boot/UserShutdownScript</span> will be executed as the first step in the shutdown process. If the script returns a non-zero exit status, the shutdown is aborted.</p>
+<p><span class="path">/boot/home/config/settings/boot/UserShutdownScript</span> va fi executat ca primul pas al procesului de oprire. Dacă scriptul întoarce o stare de ieșire diferită de zero, oprirea este anulată.</p>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="usershutdownfinishscript" name="usershutdownfinishscript">UserShutdownFinishScript</a></h3>
-<p><span class="path">/boot/home/config/settings/boot/UserShutdownFinishScript</span> is executed as the last step in the shutdown process. Note, that most parts of the system have terminated by the time this script is executed.</p>
+<p><span class="path">/boot/home/config/settings/boot/UserShutdownFinishScript</span> este executat ca ultimul pas al procesului de oprire. Observați că majoritatea componentelor sistemului s-au închis până ce scriptul acesta este executat.</p>
 
 </div>
 </div>
@@ -108,7 +107,7 @@ If they don't exist already, you'll have to create the needed files yourself. Ot
 <div class="inner"><span>
  «  <a href="preferences.html">Preferințe</a> 
 ::  <a href="contents.html" class="uplink">Conținut</a> 
-<!-- ::  <a href="filesystem-layout.html">Aranjament sistem de fișiere</a>  » -->
+<!-- ::  <a href="filesystem-layout.html">Filesystem layout</a>  » -->
 </span></div>
 </div>
 

@@ -48,7 +48,7 @@
 <li><a href="../en/attributes.html"><img src="../images/flags/gb.png" alt="" />English</a></li>
 </ul>
 <span>
- «  <a href="filetypes.html">Tipuri de fișiere</a> 
+ «  <a href="filetypes.html">Filetypes</a> 
 ::  <a href="contents.html" class="uplink">Conținut</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>
@@ -56,7 +56,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Traducerea acestei pagini nu este completă încă. Până când va fi, părțile incomplete utilizează originalul în limba engleză.</div>
 
 <h1>Atribute</h1>
 
@@ -71,22 +70,22 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="attributes-tracker" name="attributes-tracker">Atribute în Tracker</a></h2>
-<p>Attributes are displayed quite similar to a database or spreadsheet. Using Tracker you can choose which attributes to display (columns) and sort file listings (rows) accordingly.</p>
-<p>To do this, open a Tracker window, click on the <span class="menu">Attributes</span> menu, and select the attributes you want to display. Alternatively, simply right-click onto a column heading and mark the items in the context menu. You can rearrange the columns by a simple drag&amp;drop of the column heading. Moving a column out of a window, is a fast way to get rid of columns you don't need.</p>
-<p>Double-click on the line between two attributes in the heading to automatically resize a column to its optimal width.</p>
-<p>Click on a column heading to toggle the sorting order from ascending to descending. You can establish a secondary sort order by pressing the <span class="key">SHIFT</span> key while clicking on a column heading. You can sort your People files by company and within that order sort by contact name, for instance. See the above screenshot as an example. The secondary sort order is marked by a lighter colored indicator beside the heading.</p>
-<p>Editing these attributes is as simple as renaming a file: Either click on an entry or press <span class="key">ALT</span> <span class="key">E</span> and move between the attributes with <span class="key">TAB</span> and <span class="key">SHIFT</span> <span class="key">TAB</span>. <span class="key">ESC</span> leaves the editing mode without applying the changes.</p>
+<p>Atributele sunt afișate similar cu o bază de date sau foaie de calcul. Prin intermediul Tracker puteți alege atributele de afișat (coloane) și sorta corespunzător listele de fișiere (rânduri).</p>
+<p>Pentru a face asta, deschideți o fereastră Tracker, dați clic pe meniul <span class="menu">Atribute</span> și selectați atributele pe care vreți să le afișați. Alternativ, pur și simplu dați clic dreapta pe antetul unei coloane și marcați elementele în meniul contextual. Puteți să rearanjați simplu coloanele prin tragerea&amp;plasarea antetului coloanei. Mutarea unei coloane în afara unei ferestre este o metodă rapidă de eliminarea coloanelor de care nu aveți nevoie.</p>
+<p>Dați dublu clic pe linia dintre două atribute în antet pentru a redimensiona automat o coloană la dimensiunea optimă.</p>
+<p>Dați clic pe antetul unei coloane pentru a comuta ordinea de sortare de la ascendent la descendent. Puteți stabili o ordine de sortare secundară prin apăsarea tastei <span class="key">SHIFT</span> în timp ce dați clic pe antetul unei coloane. Puteți sorta fișierele People după companie și în cadrul acestei ordini, să sortați după numele de contact, de exemplu. Vedeți captura de ecran de mai sus ca exemplu. Ordinea de sortare secundară este marcată printr-un indicator colorat mai dechis, de lângă antet.</p>
+<p>Editarea acestor atribute este la fel de simplu ca redenumirea unui fișier: Dați clic pe o intrare sau apăsați <span class="key">ALT</span> <span class="key">E</span> și vă mutați prin atribute cu <span class="key">TAB</span> și <span class="key">SHIFT</span> <span class="key">TAB</span>. <span class="key">ESC</span> părăsește modul de editare fără aplicarea modificărilor.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="attributes-terminal" name="attributes-terminal">Atribute în Terminal</a></h2>
-<p>If you prefer to use the commandline or plan to work with many files using scripting, there are several commands for controlling attributes from Terminal.</p>
+<p>Dacă preferați să utilizați linia de comandă sau plănuiți să lucrați cu multe fișiere utilizând scripting, există mai multe comenzi pentru controlarea atributelor din Terminal.</p>
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="listattr" name="listattr">listattr</a></h3>
-<p><span class="cli">listattr</span> lists a file's attributes, but doesn't show the contents of the attributes.</p>
+<p><span class="cli">listattr</span> listează atributele unui fișier dar nu afișează conținutul atributelor.</p>
 <pre>usage: listattr 'filename' ['filename' ...]</pre>
-<p>From our screenshot example above:</p>
+<p>De la exemplul din captura de ecran de mai sus:</p>
 <pre class="terminal"> ~/people -&gt;listattr Clara\ Botters
 File: Clara Botters
    Type         Size                 Name
@@ -112,25 +111,25 @@ MIME String         21  "BEOS:TYPE"
     Raw Data         20  "_trk/pinfo_le"
  
 131 bytes total in attributes.</pre>
-<p>Besides all the "<tt>META:*</tt>" attributes that hold the contact's information, there are two attributes that are managed by the system:</p>
+<p>Pe lângă toate atributele "<tt>META:*</tt>" care conțin informațiile de contact, există două atribute care sunt gestionate de către sistem:</p>
 <ul>
-<li><p><tt>BEOS:TYPE</tt> holds the file type as a <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym> string, here "<tt>application/x-person</tt>". It determines the default icon and the application that opens the file when you e.g. double click it.</p></li>
-<li><p>"<tt>_trk/pinfo_le</tt>" is the attribute with which Tracker keeps track of a file's icon position.</p></li></ul>
-<div class="box-info">Note the backslash after "Clara". In Terminal you have to "escape" special characters like <tt>'"*\$?!</tt>. The space between "Clara" and "Botters" is also one of those. Therefore the backslash is really in front of the space character, and not after "Clara".</div>
+<li><p><tt>BEOS:TYPE</tt> conține tipul fișierului ca șir <acronym title="Multipurpose Internet Mail Extensions">MIME</acronym>, aici "<tt>application/x-person</tt>". Determină pictograma implicită și aplicația care deschide fișierul atunci când ex: dați dublu clic pe el.</p></li>
+<li><p>"<tt>_trk/pinfo_le</tt>" este atributul cu care Tracker monitorizează poziția pictogramei unui fișier.</p></li></ul>
+<div class="box-info">Observați bara oblică inversă (backslash) după "Clara". În Terminal trebuie să „escapați” caracterele speciale precum <tt>'"*\$?!</tt>. Spațiul între „Clara” și "Botters" este unul dintre acestea. Prin urmare bara oblică inversă este chiar în fața caracterului spațiu, și nu după „Clara”.</div>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="catattr" name="catattr">catattr</a></h3>
-<p><span class="cli">catattr</span> displays the contents of a specific attribute of a file.</p>
+<p><span class="cli">catattr</span> afișează conținutul unui atribut specific al unui fișier.</p>
 <pre>usage: catattr [--raw|-r] attr_name file1 [file2...]</pre>
-<p>Again our example:</p>
+<p>Din nou exemplul nostru:</p>
 <pre class="terminal"> ~/people -&gt;catattr META:city Clara\ Botters
 Clara Botters : string : Whelton</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="addattr" name="addattr">addattr</a></h3>
-<p><span class="cli">addattr</span> adds an attribute to a file and/or fills it with a value.</p>
+<p><span class="cli">addattr</span> adaugă un atribut la un fișier și/sau îi atribuie o valoare.</p>
 <pre>usage: addattr [-t type] attr value file1 [file2...]
     or: addattr [-f value-from-file] [-t type] attr file1 [file2...]
  
@@ -138,27 +137,27 @@ Clara Botters : string : Whelton</pre>
                  string, mime, int, llong, float, double, bool, icon, raw
                  or a numeric value (ie. 0x1234, 42, 'ABCD', ...)
          The default is "string"</pre>
-<p>So, say dear Clara took a job with the multi-national Barkelbaer Inc., you fill the formerly empty "Company" attribute with that data (which is of type "string"):</p>
+<p>Deci, să spunem că Clara a obținut un job la multi-naționalul Barkelbaer Inc., completați atributul înainte liber „Companie” cu aceste date (care sunt de tipul „string”):</p>
 <pre class="terminal"> ~/people -&gt;addattr -t string META:company Barkelbaer\ Inc. Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="rmattr" name="rmattr">rmattr</a></h3>
-<p><span class="cli">rmattr</span> completely removes an attribute from a file.</p>
+<p><span class="cli">rmattr</span> elimină complet un atribut de la un fișier.</p>
 
 <pre>usage: rmattr [-p] attr filename1 [filename2...]
          'attr' is the name of an attribute of the file
          If '-p' is specified, 'attr' is regarded as a pattern.</pre>
-<p>Though in all practicality it would be enough to just not fill the "Fax" attribute, you can completely remove it from Clara's file by typing:</p>
+<p>Chiar dacă având în vedere simțul practic ar fi fost de ajuns să nu completăm atributul „Fax”, puteți să îl eliminați din fișierul lui Clara prin:</p>
 <pre class="terminal"> ~/people -&gt;rmattr META:fax Clara\ Botters</pre>
 
 <h3>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="copyattr" name="copyattr">copyattr</a></h3>
-<p><span class="cli">copyattr</span> copies attributes from one or more files to another. By default, the actual contents of the file is <b>not</b> copied.</p>
+<p><span class="cli">copyattr</span> copiază atributele de la unul sau mai multe fișiere la alt fișier. Implicit conținutul efectiv al fișierului <b>nu</b> este copiat.</p>
 <pre>Usage: copyattr &lt;options&gt; &lt;source&gt; [ ... ] &lt;destination&gt;</pre>
 
-<p>If you do want to copy the attributes plus the data of the file itself, you can add the option "<span class="cli">-d</span>" or "<span class="cli">--data</span>".</p>
+<p>Dacă totuși vreți să copiați atributele și datele fișierului în sine, puteți să adăugați opțiunea "<span class="cli">-d</span>" sau "<span class="cli">--data</span>".</p>
 
 <p><br /></p>
 <p>Mai multe informații despre aceste comenzi și opțiunile lor pot fi găsite prin tastarea numelui comenzii urmat de "<span class="cli">-h</span>" sau "<span class="cli">--help</span>".</p>
@@ -168,7 +167,7 @@ Clara Botters : string : Whelton</pre>
 
 <div class="nav">
 <div class="inner"><span>
- «  <a href="filetypes.html">Tipuri de fișiere</a> 
+ «  <a href="filetypes.html">Filetypes</a> 
 ::  <a href="contents.html" class="uplink">Conținut</a> 
 ::  <a href="index.html">Index</a>  »
 </span></div>

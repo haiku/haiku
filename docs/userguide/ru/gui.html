@@ -14,6 +14,7 @@
  *		Diver
  *		Emalf Tallefer
  *		PoZorro
+ *		Akuji
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -59,15 +60,14 @@
 
 <div id="content">
 <div>
-<div class="box-info">Перевод этой страницы еще не завершен. Пока это не произойдет, незавершенные части будут на английском.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Содержание</td></tr>
 <tr class="index"><td>
 		<a href="#move-resize">Быстрый способ перемещения и изменения размера окон</a><br />
-                <a href="#stack-tile">Стекирование и прикремление</a><br />
+                <a href="#stack-tile">Стекирование и прикрепление</a><br />
                 <a href="#open-save-panel">Диалоги открытия и сохранения</a><br />
-                <a href="#replicants">Replicants</a></td></tr>
+                <a href="#replicants">Репликанты</a></td></tr>
 </table>
 
 <h1>Графический интерфейс Haiku</h1>
@@ -99,22 +99,21 @@
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="stack-tile" name="stack-tile">Stack &amp; Tile</a></h2>
-<p>Haiku's user interface provides a unique feature that puts the fact that windows have a yellow tab instead of a full-width title bar to perfect use. It's called "Stack &amp; Tile".<br />
-In the example below, a Tracker window with bookmarks is tiled to the left of a WebPositive window, which itself is stacked with another Tracker window showing the source folder <tt>haiku</tt>. In this animation, the user clicks on the tabs of the stacked windows to alternately bring one or  the other to the front.</p> 
+<a id="stack-tile" name="stack-tile">Стекирование и прикрепление</a></h2>
+<p>Пользовательский интерфейс Haiku имеет уникальную особенность, которая происходит из наличия у окон желтого заголовка вместо соответствующей панели на всю ширину окна. Она называется "Стекирование и прикрепление".<br />
+Пример ниже демонстрирует окно Tracker с закладками, прикрепленное к окну WebPositive, которое, в свою очередь, стекировано с другим окном Tracker, отображающим содержимое папки с исходным кодом <tt>haiku</tt>. В этой анимации пользователь кликает по заголовкам, чтобы вывести то или иное окно на передний план.</p> 
 <img src="images/gui-images/gui-s+t.gif" alt="gui-s+t.gif" />
-<p>Connected like this, the group of windows can be moved and resized together - a nice arrangement to work in a more project centric environment. Instead of looking for the right browser window with documentation, editor and Tracker windows and maybe a related email concerning one project you are currently working on, just stack&amp;tile them together.</p>
-<p>Doing the actual arranging of windows is easy: Hold down <span class="key">OPT</span> while dragging a window by its tab close to another window's tab or border until it's highlighted and release the mouse button.</p>
-<p>Stack &amp; Tile consists of two related parts.</p>
+<p>Объединенную таким образом группу окон можно перемещать, а также изменять размеры одновременно - приятная возможность организовать работу в проектно-ориентированном окружении. Вместо использования отдельных окон браузера с документацией, редактора, файлового менеджера и, возможно, почтового клиента, связанных с одним проектом, над которым вы работаете в данный момент, всего лишь стекируйте и прикрепите их.</p>
+<p>Расположить окна нужным образом довольно легко: при нажатой клавише <span class="key">OPT</span>, в процессе перемещения окна путем удержания заголовка, поднесите его к границе или заголовку другого окна, пока оно не подсветится, и отпустите кнопку мыши.</p>
+<p>"Стекирование и прикрепление" состоит из двух связанных опций.</p>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td><img src="images/gui-images/gui-stacking.png" alt="gui-stacking.png" /></td><td width="10"></td>
-<td><p>"<i>Stacking</i>" is putting windows on top of each other, automatically moving the yellow tabs into position.<br />
-While holding <span class="key">OPT</span>, tabs change color when they overlap; drop the window to establish the stacking.</p></td></tr></table>
+<td><p>"<i>Стекирование</i>" - накладывание окон одно на другое с автоматическим изменением расположения их заголовков.<br />В случае удерживания нажатой клавиши <span class="key">OPT</span>, заголовки изменяют свой цвет при накладывании одного на другой. Отпустите удерживаемое окно на размещенное под ним для стекирования.</p></td></tr></table>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2" vspace="10">
 <tr><td><img src="images/gui-images/gui-tiling.png" alt="gui-tilinging.png" /></td><td></td>
-<td><p>"<i>Tiling</i>" means gluing windows horizontally or vertically together.<br />
-Again, while holding <span class="key">OPT</span>, the borders that'll fuse together when you drop the window change color when brought near each other.</p></td></tr></table>
-<p>Separation is done in the same way, by holding <span class="key">OPT</span> while dragging a window by its tab out of the group.</p>
+<td><p>"<i>Прикрепление</i>" означает "склеивание" окон друг с другом горизонтально или вертикально.<br />
+Опять же во время удерживания нажатой клавиши <span class="key">OPT</span>, рамки окон, которые служат местом прикрепления, меняют свой цвет, когда их границы почти соприкасаются.</p></td></tr></table>
+<p>Разделение работает аналогичным образом: при зажатой кнопке <span class="key">OPT</span> заголовок захватывается курсором и, вместе с окном, отделяется от группы.</p>
 
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>

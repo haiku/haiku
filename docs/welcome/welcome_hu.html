@@ -4,7 +4,7 @@
 <head>
 <!-- 
  *
- * Copyright 2008-2015, Haiku. All rights reserved.
+ * Copyright 2008-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -55,6 +55,7 @@
 
 <div id="content">
 <div>
+<div class="box-info">Az oldal fordítása még folyamatban van. Amíg tart a fordítás, addig a lefordítatlan részek angolul jelennek meg.</div>
 
 <table class="index" id="index" summary="index">
 <tr class="heading"><td>Index</td></tr>
@@ -72,7 +73,7 @@
 <h2>
 <a id="welcome" name="welcome">Üdvözöl a Haiku!</a></h2>
 <p>Köszönjük, hogy kipróbálod a Haiku legújabb hivatalos kiadását. Reméljük, hogy találunk újabb fejlesztőket és felhasználókat, akik tesztelik a szoftvert. Tisztában vagyunk azzal, hogy ez csak egy <i>alfa-verziójú</i> kiadás, ami nem teljesen életképes és nem tartalmaz minden, az R1-es verzióban várható programot és funkciót. Mindazonáltal reméljük, hogy ez a kiadás lehetőséget nyújt a Haiku megismeréséhez, és megmutatja a benne rejlő lehetőségeket.</p>
-<p>Kérjük látogass el a project oldalára (<a hrf="http://www.haiku-os.org">Haiku-os.org</a>) a legfrissebb hírek és információk miatt.</p>
+<p>Visit our project's website <a hrf="https://www.haiku-os.org">Haiku-os.org</a> for the latest news and announcements.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -82,7 +83,7 @@
 
 <p>Azért adunk ki alfa-állapotú szoftvert, hogy minél többen teszteljék, és minél több hibára derüljön fény, illetve hogy javaslatokat kapjunk a további fejlesztéshez. Kérjük, hogy mielőtt jelentesz egy hibát, előtte próbálj rákeresni, hátha már valaki jelentette azt.</p>
 <ul>
-	<li><a href="http://dev.haiku-os.org/wiki" class="printurl">Haiku hibajelentő</a></li>
+	<li><a href="https://dev.haiku-os.org/wiki" class="printurl">Haiku Bug Tracker</a></li>
 	<li><a href="hu/bugreports.html">Tippek a hibák jelentéséhez</a></li>
 </ul>
 
@@ -92,7 +93,7 @@
 <p>A Haiku sok tekintetben hasonlít a BeOS R5-ös verziójára, ezért tekinthetjük a modern reinkarnációjának is. Ha eddig még nem találkoztál a rendszerrel, akkor ajánlom figyelmedbe a következő oldalakat:</p>
 <ul>
 	<li><a href="../userguide/hu/contents.html">Haiku felhasználói útmutató</a></li>
-	<li><a href="http://www.haiku-os.org/community/" class="printurl">BeOS/Haiku oldalak</a></li>
+	<li><a href="https://www.haiku-os.org/community/" class="printurl">List of BeOS/Haiku websites</a></li>
 </ul>
 
 <h2>
@@ -101,15 +102,13 @@
 <p>A legtöbb program elérhető a Raktár-ból, mely a Haiku részét képezi.
 A bináris kompatibilitás miatt sok BeOS-ra készült program futtatható Haiku-n. Közülük több is újra lett csomagolva a Haiku-nak megfelelően vagy eredeti formájában is használható.
 További információk a <a href="../userguide/hu/applications.html">Programok</a> fejezetben.</p>
+<p>There are several community-based software collections. See the <a href="https://www.haiku-os.org/community/software">Software Sites</a> page on our website.</p>
 
-<p>A Raktáron kívül az alábbi népszerű oldalakon is találunk programokat:</p>
-<ul>
-	<li><a href="http://pulkomandy.tk/~beosarchive/about.html" class="printurl">PulkoMandy's BeOS software archive</a> - PulkoMandy szoftverei</li>
-	<li><a href="http://haiku.uwolke.ru/" class="printurl">Guest One's Haiku repository</a> - Guest One raktár</li>
-	<li><a href="http://fatelk.com/repo" class="printurl">Fat Elk Software</a></li>
-	<li><a href="http://haikuports.org/" class="printurl">HaikuPorts</a> - portolt programok és frissítéseik</li>
-	<li><a href="https://github.com/HaikuArchives" class="printurl">HaikuArchives</a> - a BeOS és a Haiku nyílt forrású programjainak otthona</li>
-</ul>
+<h2>
+<a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
+<a id="update" name="update">Updating Haiku</a></h2>
+<p>Updating Haiku is currently done from the command line. Open a Terminal and enter "pkgman update". When it's finished, reboot.<br />
+For more details, see the guide <a href="https://www.haiku-os.org/guides/daily-tasks/updating-system">Updating your system</a> on our website.</p>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
@@ -124,24 +123,24 @@ A Haiku könyv a Be köny átirata a Haiku-specifikus információkkal.</p>
 
 <p>Néhány hasznos oldal, ahol érdemes elindulni:</p>
 <ul>
-	<li><a href="http://www.haiku-os.org/development/faq" class="printurl">Fejlesztői GYIK</a></li>
+	<li><a href="https://www.haiku-os.org/development/faq" class="printurl">Development FAQ</a></li>
 	<li><a href="http://cgit.haiku-os.org/" class="printurl">A forráskód böngészése</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/bebook/" class="printurl">A Be könyv</a></li>
-	<li><a href="http://api.haiku-os.org" class="printurl">A Haiku könyv</a></li>
-	<li><a href="http://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">A Be hírlevelek archívuma</a></li>
+	<li><a href="https://www.haiku-os.org/legacy-docs/bebook/" class="printurl">The Be Book</a></li>
+	<li><a href="https://api.haiku-os.org" class="printurl">The Haiku Book</a></li>
+	<li><a href="https://www.haiku-os.org/legacy-docs/benewsletter/" class="printurl">Be Newsletter Archive</a></li>
 </ul>
 
 <h2>
 <a href="#"><img src="images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="contact" name="contact">Kapcsolat</a></h2>
-<p>Kapcsolatba léphetsz más fejlesztőkkel és felhasználókkal IRC csatornán keresztül (<a href="http://webchat.freenode.net/?channels=haiku">#haiku</a>), a fórumunkon illetve a levelezőlistáinkon. Ha sok különböző ember összejön, akkor különféle szabályokat be kell vezetni. Kérjük, olvasd el a <a href="http://www.haiku-os.org/community/ml/etiquette">levelezőlista-illemtan</a>t.</p>
+<p>Get in contact with other developers and users and join the discussions on IRC (<a href="http://webchat.freenode.net/?channels=haiku">#haiku</a> on webchat), in our forums or the mailing lists. When many different people come together, rules have to established to keep communication effective. Please respect our <a href="https://www.haiku-os.org/community/ml/etiquette">Mailing List Etiquette</a>.</p>
 <ul>
-	<li><a href="http://www.haiku-os.org/community/irc" class="printurl">IRC csatornák</a></li>
-	<li><a href="http://www.haiku-os.org/forum" class="printurl">Fórumok</a></li>
+	<li><a href="https://www.haiku-os.org/community/irc" class="printurl">IRC channels</a></li>
+	<li><a href="https://www.haiku-os.org/forum" class="printurl">Forums</a></li>
 	<li><a href="http://www.freelists.org/list/haiku" class="printurl">Elsődleges levelezőlista</a></li>
 	<li><a href="http://www.freelists.org/list/haiku-development" class="printurl">Fejlesztői levelezőlista</a></li>
 	<li><a href="http://www.freelists.org/list/haiku-3rdparty-dev" class="printurl">Külső fejlesztői lista</a></li>
-	<li><a href="http://www.haiku-os.org/community/ml" class="printurl">Az összes levelezőlista egy helyen</a></li>
+	<li><a href="https://www.haiku-os.org/community/ml" class="printurl">Overview of all mailing lists</a></li>
 </ul>
 
 </div>

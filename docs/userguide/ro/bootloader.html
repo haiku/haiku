@@ -51,7 +51,7 @@
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
     <a href="contents.html" class="uplink">Conținut</a> 
-::  <a href="filesystem-layout.html">Aranjament sistem de fișiere</a>  »
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>
 
@@ -66,10 +66,10 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="options" name="options">Opțiuni Boot Loader</a></h2>
-<p>Once it's there, you're offered four menus:</p>
+<p>Odată ce a apărut, vă sunt oferite patru meniuri:</p>
 <table summary="bootloader menus" border="0" cellspacing="0" cellpadding="2">
-<tr><td><b>Selectează volum pornire</b></td><td> </td><td>Choose which Haiku installation/version to start.</td></tr>
-<tr><td><b>Select safe mode options</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
+<tr><td><b>Selectează volum de boot</b></td><td> </td><td>Alegeți care instalare/versiune de Haiku să înceapă.</td></tr>
+<tr><td><b>Selectează opțiuni safe mode</b></td><td> </td><td>There are several options to try in case of hardware related trouble or if the system becomes unstable or unbootable because of a misbehaving add-on. When moving the selection bar to an option, a short explanation appears at the bottom of the screen.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Safe mode</span><br />
 		Puts the system into safe mode. This can be enabled independently from the other options.</p>
@@ -96,7 +96,7 @@
 		Disables Advanced Configuration and Power Interface hardware support, overriding the ACPI setting in the kernel settings file.</p>
 	<p><span class="menu">Blacklist entries</span><br />
 		Allows to select system files that shall be ignored. Useful e.g. to disable drivers temporarily. See <a href="#troubleshooting">Troubleshooting</a> below.</p></td></tr>
-<tr><td><b>Select debug options</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
+<tr><td><b>Selectează opțiuni depanare</b></td><td> </td><td>Here you'll find several options that help with debugging or getting details for a <a href="../../welcome/en/bugreports.html">bug report</a>. Again, a short explanation for each option is displayed at the bottom.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Enable serial debug output</span><br />
 		Turns on forwarding the syslog output to the serial interface (default: 115200, 8N1).</p>
@@ -122,7 +122,7 @@
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="troubleshooting" name="troubleshooting">Depanare</a></h2>
-<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../welcome/en/bugreports.html">bug report</a> in any case.</p>
+<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../../welcome/en/bugreports.html">bug report</a> in any case.</p>
 <p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
 <ul>
 <li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootScript from being started.</p></li>
@@ -135,19 +135,19 @@ So, if you encounter boot problems after installing some package, boot a Haiku v
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="booting" name="booting">Pornirea Haiku</a></h2>
-<p>After activating one or more options, you return to the main menu and continue booting, which presents you with this boot screen:</p>
+<p>După activarea uneia sau mai multor opțiuni, vă întoarceți la meniul principal și continuați pornirea sistemului, care vă arată acest ecran de boot:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
-<p>If everything works OK, one symbol after another quickly lights up.<br />
-The different symbols roughly correspond to these boot stages:</p>
+<p>Dacă totul fucționează corect, se aprinde rapid un simbol, unul după altul.<br />
+Diferitele simboluri corespund aproximativ cu aceste etape de boot:</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0"> 
-	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Initializing modules.</td></tr>
-	<tr><td><b>Disk + magnifier</b></td><td> </td><td>Creating rootfs (<span class="path">/</span>) and mounting devfs (<span class="path">/dev</span>).</td></tr>
-	<tr><td><b>Plug-in card</b></td><td> </td><td>Initializing device manager.</td></tr>
-	<tr><td><b>Disc pornire</b></td><td> </td><td>Mounting boot disk.</td></tr>
-	<tr><td><b>Cip</b></td><td> </td><td>Loading CPU specific modules.</td></tr>
-	<tr><td><b>Dosar</b></td><td> </td><td>Final initialization of subsystems.</td></tr>
-	<tr><td><b>Rachetă</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
+	<tr><td><b>Atom</b></td><td style="width:10px;"> </td><td>Se inițializează modulele.</td></tr>
+	<tr><td><b>Disc + lupă</b></td><td> </td><td>Se creează rootfs (<span class="path">/</span>) și se montează devfs (<span class="path">/dev</span>).</td></tr>
+	<tr><td><b>Card plug-in</b></td><td> </td><td>Se inițializează gestionarul de dispozitive.</td></tr>
+	<tr><td><b>Disc de boot</b></td><td> </td><td>Se montează discul de boot.</td></tr>
+	<tr><td><b>Cip</b></td><td> </td><td>Se încarcă modulele specifice CPU.</td></tr>
+	<tr><td><b>Dosar</b></td><td> </td><td>Se finalizează inițializarea subsistemelor.</td></tr>
+	<tr><td><b>Rachetă</b></td><td> </td><td>Launch_daemon a pornit sistemul.</td></tr>
 </table>
 
 </div>
@@ -158,7 +158,7 @@ The different symbols roughly correspond to these boot stages:</p>
     <!-- «  <a href="installation.html">Installing Haiku</a> 
 ::  -->
     <a href="contents.html" class="uplink">Conținut</a> 
-::  <a href="filesystem-layout.html">Aranjament sistem de fișiere</a>  »
+::  <a href="filesystem-layout.html">Filesystem layout</a>  »
 </span></div>
 </div>
 

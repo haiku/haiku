@@ -61,12 +61,11 @@
 
 <h2><img src="../../images/apps-images/cli-app-icon_64.png" alt="cli-app-icon_64.png" width="64" height="64" />Aplikácie príkazového riadka špecifické pre Haiku</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
-<tr><td>Umiestnenie:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin/</span><br />
-<span class="path">/boot/system/non-packaged/bin/</span><br /><span class="path">~/config/bin/</span><br /><span class="path">~/config/non-packaged/bin/</span></td></tr>
+<tr><td>Umiestnenie:</td><td style="width:15px;"></td><td><span class="path">/boot/system/bin</span><br /><span class="path">/boot/common/bin</span><br /><span class="path">~/config/bin</span></td></tr>
 </table>
 <p><br /></p>
-<p>All commandline applications shipped with Haiku are in <span class="path">/boot/system/bin/</span>. Your own or additionally installed commandline apps will appear there as well, or in <span class="path">~/config/bin/</span>, when installed from a .hpkg package. Otherwise you can put them into  <span class="path">/boot/system/non-packaged/bin/</span> or <span class="path">~/config/non-packaged/bin/</span>. All these locations are part of the PATH variable and are therefore automatically found.<br />
-The following isn't an exhaustive list of all Haiku-specific CLI apps, it serves just to highlight a few of the most useful to give you a taste. Feel encouraged to explore what's in the <span class="path">bin/</span> folders on your own a bit. Executing an app with the parameter <tt>--help</tt> shows the usage of the command and all its various options.</p>
+<p>Všetky aplikácie príkazového riadka v Haiku sa nachádzajú v <span class="path">/boot/system/bin</span>. Vaše vlastné alebo dodatočne nainštalované aplikácie príkazového riadka budú na rovnakom mieste alebo v <span class="path">~/config/bin</span> ak sú nainštalované z balíka .hpkg. V opačnom prípade ich môžete dať do <span class="path">/boot/system/non-packaged/bin/</span> alebo do <span class="path">~/config/non-packaged/bin/</span>. Všetky tieto miesta sú uvedené v premennej PATH, teda budú automaticky nájdené.<br />
+Nasledujúci zoznam neobsahuje všetky aplikácie príkazového riadka špecifické pre Haiku, jeho účelom je vyzdvihnúť malú časť tých najužitočnejších. Voľne môžete skúmať obsah priečinkov <span class="path">bin/</span> aj sami. Ďalšie informácie o príkaze a jeho rôznych voľbách získate spustením daného príkazu spolu s parametrom <tt>--help</tt>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-attributes" name="cli-attributes">Súvisiace s atribútmi: <span class="cli">listattr</span>, <span class="cli">catattr</span>, <span class="cli">addattr</span>, <span class="cli">rmattr</span>, <span class="cli">copyattr</span></a></h3>
@@ -79,10 +78,10 @@ Všetky tieto príkazy sú popísané v téme <a href="../attributes.html#attrib
 Tieto príkazy sú popísané v téme <a href="../index.html">Index</a>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="cli-pkg" name="cli-pkg">Relating to package management: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
-<p>The <span class="cli">package</span> command is used to manage HPKG packages. Have a look at the article <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Installing applications</a> to learn the very basics. Usually the tool <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a> is used to create so-called recipes for automatic package building.</p>
-<p><span class="cli">pkgman</span> is used to search, install, update and uninstall packages. Package repositories can be added, dropped and their package lists refreshed. A special kind of update is invoked with the parameter <tt>full-sync</tt>: It is more aggressive and also downgrades or removes packages, if necessary.<br />
-For more details on a parameter, append "--help", e.g. <tt>pkgman search --help</tt>.</p>
+<a id="cli-pkg" name="cli-pkg">Súvisiace so správou balíkov: <span class="cli">package</span>, <span class="cli">pkgman</span></a></h3>
+<p>Príkaz <span class="cli">package</span> sa používa na správu balíkov HPKG. Prečítajte si článok <a href="https://www.haiku-os.org/guides/daily-tasks/install-applications">Inštalovanie aplikácií</a>, kde sa naučíte úplné základy. Na tvorbu receptov na automatické zostavovanie balíkov sa zvyčajne používa nástroj <a href="https://github.com/haikuports/haikuports/wiki">haikuporter</a>.</p>
+<p><span class="cli">pkgman</span> sa používa na hľadanie, inštalovanie, aktualizovanie a odinštalovanie balíkov. Zdroje balíkov je možné pridať, odstrániť a obnoviť zoznam balíkov z nich. Špeciálny druh aktualizácie sa vyvolá parametrom <tt>full-sync</tt>: Je agresívnejší a tiež môže znížiť verziu alebo odstrániť balíky, ak je to nutné.<br />
+Ďalšie podrobnosti o tomto parametri sa dozviete pridaním parametra „--help“, napr. <tt>pkgman search --help</tt>.</p>
 
 <h3><a href="#"><img src="../../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="cli-scripting" name="cli-scripting">Užitočné skriptovacie príkazy</a></h3>
@@ -100,8 +99,7 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-filepanel.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">hey</span></p></td><td style="width:10px;"> </td>
-<td valign="top"><p><span class="cli">hey</span> is a littler helper tool that sends BMessages to applications and prints out their answer. It can be used for application scripting, i.e. "remote controlling" a program from a script or the command line. It's usage is a bit complex... Thanks to Scot Hacker's BeOS Bible, there's a nice <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">hey tutorial</a> by Chris Herborth.</p>
-</td></tr>
+<td valign="top"><p><span class="cli">hey</span> je malý nástroj, ktorý pošle BMessages aplikáciám a vypíše ich odpoveď. Je možné použiť ho na písanie skriptov aplikácií, t.j. na „Diaľkové ovládanie“ programov zo skriptu alebo z príkazového riadka. Jeho používanie je trochu zložitejšie... Vďaka knihe Scot Hacker BeOS Bible si môžete prečítať pekný <a href="http://www.birdhouse.org/beos/bible/bos/ch_scripting6.html">návod na prácu s „hey“</a>, ktorý napísal Chris Herborth.</p></td></tr>
 <tr><td><p><span class="cli">query</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">query</span> je verzia panela „Nájsť...“ pre príkazový riadok. Rýchlym spôsobom ako vygenerovať hľadaný termín je vytvoriť požiadavku v paneli „Nájsť...“, prepnúť na <span class="menu">podľa vzorca</span>, pridať úvodzovky (<tt>"</tt>) na začiatok a koniec a celý reťazec skopírovať za váš príkaz <span class="cli">query</span> v Termináli alebo vašom skripte.</p>
 </td></tr>
@@ -114,8 +112,7 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 
 <table summary="scripting cli tools" border="0" cellpadding="2" cellspacing="0"> 
 	<tr><td><p><span class="cli">checkfs</span></p></td><td style="width:10px;"> </td>
-		<td><p><span class="cli">checkfs</span> is an important tool to check for errors in your file system. Simply add a volume name like <span class="path">/Haiku</span> or device path and it'll run through every file and correct inconsistencies where possible.</p>
-</td></tr>
+		<td><p><span class="cli">checkfs</span> je dôležitý nástroj na hľadanie chýb vo vašom súborovom systéme. Jednoducho pridajte názov zväzku ako <span class="path">/Haiku</span> alebo cestu k zariadeniu a systém prebehne každý súbor a opraví možné nezrovnalosti.</p></td></tr>
 <tr><td><p><span class="cli">desklink</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">desklink</span> dokáže priradiť ikonu ľubovolnému súboru, priečinku, požiadavke alebo aplikácii v oznamovacej oblasti Panela. Taktiež ponúka možnosť poskytnúť kontextové menu po kliknutí na ikonu pravým tlačidlom na vykonanie špeciálnych operácií. Ako príklad môžete skúsiť pridať aplikáciu príkazového riadka <span class="app">screenshot</span> s rôznymi možnosťami pomocou tohto kódu (znak „<tt>\</tt>“ v prvom riadku je na zalomenie riadka v Termináli):</p>
 <pre class="terminal"> desklink "cmd=Active window (2s):/bin/screenshot --window --border --delay 2" \
@@ -124,15 +121,34 @@ Would you like a link to it?" "On Desktop" "In Deskbar" "No thanks"</pre>
 <p><img src="../images/apps-images/cli-desklink.png" alt="cli-alert.png" /></p>
 </td></tr>
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">diskimage</span> lets you register a regular file as disk device. For example, you can register a Haiku anyboot image, mount it in Tracker and copy, edit or remove files there before using it as source in the Installer.</p>
+		<td valign="top"><p><span class="cli">diskimage</span> vám umožňuje zaregistrovať obyčajný súbor ako diskové zariadenia. Napríklad môžete sa zaregistrovať obraz Haiku vo formáte anyboot, pripojiť ho v Trackeri a kopírovať, upravovať alebo odstraňovať súbory na ňom predtým, než ho použijete ho ako zdroj v Inštalátore.</p></td></tr>
+<tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>launch_daemon spúšťa rôzne služby a aplikácie pri štarte systému. Je nastavený tak, aby niektoré z nich znovu spustil ak sa zastavia. Ak si to neželáte (napríklad by ste chceli vyskúšať upravený Tracker), použite <span class="cli">launch_roster</span> na <tt>stop</tt> reštartovanie aplikácie pred jej ukončením. Podobne ju môžete znova spustiť (<tt>start</tt>) alebo zistiť informácie o nej (<tt>info</tt>). Bez parametra <span class="cli">launch_roster</span> vypíše všetky aplikácie a služby, ktoré riadi.<br />
+Napríklad takto zastavíte spúšťanie zastavenej aplikácie Panel:</p>
+<pre class="terminal">launch_roster stop x-vnd.be-tskb</pre>
 </td></tr>
 <tr><td><p><span class="cli">mountvolume</span><br /><span class="cli">mount</span></p></td><td style="width:10px;"> </td>
-		<td valign="top"><p><span class="cli">mountvolume</span> is preferred by many to mount local partitions and disks, because its usage is so easy: just call it with the name of the partition and you're done. Try <tt>--help</tt> for more options.</p>
-<p><span class="cli">mount</span> can additionally mount remote disks by using a network filesystem, like NFS4. You specify the used filesystem with the <tt>-t</tt> parameter and the remote location with the <tt>-p</tt> parameter. As filesystem parameter you can use anything you find in <span class="path">/system/add-ons/kernel/file_system</span> (and corresponding file hierarchies under <span class="path">~/config</span> or "<span class="path">non-packaged</span>", of course). You also have to create a folder as mountpoint. Here's an example:</p>
+		<td valign="top"><p><span class="cli">mountvolume</span> mnohí používatelia preferujú na pripájanie lokálnych oblastí a diskov, pretože sa tak jednoducho používa: stačí ho zavolať s názvom diskovej oblasti a hotovo. Skúste si prečítať o ďalších voľbých zadaním <tt>--help</tt>.</p>
+<p><span class="cli">mount</span> môže naviac pripájať vzdialené pevné disky pomocou sieťového súborového systému ako je NFS4. Používaná súborový systém zadáte parametrom <tt>-t</tt> a vzdialené umiestnenie parametrom <tt>-p</tt>. Ako parameter súborového systému môžete použiť čokoľvek, čo nájdete v <span class="path">/system/add-ons/kernel/file_system</span> (a zodpovedajúcich hierarchiách súborov v priečinku <span class="path">~/config</span> alebo „<span class="path">non-packaged</span>“). Tiež musíte vytvoriť priečinok ako bod pripojenia. Napríklad:</p>
 <pre class="terminal">mkdir -p /DiskStation
 mount -t nfs4 -p "192.168.178.3:volume1" /DiskStation</pre></td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">open</span> je veľmi užitočný nástroj. Môžete ním otvoriť ľubovoľný súbor v jeho preferovanej aplikácii alebo spustiť konkrétnu aplikáciu podľa jej podpisu bez potreby poznať jej presnú cestu. Príkaz funguje aj na odkazoch URL a dokonca aj na „virtuálnych“ priečinkoch - <tt>.</tt> pre aktuálny priečinok a <tt>..</tt> pre nadradený otvorí priečinok v Trackeri.</p>
+</td></tr>
+<tr><td><p><span class="cli">ramdisk</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>A ramdisk is like a harddisk running only in the computer's memory. That makes it very fast but also volatile, because its contents vanishes when you shut down the computer, or it crashes or you experience a blackout.<br />
+To create a ramdisk of 1 GiB, format to the name "RAMses" and mount it, you enter this in Terminal or create a script of it:</p>
+<pre class="terminal">ramdisk create -s 1gb
+mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMses
+mountvolume RAMses</pre>
+<p>Note: When creating a ramdisk, the <span class="cli">ramdisk</span> command prints out the path to it. If you create several disks, that path <span class="path">/dev/disk/virtual/ram/0/raw</span> will change!</p>
+<p>To preserve the contents, at least if no calamity like a blackout etc. strikes, a ramdisk can be set up to read/write an image on the harddisk. For that, you need to supply a file of the desired size that will be read from every time you start your ramdisk, and written to when you unmount it. To create an image file "RAMimage" of 500MiB and format it, do this:</p>
+<pre class="terminal">dd if=/dev/zero of=RAMimage bs=500M count=1
+mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMimage</pre>
+<p>From now on, you start the ramdisk like this:</p>
+<pre class="terminal">ramdisk create RAMimage
+mountvolume RAMimage</pre>
+<p>It's very important to always cleanly unmount you ramdisk, either from Tracker or with <span class="cli">unmount /RAMimage</span>, or the changes won't be written back to the image file!</p>
 </td></tr>
 </table>
 </div>

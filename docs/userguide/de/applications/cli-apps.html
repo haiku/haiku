@@ -125,6 +125,10 @@ Soll eine Verknüpfung erstellt werden?" "Auf dem Desktop" "In der Deskbar" "Nei
 <tr><td><p><span class="cli">diskimage</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p>Mittels <span class="cli">diskimage</span> können normale Dateien als "Disk" angemeldet werden. So lässt dich beispielsweise ein Haiku Anyboot Image anmelden. Anschließend kann es per Tracker eingehängt werden, um Dateien darauf zu kopieren, zu ändern oder zu löschen, bevor man es als Quelle für den Installer benutzt.</p>
 </td></tr>
+<tr><td><p><span class="cli">launch_roster</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>Der launch_daemon startet beim Hochfahren verschiedene Dienste und Anwendungen. Einige werden bei ihrer Beendigung automatisch neu gestartet. Soll das nicht geschehen – vielleicht will man einen veränderten Tracker ausprobieren – kann man per <span class="cli">launch_roster stop</span> den Neustart der Anwendung verhindern, bevor man sie beendet. Mittels <tt>start</tt> lässt sich der automatische Neustart wieder einschalten,  <tt>info</tt> gibt zusätzliche Informationen aus. Ohne Parameter zeigt <span class="cli">launch_roster</span> alle Anwendungen/Dienste an, die so gesteuert werden können.<br />
+So lässt sich zum Beispiel der Neustart der Deskbar anhalten:</p>
+<pre class="terminal">launch_roster stop x-vnd.be-tskb</pre></td></tr>
 <tr><td><p><span class="cli">mountvolume</span><br /><span class="cli">mount</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">mountvolume</span> ist der allgemein bevorzugte Befehl zum Einhängen lokaler Partitionen und Disks, weil er so simpel zu benutzen ist: einfach mit dem Namen der Partition aufrufen und fertig. <tt>--help</tt> zeigt die weiteren Optionen.</p>
 <p><span class="cli">mount</span> kann zusätzlich auch nicht-lokale Disks per Netzwerk-Dateisystemen wie NFS4 einhängen. Das zu benutzende Dateisystem wird mit dem <tt>-t</tt> Parameter übergeben, die Zieladresse mit dem <tt>-p</tt> Parameter. Als Dateisystem können alle unter <span class="path">/system/add-ons/kernel/file_system</span> (bzw. dessen Entsprechungen unter <span class="path">~/config</span> oder "<span class="path">non-packaged</span>") gelisteten benutzt werden. Außerdem muss ein Verzeichnis als Einhängepunkt angelegt werden. Ein Beispiel:</p>
@@ -132,6 +136,21 @@ Soll eine Verknüpfung erstellt werden?" "Auf dem Desktop" "In der Deskbar" "Nei
 mount -t nfs4 -p "192.168.178.3:volume1" /DiskStation</pre></td></tr>
 <tr><td><p><span class="cli">open</span></p></td><td style="width:10px;"> </td>
 		<td valign="top"><p><span class="cli">open</span> ist ein nützliches kleines Tool. Es öffnet jedwede Datei mit ihrer bevorzugten Anwendung oder startet eine bestimmte Anwendung anhand ihrer Signatur ohne ihren genauen Pfad kennen zu müssen. Das funktioniert auch mit URLs und sogar den "virtuellen" Verzeichnissen, <tt>.</tt> für das aktuelle Verzeichnis und <tt>..</tt> für das übergeordnete, die dann im Tracker geöffnet werden.</p>
+</td></tr>
+<tr><td><p><span class="cli">ramdisk</span></p></td><td style="width:10px;"> </td>
+		<td valign="top"><p>Eine Ramdisk lässt sich als eine Art Festplatte verstehen die ausschließlich im Speicher des Rechners läuft. Dadurch ist sehr schnell, aber auch vergänglich, da ihr Inhalt verschwindet sobald der Rechner ausgeschaltet wird, er abstürzt oder der Strom ausfällt.<br />
+Um eine Ramdisk mit 1 GiB Größe zu erzeugen, sie auf den Namen "RAMses" zu formatieren und einzuhängen, tippt man folgendes ins Terminal, bzw. macht ein Skript daraus:</p>
+<pre class="terminal">ramdisk create -s 1gb
+mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMses
+mountvolume RAMses</pre>
+<p>Achtung: Erzeugt man eine Ramdisk, gibt der <span class="cli">ramdisk</span> Befehl deren Pfad aus. Erzeugt man mehrere Ramdisks, ändert sich der Pfad <span class="path">/dev/disk/virtual/ram/0/raw</span> !</p>
+<p>Um den Inhalt zu behalten, zumindest sofern kein Unglück wie ein Stromausfall geschieht, lässt sich eine Ramdisk auch so einrichten, dass sie eine Imagedatei auf der Festplatte benutzt. Dazu muss man eine Datei mit einer entsprechenden Größe zur Verfügung stellen, von der bei jedem Start der Ramdisk gelesen und beim Aushängen geschrieben wird. So erzeugt man eine 500 MiB große Datei "RAMimage" und formatiert sie:</p>
+<pre class="terminal">dd if=/dev/zero of=RAMimage bs=500M count=1
+mkfs -q -t bfs /dev/disk/virtual/ram/0/raw RAMimage</pre>
+<p>Ab jetzt lässt sich diese Ramdisk so starten:</p>
+<pre class="terminal">ramdisk create RAMimage
+mountvolume RAMimage</pre>
+<p>Dabei ist es äußerst wichtig die Ramdisk immer sauber auszuhängen, entweder im Tracker oder per <span class="cli">unmount /RAMimage</span>. Ansonsten werden die Änderungen nicht zurück in die Imagedatei geschrieben!</p>
 </td></tr>
 </table>
 </div>

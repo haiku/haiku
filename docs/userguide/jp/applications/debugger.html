@@ -4,13 +4,14 @@
 <head>
 <!-- 
  *
- * Copyright 2015, Haiku. All rights reserved.
+ * Copyright 2015-2017, Haiku. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		mt
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -57,30 +58,33 @@
 
 <div id="content">
 <div>
+<div class="box-info">このページの翻訳はまだ完全ではありません。完成するまでは、未完成の部分はオリジナルの英文を使用します。</div>
 
 <h2><img src="../../images/apps-images/debugger-icon_64.png" alt="debugger-icon_64.png" width="64" height="64" />Debugger</h2>
 <table summary="layout" border="0" cellspacing="0" cellpadding="2">
 <tr><td>Deskbar:</td><td style="width:15px;"></td><td><span class="menu">アプリケーション (Applications)</span></td></tr>
-<tr><td>位置:</td><td></td><td><span class="path">/boot/system/apps/Debugger</span></td></tr>
-<tr><td>設定ファイルの位置</td><td></td><td><span class="path">~/config/settings/Debugger settings</span><br />
+<tr><td>場所:</td><td></td><td><span class="path">/boot/system/apps/Debugger</span></td></tr>
+<tr><td>設定ファイル:</td><td></td><td><span class="path">~/config/settings/Debugger settings</span><br />
 <span class="path">~/config/settings/Debugger/</span></td></tr>
 </table>
 <p><br /></p>
 <p>Debugger は、一般ユーザーがあまり使う機会のないアプリケーションです。それは、プログラム中のバグを詳細に調べる開発者をターゲットにしています。時々、これらのバグはクラッシュをもたらし、しかもそこでエンドユーザーでも Debugger に出会うことがあります。プログラムがクラッシュした時、次のアラートに遭遇します。</p>
 <img src="../images/apps-images/debugger_alert.png" alt="debugger_alert.png" />
-<p>そこには、クラッシュに対応するための 3 つのオプションがあります。</p>
+<p>It gives four options to react to the crash:</p>
 <ul>
 <li><p><span class="button">終了 (Terminate)</span> クラッシュしたアプリケーションの後始末をしますが、そのほかはこれ以上何もしません。</p></li>
 <li><p><span class="button">デバッグ (Debug)</span> さらに調査するために Debugger を起動します。</p></li>
+<li><p><span class="button">Write core file</span> creates a possibly huge dump of the system's state. Better attach a regular debug report first when submitting a bug report and only provide a core file on request.</p></li>
 <li><p><span class="button">レポートを保存 (Save report)</span> デバッグレポートを作成します。それはデスクトップ上にテキストファイルとして作成され、クラッシュしたアプリケーションの作者にメールで送付することや、または、可能であればそのアプリケーションのバグトラッカーに添付することができます。<br />
 デバッグレポートは以下のものを含みます。ハードウェア情報 (CPU の種類やメモリー使用量など)、Haiku の正確なバージョン、およびクラッシュに関連すると考えられるシステム状態のあらゆる入手可能な情報。</p></li>
 </ul>
 <p>実際のDebugger の操作の記載は、Haiku の一般ユーザー向けというユーザーガイドの範囲を超えます。完全を期すために、以下のウィンドウは、上記のアラートで<span class="button">デバッグ (Debug)</span> オプションを選んだ際に現れるものです。</p>
 <img src="../images/apps-images/debugger.png" alt="debugger.png" />
-<p>少しさわり始めるとすぐわかるように、Debugger はもっとも複雑で洗練された Haiku 用アプリケーションのひとつです。もし読者が開発者で、ほかのプラットフォーム上のグラフィカルなデバッガーに慣れているなら、多くの機能はよく知っているものでしょう。</p>
-<p>Haiku の Debugger の複雑さを説明する単一のドキュメントはないので、以下のリンクが手掛かりを与えるかもしれません。もし特定の質問があるなら、それを<a href="http://www.freelists.org/list/haiku-development">開発メーリングリスト (development mailing list)</a> にポストしてください。よりよいリソースを見つけたら、その情報とともに<a href="../../../welcome/en/bugreports.html">バグレポート</a>に報告してください。</p>
+<p>少しさわり始めるとすぐわかるように、Debugger はもっとも複雑かつ洗練された Haiku 用アプリケーションのひとつです。もし読者が開発者で、ほかのプラットフォーム上のグラフィカルなデバッガーに慣れているなら、多くの機能はよく知っているものでしょう。</p>
+<p>以下は、Haiku の Debugger の複雑さに光を当てるかもしれないいくつかのリンクです。もし特定の質問があるなら、それを<a href="http://www.freelists.org/list/haiku-development">開発メーリングリスト</a> (development mailing list) にポストしてください。もしもより有用なリソースを見つけたら、その情報とともに<a href="../../../welcome/en/bugreports.html">バグレポート</a>に報告してください。</p>
 <table summary="layout" border="0" cellpadding="2" cellspacing="0">
-<tr><td><a href="https://www.haiku-os.org/taxonomy/term/1240">Blog の記事</a></td><td> </td><td>Debugger に関する 2、3 の記事があります。ほとんどは新機能追加後の Rene Gollent による記事です。</td></tr>
+<tr><td class="onelinetop"><a href="https://www.dropbox.com/s/e6gx39r0asc2t8f/DebuggerReferenceManual.pdf?dl=1">Debugger レファレンスマニュアル</a></td><td></td><td>Debugger の使い方についてのもっとも詳しい情報源。</td></tr>
+<tr><td><a href="https://www.haiku-os.org/blog/anevilyak/">Blog 記事</a></td><td> </td><td>Debugger に関する 2、3 の記事があります。ほとんどは新機能追加後の Rene Gollent による記事です。</td></tr>
 <tr><td class="onelinetop"><a href="https://www.youtube.com/watch?v=n-NDFwtmQcI&amp;list=PL2KiE-VO9zk-9XPmfusEDaOFd_7AiVKzz">BeGeistert 026 のビデオ</a></td><td> </td><td>2012 年の BeGeistert ミーティングで、Ingo Weinhold が Debugger の状況をデモしています。また、ボトルネックを追い詰めるプロファイラーのような、ほかの興味深いツールも紹介しています。</td></tr>
 </table>
 

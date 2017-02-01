@@ -11,6 +11,7 @@
  *		Humdinger <humdingerb@gmail.com>
  * Translators:
  *		helix84
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -57,7 +58,6 @@
 
 <div id="content">
 <div>
-<div class="box-info">Preklad tejto stránky zatiaľ nie je dokončený. Dovtedy sa nedokončené časti zobrazia v anglickom origináli.</div>
 
 <h1>Zavádzač systému</h1>
 
@@ -99,8 +99,7 @@ Tiež sa hodí potom ako nainštalujete softvérový komponent, ktorý robí pro
 		Umožňuje vybrať súbory systému, ktoré sa majú ignorovať. To je užitočné napr. na dočasné vypnutie ovládačov. Pozri <a href="#troubleshooting">Riešenie problémov</a> nižšie.</p>
 </td></tr>
 <tr><td><b>Vyberte voľby ladenia</b>
-</td><td> </td><td>Tu nájdete niekoľko volieb, ktoré pomáhajú pri ladení alebo získavaní podrobností do <a href="../welcome/sk/bugreports.html">hlásenia chyby</a>. Dolu má opäť každá voľba krátke vysvetlenie.
-</td></tr>
+</td><td> </td><td>Tu nájdete niekoľko volieb, ktoré pomáhajú pri ladení alebo získavaní podrobností do <a href="../../welcome/sk/bugreports.html">hlásenia chyby</a>. Dolu má opäť každá voľba krátke vysvetlenie.</td></tr>
 <tr><td></td><td></td><td>
 	<p><span class="menu">Zapnúť výstup ladenia na sériový port</span><br />
 		Zapne presmerovanie výstupu syslogu na sériové rozhranie (predvolené parametre: 115200, 8N1).</p>
@@ -115,31 +114,31 @@ Tiež sa hodí potom ako nainštalujete softvérový komponent, ktorý robí pro
 	<p><span class="menu">Pridať rozšírenú voľbu ladenia</span><br />
 		Umožňuje priame zadanie rozšírenej voľby ladenia.</p>
 </td></tr>
-<tr><td></td><td></td><td>If "<i>Enable debug syslog</i>" is activated, a warm reboot after a crash shows these additional options:</td></tr>
-<tr><td></td><td></td><td>	<p><span class="menu">Save syslog from previous session during boot</span><br />
-		Saves the syslog from the previous Haiku session to /var/log/previous_syslog when booting.</p>
-	<p><span class="menu">Display syslog from previous session</span><br />
-		Displays the syslog from the previous Haiku session</p>
-	<p><span class="menu">Save syslog from previous session</span><br />
-		Saves the syslog from the previous Haiku session to disk. Currently only FAT32 volumes are supported.</p></td></tr>
+<tr><td></td><td></td><td>Ak je aktivovaná voľba „<i>Zapnúť ladiaci syslog</i>“ teplý reštart po havárii zobrazí naviac tieto voľby:</td></tr>
+<tr><td></td><td></td><td>	<p><span class="menu">Uložiť syslog z predošlej relácie počas štartu</span><br />
+		Uloží pri štarte syslog z predošlej relácie Haiku do /var/log/previous_syslog.</p>
+	<p><span class="menu">Zobraziť syslog z predošlej relácie</span><br />
+		Zobrazí syslog z predošlej relácie Haiku</p>
+	<p><span class="menu">Uložiť syslog z predošlej relácie</span><br />
+		Uloží syslog z predošlej relácie Haiku na disk. Momentálne sú podporované iba súborové systémy FAT32.</p></td></tr>
 <tr><td class="onelinetop"><b>Vyberte bezpečný grafický režim</b></td><td> </td><td>Ak ste museli aktivovať voľbu <i>Použiť bezpečný grafický režim</i>, tu môžete nastaviť rozlíšenie a farebnú hĺbku.</td></tr>
 </table>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="troubleshooting" name="troubleshooting">Troubleshooting</a></h2>
-<p>If Haiku refuses to boot on your hardware from the get-go, try out setting different options under <span class="menu">Select safe mode options</span>. Consider filing a <a href="../welcome/en/bugreports.html">bug report</a> in any case.</p>
-<p>On the other hand, if Haiku only suddenly acts up after you have installed some software, especially hardware drivers, you have several options to get Haiku bootable again so you can uninstall the offending package:</p>
+<a id="troubleshooting" name="troubleshooting">Riešenie problémov</a></h2>
+<p>Ak Haiku odmietne na vašom hardvéri bezproblémovo naštartovať, skúste nastaviť rozličné voľby v menu  <span class="menu">Vybrať možnosti bezpečného režimu</span>. V každom prípade zvážte odoslanie <a href="../../welcome/sk/bugreports.html">hlásenia o chybe</a>.</p>
+<p>Na druhú stranu, ak Haiku len náhle začalo spôsobovať nejaký problém po inštalácii nejakého softvéru, najmä ovládačov hardvéru, máte niekoľko možností, ako znovu dostať Haiku do spustiteľného stavu, aby ste mohli problematický balík odinštalovať:</p>
 <ul>
-<li><p>Activating <span class="menu">Safe mode</span> will prevent most servers, daemons and the UserBootScript from being started.</p></li>
-<li><p>Activating <span class="menu">Disable user add-ons</span> will prevent using any add-ons (drivers, translators, etc.) you have installed in the user hierarchy under your Home folder.</p></li>
-<li><p>If the offending driver, add-on etc. is installed in the system hierarchy, things get a bit more complicated, because that area is read-only. Here, the <span class="menu">Blacklist entries</span> comes into play. With it, you can navigate through the whole system hierarchy and disable the component that's messing things up for you by checking an entry with the <span class="key">SPACE</span> or <span class="key">RETURN</span> key. <span class="key">ESC</span> returns you up one level to the parent directory.</p>
-<p>Online, there's the article <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">How to Permanently Blacklist a Package File</a> showing how to make that setting stick.</p></li>
-<li><p>Under <span class="menu">Select boot volume</span> you can specify what former "version" of Haiku to boot. Every time you un/install a package, the old state is saved and you can boot into it by choosing it from the list presented in the boot loader options.<br />
-So, if you encounter boot problems after installing some package, boot a Haiku version from before that time and uninstall the offending package.</p></li>
+<li><p>Aktivácia <span class="menu">Bezpečného režimu</span> zabráni spusteniu väčšiny serverov, démonov a používateľských skriptov pri štarte (UserBootScript).</p></li>
+<li><p><span class="menu">Vypnutie používateľských doplnkov</span> zabráni použitiu akýchkoľvek doplnkov (ovládače, prekladače atď.), ktoré ste si nainštalovali do používateľskej hierarchie vo vašom domovskom priečinku.</p></li>
+<li><p>V prípade, že je problematický ovládač, doplnok atď. nainštalovaný v hierarchii systému, bude to trochu zložitejšie, pretože táto oblasť je len na čítanie. To sa dajú použiť položky na <span class="menu">Černej listine</span>. Pomocou nich môžete prechádzať celou hierarchiou systému a zakázať komponenty, ktoré vám spôsobujú problémy, zaškrtnutím položky pomocou klávesu <span class="key">medzerník</span> alebo <span class="key">Enter</span>. <span class="key">ESC</span> vás vráti o úroveň vyššie do nadradeného adresára.</p>
+<p>Online nájdete článok <a href="http://www.haiku-os.org/blog/barrett/2013-12-15_how_permanently_blacklist_package_file">Ako trvale umiestniť na čiernu listinu súbor balíka</a>, ktorý vám ukáže ako toto nastavenie zachovať natrvalo.</p></li>
+<li><p>V menu <span class="menu">Vybraš zavádzací zväzok</span> môžete zadať, ktorú predchádzajúcu „verziu“ Haiku chcete spustiť. Zakaždým, keď nainštalujete alebo odinštalujete balík, starý stav sa uloží a môžete ho spustiť výberom zo zoznamu uvedeného v možnostiach zavádzača systému.<br />
+Takže, ak narazíte na problémy so spustením systému po inštalácii niektorého balíka, spustite verziu Haiku z doby pred problematickou udalosťou a odinštalujte problematický balík.</p></li>
 </ul>
 <h2>
 <a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
-<a id="booting" name="booting">Booting Haiku</a></h2>
+<a id="booting" name="booting">Spúšťanie Haiku</a></h2>
 <p>Po aktivovaní jednej alebo viacerých volieb sa vrátite do hlavného menu a môžete pokračovať v zavádzaní systému, ktoré sa nachádza na tejto obrazovke:</p>
 <img src="../images/bootloader-images/boot-screen.png" alt="boot-screen.png" />
 
@@ -152,7 +151,7 @@ Rozličné symboly zhruba zodpovedajú týmto fázam zavádzania:</p>
 	<tr><td><b>Zavádzací disk</b></td><td> </td><td>Pripája sa zavádzací disk.</td></tr>
 	<tr><td><b>Čip</b></td><td> </td><td>Načítavajú sa moduly špecifické pre CPU.</td></tr>
 	<tr><td><b>Priečinok</b></td><td> </td><td>Konečná inicializácia subsystémov.</td></tr>
-	<tr><td><b>Raketa</b></td><td> </td><td>Launch_daemon has started the system.</td></tr>
+	<tr><td><b>Raketa</b></td><td> </td><td>Launch_daemon spustil systém.</td></tr>
 </table>
 
 </div>

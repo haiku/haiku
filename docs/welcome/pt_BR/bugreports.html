@@ -14,6 +14,7 @@
  * Translators:
  *		tiagoms
  *		Adriano Duarte
+ *		Humdinger
  *
 -->
 	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -101,8 +102,9 @@ Após constatar que é um erro original, torne sua informação a mais acurada p
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="server" name="server">Erros de servidor</a></h2>
-<p>Quando servidores vitais como o servidor de aplicativo, o registrador ou o servidor de entrada travar, não se verá o alerta de travamento usual. Ao invés disso, toda a tela ficará em branco e uma sessão do gdb será iniciada, sua saída aparecendo diretamente na tela. Provavelmente você ainda será capaz de mover o mouse, o que irá sobrescrever o branco e a saída do gdb na tela. Aplicativos ainda em execução (como o Controlador de Processos ou o relógio na Deskbar) podem também aparecer sobre a saída do depurador na tela.<br />
-Apesar de tudo ser mais feio e inconveniente, basicamente se aplica o mesmo que aos erros de aplicativos. O mais importante é obter um "rastro" (comando <span class="cli">bt</span>). Pode-se precisar obter uma imagem da tela com uma câmera digital, uma vez que, de qualquer maneira, não será capaz de copiar o texto.</p>
+<p>When vital servers like the app server, the registrar or the input server crash, you won't see the usual crash alert. Instead the whole screen will be cleared white and a gdb session will be started, its output appearing directly on screen. Likely you will still be able to move the mouse, which will overwrite the white and gdb output on screen. Applications still running (like ProcessController or the clock in the Deskbar) might also draw over the debugger output on screen.<br />
+Besides everything being more ugly and inconvenient, basically the same applies as for application bugs. Most importantly procure a back trace (<span class="cli">bt</span> command). You may need to take a picture of the screen with a digital camera, since you won't be able to copy the text anywhere.<br />
+Depending on what exactly crashed, you can try to save a crash report on the Desktop with <span class="cli">save-report</span> and then press the power button once to try shutting cleanly down.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kernel" name="kernel">Erros do Kernel</a></h2>
@@ -114,7 +116,7 @@ Apesar de tudo ser mais feio e inconveniente, basicamente se aplica o mesmo que 
 <li><p>O sistema não inicializa corretamente. Ele pode reiniciar espontaneamente ou pára em algum ponto (por exemplo, em algum ícone da tela de inicialização). No último caso tente também <span class="key">ALT</span> <span class="key">SysReq</span> <span class="key">D</span>.</p></li>
 <li><p>O sistema inteiro ou alguma parte do equipamento não se comporta corretamente. Por exemplo, ele pode ficar muito lento, ocorrerem erros ou algo não funcionar absolutamente, a primeira verificação óbvia é se o Haiku já o suporta completamente (por exemplo, perguntando em uma lista de discussão ou num fórum).</p></li>
 </ul>
-<p>Note that while only the last point seems to indicate hardware relation, all the other symptoms could be caused by a bug in a hardware driver as well. If you have a suspicion what piece of hardware or corresponding driver might have to do with the problem, check whether removing/disabling the hardware or the driver makes a difference. For example, if you suspect Wifi you may find that your BIOS has an option to disable it. Or if not, you could blacklist the responsible Wifi driver from your Haiku installation (see <a href="../../../userguide/en/bootloader.html">Boot Loader</a>).</p>
+<p>Observe que enquanto o último ponto parece indicar uma relação com hardware, todos os outros sintomas podem ser causados também por um erro num driver de dispositivo. Caso tenha uma suspeita de que parte do hardware ou o driver correspondente pode ter algo a ver com o problema, verifique se removendo/desabilitando o dispositivo ou o driver faz alguma diferença. Por exemplo, se há suspeita sobre o Wifi, pode-se procurar na  BIOS uma opção para desabilitá-lo. Ou se não, pode remover o driver Wifi responsável a partir da sua instalação do Haiku (em <span class="path">/boot/system/add-ons/kernel/drivers/bin</span>).</p>
 
 <h3><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="kdl" name="kdl">Terra da Depuração do Kernel  - KDL</a></h3>
@@ -144,7 +146,7 @@ In the boot loader's <span class="menu">Debug menu</span> you should find the en
 <p><b>A saída em tela é útil apenas para depurar problemas muito específicos e é conhecido por ter problemas (de tempo). Não a utilize, se não precisar.</b><br />
 Isto é relevante apenas quando o Haiku falha ao inicializar na sua máquina e a <span class="menu">Opção de relatório de sistema do depurador</span> não funciona por alguma razão. Antes da logo de inicialização do Haiku aparecer, pressione <span class="key">SHIFT</span> para entrar no menu do carregador de inicialização. Selecione <span class="menu">Selecionar opções de modo seguro</span>. Próximo do fim, <span class="menu">[ ] Habilitar saída de depuração na tela</span> será listada. (Observação: As outras opções podem ser habilitadas numa tentativa de inicializar o Haiku. Se o Haiku inicializar apenas quando uma ou mais opções forem ativadas, assegure-se de mencionar quais são.)<br />
 Finalmente selecione <span class="menu">Voltar para o menu principal</span> e então <span class="menu">Continuar a inicialização</span>.<br />
-Uma ou mais páginas de texto serão exibidas na tela, apenas as últimas poucas linhas precisam ser incluídas no seu tíquete. Há mais informações em <a href="../../../userguide/pt_BR/bootloader.html">Carregador de Inicialização</a>.</p>
+Uma ou mais páginas de texto serão exibidas na tela, apenas as últimas poucas linhas precisam ser incluídas no seu tíquete. Há mais informações em <a href="../../userguide/pt_BR/bootloader.html">Carregador de Inicialização</a>.</p>
 
 <h2><a href="#"><img src="../images/up.png" style="border:none;float:right" alt="index" /></a>
 <a id="hardware" name="hardware">Erros de Dispositivo/Driver</a></h2>
