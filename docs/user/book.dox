@@ -5,7 +5,7 @@
 	Interface (API) of the Haiku operating system. This API describes
 	the internals of the operating system allowing developers to write
 	native C++ applications and device drivers. See the
-	<a href="https://api.haiku-os.org">online version</a> for the most
+	<a href="https://www.haiku-os.org/docs/api/">online version</a> for the most
 	updated version of this document. If you would like to help contribute
 	contact the <a href="https://www.freelists.org/list/haiku-doc">documentation
 	mailing list</a>. For guidelines on how to help document the API see
@@ -20,7 +20,7 @@
 	appropriate sections.
 
 	A complete reference to the BeOS R5 API is available on the web in
-	<a href="https://haiku-os.org/legacy-docs/bebook/">The Be Book</a>.
+	<a href="https://www.haiku-os.org/legacy-docs/bebook/">The Be Book</a>.
 	The Be Book is used with permission from
 	<a href="https://www.access-company.com/">Access Co.</a>, the current
 	owners of Be's intellectual property.

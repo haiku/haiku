@@ -4,7 +4,7 @@ Haiku
 | [Mailing Lists](https://www.haiku-os.org/community/ml)
 | [IRC Channels](https://www.haiku-os.org/community/irc)
 | [Issue Tracker](https://dev.haiku-os.org/)
-| [API docs](https://api.haiku-os.org)**
+| [API docs](https://www.haiku-os.org/docs/api/)**
 
 Haiku is an open-source operating system that specifically targets personal
 computing. Inspired by the BeOS, Haiku is fast, simple to use, easy to learn

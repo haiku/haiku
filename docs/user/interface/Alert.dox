@@ -42,7 +42,7 @@
 /*!
 	\var alert_type B_INFO_ALERT
 
-	\image html https://api.haiku-os.org/images/alert_info_32.png
+	\image html https://www.haiku-os.org/images/alert_info_32.png
 
 	Info icon
 
@@ -52,7 +52,7 @@
 /*!
 	\var alert_type B_IDEA_ALERT
 
-	\image html https://api.haiku-os.org/images/alert_idea_32.png
+	\image html https://www.haiku-os.org/images/alert_idea_32.png
 
 	Idea icon
 
@@ -62,7 +62,7 @@
 /*!
 	\var alert_type B_WARNING_ALERT
 
-	\image html https://api.haiku-os.org/images/alert_warning_32.png
+	\image html https://www.haiku-os.org/images/alert_warning_32.png
 
 	Warning icon
 
@@ -72,7 +72,7 @@
 /*!
 	\var alert_type B_STOP_ALERT
 
-	\image html https://api.haiku-os.org/images/alert_stop_32.png
+	\image html https://www.haiku-os.org/images/alert_stop_32.png
 
 	Stop icon
 
