@@ -211,6 +211,7 @@ RemotePackageRepository HaikuPorts
 	gzip-1.6-2
 	hdialog-0.2-2
 	help2man-1.46.6-1
+	hexvexed-1.0.0-2
 	htmldoc-1.8.27-3
 	html_parser-3.71-2
 	hubbub-0.3.0-1
@@ -1262,6 +1263,7 @@ RemotePackageRepository HaikuPorts
 	harfbuzz_x86
 	hdialog
 	help2man
+	hexvexed
 	htmldoc
 	html_parser
 	hubbub

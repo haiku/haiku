@@ -400,6 +400,7 @@ RemotePackageRepository HaikuPorts
 	help2man-1.47.4-1
 	hexcompare-1.0.4-1
 	hexedit-1.2.13-1
+	hexvexed-1.0.0-2
 	hidapi-20160919-1
 	hidapi_devel-20160919-1
 	htmldoc-1.8.29-1
@@ -1270,6 +1271,7 @@ RemotePackageRepository HaikuPorts
 	help2man
 	hexcompare
 	hexedit
+	hexvexed
 	hidapi
 	htmldoc
 	html_parser
