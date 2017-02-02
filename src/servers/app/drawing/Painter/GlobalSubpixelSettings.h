@@ -17,7 +17,11 @@ enum {
 	HINTING_MODE_MONOSPACED_ONLY
 };
 
-#define AVERAGE_BASED_SUBPIXEL_FILTERING
+// Uncommenting the following line will enable the average-based (grayscale)
+// subpixel filter, thus locking RGB subpixel font rendering out of the build.
+// Unless you have a subpixel-enabled FreeType, there shouldn't be a difference,
+// as FreeType returns the grayscale hinting unless compiled otherwise.
+//#define AVERAGE_BASED_SUBPIXEL_FILTERING
 
 extern bool gSubpixelAntialiasing;
 extern uint8 gDefaultHintingMode;
