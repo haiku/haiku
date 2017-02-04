@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Be-PSRV	940573969
+1	croatian	x-vnd.Be-PSRV	3747595904
 Undefined	ConfigWindow		Nedefinirano
 Return the number of available transports	PrintServerApp Scripting		Vrati broj dostupnih transporta
 Return the number of available printers	PrintServerApp Scripting		Vrati broj dostupnih pisača
@@ -8,7 +8,6 @@ Cancel	PrintServerApp		Poništi
 Retrieve a specific printer	PrintServerApp Scripting		Preuzmi određeni pisač
 Page %1 to %2	ConfigWindow		Stranica %1 do %2
 Get name of the printer add-on used for this printer	Printer Scripting		Uzmi ime dodatka koji se koristi za ovaj pisač
-Page setup:	ConfigWindow		Postavka stranice:
 OK	ConfigWindow		U redu
 Cancel	ConfigWindow		Poništi
 Printer server	ConfigWindow		Poslužitelj pisača

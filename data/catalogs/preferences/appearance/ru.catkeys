@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Appearance	283083658
+1	russian	x-vnd.Haiku-Appearance	2499598353
 Plain font:	Font view		Простой шрифт:
 Control highlight	Colors tab		Подсветка элемента
 Control border	Colors tab		Граница элемента
@@ -6,11 +6,14 @@ Antialiasing type:	AntialiasingSettingsView		Тип сглаживания:
 Shadow	Colors tab		Тень
 On	AntialiasingSettingsView		Включить
 Defaults	APRWindow		По умолчанию
+Link hover	Colors tab		Цвет наведенной ссылки
 Grayscale	AntialiasingSettingsView		Оттенки серого
 Shine	Colors tab		Сияние
 About	DecorSettingsView		О декораторе
 About decorator	DecorSettingsView		Об этом декораторе
 Off	AntialiasingSettingsView		Выключить
+Link text	Colors tab		Текст ссылки
+Link active	Colors tab		Активная ссылка
 Choose Decorator	DecorSettingsView		Выберите декоратор
 Success	Colors tab		Успех
 Inactive window tab text	Colors tab		Текст заголовка неактивного окна

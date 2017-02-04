@@ -1,9 +1,10 @@
-1	hungarian	x-vnd.haiku-screenshot	3896204963
+1	hungarian	x-vnd.haiku-screenshot	3958461128
 seconds	ScreenshotWindow		másodperc
 Desktop	ScreenshotWindow		Asztal
 Include window border	ScreenshotWindow		Az ablak keretének belefoglalása a képbe
 Screenshot	System name		Képernyőkép
 Select	ScreenshotWindow		Kiválasztás
+The destination path exists but is not a folder.	ScreenshotWindow		A megadott útvonal létezik, de nem mappa.
 Capture active window	ScreenshotWindow		Kép az aktív ablakról
 Cancel	ScreenshotWindow		Mégse
 Name:	ScreenshotWindow		Név:
@@ -20,8 +21,11 @@ screenshot	Screenshot	Base filename of screenshot files	képernyőkép
 New screenshot	ScreenshotWindow		Új képernyőkép
 Artwork folder	ScreenshotWindow		Artwork mappa
 Home folder	ScreenshotWindow		Saját mappa
+Failed to save screenshot	ScreenshotWindow		Nem sikerült a képernyőkép mentése.
+OK	ScreenshotWindow		Rendben
 Settings…	ScreenshotWindow		Beállítások…
 overwrite	ScreenshotWindow		felülírás
 Delay:	ScreenshotWindow		Késleltetés:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Mentési hiba \"%s\":\n\t%s
 Include mouse pointer	ScreenshotWindow		Az egérkurzor belefoglalása a képbe
 Translator Settings	ScreenshotWindow		Fordító beállítások

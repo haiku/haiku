@@ -1,9 +1,7 @@
-1	romanian	x-vnd.Be-PRNT	2163275033
+1	romanian	x-vnd.Be-PRNT	4242582634
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimantă: %printer_name%\nDriver:  %driver%\n
 Waiting	JobListView		Se așteaptă
 Print test page	PrintersWindow		Tipărește o pagină de test
-Test Page	TestPageView		Pagină de test
-Test Page	PrintersWindow		Pagină de test
 page	JobListView		pagină
 Cancel	AddPrinterDialog		Anulează
 Add printer	AddPrinterDialog		Adaugă imprimantă
@@ -12,14 +10,12 @@ Printers	PrintersWindow		Imprimante
 Add…	PrintersWindow		Adaugă…
 Default Printer	PrinterListView		Imprimantă implicită
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
-No pending jobs.	PrinterListView		Nu există sarcini în așteptare.
 pages	JobListView		pagini
 Printers	System name		Imprimante
 Processing	JobListView		Se procesează
 Red	TestPageView		Roșu
 Printer name:	AddPrinterDialog		Nume imprimantă:
 Driver: %driver%	PrinterListView		Driver: %driver%
- pending jobs.	PrinterListView		 sarcini în așteptare.
 Black	TestPageView		Negru
 Restart job	PrintersWindow		Repornește sarcină
 Add	AddPrinterDialog		Adaugă
@@ -28,7 +24,6 @@ Transport: %transport% %transport_address%	TestPageView		Transport: %transport% 
 Cancel job	PrintersWindow		Anulează sarcină
 Yellow	TestPageView		Galben
 Blue	TestPageView		Albastru
-1 pending job.	PrinterListView		1 sarcină în așteptare.
 Remove	PrintersWindow		Elimină
 <pick one>	AddPrinterDialog		<pick one>
 Print jobs for 	PrintersWindow		Sarcini de tipărire pentru 

@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Be-PSRV	123334776
+1	finnish	x-vnd.Be-PSRV	2930356711
 Undefined	ConfigWindow		Määrittelemätön
 Return the number of available transports	PrintServerApp Scripting		Palauta käytettävissä olevien siirtojen lukumäärä
 Return the number of available printers	PrintServerApp Scripting		Palauta käytettävissä olevien tulostimien lukumäärä
@@ -8,7 +8,6 @@ Cancel	PrintServerApp		Peru
 Retrieve a specific printer	PrintServerApp Scripting		Nouda tietty tulostin
 Page %1 to %2	ConfigWindow		Sivu %1 ... %2
 Get name of the printer add-on used for this printer	Printer Scripting		Hae tämän tulostimen käyttämän tulostinlisäosan nimi
-Page setup:	ConfigWindow		Sivuasetus:
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		Valmis
 Cancel	ConfigWindow		Peru

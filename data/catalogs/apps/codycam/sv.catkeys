@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-CodyCam	2193838145
+1	swedish	x-vnd.Haiku-CodyCam	1888169680
 Upload…	VideoConsumer.cpp		Ladda upp...
 Capturing Image…	VideoConsumer.cpp		Fångar bild…
 Every 30 seconds	CodyCam		Var 30:e sekund
@@ -42,7 +42,6 @@ CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		Var 24:e timme
 unknown command	SettingsHandler		okänt kommando
 Video settings	CodyCam		Videoinställningar
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Kunde inte hitta någon videokälla. En webbkamera behövs för att använda CodyKamera.
 still image filename expected	CodyCam		stillbildsfilnamn förväntas
 invalid upload client %ld\n	VideoConsumer.cpp		ogiltig uppladdningsklient %ld\n
 Every 15 seconds	CodyCam		Var 15:e sekund

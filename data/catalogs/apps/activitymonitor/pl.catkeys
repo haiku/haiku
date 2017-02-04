@@ -1,11 +1,10 @@
-1	polish	x-vnd.Haiku-ActivityMonitor	2455521641
+1	polish	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		P-błędy
 Media nodes	DataSource		Węzły multimediów
 Threads	DataSource		Wątki
 Always on top	ActivityWindow		Zawsze na wierzchu
 Add graph	ActivityWindow		Dodaj wykres
 Teams	DataSource		Zespoły
-Hide legend	ActivityView		Ukryj legendę
 MiB	DataSource		MiB
 Network send	DataSource		Wysłane
 CPU usage (combined)	DataSource		Użycie procesora (całkowite)

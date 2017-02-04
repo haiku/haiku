@@ -1,10 +1,9 @@
-1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	234995750
+1	dutch; flemish	x-vnd.Haiku-ActivityMonitor	3230060414
 P-faults	DataSource		P-onderbrekingen
 Media nodes	DataSource		Media-eenheid
 Threads	DataSource		Threads
 Add graph	ActivityWindow		Voeg grafiek toe
 Teams	DataSource		Teams
-Hide legend	ActivityView		Verberg legenda
 Network send	DataSource		Netwerk (uitgaand)
 CPU usage (combined)	DataSource		CPU-gebruik (gecombineerd)
 CPU	DataSource		CPU

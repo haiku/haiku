@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-MediaPlayer	3805057997
+1	slovak	x-vnd.Haiku-MediaPlayer	2558878117
 raw audio	MediaPlayer-InfoWin		nespracovaný zvuk
 Location	MediaPlayer-InfoWin		Umiestnenie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (americký)
@@ -29,10 +29,12 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Zistí
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Zobrazovací režim
 Medium	MediaPlayer-SettingsWindow		Stredná
+Open network stream	MediaPlayer-NetworkStream		Otvoriť sieťový tok
 Close	MediaPlayer-PlaylistWindow		Zatvoriť
 Open…	MediaPlayer-PlaylistWindow		Otvoriť…
 Toggle mute.	MediaPlayer-Main		Prepnúť stlmenie.
 Undo	MediaPlayer-PlaylistWindow		Vrátiť
+Stream URL:	MediaPlayer-NetworkStream		URL toku:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Použiť hardvérové vrstvy videa ak sú dostupné
 File info…	MediaPlayer-Main		Info o súbore…
 Pause playback.	MediaPlayer-Main		Pozastaviť prehrávanie.
@@ -79,6 +81,7 @@ Skip to the previous track.	MediaPlayer-Main		Preskočiť na predošlú stopu.
 Close window after playing video	MediaPlayer-SettingsWindow		Zatvoriť okno po prehraní videa
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Zmeniť veľkosť filmov hladko (nie v režime vrstiev)
 OK	MediaPlayer-RemovePLItemsCmd		OK
+Open network stream	MediaPlayer-Main		Otvoriť sieťový tok
 50% scale	MediaPlayer-Main		50% zmena veľkosti
 Subtitles	MediaPlayer-Main		Titulky
 Prev	MediaPlayer-Main		Pred
@@ -126,6 +129,8 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopírovať položku
 none	Subtitles menu		žiadne
 Move file to Trash	MediaPlayer-PlaylistWindow		Presunúť súbor do Koša
 URI	MediaPlayer-Main		URI
+Invalid URL inserted!	MediaPlayer-NetworkStream		Vložené neplatné URL!
+OK	MediaPlayer-NetworkStream		OK
 Mute	MediaPlayer-Main		Stlmiť
 Toggle pause/play.	MediaPlayer-Main		Prepnúť pozastavenie/prehrávanie.
 min	MediaPlayer-InfoWin	Minutes	min
@@ -140,12 +145,14 @@ Start media server	MediaPlayer-Main		Spustiť multimediálny server
 Toggle fullscreen.	MediaPlayer-Main		Prepnúť celoobrazovkový režim.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Získa trvanie aktuálne prehrávanej položky v mikrosekundách.
 ToggleFullscreen	MediaPlayer-Main		Prepnúť celoobrazovkový režim
+Bad URL	MediaPlayer-NetworkStream		Chybné URL
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# kanálov}}
 <unnamed>	PlaylistItem-name		<bez názvu>
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		žiadne
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Zistí/nastaví hlasitosť (0.0-2.0).
 Duration	MediaPlayer-Main		Trvanie
+Cancel	MediaPlayer-NetworkStream		Zrušiť
 Playlist…	MediaPlayer-Main		Zoznam stôp…
 <unknown>	PlaylistItem-author		<neznámy>
 Save as…	MediaPlayer-PlaylistWindow		Uložiť ako…

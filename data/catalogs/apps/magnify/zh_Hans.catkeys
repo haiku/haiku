@@ -1,18 +1,15 @@
-1	english	x-vnd.Haiku-Magnify	2046693978
+1	english	x-vnd.Haiku-Magnify	3799879913
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		无修剪消息\n
 Make square	Magnify-Main		创建方形
 Copy image	Magnify-Main		复制图像
 usage: magnify [size] (magnify size * size pixels)\n	Console		用法：magnify [size]（如，放大 size * size 像素）\n
 Stick coordinates	Magnify-Main		插入坐标
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, plural, one{# 像素/像素} other{# 像素/像素}}
-Hide/Show grid	Magnify-Main		隐藏/显示栅格
 magnify: size must be a multiple of 4\n	Console		放大：尺寸必须为 4 的倍数。\n
 Decrease pixel size	Magnify-Main		缩小像素尺寸
 Magnify	System name		放大镜
 Info	Magnify-Main		信息
 Remove a crosshair	Magnify-Main		删除十字光标
-Freeze/Unfreeze image	Magnify-Main		冻结/解冻 图像
-Hide/Show info	Magnify-Main		隐藏/显示信息
 Save image	Magnify-Main		保存图像
 Increase window size	Magnify-Main		放大窗口尺寸
 Decrease window size	Magnify-Main		缩小窗口尺寸

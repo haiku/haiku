@@ -1,10 +1,9 @@
-1	lithuanian	x-vnd.Haiku-HaikuDepot	2996812689
+1	lithuanian	x-vnd.Haiku-HaikuDepot	1722047333
 Name	PackageListView		Pavadinimas
 Changelog	PackageInfoView		Pakeitimų žurnalas
 Click a package to view information	PackageInfoView		Spustelėkite paketą jo informacijai pamatyti
 for %Version%	PackageInfoView		versijai %Version%
 No changelog available.	PackageInfoView		Pakeitimų žurnalas neprieinamas.
-Depot:	FilterView		Saugykla:
 Description	PackageListView		Aprašas
 Install	PackageManager		Įdiegti
 Tools	MainWindow		Priemonės
@@ -19,7 +18,6 @@ Development	Model		Programuotojams
 Fatal error	PackageManager		Kritinė klaida
 Ratings	PackageInfoView		Įvertinimai
 Inactive	PackageListView		Neaktyvus
-Refresh depots	MainWindow		Atnaujinti saugyklas
 Main Menu	MainWindow		Pagrindinis meniu
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Parsiunčiamas:
@@ -36,10 +34,8 @@ Close	MainWindow		Užverti
 Video	Model		Video
 An error occurred while refreshing the repository: %error%	MainWindow		Atnaujinant saugyklos turinį, įvyko klaida: %error%
 Pending…	PackageListView		Laukiama…
-Depot	FilterView		Visos saugyklos
 Uninstalled	PackageListView		Išdiegti
 Unknown	PackageListView		Nežinoma
-All depots	FilterView		Visos saugyklos
 Available	PackageListView		Prieinamas
 n/a	PackageInfoView		n/d
 Send	RatePackageWindow		Siųsti

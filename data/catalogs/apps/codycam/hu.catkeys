@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-CodyCam	2193838145
+1	hungarian	x-vnd.Haiku-CodyCam	3408488515
 Upload…	VideoConsumer.cpp		Feltöltés…
 Capturing Image…	VideoConsumer.cpp		Kép készítése…
 Every 30 seconds	CodyCam		30 másodpercenként
@@ -42,7 +42,6 @@ CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		24 óránként
 unknown command	SettingsHandler		ismeretlen parancs
 Video settings	CodyCam		Videóbeállítások
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Nem található videóforrás. A CodyCam használatához szükség van egy webkamerához.
 still image filename expected	CodyCam		nincs megadva fájlnév a képekhez
 invalid upload client %ld\n	VideoConsumer.cpp		ismeretlen feltöltési kliens %ld\n
 Every 15 seconds	CodyCam		15 másodpercenként
@@ -77,6 +76,7 @@ cmd: '%s'\n	FtpClient		cmd: '%s'\n
 Never	CodyCam		Soha
 Cannot create a video window	CodyCam		Nem sikerült létrehozni a videó ablakát
 Every 10 minutes	CodyCam		10 percenként
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Nem található videóforrás.\nA CodyCam használatához szükség van egy webkamerához.
 Cannot start the video source	CodyCam		Nem sikerült elindítani a videóforrást
 Cannot start the video window	CodyCam		Nem sikerült elindítani a videó ablakát
 password expected	CodyCam		nincs megadva jelszó

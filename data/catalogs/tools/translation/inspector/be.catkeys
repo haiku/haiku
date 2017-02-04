@@ -1,4 +1,4 @@
-1	belarusian	x.vnd.OBOS-Inspector	2075781936
+1	belarusian	x.vnd.OBOS-Inspector	1686702095
 User Translators	ActiveTranslatorsWindow		Канвертары Карыстача
 No image available to save.	ImageWindow		Няма выяў для захавання.
 Sorry, unable to write the image file.	ImageView		Прабачце, немагчыма запісаць файл выявы.
@@ -15,9 +15,7 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 Save feature not implemented yet.	ImageWindow		Функцыя захавання пакуль не здзейснена.
 First Page	ImageWindow		Першая старонка
 Next Page	ImageWindow		Наступная старонка
-Open...	ImageWindow		Адкрыць...
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nУжыты Канвертар:\nІмя: %1\nІнфа: %2\nВерсія: %3\n
-Save...	ImageWindow		Захаваць...
 Info	ImageWindow		Інфа
 OK	ImageWindow		ОК
 Window	ImageWindow		Вакно

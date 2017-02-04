@@ -1,10 +1,12 @@
-1	japanese	x-vnd.Haiku-HaikuDepot	2365524674
+1	japanese	x-vnd.Haiku-HaikuDepot	1527149765
 Name	PackageListView		名前
 Available packages	MainWindow		使用可能なパッケージ
 Open %DeskbarLink%	PackageManager		%DeskbarLink% を開く
+Repository	FilterView		リポジトリ
 Close	RatePackageWindow		閉じる
 The captcha puzzle needs to be solved.	UserLoginWindow		Captcha パズルを解く必要があります。
 Changelog	PackageInfoView		変更履歴
+Repository:	FilterView		リポジトリ:
 Your rating:	RatePackageWindow		評価:
 The passwords do not match.	UserLoginWindow		パスワードが一致しません。
 Log in…	MainWindow		ログイン…
@@ -15,7 +17,6 @@ Other users can see this rating	RatePackageWindow		ほかのユーザーがこ�
 Stability	RatePackageWindow		安定度
 for %Version%	PackageInfoView		%Version% に対して
 No changelog available.	PackageInfoView		変更記録はありません。
-Depot:	FilterView		Depot:
 Description	PackageListView		説明
 Install	PackageManager		インストール
 Source packages	MainWindow		ソースパッケージ
@@ -32,6 +33,7 @@ Your rating was updated successfully.	RatePackageWindow		評価の更新に成�
 <no info>	PackageInfoView		<情報無し>
 Starting the package daemon failed:\n\n%Error%	App		パッケージデーモンの起動に失敗しました:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		パッケージマネジャーの初期化中にエラーが発生しました: %message%
+All repositories	FilterView		すべてのリポジトリ
 Email address:	UserLoginWindow		メールアドレス:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		評価の更新に成功しました。もう一度パッケージを評価すれば、いつでも評価を更新または削除できます。
 Very unstable	RatePackageWindow		非常に不安定
@@ -56,7 +58,6 @@ Ratings	PackageInfoView		評価
 But none could be listed here, sorry.	UserLoginWindow		すみません。しかし、ここにはなにもリストされていません。
 System & Utilities	Model		システム & ユーティリティ
 Inactive	PackageListView		無効
-Refresh depots	MainWindow		Depot を更新
 The package action could not be scheduled: %Error%	PackageInfoView		パッケージアクションを予約できませんでした: %Error%
 Science & Mathematics	Model		科学 & 数学
 Main Menu	MainWindow		メインメニュー
@@ -104,6 +105,7 @@ Close	MainWindow		閉じる
 Preferred language:	UserLoginWindow		優先言語:
 Failed to rate package	RatePackageWindow		パッケージの評価に失敗しました
 Internet & Network	Model		インターネット & ネットワーク
+Refresh repositories	MainWindow		リポジトリの更新
 Cancel	MainWindow		キャンセル
 Quit HaikuDepot	App		HaikuDepot を終了
 Input validation	UserLoginWindow		入力検証
@@ -115,14 +117,12 @@ An error occurred while refreshing the repository: %error%	MainWindow		リポジ
 Try again	App		再試行
 Login or Create account	MainWindow		ログインまたはアカウントの作成
 Pending…	PackageListView		保留中…
-Depot	FilterView		Depot
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# アイテム} other{# アイテム}}
 OK	PackageInfoView		OK
 Uninstalled	PackageListView		アンインストール済み
 Show	MainWindow		表示
 Stable	RatePackageWindow		安定
 Unknown	PackageListView		不明
-All depots	FilterView		すべて
 Comment language:	RatePackageWindow		コメント言語:
 Pass phrase:	UserLoginWindow		パスフレーズ:
 Screenshot	ScreenshotWindow		スクリーンショット
@@ -143,6 +143,7 @@ Failed to create account	UserLoginWindow		アカウントの作成に失敗し�
 There are problems with the data you entered:\n\n	UserLoginWindow		入力したデーターに問題があります:\n\n
 Featured packages	MainWindow		おすすめパッケージ
 Start package daemon	App		パッケージデーモンを起動
+Manage repositories…	MainWindow		リポジトリの管理…
 Success	RatePackageWindow		成功
 Business	Model		ビジネス
 Audio	Model		オーディオ

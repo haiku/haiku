@@ -1,10 +1,9 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	2996812689
+1	ukrainian	x-vnd.Haiku-HaikuDepot	1722047333
 Name	PackageListView		Ім'я
 Changelog	PackageInfoView		Журнал змін
 Click a package to view information	PackageInfoView		Натисніть на пакунок, щоб побачити інформацію про нього
 for %Version%	PackageInfoView		для %Version%
 No changelog available.	PackageInfoView		Історія змін недоступна
-Depot:	FilterView		Сховище:
 Description	PackageListView		Опис
 Install	PackageManager		Встановити
 Tools	MainWindow		Інструменти
@@ -19,7 +18,6 @@ Development	Model		Розробка
 Fatal error	PackageManager		Критична помилка
 Ratings	PackageInfoView		Оцінки
 Inactive	PackageListView		Неактивний
-Refresh depots	MainWindow		Оновити сховища
 Main Menu	MainWindow		Головне меню
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Завантаження:
@@ -36,10 +34,8 @@ Close	MainWindow		Закрити
 Video	Model		Відео
 An error occurred while refreshing the repository: %error%	MainWindow		Сталася помилка при оновленні репозиторія: %error%
 Pending…	PackageListView		Очікування…
-Depot	FilterView		Всі сховища
 Uninstalled	PackageListView		Видалені
 Unknown	PackageListView		Невідомо
-All depots	FilterView		Всі сховища
 Available	PackageListView		Доступні
 n/a	PackageInfoView		немає
 Send	RatePackageWindow		Надіслати

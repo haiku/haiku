@@ -1,7 +1,7 @@
 1	russian	x-vnd.Haiku-KeyboardInputServerDevice	2536418998
 Kill application	Team monitor		Убить приложение
-Quit application	Team monitor		Выйти из приложения
-Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Чтобы закрыть приложение выберите его из списка и нажмите на кнопку 'Убить приложение' или 'Выйти из приложения'.\n\nЗажмите CONTROL+ALT+DELETE на %ld секунд для перезагрузки.
+Quit application	Team monitor		Завершить приложение
+Select an application from the list above and click one of the buttons 'Kill application' and 'Quit application' in order to close it.\n\nHold CONTROL+ALT+DELETE for %ld seconds to reboot.	Team monitor		Чтобы закрыть приложение выберите его из списка и нажмите на кнопку 'Убить приложение' или 'Завершить приложение'.\n\nЗажмите CONTROL+ALT+DELETE на %ld секунд для перезагрузки.
 If the application will not quit you may have to kill it.	Team monitor		Если приложение не завершится, возможно вам понадобится убить его.
 Force reboot	Team monitor		Перезагрузить принудительно
 Team monitor	Team monitor		Монитор процессов

@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-MediaPlayer	3805057997
+1	hungarian	x-vnd.Haiku-MediaPlayer	2558878117
 raw audio	MediaPlayer-InfoWin		nyers audio
 Location	MediaPlayer-InfoWin		Útvonal
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (amerikai)
@@ -29,10 +29,12 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Aktuá
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Megjelenítési mód
 Medium	MediaPlayer-SettingsWindow		Közepes
+Open network stream	MediaPlayer-NetworkStream		Hálózati műsor megnyitása
 Close	MediaPlayer-PlaylistWindow		Bezárás
 Open…	MediaPlayer-PlaylistWindow		Megnyitás…
 Toggle mute.	MediaPlayer-Main		Némítás állítása.
 Undo	MediaPlayer-PlaylistWindow		Visszavonás
+Stream URL:	MediaPlayer-NetworkStream		Műsor címe:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Hardveres gyorsítás használata ha elérhető
 File info…	MediaPlayer-Main		Információk…
 Pause playback.	MediaPlayer-Main		Lejátszás szüneteltetése.
@@ -79,6 +81,7 @@ Skip to the previous track.	MediaPlayer-Main		Ugrás az előző számra.
 Close window after playing video	MediaPlayer-SettingsWindow		Videófájl lejátszása után zárja be az ablakot
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Filmek simított átméretezése
 OK	MediaPlayer-RemovePLItemsCmd		Rendben
+Open network stream	MediaPlayer-Main		Hálózati műsor megnyitása
 50% scale	MediaPlayer-Main		50%-os méret
 Subtitles	MediaPlayer-Main		Feliratok
 Prev	MediaPlayer-Main		Előző
@@ -126,6 +129,8 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Bejegyzés másolása
 none	Subtitles menu		nincs 
 Move file to Trash	MediaPlayer-PlaylistWindow		Fájl Szemetesbe helyezése
 URI	MediaPlayer-Main		URI
+Invalid URL inserted!	MediaPlayer-NetworkStream		A megadott cím érvénytelen.
+OK	MediaPlayer-NetworkStream		Rendben
 Mute	MediaPlayer-Main		Némítás
 Toggle pause/play.	MediaPlayer-Main		Szünetletés/lejátszás közti váltás.
 min	MediaPlayer-InfoWin	Minutes	perc
@@ -140,12 +145,14 @@ Start media server	MediaPlayer-Main		Médiakiszolgáló indítása
 Toggle fullscreen.	MediaPlayer-Main		Teljes képernyő.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		A jelenleg lejátszott elem hossza mikroszekundumban megadva.
 ToggleFullscreen	MediaPlayer-Main		Teljes képernyő
+Bad URL	MediaPlayer-NetworkStream		Hibás cím
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# csatorna}}
 <unnamed>	PlaylistItem-name		<névtelen>
 OK	MediaPlayer-PlaylistWindow		Rendben
 none	Audio track menu		nincs
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Megadja/beállítja a hangerőt (0.0-2.0)
 Duration	MediaPlayer-Main		Időtartam
+Cancel	MediaPlayer-NetworkStream		Mégse
 Playlist…	MediaPlayer-Main		Lejátszási lista…
 <unknown>	PlaylistItem-author		<névtelen>
 Save as…	MediaPlayer-PlaylistWindow		Mentés másként…

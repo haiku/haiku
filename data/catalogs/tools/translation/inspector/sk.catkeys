@@ -1,4 +1,4 @@
-1	slovak	x.vnd.OBOS-Inspector	2075781936
+1	slovak	x.vnd.OBOS-Inspector	1686702095
 User Translators	ActiveTranslatorsWindow		Používateľské prekladače
 No image available to save.	ImageWindow		Žiaden obrázok nie je dostupný na uloženie.
 Sorry, unable to write the image file.	ImageView		Ľutujeme, nebolo možné zapísať súbor obrázka.
@@ -15,9 +15,7 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 Save feature not implemented yet.	ImageWindow		Možnosť ukladania zatiaľ nie je implementovaná.
 First Page	ImageWindow		Prvá stránka
 Next Page	ImageWindow		Ďalšia stránka
-Open...	ImageWindow		Otvoriť...
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nPoužitý prekladač:\nNázov: %1\nInfo: %2\nVerzia: %3\n
-Save...	ImageWindow		Uložiť...
 Info	ImageWindow		Info
 OK	ImageWindow		OK
 Window	ImageWindow		Okno

@@ -1,9 +1,7 @@
-1	russian	x-vnd.Be-PRNT	2163275033
+1	russian	x-vnd.Be-PRNT	4242582634
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Waiting	JobListView		Ожидание
 Print test page	PrintersWindow		Пробная страница
-Test Page	TestPageView		Тестовая страница
-Test Page	PrintersWindow		Пробная страница
 page	JobListView		страница
 Cancel	AddPrinterDialog		Отмена
 Add printer	AddPrinterDialog		Добавить принтер
@@ -12,14 +10,12 @@ Printers	PrintersWindow		Принтеры
 Add…	PrintersWindow		Добавить…
 Default Printer	PrinterListView		Принтер по умолчанию
 Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
-No pending jobs.	PrinterListView		Нет заданий в очереди
 pages	JobListView		страниц
 Printers	System name		Принтеры
 Processing	JobListView		Обрабатывается
 Red	TestPageView		Красный
 Printer name:	AddPrinterDialog		Название принтера:
 Driver: %driver%	PrinterListView		Драйвер: %driver%
- pending jobs.	PrinterListView		 нет заданий в очереди.
 Black	TestPageView		Черный
 Restart job	PrintersWindow		Перезапустить
 Add	AddPrinterDialog		Добавить
@@ -28,7 +24,6 @@ Transport: %transport% %transport_address%	TestPageView		Транспорт: %tr
 Cancel job	PrintersWindow		Отменить
 Yellow	TestPageView		Жёлтый
 Blue	TestPageView		Синий
-1 pending job.	PrinterListView		1 задание в очереди.
 Remove	PrintersWindow		Удалить
 <pick one>	AddPrinterDialog		<выбрать>
 Print jobs for 	PrintersWindow		Задания печати для 

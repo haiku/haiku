@@ -1,18 +1,15 @@
-1	slovak	x-vnd.Haiku-Magnify	2046693978
+1	slovak	x-vnd.Haiku-Magnify	3799879913
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		správa prázdna schránka\n
 Make square	Magnify-Main		Urobiť štvorec
 Copy image	Magnify-Main		Kopírovať obrázok
 usage: magnify [size] (magnify size * size pixels)\n	Console		použitie: magnify [veľkosť] (veľkosť zväčšenia * veľkosť pixlov)\n
 Stick coordinates	Magnify-Main		Prilepiť súradnice
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# pixel/pixel} few{# pixely/pixel} other{# pixelov/pixel}}
-Hide/Show grid	Magnify-Main		Skryť/zobraziť mriežku
 magnify: size must be a multiple of 4\n	Console		lupa: veľkosť musí byť násobok 4\n
 Decrease pixel size	Magnify-Main		Zmenšiť veľkosť pixla
 Magnify	System name		Lupa
 Info	Magnify-Main		Info
 Remove a crosshair	Magnify-Main		Odstrániť mušku
-Freeze/Unfreeze image	Magnify-Main		Zmraziť/rozmraziť obraz
-Hide/Show info	Magnify-Main		Skryť/zobraziť info
 Save image	Magnify-Main		Uložiť obrázok
 Increase window size	Magnify-Main		Zväčšiť veľkosť okna
 Decrease window size	Magnify-Main		Zmenšiť veľkosť okna

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-CodyCam	2193838145
+1	romanian	x-vnd.Haiku-CodyCam	1888169680
 Upload…	VideoConsumer.cpp		Încărcare…
 Capturing Image…	VideoConsumer.cpp		Se capturează imaginea…
 Every 30 seconds	CodyCam		La fiecare 30 de secunde
@@ -42,7 +42,6 @@ CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		La fiecare 24 de ore
 unknown command	SettingsHandler		comandă necunoscută
 Video settings	CodyCam		Configurări video
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Nu se poate găsi o sursă video. Aveți nevoie de o cameră web pentru a utiliza CodyCam.
 still image filename expected	CodyCam		nume de fișier imagine fixă așteptat
 invalid upload client %ld\n	VideoConsumer.cpp		client de încărcare nevalid %ld\n
 Every 15 seconds	CodyCam		La fiecare 15 secunde

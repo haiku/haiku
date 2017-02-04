@@ -1,9 +1,7 @@
-1	dutch; flemish	x-vnd.Be-PRNT	200447094
+1	dutch; flemish	x-vnd.Be-PRNT	2279754695
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Printer: %printer_name%\nDriver:   %driver%\n
 Waiting	JobListView		Bezig met wachten
 Print test page	PrintersWindow		Druk een testpagina af
-Test Page	TestPageView		Testpagina
-Test Page	PrintersWindow		Testpagina
 page	JobListView		pagina
 Cancel	AddPrinterDialog		Annuleren
 Add printer	AddPrinterDialog		Printer toevoegen
@@ -11,14 +9,12 @@ Green	TestPageView		Groen
 Printers	PrintersWindow		Printers
 Default Printer	PrinterListView		Standaardprinter
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
-No pending jobs.	PrinterListView		Geen taken in de wachtrij.
 pages	JobListView		pagina's
 Printers	System name		Printers
 Processing	JobListView		Bezig met verwerken
 Red	TestPageView		Rood
 Printer name:	AddPrinterDialog		Printernaam:
 Driver: %driver%	PrinterListView		Stuurprogramma: %driver%
- pending jobs.	PrinterListView		wachtende taken.
 Black	TestPageView		Zwart
 Restart job	PrintersWindow		Taak herstarten
 Add	AddPrinterDialog		Toevoegen
@@ -27,7 +23,6 @@ Transport: %transport% %transport_address%	TestPageView		Transport: %transport% 
 Cancel job	PrintersWindow		Taak annuleren
 Yellow	TestPageView		Geel
 Blue	TestPageView		Blauw
-1 pending job.	PrinterListView		1 taak in de wachtrij
 Remove	PrintersWindow		Verwijderen
 <pick one>	AddPrinterDialog		<kies één>
 Print jobs for 	PrintersWindow		Afdruktaken voor

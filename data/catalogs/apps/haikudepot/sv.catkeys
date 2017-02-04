@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-HaikuDepot	2365524674
+1	swedish	x-vnd.Haiku-HaikuDepot	1090759318
 Name	PackageListView		Namn
 Available packages	MainWindow		Tillgängliga paket
 Open %DeskbarLink%	PackageManager		Öppna %DeskbarLink%
@@ -15,7 +15,6 @@ Other users can see this rating	RatePackageWindow		Andra användare kan se denna
 Stability	RatePackageWindow		Stabilitet
 for %Version%	PackageInfoView		för %Version%
 No changelog available.	PackageInfoView		Ingen ändringslogg finns.
-Depot:	FilterView		Depot:
 Description	PackageListView		Beskrivning
 Install	PackageManager		Installera
 Source packages	MainWindow		Källkodspaket
@@ -56,7 +55,6 @@ Ratings	PackageInfoView		Betyg
 But none could be listed here, sorry.	UserLoginWindow		Ursäkta, Men ingen kunde listas här.
 System & Utilities	Model		System & Verktyg
 Inactive	PackageListView		Inaktiv
-Refresh depots	MainWindow		Uppdatera depå
 The package action could not be scheduled: %Error%	PackageInfoView		Paket körningen kunde inte planeras: %Error%
 Science & Mathematics	Model		Vetenskap & Matematik
 Main Menu	MainWindow		Huvudmeny
@@ -115,14 +113,12 @@ An error occurred while refreshing the repository: %error%	MainWindow		Ett fel i
 Try again	App		Försök igen
 Login or Create account	MainWindow		Logga in eller skapa konto
 Pending…	PackageListView		Väntar...
-Depot	FilterView		Depot
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# enhet} other{# enheter}}
 OK	PackageInfoView		OK
 Uninstalled	PackageListView		Avinstallera
 Show	MainWindow		Visa
 Stable	RatePackageWindow		Stabil
 Unknown	PackageListView		Okänd
-All depots	FilterView		All depots
 Comment language:	RatePackageWindow		Kommentarspråk:
 Pass phrase:	UserLoginWindow		Lösen fras:
 Screenshot	ScreenshotWindow		Skärmdump

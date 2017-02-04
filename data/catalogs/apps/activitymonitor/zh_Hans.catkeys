@@ -1,11 +1,10 @@
-1	english	x-vnd.Haiku-ActivityMonitor	2455521641
+1	english	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		页面错误
 Media nodes	DataSource		媒介节点
 Threads	DataSource		线程
 Always on top	ActivityWindow		始终置顶
 Add graph	ActivityWindow		添加图示
 Teams	DataSource		团队
-Hide legend	ActivityView		隐藏说明
 MiB	DataSource		MiB
 Network send	DataSource		网络发送
 CPU usage (combined)	DataSource		CPU 使用率（总和）

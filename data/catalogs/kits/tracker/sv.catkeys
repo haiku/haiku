@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-libtracker	545841200
+1	swedish	x-vnd.Haiku-libtracker	1564741333
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Tillägg
 Mount settings…	ContainerWindow		Monteringsinställningar...
@@ -316,7 +316,6 @@ Cancel	FilePanelPriv		Avbryt
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Applikationen \"%appname\" supporterar inte denna typ av document du försöker att öppna.\n Är du säker på att du vill fortsätta?\n \n Om du vet att applikationen supporterar denna dokument typ, borde du kontakta ägaren av applikationen och fråga efter uppdaterad version som stödjer dokumentet du vill öppna.
 Disks	DirMenu		Diskar
 New folder %ld	FSUtils		Ny mapp %ld
-All BeOS disks	AutoMounterSettings		Alla BeOS volymer
 Used space color	SettingsView		Färg för diskanvändning
 Sorry, could not create a new folder.	FSUtils		Kan inte skapa en ny mapp.
 Disk mount	TrackerSettingsWindow		Diskmontering

@@ -1,9 +1,7 @@
-1	french	x-vnd.Be-PRNT	2163275033
+1	french	x-vnd.Be-PRNT	4242582634
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimante : %printer_name%\n    Pilote : %driver%\n
 Waiting	JobListView		Attente
 Print test page	PrintersWindow		Imprimer une page de test
-Test Page	TestPageView		Page de test
-Test Page	PrintersWindow		Page de test
 page	JobListView		page
 Cancel	AddPrinterDialog		Annuler
 Add printer	AddPrinterDialog		Ajouter une imprimante
@@ -12,14 +10,12 @@ Printers	PrintersWindow		Imprimantes
 Add…	PrintersWindow		Ajouter…
 Default Printer	PrinterListView		Imprimante par défaut
 Transport: %transport% %transport_address%	PrinterListView		Liaison : %transport% %transport_address%
-No pending jobs.	PrinterListView		Pas de travaux en attente.
 pages	JobListView		pages
 Printers	System name		Imprimantes
 Processing	JobListView		Traitement
 Red	TestPageView		Rouge
 Printer name:	AddPrinterDialog		Nom de l’imprimante :
 Driver: %driver%	PrinterListView		Pilote : %driver%
- pending jobs.	PrinterListView		 travaux en attente.
 Black	TestPageView		Noir
 Restart job	PrintersWindow		Reprendre la travail
 Add	AddPrinterDialog		Ajouter
@@ -28,7 +24,6 @@ Transport: %transport% %transport_address%	TestPageView		Liaison : %transport% %
 Cancel job	PrintersWindow		Annuler le travail
 Yellow	TestPageView		Jaune
 Blue	TestPageView		Bleu
-1 pending job.	PrinterListView		1 travail en attente.
 Remove	PrintersWindow		Retirer
 <pick one>	AddPrinterDialog		<choisir>
 Print jobs for 	PrintersWindow		Travaux d’impression pour 

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-libtracker	545841200
+1	russian	x-vnd.Haiku-libtracker	779898691
 OK	WidgetAttributeText		ОК
 Add-ons	FilePanelPriv		Дополнения
 Mount settings…	ContainerWindow		Настройка подключения дисков…
@@ -12,11 +12,14 @@ Window	ContainerWindow		Окно
 Decrease size	ContainerWindow		Уменьшить размер
 You must have at least one attribute showing.	PoseView		Вы должны оставить хотя бы один атрибут для просмотра.
 Permissions	InfoWindow		Права
+Keywords	Bookmark Query Columns		Ключевые слова
 128 x 128	DeskWindow		128 x 128
 128 x 128	ContainerWindow		128 x 128
 Recent documents	FavoritesMenu		Недавние документы
 Modified	QueryPoseView		Изменён
 Created	ContainerWindow		Создан
+Unmatched brackets.	libtracker		Непарные скобки.
+Move	FSUtils	button label	Переместить
 Error %error loading add-On %name.	ContainerWindow		Ошибка %error при запуске дополнения %name.
 Skip all	FSUtils		Пропустить все
 contains	SelectionWindow		содержит
@@ -27,6 +30,7 @@ Name	OpenWithWindow		Имя
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		Невозможно открыть \"%document\" поскольку программа \"%app\" находится в корзине. 
 File	ContainerWindow		Файл
 Handles any %type	OpenWithWindow		Поддерживает любой из %type
+Name	Person Query Columns		Имя
 Delete	ContainerWindow		Удалить
 32 x 32	ContainerWindow		32 x 32
 Cannot unmount the boot volume \"%name\".	FSUtils		Невозможно отключить загрузочный раздел \"%name\".
@@ -44,6 +48,7 @@ greater than	FindPanel		больше чем
 Delete	PoseView		Удалить
 Select all	ContainerWindow		Выделить все
 Sorry, the 'Character' attribute cannot store a multi-byte glyph.	WidgetAttributeText		Извините, но атрибут 'Character' не может хранить многобайтовый глиф.
+Memory corruption.	libtracker		Повреждение памяти.
 Clean up	DeskWindow		Выстроить
 You cannot copy or move the root directory.	FSUtils		Вы не можете копировать или перемещать корневую папку.
 %SizeProcessed of %TotalSize, %BytesPerSecond/s	StatusWindow		%SizeProcessed из %TotalSize, %BytesPerSecond/с
@@ -95,11 +100,14 @@ Favorites	FavoritesMenu		Закладки
 \"%name\" is an unsupported executable.	FSUtils		\"%name\" неподдерживаемый исполняемый файл.
 Sorry, you can't copy items to the Trash.	PoseView		Извините, но вы не можете копировать объекты в корзину.
 matches wildcard expression	SelectionWindow		совпадает с шаблонным выражением
+Large	ContainerWindow		Большие
 You cannot replace a folder or a symbolic link with a file.	FSUtils		Невозможно заменить папку или символическую ссылку файлом.
 Show space bars on volumes	SettingsView		Показывать индикаторы занятого места
+Company	Person Query Columns		Компания
 Invert selection	ContainerWindow		Инвертировать
 Increase size	DeskWindow		Увеличить размер
 Resize to fit	ContainerWindow		Подогнать размер окна
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Не удалось выполнить %func в find_directory(). \nПричина: %error
 Add printer…	ContainerWindow		Добавить принтер…
 New folder	ContainerWindow		Новая папка
 Kind	ContainerWindow		Тип
@@ -107,6 +115,7 @@ home	B_USER_DIRECTORY		Домашняя
 Select…	ContainerWindow		Выделить…
 Copy to	ContainerWindow		Копировать в
 Move to Trash	ContainerWindow		В корзину
+Modified	Default Query Columns		Изменён
 Move to	ContainerWindow		Переместить в
 Create %s clipping	PoseView		Сохранить как %s
 Set new link target	InfoWindow		Изменить цель ссылки
@@ -117,6 +126,7 @@ Edit name	ContainerWindow		Переименовать
 Show volumes on Desktop	SettingsView		Показывать значки разделов
 KiB	WidgetAttributeText		КБ
 Error %error loading Add-On %name.	ContainerWindow		Ошибка %error при запуске дополнения %name.
+Mini	ContainerWindow		Маленькие
 Defaults	TrackerSettingsWindow		По умолчанию
 Mini icon view	ContainerWindow		Мелкие значки
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Невозможно открыть \"%name\". Файл ошибочно помечен как исполняемый. 
@@ -132,11 +142,13 @@ Searching for disks to mount…	StatusWindow		Поиск дисков для п�
 New folder	FSUtils		Новая папка
 Free space color	SettingsView		Цвет свободного места
 Cut	ContainerWindow		Вырезать
+Status	Email Query Columns		Статус
 Remove	FindPanel		Удалить
 Resize to fit	QueryContainerWindow		Подогнать размер окна
 Desktop	TrackerSettingsWindow		Рабочий стол
 Sorry, you can't copy items to the Trash.	FSClipBoard		Извините, но вы не можете копировать объекты в корзину.
 by attribute	FindPanel		по атрибуту
+Too many parenthesis.	libtracker		Слишком много скобок.
 Disk mounting during boot	AutoMounterSettings		Подключение дисков при загрузке
 New Query	FindPanel		Новый запрос
 Preparing to move items…	StatusWindow		Подготовка к перемещению файлов…
@@ -187,6 +199,7 @@ You cannot create a link to the root directory.	FSUtils		Невозможно с
 48 x 48	ContainerWindow		48 x 48
 Could not find application \"%appname\"	OpenWithWindow		Невозможно найти приложение \"%appname\"
 The selected item cannot be moved to the Trash. Would you like to delete it instead? (This operation cannot be reverted.)	PoseView		Выбранный объект не может быть перемещён в корзину. Хотите ли вы вместо этого удалить его? (Эту операцию будет невозможно отменить)
+Work Phone	Person Query Columns		Рабочий телефон
 Invert	SelectionWindow		Инвертировать
 Find	FindPanel		Найти
 Get info	ContainerWindow		Информация
@@ -200,12 +213,14 @@ by formula	FindPanel		по формуле
 40 x 40	DeskWindow		40 x 40
 Name	PoseView		Имя
 Group	FilePermissionsView		Группа
+Subject	Email Query Columns		Тема
 Version:	InfoWindow		Версия:
 Created:	InfoWindow		Создан:
 \nShould this be fixed?	FSUtils		\nВы хотите это исправить?
 Copying: 	StatusWindow		Копирование: 
 Capacity:	InfoWindow		Объём:
 Delete	FilePanelPriv		Удалить
+Path	Default Query Columns		Путь
 {0, plural, one{(# byte)} other{(# bytes)}}	InfoWindow		{0, plural, one{(# байт)} few{(# байта)} other{(# байтов)}}
 Save	FindPanel		Сохранить
 copy	FSUtils	filename copy	копия
@@ -217,6 +232,7 @@ Save query as template…	FindPanel		Сохранить запрос как ша
 Show folder location in title tab	SettingsView		Показывать путь папки в заголовке окна
 Proceed	FSUtils		Исправить
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		Некоторые объекты с такими же именами, которые вы %verb, уже существуют в этой папке.\n \nЗаменить их теми, которые вы %verb или спрашивать для каждого объекта?
+Rename	FSUtils	button label	Переименовать
 The mount server could not be contacted.	AutoMounterSettings		Не удалось связаться с сервером подключения дисков.
 Error deleting items	FSUtils		Ошибка при удалении файлов
 Create relative link here	ContainerWindow		Создать относительную ссылку здесь
@@ -244,6 +260,7 @@ Reverse order	ContainerWindow		В обратном порядке
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# объект} few{# объекта} other{# объектов}}
 OK	OpenWithWindow		ОК
 Add current folder	FilePanelPriv		Добавить текущую папку
+Name	Default Query Columns		Имя
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		Невозможно открыть \"%document\" приложением \"%app\" (Отсутствует символ: %symbol). \n
 The target disk does not support creating links.	FSUtils		Принимающий диск не поддерживает создание ссылок.
 starts with	SelectionWindow		начинается на
@@ -259,6 +276,7 @@ Creating links: 	StatusWindow		Создание ссылок:
 Paused: click to resume or stop	StatusWindow		Пауза: нажмите повторно для продолжения
 Preferred for %type	OpenWithWindow		Предпочтительный для %type
 GiB	WidgetAttributeText		ГБ
+Title	Bookmark Query Columns		Заголовок
 There was an error deleting \"%name\":\n\t%error	FSUtils		Ошибка при удалении \"%name\":\n\t%error
 Paste	FilePanelPriv		Вставить
 Copy more	ContainerWindow		Копировать ещё
@@ -292,6 +310,7 @@ Permissions	ContainerWindow		Права
 96 x 96	ContainerWindow		96 x 96
 moving	FSUtils		перемещаемый
 Identify	InfoWindow		Опознать
+Internal error.	libtracker		Внутренняя ошибка.
 Recent folders	ContainerWindow		Недавнюю папку
 Close all	ContainerWindow		Закрыть все
 Include trash	FindPanel		Включая корзину
@@ -307,16 +326,17 @@ after	FindPanel		после
 Select…	QueryContainerWindow		Выделить…
 More options	FindPanel		Больше опций
 link	FSUtils	filename link	ссылка
+Expression too long.	libtracker		Выражение слишком длинное.
 The specified name is illegal. Please choose another name.	FilePanelPriv		Введённое имя недопустимо. Введите какое-нибудь другое.
 You can't move a folder into itself or any of its own sub-folders.	FSUtils		Невозможно переместить папку в саму себя или в собственную подпапку.
 Handles any file	OpenWithWindow		Поддерживает любые файлы
+E-mail	Person Query Columns		Электронная почта
 Get info	FilePanelPriv		Информация
 32 x 32	DeskWindow		32 x 32
 Cancel	FilePanelPriv		Отмена
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Программа \"%appname\" не поддерживает открытие документов данного типа.\nВы действительно хотите открыть документ в ней?\n\nЕсли вы знаете, что программа поддерживает этот тип документов, то рекомендуется связаться с разработчиками программы и попросить их обновить список типов, поддерживаемых программой.
 Disks	DirMenu		Диски
 New folder %ld	FSUtils		Новая папка %ld
-All BeOS disks	AutoMounterSettings		Все диски BeOS
 Used space color	SettingsView		Цвет использованного места
 Sorry, could not create a new folder.	FSUtils		Извините, невозможно создать новую папку.
 Disk mount	TrackerSettingsWindow		Монтирование дисков
@@ -332,6 +352,7 @@ Size:	InfoWindow		Размер:
 Empty folder	SlowContextPopup		Пустая папка
 Open selection with:	OpenWithWindow		Открыть выбранное с помощью:
 Preparing to create links…	StatusWindow		Подготовка к созданию ссылок…
+Size	Default Query Columns		Размер
 Show navigator	SettingsView		Показывать панель навигации
 Desktop	B_DESKTOP_DIRECTORY		Рабочий стол
 List folders first	SettingsView		Отображать папки в начале списка
@@ -339,6 +360,7 @@ Name	SelectionWindow		Имя
 Trash	Model		Корзина
 Favorites	FilePanelPriv		Закладки
 Name	QueryPoseView		Имя
+OK	Email Query Columns		ОК
 Delete	FSUtils		Удалить
 Modified	FindPanel		Изменён
 Error moving \"%name\" to Trash. (%error)	FSUtils		Ошибка при перемещении \"%name\" в корзину. (%error)
@@ -391,6 +413,7 @@ is	FindPanel		равен
 Attributes	ContainerWindow		Атрибуты
 Handles %type	OpenWithWindow		Поддерживает %type
 ends with	FindPanel		заканчивается на
+URL	Bookmark Query Columns		Cсылка (URL)
 New	ContainerWindow		Создать
 Name matches wildcard expression:###	SelectionWindow		Имя совпадает с регулярным выражением:###
 less than	FindPanel		меньше чем
@@ -412,6 +435,7 @@ parent folder	NavMenu		родительский каталог
 contains	FindPanel		содержит
 Relation	OpenWithWindow		Возможности
 Open	FilePanelPriv		Открыть
+From	Email Query Columns		От
 Mount	DeskWindow		Подключить
 Recent queries	FindPanel		Недавние запросы
 Mount	ContainerWindow		Подключить

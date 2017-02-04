@@ -1,17 +1,14 @@
-1	italian	x-vnd.Haiku-Magnify	3240300114
+1	italian	x-vnd.Haiku-Magnify	698518753
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		appunti vuoti\n
 Make square	Magnify-Main		Rendi la finestra quadrata
 Copy image	Magnify-Main		Copia immagine
 usage: magnify [size] (magnify size * size pixels)\n	Console		uso: magnify [dimensione] (dimensione ingrandimento * dimensione dei pixel)\n
 Stick coordinates	Magnify-Main		Mantieni queste coordinate
-Hide/Show grid	Magnify-Main		Mostra/Nascondi griglia
 magnify: size must be a multiple of 4\n	Console		magnify: la dimensione deve essere un multiplo di 4\n
 Decrease pixel size	Magnify-Main		Diminuisci la dimensione dei pixel
 Magnify	System name		Magnify
 Info	Magnify-Main		Informazioni
 Remove a crosshair	Magnify-Main		Rimuovi un mirino
-Freeze/Unfreeze image	Magnify-Main		Blocca/Sblocca immagine
-Hide/Show info	Magnify-Main		Nascondi/Mostra informazioni
 Save image	Magnify-Main		Salva immagine
 Increase window size	Magnify-Main		Aumenta la dimensione della finestra
 Decrease window size	Magnify-Main		Diminuisci la dimensione della finestra

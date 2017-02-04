@@ -1,4 +1,4 @@
-1	polish	x-vnd.Be-PSRV	123334776
+1	polish	x-vnd.Be-PSRV	2930356711
 Undefined	ConfigWindow		Nieokreślone
 Return the number of available transports	PrintServerApp Scripting		Zwróć liczbę dostępnych transportów
 Return the number of available printers	PrintServerApp Scripting		Zwróć liczbę dostępnych drukarek
@@ -8,7 +8,6 @@ Cancel	PrintServerApp		Anuluj
 Retrieve a specific printer	PrintServerApp Scripting		Odzyskaj konkretną drukarkę
 Page %1 to %2	ConfigWindow		Strony %1 do %2
 Get name of the printer add-on used for this printer	Printer Scripting		Pokaż nazwę dodatku dla tej drukarki
-Page setup:	ConfigWindow		Ustawienia strony:
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		Anuluj

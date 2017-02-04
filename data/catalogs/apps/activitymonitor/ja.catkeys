@@ -1,11 +1,10 @@
-1	japanese	x-vnd.Haiku-ActivityMonitor	2455521641
+1	japanese	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		ページフォルト
 Media nodes	DataSource		メディアノード数
 Threads	DataSource		スレッド数
 Always on top	ActivityWindow		常に前面に
 Add graph	ActivityWindow		グラフを追加
 Teams	DataSource		チーム数
-Hide legend	ActivityView		説明を隠す
 MiB	DataSource		MiB
 Network send	DataSource		ネットワーク送信バイト数
 CPU usage (combined)	DataSource		CPU 使用率(合計)

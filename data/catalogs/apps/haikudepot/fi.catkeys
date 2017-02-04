@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-HaikuDepot	2365524674
+1	finnish	x-vnd.Haiku-HaikuDepot	1090759318
 Name	PackageListView		Nimi
 Available packages	MainWindow		Saatavilla olevat pakkaukset
 Open %DeskbarLink%	PackageManager		Avaa %DeskbarLink%
@@ -15,7 +15,6 @@ Other users can see this rating	RatePackageWindow		Muut käyttäjät voivat näh
 Stability	RatePackageWindow		Stabiilisuus
 for %Version%	PackageInfoView		%Version%
 No changelog available.	PackageInfoView		Mitään muutoslokia ei ole saatavilla.
-Depot:	FilterView		Varasto:
 Description	PackageListView		Kuvaus
 Install	PackageManager		Asenna
 Source packages	MainWindow		Lähdekoodipakkaukset
@@ -56,7 +55,6 @@ Ratings	PackageInfoView		Arvosanat
 But none could be listed here, sorry.	UserLoginWindow		Tässä ei kyetty luetteloimaan mitään.
 System & Utilities	Model		Järjestelmä ja apuohjelmat
 Inactive	PackageListView		Ei käytössä
-Refresh depots	MainWindow		Päivitä varastot
 The package action could not be scheduled: %Error%	PackageInfoView		Pakkaustoiminnon aikatauluttaminen epäonnistui: %Error%
 Science & Mathematics	Model		Tiede ja matematiikka
 Main Menu	MainWindow		Päävalikko
@@ -115,14 +113,12 @@ An error occurred while refreshing the repository: %error%	MainWindow		Varastoa 
 Try again	App		Yritä uudelleen
 Login or Create account	MainWindow		Kirjaudu tai luo tili
 Pending…	PackageListView		Odottaa...
-Depot	FilterView		Varasto
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# kohde} other{# kohdetta}}
 OK	PackageInfoView		Valmis
 Uninstalled	PackageListView		Poistetut asennukset
 Show	MainWindow		Näytä
 Stable	RatePackageWindow		Vakaa
 Unknown	PackageListView		Tuntematon
-All depots	FilterView		Kaikki varastot
 Comment language:	RatePackageWindow		Kommenttikieli:
 Pass phrase:	UserLoginWindow		Salasana:
 Screenshot	ScreenshotWindow		Kuvakaappaus

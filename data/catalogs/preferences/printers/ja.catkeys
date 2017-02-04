@@ -1,25 +1,24 @@
-1	japanese	x-vnd.Be-PRNT	2163275033
+1	japanese	x-vnd.Be-PRNT	686411231
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		プリンター: %printer_name%\nドライバー: %driver%\n
 Waiting	JobListView		待機中
 Print test page	PrintersWindow		テストページを印刷
-Test Page	TestPageView		テストページ
-Test Page	PrintersWindow		テストページ
+ pending jobs	PrinterListView		 個のジョブが印刷待ちです。
 page	JobListView		ページ
 Cancel	AddPrinterDialog		中止
+Test page	PrintersWindow		テストページ
 Add printer	AddPrinterDialog		プリンターを追加
 Green	TestPageView		緑
 Printers	PrintersWindow		プリンター
 Add…	PrintersWindow		追加…
+No pending jobs	PrinterListView		印刷待ち中のジョブはありません
 Default Printer	PrinterListView		通常使うプリンター
 Transport: %transport% %transport_address%	PrinterListView		転送先: %transport% %transport_address%
-No pending jobs.	PrinterListView		印刷待ち中のジョブはありません。
 pages	JobListView		ページ
 Printers	System name		プリンター
 Processing	JobListView		処理中
 Red	TestPageView		赤
 Printer name:	AddPrinterDialog		プリンター名:
 Driver: %driver%	PrinterListView		ドライバー: %driver%
- pending jobs.	PrinterListView		個のジョブが印刷待ちです。
 Black	TestPageView		黒
 Restart job	PrintersWindow		ジョブを再開
 Add	AddPrinterDialog		追加
@@ -28,7 +27,6 @@ Transport: %transport% %transport_address%	TestPageView		転送先: %transport% 
 Cancel job	PrintersWindow		ジョブを中止
 Yellow	TestPageView		黄
 Blue	TestPageView		青
-1 pending job.	PrinterListView		1 個のジョブが印刷待ちです。
 Remove	PrintersWindow		削除
 <pick one>	AddPrinterDialog		<１つ選択>
 Print jobs for 	PrintersWindow		このプリンターのジョブ:
@@ -40,5 +38,7 @@ No printer found!	TransportMenu		プリンターが見つかりません。
 Print jobs: No printer selected	PrintersWindow		印刷ジョブ: プリンターが選択されていません
 Cyan	TestPageView		シアン
 Unknown status	JobListView		状態が不明
+1 pending job	PrinterListView		1 個のジョブが印刷待ちです
 Connected to:	AddPrinterDialog		ポート:
 Printer type:	AddPrinterDialog		プリンターの種類:
+Test page	TestPageView		テストページ

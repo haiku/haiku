@@ -1,4 +1,4 @@
-1	japanese	x.vnd.OBOS-Inspector	2075781936
+1	japanese	x.vnd.OBOS-Inspector	577867100
 User Translators	ActiveTranslatorsWindow		ユーザートランスレーター
 No image available to save.	ImageWindow		保存できるイメージがありません。
 Sorry, unable to write the image file.	ImageView		すみませんが、イメージの書き出しができません。
@@ -15,9 +15,7 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 Save feature not implemented yet.	ImageWindow		保存機能はまだ実装されていません。
 First Page	ImageWindow		最初のページ
 Next Page	ImageWindow		次のページ
-Open...	ImageWindow		開く…
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\n使用されたトランスレーター:\n名前: %1\n情報: %2\nバージョン: %3\n
-Save...	ImageWindow		保存…
 Info	ImageWindow		情報
 OK	ImageWindow		OK
 Window	ImageWindow		ウィンドウ
@@ -25,8 +23,10 @@ Quit	ImageWindow		終了
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		選択されたドキュメント: %1\n\n使用したトランスレーター:\n名前: %2\n情報: %3\nバージョン: %4\n
 Active Translators	ImageWindow		有効なトランスレーター
 View	ImageWindow		ビュー
+Open…	ImageWindow		開く…
 Previous Page	ImageWindow		前のページ
 OK	ImageView		OK
 System Translators	ActiveTranslatorsWindow		システムトランスレーター
+Save…	ImageWindow		保存…
 Unknown	ImageView		不明
 File	ImageWindow		ファイル

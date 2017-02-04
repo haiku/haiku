@@ -1,11 +1,10 @@
-1	romanian	x-vnd.Haiku-ActivityMonitor	2455521641
+1	romanian	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		Defecțiuni-P
 Media nodes	DataSource		Noduri media
 Threads	DataSource		Fire de execuție
 Always on top	ActivityWindow		Mereu deasupra
 Add graph	ActivityWindow		Adaugă grafic
 Teams	DataSource		Echipe
-Hide legend	ActivityView		Ascunde legenda
 MiB	DataSource		MiO
 Network send	DataSource		Trimite în rețea
 CPU usage (combined)	DataSource		Utilizare CPU (combinat)

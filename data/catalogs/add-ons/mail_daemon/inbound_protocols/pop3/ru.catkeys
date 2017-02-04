@@ -9,7 +9,7 @@ Getting UniqueIDs…	pop3		Получение уникальных иденти�
 : No reply.\n	pop3		: Нет ответа.\n
 Error while connecting to server %serv	pop3		Ошибка при соединении с сервером %serv
 Error while authenticating user %user	pop3		Ошибка при авторизации пользователя %user
-Destination:	ConfigView		Папка:
+Destination:	ConfigView		Каталог сохранения:
 APOP	ConfigView		APOP
 Sending password…	pop3		Отправка пароля…
 Connect to server…	pop3		Подключение к серверу…

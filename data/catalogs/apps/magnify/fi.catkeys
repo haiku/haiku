@@ -1,18 +1,15 @@
-1	finnish	x-vnd.Haiku-Magnify	2046693978
+1	finnish	x-vnd.Haiku-Magnify	3799879913
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		ei leikeviestiä\n
 Make square	Magnify-Main		Tee neliö
 Copy image	Magnify-Main		Kopioi kuva
 usage: magnify [size] (magnify size * size pixels)\n	Console		käyttö: magnify [koko] (suurennuskoko * pikselien koko)\n
 Stick coordinates	Magnify-Main		Tarttumiskoordinaatit
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height @ {0, monikko, yksi{# pikseli/pikseli} muut{# pikseliä/pikseli}}
-Hide/Show grid	Magnify-Main		Piilota/näytä rasteri
 magnify: size must be a multiple of 4\n	Console		suurenna: koon on oltava neljän monikerta\n
 Decrease pixel size	Magnify-Main		Pienennä pikselikokoa
 Magnify	System name		Suurennuslasi
 Info	Magnify-Main		Tiedot
 Remove a crosshair	Magnify-Main		Poista ristikkotähtäin
-Freeze/Unfreeze image	Magnify-Main		Jähmetä/vapauta kuva
-Hide/Show info	Magnify-Main		Piilota/näytä tiedot
 Save image	Magnify-Main		Tallenna kuva
 Increase window size	Magnify-Main		Kasvata ikkunan kokoa
 Decrease window size	Magnify-Main		Pienennä ikkkunan kokoa

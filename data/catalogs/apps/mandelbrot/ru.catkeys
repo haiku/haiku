@@ -1,2 +1,13 @@
-1	russian	x-vnd.Haiku-Mandelbrot	1153122361
+1	russian	x-vnd.Haiku-Mandelbrot	3643059161
+High contrast	MandelbrotWindow		Высокий контраст
+Fire	MandelbrotWindow		Огонь
+File	MandelbrotWindow		Файл
+Palette	MandelbrotWindow		Палитра
+Mandelbrot	MandelbrotWindow		Мандельброт
+Quit	MandelbrotWindow		Выход
+Set	MandelbrotWindow		Набор
+Iterations	MandelbrotWindow		Итерации
 Mandelbrot	System name		Мандельброт
+Deepfrost	MandelbrotWindow		Заморозка
+Tricorn	MandelbrotWindow		Треуголка
+Multibrot	MandelbrotWindow		Мультиброт

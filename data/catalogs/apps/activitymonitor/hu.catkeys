@@ -1,11 +1,10 @@
-1	hungarian	x-vnd.Haiku-ActivityMonitor	2455521641
+1	hungarian	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		P hibák
 Media nodes	DataSource		Média csomópontok
 Threads	DataSource		Szálak
 Always on top	ActivityWindow		Mindig felül
 Add graph	ActivityWindow		Grafikon hozzáadása
 Teams	DataSource		Csapatok
-Hide legend	ActivityView		Magyarázat elrejtése
 MiB	DataSource		MiB
 Network send	DataSource		Küldött adatok
 CPU usage (combined)	DataSource		Processzor használat (kombinált)

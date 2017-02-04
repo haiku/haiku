@@ -1,15 +1,12 @@
-1	slovenian	x-vnd.Haiku-Magnify	3874960195
+1	slovenian	x-vnd.Haiku-Magnify	1333178834
 Make square	Magnify-Main		Preoblikuj v kvadrat
 Copy image	Magnify-Main		Kopiraj sliko
 usage: magnify [size] (magnify size * size pixels)\n	Console		Uporaba: magnify [velikost] (poveča velikost × velikost pikslov)\n
 Stick coordinates	Magnify-Main		Zakleni koordinate
-Hide/Show grid	Magnify-Main		Skrij/pokaži mrežo
 magnify: size must be a multiple of 4\n	Console		magnify: Velikost mora biti večkratnik 4\n
 Decrease pixel size	Magnify-Main		Zmanjšaj velikost pikslov
 Magnify	System name		Povečava
 Info	Magnify-Main		Informacije
-Freeze/Unfreeze image	Magnify-Main		Zamrzni/odmrzni sliko
-Hide/Show info	Magnify-Main		Skrij/pokaži informacije
 Save image	Magnify-Main		Shrani sliko
 Increase window size	Magnify-Main		Povečaj velikost okna
 Decrease window size	Magnify-Main		Zmanjšaj velikost okna

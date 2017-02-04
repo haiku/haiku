@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-CodyCam	2193838145
+1	english	x-vnd.Haiku-CodyCam	1888169680
 Upload…	VideoConsumer.cpp		上传…
 Capturing Image…	VideoConsumer.cpp		捕获图像…
 Every 30 seconds	CodyCam		间隔 30 秒
@@ -42,7 +42,6 @@ CodyCam	System name		摄像头
 Every 24 hours	CodyCam		间隔 24 小时
 unknown command	SettingsHandler		未知命令
 Video settings	CodyCam		视频设置
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		未发现视频源。您需要一个网络摄像头来使用CodyCam。
 still image filename expected	CodyCam		预期静态图像文件名
 invalid upload client %ld\n	VideoConsumer.cpp		上传客户端 %ld 无效\n
 Every 15 seconds	CodyCam		间隔 15 秒

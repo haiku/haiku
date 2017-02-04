@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-libtracker	965916127
+1	japanese	x-vnd.Haiku-libtracker	1597598656
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		アドオン
 Mount settings…	ContainerWindow		マウント設定…
@@ -354,7 +354,6 @@ Cancel	FilePanelPriv		中止
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		アプリケーション \"%appname\" は開こうとしているドキュメントタイプをサポートしていません。\n進めますか?\n\n アプリケーションがサポートすることがわかっている場合は、アプリケーションの製作元にドキュメントタイプをサポートに加えるように問い合わせてください。
 Disks	DirMenu		ディスク
 New folder %ld	FSUtils		新規フォルダー %ld 
-All BeOS disks	AutoMounterSettings		全 BFS パーティション
 Used space color	SettingsView		使用済容量の色
 Sorry, could not create a new folder.	FSUtils		新規フォルダーを作成できませんでした。
 Disk mount	TrackerSettingsWindow		ディスクのマウント
@@ -373,6 +372,7 @@ Open selection with:	OpenWithWindow		選択ファイルをアプリケーショ�
 Preparing to create links…	StatusWindow		リンク作成の準備をしています…
 Size	Default Query Columns		サイズ
 Show navigator	SettingsView		ツールバーを表示
+All Haiku disks	AutoMounterSettings		すべての Haiku ディスク
 Desktop	B_DESKTOP_DIRECTORY		デスクトップ
 List folders first	SettingsView		フォルダーを先頭に表示
 Name	SelectionWindow		名前

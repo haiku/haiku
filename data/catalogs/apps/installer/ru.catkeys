@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Installer	2424417449
+1	russian	x-vnd.Haiku-Installer	3421507633
 Boot Manager, the application to configure the Haiku boot menu, could not be launched.	InstallerWindow		Boot Manager, приложение для настройки загрузочного меню Haiku, не может быть запущено.
 Are you sure you want to abort the installation and restart the system?	InstallerWindow		Вы уверены, что хотите прервать установку и перезагрузить компьютер?
 Installer\n\twritten by Jérôme Duval and Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n	InstallerApp		Installer\n\n\tразработал Jérôme Duval и Stephan Aßmus\n\tCopyright 2005-2010, Haiku.\n\n
@@ -17,6 +17,7 @@ Are you sure you want to install onto the current boot disk? The Installer will 
 Quit Boot Manager	InstallerWindow		Закройте Менеджер Загрузки
 Stop	InstallerWindow		Остановить
 \t\tchainloader +1\n	InstallerApp		\t\tchainloader +1\n
+If the os-prober approach doesn't work for you, GRUB 2 uses an extra configuration file to add custom entries to the boot menu. To add them to the top, you have to create/edit a file by launching your favorite editor from a Terminal like this:\n\n	InstallerApp		Если решение с os-prober не работает, GRUB 2 использует дополнительный файл конфигурации для добавления записей в загрузочное меню. Чтобы добавить запись, вам необходимо создать/отредактировать файл, используя любой консольный текстовый редактор, например:\n\n
 OK	InstallerApp		ОК
 Choose the source and destination disk from the pop-up menus. Then click \"Begin\".	InstallerWindow		В выпадающих меню выберите источник и раздел, на который хотите установить Haiku. Затем нажмите \"Начать\".
 \t# Haiku on /dev/sda7\n	InstallerApp		\t# Haiku on /dev/sda7\n
@@ -90,6 +91,7 @@ With GRUB 2 the first logical partition always has the number \"5\", regardless 
 Write boot sector	InstallerWindow		Записать загрузочный сектор
 Cancel	InstallerWindow		Отмена
 DriveSetup, the application to configure disk partitions, could not be launched.	InstallerWindow		Невозможно запустить Разметку диска - приложение для настройки диска.
+The target volume is not empty. Are you sure you want to install anyway?\n\nNote: The 'system' folder will be a clean copy from the source volume but will retain its settings folder, all other folders will be merged, whereas files and links that exist on both the source and target volume will be overwritten with the source volume version.	InstallProgress		Целевой том не пустой. Вы точно хотите установить?\n\nПримечание: Папка 'system' будет представлять из себя точную копию директории из исходного тома, не изменятся лишь директории настроек, все остальные директории буду объединены. Все существующие файлы и ссылки существующие как исходном так и на целевом томе будут перезаписаны версией с исходного тома.
 No optional packages available.	PackagesView		Опциональные пакеты недоступны.
 All hard disks start with \"hd\".\n	InstallerApp		Все жесткие диски начинаются с \"hd\".\n
 Continue	InstallerApp		Продолжить

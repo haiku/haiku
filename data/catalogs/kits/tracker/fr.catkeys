@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	3663604379
+1	french	x-vnd.Haiku-libtracker	364980116
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Extensions
 Mount settings…	ContainerWindow		Réglages du montage…
@@ -113,6 +113,7 @@ Increase size	DeskWindow		Augmenter la taille
 Resize to fit	ContainerWindow		Ajuster
 At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		Dans %func\nfind_directory() a échoué.\nMotif : %error
 Add printer…	ContainerWindow		Ajouter une imprimante…
+If you rename the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo rename the home folder anyway, hold down the Shift key and click \"Rename\".	FSUtils		Si vous renommez le dossier d'accueil, %osName pourrait ne plus fonctionner normalement !\n\nÊtes-vous sûr de vouloir le faire ?\n\nPour renommer quand même le dossier d'accueil, maintenez la touche « Maj » enfoncée et cliquez sur « Renommer ».
 New folder	ContainerWindow		Nouveau dossier
 Kind	ContainerWindow		Nature
 home	B_USER_DIRECTORY		personnel
@@ -299,7 +300,7 @@ File	FilePanelPriv		Fichier
 Real name	ContainerWindow		Nom réel
 Error moving \"%name\"	FSUtils		Erreur lors du déplacement de « %name »
 You must drop items on one of the disk icons in the \"Disks\" window.	FSClipBoard		Vous devez déplacer des éléments sur une des icônes de disques de la fenêtre « Disques ».
-If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Titre
+If you move the home folder, %osName may not behave properly!\n\nAre you sure you want to do this?\n\nTo move the home folder anyway, hold down the Shift key and click \"Move\".	FSUtils		Si vous déplacez le dossier d'accueil, %osName pourrait ne plus fonctionner normalement !\n\nÊtes-vous sûr de vouloir le faire ?\n\nPour déplacer quand même le dossier d'accueil, maintenez la touche « Maj » enfoncée et cliquez sur « Déplacer ».
 Cancel	WidgetAttributeText		Annuler
 Could not find an application to open \"%name\" (%error). 	FSUtils		Impossible de trouver une application pour ouvrir « %name » (%error). 
 Create a Query template	FindPanel		Créer un modèle de requête
@@ -311,6 +312,7 @@ Show Disks icon	SettingsView		Afficher l’icône des disques
 Cancel	PoseView		Annuler
 You can't move or copy items to read-only volumes.	FSUtils		Vous ne pouvez pas déplacer ou copiez des éléments dans un volume en lecture-seule.
 Unknown	FilePermissionsView		Inconnu
+Junk on end.	libtracker		Indésirables à la fin.
 All files and folders	FindPanel		Tout les fichiers et dossiers
 {0, plural, one{for # file} other{for # files}}	InfoWindow		{0, plural, one{pour # fichier} other{pour # fichiers}}
 Could not open \"%document\" (Missing libraries: %library). \n	FSUtils		Impossible d’ouvrir « %document » (Il manque la bibliothèque : %library).\n
@@ -349,7 +351,6 @@ Cancel	FilePanelPriv		Annuler
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		L’application « %appname » ne gère pas le type de document que vous essayez d’ouvrir.\nÊtes-vous sûr de vouloir continuer ?\n\nSi vous pensez que l’application gère ce type de document, essayez de contacter l’éditeur afin qu’il mette à jour son application pour ajouter le type de votre document à la liste de ceux déjà supportés.
 Disks	DirMenu		Disques
 New folder %ld	FSUtils		Nouveau dossier %ld
-All BeOS disks	AutoMounterSettings		Tous les disques BeOS
 Used space color	SettingsView		Couleur de l’espace utilisé
 Sorry, could not create a new folder.	FSUtils		Désolé, impossible de créer un nouveau dossier.
 Disk mount	TrackerSettingsWindow		Montage des disques

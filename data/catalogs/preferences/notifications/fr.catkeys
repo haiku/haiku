@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Notifications	3115872762
+1	french	x-vnd.Haiku-Notifications	746652830
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Une erreur est survenue à la sauvegarde des préférences.\nIl est possible que vous manquiez d’espace disque.
 Notifications	GeneralView		Notifications
 seconds of inactivity	GeneralView		secondes d’inactivités
@@ -20,6 +20,7 @@ Display	PrefletView		Affichage
 Search:	NotificationView		Rechercher :
 Allowed	NotificationView		Autorisé
 Yes	NotificationView		Oui
+Last received	NotificationView		Dernière reçue
 Large icon	DisplayView		Grande icône
 Icon size:	DisplayView		Taille de l’icône :
 Hide notifications from screen after	GeneralView		Faire disparaître les notifications de l’écran après

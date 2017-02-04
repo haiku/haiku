@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	545841200
+1	english	x-vnd.Haiku-libtracker	1564741333
 OK	WidgetAttributeText		确定
 Add-ons	FilePanelPriv		附加组件
 Mount settings…	ContainerWindow		挂载设置...
@@ -316,7 +316,6 @@ Cancel	FilePanelPriv		取消
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		\"%appname\" 应用不支持您希望打开的文档格式。\n您确定要执行吗？\n\n如果您了解该应用所支持的文档类型，您需要联系应用的发行人，并且让他们更新其应用，将您的文档类型列入支持列表。
 Disks	DirMenu		磁盘
 New folder %ld	FSUtils		新建目录 %d
-All BeOS disks	AutoMounterSettings		所有 BeOS 磁盘
 Used space color	SettingsView		已用空间颜色
 Sorry, could not create a new folder.	FSUtils		对不起，无法新建目录。
 Disk mount	TrackerSettingsWindow		磁盘挂载

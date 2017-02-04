@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Haiku-Login	1678631300
+1	hungarian	x-vnd.Haiku-Login	336867745
 Error: %1	Login App		Hiba: %1
 Hide password	Login View		Jelszó elrejtése
 Desktop	Desktop Window		Asztal
@@ -8,14 +8,13 @@ OK	Login View		Rendben
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	hiba %s\n
 Login:	Login View		Felhasználónév:
 Error	Login App		Hiba
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Replikánsok ráhúzásával szerkesztheti a Bejelentkezés program mögött lévő Asztalt.\n\nHa kész van, csak lépjen ki a programból az „Alt+Q” gombokkal.
 Unimplemented	Login App		Nincs még megvalósítva
 Welcome to Haiku	Login Window		Üdvözöljük a Haikuban
 Reboot	Login View		Újraindítás
 Login application for Haiku\nUsage:\n	Login App		A Haiku bejelentkezési programja\nHasználat:\n
 Info	Login App		Infó
 Halt	Login View		Megszakítás
-ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	Ellenőrzés: %s\n
 Password:	Login View		Jelszó:
 OK	Login App		Rendben
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tKikapcsolja az ablak modálisságát\n
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		A bejelentkező képernyő mögötti asztal megjelenését személyre szabhatjuk replikánsok behúzásával a bejelentkező alkalmazásba.\n\nA művelet végeztével csupán ki kell lépni az alkalmazásból (Cmd-Q).

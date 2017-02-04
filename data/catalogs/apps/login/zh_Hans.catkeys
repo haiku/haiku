@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-Login	1678631300
+1	english	x-vnd.Haiku-Login	2683778354
 Error: %1	Login App		错误：%1
 Hide password	Login View		隐藏密码
 Desktop	Desktop Window		桌面
@@ -8,14 +8,12 @@ OK	Login View		确定
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	错误 %s\n
 Login:	Login View		登陆：
 Error	Login App		错误
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		您可以在登录程序中放置程序副本来定制桌面。\n\n完成后退出登陆程序（Alt-Q）。
 Unimplemented	Login App		未实现
 Welcome to Haiku	Login Window		欢迎使用 Haiku
 Reboot	Login View		重新启动
 Login application for Haiku\nUsage:\n	Login App		Haiku 登陆程序\n用法：\n
 Info	Login App		信息
 Halt	Login View		挂起
-ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	登陆验证：%s\n
 Password:	Login View		密码：
 OK	Login App		确定
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t不启用窗口模式\n

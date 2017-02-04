@@ -1,9 +1,10 @@
-1	japanese	x-vnd.haiku-screenshot	3896204963
+1	japanese	x-vnd.haiku-screenshot	3958461128
 seconds	ScreenshotWindow		秒
 Desktop	ScreenshotWindow		デスクトップ
 Include window border	ScreenshotWindow		ウィンドウ境界線も取り込む
 Screenshot	System name		スクリーンショット
 Select	ScreenshotWindow		選択
+The destination path exists but is not a folder.	ScreenshotWindow		保存先のパスはフォルダーではありません:
 Capture active window	ScreenshotWindow		アクティブウィンドウのみ
 Cancel	ScreenshotWindow		中止
 Name:	ScreenshotWindow		ファイル名:
@@ -20,8 +21,11 @@ screenshot	Screenshot	Base filename of screenshot files	スクリーンショッ
 New screenshot	ScreenshotWindow		新しいスクリーンショット
 Artwork folder	ScreenshotWindow		アートワークフォルダー
 Home folder	ScreenshotWindow		ホームフォルダー
+Failed to save screenshot	ScreenshotWindow		スクリーンショットの保存に失敗しました:
+OK	ScreenshotWindow		OK
 Settings…	ScreenshotWindow		設定…
 overwrite	ScreenshotWindow		上書き
 Delay:	ScreenshotWindow		遅延時間
+Error saving \"%s\":\n\t%s	ScreenshotWindow		\"%s\" の保存時にエラーが発生しました:\n\t%s
 Include mouse pointer	ScreenshotWindow		マウスポインターも取り込む
 Translator Settings	ScreenshotWindow		Translator 設定

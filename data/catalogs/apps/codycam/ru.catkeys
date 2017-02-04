@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CodyCam	2193838145
+1	russian	x-vnd.Haiku-CodyCam	1888169680
 Upload…	VideoConsumer.cpp		Загрузить…
 Capturing Image…	VideoConsumer.cpp		Захват изображения…
 Every 30 seconds	CodyCam		Каждые 30 секунд
@@ -42,7 +42,6 @@ CodyCam	System name		Вебкамера
 Every 24 hours	CodyCam		Каждые 24 часа
 unknown command	SettingsHandler		неизвестная команда
 Video settings	CodyCam		Настройка видео
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Не найден источник видеосигнала.\nПожалуйста, подключите вебкамеру.
 still image filename expected	CodyCam		укажите название изображения
 invalid upload client %ld\n	VideoConsumer.cpp		неправильный клиент загрузки: %ld\n
 Every 15 seconds	CodyCam		Каждые 15 секунд

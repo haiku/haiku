@@ -1,9 +1,10 @@
-1	swedish	x-vnd.Haiku-PackageInstaller	600665259
+1	swedish	x-vnd.Haiku-PackageInstaller	1943664225
 Install to:	PackageView		Installera till:
 OK	PackageView		OK
 Accept	PackageTextViewer		Acceptera
 No package selected.	UninstallView		Inga paket valda.
 Continue	PackageInstall		Fortsätt
+Remove	UninstallView		Ta bort
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Det valda paketet kunde inte installeras på ditt system. Det kan vara på grund av ett fel i paketet. Du bör kontakta paket-distributören om felet kvarstår.
 Image not loaded correctly	PackageImageViewer		Avbilden kunde inte läsas in korrekt
 No package selected.	PackageInfo		Inga paket valda.

@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-PSRV	123334776
+1	ukrainian	x-vnd.Be-PSRV	2930356711
 Undefined	ConfigWindow		Невизначений
 Return the number of available transports	PrintServerApp Scripting		Повернути число доступних транспортів
 Return the number of available printers	PrintServerApp Scripting		Повернути число доступних принтерів
@@ -8,7 +8,6 @@ Cancel	PrintServerApp		Відмінити
 Retrieve a specific printer	PrintServerApp Scripting		Відновити особливий принтер
 Page %1 to %2	ConfigWindow		Стор. %1 до %2
 Get name of the printer add-on used for this printer	Printer Scripting		Надати ім'я додатка для цього принтера
-Page setup:	ConfigWindow		Настройка сторінки:
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		Гаразд
 Cancel	ConfigWindow		Відмінити

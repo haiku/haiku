@@ -1,4 +1,4 @@
-1	slovenian	x-vnd.Haiku-HaikuDepot	3192425036
+1	slovenian	x-vnd.Haiku-HaikuDepot	1391952158
 Name	PackageListView		Ime
 Close	RatePackageWindow		Zapri
 Changelog	PackageInfoView		Zapisnik sprememb
@@ -12,7 +12,6 @@ Other users can see this rating	RatePackageWindow		Ostali uporabniki lahko vidij
 Stability	RatePackageWindow		Stabilnost
 for %Version%	PackageInfoView		za %Version%
 No changelog available.	PackageInfoView		Zapisnik sprememb ni na voljo.
-Depot:	FilterView		Zbirka:
 Description	PackageListView		Opis
 Install	PackageManager		Namesti
 Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Prijava ni uspela. Uporabiško ime ne obstaja ali pa je geslo napačno.
@@ -69,11 +68,9 @@ All categories	FilterView		Vse kategorije
 An error occurred while refreshing the repository: %error%	MainWindow		Prišlo je do napake med osveževanjem zbirke: %error%
 Login or Create account	MainWindow		Prijava ali ustvarjanje računa
 Pending…	PackageListView		V vrsti…
-Depot	FilterView		Zbirka
 OK	PackageInfoView		V redu
 Uninstalled	PackageListView		Odstranjen
 Stable	RatePackageWindow		Stabilen
-All depots	FilterView		Vse zbirke
 Comment language:	RatePackageWindow		Jezik komentarja:
 Authentication failed. Connection to the service failed.	UserLoginWindow		Prijava ni uspela. Povezava na storitev ni uspela.
 Cancel	RatePackageWindow		Prekliči

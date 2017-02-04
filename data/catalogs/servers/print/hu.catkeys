@@ -1,4 +1,4 @@
-1	hungarian	x-vnd.Be-PSRV	123334776
+1	hungarian	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		Nem meghatározott
 Return the number of available transports	PrintServerApp Scripting		Megadja az elérhető transzporterek számát
 Return the number of available printers	PrintServerApp Scripting		Megadja az elérhető nyomtatók számát
@@ -8,7 +8,6 @@ Cancel	PrintServerApp		Mégse
 Retrieve a specific printer	PrintServerApp Scripting		Megad egy válaszott nyomtatót
 Page %1 to %2	ConfigWindow		%1 - %2 oldal
 Get name of the printer add-on used for this printer	Printer Scripting		Megadja a nyomtatón használt nyomtatóbővítményt
-Page setup:	ConfigWindow		Oldalbeállítás:
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		Rendben
 Cancel	ConfigWindow		Mégse
@@ -18,6 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		Igen
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger
 Would you like to set one up now?	PrintServerApp		Szeretne beállítani egyet most?
+Print job setup:	ConfigWindow		Nyomtatási feladat beállításai:
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Álló
 All pages	ConfigWindow		Összes oldal

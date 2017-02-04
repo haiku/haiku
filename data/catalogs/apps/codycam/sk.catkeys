@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-CodyCam	2193838145
+1	slovak	x-vnd.Haiku-CodyCam	1888169680
 Upload…	VideoConsumer.cpp		Nahrať…
 Capturing Image…	VideoConsumer.cpp		Zachytáva sa obrázok…
 Every 30 seconds	CodyCam		Každých 30 sekúnd
@@ -42,7 +42,6 @@ CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		Každých 24 hodín
 unknown command	SettingsHandler		neznámy príkaz
 Video settings	CodyCam		Nastavenia videa
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Nedá sa nájsť zdroj videa. Aby ste mohli používať CodyCam, potrebujete webkameru.
 still image filename expected	CodyCam		očakával sa názov obrázka
 invalid upload client %ld\n	VideoConsumer.cpp		neplatný klient nahrávania %ld\n
 Every 15 seconds	CodyCam		Každých 15 sekúnd

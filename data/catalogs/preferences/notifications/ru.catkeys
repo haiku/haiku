@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-Notifications	3115872762
+1	russian	x-vnd.Haiku-Notifications	746652830
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Произошла ошибка при сохранении настроек.\nВозможно кончилось место на диске.
 Notifications	GeneralView		Уведомления
 seconds of inactivity	GeneralView		секунд бездействия
@@ -20,6 +20,7 @@ Display	PrefletView		Отображение
 Search:	NotificationView		Поиск:
 Allowed	NotificationView		Разрешено
 Yes	NotificationView		Да
+Last received	NotificationView		Последнее полученное
 Large icon	DisplayView		Большие значки
 Icon size:	DisplayView		Размер значков:
 Hide notifications from screen after	GeneralView		Скрывать уведомления после

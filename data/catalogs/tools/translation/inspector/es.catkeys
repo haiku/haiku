@@ -1,4 +1,4 @@
-1	spanish; castilian	x.vnd.OBOS-Inspector	2075781936
+1	spanish; castilian	x.vnd.OBOS-Inspector	1686702095
 User Translators	ActiveTranslatorsWindow		Convertidores del usuario
 No image available to save.	ImageWindow		No hay imágenes disponibles para guardar.
 Sorry, unable to write the image file.	ImageView		Perdón, no se pudo escribir el archivo de imagen.
@@ -15,9 +15,7 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 Save feature not implemented yet.	ImageWindow		Función de guardado no aplicado todavia.
 First Page	ImageWindow		Primera página
 Next Page	ImageWindow		Siguiente página
-Open...	ImageWindow		Abrir
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nConvertidor utilizado
-Save...	ImageWindow		Guardar...
 Info	ImageWindow		Información
 OK	ImageWindow		Aceptar
 Window	ImageWindow		Ventana

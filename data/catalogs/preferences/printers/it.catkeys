@@ -1,9 +1,7 @@
-1	italian	x-vnd.Be-PRNT	200447094
+1	italian	x-vnd.Be-PRNT	2279754695
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Stampante: %printer_name%\nDriver: %driver%\n
 Waiting	JobListView		In attesa
 Print test page	PrintersWindow		Stampa pagina di prova
-Test Page	TestPageView		Pagina di prova
-Test Page	PrintersWindow		Pagina di prova
 page	JobListView		pagina
 Cancel	AddPrinterDialog		Annulla
 Add printer	AddPrinterDialog		Aggiungi una stampante
@@ -11,14 +9,12 @@ Green	TestPageView		Verde
 Printers	PrintersWindow		Stampanti
 Default Printer	PrinterListView		Stampante predefinita
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
-No pending jobs.	PrinterListView		Nessuna stampa in coda.
 pages	JobListView		pagine
 Printers	System name		Stampanti
 Processing	JobListView		Esecuzione in corso
 Red	TestPageView		Rosso
 Printer name:	AddPrinterDialog		Nome della stampante:
 Driver: %driver%	PrinterListView		Driver: %driver%
- pending jobs.	PrinterListView		 stampe in coda.
 Black	TestPageView		Nero
 Restart job	PrintersWindow		Stampa nuovamente
 Add	AddPrinterDialog		Aggiungi
@@ -27,7 +23,6 @@ Transport: %transport% %transport_address%	TestPageView		Transport: %transport% 
 Cancel job	PrintersWindow		Annulla la stampa
 Yellow	TestPageView		Giallo
 Blue	TestPageView		Blu
-1 pending job.	PrinterListView		1 stampa in coda.
 Remove	PrintersWindow		Rimuovere
 <pick one>	AddPrinterDialog		<scegliere>
 Print jobs for 	PrintersWindow		Stampe di 

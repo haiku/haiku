@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x.vnd.OBOS-Inspector	2075781936
+1	portuguese (brazil)	x.vnd.OBOS-Inspector	1686702095
 User Translators	ActiveTranslatorsWindow		Tradutores do Usuário
 No image available to save.	ImageWindow		Nenhuma imagem disponível para salvar.
 Sorry, unable to write the image file.	ImageView		Desculpe, não foi possível gravar o arquivo de imagem.
@@ -15,9 +15,7 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 Save feature not implemented yet.	ImageWindow		Recurso salvo ainda não implementado.
 First Page	ImageWindow		Primeira Página
 Next Page	ImageWindow		Próxima página
-Open...	ImageWindow		Abrir...
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nTradutor usado:\nNome: %1\nInformações: %2\nVersão: %3\n
-Save...	ImageWindow		Salvar...
 Info	ImageWindow		Informações
 OK	ImageWindow		OK
 Window	ImageWindow		Janela

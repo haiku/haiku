@@ -1,10 +1,9 @@
-1	belarusian	x-vnd.Haiku-HaikuDepot	2996812689
+1	belarusian	x-vnd.Haiku-HaikuDepot	1722047333
 Name	PackageListView		Імя
 Changelog	PackageInfoView		Гісторыя зменаў
 Click a package to view information	PackageInfoView		Клікніце пакет каб пабачыць інфарамацыю пра яго
 for %Version%	PackageInfoView		для %Version%
 No changelog available.	PackageInfoView		Спіс змен не існуе
-Depot:	FilterView		Сховішча:
 Description	PackageListView		Апісанне
 Install	PackageManager		Усталяваць
 Tools	MainWindow		Прылады
@@ -19,7 +18,6 @@ Development	Model		Распрацоўка
 Fatal error	PackageManager		Фатальная памылка
 Ratings	PackageInfoView		Рэйтынг
 Inactive	PackageListView		Неактыўны
-Refresh depots	MainWindow		Перачытаць сховішчы
 Main Menu	MainWindow		Галоўнае меню
 (%Votes%)	PackageInfoView		(%Votes%)
 Downloading:	PackageInfoView		Спампоўваецца:
@@ -36,10 +34,8 @@ Close	MainWindow		Закрыць
 Video	Model		Відэа
 An error occurred while refreshing the repository: %error%	MainWindow		Падчас аднаўлення інфармацыі сховішчаў адбылася памылка: %error%
 Pending…	PackageListView		Чакае…
-Depot	FilterView		Сховішча
 Uninstalled	PackageListView		Выдаленныя
 Unknown	PackageListView		Невядомы
-All depots	FilterView		Усе сховішчы
 Available	PackageListView		Даступна
 n/a	PackageInfoView		н/н
 Send	RatePackageWindow		Даслаць

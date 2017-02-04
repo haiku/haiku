@@ -1,4 +1,4 @@
-1	belarusian	x-vnd.Haiku-CodyCam	183572276
+1	belarusian	x-vnd.Haiku-CodyCam	4172871107
 Capturing Image…	VideoConsumer.cpp		Захват выявы…
 Every 30 seconds	CodyCam		Кожныя 30 секунд
 File name:	CodyCam		Імя файла:
@@ -41,7 +41,6 @@ CodyCam	System name		Камера
 Every 24 hours	CodyCam		Кожныя 24 гадзіны
 unknown command	SettingsHandler		невядомая каманда
 Video settings	CodyCam		Наладкі відэа
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Немагчыма запусціць крыніцу відэа. Вам патрэбна вэб-камера.
 still image filename expected	CodyCam		імя файла статычнай выявы чаканае
 invalid upload client %ld\n	VideoConsumer.cpp		няправільны кліент загрузкі %ld\n
 Every 15 seconds	CodyCam		Кожныя 15 секунд

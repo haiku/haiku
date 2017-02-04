@@ -1,10 +1,9 @@
-1	lithuanian	x-vnd.Haiku-ActivityMonitor	1881407198
+1	lithuanian	x-vnd.Haiku-ActivityMonitor	581504566
 P-faults	DataSource		Psl. klaidos
 Threads	DataSource		Gijos
 Always on top	ActivityWindow		Visada viršuje
 Add graph	ActivityWindow		Pridėti grafiką
 Teams	DataSource		Procesų grupės
-Hide legend	ActivityView		Nerodyti legendos
 MiB	DataSource		MiB
 Network send	DataSource		Išsiunčiami duomenys
 CPU usage (combined)	DataSource		Centrinio procesoriaus apkrova (kompleksinė)

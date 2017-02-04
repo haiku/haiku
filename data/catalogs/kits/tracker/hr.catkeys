@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-libtracker	3333602726
+1	croatian	x-vnd.Haiku-libtracker	57535563
 OK	WidgetAttributeText		U redu
 Add-ons	FilePanelPriv		Dodaci
 Mount settings…	ContainerWindow		Postavke za montiranje...
@@ -265,7 +265,6 @@ Get info	FilePanelPriv		Uzmi infomacije
 Cancel	FilePanelPriv		Odustani
 Disks	DirMenu		Diskovi
 New folder %ld	FSUtils		Nova mapa %ld
-All BeOS disks	AutoMounterSettings		Svi BeOS diskovi
 Used space color	SettingsView		Boja korišrenog prostora
 Sorry, could not create a new folder.	FSUtils		Žao nam je, nemožete napraviti novu mapu.
 multiple disks	FindPanel		više diskova

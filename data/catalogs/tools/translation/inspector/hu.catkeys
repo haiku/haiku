@@ -1,4 +1,4 @@
-1	hungarian	x.vnd.OBOS-Inspector	2075781936
+1	hungarian	x.vnd.OBOS-Inspector	577867100
 User Translators	ActiveTranslatorsWindow		Felhasználói értelmezők
 No image available to save.	ImageWindow		Nincs menthető kép.
 Sorry, unable to write the image file.	ImageView		Nem sikerült a képfájl írása.
@@ -15,9 +15,7 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 Save feature not implemented yet.	ImageWindow		A mentés funkció még nincs megvalósítva.
 First Page	ImageWindow		Első oldal
 Next Page	ImageWindow		Következő oldal
-Open...	ImageWindow		Megnyitás…
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nHasznált értelmező:\nNév: %1\nInfó: %2\nVerzió: %3\n
-Save...	ImageWindow		Mentés…
 Info	ImageWindow		Infó
 OK	ImageWindow		Rendben
 Window	ImageWindow		Ablak
@@ -25,8 +23,10 @@ Quit	ImageWindow		Kilépés
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Kiválasztott Dokumentum: %1\n\nHasznált értelmező:\nNév: %2\nInfó: %3\nVerzió: %4\n
 Active Translators	ImageWindow		Aktív fordítók
 View	ImageWindow		Nézet
+Open…	ImageWindow		Megnyitás…
 Previous Page	ImageWindow		Előző oldal
 OK	ImageView		Rendben
 System Translators	ActiveTranslatorsWindow		Rendszer értelemzők
+Save…	ImageWindow		Mentés…
 Unknown	ImageView		Ismeretlen
 File	ImageWindow		Fájl

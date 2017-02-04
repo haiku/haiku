@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Be-PSRV	123334776
+1	japanese	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		未定義
 Return the number of available transports	PrintServerApp Scripting		トランスポートの数を取得
 Return the number of available printers	PrintServerApp Scripting		プリンターの数を取得
@@ -8,7 +8,6 @@ Cancel	PrintServerApp		中止
 Retrieve a specific printer	PrintServerApp Scripting		特定のプリンターを取得
 Page %1 to %2	ConfigWindow		ページ %1 からページ %2 まで
 Get name of the printer add-on used for this printer	Printer Scripting		このプリンターが使うプリンターアドオンを取得
-Page setup:	ConfigWindow		ページ設定:
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	JIS B5 (182 x 257 mm)
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		中止
@@ -18,6 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		はい
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ledger (432 x 279 mm)
 Would you like to set one up now?	PrintServerApp		プリンターを追加しますか？
+Print job setup:	ConfigWindow		印刷ジョブ設定:
 A6	ConfigWindow	ISO 216 paper size	A6 (105 x 148 mm)
 Portrait	ConfigWindow		縦
 All pages	ConfigWindow		全ページ

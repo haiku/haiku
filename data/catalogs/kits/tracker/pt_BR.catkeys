@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Haiku-libtracker	545841200
+1	portuguese (brazil)	x-vnd.Haiku-libtracker	1564741333
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Adicionais
 Mount settings…	ContainerWindow		Configurações de montagem...
@@ -316,7 +316,6 @@ Cancel	FilePanelPriv		Cancelar
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		O aplicativo \"%appname\" não suporta o tipo de documento que está prestes a abrir.\nEstá seguro de que deseja prosseguir?\n\nSe você sabe que o aplicativo suporta o tipo de documento, deve contatar o publicador do aplicativo e solicitar para atualizá-lo, de maneira a listar o tipo do seu documento como suportado.
 Disks	DirMenu		Discos
 New folder %ld	FSUtils		Nova pasta %ld
-All BeOS disks	AutoMounterSettings		Todos os discos BeOS
 Used space color	SettingsView		Espaco de cor utilizado
 Sorry, could not create a new folder.	FSUtils		Desculpe, não foi possível criar uma nova pasta.
 Disk mount	TrackerSettingsWindow		Montagem de disco

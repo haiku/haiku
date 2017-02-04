@@ -1,4 +1,4 @@
-1	japanese	x-vnd.Haiku-CodyCam	2193838145
+1	japanese	x-vnd.Haiku-CodyCam	3408488515
 Upload…	VideoConsumer.cpp		アップロード…
 Capturing Image…	VideoConsumer.cpp		画像を取得中…
 Every 30 seconds	CodyCam		30 秒ごと
@@ -42,7 +42,6 @@ CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		24 時間ごと
 unknown command	SettingsHandler		不明なコマンドです
 Video settings	CodyCam		ビデオ設定
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		ビデオソースが見つかりません。CodyCam を使うには webcam が必要です。
 still image filename expected	CodyCam		イメージのファイル名を入力してください
 invalid upload client %ld\n	VideoConsumer.cpp		アップロードクライアント %ld が正しくありません\n
 Every 15 seconds	CodyCam		15 秒ごと
@@ -77,6 +76,7 @@ cmd: '%s'\n	FtpClient		コマンド: '%s'\n
 Never	CodyCam		中止
 Cannot create a video window	CodyCam		ビデオウィンドウを作成できません
 Every 10 minutes	CodyCam		10 分ごと
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		ビデオソースが見つかりません。\nCodyCam を使うには webcam が必要です。
 Cannot start the video source	CodyCam		ビデオソースを開始できません
 Cannot start the video window	CodyCam		ビデオウィンドウを開始できません
 password expected	CodyCam		パスワードを入力してください

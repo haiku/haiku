@@ -1,4 +1,4 @@
-1	croatian	x-vnd.Haiku-CodyCam	4144146144
+1	croatian	x-vnd.Haiku-CodyCam	3838477679
 Upload…	VideoConsumer.cpp		Pošalji...
 Every 30 seconds	CodyCam		Svakih 30 sekunda
 File name:	CodyCam		Ime datoteke:
@@ -32,7 +32,6 @@ CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		Svaka 24 sata
 unknown command	SettingsHandler		nepoznata naredba
 Video settings	CodyCam		Video postavke
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Ne mogu naći video izvor.Treba vam web kamera da biste koristili CodyCam.
 invalid upload client %ld\n	VideoConsumer.cpp		neispravni klijent slanja %ld\n
 Every 15 seconds	CodyCam		Svakih 15 sekundi
 Error writing output file	VideoConsumer.cpp		Greška pri pisanju izlazne datoteke

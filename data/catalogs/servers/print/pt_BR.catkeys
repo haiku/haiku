@@ -1,4 +1,4 @@
-1	portuguese (brazil)	x-vnd.Be-PSRV	123334776
+1	portuguese (brazil)	x-vnd.Be-PSRV	2930356711
 Undefined	ConfigWindow		Indefinido
 Return the number of available transports	PrintServerApp Scripting		Mostrar o número de transportes disponíveis
 Return the number of available printers	PrintServerApp Scripting		Mostrar o número de impressoras disponíveis
@@ -8,7 +8,6 @@ Cancel	PrintServerApp		Cancelar
 Retrieve a specific printer	PrintServerApp Scripting		Obter uma impressora específica
 Page %1 to %2	ConfigWindow		Página %1 até %2
 Get name of the printer add-on used for this printer	Printer Scripting		Obter o nome de um adicional usado para esta impressora
-Page setup:	ConfigWindow		Configurações de página:
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		OK
 Cancel	ConfigWindow		Cancelar

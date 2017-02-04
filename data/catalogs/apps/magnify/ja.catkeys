@@ -1,18 +1,18 @@
-1	japanese	x-vnd.Haiku-Magnify	2046693978
+1	japanese	x-vnd.Haiku-Magnify	931164741
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		クリップボードにコピーされていません\n
 Make square	Magnify-Main		正方形を作成
 Copy image	Magnify-Main		イメージをコピー
 usage: magnify [size] (magnify size * size pixels)\n	Console		usage: magnify [size] (magnify size * size pixels)\n
+Freeze image	Magnify-Main		画像を固定
 Stick coordinates	Magnify-Main		座標を固定
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# ピクセル/ピクセル} other{# ピクセル/ピクセル}}
-Hide/Show grid	Magnify-Main		グリッドの表示 / 非表示
+Show info	Magnify-Main		情報の表示
 magnify: size must be a multiple of 4\n	Console		拡大鏡: サイズは 4 の倍数でなければなりません\n
 Decrease pixel size	Magnify-Main		ピクセルサイズを小さく
 Magnify	System name		拡大鏡
 Info	Magnify-Main		情報
 Remove a crosshair	Magnify-Main		十字カーソルを削除
-Freeze/Unfreeze image	Magnify-Main		イメージを固定 / 固定解除
-Hide/Show info	Magnify-Main		情報の表示 / 非表示
+Show grid	Magnify-Main		グリッドの表示
 Save image	Magnify-Main		イメージを保存
 Increase window size	Magnify-Main		ウィンドウを大きく
 Decrease window size	Magnify-Main		ウィンドウを小さく

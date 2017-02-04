@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	671778905
+1	german	x-vnd.Haiku-libtracker	1690679038
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-ons
 Mount settings…	ContainerWindow		Einhänge-Einstellungen…
@@ -350,7 +350,6 @@ Cancel	FilePanelPriv		Abbrechen
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Die Anwendung \"%appname\" unterstützt das zu öffnende Dateiformat nicht.\nTrotzdem fortfahren?\n\nKann die Anwendung dieses Dateiformat tatsächlich öffnen, sollte dessen Hersteller kontaktiert werden, damit das Format beim nächsten Update gleich als unterstützt erkannt wird.
 Disks	DirMenu		Datenträger
 New folder %ld	FSUtils		Neuer Ordner %ld
-All BeOS disks	AutoMounterSettings		Alle BeOS-Datenträger
 Used space color	SettingsView		Farbe für benutzten Speicher
 Sorry, could not create a new folder.	FSUtils		Der neue Ordner konnte leider nicht erstellt werden.
 Disk mount	TrackerSettingsWindow		Datenträger einhängen

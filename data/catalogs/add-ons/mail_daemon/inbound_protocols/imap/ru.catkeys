@@ -1,5 +1,5 @@
 1	russian	x-vnd.Haiku-IMAP	354143849
-Destination:	imap_config		Папка:
+Destination:	imap_config		Каталог сохранения:
 Ok	IMAPFolderConfig		OK
 status	IMAPFolderConfig		статус
 Configure IMAP Folders	imap_config		Настроить папки IMAP

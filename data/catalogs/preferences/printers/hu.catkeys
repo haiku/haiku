@@ -1,25 +1,24 @@
-1	hungarian	x-vnd.Be-PRNT	2163275033
+1	hungarian	x-vnd.Be-PRNT	686411231
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Nyomtató: %printer_name%\nVezérlő: %driver%\n
 Waiting	JobListView		Várakozás
 Print test page	PrintersWindow		Tesztoldal nyomtatása
-Test Page	TestPageView		Tesztoldal
-Test Page	PrintersWindow		Tesztoldal
+ pending jobs	PrinterListView		 függő feladat
 page	JobListView		oldal
 Cancel	AddPrinterDialog		Mégse
+Test page	PrintersWindow		Tesztoldal
 Add printer	AddPrinterDialog		Nyomtató hozzáadása
 Green	TestPageView		Zöld
 Printers	PrintersWindow		Nyomtatók
 Add…	PrintersWindow		Hozzáadás…
+No pending jobs	PrinterListView		Nincs függő feladat
 Default Printer	PrinterListView		Alapértelmezett nyomtató
 Transport: %transport% %transport_address%	PrinterListView		Csatlakozás: %transport% %transport_address%
-No pending jobs.	PrinterListView		Nincs függő feladat.
 pages	JobListView		oldal
 Printers	System name		Nyomtatók
 Processing	JobListView		Feldolgozás
 Red	TestPageView		Vörös
 Printer name:	AddPrinterDialog		Nyomtató neve:
 Driver: %driver%	PrinterListView		Vezérlő: %driver%
- pending jobs.	PrinterListView		 függő feladat.
 Black	TestPageView		Fekete
 Restart job	PrintersWindow		Feladat újraindítása
 Add	AddPrinterDialog		Hozzáadás
@@ -28,7 +27,6 @@ Transport: %transport% %transport_address%	TestPageView		Csatlakozás: %transpor
 Cancel job	PrintersWindow		Feladat visszavonása
 Yellow	TestPageView		Sárga
 Blue	TestPageView		Kék
-1 pending job.	PrinterListView		1 függő feladat.
 Remove	PrintersWindow		Eltávolítás
 <pick one>	AddPrinterDialog		<válasszon egyet>
 Print jobs for 	PrintersWindow		Feladat lista: 
@@ -40,5 +38,7 @@ No printer found!	TransportMenu		Nem található nyomtató!
 Print jobs: No printer selected	PrintersWindow		Feladatok: nincs nyomtató kiválasztva
 Cyan	TestPageView		Cián
 Unknown status	JobListView		Ismeretlen állapot
+1 pending job	PrinterListView		1 függő feladat
 Connected to:	AddPrinterDialog		Csatlakozás:
 Printer type:	AddPrinterDialog		Nyomtató típusa:
+Test page	TestPageView		Tesztoldal

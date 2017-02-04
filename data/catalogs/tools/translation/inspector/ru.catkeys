@@ -1,4 +1,4 @@
-1	russian	x.vnd.OBOS-Inspector	2075781936
+1	russian	x.vnd.OBOS-Inspector	1686702095
 User Translators	ActiveTranslatorsWindow		Пользовательские трансляторы
 No image available to save.	ImageWindow		Нет изображения для сохранения.
 Sorry, unable to write the image file.	ImageView		К сожалению, не удалось записать изображения файл.
@@ -15,9 +15,7 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 Save feature not implemented yet.	ImageWindow		Функция сохранения пока не реализована.
 First Page	ImageWindow		Первая страница
 Next Page	ImageWindow		Следующая страница
-Open...	ImageWindow		Открыть…
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nИспользованный транслятор:\nИмя: %1\nИнформация: %2\nВерсия: %3\n
-Save...	ImageWindow		Сохранить…
 Info	ImageWindow		Информация
 OK	ImageWindow		ОК
 Window	ImageWindow		Окно

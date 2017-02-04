@@ -1,9 +1,7 @@
-1	ukrainian	x-vnd.Be-PRNT	200447094
+1	ukrainian	x-vnd.Be-PRNT	2279754695
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Waiting	JobListView		Очікування
 Print test page	PrintersWindow		Друк пробної сторінки
-Test Page	TestPageView		Пробна сторінка
-Test Page	PrintersWindow		Пробна сторінка
 page	JobListView		стор.
 Cancel	AddPrinterDialog		Відмінити
 Add printer	AddPrinterDialog		Додати принтер
@@ -11,14 +9,12 @@ Green	TestPageView		Зелений
 Printers	PrintersWindow		Принтери
 Default Printer	PrinterListView		Принтер по замовчуванню
 Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
-No pending jobs.	PrinterListView		Немає черги завдань.
 pages	JobListView		Стор.
 Printers	System name		Принтери
 Processing	JobListView		Виконання
 Red	TestPageView		Червоний
 Printer name:	AddPrinterDialog		Ім'я принтера:
 Driver: %driver%	PrinterListView		Драйвер: %driver%
- pending jobs.	PrinterListView		 Немає завдань в черзі.
 Black	TestPageView		Чорний
 Restart job	PrintersWindow		Перезапустити завдання
 Add	AddPrinterDialog		Додати
@@ -27,7 +23,6 @@ Transport: %transport% %transport_address%	TestPageView		Транспорт: %tr
 Cancel job	PrintersWindow		Відмінити завдання
 Yellow	TestPageView		Жовтий
 Blue	TestPageView		Синій
-1 pending job.	PrinterListView		1 завдання в черзі.
 Remove	PrintersWindow		Видалити
 <pick one>	AddPrinterDialog		<виберіть>
 Print jobs for 	PrintersWindow		Завдання на друк для

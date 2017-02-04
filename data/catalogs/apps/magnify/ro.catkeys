@@ -1,18 +1,15 @@
-1	romanian	x-vnd.Haiku-Magnify	2046693978
+1	romanian	x-vnd.Haiku-Magnify	3799879913
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		niciun clip msg\n
 Make square	Magnify-Main		Alcătuiește pătrat
 Copy image	Magnify-Main		Copiază imagine
 usage: magnify [size] (magnify size * size pixels)\n	Console		usage: magnify [size] (magnify size * size pixels)\n
 Stick coordinates	Magnify-Main		Lipește coordonate
 %width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixeli/pixel}}
-Hide/Show grid	Magnify-Main		Ascunde/Afișează grilă
 magnify: size must be a multiple of 4\n	Console		lupă: dimensiunea trebuie să fie multiplu de 4\n
 Decrease pixel size	Magnify-Main		Micșorează dimensiune pixel
 Magnify	System name		Lupă
 Info	Magnify-Main		Info
 Remove a crosshair	Magnify-Main		Elimină un reticul
-Freeze/Unfreeze image	Magnify-Main		Îngheață/Dezgheață imagine
-Hide/Show info	Magnify-Main		Ascunde/Afișează info
 Save image	Magnify-Main		Salvează imagine
 Increase window size	Magnify-Main		Mărește dimensiune fereastră
 Decrease window size	Magnify-Main		Micșorează dimensiune fereastră

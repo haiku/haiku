@@ -1,11 +1,10 @@
-1	ukrainian	x-vnd.Haiku-ActivityMonitor	2455521641
+1	ukrainian	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		Р-помилки
 Media nodes	DataSource		Мультимедійні вузли
 Threads	DataSource		Потоки
 Always on top	ActivityWindow		Завжди зверху
 Add graph	ActivityWindow		Додати графік
 Teams	DataSource		Команди
-Hide legend	ActivityView		Сховати легенду
 MiB	DataSource		МіБ
 Network send	DataSource		Відправлено по мережі
 CPU usage (combined)	DataSource		Використання СPU (загальне)

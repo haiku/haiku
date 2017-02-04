@@ -1,9 +1,7 @@
-1	belarusian	x-vnd.Be-PRNT	200447094
+1	belarusian	x-vnd.Be-PRNT	2279754695
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Прынтэр: %printer_name%\nДрайвер:  %driver%\n
 Waiting	JobListView		Чаканне
 Print test page	PrintersWindow		Надрукаваць тэставую старонку
-Test Page	TestPageView		Тэставая старонка
-Test Page	PrintersWindow		Тэставая старонка
 page	JobListView		старонка
 Cancel	AddPrinterDialog		Адмена
 Add printer	AddPrinterDialog		Дадаць прынтэр
@@ -11,14 +9,12 @@ Green	TestPageView		Зялёны
 Printers	PrintersWindow		Прынтэры
 Default Printer	PrinterListView		Прадвызначаны прынтэр
 Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
-No pending jobs.	PrinterListView		Няма заданняў у чарзе.
 pages	JobListView		старонкаў
 Printers	System name		Прынтэры
 Processing	JobListView		Апрацоўка
 Red	TestPageView		Чырвоны
 Printer name:	AddPrinterDialog		Імя прынтэра:
 Driver: %driver%	PrinterListView		Драйвер: %driver%
- pending jobs.	PrinterListView		 заданні ў чарзе.
 Black	TestPageView		Чорны
 Restart job	PrintersWindow		Пачаць нанова
 Add	AddPrinterDialog		Дадаць
@@ -27,7 +23,6 @@ Transport: %transport% %transport_address%	TestPageView		Транспарт: %tr
 Cancel job	PrintersWindow		Адмяніць заданне
 Yellow	TestPageView		Жоўты
 Blue	TestPageView		Сіні
-1 pending job.	PrinterListView		1 заданне ў чарзе.
 Remove	PrintersWindow		Выдаліць
 <pick one>	AddPrinterDialog		<выберыце адно>
 Print jobs for 	PrintersWindow		Заданні друку для 

@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-HaikuDepot	2365524674
+1	slovak	x-vnd.Haiku-HaikuDepot	1090759318
 Name	PackageListView		Názov
 Available packages	MainWindow		Dostupné balíky
 Open %DeskbarLink%	PackageManager		Otvoriť %DeskbarLink%
@@ -15,7 +15,6 @@ Other users can see this rating	RatePackageWindow		Toto hodnotenie uvidia aj in�
 Stability	RatePackageWindow		Stabilita
 for %Version%	PackageInfoView		%Version%
 No changelog available.	PackageInfoView		Záznam zmien nie je dostupný.
-Depot:	FilterView		Zdroj:
 Description	PackageListView		Popis
 Install	PackageManager		Nainštalovať
 Source packages	MainWindow		Zdrojové balíky
@@ -56,7 +55,6 @@ Ratings	PackageInfoView		Hodnotenia
 But none could be listed here, sorry.	UserLoginWindow		Ale žiadne tu nebolo možné uviesť, ľutujeme.
 System & Utilities	Model		Systém a nástroje
 Inactive	PackageListView		Neaktívne
-Refresh depots	MainWindow		Obnoviť zdroje
 The package action could not be scheduled: %Error%	PackageInfoView		Operáciu s balíkom nebolo možné naplánovať: %Error%
 Science & Mathematics	Model		Veda a matematika
 Main Menu	MainWindow		Hlavné menu
@@ -115,14 +113,12 @@ An error occurred while refreshing the repository: %error%	MainWindow		Vyskytla 
 Try again	App		Skúsiť znova
 Login or Create account	MainWindow		Prihlásiť sa alebo Vytvoriť účet
 Pending…	PackageListView		Čaká sa…
-Depot	FilterView		Zdroj
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# položka} few{# položky} other{# položiek}}
 OK	PackageInfoView		OK
 Uninstalled	PackageListView		Odinštalované
 Show	MainWindow		Zobraziť
 Stable	RatePackageWindow		Stabilný
 Unknown	PackageListView		Neznámy
-All depots	FilterView		Všetky repozitáre
 Comment language:	RatePackageWindow		Jazyk komentára:
 Pass phrase:	UserLoginWindow		Heslo:
 Screenshot	ScreenshotWindow		Snímka obrazovky

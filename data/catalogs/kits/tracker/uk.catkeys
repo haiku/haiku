@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libtracker	3515649859
+1	ukrainian	x-vnd.Haiku-libtracker	239582696
 OK	WidgetAttributeText		Гаразд
 Add-ons	FilePanelPriv		Додатки
 Desktop	Model		Робочий стіл
@@ -308,7 +308,6 @@ Cancel	FilePanelPriv		Відмінити
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Програма \"%appname\" не підтримує відкриття документів даного типу.\nВи дійсно бажаєте відкрити документ в ній?\n\nЯкщо ви знаєте, що програма підтримує цей тип документів, то рекомендуємо зв'язатися с розробниками програми і попросити їх обновити список типів, які підтримуються нею.
 Disks	DirMenu		Диски
 New folder %ld	FSUtils		Нова папка %ld
-All BeOS disks	AutoMounterSettings		Всі диски BeOS
 Used space color	SettingsView		Колір області використання
 Sorry, could not create a new folder.	FSUtils		Вибачте, не вдалося створити нову папку
 multiple disks	FindPanel		помножити диски

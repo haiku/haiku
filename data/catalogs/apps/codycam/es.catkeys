@@ -1,4 +1,4 @@
-1	spanish; castilian	x-vnd.Haiku-CodyCam	2193838145
+1	spanish; castilian	x-vnd.Haiku-CodyCam	1888169680
 Upload…	VideoConsumer.cpp		Subir…
 Capturing Image…	VideoConsumer.cpp		Capturando imagen...
 Every 30 seconds	CodyCam		Cada 30 segundos
@@ -42,7 +42,6 @@ CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		Cada 24 horas
 unknown command	SettingsHandler		comando desconocido
 Video settings	CodyCam		Configuración de vídeo
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		No se puede encontrar una fuente de vídeo. Necesita una cámara web para usar CodyCam
 still image filename expected	CodyCam		se esperaba nombre de archivo de imagen
 invalid upload client %ld\n	VideoConsumer.cpp		cliente de carga invalido %ld\n
 Every 15 seconds	CodyCam		Cada 15 segundos

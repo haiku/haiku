@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-PackageInstaller	1689226164
+1	russian	x-vnd.Haiku-PackageInstaller	1257399046
 Install to:	PackageView		Установить в:
 OK	PackageView		ОК
 Accept	PackageTextViewer		Принять
@@ -49,6 +49,7 @@ The file named '%s' already exits in the given path.\nReplace the file with the 
 All existing files will be skipped?	PackageView		Все существующие файлы будут заменены?
 Continue	PackageInfo		Продолжить
 %index% of %total%	PackageInstall		%index% из %total%
+The package you selected has been successfully removed from your system.	UninstallView		Выбранный пакет был успешно удалён из системы.
 Abort	PackageInfo		Прервать
 PackageInstaller	System name		Установщик пакетов
 Abort	PackageInstall		Прервать

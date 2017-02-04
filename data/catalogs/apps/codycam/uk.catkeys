@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-CodyCam	183572276
+1	ukrainian	x-vnd.Haiku-CodyCam	4172871107
 Capturing Image…	VideoConsumer.cpp		Захоплення зображення…
 Every 30 seconds	CodyCam		Кожні 30 секунд
 File name:	CodyCam		Ім’я файлу:
@@ -41,7 +41,6 @@ CodyCam	System name		Вебкамера
 Every 24 hours	CodyCam		Кожні 24 години
 unknown command	SettingsHandler		невідома команда
 Video settings	CodyCam		Налаштування відео
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Не знайдено відео-джерело. Для використання CodyCam потрібна вебкамера.
 still image filename expected	CodyCam		вкажіть назву зображення
 invalid upload client %ld\n	VideoConsumer.cpp		неналежний клієнт вивантаження %ld\n
 Every 15 seconds	CodyCam		Кожні 15 секунд

@@ -1,17 +1,14 @@
-1	spanish; castilian	x-vnd.Haiku-Magnify	233476436
+1	spanish; castilian	x-vnd.Haiku-Magnify	1986662371
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		ningún mensaje de clip\n
 Make square	Magnify-Main		Crear cuadrado
 Copy image	Magnify-Main		Copiar imagen
 usage: magnify [size] (magnify size * size pixels)\n	Console		uso: magnify [tamaño] (tamaño de ampliar * tamaño de píxeles)\n
 Stick coordinates	Magnify-Main		Pegar coordenadas
-Hide/Show grid	Magnify-Main		Escoger/Mostrar cuadriculado
 magnify: size must be a multiple of 4\n	Console		magnify: el tamaño debe ser un múltiplo de 4\n
 Decrease pixel size	Magnify-Main		Disminuir tamaño del píxel
 Magnify	System name		Aumentar
 Info	Magnify-Main		Información
 Remove a crosshair	Magnify-Main		Eliminar un punto de mira
-Freeze/Unfreeze image	Magnify-Main		Congelar/Descongelar imagen
-Hide/Show info	Magnify-Main		Esconder/Mostrar información
 Save image	Magnify-Main		Guardar imagen
 Increase window size	Magnify-Main		Aumentar tamaño de ventana
 Decrease window size	Magnify-Main		Disminuir tamaño de ventana

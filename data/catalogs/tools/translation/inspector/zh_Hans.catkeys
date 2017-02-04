@@ -1,4 +1,4 @@
-1	english	x.vnd.OBOS-Inspector	2075781936
+1	english	x.vnd.OBOS-Inspector	1686702095
 User Translators	ActiveTranslatorsWindow		用户翻译器
 No image available to save.	ImageWindow		无图像可用于保存。
 Sorry, unable to write the image file.	ImageView		对不起，无法写入图像文件。
@@ -15,9 +15,7 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 Save feature not implemented yet.	ImageWindow		保存特性还未实现。
 First Page	ImageWindow		第一页
 Next Page	ImageWindow		下一页
-Open...	ImageWindow		打开...
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\n已用翻译器：\n名称：%1\n信息：%2\n版本：%3\n
-Save...	ImageWindow		保存...
 Info	ImageWindow		信息
 OK	ImageWindow		确定
 Window	ImageWindow		窗口

@@ -2,6 +2,6 @@
 or empty e-mail	SpamFilterConfig		или пустое письмо
 Genuine below and uncertain above:	SpamFilterConfig		Достоверно ниже и неточно выше:
 Spam above:	SpamFilterConfig		Спам выше:
-Add spam rating to start of subject	SpamFilterConfig		Добавить спам-рейтинг к начало темы
+Add spam rating to start of subject	SpamFilterConfig		Добавить рейтинг спама к началу темы
 Bayesian Spam Filter	SpamFilter		Байесовский спам-фильтр
 Learn from all incoming e-mail	SpamFilterConfig		Обучаться на всех входящих письмах

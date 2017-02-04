@@ -1,10 +1,12 @@
-1	hungarian	x-vnd.Haiku-HaikuDepot	2365524674
+1	hungarian	x-vnd.Haiku-HaikuDepot	1527149765
 Name	PackageListView		Név
 Available packages	MainWindow		Elérhető csomagok
 Open %DeskbarLink%	PackageManager		%DeskbarLink% megnyitása
+Repository	FilterView		Csomagtároló
 Close	RatePackageWindow		Bezárás
 The captcha puzzle needs to be solved.	UserLoginWindow		A kapta kód megadása szükséges.
 Changelog	PackageInfoView		Változásnapló
+Repository:	FilterView		Csomagtároló:
 Your rating:	RatePackageWindow		Saját értékelés:
 The passwords do not match.	UserLoginWindow		A jelszavak nem egyeznek.
 Log in…	MainWindow		Bejelentkezés…
@@ -15,7 +17,6 @@ Other users can see this rating	RatePackageWindow		A többi felhasználó szám�
 Stability	RatePackageWindow		Stabilitás
 for %Version%	PackageInfoView		%Version% verzióhoz
 No changelog available.	PackageInfoView		Nincs módosítás-előzmény
-Depot:	FilterView		Raktár:
 Description	PackageListView		Leírás
 Install	PackageManager		Telepítés
 Source packages	MainWindow		Forráskód csomagok
@@ -32,6 +33,7 @@ Your rating was updated successfully.	RatePackageWindow		Az értékelés elküld
 <no info>	PackageInfoView		<nincs információ>
 Starting the package daemon failed:\n\n%Error%	App		A csomag démon indítása sikertelen:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Hiba történt a csomagkezelő indításakor: %message%
+All repositories	FilterView		Minden csomagtár
 Email address:	UserLoginWindow		E-mail cím:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Az értékelés elküldve. A későbbiekben bármikor módosítható, csupán újra értékelni kell a csomagot.
 Very unstable	RatePackageWindow		Nagyon instabil
@@ -56,7 +58,6 @@ Ratings	PackageInfoView		Értékelés
 But none could be listed here, sorry.	UserLoginWindow		A felsoroltak közül egyik sem használható.
 System & Utilities	Model		Rendszer és eszközök
 Inactive	PackageListView		Inaktív
-Refresh depots	MainWindow		Raktárak frissítése
 The package action could not be scheduled: %Error%	PackageInfoView		A csomaggal történő művelet nem ütemezhető be: %Error%
 Science & Mathematics	Model		Tudomány és matematika
 Main Menu	MainWindow		Főmenü
@@ -104,6 +105,7 @@ Close	MainWindow		Bezárás
 Preferred language:	UserLoginWindow		Előnyben részesített nyelv:
 Failed to rate package	RatePackageWindow		A csomag értékelése sikertelen
 Internet & Network	Model		Internet és hálózat
+Refresh repositories	MainWindow		Tárolók frissítése
 Cancel	MainWindow		Mégse
 Quit HaikuDepot	App		Raktár bezárása
 Input validation	UserLoginWindow		Bevitel érvényesítése
@@ -115,14 +117,12 @@ An error occurred while refreshing the repository: %error%	MainWindow		Hiba tör
 Try again	App		Próbálja újra
 Login or Create account	MainWindow		Belépés vagy fiók létrehozása
 Pending…	PackageListView		Folyamatban…
-Depot	FilterView		Raktár
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# elem} other{# elem}}
 OK	PackageInfoView		Rendben
 Uninstalled	PackageListView		Eltávolítva
 Show	MainWindow		Megjelenítés
 Stable	RatePackageWindow		Stabil
 Unknown	PackageListView		Ismeretlen
-All depots	FilterView		Összes raktár
 Comment language:	RatePackageWindow		Hozzászólás nyelve:
 Pass phrase:	UserLoginWindow		Jelszó:
 Screenshot	ScreenshotWindow		Képernyőkép
@@ -143,6 +143,7 @@ Failed to create account	UserLoginWindow		Nem sikerült a fiók létrehozása
 There are problems with the data you entered:\n\n	UserLoginWindow		Tévesen megadott adatok:\n\n
 Featured packages	MainWindow		Ajánlott csomagok
 Start package daemon	App		Csomag démon indítása
+Manage repositories…	MainWindow		Csomagtárolók kezelése…
 Success	RatePackageWindow		Sikeres
 Business	Model		Üzleti
 Audio	Model		Audió

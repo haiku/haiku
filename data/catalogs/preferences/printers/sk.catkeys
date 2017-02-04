@@ -1,9 +1,7 @@
-1	slovak	x-vnd.Be-PRNT	2163275033
+1	slovak	x-vnd.Be-PRNT	4242582634
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tlačiareň: %printer_name%\nOvládač:  %driver%\n
 Waiting	JobListView		Čaká sa
 Print test page	PrintersWindow		Vytlačiť testovaciu stránku
-Test Page	TestPageView		Testovacia stránka
-Test Page	PrintersWindow		Testovacia stránka
 page	JobListView		strana
 Cancel	AddPrinterDialog		Zrušiť
 Add printer	AddPrinterDialog		Pridať tlačiareň
@@ -12,14 +10,12 @@ Printers	PrintersWindow		Tlačiarne
 Add…	PrintersWindow		Pridať…
 Default Printer	PrinterListView		Predvolená tlačiareň
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
-No pending jobs.	PrinterListView		Žiadne úlohy vo fronte.
 pages	JobListView		strany
 Printers	System name		Tlačiarne
 Processing	JobListView		Prebieha spracovanie
 Red	TestPageView		Červená
 Printer name:	AddPrinterDialog		Názov tlačiarene:
 Driver: %driver%	PrinterListView		Ovládač: %driver%
- pending jobs.	PrinterListView		 úloh vo fronte.
 Black	TestPageView		Čierna
 Restart job	PrintersWindow		Reštartovať úlohu
 Add	AddPrinterDialog		Pridať
@@ -28,7 +24,6 @@ Transport: %transport% %transport_address%	TestPageView		Transport: %transport% 
 Cancel job	PrintersWindow		Zrušiť úlohu
 Yellow	TestPageView		Žltá
 Blue	TestPageView		Modrá
-1 pending job.	PrinterListView		1 úloha vo fronte.
 Remove	PrintersWindow		Odstrániť
 <pick one>	AddPrinterDialog		<vyberte jednu>
 Print jobs for 	PrintersWindow		Tlačové úlohy pre 

@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-HaikuDepot	2365524674
+1	german	x-vnd.Haiku-HaikuDepot	1090759318
 Name	PackageListView		Name
 Available packages	MainWindow		Verfügbare Pakete
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
@@ -15,7 +15,6 @@ Other users can see this rating	RatePackageWindow		Diese Bewertung ist für ande
 Stability	RatePackageWindow		Stabilität
 for %Version%	PackageInfoView		für %Version%
 No changelog available.	PackageInfoView		Änderungsprotokoll nicht vorhanden.
-Depot:	FilterView		Depot:
 Description	PackageListView		Beschreibung
 Install	PackageManager		Installieren
 Source packages	MainWindow		Quellcode-Pakete
@@ -56,7 +55,6 @@ Ratings	PackageInfoView		Bewertungen
 But none could be listed here, sorry.	UserLoginWindow		Leider können sie hier nicht aufgeführt werden.
 System & Utilities	Model		Tools & System
 Inactive	PackageListView		Deaktiviert
-Refresh depots	MainWindow		Depots aktualisieren
 The package action could not be scheduled: %Error%	PackageInfoView		Die Aktion konnte nicht auf das Paket angewandt werden: %Error%
 Science & Mathematics	Model		Wissenschaft
 Main Menu	MainWindow		Hauptmenü
@@ -115,14 +113,12 @@ An error occurred while refreshing the repository: %error%	MainWindow		Bei der A
 Try again	App		Nochmal versuchen
 Login or Create account	MainWindow		Anmelden oder Benutzerkonto anlegen
 Pending…	PackageListView		Ausstehend…
-Depot	FilterView		Depot
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# Objekt} other{# Objekte}}
 OK	PackageInfoView		OK
 Uninstalled	PackageListView		Deinstalliert
 Show	MainWindow		Anzeigen
 Stable	RatePackageWindow		Stabil
 Unknown	PackageListView		Unbekannt
-All depots	FilterView		Alle Depots
 Comment language:	RatePackageWindow		Kommentar-Sprache:
 Pass phrase:	UserLoginWindow		Kennwort:
 Screenshot	ScreenshotWindow		Bildschirmfoto

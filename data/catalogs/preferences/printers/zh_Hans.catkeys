@@ -1,9 +1,7 @@
-1	english	x-vnd.Be-PRNT	2163275033
+1	english	x-vnd.Be-PRNT	4242582634
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		打印机：%printer_name%\n驱动：%driver%\n
 Waiting	JobListView		等待
 Print test page	PrintersWindow		打印测试页面
-Test Page	TestPageView		测试页面
-Test Page	PrintersWindow		测试页面
 page	JobListView		页面
 Cancel	AddPrinterDialog		取消
 Add printer	AddPrinterDialog		添加打印机
@@ -12,14 +10,12 @@ Printers	PrintersWindow		打印机
 Add…	PrintersWindow		添加…
 Default Printer	PrinterListView		默认打印机
 Transport: %transport% %transport_address%	PrinterListView		传输: %transport% %transport_address%
-No pending jobs.	PrinterListView		无挂起任务。
 pages	JobListView		页
 Printers	System name		打印机
 Processing	JobListView		处理中
 Red	TestPageView		绿
 Printer name:	AddPrinterDialog		打印机名：
 Driver: %driver%	PrinterListView		驱动程序：%driver%
- pending jobs.	PrinterListView		挂起任务。
 Black	TestPageView		黑
 Restart job	PrintersWindow		重启任务
 Add	AddPrinterDialog		添加
@@ -28,7 +24,6 @@ Transport: %transport% %transport_address%	TestPageView		传输：%transport% %t
 Cancel job	PrintersWindow		取消任务
 Yellow	TestPageView		黄
 Blue	TestPageView		蓝
-1 pending job.	PrinterListView		1个挂起任务
 Remove	PrintersWindow		删除
 <pick one>	AddPrinterDialog		<选择一个>
 Print jobs for 	PrintersWindow		打印任务

@@ -1,10 +1,9 @@
-1	italian	x-vnd.Haiku-ActivityMonitor	1116393825
+1	italian	x-vnd.Haiku-ActivityMonitor	4111458489
 P-faults	DataSource		P-fault
 Media nodes	DataSource		Nodi multimediali
 Threads	DataSource		Thread
 Add graph	ActivityWindow		Aggiungi grafico
 Teams	DataSource		Team
-Hide legend	ActivityView		Nascondi legenda
 Network send	DataSource		Invio (rete)
 CPU usage (combined)	DataSource		Uso CPU (combinato)
 CPU	DataSource		CPU

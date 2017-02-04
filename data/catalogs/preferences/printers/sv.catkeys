@@ -1,9 +1,7 @@
-1	swedish	x-vnd.Be-PRNT	2163275033
+1	swedish	x-vnd.Be-PRNT	4242582634
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Skrivare: %printer_name%\nDrivrutin: %driver%\n
 Waiting	JobListView		Väntar
 Print test page	PrintersWindow		Skriv ut testsida
-Test Page	TestPageView		Testsida
-Test Page	PrintersWindow		Testsida
 page	JobListView		sida
 Cancel	AddPrinterDialog		Avbryt
 Add printer	AddPrinterDialog		Lägg till skrivare
@@ -12,14 +10,12 @@ Printers	PrintersWindow		Skrivare
 Add…	PrintersWindow		Lägg till...
 Default Printer	PrinterListView		Standardskrivare
 Transport: %transport% %transport_address%	PrinterListView		Transport: %transport% %transport_address%
-No pending jobs.	PrinterListView		Inga utskrifter i kön.
 pages	JobListView		sidor
 Printers	System name		Skrivare
 Processing	JobListView		Bearbetar
 Red	TestPageView		Röd
 Printer name:	AddPrinterDialog		Skrivarnamn:
 Driver: %driver%	PrinterListView		Drivrutin: %driver%
- pending jobs.	PrinterListView		 utskrifter i kön.
 Black	TestPageView		Svart
 Restart job	PrintersWindow		Starta om utskrift
 Add	AddPrinterDialog		Lägg till
@@ -28,7 +24,6 @@ Transport: %transport% %transport_address%	TestPageView		Transport: %transport% 
 Cancel job	PrintersWindow		Avbryt utskrift
 Yellow	TestPageView		Gul
 Blue	TestPageView		Blå
-1 pending job.	PrinterListView		1 utskrift i kön.
 Remove	PrintersWindow		Ta bort
 <pick one>	AddPrinterDialog		<välj en>
 Print jobs for 	PrintersWindow		Utskriftjobb för

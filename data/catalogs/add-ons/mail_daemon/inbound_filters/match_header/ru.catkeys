@@ -7,7 +7,7 @@ Move to	ConfigView		Переместить в
 Then	ConfigView		Тогда
 this field is based on the action	ConfigView		это поле зависит от действия
 Delete message	ConfigView		Удалить сообщение
-<Choose account>	ConfigView		значение (используйте регулярные выражения, например *спам*)
+<Choose account>	ConfigView		<Выбрать учётную запись>
 Set flags to	ConfigView		Установить флаги в
 Set as read	ConfigView		Отметить как прочитанное
 Match header	RuleFilter		Совпадающий заголовок

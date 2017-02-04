@@ -43,8 +43,8 @@ Quit	Keymap window		終了
 Dutch	Keyboard Layout View		オランダ語
 Switch shortcut keys to Haiku mode	Keymap window		ショートカットキースイッチを Haiku モードにする
 Circumflex trigger	Keymap window		サーカムフレックスのトリガー
-Hebrew	Keyboard Layout View		ヘブライ語
 ISO-9995	Keyboard Layout View		ISO-9995
+Hebrew	Keyboard Layout View		ヘブライ語
 Diaeresis trigger	Keymap window		ウムラウトのトリガー
 Disabled	Modifier keys window	Do nothing	無効
 Belarusian (Latin)	Keyboard Layout View		ベラルーシ語 (Latin)

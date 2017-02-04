@@ -1,4 +1,4 @@
-1	english	x-vnd.Be-PSRV	123334776
+1	english	x-vnd.Be-PSRV	2930356711
 Undefined	ConfigWindow		未定义
 Return the number of available transports	PrintServerApp Scripting		返回可用的传输协议脚本编号
 Return the number of available printers	PrintServerApp Scripting		返回可用打印机编号
@@ -8,7 +8,6 @@ Cancel	PrintServerApp		取消
 Retrieve a specific printer	PrintServerApp Scripting		检索特定打印机
 Page %1 to %2	ConfigWindow		页面%1到%2
 Get name of the printer add-on used for this printer	Printer Scripting		获取该打印机的附加名
-Page setup:	ConfigWindow		页面设置:
 B5 (JIS)	ConfigWindow	JIS P0138 B5, a Japanese paper size	B5 (JIS)
 OK	ConfigWindow		确定
 Cancel	ConfigWindow		取消

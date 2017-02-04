@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-HaikuDepot	2365524674
+1	russian	x-vnd.Haiku-HaikuDepot	1090759318
 Name	PackageListView		Имя
 Available packages	MainWindow		Доступные пакеты
 Open %DeskbarLink%	PackageManager		Открыть %DeskbarLink%
@@ -15,7 +15,6 @@ Other users can see this rating	RatePackageWindow		Другие пользова
 Stability	RatePackageWindow		Стабильность
 for %Version%	PackageInfoView		для %Version%
 No changelog available.	PackageInfoView		История изменений недоступна.
-Depot:	FilterView		Склад:
 Description	PackageListView		Описание
 Install	PackageManager		Установить
 Source packages	MainWindow		Пакеты с исходным кодом
@@ -56,7 +55,6 @@ Ratings	PackageInfoView		Оценки
 But none could be listed here, sorry.	UserLoginWindow		Но не удалось определить с какими именно, извините.
 System & Utilities	Model		Система и утилиты
 Inactive	PackageListView		Неактивный
-Refresh depots	MainWindow		Обновить склады
 The package action could not be scheduled: %Error%	PackageInfoView		Действие для пакета не может быть запланировано: %Error%
 Science & Mathematics	Model		Наука и математика
 Main Menu	MainWindow		Главное меню
@@ -115,14 +113,12 @@ An error occurred while refreshing the repository: %error%	MainWindow		Возн�
 Try again	App		Попробовать снова
 Login or Create account	MainWindow		Войти или создать учетную запись
 Pending…	PackageListView		Ожидание…
-Depot	FilterView		Все склады
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# объект} few{# объекта} other{# объектов}}
 OK	PackageInfoView		OK
 Uninstalled	PackageListView		Удаленные
 Show	MainWindow		Показывать
 Stable	RatePackageWindow		Стабилен
 Unknown	PackageListView		Неизвестно
-All depots	FilterView		Все склады
 Comment language:	RatePackageWindow		Язык комментария:
 Pass phrase:	UserLoginWindow		Пароль:
 Screenshot	ScreenshotWindow		Снимок экрана

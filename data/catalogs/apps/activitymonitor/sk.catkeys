@@ -1,11 +1,10 @@
-1	slovak	x-vnd.Haiku-ActivityMonitor	2455521641
+1	slovak	x-vnd.Haiku-ActivityMonitor	1155619009
 P-faults	DataSource		P-fault
 Media nodes	DataSource		Mediálne uzly
 Threads	DataSource		Vlákna
 Always on top	ActivityWindow		Vždy na vrchu
 Add graph	ActivityWindow		Pridať graf
 Teams	DataSource		Tímy
-Hide legend	ActivityView		Skryť legendu
 MiB	DataSource		MiB
 Network send	DataSource		Sieť - odoslané
 CPU usage (combined)	DataSource		Využitie CPU (kombinované)

@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-Terminal	1384628839
+1	romanian	x-vnd.Haiku-Terminal	1269023683
 Not found.	Terminal TermWindow		Nu a fost găsit.
 Switch Terminals	Terminal TermWindow		Comută terminale
 Change directory	Terminal TermView		Modifică dosar
@@ -82,6 +82,7 @@ Close	Terminal TermWindow		Închide
 Text	Terminal AppearancePrefView		Text
 Clear all	Terminal TermWindow		Eliberează tot
 Text encoding	Terminal TermWindow		Codificare text
+Allow bold text	Terminal AppearancePrefView		Permite text aldin
 Close window	Terminal TermWindow		Închide fereastră
 Copy absolute path	Terminal TermView		Copiază calea absolută
 Save as default	Terminal TermWindow		Salvează ca implicit

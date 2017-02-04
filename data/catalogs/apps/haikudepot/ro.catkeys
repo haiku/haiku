@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-HaikuDepot	2365524674
+1	romanian	x-vnd.Haiku-HaikuDepot	1090759318
 Name	PackageListView		Nume
 Available packages	MainWindow		Pachete disponibile
 Open %DeskbarLink%	PackageManager		Deschide %DeskbarLink%
@@ -15,7 +15,6 @@ Other users can see this rating	RatePackageWindow		Alți utilizatori pot vedea a
 Stability	RatePackageWindow		Stabilitate
 for %Version%	PackageInfoView		pentru %Version%
 No changelog available.	PackageInfoView		Nu există jurnal de modificări disponibil.
-Depot:	FilterView		Depot:
 Description	PackageListView		Descriere
 Install	PackageManager		Instalare
 Source packages	MainWindow		Pachete sursă
@@ -56,7 +55,6 @@ Ratings	PackageInfoView		Evaluări
 But none could be listed here, sorry.	UserLoginWindow		Dar nu s-a putut lista niciuna, scuze.
 System & Utilities	Model		Sistem & Utilități
 Inactive	PackageListView		Inactiv
-Refresh depots	MainWindow		Actualizează depozitele
 The package action could not be scheduled: %Error%	PackageInfoView		Actiunea pachetului n-a putut fi programată: %Error%
 Science & Mathematics	Model		Știință & Matematică
 Main Menu	MainWindow		Meniu principal
@@ -115,14 +113,12 @@ An error occurred while refreshing the repository: %error%	MainWindow		O eroare 
 Try again	App		Încearcă din nou
 Login or Create account	MainWindow		Autentificare sau Creare cont
 Pending…	PackageListView		În așteptare…
-Depot	FilterView		Depot
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} other{# elemente}}
 OK	PackageInfoView		OK
 Uninstalled	PackageListView		Dezinstalat
 Show	MainWindow		Arată
 Stable	RatePackageWindow		Stabil
 Unknown	PackageListView		Necunoscut
-All depots	FilterView		Toate depozitele
 Comment language:	RatePackageWindow		Limbă comentariu:
 Pass phrase:	UserLoginWindow		Parolă:
 Screenshot	ScreenshotWindow		Captură ecran

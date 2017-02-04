@@ -1,5 +1,6 @@
-1	swedish	x-vnd.Haiku-Expander	2825008254
+1	swedish	x-vnd.Haiku-Expander	130018254
 Expand	ExpanderMenu		Expandera
+Expanding '%s'…	ExpanderWindow		Expanderar '%s'...
 Close window when done expanding	ExpanderPreferences		Stäng fönstret när expandering är klar
 Set destination…	ExpanderMenu		Ange mål…
 Use:	ExpanderPreferences		Använd:
@@ -43,6 +44,7 @@ Expand	ExpanderWindow		Expandera
 Close	ExpanderMenu		Stäng
 The destination is not a folder.	ExpanderWindow		Målet är inte en mapp.
 Open destination folder after extraction	ExpanderPreferences		Öppna destinations foldern efter extraktionen
+Creating listing for '%s'…	ExpanderWindow		Skapar innehållslista för '%s'...
 Set source…	ExpanderMenu		Sätt källa…
 Show contents	ExpanderMenu		Visa innehåll
 Stop	ExpanderWindow		Stopp

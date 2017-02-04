@@ -1,4 +1,4 @@
-1	finnish	x.vnd.OBOS-Inspector	2075781936
+1	finnish	x.vnd.OBOS-Inspector	1686702095
 User Translators	ActiveTranslatorsWindow		Käyttäjämuuntimet
 No image available to save.	ImageWindow		Tallentamista varten ei ole käytettävissä kuvaa.
 Sorry, unable to write the image file.	ImageView		Kuvatiedoston kirjoittaminen epäonnistui.
@@ -15,9 +15,7 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 Save feature not implemented yet.	ImageWindow		Tallenna-ominaisuutta ei ole vielä toteutettu.
 First Page	ImageWindow		Ensimmäinen sivu
 Next Page	ImageWindow		Seuraava sivu
-Open...	ImageWindow		Avaa...
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nKäytetty muunnin:\nNimi: %1\nTiedot: %2\nVersio: %3\n
-Save...	ImageWindow		Tallenna...
 Info	ImageWindow		Tiedot
 OK	ImageWindow		Valmis
 Window	ImageWindow		Ikkuna

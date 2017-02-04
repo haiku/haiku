@@ -1,4 +1,4 @@
-1	polish	x-vnd.Haiku-HaikuDepot	2365524674
+1	polish	x-vnd.Haiku-HaikuDepot	1090759318
 Name	PackageListView		Nazwa
 Available packages	MainWindow		Pakiety dostępne
 Open %DeskbarLink%	PackageManager		Otwórz %DeskbarLink%
@@ -15,7 +15,6 @@ Other users can see this rating	RatePackageWindow		Inni użytkownicy będą mogl
 Stability	RatePackageWindow		Stabilność
 for %Version%	PackageInfoView		dla %Version%
 No changelog available.	PackageInfoView		Dziennik zmian nie jest dostępny.
-Depot:	FilterView		Repozytorium:
 Description	PackageListView		Opis
 Install	PackageManager		Zainstaluj
 Source packages	MainWindow		Pakiety źródłowe
@@ -56,7 +55,6 @@ Ratings	PackageInfoView		Oceny
 But none could be listed here, sorry.	UserLoginWindow		Ale żaden nie mógł zostać tutaj wyświetlony.
 System & Utilities	Model		System & narzędzia
 Inactive	PackageListView		Nieaktywny
-Refresh depots	MainWindow		Odśwież listy pakietów
 The package action could not be scheduled: %Error%	PackageInfoView		Akcja dla pakietu nie mogła zostać dodana do kolejki: %Error%
 Science & Mathematics	Model		Nauka & matematyka
 Main Menu	MainWindow		Menu główne
@@ -115,14 +113,12 @@ An error occurred while refreshing the repository: %error%	MainWindow		Wystąpi�
 Try again	App		Spróbuj ponownie
 Login or Create account	MainWindow		Zaloguj lub utwórz konto
 Pending…	PackageListView		Oczekiwanie…
-Depot	FilterView		Repozytorium
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# element} few{# elementy} many{# elementów} other{# elementu}}
 OK	PackageInfoView		OK
 Uninstalled	PackageListView		Niezainstalowany
 Show	MainWindow		Pokaż
 Stable	RatePackageWindow		Stabilny
 Unknown	PackageListView		Nieznany
-All depots	FilterView		Wszystkie repozytoria
 Comment language:	RatePackageWindow		Język komentarza:
 Pass phrase:	UserLoginWindow		Hasło:
 Screenshot	ScreenshotWindow		Zrzut ekranu

@@ -1,4 +1,4 @@
-1	swedish	x.vnd.OBOS-Inspector	2075781936
+1	swedish	x.vnd.OBOS-Inspector	1686702095
 User Translators	ActiveTranslatorsWindow		Användaröversättning
 No image available to save.	ImageWindow		Ingen bild tillgänglig för att sparas.
 Sorry, unable to write the image file.	ImageView		Tyvärr kunde inte bilden sparas.
@@ -15,9 +15,7 @@ Image: %1\nColor Space: %2 (%3)\nDimensions: %4 x %5\nBytes per Row: %6\nTotal B
 Save feature not implemented yet.	ImageWindow		Möjligheten att spara är inte implementerat.
 First Page	ImageWindow		Första sidan
 Next Page	ImageWindow		Nästa sida
-Open...	ImageWindow		Öppna...
 \nTranslator Used:\nName: %1\nInfo: %2\nVersion: %3\n	ImageView		\nÖversättare:\nNamn: %1\nInformation: %2\nVersion: %3\n
-Save...	ImageWindow		Spara...
 Info	ImageWindow		Information
 OK	ImageWindow		OK
 Window	ImageWindow		Fönster

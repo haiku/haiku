@@ -1,4 +1,4 @@
-1	swedish	x-vnd.Haiku-MediaPlayer	3805057997
+1	swedish	x-vnd.Haiku-MediaPlayer	845580420
 raw audio	MediaPlayer-InfoWin		raw-ljud
 Location	MediaPlayer-InfoWin		Plats
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Amerikanskt format)
@@ -29,10 +29,12 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Få/s�
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascope)
 Display mode	MediaPlayer-InfoWin		Visningsläge
 Medium	MediaPlayer-SettingsWindow		Medium
+Open network stream	MediaPlayer-NetworkStream		Öppna nätverksström
 Close	MediaPlayer-PlaylistWindow		Stäng
 Open…	MediaPlayer-PlaylistWindow		Öppna...
 Toggle mute.	MediaPlayer-Main		Aktivera tyst läge.
 Undo	MediaPlayer-PlaylistWindow		Ångra
+Stream URL:	MediaPlayer-NetworkStream		URL för ström:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Använd hårdvarutäckning för video om möjligt
 File info…	MediaPlayer-Main		Filinformation...
 Pause playback.	MediaPlayer-Main		Pausa uppspelning.
@@ -79,6 +81,7 @@ Skip to the previous track.	MediaPlayer-Main		Hoppa till föregående spår.
 Close window after playing video	MediaPlayer-SettingsWindow		Stäng fönstret efter att video har spelats upp
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Skala filmer mjukt (icketäckande läge)
 OK	MediaPlayer-RemovePLItemsCmd		OK
+Open network stream	MediaPlayer-Main		Öppna nätverksström
 50% scale	MediaPlayer-Main		Skala till 50%
 Subtitles	MediaPlayer-Main		Bildtext
 Prev	MediaPlayer-Main		Föregående
@@ -126,6 +129,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Kopiera post
 none	Subtitles menu		ingen
 Move file to Trash	MediaPlayer-PlaylistWindow		Flytta filen till Papperskorgen
 URI	MediaPlayer-Main		URI
+OK	MediaPlayer-NetworkStream		OK
 Mute	MediaPlayer-Main		Tyst läge
 Toggle pause/play.	MediaPlayer-Main		Aktivera pause/play.
 min	MediaPlayer-InfoWin	Minutes	min
@@ -146,6 +150,7 @@ OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		ingen
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Hämta/sätt volymen (0.0-2.0)
 Duration	MediaPlayer-Main		Speltid
+Cancel	MediaPlayer-NetworkStream		Avbryt
 Playlist…	MediaPlayer-Main		Spellista...
 <unknown>	PlaylistItem-author		<okänd>
 Save as…	MediaPlayer-PlaylistWindow		Spara som...

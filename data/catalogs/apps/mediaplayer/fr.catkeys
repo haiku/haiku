@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-MediaPlayer	3946855505
+1	french	x-vnd.Haiku-MediaPlayer	2558878117
 raw audio	MediaPlayer-InfoWin		audio brut
 Location	MediaPlayer-InfoWin		Emplacement
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Panoramique américain)
@@ -129,6 +129,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Copier l’entrée
 none	Subtitles menu		aucun
 Move file to Trash	MediaPlayer-PlaylistWindow		Envoyer le fichier à la corbeille
 URI	MediaPlayer-Main		URI
+Invalid URL inserted!	MediaPlayer-NetworkStream		L'URL saisie est invalide !
 OK	MediaPlayer-NetworkStream		OK
 Mute	MediaPlayer-Main		Muet
 Toggle pause/play.	MediaPlayer-Main		Basculer entre lecture et pause.

@@ -1,9 +1,8 @@
-1	slovenian	x-vnd.Haiku-ActivityMonitor	2507853983
+1	slovenian	x-vnd.Haiku-ActivityMonitor	1207951351
 Threads	DataSource		Niti
 Always on top	ActivityWindow		Vedno na vrhu
 Add graph	ActivityWindow		Dodaj graf
 Teams	DataSource		Skupine
-Hide legend	ActivityView		Skrij legendo
 MiB	DataSource		MiB
 CPU	DataSource		CPE
 Used memory	DataSource		Spomin v rabi

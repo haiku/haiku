@@ -1,4 +1,4 @@
-1	slovak	x-vnd.Haiku-Notifications	3115872762
+1	slovak	x-vnd.Haiku-Notifications	746652830
 An error occurred saving the preferences.\nIt's possible you are running out of disk space.	PrefletWin		Vyskytla sa chyba pri ukladaní nastavení.\nJe možné, že vám došlo miesto na disku.
 Notifications	GeneralView		Oznamy
 seconds of inactivity	GeneralView		sekundách nečinnosti
@@ -20,6 +20,7 @@ Display	PrefletView		Displej
 Search:	NotificationView		Hľadať:
 Allowed	NotificationView		Povolené
 Yes	NotificationView		Áno
+Last received	NotificationView		Posledný prijatý
 Large icon	DisplayView		Veľká ikona
 Icon size:	DisplayView		Veľkosť ikony:
 Hide notifications from screen after	GeneralView		Skryť oznamy z obrazovky po

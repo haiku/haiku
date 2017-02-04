@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-HaikuDepot	2365524674
+1	english	x-vnd.Haiku-HaikuDepot	1090759318
 Name	PackageListView		名称
 Available packages	MainWindow		可用软件包
 Open %DeskbarLink%	PackageManager		打开 %DeskbarLink%
@@ -15,7 +15,6 @@ Other users can see this rating	RatePackageWindow		其他用户可以看到该�
 Stability	RatePackageWindow		稳定性
 for %Version%	PackageInfoView		用于 %Version%
 No changelog available.	PackageInfoView		未发现更新记录。
-Depot:	FilterView		软件库：
 Description	PackageListView		描述
 Install	PackageManager		安装
 Source packages	MainWindow		源代码包
@@ -56,7 +55,6 @@ Ratings	PackageInfoView		评级
 But none could be listed here, sorry.	UserLoginWindow		对不起，没有可以列出的内容。
 System & Utilities	Model		系统工具
 Inactive	PackageListView		未激活
-Refresh depots	MainWindow		刷新软件库
 The package action could not be scheduled: %Error%	PackageInfoView		软件包操作无法预订执行：%Error%
 Science & Mathematics	Model		科学数学
 Main Menu	MainWindow		主菜单
@@ -115,14 +113,12 @@ An error occurred while refreshing the repository: %error%	MainWindow		刷新软
 Try again	App		请重试
 Login or Create account	MainWindow		登录或者新建账户
 Pending…	PackageListView		挂起…
-Depot	FilterView		软件库
 {0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# 项} other{# 项}}
 OK	PackageInfoView		确定
 Uninstalled	PackageListView		已卸载
 Show	MainWindow		显示
 Stable	RatePackageWindow		稳定
 Unknown	PackageListView		未知
-All depots	FilterView		所有软件库
 Comment language:	RatePackageWindow		评论语言:
 Pass phrase:	UserLoginWindow		密钥：
 Screenshot	ScreenshotWindow		屏幕截图

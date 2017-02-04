@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-libtracker	3515649859
+1	lithuanian	x-vnd.Haiku-libtracker	239582696
 OK	WidgetAttributeText		Gerai
 Add-ons	FilePanelPriv		Priedai
 Desktop	Model		Darbalaukis
@@ -308,7 +308,6 @@ Cancel	FilePanelPriv		Atsisakyti
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Programa „%appname“ nepalaiko dokumento, kurį bandote ja atverti, tipo.\nAr tikrai norite tęsti?\n\nJeigu žinote, jog ši programa geba dirbti su šio tipo dokumentais, jums derėtų susisiekti su programos leidėju ir paprašyti programą pataisyti, kad ji nurodytų šį dokumentų tipą kaip palaikomą.
 Disks	DirMenu		Tomai
 New folder %ld	FSUtils		Naujas aplankas %ld
-All BeOS disks	AutoMounterSettings		Visus „BeOS“ tomus
 Used space color	SettingsView		Užpildytos vietos spalva
 Sorry, could not create a new folder.	FSUtils		Deja, naujo aplanko sukurti nepavyko.
 multiple disks	FindPanel		keliuose diskuose

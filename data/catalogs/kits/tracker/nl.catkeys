@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Haiku-libtracker	2575123712
+1	dutch; flemish	x-vnd.Haiku-libtracker	3594023845
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Invoegtoepassingen
 Desktop	Model		Bureaublad
@@ -303,7 +303,6 @@ Cancel	FilePanelPriv		Annuleren
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		De toepassing \"%appname\" ondersteunt niet het type document dat u zodadelijk gaat openen.\nWeet u zeker dat u door wilt gaan?n\nAls u zeker weet dat de toepassing dit bestandstype ondersteunt, dan zou u contact met de ontwikkelaar op kunnen nemen om hen te vragen de lijst van ondersteunde bestanden voor hun toepassing bij te werken.
 Disks	DirMenu		Schijven
 New folder %ld	FSUtils		Nieuwe map %ld
-All BeOS disks	AutoMounterSettings		Alle BeOS-schijven
 Used space color	SettingsView		Kleur voor gebruikte ruimte
 Sorry, could not create a new folder.	FSUtils		Sorry, kon geen nieuwe map aanmaken.
 multiple disks	FindPanel		meerdere schijven

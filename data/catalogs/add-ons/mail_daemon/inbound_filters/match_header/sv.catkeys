@@ -1,5 +1,7 @@
-1	swedish	x-vnd.Haiku-MatchHeader	4262558281
+1	swedish	x-vnd.Haiku-MatchHeader	548057976
 <Choose action>	ConfigView		<Välj åtgärd>
+Header field (e.g. Subject, From, ...)	ConfigView		Huvudfält (e.g. Subject, Från, ...)
+Account	ConfigView		Konto
 has	ConfigView		har
 Move to	ConfigView		Flytta till
 Then	ConfigView		Åtgärd
@@ -12,3 +14,4 @@ Match header	RuleFilter		Matcha rubrik
 Reply with	ConfigView		Svara med
 If	ConfigView		Om
 Match \"%attribute\" against \"%regex\"	RuleFilter		Matcha \"%attribute\" mot \"%regex\"
+Wildcard value like \"*spam*\".\nPrefix with \"REGEX:\" in order to use regular expressions.	ConfigView		Jokertecken som \"*spam*\".\nPrefix med \"REGEX:\" i ordning för att använda regular expressions.

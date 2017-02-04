@@ -1,16 +1,13 @@
-1	slovenian	x-vnd.Be-PRNT	1096771701
+1	slovenian	x-vnd.Be-PRNT	2944555829
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Tiskalnik: %printer_name%\nGonilnik:  %driver%\n
 Waiting	JobListView		Čakam
 Print test page	PrintersWindow		Natisni preizkusno stran
-Test Page	TestPageView		Preizkusna stran
-Test Page	PrintersWindow		Preizkusna stran
 page	JobListView		stran
 Cancel	AddPrinterDialog		Prekliči
 Add printer	AddPrinterDialog		Dodaj tiskalnik
 Green	TestPageView		Zelena
 Printers	PrintersWindow		Tiskalniki
 Default Printer	PrinterListView		Privzeti tiskalnik
-No pending jobs.	PrinterListView		Ni čakajočih dokumentov.
 pages	JobListView		strani
 Printers	System name		Tiskalniki
 Processing	JobListView		Obdelovanje
@@ -18,7 +15,6 @@ Red	TestPageView		Rdeča
 Printer name:	AddPrinterDialog		Ime tiskalnika:
 Yellow	TestPageView		Rumena
 Blue	TestPageView		Modra
-1 pending job.	PrinterListView		1 čakajoč dokument.
 Remove	PrintersWindow		Odstrani
 <pick one>	AddPrinterDialog		(izberite enega)
 Print jobs for 	PrintersWindow		Dokumenti za tiskanje na 

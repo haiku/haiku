@@ -1,4 +1,4 @@
-1	dutch; flemish	x-vnd.Be-PSRV	1761631281
+1	dutch; flemish	x-vnd.Be-PSRV	273685920
 Undefined	ConfigWindow		Ongedefinieerd
 Return the number of available transports	PrintServerApp Scripting		Geef het aantal beschikbare transporten
 Return the number of available printers	PrintServerApp Scripting		Geef het aantal beschikbare printers
@@ -8,7 +8,6 @@ Cancel	PrintServerApp		Annuleren
 Retrieve a specific printer	PrintServerApp Scripting		Haal een specifieke printer op
 Page %1 to %2	ConfigWindow		Pagina %1 to %2
 Get name of the printer add-on used for this printer	Printer Scripting		Haal de naam op van de gebruikte add-on voor deze printer
-Page setup:	ConfigWindow		Paginaset-up:
 OK	ConfigWindow		Oké
 Cancel	ConfigWindow		Annuleren
 Printer server	ConfigWindow		Printerserver

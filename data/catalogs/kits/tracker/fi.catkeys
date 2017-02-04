@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-libtracker	545841200
+1	finnish	x-vnd.Haiku-libtracker	1564741333
 OK	WidgetAttributeText		Valmis
 Add-ons	FilePanelPriv		Lisäosat
 Mount settings…	ContainerWindow		Liittämisasetukset...
@@ -316,7 +316,6 @@ Cancel	FilePanelPriv		Peru
 The application \"%appname\" does not support the type of document you are about to open.\nAre you sure you want to proceed?\n\nIf you know that the application supports the document type, you should contact the publisher of the application and ask them to update their application to list the type of your document as supported.	OpenWithWindow		Sovellus \"%appname\" ei tue asiakirjatyyppiä, jota olet avaamassa.\nOletko varma, että haluat edetä?\n\nJos tiedät, että sovellus tukee asiakirjatyyppiä, ota yhteys sovelluksen julkaisijaan ja pyydä heitä päivittämään sovellustaan, jotta se luettelee oikein tuetut asiakirjatyypit.
 Disks	DirMenu		Levyt
 New folder %ld	FSUtils		Uusi kansio %ld
-All BeOS disks	AutoMounterSettings		Kaikki BeOS-levyt
 Used space color	SettingsView		Käytetyn tilan väri
 Sorry, could not create a new folder.	FSUtils		Uuden kansion luominen epäonnistui.
 Disk mount	TrackerSettingsWindow		Levyn liitäntä

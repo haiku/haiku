@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-CodyCam	689799633
+1	lithuanian	x-vnd.Haiku-CodyCam	384131168
 Capturing Image…	VideoConsumer.cpp		Fotografuojama…
 Every 30 seconds	CodyCam		30 sekundžių
 File name:	CodyCam		Failo vardas:
@@ -41,7 +41,6 @@ CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		24 valandos
 unknown command	SettingsHandler		nežinoma komanda
 Video settings	CodyCam		Vaizdo parametrai
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Nepavyksta rasti vaizdo šaltinio. Norint naudotis „CodyCam“, Jums reikės internetinės kameros.
 still image filename expected	CodyCam		reikalingas paveikslo failo vardas
 invalid upload client %ld\n	VideoConsumer.cpp		negalimas įkėlimo būdas %ld\n
 Every 15 seconds	CodyCam		15 sekundžių

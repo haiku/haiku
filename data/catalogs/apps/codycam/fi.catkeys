@@ -1,4 +1,4 @@
-1	finnish	x-vnd.Haiku-CodyCam	2193838145
+1	finnish	x-vnd.Haiku-CodyCam	1888169680
 Upload…	VideoConsumer.cpp		Kopioi palvelimelle...
 Capturing Image…	VideoConsumer.cpp		Kaapataan kuva…
 Every 30 seconds	CodyCam		Joka 30. sekunti
@@ -42,7 +42,6 @@ CodyCam	System name		Cody-kameraohjelma
 Every 24 hours	CodyCam		Joka 24. tunti
 unknown command	SettingsHandler		tuntematon komento
 Video settings	CodyCam		Video-asetukset
-Cannot find a video source. You need a webcam to use CodyCam.	CodyCam		Videolähteen löytäminen epäonnistui. Tarvitset webbikameran Cody-kameraohjelman käyttämiseen.
 still image filename expected	CodyCam		odotettiin pysäytyskuvatiedostonimeä
 invalid upload client %ld\n	VideoConsumer.cpp		virheellinen lähetysasiakas %ld\n
 Every 15 seconds	CodyCam		Joka 15. sekunti

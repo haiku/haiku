@@ -1,4 +1,4 @@
-1	lithuanian	x-vnd.Haiku-Login	1678631300
+1	lithuanian	x-vnd.Haiku-Login	2683778354
 Error: %1	Login App		Klaida: %1
 Hide password	Login View		Nerodyti slaptažodžio
 Desktop	Desktop Window		Darbalaukis
@@ -8,14 +8,12 @@ OK	Login View		Gerai
 error %s\n	Desktop Window	A return message from fDesktopShelf->Save(). It can be \"B_OK\"	klaida %s\n
 Login:	Login View		Naudotojo vardas:
 Error	Login App		Klaida
-You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Alt-Q).	Login App		Prisijungimo ekrano fone rodomą darbalaukį galite tinkinti, į jį įmesdami replikantus.\n\nViską sudėlioję, tiesiog baikite programos darbą (Alt-Q).
 Unimplemented	Login App		Nerealizuota
 Welcome to Haiku	Login Window		Sveiki! Čia „Haiku“
 Reboot	Login View		Paleisti iš naujo
 Login application for Haiku\nUsage:\n	Login App		Prisijungimo prie „Haiku“ programa\nNaudojimas:\n
 Info	Login App		Informacija
 Halt	Login View		Išjungti
-ValidateLogin: %s\n	Login App	A message returned from the ValidateLogin function. It can be \"B_OK\".	ValidateLogin: %s\n
 Password:	Login View		Slaptažodis:
 OK	Login App		Gerai
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\t Nepaversti lango modaliniu\n

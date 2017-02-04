@@ -11,4 +11,4 @@ New messages	NotifierFilter		Новое сообщение
 Log window	NotifierConfigView		Окно журнала
 Keyboard LEDs	NotifierConfigView		Клавиатурные светодиоды
 Central beep	NotifierConfigView		Центральный звуковой сигнал
-Alert	NotifierConfigView		Окно предупрежния
+Alert	NotifierConfigView		Оповещение

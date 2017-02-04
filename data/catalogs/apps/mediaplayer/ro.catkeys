@@ -1,4 +1,4 @@
-1	romanian	x-vnd.Haiku-MediaPlayer	3805057997
+1	romanian	x-vnd.Haiku-MediaPlayer	2558878117
 raw audio	MediaPlayer-InfoWin		audio raw
 Location	MediaPlayer-InfoWin		Locaţie
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (American)
@@ -29,10 +29,12 @@ Gets/sets the current playing position in microseconds.	MediaPlayer-Main		Obțin
 2.35 : 1 (Cinemascope)	MediaPlayer-Main		2.35 : 1 (Cinemascop)
 Display mode	MediaPlayer-InfoWin		Mod de afișare
 Medium	MediaPlayer-SettingsWindow		Mediu
+Open network stream	MediaPlayer-NetworkStream		Deschide fluxul de rețea
 Close	MediaPlayer-PlaylistWindow		Închide
 Open…	MediaPlayer-PlaylistWindow		Deschide…
 Toggle mute.	MediaPlayer-Main		Comută pe mut.
 Undo	MediaPlayer-PlaylistWindow		Refă
+Stream URL:	MediaPlayer-NetworkStream		URL flux:
 Use hardware video overlays if available	MediaPlayer-SettingsWindow		Utilizează suprapunerea video hardware dacă este disponibilă
 File info…	MediaPlayer-Main		Informații fișier…
 Pause playback.	MediaPlayer-Main		Pauză redare.
@@ -79,6 +81,7 @@ Skip to the previous track.	MediaPlayer-Main		Mergi la pista precedentă.
 Close window after playing video	MediaPlayer-SettingsWindow		Închide fereastra după redarea video
 Scale movies smoothly (non-overlay mode)	MediaPlayer-SettingsWindow		Scalează filme lin (modul fără suprapunere)
 OK	MediaPlayer-RemovePLItemsCmd		OK
+Open network stream	MediaPlayer-Main		Deschide fluxul de rețea
 50% scale	MediaPlayer-Main		scală 50%
 Subtitles	MediaPlayer-Main		Subtitrări
 Prev	MediaPlayer-Main		Prec
@@ -126,6 +129,8 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		Copiază intrare
 none	Subtitles menu		nimic
 Move file to Trash	MediaPlayer-PlaylistWindow		Mută fișierul la Gunoi
 URI	MediaPlayer-Main		URI
+Invalid URL inserted!	MediaPlayer-NetworkStream		URL introdus nevalid!
+OK	MediaPlayer-NetworkStream		OK
 Mute	MediaPlayer-Main		Mut
 Toggle pause/play.	MediaPlayer-Main		Comută pornit/oprit.
 min	MediaPlayer-InfoWin	Minutes	minute
@@ -140,12 +145,14 @@ Start media server	MediaPlayer-Main		Pornește server media
 Toggle fullscreen.	MediaPlayer-Main		Comutare ecran complet.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Obține durata elementului redat curent în microsecunde.
 ToggleFullscreen	MediaPlayer-Main		Comutare pe tot ecranul
+Bad URL	MediaPlayer-NetworkStream		URL nepotrivit
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Mono} =2{Stereo} other{# Canale}}
 <unnamed>	PlaylistItem-name		<nedenumit>
 OK	MediaPlayer-PlaylistWindow		OK
 none	Audio track menu		nimic
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		Obține/configurează volumul (0.0-2.0).
 Duration	MediaPlayer-Main		Durată
+Cancel	MediaPlayer-NetworkStream		Anulează
 Playlist…	MediaPlayer-Main		Listă de redare…
 <unknown>	PlaylistItem-author		<necunoscut>
 Save as…	MediaPlayer-PlaylistWindow		Salvează ca…
