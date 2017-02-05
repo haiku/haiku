@@ -156,7 +156,7 @@ RemotePackageRepository HaikuPorts
 	fontboy-0.9.7-3
 	fontconfig-2.12.1-2
 	fontconfig_devel-2.12.1-2
-	fossil-1.36-3
+	fossil-1.37-1
 	freetype-2.7-1
 	freetype_devel-2.7-1
 	fribidi-0.19.6-2
