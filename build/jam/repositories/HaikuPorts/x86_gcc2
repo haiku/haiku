@@ -958,7 +958,7 @@ RemotePackageRepository HaikuPorts
 	ncurses_x86_devel-5.9-11
 	ncurses6_x86-6.0-2
 	ncurses6_x86_devel-6.0-2
-	netsurf_x86-3.6-2
+	netsurf_x86-3.6-3
 	nettle_x86-3.2-1
 	nettle_x86_devel-3.2-1
 	ninja_x86-1.5.1-2
