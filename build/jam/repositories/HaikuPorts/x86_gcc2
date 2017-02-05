@@ -1019,7 +1019,7 @@ RemotePackageRepository HaikuPorts
 	rocksndiamonds_x86-3.3.1.2-2
 	ruby_x86-2.2.2-2
 	ruby_x86_devel-2.2.2-2
-	scummvm_x86-1.7.0-3
+	scummvm_x86-1.9.0-2
 	sdcc_x86-3.4.0-1
 	sdl_gfx_x86-2.0.24-1
 	sdl_gfx_x86_devel-2.0.24-1
