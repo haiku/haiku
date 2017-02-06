@@ -124,6 +124,7 @@ RemotePackageRepository HaikuPorts
 	aalib-1.4~rc5-1
 	aalib_devel-1.4~rc5-1
 	advancemame-1.4-1
+	ale-0.9.1-3
 	amoebax-0.2.1-1
 	apache-2.4.3-2
 	apng2gif-1.7-1
@@ -148,7 +149,7 @@ RemotePackageRepository HaikuPorts
 	avr_binutils-2.26.1_2016_07_22-1
 	avr_gcc-4.8.2_2014_03_20-1
 	bafx-0.2.3-3
-	bash-4.4.005-2
+	bash-4.4.012-1
 	bchunk-1.2.0-2
 	becasso-2.0-3
 	bepdf-2.0.1~beta1-2
@@ -420,8 +421,8 @@ RemotePackageRepository HaikuPorts
 	icu55_devel-55.1-1
 	icu56-56.1-1
 	icu56_devel-56.1-1
-	ilmbase-2.2.0-2
-	ilmbase_devel-2.2.0-2
+	ilmbase-2.2.0-3
+	ilmbase_devel-2.2.0-3
 	imagemagick-6.9.6.6-1
 	imagemagick_devel-6.9.6.6-1
 	inputproto-2.3.1-1
@@ -523,6 +524,8 @@ RemotePackageRepository HaikuPorts
 	libdvdread_devel-5.0.3-3
 	libebml-1.3.4-1
 	libebml_devel-1.3.4-1
+	libebur128-1.1.0-2
+	libebur128_devel-1.1.0-2
 	libedit-2015_03_21_3.1-5
 	libedit_devel-2015_03_21_3.1-5
 	libetonyek-0.1.2-1
@@ -535,8 +538,8 @@ RemotePackageRepository HaikuPorts
 	libffi_devel-3.2.1-3
 	libfilezilla-0.6.1-2
 	libfilezilla_devel-0.6.1-2
-	libgcrypt-1.7.5-1
-	libgcrypt_devel-1.7.5-1
+	libgcrypt-1.7.6-1
+	libgcrypt_devel-1.7.6-1
 	libgeotiff-1.4.0-2
 	libgeotiff_devel-1.4.0-2
 	libgpg_error-1.26-1
@@ -753,7 +756,9 @@ RemotePackageRepository HaikuPorts
 	mesa_swpipe-13.0.2-1
 	microbe-20130728-1
 	milkytracker-0.90.86-2
+	minesweeper-20150109-4
 	minicom-2.6.2-1
+	minimizeall-1.0.0-4
 	mjpegtools-2.1.0-1
 	mjpegtools_devel-2.1.0-1
 	mkdepend-1.7-4
@@ -803,17 +808,18 @@ RemotePackageRepository HaikuPorts
 	openal_devel-1.13.0-2
 	openblas-0.2.19-3
 	openblas_devel-0.2.19-3
-	openexr-2.2.0-2
-	openexr_devel-2.2.0-2
+	openexr-2.2.0-3
+	openexr_devel-2.2.0-3
 	openjpeg-2.1.2-1
 	openjpeg_devel-2.1.2-1
 	openldap-2.4.44-1
 	openldap_devel-2.4.44-1
 	openshot-2.0.7-2
 	openssh-7.4p1-1
-	openssl-1.0.2j-1
-	openssl_devel-1.0.2j-1
+	openssl-1.0.2k-1
+	openssl_devel-1.0.2k-1
 	optipng-0.7.6-1
+	optipngtranslator-0.0.1-2
 	opus-1.1.3-1
 	opus_devel-1.1.3-1
 	opus_tools-0.1.9-2
@@ -1067,6 +1073,7 @@ RemotePackageRepository HaikuPorts
 	a52dec
 	aalib
 	advancemame
+	ale
 	amoebax
 	ansiweather
 	apache
@@ -1340,6 +1347,7 @@ RemotePackageRepository HaikuPorts
 	libdvdread
 	libdv
 	libebml
+	libebur128
 	libedit
 	liberation_fonts
 	libertine
@@ -1463,7 +1471,9 @@ RemotePackageRepository HaikuPorts
 	mesa
 	microbe
 	milkytracker
+	minesweeper
 	minicom
+	minimizeall
 	mjpegtools
 	mkdepend
 	mksh
@@ -1507,6 +1517,7 @@ RemotePackageRepository HaikuPorts
 	openssl
 	openttd_gfx
 	optipng
+	optipngtranslator
 	opusfile
 	opus
 	opus_tools
