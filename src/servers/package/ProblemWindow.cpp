@@ -7,6 +7,7 @@
 #include "ProblemWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
 #include <GroupView.h>
 #include <LayoutBuilder.h>
 #include <RadioButton.h>
@@ -21,6 +22,9 @@
 #include <package/manager/Exceptions.h>
 #include <ViewPort.h>
 
+
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PackageProblem"
 
 using namespace BPackageKit;
 
@@ -53,7 +57,8 @@ struct ProblemWindow::Solution {
 
 ProblemWindow::ProblemWindow()
 	:
-	BWindow(BRect(0, 0, 400, 300), "Package problems", B_TITLED_WINDOW_LOOK,
+	BWindow(BRect(0, 0, 400, 300), B_TRANSLATE_COMMENT("Package problems",
+			"Window title"), B_TITLED_WINDOW_LOOK,
 		B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_ALL_WORKSPACES),
@@ -77,14 +82,15 @@ ProblemWindow::ProblemWindow()
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.SetInsets(B_USE_SMALL_INSETS)
-		.Add(topTextView = new BStringView(NULL,
-			"The following problems have been encountered. Please select a "
-			"solution for each:"))
+		.Add(topTextView = new BStringView(NULL, B_TRANSLATE(
+				"The following problems have been encountered. Please select "
+				"a solution for each:")))
 		.Add(new BScrollView(NULL, viewPort = new BViewPort(), 0, false, true))
 		.AddGroup(B_HORIZONTAL)
-			.Add(fCancelButton = new BButton("Cancel", new BMessage(B_CANCEL)))
+			.Add(fCancelButton = new BButton(B_TRANSLATE("Cancel"),
+				new BMessage(B_CANCEL)))
 			.AddGlue()
-			.Add(fRetryButton = new BButton("Retry",
+			.Add(fRetryButton = new BButton(B_TRANSLATE("Retry"),
 				new BMessage(kRetryMessage)))
 		.End();
 
@@ -236,10 +242,11 @@ ProblemWindow::_AddProblem(BSolverProblem* problem,
 	problemView->AdoptParentColors();
 
 	int32 solutionCount = problem->CountSolutions();
-	for (int32 k = 0; k < solutionCount; k++) {
+	for (int k = 0; k < solutionCount; k++) {
 		const BSolverProblemSolution* solution = problem->SolutionAt(k);
 		BRadioButton* solutionButton = new BRadioButton(
-			BString().SetToFormat("solution %" B_PRId32 ":", k + 1),
+			BString().SetToFormat(B_TRANSLATE_COMMENT("solution %d:",
+				"Don't change the %d variable"), k + 1),
 			new BMessage(kUpdateRetryButtonMessage));
 		problemGroup->AddChild(solutionButton);
 
@@ -261,8 +268,8 @@ ProblemWindow::_AddProblem(BSolverProblem* problem,
 		fSolutions[solutionButton] = Solution(problem, solution);
 	}
 
-	BRadioButton* ignoreButton = new BRadioButton("ignore problem for now",
-		new BMessage(kUpdateRetryButtonMessage));
+	BRadioButton* ignoreButton = new BRadioButton(B_TRANSLATE(
+		"ignore problem for now"), new BMessage(kUpdateRetryButtonMessage));
 	problemGroup->AddChild(ignoreButton);
 	ignoreButton->SetValue(B_CONTROL_ON);
 }
@@ -278,8 +285,9 @@ ProblemWindow::_SolutionElementText(
 	if (element->Type() == BSolverProblemSolutionElement::B_ALLOW_DEINSTALLATION
 		&& package != NULL
 		&& fPackagesAddedByUser->find(package) != fPackagesAddedByUser->end()) {
-		return BString("don't activate package %source%").ReplaceAll(
-			"%source%", package->VersionedName());
+		return BString(B_TRANSLATE_COMMENT("don't activate package %source%",
+				"don't change '%source%")).ReplaceAll(
+				"%source%", package->VersionedName());
 	}
 
 	return element->ToString();

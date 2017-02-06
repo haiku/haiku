@@ -7,31 +7,42 @@
  */
 
 
+#include <Catalog.h>
+
 #include <package/solver/SolverProblem.h>
 
 #include <package/solver/SolverPackage.h>
 #include <package/solver/SolverProblemSolution.h>
 
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "SolverProblem"
+
+
 static const char* const kToStringTexts[] = {
-	"unspecified problem",
-	"%source% does not belong to a distupgrade repository",
-	"%source% has inferior architecture",
-	"problem with installed package %source%",
-	"conflicting requests",
-	"nothing provides requested %dependency%",
-	"%dependency% is provided by the system",
-	"dependency problem",
-	"package %source% is not installable",
-	"nothing provides %dependency% needed by %source%",
-	"cannot install both %source% and %target%",
-	"package %source% conflicts with %dependency% provided by %target%",
-	"package %source% obsoletes %dependency% provided by %target%",
-	"installed package %source% obsoletes %dependency% provided by %target%",
-	"package %source% implicitly obsoletes %dependency% provided by %target%",
-	"package %source% requires %dependency%, but none of the providers can be "
-		"installed",
-	"package %source% conflicts with %dependency% provided by itself"
+	B_TRANSLATE_MARK("unspecified problem"),
+	B_TRANSLATE_MARK("%source% does not belong to a distupgrade repository"),
+	B_TRANSLATE_MARK("%source% has inferior architecture"),
+	B_TRANSLATE_MARK("problem with installed package %source%"),
+	B_TRANSLATE_MARK("conflicting requests"),
+	B_TRANSLATE_MARK("nothing provides requested %dependency%"),
+	B_TRANSLATE_MARK("%dependency% is provided by the system"),
+	B_TRANSLATE_MARK("dependency problem"),
+	B_TRANSLATE_MARK("package %source% is not installable"),
+	B_TRANSLATE_MARK("nothing provides %dependency% needed by %source%"),
+	B_TRANSLATE_MARK("cannot install both %source% and %target%"),
+	B_TRANSLATE_MARK("package %source% conflicts with %dependency% provided "
+		"by %target%"),
+	B_TRANSLATE_MARK("package %source% obsoletes %dependency% provided by "
+		"%target%"),
+	B_TRANSLATE_MARK("installed package %source% obsoletes %dependency% "
+		"provided by %target%"),
+	B_TRANSLATE_MARK("package %source% implicitly obsoletes %dependency% "
+		"provided by %target%"),
+	B_TRANSLATE_MARK("package %source% requires %dependency%, but none of the "
+		"providers can be installed"),
+	B_TRANSLATE_MARK("package %source% conflicts with %dependency% provided by "
+		"itself")
 };
 
 
@@ -124,7 +135,7 @@ BSolverProblem::ToString() const
 	if (index >= sizeof(kToStringTexts) / sizeof(kToStringTexts[0]))
 		index = 0;
 
-	return BString(kToStringTexts[index])
+	return BString(B_TRANSLATE_NOCOLLECT(kToStringTexts[index]))
 		.ReplaceAll("%source%",
 			fSourcePackage != NULL 
 				? fSourcePackage->VersionedName().String() : "?")

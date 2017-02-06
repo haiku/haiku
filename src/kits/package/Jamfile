@@ -72,6 +72,10 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 		Includes [ FGristFiles InitTerminateLibPackage.cpp ]
 			: [ BuildFeatureAttribute curl : headers ] ;
 
+		AddResources $(libsolv) :
+			LibsolvSolver.rdef
+			;
+
 		SharedLibrary [ MultiArchDefaultGristFiles libpackage.so ]
 			:
 			ActivateRepositoryCacheJob.cpp
@@ -130,7 +134,7 @@ for architectureObject in [ MultiArchSubDirSetup ] {
 			:
 			shared
 			bnetapi
-			be
+			be localestub
 			[ BuildFeatureAttribute curl : library ]
 			[ TargetLibstdc++ ]
 			$(TARGET_NETWORK_LIBS)

@@ -7,6 +7,7 @@
 #include "ResultWindow.h"
 
 #include <Button.h>
+#include <Catalog.h>
 #include <GroupView.h>
 #include <LayoutBuilder.h>
 #include <ScrollView.h>
@@ -19,6 +20,9 @@
 #include <ViewPort.h>
 
 
+#undef B_TRANSLATION_CONTEXT
+#define B_TRANSLATION_CONTEXT "PackageResult"
+
 using namespace BPackageKit;
 
 
@@ -27,7 +31,8 @@ static const uint32 kApplyMessage = 'rtry';
 
 ResultWindow::ResultWindow()
 	:
-	BWindow(BRect(0, 0, 400, 300), "Package changes", B_TITLED_WINDOW_LOOK,
+	BWindow(BRect(0, 0, 400, 300), B_TRANSLATE_COMMENT("Package changes",
+			"Window title"), B_TITLED_WINDOW_LOOK,
 		B_NORMAL_WINDOW_FEEL,
 		B_ASYNCHRONOUS_CONTROLS | B_NOT_MINIMIZABLE | B_AUTO_UPDATE_SIZE_LIMITS,
 		B_ALL_WORKSPACES),
@@ -48,13 +53,14 @@ ResultWindow::ResultWindow()
 
 	BLayoutBuilder::Group<>(this, B_VERTICAL, B_USE_DEFAULT_SPACING)
 		.SetInsets(B_USE_SMALL_INSETS)
-		.Add(topTextView = new BStringView(NULL,
-			"The following additional package changes have to be made:"))
+		.Add(topTextView = new BStringView(NULL, B_TRANSLATE(
+				"The following additional package changes have to be made:")))
 		.Add(new BScrollView(NULL, viewPort = new BViewPort(), 0, false, true))
 		.AddGroup(B_HORIZONTAL)
-			.Add(fCancelButton = new BButton("Cancel", new BMessage(B_CANCEL)))
+			.Add(fCancelButton = new BButton(B_TRANSLATE("Cancel"),
+				new BMessage(B_CANCEL)))
 			.AddGlue()
-			.Add(fApplyButton = new BButton("Apply changes",
+			.Add(fApplyButton = new BButton(B_TRANSLATE("Apply changes"),
 				new BMessage(kApplyMessage)))
 		.End();
 
@@ -197,11 +203,13 @@ ResultWindow::_AddPackages(BGroupLayout* packagesGroup,
 
 		BString text;
 		if (install) {
-			text.SetToFormat("install package %s from repository %s\n",
+			text.SetToFormat(B_TRANSLATE_COMMENT("install package %s from "
+					"repository %s\n", "Don't change '%s' variables"),
 				package->Info().FileName().String(),
 				package->Repository()->Name().String());
 		} else {
-			text.SetToFormat("uninstall package %s\n",
+			text.SetToFormat(B_TRANSLATE_COMMENT("uninstall package %s\n",
+					"Don't change '%s' variable"),
 				package->VersionedName().String());
 		}
 

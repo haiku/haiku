@@ -24,8 +24,15 @@ Server package_daemon
 	Volume.cpp
 	VolumeState.cpp
 	:
-	be package
+	be localestub package
 	[ TargetLibstdc++ ]
 	:
 	package_daemon.rdef
-	;
+;
+
+DoCatalogs package_daemon :
+	x-vnd.haiku-package_daemon
+	:
+	ProblemWindow.cpp
+	ResultWindow.cpp
+;
