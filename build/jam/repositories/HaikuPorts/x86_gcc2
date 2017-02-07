@@ -71,8 +71,8 @@ RemotePackageRepository HaikuPorts
 	belife-1.0.0-2
 	bemines-1.0b2-1
 	bepodder-1.3.0-3
-	bescreencapture-2.2-1
-	bescreencapture_inputfilter-2.2-1
+	bescreencapture-2.2.1-1
+	bescreencapture_inputfilter-2.2.1-1
 	bevexed-20141224-2
 	bezilla-2.0.0.22-1
 	binutils-2.17_2016_07_24-2
@@ -163,7 +163,7 @@ RemotePackageRepository HaikuPorts
 	fribidi_devel-0.19.6-2
 	friss-0.8.0-1
 	fuse-1.1.1-1
-	gawk-4.1.0-2
+	gawk-4.1.3-1
 	gcal-3.6.3-1
 	gcc-2.95.3_2014_10_14-4
 	gcc_syslibs_devel-2.95.3_2014_10_14-4
@@ -486,6 +486,9 @@ RemotePackageRepository HaikuPorts
 	python_sip-4.18-1
 	python_twisted-13.2.0-2
 	python_zope.interface-4.1.1-3
+	python3-3.5.1-1
+	python3_sip-4.18-1
+	pyyaml-3.11-1
 	q-1.1-1
 	qemacs-0.4.0dev-1
 	qrencode-3.4.4-1
@@ -514,8 +517,8 @@ RemotePackageRepository HaikuPorts
 	sdl_mixer_devel-1.2.12-6
 	sdl_net-1.2.8-5
 	sdl_net_devel-1.2.8-5
-	sdl_sound-1.0.3-2
-	sdl_sound_devel-1.0.3-2
+	sdl_sound-1.0.3-5
+	sdl_sound_devel-1.0.3-5
 	sdl_ttf-2.0.11-5
 	sdl_ttf_devel-2.0.11-5
 	sdl2_image-2.0.0-4
@@ -621,7 +624,7 @@ RemotePackageRepository HaikuPorts
 	avr_binutils_x86-2.26.1_2016_07_22-1
 	avr_gcc_x86-4.8.2_2014_03_20-1
 	avrdude_x86-6.0.1-2
-	bepdf_x86-2.0.1~beta1-1
+	bepdf_x86-2.0.1~beta1-2
 	beshare_x86-2.31-1
 	binutils_x86-2.26.1_2016_07_22-2
 	bison_x86-3.0.4-3
@@ -675,6 +678,7 @@ RemotePackageRepository HaikuPorts
 	djvulibre_x86_devel-3.5.25-1
 	documentviewer_x86-0.3_git-8
 	dosbox_x86-0.74-2
+	doxygen_x86-1.8.10-2
 	dtc_x86-1.4.1-1
 	enca_x86-1.18-1
 	enca_x86_devel-1.18-1
@@ -800,8 +804,8 @@ RemotePackageRepository HaikuPorts
 	libedit_x86_devel-2015_03_21_3.1-2
 	libelf_x86-0.8.13-1
 	libelf_x86_devel-0.8.13-1
-	libevent_x86-2.0.21-10
-	libevent_x86_devel-2.0.21-10
+	libevent_x86-2.0.21-11
+	libevent_x86_devel-2.0.21-11
 	libexecinfo_x86-1.1-1
 	libexecinfo_x86_devel-1.1-1
 	libffi_x86-3.0.13-1
@@ -1122,7 +1126,7 @@ RemotePackageRepository HaikuPorts
 	bemines
 	bepdf_x86
 	bepodder
-#	bescreencapture
+	bescreencapture
 	beshare_x86
 	bevexed
 	blogpositive
@@ -1182,6 +1186,7 @@ RemotePackageRepository HaikuPorts
 	dos2unix
 	dosbox_x86
 	doxygen
+	doxygen_x86
 	dtc_x86
 	ducksaver
 	ed
@@ -1536,6 +1541,9 @@ RemotePackageRepository HaikuPorts
 	python_sip
 	python_twisted
 	python_zope.interface
+	python3
+	python3_sip
+	pyyaml
 	q
 	qbittorrent_x86
 	qemacs
@@ -1664,6 +1672,7 @@ RemotePackageRepository HaikuPorts
 	ctags
 	diffutils
 	findutils
+	gawk
 	glu
 	grep
 	m4
