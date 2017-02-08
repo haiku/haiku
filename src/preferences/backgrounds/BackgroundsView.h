@@ -120,6 +120,7 @@ public:
 protected:
 			void				_Save();
 			void				_NotifyServer();
+			void				_NotifyScreenPreflet();
 			void				_LoadSettings();
 			void				_LoadDesktopFolder();
 			void				_LoadDefaultFolder();

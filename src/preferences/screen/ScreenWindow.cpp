@@ -1131,6 +1131,10 @@ ScreenWindow::MessageReceived(BMessage* message)
 			_UpdateActiveMode();
 			break;
 
+		case UPDATE_DESKTOP_COLOR_MSG:
+			PostMessage(message, fMonitorView);
+			break;
+
 		default:
 			BWindow::MessageReceived(message);
 	}

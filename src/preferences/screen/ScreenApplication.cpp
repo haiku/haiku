@@ -51,6 +51,7 @@ ScreenApplication::MessageReceived(BMessage* message)
 	switch (message->what) {
 		case SET_CUSTOM_REFRESH_MSG:
 		case MAKE_INITIAL_MSG:
+		case UPDATE_DESKTOP_COLOR_MSG:
 			fScreenWindow->PostMessage(message);
 			break;
 

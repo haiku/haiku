@@ -1,5 +1,5 @@
 /*
- * Copyright 2002-2015 Haiku, Inc. All rights reserved.
+ * Copyright 2002-2017 Haiku, Inc. All rights reserved.
  * Distributed under the terms of the MIT License.
  *
  * Authors:
@@ -7,6 +7,7 @@
  *		Jerome Duval, jerome.duval@free.fr
  *		Jonas Sundström, jonas@kirilla.se
  *		John Scipione, jscipione@gmail.com
+ *		Brian Hill <supernova@warpmail.net>
  */
 
 
@@ -17,6 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <Alert.h>
 #include <Bitmap.h>
 #include <Catalog.h>
 #include <ControlLook.h>
@@ -33,6 +35,7 @@
 #include <PopUpMenu.h>
 
 #include <be_apps/Tracker/Background.h>
+#include <ScreenDefs.h>
 
 #include "ImageFilePanel.h"
 
@@ -415,10 +418,10 @@ BackgroundsView::MessageReceived(BMessage* message)
 		{
 			_Save();
 
-			//_NotifyServer();
+			// Notify the server and Screen preflet
 			thread_id notify_thread;
 			notify_thread = spawn_thread(BackgroundsView::_NotifyThread,
-				"notifyServer", B_NORMAL_PRIORITY, this);
+				"notifyThread", B_NORMAL_PRIORITY, this);
 			resume_thread(notify_thread);
 			_UpdateButtons();
 			break;
@@ -659,8 +662,14 @@ BackgroundsView::_Save()
 
 	status_t status = fCurrent->SetBackgroundImage(&node);
 	if (status != B_OK) {
-		// TODO: this should be a BAlert!
-		printf("setting background image failed: %s\n", strerror(status));
+		BString error(strerror(status));
+		BString text(B_TRANSLATE("Setting the background image failed:"));
+		text.Append("\n").Append(error);
+		BAlert* alert = new BAlert(B_TRANSLATE("Set background image error"),
+			text, B_TRANSLATE("OK"));
+		alert->SetShortcut(0, B_ESCAPE);
+		alert->Go(NULL);
+		printf("setting background image failed: %s\n", error.String());
 	}
 }
 
@@ -743,12 +752,22 @@ BackgroundsView::_NotifyServer()
 }
 
 
+void
+BackgroundsView::_NotifyScreenPreflet()
+{
+	BMessenger messenger("application/x-vnd.Haiku-Screen");
+	if (messenger.IsValid())
+		messenger.SendMessage(UPDATE_DESKTOP_COLOR_MSG);
+}
+
+
 int32
 BackgroundsView::_NotifyThread(void* data)
 {
 	BackgroundsView* view = (BackgroundsView*)data;
 
 	view->_NotifyServer();
+	view->_NotifyScreenPreflet();
 	return B_OK;
 }
 
