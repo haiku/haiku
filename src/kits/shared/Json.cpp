@@ -1,5 +1,5 @@
 /*
- * Copyright 2014, Augustin Cavalier (waddlesplash)
+ * Copyright 2014-2017, Augustin Cavalier (waddlesplash)
  * Copyright 2014, Stephan Aßmus <superstippi@gmx.de>
  * Distributed under the terms of the MIT License.
  */
@@ -7,8 +7,9 @@
 
 #include <Json.h>
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cerrno>
 
 #include <MessageBuilder.h>
 #include <UnicodeChar.h>
@@ -45,7 +46,7 @@ public:
 			error = strerror(fReturnCode);
 		printf("Parse error at %" B_PRIi32 ": %s\n", fPosition, error);
 	}
-	
+
 	status_t ReturnCode() const
 	{
 		return fReturnCode;
@@ -88,8 +89,9 @@ BJson::_Parse(BMessage& message, BString& JSON)
 {
 	BMessageBuilder builder(message);
 	int32 pos = 0;
-	int32 length = JSON.Length();
-	
+	const int32 length = JSON.Length();
+	bool hadRootNode = false;
+
 	/* Locals used by the parser. */
 	// Keeps track of the hierarchy (e.g. "{[{{") that has
 	// been read in. Allows the parser to verify that openbraces
@@ -98,18 +100,18 @@ BJson::_Parse(BMessage& message, BString& JSON)
 	// Stores the key that was just read by the string parser,
 	// in the case that we are parsing a map.
 	BString key("");
-	
+
 	// TODO: Check builder return codes and throw exception, or
 	// change builder implementation/interface to throw exceptions
 	// instead of returning errors.
 	// TODO: Elimitate more duplicated code, for example by moving
 	// more code into _ParseConstant().
-	
+
 	while (pos < length) {
 		switch (JSON[pos]) {
 		case '{':
 			hierarchy += "{";
-			
+
 			if (hierarchy != "{") {
 				if (builder.What() == JSON_TYPE_ARRAY)
 					builder.PushObject(builder.CountNames());
@@ -117,54 +119,85 @@ BJson::_Parse(BMessage& message, BString& JSON)
 					builder.PushObject(key.String());
 					key = "";
 				}
-			}
+			} else if (hadRootNode == true) {
+				throw ParseException(pos,
+					"Got '{' with empty hierarchy but already had a root node");
+			} else
+				hadRootNode = true;
 
 			builder.SetWhat(JSON_TYPE_MAP);
 			break;
 
 		case '}':
+			if (key.Length() > 0)
+				throw ParseException(pos, "Got closebrace but still have a key");
 			if (hierarchy.EndsWith("{") && hierarchy.Length() != 1) {
 				hierarchy.Truncate(hierarchy.Length() - 1);
 				builder.PopObject();
-			} else if (hierarchy.Length() == 1)
-				return; // End of the JSON data
-			else
+			} else if (hierarchy.EndsWith("{") && hierarchy.Length() == 1) {
+				hierarchy.Truncate(hierarchy.Length() - 1);
+				break; // Should be the end of the data.
+			} else
 				throw ParseException(pos, "Unmatched closebrace }");
 
             break;
 
 		case '[':
 			hierarchy += "[";
-			
-			if (builder.What() == JSON_TYPE_ARRAY)
-				builder.PushObject(builder.CountNames());
-			else {
-				builder.PushObject(key.String());
-				key = "";
-			}
+
+			if (hierarchy != "[") {
+				if (builder.What() == JSON_TYPE_ARRAY)
+					builder.PushObject(builder.CountNames());
+				else {
+					builder.PushObject(key.String());
+					key = "";
+				}
+			} else if (hadRootNode == true) {
+				throw ParseException(pos,
+					"Got '[' with empty hierarchy but already had a root node");
+			} else
+				hadRootNode = true;
 
 			builder.SetWhat(JSON_TYPE_ARRAY);
 			break;
 
 		case ']':
-			if (hierarchy.EndsWith("[")) {
+			if (hierarchy.EndsWith("[") && hierarchy.Length() != 1) {
 				hierarchy.Truncate(hierarchy.Length() - 1);
 				builder.PopObject();
-			} else {
-				BString error("Unmatched closebrace ] hierarchy: ");
-				error << hierarchy;
-				throw ParseException(pos, error);
-			}
+			} else if (hierarchy.EndsWith("[") && hierarchy.Length() == 1) {
+				hierarchy.Truncate(hierarchy.Length() - 1);
+				break; // Should be the end of the data.
+			} else
+				throw ParseException(pos, "Unmatched closebracket ]");
 
+			break;
+
+
+		case ':':
+			if (hierarchy.Length() == 0)
+				throw ParseException(pos, "Expected EOF, got ':'");
+			if (builder.What() != JSON_TYPE_MAP || key.Length() == 0) {
+				throw ParseException(pos, "Unexpected ':'");
+			}
+			break;
+		case ',':
+			if (builder.What() == JSON_TYPE_MAP && key.Length() != 0) {
+				throw ParseException(pos, "Unexpected ',' expected ':'");
+			}
+			if (hierarchy.Length() == 0)
+				throw ParseException(pos, "Expected EOF, got ','");
 			break;
 
 		case 't':
 		{
+			if (hierarchy.Length() == 0)
+				throw ParseException(pos, "Expected EOF, got 't'");
 			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0) {
 				throw ParseException(pos,
 					"'true' cannot be a key, it can only be a value");
 			}
-			
+
 			if (_ParseConstant(JSON, pos, "true")) {
 				if (builder.What() == JSON_TYPE_ARRAY)
 					key.SetToFormat("%" B_PRIu32, builder.CountNames());
@@ -178,11 +211,13 @@ BJson::_Parse(BMessage& message, BString& JSON)
 
 		case 'f':
 		{
+			if (hierarchy.Length() == 0)
+				throw ParseException(pos, "Expected EOF, got 'f'");
 			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0) {
 				throw ParseException(pos,
 					"'false' cannot be a key, it can only be a value");
 			}
-			
+
 			if (_ParseConstant(JSON, pos, "false")) {
 				if (builder.What() == JSON_TYPE_ARRAY)
 					key.SetToFormat("%" B_PRIu32, builder.CountNames());
@@ -196,11 +231,13 @@ BJson::_Parse(BMessage& message, BString& JSON)
 
         case 'n':
         {
+			if (hierarchy.Length() == 0)
+				throw ParseException(pos, "Expected EOF, got 'n'");
 			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0) {
 				throw ParseException(pos,
 					"'null' cannot be a key, it can only be a value");
 			}
-			
+
 			if (_ParseConstant(JSON, pos, "null")) {
 				if (builder.What() == JSON_TYPE_ARRAY)
 					key.SetToFormat("%" B_PRIu32, builder.CountNames());
@@ -213,6 +250,8 @@ BJson::_Parse(BMessage& message, BString& JSON)
 		}
 
 		case '"':
+			if (hierarchy.Length() == 0)
+				throw ParseException(pos, "Expected EOF, got '\"'");
 			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0)
 				key = _ParseString(JSON, pos);
 			else if (builder.What() != JSON_TYPE_ARRAY && key.Length() > 0) {
@@ -240,11 +279,13 @@ BJson::_Parse(BMessage& message, BString& JSON)
 		case '8':
 		case '9':
 		{
+			if (hierarchy.Length() == 0)
+				throw ParseException(pos, "Expected EOF, got number");
 			if (builder.What() != JSON_TYPE_ARRAY && key.Length() == 0) {
 				throw ParseException(pos,
 					"Numbers cannot be keys, they can only be values");
 			}
-			
+
 			if (builder.What() == JSON_TYPE_ARRAY)
 				key << builder.CountNames();
 
@@ -255,16 +296,21 @@ BJson::_Parse(BMessage& message, BString& JSON)
 			break;
 		}
 
-		case ':':
-		case ',':
-		default:
-			// No need to do anything here.
+		case ' ':
+		case '\t':
+		case '\n':
+		case '\r':
+			// Whitespace; ignore.
 			break;
+
+		default:
+			throw ParseException(pos, "Unexpected character");
 		}
 		pos++;
 	}
 
-	throw ParseException(pos, "Unexpected end of document");
+	if (hierarchy.Length() != 0)
+		throw ParseException(pos, "Unexpected EOF");
 }
 
 
@@ -274,9 +320,9 @@ BJson::_ParseString(BString& JSON, int32& pos)
 	if (JSON[pos] != '"') // Verify we're at the start of a string.
 		return BString("");
 	pos++;
-	
+
 	BString str;
-	while (JSON[pos] != '"') {
+	while (JSON[pos] != '"' && pos < JSON.Length()) {
 		if (JSON[pos] == '\\') {
 			pos++;
 			switch (JSON[pos]) {
@@ -336,6 +382,7 @@ double
 BJson::_ParseNumber(BString& JSON, int32& pos)
 {
 	BString value;
+	bool isDouble = false;
 
 	while (true) {
 		switch (JSON[pos]) {
@@ -343,6 +390,9 @@ BJson::_ParseNumber(BString& JSON, int32& pos)
 		case '-':
 		case 'e':
 		case 'E':
+		case '.':
+			isDouble = true;
+			// fall through
 		case '0':
 		case '1':
 		case '2':
@@ -353,7 +403,6 @@ BJson::_ParseNumber(BString& JSON, int32& pos)
 		case '7':
 		case '8':
 		case '9':
-		case '.':
 			value += JSON[pos];
 			pos++;
 			continue;
@@ -366,8 +415,16 @@ BJson::_ParseNumber(BString& JSON, int32& pos)
 		}
 		break;
 	}
-	
-	return strtod(value.String(), NULL);
+
+	errno = 0;
+	double ret = 0;
+	if (isDouble)
+		ret = strtod(value.String(), NULL);
+	else
+		ret = strtoll(value.String(), NULL, 10);
+	if (errno != 0)
+		throw ParseException(pos, "Invalid number!");
+	return ret;
 }
 
 
