@@ -252,9 +252,8 @@ status_t
 ServerIconExportUpdateProcess::_PopulateIconMetaData(IconMetaData& iconMetaData,
 	BString& jsonString) const
 {
-	BJson parser;
 	BMessage infoMetaDataMessage;
-	status_t result = parser.Parse(infoMetaDataMessage, jsonString);
+	status_t result = BJson::Parse(jsonString, infoMetaDataMessage);
 
 	if (result == B_OK)
 		return _PopulateIconMetaData(iconMetaData, infoMetaDataMessage);

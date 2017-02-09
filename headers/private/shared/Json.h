@@ -2,8 +2,8 @@
  * Copyright 2014, Augustin Cavalier (waddlesplash)
  * Distributed under the terms of the MIT License.
  */
-#ifndef JSON_H
-#define JSON_H
+#ifndef _JSON_H
+#define _JSON_H
 
 #include <Message.h>
 #include <String.h>
@@ -18,14 +18,14 @@ public:
 			};
 
 public:
-	static	status_t			Parse(BMessage& message, const char* JSON);
-	static	status_t			Parse(BMessage& message, BString& JSON);
+	static	status_t			Parse(const char* JSON, BMessage& message);
+	static	status_t			Parse(const BString& JSON, BMessage& message);
 
 private:
-	static	void				_Parse(BMessage& message, BString& JSON);
-	static	BString				_ParseString(BString& JSON, int32& pos);
-	static	double				_ParseNumber(BString& JSON, int32& pos);
-	static	bool				_ParseConstant(BString& JSON, int32& pos,
+	static	void				_Parse(const BString& JSON, BMessage& message);
+	static	BString				_ParseString(const BString& JSON, int32& pos);
+	static	double				_ParseNumber(const BString& JSON, int32& pos);
+	static	bool				_ParseConstant(const BString& JSON, int32& pos,
 									 const char* constant);
 };
 
@@ -33,4 +33,4 @@ private:
 
 using BPrivate::BJson;
 
-#endif	// JSON_H
+#endif	// _JSON_H

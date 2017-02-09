@@ -60,18 +60,18 @@ private:
 
 
 status_t
-BJson::Parse(BMessage& message, const char* JSON)
+BJson::Parse(const char* JSON, BMessage& message)
 {
 	BString temp(JSON);
-	return Parse(message, temp);
+	return Parse(temp, message);
 }
 
 
 status_t
-BJson::Parse(BMessage& message, BString& JSON)
+BJson::Parse(const BString& JSON, BMessage& message)
 {
 	try {
-		_Parse(message, JSON);
+		_Parse(JSON, message);
 		return B_OK;
 	} catch (ParseException e) {
 		e.PrintToStream();
@@ -85,7 +85,7 @@ BJson::Parse(BMessage& message, BString& JSON)
 
 
 void
-BJson::_Parse(BMessage& message, BString& JSON)
+BJson::_Parse(const BString& JSON, BMessage& message)
 {
 	BMessageBuilder builder(message);
 	int32 pos = 0;
@@ -315,7 +315,7 @@ BJson::_Parse(BMessage& message, BString& JSON)
 
 
 BString
-BJson::_ParseString(BString& JSON, int32& pos)
+BJson::_ParseString(const BString& JSON, int32& pos)
 {
 	if (JSON[pos] != '"') // Verify we're at the start of a string.
 		return BString("");
@@ -379,7 +379,7 @@ BJson::_ParseString(BString& JSON, int32& pos)
 
 
 double
-BJson::_ParseNumber(BString& JSON, int32& pos)
+BJson::_ParseNumber(const BString& JSON, int32& pos)
 {
 	BString value;
 	bool isDouble = false;
@@ -429,7 +429,7 @@ BJson::_ParseNumber(BString& JSON, int32& pos)
 
 
 bool
-BJson::_ParseConstant(BString& JSON, int32& pos, const char* constant)
+BJson::_ParseConstant(const BString& JSON, int32& pos, const char* constant)
 {
 	BString value;
 	JSON.CopyInto(value, pos, strlen(constant));

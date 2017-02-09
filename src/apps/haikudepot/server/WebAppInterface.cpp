@@ -679,8 +679,7 @@ WebAppInterface::_SendJsonRequest(const char* domain, BString jsonString,
 	if (jsonString.Length() == 0)
 		return B_ERROR;
 
-	BJson parser;
-	status_t status = parser.Parse(reply, jsonString);
+	status_t status = BJson::Parse(jsonString, reply);
 	if (ServerSettings::UrlConnectionTraceLoggingEnabled() &&
 		status == B_BAD_DATA) {
 		printf("Parser choked on JSON:\n%s\n", jsonString.String());

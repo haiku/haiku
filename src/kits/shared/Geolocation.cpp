@@ -118,7 +118,7 @@ BGeolocation::LocateSelf(float& latitude, float& longitude)
 	}
 
 	BMessage data;
-	result = BJson::Parse(data, (char*)listener.result.Buffer());
+	result = BJson::Parse((char*)listener.result.Buffer(), data);
 	delete http;
 	if (result != B_OK) {
 		return result;
