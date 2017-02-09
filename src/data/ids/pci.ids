@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2017.01.28
-#	Date:    2017-01-28 03:15:02
+#	Version: 2017.02.08
+#	Date:    2017-02-08 03:15:01
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -6097,6 +6097,10 @@
 		1077 0246  8300 Series Dual Port 10GbE Converged Network Adapter (TCP/IP Networking)
 	8031  8300 Series 10GbE Converged Network Adapter (FCoE)
 	8032  8300 Series 10GbE Converged Network Adapter (iSCSI)
+	8070  FastLinQ QL41000 Series 10/25/40/50GbE Controller
+	8080  FastLinQ QL41000 Series 10/25/40/50GbE Controller (FCoE)
+	8084  FastLinQ QL41000 Series 10/25/40/50GbE Controller (iSCSI)
+	8090  FastLinQ QL41000 Series Gigabit Ethernet Controller (SR-IOV VF)
 	8430  ISP8324 1/10GbE Converged Network Controller (NIC VF)
 	8431  8300 Series 10GbE Converged Network Adapter (FCoE VF)
 	8432  ISP2432M-based 10GbE Converged Network Adapter (CNA)
