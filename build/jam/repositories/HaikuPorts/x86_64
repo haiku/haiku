@@ -47,7 +47,7 @@ RemotePackageRepository HaikuPorts
 	courier_prime-1.203-1
 	croscorefonts-1.31.0-1
 	dejagnu-1.6-1
-	dejavu-2.35-1
+	dejavu-2.37-1
 	docbook_xml_dtd-4.5-2
 	docbook_xsl_stylesheets-1.78.1-1
 	droid-113-2
@@ -78,9 +78,9 @@ RemotePackageRepository HaikuPorts
 	nafees_nastaleeq-1.02-3
 	nafees_riqa-1.00-3
 	netsurf_buildsystem-1.5-2
-	noto-20160613-4
-	noto_chroscore-20160613-4
-	noto_regional-20160613-4
+	noto-20170202-4
+	noto_chroscore-20170202-4
+	noto_regional-20170202-4
 	noto_sans_cjk_jp-1.004-2
 	noto_sans_cjk_kr-1.004-2
 	noto_sans_cjk_sc-1.004-2
