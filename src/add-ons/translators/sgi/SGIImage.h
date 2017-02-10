@@ -40,7 +40,7 @@
  *
  *	 $Log: SGIImage.h,v $
  *	 Revision 1.2  2004/02/03 00:52:18  mwilber
- *	 Removed GPL text as permission was obtained from Michael Sweet to allow this derivative work to be distributed under the OpenBeOS license.
+ *	 Removed GPL text as permission was obtained from Michael Sweet to allow this derivative work to be distributed under the MIT License.
  *
  *	 Revision 1.1  2004/02/02 23:55:38  mwilber
  *	 Initial check in for Stephan Assmus' SGITranslator

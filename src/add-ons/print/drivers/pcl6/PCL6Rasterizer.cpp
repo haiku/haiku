@@ -2,7 +2,7 @@
 ** PCL6Rasterizer.cpp
 ** Copyright 2005, Michael Pfeiffer, laplace@users.sourceforge.net.
 ** All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 
 

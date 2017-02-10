@@ -1,6 +1,6 @@
 /* File System attribute queries
 **
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef _FSSH_FS_QUERY_H
 #define _FSSH_FS_QUERY_H

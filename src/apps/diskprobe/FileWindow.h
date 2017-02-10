@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef FILE_WINDOW_H
 #define FILE_WINDOW_H

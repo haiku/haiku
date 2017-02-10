@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2004, Ingo Weinhold, bonefish@cs.tu-berlin.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 
 #include <stdio.h>

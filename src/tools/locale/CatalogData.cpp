@@ -1,5 +1,5 @@
 /*
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 ** Copyright 2003-2004,2012. All rights reserved.
 **
 ** Authors:	Axel Dörfler, axeld@pinc-software.de

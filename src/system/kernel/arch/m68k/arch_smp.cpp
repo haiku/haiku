@@ -6,7 +6,7 @@
  * 		François Revol <revol@free.fr>
  *
  * Copyright 2004, Axel Dörfler, axeld@pinc-software.de
- * Distributed under the terms of the OpenBeOS License.
+ * Distributed under the terms of the MIT License.
  */
 
 

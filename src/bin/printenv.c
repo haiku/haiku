@@ -3,7 +3,7 @@
 //  Copyright (c) 2001-2003, OpenBeOS
 //
 //  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  by the MIT License.
 //
 //
 //  File:        printenv.c

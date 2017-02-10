@@ -1,7 +1,7 @@
 /* Stream - inode stream access functions
 **
 ** Copyright 2003-2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef STREAM_H
 #define STREAM_H

@@ -1,6 +1,6 @@
 /* Modules Definitions
 ** 
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 
 #ifndef _FSSH_MODULE_H

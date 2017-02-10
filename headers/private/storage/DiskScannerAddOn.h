@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  by the MIT License.
 //---------------------------------------------------------------------
 #ifndef _DISK_SCANNER_ADD_ON
 #define _DISK_SCANNER_ADD_ON

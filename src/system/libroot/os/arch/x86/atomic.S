@@ -3,7 +3,7 @@
  * Distributed under the terms of the MIT License.
  *
 ** Copyright 2003, Marcus Overhagen. All rights reserved.
-** Distributed under the terms of the OpenBeOS license.
+** Distributed under the terms of the MIT License.
 **
 ** Copyright 2001, Travis Geiselbrecht. All rights reserved.
 ** Distributed under the terms of the NewOS License.

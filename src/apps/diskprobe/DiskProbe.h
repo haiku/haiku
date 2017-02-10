@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2004, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef DISK_PROBE_H
 #define DISK_PROBE_H

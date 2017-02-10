@@ -1,5 +1,5 @@
 /* This software is part of the OpenBeOS distribution and is covered 
-** by the OpenBeOS license.
+** by the MIT License.
 */
 #ifndef VIRTUAL_DRIVE_H
 #define VIRTUAL_DRIVE_H

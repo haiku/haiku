@@ -3,7 +3,7 @@
 /* Stack - a template stack class
 **
 ** Copyright 2001 pinc Software. All Rights Reserved.
-** This file may be used under the terms of the OpenBeOS License.
+** This file may be used under the terms of the MIT License.
 */
 
 

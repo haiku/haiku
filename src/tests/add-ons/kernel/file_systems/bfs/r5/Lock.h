@@ -5,7 +5,7 @@
 ** Initial version by Axel Dörfler, axeld@pinc-software.de
 ** Roughly based on a Be sample code written by Nathan Schrenk.
 **
-** This file may be used under the terms of the OpenBeOS License.
+** This file may be used under the terms of the MIT License.
 */
 
 

@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2002, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef KQUEUE_H
 #define KQUEUE_H

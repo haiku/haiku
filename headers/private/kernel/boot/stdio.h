@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef _STDIO_H_
 #define _STDIO_H_

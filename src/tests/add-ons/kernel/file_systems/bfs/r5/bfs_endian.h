@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef BFS_ENDIAN_H
 #define BFS_ENDIAN_H

@@ -6,7 +6,7 @@
  * 		François Revol <revol@free.fr>
  *
  * Copyright 2003, Marcus Overhagen. All rights reserved.
- * Distributed under the terms of the OpenBeOS License.
+ * Distributed under the terms of the MIT License.
  */
 
 #include <KernelExport.h>

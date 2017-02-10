@@ -1,7 +1,7 @@
 /* 
 ** Copyright 2004, Jérôme Duval. All rights reserved.
 **
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 
 #include <Input.h>

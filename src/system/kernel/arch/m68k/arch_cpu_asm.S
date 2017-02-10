@@ -1,6 +1,6 @@
 /*
-** Copyright 2003, Axel D�fler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
+** Distributed under the terms of the MIT License.
 */
 
 #include <asm_defs.h>
@@ -13,7 +13,7 @@
  * Those two probe hardware register for presence, trapping bus errors.
  * inspired by the Linux version, cf.
  * http://lxr.linux.no/linux+v2.6.27/arch/m68k/mm/hwtest.c
- * 
+ *
  * though I'm not sure why the tests are on words only.
  * Some regs are bytes only and the even byte is unmapped...
  * but probably ignored.

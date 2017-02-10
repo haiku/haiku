@@ -1,7 +1,7 @@
 /* BlockAllocator - block bitmap handling and allocation policies
 **
 ** Initial version by Axel Dörfler, axeld@pinc-software.de
-** This file may be used under the terms of the OpenBeOS License.
+** This file may be used under the terms of the MIT License.
 */
 
 

@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 
 // ToDo: this is a dummy implementation - I've not yet gained enough knowledge

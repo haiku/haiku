@@ -6,7 +6,7 @@
 ** Parts of this code is based on work previously done by Marcus Overhagen
 **
 ** Copyright 2001, pinc Software. All Rights Reserved.
-** This file may be used under the terms of the OpenBeOS License.
+** This file may be used under the terms of the MIT License.
 */
 
 

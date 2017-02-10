@@ -1,7 +1,7 @@
 /* 
  * Copyright 2004-2010, Marcus Overhagen. All rights reserved.
  * Copyright 2016, Dario Casalinuovo. All rights reserved.
- * Distributed under the terms of the OpenBeOS License.
+ * Distributed under the terms of the MIT License.
  */
 
 

@@ -6,7 +6,7 @@
 ** Roughly based on 'btlib' written by Marcus J. Ranum
 ** 
 ** Copyright (c) 2001-2004 pinc Software. All Rights Reserved.
-** This file may be used under the terms of the OpenBeOS License.
+** This file may be used under the terms of the MIT License.
 */
 
 

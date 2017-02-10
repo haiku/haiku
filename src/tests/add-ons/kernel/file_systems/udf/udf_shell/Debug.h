@@ -4,7 +4,7 @@
 **
 ** Initial version by Axel Dörfler, axeld@pinc-software.de
 ** UDF version by Tyler Dauwalder, tyler@dauwalder.net
-** This file may be used under the terms of the OpenBeOS License.
+** This file may be used under the terms of the MIT License.
 */
 
 #ifdef DEBUG

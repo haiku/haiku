@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef KERNEL_BOOT_PLATFORM_OPENFIRMWARE_KERNEL_ARGS_H
 #define KERNEL_BOOT_PLATFORM_OPENFIRMWARE_KERNEL_ARGS_H

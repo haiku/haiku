@@ -1,6 +1,6 @@
 /* File System attributes
 **
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef _FSSH_FS_ATTR_H
 #define	_FSSH_FS_ATTR_H

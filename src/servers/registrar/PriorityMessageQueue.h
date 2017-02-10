@@ -1,6 +1,6 @@
 //----------------------------------------------------------------------
 //  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  by the MIT License.
 //---------------------------------------------------------------------
 
 #ifndef PRIORITY_MESSAGE_QUEUE_H

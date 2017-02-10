@@ -1,7 +1,7 @@
 #ifndef _CONFIG_MANAGER_DRIVER_H_
 #define _CONFIG_MANAGER_DRIVER_H_
 /* 
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 
 /* definitions for the /dev/misc/config driver which provides access

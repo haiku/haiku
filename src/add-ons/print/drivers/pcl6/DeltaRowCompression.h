@@ -2,7 +2,7 @@
 ** DeltaRowCompression.h
 ** Copyright 2005, Michael Pfeiffer, laplace@users.sourceforge.net.
 ** All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef _DELTA_ROW_COMPRESSION_H
 #define _DELTA_ROW_COMPRESSION_H

@@ -1,6 +1,6 @@
 /* File System indices
 **
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef _FSSH_FS_INDEX_H
 #define	_FSSH_FS_INDEX_H

@@ -1,6 +1,6 @@
 /* 
 ** Copyright 2003, Marcus Overhagen. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef _KERNEL_USER_ATOMIC_H
 #define _KERNEL_USER_ATOMIC_H

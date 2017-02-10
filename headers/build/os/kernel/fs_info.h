@@ -1,6 +1,6 @@
 /* General File System informations/capabilities
 **
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef _FS_INFO_H
 #define	_FS_INFO_H

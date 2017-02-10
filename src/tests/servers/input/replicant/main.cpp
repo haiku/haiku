@@ -3,7 +3,7 @@
 //	Copyright (c) 2004, OpenBeOS
 //
 //  This software is part of the OpenBeOS distribution and is covered 
-//  by the OpenBeOS license.
+//  by the MIT License.
 //
 //
 //  Program:	 desklink

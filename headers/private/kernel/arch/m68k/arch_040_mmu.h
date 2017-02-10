@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003, Axel Dörfler, axeld@pinc-software.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 #ifndef _KERNEL_ARCH_M68K_040_MMU_H
 #define _KERNEL_ARCH_M68K_040_MMU_H

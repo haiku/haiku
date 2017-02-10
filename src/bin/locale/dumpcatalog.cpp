@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003, Oliver Tappe, zooey@hirschkaefer.de. All rights reserved.
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 
 #include <cstdio>

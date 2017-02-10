@@ -2,7 +2,7 @@
 #define _FSSH_NODE_MONITOR_H
 /* Node monitor calls for kernel add-ons
 **
-** Distributed under the terms of the OpenBeOS License.
+** Distributed under the terms of the MIT License.
 */
 
 

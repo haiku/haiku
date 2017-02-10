@@ -3,7 +3,7 @@
 /* Stack - a template stack class, does not call any constructors/destructors
 **
 ** Copyright 2001 pinc Software. All Rights Reserved.
-** This file may be used under the terms of the OpenBeOS License.
+** This file may be used under the terms of the MIT License.
 **
 ** 2002-03-10 Modified by Marcus Overhagen
 */
