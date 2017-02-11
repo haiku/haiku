@@ -16,7 +16,7 @@ RemotePackageRepository HaikuPorts
 	droid-113-2
 	flare_x86_data-0.19-3
 	fontawesome-4.6.3-1
-	freedroidrpg_x86_data-0.15.1-1
+	freedroidrpg_x86_data-0.16.1-1
 	gws-0.1.8-2
 	haikuporter-1.1.1-1
 	hub-1.12.4-2
@@ -33,6 +33,7 @@ RemotePackageRepository HaikuPorts
 	openttd_sfx-0.2.3-1
 	texi2html-1.82-2
 	timgmsoundfont-fixed-5
+	unknown_horizons-2014.1-1
 	vl_gothic-20141206-1
 	wqy_microhei-0.2.0~beta-4
 	youtube_dl-2016.08.12-1
@@ -212,7 +213,7 @@ RemotePackageRepository HaikuPorts
 	hdialog-0.2-2
 	help2man-1.46.6-1
 	hexvexed-1.0.0-2
-	htmldoc-1.8.27-3
+	htmldoc-1.8.29-1
 	html_parser-3.71-2
 	hubbub-0.3.0-1
 	hubbub_devel-0.3.0-1
@@ -243,7 +244,7 @@ RemotePackageRepository HaikuPorts
 	keymapswitcher-1.2.7.11-2
 	lame-3.99.5-7
 	lame_devel-3.99.5-7
-	lbreakout2-2.6.5-1
+	lbreakout2-2.6.5-3
 	lcms-2.5-1
 	lcms_devel-2.5-1
 	less-481-1
@@ -254,8 +255,8 @@ RemotePackageRepository HaikuPorts
 	libart_lgpl_devel-2.3.21-1
 	libasr-1.0.2-2
 	libasr_devel-1.0.2-2
-	libassuan-2.1.3-1
-	libassuan_devel-2.1.3-1
+	libassuan-2.4.3-1
+	libassuan_devel-2.4.3-1
 	libcddb-1.3.2-2
 	libcddb_devel-1.3.2-2
 	libcdio-0.93-3
@@ -277,8 +278,8 @@ RemotePackageRepository HaikuPorts
 	libdvdread_devel-5.0.3-2
 	libebml-1.3.1-2
 	libebml_devel-1.3.1-2
-	libedit-2015_03_21_3.1-2
-	libedit_devel-2015_03_21_3.1-2
+	libedit-2015_03_21_3.1-5
+	libedit_devel-2015_03_21_3.1-5
 	libffi-3.0.13-2
 	libffi_devel-3.0.13-2
 	libgcrypt-1.7.2-2
@@ -438,7 +439,7 @@ RemotePackageRepository HaikuPorts
 	openjpeg-2.1.0-2
 	openjpeg_devel-2.1.0-2
 	opensound-4.2_git-2
-	openssh-7.1p1-4
+	openssh-7.4p1-2
 	openssl-1.0.2g-1
 	openssl_devel-1.0.2g-1
 	opus-1.1.3-1
@@ -462,7 +463,7 @@ RemotePackageRepository HaikuPorts
 	php-5.6.4-4
 	physfs-2.0.3-2
 	physfs_devel-2.0.3-2
-	pipepanic-0.1.3-3
+	pipepanic-0.1.3-5
 	pkgconfig-0.29-2
 	ponpokodiff-0.2.0-3
 	popt-1.16-1
@@ -532,8 +533,8 @@ RemotePackageRepository HaikuPorts
 	sequitur_devices-2.1.3-2
 	serf-1.3.8-2
 	serf_devel-1.3.8-2
-	sge-030809-2
-	sge_devel-030809-2
+	sge-030809-3
+	sge_devel-030809-3
 	sharutils-4.15.2-2
 	slang-2.2.4-1
 	slang_devel-2.2.4-1
@@ -552,7 +553,7 @@ RemotePackageRepository HaikuPorts
 	subversion-1.8.11-8
 	subversion_devel-1.8.11-8
 	sum_it-0.2beta-5
-	super_transball-2.1.5-1
+	super_transball-2.1.5-2
 	swig-3.0.11-1
 	taglib-1.7.2-2
 	taglib_devel-1.7.2-2
@@ -562,7 +563,8 @@ RemotePackageRepository HaikuPorts
 	tcl-8.5.18-4
 	tcl_devel-8.5.18-4
 	tcpdump-4.7.4-2
-	texinfo-4.13a-8
+	texinfo-6.1-1
+	texinfo4-4.13a-1
 	thememanager-1.0_git-3
 	tiff-3.9.6-2
 	tiff_devel-3.9.6-2
@@ -573,8 +575,8 @@ RemotePackageRepository HaikuPorts
 	timetracker-0.2-1
 	tinyxml-2.6.2-3
 	tinyxml_devel-2.6.2-3
-	twolame-0.3.13-1
-	twolame_devel-0.3.13-1
+	twolame-0.3.13-3
+	twolame_devel-0.3.13-3
 	ubertuber-0.9.11-2
 	unrar-5.3.4-1
 	unzip-6.0-3
@@ -588,13 +590,13 @@ RemotePackageRepository HaikuPorts
 	vlc-0.8.6i-1
 	vlc_devel-0.8.6i-1
 	vlink-0.15-1
-	vmware_addons-1.1.1-5
+	vmware_addons-1.1.1-6
 	vncserver-1.27-1
 	weather-0.1.1_git-3
 	wget-1.18-2
 	whereismymouse-1.0-1
 	which-2.21-3
-	wonderbrush-2.1.2-4
+	wonderbrush-2.1.2-5
 	wpa_supplicant-2.0-4
 	xcb_proto-1.6-2
 	xextproto-7.3.0-1
@@ -603,7 +605,7 @@ RemotePackageRepository HaikuPorts
 	xproto-7.0.26-3
 	xrick-021212-2
 	xtrans-1.3.5-2
-	yab-1.7.5.3-3
+	yab-1.7.5.3-4
 	yab_ide-2.2.7-2
 	yasm-1.3.0-3
 	zip-3.0-3
@@ -702,7 +704,8 @@ RemotePackageRepository HaikuPorts
 	fluidsynth_x86_devel-1.1.6-4
 	fontconfig_x86-2.12.1-2
 	fontconfig_x86_devel-2.12.1-2
-	freedroidrpg_x86-0.15.1-1
+	freeciv_x86-2.5.6-2
+	freedroidrpg_x86-0.16.1-1
 	freetype_x86-2.7-1
 	freetype_x86_devel-2.7-1
 	fribidi_x86-0.19.6-2
@@ -710,7 +713,7 @@ RemotePackageRepository HaikuPorts
 	gcc_x86-5.4.0_2016_06_04-1
 	gcc_x86_syslibs-5.4.0_2016_06_04-1
 	gcc_x86_syslibs_devel-5.4.0_2016_06_04-1
-	gcc6809_x86-4.6.1-2
+	gcc6809_x86-4.6.4-1
 	gdk_pixbuf_x86-2.31.5-1
 	gdk_pixbuf_x86_devel-2.31.5-1
 	gettext_x86-0.19.8.1-2
@@ -774,8 +777,8 @@ RemotePackageRepository HaikuPorts
 	libasr_x86_devel-1.0.2-2
 	libass_x86-0.13.0-1
 	libass_x86_devel-0.13.0-1
-	libassuan_x86-2.1.3-1
-	libassuan_x86_devel-2.1.3-1
+	libassuan_x86-2.4.3-1
+	libassuan_x86_devel-2.4.3-1
 	libattica_x86-0.4.2-1
 	libattica_x86_devel-0.4.2-1
 	libbluray_x86-0.9.3-2
@@ -802,16 +805,16 @@ RemotePackageRepository HaikuPorts
 	libdvdnav_x86_devel-5.0.3-3
 	libdvdread_x86-5.0.3-2
 	libdvdread_x86_devel-5.0.3-2
-	libedit_x86-2015_03_21_3.1-2
-	libedit_x86_devel-2015_03_21_3.1-2
+	libedit_x86-2015_03_21_3.1-5
+	libedit_x86_devel-2015_03_21_3.1-5
 	libelf_x86-0.8.13-1
 	libelf_x86_devel-0.8.13-1
 	libevent_x86-2.0.21-11
 	libevent_x86_devel-2.0.21-11
 	libexecinfo_x86-1.1-1
 	libexecinfo_x86_devel-1.1-1
-	libffi_x86-3.0.13-1
-	libffi_x86_devel-3.0.13-1
+	libffi_x86-3.2.1-3
+	libffi_x86_devel-3.2.1-3
 	libftdi_x86-1.0-3
 	libftdi_x86_devel-1.0-3
 	libgcrypt_x86-1.7.2-2
@@ -984,7 +987,7 @@ RemotePackageRepository HaikuPorts
 	openjpeg_x86_devel-2.1.2-1
 	openssl_x86-1.0.2g-1
 	openssl_x86_devel-1.0.2g-1
-	openttd_x86-1.3.3-1
+	openttd_x86-1.6.1-1
 	opus_x86-1.1.3-1
 	opus_x86_devel-1.1.3-1
 	opusfile_x86-0.6-1
@@ -1013,7 +1016,7 @@ RemotePackageRepository HaikuPorts
 	qt5_x86-5.6.1-1
 	qt5_x86_devel-5.6.1-1
 	qt5_x86_docs-5.6.1-1
-	quassel_x86-0.10.0-2
+	quassel_x86-0.10.0-3
 	quicklaunch-0.9.12-1
 	qupzilla_x86-1.8.6-1
 	qutim_x86-0.3.3-1
@@ -1023,27 +1026,27 @@ RemotePackageRepository HaikuPorts
 	readline_x86-6.3.8-3
 	readline_x86_devel-6.3.8-3
 	rocksndiamonds_x86-3.3.1.2-2
-	ruby_x86-2.2.2-2
-	ruby_x86_devel-2.2.2-2
+	ruby_x86-2.2.2-5
+	ruby_x86_devel-2.2.2-5
 	scummvm_x86-1.9.0-2
-	sdcc_x86-3.4.0-1
-	sdl_gfx_x86-2.0.24-1
-	sdl_gfx_x86_devel-2.0.24-1
+	sdcc_x86-3.6.0-1
+	sdl_gfx_x86-2.0.25-2
+	sdl_gfx_x86_devel-2.0.25-2
 	sdl_image_x86-1.2.12-7
 	sdl_image_x86_devel-1.2.12-7
-	sdl_net_x86-1.2.8-4
-	sdl_net_x86_devel-1.2.8-4
-	sdl_mixer_x86-1.2.12-3
-	sdl_mixer_x86_devel-1.2.12-3
+	sdl_net_x86-1.2.8-5
+	sdl_net_x86_devel-1.2.8-5
+	sdl_mixer_x86-1.2.12-6
+	sdl_mixer_x86_devel-1.2.12-6
 	sdl_sound_x86-1.0.3-5
 	sdl_sound_x86_devel-1.0.3-5
-	sdl_ttf_x86-2.0.11-1
-	sdl_ttf_x86_devel-2.0.11-1
-	sge_x86-030809-1
-	sge_x86_devel-030809-1
+	sdl_ttf_x86-2.0.11-5
+	sdl_ttf_x86_devel-2.0.11-5
+	sge_x86-030809-3
+	sge_x86_devel-030809-3
 	shared_mime_info_x86-1.3-2
 	sharutils_x86-4.15.2-2
-	simh_x86-4.0.0_git-2
+	simh_x86-4.0.0_git-3
 	smjpeg_x86-0.2.1-1
 	smjpeg_x86_devel-0.2.1-1
 	smpeg_x86-0.4.5-3
@@ -1061,8 +1064,8 @@ RemotePackageRepository HaikuPorts
 	strigi_x86-0.7.5-2
 	strigi_x86_devel-0.7.5-2
 	swig_x86-2.0.11-2
-	taglib_x86-1.9.1-2
-	taglib_x86_devel-1.9.1-2
+	taglib_x86-1.11.1-1
+	taglib_x86_devel-1.11.1-1
 	texlive_x86-2014-1
 	texlive_x86_devel-2014-1
 	tiff_x86-3.9.6-2
@@ -1073,8 +1076,8 @@ RemotePackageRepository HaikuPorts
 	tinyxml_x86_devel-2.6.2-3
 	tig_x86-2.1-1
 	transmission_x86-2.92-2
-	twolame_x86-0.3.13-2
-	twolame_x86_devel-0.3.13-2
+	twolame_x86-0.3.13-3
+	twolame_x86_devel-0.3.13-3
 	vacuum_x86-1.2.5-1
 	vcmi_x86-0.94-1
 	wizznic_x86-0.9.9-2
@@ -1221,6 +1224,7 @@ RemotePackageRepository HaikuPorts
 	fontboy
 	fontconfig
 	fossil
+	freeciv_x86
 	freedroidrpg_x86
 	freetype
 	fribidi
@@ -1623,6 +1627,7 @@ RemotePackageRepository HaikuPorts
 	tcpdump
 	texi2html
 	texinfo
+	texinfo4
 	thememanager
 	tiff
 	tiff4
@@ -1633,6 +1638,7 @@ RemotePackageRepository HaikuPorts
 	twolame
 	twolame_x86
 	ubertuber
+	unknown_horizons
 	unrar
 	unzip
 	util_macros
