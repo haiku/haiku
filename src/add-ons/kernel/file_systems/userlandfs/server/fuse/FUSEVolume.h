@@ -108,11 +108,23 @@ public:
 									uint32 count, uint32* countRead);
 	virtual	status_t			RewindAttrDir(void* node, void* cookie);
 
+	// attributes
+	virtual	status_t			OpenAttr(void* node, const char* name,
+									int openMode, void** cookie);
+	virtual	status_t			CloseAttr(void* node, void* cookie);
+	virtual	status_t			FreeAttrCookie(void* node, void* cookie);
+	virtual	status_t			ReadAttr(void* node, void* cookie,
+									off_t pos, void* buffer, size_t bufferSize,
+									size_t* bytesRead);
+	virtual	status_t			ReadAttrStat(void* node, void* cookie,
+									struct stat* st);
+
 private:
 	struct DirEntryCache;
 	struct DirCookie;
 	struct FileCookie;
 	struct AttrDirCookie;
+	struct AttrCookie;
 	struct ReadDirBuffer;
 	struct LockIterator;
 	struct RWLockableReadLocking;

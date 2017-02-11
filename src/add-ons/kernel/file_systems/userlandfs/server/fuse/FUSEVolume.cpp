@@ -280,6 +280,73 @@ private:
 };
 
 
+struct FUSEVolume::AttrCookie : RWLockable {
+public:
+	AttrCookie()
+		:
+		fValue(NULL),
+		fSize(0)
+	{
+	}
+
+	AttrCookie(const char* value)
+		:
+		fValue(strdup(value)),
+		fSize(strlen(value) + 1)
+	{
+	}
+
+	~AttrCookie()
+	{
+		free(fValue);
+	}
+
+	bool IsValid() const
+	{
+		return fValue != NULL;
+	}
+
+	status_t Allocate(size_t size)
+	{
+		fValue = (char*)malloc(size);
+		if (fValue == NULL) {
+			fSize = 0;
+			return B_NO_MEMORY;
+		}
+		fSize = size;
+		return B_OK;
+	}
+
+	void Read(void* buffer, size_t bufferSize, off_t pos,
+		size_t* bytesRead) const
+	{
+		if (pos < 0 || (uint64)pos > SIZE_MAX || (size_t)pos > fSize - 1) {
+			*bytesRead = 0;
+			return;
+		}
+		size_t copySize = fSize - pos;
+		if (copySize > bufferSize)
+			copySize = bufferSize;
+		strlcpy((char*)buffer, &fValue[pos], bufferSize);
+		*bytesRead = copySize;
+	}
+
+	char* Buffer()
+	{
+		return fValue;
+	}
+
+	size_t Size() const
+	{
+		return fSize;
+	}
+
+private:
+	char*	fValue;
+	size_t	fSize;
+};
+
+
 struct FUSEVolume::ReadDirBuffer {
 	FUSEVolume*	volume;
 	FUSENode*	directory;
@@ -2062,6 +2129,105 @@ FUSEVolume::RewindAttrDir(void* _node, void* _cookie)
 	RWLockableWriteLocker cookieLocker(this, cookie);
 
 	cookie->Clear();
+
+	return B_OK;
+}
+
+
+// #pragma mark - attributes
+
+
+status_t
+FUSEVolume::OpenAttr(void* _node, const char* name, int openMode,
+	void** _cookie)
+{
+	FUSENode* node = (FUSENode*)_node;
+
+	// lock the node
+	NodeReadLocker nodeLocker(this, node, true);
+	if (nodeLocker.Status() != B_OK)
+		RETURN_ERROR(nodeLocker.Status());
+
+	if (openMode != O_RDONLY) {
+		// Write support currently not implemented
+		RETURN_ERROR(B_UNSUPPORTED);
+	}
+
+	AutoLocker<Locker> locker(fLock);
+
+	// get a path for the node
+	char path[B_PATH_NAME_LENGTH];
+	size_t pathLen;
+	status_t error = _BuildPath(node, path, pathLen);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	locker.Unlock();
+
+	int attrSize = fuse_fs_getxattr(fFS, path, name, NULL, 0);
+	if (attrSize < 0)
+		return attrSize;
+
+	AttrCookie* cookie = new(std::nothrow)AttrCookie();
+	error = cookie->Allocate(attrSize);
+	if (error != B_OK)
+		RETURN_ERROR(error);
+
+	int bytesRead = fuse_fs_getxattr(fFS, path, name, cookie->Buffer(),
+		attrSize);
+	if (bytesRead < 0)
+		return bytesRead;
+
+	*_cookie = cookie;
+
+	return B_OK;
+}
+
+
+status_t
+FUSEVolume::CloseAttr(void* _node, void* _cookie)
+{
+	return B_OK;
+}
+
+
+status_t
+FUSEVolume::FreeAttrCookie(void* _node, void* _cookie)
+{
+	delete (AttrCookie*)_cookie;
+	return B_OK;
+}
+
+
+status_t
+FUSEVolume::ReadAttr(void* _node, void* _cookie, off_t pos, void* buffer,
+	size_t bufferSize, size_t* bytesRead)
+{
+	AttrCookie* cookie = (AttrCookie*)_cookie;
+
+	RWLockableWriteLocker cookieLocker(this, cookie);
+
+	if (!cookie->IsValid())
+		RETURN_ERROR(B_BAD_VALUE);
+
+	cookie->Read(buffer, bufferSize, pos, bytesRead);
+
+	return B_OK;
+}
+
+
+status_t
+FUSEVolume::ReadAttrStat(void* _node, void* _cookie, struct stat* st)
+{
+	AttrCookie* cookie = (AttrCookie*)_cookie;
+
+	RWLockableWriteLocker cookieLocker(this, cookie);
+
+	if (!cookie->IsValid())
+		RETURN_ERROR(B_BAD_VALUE);
+
+	st->st_size = cookie->Size();
+	st->st_type = B_RAW_TYPE;
 
 	return B_OK;
 }

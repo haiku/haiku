@@ -472,14 +472,14 @@ FUSEFileSystem::_InitCapabilities()
 // 	// or write_attr() is present
 // 	bool hasAttributes = (fFS->ops.read_attr || fFS->ops.write_attr);
 // 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CREATE_ATTR, hasAttributes);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR, hasAttributes);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_ATTR, false);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_COOKIE, hasAttributes);
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR, fFS->ops.read_attr);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_OPEN_ATTR, hasAttributes);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_CLOSE_ATTR, false);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_FREE_ATTR_COOKIE, hasAttributes);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR, fFS->ops.getxattr);
 // 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_WRITE_ATTR, fFS->ops.write_attr);
 
-// 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_STAT,
-// 		fFS->ops.stat_attr);
+	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_READ_ATTR_STAT,
+		fFS->ops.getxattr);
 // 	// missing: FS_VNODE_CAPABILITY_WRITE_ATTR_STAT
 // 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_RENAME_ATTR, fFS->ops.rename_attr);
 // 	fNodeCapabilities.Set(FS_VNODE_CAPABILITY_REMOVE_ATTR, fFS->ops.remove_attr);
