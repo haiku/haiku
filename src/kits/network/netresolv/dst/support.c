@@ -1,6 +1,3 @@
-static const char rcsid[] = "$Header: /proj/cvs/prod/libbind/dst/support.c,v 1.6 2005/10/11 00:10:13 marka Exp $";
-
-
 /*
  * Portions Copyright (c) 1995-1998 by Trusted Information Systems, Inc.
  *
