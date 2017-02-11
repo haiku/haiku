@@ -6,6 +6,7 @@
 #include "FUSEVolume.h"
 
 #include <dirent.h>
+#include <file_systems/mime_ext_table.h>
 
 #include <algorithm>
 
@@ -282,18 +283,22 @@ private:
 
 struct FUSEVolume::AttrCookie : RWLockable {
 public:
-	AttrCookie()
+	AttrCookie(const char* name)
 		:
 		fValue(NULL),
-		fSize(0)
+		fSize(0),
+		fType(0)
 	{
+		_SetType(name);
 	}
 
-	AttrCookie(const char* value)
+	AttrCookie(const char* name, const char* value)
 		:
 		fValue(strdup(value)),
-		fSize(strlen(value) + 1)
+		fSize(strlen(value) + 1),
+		fType(0)
 	{
+		_SetType(name);
 	}
 
 	~AttrCookie()
@@ -304,6 +309,11 @@ public:
 	bool IsValid() const
 	{
 		return fValue != NULL;
+	}
+
+	uint32 Type() const
+	{
+		return fType;
 	}
 
 	status_t Allocate(size_t size)
@@ -342,8 +352,18 @@ public:
 	}
 
 private:
+	void _SetType(const char* name)
+	{
+		if (strcmp(name, kAttrMimeTypeName) == 0)
+			fType = B_MIME_STRING_TYPE;
+		else
+			fType = B_RAW_TYPE;
+	}
+
+private:
 	char*	fValue;
 	size_t	fSize;
+	uint32	fType;
 };
 
 
@@ -2165,10 +2185,22 @@ FUSEVolume::OpenAttr(void* _node, const char* name, int openMode,
 	locker.Unlock();
 
 	int attrSize = fuse_fs_getxattr(fFS, path, name, NULL, 0);
-	if (attrSize < 0)
-		return attrSize;
+	if (attrSize < 0) {
+		if (strcmp(name, kAttrMimeTypeName) == 0) {
+			// Return a fake MIME type attribute based on the file extension
+			const char* mimeType = NULL;
+			error = set_mime(&mimeType, S_ISDIR(node->type) ? NULL : &path[0]);
+			if (error != B_OK)
+				return error;
+			*_cookie = new(std::nothrow)AttrCookie(name, mimeType);
+			return B_OK;
+		}
 
-	AttrCookie* cookie = new(std::nothrow)AttrCookie();
+		// Reading attribute failed
+		return attrSize;
+	}
+
+	AttrCookie* cookie = new(std::nothrow)AttrCookie(name);
 	error = cookie->Allocate(attrSize);
 	if (error != B_OK)
 		RETURN_ERROR(error);
@@ -2227,7 +2259,7 @@ FUSEVolume::ReadAttrStat(void* _node, void* _cookie, struct stat* st)
 		RETURN_ERROR(B_BAD_VALUE);
 
 	st->st_size = cookie->Size();
-	st->st_type = B_RAW_TYPE;
+	st->st_type = cookie->Type();
 
 	return B_OK;
 }
