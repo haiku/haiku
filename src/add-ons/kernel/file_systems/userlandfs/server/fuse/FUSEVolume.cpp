@@ -1474,6 +1474,10 @@ FUSEVolume::Open(void* _node, int openMode, void** _cookie)
 	// truncate the file, if requested
 	if (truncate) {
 		fuseError = fuse_fs_ftruncate(fFS, path, 0, cookie);
+		if (fuseError == ENOSYS) {
+			// Fallback to truncate if ftruncate is not implemented
+			fuseError = fuse_fs_truncate(fFS, path, 0);
+		}
 		if (fuseError != 0) {
 			fuse_fs_flush(fFS, path, cookie);
 			fuse_fs_release(fFS, path, cookie);
