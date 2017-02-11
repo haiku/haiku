@@ -783,6 +783,15 @@ FUSEVolume::Sync()
 status_t
 FUSEVolume::ReadFSInfo(fs_info* info)
 {
+	if (gHasHaikuFuseExtensions == 1 && fFS->ops.get_fs_info != NULL) {
+		int fuseError = fuse_fs_get_fs_info(fFS, info);
+		if (fuseError != 0)
+			return fuseError;
+		return B_OK;
+	}
+
+	// No Haiku FUSE extensions, so our knowledge is limited: use some values
+	// from statfs and make reasonable guesses for the rest of them.
 	if (fFS->ops.statfs == NULL)
 		return B_UNSUPPORTED;
 
@@ -791,6 +800,7 @@ FUSEVolume::ReadFSInfo(fs_info* info)
 	if (fuseError != 0)
 		return fuseError;
 
+	memset(info, 0, sizeof(*info));
 	info->flags = B_FS_IS_PERSISTENT;	// assume the FS is persistent
 	info->block_size = st.f_bsize;
 	info->io_size = 64 * 1024;			// some value

@@ -17,6 +17,11 @@
 #include "../RequestThread.h"
 
 
+int gHasHaikuFuseExtensions = 0;
+	// This global can be set to 1 by a Haiku-aware FUSE add-on to signal
+	// that it implements the Haiku-specific functions in struct
+	// fuse_operations (those which are guarded by HAS_FUSE_HAIKU_EXTENSIONS).
+
 int
 fuse_main_real(int argc, char* argv[], const struct fuse_operations* op,
 	size_t opSize, void* userData)

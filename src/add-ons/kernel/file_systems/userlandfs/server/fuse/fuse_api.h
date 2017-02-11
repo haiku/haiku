@@ -7,6 +7,8 @@
 
 #define FUSE_USE_VERSION FUSE_VERSION
 
+#define HAS_FUSE_HAIKU_EXTENSIONS
+
 #include <fuse.h>
 #include <fuse_lowlevel.h>
 #include <fuse_opt.h>

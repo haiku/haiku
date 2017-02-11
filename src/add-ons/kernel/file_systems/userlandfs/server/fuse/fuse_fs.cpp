@@ -380,3 +380,12 @@ fuse_fs_new(const struct fuse_operations* ops, size_t opSize, void* userData)
 
 	return fs;
 }
+
+
+int
+fuse_fs_get_fs_info(struct fuse_fs* fs, struct fs_info* info)
+{
+	if (fs->ops.get_fs_info == NULL)
+		return ENOSYS;
+	return fs->ops.get_fs_info(info);
+}
