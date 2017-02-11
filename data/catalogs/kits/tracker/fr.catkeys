@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-libtracker	364980116
+1	french	x-vnd.Haiku-libtracker	1983922683
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Extensions
 Mount settings…	ContainerWindow		Réglages du montage…
@@ -133,6 +133,7 @@ Edit name	ContainerWindow		Éditer le nom
 Show volumes on Desktop	SettingsView		Afficher les volumes sur le bureau
 KiB	WidgetAttributeText		Kio
 Error %error loading Add-On %name.	ContainerWindow		Erreur %error au chargement de l’extension %name.
+Mini	ContainerWindow		Mini
 Defaults	TrackerSettingsWindow		Par défaut
 Mini icon view	ContainerWindow		Vue en petites icônes
 Could not open \"%name\". The file is mistakenly marked as executable. 	FSUtils		Impossible d’ouvrir « %name ». Le fichier est marqué exécutable par erreur. 
@@ -369,6 +370,7 @@ Open selection with:	OpenWithWindow		Ouvrir la sélection avec :
 Preparing to create links…	StatusWindow		Création des liens en préparation…
 Size	Default Query Columns		Taille
 Show navigator	SettingsView		Afficher le navigateur
+All Haiku disks	AutoMounterSettings		Tous les disques Haiku
 Desktop	B_DESKTOP_DIRECTORY		Bureau
 List folders first	SettingsView		Lister les dossiers en premier
 Name	SelectionWindow		Nom

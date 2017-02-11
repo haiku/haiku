@@ -8,14 +8,14 @@ Time preferences…	TimeView		Налаштування годинника…
 About Haiku	DeskbarMenu		Про Haiku
 Edit in Tracker…	PreferencesWindow		Змінити меню 
 Recent documents:	PreferencesWindow		Недавні документи:
-Recent applications	DeskbarMenu		Останні програми
+Recent applications	DeskbarMenu		недавні програми
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Додатки
 Find…	DeskbarMenu		Знайти…
 Show clock	Tray		Показати годинник
 Window	PreferencesWindow		Вікно
 Defaults	PreferencesWindow		Типове
 Menu	PreferencesWindow		Меню
-Recent documents	DeskbarMenu		Останні документи
+Recent documents	DeskbarMenu		Недавні документи
 Auto-hide	PreferencesWindow		Автозникнення
 Always on top	PreferencesWindow		Завжди зверху
 <Deskbar folder is empty>	DeskbarMenu		<Тека Deskbar порожня>
@@ -33,10 +33,10 @@ Mount	DeskbarMenu		Приєднати
 Revert	PreferencesWindow		Повернути
 Small	PreferencesWindow		Маленькі
 Recent applications:	PreferencesWindow		Недавні додатки:
-Shutdown…	DeskbarMenu		Вимкнути...
+Shutdown…	DeskbarMenu		Вийти...
 Tracker always first	PreferencesWindow		Tracker завжди перший
-Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Настройки
-Recent folders	DeskbarMenu		Останні теки
+Preferences	B_USER_DESKBAR_DIRECTORY/Preferences		Налаштування
+Recent folders	DeskbarMenu		Недавні теки
 About this system	DeskbarMenu		Про цю систему
 Show calendar…	TimeView		Показати календар…
 Deskbar preferences…	DeskbarMenu		Налаштування Deskbar...

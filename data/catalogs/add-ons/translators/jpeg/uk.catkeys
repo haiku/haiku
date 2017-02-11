@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-JPEGTranslator	965709535
+1	ukrainian	x-vnd.Haiku-JPEGTranslator	3788699631
 Output quality	JPEGTranslator		Вихідна якість
 JPEG images	JPEGTranslator		Зображення JPEG
 Prevent colors 'washing out'	JPEGTranslator		Попереджати втрату 'насичення' кольорів
@@ -15,6 +15,7 @@ Output smoothing strength	JPEGTranslator		Інтенсивність зглаж�
 High	JPEGTranslator		Високе
 Write	JPEGTranslator		Записати
 Write black-and-white images as RGB24	JPEGTranslator		Записувати чорно-білі зображення як RGB24
+Version %d.%d.%d	JPEGTranslator		Версія %d.%d.%d
 Read greyscale images as RGB32	JPEGTranslator		Читати сірі зображення як RGB32
 Read	JPEGTranslator		Читати
 JPEG Library Warning: %s\n	be_jerror		Попередження бібліотеки JPEG: %s\n

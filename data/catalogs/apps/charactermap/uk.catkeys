@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-CharacterMap	56063163
+1	ukrainian	x-vnd.Haiku-CharacterMap	1534181938
 Enclosed alphanumerics	UnicodeBlocks		Закриті літери, цифри
 Basic Latin	UnicodeBlocks		Основна латиниця
 View	CharacterWindow		Вигляд
@@ -123,6 +123,7 @@ Vai	UnicodeBlocks		Ваї
 Yi Radicals	UnicodeBlocks		Корні Юі
 Cyrillic extended B	UnicodeBlocks		Кирилиця розширення В
 Quit	CharacterWindow		Вихід
+Ancient symbols	UnicodeBlocks		Античні символи
 Braille patterns	UnicodeBlocks		Шрифт Брейля
 New Tai Lue	UnicodeBlocks		Новий тай лю
 Runic	UnicodeBlocks		Рунічна

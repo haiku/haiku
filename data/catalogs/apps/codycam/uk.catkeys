@@ -1,4 +1,5 @@
-1	ukrainian	x-vnd.Haiku-CodyCam	4172871107
+1	ukrainian	x-vnd.Haiku-CodyCam	3408488515
+Upload…	VideoConsumer.cpp		Вивантаження…
 Capturing Image…	VideoConsumer.cpp		Захоплення зображення…
 Every 30 seconds	CodyCam		Кожні 30 секунд
 File name:	CodyCam		Ім’я файлу:
@@ -60,6 +61,7 @@ upload client name expected	CodyCam		вкажіть ім’я клієнта в�
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		Підключення…
 PASS <suppressed>  (real password sent)\n	FtpClient		Пароль <прихований> (дійсний пароль відправлено)\n
+File upload failed	VideoConsumer.cpp		Вивантаження файлу призупинене
 Every 5 minutes	CodyCam		Кожні 5 хвилин
 read: %d\n	SftpClient		читання: %d\n
 Capture controls	CodyCam		Керування захопленням
@@ -74,6 +76,7 @@ cmd: '%s'\n	FtpClient		команда: '%s'\n
 Never	CodyCam		Ніколи
 Cannot create a video window	CodyCam		Неможливо створити вікно відео
 Every 10 minutes	CodyCam		Кожні 10 хвилин
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Не знайдено джерело зображення.\n  Для використання CodyCam потрібна вебкамера.
 Cannot start the video source	CodyCam		Неможливо запустити джерело відео
 Cannot start the video window	CodyCam		Неможливо запустити вікно відео
 password expected	CodyCam		очікується пароль

@@ -1,4 +1,4 @@
-1	russian	x-vnd.Haiku-CodyCam	1888169680
+1	russian	x-vnd.Haiku-CodyCam	3408488515
 Upload…	VideoConsumer.cpp		Загрузить…
 Capturing Image…	VideoConsumer.cpp		Захват изображения…
 Every 30 seconds	CodyCam		Каждые 30 секунд
@@ -76,6 +76,7 @@ cmd: '%s'\n	FtpClient		команда: '%s'\n
 Never	CodyCam		Никогда
 Cannot create a video window	CodyCam		Невозможно создать видео окно
 Every 10 minutes	CodyCam		Каждые 10 минут
+Cannot find a video source.\nYou need a webcam to use CodyCam.	CodyCam		Не найден источник видеосигнала.\nПожалуйста, подключите вебкамеру.
 Cannot start the video source	CodyCam		Невозможно запустить видео источник
 Cannot start the video window	CodyCam		Невозможно запустить видео окно
 password expected	CodyCam		укажите пароль

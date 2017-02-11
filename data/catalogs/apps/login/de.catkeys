@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-Login	2683778354
+1	german	x-vnd.Haiku-Login	336867745
 Error: %1	Login App		Fehler: %1
 Hide password	Login View		Passwort verbergen
 Desktop	Desktop Window		Desktop
@@ -17,3 +17,4 @@ Halt	Login View		Stopp
 Password:	Login View		Passwort:
 OK	Login App		OK
 --nonmodal\tDo not make the window modal\n	Login App		--nonmodal\tFenster nicht modal\n
+You can customize the desktop shown behind the Login application by dropping replicants onto it.\n\nWhen you are finished just quit the application (Cmd-Q).	Login App		Der Desktop hinter der Login Anwendung kann durch Replikanten individualisiert werden.\n\nIst man damit fertig kann die Anwendung einfach per ALT+Q beendet werden.

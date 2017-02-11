@@ -1,9 +1,10 @@
-1	german	x-vnd.haiku-screenshot	3896204963
+1	german	x-vnd.haiku-screenshot	3958461128
 seconds	ScreenshotWindow		Sekunden
 Desktop	ScreenshotWindow		Desktop
 Include window border	ScreenshotWindow		Inklusive Fensterrahmen
 Screenshot	System name		Screenshot
 Select	ScreenshotWindow		Auswählen
+The destination path exists but is not a folder.	ScreenshotWindow		Der Zielpfad existiert, ist aber kein Ordner.
 Capture active window	ScreenshotWindow		Nur aktives Fenster
 Cancel	ScreenshotWindow		Abbrechen
 Name:	ScreenshotWindow		Name:
@@ -20,8 +21,11 @@ screenshot	Screenshot	Base filename of screenshot files	Screenshot
 New screenshot	ScreenshotWindow		Neue Aufnahme
 Artwork folder	ScreenshotWindow		Artwork-Ordner
 Home folder	ScreenshotWindow		Home-Ordner
+Failed to save screenshot	ScreenshotWindow		Speichern des Screenshots fehlgeschlagen
+OK	ScreenshotWindow		OK
 Settings…	ScreenshotWindow		Einstellungen…
 overwrite	ScreenshotWindow		überschreiben
 Delay:	ScreenshotWindow		Verzögerung:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Fehler beim Speichern von \"%s\":\n\t%s
 Include mouse pointer	ScreenshotWindow		Inklusive Mauszeiger
 Translator Settings	ScreenshotWindow		Translator-Einstellungen

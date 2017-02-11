@@ -1,13 +1,16 @@
-1	french	x-vnd.Be-PRNT	4242582634
+1	french	x-vnd.Be-PRNT	686411231
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Imprimante : %printer_name%\n    Pilote : %driver%\n
 Waiting	JobListView		Attente
 Print test page	PrintersWindow		Imprimer une page de test
+ pending jobs	PrinterListView		 travaux en attente
 page	JobListView		page
 Cancel	AddPrinterDialog		Annuler
+Test page	PrintersWindow		Page de test
 Add printer	AddPrinterDialog		Ajouter une imprimante
 Green	TestPageView		Vert
 Printers	PrintersWindow		Imprimantes
 Add…	PrintersWindow		Ajouter…
+No pending jobs	PrinterListView		Pas de travaux en attente
 Default Printer	PrinterListView		Imprimante par défaut
 Transport: %transport% %transport_address%	PrinterListView		Liaison : %transport% %transport_address%
 pages	JobListView		pages
@@ -35,5 +38,7 @@ No printer found!	TransportMenu		Aucune imprimante trouvée !
 Print jobs: No printer selected	PrintersWindow		Travaux d’impression : Aucune imprimante sélectionnée
 Cyan	TestPageView		Cyan
 Unknown status	JobListView		État inconnu
+1 pending job	PrinterListView		1 travail en attente
 Connected to:	AddPrinterDialog		Connecté à :
 Printer type:	AddPrinterDialog		Type d’imprimante :
+Test page	TestPageView		Page de test

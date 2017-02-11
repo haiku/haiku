@@ -1,4 +1,4 @@
-1	french	x-vnd.Haiku-Terminal	1384628839
+1	french	x-vnd.Haiku-Terminal	1269023683
 Not found.	Terminal TermWindow		Non trouvé.
 Switch Terminals	Terminal TermWindow		Inverser les Terminaux
 Change directory	Terminal TermView		Changer de répertoire
@@ -82,6 +82,7 @@ Close	Terminal TermWindow		Fermer
 Text	Terminal AppearancePrefView		Texte
 Clear all	Terminal TermWindow		Effacer tout
 Text encoding	Terminal TermWindow		Encodage texte
+Allow bold text	Terminal AppearancePrefView		Autoriser le texte en gras
 Close window	Terminal TermWindow		Fermer la fenêtre
 Copy absolute path	Terminal TermView		Copier le chemin absolu
 Save as default	Terminal TermWindow		Enregistrer comme valeur par défaut

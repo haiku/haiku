@@ -1,10 +1,12 @@
-1	german	x-vnd.Haiku-HaikuDepot	1090759318
+1	german	x-vnd.Haiku-HaikuDepot	1527149765
 Name	PackageListView		Name
 Available packages	MainWindow		Verfügbare Pakete
 Open %DeskbarLink%	PackageManager		%DeskbarLink% öffnen
+Repository	FilterView		Paketquelle
 Close	RatePackageWindow		Schließen
 The captcha puzzle needs to be solved.	UserLoginWindow		Die Captcha-Frage muss beantwortet werden.
 Changelog	PackageInfoView		Änderungsprotokoll
+Repository:	FilterView		Paketquelle:
 Your rating:	RatePackageWindow		Eigene Bewertung:
 The passwords do not match.	UserLoginWindow		Die Kennwörter stimmen nicht überein.
 Log in…	MainWindow		Anmelden…
@@ -31,6 +33,7 @@ Your rating was updated successfully.	RatePackageWindow		Die Bewertung wurde erf
 <no info>	PackageInfoView		<keine Info>
 Starting the package daemon failed:\n\n%Error%	App		Der Paket-Daemon konnte nicht gestartet werden:\n\n%Error%
 An error occurred while initializing the package manager: %message%	MainWindow		Bei der Initialisierung des Paketmanagers trat ein Fehler auf: %message%
+All repositories	FilterView		Alle Paketquellen
 Email address:	UserLoginWindow		E-Mail-Adresse:
 Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Die Bewertung wurde erfolgreich hochgeladen. Sie kann jederzeit durch eine erneute Bewertung aktualisiert oder gelöscht werden.
 Very unstable	RatePackageWindow		Sehr instabil
@@ -102,6 +105,7 @@ Close	MainWindow		Schließen
 Preferred language:	UserLoginWindow		Bevorzugte Sprache:
 Failed to rate package	RatePackageWindow		Paket konnte nicht bewertet werden
 Internet & Network	Model		Internet & Netzwerk
+Refresh repositories	MainWindow		Paketquellen aktualisieren
 Cancel	MainWindow		Abbrechen
 Quit HaikuDepot	App		HaikuDepot beenden
 Input validation	UserLoginWindow		Eingabeprüfung
@@ -137,8 +141,9 @@ Send	RatePackageWindow		Senden
 Category:	FilterView		Kategorie:
 Failed to create account	UserLoginWindow		Benutzerkonto konnte nicht angelegt werden
 There are problems with the data you entered:\n\n	UserLoginWindow		Mit den eingegebenen Daten gab es Probleme:\n\n
-Featured packages	MainWindow		Empfohlene Pakete
+Featured packages	MainWindow		Empfohlene Software-Pakete
 Start package daemon	App		Paket-Daemon starten
+Manage repositories…	MainWindow		Paketquellen verwalten…
 Success	RatePackageWindow		Erfolg
 Business	Model		Geschäft
 Audio	Model		Audio

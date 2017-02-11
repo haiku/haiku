@@ -1,4 +1,4 @@
-1	german	x.vnd.OBOS-Inspector	1686702095
+1	german	x.vnd.OBOS-Inspector	577867100
 User Translators	ActiveTranslatorsWindow		Benutzer-Translatoren
 No image available to save.	ImageWindow		Es ist kein Bild zum Speichern vorhanden.
 Sorry, unable to write the image file.	ImageView		Die Bilddatei konnte leider nicht gespeichert werden.
@@ -23,8 +23,10 @@ Quit	ImageWindow		Beenden
 Selected Document: %1\n\nTranslator Used:\nName: %2\nInfo: %3\nVersion: %4\n	ImageView		Ausgewähltes Dokument: %1\n\nBenutzter Translator:\nName: %2\nInfo: %3\nVersion: %4\n
 Active Translators	ImageWindow		Aktive Translatoren
 View	ImageWindow		Ansicht
+Open…	ImageWindow		Öffnen…
 Previous Page	ImageWindow		Vorherige Seite
 OK	ImageView		OK
 System Translators	ActiveTranslatorsWindow		System-Translatoren
+Save…	ImageWindow		Speichern…
 Unknown	ImageView		Unbekannt
 File	ImageWindow		Datei

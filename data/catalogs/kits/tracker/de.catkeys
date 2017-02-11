@@ -1,4 +1,4 @@
-1	german	x-vnd.Haiku-libtracker	1690679038
+1	german	x-vnd.Haiku-libtracker	1303461434
 OK	WidgetAttributeText		OK
 Add-ons	FilePanelPriv		Add-ons
 Mount settings…	ContainerWindow		Einhänge-Einstellungen…
@@ -368,6 +368,7 @@ Open selection with:	OpenWithWindow		Auswahl öffnen mit:
 Preparing to create links…	StatusWindow		Erstellen von Verknüpfungen wird vorbereitet…
 Size	Default Query Columns		Größe
 Show navigator	SettingsView		Navigator zeigen
+All Haiku disks	AutoMounterSettings		Alle Haiku Datenträger
 Desktop	B_DESKTOP_DIRECTORY		Desktop
 List folders first	SettingsView		Ordner zuerst listen
 Name	SelectionWindow		Name:
