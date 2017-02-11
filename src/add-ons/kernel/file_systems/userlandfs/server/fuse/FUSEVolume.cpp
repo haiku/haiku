@@ -1260,6 +1260,11 @@ FUSEVolume::ReadStat(void* _node, struct stat* st)
 
 	locker.Unlock();
 
+	st->st_dev = GetID();
+	st->st_ino = node->id;
+	st->st_blksize = 2048;
+	st->st_type = 0;
+
 	// stat the path
 	int fuseError = fuse_fs_getattr(fFS, path, st);
 	if (fuseError != 0)
