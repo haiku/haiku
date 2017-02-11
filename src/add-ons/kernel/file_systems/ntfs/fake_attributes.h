@@ -12,7 +12,7 @@
 
 #include <fs_attr.h>
 
-status_t set_mime(vnode *node, const char *filename);
+status_t set_mime_type(vnode *node, const char *filename);
 
 status_t fake_open_attrib_dir(fs_volume *_vol, fs_vnode *_node,
 	void **_cookie);
@@ -37,5 +37,5 @@ status_t fake_read_attrib(fs_volume *_vol, fs_vnode *_node, void *cookie,
 	off_t pos,void *buffer, size_t *_length);
 status_t fake_write_attrib(fs_volume *_vol, fs_vnode *_node, void *cookie,
 	off_t pos,	const void *buffer, size_t *_length);
-	
+
 #endif //NTFS_FAKE_ATTR_H_

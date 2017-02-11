@@ -13,7 +13,7 @@ SEARCH_SOURCE += [ FDirName $(SUBDIR) utils ] ;
 KernelAddon ntfs :
 	attributes.c
 	fake_attributes.c
-	mime_table.c
+	mime_ext_table.c
 	utils.c
 	ntfsdir.c
 	volume_util.c
@@ -22,7 +22,7 @@ KernelAddon ntfs :
 	attrdef.c
 	sd.c
 	boot.c
-	mkntfs.c	
+	mkntfs.c
 	:
 	libntfs.a
 	;
@@ -30,6 +30,9 @@ KernelAddon ntfs :
 SEARCH on [ FGristFiles
 		kernel_cpp.cpp
 	] = [ FDirName $(HAIKU_TOP) src system kernel util ] ;
+
+SEARCH on [ FGristFiles mime_ext_table.c ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
 
 SubInclude HAIKU_TOP src add-ons kernel file_systems ntfs libntfs ;
 

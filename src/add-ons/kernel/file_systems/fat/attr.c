@@ -15,13 +15,13 @@
 #include <KernelExport.h>
 
 #include <dirent.h>
+#include <file_systems/mime_ext_table.h>
 #include <fs_attr.h>
 #include <string.h>
 #include <malloc.h>
 
 #include "dosfs.h"
 #include "attr.h"
-#include "mime_table.h"
 
 int32 kBeOSTypeCookie = 0x1234;
 
@@ -29,31 +29,7 @@ int32 kBeOSTypeCookie = 0x1234;
 
 status_t set_mime_type(vnode *node, const char *filename)
 {
-	struct ext_mime *p;
-	int32 namelen, ext_len;
-
-	DPRINTF(0, ("get_mime_type of (%s)\n", filename));
-
-	node->mime = NULL;
-
-	namelen = strlen(filename);
-
-	for (p=mimes;p->extension;p++) {
-		ext_len = strlen(p->extension);
-
-		if (namelen <= ext_len)
-			continue;
-
-		if (filename[namelen-ext_len-1] != '.')
-			continue;
-
-		if (!strcasecmp(filename + namelen - ext_len, p->extension))
-			break;
-	}
-
-	node->mime = p->mime;
-
-	return B_OK;
+	return set_mime(&node->mime, filename);
 }
 
 

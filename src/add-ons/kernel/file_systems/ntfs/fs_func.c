@@ -689,12 +689,12 @@ fs_read_vnode(fs_volume *_vol, ino_t vnid, fs_vnode *_node, int *_type,
 
 		if (ns->fake_attrib) {
 			if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
-				set_mime(newNode, NULL);
+				set_mime_type(newNode, NULL);
 			else {
 				name = (char*)malloc(MAX_PATH);
 				if (name != NULL) {
 					if (utils_inode_get_name(ni, name, MAX_PATH) == 1)
-						set_mime(newNode, name);
+						set_mime_type(newNode, name);
 					free(name);
 				}
 			}
@@ -1146,9 +1146,9 @@ fs_create(fs_volume *_vol, fs_vnode *_dir, const char *name, int omode,
 
 			if (ns->fake_attrib) {
 				if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
-					set_mime(newNode, NULL);
+					set_mime_type(newNode, NULL);
 				else
-					set_mime(newNode, name);
+					set_mime_type(newNode, name);
 			}
 
 			ntfs_mark_free_space_outdated(ns);
@@ -1750,9 +1750,9 @@ fs_rename(fs_volume *_vol, fs_vnode *_odir, const char *name,
 
 		if (ns->fake_attrib) {
 			if (ni->mrec->flags & MFT_RECORD_IS_DIRECTORY)
-				set_mime(file, NULL);
+				set_mime_type(file, NULL);
 			else
-				set_mime(file, newname);
+				set_mime_type(file, newname);
 			notify_attribute_changed(ns->id, -1, file->vnid, "BEOS:TYPE",
 				B_ATTR_CHANGED);
 		}

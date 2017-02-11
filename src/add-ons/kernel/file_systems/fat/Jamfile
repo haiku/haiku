@@ -13,9 +13,12 @@ KernelAddon fat :
 	fat.c
 	file.c
 	iter.c
-	mime_table.c
+	mime_ext_table.c
 	mkdos.cpp
 	util.c
 	vcache.c
 	version.c
 ;
+
+SEARCH on [ FGristFiles mime_ext_table.c ]
+	+= [ FDirName $(HAIKU_TOP) src add-ons kernel file_systems shared ] ;
