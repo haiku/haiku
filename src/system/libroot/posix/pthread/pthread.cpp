@@ -291,7 +291,9 @@ pthread_setschedparam(pthread_t thread, int policy,
 	status = _kern_set_thread_priority(thread->id, param->sched_priority);
 	if (status == B_BAD_THREAD_ID)
 		return ESRCH;
-	return status;
+	if (status < B_OK)
+		return status;
+	return 0;
 }
 
 
