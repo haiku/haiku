@@ -384,8 +384,8 @@ RemotePackageRepository HaikuPorts
 	gsl-1.16-1
 	gsl_devel-1.16-1
 	gtk_doc-1.20-1
-	gutenprint-5.2.11-3
-	gutenprint_devel-5.2.11-3
+	gutenprint-5.2.12-1
+	gutenprint_devel-5.2.12-1
 	gyp-git-2
 	gzip-1.8-1
 	haikutwitter-1.0_git-2
