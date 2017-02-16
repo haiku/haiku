@@ -9,8 +9,8 @@
 #	The latest version can be obtained from
 #		http://www.linux-usb.org/usb.ids
 #
-# Version: 2016.12.05
-# Date:    2016-12-05 20:34:05
+# Version: 2017.02.12
+# Date:    2017-02-12 20:34:05
 #
 
 # Vendors, devices and interfaces. Please keep sorted.
@@ -709,6 +709,7 @@
 03fc  Elitegroup Computer Systems
 03fd  Xilinx, Inc.
 	0008  Platform Cable USB II
+	0050  dfu downloader
 03fe  Farallon Comunications
 0400  National Semiconductor Corp.
 	05dc  Rigol Technologies DS1000USB Oscilloscope
@@ -750,7 +751,7 @@
 	6007  Serial Converter
 	6008  Serial Converter
 	6009  Serial Converter
-	6010  FT2232C Dual USB-UART/FIFO IC
+	6010  FT2232C/D/H Dual UART/FIFO IC
 	6011  FT4232H Quad HS USB-UART/FIFO IC
 	6014  FT232H Single HS USB-UART/FIFO IC
 	6015  Bridge(I2C/SPI/UART/FIFO)
@@ -794,6 +795,7 @@
 	bfda  OpenDCC (Throttle)
 	bfdb  OpenDCC (Gateway)
 	bfdc  OpenDCC (GBM)
+	c580  HID UNIKEY dongle [F-Response]
 	c630  lcd2usb interface
 	c631  i2c-tiny-usb interface
 	c632  xu1541 c64 floppy drive interface
@@ -1857,6 +1859,7 @@
 	b651  Ferrari GT Rumble Force Wheel
 	b653  RGT Force Feedback Clutch Racing Wheel
 	b654  Ferrari GT Force Feedback Wheel
+	b687  TWCS Throttle
 	b700  Tacticalboard
 0450  DFI, Inc.
 0451  Texas Instruments, Inc.
@@ -2157,7 +2160,9 @@
 	02d1  Xbox One Controller
 	02d5  Xbox One Digital TV Tuner
 	02dd  Xbox One Controller (Covert Forces/Firmware 2015)
+	02e3  Xbox One Elite Controller
 	02e6  Wireless XBox Controller Dongle
+	02ea  Xbox One S Controller
 	0400  Windows Powered Pocket PC 2002
 	0401  Windows Powered Pocket PC 2002
 	0402  Windows Powered Pocket PC 2002
@@ -2315,6 +2320,7 @@
 	076d  LifeCam HD-5000
 	0772  LifeCam Studio
 	0779  LifeCam HD-3000
+	077f  LifeChat LX-6000 Headset
 	0780  Comfort Curve Keyboard 3000
 	0797  Optical Mouse 200
 	07a5  Wireless Receiver 1461C
@@ -2408,6 +2414,8 @@
 	0027  CyMotion Master Solar Keyboard
 	002a  Wireless Mouse & Keyboard
 	002d  SmartTerminal XX44
+	003c  Raptor Gaming Keyboard
+	003d  Raptor Gaming Keyboard Integrated Hub
 	003e  SmartTerminal ST-2xxx
 	0041  G86 6240 Keyboard
 	0080  eHealth Terminal ST 1503
@@ -2563,7 +2571,9 @@
 	0a37  USB Headset H540
 	0a38  Headset H340
 	0a44  Headset H390
+	0a45  960 Headset
 	0a4d  G430 Surround Sound Gaming Headset
+	0a5b  G933 Wireless Headset Dongle
 	0b02  C-UV35 [Bluetooth Mini-Receiver] (HID proxy mode)
 	8801  Video Camera
 	b014  Bluetooth Mouse M336/M337/M535
@@ -3411,6 +3421,7 @@
 	049b  Strobe XP 100
 	04a0  7400
 	04ac  Xerox Travel Scanner 100
+	04cd  Xerox Travel Scanner 150
 04a8  Multivideo Labs, Inc.
 	0101  Hub
 	0303  Peripheral Switch
@@ -3496,6 +3507,7 @@
 	1512  BIJ1350D PCL
 	1601  DR-2080C Scanner
 	1607  DR-6080 Scanner
+	1608  DR-2580C Scanner
 	1700  PIXMA MP110 Scanner
 	1701  PIXMA MP130 Scanner
 	1702  MP410 Composite
@@ -3886,7 +3898,9 @@
 	3211  PowerShot SX130 IS
 	3212  Powershot S95
 	3214  SELPHY CP800
+	3215  EOS 60D
 	3218  EOS 600D / Rebel T3i (ptp)
+	3219  EOS 1D X
 	3223  PowerShot A3300 IS
 	3224  PowerShot A3200 IS
 	3225  PowerShot ELPH 500 HS / IXUS 310 HS
@@ -3903,7 +3917,9 @@
 	3236  PowerShot S100
 	3237  PowerShot ELPH 310 HS / IXUS 230 HS
 	3238  PowerShot SX40 HS
+	323a  EOS 5D Mark III
 	323b  EOS Rebel T4i
+	323d  EOS M
 	323e  PowerShot A1300
 	323f  PowerShot A810
 	3240  PowerShot ELPH 320 HS / IXUS 240 HS
@@ -3912,10 +3928,14 @@
 	3243  PowerShot A4000 IS
 	3244  PowerShot SX260 HS
 	3245  PowerShot SX240 HS
+	3246  PowerShot ELPH 530 HS / IXUS 510 HS
 	3247  PowerShot ELPH 520 HS / IXUS 500 HS
 	3248  PowerShot A3400 IS
 	3249  PowerShot A2400 IS
 	324a  PowerShot A2300
+	3250  EOS 6D
+	3252  EOS 1D C
+	3253  EOS 70D
 	3255  SELPHY CP900
 	3256  SELPHY CP810
 	3258  PowerShot G15
@@ -3933,7 +3953,12 @@
 	3265  Powershot ELPH 130 IS / IXUS 140
 	3266  Powershot ELPH 120 IS / IXUS 135
 	3268  PowerShot ELPH 330 HS / IXUS 255 HS
+	326f  EOS 7D Mark II
+	3270  EOS 100D
 	3271  PowerShot A2500
+	3272  EOS 700D
+	3274  PowerShot G16
+	3275  PowerShot S120
 	3276  PowerShot SX170 IS
 	3277  PowerShot SX510 HS
 	3278  PowerShot S200
@@ -3956,10 +3981,14 @@
 	329f  PowerShot SX530 HS
 	32a6  PowerShot SX710 HS
 	32aa  Powershot ELPH 160 / IXUS 160
+	32ab  PowerShot ELPH 350HS / IXUS 275 HS
 	32ac  PowerShot ELPH 170 IS / IXUS 170
 	32ad  PowerShot SX410 IS
 	32b1  SELPHY CP1200
+	32b2  PowerShot G9 X
+	32bb  EOS M5
 	32c1  PowerShot ELPH 180 / IXUS 175
+	32c2  PowerShot SX720 HS
 04aa  DaeWoo Telecom, Ltd
 04ab  Chromatic Research
 04ac  Micro Audiometrics Corp.
@@ -4326,6 +4355,7 @@
 	1304  iKey Token
 	1305  iKey Token
 	1306  iKey Token
+	8000  SafeNet Sentinel Hardware Key
 04ba  Toucan Systems, Ltd
 04bb  I-O Data Device, Inc.
 	0101  USB2-IDE/ATAPI Bridge Adapter
@@ -4621,6 +4651,7 @@
 	1818  Keyboard [Diatec Filco Majestouch 2]
 	2011  Keyboard [Diatec Filco Majestouch 1]
 	2013  Keyboard [Das Keyboard]
+	2206  Fujitsu Siemens Mouse Esprimo Q
 	2221  Keyboard
 	2323  Keyboard
 	2519  Shenzhen LogoTech 2.4GHz receiver
@@ -4629,6 +4660,7 @@
 	a01c  wireless multimedia keyboard with trackball [Trust ADURA 17911]
 	a050  Chatman V1
 	a055  Keyboard
+	a11b  Mouse [MX-3200]
 04da  Panasonic (Matsushita)
 	0901  LS-120 Camera
 	0912  SDR-S10
@@ -4639,6 +4671,7 @@
 	0d0a  CD-R Drive KXL-CB20AN
 	0d0d  CDRCB03
 	0d0e  DVD-ROM & CD-R/RW
+	0f07  KX-MB2030 Multifunction Laser Printer
 	0f40  Printer
 	104d  Elite Panaboard UB-T880 (HID)
 	104e  Elite Panaboard Pen Adaptor (HID)
@@ -4657,6 +4690,9 @@
 	2374  Lumix Camera (PTP mode)
 	2451  HDC-SD9
 	245b  HC-X920K (3MOS Full HD video camcorder)
+	2477  SDR-H85 Camcorder (PC mode)
+	2478  SDR-H85 Camcorder (recorder mode - SD card)
+	2479  SDR-H85 Camcorder (recorder mode - HDD)
 	2497  HDC-TM700
 	250c  Gobi Wireless Modem (QDL mode)
 	250d  Gobi Wireless Modem
@@ -4805,6 +4841,7 @@
 	0082  Touchmonitor Interface
 	00ff  Touchmonitor Interface
 04e8  Samsung Electronics Co., Ltd
+	0001  Printer Bootloader
 	0100  Kingston Flash Drive (128MB)
 	0110  Connect3D Flash Drive
 	0111  Connect3D Flash Drive
@@ -4958,7 +4995,7 @@
 	6125  D3 Station External Hard Drive
 	61b5  M3 Portable Hard Drive 2TB
 	61b6  M3 Portable Hard Drive 1TB
-	61f3  MU-PT500B [T3 500GB USB SSD]
+	61f3  Portable SSD T3 (MU-PT250B, MU-PT500B)
 	6601  Mobile Phone
 	6602  Galaxy
 	6603  Galaxy
@@ -5002,8 +5039,8 @@
 	6860  Galaxy (MTP)
 	6863  GT-I9500 [Galaxy S4] / GT-I9250 [Galaxy Nexus] (network tethering)
 	6864  GT-I9070 (network tethering, USB debugging enabled)
-	6865  GT-I9300 Phone [Galaxy S III] (PTP mode)
-	6866  GT-I9300 Phone [Galaxy S III] (debugging mode)
+	6865  Galaxy (PTP mode)
+	6866  Galaxy (debugging mode)
 	6868  Escape Composite driver for Android Phones: Modem+Diagnostic+ADB
 	6875  GT-B3710 Standalone LTE device (Commercial)
 	6876  GT-B3710 LTE Modem
@@ -5143,6 +5180,7 @@
 	0214  Lynx M9 Optical Mouse
 	0230  3D Optical Mouse
 	0232  Mouse
+	0234  Optical Mouse
 	02f4  2.4G Cordless Mouse
 	0381  Touchscreen
 	04a0  Dream Cheeky Stress/Panic Button
@@ -5650,7 +5688,10 @@
 	2027  QL-560 P-touch Label Printer
 	2028  QL-570 P-touch Label Printer
 	202b  PT-7600 P-touch Label Printer
+	2061  PT-P700 P-touch Label Printer
+	2064  PT-P700 P-touch Label Printer RemovableDisk
 	2100  Card Reader Writer
+	2102  Sewing machine
 	60a0  ADS-2000
 	60a1  ADS-2100
 	60a4  ADS-2500W
@@ -6219,7 +6260,13 @@
 	05c4  DualShock 4
 	0689  Walkman NWZ-B173F
 	06bb  WALKMAN NWZ-F805
+	06c3  RC-S380
+	07c4  ILCE-6000 (aka Alpha-6000) in Mass Storage mode
 	088c  Portable Headphone Amplifier
+	08b7  ILCE-6000 (aka Alpha-6000) in MTP mode
+	094e  ILCE-6000 (aka Alpha-6000) in PC Remote mode
+	0994  ILCE-6000 (aka Alpha-6000) in charging mode
+	0bb5  Headset MDR-1000X
 	1000  Wireless Buzz! Receiver
 054d  Try Corp.
 054e  Proside Corp.
@@ -6562,6 +6609,7 @@
 	1300  SoftK56 Data Fax Voice CARP
 	1301  Modem Enumerator
 	1328  TrendNet TFM-561 modem
+	1804  HP Dock Audio
 	2000  SoftGate 802.11 Adapter
 	2002  SoftGate 802.11 Adapter
 	262a  tm5600 Video & Audio Grabber Capture
@@ -7771,6 +7819,7 @@
 	b002  USB CF Reader
 	b018  Multi-Card Reader
 	b047  SDHC Reader [RW047-7000]
+	b051  microSD RDR UHS-I Card Reader [LRWM03U-7000]
 	ba02  Workflow CFR1
 	ba0a  Workflow DD512
 	c753  JumpDrive TwistTurn
@@ -7808,6 +7857,7 @@
 	0131  CF/SM Reader/Writer
 	0142  Multiple Slides Scanner-3600
 	0143  Multiple Frames Film Scanner-36series
+	0145  Reflecta CrystalScan 7200 Photo-Scanner
 	0180  Plustek Scanner
 	0182  Wize Media 1000
 	0189  ScanJet 4600 series
@@ -7857,6 +7907,7 @@
 	0731  GL3310 SATA 3Gb/s Bridge Controller
 	0732  All-in-One Cardreader
 	0736  microSD Reader/Writer
+	0738  Card reader
 	0741  microSD Card Reader
 	0743  SDXC and microSDXC CardReader
 	0745  Logilink CR0012
@@ -9997,6 +10048,7 @@
 	0001  Dual PSX Adaptor
 	0002  Dual PCS Adaptor
 	0003  PlayStation Gamepad
+	e501  SNES Gamepad
 0813  Mattel, Inc.
 	0001  Intel Play QX3 Microscope
 	0002  Dual Mode Camera Plus
@@ -10874,7 +10926,12 @@
 0933  Quantum Corp.
 0934  Spirent Communications
 0936  NuTesla
+	000a  Moebius
+	000b  iMoebius
 	000c  Rhythmedics 6 BioData Integrator
+	000d  Hypurius
+	000e  Millennius
+	000f  Purius
 	0030  Composite Device, Mass Storage Device (Flash Drive) amd HID
 	003c  Rhythmedics HID Bootloader
 0939  Lumberg, Inc.
@@ -17044,9 +17101,23 @@
 	0890  Flash Padlock
 	0a00  SP2500 Speakers
 	0a60  Vengeance K60 Keyboard
+	0c04  Link Cooling Node
 	1a01  Flash Voyager GT
+	1a03  Voyager 3.0
+	1a09  Voyager GT 3.0
 	1a0a  Survivor Stealth Flash Drive
+	1a0b  Flash Voyager LS
+	1a15  Voyager Slider Flash Drive
 	1a90  Flash Voyager GT
+	1ab1  Voyager
+	1b04  Raptor K50 Keyboard
+	1b07  Vengeance K65 Gaming Keyboard
+	1b08  Vengeance K95 Keyboard
+	1b09  Vengeance K70R keyboard
+	1b11  K95 RGB Mechanical Gaming Keyboard
+	1b13  Vengeance K70RGB keyboard
+	1c00  Controller for Corsair Link
+	1c0c  RM850i Power Supply
 1b1f  eQ-3 Entwicklung GmbH
 	c00f  HM-CFG-USB/HM-CFG-USB-2 [HomeMatic Configuration adapter]
 1b20  MStar Semiconductor, Inc.
