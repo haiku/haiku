@@ -1,8 +1,8 @@
 #
 #	List of PCI ID's
 #
-#	Version: 2017.02.08
-#	Date:    2017-02-08 03:15:01
+#	Version: 2017.02.15
+#	Date:    2017-02-15 03:15:02
 #
 #	Maintained by Albert Pool, Martin Mares, and other volunteers from
 #	the PCI ID Project at http://pci-ids.ucw.cz/.
@@ -6098,9 +6098,19 @@
 	8031  8300 Series 10GbE Converged Network Adapter (FCoE)
 	8032  8300 Series 10GbE Converged Network Adapter (iSCSI)
 	8070  FastLinQ QL41000 Series 10/25/40/50GbE Controller
+		1077 0011  FastLinQ QL41212H 25GbE Adapter
+		1077 0012  FastLinQ QL41112H 10GbE Adapter
 	8080  FastLinQ QL41000 Series 10/25/40/50GbE Controller (FCoE)
+		1077 000d  FastLinQ QL41262H 25GbE FCoE Adapter
+		1077 000e  FastLinQ QL41162H 10GbE FCoE Adapter
 	8084  FastLinQ QL41000 Series 10/25/40/50GbE Controller (iSCSI)
+		1077 000d  FastLinQ QL41262H 25GbE iSCSI Adapter
+		1077 000e  FastLinQ QL41162H 10GbE iSCSI Adapter
 	8090  FastLinQ QL41000 Series Gigabit Ethernet Controller (SR-IOV VF)
+		1077 000d  FastLinQ QL41262H 25GbE FCoE Adapter (SR-IOV VF)
+		1077 000e  FastLinQ QL41162H 10GbE iSCSI Adapter (SR-IOV VF)
+		1077 0011  FastLinQ QL41212H 25GbE Adapter (SR-IOV VF)
+		1077 0012  FastLinQ QL41112H 10GbE Adapter (SR-IOV VF)
 	8430  ISP8324 1/10GbE Converged Network Controller (NIC VF)
 	8431  8300 Series 10GbE Converged Network Adapter (FCoE VF)
 	8432  ISP2432M-based 10GbE Converged Network Adapter (CNA)
@@ -10592,6 +10602,7 @@
 	1347  GM108M [GeForce 940M]
 	1348  GM108M [GeForce 945M / 945A]
 	1349  GM108M [GeForce 930M]
+	134b  GM108M [GeForce 940MX]
 	134d  GM108M [GeForce 940MX]
 	134e  GM108M [GeForce 930MX]
 	134f  GM108M [GeForce 920MX]
@@ -13238,6 +13249,7 @@
 	0001  FireStream 155
 	0003  FireStream 50
 119f  Bull HN Information Systems
+	1081  BXI Host Channel Adapter
 11a0  Convex Computer Corporation
 11a1  Hamamatsu Photonics K.K.
 11a2  Sierra Research and Technology
@@ -16555,6 +16567,7 @@
 14a2  Millennium Engineering Inc
 14a3  Maverick Networks
 14a4  Lite-On Technology Corporation
+	22f1  M8Pe Series NVMe SSD
 # Wrong vendor ID used
 	4318  Broadcom BCM4318 [AirForce One 54g] 802.11g WLAN Controller
 14a5  XIONICS Document Technologies Inc
@@ -17996,6 +18009,7 @@
 1599  Delta Electronics Inc
 159a  General Instrument
 159b  Faraday Technology Corp
+	4321  StorLink SL3516 (Gemini) Host Bridge
 159c  Stratus Computer Systems
 159d  Ningbo Harrison Electronics Co Ltd
 159e  A-Max Technology Co Ltd
@@ -18052,6 +18066,7 @@
 	024f  MT53100 [Spectrum-2, Flash recovery mode]
 	0262  MT27710 [ConnectX-4 Lx Programmable] EN
 	0263  MT27710 [ConnectX-4 Lx Programmable Virtual Function] EN
+	0281  NPS-600 Flash Recovery
 	1002  MT25400 Family [ConnectX-2 Virtual Function]
 	1003  MT27500 Family [ConnectX-3]
 		103c 1777  InfiniBand FDR/EN 10/40Gb Dual Port 544FLR-QSFP Adapter (Rev Cx)
@@ -19649,14 +19664,15 @@
 		1924 800e  SFN7x42Q-R2 Flareon Ultra 7000 Series 10/40G Adapter
 		1924 800f  SFN7xx4F-R1 Flareon Ultra 7000 Series 10G Adapter
 	0a03  SFC9220 10/40G Ethernet Controller
-		1924 8011  SFN 8022-R1 Solarflare Flareon 8000 Series 10G Adapter
+		1924 8011  SFN8022-R1 Flareon 8000 Series 10G Adapter
 		1924 8012  SFN8522-R1 Flareon Ultra 8000 Series 10G Adapter
-		1924 8013  SFN8042-R1 Solarflare Flareon 8000 Series 10/40G Adapter
+		1924 8013  SFN8042-R1 Flareon 8000 Series 10/40G Adapter
 		1924 8014  SFN8542-R1 Flareon Ultra 8000 Series 10/40G Adapter
 		1924 8016  SFN8022-R2 Flareon 8000 Series 10G Adapter
 		1924 8017  SFN8522-R2 Flareon Ultra 8000 Series 10G Adapter
 		1924 8018  SFN8042-R2 Flareon 8000 Series 10/40G Adapter
 		1924 8019  SFN8542-R2 Flareon Ultra 8000 Series 10/40G Adapter
+		1924 801a  SFN8722-R1 Flareon Ultra 8000 Series OCP 10G Adapter
 	1803  SFC9020 10G Ethernet Controller (Virtual Function)
 	1813  SFL9021 10GBASE-T Ethernet Controller (Virtual Function)
 	1903  SFC9120 10G Ethernet Controller (Virtual Function)
@@ -19949,7 +19965,7 @@
 	5808  DDRdrive X8
 	dd52  DDRdrive X1-30
 19e5  Huawei Technologies Co., Ltd.
-	1711  Hi1710 [iBMC Intelligent Management system chip w/VGA support] Note: huawei claims to use an SM750 VGA controller integrated in this chip.
+	1711  Hi1710 [iBMC Intelligent Management system chip w/VGA support]
 19e7  NET (Network Equipment Technologies)
 	1001  STIX DSP Card
 	1002  STIX - 1 Port T1/E1 Card
@@ -20149,7 +20165,7 @@
 1b03  Magnum Semiconductor, Inc,
 	6100  DXT/DXTPro Multiformat Broadcast HD/SD Encoder/Decoder/Transcoder
 	7000  D7 Multiformat Broadcast HD/SD Encoder/Decoder/Transcoder
-1b08  MSC Vertriebs GmbH
+1b08  MSC Technologies GmbH
 1b0a  Pegatron
 1b13  Jaton Corp
 1b1a  K&F Computing Research Co.
@@ -20487,16 +20503,18 @@
 	4022  TN9310 10GbE SFP+ Ethernet Adapter
 		1043 8709  XG-C100F 10GbE SFP+ Ethernet Adapter
 		1186 4d00  DXE-810S 10GbE SFP+ Ethernet Adapter
-		1432 8103  EN-8102PF 10GbE SPF+ Ethernet Adapter
+		1432 8103  10 Gigabit Ethernet SFP+ PCI Express Adapter
 		1fc9 3015  Ethernet Adapter
 	4024  TN9210 10GBase-T Ethernet Adapter
 	4025  TN9510 10GBase-T/NBASE-T Ethernet Adapter
 		105a 7203  SANLink3 NBase-T1
 		1186 2900  DXE-810T 10GBase-T Ethernet Adapter
-		1432 8102  EN-8102P 10GbE Ethernet Adapter
+		1432 8102  10 Gigabit Ethernet PCI Express Adapter
 		1fc9 3015  Ethernet Adapter
 	4026  TN9610 10GbE SFP+ Ethernet Adapter
 	4027  TN9710P 10GBase-T/NBASE-T Ethernet Adapter
+		1432 8104  10 Gigabit Ethernet PCI Express Adapter
+		1fc9 3015  Ethernet Adapter
 	4527  TN9710Q 5GBase-T/NBASE-T Ethernet Adapter
 1fcc  StreamLabs
 	f416  MS416
