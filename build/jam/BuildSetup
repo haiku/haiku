@@ -640,6 +640,14 @@ if $(TARGET_PLATFORM) != haiku {
 	}
 }
 
+
+# Haiku architecture is undefined on host-only builds
+# set here to host arch to prevent recusive loops.
+if $(HAIKU_HOST_BUILD_ONLY) = 1 {
+	HAIKU_ARCH = $(HOST_ARCH) ;
+	HAIKU_KERNEL_ARCH = $(HOST_ARCH) ;
+}
+
 # Set TARGET_* variables either from HAIKU_* or HOST_* depending on the
 # specified TARGET_PLATFORM. Some variables are package architecture dependent
 # and their name gets a respective suffix. A few variables exist both with and
