@@ -369,11 +369,9 @@ BInfoWindow::Show()
 		"will use to find the window width");
 
 	// window height depends on file type
-	int lines = 7;
-	if (fModel->IsSymLink())
-		lines++;
+	int lines = 8;
 	if (fModel->IsExecutable())
-		lines += 2;
+		lines++;
 	float height = font->Size() * (lines * 2 + 1);
 
 	ResizeTo(width, height);
@@ -912,6 +910,7 @@ AttributeView::AttributeView(BRect rect, Model* model)
 				Bounds().Width() - 5, fTitleRect.bottom + (lineHeight * 8));
 			fPreferredAppMenu = new BMenuField(preferredAppRect, "", "",
 				new BPopUpMenu(""));
+			currentFont.SetSize(currentFont.Size() + 2);
 			fDivider = currentFont.StringWidth(B_TRANSLATE("Opens with:"))
 				+ 5;
 			fPreferredAppMenu->SetDivider(fDivider);
