@@ -74,7 +74,7 @@ options:
                               bootstrap and build Haiku from source only.
   --target=TARGET             Select build target platform.
                               [default=${TARGET_PLATFORM}]
-                              valid targets=r5,bone,dano,haiku,host
+                              valid targets=r5,bone,dano,haiku
   --target-arch <arch>        Haiku only: Specify the target architecture to
                               build for. Must be one of the architectures of the
                               host system. The installed build tools for that
