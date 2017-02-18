@@ -186,7 +186,7 @@ BSimpleMediaInput::Disconnected()
 
 
 void
-BSimpleMediaInput::BufferReceived(BBuffer* buffer)
+BSimpleMediaInput::HandleBuffer(BBuffer* buffer)
 {
 	CALLED();
 

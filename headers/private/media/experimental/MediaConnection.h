@@ -25,6 +25,7 @@ class BMediaClientNode;
 // the BufferReceived function will be called so that you can process the BBuffer,
 // and once the function returns the output will be automatically forwarded
 // to the connection B SendBuffer method.
+// It's not possible to mix a BMediaInput with a BMediaOutput in the same class.
 class BMediaConnection {
 public:
 	const media_connection&			Connection() const;
@@ -39,7 +40,7 @@ public:
 	bool							IsConnected() const;
 
 	// This allow to specify a format that will be used while
-	// connecting to another node. See BMediaClient::SetFormat.
+	// connecting to another node.
 	void							SetAcceptedFormat(
 										const media_format& format);
 	const media_format&				AcceptedFormat() const;
@@ -47,10 +48,6 @@ public:
 	// Represents the buffer size, depends on the format set or negotiated
 	// for this connection.
 	size_t							BufferSize() const;
-
-	// Represents the duration of one buffer depends on the format set or
-	// negotiated for this connection.
-	bigtime_t						BufferDuration() const;
 
 	// Disconnect this connection. When a connection is disconnected,
 	// it can be reused as brand new.
@@ -99,9 +96,6 @@ private:
 	// see BMediaClient::Bind.
 	BMediaConnection*				fBind;
 
-	size_t							fBufferSize;
-	bigtime_t						fBufferDuration;
-
 	BBufferGroup*					fBufferGroup;
 
 	bool							fConnected;
@@ -140,7 +134,7 @@ protected:
 	// Callbacks
 	virtual status_t				FormatChanged(const media_format& format);
 
-	virtual void					BufferReceived(BBuffer* buffer);
+	virtual void					HandleBuffer(BBuffer* buffer);
 
 private:
 	media_input						_MediaInput() const;

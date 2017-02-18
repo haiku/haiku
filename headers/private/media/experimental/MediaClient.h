@@ -61,7 +61,7 @@ public:
 
 	// When those functions return, the BMediaConnection is added to the
 	// list and is visible to other nodes as not connected. Any input/output
-	// should be registered to a BMediaClient to become something useful.
+	// should be registered to a BMediaClient to become visible in the system.
 	virtual status_t				RegisterInput(BMediaInput* input);
 	virtual status_t				RegisterOutput(BMediaOutput* output);
 
@@ -81,7 +81,7 @@ public:
 	// BMediaClient::Format() will be used, in case both aren't specified
 	// an error is returned. The first parameter should always belong to
 	// this node, the second will be a connection obtained from another
-	// BMediaClient.
+	// BMediaClient. Unregistered connections will be registered automatically.
 	virtual status_t				Connect(BMediaConnection* ourConnection,
 										BMediaConnection* theirConnection);
 

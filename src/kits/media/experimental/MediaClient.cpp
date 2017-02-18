@@ -224,9 +224,7 @@ status_t
 BMediaClient::Connect(BMediaConnection* connection,
 	const media_client& client)
 {
-	CALLED();
-
-	// TODO: implement this
+	UNIMPLEMENTED();
 
 	return B_ERROR;
 }
@@ -467,7 +465,7 @@ BMediaClient::_Deinit()
 {
 	CALLED();
 
-	if (fRunning)
+	if (IsRunning())
 		Stop();
 
 	Disconnect();
@@ -555,9 +553,6 @@ BMediaClient::_ConnectOutput(BMediaInput* input,
 	media_input ourInput = input->Connection()._MediaInput();
 	media_output theirOutput = output._MediaOutput();
 	media_format format = input->AcceptedFormat();
-
-	// TODO manage the node problems
-	//fNode->ActivateInternalConnect(false);
 
 	return BMediaRoster::CurrentRoster()->Connect(theirOutput.source,
 		ourInput.destination, &format, &theirOutput, &ourInput,

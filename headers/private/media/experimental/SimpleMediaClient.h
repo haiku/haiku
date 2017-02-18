@@ -135,7 +135,7 @@ protected:
 	virtual void					Connected(const media_format& format);
 	virtual void					Disconnected();
 
-	virtual void					BufferReceived(BBuffer* buffer);
+	virtual void					HandleBuffer(BBuffer* buffer);
 };
 
 

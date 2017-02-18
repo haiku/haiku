@@ -16,8 +16,10 @@
 
 namespace BPrivate { namespace media {
 
+
 class BMediaClient;
 class BMediaConnection;
+class BMediaOutput;
 
 class BMediaClientNode : public BBufferConsumer, public BBufferProducer,
 	public BMediaEventLooper {
@@ -132,6 +134,8 @@ private:
 				void		_HandleBuffer(BBuffer* buffer);
 				void		_ProduceNewBuffer(const media_timed_event* event,
 								bigtime_t late);
+				BBuffer*	_GetNextBuffer(BMediaOutput* output,
+								bigtime_t eventTime);
 
 			BMediaClient*	fOwner;
 			bigtime_t		fStartTime;

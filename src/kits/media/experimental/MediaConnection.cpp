@@ -122,23 +122,22 @@ BMediaConnection::Release()
 }
 
 
-// TODO: The data represented by the following two functions should be
-// automatically calculated depending on the media_format.
 size_t
 BMediaConnection::BufferSize() const
 {
 	CALLED();
 
-	return fBufferSize;
-}
+	switch (fConnection.format.type) {
+		case B_MEDIA_RAW_AUDIO:
+			return fConnection.format.u.raw_audio.buffer_size;
 
+		case B_MEDIA_RAW_VIDEO:
+			return fConnection.format.u.raw_video.display.bytes_per_row *
+				fConnection.format.u.raw_video.display.line_count;
 
-bigtime_t
-BMediaConnection::BufferDuration() const
-{
-	CALLED();
-
-	return fBufferDuration;
+		default:
+			return 0;
+	}
 }
 
 
@@ -251,7 +250,7 @@ BMediaInput::FormatChanged(const media_format& format)
 
 
 void
-BMediaInput::BufferReceived(BBuffer* buffer)
+BMediaInput::HandleBuffer(BBuffer* buffer)
 {
 	CALLED();
 
@@ -310,6 +309,9 @@ BMediaOutput::SetEnabled(bool enabled)
 status_t
 BMediaOutput::PrepareToConnect(media_format* format)
 {
+	if (!format_is_compatible(AcceptedFormat(), *format))
+		return B_ERROR;
+
 	SetAcceptedFormat(*format);
 
 	return B_OK;
@@ -335,6 +337,9 @@ status_t
 BMediaOutput::SendBuffer(BBuffer* buffer)
 {
 	CALLED();
+
+	if (!IsConnected())
+		return B_ERROR;
 
 	return fOwner->fNode->SendBuffer(buffer, this);
 }

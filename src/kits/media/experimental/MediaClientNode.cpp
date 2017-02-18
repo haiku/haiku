@@ -382,14 +382,7 @@ BMediaClientNode::SetBufferGroup(const media_source& source, BBufferGroup* group
 		return B_OK;
 	}
 
-	bigtime_t latency = 0;
-	GetLatency(&latency);
-	int32 count = int32(latency / conn->BufferDuration() + 2);
-
-	if (count < 3)
-		count = 3;
-
-	conn->fBufferGroup = new BBufferGroup(conn->BufferSize(), count);
+	conn->fBufferGroup = new BBufferGroup(conn->BufferSize(), 3);
 	if (conn->fBufferGroup == NULL)
 		return B_NO_MEMORY;
 
@@ -450,8 +443,12 @@ BMediaClientNode::Connect(status_t status, const media_source& source,
 	conn->SetAcceptedFormat(format);
 	strcpy(name, Name());
 
-	// TODO: Allocate buffers, add correct latency estimate
-	// and buffer duration mode.
+	// TODO: add correct latency estimate
+	SetEventLatency(1000);
+
+	conn->fBufferGroup = new BBufferGroup(conn->BufferSize(), 3);
+	if (conn->fBufferGroup == NULL)
+		TRACE("Can't allocate the buffer group\n");
 
 	conn->Connected(format);
 }
@@ -492,7 +489,7 @@ BMediaClientNode::GetLatency(bigtime_t* outLatency)
 	CALLED();
 
 	// TODO: finish latency handling
-	*outLatency = 0;
+	*outLatency = 1000;
 	return B_OK;
 }
 
@@ -600,7 +597,7 @@ BMediaClientNode::_HandleBuffer(BBuffer* buffer)
 	BMediaInput* conn = fOwner->_FindInput(dest);
 
 	if (conn != NULL)
-		conn->BufferReceived(buffer);
+		conn->HandleBuffer(buffer);
 
 	// TODO: Investigate system level latency logging
 
@@ -620,8 +617,58 @@ BMediaClientNode::_ProduceNewBuffer(const media_timed_event* event,
 	if (RunState() != BMediaEventLooper::B_STARTED)
 		return;
 
-	// We get the data through the event
-	// so that we know which connection
+	// The connection is get through the event
+	BMediaOutput* output
+		= dynamic_cast<BMediaOutput*>((BMediaConnection*)event->pointer);
+	if (output == NULL)
+		return;
 
-	// event.pointer == connection
+	if (output->IsEnabled()) {
+		BBuffer* buffer = _GetNextBuffer(output, event->event_time);
+
+		if (buffer != NULL) {
+			if (output->SendBuffer(buffer) != B_OK) {
+				TRACE("BMediaClientNode: Failed to send buffer\n");
+				// The output failed, let's recycle the buffer
+				buffer->Recycle();
+			}
+		}
+	}
+
+	bigtime_t time = 0;
+	media_format format = output->AcceptedFormat();
+	if (format.IsAudio()) {
+		size_t nFrames = format.u.raw_audio.buffer_size
+			/ ((format.u.raw_audio.format
+				& media_raw_audio_format::B_AUDIO_SIZE_MASK)
+			* format.u.raw_audio.channel_count);
+		output->fFramesSent += nFrames;
+
+		time = fStartTime + bigtime_t((1000000LL * output->fFramesSent)
+			/ (int32)format.u.raw_audio.frame_rate);
+	}
+
+	media_timed_event nextEvent(time, B_NEW_BUFFER);
+	EventQueue()->AddEvent(nextEvent);
+}
+
+
+BBuffer*
+BMediaClientNode::_GetNextBuffer(BMediaOutput* output, bigtime_t eventTime)
+{
+	CALLED();
+
+	BBuffer* buffer = NULL;
+	if (output->fBufferGroup->RequestBuffer(buffer, 0) != B_OK) {
+		TRACE("MediaClientNode:::_GetNextBuffer: Failed to get the buffer\n");
+		return NULL;
+	}
+
+	media_header* header = buffer->Header();
+	header->type = output->AcceptedFormat().type;
+	header->size_used = output->BufferSize();
+	header->time_source = TimeSource()->ID();
+	header->start_time = eventTime;
+
+	return buffer;
 }
