@@ -45,9 +45,9 @@ PrintMountPoint(dev_t device, bool verbose)
 	if (verbose)
 		printf("   Mounted at: %s\n", mount);
 	else {
-		printf("%-15s ", mount);
-		if (strlen(mount) > 15)
-			printf("\n%15s ", "");
+		printf("%-17s ", mount);
+		if (strlen(mount) > 17)
+			printf("\n%17s ", "");
 	}
 }
 
@@ -55,10 +55,10 @@ PrintMountPoint(dev_t device, bool verbose)
 void
 PrintType(const char *fileSystem)
 {
-	char type[10];
+	char type[16];
 	strlcpy(type, fileSystem, sizeof(type));
 
-	printf("%-8s", type);
+	printf("%-9s", type);
 }
 
 
@@ -71,7 +71,8 @@ ByteString(int64 numBlocks, int64 blockSize)
 	if (blocks < 1024)
 		sprintf(string, "%" B_PRId64, numBlocks * blockSize);
 	else {
-		const char *units[] = {"K", "M", "G", NULL};
+		const char *units[] = {"KiB", "MiB", "GiB", "TiB", "PiB", "EiB",
+							   "ZiB", "YiB", NULL};
 		int32 i = -1;
 
 		do {
@@ -79,7 +80,7 @@ ByteString(int64 numBlocks, int64 blockSize)
 			i++;
 		} while (blocks >= 1024 && units[i + 1]);
 
-		sprintf(string, "%.1f%s", blocks, units[i]);
+		sprintf(string, "%.1f %s", blocks, units[i]);
 	}
 
 	return string;
@@ -236,8 +237,8 @@ main(int argc, char **argv)
 
 	// If not, then just iterate over all devices and give a compact summary
 
-	printf("Mount           Type      Total     Free     Flags   Device\n"
-		"--------------- -------- --------- --------- ------- --------------------------\n");
+	printf(" Mount             Type      Total     Free      Flags   Device\n"
+		   "----------------- --------- --------- --------- ------- ------------------------\n");
 
 	int32 cookie = 0;
 	while ((device = next_dev(&cookie)) >= B_OK) {
