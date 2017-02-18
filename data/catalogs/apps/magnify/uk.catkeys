@@ -1,14 +1,18 @@
-1	ukrainian	x-vnd.Haiku-Magnify	1986662371
+1	ukrainian	x-vnd.Haiku-Magnify	931164741
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		немає кліпу msg\n
 Make square	Magnify-Main		Задати площу
 Copy image	Magnify-Main		Копіювати зображення
 usage: magnify [size] (magnify size * size pixels)\n	Console		використання: magnify [size] (magnify size * size pixels)\n  
+Freeze image	Magnify-Main		Зображення заморожено
 Stick coordinates	Magnify-Main		Вісь кординат
-magnify: size must be a multiple of 4\n	Console		збільшення: Розмір має бути кратним 4\n
+%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		Вісь кординат
+Show info	Magnify-Main		Показати інформацію
+magnify: size must be a multiple of 4\n	Console		magnify: розмір має бути кратний 4-м\n 
 Decrease pixel size	Magnify-Main		Зменшити розмір пікселів
-Magnify	System name		Збільшення
+Magnify	System name		Magnify
 Info	Magnify-Main		Інформація
-Remove a crosshair	Magnify-Main		Зняти перехрестя
+Remove a crosshair	Magnify-Main		Видалити перехрестя
+Show grid	Magnify-Main		Показати сітку
 Save image	Magnify-Main		Зберегти зображення
 Increase window size	Magnify-Main		Збільшити розмір вікна
 Decrease window size	Magnify-Main		Зменшити розмір вікна

@@ -1,26 +1,31 @@
-1	ukrainian	x-vnd.haiku-screenshot	363809141
+1	ukrainian	x-vnd.haiku-screenshot	3958461128
 seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Робочий стіл
 Include window border	ScreenshotWindow		Включаючи межу вікна
-Screenshot	System name		Знімок екрану
+Screenshot	System name		Screenshot
 Select	ScreenshotWindow		Вибрати
+The destination path exists but is not a folder.	ScreenshotWindow		Шлях по замовчуванню присутній але це не тека.
 Capture active window	ScreenshotWindow		Захопити активне вікно
 Cancel	ScreenshotWindow		Відмінити
 Name:	ScreenshotWindow		Ім'я:
+Choose folder…	ScreenshotWindow		Виберіть теку…
 This file already exists.\n Are you sure you would like to overwrite it?	ScreenshotWindow		Цей файл вже існує.\nВи впевнені, що бажаєте перезаписати його?
-Choose folder	ScreenshotWindow		Виберіть папку
+Choose folder	ScreenshotWindow		Виберіть теку
 Save	ScreenshotWindow		Зберегти
-Overwrite	ScreenshotWindow		переписати
-Please select	ScreenshotWindow		Будь-ласка виберіть
+Overwrite	ScreenshotWindow		Переписати
+Please select	ScreenshotWindow		Виберіть будь-ласка
 Save as:	ScreenshotWindow		Зберегти як:
 Copy to clipboard	ScreenshotWindow		Копіювати до буфера обміну
 Save in:	ScreenshotWindow		Зберегти в:
 screenshot	Screenshot	Base filename of screenshot files	знімок екрана
-New screenshot	ScreenshotWindow		Новий знімок
-Artwork folder	ScreenshotWindow		Папка Artwork
-Home folder	ScreenshotWindow		Папка Home
-Settings…	ScreenshotWindow		Настройки…
+New screenshot	ScreenshotWindow		Новий знімок екрана
+Artwork folder	ScreenshotWindow		Тека Artwork
+Home folder	ScreenshotWindow		Тека Home
+Failed to save screenshot	ScreenshotWindow		Збереження знімку екрана призупинене
+OK	ScreenshotWindow		Гаразд
+Settings…	ScreenshotWindow		Налаштування…
 overwrite	ScreenshotWindow		переписати
 Delay:	ScreenshotWindow		Затримка:
+Error saving \"%s\":\n\t%s	ScreenshotWindow		Помилка збереження \"%s\":\n\t%s
 Include mouse pointer	ScreenshotWindow		Включаючи курсор
-Translator Settings	ScreenshotWindow		Настройки транслятора
+Translator Settings	ScreenshotWindow		Налаштування транслятора

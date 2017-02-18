@@ -1,27 +1,27 @@
 1	ukrainian	x-vnd.Haiku.TV	1995288111
-TV	MainWin		ТБ
-Channel	MainWin		Канали
+TV	MainWin		TV
+Channel	MainWin		Канал
 Settings…	MainWin		Налаштування…
 Interface	MainWin		Інтерфейс
 Keep aspect ratio	MainWin		Зберегти співвідношення
 Previous channel	MainWin		Попередній канал
 Settings	MainWin		Налаштування
-TV	System name		Телебачення
+TV	System name		TV
 No border	MainWin		Без рамки
 Always on top	MainWin		Завжди поверх усіх
 OK	MainWin		Гаразд
 Quit	MainWin		Вийти
 Full screen	MainWin		Повний екран
-Debug	MainWin		Налагоджуваня
+Debug	MainWin		Відладка
 Scale to native size	MainWin		Маштабувати до вихідного розміру
-unknown	MainWin		невідоме
+unknown	MainWin		невідомий
 Next channel	MainWin		Наступний канал
-Error, interface is busy:\n\n	MainWin		Помилка, інтерфейс занятий:\n\n
+Error, interface is busy:\n\n	MainWin		Помилка, інтерфейс зайнятий:\n\n
 None	MainWin		Нічого
-force 704 x 576, display aspect 4:3	MainWin		примусово 704 x 576, співвідношення дисплею 4:3
+force 704 x 576, display aspect 4:3	MainWin		примусово 704 x 576, співвідношення екрану 4:3
 DVB - Digital Video Broadcasting TV	MainWin		DVB - цифрове ефірне ТБ
-force 544 x 576, display aspect 4:3	MainWin		Примусово 544 x 576, співвідношення дисплею 4:3
-pixel aspect ratio	MainWin		Пропорції пікселя
+force 544 x 576, display aspect 4:3	MainWin		Примусово 544 x 576, співвідношення екрану 4:3
+pixel aspect ratio	MainWin		піксельна пропрорція
 No menu	MainWin		Немає меню
-Error, connecting to interface failed:\n\n	MainWin		Помилка, підключення до інтерфейсу невдалось:\n\n
-force 720 x 576, display aspect 4:3	MainWin		Примусово 720 x 576, співвідношення дисплею 4:3
+Error, connecting to interface failed:\n\n	MainWin		Помилка, підключення до інтерфейсу не вдалось:\n\n
+force 720 x 576, display aspect 4:3	MainWin		Примусово 720 x 576, співвідношення екрану 4:3

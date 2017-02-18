@@ -1,19 +1,19 @@
-1	ukrainian	x-vnd.Haiku-Sudoku	2463385585
+1	ukrainian	x-vnd.Haiku-Sudoku	3382377306
 Restore snapshot	SudokuWindow		Поновити знімок
 Could not set Sudoku:\n%s\n	SudokuWindow		Неможливо встановити Судоку: \n%s\n
 Export as…	SudokuWindow		Експортувати як…
 OK	SudokuWindow		Гаразд
 New	SudokuWindow		Новий
 Abort	ProgressWindow		Припинити
-Sudoku	System name		Судоку
+Sudoku	System name		Sudoku
 Could not open \"%s\":\n%s\n	SudokuWindow		Неможливо відкрити \"%s\":\n%s\n
-Easy	SudokuWindow		Легкий
+Easy	SudokuWindow		Простий
 Open file…	SudokuWindow		Відкрити файл…
-Solve single field	SudokuWindow		Розв'язати одне поле
+Solve single field	SudokuWindow		Вирішити одне поле
 Solve	SudokuWindow		Розв'язати
 Redo	SudokuWindow		Відмінити відміну
 File	SudokuWindow		Файл
-Advanced	SudokuWindow		Середній
+Advanced	SudokuWindow		Підвищений
 Start again	SudokuWindow		Розпочати знову
 HTML	SudokuWindow		HTML
 Sudoku request	SudokuWindow		Запит 
@@ -23,9 +23,10 @@ Sudoku solved - congratulations!\n	SudokuWindow		Вітаємо - Судоку �
 Hard	SudokuWindow		Складний
 Snapshot current	SudokuWindow		Зробити знімок
 Text	SudokuWindow		Текст
-Creating solvable field	SudokuGenerator		Створити розв'язуваний файл
+Creating solvable field	SudokuGenerator		Створити поле для розв'язку
 View	SudokuWindow		Вигляд
-Progress monitor	ProgressWindow		Індикатор прогресу
+Progress monitor	ProgressWindow		Монітор ходу
+Set all hints	SudokuWindow		Встановити підказки
 Mark invalid values	SudokuWindow		Позначати помилки
 Blank	SudokuWindow		Порожній
 Help	SudokuWindow		Довідка

@@ -1,8 +1,8 @@
 1	ukrainian	x-vnd.Haiku-Devices	865240481
 Manufacturer	DeviceSCSI		Виробник
 Order by:	DevicesView		Сортувати по:
-ACPI controller	Device		ACPI контролер
-Memory controller	Device		Контролер пам’яті
+ACPI controller	Device		Контроллер ACPI
+Memory controller	Device		Контроллер пам’яті
 Driver used	DevicePCI		Використовує драйвер
 CD-ROM	DeviceSCSI		CD-ROM
 ISA bus	Device		шина ISA
@@ -31,10 +31,10 @@ Not implemented	DevicePCI		Не підтримується
 Disk Drive	DeviceSCSI		Дисковий привід
 Not implemented	DeviceACPI		Не підтримується
 Device name	DevicePCI		Ім'я пристрою
-Display controller	Device		Контролер дисплея
-Mass storage controller	Device		Контролер накопичувачів
-Input device controller	Device		Контролер ввідних пристроїв
-Network controller	Device		Мережевий контролер
+Display controller	Device		Контроллер дисплея
+Mass storage controller	Device		Контроллер накопичувачів
+Input device controller	Device		Контроллер ввідних пристроїв
+Network controller	Device		Мережевий контроллер
 Device class	DeviceSCSI		Клас приладу
 Device name	DeviceACPI		Ім'я пристрою
 Driver used	Device		Використовує драйвер
@@ -45,7 +45,7 @@ Communications	DeviceSCSI		Комунікації
 Bus	DevicesView		Шина
 Communication controller	Device		Контролер зв’язку
 Manufacturer	DeviceACPI		Виробник
-PCI bus	Device		ШинаPCI
+PCI bus	Device		Шина PCI
 ACPI System Indicator	DeviceACPI		Індикатор системи ACPI
 None	Device		Жоден
 PCI bus	DevicesView		Шина PCI
@@ -53,12 +53,12 @@ Class Info:\t\t\t\t: %classInfo%	DeviceSCSI		Дані класу:\t\t\t\t: %clas
 Basic information	DevicesView		Основна інформація
 PCI Information	DevicePCI		Інформація про PCI
 Manufacturer:	Device		Виробник:
-ACPI bus	DevicesView		ШинаACPI
-Changer	DeviceSCSI		Ченджер
+ACPI bus	DevicesView		Шина ACPI
+Changer	DeviceSCSI		Перемикач
 ACPI System Bus	DeviceACPI		Шина системи ACPI
-Devices	System name		Пристрої
+Devices	System name		Devices
 Worm	DeviceSCSI		Хробак
-Multimedia controller	Device		Мультимедійний контролер
+Multimedia controller	Device		Контроллер мультимедіа
 Unknown	DevicePCI		Невідомий
 Device name:	Device		Назва пристрою:
 Computer	DevicesView		Компютер
@@ -73,7 +73,7 @@ Device name	Device		Назва пристрою
 Manufacturer	Device		Виробник
 Name	PropertyList		Імя
 Manufacturer	DevicePCI		Виробник
-Intelligent controller	Device		Інтелектуальний контролер
+Intelligent controller	Device		Інтелектуальний контроллер
 Satellite communications controller	Device		Контроллер супутникового зв’язку
 SCSI Information	DeviceSCSI		Дані SCSI
 Enclosure	DeviceSCSI		Вкладення
@@ -85,7 +85,7 @@ Graphics Peripheral	DeviceSCSI		Графічна периферія
 Tape Drive	DeviceSCSI		Стрічковий привід
 Bus Information	Device		Інфо про шину
 Connection	DevicesView		Підключенню
-Generate system information	DevicesView		Створення системної інформації
+Generate system information	DevicesView		Створення інформації про систему
 Encryption controller	Device		Контроллер шифрування
 Unclassified device	Device		Некласифіковані пристрої
 Device name	DeviceSCSI		Ім'я пристрою

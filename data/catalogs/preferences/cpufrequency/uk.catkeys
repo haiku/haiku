@@ -1,21 +1,21 @@
 1	ukrainian	x-vnd.Haiku-CPUFrequencyPref	1007318924
 Ok	Status view		Гаразд
-CPU frequency status view	CPU Frequency View		Статистика частоти ЦП
+CPU frequency status view	CPU Frequency View		Вікно стану CPU frequency
 OK	Status view		Гаразд
 Set state	Status view		Встановити стан
-Defaults	Pref Window		По замовчуванню
-Install replicant into Deskbar	CPU Frequency View		Встановити реплікант в Deskbar
+Defaults	Pref Window		Типово
+Install replicant into Deskbar	CPU Frequency View		Встановити реплікант у Deskbar
 Quit	Status view		Вийти
 High performance	Status view		Висока продуктивність
-Stepping policy	CPU Frequency View		Настройка кроку зміни частоти ЦП
+Stepping policy	CPU Frequency View		Правила степування
 Dynamic performance	Status view		Динамічна продуктивність
 Step up by CPU usage	Color Step View		Крок вгору по продуктивності ЦП
-Dynamic stepping	CPU Frequency View		Динамічна зміна
-Stepping policy: 	CPU Frequency View		Настройка кроку зміни частоти ЦП:
+Dynamic stepping	CPU Frequency View		Динамічний степінг
+Stepping policy: 	CPU Frequency View		Правила степування :
 Integration time [ms]: 	CPU Frequency View		Час інтеграції [мс]:
-Open Speedstep preferences…	Status view		Відкриття покрокового налаштування…
+Open Speedstep preferences…	Status view		Налаштування Open Speedstep…
 Revert	Pref Window		Повернути
 Low energy	Status view		Мале споживання
-Launching the CPU frequency preflet failed.\n\nError: 	Status view		Програму Частота процесора не вдалося запустити.\n\nПомилка: 
-CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		Частота процесора\n\Автор Клеменс Зейдлер\n\tCopyright 2009, Haiku, Inc.\n
-CPUFrequency	System name		Частота процесора
+Launching the CPU frequency preflet failed.\n\nError: 	Status view		Запуск префлету CPU frequency призупинено.\n\nПомилка: 
+CPUFrequency\n\twritten by Clemens Zeidler\n\tCopyright 2009, Haiku, Inc.\n	Status view		CPUFrequency\n\Автор Клеменс Зейдлер\n\tВсі права застережені 2009, Haiku, Inc.\n
+CPUFrequency	System name		CPUFrequency

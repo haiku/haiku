@@ -1,44 +1,154 @@
-1	ukrainian	x-vnd.Haiku-HaikuDepot	1722047333
+1	ukrainian	x-vnd.Haiku-HaikuDepot	1527149765
 Name	PackageListView		Ім'я
+Available packages	MainWindow		Доступні пакети
+Open %DeskbarLink%	PackageManager		Відкрити %DeskbarLink%
+Repository	FilterView		Репозиторій
+Close	RatePackageWindow		Закрити
+The captcha puzzle needs to be solved.	UserLoginWindow		Розв'язати головоломку "captcha"
 Changelog	PackageInfoView		Журнал змін
-Click a package to view information	PackageInfoView		Натисніть на пакунок, щоб побачити інформацію про нього
+Repository:	FilterView		Репозиторій:
+Your rating:	RatePackageWindow		Ваш рейтинг:
+The passwords do not match.	UserLoginWindow		Гасла не співпадають
+Log in…	MainWindow		Авторизуватись…
+Rate %Package%	RatePackageWindow		Оцінити %Package%
+Stability:	RatePackageWindow		Стабільність:
+Click a package to view information	PackageInfoView		клікніть по пакунку, для відображення інформації про нього
+Other users can see this rating	RatePackageWindow		Інші користувачі можуть побачити цю оцінку
+Stability	RatePackageWindow		Стабільність
 for %Version%	PackageInfoView		для %Version%
 No changelog available.	PackageInfoView		Історія змін недоступна
 Description	PackageListView		Опис
 Install	PackageManager		Встановити
+Source packages	MainWindow		Пакети з вихідними текстами
+Authentication failed. The user does not exist or the wrong password was supplied.	UserLoginWindow		Авторизацію призупинено. Користувач відсутній або введено невірний пароль.
+Account created successfully. You can now rate packages and do other useful things.	UserLoginWindow		Аккаунт створено. Тепер Ви зможете оцінювати пакети і робити інші корисні речі.
 Tools	MainWindow		Інструменти
-HaikuDepot	System name		Сховище
+HaikuDepot	System name		HaikuDepot
+Close	UserLoginWindow		Закрити
 Rate package…	PackageInfoView		Оцінити пакет…
+Category	FilterView		Категорія
 Uninstall	PackageManager		Видалити
+An error occurred while obtaining the package list: %message%	MainWindow		Сталася помилка при отриманні списку пакета: %message%
+Your rating was updated successfully.	RatePackageWindow		Ваша оцінка обновлена.
 <no info>	PackageInfoView		<немає інформації>
-An error occurred while initializing the package manager: %message%	MainWindow		Виникла помилка при ініціалізації менеджера пакетів: %message%
+Starting the package daemon failed:\n\n%Error%	App		Запуск демона пакету призупинено:\n\n%Error%
+An error occurred while initializing the package manager: %message%	MainWindow		Виникла помилка при ініціалізації менеджера пакету: %message%
+All repositories	FilterView		Всі репозиторії
+Email address:	UserLoginWindow		Адреса Email:
+Your rating was uploaded successfully. You can update or remove it at any time by rating the package again.	RatePackageWindow		Ваша оцінка завантажена успішно. Ви зможете будь-коли обновити або видалили її при наступній спробі оцінки пакету.
+Very unstable	RatePackageWindow		Дуже нестабільний
+<Package contents not available for remote packages>	PackageContentsView		<Вміст пакету недоступний для відддалених пакетів>
+The username is already taken. Please choose another.	UserLoginWindow		Ім'я користувача задіяне. Виберіть інше, буль-ласка.
 Close	PackageManager		Закрити
+Not logged in	MainWindow		Не авторизований
+The authentication was successful.	UserLoginWindow		Активізація успішна.
+Installed packages	MainWindow		Встановлені пакети
 Status	PackageListView		Стан
+Switch account…	MainWindow		Перемкнути аккаут…
+Ignore	UserLoginWindow		Ігнорувати
+Language	UserLoginWindow		Мова
+The password is too weak or invalid. Please use at least 8 characters with at least 2 numbers and 2 upper-case letters.	UserLoginWindow		Гасло занадто просте або недійсне. Будь-ласка, використовуйте принаймні 8 символів, посеред них хоча би 2 цифри та 2 прописні букви.
+Rate package	RatePackageWindow		Оцінка пакета
 Development	Model		Розробка
 Fatal error	PackageManager		Критична помилка
+The user name needs to be at least 3 letters long.	UserLoginWindow		Довжина імені користувача принаймні 3 літери.
+Log in	UserLoginWindow		Авторизуватись
+Repeat pass phrase:	UserLoginWindow		Повторити гасло:
 Ratings	PackageInfoView		Оцінки
+But none could be listed here, sorry.	UserLoginWindow		Жодних перечислень тут, вибачте
+System & Utilities	Model		Система та Інструменти
 Inactive	PackageListView		Неактивний
+The package action could not be scheduled: %Error%	PackageInfoView		Дію пакета неможливо спрогнозувати: %Error%
+Science & Mathematics	Model		Наука та Математика
 Main Menu	MainWindow		Головне меню
 (%Votes%)	PackageInfoView		(%Votes%)
+You have not solved the captcha puzzle correctly.	UserLoginWindow		Головоломка "captcha" розв'язана неправильно.
+Success	UserLoginWindow		Успішно
+HaikuDepot needs the package daemon to function, and it appears to be not running.\nWould you like to start it now?	App		HaikuDepot потребує запуску демона пакетів, який напевно не працює.\nЗапустити цого зараз?
 Downloading:	PackageInfoView		Завантаження:
+Mostly stable	RatePackageWindow		Найбільш стабільний
+There was a puzzling response from the web service.	RatePackageWindow		загадкова відповідь від мережевого сервісу.
+Log out	MainWindow		Вийти
+Education	Model		Освіта
 Search terms:	FilterView		Умови пошуку:
 %Version%	PackageInfoView		%Version%
-No user ratings available.	PackageInfoView		Рейтинг користувачів недоступний.
+No user ratings available.	PackageInfoView		Оцінка для користувача недоступна.
+Failed to update rating	RatePackageWindow		Оновлення оцінки призупинено
+Does not start	RatePackageWindow		Не починається
 An error occurred while refreshing the repository: %error% (%details%)	MainWindow		Виникла помилка при оновленні репозиторія: %error% (%details%)
-Productivity	Model		Офіс
+It was not possible to contact the web service.	RatePackageWindow		Неможливо під'єднатись до мережевого сервісу
+Only featured packages	MainWindow		Тільки наступні пакети
+There are problems in the form:\n\n	UserLoginWindow		Існують проблеми у вигляді:\n\n
+The package was not found by the web service. This probably means that it comes from a depot which is not tracked there. Rating such packages is unfortunately not supported.	RatePackageWindow		Пакет на мережевому сервісі не знайдено. Це, ймовірно, означає що він розташований у репозиторії котрий нами не відслідковується. Оцінка таких пакетів нажаль не підтримується.
+Create account	UserLoginWindow		Створити аккаунт
+Productivity	Model		Продуктивність
+No, quit HaikuDepot	App		Ні, залишити HaikuDepot
+Authentication failed	UserLoginWindow		Авторизацію призупинено
+Logged in as %User%	MainWindow		Авторизуватись як %User%
+9999.99 KiB	PackageListView		9999.99 KiB
+Language	RatePackageWindow		Мова
+Size	PackageListView		Розмір
+Failed to create or update rating: %s\n	RatePackageWindow		Призупинено оцінку або її оновлення: %s\n
+You need to be logged into an account before you can rate packages.	MainWindow		Для оцінки пакетів спочатку необхідно авторизуватись.
+ It responded with: 	RatePackageWindow		Отримана відповідь:
+User name:	UserLoginWindow		Користувач:
+User Menu	MainWindow		Меню користувача
+Unstable but usable	RatePackageWindow		Нестабільний але використання можливе
+The email address appears to be malformed.	UserLoginWindow		Почтова адреса очевидно має неправильний формат.
 Games	Model		Ігри
 Rating	PackageListView		Оцінка
+(%Votes%)	FeaturedPackagesView		(%Votes%)
+There was a puzzling response from the web service.	UserLoginWindow		Отримано загадкову відповідь від мережевого сервісу.
 Graphics	Model		Зображення
 Local	MainWindow		Локальний
 Close	MainWindow		Закрити
+Preferred language:	UserLoginWindow		Бажана мова:
+Failed to rate package	RatePackageWindow		Оцінку пакету призупинено
+Internet & Network	Model		Інтернет та Мережа
+Refresh repositories	MainWindow		Оновити репозиторії
+Cancel	MainWindow		Відмінити
+Quit HaikuDepot	App		Вийти з HaikuDepot
+Input validation	UserLoginWindow		Перевірка вхідних даних
+Update	RatePackageWindow		Оновлення
 Video	Model		Відео
+All categories	FilterView		Всі категорії
+Contents	PackageInfoView		Вміст
 An error occurred while refreshing the repository: %error%	MainWindow		Сталася помилка при оновленні репозиторія: %error%
+Try again	App		Спробувати знову
+Login or Create account	MainWindow		Авторизуватись або зареєструватись
 Pending…	PackageListView		Очікування…
+{0, plural, one{# item} other{# items}}	PackageListView		{0, plural, one{# елемент} other{# елементів}}
+OK	PackageInfoView		Згода
 Uninstalled	PackageListView		Видалені
+Show	MainWindow		Показати
+Stable	RatePackageWindow		Стабільний
 Unknown	PackageListView		Невідомо
+Comment language:	RatePackageWindow		Мова коментарів:
+Pass phrase:	UserLoginWindow		Гасло:
+Screenshot	ScreenshotWindow		Знімок
+Not specified	RatePackageWindow		Не визначено
 Available	PackageListView		Доступні
+Develop packages	MainWindow		Пакет розробника
 n/a	PackageInfoView		немає
+If you do not provide an email address, you will not be able to reset your password if you forget it.	UserLoginWindow		Якщо Ви не вкажете адресу пошти, то не зможете відновити гасло у випадку його забування.
+ It responded with: 	UserLoginWindow		Отримана відповідь:
+Authentication failed. Connection to the service failed.	UserLoginWindow		Авторизацію та під'єднання до сервісу призупинено.
+Cancel	RatePackageWindow		Відмінити
+Package action failed	PackageInfoView		Роботу пакету призупинено
+OK	UserLoginWindow		Згода
 Send	RatePackageWindow		Надіслати
+-	no package size		-
+Category:	FilterView		Категорія:
+Failed to create account	UserLoginWindow		Створення аккауту призупинено
+There are problems with the data you entered:\n\n	UserLoginWindow		Сталися проблеми з введеними даними:\n\n
+Featured packages	MainWindow		Наступні пакети
+Start package daemon	App		Запустити демон пакетів
+Manage repositories…	MainWindow		Обробка репозиторіїв…
+Success	RatePackageWindow		Успіх
+Business	Model		Бізнес
 Audio	Model		Звук
 About	PackageInfoView		Про програму
 Active	PackageListView		Активний
+It was not possible to contact the web service.	UserLoginWindow		Неможливо під'єднатись до мережевого сервісу.
+Failed to create account: %s\n	UserLoginWindow		Призупинено створення аккаунту: %s\n
+Cancel	UserLoginWindow		Відмінити

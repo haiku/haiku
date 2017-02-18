@@ -120,7 +120,7 @@ Oriya	UnicodeBlocks		Орійська
 Tibetan	UnicodeBlocks		Тібетська
 Ancient Greek numbers	UnicodeBlocks		Давньогрецькі цифри
 Vai	UnicodeBlocks		Ваї
-Yi Radicals	UnicodeBlocks		Корні Юі
+Yi Radicals	UnicodeBlocks		Корені Юі
 Cyrillic extended B	UnicodeBlocks		Кирилиця розширення В
 Quit	CharacterWindow		Вихід
 Ancient symbols	UnicodeBlocks		Античні символи
@@ -143,7 +143,7 @@ Thai	UnicodeBlocks		Тайська
 Deseret	UnicodeBlocks		Дезерет
 Tifinagh	UnicodeBlocks		Тіфінаг
 Gurmukhi	UnicodeBlocks		Гурмухі
-CharacterMap	System name		Мапа символів
+CharacterMap	System name		CharacterMap
 Lao	UnicodeBlocks		Лаоська
 Gothic	UnicodeBlocks		Готична
 Limbu	UnicodeBlocks		Лімбу

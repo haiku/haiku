@@ -46,7 +46,7 @@ Unknown	LegacyBootMenu	Text is shown for an unknown partition type	Невідо�
 Update	DrivesPage	Button	Обновити
 Please locate the Master Boot Record (MBR) save file to restore from. This is the file that was created when the boot manager was first installed.	UninstallPage		Виберіть файл з якого треба провести відновлення MBR. Цей файл було створено при першому встановленні завантажувача.
 Drives	DrivesPage	Title	Пристрої
-No space available!	DrivesPage	Cannot install	Немає наявного простору!
+No space available!	DrivesPage	Cannot install	Немає доступного простору!
 Never	DefaultPartitionPage		Ніколи
 Partition table not compatible	BootManagerController	Title	Таблиця розділів несумісна
 Old Master Boot Record saved	BootManagerController	Title	Збереження старого MBR
@@ -60,7 +60,7 @@ About to write the boot menu to disk. Are you sure you want to continue?	BootMan
 The old Master Boot Record was successfully saved to %s.	BootManagerController		Старий MBR успішно збережено в %s.
 Default Partition:	DefaultPartitionPage	Menu field label	Розділ по замовчуванню:
 Partitions	DefaultPartitionPage	Pop up menu title	Розділи
-BootManager	System name		Завантажувач
+BootManager	System name		BootManager
 Summary	BootManagerController	Title	Підсумок
 OK	BootManagerController	Button	Гаразд
 Immediately	DefaultPartitionPage		Невідкладно

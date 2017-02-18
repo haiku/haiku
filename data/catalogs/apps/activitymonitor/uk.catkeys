@@ -10,7 +10,7 @@ Network send	DataSource		Відправлено по мережі
 CPU usage (combined)	DataSource		Використання СPU (загальне)
 CPU	DataSource		CPU
 Used memory	DataSource		Використана пам'ять
-Cached memory	DataSource		Кешована  пам'ять
+Cached memory	DataSource		Кешована пам'ять
 Apps	DataSource		Додатки
 Show legend	ActivityView		Показати легенду
 Text clipboard	DataSource		Буфер обміну тексту
@@ -33,9 +33,9 @@ CPU usage	DataSource		Використання CPU
 Raw clipboard	DataSource		Буфер обміну
 Sems	DataSource		Сімс
 %.1f MiB	DataSource		%.1f МіБ
-ActivityMonitor	System name		Монітор активності
+ActivityMonitor	System name		ActivityMonitor
 Running applications	DataSource		Запущені додатки
-Semaphores	DataSource		Семафори
+Semaphores	DataSource		Запущені додатки
 Block cache	DataSource		Кеш блоку
 Swap space	DataSource		Розмір підкачки
 Swap	DataSource		Підкачка

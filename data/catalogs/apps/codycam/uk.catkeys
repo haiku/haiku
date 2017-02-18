@@ -38,7 +38,7 @@ Every 8 hours	CodyCam		Кожні 8 годин
 Rename failed	VideoConsumer.cpp		Переіменування не вдалося
 Cannot start time source!	CodyCam		Неможливо почати відлік часу!
 Cannot register the video window	CodyCam		Неможливо зареєструвати вікно відео
-CodyCam	System name		Вебкамера
+CodyCam	System name		CodyCam
 Every 24 hours	CodyCam		Кожні 24 години
 unknown command	SettingsHandler		невідома команда
 Video settings	CodyCam		Налаштування відео
@@ -60,7 +60,7 @@ Error setting type of output file	VideoConsumer.cpp		Помилка при за�
 upload client name expected	CodyCam		вкажіть ім’я клієнта вивантаження
 SFTP	CodyCam		SFTP
 Connected…	VideoConsumer.cpp		Підключення…
-PASS <suppressed>  (real password sent)\n	FtpClient		Пароль <прихований> (дійсний пароль відправлено)\n
+PASS <suppressed>  (real password sent)\n	FtpClient		Пароль <приховано> (дійсний пароль відправлено)\n
 File upload failed	VideoConsumer.cpp		Вивантаження файлу призупинене
 Every 5 minutes	CodyCam		Кожні 5 хвилин
 read: %d\n	SftpClient		читання: %d\n
@@ -84,7 +84,7 @@ reply: %d, %d\n	FtpClient		відповідь: %d, %d\n
 Cannot find the media roster	CodyCam		Неможливо знайти медіа ростер
 Every 4 hours	CodyCam		Кожні 4 години
 FTP	CodyCam		FTP
-Cannot seek time source!	CodyCam		Неможливо звернутися до лічильника часу!
+Cannot seek time source!	CodyCam		Не знайдено лічильник часу!
 File	CodyCam		Файл
 Image Format Menu	CodyCam		Меню формата зображення
 Every 30 minutes	CodyCam		Кожні 30 хвилин

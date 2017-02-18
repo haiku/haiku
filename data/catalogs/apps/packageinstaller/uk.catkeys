@@ -1,14 +1,17 @@
-1	ukrainian	x-vnd.Haiku-PackageInstaller	1413270297
+1	ukrainian	x-vnd.Haiku-PackageInstaller	252728737
 Install to:	PackageView		Встановити у:
 OK	PackageView		Гаразд
 Accept	PackageTextViewer		Прийняти
+No package selected.	UninstallView		Не вибрано пакунок.
 Continue	PackageInstall		Продовжити
+Remove	UninstallView		Видалити
 The requested package failed to install on your system. This might be a problem with the target package file. Please consult this issue with the package distributor.	PackageView		Неможливо встановити даний пакунок у вашій системі. Проблема може бути пов'язана з файлом пакунка. Зверніться до постачальника пакунка.
-Image not loaded correctly	PackageImageViewer		Малюнок завантажився неправильно
+Image not loaded correctly	PackageImageViewer		Образ завантажився неправильно
 No package selected.	PackageInfo		Не вибрано пакунок.
 The given package seems to be already installed on your system. Would you like to uninstall the existing one and continue the installation?	PackageInstall		Схоже, що цей пакунок вже встановлено у вашій системі. Бажаєте вилучити його і продовжити встановлення?
-Do you want to remember this decision for the rest of this installation?\n	PackageView		Запам'ятати цю відповідь до кінця встановлення?\n
-There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Неправильний розмір пакунка. Можливо, пакунок пошкоджено або змінено після створення. Бажаєте продовжити?
+Do you want to remember this decision for the rest of this installation?\n	PackageView		Запам'ятати вибране рішення для решти цього встановлення?\n
+Installed packages	UninstallWindow		Встановлення пакунків
+There seems to be a file size mismatch in the package file. The package might be corrupted or have been modified after its creation. Do you still wish to continue?	PackageInfo		Існує невідповідність розміру пакета і розміру файла. Пакет міг бути пошкодженим або зміненим після створення. Ви бажаєте продовжувати далі?
 Error while installing the package\n	PackageView		Помилка при встановленні пакунка\n
 Disclaimer	PackageTextViewer		Відмова від гарантій
 %name% (%size% free)	PackageView		%name% (%size% вільно)
@@ -22,8 +25,9 @@ Install %name%	PackageView		Встановити %name%
 Stop	PackageStatus		Зупинити
 Other…	PackageView		Інший...
 No installation type selected	PackageView		Не вибрано тип інсталяції
-Installing files and folders	PackageInstall		Встановлення файлів і тек
+Installing files and folders	PackageInstall		Встановлення файлів та тек
 Package installer	PackageView		Встановлювач пакунків
+Install…	UninstallView		Встановити…
 Skip all	PackageView		Пропустити всі
 The item named '%s' already exits in the given path.\nReplace the item with the one from this package or skip it?	PackageView		Елемент з ім'ям '%s' вже є у вказаному місці.\nЗамінити його елементом з цього пакунку чи пропустити його?
 The script named '%s' already exits in the given path.\nReplace the script with the one from this package or skip it?	PackageView		Скрипт з ім'ям '%s' вже є у вказаному місці.\nЗамінити його скриптом з цього пакунку чи пропустити ?
@@ -39,17 +43,22 @@ Installing package	PackageStatus		Встановлення пакунку
 Ask again	PackageView		Запитати знову
 Abort	PackageView		Перервати
 Replace all	PackageView		Замінити всі
+Package description	UninstallView		Опис пакунку
 Decline	PackageTextViewer		Відхилити
 The file named '%s' already exits in the given path.\nReplace the file with the one from this package or skip it?	PackageView		Файл з ім'ям '%s' вже є у вказаному місці.\nЗамінити його файлом з цього пакунку чи пропустити?
-All existing files will be skipped?	PackageView		Всі наявні файли будуть пропущуны?
+All existing files will be skipped?	PackageView		Всі наявні файли будуть пропущені?
 Continue	PackageInfo		Продовжити
 %index% of %total%	PackageInstall		%index% з %total%
+The package you selected has been successfully removed from your system.	UninstallView		Вибраний пакет успішно видалений з вашої системи.
 Abort	PackageInfo		Перервати
-PackageInstaller	System name		Встановлювач пакунків
+PackageInstaller	System name		PackageInstaller
 Abort	PackageInstall		Перервати
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Продовжити
 Begin	PackageView		Встановити
+OK	UninstallView		Гаразд
+The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Символічне посилання з іменем '%s' повністю присутнє в отриманому шляху.\nЗамініть посилання таким же з пакету або пропустіть його?
+The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Вибраний пакет неможливо видалити з системи. Інформаційний файл встановленого пакету ймовірно може бути пошкодженим.
 Replace	PackageView		Замінити
-Installation progress	PackageView		Прогрес встановлення
+Installation progress	PackageView		Хід встановлення
 The package file is not readable.\nOne of the possible reasons for this might be that the requested file is not a valid BeOS .pkg package.	PackageView		Файл пакунка не читається.\nОдна з можливих причин: він не є правильним файлом пакунка BeOS .pkg.

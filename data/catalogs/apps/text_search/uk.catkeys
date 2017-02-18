@@ -6,19 +6,19 @@ Close	GrepWindow		Закрити
 Cancel	GrepWindow		Відмінити
 The unselected files will be removed from the list.	GrepWindow		Не вибрані файли будуть вилучені зі списку.
 Set target…	GrepWindow		Встановити ціль…
-Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker.
+Please select the files you wish to have selected for you in Tracker.	GrepWindow		Виберіть файли які Ви маєте виділити у Tracker'i.
 Open files in Pe	GrepWindow		Відкрити файл у Pe
 %appname% : %path%	GrepWindow		%appname% : %path%
 Copy text to clipboard	GrepWindow		Копіювати текст до буферу обміну
 Settings	GrepWindow		Налаштування
 Select all	GrepWindow		Вибрати все
 OK	GrepWindow		Гаразд
-Skip folders starting with a dot	GrepWindow		Пропустити папки, що починаються з точки
-%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME невдалося відкрити одну або більше директорій.
+Skip folders starting with a dot	GrepWindow		Пропустити папки, що починаються з крапки
+%APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не вдалося відкрити одну або більше тек.
 Escape search text	GrepWindow		Відмінити пошук туксту
-Search	GrepWindow		Пошук
+Search	GrepWindow		Відмінити пошук тексту
 Open selection	GrepWindow		Відкрити вибране
-Look in sub-folders	GrepWindow		Дивитися в підпапках
+Look in sub-folders	GrepWindow		Дивитися в підтеках
 Actions	GrepWindow		Дії
 File	GrepWindow		Файл
 Encoding	GrepWindow		Кодування
@@ -28,7 +28,7 @@ New window	GrepWindow		Нове вікно
 Please select the files you wish to keep searching.	GrepWindow		Будь ласка виберіть файли які ви хочете продовжувати шукати.
 TextSearch	GrepWindow		Пошук тексту
 Quit	GrepWindow		Вийти
-Show files in Tracker	GrepWindow		Показати файл у Tracker
+Show files in Tracker	GrepWindow		Показати файл у Tracker'i
 Case-sensitive	GrepWindow		З урахуванням регістру
 Text files only	GrepWindow		Тільки текстові файли
 Show lines	GrepWindow		Показати лінії

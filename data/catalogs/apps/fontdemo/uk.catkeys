@@ -1,12 +1,12 @@
 1	ukrainian	x-vnd.Haiku-FontDemo	3449067186
 Stop cycling	ControlView		Зупинити цикл
 Haiku, Inc.	FontDemoView		Haiku, Inc.
-Rotation: %d	ControlView		Повертання: %d
+Rotation: %d	ControlView		Обертання: %d
 Shear: %d	ControlView		Зсув: %d
 Spacing: %d	ControlView		Відстань: %d
 Cycle fonts	ControlView		Показувати циклічно
 Font:	ControlView		Шрифт:
-Drawing mode:	ControlView		Режим малювання
+Drawing mode:	ControlView		Режим малювання:
 Haiku, Inc.	ControlView		Haiku, Inc.
 Controls	FontDemo		Керування
 FontDemo	System name		FontDemo

@@ -8,8 +8,8 @@ Configure attributes	People		Встановити атрибути
 Company	People		Компанія
 %name% picture	People		%name% малюнок
 Work phone	People		Робочий телефон
-People	System name		Люди
-New person	People		Нова персона
+People	System name		People
+New person	People		Нова особа
 Select all	People		Вибрати всіх
 File	People		Файл
 Unnamed person	People		Безіменна особа
@@ -17,7 +17,7 @@ Could not create %s.	People		Не вдалося створити %s.
 Country	People		Країна
 Close	People		Закрити
 Group	People		Група
-Nickname	People		Нік
+Nickname	People		Кличка
 Quit	People		Вийти
 Name	People		Ім'я
 Revert	People		Повернути
@@ -27,7 +27,7 @@ E-mail	People		E-mail
 Load image…	People		Завантажити зображення…
 OK	People		Гаразд
 Remove image	People		Видалити зображення
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Підключення префлету Типи Файлів призупинене.\n\nПомилка:
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Підключення префлету FileTypes призупинене.\n\nПомилка:
 Home phone	People		Домашній телефон
 Save as…	People		Зберегти як…
 Redo	People		Переробити

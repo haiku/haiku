@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-ShowImage	575555985
+1	ukrainian	x-vnd.Haiku-ShowImage	3998703664
 Use as background…	Menus		Використати як тло…
 File	Menus		Файл
 Slide delay	Menus		Затримка слайда
@@ -7,6 +7,7 @@ Zoom in	Menus		Збільшення
 The document '%s' has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' було змінено. Ви хочете закрити його?
 Page setup…	Menus		Налаштування сторінки…
 Print…	Menus		Друк…
+Get info…	Menus		Інформація…
 OK	SaveToFile		Гаразд
 Previous page	Menus		Попередня сторінка
 View	Menus		Вигляд
@@ -20,7 +21,7 @@ Browse	Menus		Переглянути
 Edit	Menus		Редагувати
 Could not load image! Either the file or an image translator for it does not exist.	LoadAlerts		Неможливо завантажити зображення! Жодного файла або оброблювача зображень для нього не знайдено.
 First page	Menus		Перша сторінка
-The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (сторінка %d) були змінені. Ви хочете закрити документ?
+The document '%s' (page %d) has been changed. Do you want to close the document?	ClosePrompt		Документ '%s' (сторінка %d) був змінений. Закрити його?
 Leave full screen	Menus		Вийти з повноекранного режиму
 Close	Menus		Закрити
 Close	ClosePrompt		Закрити
@@ -55,7 +56,7 @@ Image	Menus		Зображення
 Move to Trash	Menus		Перемістити в кошик
 OK	Alerts		Гаразд
 Rotate clockwise	Menus		Поворот за годинниковою стрілкою
-Job setup	PrintOptionsWindow		Настройка завдання
-Original size	Menus		Оригінальний розмір
+Job setup	PrintOptionsWindow		Налаштування завдання
+Original size	Menus		Розмір оригіналу
 Next page	Menus		Наступна сторінка
 Save as…	Menus		Зберегти як…

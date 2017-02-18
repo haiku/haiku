@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-libbe	3211461559
+1	ukrainian	x-vnd.Haiku-libbe	3337473349
 gamma	AboutWindow		гамма
 beta	AboutWindow		бета
 %3.2f GiB	StringForSize		%3.2f GiB
@@ -6,24 +6,28 @@ Written by:	AboutWindow		Автор:
 About %app%	AboutMenuItem		Про %app%
 Cut	TextView		Вирізати
 Version	AboutWindow		Версія
-Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Неможливо створити реплікант для \"%опису\".\n%помилки
+Cannot create the replicant for \"%description\".\n%error	ZombieReplicantView		Неможливо створити реплікант для \"%description\".\n%error
 Copy	TextView		Копіювати
 %3.2f KiB	StringForSize		%3.2f KiB
 alpha	AboutWindow		альфа
 Error	PrintJob		Помилка
 All Rights Reserved.	AboutWindow		Усі права застережено.
+{0, plural, one{# byte} other{# bytes}}	StringForSize		{0, plural, one{# біт} other{# бітів}}
 About %app%	AboutWindow		Про %app%
+No pages to print!	PrintJob		Жодної сторінки для друку!
 OK	Dragger		Гаразд
 OK	PrintJob		Гаразд
 Green:	ColorControl		Зелений:
-Version history:	AboutWindow		Історія версій:
+Version history:	AboutWindow		Історія версії:
 Remove replicant	Dragger		Видалити реплікант
+Select all	TextView		Вибрати все
+OK	AboutWindow		Гаразд
 OK	ZombieReplicantView		Гаразд
 Print Server is not responding.	PrintJob		Принт сервер недоступний.
 Paste	TextView		Вставити
 Special Thanks:	AboutWindow		Особлива подяка
 %.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити додаток для репліканту. Незнайдено сигнатуру додатку.\n%помилка
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити додаток для репліканту. Не знайдено сигнатуру додатку.\n%error
 Redo	TextView		Відмінити відміну
 <empty>	Menu		<пусто>
 Warning	Dragger		Увага
@@ -34,5 +38,5 @@ About %app…	Dragger		Про %app…
 development	AboutWindow		розробка
 Error	ZombieReplicantView		Помилка
 Blue:	ColorControl		Синій:
-gold master	AboutWindow		золота
+gold master	AboutWindow		золотий майстер
 Can't delete this replicant from its original application. Life goes on.	Dragger		Неможливо видалити реплікант з рідного додатку. Життя продовжується.

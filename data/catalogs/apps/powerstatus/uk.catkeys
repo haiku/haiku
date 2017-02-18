@@ -1,14 +1,16 @@
-1	ukrainian	x-vnd.Haiku-PowerStatus	3224068645
+1	ukrainian	x-vnd.Haiku-PowerStatus	3969330583
 Design capacity low warning: 	PowerStatus		Попередження про зниження проектної ємності:
 Show percent	PowerStatus		Показати процент
 Design capacity: 	PowerStatus		Проектна ємність: 
  mW	PowerStatus		 мВт
+The battery level is getting low, please plug in the device.	PowerStatus		Рівень заряда батареї знижується, будь-ласка, під'єднайте пристрій до електромережі.
+Battery low	PowerStatus		Батарея розряджена
 Type: 	PowerStatus		Тип:
-non-rechargeable	PowerStatus		той що не може перезаряджатись
+non-rechargeable	PowerStatus		Не підлягає зарядці
 Empty battery slot	PowerStatus		Слот підключення батареї пустий
  mV	PowerStatus		 мВ
 Run in window	PowerStatus		Запустити у вікні
-PowerStatus	System name		Стан живлення
+PowerStatus	System name		PowerStatus
  mWh	PowerStatus		 мВт·год
 Battery info…	PowerStatus		Дані батареї…
 Damaged battery	PowerStatus		Батарея знищена
@@ -27,16 +29,18 @@ Install in Deskbar	PowerStatus		Встановити в Deskbar
 Capacity: 	PowerStatus		Ємність:
 Battery discharging	PowerStatus		Батарея розряджена
 Serial number: 	PowerStatus		Серійний номер:
+Battery critical	PowerStatus		Розряд батареї критичний
 Capacity granularity 1: 	PowerStatus		Градація ємності 1:
 OEM info: 	PowerStatus		Дані OEM:
 Design voltage: 	PowerStatus		Проектна напруга:
 Battery charging	PowerStatus		Батарея заряджається
+The battery level is critical, please plug in the device immediately.	PowerStatus		Розряд батареї критичний негайно починайте її зарядку.
 Design capacity warning: 	PowerStatus		Попередження про проектну ємність:
 Battery info	PowerStatus		Дані батареї
 Quit	PowerStatus		Вийти
-rechargeable	PowerStatus		та що може перезаряджатись
+rechargeable	PowerStatus		заряджувана
 charging	PowerStatus		зарядка
-You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Ви можете запустити Стан живлення у вікні або встановити його у Deskbar.
+You can run PowerStatus in a window or install it in the Deskbar.	PowerStatus		Ви можете запустити PowerStatus у вікні або встановити його у Deskbar.
 Power status box	PowerStatus		Вікно стану живлення
 Show status icon	PowerStatus		Показати іконку стану
 Capacity granularity 2: 	PowerStatus		Градація ємності 2:

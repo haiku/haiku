@@ -1,20 +1,20 @@
 1	ukrainian	x-vnd.Haiku-LaunchBox	3692177981
 New	LaunchBox		Новий
-Set description…	LaunchBox		Встановити Опис…
+Set description…	LaunchBox		Встановити опис…
 Vertical layout	LaunchBox		Вертикальне розташування
 OK	LaunchBox		Гаразд
 Pad 1	LaunchBox		Панель 1
 last chance	LaunchBox		остання спроба
 Quit	LaunchBox		Вийти
-Open containing folder	LaunchBox		Відкрити теку, яка містить дані
+Open containing folder	LaunchBox		Відкрити папку що містить
 Clear button	LaunchBox		Очистити кнопку
 LaunchBox	System name		LaunchBox
 Ignore double-click	LaunchBox		Ігнорувати подвійне натискання
 Auto-raise	LaunchBox		Автоматичне спливання
 Show on all workspaces	LaunchBox		Показати на всіх робочих просторах
 Show window border	LaunchBox		Показувати межі вікна
-Pad	LaunchBox		Панель 
-Icon size	LaunchBox		Розмір Іконки
+Pad	LaunchBox		Панель
+Icon size	LaunchBox		Розмір іконки
 Bummer	LaunchBox		Помилка
 Cancel	LaunchBox		Відміна
 Remove button	LaunchBox		Видалити кнопку
@@ -24,8 +24,8 @@ Failed to launch '%1'.\n\nError:	LaunchBox		Призупинено запуск 
 Name Panel	LaunchBox		Панель назви
 Add button here	LaunchBox		Додати кнопку тут
 Description for '%3'	LaunchBox		Опис для '%3'
-Settings	LaunchBox		Настройки
-Failed to launch 'something', error in Pad data.	LaunchBox		Не вдалось запустити 'щось'. Помилка в даних панелі.
+Settings	LaunchBox		Налаштування
+Failed to launch 'something', error in Pad data.	LaunchBox		Не вдалось запустити 'дещо'. Помилка в даних панелі.
 Pad %1	LaunchBox		Панель %1
 Close	LaunchBox		Закрити
 Failed to send 'open folder' command to Tracker.\n\nError: 	LaunchBox		Призупинено команду 'відкрити папку' для Tracker.\n\nПомилка:

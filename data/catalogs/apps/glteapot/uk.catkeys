@@ -11,11 +11,11 @@ Quit	TeapotWindow		Вийти
 Filled polygons	TeapotWindow		Заповнити багатокутники
 Settings	TeapotWindow		Налаштування
 Fog	TeapotWindow		Туман
-Backface culling	TeapotWindow		Backface culling
+Backface culling	TeapotWindow		Усунути тло
 Z-buffered	TeapotWindow		Z-буферизація
 File	TeapotWindow		Файл
 Perspective	TeapotWindow		Перспектива
-GLTeapot	System name		Чайник GL
+GLTeapot	System name		GLTeapot
 Green	TeapotWindow		Зелений
 Right	TeapotWindow		Вправо
 FPS display	TeapotWindow		Показати FPS

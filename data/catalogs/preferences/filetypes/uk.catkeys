@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-FileTypes	3116280330
+1	ukrainian	x-vnd.Haiku-FileTypes	734679611
 Application types…	FileTypes Window		Типи додатків…
 Description:	Application Types Window		Опис:
 Args only	Application Type Window		Тільки аргументи
@@ -21,7 +21,7 @@ Could not change attributes	Attribute Window		Неможливо змінити 
 Could not retrieve preferred application of this file	Preferred App Menu		Неможливо виправити бажаний додаток для цього файлу
 Beta	Application Types Window		Бета
 Extensions:	FileTypes Window		Розширення:
-Select same preferred application as	FileTypes Window		Вибрати такий самий бажаний додаток як 
+Select same preferred application as	FileTypes Window		Вибрати такий самий бажаний додаток як
 Save	Application Type Window		Зберегти
 Could not retrieve application signature	Preferred App Menu		Неможливо виправити підпис додатку
 Add	Extension Window		Додати
@@ -29,7 +29,7 @@ Select same preferred application as	FileType Window		Вибрати за баж
 Cancel	Attribute Window		Відмінити
 Icon	Application Type Window		Іконка
 Removing a file type cannot be reverted.\nAre you sure you want to remove it?	FileTypes Window		Видалення типу файлу незворотнє.\nВи впевнені , що бажаєте видалити його?
-Editable	Attribute Window	If Tracker allows to edit this attribute.	Що піддається редагуванню
+Editable	Attribute Window	If Tracker allows to edit this attribute.	Підлягає редагуванню
 Multiple launch	Application Type Window		Складний запуск
 (from application)	FileTypes Window		(з додатку)
 Could not set preferred application	FileTypes Window		Неможливо встановити бажаного додатку
@@ -40,7 +40,7 @@ Application type	Application Type Window		Тип додатку
 Done	Type List Window		Виконано
 Attribute	Attribute Window		Атрибут
 Show recognition rule	FileTypes Window		Показати правило розпізнавання
-FileTypes request	Preferred App Menu		Запит Типів Файлів 
+FileTypes request	Preferred App Menu		Запит FileTypes
 Could not open file	FileType Window		Неможливо відкрити файл
 Description:	FileTypes Window		Опис:
 File	FileTypes Window		Файл
@@ -52,15 +52,16 @@ Set preferred application	Preferred App Menu		Вибрати бажаний до
 Don't save	Application Type Window		Не зберігати
 Save changes before closing?	Application Type Window		Зберегти зміни перед закриттям?
 File	Application Type Window		Файл
+{0, plural, one{# Application type could be removed} other{# Application types could be removed}}	Application Types Window		{0, plural, one{# Тип додатку може бути видалений} other{# Типи додатків можуть бути видалені}}
 Version:	Application Type Window		Версія:
 Select…	FileTypes Window		Вибрати…
-FileTypes request	FileTypes		Запит Типів Файлів
+FileTypes request	FileTypes		Запит FileTypes
 Open…	FileTypes Window		Відкрити…
 Select…	FileType Window		Вибрати…
 Launch	Application Types Window		Запустити
 Same as…	FileType Window	The same APPLICATION as ...	Такий додаток як…
 Abort	Application Types Window		Відмінити
-FileTypes	FileTypes		Типи Файлів
+FileTypes	FileTypes		FileTypes
 OK	FileTypes		Гаразд
 Extra attributes	FileTypes Window		Суператрибути
 Development	Application Type Window		Розробка
@@ -89,7 +90,7 @@ Done	Attribute Window		Виконано
 no icon	FileTypes Window		іконка відсутня
 Alpha	Application Types Window		Aльфа
 Version	Application Types Window		Версія
-Background app	Application Type Window		Додаток Тло
+Background app	Application Type Window		Додаток Background
 Add new group	New File Type Window		Додати нову групу
 Move down	FileTypes Window		Перемістити вниз
 Cancel	Application Type Window		Відмінити
@@ -98,7 +99,7 @@ New resource file…	FileTypes Window		Новий файл ресурсів…
 Cancel	New File Type Window		Відмінити
 Icon	FileTypes Window		Іконка
 Extension:	Extension Window		Розширення:
-Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Видалення головного типу незоротнє.\nВсі типи файлів що відносяться до нього будуть втрачені!\n\nВи впевнені , що бажаєте цього? Для видалення цілої групи утримуючи клавішу Shift натисніть \"Remove (Видалити)\".
+Removing a super type cannot be reverted.\nAll file types that belong to this super type will be lost!\n\nAre you sure you want to do this? To remove the whole group, hold down the Shift key and press \"Remove\".	FileTypes Window		Видалення головного типу незоротнє.\nВсі типи файлів що відносяться до нього будуть втрачені!\n\nВи впевнені , що бажаєте цього? Для видалення цілої групи утримуючи клавішу Shift натисніть \"Видалити\".
 Internal name:	FileTypes Window		Внутрішнє ім'я:
 Add	Attribute Window		Додати
 Close	Application Type Window		Закрити
@@ -117,20 +118,20 @@ Move up	FileTypes Window		Перемістити вверх
 Description	FileTypes Window		Опис
 Save request	Application Type Window		Зберегти запит
 Beta	Application Type Window		Бета
-None	FileTypes Window		Немає
+None	FileTypes Window		Жоден
 Remove	FileTypes Window		Видалити
 Attribute name:	Attribute Window		Ім'я атрибута:
 Extension	Extension Window		Розширення
 Add type	New File Type Window		Додати тип
 Internal name:	Attribute Window		Внутрішнє ім'я:
-Show in Tracker…	Application Types Window		Показати в Tracker…
+Show in Tracker…	Application Types Window		Показати в Tracker'і…
 Final	Application Type Window		Завершення
 Width:	Attribute Window	Default column width in Tracker for this attribute.	Ширина:
-Display as:	Attribute Window	Tracker offers different display modes for attributes.	Показати як:                                                    
+Display as:	Attribute Window	Tracker offers different display modes for attributes.	Показати як:
 This file type already exists	New File Type Window		Тип файлу повністю присутній
 Same as…	FileTypes Window		Такий як…
 Exclusive launch	Application Type Window		Виключний запуск
-FileTypes	System name		Типи файлів
+FileTypes	System name		FileTypes
 Application types	Application Types Window		Типи додатків
 Could not remove file type: %s\n	FileTypes Window		Неможливо видалити тип файлу: %s\n
 Signature:	Application Types Window		Підпис:
@@ -141,16 +142,16 @@ Select preferred application	FileTypes Window		Вибрати бажаний д�
 Right	Attribute Window	Attribute column alignment in Tracker	Вправо
 Default application	FileType Window		Додаток по замовчуванню
 Long description:	Application Type Window		Довгий опис:
-FileTypes request	FileTypes Window		Запит Типів Файлів 
+FileTypes request	FileTypes Window		Запит FileTypes
 Version info	Application Type Window		інформація про версію
-(from super type)	FileTypes Window		(для головного типу)
+(from super type)	FileTypes Window		(від супер типу)
 Version:	Application Types Window		Версія:
 Preferred application	FileTypes Window		Бажаний додаток
 Short description:	Application Type Window		Короткий опис:
 File could not be opened	Preferred App Menu		Файл неможливо відкрити
 Could not change file extensions	Extension Window		Неможливо змінити розширення файлу
-Edit icon…	Icon View		Редагування іконки…
-Same as…	FileType Window	The same TYPE as ...	Такий тип як у… 
+Edit icon…	Icon View		Редагувати іконки…
+Same as…	FileType Window	The same TYPE as ...	Такий тип як у…
 Save into resource file…	Application Type Window		Зберегти інформацію про джерело файлу…
 Visible	Attribute Window		Видимий
 Could not install file type	New File Type Window		Неможливо встановити тип файлу

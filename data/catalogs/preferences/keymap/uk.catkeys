@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Haiku-Keymap	439384761
+1	ukrainian	x-vnd.Haiku-Keymap	3155537444
 Dvorak	Keyboard Layout View		Дворак
 Shift:	Modifier keys window	Shift key role name	Shift:
 Revert	Modifier keys window		Повернути
@@ -38,7 +38,7 @@ Bulgarian (Phonetic)	Keyboard Layout View		Болгарська (фонетич�
 Dvorak (programmer's)	Keyboard Layout View		Дворак (для програмістів)
 Estonian	Keyboard Layout View		Естонська
 Russian (Mac)	Keyboard Layout View		Російська (Mac)
-Defaults	Keymap window		Типові значення
+Defaults	Keymap window		Типово
 Quit	Keymap window		Вихід
 Dutch	Keyboard Layout View		Голландська
 Switch shortcut keys to Haiku mode	Keymap window		Перемикати швидкі кнопки як у Haiku
@@ -51,17 +51,17 @@ Belarusian (Latin)	Keyboard Layout View		Білоруська (латиниця)
 Danish	Keyboard Layout View		Датська
 Open…	Keymap window		Відкрити…
 Russian (Typewriter)	Keyboard Layout View		Російська (машинопис)
-Error: duplicate keys	Modifier keys window		дублюючі клавіші
+Error: duplicate keys	Modifier keys window		Помилка: дублювання клавіш
 System:	Keymap window		Системні:
 Lithuanian	Keyboard Layout View		Литовська
 Finnish	Keyboard Layout View		Фінська
 Svorak	Keyboard Layout View		Svorak
-Left command	Keyboard Layout View		Ліва команда
+Left command	Keyboard Layout View		Команда Left
 Romanian	Keyboard Layout View		Румунська
 Set modifier keys…	Keymap window		Призначити клавіші-модифікатори...
 Option:	Modifier keys window	Option key role name	Параметр:
 Czech (Mac)	Keyboard Layout View		Чеська (Mac)
-Control	Keyboard Layout View	Control key	Control
+Control	Keyboard Layout View	Control key	Керування
 Left option	Keyboard Layout View		Ліва option
 Portuguese	Keyboard Layout View		Португальська
 Right control	Keyboard Layout View		Права Control
@@ -78,13 +78,14 @@ Right option	Keyboard Layout View		Права option
 Right shift	Keyboard Layout View		Правий shift
 Key	Modifier keys window	As in a computer keyboard key	Клавіша
 Ctrl key	Modifier keys window	Label of key farthest from the spacebar, usually Ctrle.g. Strg for German keyboard	Клавіша Ctrl
-Control:	Modifier keys window	Control key role name	Control:
+Control:	Modifier keys window	Control key role name	Керування:
 Brazilian	Keyboard Layout View		Бразильська
+Remove	Keyboard Layout View		Видалити
 Brazilian (ABNT2)	Keyboard Layout View		Бразилійська (ABNT-2)
 French (Bépo)	Keyboard Layout View		Французька (Bépo)
-Option	Keyboard Layout View	Option key	Option
+Option	Keyboard Layout View	Option key	Опції
 US-International	Keyboard Layout View		США міжнародна
-Sample and clipboard:	Keymap window		Приклад і буфер обміну
+Sample and clipboard:	Keymap window		Приклад і буфер обміну:
 Swiss-German	Keyboard Layout View		Німецька (Швейцарія)
 Alt/Opt key	Modifier keys window	Label of Alt key (PC)/Option key (Mac)	Клавіша Alt/Opt
 Layout	Keymap window		Макет
@@ -92,7 +93,7 @@ Switch shortcut keys to Windows/Linux mode	Keymap window		Перемикати �
 Albanian	Keyboard Layout View		Албанська
 Right command	Keyboard Layout View		Права command
 Revert	Keymap window		Повернути
-Command:	Modifier keys window	Command key role name	Command:
+Command:	Modifier keys window	Command key role name	Команда:
 Latin-American	Keyboard Layout View		Латиноамериканська
 Spanish (Dvorak)	Keyboard Layout View		Іспанська (Дворак)
 Lithuanian (Standard)	Keyboard Layout View		Литовська (стандартна)
@@ -110,7 +111,7 @@ Swedish	Keyboard Layout View		Шведська
 Macedonian	Keyboard Layout View		Македонська
 (Current)	Keymap window		(Активна)
 Font	Keymap window		Шрифт
-Keymap	System name		Розкладка
+Keymap	System name		Keymap
 French (Mac)	Keyboard Layout View		Французька (Mac)
 Left shift	Keyboard Layout View		Лівий shift
 Shift	Keyboard Layout View	Shift key	Shift

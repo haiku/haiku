@@ -6,7 +6,7 @@ Hide clock	TimeView		Приховати годинник
 Applications	PreferencesWindow		Додатки
 Time preferences…	TimeView		Налаштування годинника…
 About Haiku	DeskbarMenu		Про Haiku
-Edit in Tracker…	PreferencesWindow		Змінити меню 
+Edit in Tracker…	PreferencesWindow		Змінити меню…
 Recent documents:	PreferencesWindow		Недавні документи:
 Recent applications	DeskbarMenu		недавні програми
 Applications	B_USER_DESKBAR_DIRECTORY/Applications		Додатки

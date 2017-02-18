@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.haiku-icon_o_matic	1929083132
+1	ukrainian	x-vnd.haiku-icon_o_matic	3554185674
 Select All	Icon-O-Matic-PathManipulator		Вибрати все
 Add Style	Icon-O-Matic-AddStylesCmd		Додати cтиль
 Color (#%02x%02x%02x)	Style name after dropping a color		Колір (#%02x%02x%02x)
@@ -6,14 +6,14 @@ Add	Icon-O-Matic-StylesList		Додати
 Move Shape	Icon-O-Matic-MoveShapesCommand		Перемістити Фігуру
 Opening the document failed!	Icon-O-Matic-Main		Відкриття документу призупинено!
 Reset transformation	Icon-O-Matic-ShapesList		Скинути перетворення
-Move Paths	Icon-O-Matic-MovePathsCmd		Перемістити шляхи
-None	Icon-O-Matic-Properties		Нічого
+Move Paths	Icon-O-Matic-MovePathsCmd		Шляхи переміщення
+None	Icon-O-Matic-Properties		Жоден
 New	Icon-O-Matic-Menu-File		Новий
 Icon-O-Matic might not have interpreted all data from the SVG when it was loaded. By overwriting the original file, this information would now be lost.	Icon-O-Matic-SVGExport		Icon-O-Matic може неправильно інтерпретувати дані з SVG , коли буде завантажений. При перезаписі файлу ця інформація може бути втрачена.
-Paste Properties	Icon-O-Matic-Properties		Вставити Властивості
+Paste Properties	Icon-O-Matic-Properties		Властивості вставки
 Stroke	Transformation		Згладити
 Closed	Icon-O-Matic-PropertyNames		Закрити
-Remove Path	Icon-O-Matic-RemovePathsCmd		Видалити Шлях
+Remove Path	Icon-O-Matic-RemovePathsCmd		Шлях видалення
 Add shape with path	Icon-O-Matic-Menu-Shape		Додати фігуру з шляхом
 Select	Icon-O-Matic-Properties		Вибрати
 Height	Icon-O-Matic-PropertyNames		Висота
@@ -51,9 +51,9 @@ Error: 	Icon-O-Matic-Main		Помилка:
 Rotate indices backwards	Icon-O-Matic-PathsList		Обертати проти годинникової стрілки
 Name	Icon-O-Matic-PropertyNames		Ім’я
 bad news	Icon-O-Matic-Exporter		погані новини
-<nothing to undo>	Icon-O-Matic-Menu-Edit		<нічого, щоб скасувати>
+<nothing to undo>	Icon-O-Matic-Menu-Edit		<нічого, для скасування>
 Off	Icon-O-Matic-Menu-Settings		Вимкнути
-Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Заморозити фігуру
+Freeze Shape	Icon-O-Matic-FreezeTransformationCmd		Вимкнути
 PNG Set	Icon-O-Matic-SavePanel		Встановити PNG 
 Joins	Icon-O-Matic-PropertyNames		З'єднання
 Remove Style	Icon-O-Matic-RemoveStylesCmd		Видалити стиль
@@ -61,12 +61,13 @@ Scale X	Icon-O-Matic-PropertyNames		Маштаб по X
 Set 	Set (property name)		Встановити 
 Cancel	Icon-O-Matic-SVGExport		Відмінити
 Add shape with style	Icon-O-Matic-Menu-Shape		Додати фігуру зі стилем
-Remove Shape	Icon-O-Matic-RemoveShapesCmd		Видалити Фігуру
+Remove Shape	Icon-O-Matic-RemoveShapesCmd		Видалити фігуру
 Reverse	Icon-O-Matic-PathsList		Повернути
 HVIF Source Code	Icon-O-Matic-SavePanel		Код джерела HVIF
-Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Скинути Перетворення
+Reset Transformations	Icon-O-Matic-ResetTransformationCmd		Скинути перетворення
 Settings	Icon-O-Matic-Menus		Налаштування
 All	Icon-O-Matic-Properties		Всі
+The text you are trying to import is quite long, are you sure?	Icon-O-Matic-StyledTextImport		Текст який ви намагаєтесь імпортувати досить довгий, продовжити?
 Multi Paste Properties	Icon-O-Matic-Properties		Вставити кілька властивостей
 Undo	Icon-O-Matic-Main		Скасувати
 Click on a shape above	Empty transformers list - 1st line		Натиснути на фігуру нижче
@@ -81,7 +82,7 @@ Add with path	Icon-O-Matic-ShapesList		Додати зі шляхом
 Export icon	Dialog title		Експортувати значок
 Gradient type	Icon-O-Matic-StyleTypes		Тип градієнту
 Icon-O-Matic	System name		Icon-O-Matic
-Cancel	Icon-O-Matic-Menu-Settings		Відміна
+Cancel	Icon-O-Matic-Menu-Settings		Відмінити
 Modify Control Point	Icon-O-Matic-ChangePointCmd		Змінити контрольну точку
 Saving your document failed!	Icon-O-Matic-Exporter		Збереження вашого документу призупинене!
 edit it's properties here.	Empty property list - 3rd line		змінити його властивості тут.
@@ -108,7 +109,7 @@ Move Shapes	Icon-O-Matic-MoveShapesCommand		Перемістити фігури
 Remove Styles	Icon-O-Matic-RemoveStylesCmd		Видалити стилі
 Add	Icon-O-Matic-TransformersList		Додати
 Color	Icon-O-Matic-StyleTypes		Колір
-Settings…	Icon-O-Matic-SavePanel		Настройки…
+Settings…	Icon-O-Matic-SavePanel		Налаштування…
 Remove	Icon-O-Matic-PathManipulator		Видалити
 Radial	Icon-O-Matic-StyleTypes		Радіальний
 Perspective	Icon-O-Matic-TransformersList		Перспектива
@@ -145,7 +146,7 @@ Error: 	Icon-O-Matic-Exporter		Помилка:
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Додати перетворювачі
 Diamond	Icon-O-Matic-StyleTypes		Ромб
 Path	Icon-O-Matic-PropertyNames		Шлях
-Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Не вдалося відкрити файл '%s' Як документ SVG.\n\nПомилка: %s
+Failed to open the file '%s' as an SVG document.\n\nError: %s	Icon-O-Matic-SVGImport		Не вдалося відкрити файл '%s' як документ SVG.\n\nПомилка: %s
 Swatches	Icon-O-Matic-Menus		Узори
 <unavailable>	Icon-O-Matic-StyleTypes		<недоступний>
 Rotation	Icon-O-Matic-PropertyNames		Обертання
@@ -158,7 +159,7 @@ Snap to grid	Icon-O-Matic-Menu-Settings		Прив'язати до сітки
 Remove	Icon-O-Matic-ShapesList		Видалити
 Yes	Icon-O-Matic-StyledTextImport		Так
 Transformation	Icon-O-Matic-TransformersList		Перетворення
-Add Styles	Icon-O-Matic-AddStylesCmd		Додати Стилі
+Add Styles	Icon-O-Matic-AddStylesCmd		Додати стилі
 Remove Control Points	Icon-O-Matic-RemovePointsCmd		Видалити контрольні точки
 Format	Icon-O-Matic-SavePanel		Формат
 Add rect	Icon-O-Matic-PathsList		Додати прямокутник
@@ -186,6 +187,7 @@ Save	Icon-O-Matic-Menu-File		Зберегти
 Append…	Icon-O-Matic-Menu-File		Додати…
 Move Path	Icon-O-Matic-MovePathsCmd		Перемістити шлях
 Overwrite	Icon-O-Matic-SVGExport		Перезаписати
+Text too long	Icon-O-Matic-StyledTextImport		Текст надзвичайно довгий 
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Заморозити фігури
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Розділити контрольну точку
 Open…	Icon-O-Matic-Menu-File		Відкрити…
@@ -194,6 +196,6 @@ Color (#%02x%02x%02x)	Icon-O-Matic-StyledTextImport		Колір (#%02x%02x%02x)
 Edit Gradient	Icon-O-Matic-SetGradientCmd		Редагувати градієнт
 Clean Up Path	Icon-O-Matic-CleanUpPathCmd		Очистити шлях
 Rounding	Icon-O-Matic-PropertyNames		Округлення
-Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Видалити Фігури
+Remove Shapes	Icon-O-Matic-RemoveShapesCmd		Видалити фігури
 Clean up	Icon-O-Matic-PathsList		Очистити
-Detect Orient.	Icon-O-Matic-PropertyNames		Виявляти орієнт.
+Detect Orient.	Icon-O-Matic-PropertyNames		Виявити орієнтування.

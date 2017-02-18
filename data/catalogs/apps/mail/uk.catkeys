@@ -1,7 +1,8 @@
-1	ukrainian	x-vnd.Be-MAIL	3209807243
+1	ukrainian	x-vnd.Be-MAIL	1865394837
 View	Mail		Вигляд
 %d - Date	Mail		%d - Дата
 Attach attributes:	Mail		Додати атрибути:
+Unknown	Mail		Невідомо
 Inconsistency occurred in the undo/redo buffer.	Mail		Невідповідність у буфері відміни/заміни.
 An error occurred trying to save the attachment.	Mail		Сталася помилка при збереженні вкладення.
 Copy to new	Mail		Копіювати до нового
@@ -33,7 +34,7 @@ There is no installed handler for URL links.	Mail		Не встановлено �
 Signature	Mail		Підпис
 Find again	Mail		Повторний пошук
 Bcc:	Mail		Bcc:
-Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить  %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете  зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб п.овернутися назад і виправити ситуацію.
+Your main text contains %ld unencodable characters. Perhaps a different character set would work better? Hit Send to send it anyway (a substitute character will be used in place of the unencodable ones), or choose Cancel to go back and try fixing it up.	Mail		Ваш основний текст містить %ld нерозкодованих символів. Можливо інше кодування спрацює краще? Виберіть Відправити якщо хочете зробити це не зважаючи(нерозкодований символ буде замінено таким що ситуативно підходить), або натисніть Відмінити щоб повернутися назад і виправити ситуацію.
 Signature:	Mail		Підпис:
 Save changes to this signature?	Mail		Зберегти зміни в цьому підписі?
 Cc:	Mail		Cc:
@@ -58,11 +59,11 @@ Forward without attachments	Mail		Переслати без вкладень
 Previous	Mail		Попередній
 Redo	Mail		Відмінити відміну
 Add enclosure…	Mail		Додати вкладення…
-Mail	System name		Пошта
+Mail	System name		Mail
 Print…	Mail		Друкувати…
 Warn unencodable:	Mail		Увага нерозкодоване:
 Quit	Mail		Завершити
-%n - Full name	Mail		%n - Повне ім'я
+%n - Full name	Mail		%n - повне ім'я
  Read 	Mail		 Прочитаним 
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Кошик
@@ -144,7 +145,9 @@ Open attachment	Mail		Відкрити вкладення
 sent	B_USER_DIRECTORY/mail/sent		відіслати
 (Date unavailable)	Mail		(Дата недоступна)
 Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть улюблені поштові запити і шаблони запитів у цю папку.
+Spam	Mail		Спам
 Reply	Mail		Відповісти
+Encoding	Mail		Кодування:
 From:	Mail		Від:
 Couldn't open this signature. Sorry.	Mail		Прикро, неможливо відкрити цей підпис.
 Open draft	Mail		Відкрити чорновик

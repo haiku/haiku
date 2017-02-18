@@ -23,7 +23,7 @@ Cannot open the temporary file created to hold the new recording	RecorderWindow	
 Input:	RecorderWindow		Вхід:
 Forward	RecorderWindow		Вперед
 Play	RecorderWindow		Відтворити
-SoundRecorder	System name		Запис звуку
+SoundRecorder	System name		SoundRecorder
 Channels:	RecorderWindow		Канали:
  bits	RecorderWindow		 біт
 None	RecorderWindow		Жоден

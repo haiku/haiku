@@ -1,32 +1,38 @@
-1	ukrainian	x-vnd.Haiku-MediaConverter	217152063
+1	ukrainian	x-vnd.Haiku-MediaConverter	341686525
 Video using parameters form settings	MediaConverter		Відео використовує параметри з налаштувань
+{0, plural, one{The file was not recognized as a supported media file:} other{# files were not recognized as supported media files:}}	MediaConverter		{0, plural, one{Файл не був розпізнаний як підтримуваний медіафайл:} other{# Файли не були розпізнані як підтримувані медіафайли:}}
 Video encoding:	MediaConverter		Кодування відео:
+%u x %u, %.2ffps	MediaFileInfo	Width x Height, fps	%u x %u, %.2ffps
 Error read audio frame %lld	MediaConverter		Помилка читання аудіокадру %lld
 No audio	Audio codecs list		без звуку
 Error	MediaConverter		Помилка
-Error loading a file	MediaConverter		Помилка загрузки файлу
+{0, plural, one{# bit} other{# bits}}	MediaFileInfo		{0, plural, one{# біт} other{# бітів}}
+Error loading a file	MediaConverter		Помилка завантаження файлу
 Error read video frame %lld	MediaConverter		Помилка читання відеокадру %lld
 File Error	MediaConverter-FileInfo		Помилка файлу
 Open…	Menu		Відкрити…
 Start [ms]: 	MediaConverter		Початок [ms]:
 Output file '%filename' created	MediaConverter		Вихідний файл '%filename' створено
 Output format	MediaConverter		Формат виходу
-End   [ms]: 	MediaConverter		Кінець   [ms]:
-MediaConverter	System name		Медіаконвертор
+End   [ms]: 	MediaConverter		Кінець [ms]:
+MediaConverter	System name		MediaConverter
 No video	Video codecs list		Немає відео
 Duration:	MediaConverter-FileInfo		Тривалість:
 OK	MediaConverter		Гаразд
+%.1f kHz mono	MediaFileInfo		%.1f kHz монo
 Error converting '%filename'	MediaConverter		Помилка перетворення '%filename'
 Low	MediaConverter		Низька
 Conversion completed	MediaConverter		Конвертація завершена
 Audio:	MediaConverter-FileInfo		Аудіо:
 OK	MediaConverter-FileInfo		Гаразд
  seconds	MediaFileInfo		 секунд
-Source files	MediaConverter		Файл первинних текстів
+Source files	MediaConverter		Файли джерела
 Error writing video frame %lld	MediaConverter		Помилка запису відеокадру %lld
+{0, plural, one{# frame} other{# frames}}	MediaFileInfo		{0, plural, one{# кадр} other{# кадрів}}
 Error writing audio frame %lld	MediaConverter		Помилка запису аудіокадру %lld
 Cancelling	MediaConverter		Відміна
-Error loading files	MediaConverter		Помилка загрузки файлів
+{0, plural, one{# byte} other{# bytes}}	MediaFileInfo		{0, plural, one{# біт} other{# бітів}}
+Error loading files	MediaConverter		Помилка завантаження файлів
 Cancel	MediaConverter		Відмінити
 None available	Video codecs		Недоступний
 Conversion cancelled	MediaConverter		Конверсію відмінено
@@ -49,13 +55,15 @@ None available	Audio codecs		Не доступний жоден
 MediaConverter+:SaveDirectory	MediaConverter		MediaConverter+:SaveDirectory
 Error launching: %strError%	MediaConverter		Помилка підключення: %strError%
 High	MediaConverter		Висока
-Drop media files onto this window	MediaConverter		Помістити відеофайл у це вікно
+Drop media files onto this window	MediaConverter		Помістити медіафайли у це вікно
 Audio encoding:	MediaConverter		Декодування звуку:
 Audio quality not supported	MediaConverter		Якість звуку не підтримується
 File	Menu		Файл
+%.1f kHz stereo	MediaFileInfo		%.1f kHz стерео
 Convert	MediaConverter		Перетворити
 Writing audio track: %ld%% complete	MediaConverter		Запис звукового треку: %ld%% завершено
 Video quality: %3d%%	MediaConverter		Якість відео: %3d%%
+%.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld канал
 Output folder	MediaConverter		Вихідна папка
 Audio quality: %3d%%	MediaConverter		Якість звуку: %3d%%
 An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Сталася помилка при зчитуванні даних про файл.\n\nПомилка :

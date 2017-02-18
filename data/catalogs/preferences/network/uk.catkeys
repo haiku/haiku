@@ -1,23 +1,50 @@
-1	ukrainian	x-vnd.Haiku-Network	3992214214
-Choose automatically	EthernetSettingsView		Вибрати автоматично
-Gateway:	EthernetSettingsView		Шлюз:
-Netmask:	EthernetSettingsView		Маска:
-DHCP	EthernetSettingsView		DHCP
-Apply	EthernetSettingsView		Застосовувати
-Netmask is invalid	EthernetSettingsView		Некоректна маска підмережі.
-OK	EthernetSettingsView		Гаразд
-IP address:	EthernetSettingsView		IP адреса:
-Adapter:	EthernetSettingsView		Адаптер:
-Domain:	EthernetSettingsView		Домен:
-Gateway is invalid	EthernetSettingsView		Невірно вказаний шлюз
-Revert	EthernetSettingsView		Повернутися
-<no wireless networks found>	EthernetSettingsView		<немає жодної бездротової мережі>
-Network	System name		Мережа
-Mode:	EthernetSettingsView		Режим:
-IP address is invalid	EthernetSettingsView		Невірно вказана адреса IP
-Network:	EthernetSettingsView		Мережа:
-The net_server needs to run for the auto configuration!	EthernetSettingsView		Net_server необхідно урухомити для автоматичної конфігурації!
-Disabled	EthernetSettingsView		Недоступний
-Auto-configuring failed: 	EthernetSettingsView		Автоматична настройка не вдалася:
-Static	EthernetSettingsView		Невірно вказаний DNS #2
-<no adapter>	EthernetSettingsView		<адаптери відсутні >
+1	ukrainian	x-vnd.Haiku-Network	2512967175
+Static	IntefaceAddressView		Статичний
+EAP	EAP protected network		EAP
+Services	NetworkWindow		Служби
+no link	InterfaceListItem		немає з'єднання
+WPA2	WPA2 protected network		WPA2
+Choose automatically	IntefaceView		Вибрати автоматично
+connected	IntefaceView		під'єднано
+Ethernet device	InterfaceListItem		Мережева карта
+The netmask defines your local network	IntefaceAddressView		Нетмаска визначає вашу локальну мережу
+%name% (%authenticationMode%)	WirelessNetworkMenuItem		%name% (%authenticationMode%)
+Network	NetworkWindow		Мережа
+Show network status in Deskbar	NetworkWindow		Показати стан мережі у Deskbar'і
+The method for obtaining an IP address	IntefaceAddressView		Спосіб отримання IP адреси
+connected	InterfaceListItem		під'єднання
+disabled	InterfaceListItem		заборонити
+Dial Up	NetworkWindow		Dial Up
+Apply	IntefaceAddressView		Застосовувати
+Installing NetworkStatus in Deskbar failed: %s	NetworkWindow		Встановлення Стан'у Мережі у Deskbar призупинено: %s
+MAC address:	IntefaceView		MAC адреса:
+Wireless device	InterfaceListItem		Бездротова карта
+Disabled	IntefaceAddressView		Заборонити
+Renegotiate	IntefaceView		Переукласти
+Ok	NetworkWindow		Гаразд
+Network:	IntefaceView		Мережа:
+launch error	NetworkWindow		Помилка з'єднання
+Other	NetworkWindow		Інший
+Automatic	IntefaceAddressView		Автоматично
+Gateway:	IntefaceAddressView		Шлюз:
+Revert	NetworkWindow		Повернути
+Enable	ServiceView		Увімкнути
+disconnected	IntefaceView		від'єднати
+Status:	IntefaceView		Стан:
+Link speed:	IntefaceView		Швидкість з'єднання:
+Your gateway to the internet	IntefaceAddressView		Ваш інтернет шлюз
+New…	NetworkWindow		Новий…
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Режим:
+WPA	WPA protected network		WPA
+Sent:	IntefaceView		Відправити:
+open	Open network		відкрити
+IP Address:	IntefaceAddressView		IP адреса:
+Received:	IntefaceView		Отримати:
+Disable	IntefaceView		Заборонити
+<no wireless networks found>	IntefaceView		<бездротових з'єднань не виявлено>
+Netmask:	IntefaceAddressView		Нетмаска:
+Disable	ServiceView		Заборонити
+Your IP address	IntefaceAddressView		Ваша IP адреса
+Manage…	NetworkWindow		Керування…
+WEP	WEP protected network		WEP

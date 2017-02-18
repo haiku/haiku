@@ -1,3 +1,5 @@
-1	ukrainian	x-vnd.Haiku-cmd-dstconfig	81357278
+1	ukrainian	x-vnd.Haiku-cmd-dstconfig	684321431
 Ask me later	dstcheck		Запитати пізніше
 Manually adjust time…	dstcheck		Ручна зміна часу…
+Keep this time	dstcheck		Використовувати цей час
+Attention!\n\nBecause of the switch from daylight saving time, your computer's clock may be an hour off.\nYour computer thinks it is %current time%.\n\nIs this the correct time?	dstcheck		Увага!\n\nЧерез перехід з літнього часу годинник вашого комп'ютера може відставати на годину..\nВаш комп'ютер вважає що зараз %current time%.\n\nЦе правильний час?

@@ -3,7 +3,7 @@ Display	DeviceClass		Дисплей
 Capturing	DeviceClass		Захоплення
 Printer	DeviceClass		Принтер
 Uncategorized	DeviceClass		Без рубрики
-1-17% utilized	DeviceClass		1–17% використані
+1-17% utilized	DeviceClass		1–17% використано
 Positioning	DeviceClass		Позиціонування
 Rendering	DeviceClass		Рендерінг
 Phone	DeviceClass		Телефон
@@ -12,14 +12,14 @@ Phone	DeviceClass		Телефон
 Combo keyboard/pointing device	DeviceClass		Комбінована клавіатура/вказівний пристрій
 Controller	DeviceClass		Контролер
 No service available	DeviceClass		Немає доступних сервісів
-Wearable	DeviceClass	A wearable computer	Переносний Примітка: переносний комп'ютер
+Wearable	DeviceClass	A wearable computer	Переносний
 Handheld	DeviceClass		Надолонний
 Invalid device class!\n	DeviceClass		Невірний клас приладу!\n
-Sensing device	DeviceClass		Чутливий елемент
+Sensing device	DeviceClass		Чутливий пристрій
 Computer	DeviceClass		Комп’ютер
 Cellular	DeviceClass		Стільниковий
 Microphone	DeviceClass		Мікрофон
-Unknown (reserved) minor device class	DeviceClass		Невідомий (зарезервований) незначний клас пристрою  
+Unknown (reserved) minor device class	DeviceClass		Невідомий (зарезервований) незначний клас пристрою
 Cordless	DeviceClass		Бездротовий
 Common ISDN access	DeviceClass		Загальний доступ ISDN
 83-99% utilized	DeviceClass		83–99% використано
@@ -50,10 +50,10 @@ Gaming/Toy	DeviceClass		Ігрові/іграшки
 Audio	DeviceClass		Аудіо
 Robot	DeviceClass		Робот
 Camcorder	DeviceClass		Відеокамера
-Digitizer tablet	DeviceClass		Кодувальний планшет
+Digitizer tablet	DeviceClass		Цифровий планшет
 Loudspeaker	DeviceClass		Гучномовець
 Joystick	DeviceClass		Джойстик
-LAN access	DeviceClass		Доступ до ЛВС
+LAN access	DeviceClass		Доступ до мережі
 Wrist watch	DeviceClass		Наручний годинник
 Minor class: 	DeviceClass		Малий клас: 
 Networking	DeviceClass		Мережа

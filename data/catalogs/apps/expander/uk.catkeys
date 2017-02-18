@@ -1,5 +1,6 @@
-1	ukrainian	x-vnd.Haiku-Expander	4079673648
+1	ukrainian	x-vnd.Haiku-Expander	130018254
 Expand	ExpanderMenu		Розпакувати
+Expanding '%s'…	ExpanderWindow		Розпаковка '%s'…
 Close window when done expanding	ExpanderPreferences		Закрити вікно після розпаковки
 Set destination…	ExpanderMenu		Встановити ціль…
 Use:	ExpanderPreferences		Використати:
@@ -32,16 +33,18 @@ Automatically show contents listing	ExpanderPreferences		Автоматично 
 OK	ExpanderPreferences		Гаразд
 Leave destination folder path empty	ExpanderPreferences		Зберегти шлях папки призначення пустим
 Failed to create the destination folder.	ExpanderWindow		Не вдалося створити папку призначення.
+Select '%s'…	DirectoryFilePanel		Вибрати '%s'…
 Create	ExpanderWindow		Створити
 The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка була переіменована, видалена або не\nпідтримується.
 The file doesn't exist	ExpanderWindow		Файл відсутній
 Stop	ExpanderMenu		Зупинити
 File	ExpanderMenu		Файл
-Expander	System name		Розпаковувач
+Expander	System name		Expander
 Expand	ExpanderWindow		Розпакувати
 Close	ExpanderMenu		Закрити
 The destination is not a folder.	ExpanderWindow		Ціль не є папкою.
 Open destination folder after extraction	ExpanderPreferences		Відкрити папку призначення після розтиску
+Creating listing for '%s'…	ExpanderWindow		Створення списку для '%s'…
 Set source…	ExpanderMenu		Встановити джерело…
 Show contents	ExpanderMenu		Показати вміст
 Stop	ExpanderWindow		Зупинити

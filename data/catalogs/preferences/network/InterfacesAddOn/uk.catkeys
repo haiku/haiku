@@ -1,0 +1,32 @@
+1	ukrainian	x-vnd.Haiku-InterfacesAddOn	3297241710
+Interface	InterfaceWindow		Інтерфейс
+Network:	IntefaceHardwareView		Мережа
+Static	IntefaceAddressView		Статичний
+None	InterfacesListView		Жоден
+IP:	InterfacesListView	IPv4 address label	IP:
+Renegotiate address	InterfacesListView		Переглянути адресу
+Status:	IntefaceHardwareView		Стан:
+IPv6:	InterfacesListView	IPv6 address label	IPv6:
+Link speed:	IntefaceHardwareView		Швидкість з'єднання:
+The method for obtaining an IP address	IntefaceAddressView		Спосіб отримання IP-адреси
+Your gateway	IntefaceAddressView		Ваш шлюз
+Enable	InterfacesListView		Доступно
+Received:	IntefaceHardwareView		Отримано:
+Choose automatically	IntefaceHardwareView		Вибрати автоматично
+connected	IntefaceHardwareView		підє'днано
+Automatic	IntefaceAddressView		Автоматично
+Gateway:	IntefaceAddressView		Шлюз:
+Disable	InterfacesListView		Заборонити
+Sent:	IntefaceHardwareView		Відправити:
+DHCP	IntefaceAddressView		DHCP
+Mode:	IntefaceAddressView		Режим:
+<no wireless networks found>	IntefaceHardwareView		<не виявлено бездротової мережі>
+Your netmask	IntefaceAddressView		Ваша нетмаска
+IP Address:	IntefaceAddressView		IP адреса:
+Off	IntefaceAddressView		Вимкнути
+MAC address:	IntefaceHardwareView		MAC адреса:
+Renegotiate	IntefaceHardwareView		Переукласти
+Netmask:	IntefaceAddressView		Нетмаска:
+Your IP address	IntefaceAddressView		Ваша IP адреса
+disconnected	IntefaceHardwareView		від'єднання
+Disable	IntefaceHardwareView		Заборонити

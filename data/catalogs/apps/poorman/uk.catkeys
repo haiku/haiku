@@ -1,17 +1,18 @@
-1	ukrainian	x-vnd.Haiku-PoorMan	3296382959
+1	ukrainian	x-vnd.Haiku-PoorMan	1829050509
 Website location	PoorMan		Розташування сайту
 Error Server	PoorMan		Помилка сервера
 Settings…	PoorMan		Налаштування…
 Create PoorMan log	PoorMan		Створити логи PoorMan
-Shutting down.\n	PoorMan		Вимкнути.\n
+Shutting down.\n	PoorMan		Вимкнення.\n
 Hits: %lu	PoorMan		Підказки: %lu
-Web folder:	PoorMan		Інтернет папка
+Web folder:	PoorMan		Підказки: %lu
 Save log console selection	PoorMan		Зберегти логи вибраної консолі
 Run server	PoorMan		Запустити сервер
-PoorMan settings	PoorMan		Настройки PoorMan
+PoorMan settings	PoorMan		Налаштування PoorMan
 Clear hit counter	PoorMan		Очистити лічильник пошуку
 Copy	PoorMan		Копіювати
 Max. simultaneous connections:	PoorMan		Максимально одночасних підключень:
+Create public_html	PoorMan		Create public_html
 Start page:	PoorMan		Запустити сторінку:
 done.\n	PoorMan		готово.\n
 Create	PoorMan		Створити
@@ -28,11 +29,12 @@ Quit	PoorMan		Вийти
 Hits: 0	PoorMan		Підказка: 0
 Save log console	PoorMan		Зберегти лог консолі
 Edit	PoorMan		Редагувати
-Create Log File	PoorMan		Створити лог файл 
+Create Log File	PoorMan		Створити лог файл
 Log to console	PoorMan		Виводити лог в консоль
-Directory: (none)	PoorMan		Директорія: (жодна)
-Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть директорію щоб опублікувати в інтернеті.\n\nPoorMan може створити директорію по замовчуванню \"public_html\" у вашій домашній директорії.\nАбо ви вибере одну з своїх власних директорій.
+Directory: (none)	PoorMan		Тека: (жодна)
+Please choose the folder to publish on the web.\n\nYou can have PoorMan create a default \"public_html\" in your home folder.\nOr you select one of your own folders instead.	PoorMan		Будь-ласка виберіть теку для публікації в інтернеті.\n\nPoorMan може створити теку по замовчуванню \"public_html\" у вашій домашній теці.\nАбо виберіть одну з своїх власних тек.
 Log To Console	PoorMan		Лог в консоль
+{0, plural, one{# connection} other{# connections}}	PoorMan		{0, plural, one{# з'єднання} other{# з'єднань}}
 Connections	PoorMan		Підє'днання
 Status: Running	PoorMan		Стан: Запущений
 Controls	PoorMan		Органи управління
@@ -43,16 +45,16 @@ File	PoorMan		Файл
 File Logging	PoorMan		Логування в файл
 Save console selections as…	PoorMan		Зберегти вибране консолі як…
 File logging	PoorMan		Файл реєстрації
-Select web folder	PoorMan		Зберегти веб каталог
+Select web folder	PoorMan		Зберегти веб теку
 Logging view	PoorMan		Перегляд реєстрації
 Logging	PoorMan		Реєстрація
-A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна веб директорія була створена в \"/boot/home/public_html.\"\n Перевірте чи присутній файл HTML під назвою \"index.html\" в цій директорії.
+A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна веб тека була створена в \"/boot/home/public_html.\"\n Перевірте чи присутній файл HTML під назвою \"index.html\" в цій теці.
 Clear log file	PoorMan		Очистити лог файл
 Log file name:	PoorMan		Ім'я лог файлу:
-Directory: 	PoorMan		Каталог:
+Directory: 	PoorMan		Тека:
 Log To File	PoorMan		Лог в файл
 Done	PoorMan		Виконано
-Create log file	PoorMan		Очистити логфайл 
+Create log file	PoorMan		Очистити лог файл 
 Starting up... 	PoorMan		Запускаєтся…
 Site	PoorMan		Сайт
 Cancel	PoorMan		Відмінити
