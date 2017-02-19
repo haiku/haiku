@@ -7,12 +7,12 @@
  */
 
 *, title {
-  font-family: "DejaVu Sans", Arial, sans-serif;
+  font-family: "Noto Sans", Arial, sans-serif;
   color: #333333;
 }
 cmdsynopsis, code, command, computeroutput, envar, filename, keycode, keysym,
 literal, option, parameter, sgmltag, systemitem {
-	font-family: "Deja Vu Mono", Courier, "Courier New", monospace, fixed;
+	font-family: "Noto Mono", Courier, "Courier New", monospace, fixed;
 }
 term {
   font-weight: bold;

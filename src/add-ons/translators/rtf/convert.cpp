@@ -808,7 +808,7 @@ status_t convert_styled_text_to_rtf(
 	} else {
 		// There is no STYL section
 		// Just use a generic preamble
-		rtfFile << "{\\fonttbl\\f0 DejaVu Sans;}\\f0\\pard " << plainText
+		rtfFile << "{\\fonttbl\\f0 Noto Sans;}\\f0\\pard " << plainText
 			<< "}";
 	}
 	

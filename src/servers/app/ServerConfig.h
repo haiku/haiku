@@ -27,17 +27,17 @@
 
 // These definitions provide the server something to use for default
 // system fonts.
-#define DEFAULT_PLAIN_FONT_FAMILY "DejaVu Sans"
+#define DEFAULT_PLAIN_FONT_FAMILY "Noto Sans"
 #define FALLBACK_PLAIN_FONT_FAMILY "Swis721 BT"
 #define DEFAULT_PLAIN_FONT_STYLE "Book"
 #define DEFAULT_PLAIN_FONT_SIZE 12.0f
-#define DEFAULT_BOLD_FONT_FAMILY "DejaVu Sans"
+#define DEFAULT_BOLD_FONT_FAMILY "Noto Sans"
 #define FALLBACK_BOLD_FONT_FAMILY "Swis721 BT"
 #define DEFAULT_BOLD_FONT_STYLE "Bold"
 #define DEFAULT_BOLD_FONT_SIZE 12.0f
-#define DEFAULT_FIXED_FONT_FAMILY "DejaVu Sans Mono"
+#define DEFAULT_FIXED_FONT_FAMILY "Noto Mono"
 #define FALLBACK_FIXED_FONT_FAMILY "Courier10 BT"
-#define DEFAULT_FIXED_FONT_STYLE "Book"
+#define DEFAULT_FIXED_FONT_STYLE "Regular"
 #define DEFAULT_FIXED_FONT_SIZE 12.0f
 
 // This is the port capacity for all monitoring objects - ServerApps

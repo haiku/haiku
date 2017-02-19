@@ -75,12 +75,12 @@ rule DefineDefaultBuildProfiles
 			AddHaikuImagePackages
 				bepdf
 				cvs
-				dejavu
 				keymapswitcher
 				llvm
 				man
 				mercurial
 				nano
+				noto
 				openssh
 				p7zip
 				pe
@@ -130,9 +130,9 @@ rule DefineDefaultBuildProfiles
 			HAIKU_IMAGE_SIZE ?= 600 ;
 
 			AddHaikuImagePackages
-				dejavu
 				man
 				nano
+				noto
 				openssh
 				openssl
 				p7zip
@@ -164,7 +164,6 @@ rule DefineDefaultBuildProfiles
 				binutils
 				bison
 				curl_devel
-				dejavu
 				expat
 				flex
 				freetype_devel
@@ -179,6 +178,7 @@ rule DefineDefaultBuildProfiles
 				make
 				ncurses6
 				ncurses6_devel
+				noto
 				python
 				sed
 				texinfo
