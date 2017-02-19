@@ -3,7 +3,8 @@
  * This file may be used under the terms of the MIT License.
  */
 
-//!	connection between pure inode and kernel_interface attributes
+
+//!	Connection between pure inode and kernel_interface attributes.
 
 
 #include "Attribute.h"
@@ -120,16 +121,16 @@ Attribute::Create(const char* name, type_code type, int openMode,
 	attr_cookie** _cookie)
 {
 	status_t status = CheckAccess(name, openMode);
-	if (status < B_OK)
+	if (status != B_OK)
 		return status;
-
-	attr_cookie* cookie = new(std::nothrow) attr_cookie;
-	if (cookie == NULL)
-		RETURN_ERROR(B_NO_MEMORY);
 
 	bool exists = Get(name) == B_OK;
 	if (exists && (openMode & O_EXCL) != 0)
 		return B_FILE_EXISTS;
+
+	attr_cookie* cookie = new(std::nothrow) attr_cookie;
+	if (cookie == NULL)
+		RETURN_ERROR(B_NO_MEMORY);
 
 	fName = name;
 
