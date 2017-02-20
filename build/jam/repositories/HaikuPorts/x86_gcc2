@@ -680,7 +680,7 @@ RemotePackageRepository HaikuPorts
 	djvulibre_x86-3.5.25-1
 	djvulibre_x86_devel-3.5.25-1
 	documentviewer_x86-0.3_git-8
-	dosbox_x86-0.74-2
+	dosbox_x86-0.74-3
 	doxygen_x86-1.8.10-2
 	dtc_x86-1.4.1-1
 	enca_x86-1.18-1
