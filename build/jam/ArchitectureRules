@@ -519,7 +519,7 @@ rule ArchitectureSetupWarnings architecture
 #	EnableWerror src add-ons input_server methods pen ;
 	EnableWerror src add-ons input_server methods t9 ;
 	EnableWerror src add-ons kernel bluetooth ;
-#	EnableWerror src add-ons kernel bus_managers acpi ;
+	EnableWerror src add-ons kernel bus_managers acpi ;
 	EnableWerror src add-ons kernel bus_managers agp_gart ;
 	EnableWerror src add-ons kernel bus_managers ata ;
 	EnableWerror src add-ons kernel bus_managers config_manager ;
