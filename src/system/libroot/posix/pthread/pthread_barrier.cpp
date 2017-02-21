@@ -137,7 +137,10 @@ pthread_barrierattr_destroy(pthread_barrierattr_t* _attr)
 int
 pthread_barrierattr_getpshared(const pthread_barrierattr_t* _attr, int* shared)
 {
-	pthread_barrierattr* attr = *_attr;
+	pthread_barrierattr* attr;
+
+	if (_attr == NULL || (attr = *_attr) == NULL || shared == NULL)
+		return B_BAD_VALUE;
 
 	*shared = attr->process_shared
 		? PTHREAD_PROCESS_SHARED : PTHREAD_PROCESS_PRIVATE;
@@ -149,7 +152,13 @@ pthread_barrierattr_getpshared(const pthread_barrierattr_t* _attr, int* shared)
 int
 pthread_barrierattr_setpshared(pthread_barrierattr_t* _attr, int shared)
 {
-	pthread_barrierattr* attr = *_attr;
+	pthread_barrierattr* attr;
+
+	if (_attr == NULL || (attr = *_attr) == NULL
+		|| shared < PTHREAD_PROCESS_PRIVATE
+		|| shared > PTHREAD_PROCESS_SHARED) {
+		return B_BAD_VALUE;
+	}
 
 	attr->process_shared = shared == PTHREAD_PROCESS_SHARED;
 
