@@ -26,7 +26,6 @@ SYSTEM_APPS += [ FFilterByBuildFeatures
 	RemoteDesktop
 	Screenshot SerialConnect SoundRecorder
 	TV
-	WebWatch
 ] ;
 
 DESKBAR_APPLICATIONS +=
