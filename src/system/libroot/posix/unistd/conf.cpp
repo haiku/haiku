@@ -90,7 +90,7 @@ __sysconf(int name)
 		case _SC_PAGE_SIZE:
 			return B_PAGE_SIZE;
 		case _SC_SEM_NSEMS_MAX:
-			return MAX_POSIX_SEMS;
+			return _POSIX_SEM_NSEMS_MAX;
 		case _SC_SEM_VALUE_MAX:
 			return _POSIX_SEM_VALUE_MAX;
 		case _SC_SEMAPHORES:
