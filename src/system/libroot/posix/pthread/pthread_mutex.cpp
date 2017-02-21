@@ -162,7 +162,7 @@ pthread_mutex_unlock(pthread_mutex_t* mutex)
 
 
 int
-pthread_mutex_getprioceiling(pthread_mutex_t* mutex, int* _prioCeiling)
+pthread_mutex_getprioceiling(const pthread_mutex_t* mutex, int* _prioCeiling)
 {
 	if (mutex == NULL || _prioCeiling == NULL)
 		return EINVAL;
