@@ -1398,7 +1398,7 @@ BString::StartsWith(const BString& string) const
 bool
 BString::StartsWith(const char* string) const
 {
-	return StartsWith(string, strlen(string));
+	return StartsWith(string, strlen(safestr(string)));
 }
 
 
@@ -1422,14 +1422,14 @@ BString::IStartsWith(const BString& string) const
 bool
 BString::IStartsWith(const char* string) const
 {
-	return IStartsWith(string, strlen(string));
+	return IStartsWith(string, strlen(safestr(string)));
 }
 
 
 bool
 BString::IStartsWith(const char* string, int32 length) const
 {
-	if (length > Length() || length > (int32)strlen(string))
+	if (length > Length() || length > (int32)strlen(safestr(string)))
 		return false;
 
 	return _IFindAfter(string, 0, length) == 0;
@@ -1446,7 +1446,7 @@ BString::EndsWith(const BString& string) const
 bool
 BString::EndsWith(const char* string) const
 {
-	return EndsWith(string, strlen(string));
+	return EndsWith(string, strlen(safestr(string)));
 }
 
 
@@ -1471,7 +1471,7 @@ BString::IEndsWith(const BString& string) const
 bool
 BString::IEndsWith(const char* string) const
 {
-	return IEndsWith(string, strlen(string));
+	return IEndsWith(string, strlen(safestr(string)));
 }
 
 
