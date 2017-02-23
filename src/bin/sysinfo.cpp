@@ -73,17 +73,19 @@ struct cache_description {
 	{0x55, "Inst TLB: 2M/4M-bytes pages, fully associative, 7 entries"},
 	{0x56, "L1 Data TLB: 4M-bytes pages, 4-way set associative, 16 entries"},
 	{0x57, "L1 Data TLB: 4K-bytes pages, 4-way set associative, 16 entries"},
-	{0x59, "L0 Data TLB, 4K-bytes pages, fully associative, 16 entries"},
-	{0x5A, "Data TLB: 2M/4M-bytes pages, 4-way set associative, 32 entries"},
+	{0x59, "L0 Data TLB: 4K-bytes pages, fully associative, 16 entries"},
+	{0x5A, "L0 Data TLB: 2M/4M-bytes pages, 4-way set associative, 32 entries"},
 	{0x5B, "Data TLB: 4K/4M-bytes pages, fully associative, 64 entries"},
 	{0x5C, "Data TLB: 4K/4M-bytes pages, fully associative, 128 entries"},
 	{0x5D, "Data TLB: 4K/4M-bytes pages, fully associative, 256 entries"},
+	{0x63, "Data TLB: 2M/4M-bytes pages, 4-way set associative, 32 entries"},
 	{0x66, "L1 data cache: 8 KB, 4-way set associative, 64 bytes/line, sectored"},
 	{0x67, "L1 data cache: 16 KB, 4-way set associative, 64 bytes/line, sectored"},
 	{0x68, "L1 data cache: 32 KB, 4-way set associative, 64 bytes/line, sectored"},
 	{0x70, "Inst trace cache: 12K µOPs, 8-way set associative"},
 	{0x71, "Inst trace cache: 16K µOPs, 8-way set associative"},
 	{0x72, "Inst trace cache: 32K µOPs, 8-way set associative"},
+	{0x76, "Code TLB: 2M/4M pages, fully, 8 entries"},
 	{0x77, /* IA-64 */ "L1 inst cache: 16 KB, 4-way set associative, 64 bytes/line, sectored"},
 	{0x79, "L2 cache: 128 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
 	{0x7A, "L2 cache: 256 KB, 8-way set associative, 64 bytes/line, dual-sectored"},
@@ -119,8 +121,11 @@ struct cache_description {
 	{0xB2, "Inst TLB: 4K-bytes pages, 4-way set associative, 64 entries"},
 	{0xB3, "Data TLB: 4K-bytes pages, 4-way set associative, 128 entries"},
 	{0xB4, "Data TLB: 4K-bytes pages, 4-way set associative, 256 entries"},
+	{0xB5, "Code TLB: 4K-bytes pages, 8-way set associative, 64 entries"},
+	{0xB6, "Code TLB: 4K-bytes pages, 8-way set associative, 128 entries"},
 	{0xBA, "Data TLB, 4K-bytes pages, 4-way set associative, 64 entries"},
 	{0xC0, "Data TLB, 4K-4M bytes pages, 4-way set associative, 8 entries"},
+	{0xC3, "Shared 2nd-level TLB: 4K/2M, 6-way set associative, 1536 entries"},
 	{0xCA, "Shared 2nd-level TLB: 4K, 4-way set associative, 512 entries"},
 	{0xD0, "L3 cache: 512 KB, 4-way set associative, 64-bytes/line"},
 	{0xD1, "L3 cache: 1024 KB, 4-way set associative, 64-bytes/line"},
@@ -136,7 +141,57 @@ struct cache_description {
 	{0xE4, "L3 cache: 8192 KB, 16-way set associative, 64-bytes/line"},
 	{0xF0, "64-byte Prefetching"},
 	{0xF1, "128-byte Prefetching"},
+	{0xFF, "TODO: Query standard level 0000_0004h instead"},
 	{0, NULL}
+};
+
+
+/* CPU Features */
+static const char *kFeatures[32] = {
+	"FPU", "VME", "DE", "PSE",
+	"TSC", "MSR", "PAE", "MCE",
+	"CX8", "APIC", NULL, "SEP",
+	"MTRR", "PGE", "MCA", "CMOV",
+	"PAT", "PSE36", "PSN", "CFLUSH",
+	NULL, "DS", "ACPI", "MMX",
+	"FXSTR", "SSE", "SSE2", "SS",
+	"HTT", "TM", NULL, "PBE",
+};
+
+/* CPU Extended features */
+static const char *kExtendedFeatures[32] = {
+	"SSE3", "PCLMULDQ", "DTES64", "MONITOR", "DS-CPL", "VMX", "SMX", "EST",
+	"TM2", "SSSE3", "CNTXT-ID", NULL, "FMA", "CX16", "xTPR", "PDCM",
+	NULL, "PCID", "DCA", "SSE4.1", "SSE4.2", "x2APIC", "MOVEB", "POPCNT",
+	"TSC-DEADLINE", "AES", "XSAVE", "OSXSAVE", "AVX", "F16C", "RDRND",
+	"HYPERVISOR"
+};
+
+
+/* AMD Extended features leaf 0x80000001 */
+static const char *kAMDExtFeatures[32] = {
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	NULL, NULL, NULL, "SCE", NULL, NULL, NULL, NULL,
+	NULL, NULL, NULL, NULL, "NX", NULL, "AMD-MMX", NULL,
+	"FXSR", "FFXSR", NULL, "RDTSCP", NULL, "64", "3DNow+", "3DNow!"
+};
+
+
+/* AMD Extended features leaf 0x80000007 */
+static const char *kAMDExtFeaturesPower[32] = {
+	"TS", "FID", "VID", "TTP", "TM", "STC", "MUL100", "HWPS",
+	"ITSC", "CPB", "EFRO", "PFI", "PA", NULL, NULL, NULL,
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+};
+
+
+/* AMD Extended features leaf 0x80000008 */
+static const char *kAMDExtFeaturesTwo[32] = {
+	"CLZERO", NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+	NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 
 
@@ -353,104 +408,13 @@ print_transmeta_features(uint32 features)
 
 
 static void
-print_amd_power_management_features(uint32 features)
+print_features(const char** table, uint32 features)
 {
-	static const char *kFeatures[6] = {
-		"TS", "FID", "VID", "TTP", "TM", "STC",
-	};
-	int32 found = 4;
-
-	printf("\tPower Management Features:");
-
-	for (int32 i = 0; i < 6; i++) {
-		if ((features & (1UL << i)) && kFeatures[i] != NULL) {
-			printf("%s%s", found == 0 ? "\t\t" : " ", kFeatures[i]);
-			found++;
-			if (found > 0 && (found % 16) == 0) {
-				putchar('\n');
-				found = 0;
-			}
-		}
-	}
-
-	if (found != 0)
-		putchar('\n');
-}
-
-
-static void
-print_amd_features(uint32 features)
-{
-	static const char *kFeatures[32] = {
-		NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-		NULL, NULL, NULL, "SCE", NULL, NULL, NULL, NULL,
-		NULL, NULL, NULL, NULL, "NX", NULL, "AMD-MMX", NULL,
-		NULL, "FFXSTR", NULL, "RDTSCP", NULL, "64", "3DNow+", "3DNow!"
-	};
 	int32 found = 0;
 
 	for (int32 i = 0; i < 32; i++) {
-		if ((features & (1UL << i)) && kFeatures[i] != NULL) {
-			printf("%s%s", found == 0 ? "\t\t" : " ", kFeatures[i]);
-			found++;
-			if (found > 0 && (found % 16) == 0) {
-				putchar('\n');
-				found = 0;
-			}
-		}
-	}
-
-	if (found != 0)
-		putchar('\n');
-}
-
-
-static void
-print_extended_features(uint32 features)
-{
-	static const char *kFeatures[32] = {
-		"SSE3", "PCLMULDQ", "DTES64", "MONITOR", "DS-CPL", "VMX", "SMX", "EST",
-		"TM2", "SSSE3", "CNTXT-ID", NULL, "FMA", "CX16", "xTPR", "PDCM",
-		NULL, "PCID", "DCA", "SSE4.1", "SSE4.2", "x2APIC", "MOVEB", "POPCNT",
-		"TSC-DEADLINE", "AES", "XSAVE", "OSXSAVE", "AVX", "F16C", "RDRND",
-		"HYPERVISOR"
-	};
-	int32 found = 0;
-
-	for (int32 i = 0; i < 32; i++) {
-		if ((features & (1UL << i)) && kFeatures[i] != NULL) {
-			printf("%s%s", found == 0 ? "\t\t" : " ", kFeatures[i]);
-			found++;
-			if (found > 0 && (found % 16) == 0) {
-				putchar('\n');
-				found = 0;
-			}
-		}
-	}
-
-	if (found != 0)
-		putchar('\n');
-}
-
-
-static void
-print_features(uint32 features)
-{
-	static const char *kFeatures[32] = {
-		"FPU", "VME", "DE", "PSE",
-		"TSC", "MSR", "PAE", "MCE",
-		"CX8", "APIC", NULL, "SEP",
-		"MTRR", "PGE", "MCA", "CMOV",
-		"PAT", "PSE36", "PSN", "CFLUSH",
-		NULL, "DS", "ACPI", "MMX",
-		"FXSTR", "SSE", "SSE2", "SS",
-		"HTT", "TM", NULL, "PBE",
-	};
-	int32 found = 0;
-
-	for (int32 i = 0; i < 32; i++) {
-		if ((features & (1UL << i)) && kFeatures[i] != NULL) {
-			printf("%s%s", found == 0 ? "\t\t" : " ", kFeatures[i]);
+		if ((features & (1UL << i)) && table[i] != NULL) {
+			printf("%s%s", found == 0 ? "\t\t" : " ", table[i]);
 			found++;
 			if (found > 0 && (found % 16) == 0) {
 				putchar('\n');
@@ -467,34 +431,32 @@ print_features(uint32 features)
 #if defined(__INTEL__) || defined(__x86_64__)
 
 static void
-print_processor_signature(enum cpu_vendor vendor, cpuid_info *info,
-	const char *prefix)
+print_processor_signature(enum cpu_vendor vendor, cpuid_info *info)
 {
-
+	printf("\tSignature: 0x%1" B_PRIx32 "%1" B_PRIx32 "0%1" B_PRIx32
+		"%1" B_PRIx32 "%1" B_PRIx32 "; ", info->eax_1.extended_family,
+		info->eax_1.extended_model, info->eax_1.family,
+		info->eax_1.model, info->eax_1.stepping);
 	if (vendor == B_CPU_VENDOR_AMD) {
-		printf("\t%s%sype %" B_PRIu32 ", family %" B_PRIu32 ", model %" B_PRIu32
-			", stepping %" B_PRIu32 ", features 0x%08" B_PRIx32 "\n",
-			prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
+		printf("Type %" B_PRIu32 ", family %" B_PRIu32 ", model %" B_PRIu32
+			", stepping %" B_PRIu32 "\n",
 			info->eax_1.type,
 			info->eax_1.family + (info->eax_1.family == 0xf
 				? info->eax_1.extended_family : 0),
 			info->eax_1.model + (info->eax_1.model == 0xf
 				? info->eax_1.extended_model << 4 : 0),
-			info->eax_1.stepping,
-			info->eax_1.features);
+			info->eax_1.stepping);
 	} else if (vendor == B_CPU_VENDOR_INTEL) {
 		// model calculation is different for INTEL
-		printf("\t%s%sype %" B_PRIu32 ", family %" B_PRIu32 ", model %" B_PRIu32
-			", stepping %" B_PRIu32 ", features 0x%08" B_PRIx32 "\n",
-			prefix ? prefix : "", prefix && prefix[0] ? "t" : "T",
+		printf("Type %" B_PRIu32 ", family %" B_PRIu32 ", model %" B_PRIu32
+			", stepping %" B_PRIu32 "\n",
 			info->eax_1.type,
 			info->eax_1.family + (info->eax_1.family == 0xf
 				? info->eax_1.extended_family : 0),
 			info->eax_1.model
 				+ ((info->eax_1.family == 0xf || info->eax_1.family == 0x6)
 					? info->eax_1.extended_model << 4 : 0),
-			info->eax_1.stepping,
-			info->eax_1.features);
+			info->eax_1.stepping);
 	}
 }
 
@@ -535,6 +497,7 @@ dump_cpu(enum cpu_vendor vendor, uint32 model, int32 cpu)
 	// References:
 	// http://grafi.ii.pw.edu.pl/gbm/x86/cpuid.html
 	// http://www.sandpile.org/ia32/cpuid.htm
+	// http://www.sandpile.org/x86/cpuid.htm
 	// http://www.amd.com/us-en/assets/content_type/white_papers_and_tech_docs/TN13.pdf (Duron erratum)
 
 	cpuid_info baseInfo;
@@ -598,31 +561,39 @@ dump_cpu(enum cpu_vendor vendor, uint32 model, int32 cpu)
 	}
 
 	get_cpuid(&cpuInfo, 1, cpu);
-	// Dump Raw CPUID
-	printf("\tRaw CPUID: 0x%1" B_PRIx32 "%1" B_PRIx32 "0%1" B_PRIx32
-		"%1" B_PRIx32 "%1" B_PRIx32 ", ", cpuInfo.eax_1.extended_family,
-		cpuInfo.eax_1.extended_model, cpuInfo.eax_1.family,
-		cpuInfo.eax_1.model, cpuInfo.eax_1.stepping);
-
-	print_processor_signature(vendor, &cpuInfo, NULL);
-	print_features(cpuInfo.eax_1.features);
+	print_processor_signature(vendor, &cpuInfo);
+	printf("\tFeatures: 0x%08" B_PRIx32 "\n", cpuInfo.eax_1.features);
+	print_features(kFeatures, cpuInfo.eax_1.features);
 
 	if (maxStandardFunction >= 1) {
 		/* Extended features */
-		printf("\tExtended Intel: 0x%08" B_PRIx32 "\n", cpuInfo.eax_1.extended_features);
-		print_extended_features(cpuInfo.eax_1.extended_features);
+		printf("\tExtended Features (0x00000001): 0x%08" B_PRIx32 "\n",
+			cpuInfo.eax_1.extended_features);
+		print_features(kExtendedFeatures, cpuInfo.eax_1.extended_features);
 	}
 
-	/* Extended CPUID */
+	/* Extended CPUID Information */
 	if (maxExtendedFunction >= 1) {
 		get_cpuid(&cpuInfo, 0x80000001, cpu);
-		print_processor_signature(vendor, &cpuInfo, "Extended AMD: ");
+		if (vendor == B_CPU_VENDOR_INTEL || vendor == B_CPU_VENDOR_AMD) {
+			// 0x80000001 EDX has overlap of 64,ED,SY/SE between amd and intel
+			printf("\tExtended Features (0x80000001): 0x%08" B_PRIx32 "\n",
+				cpuInfo.eax_1.features);
+			print_features(kAMDExtFeatures, cpuInfo.regs.edx);
+		}
 
-		if (vendor == B_CPU_VENDOR_AMD || vendor == B_CPU_VENDOR_INTEL) {
-			print_amd_features(cpuInfo.regs.edx);
+		if (vendor == B_CPU_VENDOR_AMD) {
 			if (maxExtendedFunction >= 7) {
 				get_cpuid(&cpuInfo, 0x80000007, cpu);
-				print_amd_power_management_features(cpuInfo.regs.edx);
+				printf("\tExtended Features (0x80000007): 0x%08" B_PRIx32 "\n",
+					cpuInfo.regs.edx);
+				print_features(kAMDExtFeaturesPower, cpuInfo.regs.edx);
+			}
+			if (maxExtendedFunction >= 8) {
+				get_cpuid(&cpuInfo, 0x80000008, cpu);
+				printf("\tExtended Features (0x80000008): 0x%08" B_PRIx32 "\n",
+					cpuInfo.regs.ebx);
+				print_features(kAMDExtFeaturesTwo, cpuInfo.regs.ebx);
 			}
 		} else if (vendor == B_CPU_VENDOR_TRANSMETA)
 			print_transmeta_features(cpuInfo.regs.edx);
