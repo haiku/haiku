@@ -606,11 +606,12 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 	// set SetupStage
 	uint8 index = 0;
 	setupDescriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0) | TRB_2_BYTES(8);
-	setupDescriptor->trbs[index].dwtrb3 = TRB_3_TYPE(TRB_TYPE_SETUP_STAGE)
-		| TRB_3_IDT_BIT | TRB_3_CYCLE_BIT;
+	setupDescriptor->trbs[index].dwtrb3
+		= B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_SETUP_STAGE)
+			| TRB_3_IDT_BIT | TRB_3_CYCLE_BIT);
 	if (requestData->Length > 0) {
-		setupDescriptor->trbs[index].dwtrb3 |= directionIn ? TRB_3_TRT_IN
-			: TRB_3_TRT_OUT;
+		setupDescriptor->trbs[index].dwtrb3 |= B_HOST_TO_LENDIAN_INT32(
+			directionIn ? TRB_3_TRT_IN : TRB_3_TRT_OUT);
 	}
 	memcpy(&setupDescriptor->trbs[index].qwtrb0, requestData,
 		sizeof(usb_request_data));
@@ -623,9 +624,10 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 		setupDescriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0)
 			| TRB_2_BYTES(requestData->Length)
 			| TRB_2_TD_SIZE(transfer->VectorCount());
-		setupDescriptor->trbs[index].dwtrb3 = TRB_3_TYPE(TRB_TYPE_DATA_STAGE)
-			| (directionIn ? (TRB_3_DIR_IN | TRB_3_ISP_BIT) : 0)
-			| TRB_3_CYCLE_BIT;
+		setupDescriptor->trbs[index].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
+			TRB_3_TYPE(TRB_TYPE_DATA_STAGE)
+				| (directionIn ? (TRB_3_DIR_IN | TRB_3_ISP_BIT) : 0)
+				| TRB_3_CYCLE_BIT);
 
 		// TODO copy data for out transfers
 		index++;
@@ -633,9 +635,10 @@ XHCI::SubmitControlRequest(Transfer *transfer)
 
 	// set StatusStage
 	setupDescriptor->trbs[index].dwtrb2 = TRB_2_IRQ(0);
-	setupDescriptor->trbs[index].dwtrb3 = TRB_3_TYPE(TRB_TYPE_STATUS_STAGE)
-		| ((directionIn && requestData->Length > 0) ? 0 : TRB_3_DIR_IN)
-		| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT;
+	setupDescriptor->trbs[index].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
+		TRB_3_TYPE(TRB_TYPE_STATUS_STAGE)
+			| ((directionIn && requestData->Length > 0) ? 0 : TRB_3_DIR_IN)
+			| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
 
 	setupDescriptor->trb_count = index + 1;
 
@@ -692,16 +695,18 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 			td_chain->trbs[index].dwtrb2 = TRB_2_IRQ(0)
 				| TRB_2_BYTES(descriptor->buffer_size[index])
 				| TRB_2_TD_SIZE(rest);
-			td_chain->trbs[index].dwtrb3 = TRB_3_TYPE(TRB_TYPE_NORMAL)
-				| TRB_3_CYCLE_BIT | TRB_3_CHAIN_BIT | (directionIn ? TRB_3_ISP_BIT : 0);
+			td_chain->trbs[index].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
+				TRB_3_TYPE(TRB_TYPE_NORMAL) | TRB_3_CYCLE_BIT | TRB_3_CHAIN_BIT
+					| (directionIn ? TRB_3_ISP_BIT : 0));
 			rest--;
 		}
 		// link next td, if any
 		if (td_chain->next_chain != NULL) {
 			td_chain->trbs[td_chain->trb_count].qwtrb0 = td_chain->next_chain->this_phy;
 			td_chain->trbs[td_chain->trb_count].dwtrb2 = TRB_2_IRQ(0);
-			td_chain->trbs[td_chain->trb_count].dwtrb3 = TRB_3_TYPE(TRB_TYPE_LINK)
-				| TRB_3_CYCLE_BIT | TRB_3_CHAIN_BIT;
+			td_chain->trbs[td_chain->trb_count].dwtrb3
+				= B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_LINK)
+					| TRB_3_CYCLE_BIT | TRB_3_CHAIN_BIT);
 		}
 
 		last = td_chain;
@@ -709,8 +714,10 @@ XHCI::SubmitNormalRequest(Transfer *transfer)
 	}
 
 	if (last->trb_count > 0) {
-		last->trbs[last->trb_count - 1].dwtrb3 |= TRB_3_IOC_BIT;
-		last->trbs[last->trb_count - 1].dwtrb3 &= ~TRB_3_CHAIN_BIT;
+		last->trbs[last->trb_count - 1].dwtrb3
+			|= B_HOST_TO_LENDIAN_INT32(TRB_3_IOC_BIT);
+		last->trbs[last->trb_count - 1].dwtrb3
+			&= B_HOST_TO_LENDIAN_INT32(~TRB_3_CHAIN_BIT);
 	}
 
 	if (!directionIn) {
@@ -1518,8 +1525,8 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	addr_t addr = endpoint->trb_addr + next * sizeof(struct xhci_trb);
 	last->trbs[last->trb_count].qwtrb0 = addr;
 	last->trbs[last->trb_count].dwtrb2 = TRB_2_IRQ(0);
-	last->trbs[last->trb_count].dwtrb3 = TRB_3_TYPE(TRB_TYPE_LINK)
-		| TRB_3_IOC_BIT | TRB_3_CYCLE_BIT;
+	last->trbs[last->trb_count].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
+		TRB_3_TYPE(TRB_TYPE_LINK) | TRB_3_IOC_BIT | TRB_3_CYCLE_BIT);
 
 	endpoint->trbs[next].qwtrb0 = 0;
 	endpoint->trbs[next].dwtrb2 = 0;
@@ -1528,13 +1535,14 @@ XHCI::_LinkDescriptorForPipe(xhci_td *descriptor, xhci_endpoint *endpoint)
 	// link the descriptor
 	endpoint->trbs[current].qwtrb0 = descriptor->this_phy;
 	endpoint->trbs[current].dwtrb2 = TRB_2_IRQ(0);
-	endpoint->trbs[current].dwtrb3 = TRB_3_TYPE(TRB_TYPE_LINK)
-		| TRB_3_CYCLE_BIT;
+	endpoint->trbs[current].dwtrb3 = B_HOST_TO_LENDIAN_INT32(
+		TRB_3_TYPE(TRB_TYPE_LINK) | TRB_3_CYCLE_BIT);
 
 	TRACE("_LinkDescriptorForPipe pCurrent %p phys 0x%" B_PRIxPHYSADDR
 		" 0x%" B_PRIxPHYSADDR " 0x%08" B_PRIx32 "\n", &endpoint->trbs[current],
 		endpoint->trb_addr + current * sizeof(struct xhci_trb),
-		endpoint->trbs[current].qwtrb0, endpoint->trbs[current].dwtrb3);
+		endpoint->trbs[current].qwtrb0,
+		B_LENDIAN_TO_HOST_INT32(endpoint->trbs[current].dwtrb3));
 	endpoint->current = next;
 
 	return B_OK;
@@ -1936,19 +1944,20 @@ XHCI::QueueCommand(xhci_trb* trb)
 	j = fCmdCcs;
 
 	TRACE("command[%u] = %" B_PRIx32 " (0x%016" B_PRIx64 ", 0x%08" B_PRIx32
-		", 0x%08" B_PRIx32 ")\n", i, TRB_3_TYPE_GET(trb->dwtrb3),
-		trb->qwtrb0, trb->dwtrb2, trb->dwtrb3);
+		", 0x%08" B_PRIx32 ")\n", i,
+		TRB_3_TYPE_GET(B_LENDIAN_TO_HOST_INT32(trb->dwtrb3)), trb->qwtrb0,
+		trb->dwtrb2, B_LENDIAN_TO_HOST_INT32(trb->dwtrb3));
 
 	fCmdRing[i].qwtrb0 = trb->qwtrb0;
 	fCmdRing[i].dwtrb2 = trb->dwtrb2;
-	temp = trb->dwtrb3;
+	temp = B_LENDIAN_TO_HOST_INT32(trb->dwtrb3);
 
 	if (j)
 		temp |= TRB_3_CYCLE_BIT;
 	else
 		temp &= ~TRB_3_CYCLE_BIT;
 	temp &= ~TRB_3_TC_BIT;
-	fCmdRing[i].dwtrb3 = temp;
+	fCmdRing[i].dwtrb3 = B_HOST_TO_LENDIAN_INT32(temp);
 
 	fCmdAddr = fErst->rs_addr + (XHCI_MAX_EVENTS + i) * sizeof(xhci_trb);
 
@@ -1958,7 +1967,7 @@ XHCI::QueueCommand(xhci_trb* trb)
 		temp = TRB_3_TYPE(TRB_TYPE_LINK) | TRB_3_TC_BIT;
 		if (j)
 			temp |= TRB_3_CYCLE_BIT;
-		fCmdRing[i].dwtrb3 = temp;
+		fCmdRing[i].dwtrb3 = B_HOST_TO_LENDIAN_INT32(temp);
 
 		i = 0;
 		j ^= 1;
@@ -1975,7 +1984,7 @@ XHCI::HandleCmdComplete(xhci_trb* trb)
 	if (fCmdAddr == trb->qwtrb0) {
 		TRACE("Received command event\n");
 		fCmdResult[0] = trb->dwtrb2;
-		fCmdResult[1] = trb->dwtrb3;
+		fCmdResult[1] = B_LENDIAN_TO_HOST_INT32(trb->dwtrb3);
 		release_sem_etc(fCmdCompSem, 1, B_DO_NOT_RESCHEDULE);
 	}
 
@@ -1989,8 +1998,9 @@ XHCI::HandleTransferComplete(xhci_trb* trb)
 	addr_t source = trb->qwtrb0;
 	uint8 completionCode = TRB_2_COMP_CODE_GET(trb->dwtrb2);
 	uint32 remainder = TRB_2_REM_GET(trb->dwtrb2);
-	uint8 endpointNumber = TRB_3_ENDPOINT_GET(trb->dwtrb3);
-	uint8 slot = TRB_3_SLOT_GET(trb->dwtrb3);
+	uint8 endpointNumber
+		= TRB_3_ENDPOINT_GET(B_LENDIAN_TO_HOST_INT32(trb->dwtrb3));
+	uint8 slot = TRB_3_SLOT_GET(B_LENDIAN_TO_HOST_INT32(trb->dwtrb3));
 
 	if (slot > fSlotCount)
 		TRACE_ERROR("invalid slot\n");
@@ -2060,9 +2070,9 @@ XHCI::DoCommand(xhci_trb* trb)
 	}
 
 	trb->dwtrb2 = fCmdResult[0];
-	trb->dwtrb3 = fCmdResult[1];
+	trb->dwtrb3 = B_HOST_TO_LENDIAN_INT32(fCmdResult[1]);
 	TRACE("Storing trb 0x%08" B_PRIx32 " 0x%08" B_PRIx32 "\n", trb->dwtrb2,
-		trb->dwtrb3);
+		B_LENDIAN_TO_HOST_INT32(trb->dwtrb3));
 
 	Unlock();
 	return status;
@@ -2076,7 +2086,7 @@ XHCI::Noop()
 	xhci_trb trb;
 	trb.qwtrb0 = 0;
 	trb.dwtrb2 = 0;
-	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_CMD_NOOP);
+	trb.dwtrb3 = B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_CMD_NOOP));
 
 	return DoCommand(&trb);
 }
@@ -2089,13 +2099,13 @@ XHCI::EnableSlot(uint8* slot)
 	xhci_trb trb;
 	trb.qwtrb0 = 0;
 	trb.dwtrb2 = 0;
-	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_ENABLE_SLOT);
+	trb.dwtrb3 = B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_ENABLE_SLOT));
 
 	status_t status = DoCommand(&trb);
 	if (status != B_OK)
 		return status;
 
-	*slot = TRB_3_SLOT_GET(trb.dwtrb3);
+	*slot = TRB_3_SLOT_GET(B_LENDIAN_TO_HOST_INT32(trb.dwtrb3));
 	return *slot != 0 ? B_OK : B_BAD_VALUE;
 }
 
@@ -2107,7 +2117,8 @@ XHCI::DisableSlot(uint8 slot)
 	xhci_trb trb;
 	trb.qwtrb0 = 0;
 	trb.dwtrb2 = 0;
-	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_DISABLE_SLOT) | TRB_3_SLOT(slot);
+	trb.dwtrb3 = B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_DISABLE_SLOT)
+		| TRB_3_SLOT(slot));
 
 	return DoCommand(&trb);
 }
@@ -2120,10 +2131,11 @@ XHCI::SetAddress(uint64 inputContext, bool bsr, uint8 slot)
 	xhci_trb trb;
 	trb.qwtrb0 = inputContext;
 	trb.dwtrb2 = 0;
-	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_ADDRESS_DEVICE) | TRB_3_SLOT(slot);
+	trb.dwtrb3 = B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_ADDRESS_DEVICE)
+		| TRB_3_SLOT(slot));
 
 	if (bsr)
-		trb.dwtrb3 |= TRB_3_BSR_BIT;
+		trb.dwtrb3 |= B_HOST_TO_LENDIAN_INT32(TRB_3_BSR_BIT);
 
 	return DoCommand(&trb);
 }
@@ -2136,10 +2148,11 @@ XHCI::ConfigureEndpoint(uint64 inputContext, bool deconfigure, uint8 slot)
 	xhci_trb trb;
 	trb.qwtrb0 = inputContext;
 	trb.dwtrb2 = 0;
-	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_CONFIGURE_ENDPOINT) | TRB_3_SLOT(slot);
+	trb.dwtrb3 = B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_CONFIGURE_ENDPOINT)
+		| TRB_3_SLOT(slot));
 
 	if (deconfigure)
-		trb.dwtrb3 |= TRB_3_DCEP_BIT;
+		trb.dwtrb3 |= B_HOST_TO_LENDIAN_INT32(TRB_3_DCEP_BIT);
 
 	return DoCommand(&trb);
 }
@@ -2152,7 +2165,8 @@ XHCI::EvaluateContext(uint64 inputContext, uint8 slot)
 	xhci_trb trb;
 	trb.qwtrb0 = inputContext;
 	trb.dwtrb2 = 0;
-	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_EVALUATE_CONTEXT) | TRB_3_SLOT(slot);
+	trb.dwtrb3 = B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_EVALUATE_CONTEXT)
+		| TRB_3_SLOT(slot));
 
 	return DoCommand(&trb);
 }
@@ -2165,10 +2179,10 @@ XHCI::ResetEndpoint(bool preserve, uint8 endpoint, uint8 slot)
 	xhci_trb trb;
 	trb.qwtrb0 = 0;
 	trb.dwtrb2 = 0;
-	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_RESET_ENDPOINT) | TRB_3_SLOT(slot)
-		| TRB_3_ENDPOINT(endpoint);
+	trb.dwtrb3 = B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_RESET_ENDPOINT)
+		| TRB_3_SLOT(slot) | TRB_3_ENDPOINT(endpoint));
 	if (preserve)
-		trb.dwtrb3 |= TRB_3_PRSV_BIT;
+		trb.dwtrb3 |= B_HOST_TO_LENDIAN_INT32(TRB_3_PRSV_BIT);
 
 	return DoCommand(&trb);
 }
@@ -2181,10 +2195,10 @@ XHCI::StopEndpoint(bool suspend, uint8 endpoint, uint8 slot)
 	xhci_trb trb;
 	trb.qwtrb0 = 0;
 	trb.dwtrb2 = 0;
-	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_STOP_ENDPOINT) | TRB_3_SLOT(slot)
-		| TRB_3_ENDPOINT(endpoint);
+	trb.dwtrb3 = B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_STOP_ENDPOINT)
+		| TRB_3_SLOT(slot) | TRB_3_ENDPOINT(endpoint));
 	if (suspend)
-		trb.dwtrb3 |= TRB_3_SUSPEND_ENDPOINT_BIT;
+		trb.dwtrb3 |= B_HOST_TO_LENDIAN_INT32(TRB_3_SUSPEND_ENDPOINT_BIT);
 
 	return DoCommand(&trb);
 }
@@ -2197,8 +2211,8 @@ XHCI::SetTRDequeue(uint64 dequeue, uint16 stream, uint8 endpoint, uint8 slot)
 	xhci_trb trb;
 	trb.qwtrb0 = dequeue;
 	trb.dwtrb2 = TRB_2_STREAM(stream);
-	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_SET_TR_DEQUEUE) | TRB_3_SLOT(slot)
-		| TRB_3_ENDPOINT(endpoint);
+	trb.dwtrb3 = B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_SET_TR_DEQUEUE)
+		| TRB_3_SLOT(slot) | TRB_3_ENDPOINT(endpoint));
 
 	return DoCommand(&trb);
 }
@@ -2211,7 +2225,8 @@ XHCI::ResetDevice(uint8 slot)
 	xhci_trb trb;
 	trb.qwtrb0 = 0;
 	trb.dwtrb2 = 0;
-	trb.dwtrb3 = TRB_3_TYPE(TRB_TYPE_RESET_DEVICE) | TRB_3_SLOT(slot);
+	trb.dwtrb3 = B_HOST_TO_LENDIAN_INT32(TRB_3_TYPE(TRB_TYPE_RESET_DEVICE)
+		| TRB_3_SLOT(slot));
 
 	return DoCommand(&trb);
 }
@@ -2243,10 +2258,10 @@ XHCI::CompleteEvents()
 		uint8 t = 2;
 
 		while (1) {
-			uint32 temp = fEventRing[i].dwtrb3;
+			uint32 temp = B_LENDIAN_TO_HOST_INT32(fEventRing[i].dwtrb3);
 			TRACE("event[%u] = %u (0x%016" B_PRIx64 " 0x%08" B_PRIx32 " 0x%08"
 				B_PRIx32 ")\n", i, (uint8)TRB_3_TYPE_GET(temp), fEventRing[i].qwtrb0,
-				fEventRing[i].dwtrb2, fEventRing[i].dwtrb3);
+				fEventRing[i].dwtrb2, B_LENDIAN_TO_HOST_INT32(fEventRing[i].dwtrb3));
 			uint8 k = (temp & TRB_3_CYCLE_BIT) ? 1 : 0;
 			if (j != k)
 				break;
@@ -2255,7 +2270,7 @@ XHCI::CompleteEvents()
 
 			TRACE("event[%u] = %u (0x%016" B_PRIx64 " 0x%08" B_PRIx32 " 0x%08"
 				B_PRIx32 ")\n", i, event, fEventRing[i].qwtrb0,
-				fEventRing[i].dwtrb2, fEventRing[i].dwtrb3);
+				fEventRing[i].dwtrb2, B_LENDIAN_TO_HOST_INT32(fEventRing[i].dwtrb3));
 			switch (event) {
 			case TRB_TYPE_COMMAND_COMPLETION:
 				HandleCmdComplete(&fEventRing[i]);
