@@ -26,7 +26,7 @@ spam	B_USER_DIRECTORY/mail/spam		спам
 Beginner	Mail		Початківець
 Don't save	Mail		Не зберігати
 Expert	Mail		Експерт
-Reply account:	Mail		Аккаунт для відповіді:
+Reply account:	Mail		Обліковий запис для відповіді:
 Message	Mail		Повідомлення
 Settings…	Mail		Налаштування…
 Reply to sender	Mail		Відповісти відправникові
@@ -59,7 +59,7 @@ Forward without attachments	Mail		Переслати без вкладень
 Previous	Mail		Попередній
 Redo	Mail		Відмінити відміну
 Add enclosure…	Mail		Додати вкладення…
-Mail	System name		Mail
+Mail	System name		Пошта
 Print…	Mail		Друкувати…
 Warn unencodable:	Mail		Увага нерозкодоване:
 Quit	Mail		Завершити
@@ -67,12 +67,12 @@ Quit	Mail		Завершити
  Read 	Mail		 Прочитаним 
 UTF-8	Mail	This string is used as a key to set default message compose encoding. It must be correct IANA name from http://cgit.haiku-os.org/haiku/tree/src/kits/textencoding/character_sets.cpp Translate it only if you want to change default message compose encoding for your locale. If you don't know what is it and why it may needs changing, just leave \"UTF-8\".	UTF-8
 Trash	Mail		Кошик
-Default account:	Mail		Аккаунт по замовчуванню:
+Default account:	Mail		Типовий обліковий запис:
 Size:	Mail		Розмір:
-Account from mail	Mail		Аккаунт для пошти
+Account from mail	Mail		Обліковий запис пошти
 Edit signatures…	Mail		Редагувати підписи…
 New	Mail		Новий
-Attachments: 	Mail		Вкладення:
+Attachments: 	Mail		Вкладення: 
 On	Mail		Включити
 Set to %s	Mail		Встановити в %s
 Forward	Mail		Переслати
@@ -83,10 +83,10 @@ Only files can be added as attachments.	Mail		Тільки файли можут
 Previous message	Mail		Попередній лист
 Attachments:	Mail		Вкладення:
 Title:	Mail		Назва:
-<no account found>	Mail		<аккаунт не знайдено>
+<no account found>	Mail		<обліковий запис не знайдено>
 Find…	Mail		Знайти…
 Accounts…	Mail		Аккаунти…
-Mail preferences	Mail		Настройки пошти
+Mail preferences	Mail		Налаштування пошти
 Initial spell check mode:	Mail		Режим перевірки правопису:
 Leave same	Mail		Зберегти саме це
 Page setup…	Mail		Налаштувати сторінку…
@@ -128,23 +128,23 @@ Reply preamble:	Mail		Вступ відповіді:
 Signatures	Mail		Підписи
 Next	Mail		Наступний
 Set to…	Mail		Встановити в…
-Use default account	Mail		Використовувати аккаунт по замовчуванню
+Use default account	Mail		Використати типовий обліковий запис
 Sorry	Mail		Вибачте
 Encoding:	Mail		Кодування:
 Font:	Mail		Шрифт:
 (Address unavailable)	Mail		(Адреса недоступна)
 Save address	Mail		Зберегти адресу
 Queries	Mail		Запити
-Send this message before closing?	Mail		Відіслати це повідомлення перед закриттям? 
+Send this message before closing?	Mail		Відіслати це повідомлення перед закриттям?
 Save	Mail		Зберегти
 Random	Mail		Випадковий
-Close and 	Mail		Закрити і
+Close and 	Mail		Закрити і 
 Save as draft	Mail		Зберегти як чорновик
 The mail_daemon could not be started:\n\t	Mail		Mail_daemon не запущено:\n\t
 Open attachment	Mail		Відкрити вкладення
 sent	B_USER_DIRECTORY/mail/sent		відіслати
 (Date unavailable)	Mail		(Дата недоступна)
-Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть улюблені поштові запити і шаблони запитів у цю папку.
+Put your favorite e-mail queries and query templates in this folder.	Mail		Покладіть улюблені поштові запити і шаблони запитів у цю теку.
 Spam	Mail		Спам
 Reply	Mail		Відповісти
 Encoding	Mail		Кодування:
@@ -157,10 +157,10 @@ Set to Saved	Mail		Перемкнути до збереження
 Open this link	Mail		Відкрити це посилання
 Auto signature:	Mail		Автопідпис:
 Add signature	Mail		Додати підпис
-Need Tracker to move items to trash	Mail		Для видалення в кошик потрібен Tracker
+Need Tracker to move items to trash	Mail		Для видалення в Кошик потрібен Tracker
 Mailing	Mail		Відправлення
 Unread	Mail		Нечитане
 Remove quote	Mail		Видалити цитату
-Move to trash	Mail		Видалити
+Move to trash	Mail		Видалити у Кошик
 Select all	Mail		Виділити все
 An error occurred trying to save this signature.	Mail		Помилка при збереженні цього підпису.

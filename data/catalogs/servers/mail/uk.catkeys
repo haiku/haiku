@@ -1,7 +1,10 @@
-1	ukrainian	x-vnd.Be-POST	825141276
+1	ukrainian	x-vnd.Be-POST	2949558073
 Fetching mail for %name	Notifier		Отримання пошти для %name
 Check for mails only	DeskbarView		Перевірити тільки пошту
-Send pending mails	DeskbarView		Відправити чергову пошту 
+Send pending mails	DeskbarView		Відправка пошти з черги 
+{0, plural, one{One new message} other{# new messages}}	MailDaemon		{0, plural, one{{нове повідомлення} other{# нові повідомлення}}
+{0, plural, one{# new message} other{# new messages}}	DeskbarView		{0, plural, one{# нове повідомлення} other{# нові повідомлення}}
+{0, plural, one{# new message} other{# new messages}} for %name\n	MailDaemon		{0, plural, one{# нове повідомлення} other{# нові повідомлення}} для %name
 New Messages	MailDaemon		Нові повідомлення
 <no accounts>	DeskbarView		<облікові записи відсутні>
 Mail status	MailDaemon		Стан пошти

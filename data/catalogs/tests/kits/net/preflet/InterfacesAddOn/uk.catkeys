@@ -2,13 +2,13 @@
 Interface	InterfaceWindow		Інтерфейс
 Configure…	InterfacesListView		Налаштувати…
 Static	IntefaceAddressView		Статичне
-None	InterfacesListView		Відсутні
+None	InterfacesListView		Жоден
 IP:	InterfacesListView	IPv4 address label	IP:
 Status:	IntefaceHardwareView		Стан:
 IPv6:	InterfacesListView	IPv6 address label	IPv6:
 Save	InterfaceWindow		Зберегти
 Link speed:	IntefaceHardwareView		Швидкість з'єднання:
-Renegotiate	InterfacesAddOn		Переотримати
+Renegotiate	InterfacesAddOn		Переукласти
 The method for obtaining an IP address	IntefaceAddressView		Метод отримання IP адреси
 Your gateway	IntefaceAddressView		Ваш шлюз
 Enable	InterfacesListView		Увімкнути

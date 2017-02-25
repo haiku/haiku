@@ -16,7 +16,7 @@ OK	GrepWindow		Гаразд
 Skip folders starting with a dot	GrepWindow		Пропустити папки, що починаються з крапки
 %APP_NAME couldn't open one or more folders.	GrepWindow		%APP_NAME не вдалося відкрити одну або більше тек.
 Escape search text	GrepWindow		Відмінити пошук туксту
-Search	GrepWindow		Відмінити пошук тексту
+Search	GrepWindow		Пошук
 Open selection	GrepWindow		Відкрити вибране
 Look in sub-folders	GrepWindow		Дивитися в підтеках
 Actions	GrepWindow		Дії

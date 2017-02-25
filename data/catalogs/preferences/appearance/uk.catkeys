@@ -10,11 +10,11 @@ Link hover	Colors tab		Зависле посилання
 Grayscale	AntialiasingSettingsView		Відтінки сірого
 Shine	Colors tab		Сяйво
 About	DecorSettingsView		Про
-About decorator	DecorSettingsView		Про Decorator
+About decorator	DecorSettingsView		Про Декоратор
 Off	AntialiasingSettingsView		Вимкнути
 Link text	Colors tab		Текст посилання
 Link active	Colors tab		Активне посилання
-Choose Decorator	DecorSettingsView		Вибір Decorator'а
+Choose Decorator	DecorSettingsView		Вибір Декоратора
 Success	Colors tab		Успішно
 Inactive window tab text	Colors tab		Текст заголовку неактивного вікна
 Failure	Colors tab		Призупинено
@@ -41,15 +41,15 @@ OK	DecorSettingsView		Гаразд
 Control mark	Colors tab		Відмітка
 Size:	Font Selection view		Розмір:
 Link visited	Colors tab		Відвідане посилання
-Decorator:	DecorSettingsView		Decorator:
+Decorator:	DecorSettingsView		Декоратор:
 Selected list item background	Colors tab		Тло вибраного пункта меню
 Panel background	Colors tab		Тло панелі
 Menu font:	Font view		Шрифт меню:
 Colors	APRWindow		Кольори
-Control background	Colors tab		Тло керування
+Control background	Colors tab		Керування тлом
 Inactive window tab	Colors tab		Заголовок неактивного вікна
 List item text	Colors tab		Текст елементів списку
-Appearance	System name		Appearance
+Appearance	System name		Вигляд
 Fixed font:	Font view		Моноширинний шрифт:
 The quick brown fox jumps over the lazy dog.	Font Selection view	Don't translate this literally ! Use a phrase showing all chars from A to Z.	Жебракують філософи при ґанку церкви в Гадячі, ще й шатро їхнє п’яне знаємо.
 %decorName\n\nAuthors:\n\t%decorAuthors\n\nURL: %decorURL\nLicense: %decorLic\n\n%decorDesc\n	DecorSettingsView		%decorName\n\nАвторы:\n\t%decorAuthors\n\nURL: %decorURL\nЛіцензія: %decorLic\n\n%decorDesc\n
@@ -64,7 +64,7 @@ Inactive window border	Colors tab		Межа неактивного вікна
 Menu item text	Colors tab		Текст елемента меню
 LCD subpixel	AntialiasingSettingsView		Субпіксельне зглажування
 Selected menu item border	Colors tab		Межа виділеного елемента меню
-Strong	AntialiasingSettingsView		Сильне
+Strong	AntialiasingSettingsView		Сильно
 Panel text	Colors tab		Текст панелі
 Arrow style	DecorSettingsView		Стиль стрілок
 Monospaced fonts only	AntialiasingSettingsView		Тільки моноширинні шрифти

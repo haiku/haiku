@@ -1,15 +1,19 @@
-1	ukrainian	x-vnd.Be-PRNT	2279754695
+1	ukrainian	x-vnd.Be-PRNT	686411231
 Printer: %printer_name%\nDriver:  %driver%\n	TestPageView		Принтер: %printer_name%\nДрайвер: %driver%\n
 Waiting	JobListView		Очікування
 Print test page	PrintersWindow		Друк пробної сторінки
-page	JobListView		стор.
+ pending jobs	PrinterListView		 очікування завдань
+page	JobListView		сторінка
 Cancel	AddPrinterDialog		Відмінити
+Test page	PrintersWindow		Пробна сторінка
 Add printer	AddPrinterDialog		Додати принтер
 Green	TestPageView		Зелений
 Printers	PrintersWindow		Принтери
-Default Printer	PrinterListView		Принтер по замовчуванню
+Add…	PrintersWindow		Додати …
+No pending jobs	PrinterListView		Немає черги завдань.
+Default Printer	PrinterListView		Типовий принтер
 Transport: %transport% %transport_address%	PrinterListView		Транспорт: %transport% %transport_address%
-pages	JobListView		Стор.
+pages	JobListView		сторінки
 Printers	System name		Принтери
 Processing	JobListView		Виконання
 Red	TestPageView		Червоний
@@ -18,21 +22,23 @@ Driver: %driver%	PrinterListView		Драйвер: %driver%
 Black	TestPageView		Чорний
 Restart job	PrintersWindow		Перезапустити завдання
 Add	AddPrinterDialog		Додати
-Make default	PrintersWindow		Зробити по замовчуванню
+Make default	PrintersWindow		Зробити типовим
 Transport: %transport% %transport_address%	TestPageView		Транспорт: %transport% %transport_address%
 Cancel job	PrintersWindow		Відмінити завдання
 Yellow	TestPageView		Жовтий
 Blue	TestPageView		Синій
 Remove	PrintersWindow		Видалити
 <pick one>	AddPrinterDialog		<виберіть>
-Print jobs for 	PrintersWindow		Завдання на друк для
+Print jobs for 	PrintersWindow		Завдання на друк для 
 Failed	JobListView		Призупинено
 %.2f KB	JobListView		%.2f KB
-Magenta	TestPageView		Магента
+Magenta	TestPageView		Маджента
 Completed	JobListView		Завершено
 No printer found!	TransportMenu		Принтера не знайдено!
-Print jobs: No printer selected	PrintersWindow		Завдання на друк: Принтера не знайдено
+Print jobs: No printer selected	PrintersWindow		Завдання на друк: Принтер не вибрано
 Cyan	TestPageView		Голубий
 Unknown status	JobListView		Стан невідомий
+1 pending job	PrinterListView		1 завдання в черзі.
 Connected to:	AddPrinterDialog		Підключений до:
-Printer type:	AddPrinterDialog		Тип принтера:
+Printer type:	AddPrinterDialog		Підключений до:
+Test page	TestPageView		Пробна сторінка

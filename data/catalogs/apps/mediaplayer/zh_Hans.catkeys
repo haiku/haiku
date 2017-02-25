@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-MediaPlayer	2711018042
+1	english	x-vnd.Haiku-MediaPlayer	3099592804
 raw audio	MediaPlayer-InfoWin		原生音频
 Location	MediaPlayer-InfoWin		位置
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1（美式）
@@ -125,6 +125,7 @@ Copy Entry	MediaPlayer-CopyPLItemsCmd		复制条目
 none	Subtitles menu		无
 Move file to Trash	MediaPlayer-PlaylistWindow		移动文件到垃圾箱
 URI	MediaPlayer-Main		URI
+OK	MediaPlayer-NetworkStream		确定
 Mute	MediaPlayer-Main		静音
 Toggle pause/play.	MediaPlayer-Main		暂停/播放。
 min	MediaPlayer-InfoWin	Minutes	分
@@ -145,6 +146,7 @@ OK	MediaPlayer-PlaylistWindow		确定
 none	Audio track menu		无
 Gets/sets the volume (0.0-2.0).	MediaPlayer-Main		设置音量为（0.0-2.0）。
 Duration	MediaPlayer-Main		次数
+Cancel	MediaPlayer-NetworkStream		取消
 Playlist…	MediaPlayer-Main		播放列表...
 <unknown>	PlaylistItem-author		<未知>
 Save as…	MediaPlayer-PlaylistWindow		保存为...

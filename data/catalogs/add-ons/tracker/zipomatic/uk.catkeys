@@ -2,16 +2,16 @@
 Stop	file:ZipOMaticWindow.cpp		Зупинити
 Creating archive: %s	file:ZipOMaticWindow.cpp		Створення архіву: %s
 Continue	file:ZipOMaticWindow.cpp		Продовжити
-Preparing to archive	file:ZipperThread.cpp		Підготовка архіву
+Preparing to archive	file:ZipperThread.cpp		Підготовка до архівації
 Drop files here.	file:ZipOMaticWindow.cpp		Перенесіть файли сюди.
 Filename: %s	file:ZipOMaticWindow.cpp		Ім'я файлу: %s
 You have {0, plural, one{# Zip-O-Matic} other{# Zip-O-Matics}} running.\n\n	file:ZipOMatic.cpp		У вас {0, plural, one{запущена # копія} few{запущено # копії} other{запущено # копій}} Zip-O-Matic.\n
 Let them continue	file:ZipOMatic.cpp		Нехай це продовжується
-Do you want to stop them?	file:ZipOMatic.cpp		Ви хочете зупинити це?
-Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ви впевнені, що хочете зупинити створення цього архіву?
+Do you want to stop them?	file:ZipOMatic.cpp		Ви бажаєте зупинити це?
+Are you sure you want to stop creating this archive?	file:ZipOMaticWindow.cpp		Ви впевнені, що бажаєте зупинити створення цього архіву?
 Stopped	file:ZipOMaticWindow.cpp		Зупинено
 Archive	file:ZipperThread.cpp		Архів
 Error creating archive	file:ZipOMaticWindow.cpp		Помилка створення архіву
 {0, plural, one{# file added.} other{# files added.}}	file:ZipOMaticWindow.cpp		{0, plural, one{# файл додано.} other{# файлів додано.}}
-Archive created OK	file:ZipOMaticWindow.cpp		Архів успішно створений
+Archive created OK	file:ZipOMaticWindow.cpp		Архів успішно створено
 Stop them	file:ZipOMatic.cpp		Зупинити це

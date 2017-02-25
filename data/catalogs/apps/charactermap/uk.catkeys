@@ -29,7 +29,7 @@ Font	CharacterWindow		Шрифт
 Variation selectors supplement	UnicodeBlocks		Додаткові селектори варіантів написання
 Gujarati	UnicodeBlocks		Гуджараті
 Cuneiform	UnicodeBlocks		Клинопис
-CJK radicals supplement	UnicodeBlocks		Додаткові ієрогліфічні ключі CJK 
+CJK radicals supplement	UnicodeBlocks		Додаткові ієрогліфічні ключі CJK
 Balinese	UnicodeBlocks		Балінезійська
 Cham	UnicodeBlocks		Писемність Чам
 Specials	UnicodeBlocks		Спеціальні символи
@@ -84,7 +84,7 @@ Hiragana	UnicodeBlocks		Хірагана
 Tagalog	UnicodeBlocks		Тагальська
 Control pictures	UnicodeBlocks		Малюнки керування
 Variation selectors	UnicodeBlocks		Селектори варіантів
-Linear B syllabary	UnicodeBlocks		Лінійні склади B 
+Linear B syllabary	UnicodeBlocks		Лінійні склади B
 Buginese	UnicodeBlocks		Бугійська
 Bopomofo	UnicodeBlocks		Бопомофо
 Code	CharacterWindow		Код
@@ -126,7 +126,7 @@ Quit	CharacterWindow		Вихід
 Ancient symbols	UnicodeBlocks		Античні символи
 Braille patterns	UnicodeBlocks		Шрифт Брейля
 New Tai Lue	UnicodeBlocks		Новий тай лю
-Runic	UnicodeBlocks		Рунічна
+Runic	UnicodeBlocks		Рунічні
 Miscellaneous mathematical symbols B	UnicodeBlocks		Різні математичні символи В
 Cuneiform numbers and punctuation	UnicodeBlocks		Клинописні цифри і знаки пунктуації
 Private use area	UnicodeBlocks		Зона приватного використання
@@ -143,7 +143,7 @@ Thai	UnicodeBlocks		Тайська
 Deseret	UnicodeBlocks		Дезерет
 Tifinagh	UnicodeBlocks		Тіфінаг
 Gurmukhi	UnicodeBlocks		Гурмухі
-CharacterMap	System name		CharacterMap
+CharacterMap	System name		Мапа символів
 Lao	UnicodeBlocks		Лаоська
 Gothic	UnicodeBlocks		Готична
 Limbu	UnicodeBlocks		Лімбу

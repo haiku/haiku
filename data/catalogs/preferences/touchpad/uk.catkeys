@@ -3,9 +3,9 @@ Scrolling	TouchpadPrefView		Прокрутка
 Touchpad	System name		Тачпад
 Revert	TouchpadPrefView		Повернути
 Tapping	TouchpadPrefView		Торкання
-Please confirm	TouchpadPrefView		Підтвердьте
+Please confirm	TouchpadPrefView		Підтвердити
 Two finger scrolling	TouchpadPrefView		Прокрутка двома пальцями
-Defaults	TouchpadPrefView		За замовчуванням
+Defaults	TouchpadPrefView		Типово
 Slow	TouchpadPrefView		Повільно
 Vertical	TouchpadPrefView		Вертикальне
 High	TouchpadPrefView		Висока
@@ -13,7 +13,7 @@ Horizontal scrolling	TouchpadPrefView		Горизонтальна прокрут
 Fast	TouchpadPrefView		Швидко
 OK	TouchpadPrefView		Гаразд
 Acceleration	TouchpadPrefView		Прискорення
-The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Нова область прокручування дуже велика і може завадити працювати мишею. Ви дійсно хочете змінити її?
+The new scroll area is very large and may impede normal mouse operation. Do you really want to change it?	TouchpadPrefView		Нова область прокручування дуже велика і може завадити роботі мишею. Ви дійсно хочете змінити її?
 Horizontal	TouchpadPrefView		Горизонтальне
 Off	TouchpadPrefView		Низька
 Sensitivity	TouchpadPrefView		Чутливість

@@ -7,8 +7,8 @@ Write black-and-white images as RGB24	JPEG2000Translator		Записати чо�
 Output quality	JPEG2000Translator		Якість вихідних
 Read	JPEG2000Translator		Читати
 ©2002-2003, Shard\n©2005-2006, Haiku\n\nBased on JasPer library:\n© 1999-2000, Image Power, Inc. and\nthe University of British Columbia, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 codec was used as \"tutorial\".\n\thttp://www.imagemagick.org/\n	JPEG2000Translator		©2002-2003, Shard\n©2005-2006, Haiku\n\nБазоване на бібліотеці JasPer:\n© 1999-2000, Image Power, Inc. і\nуніверситету Британської Колумбії, Canada.\n© 2001-2003 Michael David Adams.\n\thttp://www.ece.uvic.ca/~mdadams/jasper/\n\nImageMagick's jp2 кодек був використаний як  \"tutorial\".\n\thttp://www.imagemagick.org/\n
-Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Be Bitmap Format (Перетворювач JPEG2000)
+Be Bitmap Format (JPEG2000Translator)	JPEG2000Translator		Формат растрових зображень Be (Перетворювач JPEG2000)
 Low	JPEG2000Translator		Низька
 About	JPEG2000Translator		Про
 High	JPEG2000Translator		Висока
-Read greyscale images as RGB32	JPEG2000Translator		Читати сірі зображення як RGB32
+Read greyscale images as RGB32	JPEG2000Translator		Читати зображення у відтінках сірого як RGB32

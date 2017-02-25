@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-DiskProbe	2944605311
-File offset: 	ProbeView		Зміщення файлу:
+File offset: 	ProbeView		Зміщення файлу: 
 %ld (native)	ProbeView		%ld (рідна)
 64 bit unsigned value:	TypeEditors		64-х бітне беззнакове значення:
 Find again	ProbeView		Знайти знову
@@ -13,7 +13,7 @@ Attribute	ProbeView		Атрибут
 Floating-point value:	TypeEditors		Значення з плаваючою комою:
 16 bit	TypeEditors		16 біт
 Attributes	ProbeView		Атрибути
-Device offset: 	ProbeView		Зміщення пристрою:
+Device offset: 	ProbeView		Зміщення пристрою: 
 Selection	ProbeView		Вибір
 DiskProbe	System name		DiskProbe
 what: '%.4s'\n\n	TypeEditors	'What' is a message specifier that defines the type of the message.	what: '%.4s'\n\n
@@ -23,17 +23,17 @@ Boolean	TypeEditors	This is the type of editor	Булевий
 Paste	ProbeView		Вставити
 PNG format	TypeEditors		PNG формат
 Font size	ProbeView		Розмір шрифту
-Attribute type: 	ProbeView		Тип атрибуту:
+Attribute type: 	ProbeView		Тип атрибуту: 
 Attribute	AttributeWindow		Атрибут
 8 bit signed value:	TypeEditors		8-ми бітне знакове значення
 Number:	TypeEditors		Номер:
 Save	ProbeView		Зберегти
 Stop	ProbeView		Зупинити
-Number editor	TypeEditors		Редактор номеру
+Number editor	TypeEditors		Числовий редактор
 Hex	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Шіснадцятковий
-No type editor available	AttributeWindow		Недоступний редактор номеру
+No type editor available	AttributeWindow		Недоступний редактор типу
 Double precision floating-point value:	TypeEditors		Значення з плаваючою комою подвійної точності
-Device: 	ProbeView		Пристрій:
+Device: 	ProbeView		Пристрій: 
 Do you really want to remove the attribute \"%s\" from the file \"%s\"?\n\nYou cannot undo this action.	AttributeWindow		Ви дійсно бажаєте видалити атрибут \"%s\" для файлу \"%s\"?\n\nЦя дія незворотня.
 Text	TypeEditors	This is the type of editor	Текст
 8 bit unsigned value:	TypeEditors		8-ми бітне беззнакове значення
@@ -49,7 +49,7 @@ Number	TypeEditors	This is the type of editor	Номер
 Decimal	ProbeView	A menu item, as short as possible, noun is recommended if it is shorter than adjective.	Десятковий
 16 bit signed value:	TypeEditors		16-ти бітне знакове значення:
 String editor	TypeEditors		Редактор рядків
-of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	з   0x0
+of 0x0	ProbeView	This is a part of 'Block 0xXXXX of 0x0026' message. In languages without 'of' structure it can be replaced simply with '/'.	з 0x0
 64 bit signed offset:	TypeEditors		64-бітне знакове зміщення
 Boolean editor	TypeEditors		Булевий редактор
 Copy	ProbeView		Копіювати
@@ -74,19 +74,19 @@ Raw editor	AttributeWindow		Raw редактор
 Message View	TypeEditors		Вид повідомлення
 DiskProbe request	ProbeView		Запит DiskProbe
 32 bit unsigned size:	TypeEditors		32-х бітний беззнаковий розмір
-Flattened bitmap	TypeEditors		Плаский образ
+Flattened bitmap	TypeEditors		Зведене растрове зображення
 Open file…	FileWindow		Відкрити файл…
 Next	ProbeView		Наступне
 Close	FileWindow		Закрити
 Attribute: 	ProbeView		Атрибут:
-Remove from file	AttributeWindow		Видалити для файлу
+Remove from file	AttributeWindow		Видалити з файла
 Don't save	ProbeView		Не зберігати
 Previous	ProbeView		Попереднє
 64 bit signed value:	TypeEditors		64-х бітна знакова величина:
 Icon	TypeEditors		Іконка
 Block: 	ProbeView		Блок:
 Examine device:	OpenWindow		Перевірка пристрою:
-Offset: 	ProbeView		Зміщення:
+Offset: 	ProbeView		Зміщення: 
 OK	ProbeView		Гаразд
 Add	ProbeView		Додати
 Edit	ProbeView		Редагувати
@@ -116,13 +116,13 @@ Mode:	FindWindow		Режим:
 Open device	FileWindow		Відкрити пристрій
 Could not find search string.	ProbeView		Неможливо знайти запитаний рядок.
 16 bit unsigned value:	TypeEditors		16-ти бітна беззнакова величина:
-Attribute offset: 	ProbeView		Зміщення атрибуту:
+Attribute offset: 	ProbeView		Зміщення атрибуту: 
 View	ProbeView	This is the last menubar item 'File Edit Block View'	Перегляд
 Redo	ProbeView		Відмінити відміну
-File: 	ProbeView		Файл:
+File: 	ProbeView		Файл: 
 32 bit unsigned pointer:	TypeEditors		32-х бітний беззнаковий вказівник:
 of 	ProbeView		з
-Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Запис до файлу зупинено:\n%s\n\nКоли Ви вийдете зміни не збережуться.
+Writing to the file failed:\n%s\n\nAll changes will be lost when you quit.	ProbeView		Запис до файлу зупинено:\n%s\n\nВсі зміни будуть втрачені при виході.
 32 bit	TypeEditors		32 біти
 Cancel	ProbeView		Відмінити
 Swapped: 0x%0*Lx	ProbeView		Перевернутий: 0x%0*Lx

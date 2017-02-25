@@ -8,7 +8,7 @@ File expanded	ExpanderWindow		Розпаковка файлу
 The destination is read only.	ExpanderWindow		Ціль тільки для читання.
 Expander: Open	ExpanderWindow		Expander: Відкрити
  is not supported	ExpanderWindow		 не підтримується
-Expander settings	ExpanderPreferences		Настройки Розпаковувача
+Expander settings	ExpanderPreferences		Налаштування Розпаковувача
 Select current	DirectoryFilePanel		Вибрати поточний
 Source	ExpanderWindow		Джерело
 Error when expanding archive	ExpanderWindow		Помилка при розпаковці архіва
@@ -18,7 +18,7 @@ Automatically expand files	ExpanderPreferences		Автоматично розп�
 Continue	ExpanderWindow		Продовжити
 Destination folder	ExpanderPreferences		Папка призначення
 Other	ExpanderPreferences		Інше
-Cancel	ExpanderPreferences		Відміна
+Cancel	ExpanderPreferences		Відмінити
 Expansion	ExpanderPreferences		Розширення
 Are you sure you want to stop expanding this\narchive? The expanded items may not be complete.	ExpanderWindow		Ви впевнені, що хочете зупинити розпаковку цього архіва? Розпаковка елементів може бути неповною.
 Select	DirectoryFilePanel		Вибрати
@@ -31,21 +31,21 @@ Select	ExpanderPreferences		Вибрати
 Show contents	ExpanderWindow		Показати вміст
 Automatically show contents listing	ExpanderPreferences		Автоматично показувати список вмісту
 OK	ExpanderPreferences		Гаразд
-Leave destination folder path empty	ExpanderPreferences		Зберегти шлях папки призначення пустим
-Failed to create the destination folder.	ExpanderWindow		Не вдалося створити папку призначення.
+Leave destination folder path empty	ExpanderPreferences		Зберегти шлях теки призначення пустим
+Failed to create the destination folder.	ExpanderWindow		Не вдалося створити теку призначення.
 Select '%s'…	DirectoryFilePanel		Вибрати '%s'…
 Create	ExpanderWindow		Створити
-The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Папка була переіменована, видалена або не\nпідтримується.
+The folder was either moved, renamed or not\nsupported.	ExpanderWindow		Тека була переіменована, видалена або не\nпідтримується.
 The file doesn't exist	ExpanderWindow		Файл відсутній
 Stop	ExpanderMenu		Зупинити
 File	ExpanderMenu		Файл
-Expander	System name		Expander
+Expander	System name		Розпаковувач
 Expand	ExpanderWindow		Розпакувати
 Close	ExpanderMenu		Закрити
-The destination is not a folder.	ExpanderWindow		Ціль не є папкою.
-Open destination folder after extraction	ExpanderPreferences		Відкрити папку призначення після розтиску
+The destination is not a folder.	ExpanderWindow		Ціль не є текою.
+Open destination folder after extraction	ExpanderPreferences		Відкрити теку призначення після розпаковки
 Creating listing for '%s'…	ExpanderWindow		Створення списку для '%s'…
 Set source…	ExpanderMenu		Встановити джерело…
 Show contents	ExpanderMenu		Показати вміст
 Stop	ExpanderWindow		Зупинити
-Destination	ExpanderWindow		Папка призначення
+Destination	ExpanderWindow		Тека призначення

@@ -11,11 +11,11 @@ Error loading a file	MediaConverter		Помилка завантаження ф�
 Error read video frame %lld	MediaConverter		Помилка читання відеокадру %lld
 File Error	MediaConverter-FileInfo		Помилка файлу
 Open…	Menu		Відкрити…
-Start [ms]: 	MediaConverter		Початок [ms]:
+Start [ms]: 	MediaConverter		Початок [ms]: 
 Output file '%filename' created	MediaConverter		Вихідний файл '%filename' створено
 Output format	MediaConverter		Формат виходу
-End   [ms]: 	MediaConverter		Кінець [ms]:
-MediaConverter	System name		MediaConverter
+End   [ms]: 	MediaConverter		Кінець [ms]: 
+MediaConverter	System name		Медіаконвертор
 No video	Video codecs list		Немає відео
 Duration:	MediaConverter-FileInfo		Тривалість:
 OK	MediaConverter		Гаразд
@@ -37,11 +37,11 @@ Cancel	MediaConverter		Відмінити
 None available	Video codecs		Недоступний
 Conversion cancelled	MediaConverter		Конверсію відмінено
 No file selected	MediaConverter-FileInfo		Файлу не вибрано
-Select this folder	MediaConverter		Вибрати цю папку
+Select this folder	MediaConverter		Вибрати цю теку
 Continue	MediaConverter		Продовжити
 Encoder parameters	MediaConverter-EncoderWindow		Параметри декодера
 Video:	MediaConverter-FileInfo		Відео:
-%d bit 	MediaFileInfo		%d біт
+%d bit 	MediaFileInfo		%d біт 
 Error creating '%filename'	MediaConverter		Помилка створення '%filename'
 Video quality not supported	MediaConverter		Якість відео не підтримується
 Cancelling…	MediaConverter		Відміна…
@@ -64,6 +64,6 @@ Convert	MediaConverter		Перетворити
 Writing audio track: %ld%% complete	MediaConverter		Запис звукового треку: %ld%% завершено
 Video quality: %3d%%	MediaConverter		Якість відео: %3d%%
 %.1f kHz %ld channel	MediaFileInfo		%.1f kHz %ld канал
-Output folder	MediaConverter		Вихідна папка
+Output folder	MediaConverter		Вихідна тека
 Audio quality: %3d%%	MediaConverter		Якість звуку: %3d%%
-An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Сталася помилка при зчитуванні даних про файл.\n\nПомилка :
+An error has occurred reading the file info.\n\nError : 	MediaConverter-FileInfo		Сталася помилка при зчитуванні даних про файл.\n\nПомилка : 

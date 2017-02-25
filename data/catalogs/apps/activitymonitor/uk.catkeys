@@ -11,7 +11,7 @@ CPU usage (combined)	DataSource		Використання СPU (загальне
 CPU	DataSource		CPU
 Used memory	DataSource		Використана пам'ять
 Cached memory	DataSource		Кешована пам'ять
-Apps	DataSource		Додатки
+Apps	DataSource		Програми
 Show legend	ActivityView		Показати легенду
 Text clipboard	DataSource		Буфер обміну тексту
 Settings	ActivityWindow		Налаштування
@@ -33,12 +33,12 @@ CPU usage	DataSource		Використання CPU
 Raw clipboard	DataSource		Буфер обміну
 Sems	DataSource		Сімс
 %.1f MiB	DataSource		%.1f МіБ
-ActivityMonitor	System name		ActivityMonitor
+ActivityMonitor	System name		Монітор активності
 Running applications	DataSource		Запущені додатки
-Semaphores	DataSource		Запущені додатки
+Semaphores	DataSource		Семафори
 Block cache	DataSource		Кеш блоку
-Swap space	DataSource		Розмір підкачки
-Swap	DataSource		Підкачка
+Swap space	DataSource		Розмір файлу підкачки
+Swap	DataSource		Файл підкачки
 File	ActivityWindow		Файл
 usage	DataSource		використання
 Additional items	ActivityView		Додаткові елементи

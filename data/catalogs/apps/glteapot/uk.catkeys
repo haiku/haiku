@@ -15,7 +15,7 @@ Backface culling	TeapotWindow		Усунути тло
 Z-buffered	TeapotWindow		Z-буферизація
 File	TeapotWindow		Файл
 Perspective	TeapotWindow		Перспектива
-GLTeapot	System name		GLTeapot
+GLTeapot	System name		Чайник GL
 Green	TeapotWindow		Зелений
 Right	TeapotWindow		Вправо
 FPS display	TeapotWindow		Показати FPS

@@ -51,16 +51,16 @@ Logging	PoorMan		Реєстрація
 A default web folder has been created at \"/boot/home/public_html.\"\nMake sure there is a HTML file named \"index.html\" in that folder.	PoorMan		Стандартна веб тека була створена в \"/boot/home/public_html.\"\n Перевірте чи присутній файл HTML під назвою \"index.html\" в цій теці.
 Clear log file	PoorMan		Очистити лог файл
 Log file name:	PoorMan		Ім'я лог файлу:
-Directory: 	PoorMan		Тека:
+Directory: 	PoorMan		Тека: 
 Log To File	PoorMan		Лог в файл
 Done	PoorMan		Виконано
-Create log file	PoorMan		Очистити лог файл 
-Starting up... 	PoorMan		Запускаєтся…
+Create log file	PoorMan		Очистити лог файл
+Starting up... 	PoorMan		Запускаєтся… 
 Site	PoorMan		Сайт
 Cancel	PoorMan		Відмінити
-Console logging	PoorMan		Логування в консоль
+Console logging	PoorMan		Консоль логування
 Cannot start the server	PoorMan		Не вдалося запустити сервер
 Select	PoorMan		Вибрати
 Save console as…	PoorMan		Зберегти консоль як…
 PoorMan	System name		PoorMan
-Console Logging	PoorMan		Консоль реєстрації
+Console Logging	PoorMan		Консоль логування

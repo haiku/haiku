@@ -1,15 +1,15 @@
 1	ukrainian	x-vnd.Haiku-BluetoothPrefs	145165464
-About Bluetooth…	Window		Про Bluetooth…
+About Bluetooth…	Window		Про Блютуз…
 Handheld	Settings view		Переносний
-Default inquiry time:	Settings view		Час запиту по замовчуванню:
+Default inquiry time:	Settings view		Час запиту типовий:
 Manufacturer: 	Device View		Виробник:
 Add device to list	Inquiry panel		Додати прилад до списку
 Starting scan...	Inquiry panel		Початок сканування…
 Smart phone	Settings view		Смартфон
-With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		За підтримку:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nДякуємо особам що допомагали...\n\nЗа подароване і куплене залізо:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nФінансово:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nЗ латками:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nТестування:\n- Petter H. Juliussen\nТим хто дав мені знання:\n- the yellowTAB team
+With support of:\n - Mika Lindqvist\n - Adrien Destugues\n - Maksym Yevmenkin\n\nThanks to the individuals who helped...\n\nShipping/donating hardware:\n - Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n - Edwin Erik Amsler\n - Dennis d'Entremont\n - Luroh\n - Pieter Panman\n\nEconomically:\n - Karl vom Dorff, Andrea Bernardi (OSDrawer),\n - Matt M, Doug F, Hubert H,\n - Sebastian B, Andrew M, Jared E,\n - Frederik H, Tom S, Ferry B,\n - Greg G, David F, Richard S, Martin W:\n\nWith patches:\n - Michael Weirauch\n - Fredrik Ekdahl\n - Raynald Lesieur\n - Andreas Färber\n - Joerg Meyer\nTesting:\n - Petter H. Juliussen\nWho gave me all the knowledge:\n - the yellowTAB team	main		За підтримки:\n- Mika Lindqvist\n- Adrien Destugues\n- Maksym Yevmenkin\n\nДякуємо особам що допомагали...\n\nЗа подароване і куплене залізо:\n- Henry Jair Abril Florez (el Colombian)\n\t& Stefanie Bartolich\n- Edwin Erik Amsler\n- Dennis d'Entremont\n- Luroh\n- Pieter Panman\n\nФінансово:\n- Karl vom Dorff, Andrea Bernardi (OSDrawer),\n- Matt M, Doug F, Hubert H,\n- Sebastian B, Andrew M, Jared E,\n- Frederik H, Tom S, Ferry B,\n- Greg G, David F, Richard S, Martin W:\n\nЗ латками:\n- Michael Weirauch\n- Fredrik Ekdahl\n- Raynald Lesieur\n- Andreas Färber\n- Joerg Meyer\nТестування:\n- Petter H. Juliussen\nТим хто дав мені знання:\n- the yellowTAB team
 Server	Settings view		Сервер
-Stop bluetooth services…	Window		Зупинити служби Bluetooth…
-The Bluetooth services are not currently running on this system.	main		Сервіс Bluetooth все ще не запущений у системі.
+Stop bluetooth services…	Window		Зупинити служби Блютуз…
+The Bluetooth services are not currently running on this system.	main		Служби Блютуз все ще не запущені у системі.
 Identify host as:	Settings view		Визначити хост як:
 Refresh…	Remote devices		Обновити…
 Pair…	Remote devices		Пара…
@@ -24,16 +24,16 @@ Launch now	main		Увімкнути
 Remove	Remote devices		Видалити
 Quit	main		Вийти
 15 secs	Settings view		15 сек
-Start bluetooth services…	Window		Запуск служб Bluetooth…
+Start bluetooth services…	Window		Запуск служб Блютуз…
 Policy...	Settings view		Правило...
 61 secs	Settings view		61 сек
-There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		В системі не зареєстровано жодного пристрою Bluetooth.
+There isn't any Bluetooth LocalDevice registered on the system.	Inquiry panel		В системі не зареєстровано жодного пристрою Блютуз.
 Identify us as...	Settings view		Визначити нас як…
  packets: 	Device View		 пакетів: 
 As blocked	Remote devices		Як заблокований
-Bluetooth	System name		Bluetooth
+Bluetooth	System name		Блютуз
 Disconnect	Remote devices		Роз’єднати
-Defaults	Window		По замовчуванню
+Defaults	Window		Типово
 Inquiry	Inquiry panel		Запит
 Desktop	Settings view		Робочий стіл
 Revert	Window		Повернути
@@ -46,7 +46,7 @@ Only from trusted devices	Settings view		Тільки для перевірен�
 Scanning progress	Inquiry panel		Хід сканування
 Always ask	Settings view		Завжди питати
 Retrieving name of %1	Inquiry panel		Відновлення імені %1
-Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Переконайтесь, що функція Bluetooth віддаленого пристрою активована. Натисніть 'Запит' для початку сканування. Час для отримання імен не повинен перевищувати 3 секунди. Після цього ви зможете додати їх до головного списку, де потім з’єднуватися з ними.
+Check that the Bluetooth capabilities of your remote device are activated. Press 'Inquiry' to start scanning. The needed time for the retrieval of the names is unknown, although should not take more than 3 seconds per device. Afterwards you will be able to add them to your main list, where you will be able to pair with them.	Inquiry panel		Переконайтесь, що функція Блютуз віддаленого пристрою активована. Натисніть 'Запит' для початку сканування. Час для отримання імен не повинен перевищувати 3 секунди. Після цього ви зможете додати їх до головного списку, де потім з’єднуватися з ними.
 Authenticate	Extended local device view		Справдити
 Refresh local devices…	Window		Обновлення локальних пристроїв…
 Pick device...	Settings view		Вибрати пристрій...

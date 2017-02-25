@@ -56,7 +56,7 @@ Manufacturer:	Device		Виробник:
 ACPI bus	DevicesView		Шина ACPI
 Changer	DeviceSCSI		Перемикач
 ACPI System Bus	DeviceACPI		Шина системи ACPI
-Devices	System name		Devices
+Devices	System name		Пристрої
 Worm	DeviceSCSI		Хробак
 Multimedia controller	Device		Контроллер мультимедіа
 Unknown	DevicePCI		Невідомий

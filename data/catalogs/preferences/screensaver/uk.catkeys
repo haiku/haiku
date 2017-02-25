@@ -2,27 +2,27 @@
 Could not load screen saver	ScreenSaver		Не вдалося загрузити зберігач
 30 seconds	ScreenSaver		30 секунд
 Start screensaver	ScreenSaver		Запустити зберігач
-Password…	ScreenSaver		Пароль…
-Password:	ScreenSaver		Пароль:
-Password lock	ScreenSaver		Використати пароль
+Password…	ScreenSaver		Гасло…
+Password:	ScreenSaver		Гасло:
+Password lock	ScreenSaver		Гасло блокування:
 Screensavers	ScreenSaver		Зберігачі екрану
 Display Power Management Signaling not available	ScreenSaver		Display Power Management Signaling not available
 ScreenSaver	System name		Зберігач екрану
 Test	ScreenSaver		Тест
 General	ScreenSaver		Основний
-Fade now when mouse is here	ScreenSaver		Увімкнути заставку коли курсор знаходиться тут
-Enable screensaver	ScreenSaver		Використати зберігач
-Don't fade when mouse is here	ScreenSaver		Не вмикати заставку коли курсор знаходиться тут
+Fade now when mouse is here	ScreenSaver		Зникнути зараз коли курсор знаходиться тут
+Enable screensaver	ScreenSaver		Увімкнути зберігач
+Don't fade when mouse is here	ScreenSaver		Не зникати коли курсор знаходиться тут
 Cancel	ScreenSaver		Відмінити
 Turn off screen	ScreenSaver		Вимкнути екран
 No options available	ScreenSaver		Опції недоступні
-Password Window	ScreenSaver		Вікно паролю
-Screensaver settings	ScreenSaver		Настройки зберігача
-Passwords don't match. Please try again.	ScreenSaver		Пароль не збігаєтся. Будь ласка, спробуйте ще раз.
+Password Window	ScreenSaver		Вікно гасла
+Screensaver settings	ScreenSaver		Налаштування зберігача
+Passwords don't match. Please try again.	ScreenSaver		Гасла не збігаються. Будь ласка, спробуйте знову.
 OK	ScreenSaver		Гаразд
-Blackness	ScreenSaver		Чорнота
-Use custom password	ScreenSaver		Використовувати пароль користувача
+Blackness	ScreenSaver		Темнота
+Use custom password	ScreenSaver		Використовувати гасло користувача
 Done	ScreenSaver		Готово
-Confirm password:	ScreenSaver		Підтвердіть пароль:
+Confirm password:	ScreenSaver		Підтвердіть гасло:
 No preview available	PreviewView		Попередній перегляд неможливий
-Use network password	ScreenSaver		Використовувати мережевий пароль
+Use network password	ScreenSaver		Використати мережеве гасло

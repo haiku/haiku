@@ -20,7 +20,7 @@ Done	PackageInstall		Зроблено
 All existing files will be replaced?	PackageView		Замінити всі наявні файли?
 Preparing package	PackageInstall		Підготовка пакунка
 No package available.	PackageInfo		Пакунок недоступний.
-none	PackageView		жоден
+none	PackageView		жодного
 Install %name%	PackageView		Встановити %name%
 Stop	PackageStatus		Зупинити
 Other…	PackageView		Інший...
@@ -51,11 +51,11 @@ Continue	PackageInfo		Продовжити
 %index% of %total%	PackageInstall		%index% з %total%
 The package you selected has been successfully removed from your system.	UninstallView		Вибраний пакет успішно видалений з вашої системи.
 Abort	PackageInfo		Перервати
-PackageInstaller	System name		PackageInstaller
+PackageInstaller	System name		Встановлювач пакунків
 Abort	PackageInstall		Перервати
 %name% (%size%)	PackageView		%name% (%size%)
 Continue	PackageTextViewer		Продовжити
-Begin	PackageView		Встановити
+Begin	PackageView		Почати
 OK	UninstallView		Гаразд
 The symbolic link named '%s' already exists in the given path.\nReplace the link with the one from this package or skip it?	PackageView		Символічне посилання з іменем '%s' повністю присутнє в отриманому шляху.\nЗамініть посилання таким же з пакету або пропустіть його?
 The selected package was not removed from your system. The given installed package information file might have been corrupted.	UninstallView		Вибраний пакет неможливо видалити з системи. Інформаційний файл встановленого пакету ймовірно може бути пошкодженим.

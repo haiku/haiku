@@ -11,11 +11,11 @@ Get info…	Menus		Інформація…
 OK	SaveToFile		Гаразд
 Previous page	Menus		Попередня сторінка
 View	Menus		Вигляд
-Full screen	Menus		У повний екран
+Full screen	Menus		Повноекранний режим
 Go to page	Menus		Перейти до сторінки
 Zoom out	Menus		Зменшення
 Quit	Menus		Вийти
-Rotate counterclockwise	Menus		Обертати проти год. стрілки
+Rotate counterclockwise	Menus		Обертати проти годинниковоі стрілки
 High-quality zooming	Menus		Високоякісне збільшення
 Browse	Menus		Переглянути
 Edit	Menus		Редагувати
@@ -34,7 +34,7 @@ Open…	Menus		Відкрити…
 Next file	Menus		Наступний файл
 Clear selection	Menus		Очистити вибір
 Close document	ClosePrompt		Закрити документ
-Height: 	PrintOptionsWindow		Висота:
+Height: 	PrintOptionsWindow		Висота: 
 The file '%s' could not be written.	SaveToFile		Файл '%s' не може бути записаний.
 Cancel	ClosePrompt		Відмінити
 Show tool bar	Menus		Показати панель інструментів
@@ -53,7 +53,7 @@ Select all	Menus		Вибрати все
 Zoom factor in %:	PrintOptionsWindow		Масштаб зображення %:
 Width:	PrintOptionsWindow		Ширина:
 Image	Menus		Зображення
-Move to Trash	Menus		Перемістити в кошик
+Move to Trash	Menus		Перемістити у Кошик
 OK	Alerts		Гаразд
 Rotate clockwise	Menus		Поворот за годинниковою стрілкою
 Job setup	PrintOptionsWindow		Налаштування завдання

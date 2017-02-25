@@ -25,9 +25,9 @@ OK	AboutWindow		Гаразд
 OK	ZombieReplicantView		Гаразд
 Print Server is not responding.	PrintJob		Принт сервер недоступний.
 Paste	TextView		Вставити
-Special Thanks:	AboutWindow		Особлива подяка
+Special Thanks:	AboutWindow		Особлива подяка:
 %.2f TiB	StringForSize		%.2f TiB
-Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити додаток для репліканту. Не знайдено сигнатуру додатку.\n%error
+Cannot locate the application for the replicant. No application signature supplied.\n%error	ZombieReplicantView		Неможливо визначити програму для репліканта. Не знайдено підпису програми.\n%error
 Redo	TextView		Відмінити відміну
 <empty>	Menu		<пусто>
 Warning	Dragger		Увага
@@ -39,4 +39,4 @@ development	AboutWindow		розробка
 Error	ZombieReplicantView		Помилка
 Blue:	ColorControl		Синій:
 gold master	AboutWindow		золотий майстер
-Can't delete this replicant from its original application. Life goes on.	Dragger		Неможливо видалити реплікант з рідного додатку. Життя продовжується.
+Can't delete this replicant from its original application. Life goes on.	Dragger		Неможливо видалити реплікант з рідної прграми. Життя продовжується.

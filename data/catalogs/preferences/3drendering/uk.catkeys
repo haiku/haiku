@@ -15,7 +15,7 @@ Model stack size:	Capabilities		Розмір стека моделі:
 Projection stack size:	Capabilities		Розмір стека проекції:
 Max. lights:	Capabilities		Максимальна кількість джерел світла:
 Max. 2D texture size:	Capabilities		Максимальний розмір 2D текстур:
-Max. convolution:	Capabilities		Максимальний оборот:
+Max. convolution:	Capabilities		Максимальне звертання:
 GLUT API version:	InfoView		Версія GLUT API:
 Texture stack size:	Capabilities		Розмір стека текстури:
 Max. evaluators equation order:	Capabilities		Максимальний оціночний блок команд:

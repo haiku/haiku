@@ -2,21 +2,21 @@
 Compression method:	ConfigView		Метод стискання:
 WebP image translator	ConfigView		Перетворювач зображень WebP
 Based on libwebp v0.1,	ConfigView		На основі libwebp v0.1,
-Preset	ConfigView		Набір параметрів
+Preset	ConfigView		Попередньо встановлене
 WebP images	WebPTranslator		Зображення WebP
-WebPTranslator Settings	ConfigView		Настройки перетворювача WebP
+WebPTranslator Settings	ConfigView		Налаштування перетворювача WebP
 Output quality:	ConfigView		Якість виведення:
-WebP Settings	main		Параметри WebP
+WebP Settings	main		Налаштування WebP
 Text	ConfigView		Текст
 Slower but better	ConfigView		Повільніше, але краще
 WebP image	WebPTranslator		Зображення WebP
 ©2010-2011 Haiku Inc.	ConfigView		©2010-2011 Haiku Inc.
-Output preset:	ConfigView		Параметри виведення:
+Output preset:	ConfigView		Попередньо встановлений вихід:
 Picture	ConfigView		Картинка
 Low	ConfigView		Низький
 High	ConfigView		Високий
 Drawing	ConfigView		Малюнок
-Default	ConfigView		По замовчуванню
+Default	ConfigView		Типово
 Fast	ConfigView		Швидко
 Photo	ConfigView		Фото
 Preprocessing filter	ConfigView		Фільтр попередньої обробки

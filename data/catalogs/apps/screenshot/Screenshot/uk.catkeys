@@ -2,7 +2,7 @@
 seconds	ScreenshotWindow		секунд
 Desktop	ScreenshotWindow		Робочий стіл
 Include window border	ScreenshotWindow		Включаючи межу вікна
-Screenshot	System name		Screenshot
+Screenshot	System name		Знімок екрану
 Select	ScreenshotWindow		Вибрати
 The destination path exists but is not a folder.	ScreenshotWindow		Шлях по замовчуванню присутній але це не тека.
 Capture active window	ScreenshotWindow		Захопити активне вікно

@@ -1,2 +1,7 @@
-1	english	x-vnd.Haiku-Mandelbrot	1153122361
+1	english	x-vnd.Haiku-Mandelbrot	149022624
+File	MandelbrotWindow		文件
+Palette	MandelbrotWindow		画板
+Mandelbrot	MandelbrotWindow		分形图形
+Quit	MandelbrotWindow		退出
+Iterations	MandelbrotWindow		迭代次数
 Mandelbrot	System name		分形图形

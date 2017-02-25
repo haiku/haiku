@@ -1,30 +1,30 @@
 1	ukrainian	x-vnd.Haiku-Shortcuts	102336796
 OK	ShortcutsWindow		Гаразд
-Shortcuts wasn't able to save your keyset.	ShortcutsWindow		не вдалося створити список горячих клавіш.
+Shortcuts wasn't able to save your keyset.	ShortcutsWindow		Гарячим клавішам невдалося зберегти ваші установки.
 Cancel	ShortcutsWindow		Відмінити
-Append KeySet…	ShortcutsWindow		Додати список горячих клавіш…
-Control	ShortcutsSpec	Name for modifier on keyboard	Ctrl
+Append KeySet…	ShortcutsWindow		Додати список гарячих клавіш…
+Control	ShortcutsSpec	Name for modifier on keyboard	Керування
 Key	ShortcutsWindow		Клавіша
 Open KeySet…	ShortcutsWindow		Відкрити список горячих клавіш…
-Error, NULL state description?	ShortcutsSpec		Помилка, NULL опису стану?
+Error, NULL state description?	ShortcutsSpec		Помилка, нульовий опису стану?
 Revert to saved	ShortcutsWindow		Повернутися до збереження
 Alt	ShortcutsSpec	Name for modifier on keyboard	Alt
 *InsertString \"Your Text Here\"	ShortcutsWindow		*Вставити Рядок \"Ваш текст тут\"
 *MouseUp	ShortcutsWindow		*Мишку вгору
-(Choose application with file requester)	ShortcutsWindow		(Виберіть програму з файлами запису)
+(Choose application with file requester)	ShortcutsWindow		(Виберіть додаток з запиту файла)
 *LaunchHandler text/html	ShortcutsWindow		*Запустити обробник текст/html
-Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Не вдалося відкрити список гарячих клавіш!
+Shortcuts was couldn't open your KeySet file!	ShortcutsWindow		Гарячим клавішам не вдалося відкрити список!
 *Multi \"*MoveMouseTo 100% 0\" \"*MouseButton 1\"	ShortcutsWindow		*Багато \"*Перемістити мишку до 100% 0\" \"*Кнопка мишки1\"
 Option	ShortcutsSpec	Name for modifier on keyboard	Параметр
 Save	ShortcutsWindow		Зберегти
 *MouseButton 1	ShortcutsWindow		*Кнопка мишки 1
 *MoveMouse +20 +0	ShortcutsWindow		*Переміщення мишки +20 +0
 Save changes before closing?	ShortcutsWindow		Зберегти зміни перед закриттям?
-Remove selected shortcut	ShortcutsWindow		Видалити вибрану горячу клавішу
-Add new shortcut	ShortcutsWindow		Додати нову горячу клавішу
+Remove selected shortcut	ShortcutsWindow		Видалити вибрану гарячу клавішу
+Add new shortcut	ShortcutsWindow		Додати нову гарячу клавішу
 Save & apply	ShortcutsWindow		Зберегти і використати
 *SendMessage application/x-vnd.Be-TRAK 'Tfnd'	ShortcutsWindow		*Відправити повідомлення додатку/x-vnd.Be-TRAK 'Tfnd'
-Append	ShortcutsWindow		Сумістити
+Append	ShortcutsWindow		Приєднати
 File	ShortcutsWindow		Файл
 Quit	ShortcutsWindow		Вийти
 *MouseDown	ShortcutsWindow		*Мишку вниз
@@ -35,8 +35,8 @@ Shift	ShortcutsSpec	Name for modifier on keyboard	Shift
 *MoveMouseTo 50% 50%	ShortcutsWindow		*Переміщення мишки в 50% 50%
 Save KeySet as…	ShortcutsWindow		Зберегти список як…
 Open	ShortcutsWindow		Відкрити
-Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Ярлику невдалось розібрати ваш файл Ключів!
+Shortcuts was unable to parse your KeySet file!	ShortcutsWindow		Гарячим клавішам не вдалось розібратись у вашому файлі списку!
 Select	ShortcutsWindow		Вибрати
-Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Не вдалося зберегти ваш файл список горячих клавіш!
+Shortcuts was unable to save your KeySet file!	ShortcutsWindow		Горячим клавішам не вдалось зберегти ваш файл список!
 Oh no	ShortcutsWindow		О ні
 Shortcuts	System name		Гарячі клавіші

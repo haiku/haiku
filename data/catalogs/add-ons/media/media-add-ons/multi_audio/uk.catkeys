@@ -3,28 +3,28 @@ Master	MultiAudio		Головний
 SPDIF	MultiAudio		SPDIF
 Gain	MultiAudio		Гучність
 Output 3D center	MultiAudio		Центр 3D вихода
-Extended Setup	MultiAudio		Розширене налаштування
+Extended Setup	MultiAudio		Розширені налаштування
 CD	MultiAudio		CD
-Tone control	MultiAudio		Керування тоном
+Tone control	MultiAudio		Регулятор тембру
 Phone	MultiAudio		Телефон
-Aux	MultiAudio		Додатковий
+Aux	MultiAudio		Лінійний вхід
 Output bass	MultiAudio		Вихід басів
 Headphones	MultiAudio		Навушники
 Beep	MultiAudio		Сигнал
-Output mono mix	MultiAudio		Вихід моно мікс
-Output stereo mix	MultiAudio		Вихід стерео мікс
+Output mono mix	MultiAudio		Змішування виходу моно
+Output stereo mix	MultiAudio		Змішування виходу стерео
 Input	MultiAudio		Вхід
 Output treble	MultiAudio		Вихід високих
-Mono mix	MultiAudio		Моно міксування
+Mono mix	MultiAudio		Змішування моно
 General	MultiAudio		Загальні
 Input & Output	MultiAudio		Вхід і Вихід
 Enhanced Setup	MultiAudio		Розширені налаштування
-Stereo mix	MultiAudio		Стерео міксування
-Output 3D depth	MultiAudio		Вихід 3D глибини
+Stereo mix	MultiAudio		Змішування стерео
+Output 3D depth	MultiAudio		Глибина 3D виходу 
 Volume	MultiAudio		Гучність
 Output	MultiAudio		Вихід
 Video	MultiAudio		Відео
-Line	MultiAudio		Лінія
+Line	MultiAudio		Лінійний
 Mic	MultiAudio		Мікрофон
  frequency:	MultiAudio		 частота:
 Enable	MultiAudio		Увімкнути

@@ -1,5 +1,5 @@
 1	ukrainian	x-vnd.Haiku-StyledEdit	727465241
-StyledEdit	System name		StyledEdit
+StyledEdit	System name		Редактор тексту
 This file is marked read-only. Save changes to the document \"%s\"? 	SaveAlert		Цей файл помічений тільки для читання. Зберегти зміни в документі \"%s\"? 
 Paste	Menus		Вставити
 OK	LoadAlert		Гаразд
@@ -59,7 +59,7 @@ OK	Statistics		Гаразд
 New	Menus		Новий
 Wrap-around search	FindandReplaceWindow		Шукати по всьому документу
 Bold	Menus		Товстий
-Find selection	Menus		Знайти  вибране
+Find selection	Menus		Знайти вибране
 Find:	FindandReplaceWindow		Знайти:
 Error saving \"%s\":\n%s	SaveAlert		Помилка збереження \"%s\":\n%s
 Copy	Menus		Копіювати
@@ -72,7 +72,7 @@ Find…	Menus		Знайти…
 Select all	Menus		Вибрати все
 Don't save	SaveAlert		Не зберігати
 Recover	NodeMonitorAlerts		Відновити
-Error loading \"%s\":\n\t%s	LoadAlert		Помилка загрузки \"%s\":\n\t%s
+Error loading \"%s\":\n\t%s	LoadAlert		Помилка завантаження \"%s\":\n\t%s
 Ignore	NodeMonitorAlerts		Ігнорувати
 Read-only	StatusView		Тільки читання
 Undo typing	QuitAlert		Відміна друку

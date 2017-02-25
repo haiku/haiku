@@ -2,7 +2,7 @@
 Websafe	GIFView		Придатний для Web
 Write interlaced images	GIFView		Записати зображення, що переплітаються
 Optimal	GIFView		Оптимальний
-Greyscale	GIFView		Сірий
+Greyscale	GIFView		 Відтінки сірого
 Colors:	GIFView		Кольори:
 GIF image translator	GIFTranslator		Транслятор GIFзображень
 Be Bitmap Format (GIFTranslator)	GIFTranslator		Формат Be Bitmap (Перетворювач GIF)
@@ -14,6 +14,6 @@ GIF images	GIFTranslator		Зображення GIF
 Version %d.%d.%d, %s	GIFView		Версія %d.%d.%d, %s
 Use RGB color	GIFView		Використовувати кольори RGB
 Use dithering	GIFView		Використовувати згладжування
-GIF Settings	GIFTranslator		Настройки GIF
+GIF Settings	GIFTranslator		Налаштування GIF
 BeOS system	GIFView		Система BeOS
 Automatic (from alpha channel)	GIFView		Автоматично (з альфа каналу)

@@ -2,7 +2,7 @@
 Version %d.%d.%d, %s	ConfigView		Версія %d.%d.%d, %s
 EXR image translator	EXRTranslator		Перетворювач зображень EXR
 Based on OpenEXR (http://www.openexr.com)	ConfigView		Базоване на OpenEXR (http://www.openexr.com)
-EXR Settings	main		Настройки EXR
+EXR Settings	main		Налаштування EXR
 EXR images	EXRTranslator		Зображення EXR
 a division of Lucasfilm Entertainment Company Ltd	ConfigView		відділення Lucasfilm Entertainment Company Ltd
 EXR image	EXRTranslator		Зображення EXR

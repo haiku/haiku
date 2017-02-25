@@ -1,6 +1,6 @@
 1	ukrainian	x-vnd.Haiku-desklink	3451447865
 Control physical output	MediaReplicant		Керувати фізичним виходом 
-Couldn't launch 	MediaReplicant		Не вдалося запустити
+Couldn't launch 	MediaReplicant		Не вдалося запустити 
 Muted	MediaReplicant		Приглушити
 OK	MediaReplicant		Гаразд
 Sound preferences…	MediaReplicant		Налаштування звуку…
@@ -8,7 +8,7 @@ Sound preferences…	MediaReplicant		Налаштування звуку…
 Open %name	DeskButton	Don't translate variable %name	Відкрити %name
 No media server running	VolumeControl		Не запущено медіа сервер
 Media preferences…	MediaReplicant		Налаштування медіа…
-Open MediaPlayer	MediaReplicant		Відкрити MediaPlayer
+Open MediaPlayer	MediaReplicant		Відкрити Медіапрогравач
 desklink	MediaReplicant		desklink
 Options	MediaReplicant		Опції
 %ld dB	VolumeControl		%ld dB

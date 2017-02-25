@@ -3,22 +3,22 @@ raw audio	MediaPlayer-InfoWin		raw аудіо
 Location	MediaPlayer-InfoWin		Шлях
 1.85 : 1 (American)	MediaPlayer-Main		1.85 : 1 (Амер.)
 %d kHz	MediaPlayer-InfoWin		%d кГц
-Stream settings	MediaPlayer-Main		Настройки потоку
+Stream settings	MediaPlayer-Main		Налаштування потоку
 <unknown>	PlaylistItem-album		<невідомий>
-Scale controls in full screen mode	MediaPlayer-SettingsWindow		Настройка маштабу в повноекранному режимі
+Scale controls in full screen mode	MediaPlayer-SettingsWindow		Налаштування маштабу в повноекранному режимі
 Video	MediaPlayer-InfoWin		Відео
 Subtitle size:	MediaPlayer-SettingsWindow		Розмір субтитрів:
 Save Playlist	MediaPlayer-PlaylistWindow		Зберегти список відтворення
 <no media>	MediaPlayer-InfoWin		<немає даних>
 (not supported)	MediaPlayer-InfoWin		(не підтримується)
 None of the files you wanted to play appear to be media files.	MediaPlayer-Main		Жоден з файлів, які ви хотіли відкрити не є медіа файлом.
-Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Збереження списку відтворення призупинено.\n\nПомилка:
+Saving the playlist failed.\n\nError: 	MediaPlayer-PlaylistWindow		Збереження списку відтворення призупинено.\n\nПомилка: 
 %.3f kHz	MediaPlayer-InfoWin		%.3f кГц
 New player…	MediaPlayer-Main		Новий програвач…
 100% scale	MediaPlayer-Main		Масштаб 100%
 Subtitle placement:	MediaPlayer-SettingsWindow		Розміщення субтитрів:
 Close	MediaPlayer-Main		Закрити
-Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Деякі файли не можуть бути переміщені в кошик.
+Some files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Деякі файли не можуть бути переміщені у Кошик.
 <unknown>	MediaPlayer-InfoWin		<невідомий>
 Seek	MediaPlayer-Main		Пошук
 Open	MediaPlayer-Main		Відкрити
@@ -53,26 +53,26 @@ Muted	MediaPlayer-SettingsWindow		Приглушений
 Quit	MediaPlayer-Main		Вийти
 Video	MediaPlayer-Main		Відео
 Start playing.	MediaPlayer-Main		Почати відтворення.
-There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Немає встановленого декодера щоб підтримував файл цього формату, або у декодера є проблема з спеціальною версією формату.
+There is no decoder installed to handle the file format, or the decoder has trouble with the specific version of the format.	MediaPlayer-Main		Не встановлено декодера для підтримки файла цього формату, або у декодера є проблема з спеціальною версією формату.
 Import Entry	MediaPlayer-ImportPLItemsCmd		Імпортувати запис
-Gets the URI of the currently playing item.	MediaPlayer-Main		Отримати URI файлу, що відтворюєтся в даний момент.
+Gets the URI of the currently playing item.	MediaPlayer-Main		Отримати URL файлу, що відтворюєтся в даний момент.
 400% scale	MediaPlayer-Main		Масштаб 400%
 Saving the playlist failed:\n\nError: 	MediaPlayer-PlaylistWindow		Збереження списку відтворення призупинено:\n\nПомилка:
 Move Entries	MediaPlayer-MovePLItemsCmd		Перемістити записи
 Audio	MediaPlayer-Main		Аудіо
 Open Playlist	MediaPlayer-PlaylistWindow		Відкрити список відтворення
-MediaPlayer	System name		MediaPlayer
+MediaPlayer	System name		Медіапрогравач
 OK	MediaPlayer-Main		Гаразд
 Settings…	MediaPlayer-Main		Налаштування…
-MediaPlayer settings	MediaPlayer-SettingsWindow		Налаштування MediaPlayer'a
+MediaPlayer settings	MediaPlayer-SettingsWindow		Налаштування Медіапрогравача
 h	MediaPlayer-InfoWin	Hours	г
 Select all	MediaPlayer-PlaylistWindow		Вибрати все
 Move Entry	MediaPlayer-MovePLItemsCmd		Перемістити запис
 Open	MediaPlayer-PlaylistWindow		Відкрити
 Stop playing.	MediaPlayer-Main		Зупинити відтворення.
 Seek by the specified amounts of microseconds.	MediaPlayer-Main		Пошук за визначеною кількістю мікросекунд.
-The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' не може бути відкритим.\n\n
-Error: 	MediaPlayer-RemovePLItemsCmd		Помилка:
+The file '%filename' could not be opened.\n\n	MediaPlayer-Main		Файл '%filename' неможливо відкрити.\n\n
+Error: 	MediaPlayer-RemovePLItemsCmd		Помилка: 
 Audio	MediaPlayer-InfoWin		Аудіо
 Move into trash error	MediaPlayer-RemovePLItemsCmd		Помилка переміщення до кошика
 Internal error (malformed message). Saving the playlist failed.	MediaPlayer-PlaylistWindow		Внутрішня помилка (неправильне повідомлення). Збереження списку відтворення призупинено.
@@ -100,7 +100,7 @@ Remove Entries	MediaPlayer-RemovePLItemsCmd		Видалити записи
 Video track	MediaPlayer-Main		Відео трек
 Loop video	MediaPlayer-SettingsWindow		Закільцювати відео
 Attributes	MediaPlayer-Main		Атрибути
-All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Не вдалося відправити всі файли до кошика.
+All files could not be moved into Trash.	MediaPlayer-RemovePLItemsCmd		Не вдалося відправити всі файли до Кошика.
 <untitled>	PlaylistItem-title		<безіменний>
 Track	Audio Track Menu		Трек
 unknown format	MediaPlayer-InfoWin		невідомий формат
@@ -108,12 +108,12 @@ Position	MediaPlayer-Main		Положення
 <nothing to redo>	MediaPlayer-PlaylistWindow		<нічого для відміни>
 Skip to the next track.	MediaPlayer-Main		Пропустити до наступного треку.
 Play	MediaPlayer-Main		Відтворити
-Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Видалити записи до кошика
-200% scale	MediaPlayer-Main		Масштаб 200% 
+Remove Entries into Trash	MediaPlayer-RemovePLItemsCmd		Видалити записи до Кошика
+200% scale	MediaPlayer-Main		Масштаб 200%
 It appears the media server is not running.\nWould you like to start it ?	MediaPlayer-Main		Схоже медіа сервер не працює.\nБажаєте запустити його?
 Duration	MediaPlayer-InfoWin		Тривалість
 Aspect ratio	MediaPlayer-Main		Співідношення сторін
-Error: 	MediaPlayer-Main		Помилка:
+Error: 	MediaPlayer-Main		Помилка: 
 Large	MediaPlayer-SettingsWindow		Великий
 Bottom of video	MediaPlayer-SettingsWindow		Нижня частина відео
 DrawBitmap	MediaPlayer-InfoWin		DrawBitmap
@@ -127,8 +127,8 @@ Hide interface	MediaPlayer-Main		Приховати інтерфейс
 Open clips	MediaPlayer-Main		Відкрити кліпи
 Copy Entry	MediaPlayer-CopyPLItemsCmd		Копіювати запис
 none	Subtitles menu		нічого
-Move file to Trash	MediaPlayer-PlaylistWindow		Перемістити до кошика
-URI	MediaPlayer-Main		URI
+Move file to Trash	MediaPlayer-PlaylistWindow		Перемістити до Кошика
+URI	MediaPlayer-Main		URL
 Invalid URL inserted!	MediaPlayer-NetworkStream		Помилка введення URL!
 OK	MediaPlayer-NetworkStream		Гаразд
 Mute	MediaPlayer-Main		Заглушити
@@ -144,8 +144,8 @@ Start media server	MediaPlayer-Main		Запустити Медіа сервер
 %.3f fps	MediaPlayer-InfoWin		%.3f fps
 Toggle fullscreen.	MediaPlayer-Main		Перемкнути у повноекранний режим.
 Gets the duration of the currently playing item in microseconds.	MediaPlayer-Main		Отримати тривалість фрагменту, що відтворюється в мілісекундах. 
-ToggleFullscreen	MediaPlayer-Main		Переключити у повноекранний режим
-Bad URL	MediaPlayer-NetworkStream		Поганий URL
+ToggleFullscreen	MediaPlayer-Main		Перемкнути у повноекранний режим
+Bad URL	MediaPlayer-NetworkStream		Невірний URL
 {0, plural, =1{Mono} =2{Stereo} other{# Channels}}	MediaPlayer-InfoWin		{0, plural, =1{Моно} =2{Стерео} other{# Канали}}
 <unnamed>	PlaylistItem-name		<неназваний>
 OK	MediaPlayer-PlaylistWindow		Гаразд
@@ -159,7 +159,7 @@ Save as…	MediaPlayer-PlaylistWindow		Зберегти як…
 Copy Entries	MediaPlayer-CopyPLItemsCmd		Копіювати записи
 Redo	MediaPlayer-PlaylistWindow		Переробити
 Always on top	MediaPlayer-Main		Завжди зверху
-Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис з кошика
+Remove Entry into Trash	MediaPlayer-RemovePLItemsCmd		Видалити запис до Кошика
 Save	MediaPlayer-Main		Зберегти
 <nothing to undo>	MediaPlayer-PlaylistWindow		<нічого до відміни>
 File info	MediaPlayer-InfoWin		Інформація про файл
@@ -174,4 +174,4 @@ Save error	MediaPlayer-PlaylistWindow		Помилка збереження
 Rating	MediaPlayer-Main		Рейтинг
 Playlist	MediaPlayer-PlaylistWindow		Список відтворення
 Lock Peaks	MediaPlayer-PeakView		Блокувати піки
-Low volume	MediaPlayer-SettingsWindow		Мала гучність
+Low volume	MediaPlayer-SettingsWindow		Низька гучність

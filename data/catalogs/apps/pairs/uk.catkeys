@@ -6,13 +6,13 @@ Beginner (4x4)	PairsWindow		Початківець (4x4)
 You completed the game in {0, plural, one{# click} other{# clicks}}.\n	PairsWindow		Ви завершили гру в {0, plural, one{# клік} other{# кліків}}.\n
 Quit game	PairsWindow		Завершити гру
 Large	PairsWindow		Великий
-Small	PairsWindow		Малий
+Small	PairsWindow		Мале
 Game	PairsWindow		Гра
 OK	Pairs		Гаразд
 Size	PairsWindow		Розмір
 New	PairsWindow		Нова
 Intermediate (6x6)	PairsWindow		Середняк (6x6)
 Quit	PairsWindow		Завершити
-Pairs	System name		Pairs
+Pairs	System name		Пари
 New game	PairsWindow		Нова гра
 Medium	PairsWindow		Середній

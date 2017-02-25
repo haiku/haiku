@@ -5,7 +5,7 @@ Export as…	SudokuWindow		Експортувати як…
 OK	SudokuWindow		Гаразд
 New	SudokuWindow		Новий
 Abort	ProgressWindow		Припинити
-Sudoku	System name		Sudoku
+Sudoku	System name		Судоку
 Could not open \"%s\":\n%s\n	SudokuWindow		Неможливо відкрити \"%s\":\n%s\n
 Easy	SudokuWindow		Простий
 Open file…	SudokuWindow		Відкрити файл…
@@ -16,7 +16,7 @@ File	SudokuWindow		Файл
 Advanced	SudokuWindow		Підвищений
 Start again	SudokuWindow		Розпочати знову
 HTML	SudokuWindow		HTML
-Sudoku request	SudokuWindow		Запит 
+Sudoku request	SudokuWindow		Запит Судоку
 Copy	SudokuWindow		Копіювати
 Mark valid hints	SudokuWindow		Позначати правильні підказки
 Sudoku solved - congratulations!\n	SudokuWindow		Вітаємо - Судоку розв'язане!\n

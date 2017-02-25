@@ -2,14 +2,14 @@
 no clip msg\n	In console, when clipboard is empty after clicking Copy image		немає кліпу msg\n
 Make square	Magnify-Main		Задати площу
 Copy image	Magnify-Main		Копіювати зображення
-usage: magnify [size] (magnify size * size pixels)\n	Console		використання: magnify [size] (magnify size * size pixels)\n  
+usage: magnify [size] (magnify size * size pixels)\n	Console		використання: Збільшувач [size] (magnify size * size pixels)\n  
 Freeze image	Magnify-Main		Зображення заморожено
 Stick coordinates	Magnify-Main		Вісь кординат
-%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		Вісь кординат
+%width x %height  @ {0, plural, one{# pixel/pixel} other{# pixels/pixel}}	Magnify-Main		%width x %height  @ {0, plural, one{# піксель/піксель}other{#пікселі/піксель}}
 Show info	Magnify-Main		Показати інформацію
-magnify: size must be a multiple of 4\n	Console		magnify: розмір має бути кратний 4-м\n 
-Decrease pixel size	Magnify-Main		Зменшити розмір пікселів
-Magnify	System name		Magnify
+magnify: size must be a multiple of 4\n	Console		збільшувач: розмір має бути кратним 4\n
+Decrease pixel size	Magnify-Main		Зменшити розмір пікселя
+Magnify	System name		Збільшувач
 Info	Magnify-Main		Інформація
 Remove a crosshair	Magnify-Main		Видалити перехрестя
 Show grid	Magnify-Main		Показати сітку

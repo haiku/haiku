@@ -1,4 +1,4 @@
-1	english	x-vnd.Haiku-libtracker	1564741333
+1	english	x-vnd.Haiku-libtracker	3168503700
 OK	WidgetAttributeText		确定
 Add-ons	FilePanelPriv		附加组件
 Mount settings…	ContainerWindow		挂载设置...
@@ -17,6 +17,7 @@ Permissions	InfoWindow		权限
 Recent documents	FavoritesMenu		最近文本
 Modified	QueryPoseView		修改
 Created	ContainerWindow		创建
+Move	FSUtils	button label	移动
 Error %error loading add-On %name.	ContainerWindow		载入附加组件 %name 出错：%error 。
 Skip all	FSUtils		跳过所有
 contains	SelectionWindow		包含
@@ -27,6 +28,7 @@ Name	OpenWithWindow		名称
 Could not open \"%document\" because application \"%app\" is in the Trash. 	FSUtils		无法打开\"%document\"，\"%app\" 程序处于垃圾箱中。
 File	ContainerWindow		文件
 Handles any %type	OpenWithWindow		处理所有 %type 类型
+Name	Person Query Columns		名称
 Delete	ContainerWindow		删除
 32 x 32	ContainerWindow		32 x 32
 Cannot unmount the boot volume \"%name\".	FSUtils		无法卸载引导卷 \"%name\"。
@@ -100,6 +102,7 @@ Show space bars on volumes	SettingsView		显示卷进度栏
 Invert selection	ContainerWindow		反向选择
 Increase size	DeskWindow		增大尺寸
 Resize to fit	ContainerWindow		合适大小
+At %func \nfind_directory() failed. \nReason: %error	Email Query Columns		在 %func \nfind_directory()失败。\n原因：%error
 Add printer…	ContainerWindow		添加打印机...
 New folder	ContainerWindow		新建文件夹
 Kind	ContainerWindow		种类
@@ -107,6 +110,7 @@ home	B_USER_DIRECTORY		主目录
 Select…	ContainerWindow		选择...
 Copy to	ContainerWindow		复制到
 Move to Trash	ContainerWindow		移动到垃圾箱
+Modified	Default Query Columns		修改
 Move to	ContainerWindow		移动到
 Create %s clipping	PoseView		创建 %s 片段
 Set new link target	InfoWindow		设置链接目标
@@ -217,6 +221,7 @@ Save query as template…	FindPanel		保存查询为模板…
 Show folder location in title tab	SettingsView		在标签标题显示目录位置
 Proceed	FSUtils		执行
 Some items already exist in this folder with the same names as the items you are %verb.\n \nWould you like to replace them with the ones you are %verb or be prompted for each one?	FSUtils		目录中已经存在与您将 %verb 的项目同名的内容。\n\n您希望将其替换为您正在 %verb 的项目并将其应用于所有内容吗？
+Rename	FSUtils	button label	重命名
 The mount server could not be contacted.	AutoMounterSettings		挂载服务失去联系。
 Error deleting items	FSUtils		删除项目错误
 Create relative link here	ContainerWindow		创建相对链接
@@ -244,6 +249,7 @@ Reverse order	ContainerWindow		倒序排列
 {0, plural, one{# item} other{# items}}	CountView	Number of selected items: \"1 item\" or \"2 items\"	{0, plural, one{# 项} other{# 项}}
 OK	OpenWithWindow		确定
 Add current folder	FilePanelPriv		添加当前目录
+Name	Default Query Columns		名称
 Could not open \"%document\" with application \"%app\" (Missing symbol: %symbol). \n	FSUtils		无法使用 \"%app\" 程序打开 \"%document\"（缺失符号： %symbol）。\n
 The target disk does not support creating links.	FSUtils		目标磁盘不支持创建链接。
 starts with	SelectionWindow		启动方式
@@ -331,6 +337,7 @@ Size:	InfoWindow		大小：
 Empty folder	SlowContextPopup		清空目录
 Open selection with:	OpenWithWindow		打开选中：
 Preparing to create links…	StatusWindow		准备创建链接...
+Size	Default Query Columns		大小
 Show navigator	SettingsView		显示导航
 Desktop	B_DESKTOP_DIRECTORY		桌面
 List folders first	SettingsView		首先列出目录
@@ -338,6 +345,7 @@ Name	SelectionWindow		名称
 Trash	Model		垃圾箱
 Favorites	FilePanelPriv		选择
 Name	QueryPoseView		名称
+OK	Email Query Columns		确定
 Delete	FSUtils		删除
 Modified	FindPanel		修改
 Error moving \"%name\" to Trash. (%error)	FSUtils		移动 \"%name\" 到垃圾箱出错。（%error）

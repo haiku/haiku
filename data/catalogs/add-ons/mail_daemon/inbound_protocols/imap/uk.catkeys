@@ -1,12 +1,12 @@
 1	ukrainian	x-vnd.Haiku-IMAP	354143849
-Destination:	imap_config		Типові:
+Destination:	imap_config		Призначення:
 Ok	IMAPFolderConfig		Гаразд
 status	IMAPFolderConfig		стан
-Configure IMAP Folders	imap_config		Зконфігурувати папки IMAP
+Configure IMAP Folders	imap_config		Зконфігурувати теки IMAP
 Cancel	IMAPFolderConfig		Скасувати
 Apply	IMAPFolderConfig		Застосувати
-Fetching IMAP folders, have patience...	IMAPFolderConfig		Отримання папок IMAP, зачекайте…
-Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Не6можливо під'єднатися до сервера \"%server%\":\n%error%
-IMAP Folders	IMAPFolderConfig		Папки IMAP
-Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Обновляються підписи до папок  IMAP, зачекайте...
+Fetching IMAP folders, have patience...	IMAPFolderConfig		Отримання тек IMAP, зачекайте…
+Could not connect to server \"%server%\":\n%error%	IMAPFolderConfig		Неможливо під'єднатися до сервера \"%server%\":\n%error%
+IMAP Folders	IMAPFolderConfig		Теки IMAP
+Update subcription of IMAP folders, have patience...	IMAPFolderConfig		Обновляються підписи до тек IMAP, зачекайте...
 Failed to fetch available storage.	IMAPFolderConfig		Призупинено отримання доступних масивів.

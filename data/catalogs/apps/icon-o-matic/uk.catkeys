@@ -3,7 +3,7 @@ Select All	Icon-O-Matic-PathManipulator		Вибрати все
 Add Style	Icon-O-Matic-AddStylesCmd		Додати cтиль
 Color (#%02x%02x%02x)	Style name after dropping a color		Колір (#%02x%02x%02x)
 Add	Icon-O-Matic-StylesList		Додати
-Move Shape	Icon-O-Matic-MoveShapesCommand		Перемістити Фігуру
+Move Shape	Icon-O-Matic-MoveShapesCommand		Перемістити фігуру
 Opening the document failed!	Icon-O-Matic-Main		Відкриття документу призупинено!
 Reset transformation	Icon-O-Matic-ShapesList		Скинути перетворення
 Move Paths	Icon-O-Matic-MovePathsCmd		Шляхи переміщення
@@ -142,7 +142,7 @@ Move Pivot	Icon-O-Matic-TransformationBoxStates		Перемістити стри
 Path	Icon-O-Matic-Menus		Шлях
 Freeze transformation	Icon-O-Matic-ShapesList		Заморозити перетворення
 File	Icon-O-Matic-Menus		Файл
-Error: 	Icon-O-Matic-Exporter		Помилка:
+Error: 	Icon-O-Matic-Exporter		Помилка: 
 Add Transformers	Icon-O-Matic-AddTransformersCmd		Додати перетворювачі
 Diamond	Icon-O-Matic-StyleTypes		Ромб
 Path	Icon-O-Matic-PropertyNames		Шлях
@@ -154,7 +154,7 @@ Add with style	Icon-O-Matic-ShapesList		Додати зі стилем
 Add	Icon-O-Matic-PathsList		Додати
 Add Shapes	Icon-O-Matic-AddShapesCmd		Додати фігури
 Move Style	Icon-O-Matic-MoveStylesCmd		Перемістити стиль
-Bummer	Cancel button - error alert		Помилка
+Bummer	Cancel button - error alert		облом
 Snap to grid	Icon-O-Matic-Menu-Settings		Прив'язати до сітки
 Remove	Icon-O-Matic-ShapesList		Видалити
 Yes	Icon-O-Matic-StyledTextImport		Так
@@ -177,7 +177,7 @@ Flip Control Point	Icon-O-Matic-FlipPointsCmd		Повернути контрол
 Redo	Icon-O-Matic-Main		Переробити
 Assign Paths	Icon-O-Matic-AddPathsCmd		Призначення шляхів
 OK	Icon-O-Matic-SVGImport		Гаразд
-Multi paste	Icon-O-Matic-Properties		Вставити кілька
+Multi paste	Icon-O-Matic-Properties		Мультивставка
 to attach transformers.	Empty transformers list - 2nd line		для прив'язки перетворювачів.
 Reset Transformation	Icon-O-Matic-ResetTransformationCmd		Скинути перетворення
 Reverse Path	Icon-O-Matic-ReversePathCmd		Повернути шлях
@@ -187,7 +187,7 @@ Save	Icon-O-Matic-Menu-File		Зберегти
 Append…	Icon-O-Matic-Menu-File		Додати…
 Move Path	Icon-O-Matic-MovePathsCmd		Перемістити шлях
 Overwrite	Icon-O-Matic-SVGExport		Перезаписати
-Text too long	Icon-O-Matic-StyledTextImport		Текст надзвичайно довгий 
+Text too long	Icon-O-Matic-StyledTextImport		Текст надзвичайно довгий
 Freeze Shapes	Icon-O-Matic-FreezeTransformationCmd		Заморозити фігури
 Split Control Point	Icon-O-Matic-SplitPointsCmd		Розділити контрольну точку
 Open…	Icon-O-Matic-Menu-File		Відкрити…

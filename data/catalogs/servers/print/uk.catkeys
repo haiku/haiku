@@ -1,4 +1,4 @@
-1	ukrainian	x-vnd.Be-PSRV	2930356711
+1	ukrainian	x-vnd.Be-PSRV	1222926379
 Undefined	ConfigWindow		Невизначений
 Return the number of available transports	PrintServerApp Scripting		Повернути число доступних транспортів
 Return the number of available printers	PrintServerApp Scripting		Повернути число доступних принтерів
@@ -17,6 +17,7 @@ A printer with that name already exists, but its driver could not be found! Repl
 Yes	PrintServerApp		Так
 Ledger	ConfigWindow	ANSI B (ledger), a North American paper size	Ледгер
 Would you like to set one up now?	PrintServerApp		Бажаєте встановити його зараз?
+Print job setup:	ConfigWindow		Налаштування завдань для друку
 A6	ConfigWindow	ISO 216 paper size	A6
 Portrait	ConfigWindow		Портрет
 All pages	ConfigWindow		Всі сторінки

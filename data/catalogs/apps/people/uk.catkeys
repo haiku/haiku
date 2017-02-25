@@ -3,16 +3,16 @@ Edit	People		Редагувати
 Error	People		Помилка
 City	People		Місто
 The file '%name%' could not be written.	People		Файл '%name%' не може бути записаний.
-none	Groups list		нічого
+none	Groups list		жодного
 Configure attributes	People		Встановити атрибути
 Company	People		Компанія
 %name% picture	People		%name% малюнок
 Work phone	People		Робочий телефон
-People	System name		People
-New person	People		Нова особа
+People	System name		Персони
+New person	People		Нова персона
 Select all	People		Вибрати всіх
 File	People		Файл
-Unnamed person	People		Безіменна особа
+Unnamed person	People		Безіменна персона
 Could not create %s.	People		Не вдалося створити %s.
 Country	People		Країна
 Close	People		Закрити
@@ -23,11 +23,11 @@ Name	People		Ім'я
 Revert	People		Повернути
 Don't save	People		Не зберігати
 Undo	People		Cкасувати
-E-mail	People		E-mail
+E-mail	People		Пошта
 Load image…	People		Завантажити зображення…
 OK	People		Гаразд
 Remove image	People		Видалити зображення
-Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Підключення префлету FileTypes призупинене.\n\nПомилка:
+Launching the FileTypes preflet to configure Person attributes has failed.\n\nError: 	People		Підключення префлету FileTypes для вибору атрибутів Person призупинене.\n\nПомилка: 
 Home phone	People		Домашній телефон
 Save as…	People		Зберегти як…
 Redo	People		Переробити
@@ -35,13 +35,13 @@ Save changes before closing?	People		Зберегти зміни перед за
 Paste	People		Вставити
 Drop an image here,\nor use the contextual menu.	People		Перемістіть зображення сюди,\nабо використайте контекстне меню.
 Save	People		Зберегти
-Person	Short mimetype description		Особа
-New person…	People		Нова особа
+Person	Short mimetype description		Person
+New person…	People		Нова персона
 Address	People		Адреса
 URL	People		URL
 Sorry	People		Вибачте
 Zip	People		Індекс
-Contact information for a person.	Long mimetype description		Контактна інформація особи
+Contact information for a person.	Long mimetype description		Контактна інформація персони
 Fax	People		Факс
 Contact name	People		Контактне ім'я
 Cut	People		Вирізати

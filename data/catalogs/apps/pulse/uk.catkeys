@@ -1,7 +1,7 @@
 1	ukrainian	x-vnd.Haiku-Pulse	2324471783
 OK	PrefsWindow		Гаразд
 Quit	DeskbarPulseView		Вийти
-Mini mode	DeskbarPulseView		Вийти
+Mini mode	DeskbarPulseView		Режим міні
 Remove replicant	CPUButton		Видалити реплікант
 Active color	ConfigView		Колір активності
 Usage: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n	PulseApp		Використання: Pulse [--mini] [-w width] [--width=width]\n\t[--deskbar] [--normal] [--framecolor 0xrrggbb]\n\t[--activecolor 0xrrggbb] [--idlecolor 0xrrggbb]\n
@@ -11,15 +11,15 @@ OK	DeskbarPulseView		Гаразд
 Deskbar mode	PrefsWindow		Deskbar режим
 %.2f GHz	NormalPulseView		%.2f GHz
 Normal mode	PrefsWindow		Норм. режим
-Defaults	PrefsWindow		По замовчуванню
-Normal mode	MiniPulseView		Режим Normal
+Defaults	PrefsWindow		Типово
+Normal mode	MiniPulseView		Режим нормальний
 Error	PulseApp		Помилка
 Info	PulseView		Дані
 Deskbar	CPUButton		Deskbar
 Frame color	ConfigView		Колір рамки
-Mini mode	PrefsWindow		Режим Mini
+Mini mode	PrefsWindow		Режим міні
 OK	PulseApp		Гаразд
-Bar colors	ConfigView		Кольори основи
+Bar colors	ConfigView		Кольори смуги
 Settings…	PulseView		Налаштування…
 You can't disable the last active CPU.	PulseView		Неможливо усунути останній активний процесор.
 Info	PulseApp		Дані
@@ -27,20 +27,20 @@ Info	CPUButton		Інформація
 OK	PulseView		Гаразд
 Deskbar menu	CPUButton		Меню Deskbar'a
 About Pulse…	PulseView		Про Pulse…
-Deskbar mode	MiniPulseView		Режим у Deskbar'i 
+Deskbar mode	MiniPulseView		Deskbar режим 
 Quit	MiniPulseView		Вийти
 Pulse	System name		Pulse
 Pulse	NormalPulseView		Pulse
 %ld MHz	NormalPulseView		%ld MHz
-Deskbar mode	NormalPulseView		Режим у Deskbar'I 
+Deskbar mode	NormalPulseView		Deskbar режим 
 Pulse	PulseApp		Pulse
 Width of icon:	ConfigView		Ширина іконки:
 You can't disable the last active CPU.	CPUButton		Неможливо усунути останній активний процесор.
-Normal mode	DeskbarPulseView		Режим Normal
+Normal mode	DeskbarPulseView		Режим нормальний
 OK	CPUButton		Гаразд
 About Pulse…	CPUButton		Про Pulse…
 Removing from Deskbar failed.\n%s	DeskbarPulseView		Видалення з Deskbar призупинене.\n%s
-Mini mode	NormalPulseView		Режим Mini
+Mini mode	NormalPulseView		Режим міні
 Info	DeskbarPulseView		Інформація
 Pulse settings	PulseWindow		Налаштування Pulse
 Idle color	ConfigView		Колір вільного
