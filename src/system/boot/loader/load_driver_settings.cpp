@@ -37,8 +37,10 @@ load_driver_settings_file(Directory* directory, const char* name)
 	if (buffer == NULL)
 		return B_NO_MEMORY;
 
-	if (read(fd, buffer, stat.st_size) != stat.st_size)
+	if (read(fd, buffer, stat.st_size) != stat.st_size) {
+		kernel_args_free(buffer);
 		return B_IO_ERROR;
+	}
 
 	driver_settings_file* file = (driver_settings_file*)kernel_args_malloc(
 		sizeof(driver_settings_file));
