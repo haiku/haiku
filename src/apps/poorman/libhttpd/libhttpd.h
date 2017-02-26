@@ -145,7 +145,7 @@ typedef struct {
     int should_linger;
     struct stat sb;
     int conn_fd;
-    char* file_address;
+    int processed_directory_index;
     } httpd_conn;
 
 /* Methods. */

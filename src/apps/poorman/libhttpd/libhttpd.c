@@ -1767,7 +1767,7 @@ httpd_get_conn( httpd_server* hs, int listen_fd, httpd_conn* hc )
     hc->last_byte_index = -1;
     hc->keep_alive = 0;
     hc->should_linger = 0;
-    hc->file_address = (char*) 0;
+    hc->processed_directory_index = 0;
     return GC_OK;
     }
 
@@ -2459,11 +2459,6 @@ httpd_close_conn( httpd_conn* hc, struct timeval* nowP )
     {
     make_log_entry( hc, nowP );
 
-    if ( hc->file_address != (char*) 0 )
-	{
-	//mmc_unmap( hc->file_address, &(hc->sb), nowP );
-	hc->file_address = (char*) 0;
-	}
     if ( hc->conn_fd >= 0 )
 	{
 	(void) close( hc->conn_fd );
@@ -2713,6 +2708,7 @@ ls( httpd_conn* hc )
 	send_mime(
 	    hc, 200, ok200title, "", "", "text/html; charset=%s", (off_t) -1,
 	    hc->sb.st_mtime );
+	httpd_write_response( hc );
 	free(de);
 	}
     else if ( hc->method == METHOD_GET )
@@ -2948,6 +2944,7 @@ ls( httpd_conn* hc )
 	free(de);
 	return -1;
 	}
+	hc->processed_directory_index = 1;
 	return 0;
     }
 
@@ -3265,7 +3262,6 @@ if(hc->hs->do_list_dir){
 	}
     else
 	{
-	hc->file_address = (char*)1;
 	send_mime(
 	    hc, 200, ok200title, hc->encodings, "", hc->type, hc->sb.st_size,
 	    hc->sb.st_mtime );

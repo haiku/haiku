@@ -317,11 +317,12 @@ int32 PoorManServer::_Worker(void* data)
 	/*true means the connection is already handled
 	 *by the directory index generator in httpd_start_request().
 	 */
-	if (hc->file_address == (char*) 0) {
-		static_cast<PoorManApplication*>(be_app)->GetPoorManWindow()->SetHits(
-			static_cast<PoorManApplication*>(be_app)->GetPoorManWindow()->GetHits() + 1
-		);
-		hc->conn_fd = -1;
+	if (hc->processed_directory_index == 1) {
+		if (hc->method == METHOD_GET) {
+			static_cast<PoorManApplication*>(be_app)->GetPoorManWindow()->SetHits(
+				static_cast<PoorManApplication*>(be_app)->GetPoorManWindow()->GetHits() + 1
+			);
+		}
 		goto cleanup;
 	}
 	
