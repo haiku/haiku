@@ -252,6 +252,7 @@ RemotePackageRepository HaikuPorts
 	docutils-0.12-1
 	documentviewer-0.3_git-10
 	dos2unix-7.3.2-1
+	dosbox-0.74-4
 	dovecot-2.2.24-1
 	doxygen-1.8.12-1
 	dtc-1.4.1-1
@@ -612,8 +613,8 @@ RemotePackageRepository HaikuPorts
 	libpaper_devel-1.1.24-1
 	libparserutils-0.2.3-1
 	libparserutils_devel-0.2.3-1
-	libpcap-1.8.1-1
-	libpcap_devel-1.8.1-1
+	libpcap-1.8.1-2
+	libpcap_devel-1.8.1-2
 	libpcre0-8.21-7
 	libpcre-8.39-2
 	libpcre_devel-8.39-2
@@ -830,8 +831,8 @@ RemotePackageRepository HaikuPorts
 	p7zip-9.20.1-6
 	padblocker-1.0-1
 	paladin-1.4~git-2
-	pango-1.40.2-1
-	pango_devel-1.40.2-1
+	pango-1.40.3-1
+	pango_devel-1.40.3-1
 	pari-2.7.6-2
 	pari_devel-2.7.6-2
 	patch-2.7.5-1
@@ -950,8 +951,10 @@ RemotePackageRepository HaikuPorts
 	sdl_image_devel-1.2.12-6
 	sdl_mixer-1.2.12-6
 	sdl_mixer_devel-1.2.12-6
-	sdl_net-1.2.8-5
-	sdl_net_devel-1.2.8-5
+	sdl_net-1.2.8-6
+	sdl_net_devel-1.2.8-6
+	sdl_sound-1.0.3-7
+	sdl_sound_devel-1.0.3-7
 	sdl_ttf-2.0.11-4
 	sdl_ttf_devel-2.0.11-4
 	sed-4.2.1-6
@@ -1184,6 +1187,7 @@ RemotePackageRepository HaikuPorts
 	documentviewer
 	docutils
 	dos2unix
+	dosbox
 	dovecot
 	doxygen
 	dtc
@@ -1607,6 +1611,7 @@ RemotePackageRepository HaikuPorts
 	sdl_image
 	sdl_mixer
 	sdl_net
+	sdl_sound
 	sdl_ttf
 	sed
 	serf
