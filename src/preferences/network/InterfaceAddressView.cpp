@@ -344,5 +344,6 @@ InterfaceAddressView::_SetAddress(BNetworkAddress& address, const char* text)
 	if (string.IsEmpty())
 		return;
 
-	address.SetTo(string.String());
+	address.SetTo(string.String(), static_cast<uint16>(0),
+		B_NO_ADDRESS_RESOLUTION);
 }
