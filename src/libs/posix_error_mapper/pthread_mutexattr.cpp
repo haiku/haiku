@@ -15,28 +15,28 @@ WRAPPER_FUNCTION(int, pthread_mutexattr_destroy,
 
 
 WRAPPER_FUNCTION(int, pthread_mutexattr_getprioceiling,
-		(pthread_mutexattr_t *mutexAttr, int *_priorityCeiling),
+		(const pthread_mutexattr_t *mutexAttr, int *_priorityCeiling),
 	return B_TO_POSITIVE_ERROR(sReal_pthread_mutexattr_getprioceiling(mutexAttr,
 		_priorityCeiling));
 )
 
 
 WRAPPER_FUNCTION(int, pthread_mutexattr_getprotocol,
-		(pthread_mutexattr_t *mutexAttr, int *_protocol),
+		(const pthread_mutexattr_t *mutexAttr, int *_protocol),
 	return B_TO_POSITIVE_ERROR(sReal_pthread_mutexattr_getprotocol(mutexAttr,
 		_protocol));
 )
 
 
 WRAPPER_FUNCTION(int, pthread_mutexattr_getpshared,
-		(pthread_mutexattr_t *mutexAttr, int *_processShared),
+		(const pthread_mutexattr_t *mutexAttr, int *_processShared),
 	return B_TO_POSITIVE_ERROR(sReal_pthread_mutexattr_getpshared(mutexAttr,
 		_processShared));
 )
 
 
 WRAPPER_FUNCTION(int, pthread_mutexattr_gettype,
-		(pthread_mutexattr_t *mutexAttr, int *_type),
+		(const pthread_mutexattr_t *mutexAttr, int *_type),
 	return B_TO_POSITIVE_ERROR(sReal_pthread_mutexattr_gettype(mutexAttr,
 		_type));
 )

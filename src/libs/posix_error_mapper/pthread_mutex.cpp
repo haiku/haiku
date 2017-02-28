@@ -14,7 +14,7 @@ WRAPPER_FUNCTION(int, pthread_mutex_destroy, (pthread_mutex_t *mutex),
 
 
 WRAPPER_FUNCTION(int, pthread_mutex_getprioceiling,
-		(pthread_mutex_t *mutex, int *_priorityCeiling),
+		(const pthread_mutex_t *mutex, int *_priorityCeiling),
 	return B_TO_POSITIVE_ERROR(sReal_pthread_mutex_getprioceiling(mutex,
 		_priorityCeiling));
 )
